@@ -31,7 +31,7 @@ IN: project-euler.042
 
 : source-042 ( -- seq )
     "extra/project-euler/042/words.txt" resource-path
-    ascii file-contents [ quotable? ] subset "," split ;
+    ascii file-contents [ quotable? ] filter "," split ;
 
 : (triangle-upto) ( limit n -- )
     2dup nth-triangle > [

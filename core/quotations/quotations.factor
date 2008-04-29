@@ -50,14 +50,14 @@ M: curry nth
 INSTANCE: curry immutable-sequence
 
 M: compose length
-    dup compose-first length
-    swap compose-second length + ;
+    [ compose-first length ]
+    [ compose-second length ] bi + ;
 
 M: compose nth
     2dup compose-first length < [
         compose-first
     ] [
-        [ compose-first length - ] keep compose-second
+        [ compose-first length - ] [ compose-second ] bi
     ] if nth ;
 
 INSTANCE: compose immutable-sequence

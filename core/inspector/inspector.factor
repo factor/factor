@@ -96,7 +96,7 @@ SYMBOL: +editable+
 
 : namestack. ( seq -- )
     [
-        [ global eq? not ] subset
+        [ global eq? not ] filter
         [ keys ] map concat prune
     ] keep [ dupd assoc-stack ] curry H{ } map>assoc describe ;
 

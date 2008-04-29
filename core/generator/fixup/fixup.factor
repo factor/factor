@@ -3,7 +3,7 @@
 USING: arrays generic assocs hashtables
 kernel kernel.private math namespaces sequences words
 quotations strings alien.strings layouts system combinators
-math.bitfields words.private cpu.architecture ;
+math.bitfields words.private cpu.architecture math.order ;
 IN: generator.fixup
 
 : no-stack-frame -1 ; inline

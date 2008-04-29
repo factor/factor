@@ -300,7 +300,7 @@ SYMBOL: node-stack
     dup in-d>> first node-class ;
 
 : active-children ( node -- seq )
-    children>> [ last-node ] map [ #terminate? not ] subset ;
+    children>> [ last-node ] map [ #terminate? not ] filter ;
 
 DEFER: #tail?
 

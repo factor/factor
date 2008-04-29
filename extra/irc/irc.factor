@@ -9,7 +9,7 @@ IN: irc
 ! utils
 : split-at-first ( seq separators -- before after )
     dupd '[ , member? ] find
-        [ cut 1 tail ]
+        [ cut rest ]
         [ swap ]
     if ;
 
@@ -101,7 +101,7 @@ SYMBOL: irc-client
 : irc-client> ( -- irc-client ) irc-client get ;
 : irc-stream> ( -- stream ) irc-client> stream>> ;
 
-: remove-heading-: ( seq -- seq ) dup ":" head? [ 1 tail ] when ;
+: remove-heading-: ( seq -- seq ) dup ":" head? [ rest ] when ;
 
 : parse-name ( string -- string )
     remove-heading-: "!" split-at-first drop ;

@@ -3,7 +3,7 @@
 USING: arrays assocs classes db kernel namespaces
 classes.tuple words sequences slots math accessors
 math.parser io prettyprint db.types continuations
-mirrors sequences.lib tools.walker combinators.lib ;
+mirrors sequences.lib combinators.lib ;
 IN: db.tuples
 
 : define-persistent ( class table columns -- )
@@ -37,15 +37,10 @@ SYMBOL: sql-counter
 HOOK: create-sql-statement db ( class -- obj )
 HOOK: drop-sql-statement db ( class -- obj )
 
-HOOK: <insert-native-statement> db ( class -- obj )
-HOOK: <insert-nonnative-statement> db ( class -- obj )
-
+HOOK: <insert-db-assigned-statement> db ( class -- obj )
+HOOK: <insert-user-assigned-statement> db ( class -- obj )
 HOOK: <update-tuple-statement> db ( class -- obj )
-HOOK: <update-tuples-statement> db ( class -- obj )
-
-HOOK: <delete-tuple-statement> db ( class -- obj )
-HOOK: <delete-tuples-statement> db ( class -- obj )
-
+HOOK: <delete-tuple-statement> db ( tuple class -- obj )
 HOOK: <select-by-slots-statement> db ( tuple class -- tuple )
 
 HOOK: insert-tuple* db ( tuple statement -- )
@@ -65,7 +60,7 @@ SINGLETON: retryable
     [ bind-params>> ] [ in-params>> ] bi
     [
         dup generator-bind? [
-            singleton>> eval-generator >>value
+            generator-singleton>> eval-generator >>value
         ] [
             drop
         ] if
@@ -105,7 +100,7 @@ M: retryable execute-statement* ( statement type -- )
         [ with-disposal ] curry each
     ] [
         with-disposal
-    ] if ;
+    ] if ; inline
 
 : create-table ( class -- )
     create-sql-statement [ execute-statement ] with-disposals ;
@@ -113,25 +108,28 @@ M: retryable execute-statement* ( statement type -- )
 : drop-table ( class -- )
     drop-sql-statement [ execute-statement ] with-disposals ;
 
-: ensure-table ( class -- )
+: recreate-table ( class -- )
     [
         drop-sql-statement make-nonthrowable
         [ execute-statement ] with-disposals
     ] [ create-table ] bi ;
 
-: insert-native ( tuple -- )
+: ensure-table ( class -- )
+    [ create-table ] curry ignore-errors ;
+
+: insert-db-assigned-statement ( tuple -- )
     dup class
-    db get db-insert-statements [ <insert-native-statement> ] cache
+    db get db-insert-statements [ <insert-db-assigned-statement> ] cache
     [ bind-tuple ] 2keep insert-tuple* ;
 
-: insert-nonnative ( tuple -- )
+: insert-user-assigned-statement ( tuple -- )
     dup class
-    db get db-insert-statements [ <insert-nonnative-statement> ] cache
+    db get db-insert-statements [ <insert-user-assigned-statement> ] cache
     [ bind-tuple ] keep execute-statement ;
 
 : insert-tuple ( tuple -- )
-    dup class db-columns find-primary-key nonnative-id?
-    [ insert-nonnative ] [ insert-native ] if ;
+    dup class db-columns find-primary-key db-assigned-id-spec?
+    [ insert-db-assigned-statement ] [ insert-user-assigned-statement ] if ;
 
 : update-tuple ( tuple -- )
     dup class
@@ -139,9 +137,9 @@ M: retryable execute-statement* ( statement type -- )
     [ bind-tuple ] keep execute-statement ;
 
 : delete-tuple ( tuple -- )
-    dup class
-    db get db-delete-statements [ <delete-tuple-statement> ] cache
-    [ bind-tuple ] keep execute-statement ;
+    dup dup class <delete-tuple-statement> [
+        [ bind-tuple ] keep execute-statement
+    ] with-disposal ;
 
 : select-tuples ( tuple -- tuples )
     dup dup class <select-by-slots-statement> [

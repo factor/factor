@@ -1,6 +1,7 @@
 ! Copyright (c) 2007, 2008 Slava Pestov, Doug Coleman, Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs kernel math math.ranges mirrors namespaces sequences sorting ;
+USING: assocs kernel math math.order math.ranges mirrors
+namespaces sequences sorting ;
 IN: math.combinatorics
 
 <PRIVATE

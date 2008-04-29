@@ -1,4 +1,4 @@
-USING: kernel layouts math namespaces sequences
+USING: kernel layouts math math.order namespaces sequences
 sequences.private accessors ;
 IN: math.ranges
 

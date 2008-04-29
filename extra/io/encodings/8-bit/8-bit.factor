@@ -39,7 +39,7 @@ IN: io.encodings.8-bit
 
 : process-contents ( lines -- assoc )
     [ "#" split1 drop ] map
-    [ empty? not ] subset
+    [ empty? not ] filter
     [ "\t" split 2 head [ 2 tail-if hex> ] map ] map ;
 
 : byte>ch ( assoc -- array )

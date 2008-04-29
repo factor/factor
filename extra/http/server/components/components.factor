@@ -280,6 +280,22 @@ TUPLE: date < string ;
 M: date component-string
     drop timestamp>string ;
 
+! Link components
+
+GENERIC: link-title ( obj -- string )
+GENERIC: link-href ( obj -- url )
+
+SINGLETON: link-renderer
+
+M: link-renderer render-view*
+    drop <a dup link-href =href a> link-title write </a> ;
+
+TUPLE: link < string ;
+
+: <link> ( id -- component )
+    link new-string
+        link-renderer >>renderer ;
+
 ! List components
 SYMBOL: +plain+
 SYMBOL: +ordered+
@@ -289,17 +305,20 @@ TUPLE: list-renderer component type ;
 
 C: <list-renderer> list-renderer
 
-: render-plain-list ( seq quot component -- )
-    swap '[ , @ ] each ; inline
+: render-plain-list ( seq component quot -- )
+    '[ , component>> renderer>> @ ] each ; inline
+
+: render-li-list ( seq component quot -- )
+    '[ <li> @ </li> ] render-plain-list ; inline
 
 : render-ordered-list ( seq quot component -- )
-    swap <ol> '[ <li> , @ </li> ] each </ol> ; inline
+    <ol> render-li-list </ol> ; inline
 
 : render-unordered-list ( seq quot component -- )
-    swap <ul> '[ <li> , @ </li> ] each </ul> ; inline
+    <ul> render-li-list </ul> ; inline
 
 : render-list ( value renderer quot -- )
-    swap [ component>> ] [ type>> ] bi {
+    over type>> {
         { +plain+     [ render-plain-list ] }
         { +ordered+   [ render-ordered-list ] }
         { +unordered+ [ render-unordered-list ] }
@@ -317,3 +336,26 @@ TUPLE: list < component ;
     <list-renderer> list swap new-component ;
 
 M: list component-string drop ;
+
+! Choice
+TUPLE: choice-renderer choices ;
+
+C: <choice-renderer> choice-renderer
+
+M: choice-renderer render-view*
+    drop write ;
+
+M: choice-renderer render-edit*
+    <select swap =name select>
+        choices>> [
+            <option [ = [ "true" =selected ] when ] keep option>
+                write
+            </option>
+        ] with each
+    </select> ;
+
+TUPLE: choice < string ;
+
+: <choice> ( id choices -- component )
+    swap choice new-string
+        swap <choice-renderer> >>renderer ;

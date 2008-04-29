@@ -131,7 +131,7 @@ M: email clone
         "-" %
         millis #
         "@" %
-        smtp-domain get %
+        smtp-domain get [ host-name ] unless* %
         ">" %
     ] "" make ;
 

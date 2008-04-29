@@ -6,9 +6,9 @@ tuple-syntax namespaces ;
 [ "/" "localhost" 8888 ] [ "http://localhost:8888" parse-url ] unit-test
 
 [ "foo.txt" ] [ "http://www.paulgraham.com/foo.txt" download-name ] unit-test
-[ "foo.txt" ] [ "http://www.arcsucks.com/foo.txt?xxx" download-name ] unit-test
-[ "foo.txt" ] [ "http://www.arcsucks.com/foo.txt/" download-name ] unit-test
-[ "www.arcsucks.com" ] [ "http://www.arcsucks.com////" download-name ] unit-test
+[ "foo.txt" ] [ "http://www.arc.com/foo.txt?xxx" download-name ] unit-test
+[ "foo.txt" ] [ "http://www.arc.com/foo.txt/" download-name ] unit-test
+[ "www.arc.com" ] [ "http://www.arc.com////" download-name ] unit-test
 
 [
     TUPLE{ request
@@ -18,7 +18,7 @@ tuple-syntax namespaces ;
         port: 80
         version: "1.1"
         cookies: V{ }
-        header: H{ }
+        header: H{ { "connection" "close" } }
     }
 ] [
     [

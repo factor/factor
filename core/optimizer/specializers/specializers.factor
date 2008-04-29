@@ -12,7 +12,7 @@ IN: optimizer.specializers
 : make-specializer ( classes -- quot )
     dup length <reversed>
     [ (picker) 2array ] 2map
-    [ drop object eq? not ] assoc-subset
+    [ drop object eq? not ] assoc-filter
     dup empty? [ drop [ t ] ] [
         [ (make-specializer) ] { } assoc>map
         unclip [ swap [ f ] \ if 3array append [ ] like ] reduce

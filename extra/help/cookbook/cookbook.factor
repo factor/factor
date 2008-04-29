@@ -111,7 +111,7 @@ $nl
 "You can create a new array, only containing elements which satisfy some condition:"
 { $example
     ": negative? ( n -- ? ) 0 < ;"
-    "{ -12 10 16 0 -1 -3 -9 } [ negative? ] subset ."
+    "{ -12 10 16 0 -1 -3 -9 } [ negative? ] filter ."
     "{ -12 -1 -3 -9 }"
 }
 { $references

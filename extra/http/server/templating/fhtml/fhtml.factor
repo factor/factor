@@ -76,7 +76,7 @@ TUPLE: fhtml path ;
 
 C: <fhtml> fhtml
 
-M: fhtml call-template ( filename -- )
+M: fhtml call-template* ( filename -- )
     '[
         , path>> [
             "quiet" on

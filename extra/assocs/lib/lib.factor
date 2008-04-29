@@ -38,7 +38,7 @@ IN: assocs.lib
 : insert ( value variable -- ) namespace insert-at ;
 
 : generate-key ( assoc -- str )
-    >r 256 random-bits >hex r>
+    >r 32 random-bits >hex r>
     2dup key? [ nip generate-key ] [ drop ] if ;
 
 : set-at-unique ( value assoc -- key )

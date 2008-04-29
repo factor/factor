@@ -3,7 +3,7 @@ bit-vectors.private combinators ;
 IN: bit-vectors
 
 ARTICLE: "bit-vectors" "Bit vectors"
-"A bit vector is a resizable mutable sequence of bits. The literal syntax is covered in " { $link "syntax-bit-vectors" } ". Bit vector words are found in the " { $vocab-link "bit-vectors" } " vocabulary."
+"A bit vector is a resizable mutable sequence of bits. Bit vector words are found in the " { $vocab-link "bit-vectors" } " vocabulary."
 $nl
 "Bit vectors form a class:"
 { $subsection bit-vector }
@@ -19,7 +19,7 @@ $nl
 ABOUT: "bit-vectors"
 
 HELP: bit-vector
-{ $description "The class of resizable bit vectors. See " { $link "syntax-bit-vectors" } " for syntax and " { $link "bit-vectors" } " for general information." } ;
+{ $description "The class of resizable bit vectors. See " { $link "bit-vectors" } " for information." } ;
 
 HELP: <bit-vector>
 { $values { "n" "a positive integer specifying initial capacity" } { "bit-vector" bit-vector } }

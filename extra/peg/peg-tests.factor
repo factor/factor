@@ -1,7 +1,8 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test strings namespaces arrays sequences peg peg.private accessors words math ;
+USING: kernel tools.test strings namespaces arrays sequences 
+       peg peg.private accessors words math accessors ;
 IN: peg.tests
 
 { f } [
@@ -10,7 +11,7 @@ IN: peg.tests
 
 { "begin" "end" } [
   "beginend" "begin" token parse 
-  { parse-result-ast parse-result-remaining } get-slots
+  { ast>> remaining>> } get-slots
   >string
 ] unit-test
 
@@ -23,11 +24,11 @@ IN: peg.tests
 ] unit-test
 
 { CHAR: a } [
-  "abcd" CHAR: a CHAR: z range parse parse-result-ast
+  "abcd" CHAR: a CHAR: z range parse ast>>
 ] unit-test
 
 { CHAR: z } [
-  "zbcd" CHAR: a CHAR: z range parse parse-result-ast
+  "zbcd" CHAR: a CHAR: z range parse ast>>
 ] unit-test
 
 { f } [
@@ -35,15 +36,15 @@ IN: peg.tests
 ] unit-test
 
 { V{ "g" "o" } } [
-  "good" "g" token "o" token 2array seq parse parse-result-ast
+  "good" "g" token "o" token 2array seq parse ast>>
 ] unit-test
 
 { "a" } [
-  "abcd" "a" token "b" token 2array choice parse parse-result-ast
+  "abcd" "a" token "b" token 2array choice parse ast>>
 ] unit-test
 
 { "b" } [
-  "bbcd" "a" token "b" token 2array choice parse parse-result-ast
+  "bbcd" "a" token "b" token 2array choice parse ast>>
 ] unit-test
 
 { f } [
@@ -55,15 +56,15 @@ IN: peg.tests
 ] unit-test
 
 { 0 } [
-  "" "a" token repeat0 parse parse-result-ast length
+  "" "a" token repeat0 parse ast>> length
 ] unit-test
 
 { 0 } [
-  "b" "a" token repeat0 parse parse-result-ast length
+  "b" "a" token repeat0 parse ast>> length
 ] unit-test
 
 { V{ "a" "a" "a" } } [
-  "aaab" "a" token repeat0 parse parse-result-ast 
+  "aaab" "a" token repeat0 parse ast>> 
 ] unit-test
 
 { f } [
@@ -75,15 +76,15 @@ IN: peg.tests
 ] unit-test
 
 { V{ "a" "a" "a" } } [
-  "aaab" "a" token repeat1 parse parse-result-ast
+  "aaab" "a" token repeat1 parse ast>>
 ] unit-test
 
 { V{ "a" "b" } } [ 
-  "ab" "a" token optional "b" token 2array seq parse parse-result-ast 
+  "ab" "a" token optional "b" token 2array seq parse ast>> 
 ] unit-test
 
 { V{ f "b" } } [ 
-  "b" "a" token optional "b" token 2array seq parse parse-result-ast 
+  "b" "a" token optional "b" token 2array seq parse ast>> 
 ] unit-test
 
 { f } [ 
@@ -91,7 +92,7 @@ IN: peg.tests
 ] unit-test
 
 { V{ CHAR: a CHAR: b } } [
-  "ab" "a" token ensure CHAR: a CHAR: z range dup 3array seq parse parse-result-ast
+  "ab" "a" token ensure CHAR: a CHAR: z range dup 3array seq parse ast>>
 ] unit-test
 
 { f } [
@@ -123,11 +124,11 @@ IN: peg.tests
 ] unit-test
 
 { 1 } [
-  "a" "a" token [ drop 1 ] action parse parse-result-ast 
+  "a" "a" token [ drop 1 ] action parse ast>> 
 ] unit-test
 
 { V{ 1 1 } } [
-  "aa" "a" token [ drop 1 ] action dup 2array seq parse parse-result-ast 
+  "aa" "a" token [ drop 1 ] action dup 2array seq parse ast>> 
 ] unit-test
 
 { f } [
@@ -139,19 +140,19 @@ IN: peg.tests
 ] unit-test
 
 { CHAR: a } [ 
-  "a" [ CHAR: a = ] satisfy parse parse-result-ast
+  "a" [ CHAR: a = ] satisfy parse ast>>
 ] unit-test
 
 { "a" } [
-  "    a" "a" token sp parse parse-result-ast
+  "    a" "a" token sp parse ast>>
 ] unit-test
 
 { "a" } [
-  "a" "a" token sp parse parse-result-ast
+  "a" "a" token sp parse ast>>
 ] unit-test
 
 { V{ "a" } } [
-  "[a]" "[" token hide "a" token "]" token hide 3array seq parse parse-result-ast
+  "[a]" "[" token hide "a" token "]" token hide 3array seq parse ast>>
 ] unit-test
 
 { f } [
@@ -164,8 +165,8 @@ IN: peg.tests
     [ "1" token , "-" token , "1" token , ] seq* ,
     [ "1" token , "+" token , "1" token , ] seq* ,
   ] choice* 
-  "1-1" over parse parse-result-ast swap
-  "1+1" swap parse parse-result-ast
+  "1-1" over parse ast>> swap
+  "1+1" swap parse ast>>
 ] unit-test
 
 : expr ( -- parser ) 
@@ -174,7 +175,7 @@ IN: peg.tests
   [ expr ] delay "+" token "1" token 3seq "1" token 2choice ;
 
 { V{ V{ "1" "+" "1" } "+" "1" } } [
-  "1+1+1" expr parse parse-result-ast   
+  "1+1+1" expr parse ast>>   
 ] unit-test
 
 { t } [
@@ -189,6 +190,6 @@ IN: peg.tests
 ] unit-test
 
 { CHAR: B } [
-  "B" [ drop t ] satisfy [ 66 >= ] semantic parse parse-result-ast
+  "B" [ drop t ] satisfy [ 66 >= ] semantic parse ast>>
 ] unit-test
 

@@ -1,6 +1,7 @@
 ! Copyright (c) 2008 Eric Mertens
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math sequences sequences.private locals hints ;
+USING: kernel math math.order sequences sequences.private
+locals hints ;
 IN: project-euler.150
 
 <PRIVATE
@@ -17,7 +18,7 @@ IN: project-euler.150
     0 0 rot [ (partial-sum-infimum) ] each drop ; inline
 
 : generate ( n quot -- seq )
-    [ drop ] swap compose map ; inline
+    [ drop ] prepose map ; inline
 
 : map-infimum ( seq quot -- min )
     [ min ] compose 0 swap reduce ; inline

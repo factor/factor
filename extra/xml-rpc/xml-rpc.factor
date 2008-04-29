@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-IN: xml-rpc
 USING: kernel xml arrays math generic http.client combinators
     hashtables namespaces io base64 sequences strings calendar
     xml.data xml.writer xml.utilities assocs math.parser debugger
-    calendar.format ;
+    calendar.format math.order ;
+IN: xml-rpc
 
 ! * Sending RPC requests
 ! TODO: time

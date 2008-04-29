@@ -51,11 +51,11 @@ IN: unicode.normalize
     [ >r >r 2dup r> r> insert ] 2each 2drop ; inline
 
 : reorder-slice ( string start -- slice done? )
-    2dup swap [ non-starter? not ] find* drop
+    2dup swap [ non-starter? not ] find-from drop
     [ [ over length ] unless* rot <slice> ] keep not ;
 
 : reorder-next ( string i -- new-i done? )
-    over [ non-starter? ] find* drop [
+    over [ non-starter? ] find-from drop [
         reorder-slice
         >r dup [ combining-class ] insertion-sort slice-to r>
     ] [ length t ] if* ;
@@ -67,7 +67,7 @@ IN: unicode.normalize
     0 reorder-loop ;
 
 : reorder-back ( string i -- )
-    over [ non-starter? not ] find-last* drop ?1+ reorder-next 2drop ;
+    over [ non-starter? not ] find-last-from drop ?1+ reorder-next 2drop ;
 
 : decompose ( string quot -- decomposed )
     ! When there are 8 and 32-bit strings, this'll be

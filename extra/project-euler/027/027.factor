@@ -46,8 +46,8 @@ IN: project-euler.027
 <PRIVATE
 
 : source-027 ( -- seq )
-    1000 [ prime? ] subset [ dup [ neg ] map append ] keep
-    cartesian-product [ first2 < ] subset ;
+    1000 [ prime? ] filter [ dup [ neg ] map append ] keep
+    cartesian-product [ first2 < ] filter ;
 
 : quadratic ( b a n -- m )
     dup sq -rot * + + ;

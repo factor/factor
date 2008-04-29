@@ -3,7 +3,7 @@ float-vectors.private combinators ;
 IN: float-vectors
 
 ARTICLE: "float-vectors" "Float vectors"
-"A float vector is a resizable mutable sequence of unsigned floats. The literal syntax is covered in " { $link "syntax-float-vectors" } ". Float vector words are found in the " { $vocab-link "float-vectors" } " vocabulary."
+"A float vector is a resizable mutable sequence of unsigned floats. Float vector words are found in the " { $vocab-link "float-vectors" } " vocabulary."
 $nl
 "Float vectors form a class:"
 { $subsection float-vector }
@@ -19,7 +19,7 @@ $nl
 ABOUT: "float-vectors"
 
 HELP: float-vector
-{ $description "The class of resizable float vectors. See " { $link "syntax-float-vectors" } " for syntax and " { $link "float-vectors" } " for general information." } ;
+{ $description "The class of resizable float vectors. See " { $link "float-vectors" } " for information." } ;
 
 HELP: <float-vector>
 { $values { "n" "a positive integer specifying initial capacity" } { "float-vector" float-vector } }

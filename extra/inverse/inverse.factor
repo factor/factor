@@ -204,7 +204,7 @@ DEFER: _
     "predicate" word-prop [ dupd call assure ] curry ;
 
 : slot-readers ( class -- quot )
-    all-slots 1 tail ! tail gets rid of delegate
+    all-slots rest ! tail gets rid of delegate
     [ slot-spec-reader 1quotation [ keep ] curry ] map concat
     [ ] like [ drop ] compose ;
 
@@ -218,7 +218,7 @@ DEFER: _
 
 : empty-inverse ( class -- quot )
     deconstruct-pred
-    [ tuple>array 1 tail [ ] contains? [ fail ] when ]
+    [ tuple>array rest [ ] contains? [ fail ] when ]
     compose ;
 
 \ new 1 [ ?wrapped empty-inverse ] define-pop-inverse

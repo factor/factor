@@ -3,7 +3,7 @@
 USING: arrays generic hashtables kernel kernel.private
 math namespaces sequences words quotations layouts combinators
 sequences.private classes classes.builtin classes.algebra
-definitions ;
+definitions math.order ;
 IN: generic.math
 
 PREDICATE: math-class < class
@@ -23,7 +23,7 @@ PREDICATE: math-class < class
     } cond ;
     
 : math-class-max ( class class -- class )
-    [ [ math-precedence ] compare 0 > ] most ;
+    [ [ math-precedence ] compare +gt+ eq? ] most ;
 
 : (math-upgrade) ( max class -- quot )
     dupd = [ drop [ ] ] [ "coercer" word-prop [ ] or ] if ;

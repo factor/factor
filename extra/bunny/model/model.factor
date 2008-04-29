@@ -2,17 +2,17 @@ USING: alien alien.c-types arrays sequences math math.vectors
 math.matrices math.parser io io.files kernel opengl opengl.gl
 opengl.glu io.encodings.ascii opengl.capabilities shuffle
 http.client vectors splitting tools.time system combinators
-float-arrays continuations namespaces sequences.lib ;
+float-arrays continuations namespaces sequences.lib accessors ;
 IN: bunny.model
 
 : numbers ( str -- seq )
-    " " split [ string>number ] map [ ] subset ;
+    " " split [ string>number ] map [ ] filter ;
 
 : (parse-model) ( vs is -- vs is )
     readln [
         numbers {
             { [ dup length 5 = ] [ 3 head pick push ] }
-            { [ dup first 3 = ] [ 1 tail over push ] }
+            { [ dup first 3 = ] [ rest over push ] }
             [ drop ]
         } cond (parse-model)
     ] when* ;
@@ -85,24 +85,24 @@ M: bunny-dlist bunny-geom
     bunny-dlist-list glCallList ;
 
 M: bunny-buffers bunny-geom
-    dup {
-        bunny-buffers-array
-        bunny-buffers-element-array
-    } get-slots [
+    dup { array>> element-array>> } get-slots [
         { GL_VERTEX_ARRAY GL_NORMAL_ARRAY } [
             GL_DOUBLE 0 0 buffer-offset glNormalPointer
-            dup bunny-buffers-nv "double" heap-size * buffer-offset
-            3 GL_DOUBLE 0 roll glVertexPointer
-            bunny-buffers-ni
-            GL_TRIANGLES swap GL_UNSIGNED_INT 0 buffer-offset glDrawElements
+            [
+                nv>> "double" heap-size * buffer-offset
+                3 GL_DOUBLE 0 roll glVertexPointer
+            ] [
+                ni>>
+                GL_TRIANGLES swap GL_UNSIGNED_INT 0 buffer-offset glDrawElements
+            ] bi
         ] all-enabled-client-state
     ] with-array-element-buffers ;
 
 M: bunny-dlist dispose
-    bunny-dlist-list delete-dlist ;
+    list>> delete-dlist ;
 
 M: bunny-buffers dispose
-    { bunny-buffers-array bunny-buffers-element-array } get-slots
+    { array>> element-array>> } get-slots
     delete-gl-buffer delete-gl-buffer ;
 
 : <bunny-geom> ( model -- geom )

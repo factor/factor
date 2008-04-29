@@ -75,7 +75,7 @@ USE: prettyprint
 M: #call-label collect-label-info*
     node-param label-info get at
     node-stack get over third tail
-    [ [ #label? ] subset [ node-param ] map ] keep
+    [ [ #label? ] filter [ node-param ] map ] keep
     [ node-successor #tail? ] all? 2array
     swap second push ;
 
@@ -91,7 +91,7 @@ SYMBOL: potential-loops
 
 : remove-non-tail-calls ( -- )
     label-info get
-    [ nip second [ second ] all? ] assoc-subset
+    [ nip second [ second ] all? ] assoc-filter
     [ first ] assoc-map
     potential-loops set ;
 

@@ -4,21 +4,21 @@
 
 	<t:title>Edit Item</t:title>
 
-	<t:form action="edit">
+	<t:form action="$todo-list/edit">
 		<t:edit component="id" />
 
 		<table>
-			<tr><th class="field-label">Summary:    </th><td><t:edit component="summary"     /></td></tr>
-			<tr><th class="field-label">Priority:   </th><td><t:edit component="priority"    /></td></tr>
+			<tr><th class="field-label">Summary: </th><td><t:edit component="summary" /></td></tr>
+			<tr><th class="field-label">Priority: </th><td><t:edit component="priority" /></td></tr>
 			<tr><th class="field-label big-field-label">Description:</th><td><t:edit component="description" /></td></tr>
 		</table>
 
 		<input type="SUBMIT" value="Done" />
 	</t:form>
 
-	<t:a href="view" query="id">View</t:a>
+	<t:a href="$todo-list/view" query="id">View</t:a>
 	|
-	<t:form action="delete" class="inline">
+	<t:form action="$todo-list/delete" class="inline">
 		<t:edit component="id" />
 		<button type="submit" class="link-button link">Delete</button>
 	</t:form>

@@ -13,7 +13,7 @@ ARTICLE: { "state-parser" "main" } "State-based parsing"
     { $subsection next }
     { $subsection state-parse }
     { $subsection get-char }
-    { $subsection rest }
+    { $subsection take-rest }
     { $subsection string-parse }
     { $subsection expect }
     { $subsection expect-string }
@@ -23,7 +23,7 @@ HELP: get-char
 { $values { "char" "the current character" } }
 { $description "Accesses the current character of the stream that is being parsed" } ;
 
-HELP: rest
+HELP: take-rest
 { $values { "string" "the rest of the parser input" } }
 { $description "Exausts the stream of the parser input and returns a string representing the rest of the input" } ;
 

@@ -270,7 +270,7 @@ M: no-such-symbol compiler-error-type
     pop-literal nip >>library
     pop-literal nip >>return
     ! Quotation which coerces parameters to required types
-    dup param-prep-quot f infer-quot
+    dup param-prep-quot recursive-state get infer-quot
     ! Set ABI
     dup library>> library [ abi>> ] [ "cdecl" ] if* >>abi
     ! Add node to IR
@@ -278,7 +278,7 @@ M: no-such-symbol compiler-error-type
     ! Magic #: consume exactly the number of inputs
     dup 0 alien-invoke-stack
     ! Quotation which coerces return value to required type
-    return-prep-quot f infer-quot
+    return-prep-quot recursive-state get infer-quot
 ] "infer" set-word-prop
 
 M: #alien-invoke generate-node
@@ -306,13 +306,13 @@ M: alien-indirect-error summary
     pop-parameters >>parameters
     pop-literal nip >>return
     ! Quotation which coerces parameters to required types
-    dup param-prep-quot [ dip ] curry f infer-quot
+    dup param-prep-quot [ dip ] curry recursive-state get infer-quot
     ! Add node to IR
     dup node,
     ! Magic #: consume the function pointer, too
     dup 1 alien-invoke-stack
     ! Quotation which coerces return value to required type
-    return-prep-quot f infer-quot
+    return-prep-quot recursive-state get infer-quot
 ] "infer" set-word-prop
 
 M: #alien-indirect generate-node
@@ -345,7 +345,7 @@ M: alien-callback-error summary
 
 : callback-bottom ( node -- )
     xt>> [ word-xt drop <alien> ] curry
-    f infer-quot ;
+    recursive-state get infer-quot ;
 
 \ alien-callback [
     4 ensure-values

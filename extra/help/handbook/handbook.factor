@@ -104,6 +104,7 @@ $nl
 ARTICLE: "objects" "Objects"
 "An " { $emphasis "object" } " is any datum which may be identified. All values are objects in Factor. Each object carries type information, and types are checked at runtime; Factor is dynamically typed."
 { $subsection "equality" }
+{ $subsection "math.order" }
 { $subsection "classes" }
 { $subsection "tuples" }
 { $subsection "generic" }
@@ -228,13 +229,13 @@ ARTICLE: "article-index" "Article index"
 { $index [ articles get keys ] } ;
 
 ARTICLE: "primitive-index" "Primitive index"
-{ $index [ all-words [ primitive? ] subset ] } ;
+{ $index [ all-words [ primitive? ] filter ] } ;
 
 ARTICLE: "error-index" "Error index"
 { $index [ all-errors ] } ;
 
 ARTICLE: "type-index" "Type index"
-{ $index [ builtins get [ ] subset ] } ;
+{ $index [ builtins get [ ] filter ] } ;
 
 ARTICLE: "class-index" "Class index"
 { $index [ classes ] } ;

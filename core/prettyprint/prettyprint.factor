@@ -45,7 +45,7 @@ sets ;
     ] if ;
 
 : vocabs. ( in use -- )
-    dupd remove [ { "syntax" "scratchpad" } member? not ] subset
+    dupd remove [ { "syntax" "scratchpad" } member? not ] filter
     use. in. ;
 
 : with-use ( obj quot -- )

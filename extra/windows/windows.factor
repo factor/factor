@@ -30,10 +30,10 @@ FUNCTION: void* error_message ( DWORD id ) ;
 : win32-error ( -- )
     GetLastError (win32-error) ;
 
-: win32-error=0/f { 0 f } member? [ win32-error ] when ;
-: win32-error>0 0 > [ win32-error ] when ;
-: win32-error<0 0 < [ win32-error ] when ;
-: win32-error<>0 zero? [ win32-error ] unless ;
+: win32-error=0/f ( n -- ) { 0 f } member? [ win32-error ] when ;
+: win32-error>0 ( n -- ) 0 > [ win32-error ] when ;
+: win32-error<0 ( n -- ) 0 < [ win32-error ] when ;
+: win32-error<>0 ( n -- ) zero? [ win32-error ] unless ;
 
 : invalid-handle? ( handle -- )
     INVALID_HANDLE_VALUE = [

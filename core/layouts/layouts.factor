@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces math words kernel assocs classes
-kernel.private ;
+math.order kernel.private ;
 IN: layouts
 
 SYMBOL: tag-mask

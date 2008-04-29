@@ -30,7 +30,7 @@ IN: project-euler.001
 ! -------------------
 
 : euler001a ( -- answer )
-    1000 [ dup 5 mod swap 3 mod [ zero? ] either? ] subset sum ;
+    1000 [ dup 5 mod swap 3 mod [ zero? ] either? ] filter sum ;
 
 ! [ euler001a ] 100 ave-time
 ! 0 ms run / 0 ms GC ave time - 100 trials

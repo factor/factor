@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: tools.threads
 USING: threads kernel prettyprint prettyprint.config
 io io.styles sequences assocs namespaces sorting boxes
-heaps.private system math math.parser ;
+heaps.private system math math.parser math.order ;
+IN: tools.threads
 
 : thread. ( thread -- )
     dup thread-id pprint-cell

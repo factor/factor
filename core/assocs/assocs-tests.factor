@@ -30,10 +30,10 @@ continuations ;
 [ t ] [ H{ { 1 1 } { 2 2 } } [ = ] assoc-all? ] unit-test
 [ f ] [ H{ { 1 2 } { 2 2 } } [ = ] assoc-all? ] unit-test
 
-[ H{ } ] [ H{ { t f } { f t } } [ 2drop f ] assoc-subset ] unit-test
+[ H{ } ] [ H{ { t f } { f t } } [ 2drop f ] assoc-filter ] unit-test
 [ H{ { 3 4 } { 4 5 } { 6 7 } } ] [
     H{ { 1 2 } { 2 3 } { 3 4 } { 4 5 } { 6 7 } }
-    [ drop 3 >= ] assoc-subset
+    [ drop 3 >= ] assoc-filter
 ] unit-test
 
 [ 21 ] [

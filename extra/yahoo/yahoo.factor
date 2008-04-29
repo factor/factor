@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: http.client xml xml.utilities kernel sequences
-namespaces http math.parser help ;
+namespaces http math.parser help math.order ;
 IN: yahoo
 
 TUPLE: result title url summary ;

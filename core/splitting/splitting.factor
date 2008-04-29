@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math namespaces strings arrays vectors sequences
-sets ;
+sets math.order ;
 IN: splitting
 
 TUPLE: groups seq n sliced? ;
@@ -61,7 +61,7 @@ INSTANCE: groups sequence
     dup [ swap ] when ;
 
 : (split) ( separators n seq -- )
-    3dup rot [ member? ] curry find* drop
+    3dup rot [ member? ] curry find-from drop
     [ [ swap subseq , ] 2keep 1+ swap (split) ]
     [ swap dup zero? [ drop ] [ tail ] if , drop ] if* ; inline
 

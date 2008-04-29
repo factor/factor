@@ -341,6 +341,7 @@ HELP: new
 { $examples
     { $example
         "USING: kernel prettyprint ;"
+        "IN: scratchpad"
         "TUPLE: employee number name department ;"
         "employee new ."
         "T{ employee f f f f }"

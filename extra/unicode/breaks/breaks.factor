@@ -25,7 +25,7 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
 
 : process-other-extend ( lines -- set )
     [ "#" split1 drop ";" split1 drop trim-blank ] map
-    [ empty? not ] subset
+    [ empty? not ] filter
     [ ".." split1 [ dup ] unless* [ hex> ] bi@ [a,b] ] map
     concat [ dup ] H{ } map>assoc ;
 
