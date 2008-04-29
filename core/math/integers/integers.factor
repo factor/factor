@@ -110,10 +110,10 @@ M: bignum (log2) bignum-log2 ;
 ! Main word
 : /f-abs ( m n -- f )
     over zero? [
-        2drop 0 >float
+        2drop 0.0
     ] [
         dup zero? [
-            2drop 1 >float 0 >float /
+            2drop 1.0/0.0
         ] [
             pre-scale
             /f-loop over odd?

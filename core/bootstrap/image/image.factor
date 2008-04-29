@@ -39,19 +39,23 @@ C: <id> id
 
 M: id hashcode* obj>> hashcode* ;
 
+GENERIC: (eql?) ( obj1 obj2 -- ? )
+
+: eql? ( obj1 obj2 -- ? )
+    [ (eql?) ] [ [ class ] bi@ = ] 2bi and ;
+
+M: integer (eql?) = ;
+
+M: sequence (eql?)
+    over sequence? [
+        2dup [ length ] bi@ =
+        [ [ eql? ] 2all? ] [ 2drop f ] if
+    ] [ 2drop f ] if ;
+
+M: object (eql?) = ;
+
 M: id equal?
-    over id? [
-        [ obj>> ] bi@
-        [ = ] [
-            dup number? [
-                [ class ] bi@ =
-            ] [
-                2drop t
-            ] if
-        ] 2bi and
-    ] [
-        2drop f
-    ] if ;
+    over id? [ [ obj>> ] bi@ eql? ] [ 2drop f ] if ;
 
 SYMBOL: objects
 
