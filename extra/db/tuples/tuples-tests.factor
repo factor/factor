@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files kernel tools.test db db.tuples classes
 db.types continuations namespaces math math.ranges
-prettyprint tools.walker calendar sequences db.sqlite
-math.intervals db.postgresql accessors random math.bitfields.lib ;
+prettyprint calendar sequences db.sqlite math.intervals
+db.postgresql accessors random math.bitfields.lib ;
 IN: db.tuples.tests
 
 TUPLE: person the-id the-name the-number the-real
@@ -30,6 +30,7 @@ SYMBOL: person3
 SYMBOL: person4
 
 : test-tuples ( -- )
+    [ ] [ person recreate-table ] unit-test
     [ ] [ person ensure-table ] unit-test
     [ ] [ person drop-table ] unit-test
     [ ] [ person create-table ] unit-test
@@ -292,6 +293,46 @@ TUPLE: exam id name score ;
         }
     ] [
         T{ exam f T{ range f 1 3 1 } } select-tuples
+    ] unit-test
+
+    [
+        {
+            T{ exam f 2 "Stan" 80 }
+            T{ exam f 3 "Kenny" 60 }
+            T{ exam f 4 "Cartman" 41 }
+        }
+    ] [
+        T{ exam f T{ interval f { 2 t } { 1.0/0.0 f } } } select-tuples
+    ] unit-test
+
+    [
+        {
+            T{ exam f 1 "Kyle" 100 }
+        }
+    ] [
+        T{ exam f T{ interval f { -1.0/0.0 t } { 2 f } } } select-tuples
+    ] unit-test
+
+    [
+        {
+            T{ exam f 1 "Kyle" 100 }
+            T{ exam f 2 "Stan" 80 }
+            T{ exam f 3 "Kenny" 60 }
+            T{ exam f 4 "Cartman" 41 }
+        }
+    ] [
+        T{ exam f T{ interval f { -1.0/0.0 t } { 1/0. f } } } select-tuples
+    ] unit-test
+    
+    [
+        {
+            T{ exam f 1 "Kyle" 100 }
+            T{ exam f 2 "Stan" 80 }
+            T{ exam f 3 "Kenny" 60 }
+            T{ exam f 4 "Cartman" 41 }
+        }
+    ] [
+        T{ exam } select-tuples
     ] unit-test ;
 
 TUPLE: bignum-test id m n o ;
@@ -328,7 +369,7 @@ C: <secret> secret
         { "message" "MESSAGE" TEXT }
     } define-persistent
 
-    [ ] [ secret ensure-table ] unit-test
+    [ ] [ secret recreate-table ] unit-test
 
     [ t ] [ f "kilroy was here" <secret> [ insert-tuple ] keep n>> integer? ] unit-test
 
@@ -342,7 +383,7 @@ C: <secret> secret
     ] unit-test
 
     [ t ] [
-        T{ secret } select-tuples dup . length 3 =
+        T{ secret } select-tuples length 3 =
     ] unit-test ;
 
 [ db-assigned-person-schema test-tuples ] test-sqlite

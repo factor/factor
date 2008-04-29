@@ -3,7 +3,7 @@
 USING: arrays assocs classes db kernel namespaces
 classes.tuple words sequences slots math accessors
 math.parser io prettyprint db.types continuations
-mirrors sequences.lib tools.walker combinators.lib ;
+mirrors sequences.lib combinators.lib ;
 IN: db.tuples
 
 : define-persistent ( class table columns -- )
@@ -108,11 +108,14 @@ M: retryable execute-statement* ( statement type -- )
 : drop-table ( class -- )
     drop-sql-statement [ execute-statement ] with-disposals ;
 
-: ensure-table ( class -- )
+: recreate-table ( class -- )
     [
         drop-sql-statement make-nonthrowable
         [ execute-statement ] with-disposals
     ] [ create-table ] bi ;
+
+: ensure-table ( class -- )
+    [ create-table ] curry ignore-errors ;
 
 : insert-db-assigned-statement ( tuple -- )
     dup class
