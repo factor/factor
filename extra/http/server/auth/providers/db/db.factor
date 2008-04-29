@@ -7,7 +7,7 @@ IN: http.server.auth.providers.db
 
 user "USERS"
 {
-    { "username" "USERNAME" { VARCHAR 256 } +assigned-id+ }
+    { "username" "USERNAME" { VARCHAR 256 } +user-assigned-id+ }
     { "realname" "REALNAME" { VARCHAR 256 } }
     { "password" "PASSWORD" { VARCHAR 256 } +not-null+ }
     { "email" "EMAIL" { VARCHAR 256 } }
