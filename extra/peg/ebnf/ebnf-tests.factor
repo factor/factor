@@ -297,3 +297,31 @@ main = Primary
 ] unit-test
 
 'ebnf' compile must-infer
+
+{ V{ V{ "a" "b" } "c" } } [
+  "abc" [EBNF a="a" "b" foo=(a "c") EBNF] call parse-result-ast
+] unit-test
+
+{ f } [
+  "a bc" [EBNF a="a" "b" foo=(a "c") EBNF] call 
+] unit-test
+
+{ f } [
+  "ab c" [EBNF a="a" "b" foo=(a "c") EBNF] call 
+] unit-test
+
+{ f } [
+  "a b c" [EBNF a="a" "b" foo=(a "c") EBNF] call 
+] unit-test
+
+{ V{ V{ "a" "b" } "c" } } [
+  "abc" [EBNF a="a" "b" foo=(a "c")~ EBNF] call parse-result-ast
+] unit-test
+
+{ V{ V{ "a" "b" } "c" } } [
+  "ab c" [EBNF a="a" "b" foo=(a "c")~ EBNF] call parse-result-ast
+] unit-test
+
+{ f } [
+  "a bc" [EBNF a="a" "b" foo=(a "c")~ EBNF] call
+] unit-test
