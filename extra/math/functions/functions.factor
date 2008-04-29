@@ -80,10 +80,6 @@ M: integer (^)
         -rot (^mod)
     ] if ; foldable
 
-GENERIC: abs ( x -- y ) foldable
-
-M: real abs dup 0 < [ neg ] when ;
-
 GENERIC: absq ( x -- y ) foldable
 
 M: real absq sq ;
