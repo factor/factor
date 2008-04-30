@@ -95,7 +95,7 @@ HELP: case
     "If there is no case matching " { $snippet "obj" } ", the default case is taken. If the last element of " { $snippet "cases" } " is a quotation, the quotation is called with " { $snippet "obj" } " on the stack. Otherwise, a " { $link no-cond } " error is rasied."
     $nl
     "The following two phrases are equivalent:"
-    { $code "{ { X [ Y ] } { Y [ T ] } } case" }
+    { $code "{ { X [ Y ] } { Z [ T ] } } case" }
     { $code "dup X = [ drop Y ] [ dup Z = [ drop T ] [ no-case ] if ] if" }
 }
 { $examples
