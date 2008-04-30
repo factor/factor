@@ -6,7 +6,7 @@
 
 	<div class="navbar">
 		  <t:a t:href="$user-admin">List Users</t:a>
-		| <t:a t:href="$user-admin/edit">Add User</t:a>
+		| <t:a t:href="$user-admin/new">Add User</t:a>
 
 		<t:if t:code="http.server.auth.login:allow-edit-profile?">
 			| <t:a t:href="$login/edit-profile" t:flow="begin">Edit Profile</t:a>

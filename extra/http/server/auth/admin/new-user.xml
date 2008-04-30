@@ -2,9 +2,9 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-	<t:title>Edit User</t:title>
+	<t:title>New User</t:title>
 
-	<t:form t:action="$user-admin/edit">
+	<t:form t:action="$user-admin/new">
 
 	<table>
 	
@@ -32,16 +32,15 @@
 		<th class="field-label">E-mail:</th>
 		<td><t:edit t:component="email" /></td>
 	</tr>
-	
-	<tr>
-		<th class="field-label">Profile:</th>
-		<td><t:view t:component="profile" /></td>
-	</tr>
 
 	</table>
 	
 	<p>
-		<input type="submit" value="Update" />
+		<button type="submit" class="link-button link">Create</button>
+
+		<t:if t:var="http.server.auth.login:user-exists?">
+				<t:error>username taken</t:error>
+		</t:if>
 
 		<t:if t:var="http.server.auth.login:password-mismatch?">
 			<t:error>passwords do not match</t:error>
@@ -49,5 +48,4 @@
 	</p>
 
 	</t:form>
-	
 </t:chloe>

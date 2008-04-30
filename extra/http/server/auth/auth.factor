@@ -7,7 +7,6 @@ http.server.auth.providers ;
 IN: http.server.auth
 
 SYMBOL: logged-in-user
-SYMBOL: user-profile-changed?
 
 GENERIC: init-user-profile ( responder -- )
 
@@ -19,16 +18,18 @@ M: dispatcher init-user-profile
 M: filter-responder init-user-profile
     responder>> init-user-profile ;
 
-: uid ( -- string ) logged-in-user sget username>> ;
+: profile ( -- assoc ) logged-in-user get profile>> ;
 
-: profile ( -- assoc ) logged-in-user sget profile>> ;
+: user-changed ( -- )
+    logged-in-user get t >>changed? drop ;
 
 : uget ( key -- value )
     profile at ;
 
 : uset ( value key -- )
-    profile set-at user-profile-changed? on ;
+    profile set-at
+    user-changed ;
 
 : uchange ( quot key -- )
     profile swap change-at
-    user-profile-changed? on ; inline
+    user-changed ; inline
