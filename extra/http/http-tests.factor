@@ -134,8 +134,7 @@ read-response-test-1' 1array [
 
 ! Live-fire exercise
 USING: http.server http.server.static http.server.sessions
-http.server.sessions.storage.db http.server.actions
-http.server.auth.login http.server.db http.client
+http.server.actions http.server.auth.login http.server.db http.client
 io.server io.files io io.encodings.ascii
 accessors namespaces threads ;
 
@@ -195,7 +194,6 @@ test-db [
             <action> <protected>
             <login>
             <sessions>
-                sessions-in-db >>sessions
             "" add-responder
             add-quit-action
             <dispatcher>
@@ -226,7 +224,6 @@ test-db [
             <action> [ "text/plain" <content> [ "Hi" write ] >>body ] >>display
             <login>
             <sessions>
-                sessions-in-db >>sessions
             "" add-responder
             add-quit-action
         test-db <db-persistence>

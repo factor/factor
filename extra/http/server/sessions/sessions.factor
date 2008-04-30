@@ -16,7 +16,7 @@ TUPLE: session id expires namespace changed? ;
 session "SESSIONS"
 {
     { "id" "ID" +random-id+ system-random-generator }
-    { "expires" "EXPIRES" BIG-INTEGER +not-null+ }
+    { "expires" "EXPIRES" TIMESTAMP +not-null+ }
     { "namespace" "NAMESPACE" FACTOR-BLOB }
 } define-persistent
 
@@ -25,14 +25,13 @@ session "SESSIONS"
 
 : init-sessions-table session ensure-table ;
 
-: expired-sessions ( -- session )
-    f <session>
-        -1.0/0.0 now timestamp>millis [a,b] >>expires
-    select-tuples ;
-
 : start-expiring-sessions ( db seq -- )
     '[
-        , , [ expired-sessions [ delete-tuple ] each ] with-db
+        , , [
+            session new
+                -1.0/0.0 now [a,b] >>expires
+            delete-tuples
+        ] with-db
     ] 5 minutes every drop ;
 
 GENERIC: init-session* ( responder -- )
@@ -72,7 +71,7 @@ TUPLE: sessions < filter-responder timeout domain ;
     session [ sessions get init-session* ] with-variable ;
 
 : cutoff-time ( -- time )
-    sessions get timeout>> from-now timestamp>millis ;
+    sessions get timeout>> from-now ;
 
 : touch-session ( session -- )
     cutoff-time >>expires drop ;

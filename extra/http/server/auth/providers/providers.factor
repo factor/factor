@@ -6,7 +6,9 @@ IN: http.server.auth.providers
 
 TUPLE: user username realname password email ticket profile ;
 
-: <user> user new H{ } clone >>profile ;
+: <user> ( username -- user )
+    user new
+        swap >>username ;
 
 GENERIC: get-user ( username provider -- user/f )
 

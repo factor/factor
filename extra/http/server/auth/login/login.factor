@@ -125,11 +125,11 @@ SYMBOL: user-exists?
 
                 same-password-twice
 
-                <user>
-                    "username" value >>username
+                "username" value <user>
                     "realname" value >>realname
                     "new-password" value >>password
                     "email" value >>email
+                    H{ } clone >>profile
 
                 users new-user [
                     user-exists? on

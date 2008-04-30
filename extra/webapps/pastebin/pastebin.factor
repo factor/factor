@@ -197,9 +197,9 @@ annotation "ANNOTATION"
         { { "id" [ v-number ] } } >>post-params
 
         [
-            "id" get ctor call delete-tuple
+            "id" get ctor call delete-tuples
 
-            "id" get f <annotation> select-tuples [ delete-tuple ] each
+            "id" get f <annotation> delete-tuples
 
             next f <permanent-redirect>
         ] >>submit ;
@@ -209,7 +209,7 @@ annotation "ANNOTATION"
         { { "id" [ v-number ] } { "aid" [ v-number ] } } >>post-params
 
         [
-            "id" get "aid" get ctor call delete-tuple
+            "id" get "aid" get ctor call delete-tuples
 
             "id" get next <id-redirect>
         ] >>submit ;

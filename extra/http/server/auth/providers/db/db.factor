@@ -20,9 +20,7 @@ user "USERS"
 SINGLETON: users-in-db
 
 : find-user ( username -- user )
-    <user>
-        swap >>username
-    select-tuple ;
+    <user> select-tuple ;
 
 M: users-in-db get-user
     drop
