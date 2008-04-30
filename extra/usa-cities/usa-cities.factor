@@ -1,7 +1,9 @@
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: io.files io.encodings.ascii sequences sequences.lib
 math.parser combinators kernel memoize csv symbols inspector
 words accessors math.order sorting ;
-IN: zip-codes
+IN: usa-cities
 
 SINGLETONS: AK AL AR AS AZ CA CO CT DC DE FL GA HI IA ID IL IN
 KS KY LA MA MD ME MI MN MO MS MT NC ND NE NH NJ NM NV NY OH OK
