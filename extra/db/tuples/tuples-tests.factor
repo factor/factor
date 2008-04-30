@@ -68,7 +68,7 @@ SYMBOL: person4
     ] [ T{ person f f f 10 3.14 } select-tuples ] unit-test
 
 
-    [ ] [ person1 get delete-tuple ] unit-test
+    [ ] [ person1 get delete-tuples ] unit-test
     [ f ] [ T{ person f 1 } select-tuple ] unit-test
 
     [ ] [ person3 get insert-tuple ] unit-test
@@ -418,7 +418,7 @@ TUPLE: does-not-persist ;
 \ bind-tuple must-infer
 \ insert-tuple must-infer
 \ update-tuple must-infer
-\ delete-tuple must-infer
+\ delete-tuples must-infer
 \ select-tuple must-infer
 \ define-persistent must-infer
 \ ensure-table must-infer

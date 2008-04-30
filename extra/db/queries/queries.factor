@@ -112,7 +112,7 @@ M: string where ( spec obj -- ) object-where ;
         ] interleave drop
     ] if ;
 
-M: db <delete-tuple-statement> ( tuple table -- sql )
+M: db <delete-tuples-statement> ( tuple table -- sql )
     [
         "delete from " 0% 0%
         where-clause
