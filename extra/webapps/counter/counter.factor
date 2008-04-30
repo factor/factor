@@ -1,5 +1,6 @@
 USING: math kernel accessors http.server http.server.actions
-http.server.sessions http.server.templating.fhtml locals ;
+http.server.sessions http.server.templating
+http.server.templating.fhtml locals ;
 IN: webapps.counter
 
 SYMBOL: count
@@ -15,11 +16,11 @@ M: counter-app init-session*
         "" f <standard-redirect>
     ] >>display ;
 
+: counter-template ( -- template )
+    "resource:extra/webapps/counter/counter.fhtml" <fhtml> ;
+
 : <display-action> ( -- action )
-    <action> [
-        "text/html" <content>
-           "resource:extra/webapps/counter/counter.fhtml" <fhtml> >>body
-    ] >>display ;
+    <action> [ counter-template serve-template ] >>display ;
 
 : <counter-app> ( -- responder )
     counter-app new-dispatcher
