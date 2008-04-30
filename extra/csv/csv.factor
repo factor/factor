@@ -4,32 +4,33 @@
 ! Simple CSV Parser
 ! Phil Dawes phil@phildawes.net
 
-USING: kernel sequences io namespaces combinators
-unicode.categories ;
+USING: kernel sequences io namespaces combinators unicode.categories vars ;
 IN: csv
 
 DEFER: quoted-field
+
+VAR: delimiter
 
 ! trims whitespace from either end of string
 : trim-whitespace ( str -- str )
   [ blank? ] trim ; inline
 
 : skip-to-field-end ( -- endchar )
-  ",\n" read-until nip ; inline
+  "\n" delimiter> suffix read-until nip ; inline
   
 : not-quoted-field ( -- endchar )
-  ",\"\n" read-until   ! "
+  "\"\n" delimiter> suffix read-until   ! "
   dup
-  { { CHAR: "   [ drop drop quoted-field ] }  ! " 
-    { CHAR: ,   [ swap trim-whitespace % ] } 
-    { CHAR: \n  [ swap trim-whitespace % ] }    
-    { f         [ swap trim-whitespace % ] }       ! eof
+  { { CHAR: "     [ drop drop quoted-field ] }  ! " 
+    { delimiter> [ swap trim-whitespace % ] } 
+    { CHAR: \n    [ swap trim-whitespace % ] }    
+    { f           [ swap trim-whitespace % ] }       ! eof
   } case ;
   
 : maybe-escaped-quote ( -- endchar )
   read1 dup 
-  { { CHAR: "   [ , quoted-field ] }  ! " is an escaped quote
-    { CHAR: ,   [ ] }                 ! end of quoted field 
+  { { CHAR: "    [ , quoted-field ] }  ! " is an escaped quote
+    { delimiter> [ ] }                 ! end of quoted field 
     [ 2drop skip-to-field-end ]       ! end of quoted field + padding
   } case ;
   
@@ -42,7 +43,7 @@ DEFER: quoted-field
 
 : (row) ( -- sep )
   field , 
-  dup CHAR: , = [ drop (row) ] when ;
+  dup delimiter> = [ drop (row) ] when ;
 
 : row ( -- eof? array[string] )
   [ (row) ] { } make ;
@@ -54,8 +55,16 @@ DEFER: quoted-field
   row append-if-row-not-empty
   [ (csv) ] when ;
 
+: init-vars ( -- )
+  delimiter> [ CHAR: , >delimiter ] unless ; inline
+  
 : csv-row ( stream -- row )
+  init-vars
   [ row nip ] with-stream ;
 
 : csv ( stream -- rows )
+  init-vars
   [ [ (csv) ] { } make ] with-stream ;
+
+: with-delimiter ( char quot -- )
+  delimiter swap with-variable ; inline

@@ -46,6 +46,7 @@ IN: csv.tests
 [ "Year,Make,Model\n1997,Ford,E350\n2000,Mercury,Cougar" 
    <string-reader> csv ] named-unit-test
 
+   
 
    
 ! !!!!!!!!  other tests
@@ -59,3 +60,8 @@ IN: csv.tests
 "trims leading and trailing whitespace - n.b. this isn't really conformant, but lots of csv seems to assume this"
 [ { { "foo yeah" "bah" "baz" } } ] 
 [ "  foo yeah  , bah ,baz\n" <string-reader> csv ] named-unit-test
+
+
+"allows setting of delimiting character"
+[ { { "foo" "bah" "baz" } } ] 
+[ "foo\tbah\tbaz\n" <string-reader> CHAR: \t [ csv ] with-delimiter ] named-unit-test
