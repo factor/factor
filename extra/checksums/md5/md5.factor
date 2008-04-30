@@ -3,8 +3,8 @@
 USING: kernel io io.binary io.files io.streams.byte-array math
 math.functions math.parser namespaces splitting strings
 sequences crypto.common byte-arrays locals sequences.private
-io.encodings.binary symbols math.bitfields.lib ;
-IN: crypto.md5
+io.encodings.binary symbols math.bitfields.lib checksums ;
+IN: checksums.md5
 
 <PRIVATE
 
@@ -166,26 +166,18 @@ SYMBOLS: a b c d old-a old-b old-c old-d ;
         [ (process-md5-block) ] each
     ] if ;
     
-: (stream>md5) ( -- )
+: stream>md5 ( -- )
     64 read [ process-md5-block ] keep
-    length 64 = [ (stream>md5) ] when ;
+    length 64 = [ stream>md5 ] when ;
 
 : get-md5 ( -- str )
     [ a b c d ] [ get 4 >le ] map concat >byte-array ;
 
 PRIVATE>
 
-: stream>md5 ( stream -- byte-array )
-    [ initialize-md5 (stream>md5) get-md5 ] with-stream ;
+SINGLETON: md5
 
-: byte-array>md5 ( byte-array -- checksum )
-    binary <byte-reader> stream>md5 ;
+INSTANCE: md5 checksum
 
-: byte-array>md5str ( byte-array -- md5-string )
-    byte-array>md5 hex-string ;
-
-: file>md5 ( path -- byte-array )
-    binary <file-reader> stream>md5 ;
-
-: file>md5str ( path -- md5-string )
-    file>md5 hex-string ;
+M: md5 checksum-stream ( stream -- byte-array )
+    drop [ initialize-md5 stream>md5 get-md5 ] with-stream ;

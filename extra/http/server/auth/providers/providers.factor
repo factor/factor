@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors random math.parser locals
-sequences math crypto.sha2 ;
+sequences math ;
 IN: http.server.auth.providers
 
 TUPLE: user username realname password email ticket profile deleted changed? ;

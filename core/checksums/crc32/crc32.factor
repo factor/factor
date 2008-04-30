@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences sequences.private namespaces
 words io io.binary io.files io.streams.string quotations
-definitions ;
-IN: io.crc32
+definitions checksums ;
+IN: checksums.crc32
 
 : crc32-polynomial HEX: edb88320 ; inline
 
@@ -20,10 +20,20 @@ IN: io.crc32
     mask-byte crc32-table nth-unsafe >bignum
     swap -8 shift bitxor ; inline
 
-: crc32 ( seq -- n )
-    >r HEX: ffffffff dup r> [ (crc32) ] each bitxor ;
+SINGLETON: crc32
 
-: lines-crc32 ( seq -- n )
-    HEX: ffffffff tuck [
-        [ (crc32) ] each CHAR: \n (crc32)
-    ] reduce bitxor ;
+INSTANCE: crc32 checksum
+
+: init-crc32 drop >r HEX: ffffffff dup r> ; inline
+
+: finish-crc32 bitxor 4 >be ; inline
+
+M: crc32 checksum-bytes
+    init-crc32
+    [ (crc32) ] each
+    finish-crc32 ;
+
+M: crc32 checksum-lines
+    init-crc32
+    [ [ (crc32) ] each CHAR: \n (crc32) ] each
+    finish-crc32 ;

@@ -1,10 +1,10 @@
-USING: io.crc32 io.encodings.ascii io.files kernel math ;
+USING: checksums checksums.crc32 io.encodings.ascii io.files kernel math ;
 IN: benchmark.crc32
 
 : crc32-primes-list ( -- )
     10 [
-        "extra/math/primes/list/list.factor" resource-path
-        ascii file-contents crc32 drop
+        "resource:extra/math/primes/list/list.factor"
+        crc32 checksum-file drop
     ] times ;
 
 MAIN: crc32-primes-list
