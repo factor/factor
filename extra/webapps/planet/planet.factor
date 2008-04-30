@@ -27,7 +27,7 @@ M: blog link-href www-url>> ;
 
 blog "BLOGS"
 {
-    { "id" "ID" INTEGER +native-id+ }
+    { "id" "ID" INTEGER +db-assigned-id+ }
     { "name" "NAME" { VARCHAR 256 } +not-null+ }
     { "www-url" "WWWURL" { VARCHAR 256 } +not-null+ }
     { "feed-url" "FEEDURL" { VARCHAR 256 } +not-null+ }

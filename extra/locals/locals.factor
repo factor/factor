@@ -81,16 +81,24 @@ C: <quote> quote
 UNION: special local quote local-word local-reader local-writer ;
 
 : load-locals-quot ( args -- quot )
-    dup [ local-reader? ] contains? [
-        <reversed> [
-            local-reader? [ 1array >r ] [ >r ] ?
-        ] map concat
+    dup empty? [
+        drop [ ]
     ] [
-        length [ load-locals ] curry >quotation
+        dup [ local-reader? ] contains? [
+            <reversed> [
+                local-reader? [ 1array >r ] [ >r ] ?
+            ] map concat
+        ] [
+            length [ load-locals ] curry >quotation
+        ] if
     ] if ;
 
 : drop-locals-quot ( args -- quot )
-    length [ drop-locals ] curry ;
+    dup empty? [
+        drop [ ]
+    ] [
+        length [ drop-locals ] curry
+    ] if ;
 
 : point-free-body ( quot args -- newquot )
     >r 1 head-slice* r> [ localize ] curry map concat ;

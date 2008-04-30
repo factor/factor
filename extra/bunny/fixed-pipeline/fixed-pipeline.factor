@@ -6,7 +6,7 @@ TUPLE: bunny-fixed-pipeline ;
 
 : <bunny-fixed-pipeline> ( gadget -- draw )
     drop
-    { } bunny-fixed-pipeline construct ;
+    bunny-fixed-pipeline new ;
 
 M: bunny-fixed-pipeline draw-bunny
     drop

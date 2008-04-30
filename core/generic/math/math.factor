@@ -23,7 +23,7 @@ PREDICATE: math-class < class
     } cond ;
     
 : math-class-max ( class class -- class )
-    [ [ math-precedence ] compare 0 > ] most ;
+    [ [ math-precedence ] compare +gt+ eq? ] most ;
 
 : (math-upgrade) ( max class -- quot )
     dupd = [ drop [ ] ] [ "coercer" word-prop [ ] or ] if ;

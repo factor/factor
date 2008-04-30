@@ -55,8 +55,12 @@ unless
 : (function-word) ( function interface -- word )
     name>> "::" rot name>> 3append create-in ;
 
-: all-functions ( definition -- functions )
-    dup parent>> [ all-functions ] [ { } ] if*
+: family-tree ( definition -- definitions )
+    dup parent>> [ family-tree ] [ { } ] if*
+    swap suffix ;
+
+: family-tree-functions ( definition -- functions )
+    dup parent>> [ family-tree-functions ] [ { } ] if*
     swap functions>> append ;
 
 : (define-word-for-function) ( function interface n -- )
@@ -69,7 +73,7 @@ unless
     [ [ (iid-word) ] [ iid>> 1quotation ] bi define ]
     [ name>> "com-interface" swap typedef ]
     [
-        dup all-functions
+        dup family-tree-functions
         [ (define-word-for-function) ] with each-index
     ]
     tri ;

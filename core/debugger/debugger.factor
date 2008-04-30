@@ -97,10 +97,10 @@ M: relative-overflow summary
 
 : assert-depth ( quot -- )
     >r datastack r> swap slip >r datastack r>
-    2dup [ length ] compare sgn {
-        { -1 [ trim-datastacks nip relative-underflow ] }
-        { 0 [ 2drop ] }
-        { 1 [ trim-datastacks drop relative-overflow ] }
+    2dup [ length ] compare {
+        { +lt+ [ trim-datastacks nip relative-underflow ] }
+        { +eq+ [ 2drop ] }
+        { +gt+ [ trim-datastacks drop relative-overflow ] }
     } case ; inline
 
 : expired-error. ( obj -- )

@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files kernel tools.test db db.tuples classes
 db.types continuations namespaces math math.ranges
-prettyprint tools.walker calendar sequences db.sqlite
-math.intervals db.postgresql accessors random math.bitfields.lib ;
+prettyprint calendar sequences db.sqlite math.intervals
+db.postgresql accessors random math.bitfields.lib ;
 IN: db.tuples.tests
 
 TUPLE: person the-id the-name the-number the-real
@@ -21,7 +21,7 @@ ts date time blob factor-blob ;
         set-person-factor-blob
     } person construct ;
 
-: <assigned-person> ( id name age real ts date time blob factor-blob -- person )
+: <user-assigned-person> ( id name age real ts date time blob factor-blob -- person )
     <person> [ set-person-the-id ] keep ;
 
 SYMBOL: person1
@@ -30,6 +30,7 @@ SYMBOL: person3
 SYMBOL: person4
 
 : test-tuples ( -- )
+    [ ] [ person recreate-table ] unit-test
     [ ] [ person ensure-table ] unit-test
     [ ] [ person drop-table ] unit-test
     [ ] [ person create-table ] unit-test
@@ -67,7 +68,7 @@ SYMBOL: person4
     ] [ T{ person f f f 10 3.14 } select-tuples ] unit-test
 
 
-    [ ] [ person1 get delete-tuple ] unit-test
+    [ ] [ person1 get delete-tuples ] unit-test
     [ f ] [ T{ person f 1 } select-tuple ] unit-test
 
     [ ] [ person3 get insert-tuple ] unit-test
@@ -106,10 +107,10 @@ SYMBOL: person4
 
     [ ] [ person drop-table ] unit-test ;
 
-: native-person-schema ( -- )
+: db-assigned-person-schema ( -- )
     person "PERSON"
     {
-        { "the-id" "ID" +native-id+ }
+        { "the-id" "ID" +db-assigned-id+ }
         { "the-name" "NAME" { VARCHAR 256 } +not-null+ }
         { "the-number" "AGE" INTEGER { +default+ 0 } }
         { "the-real" "REAL" DOUBLE { +default+ 0.3 } }
@@ -132,10 +133,10 @@ SYMBOL: person4
         T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
         f H{ { 1 2 } { 3 4 } { 5 "lol" } } <person> person4 set ;
 
-: assigned-person-schema ( -- )
+: user-assigned-person-schema ( -- )
     person "PERSON"
     {
-        { "the-id" "ID" INTEGER +assigned-id+ }
+        { "the-id" "ID" INTEGER +user-assigned-id+ }
         { "the-name" "NAME" { VARCHAR 256 } +not-null+ }
         { "the-number" "AGE" INTEGER { +default+ 0 } }
         { "the-real" "REAL" DOUBLE { +default+ 0.3 } }
@@ -145,27 +146,27 @@ SYMBOL: person4
         { "blob" "B" BLOB }
         { "factor-blob" "FB" FACTOR-BLOB }
     } define-persistent
-    1 "billy" 10 3.14 f f f f f <assigned-person> person1 set
-    2 "johnny" 10 3.14 f f f f f <assigned-person> person2 set
+    1 "billy" 10 3.14 f f f f f <user-assigned-person> person1 set
+    2 "johnny" 10 3.14 f f f f f <user-assigned-person> person2 set
     3 "teddy" 10 3.14
         T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
         T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
         T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
         B{ 115 116 111 114 101 105 110 97 98 108 111 98 }
-        f <assigned-person> person3 set
+        f <user-assigned-person> person3 set
     4 "eddie" 10 3.14
         T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
         T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
         T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
-        f H{ { 1 2 } { 3 4 } { 5 "lol" } } <assigned-person> person4 set ;
+        f H{ { 1 2 } { 3 4 } { 5 "lol" } } <user-assigned-person> person4 set ;
 
 TUPLE: paste n summary author channel mode contents timestamp annotations ;
 TUPLE: annotation n paste-id summary author mode contents ;
 
-: native-paste-schema ( -- )
+: db-assigned-paste-schema ( -- )
     paste "PASTE"
     {
-        { "n" "ID" +native-id+ }
+        { "n" "ID" +db-assigned-id+ }
         { "summary" "SUMMARY" TEXT }
         { "author" "AUTHOR" TEXT }
         { "channel" "CHANNEL" TEXT }
@@ -177,7 +178,7 @@ TUPLE: annotation n paste-id summary author mode contents ;
 
     annotation "ANNOTATION"
     {
-        { "n" "ID" +native-id+ }
+        { "n" "ID" +db-assigned-id+ }
         { "paste-id" "PASTE_ID" INTEGER { +foreign-id+ paste "n" } }
         { "summary" "SUMMARY" TEXT }
         { "author" "AUTHOR" TEXT }
@@ -210,7 +211,7 @@ TUPLE: serialize-me id data ;
 : test-serialize ( -- )
     serialize-me "SERIALIZED"
     {
-        { "id" "ID" +native-id+ }
+        { "id" "ID" +db-assigned-id+ }
         { "data" "DATA" FACTOR-BLOB }
     } define-persistent
     [ serialize-me drop-table ] [ drop ] recover
@@ -226,7 +227,7 @@ TUPLE: exam id name score ;
 : test-intervals ( -- )
     exam "EXAM"
     {
-        { "id" "ID" +native-id+ }
+        { "id" "ID" +db-assigned-id+ }
         { "name" "NAME" TEXT }
         { "score" "SCORE" INTEGER }
     } define-persistent
@@ -292,6 +293,46 @@ TUPLE: exam id name score ;
         }
     ] [
         T{ exam f T{ range f 1 3 1 } } select-tuples
+    ] unit-test
+
+    [
+        {
+            T{ exam f 2 "Stan" 80 }
+            T{ exam f 3 "Kenny" 60 }
+            T{ exam f 4 "Cartman" 41 }
+        }
+    ] [
+        T{ exam f T{ interval f { 2 t } { 1.0/0.0 f } } } select-tuples
+    ] unit-test
+
+    [
+        {
+            T{ exam f 1 "Kyle" 100 }
+        }
+    ] [
+        T{ exam f T{ interval f { -1.0/0.0 t } { 2 f } } } select-tuples
+    ] unit-test
+
+    [
+        {
+            T{ exam f 1 "Kyle" 100 }
+            T{ exam f 2 "Stan" 80 }
+            T{ exam f 3 "Kenny" 60 }
+            T{ exam f 4 "Cartman" 41 }
+        }
+    ] [
+        T{ exam f T{ interval f { -1.0/0.0 t } { 1/0. f } } } select-tuples
+    ] unit-test
+    
+    [
+        {
+            T{ exam f 1 "Kyle" 100 }
+            T{ exam f 2 "Stan" 80 }
+            T{ exam f 3 "Kenny" 60 }
+            T{ exam f 4 "Cartman" 41 }
+        }
+    ] [
+        T{ exam } select-tuples
     ] unit-test ;
 
 TUPLE: bignum-test id m n o ;
@@ -304,7 +345,7 @@ TUPLE: bignum-test id m n o ;
 : test-bignum
     bignum-test "BIGNUM_TEST"
     {
-        { "id" "ID" +native-id+ }
+        { "id" "ID" +db-assigned-id+ }
         { "m" "M" BIG-INTEGER }
         { "n" "N" UNSIGNED-BIG-INTEGER }
         { "o" "O" SIGNED-BIG-INTEGER }
@@ -328,9 +369,9 @@ C: <secret> secret
         { "message" "MESSAGE" TEXT }
     } define-persistent
 
-    [ ] [ secret ensure-table ] unit-test
+    [ ] [ secret recreate-table ] unit-test
 
-    [ ] [ f "kilroy was here" <secret> insert-tuple ] unit-test
+    [ t ] [ f "kilroy was here" <secret> [ insert-tuple ] keep n>> integer? ] unit-test
 
     [ ] [ f "kilroy was here2" <secret> insert-tuple ] unit-test
 
@@ -345,17 +386,17 @@ C: <secret> secret
         T{ secret } select-tuples length 3 =
     ] unit-test ;
 
-[ native-person-schema test-tuples ] test-sqlite
-[ assigned-person-schema test-tuples ] test-sqlite
-[ assigned-person-schema test-repeated-insert ] test-sqlite
+[ db-assigned-person-schema test-tuples ] test-sqlite
+[ user-assigned-person-schema test-tuples ] test-sqlite
+[ user-assigned-person-schema test-repeated-insert ] test-sqlite
 [ test-bignum ] test-sqlite
 [ test-serialize ] test-sqlite
 [ test-intervals ] test-sqlite
 [ test-random-id ] test-sqlite
 
-[ native-person-schema test-tuples ] test-postgresql
-[ assigned-person-schema test-tuples ] test-postgresql
-[ assigned-person-schema test-repeated-insert ] test-postgresql
+[ db-assigned-person-schema test-tuples ] test-postgresql
+[ user-assigned-person-schema test-tuples ] test-postgresql
+[ user-assigned-person-schema test-repeated-insert ] test-postgresql
 [ test-bignum ] test-postgresql
 [ test-serialize ] test-postgresql
 [ test-intervals ] test-postgresql
@@ -377,7 +418,7 @@ TUPLE: does-not-persist ;
 \ bind-tuple must-infer
 \ insert-tuple must-infer
 \ update-tuple must-infer
-\ delete-tuple must-infer
+\ delete-tuples must-infer
 \ select-tuple must-infer
 \ define-persistent must-infer
 \ ensure-table must-infer

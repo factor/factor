@@ -15,7 +15,7 @@ GENERIC: where ( specs obj -- )
 
 : query-make ( class quot -- )
     >r sql-props r>
-    [ 0 sql-counter rot with-variable ] { "" { } { } } nmake
+    [ 0 sql-counter rot with-variable ";" 0% ] { "" { } { } } nmake
     <simple-statement> maybe-make-retryable ; inline
 
 M: db begin-transaction ( -- ) "BEGIN" sql-command ;
@@ -35,14 +35,6 @@ M: db <update-tuple-statement> ( class -- statement )
         where-primary-key%
     ] query-make ;
 
-M: db <delete-tuple-statement> ( specs table -- sql )
-    [
-        "delete from " 0% 0%
-        " where " 0%
-        find-primary-key
-        dup column-name>> 0% " = " 0% bind%
-    ] query-make ;
-
 M: random-id-generator eval-generator ( singleton -- obj )
     drop
     system-random-generator get [
@@ -52,18 +44,40 @@ M: random-id-generator eval-generator ( singleton -- obj )
 : interval-comparison ( ? str -- str )
     "from" = " >" " <" ? swap [ "= " append ] when ;
 
+: fp-infinity? ( float -- ? )
+    dup float? [
+        double>bits -52 shift 11 2^ 1- [ bitand ] keep =
+    ] [
+        drop f
+    ] if ;
+
+: (infinite-interval?) ( interval -- ?1 ?2 )
+    [ from>> ] [ to>> ] bi
+    [ first fp-infinity? ] bi@ ;
+
+: double-infinite-interval? ( obj -- ? )
+    dup interval? [ (infinite-interval?) and ] [ drop f ] if ;
+
+: infinite-interval? ( obj -- ? )
+    dup interval? [ (infinite-interval?) or ] [ drop f ] if ;
+
 : where-interval ( spec obj from/to -- )
-    pick column-name>> 0%
-    >r first2 r> interval-comparison 0%
-    bind# ;
+    over first fp-infinity? [
+        3drop
+    ] [
+        pick column-name>> 0%
+        >r first2 r> interval-comparison 0%
+        bind#
+    ] if ;
 
 : in-parens ( quot -- )
     "(" 0% call ")" 0% ; inline
 
 M: interval where ( spec obj -- )
     [
-        [ from>> "from" where-interval " and " 0% ]
-        [ to>> "to" where-interval ] 2bi
+        [ from>> "from" where-interval ] [
+            nip infinite-interval? [ " and " 0% ] unless
+        ] [ to>> "to" where-interval ] 2tri
     ] in-parens ;
 
 M: sequence where ( spec obj -- )
@@ -80,12 +94,29 @@ M: integer where ( spec obj -- ) object-where ;
 
 M: string where ( spec obj -- ) object-where ;
 
+: filter-slots ( tuple specs -- specs' )
+    [
+        slot-name>> swap get-slot-named
+        dup double-infinite-interval? [ drop f ] when
+    ] with filter ;
+
 : where-clause ( tuple specs -- )
-    " where " 0% [
-        " and " 0%
+    dupd filter-slots
+    dup empty? [
+        2drop
     ] [
-        2dup slot-name>> swap get-slot-named where
-    ] interleave drop ;
+        " where " 0% [
+            " and " 0%
+        ] [
+            2dup slot-name>> swap get-slot-named where
+        ] interleave drop
+    ] if ;
+
+M: db <delete-tuples-statement> ( tuple table -- sql )
+    [
+        "delete from " 0% 0%
+        where-clause
+    ] query-make ;
 
 M: db <select-by-slots-statement> ( tuple class -- statement )
     [
@@ -94,7 +125,5 @@ M: db <select-by-slots-statement> ( tuple class -- statement )
         [ dup column-name>> 0% 2, ] interleave
 
         " from " 0% 0%
-        dupd
-        [ slot-name>> swap get-slot-named ] with filter
-        dup empty? [ 2drop ] [ where-clause ] if ";" 0%
+        where-clause
     ] query-make ;

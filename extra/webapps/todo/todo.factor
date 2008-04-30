@@ -2,10 +2,16 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel locals sequences namespaces
 db db.types db.tuples
-http.server.components http.server.components.farkup
-http.server.forms http.server.templating.chloe
-http.server.boilerplate http.server.crud http.server.auth
-http.server.actions http.server.db
+http.server.sessions
+http.server.components
+http.server.components.farkup
+http.server.forms
+http.server.templating.chloe
+http.server.boilerplate
+http.server.crud
+http.server.auth
+http.server.actions
+http.server.db
 http.server.auth.login
 http.server ;
 IN: webapps.todo
@@ -15,7 +21,7 @@ TUPLE: todo uid id priority summary description ;
 todo "TODO"
 {
     { "uid" "UID" { VARCHAR 256 } +not-null+ }
-    { "id" "ID" +native-id+ }
+    { "id" "ID" +db-assigned-id+ }
     { "priority" "PRIORITY" INTEGER +not-null+ }
     { "summary" "SUMMARY" { VARCHAR 256 } +not-null+ }
     { "description" "DESCRIPTION" { VARCHAR 256 } }

@@ -1,15 +1,16 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test peg peg.ebnf words math math.parser sequences ;
+USING: kernel tools.test peg peg.ebnf words math math.parser 
+       sequences accessors ;
 IN: peg.ebnf.tests
 
 { T{ ebnf-non-terminal f "abc" } } [
-  "abc" 'non-terminal' parse parse-result-ast 
+  "abc" 'non-terminal' parse ast>> 
 ] unit-test
 
 { T{ ebnf-terminal f "55" } } [
-  "'55'" 'terminal' parse parse-result-ast 
+  "'55'" 'terminal' parse ast>> 
 ] unit-test
 
 {
@@ -20,7 +21,7 @@ IN: peg.ebnf.tests
      }
   } 
 } [
-  "digit = '1' | '2'" 'rule' parse parse-result-ast
+  "digit = '1' | '2'" 'rule' parse ast>>
 ] unit-test
 
 {
@@ -31,7 +32,7 @@ IN: peg.ebnf.tests
      }
   }   
 } [
-  "digit = '1' '2'" 'rule' parse parse-result-ast
+  "digit = '1' '2'" 'rule' parse ast>>
 ] unit-test
 
 {
@@ -44,20 +45,22 @@ IN: peg.ebnf.tests
      }
   } 
 } [
-  "one two | three" 'choice' parse parse-result-ast
+  "one two | three" 'choice' parse ast>>
 ] unit-test
 
 {
   T{ ebnf-sequence f
      V{ 
        T{ ebnf-non-terminal f "one" }
-       T{ ebnf-choice f
-          V{ T{ ebnf-non-terminal f "two" } T{ ebnf-non-terminal f "three" } }
+       T{ ebnf-whitespace f
+         T{ ebnf-choice f
+            V{ T{ ebnf-non-terminal f "two" } T{ ebnf-non-terminal f "three" } }
+         }
        }
      }
   } 
 } [
-  "one (two | three)" 'choice' parse parse-result-ast
+  "one {two | three}" 'choice' parse ast>>
 ] unit-test
 
 {
@@ -77,7 +80,7 @@ IN: peg.ebnf.tests
      }
   } 
 } [
-  "one ((two | three) four)*" 'choice' parse parse-result-ast
+  "one ((two | three) four)*" 'choice' parse ast>>
 ] unit-test
 
 {
@@ -89,43 +92,43 @@ IN: peg.ebnf.tests
      }
   } 
 } [
-  "one ( two )? three" 'choice' parse parse-result-ast
+  "one ( two )? three" 'choice' parse ast>>
 ] unit-test
 
 { "foo" } [
-  "\"foo\"" 'identifier' parse parse-result-ast
+  "\"foo\"" 'identifier' parse ast>>
 ] unit-test
 
 { "foo" } [
-  "'foo'" 'identifier' parse parse-result-ast
+  "'foo'" 'identifier' parse ast>>
 ] unit-test
 
 { "foo" } [
-  "foo" 'non-terminal' parse parse-result-ast ebnf-non-terminal-symbol
+  "foo" 'non-terminal' parse ast>> ebnf-non-terminal-symbol
 ] unit-test
 
 { "foo" } [
-  "foo]" 'non-terminal' parse parse-result-ast ebnf-non-terminal-symbol
+  "foo]" 'non-terminal' parse ast>> ebnf-non-terminal-symbol
 ] unit-test
 
 { V{ "a" "b" } } [
-  "ab" [EBNF foo='a' 'b' EBNF] call parse-result-ast 
+  "ab" [EBNF foo='a' 'b' EBNF] call ast>> 
 ] unit-test
 
 { V{ 1 "b" } } [
-  "ab" [EBNF foo=('a')[[ drop 1 ]] 'b' EBNF] call parse-result-ast 
+  "ab" [EBNF foo=('a')[[ drop 1 ]] 'b' EBNF] call ast>> 
 ] unit-test
 
 { V{ 1 2 } } [
-  "ab" [EBNF foo=('a') [[ drop 1 ]] ('b') [[ drop 2 ]] EBNF] call parse-result-ast 
+  "ab" [EBNF foo=('a') [[ drop 1 ]] ('b') [[ drop 2 ]] EBNF] call ast>> 
 ] unit-test
 
 { CHAR: A } [
-  "A" [EBNF foo=[A-Z] EBNF] call parse-result-ast 
+  "A" [EBNF foo=[A-Z] EBNF] call ast>> 
 ] unit-test
 
 { CHAR: Z } [
-  "Z" [EBNF foo=[A-Z] EBNF] call parse-result-ast 
+  "Z" [EBNF foo=[A-Z] EBNF] call ast>> 
 ] unit-test
 
 { f } [
@@ -133,7 +136,7 @@ IN: peg.ebnf.tests
 ] unit-test
 
 { CHAR: 0 } [
-  "0" [EBNF foo=[^A-Z] EBNF] call parse-result-ast 
+  "0" [EBNF foo=[^A-Z] EBNF] call ast>> 
 ] unit-test
 
 { f } [
@@ -145,31 +148,31 @@ IN: peg.ebnf.tests
 ] unit-test
 
 { V{ "1" "+" "foo" } } [
-  "1+1" [EBNF foo='1' '+' '1' [[ drop "foo" ]] EBNF] call parse-result-ast
+  "1+1" [EBNF foo='1' '+' '1' [[ drop "foo" ]] EBNF] call ast>>
 ] unit-test
 
 { "foo" } [
-  "1+1" [EBNF foo='1' '+' '1' => [[ drop "foo" ]] EBNF] call parse-result-ast
+  "1+1" [EBNF foo='1' '+' '1' => [[ drop "foo" ]] EBNF] call ast>>
 ] unit-test
 
 { "foo" } [
-  "1+1" [EBNF foo='1' '+' '1' => [[ drop "foo" ]] | '1' '-' '1' => [[ drop "bar" ]] EBNF] call parse-result-ast
+  "1+1" [EBNF foo='1' '+' '1' => [[ drop "foo" ]] | '1' '-' '1' => [[ drop "bar" ]] EBNF] call ast>>
 ] unit-test
 
 { "bar" } [
-  "1-1" [EBNF foo='1' '+' '1' => [[ drop "foo" ]] | '1' '-' '1' => [[ drop "bar" ]] EBNF] call parse-result-ast
+  "1-1" [EBNF foo='1' '+' '1' => [[ drop "foo" ]] | '1' '-' '1' => [[ drop "bar" ]] EBNF] call ast>>
 ] unit-test
 
 { 6 } [
-  "4+2" [EBNF num=[0-9] => [[ digit> ]] foo=num:x '+' num:y => [[ drop x y + ]] EBNF] call parse-result-ast
+  "4+2" [EBNF num=[0-9] => [[ digit> ]] foo=num:x '+' num:y => [[ drop x y + ]] EBNF] call ast>>
 ] unit-test
 
 { 6 } [
-  "4+2" [EBNF foo=[0-9]:x '+' [0-9]:y => [[ drop x digit> y digit> + ]] EBNF] call parse-result-ast
+  "4+2" [EBNF foo=[0-9]:x '+' [0-9]:y => [[ drop x digit> y digit> + ]] EBNF] call ast>>
 ] unit-test
 
 { 10 } [
-  { 1 2 3 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ drop x y + ]] | num EBNF] call parse-result-ast
+  { 1 2 3 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ drop x y + ]] | num EBNF] call ast>>
 ] unit-test
 
 { f } [
@@ -177,7 +180,7 @@ IN: peg.ebnf.tests
 ] unit-test
 
 { 3 } [
-  { 1 2 "a" 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ drop x y + ]] | num EBNF] call parse-result-ast
+  { 1 2 "a" 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ drop x y + ]] | num EBNF] call ast>>
 ] unit-test
 
 { f } [
@@ -185,44 +188,44 @@ IN: peg.ebnf.tests
 ] unit-test
 
 { V{ "a" " " "b" } } [
-  "a b" [EBNF -=" " | "\t" | "\n" foo="a" - "b" EBNF] call parse-result-ast
+  "a b" [EBNF -=" " | "\t" | "\n" foo="a" - "b" EBNF] call ast>>
 ] unit-test
 
 { V{ "a" "\t" "b" } } [
-  "a\tb" [EBNF -=" " | "\t" | "\n" foo="a" - "b" EBNF] call parse-result-ast 
+  "a\tb" [EBNF -=" " | "\t" | "\n" foo="a" - "b" EBNF] call ast>> 
 ] unit-test
 
 { V{ "a" "\n" "b" } } [
-  "a\nb" [EBNF -=" " | "\t" | "\n" foo="a" - "b" EBNF] call parse-result-ast
+  "a\nb" [EBNF -=" " | "\t" | "\n" foo="a" - "b" EBNF] call ast>>
 ] unit-test
 
 { V{ "a" f "b" } } [
-  "ab" [EBNF -=" " | "\t" | "\n" foo="a" (-)? "b" EBNF] call parse-result-ast
+  "ab" [EBNF -=" " | "\t" | "\n" foo="a" (-)? "b" EBNF] call ast>>
 ] unit-test
 
 { V{ "a" " " "b" } } [
-  "a b" [EBNF -=" " | "\t" | "\n" foo="a" (-)? "b" EBNF] call parse-result-ast
+  "a b" [EBNF -=" " | "\t" | "\n" foo="a" (-)? "b" EBNF] call ast>>
 ] unit-test
 
 
 { V{ "a" "\t" "b" } } [
-  "a\tb" [EBNF -=" " | "\t" | "\n" foo="a" (-)? "b" EBNF] call parse-result-ast
+  "a\tb" [EBNF -=" " | "\t" | "\n" foo="a" (-)? "b" EBNF] call ast>>
 ] unit-test
 
 { V{ "a" "\n" "b" } } [
-  "a\nb" [EBNF -=" " | "\t" | "\n" foo="a" (-)? "b" EBNF] call parse-result-ast
+  "a\nb" [EBNF -=" " | "\t" | "\n" foo="a" (-)? "b" EBNF] call ast>>
 ] unit-test
 
 { V{ "a" "b" } } [
-  "ab" [EBNF -=(" " | "\t" | "\n")? => [[ drop ignore ]] foo="a" - "b" EBNF] call parse-result-ast
+  "ab" [EBNF -=(" " | "\t" | "\n")? => [[ drop ignore ]] foo="a" - "b" EBNF] call ast>>
 ] unit-test
 
 { V{ "a" "b" } } [
-  "a\tb" [EBNF -=(" " | "\t" | "\n")? => [[ drop ignore ]] foo="a" - "b" EBNF] call parse-result-ast
+  "a\tb" [EBNF -=(" " | "\t" | "\n")? => [[ drop ignore ]] foo="a" - "b" EBNF] call ast>>
 ] unit-test
 
 { V{ "a" "b" } } [
-  "a\nb" [EBNF -=(" " | "\t" | "\n")? => [[ drop ignore ]] foo="a" - "b" EBNF] call parse-result-ast
+  "a\nb" [EBNF -=(" " | "\t" | "\n")? => [[ drop ignore ]] foo="a" - "b" EBNF] call ast>>
 ] unit-test
 
 { f } [
@@ -232,19 +235,19 @@ IN: peg.ebnf.tests
 { V{ V{ 49 } "+" V{ 49 } } } [ 
   #! Test direct left recursion. 
   #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
-  "1+1" [EBNF num=([0-9])+ expr=expr "+" num | num EBNF] call parse-result-ast
+  "1+1" [EBNF num=([0-9])+ expr=expr "+" num | num EBNF] call ast>>
 ] unit-test
 
 { V{ V{ V{ 49 } "+" V{ 49 } } "+" V{ 49 } } } [ 
   #! Test direct left recursion. 
   #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
-  "1+1+1" [EBNF num=([0-9])+ expr=expr "+" num | num EBNF] call parse-result-ast
+  "1+1+1" [EBNF num=([0-9])+ expr=expr "+" num | num EBNF] call ast>>
 ] unit-test
 
 { V{ V{ V{ 49 } "+" V{ 49 } } "+" V{ 49 } } } [ 
   #! Test indirect left recursion. 
   #! Using packrat, so first part of expr fails, causing 2nd choice to be used  
-  "1+1+1" [EBNF num=([0-9])+ x=expr expr=x "+" num | num EBNF] call parse-result-ast
+  "1+1+1" [EBNF num=([0-9])+ x=expr expr=x "+" num | num EBNF] call ast>>
 ] unit-test
 
 { t } [
@@ -277,23 +280,88 @@ main = Primary
 ;EBNF 
 
 { "this" } [
-  "this" primary parse-result-ast
+  "this" primary ast>>
 ] unit-test
 
 { V{ "this" "." "x" } } [
-  "this.x" primary parse-result-ast
+  "this.x" primary ast>>
 ] unit-test
 
 { V{ V{ "this" "." "x" } "." "y" } } [
-  "this.x.y" primary parse-result-ast
+  "this.x.y" primary ast>>
 ] unit-test
 
 { V{ V{ "this" "." "x" } "." "m" "(" ")" } } [
-  "this.x.m()" primary parse-result-ast
+  "this.x.m()" primary ast>>
 ] unit-test
 
 { V{ V{ V{ "x" "[" "i" "]" } "[" "j" "]" } "." "y" } } [
-  "x[i][j].y" primary parse-result-ast
+  "x[i][j].y" primary ast>>
 ] unit-test
 
 'ebnf' compile must-infer
+
+{ V{ V{ "a" "b" } "c" } } [
+  "abc" [EBNF a="a" "b" foo=(a "c") EBNF] call ast>>
+] unit-test
+
+{ V{ V{ "a" "b" } "c" } } [
+  "abc" [EBNF a="a" "b" foo={a "c"} EBNF] call ast>>
+] unit-test
+
+{ V{ V{ "a" "b" } "c" } } [
+  "abc" [EBNF a="a" "b" foo=a "c" EBNF] call ast>>
+] unit-test
+
+{ f } [
+  "a bc" [EBNF a="a" "b" foo=(a "c") EBNF] call 
+] unit-test
+
+{ f } [
+  "a bc" [EBNF a="a" "b" foo=a "c" EBNF] call 
+] unit-test
+
+{ f } [
+  "a bc" [EBNF a="a" "b" foo={a "c"} EBNF] call
+] unit-test
+
+{ f } [
+  "ab c" [EBNF a="a" "b" foo=a "c" EBNF] call 
+] unit-test
+
+{ V{ V{ "a" "b" } "c" } } [
+  "ab c" [EBNF a="a" "b" foo={a "c"} EBNF] call ast>>
+] unit-test
+
+{ f } [
+  "ab c" [EBNF a="a" "b" foo=(a "c") EBNF] call 
+] unit-test
+
+{ f } [
+  "a b c" [EBNF a="a" "b" foo=a "c" EBNF] call 
+] unit-test
+
+{ f } [
+  "a b c" [EBNF a="a" "b" foo=(a "c") EBNF] call 
+] unit-test
+
+{ f } [
+  "a b c" [EBNF a="a" "b" foo={a "c"} EBNF] call 
+] unit-test
+
+{ V{ V{ V{ "a" "b" } "c" } V{ V{ "a" "b" } "c" } } } [
+  "ab cab c" [EBNF a="a" "b" foo={a "c"}* EBNF] call ast>>
+] unit-test
+
+{ V{ } } [
+  "ab cab c" [EBNF a="a" "b" foo=(a "c")* EBNF] call ast>>
+] unit-test
+
+{ V{ V{ V{ "a" "b" } "c" } V{ V{ "a" "b" } "c" } } } [
+  "ab c ab c" [EBNF a="a" "b" foo={a "c"}* EBNF] call ast>>
+] unit-test
+
+{ V{ } } [
+  "ab c ab c" [EBNF a="a" "b" foo=(a "c")* EBNF] call ast>>
+] unit-test
+

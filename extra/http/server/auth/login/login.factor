@@ -35,9 +35,7 @@ TUPLE: user-saver user ;
 C: <user-saver> user-saver
 
 M: user-saver dispose
-    user-profile-changed? get [
-        user>> users update-user
-    ] [ drop ] if ;
+    user>> dup changed?>> [ users update-user ] [ drop ] if ;
 
 : save-user-after ( user -- )
     <user-saver> add-always-destructor ;
@@ -59,7 +57,7 @@ M: user-saver dispose
             add-field ;
 
 : successful-login ( user -- response )
-    logged-in-user sset
+    username>> set-uid
     "$login" end-flow ;
 
 :: <login-action> ( -- action )
@@ -125,11 +123,11 @@ SYMBOL: user-exists?
 
                 same-password-twice
 
-                <user>
-                    "username" value >>username
+                "username" value <user>
                     "realname" value >>realname
                     "new-password" value >>password
                     "email" value >>email
+                    H{ } clone >>profile
 
                 users new-user [
                     user-exists? on
@@ -160,7 +158,7 @@ SYMBOL: user-exists?
             [
                 blank-values
 
-                logged-in-user sget
+                logged-in-user get
                 [ username>> "username" set-value ]
                 [ realname>> "realname" set-value ]
                 [ email>> "email" set-value ]
@@ -175,7 +173,7 @@ SYMBOL: user-exists?
 
                 form validate-form
 
-                logged-in-user sget
+                logged-in-user get
 
                 { "password" "new-password" "verify-password" }
                 [ value empty? ] all? [
@@ -190,9 +188,9 @@ SYMBOL: user-exists?
                 "realname" value >>realname
                 "email" value >>email
 
-                drop
+                t >>changed?
 
-                user-profile-changed? on
+                drop
 
                 "$login" end-flow
             ] >>submit
@@ -330,7 +328,7 @@ SYMBOL: lost-password-from
 : <logout-action> ( -- action )
     <action>
         [
-            f logged-in-user sset
+            f set-uid
             "$login/login" end-flow
         ] >>submit ;
 
@@ -345,8 +343,9 @@ C: <protected> protected
     "$login/login" f <standard-redirect> ;
 
 M: protected call-responder* ( path responder -- response )
-    logged-in-user sget dup [
-        save-user-after
+    uid dup [
+        users get-user
+        [ logged-in-user set ] [ save-user-after ] bi
         call-next-method
     ] [
         3drop show-login-page

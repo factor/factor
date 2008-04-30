@@ -11,7 +11,7 @@ C: <node> node
 
 node "node"
 {
-    { "id" "id" +native-id+ +autoincrement+ }
+    { "id" "id" +db-assigned-id+ +autoincrement+ }
     { "content" "content" TEXT }
 } define-persistent
 

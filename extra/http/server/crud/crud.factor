@@ -51,7 +51,7 @@ IN: http.server.crud
         { { "id" [ v-number ] } } >>post-params
 
         [
-            "id" get ctor call delete-tuple
+            "id" get ctor call delete-tuples
 
             next f <standard-redirect>
         ] >>submit ;

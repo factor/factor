@@ -18,6 +18,8 @@ IN: bootstrap.compiler
 
 enable-compiler
 
+: compile-uncompiled [ compiled? not ] filter compile ;
+
 nl
 "Compiling..." write flush
 
@@ -42,38 +44,38 @@ nl
     find-pair-next namestack*
 
     bitand bitor bitxor bitnot
-} compile
+} compile-uncompiled
 
 "." write flush
 
 {
-    + 1+ 1- 2/ < <= > >= shift min
-} compile
+    + 1+ 1- 2/ < <= > >= shift
+} compile-uncompiled
 
 "." write flush
 
 {
     new-sequence nth push pop peek
-} compile
+} compile-uncompiled
 
 "." write flush
 
 {
     hashcode* = get set
-} compile
+} compile-uncompiled
 
 "." write flush
 
 {
     . lines
-} compile
+} compile-uncompiled
 
 "." write flush
 
 {
     malloc calloc free memcpy
-} compile
+} compile-uncompiled
 
-vocabs [ words [ compiled? not ] filter compile "." write flush ] each
+vocabs [ words compile-uncompiled "." write flush ] each
 
 " done" print flush

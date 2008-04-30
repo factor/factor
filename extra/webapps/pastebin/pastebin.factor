@@ -24,7 +24,7 @@ TUPLE: paste id summary author mode date contents annotations captcha ;
 
 paste "PASTE"
 {
-    { "id" "ID" INTEGER +native-id+ }
+    { "id" "ID" INTEGER +db-assigned-id+ }
     { "summary" "SUMMARY" { VARCHAR 256 } +not-null+ }
     { "author" "AUTHOR" { VARCHAR 256 } +not-null+ }
     { "mode" "MODE" { VARCHAR 256 } +not-null+ }
@@ -43,7 +43,7 @@ TUPLE: annotation aid id summary author mode contents date captcha ;
 
 annotation "ANNOTATION"
 {
-    { "aid" "AID" INTEGER +native-id+ }
+    { "aid" "AID" INTEGER +db-assigned-id+ }
     { "id" "ID" INTEGER +not-null+ }
     { "summary" "SUMMARY" { VARCHAR 256 } +not-null+ }
     { "author" "AUTHOR" { VARCHAR 256 } +not-null+ }
@@ -197,9 +197,9 @@ annotation "ANNOTATION"
         { { "id" [ v-number ] } } >>post-params
 
         [
-            "id" get ctor call delete-tuple
+            "id" get ctor call delete-tuples
 
-            "id" get f <annotation> select-tuples [ delete-tuple ] each
+            "id" get f <annotation> delete-tuples
 
             next f <permanent-redirect>
         ] >>submit ;
@@ -209,7 +209,7 @@ annotation "ANNOTATION"
         { { "id" [ v-number ] } { "aid" [ v-number ] } } >>post-params
 
         [
-            "id" get "aid" get ctor call delete-tuple
+            "id" get "aid" get ctor call delete-tuples
 
             "id" get next <id-redirect>
         ] >>submit ;

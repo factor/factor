@@ -6,17 +6,17 @@ namespaces accessors kernel ;
 <users-in-memory> "provider" set
 
 [ t ] [
-    <user>
-        "slava" >>username
+    "slava" <user>
         "foobar" >>password
         "slava@factorcode.org" >>email
+        H{ } clone >>profile
     "provider" get new-user
     username>> "slava" =
 ] unit-test
 
 [ f ] [
-    <user>
-        "slava" >>username
+    "slava" <user>
+        H{ } clone >>profile
     "provider" get new-user
 ] unit-test
 

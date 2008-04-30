@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel arrays strings math.parser sequences
-peg peg.ebnf peg.parsers memoize math ;
+peg peg.ebnf peg.parsers memoize math accessors ;
 IN: peg.expr
 
 EBNF: expr 
@@ -20,5 +20,5 @@ exp      =   exp "+" fac    => [[ first3 nip + ]]
 ;EBNF
 
 : eval-expr ( string -- number )
-  expr parse-result-ast ;
+  expr ast>> ;
 
