@@ -4,7 +4,8 @@
 ! Simple CSV Parser
 ! Phil Dawes phil@phildawes.net
 
-USING: kernel sequences io namespaces combinators ;
+USING: kernel sequences io namespaces combinators
+unicode.categories ;
 IN: csv
 
 DEFER: quoted-field
@@ -29,7 +30,7 @@ DEFER: quoted-field
 
 ! trims whitespace from either end of string
 : trim-whitespace ( str -- str )
-  [ "\s\t" member? ] trim ; inline
+  [ blank? ] trim ; inline
   
 : quoted-field ( -- endchar )
   "\"" read-until                                 ! "
