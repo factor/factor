@@ -1,4 +1,5 @@
 USING: io.streams.string csv tools.test shuffle ;
+IN: csv.tests
 
 ! I like to name my unit tests
 : named-unit-test ( name output input -- ) 
@@ -32,7 +33,7 @@ USING: io.streams.string csv tools.test shuffle ;
 "Fields with leading or trailing spaces must be delimited by double-quote characters. (See comment about leading and trailing spaces above)"
 [ { { "1997" "Ford" "E350" "  Super luxurious truck    " } } ]
 [ "1997,Ford,E350,\"  Super luxurious truck    \""
-  <string-reader> csv ] unit-test
+  <string-reader> csv ] named-unit-test
 
 "Fields may always be delimited by double-quote characters, whether necessary or not."
 [ { { "1997" "Ford" "E350" } } ]
