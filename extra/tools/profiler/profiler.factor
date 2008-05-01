@@ -39,7 +39,7 @@ M: method-body (profile.)
     ] with-row ;
 
 : counters. ( assoc -- )
-    [ second 0 > ] subset sort-values
+    [ second 0 > ] filter sort-values
     standard-table-style [
         [ counter. ] assoc-each
     ] tabular-output ;
@@ -58,13 +58,13 @@ M: method-body (profile.)
     "Call counts for words which call " write
     dup pprint
     ":" print
-    usage [ word? ] subset counters counters. ;
+    usage [ word? ] filter counters counters. ;
 
 : vocabs-profile. ( -- )
     "Call counts for all vocabularies:" print
     vocabs [
         dup words
-        [ "predicating" word-prop not ] subset
+        [ "predicating" word-prop not ] filter
         [ profile-counter ] map sum
     ] { } map>assoc counters. ;
 

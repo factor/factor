@@ -4,9 +4,12 @@ USING: kernel accessors random math.parser locals
 sequences math crypto.sha2 ;
 IN: http.server.auth.providers
 
-TUPLE: user username realname password email ticket profile ;
+TUPLE: user username realname password email ticket profile deleted changed? ;
 
-: <user> user new H{ } clone >>profile ;
+: <user> ( username -- user )
+    user new
+        swap >>username
+        0 >>deleted ;
 
 GENERIC: get-user ( username provider -- user/f )
 

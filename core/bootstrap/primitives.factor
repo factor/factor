@@ -58,16 +58,13 @@ num-types get f <array> builtins set
     "alien.accessors"
     "arrays"
     "bit-arrays"
-    "bit-vectors"
     "byte-arrays"
-    "byte-vectors"
     "classes.private"
     "classes.tuple"
     "classes.tuple.private"
     "compiler.units"
     "continuations.private"
     "float-arrays"
-    "float-vectors"
     "generator"
     "growable"
     "hashtables"
@@ -160,7 +157,7 @@ num-types get f <array> builtins set
 
 ! Catch-all class for providing a default method.
 "object" "kernel" create
-[ f builtins get [ ] subset union-class define-class ]
+[ f builtins get [ ] filter union-class define-class ]
 [ [ drop t ] "predicate" set-word-prop ]
 bi
 
@@ -455,54 +452,6 @@ tuple
     }
 } define-tuple-class
 
-"byte-vector" "byte-vectors" create
-tuple
-{
-    {
-        { "byte-array" "byte-arrays" }
-        "underlying"
-        { "underlying" "growable" }
-        { "set-underlying" "growable" }
-    } {
-        { "array-capacity" "sequences.private" }
-        "fill"
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    }
-} define-tuple-class
-
-"bit-vector" "bit-vectors" create
-tuple
-{
-    {
-        { "bit-array" "bit-arrays" }
-        "underlying"
-        { "underlying" "growable" }
-        { "set-underlying" "growable" }
-    } {
-        { "array-capacity" "sequences.private" }
-        "fill"
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    }
-} define-tuple-class
-
-"float-vector" "float-vectors" create
-tuple
-{
-    {
-        { "float-array" "float-arrays" }
-        "underlying"
-        { "underlying" "growable" }
-        { "set-underlying" "growable" }
-    } {
-        { "array-capacity" "sequences.private" }
-        "fill"
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    }
-} define-tuple-class
-
 "curry" "kernel" create
 tuple
 {
@@ -689,10 +638,6 @@ tuple
     { "set-alien-double" "alien.accessors" }
     { "alien-cell" "alien.accessors" }
     { "set-alien-cell" "alien.accessors" }
-    { "alien>char-string" "alien" }
-    { "string>char-alien" "alien" }
-    { "alien>u16-string" "alien" }
-    { "string>u16-alien" "alien" }
     { "(throw)" "kernel.private" }
     { "alien-address" "alien" }
     { "slot" "slots.private" }

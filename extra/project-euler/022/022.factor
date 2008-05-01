@@ -29,7 +29,7 @@ IN: project-euler.022
 
 : source-022 ( -- seq )
     "extra/project-euler/022/names.txt" resource-path
-    ascii file-contents [ quotable? ] subset "," split ;
+    ascii file-contents [ quotable? ] filter "," split ;
 
 : name-scores ( seq -- seq )
     [ 1+ swap alpha-value * ] map-index ;

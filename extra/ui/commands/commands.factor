@@ -37,7 +37,7 @@ GENERIC: command-word ( command -- word )
 : command-gestures ( class -- hash )
     commands values [
         [
-            [ first ] subset
+            [ first ] filter
             [ [ invoke-command ] curry swap set ] assoc-each
         ] each
     ] H{ } make-assoc ;
@@ -56,7 +56,7 @@ GENERIC: command-word ( command -- word )
 M: word command-name ( word -- str )
     word-name
     "com-" ?head drop
-    dup first Letter? [ 1 tail ] unless
+    dup first Letter? [ rest ] unless
     (command-name) ;
 
 M: word command-description ( word -- str )
@@ -66,7 +66,7 @@ M: word command-description ( word -- str )
     H{ { +nullary+ f } { +listener+ f } { +description+ f } } ;
 
 : define-command ( word hash -- )
-    default-flags swap assoc-union >r word-props r> update ;
+    [ word-props ] [ default-flags swap assoc-union ] bi* update ;
 
 : command-quot ( target command -- quot )
     dup 1quotation swap +nullary+ word-prop

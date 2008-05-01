@@ -32,7 +32,7 @@ IN: project-euler.036
 PRIVATE>
 
 : euler036 ( -- answer )
-    1 1000000 2 <range> [ both-bases? ] subset sum ;
+    1 1000000 2 <range> [ both-bases? ] filter sum ;
 
 ! [ euler036 ] 100 ave-time
 ! 3891 ms run / 173 ms GC ave time - 100 trials

@@ -85,7 +85,7 @@ SYMBOL: this-test
 : run-tests ( prefix -- failures )
     child-vocabs dup empty? [ drop f ] [
         [ dup run-test ] { } map>assoc
-        [ second empty? not ] subset
+        [ second empty? not ] filter
     ] if ;
 
 : test ( prefix -- )

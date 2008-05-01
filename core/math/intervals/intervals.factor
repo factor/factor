@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 ! Based on Slate's src/unfinished/interval.slate by Brian Rice.
-USING: kernel sequences arrays math combinators ;
+USING: kernel sequences arrays math combinators math.order ;
 IN: math.intervals
 
 TUPLE: interval from to ;
@@ -95,6 +95,8 @@ C: <interval> interval
 : interval-neg ( i1 -- i2 ) -1 [a,a] interval* ;
 
 : interval-bitnot ( i1 -- i2 ) interval-neg interval-1- ;
+
+: interval-sq ( i1 -- i2 ) dup interval* ;
 
 : make-interval ( from to -- int )
     over first over first {

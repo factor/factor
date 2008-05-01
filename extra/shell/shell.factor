@@ -1,6 +1,7 @@
 
-USING: kernel words continuations namespaces debugger sequences combinators
-       system io io.files io.launcher sequences.deep
+USING: kernel parser words continuations namespaces debugger
+       sequences combinators splitting prettyprint
+       system io io.files io.launcher io.encodings.utf8 sequences.deep
        accessors multi-methods newfx shell.parser ;
 
 IN: shell
@@ -41,6 +42,21 @@ METHOD: expand { glob-expr }
     [ ]
   if ;
 
+METHOD: expand { factor-expr } expr>> eval unparse ;
+
+DEFER: expansion
+
+METHOD: expand { back-quoted-expr }
+  expr>>
+  expr
+  ast>>
+  command>>
+  expansion
+  utf8 <process-stream>
+  contents
+  " \n" split
+  "" remove ;
+
 METHOD: expand { object } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -49,22 +65,45 @@ METHOD: expand { object } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: run-incantation ( incantation -- )
+: run-sword ( basic-expr -- )
+  command>> expansion unclip "shell" lookup execute ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: run-foreground ( process -- )
+  [ try-process ] [ print-error drop ] recover ;
+
+: run-background ( process -- ) run-detached drop ;
+
+: run-basic-expr ( basic-expr -- )
   <process>
     over command>> expansion >>command
     over stdin>>             >>stdin
     over stdout>>            >>stdout
   swap background>>
-    [ run-detached drop ]
-    [ [ try-process ] [ print-error drop ] recover ]
+    [ run-background ]
+    [ run-foreground ]
   if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: chant ( incantation -- )
+: basic-chant ( basic-expr -- )
   dup command>> first swords member-of?
-    [ command>> unclip "shell" lookup execute ]
-    [ run-incantation ]
+    [ run-sword ]
+    [ run-basic-expr ]
+  if ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: pipeline-chant ( pipeline-chant -- )
+  drop "ix: pipelines not supported" print ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: chant ( obj -- )
+  dup basic-expr?
+    [ basic-chant    ]
+    [ pipeline-chant ]
   if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

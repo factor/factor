@@ -1,6 +1,6 @@
-USING: alien alien.c-types alien.syntax combinators
+USING: alien alien.c-types alien.strings alien.syntax combinators
 kernel windows windows.user32 windows.ole32
-windows.com windows.com.syntax ;
+windows.com windows.com.syntax io.files ;
 IN: windows.shell32
 
 : CSIDL_DESKTOP HEX: 00 ; inline
@@ -83,7 +83,7 @@ FUNCTION: HINSTANCE ShellExecuteW ( HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFi
 : ShellExecute ShellExecuteW ; inline
 
 : open-in-explorer ( dir -- )
-    f "open" rot f f SW_SHOWNORMAL ShellExecute drop ;
+    f "open" rot (normalize-path) f f SW_SHOWNORMAL ShellExecute drop ;
 
 : shell32-error ( n -- )
     ole32-error ; inline
@@ -91,7 +91,7 @@ FUNCTION: HINSTANCE ShellExecuteW ( HWND hwnd, LPCTSTR lpOperation, LPCTSTR lpFi
 : shell32-directory ( n -- str )
     f swap f SHGFP_TYPE_DEFAULT
     MAX_UNICODE_PATH "ushort" <c-array>
-    [ SHGetFolderPath shell32-error ] keep alien>u16-string ;
+    [ SHGetFolderPath shell32-error ] keep utf16n alien>string ;
 
 : desktop ( -- str )
     CSIDL_DESKTOPDIRECTORY shell32-directory ;
@@ -167,6 +167,15 @@ TYPEDEF: DWORD SHGDNF
 
 TYPEDEF: ULONG SFGAOF
 
+C-STRUCT: DROPFILES
+    { "DWORD" "pFiles" }
+    { "POINT" "pt" }
+    { "BOOL" "fNC" }
+    { "BOOL" "fWide" } ;
+TYPEDEF: DROPFILES* LPDROPFILES
+TYPEDEF: DROPFILES* LPCDROPFILES
+TYPEDEF: HANDLE HDROP
+
 C-STRUCT: SHITEMID
     { "USHORT" "cb" }
     { "BYTE[1]" "abID" } ;
@@ -210,5 +219,6 @@ COM-INTERFACE: IShellFolder IUnknown {000214E6-0000-0000-C000-000000000046}
 
 FUNCTION: HRESULT SHGetDesktopFolder ( IShellFolder** ppshf ) ;
 
-FUNCTION: HRESULT StrRetToBufW ( STRRET *pstr, PCUITEMID_CHILD pidl, LPWSTR pszBuf, UINT cchBuf ) ;
-: StrRetToBuf StrRetToBufW ; inline
+FUNCTION: UINT DragQueryFileW ( HDROP hDrop, UINT iFile, LPWSTR lpszFile, UINT cch ) ;
+: DragQueryFile DragQueryFileW ; inline
+

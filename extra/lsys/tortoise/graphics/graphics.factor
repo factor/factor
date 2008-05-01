@@ -1,5 +1,5 @@
 
-USING: kernel math vectors sequences opengl.gl math.vectors
+USING: kernel math vectors sequences opengl.gl math.vectors math.order
        math.matrices vars opengl self pos ori turtle lsys.tortoise
 
        lsys.strings.interpret ;

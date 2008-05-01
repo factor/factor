@@ -150,18 +150,6 @@ ARTICLE: "syntax-byte-arrays" "Byte array syntax"
 { $subsection POSTPONE: B{ }
 "Byte arrays are documented in " { $link "byte-arrays" } "." ;
 
-ARTICLE: "syntax-bit-vectors" "Bit vector syntax"
-{ $subsection POSTPONE: ?V{ }
-"Bit vectors are documented in " { $link "bit-vectors" } "." ;
-
-ARTICLE: "syntax-float-vectors" "Float vector syntax"
-{ $subsection POSTPONE: FV{ }
-"Float vectors are documented in " { $link "float-vectors" } "." ;
-
-ARTICLE: "syntax-byte-vectors" "Byte vector syntax"
-{ $subsection POSTPONE: BV{ }
-"Byte vectors are documented in " { $link "byte-vectors" } "." ;
-
 ARTICLE: "syntax-pathnames" "Pathname syntax"
 { $subsection POSTPONE: P" }
 "Pathnames are documented in " { $link "pathnames" } "." ;
@@ -182,9 +170,6 @@ $nl
 { $subsection "syntax-float-arrays" }
 { $subsection "syntax-vectors" }
 { $subsection "syntax-sbufs" }
-{ $subsection "syntax-bit-vectors" }
-{ $subsection "syntax-byte-vectors" }
-{ $subsection "syntax-float-vectors" }
 { $subsection "syntax-hashtables" }
 { $subsection "syntax-tuples" }
 { $subsection "syntax-pathnames" } ;
@@ -205,7 +190,7 @@ HELP: delimiter
 HELP: parsing
 { $syntax ": foo ... ; parsing" }
 { $description "Declares the most recently defined word as a parsing word." }
-{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example "USE: io" "<< : hello \"Hello parser!\" print ; parsing >>\n: world hello ;" "Hello parser!" } } ;
+{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example "USE: io" "IN: scratchpad" "<< : hello \"Hello parser!\" print ; parsing >>\n: world hello ;" "Hello parser!" } } ;
 
 HELP: inline
 { $syntax ": foo ... ; inline" }
@@ -291,29 +276,11 @@ HELP: B{
 { $description "Marks the beginning of a literal byte array. Literal byte arrays are terminated by " { $link POSTPONE: } } "." } 
 { $examples { $code "B{ 1 2 3 }" } } ;
 
-HELP: BV{
-{ $syntax "BV{ elements... }" }
-{ $values { "elements" "a list of bytes" } }
-{ $description "Marks the beginning of a literal byte vector. Literal byte vectors are terminated by " { $link POSTPONE: } } "." } 
-{ $examples { $code "BV{ 1 2 3 12 }" } } ;
-
 HELP: ?{
 { $syntax "?{ elements... }" }
 { $values { "elements" "a list of booleans" } }
 { $description "Marks the beginning of a literal bit array. Literal bit arrays are terminated by " { $link POSTPONE: } } "." } 
 { $examples { $code "?{ t f t }" } } ;
-
-HELP: ?V{
-{ $syntax "?V{ elements... }" }
-{ $values { "elements" "a list of booleans" } }
-{ $description "Marks the beginning of a literal bit vector. Literal bit vectors are terminated by " { $link POSTPONE: } } "." } 
-{ $examples { $code "?V{ t f t }" } } ;
-
-HELP: FV{
-{ $syntax "FV{ elements... }" }
-{ $values { "elements" "a list of real numbers" } }
-{ $description "Marks the beginning of a literal float vector. Literal float vectors are terminated by " { $link POSTPONE: } } "." } 
-{ $examples { $code "FV{ 1.0 2.0 3.0 }" } } ;
 
 HELP: F{
 { $syntax "F{ elements... }" }
@@ -371,7 +338,7 @@ HELP: SYMBOL:
 { $syntax "SYMBOL: word" }
 { $values { "word" "a new word to define" } }
 { $description "Defines a new symbol word in the current vocabulary. Symbols push themselves on the stack when executed, and are used to identify variables (see " { $link "namespaces" } ") as well as for storing crufties in word properties (see " { $link "word-props" } ")." }
-{ $examples { $example "USE: prettyprint" "SYMBOL: foo\nfoo ." "foo" } } ;
+{ $examples { $example "USE: prettyprint" "IN: scratchpad" "SYMBOL: foo\nfoo ." "foo" } } ;
 
 { define-symbol POSTPONE: SYMBOL: } related-words
 
@@ -505,6 +472,7 @@ HELP: HOOK:
 { $examples
     { $example
         "USING: io namespaces ;"
+        "IN: scratchpad"
         "SYMBOL: transport"
         "TUPLE: land-transport ;"
         "TUPLE: air-transport ;"

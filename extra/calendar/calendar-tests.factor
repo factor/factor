@@ -1,6 +1,10 @@
 USING: arrays calendar kernel math sequences tools.test
-continuations system ;
+continuations system math.order threads ;
 IN: calendar.tests
+
+\ time+ must-infer
+\ time* must-infer
+\ time- must-infer
 
 [ f ] [ 2004 12 32 0   0  0 instant <timestamp> valid-timestamp? ] unit-test
 [ f ] [ 2004  2 30 0   0  0 instant <timestamp> valid-timestamp? ] unit-test
@@ -127,16 +131,16 @@ IN: calendar.tests
 [ t ] [ 2004 1 1 23 0 0 9+1/2 hours <timestamp> >gmt
         2004 1 1 13 30 0 instant <timestamp> = ] unit-test
 
-[ 0 ] [ 2004 1 1 13 30 0 instant <timestamp>
+[ +eq+ ] [ 2004 1 1 13 30 0 instant <timestamp>
         2004 1 1 12 30 0 -1 hours <timestamp> <=> ] unit-test
 
-[ 1 ] [ 2004 1 1 13 30 0 instant <timestamp>
+[ +gt+ ] [ 2004 1 1 13 30 0 instant <timestamp>
         2004 1 1 12 30 0 instant <timestamp> <=> ] unit-test
 
-[ -1 ] [ 2004 1 1 12 30 0 instant <timestamp>
+[ +lt+ ] [ 2004 1 1 12 30 0 instant <timestamp>
         2004 1 1 13 30 0 instant <timestamp> <=> ] unit-test
 
-[ 1 ] [ 2005 1 1 12 30 0 instant <timestamp>
+[ +gt+ ] [ 2005 1 1 12 30 0 instant <timestamp>
         2004 1 1 13 30 0 instant <timestamp> <=> ] unit-test
 
 [ t ] [ now timestamp>millis millis - 1000 < ] unit-test
@@ -159,3 +163,7 @@ IN: calendar.tests
 [ t ] [ 5 months checktime+ ] unit-test
 
 [ t ] [ 5 years checktime+ ] unit-test
+
+[ t ] [ now 50 milliseconds sleep now before? ] unit-test
+[ t ] [ now 50 milliseconds sleep now swap after? ] unit-test
+[ t ] [ now 50 milliseconds sleep now 50 milliseconds sleep now swapd between? ] unit-test

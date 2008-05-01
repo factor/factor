@@ -1,8 +1,7 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays alien.c-types alien.structs
-sequences math kernel generator.registers
-namespaces libc ;
+sequences math kernel namespaces libc cpu.architecture ;
 IN: alien.arrays
 
 UNION: value-type array struct-type ;
@@ -27,7 +26,9 @@ M: array stack-size drop "void*" stack-size ;
 
 M: value-type c-type-reg-class drop int-regs ;
 
-M: value-type c-type-prep drop f ;
+M: value-type c-type-boxer-quot drop f ;
+
+M: value-type c-type-unboxer-quot drop f ;
 
 M: value-type c-type-getter
     drop [ swap <displaced-alien> ] ;

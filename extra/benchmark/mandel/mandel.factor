@@ -1,5 +1,5 @@
 IN: benchmark.mandel
-USING: arrays io kernel math namespaces sequences
+USING: arrays io kernel math math.order namespaces sequences
 byte-arrays byte-vectors math.functions math.parser io.files
 colors.hsv io.encodings.binary ;
 

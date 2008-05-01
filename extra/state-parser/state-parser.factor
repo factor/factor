@@ -99,7 +99,7 @@ SYMBOL: prolog-data
         dup slip swap dup [ get-char , ] unless
     ] skip-until ] "" make nip ; inline
 
-: rest ( -- string )
+: take-rest ( -- string )
     [ f ] take-until ;
 
 : take-char ( ch -- string )

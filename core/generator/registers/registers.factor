@@ -4,7 +4,7 @@ USING: arrays assocs classes classes.private classes.algebra
 combinators cpu.architecture generator.fixup hashtables kernel
 layouts math namespaces quotations sequences system vectors
 words effects alien byte-arrays bit-arrays float-arrays
-accessors sets ;
+accessors sets math.order ;
 IN: generator.registers
 
 SYMBOL: +input+
@@ -12,13 +12,6 @@ SYMBOL: +output+
 SYMBOL: +scratch+
 SYMBOL: +clobber+
 SYMBOL: known-tag
-
-! Register classes
-SINGLETON: int-regs
-SINGLETON: single-float-regs
-SINGLETON: double-float-regs
-UNION: float-regs single-float-regs double-float-regs ;
-UNION: reg-class int-regs float-regs ;
 
 <PRIVATE
 
@@ -321,7 +314,7 @@ M: phantom-retainstack finalize-height
 : (live-locs) ( phantom -- seq )
     #! Discard locs which haven't moved
     [ phantom-locs* ] [ stack>> ] bi zip
-    [ live-loc? ] assoc-subset
+    [ live-loc? ] assoc-filter
     values ;
 
 : live-locs ( -- seq )
@@ -379,7 +372,7 @@ M: value (lazy-load)
 : (compute-free-vregs) ( used class -- vector )
     #! Find all vregs in 'class' which are not in 'used'.
     [ vregs length reverse ] keep
-    [ <vreg> ] curry map diff
+    [ <vreg> ] curry map swap diff
     >vector ;
 
 : compute-free-vregs ( -- )
@@ -468,11 +461,6 @@ M: loc lazy-store
 : finalize-contents ( -- )
     finalize-locs finalize-vregs reset-phantoms ;
 
-: %gc ( -- )
-    0 frame-required
-    %prepare-alien-invoke
-    "simple_gc" f %alien-invoke ;
-
 ! Loading stacks to vregs
 : free-vregs? ( int# float# -- ? )
     double-float-regs free-vregs length <=
@@ -496,7 +484,7 @@ M: loc lazy-store
 
 : substitute-vregs ( values vregs -- )
     [ vreg-substitution ] 2map
-    [ substitute-vreg? ] assoc-subset >hashtable
+    [ substitute-vreg? ] assoc-filter >hashtable
     [ >r stack>> r> substitute-here ] curry each-phantom ;
 
 : set-operand ( value var -- )

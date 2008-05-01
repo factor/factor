@@ -4,14 +4,6 @@ io.streams.string kernel sequences ascii boxes namespaces xml
 splitting ;
 IN: http.server.templating.chloe.tests
 
-[ "foo" ]
-[ "<a href=\"foo\">blah</a>" string>xml "href" required-attr ]
-unit-test
-
-[ "<a name=\"foo\">blah</a>" string>xml "href" required-attr ]
-[ "href attribute is required" = ]
-must-fail-with
-
 [ f ] [ f parse-query-attr ] unit-test
 
 [ f ] [ "" parse-query-attr ] unit-test
@@ -30,7 +22,7 @@ must-fail-with
 ] unit-test
 
 : run-template
-    with-string-writer [ "\r\n\t" member? not ] subset
+    with-string-writer [ "\r\n\t" member? not ] filter
     "?>" split1 nip ; inline
 
 : test-template ( name -- template )

@@ -1,12 +1,12 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types parser threads words kernel.private
-kernel ;
+USING: alien alien.c-types alien.strings parser threads words
+kernel.private kernel io.encodings.utf8 ;
 IN: alien.remote-control
 
 : eval-callback
     "void*" { "char*" } "cdecl"
-    [ eval>string malloc-char-string ] alien-callback ;
+    [ eval>string utf8 malloc-string ] alien-callback ;
 
 : yield-callback
     "void" { } "cdecl" [ yield ] alien-callback ;

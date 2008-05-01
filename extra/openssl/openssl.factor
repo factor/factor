@@ -3,8 +3,9 @@
 !
 ! Tested with OpenSSL 0.9.8a_0 on Mac OS X 10.4.9 PowerPC
 
-USING: alien alien.c-types assocs kernel libc namespaces
-openssl.libcrypto openssl.libssl sequences ;
+USING: alien alien.c-types alien.strings assocs kernel libc
+namespaces openssl.libcrypto openssl.libssl sequences
+io.encodings.ascii ;
 
 IN: openssl
 
@@ -21,7 +22,7 @@ SYMBOL: rsa
 
 : password-cb ( -- alien )
     "int" { "char*" "int" "int" "void*" } "cdecl"
-    [ 3drop "password" string>char-alien 1023 memcpy
+    [ 3drop "password" ascii string>alien 1023 memcpy
     "password" length ] alien-callback ;
 
 ! =========================================================

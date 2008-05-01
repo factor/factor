@@ -3,7 +3,8 @@
 USING: alien alien.c-types alien.compiler arrays
 cpu.x86.assembler cpu.architecture kernel kernel.private math
 memory namespaces sequences words generator generator.registers
-generator.fixup system layouts combinators compiler.constants ;
+generator.fixup system layouts combinators compiler.constants
+math.order ;
 IN: cpu.x86.architecture
 
 HOOK: ds-reg cpu
@@ -33,6 +34,10 @@ M: float-regs %load-param-reg >r swap stack@ r> MOVSS/D ;
 GENERIC: push-return-reg ( reg-class -- )
 GENERIC: load-return-reg ( stack@ reg-class -- )
 GENERIC: store-return-reg ( stack@ reg-class -- )
+
+! Only used by inline allocation
+HOOK: temp-reg-1 cpu
+HOOK: temp-reg-2 cpu
 
 HOOK: address-operand cpu ( address -- operand )
 

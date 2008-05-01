@@ -227,7 +227,11 @@ void dump_zone(F_ZONE *z)
 void dump_generations(void)
 {
 	int i;
-	for(i = 0; i < data_heap->gen_count; i++)
+
+	printf("Nursery: ");
+	dump_zone(&nursery);
+	
+	for(i = 1; i < data_heap->gen_count; i++)
 	{
 		printf("Generation %d: ",i);
 		dump_zone(&data_heap->generations[i]);

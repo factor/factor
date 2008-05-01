@@ -1,10 +1,10 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays bit-arrays bit-vectors byte-arrays
-byte-vectors definitions generic hashtables kernel math
+USING: alien arrays bit-arrays byte-arrays
+definitions generic hashtables kernel math
 namespaces parser sequences strings sbufs vectors words
 quotations io assocs splitting classes.tuple generic.standard
-generic.math classes io.files vocabs float-arrays float-vectors
+generic.math classes io.files vocabs float-arrays
 classes.union classes.mixin classes.predicate classes.singleton
 compiler.units combinators debugger ;
 IN: bootstrap.syntax
@@ -79,11 +79,8 @@ IN: bootstrap.syntax
     "{" [ \ } [ >array ] parse-literal ] define-syntax
     "V{" [ \ } [ >vector ] parse-literal ] define-syntax
     "B{" [ \ } [ >byte-array ] parse-literal ] define-syntax
-    "BV{" [ \ } [ >byte-vector ] parse-literal ] define-syntax
     "?{" [ \ } [ >bit-array ] parse-literal ] define-syntax
-    "?V{" [ \ } [ >bit-vector ] parse-literal ] define-syntax
     "F{" [ \ } [ >float-array ] parse-literal ] define-syntax
-    "FV{" [ \ } [ >float-vector ] parse-literal ] define-syntax
     "H{" [ \ } [ >hashtable ] parse-literal ] define-syntax
     "T{" [ \ } [ >tuple ] parse-literal ] define-syntax
     "W{" [ \ } [ first <wrapper> ] parse-literal ] define-syntax
@@ -192,8 +189,12 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "call-next-method" [
-        current-class get literalize parsed
-        current-generic get literalize parsed
-        \ (call-next-method) parsed
+        current-class get current-generic get
+        2dup [ word? ] both? [
+            [ literalize parsed ] bi@
+            \ (call-next-method) parsed
+        ] [
+            not-in-a-method-error
+        ] if
     ] define-syntax
 ] with-compilation-unit

@@ -3,7 +3,7 @@
 
 USING: arrays kernel math math.functions namespaces sequences
 strings system vocabs.loader calendar.backend threads
-accessors combinators locals classes.tuple ;
+accessors combinators locals classes.tuple math.order ;
 IN: calendar
 
 TUPLE: timestamp year month day hour minute second gmt-offset ;
@@ -211,12 +211,14 @@ M: duration time+
     #! Uses average month/year length since dt loses calendar
     #! data
     0 swap
-    [ year>> + ] keep
-    [ month>> months-per-year / + ] keep
-    [ day>> days-per-year / + ] keep
-    [ hour>> hours-per-year / + ] keep
-    [ minute>> minutes-per-year / + ] keep
-    second>> seconds-per-year / + ;
+    {
+        [ year>> + ]
+        [ month>> months-per-year / + ]
+        [ day>> days-per-year / + ]
+        [ hour>> hours-per-year / + ]
+        [ minute>> minutes-per-year / + ]
+        [ second>> seconds-per-year / + ]
+    } cleave ;
 
 M: duration <=> [ dt>years ] compare ;
 
@@ -252,14 +254,21 @@ M: timestamp time-
     #! Exact calendar-time difference
     (time-) seconds ;
 
+: time* ( obj1 obj2 -- obj3 )
+    dup real? [ swap ] when
+    dup real? [ * ] [
+        {
+            [   year>> * ]
+            [  month>> * ]
+            [    day>> * ]
+            [   hour>> * ]
+            [ minute>> * ]
+            [ second>> * ]
+        } 2cleave <duration>
+    ] if ;
+
 : before ( dt -- -dt )
-    [ year>>   neg ] keep
-    [ month>>  neg ] keep
-    [ day>>    neg ] keep
-    [ hour>>   neg ] keep
-    [ minute>> neg ] keep
-      second>> neg
-    <duration> ;
+    -1 time* ;
 
 M: duration time-
     before time+ ;

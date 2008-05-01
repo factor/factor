@@ -3,7 +3,8 @@ math.constants parser sequences tools.test words assocs
 namespaces quotations sequences.private classes continuations
 generic.standard effects classes.tuple classes.tuple.private
 arrays vectors strings compiler.units accessors classes.algebra
-calendar prettyprint io.streams.string splitting inspector ;
+calendar prettyprint io.streams.string splitting inspector
+columns math.order ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
@@ -87,7 +88,7 @@ C: <empty> empty
 [ t length ] [ object>> t eq? ] must-fail-with
 
 [ "<constructor-test>" ]
-[ "TUPLE: constructor-test ; C: <constructor-test> constructor-test" eval word word-name ] unit-test
+[ "IN: classes.tuple.test TUPLE: constructor-test ; C: <constructor-test> constructor-test" eval word word-name ] unit-test
 
 TUPLE: size-test a b c d ;
 

@@ -54,11 +54,11 @@ M: tuple-class group-words
     >r protocol-words r> diff ;
 
 : forget-old-definitions ( protocol new-wordlist -- )
-    values [ drop protocol-users ] [ lost-words ] 2bi
-    forget-all-methods ;
+    >r users-and-words r>
+    swap diff forget-all-methods ;
 
 : added-words ( protocol wordlist -- added-words )
-    swap protocol-words diff ;
+    swap protocol-words swap diff ;
 
 : add-new-definitions ( protocol wordlist -- )
      dupd added-words >r protocol-consult >alist r>

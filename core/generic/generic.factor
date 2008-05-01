@@ -29,10 +29,13 @@ PREDICATE: method-spec < pair
 : order ( generic -- seq )
     "methods" word-prop keys sort-classes ;
 
+: specific-method ( class word -- class )
+    order min-class ;
+
 GENERIC: effective-method ( ... generic -- method )
 
 : next-method-class ( class generic -- class/f )
-    order [ class< ] with subset reverse dup length 1 =
+    order [ class< ] with filter reverse dup length 1 =
     [ drop f ] [ second ] if ;
 
 : next-method ( class generic -- class/f )
@@ -134,7 +137,7 @@ M: method-body forget*
     all-words [
         "methods" word-prop keys
         swap [ key? ] curry contains?
-    ] with subset ;
+    ] with filter ;
 
 : implementors ( class -- seq )
     dup associate implementors* ;

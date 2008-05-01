@@ -3,10 +3,11 @@
 USING: arrays generator generator.registers generator.fixup
 hashtables kernel math namespaces sequences words
 inference.state inference.backend inference.dataflow system
-math.parser classes alien.arrays alien.c-types alien.structs
-alien.syntax cpu.architecture alien inspector quotations assocs
-kernel.private threads continuations.private libc combinators
-compiler.errors continuations layouts accessors ;
+math.parser classes alien.arrays alien.c-types alien.strings
+alien.structs alien.syntax cpu.architecture alien inspector
+quotations assocs kernel.private threads continuations.private
+libc combinators compiler.errors continuations layouts accessors
+;
 IN: alien.compiler
 
 TUPLE: #alien-node < node return parameters abi ;
@@ -20,9 +21,7 @@ TUPLE: #alien-invoke < #alien-node library function ;
 : large-struct? ( ctype -- ? )
     dup c-struct? [
         heap-size struct-small-enough? not
-    ] [
-        drop f
-    ] if ;
+    ] [ drop f ] if ;
 
 : alien-node-parameters* ( node -- seq )
     dup parameters>>
@@ -162,17 +161,16 @@ M: long-long-type flatten-value-type ( type -- )
     dup return>> "void" = 0 1 ?
     swap produce-values ;
 
-: (make-prep-quot) ( parameters -- )
+: (param-prep-quot) ( parameters -- )
     dup empty? [
         drop
     ] [
-        unclip c-type c-type-prep %
-        \ >r , (make-prep-quot) \ r> ,
+        unclip c-type c-type-unboxer-quot %
+        \ >r , (param-prep-quot) \ r> ,
     ] if ;
 
-: make-prep-quot ( node -- quot )
-    parameters>>
-    [ <reversed> (make-prep-quot) ] [ ] make ;
+: param-prep-quot ( node -- quot )
+    parameters>> [ <reversed> (param-prep-quot) ] [ ] make ;
 
 : unbox-parameters ( offset node -- )
     parameters>> [
@@ -199,6 +197,20 @@ M: long-long-type flatten-value-type ( type -- )
 
 : box-return* ( node -- )
     return>> [ ] [ box-return ] if-void ;
+
+: (return-prep-quot) ( parameters -- )
+    dup empty? [
+        drop
+    ] [
+        unclip c-type c-type-boxer-quot %
+        \ >r , (return-prep-quot) \ r> ,
+    ] if ;
+
+: callback-prep-quot ( node -- quot )
+    parameters>> [ <reversed> (return-prep-quot) ] [ ] make ;
+
+: return-prep-quot ( node -- quot )
+    [ return>> [ ] [ 1array (return-prep-quot) ] if-void ] [ ] make ;
 
 M: alien-invoke-error summary
     drop
@@ -258,15 +270,15 @@ M: no-such-symbol compiler-error-type
     pop-literal nip >>library
     pop-literal nip >>return
     ! Quotation which coerces parameters to required types
-    dup make-prep-quot recursive-state get infer-quot
+    dup param-prep-quot recursive-state get infer-quot
     ! Set ABI
-    dup library>>
-    library [ abi>> ] [ "cdecl" ] if*
-    >>abi
+    dup library>> library [ abi>> ] [ "cdecl" ] if* >>abi
     ! Add node to IR
     dup node,
     ! Magic #: consume exactly the number of inputs
-    0 alien-invoke-stack
+    dup 0 alien-invoke-stack
+    ! Quotation which coerces return value to required type
+    return-prep-quot recursive-state get infer-quot
 ] "infer" set-word-prop
 
 M: #alien-invoke generate-node
@@ -294,11 +306,13 @@ M: alien-indirect-error summary
     pop-parameters >>parameters
     pop-literal nip >>return
     ! Quotation which coerces parameters to required types
-    dup make-prep-quot [ dip ] curry recursive-state get infer-quot
+    dup param-prep-quot [ dip ] curry recursive-state get infer-quot
     ! Add node to IR
     dup node,
     ! Magic #: consume the function pointer, too
-    1 alien-invoke-stack
+    dup 1 alien-invoke-stack
+    ! Quotation which coerces return value to required type
+    return-prep-quot recursive-state get infer-quot
 ] "infer" set-word-prop
 
 M: #alien-indirect generate-node
@@ -371,16 +385,18 @@ TUPLE: callback-context ;
     slip
     wait-to-return ; inline
 
-: prepare-callback-return ( ctype -- quot )
+: callback-return-quot ( ctype -- quot )
     return>> {
         { [ dup "void" = ] [ drop [ ] ] }
         { [ dup large-struct? ] [ heap-size [ memcpy ] curry ] }
-        [ c-type c-type-prep ]
+        [ c-type c-type-unboxer-quot ]
     } cond ;
 
 : wrap-callback-quot ( node -- quot )
     [
-        [ quot>> ] [ prepare-callback-return ] bi append ,
+        [ callback-prep-quot ]
+        [ quot>> ]
+        [ callback-return-quot ] tri 3append ,
         [ callback-context new do-callback ] %
     ] [ ] make ;
 
@@ -405,9 +421,10 @@ TUPLE: callback-context ;
         init-templates
         %prologue-later
         dup alien-stack-frame [
-            dup registers>objects
-            dup wrap-callback-quot %alien-callback
-            %callback-return
+            [ registers>objects ]
+            [ wrap-callback-quot %alien-callback ]
+            [ %callback-return ]
+            tri
         ] with-stack-frame
     ] with-generator ;
 

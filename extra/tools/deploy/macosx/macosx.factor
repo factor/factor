@@ -31,10 +31,14 @@ IN: tools.deploy.macosx
     write-plist ;
 
 : create-app-dir ( vocab bundle-name -- vm )
-    dup "Frameworks" copy-bundle-dir
-    dup "Resources/English.lproj/MiniFactor.nib" copy-bundle-dir
-    dup "Contents/Resources/" copy-fonts
-    2dup create-app-plist "Contents/MacOS/" append-path "" copy-vm ;
+    [
+        nip
+        [ "Frameworks" copy-bundle-dir ]
+        [ "Resources/English.lproj/MiniFactor.nib" copy-bundle-dir ]
+        [ "Contents/Resources/" copy-fonts ] tri
+    ]
+    [ create-app-plist ]
+    [ "Contents/MacOS/" append-path "" copy-vm ] 2tri ;
 
 : deploy.app-image ( vocab bundle-name -- str )
     [ % "/Contents/Resources/" % % ".image" % ] "" make ;
@@ -43,9 +47,8 @@ IN: tools.deploy.macosx
     deploy-name get ".app" append ;
 
 : show-in-finder ( path -- )
-    NSWorkspace
-    -> sharedWorkspace
-    over <NSString> rot parent-directory <NSString>
+    [ NSWorkspace -> sharedWorkspace ]
+    [ normalize-path [ <NSString> ] [ parent-directory <NSString> ] bi ] bi*
     -> selectFile:inFileViewerRootedAtPath: drop ;
 
 M: macosx deploy* ( vocab -- )
@@ -56,6 +59,6 @@ M: macosx deploy* ( vocab -- )
             [ bundle-name create-app-dir ] keep
             [ bundle-name deploy.app-image ] keep
             namespace make-deploy-image
-            bundle-name normalize-path show-in-finder
+            bundle-name show-in-finder
         ] bind
     ] with-directory ;

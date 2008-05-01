@@ -35,3 +35,8 @@ IN: locals.backend
     [ infer-r> ]
     [ { } <effect> infer-shuffle ] bi
 ] "infer" set-word-prop
+
+<<
+{ load-locals get-local drop-locals }
+[ t "no-compile" set-word-prop ] each
+>>

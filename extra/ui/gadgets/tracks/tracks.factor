@@ -8,7 +8,7 @@ TUPLE: track sizes ;
 
 : normalized-sizes ( track -- seq )
     track-sizes
-    [ [ ] subset sum ] keep [ dup [ over / ] when ] map nip ;
+    [ [ ] filter sum ] keep [ dup [ over / ] when ] map nip ;
 
 : <track> ( orientation -- track )
     <pack> V{ } clone

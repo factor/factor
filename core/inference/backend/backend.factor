@@ -4,7 +4,7 @@ USING: inference.dataflow inference.state arrays generic io
 io.streams.string kernel math namespaces parser prettyprint
 sequences strings vectors words quotations effects classes
 continuations debugger assocs combinators compiler.errors
-generic.standard.engines.tuple accessors ;
+generic.standard.engines.tuple accessors math.order ;
 IN: inference.backend
 
 : recursive-label ( word -- label/f )
@@ -60,7 +60,7 @@ M: object value-literal \ literal-expected inference-warning ;
 : value-vector ( n -- vector ) [ drop <computed> ] V{ } map-as ;
 
 : add-inputs ( seq stack -- n stack )
-    tuck [ length ] compare dup 0 >
+    tuck [ length ] bi@ - dup 0 >
     [ dup value-vector [ swapd push-all ] keep ]
     [ drop 0 swap ] if ;
 
@@ -261,7 +261,7 @@ TUPLE: cannot-unify-specials ;
 
 : balanced? ( in out -- ? )
     [ dup [ length - ] [ 2drop f ] if ] 2map
-    [ ] subset all-equal? ;
+    [ ] filter all-equal? ;
 
 TUPLE: unbalanced-branches-error quots in out ;
 
@@ -281,7 +281,7 @@ TUPLE: unbalanced-branches-error quots in out ;
     2dup balanced? [
         over supremum -rot
         [ >r dupd r> unify-inputs ] 2map
-        [ ] subset unify-stacks
+        [ ] filter unify-stacks
         rot drop
     ] [
         unbalanced-branches-error
@@ -409,6 +409,25 @@ TUPLE: recursive-declare-error word ;
         \ recursive-declare-error inference-error
     ] if* ;
 
+GENERIC: collect-label-info* ( label node -- )
+
+M: node collect-label-info* 2drop ;
+
+: (collect-label-info) ( label node vector -- )
+    >r tuck [ param>> ] bi@ eq? r> [ push ] curry [ drop ] if ;
+    inline
+
+M: #call-label collect-label-info*
+    over calls>> (collect-label-info) ;
+
+M: #return collect-label-info*
+    over returns>> (collect-label-info) ;
+
+: collect-label-info ( #label -- )
+    V{ } clone >>calls
+    V{ } clone >>returns
+    dup [ collect-label-info* ] with each-node ;
+
 : nest-node ( -- ) #entry node, ;
 
 : unnest-node ( new-node -- new-node )
@@ -419,27 +438,17 @@ TUPLE: recursive-declare-error word ;
 
 : <inlined-block> gensym dup t "inlined-block" set-word-prop ;
 
-: inline-block ( word -- node-block data )
+: inline-block ( word -- #label data )
     [
         copy-inference nest-node
         dup word-def swap <inlined-block>
         [ infer-quot-recursive ] 2keep
         #label unnest-node
+        dup collect-label-info
     ] H{ } make-assoc ;
 
-GENERIC: collect-recursion* ( label node -- )
-
-M: node collect-recursion* 2drop ;
-
-M: #call-label collect-recursion*
-    tuck node-param eq? [ , ] [ drop ] if ;
-
-: collect-recursion ( #label -- seq )
-    dup node-param
-    [ [ swap collect-recursion* ] curry each-node ] { } make ;
-
-: join-values ( node -- )
-    collect-recursion [ node-in-d ] map meta-d get suffix
+: join-values ( #label -- )
+    calls>> [ node-in-d ] map meta-d get suffix
     unify-lengths unify-stacks
     meta-d [ length tail* ] change ;
 
@@ -460,7 +469,7 @@ M: #call-label collect-recursion*
         drop join-values inline-block apply-infer
         r> over set-node-in-d
         dup node,
-        collect-recursion [
+        calls>> [
             [ flatten-curries ] modify-values
         ] each
     ] [

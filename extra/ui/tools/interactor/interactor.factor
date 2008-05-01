@@ -7,7 +7,7 @@ sequences strings threads listener
 classes.tuple ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.presentations ui.gadgets.worlds ui.gestures
 definitions boxes calendar concurrency.flags ui.tools.workspace
-accessors ;
+accessors math.order ;
 IN: ui.tools.interactor
 
 TUPLE: interactor history output flag thread help ;

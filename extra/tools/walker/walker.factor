@@ -259,3 +259,8 @@ SYMBOL: +stopped+
     ] 3curry
     "Walker on " self thread-name append spawn
     [ associate-thread ] keep ;
+
+! For convenience
+IN: syntax
+
+: B break ;

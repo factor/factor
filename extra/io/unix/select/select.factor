@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel io.nonblocking io.unix.backend
 bit-arrays sequences assocs unix math namespaces structs
-accessors ;
+accessors math.order ;
 IN: io.unix.select
 
 TUPLE: select-mx < mx read-fdset write-fdset ;

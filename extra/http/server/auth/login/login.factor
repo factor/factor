@@ -13,6 +13,7 @@ http.server.auth.providers
 http.server.auth.providers.null
 http.server.actions
 http.server.components
+http.server.flows
 http.server.forms
 http.server.sessions
 http.server.boilerplate
@@ -22,7 +23,6 @@ http.server.validators ;
 IN: http.server.auth.login
 QUALIFIED: smtp
 
-SYMBOL: post-login-url
 SYMBOL: login-failed?
 
 TUPLE: login < dispatcher users ;
@@ -35,9 +35,7 @@ TUPLE: user-saver user ;
 C: <user-saver> user-saver
 
 M: user-saver dispose
-    user-profile-changed? get [
-        user>> users update-user
-    ] [ drop ] if ;
+    user>> dup changed?>> [ users update-user ] [ drop ] if ;
 
 : save-user-after ( user -- )
     <user-saver> add-always-destructor ;
@@ -59,9 +57,8 @@ M: user-saver dispose
             add-field ;
 
 : successful-login ( user -- response )
-    logged-in-user sset
-    post-login-url sget "" or f <permanent-redirect>
-    f post-login-url sset ;
+    username>> set-uid
+    "$login" end-flow ;
 
 :: <login-action> ( -- action )
     [let | form [ <login-form> ] |
@@ -126,11 +123,11 @@ SYMBOL: user-exists?
 
                 same-password-twice
 
-                <user>
-                    "username" value >>username
+                "username" value <user>
                     "realname" value >>realname
                     "new-password" value >>password
                     "email" value >>email
+                    H{ } clone >>profile
 
                 users new-user [
                     user-exists? on
@@ -139,7 +136,7 @@ SYMBOL: user-exists?
 
                 successful-login
 
-                login get default>> responder>> init-user-profile
+                login get init-user-profile
             ] >>submit
     ] ;
 
@@ -155,17 +152,17 @@ SYMBOL: user-exists?
         "verify-password" <password> add-field
         "email" <email> add-field ;
 
-SYMBOL: previous-page
-
 :: <edit-profile-action> ( -- action )
     [let | form [ <edit-profile-form> ] |
         <action>
             [
                 blank-values
-                logged-in-user sget
-                dup username>> "username" set-value
-                dup realname>> "realname" set-value
-                dup email>> "email" set-value
+
+                logged-in-user get
+                [ username>> "username" set-value ]
+                [ realname>> "realname" set-value ]
+                [ email>> "email" set-value ]
+                tri
             ] >>init
 
             [ form edit-form ] >>display
@@ -176,9 +173,10 @@ SYMBOL: previous-page
 
                 form validate-form
 
-                logged-in-user sget
+                logged-in-user get
 
-                "password" value empty? [
+                { "password" "new-password" "verify-password" }
+                [ value empty? ] all? [
                     same-password-twice
 
                     "password" value uid users check-login
@@ -190,9 +188,11 @@ SYMBOL: previous-page
                 "realname" value >>realname
                 "email" value >>email
 
-                user-profile-changed? on
+                t >>changed?
 
-                previous-page sget f <permanent-redirect>
+                drop
+
+                "$login" end-flow
             ] >>submit
     ] ;
 
@@ -328,32 +328,30 @@ SYMBOL: lost-password-from
 : <logout-action> ( -- action )
     <action>
         [
-            f logged-in-user sset
-            "login" f <permanent-redirect>
+            f set-uid
+            "$login/login" end-flow
         ] >>submit ;
 
 ! ! ! Authentication logic
 
-TUPLE: protected responder ;
+TUPLE: protected < filter-responder ;
 
 C: <protected> protected
 
 : show-login-page ( -- response )
-    request get request-url post-login-url sset
-    "login" f <permanent-redirect> ;
+    begin-flow
+    "$login/login" f <standard-redirect> ;
 
-M: protected call-responder ( path responder -- response )
-    logged-in-user sget dup [
-        save-user-after
-        request get request-url previous-page sset
-        responder>> call-responder
+M: protected call-responder* ( path responder -- response )
+    uid dup [
+        users get-user
+        [ logged-in-user set ] [ save-user-after ] bi
+        call-next-method
     ] [
-        3drop
-        request get method>> { "GET" "HEAD" } member?
-        [ show-login-page ] [ <400> ] if
+        3drop show-login-page
     ] if ;
 
-M: login call-responder ( path responder -- response )
+M: login call-responder* ( path responder -- response )
     dup login set
     call-next-method ;
 
@@ -363,7 +361,7 @@ M: login call-responder ( path responder -- response )
 
 : <login> ( responder -- auth )
     login new-dispatcher
-        swap <protected> >>default
+        swap >>default
         <login-action> <login-boilerplate> "login" add-responder
         <logout-action> <login-boilerplate> "logout" add-responder
         no-users >>users ;

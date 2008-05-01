@@ -4,11 +4,11 @@ IN: sequences.deep.tests
 
 [ [ "hello" 3 4 swap ] ] [ [ { "hello" V{ 3 4 } } swap ] flatten ] unit-test
 
-[ "foo" t ] [ { { "foo" } "bar" } [ string? ] deep-find* ] unit-test
+[ "foo" t ] [ { { "foo" } "bar" } [ string? ] deep-find-from ] unit-test
 
-[ f f ] [ { { "foo" } "bar" } [ number? ] deep-find* ] unit-test
+[ f f ] [ { { "foo" } "bar" } [ number? ] deep-find-from ] unit-test
 
-[ { { "foo" } "bar" } t ] [ { { "foo" } "bar" } [ array? ] deep-find* ] unit-test
+[ { { "foo" } "bar" } t ] [ { { "foo" } "bar" } [ array? ] deep-find-from ] unit-test
 
 : change-something ( seq -- newseq )
     dup array? [ "hi" suffix ] [ "hello" append ] if ;

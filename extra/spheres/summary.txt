@@ -1,0 +1,1 @@
+Draw pixel-perfect spheres using GLSL shaders

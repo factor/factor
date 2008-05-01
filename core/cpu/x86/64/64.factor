@@ -12,6 +12,8 @@ M: x86.64 ds-reg R14 ;
 M: x86.64 rs-reg R15 ;
 M: x86.64 stack-reg RSP ;
 M: x86.64 stack-save-reg RSI ;
+M: x86.64 temp-reg-1 RAX ;
+M: x86.64 temp-reg-2 RCX ;
 
 M: temp-reg v>operand drop RBX ;
 
@@ -179,7 +181,7 @@ stack-params "__stack_value" c-type set-c-type-reg-class >>
 : split-struct ( pairs -- seq )
     [
         [ 8 mod zero? [ t , ] when , ] assoc-each
-    ] { } make { t } split [ empty? not ] subset ;
+    ] { } make { t } split [ empty? not ] filter ;
 
 : flatten-large-struct ( type -- )
     heap-size cell align

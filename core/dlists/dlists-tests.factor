@@ -79,7 +79,7 @@ IN: dlists.tests
         [ dlist-push-all ] keep
         [ dlist-delete-all ] keep
         dlist>array
-    ] 2keep diff assert-same-elements
+    ] 2keep swap diff assert-same-elements
 ] unit-test
 
 [ ] [

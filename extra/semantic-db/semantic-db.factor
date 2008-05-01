@@ -12,7 +12,7 @@ TUPLE: node id content ;
 
 node "node"
 {
-    { "id" "id" +native-id+ +autoincrement+ }
+    { "id" "id" +db-assigned-id+ +autoincrement+ }
     { "content" "content" TEXT }
 } define-persistent
 
@@ -20,7 +20,7 @@ node "node"
     node create-table ;
 
 : delete-node ( node-id -- )
-    <id-node> delete-tuple ;
+    <id-node> delete-tuples ;
 
 : create-node* ( str -- node-id )
     <node> dup insert-tuple id>> ;
@@ -43,7 +43,7 @@ TUPLE: arc id relation subject object ;
     f <node> dup insert-tuple id>> >>id insert-tuple ;
 
 : delete-arc ( arc-id -- )
-    dup delete-node <id-arc> delete-tuple ;
+    dup delete-node <id-arc> delete-tuples ;
 
 : create-arc* ( relation subject object -- arc-id )
     <arc> dup insert-arc id>> ;
@@ -53,7 +53,7 @@ TUPLE: arc id relation subject object ;
 
 arc "arc"
 {
-    { "id" "id" INTEGER +assigned-id+ } ! foreign key to node table?
+    { "id" "id" INTEGER +user-assigned-id+ } ! foreign key to node table?
     { "relation" "relation" INTEGER +not-null+ }
     { "subject" "subject" INTEGER +not-null+ }
     { "object" "object" INTEGER +not-null+ }
@@ -76,7 +76,7 @@ arc "arc"
     create-node-table create-arc-table create-bootstrap-nodes create-bootstrap-arcs ;
 
 : param ( value key type -- param )
-    swapd 3array ;
+    swapd <sqlite-low-level-binding> ;
 
 : single-int-results ( bindings sql -- array )
     f f <simple-statement> [ do-bound-query ] with-disposal

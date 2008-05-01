@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2006 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays hashtables io kernel math
-namespaces prettyprint sequences strings combinators x11.xlib ;
+math.order namespaces prettyprint sequences strings combinators
+x11.xlib ;
 IN: x11.events
 
 GENERIC: expose-event ( event window -- )

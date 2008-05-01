@@ -29,7 +29,7 @@ M: predicate word-help* drop \ $predicate ;
 
 : all-articles ( -- seq )
     articles get keys
-    all-words [ word-help ] subset append ;
+    all-words [ word-help ] filter append ;
 
 : xref-help ( -- )
     all-articles [ xref-article ] each ;
@@ -38,10 +38,10 @@ M: predicate word-help* drop \ $predicate ;
     \ $error-description swap word-help elements empty? not ;
 
 : sort-articles ( seq -- newseq )
-    [ dup article-title ] { } map>assoc sort-values 0 <column> ;
+    [ dup article-title ] { } map>assoc sort-values keys ;
 
 : all-errors ( -- seq )
-    all-words [ error? ] subset sort-articles ;
+    all-words [ error? ] filter sort-articles ;
 
 M: word article-name word-name ;
 
@@ -135,7 +135,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     ":vars - list all variables at error time" print ;
 
 : :help ( -- )
-    error get delegates [ error-help ] map [ ] subset
+    error get delegates [ error-help ] map [ ] filter
     {
         { [ dup empty? ] [ (:help-none) ] }
         { [ dup length 1 = ] [ first help ] }

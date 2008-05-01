@@ -3,7 +3,7 @@
 USING: arrays generic assocs inference inference.class
 inference.dataflow inference.backend inference.state io kernel
 math namespaces sequences vectors words quotations hashtables
-combinators classes optimizer.def-use ;
+combinators classes optimizer.def-use accessors ;
 IN: optimizer.backend
 
 SYMBOL: class-substitutions
@@ -16,37 +16,32 @@ SYMBOL: optimizer-changed
 
 GENERIC: optimize-node* ( node -- node/t changed? )
 
-: ?union ( assoc/f assoc -- hash )
-    over [ assoc-union ] [ nip ] if ;
+: ?union ( assoc assoc/f -- assoc' )
+    dup assoc-empty? [ drop ] [ swap assoc-union ] if ;
 
-: add-node-literals ( assoc node -- )
-    over assoc-empty? [
+: add-node-literals ( node assoc -- )
+    [ ?union ] curry change-literals drop ;
+
+: add-node-classes ( node assoc -- )
+    [ ?union ] curry change-classes drop ;
+
+: substitute-values ( node assoc -- )
+    dup assoc-empty? [
         2drop
     ] [
-        [ node-literals ?union ] keep set-node-literals
-    ] if ;
-
-: add-node-classes ( assoc node -- )
-    over assoc-empty? [
-        2drop
-    ] [
-        [ node-classes ?union ] keep set-node-classes
-    ] if ;
-
-: substitute-values ( assoc node -- )
-    over assoc-empty? [
-        2drop
-    ] [
-        2dup node-in-d swap substitute-here
-        2dup node-in-r swap substitute-here
-        2dup node-out-d swap substitute-here
-        node-out-r swap substitute-here
+        {
+            [ >r  in-d>> r> substitute-here ]
+            [ >r  in-r>> r> substitute-here ]
+            [ >r out-d>> r> substitute-here ]
+            [ >r out-r>> r> substitute-here ]
+        } 2cleave
     ] if ;
 
 : perform-substitutions ( node -- )
-    class-substitutions get over add-node-classes
-    literal-substitutions get over add-node-literals
-    value-substitutions get swap substitute-values ;
+    [   class-substitutions get add-node-classes  ]
+    [ literal-substitutions get add-node-literals ]
+    [   value-substitutions get substitute-values ]
+    tri ;
 
 DEFER: optimize-nodes
 
@@ -90,18 +85,21 @@ M: node optimize-node* drop t f ;
     #! Not very efficient.
     dupd union* update ;
 
-: compute-value-substitutions ( #return/#values #call/#merge -- assoc )
-    node-out-d swap node-in-d 2array unify-lengths flip
-    [ = not ] assoc-subset >hashtable ;
+: compute-value-substitutions ( #call/#merge #return/#values -- assoc )
+    [ out-d>> ] [ in-d>> ] bi* 2array unify-lengths flip
+    [ = not ] assoc-filter >hashtable ;
 
 : cleanup-inlining ( #return/#values -- newnode changed? )
-    dup node-successor dup [
-        class-substitutions get pick node-classes update
-        literal-substitutions get pick node-literals update
-        tuck compute-value-substitutions value-substitutions get swap update*
-        node-successor t
+    dup node-successor [
+        [ node-successor ] keep
+        {
+            [ nip classes>> class-substitutions get swap update ]
+            [ nip literals>> literal-substitutions get swap update ]
+            [ compute-value-substitutions value-substitutions get swap update* ]
+            [ drop node-successor ]
+        } 2cleave t
     ] [
-        2drop t f
+        drop t f
     ] if ;
 
 ! #return

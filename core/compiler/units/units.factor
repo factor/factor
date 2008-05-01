@@ -53,7 +53,7 @@ GENERIC: definitions-changed ( assoc obj -- )
     [ definitions-changed ] with each ;
 
 : changed-vocabs ( assoc -- vocabs )
-    [ drop word? ] assoc-subset
+    [ drop word? ] assoc-filter
     [ drop word-vocabulary dup [ vocab ] when dup ] assoc-map ;
 
 : updated-definitions ( -- assoc )
@@ -73,7 +73,7 @@ SYMBOL: outdated-tuples
 SYMBOL: update-tuples-hook
 
 : call-recompile-hook ( -- )
-    changed-definitions get keys [ word? ] subset
+    changed-definitions get keys [ word? ] filter
     compiled-usages recompile-hook get call ;
 
 : call-update-tuples-hook ( -- )

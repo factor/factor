@@ -90,7 +90,7 @@ M: object flatten-curry , ;
 
 : node-child node-children first ;
 
-TUPLE: #label < node word loop? ;
+TUPLE: #label < node word loop? returns calls ;
 
 : #label ( word label -- node )
     \ #label param-node swap >>word ;
@@ -290,6 +290,9 @@ SYMBOL: node-stack
 : node-input-classes ( node -- seq )
     dup in-d>> [ node-class ] with map ;
 
+: node-output-classes ( node -- seq )
+    dup out-d>> [ node-class ] with map ;
+
 : node-input-intervals ( node -- seq )
     dup in-d>> [ node-interval ] with map ;
 
@@ -297,7 +300,7 @@ SYMBOL: node-stack
     dup in-d>> first node-class ;
 
 : active-children ( node -- seq )
-    children>> [ last-node ] map [ #terminate? not ] subset ;
+    children>> [ last-node ] map [ #terminate? not ] filter ;
 
 DEFER: #tail?
 

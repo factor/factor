@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: generic kernel math sequences arrays assocs alarms
-calendar ;
+calendar math.order ;
 IN: models
 
 TUPLE: model < identity-tuple

@@ -40,16 +40,16 @@ SYMBOL: current-label-start
     compiled-stack-traces?
     compiling-word get f ?
     1vector literal-table set
-    f compiling-word get compiled get set-at ;
+    f compiling-label get compiled get set-at ;
 
-: finish-compiling ( literals relocation labels code -- )
+: save-machine-code ( literals relocation labels code -- )
     4array compiling-label get compiled get set-at ;
 
 : with-generator ( node word label quot -- )
     [
         >r begin-compiling r>
         { } make fixup
-        finish-compiling
+        save-machine-code
     ] with-scope ; inline
 
 GENERIC: generate-node ( node -- next )
@@ -73,6 +73,7 @@ GENERIC: generate-node ( node -- next )
 : word-dataflow ( word -- effect dataflow )
     [
         dup "no-effect" word-prop [ no-effect ] when
+        dup "no-compile" word-prop [ no-effect ] when
         dup specialized-def over dup 2array 1array infer-quot
         finish-word
     ] with-infer ;

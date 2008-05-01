@@ -35,11 +35,11 @@ IN: project-euler.079
     ] { } make ;
 
 : find-source ( seq -- elt )
-    dup values swap keys [ prune ] bi@ diff
+    [ keys ] [ values ] bi diff prune
     dup empty? [ "Topological sort failed" throw ] [ first ] if ;
 
 : remove-source ( seq elt -- seq )
-    [ swap member? not ] curry subset ;
+    [ swap member? not ] curry filter ;
 
 : (topological-sort) ( seq -- )
     dup length 1 > [
@@ -52,7 +52,7 @@ PRIVATE>
 
 : topological-sort ( seq -- seq )
     [ [ (topological-sort) ] { } make ] keep
-    concat prune dupd diff append ;
+    concat prune over diff append ;
 
 : euler079 ( -- answer )
     source-079 >edges topological-sort 10 digits>integer ;

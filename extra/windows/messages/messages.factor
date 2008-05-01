@@ -7,7 +7,7 @@ IN: windows.messages
 SYMBOL: windows-messages
 
 "windows.messages" words
-[ word-name "windows-message" head? not ] subset
+[ word-name "windows-message" head? not ] filter
 [ dup execute swap ] { } map>assoc
 windows-messages set-global
 

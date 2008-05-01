@@ -1,13 +1,14 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
+! Portions copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays assocs ui ui.gadgets
-ui.backend ui.clipboards ui.gadgets.worlds ui.gestures io kernel
-math math.vectors namespaces prettyprint sequences strings
-vectors words windows.kernel32 windows.gdi32 windows.user32
-windows.opengl32 windows.messages windows.types windows.nt
-windows threads libc combinators continuations command-line
-shuffle opengl ui.render unicode.case ascii math.bitfields
-locals symbols accessors ;
+USING: alien alien.c-types alien.strings arrays assocs ui
+ui.gadgets ui.backend ui.clipboards ui.gadgets.worlds
+ui.gestures io kernel math math.vectors namespaces prettyprint
+sequences strings vectors words windows.kernel32 windows.gdi32
+windows.user32 windows.opengl32 windows.messages windows.types
+windows.nt windows threads libc combinators continuations
+command-line shuffle opengl ui.render unicode.case ascii
+math.bitfields locals symbols accessors ;
 IN: ui.windows
 
 SINGLETON: windows-ui-backend
@@ -36,14 +37,14 @@ SINGLETON: windows-ui-backend
             CF_UNICODETEXT GetClipboardData dup win32-error=0/f
             dup GlobalLock dup win32-error=0/f
             GlobalUnlock win32-error=0/f
-            alien>u16-string
+            utf16n alien>string
         ] if
     ] with-clipboard
     crlf>lf ;
 
 : copy ( str -- )
     lf>crlf [
-        string>u16-alien
+        utf16n string>alien
         EmptyClipboard win32-error=0/f
         GMEM_MOVEABLE over length 1+ GlobalAlloc
             dup win32-error=0/f
@@ -409,7 +410,7 @@ SYMBOL: trace-messages?
         0 over set-WNDCLASSEX-cbClsExtra
         0 over set-WNDCLASSEX-cbWndExtra
         f GetModuleHandle over set-WNDCLASSEX-hInstance
-        f GetModuleHandle "fraptor" string>u16-alien LoadIcon
+        f GetModuleHandle "fraptor" utf16n string>alien LoadIcon
         over set-WNDCLASSEX-hIcon
         f IDC_ARROW LoadCursor over set-WNDCLASSEX-hCursor
 
@@ -447,7 +448,7 @@ SYMBOL: trace-messages?
 : init-win32-ui ( -- )
     V{ } clone nc-buttons set-global
     "MSG" malloc-object msg-obj set-global
-    "Factor-window" malloc-u16-string class-name-ptr set-global
+    "Factor-window" utf16n malloc-string class-name-ptr set-global
     register-wndclassex drop
     GetDoubleClickTime double-click-timeout set-global ;
 
@@ -492,7 +493,7 @@ M: windows-ui-backend raise-window* ( world -- )
 M: windows-ui-backend set-title ( string world -- )
     world-handle
     dup win-title [ free ] when*
-    >r malloc-u16-string r>
+    >r utf16n malloc-string r>
     2dup set-win-title
     win-hWnd WM_SETTEXT 0 roll alien-address SendMessage drop ;
 

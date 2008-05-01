@@ -5,7 +5,7 @@ namespaces parser kernel kernel.private classes classes.private
 arrays hashtables vectors classes.tuple sbufs inference.dataflow
 hashtables.private sequences.private math classes.tuple.private
 growable namespaces.private assocs words generator command-line
-vocabs io prettyprint libc compiler.units ;
+vocabs io prettyprint libc compiler.units math.order ;
 IN: bootstrap.compiler
 
 ! Don't bring this in when deploying, since it will store a
@@ -17,6 +17,8 @@ IN: bootstrap.compiler
 "cpu." cpu word-name append require
 
 enable-compiler
+
+: compile-uncompiled [ compiled? not ] filter compile ;
 
 nl
 "Compiling..." write flush
@@ -42,38 +44,38 @@ nl
     find-pair-next namestack*
 
     bitand bitor bitxor bitnot
-} compile
+} compile-uncompiled
 
 "." write flush
 
 {
-    + 1+ 1- 2/ < <= > >= shift min
-} compile
+    + 1+ 1- 2/ < <= > >= shift
+} compile-uncompiled
 
 "." write flush
 
 {
     new-sequence nth push pop peek
-} compile
+} compile-uncompiled
 
 "." write flush
 
 {
     hashcode* = get set
-} compile
+} compile-uncompiled
 
 "." write flush
 
 {
     . lines
-} compile
+} compile-uncompiled
 
 "." write flush
 
 {
     malloc calloc free memcpy
-} compile
+} compile-uncompiled
 
-vocabs [ words [ compiled? not ] subset compile "." write flush ] each
+vocabs [ words compile-uncompiled "." write flush ] each
 
 " done" print flush
