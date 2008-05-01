@@ -1,8 +1,11 @@
+! Copyright (C) 2008 Daniel Ehrenberg
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel strings unicode.syntax.backend io.files assocs
 splitting sequences io namespaces sets
 io.encodings.ascii io.encodings.utf8 io.encodings.utf16 io.encodings.8-bit ;
 IN: io.encodings.iana
 
+<PRIVATE
 VALUE: n>e-table
 
 : e>n-table H{
@@ -22,6 +25,7 @@ VALUE: n>e-table
     { latin5 "ISO-8859-9" }
     { latin6 "ISO-8859-10" }
 } ;
+PRIVATE>
 
 : name>encoding ( string -- encoding )
     n>e-table at ;
@@ -29,6 +33,7 @@ VALUE: n>e-table
 : encoding>name ( encoding -- string )
     e>n-table at ;
 
+<PRIVATE
 : parse-iana ( stream -- synonym-set )
     lines { "" } split [
         [ " " split ] map
@@ -44,6 +49,7 @@ VALUE: n>e-table
             [ drop ] if*
         ] with each
     ] each ] H{ } make-assoc ;
+PRIVATE>
 
 "resource:extra/io/encodings/iana/character-sets"
 ascii <file-reader> make-n>e \ n>e-table set-value
