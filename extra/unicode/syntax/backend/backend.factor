@@ -1,4 +1,4 @@
-USING: kernel parser sequences definitions ;
+USING: kernel parser sequences words ;
 IN: unicode.syntax.backend
 
 : VALUE:
