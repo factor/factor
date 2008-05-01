@@ -7,6 +7,7 @@ http.server.boilerplate
 http.server.auth.providers
 http.server.auth.providers.db
 http.server.auth.login
+http.server.auth
 http.server.forms
 http.server.components.inspector
 http.server.components
@@ -28,6 +29,7 @@ IN: http.server.auth.admin
         "new-password" <password> t >>required add-field
         "verify-password" <password> t >>required add-field
         "email" <email> add-field ;
+        ! "capabilities" <capabilities> add-field ;
 
 : <edit-user-form> ( -- form )
     "user" <form>
@@ -39,6 +41,7 @@ IN: http.server.auth.admin
         "verify-password" <password> add-field
         "email" <email> add-field
         "profile" <inspector> add-field ;
+        ! "capabilities" <capabilities> add-field ;
 
 : <user-list-form> ( -- form )
     "user-list" <form>
@@ -77,7 +80,7 @@ IN: http.server.auth.admin
             "username" value <user>
                 "realname" value >>realname
                 "email" value >>email
-                "new-password" value >>password
+                "new-password" value >>encoded-password
                 H{ } clone >>profile
 
             insert-tuple
@@ -116,7 +119,7 @@ IN: http.server.auth.admin
             { "new-password" "verify-password" }
             [ value empty? ] all? [
                 same-password-twice
-                "new-password" value >>password
+                "new-password" value >>encoded-password
             ] unless
 
             update-tuple
@@ -139,6 +142,10 @@ IN: http.server.auth.admin
 
 TUPLE: user-admin < dispatcher ;
 
+SYMBOL: can-administer-users?
+
+can-administer-users? define-capability
+
 :: <user-admin> ( -- responder )
     [let | ctor [ [ <user> ] ] |
         user-admin new-dispatcher
@@ -148,5 +155,5 @@ TUPLE: user-admin < dispatcher ;
             ctor "$user-admin" <delete-user-action> "delete" add-responder
         <boilerplate>
             "admin" admin-template >>template
-        <protected>
+        { can-administer-users? } <protected>
     ] ;

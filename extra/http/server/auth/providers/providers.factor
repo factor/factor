@@ -4,7 +4,7 @@ USING: kernel accessors random math.parser locals
 sequences math ;
 IN: http.server.auth.providers
 
-TUPLE: user username realname password email ticket profile deleted changed? ;
+TUPLE: user username realname password salt email ticket profile deleted changed? ;
 
 : <user> ( username -- user )
     user new
@@ -16,9 +16,6 @@ GENERIC: get-user ( username provider -- user/f )
 GENERIC: update-user ( user provider -- )
 
 GENERIC: new-user ( user provider -- user/f )
-
-: check-login ( password username provider -- user/f )
-    get-user dup [ [ password>> = ] keep and ] [ 2drop f ] if ;
 
 ! Password recovery support
 

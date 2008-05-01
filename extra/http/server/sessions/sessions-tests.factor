@@ -143,7 +143,7 @@ M: foo call-responder*
             ] with-destructors response set
         ] unit-test
 
-        [ "text/plain" ] [ response get "content-type" header ] unit-test
+        [ "text/plain" ] [ response get content-type>> ] unit-test
 
         [ f ] [ response get cookies>> empty? ] unit-test
     ] with-scope

@@ -1,6 +1,6 @@
 USING: http tools.test multiline tuple-syntax
 io.streams.string kernel arrays splitting sequences
-assocs io.sockets db db.sqlite ;
+assocs io.sockets db db.sqlite continuations ;
 IN: http.tests
 
 [ "hello%20world" ] [ "hello world" url-encode ] unit-test
@@ -93,7 +93,7 @@ Host: www.sex.com
 
 STRING: read-response-test-1
 HTTP/1.1 404 not found
-Content-Type: text/html
+Content-Type: text/html; charset=UTF8
 
 blah
 ;
@@ -103,8 +103,10 @@ blah
         version: "1.1"
         code: 404
         message: "not found"
-        header: H{ { "content-type" "text/html" } }
+        header: H{ { "content-type" "text/html; charset=UTF8" } }
         cookies: V{ }
+        content-type: "text/html"
+        content-charset: "UTF8"
     }
 ] [
     read-response-test-1 lf>crlf
@@ -114,7 +116,7 @@ blah
 
 STRING: read-response-test-1'
 HTTP/1.1 404 not found
-content-type: text/html
+content-type: text/html; charset=UTF8
 
 
 ;
@@ -140,10 +142,12 @@ accessors namespaces threads ;
 
 : add-quit-action
     <action>
-        [ stop-server "text/html" <content> [ "Goodbye" write ] >>body ] >>display
+        [ stop-server [ "Goodbye" write ] <html-content> ] >>display
     "quit" add-responder ;
 
 : test-db "test.db" temp-file sqlite-db ;
+
+[ test-db drop delete-file ] ignore-errors
 
 test-db [
     init-sessions-table
@@ -191,7 +195,7 @@ test-db [
 [ ] [
     [
         <dispatcher>
-            <action> <protected>
+            <action> f <protected>
             <login>
             <sessions>
             "" add-responder
