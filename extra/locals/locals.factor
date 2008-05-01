@@ -279,7 +279,9 @@ M: wlet local-rewrite*
 
 : (::) CREATE-WORD parse-locals-definition ;
 
-: (M::) CREATE-METHOD parse-locals-definition ;
+: (M::)
+    CREATE-METHOD
+    [ parse-locals-definition ] with-method-definition ;
 
 PRIVATE>
 
