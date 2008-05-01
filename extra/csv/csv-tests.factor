@@ -46,9 +46,7 @@ IN: csv.tests
 [ "Year,Make,Model\n1997,Ford,E350\n2000,Mercury,Cougar" 
    <string-reader> csv ] named-unit-test
 
-   
 
-   
 ! !!!!!!!!  other tests
    
 [ { { "Phil Dawes" } } ] 
@@ -65,3 +63,8 @@ IN: csv.tests
 "allows setting of delimiting character"
 [ { { "foo" "bah" "baz" } } ] 
 [ "foo\tbah\tbaz\n" <string-reader> CHAR: \t [ csv ] with-delimiter ] named-unit-test
+
+"Quoted field followed immediately by newline"
+[ { { "foo" "bar" }
+    { "1"   "2" } } ]
+[ "foo,\"bar\"\n1,2" <string-reader> csv ] named-unit-test
