@@ -167,8 +167,10 @@ SYMBOLS: source dot-buffer dash-buffer intra-char-gap-buffer letter-gap-buffer ;
 
 PRIVATE>
 
-: play-as-morse ( str unit-length -- )
+: play-as-morse* ( str unit-length -- )
     [
         [ letter-gap ] [ ch>morse play-char ] interleave
     ] swap playing-morse ;
 
+: play-as-morse ( str -- )
+    0.05 play-as-morse* ;
