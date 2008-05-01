@@ -63,8 +63,12 @@ MEMO: eq ( -- parser )
         ] with-html-stream
     ] with-string-writer ;
 
+: check-url ( href -- href' )
+    dup { "http://" "https://" "ftp://" } [ head? ] with contains?
+    [ drop "/" ] unless ;
+
 : escape-link ( href text -- href-esc text-esc )
-    >r escape-quoted-string r> escape-string ;
+    >r check-url escape-quoted-string r> escape-string ;
 
 : make-link ( href text -- seq )
     escape-link
