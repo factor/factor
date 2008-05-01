@@ -1,15 +1,7 @@
 USING: assocs math kernel sequences io.files hashtables
-quotations splitting arrays math.parser hash2
+quotations splitting arrays math.parser hash2 unicode.syntax.backend
 byte-arrays words namespaces words compiler.units parser io.encodings.ascii  ;
 IN: unicode.data
-
-<<
-: VALUE:
-    CREATE-WORD { f } clone [ first ] curry define ; parsing
-
-: set-value ( value word -- )
-    word-def first set-first ;
->>
 
 ! Convenience functions
 : ?between? ( n/f from to -- ? )

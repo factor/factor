@@ -1,6 +1,6 @@
 USING: unicode.categories kernel math combinators splitting
 sequences math.parser io.files io assocs arrays namespaces
-math.ranges unicode.normalize
+math.ranges unicode.normalize unicode.syntax.backend
 unicode.syntax unicode.data compiler.units alien.syntax io.encodings.ascii ;
 IN: unicode.breaks
 
