@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs db db.sqlite db.postgresql http.server http.server.actions io kernel namespaces semantic-db sequences strings ;
+USING: accessors assocs db db.sqlite db.postgresql http http.server http.server.actions io kernel math.parser namespaces semantic-db sequences strings ;
 IN: tangle
 
 GENERIC: render* ( content templater -- output )
@@ -13,37 +13,21 @@ M: echo-template render* drop ;
 ! METHOD: render* { string echo-template } drop ;
 M: object render render* write ;
 
-TUPLE: tangle db templater ;
+TUPLE: tangle db seq templater ;
 C: <tangle> tangle
 
-TUPLE: sqlite-tangle ;
-TUPLE: postgres-tangle ;
-
-: make-tangle ( db templater type -- tangle )
-    new [ <tangle> ] dip tuck set-delegate ;
-
-: <sqlite-tangle> ( db templater -- tangle ) sqlite-tangle make-tangle ;
-: <postgres-tangle> ( db templater -- tangle ) postgres-tangle make-tangle ;
-
 : with-tangle ( tangle quot -- )
-    [ db>> ] dip with-db ;
-
-: init-db ( tangle -- tangle )
-    dup [ init-semantic-db ] with-tangle ;
-
-GENERIC# new-db 1 ( tangle obj -- tangle )
-M: sqlite-tangle new-db ( tangle filename -- tangle )
-    sqlite-db >>db init-db ;
-M: postgres-tangle new-db ( tangle args -- tangle )
-    postgresql-db >>db init-db ;
+    [ [ db>> ] [ seq>> ] bi ] dip with-db ;
 
 TUPLE: node-responder tangle ;
 C: <node-responder> node-responder
 
-M: node-responder call-responder* ( path responder -- response )
-    "text/plain" <content> nip params get
-    [ "node-id" swap at* [ >>body ] [ drop ] if ] when* nip ;
+: node-response ( responder id -- responder )
+    load-node [ node-content ] [ "Unknown node" ] if* >>body ;
 
-: test-tangle ( -- )
-    f f <sqlite-tangle> <node-responder> main-responder set ;
+M: node-responder call-responder* ( path responder -- response )
+    dup tangle>> [
+        "text/plain" <content> nip request get request-params
+        [ "node-id" swap at* [ string>number node-response ] [ drop ] if ] when* nip
+    ] with-tangle ;
 

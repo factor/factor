@@ -15,7 +15,7 @@ node "node"
     { "content" "content" TEXT }
 } define-persistent
 
-: delete-node ( node -- ) delete-tuple ;
+: delete-node ( node -- ) delete-tuples ;
 : create-node ( content -- node ) f swap <node> dup insert-tuple ;
 : load-node ( id -- node ) f <node> select-tuple ;
 
@@ -33,7 +33,7 @@ TUPLE: arc id subject object relation ;
 : <id-arc> ( id -- arc )
     arc new swap >>id ;
 
-: delete-arc ( arc -- ) delete-tuple ;
+: delete-arc ( arc -- ) delete-tuples ;
 
 : create-arc ( subject object relation -- )
     [ id>> ] 3apply <arc> insert-tuple ;
@@ -76,7 +76,7 @@ TUPLE: arc id subject object relation ;
 
 arc "arc"
 {
-    { "id" "id" +native-id+ +autoincrement+ }
+    { "id" "id" +db-assigned-id+ +autoincrement+ }
     { "relation" "relation" INTEGER +not-null+ }
     { "subject" "subject" INTEGER +not-null+ }
     { "object" "object" INTEGER +not-null+ }
