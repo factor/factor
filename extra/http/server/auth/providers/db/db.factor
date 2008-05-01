@@ -13,25 +13,22 @@ user "USERS"
     { "email" "EMAIL" { VARCHAR 256 } }
     { "ticket" "TICKET" { VARCHAR 256 } }
     { "profile" "PROFILE" FACTOR-BLOB }
+    { "deleted" "DELETED" INTEGER +not-null+ }
 } define-persistent
 
 : init-users-table user ensure-table ;
 
 SINGLETON: users-in-db
 
-: find-user ( username -- user )
-    <user>
-        swap >>username
-    select-tuple ;
-
 M: users-in-db get-user
-    drop
-    find-user ;
+    drop <user> select-tuple ;
 
 M: users-in-db new-user
     drop
     [
-        dup username>> find-user [
+        user new
+            over username>> >>username
+        select-tuple [
             drop f
         ] [
             dup insert-tuple

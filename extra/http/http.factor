@@ -329,7 +329,8 @@ SYMBOL: max-post-request
     [ host>> ] [ port>> ] bi <inet> ;
 
 : request-host ( request -- string )
-    [ host>> ] [ drop ":" ] [ port>> number>string ] tri 3append ;
+    [ host>> ] [ port>> ] bi
+    dup 80 = [ drop ] [ ":" swap number>string 3append ] if ;
 
 : write-request-header ( request -- request )
     dup header>> >hashtable

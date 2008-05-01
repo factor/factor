@@ -20,7 +20,7 @@ node "node"
     node create-table ;
 
 : delete-node ( node-id -- )
-    <id-node> delete-tuple ;
+    <id-node> delete-tuples ;
 
 : create-node* ( str -- node-id )
     <node> dup insert-tuple id>> ;
@@ -43,7 +43,7 @@ TUPLE: arc id relation subject object ;
     f <node> dup insert-tuple id>> >>id insert-tuple ;
 
 : delete-arc ( arc-id -- )
-    dup delete-node <id-arc> delete-tuple ;
+    dup delete-node <id-arc> delete-tuples ;
 
 : create-arc* ( relation subject object -- arc-id )
     <arc> dup insert-arc id>> ;

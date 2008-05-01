@@ -1,0 +1,24 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:style include="resource:extra/http/server/auth/admin/admin.css" />
+
+	<div class="navbar">
+		  <t:a t:href="$user-admin">List Users</t:a>
+		| <t:a t:href="$user-admin/new">Add User</t:a>
+
+		<t:if t:code="http.server.auth.login:allow-edit-profile?">
+			| <t:a t:href="$login/edit-profile" t:flow="begin">Edit Profile</t:a>
+		</t:if>
+
+		<t:form t:action="$login/logout" t:flow="begin" class="inline">
+			| <button type="submit" class="link-button link">Logout</button>
+		</t:form>
+	</div>
+
+	<h1><t:write-title /></h1>
+
+	<t:call-next-template />
+
+</t:chloe>

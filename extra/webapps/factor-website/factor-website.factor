@@ -6,9 +6,9 @@ http.server
 http.server.db
 http.server.flows
 http.server.sessions
+http.server.auth.admin
 http.server.auth.login
 http.server.auth.providers.db
-http.server.sessions.storage.db
 http.server.boilerplate
 http.server.templating.chloe
 webapps.pastebin
@@ -16,7 +16,7 @@ webapps.planet
 webapps.todo ;
 IN: webapps.factor-website
 
-: test-db "test.db" resource-path sqlite-db ;
+: test-db "resource:test.db" sqlite-db ;
 
 : factor-template ( path -- template )
     "resource:extra/webapps/factor-website/" swap ".xml" 3append <chloe> ;
@@ -39,6 +39,7 @@ IN: webapps.factor-website
         <todo-list> "todo" add-responder
         <pastebin> "pastebin" add-responder
         <planet-factor> "planet" add-responder
+        <user-admin> "user-admin" add-responder
     <login>
         users-in-db >>users
         allow-registration
@@ -48,7 +49,6 @@ IN: webapps.factor-website
         "page" factor-template >>template
     <flows>
     <sessions>
-        sessions-in-db >>sessions
     test-db <db-persistence> ;
 
 : init-factor-website ( -- )

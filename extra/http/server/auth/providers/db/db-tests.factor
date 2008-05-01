@@ -6,22 +6,24 @@ io.files accessors kernel ;
 
 users-in-db "provider" set
 
+[ "auth-test.db" temp-file delete-file ] ignore-errors
+
 "auth-test.db" temp-file sqlite-db [
 
     init-users-table
 
     [ t ] [
-        <user>
-            "slava" >>username
+        "slava" <user>
             "foobar" >>password
             "slava@factorcode.org" >>email
+            H{ } clone >>profile
             "provider" get new-user
             username>> "slava" =
     ] unit-test
 
     [ f ] [
-        <user>
-            "slava" >>username
+        "slava" <user>
+            H{ } clone >>profile
         "provider" get new-user
     ] unit-test
 

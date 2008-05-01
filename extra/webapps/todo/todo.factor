@@ -2,10 +2,16 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel locals sequences namespaces
 db db.types db.tuples
-http.server.components http.server.components.farkup
-http.server.forms http.server.templating.chloe
-http.server.boilerplate http.server.crud http.server.auth
-http.server.actions http.server.db
+http.server.sessions
+http.server.components
+http.server.components.farkup
+http.server.forms
+http.server.templating.chloe
+http.server.boilerplate
+http.server.crud
+http.server.auth
+http.server.actions
+http.server.db
 http.server.auth.login
 http.server ;
 IN: webapps.todo

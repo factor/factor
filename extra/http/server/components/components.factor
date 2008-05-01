@@ -30,8 +30,6 @@ TUPLE: hidden < field ;
 
 : hidden ( -- renderer ) T{ hidden f "hidden" } ; inline
 
-M: hidden render-view* 2drop ;
-
 ! Component protocol
 SYMBOL: components
 
