@@ -36,7 +36,7 @@ VALUE: n>e-table
         [ second ] map { "None" } diff
     ] map ;
 
-: make-n>e ( stream -- n>e ) ! encodings is string => symbol
+: make-n>e ( stream -- n>e )
     parse-iana [ [
         dup [
             e>n-table value-at
