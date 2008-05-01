@@ -31,6 +31,7 @@ VAR: delimiter
   read1 dup 
   { { CHAR: "    [ , quoted-field ] }  ! " is an escaped quote
     { delimiter> [ ] }                 ! end of quoted field 
+    { CHAR: \n   [ ] }
     [ 2drop skip-to-field-end ]       ! end of quoted field + padding
   } case ;
   
