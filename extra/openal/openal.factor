@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel alien system combinators alien.syntax namespaces
+USING: kernel arrays alien system combinators alien.syntax namespaces
        alien.c-types sequences vocabs.loader shuffle combinators.lib
        openal.backend ;
 IN: openal
@@ -265,6 +265,12 @@ os macosx? "openal.macosx" "openal.other" ? require
 : create-buffer-from-wav ( filename -- buffer )
   gen-buffer dup rot load-wav-file
   [ alBufferData ] 4keep alutUnloadWAV ;
+
+: queue-buffers ( source buffers -- )
+    [ length ] [ >c-uint-array ] bi alSourceQueueBuffers ;
+
+: queue-buffer ( source buffer -- )
+    1array queue-buffers ;
 
 : set-source-param ( source param value -- )
   alSourcei ;

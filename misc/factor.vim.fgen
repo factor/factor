@@ -2,7 +2,7 @@
 %>" Vim syntax file
 " Language:	factor
 " Maintainer:	Alex Chapman <chapman.alex@gmail.com>
-" Last Change:	2007 Jan 18
+" Last Change:	2008 Apr 28
 
 " For version 5.x: Clear all syntax items
 " For version 6.x: Quit when a syntax file was already loaded
