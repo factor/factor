@@ -4,22 +4,22 @@ generic.standard generic.math combinators ;
 IN: generic
 
 ARTICLE: "method-order" "Method precedence"
-"Consider the case where a generic word has methods on two classes, say A and B, which share a non-empty intersection. If the generic word is called on an object which is an instance of both A and B, a choice of method must be made. If A is a subclass of B, the method for A to be called; this makes sense, because we're defining general behavior for instances of B, and refining it for instances of A. Conversely, if B is a subclass of A, then we expect B's method to be called. However, if neither is a subclass of the other, we have an ambiguous situation and undefined behavior will result. Either the method for A or B will be called, and there is no way to predict ahead of time."
-$nl
-"The generic word system linearly orders all the methods on a generic word by their class. Conceptually, method dispatch is implemented by testing the object against the predicate word for every class, in order. If methods are defined on overlapping classes, this order will fail to be unique and the problem described above can occur."
+"Conceptually, method dispatch is implemented by testing the object against the predicate word for every class, in linear order (" { $link "class-linearization" } ")."
 $nl
 "Here is an example:"
 { $code
     "GENERIC: explain"
-    "M: number explain drop \"an integer\" print ;"
-    "M: sequence explain drop \"a sequence\" print ;"
     "M: object explain drop \"an object\" print ;"
+    "M: number explain drop \"a number\" print ;"
+    "M: sequence explain drop \"a sequence\" print ;"
 }
-"Neither " { $link number } " nor " { $link sequence } " are subclasses of each other, yet their intersection is the non-empty " { $link integer } " class. As a result, the outcome of calling " { $snippet "bar" } " with an " { $link integer } " on the stack is undefined - either one of the two methods may be called. This situation can lead to subtle bugs. To avoid it, explicitly disambiguate the method order by defining a method on the intersection. If in this case we want integers to behave like numbers, we would also define:"
-{ $code "M: integer explain drop \"an integer\" print ;" }
-"On the other hand, if we want integers to behave like sequences here, we could define:"
+"The linear order is the following, from least-specific to most-specific:"
+{ $code "{ object sequence number }" }
+"Neither " { $link number } " nor " { $link sequence } " are subclasses of each other, yet their intersection is the non-empty " { $link integer } " class. Calling " { $snippet "explain" } " with an integer on the stack will print " { $snippet "a number" } " because " { $link number } " precedes " { $link sequence } " in the class linearization order. If this was not the desired outcome, define a method on the intersection:"
 { $code "M: integer explain drop \"a sequence\" print ;" }
-"The " { $link order } " word can be useful to clarify method dispatch order."
+"Now, the linear order is the following, from least-specific to most-specific:"
+{ $code "{ object sequence number integer }" }
+"The " { $link order } " word can be useful to clarify method dispatch order:"
 { $subsection order } ;
 
 ARTICLE: "generic-introspection" "Generic word introspection"

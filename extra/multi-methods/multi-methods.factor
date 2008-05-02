@@ -86,12 +86,12 @@ SYMBOL: total
     [
         {
             { [ 2dup eq? ] [ +eq+ ] }
-            { [ 2dup [ class< ] 2keep swap class< and ] [ +eq+ ] }
-            { [ 2dup class< ] [ +lt+ ] }
-            { [ 2dup swap class< ] [ +gt+ ] }
+            { [ 2dup [ class<= ] [ swap class<= ] 2bi and ] [ +eq+ ] }
+            { [ 2dup class<= ] [ +lt+ ] }
+            { [ 2dup swap class<= ] [ +gt+ ] }
             [ +eq+ ]
         } cond 2nip
-    ] 2map [ zero? not ] find nip +eq+ or ;
+    ] 2map [ +eq+ eq? not ] find nip +eq+ or ;
 
 : sort-methods ( alist -- alist' )
     [ [ first ] bi@ classes< ] topological-sort ;

@@ -24,7 +24,7 @@ splitting kernel hashtables continuations ;
     <action> [
         [
             "hello" print
-            "text/html" <content> swap '[ , write ] >>body
+            '[ , write ] <html-content>
         ] show-page
         "byebye" print
         [ 123 ] show-final

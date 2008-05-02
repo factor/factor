@@ -305,12 +305,12 @@ M: wrapper '
     [ emit ] emit-object ;
 
 ! Strings
-: emit-chars ( seq -- )
+: emit-bytes ( seq -- )
     bootstrap-cell <groups>
     big-endian get [ [ be> ] map ] [ [ le> ] map ] if
     emit-seq ;
 
-: pack-string ( string -- newstr )
+: pad-bytes ( seq -- newseq )
     dup length bootstrap-cell align 0 pad-right ;
 
 : emit-string ( string -- ptr )
@@ -318,7 +318,7 @@ M: wrapper '
         dup length emit-fixnum
         f ' emit
         f ' emit
-        pack-string emit-chars
+        pad-bytes emit-bytes
     ] emit-object ;
 
 M: string '
@@ -335,7 +335,11 @@ M: string '
         [ 0 emit-fixnum ] emit-object
     ] bi* ;
 
-M: byte-array ' byte-array emit-dummy-array ;
+M: byte-array '
+    byte-array type-number object tag-number [
+        dup length emit-fixnum
+        pad-bytes emit-bytes
+    ] emit-object ;
 
 M: bit-array ' bit-array emit-dummy-array ;
 
@@ -400,8 +404,8 @@ M: quotation '
     [
         {
             dictionary source-files builtins
-            update-map class<-cache class-not-cache
-            classes-intersect-cache class-and-cache
+            update-map class<=-cache class<=>-cache
+            class-not-cache classes-intersect-cache class-and-cache
             class-or-cache
         } [ dup get swap bootstrap-word set ] each
     ] H{ } make-assoc

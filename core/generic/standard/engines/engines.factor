@@ -26,8 +26,8 @@ M: method-body engine>quot 1quotation ;
     alist>quot ;
 
 : split-methods ( assoc class -- first second )
-    [ [ nip class< not ] curry assoc-filter ]
-    [ [ nip class<     ] curry assoc-filter ] 2bi ;
+    [ [ nip class<= not ] curry assoc-filter ]
+    [ [ nip class<=     ] curry assoc-filter ] 2bi ;
 
 : convert-methods ( assoc class word -- assoc' )
     over >r >r split-methods dup assoc-empty? [

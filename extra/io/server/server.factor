@@ -47,7 +47,7 @@ PRIVATE>
     ] with-variable ; inline
 
 : stop-server ( -- )
-    servers get [ dispose ] each ;
+    servers get dispose-each ;
 
 <PRIVATE
 

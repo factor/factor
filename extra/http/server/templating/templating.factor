@@ -24,5 +24,4 @@ M: template write-response-body* call-template ;
 
 ! responder integration
 : serve-template ( template -- response )
-    "text/html" <content>
-    swap '[ , call-template ] >>body ;
+    '[ , call-template ] <html-content> ;

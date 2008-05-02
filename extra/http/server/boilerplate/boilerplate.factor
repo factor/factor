@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces boxes sequences strings
-io io.streams.string arrays
+io io.streams.string arrays locals
 html.elements
 http
 http.server
@@ -47,7 +47,7 @@ SYMBOL: nested-template?
 SYMBOL: next-template
 
 : call-next-template ( -- )
-    next-template get write ;
+    next-template get write-html ;
 
 M: f call-template* drop call-next-template ;
 
@@ -68,9 +68,10 @@ M: f call-template* drop call-next-template ;
         bi*
     ] with-scope ; inline
 
-M: boilerplate call-responder*
-    tuck call-next-method
-    dup "content-type" header "text/html" = [
-        clone swap template>>
-        [ [ with-boilerplate ] 2curry ] curry change-body
-    ] [ nip ] if ;
+M:: boilerplate call-responder* ( path responder -- )
+    path responder call-next-method
+    dup content-type>> "text/html" = [
+        clone [| body |
+            [ body responder template>> with-boilerplate ]
+        ] change-body
+    ] when ;

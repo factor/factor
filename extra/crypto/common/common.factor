@@ -1,5 +1,6 @@
 USING: arrays kernel io io.binary sbufs splitting strings sequences
-namespaces math math.parser parser hints math.bitfields.lib ;
+namespaces math math.parser parser hints math.bitfields.lib
+assocs ;
 IN: crypto.common
 
 : w+ ( int int -- int ) + 32 bits ; inline
@@ -39,9 +40,6 @@ SYMBOL: big-endian?
 : update-old-new ( old new -- )
     [ get >r get r> ] 2keep >r >r w+ dup r> set r> set ; inline
 
-: hex-string ( seq -- str )
-    [ [ >hex 2 48 pad-left % ] each ] "" make ;
-
 : slice3 ( n seq -- a b c ) >r dup 3 + r> <slice> first3 ;
 
 : seq>2seq ( seq -- seq1 seq2 )
@@ -50,7 +48,7 @@ SYMBOL: big-endian?
 
 : 2seq>seq ( seq1 seq2 -- seq )
     #! { aceg } { bdfh } -> { abcdefgh }
-    [ 2array flip concat ] keep like ;
+    [ zip concat ] keep like ;
 
 : mod-nth ( n seq -- elt )
     #! 5 "abcd" -> b

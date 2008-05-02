@@ -9,6 +9,8 @@ PREDICATE: mixin-class < union-class "mixin" word-prop ;
 M: mixin-class reset-class
     { "class" "metaclass" "members" "mixin" } reset-props ;
 
+M: mixin-class rank-class drop 3 ;
+
 : redefine-mixin-class ( class members -- )
     dupd define-union-class
     t "mixin" set-word-prop ;

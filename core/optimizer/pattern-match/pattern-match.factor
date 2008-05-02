@@ -12,7 +12,7 @@ SYMBOL: @
     @ get [ eq? ] [ @ set t ] if* ;
 
 : match-class ( value spec -- ? )
-    >r node get swap node-class r> class< ;
+    >r node get swap node-class r> class<= ;
 
 : value-match? ( value spec -- ? )
     {

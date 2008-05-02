@@ -1,0 +1,48 @@
+body, button {
+	font:9pt "Lucida Grande", "Lucida Sans Unicode", verdana, geneva, sans-serif;
+	color:#444;
+}
+
+.link-button {
+	padding: 0px;
+	background: none;
+	border: none;
+}
+
+a, .link {
+	color: #222;
+	border-bottom:1px dotted #666;
+	text-decoration:none;
+}
+
+a:hover, .link:hover {
+	border-bottom:1px solid #66a;
+}
+
+.error { color: #a00; }
+
+.field-label {
+	text-align: right;
+}
+
+.inline {
+	display: inline;
+}
+
+.navbar {
+	background-color: #eee;
+	padding: 5px;
+	border: 1px solid #ccc;
+}
+
+.big-field-label {
+	vertical-align: top;
+}
+
+.description {
+	border: 1px dashed #ccc;
+	background-color: #f5f5f5;
+	padding: 5px;
+	font-size: 150%;
+	color: #000000;
+}

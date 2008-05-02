@@ -36,6 +36,11 @@
 	</tr>
 	
 	<tr>
+		<th class="field-label big-field-label">Capabilities:</th>
+		<td><t:edit t:component="capabilities" /></td>
+	</tr>
+	
+	<tr>
 		<th class="field-label">Profile:</th>
 		<td><t:view t:component="profile" /></td>
 	</tr>
