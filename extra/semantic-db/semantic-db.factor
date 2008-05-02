@@ -112,6 +112,9 @@ arc "arc"
 : param ( value key type -- param )
     swapd <sqlite-low-level-binding> ;
 
+: all-node-ids ( -- seq )
+    f "select n.id from node n" results [ first string>number ] map ;
+
 : subjects-with-cor ( content object relation -- sql-results )
     [ id>> ] bi@
     [

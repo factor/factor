@@ -12,9 +12,9 @@ IN: tangle.tests
 
 test-db [
     init-semantic-db test-tangle
-    [ "pluck_eggs" ] [ "foo/bar/pluck_eggs" path>node [ node-content ] when* ] unit-test
-    [ "How to Pluck Eggs" ] [ "foo/bar/pluck_eggs" path>node [ has-filename-subjects first node-content ] when* ] unit-test
-    [ "foo/bar/pluck_eggs" ] [ "foo/bar/pluck_eggs" path>node node>path ] unit-test
+    [ "pluck_eggs" ] [ { "foo" "bar" "pluck_eggs" } path>node [ node-content ] when* ] unit-test
+    [ "How to Pluck Eggs" ] [ { "foo" "bar" "pluck_eggs" } path>node [ has-filename-subjects first node-content ] when* ] unit-test
+    [ { "foo" "bar" "pluck_eggs" } ] [ { "foo" "bar" "pluck_eggs" } path>node node>path >array ] unit-test
     [ f ] [ TUPLE{ node id: 666 content: "some content" } parent-directory ] unit-test
     [ f ] [ TUPLE{ node id: 666 content: "some content" } node>path ] unit-test
     [ "Main Menu" ] [ "Main Menu" ensure-menu node-content ] unit-test

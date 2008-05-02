@@ -27,9 +27,11 @@ RELATION: in-directory
 : (path>node) ( node name -- node )
     swap [ file-in-directory ] [ drop f ] if* ;
 
-USE: tools.walker
 : path>node ( path -- node )
-    "/" split ensure-root swap [ (path>node) ] each ;
+    ensure-root swap [ (path>node) ] each ;
+
+: path>file ( path -- file )
+    path>node [ has-filename-subjects ?first ] [ f ] if* ;
 
 : (node>path) ( root seq node -- seq )
     pick over node= [
@@ -45,7 +47,10 @@ USE: tools.walker
 
 : node>path* ( root node -- path )
     V{ } clone swap (node>path) dup empty?
-    [ drop f ] [ <reversed> "/" join ] if ;
+    [ drop f ] [ <reversed> ] if ;
 
 : node>path ( node -- path )
     ensure-root swap node>path* ;
+
+: file>path ( node -- path )
+    has-filename-objects ?first [ node>path ] [ f ] if* ;

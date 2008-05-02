@@ -18,6 +18,7 @@ test-db [
     [ 3 ] [ "third node" create-node id>> ] unit-test
     [ 4 ] [ f create-node id>> ] unit-test
     [ ] [ 1 f <node> 2 f <node> 3 f <node> create-arc ] unit-test
+    [ { 1 2 3 4 } ] [ all-node-ids ] unit-test
 ] with-db delete-db
 
  test-db [
