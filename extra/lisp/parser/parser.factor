@@ -18,8 +18,8 @@ RPAREN       = ")"
 dquote       = '"'
 squote       = "'"
 digit        = [0-9]
-integer      = ("-")? (digit)+                            => [[ string>number ]]
-float        = ("-")? (digit)+ "." (digit)*               => [[ first3 >string [ >string ] dipd 3append string>number ]]
+integer      = (digit)+                            => [[ string>number ]]
+float        = (digit)+ "." (digit)*               => [[ first3 >string [ >string ] dipd 3append string>number ]]
 number       = float
               | integer
 id-specials  = "!" | "$" | "%" | "&" | "*" | "/" | ":" | "<"
