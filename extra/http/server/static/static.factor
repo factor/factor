@@ -7,7 +7,7 @@ logging calendar.format accessors io.encodings.binary fry ;
 IN: http.server.static
 
 ! special maps mime types to quots with effect ( path -- )
-TUPLE: file-responder root hook special ;
+TUPLE: file-responder root hook special allow-listings ;
 
 : modified-since? ( filename -- ? )
     request get "if-modified-since" header dup [
@@ -19,8 +19,14 @@ TUPLE: file-responder root hook special ;
 : <304> ( -- response )
     304 "Not modified" <trivial-response> ;
 
+: <403> ( -- response )
+    403 "Forbidden" <trivial-response> ;
+
 : <file-responder> ( root hook -- responder )
-    H{ } clone file-responder boa ;
+    file-responder new
+        swap >>hook
+        swap >>root
+        H{ } clone >>special ;
 
 : <static> ( root -- responder )
     [
@@ -65,7 +71,11 @@ TUPLE: file-responder root hook special ;
     ] simple-html-document ;
 
 : list-directory ( directory -- response )
-    '[ , directory. ] <html-content> ;
+    file-responder get allow-listings>> [
+        '[ , directory. ] <html-content>
+    ] [
+        drop <403>
+    ] if ;
 
 : find-index ( filename -- path )
     "index.html" append-path dup exists? [ drop f ] unless ;

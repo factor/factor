@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors quotations assocs kernel splitting
-combinators sequences namespaces hashtables
+combinators sequences namespaces hashtables sets
 fry arrays threads locals qualified random
 io
 io.sockets
@@ -364,7 +364,7 @@ C: <protected> protected
     "$login/login" f <standard-redirect> ;
 
 : check-capabilities ( responder user -- ? )
-    [ capabilities>> ] [ profile>> ] bi* '[ , at ] all? ;
+    [ capabilities>> ] bi@ subset? ;
 
 M: protected call-responder* ( path responder -- response )
     uid dup [

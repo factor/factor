@@ -32,6 +32,11 @@
 		<th class="field-label">E-mail:</th>
 		<td><t:edit t:component="email" /></td>
 	</tr>
+	
+	<tr>
+		<th class="field-label big-field-label">Capabilities:</th>
+		<td><t:edit t:component="capabilities" /></td>
+	</tr>
 
 	</table>
 	

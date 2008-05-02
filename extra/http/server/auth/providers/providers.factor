@@ -4,7 +4,10 @@ USING: kernel accessors random math.parser locals
 sequences math ;
 IN: http.server.auth.providers
 
-TUPLE: user username realname password salt email ticket profile deleted changed? ;
+TUPLE: user
+username realname
+password salt
+email ticket capabilities profile deleted changed? ;
 
 : <user> ( username -- user )
     user new

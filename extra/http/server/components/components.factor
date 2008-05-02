@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors namespaces kernel io math.parser assocs classes
 words classes.tuple arrays sequences splitting mirrors
-hashtables fry combinators continuations math
+hashtables fry locals combinators continuations math
 calendar.format html.elements xml.entities
 http.server.validators ;
 IN: http.server.components
@@ -18,10 +18,11 @@ TUPLE: field type ;
 
 C: <field> field
 
-M: field render-view* drop escape-string write ;
+M: field render-view*
+    drop escape-string write ;
 
 M: field render-edit*
-    <input type>> =type [ =id ] [ =name ] bi =value input/> ;
+    <input type>> =type =name =value input/> ;
 
 : render-error ( message -- )
     <span "error" =class span> escape-string write </span> ;
@@ -348,8 +349,8 @@ M: choice-renderer render-view*
         escape-string write
     </option> ;
 
-: render-options ( text selected -- )
-    [ [ drop ] [ member? ] 2bi render-option ] curry each ;
+: render-options ( options selected -- )
+    '[ dup , member? render-option ] each ;
 
 M: choice-renderer render-edit*
     <select swap =name select>
@@ -365,11 +366,16 @@ TUPLE: choice < string ;
 ! Menu
 TUPLE: menu-renderer choices size ;
 
-C: <menu-renderer> menu-renderer
+: <menu-renderer> ( choices -- renderer )
+    5 menu-renderer boa ;
 
-M: menu-renderer render-edit*
-    <select dup size>> [ number>string =size ] when* swap =name select>
-        choices>> render-options
+M:: menu-renderer render-edit* ( value id renderer -- )
+    <select
+        renderer size>> [ number>string =size ] when*
+        id =name
+        "true" =multiple
+    select>
+        renderer choices>> value render-options
     </select> ;
 
 TUPLE: menu < string ;
@@ -377,3 +383,22 @@ TUPLE: menu < string ;
 : <menu> ( id choices -- component )
     swap menu new-string
         swap <menu-renderer> >>renderer ;
+
+! Checkboxes
+TUPLE: checkbox-renderer label ;
+
+C: <checkbox-renderer> checkbox-renderer
+
+M: checkbox-renderer render-edit*
+    <input
+        "checkbox" =type
+        swap =id
+        swap [ "true" =selected ] when
+    input>
+        label>> escape-string write
+    </input> ;
+
+TUPLE: checkbox < string ;
+
+: <checkbox> ( id label -- component )
+    checkbox swap <checkbox-renderer> new-component ;

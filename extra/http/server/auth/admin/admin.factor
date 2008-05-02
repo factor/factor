@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences accessors namespaces combinators
-locals db.tuples
+USING: kernel sequences accessors namespaces combinators words
+assocs locals db.tuples arrays splitting strings qualified
+
 http.server.templating.chloe
 http.server.boilerplate
 http.server.auth.providers
@@ -10,16 +11,25 @@ http.server.auth.login
 http.server.auth
 http.server.forms
 http.server.components.inspector
-http.server.components
 http.server.validators
 http.server.sessions
 http.server.actions
 http.server.crud
 http.server ;
+EXCLUDE: http.server.components => string? number? ;
 IN: http.server.auth.admin
 
 : admin-template ( name -- template )
     "resource:extra/http/server/auth/admin/" swap ".xml" 3append <chloe> ;
+
+: words>strings ( seq -- seq' )
+    [ [ word-vocabulary ] [ drop ":" ] [ word-name ] tri 3append ] map ;
+
+: strings>words ( seq -- seq' )
+    [ ":" split1 swap lookup ] map ;
+
+: <capabilities> ( id -- component )
+    capabilities get words>strings <menu> ;
 
 : <new-user-form> ( -- form )
     "user" <form>
@@ -28,8 +38,8 @@ IN: http.server.auth.admin
         "realname" <string> add-field
         "new-password" <password> t >>required add-field
         "verify-password" <password> t >>required add-field
-        "email" <email> add-field ;
-        ! "capabilities" <capabilities> add-field ;
+        "email" <email> add-field
+        "capabilities" <capabilities> add-field ;
 
 : <edit-user-form> ( -- form )
     "user" <form>
@@ -40,8 +50,8 @@ IN: http.server.auth.admin
         "new-password" <password> add-field
         "verify-password" <password> add-field
         "email" <email> add-field
-        "profile" <inspector> add-field ;
-        ! "capabilities" <capabilities> add-field ;
+        "profile" <inspector> add-field
+        "capabilities" <capabilities> add-field ;
 
 : <user-list-form> ( -- form )
     "user-list" <form>
@@ -102,6 +112,7 @@ IN: http.server.auth.admin
                 [ realname>> "realname" set-value ]
                 [ email>> "email" set-value ]
                 [ profile>> "profile" set-value ]
+                [ capabilities>> words>strings "capabilities" set-value ]
             } cleave
         ] >>init
 
@@ -121,6 +132,11 @@ IN: http.server.auth.admin
                 same-password-twice
                 "new-password" value >>encoded-password
             ] unless
+
+            "capabilities" value {
+                { [ dup string? ] [ 1array ] }
+                { [ dup array? ] [ ] }
+            } cond strings>words >>capabilities
 
             update-tuple
 
@@ -157,3 +173,9 @@ can-administer-users? define-capability
             "admin" admin-template >>template
         { can-administer-users? } <protected>
     ] ;
+
+: make-admin ( username -- )
+    <user>
+    select-tuple
+    [ can-administer-users? suffix ] change-capabilities
+    update-tuple ;

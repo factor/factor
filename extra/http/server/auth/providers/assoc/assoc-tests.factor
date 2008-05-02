@@ -1,7 +1,7 @@
 IN: http.server.auth.providers.assoc.tests
 USING: http.server.actions http.server.auth.providers 
-http.server.auth.providers.assoc tools.test
-namespaces accessors kernel ;
+http.server.auth.providers.assoc http.server.auth.login
+tools.test namespaces accessors kernel ;
 
 <action> <login>
     <users-in-memory> >>users

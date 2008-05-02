@@ -119,21 +119,41 @@ IN: http
         header-value>string check-header-string write crlf
     ] assoc-each crlf ;
 
+: add-query-param ( value key assoc -- )
+    [
+        at [
+            {
+                { [ dup string? ] [ swap 2array ] }
+                { [ dup array? ] [ swap suffix ] }
+                { [ dup not ] [ drop ] }
+            } cond
+        ] when*
+    ] 2keep set-at ;
+
 : query>assoc ( query -- assoc )
     dup [
-        "&" split [
-            "=" split1 [ dup [ url-decode ] when ] bi@
-        ] H{ } map>assoc
+        "&" split H{ } clone [
+            [
+                >r "=" split1 [ dup [ url-decode ] when ] bi@ swap r>
+                add-query-param
+            ] curry each
+        ] keep
     ] when ;
 
 : assoc>query ( hash -- str )
     [
-        [ url-encode ]
-        [ dup number? [ number>string ] when url-encode ]
-        bi*
-        "=" swap 3append
-    ] { } assoc>map
-    "&" join ;
+        {
+            { [ dup number? ] [ number>string ] }
+            { [ dup string? ] [ 1array ] }
+            { [ dup sequence? ] [ ] }
+        } cond
+    ] assoc-map
+    [
+        [
+            >r url-encode r>
+            [ url-encode "=" swap 3append , ] with each
+        ] assoc-each
+    ] { } make "&" join ;
 
 TUPLE: cookie name value path domain expires max-age http-only ;
 

@@ -24,6 +24,12 @@ IN: http.tests
 [ "/bar" ] [ "http://foo.com/bar" url>path ] unit-test
 [ "/bar" ] [ "/bar" url>path ] unit-test
 
+[ "a=b&a=c" ] [ { { "a" { "b" "c" } } } assoc>query ] unit-test
+
+[ H{ { "a" "b" } } ] [ "a=b" query>assoc ] unit-test
+
+[ H{ { "a" { "b" "c" } } } ] [ "a=b&a=c" query>assoc ] unit-test
+
 : lf>crlf "\n" split "\r\n" join ;
 
 STRING: read-request-test-1
