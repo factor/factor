@@ -74,3 +74,7 @@ TUPLE: oint location forward up left ;
 : perpendicular-distance ( oint oint -- distance )
     tuck distance-vector swap 2dup oint-left scalar-projection abs
     -rot oint-up scalar-projection abs + ;
+
+:: reflect ( v l -- v' )
+    #! reflect v on l
+    v l v. l l v. / 2 * l n*v v v- ;

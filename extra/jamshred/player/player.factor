@@ -28,7 +28,8 @@ TUPLE: player name tunnel nearest-segment ;
     0.3 ;
 
 : player-speed ( player -- speed )
-    dup player-nearest-segment fraction-from-wall sq max-speed * ;
+    max-speed ;
+    ! dup player-nearest-segment fraction-from-wall sq max-speed * ;
 
 : move-player ( player -- )
     dup player-speed over go-forward update-nearest-segment ;
