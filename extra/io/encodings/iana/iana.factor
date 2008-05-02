@@ -27,10 +27,10 @@ VALUE: n>e-table
 } ;
 PRIVATE>
 
-: name>encoding ( string -- encoding )
+: name>encoding ( name -- encoding )
     n>e-table at ;
 
-: encoding>name ( encoding -- string )
+: encoding>name ( encoding -- name )
     e>n-table at ;
 
 <PRIVATE

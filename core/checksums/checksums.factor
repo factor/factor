@@ -18,7 +18,7 @@ M: checksum checksum-stream >r contents r> checksum-bytes ;
 
 M: checksum checksum-lines >r B{ CHAR: \n } join r> checksum-bytes ;
 
-: checksum-file ( path checksum -- n )
+: checksum-file ( path checksum -- value )
     >r binary <file-reader> r> checksum-stream ;
 
 : hex-string ( seq -- str )

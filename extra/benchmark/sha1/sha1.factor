@@ -1,4 +1,4 @@
-USING: checksum checksums.sha1 io.files kernel ;
+USING: checksums checksums.sha1 io.files kernel ;
 IN: benchmark.sha1
 
 : sha1-primes-list ( -- )
