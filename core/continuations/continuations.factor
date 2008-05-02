@@ -138,6 +138,11 @@ SYMBOL: thread-error-hook
 
 GENERIC: dispose ( object -- )
 
+: dispose-each ( seq -- )
+    [
+        [ [ dispose ] curry [ , ] recover ] each
+    ] { } make dup empty? [ drop ] [ peek rethrow ] if ;
+
 : with-disposal ( object quot -- )
     over [ dispose ] curry [ ] cleanup ; inline
 
