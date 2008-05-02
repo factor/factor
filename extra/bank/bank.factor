@@ -26,8 +26,6 @@ C: <transaction> transaction
 : daily-rate>> ( account date -- rate )
     [ interest-rate>> ] dip daily-rate ;
 
-: before? ( date date -- ? ) <=> 0 < ;
-
 : transactions-on-date ( account date -- transactions )
     [ before? ] curry filter ;
 
