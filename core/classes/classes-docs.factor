@@ -47,6 +47,7 @@ $nl
 $nl
 "Classes can be inspected and operated upon:"
 { $subsection "class-operations" }
+{ $subsection "class-linearization" }
 { $see-also "class-index" } ;
 
 ABOUT: "classes"

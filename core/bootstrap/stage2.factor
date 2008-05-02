@@ -44,10 +44,6 @@ SYMBOL: bootstrap-time
     "Now, you can run Factor:" print
     vm write " -i=" write "output-image" get print flush ;
 
-! Wrap everything in a catch which starts a listener so
-! you can see what went wrong, instead of dealing with a
-! fep
-
 ! We time bootstrap
 millis >r
 

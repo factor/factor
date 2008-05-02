@@ -10,14 +10,14 @@ PREDICATE: math-class < class
     dup null bootstrap-word eq? [
         drop f
     ] [
-        number bootstrap-word class<
+        number bootstrap-word class<=
     ] if ;
 
 : last/first ( seq -- pair ) [ peek ] [ first ] bi 2array ;
 
 : math-precedence ( class -- pair )
     {
-        { [ dup null class< ] [ drop { -1 -1 } ] }
+        { [ dup null class<= ] [ drop { -1 -1 } ] }
         { [ dup math-class? ] [ class-types last/first ] }
         [ drop { 100 100 } ]
     } cond ;

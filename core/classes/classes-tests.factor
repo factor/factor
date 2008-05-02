@@ -18,14 +18,14 @@ GENERIC: generic-update-test ( x -- y )
 
 M: union-1 generic-update-test drop "union-1" ;
 
-[ f ] [ bignum union-1 class< ] unit-test
-[ t ] [ union-1 number class< ] unit-test
+[ f ] [ bignum union-1 class<= ] unit-test
+[ t ] [ union-1 number class<= ] unit-test
 [ "union-1" ] [ 1.0 generic-update-test ] unit-test
 
 "IN: classes.tests USE: math USE: arrays UNION: union-1 rational array ;" eval
 
-[ t ] [ bignum union-1 class< ] unit-test
-[ f ] [ union-1 number class< ] unit-test
+[ t ] [ bignum union-1 class<= ] unit-test
+[ f ] [ union-1 number class<= ] unit-test
 [ "union-1" ] [ { 1.0 } generic-update-test ] unit-test
 
 "IN: classes.tests USE: math PREDICATE: union-1 < integer even? ;" eval
@@ -52,7 +52,7 @@ M: sequence-mixin collection-size length ;
 
 M: assoc-mixin collection-size assoc-size ;
 
-[ t ] [ array sequence-mixin class< ] unit-test
+[ t ] [ array sequence-mixin class<= ] unit-test
 [ t ] [ { 1 2 3 } sequence-mixin? ] unit-test
 [ 3 ] [ { 1 2 3 } collection-size ] unit-test
 [ f ] [ H{ { 1 2 } { 2 3 } } sequence-mixin? ] unit-test
@@ -67,14 +67,14 @@ MIXIN: mx1
 
 INSTANCE: integer mx1
 
-[ t ] [ integer mx1 class< ] unit-test
-[ t ] [ mx1 integer class< ] unit-test
-[ t ] [ mx1 number class< ] unit-test
+[ t ] [ integer mx1 class<= ] unit-test
+[ t ] [ mx1 integer class<= ] unit-test
+[ t ] [ mx1 number class<= ] unit-test
 
 "IN: classes.tests USE: arrays INSTANCE: array mx1" eval
 
-[ t ] [ array mx1 class< ] unit-test
-[ f ] [ mx1 number class< ] unit-test
+[ t ] [ array mx1 class<= ] unit-test
+[ f ] [ mx1 number class<= ] unit-test
 
 [ \ mx1 forget ] with-compilation-unit
 
@@ -94,14 +94,14 @@ UNION: redefine-bug-1 fixnum ;
 
 UNION: redefine-bug-2 redefine-bug-1 quotation ;
 
-[ t ] [ fixnum redefine-bug-2 class< ] unit-test
-[ t ] [ quotation redefine-bug-2 class< ] unit-test
+[ t ] [ fixnum redefine-bug-2 class<= ] unit-test
+[ t ] [ quotation redefine-bug-2 class<= ] unit-test
 
 [ ] [ "IN: classes.tests USE: math UNION: redefine-bug-1 bignum ;" eval ] unit-test
 
-[ t ] [ bignum redefine-bug-1 class< ] unit-test
-[ f ] [ fixnum redefine-bug-2 class< ] unit-test
-[ t ] [ bignum redefine-bug-2 class< ] unit-test
+[ t ] [ bignum redefine-bug-1 class<= ] unit-test
+[ f ] [ fixnum redefine-bug-2 class<= ] unit-test
+[ t ] [ bignum redefine-bug-2 class<= ] unit-test
 
 USE: io.streams.string
 

@@ -80,9 +80,6 @@ M: number equal? number= ;
 
 M: real hashcode* nip >fixnum ;
 
-! real and sequence overlap. we disambiguate:
-M: integer hashcode* nip >fixnum ;
-
 GENERIC: fp-nan? ( x -- ? )
 
 M: object fp-nan?

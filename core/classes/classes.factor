@@ -5,21 +5,24 @@ slots.private namespaces sequences strings words vectors math
 quotations combinators sorting effects graphs vocabs ;
 IN: classes
 
-SYMBOL: class<-cache
+SYMBOL: class<=-cache
+SYMBOL: class<=>-cache
 SYMBOL: class-not-cache
 SYMBOL: classes-intersect-cache
 SYMBOL: class-and-cache
 SYMBOL: class-or-cache
 
 : init-caches ( -- )
-    H{ } clone class<-cache set
+    H{ } clone class<=-cache set
+    H{ } clone class<=>-cache set
     H{ } clone class-not-cache set
     H{ } clone classes-intersect-cache set
     H{ } clone class-and-cache set
     H{ } clone class-or-cache set ;
 
 : reset-caches ( -- )
-    class<-cache get clear-assoc
+    class<=-cache get clear-assoc
+    class<=>-cache get clear-assoc
     class-not-cache get clear-assoc
     classes-intersect-cache get clear-assoc
     class-and-cache get clear-assoc
@@ -56,6 +59,8 @@ PREDICATE: predicate < word "predicating" word-prop >boolean ;
 : members ( class -- seq )
     #! Output f for non-classes to work with algebra code
     dup class? [ "members" word-prop ] [ drop f ] if ;
+
+GENERIC: rank-class ( class -- n )
 
 GENERIC: reset-class ( class -- )
 

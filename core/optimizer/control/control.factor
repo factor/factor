@@ -154,9 +154,9 @@ SYMBOL: potential-loops
         node-literal t
     ] [
         node-class {
-            { [ dup null class< ] [ drop f f ] }
-            { [ dup \ f class-not class< ] [ drop t t ] }
-            { [ dup \ f class< ] [ drop f t ] }
+            { [ dup null class<= ] [ drop f f ] }
+            { [ dup \ f class-not class<= ] [ drop t t ] }
+            { [ dup \ f class<= ] [ drop f t ] }
             [ drop f f ]
         } cond
     ] if ;

@@ -233,8 +233,8 @@ TUPLE: laptop < computer battery ;
 C: <laptop> laptop
 
 [ t ] [ laptop tuple-class? ] unit-test
-[ t ] [ laptop tuple class< ] unit-test
-[ t ] [ laptop computer class< ] unit-test
+[ t ] [ laptop tuple class<= ] unit-test
+[ t ] [ laptop computer class<= ] unit-test
 [ t ] [ laptop computer classes-intersect? ] unit-test
 
 [ ] [ "Pentium" 128 3 hours <laptop> "laptop" set ] unit-test
@@ -266,8 +266,8 @@ TUPLE: server < computer rackmount ;
 C: <server> server
 
 [ t ] [ server tuple-class? ] unit-test
-[ t ] [ server tuple class< ] unit-test
-[ t ] [ server computer class< ] unit-test
+[ t ] [ server tuple class<= ] unit-test
+[ t ] [ server computer class<= ] unit-test
 [ t ] [ server computer classes-intersect? ] unit-test
 
 [ ] [ "PowerPC" 64 "1U" <server> "server" set ] unit-test
@@ -286,8 +286,8 @@ test-server-slot-values
 [ f ] [ "server" get laptop? ] unit-test
 [ f ] [ "laptop" get server? ] unit-test
 
-[ f ] [ server laptop class< ] unit-test
-[ f ] [ laptop server class< ] unit-test
+[ f ] [ server laptop class<= ] unit-test
+[ f ] [ laptop server class<= ] unit-test
 [ f ] [ laptop server classes-intersect? ] unit-test
 
 [ f ] [ 1 2 <computer> laptop? ] unit-test
@@ -306,9 +306,9 @@ TUPLE: electronic-device ;
 
 [ ] [ "IN: classes.tuple.tests TUPLE: computer < electronic-device cpu ram ;" eval ] unit-test
 
-[ f ] [ electronic-device laptop class< ] unit-test
-[ t ] [ server electronic-device class< ] unit-test
-[ t ] [ laptop server class-or electronic-device class< ] unit-test
+[ f ] [ electronic-device laptop class<= ] unit-test
+[ t ] [ server electronic-device class<= ] unit-test
+[ t ] [ laptop server class-or electronic-device class<= ] unit-test
 
 [ t ] [ "laptop" get electronic-device? ] unit-test
 [ t ] [ "laptop" get computer? ] unit-test
