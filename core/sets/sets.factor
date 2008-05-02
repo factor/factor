@@ -29,3 +29,9 @@ IN: sets
 
 : union ( seq1 seq2 -- newseq )
     append prune ;
+
+: subset? ( seq1 seq2 -- ? )
+    unique [ key? ] curry all? ;
+
+: set= ( seq1 seq2 -- ? )
+    [ unique ] bi@ = ;

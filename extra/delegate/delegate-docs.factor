@@ -24,30 +24,17 @@ HELP: CONSULT:
 
 { define-consult POSTPONE: CONSULT: } related-words
 
-HELP: define-mimic
-{ $values { "group" "a protocol, generic word or tuple class" } { "mimicker" "a class" } { "mimicked" "a class" } }
-{ $description "For the generic words in the group, the given mimicker copies the methods of the mimicked. This only works for the methods that have already been defined when the word is called." }
-{ $notes "Usually, " { $link POSTPONE: MIMIC: } " should be used instead. This is only for runtime use." } ;
-
-HELP: MIMIC:
-{ $syntax "MIMIC: group mimicker mimicked" }
-{ $values { "group" "a protocol, generic word or tuple class" } { "mimicker" "a class" } { "mimicked" "a class" } }
-{ $description "For the generic words in the group, the given mimicker copies the methods of the mimicked. This only works for the methods that have already been defined when the syntax is used. Mimicking overwrites existing methods." } ;
-
 HELP: group-words
 { $values { "group" "a group" } { "words" "an array of words" } }
-{ $description "Given a protocol, generic word or tuple class, this returns the corresponding generic words that this group contains." } ;
+{ $description "Given a protocol or tuple class, this returns the corresponding generic words that this group contains." } ;
 
 ARTICLE: { "delegate" "intro" } "Delegation module"
-"This vocabulary defines methods for consultation and mimicry, independent of the current Factor object system; it is a replacement for Factor's builtin delegation system. Fundamental to the concept of generic word groups, which can be specific protocols, generic words or tuple slot accessors. Fundamentally, a group is a word which has a method for " { $link group-words } ". To define a group as a set of words, use"
+"This vocabulary defines methods for consultation and mimicry, independent of the current Factor object system; it is a replacement for Factor's builtin delegation system. Fundamental to the concept of generic word groups, which can be specific protocols, generic words or tuple slot accessors. Fundamentally, a group is a word which has a method for " { $link group-words } ". One type of group is a tuple, which consists of the slot words. To define a group as a set of words, use"
 { $subsection POSTPONE: PROTOCOL: }
 { $subsection define-protocol }
 "One method of object extension which this vocabulary defines is consultation. This is slightly different from the current Factor concept of delegation, in that instead of delegating for all generic words not implemented, only generic words included in a specific group are consulted. Additionally, instead of using a single hard-coded delegate slot, you can specify any quotation to execute in order to retrieve who to consult. The literal syntax and defining word are"
 { $subsection POSTPONE: CONSULT: }
-{ $subsection define-consult }
-"Another object extension mechanism is mimicry. This is the copying of methods in a group from one class to another. For certain applications, this is more appropriate than delegation, as it avoids the slicing problem. It is inappropriate for tuple slots, however. The literal syntax and defining word are"
-{ $subsection POSTPONE: MIMIC: }
-{ $subsection define-mimic } ;
+{ $subsection define-consult } ;
 
 IN: delegate
 ABOUT: { "delegate" "intro" }

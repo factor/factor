@@ -1,9 +1,9 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel namespaces io io.timeouts strings splitting
-threads http sequences prettyprint io.server logging calendar
-html.elements accessors math.parser combinators.lib
-tools.vocabs debugger html continuations random combinators
+threads sequences prettyprint io.server logging calendar
+http html html.elements accessors math.parser combinators.lib
+tools.vocabs debugger continuations random combinators
 destructors io.encodings.8-bit fry classes words ;
 IN: http.server
 
@@ -22,7 +22,10 @@ GENERIC: call-responder* ( path responder -- response )
     <response>
         200 >>code
         "Document follows" >>message
-        swap set-content-type ;
+        swap >>content-type ;
+
+: <html-content> ( quot -- response )
+    "text/html" <content> swap >>body ;
 
 TUPLE: trivial-responder response ;
 
@@ -38,9 +41,7 @@ M: trivial-responder call-responder* nip response>> call ;
     </html> ;
 
 : <trivial-response> ( code message -- response )
-    2dup '[ , , trivial-response-body ]
-    "text/html" <content>
-        swap >>body
+    2dup '[ , , trivial-response-body ] <html-content>
         swap >>message
         swap >>code ;
 

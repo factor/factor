@@ -11,10 +11,6 @@ namespaces assocs kernel sequences math tools.test words ;
     dataflow compute-def-use drop compute-dead-literals keys
     [ value-literal ] map ;
 
-: subset? [ member? ] curry all? ;
-
-: set= 2dup subset? >r swap subset? r> and ;
-
 [ { [ + ] } ] [
     [ [ 1 2 3 ] [ + ] over drop drop ] kill-set
 ] unit-test

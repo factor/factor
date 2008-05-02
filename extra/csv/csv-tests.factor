@@ -47,7 +47,6 @@ IN: csv.tests
    <string-reader> csv ] named-unit-test
 
 
-   
 ! !!!!!!!!  other tests
    
 [ { { "Phil Dawes" } } ] 
@@ -59,3 +58,13 @@ IN: csv.tests
 "trims leading and trailing whitespace - n.b. this isn't really conformant, but lots of csv seems to assume this"
 [ { { "foo yeah" "bah" "baz" } } ] 
 [ "  foo yeah  , bah ,baz\n" <string-reader> csv ] named-unit-test
+
+
+"allows setting of delimiting character"
+[ { { "foo" "bah" "baz" } } ] 
+[ "foo\tbah\tbaz\n" <string-reader> CHAR: \t [ csv ] with-delimiter ] named-unit-test
+
+"Quoted field followed immediately by newline"
+[ { { "foo" "bar" }
+    { "1"   "2" } } ]
+[ "foo,\"bar\"\n1,2" <string-reader> csv ] named-unit-test

@@ -59,6 +59,7 @@ num-types get f <array> builtins set
     "arrays"
     "bit-arrays"
     "byte-arrays"
+    "byte-vectors"
     "classes.private"
     "classes.tuple"
     "classes.tuple.private"
@@ -441,6 +442,22 @@ tuple
 {
     {
         { "array" "arrays" }
+        "underlying"
+        { "underlying" "growable" }
+        { "set-underlying" "growable" }
+    } {
+        { "array-capacity" "sequences.private" }
+        "fill"
+        { "length" "sequences" }
+        { "set-fill" "growable" }
+    }
+} define-tuple-class
+
+"byte-vector" "byte-vectors" create
+tuple
+{
+    {
+        { "byte-array" "byte-arrays" }
         "underlying"
         { "underlying" "growable" }
         { "set-underlying" "growable" }

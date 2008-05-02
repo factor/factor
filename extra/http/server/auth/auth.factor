@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs namespaces kernel
+USING: accessors assocs namespaces kernel sequences
 http.server
 http.server.sessions
 http.server.auth.providers ;
@@ -33,3 +33,9 @@ M: filter-responder init-user-profile
 : uchange ( quot key -- )
     profile swap change-at
     user-changed ; inline
+
+SYMBOL: capabilities
+
+V{ } clone capabilities set-global
+
+: define-capability ( word -- ) capabilities get push-new ;

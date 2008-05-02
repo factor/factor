@@ -9,9 +9,11 @@ user "USERS"
 {
     { "username" "USERNAME" { VARCHAR 256 } +user-assigned-id+ }
     { "realname" "REALNAME" { VARCHAR 256 } }
-    { "password" "PASSWORD" { VARCHAR 256 } +not-null+ }
+    { "password" "PASSWORD" BLOB +not-null+ }
+    { "salt" "SALT" INTEGER +not-null+ }
     { "email" "EMAIL" { VARCHAR 256 } }
     { "ticket" "TICKET" { VARCHAR 256 } }
+    { "capabilities" "CAPABILITIES" FACTOR-BLOB }
     { "profile" "PROFILE" FACTOR-BLOB }
     { "deleted" "DELETED" INTEGER +not-null+ }
 } define-persistent

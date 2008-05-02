@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: splitting kernel io sequences farkup accessors
-http.server.components ;
+http.server.components xml.entities ;
 IN: http.server.components.farkup
 
 TUPLE: farkup-renderer < text-renderer ;

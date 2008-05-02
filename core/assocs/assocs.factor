@@ -98,11 +98,11 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 : assoc-stack ( key seq -- value )
     dup length 1- swap (assoc-stack) ;
 
-: subassoc? ( assoc1 assoc2 -- ? )
+: assoc-subset? ( assoc1 assoc2 -- ? )
     [ swapd at* [ = ] [ 2drop f ] if ] curry assoc-all? ;
 
 : assoc= ( assoc1 assoc2 -- ? )
-    2dup subassoc? >r swap subassoc? r> and ;
+    [ assoc-subset? ] [ swap assoc-subset? ] 2bi and ;
 
 : assoc-hashcode ( n assoc -- code )
     [

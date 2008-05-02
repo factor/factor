@@ -1,8 +1,8 @@
 USING: arrays combinators crypto.common kernel io
 io.encodings.binary io.files io.streams.byte-array math.vectors
 strings sequences namespaces math parser sequences vectors
-io.binary hashtables symbols math.bitfields.lib ;
-IN: crypto.sha1
+io.binary hashtables symbols math.bitfields.lib checksums ;
+IN: checksums.sha1
 
 ! Implemented according to RFC 3174.
 
@@ -99,30 +99,22 @@ SYMBOLS: h0 h1 h2 h3 h4 A B C D E w K ;
         [ (process-sha1-block) ] each
     ] if ;
 
-: (stream>sha1) ( -- )
+: stream>sha1 ( -- )
     64 read [ process-sha1-block ] keep
-    length 64 = [ (stream>sha1) ] when ;
+    length 64 = [ stream>sha1 ] when ;
 
 : get-sha1 ( -- str )
     [ [ h0 h1 h2 h3 h4 ] [ get 4 >be % ] each ] "" make ;
 
-: stream>sha1 ( stream -- sha1 )
-    [ initialize-sha1 (stream>sha1) get-sha1 ] with-stream ;
+SINGLETON: sha1
 
-: byte-array>sha1 ( string -- sha1 )
-    binary <byte-reader> stream>sha1 ;
+INSTANCE: sha1 checksum
 
-: byte-array>sha1str ( string -- str )
-    byte-array>sha1 hex-string ;
+M: sha1 checksum-stream ( stream -- sha1 )
+    drop [ initialize-sha1 stream>sha1 get-sha1 ] with-stream ;
 
-: byte-array>sha1-bignum ( string -- n )
-    byte-array>sha1 be> ;
-
-: file>sha1 ( file -- sha1 )
-    binary <file-reader> stream>sha1 ;
-
-: byte-array>sha1-interleave ( string -- seq )
+: sha1-interleave ( string -- seq )
     [ zero? ] left-trim
     dup length odd? [ rest ] when
-    seq>2seq [ byte-array>sha1 ] bi@
+    seq>2seq [ sha1 checksum-bytes ] bi@
     2seq>seq ;

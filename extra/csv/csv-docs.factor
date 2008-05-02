@@ -12,3 +12,10 @@ HELP: csv-row
           { "row" "an array of fields" } } 
 { $description "parses a row from a csv stream"
 } ;
+
+
+HELP: with-delimiter
+{ $values { "char" "field delimiter (e.g. CHAR: \t)" }
+          { "quot" "a quotation" } }
+{ $description "Sets the field delimiter for csv or csv-row words "
+} ;

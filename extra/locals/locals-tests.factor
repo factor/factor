@@ -230,3 +230,10 @@ DEFER: xyzzy
 
 [ "xxx" "yyy" ] [ "yyy" "xxx" let*-test-4 ] unit-test
 
+GENERIC: next-method-test ( a -- b )
+
+M: integer next-method-test 3 + ;
+
+M:: fixnum next-method-test ( a -- b ) a call-next-method 1 + ;
+
+[ 5 ] [ 1 next-method-test ] unit-test

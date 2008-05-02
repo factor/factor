@@ -3,13 +3,13 @@ USING: kernel math namespaces tools.test vectors sequences
 sequences.private hashtables io prettyprint assocs
 continuations ;
 
-[ t ] [ H{ } dup subassoc? ] unit-test
-[ f ] [ H{ { 1 3 } } H{ } subassoc? ] unit-test
-[ t ] [ H{ } H{ { 1 3 } } subassoc? ] unit-test
-[ t ] [ H{ { 1 3 } } H{ { 1 3 } } subassoc? ] unit-test
-[ f ] [ H{ { 1 3 } } H{ { 1 "hey" } } subassoc? ] unit-test
-[ f ] [ H{ { 1 f } } H{ } subassoc? ] unit-test
-[ t ] [ H{ { 1 f } } H{ { 1 f } } subassoc? ] unit-test
+[ t ] [ H{ } dup assoc-subset? ] unit-test
+[ f ] [ H{ { 1 3 } } H{ } assoc-subset? ] unit-test
+[ t ] [ H{ } H{ { 1 3 } } assoc-subset? ] unit-test
+[ t ] [ H{ { 1 3 } } H{ { 1 3 } } assoc-subset? ] unit-test
+[ f ] [ H{ { 1 3 } } H{ { 1 "hey" } } assoc-subset? ] unit-test
+[ f ] [ H{ { 1 f } } H{ } assoc-subset? ] unit-test
+[ t ] [ H{ { 1 f } } H{ { 1 f } } assoc-subset? ] unit-test
 
 ! Test some combinators
 [

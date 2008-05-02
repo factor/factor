@@ -1,19 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel kernel.private math sequences
-sequences.private growable byte-arrays prettyprint.backend
-parser accessors ;
+sequences.private growable byte-arrays ;
 IN: byte-vectors
-
-TUPLE: byte-vector underlying fill ;
-
-M: byte-vector underlying underlying>> { byte-array } declare ;
-
-M: byte-vector set-underlying (>>underlying) ;
-
-M: byte-vector length fill>> { array-capacity } declare ;
-
-M: byte-vector set-fill (>>fill) ;
 
 <PRIVATE
 
@@ -43,9 +32,3 @@ M: byte-vector equal?
 M: byte-array new-resizable drop <byte-vector> ;
 
 INSTANCE: byte-vector growable
-
-: BV{ \ } [ >byte-vector ] parse-literal ; parsing
-
-M: byte-vector >pprint-sequence ;
-
-M: byte-vector pprint-delims drop \ BV{ \ } ;

@@ -1,6 +1,6 @@
 USING: crypto.common kernel splitting math sequences namespaces
-io.binary symbols math.bitfields.lib ;
-IN: crypto.sha2
+io.binary symbols math.bitfields.lib checksums ;
+IN: checksums.sha2
 
 <PRIVATE
 
@@ -118,14 +118,15 @@ SYMBOLS: vars M K H S0 S1 process-M word-size block-size ;
 
 PRIVATE>
 
-: byte-array>sha-256 ( string -- string )
-    [
+SINGLETON: sha-256
+
+INSTANCE: sha-256 checksum
+
+M: sha-256 checksum-bytes
+    drop [
         K-256 K set
         initial-H-256 H set
         4 word-size set
         64 block-size set
         byte-array>sha2
     ] with-scope ;
-
-: byte-array>sha-256-string ( string -- hexstring )
-    byte-array>sha-256 hex-string ;

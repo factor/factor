@@ -1,41 +1,47 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: calendar html io io.files kernel math math.parser http
-http.server namespaces parser sequences strings assocs
-hashtables debugger http.mime sorting html.elements logging
-calendar.format accessors io.encodings.binary fry ;
+USING: calendar html io io.files kernel math math.order
+math.parser http http.server namespaces parser sequences strings
+assocs hashtables debugger http.mime sorting html.elements
+logging calendar.format accessors io.encodings.binary fry ;
 IN: http.server.static
 
 ! special maps mime types to quots with effect ( path -- )
-TUPLE: file-responder root hook special ;
+TUPLE: file-responder root hook special allow-listings ;
 
-: file-http-date ( filename -- string )
-    file-info modified>> timestamp>http-string ;
-
-: last-modified-matches? ( filename -- ? )
-    file-http-date dup [
-        request get "if-modified-since" header =
-    ] when ;
+: modified-since? ( filename -- ? )
+    request get "if-modified-since" header dup [
+        [ file-info modified>> ] [ rfc822>timestamp ] bi* after?
+    ] [
+        2drop t
+    ] if ;
 
 : <304> ( -- response )
     304 "Not modified" <trivial-response> ;
 
+: <403> ( -- response )
+    403 "Forbidden" <trivial-response> ;
+
 : <file-responder> ( root hook -- responder )
-    H{ } clone file-responder boa ;
+    file-responder new
+        swap >>hook
+        swap >>root
+        H{ } clone >>special ;
 
 : <static> ( root -- responder )
     [
         <content>
-        swap
-        [ file-info size>> "content-length" set-header ]
-        [ file-http-date "last-modified" set-header ]
-        [ '[ , binary <file-reader> stdio get stream-copy ] >>body ]
-        tri
+        swap [
+            file-info
+            [ size>> "content-length" set-header ]
+            [ modified>> "last-modified" set-header ] bi
+        ]
+        [ '[ , binary <file-reader> stdio get stream-copy ] >>body ] bi
     ] <file-responder> ;
 
 : serve-static ( filename mime-type -- response )
-    over last-modified-matches?
-    [ 2drop <304> ] [ file-responder get hook>> call ] if ;
+    over modified-since?
+    [ file-responder get hook>> call ] [ 2drop <304> ] if ;
 
 : serving-path ( filename -- filename )
     file-responder get root>> right-trim-separators
@@ -65,8 +71,11 @@ TUPLE: file-responder root hook special ;
     ] simple-html-document ;
 
 : list-directory ( directory -- response )
-    "text/html" <content>
-    swap '[ , directory. ] >>body ;
+    file-responder get allow-listings>> [
+        '[ , directory. ] <html-content>
+    ] [
+        drop <403>
+    ] if ;
 
 : find-index ( filename -- path )
     "index.html" append-path dup exists? [ drop f ] unless ;

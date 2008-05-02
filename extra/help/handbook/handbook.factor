@@ -204,7 +204,8 @@ ARTICLE: "io" "Input and output"
 { $heading "Other features" }
 { $subsection "network-streams" }
 { $subsection "io.launcher" }
-{ $subsection "io.timeouts" } ;
+{ $subsection "io.timeouts" }
+{ $subsection "checksums" } ;
 
 ARTICLE: "tools" "Developer tools"
 { $subsection "tools.vocabs" }

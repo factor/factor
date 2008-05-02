@@ -1,18 +1,19 @@
-USING: arrays combinators crypto.common crypto.md5 crypto.sha1
-crypto.md5.private io io.binary io.files io.streams.byte-array
-kernel math math.vectors memoize sequences io.encodings.binary ;
+USING: arrays combinators crypto.common checksums checksums.md5
+checksums.sha1 checksums.md5.private io io.binary io.files
+io.streams.byte-array kernel math math.vectors memoize sequences
+io.encodings.binary ;
 IN: crypto.hmac
 
 : sha1-hmac ( Ko Ki -- hmac )
     initialize-sha1 process-sha1-block
-    (stream>sha1) get-sha1
+    stream>sha1 get-sha1
     initialize-sha1
     >r process-sha1-block r>
     process-sha1-block get-sha1 ;
 
 : md5-hmac ( Ko Ki -- hmac )
     initialize-md5 process-md5-block
-    (stream>md5) get-md5
+    stream>md5 get-md5
     initialize-md5
     >r process-md5-block r>
     process-md5-block get-md5 ;

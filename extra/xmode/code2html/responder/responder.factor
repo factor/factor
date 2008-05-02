@@ -9,7 +9,7 @@ IN: xmode.code2html.responder
     [
         drop
         "text/html" <content> swap
-        [ file-http-date "last-modified" set-header ]
+        [ "last-modified" set-header ]
         [
             '[
                 ,
