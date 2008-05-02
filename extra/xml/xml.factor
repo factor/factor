@@ -3,17 +3,11 @@
 USING: io io.streams.string io.files kernel math namespaces
 prettyprint sequences arrays generic strings vectors
 xml.char-classes xml.data xml.errors xml.tokenize xml.writer
-xml.utilities state-parser assocs ascii io.encodings.utf8 ;
+xml.utilities state-parser assocs ascii io.encodings.utf8
+accessors xml.backend ;
 IN: xml
 
 !   -- Overall parser with data tree
-
-! A stack of { tag children } pairs
-SYMBOL: xml-stack
-
-: <unclosed> ( -- unclosed )
-    xml-stack get rest-slice [ first opener-name ] map
-    { set-unclosed-tags } unclosed construct ;
 
 : add-child ( object -- )
     xml-stack get peek second push ;
