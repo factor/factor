@@ -16,3 +16,5 @@ PREDICATE: builtin-class < class
 M: hi-tag class hi-tag type>class ;
 
 M: object class tag type>class ;
+
+M: builtin-class rank-class drop 0 ;

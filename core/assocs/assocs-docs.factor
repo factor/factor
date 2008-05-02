@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Daniel Ehrenberg and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel sequences
-sequences.private namespaces classes math ;
+sequences.private namespaces math ;
 IN: assocs
 
 ARTICLE: "alists" "Association lists"

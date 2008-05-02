@@ -181,11 +181,11 @@ INSTANCE: constant value
 
 : %unbox-c-ptr ( dst src -- )
     dup operand-class {
-        { [ dup \ f class< ] [ drop %unbox-f ] }
-        { [ dup simple-alien class< ] [ drop %unbox-alien ] }
-        { [ dup byte-array class< ] [ drop %unbox-byte-array ] }
-        { [ dup bit-array class< ] [ drop %unbox-byte-array ] }
-        { [ dup float-array class< ] [ drop %unbox-byte-array ] }
+        { [ dup \ f class<= ] [ drop %unbox-f ] }
+        { [ dup simple-alien class<= ] [ drop %unbox-alien ] }
+        { [ dup byte-array class<= ] [ drop %unbox-byte-array ] }
+        { [ dup bit-array class<= ] [ drop %unbox-byte-array ] }
+        { [ dup float-array class<= ] [ drop %unbox-byte-array ] }
         [ drop %unbox-any-c-ptr ]
     } cond ; inline
 
@@ -569,7 +569,7 @@ M: loc lazy-store
     {
         { f [ drop t ] }
         { known-tag [ class-tag >boolean ] }
-        [ class< ]
+        [ class<= ]
     } case ;
 
 : spec-matches? ( value spec -- ? )
@@ -644,7 +644,7 @@ PRIVATE>
 UNION: immediate fixnum POSTPONE: f ;
 
 : operand-immediate? ( operand -- ? )
-    operand-class immediate class< ;
+    operand-class immediate class<= ;
 
 : phantom-push ( obj -- )
     1 phantom-datastack get adjust-phantom

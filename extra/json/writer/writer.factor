@@ -21,11 +21,6 @@ M: string json-print ( obj -- )
 M: number json-print ( num -- )  
   number>string write ;
 
-! sequence and number overlap, we provide an explicit
-! disambiguation method
-M: integer json-print ( num -- )  
-  number>string write ;
-
 M: sequence json-print ( array -- ) 
   CHAR: [ write1 [ >json ] map "," join write CHAR: ] write1 ;
 

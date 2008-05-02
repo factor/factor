@@ -96,7 +96,7 @@ optimizer.math.partial generic.standard system accessors ;
 
 : math-closure ( class -- newclass )
     { null fixnum bignum integer rational float real number }
-    [ class< ] with find nip number or ;
+    [ class<= ] with find nip number or ;
 
 : fits? ( interval class -- ? )
     "interval" word-prop dup
@@ -108,7 +108,7 @@ optimizer.math.partial generic.standard system accessors ;
     dup r> at swap or ;
 
 : won't-overflow? ( interval node -- ? )
-    node-in-d [ value-class* fixnum class< ] all?
+    node-in-d [ value-class* fixnum class<= ] all?
     swap fixnum fits? and ;
 
 : post-process ( class interval node -- classes intervals )
@@ -214,7 +214,7 @@ optimizer.math.partial generic.standard system accessors ;
 : twiddle-interval ( i1 -- i2 )
     dup [
         node get node-in-d
-        [ value-class* integer class< ] all?
+        [ value-class* integer class<= ] all?
         [ integral-closure ] when
     ] when ;
 
@@ -293,7 +293,7 @@ most-negative-fixnum most-positive-fixnum [a,b]
 ! Removing overflow checks
 : remove-overflow-check? ( #call -- ? )
     dup out-d>> first node-class
-    [ fixnum class< ] [ null eq? not ] bi and ;
+    [ fixnum class<= ] [ null eq? not ] bi and ;
 
 {
     { + [ fixnum+fast ] }
@@ -356,7 +356,7 @@ most-negative-fixnum most-positive-fixnum [a,b]
     dup #call? [ node-param eq? ] [ 2drop f ] if ;
 
 : coerced-to-fixnum? ( #call -- ? )
-    dup dup node-in-d [ node-class integer class< ] with all?
+    dup dup node-in-d [ node-class integer class<= ] with all?
     [ \ >fixnum consumed-by? ] [ drop f ] if ;
 
 {
@@ -377,7 +377,7 @@ most-negative-fixnum most-positive-fixnum [a,b]
 
 : convert-rem-to-and? ( #call -- ? )
     dup node-in-d {
-        { [ 2dup first node-class integer class< not ] [ f ] }
+        { [ 2dup first node-class integer class<= not ] [ f ] }
         { [ 2dup second node-literal integer? not ] [ f ] }
         { [ 2dup second node-literal power-of-2? not ] [ f ] }
         [ t ]

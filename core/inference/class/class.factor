@@ -143,7 +143,7 @@ M: literal-constraint constraint-satisfied?
     [ swap literal>> eql? ] [ 2drop f ] if ;
 
 M: class-constraint constraint-satisfied?
-    [ value>> value-class* ] [ class>> ] bi class< ;
+    [ value>> value-class* ] [ class>> ] bi class<= ;
 
 M: pair apply-constraint
     first2 2dup constraints get set-at
