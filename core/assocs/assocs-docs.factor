@@ -68,7 +68,7 @@ ARTICLE: "assocs-lookup" "Lookup and querying of assocs"
 
 ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
 "It is often useful to use the keys of an associative mapping as a set, exploiting the constant or logarithmic lookup time of most implementations (" { $link "alists" } " being a notable exception)."
-{ $subsection subassoc? }
+{ $subsection assoc-subset? }
 { $subsection assoc-intersect }
 { $subsection update }
 { $subsection assoc-union }
@@ -215,7 +215,7 @@ HELP: assoc-all?
 { $values { "assoc" assoc } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "?" "a boolean" } }
 { $description "Tests if all entries in the assoc satisfy a predicate by applying the quotation to each entry in turn. a predicate quotation to entry in the assoc. Iteration stops if an entry is found for which the quotation outputs " { $link f } ". If the assoc is empty, always outputs " { $link t } "." } ;
 
-HELP: subassoc?
+HELP: assoc-subset?
 { $values { "assoc1" assoc } { "assoc2" assoc } { "?" "a new assoc" } }
 { $description "Tests if " { $snippet "assoc2" } " contains all key/value pairs of " { $snippet "assoc1" } "." } ;
 
