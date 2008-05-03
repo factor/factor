@@ -145,7 +145,6 @@ IN: tools.deploy.shaker
                 classes:class-not-cache
                 classes:class-or-cache
                 classes:class<=-cache
-                classes:class<=>-cache
                 classes:classes-intersect-cache
                 classes:update-map
                 command-line:main-vocab-hook

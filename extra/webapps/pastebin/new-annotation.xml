@@ -4,8 +4,7 @@
 
 	<t:title>New Annotation</t:title>
 
-	<t:form t:action="$pastebin/annotate">
-		<t:edit t:component="id" />
+	<t:form t:action="$pastebin/annotate" t:for="id">
 
 		<table>
 			<tr><th class="field-label">Summary: </th><td><t:edit t:component="summary" /></td></tr>

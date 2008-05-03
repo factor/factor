@@ -10,14 +10,8 @@
 		<tr><th class="field-label">Date:    </th><td><t:view t:component="date"    /></td></tr>
 	</table>
 
-	<div class="description">
-		<t:view t:component="contents" />
-	</div>
+	<pre class="description"><t:view t:component="contents" /></pre>
 
-	<t:form t:action="$pastebin/delete-annotation" class="inline">
-		<t:edit t:component="id" />
-		<t:edit t:component="aid" />
-		<button class="link-button link">Delete Annotation</button>
-	</t:form>
+	<t:button t:action="$pastebin/delete-annotation" t:for="aid" class="link-button link">Delete Annotation</t:button>
 
 </t:chloe>

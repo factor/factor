@@ -187,31 +187,15 @@ C: <anonymous-complement> anonymous-complement
         [ [ rank-class ] bi@ < ]
     } cond ;
 
-: class-tie-breaker ( first second -- n )
-    2dup [ rank-class ] compare {
-        { +lt+ [ 2drop +lt+ ] }
-        { +gt+ [ 2drop +gt+ ] }
-        { +eq+ [ <=> ] }
-    } case ;
-
-: (class<=>) ( first second -- n )
-    {
-        { [ 2dup class<= ] [
-            2dup swap class<=
-            [ class-tie-breaker ] [ 2drop +lt+ ] if
-        ] }
-        { [ 2dup swap class<= ] [
-            2dup class<=
-            [ class-tie-breaker ] [ 2drop +gt+ ] if
-        ] }
-        [ class-tie-breaker ]
-    } cond ;
-
-: class<=> ( first second -- n )
-    class<=>-cache get [ (class<=>) ] 2cache ;
+: largest-class ( seq -- n elt )
+    dup [ [ class< ] with contains? not ] curry find-last
+    [ "Topological sort failed" throw ] unless* ;
 
 : sort-classes ( seq -- newseq )
-    [ class<=> invert-comparison ] sort ;
+    [ [ word-name ] compare ] sort >vector
+    [ dup empty? not ]
+    [ dup largest-class >r over delete-nth r> ]
+    [ ] unfold nip ;
 
 : min-class ( class seq -- class/f )
     over [ classes-intersect? ] curry filter

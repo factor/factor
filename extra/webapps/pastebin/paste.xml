@@ -2,9 +2,7 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-	<t:title>Pastebin</t:title>
-
-	<h2>Paste: <t:view t:component="summary" /></h2>
+	<t:title>Paste: <t:view t:component="summary" /></t:title>
 
 	<table>
 		<tr><th class="field-label">Author:  </th><td><t:view t:component="author"  /></td></tr>
@@ -14,10 +12,7 @@
 
 	<pre class="description"><t:view t:component="contents" /></pre>
 
-	<t:form t:action="$pastebin/delete-paste" class="inline">
-		<t:edit t:component="id" />
-		<button class="link-button link">Delete Paste</button>
-	</t:form>
+	<t:button t:action="$pastebin/delete-paste" t:for="id" class="link-button link">Delete Paste</t:button>
 	|
 	<t:a t:href="$pastebin/annotate" t:query="id">Annotate</t:a>
 

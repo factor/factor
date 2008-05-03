@@ -143,7 +143,7 @@ IN: http
 : assoc>query ( hash -- str )
     [
         {
-            { [ dup number? ] [ number>string ] }
+            { [ dup number? ] [ number>string 1array ] }
             { [ dup string? ] [ 1array ] }
             { [ dup sequence? ] [ ] }
         } cond

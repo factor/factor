@@ -23,10 +23,8 @@
 		<p>
 
 			<input type="submit" value="Log in" />
+			<t:validation-message />
 
-			<t:if t:var="http.server.auth.login:login-failed?">
-				<t:error>invalid username or password</t:error>
-			</t:if>
 		</p>
 
 	</t:form>
