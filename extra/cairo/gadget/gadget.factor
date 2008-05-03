@@ -11,9 +11,11 @@ TUPLE: cairo-gadget width height quot ;
     swap >>height
     swap >>width ;
 
+: (with-surface) ( surface quot -- surface )
+    >r dup cairo_create dup r> call cairo_destroy ;
+    
 : with-surface ( surface quot -- )
-    >r dup cairo_create dup r> call
-    cairo_destroy cairo_surface_destroy ;
+    (with-surface) cairo_surface_destroy ;
 
 : cairo>bytes ( width height quot -- byte-array )
     >r over 4 *
@@ -21,12 +23,18 @@ TUPLE: cairo-gadget width height quot ;
     [ cairo_image_surface_create_for_data ] 3bi
     r> with-surface ;
 
+: cairo>png ( width height quot path -- )
+    >r >r CAIRO_FORMAT_ARGB32 -rot
+    cairo_image_surface_create
+    r> (with-surface) dup r> cairo_surface_write_to_png
+    drop cairo_surface_destroy ;
+
 M: cairo-gadget draw-gadget* ( gadget -- )
     origin get [
         0 0 glRasterPos2i
         1.0 -1.0 glPixelZoom
         [ width>> ] [ height>> ] [ quot>> ] tri
-        [ drop GL_RGBA GL_UNSIGNED_BYTE ] [ cairo>bytes ] 3bi
+        [ drop GL_BGRA GL_UNSIGNED_BYTE ] [ cairo>bytes ] 3bi
         glDrawPixels
     ] with-translation ;
 
