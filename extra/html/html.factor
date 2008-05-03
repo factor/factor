@@ -225,13 +225,13 @@ M: html-stream stream-nl ( stream -- )
 
 : vertical-layout ( list -- )
     #! Given a list of HTML components, arrange them vertically.
-    <table> 
+    <table>
     [ <tr> <td> call </td> </tr> ] each
     </table> ;
 
 : horizontal-layout ( list -- )
     #! Given a list of HTML components, arrange them horizontally.
-    <table> 
+    <table>
      <tr "top" =valign tr> [ <td> call </td> ] each </tr>
     </table> ;
 
@@ -246,8 +246,8 @@ M: html-stream stream-nl ( stream -- )
 : simple-page ( title quot -- )
     #! Call the quotation, with all output going to the
     #! body of an html page with the given title.
-    <html>  
-        <head> <title> swap write </title> </head> 
+    <html>
+        <head> <title> swap write </title> </head>
         <body> call </body>
     </html> ;
 
@@ -255,10 +255,13 @@ M: html-stream stream-nl ( stream -- )
     #! Call the quotation, with all output going to the
     #! body of an html page with the given title. stylesheet-quot
     #! is called to generate the required stylesheet.
-    <html>  
-        <head>  
-             <title> rot write </title> 
-             swap call 
-        </head> 
+    <html>
+        <head>
+             <title> rot write </title>
+             swap call
+        </head>
         <body> call </body>
     </html> ;
+
+: render-error ( message -- )
+    <span "error" =class span> escape-string write </span> ;

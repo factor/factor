@@ -30,6 +30,7 @@ IN: http.tests
 
 [ H{ { "a" { "b" "c" } } } ] [ "a=b&a=c" query>assoc ] unit-test
 
+[ "a=3" ] [ { { "a" 3 } } assoc>query ] unit-test
 : lf>crlf "\n" split "\r\n" join ;
 
 STRING: read-request-test-1
