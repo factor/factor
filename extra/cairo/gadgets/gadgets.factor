@@ -1,8 +1,12 @@
 USING: cairo ui.render kernel opengl.gl opengl
 math byte-arrays ui.gadgets accessors arrays 
-namespaces ;
+namespaces io.backend ;
 
-IN: cairo.gadget
+IN: cairo.gadgets
+
+! We need two kinds of gadgets:
+! one performs the cairo ops once and caches the bytes, the other
+! performs cairo ops every refresh
 
 TUPLE: cairo-gadget width height quot ;
 : <cairo-gadget> ( width height quot -- cairo-gadget )
@@ -37,6 +41,30 @@ M: cairo-gadget draw-gadget* ( gadget -- )
         [ drop GL_BGRA GL_UNSIGNED_BYTE ] [ cairo>bytes ] 3bi
         glDrawPixels
     ] with-translation ;
-
+    
 M: cairo-gadget pref-dim* ( gadget -- rect )
     [ width>> ] [ height>> ] bi 2array ;
+
+TUPLE: pixels-gadget width height bytes ;
+: <pixels-gadget> ( width height bytes -- pixel-gadget )
+    pixels-gadget construct-gadget
+    swap >>bytes
+    swap >>height
+    swap >>width ;
+    
+M: pixels-gadget draw-gadget* ( gadget -- )
+    origin get [
+        0 0 glRasterPos2i
+        1.0 -1.0 glPixelZoom
+        [ width>> ] [ height>> ] [ bytes>> ] tri
+        GL_BGRA GL_UNSIGNED_BYTE rot glDrawPixels
+    ] with-translation ;
+
+M: pixels-gadget pref-dim* ( gadget -- rect )
+    [ width>> ] [ height>> ] bi 2array ;
+
+: <png-gadget> ( path -- gadget )
+    normalize-path cairo_image_surface_create_from_png
+    [ cairo_image_surface_get_width ] [ cairo_image_surface_get_height 2dup ]
+    [ [ dupd 0 0 cairo_set_source_surface cairo_paint ]  curry cairo>bytes ] tri
+    <pixels-gadget> ;
