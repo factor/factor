@@ -703,7 +703,7 @@ cairo_status_to_string ( cairo_status_t status ) ;
 ! Surface manipulation
 
 FUNCTION: cairo_surface_t*
-cairo_surface_create_similar ( cairo_surface_t * other, cairo_content_t	content, int width, int height ) ;
+cairo_surface_create_similar ( cairo_surface_t* other, cairo_content_t content, int width, int height ) ;
 
 FUNCTION: cairo_surface_t*
 cairo_surface_reference ( cairo_surface_t* surface ) ;
@@ -744,8 +744,7 @@ FUNCTION: cairo_content_t
 cairo_surface_get_content ( cairo_surface_t* surface ) ;
 
 FUNCTION: cairo_status_t
-cairo_surface_write_to_png ( cairo_surface_t	*surface,
-			    const char		*filename ) ;
+cairo_surface_write_to_png ( cairo_surface_t* surface, char* filename ) ;
 
 FUNCTION: cairo_status_t
 cairo_surface_write_to_png_stream ( cairo_surface_t* surface, cairo_write_func_t write_func, void* closure ) ;
