@@ -670,6 +670,9 @@ PRIVATE>
 : unclip ( seq -- rest first )
     [ rest ] [ first ] bi ;
 
+: unclip-last ( seq -- rest last )
+    [ 1 head* ] [ peek ] bi ;
+
 : unclip-slice ( seq -- rest first )
     [ rest-slice ] [ first ] bi ;
 
