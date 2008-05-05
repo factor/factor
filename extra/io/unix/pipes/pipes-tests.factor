@@ -4,13 +4,13 @@ IN: io.unix.pipes.tests
 
 [ { 0 0 } ] [ { "ls" "grep x" } with-pipeline ] unit-test
 
-! [ ] [
-!     {
-!         "ls"
-!         [
-!             input-stream [ utf8 <decoder> ] change
-!             input-stream get lines reverse [ print ] each f
-!         ]
-!         "grep x"
-!     } with-pipeline
-! ] unit-test
+[ { 0 f 0 } ] [
+    {
+        "ls"
+        [
+            input-stream [ utf8 <decoder> ] change
+            input-stream get lines reverse [ print ] each f
+        ]
+        "grep x"
+    } with-pipeline
+] unit-test

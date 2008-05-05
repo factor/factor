@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel continuations io io.encodings io.encodings.private
-io.timeouts debugger inspector listener accessors ;
+io.timeouts debugger inspector listener accessors delegate
+delegate.protocols ;
 IN: io.streams.duplex
 
 ! We ensure that the stream can only be closed once, to preserve
@@ -28,50 +29,9 @@ M: stream-closed-twice summary
 
 PRIVATE>
 
-M: duplex-stream stream-flush
-    out stream-flush ;
+CONSULT: input-stream-protocol duplex-stream in ;
 
-M: duplex-stream stream-readln
-    in stream-readln ;
-
-M: duplex-stream stream-read1
-    in stream-read1 ;
-
-M: duplex-stream stream-read-until
-    in stream-read-until ;
-
-M: duplex-stream stream-read-partial
-    in stream-read-partial ;
-
-M: duplex-stream stream-read
-    in stream-read ;
-
-M: duplex-stream stream-write1
-    out stream-write1 ;
-
-M: duplex-stream stream-write
-    out stream-write ;
-
-M: duplex-stream stream-nl
-    out stream-nl ;
-
-M: duplex-stream stream-format
-    out stream-format ;
-
-M: duplex-stream make-span-stream
-    out make-span-stream ;
-
-M: duplex-stream make-block-stream
-    out make-block-stream ;
-
-M: duplex-stream make-cell-stream
-    out make-cell-stream ;
-
-M: duplex-stream stream-write-table
-    out stream-write-table ;
-
-M: duplex-stream stream-read-quot
-    in stream-read-quot ;
+CONSULT: output-stream-protocol duplex-stream out ;
 
 M: duplex-stream set-timeout
     [ in set-timeout ] [ out set-timeout ] 2bi ;

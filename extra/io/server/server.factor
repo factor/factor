@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.sockets io.files logging continuations kernel
-math math.parser namespaces parser sequences strings
-prettyprint debugger quotations calendar
+USING: io io.sockets io.files io.streams.duplex logging
+continuations kernel math math.parser namespaces parser
+sequences strings prettyprint debugger quotations calendar
 threads concurrency.combinators assocs ;
 IN: io.server
 
