@@ -146,6 +146,16 @@ M: process set-timeout set-process-timeout ;
 
 M: process timed-out kill-process ;
 
+M: object pipeline-element-quot
+    [
+        >process
+            swap >>stdout
+            swap >>stdin
+        run-detached
+    ] curry ;
+
+M: process wait-for-pipeline-element wait-for-process ;
+
 : <process-reader*> ( process encoding -- process stream )
     [
         >r (pipe) {

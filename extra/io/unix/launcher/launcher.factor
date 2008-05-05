@@ -36,7 +36,8 @@ USE: unix
 : reset-fd ( fd -- )
     #! We drop the error code because on *BSD, fcntl of
     #! /dev/null fails.
-    F_SETFL 0 fcntl drop ;
+    [ F_SETFL 0 fcntl drop ]
+    [ F_SETFD 0 fcntl drop ] bi ;
 
 : redirect-inherit ( obj mode fd -- )
     2nip reset-fd ;

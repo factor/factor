@@ -21,7 +21,9 @@ IN: unix
 : SO_SNDTIMEO HEX: 1005 ; inline
 : SO_RCVTIMEO HEX: 1006 ; inline
 
+: F_SETFD 2 ; inline
 : F_SETFL 4 ; inline
+: FD_CLOEXEC 1 ; inline
 : O_NONBLOCK 4 ; inline
 
 C-STRUCT: sockaddr-in

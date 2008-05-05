@@ -78,7 +78,8 @@ M: integer init-handle ( fd -- )
     #! since on OS X 10.3, this operation fails from init-io
     #! when running the Factor.app (presumably because fd 0 and
     #! 1 are closed).
-    F_SETFL O_NONBLOCK fcntl drop ;
+    [ F_SETFL O_NONBLOCK fcntl drop ]
+    [ F_SETFD FD_CLOEXEC fcntl drop ] bi ;
 
 M: integer close-handle ( fd -- )
     close ;

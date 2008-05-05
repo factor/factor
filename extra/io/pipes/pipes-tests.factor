@@ -1,19 +1,26 @@
-USING: io io.pipes io.streams.string io.encodings.utf8 
-continuations tools.test kernel ;
+USING: io io.pipes io.streams.string io.encodings.utf8
+io.streams.duplex io.encodings namespaces continuations
+tools.test kernel ;
 IN: io.pipes.tests
 
 [ "Hello" ] [
-    utf8 <pipe> "Hello" over stream-write dispose
-    dup stream-readln swap dispose
+    utf8 <pipe> [
+        "Hello" print flush
+        readln
+    ] with-stream
 ] unit-test
 
-[ { } ] [ { } utf8 with-pipes ] unit-test
-[ { f } ] [ { [ f ] } utf8 with-pipes ] unit-test
-[ { "Hello" } ] [ "Hello" [ { [ readln ] } utf8 with-pipes ] with-string-reader ] unit-test
+[ { } ] [ { } with-pipeline ] unit-test
+[ { f } ] [ { [ f ] } with-pipeline ] unit-test
+[ { "Hello" } ] [
+    "Hello" [
+        { [ input-stream [ utf8 <decoder> ] change readln ] } with-pipeline
+    ] with-string-reader
+] unit-test
 
 [ { f "Hello" } ] [
     {
-        [ "Hello" print flush f ]
-        [ readln ]
-    } utf8 with-pipes
+        [ output-stream [ utf8 <encoder> ] change "Hello" print flush f ]
+        [ input-stream [ utf8 <decoder> ] change readln ]
+    } with-pipeline
 ] unit-test
