@@ -32,7 +32,7 @@ HOOK: (pipe) io-backend ( -- pipe )
 : <pipes> ( n -- pipes )
     [ (pipe) dup add-always-destructor ] replicate
     f f pipe boa [ prefix ] [ suffix ] bi
-    2 <sliding-groups> ;
+    2 <clumps> ;
 
 : with-pipe-fds ( seq -- results )
     [

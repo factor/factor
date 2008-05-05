@@ -42,28 +42,30 @@ TUPLE: sliced-groups < groups ;
 
 M: sliced-groups nth group@ <slice> ;
 
-TUPLE: sliding-groups < abstract-groups ;
+TUPLE: clumps < abstract-groups ;
 
-: <sliding-groups> ( seq n -- groups )
-    sliding-groups construct-groups ; inline
+: <clumps> ( seq n -- groups )
+    clumps construct-groups ; inline
 
-M: sliding-groups length
+M: clumps length
     [ seq>> length ] [ n>> ] bi - 1+ ;
 
-M: sliding-groups set-length
+M: clumps set-length
     [ n>> + 1- ] [ seq>> ] bi set-length ;
 
-M: sliding-groups group@
+M: clumps group@
     [ n>> over + ] [ seq>> ] bi ;
 
-TUPLE: sliced-sliding-groups < groups ;
+TUPLE: sliced-clumps < groups ;
 
-: <sliced-sliding-groups> ( seq n -- groups )
-    sliced-sliding-groups construct-groups ; inline
+: <sliced-clumps> ( seq n -- groups )
+    sliced-clumps construct-groups ; inline
 
-M: sliced-sliding-groups nth group@ <slice> ;
+M: sliced-clumps nth group@ <slice> ;
 
 : group ( seq n -- array ) <groups> { } like ;
+
+: clump ( seq n -- array ) <clumps> { } like ;
 
 : ?head ( seq begin -- newseq ? )
     2dup head? [ length tail t ] [ drop f ] if ;

@@ -60,10 +60,12 @@ SYMBOL: error-stream
     [ with-output-stream* ] curry with-disposal ; inline
 
 : with-streams* ( input output quot -- )
-    [ with-input-stream* ] curry with-output-stream* ; inline
+    [ output-stream set input-stream set ] prepose with-scope ; inline
 
 : with-streams ( input output quot -- )
-    [ with-input-stream ] curry with-output-stream ; inline
+    [ [ with-streams* ] 3curry ]
+    [ [ drop dispose dispose ] 3curry ] 3bi
+    [ ] cleanup ; inline
 
 : tabular-output ( style quot -- )
     swap >r { } make r> output-stream get stream-write-table ; inline

@@ -16,7 +16,7 @@ IN: builder.util
 
 : minutes>ms ( min -- ms ) 60 * 1000 * ;
 
-: file>string ( file -- string ) utf8 [ stdio get contents ] with-file-reader ;
+: file>string ( file -- string ) utf8 file-contents ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -107,5 +107,5 @@ USE: prettyprint
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : git-id ( -- id )
-  { "git" "show" } utf8 <process-stream> [ readln ] with-stream
+  { "git" "show" } utf8 <process-reader> [ readln ] with-input-stream
   " " split second ;
