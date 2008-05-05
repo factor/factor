@@ -1,13 +1,13 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic hashtables inspector io kernel
-math namespaces prettyprint sequences assocs sequences.private
-strings io.styles vectors words system splitting math.parser
-classes.tuple continuations continuations.private combinators
-generic.math io.streams.duplex classes.builtin classes
-compiler.units generic.standard vocabs threads threads.private
-init kernel.private libc io.encodings mirrors accessors
-math.order ;
+math namespaces prettyprint prettyprint.config sequences assocs
+sequences.private strings io.styles vectors words system
+splitting math.parser classes.tuple continuations
+continuations.private combinators generic.math io.streams.duplex
+classes.builtin classes compiler.units generic.standard vocabs
+threads threads.private init kernel.private libc io.encodings
+mirrors accessors math.order ;
 IN: debugger
 
 GENERIC: error. ( error -- )
@@ -240,6 +240,15 @@ M: condition summary error>> summary ;
 M: condition error-help error>> error-help ;
 
 M: assert summary drop "Assertion failed" ;
+
+M: assert error.
+    "Assertion failed" print
+    standard-table-style [
+        15 length-limit set
+        5 line-limit set
+        [ expect>> [ [ "Expect:" write ] with-cell pprint-cell ] with-row ]
+        [ got>> [ [ "Got:" write ] with-cell pprint-cell ] with-row ] bi
+    ] tabular-output ;
 
 M: immutable summary drop "Sequence is immutable" ;
 
