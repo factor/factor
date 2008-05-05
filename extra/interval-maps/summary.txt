@@ -1,0 +1,1 @@
+Interval maps for disjoint closed ranges
