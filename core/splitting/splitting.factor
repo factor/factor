@@ -1,39 +1,67 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math namespaces strings arrays vectors sequences
-sets math.order ;
+sets math.order accessors ;
 IN: splitting
 
-TUPLE: groups seq n sliced? ;
+TUPLE: abstract-groups seq n ;
 
-: check-groups 0 <= [ "Invalid group count" throw ] when ;
+: check-groups dup 0 <= [ "Invalid group count" throw ] when ; inline
+
+: construct-groups ( seq n class -- groups )
+    >r check-groups r> boa ; inline
+
+GENERIC: group@ ( n groups -- from to seq )
+
+M: abstract-groups nth group@ subseq ;
+
+M: abstract-groups set-nth group@ <slice> 0 swap copy ;
+
+M: abstract-groups like drop { } like ;
+
+INSTANCE: abstract-groups sequence
+
+TUPLE: groups < abstract-groups ;
 
 : <groups> ( seq n -- groups )
-    dup check-groups f groups boa ; inline
-
-: <sliced-groups> ( seq n -- groups )
-    <groups> t over set-groups-sliced? ;
+    groups construct-groups ; inline
 
 M: groups length
-    dup groups-seq length swap groups-n [ + 1- ] keep /i ;
+    [ seq>> length ] [ n>> ] bi [ + 1- ] keep /i ;
 
 M: groups set-length
-    [ groups-n * ] keep groups-seq set-length ;
+    [ n>> * ] [ seq>> ] bi set-length ;
 
-: group@ ( n groups -- from to seq )
-    [ groups-n [ * dup ] keep + ] keep
-    groups-seq [ length min ] keep ;
+M: groups group@
+    [ n>> [ * dup ] keep + ] [ seq>> ] bi [ length min ] keep ;
 
-M: groups nth
-    [ group@ ] keep
-    groups-sliced? [ <slice> ] [ subseq ] if ;
+TUPLE: sliced-groups < groups ;
 
-M: groups set-nth
-    group@ <slice> 0 swap copy ;
+: <sliced-groups> ( seq n -- groups )
+    sliced-groups construct-groups ; inline
 
-M: groups like drop { } like ;
+M: sliced-groups nth group@ <slice> ;
 
-INSTANCE: groups sequence
+TUPLE: sliding-groups < abstract-groups ;
+
+: <sliding-groups> ( seq n -- groups )
+    sliding-groups construct-groups ; inline
+
+M: sliding-groups length
+    [ seq>> length ] [ n>> ] bi - 1+ ;
+
+M: sliding-groups set-length
+    [ n>> + 1- ] [ seq>> ] bi set-length ;
+
+M: sliding-groups group@
+    [ n>> over + ] [ seq>> ] bi ;
+
+TUPLE: sliced-sliding-groups < groups ;
+
+: <sliced-sliding-groups> ( seq n -- groups )
+    sliced-sliding-groups construct-groups ; inline
+
+M: sliced-sliding-groups nth group@ <slice> ;
 
 : group ( seq n -- array ) <groups> { } like ;
 
