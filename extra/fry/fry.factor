@@ -54,7 +54,7 @@ DEFER: (shallow-fry)
                     [ { , namespaces:, @ } member? ] filter length
                     \ , <repetition> %
                 ]
-                [ deep-fry % ] bi
+                [ fry % ] bi
             ] [ namespaces:, ] if
         ] each
     ] [ ] make deep-fry ;
