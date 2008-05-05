@@ -44,7 +44,7 @@ SYMBOL: redirects
 
 : do-redirect ( response -- response stream )
     dup response-code 300 399 between? [
-        stdio get dispose
+        output-stream get dispose
         redirects inc
         redirects get max-redirects < [
             header>> "location" swap at
@@ -57,7 +57,7 @@ SYMBOL: redirects
             too-many-redirects
         ] if
     ] [
-        stdio get
+        output-stream get
     ] if ;
 
 : close-on-error ( stream quot -- )
@@ -68,9 +68,10 @@ PRIVATE>
 : http-request ( request -- response stream )
     dup request [
         dup request-addr latin1 <client>
-        1 minutes over set-timeout
         [
-            write-request flush
+            1 minutes timeouts
+            write-request
+            input-stream get dispose
             read-response
             do-redirect
         ] close-on-error
@@ -82,7 +83,7 @@ PRIVATE>
 
 : do-chunked-encoding ( response stream -- response stream/string )
     over "transfer-encoding" header "chunked" = [
-        [ [ read-chunks ] "" make ] with-stream
+        [ [ read-chunks ] "" make ] with-input-stream
     ] when ;
 
 : <get-request> ( url -- request )

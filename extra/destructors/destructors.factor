@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: continuations io.backend libc kernel namespaces
-sequences system vectors ;
+USING: continuations io.backend io.nonblocking libc kernel
+namespaces sequences system vectors ;
 IN: destructors
 
 SYMBOL: error-destructors
@@ -59,10 +59,8 @@ TUPLE: handle-destructor alien ;
 
 C: <handle-destructor> handle-destructor
 
-HOOK: destruct-handle io-backend ( obj -- )
-
 M: handle-destructor dispose ( obj -- )
-    handle-destructor-alien destruct-handle ;
+    handle-destructor-alien close-handle ;
 
 : close-always ( handle -- )
     <handle-destructor> add-always-destructor ;

@@ -135,7 +135,7 @@ HELP: infer
 
 HELP: infer.
 { $values { "quot" "a quotation" } }
-{ $description "Attempts to infer the quotation's stack effect, and prints this data to the " { $link stdio } " stream." }
+{ $description "Attempts to infer the quotation's stack effect, and prints this data to " { $link output-stream } "." }
 { $errors "Throws an " { $link inference-error } " if stack effect inference fails." } ;
 
 { infer infer. } related-words

@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.backend io.timeouts system kernel namespaces
-strings hashtables sequences assocs combinators vocabs.loader
-init threads continuations math io.encodings io.streams.duplex
-io.nonblocking accessors concurrency.flags ;
+USING: io io.backend io.timeouts io.pipes system kernel
+namespaces strings hashtables sequences assocs combinators
+vocabs.loader init threads continuations math io.encodings
+io.streams.duplex io.nonblocking io.streams.duplex accessors
+concurrency.flags locals destructors ;
 IN: io.launcher
 
 TUPLE: process < identity-tuple
@@ -145,20 +146,60 @@ M: process set-timeout set-process-timeout ;
 
 M: process timed-out kill-process ;
 
-HOOK: (process-stream) io-backend ( process -- handle in out )
+:: <process-reader*> ( process encoding -- process stream )
+    [
+        (pipe) {
+            [ add-error-destructor ]
+            [
+                process >process
+                    [ swap out>> or ] change-stdout
+                run-detached
+            ]
+            [ out>> close-handle ]
+            [ in>> <reader> encoding <decoder> ]
+        } cleave
+    ] with-destructors ;
 
-: <process-stream*> ( desc encoding -- stream process )
-    >r >process dup dup (process-stream) <reader&writer>
-    r> <encoder-duplex> -roll
-    process-started ;
+: <process-reader> ( desc encoding -- stream )
+    <process-reader*> nip ; inline
+
+:: <process-writer*> ( process encoding -- process stream )
+    [
+        (pipe) {
+            [ add-error-destructor ]
+            [
+                process >process
+                    [ swap in>> or ] change-stdout
+                run-detached
+            ]
+            [ in>> close-handle ]
+            [ out>> <writer> encoding <encoder> ]
+        } cleave
+    ] with-destructors ;
+
+: <process-writer> ( desc encoding -- stream )
+    <process-writer*> nip ; inline
+
+:: <process-stream*> ( process encoding -- process stream )
+    [
+        (pipe) (pipe) {
+            [ [ add-error-destructor ] bi@ ]
+            [
+                process >process
+                    [ swap out>> or ] change-stdout
+                    [ swap in>> or ] change-stdin
+                run-detached
+            ]
+            [ [ in>> close-handle ] [ out>> close-handle ] bi* ]
+            [
+                [ in>> <reader> ] [ out>> <writer> ] bi*
+                encoding <encoder-duplex>
+            ]
+        } 2cleave
+    ] with-destructors ;
 
 : <process-stream> ( desc encoding -- stream )
-    <process-stream*> drop ; inline
-
-: with-process-stream ( desc quot -- status )
-    swap <process-stream*> >r
-    [ swap with-stream ] keep
-    r> wait-for-process ; inline
+    <process-stream*> nip ; inline
 
 : notify-exit ( process status -- )
     >>status
@@ -168,9 +209,9 @@ HOOK: (process-stream) io-backend ( process -- handle in out )
 
 GENERIC: underlying-handle ( stream -- handle )
 
-M: port underlying-handle port-handle ;
+M: port underlying-handle handle>> ;
 
 M: duplex-stream underlying-handle
-    dup duplex-stream-in underlying-handle
-    swap duplex-stream-out underlying-handle tuck =
-    [ "Invalid duplex stream" throw ] when ;
+    [ in>> underlying-handle ]
+    [ out>> underlying-handle ] bi
+    [ = [ "Invalid duplex stream" throw ] when ] keep ;

@@ -98,3 +98,5 @@ unit-test
 [ 1 1 >base ] must-fail
 [ 1 0 >base ] must-fail
 [ 1 -1 >base ] must-fail
+
+[ "0.0/0.0" ] [ 0.0 0.0 / number>string ] unit-test

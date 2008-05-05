@@ -4,7 +4,7 @@ USING: namespaces continuations.private kernel.private init
 assocs kernel vocabs words sequences memory io system arrays
 continuations math definitions mirrors splitting parser classes
 inspector layouts vocabs.loader prettyprint.config prettyprint
-debugger io.streams.c io.streams.duplex io.files io.backend
+debugger io.streams.c io.files io.backend
 quotations io.launcher words.private tools.deploy.config
 bootstrap.image io.encodings.utf8 accessors ;
 IN: tools.deploy.backend
@@ -31,10 +31,9 @@ IN: tools.deploy.backend
         +stdout+ >>stderr
         +closed+ >>stdin
         +low-priority+ >>priority
-    utf8 <process-stream*>
-    >r copy-lines r> wait-for-process zero? [
-        "Deployment failed" throw
-    ] unless ;
+    utf8 <process-reader*>
+    copy-lines
+    wait-for-process zero? [ "Deployment failed" throw ] unless ;
 
 : make-boot-image ( -- )
     #! If stage1 image doesn't exist, create one.

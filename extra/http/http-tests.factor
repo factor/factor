@@ -31,6 +31,7 @@ IN: http.tests
 [ H{ { "a" { "b" "c" } } } ] [ "a=b&a=c" query>assoc ] unit-test
 
 [ "a=3" ] [ { { "a" 3 } } assoc>query ] unit-test
+
 : lf>crlf "\n" split "\r\n" join ;
 
 STRING: read-request-test-1
@@ -183,12 +184,12 @@ test-db [
 
 ! Try with a slightly malformed request
 [ t ] [
-    "localhost" 1237 <inet> ascii <client> [
+    "localhost" 1237 <inet> ascii [
         "GET nested HTTP/1.0\r\n" write flush
         "\r\n" write flush
         read-crlf drop
         read-header
-    ] with-stream "location" swap at "/" head?
+    ] with-client "location" swap at "/" head?
 ] unit-test
 
 [ "http://localhost:1237/redirect-loop" http-get ]

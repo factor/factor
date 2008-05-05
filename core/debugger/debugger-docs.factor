@@ -64,7 +64,7 @@ HELP: :3
 
 HELP: error.
 { $values { "error" "an error" } }
-{ $contract "Print an error to the " { $link stdio } " stream.  You can define methods on this generic word to print human-readable messages for custom errors." }
+{ $contract "Print an error to " { $link output-stream } ". You can define methods on this generic word to print human-readable messages for custom errors." }
 { $notes "Code should call " { $link print-error } " instead, which handles the case where the printing of the error itself throws an error." } ;
 
 HELP: error-help
@@ -75,11 +75,11 @@ HELP: error-help
 
 HELP: print-error
 { $values { "error" "an error" } }
-{ $description "Print an error to the " { $link stdio } " stream." }
+{ $description "Print an error to " { $link output-stream } "." }
 { $notes "This word is called by the listener and other tools which report caught errors to the user." } ;
 
 HELP: restarts.
-{ $description "Print a list of restarts for the most recently thrown error to the " { $link stdio } " stream." } ;
+{ $description "Print a list of restarts for the most recently thrown error to " { $link output-stream } "." } ;
 
 HELP: error-hook
 { $var-description "A quotation with stack effect " { $snippet "( error -- )" } " which is used by " { $link try } " to report the error to the user." }

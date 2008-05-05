@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: inspector ui.tools.interactor ui.tools.inspector
-ui.tools.workspace help.markup io io.streams.duplex io.styles
+ui.tools.workspace help.markup io io.styles
 kernel models namespaces parser quotations sequences ui.commands
 ui.gadgets ui.gadgets.editors ui.gadgets.labelled
 ui.gadgets.panes ui.gadgets.buttons ui.gadgets.scrollers
@@ -16,10 +16,8 @@ TUPLE: listener-gadget input output stack ;
     <scrolling-pane> g-> set-listener-gadget-output
     <scroller> "Output" <labelled-gadget> 1 track, ;
 
-: listener-stream ( listener -- stream )
-    dup listener-gadget-input
-    swap listener-gadget-output <pane-stream>
-    <duplex-stream> ;
+: listener-streams ( listener -- input output )
+    [ input>> ] [ output>> <pane-stream> ] bi ;
 
 : <listener-input> ( listener -- gadget )
     listener-gadget-output <pane-stream> <interactor> ;
@@ -148,13 +146,15 @@ M: stack-display tool-scroller
     swap show-tool inspect-object ;
 
 : listener-thread ( listener -- )
-    dup listener-stream [
-        dup [ ui-listener-hook ] curry listener-hook set
-        dup [ ui-error-hook ] curry error-hook set
-        [ ui-inspector-hook ] curry inspector-hook set
-        welcome.
-        listener
-    ] with-stream* ;
+    dup listener-streams [
+        [
+            [ [ ui-listener-hook ] curry listener-hook set ]
+            [ [ ui-error-hook ] curry error-hook set ]
+            [ [ ui-inspector-hook ] curry inspector-hook set ] tri
+            welcome.
+            listener
+        ] with-input-stream*
+    ] with-output-stream* ;
 
 : start-listener-thread ( listener -- )
     [ listener-thread ] curry "Listener" spawn drop ;

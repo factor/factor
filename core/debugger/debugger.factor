@@ -4,7 +4,7 @@ USING: arrays definitions generic hashtables inspector io kernel
 math namespaces prettyprint prettyprint.config sequences assocs
 sequences.private strings io.styles vectors words system
 splitting math.parser classes.tuple continuations
-continuations.private combinators generic.math io.streams.duplex
+continuations.private combinators generic.math
 classes.builtin classes compiler.units generic.standard vocabs
 threads threads.private init kernel.private libc io.encodings
 mirrors accessors math.order ;
@@ -208,9 +208,6 @@ M: no-next-method summary
 
 M: inconsistent-next-method summary
     drop "Executing call-next-method with inconsistent parameters" ;
-
-M: stream-closed-twice summary
-    drop "Attempt to perform I/O on closed stream" ;
 
 M: check-method summary
     drop "Invalid parameters for create-method" ;

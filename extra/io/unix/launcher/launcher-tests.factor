@@ -31,7 +31,7 @@ accessors kernel sequences io.encodings.utf8 ;
     "cat"
     "launcher-test-1" temp-file
     2array
-    ascii <process-stream> contents
+    ascii <process-reader> contents
 ] unit-test
 
 [ f ] [
@@ -40,7 +40,7 @@ accessors kernel sequences io.encodings.utf8 ;
         "launcher-test-1" temp-file
         2array >>command
         +inherit+ >>stdout
-    ascii <process-stream> contents
+    ascii <process-reader> contents
 ] unit-test
 
 [ ] [
@@ -59,7 +59,7 @@ accessors kernel sequences io.encodings.utf8 ;
     "cat"
     "launcher-test-1" temp-file
     2array
-    ascii <process-stream> contents
+    ascii <process-reader> contents
 ] unit-test
 
 [ ] [
@@ -77,14 +77,14 @@ accessors kernel sequences io.encodings.utf8 ;
     "cat"
     "launcher-test-1" temp-file
     2array
-    ascii <process-stream> contents
+    ascii <process-reader> contents
 ] unit-test
 
 [ t ] [
     <process>
         "env" >>command
         { { "A" "B" } } >>environment
-    ascii <process-stream> lines
+    ascii <process-reader> lines
     "A=B" swap member?
 ] unit-test
 
@@ -93,7 +93,7 @@ accessors kernel sequences io.encodings.utf8 ;
         "env" >>command
         { { "A" "B" } } >>environment
         +replace-environment+ >>environment-mode
-    ascii <process-stream> lines
+    ascii <process-reader> lines
 ] unit-test
 
 [ "hi\n" ] [

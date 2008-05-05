@@ -27,7 +27,7 @@ HELP: counters
 
 HELP: counters.
 { $values { "assoc" "an association list mapping words to integers" } }
-{ $description "Prints an association list of call counts to the " { $link stdio } " stream." } ;
+{ $description "Prints an association list of call counts to " { $link output-stream } "." } ;
 
 HELP: profile
 { $values { "quot" quotation } }

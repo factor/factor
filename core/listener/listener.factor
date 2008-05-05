@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables io kernel math math.parser memory
 namespaces parser sequences strings io.styles
-io.streams.duplex vectors words generic system combinators
-continuations debugger definitions compiler.units accessors ;
+vectors words generic system combinators continuations debugger
+definitions compiler.units accessors ;
 IN: listener
 
 SYMBOL: quit-flag
@@ -35,10 +35,7 @@ GENERIC: stream-read-quot ( stream -- quot/f )
 M: object stream-read-quot
     V{ } clone read-quot-loop ;
 
-M: duplex-stream stream-read-quot
-    duplex-stream-in stream-read-quot ;
-
-: read-quot ( -- quot/f ) stdio get stream-read-quot ;
+: read-quot ( -- quot/f ) input-stream get stream-read-quot ;
 
 : bye ( -- ) quit-flag on ;
 

@@ -154,13 +154,12 @@ MACRO: (pack) ( seq str -- quot )
 
 MACRO: (unpack) ( str -- quot )
     [
-        \ <string-reader> ,
         [
             [ unpack-table at , \ , , ] each
         ] [ ] make
         1quotation [ { } make ] append
         1quotation %
-        \ with-stream ,
+        \ with-string-input ,
     ] [ ] make ;
 
 : unpack-native ( seq str -- seq )

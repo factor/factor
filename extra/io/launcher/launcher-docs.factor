@@ -138,13 +138,6 @@ HELP: <process-stream>
   { "stream" "a bidirectional stream" } }
 { $description "Launches a process and redirects its input and output via a pair of pipes which may be read and written as a stream of the given encoding." } ;
 
-HELP: with-process-stream
-{ $values
-  { "desc" "a launch descriptor" }
-  { "quot" quotation }
-  { "status" "an exit code" } }
-{ $description "Calls " { $snippet "quot" } " in a dynamic scope where " { $link stdio } " is rebound to a process stream. After the quotation returns, waits for the process to end and outputs the exit code." } ;
-
 HELP: wait-for-process
 { $values { "process" process } { "status" integer } }
 { $description "If the process is still running, waits for it to exit, otherwise outputs the exit code immediately. Can be called multiple times on the same process." } ;
@@ -175,8 +168,9 @@ ARTICLE: "io.launcher.launch" "Launching processes"
 { $subsection try-process }
 { $subsection run-detached }
 "Redirecting standard input and output to a pipe:"
-{ $subsection <process-stream> }
-{ $subsection with-process-stream } ;
+{ $subsection <process-reader> }
+{ $subsection <process-writer> }
+{ $subsection <process-stream> } ;
 
 ARTICLE: "io.launcher.examples" "Launcher examples"
 "Starting a command and waiting for it to finish:"
@@ -212,7 +206,7 @@ ARTICLE: "io.launcher.examples" "Launcher examples"
     "    <process>"
     "        swap >>stderr"
     "        \"report\" >>command"
-    "    ascii <process-stream> lines sort reverse [ print ] each"
+    "    ascii <process-reader> lines sort reverse [ print ] each"
     "] with-disposal"
 } ;
 

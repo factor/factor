@@ -51,9 +51,9 @@ IN: http.server.cgi
     200 >>code
     "CGI output follows" >>message
     swap '[
-        , stdio get swap <cgi-process> <process-stream> [
+        , output-stream get swap <cgi-process> <process-stream> [
             post? [ request get post-data>> write flush ] when
-            stdio get swap (stream-copy)
+            input-stream get swap (stream-copy)
         ] with-stream
     ] >>body ;
 

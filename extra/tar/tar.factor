@@ -1,7 +1,6 @@
-USING: combinators io io.files io.streams.duplex
-io.streams.string kernel math math.parser continuations
-namespaces pack prettyprint sequences strings system
-hexdump io.encodings.binary inspector accessors ;
+USING: combinators io io.files io.streams.string kernel math
+math.parser continuations namespaces pack prettyprint sequences
+strings system hexdump io.encodings.binary inspector accessors ;
 IN: tar
 
 : zero-checksum 256 ;
@@ -61,9 +60,7 @@ SYMBOL: filename
     ] if* ;
 
 : read-data-blocks ( tar-header out -- )
-    >r stdio get r> <duplex-stream> [
-        (read-data-blocks)
-    ] with-stream* ;
+    [ (read-data-blocks) ] with-output-stream* ;
 
 : parse-tar-header ( seq -- obj )
     [ header-checksum ] keep over zero-checksum = [

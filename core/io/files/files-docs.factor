@@ -201,17 +201,17 @@ HELP: <file-appender>
 
 HELP: with-file-reader
 { $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" "a quotation" } }
-{ $description "Opens a file for reading and calls the quotation using " { $link with-stream } "." }
+{ $description "Opens a file for reading and calls the quotation using " { $link with-input-stream } "." }
 { $errors "Throws an error if the file is unreadable." } ;
 
 HELP: with-file-writer
 { $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" "a quotation" } }
-{ $description "Opens a file for writing using the given encoding and calls the quotation using " { $link with-stream } "." }
+{ $description "Opens a file for writing using the given encoding and calls the quotation using " { $link with-output-stream } "." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
 HELP: with-file-appender
 { $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" "a quotation" } }
-{ $description "Opens a file for appending using the given encoding and calls the quotation using " { $link with-stream } "." }
+{ $description "Opens a file for appending using the given encoding and calls the quotation using " { $link with-output-stream } "." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
 HELP: set-file-lines

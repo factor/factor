@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel continuations io accessors ;
+USING: kernel continuations io io.encodings io.encodings.private
+io.timeouts debugger inspector listener accessors ;
 IN: io.streams.duplex
 
 ! We ensure that the stream can only be closed once, to preserve
@@ -12,6 +13,9 @@ TUPLE: duplex-stream in out closed ;
     f duplex-stream boa ;
 
 ERROR: stream-closed-twice ;
+
+M: stream-closed-twice summary
+    drop "Attempt to perform I/O on closed stream" ;
 
 <PRIVATE
 
@@ -66,6 +70,12 @@ M: duplex-stream make-cell-stream
 M: duplex-stream stream-write-table
     out stream-write-table ;
 
+M: duplex-stream stream-read-quot
+    in stream-read-quot ;
+
+M: duplex-stream set-timeout
+    [ in set-timeout ] [ out set-timeout ] 2bi ;
+
 M: duplex-stream dispose
     #! The output stream is closed first, in case both streams
     #! are attached to the same file descriptor, the output
@@ -75,3 +85,12 @@ M: duplex-stream dispose
         [ dup out>> dispose ]
         [ dup in>> dispose ] [ ] cleanup
     ] unless drop ;
+
+: <encoder-duplex> ( stream-in stream-out encoding -- duplex )
+    tuck reencode >r redecode r> <duplex-stream> ;
+
+: with-stream* ( stream quot -- )
+    >r [ in>> ] [ out>> ] bi r> with-streams* ; inline
+
+: with-stream ( stream quot -- )
+    >r [ in>> ] [ out>> ] bi r> with-streams ; inline

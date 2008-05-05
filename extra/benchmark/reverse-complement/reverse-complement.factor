@@ -32,13 +32,11 @@ HINTS: do-line vector string ;
     readln [ do-line (reverse-complement) ] [ show-seq ] if* ;
 
 : reverse-complement ( infile outfile -- )
-    ascii <file-writer> [
-        swap ascii <file-reader> [
-            swap <duplex-stream> [
-                500000 <vector> (reverse-complement)
-            ] with-stream
-        ] with-disposal
-    ] with-disposal ;
+    ascii [
+        ascii [
+            500000 <vector> (reverse-complement)
+        ] with-file-reader
+    ] with-file-writer ;
 
 : reverse-complement-in
     "reverse-complement-in.txt" temp-file ;

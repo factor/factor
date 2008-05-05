@@ -1,7 +1,8 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: generic kernel io.backend namespaces continuations
-sequences arrays io.encodings io.nonblocking accessors ;
+sequences arrays io.encodings io.nonblocking io.streams.duplex
+accessors ;
 IN: io.sockets
 
 TUPLE: local path ;
@@ -29,6 +30,9 @@ M: object (client) ((client)) ;
 
 : <client> ( addrspec encoding -- stream )
     >r (client) r> <encoder-duplex> ;
+
+: with-client ( addrspec encoding quot -- )
+    >r <client> r> with-stream ; inline
 
 HOOK: (server) io-backend ( addrspec -- handle )
 
