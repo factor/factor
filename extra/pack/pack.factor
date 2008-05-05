@@ -159,7 +159,7 @@ MACRO: (unpack) ( str -- quot )
         ] [ ] make
         1quotation [ { } make ] append
         1quotation %
-        \ with-string-input ,
+        \ with-string-reader ,
     ] [ ] make ;
 
 : unpack-native ( seq str -- seq )

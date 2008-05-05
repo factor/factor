@@ -1,7 +1,8 @@
 ! Copyright (C) 2007 Elie CHAFTARI
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators kernel prettyprint io io.timeouts io.server
-sequences namespaces io.sockets continuations calendar io.encodings.ascii ;
+sequences namespaces io.sockets continuations calendar
+io.encodings.ascii io.streams.duplex ;
 IN: smtp.server
 
 ! Mock SMTP server for testing purposes.
@@ -65,7 +66,7 @@ SYMBOL: data-mode
     "Starting SMTP server on port " write dup . flush
     "127.0.0.1" swap <inet4> ascii <server> [
         accept drop [
-            default-timeout
+            1 minutes timeouts
             "220 hello\r\n" write flush
             process
             global [ flush ] bind
