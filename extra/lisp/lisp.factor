@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel peg sequences arrays strings combinators.lib
-namespaces combinators math bake locals.private accessors vectors syntax lisp.parser ;
+namespaces combinators math bake locals locals.private accessors
+vectors syntax lisp.parser assocs parser sequences.lib ;
 IN: lisp
 
 DEFER: convert-form
@@ -10,29 +11,42 @@ DEFER: funcall
 ! Functions to convert s-exps to quotations
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 : convert-body ( s-exp -- quot )
-  [ convert-form ] map reverse [ ] [ compose ] reduce ; inline
+  [ convert-form ] map [ ] [ compose ] reduce ; inline
   
 : convert-if ( s-exp -- quot )
   rest [ convert-form ] map reverse first3  [ % , , if ] bake ;
   
 : convert-begin ( s-exp -- quot )  
-  rest convert-body ;
+  rest convert-form ;
   
 : convert-cond ( s-exp -- quot )  
-  rest [ [ convert-body map ] map ] [ % cond ] bake ;
+  rest [ [ convert-form map ] map ] [ % cond ] bake ;
   
 : convert-general-form ( s-exp -- quot )
-  unclip swap convert-body [ % , funcall ] bake ;
+  unclip convert-form swap convert-body [ , % funcall ] bake ;
   
 <PRIVATE  
 : localize-body ( vars body -- newbody )  
   [ dup lisp-symbol? [ tuck name>> swap member? [ name>> make-local ] [ ] if ]
-                     [ dup s-exp? [ body>> localize-body <s-exp> ] [ nip ] if ] if ] with map ;
-PRIVATE>                     
+                     [ dup s-exp? [ body>> localize-body <s-exp> ] [ nip ] if ] if
+                   ] with map ;
+  
+: localize-lambda ( body vars -- newbody newvars )
+  dup make-locals dup push-locals [ swap localize-body <s-exp> convert-form ] dipd
+  pop-locals swap ;
+  
+PRIVATE>
+                   
+: split-lambda ( s-exp -- body vars )                   
+  first3 -rot nip [ body>> ] bi@ [ name>> ] map ; inline                 
+  
+: rest-lambda-vars ( seq -- n newseq )  
+  "&rest" swap [ remove ] [ index ] 2bi ;
   
 : convert-lambda ( s-exp -- quot )  
-  first3 -rot nip [ body>> ] bi@ reverse [ name>> ] map dup make-locals dup push-locals
-  [ swap localize-body convert-body ] dipd pop-locals swap <lambda> ;
+  split-lambda dup "&rest"  swap member? [ rest-lambda-vars ] [ dup length ] if
+  [ localize-lambda <lambda> ] dip
+  [ , cut [ dup length firstn ] dip dup empty? [ drop ] when  , with-locals ] bake ;
   
 : convert-quoted ( s-exp -- quot )  
   second [ , ] bake ;
@@ -56,17 +70,19 @@ PRIVATE>
   
 : lisp-string>factor ( str -- quot )
   lisp-expr parse-result-ast convert-form ;
+  
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYMBOL: lisp-env  
+SYMBOL: lisp-env
 
-H{ } clone lisp-env set
+: init-env ( -- )
+  H{ } clone lisp-env set ;
 
-: define-lisp-word ( name body -- )
-  lisp-env get set-at ;
+: lisp-define ( name quot -- )
+  swap lisp-env get set-at ;
   
-: get-lisp-word ( name -- word )  
+: lisp-get ( name -- word )
   lisp-env get at ;
   
-: funcall ( quot sym -- * )  
-  name>> get-lisp-word call ;
+: funcall ( quot sym -- * )
+  dup lisp-symbol?  [ name>> lisp-get ] when call ; inline
