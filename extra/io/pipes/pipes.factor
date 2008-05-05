@@ -8,30 +8,29 @@ IN: io.pipes
 
 TUPLE: pipe in out ;
 
-: close-pipe ( pipe -- )
-    [ in>> ] [ out>> ] bi 2array dispose-each ;
+M: pipe dispose ( pipe -- )
+    [ in>> close-handle ] [ out>> close-handle ] bi ;
 
 HOOK: (pipe) io-backend ( -- pipe )
 
 :: <pipe> ( encoding -- input-stream output-stream )
     [
         (pipe)
-        [ [ close-later ] each ]
-        [
-            [ in>> <reader> encoding <decoder> ]
-            [ out>> <writer> encoding <encoder> ] bi
-        ] bi
+        [ add-error-destructor ]
+        [ in>> <reader> encoding <decoder> ]
+        [ out>> <writer> encoding <encoder> ]
+        tri
     ] with-destructors ;
 
 :: with-fds ( input-fd output-fd quot encoding -- )
     input-fd [ <reader> encoding <decoder> dup add-always-destructor ] [ input-stream get ] if* [
         output-fd [ <writer> encoding <encoder> dup add-always-destructor ] [ output-stream get ] if*
-        quot with-output-stream
-    ] with-input-stream ; inline
+        quot with-output-stream*
+    ] with-input-stream* ; inline
 
 : <pipes> ( n -- pipes )
-    [ (pipe) dup [ close-later ] each ] replicate
-    { f f } [ prefix ] [ suffix ] bi
+    [ (pipe) dup add-error-destructor ] replicate
+    f f pipe boa [ prefix ] [ suffix ] bi
     2 <sliding-groups> ;
 
 : with-pipe-fds ( seq -- results )

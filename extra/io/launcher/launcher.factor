@@ -4,7 +4,7 @@ USING: io io.backend io.timeouts io.pipes system kernel
 namespaces strings hashtables sequences assocs combinators
 vocabs.loader init threads continuations math io.encodings
 io.streams.duplex io.nonblocking io.streams.duplex accessors
-concurrency.flags locals destructors ;
+concurrency.flags destructors ;
 IN: io.launcher
 
 TUPLE: process < identity-tuple
@@ -146,56 +146,53 @@ M: process set-timeout set-process-timeout ;
 
 M: process timed-out kill-process ;
 
-:: <process-reader*> ( process encoding -- process stream )
+: <process-reader*> ( process encoding -- process stream )
     [
-        (pipe) {
+        >r (pipe) {
             [ add-error-destructor ]
             [
-                process >process
+                swap >process
                     [ swap out>> or ] change-stdout
                 run-detached
             ]
             [ out>> close-handle ]
-            [ in>> <reader> encoding <decoder> ]
-        } cleave
+            [ in>> <reader> ]
+        } cleave r> <decoder>
     ] with-destructors ;
 
 : <process-reader> ( desc encoding -- stream )
     <process-reader*> nip ; inline
 
-:: <process-writer*> ( process encoding -- process stream )
+: <process-writer*> ( process encoding -- process stream )
     [
-        (pipe) {
+        >r (pipe) {
             [ add-error-destructor ]
             [
-                process >process
+                swap >process
                     [ swap in>> or ] change-stdout
                 run-detached
             ]
             [ in>> close-handle ]
-            [ out>> <writer> encoding <encoder> ]
-        } cleave
+            [ out>> <writer> ]
+        } cleave r> <encoder>
     ] with-destructors ;
 
 : <process-writer> ( desc encoding -- stream )
     <process-writer*> nip ; inline
 
-:: <process-stream*> ( process encoding -- process stream )
+: <process-stream*> ( process encoding -- process stream )
     [
-        (pipe) (pipe) {
+        >r (pipe) (pipe) {
             [ [ add-error-destructor ] bi@ ]
             [
-                process >process
+                rot >process
                     [ swap out>> or ] change-stdout
                     [ swap in>> or ] change-stdin
                 run-detached
             ]
             [ [ in>> close-handle ] [ out>> close-handle ] bi* ]
-            [
-                [ in>> <reader> ] [ out>> <writer> ] bi*
-                encoding <encoder-duplex>
-            ]
-        } 2cleave
+            [ [ in>> <reader> ] [ out>> <writer> ] bi* ]
+        } 2cleave r> <encoder-duplex>
     ] with-destructors ;
 
 : <process-stream> ( desc encoding -- stream )
