@@ -184,8 +184,12 @@ HELP: +unknown+
 { $description "A unknown file type." } ;
 
 HELP: <file-reader>
-{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" { "stream" "an input stream" } }
-    { "stream" "an input stream" } }
+{
+  $values
+  { "path" "a pathname string" }
+  { "encoding" "an encoding descriptor" }
+  { "stream" "an input stream" }
+}
 { $description "Outputs an input stream for reading from the specified pathname using the given encoding." }
 { $errors "Throws an error if the file is unreadable." } ;
 
