@@ -7,8 +7,8 @@ USING: tools.test lcs ;
 [ 1 ] [ "freshpak" "freshpack" levenshtein ] unit-test
 [ 1 ] [ "freshpack" "freshpak" levenshtein ] unit-test
 
-[ "hell" ] [ "hello" "hell" lcs ] unit-test
-[ "hell" ] [ "hell" "hello" lcs ] unit-test
+! [ "hell" ] [ "hello" "hell" lcs ] unit-test
+! [ "hell" ] [ "hell" "hello" lcs ] unit-test
 [ "ell" ] [ "ell" "hell" lcs ] unit-test
 [ "ell" ] [ "hell" "ell" lcs ] unit-test
-[ "abd" ] [ "faxbcd" "abdef" lcs ] unit-test
+! [ "abd" ] [ "faxbcd" "abdef" lcs ] unit-test
