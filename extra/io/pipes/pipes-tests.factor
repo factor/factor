@@ -14,7 +14,7 @@ IN: io.pipes.tests
 [ { f } ] [ { [ f ] } run-pipeline ] unit-test
 [ { "Hello" } ] [
     "Hello" [
-        { [ input-stream [ utf8 <decoder> ] change readln ] } with-pipeline
+        { [ input-stream [ utf8 <decoder> ] change readln ] } run-pipeline
     ] with-string-reader
 ] unit-test
 
