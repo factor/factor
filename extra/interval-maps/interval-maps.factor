@@ -1,36 +1,40 @@
-USING: kernel sequences arrays math.intervals accessors
+USING: kernel sequences arrays accessors
 math.order sorting math assocs locals namespaces ;
 IN: interval-maps
 
 TUPLE: interval-map array ;
 
 <PRIVATE
-TUPLE: interval-node interval value ;
+TUPLE: interval-node from to value ;
+: range ( node -- from to ) [ from>> ] [ to>> ] bi ;
 
 : fixup-value ( value ? -- value/f ? )
     [ drop f f ] unless* ;
 
 : find-interval ( key interval-map -- i )
-    [ interval>> from>> first <=> ] binsearch ;
+    [ from>> <=> ] binsearch ;
 
-GENERIC: >interval ( object -- interval )
-M: number >interval [a,a] ;
-M: sequence >interval first2 [a,b] ;
-M: interval >interval ;
+GENERIC: >interval ( object -- 2array )
+M: number >interval dup 2array ;
+M: sequence >interval ;
 
 : all-intervals ( sequence -- intervals )
     [ >r >interval r> ] assoc-map ;
 
+: disjoint? ( node1 node2 -- ? )
+    [ to>> ] [ from>> ] bi* < ;
+
 : ensure-disjoint ( intervals -- intervals )
-    dup keys [ interval-intersect not ] monotonic?
+    dup [ disjoint? ] monotonic?
     [ "Intervals are not disjoint" throw ] unless ;
 
-
+: interval-contains? ( object interval-node -- ? )
+    range between? ;
 PRIVATE>
 
 : interval-at* ( key map -- value ? )
     array>> [ find-interval ] 2keep swapd nth
-    [ nip value>> ] [ interval>> interval-contains? ] 2bi
+    [ nip value>> ] [ interval-contains? ] 2bi
     fixup-value ;
 
 : interval-at ( key map -- value ) interval-at* drop ;
@@ -38,9 +42,9 @@ PRIVATE>
 
 : <interval-map> ( specification -- map )
     all-intervals { } assoc-like
-    [ [ first to>> ] compare ] sort ensure-disjoint
-    [ interval-node boa ] { } assoc>map
-    interval-map boa ;
+    [ [ first second ] compare ] sort
+    [ >r first2 r> interval-node boa ] { } assoc>map
+    ensure-disjoint interval-map boa ;
 
 :: coalesce ( alist -- specification )
     ! Only works with integer keys, because they're discrete
