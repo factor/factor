@@ -114,7 +114,7 @@ IN: tools.deploy.shaker
             continuations:error-continuation
             continuations:error-thread
             continuations:restarts
-            error-hook
+            listener:error-hook
             init:init-hooks
             inspector:inspector-hook
             io.thread:io-thread
