@@ -128,7 +128,7 @@ TUPLE: stack-display ;
     stack-display new
     g workspace-listener swap [
         dup <toolbar> f track,
-        listener-gadget-stack [ stack. ]
+        stack>> [ [ stack. ] curry try ]
         t "Data stack" <labelled-pane> 1 track,
     ] { 0 1 } build-track ;
 

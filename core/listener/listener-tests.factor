@@ -51,6 +51,6 @@ IN: listener.tests
 [
     [ ] [
         "IN: listener.tests : hello\n\"world\" ;" parse-interactive
-    drop
+        drop
     ] unit-test
 ] with-file-vocabs

@@ -43,9 +43,11 @@ M: object stream-read-quot
     "( " in get " )" 3append
     H{ { background { 1 0.7 0.7 1 } } } format bl flush ;
 
+SYMBOL: error-hook
+
 : listen ( -- )
     listener-hook get call prompt.
-    [ read-quot [ try ] [ bye ] if* ]
+    [ read-quot [ [ error-hook get call ] recover ] [ bye ] if* ]
     [
         dup parse-error? [
             error-hook get call
