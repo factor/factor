@@ -64,17 +64,13 @@ M: string error. print ;
     [ global [ "Error in print-error!" print drop ] bind ]
     recover ;
 
-SYMBOL: error-hook
-
-[
-    print-error
-    restarts.
-    nl
-    "Type :help for debugging help." print flush
-] error-hook set-global
-
 : try ( quot -- )
-    [ error-hook get call ] recover ;
+    [
+        print-error
+        restarts.
+        nl
+        "Type :help for debugging help." print flush
+    ] recover ;
 
 ERROR: assert got expect ;
 
