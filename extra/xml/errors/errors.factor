@@ -119,9 +119,8 @@ M: bad-version summary ( obj -- str )
         num>> .
     ] with-string-writer ;
 
-TUPLE: notags < parsing-error ;
-: <notags>
-    \ notags parsing-error ;
+TUPLE: notags ;
+C: <notags> notags
 M: notags summary ( obj -- str )
     drop "XML document lacks a main tag" ;
 
@@ -162,7 +161,7 @@ M: bad-instruction summary ( obj -- str )
     [
         dup call-next-method write
         "Misplaced processor instruction:" print
-        bad-instruction-inst write-item nl
+        instruction>> write-item nl
     ] with-string-writer ;
 
 TUPLE: bad-directive < parsing-error dir ;
