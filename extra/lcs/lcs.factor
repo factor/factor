@@ -2,21 +2,20 @@ USING: sequences kernel math locals math.order math.ranges
 accessors combinators.lib arrays namespaces combinators ;
 IN: lcs
 
-! Classic dynamic programming O(n^2) algorithm for the
-! Longest Common Subsequence
-! Slight modification to get Levenshtein distance
+<PRIVATE
+: levenshtein-step ( insert delete change same? -- next )
+    0 1 ? + >r [ 1+ ] bi@ r> min min ;
 
-! j is row, i is column
-! Going from str1 to str2
-! str1 along side column, str2 along top row
+: lcs-step ( insert delete change same? -- next )
+    1 -9999 ? + max max ; ! Replace -9999 with -inf when added
 
-:: lcs-step ( i j matrix old new change-cost -- )
-    i j matrix nth nth
-        i old nth j new nth = 0 change-cost ? +
-    i j 1+ matrix nth nth 1+ ! insertion cost
-    i 1+ j matrix nth nth 1+ ! deletion cost
-    min min
-    i 1+ j 1+ matrix nth set-nth ;
+:: loop-step ( i j matrix old new step -- )
+    i j 1+ matrix nth nth ! insertion
+    i 1+ j matrix nth nth ! deletion
+    i j matrix nth nth ! replace/retain
+    i old nth j new nth = ! same?
+    step call
+    i 1+ j 1+ matrix nth set-nth ; inline
 
 : lcs-initialize ( |str1| |str2| -- matrix )
     [ drop 0 <array> ] with map ;
@@ -24,21 +23,24 @@ IN: lcs
 : levenshtein-initialize ( |str1| |str2| -- matrix )
     [ [ + ] curry map ] with map ;
 
-:: run-lcs ( old new quot change-cost -- matrix )
-    [let | matrix [ old length 1+ new length 1+ quot call ] |
+:: run-lcs ( old new init step -- matrix )
+    [let | matrix [ old length 1+ new length 1+ init call ] |
         old length [0,b) [| i |
             new length [0,b)
-            [| j | i j matrix old new change-cost lcs-step ]
+            [| j | i j matrix old new step loop-step ]
             each
-        ] each matrix ] ;
+        ] each matrix ] ; inline
+PRIVATE>
 
 : levenshtein ( old new -- n )
-    [ levenshtein-initialize ] 1 run-lcs peek peek ;
+    [ levenshtein-initialize ] [ levenshtein-step ]
+    run-lcs peek peek ;
 
 TUPLE: retain item ;
 TUPLE: delete item ;
 TUPLE: insert item ;
 
+<PRIVATE
 TUPLE: trace-state old new table i j ;
 
 : old-nth ( state -- elt )
@@ -86,9 +88,10 @@ TUPLE: trace-state old new table i j ;
 : trace-diff ( old new table -- diff )
     [ ] [ first length 1- ] [ length 1- ] tri trace-state boa
     [ (trace-diff) ] { } make reverse ;
+PRIVATE>
 
 : diff ( old new -- diff )
-    2dup [ lcs-initialize ] 2 run-lcs trace-diff ;
+    2dup [ lcs-initialize ] [ lcs-step ] run-lcs trace-diff ;
 
-: lcs ( str1 str2 -- lcs )
+: lcs ( seq1 seq2 -- lcs )
     [ diff [ retain? ] filter ] keep [ item>> ] swap map-as ;
