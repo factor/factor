@@ -42,11 +42,11 @@ PRIVATE>
     [ interval-node boa ] { } assoc>map
     interval-map boa ;
 
-:: coalesce ( assoc -- specification )
+:: coalesce ( alist -- specification )
     ! Only works with integer keys, because they're discrete
     ! Makes 2array keys
     [
-        assoc sort-keys unclip first2 dupd roll
+        alist sort-keys unclip first2 dupd roll
         [| oldkey oldval key val | ! Underneath is start
             oldkey 1+ key =
             oldval val = and
