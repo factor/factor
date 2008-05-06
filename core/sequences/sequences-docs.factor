@@ -92,6 +92,7 @@ ARTICLE: "sequences-slices" "Subsequences and slices"
 { $subsection subseq }
 { $subsection head }
 { $subsection tail }
+{ $subsection butlast }
 { $subsection rest }
 { $subsection head* }
 { $subsection tail* }
@@ -106,6 +107,7 @@ ARTICLE: "sequences-slices" "Subsequences and slices"
 { $subsection <slice> }
 { $subsection head-slice }
 { $subsection tail-slice }
+{ $subsection butlast-slice }
 { $subsection rest-slice }
 { $subsection head-slice* }
 { $subsection tail-slice* }
@@ -836,11 +838,16 @@ HELP: tail-slice
 { $description "Outputs a virtual sequence sharing storage with all elements from the " { $snippet "n" } "th index until the end of the input sequence." }
 { $errors "Throws an error if the index is out of bounds." } ;
 
+HELP: butlast-slice
+{ $values { "seq" sequence } { "slice" "a slice" } }
+{ $description "Outputs a virtual sequence sharing storage with all but the last element of the input sequence." }
+{ $errors "Throws an error on an empty sequence." } ;
+
 HELP: rest-slice
 { $values { "seq" sequence } { "slice" "a slice" } }
 { $description "Outputs a virtual sequence sharing storage with all elements from the 1st index until the end of the input sequence." }
 { $notes "Equivalent to " { $snippet "1 tail" } }
-{ $errors "Throws an error if the index is out of bounds." } ;
+{ $errors "Throws an error on an empty sequence." } ;
 
 HELP: head-slice*
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "slice" "a slice" } }
@@ -861,6 +868,11 @@ HELP: tail
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "tailseq" "a new sequence" } }
 { $description "Outputs a new sequence consisting of the input sequence with the first n items removed." }
 { $errors "Throws an error if the index is out of bounds." } ;
+
+HELP: butlast
+{ $values { "seq" sequence } { "headseq" "a new sequence" } }
+{ $description "Outputs a new sequence consisting of the input sequence with the last item removed." }
+{ $errors "Throws an error on an empty sequence." } ;
 
 HELP: rest
 { $values { "seq" sequence } { "tailseq" "a new sequence" } }
