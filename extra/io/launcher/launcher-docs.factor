@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax quotations kernel io math
-calendar ;
+USING: help.markup help.syntax quotations kernel io io.files
+math calendar ;
 IN: io.launcher
 
 ARTICLE: "io.launcher.command" "Specifying a command"
@@ -26,10 +26,10 @@ $nl
 "To specify redirection, set the " { $snippet "stdin" } ", " { $snippet "stdout" } " and " { $snippet "stderr" } " slots of a " { $link process } " to one of the following values:"
 { $list
     { { $link f } " - default value; the stream is either inherited from the current process, or is a " { $link <process-stream> } " pipe" }
-    { { $link +inherit+ } " - the stream is inherited from the current process, overriding a " { $link <process-stream> } " pipe" }
     { { $link +closed+ } " - the stream is closed; reads will return end of file and writes will fails" }
     { { $link +stdout+ } " - a special value for the " { $snippet "stderr" } " slot only, indicating that the standard output and standard error streams should be merged" }
     { "a path name - the stream is sent to the given file, which must exist for input and is created automatically on output" }
+    { "an " { $link appender } " wrapping a path name - output is sent to the end given file, as with " { $link <file-appender> } }
     { "a file stream or a socket - the stream is connected to the given Factor stream, which cannot be used again from within Factor and must be closed after the process has been started" }
 } ;
 
@@ -47,11 +47,15 @@ ARTICLE: "io.launcher.priority" "Setting process priority"
 HELP: +closed+
 { $description "Possible value for the " { $snippet "stdin" } ", " { $snippet "stdout" } ", and " { $snippet "stderr" } " slots of a " { $link process } "." } ;
 
-HELP: +inherit+
-{ $description "Possible value for the " { $snippet "stdin" } ", " { $snippet "stdout" } ", and " { $snippet "stderr" } " slots of a " { $link process } "." } ;
-
 HELP: +stdout+
 { $description "Possible value for the " { $snippet "stderr" } " slot of a " { $link process } "." } ;
+
+HELP: appender
+{ $class-description "An object representing a file to append to. Instances are created with " { $link <appender> } "." } ;
+
+HELP: <appender>
+{ $values { "path" "a pathname string" } { "appender" appender } }
+{ $description "Creates an object which may be stored in the " { $snippet "stdout" } " or " { $snippet "stderr" } " slot of a " { $link process } " instance." } ;
 
 HELP: +prepend-environment+
 { $description "Possible value of " { $snippet "environment-mode" } " slot of a " { $link process } "."

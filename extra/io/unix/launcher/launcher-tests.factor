@@ -34,15 +34,6 @@ accessors kernel sequences io.encodings.utf8 ;
     ascii <process-reader> contents
 ] unit-test
 
-[ f ] [
-    <process>
-        "cat"
-        "launcher-test-1" temp-file
-        2array >>command
-        +inherit+ >>stdout
-    ascii <process-reader> contents
-] unit-test
-
 [ ] [
     [ "launcher-test-1" temp-file delete-file ] ignore-errors
 ] unit-test
@@ -106,4 +97,16 @@ accessors kernel sequences io.encodings.utf8 ;
     ] with-directory
     temp-directory "aloha" append-path
     utf8 file-contents
+] unit-test
+
+[ ] [ "append-test" temp-file delete-file ] unit-test
+
+[ "hi\nhi\n" ] [
+    2 [
+        <process>
+            "echo hi" >>command
+            "append-test" temp-file <appender> >>stdout
+        try-process
+    ] times
+    "append-test" temp-file utf8 file-contents
 ] unit-test

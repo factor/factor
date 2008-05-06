@@ -27,8 +27,11 @@ handle status
 killed ;
 
 SYMBOL: +closed+
-SYMBOL: +inherit+
 SYMBOL: +stdout+
+
+TUPLE: appender path ;
+
+: <appender> ( path -- appender ) appender boa ;
 
 SYMBOL: +prepend-environment+
 SYMBOL: +replace-environment+

@@ -10,8 +10,8 @@ IN: io.pipes.tests
     ] with-stream
 ] unit-test
 
-[ { } ] [ { } with-pipeline ] unit-test
-[ { f } ] [ { [ f ] } with-pipeline ] unit-test
+[ { } ] [ { } run-pipeline ] unit-test
+[ { f } ] [ { [ f ] } run-pipeline ] unit-test
 [ { "Hello" } ] [
     "Hello" [
         { [ input-stream [ utf8 <decoder> ] change readln ] } with-pipeline
@@ -22,5 +22,5 @@ IN: io.pipes.tests
     {
         [ output-stream [ utf8 <encoder> ] change "Hello" print flush f ]
         [ input-stream [ utf8 <decoder> ] change readln ]
-    } with-pipeline
+    } run-pipeline
 ] unit-test

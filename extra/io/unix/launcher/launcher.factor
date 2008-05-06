@@ -46,6 +46,9 @@ USE: unix
     >r >r normalize-path r> file-mode
     open dup io-error r> redirect-fd ;
 
+: redirect-file-append ( obj mode fd -- )
+    >r drop path>> normalize-path open-append r> redirect-fd ;
+
 : redirect-closed ( obj mode fd -- )
     >r >r drop "/dev/null" r> r> redirect-file ;
 
@@ -53,8 +56,8 @@ USE: unix
     {
         { [ pick not ] [ redirect-inherit ] }
         { [ pick string? ] [ redirect-file ] }
+        { [ pick appender? ] [ redirect-file-append ] }
         { [ pick +closed+ eq? ] [ redirect-closed ] }
-        { [ pick +inherit+ eq? ] [ redirect-closed ] }
         { [ pick integer? ] [ >r drop dup reset-fd r> redirect-fd ] }
         [ >r >r underlying-handle r> r> redirect ]
     } cond ;

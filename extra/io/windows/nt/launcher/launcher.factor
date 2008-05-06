@@ -52,7 +52,6 @@ IN: io.windows.nt.launcher
 : redirect ( default obj access-mode create-mode -- handle )
     {
         { [ pick not ] [ redirect-default ] }
-        { [ pick +inherit+ eq? ] [ redirect-inherit ] }
         { [ pick +closed+ eq? ] [ redirect-closed ] }
         { [ pick string? ] [ redirect-file ] }
         [ redirect-stream ]

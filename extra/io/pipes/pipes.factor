@@ -50,7 +50,7 @@ GENERIC: wait-for-pipeline-element ( obj -- result )
 
 M: object wait-for-pipeline-element ;
 
-: with-pipeline ( seq -- results )
+: run-pipeline ( seq -- results )
     [ pipeline-element-quot ] map
     with-pipe-fds
     [ wait-for-pipeline-element ] map ;

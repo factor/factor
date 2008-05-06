@@ -193,17 +193,19 @@ ARTICLE: "io" "Input and output"
 "Utilities:"
 { $subsection "stream-binary" }
 { $subsection "styles" }
-{ $heading "Files" }
-{ $subsection "io.files" }
-{ $subsection "io.mmap" }
-{ $subsection "io.monitors" }
 { $heading "Encodings" }
 { $subsection "encodings-introduction" }
 { $subsection "io.encodings" }
 { $subsection "io.encodings.string" }
-{ $heading "Other features" }
+{ $heading "Files" }
+{ $subsection "io.files" }
+{ $subsection "io.mmap" }
+{ $subsection "io.monitors" }
+{ $heading "Communications" }
 { $subsection "network-streams" }
 { $subsection "io.launcher" }
+{ $subsection "io.pipes" }
+{ $heading "Other features" }
 { $subsection "io.timeouts" }
 { $subsection "checksums" } ;
 
