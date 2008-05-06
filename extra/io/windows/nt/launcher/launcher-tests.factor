@@ -1,7 +1,7 @@
 IN: io.windows.launcher.nt.tests
 USING: io.launcher tools.test calendar accessors
 namespaces kernel system arrays io io.files io.encodings.ascii
-sequences parser assocs hashtables math ;
+sequences parser assocs hashtables math continuations ;
 
 [ ] [
     <process>
@@ -140,3 +140,18 @@ sequences parser assocs hashtables math ;
 
     [ ] [ "dir.txt" temp-file delete-file ] unit-test
 ] times
+
+[ "append-test" temp-file delete-file ] ignore-errors
+
+[ "Hello appender\r\nHello appender\r\n" ] [
+    2 [
+        "resource:extra/io/windows/nt/launcher/test" [
+            <process>
+                vm "-script" "append.factor" 3array >>command
+                "append-test" temp-file <appender> >>stdout
+            try-process
+        ] with-directory
+    ] times
+   
+    "append-test" temp-file ascii file-contents
+] unit-test

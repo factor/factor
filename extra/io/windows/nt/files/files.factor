@@ -52,6 +52,10 @@ M: winnt CreateFile-flags ( DWORD -- DWORD )
 M: winnt FileArgs-overlapped ( port -- overlapped )
     make-overlapped ;
 
+M: winnt open-append
+    [ dup file-info size>> ] [ drop 0 ] recover
+    >r (open-append) r> ;
+
 : update-file-ptr ( n port -- )
     port-handle
     dup win32-file-ptr [

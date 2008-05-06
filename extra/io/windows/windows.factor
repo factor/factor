@@ -86,15 +86,13 @@ M: alien close-handle ( handle -- )
     f CreateFileW dup win32-error=0/f
     GetLastError ERROR_ALREADY_EXISTS = not ;
 
-: set-file-pointer ( handle length -- )
-    dupd d>w/w <uint> FILE_BEGIN SetFilePointer
+: set-file-pointer ( handle length method -- )
+    >r dupd d>w/w <uint> r> SetFilePointer
     INVALID_SET_FILE_POINTER = [
         CloseHandle "SetFilePointer failed" throw
     ] when drop ;
 
-: open-append ( path -- handle length )
-    [ dup file-info size>> ] [ drop 0 ] recover
-    >r (open-append) r> 2dup set-file-pointer ;
+HOOK: open-append os ( path -- handle length )
 
 TUPLE: FileArgs
     hFile lpBuffer nNumberOfBytesToRead

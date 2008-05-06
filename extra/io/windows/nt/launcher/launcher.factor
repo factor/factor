@@ -51,6 +51,12 @@ IN: io.windows.nt.launcher
     f ! template file
     CreateFile dup invalid-handle? dup close-always ;
 
+: redirect-append ( default path access-mode create-mode -- handle )
+    >r >r path>> r> r>
+    drop OPEN_ALWAYS
+    redirect-file
+    dup 0 FILE_END set-file-pointer ;
+
 : set-inherit ( handle ? -- )
     >r HANDLE_FLAG_INHERIT r> >BOOLEAN SetHandleInformation win32-error=0/f ;
 
@@ -66,7 +72,7 @@ IN: io.windows.nt.launcher
         { [ pick not ] [ redirect-default ] }
         { [ pick +closed+ eq? ] [ redirect-closed ] }
         { [ pick string? ] [ redirect-file ] }
-        { [ pick appender? ] [ redirect-file ] }
+        { [ pick appender? ] [ redirect-append ] }
         { [ pick win32-file? ] [ redirect-handle ] }
         [ redirect-stream ]
     } cond ;
