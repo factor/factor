@@ -6,7 +6,7 @@ ui.gadgets.paragraphs ui.gadgets.incremental ui.gadgets.packs
 ui.gadgets.theme ui.clipboards ui.gestures ui.traverse ui.render
 hashtables io kernel namespaces sequences io.styles strings
 quotations math opengl combinators math.vectors
-io.streams.duplex sorting splitting io.streams.nested assocs
+sorting splitting io.streams.nested assocs
 ui.gadgets.presentations ui.gadgets.slots ui.gadgets.grids
 ui.gadgets.grid-lines classes.tuple models continuations ;
 IN: ui.gadgets.panes
@@ -113,14 +113,11 @@ GENERIC: write-gadget ( gadget stream -- )
 M: pane-stream write-gadget
     pane-stream-pane pane-current add-gadget ;
 
-M: duplex-stream write-gadget
-    duplex-stream-out write-gadget ;
-
 : print-gadget ( gadget stream -- )
     tuck write-gadget stream-nl ;
 
 : gadget. ( gadget -- )
-    stdio get print-gadget ;
+    output-stream get print-gadget ;
 
 : ?nl ( stream -- )
     dup pane-stream-pane pane-current gadget-children empty?
@@ -129,7 +126,7 @@ M: duplex-stream write-gadget
 : with-pane ( pane quot -- )
     over scroll>top
     over pane-clear >r <pane-stream> r>
-    over >r with-stream* r> ?nl ; inline
+    over >r with-output-stream* r> ?nl ; inline
 
 : make-pane ( quot -- gadget )
     <pane> [ swap with-pane ] keep smash-pane ; inline

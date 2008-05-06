@@ -116,10 +116,13 @@ $nl
 "Other threads may interrupt the sleep by calling " { $link interrupt } "." } ;
 
 HELP: sleep
-{ $values { "ms" "a non-negative integer" } }
-{ $description "Suspends the current thread for " { $snippet "ms" } " milliseconds."
+{ $values { "dt" "a duration" } }
+{ $description "Suspends the current thread for the given duration."
 $nl
-"Other threads may interrupt the sleep by calling " { $link interrupt } "." } ;
+"Other threads may interrupt the sleep by calling " { $link interrupt } "." }
+{ $examples
+    { $code "USING: threads calendar ;" "10 seconds sleep" }
+} ;
 
 HELP: interrupt
 { $values { "thread" thread } }

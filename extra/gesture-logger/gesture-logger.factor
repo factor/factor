@@ -15,13 +15,13 @@ TUPLE: gesture-logger stream ;
 M: gesture-logger handle-gesture*
     drop
     dup T{ button-down } = [ over request-focus ] when
-    swap gesture-logger-stream [ . ] with-stream*
+    swap gesture-logger-stream [ . ] with-output-stream*
     t ;
 
 M: gesture-logger user-input*
     gesture-logger-stream [
         "User input: " write print
-    ] with-stream* t ;
+    ] with-output-stream* t ;
 
 : gesture-logger ( -- )
     [

@@ -48,7 +48,7 @@ SYMBOL: log-files
 
 : (log-message) ( msg -- )
     #! msg: { msg word-name level service }
-    first4 log-stream [ write-message flush ] with-stream* ;
+    first4 log-stream [ write-message flush ] with-output-stream* ;
 
 : try-dispose ( stream -- )
     [ dispose ] curry [ error. ] recover ;

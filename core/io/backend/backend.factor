@@ -11,8 +11,10 @@ HOOK: init-io io-backend ( -- )
 HOOK: (init-stdio) io-backend ( -- stdin stdout stderr )
 
 : init-stdio ( -- )
-    (init-stdio) utf8 <encoder> stderr set-global
-    utf8 <encoder-duplex> stdio set-global ;
+    (init-stdio)
+    [ utf8 <decoder> input-stream set-global ]
+    [ utf8 <encoder> output-stream set-global ]
+    [ utf8 <encoder> error-stream set-global ] tri* ;
 
 HOOK: io-multiplex io-backend ( ms -- )
 

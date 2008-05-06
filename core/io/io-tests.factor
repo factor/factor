@@ -15,14 +15,14 @@ IN: io.tests
     "This is a line.\rThis is another line.\r"
 ] [
     "core/io/test/mac-os-eol.txt" <resource-reader>
-    [ 500 read ] with-stream
+    [ 500 read ] with-input-stream
 ] unit-test
 
 [
     255
 ] [
     "core/io/test/binary.txt" <resource-reader>
-    [ read1 ] with-stream >fixnum
+    [ read1 ] with-input-stream >fixnum
 ] unit-test
 
 ! Make sure we use correct to_c_string form when writing
@@ -40,7 +40,7 @@ IN: io.tests
             "J" read-until 2array ,
             "i" read-until 2array ,
             "X" read-until 2array ,
-        ] with-stream
+        ] with-input-stream
     ] { } make
 ] unit-test
 
@@ -49,12 +49,3 @@ IN: io.tests
         10 [ 65536 read drop ] times
     ] with-file-reader
 ] unit-test
-
-! [ "" ] [ 0 read ] unit-test
-
-! [ ] [ "123" write 9000 CHAR: x <string> write flush ] unit-test
-
-! [
-!     "/core/io/test/binary.txt" <resource-reader>
-!     [ 0.2 read ] with-stream
-! ] must-fail

@@ -5,23 +5,25 @@ prettyprint.private kernel.private assocs random combinators
 parser prettyprint.backend math.order accessors ;
 IN: trees
 
-MIXIN: tree-mixin
-
 TUPLE: tree root count ;
 
+: new-tree ( class -- tree )
+    new
+        f >>root
+        0 >>count ; inline
+
 : <tree> ( -- tree )
-    f 0 tree boa ;
+    tree new-tree ;
 
-: construct-tree ( class -- tree )
-    new <tree> over set-delegate ; inline
-
-INSTANCE: tree tree-mixin
-
-INSTANCE: tree-mixin assoc
+INSTANCE: tree assoc
 
 TUPLE: node key value left right ;
+
+: new-node ( key value class -- node )
+    new swap >>value swap >>key ;
+
 : <node> ( key value -- node )
-    f f node boa ;
+    node new-node ;
 
 SYMBOL: current-side
 
@@ -57,9 +59,6 @@ SYMBOL: current-side
 : go-left ( quot -- ) left swap with-side ; inline
 : go-right ( quot -- ) right swap with-side ; inline
 
-: change-root ( tree quot -- )
-    swap [ root>> swap call ] keep set-tree-root ; inline
-
 : leaf? ( node -- ? )
     [ left>> ] [ right>> ] bi or not ;
 
@@ -91,7 +90,7 @@ M: tree at* ( key tree -- value ? )
     ] if ;
 
 M: tree set-at ( value key tree -- )
-    [ [ node-set ] [ swap <node> ] if* ] change-root ;
+    [ [ node-set ] [ swap <node> ] if* ] change-root drop ;
 
 : valid-node? ( node -- ? )
     [
@@ -117,10 +116,10 @@ M: tree set-at ( value key tree -- )
         [ >r right>> r> find-node ]
     } cond ; inline
 
-M: tree-mixin assoc-find ( tree quot -- key value ? )
+M: tree assoc-find ( tree quot -- key value ? )
     >r root>> r> find-node ;
 
-M: tree-mixin clear-assoc
+M: tree clear-assoc
     0 >>count
     f >>root drop ;
 
@@ -182,7 +181,7 @@ DEFER: delete-node
     ] if ;
 
 M: tree delete-at
-    [ delete-bst-node ] change-root ;
+    [ delete-bst-node ] change-root drop ;
 
 M: tree new-assoc
     2drop <tree> ;
@@ -192,14 +191,12 @@ M: tree clone dup assoc-clone-like ;
 : >tree ( assoc -- tree )
     T{ tree f f 0 } assoc-clone-like ;
 
-M: tree-mixin assoc-like drop dup tree? [ >tree ] unless ;
+M: tree assoc-like drop dup tree? [ >tree ] unless ;
 
 : TREE{
     \ } [ >tree ] parse-literal ; parsing
-
+                                                        
 M: tree pprint-delims drop \ TREE{ \ } ;
-
-M: tree-mixin assoc-size count>> ;
-M: tree-mixin clone dup assoc-clone-like ;
-M: tree-mixin >pprint-sequence >alist ;
-M: tree-mixin pprint-narrow? drop t ;
+M: tree assoc-size count>> ;
+M: tree >pprint-sequence >alist ;
+M: tree pprint-narrow? drop t ;

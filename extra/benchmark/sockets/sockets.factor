@@ -1,6 +1,6 @@
 USING: io.sockets io kernel math threads io.encodings.ascii
-debugger tools.time prettyprint concurrency.count-downs
-namespaces arrays continuations ;
+io.streams.duplex debugger tools.time prettyprint
+concurrency.count-downs namespaces arrays continuations ;
 IN: benchmark.sockets
 
 SYMBOL: counter
@@ -30,17 +30,17 @@ SYMBOL: counter
     ] ignore-errors ;
 
 : simple-client ( -- )
-    server-addr ascii <client> [
+    server-addr ascii [
         CHAR: b write1 flush
         number-of-requests
         [ CHAR: a dup write1 flush read1 assert= ] times
         counter get count-down
-    ] with-stream ;
+    ] with-client ;
 
 : stop-server ( -- )
-    server-addr ascii <client> [
+    server-addr ascii [
         CHAR: x write1
-    ] with-stream ;
+    ] with-client ;
 
 : clients ( n -- )
     dup pprint " clients: " write [

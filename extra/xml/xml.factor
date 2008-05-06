@@ -98,7 +98,7 @@ SYMBOL: text-now?
 TUPLE: pull-xml scope ;
 : <pull-xml> ( -- pull-xml )
     [
-        stdio [ ] change ! bring stdio var in this scope
+        input-stream [ ] change ! bring var in this scope
         init-parser reset-prolog init-ns-stack
         text-now? on
     ] H{ } make-assoc

@@ -120,8 +120,9 @@ IN: tools.deploy.shaker
             io.thread:io-thread
             libc.private:mallocs
             source-files:source-files
-            stderr
-            stdio
+            input-stream
+            output-stream
+            error-stream
         } %
 
         deploy-threads? [

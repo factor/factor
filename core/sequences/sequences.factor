@@ -670,8 +670,14 @@ PRIVATE>
 : unclip ( seq -- rest first )
     [ rest ] [ first ] bi ;
 
+: unclip-last ( seq -- butfirst last )
+    [ 1 head* ] [ peek ] bi ;
+
 : unclip-slice ( seq -- rest first )
     [ rest-slice ] [ first ] bi ;
+
+: unclip-last-slice ( seq -- butfirst last )
+    [ 1 head-slice* ] [ peek ] bi ;
 
 : <flat-slice> ( seq -- slice )
     dup slice? [ { } like ] when 0 over length rot <slice> ;

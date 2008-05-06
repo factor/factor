@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays continuations io
 io.windows io.windows.nt.pipes libc io.nonblocking
-io.streams.duplex windows.types math windows.kernel32
+windows.types math windows.kernel32
 namespaces io.launcher kernel sequences windows.errors
 splitting system threads init strings combinators
 io.backend accessors concurrency.flags io.files assocs

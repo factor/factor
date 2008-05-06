@@ -10,7 +10,7 @@ IN: io.streams.encodings.tests
 unit-test
 
 : lines-test ( stream -- line1 line2 )
-    [ readln readln ] with-stream ;
+    [ readln readln ] with-input-stream ;
 
 [
     "This is a line."

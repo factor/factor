@@ -205,8 +205,8 @@ ARTICLE: "cookbook-io" "Input and output cookbook"
 }
 "Send some bytes to a remote host:"
 { $code
-    "\"myhost\" 1033 <inet> <client>"
-    "[ { 12 17 102 } >string write ] with-stream"
+    "\"myhost\" 1033 <inet>"
+    "[ { 12 17 102 } >string write ] with-client"
 }
 { $references
     { }

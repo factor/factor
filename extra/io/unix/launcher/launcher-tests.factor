@@ -31,16 +31,7 @@ accessors kernel sequences io.encodings.utf8 ;
     "cat"
     "launcher-test-1" temp-file
     2array
-    ascii <process-stream> contents
-] unit-test
-
-[ f ] [
-    <process>
-        "cat"
-        "launcher-test-1" temp-file
-        2array >>command
-        +inherit+ >>stdout
-    ascii <process-stream> contents
+    ascii <process-reader> contents
 ] unit-test
 
 [ ] [
@@ -59,7 +50,7 @@ accessors kernel sequences io.encodings.utf8 ;
     "cat"
     "launcher-test-1" temp-file
     2array
-    ascii <process-stream> contents
+    ascii <process-reader> contents
 ] unit-test
 
 [ ] [
@@ -77,14 +68,14 @@ accessors kernel sequences io.encodings.utf8 ;
     "cat"
     "launcher-test-1" temp-file
     2array
-    ascii <process-stream> contents
+    ascii <process-reader> contents
 ] unit-test
 
 [ t ] [
     <process>
         "env" >>command
         { { "A" "B" } } >>environment
-    ascii <process-stream> lines
+    ascii <process-reader> lines
     "A=B" swap member?
 ] unit-test
 
@@ -93,7 +84,7 @@ accessors kernel sequences io.encodings.utf8 ;
         "env" >>command
         { { "A" "B" } } >>environment
         +replace-environment+ >>environment-mode
-    ascii <process-stream> lines
+    ascii <process-reader> lines
 ] unit-test
 
 [ "hi\n" ] [
@@ -106,4 +97,16 @@ accessors kernel sequences io.encodings.utf8 ;
     ] with-directory
     temp-directory "aloha" append-path
     utf8 file-contents
+] unit-test
+
+[ ] [ "append-test" temp-file delete-file ] unit-test
+
+[ "hi\nhi\n" ] [
+    2 [
+        <process>
+            "echo hi" >>command
+            "append-test" temp-file <appender> >>stdout
+        try-process
+    ] times
+    "append-test" temp-file utf8 file-contents
 ] unit-test

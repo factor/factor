@@ -21,19 +21,19 @@ HELP: compiler-error
 
 HELP: compiler-error.
 { $values { "error" "an error" } { "word" word } }
-{ $description "Prints a compiler error to the " { $link stdio } " stream." } ;
+{ $description "Prints a compiler error to " { $link output-stream } "." } ;
 
 HELP: compiler-errors.
 { $values { "type" symbol } }
-{ $description "Prints compiler errors to the " { $link stdio } " stream. The type parameter is one of " { $link +error+ } ", " { $link +warning+ } ", or " { $link +linkage+ } "." } ;
+{ $description "Prints compiler errors to " { $link output-stream } ". The type parameter is one of " { $link +error+ } ", " { $link +warning+ } ", or " { $link +linkage+ } "." } ;
 HELP: :errors
-{ $description "Prints all serious compiler errors from the most recent compile to the " { $link stdio } " stream." } ;
+{ $description "Prints all serious compiler errors from the most recent compile to " { $link output-stream } "." } ;
 
 HELP: :warnings
-{ $description "Prints all ignorable compiler warnings from the most recent compile to the " { $link stdio } " stream." } ;
+{ $description "Prints all ignorable compiler warnings from the most recent compile to " { $link output-stream } "." } ;
 
 HELP: :linkage
-{ $description "Prints all C library interface linkage errors from the most recent compile to the " { $link stdio } " stream." } ;
+{ $description "Prints all C library interface linkage errors from the most recent compile to " { $link output-stream } "." } ;
 
 { :errors :warnings } related-words
 

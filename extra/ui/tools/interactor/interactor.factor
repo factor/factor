@@ -71,7 +71,7 @@ M: interactor model-changed
 : interactor-input. ( string interactor -- )
     interactor-output [
         dup string? [ dup write-input nl ] [ short. ] if
-    ] with-stream* ;
+    ] with-output-stream* ;
 
 : add-interactor-history ( str interactor -- )
     over empty? [ 2drop ] [ interactor-history push-new ] if ;
