@@ -1,10 +1,12 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.backend io.launcher io.nonblocking io.unix.backend
-io.unix.files io.nonblocking sequences kernel namespaces math
-system alien.c-types debugger continuations arrays assocs
-combinators unix.process strings threads unix
-io.unix.launcher.parser accessors io.files io.files.private ;
+USING: kernel namespaces math system sequences debugger
+continuations arrays assocs combinators alien.c-types strings
+threads accessors
+io io.backend io.launcher io.nonblocking io.files
+io.files.private io.unix.files io.unix.backend
+io.unix.launcher.parser
+unix unix.process ;
 IN: io.unix.launcher
 
 ! Search unix first
@@ -34,7 +36,8 @@ USE: unix
 : reset-fd ( fd -- )
     #! We drop the error code because on *BSD, fcntl of
     #! /dev/null fails.
-    F_SETFL 0 fcntl drop ;
+    [ F_SETFL 0 fcntl drop ]
+    [ F_SETFD 0 fcntl drop ] bi ;
 
 : redirect-inherit ( obj mode fd -- )
     2nip reset-fd ;
@@ -43,19 +46,20 @@ USE: unix
     >r >r normalize-path r> file-mode
     open dup io-error r> redirect-fd ;
 
+: redirect-file-append ( obj mode fd -- )
+    >r drop path>> normalize-path open-append r> redirect-fd ;
+
 : redirect-closed ( obj mode fd -- )
     >r >r drop "/dev/null" r> r> redirect-file ;
-
-: redirect-stream ( obj mode fd -- )
-    >r drop underlying-handle dup reset-fd r> redirect-fd ;
 
 : redirect ( obj mode fd -- )
     {
         { [ pick not ] [ redirect-inherit ] }
         { [ pick string? ] [ redirect-file ] }
+        { [ pick appender? ] [ redirect-file-append ] }
         { [ pick +closed+ eq? ] [ redirect-closed ] }
-        { [ pick +inherit+ eq? ] [ redirect-closed ] }
-        [ redirect-stream ]
+        { [ pick integer? ] [ >r drop dup reset-fd r> redirect-fd ] }
+        [ >r >r underlying-handle r> r> redirect ]
     } cond ;
 
 : ?closed dup +closed+ eq? [ drop "/dev/null" ] when ;
@@ -90,27 +94,10 @@ M: unix run-process* ( process -- pid )
 M: unix kill-process* ( pid -- )
     SIGTERM kill io-error ;
 
-: open-pipe ( -- pair )
-    2 "int" <c-array> dup pipe zero?
-    [ 2 c-int-array> ] [ drop f ] if ;
-
-: setup-stdio-pipe ( stdin stdout -- )
-    2dup first close second close
-    >r first 0 dup2 drop r> second 1 dup2 drop ;
-
-M: unix (process-stream)
-    >r open-pipe open-pipe r>
-    [ >r setup-stdio-pipe r> spawn-process ] curry
-    [ -rot 2dup second close first close ]
-    with-fork
-    first swap second ;
-
 : find-process ( handle -- process )
     processes get swap [ nip swap handle>> = ] curry
     assoc-find 2drop ;
 
-! Inefficient process wait polling, used on Linux and Solaris.
-! On BSD and Mac OS X, we use kqueue() which scales better.
 M: unix wait-for-processes ( -- ? )
     -1 0 <int> tuck WNOHANG waitpid
     dup 0 <= [

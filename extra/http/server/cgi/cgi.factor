@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces kernel assocs io.files combinators
-arrays io.launcher io http.server.static http.server
+USING: namespaces kernel assocs io.files io.streams.duplex
+combinators arrays io.launcher io http.server.static http.server
 http accessors sequences strings math.parser fry ;
 IN: http.server.cgi
 
@@ -51,9 +51,9 @@ IN: http.server.cgi
     200 >>code
     "CGI output follows" >>message
     swap '[
-        , stdio get swap <cgi-process> <process-stream> [
+        , output-stream get swap <cgi-process> <process-stream> [
             post? [ request get post-data>> write flush ] when
-            stdio get swap (stream-copy)
+            input-stream get swap (stream-copy)
         ] with-stream
     ] >>body ;
 

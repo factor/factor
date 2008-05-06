@@ -77,7 +77,7 @@ sequences parser assocs hashtables math ;
         <process>
             vm "-script" "stderr.factor" 3array >>command
             "err2.txt" temp-file >>stderr
-        ascii <process-stream> lines first
+        ascii <process-reader> lines first
     ] with-directory
 ] unit-test
 
@@ -89,7 +89,7 @@ sequences parser assocs hashtables math ;
     "extra/io/windows/nt/launcher/test" resource-path [
         <process>
             vm "-script" "env.factor" 3array >>command
-        ascii <process-stream> contents
+        ascii <process-reader> contents
     ] with-directory eval
 
     os-envs =
@@ -101,7 +101,7 @@ sequences parser assocs hashtables math ;
             vm "-script" "env.factor" 3array >>command
             +replace-environment+ >>environment-mode
             os-envs >>environment
-        ascii <process-stream> contents
+        ascii <process-reader> contents
     ] with-directory eval
     
     os-envs =
@@ -112,7 +112,7 @@ sequences parser assocs hashtables math ;
         <process>
             vm "-script" "env.factor" 3array >>command
             { { "A" "B" } } >>environment
-        ascii <process-stream> contents
+        ascii <process-reader> contents
     ] with-directory eval
 
     "A" swap at
@@ -124,7 +124,7 @@ sequences parser assocs hashtables math ;
             vm "-script" "env.factor" 3array >>command
             { { "HOME" "XXX" } } >>environment
             +prepend-environment+ >>environment-mode
-        ascii <process-stream> contents
+        ascii <process-reader> contents
     ] with-directory eval
 
     "HOME" swap at "XXX" =

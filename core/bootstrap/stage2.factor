@@ -87,7 +87,7 @@ f error-continuation set-global
             parse-command-line
             run-user-init
             "run" get run
-            stdio get [ stream-flush ] when*
+            output-stream get [ stream-flush ] when*
         ] [ print-error 1 exit ] recover
     ] set-boot-quot
 

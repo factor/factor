@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays continuations destructors io
-io.windows libc io.nonblocking io.streams.duplex windows.types
+io.windows libc io.nonblocking windows.types
 math windows.kernel32 windows namespaces io.launcher kernel
 sequences windows.errors assocs splitting system strings
 io.windows.launcher io.windows.nt.pipes io.backend io.files
@@ -52,7 +52,6 @@ IN: io.windows.nt.launcher
 : redirect ( default obj access-mode create-mode -- handle )
     {
         { [ pick not ] [ redirect-default ] }
-        { [ pick +inherit+ eq? ] [ redirect-inherit ] }
         { [ pick +closed+ eq? ] [ redirect-closed ] }
         { [ pick string? ] [ redirect-file ] }
         [ redirect-stream ]

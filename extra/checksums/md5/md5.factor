@@ -180,4 +180,4 @@ SINGLETON: md5
 INSTANCE: md5 checksum
 
 M: md5 checksum-stream ( stream -- byte-array )
-    drop [ initialize-md5 stream>md5 get-md5 ] with-stream ;
+    drop [ initialize-md5 stream>md5 get-md5 ] with-input-stream ;

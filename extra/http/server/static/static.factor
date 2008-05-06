@@ -36,7 +36,7 @@ TUPLE: file-responder root hook special allow-listings ;
             [ size>> "content-length" set-header ]
             [ modified>> "last-modified" set-header ] bi
         ]
-        [ '[ , binary <file-reader> stdio get stream-copy ] >>body ] bi
+        [ '[ , binary <file-reader> output-stream get stream-copy ] >>body ] bi
     ] <file-responder> ;
 
 : serve-static ( filename mime-type -- response )

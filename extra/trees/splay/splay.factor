@@ -4,12 +4,10 @@ USING: arrays kernel math namespaces sequences assocs parser
 prettyprint.backend trees generic math.order ;
 IN: trees.splay
 
-TUPLE: splay ;
+TUPLE: splay < tree ;
 
 : <splay> ( -- tree )
-    \ splay construct-tree ;
-
-INSTANCE: splay tree-mixin
+    \ splay new-tree ;
 
 : rotate-right ( node -- node )
     dup node-left
@@ -131,7 +129,7 @@ M: splay new-assoc
     2drop <splay> ;
 
 : >splay ( assoc -- tree )
-    T{ splay T{ tree f f 0 } } assoc-clone-like ;
+    T{ splay f f 0 } assoc-clone-like ;
 
 : SPLAY{
     \ } [ >splay ] parse-literal ; parsing

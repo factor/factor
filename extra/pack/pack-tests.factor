@@ -38,7 +38,7 @@ USING: io io.streams.string kernel namespaces pack strings tools.test ;
 
 [ 2 ] [
     [ 2 "int" b, ] B{ } make
-    <string-reader> [ "int" read-native ] with-stream
+    <string-reader> [ "int" read-native ] with-input-stream
 ] unit-test
 
 [ "FRAM" ] [ "FRAM\0" [ read-c-string ] with-string-reader ] unit-test

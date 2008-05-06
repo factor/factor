@@ -475,7 +475,7 @@ M: quotation '
     "Writing image to " write
     architecture get boot-image-name resource-path
     [ write "..." print flush ]
-    [ binary <file-writer> [ (write-image) ] with-stream ] bi ;
+    [ binary [ (write-image) ] with-file-writer ] bi ;
 
 PRIVATE>
 

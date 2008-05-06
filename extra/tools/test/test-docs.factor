@@ -91,4 +91,4 @@ HELP: run-all-tests
 
 HELP: test-failures.
 { $values { "assoc" "an association list of unit test failures" } }
-{ $description "Prints unit test failures output by " { $link run-tests } " or " { $link run-all-tests } " to the " { $link stdio } " stream." } ;
+{ $description "Prints unit test failures output by " { $link run-tests } " or " { $link run-all-tests } " to " { $link output-stream } "." } ;

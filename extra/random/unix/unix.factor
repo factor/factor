@@ -9,7 +9,7 @@ C: <unix-random> unix-random
 
 : file-read-unbuffered ( n path -- bytes )
     over default-buffer-size [
-        binary <file-reader> [ read ] with-stream
+        binary [ read ] with-file-reader
     ] with-variable ;
 
 M: unix-random random-bytes* ( n tuple -- byte-array )

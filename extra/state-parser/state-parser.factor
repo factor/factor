@@ -133,8 +133,8 @@ SYMBOL: prolog-data
     read1 set-next next ;
 
 : state-parse ( stream quot -- )
-    ! with-stream implicitly creates a new scope which we use
-    swap [ init-parser call ] with-stream ; inline
+    ! with-input-stream implicitly creates a new scope which we use
+    swap [ init-parser call ] with-input-stream ; inline
 
 : string-parse ( input quot -- )
     >r <string-reader> r> state-parse ; inline

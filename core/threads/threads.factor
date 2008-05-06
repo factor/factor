@@ -93,7 +93,7 @@ PRIVATE>
 
 <PRIVATE
 
-: schedule-sleep ( thread ms -- )
+: schedule-sleep ( thread dt -- )
     >r check-registered dup r> sleep-queue heap-push*
     >>sleep-entry drop ;
 
@@ -153,7 +153,7 @@ M: integer sleep-until
 M: f sleep-until
     drop [ drop ] "interrupt" suspend drop ;
 
-GENERIC: sleep ( ms -- )
+GENERIC: sleep ( dt -- )
 
 M: real sleep
     millis + >integer sleep-until ;

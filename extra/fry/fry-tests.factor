@@ -48,3 +48,7 @@ sequences ;
 [ { 1 2 3 } ] [
     3 1 '[ , [ , + ] map ] call
 ] unit-test
+
+[ { 1 { 2 { 3 } } } ] [
+    1 2 3 '[ , [ , [ , 1array ] call 2array ] call 2array ] call
+] unit-test

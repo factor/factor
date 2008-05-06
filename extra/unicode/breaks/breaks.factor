@@ -105,9 +105,6 @@ VALUE: grapheme-table
 : string-reverse ( str -- rts )
     >graphemes reverse concat ;
 
-: unclip-last-slice ( seq -- beginning last )
-    dup 1 head-slice* swap peek ;
-
 : last-grapheme ( str -- i )
     unclip-last-slice grapheme-class swap
     [ grapheme-class dup rot grapheme-break? ] find-last-index ?1+ nip ;

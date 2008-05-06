@@ -82,10 +82,8 @@ IN: http.server.auth.admin
 
             same-password-twice
 
-            user new "username" value >>username select-tuple [
-                user-exists? on
-                validation-failed
-            ] when
+            user new "username" value >>username select-tuple
+            [ user-exists ] when
 
             "username" value <user>
                 "realname" value >>realname

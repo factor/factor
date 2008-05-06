@@ -61,11 +61,11 @@ VAR: delimiter
   
 : csv-row ( stream -- row )
   init-vars
-  [ row nip ] with-stream ;
+  [ row nip ] with-input-stream ;
 
 : csv ( stream -- rows )
   init-vars
-  [ [ (csv) ] { } make ] with-stream ;
+  [ [ (csv) ] { } make ] with-input-stream ;
 
 : with-delimiter ( char quot -- )
   delimiter swap with-variable ; inline

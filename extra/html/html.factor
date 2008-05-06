@@ -44,7 +44,7 @@ TUPLE: html-sub-stream style stream ;
     rot html-sub-stream-stream ;
 
 : delegate-write ( string -- )
-    stdio get delegate stream-write ;
+    output-stream get delegate stream-write ;
 
 : object-link-tag ( style quot -- )
     presented pick at [
@@ -101,7 +101,7 @@ TUPLE: html-sub-stream style stream ;
 : format-html-span ( string style stream -- )
     [
         [ [ drop delegate-write ] span-tag ] object-link-tag
-    ] with-stream* ;
+    ] with-output-stream* ;
 
 TUPLE: html-span-stream ;
 
@@ -134,7 +134,7 @@ M: html-span-stream dispose
 : format-html-div ( string style stream -- )
     [
         [ [ delegate-write ] div-tag ] object-link-tag
-    ] with-stream* ;
+    ] with-output-stream* ;
 
 TUPLE: html-block-stream ;
 
@@ -184,17 +184,17 @@ M: html-stream stream-write-table ( grid style stream -- )
                 </td>
             ] with each </tr>
         ] with each </table>
-    ] with-stream* ;
+    ] with-output-stream* ;
 
 M: html-stream make-cell-stream ( style stream -- stream' )
     (html-sub-stream) ;
 
 M: html-stream stream-nl ( stream -- )
-    dup test-last-div? [ drop ] [ [ <br/> ] with-stream* ] if ;
+    dup test-last-div? [ drop ] [ [ <br/> ] with-output-stream* ] if ;
 
 ! Utilities
 : with-html-stream ( quot -- )
-    stdio get <html-stream> swap with-stream* ; inline
+    output-stream get <html-stream> swap with-output-stream* ; inline
 
 : xhtml-preamble
     "<?xml version=\"1.0\"?>" write-html

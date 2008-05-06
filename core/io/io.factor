@@ -30,39 +30,52 @@ GENERIC: stream-write-table ( table-cells style stream -- )
     [ 2dup (stream-copy) ] [ dispose dispose ] [ ]
     cleanup ;
 
-! Default stream
-SYMBOL: stdio
+! Default streams
+SYMBOL: input-stream
+SYMBOL: output-stream
+SYMBOL: error-stream
 
-! Default error stream
-SYMBOL: stderr
+: readln ( -- str/f ) input-stream get stream-readln ;
+: read1 ( -- ch/f ) input-stream get stream-read1 ;
+: read ( n -- str/f ) input-stream get stream-read ;
+: read-until ( seps -- str/f sep/f ) input-stream get stream-read-until ;
 
-: readln ( -- str/f ) stdio get stream-readln ;
-: read1 ( -- ch/f ) stdio get stream-read1 ;
-: read ( n -- str/f ) stdio get stream-read ;
-: read-until ( seps -- str/f sep/f ) stdio get stream-read-until ;
+: write1 ( ch -- ) output-stream get stream-write1 ;
+: write ( str -- ) output-stream get stream-write ;
+: flush ( -- ) output-stream get stream-flush ;
 
-: write1 ( ch -- ) stdio get stream-write1 ;
-: write ( str -- ) stdio get stream-write ;
-: flush ( -- ) stdio get stream-flush ;
+: nl ( -- ) output-stream get stream-nl ;
+: format ( str style -- ) output-stream get stream-format ;
 
-: nl ( -- ) stdio get stream-nl ;
-: format ( str style -- ) stdio get stream-format ;
+: with-input-stream* ( stream quot -- )
+    input-stream swap with-variable ; inline
 
-: with-stream* ( stream quot -- )
-    stdio swap with-variable ; inline
+: with-input-stream ( stream quot -- )
+    [ with-input-stream* ] curry with-disposal ; inline
 
-: with-stream ( stream quot -- )
-    [ with-stream* ] curry with-disposal ; inline
+: with-output-stream* ( stream quot -- )
+    output-stream swap with-variable ; inline
+
+: with-output-stream ( stream quot -- )
+    [ with-output-stream* ] curry with-disposal ; inline
+
+: with-streams* ( input output quot -- )
+    [ output-stream set input-stream set ] prepose with-scope ; inline
+
+: with-streams ( input output quot -- )
+    [ [ with-streams* ] 3curry ]
+    [ [ drop dispose dispose ] 3curry ] 3bi
+    [ ] cleanup ; inline
 
 : tabular-output ( style quot -- )
-    swap >r { } make r> stdio get stream-write-table ; inline
+    swap >r { } make r> output-stream get stream-write-table ; inline
 
 : with-row ( quot -- )
     { } make , ; inline
 
 : with-cell ( quot -- )
-    H{ } stdio get make-cell-stream
-    [ swap with-stream ] keep , ; inline
+    H{ } output-stream get make-cell-stream
+    [ swap with-output-stream ] keep , ; inline
 
 : write-cell ( str -- )
     [ write ] with-cell ; inline
@@ -71,13 +84,14 @@ SYMBOL: stderr
     swap dup assoc-empty? [
         drop call
     ] [
-        stdio get make-span-stream swap with-stream
+        output-stream get make-span-stream swap with-output-stream
     ] if ; inline
 
 : with-nesting ( style quot -- )
-    >r stdio get make-block-stream r> with-stream ; inline
+    >r output-stream get make-block-stream
+    r> with-output-stream ; inline
 
-: print ( string -- ) stdio get stream-print ;
+: print ( string -- ) output-stream get stream-print ;
 
 : bl ( -- ) " " write ;
 
@@ -85,9 +99,9 @@ SYMBOL: stderr
     presented associate format ;
 
 : lines ( stream -- seq )
-    [ [ readln dup ] [ ] [ drop ] unfold ] with-stream ;
+    [ [ readln dup ] [ ] [ drop ] unfold ] with-input-stream ;
 
 : contents ( stream -- str )
     [
         [ 65536 read dup ] [ ] [ drop ] unfold concat f like
-    ] with-stream  ;
+    ] with-input-stream ;

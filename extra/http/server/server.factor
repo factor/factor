@@ -260,15 +260,13 @@ SYMBOL: exit-continuation
         bi
     ] recover ;
 
-: default-timeout 1 minutes stdio get set-timeout ;
-
 : ?refresh-all ( -- )
     development-mode get-global
     [ global [ refresh-all ] bind ] when ;
 
 : handle-client ( -- )
     [
-        default-timeout
+        1 minutes timeouts
         ?refresh-all
         read-request
         do-request
