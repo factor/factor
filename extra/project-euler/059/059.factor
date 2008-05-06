@@ -52,7 +52,7 @@ IN: project-euler.059
 <PRIVATE
 
 : source-059 ( -- seq )
-    "extra/project-euler/059/cipher1.txt" resource-path
+    "resource:extra/project-euler/059/cipher1.txt"
     ascii file-contents [ blank? ] right-trim "," split
     [ string>number ] map ;
 
@@ -78,7 +78,7 @@ INSTANCE: rollover immutable-sequence
     frequency-analysis sort-values keys peek ;
 
 : crack-key ( seq key-length -- key )
-    [ " " decrypt ] dip group 1 head-slice*
+    [ " " decrypt ] dip group butlast-slice
     flip [ most-frequent ] map ;
 
 PRIVATE>

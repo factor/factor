@@ -38,7 +38,7 @@ IN: project-euler.067
 <PRIVATE
 
 : source-067 ( -- seq )
-    "extra/project-euler/067/triangle.txt" resource-path
+    "resource:extra/project-euler/067/triangle.txt"
     ascii file-lines [ " " split [ string>number ] map ] map ;
 
 PRIVATE>

@@ -30,7 +30,7 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
     concat [ dup ] H{ } map>assoc ;
 
 : other-extend-lines ( -- lines )
-    "extra/unicode/PropList.txt" resource-path ascii file-lines ;
+    "resource:extra/unicode/PropList.txt" ascii file-lines ;
 
 VALUE: other-extend
 

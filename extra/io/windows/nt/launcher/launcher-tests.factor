@@ -41,7 +41,7 @@ sequences parser assocs hashtables math continuations ;
 ] unit-test
 
 [ ] [
-    "extra/io/windows/nt/launcher/test" resource-path [
+    "resource:extra/io/windows/nt/launcher/test" [
         <process>
             vm "-script" "stderr.factor" 3array >>command
             "out.txt" temp-file >>stdout
@@ -59,7 +59,7 @@ sequences parser assocs hashtables math continuations ;
 ] unit-test
 
 [ ] [
-    "extra/io/windows/nt/launcher/test" resource-path [
+    "resource:extra/io/windows/nt/launcher/test" [
         <process>
             vm "-script" "stderr.factor" 3array >>command
             "out.txt" temp-file >>stdout
@@ -73,7 +73,7 @@ sequences parser assocs hashtables math continuations ;
 ] unit-test
 
 [ "output" ] [
-    "extra/io/windows/nt/launcher/test" resource-path [
+    "resource:extra/io/windows/nt/launcher/test" [
         <process>
             vm "-script" "stderr.factor" 3array >>command
             "err2.txt" temp-file >>stderr
@@ -86,7 +86,7 @@ sequences parser assocs hashtables math continuations ;
 ] unit-test
 
 [ t ] [
-    "extra/io/windows/nt/launcher/test" resource-path [
+    "resource:extra/io/windows/nt/launcher/test" [
         <process>
             vm "-script" "env.factor" 3array >>command
         ascii <process-reader> contents
@@ -96,7 +96,7 @@ sequences parser assocs hashtables math continuations ;
 ] unit-test
 
 [ t ] [
-    "extra/io/windows/nt/launcher/test" resource-path [
+    "resource:extra/io/windows/nt/launcher/test" [
         <process>
             vm "-script" "env.factor" 3array >>command
             +replace-environment+ >>environment-mode
@@ -108,7 +108,7 @@ sequences parser assocs hashtables math continuations ;
 ] unit-test
 
 [ "B" ] [
-    "extra/io/windows/nt/launcher/test" resource-path [
+    "resource:extra/io/windows/nt/launcher/test" [
         <process>
             vm "-script" "env.factor" 3array >>command
             { { "A" "B" } } >>environment
@@ -119,7 +119,7 @@ sequences parser assocs hashtables math continuations ;
 ] unit-test
 
 [ f ] [
-    "extra/io/windows/nt/launcher/test" resource-path [
+    "resource:extra/io/windows/nt/launcher/test" [
         <process>
             vm "-script" "env.factor" 3array >>command
             { { "HOME" "XXX" } } >>environment
