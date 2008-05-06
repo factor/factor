@@ -225,3 +225,9 @@ M: duplex-stream underlying-handle
     [ in>> underlying-handle ]
     [ out>> underlying-handle ] bi
     [ = [ "Invalid duplex stream" throw ] when ] keep ;
+
+M: encoder underlying-handle
+    stream>> underlying-handle ;
+
+M: decoder underlying-handle
+    stream>> underlying-handle ;
