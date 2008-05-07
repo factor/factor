@@ -2,15 +2,6 @@ USING: help.syntax help.markup kernel macros prettyprint
 memoize ;
 IN: locals
 
-<PRIVATE
-
-: $with-locals-note
-    drop {
-        "This form must appear either in a word defined by " { $link POSTPONE: :: } " or " { $link POSTPONE: MACRO:: } ", or alternatively, " { $link with-locals } " must be called on the top-level form of the word to perform closure conversion."
-    } $notes ;
-
-PRIVATE>
-
 HELP: [|
 { $syntax "[| bindings... | body... ]" }
 { $description "A lambda abstraction. When called, reads stack values into the bindings from left to right; the body may then refer to these bindings." }
@@ -22,8 +13,7 @@ HELP: [|
         "3 5 adder call ."
         "8"
     }
-}
-$with-locals-note ;
+} ;
 
 HELP: [let
 { $syntax "[let | binding1 [ value1... ]\n       binding2 [ value2... ]\n       ... |\n    body... ]" }
@@ -38,8 +28,7 @@ HELP: [let
         "6 { 36 14 } frobnicate ."
         "{ 36 2 }"
     }
-}
-$with-locals-note ;
+} ;
 
 HELP: [let*
 { $syntax "[let* | binding1 [ value1... ]\n       binding2 [ value2... ]\n       ... |\n    body... ]" }
@@ -55,8 +44,7 @@ HELP: [let*
         "1 { 32 48 } frobnicate ."
         "{ 2 3 }"
     }
-}
-$with-locals-note ;
+} ;
 
 { POSTPONE: [let POSTPONE: [let* } related-words
 
@@ -74,10 +62,6 @@ HELP: [wlet
         "{ 3 4 5 }"
     }
 } ;
-
-HELP: with-locals
-{ $values { "form" "a quotation, lambda, let or wlet form" } { "quot" "a quotation" } }
-{ $description "Performs closure conversion of a lexically-scoped form. All nested sub-forms are converted. This word must be applied to a " { $link POSTPONE: [| } ", " { $link POSTPONE: [let } " or " { $link POSTPONE: [wlet } " used in an ordinary definition, however forms in " { $link POSTPONE: :: } " and " { $link POSTPONE: MACRO:: } " definitions are automatically closure-converted and there is no need to use this word." } ;
 
 HELP: ::
 { $syntax ":: word ( bindings... -- outputs... ) body... ;" }
@@ -136,8 +120,6 @@ $nl
 { $subsection POSTPONE: :: }
 { $subsection POSTPONE: MEMO:: }
 { $subsection POSTPONE: MACRO:: }
-"Explicit closure conversion outside of applicative word definitions:"
-{ $subsection with-locals }
 "Lexical binding forms:"
 { $subsection POSTPONE: [let }
 { $subsection POSTPONE: [let* }

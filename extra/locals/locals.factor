@@ -201,8 +201,11 @@ M: object local-rewrite* , ;
 : pop-locals ( assoc -- )
     use get delete ;
 
+SYMBOL: in-lambda?
+
 : (parse-lambda) ( assoc end -- quot )
-    parse-until >quotation swap pop-locals ;
+    t in-lambda? [ parse-until ] with-variable
+    >quotation swap pop-locals ;
 
 : parse-lambda ( -- lambda )
     "|" parse-tokens make-locals dup push-locals
@@ -283,24 +286,24 @@ M: wlet local-rewrite*
     CREATE-METHOD
     [ parse-locals-definition ] with-method-definition ;
 
+: parsed-lambda ( form -- )
+    in-lambda? get [ parsed ] [ lambda-rewrite over push-all ] if ;
+
 PRIVATE>
 
-: [| parse-lambda parsed ; parsing
+: [| parse-lambda parsed-lambda ; parsing
 
 : [let
     scan "|" assert= parse-bindings
-\ ] (parse-lambda) <let> parsed ; parsing
+    \ ] (parse-lambda) <let> parsed-lambda ; parsing
 
 : [let*
     scan "|" assert= parse-bindings*
-    >r \ ] parse-until >quotation <let*> parsed r> pop-locals ;
-    parsing
+    \ ] (parse-lambda) <let*> parsed-lambda ; parsing
 
 : [wlet
     scan "|" assert= parse-wbindings
-    \ ] (parse-lambda) <wlet> parsed ; parsing
-
-MACRO: with-locals ( form -- quot ) lambda-rewrite ;
+    \ ] (parse-lambda) <wlet> parsed-lambda ; parsing
 
 : :: (::) define ; parsing
 
