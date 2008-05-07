@@ -55,10 +55,6 @@ TUPLE: oint location forward up left ;
 : proj-perp ( v u -- w )
     dupd proj v- ;
 
-! :: reflect ( v l -- v' )
-!     #! reflect v on l
-!     v l v. l l v. / 2 * l n*v v v- ;
-
-:: reflect ( vec n -- v' )
+:: reflect ( v n -- v' )
     #! bounce v on a surface with normal n
-    vec n v. n n*v -2 * vec v+ ;
+    v v n v. n n v. / 2 * n n*v v- ;

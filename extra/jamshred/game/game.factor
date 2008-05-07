@@ -3,10 +3,10 @@
 USING: accessors kernel opengl arrays sequences jamshred.log jamshred.player jamshred.tunnel math.vectors ;
 IN: jamshred.game
 
-TUPLE: jamshred tunnel players running ;
+TUPLE: jamshred tunnel players running quit ;
 
 : <jamshred> ( -- jamshred )
-    <random-tunnel> "Player 1" <player> 2dup swap play-in-tunnel 1array f
+    <random-tunnel> "Player 1" <player> 2dup swap play-in-tunnel 1array f f
     jamshred boa ;
 
 : jamshred-player ( jamshred -- player )
@@ -19,7 +19,13 @@ TUPLE: jamshred tunnel players running ;
     ] [ drop ] if ;
 
 : toggle-running ( jamshred -- )
-    [ running>> not ] [ (>>running) ] bi ;
+    dup running>> [
+        f >>running drop
+    ] [
+        [ jamshred-player moved ]
+        [ t >>running drop ] bi
+    ] if ;
 
 : mouse-moved ( x-radians y-radians jamshred -- )
     jamshred-player -rot turn-player ;
+

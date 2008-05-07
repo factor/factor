@@ -126,15 +126,23 @@ C: <segment> segment
 !     ] [
 !     ] if ;
 
+USING: jamshred.log prettyprint io.streams.string ;
+
+: distant 10 ; inline
+
 :: (collision-coefficient) ( -2b sqrt(b^2-2ac) 2a -- c )
-    -2b sqrt(b^2-2ac) + 2a /
-    -2b sqrt(b^2-2ac) - 2a / max ; ! the -ve answer is behind us (I think..)
+    sqrt(b^2-2ac) complex? [
+        distant
+    ] [
+        -2b sqrt(b^2-2ac) + 2a /
+        -2b sqrt(b^2-2ac) - 2a / max ! the -ve answer is behind us
+    ] if ;
 
 :: collision-coefficient ( v w -- c )
     [let* | a [ v dup v. ]
             b [ v w v. 2 * ]
             c [ w dup v. v dup v. - ] |
-        b -2 * b sq a c * 2 * - sqrt a 2 * (collision-coefficient) ] ;
+        b neg b sq a c * 4 * - sqrt a 2 * (collision-coefficient) ] ;
 
 : distance-to-collision ( oint segment -- distance )
     [ sideways-heading ] [ [ location>> ] bi@ v- collision-coefficient ]
@@ -150,18 +158,15 @@ C: <segment> segment
     location>> (wall-normal) ;
 
 : bounce-forward ( segment oint -- )
-    [ wall-normal ] [ swap reflect ] [ (>>forward) ] tri ;
+    [ wall-normal ] [ forward>> swap reflect ] [ (>>forward) ] tri ;
 
-: bounce-up ( oint segment -- )
-    2drop ; ! TODO
+: bounce-left ( segment oint -- )
+    [ forward>> vneg ] dip [ left>> swap reflect ] [ (>>left) ] bi ;
 
-: bounce-left ( oint segment -- )
-    2drop ; ! TODO
-
-! : bounce ( oint segment -- )
-!     [ swap bounce-forward ]
-!     [ bounce-up ]
-!     [ bounce-left ] 2tri ;
+: bounce-up ( segment oint -- )
+    #! must be done after forward and left!
+    nip [ forward>> ] [ left>> cross ] [ (>>up) ] tri ;
 
 : bounce ( oint segment -- )
-    drop 0.01 left-pivot ; ! just temporary
+    swap [ bounce-forward ] [ bounce-left ] [ bounce-up ] 2tri ;
+

@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alarms arrays calendar jamshred.game jamshred.gl jamshred.log kernel math math.constants namespaces sequences ui ui.gadgets ui.gestures ui.render math.vectors ;
+USING: accessors alarms arrays calendar jamshred.game jamshred.gl jamshred.log kernel math math.constants namespaces sequences threads ui ui.gadgets ui.gestures ui.render math.vectors ;
 IN: jamshred
 
 TUPLE: jamshred-gadget jamshred last-hand-loc alarm ;
@@ -8,8 +8,8 @@ TUPLE: jamshred-gadget jamshred last-hand-loc alarm ;
 : <jamshred-gadget> ( jamshred -- gadget )
     jamshred-gadget construct-gadget swap >>jamshred ;
 
-: default-width ( -- x ) 1024 ;
-: default-height ( -- y ) 768 ;
+: default-width ( -- x ) 640 ;
+: default-height ( -- y ) 480 ;
 
 M: jamshred-gadget pref-dim*
     drop default-width default-height 2array ;
@@ -17,16 +17,19 @@ M: jamshred-gadget pref-dim*
 M: jamshred-gadget draw-gadget* ( gadget -- )
     [ jamshred>> ] [ rect-dim first2 draw-jamshred ] bi ;
 
-: tick ( gadget -- )
-    [ jamshred>> jamshred-update ] [ relayout-1 ] bi ;
+: jamshred-loop ( gadget -- )
+    dup jamshred>> quit>> [
+        drop
+    ] [
+        dup [ jamshred>> jamshred-update ]
+        [ relayout-1 ] bi
+        50 sleep jamshred-loop
+    ] if ;
 
 M: jamshred-gadget graft* ( gadget -- )
-    [
-        [ tick ] curry 10 milliseconds from-now 10 milliseconds add-alarm
-    ] keep (>>alarm) ;
-
+    [ jamshred-loop ] in-thread drop ;
 M: jamshred-gadget ungraft* ( gadget -- )
-    [ alarm>> cancel-alarm ] [ f >>alarm drop ] bi ;
+    jamshred>> t >>quit drop ;
 
 : jamshred-restart ( jamshred-gadget -- )
     <jamshred> >>jamshred drop ;
