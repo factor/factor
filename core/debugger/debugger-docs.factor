@@ -81,13 +81,9 @@ HELP: print-error
 HELP: restarts.
 { $description "Print a list of restarts for the most recently thrown error to " { $link output-stream } "." } ;
 
-HELP: error-hook
-{ $var-description "A quotation with stack effect " { $snippet "( error -- )" } " which is used by " { $link try } " to report the error to the user." }
-{ $examples "The default value prints the error with " { $link print-error } ", followed by a list of restarts and a help message. The graphical listener sets this variable to display a popup instead." } ;
-
 HELP: try
 { $values { "quot" "a quotation" } }
-{ $description "Attempts to call a quotation; if it throws an error, the " { $link error-hook } " gets called, stacks are restored, and execution continues after the call to " { $link try } "." }
+{ $description "Attempts to call a quotation; if it throws an error, the error is printed to " { $link output-stream } ", stacks are restored, and execution continues after the call to " { $link try } "." }
 { $examples
     "The following example prints an error and keeps going:"
     { $code

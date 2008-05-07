@@ -1,53 +1,53 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators continuations documents
- hashtables io io.styles kernel math
-math.vectors models namespaces parser prettyprint quotations
-sequences strings threads listener
-classes.tuple ui.commands ui.gadgets ui.gadgets.editors
-ui.gadgets.presentations ui.gadgets.worlds ui.gestures
-definitions boxes calendar concurrency.flags ui.tools.workspace
-accessors math.order ;
+hashtables io io.styles kernel math math.order math.vectors
+models namespaces parser prettyprint quotations sequences
+strings threads listener classes.tuple ui.commands ui.gadgets
+ui.gadgets.editors ui.gadgets.presentations ui.gadgets.worlds
+ui.gestures definitions calendar concurrency.flags
+ui.tools.workspace accessors ;
 IN: ui.tools.interactor
 
-TUPLE: interactor history output flag thread help ;
+! If waiting is t, we're waiting for user input, and invoking
+! evaluate-input resumes the thread.
+TUPLE: interactor output history flag thread waiting help ;
+
+: register-self ( interactor -- )
+    self >>thread drop ;
 
 : interactor-continuation ( interactor -- continuation )
-    interactor-thread box-value
-    thread-continuation box-value ;
+    thread>> continuation>> value>> ;
 
 : interactor-busy? ( interactor -- ? )
-    interactor-thread box-full? not ;
+    #! We're busy if there's no thread to resume.
+    [ waiting>> ]
+    [ thread>> dup [ thread-registered? ] when ]
+    bi and not ;
 
 : interactor-use ( interactor -- seq )
     dup interactor-busy? [ drop f ] [
         use swap
-        interactor-continuation continuation-name
+        interactor-continuation name>>
         assoc-stack
     ] if ;
 
-: init-caret-help ( interactor -- )
-    dup editor-caret 1/3 seconds <delay>
-    swap set-interactor-help ;
-
-: init-interactor-history ( interactor -- )
-    V{ } clone swap set-interactor-history ;
-
-: init-interactor-state ( interactor -- )
-    <flag> over set-interactor-flag
-    <box> swap set-interactor-thread ;
+: <help-model> ( interactor -- model )
+    editor-caret 1/3 seconds <delay> ;
 
 : <interactor> ( output -- gadget )
     <source-editor>
     interactor construct-editor
-    tuck set-interactor-output
-    dup init-interactor-history
-    dup init-interactor-state
-    dup init-caret-help ;
+        V{ } clone >>history
+        <flag> >>flag
+        dup <help-model> >>help
+        swap >>output ;
 
 M: interactor graft*
-    dup delegate graft*
-    dup interactor-help add-connection ;
+    [ delegate graft* ] [ dup help>> add-connection ] bi ;
+
+M: interactor ungraft*
+    [ dup help>> remove-connection ] [ delegate ungraft ] bi ;
 
 : word-at-loc ( loc interactor -- word )
     over [
@@ -58,7 +58,7 @@ M: interactor graft*
     ] if ;
 
 M: interactor model-changed
-    2dup interactor-help eq? [
+    2dup help>> eq? [
         swap model-value over word-at-loc swap show-summary
     ] [
         delegate model-changed
@@ -69,7 +69,7 @@ M: interactor model-changed
     [ H{ { font-style bold } } format ] with-nesting ;
 
 : interactor-input. ( string interactor -- )
-    interactor-output [
+    output>> [
         dup string? [ dup write-input nl ] [ short. ] if
     ] with-output-stream* ;
 
@@ -77,7 +77,7 @@ M: interactor model-changed
     over empty? [ 2drop ] [ interactor-history push-new ] if ;
 
 : interactor-continue ( obj interactor -- )
-    interactor-thread box> resume-with ;
+    thread>> resume-with ;
 
 : clear-input ( interactor -- ) gadget-model clear-doc ;
 
@@ -99,10 +99,12 @@ M: interactor model-changed
     ] unless drop ;
 
 : interactor-yield ( interactor -- obj )
-    [
-        [ interactor-thread >box ] keep
-        interactor-flag raise-flag
-    ] curry "input" suspend ;
+    dup thread>> self eq? [
+        t >>waiting
+        [ [ flag>> raise-flag ] curry "input" suspend ] keep
+        f >>waiting
+        drop
+    ] [ drop f ] if ;
 
 M: interactor stream-readln
     [ interactor-yield ] keep interactor-finish
@@ -161,7 +163,8 @@ M: interactor stream-read-quot
     } cond ;
 
 M: interactor pref-dim*
-    0 over line-height 4 * 2array swap delegate pref-dim* vmax ;
+    [ line-height 4 * 0 swap 2array ] [ delegate pref-dim* ] bi
+    vmax ;
 
 interactor "interactor" f {
     { T{ key-down f f "RET" } evaluate-input }

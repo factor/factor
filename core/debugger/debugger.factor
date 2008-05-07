@@ -64,13 +64,14 @@ M: string error. print ;
     [ global [ "Error in print-error!" print drop ] bind ]
     recover ;
 
+: print-error-and-restarts ( error -- )
+    print-error
+    restarts.
+    nl
+    "Type :help for debugging help." print flush ;
+
 : try ( quot -- )
-    [
-        print-error
-        restarts.
-        nl
-        "Type :help for debugging help." print flush
-    ] recover ;
+    [ print-error-and-restarts ] recover ;
 
 ERROR: assert got expect ;
 
@@ -269,8 +270,7 @@ M: double-free summary
 M: realloc-error summary
     drop "Memory reallocation failed" ;
 
-: error-in-thread. ( -- )
-    error-thread get-global
+: error-in-thread. ( thread -- )
     "Error in thread " write
     [
         dup thread-id #
@@ -284,7 +284,7 @@ M: thread error-in-thread ( error thread -- )
         die drop
     ] [
         global [
-            error-in-thread. print-error flush
+            error-thread get-global error-in-thread. print-error flush
         ] bind
     ] if ;
 

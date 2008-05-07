@@ -23,34 +23,31 @@ HOOK: (pipe) io-backend ( -- pipe )
         r> <encoder-duplex>
     ] with-destructors ;
 
-: with-fds ( input-fd output-fd quot -- )
-    >r >r [ <reader> dup add-always-destructor ] [ input-stream get ] if* r> r> [
-        >r [ <writer> dup add-always-destructor ] [ output-stream get ] if* r>
-        with-output-stream*
-    ] 2curry with-input-stream* ; inline
+<PRIVATE
 
-: <pipes> ( n -- pipes )
-    [ (pipe) dup add-always-destructor ] replicate
-    f f pipe boa [ prefix ] [ suffix ] bi
-    2 <clumps> ;
+: ?reader [ <reader> dup add-always-destructor ] [ input-stream get ] if* ;
+: ?writer [ <writer> dup add-always-destructor ] [ output-stream get ] if* ;
 
-: with-pipe-fds ( seq -- results )
+GENERIC: run-pipeline-element ( input-fd output-fd obj -- quot )
+
+M: callable run-pipeline-element
     [
-        [ length dup zero? [ drop { } ] [ 1- <pipes> ] if ] keep
-        [ >r [ first in>> ] [ second out>> ] bi r> 2curry ] 2map
-        [ call ] parallel-map
+        >r [ ?reader ] [ ?writer ] bi*
+        r> with-streams*
     ] with-destructors ;
 
-GENERIC: pipeline-element-quot ( obj -- quot )
+: <pipes> ( n -- pipes )
+    [
+        [ (pipe) dup add-error-destructor ] replicate
+        T{ pipe } [ prefix ] [ suffix ] bi
+        2 <clumps>
+    ] with-destructors ;
 
-M: callable pipeline-element-quot
-    [ with-fds ] curry ;
-
-GENERIC: wait-for-pipeline-element ( obj -- result )
-
-M: object wait-for-pipeline-element ;
+PRIVATE>
 
 : run-pipeline ( seq -- results )
-    [ pipeline-element-quot ] map
-    with-pipe-fds
-    [ wait-for-pipeline-element ] map ;
+    [ length dup zero? [ drop { } ] [ 1- <pipes> ] if ] keep
+    [
+        >r [ first in>> ] [ second out>> ] bi
+        r> run-pipeline-element
+    ] 2parallel-map ;
