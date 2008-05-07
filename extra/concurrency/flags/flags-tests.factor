@@ -1,5 +1,6 @@
 IN: concurrency.flags.tests
-USING: tools.test concurrency.flags kernel threads locals ;
+USING: tools.test concurrency.flags concurrency.combinators
+kernel threads locals ;
 
 :: flag-test-1 ( -- )
     [let | f [ <flag> ] |
@@ -44,3 +45,9 @@ USING: tools.test concurrency.flags kernel threads locals ;
     ] ;
 
 [ t ] [ flag-test-5 ] unit-test
+
+[ ] [
+    { 1 2 } <flag>
+    [ [ 1000 sleep raise-flag ] curry "Flag test" spawn drop ]
+    [ [ wait-for-flag drop ] curry parallel-each ] bi
+] unit-test
