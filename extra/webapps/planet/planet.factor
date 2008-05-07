@@ -11,7 +11,8 @@ http.server.actions
 http.server.boilerplate
 http.server.templating.chloe
 http.server.components
-http.server.auth.login ;
+http.server.auth.login
+http.server.auth ;
 IN: webapps.planet
 
 TUPLE: planet-factor < dispatcher postings ;
@@ -159,11 +160,15 @@ blog "BLOGS"
             blog-form blog-ctor "$planet-factor/admin" <edit-action>   "edit-blog"   add-responder
     ] ;
 
+SYMBOL: can-administer-planet-factor?
+
+can-administer-planet-factor? define-capability
+
 : <planet-factor> ( -- responder )
     planet-factor new-dispatcher
         dup <planet-action> "list" add-main-responder
         dup <feed-action> "feed.xml" add-responder
-        dup <planet-factor-admin> <protected> "admin" add-responder
+        dup <planet-factor-admin> { can-administer-planet-factor? } <protected> "admin" add-responder
     <boilerplate>
         "planet" planet-template >>template ;
 

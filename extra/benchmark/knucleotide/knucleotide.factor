@@ -56,7 +56,7 @@ IN: benchmark.knucleotide
     drop ;
 
 : knucleotide ( -- )
-    "extra/benchmark/knucleotide/knucleotide-input.txt" resource-path
+    "resource:extra/benchmark/knucleotide/knucleotide-input.txt"
     ascii [ read-input ] with-file-reader
     process-input ;
 

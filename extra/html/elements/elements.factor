@@ -143,7 +143,7 @@ SYMBOL: html
         "h1" "h2" "h3" "h4" "h5" "h6" "h7" "h8" "h9"
         "ol" "li" "form" "a" "p" "html" "head" "body" "title"
         "b" "i" "ul" "table" "tbody" "tr" "td" "th" "pre" "textarea"
-        "script" "div" "span" "select" "option" "style"
+        "script" "div" "span" "select" "option" "style" "input"
     ] [ define-closed-html-word ] each
 
     ! Define some open HTML tags
@@ -161,6 +161,6 @@ SYMBOL: html
         "id" "onclick" "style" "valign" "accesskey"
         "src" "language" "colspan" "onchange" "rel"
         "width" "selected" "onsubmit" "xmlns" "lang" "xml:lang"
-        "media" "title"
+        "media" "title" "multiple"
     ] [ define-attribute-word ] each
 ] with-compilation-unit

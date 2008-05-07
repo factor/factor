@@ -32,19 +32,17 @@
 		<th class="field-label">E-mail:</th>
 		<td><t:edit t:component="email" /></td>
 	</tr>
+	
+	<tr>
+		<th class="field-label big-field-label">Capabilities:</th>
+		<td><t:edit t:component="capabilities" /></td>
+	</tr>
 
 	</table>
 	
 	<p>
 		<button type="submit" class="link-button link">Create</button>
-
-		<t:if t:var="http.server.auth.login:user-exists?">
-				<t:error>username taken</t:error>
-		</t:if>
-
-		<t:if t:var="http.server.auth.login:password-mismatch?">
-			<t:error>passwords do not match</t:error>
-		</t:if>
+		<t:validation-message />
 	</p>
 
 	</t:form>

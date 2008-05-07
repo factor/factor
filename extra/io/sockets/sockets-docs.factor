@@ -14,6 +14,7 @@ ARTICLE: "network-addressing" "Address specifiers"
 ARTICLE: "network-connection" "Connection-oriented networking"
 "Network connections can be established with this word:"
 { $subsection <client> }
+{ $subsection with-client }
 "Connection-oriented network servers are implemented by first opening a server socket, then waiting for connections:"
 { $subsection <server> }
 { $subsection accept }

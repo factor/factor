@@ -108,4 +108,4 @@ HELP: me
 HELP: inspector-hook
 { $var-description "A quotation with stack effect " { $snippet "( obj -- )" } ", called by the inspector to display an overview of an object."
 $nl
-"The default implementation calls " { $link describe } " which outputs on the " { $link stdio } " stream, but the graphical listener sets this variable so that calling " { $link inspect } " in the UI opens the graphical inspector." } ;
+"The default implementation calls " { $link describe } " which outputs on " { $link output-stream } ", but the graphical listener sets this variable so that calling " { $link inspect } " in the UI opens the graphical inspector." } ;

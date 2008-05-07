@@ -2,13 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays destructors io io.backend
 io.buffers io.files io.nonblocking io.sockets io.binary
-io.sockets.impl windows.errors strings io.streams.duplex
+io.sockets.impl windows.errors strings
 kernel math namespaces sequences windows windows.kernel32
 windows.shell32 windows.types windows.winsock splitting
 continuations math.bitfields system accessors ;
 IN: io.windows
-
-M: windows destruct-handle CloseHandle drop ;
 
 M: windows destruct-socket closesocket drop ;
 
@@ -43,7 +41,10 @@ M: win32-file init-handle ( handle -- )
     drop ;
 
 M: win32-file close-handle ( handle -- )
-    win32-file-handle CloseHandle drop ;
+    win32-file-handle close-handle ;
+
+M: alien close-handle ( handle -- )
+    CloseHandle drop ;
 
 ! Clean up resources (open handle) if add-completion fails
 : open-file ( path access-mode create-mode flags -- handle )
@@ -85,15 +86,13 @@ M: win32-file close-handle ( handle -- )
     f CreateFileW dup win32-error=0/f
     GetLastError ERROR_ALREADY_EXISTS = not ;
 
-: set-file-pointer ( handle length -- )
-    dupd d>w/w <uint> FILE_BEGIN SetFilePointer
+: set-file-pointer ( handle length method -- )
+    >r dupd d>w/w <uint> r> SetFilePointer
     INVALID_SET_FILE_POINTER = [
         CloseHandle "SetFilePointer failed" throw
     ] when drop ;
 
-: open-append ( path -- handle length )
-    [ dup file-info size>> ] [ drop 0 ] recover
-    >r (open-append) r> 2dup set-file-pointer ;
+HOOK: open-append os ( path -- handle length )
 
 TUPLE: FileArgs
     hFile lpBuffer nNumberOfBytesToRead

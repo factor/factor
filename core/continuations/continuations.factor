@@ -101,6 +101,14 @@ PRIVATE>
 : continue ( continuation -- )
     f swap continue-with ;
 
+SYMBOL: return-continuation
+
+: with-return ( quot -- )
+    [ [ return-continuation set ] prepose callcc0 ] with-scope ; inline
+
+: return ( -- )
+    return-continuation get continue ;
+
 GENERIC: compute-restarts ( error -- seq )
 
 <PRIVATE
@@ -137,6 +145,11 @@ SYMBOL: thread-error-hook
     ] { } make peek swap [ rethrow ] when ; inline
 
 GENERIC: dispose ( object -- )
+
+: dispose-each ( seq -- )
+    [
+        [ [ dispose ] curry [ , ] recover ] each
+    ] { } make dup empty? [ drop ] [ peek rethrow ] if ;
 
 : with-disposal ( object quot -- )
     over [ dispose ] curry [ ] cleanup ; inline

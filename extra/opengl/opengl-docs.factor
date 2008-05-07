@@ -7,7 +7,7 @@ HELP: gl-color
 { $description "Wrapper for " { $link glColor4d } " taking a color specifier." } ;
 
 HELP: gl-error
-{ $description "If the most recent OpenGL call resulted in an error, print the error to the " { $link stdio } " stream." } ;
+{ $description "If the most recent OpenGL call resulted in an error, print the error to " { $link output-stream } "." } ;
 
 HELP: do-state
   {

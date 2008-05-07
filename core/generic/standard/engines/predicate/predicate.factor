@@ -11,7 +11,7 @@ C: <predicate-dispatch-engine> predicate-dispatch-engine
     [ >r "predicate" word-prop picker prepend r> ] assoc-map ;
 
 : keep-going? ( assoc -- ? )
-    assumed get swap second first class< ;
+    assumed get swap second first class<= ;
 
 : prune-redundant-predicates ( assoc -- default assoc' )
     {

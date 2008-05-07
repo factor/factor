@@ -2,7 +2,7 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-	<t:style include="resource:extra/webapps/todo/todo.css" />
+	<t:style t:include="resource:extra/webapps/todo/todo.css" />
 
 	<div class="navbar">
 		  <t:a t:href="$todo-list/list">List Items</t:a>
@@ -12,9 +12,7 @@
 			| <t:a t:href="$login/edit-profile" t:flow="begin">Edit Profile</t:a>
 		</t:if>
 
-		<t:form t:action="$login/logout" t:flow="begin" class="inline">
-			| <button type="submit" class="link-button link">Logout</button>
-		</t:form>
+		<t:button t:action="$login/logout" t:flow="begin" class="link-button link">Logout</t:button>
 	</div>
 
 	<h1><t:write-title /></h1>

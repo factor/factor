@@ -1,6 +1,6 @@
 USING: kernel math namespaces io tools.test sequences vectors
 continuations debugger parser memory arrays words
-kernel.private ;
+kernel.private accessors ;
 IN: continuations.tests
 
 : (callcc1-test)
@@ -39,7 +39,7 @@ IN: continuations.tests
 
 "!!! The following error is part of the test" print
 
-[ ] [ [ [ "2 car" ] eval ] [ print-error ] recover ] unit-test
+[ ] [ [ [ "2 car" ] eval ] try ] unit-test
 
 [ f throw ] must-fail
 
@@ -100,3 +100,22 @@ SYMBOL: error-counter
     [ 3 ] [ always-counter get ] unit-test
     [ 1 ] [ error-counter get ] unit-test
 ] with-scope
+
+TUPLE: dispose-error ;
+
+M: dispose-error dispose 3 throw ;
+
+TUPLE: dispose-dummy disposed? ;
+
+M: dispose-dummy dispose t >>disposed? drop ;
+
+T{ dispose-error } "a" set
+T{ dispose-dummy } "b" set
+
+[ f ] [ "b" get disposed?>> ] unit-test
+
+[ { "a" "b" } [ get ] map dispose-each ] [ 3 = ] must-fail-with
+
+[ t ] [ "b" get disposed?>> ] unit-test
+
+[ ] [ [ return ] with-return ] unit-test

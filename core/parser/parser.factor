@@ -421,14 +421,17 @@ ERROR: bad-number ;
 SYMBOL: current-class
 SYMBOL: current-generic
 
-: (M:)
-    CREATE-METHOD
+: with-method-definition ( quot -- parsed )
     [
+        >r
         [ "method-class" word-prop current-class set ]
         [ "method-generic" word-prop current-generic set ]
         [ ] tri
-        parse-definition
-    ] with-scope ;
+        r> call
+    ] with-scope ; inline
+
+: (M:)
+    CREATE-METHOD [ parse-definition ] with-method-definition ;
 
 : scan-object ( -- object )
     scan-word dup parsing?

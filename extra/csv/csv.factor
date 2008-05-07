@@ -31,6 +31,7 @@ VAR: delimiter
   read1 dup 
   { { CHAR: "    [ , quoted-field ] }  ! " is an escaped quote
     { delimiter> [ ] }                 ! end of quoted field 
+    { CHAR: \n   [ ] }
     [ 2drop skip-to-field-end ]       ! end of quoted field + padding
   } case ;
   
@@ -60,11 +61,11 @@ VAR: delimiter
   
 : csv-row ( stream -- row )
   init-vars
-  [ row nip ] with-stream ;
+  [ row nip ] with-input-stream ;
 
 : csv ( stream -- rows )
   init-vars
-  [ [ (csv) ] { } make ] with-stream ;
+  [ [ (csv) ] { } make ] with-input-stream ;
 
 : with-delimiter ( char quot -- )
   delimiter swap with-variable ; inline

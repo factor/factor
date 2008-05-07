@@ -1,16 +1,8 @@
 USING: assocs math kernel sequences io.files hashtables
 quotations splitting arrays math.parser hash2 math.order
 byte-arrays words namespaces words compiler.units parser
-io.encodings.ascii ;
+io.encodings.ascii unicode.syntax.backend ;
 IN: unicode.data
-
-<<
-: VALUE:
-    CREATE-WORD { f } clone [ first ] curry define ; parsing
-
-: set-value ( value word -- )
-    word-def first set-first ;
->>
 
 ! Convenience functions
 : ?between? ( n/f from to -- ? )
@@ -22,7 +14,7 @@ IN: unicode.data
     ascii file-lines [ ";" split ] map ;
 
 : load-data ( -- data )
-    "extra/unicode/UnicodeData.txt" resource-path data ;
+    "resource:extra/unicode/UnicodeData.txt" data ;
 
 : (process-data) ( index data -- newdata )
     [ [ nth ] keep first swap 2array ] with map
@@ -128,7 +120,7 @@ VALUE: special-casing
 
 ! Special casing data
 : load-special-casing ( -- special-casing )
-    "extra/unicode/SpecialCasing.txt" resource-path data
+    "resource:extra/unicode/SpecialCasing.txt" data
     [ length 5 = ] filter
     [ [ set-code-point ] each ] H{ } make-assoc ;
 

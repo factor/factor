@@ -1,6 +1,6 @@
 USING: http tools.test multiline tuple-syntax
 io.streams.string kernel arrays splitting sequences
-assocs io.sockets db db.sqlite ;
+assocs io.sockets db db.sqlite continuations ;
 IN: http.tests
 
 [ "hello%20world" ] [ "hello world" url-encode ] unit-test
@@ -23,6 +23,14 @@ IN: http.tests
 [ "/" ] [ "http://foo.com/" url>path ] unit-test
 [ "/bar" ] [ "http://foo.com/bar" url>path ] unit-test
 [ "/bar" ] [ "/bar" url>path ] unit-test
+
+[ "a=b&a=c" ] [ { { "a" { "b" "c" } } } assoc>query ] unit-test
+
+[ H{ { "a" "b" } } ] [ "a=b" query>assoc ] unit-test
+
+[ H{ { "a" { "b" "c" } } } ] [ "a=b&a=c" query>assoc ] unit-test
+
+[ "a=3" ] [ { { "a" 3 } } assoc>query ] unit-test
 
 : lf>crlf "\n" split "\r\n" join ;
 
@@ -93,7 +101,7 @@ Host: www.sex.com
 
 STRING: read-response-test-1
 HTTP/1.1 404 not found
-Content-Type: text/html
+Content-Type: text/html; charset=UTF8
 
 blah
 ;
@@ -103,8 +111,10 @@ blah
         version: "1.1"
         code: 404
         message: "not found"
-        header: H{ { "content-type" "text/html" } }
+        header: H{ { "content-type" "text/html; charset=UTF8" } }
         cookies: V{ }
+        content-type: "text/html"
+        content-charset: "UTF8"
     }
 ] [
     read-response-test-1 lf>crlf
@@ -114,7 +124,7 @@ blah
 
 STRING: read-response-test-1'
 HTTP/1.1 404 not found
-content-type: text/html
+content-type: text/html; charset=UTF8
 
 
 ;
@@ -140,10 +150,12 @@ accessors namespaces threads ;
 
 : add-quit-action
     <action>
-        [ stop-server "text/html" <content> [ "Goodbye" write ] >>body ] >>display
+        [ stop-server [ "Goodbye" write ] <html-content> ] >>display
     "quit" add-responder ;
 
 : test-db "test.db" temp-file sqlite-db ;
+
+[ test-db drop delete-file ] ignore-errors
 
 test-db [
     init-sessions-table
@@ -154,7 +166,7 @@ test-db [
         <dispatcher>
             add-quit-action
             <dispatcher>
-                "extra/http/test" resource-path <static> >>default
+                "resource:extra/http/test" <static> >>default
             "nested" add-responder
             <action>
                 [ "redirect-loop" f <standard-redirect> ] >>display
@@ -166,18 +178,18 @@ test-db [
 ] unit-test
 
 [ t ] [
-    "extra/http/test/foo.html" resource-path ascii file-contents
+    "resource:extra/http/test/foo.html" ascii file-contents
     "http://localhost:1237/nested/foo.html" http-get =
 ] unit-test
 
 ! Try with a slightly malformed request
 [ t ] [
-    "localhost" 1237 <inet> ascii <client> [
+    "localhost" 1237 <inet> ascii [
         "GET nested HTTP/1.0\r\n" write flush
         "\r\n" write flush
         read-crlf drop
         read-header
-    ] with-stream "location" swap at "/" head?
+    ] with-client "location" swap at "/" head?
 ] unit-test
 
 [ "http://localhost:1237/redirect-loop" http-get ]
@@ -191,7 +203,7 @@ test-db [
 [ ] [
     [
         <dispatcher>
-            <action> <protected>
+            <action> f <protected>
             <login>
             <sessions>
             "" add-responder

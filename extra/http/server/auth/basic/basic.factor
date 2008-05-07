@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors quotations assocs kernel splitting
 base64 html.elements io combinators http.server
-http.server.auth.providers http.server.auth.providers.null
+http.server.auth.providers http.server.auth.login
 http sequences ;
 IN: http.server.auth.basic
 

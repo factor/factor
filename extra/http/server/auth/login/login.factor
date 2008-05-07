@@ -1,16 +1,23 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors quotations assocs kernel splitting
-base64 io combinators sequences io.files namespaces hashtables
-fry io.sockets arrays threads locals qualified continuations
+combinators sequences namespaces hashtables sets
+fry arrays threads locals qualified random
+io
+io.sockets
+io.encodings.utf8
+io.encodings.string
+io.binary
+continuations
 destructors
-
+checksums
+checksums.sha2
 html.elements
 http
 http.server
 http.server.auth
 http.server.auth.providers
-http.server.auth.providers.null
+http.server.auth.providers.db
 http.server.actions
 http.server.components
 http.server.flows
@@ -23,11 +30,24 @@ http.server.validators ;
 IN: http.server.auth.login
 QUALIFIED: smtp
 
-SYMBOL: login-failed?
+TUPLE: login < dispatcher users checksum ;
 
-TUPLE: login < dispatcher users ;
+: users ( -- provider )
+    login get users>> ;
 
-: users login get users>> ;
+: encode-password ( string salt -- bytes )
+    [ utf8 encode ] [ 4 >be ] bi* append
+    login get checksum>> checksum-bytes ;
+
+: >>encoded-password ( user string -- user )
+    32 random-bits [ encode-password ] keep
+    [ >>password ] [ >>salt ] bi* ; inline
+
+: valid-login? ( password user -- ? )
+    [ salt>> encode-password ] [ password>> ] bi = ;
+
+: check-login ( password username -- user/f )
+    users get-user dup [ [ valid-login? ] keep and ] [ 2drop f ] if ;
 
 ! Destructor
 TUPLE: user-saver user ;
@@ -60,6 +80,8 @@ M: user-saver dispose
     username>> set-uid
     "$login" end-flow ;
 
+: login-failed "invalid username or password" validation-failed-with ;
+
 :: <login-action> ( -- action )
     [let | form [ <login-form> ] |
         <action>
@@ -72,13 +94,8 @@ M: user-saver dispose
 
                 form validate-form
 
-                "password" value "username" value
-                users check-login [
-                    successful-login
-                ] [
-                    login-failed? on
-                    validation-failed
-                ] if*
+                "password" value "username" value check-login
+                [ successful-login ] [ login-failed ] if*
             ] >>submit
     ] ;
 
@@ -100,14 +117,13 @@ M: user-saver dispose
         "email" <email> add-field
         "captcha" <captcha> add-field ;
 
-SYMBOL: password-mismatch?
-SYMBOL: user-exists?
+: password-mismatch "passwords do not match" validation-failed-with ;
+
+: user-exists "username taken" validation-failed-with ;
 
 : same-password-twice ( -- )
-    "new-password" value "verify-password" value = [ 
-        password-mismatch? on
-        validation-failed
-    ] unless ;
+    "new-password" value "verify-password" value =
+    [ password-mismatch ] unless ;
 
 :: <register-action> ( -- action )
     [let | form [ <register-form> ] |
@@ -125,14 +141,11 @@ SYMBOL: user-exists?
 
                 "username" value <user>
                     "realname" value >>realname
-                    "new-password" value >>password
+                    "new-password" value >>encoded-password
                     "email" value >>email
                     H{ } clone >>profile
 
-                users new-user [
-                    user-exists? on
-                    validation-failed
-                ] unless*
+                users new-user [ user-exists ] unless*
 
                 successful-login
 
@@ -179,10 +192,10 @@ SYMBOL: user-exists?
                 [ value empty? ] all? [
                     same-password-twice
 
-                    "password" value uid users check-login
-                    [ login-failed? on validation-failed ] unless
+                    "password" value uid check-login
+                    [ login-failed ] unless
 
-                    "new-password" value >>password
+                    "new-password" value >>encoded-password
                 ] unless
 
                 "realname" value >>realname
@@ -314,7 +327,7 @@ SYMBOL: lost-password-from
                 "ticket" value
                 "username" value
                 users claim-ticket [
-                    "new-password" value >>password
+                    "new-password" value >>encoded-password
                     users update-user
 
                     "recover-4" login-template serve-template
@@ -334,7 +347,7 @@ SYMBOL: lost-password-from
 
 ! ! ! Authentication logic
 
-TUPLE: protected < filter-responder ;
+TUPLE: protected < filter-responder capabilities ;
 
 C: <protected> protected
 
@@ -342,11 +355,17 @@ C: <protected> protected
     begin-flow
     "$login/login" f <standard-redirect> ;
 
+: check-capabilities ( responder user -- ? )
+    [ capabilities>> ] bi@ subset? ;
+
 M: protected call-responder* ( path responder -- response )
     uid dup [
-        users get-user
-        [ logged-in-user set ] [ save-user-after ] bi
-        call-next-method
+        users get-user 2dup check-capabilities [
+            [ logged-in-user set ] [ save-user-after ] bi
+            call-next-method
+        ] [
+            3drop show-login-page
+        ] if
     ] [
         3drop show-login-page
     ] if ;
@@ -364,12 +383,13 @@ M: login call-responder* ( path responder -- response )
         swap >>default
         <login-action> <login-boilerplate> "login" add-responder
         <logout-action> <login-boilerplate> "logout" add-responder
-        no-users >>users ;
+        users-in-db >>users
+        sha-256 >>checksum ;
 
 ! ! ! Configuration
 
 : allow-edit-profile ( login -- login )
-    <edit-profile-action> <protected> <login-boilerplate>
+    <edit-profile-action> f <protected> <login-boilerplate>
         "edit-profile" add-responder ;
 
 : allow-registration ( login -- login )

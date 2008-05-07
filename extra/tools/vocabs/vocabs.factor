@@ -3,8 +3,8 @@
 USING: io.files kernel io.encodings.utf8 vocabs.loader vocabs
 sequences namespaces math.parser arrays hashtables assocs
 memoize inspector sorting splitting combinators source-files
-io debugger continuations compiler.errors init io.crc32 
-sets ;
+io debugger continuations compiler.errors init
+checksums checksums.crc32 sets ;
 IN: tools.vocabs
 
 : vocab-tests-file ( vocab -- path )
@@ -63,7 +63,7 @@ SYMBOL: failures
     dup source-files get at [
         dup source-file-path
         dup exists? [
-            utf8 file-lines lines-crc32
+            utf8 file-lines crc32 checksum-lines
             swap source-file-checksum = not
         ] [
             2drop f

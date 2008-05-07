@@ -1,2 +1,2 @@
 collections
-collections sequences
+sequences

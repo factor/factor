@@ -87,7 +87,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
 
 : adjust-points [ [ 1 + 0.5 * ] map ] bi@ ;
 
-: scale-points 2array flip [ v* ] with map [ v+ ] with map ;
+: scale-points zip [ v* ] with map [ v+ ] with map ;
 
 : circle-points ( loc dim steps -- points )
     circle-steps unit-circle adjust-points scale-points ;

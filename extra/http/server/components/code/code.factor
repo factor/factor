@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: splitting kernel io sequences xmode.code2html accessors
-http.server.components ;
+http.server.components html xml.entities ;
 IN: http.server.components.code
 
 TUPLE: code-renderer < text-renderer mode ;
@@ -11,7 +11,9 @@ TUPLE: code-renderer < text-renderer mode ;
         swap >>mode ;
 
 M: code-renderer render-view*
-    [ string-lines ] [ mode>> value ] bi* htmlize-lines ;
+    [
+        [ string-lines ] [ mode>> value ] bi* htmlize-lines
+    ] with-html-stream ;
 
 : <code> ( id mode -- component )
     swap <text>

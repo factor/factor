@@ -44,10 +44,6 @@ SYMBOL: bootstrap-time
     "Now, you can run Factor:" print
     vm write " -i=" write "output-image" get print flush ;
 
-! Wrap everything in a catch which starts a listener so
-! you can see what went wrong, instead of dealing with a
-! fep
-
 ! We time bootstrap
 millis >r
 
@@ -91,7 +87,7 @@ f error-continuation set-global
             parse-command-line
             run-user-init
             "run" get run
-            stdio get [ stream-flush ] when*
+            output-stream get [ stream-flush ] when*
         ] [ print-error 1 exit ] recover
     ] set-boot-quot
 

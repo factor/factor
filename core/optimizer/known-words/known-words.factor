@@ -4,7 +4,7 @@ IN: optimizer.known-words
 USING: alien arrays generic hashtables inference.dataflow
 inference.class kernel assocs math math.private kernel.private
 sequences words parser vectors strings sbufs io namespaces
-assocs quotations sequences.private io.binary io.crc32
+assocs quotations sequences.private io.binary
 io.streams.string layouts splitting math.intervals
 math.floats.private classes.tuple classes.tuple.private classes
 classes.algebra optimizer.def-use optimizer.backend
@@ -125,8 +125,6 @@ sequences.private combinators ;
 \ >vector { { array } { vector } } "specializer" set-word-prop
 
 \ >sbuf { string } "specializer" set-word-prop
-
-\ crc32 { string } "specializer" set-word-prop
 
 \ split, { string string } "specializer" set-word-prop
 

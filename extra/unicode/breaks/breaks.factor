@@ -1,6 +1,6 @@
 USING: unicode.categories kernel math combinators splitting
 sequences math.parser io.files io assocs arrays namespaces
-math.ranges unicode.normalize
+math.ranges unicode.normalize unicode.syntax.backend
 unicode.syntax unicode.data compiler.units alien.syntax io.encodings.ascii ;
 IN: unicode.breaks
 
@@ -30,7 +30,7 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
     concat [ dup ] H{ } map>assoc ;
 
 : other-extend-lines ( -- lines )
-    "extra/unicode/PropList.txt" resource-path ascii file-lines ;
+    "resource:extra/unicode/PropList.txt" ascii file-lines ;
 
 VALUE: other-extend
 
@@ -104,9 +104,6 @@ VALUE: grapheme-table
 
 : string-reverse ( str -- rts )
     >graphemes reverse concat ;
-
-: unclip-last-slice ( seq -- beginning last )
-    dup 1 head-slice* swap peek ;
 
 : last-grapheme ( str -- i )
     unclip-last-slice grapheme-class swap

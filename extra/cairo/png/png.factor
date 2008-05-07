@@ -21,7 +21,7 @@ ERROR: cairo-error string ;
         { CAIRO_STATUS_FILE_NOT_FOUND [ "Cairo: file not found" cairo-error ] }
         { CAIRO_STATUS_READ_ERROR [ "Cairo: read error" cairo-error ] }
         [ drop ]
-    } cond ;
+    } case ;
 
 : <png> ( path -- png )
     normalize-path

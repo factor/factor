@@ -8,6 +8,7 @@ http.server.actions
 http.server.components
 http.server.components.code
 http.server.templating.chloe
+http.server.auth
 http.server.auth.login
 http.server.boilerplate
 http.server.validators
@@ -206,12 +207,11 @@ annotation "ANNOTATION"
 
 :: <delete-annotation-action> ( ctor next -- action )
     <action>
-        { { "id" [ v-number ] } { "aid" [ v-number ] } } >>post-params
+        { { "aid" [ v-number ] } } >>post-params
 
         [
-            "id" get "aid" get ctor call delete-tuples
-
-            "id" get next <id-redirect>
+            f "aid" get ctor call select-tuple
+            [ delete-tuples ] [ id>> next <id-redirect> ] bi
         ] >>submit ;
 
 :: <new-paste-action> ( form ctor next -- action )
@@ -236,13 +236,17 @@ annotation "ANNOTATION"
 
 TUPLE: pastebin < dispatcher ;
 
+SYMBOL: can-delete-pastes?
+
+can-delete-pastes? define-capability
+
 : <pastebin> ( -- responder )
     pastebin new-dispatcher
         <paste-list-action> "list" add-main-responder
         <feed-action> "feed.xml" add-responder
         <paste-form> [ <paste> ] <view-paste-action> "view-paste" add-responder
-                   [ <paste> ] "$pastebin/list" <delete-paste-action> <protected> "delete-paste" add-responder
-                   [ <annotation> ] "$pastebin/view-paste" <delete-annotation-action> <protected> "delete-annotation" add-responder
+        [ <paste> ] "$pastebin/list" <delete-paste-action> { can-delete-pastes? } <protected> "delete-paste" add-responder
+        [ <annotation> ] "$pastebin/view-paste" <delete-annotation-action> { can-delete-pastes? } <protected> "delete-annotation" add-responder
         <paste-form> [ <paste> ]    <view-paste-action>     "$pastebin/view-paste"   add-responder
         <new-paste-form> [ <paste> now >>date ] "$pastebin/view-paste" <new-paste-action>     "new-paste"    add-responder
         <new-annotation-form> [ <annotation> now >>date ] "$pastebin/view-paste" <annotate-action> "annotate" add-responder

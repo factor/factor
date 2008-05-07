@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors namespaces kernel io math.parser assocs classes
 words classes.tuple arrays sequences splitting mirrors
-hashtables fry combinators continuations math
-calendar.format html.elements
+hashtables fry locals combinators continuations math
+calendar.format html html.elements xml.entities
 http.server.validators ;
 IN: http.server.components
 
@@ -18,13 +18,11 @@ TUPLE: field type ;
 
 C: <field> field
 
-M: field render-view* drop write ;
+M: field render-view*
+    drop escape-string write ;
 
 M: field render-edit*
-    <input type>> =type [ =id ] [ =name ] bi =value input/> ;
-
-: render-error ( message -- )
-    <span "error" =class span> write </span> ;
+    <input type>> =type =name =value input/> ;
 
 TUPLE: hidden < field ;
 
@@ -232,7 +230,7 @@ TUPLE: text-renderer rows cols ;
     text-renderer new-text-renderer ;
 
 M: text-renderer render-view*
-    drop write ;
+    drop escape-string write ;
 
 M: text-renderer render-edit*
     <textarea
@@ -241,7 +239,7 @@ M: text-renderer render-edit*
         [ =id   ]
         [ =name ] bi
     textarea>
-        write
+        escape-string write
     </textarea> ;
 
 TUPLE: text < string ;
@@ -261,7 +259,7 @@ TUPLE: html-text-renderer < text-renderer ;
     html-text-renderer new-text-renderer ;
 
 M: html-text-renderer render-view*
-    drop write ;
+    drop escape-string write ;
 
 TUPLE: html-text < text ;
 
@@ -286,7 +284,7 @@ GENERIC: link-href ( obj -- url )
 SINGLETON: link-renderer
 
 M: link-renderer render-view*
-    drop <a dup link-href =href a> link-title write </a> ;
+    drop <a dup link-href =href a> link-title escape-string write </a> ;
 
 TUPLE: link < string ;
 
@@ -341,15 +339,19 @@ TUPLE: choice-renderer choices ;
 C: <choice-renderer> choice-renderer
 
 M: choice-renderer render-view*
-    drop write ;
+    drop escape-string write ;
+
+: render-option ( text selected? -- )
+    <option [ "true" =selected ] when option>
+        escape-string write
+    </option> ;
+
+: render-options ( options selected -- )
+    '[ dup , member? render-option ] each ;
 
 M: choice-renderer render-edit*
     <select swap =name select>
-        choices>> [
-            <option [ = [ "true" =selected ] when ] keep option>
-                write
-            </option>
-        ] with each
+        choices>> swap 1array render-options
     </select> ;
 
 TUPLE: choice < string ;
@@ -357,3 +359,43 @@ TUPLE: choice < string ;
 : <choice> ( id choices -- component )
     swap choice new-string
         swap <choice-renderer> >>renderer ;
+
+! Menu
+TUPLE: menu-renderer choices size ;
+
+: <menu-renderer> ( choices -- renderer )
+    5 menu-renderer boa ;
+
+M:: menu-renderer render-edit* ( value id renderer -- )
+    <select
+        renderer size>> [ number>string =size ] when*
+        id =name
+        "true" =multiple
+    select>
+        renderer choices>> value render-options
+    </select> ;
+
+TUPLE: menu < string ;
+
+: <menu> ( id choices -- component )
+    swap menu new-string
+        swap <menu-renderer> >>renderer ;
+
+! Checkboxes
+TUPLE: checkbox-renderer label ;
+
+C: <checkbox-renderer> checkbox-renderer
+
+M: checkbox-renderer render-edit*
+    <input
+        "checkbox" =type
+        swap =id
+        swap [ "true" =selected ] when
+    input>
+        label>> escape-string write
+    </input> ;
+
+TUPLE: checkbox < string ;
+
+: <checkbox> ( id label -- component )
+    checkbox swap <checkbox-renderer> new-component ;

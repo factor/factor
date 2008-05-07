@@ -1,10 +1,13 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors random math.parser locals
-sequences math crypto.sha2 ;
+sequences math ;
 IN: http.server.auth.providers
 
-TUPLE: user username realname password email ticket profile deleted changed? ;
+TUPLE: user
+username realname
+password salt
+email ticket capabilities profile deleted changed? ;
 
 : <user> ( username -- user )
     user new
@@ -16,9 +19,6 @@ GENERIC: get-user ( username provider -- user/f )
 GENERIC: update-user ( user provider -- )
 
 GENERIC: new-user ( user provider -- user/f )
-
-: check-login ( password username provider -- user/f )
-    get-user dup [ [ password>> = ] keep and ] [ 2drop f ] if ;
 
 ! Password recovery support
 

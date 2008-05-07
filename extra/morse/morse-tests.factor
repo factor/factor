@@ -9,3 +9,5 @@ USING: arrays morse strings tools.test ;
 [ "-- --- .-. ... . / -.-. --- -.. ." ] [ "morse code" >morse ] unit-test
 [ "morse code" ] [ "-- --- .-. ... . / -.-. --- -.. ." morse> ] unit-test
 [ "hello, world!" ] [ "Hello, World!" >morse morse> ] unit-test
+[ ] [ "sos" 0.075 play-as-morse* ] unit-test
+[ ] [ "Factor rocks!" play-as-morse ] unit-test

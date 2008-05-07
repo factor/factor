@@ -265,7 +265,7 @@ ARTICLE: "embedding-restrictions" "Embedding API restrictions"
 ARTICLE: "embedding-factor" "What embedding looks like from Factor"
 "Factor code will run inside an embedded instance in the same way it would run in a stand-alone instance."
 $nl
-"One exception is the global " { $link stdio } " stream, which is by default not bound to the terminal where the process is running, to avoid conflicting with any I/O the host process might perform. To initialize the terminal stream, " { $link init-stdio } " must be called explicitly."
+"One exception is that the global " { $link input-stream } " and " { $link output-stream } " streams are not bound by default, to avoid conflicting with any I/O the host process might perform. The " { $link init-stdio } " words must be called explicitly to initialize terminal streams."
 $nl
 "There is a word which can detect when Factor is embedded:"
 { $subsection embedded? }

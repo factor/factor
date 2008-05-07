@@ -432,3 +432,6 @@ must-fail-with
 ] must-fail
 
 [ ": foo ;" eval ] [ error>> no-current-vocab? ] must-fail-with
+
+[ 92 ] [ "CHAR: \\" eval ] unit-test
+[ 92 ] [ "CHAR: \\\\" eval ] unit-test

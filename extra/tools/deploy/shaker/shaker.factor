@@ -114,14 +114,15 @@ IN: tools.deploy.shaker
             continuations:error-continuation
             continuations:error-thread
             continuations:restarts
-            error-hook
+            listener:error-hook
             init:init-hooks
             inspector:inspector-hook
             io.thread:io-thread
             libc.private:mallocs
             source-files:source-files
-            stderr
-            stdio
+            input-stream
+            output-stream
+            error-stream
         } %
 
         deploy-threads? [
@@ -144,7 +145,7 @@ IN: tools.deploy.shaker
                 classes:class-and-cache
                 classes:class-not-cache
                 classes:class-or-cache
-                classes:class<-cache
+                classes:class<=-cache
                 classes:classes-intersect-cache
                 classes:update-map
                 command-line:main-vocab-hook

@@ -30,3 +30,5 @@ M: predicate-class reset-class
         "predicate-definition"
         "superclass"
     } reset-props ;
+
+M: predicate-class rank-class drop 1 ;

@@ -30,9 +30,8 @@ IN: io.encodings.8-bit
 } ;
 
 : encoding-file ( file-name -- stream )
-    "extra/io/encodings/8-bit/" ".TXT"
-    swapd 3append resource-path
-    ascii <file-reader> ;
+    "resource:extra/io/encodings/8-bit/" ".TXT"
+    swapd 3append ascii <file-reader> ;
 
 : tail-if ( seq n -- newseq )
     2dup swap length <= [ tail ] [ drop ] if ;

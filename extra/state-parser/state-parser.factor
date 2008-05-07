@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.streams.string kernel math namespaces sequences
-strings circular prettyprint debugger ascii ;
+strings circular prettyprint debugger ascii sbufs fry inspector
+accessors sequences.lib ;
 IN: state-parser
 
 ! * Basic underlying words
@@ -11,50 +12,56 @@ TUPLE: spot char line column next ;
 
 C: <spot> spot
 
-: get-char ( -- char ) spot get spot-char ;
-: set-char ( char -- ) spot get set-spot-char ;
-: get-line ( -- line ) spot get spot-line ;
-: set-line ( line -- ) spot get set-spot-line ;
-: get-column ( -- column ) spot get spot-column ;
-: set-column ( column -- ) spot get set-spot-column ;
-: get-next ( -- char ) spot get spot-next ;
-: set-next ( char -- ) spot get set-spot-next ;
+: get-char ( -- char ) spot get char>> ;
+: set-char ( char -- ) spot get swap >>char drop ;
+: get-line ( -- line ) spot get line>> ;
+: set-line ( line -- ) spot get swap >>line drop ;
+: get-column ( -- column ) spot get column>> ;
+: set-column ( column -- ) spot get swap >>column drop ;
+: get-next ( -- char ) spot get next>> ;
+: set-next ( char -- ) spot get swap >>next drop ;
 
 ! * Errors
 TUPLE: parsing-error line column ;
-: <parsing-error> ( -- parsing-error )
-    get-line get-column parsing-error boa ;
 
-: construct-parsing-error ( ... slots class -- error )
-    construct <parsing-error> over set-delegate ; inline
+: parsing-error ( class -- obj )
+    new
+        get-line >>line
+        get-column >>column ;
+M: parsing-error summary ( obj -- str )
+    [
+        "Parsing error" print
+        "Line: " write dup line>> .
+        "Column: " write column>> .
+    ] with-string-writer ;
 
-: parsing-error. ( parsing-error -- )
-    "Parsing error" print
-    "Line: " write dup parsing-error-line .
-    "Column: " write parsing-error-column . ;
+TUPLE: expected < parsing-error should-be was ;
+: expected ( should-be was -- * )
+    \ expected parsing-error
+        swap >>was
+        swap >>should-be throw ;
+M: expected summary ( obj -- str )
+    [
+        dup call-next-method write
+        "Token expected: " write dup should-be>> print
+        "Token present: " write was>> print
+    ] with-string-writer ;
 
-TUPLE: expected should-be was ;
-: <expected> ( should-be was -- error )
-    { set-expected-should-be set-expected-was }
-    expected construct-parsing-error ;
-M: expected error.
-    dup parsing-error.
-    "Token expected: " write dup expected-should-be print
-    "Token present: " write expected-was print ;
+TUPLE: unexpected-end < parsing-error ;
+: unexpected-end \ unexpected-end parsing-error throw ;
+M: unexpected-end summary ( obj -- str )
+    [
+        call-next-method write
+        "File unexpectedly ended." print
+    ] with-string-writer ;
 
-TUPLE: unexpected-end ;
-: <unexpected-end> ( -- unexpected-end )
-    { } unexpected-end construct-parsing-error ;
-M: unexpected-end error.
-    parsing-error.
-    "File unexpectedly ended." print ;
-
-TUPLE: missing-close ;
-: <missing-close> ( -- missing-close )
-    { } missing-close construct-parsing-error ;
-M: missing-close error.
-    parsing-error.
-    "Missing closing token." print ;
+TUPLE: missing-close < parsing-error ;
+: missing-close \ missing-close parsing-error throw ;
+M: missing-close summary ( obj -- str )
+    [
+        call-next-method write
+        "Missing closing token." print
+    ] with-string-writer ;
 
 SYMBOL: prolog-data
 
@@ -65,7 +72,8 @@ SYMBOL: prolog-data
     [ 0 get-line 1+ set-line ] [ get-column 1+ ] if
     set-column ;
 
-: (next) ( -- char ) ! this normalizes \r\n and \r
+! (next) normalizes \r\n and \r
+: (next) ( -- char )
     get-next read1
     2dup swap CHAR: \r = [
         CHAR: \n =
@@ -75,10 +83,7 @@ SYMBOL: prolog-data
 
 : next ( -- )
     #! Increment spot.
-    get-char [
-        <unexpected-end> throw
-    ] unless
-    (next) record ;
+    get-char [ unexpected-end ] unless (next) record ;
 
 : next* ( -- )
     get-char [ (next) record ] when ;
@@ -95,15 +100,29 @@ SYMBOL: prolog-data
     #! Take the substring of a string starting at spot
     #! from code until the quotation given is true and
     #! advance spot to after the substring.
-    [ [
-        dup slip swap dup [ get-char , ] unless
-    ] skip-until ] "" make nip ; inline
+    10 <sbuf> [
+        '[ @ [ t ] [ get-char , push f ] if ] skip-until
+    ] keep >string ; inline
 
 : take-rest ( -- string )
     [ f ] take-until ;
 
 : take-char ( ch -- string )
     [ dup get-char = ] take-until nip ;
+
+TUPLE: not-enough-characters < parsing-error ;
+: not-enough-characters
+    \ not-enough-characters parsing-error throw ;
+M: not-enough-characters summary ( obj -- str )
+    [
+        call-next-method write
+        "Not enough characters" print
+    ] with-string-writer ;
+
+: take ( n -- string )
+    [ 1- ] [ <sbuf> ] bi [
+        '[ drop get-char [ next , push f ] [ t ] if* ] attempt-each drop
+    ] keep get-char [ over push ] when* >string ;
 
 : pass-blank ( -- )
     #! Advance code past any whitespace, including newlines
@@ -117,24 +136,24 @@ SYMBOL: prolog-data
     dup length <circular-string>
     [ 2dup string-matches? ] take-until nip
     dup length rot length 1- - head
-    get-char [ <missing-close> throw ] unless next ;
+    get-char [ missing-close ] unless next ;
 
 : expect ( ch -- )
     get-char 2dup = [ 2drop ] [
-        >r 1string r> 1string <expected> throw
+        >r 1string r> 1string expected
     ] if next ;
 
 : expect-string ( string -- )
     dup [ drop get-char next ] map 2dup =
-    [ 2drop ] [ <expected> throw ] if ;
+    [ 2drop ] [ expected ] if ;
 
 : init-parser ( -- )
     0 1 0 f <spot> spot set
     read1 set-next next ;
 
 : state-parse ( stream quot -- )
-    ! with-stream implicitly creates a new scope which we use
-    swap [ init-parser call ] with-stream ; inline
+    ! with-input-stream implicitly creates a new scope which we use
+    swap [ init-parser call ] with-input-stream ; inline
 
 : string-parse ( input quot -- )
     >r <string-reader> r> state-parse ; inline

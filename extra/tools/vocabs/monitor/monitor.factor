@@ -13,9 +13,9 @@ IN: tools.vocabs.monitor
     dup ".factor" tail? [ parent-directory ] when ;
 
 : chop-vocab-root ( path -- path' )
-    "resource:" prepend-path (normalize-path)
+    "resource:" prepend-path normalize-path
     dup vocab-roots get
-    [ (normalize-path) ] map
+    [ normalize-path ] map
     [ head? ] with find nip
     ?head drop ;
 
@@ -29,17 +29,17 @@ IN: tools.vocabs.monitor
     reset-cache
     monitor-loop ;
 
-: add-monitor-for-path ( path -- ) 
-    normalize-path dup exists? [ t my-mailbox (monitor) ] when drop ;
-    
+: add-monitor-for-path ( path -- )
+    dup exists? [ t my-mailbox (monitor) ] when drop ;
+
 : monitor-thread ( -- )
     [
         [
             vocab-roots get prune [ add-monitor-for-path ] each
-            
+
             H{ } clone changed-vocabs set-global
             vocabs [ changed-vocab ] each
-            
+
             monitor-loop
         ] with-monitors
     ] ignore-errors ;

@@ -7,17 +7,13 @@ SYMBOL: +lt+
 SYMBOL: +eq+
 SYMBOL: +gt+
 
-GENERIC: <=> ( obj1 obj2 -- symbol )
-
-: (<=>) ( a b -- symbol )
-    2dup < [ 2drop +lt+ ] [ number= +eq+ +gt+ ? ] if ; inline
-
 : invert-comparison ( symbol -- new-symbol )
     #! Can't use case, index or nth here
     dup +lt+ eq? [ drop +gt+ ] [ +eq+ eq? +eq+ +lt+ ? ] if ;
 
-M: real <=> (<=>) ;
-M: integer <=> (<=>) ;
+GENERIC: <=> ( obj1 obj2 -- symbol )
+
+M: real <=> 2dup < [ 2drop +lt+ ] [ number= +eq+ +gt+ ? ] if ;
 
 GENERIC: before? ( obj1 obj2 -- ? )
 GENERIC: after? ( obj1 obj2 -- ? )

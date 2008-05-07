@@ -102,7 +102,7 @@ ERROR: bad-superclass class ;
     dup tuple-predicate-quot define-predicate ;
 
 : superclass-size ( class -- n )
-    superclasses 1 head-slice*
+    superclasses but-last-slice
     [ slot-names length ] map sum ;
 
 : generate-tuple-slots ( class slots -- slot-specs )
@@ -225,6 +225,8 @@ M: tuple-class reset-class
             "slots"
         } reset-props
     ] bi ;
+
+M: tuple-class rank-class drop 0 ;
 
 M: tuple clone
     (clone) dup delegate clone over set-delegate ;

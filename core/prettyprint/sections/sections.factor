@@ -15,9 +15,9 @@ SYMBOL: pprinter-stack
 SYMBOL: pprinter-in
 SYMBOL: pprinter-use
 
-TUPLE: pprinter last-newline line-count end-printing indent ;
+TUPLE: pprinter last-newline line-count indent ;
 
-: <pprinter> ( -- pprinter ) 0 1 f 0 pprinter boa ;
+: <pprinter> ( -- pprinter ) 0 1 0 pprinter boa ;
 
 : record-vocab ( word -- )
     word-vocabulary [ dup pprinter-use get set-at ] when* ;
@@ -34,7 +34,7 @@ TUPLE: pprinter last-newline line-count end-printing indent ;
     ] [
         pprinter get (>>last-newline)
         line-limit? [
-            "..." write pprinter get end-printing>> continue
+            "..." write pprinter get return
         ] when
         pprinter get [ 1+ ] change-line-count drop
         nl do-indent
@@ -275,16 +275,15 @@ M: colon unindent-first-line? drop t ;
         [
             dup style>> [
                 [
-                    >r pprinter get (>>end-printing) r>
                     short-section
-                ] curry callcc0
+                ] curry with-return
             ] with-nesting
         ] if-nonempty
     ] with-variable ;
 
 ! Long section layout algorithm
 : chop-break ( seq -- seq )
-    dup peek line-break? [ 1 head-slice* chop-break ] when ;
+    dup peek line-break? [ but-last-slice chop-break ] when ;
 
 SYMBOL: prev
 SYMBOL: next
