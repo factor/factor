@@ -10,7 +10,7 @@ SYMBOL: counter
 : server-addr "127.0.0.1" 7777 <inet4> ;
 
 : server-loop ( server -- )
-    dup accept [
+    dup accept drop [
         [
             read1 CHAR: x = [
                 "server" get dispose
