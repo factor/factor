@@ -45,6 +45,8 @@ M: object stream-read-quot
 
 SYMBOL: error-hook
 
+[ print-error-and-restarts ] error-hook set-global
+
 : listen ( -- )
     listener-hook get call prompt.
     [ read-quot [ [ error-hook get call ] recover ] [ bye ] if* ]
