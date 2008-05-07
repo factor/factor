@@ -78,7 +78,7 @@ INSTANCE: rollover immutable-sequence
     frequency-analysis sort-values keys peek ;
 
 : crack-key ( seq key-length -- key )
-    [ " " decrypt ] dip group butlast-slice
+    [ " " decrypt ] dip group but-last-slice
     flip [ most-frequent ] map ;
 
 PRIVATE>

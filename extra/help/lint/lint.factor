@@ -10,7 +10,7 @@ IN: help.lint
 
 : check-example ( element -- )
     rest [
-        butlast "\n" join 1vector
+        but-last "\n" join 1vector
         [
             use [ clone ] change
             [ eval>string ] with-datastack

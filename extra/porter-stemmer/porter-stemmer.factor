@@ -93,7 +93,7 @@ USING: kernel math parser sequences combinators splitting ;
         { [ "iz" ?tail ] [ "ize" append ] }
         {
             [ dup length 1- over double-consonant? ]
-            [ dup "lsz" last-is? [ butlast-slice ] unless ]
+            [ dup "lsz" last-is? [ but-last-slice ] unless ]
         }
         {
             [ t ]
@@ -120,7 +120,7 @@ USING: kernel math parser sequences combinators splitting ;
     } cond ;
 
 : step1c ( str -- newstr )
-    dup butlast-slice stem-vowel? [
+    dup but-last-slice stem-vowel? [
         "y" ?tail [ "i" append ] when
     ] when ;
 
@@ -196,18 +196,18 @@ USING: kernel math parser sequences combinators splitting ;
 : remove-e? ( str -- ? )
     dup consonant-seq dup 1 >
     [ 2drop t ]
-    [ 1 = [ butlast-slice cvc? not ] [ drop f ] if ] if ;
+    [ 1 = [ but-last-slice cvc? not ] [ drop f ] if ] if ;
 
 : remove-e ( str -- newstr )
     dup peek CHAR: e = [
-        dup remove-e? [ butlast-slice ] when
+        dup remove-e? [ but-last-slice ] when
     ] when ;
 
 : ll->l ( str -- newstr )
     {
         { [ dup peek CHAR: l = not ] [ ] }
         { [ dup length 1- over double-consonant? not ] [ ] }
-        { [ dup consonant-seq 1 > ] [ butlast-slice ] }
+        { [ dup consonant-seq 1 > ] [ but-last-slice ] }
         [ ]
     } cond ;
 

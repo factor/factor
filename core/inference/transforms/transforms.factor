@@ -32,7 +32,7 @@ IN: inference.transforms
         drop [ no-case ]
     ] [
         dup peek quotation? [
-            dup peek swap butlast
+            dup peek swap but-last
         ] [
             [ no-case ] swap
         ] if case>quot

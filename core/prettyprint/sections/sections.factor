@@ -284,7 +284,7 @@ M: colon unindent-first-line? drop t ;
 
 ! Long section layout algorithm
 : chop-break ( seq -- seq )
-    dup peek line-break? [ butlast-slice chop-break ] when ;
+    dup peek line-break? [ but-last-slice chop-break ] when ;
 
 SYMBOL: prev
 SYMBOL: next
