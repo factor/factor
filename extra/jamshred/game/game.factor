@@ -1,7 +1,6 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel opengl arrays sequences jamshred.tunnel
-jamshred.player math.vectors ;
+USING: accessors kernel opengl arrays sequences jamshred.log jamshred.player jamshred.tunnel math.vectors ;
 IN: jamshred.game
 
 TUPLE: jamshred tunnel players running ;
@@ -12,15 +11,15 @@ TUPLE: jamshred tunnel players running ;
 
 : jamshred-player ( jamshred -- player )
     ! TODO: support more than one player
-    jamshred-players first ;
+    players>> first ;
 
 : jamshred-update ( jamshred -- )
-    dup jamshred-running [
+    dup running>> [
         jamshred-player update-player
     ] [ drop ] if ;
 
 : toggle-running ( jamshred -- )
-    dup jamshred-running not swap set-jamshred-running ;
+    [ running>> not ] [ (>>running) ] bi ;
 
 : mouse-moved ( x-radians y-radians jamshred -- )
     jamshred-player -rot turn-player ;

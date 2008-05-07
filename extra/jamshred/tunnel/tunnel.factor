@@ -1,23 +1,20 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays float-arrays kernel jamshred.oint math math.functions
-math.ranges math.vectors math.constants random sequences vectors ;
+USING: accessors arrays float-arrays kernel jamshred.oint locals math math.functions math.constants math.matrices math.order math.ranges math.vectors random sequences vectors ;
 IN: jamshred.tunnel
 
 : n-segments ( -- n ) 5000 ; inline
 
-TUPLE: segment number color radius ;
-
-: <segment> ( number color radius location forward up left -- segment )
-    <oint> >r segment boa r> over set-delegate ;
+TUPLE: segment < oint number color radius ;
+C: <segment> segment
 
 : segment-vertex ( theta segment -- vertex )
-     tuck 2dup oint-up swap sin v*n
-     >r oint-left swap cos v*n r> v+
-     swap oint-location v+ ;
+     tuck 2dup up>> swap sin v*n
+     >r left>> swap cos v*n r> v+
+     swap location>> v+ ;
 
 : segment-vertex-normal ( vertex segment -- normal )
-    oint-location swap v- normalize ;
+    location>> swap v- normalize ;
 
 : segment-vertex-and-normal ( segment theta -- vertex normal )
     swap [ segment-vertex ] keep dupd segment-vertex-normal ;
@@ -50,15 +47,15 @@ TUPLE: segment number color radius ;
 : default-segment-radius ( -- r ) 1 ;
 
 : initial-segment ( -- segment )
-    0 random-color default-segment-radius
-    F{ 0 0 0 } F{ 0 0 -1 } F{ 0 1 0 } F{ -1 0 0 } <segment> ;
+        F{ 0 0 0 } F{ 0 0 -1 } F{ 0 1 0 } F{ -1 0 0 }
+        0 random-color default-segment-radius <segment> ;
 
 : random-segments ( n -- segments )
     initial-segment 1vector swap (random-segments) ;
 
 : simple-segment ( n -- segment )
-    random-color default-segment-radius pick F{ 0 0 -1 } n*v
-    F{ 0 0 -1 } F{ 0 1 0 } F{ -1 0 0 } <segment> ;
+    [ F{ 0 0 -1 } n*v F{ 0 0 -1 } F{ 0 1 0 } F{ -1 0 0 } ] keep
+    random-color default-segment-radius <segment> ;
 
 : simple-segments ( n -- segments )
     [ simple-segment ] map ;
@@ -111,3 +108,60 @@ TUPLE: segment number color radius ;
 
 : fraction-from-wall ( oint segment -- fraction )
     fraction-from-centre 1 swap - ;
+
+: sideways-heading ( oint segment -- v )
+    [ forward>> ] bi@ proj-perp ;
+
+! : facing-nearest-wall? ( oint segment -- ? )
+!     [ [ location>> ] bi@ distance ]
+!     [ sideways-heading ]
+!     [ [ location>> ] bi@ [ v+ ] dip distance ] tri < ;
+
+! : distance-to-collision ( oint segment -- distance )
+! ! TODO: this isn't right. If oint is facing away from the wall then it should return a much bigger distance...
+!     #! distance on the oint's heading to the segment wall
+!     facing-nearest-wall? [
+!         [ sideways-heading norm ]
+!         [ distance-from-wall ] 2bi swap /
+!     ] [
+!     ] if ;
+
+:: (collision-coefficient) ( -2b sqrt(b^2-2ac) 2a -- c )
+    -2b sqrt(b^2-2ac) + 2a /
+    -2b sqrt(b^2-2ac) - 2a / max ; ! the -ve answer is behind us (I think..)
+
+:: collision-coefficient ( v w -- c )
+    [let* | a [ v dup v. ]
+            b [ v w v. 2 * ]
+            c [ w dup v. v dup v. - ] |
+        b -2 * b sq a c * 2 * - sqrt a 2 * (collision-coefficient) ] ;
+
+: distance-to-collision ( oint segment -- distance )
+    [ sideways-heading ] [ [ location>> ] bi@ v- collision-coefficient ]
+    [ drop forward>> n*v norm ] 2tri ;
+
+:: (wall-normal) ( seg loc -- n )
+    [let* | back [ loc seg location>> v- ]
+           back-proj [ back seg forward>> proj ]
+           perp-point [ loc back-proj v- ] |
+        perp-point seg location>> v- normalize ] ;
+
+: wall-normal ( segment oint -- n )
+    location>> (wall-normal) ;
+
+: bounce-forward ( segment oint -- )
+    [ wall-normal ] [ swap reflect ] [ (>>forward) ] tri ;
+
+: bounce-up ( oint segment -- )
+    2drop ; ! TODO
+
+: bounce-left ( oint segment -- )
+    2drop ; ! TODO
+
+! : bounce ( oint segment -- )
+!     [ swap bounce-forward ]
+!     [ bounce-up ]
+!     [ bounce-left ] 2tri ;
+
+: bounce ( oint segment -- )
+    drop 0.01 left-pivot ; ! just temporary
