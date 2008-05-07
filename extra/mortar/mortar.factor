@@ -122,7 +122,7 @@ over class-class-methods assoc-stack call ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : send-message-next ( object message -- )
-over object-class class-methods 1 head* assoc-stack call ;
+over object-class class-methods butlast assoc-stack call ;
 
 : <-~ scan parsed \ send-message-next parsed ; parsing
 

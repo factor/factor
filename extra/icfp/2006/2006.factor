@@ -148,4 +148,4 @@ SYMBOL: open-arrays
     init f exec-loop ;
 
 : run-sand ( -- )
-    "extra/icfp/2006/sandmark.umz" resource-path run-prog ;
+    "resource:extra/icfp/2006/sandmark.umz" run-prog ;

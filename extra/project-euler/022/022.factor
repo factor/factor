@@ -28,7 +28,7 @@ IN: project-euler.022
 <PRIVATE
 
 : source-022 ( -- seq )
-    "extra/project-euler/022/names.txt" resource-path
+    "resource:extra/project-euler/022/names.txt"
     ascii file-contents [ quotable? ] filter "," split ;
 
 : name-scores ( seq -- seq )

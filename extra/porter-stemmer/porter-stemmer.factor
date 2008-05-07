@@ -66,8 +66,6 @@ USING: kernel math parser sequences combinators splitting ;
 : r ( str oldsuffix newsuffix -- str )
     pick consonant-seq 0 > [ nip ] [ drop ] if append ;
 
-: butlast ( seq -- seq ) 1 head-slice* ;
-
 : step1a ( str -- newstr )
     dup peek CHAR: s = [
         {
@@ -95,7 +93,7 @@ USING: kernel math parser sequences combinators splitting ;
         { [ "iz" ?tail ] [ "ize" append ] }
         {
             [ dup length 1- over double-consonant? ]
-            [ dup "lsz" last-is? [ butlast ] unless ]
+            [ dup "lsz" last-is? [ butlast-slice ] unless ]
         }
         {
             [ t ]
@@ -122,7 +120,7 @@ USING: kernel math parser sequences combinators splitting ;
     } cond ;
 
 : step1c ( str -- newstr )
-    dup butlast stem-vowel? [
+    dup butlast-slice stem-vowel? [
         "y" ?tail [ "i" append ] when
     ] when ;
 
@@ -198,18 +196,18 @@ USING: kernel math parser sequences combinators splitting ;
 : remove-e? ( str -- ? )
     dup consonant-seq dup 1 >
     [ 2drop t ]
-    [ 1 = [ butlast cvc? not ] [ drop f ] if ] if ;
+    [ 1 = [ butlast-slice cvc? not ] [ drop f ] if ] if ;
 
 : remove-e ( str -- newstr )
     dup peek CHAR: e = [
-        dup remove-e? [ butlast ] when
+        dup remove-e? [ butlast-slice ] when
     ] when ;
 
 : ll->l ( str -- newstr )
     {
         { [ dup peek CHAR: l = not ] [ ] }
         { [ dup length 1- over double-consonant? not ] [ ] }
-        { [ dup consonant-seq 1 > ] [ butlast ] }
+        { [ dup consonant-seq 1 > ] [ butlast-slice ] }
         [ ]
     } cond ;
 

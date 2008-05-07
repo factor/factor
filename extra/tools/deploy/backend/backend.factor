@@ -63,11 +63,11 @@ DEFER: ?make-staging-image
         dup empty? [
             "-i=" my-boot-image-name append ,
         ] [
-            dup 1 head* ?make-staging-image
+            dup butlast ?make-staging-image
 
             "-resource-path=" "" resource-path append ,
 
-            "-i=" over 1 head* staging-image-name append ,
+            "-i=" over butlast staging-image-name append ,
 
             "-run=tools.deploy.restage" ,
         ] if
