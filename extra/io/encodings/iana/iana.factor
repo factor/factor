@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel strings unicode.syntax.backend io.files assocs
-splitting sequences io namespaces sets
-io.encodings.ascii io.encodings.utf8 io.encodings.utf16 io.encodings.8-bit ;
+USING: kernel strings values io.files assocs
+splitting sequences io namespaces sets io.encodings.8-bit
+io.encodings.ascii io.encodings.utf8 io.encodings.utf16  ;
 IN: io.encodings.iana
 
 <PRIVATE
