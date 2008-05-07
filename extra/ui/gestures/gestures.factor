@@ -111,7 +111,8 @@ SYMBOL: double-click-timeout
     ] if ;
 
 : drag-gesture ( -- )
-    hand-buttons get-global first <drag> button-gesture ;
+    hand-buttons get-global
+    dup empty? [ drop ] [ first <drag> button-gesture ] if ;
 
 SYMBOL: drag-timer
 
