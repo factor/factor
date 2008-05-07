@@ -8,6 +8,8 @@ tools.test kernel calendar parser accessors ;
 [
     [ ] [ <pane> <pane-stream> <interactor> "interactor" set ] unit-test
 
+    [ ] [ "interactor" get register-self ] unit-test
+
     [ ] [ "[ 1 2 3" "interactor" get set-editor-string ] unit-test
 
     [ ] [ <promise> "promise" set ] unit-test

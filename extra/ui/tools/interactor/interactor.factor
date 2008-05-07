@@ -14,7 +14,9 @@ IN: ui.tools.interactor
 TUPLE: interactor output history flag mailbox thread waiting help ;
 
 : register-self ( interactor -- )
-    self >>thread drop ;
+    <mailbox> >>mailbox
+    self >>thread
+    drop ;
 
 : interactor-continuation ( interactor -- continuation )
     thread>> continuation>> value>> ;
@@ -40,7 +42,6 @@ TUPLE: interactor output history flag mailbox thread waiting help ;
     interactor construct-editor
         V{ } clone >>history
         <flag> >>flag
-        <mailbox> >>mailbox
         dup <help-model> >>help
         swap >>output ;
 
