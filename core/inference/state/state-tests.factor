@@ -1,6 +1,10 @@
 IN: inference.state.tests
 USING: tools.test inference.state words ;
 
+: computing-dependencies ( quot -- dependencies )
+    H{ } clone [ dependencies rot with-variable ] keep ;
+    inline
+
 SYMBOL: a
 SYMBOL: b
 
