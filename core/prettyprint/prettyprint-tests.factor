@@ -114,7 +114,7 @@ unit-test
             [ parse-fresh drop ] with-compilation-unit
             [
                 "prettyprint.tests" lookup see
-            ] with-string-writer "\n" split butlast
+            ] with-string-writer "\n" split but-last
         ] keep =
     ] with-scope ;
 

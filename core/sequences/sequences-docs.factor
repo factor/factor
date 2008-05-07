@@ -92,7 +92,7 @@ ARTICLE: "sequences-slices" "Subsequences and slices"
 { $subsection subseq }
 { $subsection head }
 { $subsection tail }
-{ $subsection butlast }
+{ $subsection but-last }
 { $subsection rest }
 { $subsection head* }
 { $subsection tail* }
@@ -107,7 +107,7 @@ ARTICLE: "sequences-slices" "Subsequences and slices"
 { $subsection <slice> }
 { $subsection head-slice }
 { $subsection tail-slice }
-{ $subsection butlast-slice }
+{ $subsection but-last-slice }
 { $subsection rest-slice }
 { $subsection head-slice* }
 { $subsection tail-slice* }
@@ -838,7 +838,7 @@ HELP: tail-slice
 { $description "Outputs a virtual sequence sharing storage with all elements from the " { $snippet "n" } "th index until the end of the input sequence." }
 { $errors "Throws an error if the index is out of bounds." } ;
 
-HELP: butlast-slice
+HELP: but-last-slice
 { $values { "seq" sequence } { "slice" "a slice" } }
 { $description "Outputs a virtual sequence sharing storage with all but the last element of the input sequence." }
 { $errors "Throws an error on an empty sequence." } ;
@@ -869,7 +869,7 @@ HELP: tail
 { $description "Outputs a new sequence consisting of the input sequence with the first n items removed." }
 { $errors "Throws an error if the index is out of bounds." } ;
 
-HELP: butlast
+HELP: but-last
 { $values { "seq" sequence } { "headseq" "a new sequence" } }
 { $description "Outputs a new sequence consisting of the input sequence with the last item removed." }
 { $errors "Throws an error on an empty sequence." } ;

@@ -102,7 +102,7 @@ ERROR: bad-superclass class ;
     dup tuple-predicate-quot define-predicate ;
 
 : superclass-size ( class -- n )
-    superclasses butlast-slice
+    superclasses but-last-slice
     [ slot-names length ] map sum ;
 
 : generate-tuple-slots ( class slots -- slot-specs )

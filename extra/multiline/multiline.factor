@@ -14,7 +14,7 @@ IN: multiline
     ] [ ";" unexpected-eof ] if* ;
 
 : parse-here ( -- str )
-    [ (parse-here) ] "" make butlast
+    [ (parse-here) ] "" make but-last
     lexer get next-line ;
 
 : STRING:
@@ -34,7 +34,7 @@ IN: multiline
     [
         lexer get lexer-column swap (parse-multiline-string)
         lexer get set-lexer-column
-    ] "" make rest butlast ;
+    ] "" make rest but-last ;
 
 : <"
     "\">" parse-multiline-string parsed ; parsing

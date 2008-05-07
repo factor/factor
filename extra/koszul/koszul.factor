@@ -184,7 +184,7 @@ DEFER: (d)
     [ length ] keep [ (graded-ker/im-d) ] curry map ;
 
 : graded-betti ( generators -- seq )
-    basis graded graded-ker/im-d flip first2 butlast 0 prefix v- ;
+    basis graded graded-ker/im-d flip first2 but-last 0 prefix v- ;
 
 ! Bi-graded for two-step complexes
 : (bigraded-ker/im-d) ( u-deg z-deg bigraded-basis -- null/rank )

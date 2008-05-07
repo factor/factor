@@ -7,7 +7,7 @@ IN: tuple-syntax
 
 : parse-slot-writer ( tuple -- slot# )
     scan dup "}" = [ 2drop f ] [
-        butlast swap object-slots slot-named slot-spec-offset
+        but-last swap object-slots slot-named slot-spec-offset
     ] if ;
 
 : parse-slots ( accum tuple -- accum tuple )

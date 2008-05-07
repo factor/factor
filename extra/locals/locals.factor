@@ -101,7 +101,7 @@ UNION: special local quote local-word local-reader local-writer ;
     ] if ;
 
 : point-free-body ( quot args -- newquot )
-    >r butlast-slice r> [ localize ] curry map concat ;
+    >r but-last-slice r> [ localize ] curry map concat ;
 
 : point-free-end ( quot args -- newquot )
     over peek special?
