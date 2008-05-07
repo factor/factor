@@ -92,10 +92,11 @@ ARTICLE: "sequences-slices" "Subsequences and slices"
 { $subsection subseq }
 { $subsection head }
 { $subsection tail }
-{ $subsection but-last }
-{ $subsection rest }
 { $subsection head* }
 { $subsection tail* }
+"Removing the first or last element:"
+{ $subsection rest }
+{ $subsection but-last }
 "Taking a sequence apart into a head and a tail:"
 { $subsection unclip }
 { $subsection cut }
