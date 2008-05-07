@@ -213,6 +213,7 @@ GENERIC: error-in-thread ( error thread -- )
     initial-thread global
     [ drop f "Initial" <thread> ] cache
     <box> >>continuation
+    t >>runnable
     f >>state
     dup register-thread
     set-self ;
