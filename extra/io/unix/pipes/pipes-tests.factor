@@ -9,6 +9,7 @@ IN: io.unix.pipes.tests
         "ls"
         [
             input-stream [ utf8 <decoder> ] change
+            output-stream [ utf8 <encoder> ] change
             input-stream get lines reverse [ print ] each f
         ]
         "grep x"
