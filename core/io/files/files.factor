@@ -25,13 +25,13 @@ HOOK: (file-appender) io-backend ( path -- stream )
     <file-reader> lines ;
 
 : with-file-reader ( path encoding quot -- )
-    >r <file-reader> r> with-stream ; inline
+    >r <file-reader> r> with-input-stream ; inline
 
 : file-contents ( path encoding -- str )
     <file-reader> contents ;
 
 : with-file-writer ( path encoding quot -- )
-    >r <file-writer> r> with-stream ; inline
+    >r <file-writer> r> with-output-stream ; inline
 
 : set-file-lines ( seq path encoding -- )
     [ [ print ] each ] with-file-writer ;
@@ -40,7 +40,7 @@ HOOK: (file-appender) io-backend ( path -- stream )
     [ write ] with-file-writer ;
 
 : with-file-appender ( path encoding quot -- )
-    >r <file-appender> r> with-stream ; inline
+    >r <file-appender> r> with-output-stream ; inline
 
 ! Pathnames
 : path-separator? ( ch -- ? ) os windows? "/\\" "/" ? member? ;

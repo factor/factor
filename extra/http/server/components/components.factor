@@ -3,7 +3,7 @@
 USING: accessors namespaces kernel io math.parser assocs classes
 words classes.tuple arrays sequences splitting mirrors
 hashtables fry locals combinators continuations math
-calendar.format html.elements xml.entities
+calendar.format html html.elements xml.entities
 http.server.validators ;
 IN: http.server.components
 
@@ -23,9 +23,6 @@ M: field render-view*
 
 M: field render-edit*
     <input type>> =type =name =value input/> ;
-
-: render-error ( message -- )
-    <span "error" =class span> escape-string write </span> ;
 
 TUPLE: hidden < field ;
 

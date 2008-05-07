@@ -24,7 +24,7 @@ TAGS>
     ] keep ;
 
 : load-catalog ( -- modes )
-    "extra/xmode/modes/catalog" resource-path
+    "resource:extra/xmode/modes/catalog"
     file>xml parse-modes-tag ;
 
 : modes ( -- assoc )
@@ -38,8 +38,8 @@ TAGS>
 MEMO: (load-mode) ( name -- rule-sets )
     modes at [
         mode-file
-        "extra/xmode/modes/" prepend
-        resource-path utf8 <file-reader> parse-mode
+        "resource:extra/xmode/modes/" prepend
+        utf8 <file-reader> parse-mode
     ] [
         "text" (load-mode)
     ] if* ;

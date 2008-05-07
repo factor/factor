@@ -29,7 +29,7 @@
 			<key>begin</key>
 			<string>&lt;%\s</string>
 			<key>end</key>
-			<string>\s%&gt;</string>
+			<string>(?&lt;=\s)%&gt;</string>
 			<key>name</key>
 			<string>source.factor.embedded.html</string>
 			<key>patterns</key>

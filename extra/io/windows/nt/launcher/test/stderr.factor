@@ -2,4 +2,4 @@ USE: io
 USE: namespaces
 
 "output" write flush
-"error" stderr get stream-write stderr get stream-flush
+"error" error-stream get stream-write error-stream get stream-flush

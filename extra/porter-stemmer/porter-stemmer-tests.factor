@@ -56,11 +56,9 @@ io.files io.encodings.utf8 ;
 [ "hell" ] [ "hell" step5 "" like ] unit-test
 [ "mate" ] [ "mate" step5 "" like ] unit-test
 
-: resource-lines resource-path utf8 file-lines ;
-
 [ { } ] [
-    "extra/porter-stemmer/test/voc.txt" resource-lines
+    "resource:extra/porter-stemmer/test/voc.txt" utf8 file-lines
     [ stem ] map
-    "extra/porter-stemmer/test/output.txt" resource-lines
+    "resource:extra/porter-stemmer/test/output.txt" utf8 file-lines
     [ 2array ] 2map [ first2 = not ] filter
 ] unit-test

@@ -1,8 +1,8 @@
-USING: checksums ;
+USING: checksums kernel ;
 IN: checksums.null
 
 SINGLETON: null
 
 INSTANCE: null checksum
 
-M: null checksum-bytes ;
+M: null checksum-bytes drop ;

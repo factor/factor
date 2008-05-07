@@ -1,6 +1,7 @@
 USING: io.files io.sockets io kernel threads
 namespaces tools.test continuations strings byte-arrays
-sequences prettyprint system io.encodings.binary io.encodings.ascii ;
+sequences prettyprint system io.encodings.binary io.encodings.ascii
+io.streams.duplex ;
 IN: io.unix.tests
 
 ! Unix domain stream sockets
@@ -24,12 +25,11 @@ yield
 
 [ { "Hello world" "FOO" } ] [
     [
-        socket-server <local> ascii <client>
-        [
+        socket-server <local> ascii [
             readln ,
             "XYZ" print flush
             readln ,
-        ] with-stream
+        ] with-client
     ] { } make
 ] unit-test
 
@@ -125,16 +125,16 @@ datagram-client delete-file
 ! Invalid parameter tests
 
 [
-    image binary [ stdio get accept ] with-file-reader
+    image binary [ input-stream get accept ] with-file-reader
 ] must-fail
 
 [
-    image binary [ stdio get receive ] with-file-reader
+    image binary [ input-stream get receive ] with-file-reader
 ] must-fail
 
 [
     image binary [
         B{ 1 2 } datagram-server <local>
-        stdio get send
+        input-stream get send
     ] with-file-reader
 ] must-fail

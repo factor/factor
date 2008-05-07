@@ -11,7 +11,7 @@ help.stylesheet splitting tools.test.ui models math inspector ;
 [ ] [ #children "num-children" set ] unit-test
 
 [ ] [
-    "pane" get <pane-stream> [ 10000 [ . ] each ] with-stream*
+    "pane" get <pane-stream> [ 10000 [ . ] each ] with-output-stream*
 ] unit-test
 
 [ t ] [ #children "num-children" get = ] unit-test

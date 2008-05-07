@@ -4,9 +4,7 @@
 
 	<t:title>Edit User</t:title>
 
-	<t:form t:action="$user-admin/edit">
-
-	<t:edit t:component="username" />
+	<t:form t:action="$user-admin/edit" t:for="username">
 
 	<table>
 	
@@ -49,17 +47,10 @@
 	
 	<p>
 		<button type="submit" class="link-button link">Update</button>
-
-		<t:if t:var="http.server.auth.login:password-mismatch?">
-			<t:error>passwords do not match</t:error>
-		</t:if>
+		<t:validation-message />
 	</p>
 
 	</t:form>
 
-	<t:form t:action="$user-admin/delete">
-		<t:edit t:component="username" />
-
-		<button type="submit" class="link-button link">Delete</button>
-	</t:form>
+	<t:button t:action="$user-admin/delete" t:for="username" class="link-button link">Delete</t:button>
 </t:chloe>

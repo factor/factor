@@ -65,7 +65,7 @@ TUPLE: tangle-dispatcher < dispatcher tangle ;
 : <tangle-dispatcher> ( tangle -- dispatcher )
     tangle-dispatcher new-dispatcher swap >>tangle
     <path-responder> >>default
-    "extra/tangle/resources" resource-path <static> "resources" add-responder
+    "resource:extra/tangle/resources" <static> "resources" add-responder
     <node-responder> "node" add-responder
     <action> [ all-node-ids <json-response> ] >>display "all" add-responder ;
 

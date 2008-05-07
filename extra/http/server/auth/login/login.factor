@@ -30,8 +30,6 @@ http.server.validators ;
 IN: http.server.auth.login
 QUALIFIED: smtp
 
-SYMBOL: login-failed?
-
 TUPLE: login < dispatcher users checksum ;
 
 : users ( -- provider )
@@ -82,6 +80,8 @@ M: user-saver dispose
     username>> set-uid
     "$login" end-flow ;
 
+: login-failed "invalid username or password" validation-failed-with ;
+
 :: <login-action> ( -- action )
     [let | form [ <login-form> ] |
         <action>
@@ -94,12 +94,8 @@ M: user-saver dispose
 
                 form validate-form
 
-                "password" value "username" value check-login [
-                    successful-login
-                ] [
-                    login-failed? on
-                    validation-failed
-                ] if*
+                "password" value "username" value check-login
+                [ successful-login ] [ login-failed ] if*
             ] >>submit
     ] ;
 
@@ -121,14 +117,13 @@ M: user-saver dispose
         "email" <email> add-field
         "captcha" <captcha> add-field ;
 
-SYMBOL: password-mismatch?
-SYMBOL: user-exists?
+: password-mismatch "passwords do not match" validation-failed-with ;
+
+: user-exists "username taken" validation-failed-with ;
 
 : same-password-twice ( -- )
-    "new-password" value "verify-password" value = [ 
-        password-mismatch? on
-        validation-failed
-    ] unless ;
+    "new-password" value "verify-password" value =
+    [ password-mismatch ] unless ;
 
 :: <register-action> ( -- action )
     [let | form [ <register-form> ] |
@@ -150,10 +145,7 @@ SYMBOL: user-exists?
                     "email" value >>email
                     H{ } clone >>profile
 
-                users new-user [
-                    user-exists? on
-                    validation-failed
-                ] unless*
+                users new-user [ user-exists ] unless*
 
                 successful-login
 
@@ -201,7 +193,7 @@ SYMBOL: user-exists?
                     same-password-twice
 
                     "password" value uid check-login
-                    [ login-failed? on validation-failed ] unless
+                    [ login-failed ] unless
 
                     "new-password" value >>encoded-password
                 ] unless

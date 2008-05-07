@@ -404,7 +404,7 @@ M: quotation '
     [
         {
             dictionary source-files builtins
-            update-map class<=-cache class<=>-cache
+            update-map class<=-cache
             class-not-cache classes-intersect-cache class-and-cache
             class-or-cache
         } [ dup get swap bootstrap-word set ] each
@@ -475,7 +475,7 @@ M: quotation '
     "Writing image to " write
     architecture get boot-image-name resource-path
     [ write "..." print flush ]
-    [ binary <file-writer> [ (write-image) ] with-stream ] bi ;
+    [ binary [ (write-image) ] with-file-writer ] bi ;
 
 PRIVATE>
 

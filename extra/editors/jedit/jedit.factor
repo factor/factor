@@ -25,11 +25,11 @@ IN: editors.jedit
     ] with-byte-writer ;
 
 : send-jedit-request ( request -- )
-    jedit-server-info "localhost" rot <inet> binary <client> [
+    jedit-server-info "localhost" rot <inet> binary [
         4 >be write
         dup length 2 >be write
         write
-    ] with-stream ;
+    ] with-client ;
 
 : jedit-location ( file line -- )
     number>string "+line:" prepend 2array

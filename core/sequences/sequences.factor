@@ -216,6 +216,8 @@ M: slice length dup slice-to swap slice-from - ;
 
 : tail-slice* ( seq n -- slice ) from-end tail-slice ;
 
+: but-last-slice ( seq -- slice ) 1 head-slice* ;
+
 INSTANCE: slice virtual-sequence
 
 ! One element repeated many times
@@ -262,6 +264,8 @@ PRIVATE>
 : head* ( seq n -- headseq ) from-end head ;
 
 : tail* ( seq n -- tailseq ) from-end tail ;
+
+: but-last ( seq -- headseq ) 1 head* ;
 
 : copy ( src i dst -- )
     pick length >r 3dup check-copy spin 0 r>
@@ -670,8 +674,14 @@ PRIVATE>
 : unclip ( seq -- rest first )
     [ rest ] [ first ] bi ;
 
+: unclip-last ( seq -- butfirst last )
+    [ but-last ] [ peek ] bi ;
+
 : unclip-slice ( seq -- rest first )
     [ rest-slice ] [ first ] bi ;
+
+: unclip-last-slice ( seq -- butfirst last )
+    [ but-last-slice ] [ peek ] bi ;
 
 : <flat-slice> ( seq -- slice )
     dup slice? [ { } like ] when 0 over length rot <slice> ;

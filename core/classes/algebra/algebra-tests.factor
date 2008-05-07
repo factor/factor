@@ -248,7 +248,16 @@ UNION: yyy xxx ;
 [ { yyy xxx } ] [ { xxx yyy } sort-classes ] unit-test
 [ { yyy xxx } ] [ { yyy xxx } sort-classes ] unit-test
 
-[ { number integer ratio } ] [ { ratio number integer } sort-classes ] unit-test
+[ { number ratio integer } ] [ { ratio number integer } sort-classes ] unit-test
 [ { sequence number ratio } ] [ { ratio number sequence } sort-classes ] unit-test
 
-[ +lt+ ] [ \ real sequence class<=> ] unit-test
+TUPLE: xa ;
+TUPLE: xb ;
+TUPLE: xc < xa ;
+TUPLE: xd < xb ;
+TUPLE: xe ;
+TUPLE: xf < xb ;
+TUPLE: xg < xb ;
+TUPLE: xh < xb ;
+
+[ t ] [ { xa xb xc xd xe xf xg xh } sort-classes dup sort-classes = ] unit-test

@@ -2,35 +2,35 @@ USING: io.files io.streams.string io
 tools.test kernel io.encodings.ascii ;
 IN: io.streams.encodings.tests
 
-: <resource-reader> ( resource -- stream )
-    resource-path ascii <file-reader> ;
-    
 [ { } ]
-[ "core/io/test/empty-file.txt" <resource-reader> lines ]
+[ "resource:core/io/test/empty-file.txt" ascii <file-reader> lines ]
 unit-test
 
 : lines-test ( stream -- line1 line2 )
-    [ readln readln ] with-stream ;
+    [ readln readln ] with-input-stream ;
 
 [
     "This is a line."
     "This is another line."
 ] [
-    "core/io/test/windows-eol.txt" <resource-reader> lines-test
+    "resource:core/io/test/windows-eol.txt"
+    ascii <file-reader> lines-test
 ] unit-test
 
 [
     "This is a line."
     "This is another line."
 ] [
-    "core/io/test/mac-os-eol.txt" <resource-reader> lines-test
+    "resource:core/io/test/mac-os-eol.txt"
+    ascii <file-reader> lines-test
 ] unit-test
 
 [
     "This is a line."
     "This is another line."
 ] [
-    "core/io/test/unix-eol.txt" <resource-reader> lines-test
+    "resource:core/io/test/unix-eol.txt"
+    ascii <file-reader> lines-test
 ] unit-test
 
 [
