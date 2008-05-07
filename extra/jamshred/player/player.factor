@@ -27,7 +27,6 @@ TUPLE: player < oint name tunnel nearest-segment last-move ;
 
 : player-speed ( player -- speed )
     drop max-speed ;
-    ! dup nearest-segment>> fraction-from-wall sq max-speed * ;
 
 : distance-to-move ( player -- distance )
     [ player-speed ] [ last-move>> millis dup >r swap - 1000 / * r> ]
@@ -35,14 +34,9 @@ TUPLE: player < oint name tunnel nearest-segment last-move ;
 
 DEFER: (move-player)
 
-USE: morse
 : ?bounce ( distance-remaining player -- )
     over 0 > [
-        "e" play-as-morse
-        [ dup nearest-segment>> bounce ]
-        ! [ (move-player) ] ! uncomment when bounce works...
-        [ 2drop ]
-        bi
+        [ dup nearest-segment>> bounce ] [ (move-player) ] bi
     ] [
         2drop
     ] if ;
@@ -50,14 +44,11 @@ USE: morse
 : move-player-distance ( distance-remaining player distance -- distance-remaining player )
     pick min tuck over go-forward [ - ] dip ;
 
-USE: prettyprint
-USE: io.streams.string
 : (move-player) ( distance-remaining player -- )
     over 0 <= [
         2drop
     ] [
         dup dup nearest-segment>> distance-to-collision
-        [ dup . ] with-string-writer jamshred-log
         move-player-distance ?bounce
     ] if ;
 

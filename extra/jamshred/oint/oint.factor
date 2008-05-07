@@ -9,6 +9,7 @@ IN: jamshred.oint
 ! segment's location and orientation are given by an oint.
 
 TUPLE: oint location forward up left ;
+C: <oint> oint
 
 : rotation-quaternion ( theta axis -- quaternion )
     swap 2 / dup cos swap sin rot n*v first3 rect> >r rect> r> 2array ;
@@ -48,12 +49,12 @@ TUPLE: oint location forward up left ;
     #! the scalar projection of v1 onto v2
     tuck v. swap norm / ;
 
+: proj-perp ( u v -- w )
+    dupd proj v- ;
+
 : perpendicular-distance ( oint oint -- distance )
     tuck distance-vector swap 2dup left>> scalar-projection abs
     -rot up>> scalar-projection abs + ;
-
-: proj-perp ( v u -- w )
-    dupd proj v- ;
 
 :: reflect ( v n -- v' )
     #! bounce v on a surface with normal n

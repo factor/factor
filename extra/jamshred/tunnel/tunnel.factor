@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays float-arrays kernel jamshred.oint locals math math.functions math.constants math.matrices math.order math.ranges math.vectors random sequences vectors ;
+USING: accessors arrays combinators float-arrays kernel jamshred.oint locals math math.functions math.constants math.matrices math.order math.ranges math.vectors math.quadratic random sequences vectors ;
 IN: jamshred.tunnel
 
 : n-segments ( -- n ) 5000 ; inline
@@ -24,7 +24,7 @@ C: <segment> segment
     dup [ / pi 2 * * ] curry map ;
 
 : segment-number++ ( segment -- )
-    dup segment-number 1+ swap set-segment-number ;
+    [ number>> 1+ ] keep (>>number) ;
 
 : random-color ( -- color )
     { 100 100 100 } [ random 100 / >float ] map { 1.0 } append ;
@@ -47,8 +47,8 @@ C: <segment> segment
 : default-segment-radius ( -- r ) 1 ;
 
 : initial-segment ( -- segment )
-        F{ 0 0 0 } F{ 0 0 -1 } F{ 0 1 0 } F{ -1 0 0 }
-        0 random-color default-segment-radius <segment> ;
+    F{ 0 0 0 } F{ 0 0 -1 } F{ 0 1 0 } F{ -1 0 0 }
+    0 random-color default-segment-radius <segment> ;
 
 : random-segments ( n -- segments )
     initial-segment 1vector swap (random-segments) ;
@@ -97,65 +97,52 @@ C: <segment> segment
     [ nearest-segment-forward ] 3keep
     nearest-segment-backward r> nearer-segment ;
 
-: distance-from-centre ( oint segment -- distance )
-    perpendicular-distance ;
+: vector-to-centre ( seg loc -- v )
+    over location>> swap v- swap forward>> proj-perp ;
 
-: distance-from-wall ( oint segment -- distance )
-    tuck distance-from-centre swap segment-radius swap - ;
+: distance-from-centre ( seg loc -- distance )
+    vector-to-centre norm ;
 
-: fraction-from-centre ( oint segment -- fraction )
-    tuck distance-from-centre swap segment-radius / ;
+: wall-normal ( seg oint -- n )
+    location>> vector-to-centre normalize ;
 
-: fraction-from-wall ( oint segment -- fraction )
+: from ( seg loc -- radius d-f-c )
+    dupd location>> distance-from-centre [ radius>> ] dip ;
+
+: distance-from-wall ( seg loc -- distance ) from - ;
+: fraction-from-centre ( seg loc -- fraction ) from / ;
+: fraction-from-wall ( seg loc -- fraction )
     fraction-from-centre 1 swap - ;
-
-: sideways-heading ( oint segment -- v )
-    [ forward>> ] bi@ proj-perp ;
-
-! : facing-nearest-wall? ( oint segment -- ? )
-!     [ [ location>> ] bi@ distance ]
-!     [ sideways-heading ]
-!     [ [ location>> ] bi@ [ v+ ] dip distance ] tri < ;
-
-! : distance-to-collision ( oint segment -- distance )
-! ! TODO: this isn't right. If oint is facing away from the wall then it should return a much bigger distance...
-!     #! distance on the oint's heading to the segment wall
-!     facing-nearest-wall? [
-!         [ sideways-heading norm ]
-!         [ distance-from-wall ] 2bi swap /
-!     ] [
-!     ] if ;
-
-USING: jamshred.log prettyprint io.streams.string ;
 
 : distant 10 ; inline
 
-:: (collision-coefficient) ( -2b sqrt(b^2-2ac) 2a -- c )
-    sqrt(b^2-2ac) complex? [
+:: (collision-coefficient) ( -b sqrt(b^2-4ac) 2a -- c )
+    sqrt(b^2-4ac) complex? [
         distant
     ] [
-        -2b sqrt(b^2-2ac) + 2a /
-        -2b sqrt(b^2-2ac) - 2a / max ! the -ve answer is behind us
+        -b sqrt(b^2-4ac) + 2a /
+        -b sqrt(b^2-4ac) - 2a / max ! the -ve answer is behind us
     ] if ;
 
 :: collision-coefficient ( v w -- c )
     [let* | a [ v dup v. ]
             b [ v w v. 2 * ]
             c [ w dup v. v dup v. - ] |
-        b neg b sq a c * 4 * - sqrt a 2 * (collision-coefficient) ] ;
+        c b a quadratic [ real-part ] bi@ max ] ;
 
+: sideways-heading ( oint segment -- v )
+    [ forward>> ] bi@ proj-perp ;
+
+: sideways-relative-location ( oint segment -- loc )
+    [ [ location>> ] bi@ v- ] keep forward>> proj-perp ;
+
+: collision-vector ( oint segment -- v )
+        dupd [ sideways-heading ] [ sideways-relative-location ] 2bi
+        collision-coefficient swap forward>> n*v ;
+
+USING: prettyprint jamshred.log io.streams.string ;
 : distance-to-collision ( oint segment -- distance )
-    [ sideways-heading ] [ [ location>> ] bi@ v- collision-coefficient ]
-    [ drop forward>> n*v norm ] 2tri ;
-
-:: (wall-normal) ( seg loc -- n )
-    [let* | back [ loc seg location>> v- ]
-           back-proj [ back seg forward>> proj ]
-           perp-point [ loc back-proj v- ] |
-        perp-point seg location>> v- normalize ] ;
-
-: wall-normal ( segment oint -- n )
-    location>> (wall-normal) ;
+    collision-vector norm [ dup . ] with-string-writer jamshred-log ;
 
 : bounce-forward ( segment oint -- )
     [ wall-normal ] [ forward>> swap reflect ] [ (>>forward) ] tri ;
