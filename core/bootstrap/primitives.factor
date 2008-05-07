@@ -607,7 +607,7 @@ tuple
     { "(exists?)" "io.files.private" }
     { "(directory)" "io.files.private" }
     { "gc" "memory" }
-    { "gc-time" "memory" }
+    { "gc-stats" "memory" }
     { "save-image" "memory" }
     { "save-image-and-exit" "memory" }
     { "datastack" "kernel" }

@@ -362,7 +362,7 @@ M: object infer-call
 
 \ gc { } { } <effect> set-primitive-effect
 
-\ gc-time { } { integer } <effect> set-primitive-effect
+\ gc-stats { } { array } <effect> set-primitive-effect
 
 \ save-image { string } { } <effect> set-primitive-effect
 

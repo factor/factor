@@ -145,7 +145,10 @@ void init_data_heap(CELL gens,
 s64 gc_time;
 CELL nursery_collections;
 CELL aging_collections;
-CELL cards_scanned;
+CELL tenured_collections;
+s64 cards_checked;
+s64 cards_scanned;
+CELL code_heap_scans;
 
 /* only meaningful during a GC */
 bool performing_gc;
@@ -364,7 +367,7 @@ INLINE void* allot_object(CELL type, CELL a)
 CELL collect_next(CELL scan);
 
 DECLARE_PRIMITIVE(gc);
-DECLARE_PRIMITIVE(gc_time);
+DECLARE_PRIMITIVE(gc_stats);
 DECLARE_PRIMITIVE(become);
 
 CELL find_all_words(void);

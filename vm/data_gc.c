@@ -144,7 +144,10 @@ void init_data_heap(CELL gens,
 	gc_time = 0;
 	aging_collections = 0;
 	nursery_collections = 0;
+	tenured_collections = 0;
+	cards_checked = 0;
 	cards_scanned = 0;
+	code_heap_scans = 0;
 	secure_gc = secure_gc_;
 }
 
@@ -283,7 +286,7 @@ DEFINE_PRIMITIVE(end_scan)
 }
 
 /* Scan all the objects in the card */
-INLINE void collect_card(F_CARD *ptr, CELL gen, CELL here)
+void collect_card(F_CARD *ptr, CELL gen, CELL here)
 {
 	F_CARD c = *ptr;
 	CELL offset = (c & CARD_BASE_MASK);
@@ -305,14 +308,49 @@ INLINE void collect_card(F_CARD *ptr, CELL gen, CELL here)
 	cards_scanned++;
 }
 
-/* Copy all newspace objects referenced from marked cards to the destination */
-INLINE void collect_gen_cards(CELL gen)
+void collect_card_deck(CELL gen,
+	F_CARD *first_card, F_CARD *last_card,
+	F_CARD mask, F_CARD unmask)
 {
-	F_CARD *ptr = ADDR_TO_CARD(data_heap->generations[gen].start);
 	CELL here = data_heap->generations[gen].here;
-	F_CARD *last_card = ADDR_TO_CARD(here - 1);
 
-	CELL mask, unmask;
+	long long cards_checked_ = 0;
+
+	u32 *quad_ptr;
+	u32 quad_mask = mask | (mask << 8) | (mask << 16) | (mask << 24);
+
+	u32 *last_card_aligned = (u32 *)(((CELL)last_card + 3) & ~3);
+
+	for(quad_ptr = (u32 *)first_card; quad_ptr <= (u32 *)last_card_aligned; quad_ptr++)
+	{
+		cards_checked_ += 4;
+
+		if(*quad_ptr & quad_mask)
+		{
+			F_CARD *ptr = (F_CARD *)quad_ptr;
+
+			int card;
+			for(card = 0; card < 4; card++)
+			{
+				if(ptr[card] & mask)
+				{
+					collect_card(&ptr[card],gen,here);
+					ptr[card] &= ~unmask;
+				}
+			}
+		}
+	}
+
+	cards_checked += cards_checked_;
+}
+
+/* Copy all newspace objects referenced from marked cards to the destination */
+void collect_gen_cards(CELL gen)
+{
+	F_CARD *first_card = ADDR_TO_CARD(data_heap->generations[gen].start);
+	F_CARD *last_card = ADDR_TO_CARD(data_heap->generations[gen].here - 1);
+
+	F_CARD mask, unmask;
 
 	/* if we are collecting the nursery, we care about old->nursery pointers
 	but not old->aging pointers */
@@ -360,14 +398,7 @@ INLINE void collect_gen_cards(CELL gen)
 		return;
 	}
 
-	for(; ptr <= last_card; ptr++)
-	{
-		if(*ptr & mask)
-		{
-			collect_card(ptr,gen,here);
-			*ptr &= ~unmask;
-		}
-	}
+	collect_card_deck(gen,first_card,last_card,mask,unmask);
 }
 
 /* Scan cards in all generations older than the one being collected, copying
@@ -657,17 +688,13 @@ void end_gc(void)
 
 		if(collecting_gen == TENURED)
 		{
+			tenured_collections++;
 			GC_PRINT(END_AGING_GC,aging_collections,cards_scanned);
-			aging_collections = 0;
-			cards_scanned = 0;
 		}
 		else if(HAVE_AGING_P && collecting_gen == AGING)
 		{
 			aging_collections++;
-
 			GC_PRINT(END_NURSERY_GC,nursery_collections,cards_scanned);
-			nursery_collections = 0;
-			cards_scanned = 0;
 		}
 	}
 	else
@@ -758,7 +785,10 @@ void garbage_collection(CELL gen,
 			literals from any code block which gets marked as live.
 			if we are not doing code GC, just consider all literals
 			as roots. */
+			code_heap_scans++;
+
 			collect_literals();
+
 			if(collecting_accumulation_gen_p())
 				last_code_heap_scan = collecting_gen;
 			else
@@ -794,9 +824,19 @@ DEFINE_PRIMITIVE(gc)
 }
 
 /* Push total time spent on GC */
-DEFINE_PRIMITIVE(gc_time)
+DEFINE_PRIMITIVE(gc_stats)
 {
-	box_unsigned_8(gc_time);
+	CELL array = tag_object(allot_array(ARRAY_TYPE,7,F));
+	REGISTER_ROOT(array);
+	set_array_nth(untag_object(array),0,tag_bignum(long_long_to_bignum(gc_time)));
+	set_array_nth(untag_object(array),1,allot_cell(nursery_collections));
+	set_array_nth(untag_object(array),2,allot_cell(aging_collections));
+	set_array_nth(untag_object(array),3,allot_cell(tenured_collections));
+	set_array_nth(untag_object(array),4,tag_bignum(long_long_to_bignum(cards_scanned)));
+	set_array_nth(untag_object(array),5,tag_bignum(long_long_to_bignum(cards_checked)));
+	set_array_nth(untag_object(array),6,allot_cell(code_heap_scans));
+	UNREGISTER_ROOT(array);
+	dpush(array);
 }
 
 DEFINE_PRIMITIVE(become)
