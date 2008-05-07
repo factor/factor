@@ -13,9 +13,11 @@ TUPLE: macosx-monitor < monitor handle ;
     ] curry each ;
 
 M:: macosx (monitor) ( path recursive? mailbox -- monitor )
-    path mailbox macosx-monitor new-monitor
-    dup [ enqueue-notifications ] curry
-    path 1array 0 0 <event-stream> >>handle ;
+    [let | path [ path normalize-path ] |
+        path mailbox macosx-monitor new-monitor
+        dup [ enqueue-notifications ] curry
+        path 1array 0 0 <event-stream> >>handle
+    ] ;
 
 M: macosx-monitor dispose
     handle>> dispose ;
