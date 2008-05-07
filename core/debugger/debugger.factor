@@ -269,8 +269,7 @@ M: double-free summary
 M: realloc-error summary
     drop "Memory reallocation failed" ;
 
-: error-in-thread. ( -- )
-    error-thread get-global
+: error-in-thread. ( thread -- )
     "Error in thread " write
     [
         dup thread-id #
@@ -284,7 +283,7 @@ M: thread error-in-thread ( error thread -- )
         die drop
     ] [
         global [
-            error-in-thread. print-error flush
+            error-thread get-global error-in-thread. print-error flush
         ] bind
     ] if ;
 
