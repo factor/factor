@@ -23,7 +23,7 @@ HELP: EXCLUDE:
 { $syntax "EXCLUDE: vocab => words ... ;" }
 { $description "Imports everything from " { $snippet "vocab" } " excluding " { $snippet "words" } "." }
 { $examples { $code
-    "EXCLUDE: math.parser => bin> hex> ; ! imports everythin but bin> and hex>" } } ;
+    "EXCLUDE: math.parser => bin> hex> ; ! imports everything but bin> and hex>" } } ;
 
 HELP: RENAME:
 { $syntax "RENAME: word vocab => newname " }
