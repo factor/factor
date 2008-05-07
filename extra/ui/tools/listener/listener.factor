@@ -7,7 +7,7 @@ ui.gadgets ui.gadgets.editors ui.gadgets.labelled
 ui.gadgets.panes ui.gadgets.buttons ui.gadgets.scrollers
 ui.gadgets.tracks ui.gestures ui.operations vocabs words
 prettyprint listener debugger threads boxes concurrency.flags
-math arrays generic accessors combinators ;
+math arrays generic accessors combinators assocs ;
 IN: ui.tools.listener
 
 TUPLE: listener-gadget input output stack ;
@@ -101,12 +101,11 @@ M: engine-word word-completion-string
     "engine-generic" word-prop word-completion-string ;
 
 : use-if-necessary ( word seq -- )
-    >r word-vocabulary vocab-words r>
-    {
-        { [ dup not ] [ 2drop ] }
-        { [ 2dup memq? ] [ 2drop ] }
-        [ push ]
-    } cond ;
+    over word-vocabulary [
+        2dup assoc-stack pick = [ 2drop ] [
+            >r word-vocabulary vocab-words r> push
+        ] if
+    ] [ 2drop ] if ;
 
 : insert-word ( word -- )
     get-workspace workspace-listener input>>
