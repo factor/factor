@@ -6,12 +6,12 @@ models namespaces parser prettyprint quotations sequences
 strings threads listener classes.tuple ui.commands ui.gadgets
 ui.gadgets.editors ui.gadgets.presentations ui.gadgets.worlds
 ui.gestures definitions calendar concurrency.flags
-ui.tools.workspace accessors ;
+concurrency.mailboxes ui.tools.workspace accessors ;
 IN: ui.tools.interactor
 
 ! If waiting is t, we're waiting for user input, and invoking
 ! evaluate-input resumes the thread.
-TUPLE: interactor output history flag thread waiting help ;
+TUPLE: interactor output history flag mailbox thread waiting help ;
 
 : register-self ( interactor -- )
     self >>thread drop ;
@@ -40,6 +40,7 @@ TUPLE: interactor output history flag thread waiting help ;
     interactor construct-editor
         V{ } clone >>history
         <flag> >>flag
+        <mailbox> >>mailbox
         dup <help-model> >>help
         swap >>output ;
 
@@ -77,7 +78,7 @@ M: interactor model-changed
     over empty? [ 2drop ] [ interactor-history push-new ] if ;
 
 : interactor-continue ( obj interactor -- )
-    thread>> resume-with ;
+    mailbox>> mailbox-put ;
 
 : clear-input ( interactor -- ) gadget-model clear-doc ;
 
@@ -100,14 +101,16 @@ M: interactor model-changed
 
 : interactor-yield ( interactor -- obj )
     dup thread>> self eq? [
-        t >>waiting
-        [ [ flag>> raise-flag ] curry "input" suspend ] keep
-        f >>waiting
-        drop
+        {
+            [ t >>waiting drop ]
+            [ flag>> raise-flag ]
+            [ mailbox>> mailbox-get ]
+            [ f >>waiting drop ]
+        } cleave
     ] [ drop f ] if ;
 
 M: interactor stream-readln
-    [ interactor-yield ] keep interactor-finish
+    [ interactor-yield ] [ interactor-finish ] bi
     dup [ first ] when ;
 
 : interactor-call ( quot interactor -- )

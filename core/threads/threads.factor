@@ -12,7 +12,7 @@ SYMBOL: initial-thread
 TUPLE: thread
 name quot exit-handler
 id
-continuation state
+continuation state runnable
 mailbox variables sleep-entry ;
 
 : self ( -- thread ) 40 getenv ; inline
@@ -138,8 +138,11 @@ DEFER: next
 : (next) ( arg thread -- * )
     f >>state
     dup set-self
-    dup continuation>> ?box
-    [ nip continue-with ] [ drop start ] if ;
+    dup runnable>> [
+        continuation>> box> continue-with
+    ] [
+        t >>runnable start
+    ] if ;
 
 : next ( -- * )
     expire-sleep-loop
