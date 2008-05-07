@@ -1,12 +1,12 @@
 USING: unicode.syntax.backend kernel sequences assocs io.files
 io.encodings ascii math.ranges io splitting math.parser 
 namespaces byte-arrays locals math sets io.encodings.ascii
-words compiler.units ;
+words compiler.units arrays interval-maps ;
 IN: unicode.script
 
 <PRIVATE
-VALUE: char>num-table
-VALUE: num>name-table
+VALUE: script-table
+SYMBOL: interned
 
 : parse-script ( stream -- assoc )
     ! assoc is code point/range => name
@@ -14,26 +14,18 @@ VALUE: num>name-table
         ";" split1 [ [ blank? ] trim ] bi@
     ] H{ } map>assoc ;
 
-: set-if ( value var -- )
-    dup 500000 < [ set ] [ 2drop ] if ;
+: range, ( value key -- )
+    swap interned get
+    [ word-name = ] with find nip 2array , ;
 
-: expand-ranges ( assoc -- char-assoc )
-    ! char-assoc is code point => name
-    [ [
-        CHAR: . pick member? [
-            swap ".." split1 [ hex> ] bi@ [a,b]
-            [ set-if ] with each
-        ] [ swap hex> set-if ] if
-    ] assoc-each ] H{ } make-assoc ;
-
-: hash>byte-array ( hash -- byte-array )
-    [ keys supremum 1+ <byte-array> dup ] keep
-    [ -rot set-nth ] with assoc-each ;
-
-: make-char>num ( assoc -- char>num-table )
-    expand-ranges
-    [ num>name-table index ] assoc-map
-    hash>byte-array ;
+: expand-ranges ( assoc -- interval-map )
+    [
+        [
+            CHAR: . pick member? [
+                swap ".." split1 [ hex> ] bi@ 2array
+            ] [ swap hex> ] if range,
+        ] assoc-each
+    ] { } make <interval-map> ;
 
 : >symbols ( strings -- symbols )
     [
@@ -41,9 +33,9 @@ VALUE: num>name-table
     ] with-compilation-unit ;
 
 : process-script ( ranges -- )
-    [ values prune \ num>name-table set-value ]
-    [ make-char>num \ char>num-table set-value ] bi
-    num>name-table >symbols \ num>name-table set-value ;
+    dup values prune >symbols interned [
+        expand-ranges \ script-table set-value
+    ] with-variable ;
 
 : load-script ( -- )
     "resource:extra/unicode/script/Scripts.txt"
@@ -52,5 +44,7 @@ VALUE: num>name-table
 load-script
 PRIVATE>
 
+SYMBOL: Unknown
+
 : script-of ( char -- script )
-    char>num-table nth num>name-table nth ;
+    script-table interval-at [ Unknown ] unless* ;

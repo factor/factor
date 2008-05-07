@@ -1,5 +1,5 @@
 USING: kernel sequences arrays math.intervals accessors
-math.order sorting math assocs  ;
+math.order sorting math assocs locals namespaces ;
 IN: interval-maps
 
 TUPLE: interval-map array ;
@@ -24,6 +24,8 @@ M: interval >interval ;
 : ensure-disjoint ( intervals -- intervals )
     dup keys [ interval-intersect not ] monotonic?
     [ "Intervals are not disjoint" throw ] unless ;
+
+
 PRIVATE>
 
 : interval-at* ( key map -- value ? )
@@ -35,7 +37,20 @@ PRIVATE>
 : interval-key? ( key map -- ? ) interval-at* nip ;
 
 : <interval-map> ( specification -- map )
-    all-intervals ensure-disjoint
-    [ [ first to>> ] compare ] sort
+    all-intervals { } assoc-like
+    [ [ first to>> ] compare ] sort ensure-disjoint
     [ interval-node boa ] { } assoc>map
     interval-map boa ;
+
+:: coalesce ( alist -- specification )
+    ! Only works with integer keys, because they're discrete
+    ! Makes 2array keys
+    [
+        alist sort-keys unclip first2 dupd roll
+        [| oldkey oldval key val | ! Underneath is start
+            oldkey 1+ key =
+            oldval val = and
+            [ oldkey 2array oldval 2array , key ] unless
+            key val
+        ] assoc-each [ 2array ] bi@ ,
+    ] { } make ;
