@@ -1,7 +1,6 @@
-USING: kernel parser quotations classes.tuple words
+USING: kernel parser quotations classes.tuple words math.order
 namespaces.lib namespaces sequences arrays combinators
 prettyprint strings math.parser sequences.lib math symbols ;
-USE: tools.walker
 IN: db.sql
 
 SYMBOLS: insert update delete select distinct columns from as

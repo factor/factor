@@ -1,22 +1,20 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: boxes kernel threads ;
+USING: dlists kernel threads concurrency.conditions accessors ;
 IN: concurrency.flags
 
-TUPLE: flag value? thread ;
+TUPLE: flag value threads ;
 
-: <flag> ( -- flag ) f <box> flag boa ;
+: <flag> ( -- flag ) f <dlist> flag boa ;
 
 : raise-flag ( flag -- )
-    dup flag-value? [
-        t over set-flag-value?
-        dup flag-thread [ resume ] if-box?
-    ] unless drop ;
+    dup value>> [ drop ] [ t >>value threads>> notify-all ] if ;
+
+: wait-for-flag-timeout ( flag timeout -- )
+    over value>> [ 2drop ] [ >r threads>> r> "flag" wait ] if ;
 
 : wait-for-flag ( flag -- )
-    dup flag-value? [ drop ] [
-        [ flag-thread >box ] curry "flag" suspend drop
-    ] if ;
+    f wait-for-flag-timeout ;
 
 : lower-flag ( flag -- )
-    dup wait-for-flag f swap set-flag-value? ;
+    [ wait-for-flag ] [ f >>value drop ] bi ;

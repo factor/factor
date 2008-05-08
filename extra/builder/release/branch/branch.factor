@@ -21,7 +21,7 @@ IN: builder.release.branch
   {
     "scp"
     my-boot-image-name
-    "factorcode.org:/var/www/factorcode.org/newsite/images/clean"
+    { "factorcode.org:/var/www/factorcode.org/newsite/images/clean/" platform }
   }
   to-strings
   try-process ;

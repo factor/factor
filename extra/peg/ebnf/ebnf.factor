@@ -17,6 +17,7 @@ TUPLE: ebnf-sequence elements ;
 TUPLE: ebnf-repeat0 group ;
 TUPLE: ebnf-repeat1 group ;
 TUPLE: ebnf-optional group ;
+TUPLE: ebnf-whitespace group ;
 TUPLE: ebnf-rule symbol elements ;
 TUPLE: ebnf-action parser code ;
 TUPLE: ebnf-var parser name ;
@@ -34,6 +35,7 @@ C: <ebnf-sequence> ebnf-sequence
 C: <ebnf-repeat0> ebnf-repeat0
 C: <ebnf-repeat1> ebnf-repeat1
 C: <ebnf-optional> ebnf-optional
+C: <ebnf-whitespace> ebnf-whitespace
 C: <ebnf-rule> ebnf-rule
 C: <ebnf-action> ebnf-action
 C: <ebnf-var> ebnf-var
@@ -84,6 +86,7 @@ C: <ebnf> ebnf
       [ dup CHAR: + = ]
       [ dup CHAR: ? = ]
       [ dup CHAR: : = ]
+      [ dup CHAR: ~ = ]
     } || not nip    
   ] satisfy repeat1 [ >string <ebnf-non-terminal> ] action ;
 
@@ -134,9 +137,15 @@ DEFER: 'choice'
   #! Parse a group of choices, with a suffix indicating
   #! the type of group (repeat0, repeat1, etc) and
   #! an quot that is the action that produces the AST.
-  "(" [ 'choice' sp ] delay ")" syntax-pack 
-  swap 2seq  
-  [ first ] rot compose action ;
+  2dup
+  [
+    "(" [ 'choice' sp ] delay ")" syntax-pack 
+    swap 2seq  
+    [ first ] rot compose action ,
+    "{" [ 'choice' sp ] delay "}" syntax-pack 
+    swap 2seq  
+    [ first <ebnf-whitespace> ] rot compose action ,
+  ] choice* ;
   
 : 'group' ( -- parser )
   #! A grouping with no suffix. Used for precedence.
@@ -238,9 +247,15 @@ GENERIC: (transform) ( ast -- parser )
 
 SYMBOL: parser
 SYMBOL: main
+SYMBOL: ignore-ws
 
 : transform ( ast -- object )
-  H{ } clone dup dup [ parser set swap (transform) main set ] bind ;
+  H{ } clone dup dup [ 
+    f ignore-ws set 
+    parser set 
+    swap (transform) 
+    main set 
+  ] bind ;
 
 M: ebnf (transform) ( ast -- parser )
   rules>> [ (transform) ] map peek ;
@@ -252,7 +267,13 @@ M: ebnf-rule (transform) ( ast -- parser )
   ] keep ;
 
 M: ebnf-sequence (transform) ( ast -- parser )
-  elements>> [ (transform) ] map seq [ dup length 1 = [ first ] when ] action ;
+  #! If ignore-ws is set then each element of the sequence
+  #! ignores leading whitespace. This is not inherited by
+  #! subelements of the sequence.
+  elements>> [ 
+    f ignore-ws [ (transform) ] with-variable
+    ignore-ws get [ sp ] when
+  ] map seq [ dup length 1 = [ first ] when ] action ;
 
 M: ebnf-choice (transform) ( ast -- parser )
   options>> [ (transform) ] map choice ;
@@ -282,10 +303,13 @@ M: ebnf-repeat1 (transform) ( ast -- parser )
 M: ebnf-optional (transform) ( ast -- parser )
   transform-group optional ;
 
+M: ebnf-whitespace (transform) ( ast -- parser )
+  t ignore-ws [ transform-group ] with-variable ;
+
 GENERIC: build-locals ( code ast -- code )
 
 M: ebnf-sequence build-locals ( code ast -- code )
-  elements>> dup [ ebnf-var? ] subset empty? [
+  elements>> dup [ ebnf-var? ] filter empty? [
     drop 
   ] [ 
     [
@@ -300,7 +324,7 @@ M: ebnf-sequence build-locals ( code ast -- code )
         ] 2each
         " | " %
         %  
-        " ] with-locals" %     
+        " ]" %     
     ] "" make 
   ] if ;
 
@@ -310,7 +334,7 @@ M: ebnf-var build-locals ( code ast -- )
     name>> % " [ dup ] " %
     " | " %
     %  
-    " ] with-locals" %     
+    " ]" %     
   ] "" make ;
 
 M: object build-locals ( code ast -- )

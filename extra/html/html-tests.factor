@@ -24,7 +24,7 @@ IN: html.tests
 ] unit-test
 
 [ "<" ] [
-    [ "<" H{ } stdio get format-html-span ] make-html-string
+    [ "<" H{ } output-stream get format-html-span ] make-html-string
 ] unit-test
 
 TUPLE: funky town ;

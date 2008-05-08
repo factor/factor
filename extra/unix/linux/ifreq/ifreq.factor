@@ -55,7 +55,7 @@ IN: unix.linux.ifreq
 
 : set-if-metric ( name metric -- )
   "struct-ifreq" <c-object>
-  rot string>char-alien over set-struct-ifreq-ifr-ifrn
+  rot ascii string>alien over set-struct-ifreq-ifr-ifrn
   swap <int>		over set-struct-ifreq-ifr-ifru
 
   AF_INET SOCK_DGRAM 0 socket SIOCSIFMETRIC rot ioctl drop ;

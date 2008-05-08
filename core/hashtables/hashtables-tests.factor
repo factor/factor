@@ -10,7 +10,7 @@ continuations ;
 [ ] [ 1000 [ dup sq ] H{ } map>assoc "testhash" set ] unit-test
 
 [ V{ } ]
-[ 1000 [ dup sq swap "testhash" get at = not ] subset ]
+[ 1000 [ dup sq swap "testhash" get at = not ] filter ]
 unit-test
 
 [ t ]

@@ -63,7 +63,7 @@ IN: smtp.tests
     prepare
     dup headers>> >alist sort-keys [
         drop { "Date" "Message-Id" } member? not
-    ] assoc-subset
+    ] assoc-filter
     over to>>
     rot from>>
 ] unit-test

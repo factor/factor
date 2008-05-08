@@ -54,7 +54,7 @@ TUPLE: zoom-in-action ;  C: <zoom-in-action> zoom-in-action
 TUPLE: zoom-out-action ; C: <zoom-out-action> zoom-out-action
 
 : generalize-gesture ( gesture -- newgesture )
-    tuple>array 1 head* >tuple ;
+    tuple>array but-last >tuple ;
 
 ! Modifiers
 SYMBOLS: C+ A+ M+ S+ ;
@@ -111,7 +111,8 @@ SYMBOL: double-click-timeout
     ] if ;
 
 : drag-gesture ( -- )
-    hand-buttons get-global first <drag> button-gesture ;
+    hand-buttons get-global
+    dup empty? [ drop ] [ first <drag> button-gesture ] if ;
 
 SYMBOL: drag-timer
 
@@ -172,7 +173,7 @@ SYMBOL: drag-timer
     ] if ;
 
 : modifier ( mod modifiers -- seq )
-    [ second swap bitand 0 > ] with subset
+    [ second swap bitand 0 > ] with filter
     0 <column> prune dup empty? [ drop f ] [ >array ] if ;
 
 : drag-loc ( -- loc )

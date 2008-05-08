@@ -169,3 +169,8 @@ MACRO: multikeep ( word out-indexes -- ... )
 : generate ( generator predicate -- obj )
     [ dup ] swap [ dup [ nip ] unless not ] 3compose
     swap [ ] do-while ;
+
+MACRO: predicates ( seq -- quot/f )
+    dup [ 1quotation [ drop ] prepend ] map
+    >r [ [ dup ] prepend ] map r> zip [ drop f ] suffix
+    [ cond ] curry ;

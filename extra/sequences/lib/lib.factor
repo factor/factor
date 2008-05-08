@@ -4,7 +4,7 @@
 USING: combinators.lib kernel sequences math namespaces assocs 
 random sequences.private shuffle math.functions mirrors
 arrays math.parser math.private sorting strings ascii macros
-assocs.lib quotations hashtables ;
+assocs.lib quotations hashtables math.order ;
 IN: sequences.lib
 
 : each-withn ( seq quot n -- ) nwith each ; inline
@@ -45,14 +45,14 @@ MACRO: firstn ( n -- )
   >r
   dup length
   dup [ / ] curry
-  [ 1+ ] swap compose
+  [ 1+ ] prepose
   r> compose
   2each ;                       inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : sigma ( seq quot -- n )
-    [ rot slip + ] curry 0 swap reduce ; inline
+    [ + ] compose 0 swap reduce ; inline
 
 : count ( seq quot -- n )
     [ 1 0 ? ] compose sigma ; inline
@@ -66,9 +66,9 @@ MACRO: firstn ( n -- )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: higher ( a b quot -- c ) [ compare 0 > ] curry most ; inline
+: higher ( a b quot -- c ) [ compare +gt+ eq? ] curry most ; inline
 
-: lower  ( a b quot -- c ) [ compare 0 < ] curry most ; inline
+: lower  ( a b quot -- c ) [ compare +lt+ eq? ] curry most ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -117,7 +117,7 @@ MACRO: firstn ( n -- )
 
 : split-around ( seq quot -- before elem after )
     dupd find over [ "Element not found" throw ] unless
-    >r cut 1 tail r> swap ; inline
+    >r cut rest r> swap ; inline
 
 : (map-until) ( quot pred -- quot )
     [ dup ] swap 3compose
@@ -129,7 +129,11 @@ MACRO: firstn ( n -- )
 : take-while ( seq quot -- newseq )
     [ not ] compose
     [ find drop [ head-slice ] when* ] curry
-    [ dup ] swap compose keep like ;
+    [ dup ] prepose keep like ;
+
+: replicate ( seq quot -- newseq )
+    #! quot: ( -- obj )
+    [ drop ] prepose map ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -155,7 +159,7 @@ PRIVATE>
 
 : switches ( seq1 seq -- subseq )
     ! seq1 is a sequence of ones and zeroes
-    >r [ length ] keep [ nth 1 = ] curry subset r>
+    >r [ length ] keep [ nth 1 = ] curry filter r>
     [ nth ] curry { } map-as ;
 
 : power-set ( seq -- subsets )
@@ -212,7 +216,7 @@ USE: continuations
   >r dup length swap r>
   [ = [ ] [ drop f ] if ] curry
   2map
-  [ ] subset ;
+  [ ] filter ;
 
 <PRIVATE
 : (attempt-each-integer) ( i n quot -- result )
@@ -235,4 +239,7 @@ PRIVATE>
     zip >hashtable substitute ;
 
 : remove-nth ( seq n -- seq' )
-    cut-slice 1 tail-slice append ;
+    cut-slice rest-slice append ;
+
+: short ( seq n -- seq n' )
+    over length min ; inline

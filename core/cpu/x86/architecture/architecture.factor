@@ -3,7 +3,8 @@
 USING: alien alien.c-types alien.compiler arrays
 cpu.x86.assembler cpu.architecture kernel kernel.private math
 memory namespaces sequences words generator generator.registers
-generator.fixup system layouts combinators compiler.constants ;
+generator.fixup system layouts combinators compiler.constants
+math.order ;
 IN: cpu.x86.architecture
 
 HOOK: ds-reg cpu

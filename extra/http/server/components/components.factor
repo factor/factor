@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors namespaces kernel io math.parser assocs classes
 words classes.tuple arrays sequences splitting mirrors
-hashtables fry combinators continuations math
-calendar.format html.elements
+hashtables fry locals combinators continuations math
+calendar.format html html.elements xml.entities
 http.server.validators ;
 IN: http.server.components
 
@@ -18,19 +18,15 @@ TUPLE: field type ;
 
 C: <field> field
 
-M: field render-view* drop write ;
+M: field render-view*
+    drop escape-string write ;
 
 M: field render-edit*
-    <input type>> =type [ =id ] [ =name ] bi =value input/> ;
-
-: render-error ( message -- )
-    <span "error" =class span> write </span> ;
+    <input type>> =type =name =value input/> ;
 
 TUPLE: hidden < field ;
 
 : hidden ( -- renderer ) T{ hidden f "hidden" } ; inline
-
-M: hidden render-view* 2drop ;
 
 ! Component protocol
 SYMBOL: components
@@ -234,7 +230,7 @@ TUPLE: text-renderer rows cols ;
     text-renderer new-text-renderer ;
 
 M: text-renderer render-view*
-    drop write ;
+    drop escape-string write ;
 
 M: text-renderer render-edit*
     <textarea
@@ -243,7 +239,7 @@ M: text-renderer render-edit*
         [ =id   ]
         [ =name ] bi
     textarea>
-        write
+        escape-string write
     </textarea> ;
 
 TUPLE: text < string ;
@@ -263,7 +259,7 @@ TUPLE: html-text-renderer < text-renderer ;
     html-text-renderer new-text-renderer ;
 
 M: html-text-renderer render-view*
-    drop write ;
+    drop escape-string write ;
 
 TUPLE: html-text < text ;
 
@@ -280,6 +276,22 @@ TUPLE: date < string ;
 M: date component-string
     drop timestamp>string ;
 
+! Link components
+
+GENERIC: link-title ( obj -- string )
+GENERIC: link-href ( obj -- url )
+
+SINGLETON: link-renderer
+
+M: link-renderer render-view*
+    drop <a dup link-href =href a> link-title escape-string write </a> ;
+
+TUPLE: link < string ;
+
+: <link> ( id -- component )
+    link new-string
+        link-renderer >>renderer ;
+
 ! List components
 SYMBOL: +plain+
 SYMBOL: +ordered+
@@ -289,17 +301,20 @@ TUPLE: list-renderer component type ;
 
 C: <list-renderer> list-renderer
 
-: render-plain-list ( seq quot component -- )
-    swap '[ , @ ] each ; inline
+: render-plain-list ( seq component quot -- )
+    '[ , component>> renderer>> @ ] each ; inline
+
+: render-li-list ( seq component quot -- )
+    '[ <li> @ </li> ] render-plain-list ; inline
 
 : render-ordered-list ( seq quot component -- )
-    swap <ol> '[ <li> , @ </li> ] each </ol> ; inline
+    <ol> render-li-list </ol> ; inline
 
 : render-unordered-list ( seq quot component -- )
-    swap <ul> '[ <li> , @ </li> ] each </ul> ; inline
+    <ul> render-li-list </ul> ; inline
 
 : render-list ( value renderer quot -- )
-    swap [ component>> ] [ type>> ] bi {
+    over type>> {
         { +plain+     [ render-plain-list ] }
         { +ordered+   [ render-ordered-list ] }
         { +unordered+ [ render-unordered-list ] }
@@ -317,3 +332,70 @@ TUPLE: list < component ;
     <list-renderer> list swap new-component ;
 
 M: list component-string drop ;
+
+! Choice
+TUPLE: choice-renderer choices ;
+
+C: <choice-renderer> choice-renderer
+
+M: choice-renderer render-view*
+    drop escape-string write ;
+
+: render-option ( text selected? -- )
+    <option [ "true" =selected ] when option>
+        escape-string write
+    </option> ;
+
+: render-options ( options selected -- )
+    '[ dup , member? render-option ] each ;
+
+M: choice-renderer render-edit*
+    <select swap =name select>
+        choices>> swap 1array render-options
+    </select> ;
+
+TUPLE: choice < string ;
+
+: <choice> ( id choices -- component )
+    swap choice new-string
+        swap <choice-renderer> >>renderer ;
+
+! Menu
+TUPLE: menu-renderer choices size ;
+
+: <menu-renderer> ( choices -- renderer )
+    5 menu-renderer boa ;
+
+M:: menu-renderer render-edit* ( value id renderer -- )
+    <select
+        renderer size>> [ number>string =size ] when*
+        id =name
+        "true" =multiple
+    select>
+        renderer choices>> value render-options
+    </select> ;
+
+TUPLE: menu < string ;
+
+: <menu> ( id choices -- component )
+    swap menu new-string
+        swap <menu-renderer> >>renderer ;
+
+! Checkboxes
+TUPLE: checkbox-renderer label ;
+
+C: <checkbox-renderer> checkbox-renderer
+
+M: checkbox-renderer render-edit*
+    <input
+        "checkbox" =type
+        swap =id
+        swap [ "true" =selected ] when
+    input>
+        label>> escape-string write
+    </input> ;
+
+TUPLE: checkbox < string ;
+
+: <checkbox> ( id label -- component )
+    checkbox swap <checkbox-renderer> new-component ;

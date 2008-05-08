@@ -1,6 +1,6 @@
 USING: arrays kernel math math.functions math.miller-rabin math.matrices
-    math.parser math.primes.factors math.ranges namespaces sequences
-    sequences.lib sorting unicode.case ;
+    math.order math.parser math.primes.factors math.ranges namespaces
+    sequences sequences.lib sorting unicode.case ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution
@@ -40,10 +40,10 @@ IN: project-euler.common
 
 ! Propagate one row into the upper one
 : propagate ( bottom top -- newtop )
-    [ over 1 tail rot first2 max rot + ] map nip ;
+    [ over rest rot first2 max rot + ] map nip ;
 
 : shift-3rd ( seq obj obj -- seq obj obj )
-    rot 1 tail -rot ;
+    rot rest -rot ;
 
 : (sum-divisors) ( n -- sum )
     dup sqrt >fixnum [1,b] [
@@ -95,7 +95,7 @@ PRIVATE>
 ! Not strictly needed, but it is nice to be able to dump the triangle after the
 ! propagation
 : propagate-all ( triangle -- newtriangle )
-    reverse [ first dup ] keep 1 tail [ propagate dup ] map nip reverse swap suffix ;
+    reverse [ first dup ] keep rest [ propagate dup ] map nip reverse swap suffix ;
 
 : sum-divisors ( n -- sum )
     dup 4 < [ { 0 1 3 4 } nth ] [ (sum-divisors) ] if ;

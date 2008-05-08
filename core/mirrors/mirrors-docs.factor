@@ -30,16 +30,13 @@ HELP: <mirror>
 { $examples
     { $example
         "USING: assocs mirrors prettyprint ;"
+        "IN: scratchpad"
         "TUPLE: circle center radius ;"
         "C: <circle> circle"
         "{ 100 50 } 15 <circle> <mirror> >alist ."
         "{ { \"delegate\" f } { \"center\" { 100 50 } } { \"radius\" 15 } }"
     }
 } ;
-
-HELP: >mirror<
-{ $values { "mirror" mirror } { "obj" object } { "slots" "a sequence of " { $link slot-spec } " instances" } }
-{ $description "Pushes the object being viewed in the mirror together with its slots." } ;
 
 HELP: make-mirror
 { $values { "obj" object } { "assoc" assoc } }

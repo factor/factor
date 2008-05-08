@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays bit-arrays byte-arrays
+USING: alien arrays bit-arrays byte-arrays byte-vectors
 definitions generic hashtables kernel math
 namespaces parser sequences strings sbufs vectors words
 quotations io assocs splitting classes.tuple generic.standard
@@ -79,6 +79,7 @@ IN: bootstrap.syntax
     "{" [ \ } [ >array ] parse-literal ] define-syntax
     "V{" [ \ } [ >vector ] parse-literal ] define-syntax
     "B{" [ \ } [ >byte-array ] parse-literal ] define-syntax
+    "BV{" [ \ } [ >byte-vector ] parse-literal ] define-syntax
     "?{" [ \ } [ >bit-array ] parse-literal ] define-syntax
     "F{" [ \ } [ >float-array ] parse-literal ] define-syntax
     "H{" [ \ } [ >hashtable ] parse-literal ] define-syntax
@@ -189,8 +190,12 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "call-next-method" [
-        current-class get literalize parsed
-        current-generic get literalize parsed
-        \ (call-next-method) parsed
+        current-class get current-generic get
+        2dup [ word? ] both? [
+            [ literalize parsed ] bi@
+            \ (call-next-method) parsed
+        ] [
+            not-in-a-method-error
+        ] if
     ] define-syntax
 ] with-compilation-unit

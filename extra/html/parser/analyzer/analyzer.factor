@@ -11,7 +11,7 @@ IN: html.parser.analyzer
     (find-relative) ;
 
 : (find-all) ( n seq quot -- )
-    2dup >r >r find* [
+    2dup >r >r find-from [
         dupd 2array , 1+ r> r> (find-all)
     ] [
         r> r> 3drop
@@ -21,7 +21,7 @@ IN: html.parser.analyzer
     [ 0 -rot (find-all) ] { } make ;
 
 : (find-nth) ( offset seq quot n count -- obj )
-    >r >r [ find* ] 2keep 4 npick [
+    >r >r [ find-from ] 2keep 4 npick [
         r> r> 1+ 2dup <= [
             4drop
         ] [
@@ -46,7 +46,7 @@ IN: html.parser.analyzer
         ] [
             drop t
         ] if
-    ] subset ;
+    ] filter ;
 
 : trim-text ( vector -- vector' )
     [
@@ -57,14 +57,14 @@ IN: html.parser.analyzer
     ] map ;
 
 : find-by-id ( id vector -- vector )
-    [ tag-attributes "id" swap at = ] with subset ;
+    [ tag-attributes "id" swap at = ] with filter ;
 
 : find-by-class ( id vector -- vector )
-    [ tag-attributes "class" swap at = ] with subset ;
+    [ tag-attributes "class" swap at = ] with filter ;
 
 : find-by-name ( str vector -- vector )
     >r >lower r>
-    [ tag-name = ] with subset ;
+    [ tag-name = ] with filter ;
 
 : find-first-name ( str vector -- i/f tag/f )
     >r >lower r>
@@ -76,13 +76,13 @@ IN: html.parser.analyzer
 
 : find-by-attribute-key ( key vector -- vector )
     >r >lower r>
-    [ tag-attributes at ] with subset
-    [ ] subset ;
+    [ tag-attributes at ] with filter
+    [ ] filter ;
 
 : find-by-attribute-key-value ( value key vector -- vector )
     >r >lower r>
-    [ tag-attributes at over = ] with subset nip
-    [ ] subset ;
+    [ tag-attributes at over = ] with filter nip
+    [ ] filter ;
 
 : find-first-attribute-key-value ( value key vector -- i/f tag/f )
     >r >lower r>
@@ -99,7 +99,7 @@ IN: html.parser.analyzer
     
 : find-between ( i/f tag/f vector -- vector )
     find-between* dup length 3 >= [
-        [ 1 tail-slice 1 head-slice* ] keep like
+        [ rest-slice but-last-slice ] keep like
     ] when ;
 
 : find-between-first ( string vector -- vector' )
@@ -109,12 +109,12 @@ IN: html.parser.analyzer
     tag-attributes [ "href" swap at ] [ f ] if* ;
 
 : find-links ( vector -- vector )
-    [ tag-name "a" = ] subset
-    [ tag-link ] subset ;
+    [ tag-name "a" = ] filter
+    [ tag-link ] filter ;
 
 
 : find-by-text ( seq quot -- tag )
-    [ dup tag-name text = ] swap compose find drop ;
+    [ dup tag-name text = ] prepose find drop ;
 
 : find-opening-tags-by-name ( name seq -- seq )
     [ [ tag-name = ] keep tag-closing? not and ] with find-all ;
@@ -125,11 +125,11 @@ IN: html.parser.analyzer
 : query>assoc* ( str -- hash )
     "?" split1 nip query>assoc ;
 
-! clear "http://fark.com" http-get parse-html find-links [ "go.pl" swap start ] subset [ "=" split peek ] map
+! clear "http://fark.com" http-get parse-html find-links [ "go.pl" swap start ] filter [ "=" split peek ] map
 
 ! clear "http://www.sailwx.info/shiptrack/cruiseships.phtml" http-get parse-html remove-blank-text
 ! "a" over find-opening-tags-by-name
-! [ nip "shipposition.phtml?call=GBTT" swap href-contains? ] assoc-subset
+! [ nip "shipposition.phtml?call=GBTT" swap href-contains? ] assoc-filter
 ! first first 8 + over nth
 ! tag-attributes "href" swap at query>assoc*
 ! "lat" over at "lon" rot at

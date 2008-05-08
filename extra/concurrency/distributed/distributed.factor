@@ -3,7 +3,7 @@
 USING: serialize sequences concurrency.messaging threads io
 io.server qualified arrays namespaces kernel io.encodings.binary
 accessors ;
-QUALIFIED: io.sockets
+FROM: io.sockets => host-name <inet> with-client ;
 IN: concurrency.distributed
 
 SYMBOL: local-node
@@ -23,7 +23,7 @@ SYMBOL: local-node
 
 : start-node ( port -- )
     [ internet-server ]
-    [ io.sockets:host-name swap io.sockets:<inet> ] bi
+    [ host-name swap <inet> ] bi
     (start-node) ;
 
 TUPLE: remote-process id node ;
@@ -31,8 +31,7 @@ TUPLE: remote-process id node ;
 C: <remote-process> remote-process
 
 : send-remote-message ( message node -- )
-    binary io.sockets:<client>
-    [ serialize ] with-stream ;
+    binary [ serialize ] with-client ;
 
 M: remote-process send ( message thread -- )
     [ id>> 2array ] [ node>> ] bi

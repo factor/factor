@@ -5,7 +5,7 @@ inference.transforms parser words quotations debugger macros
 arrays macros splitting combinators prettyprint.backend
 definitions prettyprint hashtables prettyprint.sections sets
 sequences.private effects generic compiler.units accessors
-locals.backend ;
+locals.backend memoize ;
 IN: locals
 
 ! Inspired by
@@ -81,19 +81,27 @@ C: <quote> quote
 UNION: special local quote local-word local-reader local-writer ;
 
 : load-locals-quot ( args -- quot )
-    dup [ local-reader? ] contains? [
-        <reversed> [
-            local-reader? [ 1array >r ] [ >r ] ?
-        ] map concat
+    dup empty? [
+        drop [ ]
     ] [
-        length [ load-locals ] curry >quotation
+        dup [ local-reader? ] contains? [
+            <reversed> [
+                local-reader? [ 1array >r ] [ >r ] ?
+            ] map concat
+        ] [
+            length [ load-locals ] curry >quotation
+        ] if
     ] if ;
 
 : drop-locals-quot ( args -- quot )
-    length [ drop-locals ] curry ;
+    dup empty? [
+        drop [ ]
+    ] [
+        length [ drop-locals ] curry
+    ] if ;
 
 : point-free-body ( quot args -- newquot )
-    >r 1 head-slice* r> [ localize ] curry map concat ;
+    >r but-last-slice r> [ localize ] curry map concat ;
 
 : point-free-end ( quot args -- newquot )
     over peek special?
@@ -130,7 +138,7 @@ M: object free-vars* drop ;
 M: quotation free-vars* [ add-if-free ] each ;
 
 M: lambda free-vars*
-    [ vars>> ] [ body>> ] bi free-vars diff % ;
+    [ vars>> ] [ body>> ] bi free-vars swap diff % ;
 
 GENERIC: lambda-rewrite* ( obj -- )
 
@@ -193,8 +201,11 @@ M: object local-rewrite* , ;
 : pop-locals ( assoc -- )
     use get delete ;
 
+SYMBOL: in-lambda?
+
 : (parse-lambda) ( assoc end -- quot )
-    parse-until >quotation swap pop-locals ;
+    t in-lambda? [ parse-until ] with-variable
+    >quotation swap pop-locals ;
 
 : parse-lambda ( -- lambda )
     "|" parse-tokens make-locals dup push-locals
@@ -271,32 +282,36 @@ M: wlet local-rewrite*
 
 : (::) CREATE-WORD parse-locals-definition ;
 
-: (M::) CREATE-METHOD parse-locals-definition ;
+: (M::)
+    CREATE-METHOD
+    [ parse-locals-definition ] with-method-definition ;
+
+: parsed-lambda ( form -- )
+    in-lambda? get [ parsed ] [ lambda-rewrite over push-all ] if ;
 
 PRIVATE>
 
-: [| parse-lambda parsed ; parsing
+: [| parse-lambda parsed-lambda ; parsing
 
 : [let
     scan "|" assert= parse-bindings
-\ ] (parse-lambda) <let> parsed ; parsing
+    \ ] (parse-lambda) <let> parsed-lambda ; parsing
 
 : [let*
     scan "|" assert= parse-bindings*
-    >r \ ] parse-until >quotation <let*> parsed r> pop-locals ;
-    parsing
+    \ ] (parse-lambda) <let*> parsed-lambda ; parsing
 
 : [wlet
     scan "|" assert= parse-wbindings
-    \ ] (parse-lambda) <wlet> parsed ; parsing
-
-MACRO: with-locals ( form -- quot ) lambda-rewrite ;
+    \ ] (parse-lambda) <wlet> parsed-lambda ; parsing
 
 : :: (::) define ; parsing
 
 : M:: (M::) define ; parsing
 
 : MACRO:: (::) define-macro ; parsing
+
+: MEMO:: (::) define-memoized ; parsing
 
 <PRIVATE
 

@@ -2,16 +2,16 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel classes classes.builtin combinators accessors
 sequences arrays vectors assocs namespaces words sorting layouts
-math hashtables kernel.private sets ;
+math hashtables kernel.private sets math.order ;
 IN: classes.algebra
 
 : 2cache ( key1 key2 assoc quot -- value )
     >r >r 2array r> [ first2 ] r> compose cache ; inline
 
-DEFER: (class<)
+DEFER: (class<=)
 
-: class< ( first second -- ? )
-    class<-cache get [ (class<) ] 2cache ;
+: class<= ( first second -- ? )
+    class<=-cache get [ (class<=) ] 2cache ;
 
 DEFER: (class-not)
 
@@ -45,31 +45,31 @@ TUPLE: anonymous-complement class ;
 
 C: <anonymous-complement> anonymous-complement
 
-: superclass< ( first second -- ? )
-    >r superclass r> class< ;
+: superclass<= ( first second -- ? )
+    >r superclass r> class<= ;
 
-: left-union-class< ( first second -- ? )
-    >r members r> [ class< ] curry all? ;
+: left-union-class<= ( first second -- ? )
+    >r members r> [ class<= ] curry all? ;
 
-: right-union-class< ( first second -- ? )
-    members [ class< ] with contains? ;
+: right-union-class<= ( first second -- ? )
+    members [ class<= ] with contains? ;
 
 : left-anonymous-union< ( first second -- ? )
-    >r members>> r> [ class< ] curry all? ;
+    >r members>> r> [ class<= ] curry all? ;
 
 : right-anonymous-union< ( first second -- ? )
-    members>> [ class< ] with contains? ;
+    members>> [ class<= ] with contains? ;
 
 : left-anonymous-intersection< ( first second -- ? )
-    >r members>> r> [ class< ] curry contains? ;
+    >r members>> r> [ class<= ] curry contains? ;
 
 : right-anonymous-intersection< ( first second -- ? )
-    members>> [ class< ] with all? ;
+    members>> [ class<= ] with all? ;
 
 : anonymous-complement< ( first second -- ? )
-    [ class>> ] bi@ swap class< ;
+    [ class>> ] bi@ swap class<= ;
 
-: (class<) ( first second -- -1/0/1 )  
+: (class<=) ( first second -- -1/0/1 )  
     {
         { [ 2dup eq? ] [ 2drop t ] }
         { [ dup object eq? ] [ 2drop t ] }
@@ -77,13 +77,13 @@ C: <anonymous-complement> anonymous-complement
         { [ 2dup [ anonymous-complement? ] both? ] [ anonymous-complement< ] }
         { [ over anonymous-union? ] [ left-anonymous-union< ] }
         { [ over anonymous-intersection? ] [ left-anonymous-intersection< ] }
-        { [ over members ] [ left-union-class< ] }
+        { [ over members ] [ left-union-class<= ] }
         { [ dup anonymous-union? ] [ right-anonymous-union< ] }
         { [ dup anonymous-intersection? ] [ right-anonymous-intersection< ] }
         { [ over anonymous-complement? ] [ 2drop f ] }
         { [ dup anonymous-complement? ] [ class>> classes-intersect? not ] }
-        { [ dup members ] [ right-union-class< ] }
-        { [ over superclass ] [ superclass< ] }
+        { [ dup members ] [ right-union-class<= ] }
+        { [ over superclass ] [ superclass<= ] }
         [ 2drop f ]
     } cond ;
 
@@ -94,7 +94,7 @@ C: <anonymous-complement> anonymous-complement
     members>> [ classes-intersect? ] with all? ;
 
 : anonymous-complement-intersect? ( first second -- ? )
-    class>> class< not ;
+    class>> class<= not ;
 
 : union-class-intersect? ( first second -- ? )
     members [ classes-intersect? ] with contains? ;
@@ -103,7 +103,7 @@ C: <anonymous-complement> anonymous-complement
     {
         { [ over tuple eq? ] [ 2drop t ] }
         { [ over builtin-class? ] [ 2drop f ] }
-        { [ over tuple-class? ] [ [ class< ] [ swap class< ] 2bi or ] }
+        { [ over tuple-class? ] [ [ class<= ] [ swap class<= ] 2bi or ] }
         [ swap classes-intersect? ]
     } cond ;
 
@@ -145,8 +145,8 @@ C: <anonymous-complement> anonymous-complement
 
 : (class-and) ( first second -- class )
     {
-        { [ 2dup class< ] [ drop ] }
-        { [ 2dup swap class< ] [ nip ] }
+        { [ 2dup class<= ] [ drop ] }
+        { [ 2dup swap class<= ] [ nip ] }
         { [ 2dup classes-intersect? not ] [ 2drop null ] }
         { [ dup members ] [ right-union-and ] }
         { [ dup anonymous-union? ] [ right-anonymous-union-and ] }
@@ -165,8 +165,8 @@ C: <anonymous-complement> anonymous-complement
 
 : (class-or) ( first second -- class )
     {
-        { [ 2dup class< ] [ nip ] }
-        { [ 2dup swap class< ] [ drop ] }
+        { [ 2dup class<= ] [ nip ] }
+        { [ 2dup swap class<= ] [ drop ] }
         { [ dup anonymous-union? ] [ right-anonymous-union-or ] }
         { [ over anonymous-union? ] [ left-anonymous-union-or ] }
         [ 2array <anonymous-union> ]
@@ -180,22 +180,27 @@ C: <anonymous-complement> anonymous-complement
         [ <anonymous-complement> ]
     } cond ;
 
+: class< ( first second -- ? )
+    {
+        { [ 2dup class<= not ] [ 2drop f ] }
+        { [ 2dup swap class<= not ] [ 2drop t ] }
+        [ [ rank-class ] bi@ < ]
+    } cond ;
+
 : largest-class ( seq -- n elt )
-    dup [
-        [ 2dup class< >r swap class< not r> and ]
-        with subset empty?
-    ] curry find [ "Topological sort failed" throw ] unless* ;
+    dup [ [ class< ] with contains? not ] curry find-last
+    [ "Topological sort failed" throw ] unless* ;
 
 : sort-classes ( seq -- newseq )
-    >vector
+    [ [ word-name ] compare ] sort >vector
     [ dup empty? not ]
     [ dup largest-class >r over delete-nth r> ]
     [ ] unfold nip ;
 
 : min-class ( class seq -- class/f )
-    over [ classes-intersect? ] curry subset
+    over [ classes-intersect? ] curry filter
     dup empty? [ 2drop f ] [
-        tuck [ class< ] with all? [ peek ] [ drop f ] if
+        tuck [ class<= ] with all? [ peek ] [ drop f ] if
     ] if ;
 
 : (flatten-class) ( class -- )
@@ -212,7 +217,7 @@ C: <anonymous-complement> anonymous-complement
 
 : flatten-builtin-class ( class -- assoc )
     flatten-class [
-        dup tuple class< [ 2drop tuple tuple ] when
+        dup tuple class<= [ 2drop tuple tuple ] when
     ] assoc-map ;
 
 : class-types ( class -- seq )

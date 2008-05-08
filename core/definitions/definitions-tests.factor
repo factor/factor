@@ -1,6 +1,6 @@
-IN: definitions.tests
 USING: tools.test generic kernel definitions sequences
 compiler.units words ;
+IN: definitions.tests
 
 GENERIC: some-generic ( a -- b )
 

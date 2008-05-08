@@ -5,19 +5,16 @@
 	<t:title>View Item</t:title>
 
 	<table>
-		<tr><th class="field-label">Summary:    </th><td><t:view component="summary"     /></td></tr>
-		<tr><th class="field-label">Priority:   </th><td><t:view component="priority"    /></td></tr>
+		<tr><th class="field-label">Summary:    </th><td><t:view t:component="summary"     /></td></tr>
+		<tr><th class="field-label">Priority:   </th><td><t:view t:component="priority"    /></td></tr>
 	</table>
 
 	<div class="description">
-		<t:view component="description" />
+		<t:view t:component="description" />
 	</div>
 
-	<t:a href="edit" query="id">Edit</t:a>
+	<t:a t:href="$todo-list/edit" t:query="id">Edit</t:a>
 	|
-	<t:form action="delete" class="inline">
-		<t:edit component="id" />
-		<button class="link-button link">Delete</button>
-	</t:form>
+	<t:button t:action="$todo-list/delete" t:for="id" class="link-button link">Delete</t:button>
 
 </t:chloe>

@@ -61,7 +61,7 @@ M: word reset
         "--- Entering: " write swap .
         "--- Variable values:" print
         [ dup get ] H{ } map>assoc describe
-    ] 2curry swap compose ;
+    ] 2curry prepose ;
 
 : watch-vars ( word vars -- )
     dupd [ (watch-vars) ] 2curry annotate ;

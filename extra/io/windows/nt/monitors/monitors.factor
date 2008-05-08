@@ -3,9 +3,9 @@
 USING: alien alien.c-types libc destructors locals
 kernel math assocs namespaces continuations sequences hashtables
 sorting arrays combinators math.bitfields strings system
-accessors threads
-io.backend io.windows io.windows.nt.backend io.monitors
-io.nonblocking io.buffers io.files io.timeouts io
+accessors threads splitting
+io.backend io.windows io.windows.nt.backend io.windows.nt.files
+io.monitors io.nonblocking io.buffers io.files io.timeouts io
 windows windows.kernel32 windows.types ;
 IN: io.windows.nt.monitors
 
@@ -79,9 +79,12 @@ TUPLE: win32-monitor < monitor port ;
 : file-notify-records ( buffer -- seq )
     [ (file-notify-records) drop ] { } make ;
 
-: parse-notify-records ( monitor buffer -- )
-    file-notify-records
-    [ parse-notify-record rot queue-change ] with each ;
+:: parse-notify-records ( monitor buffer -- )
+    buffer file-notify-records [
+        parse-notify-record
+        [ monitor path>> prepend-path normalize-path ] dip
+        monitor queue-change
+    ] each ;
 
 : fill-queue ( monitor -- )
     dup port>> check-closed
@@ -98,7 +101,7 @@ TUPLE: win32-monitor < monitor port ;
 
 M:: winnt (monitor) ( path recursive? mailbox -- monitor )
     [
-        path mailbox win32-monitor new-monitor
+        path normalize-path mailbox win32-monitor new-monitor
             path open-directory \ win32-monitor-port <buffered-port>
                 recursive? >>recursive
             >>port

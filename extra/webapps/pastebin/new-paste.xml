@@ -1,0 +1,23 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>New Paste</t:title>
+
+	<t:form t:action="$pastebin/new-paste">
+
+		<table>
+			<tr><th class="field-label">Summary: </th><td><t:edit t:component="summary" /></td></tr>
+			<tr><th class="field-label">Author: </th><td><t:edit t:component="author" /></td></tr>
+			<tr><th class="field-label">Mode: </th><td><t:edit t:component="mode" /></td></tr>
+			<tr><th class="field-label big-field-label">Description: </th><td><t:edit t:component="contents" /></td></tr>
+			<tr><th class="field-label">Captcha: </th><td><t:edit t:component="captcha" /></td></tr>
+			<tr>
+			<td></td>
+			<td>Leave the captcha blank. Spam-bots will fill it indiscriminantly, so their attempts to register will be blocked.</td>
+			</tr>
+		</table>
+
+		<input type="SUBMIT" value="Submit" />
+	</t:form>
+</t:chloe>

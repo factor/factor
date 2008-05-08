@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Daniel Ehrenberg and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel sequences
-sequences.private namespaces classes math ;
+sequences.private namespaces math ;
 IN: assocs
 
 ARTICLE: "alists" "Association lists"
@@ -68,7 +68,7 @@ ARTICLE: "assocs-lookup" "Lookup and querying of assocs"
 
 ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
 "It is often useful to use the keys of an associative mapping as a set, exploiting the constant or logarithmic lookup time of most implementations (" { $link "alists" } " being a notable exception)."
-{ $subsection subassoc? }
+{ $subsection assoc-subset? }
 { $subsection assoc-intersect }
 { $subsection update }
 { $subsection assoc-union }
@@ -96,7 +96,7 @@ $nl
 { $subsection assoc-each }
 { $subsection assoc-map }
 { $subsection assoc-push-if }
-{ $subsection assoc-subset }
+{ $subsection assoc-filter }
 { $subsection assoc-contains? }
 { $subsection assoc-all? }
 "Three additional combinators:"
@@ -203,7 +203,7 @@ HELP: assoc-push-if
 { $values { "accum" "a resizable mutable sequence" } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "key" object } { "value" object } }
 { $description "If the quotation yields true when applied to the key/value pair, adds the key/value pair at the end of " { $snippet "accum" } "." } ;
 
-HELP: assoc-subset
+HELP: assoc-filter
 { $values { "assoc" assoc } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "subassoc" "a new assoc" } }
 { $description "Outputs an assoc of the same type as " { $snippet "assoc" } " consisting of all entries for which the predicate quotation yields true." } ;
 
@@ -215,7 +215,7 @@ HELP: assoc-all?
 { $values { "assoc" assoc } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "?" "a boolean" } }
 { $description "Tests if all entries in the assoc satisfy a predicate by applying the quotation to each entry in turn. a predicate quotation to entry in the assoc. Iteration stops if an entry is found for which the quotation outputs " { $link f } ". If the assoc is empty, always outputs " { $link t } "." } ;
 
-HELP: subassoc?
+HELP: assoc-subset?
 { $values { "assoc1" assoc } { "assoc2" assoc } { "?" "a new assoc" } }
 { $description "Tests if " { $snippet "assoc2" } " contains all key/value pairs of " { $snippet "assoc1" } "." } ;
 
@@ -281,7 +281,7 @@ HELP: assoc-union
 
 HELP: assoc-diff
 { $values { "assoc1" assoc } { "assoc2" assoc } { "diff" "a new assoc" } }
-{ $description "Outputs an assoc consisting of all entries from " { $snippet "assoc2" } " whose key is not contained in " { $snippet "assoc1" } "." } 
+{ $description "Outputs an assoc consisting of all entries from " { $snippet "assoc1" } " whose key is not contained in " { $snippet "assoc2" } "." } 
 ;
 HELP: remove-all
 { $values { "assoc" assoc } { "seq" "a sequence" } { "subseq" "a new sequence" } }

@@ -30,7 +30,7 @@ PRIVATE>
     V{ 0 } clone 1 rot (fib-upto) ;
 
 : euler002 ( -- answer )
-    1000000 fib-upto [ even? ] subset sum ;
+    1000000 fib-upto [ even? ] filter sum ;
 
 ! [ euler002 ] 100 ave-time
 ! 0 ms run / 0 ms GC ave time - 100 trials
@@ -41,10 +41,10 @@ PRIVATE>
 
 : fib-upto* ( n -- seq )
     0 1 [ pick over >= ] [ tuck + dup ] [ ] unfold 3nip
-    1 head-slice* { 0 1 } prepend ;
+    but-last-slice { 0 1 } prepend ;
 
 : euler002a ( -- answer )
-    1000000 fib-upto* [ even? ] subset sum ;
+    1000000 fib-upto* [ even? ] filter sum ;
 
 ! [ euler002a ] 100 ave-time
 ! 0 ms run / 0 ms GC ave time - 100 trials

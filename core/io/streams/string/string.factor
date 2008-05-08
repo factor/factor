@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io kernel math namespaces sequences sbufs strings
 generic splitting growable continuations io.streams.plain
-io.encodings io.encodings.private ;
+io.encodings io.encodings.private math.order ;
 IN: io.streams.string
 
 M: growable dispose drop ;
@@ -15,7 +15,7 @@ M: growable stream-flush drop ;
     512 <sbuf> ;
 
 : with-string-writer ( quot -- str )
-    <string-writer> swap [ stdio get ] compose with-stream*
+    <string-writer> swap [ output-stream get ] compose with-output-stream*
     >string ; inline
 
 M: growable stream-read1 dup empty? [ drop f ] [ pop ] if ;
@@ -56,7 +56,7 @@ M: null decode-char drop stream-read1 ;
     >sbuf dup reverse-here null <decoder> ;
 
 : with-string-reader ( str quot -- )
-    >r <string-reader> r> with-stream ; inline
+    >r <string-reader> r> with-input-stream ; inline
 
 INSTANCE: growable plain-writer
 
@@ -67,15 +67,14 @@ INSTANCE: growable plain-writer
     ] unless ;
 
 : map-last ( seq quot -- seq )
-    swap dup length <reversed>
-    [ zero? rot [ call ] keep swap ] 2map nip ; inline
+    >r dup length <reversed> [ zero? ] r> compose 2map ; inline
 
 : format-table ( table -- seq )
     flip [ format-column ] map-last
     flip [ " " join ] map ;
 
 M: plain-writer stream-write-table
-    [ drop format-table [ print ] each ] with-stream* ;
+    [ drop format-table [ print ] each ] with-output-stream* ;
 
 M: plain-writer make-cell-stream 2drop <string-writer> ;
 

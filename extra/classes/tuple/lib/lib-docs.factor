@@ -6,6 +6,7 @@ HELP: >tuple<
 { $description "Explodes the tuple so that tuple slots are on the stack in the order listed in the tuple." }
 { $example
     "USING: kernel prettyprint classes.tuple.lib ;"
+    "IN: scratchpad"
     "TUPLE: foo a b c ;"
     "1 2 3 \\ foo boa \\ foo >tuple< .s"
     "1\n2\n3"
@@ -18,6 +19,7 @@ HELP: >tuple*<
 { $description "Explodes the tuple so that tuple slots ending with '*' are on the stack in the order listed in the tuple." }
 { $example
     "USING: kernel prettyprint classes.tuple.lib ;"
+    "IN: scratchpad"
     "TUPLE: foo a bb* ccc dddd* ;"
     "1 2 3 4 \\ foo boa \\ foo >tuple*< .s"
     "2\n4"

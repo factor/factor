@@ -3,6 +3,7 @@ io.streams.string namespaces classes effects source-files
 assocs sequences strings io.files definitions continuations
 sorting classes.tuple compiler.units debugger vocabs
 vocabs.loader accessors ;
+
 IN: parser.tests
 
 [
@@ -429,3 +430,8 @@ must-fail-with
 [
     "USE: this-better-not-exist" eval
 ] must-fail
+
+[ ": foo ;" eval ] [ error>> no-current-vocab? ] must-fail-with
+
+[ 92 ] [ "CHAR: \\" eval ] unit-test
+[ 92 ] [ "CHAR: \\\\" eval ] unit-test

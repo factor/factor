@@ -311,7 +311,7 @@ M: array elements*
     [
         swap [
             elements [
-                1 tail [ dup set ] each
+                rest [ dup set ] each
             ] each
         ] curry each
     ] H{ } make-assoc keys ;

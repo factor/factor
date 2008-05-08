@@ -13,7 +13,7 @@ ARTICLE: { "state-parser" "main" } "State-based parsing"
     { $subsection next }
     { $subsection state-parse }
     { $subsection get-char }
-    { $subsection rest }
+    { $subsection take-rest }
     { $subsection string-parse }
     { $subsection expect }
     { $subsection expect-string }
@@ -23,7 +23,7 @@ HELP: get-char
 { $values { "char" "the current character" } }
 { $description "Accesses the current character of the stream that is being parsed" } ;
 
-HELP: rest
+HELP: take-rest
 { $values { "string" "the rest of the parser input" } }
 { $description "Exausts the stream of the parser input and returns a string representing the rest of the input" } ;
 
@@ -69,4 +69,4 @@ HELP: next
 { $description "originally written as " { $code "spot inc" } ", code that would no longer run, this word moves the state of the XML parser to the next place in the source file, keeping track of appropriate debugging information." } ;
 
 HELP: parsing-error
-{ $class-description "class to which parsing errors delegate, containing information about which line and column the error occured on, and what the line was. Contains three slots, line, an integer, column, another integer, and line-str, a string" } ;
+{ $class-description "class from which parsing errors inherit, containing information about which line and column the error occured on, and what the line was. Contains three slots, line, an integer, column, another integer, and line-str, a string" } ;

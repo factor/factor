@@ -2,7 +2,7 @@ USING: kernel help.markup help.syntax sequences ;
 IN: sets
 
 ARTICLE: "sets" "Set-theoretic operations on sequences"
-"Set-theoretic operations on sequences are defined on the " { $vocab-link "sets" } " vocabulary. These operations use hashtables internally to achieve linear running time."
+"Set-theoretic operations on sequences are defined on the " { $vocab-link "sets" } " vocabulary. All of these operations use hashtables internally to achieve linear running time."
 $nl
 "Remove duplicates:"
 { $subsection prune }
@@ -12,7 +12,13 @@ $nl
 { $subsection diff }
 { $subsection intersect }
 { $subsection union }
+{ $subsection subset? }
+{ $subsection set= }
+"A word used to implement the above:"
+{ $subsection unique }
 { $see-also member? memq? contains? all? "assocs-sets" } ;
+
+ABOUT: "sets"
 
 HELP: unique
 { $values { "seq" "a sequence" } { "assoc" "an assoc" } }
@@ -39,9 +45,9 @@ HELP: all-unique?
 
 HELP: diff
 { $values { "seq1" sequence } { "seq2" sequence } { "newseq" sequence } }
-{ $description "Outputs a sequence consisting of elements present in " { $snippet "seq2" } " but not " { $snippet "seq1" } ", comparing elements for equality." 
+{ $description "Outputs a sequence consisting of elements present in " { $snippet "seq1" } " but not " { $snippet "seq2" } ", comparing elements for equality." 
 } { $examples
-    { $example "USING: sets prettyprint ;" "{ 1 2 3 } { 2 3 4 } diff ." "{ 4 }" }
+    { $example "USING: sets prettyprint ;" "{ 1 2 3 } { 2 3 4 } diff ." "{ 1 }" }
 } ;
 
 HELP: intersect
@@ -59,3 +65,11 @@ HELP: union
 } ;
 
 { diff intersect union } related-words
+
+HELP: subset?
+{ $values { "seq1" sequence } { "seq2" sequence } { "?" "a boolean" } }
+{ $description "Tests if every element of " { $snippet "seq1" } " is contained in " { $snippet "seq2" } "." } ;
+
+HELP: set=
+{ $values { "seq1" sequence } { "seq2" sequence } { "?" "a boolean" } }
+{ $description "Tests if both sequences contain the same elements, disregrading order and duplicates." } ;

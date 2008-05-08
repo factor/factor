@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Mackenzie Straight, Doug Coleman.
 
-USING: alien alien.c-types alien.syntax arrays byte-arrays
-kernel math sequences windows.types windows.kernel32
+USING: alien alien.c-types alien.strings alien.syntax arrays
+byte-arrays kernel math sequences windows.types windows.kernel32
 windows.errors structs windows math.bitfields ;
 IN: windows.winsock
 

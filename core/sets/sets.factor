@@ -22,10 +22,16 @@ IN: sets
     dup length <hashtable> [ (all-unique?) ] curry all? ;
 
 : intersect ( seq1 seq2 -- newseq )
-    unique [ key? ] curry subset ;
+    unique [ key? ] curry filter ;
 
 : diff ( seq1 seq2 -- newseq )
-    swap unique [ key? not ] curry subset ;
+    unique [ key? not ] curry filter ;
 
 : union ( seq1 seq2 -- newseq )
     append prune ;
+
+: subset? ( seq1 seq2 -- ? )
+    unique [ key? ] curry all? ;
+
+: set= ( seq1 seq2 -- ? )
+    [ unique ] bi@ = ;

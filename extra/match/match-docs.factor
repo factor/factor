@@ -42,6 +42,7 @@ HELP: match-replace
 { $examples
   { $example
       "USING: match prettyprint ;"
+      "IN: scratchpad"
       "MATCH-VARS: ?a ?b ;"
       "{ 1 2 } { ?a ?b } { ?b ?a } match-replace ." 
       "{ 2 1 }"

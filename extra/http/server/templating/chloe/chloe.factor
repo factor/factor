@@ -1,9 +1,14 @@
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences combinators kernel namespaces
-classes.tuple assocs splitting words arrays
-io io.files io.encodings.utf8 html.elements unicode.case
-tuple-syntax xml xml.data xml.writer xml.utilities
+classes.tuple assocs splitting words arrays memoize
+io io.files io.encodings.utf8 io.streams.string
+unicode.case tuple-syntax html html.elements
+multiline xml xml.data xml.writer xml.utilities
 http.server
 http.server.auth
+http.server.flows
+http.server.actions
 http.server.components
 http.server.sessions
 http.server.templating
@@ -18,23 +23,40 @@ C: <chloe> chloe
 
 DEFER: process-template
 
-: chloe-ns TUPLE{ name url: "http://factorcode.org/chloe/1.0" } ;
+: chloe-ns "http://factorcode.org/chloe/1.0" ; inline
+
+: chloe-attrs-only ( assoc -- assoc' )
+    [ drop name-url chloe-ns = ] assoc-filter ;
+
+: non-chloe-attrs-only ( assoc -- assoc' )
+    [ drop name-url chloe-ns = not ] assoc-filter ;
 
 : chloe-tag? ( tag -- ? )
     {
         { [ dup tag? not ] [ f ] }
-        { [ dup chloe-ns names-match? not ] [ f ] }
+        { [ dup url>> chloe-ns = not ] [ f ] }
         [ t ]
     } cond nip ;
 
 SYMBOL: tags
 
+MEMO: chloe-name ( string -- name )
+    name new
+        swap >>tag
+        chloe-ns >>url ;
+
 : required-attr ( tag name -- value )
-    dup rot at*
+    dup chloe-name rot at*
     [ nip ] [ drop " attribute is required" append throw ] if ;
 
 : optional-attr ( tag name -- value )
-    swap at ;
+    chloe-name swap at ;
+
+: children>string ( tag -- string )
+    [ [ process-template ] each ] with-string-writer ;
+
+: title-tag ( tag -- )
+    children>string set-title ;
 
 : write-title-tag ( tag -- )
     drop
@@ -83,14 +105,33 @@ SYMBOL: tags
     dup empty?
     [ drop f ] [ "," split [ dup value ] H{ } map>assoc ] if ;
 
+: flow-attr ( tag -- )
+    "flow" optional-attr {
+        { "none" [ flow-id off ] }
+        { "begin" [ begin-flow ] }
+        { "current" [ ] }
+        { f [ ] }
+    } case ;
+
+: session-attr ( tag -- )
+    "session" optional-attr {
+        { "none" [ session off flow-id off ] }
+        { "current" [ ] }
+        { f [ ] }
+    } case ;
+
 : a-start-tag ( tag -- )
-    <a
-    dup "value" optional-attr [ value f ] [
-        [ "href" required-attr ]
-        [ "query" optional-attr parse-query-attr ]
-        bi
-    ] ?if link>string =href
-    a> ;
+    [
+        <a
+        dup flow-attr
+        dup session-attr
+        dup "value" optional-attr [ value f ] [
+            [ "href" required-attr ]
+            [ "query" optional-attr parse-query-attr ]
+            bi
+        ] ?if link>string =href
+        a>
+    ] with-scope ;
 
 : process-tag-children ( tag -- )
     [ process-template ] each ;
@@ -102,17 +143,48 @@ SYMBOL: tags
     tri ;
 
 : form-start-tag ( tag -- )
-    <form
-    "POST" =method
-    tag-attrs print-attrs
-    form>
-    hidden-form-field ;
+    [
+        [
+            <form
+            "POST" =method
+            {
+                [ flow-attr ]
+                [ session-attr ]
+                [ "action" required-attr resolve-base-path =action ]
+                [ tag-attrs non-chloe-attrs-only print-attrs ]
+            } cleave
+            form>
+        ] [
+            hidden-form-field
+            "for" optional-attr [ component render-edit ] when*
+        ] bi
+    ] with-scope ;
 
 : form-tag ( tag -- )
     [ form-start-tag ]
     [ process-tag-children ]
     [ drop </form> ]
     tri ;
+
+DEFER: process-chloe-tag
+
+STRING: button-tag-markup
+<t:form class="inline" xmlns:t="http://factorcode.org/chloe/1.0">
+    <button type="submit"></button>
+</t:form>
+;
+
+: add-tag-attrs ( attrs tag -- )
+    tag-attrs swap update ;
+
+: button-tag ( tag -- )
+    button-tag-markup string>xml delegate
+    {
+        [ >r tag-attrs chloe-attrs-only r> add-tag-attrs ]
+        [ >r tag-attrs non-chloe-attrs-only r> "button" tag-named add-tag-attrs ]
+        [ >r children>string 1array r> "button" tag-named set-tag-children ]
+        [ nip ]
+    } 2cleave process-chloe-tag ;
 
 : attr>word ( value -- word/f )
     dup ":" split1 swap lookup
@@ -124,23 +196,25 @@ SYMBOL: tags
     ] unless ;
 
 : if-satisfied? ( tag -- ? )
+    t swap
     {
-        [ "code" optional-attr [ attr>word execute ] [ t ] if* ]
-        [  "var" optional-attr [ attr>var      get ] [ t ] if* ]
-        [ "svar" optional-attr [ attr>var     sget ] [ t ] if* ]
-        [ "uvar" optional-attr [ attr>var     uget ] [ t ] if* ]
-    } cleave 4array [ ] all? ;
+        [ "code"  optional-attr [ attr>word execute and ] when* ]
+        [  "var"  optional-attr [ attr>var      get and ] when* ]
+        [ "svar"  optional-attr [ attr>var     sget and ] when* ]
+        [ "uvar"  optional-attr [ attr>var     uget and ] when* ]
+        [ "value" optional-attr [ value             and ] when* ]
+    } cleave ;
 
 : if-tag ( tag -- )
     dup if-satisfied? [ process-tag-children ] [ drop ] if ;
 
-: error-tag ( tag -- )
+: error-message-tag ( tag -- )
     children>string render-error ;
 
 : process-chloe-tag ( tag -- )
     dup name-tag {
         { "chloe" [ [ process-template ] each ] }
-        { "title" [ children>string set-title ] }
+        { "title" [ title-tag ] }
         { "write-title" [ write-title-tag ] }
         { "style" [ style-tag ] }
         { "write-style" [ write-style-tag ] }
@@ -151,8 +225,11 @@ SYMBOL: tags
         { "summary" [ summary-tag ] }
         { "a" [ a-tag ] }
         { "form" [ form-tag ] }
-        { "error" [ error-tag ] }
+        { "button" [ button-tag ] }
+        { "error-message" [ error-message-tag ] }
+        { "validation-message" [ drop render-validation-message ] }
         { "if" [ if-tag ] }
+        { "comment" [ drop ] }
         { "call-next-template" [ drop call-next-template ] }
         [ "Unknown chloe tag: " swap append throw ]
     } case ;
@@ -189,7 +266,7 @@ SYMBOL: tags
         ] if
     ] with-scope ;
 
-M: chloe call-template
+M: chloe call-template*
     path>> utf8 <file-reader> read-xml process-chloe ;
 
 INSTANCE: chloe template

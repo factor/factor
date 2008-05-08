@@ -103,7 +103,7 @@ M: f parse-sockaddr nip ;
 : parse-addrinfo-list ( addrinfo -- seq )
     [ addrinfo-next ] follow
     [ addrinfo>addrspec ] map
-    [ ] subset ;
+    [ ] filter ;
 
 : prepare-resolve-host ( host serv passive? -- host' serv' flags )
     #! If the port is a number, we resolve for 'http' then

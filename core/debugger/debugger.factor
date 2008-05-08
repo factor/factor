@@ -1,12 +1,13 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic hashtables inspector io kernel
-math namespaces prettyprint sequences assocs sequences.private
-strings io.styles vectors words system splitting math.parser
-classes.tuple continuations continuations.private combinators
-generic.math io.streams.duplex classes.builtin classes
-compiler.units generic.standard vocabs threads threads.private
-init kernel.private libc io.encodings accessors ;
+math namespaces prettyprint prettyprint.config sequences assocs
+sequences.private strings io.styles vectors words system
+splitting math.parser classes.tuple continuations
+continuations.private combinators generic.math
+classes.builtin classes compiler.units generic.standard vocabs
+threads threads.private init kernel.private libc io.encodings
+mirrors accessors math.order ;
 IN: debugger
 
 GENERIC: error. ( error -- )
@@ -63,17 +64,14 @@ M: string error. print ;
     [ global [ "Error in print-error!" print drop ] bind ]
     recover ;
 
-SYMBOL: error-hook
-
-[
+: print-error-and-restarts ( error -- )
     print-error
     restarts.
     nl
-    "Type :help for debugging help." print flush
-] error-hook set-global
+    "Type :help for debugging help." print flush ;
 
 : try ( quot -- )
-    [ error-hook get call ] recover ;
+    [ print-error-and-restarts ] recover ;
 
 ERROR: assert got expect ;
 
@@ -96,10 +94,10 @@ M: relative-overflow summary
 
 : assert-depth ( quot -- )
     >r datastack r> swap slip >r datastack r>
-    2dup [ length ] compare sgn {
-        { -1 [ trim-datastacks nip relative-underflow ] }
-        { 0 [ 2drop ] }
-        { 1 [ trim-datastacks drop relative-overflow ] }
+    2dup [ length ] compare {
+        { +lt+ [ trim-datastacks nip relative-underflow ] }
+        { +eq+ [ 2drop ] }
+        { +gt+ [ trim-datastacks drop relative-overflow ] }
     } case ; inline
 
 : expired-error. ( obj -- )
@@ -208,9 +206,6 @@ M: no-next-method summary
 M: inconsistent-next-method summary
     drop "Executing call-next-method with inconsistent parameters" ;
 
-M: stream-closed-twice summary
-    drop "Attempt to perform I/O on closed stream" ;
-
 M: check-method summary
     drop "Invalid parameters for create-method" ;
 
@@ -240,6 +235,15 @@ M: condition error-help error>> error-help ;
 
 M: assert summary drop "Assertion failed" ;
 
+M: assert error.
+    "Assertion failed" print
+    standard-table-style [
+        15 length-limit set
+        5 line-limit set
+        [ expect>> [ [ "Expect:" write ] with-cell pprint-cell ] with-row ]
+        [ got>> [ [ "Got:" write ] with-cell pprint-cell ] with-row ] bi
+    ] tabular-output ;
+
 M: immutable summary drop "Sequence is immutable" ;
 
 M: redefine-error error.
@@ -266,8 +270,7 @@ M: double-free summary
 M: realloc-error summary
     drop "Memory reallocation failed" ;
 
-: error-in-thread. ( -- )
-    error-thread get-global
+: error-in-thread. ( thread -- )
     "Error in thread " write
     [
         dup thread-id #
@@ -281,13 +284,19 @@ M: thread error-in-thread ( error thread -- )
         die drop
     ] [
         global [
-            error-in-thread. print-error flush
+            error-thread get-global error-in-thread. print-error flush
         ] bind
     ] if ;
 
 M: encode-error summary drop "Character encoding error" ;
 
 M: decode-error summary drop "Character decoding error" ;
+
+M: no-such-slot summary drop "No such slot" ;
+
+M: immutable-slot summary drop "Slot is immutable" ;
+
+M: bad-create summary drop "Bad parameters to create" ;
 
 <PRIVATE
 

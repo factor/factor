@@ -1,7 +1,7 @@
 USING: generic help.markup help.syntax math memory
-namespaces sequences kernel.private layouts sorting classes
+namespaces sequences kernel.private layouts classes
 kernel.private vectors combinators quotations strings words
-assocs arrays ;
+assocs arrays math.order ;
 IN: kernel
 
 ARTICLE: "shuffle-words" "Shuffle words"
@@ -241,7 +241,7 @@ ARTICLE: "conditionals" "Conditionals and logic"
 "See " { $link "combinators" } " for forms which abstract away common patterns involving multiple nested branches."
 { $see-also "booleans" "bitwise-arithmetic" both? either? } ;
 
-ARTICLE: "equality" "Equality and comparison testing"
+ARTICLE: "equality" "Equality"
 "There are two distinct notions of ``sameness'' when it comes to objects. You can test if two references point to the same object (" { $emphasis "identity comparison" } "), or you can test if two objects are equal in a domain-specific sense, usually by being instances of the same class, and having equal slot values (" { $emphasis "value comparison" } "). Both notions of equality are equality relations in the mathematical sense."
 $nl
 "Identity comparison:"
@@ -250,15 +250,8 @@ $nl
 { $subsection = }
 "Custom value comparison methods:"
 { $subsection equal? }
+"Utility class:"
 { $subsection identity-tuple }
-"Some types of objects also have an intrinsic order allowing sorting using " { $link natural-sort } ":"
-{ $subsection <=> }
-{ $subsection compare }
-"Utilities for comparing objects:"
-{ $subsection after? }
-{ $subsection before? }
-{ $subsection after=? }
-{ $subsection before=? }
 "An object can be cloned; the clone has distinct identity but equal value:"
 { $subsection clone } ;
 
@@ -391,29 +384,6 @@ HELP: identity-tuple
     "By calling " { $link = } " on instances of " { $snippet "foo" } " we get the results we expect:"
     { $unchecked-example "T{ foo } dup = ." "t" }
     { $unchecked-example "T{ foo } dup clone = ." "f" }
-} ;
-
-HELP: <=>
-{ $values { "obj1" object } { "obj2" object } { "n" real } }
-{ $contract
-    "Compares two objects using an intrinsic total order, for example, the natural order for real numbers and lexicographic order for strings."
-    $nl
-    "The output value is one of the following:"
-    { $list
-        { "positive - indicating that " { $snippet "obj1" } " follows " { $snippet "obj2" } }
-        { "zero - indicating that " { $snippet "obj1" } " is equal to " { $snippet "obj2" } }
-        { "negative - indicating that " { $snippet "obj1" } " precedes " { $snippet "obj2" } }
-    }
-    "The default implementation treats the two objects as sequences, and recursively compares their elements. So no extra work is required to compare sequences lexicographically."
-} ;
-
-{ <=> compare natural-sort sort-keys sort-values } related-words
-
-HELP: compare
-{ $values { "obj1" object } { "obj2" object } { "quot" "a quotation with stack effect " { $snippet "( obj -- newobj )" } } { "n" integer } }
-{ $description "Compares the results of applying the quotation to both objects via " { $link <=> } "." }
-{ $examples
-    { $example "USING: kernel prettyprint sequences ;" "\"hello\" \"hi\" [ length ] compare ." "3" }
 } ;
 
 HELP: clone

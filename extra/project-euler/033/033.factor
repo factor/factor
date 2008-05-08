@@ -30,7 +30,7 @@ IN: project-euler.033
 <PRIVATE
 
 : source-033 ( -- seq )
-    10 99 [a,b] dup cartesian-product [ first2 < ] subset ;
+    10 99 [a,b] dup cartesian-product [ first2 < ] filter ;
 
 : safe? ( ax xb -- ? )
     [ 10 /mod ] bi@ -roll = rot zero? not and nip ;
@@ -42,7 +42,7 @@ IN: project-euler.033
     2dup / [ ax/xb ] dip = ;
 
 : curious-fractions ( seq -- seq )
-    [ first2 curious? ] subset [ first2 / ] map ;
+    [ first2 curious? ] filter [ first2 / ] map ;
 
 PRIVATE>
 

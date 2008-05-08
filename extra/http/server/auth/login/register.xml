@@ -4,18 +4,18 @@
 
 	<t:title>New User Registration</t:title>
 
-	<t:form action="register">
+	<t:form t:action="register">
 
 		<table>
 
 		<tr>
 		<th class="field-label">User name:</th>
-		<td><t:edit component="username" /></td>
+		<td><t:edit t:component="username" /></td>
 		</tr>
 
 		<tr>
 		<th class="field-label">Real name:</th>
-		<td><t:edit component="realname" /></td>
+		<td><t:edit t:component="realname" /></td>
 		</tr>
 
 		<tr>
@@ -25,12 +25,12 @@
 
 		<tr>
 		<th class="field-label">Password:</th>
-		<td><t:edit component="new-password" /></td>
+		<td><t:edit t:component="new-password" /></td>
 		</tr>
 
 		<tr>
 		<th class="field-label">Verify:</th>
-		<td><t:edit component="verify-password" /></td>
+		<td><t:edit t:component="verify-password" /></td>
 		</tr>
 
 		<tr>
@@ -40,7 +40,7 @@
 
 		<tr>
 		<th class="field-label">E-mail:</th>
-		<td><t:edit component="email" /></td>
+		<td><t:edit t:component="email" /></td>
 		</tr>
 
 		<tr>
@@ -50,7 +50,7 @@
 
 		<tr>
 		<th class="field-label">Captcha:</th>
-		<td><t:edit component="captcha" /></td>
+		<td><t:edit t:component="captcha" /></td>
 		</tr>
 
 		<tr>
@@ -63,14 +63,7 @@
 		<p>
 
 			<input type="submit" value="Register" />
-
-			<t:if var="http.server.auth.login:user-exists?">
-				<t:error>username taken</t:error>
-			</t:if>
-
-			<t:if var="http.server.auth.login:password-mismatch?">
-				<t:error>passwords do not match</t:error>
-			</t:if>
+			<t:validation-message />
 
 		</p>
 

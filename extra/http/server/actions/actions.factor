@@ -2,12 +2,19 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors sequences kernel assocs combinators
 http.server http.server.validators http hashtables namespaces
-fry continuations locals ;
+fry continuations locals boxes xml.entities html.elements io ;
 IN: http.server.actions
 
-SYMBOL: +append-path
-
 SYMBOL: params
+
+SYMBOL: validation-message
+
+: render-validation-message ( -- )
+    validation-message get value>> [
+        <span "error" =class span>
+            escape-string write
+        </span>
+    ] when* ;
 
 TUPLE: action init display submit get-params post-params ;
 
@@ -37,14 +44,25 @@ TUPLE: action init display submit get-params post-params ;
 : validation-failed ( -- * )
     action get display>> call exit-with ;
 
-M: action call-responder ( path action -- response )
+: validation-failed-with ( string -- * )
+    validation-message get >box
+    validation-failed ;
+
+M: action call-responder* ( path action -- response )
     '[
-        , ,
-        [ +append-path associate request-params assoc-union params set ]
-        [ action set ] bi*
-        request get method>> {
-            { "GET" [ handle-get ] }
-            { "HEAD" [ handle-get ] }
-            { "POST" [ handle-post ] }
-        } case
+        , [ CHAR: / = ] right-trim empty? [
+            , action set
+            request get
+            <box> validation-message set
+            [ request-params params set ]
+            [
+                method>> {
+                    { "GET" [ handle-get ] }
+                    { "HEAD" [ handle-get ] }
+                    { "POST" [ handle-post ] }
+                } case
+            ] bi
+        ] [
+            <404>
+        ] if
     ] with-exit-continuation ;

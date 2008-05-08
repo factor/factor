@@ -2,11 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors quotations assocs kernel splitting
 base64 html.elements io combinators http.server
-http.server.auth.providers http.server.auth.providers.null
+http.server.auth.providers http.server.auth.login
 http sequences ;
 IN: http.server.auth.basic
 
-TUPLE: basic-auth responder realm provider ;
+TUPLE: basic-auth < filter-responder realm provider ;
 
 C: <basic-auth> basic-auth
 
@@ -36,6 +36,6 @@ C: <basic-auth> basic-auth
 : logged-in? ( request responder -- ? )
     provider>> swap "authorization" header authorization-ok? ;
 
-M: basic-auth call-responder ( request path responder -- response )
+M: basic-auth call-responder* ( request path responder -- response )
     pick over logged-in?
-    [ responder>> call-responder ] [ 2nip realm>> <401> ] if ;
+    [ call-next-method ] [ 2nip realm>> <401> ] if ;

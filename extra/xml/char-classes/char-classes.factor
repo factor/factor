@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences unicode.syntax math ;
+USING: kernel sequences unicode.syntax math math.order ;
 IN: xml.char-classes
 
 CATEGORY: 1.0name-start* Ll Lu Lo Lt Nl \u000559\u0006E5\u0006E6_ ;

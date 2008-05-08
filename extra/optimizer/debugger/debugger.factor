@@ -38,7 +38,7 @@ M: comment pprint*
         " --" %
         " " over node-out-d values%
         " r: " swap node-out-r values%
-    ] "" make 1 tail ;
+    ] "" make rest ;
 
 MACRO: match-choose ( alist -- )
     [ [ ] curry ] assoc-map [ match-cond ] curry ;

@@ -67,13 +67,13 @@ MACRO: match-cond ( assoc -- )
     [ replace-patterns ] bind ;
 
 : ?1-tail ( seq -- tail/f )
-    dup length zero? not [ 1 tail ] [ drop f ] if ;
+    dup length zero? not [ rest ] [ drop f ] if ;
 
 : (match-first) ( seq pattern-seq -- bindings leftover/f )
     2dup [ length ] bi@ < [ 2drop f f ]
     [
         2dup length head over match
-        [ nip swap ?1-tail ] [ >r 1 tail r> (match-first) ] if*
+        [ nip swap ?1-tail ] [ >r rest r> (match-first) ] if*
     ] if ;
     
 : match-first ( seq pattern-seq -- bindings )

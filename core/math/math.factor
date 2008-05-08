@@ -17,15 +17,11 @@ MATH: <= ( x y -- ? ) foldable
 MATH: >  ( x y -- ? ) foldable
 MATH: >= ( x y -- ? ) foldable
 
-: after? ( obj1 obj2 -- ? ) <=> 0 > ; inline
-: before? ( obj1 obj2 -- ? ) <=> 0 < ; inline
-: after=? ( obj1 obj2 -- ? ) <=> 0 >= ; inline
-: before=? ( obj1 obj2 -- ? ) <=> 0 <= ; inline
-
 MATH: +   ( x y -- z ) foldable
 MATH: -   ( x y -- z ) foldable
 MATH: *   ( x y -- z ) foldable
 MATH: /   ( x y -- z ) foldable
+MATH: /f  ( x y -- z ) foldable
 MATH: /i  ( x y -- z ) foldable
 MATH: mod ( x y -- z ) foldable
 
@@ -37,6 +33,8 @@ MATH: bitxor ( x y -- z ) foldable
 GENERIC# shift 1 ( x n -- y ) foldable
 GENERIC: bitnot ( x -- y ) foldable
 GENERIC# bit? 1 ( x n -- ? ) foldable
+
+GENERIC: abs ( x -- y ) foldable
 
 <PRIVATE
 
@@ -51,32 +49,18 @@ PRIVATE>
         (log2)
     ] if ; foldable
 
-GENERIC: zero? ( x -- ? ) foldable
-
-M: object zero? drop f ;
-
+: zero? ( x -- ? ) 0 number= ; inline
 : 1+ ( x -- y ) 1 + ; inline
 : 1- ( x -- y ) 1 - ; inline
 : 2/ ( x -- y ) -1 shift ; inline
 : sq ( x -- y ) dup * ; inline
 : neg ( x -- -x ) 0 swap - ; inline
 : recip ( x -- y ) 1 swap / ; inline
+: sgn ( x -- n ) dup 0 < [ drop -1 ] [ 0 > 1 0 ? ] if ; inline
 
 : ?1+ [ 1+ ] [ 0 ] if* ; inline
 
-: /f  ( x y -- z ) >r >float r> >float float/f ; inline
-
-: max ( x y -- z ) [ > ] most ; inline
-: min ( x y -- z ) [ < ] most ; inline
-
-: between? ( x y z -- ? )
-    pick >= [ >= ] [ 2drop f ] if ; inline
-
 : rem ( x y -- z ) tuck mod over + swap mod ; foldable
-
-: sgn ( x -- n ) dup 0 < [ drop -1 ] [ 0 > 1 0 ? ] if ; inline
-
-: [-] ( x y -- z ) - 0 max ; inline
 
 : 2^ ( n -- 2^n ) 1 swap shift ; inline
 
@@ -95,13 +79,6 @@ UNION: number real complex ;
 M: number equal? number= ;
 
 M: real hashcode* nip >fixnum ;
-
-M: real <=> - ;
-
-! real and sequence overlap. we disambiguate:
-M: integer hashcode* nip >fixnum ;
-
-M: integer <=> - ;
 
 GENERIC: fp-nan? ( x -- ? )
 
@@ -161,7 +138,7 @@ PRIVATE>
     iterate-prep (each-integer) ; inline
 
 : times ( n quot -- )
-    [ drop ] swap compose each-integer ; inline
+    [ drop ] prepose each-integer ; inline
 
 : find-integer ( n quot -- i )
     iterate-prep (find-integer) ; inline

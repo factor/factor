@@ -37,9 +37,7 @@ M: form init V{ } clone >>components ;
     ] with-form ;
 
 : <form-response> ( form template -- response )
-    [ components>> components set ]
-    [ "text/html" <content> swap >>body ]
-    bi* ;
+    [ components>> components set ] [ <html-content> ] bi* ;
 
 : view-form ( form -- response )
     dup view-template>> <form-response> ;
@@ -78,4 +76,4 @@ M: form render-view*
     dup view-template>> render-form ;
 
 M: form render-edit*
-    dup edit-template>> render-form ;
+    nip dup edit-template>> render-form ;

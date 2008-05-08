@@ -6,7 +6,7 @@ io.streams.byte-array io.streams.memory io.encodings.utf8
 io.encodings.utf16 system alien strings cpu.architecture ;
 IN: alien.strings
 
-GENERIC# alien>string 1 ( alien encoding -- string/f )
+GENERIC# alien>string 1 ( c-ptr encoding -- string/f )
 
 M: c-ptr alien>string
     >r <memory-stream> r> <decoder>

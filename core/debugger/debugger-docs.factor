@@ -1,7 +1,7 @@
 USING: alien arrays generic generic.math help.markup help.syntax
 kernel math memory strings sbufs vectors io io.files classes
 help generic.standard continuations system debugger.private
-io.files.private ;
+io.files.private listener ;
 IN: debugger
 
 ARTICLE: "errors-assert" "Assertions"
@@ -64,7 +64,7 @@ HELP: :3
 
 HELP: error.
 { $values { "error" "an error" } }
-{ $contract "Print an error to the " { $link stdio } " stream.  You can define methods on this generic word to print human-readable messages for custom errors." }
+{ $contract "Print an error to " { $link output-stream } ". You can define methods on this generic word to print human-readable messages for custom errors." }
 { $notes "Code should call " { $link print-error } " instead, which handles the case where the printing of the error itself throws an error." } ;
 
 HELP: error-help
@@ -75,19 +75,15 @@ HELP: error-help
 
 HELP: print-error
 { $values { "error" "an error" } }
-{ $description "Print an error to the " { $link stdio } " stream." }
+{ $description "Print an error to " { $link output-stream } "." }
 { $notes "This word is called by the listener and other tools which report caught errors to the user." } ;
 
 HELP: restarts.
-{ $description "Print a list of restarts for the most recently thrown error to the " { $link stdio } " stream." } ;
-
-HELP: error-hook
-{ $var-description "A quotation with stack effect " { $snippet "( error -- )" } " which is used by " { $link try } " to report the error to the user." }
-{ $examples "The default value prints the error with " { $link print-error } ", followed by a list of restarts and a help message. The graphical listener sets this variable to display a popup instead." } ;
+{ $description "Print a list of restarts for the most recently thrown error to " { $link output-stream } "." } ;
 
 HELP: try
 { $values { "quot" "a quotation" } }
-{ $description "Attempts to call a quotation; if it throws an error, the " { $link error-hook } " gets called, stacks are restored, and execution continues after the call to " { $link try } "." }
+{ $description "Attempts to call a quotation; if it throws an error, the error is printed to " { $link output-stream } ", stacks are restored, and execution continues after the call to " { $link try } "." }
 { $examples
     "The following example prints an error and keeps going:"
     { $code

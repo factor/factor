@@ -24,6 +24,9 @@ USING: alien.syntax ;
 : SO_SNDTIMEO HEX: 15 ; inline
 : SO_RCVTIMEO HEX: 14 ; inline
 
+: F_SETFD 2 ; inline
+: FD_CLOEXEC 1 ; inline
+
 : F_SETFL 4 ; inline
 : O_NONBLOCK HEX: 800 ; inline
 

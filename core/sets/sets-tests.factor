@@ -11,7 +11,7 @@ IN: sets.tests
 [ { 2 3 } ] [ { 1 2 3 } { 2 3 4 } intersect ] unit-test
 
 [ { } ] [ { } { } diff ] unit-test
-[ { 4 } ] [ { 1 2 3 } { 2 3 4 } diff ] unit-test
+[ { 1 } ] [ { 1 2 3 } { 2 3 4 } diff ] unit-test
 
 [ V{ } ] [ { } { } union ] unit-test
 [ V{ 1 2 3 4 } ] [ { 1 2 3 } { 2 3 4 } union ] unit-test

@@ -31,7 +31,7 @@ $nl
     { { $snippet "set-" { $emphasis "foo" } } { "sets " { $snippet "foo" } " to a new value" } { $links set-length } }
     { { $snippet { $emphasis "foo" } "-" { $emphasis "bar" } } { "(tuple accessors) outputs the value of the " { $snippet "bar" } " slot of the " { $snippet "foo" } " at the top of the stack" } { } }
     { { $snippet "set-" { $emphasis "foo" } "-" { $emphasis "bar" } } { "(tuple mutators) sets the value of the " { $snippet "bar" } " slot of the " { $snippet "foo" } " at the top of the stack" } { } }
-    { { $snippet "with-" { $emphasis "foo" } } { "performs some kind of initialization and cleanup related to " { $snippet "foo" } ", usually in a new dynamic scope" } { $links with-scope with-stream } }
+    { { $snippet "with-" { $emphasis "foo" } } { "performs some kind of initialization and cleanup related to " { $snippet "foo" } ", usually in a new dynamic scope" } { $links with-scope with-input-stream with-output-stream } }
     { { $snippet "$" { $emphasis "foo" } } { "help markup" } { $links $heading $emphasis } }
 }
 { $heading "Stack effect conventions" }
@@ -104,6 +104,7 @@ $nl
 ARTICLE: "objects" "Objects"
 "An " { $emphasis "object" } " is any datum which may be identified. All values are objects in Factor. Each object carries type information, and types are checked at runtime; Factor is dynamically typed."
 { $subsection "equality" }
+{ $subsection "math.order" }
 { $subsection "classes" }
 { $subsection "tuples" }
 { $subsection "generic" }
@@ -192,18 +193,21 @@ ARTICLE: "io" "Input and output"
 "Utilities:"
 { $subsection "stream-binary" }
 { $subsection "styles" }
-{ $heading "Files" }
-{ $subsection "io.files" }
-{ $subsection "io.mmap" }
-{ $subsection "io.monitors" }
 { $heading "Encodings" }
 { $subsection "encodings-introduction" }
 { $subsection "io.encodings" }
 { $subsection "io.encodings.string" }
-{ $heading "Other features" }
+{ $heading "Files" }
+{ $subsection "io.files" }
+{ $subsection "io.mmap" }
+{ $subsection "io.monitors" }
+{ $heading "Communications" }
 { $subsection "network-streams" }
 { $subsection "io.launcher" }
-{ $subsection "io.timeouts" } ;
+{ $subsection "io.pipes" }
+{ $heading "Other features" }
+{ $subsection "io.timeouts" }
+{ $subsection "checksums" } ;
 
 ARTICLE: "tools" "Developer tools"
 { $subsection "tools.vocabs" }
@@ -228,13 +232,13 @@ ARTICLE: "article-index" "Article index"
 { $index [ articles get keys ] } ;
 
 ARTICLE: "primitive-index" "Primitive index"
-{ $index [ all-words [ primitive? ] subset ] } ;
+{ $index [ all-words [ primitive? ] filter ] } ;
 
 ARTICLE: "error-index" "Error index"
 { $index [ all-errors ] } ;
 
 ARTICLE: "type-index" "Type index"
-{ $index [ builtins get [ ] subset ] } ;
+{ $index [ builtins get [ ] filter ] } ;
 
 ARTICLE: "class-index" "Class index"
 { $index [ classes ] } ;

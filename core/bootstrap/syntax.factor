@@ -16,6 +16,7 @@ IN: bootstrap.syntax
     "?{"
     "BIN:"
     "B{"
+    "BV{"
     "C:"
     "CHAR:"
     "DEFER:"

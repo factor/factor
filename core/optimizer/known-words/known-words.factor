@@ -4,7 +4,7 @@ IN: optimizer.known-words
 USING: alien arrays generic hashtables inference.dataflow
 inference.class kernel assocs math math.private kernel.private
 sequences words parser vectors strings sbufs io namespaces
-assocs quotations sequences.private io.binary io.crc32
+assocs quotations sequences.private io.binary
 io.streams.string layouts splitting math.intervals
 math.floats.private classes.tuple classes.tuple.private classes
 classes.algebra optimizer.def-use optimizer.backend
@@ -60,7 +60,8 @@ sequences.private combinators ;
     [ value-literal sequence? ] [ drop f ] if ;
 
 : member-quot ( seq -- newquot )
-    [ [ t ] ] { } map>assoc [ drop f ] suffix [ nip case ] curry ;
+    [ literalize [ t ] ] { } map>assoc
+    [ drop f ] suffix [ nip case ] curry ;
 
 : expand-member ( #call -- )
     dup node-in-d peek value-literal member-quot f splice-quot ;
@@ -124,8 +125,6 @@ sequences.private combinators ;
 \ >vector { { array } { vector } } "specializer" set-word-prop
 
 \ >sbuf { string } "specializer" set-word-prop
-
-\ crc32 { string } "specializer" set-word-prop
 
 \ split, { string string } "specializer" set-word-prop
 

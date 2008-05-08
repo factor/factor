@@ -8,7 +8,7 @@ splitting growable classes classes.builtin classes.tuple
 classes.tuple.private words.private io.binary io.files vocabs
 vocabs.loader source-files definitions debugger float-arrays
 quotations.private sequences.private combinators
-io.encodings.binary ;
+io.encodings.binary math.order accessors ;
 IN: bootstrap.image
 
 : my-arch ( -- arch )
@@ -30,6 +30,43 @@ IN: bootstrap.image
     } ;
 
 <PRIVATE
+
+! Object cache; we only consider numbers equal if they have the
+! same type
+TUPLE: id obj ;
+
+C: <id> id
+
+M: id hashcode* obj>> hashcode* ;
+
+GENERIC: (eql?) ( obj1 obj2 -- ? )
+
+: eql? ( obj1 obj2 -- ? )
+    [ (eql?) ] [ [ class ] bi@ = ] 2bi and ;
+
+M: integer (eql?) = ;
+
+M: sequence (eql?)
+    over sequence? [
+        2dup [ length ] bi@ =
+        [ [ eql? ] 2all? ] [ 2drop f ] if
+    ] [ 2drop f ] if ;
+
+M: object (eql?) = ;
+
+M: id equal?
+    over id? [ [ obj>> ] bi@ eql? ] [ 2drop f ] if ;
+
+SYMBOL: objects
+
+: (objects) <id> objects get ; inline
+
+: lookup-object ( obj -- n/f ) (objects) at ;
+
+: put-object ( n obj -- ) (objects) set-at ;
+
+: cache-object ( obj quot -- value )
+    >r (objects) r> [ obj>> ] prepose cache ; inline
 
 ! Constants
 
@@ -60,9 +97,6 @@ IN: bootstrap.image
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
-
-! Object cache
-SYMBOL: objects
 
 ! Image output format
 SYMBOL: big-endian
@@ -187,7 +221,9 @@ GENERIC: ' ( obj -- ptr )
     2tri ;
 
 M: bignum '
-    bignum tag-number dup [ emit-bignum ] emit-object ;
+    [
+        bignum tag-number dup [ emit-bignum ] emit-object
+    ] cache-object ;
 
 ! Fixnums
 
@@ -202,9 +238,11 @@ M: fixnum '
 ! Floats
 
 M: float '
-    float tag-number dup [
-        align-here double>bits emit-64
-    ] emit-object ;
+    [
+        float tag-number dup [
+            align-here double>bits emit-64
+        ] emit-object
+    ] cache-object ;
 
 ! Special objects
 
@@ -243,7 +281,7 @@ M: f '
         ] bi
         \ word type-number object tag-number
         [ emit-seq ] emit-object
-    ] keep objects get set-at ;
+    ] keep put-object ;
 
 : word-error ( word msg -- * )
     [ % dup word-vocabulary % " " % word-name % ] "" make throw ;
@@ -252,7 +290,7 @@ M: f '
     [ target-word ] keep or ;
 
 : fixup-word ( word -- offset )
-    transfer-word dup objects get at
+    transfer-word dup lookup-object
     [ ] [ "Not in image: " word-error ] ?if ;
 
 : fixup-words ( -- )
@@ -267,12 +305,12 @@ M: wrapper '
     [ emit ] emit-object ;
 
 ! Strings
-: emit-chars ( seq -- )
+: emit-bytes ( seq -- )
     bootstrap-cell <groups>
     big-endian get [ [ be> ] map ] [ [ le> ] map ] if
     emit-seq ;
 
-: pack-string ( string -- newstr )
+: pad-bytes ( seq -- newseq )
     dup length bootstrap-cell align 0 pad-right ;
 
 : emit-string ( string -- ptr )
@@ -280,13 +318,13 @@ M: wrapper '
         dup length emit-fixnum
         f ' emit
         f ' emit
-        pack-string emit-chars
+        pad-bytes emit-bytes
     ] emit-object ;
 
 M: string '
     #! We pool strings so that each string is only written once
     #! to the image
-    objects get [ emit-string ] cache ;
+    [ emit-string ] cache-object ;
 
 : assert-empty ( seq -- )
     length 0 assert= ;
@@ -297,7 +335,11 @@ M: string '
         [ 0 emit-fixnum ] emit-object
     ] bi* ;
 
-M: byte-array ' byte-array emit-dummy-array ;
+M: byte-array '
+    byte-array type-number object tag-number [
+        dup length emit-fixnum
+        pad-bytes emit-bytes
+    ] emit-object ;
 
 M: bit-array ' bit-array emit-dummy-array ;
 
@@ -305,18 +347,18 @@ M: float-array ' float-array emit-dummy-array ;
 
 ! Tuples
 : (emit-tuple) ( tuple -- pointer )
-    [ tuple>array 1 tail-slice ]
+    [ tuple>array rest-slice ]
     [ class transfer-word tuple-layout ] bi prefix [ ' ] map
     tuple type-number dup [ emit-seq ] emit-object ;
 
 : emit-tuple ( tuple -- pointer )
     dup class word-name "tombstone" =
-    [ objects get [ (emit-tuple) ] cache ] [ (emit-tuple) ] if ;
+    [ [ (emit-tuple) ] cache-object ] [ (emit-tuple) ] if ;
 
 M: tuple ' emit-tuple ;
 
 M: tuple-layout '
-    objects get [
+    [
         [
             {
                 [ layout-hashcode , ]
@@ -328,12 +370,12 @@ M: tuple-layout '
         ] { } make [ ' ] map
         \ tuple-layout type-number
         object tag-number [ emit-seq ] emit-object
-    ] cache ;
+    ] cache-object ;
 
 M: tombstone '
     delegate
     "((tombstone))" "((empty))" ? "hashtables.private" lookup
-    word-def first objects get [ emit-tuple ] cache ;
+    word-def first [ emit-tuple ] cache-object ;
 
 ! Arrays
 M: array '
@@ -343,7 +385,7 @@ M: array '
 ! Quotations
 
 M: quotation '
-    objects get [
+    [
         quotation-array '
         quotation type-number object tag-number [
             emit ! array
@@ -351,7 +393,7 @@ M: quotation '
             0 emit ! xt
             0 emit ! code
         ] emit-object
-    ] cache ;
+    ] cache-object ;
 
 ! End of the image
 
@@ -362,8 +404,8 @@ M: quotation '
     [
         {
             dictionary source-files builtins
-            update-map class<-cache class-not-cache
-            classes-intersect-cache class-and-cache
+            update-map class<=-cache
+            class-not-cache classes-intersect-cache class-and-cache
             class-or-cache
         } [ dup get swap bootstrap-word set ] each
     ] H{ } make-assoc
@@ -433,7 +475,7 @@ M: quotation '
     "Writing image to " write
     architecture get boot-image-name resource-path
     [ write "..." print flush ]
-    [ binary <file-writer> [ (write-image) ] with-stream ] bi ;
+    [ binary [ (write-image) ] with-file-writer ] bi ;
 
 PRIVATE>
 

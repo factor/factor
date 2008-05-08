@@ -1,15 +1,8 @@
 USING: assocs math kernel sequences io.files hashtables
-quotations splitting arrays math.parser hash2
-byte-arrays words namespaces words compiler.units parser io.encodings.ascii  ;
+quotations splitting arrays math.parser hash2 math.order
+byte-arrays words namespaces words compiler.units parser
+io.encodings.ascii unicode.syntax.backend ;
 IN: unicode.data
-
-<<
-: VALUE:
-    CREATE-WORD { f } clone [ first ] curry define ; parsing
-
-: set-value ( value word -- )
-    word-def first set-first ;
->>
 
 ! Convenience functions
 : ?between? ( n/f from to -- ? )
@@ -21,11 +14,11 @@ IN: unicode.data
     ascii file-lines [ ";" split ] map ;
 
 : load-data ( -- data )
-    "extra/unicode/UnicodeData.txt" resource-path data ;
+    "resource:extra/unicode/UnicodeData.txt" data ;
 
 : (process-data) ( index data -- newdata )
     [ [ nth ] keep first swap 2array ] with map
-    [ second empty? not ] subset
+    [ second empty? not ] filter
     [ >r hex> r> ] assoc-map ;
 
 : process-data ( index data -- hash )
@@ -48,9 +41,9 @@ IN: unicode.data
     [ " " split [ hex> ] map ] assoc-map ;
 
 : process-canonical ( data -- hash2 hash )
-    (process-decomposed) [ first* ] subset
+    (process-decomposed) [ first* ] filter
     [
-        [ second length 2 = ] subset
+        [ second length 2 = ] filter
         ! using 1009 as the size, the maximum load is 4
         [ first2 first2 rot 3array ] map 1009 alist>hash2
     ] keep
@@ -58,13 +51,13 @@ IN: unicode.data
 
 : process-compat ( data -- hash )
     (process-decomposed)
-    [ dup first* [ first2 1 tail 2array ] unless ] map
+    [ dup first* [ first2 rest 2array ] unless ] map
     >hashtable chain-decomposed ;
 
 : process-combining ( data -- hash )
     3 swap (process-data)
     [ string>number ] assoc-map
-    [ nip zero? not ] assoc-subset
+    [ nip zero? not ] assoc-filter
     >hashtable ;
 
 : categories ( -- names )
@@ -96,7 +89,7 @@ IN: unicode.data
     ] assoc-map >hashtable ;
 
 : multihex ( hexstring -- string )
-    " " split [ hex> ] map [ ] subset ;
+    " " split [ hex> ] map [ ] filter ;
 
 TUPLE: code-point lower title upper ;
 
@@ -127,8 +120,8 @@ VALUE: special-casing
 
 ! Special casing data
 : load-special-casing ( -- special-casing )
-    "extra/unicode/SpecialCasing.txt" resource-path data
-    [ length 5 = ] subset
+    "resource:extra/unicode/SpecialCasing.txt" data
+    [ length 5 = ] filter
     [ [ set-code-point ] each ] H{ } make-assoc ;
 
 load-data

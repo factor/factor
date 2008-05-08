@@ -17,14 +17,14 @@ MEMO: any-char-parser ( -- parser )
 
 : search ( string parser -- seq )
   any-char-parser [ drop f ] action 2array choice repeat0 parse dup [
-    parse-result-ast [ ] subset
+    parse-result-ast [ ] filter
   ] [
     drop { }
   ] if ;
 
 
 : (replace) ( string parser -- seq )
-  any-char-parser 2array choice repeat0 parse parse-result-ast [ ] subset ;
+  any-char-parser 2array choice repeat0 parse parse-result-ast [ ] filter ;
 
 : replace ( string parser -- result )
  [  (replace) [ tree-write ] each ] with-string-writer ;

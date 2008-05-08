@@ -6,8 +6,6 @@ IN: math.floats.private
 M: fixnum >float fixnum>float ;
 M: bignum >float bignum>float ;
 
-M: float zero? dup 0.0 float= swap -0.0 float= or ;
-
 M: float >fixnum float>fixnum ;
 M: float >bignum float>bignum ;
 M: float >float ;
@@ -22,4 +20,7 @@ M: float + float+ ;
 M: float - float- ;
 M: float * float* ;
 M: float / float/f ;
+M: float /f float/f ;
 M: float mod float-mod ;
+
+M: real abs dup 0 < [ neg ] when ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: generic assocs help http io io.styles io.files continuations
-io.streams.string kernel math math.parser namespaces
+io.streams.string kernel math math.order math.parser namespaces
 quotations assocs sequences strings words html.elements
 xml.entities sbufs continuations ;
 IN: html
@@ -44,7 +44,7 @@ TUPLE: html-sub-stream style stream ;
     rot html-sub-stream-stream ;
 
 : delegate-write ( string -- )
-    stdio get delegate stream-write ;
+    output-stream get delegate stream-write ;
 
 : object-link-tag ( style quot -- )
     presented pick at [
@@ -101,7 +101,7 @@ TUPLE: html-sub-stream style stream ;
 : format-html-span ( string style stream -- )
     [
         [ [ drop delegate-write ] span-tag ] object-link-tag
-    ] with-stream* ;
+    ] with-output-stream* ;
 
 TUPLE: html-span-stream ;
 
@@ -134,7 +134,7 @@ M: html-span-stream dispose
 : format-html-div ( string style stream -- )
     [
         [ [ delegate-write ] div-tag ] object-link-tag
-    ] with-stream* ;
+    ] with-output-stream* ;
 
 TUPLE: html-block-stream ;
 
@@ -184,17 +184,17 @@ M: html-stream stream-write-table ( grid style stream -- )
                 </td>
             ] with each </tr>
         ] with each </table>
-    ] with-stream* ;
+    ] with-output-stream* ;
 
 M: html-stream make-cell-stream ( style stream -- stream' )
     (html-sub-stream) ;
 
 M: html-stream stream-nl ( stream -- )
-    dup test-last-div? [ drop ] [ [ <br/> ] with-stream* ] if ;
+    dup test-last-div? [ drop ] [ [ <br/> ] with-output-stream* ] if ;
 
 ! Utilities
 : with-html-stream ( quot -- )
-    stdio get <html-stream> swap with-stream* ; inline
+    output-stream get <html-stream> swap with-output-stream* ; inline
 
 : xhtml-preamble
     "<?xml version=\"1.0\"?>" write-html
@@ -225,13 +225,13 @@ M: html-stream stream-nl ( stream -- )
 
 : vertical-layout ( list -- )
     #! Given a list of HTML components, arrange them vertically.
-    <table> 
+    <table>
     [ <tr> <td> call </td> </tr> ] each
     </table> ;
 
 : horizontal-layout ( list -- )
     #! Given a list of HTML components, arrange them horizontally.
-    <table> 
+    <table>
      <tr "top" =valign tr> [ <td> call </td> ] each </tr>
     </table> ;
 
@@ -246,8 +246,8 @@ M: html-stream stream-nl ( stream -- )
 : simple-page ( title quot -- )
     #! Call the quotation, with all output going to the
     #! body of an html page with the given title.
-    <html>  
-        <head> <title> swap write </title> </head> 
+    <html>
+        <head> <title> swap write </title> </head>
         <body> call </body>
     </html> ;
 
@@ -255,10 +255,13 @@ M: html-stream stream-nl ( stream -- )
     #! Call the quotation, with all output going to the
     #! body of an html page with the given title. stylesheet-quot
     #! is called to generate the required stylesheet.
-    <html>  
-        <head>  
-             <title> rot write </title> 
-             swap call 
-        </head> 
+    <html>
+        <head>
+             <title> rot write </title>
+             swap call
+        </head>
         <body> call </body>
     </html> ;
+
+: render-error ( message -- )
+    <span "error" =class span> escape-string write </span> ;

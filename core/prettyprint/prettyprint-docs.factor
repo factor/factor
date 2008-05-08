@@ -135,7 +135,7 @@ ARTICLE: "prettyprint" "The prettyprinter"
 $nl
 "Prettyprinter words are found in the " { $vocab-link "prettyprint" } " vocabulary."
 $nl
-"The key words to print an object to the " { $link stdio } " stream; the first two emit a trailing newline, the second two do not:"
+"The key words to print an object to " { $link output-stream } "; the first two emit a trailing newline, the second two do not:"
 { $subsection . }
 { $subsection short. }
 { $subsection pprint }
@@ -161,17 +161,17 @@ ABOUT: "prettyprint"
 
 HELP: with-pprint
 { $values { "obj" object } { "quot" quotation } }
-{ $description "Sets up the prettyprinter and calls the quotation in a new scope. The quotation should add sections to the top-level block. When the quotation returns, the top-level block is printed to the " { $link stdio } " stream." } ;
+{ $description "Sets up the prettyprinter and calls the quotation in a new scope. The quotation should add sections to the top-level block. When the quotation returns, the top-level block is printed to " { $link output-stream } "." } ;
 
 HELP: pprint
 { $values { "obj" object } }
-{ $description "Prettyprints an object to the " { $link stdio } " stream. Output is influenced by many variables; see " { $link "prettyprint-variables" } "." } ;
+{ $description "Prettyprints an object to " { $link output-stream } ". Output is influenced by many variables; see " { $link "prettyprint-variables" } "." } ;
 
 { pprint pprint* with-pprint } related-words
 
 HELP: .
 { $values { "obj" object } }
-{ $description "Prettyprints an object to the " { $link stdio } " stream with a trailing line break. Output is influenced by many variables; see " { $link "prettyprint-variables" } "." } ;
+{ $description "Prettyprints an object to " { $link output-stream } " with a trailing line break. Output is influenced by many variables; see " { $link "prettyprint-variables" } "." } ;
 
 HELP: unparse
 { $values { "obj" object } { "str" "Factor source string" } }
@@ -179,11 +179,11 @@ HELP: unparse
 
 HELP: pprint-short
 { $values { "obj" object } }
-{ $description "Prettyprints an object to the " { $link stdio } " stream. This word rebinds printer control variables to enforce ``shorter'' output. See " { $link "prettyprint-variables" } "." } ;
+{ $description "Prettyprints an object to " { $link output-stream } ". This word rebinds printer control variables to enforce ``shorter'' output. See " { $link "prettyprint-variables" } "." } ;
 
 HELP: short.
 { $values { "obj" object } }
-{ $description "Prettyprints an object to the " { $link stdio } " stream with a trailing line break. This word rebinds printer control variables to enforce ``shorter'' output." } ;
+{ $description "Prettyprints an object to " { $link output-stream } " with a trailing line break. This word rebinds printer control variables to enforce ``shorter'' output." } ;
 
 HELP: .b
 { $values { "n" "an integer" } }
@@ -242,8 +242,16 @@ HELP: definer
 { $values { "defspec" "a definition specifier" } { "start" word } { "end" "a word or " { $link f } } }
 { $contract "Outputs the parsing words which delimit the definition." }
 { $examples
-    { $example "USING: definitions prettyprint ;" ": foo ; \\ foo definer . ." ";\nPOSTPONE: :" }
-    { $example "USING: definitions prettyprint ;" "SYMBOL: foo \\ foo definer . ." "f\nPOSTPONE: SYMBOL:" }
+    { $example "USING: definitions prettyprint ;"
+               "IN: scratchpad"
+               ": foo ; \\ foo definer . ."
+               ";\nPOSTPONE: :"
+    }
+    { $example "USING: definitions prettyprint ;"
+               "IN: scratchpad"
+               "SYMBOL: foo \\ foo definer . ."
+               "f\nPOSTPONE: SYMBOL:"
+    }
 }
 { $notes "This word is used in the implementation of " { $link see } "." } ;
 

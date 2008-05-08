@@ -1,10 +1,11 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays byte-arrays bit-arrays generic hashtables io
-assocs kernel math namespaces sequences strings sbufs io.styles
-vectors words prettyprint.config prettyprint.sections quotations
-io io.files math.parser effects classes.tuple
-classes.tuple.private classes float-arrays ;
+USING: arrays byte-arrays byte-vectors bit-arrays generic
+hashtables io assocs kernel math namespaces sequences strings
+sbufs io.styles vectors words prettyprint.config
+prettyprint.sections quotations io io.files math.parser effects
+classes.tuple math.order classes.tuple.private classes
+float-arrays ;
 IN: prettyprint.backend
 
 GENERIC: pprint* ( obj -- )
@@ -140,6 +141,7 @@ M: compose pprint-delims drop \ [ \ ] ;
 M: array pprint-delims drop \ { \ } ;
 M: byte-array pprint-delims drop \ B{ \ } ;
 M: bit-array pprint-delims drop \ ?{ \ } ;
+M: byte-vector pprint-delims drop \ BV{ \ } ;
 M: float-array pprint-delims drop \ F{ \ } ;
 M: vector pprint-delims drop \ V{ \ } ;
 M: hashtable pprint-delims drop \ H{ \ } ;
@@ -152,6 +154,7 @@ GENERIC: >pprint-sequence ( obj -- seq )
 M: object >pprint-sequence ;
 
 M: vector >pprint-sequence ;
+M: byte-vector >pprint-sequence ;
 M: curry >pprint-sequence ;
 M: compose >pprint-sequence ;
 M: hashtable >pprint-sequence >alist ;

@@ -2,36 +2,24 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-	<t:title>Planet Factor</t:title>
+	<t:style t:include="resource:extra/webapps/planet/planet.css" />
 
-	<t:atom title="Planet Factor - Atom" href="feed.xml" />
+	<div class="navbar">
+		  <t:a t:href="$planet-factor/list">Front Page</t:a>
+		| <t:a t:href="$planet-factor/feed.xml">Atom Feed</t:a>
+		| <t:a t:href="$planet-factor/admin">Admin</t:a>
 
-	<t:style include="resource:extra/webapps/planet/planet.css" />
+		<t:if t:code="http.server.sessions:uid">
+			<t:if t:code="http.server.auth.login:allow-edit-profile?">
+				| <t:a t:href="$login/edit-profile" t:flow="begin">Edit Profile</t:a>
+			</t:if>
+	
+			| <t:button t:action="$login/logout" t:flow="begin" class="link-button link">Logout</t:button>
+		</t:if>
+	</div>
 
-	<table width="100%" cellpadding="10">
-		<tr>
-			<td> <t:view component="postings" /> </td>
+	<h1><t:write-title /></h1>
 
-			<td valign="top" width="25%" class="infobox">
-				<p>
-					<strong>planet-factor</strong> is an Atom feed aggregator that collects the
-					contents of <a href="http://factorcode.org/">Factor</a>-related blogs. It was inspired by
-					<a href="http://planet.lisp.org">Planet Lisp</a>.
-				</p>
-				<p>
-					<img src="http://planet.lisp.org/feed-icon-14x14.png" />
-					<a href="feed.xml"> Syndicate </a>
-				</p>
-
-				<h2>Blogroll</h2>
-
-				<t:summary component="blogroll" />
-
-				Admin: <t:a href="edit-blog">Add Blog</t:a>
-				|
-				<t:a href="update">Update</t:a>
-			</td>
-		</tr>
-	</table>
+        <t:call-next-template />
 
 </t:chloe>

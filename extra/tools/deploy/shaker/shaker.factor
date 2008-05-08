@@ -73,7 +73,7 @@ IN: tools.deploy.shaker
     [
         [
             word-props swap
-            '[ , nip member? ] assoc-subset
+            '[ , nip member? ] assoc-filter
             f assoc-like
         ] keep set-word-props
     ] with each ;
@@ -104,7 +104,7 @@ IN: tools.deploy.shaker
     set-global ;
 
 : strip-vocab-globals ( except names -- words )
-    [ child-vocabs [ words ] map concat ] map concat diff ;
+    [ child-vocabs [ words ] map concat ] map concat swap diff ;
 
 : stripped-globals ( -- seq )
     [
@@ -114,14 +114,15 @@ IN: tools.deploy.shaker
             continuations:error-continuation
             continuations:error-thread
             continuations:restarts
-            error-hook
+            listener:error-hook
             init:init-hooks
             inspector:inspector-hook
             io.thread:io-thread
             libc.private:mallocs
             source-files:source-files
-            stderr
-            stdio
+            input-stream
+            output-stream
+            error-stream
         } %
 
         deploy-threads? [
@@ -144,7 +145,7 @@ IN: tools.deploy.shaker
                 classes:class-and-cache
                 classes:class-not-cache
                 classes:class-or-cache
-                classes:class<-cache
+                classes:class<=-cache
                 classes:classes-intersect-cache
                 classes:update-map
                 command-line:main-vocab-hook
@@ -201,8 +202,8 @@ IN: tools.deploy.shaker
     strip-globals? [
         "Stripping globals" show
         global swap
-        '[ drop , member? not ] assoc-subset
-        [ drop string? not ] assoc-subset ! strip CLI args
+        '[ drop , member? not ] assoc-filter
+        [ drop string? not ] assoc-filter ! strip CLI args
         dup keys unparse show
         21 setenv
     ] [ drop ] if ;

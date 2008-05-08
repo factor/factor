@@ -26,7 +26,7 @@ SYMBOL: windows
     [ [ length 1- dup 1- ] keep exchange ] [ drop ] if ;
 
 : unregister-window ( handle -- )
-    windows global [ [ first = not ] with subset ] change-at ;
+    windows global [ [ first = not ] with filter ] change-at ;
 
 : raised-window ( world -- )
     windows get-global [ second eq? ] with find drop

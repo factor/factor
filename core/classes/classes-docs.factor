@@ -47,6 +47,7 @@ $nl
 $nl
 "Classes can be inspected and operated upon:"
 { $subsection "class-operations" }
+{ $subsection "class-linearization" }
 { $see-also "class-index" } ;
 
 ABOUT: "classes"
@@ -55,7 +56,7 @@ HELP: class
 { $values { "object" object } { "class" class } }
 { $description "Outputs an object's canonical class. While an object may be an instance of more than one class, the canonical class is either its built-in class, or if the object is a tuple, its tuple class." }
 { $class-description "The class of all class words." }
-{ $examples { $example "USING: classes prettyprint ;" "1.0 class ." "float" } { $example "USING: classes prettyprint ;" "TUPLE: point x y z ;\nT{ point f 1 2 3 } class ." "point" } } ;
+{ $examples { $example "USING: classes prettyprint ;" "1.0 class ." "float" } { $example "USING: classes prettyprint ;" "IN: scratchpad" "TUPLE: point x y z ;\nT{ point f 1 2 3 } class ." "point" } } ;
 
 HELP: classes
 { $values { "seq" "a sequence of class words" } }
@@ -63,7 +64,7 @@ HELP: classes
 
 HELP: tuple-class
 { $class-description "The class of tuple class words." }
-{ $examples { $example "USING: classes prettyprint ;" "TUPLE: name title first last ;" "name tuple-class? ." "t" } } ;
+{ $examples { $example "USING: classes prettyprint ;" "IN: scratchpad" "TUPLE: name title first last ;" "name tuple-class? ." "t" } } ;
 
 HELP: update-map
 { $var-description "Hashtable mapping each class to a set of classes defined in terms of this class. The " { $link define-class } " word uses this information to update generic words when classes are redefined." } ;

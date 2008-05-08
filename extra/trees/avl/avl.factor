@@ -1,32 +1,34 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel generic math math.functions math.parser
-namespaces io prettyprint.backend sequences trees assocs parser ;
+USING: combinators kernel generic math math.functions
+math.parser namespaces io prettyprint.backend sequences trees
+assocs parser accessors math.order ;
 IN: trees.avl
 
-TUPLE: avl ;
-
-INSTANCE: avl tree-mixin
+TUPLE: avl < tree ;
 
 : <avl> ( -- tree )
-    avl construct-tree ;
+    avl new-tree ;
 
-TUPLE: avl-node balance ;
+TUPLE: avl-node < node balance ;
 
 : <avl-node> ( key value -- node )
-    swap <node> 0 avl-node boa tuck set-delegate ;
+    avl-node new-node
+        0 >>balance ;
 
-: change-balance ( node amount -- )
-    over avl-node-balance + swap set-avl-node-balance ;
+: increase-balance ( node amount -- )
+    swap [ + ] change-balance drop ;
 
 : rotate ( node -- node )
-    dup node+link dup node-link pick set-node+link tuck set-node-link ;    
+    dup node+link dup node-link pick set-node+link
+    tuck set-node-link ;    
 
 : single-rotate ( node -- node )
-    0 over set-avl-node-balance 0 over node+link set-avl-node-balance rotate ;
+    0 over (>>balance) 0 over node+link 
+    (>>balance) rotate ;
 
 : pick-balances ( a node -- balance balance )
-    avl-node-balance {
+    balance>> {
         { [ dup zero? ] [ 2drop 0 0 ] }
         { [ over = ] [ neg 0 ] }
         [ 0 swap ]
@@ -35,18 +37,22 @@ TUPLE: avl-node balance ;
 : double-rotate ( node -- node )
     [
         node+link [
-            node-link current-side get neg over pick-balances rot 0 swap set-avl-node-balance
-        ] keep set-avl-node-balance
-    ] keep tuck set-avl-node-balance
-    dup node+link [ rotate ] with-other-side over set-node+link rotate ;
+            node-link current-side get neg
+            over pick-balances rot 0 swap (>>balance)
+        ] keep (>>balance)
+    ] keep swap >>balance
+    dup node+link [ rotate ] with-other-side
+    over set-node+link rotate ;
 
 : select-rotate ( node -- node )
-    dup node+link avl-node-balance current-side get = [ double-rotate ] [ single-rotate ] if ;
+    dup node+link balance>> current-side get =
+    [ double-rotate ] [ single-rotate ] if ;
 
 : balance-insert ( node -- node taller? )
     dup avl-node-balance {
         { [ dup zero? ] [ drop f ] }
-        { [ dup abs 2 = ] [ sgn neg [ select-rotate ] with-side f ] }
+        { [ dup abs 2 = ]
+          [ sgn neg [ select-rotate ] with-side f ] }
         { [ drop t ] [ t ] } ! balance is -1 or 1, tree is taller
     } cond ;
 
@@ -56,7 +62,8 @@ DEFER: avl-set
     2dup node-key before? left right ? [
         [ node-link avl-set ] keep swap
         >r tuck set-node-link r>
-        [ dup current-side get change-balance balance-insert ] [ f ] if
+        [ dup current-side get increase-balance balance-insert ]
+        [ f ] if
     ] with-side ;
 
 : (avl-set) ( value key node -- node taller? )
@@ -65,10 +72,10 @@ DEFER: avl-set
     ] [ avl-insert ] if ;
 
 : avl-set ( value key node -- node taller? )
-    [ (avl-set) ] [ <avl-node> t ] if* ;
+    [ (avl-set) ] [ swap <avl-node> t ] if* ;
 
 M: avl set-at ( value key node -- node )
-    [ avl-set drop ] change-root ;
+    [ avl-set drop ] change-root drop ;
 
 : delete-select-rotate ( node -- node shorter? )
     dup node+link avl-node-balance zero? [
@@ -86,10 +93,10 @@ M: avl set-at ( value key node -- node )
     } cond ;
 
 : balance-delete ( node -- node shorter? )
-    current-side get over avl-node-balance {
+    current-side get over balance>> {
         { [ dup zero? ] [ drop neg over set-avl-node-balance f ] }
-        { [ dupd = ] [ drop 0 over set-avl-node-balance t ] }
-        [ dupd neg change-balance rebalance-delete ]
+        { [ dupd = ] [ drop 0 >>balance t ] }
+        [ dupd neg increase-balance rebalance-delete ]
     } cond ;
 
 : avl-replace-with-extremity ( to-replace node -- node shorter? )
@@ -134,12 +141,12 @@ M: avl-node avl-delete ( key node -- node shorter? deleted? )
     ] if ;
 
 M: avl delete-at ( key node -- )
-    [ avl-delete 2drop ] change-root ;
+    [ avl-delete 2drop ] change-root drop ;
 
 M: avl new-assoc 2drop <avl> ;
 
 : >avl ( assoc -- avl )
-    T{ avl T{ tree f f 0 } } assoc-clone-like ;
+    T{ avl f f 0 } assoc-clone-like ;
 
 M: avl assoc-like
     drop dup avl? [ >avl ] unless ;

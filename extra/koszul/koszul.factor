@@ -3,7 +3,7 @@
 USING: arrays assocs hashtables assocs io kernel math
 math.vectors math.matrices math.matrices.elimination namespaces
 parser prettyprint sequences words combinators math.parser
-splitting sorting shuffle symbols sets ;
+splitting sorting shuffle symbols sets math.order ;
 IN: koszul
 
 ! Utilities
@@ -19,7 +19,7 @@ IN: koszul
     } cond ;
 
 : canonicalize
-    [ nip zero? not ] assoc-subset ;
+    [ nip zero? not ] assoc-filter ;
 
 SYMBOL: terms
 
@@ -71,7 +71,7 @@ SYMBOL: terms
     [ natural-sort ] keep [ index ] curry map ;
 
 : (inversions) ( n seq -- n )
-    [ > ] with subset length ;
+    [ > ] with filter length ;
 
 : inversions ( seq -- n )
     0 swap [ length ] keep [
@@ -148,7 +148,7 @@ DEFER: (d)
 : nth-basis-elt ( generators n -- elt )
     over length [
         3dup bit? [ nth ] [ 2drop f ] if
-    ] map [ ] subset 2nip ;
+    ] map [ ] filter 2nip ;
 
 : basis ( generators -- seq )
     natural-sort dup length 2^ [ nth-basis-elt ] with map ;
@@ -184,7 +184,7 @@ DEFER: (d)
     [ length ] keep [ (graded-ker/im-d) ] curry map ;
 
 : graded-betti ( generators -- seq )
-    basis graded graded-ker/im-d flip first2 1 head* 0 prefix v- ;
+    basis graded graded-ker/im-d flip first2 but-last 0 prefix v- ;
 
 ! Bi-graded for two-step complexes
 : (bigraded-ker/im-d) ( u-deg z-deg bigraded-basis -- null/rank )
@@ -203,7 +203,7 @@ DEFER: (d)
     [ basis graded ] bi@ tensor bigraded-ker/im-d
     [ [ [ first ] map ] map ] keep
     [ [ second ] map 2 head* { 0 0 } prepend ] map
-    1 tail dup first length 0 <array> suffix
+    rest dup first length 0 <array> suffix
     [ v- ] 2map ;
 
 ! Laplacian
@@ -279,7 +279,7 @@ DEFER: (d)
 
 : bigraded-laplacian ( u-generators z-generators quot -- seq )
     >r [ basis graded ] bi@ tensor bigraded-triples r>
-    [ [ first3 ] swap compose map ] curry map ; inline
+    [ [ first3 ] prepose map ] curry map ; inline
 
 : bigraded-laplacian-betti ( u-generators z-generators -- seq )
     [ laplacian-betti ] bigraded-laplacian ;

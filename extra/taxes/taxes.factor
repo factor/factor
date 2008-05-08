@@ -1,5 +1,5 @@
 USING: arrays assocs kernel math math.intervals namespaces
-sequences combinators.lib money ;
+sequences combinators.lib money math.order ;
 IN: taxes
 
 : monthly ( x -- y ) 12 / ;

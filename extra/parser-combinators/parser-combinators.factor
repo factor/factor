@@ -177,7 +177,7 @@ M: or-parser parse ( input parser1 -- list )
     #! Return a new string without any leading whitespace
     #! from the original string.
     dup empty? [
-        dup first blank? [ 1 tail-slice left-trim-slice ] when
+        dup first blank? [ rest-slice left-trim-slice ] when
     ] unless ;
 
 TUPLE: sp-parser p1 ;
@@ -200,7 +200,7 @@ M: just-parser parse ( input parser -- result )
     #! from the results anything where the remaining
     #! input to be parsed is not empty. So ensures a
     #! fully parsed input string.
-    just-parser-p1 parse [ parse-result-unparsed empty? ] lsubset ;
+    just-parser-p1 parse [ parse-result-unparsed empty? ] lfilter ;
 
 TUPLE: apply-parser p1 quot ;
 

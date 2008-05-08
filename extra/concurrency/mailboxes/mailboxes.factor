@@ -3,7 +3,7 @@
 IN: concurrency.mailboxes
 USING: dlists threads sequences continuations
 namespaces random math quotations words kernel arrays assocs
-init system concurrency.conditions accessors ;
+init system concurrency.conditions accessors debugger ;
 
 TUPLE: mailbox threads data closed ;
 
@@ -82,6 +82,9 @@ M: mailbox dispose
     f wait-for-close-timeout ;
 
 TUPLE: linked-error error thread ;
+
+M: linked-error error.
+    [ thread>> error-in-thread. ] [ error>> error. ] bi ;
 
 C: <linked-error> linked-error
 

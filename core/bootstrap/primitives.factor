@@ -59,6 +59,7 @@ num-types get f <array> builtins set
     "arrays"
     "bit-arrays"
     "byte-arrays"
+    "byte-vectors"
     "classes.private"
     "classes.tuple"
     "classes.tuple.private"
@@ -157,7 +158,7 @@ num-types get f <array> builtins set
 
 ! Catch-all class for providing a default method.
 "object" "kernel" create
-[ f builtins get [ ] subset union-class define-class ]
+[ f builtins get [ ] filter union-class define-class ]
 [ [ drop t ] "predicate" set-word-prop ]
 bi
 
@@ -441,6 +442,22 @@ tuple
 {
     {
         { "array" "arrays" }
+        "underlying"
+        { "underlying" "growable" }
+        { "set-underlying" "growable" }
+    } {
+        { "array-capacity" "sequences.private" }
+        "fill"
+        { "length" "sequences" }
+        { "set-fill" "growable" }
+    }
+} define-tuple-class
+
+"byte-vector" "byte-vectors" create
+tuple
+{
+    {
+        { "byte-array" "byte-arrays" }
         "underlying"
         { "underlying" "growable" }
         { "set-underlying" "growable" }
