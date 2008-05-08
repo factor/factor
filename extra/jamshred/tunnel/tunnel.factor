@@ -137,7 +137,9 @@ C: <segment> segment
     [ wall-normal ] [ forward>> swap reflect ] [ (>>forward) ] tri ;
 
 : bounce-left ( segment oint -- )
-    [ forward>> vneg ] dip [ left>> swap reflect ] [ (>>left) ] bi ;
+    #! must be done after forward
+    [ forward>> vneg ] dip [ left>> swap reflect ]
+    [ forward>> proj-perp normalize ] [ (>>left) ] tri ;
 
 : bounce-up ( segment oint -- )
     #! must be done after forward and left!

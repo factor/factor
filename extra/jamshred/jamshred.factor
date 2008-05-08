@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alarms arrays calendar jamshred.game jamshred.gl jamshred.log kernel math math.constants namespaces sequences threads ui ui.gadgets ui.gestures ui.render math.vectors ;
+USING: accessors alarms arrays calendar jamshred.game jamshred.gl jamshred.player jamshred.log kernel math math.constants namespaces sequences threads ui ui.gadgets ui.gestures ui.render math.vectors ;
 IN: jamshred
 
 TUPLE: jamshred-gadget jamshred last-hand-loc alarm ;
@@ -8,8 +8,8 @@ TUPLE: jamshred-gadget jamshred last-hand-loc alarm ;
 : <jamshred-gadget> ( jamshred -- gadget )
     jamshred-gadget construct-gadget swap >>jamshred ;
 
-: default-width ( -- x ) 640 ;
-: default-height ( -- y ) 480 ;
+: default-width ( -- x ) 800 ;
+: default-height ( -- y ) 600 ;
 
 M: jamshred-gadget pref-dim*
     drop default-width default-height 2array ;
@@ -23,7 +23,7 @@ M: jamshred-gadget draw-gadget* ( gadget -- )
     ] [
         dup [ jamshred>> jamshred-update ]
         [ relayout-1 ] bi
-        50 sleep jamshred-loop
+        10 sleep jamshred-loop
     ] if ;
 
 M: jamshred-gadget graft* ( gadget -- )
@@ -57,10 +57,15 @@ M: jamshred-gadget ungraft* ( gadget -- )
         ] [ 2drop ] if* 
     ] 2keep >>last-hand-loc drop ;
 
+: handle-mouse-scroll ( jamshred-gadget -- )
+    jamshred>> jamshred-player scroll-direction get
+    second neg swap change-player-speed ;
+
 jamshred-gadget H{
     { T{ key-down f f "r" } [ jamshred-restart ] }
     { T{ key-down f f " " } [ jamshred>> toggle-running ] }
     { T{ motion } [ handle-mouse-motion ] }
+    { T{ mouse-scroll } [ handle-mouse-scroll ] }
 } set-gestures
 
 : jamshred-window ( -- )
