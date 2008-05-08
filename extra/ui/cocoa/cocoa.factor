@@ -14,18 +14,8 @@ C: <handle> handle
 
 SINGLETON: cocoa-ui-backend
 
-SYMBOL: stop-after-last-window?
-
-: event-loop? ( -- ? )
-    stop-after-last-window? get-global
-    [ windows get-global empty? not ] [ t ] if ;
-
-: event-loop ( -- )
-    event-loop? [
-        [
-            [ NSApp do-events ui-wait ] ui-try
-        ] with-autorelease-pool event-loop
-    ] when ;
+M: cocoa-ui-backend do-events ( -- )
+    [ [ NSApp do-events ui-wait ] ui-try ] with-autorelease-pool ;
 
 TUPLE: pasteboard handle ;
 
@@ -112,6 +102,7 @@ M: cocoa-ui-backend ui
     "UI" assert.app [
         [
             init-clipboard
+            stop-after-last-window? off
             cocoa-init-hook get [ call ] when*
             start-ui
             finish-launching
