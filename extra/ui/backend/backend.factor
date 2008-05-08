@@ -5,6 +5,8 @@ IN: ui.backend
 
 SYMBOL: ui-backend
 
+HOOK: do-events ui-backend ( -- )
+
 HOOK: set-title ui-backend ( string world -- )
 
 HOOK: set-fullscreen* ui-backend ( ? world -- )
