@@ -702,6 +702,7 @@ tuple
     { "resize-float-array" "float-arrays" }
     { "dll-valid?" "alien" }
     { "unimplemented" "kernel.private" }
+    { "gc-reset" "memory" }
 }
 dup length [ >r first2 r> make-primitive ] 2each
 
