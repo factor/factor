@@ -186,4 +186,5 @@ void *primitives[] = {
 	primitive_resize_float_array,
 	primitive_dll_validp,
 	primitive_unimplemented,
+	primitive_gc_reset,
 };

@@ -138,6 +138,8 @@ void collect_cards(void);
 /* the oldest generation */
 #define TENURED (data_heap->gen_count-1)
 
+#define MAX_GEN_COUNT 3
+
 /* used during garbage collection only */
 F_ZONE *newspace;
 
@@ -158,16 +160,17 @@ void init_data_heap(CELL gens,
 	bool secure_gc_);
 
 /* statistics */
-CELL nursery_gc_time;
-CELL nursery_collections;
-CELL aging_gc_time;
-CELL aging_collections;
-CELL tenured_gc_time;
-CELL tenured_collections;
+typedef struct {
+	CELL collections;
+	CELL gc_time;
+	CELL max_gc_time;
+	CELL object_count;
+	u64 bytes_copied;
+} F_GC_STATS;
+
+F_GC_STATS gc_stats[MAX_GEN_COUNT];
 u64 cards_scanned;
 u64 decks_scanned;
-u64 bytes_copied;
-u64 bytes_collected;
 CELL code_heap_scans;
 
 /* only meaningful during a GC */
@@ -388,6 +391,7 @@ CELL collect_next(CELL scan);
 
 DECLARE_PRIMITIVE(gc);
 DECLARE_PRIMITIVE(gc_stats);
+DECLARE_PRIMITIVE(gc_reset);
 DECLARE_PRIMITIVE(become);
 
 CELL find_all_words(void);
