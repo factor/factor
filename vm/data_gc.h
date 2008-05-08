@@ -46,6 +46,9 @@ typedef struct {
 
 	CELL *cards;
 	CELL *cards_end;
+
+	CELL *decks;
+	CELL *decks_end;
 } F_DATA_HEAP;
 
 F_DATA_HEAP *data_heap;
@@ -71,16 +74,26 @@ offset within the card */
 #define CARD_BITS 6
 #define ADDR_CARD_MASK (CARD_SIZE-1)
 
-INLINE void clear_card(F_CARD *c)
-{
-	*c = CARD_BASE_MASK; /* invalid value */
-}
-
 DLLEXPORT CELL cards_offset;
-void init_cards_offset(void);
 
 #define ADDR_TO_CARD(a) (F_CARD*)(((CELL)(a) >> CARD_BITS) + cards_offset)
 #define CARD_TO_ADDR(c) (CELL*)(((CELL)(c) - cards_offset)<<CARD_BITS)
+
+/* A deck is 4 kilobytes or 64 cards. */
+typedef u8 F_DECK;
+
+#define DECK_SIZE (4 * 1024)
+#define DECK_BITS 12
+#define ADDR_DECK_MASK (DECK_SIZE-1)
+
+DLLEXPORT CELL decks_offset;
+
+#define ADDR_TO_DECK(a) (F_DECK*)(((CELL)(a) >> DECK_BITS) + decks_offset)
+#define DECK_TO_ADDR(c) (CELL*)(((CELL)(c) - decks_offset)<<DECK_BITS)
+
+#define DECK_TO_CARD(d) (F_CARD*)((((CELL)(d) - decks_offset) << (DECK_BITS - CARD_BITS)) + cards_offset)
+
+void init_card_decks(void);
 
 /* this is an inefficient write barrier. compiled definitions use a more
 efficient one hand-coded in assembly. the write barrier must be called
@@ -89,7 +102,10 @@ to a younger one */
 INLINE void write_barrier(CELL address)
 {
 	F_CARD *c = ADDR_TO_CARD(address);
-	*c |= (CARD_POINTS_TO_NURSERY | CARD_POINTS_TO_AGING);
+	*c |= CARD_MARK_MASK;
+
+	F_DECK *d = ADDR_TO_DECK(address);
+	*d = CARD_MARK_MASK ;
 }
 
 #define SLOT(obj,slot) (UNTAG(obj) + (slot) * CELLS)
@@ -142,12 +158,16 @@ void init_data_heap(CELL gens,
 	bool secure_gc_);
 
 /* statistics */
-s64 gc_time;
+CELL nursery_gc_time;
 CELL nursery_collections;
+CELL aging_gc_time;
 CELL aging_collections;
+CELL tenured_gc_time;
 CELL tenured_collections;
-s64 cards_checked;
-s64 cards_scanned;
+u64 cards_scanned;
+u64 decks_scanned;
+u64 bytes_copied;
+u64 bytes_collected;
 CELL code_heap_scans;
 
 /* only meaningful during a GC */

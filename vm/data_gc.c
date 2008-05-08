@@ -21,10 +21,11 @@ CELL init_zone(F_ZONE *z, CELL size, CELL start)
 	return z->end;
 }
 
-void init_cards_offset(void)
+void init_card_decks(void)
 {
-	cards_offset = (CELL)data_heap->cards
-		- (data_heap->segment->start >> CARD_BITS);
+	CELL start = data_heap->segment->start & ~(DECK_SIZE - 1);
+	cards_offset = (CELL)data_heap->cards - (start >> CARD_BITS);
+	decks_offset = (CELL)data_heap->decks - (start >> DECK_BITS);
 }
 
 F_DATA_HEAP *alloc_data_heap(CELL gens,
@@ -62,9 +63,13 @@ F_DATA_HEAP *alloc_data_heap(CELL gens,
 	data_heap->generations = safe_malloc(sizeof(F_ZONE) * data_heap->gen_count);
 	data_heap->semispaces = safe_malloc(sizeof(F_ZONE) * data_heap->gen_count);
 
-	CELL cards_size = total_size / CARD_SIZE;
+	CELL cards_size = (total_size + DECK_SIZE) / CARD_SIZE;
 	data_heap->cards = safe_malloc(cards_size);
 	data_heap->cards_end = data_heap->cards + cards_size;
+
+	CELL decks_size = (total_size + DECK_SIZE) / DECK_SIZE;
+	data_heap->decks = safe_malloc(decks_size);
+	data_heap->decks_end = data_heap->decks + decks_size;
 
 	CELL alloter = data_heap->segment->start;
 
@@ -105,6 +110,7 @@ void dealloc_data_heap(F_DATA_HEAP *data_heap)
 	free(data_heap->generations);
 	free(data_heap->semispaces);
 	free(data_heap->cards);
+	free(data_heap->decks);
 	free(data_heap);
 }
 
@@ -113,17 +119,28 @@ cleared when a generation has been cleared */
 void clear_cards(CELL from, CELL to)
 {
 	/* NOTE: reverse order due to heap layout. */
+	F_CARD *first_card = ADDR_TO_CARD(data_heap->generations[to].start);
 	F_CARD *last_card = ADDR_TO_CARD(data_heap->generations[from].end);
-	F_CARD *ptr = ADDR_TO_CARD(data_heap->generations[to].start);
-	for(; ptr < last_card; ptr++)
-		clear_card(ptr);
+	F_CARD *ptr;
+	for(ptr = first_card; ptr < last_card; ptr++)
+		*ptr = CARD_BASE_MASK; /* invalid value */
+}
+
+void clear_decks(CELL from, CELL to)
+{
+	/* NOTE: reverse order due to heap layout. */
+	F_CARD *first_deck = ADDR_TO_CARD(data_heap->generations[to].start);
+	F_CARD *last_deck = ADDR_TO_CARD(data_heap->generations[from].end);
+	F_CARD *ptr;
+	for(ptr = first_deck; ptr < last_deck; ptr++)
+		*ptr = 0;
 }
 
 void set_data_heap(F_DATA_HEAP *data_heap_)
 {
 	data_heap = data_heap_;
 	nursery = data_heap->generations[NURSERY];
-	init_cards_offset();
+	init_card_decks();
 	clear_cards(NURSERY,TENURED);
 }
 
@@ -141,13 +158,16 @@ void init_data_heap(CELL gens,
 	extra_roots_region = alloc_segment(getpagesize());
 	extra_roots = extra_roots_region->start - CELLS;
 
-	gc_time = 0;
-	aging_collections = 0;
+	nursery_gc_time = 0;
 	nursery_collections = 0;
+	aging_gc_time = 0;
+	aging_collections = 0;
+	tenured_gc_time = 0;
 	tenured_collections = 0;
-	cards_checked = 0;
 	cards_scanned = 0;
+	decks_scanned = 0;
 	code_heap_scans = 0;
+	bytes_copied = 0;
 	secure_gc = secure_gc_;
 }
 
@@ -231,6 +251,7 @@ DEFINE_PRIMITIVE(data_room)
 	int gen;
 
 	dpush(tag_fixnum((data_heap->cards_end - data_heap->cards) >> 10));
+	dpush(tag_fixnum((data_heap->decks_end - data_heap->decks) >> 10));
 
 	for(gen = 0; gen < data_heap->gen_count; gen++)
 	{
@@ -293,9 +314,9 @@ void collect_card(F_CARD *ptr, CELL gen, CELL here)
 
 	if(offset == CARD_BASE_MASK)
 	{
-		if(c == 0xff)
+		/* if(c == 0xff)
 			critical_error("bad card",(CELL)ptr);
-		else
+		else */
 			return;
 	}
 
@@ -308,23 +329,18 @@ void collect_card(F_CARD *ptr, CELL gen, CELL here)
 	cards_scanned++;
 }
 
-void collect_card_deck(CELL gen,
-	F_CARD *first_card, F_CARD *last_card,
-	F_CARD mask, F_CARD unmask)
+void collect_card_deck(F_DECK *deck, CELL gen, F_CARD mask, F_CARD unmask)
 {
-	CELL here = data_heap->generations[gen].here;
+	F_CARD *first_card = DECK_TO_CARD(deck);
+	F_CARD *last_card = DECK_TO_CARD(deck + 1);
 
-	long long cards_checked_ = 0;
+	CELL here = data_heap->generations[gen].here;
 
 	u32 *quad_ptr;
 	u32 quad_mask = mask | (mask << 8) | (mask << 16) | (mask << 24);
 
-	u32 *last_card_aligned = (u32 *)(((CELL)last_card + 3) & ~3);
-
-	for(quad_ptr = (u32 *)first_card; quad_ptr <= (u32 *)last_card_aligned; quad_ptr++)
+	for(quad_ptr = (u32 *)first_card; quad_ptr < (u32 *)last_card; quad_ptr++)
 	{
-		cards_checked_ += 4;
-
 		if(*quad_ptr & quad_mask)
 		{
 			F_CARD *ptr = (F_CARD *)quad_ptr;
@@ -341,14 +357,14 @@ void collect_card_deck(CELL gen,
 		}
 	}
 
-	cards_checked += cards_checked_;
+	decks_scanned++;
 }
 
 /* Copy all newspace objects referenced from marked cards to the destination */
 void collect_gen_cards(CELL gen)
 {
-	F_CARD *first_card = ADDR_TO_CARD(data_heap->generations[gen].start);
-	F_CARD *last_card = ADDR_TO_CARD(data_heap->generations[gen].here - 1);
+	F_DECK *first_deck = ADDR_TO_DECK(data_heap->generations[gen].start);
+	F_DECK *last_deck = ADDR_TO_DECK(data_heap->generations[gen].end);
 
 	F_CARD mask, unmask;
 
@@ -398,7 +414,16 @@ void collect_gen_cards(CELL gen)
 		return;
 	}
 
-	collect_card_deck(gen,first_card,last_card,mask,unmask);
+	F_DECK *ptr;
+
+	for(ptr = first_deck; ptr < last_deck; ptr++)
+	{
+		if(*ptr & mask)
+		{
+			collect_card_deck(ptr,gen,mask,unmask);
+			*ptr &= ~unmask;
+		}
+	}
 }
 
 /* Scan cards in all generations older than the one being collected, copying
@@ -485,6 +510,7 @@ INLINE void *copy_untagged_object(void *pointer, CELL size)
 		longjmp(gc_jmp,1);
 	allot_barrier(newspace->here);
 	newpointer = allot_zone(newspace,size);
+	bytes_copied += size;
 	memcpy(newpointer,pointer,size);
 	return newpointer;
 }
@@ -615,6 +641,7 @@ CELL collect_next(CELL scan)
 INLINE void reset_generation(CELL i)
 {
 	F_ZONE *z = (i == NURSERY ? &nursery : &data_heap->generations[i]);
+	bytes_collected += (z->here - z->start);
 	z->here = z->start;
 	if(secure_gc)
 		memset((void*)z->start,69,z->size);
@@ -669,7 +696,7 @@ void begin_gc(CELL requested_bytes)
 #endif
 }
 
-void end_gc(void)
+void end_gc(CELL gc_elapsed)
 {
 	if(growing_data_heap)
 	{
@@ -689,11 +716,13 @@ void end_gc(void)
 		if(collecting_gen == TENURED)
 		{
 			tenured_collections++;
+			tenured_gc_time += gc_elapsed;
 			GC_PRINT(END_AGING_GC,aging_collections,cards_scanned);
 		}
 		else if(HAVE_AGING_P && collecting_gen == AGING)
 		{
 			aging_collections++;
+			aging_gc_time += gc_elapsed;
 			GC_PRINT(END_NURSERY_GC,nursery_collections,cards_scanned);
 		}
 	}
@@ -704,6 +733,7 @@ void end_gc(void)
 		reset_generations(NURSERY,collecting_gen);
 
 		nursery_collections++;
+		nursery_gc_time += gc_elapsed;
 	}
 
 	if(collecting_gen == TENURED)
@@ -802,9 +832,8 @@ void garbage_collection(CELL gen,
 	CELL gc_elapsed = (current_millis() - start);
 
 	GC_PRINT(END_GC,gc_elapsed);
-	end_gc();
+	end_gc(gc_elapsed);
 
-	gc_time += gc_elapsed;
 	performing_gc = false;
 }
 
@@ -826,15 +855,19 @@ DEFINE_PRIMITIVE(gc)
 /* Push total time spent on GC */
 DEFINE_PRIMITIVE(gc_stats)
 {
-	CELL array = tag_object(allot_array(ARRAY_TYPE,7,F));
+	CELL array = tag_object(allot_array(ARRAY_TYPE,11,F));
 	REGISTER_ROOT(array);
-	set_array_nth(untag_object(array),0,tag_bignum(long_long_to_bignum(gc_time)));
+	set_array_nth(untag_object(array),0,allot_cell(nursery_gc_time));
 	set_array_nth(untag_object(array),1,allot_cell(nursery_collections));
-	set_array_nth(untag_object(array),2,allot_cell(aging_collections));
-	set_array_nth(untag_object(array),3,allot_cell(tenured_collections));
-	set_array_nth(untag_object(array),4,tag_bignum(long_long_to_bignum(cards_scanned)));
-	set_array_nth(untag_object(array),5,tag_bignum(long_long_to_bignum(cards_checked)));
-	set_array_nth(untag_object(array),6,allot_cell(code_heap_scans));
+	set_array_nth(untag_object(array),2,allot_cell(aging_gc_time));
+	set_array_nth(untag_object(array),3,allot_cell(aging_collections));
+	set_array_nth(untag_object(array),4,allot_cell(tenured_gc_time));
+	set_array_nth(untag_object(array),5,allot_cell(tenured_collections));
+	set_array_nth(untag_object(array),6,tag_bignum(long_long_to_bignum(cards_scanned)));
+	set_array_nth(untag_object(array),7,tag_bignum(long_long_to_bignum(decks_scanned)));
+	set_array_nth(untag_object(array),8,allot_cell(code_heap_scans));
+	set_array_nth(untag_object(array),9,tag_bignum(long_long_to_bignum(bytes_copied)));
+	set_array_nth(untag_object(array),10,tag_bignum(long_long_to_bignum(bytes_collected)));
 	UNREGISTER_ROOT(array);
 	dpush(array);
 }

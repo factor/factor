@@ -372,7 +372,7 @@ M: object infer-call
 t over set-effect-terminated?
 set-primitive-effect
 
-\ data-room { } { integer array } <effect> set-primitive-effect
+\ data-room { } { integer integer array } <effect> set-primitive-effect
 \ data-room make-flushable
 
 \ code-room { } { integer integer integer integer } <effect> set-primitive-effect
