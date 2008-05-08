@@ -2,7 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: alien alien.c-types alien.syntax kernel libc structs
-math namespaces system combinators vocabs.loader unix.types ;
+       math namespaces system combinators vocabs.loader unix.ffi unix.types
+       qualified ;
+
+QUALIFIED: unix.ffi
 
 IN: unix
 
@@ -75,7 +78,17 @@ FUNCTION: void* mmap ( void* addr, size_t len, int prot, int flags, int fd, off_
 FUNCTION: int munmap ( void* addr, size_t len ) ;
 FUNCTION: uint ntohl ( uint n ) ;
 FUNCTION: ushort ntohs ( ushort n ) ;
-FUNCTION: int open ( char* path, int flags, int prot ) ;
+FUNCTION: char* strerror ( int errno ) ;
+
+TUPLE: open-error path flags prot message ;
+
+: open ( path flags prot -- int )
+  [ ] [ unix.ffi:open ] 3bi
+  dup 0 >=
+    [ nip nip nip ]
+    [ drop err_no strerror open-error boa throw ]
+  if ;
+
 FUNCTION: int pclose ( void* file ) ;
 FUNCTION: int pipe ( int* filedes ) ;
 FUNCTION: void* popen ( char* command, char* type ) ;
@@ -96,7 +109,6 @@ FUNCTION: int setreuid ( uid_t ruid, uid_t euid ) ;
 FUNCTION: int setsockopt ( int s, int level, int optname, void* optval, socklen_t optlen ) ;
 FUNCTION: int setuid ( uid_t uid ) ;
 FUNCTION: int socket ( int domain, int type, int protocol ) ;
-FUNCTION: char* strerror ( int errno ) ;
 FUNCTION: int symlink ( char* path1, char* path2 ) ;
 FUNCTION: int system ( char* command ) ;
 FUNCTION: int unlink ( char* path ) ;

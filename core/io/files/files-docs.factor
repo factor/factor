@@ -277,7 +277,7 @@ HELP: append-path
 
 HELP: prepend-path
 { $values { "str1" "a string" } { "str2" "a string" } { "str" "a string" } }
-{ $description "Concatenates two pathnames." } ;
+{ $description "Appends str1 onto str2 to form a pathname." } ;
 
 { append-path prepend-path } related-words
 
