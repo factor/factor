@@ -15,7 +15,12 @@ C: <handle> handle
 SINGLETON: cocoa-ui-backend
 
 M: cocoa-ui-backend do-events ( -- )
-    [ [ NSApp do-events ui-wait ] ui-try ] with-autorelease-pool ;
+    [
+        [
+            NSApp [ dup do-event ] [ ] [ ] while drop
+            ui-wait
+        ] ui-try
+    ] with-autorelease-pool ;
 
 TUPLE: pasteboard handle ;
 
