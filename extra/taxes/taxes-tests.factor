@@ -111,6 +111,6 @@ IN: taxes.tests
     24000 2008 2 f <w4> <federal> withholding biweekly dollars/cents
 ] unit-test
 
-[ 754 22 ] [
+[ 754 72 ] [
     78250 2008 2 f <w4> <federal> withholding biweekly dollars/cents
 ] unit-test
