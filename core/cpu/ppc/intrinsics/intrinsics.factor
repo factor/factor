@@ -56,13 +56,24 @@ IN: cpu.ppc.intrinsics
 : load-cards-offset ( dest -- )
     "cards_offset" f pick %load-dlsym  dup 0 LWZ ;
 
+: load-decks-offset ( dest -- )
+    "decks_offset" f pick %load-dlsym  dup 0 LWZ ;
+
 : %write-barrier ( -- )
     "val" get operand-immediate? "obj" get fresh-object? or [
+        ! Mark the card
         "obj" operand "scratch" operand card-bits SRWI
         "val" operand load-cards-offset
         "scratch" operand dup "val" operand ADD
         "val" operand "scratch" operand 0 LBZ
         "val" operand dup card-mark ORI
+        "val" operand "scratch" operand 0 STB
+
+        ! Mark the card deck
+        "obj" operand "scratch" operand deck-bits SRWI
+        "val" operand load-decks-offset
+        "scratch" operand dup "val" operand ADD
+        card-mark "val" operand LI
         "val" operand "scratch" operand 0 STB
     ] unless ;
 

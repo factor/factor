@@ -71,7 +71,7 @@ IN: cpu.x86.intrinsics
         ! Mark the card deck
         "obj" operand deck-bits card-bits - SHR
         "decks_offset" f temp-reg v>operand %alien-global
-        temp-reg v>operand "obj" operand [+] card-mark OR
+        temp-reg v>operand "obj" operand [+] card-mark MOV
     ] unless ;
 
 \ set-slot {
