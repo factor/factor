@@ -114,21 +114,11 @@ C: <segment> segment
 : fraction-from-wall ( seg loc -- fraction )
     fraction-from-centre 1 swap - ;
 
-: distant 10 ; inline
-
-:: (collision-coefficient) ( -b sqrt(b^2-4ac) 2a -- c )
-    sqrt(b^2-4ac) complex? [
-        distant
-    ] [
-        -b sqrt(b^2-4ac) + 2a /
-        -b sqrt(b^2-4ac) - 2a / max ! the -ve answer is behind us
-    ] if ;
-
-:: collision-coefficient ( v w -- c )
+:: collision-coefficient ( v w r -- c )
     [let* | a [ v dup v. ]
             b [ v w v. 2 * ]
-            c [ w dup v. v dup v. - ] |
-        c b a quadratic [ real-part ] bi@ max ] ;
+            c [ w dup v. r sq - ] |
+        c b a quadratic max ] ;
 
 : sideways-heading ( oint segment -- v )
     [ forward>> ] bi@ proj-perp ;
@@ -137,12 +127,11 @@ C: <segment> segment
     [ [ location>> ] bi@ v- ] keep forward>> proj-perp ;
 
 : collision-vector ( oint segment -- v )
-        dupd [ sideways-heading ] [ sideways-relative-location ] 2bi
-        collision-coefficient swap forward>> n*v ;
+    [ sideways-heading ] [ sideways-relative-location ] [ radius>> ] 2tri
+    swap [ collision-coefficient ] dip forward>> n*v ;
 
-USING: prettyprint jamshred.log io.streams.string ;
 : distance-to-collision ( oint segment -- distance )
-    collision-vector norm [ dup . ] with-string-writer jamshred-log ;
+    collision-vector norm ;
 
 : bounce-forward ( segment oint -- )
     [ wall-normal ] [ forward>> swap reflect ] [ (>>forward) ] tri ;
