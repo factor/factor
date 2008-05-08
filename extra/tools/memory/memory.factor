@@ -36,6 +36,7 @@ IN: tools.memory
         [ first2 ] [ number>string "Generation " prepend ] bi*
         write-total/used/free
     ] 2each
+    "Decks" write-total
     "Cards" write-total ;
 
 : write-labelled-size ( n string -- )

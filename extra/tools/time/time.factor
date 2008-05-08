@@ -9,15 +9,19 @@ IN: tools.time
 
 : stats. ( data -- )
     {
-        "Run time"
-        "GC time"
-        "Nursery collections"
-        "Aging collections"
-        "Tenured collections"
-        "Cards checked"
-        "Cards scanned"
-        "Code literal collections"
-    } swap zip [ nip 0 > ] assoc-filter
+        "Run time (ms):"
+        "Nursery GC time (ms):"
+        "Nursery GC #:"
+        "Aging GC time (ms):"
+        "Aging GC #:"
+        "Tenured GC time (ms):"
+        "Tenured GC #:"
+        "Cards scanned:"
+        "Decks scanned:"
+        "Code literal GC #:"
+        "Bytes copied:"
+        "Bytes collected:"
+    } swap zip
     standard-table-style [
         [
             [
