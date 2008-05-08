@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alarms arrays calendar jamshred.game jamshred.gl jamshred.player jamshred.log kernel math math.constants namespaces sequences threads ui ui.gadgets ui.gestures ui.render math.vectors ;
+USING: accessors alarms arrays calendar jamshred.game jamshred.gl jamshred.player jamshred.log kernel math math.constants namespaces sequences threads ui ui.backend ui.gadgets ui.gadgets.worlds ui.gestures ui.render math.vectors ;
 IN: jamshred
 
 TUPLE: jamshred-gadget jamshred last-hand-loc alarm ;
@@ -26,10 +26,20 @@ M: jamshred-gadget draw-gadget* ( gadget -- )
         10 sleep jamshred-loop
     ] if ;
 
+: fullscreen ( gadget -- )
+    find-world t swap set-fullscreen* ;
+
+: no-fullscreen ( gadget -- )
+    find-world f swap set-fullscreen* ;
+
+: toggle-fullscreen ( world -- )
+    [ fullscreen? not ] keep set-fullscreen* ;
+
 M: jamshred-gadget graft* ( gadget -- )
     [ jamshred-loop ] in-thread drop ;
+
 M: jamshred-gadget ungraft* ( gadget -- )
-    jamshred>> t >>quit drop ;
+    jamshred>> t swap (>>quit) ;
 
 : jamshred-restart ( jamshred-gadget -- )
     <jamshred> >>jamshred drop ;
@@ -61,9 +71,14 @@ M: jamshred-gadget ungraft* ( gadget -- )
     jamshred>> jamshred-player scroll-direction get
     second neg swap change-player-speed ;
 
+: quit ( gadget -- )
+    [ no-fullscreen ] [ close-window ] bi ;
+
 jamshred-gadget H{
     { T{ key-down f f "r" } [ jamshred-restart ] }
     { T{ key-down f f " " } [ jamshred>> toggle-running ] }
+    { T{ key-down f f "f" } [ find-world toggle-fullscreen ] }
+    { T{ key-down f f "q" } [ quit ] }
     { T{ motion } [ handle-mouse-motion ] }
     { T{ mouse-scroll } [ handle-mouse-scroll ] }
 } set-gestures

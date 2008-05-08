@@ -1,16 +1,16 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors jamshred.log jamshred.oint jamshred.tunnel kernel math math.constants math.order math.ranges sequences system ;
+USING: accessors colors jamshred.log jamshred.oint jamshred.sound jamshred.tunnel kernel math math.constants math.order math.ranges shuffle sequences system ;
 IN: jamshred.player
 
-TUPLE: player < oint name tunnel nearest-segment last-move speed ;
+TUPLE: player < oint name sounds tunnel nearest-segment last-move speed ;
 
 ! speeds are in GL units / second
 : default-speed ( -- speed ) 1.0 ;
-: max-speed ( -- speed ) 10.0 ;
+: max-speed ( -- speed ) 30.0 ;
 
-: <player> ( name -- player )
-    [ F{ 0 0 5 } F{ 0 0 -1 } F{ 0 1 0 } F{ -1 0 0 } ] dip
+: <player> ( name sounds -- player )
+    [ F{ 0 0 5 } F{ 0 0 -1 } F{ 0 1 0 } F{ -1 0 0 } ] 2dip
     f f f default-speed player boa ;
 
 : turn-player ( player x-radians y-radians -- )
@@ -43,7 +43,8 @@ DEFER: (move-player)
 
 : ?bounce ( distance-remaining player -- )
     over 0 > [
-        [ dup nearest-segment>> bounce ] [ (move-player) ] bi
+        [ dup nearest-segment>> bounce ] [ sounds>> bang ]
+        [ (move-player) ] tri
     ] [
         2drop
     ] if ;
