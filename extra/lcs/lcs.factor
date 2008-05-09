@@ -7,7 +7,7 @@ IN: lcs
     0 1 ? + >r [ 1+ ] bi@ r> min min ;
 
 : lcs-step ( insert delete change same? -- next )
-    1 -9999 ? + max max ; ! Replace -9999 with -inf when added
+    1 -1./0. ? + max max ; ! -1./0. is -inf (float)
 
 :: loop-step ( i j matrix old new step -- )
     i j 1+ matrix nth nth ! insertion
@@ -25,10 +25,9 @@ IN: lcs
 
 :: run-lcs ( old new init step -- matrix )
     [let | matrix [ old length 1+ new length 1+ init call ] |
-        old length [0,b) [| i |
-            new length [0,b)
-            [| j | i j matrix old new step loop-step ]
-            each
+        old length [| i |
+            new length
+            [| j | i j matrix old new step loop-step ] each
         ] each matrix ] ; inline
 PRIVATE>
 
