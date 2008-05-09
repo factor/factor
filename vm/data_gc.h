@@ -44,8 +44,14 @@ typedef struct {
 	F_ZONE *generations;
 	F_ZONE* semispaces;
 
+	CELL *allot_markers;
+	CELL *allot_markers_end;
+
 	CELL *cards;
 	CELL *cards_end;
+
+	CELL *decks;
+	CELL *decks_end;
 } F_DATA_HEAP;
 
 F_DATA_HEAP *data_heap;
@@ -71,16 +77,30 @@ offset within the card */
 #define CARD_BITS 6
 #define ADDR_CARD_MASK (CARD_SIZE-1)
 
-INLINE void clear_card(F_CARD *c)
-{
-	*c = CARD_BASE_MASK; /* invalid value */
-}
-
 DLLEXPORT CELL cards_offset;
-void init_cards_offset(void);
+DLLEXPORT CELL allot_markers_offset;
 
 #define ADDR_TO_CARD(a) (F_CARD*)(((CELL)(a) >> CARD_BITS) + cards_offset)
 #define CARD_TO_ADDR(c) (CELL*)(((CELL)(c) - cards_offset)<<CARD_BITS)
+
+/* A deck is 4 kilobytes or 64 cards. */
+typedef u8 F_DECK;
+
+#define DECK_SIZE (4 * 1024)
+#define DECK_BITS 12
+#define ADDR_DECK_MASK (DECK_SIZE-1)
+
+DLLEXPORT CELL decks_offset;
+
+#define ADDR_TO_DECK(a) (F_DECK*)(((CELL)(a) >> DECK_BITS) + decks_offset)
+#define DECK_TO_ADDR(c) (CELL*)(((CELL)(c) - decks_offset) << DECK_BITS)
+
+#define DECK_TO_CARD(d) (F_CARD*)((((CELL)(d) - decks_offset) << (DECK_BITS - CARD_BITS)) + cards_offset)
+
+#define ADDR_TO_ALLOT_MARKER(a) (F_CARD*)(((CELL)(a) >> CARD_BITS) + allot_markers_offset)
+#define CARD_OFFSET(c) (*((c) - (CELL)data_heap->cards + (CELL)data_heap->allot_markers))
+
+void init_card_decks(void);
 
 /* this is an inefficient write barrier. compiled definitions use a more
 efficient one hand-coded in assembly. the write barrier must be called
@@ -88,8 +108,8 @@ any time we are potentially storing a pointer from an older generation
 to a younger one */
 INLINE void write_barrier(CELL address)
 {
-	F_CARD *c = ADDR_TO_CARD(address);
-	*c |= (CARD_POINTS_TO_NURSERY | CARD_POINTS_TO_AGING);
+	*ADDR_TO_CARD(address) = CARD_MARK_MASK;
+	*ADDR_TO_DECK(address) = CARD_MARK_MASK;
 }
 
 #define SLOT(obj,slot) (UNTAG(obj) + (slot) * CELLS)
@@ -103,11 +123,10 @@ INLINE void set_slot(CELL obj, CELL slot, CELL value)
 /* we need to remember the first object allocated in the card */
 INLINE void allot_barrier(CELL address)
 {
-	F_CARD *ptr = ADDR_TO_CARD(address);
-	F_CARD c = *ptr;
-	CELL b = (c & CARD_BASE_MASK);
-	CELL a = (address & ADDR_CARD_MASK);
-	*ptr = ((c & CARD_MARK_MASK) | ((b < a) ? b : a));
+	F_CARD *ptr = ADDR_TO_ALLOT_MARKER(address);
+	F_CARD b = *ptr;
+	F_CARD a = (address & ADDR_CARD_MASK);
+	*ptr = (b < a ? b : a);
 }
 
 void clear_cards(CELL from, CELL to);
@@ -121,6 +140,8 @@ void collect_cards(void);
 #define HAVE_AGING_P (data_heap->gen_count>2)
 /* the oldest generation */
 #define TENURED (data_heap->gen_count-1)
+
+#define MAX_GEN_COUNT 3
 
 /* used during garbage collection only */
 F_ZONE *newspace;
@@ -142,10 +163,18 @@ void init_data_heap(CELL gens,
 	bool secure_gc_);
 
 /* statistics */
-s64 gc_time;
-CELL nursery_collections;
-CELL aging_collections;
-CELL cards_scanned;
+typedef struct {
+	CELL collections;
+	CELL gc_time;
+	CELL max_gc_time;
+	CELL object_count;
+	u64 bytes_copied;
+} F_GC_STATS;
+
+F_GC_STATS gc_stats[MAX_GEN_COUNT];
+u64 cards_scanned;
+u64 decks_scanned;
+CELL code_heap_scans;
 
 /* only meaningful during a GC */
 bool performing_gc;
@@ -364,7 +393,8 @@ INLINE void* allot_object(CELL type, CELL a)
 CELL collect_next(CELL scan);
 
 DECLARE_PRIMITIVE(gc);
-DECLARE_PRIMITIVE(gc_time);
+DECLARE_PRIMITIVE(gc_stats);
+DECLARE_PRIMITIVE(gc_reset);
 DECLARE_PRIMITIVE(become);
 
 CELL find_all_words(void);

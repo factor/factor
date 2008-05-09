@@ -20,7 +20,7 @@ IN: optimizer.report
     [
         dup [
             word-dataflow nip 1 count-optimization-passes
-        ] benchmark nip 2array
+        ] benchmark 2array
     ] { } map>assoc
     [ first ] "Worst number of optimizer passes:" results
     [ second ] "Worst compile times:" results ;

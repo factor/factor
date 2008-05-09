@@ -183,14 +183,9 @@ M: world client-event
         ui-wait wait-event
     ] if ;
 
-: do-events ( -- )
+M: x11-ui-backend do-events
     wait-event dup XAnyEvent-window window dup
     [ [ 2dup handle-event ] assert-depth ] when 2drop ;
-
-: event-loop ( -- )
-    windows get empty? [
-        [ do-events ] ui-try event-loop
-    ] unless ;
 
 : x-clipboard@ ( gadget clipboard -- prop win )
     x-clipboard-atom swap
@@ -254,6 +249,7 @@ M: x11-ui-backend ui ( -- )
     [
         f [
             [
+                stop-after-last-window? on
                 init-clipboard
                 start-ui
                 event-loop

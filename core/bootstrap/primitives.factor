@@ -607,7 +607,7 @@ tuple
     { "(exists?)" "io.files.private" }
     { "(directory)" "io.files.private" }
     { "gc" "memory" }
-    { "gc-time" "memory" }
+    { "gc-stats" "memory" }
     { "save-image" "memory" }
     { "save-image-and-exit" "memory" }
     { "datastack" "kernel" }
@@ -702,6 +702,7 @@ tuple
     { "resize-float-array" "float-arrays" }
     { "dll-valid?" "alien" }
     { "unimplemented" "kernel.private" }
+    { "gc-reset" "memory" }
 }
 dup length [ >r first2 r> make-primitive ] 2each
 

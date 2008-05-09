@@ -26,7 +26,7 @@ HELP: with-cocoa
 { $values { "quot" quotation } }
 { $description "Sets up an autorelease pool, initializes the " { $snippet "NSApplication" } " singleton, and calls the quotation." } ;
 
-HELP: do-events
+HELP: do-event
 { $values { "app" "an " { $snippet "NSApplication" } } }
 { $description "Processes any pending events in the queue. Does not block." } ;
 
@@ -49,7 +49,7 @@ ARTICLE: "cocoa-application-utils" "Cocoa application utilities"
 { $subsection NSApp }
 { $subsection with-autorelease-pool }
 { $subsection with-cocoa }
-{ $subsection do-events }
+{ $subsection do-event }
 { $subsection add-observer }
 { $subsection remove-observer }
 { $subsection install-delegate } ;

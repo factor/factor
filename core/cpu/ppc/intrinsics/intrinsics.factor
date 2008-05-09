@@ -56,14 +56,22 @@ IN: cpu.ppc.intrinsics
 : load-cards-offset ( dest -- )
     "cards_offset" f pick %load-dlsym  dup 0 LWZ ;
 
+: load-decks-offset ( dest -- )
+    "decks_offset" f pick %load-dlsym  dup 0 LWZ ;
+
 : %write-barrier ( -- )
     "val" get operand-immediate? "obj" get fresh-object? or [
-        "obj" operand "scratch" operand card-bits SRWI
+        "scratch1" operand card-mark LI
+
+        ! Mark the card
         "val" operand load-cards-offset
-        "scratch" operand dup "val" operand ADD
-        "val" operand "scratch" operand 0 LBZ
-        "val" operand dup card-mark ORI
-        "val" operand "scratch" operand 0 STB
+        "obj" operand "scratch2" operand card-bits SRWI
+        "val" operand "scratch2" operand "val" operand STBX
+
+        ! Mark the card deck
+        "val" operand load-decks-offset
+        "obj" operand "scratch" operand deck-bits SRWI
+        "val" operand "scratch" operand "val" operand STBX
     ] unless ;
 
 \ set-slot {
@@ -71,7 +79,7 @@ IN: cpu.ppc.intrinsics
     {
         [ %slot-literal-known-tag STW %write-barrier ] H{
             { +input+ { { f "val" } { f "obj" known-tag } { [ small-slot? ] "n" } } }
-            { +scratch+ { { f "scratch" } } }
+            { +scratch+ { { f "scratch1" } { f "scratch2" } } }
             { +clobber+ { "val" } }
         }
     }
