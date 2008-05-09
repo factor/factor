@@ -472,7 +472,7 @@ M: string write-response-body* write ;
 
 M: callable write-response-body* call ;
 
-M: object write-response-body* stdio get stream-copy ;
+M: object write-response-body* output-stream get stream-copy ;
 
 : write-response-body ( response -- response )
     dup body>> write-response-body* ;

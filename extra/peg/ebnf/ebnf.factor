@@ -324,7 +324,7 @@ M: ebnf-sequence build-locals ( code ast -- code )
         ] 2each
         " | " %
         %  
-        " ] with-locals" %     
+        " ]" %     
     ] "" make 
   ] if ;
 
@@ -334,7 +334,7 @@ M: ebnf-var build-locals ( code ast -- )
     name>> % " [ dup ] " %
     " | " %
     %  
-    " ] with-locals" %     
+    " ]" %     
   ] "" make ;
 
 M: object build-locals ( code ast -- )

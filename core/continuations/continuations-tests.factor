@@ -39,7 +39,7 @@ IN: continuations.tests
 
 "!!! The following error is part of the test" print
 
-[ ] [ [ [ "2 car" ] eval ] [ print-error ] recover ] unit-test
+[ ] [ [ [ "2 car" ] eval ] try ] unit-test
 
 [ f throw ] must-fail
 
@@ -117,3 +117,5 @@ T{ dispose-dummy } "b" set
 [ { "a" "b" } [ get ] map dispose-each ] [ 3 = ] must-fail-with
 
 [ t ] [ "b" get disposed?>> ] unit-test
+
+[ ] [ [ return ] with-return ] unit-test

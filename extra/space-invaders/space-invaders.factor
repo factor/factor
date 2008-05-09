@@ -45,21 +45,21 @@ TUPLE: space-invaders port1 port2i port2o port3o port4lo port4hi port5o bitmap s
 
 : init-sound ( index cpu filename  -- )
   swapd >r space-invaders-sounds nth AL_BUFFER r> 
-  resource-path create-buffer-from-wav set-source-param ; 
+  create-buffer-from-wav set-source-param ; 
 
 : init-sounds ( cpu -- )
   init-openal
   [ 9 gen-sources swap set-space-invaders-sounds ] keep
-  [ SOUND-SHOT        "extra/space-invaders/resources/Shot.wav" init-sound ] keep 
-  [ SOUND-UFO         "extra/space-invaders/resources/Ufo.wav" init-sound ] keep 
+  [ SOUND-SHOT        "resource:extra/space-invaders/resources/Shot.wav" init-sound ] keep 
+  [ SOUND-UFO         "resource:extra/space-invaders/resources/Ufo.wav" init-sound ] keep 
   [ space-invaders-sounds SOUND-UFO swap nth AL_LOOPING AL_TRUE set-source-param ] keep
-  [ SOUND-BASE-HIT    "extra/space-invaders/resources/BaseHit.wav" init-sound ] keep 
-  [ SOUND-INVADER-HIT "extra/space-invaders/resources/InvHit.wav" init-sound ] keep 
-  [ SOUND-WALK1       "extra/space-invaders/resources/Walk1.wav" init-sound ] keep 
-  [ SOUND-WALK2       "extra/space-invaders/resources/Walk2.wav" init-sound ] keep 
-  [ SOUND-WALK3       "extra/space-invaders/resources/Walk3.wav" init-sound ] keep 
-  [ SOUND-WALK4       "extra/space-invaders/resources/Walk4.wav" init-sound ] keep 
-  [ SOUND-UFO-HIT    "extra/space-invaders/resources/UfoHit.wav" init-sound ] keep
+  [ SOUND-BASE-HIT    "resource:extra/space-invaders/resources/BaseHit.wav" init-sound ] keep 
+  [ SOUND-INVADER-HIT "resource:extra/space-invaders/resources/InvHit.wav" init-sound ] keep 
+  [ SOUND-WALK1       "resource:extra/space-invaders/resources/Walk1.wav" init-sound ] keep 
+  [ SOUND-WALK2       "resource:extra/space-invaders/resources/Walk2.wav" init-sound ] keep 
+  [ SOUND-WALK3       "resource:extra/space-invaders/resources/Walk3.wav" init-sound ] keep 
+  [ SOUND-WALK4       "resource:extra/space-invaders/resources/Walk4.wav" init-sound ] keep 
+  [ SOUND-UFO-HIT    "resource:extra/space-invaders/resources/UfoHit.wav" init-sound ] keep
   f swap set-space-invaders-looping? ;
 
 : <space-invaders> ( -- cpu )

@@ -140,9 +140,9 @@ M: ratio >base
 
 M: float >base
     drop {
+        { [ dup fp-nan? ] [ drop "0.0/0.0" ] }
         { [ dup 1.0/0.0 = ] [ drop "1.0/0.0" ] }
         { [ dup -1.0/0.0 = ] [ drop "-1.0/0.0" ] }
-        { [ dup fp-nan? ] [ drop "0.0/0.0" ] }
         [ float>string fix-float ]
     } cond ;
 

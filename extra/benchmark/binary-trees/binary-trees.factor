@@ -53,3 +53,5 @@ M: f item-check drop 0 ;
 
 : binary-trees-main ( -- )
     16 binary-trees ;
+
+MAIN: binary-trees-main

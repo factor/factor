@@ -111,7 +111,7 @@ SINGLETON: sha1
 INSTANCE: sha1 checksum
 
 M: sha1 checksum-stream ( stream -- sha1 )
-    drop [ initialize-sha1 stream>sha1 get-sha1 ] with-stream ;
+    drop [ initialize-sha1 stream>sha1 get-sha1 ] with-input-stream ;
 
 : sha1-interleave ( string -- seq )
     [ zero? ] left-trim

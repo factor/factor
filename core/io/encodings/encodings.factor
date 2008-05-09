@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors namespaces growable
 strings io classes continuations combinators io.styles
-io.streams.plain splitting io.streams.duplex byte-arrays
-sequences.private accessors ;
+io.streams.plain splitting byte-arrays sequences.private
+accessors ;
 IN: io.encodings
 
 ! The encoding descriptor protocol
@@ -131,6 +131,3 @@ INSTANCE: encoder plain-writer
     over decoder? [ >r decoder-stream r> ] when <decoder> ;
 
 PRIVATE>
-
-: <encoder-duplex> ( stream-in stream-out encoding -- duplex )
-    tuck reencode >r redecode r> <duplex-stream> ;

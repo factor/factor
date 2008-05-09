@@ -30,7 +30,7 @@ MEMO: opad ( -- seq ) 64 HEX: 5c <array> ;
     ipad seq-bitxor ;
 
 : stream>sha1-hmac ( K stream -- hmac )
-    [ init-hmac sha1-hmac ] with-stream ;
+    [ init-hmac sha1-hmac ] with-input-stream ;
 
 : file>sha1-hmac ( K path -- hmac )
     binary <file-reader> stream>sha1-hmac ;
@@ -39,7 +39,7 @@ MEMO: opad ( -- seq ) 64 HEX: 5c <array> ;
     binary <byte-reader> stream>sha1-hmac ;
 
 : stream>md5-hmac ( K stream -- hmac )
-    [ init-hmac md5-hmac ] with-stream ;
+    [ init-hmac md5-hmac ] with-input-stream ;
 
 : file>md5-hmac ( K path -- hmac )
     binary <file-reader> stream>md5-hmac ;

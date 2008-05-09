@@ -15,7 +15,7 @@ HELP: line-limit?
 
 
 HELP: do-indent
-{ $description "Outputs the current indent nesting to the " { $link stdio } " stream." } ;
+{ $description "Outputs the current indent nesting to " { $link output-stream } "." } ;
 
 HELP: fresh-line
 { $values { "n" "the current column position" } }

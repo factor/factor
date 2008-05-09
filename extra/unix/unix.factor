@@ -2,7 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: alien alien.c-types alien.syntax kernel libc structs
-math namespaces system combinators vocabs.loader unix.types ;
+       math namespaces system combinators vocabs.loader unix.ffi unix.types
+       qualified ;
+
+QUALIFIED: unix.ffi
 
 IN: unix
 
@@ -75,7 +78,20 @@ FUNCTION: void* mmap ( void* addr, size_t len, int prot, int flags, int fd, off_
 FUNCTION: int munmap ( void* addr, size_t len ) ;
 FUNCTION: uint ntohl ( uint n ) ;
 FUNCTION: ushort ntohs ( ushort n ) ;
-FUNCTION: int open ( char* path, int flags, int prot ) ;
+FUNCTION: char* strerror ( int errno ) ;
+
+ERROR: open-error path flags prot message ;
+
+: open ( path flags prot -- int )
+    3dup unix.ffi:open
+    dup 0 >= [ >r 3drop r> ] [ drop err_no strerror open-error ] if ;
+
+ERROR: utime-error path message ;
+
+: utime ( path buf -- )
+    dupd unix.ffi:utime
+    0 = [ drop ] [ err_no strerror utime-error ] if ;
+
 FUNCTION: int pclose ( void* file ) ;
 FUNCTION: int pipe ( int* filedes ) ;
 FUNCTION: void* popen ( char* command, char* type ) ;
@@ -96,7 +112,6 @@ FUNCTION: int setreuid ( uid_t ruid, uid_t euid ) ;
 FUNCTION: int setsockopt ( int s, int level, int optname, void* optval, socklen_t optlen ) ;
 FUNCTION: int setuid ( uid_t uid ) ;
 FUNCTION: int socket ( int domain, int type, int protocol ) ;
-FUNCTION: char* strerror ( int errno ) ;
 FUNCTION: int symlink ( char* path1, char* path2 ) ;
 FUNCTION: int system ( char* command ) ;
 FUNCTION: int unlink ( char* path ) ;
@@ -158,8 +173,6 @@ FUNCTION: int setpriority ( int which, int who, int prio ) ;
 
 FUNCTION: pid_t wait ( int* status ) ;
 FUNCTION: pid_t waitpid ( pid_t wpid, int* status, int options ) ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
 

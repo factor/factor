@@ -22,7 +22,7 @@ IN: rss.tests
             f
         }
     }
-} ] [ "extra/rss/rss1.xml" resource-path load-news-file ] unit-test
+} ] [ "resource:extra/rss/rss1.xml" load-news-file ] unit-test
 [ T{
     feed
     f
@@ -39,4 +39,4 @@ IN: rss.tests
             T{ timestamp f 2003 12 13 8 29 29 T{ duration f 0 0 0 -4 0 0 } }
         }
     }
-} ] [ "extra/rss/atom.xml" resource-path load-news-file ] unit-test
+} ] [ "resource:extra/rss/atom.xml" load-news-file ] unit-test

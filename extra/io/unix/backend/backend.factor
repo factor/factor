@@ -1,10 +1,10 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien generic assocs kernel kernel.private math
-io.nonblocking sequences strings structs sbufs
-threads unix vectors io.buffers io.backend io.encodings
-io.streams.duplex math.parser continuations system libc
-qualified namespaces io.timeouts io.encodings.utf8 accessors ;
+io.nonblocking sequences strings structs sbufs threads unix
+vectors io.buffers io.backend io.encodings math.parser
+continuations system libc qualified namespaces io.timeouts
+io.encodings.utf8 accessors ;
 QUALIFIED: io
 IN: io.unix.backend
 
@@ -78,7 +78,8 @@ M: integer init-handle ( fd -- )
     #! since on OS X 10.3, this operation fails from init-io
     #! when running the Factor.app (presumably because fd 0 and
     #! 1 are closed).
-    F_SETFL O_NONBLOCK fcntl drop ;
+    [ F_SETFL O_NONBLOCK fcntl drop ]
+    [ F_SETFD FD_CLOEXEC fcntl drop ] bi ;
 
 M: integer close-handle ( fd -- )
     close ;

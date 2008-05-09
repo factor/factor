@@ -24,6 +24,10 @@ HELP: morse>
 { $description "Translates morse code into ASCII text" }
 { $see-also >morse morse>ch } ;
 
-HELP: play-as-morse
+HELP: play-as-morse*
 { $values { "str" "A string of ascii characters which can be translated into morse code" } { "unit-length" "The length of a dot" } }
+{ $description "Plays a string as morse code" } ;
+
+HELP: play-as-morse
+{ $values { "str" "A string of ascii characters which can be translated into morse code" } }
 { $description "Plays a string as morse code" } ;

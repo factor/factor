@@ -63,9 +63,15 @@ IN: cpu.x86.intrinsics
 : generate-write-barrier ( -- )
     #! Mark the card pointed to by vreg.
     "val" get operand-immediate? "obj" get fresh-object? or [
+        ! Mark the card
         "obj" operand card-bits SHR
         "cards_offset" f temp-reg v>operand %alien-global
-        temp-reg v>operand "obj" operand [+] card-mark OR
+        temp-reg v>operand "obj" operand [+] card-mark <byte> MOV
+
+        ! Mark the card deck
+        "obj" operand deck-bits card-bits - SHR
+        "decks_offset" f temp-reg v>operand %alien-global
+        temp-reg v>operand "obj" operand [+] card-mark <byte> MOV
     ] unless ;
 
 \ set-slot {

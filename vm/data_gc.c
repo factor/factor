@@ -21,10 +21,12 @@ CELL init_zone(F_ZONE *z, CELL size, CELL start)
 	return z->end;
 }
 
-void init_cards_offset(void)
+void init_card_decks(void)
 {
-	cards_offset = (CELL)data_heap->cards
-		- (data_heap->segment->start >> CARD_BITS);
+	CELL start = data_heap->segment->start & ~(DECK_SIZE - 1);
+	allot_markers_offset = (CELL)data_heap->allot_markers - (start >> CARD_BITS);
+	cards_offset = (CELL)data_heap->cards - (start >> CARD_BITS);
+	decks_offset = (CELL)data_heap->decks - (start >> DECK_BITS);
 }
 
 F_DATA_HEAP *alloc_data_heap(CELL gens,
@@ -62,9 +64,16 @@ F_DATA_HEAP *alloc_data_heap(CELL gens,
 	data_heap->generations = safe_malloc(sizeof(F_ZONE) * data_heap->gen_count);
 	data_heap->semispaces = safe_malloc(sizeof(F_ZONE) * data_heap->gen_count);
 
-	CELL cards_size = total_size / CARD_SIZE;
+	CELL cards_size = (total_size + DECK_SIZE) / CARD_SIZE;
+	data_heap->allot_markers = safe_malloc(cards_size);
+	data_heap->allot_markers_end = data_heap->allot_markers + cards_size;
+
 	data_heap->cards = safe_malloc(cards_size);
 	data_heap->cards_end = data_heap->cards + cards_size;
+
+	CELL decks_size = (total_size + DECK_SIZE) / DECK_SIZE;
+	data_heap->decks = safe_malloc(decks_size);
+	data_heap->decks_end = data_heap->decks + decks_size;
 
 	CELL alloter = data_heap->segment->start;
 
@@ -104,7 +113,9 @@ void dealloc_data_heap(F_DATA_HEAP *data_heap)
 	dealloc_segment(data_heap->segment);
 	free(data_heap->generations);
 	free(data_heap->semispaces);
+	free(data_heap->allot_markers);
 	free(data_heap->cards);
+	free(data_heap->decks);
 	free(data_heap);
 }
 
@@ -113,18 +124,45 @@ cleared when a generation has been cleared */
 void clear_cards(CELL from, CELL to)
 {
 	/* NOTE: reverse order due to heap layout. */
+	F_CARD *first_card = ADDR_TO_CARD(data_heap->generations[to].start);
 	F_CARD *last_card = ADDR_TO_CARD(data_heap->generations[from].end);
-	F_CARD *ptr = ADDR_TO_CARD(data_heap->generations[to].start);
-	for(; ptr < last_card; ptr++)
-		clear_card(ptr);
+	F_CARD *ptr;
+	for(ptr = first_card; ptr < last_card; ptr++) *ptr = 0;
+}
+
+void clear_decks(CELL from, CELL to)
+{
+	/* NOTE: reverse order due to heap layout. */
+	F_CARD *first_deck = ADDR_TO_CARD(data_heap->generations[to].start);
+	F_CARD *last_deck = ADDR_TO_CARD(data_heap->generations[from].end);
+	F_CARD *ptr;
+	for(ptr = first_deck; ptr < last_deck; ptr++) *ptr = 0;
+}
+
+void clear_allot_markers(CELL from, CELL to)
+{
+	/* NOTE: reverse order due to heap layout. */
+	F_CARD *first_card = ADDR_TO_ALLOT_MARKER(data_heap->generations[to].start);
+	F_CARD *last_card = ADDR_TO_ALLOT_MARKER(data_heap->generations[from].end);
+	F_CARD *ptr;
+	for(ptr = first_card; ptr < last_card; ptr++) *ptr = CARD_BASE_MASK;
 }
 
 void set_data_heap(F_DATA_HEAP *data_heap_)
 {
 	data_heap = data_heap_;
 	nursery = data_heap->generations[NURSERY];
-	init_cards_offset();
+	init_card_decks();
 	clear_cards(NURSERY,TENURED);
+	clear_decks(NURSERY,TENURED);
+	clear_allot_markers(NURSERY,TENURED);
+}
+
+void gc_reset(void)
+{
+	int i;
+	for(i = 0; i < MAX_GEN_COUNT; i++)
+		memset(&gc_stats[i],0,sizeof(F_GC_STATS));
 }
 
 void init_data_heap(CELL gens,
@@ -141,11 +179,13 @@ void init_data_heap(CELL gens,
 	extra_roots_region = alloc_segment(getpagesize());
 	extra_roots = extra_roots_region->start - CELLS;
 
-	gc_time = 0;
-	aging_collections = 0;
-	nursery_collections = 0;
-	cards_scanned = 0;
 	secure_gc = secure_gc_;
+
+	gc_reset();
+
+	cards_scanned = 0;
+	decks_scanned = 0;
+	code_heap_scans = 0;
 }
 
 /* Size of the object pointed to by a tagged pointer */
@@ -228,6 +268,7 @@ DEFINE_PRIMITIVE(data_room)
 	int gen;
 
 	dpush(tag_fixnum((data_heap->cards_end - data_heap->cards) >> 10));
+	dpush(tag_fixnum((data_heap->decks_end - data_heap->decks) >> 10));
 
 	for(gen = 0; gen < data_heap->gen_count; gen++)
 	{
@@ -263,7 +304,7 @@ CELL next_object(void)
 
 	if(heap_scan_ptr >= data_heap->generations[TENURED].here)
 		return F;
-	
+
 	type = untag_header(value);
 	heap_scan_ptr += untagged_object_size(heap_scan_ptr);
 
@@ -283,36 +324,60 @@ DEFINE_PRIMITIVE(end_scan)
 }
 
 /* Scan all the objects in the card */
-INLINE void collect_card(F_CARD *ptr, CELL gen, CELL here)
+void collect_card(F_CARD *ptr, CELL gen, CELL here)
 {
-	F_CARD c = *ptr;
-	CELL offset = (c & CARD_BASE_MASK);
+	CELL offset = CARD_OFFSET(ptr);
 
-	if(offset == CARD_BASE_MASK)
+	if(offset != CARD_BASE_MASK)
 	{
-		if(c == 0xff)
-			critical_error("bad card",(CELL)ptr);
-		else
-			return;
+		CELL card_scan = (CELL)CARD_TO_ADDR(ptr) + offset;
+		CELL card_end = (CELL)CARD_TO_ADDR(ptr + 1);
+
+		while(card_scan < card_end && card_scan < here)
+			card_scan = collect_next(card_scan);
+
+		cards_scanned++;
+	}
+}
+
+void collect_card_deck(F_DECK *deck, CELL gen, F_CARD mask, F_CARD unmask)
+{
+	F_CARD *first_card = DECK_TO_CARD(deck);
+	F_CARD *last_card = DECK_TO_CARD(deck + 1);
+
+	CELL here = data_heap->generations[gen].here;
+
+	u32 *quad_ptr;
+	u32 quad_mask = mask | (mask << 8) | (mask << 16) | (mask << 24);
+
+	for(quad_ptr = (u32 *)first_card; quad_ptr < (u32 *)last_card; quad_ptr++)
+	{
+		if(*quad_ptr & quad_mask)
+		{
+			F_CARD *ptr = (F_CARD *)quad_ptr;
+
+			int card;
+			for(card = 0; card < 4; card++)
+			{
+				if(ptr[card] & mask)
+				{
+					collect_card(&ptr[card],gen,here);
+					ptr[card] &= ~unmask;
+				}
+			}
+		}
 	}
 
-	CELL card_scan = (CELL)CARD_TO_ADDR(ptr) + offset;
-	CELL card_end = (CELL)CARD_TO_ADDR(ptr + 1);
-
-	while(card_scan < card_end && card_scan < here)
-		card_scan = collect_next(card_scan);
-
-	cards_scanned++;
+	decks_scanned++;
 }
 
 /* Copy all newspace objects referenced from marked cards to the destination */
-INLINE void collect_gen_cards(CELL gen)
+void collect_gen_cards(CELL gen)
 {
-	F_CARD *ptr = ADDR_TO_CARD(data_heap->generations[gen].start);
-	CELL here = data_heap->generations[gen].here;
-	F_CARD *last_card = ADDR_TO_CARD(here - 1);
+	F_DECK *first_deck = ADDR_TO_DECK(data_heap->generations[gen].start);
+	F_DECK *last_deck = ADDR_TO_DECK(data_heap->generations[gen].end);
 
-	CELL mask, unmask;
+	F_CARD mask, unmask;
 
 	/* if we are collecting the nursery, we care about old->nursery pointers
 	but not old->aging pointers */
@@ -360,11 +425,13 @@ INLINE void collect_gen_cards(CELL gen)
 		return;
 	}
 
-	for(; ptr <= last_card; ptr++)
+	F_DECK *ptr;
+
+	for(ptr = first_deck; ptr < last_deck; ptr++)
 	{
 		if(*ptr & mask)
 		{
-			collect_card(ptr,gen,here);
+			collect_card_deck(ptr,gen,mask,unmask);
 			*ptr &= ~unmask;
 		}
 	}
@@ -454,6 +521,11 @@ INLINE void *copy_untagged_object(void *pointer, CELL size)
 		longjmp(gc_jmp,1);
 	allot_barrier(newspace->here);
 	newpointer = allot_zone(newspace,size);
+
+	F_GC_STATS *s = &gc_stats[collecting_gen];
+	s->object_count++;
+	s->bytes_copied += size;
+
 	memcpy(newpointer,pointer,size);
 	return newpointer;
 }
@@ -584,6 +656,7 @@ CELL collect_next(CELL scan)
 INLINE void reset_generation(CELL i)
 {
 	F_ZONE *z = (i == NURSERY ? &nursery : &data_heap->generations[i]);
+
 	z->here = z->start;
 	if(secure_gc)
 		memset((void*)z->start,69,z->size);
@@ -594,8 +667,12 @@ their allocation pointers and cards reset. */
 void reset_generations(CELL from, CELL to)
 {
 	CELL i;
-	for(i = from; i <= to; i++) reset_generation(i);
+	for(i = from; i <= to; i++)
+		reset_generation(i);
+
 	clear_cards(from,to);
+	clear_decks(from,to);
+	clear_allot_markers(from,to);
 }
 
 /* Prepare to start copying reachable objects into an unused zone */
@@ -620,6 +697,8 @@ void begin_gc(CELL requested_bytes)
 		reset_generation(collecting_gen);
 		newspace = &data_heap->generations[collecting_gen];
 		clear_cards(collecting_gen,collecting_gen);
+		clear_decks(collecting_gen,collecting_gen);
+		clear_allot_markers(collecting_gen,collecting_gen);
 	}
 	else
 	{
@@ -638,8 +717,15 @@ void begin_gc(CELL requested_bytes)
 #endif
 }
 
-void end_gc(void)
+void end_gc(CELL gc_elapsed)
 {
+	F_GC_STATS *s = &gc_stats[collecting_gen];
+
+	s->collections++;
+	s->gc_time += gc_elapsed;
+	if(s->max_gc_time < gc_elapsed)
+		s->max_gc_time = gc_elapsed;
+
 	if(growing_data_heap)
 	{
 		dealloc_data_heap(old_data_heap);
@@ -654,29 +740,12 @@ void end_gc(void)
 		old-school Cheney collector */
 		if(collecting_gen != NURSERY)
 			reset_generations(NURSERY,collecting_gen - 1);
-
-		if(collecting_gen == TENURED)
-		{
-			GC_PRINT(END_AGING_GC,aging_collections,cards_scanned);
-			aging_collections = 0;
-			cards_scanned = 0;
-		}
-		else if(HAVE_AGING_P && collecting_gen == AGING)
-		{
-			aging_collections++;
-
-			GC_PRINT(END_NURSERY_GC,nursery_collections,cards_scanned);
-			nursery_collections = 0;
-			cards_scanned = 0;
-		}
 	}
 	else
 	{
 		/* all generations up to and including the one
 		collected are now empty */
 		reset_generations(NURSERY,collecting_gen);
-
-		nursery_collections++;
 	}
 
 	if(collecting_gen == TENURED)
@@ -758,7 +827,10 @@ void garbage_collection(CELL gen,
 			literals from any code block which gets marked as live.
 			if we are not doing code GC, just consider all literals
 			as roots. */
+			code_heap_scans++;
+
 			collect_literals();
+
 			if(collecting_accumulation_gen_p())
 				last_code_heap_scan = collecting_gen;
 			else
@@ -772,9 +844,8 @@ void garbage_collection(CELL gen,
 	CELL gc_elapsed = (current_millis() - start);
 
 	GC_PRINT(END_GC,gc_elapsed);
-	end_gc();
+	end_gc(gc_elapsed);
 
-	gc_time += gc_elapsed;
 	performing_gc = false;
 }
 
@@ -793,10 +864,38 @@ DEFINE_PRIMITIVE(gc)
 	gc();
 }
 
-/* Push total time spent on GC */
-DEFINE_PRIMITIVE(gc_time)
+DEFINE_PRIMITIVE(gc_stats)
 {
-	box_unsigned_8(gc_time);
+	GROWABLE_ARRAY(stats);
+
+	CELL i;
+	CELL total_gc_time = 0;
+
+	for(i = 0; i < MAX_GEN_COUNT; i++)
+	{
+		F_GC_STATS *s = &gc_stats[i];
+		GROWABLE_ADD(stats,allot_cell(s->collections));
+		GROWABLE_ADD(stats,allot_cell(s->gc_time));
+		GROWABLE_ADD(stats,allot_cell(s->max_gc_time));
+		GROWABLE_ADD(stats,allot_cell(s->collections == 0 ? 0 : s->gc_time / s->collections));
+		GROWABLE_ADD(stats,allot_cell(s->object_count));
+		GROWABLE_ADD(stats,tag_bignum(long_long_to_bignum(s->bytes_copied)));
+
+		total_gc_time += s->gc_time;
+	}
+
+	GROWABLE_ADD(stats,allot_cell(total_gc_time));
+	GROWABLE_ADD(stats,tag_bignum(long_long_to_bignum(cards_scanned)));
+	GROWABLE_ADD(stats,tag_bignum(long_long_to_bignum(decks_scanned)));
+	GROWABLE_ADD(stats,allot_cell(code_heap_scans));
+
+	GROWABLE_TRIM(stats);
+	dpush(stats);
+}
+
+DEFINE_PRIMITIVE(gc_reset)
+{
+	gc_reset();
 }
 
 DEFINE_PRIMITIVE(become)
@@ -809,7 +908,7 @@ DEFINE_PRIMITIVE(become)
 		critical_error("bad parameters to become",0);
 
 	CELL i;
-	
+
 	for(i = 0; i < capacity; i++)
 	{
 		CELL old_obj = array_nth(old_objects,i);

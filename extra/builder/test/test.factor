@@ -3,6 +3,7 @@ USING: kernel namespaces assocs
        io.files io.encodings.utf8 prettyprint 
        help.lint
        benchmark
+       tools.time
        bootstrap.stage2
        tools.test tools.vocabs
        builder.util ;
@@ -26,8 +27,8 @@ IN: builder.test
 
 : do-all ( -- )
   bootstrap-time get   "../boot-time" utf8 [ . ] with-file-writer
-  [ do-load  ] runtime "../load-time" utf8 [ . ] with-file-writer
-  [ do-tests ] runtime "../test-time" utf8 [ . ] with-file-writer
+  [ do-load  ] benchmark "../load-time" utf8 [ . ] with-file-writer
+  [ do-tests ] benchmark "../test-time" utf8 [ . ] with-file-writer
   do-help-lint
   do-benchmarks ;
 

@@ -36,10 +36,6 @@ SYMBOL: dependencies
         2dup at +inlined+ eq? [ 3drop ] [ set-at ] if
     ] [ 3drop ] if ;
 
-: computing-dependencies ( quot -- dependencies )
-    H{ } clone [ dependencies rot with-variable ] keep ;
-    inline
-
 ! Did the current control-flow path throw an error?
 SYMBOL: terminated?
 

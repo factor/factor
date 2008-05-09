@@ -1,23 +1,20 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays float-arrays kernel jamshred.oint math math.functions
-math.ranges math.vectors math.constants random sequences vectors ;
+USING: accessors arrays combinators float-arrays kernel jamshred.oint locals math math.functions math.constants math.matrices math.order math.ranges math.vectors math.quadratic random sequences vectors ;
 IN: jamshred.tunnel
 
 : n-segments ( -- n ) 5000 ; inline
 
-TUPLE: segment number color radius ;
-
-: <segment> ( number color radius location forward up left -- segment )
-    <oint> >r segment boa r> over set-delegate ;
+TUPLE: segment < oint number color radius ;
+C: <segment> segment
 
 : segment-vertex ( theta segment -- vertex )
-     tuck 2dup oint-up swap sin v*n
-     >r oint-left swap cos v*n r> v+
-     swap oint-location v+ ;
+     tuck 2dup up>> swap sin v*n
+     >r left>> swap cos v*n r> v+
+     swap location>> v+ ;
 
 : segment-vertex-normal ( vertex segment -- normal )
-    oint-location swap v- normalize ;
+    location>> swap v- normalize ;
 
 : segment-vertex-and-normal ( segment theta -- vertex normal )
     swap [ segment-vertex ] keep dupd segment-vertex-normal ;
@@ -27,7 +24,7 @@ TUPLE: segment number color radius ;
     dup [ / pi 2 * * ] curry map ;
 
 : segment-number++ ( segment -- )
-    dup segment-number 1+ swap set-segment-number ;
+    [ number>> 1+ ] keep (>>number) ;
 
 : random-color ( -- color )
     { 100 100 100 } [ random 100 / >float ] map { 1.0 } append ;
@@ -50,15 +47,15 @@ TUPLE: segment number color radius ;
 : default-segment-radius ( -- r ) 1 ;
 
 : initial-segment ( -- segment )
-    0 random-color default-segment-radius
-    F{ 0 0 0 } F{ 0 0 -1 } F{ 0 1 0 } F{ -1 0 0 } <segment> ;
+    F{ 0 0 0 } F{ 0 0 -1 } F{ 0 1 0 } F{ -1 0 0 }
+    0 random-color default-segment-radius <segment> ;
 
 : random-segments ( n -- segments )
     initial-segment 1vector swap (random-segments) ;
 
 : simple-segment ( n -- segment )
-    random-color default-segment-radius pick F{ 0 0 -1 } n*v
-    F{ 0 0 -1 } F{ 0 1 0 } F{ -1 0 0 } <segment> ;
+    [ F{ 0 0 -1 } n*v F{ 0 0 -1 } F{ 0 1 0 } F{ -1 0 0 } ] keep
+    random-color default-segment-radius <segment> ;
 
 : simple-segments ( n -- segments )
     [ simple-segment ] map ;
@@ -100,14 +97,54 @@ TUPLE: segment number color radius ;
     [ nearest-segment-forward ] 3keep
     nearest-segment-backward r> nearer-segment ;
 
-: distance-from-centre ( oint segment -- distance )
-    perpendicular-distance ;
+: vector-to-centre ( seg loc -- v )
+    over location>> swap v- swap forward>> proj-perp ;
 
-: distance-from-wall ( oint segment -- distance )
-    tuck distance-from-centre swap segment-radius swap - ;
+: distance-from-centre ( seg loc -- distance )
+    vector-to-centre norm ;
 
-: fraction-from-centre ( oint segment -- fraction )
-    tuck distance-from-centre swap segment-radius / ;
+: wall-normal ( seg oint -- n )
+    location>> vector-to-centre normalize ;
 
-: fraction-from-wall ( oint segment -- fraction )
+: from ( seg loc -- radius d-f-c )
+    dupd location>> distance-from-centre [ radius>> ] dip ;
+
+: distance-from-wall ( seg loc -- distance ) from - ;
+: fraction-from-centre ( seg loc -- fraction ) from / ;
+: fraction-from-wall ( seg loc -- fraction )
     fraction-from-centre 1 swap - ;
+
+:: collision-coefficient ( v w r -- c )
+    [let* | a [ v dup v. ]
+            b [ v w v. 2 * ]
+            c [ w dup v. r sq - ] |
+        c b a quadratic max ] ;
+
+: sideways-heading ( oint segment -- v )
+    [ forward>> ] bi@ proj-perp ;
+
+: sideways-relative-location ( oint segment -- loc )
+    [ [ location>> ] bi@ v- ] keep forward>> proj-perp ;
+
+: collision-vector ( oint segment -- v )
+    [ sideways-heading ] [ sideways-relative-location ] [ radius>> ] 2tri
+    swap [ collision-coefficient ] dip forward>> n*v ;
+
+: distance-to-collision ( oint segment -- distance )
+    collision-vector norm ;
+
+: bounce-forward ( segment oint -- )
+    [ wall-normal ] [ forward>> swap reflect ] [ (>>forward) ] tri ;
+
+: bounce-left ( segment oint -- )
+    #! must be done after forward
+    [ forward>> vneg ] dip [ left>> swap reflect ]
+    [ forward>> proj-perp normalize ] [ (>>left) ] tri ;
+
+: bounce-up ( segment oint -- )
+    #! must be done after forward and left!
+    nip [ forward>> ] [ left>> cross ] [ (>>up) ] tri ;
+
+: bounce ( oint segment -- )
+    swap [ bounce-forward ] [ bounce-left ] [ bounce-up ] 2tri ;
+

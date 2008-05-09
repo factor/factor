@@ -20,8 +20,8 @@ IN: xmode.code2html
 
 : default-stylesheet ( -- )
     <style>
-        "extra/xmode/code2html/stylesheet.css"
-        resource-path utf8 file-contents write
+        "resource:extra/xmode/code2html/stylesheet.css"
+        utf8 file-contents write
     </style> ;
 
 : htmlize-stream ( path stream -- )
@@ -42,8 +42,7 @@ IN: xmode.code2html
 
 : htmlize-file ( path -- )
     dup utf8 [
-        stdio get
-        over ".html" append utf8 [
-            htmlize-stream
+        dup ".html" append utf8 [
+            input-stream get htmlize-stream
         ] with-file-writer
     ] with-file-reader ;

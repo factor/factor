@@ -10,6 +10,6 @@ IN: xml.tests
     [ assemble-data ] map ;
 
 [ "http://www.foxnews.com/oreilly/" ] [
-    "extra/xml/tests/soap.xml" resource-path file>xml
+    "resource:extra/xml/tests/soap.xml" file>xml
     parse-result first first
 ] unit-test

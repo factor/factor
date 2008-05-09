@@ -124,7 +124,7 @@ M: mock-gadget ungraft*
     dup mock-gadget-ungraft-called 1+
     swap set-mock-gadget-ungraft-called ;
 
-! We can't print to stdio here because that might be a pane
+! We can't print to output-stream here because that might be a pane
 ! stream, and our graft-queue rebinding here would be captured
 ! by code adding children to the pane...
 [

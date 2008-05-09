@@ -14,7 +14,7 @@ IN: unicode.data
     ascii file-lines [ ";" split ] map ;
 
 : load-data ( -- data )
-    "extra/unicode/UnicodeData.txt" resource-path data ;
+    "resource:extra/unicode/UnicodeData.txt" data ;
 
 : (process-data) ( index data -- newdata )
     [ [ nth ] keep first swap 2array ] with map
@@ -120,7 +120,7 @@ VALUE: special-casing
 
 ! Special casing data
 : load-special-casing ( -- special-casing )
-    "extra/unicode/SpecialCasing.txt" resource-path data
+    "resource:extra/unicode/SpecialCasing.txt" data
     [ length 5 = ] filter
     [ [ set-code-point ] each ] H{ } make-assoc ;
 

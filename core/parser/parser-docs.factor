@@ -5,7 +5,7 @@ quotations namespaces compiler.units assocs ;
 IN: parser
 
 ARTICLE: "vocabulary-search-shadow" "Shadowing word names"
-"If adding a vocabulary to the search path results in a word in another vocabulary becoming inaccessible due to the new vocabulary defining a word with the same name, a message is printed to the " { $link stdio } " stream. Except when debugging suspected name clashes, these messages can be ignored."
+"If adding a vocabulary to the search path results in a word in another vocabulary becoming inaccessible due to the new vocabulary defining a word with the same name, we say that the old word has been " { $emphasis "shadowed" } "."
 $nl
 "Here is an example where shadowing occurs:"
 { $code
@@ -13,18 +13,18 @@ $nl
     "USING: sequences io ;"
     ""
     ": append"
-    "    \"foe::append calls sequences::append\" print  append ;"
+    "    \"foe::append calls sequences:append\" print  append ;"
     ""
     "IN: fee"
     ""
     ": append"
-    "    \"fee::append calls fee::append\" print  append ;"
+    "    \"fee::append calls fee:append\" print  append ;"
     ""
     "IN: fox"
     "USE: foe"
     ""
     ": append"
-    "    \"fox::append calls foe::append\" print  append ;"
+    "    \"fox::append calls foe:append\" print  append ;"
     ""
     "\"1234\" \"5678\" append print"
     ""
@@ -33,12 +33,13 @@ $nl
 }
 "When placed in a source file and run, the above code produces the following output:"
 { $code
-    "foe::append calls sequences::append"
+    "foe:append calls sequences:append"
     "12345678"
-    "fee::append calls foe::append"
-    "foe::append calls sequences::append"
+    "fee:append calls foe:append"
+    "foe:append calls sequences:append"
     "12345678"
-} ;
+}
+"The " { $vocab-link "qualified" } " vocabulary contains some tools for helping with shadowing." ;
 
 ARTICLE: "vocabulary-search-errors" "Word lookup errors"
 "If the parser cannot not find a word in the current vocabulary search path, it attempts to look for the word in all loaded vocabularies. Then, one of three things happen:"
@@ -215,7 +216,7 @@ HELP: save-location
 { $description "Saves the location of a definition and associates this definition with the current source file." } ;
 
 HELP: parser-notes
-{ $var-description "A boolean controlling whether the parser will print various notes and warnings. Switched on by default. If a source file is being run for its effect on the " { $link stdio } " stream, this variable should be switched off, to prevent parser notes from polluting the output." } ;
+{ $var-description "A boolean controlling whether the parser will print various notes and warnings. Switched on by default. If a source file is being run for its effect on " { $link output-stream } ", this variable should be switched off, to prevent parser notes from polluting the output." } ;
 
 HELP: parser-notes?
 { $values { "?" "a boolean" } }
@@ -506,7 +507,7 @@ HELP: bootstrap-file
 
 HELP: eval>string
 { $values { "str" string } { "output" string } }
-{ $description "Evaluates the Factor code in " { $snippet "str" } " with the " { $link stdio } " stream rebound to a string output stream, then outputs the resulting string." } ;
+{ $description "Evaluates the Factor code in " { $snippet "str" } " with " { $link output-stream } " rebound to a string output stream, then outputs the resulting string." } ;
 
 HELP: staging-violation
 { $values { "word" word } }

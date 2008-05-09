@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces arrays prettyprint sequences kernel
 vectors quotations words parser assocs combinators
-continuations debugger io io.files vocabs tools.time
+continuations debugger io io.files vocabs
 vocabs.loader source-files compiler.units inspector
 inference effects tools.vocabs ;
 IN: tools.test
@@ -19,7 +19,7 @@ SYMBOL: this-test
 
 : (unit-test) ( what quot -- )
     swap dup . flush this-test set
-    [ time ] curry failures get [
+    failures get [
         [ this-test get failure ] recover
     ] [
         call

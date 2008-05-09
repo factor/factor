@@ -9,7 +9,7 @@ USING: kernel xml tools.test io namespaces sequences xml.errors xml.entities
 \ read-xml must-infer
 
 SYMBOL: xml-file
-[ ] [ "extra/xml/tests/test.xml" resource-path
+[ ] [ "resource:extra/xml/tests/test.xml"
     [ file>xml ] with-html-entities xml-file set ] unit-test
 [ "1.0" ] [ xml-file get xml-prolog prolog-version ] unit-test
 [ f ] [ xml-file get xml-prolog prolog-standalone ] unit-test

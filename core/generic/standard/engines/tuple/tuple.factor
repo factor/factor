@@ -127,8 +127,6 @@ M: echelon-dispatch-engine engine>quot
     1 slot { tuple-layout } declare
     5 slot ; inline
 
-: unclip-last [ 1 head* ] [ peek ] bi ;
-
 M: tuple-dispatch-engine engine>quot
     [
         picker %
