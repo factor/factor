@@ -63,8 +63,7 @@ M: x86 %prologue ( n -- )
 M: x86 %epilogue ( n -- )
     stack-reg swap ADD ;
 
-: %alien-global ( symbol dll register -- )
-    [ 0 MOV rc-absolute-cell rel-dlsym ] keep dup [] MOV ;
+HOOK: %alien-global cpu ( symbol dll register -- )
 
 M: x86 %prepare-alien-invoke
     #! Save Factor stack pointers in case the C code calls a

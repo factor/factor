@@ -44,6 +44,9 @@ typedef struct {
 	F_ZONE *generations;
 	F_ZONE* semispaces;
 
+	CELL *allot_markers;
+	CELL *allot_markers_end;
+
 	CELL *cards;
 	CELL *cards_end;
 
@@ -75,6 +78,7 @@ offset within the card */
 #define ADDR_CARD_MASK (CARD_SIZE-1)
 
 DLLEXPORT CELL cards_offset;
+DLLEXPORT CELL allot_markers_offset;
 
 #define ADDR_TO_CARD(a) (F_CARD*)(((CELL)(a) >> CARD_BITS) + cards_offset)
 #define CARD_TO_ADDR(c) (CELL*)(((CELL)(c) - cards_offset)<<CARD_BITS)
@@ -89,9 +93,12 @@ typedef u8 F_DECK;
 DLLEXPORT CELL decks_offset;
 
 #define ADDR_TO_DECK(a) (F_DECK*)(((CELL)(a) >> DECK_BITS) + decks_offset)
-#define DECK_TO_ADDR(c) (CELL*)(((CELL)(c) - decks_offset)<<DECK_BITS)
+#define DECK_TO_ADDR(c) (CELL*)(((CELL)(c) - decks_offset) << DECK_BITS)
 
 #define DECK_TO_CARD(d) (F_CARD*)((((CELL)(d) - decks_offset) << (DECK_BITS - CARD_BITS)) + cards_offset)
+
+#define ADDR_TO_ALLOT_MARKER(a) (F_CARD*)(((CELL)(a) >> CARD_BITS) + allot_markers_offset)
+#define CARD_OFFSET(c) (*((c) - (CELL)data_heap->cards + (CELL)data_heap->allot_markers))
 
 void init_card_decks(void);
 
@@ -101,11 +108,8 @@ any time we are potentially storing a pointer from an older generation
 to a younger one */
 INLINE void write_barrier(CELL address)
 {
-	F_CARD *c = ADDR_TO_CARD(address);
-	*c |= CARD_MARK_MASK;
-
-	F_DECK *d = ADDR_TO_DECK(address);
-	*d = CARD_MARK_MASK ;
+	*ADDR_TO_CARD(address) = CARD_MARK_MASK;
+	*ADDR_TO_DECK(address) = CARD_MARK_MASK;
 }
 
 #define SLOT(obj,slot) (UNTAG(obj) + (slot) * CELLS)
@@ -119,11 +123,10 @@ INLINE void set_slot(CELL obj, CELL slot, CELL value)
 /* we need to remember the first object allocated in the card */
 INLINE void allot_barrier(CELL address)
 {
-	F_CARD *ptr = ADDR_TO_CARD(address);
-	F_CARD c = *ptr;
-	CELL b = (c & CARD_BASE_MASK);
-	CELL a = (address & ADDR_CARD_MASK);
-	*ptr = ((c & CARD_MARK_MASK) | ((b < a) ? b : a));
+	F_CARD *ptr = ADDR_TO_ALLOT_MARKER(address);
+	F_CARD b = *ptr;
+	F_CARD a = (address & ADDR_CARD_MASK);
+	*ptr = (b < a ? b : a);
 }
 
 void clear_cards(CELL from, CELL to);

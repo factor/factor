@@ -24,6 +24,7 @@ CELL init_zone(F_ZONE *z, CELL size, CELL start)
 void init_card_decks(void)
 {
 	CELL start = data_heap->segment->start & ~(DECK_SIZE - 1);
+	allot_markers_offset = (CELL)data_heap->allot_markers - (start >> CARD_BITS);
 	cards_offset = (CELL)data_heap->cards - (start >> CARD_BITS);
 	decks_offset = (CELL)data_heap->decks - (start >> DECK_BITS);
 }
@@ -64,6 +65,9 @@ F_DATA_HEAP *alloc_data_heap(CELL gens,
 	data_heap->semispaces = safe_malloc(sizeof(F_ZONE) * data_heap->gen_count);
 
 	CELL cards_size = (total_size + DECK_SIZE) / CARD_SIZE;
+	data_heap->allot_markers = safe_malloc(cards_size);
+	data_heap->allot_markers_end = data_heap->allot_markers + cards_size;
+
 	data_heap->cards = safe_malloc(cards_size);
 	data_heap->cards_end = data_heap->cards + cards_size;
 
@@ -109,6 +113,7 @@ void dealloc_data_heap(F_DATA_HEAP *data_heap)
 	dealloc_segment(data_heap->segment);
 	free(data_heap->generations);
 	free(data_heap->semispaces);
+	free(data_heap->allot_markers);
 	free(data_heap->cards);
 	free(data_heap->decks);
 	free(data_heap);
@@ -122,8 +127,7 @@ void clear_cards(CELL from, CELL to)
 	F_CARD *first_card = ADDR_TO_CARD(data_heap->generations[to].start);
 	F_CARD *last_card = ADDR_TO_CARD(data_heap->generations[from].end);
 	F_CARD *ptr;
-	for(ptr = first_card; ptr < last_card; ptr++)
-		*ptr = CARD_BASE_MASK; /* invalid value */
+	for(ptr = first_card; ptr < last_card; ptr++) *ptr = 0;
 }
 
 void clear_decks(CELL from, CELL to)
@@ -132,8 +136,16 @@ void clear_decks(CELL from, CELL to)
 	F_CARD *first_deck = ADDR_TO_CARD(data_heap->generations[to].start);
 	F_CARD *last_deck = ADDR_TO_CARD(data_heap->generations[from].end);
 	F_CARD *ptr;
-	for(ptr = first_deck; ptr < last_deck; ptr++)
-		*ptr = 0;
+	for(ptr = first_deck; ptr < last_deck; ptr++) *ptr = 0;
+}
+
+void clear_allot_markers(CELL from, CELL to)
+{
+	/* NOTE: reverse order due to heap layout. */
+	F_CARD *first_card = ADDR_TO_ALLOT_MARKER(data_heap->generations[to].start);
+	F_CARD *last_card = ADDR_TO_ALLOT_MARKER(data_heap->generations[from].end);
+	F_CARD *ptr;
+	for(ptr = first_card; ptr < last_card; ptr++) *ptr = CARD_BASE_MASK;
 }
 
 void set_data_heap(F_DATA_HEAP *data_heap_)
@@ -142,6 +154,8 @@ void set_data_heap(F_DATA_HEAP *data_heap_)
 	nursery = data_heap->generations[NURSERY];
 	init_card_decks();
 	clear_cards(NURSERY,TENURED);
+	clear_decks(NURSERY,TENURED);
+	clear_allot_markers(NURSERY,TENURED);
 }
 
 void gc_reset(void)
@@ -290,7 +304,7 @@ CELL next_object(void)
 
 	if(heap_scan_ptr >= data_heap->generations[TENURED].here)
 		return F;
-	
+
 	type = untag_header(value);
 	heap_scan_ptr += untagged_object_size(heap_scan_ptr);
 
@@ -312,17 +326,16 @@ DEFINE_PRIMITIVE(end_scan)
 /* Scan all the objects in the card */
 void collect_card(F_CARD *ptr, CELL gen, CELL here)
 {
-	F_CARD c = *ptr;
-	CELL offset = (c & CARD_BASE_MASK);
+	CELL offset = CARD_OFFSET(ptr);
 
 	if(offset != CARD_BASE_MASK)
 	{
 		CELL card_scan = (CELL)CARD_TO_ADDR(ptr) + offset;
 		CELL card_end = (CELL)CARD_TO_ADDR(ptr + 1);
-	
+
 		while(card_scan < card_end && card_scan < here)
 			card_scan = collect_next(card_scan);
-	
+
 		cards_scanned++;
 	}
 }
@@ -658,6 +671,8 @@ void reset_generations(CELL from, CELL to)
 		reset_generation(i);
 
 	clear_cards(from,to);
+	clear_decks(from,to);
+	clear_allot_markers(from,to);
 }
 
 /* Prepare to start copying reachable objects into an unused zone */
@@ -682,6 +697,8 @@ void begin_gc(CELL requested_bytes)
 		reset_generation(collecting_gen);
 		newspace = &data_heap->generations[collecting_gen];
 		clear_cards(collecting_gen,collecting_gen);
+		clear_decks(collecting_gen,collecting_gen);
+		clear_allot_markers(collecting_gen,collecting_gen);
 	}
 	else
 	{
@@ -891,7 +908,7 @@ DEFINE_PRIMITIVE(become)
 		critical_error("bad parameters to become",0);
 
 	CELL i;
-	
+
 	for(i = 0; i < capacity; i++)
 	{
 		CELL old_obj = array_nth(old_objects,i);
