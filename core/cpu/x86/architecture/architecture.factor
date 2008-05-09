@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.compiler arrays
-cpu.x86.assembler cpu.architecture kernel kernel.private math
-memory namespaces sequences words generator generator.registers
-generator.fixup system layouts combinators compiler.constants
-math.order ;
+cpu.x86.assembler cpu.x86.assembler.private cpu.architecture
+kernel kernel.private math memory namespaces sequences words
+generator generator.registers generator.fixup system layouts
+combinators compiler.constants math.order ;
 IN: cpu.x86.architecture
 
 HOOK: ds-reg cpu
@@ -63,8 +63,7 @@ M: x86 %prologue ( n -- )
 M: x86 %epilogue ( n -- )
     stack-reg swap ADD ;
 
-: %alien-global ( symbol dll register -- )
-    [ 0 MOV rc-absolute-cell rel-dlsym ] keep dup [] MOV ;
+HOOK: %alien-global cpu ( symbol dll register -- )
 
 M: x86 %prepare-alien-invoke
     #! Save Factor stack pointers in case the C code calls a

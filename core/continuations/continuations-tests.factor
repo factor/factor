@@ -117,3 +117,5 @@ T{ dispose-dummy } "b" set
 [ { "a" "b" } [ get ] map dispose-each ] [ 3 = ] must-fail-with
 
 [ t ] [ "b" get disposed?>> ] unit-test
+
+[ ] [ [ return ] with-return ] unit-test

@@ -8,20 +8,17 @@ IN: io.tests
     "foo" "io.tests" lookup
 ] unit-test
 
-: <resource-reader> ( resource -- stream )
-    resource-path latin1 <file-reader> ;
-
 [
     "This is a line.\rThis is another line.\r"
 ] [
-    "core/io/test/mac-os-eol.txt" <resource-reader>
+    "resource:core/io/test/mac-os-eol.txt" latin1 <file-reader>
     [ 500 read ] with-input-stream
 ] unit-test
 
 [
     255
 ] [
-    "core/io/test/binary.txt" <resource-reader>
+    "resource:core/io/test/binary.txt" latin1 <file-reader>
     [ read1 ] with-input-stream >fixnum
 ] unit-test
 
@@ -36,7 +33,8 @@ IN: io.tests
     }
 ] [
     [
-        "core/io/test/separator-test.txt" <resource-reader> [
+        "resource:core/io/test/separator-test.txt"
+        latin1 <file-reader> [
             "J" read-until 2array ,
             "i" read-until 2array ,
             "X" read-until 2array ,

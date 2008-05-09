@@ -166,7 +166,7 @@ test-db [
         <dispatcher>
             add-quit-action
             <dispatcher>
-                "extra/http/test" resource-path <static> >>default
+                "resource:extra/http/test" <static> >>default
             "nested" add-responder
             <action>
                 [ "redirect-loop" f <standard-redirect> ] >>display
@@ -178,7 +178,7 @@ test-db [
 ] unit-test
 
 [ t ] [
-    "extra/http/test/foo.html" resource-path ascii file-contents
+    "resource:extra/http/test/foo.html" ascii file-contents
     "http://localhost:1237/nested/foo.html" http-get =
 ] unit-test
 

@@ -273,11 +273,11 @@ $nl
 
 HELP: append-path
 { $values { "str1" "a string" } { "str2" "a string" } { "str" "a string" } }
-{ $description "Concatenates two pathnames." } ;
+{ $description "Appends " { $snippet "str1" } " and " { $snippet "str2" } " to form a pathname." } ;
 
 HELP: prepend-path
 { $values { "str1" "a string" } { "str2" "a string" } { "str" "a string" } }
-{ $description "Concatenates two pathnames." } ;
+{ $description "Appends " { $snippet "str2" } " and " { $snippet "str1" } " to form a pathname." } ;
 
 { append-path prepend-path } related-words
 

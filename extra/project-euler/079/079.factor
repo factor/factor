@@ -27,7 +27,7 @@ IN: project-euler.079
 <PRIVATE
 
 : source-079 ( -- seq )
-    "extra/project-euler/079/keylog.txt" resource-path ascii file-lines ;
+    "resource:extra/project-euler/079/keylog.txt" ascii file-lines ;
 
 : >edges ( seq -- seq )
     [

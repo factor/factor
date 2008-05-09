@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.backend io.timeouts io.pipes system kernel
-namespaces strings hashtables sequences assocs combinators
-vocabs.loader init threads continuations math io.encodings
-io.streams.duplex io.nonblocking io.streams.duplex accessors
-concurrency.flags destructors ;
+USING: system kernel namespaces strings hashtables sequences 
+assocs combinators vocabs.loader init threads continuations
+math accessors concurrency.flags destructors
+io io.backend io.timeouts io.pipes io.pipes.private io.encodings
+io.streams.duplex io.nonblocking ;
 IN: io.launcher
 
 TUPLE: process < identity-tuple
@@ -149,15 +149,11 @@ M: process set-timeout set-process-timeout ;
 
 M: process timed-out kill-process ;
 
-M: object pipeline-element-quot
-    [
-        >process
-            swap >>stdout
-            swap >>stdin
-        run-detached
-    ] curry ;
-
-M: process wait-for-pipeline-element wait-for-process ;
+M: object run-pipeline-element
+    [ >process swap >>stdout swap >>stdin run-detached ]
+    [ drop [ [ close-handle ] when* ] bi@ ]
+    3bi
+    wait-for-process ;
 
 : <process-reader*> ( process encoding -- process stream )
     [

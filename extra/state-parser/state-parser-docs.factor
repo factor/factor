@@ -69,4 +69,4 @@ HELP: next
 { $description "originally written as " { $code "spot inc" } ", code that would no longer run, this word moves the state of the XML parser to the next place in the source file, keeping track of appropriate debugging information." } ;
 
 HELP: parsing-error
-{ $class-description "class to which parsing errors delegate, containing information about which line and column the error occured on, and what the line was. Contains three slots, line, an integer, column, another integer, and line-str, a string" } ;
+{ $class-description "class from which parsing errors inherit, containing information about which line and column the error occured on, and what the line was. Contains three slots, line, an integer, column, another integer, and line-str, a string" } ;

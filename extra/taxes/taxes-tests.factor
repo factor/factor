@@ -96,3 +96,21 @@ IN: taxes.tests
     1000000 2008 3 t <w4> <minnesota> net
     dollars/cents
 ] unit-test
+
+
+[ 30 97 ] [
+    24000 2008 2 f <w4> <minnesota> withholding biweekly dollars/cents
+] unit-test
+
+[ 173 66 ] [
+    78250 2008 2 f <w4> <minnesota> withholding biweekly dollars/cents
+] unit-test
+
+
+[ 138 69 ] [
+    24000 2008 2 f <w4> <federal> withholding biweekly dollars/cents
+] unit-test
+
+[ 754 72 ] [
+    78250 2008 2 f <w4> <federal> withholding biweekly dollars/cents
+] unit-test

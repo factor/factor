@@ -104,7 +104,7 @@ M: sliced-clumps nth group@ <slice> ;
         1array
     ] [
         "\n" split [
-            1 head-slice* [
+            but-last-slice [
                 "\r" ?tail drop "\r" split
             ] map
         ] keep peek "\r" split suffix concat

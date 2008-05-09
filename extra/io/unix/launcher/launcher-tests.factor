@@ -99,7 +99,7 @@ accessors kernel sequences io.encodings.utf8 ;
     utf8 file-contents
 ] unit-test
 
-[ ] [ "append-test" temp-file delete-file ] unit-test
+[ "append-test" temp-file delete-file ] ignore-errors
 
 [ "hi\nhi\n" ] [
     2 [

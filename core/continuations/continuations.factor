@@ -101,6 +101,14 @@ PRIVATE>
 : continue ( continuation -- )
     f swap continue-with ;
 
+SYMBOL: return-continuation
+
+: with-return ( quot -- )
+    [ [ return-continuation set ] prepose callcc0 ] with-scope ; inline
+
+: return ( -- )
+    return-continuation get continue ;
+
 GENERIC: compute-restarts ( error -- seq )
 
 <PRIVATE

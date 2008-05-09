@@ -36,7 +36,7 @@ IN: html.parser.utils
     dup quoted? [ quote ] unless ;
 
 : unquote ( str -- newstr )
-    dup quoted? [ 1 head-slice* rest-slice >string ] when ;
+    dup quoted? [ but-last-slice rest-slice >string ] when ;
 
 : quote? ( ch -- ? ) "'\"" member? ;
 

@@ -4,7 +4,7 @@ USING: hashtables generic kernel math namespaces sequences
 continuations assocs io.styles ;
 IN: io
 
-GENERIC: stream-readln ( stream -- str )
+GENERIC: stream-readln ( stream -- str/f )
 GENERIC: stream-read1 ( stream -- ch/f )
 GENERIC: stream-read ( n stream -- str/f )
 GENERIC: stream-read-until ( seps stream -- str/f sep/f )

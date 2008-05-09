@@ -387,17 +387,12 @@ SYMBOL: trace-messages?
 
 : peek-message? ( msg -- ? ) f 0 0 PM_REMOVE PeekMessage zero? ;
 
-: event-loop ( msg -- )
-    {
-        { [ windows get empty? ] [ drop ] }
-        { [ dup peek-message? ] [ ui-wait event-loop ] }
-        { [ dup MSG-message WM_QUIT = ] [ drop ] }
-        [
-            dup TranslateMessage drop
-            dup DispatchMessage drop
-            event-loop
-        ]
-    } cond ;
+M: windows-ui-backend do-events
+    msg-obj get-global
+    dup peek-message? [ drop ui-wait ] [
+        [ TranslateMessage drop ]
+        [ DispatchMessage drop ] bi
+    ] if ;
 
 : register-wndclassex ( -- class )
     "WNDCLASSEX" <c-object>
@@ -500,10 +495,11 @@ M: windows-ui-backend set-title ( string world -- )
 M: windows-ui-backend ui
     [
         [
+            stop-after-last-window? on
             init-clipboard
             init-win32-ui
             start-ui
-            msg-obj get event-loop
+            event-loop
         ] [ cleanup-win32-ui ] [ ] cleanup
     ] ui-running ;
 
