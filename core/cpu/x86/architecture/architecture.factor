@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.compiler arrays
-cpu.x86.assembler cpu.architecture kernel kernel.private math
-memory namespaces sequences words generator generator.registers
-generator.fixup system layouts combinators compiler.constants
-math.order ;
+cpu.x86.assembler cpu.x86.assembler.private cpu.architecture
+kernel kernel.private math memory namespaces sequences words
+generator generator.registers generator.fixup system layouts
+combinators compiler.constants math.order ;
 IN: cpu.x86.architecture
 
 HOOK: ds-reg cpu
