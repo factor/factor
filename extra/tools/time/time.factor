@@ -4,7 +4,7 @@ USING: kernel math math.vectors memory io io.styles prettyprint
 namespaces system sequences splitting assocs strings ;
 IN: tools.time
 
-: benchmark ( quot -- gctime runtime )
+: benchmark ( quot -- runtime )
     millis >r call millis r> - ; inline
 
 : simple-table. ( values -- )

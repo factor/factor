@@ -86,6 +86,12 @@ ERROR: open-error path flags prot message ;
     3dup unix.ffi:open
     dup 0 >= [ >r 3drop r> ] [ drop err_no strerror open-error ] if ;
 
+ERROR: utime-error path message ;
+
+: utime ( path buf -- )
+    dupd unix.ffi:utime
+    0 = [ drop ] [ err_no strerror utime-error ] if ;
+
 FUNCTION: int pclose ( void* file ) ;
 FUNCTION: int pipe ( int* filedes ) ;
 FUNCTION: void* popen ( char* command, char* type ) ;

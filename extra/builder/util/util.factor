@@ -12,8 +12,6 @@ IN: builder.util
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: runtime ( quot -- time ) benchmark nip ;
-
 : minutes>ms ( min -- ms ) 60 * 1000 * ;
 
 : file>string ( file -- string ) utf8 file-contents ;
