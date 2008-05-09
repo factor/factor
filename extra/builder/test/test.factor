@@ -3,6 +3,7 @@ USING: kernel namespaces assocs
        io.files io.encodings.utf8 prettyprint 
        help.lint
        benchmark
+       tools.time
        bootstrap.stage2
        tools.test tools.vocabs
        builder.util ;
