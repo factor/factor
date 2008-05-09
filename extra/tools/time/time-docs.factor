@@ -14,7 +14,8 @@ ARTICLE: "timing" "Timing code"
 ABOUT: "timing"
 
 HELP: benchmark
-{ $values { "quot" "a quotation" } { "gctime" "an integer denoting milliseconds" } { "runtime" "an integer denoting milliseconds" } }
+{ $values { "quot" "a quotation" }
+          { "runtime" "an integer denoting milliseconds" } }
 { $description "Runs a quotation, measuring the total wall clock time and the total time spent in the garbage collector." }
 { $notes "A nicer word for interactive use is " { $link time } "." } ;
 
