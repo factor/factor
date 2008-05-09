@@ -80,14 +80,11 @@ FUNCTION: uint ntohl ( uint n ) ;
 FUNCTION: ushort ntohs ( ushort n ) ;
 FUNCTION: char* strerror ( int errno ) ;
 
-TUPLE: open-error path flags prot message ;
+ERROR: open-error path flags prot message ;
 
 : open ( path flags prot -- int )
-  [ ] [ unix.ffi:open ] 3bi
-  dup 0 >=
-    [ nip nip nip ]
-    [ drop err_no strerror open-error boa throw ]
-  if ;
+    3dup unix.ffi:open
+    dup 0 >= [ >r 3drop r> ] [ drop err_no strerror open-error ] if ;
 
 FUNCTION: int pclose ( void* file ) ;
 FUNCTION: int pipe ( int* filedes ) ;
@@ -170,8 +167,6 @@ FUNCTION: int setpriority ( int which, int who, int prio ) ;
 
 FUNCTION: pid_t wait ( int* status ) ;
 FUNCTION: pid_t waitpid ( pid_t wpid, int* status, int options ) ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
 

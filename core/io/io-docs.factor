@@ -125,7 +125,7 @@ $nl
 ABOUT: "streams"
 
 HELP: stream-readln
-{ $values { "stream" "an input stream" } { "str" string } }
+{ $values { "stream" "an input stream" } { "str/f" "a string or " { $link f } } }
 { $contract "Reads a line of input from the stream. Outputs " { $link f } " on stream exhaustion." }
 { $notes "Most code only works on one stream at a time and should instead use " { $link readln } "; see " { $link "stdio" } "." }
 $io-error ;
@@ -139,7 +139,7 @@ $io-error ;
 HELP: stream-read
 { $values { "n" "a non-negative integer" } { "stream" "an input stream" } { "str/f" "a string or " { $link f } } }
 { $contract "Reads " { $snippet "n" } " characters of input from the stream. Outputs a truncated string or " { $link f } " on stream exhaustion." }
-{ $notes "Most code only works on one stream at a time and should instead use " { $link read1 } "; see " { $link "stdio" } "." }
+{ $notes "Most code only works on one stream at a time and should instead use " { $link read } "; see " { $link "stdio" } "." }
 $io-error ;
 
 HELP: stream-read-until
