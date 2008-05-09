@@ -96,7 +96,7 @@ HELP: deploy-io
         { "2" "Basic ANSI C streams" }
         { "3" "Non-blocking streams and networking" }
     }
-"The default value is 1, basic ANSI C streams. This enables basic console and file I/O, however more advanced features such are not available." } ;
+"The default value is 2, basic ANSI C streams. This enables basic console and file I/O, however more advanced features such as networking are not available." } ;
 
 HELP: deploy-reflection
 { $description "The level of reflection support required by the deployed image."
