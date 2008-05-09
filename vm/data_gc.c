@@ -59,6 +59,8 @@ F_DATA_HEAP *alloc_data_heap(CELL gens,
 		return NULL; /* can't happen */
 	}
 
+	total_size += DECK_SIZE;
+
 	data_heap->segment = alloc_segment(total_size);
 
 	data_heap->generations = safe_malloc(sizeof(F_ZONE) * data_heap->gen_count);
@@ -75,7 +77,7 @@ F_DATA_HEAP *alloc_data_heap(CELL gens,
 	data_heap->decks = safe_malloc(decks_size);
 	data_heap->decks_end = data_heap->decks + decks_size;
 
-	CELL alloter = data_heap->segment->start;
+	CELL alloter = (data_heap->segment->start + DECK_SIZE - 1) & ~(DECK_SIZE - 1);
 
 	alloter = init_zone(&data_heap->generations[TENURED],tenured_size,alloter);
 	alloter = init_zone(&data_heap->semispaces[TENURED],tenured_size,alloter);
@@ -92,7 +94,7 @@ F_DATA_HEAP *alloc_data_heap(CELL gens,
 		alloter = init_zone(&data_heap->semispaces[NURSERY],0,alloter);
 	}
 
-	if(alloter != data_heap->segment->end)
+	if(data_heap->segment->end - alloter > DECK_SIZE)
 		critical_error("Bug in alloc_data_heap",alloter);
 
 	return data_heap;
@@ -163,6 +165,10 @@ void gc_reset(void)
 	int i;
 	for(i = 0; i < MAX_GEN_COUNT; i++)
 		memset(&gc_stats[i],0,sizeof(F_GC_STATS));
+
+	cards_scanned = 0;
+	decks_scanned = 0;
+	code_heap_scans = 0;
 }
 
 void init_data_heap(CELL gens,
@@ -182,10 +188,6 @@ void init_data_heap(CELL gens,
 	secure_gc = secure_gc_;
 
 	gc_reset();
-
-	cards_scanned = 0;
-	decks_scanned = 0;
-	code_heap_scans = 0;
 }
 
 /* Size of the object pointed to by a tagged pointer */

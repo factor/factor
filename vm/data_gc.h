@@ -68,13 +68,11 @@ the offset of the first object is set by the allocator. */
 #define CARD_POINTS_TO_NURSERY 0x80
 #define CARD_POINTS_TO_AGING 0x40
 #define CARD_MARK_MASK (CARD_POINTS_TO_NURSERY | CARD_POINTS_TO_AGING)
-#define CARD_BASE_MASK 0x3f
+#define CARD_BASE_MASK 0xff
 typedef u8 F_CARD;
 
-/* A card is 64 bytes. 6 bits is sufficient to represent every
-offset within the card */
-#define CARD_SIZE 64
-#define CARD_BITS 6
+#define CARD_BITS 8
+#define CARD_SIZE (1<<CARD_BITS)
 #define ADDR_CARD_MASK (CARD_SIZE-1)
 
 DLLEXPORT CELL cards_offset;
@@ -83,11 +81,10 @@ DLLEXPORT CELL allot_markers_offset;
 #define ADDR_TO_CARD(a) (F_CARD*)(((CELL)(a) >> CARD_BITS) + cards_offset)
 #define CARD_TO_ADDR(c) (CELL*)(((CELL)(c) - cards_offset)<<CARD_BITS)
 
-/* A deck is 4 kilobytes or 64 cards. */
 typedef u8 F_DECK;
 
-#define DECK_SIZE (4 * 1024)
-#define DECK_BITS 12
+#define DECK_BITS (CARD_BITS + 10)
+#define DECK_SIZE (1<<DECK_BITS)
 #define ADDR_DECK_MASK (DECK_SIZE-1)
 
 DLLEXPORT CELL decks_offset;
