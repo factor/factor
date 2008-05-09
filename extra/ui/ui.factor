@@ -41,8 +41,9 @@ SYMBOL: stop-after-last-window?
     windows global [ [ first = not ] with filter ] change-at ;
 
 : raised-window ( world -- )
-    windows get-global [ second eq? ] with find drop
-    windows get-global [ length 1- ] keep exchange ;
+    windows get-global
+    [ [ second eq? ] with find drop ] keep
+    [ nth ] [ delete-nth ] [ nip ] 2tri push ;
 
 : focus-gestures ( new old -- )
     drop-prefix <reversed>
