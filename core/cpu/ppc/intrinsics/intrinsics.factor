@@ -18,13 +18,13 @@ IN: cpu.ppc.intrinsics
     "obj" get operand-tag - ;
 
 : %slot-literal-any-tag
-    "obj" operand "scratch" operand %untag
-    "val" operand "scratch" operand "n" get cells ;
+    "obj" operand "scratch1" operand %untag
+    "val" operand "scratch1" operand "n" get cells ;
 
 : %slot-any
-    "obj" operand "scratch" operand %untag
+    "obj" operand "scratch1" operand %untag
     "offset" operand "n" operand 1 SRAWI
-    "scratch" operand "val" operand "offset" operand ;
+    "scratch1" operand "val" operand "offset" operand ;
 
 \ slot {
     ! Slot number is literal and the tag is known
@@ -39,7 +39,7 @@ IN: cpu.ppc.intrinsics
     {
         [ %slot-literal-any-tag LWZ ] H{
             { +input+ { { f "obj" } { [ small-slot? ] "n" } } }
-            { +scratch+ { { f "scratch" } { f "val" } } }
+            { +scratch+ { { f "scratch1" } { f "val" } } }
             { +output+ { "val" } }
         }
     }
@@ -47,7 +47,7 @@ IN: cpu.ppc.intrinsics
     {
         [ %slot-any LWZX ] H{
             { +input+ { { f "obj" } { f "n" } } }
-            { +scratch+ { { f "val" } { f "scratch" } { f "offset" } } }
+            { +scratch+ { { f "val" } { f "scratch1" } { f "offset" } } }
             { +output+ { "val" } }
         }
     }
