@@ -45,10 +45,9 @@ M: unix (file-appender) ( path -- stream )
 
 M: unix touch-file ( path -- )
     normalize-path
-    dup exists?
-        [ f utime ]
-        [ touch-mode file-mode open close ]
-    if ;
+    dup exists? [ f utime ] [
+        touch-mode file-mode open close
+    ] if ;
 
 M: unix move-file ( from to -- )
     [ normalize-path ] bi@ rename io-error ;
