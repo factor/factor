@@ -12,7 +12,7 @@ IN: builder.util
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: runtime ( quot -- time ) benchmark nip ;
+: runtime ( quot -- time ) benchmark ;
 
 : minutes>ms ( min -- ms ) 60 * 1000 * ;
 
