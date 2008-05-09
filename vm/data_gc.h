@@ -68,22 +68,20 @@ the offset of the first object is set by the allocator. */
 #define CARD_POINTS_TO_NURSERY 0x80
 #define CARD_POINTS_TO_AGING 0x40
 #define CARD_MARK_MASK (CARD_POINTS_TO_NURSERY | CARD_POINTS_TO_AGING)
-#define CARD_BASE_MASK 0xff
 typedef u8 F_CARD;
 
-#define CARD_BITS 8
+#define CARD_BITS 6
 #define CARD_SIZE (1<<CARD_BITS)
 #define ADDR_CARD_MASK (CARD_SIZE-1)
 
 DLLEXPORT CELL cards_offset;
-DLLEXPORT CELL allot_markers_offset;
 
 #define ADDR_TO_CARD(a) (F_CARD*)(((CELL)(a) >> CARD_BITS) + cards_offset)
 #define CARD_TO_ADDR(c) (CELL*)(((CELL)(c) - cards_offset)<<CARD_BITS)
 
 typedef u8 F_DECK;
 
-#define DECK_BITS (CARD_BITS + 10)
+#define DECK_BITS (CARD_BITS + 6)
 #define DECK_SIZE (1<<DECK_BITS)
 #define ADDR_DECK_MASK (DECK_SIZE-1)
 
@@ -97,12 +95,14 @@ DLLEXPORT CELL decks_offset;
 #define ADDR_TO_ALLOT_MARKER(a) (F_CARD*)(((CELL)(a) >> CARD_BITS) + allot_markers_offset)
 #define CARD_OFFSET(c) (*((c) - (CELL)data_heap->cards + (CELL)data_heap->allot_markers))
 
+#define INVALID_ALLOT_MARKER 0xff
+
+DLLEXPORT CELL allot_markers_offset;
+
 void init_card_decks(void);
 
-/* this is an inefficient write barrier. compiled definitions use a more
-efficient one hand-coded in assembly. the write barrier must be called
-any time we are potentially storing a pointer from an older generation
-to a younger one */
+/* the write barrier must be called any time we are potentially storing a
+pointer from an older generation to a younger one */
 INLINE void write_barrier(CELL address)
 {
 	*ADDR_TO_CARD(address) = CARD_MARK_MASK;
@@ -121,9 +121,8 @@ INLINE void set_slot(CELL obj, CELL slot, CELL value)
 INLINE void allot_barrier(CELL address)
 {
 	F_CARD *ptr = ADDR_TO_ALLOT_MARKER(address);
-	F_CARD b = *ptr;
-	F_CARD a = (address & ADDR_CARD_MASK);
-	*ptr = (b < a ? b : a);
+	if(*ptr == INVALID_ALLOT_MARKER)
+		*ptr = (address & ADDR_CARD_MASK);
 }
 
 void clear_cards(CELL from, CELL to);

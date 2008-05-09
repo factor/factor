@@ -66,12 +66,12 @@ IN: cpu.ppc.intrinsics
         ! Mark the card
         "val" operand load-cards-offset
         "obj" operand "scratch2" operand card-bits SRWI
-        "val" operand "scratch2" operand "val" operand STBX
+        "scratch1" operand "scratch2" operand "val" operand STBX
 
         ! Mark the card deck
         "val" operand load-decks-offset
-        "obj" operand "scratch" operand deck-bits SRWI
-        "val" operand "scratch" operand "val" operand STBX
+        "obj" operand "scratch2" operand deck-bits SRWI
+        "scratch1" operand "scratch2" operand "val" operand STBX
     ] unless ;
 
 \ set-slot {

@@ -7,6 +7,8 @@
 #define END_AGING_GC "end_gc: aging_collections=%ld, cards_scanned=%ld\n"
 #define END_NURSERY_GC "end_gc: nursery_collections=%ld, cards_scanned=%ld\n"
 
+/* #define GC_DEBUG */
+
 #ifdef GC_DEBUG
 	#define GC_PRINT printf
 #else
@@ -23,7 +25,7 @@ CELL init_zone(F_ZONE *z, CELL size, CELL start)
 
 void init_card_decks(void)
 {
-	CELL start = data_heap->segment->start & ~(DECK_SIZE - 1);
+	CELL start = align(data_heap->segment->start,DECK_SIZE);
 	allot_markers_offset = (CELL)data_heap->allot_markers - (start >> CARD_BITS);
 	cards_offset = (CELL)data_heap->cards - (start >> CARD_BITS);
 	decks_offset = (CELL)data_heap->decks - (start >> DECK_BITS);
@@ -66,18 +68,18 @@ F_DATA_HEAP *alloc_data_heap(CELL gens,
 	data_heap->generations = safe_malloc(sizeof(F_ZONE) * data_heap->gen_count);
 	data_heap->semispaces = safe_malloc(sizeof(F_ZONE) * data_heap->gen_count);
 
-	CELL cards_size = (total_size + DECK_SIZE) / CARD_SIZE;
+	CELL cards_size = total_size >> CARD_BITS;
 	data_heap->allot_markers = safe_malloc(cards_size);
 	data_heap->allot_markers_end = data_heap->allot_markers + cards_size;
 
 	data_heap->cards = safe_malloc(cards_size);
 	data_heap->cards_end = data_heap->cards + cards_size;
 
-	CELL decks_size = (total_size + DECK_SIZE) / DECK_SIZE;
+	CELL decks_size = total_size >> DECK_BITS;
 	data_heap->decks = safe_malloc(decks_size);
 	data_heap->decks_end = data_heap->decks + decks_size;
 
-	CELL alloter = (data_heap->segment->start + DECK_SIZE - 1) & ~(DECK_SIZE - 1);
+	CELL alloter = align(data_heap->segment->start,DECK_SIZE);
 
 	alloter = init_zone(&data_heap->generations[TENURED],tenured_size,alloter);
 	alloter = init_zone(&data_heap->semispaces[TENURED],tenured_size,alloter);
@@ -121,8 +123,6 @@ void dealloc_data_heap(F_DATA_HEAP *data_heap)
 	free(data_heap);
 }
 
-/* Every card stores the offset of the first object in that card, which must be
-cleared when a generation has been cleared */
 void clear_cards(CELL from, CELL to)
 {
 	/* NOTE: reverse order due to heap layout. */
@@ -135,9 +135,9 @@ void clear_cards(CELL from, CELL to)
 void clear_decks(CELL from, CELL to)
 {
 	/* NOTE: reverse order due to heap layout. */
-	F_CARD *first_deck = ADDR_TO_CARD(data_heap->generations[to].start);
-	F_CARD *last_deck = ADDR_TO_CARD(data_heap->generations[from].end);
-	F_CARD *ptr;
+	F_DECK *first_deck = ADDR_TO_DECK(data_heap->generations[to].start);
+	F_DECK *last_deck = ADDR_TO_DECK(data_heap->generations[from].end);
+	F_DECK *ptr;
 	for(ptr = first_deck; ptr < last_deck; ptr++) *ptr = 0;
 }
 
@@ -147,7 +147,7 @@ void clear_allot_markers(CELL from, CELL to)
 	F_CARD *first_card = ADDR_TO_ALLOT_MARKER(data_heap->generations[to].start);
 	F_CARD *last_card = ADDR_TO_ALLOT_MARKER(data_heap->generations[from].end);
 	F_CARD *ptr;
-	for(ptr = first_card; ptr < last_card; ptr++) *ptr = CARD_BASE_MASK;
+	for(ptr = first_card; ptr < last_card; ptr++) *ptr = INVALID_ALLOT_MARKER;
 }
 
 void set_data_heap(F_DATA_HEAP *data_heap_)
@@ -330,8 +330,11 @@ void collect_card(F_CARD *ptr, CELL gen, CELL here)
 {
 	CELL offset = CARD_OFFSET(ptr);
 
-	if(offset != CARD_BASE_MASK)
+	if(offset != INVALID_ALLOT_MARKER)
 	{
+		if(offset & TAG_MASK)
+			critical_error("Bad card",(CELL)ptr);
+
 		CELL card_scan = (CELL)CARD_TO_ADDR(ptr) + offset;
 		CELL card_end = (CELL)CARD_TO_ADDR(ptr + 1);
 
