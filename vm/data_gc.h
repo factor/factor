@@ -70,7 +70,7 @@ the offset of the first object is set by the allocator. */
 #define CARD_MARK_MASK (CARD_POINTS_TO_NURSERY | CARD_POINTS_TO_AGING)
 typedef u8 F_CARD;
 
-#define CARD_BITS 6
+#define CARD_BITS 8
 #define CARD_SIZE (1<<CARD_BITS)
 #define ADDR_CARD_MASK (CARD_SIZE-1)
 
@@ -81,7 +81,7 @@ DLLEXPORT CELL cards_offset;
 
 typedef u8 F_DECK;
 
-#define DECK_BITS (CARD_BITS + 6)
+#define DECK_BITS (CARD_BITS + 10)
 #define DECK_SIZE (1<<DECK_BITS)
 #define ADDR_DECK_MASK (DECK_SIZE-1)
 
