@@ -61,17 +61,17 @@ IN: cpu.ppc.intrinsics
 
 : %write-barrier ( -- )
     "val" get operand-immediate? "obj" get fresh-object? or [
-        "scratch1" operand card-mark LI
+        card-mark "scratch1" operand LI
 
         ! Mark the card
         "val" operand load-cards-offset
         "obj" operand "scratch2" operand card-bits SRWI
-        "scratch1" operand "scratch2" operand "val" operand STBX
+        "scratch2" operand "scratch1" operand "val" operand STBX
 
         ! Mark the card deck
         "val" operand load-decks-offset
         "obj" operand "scratch2" operand deck-bits SRWI
-        "scratch1" operand "scratch2" operand "val" operand STBX
+        "scratch2" operand "scratch1" operand "val" operand STBX
     ] unless ;
 
 \ set-slot {
@@ -87,7 +87,7 @@ IN: cpu.ppc.intrinsics
     {
         [ %slot-literal-any-tag STW %write-barrier ] H{
             { +input+ { { f "val" } { f "obj" } { [ small-slot? ] "n" } } }
-            { +scratch+ { { f "scratch" } } }
+            { +scratch+ { { f "scratch1" } { f "scratch2" } } }
             { +clobber+ { "val" } }
         }
     }
@@ -95,7 +95,7 @@ IN: cpu.ppc.intrinsics
     {
         [ %slot-any STWX %write-barrier ] H{
             { +input+ { { f "val" } { f "obj" } { f "n" } } }
-            { +scratch+ { { f "scratch" } { f "offset" } } }
+            { +scratch+ { { f "scratch1" } { f "scratch2" } { f "offset" } } }
             { +clobber+ { "val" } }
         }
     }
