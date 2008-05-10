@@ -4,8 +4,8 @@ USING: math kernel layouts system ;
 IN: compiler.constants
 
 ! These constants must match vm/memory.h
-: card-bits 6 ;
-: deck-bits 12 ;
+: card-bits 8 ;
+: deck-bits 18 ;
 : card-mark HEX: 40 HEX: 80 bitor ;
 
 ! These constants must match vm/layouts.h

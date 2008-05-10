@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types colors jamshred.game jamshred.oint
+USING: accessors alien.c-types colors jamshred.game jamshred.oint
 jamshred.player jamshred.tunnel kernel math math.vectors opengl
 opengl.gl opengl.glu sequences ;
 IN: jamshred.gl
@@ -37,10 +37,6 @@ IN: jamshred.gl
 : draw-tunnel ( player -- )
     segments-to-render draw-segments ;
 
-! : draw-tunnel ( player tunnel -- )
-!     tuck swap player-nearest-segment segment-number dup n-segments-behind -
-!     swap n-segments-ahead + rot sub-tunnel draw-segments ;
-
 : init-graphics ( width height -- )
     GL_DEPTH_TEST glEnable
     GL_SCISSOR_TEST glDisable
@@ -63,9 +59,9 @@ IN: jamshred.gl
     GL_LIGHT0 GL_SPECULAR F{ 1.0 1.0 1.0 1.0 } >c-float-array glLightfv ;
 
 : player-view ( player -- )
-    [ oint-location first3 ] keep
-    [ dup oint-location swap oint-forward v+ first3 ] keep
-    oint-up first3 gluLookAt ;
+    [ location>> first3 ]
+    [ [ location>> ] [ forward>> ] bi v+ first3 ]
+    [ up>> first3 ] tri gluLookAt ;
 
 : draw-jamshred ( jamshred width height -- )
     init-graphics jamshred-player dup player-view draw-tunnel ;
