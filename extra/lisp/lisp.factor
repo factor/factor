@@ -46,7 +46,7 @@ PRIVATE>
 : convert-lambda ( s-exp -- quot )  
   split-lambda dup "&rest"  swap member? [ rest-lambda-vars ] [ dup length ] if
   [ localize-lambda <lambda> ] dip
-  [ , cut [ dup length firstn ] dip dup empty? [ drop ] when  , with-locals ] bake ;
+  [ , cut [ dup length firstn ] dip dup empty? [ drop ] when  , ] bake ;
   
 : convert-quoted ( s-exp -- quot )  
   second [ , ] bake ;
