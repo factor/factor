@@ -10,3 +10,6 @@ C-STRUCT: utimbuf
     { "time_t" "modtime" } ;
 
 FUNCTION: int utime ( char* path, utimebuf* buf ) ;
+
+FUNCTION: int err_no ( ) ;
+FUNCTION: char* strerror ( int errno ) ;

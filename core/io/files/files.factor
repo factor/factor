@@ -142,7 +142,9 @@ PRIVATE>
 : file-name ( path -- string )
     dup root-directory? [
         right-trim-separators
-        dup last-path-separator [ 1+ tail ] [ drop ] if
+        dup last-path-separator [ 1+ tail ] [
+            drop "resource:" ?head [ file-name ] when
+        ] if
     ] unless ;
 
 ! File info
