@@ -50,7 +50,11 @@ TUPLE: positive-even-expected n ;
 : random-prime ( numbits -- p )
     random-bits next-prime ;
 
+ERROR: no-relative-prime n ;
+
 : (find-relative-prime) ( n guess -- p )
+    over 1 <= [ over no-relative-prime ] when
+    dup 1 <= [ drop 3 ] when
     2dup gcd nip 1 > [ 2 + (find-relative-prime) ] [ nip ] if ;
 
 : find-relative-prime* ( n guess -- p )
