@@ -123,12 +123,13 @@ M: method-body definer
 M: method-body forget*
     dup "forgotten" word-prop [ drop ] [
         [
-            [   "method-class" word-prop ]
-            [ "method-generic" word-prop ] bi
-            dup generic? [
-                [ delete-at* ] with-methods
-                [ call-next-method ] [ drop ] if
-            ] [ 2drop ] if
+            [ ]
+            [ "method-class" word-prop ]
+            [ "method-generic" word-prop ] tri
+            3dup method eq? [
+                [ delete-at ] with-methods
+                call-next-method
+            ] [ 3drop ] if
         ]
         [ t "forgotten" set-word-prop ] bi
     ] if ;
