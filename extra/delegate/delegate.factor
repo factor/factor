@@ -54,17 +54,15 @@ M: tuple-class group-words
 : lost-words ( protocol wordlist -- lost-words )
     >r protocol-words r> diff ;
 
-: bid ( x y q r -- qx rxy )
-    >r swap >r keep r> r> call ; inline
-
 : forget-old-definitions ( protocol new-wordlist -- )
-    [ protocol-users ] [ lost-words ] bid forget-all-methods ;
+    [ drop protocol-users ] [ lost-words ] 2bi
+    forget-all-methods ;
 
 : added-words ( protocol wordlist -- added-words )
     swap protocol-words diff ;
 
 : add-new-definitions ( protocol wordlist -- )
-    [ protocol-consult >alist ] [ added-words ] bid
+    [ drop protocol-consult >alist ] [ added-words ] 2bi
     [ swap first2 consult-method ] cross-2each ;
 
 : initialize-protocol-props ( protocol wordlist -- )
