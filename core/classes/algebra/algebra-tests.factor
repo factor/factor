@@ -6,6 +6,12 @@ classes.private classes.union classes.mixin classes.predicate
 vectors definitions source-files compiler.units growable
 random inference effects kernel.private sbufs math.order ;
 
+\ class< must-infer
+\ class-and must-infer
+\ class-or must-infer
+\ flatten-class must-infer
+\ flatten-builtin-class must-infer
+
 : class= [ class<= ] [ swap class<= ] 2bi and ;
 
 : class-and* >r class-and r> class= ;
@@ -261,3 +267,18 @@ TUPLE: xg < xb ;
 TUPLE: xh < xb ;
 
 [ t ] [ { xa xb xc xd xe xf xg xh } sort-classes dup sort-classes = ] unit-test
+
+INTERSECTION: generic-class generic class ;
+
+[ t ] [ generic-class generic class<= ] unit-test
+[ t ] [ generic-class \ class class<= ] unit-test
+
+[ t ] [ \ class generic class-and generic-class class<= ] unit-test
+[ t ] [ \ class generic class-and generic-class swap class<= ] unit-test
+
+[ t ] [ \ word generic-class classes-intersect? ] unit-test
+[ f ] [ number generic-class classes-intersect? ] unit-test
+
+[ H{ { word word } } ] [ 
+    generic-class flatten-class
+] unit-test

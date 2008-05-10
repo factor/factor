@@ -246,3 +246,5 @@ M:: fixnum next-method-test ( a -- b ) a call-next-method 1 + ;
 : no-with-locals-test { 1 2 3 } [| x | x 3 + ] map ;
 
 [ { 4 5 6 } ] [ no-with-locals-test ] unit-test
+
+[ ] [ 1 2 [let | a [ ] b [ ] | ] ] unit-test

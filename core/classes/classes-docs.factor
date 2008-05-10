@@ -40,6 +40,7 @@ $nl
 "There are several sorts of classes:"
 { $subsection "builtin-classes" }
 { $subsection "unions" }
+{ $subsection "intersections" }
 { $subsection "mixins" }
 { $subsection "predicates" }
 { $subsection "singletons" }
@@ -86,7 +87,11 @@ HELP: members
 { $values { "class" class } { "seq" "a sequence of union members, or " { $link f } } }
 { $description "If " { $snippet "class" } " is a union class, outputs a sequence of its member classes, otherwise outputs " { $link f } "." } ;
 
+HELP: participants
+{ $values { "class" class } { "seq" "a sequence of intersection participants, or " { $link f } } }
+{ $description "If " { $snippet "class" } " is an intersection class, outputs a sequence of its participant classes, otherwise outputs " { $link f } "." } ;
+
 HELP: define-class
-{ $values { "word" word } { "members" "a sequence of class words" } { "superclass" class } { "metaclass" class } }
+{ $values { "word" word } { "superclass" class } { "members" "a sequence of class words" } { "participants" "a sequence of class words" } { "metaclass" class } }
 { $description "Sets a property indicating this word is a class word, thus making it an instance of " { $link class } ", and registers it with " { $link update-map } "." }
 $low-level-note ;
