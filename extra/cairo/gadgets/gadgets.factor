@@ -1,3 +1,5 @@
+! Copyright (C) 2008 Matthew Willis.
+! See http://factorcode.org/license.txt for BSD license.
 USING: cairo cairo.lib ui.render kernel opengl.gl opengl
 math byte-arrays ui.gadgets accessors arrays 
 namespaces io.backend ;
