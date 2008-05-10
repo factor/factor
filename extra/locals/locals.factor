@@ -363,14 +363,6 @@ M: lambda-word definer drop \ :: \ ; ;
 M: lambda-word definition
     "lambda" word-prop body>> ;
 
-: lambda-word-synopsis ( word -- )
-    dup definer.
-    dup seeing-word
-    dup pprint-word
-    stack-effect. ;
-
-M: lambda-word synopsis* lambda-word-synopsis ;
-
 PREDICATE: lambda-macro < macro
     "lambda" word-prop >boolean ;
 
@@ -378,8 +370,6 @@ M: lambda-macro definer drop \ MACRO:: \ ; ;
 
 M: lambda-macro definition
     "lambda" word-prop body>> ;
-
-M: lambda-macro synopsis* lambda-word-synopsis ;
 
 PREDICATE: lambda-method < method-body
     "lambda" word-prop >boolean ;

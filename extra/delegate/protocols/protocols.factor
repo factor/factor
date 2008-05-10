@@ -1,16 +1,19 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: delegate sequences.private sequences assocs prettyprint.sections 
-io definitions kernel continuations listener ;
+USING: delegate sequences.private sequences assocs
+prettyprint.sections io definitions kernel continuations
+listener ;
 IN: delegate.protocols
 
 PROTOCOL: sequence-protocol
-    clone clone-like like new-sequence new-resizable nth nth-unsafe
-    set-nth set-nth-unsafe length set-length lengthen ;
+    clone clone-like like new-sequence new-resizable nth
+    nth-unsafe set-nth set-nth-unsafe length set-length
+    lengthen ;
 
 PROTOCOL: assoc-protocol
-    at* assoc-size >alist set-at assoc-clone-like { assoc-find 1 }
-    delete-at clear-assoc new-assoc assoc-like ;
+    at* assoc-size >alist set-at assoc-clone-like
+    { assoc-find 1 } delete-at clear-assoc new-assoc
+    assoc-like ;
 
 PROTOCOL: input-stream-protocol
     stream-read1 stream-read stream-read-partial stream-readln

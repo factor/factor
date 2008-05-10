@@ -1,7 +1,8 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser generic kernel classes words slots assocs sequences arrays
-vectors definitions prettyprint combinators.lib math hashtables sets ;
+USING: parser generic kernel classes words slots assocs
+sequences arrays vectors definitions prettyprint combinators.lib
+math hashtables sets ;
 IN: delegate
 
 : protocol-words ( protocol -- words )
@@ -22,7 +23,8 @@ M: tuple-class group-words
 
 : consult-method ( word class quot -- )
     [ drop swap first create-method ]
-    [ nip swap first2 swapd [ ndip ] 2curry swap suffix ] 3bi define ;
+    [ nip swap first2 swapd [ ndip ] 2curry swap suffix ] 3bi
+    define ;
 
 : change-word-prop ( word prop quot -- )
     rot word-props swap change-at ; inline
@@ -31,10 +33,9 @@ M: tuple-class group-words
     rot \ protocol-consult [ swapd ?set-at ] change-word-prop ;
 
 : define-consult ( group class quot -- )
-    [ register-protocol ] [
-        rot group-words -rot
-        [ consult-method ] 2curry each
-    ] 3bi ;
+    [ register-protocol ]
+    [ rot group-words -rot [ consult-method ] 2curry each ]
+    3bi ;
 
 : CONSULT:
     scan-word scan-word parse-definition define-consult ; parsing
@@ -45,7 +46,7 @@ M: tuple-class group-words
     [ with each ] 2curry each ; inline
 
 : forget-all-methods ( classes words -- )
-    [ 2array forget ] cross-2each ;
+    [ first method forget ] cross-2each ;
 
 : protocol-users ( protocol -- users )
     protocol-consult keys ;
@@ -54,19 +55,21 @@ M: tuple-class group-words
     >r protocol-words r> diff ;
 
 : forget-old-definitions ( protocol new-wordlist -- )
-    >r [ protocol-users ] [ protocol-words ] bi r>
-    swap diff forget-all-methods ;
+    [ drop protocol-users ] [ lost-words ] 2bi
+    forget-all-methods ;
 
 : added-words ( protocol wordlist -- added-words )
-    swap protocol-words swap diff ;
+    swap protocol-words diff ;
 
 : add-new-definitions ( protocol wordlist -- )
-     dupd added-words >r protocol-consult >alist r>
-     [ first2 consult-method ] cross-2each ;
+    [ drop protocol-consult >alist ] [ added-words ] 2bi
+    [ swap first2 consult-method ] cross-2each ;
 
 : initialize-protocol-props ( protocol wordlist -- )
-    [ drop H{ } clone \ protocol-consult set-word-prop ]
-    [ { } like \ protocol-words set-word-prop ] 2bi ;
+    [
+        drop \ protocol-consult
+        [ H{ } assoc-like ] change-word-prop
+    ] [ { } like \ protocol-words set-word-prop ] 2bi ;
 
 : fill-in-depth ( wordlist -- wordlist' )
     [ dup word? [ 0 2array ] when ] map ;
