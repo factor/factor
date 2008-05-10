@@ -158,8 +158,7 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "SINGLETON:" [
-        scan create-class-in
-        dup save-location define-singleton-class
+        CREATE-CLASS define-singleton-class
     ] define-syntax
 
     "TUPLE:" [
