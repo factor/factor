@@ -6,7 +6,7 @@ continuations debugger ;
 IN: benchmark
 
 : run-benchmark ( vocab -- result )
-  [ [ require ] [ [ run ] benchmark nip ] bi ] curry
+  [ [ require ] [ [ run ] benchmark ] bi ] curry
   [ error. f ] recover ;
 
 : run-benchmarks ( -- assoc )

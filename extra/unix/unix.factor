@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: alien alien.c-types alien.syntax kernel libc structs
-       math namespaces system combinators vocabs.loader unix.ffi unix.types
-       qualified ;
+       math namespaces system combinators vocabs.loader qualified
+       unix.ffi unix.types unix.system-call ;
 
 QUALIFIED: unix.ffi
 
@@ -27,9 +27,27 @@ TYPEDEF: ulong size_t
 : ESRCH 3 ; inline
 : EEXIST 17 ; inline
 
+C-STRUCT: group
+    { "char*" "gr_name" }
+    { "char*" "gr_passwd" }
+    { "int" "gr_gid" }
+    { "char**" "gr_mem" } ;
+
+C-STRUCT: passwd
+    { "char*"  "pw_name" }
+    { "char*"  "pw_passwd" }
+    { "uid_t"  "pw_uid" }
+    { "gid_t"  "pw_gid" }
+    { "time_t" "pw_change" }
+    { "char*"  "pw_class" }
+    { "char*"  "pw_gecos" }
+    { "char*"  "pw_dir" }
+    { "char*"  "pw_shell" }
+    { "time_t" "pw_expire" }
+    { "int"    "pw_fields" } ;
+
 ! ! ! Unix functions
 LIBRARY: factor
-FUNCTION: int err_no ( ) ;
 FUNCTION: void clear_err_no ( ) ;
 
 LIBRARY: libc
@@ -64,6 +82,9 @@ FUNCTION: int getdtablesize ;
 FUNCTION: gid_t getegid ;
 FUNCTION: uid_t geteuid ;
 FUNCTION: gid_t getgid ;
+FUNCTION: int getgrgid_r ( gid_t gid, group* grp, char* buffer, size_t bufsize, group** result ) ;
+FUNCTION: int getgrnam_r ( char* name, group* grp, char* buffer, size_t bufsize, group** result ) ;
+FUNCTION: int getpwnam_r ( char* login, passwd* pwd, char* buffer, size_t bufsize, passwd** result ) ;
 FUNCTION: int getgroups ( int gidsetlen, gid_t* gidset ) ;
 FUNCTION: int gethostname ( char* name, int len ) ;
 FUNCTION: uid_t getuid ;
@@ -78,16 +99,10 @@ FUNCTION: void* mmap ( void* addr, size_t len, int prot, int flags, int fd, off_
 FUNCTION: int munmap ( void* addr, size_t len ) ;
 FUNCTION: uint ntohl ( uint n ) ;
 FUNCTION: ushort ntohs ( ushort n ) ;
-FUNCTION: char* strerror ( int errno ) ;
 
-TUPLE: open-error path flags prot message ;
+: open ( path flags prot -- int ) [ unix.ffi:open ] unix-system-call ;
 
-: open ( path flags prot -- int )
-  [ ] [ unix.ffi:open ] 3bi
-  dup 0 >=
-    [ nip nip nip ]
-    [ drop err_no strerror open-error boa throw ]
-  if ;
+: utime ( path buf -- ) [ unix.ffi:utime ] unix-system-call drop ;
 
 FUNCTION: int pclose ( void* file ) ;
 FUNCTION: int pipe ( int* filedes ) ;
@@ -170,8 +185,6 @@ FUNCTION: int setpriority ( int which, int who, int prio ) ;
 
 FUNCTION: pid_t wait ( int* status ) ;
 FUNCTION: pid_t waitpid ( pid_t wpid, int* status, int options ) ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
 

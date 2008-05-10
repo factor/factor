@@ -136,9 +136,9 @@ SYMBOL: visited
         [ reset-on-redefine reset-props ]
         [ dup visited get set-at ]
         [
-            crossref get at keys [ word? ] filter [
-                reset-on-redefine [ word-prop ] with contains?
-            ] filter
+            crossref get at keys
+            [ word? ] filter
+            [ reset-on-redefine [ word-prop ] with contains? ] filter
             [ (redefined) ] each
         ] tri
     ] if ;

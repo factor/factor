@@ -91,7 +91,7 @@ void *primitives[] = {
 	primitive_existsp,
 	primitive_read_dir,
 	primitive_gc,
-	primitive_gc_time,
+	primitive_gc_stats,
 	primitive_save_image,
 	primitive_save_image_and_exit,
 	primitive_datastack,
@@ -186,4 +186,5 @@ void *primitives[] = {
 	primitive_resize_float_array,
 	primitive_dll_validp,
 	primitive_unimplemented,
+	primitive_gc_reset,
 };

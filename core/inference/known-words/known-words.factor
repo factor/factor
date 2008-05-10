@@ -362,7 +362,7 @@ M: object infer-call
 
 \ gc { } { } <effect> set-primitive-effect
 
-\ gc-time { } { integer } <effect> set-primitive-effect
+\ gc-stats { } { array } <effect> set-primitive-effect
 
 \ save-image { string } { } <effect> set-primitive-effect
 
@@ -372,7 +372,7 @@ M: object infer-call
 t over set-effect-terminated?
 set-primitive-effect
 
-\ data-room { } { integer array } <effect> set-primitive-effect
+\ data-room { } { integer integer array } <effect> set-primitive-effect
 \ data-room make-flushable
 
 \ code-room { } { integer integer integer integer } <effect> set-primitive-effect

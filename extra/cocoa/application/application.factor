@@ -29,9 +29,6 @@ IN: cocoa.application
 : do-event ( app -- ? )
     dup next-event [ -> sendEvent: t ] [ drop f ] if* ;
 
-: do-events ( app -- )
-    dup do-event [ do-events ] [ drop ] if ;
-
 : add-observer ( observer selector name object -- )
     >r >r >r >r NSNotificationCenter -> defaultCenter
     r> r> sel_registerName
