@@ -226,6 +226,11 @@ M: tuple-class reset-class
         } reset-props
     ] bi ;
 
+M: tuple-class forget*
+    [ [ reset-class ] each-subclass ]
+    [ call-next-method ]
+    bi ;
+
 M: tuple-class rank-class drop 0 ;
 
 M: tuple clone
