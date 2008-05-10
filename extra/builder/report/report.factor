@@ -15,8 +15,8 @@ IN: builder.report
   "Build directory: " write build-dir             print
   "git id:          " write "git-id" eval-file    print nl
 
-  status-vm   get f = [ "compile-log" cat    "vm compile error" throw ] when
-  status-boot get f = [ "boot-log"    cat    "Boot error"       throw ] when
+  status-vm   get f = [ "compile-log"  cat   "vm compile error" throw ] when
+  status-boot get f = [ "boot-log" 100 cat-n "Boot error"       throw ] when
   status-test get f = [ "test-log" 100 cat-n "Test error"       throw ] when
 
   "Boot time: " write "boot-time" eval-file milli-seconds>time print
