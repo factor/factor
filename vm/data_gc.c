@@ -648,12 +648,63 @@ void do_code_slots(CELL scan)
 	}
 }
 
+/* This function is performance-critical */
 CELL collect_next(CELL scan)
 {
-	do_slots(scan,copy_handle);
+	CELL *obj = (CELL *)scan;
+	CELL *end = (CELL *)(scan + binary_payload_start(scan));
 
-	if(collecting_gen == TENURED)
+	obj++;
+
+	CELL newspace_start = newspace->start;
+	CELL newspace_end = newspace->end;
+
+	if(HAVE_NURSERY_P && collecting_gen == NURSERY)
+	{
+		CELL nursery_start = nursery.start;
+		CELL nursery_end = nursery.end;
+
+		for(; obj < end; obj++)
+		{
+			CELL pointer = *obj;
+
+			if(!immediate_p(pointer)
+				&& (pointer >= nursery_start && pointer < nursery_end))
+				*obj = copy_object(pointer);
+		}
+	}
+	else if(HAVE_AGING_P && collecting_gen == AGING)
+	{
+		F_ZONE *tenured = &data_heap->generations[TENURED];
+
+		CELL tenured_start = tenured->start;
+		CELL tenured_end = tenured->end;
+
+		for(; obj < end; obj++)
+		{
+			CELL pointer = *obj;
+
+			if(!immediate_p(pointer)
+				&& !(pointer >= newspace_start && pointer < newspace_end)
+				&& !(pointer >= tenured_start && pointer < tenured_end))
+				*obj = copy_object(pointer);
+		}
+	}
+	else if(collecting_gen == TENURED)
+	{
+		for(; obj < end; obj++)
+		{
+			CELL pointer = *obj;
+
+			if(!immediate_p(pointer)
+				&& !(pointer >= newspace_start && pointer < newspace_end))
+				*obj = copy_object(pointer);
+		}
+
 		do_code_slots(scan);
+	}
+	else
+		critical_error("Bug in collect_next",0);
 
 	return scan + untagged_object_size(scan);
 }
