@@ -29,7 +29,7 @@ TYPEDEF: ulong size_t
 
 ! ! ! Unix functions
 LIBRARY: factor
-FUNCTION: int err_no ( ) ;
+! FUNCTION: int err_no ( ) ;
 FUNCTION: void clear_err_no ( ) ;
 
 LIBRARY: libc
@@ -78,7 +78,7 @@ FUNCTION: void* mmap ( void* addr, size_t len, int prot, int flags, int fd, off_
 FUNCTION: int munmap ( void* addr, size_t len ) ;
 FUNCTION: uint ntohl ( uint n ) ;
 FUNCTION: ushort ntohs ( ushort n ) ;
-FUNCTION: char* strerror ( int errno ) ;
+! FUNCTION: char* strerror ( int errno ) ;
 
 : open ( path flags prot -- int ) [ unix.ffi:open ] unix-system-call ;
 
