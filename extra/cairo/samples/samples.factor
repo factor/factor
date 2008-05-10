@@ -3,13 +3,12 @@
 !
 ! these samples are a subset of the samples on
 ! http://cairographics.org/samples/
-USING: cairo locals math.constants math
-io.backend kernel alien.c-types libc ;
+USING: cairo cairo.lib locals math.constants math
+io.backend kernel alien.c-types libc namespaces ;
 
 IN: cairo.samples
 
-SYMBOL: cr
-:: arc ( cr -- )
+:: arc ( -- )
     [let | xc [ 128.0 ]
            yc [ 128.0 ]
            radius [ 100.0 ]
@@ -33,7 +32,7 @@ SYMBOL: cr
         cr cairo_stroke
     ] ;
 
-:: clip ( cr -- )
+: clip ( -- )
     cr 128 128 76.8 0 2 pi * cairo_arc
     cr cairo_clip
     cr cairo_new_path
@@ -48,7 +47,7 @@ SYMBOL: cr
     cr 10 cairo_set_line_width
     cr cairo_stroke ;
 
-:: clip-image ( cr -- )
+:: clip-image ( -- )
     [let* | png [ "resource:misc/icons/Factor_128x128.png"
                   normalize-path cairo_image_surface_create_from_png ]
             w [ png cairo_image_surface_get_width ]
@@ -63,7 +62,7 @@ SYMBOL: cr
         png cairo_surface_destroy
     ] ;
 
-:: dash ( cr -- )
+:: dash ( -- )
     [let | dashes [ { 50 10 10 10 } >c-double-array ]
            ndash [ 4 ] |
         cr dashes ndash -50 cairo_set_dash
@@ -75,7 +74,7 @@ SYMBOL: cr
         cr cairo_stroke
     ] ;
 
-:: gradient ( cr -- )
+:: gradient ( -- )
     [let | pat [ 0 0 0 256 cairo_pattern_create_linear ]
            radial [ 115.2 102.4 25.6 102.4 102.4 128.0
                     cairo_pattern_create_radial ] |
@@ -94,7 +93,7 @@ SYMBOL: cr
         radial cairo_pattern_destroy
     ] ;
 
-:: text ( cr -- )
+: text ( -- )
     cr "Serif" CAIRO_FONT_SLANT_NORMAL CAIRO_FONT_WEIGHT_BOLD
     cairo_select_font_face
     cr 50 cairo_set_font_size
@@ -116,7 +115,7 @@ SYMBOL: cr
     cr 70 165 5.12 0 2 pi * cairo_arc
     cr cairo_fill ;
 
-:: utf8 ( cr -- )
+: utf8 ( -- )
     cr "Serif" CAIRO_FONT_SLANT_NORMAL CAIRO_FONT_WEIGHT_NORMAL
     cairo_select_font_face
     cr 50 cairo_set_font_size

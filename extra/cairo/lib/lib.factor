@@ -1,39 +1,36 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types cairo.ffi continuations destructors
-kernel libc locals math shuffle accessors ;
+USING: cairo kernel accessors sequences
+namespaces fry continuations ;
 IN: cairo.lib
 
 TUPLE: cairo-t alien ;
 C: <cairo-t> cairo-t
 M: cairo-t dispose ( alien -- ) alien>> cairo_destroy ;
-: cairo-t-destroy-always ( alien -- ) <cairo-t> add-always-destructor ;
-: cairo-t-destroy-later ( alien -- ) <cairo-t> add-error-destructor ;
-    
+
 TUPLE: cairo-surface-t alien ;
 C: <cairo-surface-t> cairo-surface-t
 M: cairo-surface-t dispose ( alien -- ) alien>> cairo_surface_destroy ;
 
-: cairo-surface-t-destroy-always ( alien -- )
-    <cairo-surface-t> add-always-destructor ;
+: check-cairo ( cairo_status_t -- )
+    dup CAIRO_STATUS_SUCCESS = [ drop ]
+    [ cairo_status_to_string "Cairo error: " prepend throw ] if ;
 
-: cairo-surface-t-destroy-later ( alien -- )
-    <cairo-surface-t> add-error-destructor ;
+SYMBOL: cairo
+: cr ( -- cairo ) cairo get ;
 
-: cairo-surface>array ( surface -- cairo-t byte-array )
-    [
-        dup
-        [ drop CAIRO_FORMAT_ARGB32 ]
-        [ cairo_image_surface_get_width ]
-        [ cairo_image_surface_get_height ] tri
-        over 4 *
-        2dup * [
-            malloc dup free-always [
-                5 -nrot cairo_image_surface_create_for_data
-                dup cairo-surface-t-destroy-always
-                cairo_create dup cairo-t-destroy-later
-                [ swap 0 0 cairo_set_source_surface ] keep
-                dup cairo_paint
-            ] keep
-        ] keep memory>byte-array
-    ] with-destructors ;
+: (with-cairo) ( cairo-t quot -- )
+    >r alien>> cairo r> [ cr cairo_status check-cairo ]
+    compose with-variable ; inline
+    
+: with-cairo ( cairo quot -- )
+    >r <cairo-t> r> [ (with-cairo) ] curry with-disposal ; inline
+
+: (with-surface) ( cairo-surface-t quot -- )
+    >r alien>> r> [ cairo_surface_status check-cairo ] bi ; inline
+
+: with-surface ( cairo_surface quot -- )
+    >r <cairo-surface-t> r> [ (with-surface) ] curry with-disposal ; inline
+
+: with-cairo-from-surface ( cairo_surface quot -- )
+    '[ cairo_create , with-cairo ] with-surface ; inline
