@@ -1,6 +1,6 @@
 
 USING: kernel continuations sequences math accessors inference macros
-       fry arrays.lib unix ;
+       fry arrays.lib unix.ffi ;
 
 IN: unix.system-call
 
