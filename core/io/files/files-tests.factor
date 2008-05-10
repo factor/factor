@@ -1,7 +1,7 @@
 IN: io.files.tests
 USING: tools.test io.files io.files.private io threads kernel
 continuations io.encodings.ascii io.files.unique sequences
-strings accessors io.encodings.utf8 ;
+strings accessors io.encodings.utf8 math ;
 
 [ ] [ "blahblah" temp-file dup exists? [ delete-directory ] [ drop ] if ] unit-test
 [ ] [ "blahblah" temp-file make-directory ] unit-test
@@ -43,12 +43,16 @@ strings accessors io.encodings.utf8 ;
     "file4" temp-file delete-file
 ] unit-test
 
+[ "file5" temp-file delete-file ] ignore-errors
+
 [ ] [
     temp-directory [
         "file5" touch-file
         "file5" delete-file
     ] with-directory
 ] unit-test
+
+[ "file6" temp-file delete-file ] ignore-errors
 
 [ ] [
     temp-directory [
@@ -259,3 +263,6 @@ strings accessors io.encodings.utf8 ;
 
 [ t ] [ "resource:core" absolute-path? ] unit-test
 [ f ] [ "" absolute-path? ] unit-test
+
+[ "touch-twice-test" temp-file delete-file ] ignore-errors
+[ ] [ 2 [ "touch-twice-test" temp-file touch-file ] times ] unit-test

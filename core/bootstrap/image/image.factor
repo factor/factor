@@ -482,8 +482,6 @@ PRIVATE>
 : make-image ( arch -- )
     [
         architecture set
-        bootstrapping? on
-        load-help? off
         "resource:/core/bootstrap/stage1.factor" run-file
         build-image
         write-image

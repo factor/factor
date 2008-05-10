@@ -103,11 +103,11 @@ INLINE void bput(CELL where, CELL what)
 
 INLINE CELL align(CELL a, CELL b)
 {
-	return (a + b) & ~b;
+	return (a + (b-1)) & ~(b-1);
 }
 
-#define align8(a) align(a,7)
-#define align_page(a) align(a,getpagesize() - 1)
+#define align8(a) align(a,8)
+#define align_page(a) align(a,getpagesize())
 
 /* Canonical T object. It's just a word */
 CELL T;

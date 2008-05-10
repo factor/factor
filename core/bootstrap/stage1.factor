@@ -13,6 +13,8 @@ vocabs.loader system debugger continuations ;
 
 "resource:core/bootstrap/primitives.factor" run-file
 
+load-help? off
+
 ! Create a boot quotation for the target
 [
     [

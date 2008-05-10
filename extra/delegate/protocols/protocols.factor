@@ -16,12 +16,12 @@ PROTOCOL: assoc-protocol
     assoc-like ;
 
 PROTOCOL: input-stream-protocol
-    stream-read1 stream-read stream-read-until
-    stream-read-quot ;
+    stream-read1 stream-read stream-read-partial stream-readln
+    stream-read-until stream-read-quot ;
 
 PROTOCOL: output-stream-protocol
     stream-flush stream-write1 stream-write stream-format
-    stream-nl make-span-stream make-block-stream stream-readln
+    stream-nl make-span-stream make-block-stream
     make-cell-stream stream-write-table ;
 
 PROTOCOL: definition-protocol

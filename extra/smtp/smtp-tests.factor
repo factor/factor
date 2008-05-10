@@ -68,7 +68,9 @@ IN: smtp.tests
     rot from>>
 ] unit-test
 
-[ ] [ [ 4321 mock-smtp-server ] in-thread ] unit-test
+[ ] [ [ 4321 mock-smtp-server ] "SMTP server" spawn drop ] unit-test
+
+[ ] [ yield ] unit-test
 
 [ ] [
     [
@@ -85,3 +87,5 @@ IN: smtp.tests
         send-email
     ] with-scope
 ] unit-test
+
+[ ] [ yield ] unit-test

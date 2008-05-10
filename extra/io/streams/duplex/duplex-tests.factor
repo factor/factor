@@ -1,4 +1,5 @@
-USING: io.streams.duplex io kernel continuations tools.test ;
+USING: io.streams.duplex io io.streams.string
+kernel continuations tools.test ;
 IN: io.streams.duplex.tests
 
 ! Test duplex stream close behavior
@@ -37,4 +38,9 @@ M: unclosable-stream dispose
         <duplex-stream>
         [ dup dispose ] [ 2drop ] recover
     ] keep closing-stream-closed?
+] unit-test
+
+[ "Hey" ] [
+    "Hey\nThere" <string-reader> <string-writer> <duplex-stream>
+    stream-readln
 ] unit-test
