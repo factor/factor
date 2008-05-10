@@ -247,4 +247,10 @@ M:: fixnum next-method-test ( a -- b ) a call-next-method 1 + ;
 
 [ { 4 5 6 } ] [ no-with-locals-test ] unit-test
 
+{ 3 0 } [| a b c | ] must-infer-as
+
+[ ] [ 1 [let | a [ ] | ] ] unit-test
+
+[ 3 ] [ 1 [let | a [ ] | 3 ] ] unit-test
+
 [ ] [ 1 2 [let | a [ ] b [ ] | ] ] unit-test

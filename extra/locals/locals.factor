@@ -116,7 +116,9 @@ UNION: special local quote local-word local-reader local-writer ;
     2tri 3append >quotation ;
 
 : point-free ( quot args -- newquot )
-    over empty? [ drop ] [ (point-free) ] if ;
+    over empty?
+    [ nip length \ drop <repetition> >quotation ]
+    [ (point-free) ] if ;
 
 UNION: lexical local local-reader local-writer local-word ;
 
