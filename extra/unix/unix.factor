@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: alien alien.c-types alien.syntax kernel libc structs
-       math namespaces system combinators vocabs.loader unix.ffi unix.types
-       qualified ;
+       math namespaces system combinators vocabs.loader qualified
+       unix.ffi unix.types unix.system-call ;
 
 QUALIFIED: unix.ffi
 
@@ -80,17 +80,9 @@ FUNCTION: uint ntohl ( uint n ) ;
 FUNCTION: ushort ntohs ( ushort n ) ;
 FUNCTION: char* strerror ( int errno ) ;
 
-ERROR: open-error path flags prot message ;
+: open ( path flags prot -- int ) [ unix.ffi:open ] unix-system-call ;
 
-: open ( path flags prot -- int )
-    3dup unix.ffi:open
-    dup 0 >= [ >r 3drop r> ] [ drop err_no strerror open-error ] if ;
-
-ERROR: utime-error path message ;
-
-: utime ( path buf -- )
-    dupd unix.ffi:utime
-    0 = [ drop ] [ err_no strerror utime-error ] if ;
+: utime ( path buf -- ) [ unix.ffi:utime ] unix-system-call drop ;
 
 FUNCTION: int pclose ( void* file ) ;
 FUNCTION: int pipe ( int* filedes ) ;
