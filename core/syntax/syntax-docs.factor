@@ -496,14 +496,17 @@ HELP: M:
 HELP: UNION:
 { $syntax "UNION: class members... ;" }
 { $values { "class" "a new class word to define" } { "members" "a list of class words separated by whitespace" } }
-{ $description "Defines a union class. An object is an instance of a union class if it is an instance of one of its members." }
-{ $notes "Union classes are used to associate the same method with several different classes, as well as to conveniently define predicates." } ;
+{ $description "Defines a union class. An object is an instance of a union class if it is an instance of one of its members." } ;
+
+HELP: INTERSECTION:
+{ $syntax "INTERSECTION: class participants... ;" }
+{ $values { "class" "a new class word to define" } { "participants" "a list of class words separated by whitespace" } }
+{ $description "Defines an intersection class. An object is an instance of a union class if it is an instance of all of its participants." } ;
 
 HELP: MIXIN:
 { $syntax "MIXIN: class" }
 { $values { "class" "a new class word to define" } }
 { $description "Defines a mixin class. A mixin is similar to a union class, except it has no members initially, and new members can be added with the " { $link POSTPONE: INSTANCE: } " word." }
-{ $notes "Mixins classes are used to mark implementations of a protocol and define default methods." }
 { $examples "The " { $link sequence } " and " { $link assoc } " mixin classes." } ;
 
 HELP: INSTANCE:
