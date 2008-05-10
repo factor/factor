@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
-USING: lisp lisp.parser tools.test ;
+USING: lisp lisp.parser tools.test sequences math kernel ;
 
 IN: lisp.test
 
