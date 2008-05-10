@@ -27,6 +27,25 @@ TYPEDEF: ulong size_t
 : ESRCH 3 ; inline
 : EEXIST 17 ; inline
 
+C-STRUCT: group
+    { "char*" "gr_name" }
+    { "char*" "gr_passwd" }
+    { "int" "gr_gid" }
+    { "char**" "gr_mem" } ;
+
+C-STRUCT: passwd
+    { "char*"  "pw_name" }
+    { "char*"  "pw_passwd" }
+    { "uid_t"  "pw_uid" }
+    { "gid_t"  "pw_gid" }
+    { "time_t" "pw_change" }
+    { "char*"  "pw_class" }
+    { "char*"  "pw_gecos" }
+    { "char*"  "pw_dir" }
+    { "char*"  "pw_shell" }
+    { "time_t" "pw_expire" }
+    { "int"    "pw_fields" } ;
+
 ! ! ! Unix functions
 LIBRARY: factor
 FUNCTION: int err_no ( ) ;
@@ -64,6 +83,9 @@ FUNCTION: int getdtablesize ;
 FUNCTION: gid_t getegid ;
 FUNCTION: uid_t geteuid ;
 FUNCTION: gid_t getgid ;
+FUNCTION: int getgrgid_r ( gid_t gid, group* grp, char* buffer, size_t bufsize, group** result ) ;
+FUNCTION: int getgrnam_r ( char* name, group* grp, char* buffer, size_t bufsize, group** result ) ;
+FUNCTION: int getpwnam_r ( char* login, passwd* pwd, char* buffer, size_t bufsize, passwd** result ) ;
 FUNCTION: int getgroups ( int gidsetlen, gid_t* gidset ) ;
 FUNCTION: int gethostname ( char* name, int len ) ;
 FUNCTION: uid_t getuid ;
