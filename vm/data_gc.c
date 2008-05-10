@@ -38,9 +38,9 @@ F_DATA_HEAP *alloc_data_heap(CELL gens,
 {
 	GC_PRINT(ALLOC_DATA_HEAP,gens,young_size,aging_size,tenured_size);
 
-	young_size = align_page(young_size);
-	aging_size = align_page(aging_size);
-	tenured_size = align_page(tenured_size);
+	young_size = align(young_size,DECK_SIZE);
+	aging_size = align(aging_size,DECK_SIZE);
+	tenured_size = align(tenured_size,DECK_SIZE);
 
 	F_DATA_HEAP *data_heap = safe_malloc(sizeof(F_DATA_HEAP));
 	data_heap->young_size = young_size;

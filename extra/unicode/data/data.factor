@@ -1,7 +1,7 @@
 USING: assocs math kernel sequences io.files hashtables
 quotations splitting arrays math.parser hash2 math.order
 byte-arrays words namespaces words compiler.units parser
-io.encodings.ascii unicode.syntax.backend ;
+io.encodings.ascii values ;
 IN: unicode.data
 
 ! Convenience functions
