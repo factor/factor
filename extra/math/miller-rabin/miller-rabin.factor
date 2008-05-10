@@ -3,21 +3,9 @@ math.functions math.ranges namespaces random sequences
 hashtables sets ;
 IN: math.miller-rabin
 
-SYMBOL: a
-SYMBOL: n
-SYMBOL: r
-SYMBOL: s
-SYMBOL: count
-SYMBOL: trials
-
-: >even ( n -- int )
-    dup even? [ 1- ] unless ; foldable
-
-: >odd ( n -- int )
-    dup even? [ 1+ ] when ; foldable
-
-: next-odd ( m -- n )
-    dup even? [ 1+ ] [ 2 + ] if ;
+: >even ( n -- int ) dup even? [ 1- ] unless ; foldable
+: >odd ( n -- int ) dup even? [ 1+ ] when ; foldable
+: next-odd ( m -- n ) dup even? [ 1+ ] [ 2 + ] if ;
 
 TUPLE: positive-even-expected n ;
 
@@ -28,34 +16,30 @@ TUPLE: positive-even-expected n ;
     #! factor an integer into s * 2^r
     0 swap (factor-2s) ;
 
-:: (miller-rabin) ( n prime?! -- ? )
-    n 1- factor-2s s set r set
-    trials get [
-        n 1- [1,b] random a set
-        a get s get n ^mod 1 = [
-            0 count set
-            r get [
-                2^ s get * a get swap n ^mod n - -1 = [
-                    count [ 1+ ] change
-                    r get +
-                ] when
-            ] each
-            count get zero? [
-                f prime?!
-                trials get +
-            ] when
-        ] unless
-        drop
-    ] each prime? ;
-
-TUPLE: miller-rabin-bounds ;
+:: (miller-rabin) ( n trials -- ? )
+    [let | r [ n 1- factor-2s drop ]
+           s [ n 1- factor-2s nip ]
+           prime?! [ t ]
+           a! [ 0 ]
+           count! [ 0 ] |
+        trials [
+            n 1- [1,b] random a!
+            a s n ^mod 1 = [
+                0 count!
+                r [
+                    2^ s * a swap n ^mod n - -1 =
+                    [ count 1+ count! r + ] when
+                ] each
+                count zero? [ f prime?! trials + ] when
+            ] unless drop
+        ] each prime? ] ;
 
 : miller-rabin* ( n numtrials -- ? )
     over {
         { [ dup 1 <= ] [ 3drop f ] }
         { [ dup 2 = ] [ 3drop t ] }
         { [ dup even? ] [ 3drop f ] }
-        [ [ drop trials set t (miller-rabin) ] with-scope ]
+        [ [ drop (miller-rabin) ] with-scope ]
     } cond ;
 
 : miller-rabin ( n -- ? ) 10 miller-rabin* ;
