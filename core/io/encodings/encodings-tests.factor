@@ -1,5 +1,6 @@
-USING: io.files io.streams.string io
-tools.test kernel io.encodings.ascii ;
+USING: io.files io.streams.string io io.streams.byte-array
+tools.test kernel io.encodings.ascii io.encodings.utf8
+namespaces accessors io.encodings ;
 IN: io.streams.encodings.tests
 
 [ { } ]
@@ -55,4 +56,20 @@ unit-test
      "Hello world\r\n1234" <string-reader>
      dup stream-readln drop
      stream-read1
+] unit-test
+
+[ utf8 ascii ] [
+    "foo" utf8 [
+        input-stream get code>>
+        ascii decode-input
+        input-stream get code>>
+    ] with-byte-reader
+] unit-test
+
+[ utf8 ascii ] [
+    utf8 [
+        output-stream get code>>
+        ascii encode-output
+        output-stream get code>>
+    ] with-byte-writer drop
 ] unit-test
