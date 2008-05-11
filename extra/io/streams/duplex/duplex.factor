@@ -47,7 +47,7 @@ M: duplex-stream dispose
     ] unless drop ;
 
 : <encoder-duplex> ( stream-in stream-out encoding -- duplex )
-    tuck reencode >r redecode r> <duplex-stream> ;
+    tuck re-encode >r re-decode r> <duplex-stream> ;
 
 : with-stream* ( stream quot -- )
     >r [ in>> ] [ out>> ] bi r> with-streams* ; inline

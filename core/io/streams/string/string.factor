@@ -49,7 +49,7 @@ M: growable stream-read
 M: growable stream-read-partial
     stream-read ;
 
-TUPLE: null ;
+SINGLETON: null
 M: null decode-char drop stream-read1 ;
 
 : <string-reader> ( str -- stream )
