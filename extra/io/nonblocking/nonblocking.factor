@@ -57,7 +57,7 @@ M: object cancel-io drop ;
 
 M: port timed-out cancel-io ;
 
-GENERIC: (wait-to-read) ( port -- )
+HOOK: (wait-to-read) io-backend ( port -- )
 
 : wait-to-read ( count port -- )
     tuck buffer>> buffer-length > [ (wait-to-read) ] [ drop ] if ;
@@ -126,16 +126,16 @@ M: output-port stream-write
         [ buffer>> >buffer ] 2bi
     ] if ;
 
-GENERIC: port-flush ( port -- )
+HOOK: flush-port io-backend ( port -- )
 
 M: output-port stream-flush ( port -- )
     check-closed
-    [ port-flush ] [ pending-error ] bi ;
+    [ flush-port ] [ pending-error ] bi ;
 
 GENERIC: close-port ( port -- )
 
 M: output-port close-port
-    [ port-flush ] [ call-next-method ] bi ;
+    [ flush-port ] [ call-next-method ] bi ;
 
 M: port close-port
     dup cancel-io

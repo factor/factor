@@ -148,7 +148,7 @@ M: read-task do-io-task
     io-task-port dup refill
     [ [ reader-eof ] [ drop ] if ] keep ;
 
-M: input-port (wait-to-read)
+M: unix (wait-to-read)
     [ <read-task> add-io-task ] with-port-continuation
     pending-error ;
 
@@ -179,7 +179,7 @@ M: write-task do-io-task
 : (wait-to-write) ( port -- )
     [ add-write-io-task ] with-port-continuation drop ;
 
-M: output-port port-flush ( port -- )
+M: unix flush-port ( port -- )
     dup buffer>> buffer-empty? [ drop ] [ (wait-to-write) ] if ;
 
 M: unix io-multiplex ( ms/f -- )
