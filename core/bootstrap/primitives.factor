@@ -127,7 +127,7 @@ bootstrapping? on
 : register-builtin ( class -- )
     [ dup lookup-type-number "type" set-word-prop ]
     [ dup "type" word-prop builtins get set-nth ]
-    [ f f builtin-class define-class ]
+    [ f f f builtin-class define-class ]
     tri ;
 
 : define-builtin-slots ( symbol slotspec -- )
@@ -160,9 +160,14 @@ bootstrapping? on
 
 ! Catch-all class for providing a default method.
 "object" "kernel" create
-[ f builtins get [ ] filter union-class define-class ]
+[ f builtins get [ ] filter f union-class define-class ]
 [ [ drop t ] "predicate" set-word-prop ]
 bi
+
+! "object" "kernel" create
+! [ f f { } intersection-class define-class ]
+! [ [ drop t ] "predicate" set-word-prop ]
+! bi
 
 "object?" "kernel" vocab-words delete-at
 
@@ -172,7 +177,7 @@ builtins get num-tags get tail define-union-class
 
 ! Empty class with no instances
 "null" "kernel" create
-[ f { } union-class define-class ]
+[ f { } f union-class define-class ]
 [ [ drop f ] "predicate" set-word-prop ]
 bi
 

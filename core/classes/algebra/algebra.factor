@@ -48,18 +48,6 @@ C: <anonymous-complement> anonymous-complement
 : superclass<= ( first second -- ? )
     >r superclass r> class<= ;
 
-: left-union-class<= ( first second -- ? )
-    >r members r> [ class<= ] curry all? ;
-
-: right-union-class<= ( first second -- ? )
-    members [ class<= ] with contains? ;
-
-: left-intersection-class<= ( first second -- ? )
-    >r participants r> [ class<= ] curry contains? ;
-
-: right-intersection-class<= ( first second -- ? )
-    participants [ class<= ] with all? ;
-
 : left-anonymous-union<= ( first second -- ? )
     >r members>> r> [ class<= ] curry all? ;
 
@@ -75,24 +63,56 @@ C: <anonymous-complement> anonymous-complement
 : anonymous-complement<= ( first second -- ? )
     [ class>> ] bi@ swap class<= ;
 
-: (class<=) ( first second -- -1/0/1 )  
+: normalize-class ( class -- class' )
+    {
+        { [ dup members ] [ members <anonymous-union> ] }
+        { [ dup participants ] [ participants <anonymous-intersection> ] }
+        [ ]
+    } cond ;
+
+: normalize-complement ( class -- class' )
+    class>> normalize-class {
+        { [ dup anonymous-union? ] [
+            members>>
+            [ class-not normalize-class ] map
+            <anonymous-intersection> 
+        ] }
+        { [ dup anonymous-intersection? ] [
+            participants>>
+            [ class-not normalize-class ] map
+            <anonymous-union>
+        ] }
+    } cond ;
+
+: left-anonymous-complement<= ( first second -- ? )
+    >r normalize-complement r> class<= ;
+
+PREDICATE: nontrivial-anonymous-complement < anonymous-complement
+    class>> {
+        [ anonymous-union? ]
+        [ anonymous-intersection? ]
+        [ members ]
+        [ participants ]
+    } cleave or or or ;
+
+: (class<=) ( first second -- -1/0/1 )
     {
         { [ 2dup eq? ] [ 2drop t ] }
         { [ dup object eq? ] [ 2drop t ] }
         { [ over null eq? ] [ 2drop t ] }
-        { [ 2dup [ anonymous-complement? ] both? ] [ anonymous-complement<= ] }
-        { [ over anonymous-union? ] [ left-anonymous-union<= ] }
-        { [ over anonymous-intersection? ] [ left-anonymous-intersection<= ] }
-        { [ over members ] [ left-union-class<= ] }
-        { [ over participants ] [ left-intersection-class<= ] }
-        { [ dup anonymous-union? ] [ right-anonymous-union<= ] }
-        { [ dup anonymous-intersection? ] [ right-anonymous-intersection<= ] }
-        { [ over anonymous-complement? ] [ 2drop f ] }
-        { [ dup anonymous-complement? ] [ class>> classes-intersect? not ] }
-        { [ dup members ] [ right-union-class<= ] }
-        { [ dup participants ] [ right-intersection-class<= ] }
-        { [ over superclass ] [ superclass<= ] }
-        [ 2drop f ]
+        [
+            [ normalize-class ] bi@ {
+                { [ 2dup [ anonymous-complement? ] both? ] [ anonymous-complement<= ] }
+                { [ over anonymous-union? ] [ left-anonymous-union<= ] }
+                { [ over anonymous-intersection? ] [ left-anonymous-intersection<= ] }
+                { [ over nontrivial-anonymous-complement? ] [ left-anonymous-complement<= ] }
+                { [ dup anonymous-union? ] [ right-anonymous-union<= ] }
+                { [ dup anonymous-intersection? ] [ right-anonymous-intersection<= ] }
+                { [ dup anonymous-complement? ] [ class>> classes-intersect? not ] }
+                { [ over superclass ] [ superclass<= ] }
+                [ 2drop f ]
+            } cond
+        ]
     } cond ;
 
 : anonymous-union-intersect? ( first second -- ? )
@@ -103,12 +123,6 @@ C: <anonymous-complement> anonymous-complement
 
 : anonymous-complement-intersect? ( first second -- ? )
     class>> class<= not ;
-
-: union-class-intersect? ( first second -- ? )
-    members [ classes-intersect? ] with contains? ;
-
-: intersection-class-intersect? ( first second -- ? )
-    participants [ classes-intersect? ] with all? ;
 
 : tuple-class-intersect? ( first second -- ? )
     {
@@ -126,39 +140,19 @@ C: <anonymous-complement> anonymous-complement
     } cond ;
 
 : (classes-intersect?) ( first second -- ? )
-    {
+    normalize-class {
         { [ dup anonymous-union? ] [ anonymous-union-intersect? ] }
         { [ dup anonymous-intersection? ] [ anonymous-intersection-intersect? ] }
         { [ dup anonymous-complement? ] [ anonymous-complement-intersect? ] }
         { [ dup tuple-class? ] [ tuple-class-intersect? ] }
         { [ dup builtin-class? ] [ builtin-class-intersect? ] }
         { [ dup superclass ] [ superclass classes-intersect? ] }
-        { [ dup members ] [ union-class-intersect? ] }
-        { [ dup participants ] [ intersection-class-intersect? ] }
     } cond ;
 
-: left-union-and ( first second -- class )
-    >r members r> [ class-and ] curry map <anonymous-union> ;
-
-: right-union-and ( first second -- class )
-    members [ class-and ] with map <anonymous-union> ;
-
-: left-intersection-and ( first second -- class )
-    >r participants r> suffix <anonymous-intersection> ;
-
-: right-intersection-and ( first second -- class )
-    participants swap suffix <anonymous-intersection> ;
-
-: left-anonymous-union-and ( first second -- class )
-    >r members>> r> [ class-and ] curry map <anonymous-union> ;
-
-: right-anonymous-union-and ( first second -- class )
+: anonymous-union-and ( first second -- class )
     members>> [ class-and ] with map <anonymous-union> ;
 
-: left-anonymous-intersection-and ( first second -- class )
-    >r participants>> r> suffix <anonymous-intersection> ;
-
-: right-anonymous-intersection-and ( first second -- class )
+: anonymous-intersection-and ( first second -- class )
     participants>> swap suffix <anonymous-intersection> ;
 
 : (class-and) ( first second -- class )
@@ -166,30 +160,37 @@ C: <anonymous-complement> anonymous-complement
         { [ 2dup class<= ] [ drop ] }
         { [ 2dup swap class<= ] [ nip ] }
         { [ 2dup classes-intersect? not ] [ 2drop null ] }
-        { [ dup members ] [ right-union-and ] }
-        { [ dup participants ] [ right-intersection-and ] }
-        { [ dup anonymous-union? ] [ right-anonymous-union-and ] }
-        { [ dup anonymous-intersection? ] [ right-anonymous-intersection-and ] }
-        { [ over members ] [ left-union-and ] }
-        { [ over participants ] [ left-intersection-and ] }
-        { [ over anonymous-union? ] [ left-anonymous-union-and ] }
-        { [ over anonymous-intersection? ] [ left-anonymous-intersection-and ] }
-        [ 2array <anonymous-intersection> ]
+        [
+            [ normalize-class ] bi@ {
+                { [ dup anonymous-union? ] [ anonymous-union-and ] }
+                { [ dup anonymous-intersection? ] [ anonymous-intersection-and ] }
+                { [ over anonymous-union? ] [ swap anonymous-union-and ] }
+                { [ over anonymous-intersection? ] [ swap anonymous-intersection-and ] }
+                [ 2array <anonymous-intersection> ]
+            } cond
+        ]
     } cond ;
 
-: left-anonymous-union-or ( first second -- class )
-    >r members>> r> suffix <anonymous-union> ;
-
-: right-anonymous-union-or ( first second -- class )
+: anonymous-union-or ( first second -- class )
     members>> swap suffix <anonymous-union> ;
+
+: ((class-or)) ( first second -- class )
+    [ normalize-class ] bi@ {
+        { [ dup anonymous-union? ] [ anonymous-union-or ] }
+        { [ over anonymous-union? ] [ swap anonymous-union-or ] }
+        [ 2array <anonymous-union> ]
+    } cond ;
+
+: anonymous-complement-or ( first second -- class )
+    2dup class>> swap class<= [ 2drop object ] [ ((class-or)) ] if ;
 
 : (class-or) ( first second -- class )
     {
         { [ 2dup class<= ] [ nip ] }
         { [ 2dup swap class<= ] [ drop ] }
-        { [ dup anonymous-union? ] [ right-anonymous-union-or ] }
-        { [ over anonymous-union? ] [ left-anonymous-union-or ] }
-        [ 2array <anonymous-union> ]
+        { [ dup anonymous-complement? ] [ anonymous-complement-or ] }
+        { [ over anonymous-complement? ] [ swap anonymous-complement-or ] }
+        [ ((class-or)) ]
     } cond ;
 
 : (class-not) ( class -- complement )

@@ -282,3 +282,18 @@ INTERSECTION: generic-class generic class ;
 [ H{ { word word } } ] [ 
     generic-class flatten-class
 ] unit-test
+
+INTERSECTION: empty-intersection ;
+
+[ t ] [ object empty-intersection class<= ] unit-test
+[ t ] [ empty-intersection object class<= ] unit-test
+[ t ] [ \ f class-not empty-intersection class<= ] unit-test
+[ f ] [ empty-intersection \ f class-not class<= ] unit-test
+[ t ] [ \ number empty-intersection class<= ] unit-test
+[ t ] [ empty-intersection class-not null class<= ] unit-test
+[ t ] [ null empty-intersection class-not class<= ] unit-test
+
+[ t ] [ \ f class-not \ f class-or empty-intersection class<= ] unit-test
+[ t ] [ empty-intersection \ f class-not \ f class-or class<= ] unit-test
+
+[ t ] [ object \ f class-not \ f class-or class<= ] unit-test
