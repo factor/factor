@@ -2,9 +2,6 @@ USING: arrays assocs kernel vectors sequences namespaces
 random math.parser ;
 IN: assocs.lib
 
-: >set ( seq -- hash )
-    [ dup ] H{ } map>assoc ;
-
 : ref-at ( table key -- value ) swap at ;
 
 : put-at* ( table key value -- ) swap rot set-at ;
