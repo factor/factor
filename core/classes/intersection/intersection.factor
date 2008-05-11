@@ -22,7 +22,7 @@ PREDICATE: intersection-class < class
 
 M: intersection-class update-class define-intersection-predicate ;
 
-: define-intersection-class ( class members -- )
+: define-intersection-class ( class participants -- )
     [ f f rot intersection-class define-class ]
     [ drop update-classes ]
     2bi ;
