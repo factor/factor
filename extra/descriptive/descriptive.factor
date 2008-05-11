@@ -3,16 +3,16 @@ locals.private accessors parser namespaces continuations
 inspector definitions arrays.lib arrays ;
 IN: descriptive
 
-ERROR: descriptive args underlying word ;
+ERROR: descriptive-error args underlying word ;
 
-M: descriptive summary
+M: descriptive-error summary
     word>> "The " swap word-name " word encountered an error."
     3append ;
 
 <PRIVATE
 : rethrower ( word inputs -- quot )
     [ length ] keep [ >r narray r> swap 2array flip ] 2curry
-    [ 2 ndip descriptive ] 2curry ;
+    [ 2 ndip descriptive-error ] 2curry ;
 
 : [descriptive] ( word def -- newdef )
     swap dup "declared-effect" word-prop in>> rethrower
@@ -26,19 +26,18 @@ PRIVATE>
 : DESCRIPTIVE:
     (:) define-descriptive ; parsing
 
-PREDICATE: descriptive-def < word
+PREDICATE: descriptive < word
     "descriptive-definition" word-prop ;
 
-M: descriptive-def definer drop \ DESCRIPTIVE: \ ; ;
+M: descriptive definer drop \ DESCRIPTIVE: \ ; ;
 
-M: descriptive-def definition
+M: descriptive definition
     "descriptive-definition" word-prop ;
 
 : DESCRIPTIVE::
     (::) define-descriptive ; parsing
 
-PREDICATE: descriptive-lambda < lambda-word
-    "descriptive-definition" word-prop ;
+INTERSECTION: descriptive-lambda descriptive lambda-word ;
 
 M: descriptive-lambda definer drop \ DESCRIPTIVE:: \ ; ;
 
