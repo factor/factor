@@ -5,8 +5,9 @@ hashtables.private io kernel math namespaces parser sequences
 strings vectors words quotations assocs layouts classes
 classes.builtin classes.tuple classes.tuple.private
 kernel.private vocabs vocabs.loader source-files definitions
-slots.deprecated classes.union compiler.units
-bootstrap.image.private io.files accessors combinators ;
+slots.deprecated classes.union classes.intersection
+compiler.units bootstrap.image.private io.files accessors
+combinators ;
 IN: bootstrap.primitives
 
 "Creating primitives and basic runtime structures..." print flush
@@ -159,15 +160,15 @@ bootstrapping? on
 "tuple-layout" "classes.tuple.private" create register-builtin
 
 ! Catch-all class for providing a default method.
-"object" "kernel" create
-[ f builtins get [ ] filter f union-class define-class ]
-[ [ drop t ] "predicate" set-word-prop ]
-bi
-
 ! "object" "kernel" create
-! [ f f { } intersection-class define-class ]
+! [ f builtins get [ ] filter f union-class define-class ]
 ! [ [ drop t ] "predicate" set-word-prop ]
 ! bi
+
+"object" "kernel" create
+[ f f { } intersection-class define-class ]
+[ [ drop t ] "predicate" set-word-prop ]
+bi
 
 "object?" "kernel" vocab-words delete-at
 

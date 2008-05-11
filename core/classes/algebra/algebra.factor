@@ -95,25 +95,26 @@ PREDICATE: nontrivial-anonymous-complement < anonymous-complement
         [ participants ]
     } cleave or or or ;
 
+PREDICATE: empty-union < anonymous-union members>> empty? ;
+
+PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
+
 : (class<=) ( first second -- -1/0/1 )
-    {
-        { [ 2dup eq? ] [ 2drop t ] }
-        { [ dup object eq? ] [ 2drop t ] }
-        { [ over null eq? ] [ 2drop t ] }
-        [
-            [ normalize-class ] bi@ {
-                { [ 2dup [ anonymous-complement? ] both? ] [ anonymous-complement<= ] }
-                { [ over anonymous-union? ] [ left-anonymous-union<= ] }
-                { [ over anonymous-intersection? ] [ left-anonymous-intersection<= ] }
-                { [ over nontrivial-anonymous-complement? ] [ left-anonymous-complement<= ] }
-                { [ dup anonymous-union? ] [ right-anonymous-union<= ] }
-                { [ dup anonymous-intersection? ] [ right-anonymous-intersection<= ] }
-                { [ dup anonymous-complement? ] [ class>> classes-intersect? not ] }
-                { [ over superclass ] [ superclass<= ] }
-                [ 2drop f ]
-            } cond
-        ]
-    } cond ;
+    2dup eq? [ 2drop t ] [
+        [ normalize-class ] bi@ {
+            { [ dup empty-intersection? ] [ 2drop t ] }
+            { [ over empty-union? ] [ 2drop t ] }
+            { [ 2dup [ anonymous-complement? ] both? ] [ anonymous-complement<= ] }
+            { [ over anonymous-union? ] [ left-anonymous-union<= ] }
+            { [ over anonymous-intersection? ] [ left-anonymous-intersection<= ] }
+            { [ over nontrivial-anonymous-complement? ] [ left-anonymous-complement<= ] }
+            { [ dup anonymous-union? ] [ right-anonymous-union<= ] }
+            { [ dup anonymous-intersection? ] [ right-anonymous-intersection<= ] }
+            { [ dup anonymous-complement? ] [ class>> classes-intersect? not ] }
+            { [ over superclass ] [ superclass<= ] }
+            [ 2drop f ]
+        } cond
+    ] if ;
 
 : anonymous-union-intersect? ( first second -- ? )
     members>> [ classes-intersect? ] with contains? ;
@@ -230,7 +231,7 @@ DEFER: flatten-builtin-class
 : flatten-intersection-class ( class -- )
     participants [ flatten-builtin-class ] map
     dup empty? [
-        drop object (flatten-class)
+        drop builtins get [ (flatten-class) ] each
     ] [
         unclip [ assoc-intersect ] reduce [ swap set ] assoc-each
     ] if ;
