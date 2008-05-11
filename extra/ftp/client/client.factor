@@ -1,12 +1,15 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators continuations io io.encodings.binary
-io.encodings.ascii io.files io.sockets kernel math
-math.parser sequences splitting namespaces ;
+USING: accessors classes.singleton combinators continuations
+io io.encodings.binary io.encodings.ascii io.files io.sockets
+kernel math math.parser sequences splitting namespaces strings ;
 IN: ftp.client
 
-TUPLE: ftp-client host port stream user password ;
+TUPLE: ftp-client host port stream user password mode ;
 TUPLE: ftp-response n strings ;
+
+SINGLETON: active
+SINGLETON: passive
 
 : <ftp-response> ( -- ftp-response )
     ftp-response new
@@ -17,7 +20,7 @@ TUPLE: ftp-response n strings ;
         swap >>host
         21 >>port
         "anonymous" >>user
-        "lol@test.com" >>password ;
+        "factor-ftp@factorcode.org" >>password ;
 
 : add-response-line ( ftp-response string -- ftp-response )
     over strings>> push ;
@@ -52,27 +55,38 @@ TUPLE: ftp-response n strings ;
     [ "\r\n" swap stream-write ]
     [ stream-flush ] tri ;
 
-: ftp-command ( ftp-client string -- n )
+: ftp-command ( ftp-client string -- ftp-response )
     swap
     [ ftp-send ] [ ftp-read ] bi ;
 
-: ftp-user ( ftp-client -- n ) dup user>> "USER " prepend ftp-command ;
-: ftp-password ( ftp-client -- n ) dup password>> "PASS " prepend ftp-command ;
-: ftp-set-binary ( ftp-client -- n ) "TYPE I" ftp-command ;
-! : ftp-set-ascii ( ftp-client -- n ) "TYPE A" ftp-command ;
-: ftp-system ( ftp-client -- n ) "SYST" ftp-command ;
-: ftp-features ( ftp-client -- n ) "FEAT" ftp-command ;
-: ftp-pwd ( ftp-client -- n ) "PWD" ftp-command ;
-: ftp-list ( ftp-client -- n ) "LIST" ftp-command ;
-: ftp-quit ( ftp-client -- n ) "QUIT" ftp-command ;
-: ftp-cwd ( ftp-client directory -- n ) "CWD " prepend ftp-command ;
-: ftp-retr ( ftp-client filename -- n ) "RETR " prepend ftp-command ;
+: ftp-user ( ftp-client -- ftp-response )
+    dup user>> "USER " prepend ftp-command ;
+
+: ftp-password ( ftp-client -- ftp-response )
+    dup password>> "PASS " prepend ftp-command ;
+
+: ftp-set-binary ( ftp-client -- ftp-response ) "TYPE I" ftp-command ;
+
+: ftp-pwd ( ftp-client -- ftp-response )
+    "PWD" ftp-command ;
+
+: ftp-list ( ftp-client -- ftp-response )
+    "LIST" ftp-command ;
+
+: ftp-quit ( ftp-client -- ftp-response )
+    "QUIT" ftp-command ;
+
+: ftp-cwd ( ftp-client directory -- ftp-response )
+    "CWD " prepend ftp-command ;
+
+: ftp-retr ( ftp-client filename -- ftp-response )
+    "RETR " prepend ftp-command ;
 
 : parse-epsv ( ftp-response -- port )
     strings>> first
     "|" split 2 tail* first string>number ;
 
-: ftp-epsv ( ftp-client -- n ) "EPSV" ftp-command ;
+: ftp-epsv ( ftp-client -- ftp-response ) "EPSV" ftp-command ;
 
 M: ftp-client dispose ( ftp-client -- )
     [ "QUIT" ftp-command drop ] [ stream>> dispose ] bi ;
@@ -109,3 +123,14 @@ ERROR: ftp-error got expected ;
     [ dupd ftp-retr 150 ftp-assert ]
     [ binary <file-writer> stream-copy ] 2bi*
     ftp-read dup 226 ftp-assert ;
+
+GENERIC# ftp-download 1 ( obj path -- )
+
+M: ftp-client ftp-download ( ftp-client path -- )
+    >r dup ftp-login r>
+    [ parent-directory ftp-cwd drop ]
+    [ file-name ftp-get drop ]
+    [ drop dispose ] 2tri ;
+
+M: string ftp-download ( string path -- )
+    >r <ftp-client> r> ftp-download ;
