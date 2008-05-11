@@ -273,8 +273,11 @@ INTERSECTION: generic-class generic class ;
 [ t ] [ generic-class generic class<= ] unit-test
 [ t ] [ generic-class \ class class<= ] unit-test
 
-[ t ] [ \ class generic class-and generic-class class<= ] unit-test
-[ t ] [ \ class generic class-and generic-class swap class<= ] unit-test
+! Later
+[
+    [ t ] [ \ class generic class-and generic-class class<= ] unit-test
+    [ t ] [ \ class generic class-and generic-class swap class<= ] unit-test
+] call drop
 
 [ t ] [ \ word generic-class classes-intersect? ] unit-test
 [ f ] [ number generic-class classes-intersect? ] unit-test
