@@ -55,41 +55,42 @@ SINGLETON: passive
     [ "\r\n" swap stream-write ]
     [ stream-flush ] tri ;
 
-: ftp-command ( ftp-client string -- ftp-response )
-    swap
+: ftp-command ( string ftp-client -- ftp-response )
     [ ftp-send ] [ ftp-read ] bi ;
 
 : ftp-user ( ftp-client -- ftp-response )
-    dup user>> "USER " prepend ftp-command ;
+    [ user>> "USER " prepend ] [ ftp-command ] bi ;
 
 : ftp-password ( ftp-client -- ftp-response )
-    dup password>> "PASS " prepend ftp-command ;
+    [ password>> "PASS " prepend ] [ ftp-command ] bi ;
 
-: ftp-set-binary ( ftp-client -- ftp-response ) "TYPE I" ftp-command ;
+: ftp-set-binary ( ftp-client -- ftp-response )
+    >r "TYPE I" r> ftp-command ;
 
 : ftp-pwd ( ftp-client -- ftp-response )
-    "PWD" ftp-command ;
+    >r "PWD" r> ftp-command ;
 
 : ftp-list ( ftp-client -- ftp-response )
-    "LIST" ftp-command ;
+    >r "LIST" r> ftp-command ;
 
 : ftp-quit ( ftp-client -- ftp-response )
-    "QUIT" ftp-command ;
+    >r "QUIT" r> ftp-command ;
 
-: ftp-cwd ( ftp-client directory -- ftp-response )
-    "CWD " prepend ftp-command ;
+: ftp-cwd ( directory ftp-client -- ftp-response )
+    >r "CWD " prepend r> ftp-command ;
 
-: ftp-retr ( ftp-client filename -- ftp-response )
-    "RETR " prepend ftp-command ;
+: ftp-retr ( filename ftp-client -- ftp-response )
+    >r "RETR " prepend r> ftp-command ;
 
 : parse-epsv ( ftp-response -- port )
     strings>> first
     "|" split 2 tail* first string>number ;
 
-: ftp-epsv ( ftp-client -- ftp-response ) "EPSV" ftp-command ;
+: ftp-epsv ( ftp-client -- ftp-response )
+    >r "EPSV" r> ftp-command ;
 
 M: ftp-client dispose ( ftp-client -- )
-    [ "QUIT" ftp-command drop ] [ stream>> dispose ] bi ;
+    [ ftp-quit drop ] [ stream>> dispose ] bi ;
 
 ERROR: ftp-error got expected ;
 : ftp-assert ( ftp-response n -- )
@@ -109,28 +110,29 @@ ERROR: ftp-error got expected ;
         [ ftp-set-binary 200 ftp-assert ]
     } cleave ;
 
+: start-2nd ( ftp-client -- port )
+    ftp-epsv [ 229 ftp-assert ] [ parse-epsv ] bi ;
+
 : list ( ftp-client -- ftp-response )
-    dup ftp-epsv dup 229 ftp-assert
-    >r dup host>> r> parse-epsv <inet> ascii <client>
+    dup [ host>> ] [ start-2nd ] bi <inet> ascii <client>
     over ftp-list 150 ftp-assert
     lines <ftp-response> swap >>strings
     >r ftp-read 226 ftp-assert r> ;
 
-: ftp-get ( ftp-client filename -- ftp-response )
-    over ftp-epsv dup 229 ftp-assert
-    pick host>> swap parse-epsv <inet> binary <client>
-    swap tuck
-    [ dupd ftp-retr 150 ftp-assert ]
+: ftp-get ( filename ftp-client -- ftp-response )
+    dup [ host>> ] [ start-2nd ] bi <inet> binary <client>
+    rot tuck
+    [ over ftp-retr 150 ftp-assert ]
     [ binary <file-writer> stream-copy ] 2bi*
     ftp-read dup 226 ftp-assert ;
 
-GENERIC# ftp-download 1 ( obj path -- )
+GENERIC: ftp-download ( path obj -- )
 
-M: ftp-client ftp-download ( ftp-client path -- )
-    >r dup ftp-login r>
-    [ parent-directory ftp-cwd drop ]
-    [ file-name ftp-get drop ]
-    [ drop dispose ] 2tri ;
+M: ftp-client ftp-download ( path ftp-client -- )
+    dup ftp-login
+    [ >r parent-directory r> ftp-cwd drop ]
+    [ >r file-name r> ftp-get drop ]
+    [ dispose drop ] 2tri ;
 
-M: string ftp-download ( string path -- )
-    >r <ftp-client> r> ftp-download ;
+M: string ftp-download ( path string -- )
+    <ftp-client> ftp-download ;
