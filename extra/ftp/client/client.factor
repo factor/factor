@@ -19,21 +19,32 @@ TUPLE: ftp-response n strings ;
         "anonymous" >>user
         "lol@test.com" >>password ;
 
-: read-epsv ( stream -- port )
-    dup stream-readln dup print
-    "|" split 2 tail* first string>number ;
+: add-response-line ( ftp-response string -- ftp-response )
+    over strings>> push ;
 
-: read-until-command ( stream ftp-response -- n )
+: (ftp-response-code) ( str -- n )
+    3 head string>number ;
+
+: ftp-response-code ( string -- n/f )
+    dup fourth CHAR: - = [ drop f ] [ (ftp-response-code) ] if ;
+
+: last-code ( ftp-response -- n )
+    strings>> peek (ftp-response-code) ;
+
+: read-response-until ( stream ftp-response n -- ftp-response )
+    >r over stream-readln
+    [ add-response-line ] [ ftp-response-code ] bi
+    r> tuck = [ drop nip ] [ read-response-until ] if ;
+
+: read-response ( stream -- ftp-response )
+    <ftp-response>
     over stream-readln
-    " " split1 drop string>number dup number? [
-        nip
-    ] [
-        drop read-until-command
-    ] if ;
+    [ add-response-line ] [ fourth CHAR: - = ] bi
+    [ dup last-code read-response-until ]
+    [ nip ] if dup last-code >>n ;
 
 : ftp-read ( ftp-client -- ftp-response )
-    stream>> <ftp-response> [ read-until-command ] keep
-    dup strings>> peek " " split1 ;
+    stream>> read-response ;
 
 : ftp-send ( str ftp-client -- )
     stream>>
@@ -48,24 +59,29 @@ TUPLE: ftp-response n strings ;
 : ftp-user ( ftp-client -- n ) dup user>> "USER " prepend ftp-command ;
 : ftp-password ( ftp-client -- n ) dup password>> "PASS " prepend ftp-command ;
 : ftp-set-binary ( ftp-client -- n ) "TYPE I" ftp-command ;
-: ftp-set-ascii ( ftp-client -- n ) "TYPE A" ftp-command ;
+! : ftp-set-ascii ( ftp-client -- n ) "TYPE A" ftp-command ;
 : ftp-system ( ftp-client -- n ) "SYST" ftp-command ;
 : ftp-features ( ftp-client -- n ) "FEAT" ftp-command ;
 : ftp-pwd ( ftp-client -- n ) "PWD" ftp-command ;
 : ftp-list ( ftp-client -- n ) "LIST" ftp-command ;
 : ftp-quit ( ftp-client -- n ) "QUIT" ftp-command ;
-: ftp-epsv ( ftp-client -- n str ) "EPSV" ftp-command ;
 : ftp-cwd ( ftp-client directory -- n ) "CWD " prepend ftp-command ;
 : ftp-retr ( ftp-client filename -- n ) "RETR " prepend ftp-command ;
 
+: parse-epsv ( ftp-response -- port )
+    strings>> first
+    "|" split 2 tail* first string>number ;
+
+: ftp-epsv ( ftp-client -- n ) "EPSV" ftp-command ;
+
 M: ftp-client dispose ( ftp-client -- )
-    [ "QUIT" ftp-command ] [ stream>> dispose ] bi ;
+    [ "QUIT" ftp-command drop ] [ stream>> dispose ] bi ;
 
 ERROR: ftp-error got expected ;
-: ftp-assert ( m n -- )
-    2dup = [ 2drop ] [ ftp-error ] if ;
+: ftp-assert ( ftp-response n -- )
+    2dup >r n>> r> = [ 2drop ] [ ftp-error ] if ;
 
-: ftp-connect ( ftp-client -- stream )
+: ftp-connect ( ftp-client -- )
     dup
     [ host>> ] [ port>> ] bi <inet> ascii <client>
     >>stream drop ;
@@ -79,29 +95,17 @@ ERROR: ftp-error got expected ;
         [ ftp-set-binary 200 ftp-assert ]
     } cleave ;
 
-: list ( stream -- )
-    dup ftp-epsv
-    dup read-epsv
-    ! host get swap <inet> binary <client>
-    over ftp-list
-    over read-until-command drop
-    contents write
-    read-until-command drop ;
+: list ( ftp-client -- ftp-response )
+    dup ftp-epsv dup 229 ftp-assert
+    >r dup host>> r> parse-epsv <inet> ascii <client>
+    over ftp-list 150 ftp-assert
+    lines <ftp-response> swap >>strings
+    >r ftp-read 226 ftp-assert r> ;
 
-: ftp-get ( ftp-client filename -- )
-    over ftp-epsv 229 ftp-assert
-    
-    ;
-
-! : ftp-get ( path stream -- )
-    ! dup ftp-epsv
-    ! dup read-epsv
-    ! ! host get swap <inet> binary <client>
-    ! >r [ ftp-retr ] 2keep dup read-until-command drop r>
-    ! rot binary <file-writer> stream-copy
-    ! read-until-command drop ;
-
-
-
-: ftp-interact ( stream -- )
-    readln over ftp-send read-until-command drop ;
+: ftp-get ( ftp-client filename -- ftp-response )
+    over ftp-epsv dup 229 ftp-assert
+    pick host>> swap parse-epsv <inet> binary <client>
+    swap tuck
+    [ dupd ftp-retr 150 ftp-assert ]
+    [ binary <file-writer> stream-copy ] 2bi*
+    ftp-read dup 226 ftp-assert ;
