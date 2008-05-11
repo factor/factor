@@ -356,7 +356,7 @@ M: object infer-call
 
 \ setenv { object fixnum } { } <effect> set-primitive-effect
 
-\ exists? { string } { object } <effect> set-primitive-effect
+\ (exists?) { string } { object } <effect> set-primitive-effect
 
 \ (directory) { string } { array } <effect> set-primitive-effect
 
