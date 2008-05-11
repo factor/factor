@@ -148,7 +148,7 @@ $nl
 { $subsection "spread-shuffle-equivalence" } ;
 
 ARTICLE: "apply-combinators" "Apply combinators"
-"The apply combinators apply multiple quotations to multiple values. The " { $snippet "@" } " suffix signifies application."
+"The apply combinators apply a single quotation to multiple values. The " { $snippet "@" } " suffix signifies application."
 $nl
 "Two quotations:"
 { $subsection bi@ }
@@ -179,6 +179,7 @@ ARTICLE: "compositional-combinators" "Compositional combinators"
 { $subsection with }
 { $subsection compose }
 { $subsection 3compose }
+{ $subsection prepose }
 "Quotations also implement the sequence protocol, and can be manipulated with sequence words; see " { $link "quotations" } "." ;
 
 ARTICLE: "implementing-combinators" "Implementing combinators"
@@ -835,8 +836,16 @@ HELP: compose ( quot1 quot2 -- compose )
     "However, " { $link compose } " runs in constant time, and the optimizing compiler is able to compile code which calls composed quotations."
 } ;
 
+
+HELP: prepose
+{ $values { "quot1" callable } { "quot2" callable } { "compose" compose } }
+{ $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot2" } " followed by " { $snippet "quot1" } "." }
+{ $notes "See " { $link compose } " for details." } ;
+
+{ compose prepose } related-words
+
 HELP: 3compose
-{ $values { "quot1" callable } { "quot2" callable } { "quot3" callable } { "curry" curry } }
+{ $values { "quot1" callable } { "quot2" callable } { "quot3" callable } { "compose" compose } }
 { $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot1" } ", " { $snippet "quot2" } " and then " { $snippet "quot3" } "." }
 { $notes
     "The three quotations must leave the retain stack in the same state on exit as it was on entry, so for example, the following code is not allowed:"
