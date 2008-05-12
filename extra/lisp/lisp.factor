@@ -43,10 +43,10 @@ PRIVATE>
 : rest-lambda ( body vars -- quot )  
   "&rest" swap [ remove ] [ index ] 2bi
   [ localize-lambda <lambda> ] dip
-  [ , cut swap [ % , ] bake , with-locals compose ] bake ;
+  [ , cut swap [ % , ] bake , compose ] bake ;
   
 : normal-lambda ( body vars -- quot )
-  localize-lambda <lambda> [ , with-locals compose ] bake ;
+  localize-lambda <lambda> [ , compose ] bake ;
   
 : convert-lambda ( s-exp -- quot )  
   split-lambda dup "&rest"  swap member? [ rest-lambda ] [ normal-lambda ] if ;
