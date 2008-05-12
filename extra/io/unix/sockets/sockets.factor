@@ -5,7 +5,7 @@ namespaces threads sequences byte-arrays io.nonblocking
 io.binary io.unix.backend io.streams.duplex io.sockets.impl
 io.backend io.files io.files.private io.encodings.utf8
 math.parser continuations libc combinators system accessors
-qualified unix.ffi unix ;
+qualified unix ;
 
 EXCLUDE: io => read write close ;
 EXCLUDE: io.sockets => accept ;
