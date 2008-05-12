@@ -126,10 +126,10 @@ FUNCTION: int utime ( char* path, utimebuf* buf ) ;
 : touch ( filename -- ) f [ utime ] unix-system-call drop ;
 
 : change-file-times ( filename access modification -- )
-  "utimebuf" <c-object>
-  tuck set-utimbuf-modtime
-  tuck set-utimbuf-actime
-  [ utime ] unix-system-call drop ;
+    "utimebuf" <c-object>
+    tuck set-utimbuf-modtime
+    tuck set-utimbuf-actime
+    [ utime ] unix-system-call drop ;
 
 FUNCTION: int pclose ( void* file ) ;
 FUNCTION: int pipe ( int* filedes ) ;
