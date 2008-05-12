@@ -1,12 +1,13 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes.singleton combinators continuations
-io io.encodings.binary io.encodings.ascii io.files io.sockets
-kernel math math.parser sequences splitting namespaces strings ;
+USING: accessors arrays classes.singleton combinators
+continuations io io.encodings.binary io.encodings.ascii
+io.files io.sockets kernel io.streams.duplex math
+math.parser sequences splitting namespaces strings fry ;
 IN: ftp.client
 
-TUPLE: ftp-client host port stream user password mode ;
-TUPLE: ftp-response n strings ;
+TUPLE: ftp-client host port user password mode ;
+TUPLE: ftp-response n strings parsed ;
 
 SINGLETON: active
 SINGLETON: passive
@@ -20,7 +21,7 @@ SINGLETON: passive
         swap >>host
         21 >>port
         "anonymous" >>user
-        "factor-ftp@factorcode.org" >>password ;
+        "ftp@my.org" >>password ;
 
 : add-response-line ( ftp-response string -- ftp-response )
     over strings>> push ;
@@ -31,108 +32,164 @@ SINGLETON: passive
 : ftp-response-code ( string -- n/f )
     dup fourth CHAR: - = [ drop f ] [ (ftp-response-code) ] if ;
 
-: last-code ( ftp-response -- n )
-    strings>> peek (ftp-response-code) ;
-
-: read-response-until ( stream ftp-response n -- ftp-response )
-    >r over stream-readln
+: read-response-loop ( ftp-response -- ftp-response )
+    readln
     [ add-response-line ] [ ftp-response-code ] bi
-    r> tuck = [ drop nip ] [ read-response-until ] if ;
+    over n>> = [ read-response-loop ] unless ;
 
-: read-response ( stream -- ftp-response )
-    <ftp-response>
-    over stream-readln
-    [ add-response-line ] [ fourth CHAR: - = ] bi
-    [ dup last-code read-response-until ]
-    [ nip ] if dup last-code >>n ;
+: read-response ( -- ftp-response )
+    <ftp-response> readln
+    [ (ftp-response-code) >>n ]
+    [ add-response-line ]
+    [ fourth CHAR: - = ] tri
+    [ read-response-loop ] when ;
 
-: ftp-read ( ftp-client -- ftp-response )
-    stream>> read-response ;
+: ftp-send ( string -- )
+    write "\r\n" write flush ;
 
-: ftp-send ( str ftp-client -- )
-    stream>>
-    [ stream-write ]
-    [ "\r\n" swap stream-write ]
-    [ stream-flush ] tri ;
-
-: ftp-command ( string ftp-client -- ftp-response )
-    [ ftp-send ] [ ftp-read ] bi ;
+: ftp-command ( string -- ftp-response )
+    ftp-send read-response ;
 
 : ftp-user ( ftp-client -- ftp-response )
-    [ user>> "USER " prepend ] [ ftp-command ] bi ;
+    user>> "USER " prepend ftp-command ;
 
 : ftp-password ( ftp-client -- ftp-response )
-    [ password>> "PASS " prepend ] [ ftp-command ] bi ;
+    password>> "PASS " prepend ftp-command ;
 
-: ftp-set-binary ( ftp-client -- ftp-response )
-    >r "TYPE I" r> ftp-command ;
+: ftp-set-binary ( -- ftp-response )
+    "TYPE I" ftp-command ;
 
-: ftp-pwd ( ftp-client -- ftp-response )
-    >r "PWD" r> ftp-command ;
+: ftp-pwd ( -- ftp-response )
+    "PWD" ftp-command ;
 
-: ftp-list ( ftp-client -- ftp-response )
-    >r "LIST" r> ftp-command ;
+: ftp-list ( -- ftp-response )
+    "LIST" ftp-command ;
 
-: ftp-quit ( ftp-client -- ftp-response )
-    >r "QUIT" r> ftp-command ;
+: ftp-quit ( -- ftp-response )
+    "QUIT" ftp-command ;
 
-: ftp-cwd ( directory ftp-client -- ftp-response )
-    >r "CWD " prepend r> ftp-command ;
+: ftp-cwd ( directory -- ftp-response )
+    "CWD " prepend ftp-command ;
 
-: ftp-retr ( filename ftp-client -- ftp-response )
-    >r "RETR " prepend r> ftp-command ;
+: ftp-retr ( filename -- ftp-response )
+    "RETR " prepend ftp-command ;
 
 : parse-epsv ( ftp-response -- port )
     strings>> first
     "|" split 2 tail* first string>number ;
 
-: ftp-epsv ( ftp-client -- ftp-response )
-    >r "EPSV" r> ftp-command ;
+: ch>attribute ( ch -- symbol )
+    {
+        { CHAR: d [ +directory+ ] }
+        { CHAR: l [ +symbolic-link+ ] }
+        { CHAR: - [ +regular-file+ ] }
+        [ drop +unknown+ ]
+    } case ;
 
-M: ftp-client dispose ( ftp-client -- )
-    [ ftp-quit drop ] [ stream>> dispose ] bi ;
+TUPLE: remote-file
+    type permissions links owner group size month day time year name ;
+
+: <remote-file> ( -- remote-file ) remote-file new ;
+
+: parse-permissions ( remote-file str -- remote-file )
+    [ first ch>attribute >>type ] [ rest >>permissions ] bi ;
+
+: parse-list-9 ( lines -- seq )
+    [
+        <remote-file> swap {
+            [ 0 swap nth parse-permissions ]
+            [ 1 swap nth string>number >>links ]
+            [ 2 swap nth >>owner ]
+            [ 3 swap nth >>group ]
+            [ 4 swap nth string>number >>size ]
+            [ 5 swap nth >>month ]
+            [ 6 swap nth >>day ]
+            [ 7 swap nth >>time ]
+            [ 8 swap nth >>name ]
+        } cleave
+    ] map ;
+
+: parse-list-8 ( lines -- seq )
+    [
+        <remote-file> swap {
+            [ 0 swap nth parse-permissions ]
+            [ 1 swap nth string>number >>links ]
+            [ 2 swap nth >>owner ]
+            [ 3 swap nth >>size ]
+            [ 4 swap nth >>month ]
+            [ 5 swap nth >>day ]
+            [ 6 swap nth >>time ]
+            [ 7 swap nth >>name ]
+        } cleave
+    ] map ;
+
+: parse-list-3 ( lines -- seq )
+    [
+        <remote-file> swap {
+            [ 0 swap nth parse-permissions ]
+            [ 1 swap nth string>number >>links ]
+            [ 2 swap nth >>name ]
+        } cleave
+    ] map ;
+
+: parse-list ( ftp-response -- ftp-response )
+    dup strings>>
+    [ " " split [ empty? not ] filter ] map
+    dup length {
+        { 9 [ parse-list-9 ] }
+        { 8 [ parse-list-8 ] }
+        { 3 [ parse-list-3 ] }
+        [ drop ]
+    } case >>parsed ;
+
+: ftp-epsv ( -- ftp-response )
+    "EPSV" ftp-command ;
 
 ERROR: ftp-error got expected ;
 : ftp-assert ( ftp-response n -- )
     2dup >r n>> r> = [ 2drop ] [ ftp-error ] if ;
 
-: ftp-connect ( ftp-client -- )
-    dup
-    [ host>> ] [ port>> ] bi <inet> ascii <client>
-    >>stream drop ;
-
 : ftp-login ( ftp-client -- )
-    {
-        [ ftp-connect ]
-        [ ftp-read 220 ftp-assert ]
-        [ ftp-user 331 ftp-assert ]
-        [ ftp-password 230 ftp-assert ]
-        [ ftp-set-binary 200 ftp-assert ]
-    } cleave ;
+    read-response 220 ftp-assert
+    [ ftp-user 331 ftp-assert ]
+    [ ftp-password 230 ftp-assert ] bi
+    ftp-set-binary 200 ftp-assert ;
 
-: start-2nd ( ftp-client -- port )
-    ftp-epsv [ 229 ftp-assert ] [ parse-epsv ] bi ;
+: open-remote-port ( -- port )
+    ftp-epsv
+    [ 229 ftp-assert ] [ parse-epsv ] bi ;
 
 : list ( ftp-client -- ftp-response )
-    dup [ host>> ] [ start-2nd ] bi <inet> ascii <client>
-    over ftp-list 150 ftp-assert
-    lines <ftp-response> swap >>strings
-    >r ftp-read 226 ftp-assert r> ;
+    host>> open-remote-port <inet> ascii <client>
+    ftp-list 150 ftp-assert
+    lines
+    <ftp-response> swap >>strings
+    read-response 226 ftp-assert
+    parse-list ;
 
 : ftp-get ( filename ftp-client -- ftp-response )
-    dup [ host>> ] [ start-2nd ] bi <inet> binary <client>
-    rot tuck
-    [ over ftp-retr 150 ftp-assert ]
-    [ binary <file-writer> stream-copy ] 2bi*
-    ftp-read dup 226 ftp-assert ;
+    host>> open-remote-port <inet> binary <client>
+    swap
+    [ ftp-retr 150 ftp-assert drop ]
+    [ binary <file-writer> stream-copy ] 2bi
+    read-response dup 226 ftp-assert ;
+
+: ftp-connect ( ftp-client -- stream )
+    [ host>> ] [ port>> ] bi <inet> ascii <client> ;
 
 GENERIC: ftp-download ( path obj -- )
 
+: with-ftp-client ( ftp-client quot -- )
+    dupd '[
+        , [ ftp-login ] [ @ ] bi
+        ftp-quit drop
+    ] >r ftp-connect r> with-stream ; inline
+
 M: ftp-client ftp-download ( path ftp-client -- )
-    dup ftp-login
-    [ >r parent-directory r> ftp-cwd drop ]
-    [ >r file-name r> ftp-get drop ]
-    [ dispose drop ] 2tri ;
+    [
+        [ drop parent-directory ftp-cwd drop ]
+        [ >r file-name r> ftp-get drop ] 2bi
+    ] with-ftp-client ;
 
 M: string ftp-download ( path string -- )
     <ftp-client> ftp-download ;
