@@ -38,15 +38,18 @@ DEFER: funcall
 PRIVATE>
                    
 : split-lambda ( s-exp -- body vars )                   
-  first3 -rot nip [ body>> ] bi@ [ name>> ] map ; inline                 
+  first3 -rot nip [ body>> ] bi@ [ name>> ] map ; inline
   
-: rest-lambda-vars ( seq -- n newseq )  
-  "&rest" swap [ remove ] [ index ] 2bi ;
+: rest-lambda ( body vars -- quot )  
+  "&rest" swap [ remove ] [ index ] 2bi
+  [ localize-lambda <lambda> ] dip
+  [ , cut swap [ % , ] bake , compose ] bake ;
+  
+: normal-lambda ( body vars -- quot )
+  localize-lambda <lambda> [ , compose ] bake ;
   
 : convert-lambda ( s-exp -- quot )  
-  split-lambda dup "&rest"  swap member? [ rest-lambda-vars ] [ dup length ] if
-  [ localize-lambda <lambda> ] dip
-  [ , cut [ dup length firstn ] dip dup empty? [ drop ] when  , ] bake ;
+  split-lambda dup "&rest"  swap member? [ rest-lambda ] [ normal-lambda ] if ;
   
 : convert-quoted ( s-exp -- quot )  
   second [ , ] bake ;
@@ -64,10 +67,9 @@ PRIVATE>
     [ drop convert-general-form ] if ;
   
 : convert-form ( lisp-form -- quot )
-  { { [ dup s-exp? ] [ body>> convert-list-form ] }
-   [ [ , ] [ ] make ]
-  } cond ;
-  
+  dup s-exp?  [ body>> convert-list-form ]
+              [ [ , ] [ ] make ] if ;
+                
 : lisp-string>factor ( str -- quot )
   lisp-expr parse-result-ast convert-form ;
   
