@@ -1,12 +1,13 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors classes.singleton combinators continuations
-io io.encodings.binary io.encodings.ascii io.files io.sockets
-kernel math math.parser sequences splitting namespaces strings ;
+USING: accessors arrays classes.singleton combinators
+continuations io io.encodings.binary io.encodings.ascii
+io.files io.sockets kernel math math.parser sequences
+splitting namespaces strings ;
 IN: ftp.client
 
 TUPLE: ftp-client host port stream user password mode ;
-TUPLE: ftp-response n strings ;
+TUPLE: ftp-response n strings parsed ;
 
 SINGLETON: active
 SINGLETON: passive
@@ -86,6 +87,70 @@ SINGLETON: passive
     strings>> first
     "|" split 2 tail* first string>number ;
 
+: ch>attribute ( ch -- symbol )
+    {
+        { CHAR: d [ +directory+ ] }
+        { CHAR: l [ +symbolic-link+ ] }
+        { CHAR: - [ +regular-file+ ] }
+        [ drop +unknown+ ]
+    } case ;
+
+TUPLE: remote-file
+    type permissions links owner group size month day time year name ;
+
+: <remote-file> ( -- remote-file ) remote-file new ;
+
+: parse-permissions ( remote-file str -- remote-file )
+    [ first ch>attribute >>type ] [ rest >>permissions ] bi ;
+
+: parse-list-9 ( lines -- seq )
+    [
+        <remote-file> swap {
+            [ 0 swap nth parse-permissions ]
+            [ 1 swap nth string>number >>links ]
+            [ 2 swap nth >>owner ]
+            [ 3 swap nth >>group ]
+            [ 4 swap nth string>number >>size ]
+            [ 5 swap nth >>month ]
+            [ 6 swap nth >>day ]
+            [ 7 swap nth >>time ]
+            [ 8 swap nth >>name ]
+        } cleave
+    ] map ;
+
+: parse-list-8 ( lines -- seq )
+    [
+        <remote-file> swap {
+            [ 0 swap nth parse-permissions ]
+            [ 1 swap nth string>number >>links ]
+            [ 2 swap nth >>owner ]
+            [ 3 swap nth >>size ]
+            [ 4 swap nth >>month ]
+            [ 5 swap nth >>day ]
+            [ 6 swap nth >>time ]
+            [ 7 swap nth >>name ]
+        } cleave
+    ] map ;
+
+: parse-list-3 ( lines -- seq )
+    [
+        <remote-file> swap {
+            [ 0 swap nth parse-permissions ]
+            [ 1 swap nth string>number >>links ]
+            [ 2 swap nth >>name ]
+        } cleave
+    ] map ;
+
+: parse-list ( ftp-response -- ftp-response )
+    dup strings>>
+    [ " " split [ empty? not ] filter ] map
+    dup length {
+        { 9 [ parse-list-9 ] }
+        { 8 [ parse-list-8 ] }
+        { 3 [ parse-list-3 ] }
+        [ drop ]
+    } case >>parsed ;
+
 : ftp-epsv ( ftp-client -- ftp-response )
     >r "EPSV" r> ftp-command ;
 
@@ -117,7 +182,8 @@ ERROR: ftp-error got expected ;
     dup [ host>> ] [ start-2nd ] bi <inet> ascii <client>
     over ftp-list 150 ftp-assert
     lines <ftp-response> swap >>strings
-    >r ftp-read 226 ftp-assert r> ;
+    >r ftp-read 226 ftp-assert r>
+    parse-list ;
 
 : ftp-get ( filename ftp-client -- ftp-response )
     dup [ host>> ] [ start-2nd ] bi <inet> binary <client>
