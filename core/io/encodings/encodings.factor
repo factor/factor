@@ -30,8 +30,7 @@ ERROR: encode-error ;
 
 <PRIVATE
 
-M: tuple-class <decoder> new <decoder> ;
-M: tuple <decoder> f decoder boa ;
+M: object <decoder> f decoder boa ;
 
 : >decoder< ( decoder -- stream encoding )
     [ stream>> ] [ code>> ] bi ;
@@ -104,8 +103,7 @@ M: decoder stream-readln ( stream -- str )
 M: decoder dispose decoder-stream dispose ;
 
 ! Encoding
-M: tuple-class <encoder> new <encoder> ;
-M: tuple <encoder> encoder boa ;
+M: object <encoder> encoder boa ;
 
 : >encoder< ( encoder -- stream encoding )
     [ stream>> ] [ code>> ] bi ;
@@ -121,13 +119,16 @@ M: encoder dispose encoder-stream dispose ;
 M: encoder stream-flush encoder-stream stream-flush ;
 
 INSTANCE: encoder plain-writer
+PRIVATE>
 
-! Rebinding duplex streams which have not read anything yet
-
-: reencode ( stream encoding -- newstream )
+: re-encode ( stream encoding -- newstream )
     over encoder? [ >r encoder-stream r> ] when <encoder> ;
 
-: redecode ( stream encoding -- newstream )
+: encode-output ( encoding -- )
+    output-stream [ swap re-encode ] change ;
+
+: re-decode ( stream encoding -- newstream )
     over decoder? [ >r decoder-stream r> ] when <decoder> ;
 
-PRIVATE>
+: decode-input ( encoding -- )
+    input-stream [ swap re-decode ] change ;

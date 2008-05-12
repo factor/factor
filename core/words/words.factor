@@ -3,7 +3,7 @@
 USING: arrays definitions graphs assocs kernel kernel.private
 slots.private math namespaces sequences strings vectors sbufs
 quotations assocs hashtables sorting words.private vocabs
-math.order ;
+math.order sets ;
 IN: words
 
 : word ( -- word ) \ word get-global ;
@@ -121,7 +121,7 @@ SYMBOL: +called+
     compiled-crossref get at ;
 
 : compiled-usages ( words -- seq )
-    [ [ dup ] H{ } map>assoc dup ] keep [
+    [ unique dup ] keep [
         compiled-usage [ nip +inlined+ eq? ] assoc-filter update
     ] with each keys ;
 

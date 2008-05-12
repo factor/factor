@@ -64,7 +64,7 @@ typedef signed long long s64;
 
 INLINE bool immediate_p(CELL obj)
 {
-	return (TAG(obj) == FIXNUM_TYPE || obj == F);
+	return (obj == F || TAG(obj) == FIXNUM_TYPE);
 }
 
 INLINE F_FIXNUM untag_fixnum_fast(CELL tagged)

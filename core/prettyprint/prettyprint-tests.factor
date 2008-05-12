@@ -334,5 +334,11 @@ PREDICATE: predicate-see-test < integer even? ;
     [ \ predicate-see-test see ] with-string-writer
 ] unit-test
 
+INTERSECTION: intersection-see-test sequence number ;
+
+[ "USING: math sequences ;\nIN: prettyprint.tests\nINTERSECTION: intersection-see-test sequence number ;\n" ] [
+    [ \ intersection-see-test see ] with-string-writer
+] unit-test
+
 [ ] [ \ compose see ] unit-test
 [ ] [ \ curry see ] unit-test

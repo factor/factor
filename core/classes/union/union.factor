@@ -7,7 +7,6 @@ IN: classes.union
 PREDICATE: union-class < class
     "metaclass" word-prop union-class eq? ;
 
-! Union classes for dispatch on multiple classes.
 : union-predicate-quot ( members -- quot )
     dup empty? [
         drop [ drop f ]
@@ -24,7 +23,7 @@ PREDICATE: union-class < class
 M: union-class update-class define-union-predicate ;
 
 : define-union-class ( class members -- )
-    [ f swap union-class define-class ]
+    [ f swap f union-class define-class ]
     [ drop update-classes ]
     2bi ;
 

@@ -66,6 +66,9 @@ strings accessors io.encodings.utf8 math ;
 [ "awk" ] [ "/usr/libexec/awk///" file-name ] unit-test
 [ "" ] [ "" file-name ] unit-test
 
+[ "freetype6.dll" ] [ "resource:freetype6.dll" file-name ] unit-test
+[ "freetype6.dll" ] [ "resource:/freetype6.dll" file-name ] unit-test
+
 [ ] [
     { "Hello world." }
     "test-foo.txt" temp-file ascii set-file-lines

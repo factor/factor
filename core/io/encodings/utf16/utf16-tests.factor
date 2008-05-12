@@ -24,7 +24,7 @@ IN: io.encodings.utf16.tests
 [ { HEX: ff HEX: fe 120 0 52 216 30 221 } ] [ { CHAR: x HEX: 1d11e } utf16 encode >array ] unit-test
 
 : correct-endian
-    code>> class little-endian? [ utf16le = ] [ utf16be = ] if ;
+    code>> little-endian? [ utf16le = ] [ utf16be = ] if ;
 
 [ t ] [ B{ } utf16n <byte-reader> correct-endian ] unit-test
 [ t ] [ utf16n <byte-writer> correct-endian ] unit-test

@@ -46,6 +46,7 @@ IN: bootstrap.syntax
     "TUPLE:"
     "T{"
     "UNION:"
+    "INTERSECTION:"
     "USE:"
     "USING:"
     "V{"

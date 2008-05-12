@@ -435,3 +435,28 @@ must-fail-with
 
 [ 92 ] [ "CHAR: \\" eval ] unit-test
 [ 92 ] [ "CHAR: \\\\" eval ] unit-test
+
+[ ] [
+    {
+        "IN: parser.tests"
+        "USING: math arrays ;"
+        "GENERIC: change-combination"
+        "M: integer change-combination 1 ;"
+        "M: array change-combination 2 ;"
+    } "\n" join <string-reader> "change-combination-test" parse-stream drop
+] unit-test
+
+[ ] [
+    {
+        "IN: parser.tests"
+        "USING: math arrays ;"
+        "GENERIC# change-combination 1"
+        "M: integer change-combination 1 ;"
+        "M: array change-combination 2 ;"
+    } "\n" join <string-reader> "change-combination-test" parse-stream drop
+] unit-test
+
+[ 2 ] [
+    "change-combination" "parser.tests" lookup
+    "methods" word-prop assoc-size
+] unit-test

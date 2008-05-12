@@ -14,7 +14,7 @@ PREDICATE: predicate-class < class
     ] [ ] make ;
 
 : define-predicate-class ( class superclass definition -- )
-    [ drop f predicate-class define-class ]
+    [ drop f f predicate-class define-class ]
     [ nip "predicate-definition" set-word-prop ]
     [
         2drop

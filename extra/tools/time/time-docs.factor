@@ -16,7 +16,7 @@ ABOUT: "timing"
 HELP: benchmark
 { $values { "quot" "a quotation" }
           { "runtime" "an integer denoting milliseconds" } }
-{ $description "Runs a quotation, measuring the total wall clock time and the total time spent in the garbage collector." }
+      { $description "Runs a quotation, measuring the total wall clock time." }
 { $notes "A nicer word for interactive use is " { $link time } "." } ;
 
 HELP: time

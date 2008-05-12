@@ -85,9 +85,9 @@ M: string-type c-type-getter
 M: string-type c-type-setter
     drop [ set-alien-cell ] ;
 
-TUPLE: utf16n ;
-
 ! Native-order UTF-16
+
+SINGLETON: utf16n
 
 : utf16n ( -- descriptor )
     little-endian? utf16le utf16be ? ; foldable

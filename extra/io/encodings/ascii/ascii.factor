@@ -13,7 +13,7 @@ IN: io.encodings.ascii
     [ drop f ] if* ;
 PRIVATE>
 
-TUPLE: ascii ;
+SINGLETON: ascii
 
 M: ascii encode-char
     128 encode-if< ;
