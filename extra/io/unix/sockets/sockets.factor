@@ -71,7 +71,7 @@ TUPLE: accept-task < input-task ;
     dup <c-object> [ swap heap-size <int> accept ] keep ; inline
 
 : do-accept ( port fd sockaddr -- )
-  swapd over addr>> parse-sockaddr >>client-addr (>>client) ;
+    swapd over addr>> parse-sockaddr >>client-addr (>>client) ;
 
 M: accept-task do-io-task
     io-task-port dup accept-sockaddr
