@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: generic kernel io.backend namespaces continuations
 sequences arrays io.encodings io.nonblocking io.streams.duplex
-accessors ;
+accessors destructors ;
 IN: io.sockets
 
 TUPLE: local path ;
@@ -22,11 +22,21 @@ TUPLE: inet host port ;
 
 C: <inet> inet
 
-HOOK: ((client)) io-backend ( addrspec -- client-in client-out )
+GENERIC: wait-to-connect ( client-out handle -- )
+
+GENERIC: ((client)) ( addrspec -- handle )
 
 GENERIC: (client) ( addrspec -- client-in client-out )
-M: array (client) [ ((client)) 2array ] attempt-all first2 ;
-M: object (client) ((client)) ;
+
+M: array (client) [ (client) 2array ] attempt-all first2 ;
+
+M: object (client)
+    [
+        ((client))
+        dup <ports>
+        2dup [ add-error-destructor ] bi@
+        dup dup handle>> wait-to-connect
+    ] with-destructors ;
 
 : <client> ( addrspec encoding -- stream )
     >r (client) r> <encoder-duplex> ;
@@ -42,7 +52,7 @@ HOOK: (server) io-backend ( addrspec -- handle )
 HOOK: (accept) io-backend ( server -- addrspec handle )
 
 : accept ( server -- client addrspec )
-    [ (accept) dup <reader&writer> ] [ encoding>> ] bi
+    [ (accept) dup <ports> ] [ encoding>> ] bi
     <encoder-duplex> swap ;
 
 HOOK: <datagram> io-backend ( addrspec -- datagram )
@@ -55,8 +65,8 @@ HOOK: resolve-host io-backend ( host serv passive? -- seq )
 
 HOOK: host-name io-backend ( -- string )
 
+: resolve-client-addr ( inet -- seq )
+    [ host>> ] [ port>> ] bi f resolve-host ;
+
 M: inet (client)
-    [ host>> ] [ port>> ] bi f resolve-host
-    [ empty? [ "Host name lookup failed" throw ] when ]
-    [ (client) ]
-    bi ;
+    resolve-client-addr (client) ;

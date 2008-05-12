@@ -46,5 +46,5 @@ M: wince (init-stdio) ( -- )
             1 _getstdfilex _fileno
             2 _getstdfilex _fileno
         ] if [ f <win32-file> ] 3apply
-        rot <reader> -rot [ <writer> ] bi@
+        [ <input-port> ] [ <output-port> ] [ <output-port> ] tri*
     ] with-variable ;

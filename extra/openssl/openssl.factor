@@ -19,11 +19,14 @@ M: SSLv23 ssl-method drop SSLv23_method ;
 M: SSLv3  ssl-method drop SSLv3_method ;
 M: TLSv1  ssl-method drop TLSv1_method ;
 
-: (ssl-error) ( num -- * )
-    ERR_get_error ERR_clear_error f ERR_error_string throw ;
+: (ssl-error-string) ( n -- string )
+    ERR_clear_error f ERR_error_string ;
+
+: ssl-error-string ( -- string )
+    ERR_get_error ERR_clear_error f ERR_error_string ;
 
 : ssl-error ( obj -- )
-    { f 0 } member? [ (ssl-error) ] when ;
+    { f 0 } member? [ ssl-error-string throw ] when ;
 
 : init-ssl ( -- )
     SSL_library_init ssl-error
@@ -114,14 +117,19 @@ M: openssl-context dispose
     dup handle>> [ SSL_CTX_free ] when* f >>handle
     drop ;
 
-TUPLE: ssl file handle ;
+TUPLE: ssl-handle file handle ;
 
-: <ssl> ( file -- ssl )
-    ssl-context get handle>> SSL_new dup ssl-error ssl boa ;
+: <ssl-handle> ( fd -- ssl )
+    ssl-context get handle>> SSL_new dup ssl-error ssl-handle boa ;
 
-M: ssl init-handle drop ;
+: <ssl-socket> ( fd -- ssl )
+    [ BIO_NOCLOSE BIO_new_socket dup ssl-error ] keep
+    <ssl-handle>
+    [ handle>> swap dup SSL_set_bio ] keep ;
 
-M: ssl close-handle
+M: ssl-handle init-handle drop ;
+
+M: ssl-handle close-handle
     [ file>> close-handle ] [ handle>> SSL_free ] bi ;
 
 ERROR: certificate-verify-error result ;

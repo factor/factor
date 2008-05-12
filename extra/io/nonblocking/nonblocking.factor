@@ -3,7 +3,8 @@
 USING: math kernel io sequences io.buffers io.timeouts generic
 byte-vectors system io.encodings math.order io.backend
 continuations debugger classes byte-arrays namespaces splitting
-dlists assocs io.encodings.binary inspector accessors ;
+dlists assocs io.encodings.binary inspector accessors
+destructors ;
 IN: io.nonblocking
 
 SYMBOL: default-buffer-size
@@ -29,16 +30,19 @@ GENERIC: close-handle ( handle -- )
 
 TUPLE: input-port < port ;
 
-: <reader> ( handle -- input-port )
+: <input-port> ( handle -- input-port )
     input-port <buffered-port> ;
 
 TUPLE: output-port < port ;
 
-: <writer> ( handle -- output-port )
+: <output-port> ( handle -- output-port )
     output-port <buffered-port> ;
 
-: <reader&writer> ( read-handle write-handle -- input-port output-port )
-    swap <reader> [ swap <writer> ] [ ] [ dispose drop ] cleanup ;
+: <ports> ( read-handle write-handle -- input-port output-port )
+    [
+        [ <input-port> dup add-error-destructor ]
+        [ <output-port> dup add-error-destructor ] bi*
+    ] with-destructors ;
 
 : pending-error ( port -- )
     [ f ] change-error drop [ throw ] when* ;

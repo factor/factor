@@ -17,16 +17,16 @@ HOOK: (pipe) io-backend ( -- pipe )
     [
         >r (pipe)
         [ add-error-destructor ]
-        [ in>> <reader> ]
-        [ out>> <writer> ]
+        [ in>> <input-port> ]
+        [ out>> <output-port> ]
         tri
         r> <encoder-duplex>
     ] with-destructors ;
 
 <PRIVATE
 
-: ?reader [ <reader> dup add-always-destructor ] [ input-stream get ] if* ;
-: ?writer [ <writer> dup add-always-destructor ] [ output-stream get ] if* ;
+: ?reader [ <input-port> dup add-always-destructor ] [ input-stream get ] if* ;
+: ?writer [ <output-port> dup add-always-destructor ] [ output-stream get ] if* ;
 
 GENERIC: run-pipeline-element ( input-fd output-fd obj -- quot )
 

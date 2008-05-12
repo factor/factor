@@ -57,10 +57,10 @@ M: kqueue-mx unregister-io-task ( task mx -- )
     dup multiplexer-error ;
 
 :: kevent-read-task ( mx fd kevent -- )
-    mx fd mx reads>> at handle-io-task ;
+    mx fd mx reads>> at perform-io-task ;
 
 :: kevent-write-task ( mx fd kevent -- )
-    mx fd mx writes>> at handle-io-task ;
+    mx fd mx writes>> at perform-io-task ;
 
 :: kevent-proc-task ( mx pid kevent -- )
     pid wait-for-pid

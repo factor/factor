@@ -43,10 +43,10 @@ M: epoll-mx unregister-io-task ( task mx -- )
     r> epoll_wait dup multiplexer-error ;
 
 : epoll-read-task ( mx fd -- )
-    over mx-reads at* [ handle-io-task ] [ 2drop ] if ;
+    over mx-reads at* [ perform-io-task ] [ 2drop ] if ;
 
 : epoll-write-task ( mx fd -- )
-    over mx-writes at* [ handle-io-task ] [ 2drop ] if ;
+    over mx-writes at* [ perform-io-task ] [ 2drop ] if ;
 
 : handle-event ( mx kevent -- )
     epoll-event-fd 2dup epoll-read-task epoll-write-task ;

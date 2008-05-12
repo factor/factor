@@ -11,7 +11,11 @@ IN: io.unix.backend
 ! I/O tasks
 TUPLE: io-task port callbacks ;
 
-: io-task-fd port>> handle>> ;
+GENERIC: handle-fd ( handle -- fd )
+
+M: integer handle-fd ;
+
+: io-task-fd port>> handle>> handle-fd ;
 
 : <io-task> ( port continuation/f class -- task )
     new
@@ -84,9 +88,10 @@ M: integer init-handle ( fd -- )
 M: integer close-handle ( fd -- )
     close ;
 
+TUPLE: unix-io-error error port ;
+
 : report-error ( error port -- )
-    [ "Error on fd " % dup handle>> # ": " % swap % ] "" make
-    >>error drop ;
+    tuck unix-io-error boa >>error drop ;
 
 : ignorable-error? ( n -- ? )
     [ EAGAIN number= ] [ EINTR number= ] bi or ;
@@ -100,7 +105,7 @@ M: integer close-handle ( fd -- )
     dup rot unregister-io-task
     io-task-callbacks [ resume ] each ;
 
-: handle-io-task ( mx task -- )
+: perform-io-task ( mx task -- )
     dup do-io-task [ pop-callbacks ] [ 2drop ] if ;
 
 : handle-timeout ( port mx assoc -- )
@@ -127,25 +132,25 @@ M: unix cancel-io ( port -- )
     [ buffer>> buffer-end ]
     [ buffer>> buffer-capacity ] tri read ;
 
-: refill ( port -- ? )
+GENERIC: refill ( port handle -- ? )
+
+M: integer refill
     #! Return f if there is a recoverable error
+    drop
     dup buffer>> buffer-empty? [
-        dup (refill)  dup 0 >= [
+        dup (refill) dup 0 >= [
             swap buffer>> n>buffer t
         ] [
             drop defer-error
         ] if
-    ] [
-        drop t
-    ] if ;
+    ] [ drop t ] if ;
 
 TUPLE: read-task < input-task ;
 
-: <read-task> ( port continuation -- task )
-    read-task <io-task> ;
+: <read-task> ( port continuation -- task ) read-task <io-task> ;
 
 M: read-task do-io-task
-    io-task-port dup refill
+    port>> dup dup handle>> refill
     [ [ reader-eof ] [ drop ] if ] keep ;
 
 M: unix (wait-to-read)
@@ -153,7 +158,10 @@ M: unix (wait-to-read)
     pending-error ;
 
 ! Writers
-: write-step ( port -- ? )
+GENERIC: drain ( port handle -- ? )
+
+M: integer drain
+    drop
     dup
     [ handle>> ]
     [ buffer>> buffer@ ]
@@ -164,12 +172,11 @@ M: unix (wait-to-read)
 
 TUPLE: write-task < output-task ;
 
-: <write-task> ( port continuation -- task )
-    write-task <io-task> ;
+: <write-task> ( port continuation -- task ) write-task <io-task> ;
 
 M: write-task do-io-task
     io-task-port dup [ buffer>> buffer-empty? ] [ port-error ] bi or
-    [ 0 swap buffer>> buffer-reset t ] [ write-step ] if ;
+    [ 0 swap buffer>> buffer-reset t ] [ dup handle>> drain ] if ;
 
 : add-write-io-task ( port continuation -- )
     over handle>> mx get-global writes>> at*
@@ -186,9 +193,9 @@ M: unix io-multiplex ( ms/f -- )
     mx get-global wait-for-events ;
 
 M: unix (init-stdio) ( -- )
-    0 <reader>
-    1 <writer>
-    2 <writer> ;
+    0 <input-port>
+    1 <output-port>
+    2 <output-port> ;
 
 ! mx io-task for embedding an fd-based mx inside another mx
 TUPLE: mx-port < port mx ;

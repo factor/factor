@@ -11,7 +11,6 @@ IN: unix
 
 TYPEDEF: uint in_addr_t
 TYPEDEF: uint socklen_t
-TYPEDEF: ulong size_t
 
 : PROT_NONE   0 ; inline
 : PROT_READ   1 ; inline
