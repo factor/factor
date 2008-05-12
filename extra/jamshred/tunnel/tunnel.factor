@@ -126,10 +126,14 @@ C: <segment> segment
 : sideways-relative-location ( oint segment -- loc )
     [ [ location>> ] bi@ v- ] keep forward>> proj-perp ;
 
+: bounce-offset 0.1 ; inline
+
+: bounce-radius ( segment -- r )
+    radius>> bounce-offset - ; ! bounce before we hit so that we can't see through the wall (hack?)
+
 : collision-vector ( oint segment -- v )
     [ sideways-heading ] [ sideways-relative-location ]
-    [ radius>> 0.1 - ] ! bounce before we hit so that we can't see through the wall (hack?)
-    2tri
+    [ bounce-radius ] 2tri
     swap [ collision-coefficient ] dip forward>> n*v ;
 
 : distance-to-collision ( oint segment -- distance )

@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: jamshred.oint jamshred.tunnel kernel sequences tools.test ;
+USING: arrays jamshred.oint jamshred.tunnel kernel math.vectors sequences tools.test ;
 IN: jamshred.tunnel.tests
 
 [ 0 ] [ T{ segment f { 0 0 0 } f f f 0 }
@@ -41,4 +41,5 @@ IN: jamshred.tunnel.tests
 
 [ { 0 1 0 } ] [ simple-collision-up sideways-heading ] unit-test
 [ { 0 0 0 } ] [ simple-collision-up sideways-relative-location ] unit-test
-[ { 0 1 0 } ] [ simple-collision-up collision-vector ] unit-test
+[ { 0 1 0 } ]
+[ simple-collision-up collision-vector 0 bounce-offset 0 3array v+ ] unit-test
