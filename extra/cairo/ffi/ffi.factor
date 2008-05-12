@@ -7,7 +7,7 @@
 USING: system combinators alien alien.syntax kernel 
 alien.c-types accessors sequences arrays ui.gadgets ;
 
-IN: cairo
+IN: cairo.ffi
 << "cairo" {
     { [ os winnt? ] [ "libcairo-2.dll" ] }
     { [ os macosx? ] [ "libcairo.dylib" ] }
@@ -340,24 +340,6 @@ C-STRUCT: cairo_rectangle_t
     { "double" "y" }
     { "double" "width" }
     { "double" "height" } ;
-
-: <cairo-rect> ( x y width height -- cairo_rectangle_t )
-    "cairo_rectangle_t" <c-object> dup
-    { 
-        [ set-cairo_rectangle_t-height ] [ set-cairo_rectangle_t-width ]
-        [ set-cairo_rectangle_t-y ] [ set-cairo_rectangle_t-x ]
-    } cleave ;
-    
-: rect>cairo ( rect -- cairo_rectangle_t )
-    [ loc>> ] [ dim>> ] bi [ [ first ] [ second ] bi ] bi@
-    <cairo-rect> ;
-
-: cairo>rect ( cairo_rectangle_t -- rect )
-    {
-        [ cairo_rectangle_t-x ] [ cairo_rectangle_t-y ]
-        [ cairo_rectangle_t-width ] [ cairo_rectangle_t-height ]
-    } cleave
-    [ 2array ] 2bi@ <rect> ;
     
 C-STRUCT: cairo_rectangle_list_t
     { "cairo_status_t"     "status" }
