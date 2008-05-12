@@ -71,7 +71,7 @@ PRIVATE>
               [ [ , ] [ ] make ] if ;
                 
 : lisp-string>factor ( str -- quot )
-  lisp-expr parse-result-ast convert-form ;
+  lisp-expr parse-result-ast convert-form lambda-rewrite call ;
   
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
