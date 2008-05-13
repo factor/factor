@@ -97,10 +97,10 @@ M: unix copy-file ( from to -- )
     \ file-info boa ;
 
 M: unix file-info ( path -- info )
-    normalize-path stat* stat>file-info ;
+    normalize-path file-status stat>file-info ;
 
 M: unix link-info ( path -- info )
-    normalize-path lstat* stat>file-info ;
+    normalize-path link-status stat>file-info ;
 
 M: unix make-link ( path1 path2 -- )
     normalize-path symlink io-error ;
