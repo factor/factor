@@ -4,7 +4,7 @@ USING: accessors byte-arrays kernel debugger sequences namespaces math
 math.order combinators init alien alien.c-types alien.strings libc
 continuations destructors
 openssl openssl.libcrypto openssl.libssl
-io.files io.nonblocking io.unix.backend io.unix.sockets
+io.files io.ports io.unix.backend io.unix.sockets
 io.encodings.ascii io.buffers io.sockets io.sockets.secure
 unix ;
 IN: io.unix.sockets.secure
@@ -16,64 +16,56 @@ IN: io.unix.sockets.secure
 
 M: ssl-handle handle-fd file>> ;
 
-: syscall-error ( port r -- )
+: syscall-error ( port r -- * )
     ERR_get_error dup zero? [
         drop
         {
-            { -1 [ err_no strerror ] }
-            { 0 [ "Premature EOF" ] }
+            { -1 [ (io-error) ] }
+            { 0 [ "Premature EOF" throw ] }
         } case
     ] [
-        nip (ssl-error-string)
-    ] if swap report-error ;
+        nip (ssl-error)
+    ] if ;
 
 : check-response ( port r -- port r n )
     over handle>> handle>> over SSL_get_error ; inline
 
 ! Input ports
-: report-ssl-error ( port r -- )
-    drop ssl-error-string swap report-error ;
-
-: check-read-response ( port r -- ? )
+: check-read-response ( port r -- event )
     check-response
     {
-        { SSL_ERROR_NONE [ swap buffer>> n>buffer t ] }
-        { SSL_ERROR_ZERO_RETURN [ drop reader-eof t ] }
-        { SSL_ERROR_WANT_READ [ 2drop f ] }
-        { SSL_ERROR_WANT_WRITE [ 2drop f ] } ! XXX
-        { SSL_ERROR_SYSCALL [ syscall-error t ] }
-        { SSL_ERROR_SSL [ report-ssl-error t ] }
+        { SSL_ERROR_NONE [ swap buffer>> n>buffer f ] }
+        { SSL_ERROR_ZERO_RETURN [ drop eof f ] }
+        { SSL_ERROR_WANT_READ [ 2drop +input+ ] }
+        { SSL_ERROR_WANT_WRITE [ 2drop +output+ ] }
+        { SSL_ERROR_SYSCALL [ syscall-error ] }
+        { SSL_ERROR_SSL [ (ssl-error) ] }
     } case ;
 
 M: ssl-handle refill
-    drop
-    dup buffer>> buffer-empty? [
-        dup
-        [ handle>> handle>> ] ! ssl
-        [ buffer>> buffer-end ] ! buf
-        [ buffer>> buffer-capacity ] tri ! len
-        SSL_read
-        check-read-response
-    ] [ drop t ] if ;
+    handle>> ! ssl
+    over buffer>>
+    [ buffer-end ] ! buf
+    [ buffer-capacity ] bi ! len
+    SSL_read
+    check-read-response ;
 
 ! Output ports
-: check-write-response ( port r -- ? )
+: check-write-response ( port r -- event )
     check-response
     {
         { SSL_ERROR_NONE [ swap buffer>> buffer-consume f ] }
-        ! { SSL_ERROR_ZERO_RETURN [ drop reader-eof ] } ! XXX
-        { SSL_ERROR_WANT_READ [ 2drop f ] } ! XXX
-        { SSL_ERROR_WANT_WRITE [ 2drop f ] }
-        { SSL_ERROR_SYSCALL [ syscall-error t ] }
-        { SSL_ERROR_SSL [ report-ssl-error t ] }
+        { SSL_ERROR_WANT_READ [ 2drop +input+ ] }
+        { SSL_ERROR_WANT_WRITE [ 2drop +output+ ] }
+        { SSL_ERROR_SYSCALL [ syscall-error ] }
+        { SSL_ERROR_SSL [ (ssl-error) ] }
     } case ;
 
 M: ssl-handle drain
-    drop
-    dup
-    [ handle>> handle>> ] ! ssl
-    [ buffer>> buffer@ ] ! buf
-    [ buffer>> buffer-length ] tri ! len
+    handle>> ! ssl
+    over buffer>>
+    [ buffer@ ] ! buf
+    [ buffer-length ] bi ! len
     SSL_write
     check-write-response ;
 
@@ -81,17 +73,20 @@ M: ssl-handle drain
 M: ssl ((client)) ( addrspec -- handle )
     [ addrspec>> ((client)) <ssl-socket> ] with-destructors ;
 
-: check-connect-response ( port r -- ? )
+: check-connect-response ( port r -- event )
     check-response
     {
-        { SSL_ERROR_NONE [ 2drop t ] }
-        { SSL_ERROR_WANT_READ [ 2drop f ] } ! XXX
-        { SSL_ERROR_WANT_WRITE [ 2drop f ] } ! XXX
-        { SSL_ERROR_SYSCALL [ syscall-error t ] }
-        { SSL_ERROR_SSL [ report-ssl-error t ] }
+        { SSL_ERROR_NONE [ 2drop f ] }
+        { SSL_ERROR_WANT_READ [ 2drop +input+ ] }
+        { SSL_ERROR_WANT_WRITE [ 2drop +output+ ] }
+        { SSL_ERROR_SYSCALL [ syscall-error ] }
+        { SSL_ERROR_SSL [ (ssl-error) ] }
     } case ;
 
-M: ssl-handle (wait-to-connect)
-    handle>> ! ssl
-    SSL_connect
-    check-connect-response ;
+: do-ssl-connect ( port ssl -- )
+    2dup SSL_connect check-connect-response dup
+    [ nip wait-for-port ] [ 3drop ] if ;
+
+M: ssl-handle wait-to-connect
+    [ file>> wait-to-connect ]
+    [ handle>> do-ssl-connect ] 2bi ;

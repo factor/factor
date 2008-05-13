@@ -1,9 +1,9 @@
 USING: io io.buffers io.backend help.markup help.syntax kernel
 byte-arrays sbufs words continuations byte-vectors classes ;
-IN: io.nonblocking
+IN: io.ports
 
-ARTICLE: "io.nonblocking" "Non-blocking I/O implementation"
-"On Windows and Unix, Factor implements blocking file and network streams on top of a non-blocking I/O substrate, ensuring that Factor threads will yield when performing I/O. This substrate is implemented in the " { $vocab-link "io.nonblocking" } " vocabulary."
+ARTICLE: "io.ports" "Non-blocking I/O implementation"
+"On Windows and Unix, Factor implements blocking file and network streams on top of a non-blocking I/O substrate, ensuring that Factor threads will yield when performing I/O. This substrate is implemented in the " { $vocab-link "io.ports" } " vocabulary."
 $nl
 "A " { $emphasis "port" } " is a stream using non-blocking I/O substrate:"
 { $subsection port }
@@ -29,7 +29,7 @@ $nl
 { $subsection server-port }
 { $subsection datagram-port } ;
 
-ABOUT: "io.nonblocking"
+ABOUT: "io.ports"
 
 HELP: port
 { $class-description "Instances of this class present a blocking stream interface on top of an underlying non-blocking I/O system, giving the illusion of blocking by yielding the thread which is waiting for input or output."
@@ -81,10 +81,6 @@ HELP: (wait-to-read)
 { $contract "Suspends the current thread until the port's buffer has data available for reading." } ;
 
 HELP: wait-to-read
-{ $values { "count" "a non-negative integer" } { "port" input-port } }
-{ $description "If the port's buffer has at least " { $snippet "count" } " unread bytes, returns immediately, otherwise suspends the current thread until some data is available for reading." } ;
-
-HELP: wait-to-read1
 { $values { "port" input-port } }
 { $description "If the port's buffer has unread data, returns immediately, otherwise suspends the current thread until some data is available for reading." } ;
 

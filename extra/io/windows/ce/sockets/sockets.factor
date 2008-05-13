@@ -1,5 +1,5 @@
 USING: alien alien.c-types combinators io io.backend io.buffers
-io.nonblocking io.sockets io.sockets.impl io.windows kernel libc
+io.ports io.sockets io.windows kernel libc
 math namespaces prettyprint qualified sequences strings threads
 threads.private windows windows.kernel32 io.windows.ce.backend
 byte-arrays system ;
@@ -41,7 +41,6 @@ M: wince (server) ( addrspec -- handle )
 
 M: wince (accept) ( server -- client )
     [
-        dup check-server-port
         [
             dup port-handle win32-file-handle
             swap server-port-addr sockaddr-type heap-size

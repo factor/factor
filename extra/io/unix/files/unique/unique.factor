@@ -1,4 +1,4 @@
-USING: kernel io.nonblocking io.unix.backend math.bitfields
+USING: kernel io.ports io.unix.backend math.bitfields
 unix io.files.unique.backend system ;
 IN: io.unix.files.unique
 

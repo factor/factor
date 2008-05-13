@@ -1,69 +1,85 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien generic assocs kernel kernel.private math
-io.nonblocking sequences strings structs sbufs threads unix
+io.ports sequences strings structs sbufs threads unix
 vectors io.buffers io.backend io.encodings math.parser
 continuations system libc qualified namespaces io.timeouts
-io.encodings.utf8 accessors ;
+io.encodings.utf8 accessors inspector combinators ;
 QUALIFIED: io
 IN: io.unix.backend
 
 ! I/O tasks
-TUPLE: io-task port callbacks ;
-
 GENERIC: handle-fd ( handle -- fd )
 
 M: integer handle-fd ;
 
-: io-task-fd port>> handle>> handle-fd ;
-
-: <io-task> ( port continuation/f class -- task )
-    new
-        swap [ 1vector ] [ V{ } clone ] if* >>callbacks
-        swap >>port ; inline
-
-TUPLE: input-task < io-task ;
-
-TUPLE: output-task < io-task ;
-
-GENERIC: do-io-task ( task -- ? )
-GENERIC: io-task-container ( mx task -- hashtable )
-
 ! I/O multiplexers
 TUPLE: mx fd reads writes ;
-
-M: input-task io-task-container drop reads>> ;
-
-M: output-task io-task-container drop writes>> ;
 
 : new-mx ( class -- obj )
     new
         H{ } clone >>reads
         H{ } clone >>writes ; inline
 
-GENERIC: register-io-task ( task mx -- )
-GENERIC: unregister-io-task ( task mx -- )
+GENERIC: add-input-callback ( thread fd mx -- )
+
+: add-callback ( thread fd assoc -- )
+    [ ?push ] change-at ;
+
+M: mx add-input-callback reads>> add-callback ;
+
+GENERIC: add-output-callback ( thread fd mx -- )
+
+M: mx add-output-callback writes>> add-callback ;
+
+GENERIC: remove-input-callbacks ( fd mx -- callbacks )
+
+M: mx remove-input-callbacks reads>> delete-at* drop ;
+
+GENERIC: remove-output-callbacks ( fd mx -- callbacks )
+
+M: mx remove-output-callbacks writes>> delete-at* drop ;
+
 GENERIC: wait-for-events ( ms mx -- )
 
-: fd/container ( task mx -- task fd container )
-    over io-task-container >r dup io-task-fd r> ; inline
+TUPLE: unix-io-error error port ;
 
-: check-io-task ( task mx -- )
-    fd/container key? nip [
-        "Cannot perform multiple reads from the same port" throw
-    ] when ;
+: report-error ( error port -- )
+    tuck unix-io-error boa >>error drop ;
 
-M: mx register-io-task ( task mx -- )
-    2dup check-io-task fd/container set-at ;
+: input-available ( fd mx -- )
+    remove-input-callbacks [ resume ] each ;
 
-: add-io-task ( task -- )
-    mx get-global register-io-task ;
+: output-available ( fd mx -- )
+    remove-output-callbacks [ resume ] each ;
 
-: with-port-continuation ( port quot -- port )
-    [ "I/O" suspend drop ] curry with-timeout ; inline
+TUPLE: io-timeout ;
 
-M: mx unregister-io-task ( task mx -- )
-    fd/container delete-at drop ;
+M: io-timeout summary drop "I/O operation timed out" ;
+
+M: unix cancel-io ( port -- )
+    io-timeout new over report-error
+    handle>> handle-fd mx get-global
+    [ input-available ] [ output-available ] 2bi ;
+
+SYMBOL: +retry+ ! just try the operation again without blocking
+SYMBOL: +input+
+SYMBOL: +output+
+
+: wait-for-port ( port event -- )
+    dup +retry+ eq? [ 2drop ] [
+        [
+            [
+                >r
+                swap handle>> handle-fd
+                mx get-global
+                r> {
+                    { +input+ [ add-input-callback ] }
+                    { +output+ [ add-output-callback ] }
+                } case
+            ] curry "I/O" suspend drop
+        ] curry with-timeout pending-error
+    ] if ;
 
 ! Some general stuff
 : file-mode OCT: 0666 ;
@@ -88,43 +104,8 @@ M: integer init-handle ( fd -- )
 M: integer close-handle ( fd -- )
     close ;
 
-TUPLE: unix-io-error error port ;
-
-: report-error ( error port -- )
-    tuck unix-io-error boa >>error drop ;
-
-: ignorable-error? ( n -- ? )
-    [ EAGAIN number= ] [ EINTR number= ] bi or ;
-
-: defer-error ( port -- ? )
-    #! Return t if it is an unrecoverable error.
-    err_no dup ignorable-error?
-    [ 2drop f ] [ strerror swap report-error t ] if ;
-
-: pop-callbacks ( mx task -- )
-    dup rot unregister-io-task
-    io-task-callbacks [ resume ] each ;
-
-: perform-io-task ( mx task -- )
-    dup do-io-task [ pop-callbacks ] [ 2drop ] if ;
-
-: handle-timeout ( port mx assoc -- )
-    >r swap port-handle r> delete-at* [
-        "I/O operation cancelled" over port>> report-error
-        pop-callbacks
-    ] [
-        2drop
-    ] if ;
-
-: cancel-io-tasks ( port mx -- )
-    [ dup reads>> handle-timeout ]
-    [ dup writes>> handle-timeout ] 2bi ;
-
-M: unix cancel-io ( port -- )
-    mx get-global cancel-io-tasks ;
-
 ! Readers
-: reader-eof ( reader -- )
+: eof ( reader -- )
     dup buffer>> buffer-empty? [ t >>eof ] when drop ;
 
 : (refill) ( port -- n )
@@ -132,62 +113,42 @@ M: unix cancel-io ( port -- )
     [ buffer>> buffer-end ]
     [ buffer>> buffer-capacity ] tri read ;
 
-GENERIC: refill ( port handle -- ? )
+! Returns an event to wait for which will ensure completion of
+! this request
+GENERIC: refill ( port handle -- event/f )
 
 M: integer refill
-    #! Return f if there is a recoverable error
-    drop
-    dup buffer>> buffer-empty? [
-        dup (refill) dup 0 >= [
-            swap buffer>> n>buffer t
-        ] [
-            drop defer-error
-        ] if
-    ] [ drop t ] if ;
+    over buffer>> [ buffer-end ] [ buffer-capacity ] bi read
+    {
+        { [ dup 0 = ] [ drop eof f ] }
+        { [ dup 0 > ] [ swap buffer>> n>buffer f ] }
+        { [ err_no EINTR = ] [ 2drop +retry+ ] }
+        { [ err_no EAGAIN = ] [ 2drop +input+ ] }
+        [ (io-error) ]
+    } cond ;
 
-TUPLE: read-task < input-task ;
-
-: <read-task> ( port continuation -- task ) read-task <io-task> ;
-
-M: read-task do-io-task
-    port>> dup dup handle>> refill
-    [ [ reader-eof ] [ drop ] if ] keep ;
-
-M: unix (wait-to-read)
-    [ <read-task> add-io-task ] with-port-continuation
-    pending-error ;
+M: unix (wait-to-read) ( port -- )
+    dup dup handle>> refill dup
+    [ dupd wait-for-port (wait-to-read) ] [ 2drop ] if ;
 
 ! Writers
-GENERIC: drain ( port handle -- ? )
+GENERIC: drain ( port handle -- event/f )
 
 M: integer drain
-    drop
-    dup
-    [ handle>> ]
-    [ buffer>> buffer@ ]
-    [ buffer>> buffer-length ] tri
-    write dup 0 >=
-    [ swap buffer>> buffer-consume f ]
-    [ drop defer-error ] if ;
+    over buffer>> [ buffer@ ] [ buffer-length ] bi write
+    {
+        { [ dup 0 >= ] [
+            over buffer>> buffer-consume
+            buffer>> buffer-empty? f +output+ ?
+        ] }
+        { [ err_no EINTR = ] [ 2drop +retry+ ] }
+        { [ err_no EAGAIN = ] [ 2drop +output+ ] }
+        [ (io-error) ]
+    } cond ;
 
-TUPLE: write-task < output-task ;
-
-: <write-task> ( port continuation -- task ) write-task <io-task> ;
-
-M: write-task do-io-task
-    io-task-port dup [ buffer>> buffer-empty? ] [ port-error ] bi or
-    [ 0 swap buffer>> buffer-reset t ] [ dup handle>> drain ] if ;
-
-: add-write-io-task ( port continuation -- )
-    over handle>> mx get-global writes>> at*
-    [ io-task-callbacks push drop ]
-    [ drop <write-task> add-io-task ] if ;
-
-: (wait-to-write) ( port -- )
-    [ add-write-io-task ] with-port-continuation drop ;
-
-M: unix flush-port ( port -- )
-    dup buffer>> buffer-empty? [ drop ] [ (wait-to-write) ] if ;
+M: unix (wait-to-write) ( port -- )
+    dup dup handle>> drain dup
+    [ dupd wait-for-port (wait-to-write) ] [ 2drop ] if ;
 
 M: unix io-multiplex ( ms/f -- )
     mx get-global wait-for-events ;
@@ -203,16 +164,10 @@ TUPLE: mx-port < port mx ;
 : <mx-port> ( mx -- port )
     dup fd>> mx-port <port> swap >>mx ;
 
-TUPLE: mx-task < io-task ;
-
-: <mx-task> ( port -- task )
-    f mx-task <io-task> ;
-
-M: mx-task do-io-task
-    port>> mx>> 0 swap wait-for-events f ;
-
 : multiplexer-error ( n -- )
-    0 < [ err_no ignorable-error? [ (io-error) ] unless ] when ;
+    0 < [
+        err_no [ EAGAIN = ] [ EINTR = ] bi or [ (io-error) ] unless
+    ] when ;
 
 : ?flag ( n mask symbol -- n )
     pick rot bitand 0 > [ , ] [ drop ] if ;

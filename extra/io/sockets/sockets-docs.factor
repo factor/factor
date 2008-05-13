@@ -64,7 +64,7 @@ HELP: local
 } ;
 
 HELP: inet
-{ $class-description "Host name/port number specifier for TCP/IP and UDP/IP connections. The " { $link inet-host } " and " { $link inet-port } " slots hold the host name and port name or number, respectively. New instances are created by calling " { $link <inet> } "." }
+{ $class-description "Host name/port number specifier for TCP/IP and UDP/IP connections. The " { $snippet "host" } " and " { $snippet "port" } " slots hold the host name and port name or number, respectively. New instances are created by calling " { $link <inet> } "." }
 { $notes
     "This address specifier is only supported by " { $link <client> } ", which calls " { $link resolve-host }  " to obtain a list of IP addresses associated with the host name, and attempts a connection to each one in turn until one succeeds. Other network words do not accept this address specifier, and " { $link resolve-host } " must be called directly; it is then up to the application to pick the correct address from the (possibly several) addresses associated to the host name."
 }
@@ -74,7 +74,7 @@ HELP: inet
 } ;
 
 HELP: inet4
-{ $class-description "IPv4 address/port number specifier for TCP/IP and UDP/IP connections. The " { $link inet4-host } " and " { $link inet4-port } " slots hold the IPv4 address and port number, respectively. New instances are created by calling " { $link <inet4> } "." }
+{ $class-description "IPv4 address/port number specifier for TCP/IP and UDP/IP connections. The " { $snippet "host" } " and " { $snippet "port" } " slots hold the IPv4 address and port number, respectively. New instances are created by calling " { $link <inet4> } "." }
 { $notes
 "New instances should not be created directly; instead, use " { $link resolve-host } " to look up the address associated to a host name. Also, try to support IPv6 where possible."
 }
@@ -83,7 +83,7 @@ HELP: inet4
 } ;
 
 HELP: inet6
-{ $class-description "IPv6 address/port number specifier for TCP/IP and UDP/IP connections. The " { $link inet6-host } " and " { $link inet6-port } " slots hold the IPv6 address and port number, respectively. New instances are created by calling " { $link <inet6> } "." }
+{ $class-description "IPv6 address/port number specifier for TCP/IP and UDP/IP connections. The " { $snippet "host" } " and " { $snippet "port" } " slots hold the IPv6 address and port number, respectively. New instances are created by calling " { $link <inet6> } "." }
 { $notes
 "New instances should not be created directly; instead, use " { $link resolve-host } " to look up the address associated to a host name." }
 { $examples
@@ -91,12 +91,18 @@ HELP: inet6
 } ;
 
 HELP: <client>
-{ $values { "addrspec" "an address specifier" } { "encoding" "an encding descriptor" } { "stream" "a bidirectional stream" } }
-{ $description "Opens a network connection and outputs a bidirectional stream using the given encoding." }
+{ $values { "remote" "an address specifier" } { "encoding" "an encding descriptor" } { "stream" "a bidirectional stream" } { "local" "an address specifier" } }
+{ $description "Opens a network connection and outputs a bidirectional stream using the given encoding, together with the local address the socket was bound to." }
 { $errors "Throws an error if the connection cannot be established." }
+{ $notes "The " { $link with-client } " word is easier to use in most situations." }
 { $examples
     { $code "\"www.apple.com\" \"http\" <inet> utf8 <client>" }
 } ;
+
+HELP: with-client
+{ $values { "remote" "an address specifier" } { "encoding" "an encding descriptor" } { "quot" quotation } }
+{ $description "Opens a network connection and calls the quotation in a new dynamic scope with " { $link input-stream } " and " { $link output-stream } " rebound to the network streams. The local address the socket is bound to is stored in the " { $link local-address } " variable." }
+{ $errors "Throws an error if the connection cannot be established." } ;
 
 HELP: <server>
 { $values  { "addrspec" "an address specifier" } { "encoding" "an encoding descriptor" } { "server" "a handle" } }
@@ -113,6 +119,13 @@ HELP: <server>
     "To start a server which listens for connections from the loopback interface only, use an address specifier returned by the following code, where 1234 is the desired port number:"
     { $code "\"localhost\" 1234 t resolve-host" }
     "Since " { $link resolve-host } " can return multiple address specifiers, your server code must listen on them all to work properly. The " { $vocab-link "io.server" } " vocabulary can be used to help with this."
+    $nl
+    "To start a TCP/IP server which listens for connections on a randomly-assigned port, set the port number in the address specifier to 0, and then read the " { $snippet "addr" } " slot of the server instance to obtain the actual port number it is listening on:"
+    { $unchecked-example
+        "f 0 <inet4> ascii <server>"
+        "[ addr>> . ] [ dispose ] bi"
+        "T{ inet4 f \"0.0.0.0\" 58901 }"
+    }
 }
 { $errors "Throws an error if the address is already in use, or if it if the system forbids access." } ;
 

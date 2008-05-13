@@ -3,7 +3,7 @@
 USING: kernel namespaces math system sequences debugger
 continuations arrays assocs combinators alien.c-types strings
 threads accessors
-io io.backend io.launcher io.nonblocking io.files
+io io.backend io.launcher io.ports io.files
 io.files.private io.unix.files io.unix.backend
 io.unix.launcher.parser
 unix unix.process ;

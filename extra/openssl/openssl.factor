@@ -5,7 +5,7 @@ math.order combinators init alien alien.c-types alien.strings libc
 continuations destructors debugger inspector
 locals unicode.case
 openssl.libcrypto openssl.libssl
-io.nonblocking io.files io.encodings.ascii io.sockets.secure ;
+io.ports io.files io.encodings.ascii io.sockets.secure ;
 IN: openssl
 
 ! This code is based on http://www.rtfm.com/openssl-examples/
@@ -25,8 +25,11 @@ M: TLSv1  ssl-method drop TLSv1_method ;
 : ssl-error-string ( -- string )
     ERR_get_error ERR_clear_error f ERR_error_string ;
 
+: (ssl-error) ( -- * )
+    ssl-error-string throw ;
+
 : ssl-error ( obj -- )
-    { f 0 } member? [ ssl-error-string throw ] when ;
+    { f 0 } member? [ (ssl-error) ] when ;
 
 : init-ssl ( -- )
     SSL_library_init ssl-error

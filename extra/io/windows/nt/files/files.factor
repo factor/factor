@@ -1,5 +1,5 @@
 USING: continuations destructors io.buffers io.files io.backend
-io.timeouts io.nonblocking io.windows io.windows.nt.backend
+io.timeouts io.ports io.windows io.windows.nt.backend
 kernel libc math threads windows windows.kernel32 system
 alien.c-types alien.arrays alien.strings sequences combinators
 combinators.lib sequences.lib ascii splitting alien strings

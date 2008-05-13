@@ -4,7 +4,7 @@ USING: alien.c-types kernel math math.bitfields namespaces
 locals accessors combinators threads vectors hashtables
 sequences assocs continuations sets
 unix unix.time unix.kqueue unix.process
-io.nonblocking io.unix.backend io.launcher io.unix.launcher
+io.ports io.unix.backend io.launcher io.unix.launcher
 io.monitors ;
 IN: io.unix.kqueue
 

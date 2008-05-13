@@ -12,17 +12,19 @@ SYMBOL: servers
 
 LOG: accepted-connection NOTICE
 
-: with-client ( client addrspec quot -- )
-    [
-        swap accepted-connection
-        with-stream*
-    ] 2curry with-disposal ; inline
+SYMBOL: remote-address
 
-\ with-client DEBUG add-error-logging
+: with-connection ( client addrspec quot -- )
+    [
+        >r [ remote-address set ] [ accepted-connection ] bi
+        r> call
+    ] 2curry with-stream ; inline
+
+\ with-connection DEBUG add-error-logging
 
 : accept-loop ( server quot -- )
     [
-        >r accept r> [ with-client ] 3curry "Client" spawn drop
+        >r accept r> [ with-connection ] 3curry "Client" spawn drop
     ] 2keep accept-loop ; inline
 
 : server-loop ( addrspec encoding quot -- )

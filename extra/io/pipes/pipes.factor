@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.encodings io.backend io.nonblocking io.streams.duplex
+USING: io.encodings io.backend io.ports io.streams.duplex
 io splitting sequences sequences.lib namespaces kernel
 destructors math concurrency.combinators accessors
 arrays continuations quotations ;

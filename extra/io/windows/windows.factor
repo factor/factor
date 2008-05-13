@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2008 Mackenzie Straight, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays destructors io io.backend
-io.buffers io.files io.nonblocking io.sockets io.binary
-io.sockets.impl windows.errors strings
+io.buffers io.files io.ports io.sockets io.binary
+io.sockets windows.errors strings
 kernel math namespaces sequences windows windows.kernel32
 windows.shell32 windows.types windows.winsock splitting
 continuations math.bitfields system accessors ;
