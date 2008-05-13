@@ -141,10 +141,10 @@ FUNCTION: ssize_t readlink ( char* path, char* buf, size_t bufsize ) ;
 : PATH_MAX 1024 ; inline
 
 : read-symbolic-link ( path -- path )
-  PATH_MAX <byte-array> dup >r
-  PATH_MAX
-  [ readlink ] unix-system-call
-  r> swap head-slice >string ;
+    PATH_MAX <byte-array> dup >r
+    PATH_MAX
+    [ readlink ] unix-system-call
+    r> swap head-slice >string ;
 
 FUNCTION: ssize_t recv ( int s, void* buf, size_t nbytes, int flags ) ;
 FUNCTION: ssize_t recvfrom ( int s, void* buf, size_t nbytes, int flags, sockaddr-in* from, socklen_t* fromlen ) ;
