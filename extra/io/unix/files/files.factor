@@ -17,8 +17,7 @@ M: unix cd ( path -- )
 
 : read-flags O_RDONLY ; inline
 
-: open-read ( path -- fd )
-    O_RDONLY file-mode open dup io-error ;
+: open-read ( path -- fd ) O_RDONLY file-mode open-file ;
 
 M: unix (file-reader) ( path -- stream )
     open-read <input-port> ;
