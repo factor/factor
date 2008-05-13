@@ -1,6 +1,6 @@
 
 USING: kernel system combinators alien.syntax alien.c-types
-       math io.unix.backend vocabs.loader ;
+       math io.unix.backend vocabs.loader unix ;
 
 IN: unix.stat
 
@@ -67,5 +67,5 @@ FUNCTION: int mkdir ( char* path, mode_t mode ) ;
 
 : link-status ( pathname -- stat )
     "stat" <c-object> dup >r
-    [ lstat ] unix-system-call
+    [ lstat ] unix-system-call drop
     r> ;
