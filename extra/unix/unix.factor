@@ -1,11 +1,11 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: alien alien.c-types alien.syntax kernel libc structs
+USING: alien alien.c-types alien.syntax kernel libc structs sequences
+       continuations
        math namespaces system combinators vocabs.loader qualified
-       unix.ffi unix.types unix.system-call ;
-
-QUALIFIED: unix.ffi
+       accessors inference macros fry arrays.lib 
+       unix.types ;
 
 IN: unix
 
@@ -45,9 +45,22 @@ C-STRUCT: passwd
     { "time_t" "pw_expire" }
     { "int"    "pw_fields" } ;
 
-! ! ! Unix functions
 LIBRARY: factor
+
 FUNCTION: void clear_err_no ( ) ;
+FUNCTION: int err_no ( ) ;
+
+ERROR: unix-system-call-error word args message ;
+
+DEFER: strerror
+
+MACRO: unix-system-call ( quot -- )
+    [ ] [ infer in>> ] [ first ] tri
+   '[
+        [ @ dup 0 < [ dup throw ] [ ] if ]
+        [ drop , narray , swap err_no strerror unix-system-call-error ]
+        recover
+    ] ;
 
 LIBRARY: libc
 
@@ -86,6 +99,7 @@ FUNCTION: int getgrnam_r ( char* name, group* grp, char* buffer, size_t bufsize,
 FUNCTION: int getpwnam_r ( char* login, passwd* pwd, char* buffer, size_t bufsize, passwd** result ) ;
 FUNCTION: int getgroups ( int gidsetlen, gid_t* gidset ) ;
 FUNCTION: int gethostname ( char* name, int len ) ;
+FUNCTION: int getsockname ( int socket, sockaddr* address, socklen_t* address_len ) ;
 FUNCTION: uid_t getuid ;
 FUNCTION: uint htonl ( uint n ) ;
 FUNCTION: ushort htons ( ushort n ) ;
@@ -99,9 +113,23 @@ FUNCTION: int munmap ( void* addr, size_t len ) ;
 FUNCTION: uint ntohl ( uint n ) ;
 FUNCTION: ushort ntohs ( ushort n ) ;
 
-: open ( path flags prot -- int ) [ unix.ffi:open ] unix-system-call ;
+FUNCTION: int open ( char* path, int flags, int prot ) ;
 
-: utime ( path buf -- ) [ unix.ffi:utime ] unix-system-call drop ;
+: open-file ( path flags mode -- fd ) [ open ] unix-system-call ;
+
+C-STRUCT: utimbuf
+    { "time_t" "actime"  }
+    { "time_t" "modtime" } ;
+
+FUNCTION: int utime ( char* path, utimebuf* buf ) ;
+
+: touch ( filename -- ) f [ utime ] unix-system-call drop ;
+
+: change-file-times ( filename access modification -- )
+    "utimebuf" <c-object>
+    tuck set-utimbuf-modtime
+    tuck set-utimbuf-actime
+    [ utime ] unix-system-call drop ;
 
 FUNCTION: int pclose ( void* file ) ;
 FUNCTION: int pipe ( int* filedes ) ;
@@ -123,6 +151,7 @@ FUNCTION: int setreuid ( uid_t ruid, uid_t euid ) ;
 FUNCTION: int setsockopt ( int s, int level, int optname, void* optval, socklen_t optlen ) ;
 FUNCTION: int setuid ( uid_t uid ) ;
 FUNCTION: int socket ( int domain, int type, int protocol ) ;
+FUNCTION: char* strerror ( int errno ) ;
 FUNCTION: int symlink ( char* path1, char* path2 ) ;
 FUNCTION: int system ( char* command ) ;
 FUNCTION: int unlink ( char* path ) ;

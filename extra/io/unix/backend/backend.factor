@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien generic assocs kernel kernel.private math
-io.nonblocking sequences strings structs sbufs threads unix.ffi unix
+io.nonblocking sequences strings structs sbufs threads unix
 vectors io.buffers io.backend io.encodings math.parser
 continuations system libc qualified namespaces io.timeouts
 io.encodings.utf8 accessors ;
