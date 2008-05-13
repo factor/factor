@@ -164,7 +164,11 @@ FUNCTION: int socket ( int domain, int type, int protocol ) ;
 FUNCTION: char* strerror ( int errno ) ;
 FUNCTION: int symlink ( char* path1, char* path2 ) ;
 FUNCTION: int system ( char* command ) ;
+
 FUNCTION: int unlink ( char* path ) ;
+
+: unlink-file ( path -- ) [ unlink ] unix-system-call ;
+
 FUNCTION: int utimes ( char* path, timeval[2] times ) ;
 
 : SIGKILL 9 ; inline
