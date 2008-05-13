@@ -21,7 +21,7 @@ M: unix cd ( path -- )
     O_RDONLY file-mode open dup io-error ;
 
 M: unix (file-reader) ( path -- stream )
-    open-read <reader> ;
+    open-read <input-port> ;
 
 : write-flags { O_WRONLY O_CREAT O_TRUNC } flags ; inline
 
@@ -29,7 +29,7 @@ M: unix (file-reader) ( path -- stream )
     write-flags file-mode open dup io-error ;
 
 M: unix (file-writer) ( path -- stream )
-    open-write <writer> ;
+    open-write <output-port> ;
 
 : append-flags { O_WRONLY O_APPEND O_CREAT } flags ; inline
 
@@ -38,7 +38,7 @@ M: unix (file-writer) ( path -- stream )
     [ dup 0 SEEK_END lseek io-error ] [ ] [ close ] cleanup ;
 
 M: unix (file-appender) ( path -- stream )
-    open-append <writer> ;
+    open-append <output-port> ;
 
 : touch-mode ( -- n )
     { O_WRONLY O_APPEND O_CREAT O_EXCL } flags ; foldable

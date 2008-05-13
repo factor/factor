@@ -52,7 +52,6 @@ IN: db.postgresql.ffi
 
 : InvalidOid 0 ; inline
 
-TYPEDEF: int size_t
 TYPEDEF: int ConnStatusType
 TYPEDEF: int ExecStatusType 
 TYPEDEF: int PostgresPollingStatusType

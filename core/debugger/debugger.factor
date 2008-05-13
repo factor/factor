@@ -298,6 +298,8 @@ M: immutable-slot summary drop "Slot is immutable" ;
 
 M: bad-create summary drop "Bad parameters to create" ;
 
+M: attempt-all-error summary drop "Nothing to attempt" ;
+
 <PRIVATE
 
 : init-debugger ( -- )

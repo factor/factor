@@ -85,7 +85,7 @@ M: winnt open-append
 : flush-output ( port -- )
     [ [ (flush-output) ] with-timeout ] with-destructors ;
 
-M: port port-flush
+M: winnt flush-port
     dup buffer>> buffer-empty? [ dup flush-output ] unless drop ;
 
 : finish-read ( overlapped port -- )
@@ -106,5 +106,5 @@ M: port port-flush
         finish-read
     ] [ 2drop ] if ;
 
-M: input-port (wait-to-read) ( port -- )
+M: winnt (wait-to-read) ( port -- )
     [ [ ((wait-to-read)) ] with-timeout ] with-destructors ;

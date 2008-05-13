@@ -123,13 +123,13 @@ C: <FileArgs> FileArgs
     FileArgs-lpOverlapped ;
 
 M: windows (file-reader) ( path -- stream )
-    open-read <win32-file> <reader> ;
+    open-read <win32-file> <input-port> ;
 
 M: windows (file-writer) ( path -- stream )
-    open-write <win32-file> <writer> ;
+    open-write <win32-file> <output-port> ;
 
 M: windows (file-appender) ( path -- stream )
-    open-append <win32-file> <writer> ;
+    open-append <win32-file> <output-port> ;
 
 M: windows move-file ( from to -- )
     [ normalize-path ] bi@ MoveFile win32-error=0/f ;
@@ -151,10 +151,12 @@ M: windows delete-directory ( path -- )
 
 HOOK: WSASocket-flags io-backend ( -- DWORD )
 
-TUPLE: win32-socket < win32-file ;
+TUPLE: win32-socket < win32-file overlapped ;
 
-: <win32-socket> ( handle -- win32-socket )
-    f win32-file boa ;
+: <win32-socket> ( handle overlapped -- win32-socket )
+    win32-socket new
+        swap >>overlapped
+        swap >>handle ;
 
 : open-socket ( family type -- socket )
     0 f 0 WSASocket-flags WSASocket dup socket-error ;
@@ -172,6 +174,18 @@ USE: windows.winsock
 : bind-socket ( socket sockaddr addrspec -- )
     [ server-sockaddr ] keep
     sockaddr-type heap-size bind socket-error ;
+
+TUPLE: socket-destructor alien ;
+
+C: <socket-destructor> socket-destructor
+
+HOOK: destruct-socket io-backend ( obj -- )
+
+M: socket-destructor dispose ( obj -- )
+    alien>> destruct-socket ;
+
+: close-socket-later ( handle -- )
+    <socket-destructor> <only-once> add-error-destructor ;
 
 : server-fd ( addrspec type -- fd )
     >r dup protocol-family r> open-socket

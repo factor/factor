@@ -3,7 +3,7 @@
 !
 ! these samples are a subset of the samples on
 ! http://cairographics.org/samples/
-USING: cairo cairo.lib locals math.constants math
+USING: cairo cairo.ffi locals math.constants math
 io.backend kernel alien.c-types libc namespaces ;
 
 IN: cairo.samples
@@ -138,3 +138,10 @@ IN: cairo.samples
     cr 0 128 cairo_move_to
     cr 256 0 cairo_rel_line_to
     cr cairo_stroke ;
+ 
+ USING: quotations cairo.gadgets ui.gadgets.panes sequences ;
+ : samples ( -- )
+    { arc clip clip-image dash gradient text utf8 }
+    [ 256 256 rot 1quotation <cached-cairo> gadget. ] each ;
+ 
+ MAIN: samples

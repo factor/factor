@@ -3,18 +3,10 @@
 USING: accessors arrays classes.singleton combinators
 continuations io io.encodings.binary io.encodings.ascii
 io.files io.sockets kernel io.streams.duplex math
-math.parser sequences splitting namespaces strings fry ;
+math.parser sequences splitting namespaces strings fry ftp ;
 IN: ftp.client
 
 TUPLE: ftp-client host port user password mode ;
-TUPLE: ftp-response n strings parsed ;
-
-SINGLETON: active
-SINGLETON: passive
-
-: <ftp-response> ( -- ftp-response )
-    ftp-response new
-        V{ } clone >>strings ;
 
 : <ftp-client> ( host -- ftp-client )
     ftp-client new
@@ -22,6 +14,12 @@ SINGLETON: passive
         21 >>port
         "anonymous" >>user
         "ftp@my.org" >>password ;
+
+TUPLE: ftp-response n strings parsed ;
+
+: <ftp-response> ( -- ftp-response )
+    ftp-response new
+        V{ } clone >>strings ;
 
 : add-response-line ( ftp-response string -- ftp-response )
     over strings>> push ;
@@ -44,11 +42,9 @@ SINGLETON: passive
     [ fourth CHAR: - = ] tri
     [ read-response-loop ] when ;
 
-: ftp-send ( string -- )
-    write "\r\n" write flush ;
-
 : ftp-command ( string -- ftp-response )
     ftp-send read-response ;
+
 
 : ftp-user ( ftp-client -- ftp-response )
     user>> "USER " prepend ftp-command ;

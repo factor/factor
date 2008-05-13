@@ -382,4 +382,6 @@ M: long-long-type box-return ( type -- )
     "double" define-primitive-type
 
     os winnt? cpu x86.64? and "longlong" "long" ? "ptrdiff_t" typedef
+
+    "ulong" "size_t" typedef
 ] with-compilation-unit

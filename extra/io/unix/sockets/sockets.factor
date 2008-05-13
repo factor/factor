@@ -3,24 +3,20 @@
 USING: alien alien.c-types alien.strings generic kernel math
 namespaces threads sequences byte-arrays io.nonblocking
 io.binary io.unix.backend io.streams.duplex io.sockets.impl
-io.backend io.files io.files.private io.encodings.utf8
-math.parser continuations libc combinators system accessors
-qualified unix ;
+io.backend io.nonblocking io.files io.files.private
+io.encodings.utf8 math.parser continuations libc combinators
+system accessors qualified destructors unix ;
 
 EXCLUDE: io => read write close ;
 EXCLUDE: io.sockets => accept ;
 
 IN: io.unix.sockets
 
-: pending-init-error ( port -- )
-    #! We close it here to avoid a resource leak; callers of
-    #! <client> don't set up error handlers until after <client>
-    #! returns (and if they did before, they wouldn't have
-    #! anything to close!)
-    dup port-error dup [ swap dispose throw ] [ 2drop ] if ;
-
 : socket-fd ( domain type -- socket )
-    0 socket dup io-error dup init-handle ;
+    0 socket
+    dup io-error
+    dup close-later
+    dup init-handle ;
 
 : sockopt ( fd level opt -- )
     1 <int> "int" heap-size setsockopt io-error ;
@@ -37,25 +33,24 @@ TUPLE: connect-task < output-task ;
 : <connect-task> ( port continuation -- task )
     connect-task <io-task> ;
 
+GENERIC: (wait-to-connect) ( port handle -- ? )
+
+M: integer (wait-to-connect)
+    f 0 write 0 < [ defer-error ] [ drop t ] if ;
+
 M: connect-task do-io-task
-    port>> dup handle>> f 0 write
-    0 < [ defer-error ] [ drop t ] if ;
+    port>> dup handle>> (wait-to-connect) ;
 
-: wait-to-connect ( port -- )
-    [ <connect-task> add-io-task ] with-port-continuation drop ;
+M: object wait-to-connect ( client-out fd -- )
+    drop
+    [ <connect-task> add-io-task ] with-port-continuation
+    pending-error ;
 
-M: unix ((client)) ( addrspec -- client-in client-out )
-    dup make-sockaddr/size >r >r
-    protocol-family SOCK_STREAM socket-fd
-    dup r> r> connect
-    zero? err_no EINPROGRESS = or [
-        dup init-client-socket
-        dup <reader&writer>
-        dup wait-to-connect
-        dup pending-init-error
-    ] [
-        dup close (io-error)
-    ] if ;
+M: object ((client)) ( addrspec -- fd )
+    [ protocol-family SOCK_STREAM socket-fd ] [ make-sockaddr/size ] bi
+    [ 2drop ] [ connect ] 3bi
+    zero? err_no EINPROGRESS = or
+    [ dup init-client-socket ] [ (io-error) ] if ;
 
 ! Server sockets - TCP and Unix domain
 : init-server-socket ( fd -- )
@@ -80,15 +75,17 @@ M: accept-task do-io-task
 : wait-to-accept ( server -- )
     [ <accept-task> add-io-task ] with-port-continuation drop ;
 
-: server-fd ( addrspec type -- fd )
-    >r dup protocol-family r>  socket-fd
+: server-socket-fd ( addrspec type -- fd )
+    >r dup protocol-family r> socket-fd
     dup init-server-socket
     dup rot make-sockaddr/size bind
     zero? [ dup close (io-error) ] unless ;
 
 M: unix (server) ( addrspec -- handle )
-    SOCK_STREAM server-fd
-    dup 10 listen zero? [ dup close (io-error) ] unless ;
+    [
+        SOCK_STREAM server-socket-fd
+        dup 10 listen io-error
+    ] with-destructors ;
 
 M: unix (accept) ( server -- addrspec handle )
     #! Wait for a client connection.
@@ -99,7 +96,9 @@ M: unix (accept) ( server -- addrspec handle )
 
 ! Datagram sockets - UDP and Unix domain
 M: unix <datagram>
-    [ SOCK_DGRAM server-fd ] keep <datagram-port> ;
+    [
+        [ SOCK_DGRAM server-socket-fd ] keep <datagram-port>
+    ] with-destructors ;
 
 SYMBOL: receive-buffer
 

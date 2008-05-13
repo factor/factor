@@ -45,12 +45,16 @@ TUPLE: ConnectEx-args port
     "stdcall" alien-indirect drop
     winsock-error-string [ throw ] when* ;
 
-: connect-continuation ( ConnectEx port -- )
-    >r ConnectEx-args-lpOverlapped* r>
+: connect-continuation ( overlapped port -- )
     2dup save-callback
     get-overlapped-result drop ;
 
-M: winnt ((client)) ( addrspec -- client-in client-out )
+M: win32-socket wait-to-connect ( client-out handle -- )
+    [ overlapped>> swap connect-continuation ]
+    [ drop pending-error ]
+    2bi ;
+
+M: object ((client)) ( addrspec -- handle )
     [
         \ ConnectEx-args new
         over make-sockaddr/size pick init-connect
@@ -60,8 +64,7 @@ M: winnt ((client)) ( addrspec -- client-in client-out )
         dup ConnectEx-args-s* INADDR_ANY roll bind-socket
         dup (ConnectEx)
 
-        dup ConnectEx-args-s* <win32-socket> dup <reader&writer>
-        >r [ connect-continuation ] keep [ pending-error ] keep r>
+        dup [ ConnectEx-args-s* ] [ ConnectEx-args-lpOverlapped* ] bi <win32-socket>
     ] with-destructors ;
 
 TUPLE: AcceptEx-args port
@@ -117,7 +120,7 @@ TUPLE: AcceptEx-args port
     [ extract-remote-host ] keep
     ! addrspec AcceptEx
     [ AcceptEx-args-sAcceptSocket* add-completion ] keep
-    AcceptEx-args-sAcceptSocket* <win32-socket> ;
+    [ AcceptEx-args-sAcceptSocket* ] [ AcceptEx-args-lpOverlapped* ] bi <win32-socket> ;
 
 M: winnt (accept) ( server -- addrspec handle )
     [
@@ -135,7 +138,7 @@ M: winnt (server) ( addrspec -- handle )
     [
         SOCK_STREAM server-fd dup listen-on-socket
         dup add-completion
-        <win32-socket>
+        f <win32-socket>
     ] with-destructors ;
 
 M: winnt <datagram> ( addrspec -- datagram )
@@ -143,7 +146,7 @@ M: winnt <datagram> ( addrspec -- datagram )
         [
             SOCK_DGRAM server-fd
             dup add-completion
-            <win32-socket>
+            f <win32-socket>
         ] keep <datagram-port>
     ] with-destructors ;
 

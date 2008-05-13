@@ -1,6 +1,13 @@
-USING: io.unix.backend io.unix.files io.unix.sockets
-io.unix.launcher io.unix.mmap io.unix.pipes io.timeouts
-io.backend combinators namespaces system vocabs.loader
-sequences words init ;
+USING: system words sequences vocabs.loader ;
+
+{
+    "io.unix.backend"
+    "io.unix.files"
+    "io.unix.sockets"
+    "io.unix.sockets.secure"
+    "io.unix.launcher"
+    "io.unix.mmap"
+    "io.unix.pipes"
+} [ require ] each
 
 "io.unix." os word-name append require

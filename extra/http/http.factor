@@ -17,6 +17,8 @@ IN: http
 
 : http-port 80 ; inline
 
+: https-port 443 ; inline
+
 : url-quotable? ( ch -- ? )
     #! In a URL, can this character be used without
     #! URL-encoding?

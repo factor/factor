@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: http.client checksums checksums.md5 splitting assocs
+USING: http.client checksums checksums.openssl splitting assocs
 kernel io.files bootstrap.image sequences io namespaces
 io.launcher math io.encodings.ascii ;
 IN: bootstrap.image.upload
@@ -19,7 +19,9 @@ SYMBOL: upload-images-destination
 : compute-checksums ( -- )
     checksums ascii [
         boot-image-names [
-            [ write bl ] [ md5 checksum-file hex-string print ] bi
+            [ write bl ]
+            [ openssl-md5 checksum-file hex-string print ]
+            bi
         ] each
     ] with-file-writer ;
 
