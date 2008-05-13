@@ -51,8 +51,7 @@ M: unix touch-file ( path -- )
 M: unix move-file ( from to -- )
     [ normalize-path ] bi@ rename io-error ;
 
-M: unix delete-file ( path -- )
-    normalize-path unlink io-error ;
+M: unix delete-file ( path -- ) normalize-path unlink-file ;
 
 M: unix make-directory ( path -- )
     normalize-path OCT: 777 mkdir io-error ;
