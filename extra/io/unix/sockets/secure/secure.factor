@@ -6,11 +6,13 @@ continuations destructors
 openssl openssl.libcrypto openssl.libssl
 io.files io.nonblocking io.unix.backend io.unix.sockets
 io.encodings.ascii io.buffers io.sockets io.sockets.secure
-unix.ffi ;
+unix ;
 IN: io.unix.sockets.secure
 
 ! todo: SSL_pending, rehandshake
 ! do we call write twice, wth 0 bytes at the end?
+! check-certificate at some point
+! test on windows
 
 M: ssl-handle handle-fd file>> ;
 

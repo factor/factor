@@ -175,6 +175,18 @@ USE: windows.winsock
     [ server-sockaddr ] keep
     sockaddr-type heap-size bind socket-error ;
 
+TUPLE: socket-destructor alien ;
+
+C: <socket-destructor> socket-destructor
+
+HOOK: destruct-socket io-backend ( obj -- )
+
+M: socket-destructor dispose ( obj -- )
+    alien>> destruct-socket ;
+
+: close-socket-later ( handle -- )
+    <socket-destructor> <only-once> add-error-destructor ;
+
 : server-fd ( addrspec type -- fd )
     >r dup protocol-family r> open-socket
         dup close-socket-later

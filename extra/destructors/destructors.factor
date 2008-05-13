@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors continuations io.backend io.nonblocking libc
+USING: accessors continuations io.backend libc
 kernel namespaces sequences system vectors ;
 IN: destructors
 
@@ -49,33 +49,3 @@ M: memory-destructor dispose ( obj -- )
 
 : free-later ( alien -- )
     <memory-destructor> <only-once> add-error-destructor ;
-
-! Handles
-TUPLE: handle-destructor alien ;
-
-C: <handle-destructor> handle-destructor
-
-M: handle-destructor dispose ( obj -- )
-    alien>> close-handle ;
-
-: close-always ( handle -- )
-    <handle-destructor> <only-once> add-always-destructor ;
-
-: close-later ( handle -- )
-    <handle-destructor> <only-once> add-error-destructor ;
-
-! Sockets
-TUPLE: socket-destructor alien ;
-
-C: <socket-destructor> socket-destructor
-
-HOOK: destruct-socket io-backend ( obj -- )
-
-M: socket-destructor dispose ( obj -- )
-    alien>> destruct-socket ;
-
-: close-socket-always ( handle -- )
-    <socket-destructor> <only-once> add-always-destructor ;
-
-: close-socket-later ( handle -- )
-    <socket-destructor> <only-once> add-error-destructor ;

@@ -20,6 +20,19 @@ GENERIC: init-handle ( handle -- )
 
 GENERIC: close-handle ( handle -- )
 
+TUPLE: handle-destructor handle ;
+
+C: <handle-destructor> handle-destructor
+
+M: handle-destructor dispose ( obj -- )
+    handle>> close-handle ;
+
+: close-always ( handle -- )
+    <handle-destructor> <only-once> add-always-destructor ;
+
+: close-later ( handle -- )
+    <handle-destructor> <only-once> add-error-destructor ;
+
 : <port> ( handle class -- port )
     new
         swap dup init-handle >>handle ; inline
