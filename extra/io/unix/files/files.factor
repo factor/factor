@@ -105,6 +105,4 @@ M: unix make-link ( path1 path2 -- )
     normalize-path symlink io-error ;
 
 M: unix read-link ( path -- path' )
-    normalize-path
-    PATH_MAX [ <byte-array> tuck ] [ ] bi readlink
-    dup io-error head-slice >string ;
+   normalize-path read-symbolic-link ;
