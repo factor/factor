@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays kernel debugger sequences namespaces math
 math.order combinators init alien alien.c-types alien.strings libc
-continuations destructors
+continuations destructors debugger inspector
 locals unicode.case
 openssl.libcrypto openssl.libssl
 io.nonblocking io.files io.encodings.ascii io.sockets.secure ;
@@ -117,10 +117,19 @@ M: openssl-context dispose
     dup handle>> [ SSL_CTX_free ] when* f >>handle
     drop ;
 
-TUPLE: ssl-handle file handle ;
+TUPLE: ssl-handle file handle disposed ;
+
+ERROR: no-ssl-context ;
+
+M: no-ssl-context summary
+    drop "SSL operations must be wrapped in calls to with-ssl-context" ;
+
+: current-ssl-context ( -- ctx )
+    ssl-context get [ no-ssl-context ] unless* ;
 
 : <ssl-handle> ( fd -- ssl )
-    ssl-context get handle>> SSL_new dup ssl-error ssl-handle boa ;
+    current-ssl-context handle>> SSL_new dup ssl-error
+    f ssl-handle boa ;
 
 : <ssl-socket> ( fd -- ssl )
     [ BIO_NOCLOSE BIO_new_socket dup ssl-error ] keep
@@ -130,7 +139,11 @@ TUPLE: ssl-handle file handle ;
 M: ssl-handle init-handle drop ;
 
 M: ssl-handle close-handle
-    [ file>> close-handle ] [ handle>> SSL_free ] bi ;
+    dup disposed>> [ drop ] [
+        [ t >>disposed drop ]
+        [ file>> close-handle ]
+        [ handle>> SSL_free ] tri
+    ] if ;
 
 ERROR: certificate-verify-error result ;
 

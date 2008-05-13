@@ -119,3 +119,5 @@ T{ dispose-dummy } "b" set
 [ t ] [ "b" get disposed?>> ] unit-test
 
 [ ] [ [ return ] with-return ] unit-test
+
+[ { } [ ] attempt-all ] [ attempt-all-error? ] must-fail-with

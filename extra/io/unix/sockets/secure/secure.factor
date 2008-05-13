@@ -12,7 +12,7 @@ IN: io.unix.sockets.secure
 ! todo: SSL_pending, rehandshake
 ! do we call write twice, wth 0 bytes at the end?
 
-M: ssl handle-fd file>> ;
+M: ssl-handle handle-fd file>> ;
 
 : syscall-error ( port r -- )
     ERR_get_error dup zero? [
@@ -90,6 +90,6 @@ M: ssl ((client)) ( addrspec -- handle )
     } case ;
 
 M: ssl-handle (wait-to-connect)
-    handle>> handle>> ! ssl
+    handle>> ! ssl
     SSL_connect
     check-connect-response ;

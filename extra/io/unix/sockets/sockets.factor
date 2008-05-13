@@ -41,7 +41,7 @@ M: integer (wait-to-connect)
 M: connect-task do-io-task
     port>> dup handle>> (wait-to-connect) ;
 
-M: integer wait-to-connect ( client-out fd -- )
+M: object wait-to-connect ( client-out fd -- )
     drop
     [ <connect-task> add-io-task ] with-port-continuation
     pending-error ;
