@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: alien alien.c-types alien.syntax kernel libc structs sequences
-       continuations
+       continuations byte-arrays strings
        math namespaces system combinators vocabs.loader qualified
        accessors inference macros fry arrays.lib 
        unix.types ;
@@ -135,7 +135,17 @@ FUNCTION: int pclose ( void* file ) ;
 FUNCTION: int pipe ( int* filedes ) ;
 FUNCTION: void* popen ( char* command, char* type ) ;
 FUNCTION: ssize_t read ( int fd, void* buf, size_t nbytes ) ;
+
 FUNCTION: ssize_t readlink ( char* path, char* buf, size_t bufsize ) ;
+
+: PATH_MAX 1024 ; inline
+
+: read-symbolic-link ( path -- path )
+  PATH_MAX <byte-array> dup >r
+  PATH_MAX
+  [ readlink ] unix-system-call
+  r> swap head-slice >string ;
+
 FUNCTION: ssize_t recv ( int s, void* buf, size_t nbytes, int flags ) ;
 FUNCTION: ssize_t recvfrom ( int s, void* buf, size_t nbytes, int flags, sockaddr-in* from, socklen_t* fromlen ) ;
 FUNCTION: int rename ( char* from, char* to ) ;
@@ -161,8 +171,6 @@ FUNCTION: int utimes ( char* path, timeval[2] times ) ;
 : SIGTERM 15 ; inline
 
 FUNCTION: int kill ( pid_t pid, int sig ) ;
-
-: PATH_MAX 1024 ; inline
 
 : PRIO_PROCESS 0 ; inline
 : PRIO_PGRP 1 ; inline
