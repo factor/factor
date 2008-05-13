@@ -32,7 +32,7 @@ M: win32-socket wince-write ( port port-handle -- )
     windows.winsock:winsock-error!=0/f ;
 
 M: wince (client) ( addrspec -- reader writer )
-    do-connect <win32-socket> dup <reader&writer> ;
+    do-connect <win32-socket> dup <ports> ;
 
 M: wince (server) ( addrspec -- handle )
     windows.winsock:SOCK_STREAM server-fd
@@ -52,7 +52,7 @@ M: wince (accept) ( server -- client )
                 [ windows.winsock:winsock-error ] when
             ] keep
         ] keep server-port-addr parse-sockaddr swap
-        <win32-socket> <reader&writer>
+        <win32-socket> <ports>
     ] with-timeout ;
 
 M: wince <datagram> ( addrspec -- datagram )

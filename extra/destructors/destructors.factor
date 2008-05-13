@@ -1,30 +1,17 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: continuations io.backend io.nonblocking libc kernel
-namespaces sequences system vectors ;
+USING: accessors continuations io.backend io.nonblocking libc
+kernel namespaces sequences system vectors ;
 IN: destructors
 
 SYMBOL: error-destructors
 SYMBOL: always-destructors
 
-TUPLE: destructor object destroyed? ;
-
-M: destructor dispose
-    dup destructor-destroyed? [
-        drop
-    ] [
-        dup destructor-object dispose 
-        t swap set-destructor-destroyed?
-    ] if ;
-
-: <destructor> ( obj -- newobj )
-    f destructor boa ;
-
 : add-error-destructor ( obj -- )
-    <destructor> error-destructors get push ;
+    error-destructors get push ;
 
 : add-always-destructor ( obj -- )
-    <destructor> always-destructors get push ;
+    always-destructors get push ;
 
 : do-always-destructors ( -- )
     always-destructors get <reversed> dispose-each ;
@@ -40,19 +27,28 @@ M: destructor dispose
         [ do-error-destructors ] cleanup
     ] with-scope ; inline
 
+TUPLE: only-once object destroyed ;
+
+M: only-once dispose
+    dup destroyed>> [ drop ] [
+        [ object>> dispose ] [ t >>destroyed drop ] bi
+    ] if ;
+
+: <only-once> f only-once boa ;
+
 ! Memory allocations
 TUPLE: memory-destructor alien ;
 
 C: <memory-destructor> memory-destructor
 
 M: memory-destructor dispose ( obj -- )
-    memory-destructor-alien free ;
+    alien>> free ;
 
 : free-always ( alien -- )
-    <memory-destructor> add-always-destructor ;
+    <memory-destructor> <only-once> add-always-destructor ;
 
 : free-later ( alien -- )
-    <memory-destructor> add-error-destructor ;
+    <memory-destructor> <only-once> add-error-destructor ;
 
 ! Handles
 TUPLE: handle-destructor alien ;
@@ -60,13 +56,13 @@ TUPLE: handle-destructor alien ;
 C: <handle-destructor> handle-destructor
 
 M: handle-destructor dispose ( obj -- )
-    handle-destructor-alien close-handle ;
+    alien>> close-handle ;
 
 : close-always ( handle -- )
-    <handle-destructor> add-always-destructor ;
+    <handle-destructor> <only-once> add-always-destructor ;
 
 : close-later ( handle -- )
-    <handle-destructor> add-error-destructor ;
+    <handle-destructor> <only-once> add-error-destructor ;
 
 ! Sockets
 TUPLE: socket-destructor alien ;
@@ -76,10 +72,10 @@ C: <socket-destructor> socket-destructor
 HOOK: destruct-socket io-backend ( obj -- )
 
 M: socket-destructor dispose ( obj -- )
-    socket-destructor-alien destruct-socket ;
+    alien>> destruct-socket ;
 
 : close-socket-always ( handle -- )
-    <socket-destructor> add-always-destructor ;
+    <socket-destructor> <only-once> add-always-destructor ;
 
 : close-socket-later ( handle -- )
-    <socket-destructor> add-error-destructor ;
+    <socket-destructor> <only-once> add-error-destructor ;

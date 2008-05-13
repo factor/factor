@@ -3,6 +3,9 @@ USING: tools.test io.files io.files.private io threads kernel
 continuations io.encodings.ascii io.files.unique sequences
 strings accessors io.encodings.utf8 math ;
 
+\ exists? must-infer
+\ (exists?) must-infer
+
 [ ] [ "blahblah" temp-file dup exists? [ delete-directory ] [ drop ] if ] unit-test
 [ ] [ "blahblah" temp-file make-directory ] unit-test
 [ t ] [ "blahblah" temp-file directory? ] unit-test

@@ -165,7 +165,7 @@ M: object run-pipeline-element
                 run-detached
             ]
             [ out>> close-handle ]
-            [ in>> <reader> ]
+            [ in>> <input-port> ]
         } cleave r> <decoder>
     ] with-destructors ;
 
@@ -182,7 +182,7 @@ M: object run-pipeline-element
                 run-detached
             ]
             [ in>> close-handle ]
-            [ out>> <writer> ]
+            [ out>> <output-port> ]
         } cleave r> <encoder>
     ] with-destructors ;
 
@@ -200,7 +200,7 @@ M: object run-pipeline-element
                 run-detached
             ]
             [ [ in>> close-handle ] [ out>> close-handle ] bi* ]
-            [ [ in>> <reader> ] [ out>> <writer> ] bi* ]
+            [ [ in>> <input-port> ] [ out>> <output-port> ] bi* ]
         } 2cleave r> <encoder-duplex>
     ] with-destructors ;
 

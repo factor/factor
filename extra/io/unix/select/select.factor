@@ -21,12 +21,12 @@ TUPLE: select-mx < mx read-fdset write-fdset ;
 : clear-nth ( n seq -- ? )
     [ nth ] [ f -rot set-nth ] 2bi ;
 
-: handle-fd ( fd task fdset mx -- )
+: check-fd ( fd task fdset mx -- )
     roll munge rot clear-nth
-    [ swap handle-io-task ] [ 2drop ] if ;
+    [ swap perform-io-task ] [ 2drop ] if ;
 
-: handle-fdset ( tasks fdset mx -- )
-    [ handle-fd ] 2curry assoc-each ;
+: check-fdset ( tasks fdset mx -- )
+    [ check-fd ] 2curry assoc-each ;
 
 : init-fdset ( tasks fdset -- )
     [ >r drop t swap munge r> set-nth ] curry assoc-each ;
@@ -52,5 +52,5 @@ TUPLE: select-mx < mx read-fdset write-fdset ;
 M: select-mx wait-for-events ( ms mx -- )
     swap >r dup init-fdsets r> dup [ make-timeval ] when
     select multiplexer-error
-    dup read-fdset/tasks pick handle-fdset
-    dup write-fdset/tasks rot handle-fdset ;
+    dup read-fdset/tasks pick check-fdset
+    dup write-fdset/tasks rot check-fdset ;

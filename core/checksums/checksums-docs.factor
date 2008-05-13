@@ -49,4 +49,7 @@ $nl
 { $vocab-subsection "MD5 checksum" "checksums.md5" }
 { $vocab-subsection "SHA1 checksum" "checksums.sha1" }
 { $vocab-subsection "SHA2 checksum" "checksums.sha2" }
-{ $vocab-subsection "Adler-32 checksum" "checksums.adler-32" } ;
+{ $vocab-subsection "Adler-32 checksum" "checksums.adler-32" }
+{ $vocab-subsection "OpenSSL checksums" "checksums.openssl" } ;
+
+ABOUT: "checksums"

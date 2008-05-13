@@ -139,10 +139,16 @@ SYMBOL: thread-error-hook
     over >r compose [ dip rethrow ] curry
     recover r> call ; inline
 
+ERROR: attempt-all-error ;
+
 : attempt-all ( seq quot -- obj )
-    [
-        [ [ , f ] compose [ , drop t ] recover ] curry all?
-    ] { } make peek swap [ rethrow ] when ; inline
+    over empty? [
+        attempt-all-error
+    ] [
+        [
+            [ [ , f ] compose [ , drop t ] recover ] curry all?
+        ] { } make peek swap [ rethrow ] when
+    ] if ; inline
 
 GENERIC: dispose ( object -- )
 

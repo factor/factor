@@ -4,10 +4,6 @@ USING: lisp lisp.parser tools.test sequences math kernel ;
 
 IN: lisp.test
 
-{ [ "aoeu" 2 1 T{ lisp-symbol f "foo" } ] } [
-  "(foo 1 2 \"aoeu\")" lisp-string>factor
-] unit-test
-
 init-env
 
 "+" [ first2 + ] lisp-define
