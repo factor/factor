@@ -23,11 +23,8 @@ $nl
 "Per-port native I/O protocol:"
 { $subsection init-handle }
 { $subsection (wait-to-read) }
-"Additionally, the I/O backend must provide an implementation of the " { $link stream-flush } " and " { $link dispose } " generic words."
-$nl
-"Dummy ports which should be used to implement networking:"
-{ $subsection server-port }
-{ $subsection datagram-port } ;
+{ $subsection (wait-to-write) }
+"Additionally, the I/O backend must provide an implementation of the " { $link dispose } " generic word." ;
 
 ABOUT: "io.ports"
 

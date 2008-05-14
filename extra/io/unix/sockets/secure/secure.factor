@@ -73,6 +73,8 @@ M: ssl-handle drain
 M: ssl ((client)) ( addrspec -- handle )
     [ addrspec>> ((client)) <ssl-socket> ] with-destructors ;
 
+M: ssl parse-sockaddr addrspec>> parse-sockaddr ;
+
 : check-connect-response ( port r -- event )
     check-response
     {
@@ -83,10 +85,13 @@ M: ssl ((client)) ( addrspec -- handle )
         { SSL_ERROR_SSL [ (ssl-error) ] }
     } case ;
 
-: do-ssl-connect ( port ssl -- )
+: do-ssl-connect ( port ssl addrspec -- )
+    drop
     2dup SSL_connect check-connect-response dup
     [ nip wait-for-port ] [ 3drop ] if ;
 
 M: ssl-handle (wait-to-connect)
-    [ file>> (wait-to-connect) ]
-    [ handle>> do-ssl-connect ] 2bi ;
+    addrspec>>
+    [ >r file>> r> (wait-to-connect) ]
+    [ >r handle>> r> do-ssl-connect ]
+    3bi ;
