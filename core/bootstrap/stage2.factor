@@ -23,7 +23,7 @@ SYMBOL: bootstrap-time
 
 : load-components ( -- )
     "include" "exclude"
-    [ get-global " " split [ empty? not ] filter ] bi@
+    [ get-global " " split harvest ] bi@
     diff
     [ "bootstrap." prepend require ] each ;
 

@@ -130,7 +130,7 @@ TUPLE: remote-file
 
 : parse-list ( ftp-response -- ftp-response )
     dup strings>>
-    [ " " split [ empty? not ] filter ] map
+    [ " " split harvest ] map
     dup length {
         { 9 [ parse-list-9 ] }
         { 8 [ parse-list-8 ] }

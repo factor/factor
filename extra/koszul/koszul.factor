@@ -148,7 +148,7 @@ DEFER: (d)
 : nth-basis-elt ( generators n -- elt )
     over length [
         3dup bit? [ nth ] [ 2drop f ] if
-    ] map [ ] filter 2nip ;
+    ] map sift 2nip ;
 
 : basis ( generators -- seq )
     natural-sort dup length 2^ [ nth-basis-elt ] with map ;

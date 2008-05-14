@@ -33,7 +33,7 @@ M: bunny-gadget graft* ( gadget -- )
     [ <bunny-fixed-pipeline> ]
     [ <bunny-cel-shaded> ]
     [ <bunny-outlined> ] tri 3array
-    [ ] filter >>draw-seq
+    sift >>draw-seq
     0 >>draw-n
     drop ;
 

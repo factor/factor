@@ -238,7 +238,7 @@ ARTICLE: "error-index" "Error index"
 { $index [ all-errors ] } ;
 
 ARTICLE: "type-index" "Type index"
-{ $index [ builtins get [ ] filter ] } ;
+{ $index [ builtins get sift ] } ;
 
 ARTICLE: "class-index" "Class index"
 { $index [ classes ] } ;

@@ -309,7 +309,7 @@ M: f section-end-group? drop f ;
             2dup 1+ swap ?nth next set
             swap nth dup split-before dup , split-after
         ] with each
-    ] { } make { t } split [ empty? not ] filter ;
+    ] { } make { t } split harvest ;
 
 : break-group? ( seq -- ? )
     [ first section-fits? ] [ peek section-fits? not ] bi and ;

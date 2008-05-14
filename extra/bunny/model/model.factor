@@ -6,7 +6,7 @@ float-arrays continuations namespaces sequences.lib accessors ;
 IN: bunny.model
 
 : numbers ( str -- seq )
-    " " split [ string>number ] map [ ] filter ;
+    " " split [ string>number ] map sift ;
 
 : (parse-model) ( vs is -- vs is )
     readln [
