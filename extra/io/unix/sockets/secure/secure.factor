@@ -87,6 +87,6 @@ M: ssl ((client)) ( addrspec -- handle )
     2dup SSL_connect check-connect-response dup
     [ nip wait-for-port ] [ 3drop ] if ;
 
-M: ssl-handle wait-to-connect
-    [ file>> wait-to-connect ]
+M: ssl-handle (wait-to-connect)
+    [ file>> (wait-to-connect) ]
     [ handle>> do-ssl-connect ] 2bi ;

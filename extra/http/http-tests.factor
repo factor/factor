@@ -174,6 +174,8 @@ test-db [
         main-responder set
 
         [ 1237 httpd ] "HTTPD test" spawn drop
+
+        yield
     ] with-scope
 ] unit-test
 

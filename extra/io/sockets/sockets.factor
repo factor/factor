@@ -195,9 +195,9 @@ GENERIC: (server) ( addrspec -- handle sockaddr )
         swap >>addr
         r> >>encoding ;
 
-HOOK: (accept) io-backend ( server -- handle sockaddr )
+HOOK: (accept) io-backend ( server -- handle remote )
 
-: accept ( server -- client addrspec )
+: accept ( server -- client remote )
     check-server-port
     [ (accept) ] keep
     tuck

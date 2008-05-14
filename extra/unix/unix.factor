@@ -100,6 +100,7 @@ FUNCTION: int getpwnam_r ( char* login, passwd* pwd, char* buffer, size_t bufsiz
 FUNCTION: int getgroups ( int gidsetlen, gid_t* gidset ) ;
 FUNCTION: int gethostname ( char* name, int len ) ;
 FUNCTION: int getsockname ( int socket, sockaddr* address, socklen_t* address_len ) ;
+FUNCTION: int getpeername ( int socket, sockaddr* address, socklen_t* address_len ) ;
 FUNCTION: uid_t getuid ;
 FUNCTION: uint htonl ( uint n ) ;
 FUNCTION: ushort htons ( ushort n ) ;

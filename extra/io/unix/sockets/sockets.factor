@@ -31,6 +31,9 @@ M: unix addrinfo-error ( n -- )
 : get-socket-name ( fd addrspec -- sockaddr )
     empty-sockaddr/size [ getsockname io-error ] 2keep drop ;
 
+: get-peer-name ( fd addrspec -- sockaddr )
+    empty-sockaddr/size [ getpeername io-error ] 2keep drop ;
+
 M: integer (wait-to-connect)
     >r >r +output+ wait-for-port r> r> get-socket-name ;
 
@@ -59,19 +62,19 @@ M: object (server) ( addrspec -- handle sockaddr )
         get-socket-name
     ] with-destructors ;
 
-: do-accept ( server -- fd sockaddr )
+: do-accept ( server -- fd remote )
     [ handle>> ] [ addr>> empty-sockaddr/size ] bi
     [ accept ] 2keep drop ; inline
 
-M: unix (accept) ( server -- fd sockaddr )
+M: unix (accept) ( server -- fd remote )
     dup do-accept
     {
         { [ over 0 >= ] [ rot drop ] }
-        { [ err_no EINTR = ] [ 2drop do-accept ] }
+        { [ err_no EINTR = ] [ 2drop (accept) ] }
         { [ err_no EAGAIN = ] [
             2drop
             [ +input+ wait-for-port ]
-            [ do-accept ] bi
+            [ (accept) ] bi
         ] }
         [ (io-error) ]
     } cond ;
