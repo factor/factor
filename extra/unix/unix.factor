@@ -69,7 +69,11 @@ FUNCTION: int bind ( int s, void* name, socklen_t namelen ) ;
 FUNCTION: int chdir ( char* path ) ;
 FUNCTION: int chown ( char* path, uid_t owner, gid_t group ) ;
 FUNCTION: int chroot ( char* path ) ;
-FUNCTION: void close ( int fd ) ;
+
+FUNCTION: int close ( int fd ) ;
+
+: close-file ( fd -- ) [ close ] unix-system-call drop ;
+
 FUNCTION: int connect ( int s, void* name, socklen_t namelen ) ;
 FUNCTION: int dup2 ( int oldd, int newd ) ;
 ! FUNCTION: int dup ( int oldd ) ;
