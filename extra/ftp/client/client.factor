@@ -27,7 +27,6 @@ IN: ftp.client
 : ftp-command ( string -- ftp-response )
     ftp-send read-response ;
 
-
 : ftp-user ( ftp-client -- ftp-response )
     user>> "USER " prepend ftp-command ;
 
@@ -56,21 +55,13 @@ IN: ftp.client
     strings>> first
     "|" split 2 tail* first string>number ;
 
-: ch>attribute ( ch -- symbol )
-    {
-        { CHAR: d [ +directory+ ] }
-        { CHAR: l [ +symbolic-link+ ] }
-        { CHAR: - [ +regular-file+ ] }
-        [ drop +unknown+ ]
-    } case ;
-
 TUPLE: remote-file
     type permissions links owner group size month day time year name ;
 
 : <remote-file> ( -- remote-file ) remote-file new ;
 
 : parse-permissions ( remote-file str -- remote-file )
-    [ first ch>attribute >>type ] [ rest >>permissions ] bi ;
+    [ first ch>type >>type ] [ rest >>permissions ] bi ;
 
 : parse-list-9 ( lines -- seq )
     [
