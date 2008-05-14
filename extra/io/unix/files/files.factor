@@ -32,7 +32,7 @@ M: unix (file-writer) ( path -- stream )
 
 : open-append ( path -- fd )
     append-flags file-mode open-file
-    [ dup 0 SEEK_END lseek io-error ] [ ] [ close ] cleanup ;
+    [ dup 0 SEEK_END lseek io-error ] [ ] [ close-file ] cleanup ;
 
 M: unix (file-appender) ( path -- stream )
     open-append <output-port> ;
@@ -43,7 +43,7 @@ M: unix (file-appender) ( path -- stream )
 M: unix touch-file ( path -- )
     normalize-path
     dup exists? [ touch ] [
-        touch-mode file-mode open-file close
+        touch-mode file-mode open-file close-file
     ] if ;
 
 M: unix move-file ( from to -- )

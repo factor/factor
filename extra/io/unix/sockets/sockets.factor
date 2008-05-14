@@ -79,7 +79,7 @@ M: accept-task do-io-task
     >r dup protocol-family r> socket-fd
     dup init-server-socket
     dup rot make-sockaddr/size bind
-    zero? [ dup close (io-error) ] unless ;
+    zero? [ dup close-file (io-error) ] unless ;
 
 M: unix (server) ( addrspec -- handle )
     [

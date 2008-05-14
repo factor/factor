@@ -31,7 +31,7 @@ USE: unix
     ] when* ;
 
 : redirect-fd ( oldfd fd -- )
-    2dup = [ 2drop ] [ dupd dup2 io-error close ] if ;
+    2dup = [ 2drop ] [ dupd dup2 io-error close-file ] if ;
 
 : reset-fd ( fd -- )
     #! We drop the error code because on *BSD, fcntl of

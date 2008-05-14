@@ -85,8 +85,7 @@ M: integer init-handle ( fd -- )
     [ F_SETFL O_NONBLOCK fcntl drop ]
     [ F_SETFD FD_CLOEXEC fcntl drop ] bi ;
 
-M: integer close-handle ( fd -- )
-    close ;
+M: integer close-handle ( fd -- ) close-file ;
 
 TUPLE: unix-io-error error port ;
 
