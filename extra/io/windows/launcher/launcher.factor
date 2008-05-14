@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays continuations io
-io.windows io.windows.nt.pipes libc io.nonblocking
+io.windows io.windows.nt.pipes libc io.ports
 windows.types math windows.kernel32
 namespaces io.launcher kernel sequences windows.errors
 splitting system threads init strings combinators

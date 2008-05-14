@@ -110,3 +110,5 @@ accessors kernel sequences io.encodings.utf8 ;
     ] times
     "append-test" temp-file utf8 file-contents
 ] unit-test
+
+[ ] [ "ls" utf8 <process-stream> contents drop ] unit-test

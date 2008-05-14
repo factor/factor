@@ -1,22 +1,25 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien io io.files kernel math system unix io.unix.backend
-io.mmap ;
+USING: alien io io.files kernel math math.bitfields system unix
+io.unix.backend io.ports io.mmap destructors locals accessors ;
 IN: io.unix.mmap
 
-: open-r/w ( path -- fd ) O_RDWR file-mode open dup io-error ;
+: open-r/w ( path -- fd ) O_RDWR file-mode open-file ;
 
-: mmap-open ( length prot flags path -- alien fd )
-    >r f -roll r> open-r/w [ 0 mmap ] keep
-    over MAP_FAILED = [ close (io-error) ] when ;
+:: mmap-open ( length prot flags path -- alien fd )
+    [
+        f length prot flags
+        path open-r/w dup close-later
+        [ 0 mmap dup MAP_FAILED = [ (io-error) ] when ] keep
+    ] with-destructors ;
 
-M: unix (mapped-file) ( path length -- obj )
+M: unix (mapped-file)
     swap >r
-    dup PROT_READ PROT_WRITE bitor MAP_FILE MAP_SHARED bitor
-    r> mmap-open f mapped-file boa ;
+    { PROT_READ PROT_WRITE } flags
+    { MAP_FILE MAP_SHARED } flags
+    r> mmap-open ;
 
 M: unix close-mapped-file ( mmap -- )
-    [ mapped-file-address ] keep
-    [ mapped-file-length munmap ] keep
-    mapped-file-handle close
-    io-error ;
+    [ [ address>> ] [ length>> ] bi munmap io-error ]
+    [ handle>> close-file ]
+    bi ;

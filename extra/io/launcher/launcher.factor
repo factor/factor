@@ -4,7 +4,7 @@ USING: system kernel namespaces strings hashtables sequences
 assocs combinators vocabs.loader init threads continuations
 math accessors concurrency.flags destructors
 io io.backend io.timeouts io.pipes io.pipes.private io.encodings
-io.streams.duplex io.nonblocking ;
+io.streams.duplex io.ports ;
 IN: io.launcher
 
 TUPLE: process < identity-tuple
@@ -199,7 +199,7 @@ M: object run-pipeline-element
                     [ swap in>> or ] change-stdin
                 run-detached
             ]
-            [ [ in>> close-handle ] [ out>> close-handle ] bi* ]
+            [ [ out>> close-handle ] [ in>> close-handle ] bi* ]
             [ [ in>> <input-port> ] [ out>> <output-port> ] bi* ]
         } 2cleave r> <encoder-duplex>
     ] with-destructors ;

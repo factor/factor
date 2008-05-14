@@ -6,6 +6,7 @@ IN: http.server.tests
 
 [
     <request>
+    http >>protocol
     "www.apple.com" >>host
     "/xxx/bar" >>path
     { { "a" "b" } } >>query

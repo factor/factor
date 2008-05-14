@@ -445,6 +445,12 @@ PRIVATE>
 : remove ( obj seq -- newseq )
     [ = not ] with filter ;
 
+: sift ( seq -- newseq )
+    [ ] filter ;
+
+: harvest ( seq -- newseq )
+    [ empty? not ] filter ;
+
 : cache-nth ( i seq quot -- elt )
     2over ?nth dup [
         >r 3drop r>

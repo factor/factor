@@ -77,12 +77,12 @@ IN: html.parser.analyzer
 : find-by-attribute-key ( key vector -- vector )
     >r >lower r>
     [ tag-attributes at ] with filter
-    [ ] filter ;
+    sift ;
 
 : find-by-attribute-key-value ( value key vector -- vector )
     >r >lower r>
     [ tag-attributes at over = ] with filter nip
-    [ ] filter ;
+    sift ;
 
 : find-first-attribute-key-value ( value key vector -- i/f tag/f )
     >r >lower r>

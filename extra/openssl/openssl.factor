@@ -5,7 +5,7 @@ math.order combinators init alien alien.c-types alien.strings libc
 continuations destructors debugger inspector
 locals unicode.case
 openssl.libcrypto openssl.libssl
-io.nonblocking io.files io.encodings.ascii io.sockets.secure ;
+io.backend io.ports io.files io.encodings.ascii io.sockets.secure ;
 IN: openssl
 
 ! This code is based on http://www.rtfm.com/openssl-examples/
@@ -25,8 +25,11 @@ M: TLSv1  ssl-method drop TLSv1_method ;
 : ssl-error-string ( -- string )
     ERR_get_error ERR_clear_error f ERR_error_string ;
 
+: (ssl-error) ( -- * )
+    ssl-error-string throw ;
+
 : ssl-error ( obj -- )
-    { f 0 } member? [ ssl-error-string throw ] when ;
+    { f 0 } member? [ (ssl-error) ] when ;
 
 : init-ssl ( -- )
     SSL_library_init ssl-error
@@ -117,7 +120,7 @@ M: openssl-context dispose
     dup handle>> [ SSL_CTX_free ] when* f >>handle
     drop ;
 
-TUPLE: ssl-handle file handle disposed ;
+TUPLE: ssl-handle file handle connected disposed ;
 
 ERROR: no-ssl-context ;
 
@@ -129,20 +132,19 @@ M: no-ssl-context summary
 
 : <ssl-handle> ( fd -- ssl )
     current-ssl-context handle>> SSL_new dup ssl-error
-    f ssl-handle boa ;
+    f f ssl-handle boa ;
 
-: <ssl-socket> ( fd -- ssl )
-    [ BIO_NOCLOSE BIO_new_socket dup ssl-error ] keep
-    <ssl-handle>
-    [ handle>> swap dup SSL_set_bio ] keep ;
+M: ssl-handle init-handle file>> init-handle ;
 
-M: ssl-handle init-handle drop ;
+HOOK: ssl-shutdown io-backend ( handle -- )
 
 M: ssl-handle close-handle
     dup disposed>> [ drop ] [
-        [ t >>disposed drop ]
+        t >>disposed
+        [ ssl-shutdown ]
+        [ handle>> SSL_free ]
         [ file>> close-handle ]
-        [ handle>> SSL_free ] tri
+        tri
     ] if ;
 
 ERROR: certificate-verify-error result ;

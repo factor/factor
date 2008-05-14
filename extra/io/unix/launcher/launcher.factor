@@ -3,7 +3,7 @@
 USING: kernel namespaces math system sequences debugger
 continuations arrays assocs combinators alien.c-types strings
 threads accessors
-io io.backend io.launcher io.nonblocking io.files
+io io.backend io.launcher io.ports io.files
 io.files.private io.unix.files io.unix.backend
 io.unix.launcher.parser
 unix unix.process ;
@@ -31,7 +31,7 @@ USE: unix
     ] when* ;
 
 : redirect-fd ( oldfd fd -- )
-    2dup = [ 2drop ] [ dupd dup2 io-error close ] if ;
+    2dup = [ 2drop ] [ dupd dup2 io-error close-file ] if ;
 
 : reset-fd ( fd -- )
     #! We drop the error code because on *BSD, fcntl of
@@ -44,7 +44,7 @@ USE: unix
 
 : redirect-file ( obj mode fd -- )
     >r >r normalize-path r> file-mode
-    open dup io-error r> redirect-fd ;
+    open-file r> redirect-fd ;
 
 : redirect-file-append ( obj mode fd -- )
     >r drop path>> normalize-path open-append r> redirect-fd ;
@@ -58,7 +58,7 @@ USE: unix
         { [ pick string? ] [ redirect-file ] }
         { [ pick appender? ] [ redirect-file-append ] }
         { [ pick +closed+ eq? ] [ redirect-closed ] }
-        { [ pick integer? ] [ >r drop dup reset-fd r> redirect-fd ] }
+        { [ pick fd? ] [ >r drop fd>> dup reset-fd r> redirect-fd ] }
         [ >r >r underlying-handle r> r> redirect ]
     } cond ;
 

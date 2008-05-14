@@ -1,6 +1,6 @@
 USING: io io.pipes io.streams.string io.encodings.utf8
-io.streams.duplex io.encodings namespaces continuations
-tools.test kernel ;
+io.streams.duplex io.encodings io.timeouts namespaces
+continuations tools.test kernel calendar ;
 IN: io.pipes.tests
 
 [ "Hello" ] [
@@ -24,3 +24,10 @@ IN: io.pipes.tests
         [ input-stream [ utf8 <decoder> ] change readln ]
     } run-pipeline
 ] unit-test
+
+[
+    utf8 <pipe> [
+        5 seconds over set-timeout
+        stream-readln
+    ] with-disposal
+] must-fail

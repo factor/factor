@@ -160,11 +160,6 @@ bootstrapping? on
 "tuple-layout" "classes.tuple.private" create register-builtin
 
 ! Catch-all class for providing a default method.
-! "object" "kernel" create
-! [ f builtins get [ ] filter f union-class define-class ]
-! [ [ drop t ] "predicate" set-word-prop ]
-! bi
-
 "object" "kernel" create
 [ f f { } intersection-class define-class ]
 [ [ drop t ] "predicate" set-word-prop ]

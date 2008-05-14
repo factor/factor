@@ -1,5 +1,5 @@
 USING: alien alien.c-types alien.syntax arrays continuations
-destructors generic io.mmap io.nonblocking io.windows
+destructors generic io.mmap io.ports io.windows
 kernel libc math namespaces quotations sequences windows
 windows.advapi32 windows.kernel32 io.backend system ;
 IN: io.windows.mmap

@@ -42,7 +42,7 @@ C-STRUCT: struct-rtentry
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-USING: kernel alien.c-types io.sockets io.sockets.impl
+USING: kernel alien.c-types io.sockets
        unix unix.linux.sockios ;
 
 : route ( dst gateway genmask flags -- )

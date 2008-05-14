@@ -10,7 +10,7 @@ SYMBOL: interned
 
 : parse-script ( stream -- assoc )
     ! assoc is code point/range => name
-    lines [ "#" split1 drop ] map [ empty? not ] filter [
+    lines [ "#" split1 drop ] map harvest [
         ";" split1 [ [ blank? ] trim ] bi@
     ] H{ } map>assoc ;
 

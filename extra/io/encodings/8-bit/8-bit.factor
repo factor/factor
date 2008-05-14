@@ -37,8 +37,7 @@ IN: io.encodings.8-bit
     2dup swap length <= [ tail ] [ drop ] if ;
 
 : process-contents ( lines -- assoc )
-    [ "#" split1 drop ] map
-    [ empty? not ] filter
+    [ "#" split1 drop ] map harvest
     [ "\t" split 2 head [ 2 tail-if hex> ] map ] map ;
 
 : byte>ch ( assoc -- array )

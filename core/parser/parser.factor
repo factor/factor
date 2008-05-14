@@ -207,7 +207,7 @@ SYMBOL: in
 : add-use ( seq -- ) [ use+ ] each ;
 
 : set-use ( seq -- )
-    [ vocab-words ] map [ ] filter >vector use set ;
+    [ vocab-words ] V{ } map-as sift use set ;
 
 : check-vocab-string ( name -- name )
     dup string?
@@ -278,7 +278,7 @@ M: no-word-error summary
     dup forward-reference? [
         drop
         use get
-        [ at ] with map [ ] filter
+        [ at ] with map sift
         [ forward-reference? not ] find nip
     ] [
         nip

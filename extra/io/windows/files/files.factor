@@ -3,7 +3,7 @@
 USING: alien.c-types io.backend io.files io.windows kernel math
 windows windows.kernel32 windows.time calendar combinators
 math.functions sequences namespaces words symbols system
-combinators.lib io.nonblocking destructors math.bitfields.lib ;
+combinators.lib io.ports destructors math.bitfields.lib ;
 IN: io.windows.files
 
 SYMBOLS: +read-only+ +hidden+ +system+

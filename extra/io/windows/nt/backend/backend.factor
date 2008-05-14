@@ -1,5 +1,5 @@
 USING: alien alien.c-types arrays assocs combinators
-continuations destructors io io.backend io.nonblocking
+continuations destructors io io.backend io.ports
 io.windows libc kernel math namespaces sequences
 threads classes.tuple.lib windows windows.errors
 windows.kernel32 strings splitting io.files qualified ascii

@@ -1,5 +1,5 @@
 USING: kernel system io.files.unique.backend
-windows.kernel32 io.windows io.nonblocking windows ;
+windows.kernel32 io.windows io.ports windows ;
 IN: io.windows.files.unique
 
 M: windows (make-unique-file) ( path -- )

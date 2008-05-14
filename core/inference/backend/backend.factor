@@ -261,7 +261,7 @@ TUPLE: cannot-unify-specials ;
 
 : balanced? ( in out -- ? )
     [ dup [ length - ] [ 2drop f ] if ] 2map
-    [ ] filter all-equal? ;
+    sift all-equal? ;
 
 TUPLE: unbalanced-branches-error quots in out ;
 
@@ -281,7 +281,7 @@ TUPLE: unbalanced-branches-error quots in out ;
     2dup balanced? [
         over supremum -rot
         [ >r dupd r> unify-inputs ] 2map
-        [ ] filter unify-stacks
+        sift unify-stacks
         rot drop
     ] [
         unbalanced-branches-error

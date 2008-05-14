@@ -216,7 +216,7 @@ USE: continuations
   >r dup length swap r>
   [ = [ ] [ drop f ] if ] curry
   2map
-  [ ] filter ;
+  sift ;
 
 <PRIVATE
 : (attempt-each-integer) ( i n quot -- result )

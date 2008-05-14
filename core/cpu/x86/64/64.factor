@@ -184,7 +184,7 @@ stack-params "__stack_value" c-type set-c-type-reg-class >>
 : split-struct ( pairs -- seq )
     [
         [ 8 mod zero? [ t , ] when , ] assoc-each
-    ] { } make { t } split [ empty? not ] filter ;
+    ] { } make { t } split harvest ;
 
 : flatten-large-struct ( type -- )
     heap-size cell align
