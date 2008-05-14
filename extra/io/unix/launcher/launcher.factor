@@ -44,7 +44,7 @@ USE: unix
 
 : redirect-file ( obj mode fd -- )
     >r >r normalize-path r> file-mode
-    open dup io-error r> redirect-fd ;
+    open-file r> redirect-fd ;
 
 : redirect-file-append ( obj mode fd -- )
     >r drop path>> normalize-path open-append r> redirect-fd ;

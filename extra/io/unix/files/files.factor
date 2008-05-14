@@ -12,8 +12,7 @@ M: unix cwd ( -- path )
     MAXPATHLEN [ <byte-array> ] [ ] bi getcwd
     [ (io-error) ] unless* ;
 
-M: unix cd ( path -- )
-    chdir io-error ;
+M: unix cd ( path -- ) [ chdir ] unix-system-call drop ;
 
 : read-flags O_RDONLY ; inline
 
@@ -24,8 +23,7 @@ M: unix (file-reader) ( path -- stream )
 
 : write-flags { O_WRONLY O_CREAT O_TRUNC } flags ; inline
 
-: open-write ( path -- fd )
-    write-flags file-mode open dup io-error ;
+: open-write ( path -- fd ) write-flags file-mode open-file ;
 
 M: unix (file-writer) ( path -- stream )
     open-write <output-port> ;
@@ -33,7 +31,7 @@ M: unix (file-writer) ( path -- stream )
 : append-flags { O_WRONLY O_APPEND O_CREAT } flags ; inline
 
 : open-append ( path -- fd )
-    append-flags file-mode open dup io-error
+    append-flags file-mode open-file
     [ dup 0 SEEK_END lseek io-error ] [ ] [ close ] cleanup ;
 
 M: unix (file-appender) ( path -- stream )
@@ -45,7 +43,7 @@ M: unix (file-appender) ( path -- stream )
 M: unix touch-file ( path -- )
     normalize-path
     dup exists? [ touch ] [
-        touch-mode file-mode open close
+        touch-mode file-mode open-file close
     ] if ;
 
 M: unix move-file ( from to -- )
