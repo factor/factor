@@ -239,7 +239,7 @@ HOOK: (send) io-backend ( packet addrspec datagram -- )
 : parse-addrinfo-list ( addrinfo -- seq )
     [ addrinfo-next ] follow
     [ addrinfo>addrspec ] map
-    [ ] filter ;
+    sift ;
 
 : prepare-resolve-host ( host serv passive? -- host' serv' flags )
     #! If the port is a number, we resolve for 'http' then
