@@ -4,7 +4,7 @@
 USING: alien alien.c-types alien.syntax kernel libc structs sequences
        continuations byte-arrays strings
        math namespaces system combinators vocabs.loader qualified
-       accessors inference macros fry arrays.lib 
+       accessors inference macros locals shuffle arrays.lib 
        unix.types ;
 
 IN: unix
@@ -50,19 +50,26 @@ LIBRARY: factor
 FUNCTION: void clear_err_no ( ) ;
 FUNCTION: int err_no ( ) ;
 
-ERROR: unix-system-call-error word args message ;
-
-DEFER: strerror
-
-MACRO: unix-system-call ( quot -- )
-    [ ] [ infer in>> ] [ first ] tri
-   '[
-        [ @ dup 0 < [ dup throw ] [ ] if ]
-        [ drop , narray , swap err_no strerror unix-system-call-error ]
-        recover
-    ] ;
-
 LIBRARY: libc
+
+ERROR: unix-system-call-error args message word ;
+
+FUNCTION: char* strerror ( int errno ) ;
+
+MACRO:: unix-system-call ( quot -- )
+    [let | n [ quot infer in>> ]
+           word [ quot first ] |
+        [
+            n ndup quot call dup 0 < [
+                drop
+                n narray
+                err_no strerror
+                word unix-system-call-error
+            ] [
+                n nnip
+            ] if
+        ]
+    ] ;
 
 FUNCTION: int accept ( int s, void* sockaddr, socklen_t* socklen ) ;
 FUNCTION: int bind ( int s, void* name, socklen_t namelen ) ;
@@ -162,7 +169,6 @@ FUNCTION: int setreuid ( uid_t ruid, uid_t euid ) ;
 FUNCTION: int setsockopt ( int s, int level, int optname, void* optval, socklen_t optlen ) ;
 FUNCTION: int setuid ( uid_t uid ) ;
 FUNCTION: int socket ( int domain, int type, int protocol ) ;
-FUNCTION: char* strerror ( int errno ) ;
 FUNCTION: int symlink ( char* path1, char* path2 ) ;
 FUNCTION: int system ( char* command ) ;
 

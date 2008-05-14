@@ -1,37 +1,38 @@
 ! Copyright (C) 2007, 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations io.backend kernel quotations sequences
-system alien alien.accessors sequences.private ;
+system alien alien.accessors accessors sequences.private ;
 IN: io.mmap
 
-TUPLE: mapped-file length address handle closed? ;
+TUPLE: mapped-file address handle length closed ;
 
 : check-closed ( mapped-file -- mapped-file )
-    dup mapped-file-closed? [
+    dup closed>> [
         "Mapped file is closed" throw
     ] when ; inline
 
-M: mapped-file length check-closed mapped-file-length ;
+M: mapped-file length check-closed length>> ;
 
 M: mapped-file nth-unsafe
-    check-closed mapped-file-address swap alien-unsigned-1 ;
+    check-closed address>> swap alien-unsigned-1 ;
 
 M: mapped-file set-nth-unsafe
-    check-closed mapped-file-address swap set-alien-unsigned-1 ;
+    check-closed address>> swap set-alien-unsigned-1 ;
 
 INSTANCE: mapped-file sequence
 
-HOOK: (mapped-file) io-backend ( path length -- mmap )
+HOOK: (mapped-file) io-backend ( path length -- address handle )
 
 : <mapped-file> ( path length -- mmap )
-    >r normalize-path r> (mapped-file) ;
+    [ >r normalize-path r> (mapped-file) ] keep
+    f mapped-file boa ;
 
 HOOK: close-mapped-file io-backend ( mmap -- )
 
 M: mapped-file dispose ( mmap -- )
-    check-closed
-    t over set-mapped-file-closed?
-    close-mapped-file ;
+    dup closed>> [ drop ] [
+        t >>closed close-mapped-file
+    ] if ;
 
 : with-mapped-file ( path length quot -- )
     >r <mapped-file> r> with-disposal ; inline
