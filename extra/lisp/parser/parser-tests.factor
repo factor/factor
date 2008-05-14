@@ -8,6 +8,14 @@ IN: lisp.parser.tests
   "1234" "atom" \ lisp-expr rule parse parse-result-ast
 ] unit-test
 
+{ -42  }  [
+  "-42" "atom" \ lisp-expr rule parse parse-result-ast
+] unit-test
+
+{ 37/52 } [
+  "37/52" "atom" \ lisp-expr rule parse parse-result-ast
+] unit-test
+
 { 123.98 } [
   "123.98" "atom" \ lisp-expr rule parse parse-result-ast
 ] unit-test
