@@ -4,11 +4,11 @@ USING: alien io io.files kernel math system unix io.unix.backend
 io.mmap ;
 IN: io.unix.mmap
 
-: open-r/w ( path -- fd ) O_RDWR file-mode open dup io-error ;
+: open-r/w ( path -- fd ) O_RDWR file-mode open-file ;
 
 : mmap-open ( length prot flags path -- alien fd )
     >r f -roll r> open-r/w [ 0 mmap ] keep
-    over MAP_FAILED = [ close (io-error) ] when ;
+    over MAP_FAILED = [ close-file (io-error) ] when ;
 
 M: unix (mapped-file) ( path length -- obj )
     swap >r
@@ -18,5 +18,5 @@ M: unix (mapped-file) ( path length -- obj )
 M: unix close-mapped-file ( mmap -- )
     [ mapped-file-address ] keep
     [ mapped-file-length munmap ] keep
-    mapped-file-handle close
+    mapped-file-handle close-file
     io-error ;

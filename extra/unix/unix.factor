@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: alien alien.c-types alien.syntax kernel libc structs sequences
-       continuations
+       continuations byte-arrays strings
        math namespaces system combinators vocabs.loader qualified
        accessors inference macros fry arrays.lib 
        unix.types ;
@@ -69,13 +69,14 @@ FUNCTION: int bind ( int s, void* name, socklen_t namelen ) ;
 FUNCTION: int chdir ( char* path ) ;
 FUNCTION: int chown ( char* path, uid_t owner, gid_t group ) ;
 FUNCTION: int chroot ( char* path ) ;
-FUNCTION: void close ( int fd ) ;
+
+FUNCTION: int close ( int fd ) ;
+
+: close-file ( fd -- ) [ close ] unix-system-call drop ;
+
 FUNCTION: int connect ( int s, void* name, socklen_t namelen ) ;
 FUNCTION: int dup2 ( int oldd, int newd ) ;
 ! FUNCTION: int dup ( int oldd ) ;
-FUNCTION: int execv ( char* path, char** argv ) ;
-FUNCTION: int execvp ( char* path, char** argv ) ;
-FUNCTION: int execve ( char* path, char** argv, char** envp ) ;
 : _exit ( status -- * )
     #! We throw to give this a terminating stack effect.
     "int" f "_exit" { "int" } alien-invoke "Exit failed" throw ;
@@ -83,7 +84,6 @@ FUNCTION: int fchdir ( int fd ) ;
 FUNCTION: int fchown ( int fd, uid_t owner, gid_t group ) ;
 FUNCTION: int fcntl ( int fd, int cmd, int arg ) ;
 FUNCTION: int flock ( int fd, int operation ) ;
-FUNCTION: pid_t fork ( ) ;
 FUNCTION: void freeaddrinfo ( addrinfo* ai ) ;
 FUNCTION: int futimes ( int id, timeval[2] times ) ;
 FUNCTION: char* gai_strerror ( int ecode ) ;
@@ -136,7 +136,17 @@ FUNCTION: int pclose ( void* file ) ;
 FUNCTION: int pipe ( int* filedes ) ;
 FUNCTION: void* popen ( char* command, char* type ) ;
 FUNCTION: ssize_t read ( int fd, void* buf, size_t nbytes ) ;
+
 FUNCTION: ssize_t readlink ( char* path, char* buf, size_t bufsize ) ;
+
+: PATH_MAX 1024 ; inline
+
+: read-symbolic-link ( path -- path )
+    PATH_MAX <byte-array> dup >r
+    PATH_MAX
+    [ readlink ] unix-system-call
+    r> swap head-slice >string ;
+
 FUNCTION: ssize_t recv ( int s, void* buf, size_t nbytes, int flags ) ;
 FUNCTION: ssize_t recvfrom ( int s, void* buf, size_t nbytes, int flags, sockaddr-in* from, socklen_t* fromlen ) ;
 FUNCTION: int rename ( char* from, char* to ) ;
@@ -155,15 +165,17 @@ FUNCTION: int socket ( int domain, int type, int protocol ) ;
 FUNCTION: char* strerror ( int errno ) ;
 FUNCTION: int symlink ( char* path1, char* path2 ) ;
 FUNCTION: int system ( char* command ) ;
+
 FUNCTION: int unlink ( char* path ) ;
+
+: unlink-file ( path -- ) [ unlink ] unix-system-call drop ;
+
 FUNCTION: int utimes ( char* path, timeval[2] times ) ;
 
 : SIGKILL 9 ; inline
 : SIGTERM 15 ; inline
 
 FUNCTION: int kill ( pid_t pid, int sig ) ;
-
-: PATH_MAX 1024 ; inline
 
 : PRIO_PROCESS 0 ; inline
 : PRIO_PGRP 1 ; inline

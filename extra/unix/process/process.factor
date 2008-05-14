@@ -1,11 +1,19 @@
-USING: kernel alien.c-types alien.strings sequences math unix
-vectors kernel namespaces continuations threads assocs vectors
-io.unix.backend io.encodings.utf8 ;
+USING: kernel alien.c-types alien.strings sequences math alien.syntax unix
+       vectors kernel namespaces continuations threads assocs vectors
+       io.unix.backend io.encodings.utf8 ;
 IN: unix.process
 
 ! Low-level Unix process launching utilities. These are used
 ! to implement io.launcher on Unix. User code should use
 ! io.launcher instead.
+
+FUNCTION: pid_t fork ( ) ;
+
+: fork-process ( -- pid ) [ fork ] unix-system-call ;
+
+FUNCTION: int execv ( char* path, char** argv ) ;
+FUNCTION: int execvp ( char* path, char** argv ) ;
+FUNCTION: int execve ( char* path, char** argv, char** envp ) ;
 
 : >argv ( seq -- alien )
     [ utf8 malloc-string ] map f suffix >c-void*-array ;
@@ -29,7 +37,7 @@ IN: unix.process
     >r [ first ] [ ] bi r> exec-with-env ;
 
 : with-fork ( child parent -- )
-    fork dup io-error dup zero? -roll swap curry if ; inline
+    fork-process dup zero? -roll swap curry if ; inline
 
 : wait-for-pid ( pid -- status )
     0 <int> [ 0 waitpid drop ] keep *int WEXITSTATUS ;
