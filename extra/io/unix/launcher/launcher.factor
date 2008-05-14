@@ -58,7 +58,7 @@ USE: unix
         { [ pick string? ] [ redirect-file ] }
         { [ pick appender? ] [ redirect-file-append ] }
         { [ pick +closed+ eq? ] [ redirect-closed ] }
-        { [ pick integer? ] [ >r drop dup reset-fd r> redirect-fd ] }
+        { [ pick fd? ] [ >r drop fd>> dup reset-fd r> redirect-fd ] }
         [ >r >r underlying-handle r> r> redirect ]
     } cond ;
 

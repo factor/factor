@@ -12,69 +12,68 @@ EXCLUDE: io.sockets => accept ;
 
 IN: io.unix.sockets
 
-: socket-fd ( domain type -- socket )
-    0 socket
-    dup io-error
-    dup close-later
-    dup init-handle ;
+: socket-fd ( domain type -- fd )
+    0 socket dup io-error <fd> [ close-later ] [ init-handle ] [ ] tri ;
 
-: sockopt ( fd level opt -- )
-    1 <int> "int" heap-size setsockopt io-error ;
+: set-socket-option ( fd level opt -- )
+    >r >r handle-fd r> r> 1 <int> "int" heap-size setsockopt io-error ;
 
 M: unix addrinfo-error ( n -- )
     dup zero? [ drop ] [ gai_strerror throw ] if ;
 
 ! Client sockets - TCP and Unix domain
 : init-client-socket ( fd -- )
-    SOL_SOCKET SO_OOBINLINE sockopt ;
+    SOL_SOCKET SO_OOBINLINE set-socket-option ;
 
 : get-socket-name ( fd addrspec -- sockaddr )
-    empty-sockaddr/size [ getsockname io-error ] 2keep drop ;
+    >r handle-fd r> empty-sockaddr/size
+    [ getsockname io-error ] 2keep drop ;
 
 : get-peer-name ( fd addrspec -- sockaddr )
-    empty-sockaddr/size [ getpeername io-error ] 2keep drop ;
+    >r handle-fd r> empty-sockaddr/size
+    [ getpeername io-error ] 2keep drop ;
 
-M: integer (wait-to-connect)
+M: fd (wait-to-connect)
     >r >r +output+ wait-for-port r> r> get-socket-name ;
 
 M: object ((client)) ( addrspec -- fd )
     [ protocol-family SOCK_STREAM socket-fd ] [ make-sockaddr/size ] bi
-    [ 2drop ] [ connect ] 3bi
-    zero? err_no EINPROGRESS = or
+    >r >r dup handle-fd r> r> connect zero? err_no EINPROGRESS = or
     [ dup init-client-socket ] [ (io-error) ] if ;
 
 ! Server sockets - TCP and Unix domain
 : init-server-socket ( fd -- )
-    SOL_SOCKET SO_REUSEADDR sockopt ;
+    SOL_SOCKET SO_REUSEADDR set-socket-option ;
 
 : server-socket-fd ( addrspec type -- fd )
     >r dup protocol-family r> socket-fd
     dup init-server-socket
-    dup rot make-sockaddr/size bind io-error ;
+    dup handle-fd rot make-sockaddr/size bind io-error ;
 
 M: object (server) ( addrspec -- handle sockaddr )
     [
         [
             SOCK_STREAM server-socket-fd
-            dup 10 listen io-error
+            dup handle-fd 10 listen io-error
             dup
         ] keep
         get-socket-name
     ] with-destructors ;
 
-: do-accept ( server -- fd remote )
-    [ handle>> ] [ addr>> empty-sockaddr/size ] bi
+: do-accept ( server addrspec -- fd remote )
+    [ handle>> handle-fd ] [ empty-sockaddr/size ] bi*
     [ accept ] 2keep drop ; inline
 
-M: unix (accept) ( server -- fd remote )
-    dup do-accept
+M: object (accept) ( server addrspec -- fd remote )
+    2dup do-accept
     {
-        { [ over 0 >= ] [ rot drop ] }
+        { [ over 0 >= ] [ { [ drop ] [ drop ] [ <fd> ] [ ] } spread ] }
         { [ err_no EINTR = ] [ 2drop (accept) ] }
         { [ err_no EAGAIN = ] [
             2drop
-            [ +input+ wait-for-port ]
-            [ (accept) ] bi
+            [ drop +input+ wait-for-port ]
+            [ (accept) ]
+            2bi
         ] }
         [ (io-error) ]
     } cond ;
@@ -91,7 +90,7 @@ packet-size <byte-array> receive-buffer set-global
 
 :: do-receive ( port -- packet sockaddr )
     port addr>> empty-sockaddr/size [| sockaddr len |
-        port handle>> ! s
+        port handle>> handle-fd ! s
         receive-buffer get-global ! buf
         packet-size ! nbytes
         0 ! flags
@@ -110,7 +109,7 @@ M: unix (receive) ( datagram -- packet sockaddr )
     ] if ;
 
 :: do-send ( packet sockaddr len socket datagram -- )
-    socket packet dup length 0 sockaddr len sendto
+    socket handle-fd packet dup length 0 sockaddr len sendto
     0 < [
         err_no EINTR = [
             packet sockaddr len socket datagram do-send

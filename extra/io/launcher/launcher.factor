@@ -199,7 +199,7 @@ M: object run-pipeline-element
                     [ swap in>> or ] change-stdin
                 run-detached
             ]
-            [ [ in>> close-handle ] [ out>> close-handle ] bi* ]
+            [ [ out>> close-handle ] [ in>> close-handle ] bi* ]
             [ [ in>> <input-port> ] [ out>> <output-port> ] bi* ]
         } 2cleave r> <encoder-duplex>
     ] with-destructors ;

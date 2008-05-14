@@ -11,7 +11,15 @@ IN: io.unix.backend
 ! I/O tasks
 GENERIC: handle-fd ( handle -- fd )
 
-M: integer handle-fd ;
+TUPLE: fd fd closed ;
+
+: <fd> ( n -- fd ) f fd boa ;
+
+M: fd dispose
+    dup closed>>
+    [ drop ] [ t >>closed fd>> close-file ] if ;
+
+M: fd handle-fd fd>> ;
 
 ! I/O multiplexers
 TUPLE: mx fd reads writes ;
@@ -66,20 +74,22 @@ SYMBOL: +retry+ ! just try the operation again without blocking
 SYMBOL: +input+
 SYMBOL: +output+
 
-: wait-for-port ( port event -- )
+: wait-for-fd ( handle event -- )
     dup +retry+ eq? [ 2drop ] [
         [
-            [
-                >r
-                swap handle>> handle-fd
-                mx get-global
-                r> {
-                    { +input+ [ add-input-callback ] }
-                    { +output+ [ add-output-callback ] }
-                } case
-            ] curry "I/O" suspend drop
-        ] curry with-timeout pending-error
+            >r
+            swap handle-fd
+            mx get-global
+            r> {
+                { +input+ [ add-input-callback ] }
+                { +output+ [ add-output-callback ] }
+            } case
+        ] curry "I/O" suspend 2drop
     ] if ;
+
+: wait-for-port ( port event -- )
+    [ >r dup handle>> r> wait-for-fd ] curry
+    with-timeout pending-error ;
 
 ! Some general stuff
 : file-mode OCT: 0666 ;
@@ -93,15 +103,16 @@ SYMBOL: +output+
 
 : io-error ( n -- ) 0 < [ (io-error) ] when ;
  
-M: integer init-handle ( fd -- )
+M: fd init-handle ( fd -- )
     #! We drop the error code rather than calling io-error,
     #! since on OS X 10.3, this operation fails from init-io
     #! when running the Factor.app (presumably because fd 0 and
     #! 1 are closed).
+    fd>>
     [ F_SETFL O_NONBLOCK fcntl drop ]
     [ F_SETFD FD_CLOEXEC fcntl drop ] bi ;
 
-M: integer close-handle ( fd -- ) close-file ;
+M: fd close-handle ( fd -- ) dispose ;
 
 ! Readers
 : eof ( reader -- )
@@ -116,8 +127,8 @@ M: integer close-handle ( fd -- ) close-file ;
 ! this request
 GENERIC: refill ( port handle -- event/f )
 
-M: integer refill
-    over buffer>> [ buffer-end ] [ buffer-capacity ] bi read
+M: fd refill
+    fd>> over buffer>> [ buffer-end ] [ buffer-capacity ] bi read
     {
         { [ dup 0 = ] [ drop eof f ] }
         { [ dup 0 > ] [ swap buffer>> n>buffer f ] }
@@ -133,8 +144,8 @@ M: unix (wait-to-read) ( port -- )
 ! Writers
 GENERIC: drain ( port handle -- event/f )
 
-M: integer drain
-    over buffer>> [ buffer@ ] [ buffer-length ] bi write
+M: fd drain
+    fd>> over buffer>> [ buffer@ ] [ buffer-length ] bi write
     {
         { [ dup 0 >= ] [
             over buffer>> buffer-consume
@@ -153,9 +164,9 @@ M: unix io-multiplex ( ms/f -- )
     mx get-global wait-for-events ;
 
 M: unix (init-stdio) ( -- )
-    0 <input-port>
-    1 <output-port>
-    2 <output-port> ;
+    0 <fd> <input-port>
+    1 <fd> <output-port>
+    2 <fd> <output-port> ;
 
 ! mx io-task for embedding an fd-based mx inside another mx
 TUPLE: mx-port < port mx ;

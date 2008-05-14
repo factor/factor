@@ -6,17 +6,16 @@ continuations destructors
 openssl openssl.libcrypto openssl.libssl
 io.files io.ports io.unix.backend io.unix.sockets
 io.encodings.ascii io.buffers io.sockets io.sockets.secure
-unix ;
+unix system ;
 IN: io.unix.sockets.secure
 
 ! todo: SSL_pending, rehandshake
-! do we call write twice, wth 0 bytes at the end?
 ! check-certificate at some point
 ! test on windows
 
-M: ssl-handle handle-fd file>> ;
+M: ssl-handle handle-fd file>> handle-fd ;
 
-: syscall-error ( port r -- * )
+: syscall-error ( r -- * )
     ERR_get_error dup zero? [
         drop
         {
@@ -70,10 +69,14 @@ M: ssl-handle drain
     check-write-response ;
 
 ! Client sockets
-M: ssl ((client)) ( addrspec -- handle )
-    [ addrspec>> ((client)) <ssl-socket> ] with-destructors ;
+: <ssl-socket> ( fd -- ssl )
+    [ fd>> BIO_NOCLOSE BIO_new_socket dup ssl-error ] keep <ssl-handle>
+    [ handle>> swap dup SSL_set_bio ] keep ;
 
-M: ssl parse-sockaddr addrspec>> parse-sockaddr ;
+M: ssl ((client)) ( addrspec -- handle )
+    addrspec>> ((client)) <ssl-socket> ;
+
+M: ssl parse-sockaddr addrspec>> parse-sockaddr <ssl> ;
 
 : check-connect-response ( port r -- event )
     check-response
@@ -85,13 +88,54 @@ M: ssl parse-sockaddr addrspec>> parse-sockaddr ;
         { SSL_ERROR_SSL [ (ssl-error) ] }
     } case ;
 
-: do-ssl-connect ( port ssl addrspec -- )
-    drop
+: do-ssl-connect ( port ssl-handle -- )
     2dup SSL_connect check-connect-response dup
-    [ nip wait-for-port ] [ 3drop ] if ;
+    [ >r over r> wait-for-port do-ssl-connect ] [ 3drop ] if ;
 
 M: ssl-handle (wait-to-connect)
     addrspec>>
     [ >r file>> r> (wait-to-connect) ]
-    [ >r handle>> r> do-ssl-connect ]
-    3bi ;
+    [ drop handle>> do-ssl-connect ]
+    [ drop t >>connected 2drop ]
+    3tri ;
+
+M: ssl (server) addrspec>> (server) ;
+
+: check-accept-response ( handle r -- event )
+    over handle>> over SSL_get_error
+    {
+        { SSL_ERROR_NONE [ 2drop f ] }
+        { SSL_ERROR_WANT_READ [ 2drop +input+ ] }
+        { SSL_ERROR_WANT_WRITE [ 2drop +output+ ] }
+        { SSL_ERROR_SYSCALL [ syscall-error ] }
+        { SSL_ERROR_SSL [ (ssl-error) ] }
+    } case ;
+
+: do-ssl-accept ( ssl-handle -- )
+    dup dup handle>> SSL_accept check-accept-response dup
+    [ >r dup file>> r> wait-for-fd do-ssl-accept ] [ 2drop ] if ;
+
+M: ssl (accept)
+    [
+        addrspec>>
+        (accept) >r
+        dup close-later
+        <ssl-socket> dup close-later
+        dup do-ssl-accept
+        r>
+    ] with-destructors ;
+
+: check-shutdown-response ( handle r -- event )
+    >r handle>> r> SSL_get_error
+    {
+        { SSL_ERROR_WANT_READ [ +input+ ] }
+        { SSL_ERROR_WANT_WRITE [ +output+ ] }
+        { SSL_ERROR_SYSCALL [ -1 syscall-error ] }
+        { SSL_ERROR_SSL [ (ssl-error) ] }
+    } case ;
+
+M: unix ssl-shutdown
+    dup connected>> [
+        dup dup handle>> SSL_shutdown check-shutdown-response
+        dup [ dupd wait-for-fd ssl-shutdown ] [ 2drop ] if
+    ] [ drop ] if ;
