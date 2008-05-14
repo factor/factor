@@ -26,14 +26,14 @@ DEFER: funcall
   unclip convert-form swap convert-body [ , % funcall ] bake ;
   
 <PRIVATE  
-: localize-body ( vars body -- newbody )  
-  [ dup lisp-symbol? [ tuck name>> swap member? [ name>> make-local ] [ ] if ]
-                     [ dup s-exp? [ body>> localize-body <s-exp> ] [ nip ] if ] if
-                   ] with map ;
+: localize-body ( assoc body -- assoc newbody )  
+  [ dup lisp-symbol? [ over dupd [ name>> ] dip at swap or ]
+                     [ dup s-exp? [ body>> localize-body <s-exp> ] when ] if
+                   ] map ;
   
 : localize-lambda ( body vars -- newbody newvars )
-  dup make-locals dup push-locals [ swap localize-body <s-exp> convert-form ] dipd
-  pop-locals swap ;
+  make-locals dup push-locals swap
+  [ swap localize-body <s-exp> convert-form swap pop-locals ] dip swap ;
   
 PRIVATE>
                    

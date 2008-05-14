@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel peg.ebnf peg.expr math.parser sequences arrays strings
-combinators.lib ;
+combinators.lib math ;
 
 IN: lisp.parser
 
@@ -18,9 +18,11 @@ RPAREN       = ")"
 dquote       = '"'
 squote       = "'"
 digit        = [0-9]
-integer      = (digit)+                            => [[ string>number ]]
-float        = (digit)+ "." (digit)*               => [[ first3 >string [ >string ] dipd 3append string>number ]]
+integer      = ("-")? (digit)+                           => [[ first2 append string>number ]]
+float        = integer "." (digit)*                      => [[ first3 >string [ number>string ] dipd 3append string>number ]]
+rational     = integer "/" (digit)+                      => [[ first3 nip string>number / ]]
 number       = float
+              | rational
               | integer
 id-specials  = "!" | "$" | "%" | "&" | "*" | "/" | ":" | "<"
               | " =" | ">" | "?" | "^" | "_" | "~" | "+" | "-" | "." | "@"
