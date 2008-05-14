@@ -167,7 +167,7 @@ FUNCTION: int system ( char* command ) ;
 
 FUNCTION: int unlink ( char* path ) ;
 
-: unlink-file ( path -- ) [ unlink ] unix-system-call ;
+: unlink-file ( path -- ) [ unlink ] unix-system-call drop ;
 
 FUNCTION: int utimes ( char* path, timeval[2] times ) ;
 
