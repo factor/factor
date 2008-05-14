@@ -6,6 +6,6 @@ IN: io.unix.files.unique
     { O_RDWR O_CREAT O_EXCL } flags ;
 
 M: unix (make-unique-file) ( path -- )
-    open-unique-flags file-mode open dup io-error close ;
+    open-unique-flags file-mode open-file close-file ;
 
 M: unix temporary-path ( -- path ) "/tmp" ;
