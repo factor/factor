@@ -107,9 +107,8 @@ SYMBOL: receive-buffer
 packet-size <byte-array> receive-buffer set-global
 
 : setup-receive ( port -- s buffer len flags from fromlen )
-    dup port-handle
-    swap datagram-port-addr sockaddr-type
-    dup <c-object> swap heap-size <int>
+    [ handle>> ] [ addr>> sockaddr-type ] bi
+    [ <c-object> ] [ heap-size <int> ] bi
     >r >r receive-buffer get-global packet-size 0 r> r> ;
 
 : do-receive ( s buffer len flags from fromlen -- sockaddr data )
