@@ -106,7 +106,7 @@ C: <vocab-author> vocab-author
 : vocab-xref ( vocab quot -- vocabs )
     >r dup vocab-name swap words r> map
     [ [ word? ] filter [ word-vocabulary ] map ] map>set
-    remove [ ] filter [ vocab ] map ; inline
+    remove sift [ vocab ] map ; inline
 
 : vocab-uses ( vocab -- vocabs ) [ uses ] vocab-xref ;
 

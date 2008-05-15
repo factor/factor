@@ -110,14 +110,16 @@ M: email clone
 
 : (send) ( email -- )
     [
-        helo get-ok
-        dup from>> mail-from get-ok
-        dup to>> [ rcpt-to get-ok ] each
-        data get-ok
-        dup headers>> write-headers
-        crlf
-        body>> send-body get-ok
-        quit get-ok
+        [
+            helo get-ok
+            dup from>> mail-from get-ok
+            dup to>> [ rcpt-to get-ok ] each
+            data get-ok
+            dup headers>> write-headers
+            crlf
+            body>> send-body get-ok
+            quit get-ok USING: continuations debugger ;
+        ] [ global [ error. :c ] bind ] recover
     ] with-smtp-connection ;
 
 : extract-email ( recepient -- email )

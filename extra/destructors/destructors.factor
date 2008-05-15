@@ -4,20 +4,23 @@ USING: accessors continuations io.backend libc
 kernel namespaces sequences system vectors ;
 IN: destructors
 
-SYMBOL: error-destructors
+<PRIVATE
+
 SYMBOL: always-destructors
 
-: add-error-destructor ( obj -- )
-    error-destructors get push ;
-
-: add-always-destructor ( obj -- )
-    always-destructors get push ;
+SYMBOL: error-destructors
 
 : do-always-destructors ( -- )
     always-destructors get <reversed> dispose-each ;
 
 : do-error-destructors ( -- )
     error-destructors get <reversed> dispose-each ;
+
+PRIVATE>
+
+: &dispose dup always-destructors get push ; inline
+
+: |dispose dup error-destructors get push ; inline
 
 : with-destructors ( quot -- )
     [
@@ -44,8 +47,8 @@ C: <memory-destructor> memory-destructor
 M: memory-destructor dispose ( obj -- )
     alien>> free ;
 
-: free-always ( alien -- )
-    <memory-destructor> <only-once> add-always-destructor ;
+: &free ( alien -- alien )
+    <memory-destructor> <only-once> &dispose ; inline
 
-: free-later ( alien -- )
-    <memory-destructor> <only-once> add-error-destructor ;
+: |free ( alien -- alien )
+    <memory-destructor> <only-once> |dispose ; inline

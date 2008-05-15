@@ -135,7 +135,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     ":vars - list all variables at error time" print ;
 
 : :help ( -- )
-    error get delegates [ error-help ] map [ ] filter
+    error get delegates [ error-help ] map sift
     {
         { [ dup empty? ] [ (:help-none) ] }
         { [ dup length 1 = ] [ first help ] }

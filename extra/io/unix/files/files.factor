@@ -1,15 +1,15 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.backend io.nonblocking io.unix.backend io.files io
+USING: io.backend io.ports io.unix.backend io.files io
 unix unix.stat unix.time kernel math continuations
 math.bitfields byte-arrays alien combinators calendar
 io.encodings.binary accessors sequences strings system
-io.files.private ;
+io.files.private destructors ;
 
 IN: io.unix.files
 
 M: unix cwd ( -- path )
-    MAXPATHLEN [ <byte-array> ] [ ] bi getcwd
+    MAXPATHLEN [ <byte-array> ] keep getcwd
     [ (io-error) ] unless* ;
 
 M: unix cd ( path -- ) [ chdir ] unix-system-call drop ;
@@ -19,23 +19,26 @@ M: unix cd ( path -- ) [ chdir ] unix-system-call drop ;
 : open-read ( path -- fd ) O_RDONLY file-mode open-file ;
 
 M: unix (file-reader) ( path -- stream )
-    open-read <input-port> ;
+    open-read <fd> <input-port> ;
 
 : write-flags { O_WRONLY O_CREAT O_TRUNC } flags ; inline
 
-: open-write ( path -- fd ) write-flags file-mode open-file ;
+: open-write ( path -- fd )
+    write-flags file-mode open-file ;
 
 M: unix (file-writer) ( path -- stream )
-    open-write <output-port> ;
+    open-write <fd> <output-port> ;
 
 : append-flags { O_WRONLY O_APPEND O_CREAT } flags ; inline
 
 : open-append ( path -- fd )
-    append-flags file-mode open-file
-    [ dup 0 SEEK_END lseek io-error ] [ ] [ close-file ] cleanup ;
+    [
+        append-flags file-mode open-file |close-handle
+        dup 0 SEEK_END lseek io-error
+    ] with-destructors ;
 
 M: unix (file-appender) ( path -- stream )
-    open-append <output-port> ;
+    open-append <fd> <output-port> ;
 
 : touch-mode ( -- n )
     { O_WRONLY O_APPEND O_CREAT O_EXCL } flags ; foldable

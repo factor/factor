@@ -7,7 +7,7 @@ strings vectors hashtables quotations arrays byte-arrays
 math.parser calendar calendar.format
 
 io io.streams.string io.encodings.utf8 io.encodings.string
-io.sockets
+io.sockets io.sockets.secure
 
 unicode.case unicode.categories qualified ;
 
@@ -15,9 +15,31 @@ EXCLUDE: fry => , ;
 
 IN: http
 
-: http-port 80 ; inline
+SINGLETON: http
 
-: https-port 443 ; inline
+SINGLETON: https
+
+GENERIC: http-port ( protocol -- port )
+
+M: http http-port drop 80 ;
+
+M: https http-port drop 443 ;
+
+GENERIC: protocol>string ( protocol -- string )
+
+M: http protocol>string drop "http" ;
+
+M: https protocol>string drop "https" ;
+
+: string>protocol ( string -- protocol )
+    {
+        { "http" [ http ] }
+        { "https" [ https ] }
+        [ "Unknown protocol: " swap append throw ]
+    } case ;
+
+: absolute-url? ( url -- ? )
+    [ "http://" head? ] [ "https://" head? ] bi or ;
 
 : url-quotable? ( ch -- ? )
     #! In a URL, can this character be used without
@@ -212,6 +234,7 @@ TUPLE: cookie name value path domain expires max-age http-only ;
     [ unparse-cookie ] map concat "; " join ;
 
 TUPLE: request
+protocol
 host
 port
 method
@@ -229,7 +252,7 @@ cookies ;
 : <request>
     request new
         "1.1" >>version
-        http-port >>port
+        http >>protocol
         H{ } clone >>header
         H{ } clone >>query
         V{ } clone >>cookies
@@ -242,6 +265,7 @@ cookies ;
     pick query>> set-at ;
 
 : chop-hostname ( str -- str' )
+    ":" split1 "//" ?head drop nip
     CHAR: / over index over length or tail
     dup empty? [ drop "/" ] when ;
 
@@ -249,7 +273,9 @@ cookies ;
     #! Technically, only proxies are meant to support hostnames
     #! in HTTP requests, but IE sends these sometimes so we
     #! just chop the hostname part.
-    url-decode "http://" ?head [ chop-hostname ] when ;
+    url-decode
+    dup { "http://" "https://" } [ head? ] with contains?
+    [ chop-hostname ] when ;
 
 : read-method ( request -- request )
     " " read-until [ "Bad request: method" throw ] unless
@@ -298,10 +324,11 @@ SYMBOL: max-post-request
 
 : parse-host ( string -- host port )
     "." ?tail drop ":" split1
-    [ string>number ] [ http-port ] if* ;
+    dup [ string>number ] when ;
 
 : extract-host ( request -- request )
-    dup "host" header parse-host >r >>host r> >>port ;
+    dup [ "host" header parse-host ] keep protocol>> http-port or
+    [ >>host ] [ >>port ] bi* ;
 
 : extract-post-data-type ( request -- request )
     dup "content-type" header >>post-data-type ;
@@ -314,7 +341,7 @@ SYMBOL: max-post-request
     dup "cookie" header [ parse-cookies >>cookies ] when* ;
 
 : parse-content-type-attributes ( string -- attributes )
-    " " split [ empty? not ] filter [ "=" split1 >r >lower r> ] { } map>assoc ;
+    " " split harvest [ "=" split1 >r >lower r> ] { } map>assoc ;
 
 : parse-content-type ( content-type -- type encoding )
     ";" split1 parse-content-type-attributes "charset" swap at ;
@@ -353,12 +380,20 @@ SYMBOL: max-post-request
         "application/x-www-form-urlencoded" >>post-data-type
     ] if ;
 
+GENERIC: protocol-addr ( request protocol -- addr )
+
+M: object protocol-addr
+    drop [ host>> ] [ port>> ] bi <inet> ;
+
+M: https protocol-addr
+    call-next-method <ssl> ;
+
 : request-addr ( request -- addr )
-    [ host>> ] [ port>> ] bi <inet> ;
+    dup protocol>> protocol-addr ;
 
 : request-host ( request -- string )
-    [ host>> ] [ port>> ] bi
-    dup 80 = [ drop ] [ ":" swap number>string 3append ] if ;
+    [ host>> ] [ port>> ] bi dup http http-port =
+    [ drop ] [ ":" swap number>string 3append ] if ;
 
 : write-request-header ( request -- request )
     dup header>> >hashtable
@@ -381,13 +416,32 @@ SYMBOL: max-post-request
     flush
     drop ;
 
+: request-with-path ( request path -- request )
+    [ "/" prepend ] [ "/" ] if*
+    "?" split1 [ >>path ] [ dup [ query>assoc ] when >>query ] bi* ;
+
+: request-with-url ( request url -- request )
+    ":" split1
+    [ string>protocol >>protocol ]
+    [
+        "//" ?head [ "Invalid URL" throw ] unless
+        "/" split1
+        [
+            parse-host [ >>host ] [ >>port ] bi*
+            dup protocol>> http-port '[ , or ] change-port
+        ]
+        [ request-with-path ]
+        bi*
+    ] bi* ;
+
 : request-url ( request -- url )
     [
         [
             dup host>> [
-                [ "http://" write host>> url-encode write ]
-                [ ":" write port>> number>string write ]
-                bi
+                [ protocol>> protocol>string write "://" write ]
+                [ host>> url-encode write ":" write ]
+                [ [ port>> ] [ protocol>> http-port or ] bi number>string write ]
+                tri
             ] [ drop ] if
         ]
         [ path>> "/" head? [ "/" write ] unless ]

@@ -118,7 +118,7 @@ FUNCTION: int SSL_write ( ssl-pointer ssl, void* buf, int num ) ;
 
 FUNCTION: int SSL_read ( ssl-pointer ssl, void* buf, int num ) ;
 
-FUNCTION: void SSL_shutdown ( ssl-pointer ssl ) ;
+FUNCTION: int SSL_shutdown ( ssl-pointer ssl ) ;
 
 FUNCTION: void SSL_free ( ssl-pointer ssl ) ;
 

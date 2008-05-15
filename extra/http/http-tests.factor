@@ -45,6 +45,7 @@ blah
 
 [
     TUPLE{ request
+        protocol: http
         port: 80
         method: "GET"
         path: "/bar"
@@ -84,6 +85,7 @@ Host: www.sex.com
 
 [
     TUPLE{ request
+        protocol: http
         port: 80
         method: "HEAD"
         path: "/bar"
@@ -174,6 +176,8 @@ test-db [
         main-responder set
 
         [ 1237 httpd ] "HTTPD test" spawn drop
+
+        yield
     ] with-scope
 ] unit-test
 

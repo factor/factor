@@ -1,6 +1,6 @@
 USING: alien alien.accessors alien.c-types byte-arrays
-continuations destructors io.nonblocking io.timeouts io.sockets
-io.sockets.impl io namespaces io.streams.duplex io.windows
+continuations destructors io.ports io.timeouts io.sockets
+io.sockets io namespaces io.streams.duplex io.windows
 io.windows.nt.backend windows.winsock kernel libc math sequences
 threads classes.tuple.lib system accessors ;
 IN: io.windows.nt.sockets
@@ -125,7 +125,6 @@ TUPLE: AcceptEx-args port
 M: winnt (accept) ( server -- addrspec handle )
     [
         [
-            check-server-port
             \ AcceptEx-args new
             [ init-accept ] keep
             [ ((accept)) ] keep
@@ -141,13 +140,11 @@ M: winnt (server) ( addrspec -- handle )
         f <win32-socket>
     ] with-destructors ;
 
-M: winnt <datagram> ( addrspec -- datagram )
+M: winnt (datagram) ( addrspec -- handle )
     [
-        [
-            SOCK_DGRAM server-fd
-            dup add-completion
-            f <win32-socket>
-        ] keep <datagram-port>
+        SOCK_DGRAM server-fd
+        dup add-completion
+        f <win32-socket>
     ] with-destructors ;
 
 TUPLE: WSARecvFrom-args port

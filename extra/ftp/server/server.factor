@@ -1,27 +1,30 @@
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators io io.encodings.8-bit
 io.files io.server io.sockets kernel math.parser
 namespaces sequences ftp io.unix.launcher.parser
-unicode.case ;
+unicode.case splitting assocs ;
 IN: ftp.server
 
 SYMBOL: client
+SYMBOL: stream
 
-TUPLE: ftp-client-command string tokenized ;
+TUPLE: ftp-command raw tokenized ;
 
-: <ftp-client-command> ( -- obj )
-    ftp-client-command new ;
+: <ftp-command> ( -- obj )
+    ftp-command new ;
 
-: read-client-command ( -- ftp-client-command )
-    <ftp-client-command> readln
-    [ >>string ] [ tokenize-command >>tokenized ] bi ;
+: read-command ( -- ftp-command )
+    <ftp-command> readln
+    [ >>raw ] [ tokenize-command >>tokenized ] bi ;
+
+: (send-response) ( n string separator -- )
+    rot number>string write write ftp-send ;
 
 : send-response ( ftp-response -- )
     [ n>> ] [ strings>> ] bi
-    2dup
-    but-last-slice [
-        [ number>string write "-" write ] [ ftp-send ] bi*
-    ] with each
-    first [ number>string write bl ] [ ftp-send ] bi* ;
+    [ but-last-slice [ "-" (send-response) ] with each ]
+    [ first " " (send-response) ] 2bi ;
 
 : server-response ( n string -- )
     <ftp-response>
@@ -35,72 +38,123 @@ TUPLE: ftp-client-command string tokenized ;
 : send-PASS-request ( -- )
     331 "Please specify the password." server-response ;
 
-: parse-USER ( ftp-client-command -- )
+: anonymous-only ( -- )
+    530 "This FTP server is anonymous only." server-response ;
+
+: parse-USER ( ftp-command -- )
     tokenized>> second client get swap >>user drop ;
 
 : send-login-response ( -- )
     ! client get
     230 "Login successful" server-response ;
 
-: parse-PASS ( ftp-client-command -- )
+: parse-PASS ( ftp-command -- )
     tokenized>> second client get swap >>password drop ;
 
-: send-quit-response ( ftp-client-command -- )
+: send-quit-response ( ftp-command -- )
     drop 221 "Goodbye." server-response ;
 
-: unimplemented-command ( ftp-client-command -- )
-    500 "Unimplemented command: " rot string>> append server-response ;
+: ftp-error ( string -- )
+    500 "Unrecognized command: " rot append server-response ;
+
+: send-type-error ( -- )
+    "TYPE is binary only" ftp-error ;
+
+: send-type-success ( string -- )
+    200 "Switching to " rot " mode" 3append server-response ;
+
+: parse-TYPE ( obj -- )
+    tokenized>> second >upper {
+        { "IMAGE" [ "Binary" send-type-success ] }
+        { "I" [ "Binary" send-type-success ] }
+        [ drop send-type-error ]
+    } case ;
+
+: pwd-response ( -- )
+    257 current-directory get "\"" swap "\"" 3append server-response ;
+
+! : random-local-inet ( -- spec )
+    ! remote-address get class new 0 >>port ;
+
+! : handle-LIST ( -- )
+    ! random-local-inet ascii <server> ;
+
+: handle-STOR ( obj -- )
+    ;
+
+! EPRT |2|::1|62138|
+! : handle-EPRT ( obj -- )
+    ! tokenized>> second "|" split harvest ;
+
+! : handle-EPSV ( obj -- )
+    ! 229 "Entering Extended Passive Mode (|||"
+    ! random-local-inet ! get port number>string
+    ! "|)" 3append server-response ;
+
+! LPRT 6,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,242,186
+: handle-LPRT ( obj -- )
+    tokenized>> "," split ;
+
+: start-directory ( -- )
+    150 "Here comes the directory listing." server-response ;
+
+: finish-directory ( -- )
+    226 "Directory send OK." server-response ;
+
+: send-directory-list ( stream -- )
+    [ directory-list write ] with-output-stream ;
+
+: unrecognized-command ( obj -- ) raw>> ftp-error ;
 
 : handle-client-loop ( -- )
-    <ftp-client-command> readln
-    [ >>string ]
+    <ftp-command> readln
+    [ >>raw ]
     [ tokenize-command >>tokenized ] bi
     dup tokenized>> first >upper {
         { "USER" [ parse-USER send-PASS-request t ] }
         { "PASS" [ parse-PASS send-login-response t ] }
-        ! { "ACCT" [ ] }
+        { "ACCT" [ drop "ACCT unimplemented" ftp-error t ] }
         ! { "CWD" [ ] }
         ! { "CDUP" [ ] }
         ! { "SMNT" [ ] }
 
-        ! { "REIN" [ ] }
+        ! { "REIN" [ drop client get reset-ftp-client t ] }
         { "QUIT" [ send-quit-response f ] }
 
         ! { "PORT" [ ] }
         ! { "PASV" [ ] }
         ! { "MODE" [ ] }
-        ! { "TYPE" [ ] }
+        { "TYPE" [ parse-TYPE t ] }
         ! { "STRU" [ ] }
 
         ! { "ALLO" [ ] }
         ! { "REST" [ ] }
-        ! { "STOR" [ ] }
+        ! { "STOR" [ handle-STOR t ] }
         ! { "STOU" [ ] }
         ! { "RETR" [ ] }
-        ! { "LIST" [ ] }
+        ! { "LIST" [ drop handle-LIST t ] }
         ! { "NLST" [ ] }
-        ! { "LIST" [ ] }
         ! { "APPE" [ ] }
         ! { "RNFR" [ ] }
         ! { "RNTO" [ ] }
         ! { "DELE" [ ] }
         ! { "RMD" [ ] }
         ! { "MKD" [ ] }
-        ! { "PWD" [ ] }
+        { "PWD" [ drop pwd-response t ] }
         ! { "ABOR" [ ] }
 
-        ! { "SYST" [ ] }
+        ! { "SYST" [ drop ] }
         ! { "STAT" [ ] }
         ! { "HELP" [ ] }
 
         ! { "SITE" [ ] }
         ! { "NOOP" [ ] }
 
-        ! { "EPRT" [ ] }
-        ! { "LPRT" [ ] }
-        ! { "EPSV" [ ] }
-        ! { "LPSV" [ ] }
-        [ drop unimplemented-command t ]
+        ! { "EPRT" [ handle-eprt ] }
+        ! { "LPRT" [ handle-lprt ] }
+        ! { "EPSV" [ drop handle-epsv t ] }
+        ! { "LPSV" [ drop handle-lpsv t ] }
+        [ drop unrecognized-command t ]
     } case [ handle-client-loop ] when ;
 
 : handle-client ( -- )

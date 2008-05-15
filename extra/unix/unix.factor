@@ -4,7 +4,7 @@
 USING: alien alien.c-types alien.syntax kernel libc structs sequences
        continuations byte-arrays strings
        math namespaces system combinators vocabs.loader qualified
-       accessors inference macros fry arrays.lib 
+       accessors inference macros locals shuffle arrays.lib 
        unix.types ;
 
 IN: unix
@@ -50,19 +50,26 @@ LIBRARY: factor
 FUNCTION: void clear_err_no ( ) ;
 FUNCTION: int err_no ( ) ;
 
-ERROR: unix-system-call-error word args message ;
-
-DEFER: strerror
-
-MACRO: unix-system-call ( quot -- )
-    [ ] [ infer in>> ] [ first ] tri
-   '[
-        [ @ dup 0 < [ dup throw ] [ ] if ]
-        [ drop , narray , swap err_no strerror unix-system-call-error ]
-        recover
-    ] ;
-
 LIBRARY: libc
+
+ERROR: unix-system-call-error args message word ;
+
+FUNCTION: char* strerror ( int errno ) ;
+
+MACRO:: unix-system-call ( quot -- )
+    [let | n [ quot infer in>> ]
+           word [ quot first ] |
+        [
+            n ndup quot call dup 0 < [
+                drop
+                n narray
+                err_no strerror
+                word unix-system-call-error
+            ] [
+                n nnip
+            ] if
+        ]
+    ] ;
 
 FUNCTION: int accept ( int s, void* sockaddr, socklen_t* socklen ) ;
 FUNCTION: int bind ( int s, void* name, socklen_t namelen ) ;
@@ -100,6 +107,7 @@ FUNCTION: int getpwnam_r ( char* login, passwd* pwd, char* buffer, size_t bufsiz
 FUNCTION: int getgroups ( int gidsetlen, gid_t* gidset ) ;
 FUNCTION: int gethostname ( char* name, int len ) ;
 FUNCTION: int getsockname ( int socket, sockaddr* address, socklen_t* address_len ) ;
+FUNCTION: int getpeername ( int socket, sockaddr* address, socklen_t* address_len ) ;
 FUNCTION: uid_t getuid ;
 FUNCTION: uint htonl ( uint n ) ;
 FUNCTION: ushort htons ( ushort n ) ;
@@ -161,7 +169,6 @@ FUNCTION: int setreuid ( uid_t ruid, uid_t euid ) ;
 FUNCTION: int setsockopt ( int s, int level, int optname, void* optval, socklen_t optlen ) ;
 FUNCTION: int setuid ( uid_t uid ) ;
 FUNCTION: int socket ( int domain, int type, int protocol ) ;
-FUNCTION: char* strerror ( int errno ) ;
 FUNCTION: int symlink ( char* path1, char* path2 ) ;
 FUNCTION: int system ( char* command ) ;
 
@@ -170,61 +177,6 @@ FUNCTION: int unlink ( char* path ) ;
 : unlink-file ( path -- ) [ unlink ] unix-system-call drop ;
 
 FUNCTION: int utimes ( char* path, timeval[2] times ) ;
-
-: SIGKILL 9 ; inline
-: SIGTERM 15 ; inline
-
-FUNCTION: int kill ( pid_t pid, int sig ) ;
-
-: PRIO_PROCESS 0 ; inline
-: PRIO_PGRP 1 ; inline
-: PRIO_USER 2 ; inline
-
-: PRIO_MIN -20 ; inline
-: PRIO_MAX 20 ; inline
-
-! which/who = 0 for current process
-FUNCTION: int getpriority ( int which, int who ) ;
-FUNCTION: int setpriority ( int which, int who, int prio ) ;
-
-! Flags for waitpid
-
-: WNOHANG   1 ; inline
-: WUNTRACED 2 ; inline
-
-: WSTOPPED   2 ; inline
-: WEXITED    4 ; inline
-: WCONTINUED 8 ; inline
-: WNOWAIT    HEX: 1000000 ; inline
-
-! Examining status
-
-: WTERMSIG ( status -- value )
-    HEX: 7f bitand ; inline
-
-: WIFEXITED ( status -- ? )
-    WTERMSIG zero? ; inline
-
-: WEXITSTATUS ( status -- value )
-    HEX: ff00 bitand -8 shift ; inline
-
-: WIFSIGNALED ( status -- ? )
-    HEX: 7f bitand 1+ -1 shift 0 > ; inline
-
-: WCOREFLAG ( -- value )
-    HEX: 80 ; inline
-
-: WCOREDUMP ( status -- ? )
-    WCOREFLAG bitand zero? not ; inline
-
-: WIFSTOPPED ( status -- ? )
-    HEX: ff bitand HEX: 7f = ; inline
-
-: WSTOPSIG ( status -- value )
-    WEXITSTATUS ; inline
-
-FUNCTION: pid_t wait ( int* status ) ;
-FUNCTION: pid_t waitpid ( pid_t wpid, int* status, int options ) ;
 
 FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
 

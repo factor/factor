@@ -13,7 +13,7 @@ concurrency.messaging continuations ;
 
 [ ] [ test-node dup 1array swap (start-node) ] unit-test
 
-[ ] [ yield ] unit-test
+[ ] [ 1000 sleep ] unit-test
 
 [ ] [
     [

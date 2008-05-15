@@ -1,4 +1,4 @@
-USING: alien.c-types io io.files io.nonblocking kernel
+USING: alien.c-types io io.files io.ports kernel
 namespaces random io.encodings.binary init
 accessors system ;
 IN: random.unix

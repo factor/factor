@@ -40,4 +40,4 @@ M: return-connection dispose
     [ db>> ] [ pool>> ] bi return-connection ;
 
 : return-connection-later ( db pool -- )
-    \ return-connection boa add-always-destructor ;
+    \ return-connection boa &dispose drop ;

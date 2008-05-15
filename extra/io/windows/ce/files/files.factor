@@ -1,5 +1,5 @@
 USING: alien alien.c-types combinators io io.backend io.buffers
-io.files io.nonblocking io.windows kernel libc math namespaces
+io.files io.ports io.windows kernel libc math namespaces
 prettyprint sequences strings threads threads.private
 windows windows.kernel32 io.windows.ce.backend system ;
 IN: windows.ce.files

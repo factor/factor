@@ -17,7 +17,7 @@ IN: ui.tools.tests
 [ ] [ "w" get com-scroll-down ] unit-test
 [ t ] [
     "w" get workspace-book gadget-children
-    [ tool-scroller ] map [ ] filter [ scroller? ] all?
+    [ tool-scroller ] map sift [ scroller? ] all?
 ] unit-test
 [ ] [ "w" get hide-popup ] unit-test
 [ ] [ <gadget> "w" get show-popup ] unit-test

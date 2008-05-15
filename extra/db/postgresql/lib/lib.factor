@@ -67,12 +67,10 @@ M: postgresql-result-null summary ( obj -- str )
     in-params>> [ type>> type>oid ] map >c-uint-array ;
 
 : malloc-byte-array/length
-    [ malloc-byte-array dup free-always ] [ length ] bi ;
+    [ malloc-byte-array &free ] [ length ] bi ;
 
 : default-param-value
-    number>string* dup [
-        utf8 malloc-string dup free-always
-    ] when 0 ;
+    number>string* dup [ utf8 malloc-string &free ] when 0 ;
 
 : param-values ( statement -- seq seq2 )
     [ bind-params>> ] [ in-params>> ] bi
@@ -128,8 +126,8 @@ C: <postgresql-malloc-destructor> postgresql-malloc-destructor
 M: postgresql-malloc-destructor dispose ( obj -- )
     alien>> PQfreemem ;
 
-: postgresql-free-always ( alien -- )
-    <postgresql-malloc-destructor> add-always-destructor ;
+: &postgresql-free ( alien -- alien )
+    <postgresql-malloc-destructor> &dispose ; inline
 
 : pq-get-blob ( handle row column -- obj/f )
     [ PQgetvalue ] 3keep 3dup PQgetlength
@@ -142,7 +140,7 @@ M: postgresql-malloc-destructor dispose ( obj -- )
                 PQunescapeBytea dup zero? [
                     postgresql-result-error-message throw
                 ] [
-                    dup postgresql-free-always
+                    &postgresql-free
                 ] if
             ] keep
             *uint memory>byte-array

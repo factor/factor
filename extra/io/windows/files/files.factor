@@ -3,7 +3,7 @@
 USING: alien.c-types io.backend io.files io.windows kernel math
 windows windows.kernel32 windows.time calendar combinators
 math.functions sequences namespaces words symbols system
-combinators.lib io.nonblocking destructors math.bitfields.lib ;
+combinators.lib io.ports destructors math.bitfields.lib ;
 IN: io.windows.files
 
 SYMBOLS: +read-only+ +hidden+ +system+
@@ -68,6 +68,11 @@ SYMBOLS: +read-only+ +hidden+ +system+
         ! [ BY_HANDLE_FILE_INFORMATION-ftCreationTime FILETIME>timestamp ]
         [ BY_HANDLE_FILE_INFORMATION-ftLastWriteTime FILETIME>timestamp ]
         ! [ BY_HANDLE_FILE_INFORMATION-ftLastAccessTime FILETIME>timestamp ]
+        ! [ BY_HANDLE_FILE_INFORMATION-nNumberOfLinks ]
+        ! [
+          ! [ BY_HANDLE_FILE_INFORMATION-nFileIndexLow ]
+          ! [ BY_HANDLE_FILE_INFORMATION-nFileIndexHigh ] bi >64bit
+        ! ]
     } cleave
     \ file-info boa ;
 

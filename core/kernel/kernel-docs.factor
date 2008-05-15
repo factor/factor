@@ -718,17 +718,21 @@ $nl
 
 HELP: unless*
 { $values { "cond" "a generalized boolean" } { "false" "a quotation " } }
-{ $description "Variant of " { $link if* } " with no true quotation."
-$nl
+{ $description "Variant of " { $link if* } " with no true quotation." }
+{ $notes
 "The following two lines are equivalent:"
-{ $code "X [ Y ] unless*" "X dup [ ] [ drop Y ] if" } } ;
+{ $code "X [ Y ] unless*" "X dup [ ] [ drop Y ] if" }
+"The following two lines are equivalent, where " { $snippet "L" } " is a literal:"
+{ $code "[ L ] unless*" "L or" } } ;
 
 HELP: ?if
 { $values { "default" object } { "cond" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } { "false" "a quotation with stack effect " { $snippet "( default -- )" } } }
-{ $description "If the condition is " { $link f } ", the " { $snippet "false" } " quotation is called with the " { $snippet "default" } " value on the stack. Otherwise, the " { $snippet "true" } " quotation is called with the condition on the stack."
-$nl
+{ $description "If the condition is " { $link f } ", the " { $snippet "false" } " quotation is called with the " { $snippet "default" } " value on the stack. Otherwise, the " { $snippet "true" } " quotation is called with the condition on the stack." }
+{ $notes
 "The following two lines are equivalent:"
-{ $code "[ X ] [ Y ] ?if" "dup [ nip X ] [ drop Y ] if" } } ;
+{ $code "[ X ] [ Y ] ?if" "dup [ nip X ] [ drop Y ] if" }
+"The following two lines are equivalent:"
+{ $code "[ ] [ ] ?if" "swap or" } } ;
 
 HELP: die
 { $description "Starts the front-end processor (FEP), which is a low-level debugger which can inspect memory addresses and the like. The FEP is also entered when a critical error occurs." }
