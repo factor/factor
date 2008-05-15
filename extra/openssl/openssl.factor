@@ -137,14 +137,11 @@ M: ssl-handle init-handle file>> init-handle ;
 
 HOOK: ssl-shutdown io-backend ( handle -- )
 
-M: ssl-handle close-handle
-    dup disposed>> [ drop ] [
-        t >>disposed
-        [ ssl-shutdown ]
-        [ handle>> SSL_free ]
-        [ file>> close-handle ]
-        tri
-    ] if ;
+M: ssl-handle dispose*
+    [ ssl-shutdown ]
+    [ handle>> SSL_free ]
+    [ file>> dispose ]
+    tri ;
 
 ERROR: certificate-verify-error result ;
 

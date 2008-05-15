@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io io.backend threads
-strings byte-arrays continuations quotations ;
+strings byte-arrays continuations destructors quotations ;
 IN: io.sockets
 
 ARTICLE: "network-addressing" "Address specifiers"

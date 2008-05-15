@@ -187,7 +187,7 @@ SYMBOL: local-address
 TUPLE: server-port < port addr encoding ;
 
 : check-server-port ( port -- port )
-    check-closed
+    dup check-disposed
     dup server-port? [ "Not a server port" throw ] unless ; inline
 
 GENERIC: (server) ( addrspec -- handle )
@@ -216,7 +216,7 @@ HOOK: (datagram) io-backend ( addr -- datagram )
     dup (datagram) datagram-port <port> swap >>addr ;
 
 : check-datagram-port ( port -- port )
-    check-closed
+    dup check-disposed
     dup datagram-port? [ "Not a datagram port" throw ] unless ; inline
 
 HOOK: (receive) io-backend ( datagram -- packet addrspec )

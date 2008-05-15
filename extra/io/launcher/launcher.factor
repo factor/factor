@@ -151,7 +151,7 @@ M: process timed-out kill-process ;
 
 M: object run-pipeline-element
     [ >process swap >>stdout swap >>stdin run-detached ]
-    [ drop [ [ close-handle ] when* ] bi@ ]
+    [ drop [ [ dispose ] when* ] bi@ ]
     3bi
     wait-for-process ;
 
@@ -164,7 +164,7 @@ M: object run-pipeline-element
                     [ swap out>> or ] change-stdout
                 run-detached
             ]
-            [ out>> close-handle ]
+            [ out>> dispose ]
             [ in>> <input-port> ]
         } cleave r> <decoder>
     ] with-destructors ;
@@ -181,7 +181,7 @@ M: object run-pipeline-element
                     [ swap in>> or ] change-stdout
                 run-detached
             ]
-            [ in>> close-handle ]
+            [ in>> dispose ]
             [ out>> <output-port> ]
         } cleave r> <encoder>
     ] with-destructors ;
@@ -199,7 +199,7 @@ M: object run-pipeline-element
                     [ swap in>> or ] change-stdin
                 run-detached
             ]
-            [ [ out>> close-handle ] [ in>> close-handle ] bi* ]
+            [ [ out>> dispose ] [ in>> dispose ] bi* ]
             [ [ in>> <input-port> ] [ out>> <output-port> ] bi* ]
         } 2cleave r> <encoder-duplex>
     ] with-destructors ;

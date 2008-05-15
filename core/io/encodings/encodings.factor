@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors namespaces growable
-strings io classes continuations combinators io.styles
-io.streams.plain splitting byte-arrays sequences.private
-accessors ;
+strings io classes continuations destructors combinators
+io.styles io.streams.plain splitting byte-arrays
+sequences.private accessors ;
 IN: io.encodings
 
 ! The encoding descriptor protocol

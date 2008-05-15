@@ -1,4 +1,5 @@
-USING: help.markup help.syntax alien math continuations ;
+USING: help.markup help.syntax alien math continuations
+destructors ;
 IN: io.mmap
 
 HELP: mapped-file

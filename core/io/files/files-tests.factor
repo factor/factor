@@ -1,14 +1,14 @@
 IN: io.files.tests
 USING: tools.test io.files io.files.private io threads kernel
 continuations io.encodings.ascii io.files.unique sequences
-strings accessors io.encodings.utf8 math ;
+strings accessors io.encodings.utf8 math destructors ;
 
 \ exists? must-infer
 \ (exists?) must-infer
 
 [ ] [ "blahblah" temp-file dup exists? [ delete-directory ] [ drop ] if ] unit-test
 [ ] [ "blahblah" temp-file make-directory ] unit-test
-[ t ] [ "blahblah" temp-file directory? ] unit-test
+[ t ] [ "blahblah" temp-file file-info directory? ] unit-test
 
 [ t ] [
     [ temp-directory "loldir" append-path delete-directory ] ignore-errors

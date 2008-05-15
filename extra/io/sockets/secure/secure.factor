@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel symbols namespaces continuations
-io.sockets sequences ;
+destructors io.sockets sequences ;
 IN: io.sockets.secure
 
 SYMBOL: ssl-backend

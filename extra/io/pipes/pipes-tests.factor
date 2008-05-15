@@ -1,6 +1,6 @@
 USING: io io.pipes io.streams.string io.encodings.utf8
 io.streams.duplex io.encodings io.timeouts namespaces
-continuations tools.test kernel calendar ;
+continuations tools.test kernel calendar destructors ;
 IN: io.pipes.tests
 
 [ "Hello" ] [

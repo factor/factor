@@ -9,7 +9,7 @@ IN: io.pipes
 TUPLE: pipe in out ;
 
 M: pipe dispose ( pipe -- )
-    [ in>> close-handle ] [ out>> close-handle ] bi ;
+    [ in>> dispose ] [ out>> dispose ] bi ;
 
 HOOK: (pipe) io-backend ( -- pipe )
 

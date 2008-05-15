@@ -1,13 +1,14 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors sequences assocs arrays continuations combinators kernel
-threads concurrency.messaging concurrency.mailboxes concurrency.promises
-io.files io.monitors debugger ;
+USING: accessors sequences assocs arrays continuations
+destructors combinators kernel threads concurrency.messaging
+concurrency.mailboxes concurrency.promises io.files io.monitors
+debugger ;
 IN: io.monitors.recursive
 
 ! Simulate recursive monitors on platforms that don't have them
 
-TUPLE: recursive-monitor < monitor children thread ready ;
+TUPLE: recursive-monitor < monitor children thread ready disposed ;
 
 : notify? ( -- ? ) monitor tget ready>> promise-fulfilled? ;
 
@@ -35,13 +36,10 @@ DEFER: add-child-monitor
 : remove-child-monitor ( monitor -- )
     monitor tget children>> delete-at* [ dispose ] [ drop ] if ;
 
-M: recursive-monitor dispose
-    dup queue>> closed>> [
-        drop
-    ] [
-        [ "stop" swap thread>> send-synchronous drop ]
-        [ queue>> dispose ] bi
-    ] if ;
+M: recursive-monitor dispose*
+    [ "stop" swap thread>> send-synchronous drop ]
+    [ queue>> dispose ]
+    bi ;
 
 : stop-pump ( -- )
     monitor tget children>> [ nip dispose ] assoc-each ;

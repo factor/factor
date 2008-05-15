@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.unix.bsd io.backend io.monitors core-foundation.fsevents
 continuations kernel sequences namespaces arrays system locals
-accessors ;
+accessors destructors ;
 IN: io.unix.macosx
 
 TUPLE: macosx-monitor < monitor handle ;

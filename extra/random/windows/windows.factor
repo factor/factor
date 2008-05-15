@@ -1,7 +1,6 @@
 USING: accessors alien.c-types byte-arrays continuations
 kernel windows windows.advapi32 init namespaces random
 destructors locals ;
-USE: tools.walker
 IN: random.windows
 
 TUPLE: windows-rng provider type ;

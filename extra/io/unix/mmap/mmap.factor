@@ -9,7 +9,7 @@ IN: io.unix.mmap
 :: mmap-open ( length prot flags path -- alien fd )
     [
         f length prot flags
-        path open-r/w |close-handle
+        path open-r/w |dispose
         [ 0 mmap dup MAP_FAILED = [ (io-error) ] when ] keep
     ] with-destructors ;
 

@@ -1,5 +1,6 @@
 USING: io io.buffers io.backend help.markup help.syntax kernel
-byte-arrays sbufs words continuations byte-vectors classes ;
+byte-arrays sbufs words continuations destructors
+byte-vectors classes ;
 IN: io.ports
 
 ARTICLE: "io.ports" "Non-blocking I/O implementation"

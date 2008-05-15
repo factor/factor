@@ -4,7 +4,7 @@ opengl.glu shuffle http.client vectors namespaces ui.gadgets
 ui.gadgets.canvas ui.render ui splitting combinators tools.time
 system combinators.lib float-arrays continuations
 opengl.demo-support multiline ui.gestures bunny.fixed-pipeline
-bunny.cel-shaded bunny.outlined bunny.model accessors ;
+bunny.cel-shaded bunny.outlined bunny.model accessors destructors ;
 IN: bunny
 
 TUPLE: bunny-gadget model geom draw-seq draw-n ;

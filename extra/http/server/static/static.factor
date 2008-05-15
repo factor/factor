@@ -91,7 +91,7 @@ TUPLE: file-responder root hook special allow-listings ;
 
 : serve-object ( filename -- response )
     serving-path dup exists?
-    [ dup directory? [ serve-directory ] [ serve-file ] if ]
+    [ dup file-info directory? [ serve-directory ] [ serve-file ] if ]
     [ drop <404> ]
     if ;
 

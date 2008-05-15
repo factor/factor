@@ -117,7 +117,7 @@ M: ssl (server) addrspec>> (server) ;
 
 M: ssl (accept)
     [
-        addrspec>> (accept) |close-handle <ssl-socket> |close-handle
+        addrspec>> (accept) |dispose <ssl-socket> |dispose
         dup do-ssl-accept
     ] with-destructors ;
 

@@ -1,8 +1,8 @@
 ! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io kernel math namespaces sequences sbufs strings
-generic splitting growable continuations io.streams.plain
-io.encodings math.order ;
+generic splitting growable continuations destructors
+io.streams.plain io.encodings math.order ;
 IN: io.streams.string
 
 M: growable dispose drop ;

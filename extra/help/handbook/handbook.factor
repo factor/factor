@@ -105,6 +105,7 @@ ARTICLE: "objects" "Objects"
 "An " { $emphasis "object" } " is any datum which may be identified. All values are objects in Factor. Each object carries type information, and types are checked at runtime; Factor is dynamically typed."
 { $subsection "equality" }
 { $subsection "math.order" }
+{ $subsection "destructors" }
 { $subsection "classes" }
 { $subsection "tuples" }
 { $subsection "generic" }
@@ -207,7 +208,8 @@ ARTICLE: "io" "Input and output"
 { $subsection "io.pipes" }
 { $heading "Other features" }
 { $subsection "io.timeouts" }
-{ $subsection "checksums" } ;
+{ $subsection "checksums" }
+{ $see-also "destructors" } ;
 
 ARTICLE: "tools" "Developer tools"
 { $subsection "tools.vocabs" }

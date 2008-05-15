@@ -1,4 +1,4 @@
-USING: help.markup help.syntax continuations io ;
+USING: help.markup help.syntax continuations destructors io ;
 IN: io.pipes
 
 HELP: pipe

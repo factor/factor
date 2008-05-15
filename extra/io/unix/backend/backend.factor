@@ -4,20 +4,18 @@ USING: alien generic assocs kernel kernel.private math
 io.ports sequences strings structs sbufs threads unix
 vectors io.buffers io.backend io.encodings math.parser
 continuations system libc qualified namespaces io.timeouts
-io.encodings.utf8 accessors inspector combinators ;
+io.encodings.utf8 destructors accessors inspector combinators ;
 QUALIFIED: io
 IN: io.unix.backend
 
 ! I/O tasks
 GENERIC: handle-fd ( handle -- fd )
 
-TUPLE: fd fd closed ;
+TUPLE: fd fd disposed ;
 
 : <fd> ( n -- fd ) f fd boa ;
 
-M: fd dispose
-    dup closed>>
-    [ drop ] [ t >>closed fd>> close-file ] if ;
+M: fd dispose* fd>> close-file ;
 
 M: fd handle-fd fd>> ;
 
@@ -111,8 +109,6 @@ M: fd init-handle ( fd -- )
     fd>>
     [ F_SETFL O_NONBLOCK fcntl drop ]
     [ F_SETFD FD_CLOEXEC fcntl drop ] bi ;
-
-M: fd close-handle ( fd -- ) dispose ;
 
 ! Readers
 : eof ( reader -- )

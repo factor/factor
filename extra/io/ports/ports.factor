@@ -10,7 +10,7 @@ IN: io.ports
 SYMBOL: default-buffer-size
 64 1024 * default-buffer-size set-global
 
-TUPLE: port handle error timeout closed ;
+TUPLE: port handle error timeout disposed ;
 
 M: port timeout timeout>> ;
 
@@ -18,35 +18,12 @@ M: port set-timeout (>>timeout) ;
 
 GENERIC: init-handle ( handle -- )
 
-GENERIC: close-handle ( handle -- )
-
-TUPLE: handle-destructor handle ;
-
-C: <handle-destructor> handle-destructor
-
-M: handle-destructor dispose ( obj -- )
-    handle>> close-handle ;
-
-: &close-handle ( handle -- handle )
-    dup <handle-destructor> <only-once> &dispose drop ; inline
-
-: |close-handle ( handle -- handle )
-    dup <handle-destructor> <only-once> |dispose drop ; inline
-
 : <port> ( handle class -- port )
     new
         swap dup init-handle >>handle ; inline
 
 : pending-error ( port -- )
     [ f ] change-error drop [ throw ] when* ;
-
-ERROR: port-closed-error port ;
-
-M: port-closed-error summary
-    drop "Port has been closed" ;
-
-: check-closed ( port -- port )
-    dup closed>> [ port-closed-error ] when ;
 
 TUPLE: buffered-port < port buffer ;
 
@@ -69,7 +46,7 @@ HOOK: (wait-to-read) io-backend ( port -- )
     [ f >>eof drop f ] r> if ; inline
 
 M: input-port stream-read1
-    check-closed
+    dup check-disposed
     dup wait-to-read [ buffer>> buffer-pop ] unless-eof ;
 
 : read-step ( count port -- byte-array/f )
@@ -77,7 +54,7 @@ M: input-port stream-read1
     [ dupd buffer>> buffer-read ] unless-eof nip ;
 
 M: input-port stream-read-partial ( max stream -- byte-array/f )
-    check-closed
+    dup check-disposed
     >r 0 max >integer r> read-step ;
 
 : read-loop ( count port accum -- )
@@ -92,7 +69,7 @@ M: input-port stream-read-partial ( max stream -- byte-array/f )
     ] if ;
 
 M: input-port stream-read
-    check-closed
+    dup check-disposed
     >r 0 max >fixnum r>
     2dup read-step dup [
         pick over length > [
@@ -115,12 +92,12 @@ TUPLE: output-port < buffered-port ;
     tuck buffer>> can-write? [ drop ] [ stream-flush ] if ;
 
 M: output-port stream-write1
-    check-closed
+    dup check-disposed
     1 over wait-to-write
     buffer>> byte>buffer ;
 
 M: output-port stream-write
-    check-closed
+    dup check-disposed
     over length over buffer>> buffer-size > [
         [ buffer>> buffer-size <groups> ]
         [ [ stream-write ] curry ] bi
@@ -136,15 +113,13 @@ HOOK: (wait-to-write) io-backend ( port -- )
     dup buffer>> buffer-empty? [ drop ] [ (wait-to-write) ] if ;
 
 M: output-port stream-flush ( port -- )
-    check-closed
+    dup check-disposed
     [ flush-port ] [ pending-error ] bi ;
 
-GENERIC: close-port ( port -- )
-
-M: output-port close-port
+M: output-port dispose*
     [ flush-port ] [ call-next-method ] bi ;
 
-M: buffered-port close-port
+M: buffered-port dispose*
     [ call-next-method ]
     [ [ [ buffer-free ] when* f ] change-buffer drop ]
     bi ;
@@ -153,11 +128,7 @@ HOOK: cancel-io io-backend ( port -- )
 
 M: port timed-out cancel-io ;
 
-M: port close-port
-    [ cancel-io ] [ handle>> close-handle ] bi ;
-
-M: port dispose
-    dup closed>> [ drop ] [ t >>closed close-port ] if ;
+M: port dispose* [ cancel-io ] [ handle>> dispose ] bi ;
 
 : <ports> ( read-handle write-handle -- input-port output-port )
     [

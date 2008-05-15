@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: cairo.ffi kernel accessors sequences
-namespaces fry continuations ;
+namespaces fry continuations destructors ;
 IN: cairo
 
 TUPLE: cairo-t alien ;
