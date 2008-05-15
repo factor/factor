@@ -1,4 +1,5 @@
-USING: destructors kernel tools.test continuations ;
+USING: destructors kernel tools.test continuations accessors
+namespaces sequences ;
 IN: destructors.tests
 
 TUPLE: dispose-error ;
