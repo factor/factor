@@ -76,6 +76,7 @@ PRIVATE>
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SYMBOL: lisp-env
+ERROR: no-such-var var ;
 
 : init-env ( -- )
   H{ } clone lisp-env set ;
@@ -84,7 +85,7 @@ SYMBOL: lisp-env
   swap lisp-env get set-at ;
   
 : lisp-get ( name -- word )
-  lisp-env get at ;
+  dup lisp-env get at [ ] [ no-such-var ] ?if ;
   
 : funcall ( quot sym -- * )
   dup lisp-symbol?  [ name>> lisp-get ] when call ; inline
