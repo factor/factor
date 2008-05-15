@@ -68,8 +68,9 @@ M: jamshred-gadget ungraft* ( gadget -- )
     ] 2keep >>last-hand-loc drop ;
 
 : handle-mouse-scroll ( jamshred-gadget -- )
-    jamshred>> jamshred-player scroll-direction get
-    second neg swap change-player-speed ;
+    jamshred>> scroll-direction get
+    [ first mouse-scroll-x ]
+    [ second mouse-scroll-y ] 2bi ;
 
 : quit ( gadget -- )
     [ no-fullscreen ] [ close-window ] bi ;

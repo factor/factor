@@ -29,6 +29,9 @@ C: <oint> oint
 : up-pivot ( oint theta -- )
     over up>> rotate-oint ;
 
+: forward-pivot ( oint theta -- )
+    over forward>> rotate-oint ;
+
 : random-float+- ( n -- m )
     #! find a random float between -n/2 and n/2
     dup 10000 * >fixnum random 10000 / swap 2 / - ;

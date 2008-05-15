@@ -16,6 +16,9 @@ TUPLE: player < oint name sounds tunnel nearest-segment last-move speed ;
 : turn-player ( player x-radians y-radians -- )
     >r over r> left-pivot up-pivot ;
 
+: roll-player ( player z-radians -- )
+    forward-pivot ;
+
 : to-tunnel-start ( player -- )
     [ tunnel>> first dup location>> ]
     [ tuck (>>location) (>>nearest-segment) ] bi ;
