@@ -1,9 +1,10 @@
 USING: alien alien.c-types arrays assocs combinators
-continuations destructors io io.backend io.ports
-io.windows libc kernel math namespaces sequences
-threads classes.tuple.lib windows windows.errors
-windows.kernel32 strings splitting io.files qualified ascii
-combinators.lib system accessors ;
+continuations destructors io io.backend io.ports io.timeouts
+io.windows io.windows.files libc kernel math namespaces
+sequences threads classes.tuple.lib windows windows.errors
+windows.kernel32 strings splitting io.files
+io.buffers qualified ascii combinators.lib system
+accessors locals ;
 QUALIFIED: windows.winsock
 IN: io.windows.nt.backend
 
@@ -28,8 +29,8 @@ SYMBOL: master-completion-port
 : <master-completion-port> ( -- handle )
     INVALID_HANDLE_VALUE f <completion-port> ;
 
-M: winnt add-completion ( handle -- )
-    master-completion-port get-global <completion-port> drop ;
+M: winnt add-completion ( win32-handle -- )
+    handle>> master-completion-port get-global <completion-port> drop ;
 
 : eof? ( error -- ? )
     dup ERROR_HANDLE_EOF = swap ERROR_BROKEN_PIPE = or ;
@@ -64,7 +65,6 @@ M: winnt add-completion ( handle -- )
 
 :: wait-for-overlapped ( ms -- overlapped ? )
     master-completion-port get-global
-    r> INFINITE or ! timeout
     0 <int> ! bytes
     f <void*> ! key
     f <void*> ! overlapped
@@ -82,9 +82,9 @@ M: winnt add-completion ( handle -- )
         GetLastError dup expected-io-error? [ 2drop f ] [
             >r lookup-callback [ thread>> ] [ port>> ] bi r>
             dup eof?
-            [ drop t >>eof drop ]
-            [ (win32-error-string) >>error drop ] if
-            thread>> resume t
+            [ drop t >>eof ]
+            [ (win32-error-string) >>error ] if drop
+            resume t
         ] if
     ] [
         lookup-callback
@@ -101,6 +101,9 @@ M: winnt init-io ( -- )
     <master-completion-port> master-completion-port set-global
     H{ } clone io-hash set-global
     windows.winsock:init-winsock ;
+
+: update-file-ptr ( n port -- )
+    handle>> dup ptr>> [ rot + >>ptr drop ] [ 2drop ] if* ;
 
 : finish-flush ( n port -- )
     [ update-file-ptr ] [ buffer>> buffer-consume ] 2bi ;
@@ -124,7 +127,7 @@ M: winnt (wait-to-write)
     over zero? [
         t >>eof 2drop
     ] [
-        [ buffer>> n>buffer ] [ update-file-ptr ] bi
+        [ buffer>> n>buffer ] [ update-file-ptr ] 2bi
     ] if ;
 
 : ((wait-to-read)) ( port -- )

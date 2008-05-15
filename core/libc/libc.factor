@@ -81,14 +81,14 @@ PRIVATE>
 <PRIVATE
 
 ! Memory allocations
-TUPLE: memory-destructor alien ;
+TUPLE: memory-destructor alien disposed ;
 
 M: memory-destructor dispose* alien>> free ;
 
 PRIVATE>
 
 : &free ( alien -- alien )
-    dup memory-destructor boa &dispose drop ; inline
+    dup f memory-destructor boa &dispose drop ; inline
 
 : |free ( alien -- alien )
-    dup memory-destructor boa |dispose drop ; inline
+    dup f memory-destructor boa |dispose drop ; inline

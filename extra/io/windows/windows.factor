@@ -19,7 +19,7 @@ TUPLE: win32-handle handle disposed ;
 M: win32-handle dispose* ( handle -- )
     handle>> CloseHandle drop ;
 
-TUPLE: win32-file handle ptr disposed ;
+TUPLE: win32-file < win32-handle ptr ;
 
 : <win32-file> ( handle -- win32-file )
     win32-file new-win32-handle ;
@@ -30,6 +30,11 @@ M: win32-file init-handle ( handle -- )
 HOOK: CreateFile-flags io-backend ( DWORD -- DWORD )
 HOOK: FileArgs-overlapped io-backend ( port -- overlapped/f )
 HOOK: add-completion io-backend ( port -- )
+
+: opened-file ( handle -- win32-file )
+    dup invalid-handle?
+    <win32-file> |dispose
+    dup add-completion ;
 
 : share-mode ( -- fixnum )
     {

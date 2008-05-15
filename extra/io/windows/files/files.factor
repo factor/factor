@@ -1,19 +1,17 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types io.backend io.files io.windows kernel math
+USING: alien.c-types io.binary io.backend io.files io.buffers
+io.windows kernel math splitting
 windows windows.kernel32 windows.time calendar combinators
 math.functions sequences namespaces words symbols system
-combinators.lib io.ports destructors math.bitfields.lib ;
+combinators.lib io.ports destructors accessors
+math.bitfields math.bitfields.lib ;
 IN: io.windows.files
 
 : open-file ( path access-mode create-mode flags -- handle )
     [
         >r >r share-mode security-attributes-inherit r> r>
-        CreateFile-flags f CreateFile
-        dup invalid-handle?
-        <win32-file>
-        |dispose
-        dup add-completion
+        CreateFile-flags f CreateFile opened-file
     ] with-destructors ;
 
 : open-pipe-r/w ( path -- win32-file )
@@ -213,7 +211,7 @@ M: winnt link-info ( path -- info )
 
 : file-times ( path -- timestamp timestamp timestamp )
     [
-        normalize-path open-existing &close-handle
+        normalize-path open-existing &dispose handle>>
         "FILETIME" <c-object>
         "FILETIME" <c-object>
         "FILETIME" <c-object>
@@ -229,7 +227,7 @@ M: winnt link-info ( path -- info )
     #! timestamp order: creation access write
     [
         >r >r >r
-            normalize-path open-existing &close-handle
+            normalize-path open-existing &dispose handle>>
         r> r> r> (set-file-times)
     ] with-destructors ;
 
@@ -246,5 +244,5 @@ M: winnt touch-file ( path -- )
     [
         normalize-path
         maybe-create-file >r &dispose r>
-        [ drop ] [ f now dup (set-file-times) ] if
+        [ drop ] [ handle>> f now dup (set-file-times) ] if
     ] with-destructors ;

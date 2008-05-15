@@ -1,6 +1,7 @@
 USING: continuations destructors io.buffers io.files io.backend
-io.timeouts io.ports io.windows io.windows.nt.backend
-kernel libc math threads windows windows.kernel32 system
+io.timeouts io.ports io.windows io.windows.files
+io.windows.nt.backend windows windows.kernel32
+kernel libc math threads system
 alien.c-types alien.arrays alien.strings sequences combinators
 combinators.lib sequences.lib ascii splitting alien strings
 assocs namespaces io.files.private accessors ;
@@ -55,7 +56,4 @@ M: winnt FileArgs-overlapped ( port -- overlapped )
 
 M: winnt open-append
     [ dup file-info size>> ] [ drop 0 ] recover
-    >r (open-append) r> ;
-
-: update-file-ptr ( n port -- )
-    handle>> dup ptr>> [ rot + >>ptr drop ] [ 2drop ] if* ;
+    >r (open-append) r> >>ptr ;

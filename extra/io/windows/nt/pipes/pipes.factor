@@ -17,10 +17,7 @@ IN: io.windows.nt.pipes
     4096
     0
     security-attributes-inherit
-    CreateNamedPipe
-    dup win32-error=0/f
-    <win32-file> |dispose
-    dup add-completion ;
+    CreateNamedPipe opened-file ;
 
 : open-other-end ( name -- handle )
     GENERIC_WRITE
@@ -29,10 +26,7 @@ IN: io.windows.nt.pipes
     OPEN_EXISTING
     FILE_FLAG_OVERLAPPED
     f
-    CreateFile
-    dup win32-error=0/f
-    <win32-file> |dispose
-    dup add-completion ;
+    CreateFile opened-file ;
 
 : unique-pipe-name ( -- string )
     [

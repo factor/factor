@@ -27,10 +27,10 @@ GENERIC: inet-ntop ( data addrspec -- str )
 GENERIC: inet-pton ( str addrspec -- data )
 
 : make-sockaddr/size ( addrspec -- sockaddr size )
-    dup make-sockaddr swap sockaddr-type heap-size ;
+    [ make-sockaddr ] [ sockaddr-type heap-size ] bi ;
 
-: empty-sockaddr/size ( addrspec -- sockaddr len )
-    sockaddr-type [ <c-object> ] [ heap-size <int> ] bi ;
+: empty-sockaddr/size ( addrspec -- sockaddr size )
+    sockaddr-type [ <c-object> ] [ heap-size ] bi ;
 
 GENERIC: parse-sockaddr ( sockaddr addrspec -- newaddrspec )
 

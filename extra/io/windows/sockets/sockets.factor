@@ -1,5 +1,5 @@
-USING: kernel accessors io.sockets io.windows
-windows.winsock system ;
+USING: kernel accessors io.sockets io.windows io.backend
+windows.winsock system destructors alien.c-types ;
 IN: io.windows.sockets
 
 HOOK: WSASocket-flags io-backend ( -- DWORD )
@@ -17,24 +17,29 @@ M: win32-socket dispose ( stream -- )
     [ empty-sockaddr/size ] [ protocol-family ] bi
     pick set-sockaddr-in-family ;
 
-: open-socket ( addrspec type -- win3-socket )
+: opened-socket ( handle -- win32-socket )
+    <win32-socket> |dispose dup add-completion ;
+
+: open-socket ( addrspec type -- win32-socket )
     >r protocol-family r>
     0 f 0 WSASocket-flags WSASocket
     dup socket-error
-    <win32-socket> |dispose
-    dup add-completion ;
+    opened-socket ;
 
-M: object get-local-address ( socket addrspec -- sockaddr )
-    >r handle>> r> empty-sockaddr/size
+M: object (get-local-address) ( socket addrspec -- sockaddr )
+    >r handle>> r> empty-sockaddr/size <int>
     [ getsockname socket-error ] 2keep drop ;
 
+: bind-socket ( win32-socket sockaddr len -- )
+    >r >r handle>> r> r> bind socket-error ;
+
 M: object ((client)) ( addrspec -- handle )
-    [ open-socket ] [ drop ] 2bi
-    [ unspecific-sockaddr/size bind socket-error ] [ drop ] 2bi ;
+    [ SOCK_STREAM open-socket ] keep
+    [ unspecific-sockaddr/size bind-socket ] [ drop ] 2bi ;
 
 : server-socket ( addrspec type -- fd )
     [ open-socket ] [ drop ] 2bi
-    [ make-sockaddr/size bind socket-error ] [ drop ] 2bi ;
+    [ make-sockaddr/size bind-socket ] [ drop ] 2bi ;
 
 ! http://support.microsoft.com/kb/127144
 ! NOTE: Possibly tweak this because of SYN flood attacks
