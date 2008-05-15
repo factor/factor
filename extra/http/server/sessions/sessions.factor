@@ -102,7 +102,7 @@ M: session-saver dispose
     ] [ drop ] if ;
 
 : save-session-after ( session -- )
-    <session-saver> add-always-destructor ;
+    <session-saver> &dispose drop ;
 
 : existing-session ( path session -- response )
     [ session set ] [ save-session-after ] bi

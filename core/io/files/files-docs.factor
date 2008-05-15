@@ -300,8 +300,8 @@ HELP: exists?
 { $description "Tests if the file named by " { $snippet "path" } " exists." } ;
 
 HELP: directory?
-{ $values { "path" "a pathname string" } { "?" "a boolean" } }
-{ $description "Tests if " { $snippet "path" } " names a directory." } ;
+{ $values { "file-info" file-info } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "file-info" } " is a directory." } ;
 
 HELP: (directory)
 { $values { "path" "a pathname string" } { "seq" "a sequence of " { $snippet "{ name dir? }" } " pairs" } }

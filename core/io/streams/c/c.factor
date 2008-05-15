@@ -2,37 +2,37 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel kernel.private namespaces io io.encodings
 sequences math generic threads.private classes io.backend
-io.files continuations byte-arrays ;
+io.files continuations destructors byte-arrays accessors ;
 IN: io.streams.c
 
-TUPLE: c-writer handle ;
+TUPLE: c-writer handle disposed ;
 
-C: <c-writer> c-writer
+: <c-writer> ( handle -- stream ) f c-writer boa ;
 
 M: c-writer stream-write1
-    c-writer-handle fputc ;
+    handle>> fputc ;
 
 M: c-writer stream-write
-    c-writer-handle fwrite ;
+    handle>> fwrite ;
 
 M: c-writer stream-flush
-    c-writer-handle fflush ;
+    handle>> fflush ;
 
-M: c-writer dispose
-    c-writer-handle fclose ;
+M: c-writer dispose*
+    handle>> fclose ;
 
-TUPLE: c-reader handle ;
+TUPLE: c-reader handle disposed ;
 
-C: <c-reader> c-reader
+: <c-reader> ( handle -- stream ) f c-reader boa ;
 
 M: c-reader stream-read
-    c-reader-handle fread ;
+    handle>> fread ;
 
 M: c-reader stream-read-partial
     stream-read ;
 
 M: c-reader stream-read1
-    c-reader-handle fgetc ;
+    handle>> fgetc ;
 
 : read-until-loop ( stream delim -- ch )
     over stream-read1 dup [
@@ -45,8 +45,8 @@ M: c-reader stream-read-until
     [ swap read-until-loop ] B{ } make swap
     over empty? over not and [ 2drop f f ] when ;
 
-M: c-reader dispose
-    c-reader-handle fclose ;
+M: c-reader dispose*
+    handle>> fclose ;
 
 M: object init-io ;
 

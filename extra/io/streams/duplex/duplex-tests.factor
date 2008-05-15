@@ -1,18 +1,13 @@
 USING: io.streams.duplex io io.streams.string
-kernel continuations tools.test ;
+kernel continuations tools.test destructors accessors ;
 IN: io.streams.duplex.tests
 
 ! Test duplex stream close behavior
-TUPLE: closing-stream closed? ;
+TUPLE: closing-stream < disposable ;
 
 : <closing-stream> closing-stream new ;
 
-M: closing-stream dispose
-    dup closing-stream-closed? [
-        "Closing twice!" throw
-    ] [
-        t swap set-closing-stream-closed?
-    ] if ;
+M: closing-stream dispose* drop ;
 
 TUPLE: unclosable-stream ;
 
@@ -30,14 +25,14 @@ M: unclosable-stream dispose
     <unclosable-stream> <closing-stream> [
         <duplex-stream>
         [ dup dispose ] [ 2drop ] recover
-    ] keep closing-stream-closed?
+    ] keep disposed>>
 ] unit-test
 
 [ t ] [
     <closing-stream> [ <unclosable-stream>
         <duplex-stream>
         [ dup dispose ] [ 2drop ] recover
-    ] keep closing-stream-closed?
+    ] keep disposed>>
 ] unit-test
 
 [ "Hey" ] [

@@ -89,7 +89,7 @@ IN: unicode.data
     ] assoc-map >hashtable ;
 
 : multihex ( hexstring -- string )
-    " " split [ hex> ] map [ ] filter ;
+    " " split [ hex> ] map sift ;
 
 TUPLE: code-point lower title upper ;
 

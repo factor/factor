@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for license.
-USING: alien continuations io kernel prettyprint sequences
-db db.mysql.ffi ;
+USING: alien continuations destructors io kernel prettyprint
+sequences db db.mysql.ffi ;
 IN: db.mysql
 
 TUPLE: mysql-db handle host user password db port ;

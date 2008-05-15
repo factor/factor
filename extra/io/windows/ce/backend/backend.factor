@@ -1,4 +1,4 @@
-USING: io.nonblocking io.windows threads.private kernel
+USING: io.ports io.windows threads.private kernel
 io.backend windows.winsock windows.kernel32 windows
 io.streams.duplex io namespaces alien.syntax system combinators
 io.buffers io.encodings io.encodings.utf8 combinators.lib ;
@@ -46,5 +46,5 @@ M: wince (init-stdio) ( -- )
             1 _getstdfilex _fileno
             2 _getstdfilex _fileno
         ] if [ f <win32-file> ] 3apply
-        rot <reader> -rot [ <writer> ] bi@
+        [ <input-port> ] [ <output-port> ] [ <output-port> ] tri*
     ] with-variable ;

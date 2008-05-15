@@ -76,7 +76,7 @@ SYMBOL: load-vocab-hook ! ( name -- )
 : words-named ( str -- seq )
     dictionary get values
     [ vocab-words at ] with map
-    [ ] filter ;
+    sift ;
 
 : child-vocab? ( prefix name -- ? )
     2dup = pick empty? or

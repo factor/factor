@@ -26,27 +26,30 @@ DEFER: funcall
   unclip convert-form swap convert-body [ , % funcall ] bake ;
   
 <PRIVATE  
-: localize-body ( vars body -- newbody )  
-  [ dup lisp-symbol? [ tuck name>> swap member? [ name>> make-local ] [ ] if ]
-                     [ dup s-exp? [ body>> localize-body <s-exp> ] [ nip ] if ] if
-                   ] with map ;
+: localize-body ( assoc body -- assoc newbody )  
+  [ dup lisp-symbol? [ over dupd [ name>> ] dip at swap or ]
+                     [ dup s-exp? [ body>> localize-body <s-exp> ] when ] if
+                   ] map ;
   
 : localize-lambda ( body vars -- newbody newvars )
-  dup make-locals dup push-locals [ swap localize-body <s-exp> convert-form ] dipd
-  pop-locals swap ;
+  make-locals dup push-locals swap
+  [ swap localize-body <s-exp> convert-form swap pop-locals ] dip swap ;
   
 PRIVATE>
                    
 : split-lambda ( s-exp -- body vars )                   
-  first3 -rot nip [ body>> ] bi@ [ name>> ] map ; inline                 
+  first3 -rot nip [ body>> ] bi@ [ name>> ] map ; inline
   
-: rest-lambda-vars ( seq -- n newseq )  
-  "&rest" swap [ remove ] [ index ] 2bi ;
+: rest-lambda ( body vars -- quot )  
+  "&rest" swap [ remove ] [ index ] 2bi
+  [ localize-lambda <lambda> ] dip
+  [ , cut swap [ % , ] bake , compose ] bake ;
+  
+: normal-lambda ( body vars -- quot )
+  localize-lambda <lambda> [ , compose ] bake ;
   
 : convert-lambda ( s-exp -- quot )  
-  split-lambda dup "&rest"  swap member? [ rest-lambda-vars ] [ dup length ] if
-  [ localize-lambda <lambda> ] dip
-  [ , cut [ dup length firstn ] dip dup empty? [ drop ] when  , ] bake ;
+  split-lambda dup "&rest"  swap member? [ rest-lambda ] [ normal-lambda ] if ;
   
 : convert-quoted ( s-exp -- quot )  
   second [ , ] bake ;
@@ -64,16 +67,16 @@ PRIVATE>
     [ drop convert-general-form ] if ;
   
 : convert-form ( lisp-form -- quot )
-  { { [ dup s-exp? ] [ body>> convert-list-form ] }
-   [ [ , ] [ ] make ]
-  } cond ;
-  
+  dup s-exp?  [ body>> convert-list-form ]
+              [ [ , ] [ ] make ] if ;
+                
 : lisp-string>factor ( str -- quot )
-  lisp-expr parse-result-ast convert-form ;
+  lisp-expr parse-result-ast convert-form lambda-rewrite call ;
   
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SYMBOL: lisp-env
+ERROR: no-such-var var ;
 
 : init-env ( -- )
   H{ } clone lisp-env set ;
@@ -82,7 +85,7 @@ SYMBOL: lisp-env
   swap lisp-env get set-at ;
   
 : lisp-get ( name -- word )
-  lisp-env get at ;
+  dup lisp-env get at [ ] [ no-such-var ] ?if ;
   
 : funcall ( quot sym -- * )
   dup lisp-symbol?  [ name>> lisp-get ] when call ; inline

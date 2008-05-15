@@ -133,7 +133,7 @@ IN: tools.deploy.shaker
 
         [
             io.backend:io-backend ,
-            "default-buffer-size" "io.nonblocking" lookup ,
+            "default-buffer-size" "io.ports" lookup ,
         ] { } make
         { "alarms" "io" "tools" } strip-vocab-globals %
 

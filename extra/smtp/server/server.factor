@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators kernel prettyprint io io.timeouts io.server
 sequences namespaces io.sockets continuations calendar
-io.encodings.ascii io.streams.duplex ;
+io.encodings.ascii io.streams.duplex destructors ;
 IN: smtp.server
 
 ! Mock SMTP server for testing purposes.

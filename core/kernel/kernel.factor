@@ -156,10 +156,10 @@ M: callstack clone (clone) ;
 : with ( param obj quot -- obj curry )
     swapd [ swapd call ] 2curry ; inline
 
-: prepose ( quot1 quot2 -- curry )
+: prepose ( quot1 quot2 -- compose )
     swap compose ; inline
 
-: 3compose ( quot1 quot2 quot3 -- curry )
+: 3compose ( quot1 quot2 quot3 -- compose )
     compose compose ; inline
 
 ! Booleans

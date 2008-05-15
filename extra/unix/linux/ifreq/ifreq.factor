@@ -1,7 +1,6 @@
 
 USING: kernel alien alien.c-types
        io.sockets
-       io.sockets.impl
        unix
        unix.linux.sockios
        unix.linux.if ;

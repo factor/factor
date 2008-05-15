@@ -5,7 +5,7 @@ kernel math math.parser namespaces prettyprint quotations
 sequences debugger db db.postgresql.lib db.postgresql.ffi
 db.tuples db.types tools.annotations math.ranges
 combinators sequences.lib classes locals words tools.walker
-namespaces.lib accessors random db.queries ;
+namespaces.lib accessors random db.queries destructors ;
 USE: tools.walker
 IN: db.postgresql
 

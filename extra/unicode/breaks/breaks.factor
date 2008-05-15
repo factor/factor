@@ -24,8 +24,7 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
     [ blank? ] right-trim ;
 
 : process-other-extend ( lines -- set )
-    [ "#" split1 drop ";" split1 drop trim-blank ] map
-    [ empty? not ] filter
+    [ "#" split1 drop ";" split1 drop trim-blank ] map harvest
     [ ".." split1 [ dup ] unless* [ hex> ] bi@ [a,b] ] map
     concat unique ;
 

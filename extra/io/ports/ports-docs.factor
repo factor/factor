@@ -1,9 +1,10 @@
 USING: io io.buffers io.backend help.markup help.syntax kernel
-byte-arrays sbufs words continuations byte-vectors classes ;
-IN: io.nonblocking
+byte-arrays sbufs words continuations destructors
+byte-vectors classes ;
+IN: io.ports
 
-ARTICLE: "io.nonblocking" "Non-blocking I/O implementation"
-"On Windows and Unix, Factor implements blocking file and network streams on top of a non-blocking I/O substrate, ensuring that Factor threads will yield when performing I/O. This substrate is implemented in the " { $vocab-link "io.nonblocking" } " vocabulary."
+ARTICLE: "io.ports" "Non-blocking I/O implementation"
+"On Windows and Unix, Factor implements blocking file and network streams on top of a non-blocking I/O substrate, ensuring that Factor threads will yield when performing I/O. This substrate is implemented in the " { $vocab-link "io.ports" } " vocabulary."
 $nl
 "A " { $emphasis "port" } " is a stream using non-blocking I/O substrate:"
 { $subsection port }
@@ -11,25 +12,21 @@ $nl
 { $subsection <buffered-port> }
 "Input ports:"
 { $subsection input-port }
-{ $subsection <reader> }
+{ $subsection <input-port> }
 "Output ports:"
 { $subsection output-port }
-{ $subsection <writer> }
+{ $subsection <output-port> }
 "Global native I/O protocol:"
 { $subsection io-backend }
 { $subsection init-io }
 { $subsection init-stdio }
 { $subsection io-multiplex }
 "Per-port native I/O protocol:"
-{ $subsection init-handle }
 { $subsection (wait-to-read) }
-"Additionally, the I/O backend must provide an implementation of the " { $link stream-flush } " and " { $link dispose } " generic words."
-$nl
-"Dummy ports which should be used to implement networking:"
-{ $subsection server-port }
-{ $subsection datagram-port } ;
+{ $subsection (wait-to-write) }
+"Additionally, the I/O backend must provide an implementation of the " { $link dispose } " generic word." ;
 
-ABOUT: "io.nonblocking"
+ABOUT: "io.ports"
 
 HELP: port
 { $class-description "Instances of this class present a blocking stream interface on top of an underlying non-blocking I/O system, giving the illusion of blocking by yielding the thread which is waiting for input or output."
@@ -48,10 +45,6 @@ HELP: input-port
 HELP: output-port
 { $class-description "The class of ports implementing the output stream protocol." } ;
 
-HELP: init-handle
-{ $values { "handle" "a native handle identifying an I/O resource" } }
-{ $contract "Prepares a native handle for use by the port; called by " { $link <port> } "." } ;
-
 HELP: <port>
 { $values { "handle" "a native handle identifying an I/O resource" } { "class" class } { "port" "a new " { $link port } } }
 { $description "Creates a new " { $link port } " with no buffer." }
@@ -62,12 +55,12 @@ HELP: <buffered-port>
 { $description "Creates a new " { $link port } " using the specified native handle and a default-sized I/O buffer." } 
 $low-level-note ;
 
-HELP: <reader>
+HELP: <input-port>
 { $values { "handle" "a native handle identifying an I/O resource" } { "input-port" "a new " { $link input-port } } }
 { $description "Creates a new " { $link input-port } " using the specified native handle and a default-sized input buffer." } 
 $low-level-note ;
 
-HELP: <writer>
+HELP: <output-port>
 { $values { "handle" "a native handle identifying an I/O resource" } { "output-port" "a new " { $link output-port } } }
 { $description "Creates a new " { $link output-port } " using the specified native handle and a default-sized input buffer." } 
 $low-level-note ;
@@ -81,10 +74,6 @@ HELP: (wait-to-read)
 { $contract "Suspends the current thread until the port's buffer has data available for reading." } ;
 
 HELP: wait-to-read
-{ $values { "count" "a non-negative integer" } { "port" input-port } }
-{ $description "If the port's buffer has at least " { $snippet "count" } " unread bytes, returns immediately, otherwise suspends the current thread until some data is available for reading." } ;
-
-HELP: wait-to-read1
 { $values { "port" input-port } }
 { $description "If the port's buffer has unread data, returns immediately, otherwise suspends the current thread until some data is available for reading." } ;
 

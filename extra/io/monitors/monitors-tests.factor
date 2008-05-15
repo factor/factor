@@ -1,7 +1,7 @@
 IN: io.monitors.tests
 USING: io.monitors tools.test io.files system sequences
 continuations namespaces concurrency.count-downs kernel io
-threads calendar prettyprint ;
+threads calendar prettyprint destructors ;
 
 os { winnt linux macosx } member? [
     [

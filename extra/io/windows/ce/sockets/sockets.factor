@@ -1,5 +1,5 @@
 USING: alien alien.c-types combinators io io.backend io.buffers
-io.nonblocking io.sockets io.sockets.impl io.windows kernel libc
+io.ports io.sockets io.windows kernel libc
 math namespaces prettyprint qualified sequences strings threads
 threads.private windows windows.kernel32 io.windows.ce.backend
 byte-arrays system ;
@@ -32,7 +32,7 @@ M: win32-socket wince-write ( port port-handle -- )
     windows.winsock:winsock-error!=0/f ;
 
 M: wince (client) ( addrspec -- reader writer )
-    do-connect <win32-socket> dup <reader&writer> ;
+    do-connect <win32-socket> dup <ports> ;
 
 M: wince (server) ( addrspec -- handle )
     windows.winsock:SOCK_STREAM server-fd
@@ -41,7 +41,6 @@ M: wince (server) ( addrspec -- handle )
 
 M: wince (accept) ( server -- client )
     [
-        dup check-server-port
         [
             dup port-handle win32-file-handle
             swap server-port-addr sockaddr-type heap-size
@@ -52,7 +51,7 @@ M: wince (accept) ( server -- client )
                 [ windows.winsock:winsock-error ] when
             ] keep
         ] keep server-port-addr parse-sockaddr swap
-        <win32-socket> <reader&writer>
+        <win32-socket> <ports>
     ] with-timeout ;
 
 M: wince <datagram> ( addrspec -- datagram )

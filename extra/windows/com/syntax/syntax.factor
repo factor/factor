@@ -45,8 +45,7 @@ unless
     <com-function-definition> ;
 
 : parse-com-functions ( -- functions )
-    ";" parse-tokens { ")" } split
-    [ empty? not ] filter
+    ";" parse-tokens { ")" } split harvest
     [ (parse-com-function) ] map ;
 
 : (iid-word) ( definition -- word )

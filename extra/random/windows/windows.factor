@@ -1,7 +1,6 @@
 USING: accessors alien.c-types byte-arrays continuations
 kernel windows windows.advapi32 init namespaces random
 destructors locals ;
-USE: tools.walker
 IN: random.windows
 
 TUPLE: windows-rng provider type ;
@@ -36,9 +35,8 @@ M: windows-crypto-context dispose ( tuple -- )
 M: windows-rng random-bytes* ( n tuple -- bytes )
     [
         [ provider>> ] [ type>> ] bi
-        windows-crypto-context
-        dup add-always-destructor handle>>
-        swap dup <byte-array>
+        windows-crypto-context &dispose
+        handle>> swap dup <byte-array>
         [ CryptGenRandom win32-error=0/f ] keep
     ] with-destructors ;
 

@@ -1,5 +1,5 @@
 USING: help.markup help.syntax quotations hashtables kernel
-classes strings continuations ;
+classes strings continuations destructors ;
 IN: io
 
 ARTICLE: "stream-protocol" "Stream protocol"

@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types kernel io.nonblocking io.unix.backend
+USING: alien.c-types kernel io.ports io.unix.backend
 bit-arrays sequences assocs unix math namespaces structs
-accessors math.order ;
+accessors math.order locals ;
 IN: io.unix.select
 
 TUPLE: select-mx < mx read-fdset write-fdset ;
@@ -21,21 +21,20 @@ TUPLE: select-mx < mx read-fdset write-fdset ;
 : clear-nth ( n seq -- ? )
     [ nth ] [ f -rot set-nth ] 2bi ;
 
-: handle-fd ( fd task fdset mx -- )
-    roll munge rot clear-nth
-    [ swap handle-io-task ] [ 2drop ] if ;
+:: check-fd ( fd fdset mx quot -- )
+    fd munge fdset clear-nth [ fd mx quot call ] when ; inline
 
-: handle-fdset ( tasks fdset mx -- )
-    [ handle-fd ] 2curry assoc-each ;
+: check-fdset ( fds fdset mx quot -- )
+    [ check-fd ] 3curry each ; inline
 
-: init-fdset ( tasks fdset -- )
-    [ >r drop t swap munge r> set-nth ] curry assoc-each ;
+: init-fdset ( fds fdset -- )
+    [ >r t swap munge r> set-nth ] curry each ;
 
 : read-fdset/tasks
-    [ reads>> ] [ read-fdset>> ] bi ;
+    [ reads>> keys ] [ read-fdset>> ] bi ;
 
 : write-fdset/tasks
-    [ writes>> ] [ write-fdset>> ] bi ;
+    [ writes>> keys ] [ write-fdset>> ] bi ;
 
 : max-fd ( assoc -- n )
     dup assoc-empty? [ drop 0 ] [ keys supremum ] if ;
@@ -45,12 +44,13 @@ TUPLE: select-mx < mx read-fdset write-fdset ;
 
 : init-fdsets ( mx -- nfds read write except )
     [ num-fds ]
-    [ read-fdset/tasks tuck init-fdset ]
-    [ write-fdset/tasks tuck init-fdset ] tri
+    [ read-fdset/tasks [ init-fdset ] keep ]
+    [ write-fdset/tasks [ init-fdset ] keep ] tri
     f ;
 
-M: select-mx wait-for-events ( ms mx -- )
-    swap >r dup init-fdsets r> dup [ make-timeval ] when
-    select multiplexer-error
-    dup read-fdset/tasks pick handle-fdset
-    dup write-fdset/tasks rot handle-fdset ;
+M:: select-mx wait-for-events ( ms mx -- )
+    mx
+    [ init-fdsets ms dup [ make-timeval ] when select multiplexer-error ]
+    [ [ read-fdset/tasks ] keep [ input-available ] check-fdset ]
+    [ [ write-fdset/tasks ] keep [ output-available ] check-fdset ]
+    tri ;

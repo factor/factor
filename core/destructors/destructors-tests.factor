@@ -1,5 +1,23 @@
-USING: destructors kernel tools.test continuations ;
+USING: destructors kernel tools.test continuations accessors
+namespaces sequences ;
 IN: destructors.tests
+
+TUPLE: dispose-error ;
+
+M: dispose-error dispose 3 throw ;
+
+TUPLE: dispose-dummy disposed? ;
+
+M: dispose-dummy dispose t >>disposed? drop ;
+
+T{ dispose-error } "a" set
+T{ dispose-dummy } "b" set
+
+[ f ] [ "b" get disposed?>> ] unit-test
+
+[ { "a" "b" } [ get ] map dispose-each ] [ 3 = ] must-fail-with
+
+[ t ] [ "b" get disposed?>> ] unit-test
 
 TUPLE: dummy-obj destroyed? ;
 
@@ -13,10 +31,10 @@ M: dummy-destructor dispose ( obj -- )
     dummy-destructor-obj t swap set-dummy-obj-destroyed? ;
 
 : destroy-always
-    <dummy-destructor> add-always-destructor ;
+    <dummy-destructor> &dispose drop ;
 
 : destroy-later
-    <dummy-destructor> add-error-destructor ;
+    <dummy-destructor> |dispose drop ;
 
 [ t ] [
     [
