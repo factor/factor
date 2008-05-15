@@ -151,10 +151,12 @@ M: inet6 parse-sockaddr
 
 M: f parse-sockaddr nip ;
 
-GENERIC# (wait-to-connect) 1 ( client-out handle remote -- sockaddr )
+GENERIC: (get-local-address) ( handle remote -- sockaddr )
 
-: wait-to-connect ( client-out handle remote -- local )
-    [ (wait-to-connect) ] keep parse-sockaddr ;
+: get-local-address ( handle remote -- local )
+    [ (get-local-address) ] keep parse-sockaddr ;
+
+GENERIC: establish-connection ( client-out remote -- )
 
 GENERIC: ((client)) ( remote -- handle )
 
@@ -164,12 +166,13 @@ M: array (client) [ (client) 3array ] attempt-all first3 ;
 
 M: object (client) ( remote -- client-in client-out local )
     [
+        [ ((client)) ] keep
         [
-            ((client))
-            dup <ports>
-            2dup [ add-error-destructor ] bi@
-            dup dup handle>>
-        ] keep wait-to-connect
+            >r dup <ports> [ |dispose ] bi@ dup r>
+            establish-connection
+        ]
+        [ get-local-address ]
+        2bi
     ] with-destructors ;
 
 : <client> ( remote encoding -- stream local )
@@ -184,26 +187,26 @@ SYMBOL: local-address
 TUPLE: server-port < port addr encoding ;
 
 : check-server-port ( port -- port )
-    check-closed
+    dup check-disposed
     dup server-port? [ "Not a server port" throw ] unless ; inline
 
-GENERIC: (server) ( addrspec -- handle sockaddr )
+GENERIC: (server) ( addrspec -- handle )
 
 : <server> ( addrspec encoding -- server )
-    >r [ (server) ] keep parse-sockaddr
-    swap server-port <port>
-        swap >>addr
-        r> >>encoding ;
+    >r
+    [ (server) ] keep
+    [ drop server-port <port> ] [ get-local-address ] 2bi
+    >>addr r> >>encoding ;
 
-GENERIC: (accept) ( server addrspec -- handle remote )
+GENERIC: (accept) ( server addrspec -- handle )
 
 : accept ( server -- client remote )
-    check-server-port
-    [ dup addr>> (accept) ] keep
-    tuck
-    [ [ dup <ports> ] [ encoding>> ] bi* <encoder-duplex> ]
-    [ addr>> parse-sockaddr ]
-    2bi* ;
+    [
+        dup addr>>
+        [ (accept) ] keep
+        [ drop dup <ports> ] [ get-local-address ] 2bi
+        -rot
+    ] keep encoding>> <encoder-duplex> swap ;
 
 TUPLE: datagram-port < port addr ;
 
@@ -213,7 +216,7 @@ HOOK: (datagram) io-backend ( addr -- datagram )
     dup (datagram) datagram-port <port> swap >>addr ;
 
 : check-datagram-port ( port -- port )
-    check-closed
+    dup check-disposed
     dup datagram-port? [ "Not a datagram port" throw ] unless ; inline
 
 HOOK: (receive) io-backend ( datagram -- packet addrspec )

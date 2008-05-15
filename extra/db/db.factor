@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs classes continuations kernel math
+USING: arrays assocs classes continuations destructors kernel math
 namespaces sequences sequences.lib classes.tuple words strings
 tools.walker accessors combinators.lib ;
 IN: db
@@ -25,7 +25,7 @@ GENERIC: make-db* ( seq class -- db )
 GENERIC: db-open ( db -- db )
 HOOK: db-close db ( handle -- )
 
-: dispose-statements ( seq -- ) [ dispose drop ] assoc-each ;
+: dispose-statements ( assoc -- ) values dispose-each ;
 
 : dispose-db ( db -- ) 
     dup db [

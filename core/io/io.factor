@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables generic kernel math namespaces sequences
-continuations assocs io.styles ;
+continuations destructors assocs io.styles ;
 IN: io
 
 GENERIC: stream-readln ( stream -- str/f )

@@ -1,18 +1,18 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.sockets io.files io.streams.duplex logging
-continuations kernel math math.parser namespaces parser
-sequences strings prettyprint debugger quotations calendar
-threads concurrency.combinators assocs fry ;
+continuations destructors kernel math math.parser namespaces
+parser sequences strings prettyprint debugger quotations
+calendar threads concurrency.combinators assocs fry ;
 IN: io.server
 
 SYMBOL: servers
 
+SYMBOL: remote-address
+
 <PRIVATE
 
 LOG: accepted-connection NOTICE
-
-SYMBOL: remote-address
 
 : with-connection ( client remote quot -- )
     '[

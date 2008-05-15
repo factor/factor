@@ -150,16 +150,6 @@ ERROR: attempt-all-error ;
         ] { } make peek swap [ rethrow ] when
     ] if ; inline
 
-GENERIC: dispose ( object -- )
-
-: dispose-each ( seq -- )
-    [
-        [ [ dispose ] curry [ , ] recover ] each
-    ] { } make dup empty? [ drop ] [ peek rethrow ] if ;
-
-: with-disposal ( object quot -- )
-    over [ dispose ] curry [ ] cleanup ; inline
-
 TUPLE: condition error restarts continuation ;
 
 C: <condition> condition ( error restarts cc -- condition )

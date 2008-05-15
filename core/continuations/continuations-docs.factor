@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel kernel.private
 continuations.private parser vectors arrays namespaces
-assocs words quotations io ;
+assocs words quotations ;
 IN: continuations
 
 ARTICLE: "errors-restartable" "Restartable errors"
@@ -28,13 +28,7 @@ $nl
 { $heading "Anti-pattern #3: Dropping and rethrowing" }
 "Do not use " { $link recover } " to handle an error by dropping it and throwing a new error. By losing the original error message, you signal to the user that something failed without leaving any indication of what actually went wrong. Either wrap the error in a new error containing additional information, or rethrow the original error. A more subtle form of this is using  " { $link throw } " instead of " { $link rethrow } ". The " { $link throw } " word should only be used when throwing new errors, and never when rethrowing errors that have been caught."
 { $heading "Anti-pattern #4: Logging and rethrowing" }
-"If you are going to rethrow an error, do not log a message. If you do so, the user will see two log messages for the same error, which will clutter logs without adding any useful information."
-{ $heading "Anti-pattern #5: Leaking external resources" }
-"Words which create objects corresponding to external resources should always be used with " { $link with-disposal } ". The following code is wrong:"
-{ $code
-    "<external-resource> ... do stuff ... dispose"
-}
-"The reason being that if " { $snippet "do stuff" } " throws an error, the resource will not be disposed of. The most important case where this can occur is with I/O streams, and the correct solution is to always use " { $link with-input-stream } " and " { $link with-output-stream } "; see " { $link "stdio" } " for details." ;
+"If you are going to rethrow an error, do not log a message. If you do so, the user will see two log messages for the same error, which will clutter logs without adding any useful information." ;
 
 ARTICLE: "errors" "Error handling"
 "Support for handling exceptional situations such as bad user input, implementation bugs, and input/output errors is provided by a set of words built using continuations."
@@ -87,19 +81,6 @@ $nl
 { $subsection "continuations.private" } ;
 
 ABOUT: "continuations"
-
-HELP: dispose
-{ $values { "object" "a disposable object" } }
-{ $contract "Releases operating system resources associated with a disposable object. Disposable objects include streams, memory mapped files, and so on."
-$nl
-"No further operations can be performed on a disposable object after this call."
-$nl
-"Disposing an object which has already been disposed should have no effect, and in particular it should not fail with an error." }
-{ $notes "You must close disposable objects after you are finished working with them, to avoid leaking operating system resources. A convenient way to automate this is by using the " { $link with-disposal } " word." } ;
-
-HELP: with-disposal
-{ $values { "object" "a disposable object" } { "quot" "a quotation with stack effect " { $snippet "( object -- )" } } }
-{ $description "Calls the quotation, disposing the object with " { $link dispose } " after the quotation returns or if it throws an error." } ;
 
 HELP: catchstack*
 { $values { "catchstack" "a vector of continuations" } }

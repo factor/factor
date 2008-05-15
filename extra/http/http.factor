@@ -265,7 +265,7 @@ cookies ;
     pick query>> set-at ;
 
 : chop-hostname ( str -- str' )
-    ":" split1 nip
+    ":" split1 "//" ?head drop nip
     CHAR: / over index over length or tail
     dup empty? [ drop "/" ] when ;
 
@@ -440,7 +440,7 @@ M: https protocol-addr
             dup host>> [
                 [ protocol>> protocol>string write "://" write ]
                 [ host>> url-encode write ":" write ]
-                [ port>> number>string write ]
+                [ [ port>> ] [ protocol>> http-port or ] bi number>string write ]
                 tri
             ] [ drop ] if
         ]

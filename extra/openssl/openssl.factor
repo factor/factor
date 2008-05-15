@@ -103,8 +103,7 @@ M: openssl <ssl-context> ( config -- context )
     maybe-init-ssl
     [
         dup method>> ssl-method SSL_CTX_new
-        dup ssl-error V{ } clone openssl-context boa
-        dup add-error-destructor
+        dup ssl-error V{ } clone openssl-context boa |dispose
         {
             [ load-certificate-chain ]
             [ set-default-password ]
@@ -138,14 +137,11 @@ M: ssl-handle init-handle file>> init-handle ;
 
 HOOK: ssl-shutdown io-backend ( handle -- )
 
-M: ssl-handle close-handle
-    dup disposed>> [ drop ] [
-        t >>disposed
-        [ ssl-shutdown ]
-        [ handle>> SSL_free ]
-        [ file>> close-handle ]
-        tri
-    ] if ;
+M: ssl-handle dispose*
+    [ ssl-shutdown ]
+    [ handle>> SSL_free ]
+    [ file>> dispose ]
+    tri ;
 
 ERROR: certificate-verify-error result ;
 

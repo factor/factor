@@ -12,7 +12,7 @@ SYMBOL: watches
 
 SYMBOL: inotify
 
-TUPLE: linux-monitor < monitor wd inotify watches ;
+TUPLE: linux-monitor < monitor wd inotify watches disposed ;
 
 : <linux-monitor> ( wd path mailbox -- monitor )
     linux-monitor new-monitor
@@ -54,14 +54,12 @@ M: linux (monitor) ( path recursive? mailbox -- monitor )
         IN_CHANGE_EVENTS swap add-watch
     ] if ;
 
-M: linux-monitor dispose ( monitor -- )
-    dup inotify>> closed>> [ drop ] [
-        [ [ wd>> ] [ watches>> ] bi delete-at ]
-        [
-            [ inotify>> handle>> ] [ wd>> ] bi
-            inotify_rm_watch io-error
-        ] bi
-    ] if ;
+M: linux-monitor dispose* ( monitor -- )
+    [ [ wd>> ] [ watches>> ] bi delete-at ]
+    [
+        [ inotify>> handle>> ] [ wd>> ] bi
+        inotify_rm_watch io-error
+    ] bi ;
 
 : ignore-flags? ( mask -- ? )
     {

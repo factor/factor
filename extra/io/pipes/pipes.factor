@@ -9,24 +9,21 @@ IN: io.pipes
 TUPLE: pipe in out ;
 
 M: pipe dispose ( pipe -- )
-    [ in>> close-handle ] [ out>> close-handle ] bi ;
+    [ in>> dispose ] [ out>> dispose ] bi ;
 
 HOOK: (pipe) io-backend ( -- pipe )
 
 : <pipe> ( encoding -- stream )
     [
-        >r (pipe)
-        [ add-error-destructor ]
-        [ in>> <input-port> ]
-        [ out>> <output-port> ]
-        tri
+        >r (pipe) |dispose
+        [ in>> <input-port> ] [ out>> <output-port> ] bi
         r> <encoder-duplex>
     ] with-destructors ;
 
 <PRIVATE
 
-: ?reader [ <input-port> dup add-always-destructor ] [ input-stream get ] if* ;
-: ?writer [ <output-port> dup add-always-destructor ] [ output-stream get ] if* ;
+: ?reader [ <input-port> &dispose ] [ input-stream get ] if* ;
+: ?writer [ <output-port> &dispose ] [ output-stream get ] if* ;
 
 GENERIC: run-pipeline-element ( input-fd output-fd obj -- quot )
 
@@ -38,7 +35,7 @@ M: callable run-pipeline-element
 
 : <pipes> ( n -- pipes )
     [
-        [ (pipe) dup add-error-destructor ] replicate
+        [ (pipe) |dispose ] replicate
         T{ pipe } [ prefix ] [ suffix ] bi
         2 <clumps>
     ] with-destructors ;

@@ -58,7 +58,7 @@ M: user-saver dispose
     user>> dup changed?>> [ users update-user ] [ drop ] if ;
 
 : save-user-after ( user -- )
-    <user-saver> add-always-destructor ;
+    <user-saver> &dispose drop ;
 
 : login-template ( name -- template )
     "resource:extra/http/server/auth/login/" swap ".xml"

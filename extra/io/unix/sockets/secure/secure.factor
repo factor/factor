@@ -92,12 +92,12 @@ M: ssl parse-sockaddr addrspec>> parse-sockaddr <ssl> ;
     2dup SSL_connect check-connect-response dup
     [ >r over r> wait-for-port do-ssl-connect ] [ 3drop ] if ;
 
-M: ssl-handle (wait-to-connect)
+M: ssl establish-connection ( client-out remote -- )
     addrspec>>
-    [ >r file>> r> (wait-to-connect) ]
-    [ drop handle>> do-ssl-connect ]
-    [ drop t >>connected 2drop ]
-    3tri ;
+    [ establish-connection ]
+    [ drop dup handle>> do-ssl-connect ]
+    [ drop t >>connected drop ]
+    2tri ;
 
 M: ssl (server) addrspec>> (server) ;
 
@@ -117,12 +117,8 @@ M: ssl (server) addrspec>> (server) ;
 
 M: ssl (accept)
     [
-        addrspec>>
-        (accept) >r
-        dup close-later
-        <ssl-socket> dup close-later
+        addrspec>> (accept) |dispose <ssl-socket> |dispose
         dup do-ssl-accept
-        r>
     ] with-destructors ;
 
 : check-shutdown-response ( handle r -- event )

@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic assocs kernel namespaces strings
-quotations io continuations accessors sequences ;
+quotations io continuations destructors accessors sequences ;
 IN: io.streams.nested
 
 TUPLE: filter-writer stream ;

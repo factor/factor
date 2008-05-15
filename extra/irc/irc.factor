@@ -3,7 +3,7 @@
 USING: arrays calendar combinators channels concurrency.messaging fry io
        io.encodings.8-bit io.sockets kernel math namespaces sequences
        sequences.lib splitting strings threads
-       continuations classes.tuple ascii accessors ;
+       continuations destructors classes.tuple ascii accessors ;
 IN: irc
 
 ! utils
@@ -143,7 +143,7 @@ SYMBOL: irc-client
     " hostname servername :irc.factor" irc-print ;
 
 : CONNECT ( server port -- stream )
-    <inet> latin1 <client> ;
+    <inet> latin1 <client> drop ;
 
 : JOIN ( channel password -- )
     "JOIN " irc-write

@@ -1,7 +1,7 @@
 IN: io.unix.launcher.tests
 USING: io.files tools.test io.launcher arrays io namespaces
 continuations math io.encodings.binary io.encodings.ascii
-accessors kernel sequences io.encodings.utf8 ;
+accessors kernel sequences io.encodings.utf8 destructors ;
 
 [ ] [
     [ "launcher-test-1" temp-file delete-file ] ignore-errors

@@ -6,7 +6,7 @@ prettyprint sequences strings classes.tuple alien.c-types
 continuations db.sqlite.lib db.sqlite.ffi db.tuples
 words combinators.lib db.types combinators math.intervals
 io namespaces.lib accessors vectors math.ranges random
-math.bitfields.lib db.queries ;
+math.bitfields.lib db.queries destructors ;
 USE: tools.walker
 IN: db.sqlite
 

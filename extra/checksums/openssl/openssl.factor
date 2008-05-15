@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays alien.c-types kernel continuations
-sequences io openssl openssl.libcrypto checksums ;
+destructors sequences io openssl openssl.libcrypto checksums ;
 IN: checksums.openssl
 
 ERROR: unknown-digest name ;
