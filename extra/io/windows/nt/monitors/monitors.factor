@@ -17,11 +17,7 @@ IN: io.windows.nt.monitors
     OPEN_EXISTING
     { FILE_FLAG_BACKUP_SEMANTICS FILE_FLAG_OVERLAPPED } flags
     f
-    CreateFile
-    dup invalid-handle?
-    dup close-later
-    dup add-completion
-    f <win32-file> ;
+    CreateFile opened-file ;
 
 TUPLE: win32-monitor-port < input-port recursive ;
 
@@ -41,11 +37,7 @@ TUPLE: win32-monitor < monitor port ;
 
 : read-changes ( port -- bytes )
     [
-        dup begin-reading-changes
-        swap [ save-callback ] 2keep
-        check-closed ! we may have closed it...
-        dup eof>> [ "EOF??" throw ] when
-        get-overlapped-result
+        [ begin-reading-changes ] [ twiddle-thumbs ] bi
     ] with-destructors ;
 
 : parse-action ( action -- changed )
@@ -87,7 +79,7 @@ TUPLE: win32-monitor < monitor port ;
     ] each ;
 
 : fill-queue ( monitor -- )
-    dup port>> check-closed
+    dup port>> dup check-disposed
     [ buffer>> ptr>> ] [ read-changes zero? ] bi
     [ 2dup parse-notify-records ] unless
     2drop ;
@@ -97,7 +89,7 @@ TUPLE: win32-monitor < monitor port ;
 
 : fill-queue-thread ( monitor -- )
     [ dup fill-queue (fill-queue-thread) ]
-    [ dup port-closed-error? [ 2drop ] [ rethrow ] if ] recover ;
+    [ dup already-disposed? [ 2drop ] [ rethrow ] if ] recover ;
 
 M:: winnt (monitor) ( path recursive? mailbox -- monitor )
     [

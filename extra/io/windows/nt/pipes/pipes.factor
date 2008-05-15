@@ -17,10 +17,7 @@ IN: io.windows.nt.pipes
     4096
     0
     security-attributes-inherit
-    CreateNamedPipe
-    dup win32-error=0/f
-    dup add-completion
-    f <win32-file> ;
+    CreateNamedPipe opened-file ;
 
 : open-other-end ( name -- handle )
     GENERIC_WRITE
@@ -29,10 +26,7 @@ IN: io.windows.nt.pipes
     OPEN_EXISTING
     FILE_FLAG_OVERLAPPED
     f
-    CreateFile
-    dup win32-error=0/f
-    dup add-completion
-    f <win32-file> ;
+    CreateFile opened-file ;
 
 : unique-pipe-name ( -- string )
     [
@@ -47,7 +41,6 @@ IN: io.windows.nt.pipes
 M: winnt (pipe) ( -- pipe )
     [
         unique-pipe-name
-        [ create-named-pipe dup close-later ]
-        [ open-other-end dup close-later ]
-        bi pipe boa
+        [ create-named-pipe ] [ open-other-end ] bi
+        pipe boa
     ] with-destructors ;

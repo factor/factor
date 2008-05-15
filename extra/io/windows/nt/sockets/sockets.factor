@@ -1,8 +1,9 @@
 USING: alien alien.accessors alien.c-types byte-arrays
 continuations destructors io.ports io.timeouts io.sockets
 io.sockets io namespaces io.streams.duplex io.windows
+io.windows.sockets
 io.windows.nt.backend windows.winsock kernel libc math sequences
-threads classes.tuple.lib system accessors ;
+threads classes.tuple.lib system combinators accessors ;
 IN: io.windows.nt.sockets
 
 : malloc-int ( object -- object )
@@ -30,121 +31,68 @@ TUPLE: ConnectEx-args port
     s* name* namelen* lpSendBuffer* dwSendDataLength*
     lpdwBytesSent* lpOverlapped* ptr* ;
 
-: init-connect ( sockaddr size ConnectEx -- )
-    [ set-ConnectEx-args-namelen* ] keep
-    [ set-ConnectEx-args-name* ] keep
-    f over set-ConnectEx-args-lpSendBuffer*
-    0 over set-ConnectEx-args-dwSendDataLength*
-    f over set-ConnectEx-args-lpdwBytesSent*
-    (make-overlapped) swap set-ConnectEx-args-lpOverlapped* ;
+: wait-for-socket ( args -- n )
+    [ lpOverlapped*>> ] [ port>> ] bi twiddle-thumbs ;
 
-: (ConnectEx) ( ConnectEx -- )
-    \ ConnectEx-args >tuple*<
+: <ConnectEx-args> ( sockaddr size -- ConnectEx )
+    ConnectEx-args new
+        swap >>namelen*
+        swap >>name*
+        f >>lpSendBuffer*
+        0 >>dwSendDataLength*
+        f >>lpdwBytesSent*
+        (make-overlapped) >>lpOverlapped* ;
+
+: call-ConnectEx ( ConnectEx -- )
+    ConnectEx-args >tuple*<
     "int"
     { "SOCKET" "sockaddr_in*" "int" "PVOID" "DWORD" "LPDWORD" "void*" }
     "stdcall" alien-indirect drop
     winsock-error-string [ throw ] when* ;
 
-: connect-continuation ( overlapped port -- )
-    2dup save-callback
-    get-overlapped-result drop ;
-
-M: win32-socket wait-to-connect ( client-out handle -- )
-    [ overlapped>> swap connect-continuation ]
-    [ drop pending-error ]
-    2bi ;
-
-M: object ((client)) ( addrspec -- handle )
-    [
-        \ ConnectEx-args new
-        over make-sockaddr/size pick init-connect
-        over tcp-socket over set-ConnectEx-args-s*
-        dup ConnectEx-args-s* add-completion
-        dup ConnectEx-args-s* get-ConnectEx-ptr over set-ConnectEx-args-ptr*
-        dup ConnectEx-args-s* INADDR_ANY roll bind-socket
-        dup (ConnectEx)
-
-        dup [ ConnectEx-args-s* ] [ ConnectEx-args-lpOverlapped* ] bi <win32-socket>
-    ] with-destructors ;
+M: object establish-connection ( client-out remote -- )
+    make-sockaddr/size <ConnectEx-args>
+        swap >>port
+        dup port>> handle>> handle>> >>s*
+        dup s*>> get-ConnectEx-ptr >>ptr*
+        dup call-ConnectEx
+        wait-for-socket drop ;
 
 TUPLE: AcceptEx-args port
     sListenSocket* sAcceptSocket* lpOutputBuffer* dwReceiveDataLength*
     dwLocalAddressLength* dwRemoteAddressLength* lpdwBytesReceived* lpOverlapped* ;
 
-: init-accept-buffer ( server-port AcceptEx -- )
-    >r server-port-addr sockaddr-type heap-size 16 +
-    dup dup 2 * malloc dup free-always r>
-    [ set-AcceptEx-args-lpOutputBuffer* ] keep
-    [ set-AcceptEx-args-dwLocalAddressLength* ] keep
-    set-AcceptEx-args-dwRemoteAddressLength* ;
+: init-accept-buffer ( addr AcceptEx -- )
+    swap sockaddr-type heap-size 16 +
+        [ >>dwLocalAddressLength* ] [ >>dwRemoteAddressLength* ] bi
+        dup dwLocalAddressLength*>> 2 * malloc &free >>lpOutputBuffer*
+        drop ;
 
-: init-accept ( server-port AcceptEx -- )
-    [ init-accept-buffer ] 2keep
-    [ set-AcceptEx-args-port ] 2keep
-    >r port-handle win32-file-handle r> [ set-AcceptEx-args-sListenSocket* ] keep
-    dup AcceptEx-args-port server-port-addr tcp-socket
-    over set-AcceptEx-args-sAcceptSocket*
-    0 over set-AcceptEx-args-dwReceiveDataLength*
-    f over set-AcceptEx-args-lpdwBytesReceived*
-    (make-overlapped) swap set-AcceptEx-args-lpOverlapped* ;
+: <AcceptEx-args> ( server addr -- AcceptEx )
+    AcceptEx-args new
+        2dup init-accept-buffer
+        swap SOCK_STREAM open-socket |dispose handle>> >>sAcceptSocket*
+        over handle>> handle>> >>sListenSocket*
+        swap >>port
+        0 >>dwReceiveDataLength*
+        f >>lpdwBytesReceived*
+        (make-overlapped) >>lpOverlapped* ;
 
-: ((accept)) ( AcceptEx -- )
-    \ AcceptEx-args >tuple*<
-    AcceptEx drop
+: call-AcceptEx ( AcceptEx -- )
+    AcceptEx-args >tuple*< AcceptEx drop
     winsock-error-string [ throw ] when* ;
 
-: make-accept-continuation ( AcceptEx -- )
-    dup AcceptEx-args-lpOverlapped*
-    swap AcceptEx-args-port save-callback ;
-
-: check-accept-error ( AcceptEx -- )
-    dup AcceptEx-args-lpOverlapped*
-    swap AcceptEx-args-port get-overlapped-result drop ;
-
-: extract-remote-host ( AcceptEx -- addrspec )
-    [
-        [ AcceptEx-args-lpOutputBuffer* ] keep
-        [ AcceptEx-args-dwReceiveDataLength* ] keep
-        [ AcceptEx-args-dwLocalAddressLength* ] keep
-        AcceptEx-args-dwRemoteAddressLength*
-        f <void*>
-        0 <int>
-        f <void*> [
-            0 <int> GetAcceptExSockaddrs
-        ] keep *void*
-    ] keep AcceptEx-args-port server-port-addr parse-sockaddr ;
-
-: accept-continuation ( AcceptEx -- addrspec client )
-    [ make-accept-continuation ] keep
-    [ check-accept-error ] keep
-    [ extract-remote-host ] keep
-    ! addrspec AcceptEx
-    [ AcceptEx-args-sAcceptSocket* add-completion ] keep
-    [ AcceptEx-args-sAcceptSocket* ] [ AcceptEx-args-lpOverlapped* ] bi <win32-socket> ;
-
-M: winnt (accept) ( server -- addrspec handle )
+M: object (accept) ( server addr -- handle )
     [
         [
-            \ AcceptEx-args new
-            [ init-accept ] keep
-            [ ((accept)) ] keep
-            [ accept-continuation ] keep
-            AcceptEx-args-port pending-error
-        ] with-timeout
-    ] with-destructors ;
-
-M: winnt (server) ( addrspec -- handle )
-    [
-        SOCK_STREAM server-fd dup listen-on-socket
-        dup add-completion
-        f <win32-socket>
-    ] with-destructors ;
-
-M: winnt (datagram) ( addrspec -- handle )
-    [
-        SOCK_DGRAM server-fd
-        dup add-completion
-        f <win32-socket>
+            <AcceptEx-args>
+            {
+                [ call-AcceptEx ]
+                [ wait-for-socket drop ]
+                [ sAcceptSocket*>> opened-socket ]
+                [ port>> pending-error ]
+            } cleave
+        ] curry with-timeout
     ] with-destructors ;
 
 TUPLE: WSARecvFrom-args port
@@ -152,53 +100,38 @@ TUPLE: WSARecvFrom-args port
        lpFlags* lpFrom* lpFromLen* lpOverlapped* lpCompletionRoutine* ;
 
 : make-receive-buffer ( -- WSABUF )
-    "WSABUF" malloc-object dup free-always
+    "WSABUF" malloc-object &free
     default-buffer-size get over set-WSABUF-len
-    default-buffer-size get malloc dup free-always over set-WSABUF-buf ;
+    default-buffer-size get malloc &free over set-WSABUF-buf ;
 
-: init-WSARecvFrom ( datagram WSARecvFrom -- )
-    [ set-WSARecvFrom-args-port ] 2keep
-    [
-        >r handle>> handle>> r>
-        set-WSARecvFrom-args-s*
-    ] 2keep [
-        >r datagram-port-addr sockaddr-type heap-size r>
-        2dup >r malloc dup free-always r> set-WSARecvFrom-args-lpFrom*
-        >r malloc-int dup free-always r> set-WSARecvFrom-args-lpFromLen*
-    ] keep
-    make-receive-buffer over set-WSARecvFrom-args-lpBuffers*
-    1 over set-WSARecvFrom-args-dwBufferCount*
-    0 malloc-int dup free-always over set-WSARecvFrom-args-lpFlags*
-    0 malloc-int dup free-always over set-WSARecvFrom-args-lpNumberOfBytesRecvd*
-    (make-overlapped) swap set-WSARecvFrom-args-lpOverlapped* ;
-
-: WSARecvFrom-continuation ( WSARecvFrom -- n )
-    dup WSARecvFrom-args-lpOverlapped*
-    swap WSARecvFrom-args-port [ save-callback ] 2keep
-    get-overlapped-result ;
+: <WSARecvFrom-args> ( datagram -- WSARecvFrom )
+    WSARecvFrom-args new
+        swap >>port
+        dup port>> handle>> handle>> >>s*
+        dup port>> addr>> sockaddr-type heap-size
+            [ malloc &free >>lpFrom* ]
+            [ malloc-int &free >>lpFromLen* ] bi
+        make-receive-buffer >>lpBuffers*
+        1 >>dwBufferCount*
+        0 malloc-int &free >>lpFlags*
+        0 malloc-int &free >>lpNumberOfBytesRecvd*
+        (make-overlapped) >>lpOverlapped* ;
 
 : call-WSARecvFrom ( WSARecvFrom -- )
-    \ WSARecvFrom-args >tuple*<
-    WSARecvFrom
-    socket-error* ;
+    WSARecvFrom-args >tuple*< WSARecvFrom socket-error* ;
 
-: parse-WSARecvFrom ( n WSARecvFrom -- packet addrspec )
-    [
-        WSARecvFrom-args-lpBuffers* WSABUF-buf
-        swap memory>byte-array
-    ] keep
-    [ WSARecvFrom-args-lpFrom* ] keep
-    WSARecvFrom-args-port datagram-port-addr parse-sockaddr ;
+: parse-WSARecvFrom ( n WSARecvFrom -- packet sockaddr )
+    [ lpBuffers*>> WSABUF-buf swap memory>byte-array ] [ lpFrom*>> ] bi ;
 
-M: winnt receive ( datagram -- packet addrspec )
+M: winnt (receive) ( datagram -- packet addrspec )
     [
-        check-datagram-port
-        \ WSARecvFrom-args new
-        [ init-WSARecvFrom ] keep
-        [ call-WSARecvFrom ] keep
-        [ WSARecvFrom-continuation ] keep
-        [ WSARecvFrom-args-port pending-error ] keep
-        parse-WSARecvFrom
+        <WSARecvFrom-args>
+        {
+            [ call-WSARecvFrom ]
+            [ wait-for-socket ]
+            [ port>> pending-error ]
+            [ parse-WSARecvFrom ]
+        } cleave
     ] with-destructors ;
 
 TUPLE: WSASendTo-args port
@@ -206,49 +139,33 @@ TUPLE: WSASendTo-args port
        dwFlags* lpTo* iToLen* lpOverlapped* lpCompletionRoutine* ;
 
 : make-send-buffer ( packet -- WSABUF )
-    "WSABUF" malloc-object dup free-always
-    over malloc-byte-array dup free-always over set-WSABUF-buf
-    swap length over set-WSABUF-len ;
+    "WSABUF" malloc-object &free
+    [ >r malloc-byte-array &free r> set-WSABUF-buf ]
+    [ >r length r> set-WSABUF-len ]
+    [ nip ]
+    2tri ;
 
-: init-WSASendTo ( packet addrspec datagram WSASendTo -- )
-    [ set-WSASendTo-args-port ] 2keep
-    [
-        >r port-handle win32-file-handle r> set-WSASendTo-args-s*
-    ] keep
-    [
-        >r make-sockaddr/size >r
-        malloc-byte-array dup free-always
-        r> r>
-        [ set-WSASendTo-args-iToLen* ] keep
-        set-WSASendTo-args-lpTo*
-    ] keep
-    [
-        >r make-send-buffer r> set-WSASendTo-args-lpBuffers*
-    ] keep
-    1 over set-WSASendTo-args-dwBufferCount*
-    0 over set-WSASendTo-args-dwFlags*
-    0 <uint> over set-WSASendTo-args-lpNumberOfBytesSent*
-    (make-overlapped) swap set-WSASendTo-args-lpOverlapped* ;
-
-: WSASendTo-continuation ( WSASendTo -- )
-    dup WSASendTo-args-lpOverlapped*
-    swap WSASendTo-args-port
-    [ save-callback ] 2keep
-    get-overlapped-result drop ;
+: <WSASendTo-args> ( packet addrspec datagram -- WSASendTo )
+    WSASendTo-args new
+        swap >>port
+        dup port>> handle>> handle>> >>s*
+        swap make-sockaddr/size
+            >r malloc-byte-array &free
+            r> [ >>lpTo* ] [ >>iToLen* ] bi*
+        swap make-send-buffer >>lpBuffers*
+        1 >>dwBufferCount*
+        0 >>dwFlags*
+        0 <uint> >>lpNumberOfBytesSent*
+        (make-overlapped) >>lpOverlapped* ;
 
 : call-WSASendTo ( WSASendTo -- )
-    \ WSASendTo-args >tuple*<
-    WSASendTo socket-error* ;
+    WSASendTo-args >tuple*< WSASendTo socket-error* ;
 
-USE: io.sockets
-
-M: winnt send ( packet addrspec datagram -- )
+M: winnt (send) ( packet addrspec datagram -- )
     [
-        check-datagram-send
-        \ WSASendTo-args new
-        [ init-WSASendTo ] keep
-        [ call-WSASendTo ] keep
-        [ WSASendTo-continuation ] keep
-        WSASendTo-args-port pending-error
+        <WSASendTo-args>
+        [ call-WSASendTo ]
+        [ wait-for-socket drop ]
+        [ port>> pending-error ]
+        tri
     ] with-destructors ;
-

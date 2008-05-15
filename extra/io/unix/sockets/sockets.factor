@@ -23,7 +23,7 @@ M: unix addrinfo-error ( n -- )
 
 ! Client sockets - TCP and Unix domain
 M: object (get-local-address) ( handle remote -- sockaddr )
-    >r handle-fd r> empty-sockaddr/size
+    >r handle-fd r> empty-sockaddr/size <int>
     [ getsockname io-error ] 2keep drop ;
 
 : init-client-socket ( fd -- )
@@ -67,7 +67,7 @@ M: object (server) ( addrspec -- handle )
     ] with-destructors ;
 
 : do-accept ( server addrspec -- fd )
-    [ handle>> handle-fd ] [ empty-sockaddr/size ] bi* accept ; inline
+    [ handle>> handle-fd ] [ empty-sockaddr/size <int> ] bi* accept ; inline
 
 M: object (accept) ( server addrspec -- fd )
     2dup do-accept
@@ -100,7 +100,7 @@ packet-size <byte-array> receive-buffer set-global
         packet-size ! nbytes
         0 ! flags
         sockaddr ! from
-        len ! fromlen
+        len <int> ! fromlen
         recvfrom dup 0 >= [
             receive-buffer get-global swap head sockaddr
         ] [

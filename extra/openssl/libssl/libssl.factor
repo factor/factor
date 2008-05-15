@@ -122,6 +122,13 @@ FUNCTION: int SSL_shutdown ( ssl-pointer ssl ) ;
 
 FUNCTION: void SSL_free ( ssl-pointer ssl ) ;
 
+FUNCTION: int SSL_want ( ssl-pointer ssl ) ;
+
+: SSL_NOTHING 1 ; inline
+: SSL_WRITING 2 ; inline
+: SSL_READING 3 ; inline
+: SSL_X509_LOOKUP 4 ; inline
+
 FUNCTION: long SSL_get_verify_result ( SSL* ssl ) ;
 
 FUNCTION: X509* SSL_get_peer_certificate ( SSL* s ) ;
