@@ -8,11 +8,11 @@ IN: io.server
 
 SYMBOL: servers
 
+SYMBOL: remote-address
+
 <PRIVATE
 
 LOG: accepted-connection NOTICE
-
-SYMBOL: remote-address
 
 : with-connection ( client remote quot -- )
     '[

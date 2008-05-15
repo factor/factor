@@ -68,6 +68,11 @@ SYMBOLS: +read-only+ +hidden+ +system+
         ! [ BY_HANDLE_FILE_INFORMATION-ftCreationTime FILETIME>timestamp ]
         [ BY_HANDLE_FILE_INFORMATION-ftLastWriteTime FILETIME>timestamp ]
         ! [ BY_HANDLE_FILE_INFORMATION-ftLastAccessTime FILETIME>timestamp ]
+        ! [ BY_HANDLE_FILE_INFORMATION-nNumberOfLinks ]
+        ! [
+          ! [ BY_HANDLE_FILE_INFORMATION-nFileIndexLow ]
+          ! [ BY_HANDLE_FILE_INFORMATION-nFileIndexHigh ] bi >64bit
+        ! ]
     } cleave
     \ file-info boa ;
 
