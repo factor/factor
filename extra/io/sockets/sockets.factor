@@ -151,10 +151,9 @@ M: inet6 parse-sockaddr
 
 M: f parse-sockaddr nip ;
 
-GENERIC# (wait-to-connect) 1 ( client-out handle remote -- sockaddr )
+GENERIC# get-local-address 1 ( handle remote -- sockaddr )
 
-: wait-to-connect ( client-out handle remote -- local )
-    [ (wait-to-connect) ] keep parse-sockaddr ;
+GENERIC: establish-connection ( client-out remote -- )
 
 GENERIC: ((client)) ( remote -- handle )
 
@@ -164,12 +163,8 @@ M: array (client) [ (client) 3array ] attempt-all first3 ;
 
 M: object (client) ( remote -- client-in client-out local )
     [
-        [
-            ((client))
-            dup <ports>
-            2dup [ add-error-destructor ] bi@
-            dup dup handle>>
-        ] keep wait-to-connect
+        [ ((client)) dup <ports> 2dup [ |dispose drop ] bi@ ] keep
+        [ establish-connection ] [ drop ] [ get-local-address ] 2tri
     ] with-destructors ;
 
 : <client> ( remote encoding -- stream local )

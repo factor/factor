@@ -103,8 +103,7 @@ M: openssl <ssl-context> ( config -- context )
     maybe-init-ssl
     [
         dup method>> ssl-method SSL_CTX_new
-        dup ssl-error V{ } clone openssl-context boa
-        dup add-error-destructor
+        dup ssl-error V{ } clone openssl-context boa |dispose
         {
             [ load-certificate-chain ]
             [ set-default-password ]

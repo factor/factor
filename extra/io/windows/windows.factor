@@ -185,7 +185,7 @@ M: socket-destructor dispose ( obj -- )
     alien>> destruct-socket ;
 
 : close-socket-later ( handle -- )
-    <socket-destructor> <only-once> add-error-destructor ;
+    <socket-destructor> <only-once> |dispose drop ;
 
 : server-fd ( addrspec type -- fd )
     >r dup protocol-family r> open-socket

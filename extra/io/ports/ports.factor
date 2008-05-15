@@ -27,11 +27,11 @@ C: <handle-destructor> handle-destructor
 M: handle-destructor dispose ( obj -- )
     handle>> close-handle ;
 
-: close-always ( handle -- )
-    <handle-destructor> <only-once> add-always-destructor ;
+: &close-handle ( handle -- handle )
+    <handle-destructor> <only-once> &dispose ; inline
 
-: close-later ( handle -- )
-    <handle-destructor> <only-once> add-error-destructor ;
+: |close-handle ( handle -- handle )
+    <handle-destructor> <only-once> |dispose ; inline
 
 : <port> ( handle class -- port )
     new
@@ -161,6 +161,6 @@ M: port dispose
 
 : <ports> ( read-handle write-handle -- input-port output-port )
     [
-        [ <input-port> dup add-error-destructor ]
-        [ <output-port> dup add-error-destructor ] bi*
+        [ <input-port> |dispose ]
+        [ <output-port> |dispose ] bi*
     ] with-destructors ;

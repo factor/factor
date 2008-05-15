@@ -119,8 +119,8 @@ M: ssl (accept)
     [
         addrspec>>
         (accept) >r
-        dup close-later
-        <ssl-socket> dup close-later
+        |close-handle
+        <ssl-socket> |close-handle
         dup do-ssl-accept
         r>
     ] with-destructors ;

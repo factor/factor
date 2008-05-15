@@ -13,10 +13,10 @@ M: dummy-destructor dispose ( obj -- )
     dummy-destructor-obj t swap set-dummy-obj-destroyed? ;
 
 : destroy-always
-    <dummy-destructor> add-always-destructor ;
+    <dummy-destructor> &dispose drop ;
 
 : destroy-later
-    <dummy-destructor> add-error-destructor ;
+    <dummy-destructor> |dispose drop ;
 
 [ t ] [
     [

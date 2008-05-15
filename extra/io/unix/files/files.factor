@@ -33,7 +33,7 @@ M: unix (file-writer) ( path -- stream )
 
 : open-append ( path -- fd )
     [
-        append-flags file-mode open-file dup close-later
+        append-flags file-mode open-file |close-handle
         dup 0 SEEK_END lseek io-error
     ] with-destructors ;
 

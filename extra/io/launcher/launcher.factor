@@ -158,7 +158,7 @@ M: object run-pipeline-element
 : <process-reader*> ( process encoding -- process stream )
     [
         >r (pipe) {
-            [ add-error-destructor ]
+            [ |dispose drop ]
             [
                 swap >process
                     [ swap out>> or ] change-stdout
@@ -175,7 +175,7 @@ M: object run-pipeline-element
 : <process-writer*> ( process encoding -- process stream )
     [
         >r (pipe) {
-            [ add-error-destructor ]
+            [ |dispose drop ]
             [
                 swap >process
                     [ swap in>> or ] change-stdout
@@ -192,7 +192,7 @@ M: object run-pipeline-element
 : <process-stream*> ( process encoding -- process stream )
     [
         >r (pipe) (pipe) {
-            [ [ add-error-destructor ] bi@ ]
+            [ [ |dispose drop ] bi@ ]
             [
                 rot >process
                     [ swap out>> or ] change-stdout
