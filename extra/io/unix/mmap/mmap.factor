@@ -6,7 +6,7 @@ IN: io.unix.mmap
 
 : open-r/w ( path -- fd ) O_RDWR file-mode open-file ;
 
-:: mmap-open ( length prot flags path -- alien fd )
+:: mmap-open ( path length prot flags -- alien fd )
     [
         f length prot flags
         path open-r/w |dispose
@@ -14,10 +14,9 @@ IN: io.unix.mmap
     ] with-destructors ;
 
 M: unix (mapped-file)
-    swap >r
     { PROT_READ PROT_WRITE } flags
     { MAP_FILE MAP_SHARED } flags
-    r> mmap-open ;
+    mmap-open ;
 
 M: unix close-mapped-file ( mmap -- )
     [ [ address>> ] [ length>> ] bi munmap io-error ]

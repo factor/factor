@@ -167,6 +167,8 @@ FUNCTION: int shutdown ( SOCKET s, int how ) ;
 FUNCTION: int send ( SOCKET s, char* buf, int len, int flags ) ;
 FUNCTION: int recv ( SOCKET s, char* buf, int len, int flags ) ;
 
+FUNCTION: int getsockname ( SOCKET s, sockaddr_in* address, int* addrlen ) ;
+
 TYPEDEF: uint SERVICETYPE
 TYPEDEF: OVERLAPPED WSAOVERLAPPED
 TYPEDEF: WSAOVERLAPPED* LPWSAOVERLAPPED

@@ -4,8 +4,9 @@ USING: alien alien.c-types arrays continuations destructors io
 io.windows libc io.ports io.pipes windows.types
 math windows.kernel32 windows namespaces io.launcher kernel
 sequences windows.errors assocs splitting system strings
-io.windows.launcher io.windows.nt.pipes io.backend io.files
-io.files.private combinators shuffle accessors locals ;
+io.windows.launcher io.windows.files
+io.backend io.files io.files.private combinators shuffle
+accessors locals ;
 IN: io.windows.nt.launcher
 
 : duplicate-handle ( handle -- handle' )
@@ -21,10 +22,10 @@ IN: io.windows.nt.launcher
 
 ! /dev/null simulation
 : null-input ( -- pipe )
-    (pipe) [ in>> handle>> ] [ out>> close-handle ] bi ;
+    (pipe) [ in>> handle>> ] [ out>> dispose ] bi ;
 
 : null-output ( -- pipe )
-    (pipe) [ in>> close-handle ] [ out>> handle>> ] bi ;
+    (pipe) [ in>> dispose ] [ out>> handle>> ] bi ;
 
 : null-pipe ( mode -- pipe )
     {
@@ -35,13 +36,13 @@ IN: io.windows.nt.launcher
 ! The below code is based on the example given in
 ! http://msdn2.microsoft.com/en-us/library/ms682499.aspx
 
-: redirect-default ( default obj access-mode create-mode -- handle )
-    3drop ;
+: redirect-default ( obj access-mode create-mode -- handle )
+    3drop f ;
 
-: redirect-closed ( default obj access-mode create-mode -- handle )
-    drop 2nip null-pipe ;
+: redirect-closed ( obj access-mode create-mode -- handle )
+    drop nip null-pipe ;
 
-:: redirect-file ( default path access-mode create-mode -- handle )
+:: redirect-file ( path access-mode create-mode -- handle )
     path normalize-path
     access-mode
     share-mode
@@ -49,9 +50,9 @@ IN: io.windows.nt.launcher
     create-mode
     FILE_ATTRIBUTE_NORMAL ! flags and attributes
     f ! template file
-    CreateFile dup invalid-handle? dup close-always ;
+    CreateFile dup invalid-handle? <win32-file> &dispose handle>> ;
 
-: redirect-append ( default path access-mode create-mode -- handle )
+: redirect-append ( path access-mode create-mode -- handle )
     >r >r path>> r> r>
     drop OPEN_ALWAYS
     redirect-file
@@ -60,14 +61,13 @@ IN: io.windows.nt.launcher
 : set-inherit ( handle ? -- )
     >r HANDLE_FLAG_INHERIT r> >BOOLEAN SetHandleInformation win32-error=0/f ;
 
-: redirect-handle ( default handle access-mode create-mode -- handle )
-    2drop nip
-    handle>> duplicate-handle dup t set-inherit ;
+: redirect-handle ( handle access-mode create-mode -- handle )
+    2drop handle>> duplicate-handle dup t set-inherit ;
 
-: redirect-stream ( default stream access-mode create-mode -- handle )
-    >r >r underlying-handle r> r> redirect-handle ;
+: redirect-stream ( stream access-mode create-mode -- handle )
+    >r >r underlying-handle handle>> r> r> redirect-handle ;
 
-: redirect ( default obj access-mode create-mode -- handle )
+: redirect ( obj access-mode create-mode -- handle )
     {
         { [ pick not ] [ redirect-default ] }
         { [ pick +closed+ eq? ] [ redirect-closed ] }
@@ -77,12 +77,9 @@ IN: io.windows.nt.launcher
         [ redirect-stream ]
     } cond ;
 
-: default-stdout ( args -- handle )
-    stdout-pipe>> dup [ out>> ] when ;
-
 : redirect-stdout ( process args -- handle )
-    default-stdout
-    swap stdout>>
+    drop
+    stdout>>
     GENERIC_WRITE
     CREATE_ALWAYS
     redirect
@@ -90,25 +87,20 @@ IN: io.windows.nt.launcher
 
 : redirect-stderr ( process args -- handle )
     over stderr>> +stdout+ eq? [
-        lpStartupInfo>>
-        STARTUPINFO-hStdOutput
         nip
+        lpStartupInfo>> STARTUPINFO-hStdOutput
     ] [
         drop
-        f
-        swap stderr>>
+        stderr>>
         GENERIC_WRITE
         CREATE_ALWAYS
         redirect
         STD_ERROR_HANDLE GetStdHandle or
     ] if ;
 
-: default-stdin ( args -- handle )
-    stdin-pipe>> dup [ in>> ] when ;
-
 : redirect-stdin ( process args -- handle )
-    default-stdin
-    swap stdin>>
+    drop
+    stdin>>
     GENERIC_READ
     OPEN_EXISTING
     redirect

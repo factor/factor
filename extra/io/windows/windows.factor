@@ -8,18 +8,33 @@ windows.shell32 windows.types windows.winsock splitting
 continuations math.bitfields system accessors ;
 IN: io.windows
 
-M: windows destruct-socket closesocket drop ;
+TUPLE: win32-handle handle disposed ;
 
-TUPLE: win32-file handle ptr ;
+: new-win32-handle ( handle class -- win32-handle )
+    new swap >>handle ;
 
-C: <win32-file> win32-file
+: <win32-handle> ( handle -- win32-handle )
+    win32-handle new-win32-handle ;
+
+M: win32-handle dispose* ( handle -- )
+    handle>> CloseHandle drop ;
+
+TUPLE: win32-file < win32-handle ptr ;
+
+: <win32-file> ( handle -- win32-file )
+    win32-file new-win32-handle ;
+
+M: win32-file init-handle ( handle -- )
+    drop ;
 
 HOOK: CreateFile-flags io-backend ( DWORD -- DWORD )
 HOOK: FileArgs-overlapped io-backend ( port -- overlapped/f )
 HOOK: add-completion io-backend ( port -- )
 
-M: windows normalize-directory ( string -- string )
-    normalize-path "\\" ?tail drop "\\*" append ;
+: opened-file ( handle -- win32-file )
+    dup invalid-handle?
+    <win32-file> |dispose
+    dup add-completion ;
 
 : share-mode ( -- fixnum )
     {
@@ -36,176 +51,3 @@ M: windows normalize-directory ( string -- string )
 : security-attributes-inherit ( -- obj )
     default-security-attributes
     TRUE over set-SECURITY_ATTRIBUTES-bInheritHandle ; foldable
-
-M: win32-file init-handle ( handle -- )
-    drop ;
-
-M: win32-file close-handle ( handle -- )
-    win32-file-handle close-handle ;
-
-M: alien close-handle ( handle -- )
-    CloseHandle drop ;
-
-! Clean up resources (open handle) if add-completion fails
-: open-file ( path access-mode create-mode flags -- handle )
-    [
-        >r >r share-mode security-attributes-inherit r> r>
-        CreateFile-flags f CreateFile
-        dup invalid-handle? dup close-later
-        dup add-completion
-    ] with-destructors ;
-
-: open-pipe-r/w ( path -- handle )
-    { GENERIC_READ GENERIC_WRITE } flags
-    OPEN_EXISTING 0 open-file ;
-
-: open-read ( path -- handle length )
-    GENERIC_READ OPEN_EXISTING 0 open-file 0 ;
-
-: open-write ( path -- handle length )
-    GENERIC_WRITE CREATE_ALWAYS 0 open-file 0 ;
-
-: (open-append) ( path -- handle )
-    GENERIC_WRITE OPEN_ALWAYS 0 open-file ;
-
-: open-existing ( path -- handle )
-    { GENERIC_READ GENERIC_WRITE } flags
-    share-mode
-    f
-    OPEN_EXISTING
-    FILE_FLAG_BACKUP_SEMANTICS
-    f CreateFileW dup win32-error=0/f ;
-
-: maybe-create-file ( path -- handle ? )
-    #! return true if file was just created
-    { GENERIC_READ GENERIC_WRITE } flags
-    share-mode
-    f
-    OPEN_ALWAYS
-    0 CreateFile-flags
-    f CreateFileW dup win32-error=0/f
-    GetLastError ERROR_ALREADY_EXISTS = not ;
-
-: set-file-pointer ( handle length method -- )
-    >r dupd d>w/w <uint> r> SetFilePointer
-    INVALID_SET_FILE_POINTER = [
-        CloseHandle "SetFilePointer failed" throw
-    ] when drop ;
-
-HOOK: open-append os ( path -- handle length )
-
-TUPLE: FileArgs
-    hFile lpBuffer nNumberOfBytesToRead
-    lpNumberOfBytesRet lpOverlapped ;
-
-C: <FileArgs> FileArgs
-
-: make-FileArgs ( port -- <FileArgs> )
-    [ port-handle win32-file-handle ] keep
-    [ buffer>> ] keep
-    [
-        buffer>> buffer-length
-        "DWORD" <c-object>
-    ] keep FileArgs-overlapped <FileArgs> ;
-
-: setup-read ( <FileArgs> -- hFile lpBuffer nNumberOfBytesToRead lpNumberOfBytesRead lpOverlapped )
-    [ FileArgs-hFile ] keep
-    [ FileArgs-lpBuffer buffer-end ] keep
-    [ FileArgs-lpBuffer buffer-capacity ] keep
-    [ FileArgs-lpNumberOfBytesRet ] keep
-    FileArgs-lpOverlapped ;
-
-: setup-write ( <FileArgs> -- hFile lpBuffer nNumberOfBytesToWrite lpNumberOfBytesWritten lpOverlapped )
-    [ FileArgs-hFile ] keep
-    [ FileArgs-lpBuffer buffer@ ] keep
-    [ FileArgs-lpBuffer buffer-length ] keep
-    [ FileArgs-lpNumberOfBytesRet ] keep
-    FileArgs-lpOverlapped ;
-
-M: windows (file-reader) ( path -- stream )
-    open-read <win32-file> <input-port> ;
-
-M: windows (file-writer) ( path -- stream )
-    open-write <win32-file> <output-port> ;
-
-M: windows (file-appender) ( path -- stream )
-    open-append <win32-file> <output-port> ;
-
-M: windows move-file ( from to -- )
-    [ normalize-path ] bi@ MoveFile win32-error=0/f ;
-
-M: windows delete-file ( path -- )
-    normalize-path DeleteFile win32-error=0/f ;
-
-M: windows copy-file ( from to -- )
-    dup parent-directory make-directories
-    [ normalize-path ] bi@ 0 CopyFile win32-error=0/f ;
-
-M: windows make-directory ( path -- )
-    normalize-path
-    f CreateDirectory win32-error=0/f ;
-
-M: windows delete-directory ( path -- )
-    normalize-path
-    RemoveDirectory win32-error=0/f ;
-
-HOOK: WSASocket-flags io-backend ( -- DWORD )
-
-TUPLE: win32-socket < win32-file overlapped ;
-
-: <win32-socket> ( handle overlapped -- win32-socket )
-    win32-socket new
-        swap >>overlapped
-        swap >>handle ;
-
-: open-socket ( family type -- socket )
-    0 f 0 WSASocket-flags WSASocket dup socket-error ;
-
-USE: windows.winsock
-: init-sockaddr ( port# addrspec -- sockaddr )
-    dup sockaddr-type <c-object>
-    [ swap protocol-family swap set-sockaddr-in-family ] keep
-    [ >r htons r> set-sockaddr-in-port ] keep ;
-
-: server-sockaddr ( port# addrspec -- sockaddr )
-    init-sockaddr
-    [ INADDR_ANY swap set-sockaddr-in-addr ] keep ;
-
-: bind-socket ( socket sockaddr addrspec -- )
-    [ server-sockaddr ] keep
-    sockaddr-type heap-size bind socket-error ;
-
-TUPLE: socket-destructor alien ;
-
-C: <socket-destructor> socket-destructor
-
-HOOK: destruct-socket io-backend ( obj -- )
-
-M: socket-destructor dispose ( obj -- )
-    alien>> destruct-socket ;
-
-: close-socket-later ( handle -- )
-    <socket-destructor> <only-once> |dispose drop ;
-
-: server-fd ( addrspec type -- fd )
-    >r dup protocol-family r> open-socket
-        dup close-socket-later
-    dup rot make-sockaddr/size bind socket-error ;
-
-USE: namespaces
-
-! http://support.microsoft.com/kb/127144
-! NOTE: Possibly tweak this because of SYN flood attacks
-: listen-backlog ( -- n ) HEX: 7fffffff ; inline
-
-: listen-on-socket ( socket -- )
-    listen-backlog listen winsock-return-check ;
-
-M: win32-socket dispose ( stream -- )
-    win32-file-handle closesocket drop ;
-
-M: windows addrinfo-error ( n -- )
-    winsock-return-check ;
-
-: tcp-socket ( addrspec -- socket )
-    protocol-family SOCK_STREAM open-socket ;

@@ -6,7 +6,7 @@ windows.types math windows.kernel32
 namespaces io.launcher kernel sequences windows.errors
 splitting system threads init strings combinators
 io.backend accessors concurrency.flags io.files assocs
-io.files.private windows destructors ;
+io.files.private windows destructors classes.tuple.lib ;
 IN: io.windows.launcher
 
 TUPLE: CreateProcess-args
@@ -19,8 +19,7 @@ TUPLE: CreateProcess-args
        lpEnvironment
        lpCurrentDirectory
        lpStartupInfo
-       lpProcessInformation
-       stdout-pipe stdin-pipe ;
+       lpProcessInformation ;
 
 : default-CreateProcess-args ( -- obj )
     CreateProcess-args new
@@ -31,18 +30,7 @@ TUPLE: CreateProcess-args
     0 >>dwCreateFlags ;
 
 : call-CreateProcess ( CreateProcess-args -- )
-    {
-        lpApplicationName>>
-        lpCommandLine>>
-        lpProcessAttributes>>
-        lpThreadAttributes>>
-        bInheritHandles>>
-        dwCreateFlags>>
-        lpEnvironment>>
-        lpCurrentDirectory>>
-        lpStartupInfo>>
-        lpProcessInformation>>
-    } get-slots CreateProcess win32-error=0/f ;
+    CreateProcess-args >tuple< CreateProcess win32-error=0/f ;
 
 : count-trailing-backslashes ( str n -- str n )
     >r "\\" ?tail [
