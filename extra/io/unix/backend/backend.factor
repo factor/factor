@@ -48,11 +48,6 @@ M: mx remove-output-callbacks writes>> delete-at* drop ;
 
 GENERIC: wait-for-events ( ms mx -- )
 
-TUPLE: unix-io-error error port ;
-
-: report-error ( error port -- )
-    tuck unix-io-error boa >>error drop ;
-
 : input-available ( fd mx -- )
     remove-input-callbacks [ resume ] each ;
 
@@ -64,7 +59,7 @@ TUPLE: io-timeout ;
 M: io-timeout summary drop "I/O operation timed out" ;
 
 M: unix cancel-io ( port -- )
-    io-timeout new over report-error
+    io-timeout new >>error
     handle>> handle-fd mx get-global
     [ input-available ] [ output-available ] 2bi ;
 

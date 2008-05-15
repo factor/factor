@@ -86,12 +86,10 @@ M: object (accept) ( server addr -- handle )
     [
         [
             <AcceptEx-args>
-            {
-                [ call-AcceptEx ]
-                [ wait-for-socket drop ]
-                [ sAcceptSocket*>> opened-socket ]
-                [ port>> pending-error ]
-            } cleave
+            [ call-AcceptEx ]
+            [ wait-for-socket drop ]
+            [ sAcceptSocket*>> opened-socket ]
+            tri
         ] curry with-timeout
     ] with-destructors ;
 
@@ -126,12 +124,10 @@ TUPLE: WSARecvFrom-args port
 M: winnt (receive) ( datagram -- packet addrspec )
     [
         <WSARecvFrom-args>
-        {
-            [ call-WSARecvFrom ]
-            [ wait-for-socket ]
-            [ port>> pending-error ]
-            [ parse-WSARecvFrom ]
-        } cleave
+        [ call-WSARecvFrom ]
+        [ wait-for-socket ]
+        [ parse-WSARecvFrom ]
+        tri
     ] with-destructors ;
 
 TUPLE: WSASendTo-args port
@@ -166,6 +162,5 @@ M: winnt (send) ( packet addrspec datagram -- )
         <WSASendTo-args>
         [ call-WSASendTo ]
         [ wait-for-socket drop ]
-        [ port>> pending-error ]
-        tri
+        bi
     ] with-destructors ;

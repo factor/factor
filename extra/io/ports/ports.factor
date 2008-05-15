@@ -113,8 +113,7 @@ HOOK: (wait-to-write) io-backend ( port -- )
     dup buffer>> buffer-empty? [ drop ] [ (wait-to-write) ] if ;
 
 M: output-port stream-flush ( port -- )
-    dup check-disposed
-    [ flush-port ] [ pending-error ] bi ;
+    [ check-disposed ] [ flush-port ] bi ;
 
 M: output-port dispose*
     [ flush-port ] [ call-next-method ] bi ;
