@@ -28,10 +28,10 @@ M: handle-destructor dispose ( obj -- )
     handle>> close-handle ;
 
 : &close-handle ( handle -- handle )
-    <handle-destructor> <only-once> &dispose ; inline
+    dup <handle-destructor> <only-once> &dispose drop ; inline
 
 : |close-handle ( handle -- handle )
-    <handle-destructor> <only-once> |dispose ; inline
+    dup <handle-destructor> <only-once> |dispose drop ; inline
 
 : <port> ( handle class -- port )
     new

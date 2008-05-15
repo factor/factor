@@ -127,7 +127,7 @@ M: postgresql-malloc-destructor dispose ( obj -- )
     alien>> PQfreemem ;
 
 : &postgresql-free ( alien -- alien )
-    <postgresql-malloc-destructor> &dispose ; inline
+    dup <postgresql-malloc-destructor> &dispose drop ; inline
 
 : pq-get-blob ( handle row column -- obj/f )
     [ PQgetvalue ] 3keep 3dup PQgetlength

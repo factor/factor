@@ -151,7 +151,10 @@ M: inet6 parse-sockaddr
 
 M: f parse-sockaddr nip ;
 
-GENERIC# get-local-address 1 ( handle remote -- sockaddr )
+GENERIC: (get-local-address) ( handle remote -- sockaddr )
+
+: get-local-address ( handle remote -- local )
+    [ (get-local-address) ] keep parse-sockaddr ;
 
 GENERIC: establish-connection ( client-out remote -- )
 
@@ -163,8 +166,13 @@ M: array (client) [ (client) 3array ] attempt-all first3 ;
 
 M: object (client) ( remote -- client-in client-out local )
     [
-        [ ((client)) dup <ports> 2dup [ |dispose drop ] bi@ ] keep
-        [ establish-connection ] [ drop ] [ get-local-address ] 2tri
+        [ ((client)) ] keep
+        [
+            >r dup <ports> [ |dispose ] bi@ dup r>
+            establish-connection
+        ]
+        [ get-local-address ]
+        2bi
     ] with-destructors ;
 
 : <client> ( remote encoding -- stream local )
@@ -182,23 +190,23 @@ TUPLE: server-port < port addr encoding ;
     check-closed
     dup server-port? [ "Not a server port" throw ] unless ; inline
 
-GENERIC: (server) ( addrspec -- handle sockaddr )
+GENERIC: (server) ( addrspec -- handle )
 
 : <server> ( addrspec encoding -- server )
-    >r [ (server) ] keep parse-sockaddr
-    swap server-port <port>
-        swap >>addr
-        r> >>encoding ;
+    >r
+    [ (server) ] keep
+    [ drop server-port <port> ] [ get-local-address ] 2bi
+    >>addr r> >>encoding ;
 
-GENERIC: (accept) ( server addrspec -- handle remote )
+GENERIC: (accept) ( server addrspec -- handle )
 
 : accept ( server -- client remote )
-    check-server-port
-    [ dup addr>> (accept) ] keep
-    tuck
-    [ [ dup <ports> ] [ encoding>> ] bi* <encoder-duplex> ]
-    [ addr>> parse-sockaddr ]
-    2bi* ;
+    [
+        dup addr>>
+        [ (accept) ] keep
+        [ drop dup <ports> ] [ get-local-address ] 2bi
+        -rot
+    ] keep encoding>> <encoder-duplex> swap ;
 
 TUPLE: datagram-port < port addr ;
 
