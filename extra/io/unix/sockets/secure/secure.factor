@@ -9,10 +9,6 @@ io.encodings.ascii io.buffers io.sockets io.sockets.secure
 unix system ;
 IN: io.unix.sockets.secure
 
-! todo: SSL_pending, rehandshake
-! check-certificate at some point
-! test on windows
-
 M: ssl-handle handle-fd file>> handle-fd ;
 
 : syscall-error ( r -- * )
@@ -78,6 +74,8 @@ M: ssl ((client)) ( addrspec -- handle )
 
 M: ssl parse-sockaddr addrspec>> parse-sockaddr <ssl> ;
 
+M: ssl (get-local-address) addrspec>> (get-local-address) ;
+
 : check-connect-response ( port r -- event )
     check-response
     {
@@ -88,15 +86,15 @@ M: ssl parse-sockaddr addrspec>> parse-sockaddr <ssl> ;
         { SSL_ERROR_SSL [ (ssl-error) ] }
     } case ;
 
-: do-ssl-connect ( port ssl-handle -- )
-    2dup SSL_connect check-connect-response dup
-    [ >r over r> wait-for-port do-ssl-connect ] [ 3drop ] if ;
+: do-ssl-connect ( port -- )
+    dup dup handle>> handle>> SSL_connect
+    check-connect-response dup
+    [ dupd wait-for-port do-ssl-connect ] [ 2drop ] if ;
 
 M: ssl establish-connection ( client-out remote -- )
-    addrspec>>
-    [ establish-connection ]
-    [ drop dup handle>> do-ssl-connect ]
-    [ drop t >>connected drop ]
+    [ addrspec>> establish-connection ]
+    [ drop do-ssl-connect ]
+    [ drop handle>> t >>connected drop ]
     2tri ;
 
 M: ssl (server) addrspec>> (server) ;
@@ -122,16 +120,29 @@ M: ssl (accept)
     ] with-destructors ;
 
 : check-shutdown-response ( handle r -- event )
-    >r handle>> r> SSL_get_error
+    #! SSL_shutdown always returns 0 due to openssl bugs?
     {
-        { SSL_ERROR_WANT_READ [ +input+ ] }
-        { SSL_ERROR_WANT_WRITE [ +output+ ] }
-        { SSL_ERROR_SYSCALL [ -1 syscall-error ] }
-        { SSL_ERROR_SSL [ (ssl-error) ] }
+        { 1 [ drop f ] }
+        { 0 [
+                dup SSL_want {
+                    { SSL_NOTHING [ dup SSL_shutdown check-shutdown-response ] }
+                    { SSL_READING [ drop +input+ ] }
+                    { SSL_WRITING [ drop +output+ ] }
+                } case
+        ] }
+        { -1 [
+            -1 SSL_get_error
+            {
+                { SSL_ERROR_WANT_READ [ +input+ ] }
+                { SSL_ERROR_WANT_WRITE [ +output+ ] }
+                { SSL_ERROR_SYSCALL [ -1 syscall-error ] }
+                { SSL_ERROR_SSL [ (ssl-error) ] }
+            } case
+        ] }
     } case ;
 
 M: unix ssl-shutdown
     dup connected>> [
-        dup dup handle>> SSL_shutdown check-shutdown-response
+        dup handle>> dup SSL_shutdown check-shutdown-response
         dup [ dupd wait-for-fd ssl-shutdown ] [ 2drop ] if
     ] [ drop ] if ;
