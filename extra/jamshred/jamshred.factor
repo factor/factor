@@ -79,6 +79,10 @@ jamshred-gadget H{
     { T{ key-down f f "r" } [ jamshred-restart ] }
     { T{ key-down f f " " } [ jamshred>> toggle-running ] }
     { T{ key-down f f "f" } [ find-world toggle-fullscreen ] }
+    { T{ key-down f f "UP" } [ jamshred>> jamshred-player 1 swap change-player-speed ] }
+    { T{ key-down f f "DOWN" } [ jamshred>> jamshred-player -1 swap change-player-speed ] }
+    { T{ key-down f f "LEFT" } [ jamshred>> 1 jamshred-roll ] }
+    { T{ key-down f f "RIGHT" } [ jamshred>> -1 jamshred-roll ] }
     { T{ key-down f f "q" } [ quit ] }
     { T{ motion } [ handle-mouse-motion ] }
     { T{ mouse-scroll } [ handle-mouse-scroll ] }

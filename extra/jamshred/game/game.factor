@@ -29,10 +29,12 @@ TUPLE: jamshred sounds tunnel players running quit ;
 : mouse-moved ( x-radians y-radians jamshred -- )
     jamshred-player -rot turn-player ;
 
-: mouse-units-per-full-roll ( -- n ) 50 ;
+: units-per-full-roll ( -- n ) 50 ;
 
-: mouse-scroll-x ( jamshred x -- )
-    [ jamshred-player ] dip 2 pi * * mouse-units-per-full-roll / roll-player ;
+: jamshred-roll ( jamshred n -- )
+    [ jamshred-player ] dip 2 pi * * units-per-full-roll / roll-player ;
+        
+: mouse-scroll-x ( jamshred x -- ) jamshred-roll ;
 
 : mouse-scroll-y ( jamshred y -- )
     neg swap jamshred-player change-player-speed ;
