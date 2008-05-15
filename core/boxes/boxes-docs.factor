@@ -2,7 +2,7 @@ USING: help.markup help.syntax kernel ;
 IN: boxes
 
 HELP: box
-{ $class-description "A data type holding a single value in the " { $link box-value } " slot. The " { $link box-full? } " slot indicates if the value is set." } ;
+{ $class-description "A data type holding a single value in the " { $snippet "value" } " slot. The " { $snippet "occupied" } " slot indicates if the value is set." } ;
 
 HELP: <box>
 { $values { "box" box } }
@@ -27,12 +27,11 @@ ARTICLE: "boxes" "Boxes"
 { $subsection box }
 "Creating an empty box:"
 { $subsection <box> }
-"Testing if a box is full:"
-{ $subsection box-full? }
 "Storing a value and removing a value from a box:"
 { $subsection >box }
 { $subsection box> }
 "Safely removing a value:"
-{ $subsection ?box } ;
+{ $subsection ?box }
+"Testing if a box is full can be done by reading the " { $snippet "occupied" } " slot." ;
 
 ABOUT: "boxes"

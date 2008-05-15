@@ -71,7 +71,7 @@ M: mailbox dispose* threads>> notify-all ;
     f swap mailbox-get-timeout? ; inline
 
 : wait-for-close-timeout ( mailbox timeout -- )
-    over closed>>
+    over disposed>>
     [ 2drop ] [ 2dup wait-for-mailbox wait-for-close-timeout ] if ;
 
 : wait-for-close ( mailbox -- )

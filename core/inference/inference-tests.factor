@@ -5,7 +5,7 @@ sequences strings vectors words quotations effects tools.test
 continuations generic.standard sorting assocs definitions
 prettyprint io inspector classes.tuple classes.union
 classes.predicate debugger threads.private io.streams.string
-io.timeouts io.thread sequences.private ;
+io.timeouts io.thread sequences.private destructors ;
 IN: inference.tests
 
 [ ] [ [ 1 ] dataflow [ ] transform-nodes drop ] unit-test
