@@ -6,6 +6,118 @@ math.functions sequences namespaces words symbols system
 combinators.lib io.ports destructors math.bitfields.lib ;
 IN: io.windows.files
 
+: open-file ( path access-mode create-mode flags -- handle )
+    [
+        >r >r share-mode security-attributes-inherit r> r>
+        CreateFile-flags f CreateFile
+        dup invalid-handle?
+        <win32-file>
+        |dispose
+        dup add-completion
+    ] with-destructors ;
+
+: open-pipe-r/w ( path -- win32-file )
+    { GENERIC_READ GENERIC_WRITE } flags
+    OPEN_EXISTING 0 open-file ;
+
+: open-read ( path -- win32-file )
+    GENERIC_READ OPEN_EXISTING 0 open-file 0 >>ptr ;
+
+: open-write ( path -- win32-file )
+    GENERIC_WRITE CREATE_ALWAYS 0 open-file 0 >>ptr ;
+
+: (open-append) ( path -- win32-file )
+    GENERIC_WRITE OPEN_ALWAYS 0 open-file ;
+
+: open-existing ( path -- win32-file )
+    { GENERIC_READ GENERIC_WRITE } flags
+    share-mode
+    f
+    OPEN_EXISTING
+    FILE_FLAG_BACKUP_SEMANTICS
+    f CreateFileW dup win32-error=0/f <win32-file> ;
+
+: maybe-create-file ( path -- win32-file ? )
+    #! return true if file was just created
+    { GENERIC_READ GENERIC_WRITE } flags
+    share-mode
+    f
+    OPEN_ALWAYS
+    0 CreateFile-flags
+    f CreateFileW dup win32-error=0/f <win32-file>
+    GetLastError ERROR_ALREADY_EXISTS = not ;
+
+: set-file-pointer ( handle length method -- )
+    >r dupd d>w/w <uint> r> SetFilePointer
+    INVALID_SET_FILE_POINTER = [
+        CloseHandle "SetFilePointer failed" throw
+    ] when drop ;
+
+HOOK: open-append os ( path -- win32-file )
+
+TUPLE: FileArgs
+    hFile lpBuffer nNumberOfBytesToRead
+    lpNumberOfBytesRet lpOverlapped ;
+
+C: <FileArgs> FileArgs
+
+: make-FileArgs ( port -- <FileArgs> )
+    {
+        [ handle>> handle>> ]
+        [ buffer>> ]
+        [ buffer>> buffer-length ]
+        [ drop "DWORD" <c-object> ]
+        [ FileArgs-overlapped ]
+    } cleave <FileArgs> ;
+
+: setup-read ( <FileArgs> -- hFile lpBuffer nNumberOfBytesToRead lpNumberOfBytesRead lpOverlapped )
+    {
+        [ hFile>> ]
+        [ lpBuffer>> buffer-end ]
+        [ lpBuffer>> buffer-capacity ]
+        [ lpNumberOfBytesRet>> ]
+        [ lpOverlapped>> ]
+    } cleave ;
+
+: setup-write ( <FileArgs> -- hFile lpBuffer nNumberOfBytesToWrite lpNumberOfBytesWritten lpOverlapped )
+    {
+        [ hFile>> ]
+        [ lpBuffer>> buffer@ ]
+        [ lpBuffer>> buffer-length ]
+        [ lpNumberOfBytesRet>> ]
+        [ lpOverlapped>> ]
+    } cleave ;
+
+M: windows (file-reader) ( path -- stream )
+    open-read <input-port> ;
+
+M: windows (file-writer) ( path -- stream )
+    open-write <output-port> ;
+
+M: windows (file-appender) ( path -- stream )
+    open-append <output-port> ;
+
+M: windows move-file ( from to -- )
+    [ normalize-path ] bi@ MoveFile win32-error=0/f ;
+
+M: windows delete-file ( path -- )
+    normalize-path DeleteFile win32-error=0/f ;
+
+M: windows copy-file ( from to -- )
+    dup parent-directory make-directories
+    [ normalize-path ] bi@ 0 CopyFile win32-error=0/f ;
+
+M: windows make-directory ( path -- )
+    normalize-path
+    f CreateDirectory win32-error=0/f ;
+
+M: windows delete-directory ( path -- )
+    normalize-path
+    RemoveDirectory win32-error=0/f ;
+
+M: windows normalize-directory ( string -- string )
+    normalize-path "\\" ?tail drop "\\*" append ;
+
 SYMBOLS: +read-only+ +hidden+ +system+
 +archive+ +device+ +normal+ +temporary+
 +sparse-file+ +reparse-point+ +compressed+ +offline+
@@ -133,6 +245,6 @@ M: winnt link-info ( path -- info )
 M: winnt touch-file ( path -- )
     [
         normalize-path
-        maybe-create-file >r &close-handle r>
+        maybe-create-file >r &dispose r>
         [ drop ] [ f now dup (set-file-times) ] if
     ] with-destructors ;

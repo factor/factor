@@ -10,7 +10,7 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
 !  http://msdn.microsoft.com/msdnmag/issues/05/03/TokenPrivileges/
 
 : (open-process-token) ( handle -- handle )
-    TOKEN_ADJUST_PRIVILEGES TOKEN_QUERY bitor "PHANDLE" <c-object>
+    { TOKEN_ADJUST_PRIVILEGES TOKEN_QUERY } flags "PHANDLE" <c-object>
     [ OpenProcessToken win32-error=0/f ] keep *void* ;
 
 : open-process-token ( -- handle )

@@ -21,10 +21,10 @@ IN: io.windows.nt.launcher
 
 ! /dev/null simulation
 : null-input ( -- pipe )
-    (pipe) [ in>> handle>> ] [ out>> close-handle ] bi ;
+    (pipe) [ in>> handle>> ] [ out>> dispose ] bi ;
 
 : null-output ( -- pipe )
-    (pipe) [ in>> close-handle ] [ out>> handle>> ] bi ;
+    (pipe) [ in>> dispose ] [ out>> handle>> ] bi ;
 
 : null-pipe ( mode -- pipe )
     {
@@ -49,7 +49,7 @@ IN: io.windows.nt.launcher
     create-mode
     FILE_ATTRIBUTE_NORMAL ! flags and attributes
     f ! template file
-    CreateFile dup invalid-handle? &close-handle ;
+    CreateFile dup invalid-handle? <win32-file> &dispose ;
 
 : redirect-append ( default path access-mode create-mode -- handle )
     >r >r path>> r> r>
@@ -77,16 +77,12 @@ IN: io.windows.nt.launcher
         [ redirect-stream ]
     } cond ;
 
-: default-stdout ( args -- handle )
-    stdout-pipe>> dup [ out>> ] when ;
-
 : redirect-stdout ( process args -- handle )
-    default-stdout
-    swap stdout>>
+    stdout>>
     GENERIC_WRITE
     CREATE_ALWAYS
     redirect
-    STD_OUTPUT_HANDLE GetStdHandle or ;
+    STD_OUTPUT_HANDLE GetStdHandle ;
 
 : redirect-stderr ( process args -- handle )
     over stderr>> +stdout+ eq? [
@@ -103,16 +99,12 @@ IN: io.windows.nt.launcher
         STD_ERROR_HANDLE GetStdHandle or
     ] if ;
 
-: default-stdin ( args -- handle )
-    stdin-pipe>> dup [ in>> ] when ;
-
 : redirect-stdin ( process args -- handle )
-    default-stdin
-    swap stdin>>
+    stdin>>
     GENERIC_READ
     OPEN_EXISTING
     redirect
-    STD_INPUT_HANDLE GetStdHandle or ;
+    STD_INPUT_HANDLE GetStdHandle ;
 
 M: winnt fill-redirection ( process args -- )
     [ 2dup redirect-stdout ] keep lpStartupInfo>> set-STARTUPINFO-hStdOutput

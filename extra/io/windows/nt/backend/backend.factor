@@ -101,3 +101,39 @@ M: winnt init-io ( -- )
     <master-completion-port> master-completion-port set-global
     H{ } clone io-hash set-global
     windows.winsock:init-winsock ;
+
+: finish-flush ( n port -- )
+    [ update-file-ptr ] [ buffer>> buffer-consume ] 2bi ;
+
+: ((wait-to-write)) ( port -- )
+    dup make-FileArgs
+    tuck setup-write WriteFile
+    dupd overlapped-error? [
+        >r lpOverlapped>> r>
+        [ twiddle-thumbs ] keep
+        [ finish-flush ] keep
+        dup buffer>> buffer-empty? [ drop ] [ ((wait-to-write)) ] if
+    ] [
+        2drop
+    ] if ;
+
+M: winnt (wait-to-write)
+    [ [ ((wait-to-write)) ] with-timeout ] with-destructors ;
+
+: finish-read ( n port -- )
+    over zero? [
+        t >>eof 2drop
+    ] [
+        [ buffer>> n>buffer ] [ update-file-ptr ] bi
+    ] if ;
+
+: ((wait-to-read)) ( port -- )
+    dup make-FileArgs
+    tuck setup-read ReadFile
+    dupd overlapped-error? [
+        >r lpOverlapped>> r>
+        [ twiddle-thumbs ] [ finish-read ] bi
+    ] [ 2drop ] if ;
+
+M: winnt (wait-to-read) ( port -- )
+    [ [ ((wait-to-read)) ] with-timeout ] with-destructors ;

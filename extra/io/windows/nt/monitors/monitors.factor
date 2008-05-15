@@ -19,9 +19,9 @@ IN: io.windows.nt.monitors
     f
     CreateFile
     dup invalid-handle?
+    <win32-file>
     |close-handle
-    dup add-completion
-    f <win32-file> ;
+    dup add-completion ;
 
 TUPLE: win32-monitor-port < input-port recursive ;
 
@@ -83,7 +83,7 @@ TUPLE: win32-monitor < monitor port ;
     ] each ;
 
 : fill-queue ( monitor -- )
-    dup port>> check-closed
+    dup port>> dup check-disposed
     [ buffer>> ptr>> ] [ read-changes zero? ] bi
     [ 2dup parse-notify-records ] unless
     2drop ;
