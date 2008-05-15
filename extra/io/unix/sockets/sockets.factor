@@ -13,7 +13,7 @@ EXCLUDE: io.sockets => accept ;
 IN: io.unix.sockets
 
 : socket-fd ( domain type -- fd )
-    0 socket dup io-error <fd> |dispose dup init-handle ;
+    0 socket dup io-error <fd> |dispose ;
 
 : set-socket-option ( fd level opt -- )
     >r >r handle-fd r> r> 1 <int> "int" heap-size setsockopt io-error ;

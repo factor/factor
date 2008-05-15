@@ -8,5 +8,4 @@ QUALIFIED: io.pipes
 M: unix io.pipes:(pipe) ( -- pair )
     2 "int" <c-array>
     dup pipe io-error
-    2 c-int-array> first2 [ <fd> ] bi@
-    [ [ init-handle ] bi@ ] [ io.pipes:pipe boa ] 2bi ;
+    2 c-int-array> first2 [ <fd> ] bi@ io.pipes:pipe boa ;

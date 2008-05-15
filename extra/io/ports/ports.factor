@@ -16,11 +16,8 @@ M: port timeout timeout>> ;
 
 M: port set-timeout (>>timeout) ;
 
-GENERIC: init-handle ( handle -- )
-
 : <port> ( handle class -- port )
-    new
-        swap dup init-handle >>handle ; inline
+    new swap >>handle ; inline
 
 : pending-error ( port -- )
     [ f ] change-error drop [ throw ] when* ;
