@@ -96,7 +96,7 @@ M: winnt link-info ( path -- info )
 
 : file-times ( path -- timestamp timestamp timestamp )
     [
-        normalize-path open-existing dup close-always
+        normalize-path open-existing &close-handle
         "FILETIME" <c-object>
         "FILETIME" <c-object>
         "FILETIME" <c-object>
@@ -112,7 +112,7 @@ M: winnt link-info ( path -- info )
     #! timestamp order: creation access write
     [
         >r >r >r
-            normalize-path open-existing dup close-always
+            normalize-path open-existing &close-handle
         r> r> r> (set-file-times)
     ] with-destructors ;
 
@@ -128,6 +128,6 @@ M: winnt link-info ( path -- info )
 M: winnt touch-file ( path -- )
     [
         normalize-path
-        maybe-create-file over close-always
+        maybe-create-file >r &close-handle r>
         [ drop ] [ f now dup (set-file-times) ] if
     ] with-destructors ;

@@ -49,7 +49,7 @@ IN: io.windows.nt.launcher
     create-mode
     FILE_ATTRIBUTE_NORMAL ! flags and attributes
     f ! template file
-    CreateFile dup invalid-handle? dup close-always ;
+    CreateFile dup invalid-handle? &close-handle ;
 
 : redirect-append ( default path access-mode create-mode -- handle )
     >r >r path>> r> r>

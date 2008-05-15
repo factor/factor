@@ -57,53 +57,39 @@ M: winnt open-append
     >r (open-append) r> ;
 
 : update-file-ptr ( n port -- )
-    port-handle
-    dup win32-file-ptr [
-        rot + swap set-win32-file-ptr
-    ] [
-        2drop
-    ] if* ;
+    handle>> dup ptr>> [ rot + >>ptr drop ] [ 2drop ] if* ;
 
-: finish-flush ( overlapped port -- )
-    dup pending-error
-    tuck get-overlapped-result
-    dup pick update-file-ptr
-    swap buffer>> buffer-consume ;
+: finish-flush ( n port -- )
+    [ update-file-ptr ] [ buffer>> buffer-consume ] 2bi ;
 
-: (flush-output) ( port -- )
+: ((wait-to-write)) ( port -- )
     dup make-FileArgs
     tuck setup-write WriteFile
     dupd overlapped-error? [
-        >r FileArgs-lpOverlapped r>
-        [ save-callback ] 2keep
+        >r lpOverlapped>> r>
+        [ twiddle-thumbs ] keep
         [ finish-flush ] keep
-        dup buffer>> buffer-empty? [ drop ] [ (flush-output) ] if
+        dup buffer>> buffer-empty? [ drop ] [ ((wait-to-write)) ] if
     ] [
         2drop
     ] if ;
 
-: flush-output ( port -- )
-    [ [ (flush-output) ] with-timeout ] with-destructors ;
+M: winnt (wait-to-write)
+    [ [ ((wait-to-write)) ] with-timeout ] with-destructors ;
 
-M: winnt flush-port
-    dup buffer>> buffer-empty? [ dup flush-output ] unless drop ;
-
-: finish-read ( overlapped port -- )
-    dup pending-error
-    tuck get-overlapped-result dup zero? [
-        drop t >>eof drop
+: finish-read ( n port -- )
+    over zero? [
+        t >>eof 2drop
     ] [
-        dup pick buffer>> n>buffer
-        swap update-file-ptr
+        [ buffer>> n>buffer ] [ update-file-ptr ] bi
     ] if ;
 
 : ((wait-to-read)) ( port -- )
     dup make-FileArgs
     tuck setup-read ReadFile
     dupd overlapped-error? [
-        >r FileArgs-lpOverlapped r>
-        [ save-callback ] 2keep
-        finish-read
+        >r lpOverlapped>> r>
+        [ twiddle-thumbs ] [ finish-read ] bi
     ] [ 2drop ] if ;
 
 M: winnt (wait-to-read) ( port -- )

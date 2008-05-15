@@ -47,7 +47,7 @@ IN: io.windows.nt.pipes
 M: winnt (pipe) ( -- pipe )
     [
         unique-pipe-name
-        [ create-named-pipe dup close-later ]
-        [ open-other-end dup close-later ]
+        [ create-named-pipe |close-handle ]
+        [ open-other-end |close-handle ]
         bi pipe boa
     ] with-destructors ;

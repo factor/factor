@@ -8,8 +8,6 @@ windows.shell32 windows.types windows.winsock splitting
 continuations math.bitfields system accessors ;
 IN: io.windows
 
-M: windows destruct-socket closesocket drop ;
-
 TUPLE: win32-file handle ptr ;
 
 C: <win32-file> win32-file
@@ -41,7 +39,7 @@ M: win32-file init-handle ( handle -- )
     drop ;
 
 M: win32-file close-handle ( handle -- )
-    win32-file-handle close-handle ;
+    handle>> close-handle ;
 
 M: alien close-handle ( handle -- )
     CloseHandle drop ;
@@ -51,7 +49,8 @@ M: alien close-handle ( handle -- )
     [
         >r >r share-mode security-attributes-inherit r> r>
         CreateFile-flags f CreateFile
-        dup invalid-handle? dup close-later
+        dup invalid-handle?
+        |close-handle
         dup add-completion
     ] with-destructors ;
 
@@ -101,26 +100,31 @@ TUPLE: FileArgs
 C: <FileArgs> FileArgs
 
 : make-FileArgs ( port -- <FileArgs> )
-    [ port-handle win32-file-handle ] keep
-    [ buffer>> ] keep
-    [
-        buffer>> buffer-length
-        "DWORD" <c-object>
-    ] keep FileArgs-overlapped <FileArgs> ;
+    {
+        [ handle>> handle>> ]
+        [ buffer>> ]
+        [ buffer>> buffer-length ]
+        [ drop "DWORD" <c-object> ]
+        [ FileArgs-overlapped ]
+    } cleave <FileArgs> ;
 
 : setup-read ( <FileArgs> -- hFile lpBuffer nNumberOfBytesToRead lpNumberOfBytesRead lpOverlapped )
-    [ FileArgs-hFile ] keep
-    [ FileArgs-lpBuffer buffer-end ] keep
-    [ FileArgs-lpBuffer buffer-capacity ] keep
-    [ FileArgs-lpNumberOfBytesRet ] keep
-    FileArgs-lpOverlapped ;
+    {
+        [ hFile>> ]
+        [ lpBuffer>> buffer-end ]
+        [ lpBuffer>> buffer-capacity ]
+        [ lpNumberOfBytesRet>> ]
+        [ lpOverlapped>> ]
+    } cleave ;
 
 : setup-write ( <FileArgs> -- hFile lpBuffer nNumberOfBytesToWrite lpNumberOfBytesWritten lpOverlapped )
-    [ FileArgs-hFile ] keep
-    [ FileArgs-lpBuffer buffer@ ] keep
-    [ FileArgs-lpBuffer buffer-length ] keep
-    [ FileArgs-lpNumberOfBytesRet ] keep
-    FileArgs-lpOverlapped ;
+    {
+        [ hFile>> ]
+        [ lpBuffer>> buffer@ ]
+        [ lpBuffer>> buffer-length ]
+        [ lpNumberOfBytesRet>> ]
+        [ lpOverlapped>> ]
+    } cleave ;
 
 M: windows (file-reader) ( path -- stream )
     open-read <win32-file> <input-port> ;
@@ -179,17 +183,14 @@ TUPLE: socket-destructor alien ;
 
 C: <socket-destructor> socket-destructor
 
-HOOK: destruct-socket io-backend ( obj -- )
-
 M: socket-destructor dispose ( obj -- )
-    alien>> destruct-socket ;
+    alien>> closesocket drop ;
 
-: close-socket-later ( handle -- )
-    <socket-destructor> <only-once> add-error-destructor ;
+: |close-socket ( handle -- handle )
+    dup <socket-destructor> <only-once> |dispose drop ;
 
 : server-fd ( addrspec type -- fd )
-    >r dup protocol-family r> open-socket
-        dup close-socket-later
+    >r dup protocol-family r> open-socket |close-socket
     dup rot make-sockaddr/size bind socket-error ;
 
 USE: namespaces
@@ -202,7 +203,7 @@ USE: namespaces
     listen-backlog listen winsock-return-check ;
 
 M: win32-socket dispose ( stream -- )
-    win32-file-handle closesocket drop ;
+    handle>> closesocket drop ;
 
 M: windows addrinfo-error ( n -- )
     winsock-return-check ;

@@ -30,8 +30,8 @@ TYPEDEF: TOKEN_PRIVILEGES* PTOKEN_PRIVILEGES
 : make-token-privileges ( name ? -- obj )
     "TOKEN_PRIVILEGES" <c-object>
     1 [ over set-TOKEN_PRIVILEGES-PrivilegeCount ] keep
-    "LUID_AND_ATTRIBUTES" malloc-array
-    dup free-always over set-TOKEN_PRIVILEGES-Privileges
+    "LUID_AND_ATTRIBUTES" malloc-array &free
+    over set-TOKEN_PRIVILEGES-Privileges
 
     swap [
         SE_PRIVILEGE_ENABLED over TOKEN_PRIVILEGES-Privileges
@@ -63,14 +63,12 @@ M: wince with-privileges
 : mmap-open ( path access-mode create-mode flProtect access -- handle handle address )
     { "SeCreateGlobalPrivilege" "SeLockMemoryPrivilege" } [
         >r >r 0 open-file dup f r> 0 0 f
-        CreateFileMapping [ win32-error=0/f ] keep
-        dup close-later
+        CreateFileMapping [ win32-error=0/f ] keep |close-handle
         dup
-        r> 0 0 0 MapViewOfFile [ win32-error=0/f ] keep
-        dup close-later
+        r> 0 0 0 MapViewOfFile [ win32-error=0/f ] keep |close-handle
     ] with-privileges ;
     
-M: windows (mapped-file) ( path length -- mmap )
+M: windows (mapped-file)
     [
         swap
         GENERIC_WRITE GENERIC_READ bitor
@@ -78,11 +76,11 @@ M: windows (mapped-file) ( path length -- mmap )
         PAGE_READWRITE SEC_COMMIT bitor
         FILE_MAP_ALL_ACCESS mmap-open
         -rot 2array
-        f \ mapped-file boa
     ] with-destructors ;
 
 M: windows close-mapped-file ( mapped-file -- )
     [
-        dup mapped-file-handle [ close-always ] each
-        mapped-file-address UnmapViewOfFile win32-error=0/f
+        [ handle>> [ &close-handle drop ] each ]
+        [ address>> UnmapViewOfFile win32-error=0/f ]
+        bi
     ] with-destructors ;

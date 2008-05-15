@@ -19,7 +19,7 @@ IN: io.windows.nt.monitors
     f
     CreateFile
     dup invalid-handle?
-    dup close-later
+    |close-handle
     dup add-completion
     f <win32-file> ;
 
@@ -41,11 +41,7 @@ TUPLE: win32-monitor < monitor port ;
 
 : read-changes ( port -- bytes )
     [
-        dup begin-reading-changes
-        swap [ save-callback ] 2keep
-        check-closed ! we may have closed it...
-        dup eof>> [ "EOF??" throw ] when
-        get-overlapped-result
+        [ begin-reading-changes ] [ twiddle-thumbs ] bi
     ] with-destructors ;
 
 : parse-action ( action -- changed )
