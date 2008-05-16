@@ -185,7 +185,7 @@ M: object (client) ( remote -- client-in client-out local )
 
 SYMBOL: local-address
 
-: with-client ( addrspec encoding quot -- )
+: with-client ( remote encoding quot -- )
     >r <client> [ local-address set ] curry
     r> compose with-stream ; inline
 
@@ -217,7 +217,7 @@ TUPLE: datagram-port < port addr ;
 
 HOOK: (datagram) io-backend ( addr -- datagram )
 
-: <datagram> ( addr -- datagram )
+: <datagram> ( addrspec -- datagram )
     dup (datagram) datagram-port <port> swap >>addr ;
 
 : check-datagram-port ( port -- port )
@@ -226,7 +226,7 @@ HOOK: (datagram) io-backend ( addr -- datagram )
 
 HOOK: (receive) io-backend ( datagram -- packet addrspec )
 
-: receive ( datagram -- packet sockaddr )
+: receive ( datagram -- packet addrspec )
     check-datagram-port
     [ (receive) ] [ addr>> ] bi parse-sockaddr ;
 
