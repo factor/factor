@@ -30,6 +30,10 @@ M: object (get-local-address) ( socket addrspec -- sockaddr )
     >r handle>> r> empty-sockaddr/size <int>
     [ getsockname socket-error ] 2keep drop ;
 
+M: object (get-remote-address) ( socket addrspec -- sockaddr )
+    >r handle>> r> empty-sockaddr/size <int>
+    [ getpeername socket-error ] 2keep drop ;
+
 : bind-socket ( win32-socket sockaddr len -- )
     >r >r handle>> r> r> bind socket-error ;
 

@@ -203,14 +203,14 @@ GENERIC: (server) ( addrspec -- handle )
     [ drop server-port <port> ] [ get-local-address ] 2bi
     >>addr r> >>encoding ;
 
-GENERIC: (accept) ( server addrspec -- handle )
+GENERIC: (accept) ( server addrspec -- handle sockaddr )
 
 : accept ( server -- client remote )
     [
         dup addr>>
         [ (accept) ] keep
-        [ drop dup <ports> ] [ get-remote-address ] 2bi
-        -rot
+        parse-sockaddr swap
+        dup <ports>
     ] keep encoding>> <encoder-duplex> swap ;
 
 TUPLE: datagram-port < port addr ;
@@ -218,7 +218,11 @@ TUPLE: datagram-port < port addr ;
 HOOK: (datagram) io-backend ( addr -- datagram )
 
 : <datagram> ( addr -- datagram )
-    dup (datagram) datagram-port <port> swap >>addr ;
+    [
+        [ (datagram) |dispose ] keep
+        [ drop datagram-port <port> ] [ get-local-address ] 2bi
+        >>addr
+    ] with-destructors ;
 
 : check-datagram-port ( port -- port )
     dup check-disposed

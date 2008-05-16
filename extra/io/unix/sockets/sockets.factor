@@ -73,16 +73,15 @@ M: object (server) ( addrspec -- handle )
 : do-accept ( server addrspec -- fd )
     [ handle>> handle-fd ] [ empty-sockaddr/size <int> ] bi* accept ; inline
 
-M: object (accept) ( server addrspec -- fd )
-    2dup do-accept
+M:: object (accept) ( server addrspec -- fd sockaddr )
+    server addrspec do-accept
     {
-        { [ dup 0 >= ] [ 2nip <fd> ] }
+        { [ dup 0 >= ] [ <fd> dup addrspec (get-remote-sockaddr) ] }
         { [ err_no EINTR = ] [ drop (accept) ] }
         { [ err_no EAGAIN = ] [
             drop
-            [ drop +input+ wait-for-port ]
-            [ (accept) ]
-            2bi
+            server +input+ wait-for-port
+            server addrspec (accept)
         ] }
         [ (io-error) ]
     } cond ;

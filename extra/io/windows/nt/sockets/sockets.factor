@@ -82,15 +82,27 @@ TUPLE: AcceptEx-args port
     AcceptEx-args >tuple*< AcceptEx drop
     winsock-error-string [ throw ] when* ;
 
-M: object (accept) ( server addr -- handle )
+: extract-remote-address ( AcceptEx -- sockaddr )
+    {
+        [ lpOutputBuffer*>> ]
+        [ dwReceiveDataLength*>> ]
+        [ dwLocalAddressLength*>> ]
+        [ dwRemoteAddressLength*>> ]
+    } cleave
+    f <void*>
+    0 <int>
+    f <void*>
+    [ 0 <int> GetAcceptExSockaddrs ] keep *void* ;
+
+M: object (accept) ( server addr -- handle sockaddr )
     [
-        [
-            <AcceptEx-args>
+        <AcceptEx-args>
+        {
             [ call-AcceptEx ]
             [ wait-for-socket drop ]
-            [ sAcceptSocket*>> opened-socket ]
-            tri
-        ] curry with-timeout
+            [ sAcceptSocket*>> <win32-socket> ]
+            [ extract-remote-address ]
+        } cleave
     ] with-destructors ;
 
 TUPLE: WSARecvFrom-args port
