@@ -26,6 +26,10 @@ M: object (get-local-address) ( handle remote -- sockaddr )
     >r handle-fd r> empty-sockaddr/size <int>
     [ getsockname io-error ] 2keep drop ;
 
+M: object (get-remote-address) ( handle local -- sockaddr )
+    >r handle-fd r> empty-sockaddr/size <int>
+    [ getpeername io-error ] 2keep drop ;
+
 : init-client-socket ( fd -- )
     SOL_SOCKET SO_OOBINLINE set-socket-option ;
 

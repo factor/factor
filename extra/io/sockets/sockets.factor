@@ -156,6 +156,11 @@ GENERIC: (get-local-address) ( handle remote -- sockaddr )
 : get-local-address ( handle remote -- local )
     [ (get-local-address) ] keep parse-sockaddr ;
 
+GENERIC: (get-remote-address) ( handle remote -- sockaddr )
+
+: get-remote-address ( handle local -- remote )
+    [ (get-remote-address) ] keep parse-sockaddr ;
+
 GENERIC: establish-connection ( client-out remote -- )
 
 GENERIC: ((client)) ( remote -- handle )
@@ -204,7 +209,7 @@ GENERIC: (accept) ( server addrspec -- handle )
     [
         dup addr>>
         [ (accept) ] keep
-        [ drop dup <ports> ] [ get-local-address ] 2bi
+        [ drop dup <ports> ] [ get-remote-address ] 2bi
         -rot
     ] keep encoding>> <encoder-duplex> swap ;
 
