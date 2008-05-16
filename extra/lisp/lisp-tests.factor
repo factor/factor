@@ -6,14 +6,12 @@ IN: lisp.test
 
 init-env
 
-"+" [ first2 + ] lisp-define
+"+" "math" "+" define-primitve
 
-{ [ first2 + ] } [
-  "+" lisp-get
+{ 5 } [
+  [ 2 3 ] "+" <lisp-symbol> funcall
 ] unit-test
 
 { 3 } [
-  [
-    "((lambda (x y) (+ x y)) 1 2)" lisp-string>factor call
-  ] with-interactive-vocabs
+  "((lambda (x y) (+ x y)) 1 2)" lisp-string>factor call
 ] unit-test

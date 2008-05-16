@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel peg sequences arrays strings combinators.lib
 namespaces combinators math bake locals locals.private accessors
-vectors syntax lisp.parser assocs parser sequences.lib ;
+vectors syntax lisp.parser assocs parser sequences.lib words ;
 IN: lisp
 
 DEFER: convert-form
@@ -24,7 +24,8 @@ DEFER: funcall
   
 : convert-general-form ( s-exp -- quot )
   unclip convert-form swap convert-body [ , % funcall ] bake ;
-  
+
+! words for convert-lambda  
 <PRIVATE  
 : localize-body ( assoc body -- assoc newbody )  
   [ dup lisp-symbol? [ over dupd [ name>> ] dip at swap or ]
@@ -34,8 +35,6 @@ DEFER: funcall
 : localize-lambda ( body vars -- newbody newvars )
   make-locals dup push-locals swap
   [ swap localize-body <s-exp> convert-form swap pop-locals ] dip swap ;
-  
-PRIVATE>
                    
 : split-lambda ( s-exp -- body vars )                   
   first3 -rot nip [ body>> ] bi@ [ name>> ] map ; inline
@@ -47,6 +46,7 @@ PRIVATE>
   
 : normal-lambda ( body vars -- quot )
   localize-lambda <lambda> [ , compose ] bake ;
+PRIVATE>
   
 : convert-lambda ( s-exp -- quot )  
   split-lambda dup "&rest"  swap member? [ rest-lambda ] [ normal-lambda ] if ;
@@ -68,7 +68,7 @@ PRIVATE>
   
 : convert-form ( lisp-form -- quot )
   dup s-exp?  [ body>> convert-list-form ]
-              [ [ , ] [ ] make ] if ;
+              [ [ , ] bake ] if ;
                 
 : lisp-string>factor ( str -- quot )
   lisp-expr parse-result-ast convert-form lambda-rewrite call ;
@@ -85,7 +85,10 @@ ERROR: no-such-var var ;
   swap lisp-env get set-at ;
   
 : lisp-get ( name -- word )
-  dup lisp-env get at [ ] [ no-such-var ] ?if ;
+  dup lisp-env get at [ ] [ no-such-var throw ] ?if ;
   
 : funcall ( quot sym -- * )
   dup lisp-symbol?  [ name>> lisp-get ] when call ; inline
+
+: define-primitve ( name vocab word -- )  
+  swap lookup [ [ , ] compose call ] bake lisp-define ;
