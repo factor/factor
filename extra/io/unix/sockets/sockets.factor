@@ -70,16 +70,17 @@ M: object (server) ( addrspec -- handle )
         dup handle-fd 10 listen io-error
     ] with-destructors ;
 
-: do-accept ( server addrspec -- fd )
-    [ handle>> handle-fd ] [ empty-sockaddr/size <int> ] bi* accept ; inline
+: do-accept ( server addrspec -- fd sockaddr )
+    [ handle>> handle-fd ] [ empty-sockaddr/size <int> ] bi*
+    [ accept ] 2keep drop ; inline
 
-M: object (accept) ( server addrspec -- fd )
+M: object (accept) ( server addrspec -- fd sockaddr )
     2dup do-accept
     {
-        { [ dup 0 >= ] [ 2nip <fd> ] }
-        { [ err_no EINTR = ] [ drop (accept) ] }
+        { [ over 0 >= ] [ >r 2nip <fd> r> ] }
+        { [ err_no EINTR = ] [ 2drop (accept) ] }
         { [ err_no EAGAIN = ] [
-            drop
+            2drop
             [ drop +input+ wait-for-port ]
             [ (accept) ]
             2bi
