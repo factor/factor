@@ -13,7 +13,15 @@ GENERIC: handle-fd ( handle -- fd )
 
 TUPLE: fd fd disposed ;
 
-: <fd> ( n -- fd ) f fd boa ;
+: <fd> ( n -- fd )
+    #! We drop the error code rather than calling io-error,
+    #! since on OS X 10.3, this operation fails from init-io
+    #! when running the Factor.app (presumably because fd 0 and
+    #! 1 are closed).
+    [ F_SETFL O_NONBLOCK fcntl drop ]
+    [ F_SETFD FD_CLOEXEC fcntl drop ]
+    [ f fd boa ]
+    tri ;
 
 M: fd dispose* fd>> close-file ;
 
@@ -48,11 +56,6 @@ M: mx remove-output-callbacks writes>> delete-at* drop ;
 
 GENERIC: wait-for-events ( ms mx -- )
 
-TUPLE: unix-io-error error port ;
-
-: report-error ( error port -- )
-    tuck unix-io-error boa >>error drop ;
-
 : input-available ( fd mx -- )
     remove-input-callbacks [ resume ] each ;
 
@@ -64,7 +67,7 @@ TUPLE: io-timeout ;
 M: io-timeout summary drop "I/O operation timed out" ;
 
 M: unix cancel-io ( port -- )
-    io-timeout new over report-error
+    io-timeout new >>error
     handle>> handle-fd mx get-global
     [ input-available ] [ output-available ] 2bi ;
 
@@ -101,15 +104,6 @@ SYMBOL: +output+
 
 : io-error ( n -- ) 0 < [ (io-error) ] when ;
  
-M: fd init-handle ( fd -- )
-    #! We drop the error code rather than calling io-error,
-    #! since on OS X 10.3, this operation fails from init-io
-    #! when running the Factor.app (presumably because fd 0 and
-    #! 1 are closed).
-    fd>>
-    [ F_SETFL O_NONBLOCK fcntl drop ]
-    [ F_SETFD FD_CLOEXEC fcntl drop ] bi ;
-
 ! Readers
 : eof ( reader -- )
     dup buffer>> buffer-empty? [ t >>eof ] when drop ;

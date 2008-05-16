@@ -22,7 +22,6 @@ $nl
 { $subsection init-stdio }
 { $subsection io-multiplex }
 "Per-port native I/O protocol:"
-{ $subsection init-handle }
 { $subsection (wait-to-read) }
 { $subsection (wait-to-write) }
 "Additionally, the I/O backend must provide an implementation of the " { $link dispose } " generic word." ;
@@ -45,10 +44,6 @@ HELP: input-port
 
 HELP: output-port
 { $class-description "The class of ports implementing the output stream protocol." } ;
-
-HELP: init-handle
-{ $values { "handle" "a native handle identifying an I/O resource" } }
-{ $contract "Prepares a native handle for use by the port; called by " { $link <port> } "." } ;
 
 HELP: <port>
 { $values { "handle" "a native handle identifying an I/O resource" } { "class" class } { "port" "a new " { $link port } } }

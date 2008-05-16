@@ -24,9 +24,6 @@ TUPLE: win32-file < win32-handle ptr ;
 : <win32-file> ( handle -- win32-file )
     win32-file new-win32-handle ;
 
-M: win32-file init-handle ( handle -- )
-    drop ;
-
 HOOK: CreateFile-flags io-backend ( DWORD -- DWORD )
 HOOK: FileArgs-overlapped io-backend ( port -- overlapped/f )
 HOOK: add-completion io-backend ( port -- )

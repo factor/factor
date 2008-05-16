@@ -168,6 +168,7 @@ FUNCTION: int send ( SOCKET s, char* buf, int len, int flags ) ;
 FUNCTION: int recv ( SOCKET s, char* buf, int len, int flags ) ;
 
 FUNCTION: int getsockname ( SOCKET s, sockaddr_in* address, int* addrlen ) ;
+FUNCTION: int getpeername ( SOCKET s, sockaddr_in* address, int* addrlen ) ;
 
 TYPEDEF: uint SERVICETYPE
 TYPEDEF: OVERLAPPED WSAOVERLAPPED

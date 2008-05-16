@@ -5,7 +5,7 @@ io.files io.buffers io.monitors io.ports io.timeouts
 io.unix.backend io.unix.select io.encodings.utf8
 unix.linux.inotify assocs namespaces threads continuations init
 math math.bitfields sets alien alien.strings alien.c-types
-vocabs.loader accessors system hashtables ;
+vocabs.loader accessors system hashtables destructors ;
 IN: io.unix.linux.monitors
 
 SYMBOL: watches
@@ -23,9 +23,9 @@ TUPLE: linux-monitor < monitor wd inotify watches disposed ;
 : wd>monitor ( wd -- monitor ) watches get at ;
 
 : <inotify> ( -- port/f )
-    inotify_init dup 0 < [ drop f ] [ <input-port> ] if ;
+    inotify_init dup 0 < [ drop f ] [ <fd> <input-port> ] if ;
 
-: inotify-fd inotify get handle>> ;
+: inotify-fd inotify get handle>> handle-fd ;
 
 : check-existing ( wd -- )
     watches get key? [
@@ -57,8 +57,10 @@ M: linux (monitor) ( path recursive? mailbox -- monitor )
 M: linux-monitor dispose* ( monitor -- )
     [ [ wd>> ] [ watches>> ] bi delete-at ]
     [
-        [ inotify>> handle>> ] [ wd>> ] bi
-        inotify_rm_watch io-error
+        dup inotify>> disposed>> [ drop ] [
+            [ inotify>> handle>> handle-fd ] [ wd>> ] bi
+            inotify_rm_watch io-error
+        ] if
     ] bi ;
 
 : ignore-flags? ( mask -- ? )
@@ -108,6 +110,7 @@ M: linux-monitor dispose* ( monitor -- )
     ] if ;
 
 : inotify-read-loop ( port -- )
+    dup check-disposed
     dup wait-to-read
     0 over buffer>> parse-file-notifications
     0 over buffer>> buffer-reset

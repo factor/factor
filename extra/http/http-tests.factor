@@ -176,10 +176,10 @@ test-db [
         main-responder set
 
         [ 1237 httpd ] "HTTPD test" spawn drop
-
-        yield
     ] with-scope
 ] unit-test
+
+[ ] [ 100 sleep ] unit-test
 
 [ t ] [
     "resource:extra/http/test/foo.html" ascii file-contents
@@ -222,7 +222,7 @@ test-db [
     ] with-scope
 ] unit-test
 
-[ ] [ 1000 sleep ] unit-test
+[ ] [ 100 sleep ] unit-test
 
 : 404? [ download-failed? ] [ response>> code>> 404 = ] bi and ;
 
@@ -249,7 +249,7 @@ test-db [
     ] with-scope
 ] unit-test
 
-[ ] [ 1000 sleep ] unit-test
+[ ] [ 100 sleep ] unit-test
 
 [ "Hi" ] [ "http://localhost:1237/" http-get ] unit-test
 

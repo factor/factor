@@ -133,8 +133,6 @@ M: no-ssl-context summary
     current-ssl-context handle>> SSL_new dup ssl-error
     f f ssl-handle boa ;
 
-M: ssl-handle init-handle file>> init-handle ;
-
 HOOK: ssl-shutdown io-backend ( handle -- )
 
 M: ssl-handle dispose*

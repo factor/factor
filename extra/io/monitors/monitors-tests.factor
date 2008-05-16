@@ -89,5 +89,6 @@ os { winnt linux macosx } member? [
     ] with-monitors
 
     ! Out-of-scope disposal should not fail
-    [ "" resource-path t <monitor> ] with-monitors dispose
+    [ ] [ [ "" resource-path f <monitor> ] with-monitors dispose ] unit-test
+    [ ] [ [ "" resource-path t <monitor> ] with-monitors dispose ] unit-test
 ] when
