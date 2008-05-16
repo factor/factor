@@ -51,9 +51,9 @@ IN: jamshred.gl
     GL_LIGHT0 glEnable
     GL_FOG glEnable
     GL_FOG_DENSITY 0.09 glFogf
+    GL_FRONT GL_AMBIENT_AND_DIFFUSE glColorMaterial
     GL_COLOR_MATERIAL glEnable
-    GL_FRONT_AND_BACK GL_AMBIENT_AND_DIFFUSE glColorMaterial
-    GL_LIGHT0 GL_POSITION F{ 0.0 0.0 -3.0 1.0 } >c-float-array glLightfv
+    GL_LIGHT0 GL_POSITION F{ 0.0 0.0 0.0 1.0 } >c-float-array glLightfv
     GL_LIGHT0 GL_AMBIENT F{ 0.2 0.2 0.2 1.0 } >c-float-array glLightfv
     GL_LIGHT0 GL_DIFFUSE F{ 1.0 1.0 1.0 1.0 } >c-float-array glLightfv
     GL_LIGHT0 GL_SPECULAR F{ 1.0 1.0 1.0 1.0 } >c-float-array glLightfv ;

@@ -21,9 +21,9 @@ M: jamshred-gadget draw-gadget* ( gadget -- )
     dup jamshred>> quit>> [
         drop
     ] [
-        dup [ jamshred>> jamshred-update ]
-        [ relayout-1 ] bi
-        yield jamshred-loop
+        [ jamshred>> jamshred-update ]
+        [ relayout-1 ]
+        [ yield jamshred-loop ] tri
     ] if ;
 
 : fullscreen ( gadget -- )
@@ -45,7 +45,7 @@ M: jamshred-gadget ungraft* ( gadget -- )
     <jamshred> >>jamshred drop ;
 
 : pix>radians ( n m -- theta )
-    2 / / pi 2 * * ;
+    / pi 4 * * ; ! 2 / / pi 2 * * ;
 
 : x>radians ( x gadget -- theta )
     #! translate motion of x pixels to an angle
