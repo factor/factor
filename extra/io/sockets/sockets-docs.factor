@@ -130,7 +130,7 @@ HELP: <server>
 { $errors "Throws an error if the address is already in use, or if it if the system forbids access." } ;
 
 HELP: accept
-{ $values { "server" "a handle" } { "client" "a bidirectional stream" } { "addrspec" "an address specifier" } }
+{ $values { "server" "a handle" } { "client" "a bidirectional stream" } { "remote" "an address specifier" } }
 { $description "Waits for a connection to a server socket created by " { $link <server> } ", and outputs a bidirectional stream when the connection has been established. The encoding of this stream is the one that was passed to the server constructor." }
 { $errors "Throws an error if the server socket is closed or otherwise is unavailable." } ;
 
