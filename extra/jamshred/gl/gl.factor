@@ -59,10 +59,10 @@ IN: jamshred.gl
     GL_LIGHT0 GL_SPECULAR F{ 1.0 1.0 1.0 1.0 } >c-float-array glLightfv ;
 
 : player-view ( player -- )
-    [ location>> first3 ]
-    [ [ location>> ] [ forward>> ] bi v+ first3 ]
-    [ up>> first3 ] tri gluLookAt ;
+    [ location>> ]
+    [ [ location>> ] [ forward>> ] bi v+ ]
+    [ up>> ] tri gl-look-at ;
 
 : draw-jamshred ( jamshred width height -- )
-    init-graphics jamshred-player dup player-view draw-tunnel ;
+    init-graphics jamshred-player [ player-view ] [ draw-tunnel ] bi ;
 

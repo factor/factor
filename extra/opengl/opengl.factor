@@ -154,7 +154,7 @@ MACRO: set-draw-buffers ( buffers -- )
     swap glPushAttrib call glPopAttrib ; inline
 
 : gl-look-at ( eye focus up -- )
-    >r >r first3 r> first3 r> first3 gluLookAt ;
+    [ first3 ] tri@ gluLookAt ;
 
 TUPLE: sprite loc dim dim2 dlist texture ;
 
