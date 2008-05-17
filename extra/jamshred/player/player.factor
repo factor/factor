@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors jamshred.log jamshred.oint jamshred.sound jamshred.tunnel kernel math math.constants math.order math.ranges shuffle sequences system ;
+USING: accessors colors combinators jamshred.log jamshred.oint jamshred.sound jamshred.tunnel kernel math math.constants math.order math.ranges shuffle sequences system ;
 IN: jamshred.player
 
 TUPLE: player < oint name sounds tunnel nearest-segment last-move speed ;
@@ -15,6 +15,9 @@ TUPLE: player < oint name sounds tunnel nearest-segment last-move speed ;
 
 : turn-player ( player x-radians y-radians -- )
     >r over r> left-pivot up-pivot ;
+
+: roll-player ( player z-radians -- )
+    forward-pivot ;
 
 : to-tunnel-start ( player -- )
     [ tunnel>> first dup location>> ]
@@ -35,6 +38,9 @@ TUPLE: player < oint name sounds tunnel nearest-segment last-move speed ;
 : change-player-speed ( inc player -- )
     [ + speed-range clamp-to-range ] change-speed drop ;
 
+: multiply-player-speed ( n player -- )
+    [ * speed-range clamp-to-range ] change-speed drop ; 
+
 : distance-to-move ( player -- distance )
     [ speed>> ] [ last-move>> millis dup >r swap - 1000 / * r> ]
     [ (>>last-move) ] tri ;
@@ -43,8 +49,12 @@ DEFER: (move-player)
 
 : ?bounce ( distance-remaining player -- )
     over 0 > [
-        [ dup nearest-segment>> bounce ] [ sounds>> bang ]
-        [ (move-player) ] tri
+        {
+            [ dup nearest-segment>> bounce ]
+            [ sounds>> bang ]
+            [ 3/4 swap multiply-player-speed ]
+            [ (move-player) ]
+        } cleave
     ] [
         2drop
     ] if ;
