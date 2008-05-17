@@ -217,7 +217,7 @@ TUPLE: datagram-port < port addr ;
 
 HOOK: (datagram) io-backend ( addr -- datagram )
 
-: <datagram> ( addr -- datagram )
+: <datagram> ( addrspec -- datagram )
     [
         [ (datagram) |dispose ] keep
         [ drop datagram-port <port> ] [ get-local-address ] 2bi
@@ -287,11 +287,8 @@ TUPLE: inet host port ;
 
 C: <inet> inet
 
-: resolve-client-addr ( inet -- seq )
-    [ host>> ] [ port>> ] bi f resolve-host ;
-
 M: inet (client)
-    resolve-client-addr (client) ;
+    [ host>> ] [ port>> ] bi f resolve-host (client) ;
 
 ERROR: invalid-inet-server addrspec ;
 

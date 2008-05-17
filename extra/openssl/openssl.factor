@@ -47,7 +47,7 @@ SYMBOL: ssl-initiazed?
 
 [ f ssl-initiazed? set-global ] "openssl" add-init-hook
 
-TUPLE: openssl-context < ssl-context aliens ;
+TUPLE: openssl-context < secure-context aliens ;
 
 : load-certificate-chain ( ctx -- )
     dup config>> key-file>> [
@@ -99,25 +99,57 @@ TUPLE: openssl-context < ssl-context aliens ;
 : set-verify-depth ( ctx -- )
     handle>> 1 SSL_CTX_set_verify_depth ;
 
-M: openssl <ssl-context> ( config -- context )
+TUPLE: bio handle disposed ;
+
+: <bio> f bio boa ;
+
+M: bio dispose* handle>> BIO_free ssl-error ;
+
+: <file-bio> ( path -- bio )
+    normalize-path "r" BIO_new_file dup ssl-error <bio> ;
+
+: load-dh-params ( ctx -- )
+    dup config>> dh-file>> [
+        [ handle>> ] [ config>> dh-file>> ] bi <file-bio> &dispose
+        handle>> f f f PEM_read_bio_DHparams dup ssl-error
+        SSL_CTX_set_tmp_dh ssl-error
+    ] [ drop ] if ;
+
+TUPLE: rsa handle disposed ;
+
+: <rsa> f rsa boa ;
+
+M: rsa dispose* handle>> RSA_free ;
+
+: generate-eph-rsa-key ( ctx -- )
+    [ handle>> ]
+    [
+        config>> ephemeral-key-bits>> RSA_F4 f f RSA_generate_key
+        dup ssl-error <rsa> &dispose handle>>
+    ] bi
+    SSL_CTX_set_tmp_rsa ssl-error ;
+
+M: openssl <secure-context> ( config -- context )
     maybe-init-ssl
     [
         dup method>> ssl-method SSL_CTX_new
-        dup ssl-error V{ } clone openssl-context boa |dispose
+        dup ssl-error f V{ } clone openssl-context boa |dispose
         {
             [ load-certificate-chain ]
             [ set-default-password ]
             [ use-private-key-file ]
             [ load-verify-locations ]
             [ set-verify-depth ]
+            [ load-dh-params ]
+            [ generate-eph-rsa-key ]
             [ ]
         } cleave
     ] with-destructors ;
 
-M: openssl-context dispose
-    dup aliens>> [ free ] each f >>aliens
-    dup handle>> [ SSL_CTX_free ] when* f >>handle
-    drop ;
+M: openssl-context dispose*
+    [ aliens>> [ free ] each ]
+    [ handle>> SSL_CTX_free ]
+    bi ;
 
 TUPLE: ssl-handle file handle connected disposed ;
 
@@ -127,7 +159,7 @@ M: no-ssl-context summary
     drop "SSL operations must be wrapped in calls to with-ssl-context" ;
 
 : current-ssl-context ( -- ctx )
-    ssl-context get [ no-ssl-context ] unless* ;
+    secure-context get [ no-ssl-context ] unless* ;
 
 : <ssl-handle> ( fd -- ssl )
     current-ssl-context handle>> SSL_new dup ssl-error
@@ -141,11 +173,9 @@ M: ssl-handle dispose*
     [ file>> dispose ]
     tri ;
 
-ERROR: certificate-verify-error result ;
-
 : check-verify-result ( ssl-handle -- )
     SSL_get_verify_result dup X509_V_OK =
-    [ certificate-verify-error ] [ drop ] if ;
+    [ drop ] [ verify-message certificate-verify-error ] if ;
 
 : common-name ( certificate -- host )
     X509_get_subject_name
@@ -153,16 +183,14 @@ ERROR: certificate-verify-error result ;
     [ 256 X509_NAME_get_text_by_NID ] keep
     swap -1 = [ drop f ] [ ascii alien>string ] if ;
 
-ERROR: common-name-verify-error expected got ;
-
 : check-common-name ( host ssl-handle -- )
     SSL_get_peer_certificate common-name 2dup [ >lower ] bi@ =
     [ 2drop ] [ common-name-verify-error ] if ;
 
-: check-certificate ( host ssl -- )
+M: openssl check-certificate ( host ssl -- )
     handle>>
     [ nip check-verify-result ]
     [ check-common-name ]
     2bi ;
 
-openssl ssl-backend set-global
+openssl secure-socket-backend set-global

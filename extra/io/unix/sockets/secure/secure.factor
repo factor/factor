@@ -6,7 +6,7 @@ continuations destructors
 openssl openssl.libcrypto openssl.libssl
 io.files io.ports io.unix.backend io.unix.sockets
 io.encodings.ascii io.buffers io.sockets io.sockets.secure
-unix system ;
+unix system inspector ;
 IN: io.unix.sockets.secure
 
 M: ssl-handle handle-fd file>> handle-fd ;
@@ -16,7 +16,7 @@ M: ssl-handle handle-fd file>> handle-fd ;
         drop
         {
             { -1 [ (io-error) ] }
-            { 0 [ "Premature EOF" throw ] }
+            { 0 [ premature-close ] }
         } case
     ] [
         nip (ssl-error)
@@ -26,7 +26,7 @@ M: ssl-handle handle-fd file>> handle-fd ;
     over handle>> handle>> over SSL_get_error ; inline
 
 ! Input ports
-: check-read-response ( port r -- event )
+: check-read-response ( port r -- event ) USING: namespaces io prettyprint ;
     check-response
     {
         { SSL_ERROR_NONE [ swap buffer>> n>buffer f ] }
@@ -69,12 +69,12 @@ M: ssl-handle drain
     [ fd>> BIO_NOCLOSE BIO_new_socket dup ssl-error ] keep <ssl-handle>
     [ handle>> swap dup SSL_set_bio ] keep ;
 
-M: ssl ((client)) ( addrspec -- handle )
+M: secure ((client)) ( addrspec -- handle )
     addrspec>> ((client)) <ssl-socket> ;
 
-M: ssl parse-sockaddr addrspec>> parse-sockaddr <ssl> ;
+M: secure parse-sockaddr addrspec>> parse-sockaddr <secure> ;
 
-M: ssl (get-local-address) addrspec>> (get-local-address) ;
+M: secure (get-local-address) addrspec>> (get-local-address) ;
 
 : check-connect-response ( port r -- event )
     check-response
@@ -91,13 +91,13 @@ M: ssl (get-local-address) addrspec>> (get-local-address) ;
     check-connect-response dup
     [ dupd wait-for-port do-ssl-connect ] [ 2drop ] if ;
 
-M: ssl establish-connection ( client-out remote -- )
+M: secure establish-connection ( client-out remote -- )
     [ addrspec>> establish-connection ]
     [ drop do-ssl-connect ]
     [ drop handle>> t >>connected drop ]
     2tri ;
 
-M: ssl (server) addrspec>> (server) ;
+M: secure (server) addrspec>> (server) ;
 
 : check-accept-response ( handle r -- event )
     over handle>> over SSL_get_error
@@ -113,25 +113,27 @@ M: ssl (server) addrspec>> (server) ;
     dup dup handle>> SSL_accept check-accept-response dup
     [ >r dup file>> r> wait-for-fd do-ssl-accept ] [ 2drop ] if ;
 
-M: ssl (accept)
+M: secure (accept)
     [
-        addrspec>> (accept) |dispose <ssl-socket> |dispose
-        dup do-ssl-accept
+        addrspec>> (accept) >r
+        |dispose <ssl-socket> t >>connected |dispose
+        dup do-ssl-accept r>
     ] with-destructors ;
 
-: check-shutdown-response ( handle r -- event )
+: check-shutdown-response ( handle r -- event ) USING: io prettyprint ;
     #! SSL_shutdown always returns 0 due to openssl bugs?
     {
         { 1 [ drop f ] }
         { 0 [
-                dup SSL_want {
-                    { SSL_NOTHING [ dup SSL_shutdown check-shutdown-response ] }
+                dup handle>> SSL_want
+                {
+                    { SSL_NOTHING [ dup handle>> SSL_shutdown check-shutdown-response ] }
                     { SSL_READING [ drop +input+ ] }
                     { SSL_WRITING [ drop +output+ ] }
                 } case
         ] }
         { -1 [
-            -1 SSL_get_error
+            handle>> -1 SSL_get_error
             {
                 { SSL_ERROR_WANT_READ [ +input+ ] }
                 { SSL_ERROR_WANT_WRITE [ +output+ ] }
@@ -143,6 +145,6 @@ M: ssl (accept)
 
 M: unix ssl-shutdown
     dup connected>> [
-        dup handle>> dup SSL_shutdown check-shutdown-response
+        dup dup handle>> SSL_shutdown check-shutdown-response
         dup [ dupd wait-for-fd ssl-shutdown ] [ 2drop ] if
     ] [ drop ] if ;
