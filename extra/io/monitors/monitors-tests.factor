@@ -1,7 +1,7 @@
 IN: io.monitors.tests
 USING: io.monitors tools.test io.files system sequences
 continuations namespaces concurrency.count-downs kernel io
-threads calendar prettyprint destructors ;
+threads calendar prettyprint destructors io.timeouts ;
 
 os { winnt linux macosx } member? [
     [
@@ -91,4 +91,21 @@ os { winnt linux macosx } member? [
     ! Out-of-scope disposal should not fail
     [ ] [ [ "" resource-path f <monitor> ] with-monitors dispose ] unit-test
     [ ] [ [ "" resource-path t <monitor> ] with-monitors dispose ] unit-test
+    
+    ! Timeouts
+    [
+        [ ] [ "monitor-timeout-test" temp-file make-directories ] unit-test
+
+        ! Non-recursive
+        [ ] [ "monitor-timeout-test" temp-file f <monitor> "m" set ] unit-test
+        [ ] [ 3 seconds "m" get set-timeout ] unit-test
+        [ [ t ] [ "m" get next-change 2drop ] [ ] while ] must-fail
+        [ ] [ "m" get dispose ] unit-test
+
+        ! Recursive
+        [ ] [ "monitor-timeout-test" temp-file t <monitor> "m" set ] unit-test
+        [ ] [ 3 seconds "m" get set-timeout ] unit-test
+        [ [ t ] [ "m" get next-change 2drop ] [ ] while ] must-fail
+        [ ] [ "m" get dispose ] unit-test
+    ] with-monitors
 ] when

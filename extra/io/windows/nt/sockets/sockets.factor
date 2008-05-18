@@ -131,7 +131,8 @@ TUPLE: WSARecvFrom-args port
     WSARecvFrom-args >tuple*< WSARecvFrom socket-error* ;
 
 : parse-WSARecvFrom ( n WSARecvFrom -- packet sockaddr )
-    [ lpBuffers*>> WSABUF-buf swap memory>byte-array ] [ lpFrom*>> ] bi ;
+    [ lpBuffers*>> WSABUF-buf swap memory>byte-array ]
+    [ [ lpFrom*>> ] [ lpFromLen*>> *int ] bi memory>byte-array ] bi ;
 
 M: winnt (receive) ( datagram -- packet addrspec )
     [

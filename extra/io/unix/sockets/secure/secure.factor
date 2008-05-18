@@ -111,7 +111,7 @@ M: secure (server) addrspec>> (server) ;
 
 : do-ssl-accept ( ssl-handle -- )
     dup dup handle>> SSL_accept check-accept-response dup
-    [ >r dup file>> r> wait-for-fd do-ssl-accept ] [ 2drop ] if ;
+    [ >r dup file>> r> wait-for-fd drop do-ssl-accept ] [ 2drop ] if ;
 
 M: secure (accept)
     [
@@ -120,7 +120,7 @@ M: secure (accept)
         dup do-ssl-accept r>
     ] with-destructors ;
 
-: check-shutdown-response ( handle r -- event ) USING: io prettyprint ;
+: check-shutdown-response ( handle r -- event )
     #! SSL_shutdown always returns 0 due to openssl bugs?
     {
         { 1 [ drop f ] }
@@ -146,5 +146,5 @@ M: secure (accept)
 M: unix ssl-shutdown
     dup connected>> [
         dup dup handle>> SSL_shutdown check-shutdown-response
-        dup [ dupd wait-for-fd ssl-shutdown ] [ 2drop ] if
+        dup [ dupd wait-for-fd drop ssl-shutdown ] [ 2drop ] if
     ] [ drop ] if ;

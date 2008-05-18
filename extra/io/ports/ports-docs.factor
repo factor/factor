@@ -29,15 +29,7 @@ $nl
 ABOUT: "io.ports"
 
 HELP: port
-{ $class-description "Instances of this class present a blocking stream interface on top of an underlying non-blocking I/O system, giving the illusion of blocking by yielding the thread which is waiting for input or output."
-$nl
-"Ports have the following slots:"
-{ $list
-    { { $snippet "handle" } " - a native handle identifying the underlying native resource used by the port" }
-    { { $snippet "error" } " - the most recent I/O error, if any. This error is thrown to the waiting thread when " { $link pending-error } " is called by stream operations" }
-    { { $snippet "type" } " - a symbol identifying the port's intended purpose" }
-    { { $snippet "eof" } " - a flag indicating if the port has reached the end of file while reading" }
-} } ;
+{ $class-description "Instances of this class present a blocking stream interface on top of an underlying non-blocking I/O system, giving the illusion of blocking by yielding the thread which is waiting for input or output." } ;
 
 HELP: input-port
 { $class-description "The class of ports implementing the input stream protocol." } ;
@@ -64,10 +56,6 @@ HELP: <output-port>
 { $values { "handle" "a native handle identifying an I/O resource" } { "output-port" "a new " { $link output-port } } }
 { $description "Creates a new " { $link output-port } " using the specified native handle and a default-sized input buffer." } 
 $low-level-note ;
-
-HELP: pending-error
-{ $values { "port" port } }
-{ $description "If an error occurred while the I/O thread was performing input or output on this port, this error will be thrown to the caller." } ;
 
 HELP: (wait-to-read)
 { $values { "port" input-port } }
