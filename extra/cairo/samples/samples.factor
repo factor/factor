@@ -116,11 +116,11 @@ IN: cairo.samples
     cr cairo_fill ;
 
 : utf8 ( -- )
-    cr "Serif" CAIRO_FONT_SLANT_NORMAL CAIRO_FONT_WEIGHT_NORMAL
-    cairo_select_font_face
+    ! cr "kochi" CAIRO_FONT_SLANT_NORMAL CAIRO_FONT_WEIGHT_NORMAL
+    ! cairo_select_font_face
     cr 50 cairo_set_font_size
     "cairo_text_extents_t" malloc-object
-    cr B{ 230 151 165 230 156 172 232 170 158 } pick cairo_text_extents
+    cr "日本語" pick cairo_text_extents
     cr over
     [ cairo_text_extents_t-width 2 / ]
     [ cairo_text_extents_t-x_bearing ] bi +
@@ -129,7 +129,7 @@ IN: cairo.samples
     [ cairo_text_extents_t-y_bearing ] bi +
     128 swap - cairo_move_to
     free
-    cr B{ 230 151 165 230 156 172 232 170 158 } cairo_show_text
+    cr "日本語" cairo_show_text
     
     cr 1 0.2 0.2 0.6 cairo_set_source_rgba
     cr 6 cairo_set_line_width
