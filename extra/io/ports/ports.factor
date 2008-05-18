@@ -110,7 +110,7 @@ HOOK: (wait-to-write) io-backend ( port -- )
 M: output-port stream-flush ( port -- )
     [ check-disposed ] [ port-flush ] bi ;
 
-M: output-port dispose
+M: output-port dispose*
     [ port-flush ] [ call-next-method ] bi ;
 
 M: buffered-port dispose*

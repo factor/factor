@@ -1,6 +1,6 @@
 USING: arrays io io.files kernel math parser strings system
 tools.test words namespaces io.encodings.8-bit
-io.encodings.binary ;
+io.encodings.binary sequences ;
 IN: io.tests
 
 [ f ] [
@@ -45,5 +45,13 @@ IN: io.tests
 [ ] [
     image binary [
         10 [ 65536 read drop ] times
+    ] with-file-reader
+] unit-test
+
+! Test EOF behavior
+[ 10 ] [
+    image binary [
+        0 read drop
+        10 read length
     ] with-file-reader
 ] unit-test

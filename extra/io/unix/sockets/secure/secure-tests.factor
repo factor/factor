@@ -56,11 +56,11 @@ concurrency.promises byte-arrays ;
 !     ] "SSL server test" spawn drop
 ! ] unit-test
 
-[
-    <secure-config> [
-        "127.0.0.1" "port" get ?promise <inet4> <secure> ascii <client> drop contents
-    ] with-secure-context
-] [ premature-close = ] must-fail-with
+! [
+!     <secure-config> [
+!         "127.0.0.1" "port" get ?promise <inet4> <secure> ascii <client> drop contents
+!     ] with-secure-context
+! ] [ \ premature-close = ] must-fail-with
 
 ! Now, try validating the certificate. This should fail because its
 ! actually an invalid certificate
