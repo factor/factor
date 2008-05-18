@@ -7,7 +7,7 @@ IN: lisp
 
 DEFER: convert-form
 DEFER: funcall
-DEFER: lookup-vars
+DEFER: lookup-var
 
 ! Functions to convert s-exps to quotations
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -21,10 +21,11 @@ DEFER: lookup-vars
   rest convert-form ;
   
 : convert-cond ( s-exp -- quot )  
-  rest [ [ convert-form map ] map ] [ % cond ] bake ;
+  rest [ body>> >array [ convert-form ] map first2 swap `{ [ % funcall ] , } bake ]
+  map >array [ , cond ] bake ;
   
 : convert-general-form ( s-exp -- quot )
-  unclip convert-form swap convert-body [ , lookup-vars % funcall ] bake ;
+  unclip convert-form swap convert-body [ , % funcall ] bake ;
 
 ! words for convert-lambda  
 <PRIVATE  
@@ -43,10 +44,10 @@ DEFER: lookup-vars
 : rest-lambda ( body vars -- quot )  
   "&rest" swap [ remove ] [ index ] 2bi
   [ localize-lambda <lambda> ] dip
-  [ , lookup-vars cut swap [ % , ] bake , compose ] bake ;
+  [ , cut swap [ % , ] bake , compose ] bake ;
   
 : normal-lambda ( body vars -- quot )
-  localize-lambda <lambda> [ lookup-vars , compose ] bake ;
+  localize-lambda <lambda> [ , compose ] bake ;
 PRIVATE>
   
 : convert-lambda ( s-exp -- quot )  
@@ -68,8 +69,10 @@ PRIVATE>
     [ drop convert-general-form ] if ;
   
 : convert-form ( lisp-form -- quot )
-  dup s-exp?  [ body>> convert-list-form ]
-              [ [ , ] bake ] if ;
+  { { [ dup s-exp? ] [ body>> convert-list-form ] }
+    { [ dup lisp-symbol? ] [ [ , lookup-var ] bake ] }
+    [ [ , ] bake ]
+  } cond ;
                 
 : lisp-string>factor ( str -- quot )
   lisp-expr parse-result-ast convert-form lambda-rewrite call ;
@@ -88,11 +91,11 @@ ERROR: no-such-var var ;
 : lisp-get ( name -- word )
   dup lisp-env get at [ ] [ no-such-var throw ] ?if ;
   
+: lookup-var ( lisp-symbol -- quot )
+  name>> lisp-get ;
+  
 : funcall ( quot sym -- * )
-  dup lisp-symbol?  [ name>> lisp-get ] when call ; inline
-
-: lookup-vars ( q -- p )  
-  [ dup lisp-symbol? [ name>> lisp-get ] when ] map ;
+  dup lisp-symbol?  [ lookup-var ] when call ; inline
   
 : define-primitve ( name vocab word -- )  
   swap lookup [ [ , ] compose call ] bake lisp-define ;
