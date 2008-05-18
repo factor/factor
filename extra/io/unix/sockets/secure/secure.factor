@@ -111,7 +111,7 @@ M: ssl (server) addrspec>> (server) ;
 
 : do-ssl-accept ( ssl-handle -- )
     dup dup handle>> SSL_accept check-accept-response dup
-    [ >r dup file>> r> wait-for-fd do-ssl-accept ] [ 2drop ] if ;
+    [ >r dup file>> r> wait-for-fd drop do-ssl-accept ] [ 2drop ] if ;
 
 M: ssl (accept)
     [
@@ -144,5 +144,5 @@ M: ssl (accept)
 M: unix ssl-shutdown
     dup connected>> [
         dup handle>> dup SSL_shutdown check-shutdown-response
-        dup [ dupd wait-for-fd ssl-shutdown ] [ 2drop ] if
+        dup [ dupd wait-for-fd drop ssl-shutdown ] [ 2drop ] if
     ] [ drop ] if ;
