@@ -8,7 +8,8 @@ accessors locals ;
 QUALIFIED: windows.winsock
 IN: io.windows.nt.backend
 
-SYMBOL: io-hash
+! Global variable with assoc mapping overlapped to threads
+SYMBOL: pending-overlapped
 
 TUPLE: io-callback port thread ;
 
@@ -33,62 +34,41 @@ M: winnt add-completion ( win32-handle -- )
     handle>> master-completion-port get-global <completion-port> drop ;
 
 : eof? ( error -- ? )
-    dup ERROR_HANDLE_EOF = swap ERROR_BROKEN_PIPE = or ;
-
-: overlapped-error? ( port n -- ? )
-    zero? [
-        GetLastError {
-            { [ dup expected-io-error? ] [ 2drop t ] }
-            { [ dup eof? ] [ drop t >>eof drop f ] }
-            [ (win32-error-string) throw ]
-        } cond
-    ] [
-        drop t
-    ] if ;
-
-: get-overlapped-result ( overlapped port -- bytes-transferred )
-    dup handle>> handle>> rot 0 <uint>
-    [ 0 GetOverlappedResult overlapped-error? drop ] keep *uint ;
-
-: save-callback ( overlapped port -- )
-    [
-        <io-callback> swap
-        dup alien? [ "bad overlapped in save-callback" throw ] unless
-        io-hash get-global set-at
-    ] "I/O" suspend 3drop ;
+    [ ERROR_HANDLE_EOF = ] [ ERROR_BROKEN_PIPE = ] bi or ;
 
 : twiddle-thumbs ( overlapped port -- bytes-transferred )
-    [ save-callback ]
-    [ get-overlapped-result ]
-    [ nip pending-error ]
-    2tri ;
-
-:: wait-for-overlapped ( ms -- overlapped ? )
-    master-completion-port get-global
-    0 <int> ! bytes
-    f <void*> ! key
-    f <void*> ! overlapped
     [
-        ms INFINITE or ! timeout
-        GetQueuedCompletionStatus
-    ] keep *void* swap zero? ;
+        drop
+        [ pending-overlapped get-global set-at ] curry "I/O" suspend
+        {
+            { [ dup integer? ] [ ] }
+            { [ dup array? ] [
+                first dup eof?
+                [ drop 0 ] [ (win32-error-string) throw ] if
+            ] }
+        } cond
+    ] with-timeout ;
 
-: lookup-callback ( overlapped -- callback )
-    io-hash get-global delete-at* drop
-    dup io-callback? [ "no callback in io-hash" throw ] unless ;
+:: wait-for-overlapped ( ms -- bytes-transferred overlapped error? )
+    master-completion-port get-global
+    0 <int> [ ! bytes
+        f <void*> ! key
+        f <void*> [ ! overlapped
+            ms INFINITE or ! timeout
+            GetQueuedCompletionStatus zero?
+        ] keep *void*
+    ] keep *int spin ;
+
+: resume-callback ( result overlapped -- )
+    pending-overlapped get-global delete-at* drop resume-with ;
 
 : handle-overlapped ( timeout -- ? )
     wait-for-overlapped [
-        GetLastError dup expected-io-error? [ 2drop f ] [
-            >r lookup-callback [ thread>> ] [ port>> ] bi r>
-            dup eof?
-            [ drop t >>eof ]
-            [ (win32-error-string) >>error ] if drop
-            resume t
-        ] if
+        >r drop GetLastError
+        [ 1array ] [ expected-io-error? ] bi
+        [ r> 2drop f ] [ r> resume-callback t ] if
     ] [
-        lookup-callback
-        thread>> resume t
+        resume-callback t
     ] if ;
 
 M: winnt cancel-io
@@ -99,29 +79,35 @@ M: winnt io-multiplex ( ms -- )
 
 M: winnt init-io ( -- )
     <master-completion-port> master-completion-port set-global
-    H{ } clone io-hash set-global
+    H{ } clone pending-overlapped set-global
     windows.winsock:init-winsock ;
+
+: file-error? ( n -- eof? )
+    zero? [
+        GetLastError {
+            { [ dup expected-io-error? ] [ drop f ] }
+            { [ dup eof? ] [ drop t ] }
+            [ (win32-error-string) throw ]
+        } cond
+    ] [ f ] if ;
+
+: wait-for-file ( FileArgs n port -- n )
+    swap file-error?
+    [ 2drop 0 ] [ >r lpOverlapped>> r> twiddle-thumbs ] if ;
 
 : update-file-ptr ( n port -- )
     handle>> dup ptr>> [ rot + >>ptr drop ] [ 2drop ] if* ;
 
-: finish-flush ( n port -- )
+: finish-write ( n port -- )
     [ update-file-ptr ] [ buffer>> buffer-consume ] 2bi ;
 
-: ((wait-to-write)) ( port -- )
-    dup make-FileArgs
-    tuck setup-write WriteFile
-    dupd overlapped-error? [
-        >r lpOverlapped>> r>
-        [ twiddle-thumbs ] keep
-        [ finish-flush ] keep
-        dup buffer>> buffer-empty? [ drop ] [ ((wait-to-write)) ] if
-    ] [
-        2drop
-    ] if ;
-
 M: winnt (wait-to-write)
-    [ [ ((wait-to-write)) ] with-timeout ] with-destructors ;
+    [
+        [ make-FileArgs dup setup-write WriteFile ]
+        [ wait-for-file ]
+        [ finish-write ]
+        tri
+    ] with-destructors ;
 
 : finish-read ( n port -- )
     over zero? [
@@ -130,13 +116,10 @@ M: winnt (wait-to-write)
         [ buffer>> n>buffer ] [ update-file-ptr ] 2bi
     ] if ;
 
-: ((wait-to-read)) ( port -- )
-    dup make-FileArgs
-    tuck setup-read ReadFile
-    dupd overlapped-error? [
-        >r lpOverlapped>> r>
-        [ twiddle-thumbs ] [ finish-read ] bi
-    ] [ 2drop ] if ;
-
 M: winnt (wait-to-read) ( port -- )
-    [ [ ((wait-to-read)) ] with-timeout ] with-destructors ;
+    [
+        [ make-FileArgs dup setup-read ReadFile ]
+        [ wait-for-file ]
+        [ finish-read ]
+        tri
+    ] with-destructors ;

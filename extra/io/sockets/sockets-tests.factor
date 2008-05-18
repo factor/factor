@@ -1,6 +1,6 @@
 IN: io.sockets.tests
 USING: io.sockets sequences math tools.test namespaces accessors 
-kernel destructors ;
+kernel destructors calendar io.timeouts ;
 
 [ B{ 1 2 3 4 } ]
 [ "1.2.3.4" T{ inet4 } inet-pton ] unit-test
@@ -62,3 +62,9 @@ kernel destructors ;
 
 [ ] [ "datagram1" get dispose ] unit-test
 [ ] [ "datagram2" get dispose ] unit-test
+
+! Test timeouts
+[ ] [ "127.0.0.1" 0 <inet4> <datagram> "datagram3" set ] unit-test
+
+[ ] [ 1 seconds "datagram3" get set-timeout ] unit-test
+[ "datagram3" get receive ] must-fail

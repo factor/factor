@@ -105,6 +105,8 @@ strings accessors io.encodings.utf8 math destructors ;
 
 [ f ] [ "test-bar.txt" temp-file exists? ] unit-test
 
+[ "test-blah" temp-file delete-tree ] ignore-errors
+
 [ ] [ "test-blah" temp-file make-directory ] unit-test
 
 [ ] [

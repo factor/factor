@@ -10,7 +10,7 @@ IN: io.ports
 SYMBOL: default-buffer-size
 64 1024 * default-buffer-size set-global
 
-TUPLE: port handle error timeout disposed ;
+TUPLE: port handle timeout disposed ;
 
 M: port timeout timeout>> ;
 
@@ -18,9 +18,6 @@ M: port set-timeout (>>timeout) ;
 
 : <port> ( handle class -- port )
     new swap >>handle ; inline
-
-: pending-error ( port -- )
-    [ f ] change-error drop [ throw ] when* ;
 
 TUPLE: buffered-port < port buffer ;
 
@@ -106,14 +103,15 @@ M: output-port stream-write
 
 HOOK: (wait-to-write) io-backend ( port -- )
 
-: flush-port ( port -- )
-    dup buffer>> buffer-empty? [ drop ] [ (wait-to-write) ] if ;
+: port-flush ( port -- )
+    dup buffer>> buffer-empty?
+    [ drop ] [ dup (wait-to-write) port-flush ] if ;
 
 M: output-port stream-flush ( port -- )
-    [ check-disposed ] [ flush-port ] bi ;
+    [ check-disposed ] [ port-flush ] bi ;
 
-M: output-port dispose*
-    [ flush-port ] [ call-next-method ] bi ;
+M: output-port dispose
+    [ port-flush ] [ call-next-method ] bi ;
 
 M: buffered-port dispose*
     [ call-next-method ]

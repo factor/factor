@@ -217,7 +217,7 @@ TUPLE: datagram-port < port addr ;
 
 HOOK: (datagram) io-backend ( addr -- datagram )
 
-: <datagram> ( addr -- datagram )
+: <datagram> ( addrspec -- datagram )
     [
         [ (datagram) |dispose ] keep
         [ drop datagram-port <port> ] [ get-local-address ] 2bi

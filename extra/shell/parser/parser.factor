@@ -23,8 +23,8 @@ TUPLE: factor-expr        expr ;
   pipeline-expr new
     over [ 1st ] [ 4th [ 1st ] map ] [ 5th ] tri suffix prefix-on >>commands
     over 2nd >>stdin
-    over 5th   >>stdout
-    swap 6th   >>background ;
+    over 6th   >>stdout
+    swap 7th   >>background ;
 
 : ast>single-quoted-expr ( ast -- obj )
   2nd >string single-quoted-expr boa ;

@@ -10,12 +10,15 @@ TUPLE: c-writer handle disposed ;
 : <c-writer> ( handle -- stream ) f c-writer boa ;
 
 M: c-writer stream-write1
+    dup check-disposed
     handle>> fputc ;
 
 M: c-writer stream-write
+    dup check-disposed
     handle>> fwrite ;
 
 M: c-writer stream-flush
+    dup check-disposed
     handle>> fflush ;
 
 M: c-writer dispose*
@@ -26,12 +29,14 @@ TUPLE: c-reader handle disposed ;
 : <c-reader> ( handle -- stream ) f c-reader boa ;
 
 M: c-reader stream-read
+    dup check-disposed
     handle>> fread ;
 
 M: c-reader stream-read-partial
     stream-read ;
 
 M: c-reader stream-read1
+    dup check-disposed
     handle>> fgetc ;
 
 : read-until-loop ( stream delim -- ch )
@@ -42,6 +47,7 @@ M: c-reader stream-read1
     ] if ;
 
 M: c-reader stream-read-until
+    dup check-disposed
     [ swap read-until-loop ] B{ } make swap
     over empty? over not and [ 2drop f f ] when ;
 
