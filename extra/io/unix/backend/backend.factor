@@ -93,7 +93,7 @@ M: io-timeout summary drop "I/O operation timed out" ;
     [
         >r handle>> r> wait-for-fd
         [ io-timeout ] when
-    ] with-timeout ;
+    ] curry with-timeout ;
 
 ! Some general stuff
 : file-mode OCT: 0666 ;
