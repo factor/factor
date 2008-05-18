@@ -116,8 +116,8 @@ IN: cairo.samples
     cr cairo_fill ;
 
 : utf8 ( -- )
-    ! cr "kochi" CAIRO_FONT_SLANT_NORMAL CAIRO_FONT_WEIGHT_NORMAL
-    ! cairo_select_font_face
+    cr "Sans" CAIRO_FONT_SLANT_NORMAL CAIRO_FONT_WEIGHT_NORMAL
+    cairo_select_font_face
     cr 50 cairo_set_font_size
     "cairo_text_extents_t" malloc-object
     cr "日本語" pick cairo_text_extents
