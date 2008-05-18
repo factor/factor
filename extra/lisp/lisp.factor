@@ -7,6 +7,7 @@ IN: lisp
 
 DEFER: convert-form
 DEFER: funcall
+DEFER: lookup-vars
 
 ! Functions to convert s-exps to quotations
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -23,7 +24,7 @@ DEFER: funcall
   rest [ [ convert-form map ] map ] [ % cond ] bake ;
   
 : convert-general-form ( s-exp -- quot )
-  unclip convert-form swap convert-body [ , % funcall ] bake ;
+  unclip convert-form swap convert-body [ , lookup-vars % funcall ] bake ;
 
 ! words for convert-lambda  
 <PRIVATE  
@@ -42,10 +43,10 @@ DEFER: funcall
 : rest-lambda ( body vars -- quot )  
   "&rest" swap [ remove ] [ index ] 2bi
   [ localize-lambda <lambda> ] dip
-  [ , cut swap [ % , ] bake , compose ] bake ;
+  [ , lookup-vars cut swap [ % , ] bake , compose ] bake ;
   
 : normal-lambda ( body vars -- quot )
-  localize-lambda <lambda> [ , compose ] bake ;
+  localize-lambda <lambda> [ lookup-vars , compose ] bake ;
 PRIVATE>
   
 : convert-lambda ( s-exp -- quot )  
@@ -90,5 +91,8 @@ ERROR: no-such-var var ;
 : funcall ( quot sym -- * )
   dup lisp-symbol?  [ name>> lisp-get ] when call ; inline
 
+: lookup-vars ( q -- p )  
+  [ dup lisp-symbol? [ name>> lisp-get ] when ] map ;
+  
 : define-primitve ( name vocab word -- )  
   swap lookup [ [ , ] compose call ] bake lisp-define ;
