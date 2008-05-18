@@ -34,27 +34,27 @@ concurrency.promises byte-arrays ;
 ] unit-test
 
 ! Now, see what happens if the server closes the connection prematurely
-[ ] [ <promise> "port" set ] unit-test
-
-[ ] [
-    [
-        <secure-config>
-            "resource:extra/openssl/test/server.pem" >>key-file
-            "resource:extra/openssl/test/root.pem" >>ca-file
-            "resource:extra/openssl/test/dh1024.pem" >>dh-file
-            "password" >byte-array >>password
-        [
-            "127.0.0.1" 0 <inet4> <secure> ascii <server> [
-                dup addr>> addrspec>> port>> "port" get fulfill
-                accept drop
-                [
-                    dup in>> stream>> handle>> f >>connected drop
-                    "hello" over stream-write dup stream-flush
-                ] with-disposal
-            ] with-disposal
-        ] with-secure-context
-    ] "SSL server test" spawn drop
-] unit-test
+! [ ] [ <promise> "port" set ] unit-test
+! 
+! [ ] [
+!     [
+!         <secure-config>
+!             "resource:extra/openssl/test/server.pem" >>key-file
+!             "resource:extra/openssl/test/root.pem" >>ca-file
+!             "resource:extra/openssl/test/dh1024.pem" >>dh-file
+!             "password" >byte-array >>password
+!         [
+!             "127.0.0.1" 0 <inet4> <secure> ascii <server> [
+!                 dup addr>> addrspec>> port>> "port" get fulfill
+!                 accept drop
+!                 [
+!                     dup in>> stream>> handle>> f >>connected drop
+!                     "hello" over stream-write dup stream-flush
+!                 ] with-disposal
+!             ] with-disposal
+!         ] with-secure-context
+!     ] "SSL server test" spawn drop
+! ] unit-test
 
 [
     <secure-config> [
