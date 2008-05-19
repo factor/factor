@@ -65,10 +65,6 @@ HELP: wait-to-read
 { $values { "port" input-port } }
 { $description "If the port's buffer has unread data, returns immediately, otherwise suspends the current thread until some data is available for reading." } ;
 
-HELP: unless-eof
-{ $values { "port" input-port } { "quot" "a quotation with stack effect " { $snippet "( port -- value )" } } { "value" object } }
-{ $description "If the port has reached end of file, outputs " { $link f } ", otherwise applies the quotation to the port." } ;
-
 HELP: can-write?
 { $values { "len" "a positive integer" } { "buffer" buffer } { "?" "a boolean" } }
 { $description "Tests if the port's output buffer can accomodate " { $snippet "len" } " bytes. If the buffer is empty, this always outputs " { $link t } ", since in that case the buffer will be grown automatically." } ;

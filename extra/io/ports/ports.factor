@@ -25,27 +25,24 @@ TUPLE: buffered-port < port buffer ;
     <port>
         default-buffer-size get <buffer> >>buffer ; inline
 
-TUPLE: input-port < buffered-port eof ;
+TUPLE: input-port < buffered-port ;
 
 : <input-port> ( handle -- input-port )
     input-port <buffered-port> ;
 
 HOOK: (wait-to-read) io-backend ( port -- )
 
-: wait-to-read ( port -- )
-    dup buffer>> buffer-empty? [ (wait-to-read) ] [ drop ] if ;
-
-: unless-eof ( port quot -- value )
-    >r dup buffer>> buffer-empty? over eof>> and
-    [ f >>eof drop f ] r> if ; inline
+: wait-to-read ( port -- eof? )
+    dup buffer>> buffer-empty? [
+        dup (wait-to-read) buffer>> buffer-empty?
+    ] [ drop f ] if ;
 
 M: input-port stream-read1
     dup check-disposed
-    dup wait-to-read [ buffer>> buffer-pop ] unless-eof ;
+    dup wait-to-read [ drop f ] [ buffer>> buffer-pop ] if ;
 
 : read-step ( count port -- byte-array/f )
-    [ wait-to-read ] keep
-    [ dupd buffer>> buffer-read ] unless-eof nip ;
+    dup wait-to-read [ 2drop f ] [ buffer>> buffer-read ] if ;
 
 M: input-port stream-read-partial ( max stream -- byte-array/f )
     dup check-disposed

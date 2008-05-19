@@ -110,11 +110,7 @@ M: winnt (wait-to-write)
     ] with-destructors ;
 
 : finish-read ( n port -- )
-    over zero? [
-        t >>eof 2drop
-    ] [
-        [ buffer>> n>buffer ] [ update-file-ptr ] 2bi
-    ] if ;
+    [ update-file-ptr ] [ buffer>> n>buffer ] 2bi ;
 
 M: winnt (wait-to-read) ( port -- )
     [
