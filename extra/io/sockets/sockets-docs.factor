@@ -37,7 +37,7 @@ ARTICLE: "network-packet" "Packet-oriented networking"
 { $subsection receive }
 "Packet-oriented sockets are closed by calling " { $link dispose } "."
 $nl
-"Address specifiers have the following interpretation with connection-oriented networking words:"
+"Address specifiers have the following interpretation with packet-oriented networking words:"
 { $list
     { { $link local } " - Unix domain datagram sockets on Unix systems" }
     { { $link inet4 } " - a TCP/IP connection to an IPv4 address and port number; no name lookup is performed" }
