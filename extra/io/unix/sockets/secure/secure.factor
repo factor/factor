@@ -26,7 +26,7 @@ M: ssl-handle handle-fd file>> handle-fd ;
     over handle>> handle>> over SSL_get_error ; inline
 
 ! Input ports
-: check-read-response ( port r -- event ) USING: namespaces io prettyprint ;
+: check-read-response ( port r -- event )
     check-response
     {
         { SSL_ERROR_NONE [ swap buffer>> n>buffer f ] }
