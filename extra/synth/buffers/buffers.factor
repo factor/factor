@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types combinators kernel locals math math.constants math.functions math.ranges openal sequences sequences.merged sequences.repeating ;
+USING: accessors alien.c-types combinators kernel locals math math.ranges openal sequences sequences.merged ;
 IN: synth.buffers
 
 TUPLE: buffer sample-freq 8bit? id ;
@@ -13,10 +13,16 @@ TUPLE: mono-buffer < buffer data ;
 : <mono-buffer> ( sample-freq 8bit? -- buffer )
     f f mono-buffer boa ;
 
+: <8bit-mono-buffer> ( sample-freq -- buffer ) t <mono-buffer> ;
+: <16bit-mono-buffer> ( sample-freq -- buffer ) f <mono-buffer> ;
+
 TUPLE: stereo-buffer < buffer left-data right-data ;
 
 : <stereo-buffer> ( sample-freq 8bit? -- buffer )
     f f f stereo-buffer boa ;
+
+: <8bit-stereo-buffer> ( sample-freq -- buffer ) t <stereo-buffer> ;
+: <16bit-stereo-buffer> ( sample-freq -- buffer ) f <stereo-buffer> ;
 
 PREDICATE: 8bit-buffer < buffer 8bit?>> ;
 PREDICATE: 16bit-buffer < buffer 8bit?>> not ;
@@ -68,21 +74,3 @@ M: 16bit-stereo-buffer buffer-data
 : ?send-buffer ( buffer -- buffer )
     dup id>> [ send-buffer ] unless ;
 
-: (sine-wave) ( samples/wave n-samples -- seq )
-    pi 2 * pick / swapd [ * sin ] curry map swap <repeating> ;
-
-: sine-wave ( sample-freq freq seconds -- seq )
-    pick * >integer [ /i ] dip (sine-wave) ;
-
-: >sine-wave-buffer ( freq seconds buffer -- buffer )
-    [ sample-freq>> -rot sine-wave ] keep swap >>data ;
-
-: >silent-buffer ( seconds buffer -- buffer )
-    tuck sample-freq>> * >integer 0 <repetition> >>data ;
-
-: play-sine-wave ( freq seconds sample-freq -- )
-    init-openal
-    t <mono-buffer> >sine-wave-buffer send-buffer id>>
-    1 gen-sources first
-    [ AL_BUFFER rot set-source-param ] [ source-play ] bi
-    check-error ;

@@ -23,4 +23,6 @@ M: merged length seqs>> [ length ] map sum ;
 M: merged virtual@ ( n seq -- n' seq' )
     seqs>> [ length /mod ] [ nth ] bi ;
 
+M: merged virtual-seq ( merged -- seq ) [ ] { } map-as ;
+
 INSTANCE: merged virtual-sequence
