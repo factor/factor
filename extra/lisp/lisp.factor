@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel peg sequences arrays strings combinators.lib
 namespaces combinators math bake locals locals.private accessors
-vectors syntax lisp.parser assocs parser sequences.lib words ;
+vectors syntax lisp.parser assocs parser sequences.lib words quotations ;
 IN: lisp
 
 DEFER: convert-form
@@ -18,7 +18,7 @@ DEFER: lookup-var
   rest [ convert-form ] map reverse first3  [ % , , if ] bake ;
   
 : convert-begin ( s-exp -- quot )  
-  rest convert-form ;
+  rest [ convert-form ] map >quotation [ , [ funcall ] each ] bake ;
   
 : convert-cond ( s-exp -- quot )  
   rest [ body>> >array [ convert-form ] map first2 swap `{ [ % funcall ] , } bake ]
