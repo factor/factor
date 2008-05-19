@@ -35,3 +35,11 @@ init-env
 { "b" } [
   "(cond (#f \"a\") (#t \"b\"))" lisp-string>factor call
 ] unit-test
+
+{ 5 } [
+  "(begin (+ 1 4))" lisp-string>factor call
+] unit-test
+
+{ 3 } [
+   "((lambda (x) (if x (begin (+ 1 2)) (- 3 5))) #t)" lisp-string>factor call
+] unit-test
