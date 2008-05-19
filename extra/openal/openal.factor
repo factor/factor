@@ -235,13 +235,13 @@ SYMBOL: init
 
 : init-openal ( -- )
   init get-global expired? [
-    f f alutInit drop
+    f f alutInit 0 = [ "Could not initialize OpenAL" throw ] when
     1337 <alien> init set-global
   ] when ;
 
 : exit-openal ( -- )
   init get-global expired? [
-    alutExit drop
+    alutExit 0 = [ "Could not close OpenAL" throw ] when
     f init set-global
   ] unless ;
 

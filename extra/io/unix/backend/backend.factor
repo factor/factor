@@ -62,21 +62,18 @@ GENERIC: wait-for-events ( ms mx -- )
 : output-available ( fd mx -- )
     remove-output-callbacks [ resume ] each ;
 
-TUPLE: io-timeout ;
-
-M: io-timeout summary drop "I/O operation timed out" ;
-
 M: unix cancel-io ( port -- )
-    io-timeout new >>error
     handle>> handle-fd mx get-global
-    [ input-available ] [ output-available ] 2bi ;
+    [ remove-input-callbacks [ t swap resume-with ] each ]
+    [ remove-output-callbacks [ t swap resume-with ] each ]
+    2bi ;
 
 SYMBOL: +retry+ ! just try the operation again without blocking
 SYMBOL: +input+
 SYMBOL: +output+
 
-: wait-for-fd ( handle event -- )
-    dup +retry+ eq? [ 2drop ] [
+: wait-for-fd ( handle event -- timeout? )
+    dup +retry+ eq? [ 2drop f ] [
         [
             >r
             swap handle-fd
@@ -85,12 +82,18 @@ SYMBOL: +output+
                 { +input+ [ add-input-callback ] }
                 { +output+ [ add-output-callback ] }
             } case
-        ] curry "I/O" suspend 2drop
+        ] curry "I/O" suspend nip
     ] if ;
 
+ERROR: io-timeout ;
+
+M: io-timeout summary drop "I/O operation timed out" ;
+
 : wait-for-port ( port event -- )
-    [ >r dup handle>> r> wait-for-fd ] curry
-    with-timeout pending-error ;
+    [
+        >r handle>> r> wait-for-fd
+        [ io-timeout ] when
+    ] curry with-timeout ;
 
 ! Some general stuff
 : file-mode OCT: 0666 ;
@@ -105,9 +108,6 @@ SYMBOL: +output+
 : io-error ( n -- ) 0 < [ (io-error) ] when ;
  
 ! Readers
-: eof ( reader -- )
-    dup buffer>> buffer-empty? [ t >>eof ] when drop ;
-
 : (refill) ( port -- n )
     [ handle>> ]
     [ buffer>> buffer-end ]
@@ -120,8 +120,7 @@ GENERIC: refill ( port handle -- event/f )
 M: fd refill
     fd>> over buffer>> [ buffer-end ] [ buffer-capacity ] bi read
     {
-        { [ dup 0 = ] [ drop eof f ] }
-        { [ dup 0 > ] [ swap buffer>> n>buffer f ] }
+        { [ dup 0 >= ] [ swap buffer>> n>buffer f ] }
         { [ err_no EINTR = ] [ 2drop +retry+ ] }
         { [ err_no EAGAIN = ] [ 2drop +input+ ] }
         [ (io-error) ]
@@ -147,8 +146,7 @@ M: fd drain
     } cond ;
 
 M: unix (wait-to-write) ( port -- )
-    dup dup handle>> drain dup
-    [ dupd wait-for-port (wait-to-write) ] [ 2drop ] if ;
+    dup dup handle>> drain dup [ wait-for-port ] [ 2drop ] if ;
 
 M: unix io-multiplex ( ms/f -- )
     mx get-global wait-for-events ;
@@ -166,7 +164,8 @@ TUPLE: mx-port < port mx ;
 
 : multiplexer-error ( n -- )
     0 < [
-        err_no [ EAGAIN = ] [ EINTR = ] bi or [ (io-error) ] unless
+        err_no [ EAGAIN = ] [ EINTR = ] bi or
+        [ (io-error) ] unless
     ] when ;
 
 : ?flag ( n mask symbol -- n )

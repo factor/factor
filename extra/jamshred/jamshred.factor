@@ -21,9 +21,9 @@ M: jamshred-gadget draw-gadget* ( gadget -- )
     dup jamshred>> quit>> [
         drop
     ] [
-        dup [ jamshred>> jamshred-update ]
-        [ relayout-1 ] bi
-        yield jamshred-loop
+        [ jamshred>> jamshred-update ]
+        [ relayout-1 ]
+        [ yield jamshred-loop ] tri
     ] if ;
 
 : fullscreen ( gadget -- )
@@ -45,7 +45,7 @@ M: jamshred-gadget ungraft* ( gadget -- )
     <jamshred> >>jamshred drop ;
 
 : pix>radians ( n m -- theta )
-    2 / / pi 2 * * ;
+    / pi 4 * * ; ! 2 / / pi 2 * * ;
 
 : x>radians ( x gadget -- theta )
     #! translate motion of x pixels to an angle
@@ -68,8 +68,9 @@ M: jamshred-gadget ungraft* ( gadget -- )
     ] 2keep >>last-hand-loc drop ;
 
 : handle-mouse-scroll ( jamshred-gadget -- )
-    jamshred>> jamshred-player scroll-direction get
-    second neg swap change-player-speed ;
+    jamshred>> scroll-direction get
+    [ first mouse-scroll-x ]
+    [ second mouse-scroll-y ] 2bi ;
 
 : quit ( gadget -- )
     [ no-fullscreen ] [ close-window ] bi ;
@@ -78,6 +79,10 @@ jamshred-gadget H{
     { T{ key-down f f "r" } [ jamshred-restart ] }
     { T{ key-down f f " " } [ jamshred>> toggle-running ] }
     { T{ key-down f f "f" } [ find-world toggle-fullscreen ] }
+    { T{ key-down f f "UP" } [ jamshred>> jamshred-player 1 swap change-player-speed ] }
+    { T{ key-down f f "DOWN" } [ jamshred>> jamshred-player -1 swap change-player-speed ] }
+    { T{ key-down f f "LEFT" } [ jamshred>> 1 jamshred-roll ] }
+    { T{ key-down f f "RIGHT" } [ jamshred>> -1 jamshred-roll ] }
     { T{ key-down f f "q" } [ quit ] }
     { T{ motion } [ handle-mouse-motion ] }
     { T{ mouse-scroll } [ handle-mouse-scroll ] }
