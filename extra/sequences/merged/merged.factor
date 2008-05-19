@@ -13,7 +13,7 @@ C: <merged> merged
     dup <merged> swap first like ;
 
 : 2merge ( seq1 seq2 -- seq )
-    dupd <2merged> rot like ;
+    dupd <2merged> swap like ;
 
 : 3merge ( seq1 seq2 seq3 -- seq )
     pick >r <3merged> r> like ;
