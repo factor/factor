@@ -3,20 +3,20 @@
 USING: accessors alien.c-types combinators kernel locals math math.constants math.functions math.ranges openal sequences sequences.merged sequences.repeating ;
 IN: synth.buffers
 
-TUPLE: buffer sample-freq 8bit? sent? id ;
+TUPLE: buffer sample-freq 8bit? id ;
 
 : <buffer> ( sample-freq 8bit? -- buffer )
-    f gen-buffer buffer boa ;
+    f buffer boa ;
 
 TUPLE: mono-buffer < buffer data ;
 
 : <mono-buffer> ( sample-freq 8bit? -- buffer )
-    f gen-buffer f mono-buffer boa ;
+    f f mono-buffer boa ;
 
 TUPLE: stereo-buffer < buffer left-data right-data ;
 
 : <stereo-buffer> ( sample-freq 8bit? -- buffer )
-    f gen-buffer f f stereo-buffer boa ;
+    f f f stereo-buffer boa ;
 
 PREDICATE: 8bit-buffer < buffer 8bit?>> ;
 PREDICATE: 16bit-buffer < buffer 8bit?>> not ;
@@ -59,15 +59,14 @@ M: 16bit-stereo-buffer buffer-data
 
 : send-buffer ( buffer -- buffer )
     {
-        [ id>> ]
+        [ gen-buffer dup [ >>id ] dip ]
         [ buffer-format ]
         [ buffer-data ]
         [ sample-freq>> alBufferData ]
-        [ t >>sent? ]
     } cleave ;
 
 : ?send-buffer ( buffer -- buffer )
-    dup sent?>> [ send-buffer ] unless ;
+    dup id>> [ send-buffer ] unless ;
 
 : (sine-wave) ( samples/wave n-samples -- seq )
     pi 2 * pick / swapd [ * sin ] curry map swap <repeating> ;
