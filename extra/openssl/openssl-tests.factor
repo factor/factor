@@ -7,7 +7,7 @@ openssl secure-socket-backend [
             "resource:extra/openssl/test/server.pem" >>key-file
             "resource:extra/openssl/test/root.pem" >>ca-file
             "resource:extra/openssl/test/dh1024.pem" >>dh-file
-            "password" ascii string>alien >>password
+            "password" >>password
         [ ] with-secure-context
     ] unit-test
 
@@ -15,7 +15,7 @@ openssl secure-socket-backend [
         <secure-config>
             "resource:extra/openssl/test/server.pem" >>key-file
             "resource:extra/openssl/test/root.pem" >>ca-file
-            "wrong password" ascii string>alien >>password
+            "wrong password" >>password
         [ ] with-secure-context
     ] must-fail
 ] with-variable

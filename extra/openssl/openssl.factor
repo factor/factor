@@ -5,7 +5,7 @@ math.order combinators init alien alien.c-types alien.strings libc
 continuations destructors debugger inspector
 locals unicode.case
 openssl.libcrypto openssl.libssl
-io.backend io.ports io.files io.encodings.ascii io.sockets.secure ;
+io.backend io.ports io.files io.encodings.8-bit io.sockets.secure ;
 IN: openssl
 
 ! This code is based on http://www.rtfm.com/openssl-examples/
@@ -68,7 +68,7 @@ TUPLE: openssl-context < secure-context aliens ;
     ] alien-callback ;
 
 : default-pasword ( ctx -- alien )
-    [ config>> password>> malloc-byte-array ] [ aliens>> ] bi
+    [ config>> password>> latin1 malloc-string ] [ aliens>> ] bi
     [ push ] [ drop ] 2bi ;
 
 : set-default-password ( ctx -- )
@@ -181,7 +181,7 @@ M: ssl-handle dispose*
     X509_get_subject_name
     NID_commonName 256 <byte-array>
     [ 256 X509_NAME_get_text_by_NID ] keep
-    swap -1 = [ drop f ] [ ascii alien>string ] if ;
+    swap -1 = [ drop f ] [ latin1 alien>string ] if ;
 
 : check-common-name ( host ssl-handle -- )
     SSL_get_peer_certificate common-name 2dup [ >lower ] bi@ =
