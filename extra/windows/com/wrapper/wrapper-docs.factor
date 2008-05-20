@@ -1,5 +1,6 @@
 USING: help.markup help.syntax io kernel math quotations
-multiline alien windows.com windows.com.syntax continuations ;
+multiline alien windows.com windows.com.syntax continuations
+destructors ;
 IN: windows.com.wrapper
 
 HELP: <com-wrapper>
