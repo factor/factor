@@ -17,7 +17,7 @@ tuple-syntax namespaces ;
         path: "/index.html"
         version: "1.1"
         cookies: V{ }
-        header: H{ { "connection" "close" } }
+        header: H{ { "connection" "close" } { "user-agent" "Factor http.client vocabulary" } }
     }
 ] [
     [
@@ -35,7 +35,7 @@ tuple-syntax namespaces ;
         path: "/index.html"
         version: "1.1"
         cookies: V{ }
-        header: H{ { "connection" "close" } }
+        header: H{ { "connection" "close" } { "user-agent" "Factor http.client vocabulary" } }
     }
 ] [
     [

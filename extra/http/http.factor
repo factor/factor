@@ -256,7 +256,8 @@ cookies ;
         H{ } clone >>header
         H{ } clone >>query
         V{ } clone >>cookies
-        "close" "connection" set-header ;
+        "close" "connection" set-header
+        "Factor http.client vocabulary" "user-agent" set-header ;
 
 : query-param ( request key -- value )
     swap query>> at ;
