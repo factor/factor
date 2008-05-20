@@ -25,7 +25,7 @@ TUPLE: fd fd disposed ;
 
 M: fd dispose* fd>> close-file ;
 
-M: fd handle-fd fd>> ;
+M: fd handle-fd dup check-disposed fd>> ;
 
 ! I/O multiplexers
 TUPLE: mx fd reads writes ;
@@ -62,11 +62,14 @@ GENERIC: wait-for-events ( ms mx -- )
 : output-available ( fd mx -- )
     remove-output-callbacks [ resume ] each ;
 
-M: unix cancel-io ( port -- )
-    handle>> handle-fd mx get-global
-    [ remove-input-callbacks [ t swap resume-with ] each ]
-    [ remove-output-callbacks [ t swap resume-with ] each ]
-    2bi ;
+M: fd cancel-io ( fd -- )
+    dup disposed>> [ drop ] [
+        fd>>
+        mx get-global
+        [ remove-input-callbacks [ t swap resume-with ] each ]
+        [ remove-output-callbacks [ t swap resume-with ] each ]
+        2bi
+    ] if ;
 
 SYMBOL: +retry+ ! just try the operation again without blocking
 SYMBOL: +input+

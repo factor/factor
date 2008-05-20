@@ -115,11 +115,11 @@ M: buffered-port dispose*
     [ [ [ buffer-free ] when* f ] change-buffer drop ]
     bi ;
 
-HOOK: cancel-io io-backend ( port -- )
+GENERIC: cancel-io ( handle -- )
 
-M: port timed-out cancel-io ;
+M: port timed-out handle>> cancel-io ;
 
-M: port dispose* [ cancel-io ] [ handle>> dispose ] bi ;
+M: port dispose* handle>> [ cancel-io ] [ dispose ] bi ;
 
 : <ports> ( read-handle write-handle -- input-port output-port )
     [
