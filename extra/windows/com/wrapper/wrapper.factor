@@ -2,7 +2,7 @@ USING: alien alien.c-types windows.com.syntax
 windows.com.syntax.private windows.com continuations kernel
 sequences.lib namespaces windows.ole32 libc
 assocs accessors arrays sequences quotations combinators
-math combinators.lib words compiler.units ;
+math combinators.lib words compiler.units destructors ;
 IN: windows.com.wrapper
 
 TUPLE: com-wrapper vtbls freed? ;
