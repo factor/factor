@@ -1,4 +1,5 @@
-USING: sequences namespaces unicode.data kernel math arrays ;
+USING: sequences namespaces unicode.data kernel math arrays
+locals combinators.lib sequences.lib ;
 IN: unicode.normalize
 
 ! Conjoining Jamo behavior
@@ -34,21 +35,6 @@ IN: unicode.normalize
     r> final-base - + hangul-base + ;
 
 ! Normalization -- Decomposition 
-
-: (insert) ( seq n quot -- )
-    over 0 = [ 3drop ] [
-        [ >r dup 1- rot [ nth ] curry bi@ r> bi@ > ] 3keep
-        roll [ 3drop ]
-        [ >r [ dup 1- rot exchange ] 2keep 1- r> (insert) ] if
-    ] if ; inline
-
-: insert ( seq quot elt n -- )
-    swap rot >r -rot [ swap set-nth ] 2keep r> (insert) ; inline
-
-: insertion-sort ( seq quot -- )
-    ! quot is a transformation on elements
-    over dup length
-    [ >r >r 2dup r> r> insert ] 2each 2drop ; inline
 
 : reorder-slice ( string start -- slice done? )
     2dup swap [ non-starter? not ] find-from drop
