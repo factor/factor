@@ -22,7 +22,6 @@ $nl
 { $subsection init-stdio }
 { $subsection io-multiplex }
 "Per-port native I/O protocol:"
-{ $subsection init-handle }
 { $subsection (wait-to-read) }
 { $subsection (wait-to-write) }
 "Additionally, the I/O backend must provide an implementation of the " { $link dispose } " generic word." ;
@@ -30,25 +29,13 @@ $nl
 ABOUT: "io.ports"
 
 HELP: port
-{ $class-description "Instances of this class present a blocking stream interface on top of an underlying non-blocking I/O system, giving the illusion of blocking by yielding the thread which is waiting for input or output."
-$nl
-"Ports have the following slots:"
-{ $list
-    { { $snippet "handle" } " - a native handle identifying the underlying native resource used by the port" }
-    { { $snippet "error" } " - the most recent I/O error, if any. This error is thrown to the waiting thread when " { $link pending-error } " is called by stream operations" }
-    { { $snippet "type" } " - a symbol identifying the port's intended purpose" }
-    { { $snippet "eof" } " - a flag indicating if the port has reached the end of file while reading" }
-} } ;
+{ $class-description "Instances of this class present a blocking stream interface on top of an underlying non-blocking I/O system, giving the illusion of blocking by yielding the thread which is waiting for input or output." } ;
 
 HELP: input-port
 { $class-description "The class of ports implementing the input stream protocol." } ;
 
 HELP: output-port
 { $class-description "The class of ports implementing the output stream protocol." } ;
-
-HELP: init-handle
-{ $values { "handle" "a native handle identifying an I/O resource" } }
-{ $contract "Prepares a native handle for use by the port; called by " { $link <port> } "." } ;
 
 HELP: <port>
 { $values { "handle" "a native handle identifying an I/O resource" } { "class" class } { "port" "a new " { $link port } } }
@@ -70,21 +57,13 @@ HELP: <output-port>
 { $description "Creates a new " { $link output-port } " using the specified native handle and a default-sized input buffer." } 
 $low-level-note ;
 
-HELP: pending-error
-{ $values { "port" port } }
-{ $description "If an error occurred while the I/O thread was performing input or output on this port, this error will be thrown to the caller." } ;
-
 HELP: (wait-to-read)
 { $values { "port" input-port } }
 { $contract "Suspends the current thread until the port's buffer has data available for reading." } ;
 
 HELP: wait-to-read
-{ $values { "port" input-port } }
-{ $description "If the port's buffer has unread data, returns immediately, otherwise suspends the current thread until some data is available for reading." } ;
-
-HELP: unless-eof
-{ $values { "port" input-port } { "quot" "a quotation with stack effect " { $snippet "( port -- value )" } } { "value" object } }
-{ $description "If the port has reached end of file, outputs " { $link f } ", otherwise applies the quotation to the port." } ;
+{ $values { "port" input-port } { "eof?" "a boolean" } }
+{ $description "If the port's buffer has unread data, returns immediately, otherwise suspends the current thread until some data is available for reading. If the buffer was empty and no more data could be read, outputs " { $link t } " to indicate end-of-file; otherwise outputs " { $link f } "." } ;
 
 HELP: can-write?
 { $values { "len" "a positive integer" } { "buffer" buffer } { "?" "a boolean" } }

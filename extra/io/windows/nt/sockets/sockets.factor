@@ -82,17 +82,27 @@ TUPLE: AcceptEx-args port
     AcceptEx-args >tuple*< AcceptEx drop
     winsock-error-string [ throw ] when* ;
 
-M: object (accept) ( server addr -- handle )
+: extract-remote-address ( AcceptEx -- sockaddr )
+    {
+        [ lpOutputBuffer*>> ]
+        [ dwReceiveDataLength*>> ]
+        [ dwLocalAddressLength*>> ]
+        [ dwRemoteAddressLength*>> ]
+    } cleave
+    f <void*>
+    0 <int>
+    f <void*>
+    [ 0 <int> GetAcceptExSockaddrs ] keep *void* ;
+
+M: object (accept) ( server addr -- handle sockaddr )
     [
-        [
-            <AcceptEx-args>
-            {
-                [ call-AcceptEx ]
-                [ wait-for-socket drop ]
-                [ sAcceptSocket*>> opened-socket ]
-                [ port>> pending-error ]
-            } cleave
-        ] curry with-timeout
+        <AcceptEx-args>
+        {
+            [ call-AcceptEx ]
+            [ wait-for-socket drop ]
+            [ sAcceptSocket*>> <win32-socket> ]
+            [ extract-remote-address ]
+        } cleave
     ] with-destructors ;
 
 TUPLE: WSARecvFrom-args port
@@ -121,17 +131,16 @@ TUPLE: WSARecvFrom-args port
     WSARecvFrom-args >tuple*< WSARecvFrom socket-error* ;
 
 : parse-WSARecvFrom ( n WSARecvFrom -- packet sockaddr )
-    [ lpBuffers*>> WSABUF-buf swap memory>byte-array ] [ lpFrom*>> ] bi ;
+    [ lpBuffers*>> WSABUF-buf swap memory>byte-array ]
+    [ [ lpFrom*>> ] [ lpFromLen*>> *int ] bi memory>byte-array ] bi ;
 
 M: winnt (receive) ( datagram -- packet addrspec )
     [
         <WSARecvFrom-args>
-        {
-            [ call-WSARecvFrom ]
-            [ wait-for-socket ]
-            [ port>> pending-error ]
-            [ parse-WSARecvFrom ]
-        } cleave
+        [ call-WSARecvFrom ]
+        [ wait-for-socket ]
+        [ parse-WSARecvFrom ]
+        tri
     ] with-destructors ;
 
 TUPLE: WSASendTo-args port
@@ -166,6 +175,5 @@ M: winnt (send) ( packet addrspec datagram -- )
         <WSASendTo-args>
         [ call-WSASendTo ]
         [ wait-for-socket drop ]
-        [ port>> pending-error ]
-        tri
+        bi
     ] with-destructors ;

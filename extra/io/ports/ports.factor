@@ -10,20 +10,14 @@ IN: io.ports
 SYMBOL: default-buffer-size
 64 1024 * default-buffer-size set-global
 
-TUPLE: port handle error timeout disposed ;
+TUPLE: port handle timeout disposed ;
 
 M: port timeout timeout>> ;
 
 M: port set-timeout (>>timeout) ;
 
-GENERIC: init-handle ( handle -- )
-
 : <port> ( handle class -- port )
-    new
-        swap dup init-handle >>handle ; inline
-
-: pending-error ( port -- )
-    [ f ] change-error drop [ throw ] when* ;
+    new swap >>handle ; inline
 
 TUPLE: buffered-port < port buffer ;
 
@@ -31,27 +25,24 @@ TUPLE: buffered-port < port buffer ;
     <port>
         default-buffer-size get <buffer> >>buffer ; inline
 
-TUPLE: input-port < buffered-port eof ;
+TUPLE: input-port < buffered-port ;
 
 : <input-port> ( handle -- input-port )
     input-port <buffered-port> ;
 
 HOOK: (wait-to-read) io-backend ( port -- )
 
-: wait-to-read ( port -- )
-    dup buffer>> buffer-empty? [ (wait-to-read) ] [ drop ] if ;
-
-: unless-eof ( port quot -- value )
-    >r dup buffer>> buffer-empty? over eof>> and
-    [ f >>eof drop f ] r> if ; inline
+: wait-to-read ( port -- eof? )
+    dup buffer>> buffer-empty? [
+        dup (wait-to-read) buffer>> buffer-empty?
+    ] [ drop f ] if ;
 
 M: input-port stream-read1
     dup check-disposed
-    dup wait-to-read [ buffer>> buffer-pop ] unless-eof ;
+    dup wait-to-read [ drop f ] [ buffer>> buffer-pop ] if ;
 
 : read-step ( count port -- byte-array/f )
-    [ wait-to-read ] keep
-    [ dupd buffer>> buffer-read ] unless-eof nip ;
+    dup wait-to-read [ 2drop f ] [ buffer>> buffer-read ] if ;
 
 M: input-port stream-read-partial ( max stream -- byte-array/f )
     dup check-disposed
@@ -109,15 +100,15 @@ M: output-port stream-write
 
 HOOK: (wait-to-write) io-backend ( port -- )
 
-: flush-port ( port -- )
-    dup buffer>> buffer-empty? [ drop ] [ (wait-to-write) ] if ;
+: port-flush ( port -- )
+    dup buffer>> buffer-empty?
+    [ drop ] [ dup (wait-to-write) port-flush ] if ;
 
 M: output-port stream-flush ( port -- )
-    dup check-disposed
-    [ flush-port ] [ pending-error ] bi ;
+    [ check-disposed ] [ port-flush ] bi ;
 
 M: output-port dispose*
-    [ flush-port ] [ call-next-method ] bi ;
+    [ port-flush ] [ call-next-method ] bi ;
 
 M: buffered-port dispose*
     [ call-next-method ]

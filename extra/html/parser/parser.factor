@@ -91,7 +91,7 @@ SYMBOL: tagstack
         read-dtd
     ] if ;
 
-: read-tag ( -- )
+: read-tag ( -- string )
     [ get-char CHAR: > = get-char CHAR: < = or ] take-until
     get-char CHAR: < = [ next* ] unless ;
 
@@ -135,7 +135,7 @@ SYMBOL: tagstack
         (parse-tag) make-tag push-tag
     ] if ;
 
-: (parse-html) ( tag -- )
+: (parse-html) ( -- )
     get-next [
         parse-text
         parse-tag

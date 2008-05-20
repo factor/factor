@@ -1,5 +1,6 @@
 IN: io.sockets.tests
-USING: io.sockets sequences math tools.test ;
+USING: io.sockets sequences math tools.test namespaces accessors 
+kernel destructors calendar io.timeouts ;
 
 [ B{ 1 2 3 4 } ]
 [ "1.2.3.4" T{ inet4 } inet-pton ] unit-test
@@ -44,3 +45,26 @@ USING: io.sockets sequences math tools.test ;
 [ B{ 0 1 0 2 0 0 0 0 0 0 0 0 0 3 0 4 } T{ inet6 } inet-ntop ] unit-test
 
 [ t ] [ "localhost" 80 f resolve-host length 1 >= ] unit-test
+
+! Smoke-test UDP
+[ ] [ "127.0.0.1" 0 <inet4> <datagram> "datagram1" set ] unit-test
+[ ] [ "datagram1" get addr>> "addr1" set ] unit-test
+[ f ] [ "addr1" get port>> 0 = ] unit-test
+
+[ ] [ "127.0.0.1" 0 <inet4> <datagram> "datagram2" set ] unit-test
+[ ] [ "datagram2" get addr>> "addr2" set ] unit-test
+[ f ] [ "addr2" get port>> 0 = ] unit-test
+
+[ ] [ B{ 1 2 3 4 } "addr2" get "datagram1" get send ] unit-test
+[ B{ 1 2 3 4 } ] [ "datagram2" get receive "from" set ] unit-test
+[ ] [ B{ 4 3 2 1 } "from" get "datagram2" get send ] unit-test
+[ B{ 4 3 2 1 } t ] [ "datagram1" get receive "addr2" get = ] unit-test
+
+[ ] [ "datagram1" get dispose ] unit-test
+[ ] [ "datagram2" get dispose ] unit-test
+
+! Test timeouts
+[ ] [ "127.0.0.1" 0 <inet4> <datagram> "datagram3" set ] unit-test
+
+[ ] [ 1 seconds "datagram3" get set-timeout ] unit-test
+[ "datagram3" get receive ] must-fail

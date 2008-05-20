@@ -37,7 +37,7 @@ ARTICLE: "network-packet" "Packet-oriented networking"
 { $subsection receive }
 "Packet-oriented sockets are closed by calling " { $link dispose } "."
 $nl
-"Address specifiers have the following interpretation with connection-oriented networking words:"
+"Address specifiers have the following interpretation with packet-oriented networking words:"
 { $list
     { { $link local } " - Unix domain datagram sockets on Unix systems" }
     { { $link inet4 } " - a TCP/IP connection to an IPv4 address and port number; no name lookup is performed" }
@@ -130,7 +130,7 @@ HELP: <server>
 { $errors "Throws an error if the address is already in use, or if it if the system forbids access." } ;
 
 HELP: accept
-{ $values { "server" "a handle" } { "client" "a bidirectional stream" } { "addrspec" "an address specifier" } }
+{ $values { "server" "a handle" } { "client" "a bidirectional stream" } { "remote" "an address specifier" } }
 { $description "Waits for a connection to a server socket created by " { $link <server> } ", and outputs a bidirectional stream when the connection has been established. The encoding of this stream is the one that was passed to the server constructor." }
 { $errors "Throws an error if the server socket is closed or otherwise is unavailable." } ;
 

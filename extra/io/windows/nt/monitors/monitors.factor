@@ -35,7 +35,7 @@ TUPLE: win32-monitor < monitor port ;
     (make-overlapped)
     [ f ReadDirectoryChangesW win32-error=0/f ] keep ;
 
-: read-changes ( port -- bytes )
+: read-changes ( port -- bytes-transferred )
     [
         [ begin-reading-changes ] [ twiddle-thumbs ] bi
     ] with-destructors ;

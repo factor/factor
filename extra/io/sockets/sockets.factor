@@ -156,6 +156,11 @@ GENERIC: (get-local-address) ( handle remote -- sockaddr )
 : get-local-address ( handle remote -- local )
     [ (get-local-address) ] keep parse-sockaddr ;
 
+GENERIC: (get-remote-address) ( handle remote -- sockaddr )
+
+: get-remote-address ( handle local -- remote )
+    [ (get-remote-address) ] keep parse-sockaddr ;
+
 GENERIC: establish-connection ( client-out remote -- )
 
 GENERIC: ((client)) ( remote -- handle )
@@ -180,7 +185,7 @@ M: object (client) ( remote -- client-in client-out local )
 
 SYMBOL: local-address
 
-: with-client ( addrspec encoding quot -- )
+: with-client ( remote encoding quot -- )
     >r <client> [ local-address set ] curry
     r> compose with-stream ; inline
 
@@ -198,22 +203,26 @@ GENERIC: (server) ( addrspec -- handle )
     [ drop server-port <port> ] [ get-local-address ] 2bi
     >>addr r> >>encoding ;
 
-GENERIC: (accept) ( server addrspec -- handle )
+GENERIC: (accept) ( server addrspec -- handle sockaddr )
 
 : accept ( server -- client remote )
     [
         dup addr>>
         [ (accept) ] keep
-        [ drop dup <ports> ] [ get-local-address ] 2bi
-        -rot
+        parse-sockaddr swap
+        dup <ports>
     ] keep encoding>> <encoder-duplex> swap ;
 
 TUPLE: datagram-port < port addr ;
 
 HOOK: (datagram) io-backend ( addr -- datagram )
 
-: <datagram> ( addr -- datagram )
-    dup (datagram) datagram-port <port> swap >>addr ;
+: <datagram> ( addrspec -- datagram )
+    [
+        [ (datagram) |dispose ] keep
+        [ drop datagram-port <port> ] [ get-local-address ] 2bi
+        >>addr
+    ] with-destructors ;
 
 : check-datagram-port ( port -- port )
     dup check-disposed
@@ -221,7 +230,7 @@ HOOK: (datagram) io-backend ( addr -- datagram )
 
 HOOK: (receive) io-backend ( datagram -- packet addrspec )
 
-: receive ( datagram -- packet sockaddr )
+: receive ( datagram -- packet addrspec )
     check-datagram-port
     [ (receive) ] [ addr>> ] bi parse-sockaddr ;
 
@@ -278,11 +287,8 @@ TUPLE: inet host port ;
 
 C: <inet> inet
 
-: resolve-client-addr ( inet -- seq )
-    [ host>> ] [ port>> ] bi f resolve-host ;
-
 M: inet (client)
-    resolve-client-addr (client) ;
+    [ host>> ] [ port>> ] bi f resolve-host (client) ;
 
 ERROR: invalid-inet-server addrspec ;
 
