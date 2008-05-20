@@ -1,7 +1,10 @@
 USING: assocs html.parser kernel math sequences strings ascii
 arrays shuffle unicode.case namespaces splitting http
-sequences.lib ;
+sequences.lib accessors io combinators http.client ;
 IN: html.parser.analyzer
+
+: scrape-html ( url -- vector )
+    http-get parse-html ;
 
 : (find-relative)
     [ >r + dup r> ?nth* [ 2drop f f ] unless ] [ 2drop f ] if ;
@@ -41,8 +44,8 @@ IN: html.parser.analyzer
 
 : remove-blank-text ( vector -- vector' )
     [
-        dup tag-name text = [
-            tag-text [ blank? ] all? not
+        dup name>> text = [
+            text>> [ blank? ] all? not
         ] [
             drop t
         ] if
@@ -50,49 +53,50 @@ IN: html.parser.analyzer
 
 : trim-text ( vector -- vector' )
     [
-        dup tag-name text = [
-            [ tag-text [ blank? ] trim ] keep
+        dup name>> text = [
+            [ text>> [ blank? ] trim ] keep
             [ set-tag-text ] keep
         ] when
     ] map ;
 
 : find-by-id ( id vector -- vector )
-    [ tag-attributes "id" swap at = ] with filter ;
+    [ attributes>> "id" swap at = ] with filter ;
 
 : find-by-class ( id vector -- vector )
-    [ tag-attributes "class" swap at = ] with filter ;
+    [ attributes>> "class" swap at = ] with filter ;
 
 : find-by-name ( str vector -- vector )
     >r >lower r>
-    [ tag-name = ] with filter ;
+    [ name>> = ] with filter ;
 
 : find-first-name ( str vector -- i/f tag/f )
     >r >lower r>
-    [ tag-name = ] with find ;
+    [ name>> = ] with find ;
 
 : find-matching-close ( str vector -- i/f tag/f )
     >r >lower r>
-    [ [ tag-name = ] keep tag-closing? and ] with find ;
+    [ [ name>> = ] keep closing?>> and ] with find ;
 
 : find-by-attribute-key ( key vector -- vector )
     >r >lower r>
-    [ tag-attributes at ] with filter
-    [ ] filter ;
+    [ attributes>> at ] with filter
+    sift ;
 
 : find-by-attribute-key-value ( value key vector -- vector )
     >r >lower r>
-    [ tag-attributes at over = ] with filter nip
-    [ ] filter ;
+    [ attributes>> at over = ] with filter nip
+    sift ;
 
 : find-first-attribute-key-value ( value key vector -- i/f tag/f )
     >r >lower r>
-    [ tag-attributes at over = ] with find rot drop ;
+    [ attributes>> at over = ] with find rot drop ;
 
 : find-between* ( i/f tag/f vector -- vector )
     pick integer? [
         rot tail-slice
-        >r tag-name r>
-        [ find-matching-close drop 1+ ] keep swap head
+        >r name>> r>
+        [ find-matching-close drop dup [ 1+ ] when ] keep
+        swap [ head ] [ first ] if*
     ] [
         3drop V{ } clone
     ] if ;
@@ -105,31 +109,63 @@ IN: html.parser.analyzer
 : find-between-first ( string vector -- vector' )
     [ find-first-name ] keep find-between ;
 
+: find-between-all ( vector quot -- seq )
+    [ [ [ closing?>> not ] bi and ] curry find-all ] curry
+    [ [ >r first2 r> find-between* ] curry map ] bi ;
+
 : tag-link ( tag -- link/f )
-    tag-attributes [ "href" swap at ] [ f ] if* ;
+    attributes>> [ "href" swap at ] [ f ] if* ;
 
-: find-links ( vector -- vector )
-    [ tag-name "a" = ] filter
-    [ tag-link ] filter ;
+: find-links ( vector -- vector' )
+    [ [ name>> "a" = ] [ attributes>> "href" swap at ] bi and ]
+    find-between-all ;
 
+: link. ( vector -- )
+    [ second text>> write bl ]
+    [ first tag-link write nl ] bi ;
 
 : find-by-text ( seq quot -- tag )
-    [ dup tag-name text = ] prepose find drop ;
+    [ dup name>> text = ] prepose find drop ;
 
 : find-opening-tags-by-name ( name seq -- seq )
-    [ [ tag-name = ] keep tag-closing? not and ] with find-all ;
+    [ [ name>> = ] keep closing?>> not and ] with find-all ;
 
 : href-contains? ( str tag -- ? )
-    tag-attributes "href" swap at* [ subseq? ] [ 2drop f ] if ;
+    attributes>> "href" swap at* [ subseq? ] [ 2drop f ] if ;
+
+
+: find-forms ( vector -- vector' )
+    "form" over find-opening-tags-by-name
+    over [ >r first2 r> find-between* ] curry map
+    [ [ name>> { "form" "input" } member? ] filter ] map ;
+
+: find-html-objects ( string vector -- vector' )
+    find-opening-tags-by-name
+    over [ >r first2 r> find-between* ] curry map ;
+
+: form-action ( vector -- string )
+    [ name>> "form" = ] find nip 
+    attributes>> "action" swap at ;
+
+: hidden-form-values ( vector -- strings )
+    [ attributes>> "type" swap at "hidden" = ] filter ;
+
+: input. ( tag -- )
+    dup name>> print
+    attributes>>
+    [ bl bl bl bl [ write "=" write ] [ write bl ] bi* nl ] assoc-each ;
+
+: form. ( vector -- )
+    [ closing?>> not ] filter
+    [
+        {
+            { [ dup name>> "form" = ]
+                [ "form action: " write attributes>> "action" swap at print
+            ] }
+            { [ dup name>> "input" = ] [ input. ] }
+            [ drop ]
+        } cond
+    ] each ;
 
 : query>assoc* ( str -- hash )
     "?" split1 nip query>assoc ;
-
-! clear "http://fark.com" http-get parse-html find-links [ "go.pl" swap start ] filter [ "=" split peek ] map
-
-! clear "http://www.sailwx.info/shiptrack/cruiseships.phtml" http-get parse-html remove-blank-text
-! "a" over find-opening-tags-by-name
-! [ nip "shipposition.phtml?call=GBTT" swap href-contains? ] assoc-filter
-! first first 8 + over nth
-! tag-attributes "href" swap at query>assoc*
-! "lat" over at "lon" rot at

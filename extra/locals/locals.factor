@@ -116,7 +116,9 @@ UNION: special local quote local-word local-reader local-writer ;
     2tri 3append >quotation ;
 
 : point-free ( quot args -- newquot )
-    over empty? [ drop ] [ (point-free) ] if ;
+    over empty?
+    [ nip length \ drop <repetition> >quotation ]
+    [ (point-free) ] if ;
 
 UNION: lexical local local-reader local-writer local-word ;
 
@@ -355,28 +357,32 @@ M: wlet pprint* \ [wlet pprint-let ;
 
 M: let* pprint* \ [let* pprint-let ;
 
-PREDICATE: lambda-word < word
-    "lambda" word-prop >boolean ;
+PREDICATE: lambda-word < word "lambda" word-prop >boolean ;
 
 M: lambda-word definer drop \ :: \ ; ;
 
 M: lambda-word definition
     "lambda" word-prop body>> ;
 
-PREDICATE: lambda-macro < macro
-    "lambda" word-prop >boolean ;
+INTERSECTION: lambda-macro macro lambda-word ;
 
 M: lambda-macro definer drop \ MACRO:: \ ; ;
 
 M: lambda-macro definition
     "lambda" word-prop body>> ;
 
-PREDICATE: lambda-method < method-body
-    "lambda" word-prop >boolean ;
+INTERSECTION: lambda-method method-body lambda-word ;
 
 M: lambda-method definer drop \ M:: \ ; ;
 
 M: lambda-method definition
+    "lambda" word-prop body>> ;
+
+INTERSECTION: lambda-memoized memoized lambda-word ;
+
+M: lambda-memoized definer drop \ MEMO:: \ ; ;
+
+M: lambda-memoized definition
     "lambda" word-prop body>> ;
 
 : method-stack-effect ( method -- effect )

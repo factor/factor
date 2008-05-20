@@ -18,9 +18,6 @@ HELP: <duplex-stream>
 { $values { "in" "an input stream" } { "out" "an output stream" } { "stream" " a duplex stream" } }
 { $description "Creates a duplex stream. Writing to a duplex stream will write to " { $snippet "out" } ", and reading from a duplex stream will read from " { $snippet "in" } ". Closing a duplex stream closes both the input and output streams." } ;
 
-HELP: stream-closed-twice
-{ $error-description "This error is thrown when performing an I/O operation on a " { $link duplex-stream } " which has been closed with " { $link dispose } "." } ;
-
 HELP: with-stream
 { $values { "stream" duplex-stream } { "quot" quotation } }
 { $description "Calls the quotation in a new dynamic scope, with both " { $link input-stream } " and " { $link output-stream } " rebound to  " { $snippet "stream" } ". The stream is closed if the quotation returns or throws an error." } ;

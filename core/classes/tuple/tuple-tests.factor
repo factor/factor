@@ -541,7 +541,7 @@ TUPLE: another-forget-accessors-test ;
 ] unit-test
 
 ! Missing error check
-[ "IN: tuples.test USE: words TUPLE: wrong-superclass < word ;" eval ] must-fail
+[ "IN: classes.tuple.tests USE: words TUPLE: wrong-superclass < word ;" eval ] must-fail
 
 TUPLE: subclass-forget-test ;
 
@@ -554,3 +554,5 @@ TUPLE: subclass-forget-test-3 < subclass-forget-test-2 ;
 [ f ] [ subclass-forget-test-1 tuple-class? ] unit-test
 [ f ] [ subclass-forget-test-2 tuple-class? ] unit-test
 [ subclass-forget-test-3 new ] must-fail
+
+[ "IN: classes.tuple.tests TUPLE: subclass-forget-test-4 < subclass-forget-test-2 ;" eval ] must-fail

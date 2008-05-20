@@ -1,12 +1,8 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
-USING: lisp lisp.parser tools.test sequences math kernel ;
+USING: lisp lisp.parser tools.test sequences math kernel parser ;
 
 IN: lisp.test
-
-{ [ "aoeu" 2 1 T{ lisp-symbol f "foo" } ] } [
-  "(foo 1 2 \"aoeu\")" lisp-string>factor
-] unit-test
 
 init-env
 
@@ -17,5 +13,7 @@ init-env
 ] unit-test
 
 { 3 } [
-  "((lambda (x y) (+ x y)) 1 2)" lisp-string>factor call
+  [
+    "((lambda (x y) (+ x y)) 1 2)" lisp-string>factor call
+  ] with-interactive-vocabs
 ] unit-test

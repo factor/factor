@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words kernel sequences namespaces assocs hashtables
 definitions kernel.private classes classes.private
-classes.algebra quotations arrays vocabs effects ;
+classes.algebra quotations arrays vocabs effects combinators ;
 IN: generic
 
 ! Method combination protocol
@@ -123,12 +123,13 @@ M: method-body definer
 M: method-body forget*
     dup "forgotten" word-prop [ drop ] [
         [
-            [   "method-class" word-prop ]
-            [ "method-generic" word-prop ] bi
-            dup generic? [
-                [ delete-at* ] with-methods
-                [ call-next-method ] [ drop ] if
-            ] [ 2drop ] if
+            [ ]
+            [ "method-class" word-prop ]
+            [ "method-generic" word-prop ] tri
+            3dup method eq? [
+                [ delete-at ] with-methods
+                call-next-method
+            ] [ 3drop ] if
         ]
         [ t "forgotten" set-word-prop ] bi
     ] if ;
@@ -146,10 +147,12 @@ M: method-body forget*
     [ implementors ] [ [ swap 2array ] curry ] bi map forget-all ;
 
 M: class forget* ( class -- )
-    [ forget-methods ]
-    [ update-map- ]
-    [ call-next-method ]
-    tri ;
+    {
+        [ forget-methods ]
+        [ update-map- ]
+        [ reset-class ]
+        [ call-next-method ]
+    } cleave ;
 
 M: assoc update-methods ( assoc -- )
     implementors* [ make-generic ] each ;

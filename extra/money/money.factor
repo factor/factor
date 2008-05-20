@@ -15,17 +15,14 @@ IN: money
         "." % number>string 2 CHAR: 0 pad-left %
     ] "" make print ;
 
-TUPLE: not-a-decimal ;
-
-: not-a-decimal ( -- * )
-    T{ not-a-decimal } throw ;
+ERROR: not-a-decimal x ;
 
 : parse-decimal ( str -- ratio )
     "." split1
     >r dup "-" head? [ drop t "0" ] [ f swap ] if r>
     [ dup empty? [ drop "0" ] when ] bi@
     dup length
-    >r [ string>number dup [ not-a-decimal ] unless ] bi@ r>
+    >r [ dup string>number [ nip ] [ not-a-decimal ] if* ] bi@ r>
     10 swap ^ / + swap [ neg ] when ;
 
 : DECIMAL:

@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel io calendar sequences io.files
-io.sockets continuations prettyprint assocs math.parser
-words debugger math combinators concurrency.messaging
-threads arrays init math.ranges strings calendar.format
-io.encodings.utf8 ;
+io.sockets continuations destructors prettyprint assocs
+math.parser words debugger math combinators
+concurrency.messaging threads arrays init math.ranges strings
+calendar.format io.encodings.utf8 ;
 IN: logging.server
 
 : log-root ( -- string )
@@ -37,7 +37,7 @@ SYMBOL: log-files
     write bl write ": " write print ;
 
 : write-message ( msg word-name level -- )
-    rot [ empty? not ] filter {
+    rot harvest {
         { [ dup empty? ] [ 3drop ] }
         { [ dup length 1 = ] [ first -rot f (write-message) ] }
         [

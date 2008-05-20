@@ -4,7 +4,7 @@ layouts classes.private classes compiler.units ;
 IN: classes.union
 
 ARTICLE: "unions" "Union classes"
-"An object is an instance of a union class if it is an instance of one of its members. Union classes are used to associate the same method with several different classes, as well as to conveniently define predicates."
+"An object is an instance of a union class if it is an instance of one of its members."
 { $subsection POSTPONE: UNION: }
 { $subsection define-union-class }
 "Union classes can be introspected:"
@@ -12,7 +12,7 @@ ARTICLE: "unions" "Union classes"
 "The set of union classes is a class:"
 { $subsection union-class }
 { $subsection union-class? } 
-"Unions are used to define behavior shared between a fixed set of classes."
+"Unions are used to define behavior shared between a fixed set of classes, as well as to conveniently define predicates."
 { $see-also "mixins" "tuple-subclassing" } ;
 
 ABOUT: "unions"

@@ -7,7 +7,7 @@ splitting math.parser classes.tuple continuations
 continuations.private combinators generic.math
 classes.builtin classes compiler.units generic.standard vocabs
 threads threads.private init kernel.private libc io.encodings
-mirrors accessors math.order ;
+mirrors accessors math.order destructors ;
 IN: debugger
 
 GENERIC: error. ( error -- )
@@ -297,6 +297,10 @@ M: no-such-slot summary drop "No such slot" ;
 M: immutable-slot summary drop "Slot is immutable" ;
 
 M: bad-create summary drop "Bad parameters to create" ;
+
+M: attempt-all-error summary drop "Nothing to attempt" ;
+
+M: already-disposed summary drop "Attempting to operate on disposed object" ;
 
 <PRIVATE
 

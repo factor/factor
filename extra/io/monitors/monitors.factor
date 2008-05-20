@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.backend kernel continuations namespaces sequences
-assocs hashtables sorting arrays threads boxes io.timeouts
-accessors concurrency.mailboxes ;
+USING: io.backend kernel continuations destructors namespaces
+sequences assocs hashtables sorting arrays threads boxes
+io.timeouts accessors concurrency.mailboxes ;
 IN: io.monitors
 
 HOOK: init-monitors io-backend ( -- )

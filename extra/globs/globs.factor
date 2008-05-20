@@ -35,4 +35,4 @@ PRIVATE>
 : <glob> 'glob' just parse-1 just ;
 
 : glob-matches? ( input glob -- ? )
-    >r >lower r> <glob> parse nil? not ;
+    [ >lower ] [ <glob> ] bi* parse nil? not ;

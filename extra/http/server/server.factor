@@ -240,7 +240,7 @@ SYMBOL: exit-continuation
     '[ exit-continuation set @ ] callcc1 exit-continuation off ;
 
 : split-path ( string -- path )
-    "/" split [ empty? not ] filter ;
+    "/" split harvest ;
 
 : init-request ( -- )
     H{ } clone base-paths set

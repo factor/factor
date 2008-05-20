@@ -1,10 +1,16 @@
-IN: classes.algebra.tests
 USING: alien arrays definitions generic assocs hashtables io
 kernel math namespaces parser prettyprint sequences strings
 tools.test vectors words quotations classes classes.algebra
 classes.private classes.union classes.mixin classes.predicate
 vectors definitions source-files compiler.units growable
 random inference effects kernel.private sbufs math.order ;
+IN: classes.algebra.tests
+
+\ class< must-infer
+\ class-and must-infer
+\ class-or must-infer
+\ flatten-class must-infer
+\ flatten-builtin-class must-infer
 
 : class= [ class<= ] [ swap class<= ] 2bi and ;
 
@@ -261,3 +267,38 @@ TUPLE: xg < xb ;
 TUPLE: xh < xb ;
 
 [ t ] [ { xa xb xc xd xe xf xg xh } sort-classes dup sort-classes = ] unit-test
+
+INTERSECTION: generic-class generic class ;
+
+[ t ] [ generic-class generic class<= ] unit-test
+[ t ] [ generic-class \ class class<= ] unit-test
+
+! Later
+[
+    [ t ] [ \ class generic class-and generic-class class<= ] unit-test
+    [ t ] [ \ class generic class-and generic-class swap class<= ] unit-test
+] drop
+
+[ t ] [ \ word generic-class classes-intersect? ] unit-test
+[ f ] [ number generic-class classes-intersect? ] unit-test
+
+[ H{ { word word } } ] [ 
+    generic-class flatten-class
+] unit-test
+
+INTERSECTION: empty-intersection ;
+
+[ t ] [ object empty-intersection class<= ] unit-test
+[ t ] [ empty-intersection object class<= ] unit-test
+[ t ] [ \ f class-not empty-intersection class<= ] unit-test
+[ f ] [ empty-intersection \ f class-not class<= ] unit-test
+[ t ] [ \ number empty-intersection class<= ] unit-test
+[ t ] [ empty-intersection class-not null class<= ] unit-test
+[ t ] [ null empty-intersection class-not class<= ] unit-test
+
+[ t ] [ \ f class-not \ f class-or empty-intersection class<= ] unit-test
+[ t ] [ empty-intersection \ f class-not \ f class-or class<= ] unit-test
+
+[ t ] [ object \ f class-not \ f class-or class<= ] unit-test
+
+[ ] [ object flatten-builtin-class drop ] unit-test

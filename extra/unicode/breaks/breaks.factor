@@ -1,7 +1,7 @@
 USING: unicode.categories kernel math combinators splitting
 sequences math.parser io.files io assocs arrays namespaces
 math.ranges unicode.normalize values io.encodings.ascii
-unicode.syntax unicode.data compiler.units alien.syntax  ;
+unicode.syntax unicode.data compiler.units alien.syntax sets ;
 IN: unicode.breaks
 
 C-ENUM: Any L V T Extend Control CR LF graphemes ;
@@ -24,10 +24,9 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
     [ blank? ] right-trim ;
 
 : process-other-extend ( lines -- set )
-    [ "#" split1 drop ";" split1 drop trim-blank ] map
-    [ empty? not ] filter
+    [ "#" split1 drop ";" split1 drop trim-blank ] map harvest
     [ ".." split1 [ dup ] unless* [ hex> ] bi@ [a,b] ] map
-    concat [ dup ] H{ } map>assoc ;
+    concat unique ;
 
 : other-extend-lines ( -- lines )
     "resource:extra/unicode/PropList.txt" ascii file-lines ;

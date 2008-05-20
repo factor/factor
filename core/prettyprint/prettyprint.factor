@@ -7,8 +7,8 @@ vectors words prettyprint.backend prettyprint.sections
 prettyprint.config sorting splitting math.parser vocabs
 definitions effects classes.builtin classes.tuple io.files
 classes continuations hashtables classes.mixin classes.union
-classes.predicate classes.singleton combinators quotations
-sets ;
+classes.intersection classes.predicate classes.singleton
+combinators quotations sets ;
 
 : make-pprint ( obj quot -- block in use )
     [
@@ -237,6 +237,11 @@ M: union-class see-class*
     <colon \ UNION: pprint-word
     dup pprint-word
     members pprint-elements pprint-; block> ;
+
+M: intersection-class see-class*
+    <colon \ INTERSECTION: pprint-word
+    dup pprint-word
+    participants pprint-elements pprint-; block> ;
 
 M: mixin-class see-class*
     <block \ MIXIN: pprint-word

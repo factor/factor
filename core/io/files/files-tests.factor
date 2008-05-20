@@ -1,11 +1,14 @@
 IN: io.files.tests
 USING: tools.test io.files io.files.private io threads kernel
 continuations io.encodings.ascii io.files.unique sequences
-strings accessors io.encodings.utf8 math ;
+strings accessors io.encodings.utf8 math destructors ;
+
+\ exists? must-infer
+\ (exists?) must-infer
 
 [ ] [ "blahblah" temp-file dup exists? [ delete-directory ] [ drop ] if ] unit-test
 [ ] [ "blahblah" temp-file make-directory ] unit-test
-[ t ] [ "blahblah" temp-file directory? ] unit-test
+[ t ] [ "blahblah" temp-file file-info directory? ] unit-test
 
 [ t ] [
     [ temp-directory "loldir" append-path delete-directory ] ignore-errors
@@ -66,6 +69,9 @@ strings accessors io.encodings.utf8 math ;
 [ "awk" ] [ "/usr/libexec/awk///" file-name ] unit-test
 [ "" ] [ "" file-name ] unit-test
 
+[ "freetype6.dll" ] [ "resource:freetype6.dll" file-name ] unit-test
+[ "freetype6.dll" ] [ "resource:/freetype6.dll" file-name ] unit-test
+
 [ ] [
     { "Hello world." }
     "test-foo.txt" temp-file ascii set-file-lines
@@ -98,6 +104,8 @@ strings accessors io.encodings.utf8 math ;
 [ f ] [ "test-foo.txt" temp-file exists? ] unit-test
 
 [ f ] [ "test-bar.txt" temp-file exists? ] unit-test
+
+[ "test-blah" temp-file delete-tree ] ignore-errors
 
 [ ] [ "test-blah" temp-file make-directory ] unit-test
 

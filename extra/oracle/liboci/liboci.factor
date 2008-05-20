@@ -124,7 +124,6 @@ TYPEDEF: ushort ub2
 TYPEDEF: short sb2
 TYPEDEF: uint ub4
 TYPEDEF: int sb4
-TYPEDEF: ulong size_t
 
 ! ===============================================
 ! Input data types (ocidfn.h)

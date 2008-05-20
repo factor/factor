@@ -101,21 +101,6 @@ SYMBOL: error-counter
     [ 1 ] [ error-counter get ] unit-test
 ] with-scope
 
-TUPLE: dispose-error ;
-
-M: dispose-error dispose 3 throw ;
-
-TUPLE: dispose-dummy disposed? ;
-
-M: dispose-dummy dispose t >>disposed? drop ;
-
-T{ dispose-error } "a" set
-T{ dispose-dummy } "b" set
-
-[ f ] [ "b" get disposed?>> ] unit-test
-
-[ { "a" "b" } [ get ] map dispose-each ] [ 3 = ] must-fail-with
-
-[ t ] [ "b" get disposed?>> ] unit-test
-
 [ ] [ [ return ] with-return ] unit-test
+
+[ { } [ ] attempt-all ] [ attempt-all-error? ] must-fail-with

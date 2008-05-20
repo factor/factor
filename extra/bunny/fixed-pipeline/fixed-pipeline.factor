@@ -1,4 +1,4 @@
-USING: alien.c-types continuations kernel
+USING: alien.c-types continuations destructors kernel
 opengl opengl.gl bunny.model ;
 IN: bunny.fixed-pipeline
 

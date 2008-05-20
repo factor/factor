@@ -1,4 +1,4 @@
-USING: help.markup help.syntax alien ;
+USING: help.markup help.syntax alien destructors ;
 IN: libc
 
 HELP: malloc
@@ -35,6 +35,14 @@ HELP: free
 HELP: with-malloc
 { $values { "size" "a positive integer" } { "quot" "a quotation with stack effect " { $snippet "( c-ptr -- )" } } }
 { $description "Allocates a zeroed block of " { $snippet "n" } " bytes and passes it to the quotation. When the quotation returns, the block is freed." } ;
+
+HELP: &free
+{ $values { "alien" c-ptr } }
+{ $description "Marks the block of memory for unconditional deallocation at the end of the current " { $link with-destructors } " scope." } ;
+
+HELP: |free
+{ $values { "alien" c-ptr } }
+{ $description "Marks the object for deallocation in the event of an error at the end of the current " { $link with-destructors } " scope." } ;
 
 ! Defined in alien-docs.factor
 ABOUT: "malloc"

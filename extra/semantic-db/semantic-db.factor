@@ -3,7 +3,7 @@
 USING: accessors arrays combinators combinators.cleave combinators.lib
 continuations db db.tuples db.types db.sqlite kernel math
 math.parser namespaces parser sets sequences sequences.deep
-sequences.lib strings words ;
+sequences.lib strings words destructors ;
 IN: semantic-db
 
 TUPLE: node id content ;

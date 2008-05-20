@@ -45,6 +45,7 @@ blah
 
 [
     TUPLE{ request
+        protocol: http
         port: 80
         method: "GET"
         path: "/bar"
@@ -84,6 +85,7 @@ Host: www.sex.com
 
 [
     TUPLE{ request
+        protocol: http
         port: 80
         method: "HEAD"
         path: "/bar"
@@ -177,6 +179,8 @@ test-db [
     ] with-scope
 ] unit-test
 
+[ ] [ 100 sleep ] unit-test
+
 [ t ] [
     "resource:extra/http/test/foo.html" ascii file-contents
     "http://localhost:1237/nested/foo.html" http-get =
@@ -218,7 +222,7 @@ test-db [
     ] with-scope
 ] unit-test
 
-[ ] [ 1000 sleep ] unit-test
+[ ] [ 100 sleep ] unit-test
 
 : 404? [ download-failed? ] [ response>> code>> 404 = ] bi and ;
 
@@ -245,7 +249,7 @@ test-db [
     ] with-scope
 ] unit-test
 
-[ ] [ 1000 sleep ] unit-test
+[ ] [ 100 sleep ] unit-test
 
 [ "Hi" ] [ "http://localhost:1237/" http-get ] unit-test
 

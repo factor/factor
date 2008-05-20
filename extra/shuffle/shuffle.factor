@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences namespaces math inference.transforms
-       combinators macros quotations math.ranges bake ;
+       combinators macros quotations math.ranges fry ;
 
 IN: shuffle
 
@@ -19,7 +19,7 @@ MACRO: ndrop ( n -- ) [ drop ] n*quot ;
 
 : nnip ( n -- ) swap >r ndrop r> ; inline
 
-MACRO: ntuck ( n -- ) 2 + [ dup , -nrot ] bake ;
+MACRO: ntuck ( n -- ) 2 + '[ dup , -nrot ] ;
 
 : 2swap ( x y z t -- z t x y ) rot >r rot r> ; inline
 

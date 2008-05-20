@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.backend io.files.private io hashtables kernel math
 memory namespaces sequences strings assocs arrays definitions
-system combinators splitting sbufs continuations io.encodings
-io.encodings.binary init accessors math.order ;
+system combinators splitting sbufs continuations destructors
+io.encodings io.encodings.binary init accessors math.order ;
 IN: io.files
 
 HOOK: (file-reader) io-backend ( path -- stream )
@@ -142,7 +142,9 @@ PRIVATE>
 : file-name ( path -- string )
     dup root-directory? [
         right-trim-separators
-        dup last-path-separator [ 1+ tail ] [ drop ] if
+        dup last-path-separator [ 1+ tail ] [
+            drop "resource:" ?head [ file-name ] when
+        ] if
     ] unless ;
 
 ! File info
@@ -170,11 +172,9 @@ SYMBOL: +socket+
 SYMBOL: +unknown+
 
 ! File metadata
-: exists? ( path -- ? )
-    normalize-path (exists?) ;
+: exists? ( path -- ? ) normalize-path (exists?) ;
 
-: directory? ( path -- ? )
-    file-info file-info-type +directory+ = ;
+: directory? ( file-info -- ? ) type>> +directory+ = ;
 
 <PRIVATE
 
@@ -230,7 +230,7 @@ HOOK: make-directory io-backend ( path -- )
 : fixup-directory ( path seq -- newseq )
     [
         dup string?
-        [ tuck append-path directory? 2array ] [ nip ] if
+        [ tuck append-path file-info directory? 2array ] [ nip ] if
     ] with map
     [ first { "." ".." } member? not ] filter ;
 

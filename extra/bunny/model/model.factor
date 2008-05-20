@@ -2,11 +2,12 @@ USING: alien alien.c-types arrays sequences math math.vectors
 math.matrices math.parser io io.files kernel opengl opengl.gl
 opengl.glu io.encodings.ascii opengl.capabilities shuffle
 http.client vectors splitting tools.time system combinators
-float-arrays continuations namespaces sequences.lib accessors ;
+float-arrays continuations destructors namespaces sequences.lib
+accessors ;
 IN: bunny.model
 
 : numbers ( str -- seq )
-    " " split [ string>number ] map [ ] filter ;
+    " " split [ string>number ] map sift ;
 
 : (parse-model) ( vs is -- vs is )
     readln [

@@ -5,8 +5,9 @@ hashtables.private io kernel math namespaces parser sequences
 strings vectors words quotations assocs layouts classes
 classes.builtin classes.tuple classes.tuple.private
 kernel.private vocabs vocabs.loader source-files definitions
-slots.deprecated classes.union compiler.units
-bootstrap.image.private io.files accessors combinators ;
+slots.deprecated classes.union classes.intersection
+compiler.units bootstrap.image.private io.files accessors
+combinators ;
 IN: bootstrap.primitives
 
 "Creating primitives and basic runtime structures..." print flush
@@ -127,7 +128,7 @@ bootstrapping? on
 : register-builtin ( class -- )
     [ dup lookup-type-number "type" set-word-prop ]
     [ dup "type" word-prop builtins get set-nth ]
-    [ f f builtin-class define-class ]
+    [ f f f builtin-class define-class ]
     tri ;
 
 : define-builtin-slots ( symbol slotspec -- )
@@ -160,7 +161,7 @@ bootstrapping? on
 
 ! Catch-all class for providing a default method.
 "object" "kernel" create
-[ f builtins get [ ] filter union-class define-class ]
+[ f f { } intersection-class define-class ]
 [ [ drop t ] "predicate" set-word-prop ]
 bi
 
@@ -172,7 +173,7 @@ builtins get num-tags get tail define-union-class
 
 ! Empty class with no instances
 "null" "kernel" create
-[ f { } union-class define-class ]
+[ f { } f union-class define-class ]
 [ [ drop f ] "predicate" set-word-prop ]
 bi
 

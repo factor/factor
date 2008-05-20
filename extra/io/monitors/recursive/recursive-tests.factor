@@ -1,7 +1,6 @@
 USING: accessors math kernel namespaces continuations
 io.files io.monitors io.monitors.recursive io.backend
-concurrency.mailboxes
-tools.test ;
+concurrency.mailboxes tools.test destructors ;
 IN: io.monitors.recursive.tests
 
 \ pump-thread must-infer

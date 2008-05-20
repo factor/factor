@@ -160,7 +160,7 @@ M: tuple-class update-class
     tri ;
 
 : define-new-tuple-class ( class superclass slots -- )
-    [ drop f tuple-class define-class ]
+    [ drop f f tuple-class define-class ]
     [ nip "slot-names" set-word-prop ]
     [ 2drop update-classes ]
     3tri ;
@@ -225,6 +225,12 @@ M: tuple-class reset-class
             "slots"
         } reset-props
     ] bi ;
+
+: reset-tuple-class ( class -- )
+    [ [ reset-class ] [ update-map- ] bi ] each-subclass ;
+
+M: tuple-class forget*
+    [ reset-tuple-class ] [ call-next-method ] bi ;
 
 M: tuple-class rank-class drop 0 ;
 

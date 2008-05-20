@@ -6,16 +6,16 @@ continuations math definitions mirrors splitting parser classes
 inspector layouts vocabs.loader prettyprint.config prettyprint
 debugger io.streams.c io.files io.backend
 quotations io.launcher words.private tools.deploy.config
-bootstrap.image io.encodings.utf8 accessors ;
+bootstrap.image io.encodings.utf8 destructors accessors ;
 IN: tools.deploy.backend
-    
+
 : copy-vm ( executable bundle-name extension -- vm )
   [ prepend-path ] dip append vm over copy-file ;
-  
-: copy-fonts ( name dir -- )  
-  append-path "fonts/" resource-path swap copy-tree-into ;
-  
-: image-name ( vocab bundle-name -- str )  
+
+: copy-fonts ( name dir -- )
+  append-path "resource:fonts/" swap copy-tree-into ;
+
+: image-name ( vocab bundle-name -- str )
   prepend-path ".image" append ;
 
 : (copy-lines) ( stream -- )

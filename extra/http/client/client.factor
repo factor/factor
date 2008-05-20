@@ -19,21 +19,7 @@ DEFER: http-request
 
 <PRIVATE
 
-: parse-url ( url -- resource host port )
-    "http://" ?head [ "Only http:// supported" throw ] unless
-    "/" split1 [ "/" prepend ] [ "/" ] if*
-    swap parse-host ;
-
-: store-path ( request path -- request )
-    "?" split1 >r >>path r> dup [ query>assoc ] when >>query ;
-
-: request-with-url ( request url -- request )
-    parse-url >r >r store-path r> >>host r> >>port ;
-
 SYMBOL: redirects
-
-: absolute-url? ( url -- ? )
-    [ "http://" head? ] [ "https://" head? ] bi or ;
 
 : do-redirect ( response data -- response data )
     over code>> 300 399 between? [
@@ -42,7 +28,7 @@ SYMBOL: redirects
         redirects get max-redirects < [
             request get
             swap "location" header dup absolute-url?
-            [ request-with-url ] [ store-path ] if
+            [ request-with-url ] [ request-with-path ] if
             "GET" >>method http-request
         ] [
             too-many-redirects

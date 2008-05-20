@@ -1,6 +1,7 @@
 USING: io.sockets io kernel math threads io.encodings.ascii
 io.streams.duplex debugger tools.time prettyprint
-concurrency.count-downs namespaces arrays continuations ;
+concurrency.count-downs namespaces arrays continuations
+destructors ;
 IN: benchmark.sockets
 
 SYMBOL: counter
