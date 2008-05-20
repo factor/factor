@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel opengl arrays sequences jamshred.log jamshred.player jamshred.sound jamshred.tunnel math.vectors ;
+USING: accessors kernel opengl arrays sequences jamshred.log jamshred.player jamshred.sound jamshred.tunnel math math.constants math.vectors ;
 IN: jamshred.game
 
 TUPLE: jamshred sounds tunnel players running quit ;
@@ -29,3 +29,12 @@ TUPLE: jamshred sounds tunnel players running quit ;
 : mouse-moved ( x-radians y-radians jamshred -- )
     jamshred-player -rot turn-player ;
 
+: units-per-full-roll ( -- n ) 50 ;
+
+: jamshred-roll ( jamshred n -- )
+    [ jamshred-player ] dip 2 pi * * units-per-full-roll / roll-player ;
+        
+: mouse-scroll-x ( jamshred x -- ) jamshred-roll ;
+
+: mouse-scroll-y ( jamshred y -- )
+    neg swap jamshred-player change-player-speed ;

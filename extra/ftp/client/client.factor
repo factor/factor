@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays classes.singleton combinators
-continuations io io.encodings.binary io.encodings.ascii
+continuations io io.encodings.binary io.encodings.utf8
 io.files io.sockets kernel io.streams.duplex math
 math.parser sequences splitting namespaces strings fry ftp ;
 IN: ftp.client
@@ -56,15 +56,17 @@ IN: ftp.client
     "|" split 2 tail* first string>number ;
 
 TUPLE: remote-file
-    type permissions links owner group size month day time year name ;
+type permissions links owner group size month day time year
+name target ;
 
 : <remote-file> ( -- remote-file ) remote-file new ;
 
 : parse-permissions ( remote-file str -- remote-file )
     [ first ch>type >>type ] [ rest >>permissions ] bi ;
 
-: parse-list-9 ( lines -- seq )
+: parse-list-11 ( lines -- seq )
     [
+        11 f pad-right
         <remote-file> swap {
             [ 0 swap nth parse-permissions ]
             [ 1 swap nth string>number >>links ]
@@ -75,6 +77,7 @@ TUPLE: remote-file
             [ 6 swap nth >>day ]
             [ 7 swap nth >>time ]
             [ 8 swap nth >>name ]
+            [ 10 swap nth >>target ]
         } cleave
     ] map ;
 
@@ -105,7 +108,8 @@ TUPLE: remote-file
     dup strings>>
     [ " " split harvest ] map
     dup length {
-        { 9 [ parse-list-9 ] }
+        { 11 [ parse-list-11 ] }
+        { 9 [ parse-list-11 ] }
         { 8 [ parse-list-8 ] }
         { 3 [ parse-list-3 ] }
         [ drop ]
@@ -129,7 +133,7 @@ ERROR: ftp-error got expected ;
     [ 229 ftp-assert ] [ parse-epsv ] bi ;
 
 : list ( ftp-client -- ftp-response )
-    host>> open-remote-port <inet> ascii <client>
+    host>> open-remote-port <inet> utf8 <client> drop
     ftp-list 150 ftp-assert
     lines
     <ftp-response> swap >>strings
@@ -137,14 +141,14 @@ ERROR: ftp-error got expected ;
     parse-list ;
 
 : ftp-get ( filename ftp-client -- ftp-response )
-    host>> open-remote-port <inet> binary <client>
+    host>> open-remote-port <inet> binary <client> drop
     swap
     [ ftp-retr 150 ftp-assert drop ]
     [ binary <file-writer> stream-copy ] 2bi
     read-response dup 226 ftp-assert ;
 
 : ftp-connect ( ftp-client -- stream )
-    [ host>> ] [ port>> ] bi <inet> ascii <client> ;
+    [ host>> ] [ port>> ] bi <inet> utf8 <client> drop ;
 
 GENERIC: ftp-download ( path obj -- )
 

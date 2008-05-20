@@ -386,7 +386,7 @@ M: object protocol-addr
     drop [ host>> ] [ port>> ] bi <inet> ;
 
 M: https protocol-addr
-    call-next-method <ssl> ;
+    call-next-method <secure> ;
 
 : request-addr ( request -- addr )
     dup protocol>> protocol-addr ;

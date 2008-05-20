@@ -27,8 +27,8 @@ HELP: with-cocoa
 { $description "Sets up an autorelease pool, initializes the " { $snippet "NSApplication" } " singleton, and calls the quotation." } ;
 
 HELP: do-event
-{ $values { "app" "an " { $snippet "NSApplication" } } }
-{ $description "Processes any pending events in the queue. Does not block." } ;
+{ $values { "app" "an " { $snippet "NSApplication" } } { "?" "a boolean" } }
+{ $description "Processes a pending event in the queue, if any, returning a boolean indicating if there was one. Does not block." } ;
 
 HELP: add-observer
 { $values { "observer" "an " { $snippet "NSObject" } } { "selector" string } { "name" "an " { $snippet "NSString" } } { "object" "an " { $snippet "NSObject" } } }
