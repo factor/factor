@@ -10,5 +10,5 @@ IN: symbols
 
 : SINGLETONS:
     ";" parse-tokens
-    [ create-class-in dup save-location define-singleton-class ] each ;
+    [ create-class-in define-singleton-class ] each ;
     parsing
