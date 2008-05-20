@@ -630,7 +630,7 @@ HELP: tri*
     "The following two lines are equivalent:"
     { $code
         "[ p ] [ q ] [ r ] tri*"
-        ">r >r q r> q r> r"
+        ">r >r p r> q r> r"
     }
 } ;
 
