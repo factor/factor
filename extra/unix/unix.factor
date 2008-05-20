@@ -26,6 +26,8 @@ TYPEDEF: uint socklen_t
 : ESRCH 3 ; inline
 : EEXIST 17 ; inline
 
+: NGROUPS_MAX 16 ; inline
+
 C-STRUCT: group
     { "char*" "gr_name" }
     { "char*" "gr_passwd" }
