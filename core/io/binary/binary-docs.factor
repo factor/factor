@@ -6,12 +6,12 @@ ARTICLE: "stream-binary" "Working with binary data"
 $nl
 "There are two ways to order the bytes making up an integer; " { $emphasis "little endian" } " byte order outputs the least significant byte first, and the most significant byte last, whereas " { $emphasis "big endian" } " is the other way around."
 $nl
-"Consider the hexadecimal integer "{ $snippet "HEX: cafebabe" } ". Big endian byte order yields the following sequence of bytes:"
+"Consider the hexadecimal integer "{ $snippet "HEX: cafebabe" } ". Little endian byte order yields the following sequence of bytes:"
 { $table
     { "Byte:" "1" "2" "3" "4" }
     { "Value:" { $snippet "be" } { $snippet "ba" } { $snippet "fe" } { $snippet "ca" } }
 }
-"Compare this with little endian byte order:"
+"Compare this with big endian byte order:"
 { $table
     { "Byte:" "1" "2" "3" "4" }
     { "Value:" { $snippet "ca" } { $snippet "fe" } { $snippet "ba" } { $snippet "be" } }
