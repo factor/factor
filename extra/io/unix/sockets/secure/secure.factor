@@ -64,6 +64,9 @@ M: ssl-handle drain
     SSL_write
     check-write-response ;
 
+M: ssl-handle cancel-io
+    file>> cancel-io ;
+
 ! Client sockets
 : <ssl-socket> ( fd -- ssl )
     [ fd>> BIO_NOCLOSE BIO_new_socket dup ssl-error ] keep <ssl-handle>
