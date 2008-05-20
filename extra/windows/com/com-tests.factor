@@ -1,7 +1,7 @@
 USING: kernel windows.com windows.com.syntax windows.ole32
 alien alien.syntax tools.test libc alien.c-types arrays.lib 
 namespaces arrays continuations accessors math windows.com.wrapper
-windows.com.wrapper.private ;
+windows.com.wrapper.private destructors ;
 IN: windows.com.tests
 
 COM-INTERFACE: ISimple IUnknown {216fb341-0eb2-44b1-8edb-60b76e353abc}
