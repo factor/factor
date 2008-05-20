@@ -8,29 +8,31 @@ symbols ;
 IN: regexp4
 
 SYMBOLS: eps start-state final-state beginning-of-text
-end-of-text left-paren right-paren alternation ;
+end-of-text left-parenthesis alternation left-bracket
+caret dash ampersand semicolon ;
 
-SYMBOL: runtim-epsilon
+SYMBOL: runtime-epsilon
 
-TUPLE: regexp raw paren-count bracket-count
+TUPLE: regexp raw parentheses-count bracket-count
 state stack nfa new-states dfa minimized-dfa
 dot-matches-newlines? character-sets capture-group
 captured-groups ;
 
 TUPLE: capture-group n range ;
 
-ERROR: paren-underflow ;
-ERROR: unbalanced-paren ;
+ERROR: parentheses-underflow ;
+ERROR: unbalanced-parentheses ;
+ERROR: unbalanced-brackets ;
 
 : push-stack ( regexp token -- ) swap stack>> push ;
 : push-all-stack ( regexp seq -- ) swap stack>> push-all ;
 : next-state ( regexp -- n ) [ 1+ ] change-state state>> ;
 
-: check-paren-underflow ( regexp -- )
-    paren-count>> 0 < [ paren-underflow ] when ;
+: check-parentheses-underflow ( regexp -- )
+    parentheses-count>> 0 < [ parentheses-underflow ] when ;
 
-: check-unbalanced-paren ( regexp -- )
-    paren-count>> 0 > [ unbalanced-paren ] when ;
+: check-unbalanced-parentheses ( regexp -- )
+    parentheses-count>> 0 > [ unbalanced-parentheses ] when ;
 
 :: (apply-alternation) ( stack regexp -- )
     [let | s2 [ stack peek first ]
@@ -82,10 +84,12 @@ ERROR: unbalanced-paren ;
         [ (apply-alternation) ] [ (apply-concatenation) ] if apply-loop
     ] when ;
 
+: cut-stack ( n vector -- vector' vector )
+    <reversed> tuck index cut reverse dup pop* ;
+    
 : apply-til-last ( token regexp -- )
-    swap [
-        <reversed> tuck index cut reverse dup pop*
-    ] change-stack >r reverse r> apply-loop stack>> push-all ;
+    swap [ cut-stack ] change-stack
+    >r reverse r> apply-loop stack>> push-all ;
 
 : concatenation-loop ( regexp -- )
     dup stack>> dup apply-concatenation?
@@ -294,16 +298,6 @@ ERROR: bad-hex number ;
     [ get-char CHAR: } = ] take-until
     "," split1 [ [ string>number ] bi@ ] keep >boolean ;
 
-: take-until-]
-    [ get-char CHAR: ] = ] take-until ;
-
-: make-character-set ( regexp str -- )
-    dup
-    [ length 1 > ] [ first CHAR: ^ = ] bi and
-    [ rest t ] [ f ] if
-    >r [ member? ] curry r>
-    [ [ not ] compose ] when make-nontoken-nfa ;
-
 : parse-escaped ( regexp -- )
     next get-char {
         { CHAR: \ [ CHAR: \ make-nontoken-nfa ] }
@@ -340,6 +334,39 @@ ERROR: bad-hex number ;
         [ dup digit? [ parse-backreference ] [ make-nontoken-nfa ] if ]
     } case ;
 
+: make-character-set ( regexp -- )
+    stack>> throw ;
+
+: (parse-character-set) ( regexp -- )
+    [
+        next get-char
+        {
+            { CHAR: [ [ [ 1+ ] change-bracket-count left-bracket push-stack ] }
+            { CHAR: ] [ [ 1- ] change-bracket-count left-bracket over stack>> cut-stack ] }
+            { CHAR: - [ dash push-stack ] }
+            { CHAR: & [ ampersand push-stack ] }
+            { CHAR: : [ semicolon push-stack ] }
+            { CHAR: \ [ parse-escaped ] }
+            { f [ unbalanced-brackets ] }
+            [ make-nontoken-nfa ]
+        } case
+    ] [
+        dup bracket-count>> 0 >
+        [ (parse-character-set) ]
+        [ make-character-set ] if
+    ] bi ;
+
+: parse-character-set-first ( regexp -- )
+    get-next
+    {
+        { CHAR: ^ [ caret push-stack next ] }
+        { CHAR: ] [ CHAR: ] make-nontoken-nfa next ] }
+        [ 2drop ]
+    } case ;
+
+: parse-character-set ( regexp -- )
+    [ parse-character-set-first ] [ (parse-character-set) ] bi ;
+
 ERROR: unsupported-token token ;
 : parse-token ( regexp token -- )
     dup {
@@ -347,20 +374,24 @@ ERROR: unsupported-token token ;
         { CHAR: $ [ drop back-anchor-construction ] }
         { CHAR: \ [ drop parse-escaped ] }
         { CHAR: | [ drop dup concatenation-loop alternation push-stack ] }
-        { CHAR: ( [ drop [ 1+ ] change-paren-count left-paren push-stack ] }
-        { CHAR: ) [ drop [ 1- ] change-paren-count left-paren apply-til-last ] }
+        { CHAR: ( [ drop [ 1+ ] change-parentheses-count left-parenthesis push-stack ] }
+        { CHAR: ) [ drop [ 1- ] change-parentheses-count left-parenthesis apply-til-last ] }
         { CHAR: * [ drop apply-kleene-closure ] }
         { CHAR: + [ drop apply-plus-closure ] }
         { CHAR: ? [ drop apply-question-closure ] }
         { CHAR: { [ drop parse-brace apply-brace-closure ] }
-        ! { CHAR: [ [ drop parse-character-set ] }
+        { CHAR: [ [
+            drop
+            dup left-bracket push-stack
+            [ 1+ ] change-bracket-count parse-character-set
+        ] }
         ! { CHAR: } [ drop drop "brace" ] }
         ! { CHAR: ? [ drop ] }
         { CHAR: . [ drop dot-construction ] }
         { beginning-of-text [ push-stack ] }
         { end-of-text [
             drop {
-                [ check-unbalanced-paren ]
+                [ check-unbalanced-parentheses ]
                 [ concatenation-loop ]
                 [ beginning-of-text apply-til-last ]
                 [ set-start-state ]
@@ -461,7 +492,8 @@ ERROR: unsupported-token token ;
 : <regexp> ( raw -- obj )
     regexp new
         swap >>raw
-        0 >>paren-count
+        0 >>parentheses-count
+        0 >>bracket-count
         -1 >>state
         V{ } clone >>stack 
         V{ } clone >>character-sets
@@ -534,8 +566,6 @@ TUPLE: dfa-traverser
 
 : matches? ( string regexp -- ? )
     dupd match [ [ length ] [ range-length 1- ] bi* = ] [ drop f ] if* ;
-
-
 
 ! character classes
 ! TUPLE: range-class from to ;

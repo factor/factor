@@ -77,58 +77,58 @@ IN: regexp4-tests
 [ t ] [ "aaa" "a{1,3}" <regexp> matches? ] unit-test
 [ f ] [ "aaaa" "a{1,3}" <regexp> matches? ] unit-test
 
-[ f ] [ "" "[a]" <regexp> matches? ] unit-test
-[ t ] [ "a" "[a]" <regexp> matches? ] unit-test
-[ t ] [ "a" "[abc]" <regexp> matches? ] unit-test
-[ f ] [ "b" "[a]" <regexp> matches? ] unit-test
-[ f ] [ "d" "[abc]" <regexp> matches? ] unit-test
-[ t ] [ "ab" "[abc]{1,2}" <regexp> matches? ] unit-test
-[ f ] [ "abc" "[abc]{1,2}" <regexp> matches? ] unit-test
+! [ f ] [ "" "[a]" <regexp> matches? ] unit-test
+! [ t ] [ "a" "[a]" <regexp> matches? ] unit-test
+! [ t ] [ "a" "[abc]" <regexp> matches? ] unit-test
+! [ f ] [ "b" "[a]" <regexp> matches? ] unit-test
+! [ f ] [ "d" "[abc]" <regexp> matches? ] unit-test
+! [ t ] [ "ab" "[abc]{1,2}" <regexp> matches? ] unit-test
+! [ f ] [ "abc" "[abc]{1,2}" <regexp> matches? ] unit-test
 
-[ f ] [ "" "[^a]" <regexp> matches? ] unit-test
-[ f ] [ "a" "[^a]" <regexp> matches? ] unit-test
-[ f ] [ "a" "[^abc]" <regexp> matches? ] unit-test
-[ t ] [ "b" "[^a]" <regexp> matches? ] unit-test
-[ t ] [ "d" "[^abc]" <regexp> matches? ] unit-test
-[ f ] [ "ab" "[^abc]{1,2}" <regexp> matches? ] unit-test
-[ f ] [ "abc" "[^abc]{1,2}" <regexp> matches? ] unit-test
+! [ f ] [ "" "[^a]" <regexp> matches? ] unit-test
+! [ f ] [ "a" "[^a]" <regexp> matches? ] unit-test
+! [ f ] [ "a" "[^abc]" <regexp> matches? ] unit-test
+! [ t ] [ "b" "[^a]" <regexp> matches? ] unit-test
+! [ t ] [ "d" "[^abc]" <regexp> matches? ] unit-test
+! [ f ] [ "ab" "[^abc]{1,2}" <regexp> matches? ] unit-test
+! [ f ] [ "abc" "[^abc]{1,2}" <regexp> matches? ] unit-test
 
-[ t ] [ "]" "[]]" <regexp> matches? ] unit-test
-[ f ] [ "]" "[^]]" <regexp> matches? ] unit-test
+! [ t ] [ "]" "[]]" <regexp> matches? ] unit-test
+! [ f ] [ "]" "[^]]" <regexp> matches? ] unit-test
 
 ! [ "^" "[^]" <regexp> matches? ] must-fail
-[ t ] [ "^" "[]^]" <regexp> matches? ] unit-test
-[ t ] [ "]" "[]^]" <regexp> matches? ] unit-test
+! [ t ] [ "^" "[]^]" <regexp> matches? ] unit-test
+! [ t ] [ "]" "[]^]" <regexp> matches? ] unit-test
 
-[ t ] [ "[" "[[]" <regexp> matches? ] unit-test
-[ f ] [ "^" "[^^]" <regexp> matches? ] unit-test
-[ t ] [ "a" "[^^]" <regexp> matches? ] unit-test
+! [ t ] [ "[" "[[]" <regexp> matches? ] unit-test
+! [ f ] [ "^" "[^^]" <regexp> matches? ] unit-test
+! [ t ] [ "a" "[^^]" <regexp> matches? ] unit-test
 
-[ t ] [ "-" "[-]" <regexp> matches? ] unit-test
-[ f ] [ "a" "[-]" <regexp> matches? ] unit-test
-[ f ] [ "-" "[^-]" <regexp> matches? ] unit-test
-[ t ] [ "a" "[^-]" <regexp> matches? ] unit-test
+! [ t ] [ "-" "[-]" <regexp> matches? ] unit-test
+! [ f ] [ "a" "[-]" <regexp> matches? ] unit-test
+! [ f ] [ "-" "[^-]" <regexp> matches? ] unit-test
+! [ t ] [ "a" "[^-]" <regexp> matches? ] unit-test
 
-[ t ] [ "-" "[-a]" <regexp> matches? ] unit-test
-[ t ] [ "a" "[-a]" <regexp> matches? ] unit-test
-[ t ] [ "-" "[a-]" <regexp> matches? ] unit-test
-[ t ] [ "a" "[a-]" <regexp> matches? ] unit-test
-[ f ] [ "b" "[a-]" <regexp> matches? ] unit-test
-[ f ] [ "-" "[^-]" <regexp> matches? ] unit-test
-[ t ] [ "a" "[^-]" <regexp> matches? ] unit-test
+! [ t ] [ "-" "[-a]" <regexp> matches? ] unit-test
+! [ t ] [ "a" "[-a]" <regexp> matches? ] unit-test
+! [ t ] [ "-" "[a-]" <regexp> matches? ] unit-test
+! [ t ] [ "a" "[a-]" <regexp> matches? ] unit-test
+! [ f ] [ "b" "[a-]" <regexp> matches? ] unit-test
+! [ f ] [ "-" "[^-]" <regexp> matches? ] unit-test
+! [ t ] [ "a" "[^-]" <regexp> matches? ] unit-test
 
-[ f ] [ "-" "[a-c]" <regexp> matches? ] unit-test
-[ t ] [ "-" "[^a-c]" <regexp> matches? ] unit-test
-[ t ] [ "b" "[a-c]" <regexp> matches? ] unit-test
-[ f ] [ "b" "[^a-c]" <regexp> matches? ] unit-test
+! [ f ] [ "-" "[a-c]" <regexp> matches? ] unit-test
+! [ t ] [ "-" "[^a-c]" <regexp> matches? ] unit-test
+! [ t ] [ "b" "[a-c]" <regexp> matches? ] unit-test
+! [ f ] [ "b" "[^a-c]" <regexp> matches? ] unit-test
 
-[ t ] [ "-" "[a-c-]" <regexp> matches? ] unit-test
-[ f ] [ "-" "[^a-c-]" <regexp> matches? ] unit-test
+! [ t ] [ "-" "[a-c-]" <regexp> matches? ] unit-test
+! [ f ] [ "-" "[^a-c-]" <regexp> matches? ] unit-test
 
-[ t ] [ "\\" "[\\\\]" <regexp> matches? ] unit-test
-[ f ] [ "a" "[\\\\]" <regexp> matches? ] unit-test
-[ f ] [ "\\" "[^\\\\]" <regexp> matches? ] unit-test
-[ t ] [ "a" "[^\\\\]" <regexp> matches? ] unit-test
+! [ t ] [ "\\" "[\\\\]" <regexp> matches? ] unit-test
+! [ f ] [ "a" "[\\\\]" <regexp> matches? ] unit-test
+! [ f ] [ "\\" "[^\\\\]" <regexp> matches? ] unit-test
+! [ t ] [ "a" "[^\\\\]" <regexp> matches? ] unit-test
 
 
 ! ((A)(B(C)))
