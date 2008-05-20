@@ -1,3 +1,5 @@
+! Copyright (C) 2008 Alex Chapman
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel namespaces openal sequences synth synth.buffers ;
 IN: synth.example
 
