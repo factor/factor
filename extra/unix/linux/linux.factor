@@ -84,3 +84,12 @@ C-STRUCT: sockaddr-un
 : SEEK_SET 0 ; inline
 : SEEK_CUR 1 ; inline
 : SEEK_END 2 ; inline
+
+C-STRUCT: passwd
+    { "char*"  "pw_name" }
+    { "char*"  "pw_passwd" }
+    { "uid_t"  "pw_uid" }
+    { "gid_t"  "pw_gid" }
+    { "char*"  "pw_gecos" }
+    { "char*"  "pw_dir" }
+    { "char*"  "pw_shell" } ;
