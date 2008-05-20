@@ -1,3 +1,5 @@
+! Copyright (C) 2008 Alex Chapman
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors calendar kernel math math.order money sequences ;
 IN: bank
 

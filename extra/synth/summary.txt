@@ -1,0 +1,1 @@
+Simple sound synthesis using OpenAL.

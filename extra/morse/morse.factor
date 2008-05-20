@@ -1,8 +1,6 @@
-! Copyright (C) 2007 Alex Chapman
+! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs combinators hashtables kernel lazy-lists math namespaces
-openal openal.waves parser-combinators promises sequences strings symbols
-unicode.case ;
+USING: accessors assocs combinators hashtables kernel lazy-lists math namespaces openal parser-combinators promises sequences strings symbols synth synth.buffers unicode.case ;
 IN: morse
 
 <PRIVATE
@@ -135,11 +133,17 @@ SYMBOLS: source dot-buffer dash-buffer intra-char-gap-buffer letter-gap-buffer ;
 : intra-char-gap ( -- ) intra-char-gap-buffer queue ;
 : letter-gap ( -- ) letter-gap-buffer queue ;
 
+: beep-freq 880 ;
+
+: <morse-buffer> ( -- buffer )
+    half-sample-freq <8bit-mono-buffer> ;
+
 : sine-buffer ( seconds -- id )
-    >r 8 22000 880 r> <sine-wave-buffer> send-buffer* ;
+    beep-freq swap <morse-buffer> >sine-wave-buffer
+    send-buffer id>> ;
 
 : silent-buffer ( seconds -- id )
-    8 22000 rot <silent-buffer> send-buffer* ;
+    <morse-buffer> >silent-buffer send-buffer id>> ;
 
 : make-buffers ( unit-length -- )
     {
