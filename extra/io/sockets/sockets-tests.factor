@@ -1,6 +1,7 @@
 IN: io.sockets.tests
 USING: io.sockets sequences math tools.test namespaces accessors 
-kernel destructors calendar io.timeouts ;
+kernel destructors calendar io.timeouts io.encodings.utf8 io
+concurrency.promises threads io.streams.string ;
 
 [ B{ 1 2 3 4 } ]
 [ "1.2.3.4" T{ inet4 } inet-pton ] unit-test
@@ -68,3 +69,24 @@ kernel destructors calendar io.timeouts ;
 
 [ ] [ 1 seconds "datagram3" get set-timeout ] unit-test
 [ "datagram3" get receive ] must-fail
+
+! See what happens if other end is closed
+[ ] [ <promise> "port" set ] unit-test
+
+[ ] [
+    [
+        "127.0.0.1" 0 <inet4> utf8 <server>
+        dup addr>> "port" get fulfill
+        [
+            accept drop
+            dup stream-readln drop
+            "hello" <string-reader> swap stream-copy
+        ] with-disposal
+    ] "Socket close test" spawn drop
+] unit-test
+
+[ "hello" f ] [
+    "port" get ?promise utf8 [
+        "hi\n" write flush readln readln
+    ] with-client
+] unit-test

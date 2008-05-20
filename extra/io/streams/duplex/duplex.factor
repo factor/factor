@@ -24,8 +24,8 @@ M: duplex-stream dispose
     #! are attached to the same file descriptor, the output
     #! buffer needs to be flushed before we close the fd.
     [
-        [ out>> &dispose drop ]
         [ in>> &dispose drop ]
+        [ out>> &dispose drop ]
         bi
     ] with-destructors ;
 
