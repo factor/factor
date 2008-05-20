@@ -153,13 +153,13 @@ M: openssl-context dispose*
 
 TUPLE: ssl-handle file handle connected disposed ;
 
-ERROR: no-ssl-context ;
+ERROR: no-secure-context ;
 
-M: no-ssl-context summary
-    drop "SSL operations must be wrapped in calls to with-ssl-context" ;
+M: no-secure-context summary
+    drop "Secure socket operations must be wrapped in calls to with-secure-context" ;
 
 : current-ssl-context ( -- ctx )
-    secure-context get [ no-ssl-context ] unless* ;
+    secure-context get [ no-secure-context ] unless* ;
 
 : <ssl-handle> ( fd -- ssl )
     current-ssl-context handle>> SSL_new dup ssl-error
