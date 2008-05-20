@@ -72,7 +72,7 @@ concurrency.promises byte-arrays ;
             "resource:extra/openssl/test/server.pem" >>key-file
             "resource:extra/openssl/test/root.pem" >>ca-file
             "resource:extra/openssl/test/dh1024.pem" >>dh-file
-            "password" >byte-array >>password
+            "password" >>password
         [
             "127.0.0.1" 0 <inet4> <secure> ascii <server> [
                 dup addr>> addrspec>> port>> "port" get fulfill

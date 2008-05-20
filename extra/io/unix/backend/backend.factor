@@ -108,9 +108,6 @@ M: io-timeout summary drop "I/O operation timed out" ;
 : io-error ( n -- ) 0 < [ (io-error) ] when ;
  
 ! Readers
-: eof ( reader -- )
-    dup buffer>> buffer-empty? [ t >>eof ] when drop ;
-
 : (refill) ( port -- n )
     [ handle>> ]
     [ buffer>> buffer-end ]
@@ -123,8 +120,7 @@ GENERIC: refill ( port handle -- event/f )
 M: fd refill
     fd>> over buffer>> [ buffer-end ] [ buffer-capacity ] bi read
     {
-        { [ dup 0 = ] [ drop eof f ] }
-        { [ dup 0 > ] [ swap buffer>> n>buffer f ] }
+        { [ dup 0 >= ] [ swap buffer>> n>buffer f ] }
         { [ err_no EINTR = ] [ 2drop +retry+ ] }
         { [ err_no EAGAIN = ] [ 2drop +input+ ] }
         [ (io-error) ]

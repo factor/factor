@@ -1,7 +1,7 @@
 
 USING: kernel parser words continuations namespaces debugger
        sequences combinators splitting prettyprint
-       system io io.files io.launcher io.encodings.utf8 sequences.deep
+       system io io.files io.launcher io.encodings.utf8 io.pipes sequences.deep
        accessors multi-methods newfx shell.parser ;
 
 IN: shell
@@ -95,8 +95,7 @@ METHOD: expand { object } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: pipeline-chant ( pipeline-chant -- )
-  drop "ix: pipelines not supported" print ;
+: pipeline-chant ( pipeline-chant -- ) commands>> run-pipeline drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

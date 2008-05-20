@@ -7,7 +7,8 @@ IN: ftp
 SINGLETON: active
 SINGLETON: passive
 
-TUPLE: ftp-client host port user password mode state ;
+TUPLE: ftp-client host port user password mode state
+command-promise ;
 
 : <ftp-client> ( host -- ftp-client )
     ftp-client new

@@ -26,5 +26,6 @@ HELP: <byte-array> ( n -- byte-array )
 
 HELP: >byte-array
 { $values { "seq" "a sequence" } { "byte-array" byte-array } }
-{ $description "Outputs a freshly-allocated byte array whose elements have the same boolean values as a given sequence." }
+{ $description
+  "Outputs a freshly-allocated byte array whose elements have the same signed byte values as a given sequence." }
 { $errors "Throws an error if the sequence contains elements other than integers." } ;
