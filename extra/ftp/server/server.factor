@@ -5,7 +5,7 @@ io.encodings io.encodings.binary io.encodings.utf8 io.files
 io.server io.sockets kernel math.parser namespaces sequences
 ftp io.unix.launcher.parser unicode.case splitting assocs
 classes io.server destructors calendar io.timeouts
-io.streams.duplex threads continuations
+io.streams.duplex threads continuations math
 concurrency.promises byte-arrays ;
 IN: ftp.server
 
@@ -78,24 +78,34 @@ C: <ftp-list> ftp-list
 
 ERROR: type-error type ;
 
+: parse-type ( string -- string' )
+    >upper {
+        { "IMAGE" [ "Binary" ] }
+        { "I" [ "Binary" ] }
+        [ type-error ]
+    } case ;
+
 : handle-TYPE ( obj -- )
     [
-        tokenized>> second >upper {
-            { "IMAGE" [ "Binary" ] }
-            { "I" [ "Binary" ] }
-            [ type-error ]
-        } case
+        tokenized>> second parse-type
         200 "Switching to " rot " mode" 3append server-response
     ] [
         2drop "TYPE is binary only" ftp-error
     ] recover ;
 
+: random-local-server ( -- server )
+    remote-address get class new 0 >>port binary <server> ;
+
+: port>bytes ( port -- hi lo )
+    [ -8 shift ] keep [ HEX: ff bitand ] bi@ ;
+
 : handle-PWD ( obj -- )
     drop
     257 current-directory get "\"" swap "\"" 3append server-response ;
 
-: random-local-server ( -- server )
-    remote-address get class new 0 >>port binary <server> ;
+: handle-SYST ( obj -- )
+    drop
+    215 "UNIX Type: L8" server-response ;
 
 : handle-STOR ( obj -- )
     [
@@ -156,7 +166,7 @@ M: ftp-put service-command ( stream obj -- )
         3drop "File transfer failed" ftp-error
     ] recover ;
 
-: extended-passive-loop ( server -- )
+: passive-loop ( server -- )
     [
         [
             |dispose
@@ -191,16 +201,28 @@ M: ftp-put service-command ( stream obj -- )
     [ tokenized>> second <ftp-get> swap fulfill ]
     curry if-command-promise ;
 
+: expect-connection ( -- port )
+    random-local-server
+    client get <promise> >>command-promise drop
+    [ [ passive-loop ] curry in-thread ]
+    [ addr>> port>> ] bi ;
+
+: handle-PASV ( obj -- )
+    drop client get passive >>mode drop
+    expect-connection
+    [
+        "Entering Passive Mode (127,0,0,1," %
+        port>bytes [ number>string ] bi@ "," swap 3append %
+        ")" %
+    ] "" make 227 swap server-response ;
+
 : handle-EPSV ( obj -- )
     drop
     client get command-promise>> [
         "You already have a passive stream" ftp-error
     ] [
         229 "Entering Extended Passive Mode (|||"
-        random-local-server
-        client get <promise> >>command-promise drop
-        [ [ B extended-passive-loop ] curry in-thread ]
-        [ addr>> port>> number>string ] bi
+        expect-connection number>string
         "|)" 3append server-response
     ] if ;
 
@@ -241,7 +263,7 @@ ERROR: not-a-directory ;
         { "QUIT" [ handle-QUIT f ] }
 
         ! { "PORT" [ ] }
-        ! { "PASV" [ ] }
+        { "PASV" [ handle-PASV t ] }
         ! { "MODE" [ ] }
         { "TYPE" [ handle-TYPE t ] }
         ! { "STRU" [ ] }
@@ -263,7 +285,7 @@ ERROR: not-a-directory ;
         { "PWD" [ handle-PWD t ] }
         ! { "ABOR" [ ] }
 
-        ! { "SYST" [ drop ] }
+        { "SYST" [ handle-SYST t ] }
         ! { "STAT" [ ] }
         ! { "HELP" [ ] }
 
