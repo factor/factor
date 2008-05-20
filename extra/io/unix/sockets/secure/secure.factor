@@ -125,12 +125,14 @@ M: secure (accept)
     {
         { 1 [ drop f ] }
         { 0 [
-                dup handle>> SSL_want
-                {
-                    { SSL_NOTHING [ dup handle>> SSL_shutdown check-shutdown-response ] }
-                    { SSL_READING [ drop +input+ ] }
-                    { SSL_WRITING [ drop +output+ ] }
-                } case
+            dup handle>> dup f 0 SSL_read 2dup SSL_get_error
+            {
+                { SSL_ERROR_ZERO_RETURN [ 2drop dup handle>> SSL_shutdown check-shutdown-response ] }
+                { SSL_ERROR_WANT_READ [ 3drop +input+ ] }
+                { SSL_ERROR_WANT_WRITE [ 3drop +output+ ] }
+                { SSL_ERROR_SYSCALL [ syscall-error ] }
+                { SSL_ERROR_SSL [ (ssl-error) ] }
+            } case
         ] }
         { -1 [
             handle>> -1 SSL_get_error
