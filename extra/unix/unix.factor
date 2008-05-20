@@ -122,6 +122,7 @@ FUNCTION: void* mmap ( void* addr, size_t len, int prot, int flags, int fd, off_
 FUNCTION: int munmap ( void* addr, size_t len ) ;
 FUNCTION: uint ntohl ( uint n ) ;
 FUNCTION: ushort ntohs ( ushort n ) ;
+FUNCTION: int shutdown ( int fd, int how ) ;
 
 FUNCTION: int open ( char* path, int flags, int prot ) ;
 

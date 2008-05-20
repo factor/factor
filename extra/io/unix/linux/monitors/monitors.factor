@@ -111,7 +111,7 @@ M: linux-monitor dispose* ( monitor -- )
 
 : inotify-read-loop ( port -- )
     dup check-disposed
-    dup wait-to-read
+    dup wait-to-read drop
     0 over buffer>> parse-file-notifications
     0 over buffer>> buffer-reset
     inotify-read-loop ;

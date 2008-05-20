@@ -287,11 +287,8 @@ TUPLE: inet host port ;
 
 C: <inet> inet
 
-: resolve-client-addr ( inet -- seq )
-    [ host>> ] [ port>> ] bi f resolve-host ;
-
 M: inet (client)
-    resolve-client-addr (client) ;
+    [ host>> ] [ port>> ] bi f resolve-host (client) ;
 
 ERROR: invalid-inet-server addrspec ;
 
