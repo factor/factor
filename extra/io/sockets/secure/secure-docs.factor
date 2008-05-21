@@ -1,0 +1,125 @@
+IN: io.sockets.secure
+USING: help.markup help.syntax calendar quotations io.sockets ;
+
+HELP: secure-socket-timeout
+{ $var-description "Timeout for operations not associated with a constructed port instance, such as SSL handshake and shutdown. Represented as a " { $link duration } "." } ;
+
+HELP: SSLv2
+{ $description "Possible value for the " { $snippet "method" } " slot of a " { $link secure-config } "."
+$nl
+"Note that the SSLv2 protocol is vulnerable to truncation attacks and its use is discouraged (" { $url "http://www.gnu.org/software/gnutls/manual/html_node/On-SSL-2-and-older-protocols.html" } ")." } ;
+
+HELP: SSLv3
+{ $description "Possible value for the " { $snippet "method" } " slot of a " { $link secure-config } "."
+$nl
+"SSLv3 is widely used, however it is being supersceded by TLSv1." } ;
+
+HELP: SSLv23
+{ $description "Possible value for the " { $snippet "method" } " slot of a " { $link secure-config } "."
+$nl
+"This value indicates that either SSLv2 or SSLv3 is acceptable." } ;
+
+HELP: TLSv1
+{ $description "Possible value for the " { $snippet "method" } " slot of a " { $link secure-config } "."
+$nl
+"TLSv1 is the newest protocol for secure socket communications." } ;
+
+ARTICLE: "ssl-methods" "SSL/TLS methods"
+"The " { $snippet "method" } " slot of a " { $link secure-config } " can be set to one of the following values:"
+{ $subsection SSLv2 }
+{ $subsection SSLv23 }
+{ $subsection SSLv3 }
+{ $subsection TLSv1 }
+"The default value is " { $link SSLv23 } "." ;
+
+HELP: secure-config
+{ $class-description "Instances represent secure socket configurations." } ;
+
+HELP: <secure-config>
+{ $values { "config" secure-config } }
+{ $description "Creates a new secure socket configration with default values." } ;
+
+ARTICLE: "ssl-key-file" "The key file and password"
+"The " { $snippet "key-file" } " and " { $snippet "password" } " slots of a " { $link secure-config } " can be set to a private key file in PEM format. These slots are required for secure servers, and also for clients when client-side authentication is used." ;
+
+ARTICLE: "ssl-ca-file" "The CA file and path"
+"The " { $snippet "ca-file" } " slot of a " { $link secure-config } " can contain the path of a file with a list of trusted certificates in PEM format. The " { $snippet "ca-path" } " slot can contain the path of a directory of trusted certifications."
+$nl
+"One of these slots are required to be specified so that secure client sockets can verify server certificates."
+$nl
+"See " { $url "http://www.openssl.org/docs/ssl/SSL_CTX_load_verify_locations.html" } " for details." ;
+
+ARTICLE: "ssl-dh-file" "Diffie-Hellman parameter file"
+"The " { $snippet "dh-file" } " slot of a " { $link secure-config } " can contain the path of a file with Diffie-Hellman key exchange parameters."
+$nl
+"This slot is required for secure server sockets." ;
+
+ARTICLE: "ssl-ephemeral-rsa" "Ephemeral RSA key bits"
+"The " { $snippet "ephemeral-key-bits" } " slot of a " { $link secure-config } " contains the length of the empheral RSA key, in bits."
+$nl
+"The default value is 1024, and anything less than that is considered insecure. This slot is required for secure server sockets." ;
+
+ARTICLE: "ssl-config" "Secure socket configuration"
+"Secure sockets require some configuration, particularly for server sockets. A class represents secure socket configuration parameters:"
+{ $subsection secure-config }
+"Creating new instances:"
+{ $subsection <secure-config> }
+"Configuration parameters:"
+{ $subsection "ssl-methods" }
+{ $subsection "ssl-key-file" }
+{ $subsection "ssl-ca-file" }
+{ $subsection "ssl-dh-file" }
+{ $subsection "ssl-ephemeral-rsa" } ;
+
+HELP: <secure-context>
+{ $values { "config" secure-config } { "context" secure-context } }
+{ $description "Creates a new " { $link secure-context } ". This word should not usually be called directly, use " { $link with-secure-context } " instead." } ;
+
+HELP: with-secure-context
+{ $values { "config" secure-config } { "quot" quotation } }
+{ $description "Calls the quotation in a new dynamic scope where a " { $link secure-context } " constructed from the specified configuration is available." } ;
+
+ARTICLE: "ssl-contexts" "Secure socket contexts"
+"All secure socket operations must be performed in a secure socket context. A context is created from a secure socket configuration. An implicit context with the default configuration is always available, however server sockets require a certificate to be set together with other parameters, and the default configuration is insufficient, so a context must be explicitly created in that case."
+{ $subsection with-secure-context } ;
+
+HELP: secure
+{ $class-description "The class of secure socket addresses." } ;
+
+HELP: <secure> ( addrspec -- secure )
+{ $values { "addrspec" "an address specifier" } { "secure" secure } }
+{ $description "Creates a new secure socket address, which can then be passed to " { $link <client> } " or " { $link <server> } "." } ;
+
+ARTICLE: "ssl-addresses" "Secure socket addresses"
+"Secure socket connections are established by passing a secure socket address to " { $link <client> } " or " { $link <server> } "."
+$nl
+"Secure socket addresses form a class:"
+{ $subsection secure }
+"Constructing secure socket addresses:"
+{ $subsection <secure> }
+"Instances of this class can wrap an " { $link inet } ", " { $link inet4 } " or an " { $link inet6 } ", although note that certificate validation is only performed for instances of " { $link inet } " since otherwise the host name is not available." ;
+
+HELP: premature-close
+{ $error-description "Thrown if an SSL connection is closed without the proper " { $snippet "close_notify" } " sequence. This error is never reported for " { $link SSLv2 } " connections because there is no distinction between expected and unexpected connection closure in that case." } ;
+
+HELP: certificate-verify-error
+{ $error-description "Thrown if certificate verification failed. The " { $snippet "result" } " slot contains an object identifying the low-level error that occurred." } ;
+
+HELP: common-name-verify-error
+{ $error-description "Thrown during certificate verification if the host name on the certificate does not match the host name the socket was connected to. This indicates a potential man-in-the-middle attack. The " { $snippet "expected" } " and " { $snippet "got" } " slots contain the mismatched host names." } ;
+
+ARTICLE: "ssl-errors" "Secure socket errors"
+"Secure sockets can throw one of several errors in addition to the usual I/O errors:"
+{ $subsection premature-close }
+{ $subsection certificate-verify-error }
+{ $subsection common-name-verify-error } ;
+
+ARTICLE: "io.sockets.secure" "Secure sockets (SSL, TLS)"
+"The " { $vocab-link "io.sockets.secure" } " vocabulary implements secure, encrypted sockets using the OpenSSL library."
+{ $subsection "ssl-config" }
+{ $subsection "ssl-contexts" }
+{ $subsection "ssl-addresses" }
+{ $subsection "ssl-errors" }
+"This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit (" { $url "http://www.openssl.org/" } "), cryptographic software written by Eric Young (eay@cryptsoft.com) and software written by Tim Hudson (tjh@cryptsoft.com)." ;
+
+ABOUT: "io.sockets.secure"
