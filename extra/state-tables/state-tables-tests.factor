@@ -1,5 +1,5 @@
-USING: kernel tables tools.test ;
-IN: tables.tests
+USING: kernel state-tables tools.test ;
+IN: state-tables.tests
 
 : test-table
     <table>
@@ -11,12 +11,17 @@ IN: tables.tests
     "b" "s" "u" <entry> over set-entry ;
 
 [
-    T{ table f
-    H{ 
-        { "a" H{ { "l" "x" } { "c" "z" } { "o" "y" } } }
-        { "b" H{ { "l" "x" } { "s" "u" } { "o" "y" } } }
+    T{
+        table
+        f
+        H{ 
+            { "a" H{ { "l" "x" } { "c" "z" } { "o" "y" } } }
+            { "b" H{ { "l" "x" } { "s" "u" } { "o" "y" } } }
+        }
+        H{ { "l" t } { "s" t } { "c" t } { "o" t } }
+        f
+        H{ }
     }
-    H{ { "l" t } { "s" t } { "c" t } { "o" t } } }
 ] [ test-table ] unit-test
 
 [ "x" t ] [ "a" "l" test-table get-entry ] unit-test
@@ -27,13 +32,13 @@ IN: tables.tests
 
 : vector-test-table
     <vector-table>
-    "a" "c" "z" <entry> over add-value
-    "a" "c" "r" <entry> over add-value
-    "a" "o" "y" <entry> over add-value
-    "a" "l" "x" <entry> over add-value
-    "b" "o" "y" <entry> over add-value
-    "b" "l" "x" <entry> over add-value
-    "b" "s" "u" <entry> over add-value ;
+    "a" "c" "z" <entry> over add-entry
+    "a" "c" "r" <entry> over add-entry
+    "a" "o" "y" <entry> over add-entry
+    "a" "l" "x" <entry> over add-entry
+    "b" "o" "y" <entry> over add-entry
+    "b" "l" "x" <entry> over add-entry
+    "b" "s" "u" <entry> over add-entry ;
 
 [
 T{ vector-table f
@@ -44,6 +49,8 @@ T{ vector-table f
             H{ { "l" "x" } { "s" "u" } { "o" "y" } } }
     }
     H{ { "l" t } { "s" t } { "c" t } { "o" t } }
+    f
+    H{ }
 }
 ] [ vector-test-table ] unit-test
 
