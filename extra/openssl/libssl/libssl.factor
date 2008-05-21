@@ -10,11 +10,12 @@ assocs parser sequences words quotations ;
 
 IN: openssl.libssl
 
-<< "libssl" {
-    { [ os winnt? ]  [ "ssleay32.dll" "cdecl" ] }
-    { [ os macosx? ] [ "libssl.dylib" "cdecl" ] }
-    { [ os unix? ]   [ "libssl.so" "cdecl" ] }
-} cond add-library >>
+<< {
+    { [ os openbsd? ] [ ] } ! VM is linked with it
+    { [ os winnt? ] [ "libssl" "ssleay32.dll" "cdecl" add-library ] }
+    { [ os macosx? ] [ "libssl" "libssl.dylib" "cdecl" add-library ] }
+    { [ os unix? ] [ "libssl" "libssl.so" "cdecl" add-library ] }
+} cond >>
 
 : X509_FILETYPE_PEM       1 ; inline
 : X509_FILETYPE_ASN1      2 ; inline
