@@ -15,8 +15,7 @@ SYMBOL: runtime-epsilon
 
 TUPLE: regexp raw parentheses-count bracket-count
 state stack nfa new-states dfa minimized-dfa
-dot-matches-newlines? character-sets capture-group
-captured-groups ;
+dot-matches-newlines? capture-group captured-groups ;
 
 TUPLE: capture-group n range ;
 
@@ -336,11 +335,26 @@ ERROR: bad-hex number ;
         [ dup digit? [ parse-backreference ] [ make-nontoken-nfa ] if ]
     } case ;
 
-: make-character-set ( regexp -- )
+: handle-dash ( vector -- vector )
+    [ dup dash eq? [ drop CHAR: - ] when ] map ;
+
+ERROR: unmatched-negated-character-class class ;
+
+: handle-caret ( vector -- vector ? )
+    dup [ length 2 >= ] [ first caret eq? ] bi and [ 
+        rest t
+    ] [
+        f
+    ] if ;
+
+: make-character-class ( regexp -- )
     left-bracket over stack>> cut-stack
     pick (>>stack)
-    [ dup number? [ '[ dup , = ] ] when ] map
-    [ [ drop t ] 2array ] map [ drop f ] suffix [ cond ] curry
+    handle-dash
+    handle-caret
+    >r [ dup number? [ '[ dup , = ] ] when ] map
+    [ [ drop t ] 2array ] map [ drop f ] suffix [ cond ] curry r>
+    [ [ not ] compose ] when
     make-nontoken-nfa ;
 
 : apply-dash ( regexp -- )
@@ -351,18 +365,18 @@ ERROR: bad-hex number ;
     stack>> dup length 3 >=
     [ [ length 2 - ] keep nth dash eq? ] [ drop f ] if ;
 
-DEFER: parse-character-set
-: (parse-character-set) ( regexp -- )
+DEFER: parse-character-class
+: (parse-character-class) ( regexp -- )
     [
         next get-char
         {
             { CHAR: [ [
                 [ 1+ ] change-bracket-count left-bracket push-stack
-                parse-character-set
+                parse-character-class
             ] }
             { CHAR: ] [
                 [ 1- ] change-bracket-count
-                make-character-set
+                make-character-class
             ] }
             { CHAR: - [ dash push-stack ] }
             ! { CHAR: & [ ampersand push-stack ] }
@@ -373,20 +387,30 @@ DEFER: parse-character-set
         } case
     ] [
         dup bracket-count>> 0 >
-        [ (parse-character-set) ] [ drop ] if
+        [ (parse-character-class) ] [ drop ] if
     ] bi ;
 
-: parse-character-set-first ( regexp -- )
+: parse-character-class-second ( regexp -- )
     get-next
     {
-        { CHAR: ^ [ caret push-stack next ] }
-        { CHAR: [ [ CHAR: [ make-nontoken-nfa next ] }
-        { CHAR: ] [ CHAR: ] make-nontoken-nfa next ] }
+        ! { CHAR: [ [ CHAR: [ push-stack next ] }
+        { CHAR: ] [ CHAR: ] push-stack next ] }
+        { CHAR: - [ CHAR: - push-stack next ] }
         [ 2drop ]
     } case ;
 
-: parse-character-set ( regexp -- )
-    [ parse-character-set-first ] [ (parse-character-set) ] bi ;
+: parse-character-class-first ( regexp -- )
+    get-next
+    {
+        { CHAR: ^ [ caret dupd push-stack next parse-character-class-second ] }
+        ! { CHAR: [ [ CHAR: [ push-stack next ] }
+        { CHAR: ] [ CHAR: ] push-stack next ] }
+        { CHAR: - [ CHAR: - push-stack next ] }
+        [ 2drop ]
+    } case ;
+
+: parse-character-class ( regexp -- )
+    [ parse-character-class-first ] [ (parse-character-class) ] bi ;
 
 ERROR: unsupported-token token ;
 : parse-token ( regexp token -- )
@@ -404,7 +428,7 @@ ERROR: unsupported-token token ;
         { CHAR: [ [
             drop
             dup left-bracket push-stack
-            [ 1+ ] change-bracket-count parse-character-set
+            [ 1+ ] change-bracket-count parse-character-class
         ] }
         ! { CHAR: } [ drop drop "brace" ] }
         ! { CHAR: ? [ drop ] }
@@ -517,7 +541,6 @@ ERROR: unsupported-token token ;
         0 >>bracket-count
         -1 >>state
         V{ } clone >>stack 
-        V{ } clone >>character-sets
         <vector-table> >>nfa
         dup [ parse-raw-regexp ] [ subset-construction ] bi ;
 
