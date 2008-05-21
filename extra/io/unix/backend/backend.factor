@@ -8,7 +8,6 @@ io.encodings.utf8 destructors accessors inspector combinators ;
 QUALIFIED: io
 IN: io.unix.backend
 
-! I/O tasks
 GENERIC: handle-fd ( handle -- fd )
 
 TUPLE: fd fd disposed ;
@@ -18,10 +17,12 @@ TUPLE: fd fd disposed ;
     #! since on OS X 10.3, this operation fails from init-io
     #! when running the Factor.app (presumably because fd 0 and
     #! 1 are closed).
-    [ F_SETFL O_NONBLOCK fcntl drop ]
-    [ F_SETFD FD_CLOEXEC fcntl drop ]
-    [ f fd boa ]
-    tri ;
+    fd new
+        swap
+        [ F_SETFL O_NONBLOCK fcntl drop ]
+        [ F_SETFD FD_CLOEXEC fcntl drop ]
+        [ >>fd ]
+        tri ;
 
 M: fd dispose*
     [ cancel-operation ] [ fd>> close-file ] bi ;
@@ -98,15 +99,6 @@ M: io-timeout summary drop "I/O operation timed out" ;
 
 ! Some general stuff
 : file-mode OCT: 0666 ;
-
-: (io-error) ( -- * ) err_no strerror throw ;
-
-: check-errno ( -- )
-    err_no dup zero? [ drop ] [ strerror throw ] if ;
-
-: check-null ( n -- ) zero? [ (io-error) ] when ;
-
-: io-error ( n -- ) 0 < [ (io-error) ] when ;
  
 ! Readers
 : (refill) ( port -- n )

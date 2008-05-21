@@ -161,6 +161,11 @@ GENERIC: (get-remote-address) ( handle remote -- sockaddr )
 : get-remote-address ( handle local -- remote )
     [ (get-remote-address) ] keep parse-sockaddr ;
 
+: <ports> ( handle -- input-port output-port )
+    [
+        [ <input-port> |dispose ] [ <output-port> |dispose ] bi
+    ] with-destructors ;
+
 GENERIC: establish-connection ( client-out remote -- )
 
 GENERIC: ((client)) ( remote -- handle )
@@ -173,7 +178,7 @@ M: object (client) ( remote -- client-in client-out local )
     [
         [ ((client)) ] keep
         [
-            >r dup <ports> [ |dispose ] bi@ dup r>
+            >r <ports> [ |dispose ] bi@ dup r>
             establish-connection
         ]
         [ get-local-address ]
@@ -210,7 +215,7 @@ GENERIC: (accept) ( server addrspec -- handle sockaddr )
         dup addr>>
         [ (accept) ] keep
         parse-sockaddr swap
-        dup <ports>
+        <ports>
     ] keep encoding>> <encoder-duplex> swap ;
 
 TUPLE: datagram-port < port addr ;

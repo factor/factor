@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors byte-arrays kernel debugger sequences namespaces math
+USING: accessors unix byte-arrays kernel debugger sequences namespaces math
 math.order combinators init alien alien.c-types alien.strings libc
 continuations destructors
 openssl openssl.libcrypto openssl.libssl
@@ -15,7 +15,7 @@ M: ssl-handle handle-fd file>> handle-fd ;
     ERR_get_error dup zero? [
         drop
         {
-            { -1 [ (io-error) ] }
+            { -1 [ err_no ECONNRESET = [ premature-close ] [ (io-error) ] if ] }
             { 0 [ premature-close ] }
         } case
     ] [
@@ -157,5 +157,7 @@ M: secure (accept)
     dup dup handle>> SSL_shutdown check-shutdown-response
     dup [ dupd wait-for-fd (shutdown) ] [ 2drop ] if ;
 
-M: ssl-handle shutdown USE: io.streams.c
-    dup connected>> [ f >>connected (shutdown) ] [ drop ] if ;
+M: ssl-handle shutdown
+    dup connected>> [
+        f >>connected [ (shutdown) ] with-timeout
+    ] [ drop ] if ;

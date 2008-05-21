@@ -159,11 +159,22 @@ ERROR: no-secure-context ;
 M: no-secure-context summary
     drop "Secure socket operations must be wrapped in calls to with-secure-context" ;
 
-: current-ssl-context ( -- ctx )
-    secure-context get [ no-secure-context ] unless* ;
+SYMBOL: default-secure-context
+
+: context-expired? ( context -- ? )
+    dup [ handle>> expired? ] [ drop t ] if ;
+
+: current-secure-context ( -- ctx )
+    secure-context get [
+        default-secure-context get dup context-expired? [
+            drop
+            <secure-config> <secure-context> default-secure-context set-global
+            current-secure-context
+        ] when
+    ] unless* ;
 
 : <ssl-handle> ( fd -- ssl )
-    current-ssl-context handle>> SSL_new dup ssl-error
+    current-secure-context handle>> SSL_new dup ssl-error
     f f ssl-handle boa ;
 
 M: ssl-handle dispose*

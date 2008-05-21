@@ -115,7 +115,7 @@ M: output-port dispose*
     [
         [ handle>> &dispose drop ]
         [ port-flush ]
-        [ [ handle>> shutdown ] with-timeout ]
+        [ handle>> shutdown ]
         tri
     ] with-destructors ;
 
@@ -129,12 +129,6 @@ M: port cancel-operation handle>> cancel-operation ;
 M: port dispose*
     [
         [ handle>> &dispose drop ]
-        [ [ handle>> shutdown ] with-timeout ]
+        [ handle>> shutdown ]
         bi
-    ] with-destructors ;
-
-: <ports> ( read-handle write-handle -- input-port output-port )
-    [
-        [ <input-port> |dispose ]
-        [ <output-port> |dispose ] bi*
     ] with-destructors ;

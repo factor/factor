@@ -118,10 +118,12 @@ concurrency.promises byte-arrays locals calendar io.timeouts ;
 ] unit-test
 
 [
-    <secure-config> [
-        "127.0.0.1" "port" get ?promise <inet4> <secure>
-        ascii <client> drop 1 seconds over set-timeout dispose
-    ] with-secure-context
+    1 seconds secure-socket-timeout [
+        <secure-config> [
+            "127.0.0.1" "port" get ?promise <inet4> <secure>
+            ascii <client> drop dispose
+        ] with-secure-context
+    ] with-variable
 ] [ io-timeout? ] must-fail-with
 
 ! Server socket shutdown timeout
@@ -137,10 +139,12 @@ concurrency.promises byte-arrays locals calendar io.timeouts ;
 ] unit-test
 
 [
-    [
-        "127.0.0.1" 0 <inet4> <secure> ascii <server> [
-            dup addr>> addrspec>> port>> "port" get fulfill
-            accept drop 1 seconds over set-timeout dispose
-        ] with-disposal
-    ] with-test-context
+    1 seconds secure-socket-timeout [
+        [
+            "127.0.0.1" 0 <inet4> <secure> ascii <server> [
+                dup addr>> addrspec>> port>> "port" get fulfill
+                accept drop dispose
+            ] with-disposal
+        ] with-test-context
+    ] with-variable
 ] [ io-timeout? ] must-fail-with
