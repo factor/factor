@@ -11,17 +11,18 @@ M: decoder set-timeout stream>> set-timeout ;
 
 M: encoder set-timeout stream>> set-timeout ;
 
-GENERIC: timed-out ( obj -- )
+GENERIC: cancel-operation ( obj -- )
 
 : queue-timeout ( obj timeout -- alarm )
-    >r [ timed-out ] curry r> later ;
+    >r [ cancel-operation ] curry r> later ;
+
+: with-timeout* ( obj timeout quot -- )
+    3dup drop queue-timeout >r nip call r> cancel-alarm ;
+    inline
 
 : with-timeout ( obj quot -- )
-    over dup timeout dup [
-        queue-timeout slip cancel-alarm
-    ] [
-        2drop call
-    ] if ; inline
+    over timeout [ >r dup timeout r> with-timeout* ] [ call ] if ;
+    inline
 
 : timeouts ( dt -- )
     [ input-stream get set-timeout ]

@@ -24,7 +24,7 @@ TUPLE: fd fd disposed ;
     tri ;
 
 M: fd dispose*
-    [ cancel-io ] [ fd>> close-file ] bi ;
+    [ cancel-operation ] [ fd>> close-file ] bi ;
 
 M: fd handle-fd dup check-disposed fd>> ;
 
@@ -63,7 +63,7 @@ GENERIC: wait-for-events ( ms mx -- )
 : output-available ( fd mx -- )
     remove-output-callbacks [ resume ] each ;
 
-M: fd cancel-io ( fd -- )
+M: fd cancel-operation ( fd -- )
     dup disposed>> [ drop ] [
         fd>>
         mx get-global
@@ -76,8 +76,12 @@ SYMBOL: +retry+ ! just try the operation again without blocking
 SYMBOL: +input+
 SYMBOL: +output+
 
-: wait-for-fd ( handle event -- timeout? )
-    dup +retry+ eq? [ 2drop f ] [
+ERROR: io-timeout ;
+
+M: io-timeout summary drop "I/O operation timed out" ;
+
+: wait-for-fd ( handle event -- )
+    dup +retry+ eq? [ 2drop ] [
         [
             >r
             swap handle-fd
@@ -86,18 +90,11 @@ SYMBOL: +output+
                 { +input+ [ add-input-callback ] }
                 { +output+ [ add-output-callback ] }
             } case
-        ] curry "I/O" suspend nip
+        ] curry "I/O" suspend nip [ io-timeout ] when
     ] if ;
 
-ERROR: io-timeout ;
-
-M: io-timeout summary drop "I/O operation timed out" ;
-
 : wait-for-port ( port event -- )
-    [
-        >r handle>> r> wait-for-fd
-        [ io-timeout ] when
-    ] curry with-timeout ;
+    [ >r handle>> r> wait-for-fd ] curry with-timeout ;
 
 ! Some general stuff
 : file-mode OCT: 0666 ;

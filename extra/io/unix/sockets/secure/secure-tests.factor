@@ -1,8 +1,8 @@
 IN: io.sockets.secure.tests
 USING: accessors kernel namespaces io io.sockets
 io.sockets.secure io.encodings.ascii io.streams.duplex
-classes words destructors threads tools.test
-concurrency.promises byte-arrays locals ;
+io.unix.backend classes words destructors threads tools.test
+concurrency.promises byte-arrays locals calendar io.timeouts ;
 
 \ <secure-config> must-infer
 { 1 0 } [ [ ] with-secure-context ] must-infer-as
@@ -63,3 +63,84 @@ concurrency.promises byte-arrays locals ;
         <client> drop dispose
     ] with-secure-context
 ] [ certificate-verify-error? ] must-fail-with
+
+! Client-side handshake timeout
+[ ] [ <promise> "port" set ] unit-test
+
+[ ] [
+    [
+        "127.0.0.1" 0 <inet4> ascii <server> [
+            dup addr>> port>> "port" get fulfill
+            accept drop 1 minutes sleep dispose
+        ] with-disposal
+    ] "Silly server" spawn drop
+] unit-test
+
+[
+    1 seconds secure-socket-timeout [
+        client-test
+    ] with-variable
+] [ io-timeout? ] must-fail-with
+
+! Server-side handshake timeout
+[ ] [ <promise> "port" set ] unit-test
+
+[ ] [
+    [
+        "127.0.0.1" "port" get ?promise
+        <inet4> ascii <client> drop 1 minutes sleep dispose
+    ] "Silly client" spawn drop
+] unit-test
+
+[
+    1 seconds secure-socket-timeout [
+        [
+            "127.0.0.1" 0 <inet4> <secure> ascii <server> [
+                dup addr>> addrspec>> port>> "port" get fulfill
+                accept drop dispose
+            ] with-disposal
+        ] with-test-context
+    ] with-variable
+] [ io-timeout? ] must-fail-with
+
+! Client socket shutdown timeout
+[ ] [ <promise> "port" set ] unit-test
+
+[ ] [
+    [
+        [
+            "127.0.0.1" 0 <inet4> <secure> ascii <server> [
+                dup addr>> addrspec>> port>> "port" get fulfill
+                accept drop 1 minutes sleep dispose
+            ] with-disposal
+        ] with-test-context
+    ] "Silly server" spawn drop
+] unit-test
+
+[
+    <secure-config> [
+        "127.0.0.1" "port" get ?promise <inet4> <secure>
+        ascii <client> drop 1 seconds over set-timeout dispose
+    ] with-secure-context
+] [ io-timeout? ] must-fail-with
+
+! Server socket shutdown timeout
+[ ] [ <promise> "port" set ] unit-test
+
+[ ] [
+    [
+        [
+            "127.0.0.1" "port" get ?promise
+            <inet4> <secure> ascii <client> drop 1 minutes sleep dispose
+        ] with-test-context
+    ] "Silly client" spawn drop
+] unit-test
+
+[
+    [
+        "127.0.0.1" 0 <inet4> <secure> ascii <server> [
+            dup addr>> addrspec>> port>> "port" get fulfill
+            accept drop 1 seconds over set-timeout dispose
+        ] with-disposal
+    ] with-test-context
+] [ io-timeout? ] must-fail-with

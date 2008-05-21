@@ -147,7 +147,7 @@ M: process timeout timeout>> ;
 
 M: process set-timeout set-process-timeout ;
 
-M: process timed-out kill-process ;
+M: process cancel-operation kill-process ;
 
 M: object run-pipeline-element
     [ >process swap >>stdout swap >>stdin run-detached ]
