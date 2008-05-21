@@ -96,7 +96,7 @@ IN: regexp4-tests
 [ t ] [ "]" "[]]" <regexp> matches? ] unit-test
 [ f ] [ "]" "[^]]" <regexp> matches? ] unit-test
 
-! [ "^" "[^]" <regexp> matches? ] must-fail
+[ "^" "[^]" <regexp> matches? ] must-fail
 [ t ] [ "^" "[]^]" <regexp> matches? ] unit-test
 [ t ] [ "]" "[]^]" <regexp> matches? ] unit-test
 
