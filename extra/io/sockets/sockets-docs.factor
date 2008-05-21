@@ -27,7 +27,8 @@ $nl
     { { $link inet4 } " - a TCP/IP connection to an IPv4 address and port number; no name lookup is performed" }
     { { $link inet6 } " - a TCP/IP connection to an IPv6 address and port number; no name lookup is performed" }
 }
-"The " { $vocab-link "io.server" } " library defines a nice high-level wrapper around " { $link <server> } " which makes it easy to listen for IPv4 and IPv6 connections simultaneously, perform logging, and optionally only allow connections from the loopback interface." ;
+"The " { $vocab-link "io.server" } " library defines a nice high-level wrapper around " { $link <server> } " which makes it easy to listen for IPv4 and IPv6 connections simultaneously, perform logging, and optionally only allow connections from the loopback interface."
+{ $see-also "io.sockets.secure" } ;
 
 ARTICLE: "network-packet" "Packet-oriented networking"
 "A packet-oriented socket can be opened with this word:"
@@ -49,11 +50,13 @@ ARTICLE: "network-streams" "Networking"
 "Factor supports connection-oriented and packet-oriented communication over a variety of protocols:"
 { $list
     "TCP/IP and UDP/IP, over IPv4 and IPv6"
-    "Unix domain sockets"
+    "Unix domain sockets (Unix only)"
 }
 { $subsection "network-addressing" }
 { $subsection "network-connection" }
-{ $subsection "network-packet" } ;
+{ $subsection "network-packet" }
+{ $subsection "io.sockets.secure" }
+{ $see-also "io.pipes" } ;
 
 ABOUT: "network-streams"
 

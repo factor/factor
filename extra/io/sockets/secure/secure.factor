@@ -22,7 +22,7 @@ ephemeral-key-bits ;
 : <secure-config> ( -- config )
     secure-config new
         SSLv23 >>method
-        512 >>ephemeral-key-bits ;
+        1024 >>ephemeral-key-bits ;
 
 TUPLE: secure-context config handle disposed ;
 
