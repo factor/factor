@@ -9,7 +9,7 @@ quotations math opengl combinators math.vectors
 sorting splitting io.streams.nested assocs
 ui.gadgets.presentations ui.gadgets.slots ui.gadgets.grids
 ui.gadgets.grid-lines classes.tuple models continuations
-destructors ;
+destructors accessors ;
 IN: ui.gadgets.panes
 
 TUPLE: pane output current prototype scrolls?
@@ -113,6 +113,9 @@ GENERIC: write-gadget ( gadget stream -- )
 
 M: pane-stream write-gadget
     pane-stream-pane pane-current add-gadget ;
+
+M: style-stream write-gadget
+    stream>> write-gadget ;
 
 : print-gadget ( gadget stream -- )
     tuck write-gadget stream-nl ;

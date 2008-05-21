@@ -1,6 +1,7 @@
 USING: io io.pipes io.streams.string io.encodings.utf8
 io.streams.duplex io.encodings io.timeouts namespaces
-continuations tools.test kernel calendar destructors ;
+continuations tools.test kernel calendar destructors
+accessors debugger math ;
 IN: io.pipes.tests
 
 [ "Hello" ] [
@@ -31,3 +32,13 @@ IN: io.pipes.tests
         stream-readln
     ] with-disposal
 ] must-fail
+
+[ ] [
+    1000 [
+        utf8 <pipe> [
+            [ in>> dispose ]
+            [ out>> "hi" over stream-write dispose ]
+            bi
+        ] curry ignore-errors
+    ] times
+] unit-test

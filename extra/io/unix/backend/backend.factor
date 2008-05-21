@@ -8,7 +8,6 @@ io.encodings.utf8 destructors accessors inspector combinators ;
 QUALIFIED: io
 IN: io.unix.backend
 
-! I/O tasks
 GENERIC: handle-fd ( handle -- fd )
 
 TUPLE: fd fd disposed ;
@@ -18,14 +17,17 @@ TUPLE: fd fd disposed ;
     #! since on OS X 10.3, this operation fails from init-io
     #! when running the Factor.app (presumably because fd 0 and
     #! 1 are closed).
-    [ F_SETFL O_NONBLOCK fcntl drop ]
-    [ F_SETFD FD_CLOEXEC fcntl drop ]
-    [ f fd boa ]
-    tri ;
+    fd new
+        swap
+        [ F_SETFL O_NONBLOCK fcntl drop ]
+        [ F_SETFD FD_CLOEXEC fcntl drop ]
+        [ >>fd ]
+        tri ;
 
-M: fd dispose* fd>> close-file ;
+M: fd dispose*
+    [ cancel-operation ] [ fd>> close-file ] bi ;
 
-M: fd handle-fd fd>> ;
+M: fd handle-fd dup check-disposed fd>> ;
 
 ! I/O multiplexers
 TUPLE: mx fd reads writes ;
@@ -62,18 +64,25 @@ GENERIC: wait-for-events ( ms mx -- )
 : output-available ( fd mx -- )
     remove-output-callbacks [ resume ] each ;
 
-M: unix cancel-io ( port -- )
-    handle>> handle-fd mx get-global
-    [ remove-input-callbacks [ t swap resume-with ] each ]
-    [ remove-output-callbacks [ t swap resume-with ] each ]
-    2bi ;
+M: fd cancel-operation ( fd -- )
+    dup disposed>> [ drop ] [
+        fd>>
+        mx get-global
+        [ remove-input-callbacks [ t swap resume-with ] each ]
+        [ remove-output-callbacks [ t swap resume-with ] each ]
+        2bi
+    ] if ;
 
 SYMBOL: +retry+ ! just try the operation again without blocking
 SYMBOL: +input+
 SYMBOL: +output+
 
-: wait-for-fd ( handle event -- timeout? )
-    dup +retry+ eq? [ 2drop f ] [
+ERROR: io-timeout ;
+
+M: io-timeout summary drop "I/O operation timed out" ;
+
+: wait-for-fd ( handle event -- )
+    dup +retry+ eq? [ 2drop ] [
         [
             >r
             swap handle-fd
@@ -82,30 +91,14 @@ SYMBOL: +output+
                 { +input+ [ add-input-callback ] }
                 { +output+ [ add-output-callback ] }
             } case
-        ] curry "I/O" suspend nip
+        ] curry "I/O" suspend nip [ io-timeout ] when
     ] if ;
 
-ERROR: io-timeout ;
-
-M: io-timeout summary drop "I/O operation timed out" ;
-
 : wait-for-port ( port event -- )
-    [
-        >r handle>> r> wait-for-fd
-        [ io-timeout ] when
-    ] curry with-timeout ;
+    [ >r handle>> r> wait-for-fd ] curry with-timeout ;
 
 ! Some general stuff
 : file-mode OCT: 0666 ;
-
-: (io-error) ( -- * ) err_no strerror throw ;
-
-: check-errno ( -- )
-    err_no dup zero? [ drop ] [ strerror throw ] if ;
-
-: check-null ( n -- ) zero? [ (io-error) ] when ;
-
-: io-error ( n -- ) 0 < [ (io-error) ] when ;
  
 ! Readers
 : (refill) ( port -- n )

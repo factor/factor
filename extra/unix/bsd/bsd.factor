@@ -48,10 +48,6 @@ C-STRUCT: sockaddr-un
 
 : max-un-path 104 ; inline
 
-: EINTR HEX: 4 ; inline
-: EAGAIN HEX: 23 ; inline
-: EINPROGRESS HEX: 24 ; inline
-
 : SOCK_STREAM 1 ; inline
 : SOCK_DGRAM 2 ; inline
 

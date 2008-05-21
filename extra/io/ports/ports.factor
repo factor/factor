@@ -100,6 +100,10 @@ M: output-port stream-write
 
 HOOK: (wait-to-write) io-backend ( port -- )
 
+GENERIC: shutdown ( handle -- )
+
+M: object shutdown drop ;
+
 : port-flush ( port -- )
     dup buffer>> buffer-empty?
     [ drop ] [ dup (wait-to-write) port-flush ] if ;
@@ -108,21 +112,23 @@ M: output-port stream-flush ( port -- )
     [ check-disposed ] [ port-flush ] bi ;
 
 M: output-port dispose*
-    [ port-flush ] [ call-next-method ] bi ;
+    [
+        [ handle>> &dispose drop ]
+        [ port-flush ]
+        [ handle>> shutdown ]
+        tri
+    ] with-destructors ;
 
 M: buffered-port dispose*
     [ call-next-method ]
     [ [ [ buffer-free ] when* f ] change-buffer drop ]
     bi ;
 
-HOOK: cancel-io io-backend ( port -- )
+M: port cancel-operation handle>> cancel-operation ;
 
-M: port timed-out cancel-io ;
-
-M: port dispose* [ cancel-io ] [ handle>> dispose ] bi ;
-
-: <ports> ( read-handle write-handle -- input-port output-port )
+M: port dispose*
     [
-        [ <input-port> |dispose ]
-        [ <output-port> |dispose ] bi*
+        [ handle>> &dispose drop ]
+        [ handle>> shutdown ]
+        bi
     ] with-destructors ;

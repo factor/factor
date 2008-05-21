@@ -5,7 +5,7 @@ USING: alien alien.c-types alien.syntax kernel libc structs sequences
        continuations byte-arrays strings
        math namespaces system combinators vocabs.loader qualified
        accessors inference macros locals shuffle arrays.lib 
-       unix.types ;
+       unix.types debugger io prettyprint ;
 
 IN: unix
 
@@ -23,9 +23,6 @@ TYPEDEF: uint socklen_t
 
 : MAP_FAILED -1 <alien> ; inline
 
-: ESRCH 3 ; inline
-: EEXIST 17 ; inline
-
 : NGROUPS_MAX 16 ; inline
 
 C-STRUCT: group
@@ -34,19 +31,6 @@ C-STRUCT: group
     { "int" "gr_gid" }
     { "char**" "gr_mem" } ;
 
-C-STRUCT: passwd
-    { "char*"  "pw_name" }
-    { "char*"  "pw_passwd" }
-    { "uid_t"  "pw_uid" }
-    { "gid_t"  "pw_gid" }
-    { "time_t" "pw_change" }
-    { "char*"  "pw_class" }
-    { "char*"  "pw_gecos" }
-    { "char*"  "pw_dir" }
-    { "char*"  "pw_shell" }
-    { "time_t" "pw_expire" }
-    { "int"    "pw_fields" } ;
-
 LIBRARY: factor
 
 FUNCTION: void clear_err_no ( ) ;
@@ -54,9 +38,29 @@ FUNCTION: int err_no ( ) ;
 
 LIBRARY: libc
 
-ERROR: unix-system-call-error args message word ;
-
 FUNCTION: char* strerror ( int errno ) ;
+
+ERROR: unix-error errno message ;
+
+M: unix-error error.
+    "Unix system call failed:" print
+    nl
+    dup message>> write " (" write errno>> pprint ")" print ;
+
+: (io-error) ( -- * ) err_no dup strerror unix-error ;
+
+: io-error ( n -- ) 0 < [ (io-error) ] when ;
+
+ERROR: unix-system-call-error args errno message word ;
+
+M: unix-system-call-error error.
+    "Unix system call ``" write dup word>> pprint "'' failed:" print
+    nl
+    dup message>> write " (" write dup errno>> pprint ")" print
+    nl
+    "It was called with the following arguments:" print
+    nl
+    args>> stack. ;
 
 MACRO:: unix-system-call ( quot -- )
     [let | n [ quot infer in>> ]
@@ -65,7 +69,7 @@ MACRO:: unix-system-call ( quot -- )
             n ndup quot call dup 0 < [
                 drop
                 n narray
-                err_no strerror
+                err_no dup strerror
                 word unix-system-call-error
             ] [
                 n nnip

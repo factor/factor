@@ -107,9 +107,14 @@ ERROR: type-error type ;
     drop
     215 "UNIX Type: L8" server-response ;
 
+: if-command-promise ( quot -- )
+    >r client get command-promise>> r>
+    [ "Establish an active or passive connection first" ftp-error ] if* ;
+
 : handle-STOR ( obj -- )
     [
-        drop
+        tokenized>> second
+        [ >r <ftp-put> r> fulfill ] if-command-promise
     ] [
         2drop
     ] recover ;
@@ -122,7 +127,7 @@ ERROR: type-error type ;
     150 "Here comes the directory listing." server-response ;
 
 : finish-directory ( -- )
-    226 "Directory send OK." server-response ;
+    226 "Opening " server-response ;
 
 GENERIC: service-command ( stream obj -- )
 
@@ -135,21 +140,25 @@ M: ftp-list service-command ( stream obj -- )
     ] with-output-stream
     finish-directory ;
 
-: start-file-transfer ( path -- )
+: transfer-outgoing-file ( path -- )
     150 "Opening BINARY mode data connection for "
     rot   
     [ file-name ] [
         " " swap  file-info file-info-size number>string
         "(" " bytes)." swapd 3append append
     ] bi 3append server-response ;
-    
+
+: transfer-incoming-file ( path -- )
+    150 "Opening BINARY mode data connection for " rot append
+    server-response ;
+
 : finish-file-transfer ( -- )
     226 "File send OK." server-response ;
 
 M: ftp-get service-command ( stream obj -- )
     [
         path>>
-        [ start-file-transfer ]
+        [ transfer-outgoing-file ]
         [ binary <file-reader> swap stream-copy ] bi
         finish-file-transfer
     ] [
@@ -159,8 +168,8 @@ M: ftp-get service-command ( stream obj -- )
 M: ftp-put service-command ( stream obj -- )
     [
         path>>
-        [ start-file-transfer ]
-        [ binary <file-reader> swap stream-copy ] bi
+        [ transfer-incoming-file ]
+        [ binary <file-writer> stream-copy ] bi
         finish-file-transfer
     ] [
         3drop "File transfer failed" ftp-error
@@ -177,16 +186,12 @@ M: ftp-put service-command ( stream obj -- )
             service-command
         ]
         [ client get f >>command-promise drop ]
-        [ ] cleanup
+        [ drop ] cleanup
     ] with-destructors ;
-
-: if-command-promise ( quot -- )
-    >r client get command-promise>> r>
-    [ "Establish an active or passive connection first" ftp-error ] if* ;
 
 : handle-LIST ( obj -- )
     drop
-    [ <ftp-list> swap fulfill ] if-command-promise ;
+    [ >r <ftp-list> r> fulfill ] if-command-promise ;
 
 : handle-SIZE ( obj -- )
     [
@@ -262,7 +267,7 @@ ERROR: not-a-directory ;
         ! { "REIN" [ drop client get reset-ftp-client t ] }
         { "QUIT" [ handle-QUIT f ] }
 
-        ! { "PORT" [ ] }
+        ! { "PORT" [  ] } ! TODO
         { "PASV" [ handle-PASV t ] }
         ! { "MODE" [ ] }
         { "TYPE" [ handle-TYPE t ] }
@@ -270,7 +275,7 @@ ERROR: not-a-directory ;
 
         ! { "ALLO" [ ] }
         ! { "REST" [ ] }
-        ! { "STOR" [ handle-STOR t ] }
+        { "STOR" [ handle-STOR t ] }
         ! { "STOU" [ ] }
         { "RETR" [ handle-RETR t ] }
         { "LIST" [ handle-LIST t ] }
@@ -279,9 +284,10 @@ ERROR: not-a-directory ;
         ! { "APPE" [ ] }
         ! { "RNFR" [ ] }
         ! { "RNTO" [ ] }
-        ! { "DELE" [ ] }
-        ! { "RMD" [ ] }
-        ! { "MKD" [ ] }
+        ! { "DELE" [ handle-DELE t ] }
+        ! { "RMD" [ handle-RMD t ] }
+        ! ! { "XRMD" [ handle-XRMD t ] }
+        ! { "MKD" [ handle-MKD t ] }
         { "PWD" [ handle-PWD t ] }
         ! { "ABOR" [ ] }
 
