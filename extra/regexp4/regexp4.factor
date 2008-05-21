@@ -393,7 +393,9 @@ DEFER: parse-character-class
 : parse-character-class-second ( regexp -- )
     get-next
     {
+        ! { CHAR: [ [ CHAR: [ push-stack next ] }
         { CHAR: ] [ CHAR: ] push-stack next ] }
+        { CHAR: - [ CHAR: - push-stack next ] }
         [ 2drop ]
     } case ;
 
@@ -401,8 +403,9 @@ DEFER: parse-character-class
     get-next
     {
         { CHAR: ^ [ caret dupd push-stack next parse-character-class-second ] }
-        { CHAR: [ [ CHAR: [ push-stack next ] }
+        ! { CHAR: [ [ CHAR: [ push-stack next ] }
         { CHAR: ] [ CHAR: ] push-stack next ] }
+        { CHAR: - [ CHAR: - push-stack next ] }
         [ 2drop ]
     } case ;
 
