@@ -10,11 +10,12 @@ USING: alien alien.syntax combinators kernel system ;
 IN: openssl.libcrypto
 
 <<
-"libcrypto" {
-    { [ os winnt? ]  [ "libeay32.dll" "cdecl" ] }
-    { [ os macosx? ] [ "libcrypto.dylib" "cdecl" ] }
-    { [ os unix? ]   [ "libcrypto.so" "cdecl" ] }
-} cond add-library
+{
+    { [ os openbsd? ] [ ] } ! VM is linked with it
+    { [ os winnt? ] [ "libcrypto" "libeay32.dll" "cdecl" add-library ] }
+    { [ os macosx? ] [ "libcrypto" "libcrypto.dylib" "cdecl" add-library ] }
+    { [ os unix? ] [ "libcrypto" "libcrypto.so" "cdecl" add-library ] }
+} cond
 >>
 
 C-STRUCT: bio-method

@@ -71,7 +71,7 @@ M: winnt add-completion ( win32-handle -- )
         resume-callback t
     ] if ;
 
-M: win32-handle cancel-io
+M: win32-handle cancel-operation
     handle>> CancelIo drop ;
 
 M: winnt io-multiplex ( ms -- )

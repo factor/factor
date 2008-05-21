@@ -5,7 +5,8 @@ math.order combinators init alien alien.c-types alien.strings libc
 continuations destructors debugger inspector
 locals unicode.case
 openssl.libcrypto openssl.libssl
-io.backend io.ports io.files io.encodings.8-bit io.sockets.secure ;
+io.backend io.ports io.files io.encodings.8-bit io.sockets.secure
+io.timeouts ;
 IN: openssl
 
 ! This code is based on http://www.rtfm.com/openssl-examples/
@@ -158,20 +159,26 @@ ERROR: no-secure-context ;
 M: no-secure-context summary
     drop "Secure socket operations must be wrapped in calls to with-secure-context" ;
 
-: current-ssl-context ( -- ctx )
-    secure-context get [ no-secure-context ] unless* ;
+SYMBOL: default-secure-context
+
+: context-expired? ( context -- ? )
+    dup [ handle>> expired? ] [ drop t ] if ;
+
+: current-secure-context ( -- ctx )
+    secure-context get [
+        default-secure-context get dup context-expired? [
+            drop
+            <secure-config> <secure-context> default-secure-context set-global
+            current-secure-context
+        ] when
+    ] unless* ;
 
 : <ssl-handle> ( fd -- ssl )
-    current-ssl-context handle>> SSL_new dup ssl-error
+    current-secure-context handle>> SSL_new dup ssl-error
     f f ssl-handle boa ;
 
-HOOK: ssl-shutdown io-backend ( handle -- )
-
 M: ssl-handle dispose*
-    [ ssl-shutdown ]
-    [ handle>> SSL_free ]
-    [ file>> dispose ]
-    tri ;
+    [ handle>> SSL_free ] [ file>> dispose ] bi ;
 
 : check-verify-result ( ssl-handle -- )
     SSL_get_verify_result dup X509_V_OK =
