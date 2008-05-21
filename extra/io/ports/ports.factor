@@ -108,7 +108,9 @@ M: output-port stream-flush ( port -- )
     [ check-disposed ] [ port-flush ] bi ;
 
 M: output-port dispose*
-    [ port-flush ] [ call-next-method ] bi ;
+    [
+        [ handle>> &dispose drop ] [ port-flush ] bi
+    ] with-destructors ;
 
 M: buffered-port dispose*
     [ call-next-method ]
@@ -119,7 +121,7 @@ GENERIC: cancel-io ( handle -- )
 
 M: port timed-out handle>> cancel-io ;
 
-M: port dispose* handle>> [ cancel-io ] [ dispose ] bi ;
+M: port dispose* handle>> dispose ;
 
 : <ports> ( read-handle write-handle -- input-port output-port )
     [
