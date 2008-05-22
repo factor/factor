@@ -4,7 +4,7 @@ USING: accessors arrays assocs combinators kernel math
 sequences namespaces locals combinators.lib state-tables
 math.parser state-parser sets dlists unicode.categories
 math.order quotations shuffle math.ranges splitting
-symbols fry ;
+symbols fry parser ;
 IN: regexp4
 
 SYMBOLS: eps start-state final-state beginning-of-text
@@ -544,6 +544,33 @@ ERROR: unsupported-token token ;
         <vector-table> >>nfa
         dup [ parse-raw-regexp ] [ subset-construction ] bi ;
 
+! Literal syntax for regexps
+: parse-options ( string -- ? )
+    #! Lame
+    {
+        { "" [ f ] }
+        { "i" [ t ] }
+    } case ;
+
+: parse-regexp ( accum end -- accum )
+    lexer get dup skip-blank
+    [ [ index-from dup 1+ swap ] 2keep swapd subseq swap ] change-lexer-column
+    ! lexer get dup still-parsing-line?
+    ! [ (parse-token) parse-options ] [ drop f ] if
+    <regexp> parsed ;
+
+: R! CHAR: ! parse-regexp ; parsing
+: R" CHAR: " parse-regexp ; parsing
+: R# CHAR: # parse-regexp ; parsing
+: R' CHAR: ' parse-regexp ; parsing
+: R( CHAR: ) parse-regexp ; parsing
+: R/ CHAR: / parse-regexp ; parsing
+: R@ CHAR: @ parse-regexp ; parsing
+: R[ CHAR: ] parse-regexp ; parsing
+: R` CHAR: ` parse-regexp ; parsing
+: R{ CHAR: } parse-regexp ; parsing
+: R| CHAR: | parse-regexp ; parsing
+
 TUPLE: dfa-traverser
     dfa
     last-state current-state
@@ -610,6 +637,9 @@ TUPLE: dfa-traverser
 
 : matches? ( string regexp -- ? )
     dupd match [ [ length ] [ range-length 1- ] bi* = ] [ drop f ] if* ;
+
+: match-head ( string regexp -- end )
+    match length>> ;
 
 ! character classes
 ! TUPLE: range-class from to ;
