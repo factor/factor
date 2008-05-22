@@ -4,7 +4,7 @@ USING: accessors arrays assocs combinators kernel math
 sequences namespaces locals combinators.lib state-tables
 math.parser state-parser sets dlists unicode.categories
 math.order quotations shuffle math.ranges splitting
-symbols fry parser ;
+symbols fry parser math.ranges inspector strings ;
 IN: regexp4
 
 SYMBOLS: eps start-state final-state beginning-of-text
@@ -191,7 +191,7 @@ ERROR: unbalanced-brackets ;
         [ [ nip at-most-n ] [ at-least-n ] if* ] if
     ] [ drop exactly-n ] if ;
 
-:: make-nontoken-nfa ( regexp obj -- )
+:: push-single-nfa ( regexp obj -- )
     [let | s0 [ regexp next-state ]
            s1 [ regexp next-state ]
            stack [ regexp stack>> ]
@@ -213,18 +213,23 @@ ERROR: unbalanced-brackets ;
 : decimal-digit? ( n -- ? ) CHAR: 0 CHAR: 9 between? ;
 
 : hex-digit? ( n -- ? )
-    dup decimal-digit? 
-    over CHAR: a CHAR: f between? or 
-    swap CHAR: A CHAR: F between? or ;
+    [
+        [ dup decimal-digit? ]
+        [ dup CHAR: a CHAR: f between? ]
+        [ dup CHAR: A CHAR: F between? ]
+    ] || nip ;
 
 : control-char? ( n -- ? )
-    dup 0 HEX: 1f between? swap HEX: 7f = or ;
+    [
+        [ dup 0 HEX: 1f between? ]
+        [ dup HEX: 7f = ]
+    ] || nip ;
 
 : punct? ( n -- ? )
     "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~" member? ;
 
 : c-identifier-char? ( ch -- ? ) 
-    dup alpha? swap CHAR: _ = or ;
+    [ [ dup alpha? ] [ dup CHAR: _ = ] ] || nip ;
 
 : java-blank? ( n -- ? )
     {   
@@ -233,7 +238,7 @@ ERROR: unbalanced-brackets ;
     } member? ;
 
 : java-printable? ( n -- ? )
-    dup alpha? swap punct? or ;
+    [ [ dup alpha? ] [ dup punct? ] ] || nip ;
 
 ERROR: bad-character-class obj ;
 
@@ -261,32 +266,26 @@ ERROR: bad-character-class obj ;
 
 ERROR: bad-octal number ;
 
-: parse-octal ( regexp -- )
+: parse-octal ( -- n )
     next get-char drop
     3 take oct>
-    dup 255 > [ bad-octal ] when
-    make-nontoken-nfa ;
+    dup 255 > [ bad-octal ] when ;
 
 ERROR: bad-hex number ;
 
-: parse-short-hex ( regexp -- )
+: parse-short-hex ( -- n )
     next 2 take hex>
-    dup number? [ bad-hex ] unless
-    make-nontoken-nfa ;
+    dup number? [ bad-hex ] unless ;
 
-: parse-long-hex ( regexp -- )
-    next 4 take hex>
-    dup number? [ bad-hex ] unless
-    make-nontoken-nfa ;
+: parse-long-hex ( -- n )
+    next 6 take hex>
+    dup number? [ bad-hex ] unless ;
 
-: parse-control-character ( regexp -- )
-    next get-char make-nontoken-nfa ;
-
-: parse-backreference ( regexp obj -- )
-    2drop ;
+: parse-control-character ( -- n )
+    next get-char ;
 
 : dot-construction ( regexp -- )
-    [ CHAR: \n = not ] make-nontoken-nfa ;
+    [ CHAR: \n = not ] push-single-nfa ;
 
 : front-anchor-construction ( regexp -- )
     drop ;
@@ -299,32 +298,50 @@ ERROR: bad-hex number ;
     [ get-char CHAR: } = ] take-until
     "," split1 [ [ string>number ] bi@ ] keep >boolean ;
 
-: parse-escaped ( regexp -- )
-    next get-char {
-        { CHAR: \ [ [ CHAR: \ = ] make-nontoken-nfa ] }
-        { CHAR: t [ [ CHAR: \t = ] make-nontoken-nfa ] }
-        { CHAR: n [ [ CHAR: \n = ] make-nontoken-nfa ] }
-        { CHAR: r [ [ CHAR: \r = ] make-nontoken-nfa ] }
-        { CHAR: f [ [ HEX: c = ] make-nontoken-nfa ] }
-        { CHAR: a [ [ HEX: 7 = ] make-nontoken-nfa ] }
-        { CHAR: e [ [ HEX: 1b = ] make-nontoken-nfa ] }
+TUPLE: character-class members ;
+TUPLE: character-class-range from to ;
+TUPLE: negated-character-class < character-class ;
+TUPLE: negated-character-class-range < character-class-range ;
+TUPLE: intersection-class < character-class ;
+TUPLE: negated-intersection-class < intersection-class ;
 
-        { CHAR: d [ [ digit? ] make-nontoken-nfa ] }
-        { CHAR: D [ [ digit? not ] make-nontoken-nfa ] }
-        { CHAR: s [ [ java-blank? ] make-nontoken-nfa ] }
-        { CHAR: S [ [ java-blank? not ] make-nontoken-nfa ] }
-        { CHAR: w [ [ c-identifier-char? ] make-nontoken-nfa ] }
-        { CHAR: W [ [ c-identifier-char? not ] make-nontoken-nfa ] }
+GENERIC: character-class-contains? ( obj character-class -- ? )
 
-        { CHAR: p [ parse-posix-class make-nontoken-nfa ] }
-        { CHAR: P [ parse-posix-class [ not ] compose make-nontoken-nfa ] }
+: parse-escaped-until ( -- seq )
+    [ get-char CHAR: \ = get-next CHAR: E = and ] take-until
+    next ;
+
+: character-class-predicate ( seq -- quot )
+    boa '[ , character-class-contains? ] ;
+
+ERROR: unmatched-escape-sequence ;
+
+: (parse-escaped) ( regexp ? ch -- obj )
+    {
+        { CHAR: \ [ [ CHAR: \ = ] ] }
+        { CHAR: t [ [ CHAR: \t = ] ] }
+        { CHAR: n [ [ CHAR: \n = ] ] }
+        { CHAR: r [ [ CHAR: \r = ] ] }
+        { CHAR: f [ [ HEX: c = ] ] }
+        { CHAR: a [ [ HEX: 7 = ] ] }
+        { CHAR: e [ [ HEX: 1b = ] ] }
+
+        { CHAR: d [ [ digit? ] ] }
+        { CHAR: D [ [ digit? not ] ] }
+        { CHAR: s [ [ java-blank? ] ] }
+        { CHAR: S [ [ java-blank? not ] ] }
+        { CHAR: w [ [ c-identifier-char? ] ] }
+        { CHAR: W [ [ c-identifier-char? not ] ] }
+
+        { CHAR: p [ parse-posix-class ] }
+        { CHAR: P [ parse-posix-class [ not ] compose ] }
         { CHAR: x [ parse-short-hex ] }
         { CHAR: u [ parse-long-hex ] }
         { CHAR: 0 [ parse-octal ] }
         { CHAR: c [ parse-control-character ] }
 
-        ! { CHAR: Q [ quot til \E ] }
-        ! { CHAR: E [ should be an error, parse this in the Q if exists ] }
+        ! { CHAR: Q [ next parse-escaped-until ] }
+        ! { CHAR: E [ unmatched-escape-sequence ] }
 
         ! { CHAR: b [ ] } ! a word boundary
         ! { CHAR: B [ ] } ! a non-word boundary
@@ -332,34 +349,57 @@ ERROR: bad-hex number ;
         ! { CHAR: G [ ] } ! end of previous match
         ! { CHAR: Z [ ] } ! end of input but for the final terminator, if any
         ! { CHAR: z [ ] } ! end of the input
-        [ dup digit? [ parse-backreference ] [ make-nontoken-nfa ] if ]
+        [ ]
     } case ;
+
+: parse-escaped ( regexp -- )
+    next get-char (parse-escaped) push-single-nfa ;
 
 : handle-dash ( vector -- vector )
     [ dup dash eq? [ drop CHAR: - ] when ] map ;
 
+M: object character-class-contains? ( obj1 obj2 -- ? )
+    = ;
+
+M: callable character-class-contains? ( obj1 callable -- ? )
+    call ;
+
+M: character-class character-class-contains? ( obj cc -- ? )
+    members>> [ character-class-contains? ] with find drop >boolean ;
+
+M: negated-character-class character-class-contains? ( obj cc -- ? )
+    call-next-method not ;
+
+M: character-class-range character-class-contains? ( obj cc -- ? )
+    [ from>> ] [ to>> ] bi between?  ;
+
+M: negated-character-class-range character-class-contains? ( obj cc -- ? )
+    call-next-method not ;
+
+M: intersection-class character-class-contains? ( obj cc -- ? )
+    members>> [ character-class-contains? not ] with find drop not ;
+
+M: negated-intersection-class character-class-contains? ( obj cc -- ? )
+    call-next-method not ;
+
 ERROR: unmatched-negated-character-class class ;
 
-: handle-caret ( vector -- vector ? )
+: handle-caret ( obj -- seq class )
     dup [ length 2 >= ] [ first caret eq? ] bi and [ 
-        rest t
+        rest negated-character-class
     ] [
-        f
+        character-class
     ] if ;
 
 : make-character-class ( regexp -- )
     left-bracket over stack>> cut-stack
     pick (>>stack)
-    handle-dash
-    handle-caret
-    >r [ dup number? [ '[ dup , = ] ] when ] map
-    [ [ drop t ] 2array ] map [ drop f ] suffix [ cond ] curry r>
-    [ [ not ] compose ] when
-    make-nontoken-nfa ;
+    handle-dash handle-caret
+    character-class-predicate push-single-nfa ;
 
 : apply-dash ( regexp -- )
     stack>> dup [ pop ] [ pop* ] [ pop ] tri
-    swap '[ dup , , between? ] swap push ;
+    swap character-class-range boa swap push ;
 
 : apply-dash? ( regexp -- ? )
     stack>> dup length 3 >=
@@ -371,7 +411,7 @@ DEFER: parse-character-class
         next get-char
         {
             { CHAR: [ [
-                [ 1+ ] change-bracket-count left-bracket push-stack
+                [ 1+ ] change-bracket-count dup left-bracket push-stack
                 parse-character-class
             ] }
             { CHAR: ] [
@@ -381,7 +421,7 @@ DEFER: parse-character-class
             { CHAR: - [ dash push-stack ] }
             ! { CHAR: & [ ampersand push-stack ] }
             ! { CHAR: : [ semicolon push-stack ] }
-            { CHAR: \ [ parse-escaped ] }
+            { CHAR: \ [ next get-char (parse-escaped) push-stack ] }
             { f [ unbalanced-brackets ] }
             [ dupd push-stack dup apply-dash? [ apply-dash ] [ drop ] if ]
         } case
@@ -393,7 +433,7 @@ DEFER: parse-character-class
 : parse-character-class-second ( regexp -- )
     get-next
     {
-        ! { CHAR: [ [ CHAR: [ push-stack next ] }
+        { CHAR: [ [ CHAR: [ push-stack next ] }
         { CHAR: ] [ CHAR: ] push-stack next ] }
         { CHAR: - [ CHAR: - push-stack next ] }
         [ 2drop ]
@@ -403,7 +443,7 @@ DEFER: parse-character-class
     get-next
     {
         { CHAR: ^ [ caret dupd push-stack next parse-character-class-second ] }
-        ! { CHAR: [ [ CHAR: [ push-stack next ] }
+        { CHAR: [ [ CHAR: [ push-stack next ] }
         { CHAR: ] [ CHAR: ] push-stack next ] }
         { CHAR: - [ CHAR: - push-stack next ] }
         [ 2drop ]
@@ -442,7 +482,7 @@ ERROR: unsupported-token token ;
                 [ set-start-state ]
             } cleave
         ] }
-        [ drop make-nontoken-nfa ]
+        [ drop push-single-nfa ]
     } case ;
 
 : (parse-raw-regexp) ( regexp -- )
@@ -639,7 +679,7 @@ TUPLE: dfa-traverser
     dupd match [ [ length ] [ range-length 1- ] bi* = ] [ drop f ] if* ;
 
 : match-head ( string regexp -- end )
-    match length>> ;
+    match length>> 1- ;
 
 ! character classes
 ! TUPLE: range-class from to ;
@@ -647,5 +687,15 @@ TUPLE: dfa-traverser
 
 ! (?:a|b)*  <- does not capture
 ! (a|b)*\1  <- group captured
-! (?!abba)  negative lookahead  matches ababa but not abbaa
+! doesn't advance the current position:
 ! (?=abba)  positive lookahead  matches abbaaa but not abaaa
+! (?!abba)  negative lookahead  matches ababa but not abbaa
+! look behind.   "lookaround"
+
+! : $ ( n -- obj ) groups get nth ;
+! [
+    ! groups bound to scope here
+! ] [
+    ! error or something
+! ] if-match
+! match in a string with  .*foo.*
