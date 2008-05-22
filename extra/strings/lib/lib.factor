@@ -3,9 +3,7 @@ strings unicode.case ;
 IN: strings.lib
 
 : >Upper ( str -- str )
-    dup empty? [
-        unclip ch>upper 1string prepend
-    ] unless ;
+    dup empty? [ unclip ch>upper prefix ] unless ;
 
 : >Upper-dashes ( str -- str )
     "-" split [ >Upper ] map "-" join ;
