@@ -24,8 +24,13 @@ TUPLE: fd fd disposed ;
         [ >>fd ]
         tri ;
 
-M: fd dispose*
-    [ cancel-operation ] [ fd>> close-file ] bi ;
+M: fd dispose
+    dup disposed>> [ drop ] [
+        [ cancel-operation ]
+        [ t >>disposed drop ]
+        [ fd>> close-file ]
+        tri
+    ] if ;
 
 M: fd handle-fd dup check-disposed fd>> ;
 

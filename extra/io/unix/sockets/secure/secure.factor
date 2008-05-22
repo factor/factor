@@ -22,6 +22,26 @@ M: ssl-handle handle-fd file>> handle-fd ;
         nip (ssl-error)
     ] if ;
 
+: check-accept-response ( handle r -- event )
+    over handle>> over SSL_get_error
+    {
+        { SSL_ERROR_NONE [ 2drop f ] }
+        { SSL_ERROR_WANT_READ [ 2drop +input+ ] }
+        { SSL_ERROR_WANT_WRITE [ 2drop +output+ ] }
+        { SSL_ERROR_SYSCALL [ syscall-error ] }
+        { SSL_ERROR_SSL [ (ssl-error) ] }
+    } case ;
+
+: do-ssl-accept ( ssl-handle -- )
+    dup dup handle>> SSL_accept check-accept-response dup
+    [ >r dup file>> r> wait-for-fd do-ssl-accept ] [ 2drop ] if ;
+
+: maybe-handshake ( ssl-handle -- )
+    dup connected>> [ drop ] [
+        t >>connected
+        [ do-ssl-accept ] with-timeout
+    ] if ;
+
 : check-response ( port r -- port r n )
     over handle>> handle>> over SSL_get_error ; inline
 
@@ -38,6 +58,7 @@ M: ssl-handle handle-fd file>> handle-fd ;
     } case ;
 
 M: ssl-handle refill
+    dup maybe-handshake
     handle>> ! ssl
     over buffer>>
     [ buffer-end ] ! buf
@@ -57,6 +78,7 @@ M: ssl-handle refill
     } case ;
 
 M: ssl-handle drain
+    dup maybe-handshake
     handle>> ! ssl
     over buffer>>
     [ buffer@ ] ! buf
@@ -107,50 +129,23 @@ M: secure establish-connection ( client-out remote -- )
 
 M: secure (server) addrspec>> (server) ;
 
-: check-accept-response ( handle r -- event )
+M: secure (accept)
+    [
+        addrspec>> (accept) >r |dispose <ssl-socket> r>
+    ] with-destructors ;
+
+: check-shutdown-response ( handle r -- event )
+    #! We don't do two-step shutdown here because I couldn't
+    #! figure out how to do it with non-blocking BIOs. Also, it
+    #! seems that SSL_shutdown always returns 0 -- this sounds
+    #! like a bug
     over handle>> over SSL_get_error
     {
         { SSL_ERROR_NONE [ 2drop f ] }
         { SSL_ERROR_WANT_READ [ 2drop +input+ ] }
         { SSL_ERROR_WANT_WRITE [ 2drop +output+ ] }
-        { SSL_ERROR_SYSCALL [ syscall-error ] }
+        { SSL_ERROR_SYSCALL [ dup zero? [ 2drop f ] [ syscall-error ] if ] }
         { SSL_ERROR_SSL [ (ssl-error) ] }
-    } case ;
-
-: do-ssl-accept ( ssl-handle -- )
-    dup dup handle>> SSL_accept check-accept-response dup
-    [ >r dup file>> r> wait-for-fd do-ssl-accept ] [ 2drop ] if ;
-
-M: secure (accept)
-    [
-        addrspec>> (accept) >r
-        |dispose <ssl-socket> t >>connected |dispose
-        dup [ do-ssl-accept ] with-timeout r>
-    ] with-destructors ;
-
-: check-shutdown-response ( handle r -- event )
-    #! SSL_shutdown always returns 0 due to openssl bugs?
-    {
-        { 1 [ drop f ] }
-        { 0 [
-            dup handle>> dup f 0 SSL_read 2dup SSL_get_error
-            {
-                { SSL_ERROR_ZERO_RETURN [ 3drop +retry+ ] }
-                { SSL_ERROR_WANT_READ [ 3drop +input+ ] }
-                { SSL_ERROR_WANT_WRITE [ 3drop +output+ ] }
-                { SSL_ERROR_SYSCALL [ syscall-error ] }
-                { SSL_ERROR_SSL [ (ssl-error) ] }
-            } case
-        ] }
-        { -1 [
-            handle>> -1 SSL_get_error
-            {
-                { SSL_ERROR_WANT_READ [ +input+ ] }
-                { SSL_ERROR_WANT_WRITE [ +output+ ] }
-                { SSL_ERROR_SYSCALL [ -1 syscall-error ] }
-                { SSL_ERROR_SSL [ (ssl-error) ] }
-            } case
-        ] }
     } case ;
 
 : (shutdown) ( handle -- )
