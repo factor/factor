@@ -1,4 +1,4 @@
-USING: alien alien.c-types kernel math sequences strings
+USING: unix alien alien.c-types kernel math sequences strings
 io.unix.backend splitting ;
 IN: hardware-info.linux
 
