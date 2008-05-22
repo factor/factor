@@ -15,6 +15,8 @@ SINGLETONS: SSLv2 SSLv23 SSLv3 TLSv1 ;
 TUPLE: secure-config
 method
 key-file password
+verify
+verify-depth
 ca-file ca-path
 dh-file
 ephemeral-key-bits ;
@@ -22,7 +24,9 @@ ephemeral-key-bits ;
 : <secure-config> ( -- config )
     secure-config new
         SSLv23 >>method
-        1024 >>ephemeral-key-bits ;
+        1024 >>ephemeral-key-bits
+        ! "resource:extra/openssl/cacert.pem" >>ca-file
+        t >>verify ;
 
 TUPLE: secure-context config handle disposed ;
 
