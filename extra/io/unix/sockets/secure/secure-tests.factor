@@ -12,7 +12,6 @@ concurrency.promises byte-arrays locals calendar io.timeouts ;
 : with-test-context
     <secure-config>
         "resource:extra/openssl/test/server.pem" >>key-file
-        "resource:extra/openssl/test/root.pem" >>ca-file
         "resource:extra/openssl/test/dh1024.pem" >>dh-file
         "password" >>password
     swap with-secure-context ;
