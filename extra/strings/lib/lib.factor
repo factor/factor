@@ -1,9 +1,6 @@
-USING: math arrays sequences kernel random splitting strings unicode.case ;
+USING: math math.ranges arrays sequences kernel random splitting
+strings unicode.case ;
 IN: strings.lib
-
-: char>digit ( c -- i ) 48 - ;
-
-: string>digits ( s -- seq ) [ char>digit ] { } map-as ;
 
 : >Upper ( str -- str )
     dup empty? [
@@ -14,13 +11,13 @@ IN: strings.lib
     "-" split [ >Upper ] map "-" join ;
 
 : lower-alpha-chars ( -- seq )
-    26 [ CHAR: a + ] map ;
+    CHAR: a CHAR: z [a,b] ;
 
 : upper-alpha-chars ( -- seq )
-    26 [ CHAR: A + ] map ;
+    CHAR: A CHAR: Z [a,b] ;
 
 : numeric-chars ( -- seq )
-    10 [ CHAR: 0 + ] map ;
+    CHAR: 0 CHAR: 9 [a,b] ;
 
 : alpha-chars ( -- seq )
     lower-alpha-chars upper-alpha-chars append ;
