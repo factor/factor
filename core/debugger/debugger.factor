@@ -93,7 +93,7 @@ M: relative-overflow summary
     drop "Superfluous items pushed to data stack" ;
 
 : assert-depth ( quot -- )
-    >r datastack r> swap slip >r datastack r>
+    >r datastack r> dip >r datastack r>
     2dup [ length ] compare {
         { +lt+ [ trim-datastacks nip relative-underflow ] }
         { +eq+ [ 2drop ] }

@@ -58,7 +58,7 @@ M: mailbox dispose* threads>> notify-all ;
 
 : while-mailbox-empty ( mailbox quot -- )
     over mailbox-empty? [
-        dup >r swap slip r> while-mailbox-empty
+        dup >r dip r> while-mailbox-empty
     ] [
         2drop
     ] if ; inline
