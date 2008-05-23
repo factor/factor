@@ -97,6 +97,7 @@ $nl
 "Certain shuffle words can also be expressed in terms of the spread combinators. Internalizing such identities can help with understanding and writing code using spread combinators:"
 { $code
     ": dip   [ ] bi* ;"
+    ": 2dip  [ ] [ ] tri* ;"
     ""
     ": slip  [ call ] [ ] bi* ;"
     ": 2slip [ call ] [ ] [ ] tri* ;"
@@ -164,8 +165,9 @@ ARTICLE: "slip-keep-combinators" "The slip and keep combinators"
 { $subsection slip }
 { $subsection 2slip }
 { $subsection 3slip }
-"The dip combinator invokes the quotation at the top of the stack, hiding the value underneath:"
+"The dip combinators invoke the quotation at the top of the stack, hiding the values underneath:"
 { $subsection dip }
+{ $subsection 2dip }
 "The keep combinators invoke a quotation which takes a number of values off the stack, and then they restore those values:"
 { $subsection keep }
 { $subsection 2keep }
@@ -874,6 +876,14 @@ HELP: dip
 { $notes "The following are equivalent:"
     { $code ">r foo bar r>" }
     { $code "[ foo bar ] dip" }
+} ;
+
+HELP: 2dip
+{ $values { "obj1" object } { "obj2" object } { "quot" quotation } }
+{ $description "Calls " { $snippet "quot" } " with " { $snippet "obj1" } " and " { $snippet "obj2" } " hidden on the retain stack." }
+{ $notes "The following are equivalent:"
+    { $code ">r >r foo bar r> r>" }
+    { $code "[ foo bar ] 2dip" }
 } ;
 
 HELP: while

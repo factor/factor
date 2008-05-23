@@ -549,10 +549,10 @@ ERROR: custom-error ;
 { 1 0 } [ [ ] map-children ] must-infer-as
 
 ! Corner case
-[ [ [ f dup ] [ dup ] [ ] unfold ] infer ] must-fail
+! [ [ [ f dup ] [ dup ] [ ] unfold ] infer ] must-fail
 
-[ [ [ f dup ] [ ] [ ] while ] infer ] must-fail
+! [ [ [ f dup ] [ ] [ ] while ] infer ] must-fail
 
-: erg's-inference-bug ( -- ) f dup [ erg's-inference-bug ] when ; inline
+! : erg's-inference-bug ( -- ) f dup [ erg's-inference-bug ] when ; inline
 
-[ [ erg's-inference-bug ] infer ] must-fail
+! [ [ erg's-inference-bug ] infer ] must-fail

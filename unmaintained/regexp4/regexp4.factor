@@ -149,8 +149,16 @@ ERROR: unbalanced-brackets ;
 
 : with0 ( obj n quot -- n quot' ) swapd curry ; inline
 
-: copy-state ( regexp state n -- )
-    [ copy-state-rows ] with0 with0 times ;
+
+: range>state ( range -- pair )
+    [ from>> ] [ length>> ] bi over - 2array ;
+
+: copy-state ( regexp range n -- )
+    dup zero? [
+        drop range>state over stack>> push apply-question-closure
+    ] [
+        [ copy-state-rows ] with0 with0 times
+    ] if ;
 
 :: (exactly-n) ( regexp state n -- )
     regexp state n copy-state
@@ -160,6 +168,7 @@ ERROR: unbalanced-brackets ;
     >r dup last-state r> 1- (exactly-n) ;
 
 : exactly-n-concatenated ( regexp state n -- )
+B
     [ (exactly-n) ] 3keep
     nip 1- [ apply-concatenation ] with0 times ;
 
@@ -168,6 +177,9 @@ ERROR: unbalanced-brackets ;
         regexp state n copy-state
         state regexp stack>> push
         regexp apply-kleene-closure ] ; 
+
+: peek-last ( regexp -- range )
+    stack>> peek first2 [a,b] ;
 
 : pop-last ( regexp -- range )
     stack>> pop first2 [a,b] ;
@@ -471,7 +483,6 @@ ERROR: unsupported-token token ;
             [ 1+ ] change-bracket-count parse-character-class
         ] }
         ! { CHAR: } [ drop drop "brace" ] }
-        ! { CHAR: ? [ drop ] }
         { CHAR: . [ drop dot-construction ] }
         { beginning-of-text [ push-stack ] }
         { end-of-text [
