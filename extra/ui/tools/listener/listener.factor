@@ -160,6 +160,7 @@ M: stack-display tool-scroller
     {
         [ com-end ]
         [ clear-output ]
+        [ input>> clear-input ]
         [ start-listener-thread ]
         [ wait-for-listener ]
     } cleave ;

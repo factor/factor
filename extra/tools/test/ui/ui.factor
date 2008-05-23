@@ -10,7 +10,7 @@ IN: tools.test.ui
         <dlist> \ graft-queue [
             over
             graft notify-queued
-            swap slip
+            dip
             ungraft notify-queued
         ] with-variable
     ] with-string-writer print ;

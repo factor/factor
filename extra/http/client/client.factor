@@ -4,7 +4,7 @@ USING: assocs http kernel math math.parser namespaces sequences
 io io.sockets io.streams.string io.files io.timeouts strings
 splitting calendar continuations accessors vectors math.order
 io.encodings.8-bit io.encodings.binary io.streams.duplex
-fry debugger inspector ;
+fry debugger inspector ascii ;
 IN: http.client
 
 : max-redirects 10 ;
@@ -37,8 +37,12 @@ SYMBOL: redirects
 
 PRIVATE>
 
+: read-chunk-size ( -- n )
+    read-crlf ";" split1 drop [ blank? ] right-trim
+    hex> [ "Bad chunk size" throw ] unless* ;
+
 : read-chunks ( -- )
-    read-crlf ";" split1 drop hex> dup { f 0 } member?
+    read-chunk-size dup zero?
     [ drop ] [ read % read-crlf "" assert= read-chunks ] if ;
 
 : read-response-body ( response -- response data )

@@ -57,6 +57,8 @@ DEFER: if
 
 : dip ( obj quot -- obj ) swap slip ; inline
 
+: 2dip ( obj1 obj2 quot -- obj1 obj2 ) -rot 2slip ; inline
+
 ! Keepers
 : keep ( x quot -- x ) over slip ; inline
 
@@ -88,14 +90,14 @@ DEFER: if
 
 ! Spreaders
 : bi* ( x y p q -- )
-    >r swap slip r> call ; inline
+    >r dip r> call ; inline
 
 : tri* ( x y z p q r -- )
     >r rot >r bi* r> r> call ; inline
 
 ! Double spreaders
 : 2bi* ( w x y z p q -- )
-    >r -rot 2slip r> call ; inline
+    >r 2dip r> call ; inline
 
 ! Appliers
 : bi@ ( x y quot -- )

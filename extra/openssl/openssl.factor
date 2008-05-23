@@ -5,7 +5,8 @@ math.order combinators init alien alien.c-types alien.strings libc
 continuations destructors debugger inspector
 locals unicode.case
 openssl.libcrypto openssl.libssl
-io.backend io.ports io.files io.encodings.8-bit io.sockets.secure ;
+io.backend io.ports io.files io.encodings.8-bit io.sockets.secure
+io.timeouts ;
 IN: openssl
 
 ! This code is based on http://www.rtfm.com/openssl-examples/
@@ -93,11 +94,14 @@ TUPLE: openssl-context < secure-context aliens ;
             [ ca-file>> dup [ (normalize-path) ] when ]
             [ ca-path>> dup [ (normalize-path) ] when ] bi
         ] bi
-        SSL_CTX_load_verify_locations ssl-error
-    ] [ drop ] if ;
+        SSL_CTX_load_verify_locations
+    ] [ handle>> SSL_CTX_set_default_verify_paths ] if ssl-error ;
 
 : set-verify-depth ( ctx -- )
-    handle>> 1 SSL_CTX_set_verify_depth ;
+    dup config>> verify-depth>> [
+        [ handle>> ] [ config>> verify-depth>> ] bi
+        SSL_CTX_set_verify_depth
+    ] [ drop ] if ;
 
 TUPLE: bio handle disposed ;
 
@@ -153,25 +157,26 @@ M: openssl-context dispose*
 
 TUPLE: ssl-handle file handle connected disposed ;
 
-ERROR: no-ssl-context ;
+SYMBOL: default-secure-context
 
-M: no-ssl-context summary
-    drop "SSL operations must be wrapped in calls to with-ssl-context" ;
+: context-expired? ( context -- ? )
+    dup [ handle>> expired? ] [ drop t ] if ;
 
-: current-ssl-context ( -- ctx )
-    secure-context get [ no-ssl-context ] unless* ;
+: current-secure-context ( -- ctx )
+    secure-context get [
+        default-secure-context get dup context-expired? [
+            drop
+            <secure-config> <secure-context> default-secure-context set-global
+            current-secure-context
+        ] when
+    ] unless* ;
 
 : <ssl-handle> ( fd -- ssl )
-    current-ssl-context handle>> SSL_new dup ssl-error
+    current-secure-context handle>> SSL_new dup ssl-error
     f f ssl-handle boa ;
 
-HOOK: ssl-shutdown io-backend ( handle -- )
-
 M: ssl-handle dispose*
-    [ ssl-shutdown ]
-    [ handle>> SSL_free ]
-    [ file>> dispose ]
-    tri ;
+    [ handle>> SSL_free ] [ file>> dispose ] bi ;
 
 : check-verify-result ( ssl-handle -- )
     SSL_get_verify_result dup X509_V_OK =
@@ -188,9 +193,11 @@ M: ssl-handle dispose*
     [ 2drop ] [ common-name-verify-error ] if ;
 
 M: openssl check-certificate ( host ssl -- )
-    handle>>
-    [ nip check-verify-result ]
-    [ check-common-name ]
-    2bi ;
+    current-secure-context config>> verify>> [
+        handle>>
+        [ nip check-verify-result ]
+        [ check-common-name ]
+        2bi
+    ] [ 2drop ] if ;
 
 openssl secure-socket-backend set-global

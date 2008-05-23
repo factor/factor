@@ -10,11 +10,12 @@ assocs parser sequences words quotations ;
 
 IN: openssl.libssl
 
-<< "libssl" {
-    { [ os winnt? ]  [ "ssleay32.dll" "cdecl" ] }
-    { [ os macosx? ] [ "libssl.dylib" "cdecl" ] }
-    { [ os unix? ]   [ "libssl.so" "cdecl" ] }
-} cond add-library >>
+<< {
+    { [ os openbsd? ] [ ] } ! VM is linked with it
+    { [ os winnt? ] [ "libssl" "ssleay32.dll" "cdecl" add-library ] }
+    { [ os macosx? ] [ "libssl" "libssl.dylib" "cdecl" add-library ] }
+    { [ os unix? ] [ "libssl" "libssl.so" "cdecl" add-library ] }
+} cond >>
 
 : X509_FILETYPE_PEM       1 ; inline
 : X509_FILETYPE_ASN1      2 ; inline
@@ -121,6 +122,11 @@ FUNCTION: int SSL_read ( ssl-pointer ssl, void* buf, int num ) ;
 
 FUNCTION: int SSL_shutdown ( ssl-pointer ssl ) ;
 
+: SSL_SENT_SHUTDOWN 1 ;
+: SSL_RECEIVED_SHUTDOWN 2 ;
+
+FUNCTION: int SSL_get_shutdown ( ssl-pointer ssl ) ;
+
 FUNCTION: void SSL_free ( ssl-pointer ssl ) ;
 
 FUNCTION: int SSL_want ( ssl-pointer ssl ) ;
@@ -149,6 +155,15 @@ FUNCTION: int SSL_use_certificate_file ( ssl-pointer ssl,
 
 FUNCTION: int SSL_CTX_load_verify_locations ( ssl-ctx ctx, char* CAfile,
                                               char* CApath ) ;
+
+FUNCTION: int SSL_CTX_set_default_verify_paths ( ssl-ctx ctx ) ;
+
+: SSL_VERIFY_NONE 0 ; inline
+: SSL_VERIFY_PEER 1 ; inline
+: SSL_VERIFY_FAIL_IF_NO_PEER_CERT 2 ; inline
+: SSL_VERIFY_CLIENT_ONCE 4 ; inline
+
+FUNCTION: void SSL_CTX_set_verify ( ssl-ctx ctx, int mode, void* callback ) ;
 
 FUNCTION: void SSL_CTX_set_client_CA_list ( ssl-ctx ctx, ssl-pointer list ) ;
 
