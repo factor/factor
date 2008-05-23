@@ -1,13 +1,13 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: db db.pooling http.server http.server.sessions kernel
-accessors continuations namespaces destructors ;
+USING: db db.pools io.pools http.server http.server.sessions
+kernel accessors continuations namespaces destructors ;
 IN: http.server.db
 
 TUPLE: db-persistence < filter-responder pool ;
 
 : <db-persistence> ( responder db params -- responder' )
-    <pool> db-persistence boa ;
+    <db-pool> db-persistence boa ;
 
 M: db-persistence call-responder*
     [

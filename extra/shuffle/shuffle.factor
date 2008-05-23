@@ -5,8 +5,6 @@ USING: kernel sequences namespaces math inference.transforms
 
 IN: shuffle
 
-: 2dip -rot 2slip ; inline
-
 MACRO: npick ( n -- ) 1- dup saver [ dup ] rot [ r> swap ] n*quot 3append ;
 
 MACRO: ndup ( n -- ) dup [ npick ] curry n*quot ;

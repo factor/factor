@@ -94,11 +94,14 @@ TUPLE: openssl-context < secure-context aliens ;
             [ ca-file>> dup [ (normalize-path) ] when ]
             [ ca-path>> dup [ (normalize-path) ] when ] bi
         ] bi
-        SSL_CTX_load_verify_locations ssl-error
-    ] [ drop ] if ;
+        SSL_CTX_load_verify_locations
+    ] [ handle>> SSL_CTX_set_default_verify_paths ] if ssl-error ;
 
 : set-verify-depth ( ctx -- )
-    handle>> 1 SSL_CTX_set_verify_depth ;
+    dup config>> verify-depth>> [
+        [ handle>> ] [ config>> verify-depth>> ] bi
+        SSL_CTX_set_verify_depth
+    ] [ drop ] if ;
 
 TUPLE: bio handle disposed ;
 
@@ -154,11 +157,6 @@ M: openssl-context dispose*
 
 TUPLE: ssl-handle file handle connected disposed ;
 
-ERROR: no-secure-context ;
-
-M: no-secure-context summary
-    drop "Secure socket operations must be wrapped in calls to with-secure-context" ;
-
 SYMBOL: default-secure-context
 
 : context-expired? ( context -- ? )
@@ -195,9 +193,11 @@ M: ssl-handle dispose*
     [ 2drop ] [ common-name-verify-error ] if ;
 
 M: openssl check-certificate ( host ssl -- )
-    handle>>
-    [ nip check-verify-result ]
-    [ check-common-name ]
-    2bi ;
+    current-secure-context config>> verify>> [
+        handle>>
+        [ nip check-verify-result ]
+        [ check-common-name ]
+        2bi
+    ] [ 2drop ] if ;
 
 openssl secure-socket-backend set-global

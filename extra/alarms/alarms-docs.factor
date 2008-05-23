@@ -2,7 +2,7 @@ IN: alarms
 USING: help.markup help.syntax calendar quotations ;
 
 HELP: alarm
-{ $class-description "An alarm. Cancel passed to " { $link cancel-alarm } "." } ;
+{ $class-description "An alarm. Can be passed to " { $link cancel-alarm } "." } ;
 
 HELP: add-alarm
 { $values { "quot" quotation } { "time" timestamp } { "frequency" "a " { $link duration } " or " { $link f } } { "alarm" alarm } }

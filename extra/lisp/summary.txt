@@ -1,1 +1,1 @@
-A Lisp interpreter in Factor 
+A Lisp interpreter/compiler in Factor 
