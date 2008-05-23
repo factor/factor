@@ -1,6 +1,7 @@
-USING: html http io io.streams.string io.styles kernel
-namespaces tools.test xml.writer sbufs sequences html.private ;
-IN: html.tests
+USING: html.streams html.streams.private
+io io.streams.string io.styles kernel
+namespaces tools.test xml.writer sbufs sequences ;
+IN: html.streams.tests
 
 : make-html-string
     [ with-html-stream ] with-string-writer ; inline

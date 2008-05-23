@@ -56,6 +56,7 @@ IN: validators
 
 : v-email ( str -- str )
     #! From http://www.regular-expressions.info/email.html
+    60 v-max-length
     "e-mail"
     R' [A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}'i
     v-regexp ;

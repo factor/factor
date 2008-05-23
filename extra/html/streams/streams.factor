@@ -4,7 +4,7 @@ USING: generic assocs help http io io.styles io.files continuations
 io.streams.string kernel math math.order math.parser namespaces
 quotations assocs sequences strings words html.elements
 xml.entities sbufs continuations destructors ;
-IN: html
+IN: html.streams
 
 GENERIC: browser-link-href ( presented -- href )
 
@@ -192,76 +192,5 @@ M: html-stream make-cell-stream ( style stream -- stream' )
 M: html-stream stream-nl ( stream -- )
     dup test-last-div? [ drop ] [ [ <br/> ] with-output-stream* ] if ;
 
-! Utilities
 : with-html-stream ( quot -- )
     output-stream get <html-stream> swap with-output-stream* ; inline
-
-: xhtml-preamble
-    "<?xml version=\"1.0\"?>" write-html
-    "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">" write-html ;
-
-: html-document ( body-quot head-quot -- )
-    #! head-quot is called to produce output to go
-    #! in the html head portion of the document.
-    #! body-quot is called to produce output to go
-    #! in the html body portion of the document.
-    xhtml-preamble
-    <html "http://www.w3.org/1999/xhtml" =xmlns "en" =xml:lang "en" =lang html>
-        <head> call </head>
-        <body> call </body>
-    </html> ;
-
-: default-css ( -- )
-    <link
-    "stylesheet" =rel "text/css" =type
-    "/responder/resources/extra/html/stylesheet.css" =href
-    link/> ;
-
-: simple-html-document ( title quot -- )
-    swap [
-        <title> write </title>
-        default-css
-    ] html-document ;
-
-: vertical-layout ( list -- )
-    #! Given a list of HTML components, arrange them vertically.
-    <table>
-    [ <tr> <td> call </td> </tr> ] each
-    </table> ;
-
-: horizontal-layout ( list -- )
-    #! Given a list of HTML components, arrange them horizontally.
-    <table>
-     <tr "top" =valign tr> [ <td> call </td> ] each </tr>
-    </table> ;
-
-: button ( label -- )
-    #! Output an HTML submit button with the given label.
-    <input "submit" =type =value input/> ;
-
-: paragraph ( str -- )
-    #! Output the string as an html paragraph
-    <p> write </p> ;
-
-: simple-page ( title quot -- )
-    #! Call the quotation, with all output going to the
-    #! body of an html page with the given title.
-    <html>
-        <head> <title> swap write </title> </head>
-        <body> call </body>
-    </html> ;
-
-: styled-page ( title stylesheet-quot quot -- )
-    #! Call the quotation, with all output going to the
-    #! body of an html page with the given title. stylesheet-quot
-    #! is called to generate the required stylesheet.
-    <html>
-        <head>
-             <title> rot write </title>
-             swap call
-        </head>
-        <body> call </body>
-    </html> ;
-
-: render-error ( message -- )
-    <span "error" =class span> escape-string write </span> ;
