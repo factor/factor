@@ -1,12 +1,12 @@
 USING: xmode.tokens xmode.marker xmode.catalog kernel html
 html.elements io io.files sequences words io.encodings.utf8
-namespaces ;
+namespaces xml.entities ;
 IN: xmode.code2html
 
 : htmlize-tokens ( tokens -- )
     [
         dup token-str swap token-id [
-            <span word-name =class span> write </span>
+            <span word-name =class span> escape-string write </span>
         ] [
             write
         ] if*
@@ -21,7 +21,7 @@ IN: xmode.code2html
 : default-stylesheet ( -- )
     <style>
         "resource:extra/xmode/code2html/stylesheet.css"
-        utf8 file-contents write
+        utf8 file-contents escape-string write
     </style> ;
 
 : htmlize-stream ( path stream -- )
@@ -29,7 +29,7 @@ IN: xmode.code2html
     <html>
         <head>
             default-stylesheet
-            <title> dup write </title>
+            <title> dup escape-string write </title>
         </head>
         <body>
             <pre>

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays io io.styles kernel memoize namespaces peg
 sequences strings html.elements xml.entities xmode.code2html
-splitting io.streams.string html peg.parsers html.elements
+splitting io.streams.string peg.parsers
 sequences.deep unicode.categories ;
 IN: farkup
 
@@ -56,11 +56,9 @@ MEMO: eq ( -- parser )
 : render-code ( string mode -- string' )
     >r string-lines r>
     [
-        [
-            H{ { wrap-margin f } } [
-                htmlize-lines
-            ] with-nesting
-        ] with-html-stream
+        <pre>
+            htmlize-lines
+        </pre>
     ] with-string-writer ;
 
 : check-url ( href -- href' )
