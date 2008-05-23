@@ -29,7 +29,7 @@ unless
             >r find-com-interface-definition family-tree
             r> 1quotation [ >r iid>> r> 2array ] curry map
         ] map-index concat
-        [ f ] prefix ,
+        [ f ] suffix ,
         \ case ,
         "void*" heap-size
         [ * rot <displaced-alien> com-add-ref 0 rot set-void*-nth S_OK ]
