@@ -160,6 +160,16 @@ METHOD: as-mutate { object object assoc }       set-at ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: subseq ( seq from to -- subseq ) rot sequences:subseq ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: key ( table val -- key ) swap assocs:value-at ;
+
+: key-of ( val table -- key ) assocs:value-at ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : 1st 0 at ;
 : 2nd 1 at ;
 : 3rd 2 at ;
