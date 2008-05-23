@@ -24,7 +24,7 @@ rational     = integer "/" (digit)+                      => [[ first3 nip string
 number       = float
               | rational
               | integer
-id-specials  = "!" | "$" | "%" | "&" | "*" | "/" | ":" | "<"
+id-specials  = "!" | "$" | "%" | "&" | "*" | "/" | ":" | "<" | "#"
               | " =" | ">" | "?" | "^" | "_" | "~" | "+" | "-" | "." | "@"
 letters      = [a-zA-Z]                                  => [[ 1array >string ]]
 initials     = letters | id-specials

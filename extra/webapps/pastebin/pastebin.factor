@@ -64,14 +64,14 @@ annotation "ANNOTATION"
     ] unless ;
 
 : <annotation-form> ( -- form )
-    "paste" <form>
+    "annotation" <form>
+        "annotation" pastebin-template >>view-template
         "id" <integer>
             hidden >>renderer
             add-field
         "aid" <integer>
             hidden >>renderer
             add-field
-        "annotation" pastebin-template >>view-template
         "summary" <string> add-field
         "author" <string> add-field
         "mode" <mode> add-field
@@ -79,7 +79,7 @@ annotation "ANNOTATION"
         "date" <date> add-field ;
 
 : <new-annotation-form> ( -- form )
-    "paste" <form>
+    "annotation" <form>
         "new-annotation" pastebin-template >>edit-template
         "id" <integer>
             hidden >>renderer
