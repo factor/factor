@@ -460,3 +460,10 @@ must-fail-with
     "change-combination" "parser.tests" lookup
     "methods" word-prop assoc-size
 ] unit-test
+
+[ [ ] ] [
+    2 [
+        "IN: classes.tests DEFER: twice-fails FORGET: twice-fails MIXIN: twice-fails"
+        <string-reader> "twice-fails-test" parse-stream
+    ] times
+] unit-test

@@ -160,3 +160,12 @@ TUPLE: flat-mx-2-1 ; INSTANCE: flat-mx-2-1 flat-mx-2
 [ t ] [ 3 number instance? ] unit-test
 [ f ] [ 3 null instance? ] unit-test
 [ t ] [ "hi" \ hi-tag instance? ] unit-test
+
+! Regression
+GENERIC: method-forget-test
+TUPLE: method-forget-class ;
+M: method-forget-class method-forget-test ;
+
+[ f ] [ \ method-forget-test "methods" assoc-empty? ] unit-test
+[ ] [ [ \ method-forget-class forget ] with-compilation-unit ] unit-test
+[ t ] [ \ method-forget-test "methods" assoc-empty? ] unit-test
