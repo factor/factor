@@ -104,3 +104,17 @@ unit-test
         2drop
     ] { } make
 ] unit-test
+
+[
+    H{
+        { "bangers" "mash" }
+        { "fries" "onion rings" }
+    }
+] [
+    { "bangers" "fries" } H{
+        { "fish" "chips" }
+        { "bangers" "mash" }
+        { "fries" "onion rings" }
+        { "nachos" "cheese" }
+    } extract-keys
+] unit-test
