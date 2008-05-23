@@ -1,10 +1,10 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel namespaces io io.timeouts strings splitting
-threads sequences prettyprint io.server logging calendar
-http html html.elements accessors math.parser combinators.lib
+threads sequences prettyprint io.server logging calendar http
+html.streams html.elements accessors math.parser combinators.lib
 tools.vocabs debugger continuations random combinators
-destructors io.encodings.8-bit fry classes words ;
+destructors io.encodings.8-bit fry classes words math ;
 IN: http.server
 
 ! path is a sequence of path component strings
@@ -274,9 +274,11 @@ SYMBOL: exit-continuation
     ] with-destructors ;
 
 : httpd ( port -- )
-    internet-server "http.server"
-    latin1 [ handle-client ] with-server ;
+    dup integer? [ internet-server ] when
+    "http.server" latin1
+    [ handle-client ] with-server ;
 
-: httpd-main ( -- ) 8888 httpd ;
+: httpd-main ( -- )
+    8888 httpd ;
 
 MAIN: httpd-main
