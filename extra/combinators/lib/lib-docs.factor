@@ -23,7 +23,7 @@ HELP: ndip
   { $example "USING: combinators.lib kernel prettyprint ;" "1 2 [ dup ] 1 ndip .s" "1\n1\n2" }
   { $example "USING: combinators.lib kernel prettyprint ;" "1 2 3 [ drop ] 2 ndip .s" "2\n3" }
 }
-{ $see-also dip dipd } ;
+{ $see-also dip 2dip } ;
 
 HELP: nslip
 { $values { "n" number } }
