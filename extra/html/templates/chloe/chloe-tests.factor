@@ -1,8 +1,8 @@
-USING: http.server.templating http.server.templating.chloe
-http.server.components http.server.boilerplate tools.test
-io.streams.string kernel sequences ascii boxes namespaces xml
+USING: html.templates html.templates.chloe
+tools.test io.streams.string kernel sequences ascii boxes
+namespaces xml
 splitting ;
-IN: http.server.templating.chloe.tests
+IN: html.templates.chloe.tests
 
 [ f ] [ f parse-query-attr ] unit-test
 
@@ -26,7 +26,7 @@ IN: http.server.templating.chloe.tests
     "?>" split1 nip ; inline
 
 : test-template ( name -- template )
-    "resource:extra/http/server/templating/chloe/test/"
+    "resource:extra/html/templates/chloe/test/"
     swap
     ".xml" 3append <chloe> ;
 

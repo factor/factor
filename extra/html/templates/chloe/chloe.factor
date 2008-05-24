@@ -3,13 +3,14 @@
 USING: accessors kernel sequences combinators kernel namespaces
 classes.tuple assocs splitting words arrays memoize
 io io.files io.encodings.utf8 io.streams.string
-unicode.case tuple-syntax html html.elements
+unicode.case tuple-syntax mirrors fry
 multiline xml xml.data xml.writer xml.utilities
+html.elements
+html.components
 http.server
 http.server.auth
 http.server.flows
 http.server.actions
-http.server.components
 http.server.sessions
 http.server.templating
 http.server.boilerplate ;
@@ -52,8 +53,11 @@ MEMO: chloe-name ( string -- name )
 : optional-attr ( tag name -- value )
     chloe-name swap at ;
 
+: process-tag-children ( tag -- )
+    [ process-template ] each ;
+
 : children>string ( tag -- string )
-    [ [ process-template ] each ] with-string-writer ;
+    [ process-tag-children ] with-string-writer ;
 
 : title-tag ( tag -- )
     children>string set-title ;
@@ -89,18 +93,6 @@ MEMO: chloe-name ( string -- name )
         atom-feed get value>> second write
     ] if ;
 
-: component-attr ( tag -- name )
-    "component" required-attr ;
-
-: view-tag ( tag -- )
-    component-attr component render-view ;
-
-: edit-tag ( tag -- )
-    component-attr component render-edit ;
-
-: summary-tag ( tag -- )
-    component-attr component render-summary ;
-
 : parse-query-attr ( string -- assoc )
     dup empty?
     [ drop f ] [ "," split [ dup value ] H{ } map>assoc ] if ;
@@ -133,9 +125,6 @@ MEMO: chloe-name ( string -- name )
         a>
     ] with-scope ;
 
-: process-tag-children ( tag -- )
-    [ process-template ] each ;
-
 : a-tag ( tag -- )
     [ a-start-tag ]
     [ process-tag-children ]
@@ -156,7 +145,7 @@ MEMO: chloe-name ( string -- name )
             form>
         ] [
             hidden-form-field
-            "for" optional-attr [ component render-edit ] when*
+            "for" optional-attr [ hidden render ] when*
         ] bi
     ] with-scope ;
 
@@ -180,9 +169,9 @@ STRING: button-tag-markup
 : button-tag ( tag -- )
     button-tag-markup string>xml delegate
     {
-        [ >r tag-attrs chloe-attrs-only r> add-tag-attrs ]
-        [ >r tag-attrs non-chloe-attrs-only r> "button" tag-named add-tag-attrs ]
-        [ >r children>string 1array r> "button" tag-named set-tag-children ]
+        [ [ tag-attrs chloe-attrs-only ] dip add-tag-attrs ]
+        [ [ tag-attrs non-chloe-attrs-only ] dip "button" tag-named add-tag-attrs ]
+        [ [ children>string 1array ] dip "button" tag-named set-tag-children ]
         [ nip ]
     } 2cleave process-chloe-tag ;
 
@@ -211,27 +200,58 @@ STRING: button-tag-markup
 : error-message-tag ( tag -- )
     children>string render-error ;
 
+: validation-messages-tag ( tag -- )
+    drop render-validation-messages ;
+
+: singleton-component-tag ( tag class -- )
+    [ "name" required-attr ] dip render ;
+
+: attrs>slots ( tag tuple -- )
+    [ attrs>> ] [ <mirror> ] bi* '[ swap tag>> , set-at ] assoc-each ;
+
+: tuple-component-tag ( tag class -- )
+    [ drop "name" required-attr ]
+    [ new [ attrs>slots ] keep ]
+    2bi render ;
+
 : process-chloe-tag ( tag -- )
     dup name-tag {
-        { "chloe" [ [ process-template ] each ] }
+        { "chloe" [ process-tag-children ] }
+
+        ! HTML head
         { "title" [ title-tag ] }
         { "write-title" [ write-title-tag ] }
         { "style" [ style-tag ] }
         { "write-style" [ write-style-tag ] }
         { "atom" [ atom-tag ] }
         { "write-atom" [ write-atom-tag ] }
-        { "view" [ view-tag ] }
-        { "edit" [ edit-tag ] }
-        { "summary" [ summary-tag ] }
+
+        ! HTML elements
         { "a" [ a-tag ] }
-        { "form" [ form-tag ] }
         { "button" [ button-tag ] }
+
+        ! Components
+        { "label" [ label singleton-component-tag ] }
+        { "link" [ link singleton-component-tag ] }
+        { "html" [ html singleton-component-tag ] }
+
+        ! Forms
+        { "form" [ form-tag ] }
         { "error-message" [ error-message-tag ] }
-        { "validation-message" [ drop render-validation-message ] }
+        { "validation-messages" [ validation-messages-tag ] }
+        { "hidden" [ hidden singleton-component-tag ] }
+        { "field" [ field tuple-component-tag ] }
+        { "password" [ password tuple-component-tag ] }
+        { "textarea" [ textarea tuple-component-tag ] }
+        { "choice" [ choice tuple-component-tag ] }
+        { "checkbox" [ checkbox tuple-component-tag ] }
+
+        ! Control flow
         { "if" [ if-tag ] }
         { "comment" [ drop ] }
         { "call-next-template" [ drop call-next-template ] }
-        [ "Unknown chloe tag: " swap append throw ]
+
+        [ "Unknown chloe tag: " prepend throw ]
     } case ;
 
 : process-tag ( tag -- )

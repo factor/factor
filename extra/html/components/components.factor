@@ -78,7 +78,7 @@ M: password render*
     [ drop "" ] 2dip size>> "password" render-field ;
 
 ! Text areas
-TUPLE: textarea rows columns ;
+TUPLE: textarea rows cols ;
 
 : <textarea> ( -- renderer )
     textarea new ;
@@ -86,14 +86,14 @@ TUPLE: textarea rows columns ;
 M: textarea render*
     <textarea
         [ rows>> [ number>string =rows ] when* ]
-        [ columns>> [ number>string =cols ] when* ] bi
+        [ cols>> [ number>string =cols ] when* ] bi
         =name
     textarea>
         object>string escape-string write
     </textarea> ;
 
 ! Choice
-TUPLE: choice size choices multiple ;
+TUPLE: choice size multiple choices ;
 
 : <choice> ( -- choice )
     choice new ;
@@ -112,7 +112,7 @@ M: choice render*
         dup size>> [ number>string =size ] when*
         dup multiple>> [ "true" =multiple ] when
     select>
-        [ choices>> ] [ multiple>> ] bi
+        [ choices>> value ] [ multiple>> ] bi
         [ swap ] [ swap 1array ] if
         render-options
     </select> ;

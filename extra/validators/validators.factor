@@ -122,12 +122,7 @@ C: <validation-error> validation-error
     [ swap validation-error-for f ] recover ; inline
 
 : validate-value ( value name validators -- result )
-    '[
-        , at {
-            { [ dup pair? ] [ first ] }
-            { [ dup quotation? ] [ ] }
-        } cond call
-    ] validate ;
+    '[ , at call ] validate ;
 
 : required-values ( assoc -- )
     [ swap [ drop v-required ] validate drop ] assoc-each ;

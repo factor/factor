@@ -1,10 +1,10 @@
 USING: io io.files io.streams.string io.encodings.utf8
-http.server.templating http.server.templating.fhtml kernel
+html.templates html.templates.fhtml kernel
 tools.test sequences parser ;
-IN: http.server.templating.fhtml.tests
+IN: html.templates.fhtml.tests
 
 : test-template ( path -- ? )
-    "resource:extra/http/server/templating/fhtml/test/"
+    "resource:extra/html/templates/fhtml/test/"
     prepend
     [
         ".fhtml" append <fhtml> [ call-template ] with-string-writer

@@ -4,12 +4,10 @@
 USING: continuations sequences kernel namespaces debugger
 combinators math quotations generic strings splitting
 accessors assocs fry
-parser io io.files io.streams.string io.encodings.utf8 source-files
-html html.elements
-http.server.static http.server http.server.templating ;
-IN: http.server.templating.fhtml
-
-: templating-vocab ( -- vocab-name ) "http.server.templating.fhtml" ;
+parser io io.files io.streams.string io.encodings.utf8
+html.elements
+html.templates ;
+IN: html.templates.fhtml
 
 ! We use a custom lexer so that %> ends a token even if not
 ! followed by whitespace
@@ -35,7 +33,7 @@ DEFER: <% delimiter
 : found-<% ( accum lexer col -- accum )
     [
         over line-text>>
-        >r >r column>> r> r> subseq parsed
+        [ column>> ] 2dip subseq parsed
         \ write-html parsed
     ] 2keep 2 + >>column drop ;
 
@@ -62,37 +60,20 @@ DEFER: <% delimiter
 
 : parse-template ( string -- quot )
     [
-        use [ clone ] change
-        templating-vocab use+
+        "quiet" on
+        parser-notes off
+        "html.templates.fhtml" use+
         string-lines parse-template-lines
-    ] with-scope ;
+    ] with-file-vocabs ;
 
-: eval-template ( string -- ) parse-template call ;
-
-: html-error. ( error -- )
-    <pre> error. </pre> ;
+: eval-template ( string -- )
+    parse-template call ;
 
 TUPLE: fhtml path ;
 
 C: <fhtml> fhtml
 
 M: fhtml call-template* ( filename -- )
-    '[
-        , path>> [
-            "quiet" on
-            parser-notes off
-            templating-vocab use+
-            ! so that reload works properly
-            dup source-file file set
-            utf8 file-contents
-            [ eval-template ] [ html-error. drop ] recover
-        ] with-file-vocabs
-    ] assert-depth ;
-
-! file responder integration
-: enable-fhtml ( responder -- responder )
-    [ <fhtml> serve-template ]
-    "application/x-factor-server-page"
-    pick special>> set-at ;
+    '[ , path>> utf8 file-contents eval-template ] assert-depth ;
 
 INSTANCE: fhtml template

@@ -60,7 +60,7 @@ TUPLE: color red green blue ;
 
 [ ] [
     [
-        "green" <textarea> 25 >>rows 30 >>columns render
+        "green" <textarea> 25 >>rows 30 >>cols render
     ] with-null-writer
 ] unit-test
 
@@ -68,11 +68,13 @@ TUPLE: color red green blue ;
 
 [ ] [ "new york" "city1" set-value ] unit-test
 
+[ ] [ { "new york" "los angeles" "chicago" } "cities" set-value ] unit-test
+
 [ ] [
     [
         "city1"
         <choice>
-            { "new york" "los angeles" "chicago" } >>choices
+            "cities" >>choices
         render
     ] with-null-writer
 ] unit-test
@@ -83,7 +85,7 @@ TUPLE: color red green blue ;
     [
         "city2"
         <choice>
-            { "new york" "los angeles" "chicago" } >>choices
+            "cities" >>choices
             t >>multiple
         render
     ] with-null-writer
@@ -93,7 +95,7 @@ TUPLE: color red green blue ;
     [
         "city2"
         <choice>
-            { "new york" "los angeles" "chicago" } >>choices
+            "cities" >>choices
             t >>multiple
             5 >>size
         render
