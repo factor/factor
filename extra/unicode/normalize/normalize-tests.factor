@@ -2,7 +2,7 @@ USING: unicode.normalize kernel tools.test sequences ;
 
 [ "ab\u000323\u000302cd" ] [ "ab\u000302" "\u000323cd" string-append ] unit-test
 
-[ "ab\u00064b\u00034d\u00034e\u000347\u000346" ] [ "ab\u000346\u000347\u00064b\u00034e\u00034d" dup reorder ] unit-test
+[ "ab\u00064b\u000347\u00034e\u00034d\u000346" ] [ "ab\u000346\u000347\u00064b\u00034e\u00034d" dup reorder ] unit-test
 [ "hello" "hello" ] [ "hello" [ nfd ] keep nfkd ] unit-test
 [ "\u00FB012\u002075\u00017F\u000323\u000307" "fi25s\u000323\u000307" ]
 [ "\u00FB012\u002075\u001E9B\u000323" [ nfd ] keep nfkd ] unit-test
