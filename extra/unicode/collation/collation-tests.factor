@@ -8,12 +8,14 @@ IN: unicode.collation.tests
     [ ";" split1 drop " " split [ hex> ] "" map-as ] map ;
 
 : test-two ( str1 str2 -- )
-    [ +lt+ ] -rot [ string<=> ] 2curry unit-test ;  
-
-: test parse-test 2 <clumps> [ test-two ] assoc-each ;
+    [ +lt+ ] -rot [ string<=> ] 2curry unit-test ;
 
 : find-failure
     parse-test dup 2 <clumps>
+    [ string<=> +lt+ = not ] assoc-find drop ;
+
+: (find-failure)
+    dup 2 <clumps>
     [ string<=> +lt+ = not ] assoc-find drop ;
 
 : failures

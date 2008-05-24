@@ -1,7 +1,7 @@
 USING: sequences io.files io.encodings.ascii kernel values
 splitting accessors math.parser ascii io assocs strings math
 namespaces sorting combinators math.order arrays
-unicode.normalize ;
+unicode.normalize unicode.data combinators.lib locals ;
 IN: unicode.collation
 
 VALUE: ducet
@@ -33,14 +33,39 @@ ascii <file-reader> parse-ducet \ ducet set-value
 : derive-weight ( char -- weight )
     ! This should check Noncharacter_Code_Point
     ! If yes, then ignore the character
-    ! otherwise, apply derivation formula
+    ! otherwise, apply derivation formula with the right base
     drop { } ;
 
-: string>weights ( string -- weights )
-    ! This should actually look things up with
-    ! multichar collation elements
-    ! Also, do weight derivation for things not in DUCET
-    [ dup 1string ducet at [ ] [ derive-weight ] ?if ]
+: last ( -- char )
+    building get empty? [ 0 ] [ building get peek peek ] if ;
+
+: blocked? ( char -- ? )
+    combining-class [
+        last combining-class =
+    ] [ last combining-class ] if* ;
+
+: possible-bases ( -- slice-of-building )
+    building get dup [ first combining-class not ] find-last
+    drop [ 0 ] unless* tail-slice ;
+
+:: ?combine ( char slice i -- ? )
+    [let | str [ i slice nth char suffix ] |
+        str ducet key? dup
+        [ str i slice set-nth ] when
+    ] ;
+
+: add ( char -- )
+    dup blocked? [ 1string , ] [
+        dup possible-bases dup length
+        [ ?combine ] 2with contains?
+        [ drop ] [ 1string , ] if
+    ] if ;
+
+: string>graphemes ( string -- graphemes )
+    [ [ add ] each ] { } make ;
+
+: graphemes>weights ( graphemes -- weights )
+    [ dup ducet at [ ] [ derive-weight ] ?if ]
     { } map-as concat ;
 
 : append-weights ( weights quot -- )
@@ -65,8 +90,6 @@ ascii <file-reader> parse-ducet \ ducet set-value
     [ zero? ] tri@ and and ;
 
 : filter-ignorable ( weights -- weights' )
-    ! Filters primary-ignorables which follow variable weighteds
-    ! and all completely-ignorables
     >r f r> [
         tuck primary>> zero? and
         [ swap ignorable?>> or ]
@@ -74,7 +97,8 @@ ascii <file-reader> parse-ducet \ ducet set-value
     ] filter nip ;
 
 : collation-key ( string -- key )
-    nfd string>weights filter-ignorable weights>bytes ;
+    nfd string>graphemes graphemes>weights
+    filter-ignorable weights>bytes ;
 
 : compare-collation ( {str1,key} {str2,key} -- <=> )
     2dup [ second ] bi@ <=> dup +eq+ =
@@ -87,3 +111,17 @@ ascii <file-reader> parse-ducet \ ducet set-value
 
 : string<=> ( str1 str2 -- <=> )
     [ dup collation-key 2array ] bi@ compare-collation ;
+
+! Fix up table for long contractions
+: help-one ( assoc key -- )
+    ! Does this need to be more general?
+    2 head 2dup swap key? [ 2drop ] [
+        [ [ 1string swap at ] with { } map-as concat ]
+        [ swap set-at ] 2bi
+    ] if ;
+
+: insert-helpers ( assoc -- )
+    dup keys [ length 3 >= ] filter
+    [ help-one ] with each ;
+
+ducet insert-helpers
