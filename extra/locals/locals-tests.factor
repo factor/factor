@@ -254,3 +254,14 @@ M:: fixnum next-method-test ( a -- b ) a call-next-method 1 + ;
 [ 3 ] [ 1 [let | a [ ] | 3 ] ] unit-test
 
 [ ] [ 1 2 [let | a [ ] b [ ] | ] ] unit-test
+
+:: a-word-with-locals ( a b -- ) ;
+
+: new-definition "IN: locals.tests\nUSING: math ;\n: a-word-with-locals ( -- x ) 2 3 + ;\n" ;
+
+[ ] [ new-definition eval ] unit-test
+
+[ t ] [
+    [ \ a-word-with-locals see ] with-string-writer
+    new-definition =
+] unit-test
