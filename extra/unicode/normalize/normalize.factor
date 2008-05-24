@@ -1,5 +1,5 @@
 USING: sequences namespaces unicode.data kernel math arrays
-locals combinators.lib sequences.lib ;
+locals combinators.lib sequences.lib combinators.lib ;
 IN: unicode.normalize
 
 ! Conjoining Jamo behavior
@@ -55,15 +55,17 @@ IN: unicode.normalize
 : reorder-back ( string i -- )
     over [ non-starter? not ] find-last-from drop ?1+ reorder-next 2drop ;
 
-: decompose ( string quot -- decomposed )
+:: decompose ( string quot -- decomposed )
     ! When there are 8 and 32-bit strings, this'll be
     ! equivalent to clone on 8 and the contents of the last
     ! main quotation on 32.
-    over [ 127 < ] all? [ drop ] [
-        swap [ [
-            dup hangul? [ hangul>jamo % drop ]
-            [ dup rot call [ % ] [ , ] ?if ] if
-        ] with each ] "" make
+    string [ 127 < ] all? [ string ] [
+        [
+            string [
+                dup hangul? [ hangul>jamo % ]
+                [ dup quot call [ % ] [ , ] ?if ] if
+            ] each
+        ] "" make
         dup reorder
     ] if ; inline
 
@@ -71,7 +73,7 @@ IN: unicode.normalize
     [ canonical-entry ] decompose ;
 
 : nfkd ( string -- string )
-    [ compat-entry ] decompose ;
+    [ compatibility-entry ] decompose ;
 
 : string-append ( s1 s2 -- string )
     ! This could be more optimized,

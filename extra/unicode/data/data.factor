@@ -1,7 +1,8 @@
 USING: assocs math kernel sequences io.files hashtables
 quotations splitting arrays math.parser hash2 math.order
 byte-arrays words namespaces words compiler.units parser
-io.encodings.ascii values ;
+io.encodings.ascii values interval-maps ascii sets assocs.lib
+combinators.lib ;
 IN: unicode.data
 
 ! Convenience functions
@@ -10,15 +11,21 @@ IN: unicode.data
 
 ! Loading data from UnicodeData.txt
 
+: split-; ( line -- array )
+    ";" split [ [ blank? ] trim ] map ;
+
 : data ( filename -- data )
-    ascii file-lines [ ";" split ] map ;
+    ascii file-lines [ split-; ] map ;
 
 : load-data ( -- data )
-    "resource:extra/unicode/UnicodeData.txt" data ;
+    "resource:extra/unicode/data/UnicodeData.txt" data ;
+
+: filter-comments ( lines -- lines )
+    [ "#@" split first ] map harvest ;
 
 : (process-data) ( index data -- newdata )
+    filter-comments
     [ [ nth ] keep first swap 2array ] with map
-    [ second empty? not ] filter
     [ >r hex> r> ] assoc-map ;
 
 : process-data ( index data -- hash )
@@ -34,7 +41,7 @@ IN: unicode.data
     dup [ swap (chain-decomposed) ] curry assoc-map ;
 
 : first* ( seq -- ? )
-    second dup empty? [ ] [ first ] ?if ;
+    second [ empty? ] [ first ] or? ;
 
 : (process-decomposed) ( data -- alist )
     5 swap (process-data)
@@ -46,12 +53,12 @@ IN: unicode.data
         [ second length 2 = ] filter
         ! using 1009 as the size, the maximum load is 4
         [ first2 first2 rot 3array ] map 1009 alist>hash2
-    ] keep
-    >hashtable chain-decomposed ;
+    ] [ >hashtable chain-decomposed ] bi ;
 
-: process-compat ( data -- hash )
+: process-compatibility ( data -- hash )
     (process-decomposed)
     [ dup first* [ first2 rest 2array ] unless ] map
+    [ second empty? not ] filter
     >hashtable chain-decomposed ;
 
 : process-combining ( data -- hash )
@@ -99,30 +106,51 @@ C: <code-point> code-point
     4 head [ multihex ] map first4
     <code-point> swap first set ;
 
+! Extra properties
+: properties-lines ( -- lines )
+    "resource:extra/unicode/data/PropList.txt"
+    ascii file-lines ;
+
+: parse-properties ( -- {{[a,b],prop}} )
+    properties-lines filter-comments [
+        split-; first2
+        [ ".." split1 [ dup ] unless* [ hex> ] bi@ 2array ] dip
+    ] { } map>assoc ;
+
+: properties>intervals ( properties -- assoc[str,interval] )
+    dup values prune [ f ] H{ } map>assoc
+    [ [ insert-at ] curry assoc-each ] keep
+    [ <interval-set> ] assoc-map ;
+
+: load-properties ( -- assoc )
+    parse-properties properties>intervals ;
+
+! Special casing data
+: load-special-casing ( -- special-casing )
+    "resource:extra/unicode/data/SpecialCasing.txt" data
+    [ length 5 = ] filter
+    [ [ set-code-point ] each ] H{ } make-assoc ;
+
 VALUE: simple-lower
 VALUE: simple-upper
 VALUE: simple-title
 VALUE: canonical-map
 VALUE: combine-map
 VALUE: class-map
-VALUE: compat-map
+VALUE: compatibility-map
 VALUE: category-map
 VALUE: name-map
 VALUE: special-casing
+VALUE: properties
 
 : canonical-entry ( char -- seq ) canonical-map at ;
 : combine-chars ( a b -- char/f ) combine-map hash2 ;
-: compat-entry ( char -- seq ) compat-map at  ;
+: compatibility-entry ( char -- seq ) compatibility-map at  ;
 : combining-class ( char -- n ) class-map at ;
 : non-starter? ( char -- ? ) class-map key? ;
 : name>char ( string -- char ) name-map at ;
 : char>name ( char -- string ) name-map value-at ;
-
-! Special casing data
-: load-special-casing ( -- special-casing )
-    "resource:extra/unicode/SpecialCasing.txt" data
-    [ length 5 = ] filter
-    [ [ set-code-point ] each ] H{ } make-assoc ;
+: property? ( char property -- ? ) properties at interval-key? ;
 
 load-data
 dup process-names \ name-map set-value
@@ -132,6 +160,9 @@ dup process-names \ name-map set-value
 dup process-combining \ class-map set-value
 dup process-canonical \ canonical-map set-value
     \ combine-map set-value
-dup process-compat \ compat-map set-value
+dup process-compatibility \ compatibility-map set-value
 process-category \ category-map set-value
+
 load-special-casing \ special-casing set-value
+
+load-properties \ properties set-value

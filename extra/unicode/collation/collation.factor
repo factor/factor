@@ -8,10 +8,6 @@ VALUE: ducet
 
 TUPLE: weight primary secondary tertiary ignorable? ;
 
-: remove-comments ( lines -- lines )
-    [ "#" split1 drop "@" split1 drop ] map
-    [ empty? not ] filter ;
-
 : parse-weight ( string -- weight )
     "]" split but-last [
         weight new swap rest unclip CHAR: * = swapd >>ignorable?
@@ -24,17 +20,27 @@ TUPLE: weight primary secondary tertiary ignorable? ;
     [ " " split [ hex> ] "" map-as ] [ parse-weight ] bi* ;
 
 : parse-ducet ( stream -- ducet )
-    lines remove-comments
+    lines filter-comments
     [ parse-line ] H{ } map>assoc ;
 
 "resource:extra/unicode/collation/allkeys.txt"
 ascii <file-reader> parse-ducet \ ducet set-value
 
-: derive-weight ( char -- weight )
-    ! This should check Noncharacter_Code_Point
-    ! If yes, then ignore the character
-    ! otherwise, apply derivation formula with the right base
-    drop { } ;
+: base ( char -- base )
+    dup "Unified_Ideograph" property?
+    [ -16 shift zero? HEX: FB40 HEX: FB80 ? ]
+    [ drop HEX: FBC0 ] if ;
+
+: AAAA ( char -- weight )
+    [ base ] [ -15 shift ] bi + HEX: 20 2 f weight boa ;
+
+: BBBB ( char -- weight )
+    HEX: 7FFF bitand HEX: 8000 bitor 0 0 f weight boa ;
+
+: derive-weight ( char -- weights )
+    first dup "Noncharacter_Code_Point" property?
+    [ drop { } ]
+    [ [ AAAA ] [ BBBB ] bi 2array ] if ;
 
 : last ( -- char )
     building get empty? [ 0 ] [ building get peek peek ] if ;
