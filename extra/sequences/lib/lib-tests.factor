@@ -79,3 +79,9 @@ IN: sequences.lib.tests
 
 [ ] [ { } 0 firstn ] unit-test
 [ "a" ] [ { "a" } 1 firstn ] unit-test
+
+[ "empty" ] [ { } [ "not empty" ] [ "empty" ] if-seq ] unit-test
+[ { 1 } "not empty" ] [ { 1 } [ "not empty" ] [ "empty" ] if-seq ] unit-test
+
+[ "empty" ] [ { } [ "empty" ] [ "not empty" ] if-empty ] unit-test
+[ { 1 } "not empty" ] [ { 1 } [ "empty" ] [ "not empty" ] if-empty ] unit-test
