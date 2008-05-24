@@ -1,6 +1,6 @@
 USING: html.streams html.streams.private
 io io.streams.string io.styles kernel
-namespaces tools.test xml.writer sbufs sequences ;
+namespaces tools.test xml.writer sbufs sequences inspector ;
 IN: html.streams.tests
 
 : make-html-string
@@ -70,3 +70,5 @@ M: funky browser-link-href
 ] [
     [ H{ } [ ] with-nesting nl ] make-html-string
 ] unit-test
+
+[ ] [ [ { 1 2 3 } describe ] with-html-stream ] unit-test

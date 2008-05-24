@@ -1,50 +1,44 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: generic assocs help http io io.styles io.files continuations
 io.streams.string kernel math math.order math.parser namespaces
 quotations assocs sequences strings words html.elements
-xml.entities sbufs continuations destructors ;
+xml.entities sbufs continuations destructors accessors ;
 IN: html.streams
 
 GENERIC: browser-link-href ( presented -- href )
 
 M: object browser-link-href drop f ;
 
-TUPLE: html-stream last-div? ;
+TUPLE: html-stream stream last-div ;
 
-! A hack: stream-nl after with-nesting or tabular-output is
-! ignored, so that HTML stream output looks like UI pane output
-: test-last-div? ( stream -- ? )
-    dup html-stream-last-div?
-    f rot set-html-stream-last-div? ;
+! stream-nl after with-nesting or tabular-output is
+! ignored, so that HTML stream output looks like
+! UI pane output
+: last-div? ( stream -- ? )
+    [ f ] change-last-div drop ;
 
 : not-a-div ( stream -- stream )
-    dup test-last-div? drop ; inline
+    f >>last-div ; inline
 
 : a-div ( stream -- straem )
-    t over set-html-stream-last-div? ; inline
+    t >>last-div ; inline
 
 : <html-stream> ( stream -- stream )
-    html-stream construct-delegate ;
+    f html-stream boa ;
 
 <PRIVATE
 
-TUPLE: html-sub-stream style stream ;
+TUPLE: html-sub-stream < html-stream style parent ;
 
-: (html-sub-stream) ( style stream -- stream )
-    html-sub-stream boa
-    512 <sbuf> <html-stream> over set-delegate ;
-
-: <html-sub-stream> ( style stream class -- stream )
-    >r (html-sub-stream) r> construct-delegate ; inline
+: new-html-sub-stream ( style stream class -- stream )
+    new
+        512 <sbuf> >>stream
+        swap >>parent
+        swap >>style ; inline
 
 : end-sub-stream ( substream -- string style stream )
-    dup delegate >string
-    over html-sub-stream-style
-    rot html-sub-stream-stream ;
-
-: delegate-write ( string -- )
-    output-stream get delegate stream-write ;
+    [ stream>> >string ] [ style>> ] [ parent>> ] tri ;
 
 : object-link-tag ( style quot -- )
     presented pick at [
@@ -99,11 +93,11 @@ TUPLE: html-sub-stream style stream ;
     ] if ; inline
 
 : format-html-span ( string style stream -- )
-    [
-        [ [ drop delegate-write ] span-tag ] object-link-tag
+    stream>> [
+        [ [ drop write ] span-tag ] object-link-tag
     ] with-output-stream* ;
 
-TUPLE: html-span-stream ;
+TUPLE: html-span-stream < html-sub-stream ;
 
 M: html-span-stream dispose
     end-sub-stream not-a-div format-html-span ;
@@ -132,11 +126,11 @@ M: html-span-stream dispose
     ] if ; inline
 
 : format-html-div ( string style stream -- )
-    [
-        [ [ delegate-write ] div-tag ] object-link-tag
+    stream>> [
+        [ [ write ] div-tag ] object-link-tag
     ] with-output-stream* ;
 
-TUPLE: html-block-stream ;
+TUPLE: html-block-stream < html-sub-stream ;
 
 M: html-block-stream dispose ( quot style stream -- )
     end-sub-stream a-div format-html-div ;
@@ -159,38 +153,43 @@ M: html-block-stream dispose ( quot style stream -- )
 PRIVATE>
 
 ! Stream protocol
-M: html-stream stream-write1 ( char stream -- )
+M: html-stream stream-flush
+    stream>> stream-flush ;
+
+M: html-stream stream-write1
     >r 1string r> stream-write ;
 
-M: html-stream stream-write ( str stream -- )
-    not-a-div >r escape-string r> delegate stream-write ;
+M: html-stream stream-write
+    not-a-div >r escape-string r> stream>> stream-write ;
 
-M: html-stream make-span-stream ( style stream -- stream' )
-    html-span-stream <html-sub-stream> ;
-
-M: html-stream stream-format ( str style stream -- )
+M: html-stream stream-format
     >r html over at [ >r escape-string r> ] unless r>
     format-html-span ;
 
-M: html-stream make-block-stream ( style stream -- stream' )
-    html-block-stream <html-sub-stream> ;
+M: html-stream stream-nl
+    dup last-div? [ drop ] [ [ <br/> ] with-output-stream* ] if ;
 
-M: html-stream stream-write-table ( grid style stream -- )
-    a-div [
+M: html-stream make-span-stream
+    html-span-stream new-html-sub-stream ;
+
+M: html-stream make-block-stream
+    html-block-stream new-html-sub-stream ;
+
+M: html-stream make-cell-stream
+    html-sub-stream new-html-sub-stream ;
+
+M: html-stream stream-write-table
+    a-div stream>> [
         <table dup table-attrs table> swap [
             <tr> [
                 <td "top" =valign swap table-style =style td>
-                    >string write-html
+                    stream>> >string write
                 </td>
             ] with each </tr>
         ] with each </table>
     ] with-output-stream* ;
 
-M: html-stream make-cell-stream ( style stream -- stream' )
-    (html-sub-stream) ;
-
-M: html-stream stream-nl ( stream -- )
-    dup test-last-div? [ drop ] [ [ <br/> ] with-output-stream* ] if ;
+M: html-stream dispose stream>> dispose ;
 
 : with-html-stream ( quot -- )
     output-stream get <html-stream> swap with-output-stream* ; inline
