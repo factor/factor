@@ -155,6 +155,7 @@ IN: regexp4-tests
 [ f ] [ "a" "\\Q\\E" <regexp> matches? ] unit-test
 [ t ] [ "|*+" "\\Q|*+\\E" <regexp> matches? ] unit-test
 [ f ] [ "abc" "\\Q|*+\\E" <regexp> matches? ] unit-test
+[ t ] [ "s" "\\Qs\\E" <regexp> matches? ] unit-test
 
 [ t ] [ "S" "\\0123" <regexp> matches? ] unit-test
 [ t ] [ "SXY" "\\0123XY" <regexp> matches? ] unit-test
@@ -235,12 +236,6 @@ IN: regexp4-tests
     R' a'
     matches?
 ] unit-test
-
-
-
-
-
-
 
 ! ((A)(B(C)))
 ! 1.  ((A)(B(C)))
