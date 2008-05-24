@@ -15,6 +15,9 @@ SYMBOL: values
 
 : blank-values H{ } clone values set ;
 
+: prepare-value ( name object -- value name object )
+    [ [ value ] keep ] dip ; inline
+
 : from-tuple <mirror> values set ;
 
 : values-tuple values get object>> ;
@@ -35,7 +38,7 @@ GENERIC: render* ( value name render -- )
         [ -rot render* ] dip
         render-error
     ] [
-        [ [ value ] keep ] dip render*
+        prepare-value render*
     ] if* ;
 
 <PRIVATE
@@ -56,7 +59,7 @@ M: hidden render* drop "hidden" render-input ;
 : render-field ( value name size type -- )
     <input
         =type
-        [ number>string =size ] when*
+        [ object>string =size ] when*
         =name
         object>string =value
     input/> ;
@@ -85,8 +88,8 @@ TUPLE: textarea rows cols ;
 
 M: textarea render*
     <textarea
-        [ rows>> [ number>string =rows ] when* ]
-        [ cols>> [ number>string =cols ] when* ] bi
+        [ rows>> [ object>string =rows ] when* ]
+        [ cols>> [ object>string =cols ] when* ] bi
         =name
     textarea>
         object>string escape-string write
@@ -109,7 +112,7 @@ TUPLE: choice size multiple choices ;
 M: choice render*
     <select
         swap =name
-        dup size>> [ number>string =size ] when*
+        dup size>> [ object>string =size ] when*
         dup multiple>> [ "true" =multiple ] when
     select>
         [ choices>> value ] [ multiple>> ] bi

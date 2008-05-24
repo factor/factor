@@ -7,14 +7,13 @@ unicode.case tuple-syntax mirrors fry
 multiline xml xml.data xml.writer xml.utilities
 html.elements
 html.components
+html.templates
 http.server
 http.server.auth
 http.server.flows
 http.server.actions
-http.server.sessions
-http.server.templating
-http.server.boilerplate ;
-IN: http.server.templating.chloe
+http.server.sessions ;
+IN: html.templates.chloe
 
 ! Chloe is Ed's favorite web designer
 
@@ -207,7 +206,11 @@ STRING: button-tag-markup
     [ "name" required-attr ] dip render ;
 
 : attrs>slots ( tag tuple -- )
-    [ attrs>> ] [ <mirror> ] bi* '[ swap tag>> , set-at ] assoc-each ;
+    [ attrs>> ] [ <mirror> ] bi*
+    '[
+        swap tag>> dup "name" =
+        [ 2drop ] [ , set-at ] if
+    ] assoc-each ;
 
 : tuple-component-tag ( tag class -- )
     [ drop "name" required-attr ]
@@ -233,6 +236,9 @@ STRING: button-tag-markup
         ! Components
         { "label" [ label singleton-component-tag ] }
         { "link" [ link singleton-component-tag ] }
+        { "code" [ code tuple-component-tag ] }
+        { "farkup" [ farkup singleton-component-tag ] }
+        { "inspector" [ inspector singleton-component-tag ] }
         { "html" [ html singleton-component-tag ] }
 
         ! Forms
