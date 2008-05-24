@@ -1,6 +1,7 @@
 IN: html.components.tests
-USING: html.components tools.test kernel io.streams.string
-io.streams.null accessors ;
+USING: tools.test kernel io.streams.string
+io.streams.null accessors inspector html.streams
+html.components ;
 
 [ ] [ blank-values ] unit-test
 
@@ -144,4 +145,26 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
 
 [ "<html>arbitrary <b>markup</b> for the win!</html>" ] [
     [ "html" html render ] with-string-writer
+] unit-test
+
+[ ] [ "int x = 4;" "code" set-value ] unit-test
+
+[ ] [ "java" "mode" set-value ] unit-test
+
+[ "<span class='KEYWORD3'>int</span> x <span class='OPERATOR'>=</span> <span class='DIGIT'>4</span>;\n" ] [
+    [ "code" <code> "mode" >>mode render ] with-string-writer
+] unit-test
+
+[ ] [ "-foo\n-bar" "farkup" set-value ] unit-test
+
+[ "<ul><li>foo</li><li>bar</li></ul>" ] [
+    [ "farkup" farkup render ] with-string-writer
+] unit-test
+
+[ ] [ { 1 2 3 } "object" set-value ] unit-test
+
+[ t ] [
+    [ "object" inspector render ] with-string-writer
+    [ "object" value [ describe ] with-html-stream ] with-string-writer
+    =
 ] unit-test

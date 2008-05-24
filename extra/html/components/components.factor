@@ -4,7 +4,7 @@ USING: accessors kernel namespaces io math.parser assocs classes
 classes.tuple words arrays sequences splitting mirrors
 hashtables combinators continuations math strings
 fry locals calendar calendar.format xml.entities validators
-html.elements ;
+html.elements html.streams xmode.code2html farkup inspector ;
 IN: html.components
 
 SYMBOL: values
@@ -143,6 +143,27 @@ M: link render*
     <a dup link-href =href a>
         link-title object>string escape-string write
     </a> ;
+
+! XMode code component
+TUPLE: code mode ;
+
+: <code> ( -- code )
+    code new ;
+
+M: code render*
+    [ string-lines ] [ drop ] [ mode>> value ] tri* htmlize-lines ;
+
+! Farkup component
+SINGLETON: farkup
+
+M: farkup render*
+    2drop string-lines "\n" join convert-farkup write ;
+
+! Inspector component
+SINGLETON: inspector
+
+M: inspector render*
+    2drop [ describe ] with-html-stream ;
 
 ! HTML component
 SINGLETON: html
