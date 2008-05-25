@@ -9,12 +9,16 @@ IN: cairo.pango.gadgets
 : <pango-gadget> ( quot -- gadget )
     [ cr layout pango_cairo_show_layout ] (pango-gadget) ;
 
-USING: prettyprint sequences ui.gadgets.panes ;
+USING: prettyprint sequences ui.gadgets.panes
+threads ;
 : hello-pango ( -- )
     50 [ 6 + ] map [
         "Sans " swap unparse append
-        [ layout-font "今日は、 Pango!" layout-text ] curry
-        <pango-gadget> gadget.
+        [ 
+            cr 0 1 0.2 0.6 cairo_set_source_rgba
+            layout-font "今日は、 Pango!" layout-text
+        ] curry
+        <pango-gadget> gadget. yield
     ] each ;
 
 MAIN: hello-pango
