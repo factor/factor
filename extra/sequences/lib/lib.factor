@@ -243,3 +243,9 @@ PRIVATE>
 
 : short ( seq n -- seq n' )
     over length min ; inline
+
+: if-seq ( seq quot1 quot2 -- )
+    [ f like ] 2dip if* ; inline
+
+: if-empty ( seq quot1 quot2 -- )
+    swap if-seq ; inline

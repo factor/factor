@@ -38,8 +38,6 @@ MACRO: napply ( n -- )
 
 : 3apply ( obj obj obj quot -- ) 3 napply ; inline
 
-: dipd ( x y quot -- y ) 2 ndip ; inline
-
 : 2with ( param1 param2 obj quot -- obj curry )
     with with ; inline
 
