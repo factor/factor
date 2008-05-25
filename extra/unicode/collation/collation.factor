@@ -76,28 +76,31 @@ ascii <file-reader> parse-ducet \ ducet set-value
         [ drop ] [ 1string , ] if
     ] if ;
 
+! The terminator method for Hangul syllables
 : terminator 1 0 0 f weight boa ;
 
 MACRO: const ( seq -- seq )
     [ dup word? [ execute ] when ] deep-map 1quotation ;
 
-! : char, ( char -- )
-    ! [
-        ! building get peek [ first ] bi@ dup jamo? [
-            ! over jamo? [
-                ! [ grapheme-class ] bi@ swap 2array
-                ! { { T L } { V L } { V T } } const
-                ! member? [ terminator , ] when
-            ! ] [ 2drop terminator , ] if
-        ! ] [ 2drop ] if
-    ! ] [ , ] bi ;
+: char, ( char -- )
+    [
+        building get peek [ first ] bi@ dup jamo? [
+            over jamo? [
+                [ grapheme-class ] bi@ swap 2array
+                { { T L } { V L } { V T } } const
+                member? [ terminator , ] when
+            ] [ 2drop terminator , ] if
+        ] [ 2drop ] if
+    ] [ , ] bi ;
 
-! : insert-terminators ( graphemes -- graphemes )
+: insert-terminators ( graphemes -- graphemes )
     ! Insert a terminator between hangul syllables
-!     [ unclip , [ char, ] each ] { } make ;
+    [ unclip , [ char, ] each ] { } make ;
+! The above code for the terminator method is not used
+! The test suite passes without it
 
 : string>graphemes ( string -- graphemes )
-    [ [ add ] each ] { } make ; ! insert-terminators ;
+    [ [ add ] each ] { } make ;
 
 : graphemes>weights ( graphemes -- weights )
     [

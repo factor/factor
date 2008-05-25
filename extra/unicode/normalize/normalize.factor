@@ -27,7 +27,7 @@ IN: unicode.normalize
     hangul-base - final-count /mod final-base +
     >r medial-count /mod medial-base +
     >r initial-base + r> r>
-    dup zero? [ drop 2array ] [ 3array ] if ;
+    dup final-base = [ drop 2array ] [ 3array ] if ;
 
 : jamo>hangul ( initial medial final -- hangul )
     >r >r initial-base - medial-count *

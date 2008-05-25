@@ -10,16 +10,8 @@ IN: unicode.collation.tests
 : test-two ( str1 str2 -- )
     [ +lt+ ] -rot [ string<=> ] 2curry unit-test ;
 
-: find-failure
-    parse-test dup 2 <clumps>
-    [ string<=> +lt+ = not ] assoc-find drop ;
-
-: (find-failure)
-    dup 2 <clumps>
-    [ string<=> +lt+ = not ] assoc-find drop ;
-
 : failures
     parse-test dup 2 <clumps>
     [ string<=> +lt+ = not ] assoc-filter dup assoc-size ;
 
-[ 7 ] [ failures 2nip ] unit-test
+parse-test 2 <clumps> [ test-two ] assoc-each

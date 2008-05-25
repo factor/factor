@@ -1,4 +1,7 @@
-USING: unicode.normalize kernel tools.test sequences ;
+USING: unicode.normalize kernel tools.test sequences
+unicode.data io.encodings.utf8 io.files splitting math.parser
+locals math quotations assocs combinators ;
+IN: unicode.normalize.tests
 
 [ "ab\u000323\u000302cd" ] [ "ab\u000302" "\u000323cd" string-append ] unit-test
 
@@ -16,3 +19,26 @@ USING: unicode.normalize kernel tools.test sequences ;
 [ f ] [ 0 hangul? ] unit-test
 [ "\u001112\u001161\u0011ab" ] [ "\u00d55c" nfd ] unit-test
 [ "\u00d55c" ] [ "\u001112\u001161\u0011ab" nfc ] unit-test
+
+: parse-test ( -- tests )
+    "resource:extra/unicode/normalize/NormalizationTest.txt"
+    utf8 file-lines filter-comments
+    [ ";" split 5 head [ " " split [ hex> ] "" map-as ] map ] map ;
+
+:: assert= ( test spec quot -- )
+    spec [
+        [
+            [ 1- test nth ] bi@
+            [ 1quotation ] [ quot curry ] bi* unit-test
+        ] with each
+    ] assoc-each ;
+
+: run-line ( test -- )
+    {
+        [ { { 2 { 1 2 3 } } { 4 { 4 5 } } } [ nfc ] assert= ]
+        [ { { 3 { 1 2 3 } } { 5 { 4 5 } } } [ nfd ] assert= ]
+        [ { { 4 { 1 2 3 4 5 } } } [ nfkc ] assert= ]
+        [ { { 5 { 1 2 3 4 5 } } } [ nfkd ] assert= ]
+    } cleave ;
+
+! parse-test [ run-line ] each
