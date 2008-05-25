@@ -1,7 +1,9 @@
 USING: sequences io.files io.encodings.ascii kernel values
 splitting accessors math.parser ascii io assocs strings math
 namespaces sorting combinators math.order arrays
-unicode.normalize unicode.data combinators.lib locals ;
+unicode.normalize unicode.data combinators.lib locals
+unicode.syntax macros sequences.deep words unicode.breaks
+quotations ;
 IN: unicode.collation
 
 VALUE: ducet
@@ -27,9 +29,12 @@ TUPLE: weight primary secondary tertiary ignorable? ;
 ascii <file-reader> parse-ducet \ ducet set-value
 
 : base ( char -- base )
-    dup "Unified_Ideograph" property?
-    [ -16 shift zero? HEX: FB40 HEX: FB80 ? ]
-    [ drop HEX: FBC0 ] if ;
+    {
+        { [ dup HEX: 3400 HEX:  4DB5 between? ] [ drop HEX: FB80 ] } ! Extension A
+        { [ dup HEX: 20000 HEX: 2A6D6 between? ] [ drop HEX: FB80 ] } ! Extension B
+        { [ dup HEX: 4E00 HEX: 9FC3 between? ] [ drop HEX: FB40 ] } ! CJK
+        [ drop HEX: FBC0 ] ! Other
+    } cond ;
 
 : AAAA ( char -- weight )
     [ base ] [ -15 shift ] bi + HEX: 20 2 f weight boa ;
@@ -37,8 +42,12 @@ ascii <file-reader> parse-ducet \ ducet set-value
 : BBBB ( char -- weight )
     HEX: 7FFF bitand HEX: 8000 bitor 0 0 f weight boa ;
 
+: illegal? ( char -- ? )
+    [ "Noncharacter_Code_Point" property? ]
+    [ category "Cs" = ] or? ;
+
 : derive-weight ( char -- weights )
-    first dup "Noncharacter_Code_Point" property?
+    first dup illegal?
     [ drop { } ]
     [ [ AAAA ] [ BBBB ] bi 2array ] if ;
 
@@ -67,12 +76,34 @@ ascii <file-reader> parse-ducet \ ducet set-value
         [ drop ] [ 1string , ] if
     ] if ;
 
+: terminator 1 0 0 f weight boa ;
+
+MACRO: const ( seq -- seq )
+    [ dup word? [ execute ] when ] deep-map 1quotation ;
+
+! : char, ( char -- )
+    ! [
+        ! building get peek [ first ] bi@ dup jamo? [
+            ! over jamo? [
+                ! [ grapheme-class ] bi@ swap 2array
+                ! { { T L } { V L } { V T } } const
+                ! member? [ terminator , ] when
+            ! ] [ 2drop terminator , ] if
+        ! ] [ 2drop ] if
+    ! ] [ , ] bi ;
+
+! : insert-terminators ( graphemes -- graphemes )
+    ! Insert a terminator between hangul syllables
+!     [ unclip , [ char, ] each ] { } make ;
+
 : string>graphemes ( string -- graphemes )
-    [ [ add ] each ] { } make ;
+    [ [ add ] each ] { } make ; ! insert-terminators ;
 
 : graphemes>weights ( graphemes -- weights )
-    [ dup ducet at [ ] [ derive-weight ] ?if ]
-    { } map-as concat ;
+    [
+        dup weight? [ 1array ] ! From tailoring
+        [ dup ducet at [ ] [ derive-weight ] ?if ] if
+    ] { } map-as concat ;
 
 : append-weights ( weights quot -- )
     swap [ ignorable?>> not ] filter

@@ -21,3 +21,5 @@ IN: unicode.collation.tests
 : failures
     parse-test dup 2 <clumps>
     [ string<=> +lt+ = not ] assoc-filter dup assoc-size ;
+
+[ 7 ] [ failures 2nip ] unit-test

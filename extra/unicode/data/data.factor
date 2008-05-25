@@ -2,8 +2,29 @@ USING: assocs math kernel sequences io.files hashtables
 quotations splitting arrays math.parser hash2 math.order
 byte-arrays words namespaces words compiler.units parser
 io.encodings.ascii values interval-maps ascii sets assocs.lib
-combinators.lib ;
+combinators.lib combinators locals math.ranges sorting ;
 IN: unicode.data
+
+VALUE: simple-lower
+VALUE: simple-upper
+VALUE: simple-title
+VALUE: canonical-map
+VALUE: combine-map
+VALUE: class-map
+VALUE: compatibility-map
+VALUE: category-map
+VALUE: name-map
+VALUE: special-casing
+VALUE: properties
+
+: canonical-entry ( char -- seq ) canonical-map at ;
+: combine-chars ( a b -- char/f ) combine-map hash2 ;
+: compatibility-entry ( char -- seq ) compatibility-map at  ;
+: combining-class ( char -- n ) class-map at ;
+: non-starter? ( char -- ? ) class-map key? ;
+: name>char ( string -- char ) name-map at ;
+: char>name ( char -- string ) name-map value-at ;
+: property? ( char property -- ? ) properties at interval-key? ;
 
 ! Convenience functions
 : ?between? ( n/f from to -- ? )
@@ -69,23 +90,34 @@ IN: unicode.data
 
 : categories ( -- names )
     ! For non-existent characters, use Cn
-    { "Lu" "Ll" "Lt" "Lm" "Lo"
+    { "Cn"
+      "Lu" "Ll" "Lt" "Lm" "Lo"
       "Mn" "Mc" "Me"
       "Nd" "Nl" "No"
       "Pc" "Pd" "Ps" "Pe" "Pi" "Pf" "Po"
       "Sm" "Sc" "Sk" "So"
       "Zs" "Zl" "Zp"
-      "Cc" "Cf" "Cs" "Co" "Cn" } ;
+      "Cc" "Cf" "Cs" "Co" } ;
 
-: unicode-chars HEX: 2FA1E ;
+: num-chars HEX: 2FA1E ;
 ! the maximum unicode char in the first 3 planes
 
-: process-category ( data -- category-listing )
-    2 swap (process-data)
-    unicode-chars <byte-array> swap dupd swap [
-        >r over unicode-chars >= [ r> 3drop ]
-        [ categories index swap r> set-nth ] if
-    ] curry assoc-each ;
+: ?set-nth ( val index seq -- )
+    2dup bounds-check? [ set-nth ] [ 3drop ] if ;
+
+:: fill-ranges ( table -- table )
+    name-map >alist sort-values keys
+    [ [ "first>" tail? ] [ "last>" tail? ] or? ] filter
+    2 group [
+        [ name>char ] bi@ [ [a,b] ] [ table ?nth ] bi
+        [ swap table ?set-nth ] curry each
+    ] assoc-each table ;
+
+:: process-category ( data -- category-listing )
+    [let | table [ num-chars <byte-array> ] |
+        2 data (process-data) [| char cat |
+            cat categories index char table ?set-nth
+        ] assoc-each table fill-ranges ] ;
 
 : ascii-lower ( string -- lower )
     [ dup CHAR: A CHAR: Z between? [ HEX: 20 + ] when ] map ;
@@ -131,37 +163,18 @@ C: <code-point> code-point
     [ length 5 = ] filter
     [ [ set-code-point ] each ] H{ } make-assoc ;
 
-VALUE: simple-lower
-VALUE: simple-upper
-VALUE: simple-title
-VALUE: canonical-map
-VALUE: combine-map
-VALUE: class-map
-VALUE: compatibility-map
-VALUE: category-map
-VALUE: name-map
-VALUE: special-casing
-VALUE: properties
-
-: canonical-entry ( char -- seq ) canonical-map at ;
-: combine-chars ( a b -- char/f ) combine-map hash2 ;
-: compatibility-entry ( char -- seq ) compatibility-map at  ;
-: combining-class ( char -- n ) class-map at ;
-: non-starter? ( char -- ? ) class-map key? ;
-: name>char ( string -- char ) name-map at ;
-: char>name ( char -- string ) name-map value-at ;
-: property? ( char property -- ? ) properties at interval-key? ;
-
-load-data
-dup process-names \ name-map set-value
-13 over process-data \ simple-lower set-value
-12 over process-data tuck \ simple-upper set-value
-14 over process-data swapd assoc-union \ simple-title set-value
-dup process-combining \ class-map set-value
-dup process-canonical \ canonical-map set-value
-    \ combine-map set-value
-dup process-compatibility \ compatibility-map set-value
-process-category \ category-map set-value
+load-data {
+    [ process-names \ name-map set-value ]
+    [ 13 swap process-data \ simple-lower set-value ]
+    [ 12 swap process-data \ simple-upper set-value ]
+    [ 14 swap process-data
+        simple-upper assoc-union \ simple-title set-value ]
+    [ process-combining \ class-map set-value ]
+    [ process-canonical \ canonical-map set-value
+        \ combine-map set-value ]
+    [ process-compatibility \ compatibility-map set-value ]
+    [ process-category \ category-map set-value ]
+} cleave
 
 load-special-casing \ special-casing set-value
 
