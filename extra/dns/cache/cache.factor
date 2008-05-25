@@ -47,15 +47,9 @@ TUPLE: entry time data ;
 
 SYMBOL: NX
 
-: cache-nx ( query ttl -- )
-  ttl->time NX entry boa
-  table-add ;
+: cache-nx ( query ttl -- ) ttl->time NX entry boa table-add ;
 
-: nx? ( obj -- ? )
-  dup entry?
-    [ data>> NX = ]
-    [ drop f ]
-  if ;
+: nx? ( obj -- ? ) dup entry? [ data>> NX = ] [ drop f ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -72,27 +66,15 @@ SYMBOL: NX
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: entry-expired? ( entry -- ? ) time>> time->ttl 0 <= ;
+: expired? ( entry -- ? ) time>> time->ttl 0 <= ;
 
 : cache-get ( query -- result )
   dup table-get               ! query result
     {
-      {
-        [ dup f = ] ! not in the cache
-        [ 2drop f ]
-      }
-      {
-        [ dup entry-expired? ] ! here but expired
-        [ drop table-rem f   ]
-      }
-      {
-        [ dup nx?  ] ! negative result has been cached
-        [ 2drop NX ]
-      }
-      {
-        [ t ]
-        [ query+entry->rrs ]
-      }
+      { [ dup f = ]      [ 2drop f ]          } ! not in the cache
+      { [ dup expired? ] [ drop table-rem f ] } ! here but expired
+      { [ dup nx?  ]     [ 2drop NX ]         } ! negative result cached
+      { [ t ]            [ query+entry->rrs ] } ! good to go
     }
   cond ;
 
@@ -114,22 +96,10 @@ SYMBOL: NX
 : cache-add ( query rr -- )
   over table-get          ! query rr entry
     {
-      {
-        [ dup f = ] ! not in the cache
-        [ drop rr->entry table-add ]
-      }
-      {
-        [ dup nx? ]
-        [ drop over table-rem rr->entry table-add ]
-      }
-      {
-        [ dup entry-expired? ]
-        [ drop rr->entry table-add ]
-      }
-      {
-        [ t ]
-        [ rot drop add-rr-to-entry ]
-      }
+      { [ dup f = ]      [ drop rr->entry table-add ] }
+      { [ dup nx? ]      [ drop over table-rem rr->entry table-add ] }
+      { [ dup expired? ] [ drop rr->entry table-add ] }
+      { [ t ]            [ rot drop add-rr-to-entry ] }
     }
   cond ;
 

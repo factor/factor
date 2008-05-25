@@ -9,14 +9,14 @@ IN: farkup
 <PRIVATE
 
 : delimiters ( -- string )
-    "*_^~%[-=|\\\n" ; inline
+    "*_^~%[-=|\\\r\n" ; inline
 
 MEMO: text ( -- parser )
     [ delimiters member? not ] satisfy repeat1
     [ >string escape-string ] action ;
 
 MEMO: delimiter ( -- parser )
-    [ dup delimiters member? swap "\n=" member? not and ] satisfy
+    [ dup delimiters member? swap "\r\n=" member? not and ] satisfy
     [ 1string ] action ;
 
 : surround-with-foo ( string tag -- seq )
@@ -37,8 +37,11 @@ MEMO: emphasis ( -- parser ) "_" "em" delimited ;
 MEMO: superscript ( -- parser ) "^" "sup" delimited ;
 MEMO: subscript ( -- parser ) "~" "sub" delimited ;
 MEMO: inline-code ( -- parser ) "%" "code" delimited ;
-MEMO: nl ( -- parser ) "\n" token ;
-MEMO: 2nl ( -- parser ) "\n\n" token hide ;
+MEMO: nl ( -- parser )
+    "\r\n" token [ drop "\n" ] action
+    "\r" token [ drop "\n" ] action
+    "\n" token 3choice ;
+MEMO: 2nl ( -- parser ) nl hide nl hide 2seq ;
 MEMO: h1 ( -- parser ) "=" "h1" delimited ;
 MEMO: h2 ( -- parser ) "==" "h2" delimited ;
 MEMO: h3 ( -- parser ) "===" "h3" delimited ;
@@ -117,7 +120,7 @@ MEMO: list-item ( -- parser )
     ] seq* [ "li" surround-with-foo ] action ;
 
 MEMO: list ( -- parser )
-    list-item "\n" token hide list-of
+    list-item nl hide list-of
     [ "ul" surround-with-foo ] action ;
 
 MEMO: table-column ( -- parser )
@@ -149,8 +152,8 @@ MEMO: line ( -- parser )
 
 MEMO: paragraph ( -- parser )
     line
-    "\n" token over 2seq repeat0
-    "\n" token "\n" token ensure-not 2seq optional 3seq
+    nl over 2seq repeat0
+    nl nl ensure-not 2seq optional 3seq
     [
         dup [ dup string? not swap [ blank? ] all? or ] deep-all?
         [ "<p>" swap "</p>" 3array ] unless
@@ -161,7 +164,7 @@ PRIVATE>
 PEG: parse-farkup ( -- parser )
     [
         list , table , h1 , h2 , h3 , h4 , code , paragraph , 2nl , nl ,
-    ] choice* repeat0 "\n" token optional 2seq ;
+    ] choice* repeat0 nl optional 2seq ;
 
 : write-farkup ( parse-result  -- )
     [ dup string? [ write ] [ drop ] if ] deep-each ;

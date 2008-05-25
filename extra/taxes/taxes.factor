@@ -33,6 +33,13 @@ TUPLE: fica-base-unknown ;
 
 ! Employer tax only, not withheld
 : futa-tax-rate ( -- x ) DECIMAL: .062 ; inline
+: futa-base-rate ( -- x ) 7000 ; inline
+: futa-tax-offset-credit ( -- x ) DECIMAL: .054 ; inline
+
+: futa-tax ( salary w4 -- x )
+    drop futa-base-rate min
+    futa-tax-rate futa-tax-offset-credit -
+    * ;
 
 ! No base rate for medicare; all wages subject
 : medicare-tax-rate ( -- x ) DECIMAL: .0145 ; inline

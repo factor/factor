@@ -5,9 +5,6 @@ IN: combinators.lib.tests
 [ 5 ] [ [ 10 random ] [ 5 = ] generate ] unit-test
 [ t ] [ [ 10 random ] [ even? ] generate even? ] unit-test
 
-{ 6 2 } [ 1 2 [ 5 + ] dip ] unit-test
-{ 6 2 1 } [ 1 2 1 [ 5 + ] dipd ] unit-test
-
 [ [ 99 ] 1 2 3 4 5 5 nslip ] must-infer
 { 99 1 2 3 4 5 } [ [ 99 ] 1 2 3 4 5 5 nslip ] unit-test
 [ 1 2 3 4 5 [ drop drop drop drop drop 2 ] 5 nkeep ] must-infer

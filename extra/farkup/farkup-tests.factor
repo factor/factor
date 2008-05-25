@@ -16,10 +16,18 @@ IN: farkup.tests
 [ "<p>**</p>" ] [ "\\**" convert-farkup ] unit-test
 
 [ "" ] [ "\n\n" convert-farkup ] unit-test
+[ "" ] [ "\r\n\r\n" convert-farkup ] unit-test
+[ "" ] [ "\r\r\r\r" convert-farkup ] unit-test
+[ "\n" ] [ "\r\r\r" convert-farkup ] unit-test
 [ "\n" ] [ "\n\n\n" convert-farkup ] unit-test
 [ "<p>foo</p><p>bar</p>" ] [ "foo\n\nbar" convert-farkup ] unit-test
+[ "<p>foo</p><p>bar</p>" ] [ "foo\r\n\r\nbar" convert-farkup ] unit-test
+[ "<p>foo</p><p>bar</p>" ] [ "foo\r\rbar" convert-farkup ] unit-test
+[ "<p>foo</p><p>bar</p>" ] [ "foo\r\r\nbar" convert-farkup ] unit-test
 
 [ "\n<p>bar\n</p>" ] [ "\nbar\n" convert-farkup ] unit-test
+[ "\n<p>bar\n</p>" ] [ "\rbar\r" convert-farkup ] unit-test
+[ "\n<p>bar\n</p>" ] [ "\r\nbar\r\n" convert-farkup ] unit-test
 
 [ "<p>foo</p>\n<p>bar</p>" ] [ "foo\n\n\nbar" convert-farkup ] unit-test
 

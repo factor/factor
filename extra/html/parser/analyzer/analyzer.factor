@@ -3,25 +3,27 @@ arrays shuffle unicode.case namespaces splitting http
 sequences.lib accessors io combinators http.client ;
 IN: html.parser.analyzer
 
+TUPLE: link attributes clickable ;
+
 : scrape-html ( url -- vector )
     http-get parse-html ;
 
 : (find-relative)
-    [ >r + dup r> ?nth* [ 2drop f f ] unless ] [ 2drop f ] if ;
+    [ >r + dup r> ?nth* [ 2drop f f ] unless ] [ 2drop f ] if ; inline
 
 : find-relative ( seq quot n -- i elt )
     >r over [ find drop ] dip r> swap pick
-    (find-relative) ;
+    (find-relative) ; inline
 
 : (find-all) ( n seq quot -- )
     2dup >r >r find-from [
         dupd 2array , 1+ r> r> (find-all)
     ] [
         r> r> 3drop
-    ] if* ;
+    ] if* ; inline
 
 : find-all ( seq quot -- alist )
-    [ 0 -rot (find-all) ] { } make ;
+    [ 0 -rot (find-all) ] { } make ; inline
 
 : (find-nth) ( offset seq quot n count -- obj )
     >r >r [ find-from ] 2keep 4 npick [
@@ -33,14 +35,14 @@ IN: html.parser.analyzer
         ] if
     ] [
         2drop r> r> 2drop
-    ] if ;
+    ] if ; inline
 
 : find-nth ( seq quot n -- i elt )
-    0 -roll 0 (find-nth) ;
+    0 -roll 0 (find-nth) ; inline
 
 : find-nth-relative ( seq quot n offest -- i elt )
     >r [ find-nth ] 3keep 2drop nip r> swap pick
-    (find-relative) ;
+    (find-relative) ; inline
 
 : remove-blank-text ( vector -- vector' )
     [
@@ -120,9 +122,14 @@ IN: html.parser.analyzer
     [ [ name>> "a" = ] [ attributes>> "href" swap at ] bi and ]
     find-between-all ;
 
+: <link> ( vector -- link )
+    [ first attributes>> ]
+    [ [ name>> { text "img" } member? ] filter ] bi
+    link boa ;
+
 : link. ( vector -- )
-    [ second text>> write bl ]
-    [ first tag-link write nl ] bi ;
+    [ attributes>> "href" swap at write nl ]
+    [ clickable>> [ bl bl text>> print ] each nl ] bi ;
 
 : find-by-text ( seq quot -- tag )
     [ dup name>> text = ] prepose find drop ;
@@ -136,12 +143,12 @@ IN: html.parser.analyzer
 
 : find-forms ( vector -- vector' )
     "form" over find-opening-tags-by-name
-    over [ >r first2 r> find-between* ] curry map
+    swap [ >r first2 r> find-between* ] curry map
     [ [ name>> { "form" "input" } member? ] filter ] map ;
 
 : find-html-objects ( string vector -- vector' )
-    find-opening-tags-by-name
-    over [ >r first2 r> find-between* ] curry map ;
+    [ find-opening-tags-by-name ] keep
+    [ >r first2 r> find-between* ] curry map ;
 
 : form-action ( vector -- string )
     [ name>> "form" = ] find nip 

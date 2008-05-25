@@ -6,6 +6,8 @@ IN: dns.resolver
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+! Need to cache records even in the case of name error
+
 : cache-message ( message -- message )
   dup dup rcode>> NAME-ERROR =
     [
