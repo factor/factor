@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: cairo cairo.ffi ui.render kernel opengl.gl opengl
 math byte-arrays ui.gadgets accessors arrays 
-namespaces io.backend memoize ;
+namespaces io.backend memoize colors ;
 
 IN: cairo.gadgets
 
@@ -64,6 +64,7 @@ M: cached-cairo draw-gadget* ( gadget -- )
     GL_TEXTURE_2D [
         [
             dup render-to-texture
+            white gl-color
             GL_TEXTURE_2D over texture>> glBindTexture
             GL_QUADS [
                 [ width>> ] [ height>> ] bi 2array four-sides
@@ -76,7 +77,8 @@ M: cached-cairo graft* ( gadget -- )
     gen-texture >>texture drop ;
 
 M: cached-cairo ungraft* ( gadget -- )
-    texture>> delete-texture ;
+    [ texture>> delete-texture ]
+    [ \ render-to-texture invalidate-memoized ] bi ;
     
 M: cairo-gadget pref-dim* ( gadget -- rect )
     [ width>> ] [ height>> ] bi 2array ;
