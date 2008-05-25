@@ -1,5 +1,6 @@
 USING: io io.files splitting unicode.collation sequences kernel
-io.encodings.utf8 math.parser math.order tools.test assocs ;
+io.encodings.utf8 math.parser math.order tools.test assocs
+io.streams.null ;
 IN: unicode.collation.tests
 
 : parse-test ( -- strings )
@@ -14,4 +15,5 @@ IN: unicode.collation.tests
     parse-test dup 2 <clumps>
     [ string<=> +lt+ = not ] assoc-filter dup assoc-size ;
 
-parse-test 2 <clumps> [ test-two ] assoc-each
+parse-test 2 <clumps>
+[ [ test-two ] assoc-each ] with-null-writer
