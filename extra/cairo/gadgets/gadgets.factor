@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: cairo cairo.ffi ui.render kernel opengl.gl opengl
 math byte-arrays ui.gadgets accessors arrays 
-namespaces io.backend ;
+namespaces io.backend memoize ;
 
 IN: cairo.gadgets
 
@@ -10,7 +10,7 @@ IN: cairo.gadgets
 ! one performs the cairo ops once and caches the bytes, the other
 ! performs cairo ops every refresh
 
-TUPLE: cairo-gadget width height quot cache? bytes ;
+TUPLE: cairo-gadget width height quot cache? texture ;
 PREDICATE: cached-cairo < cairo-gadget cache?>> ;
 : <cairo-gadget> ( width height quot -- cairo-gadget )
     cairo-gadget construct-gadget 
@@ -29,17 +29,8 @@ PREDICATE: cached-cairo < cairo-gadget cache?>> ;
     [ cairo_image_surface_create_for_data ] 3bi
     r> with-cairo-from-surface ;
 
-: (cairo>bytes) ( gadget -- byte-array )
+: cairo>bytes ( gadget -- byte-array )
     [ width>> ] [ height>> ] [ quot>> ] tri copy-cairo ;
-
-GENERIC: cairo>bytes
-M: cairo-gadget cairo>bytes ( gadget -- byte-array )
-    (cairo>bytes) ;
-
-M: cached-cairo cairo>bytes ( gadget -- byte-array )
-    dup bytes>> [ ] [
-        dup (cairo>bytes) [ >>bytes drop ] keep
-    ] ?if ;
 
 : cairo>png ( gadget path -- )
     >r [ cairo>bytes CAIRO_FORMAT_ARGB32 ] [ width>> ]
@@ -47,13 +38,45 @@ M: cached-cairo cairo>bytes ( gadget -- byte-array )
     cairo_image_surface_create_for_data
     r> [ cairo_surface_write_to_png check-cairo ] curry with-surface ;
 
-M: cairo-gadget draw-gadget* ( gadget -- )
-    origin get [
+: with-cairo-gl ( quot -- )
+    >r origin get [
         0 0 glRasterPos2i
         1.0 -1.0 glPixelZoom
+    ] r> compose with-translation ;
+
+M: cairo-gadget draw-gadget* ( gadget -- )
+    [
         [ width>> ] [ height>> GL_BGRA GL_UNSIGNED_BYTE ]
         [ cairo>bytes ] tri glDrawPixels
-    ] with-translation ;
+    ] with-cairo-gl ;
+
+MEMO: render-to-texture ( gadget -- )
+    GL_TEXTURE_BIT [
+        GL_TEXTURE_2D over texture>> glBindTexture
+        >r GL_TEXTURE_2D 0 GL_RGBA r>
+        [ width>> ] [ height>> 0 GL_BGRA GL_UNSIGNED_BYTE ]
+        [ cairo>bytes ] tri glTexImage2D
+        init-texture
+        GL_TEXTURE_2D 0 glBindTexture
+    ] do-attribs ;
+
+M: cached-cairo draw-gadget* ( gadget -- )
+    GL_TEXTURE_2D [
+        [
+            dup render-to-texture
+            GL_TEXTURE_2D over texture>> glBindTexture
+            GL_QUADS [
+                [ width>> ] [ height>> ] bi 2array four-sides
+            ] do-state
+            GL_TEXTURE_2D 0 glBindTexture
+        ] with-cairo-gl
+    ] do-enabled ;
+
+M: cached-cairo graft* ( gadget -- )
+    gen-texture >>texture drop ;
+
+M: cached-cairo ungraft* ( gadget -- )
+    texture>> delete-texture ;
     
 M: cairo-gadget pref-dim* ( gadget -- rect )
     [ width>> ] [ height>> ] bi 2array ;
@@ -63,7 +86,7 @@ M: cairo-gadget pref-dim* ( gadget -- rect )
     cr cairo_paint ;
 
 : <bytes-gadget> ( width height bytes -- cairo-gadget )
-    >r [ ] <cached-cairo> r> >>bytes ;
+    >r [ ] <cached-cairo> r> >>texture ;
 
 : <png-gadget> ( path -- gadget )
     normalize-path cairo_image_surface_create_from_png
@@ -71,3 +94,5 @@ M: cairo-gadget pref-dim* ( gadget -- rect )
     [ cairo_image_surface_get_height 2dup ]
     [ [ copy-surface ] curry copy-cairo ] tri
     <bytes-gadget> ;
+
+
