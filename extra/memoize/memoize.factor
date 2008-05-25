@@ -52,3 +52,6 @@ M: memoized definition "memo-quot" word-prop ;
 
 : reset-memoized ( word -- )
     "memoize" word-prop clear-assoc ;
+
+: invalidate-memoized ! ( inputs... word )
+    [ #in packer call ] [ "memoize" word-prop delete-at ] bi ;
