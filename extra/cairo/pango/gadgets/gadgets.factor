@@ -10,7 +10,7 @@ IN: cairo.pango.gadgets
     [ cr layout pango_cairo_show_layout ] (pango-gadget) ;
 
 USING: prettyprint sequences ui.gadgets.panes
-threads ;
+threads io.backend io.encodings.utf8 io.files ;
 : hello-pango ( -- )
     50 [ 6 + ] map [
         "Sans " swap unparse append
@@ -19,6 +19,10 @@ threads ;
             layout-font "今日は、 Pango!" layout-text
         ] curry
         <pango-gadget> gadget. yield
-    ] each ;
+    ] each
+    [ 
+        "resource:extra/cairo/pango/gadgets/gadgets.factor"
+        normalize-path utf8 file-contents layout-text
+    ] <pango-gadget> gadget. ;
 
 MAIN: hello-pango
