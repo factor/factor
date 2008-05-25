@@ -28,6 +28,20 @@ TUPLE: weight primary secondary tertiary ignorable? ;
 "resource:extra/unicode/collation/allkeys.txt"
 ascii <file-reader> parse-ducet \ ducet set-value
 
+! Fix up table for long contractions
+: help-one ( assoc key -- )
+    ! Need to be more general? Not for DUCET, apparently
+    2 head 2dup swap key? [ 2drop ] [
+        [ [ 1string swap at ] with { } map-as concat ]
+        [ swap set-at ] 2bi
+    ] if ;
+
+: insert-helpers ( assoc -- )
+    dup keys [ length 3 >= ] filter
+    [ help-one ] with each ;
+
+ducet insert-helpers
+
 : base ( char -- base )
     {
         { [ dup HEX: 3400 HEX:  4DB5 between? ] [ drop HEX: FB80 ] } ! Extension A
@@ -76,29 +90,6 @@ ascii <file-reader> parse-ducet \ ducet set-value
         [ drop ] [ 1string , ] if
     ] if ;
 
-! The terminator method for Hangul syllables
-: terminator 1 0 0 f weight boa ;
-
-MACRO: const ( seq -- seq )
-    [ dup word? [ execute ] when ] deep-map 1quotation ;
-
-: char, ( char -- )
-    [
-        building get peek [ first ] bi@ dup jamo? [
-            over jamo? [
-                [ grapheme-class ] bi@ swap 2array
-                { { T L } { V L } { V T } } const
-                member? [ terminator , ] when
-            ] [ 2drop terminator , ] if
-        ] [ 2drop ] if
-    ] [ , ] bi ;
-
-: insert-terminators ( graphemes -- graphemes )
-    ! Insert a terminator between hangul syllables
-    [ unclip , [ char, ] each ] { } make ;
-! The above code for the terminator method is not used
-! The test suite passes without it
-
 : string>graphemes ( string -- graphemes )
     [ [ add ] each ] { } make ;
 
@@ -136,32 +127,43 @@ MACRO: const ( seq -- seq )
         [ swap completely-ignorable? or not ] 2bi
     ] filter nip ;
 
+: string>weights ( string -- weights )
+    nfd string>graphemes graphemes>weights filter-ignorable ;
+
 : collation-key ( string -- key )
-    nfd string>graphemes graphemes>weights
-    filter-ignorable weights>bytes ;
+    string>weights weights>bytes ;
+
+: primary= ( str1 str2 -- ? )
+    [ string>weights [ primary>> ] map ] bi@ = ;
+
+: secondary= ( str1 str2 -- ? )
+    [
+        string>weights
+        [ { primary>> secondary>> } get-slots 2array ] map
+    ] bi@ = ;
+
+: tertiary= ( str1 str2 -- ? )
+    string>weights [
+        string>weights [
+            { primary>> secondary>> tertiary>> }
+            get-slots 3array
+       ] map
+    ] bi@ = ;
+
+: quaternary= ( str1 str2 -- ? )
+    [ collation-key ] bi@ = ;
 
 : compare-collation ( {str1,key} {str2,key} -- <=> )
     2dup [ second ] bi@ <=> dup +eq+ =
     [ drop <=> ] [ 2nip ] if ;
 
+: w/collation-key ( str -- {str,key} )
+    dup collation-key 2array ;
+
 : sort-strings ( strings -- sorted )
-    [ dup collation-key ] { } map>assoc
+    [ w/collation-key ] map
     [ compare-collation ] sort
     keys ;
 
 : string<=> ( str1 str2 -- <=> )
-    [ dup collation-key 2array ] bi@ compare-collation ;
-
-! Fix up table for long contractions
-: help-one ( assoc key -- )
-    ! Does this need to be more general?
-    2 head 2dup swap key? [ 2drop ] [
-        [ [ 1string swap at ] with { } map-as concat ]
-        [ swap set-at ] 2bi
-    ] if ;
-
-: insert-helpers ( assoc -- )
-    dup keys [ length 3 >= ] filter
-    [ help-one ] with each ;
-
-ducet insert-helpers
+    [ w/collation-key ] bi@ compare-collation ;
