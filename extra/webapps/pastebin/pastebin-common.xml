@@ -1,0 +1,31 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:atom t:title="Pastebin - Atom" t:href="$pastebin/feed.xml" />
+
+	<t:style t:include="resource:extra/webapps/pastebin/pastebin.css" />
+
+	<div class="navbar">
+
+		  <t:a t:href="$pastebin/list">Pastes</t:a>
+		| <t:a t:href="$pastebin/new-paste">New Paste</t:a>
+		| <t:a t:href="$pastebin/feed.xml">Atom Feed</t:a>
+
+		<t:if t:code="http.server.sessions:uid">
+
+			<t:if t:code="http.server.auth.login:allow-edit-profile?">
+				| <t:a t:href="$login/edit-profile" t:flow="begin">Edit Profile</t:a>
+			</t:if>
+
+			| <t:button t:action="$login/logout" t:flow="begin" class="link-button link">Logout</t:button>
+
+		</t:if>
+
+	</div>
+
+	<h1><t:write-title /></h1>
+
+        <t:call-next-template />
+
+</t:chloe>

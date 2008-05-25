@@ -680,7 +680,7 @@ PRIVATE>
 : unclip ( seq -- rest first )
     [ rest ] [ first ] bi ;
 
-: unclip-last ( seq -- butfirst last )
+: unclip-last ( seq -- butlast last )
     [ but-last ] [ peek ] bi ;
 
 : unclip-slice ( seq -- rest first )
