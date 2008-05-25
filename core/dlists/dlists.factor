@@ -47,7 +47,7 @@ C: <dlist-node> dlist-node
 
 : (dlist-find-node) ( dlist-node quot -- node/f ? )
     over [
-        [ >r obj>> r> call ] 2keep rot
+        [ call ] 2keep rot
         [ drop t ] [ >r next>> r> (dlist-find-node) ] if
     ] [ 2drop f f ] if ; inline
 
@@ -55,7 +55,7 @@ C: <dlist-node> dlist-node
     >r front>> r> (dlist-find-node) ; inline
 
 : dlist-each-node ( dlist quot -- )
-    [ t ] compose dlist-find-node 2drop ; inline
+    [ f ] compose dlist-find-node 2drop ; inline
 
 PRIVATE>
 
@@ -85,7 +85,7 @@ PRIVATE>
     [ push-back ] curry each ;
 
 : peek-front ( dlist -- obj )
-    front>> obj>> ;
+    front>> dup [ obj>> ] when ;
 
 : pop-front ( dlist -- obj )
     dup front>> [
@@ -96,10 +96,11 @@ PRIVATE>
     ] 2keep obj>>
     swap [ normalize-back ] keep dec-length ;
 
-: pop-front* ( dlist -- ) pop-front drop ;
+: pop-front* ( dlist -- )
+    pop-front drop ;
 
 : peek-back ( dlist -- obj )
-    back>> obj>> ;
+    back>> dup [ obj>> ] when ;
 
 : pop-back ( dlist -- obj )
     dup back>> [
@@ -110,9 +111,11 @@ PRIVATE>
     ] 2keep obj>>
     swap [ normalize-front ] keep dec-length ;
 
-: pop-back* ( dlist -- ) pop-back drop ;
+: pop-back* ( dlist -- )
+    pop-back drop ;
 
 : dlist-find ( dlist quot -- obj/f ? )
+    [ obj>> ] prepose
     dlist-find-node [ obj>> t ] [ drop f f ] if ; inline
 
 : dlist-contains? ( dlist quot -- ? )
@@ -141,6 +144,7 @@ PRIVATE>
     ] if ; inline
 
 : delete-node-if ( dlist quot -- obj/f )
+    [ obj>> ] prepose
     delete-node-if* drop ; inline
 
 : dlist-delete ( obj dlist -- obj/f )
