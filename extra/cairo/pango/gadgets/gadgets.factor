@@ -12,8 +12,8 @@ IN: cairo.pango.gadgets
 USING: prettyprint sequences ui.gadgets.panes ;
 : hello-pango ( -- )
     50 [ 6 + ] map [
-        "Sans Bold " swap unparse append
-        [ layout-font "Hello, Pango!" layout-text ] curry
+        "Sans " swap unparse append
+        [ layout-font "今日は、 Pango!" layout-text ] curry
         <pango-gadget> gadget.
     ] each ;
 
