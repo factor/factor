@@ -98,5 +98,7 @@ IN: dlists.tests
 [ t ] [ <dlist> 4 over push-back 5 over push-back* [ = ] curry dlist-find-node drop class dlist-node = ] unit-test
 [ ] [ <dlist> 4 over push-back 5 over push-back [ drop ] dlist-each ] unit-test
 
-[ f ] [ <dlist> peek-front ] unit-test
-[ f ] [ <dlist> peek-back ] unit-test
+[ <dlist> peek-front ] must-fail
+[ <dlist> peek-back ] must-fail
+[ <dlist> pop-front ] [ empty-dlist? ] must-fail-with
+[ <dlist> pop-back ] [ empty-dlist? ] must-fail-with

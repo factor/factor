@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Mackenzie Straight, Doug Coleman,
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel math sequences accessors ;
+USING: combinators kernel math sequences accessors inspector ;
 IN: dlists
 
 TUPLE: dlist front back length ;
@@ -84,11 +84,17 @@ PRIVATE>
 : push-all-back ( seq dlist -- )
     [ push-back ] curry each ;
 
+ERROR: empty-dlist ;
+
+M: empty-dlist summary ( dlist -- )
+    drop "Emtpy dlist" ;
+
 : peek-front ( dlist -- obj )
-    front>> dup [ obj>> ] when ;
+    front>> [ empty-dlist ] unless* obj>> ;
 
 : pop-front ( dlist -- obj )
-    dup front>> [
+    dup front>> [ empty-dlist ] unless*
+    [
         dup next>>
         f rot (>>next)
         f over set-prev-when
@@ -100,10 +106,11 @@ PRIVATE>
     pop-front drop ;
 
 : peek-back ( dlist -- obj )
-    back>> dup [ obj>> ] when ;
+    back>> [ empty-dlist ] unless* obj>> ;
 
 : pop-back ( dlist -- obj )
-    dup back>> [
+    dup back>> [ empty-dlist ] unless*
+    [
         dup prev>>
         f rot (>>prev)
         f over set-next-when
