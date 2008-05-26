@@ -44,6 +44,7 @@ IN: math.functions.tests
 
 [ t ] [ 10 asin sin 10 1.e-10 ~ ] unit-test
 [ t ] [ -1 sqrt neg dup acos cos 1.e-10 ~ ] unit-test
+[ t ] [ 10 asinh sinh 10 1.e-10 ~ ] unit-test
 
 [ 100 ] [ 100 100 gcd nip ] unit-test
 [ 100 ] [ 1000 100 gcd nip ] unit-test
