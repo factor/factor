@@ -36,17 +36,17 @@ IN: farkup.tests
 [ "<p>|a</p>" ]
 [ "|a" convert-farkup ] unit-test
 
-[ "<p>|a|</p>" ]
+[ "<table><tr><td>a</td></tr></table>" ]
 [ "|a|" convert-farkup ] unit-test
 
 [ "<table><tr><td>a</td><td>b</td></tr></table>" ]
-[ "a|b" convert-farkup ] unit-test
+[ "|a|b|" convert-farkup ] unit-test
 
-[ "<table><tr><td>a</td><td>b</td></tr></table>\n<table><tr><td>c</td><td>d</td></tr></table>" ]
-[ "a|b\nc|d" convert-farkup ] unit-test
+[ "<table><tr><td>a</td><td>b</td></tr><tr><td>c</td><td>d</td></tr></table>" ]
+[ "|a|b|\n|c|d|" convert-farkup ] unit-test
 
-[ "<table><tr><td>a</td><td>b</td></tr></table>\n<table><tr><td>c</td><td>d</td></tr></table>\n" ]
-[ "a|b\nc|d\n" convert-farkup ] unit-test
+[ "<table><tr><td>a</td><td>b</td></tr><tr><td>c</td><td>d</td></tr></table>" ]
+[ "|a|b|\n|c|d|\n" convert-farkup ] unit-test
 
 [ "<p><strong>foo</strong>\n</p><h1>aheading</h1>\n<p>adfasd</p>" ]
 [ "*foo*\n=aheading=\nadfasd" convert-farkup ] unit-test
