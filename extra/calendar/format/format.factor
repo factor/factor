@@ -1,4 +1,4 @@
-USING: math math.order math.parser kernel sequences io
+USING: math math.order math.parser math.functions kernel sequences io
 accessors arrays io.streams.string splitting
 combinators accessors debugger
 calendar calendar.format.macros ;
@@ -151,11 +151,15 @@ M: timestamp year. ( timestamp -- )
 : read-hms ( -- h m s )
     read-00 ":" expect read-00 ":" expect read-00 ;
 
+: read-rfc3339-seconds ( s -- s' ch )
+    "+-Z" read-until >r
+    [ string>number ] [ length 10 swap ^ ] bi / + r> ;
+
 : (rfc3339>timestamp) ( -- timestamp )
     read-ymd
     "Tt" expect
     read-hms
-    read1 { { CHAR: . [ read-000 1000 / + read1 ] } [ ] } case
+    read1 { { CHAR: . [ read-rfc3339-seconds ] } [ ] } case
     read-rfc3339-gmt-offset
     <timestamp> ;
 

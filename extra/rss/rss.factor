@@ -18,51 +18,67 @@ TUPLE: entry title link description pub-date ;
 
 C: <entry> entry
 
+: try-parsing-timestamp ( string -- timestamp )
+    [ rfc822>timestamp ] [ drop rfc3339>timestamp ] recover ;
+
 : rss1.0-entry ( tag -- entry )
-    [ "title" tag-named children>string ] keep   
-    [ "link" tag-named children>string ] keep
-    [ "description" tag-named children>string ] keep
-    f "date" "http://purl.org/dc/elements/1.1/" <name>
-    tag-named dup [ children>string rfc822>timestamp ] when
-    <entry> ;
+    {
+        [ "title" tag-named children>string ]
+        [ "link" tag-named children>string ]
+        [ "description" tag-named children>string ]
+        [
+            f "date" "http://purl.org/dc/elements/1.1/" <name>
+            tag-named dup [ children>string try-parsing-timestamp ] when
+        ]
+    } cleave <entry> ;
 
 : rss1.0 ( xml -- feed )
     [
         "channel" tag-named
-        [ "title" tag-named children>string ] keep
-        "link" tag-named children>string
-    ] keep
-    "item" tags-named [ rss1.0-entry ] map <feed> ;
+        [ "title" tag-named children>string ]
+        [ "link" tag-named children>string ] bi
+    ] [ "item" tags-named [ rss1.0-entry ] map ] bi
+    <feed> ;
 
 : rss2.0-entry ( tag -- entry )
-    [ "title" tag-named children>string ] keep
-    [ "link" tag-named ] keep
-    [ "guid" tag-named dupd ? children>string ] keep
-    [ "description" tag-named children>string ] keep
-    "pubDate" tag-named children>string rfc822>timestamp <entry> ;
+    {
+        [ "title" tag-named children>string ]
+        [ { "link" "guid" } any-tag-named children>string ]
+        [ "description" tag-named children>string ]
+        [
+            { "date" "pubDate" } any-tag-named
+            children>string try-parsing-timestamp
+        ]
+    } cleave <entry> ;
 
 : rss2.0 ( xml -- feed )
     "channel" tag-named 
-    [ "title" tag-named children>string ] keep
-    [ "link" tag-named children>string ] keep
-    "item" tags-named [ rss2.0-entry ] map <feed> ;
+    [ "title" tag-named children>string ]
+    [ "link" tag-named children>string ]
+    [ "item" tags-named [ rss2.0-entry ] map ]
+    tri <feed> ;
 
 : atom1.0-entry ( tag -- entry )
-    [ "title" tag-named children>string ] keep
-    [ "link" tag-named "href" swap at ] keep
-    [
-        { "content" "summary" } any-tag-named
-        dup tag-children [ string? not ] contains?
-        [ tag-children [ write-chunk ] with-string-writer ]
-        [ children>string ] if
-    ] keep
-    { "published" "updated" "issued" "modified" } any-tag-named
-    children>string rfc3339>timestamp <entry> ;
+    {
+        [ "title" tag-named children>string ]
+        [ "link" tag-named "href" swap at ]
+        [
+            { "content" "summary" } any-tag-named
+            dup tag-children [ string? not ] contains?
+            [ tag-children [ write-chunk ] with-string-writer ]
+            [ children>string ] if
+        ]
+        [
+            { "published" "updated" "issued" "modified" } 
+            any-tag-named children>string try-parsing-timestamp
+        ]
+    } cleave <entry> ;
 
 : atom1.0 ( xml -- feed )
-    [ "title" tag-named children>string ] keep
-    [ "link" tag-named "href" swap at ] keep
-    "entry" tags-named [ atom1.0-entry ] map <feed> ;
+    [ "title" tag-named children>string ]
+    [ "link" tag-named "href" swap at ]
+    [ "entry" tags-named [ atom1.0-entry ] map ]
+    tri <feed> ;
 
 : xml>feed ( xml -- feed )
     dup name-tag {
