@@ -80,12 +80,9 @@ IN: sequences.lib.tests
 [ ] [ { } 0 firstn ] unit-test
 [ "a" ] [ { "a" } 1 firstn ] unit-test
 
-<<<<<<< HEAD:extra/sequences/lib/lib-tests.factor
 [ { { 1 1 } { 1 2 } { 2 0 } } ] [ { { 2 0 } { 1 1 } { 1 2 } } dup [ first ] insertion-sort ] unit-test
-=======
 [ "empty" ] [ { } [ "not empty" ] [ "empty" ] if-seq ] unit-test
 [ { 1 } "not empty" ] [ { 1 } [ "not empty" ] [ "empty" ] if-seq ] unit-test
 
 [ "empty" ] [ { } [ "empty" ] [ "not empty" ] if-empty ] unit-test
 [ { 1 } "not empty" ] [ { 1 } [ "empty" ] [ "not empty" ] if-empty ] unit-test
->>>>>>> 299bb1fb1692a4427f5b46f70dbbcefd6aa57163:extra/sequences/lib/lib-tests.factor
