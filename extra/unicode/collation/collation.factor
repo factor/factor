@@ -127,31 +127,27 @@ ducet insert-helpers
         [ swap completely-ignorable? or not ] 2bi
     ] filter nip ;
 
-: string>weights ( string -- weights )
-    nfd string>graphemes graphemes>weights filter-ignorable ;
-
 : collation-key ( string -- key )
-    string>weights weights>bytes ;
+    nfd string>graphemes graphemes>weights
+    filter-ignorable weights>bytes ;
+
+: insensitive= ( str1 str2 levels-removed -- ? )
+    [
+        swap collation-key swap
+        [ [ 0 = not ] right-trim but-last ] times
+    ] curry bi@ = ;
 
 : primary= ( str1 str2 -- ? )
-    [ string>weights [ primary>> ] map ] bi@ = ;
+    3 insensitive= ;
 
 : secondary= ( str1 str2 -- ? )
-    [
-        string>weights
-        [ { primary>> secondary>> } get-slots 2array ] map
-    ] bi@ = ;
+    2 insensitive= ;
 
 : tertiary= ( str1 str2 -- ? )
-    string>weights [
-        string>weights [
-            { primary>> secondary>> tertiary>> }
-            get-slots 3array
-       ] map
-    ] bi@ = ;
+    1 insensitive= ;
 
 : quaternary= ( str1 str2 -- ? )
-    [ collation-key ] bi@ = ;
+    0 insensitive= ;
 
 : compare-collation ( {str1,key} {str2,key} -- <=> )
     2dup [ second ] bi@ <=> dup +eq+ =
