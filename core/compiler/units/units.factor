@@ -14,7 +14,7 @@ TUPLE: redefine-error def ;
     { { "Continue" t } } throw-restarts drop ;
 
 : add-once ( key assoc -- )
-    2dup key? [ over redefine-error ] when dupd set-at ;
+    2dup key? [ over redefine-error ] when conjoin ;
 
 : (remember-definition) ( definition loc assoc -- )
     >r over set-where r> add-once ;

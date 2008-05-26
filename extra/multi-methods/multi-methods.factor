@@ -25,7 +25,7 @@ SYMBOL: total
     ]
     [
         [ pair? ] filter
-        [ keys [ hooks get push-new ] each ] keep
+        [ keys [ hooks get adjoin ] each ] keep
     ] bi append ;
 
 : canonicalize-specializer-2 ( specializer -- specializer' )
