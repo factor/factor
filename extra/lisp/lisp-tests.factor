@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
-USING: lisp lisp.parser tools.test sequences math kernel parser ;
+USING: lisp lisp.parser tools.test sequences math kernel parser arrays ;
 
 IN: lisp.test
 
@@ -10,8 +10,11 @@ IN: lisp.test
     "#f" [ f ] lisp-define
     "#t" [ t ] lisp-define
     
-    "+" "math" "+" define-primitve
-    "-" "math" "-" define-primitve
+    "+" "math" "+" define-primitive
+    "-" "math" "-" define-primitive
+    
+    "list" [ >array ] lisp-define
+    "map" [ [ swap map ] compose call ] lisp-define
     
     { 5 } [
       [ 2 3 ] "+" <lisp-symbol> funcall
@@ -22,26 +25,30 @@ IN: lisp.test
     ] unit-test
     
     { 3 } [
-      "((lambda (x y) (+ x y)) 1 2)" lisp-string>factor call
+      "((lambda (x y) (+ x y)) 1 2)" lisp-eval
     ] unit-test
     
     { 42 } [
-      "((lambda (x y z) (+ x (- y z))) 40 3 1)" lisp-string>factor call
+      "((lambda (x y z) (+ x (- y z))) 40 3 1)" lisp-eval
     ] unit-test
     
     { 1 } [
-      "(if #t 1 2)" lisp-string>factor call
+      "(if #t 1 2)" lisp-eval
     ] unit-test
     
     { "b" } [
-      "(cond (#f \"a\") (#t \"b\"))" lisp-string>factor call
+      "(cond (#f \"a\") (#t \"b\"))" lisp-eval
     ] unit-test
     
     { 5 } [
-      "(begin (+ 1 4))" lisp-string>factor call
+      "(begin (+ 1 4))" lisp-eval
     ] unit-test
     
     { 3 } [
-       "((lambda (x) (if x (begin (+ 1 2)) (- 3 5))) #t)" lisp-string>factor call
+       "((lambda (x) (if x (begin (+ 1 2)) (- 3 5))) #t)" lisp-eval
+    ] unit-test
+    
+    { { 1 2 3 4 5 } } [
+      "(list 1 2 3 4 5)" lisp-eval
     ] unit-test
 ] with-interactive-vocabs

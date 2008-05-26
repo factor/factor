@@ -78,6 +78,9 @@ PRIVATE>
 : lisp-string>factor ( str -- quot )
     lisp-expr parse-result-ast convert-form lambda-rewrite call ;
     
+: lisp-eval ( str -- * )    
+  lisp-string>factor call ;
+    
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SYMBOL: lisp-env
@@ -98,5 +101,5 @@ ERROR: no-such-var var ;
 : funcall ( quot sym -- * )
     dup lisp-symbol?  [ lookup-var ] when call ; inline
     
-: define-primitve ( name vocab word -- )  
+: define-primitive ( name vocab word -- )  
     swap lookup 1quotation '[ , compose call ] lisp-define ;
