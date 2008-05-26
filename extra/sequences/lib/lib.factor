@@ -257,3 +257,9 @@ PRIVATE>
 : insertion-sort ( seq quot -- )
     ! quot is a transformation on elements
     over length [ insert ] 2with each ; inline
+
+: if-seq ( seq quot1 quot2 -- )
+    [ f like ] 2dip if* ; inline
+
+: if-empty ( seq quot1 quot2 -- )
+    swap if-seq ; inline

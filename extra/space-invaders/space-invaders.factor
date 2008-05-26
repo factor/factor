@@ -22,9 +22,9 @@ TUPLE: space-invaders port1 port2i port2o port3o port4lo port4hi port5o bitmap s
 : set-bitmap-pixel ( color point array -- )
   #! 'color' is a {r g b}. Point is {x y}.
   [ bitmap-index ] dip ! color index array
-  [ [ first ] dipd set-uchar-nth ] 3keep
-  [ [ second ] dipd [ 1 + ] dip set-uchar-nth ] 3keep
-  [ third ] dipd [ 2 + ] dip set-uchar-nth ;
+  [ [ first ] 2dip set-uchar-nth ] 3keep
+  [ [ second ] 2dip [ 1 + ] dip set-uchar-nth ] 3keep
+  [ third ] 2dip [ 2 + ] dip set-uchar-nth ;
 
 : get-bitmap-pixel ( point array -- color )
   #! Point is a {x y}. color is a {r g b} 
@@ -311,7 +311,7 @@ M: invaders-gadget draw-gadget* ( gadget -- )
 
 : plot-bitmap-bits ( bitmap point byte bit -- )
   #! point is a {x y}.
-  [ first2 ] dipd
+  [ first2 ] 2dip
   dup swapd -1 * shift 1 bitand 0 =
   [ - 2array ] dip
   [ black ] [ dup get-point-color ] if
