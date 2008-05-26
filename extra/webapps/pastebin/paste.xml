@@ -2,19 +2,59 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-	<t:title>Paste: <t:view t:component="summary" /></t:title>
+	<t:atom t:title="Paste - Atom" t:href="$pastebin/paste.atom" t:query="id" />
+
+	<t:title>Paste: <t:label t:name="summary" /></t:title>
 
 	<table>
-		<tr><th class="field-label">Author:  </th><td><t:view t:component="author"  /></td></tr>
-		<tr><th class="field-label">Mode:    </th><td><t:view t:component="mode"    /></td></tr>
-		<tr><th class="field-label">Date:    </th><td><t:view t:component="date"    /></td></tr>
+		<tr><th class="field-label">Author: </th><td><t:label t:name="author" /></td></tr>
+		<tr><th class="field-label">Mode: </th><td><t:label t:name="mode" /></td></tr>
+		<tr><th class="field-label">Date: </th><td><t:label t:name="date" /></td></tr>
 	</table>
 
-	<pre class="description"><t:view t:component="contents" /></pre>
+	<pre class="description"><t:code t:name="contents" t:mode="modes" /></pre>
 
 	<t:button t:action="$pastebin/delete-paste" t:for="id" class="link-button link">Delete Paste</t:button>
 	|
 	<t:a t:href="$pastebin/annotate" t:query="id">Annotate</t:a>
 
-	<t:view t:component="annotations" />
+	<t:each-tuple t:values="annotations">
+
+		<h2>Annotation: <t:label t:name="summary" /></h2>
+
+		<table>
+			<tr><th class="field-label">Author: </th><td><t:label t:name="author" /></td></tr>
+			<tr><th class="field-label">Mode: </th><td><t:label t:name="mode" /></td></tr>
+			<tr><th class="field-label">Date: </th><td><t:label t:name="date" /></td></tr>
+		</table>
+
+		<pre class="description"><t:code t:name="contents" t:mode="mode"/></pre>
+
+		<t:button t:action="$pastebin/delete-annotation" t:for="aid" class="link-button link">Delete Annotation</t:button>
+
+	</t:each-tuple>
+
+	<t:bind-assoc t:name="new-annotation">
+
+		<h2>New Annotation</h2>
+
+		<t:form t:action="$pastebin/new-annotation" t:for="id">
+
+			<table>
+				<tr><th class="field-label">Summary: </th><td><t:field t:name="summary" /></td></tr>
+				<tr><th class="field-label">Author: </th><td><t:field t:name="author" /></td></tr>
+				<tr><th class="field-label">Mode: </th><td><t:choice t:name="mode" t:choices="modes" /></td></tr>
+				<tr><th class="field-label big-field-label">Description:</th><td><t:textarea t:name="contents" /></td></tr>
+				<tr><th class="field-label">Captcha: </th><td><t:captcha t:name="captcha" /></td></tr>
+				<tr>
+				<td></td>
+				<td>Leave the captcha blank. Spam-bots will fill it indiscriminantly, so their attempts to register will be blocked.</td>
+				</tr>
+			</table>
+
+			<input type="SUBMIT" value="Done" />
+		</t:form>
+
+	</t:bind-assoc>
+
 </t:chloe>

@@ -10,29 +10,29 @@
 
 		<table>
 
-			<t:edit t:component="username" />
-			<t:edit t:component="ticket" />
+			<t:hidden t:name="username" />
+			<t:hidden t:name="ticket" />
 
 			<tr>
-			<th class="field-label">Password:</th>
-			<td><t:edit t:component="new-password" /></td>
+				<th class="field-label">Password:</th>
+				<td><t:password t:name="new-password" /></td>
 			</tr>
 
 			<tr>
-			<th class="field-label">Verify password:</th>
-			<td><t:edit t:component="verify-password" /></td>
+				<th class="field-label">Verify password:</th>
+				<td><t:password t:name="verify-password" /></td>
 			</tr>
 
 			<tr>
-			<td></td>
-			<td>Enter your password twice to ensure it is correct.</td>
+				<td></td>
+				<td>Enter your password twice to ensure it is correct.</td>
 			</tr>
 
 		</table>
 
 		<p>
 			<input type="submit" value="Set password" />
-			<t:validation-message />
+			<t:validation-messages />
 		</p>
 
 	</t:form>

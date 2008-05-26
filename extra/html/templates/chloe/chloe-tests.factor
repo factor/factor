@@ -1,7 +1,7 @@
 USING: html.templates html.templates.chloe
 tools.test io.streams.string kernel sequences ascii boxes
 namespaces xml html.components
-splitting ;
+splitting unicode.categories ;
 IN: html.templates.chloe.tests
 
 [ f ] [ f parse-query-attr ] unit-test
@@ -117,9 +117,45 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
 [ ] [ "new york" "choice" set-value ] unit-test
 
 [ ] [ { "new york" "detroit" "minneapolis" } "choices" set-value ] unit-test
-    
+
 [ ] [
     [
         "test8" test-template call-template
     ] run-template drop
+] unit-test
+
+[ ] [ { 1 2 3 } "numbers" set-value ] unit-test
+
+[ "<ul><li>1</li><li>2</li><li>3</li></ul>" ] [
+    [
+        "test9" test-template call-template
+    ] run-template [ blank? not ] filter
+] unit-test
+
+TUPLE: person first-name last-name ;
+
+[ ] [
+    {
+        T{ person f "RBaxter" "Unknown" }
+        T{ person f "Doug" "Coleman" }
+    } "people" set-value
+] unit-test
+
+[ "<table><tr><td>RBaxter</td><td>Unknown</td></tr><tr><td>Doug</td><td>Coleman</td></tr></table>" ] [
+    [
+        "test10" test-template call-template
+    ] run-template [ blank? not ] filter
+] unit-test
+
+[ ] [
+    {
+        H{ { "first-name" "RBaxter" } { "last-name" "Unknown" } }
+        H{ { "first-name" "Doug"    } { "last-name" "Coleman" } }
+    } "people" set-value
+] unit-test
+
+[ "<table><tr><td>RBaxter</td><td>Unknown</td></tr><tr><td>Doug</td><td>Coleman</td></tr></table>" ] [
+    [
+        "test11" test-template call-template
+    ] run-template [ blank? not ] filter
 ] unit-test

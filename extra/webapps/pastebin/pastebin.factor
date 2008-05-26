@@ -1,46 +1,40 @@
+! Copyright (C) 2007, 2008 Slava Pestov
+! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces assocs sorting sequences kernel accessors
-hashtables sequences.lib locals db.types db.tuples db
-calendar calendar.format rss xml.writer
-xmode.catalog
+hashtables sequences.lib db.types db.tuples db
+calendar calendar.format math.parser rss xml.writer
+xmode.catalog validators html.components html.templates.chloe
 http.server
-http.server.crud
 http.server.actions
-http.server.components
-http.server.components.code
-http.server.templating.chloe
 http.server.auth
 http.server.auth.login
-http.server.boilerplate
-http.server.validators
-http.server.forms ;
+http.server.boilerplate ;
 IN: webapps.pastebin
 
-: <mode> ( id -- component )
-    modes keys natural-sort <choice> ;
+! ! !
+! DOMAIN MODEL
+! ! !
 
-: pastebin-template ( name -- template )
-    "resource:extra/webapps/pastebin/" swap ".xml" 3append <chloe> ;
+TUPLE: paste id summary author mode date contents annotations ;
 
-TUPLE: paste id summary author mode date contents annotations captcha ;
-
-paste "PASTE"
+\ paste "PASTE"
 {
     { "id" "ID" INTEGER +db-assigned-id+ }
     { "summary" "SUMMARY" { VARCHAR 256 } +not-null+ }
     { "author" "AUTHOR" { VARCHAR 256 } +not-null+ }
     { "mode" "MODE" { VARCHAR 256 } +not-null+ }
-    { "date" "DATE" DATETIME +not-null+ }
+    { "date" "DATE" DATETIME +not-null+ , }
     { "contents" "CONTENTS" TEXT +not-null+ }
 } define-persistent
 
 : <paste> ( id -- paste )
-    paste new
+    \ paste new
         swap >>id ;
 
 : pastes ( -- pastes )
     f <paste> select-tuples ;
 
-TUPLE: annotation aid id summary author mode contents date captcha ;
+TUPLE: annotation aid id summary author mode contents date ;
 
 annotation "ANNOTATION"
 {
@@ -63,175 +57,165 @@ annotation "ANNOTATION"
         dup id>> f <annotation> select-tuples >>annotations
     ] unless ;
 
-: <annotation-form> ( -- form )
-    "annotation" <form>
-        "annotation" pastebin-template >>view-template
-        "id" <integer>
-            hidden >>renderer
-            add-field
-        "aid" <integer>
-            hidden >>renderer
-            add-field
-        "summary" <string> add-field
-        "author" <string> add-field
-        "mode" <mode> add-field
-        "contents" "mode" <code> add-field
-        "date" <date> add-field ;
+: paste ( id -- paste )
+    <paste> select-tuple fetch-annotations ;
 
-: <new-annotation-form> ( -- form )
-    "annotation" <form>
-        "new-annotation" pastebin-template >>edit-template
-        "id" <integer>
-            hidden >>renderer
-            t >>required add-field
-        "summary" <string>
-            t >>required add-field
-        "author" <string>
-            t >>required
-            add-field
-        "mode" <mode>
-            "factor" >>default
-            t >>required
-            add-field
-        "contents" "mode" <code>
-            t >>required add-field
-        "captcha" <captcha> add-field ;
+: <id-redirect> ( id next -- response )
+    swap "id" associate <standard-redirect> ;
 
-: <paste-form> ( -- form )
-    "paste" <form>
-        "paste" pastebin-template >>view-template
-        "paste-summary" pastebin-template >>summary-template
-        "id" <integer>
-            hidden >>renderer add-field
-        "summary" <string> add-field
-        "author" <string> add-field
-        "mode" <mode> add-field
-        "date" <date> add-field
-        "contents" "mode" <code> add-field
-        "annotations" <annotation-form> +plain+ <list> add-field ;
+! ! !
+! LINKS, ETC
+! ! !
 
-: <new-paste-form> ( -- form )
-    "paste" <form>
-        "new-paste" pastebin-template >>edit-template
-        "summary" <string>
-            t >>required add-field
-        "author" <string>
-            t >>required add-field
-        "mode" <mode>
-            "factor" >>default
-            t >>required
-            add-field
-        "contents" "mode" <code>
-            t >>required add-field
-        "captcha" <captcha> add-field ;
+: pastebin-link ( -- url )
+    "$pastebin/list" f link>string ;
 
-: <paste-list-form> ( -- form )
-    "pastebin" <form>
-        "paste-list" pastebin-template >>view-template
-        "pastes" <paste-form> +plain+ <list> add-field ;
+GENERIC: entity-link ( entity -- url )
 
-:: <paste-list-action> ( -- action )
-    [let | form [ <paste-list-form> ] |
-        <action>
-            [
-                blank-values
+M: paste entity-link
+    id>> "id" associate "$pastebin/paste" swap link>string ;
 
-                pastes "pastes" set-value
+M: annotation entity-link
+    [ id>> "id" associate "$pastebin/paste" swap link>string ]
+    [ aid>> number>string "#" prepend ] bi
+    append ;
 
-                form view-form
-            ] >>display
-    ] ;
+: pastebin-template ( name -- template )
+    "resource:extra/webapps/pastebin/" swap ".xml" 3append <chloe> ;
 
-:: <annotate-action> ( form ctor next -- action )
-    <action>
-        { { "id" [ v-number ] } } >>get-params
+! ! !
+! PASTE LIST
+! ! !
 
-        [
-            "id" get f ctor call
+: <pastebin-action> ( -- action )
+    <page-action>
+        [ pastes "pastes" set-value ] >>init
+        "pastebin" pastebin-template >>template ;
 
-            from-tuple form set-defaults
-        ] >>init
-
-        [ form edit-form ] >>display
-
-        [
-            f f ctor call from-tuple
-
-            form validate-form
-
-            values-tuple insert-tuple
-
-            "id" value next <id-redirect>
-        ] >>submit ;
-
-: pastebin-feed-entries ( -- entries )
-    pastes <reversed> 20 short head [
-        [ summary>> ]
-        [ "$pastebin/view-paste" swap id>> "id" associate link>string ]
-        [ date>> ] tri
-        f swap <entry>
+: pastebin-feed-entries ( seq -- entries )
+    <reversed> 20 short head [
+        entry new
+            swap
+            [ summary>> >>title ]
+            [ date>> >>pub-date ]
+            [ entity-link >>link ]
+            tri
     ] map ;
 
 : pastebin-feed ( -- feed )
     feed new
         "Factor Pastebin" >>title
-        "http://paste.factorcode.org" >>link
-        pastebin-feed-entries >>entries ;
+        pastebin-link >>link
+        pastes pastebin-feed-entries >>entries ;
 
-: <feed-action> ( -- action )
-    <action>
+: <pastebin-feed-action> ( -- action )
+    <feed-action> [ pastebin-feed ] >>feed ;
+
+! ! !
+! PASTES
+! ! !
+
+: <paste-action> ( -- action )
+    <page-action>
         [
-            "text/xml" <content>
-            [ pastebin-feed feed>xml write-xml ] >>body
-        ] >>display ;
+            validate-integer-id
+            "id" value paste from-tuple
 
-:: <view-paste-action> ( form ctor -- action )
-    <action>
-        { { "id" [ v-number ] } } >>get-params
-
-        [ "id" get ctor call select-tuple fetch-annotations from-tuple ] >>init
-
-        [ form view-form ] >>display ;
-
-:: <delete-paste-action> ( ctor next -- action )
-    <action>
-        { { "id" [ v-number ] } } >>post-params
-
-        [
-            "id" get ctor call delete-tuples
-
-            "id" get f <annotation> delete-tuples
-
-            next f <permanent-redirect>
-        ] >>submit ;
-
-:: <delete-annotation-action> ( ctor next -- action )
-    <action>
-        { { "aid" [ v-number ] } } >>post-params
-
-        [
-            f "aid" get ctor call select-tuple
-            [ delete-tuples ] [ id>> next <id-redirect> ] bi
-        ] >>submit ;
-
-:: <new-paste-action> ( form ctor next -- action )
-    <action>
-        [
-            f ctor call from-tuple
-
-            form set-defaults
+            "new-annotation" [
+                mode-names "modes" set-value
+                "factor" "mode" set-value
+            ] nest-values
         ] >>init
 
-        [ form edit-form ] >>display
+        "paste" pastebin-template >>template ;
+
+: paste-feed-entries ( paste -- entries )
+    fetch-annotations annotations>> pastebin-feed-entries ;
+
+: paste-feed ( paste -- feed )
+    feed new
+        swap
+        [ "Paste #" swap id>> number>string append >>title ]
+        [ entity-link >>link ]
+        [ paste-feed-entries >>entries ]
+        tri ;
+
+: <paste-feed-action> ( -- action )
+    <feed-action>
+        [ validate-integer-id ] >>init
+        [ "id" value paste annotations>> paste-feed ] >>feed ;
+
+: <new-paste-action> ( -- action )
+    <page-action>
+        [
+            "factor" "mode" set-value
+            mode-names "modes" set-value
+        ] >>init
+
+        "new-paste" pastebin-template >>template
 
         [
-            f ctor call from-tuple
+            {
+                { "summary" [ v-one-line ] }
+                { "author" [ v-one-line ] }
+                { "mode" [ v-mode ] }
+                { "contents" [ v-required ] }
+                { "captcha" [ v-captcha ] }
+            } validate-params
 
-            form validate-form
+            f <paste>
+                now >>date
+                dup { "summary" "author" "mode" "contents" } deposit-slots
+            [ insert-tuple ]
+            [ id>> "$pastebin/paste" <id-redirect> ] bi
+        ] >>submit ;
 
-            values-tuple insert-tuple
+: <delete-paste-action> ( -- action )
+    <action>
+        [ validate-integer-id ] >>validate
 
-            "id" value next <id-redirect>
+        [
+            "id" value <paste> delete-tuples
+            "id" value f <annotation> delete-tuples
+            "$pastebin/list" f <permanent-redirect>
+        ] >>submit ;
+
+! ! !
+! ANNOTATIONS
+! ! !
+
+: <new-annotation-action> ( -- action )
+    <action>
+        [
+            {
+                { "summary" [ v-one-line ] }
+                { "author" [ v-one-line ] }
+                { "mode" [ v-mode ] }
+                { "contents" [ v-required ] }
+                { "captcha" [ v-captcha ] }
+            } validate-params
+        ] >>validate
+
+        [
+            f f <annotation>
+                now >>date
+                dup { "summary" "author" "mode" "contents" } deposit-slots
+            [ insert-tuple ]
+            [
+                ! Add anchor here
+                "id" value "$pastebin/paste" <id-redirect>
+            ] bi
+        ] >>submit ;
+
+: <delete-annotation-action> ( -- action )
+    <action>
+        [ { { "aid" [ v-number ] } } validate-params ] >>validate
+
+        [
+            f "aid" value <annotation> select-tuple
+            [ delete-tuples ]
+            [ id>> "$pastebin/paste" <id-redirect> ]
+            bi
         ] >>submit ;
 
 TUPLE: pastebin < dispatcher ;
@@ -242,17 +226,17 @@ can-delete-pastes? define-capability
 
 : <pastebin> ( -- responder )
     pastebin new-dispatcher
-        <paste-list-action> "list" add-main-responder
-        <feed-action> "feed.xml" add-responder
-        <paste-form> [ <paste> ] <view-paste-action> "view-paste" add-responder
-        [ <paste> ] "$pastebin/list" <delete-paste-action> { can-delete-pastes? } <protected> "delete-paste" add-responder
-        [ <annotation> ] "$pastebin/view-paste" <delete-annotation-action> { can-delete-pastes? } <protected> "delete-annotation" add-responder
-        <paste-form> [ <paste> ]    <view-paste-action>     "$pastebin/view-paste"   add-responder
-        <new-paste-form> [ <paste> now >>date ] "$pastebin/view-paste" <new-paste-action>     "new-paste"    add-responder
-        <new-annotation-form> [ <annotation> now >>date ] "$pastebin/view-paste" <annotate-action> "annotate" add-responder
+        <pastebin-action> "list" add-main-responder
+        <pastebin-feed-action> "list.atom" add-responder
+        <paste-action> "paste" add-responder
+        <paste-feed-action> "paste.atom" add-responder
+        <new-paste-action> "new-paste" add-responder
+        <delete-paste-action> { can-delete-pastes? } <protected> "delete-paste" add-responder
+        <new-annotation-action> "new-annotation" add-responder
+        <delete-annotation-action> { can-delete-pastes? } <protected> "delete-annotation" add-responder
     <boilerplate>
-        "pastebin" pastebin-template >>template ;
+        "pastebin-common" pastebin-template >>template ;
 
-: init-pastes-table paste ensure-table ;
+: init-pastes-table \ paste ensure-table ;
 
 : init-annotations-table annotation ensure-table ;

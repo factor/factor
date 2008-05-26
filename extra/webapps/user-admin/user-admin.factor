@@ -26,26 +26,22 @@ IN: webapps.user-admin
     [ ":" split1 swap lookup ] map ;
 
 : <user-list-action> ( -- action )
-    <action>
+    <page-action>
         [ f <user> select-tuples "users" set-value ] >>init
-        [ "user-list" admin-template <html-content> ] >>display ;
+        "user-list" admin-template >>template ;
 
 : <new-user-action> ( -- action )
-    <action>
+    <page-action>
         [
-            "username" param <user> {
-                [ username>> "username" set-value ]
-                [ realname>> "realname" set-value ]
-                [ email>> "email" set-value ]
-                [ profile>> "profile" set-value ]
-            } cleave
-
-            capabilities get "all-capabilities" set-value
+            "username" param <user> from-tuple
+            capabilities get words>strings "all-capabilities" set-value
         ] >>init
 
-        [ "new-user" admin-template <html-content> ] >>display
+        "new-user" admin-template >>template
 
         [
+            capabilities get words>strings "all-capabilities" set-value
+
             {
                 { "username" [ v-username ] }
                 { "realname" [ v-one-line ] }
@@ -72,26 +68,26 @@ IN: webapps.user-admin
 
             "$user-admin" f <standard-redirect>
         ] >>submit ;
-    
+
+: validate-username ( -- )
+    { { "username" [ v-username ] } } validate-params ;
+
 : <edit-user-action> ( -- action )
-    <action>
+    <page-action>
         [
-            { { "username" [ v-username ] } } validate-params
+            validate-username
 
-            "username" value <user> select-tuple {
-                [ username>> "username" set-value ]
-                [ realname>> "realname" set-value ]
-                [ email>> "email" set-value ]
-                [ profile>> "profile" set-value ]
-                [ capabilities>> words>strings "capabilities" set-value ]
-            } cleave
+            "username" value <user> select-tuple
+            [ from-tuple ] [ capabilities>> words>strings "capabilities" set-value ] bi
 
-            capabilities get "all-capabilities" set-value
+            capabilities get words>strings "all-capabilities" set-value
         ] >>init
 
-        [ "edit-user" admin-template <html-content> ] >>display
+        "edit-user" admin-template >>template
 
         [
+            capabilities get words>strings "all-capabilities" set-value
+
             {
                 { "username" [ v-username ] }
                 { "realname" [ v-one-line ] }
@@ -102,9 +98,9 @@ IN: webapps.user-admin
             } validate-params
 
             "new-password" "verify-password"
-            [ value empty? ] both? [
+            [ value empty? not ] either? [
                 same-password-twice
-            ] unless
+            ] when
         ] >>validate
 
         [
@@ -112,9 +108,9 @@ IN: webapps.user-admin
                 "realname" value >>realname
                 "email" value >>email
 
-            "new-password" value empty? [ drop ] [
+            "new-password" value empty? [
                 "new-password" value >>encoded-password
-            ] if
+            ] unless
 
             "capabilities" value {
                 { [ dup string? ] [ 1array ] }
@@ -129,7 +125,8 @@ IN: webapps.user-admin
 : <delete-user-action> ( -- action )
     <action>
         [
-            { { "username" [ v-username ] } } validate-params
+            validate-username
+
             [ <user> select-tuple 1 >>deleted update-tuple ]
             [ logout-all-sessions ]
             bi
@@ -145,12 +142,12 @@ can-administer-users? define-capability
 
 : <user-admin> ( -- responder )
     user-admin new-dispatcher
-        <user-list-action> "" add-responder
+        <user-list-action> "list" add-main-responder
         <new-user-action> "new" add-responder
         <edit-user-action> "edit" add-responder
         <delete-user-action> "delete" add-responder
     <boilerplate>
-        "admin" admin-template >>template
+        "user-admin" admin-template >>template
     { can-administer-users? } <protected> ;
 
 : make-admin ( username -- )

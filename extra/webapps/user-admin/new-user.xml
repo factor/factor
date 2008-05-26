@@ -10,39 +10,39 @@
 	
 	<tr>
 		<th class="field-label">User name:</th>
-		<td><t:edit t:component="username" /></td>
+		<td><t:field t:name="username" /></td>
 	</tr>
 	
 	<tr>
 		<th class="field-label">Real name:</th>
-		<td><t:edit t:component="realname" /></td>
+		<td><t:field t:name="realname" /></td>
 	</tr>
 	
 	<tr>
 		<th class="field-label">New password:</th>
-		<td><t:edit t:component="new-password" /></td>
+		<td><t:password t:name="new-password" /></td>
 	</tr>
 	
 	<tr>
 		<th class="field-label">Verify:</th>
-		<td><t:edit t:component="verify-password" /></td>
+		<td><t:password t:name="verify-password" /></td>
 	</tr>
 	
 	<tr>
 		<th class="field-label">E-mail:</th>
-		<td><t:edit t:component="email" /></td>
+		<td><t:field t:name="email" /></td>
 	</tr>
 	
 	<tr>
 		<th class="field-label big-field-label">Capabilities:</th>
-		<td><t:edit t:component="capabilities" /></td>
+		<td><t:choice t:name="capabilities" t:choices="all-capabilities" t:multiple="true" /></td>
 	</tr>
 
 	</table>
 	
 	<p>
 		<button type="submit" class="link-button link">Create</button>
-		<t:validation-message />
+		<t:validation-messages />
 	</p>
 
 	</t:form>

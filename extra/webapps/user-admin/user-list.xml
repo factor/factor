@@ -4,10 +4,16 @@
 
 	<t:title>Users</t:title>
 
-	<t:each-tuple t:values="users">
-		<t:a t:href="$user-admin/edit" t:query="username">
-			<t:label t:name="username" />
-		</t:a>
-	</t:each-tuple>
+	<ul>
+
+		<t:each-tuple t:values="users">
+			<li>
+				<t:a t:href="$user-admin/edit" t:query="username">
+					<t:label t:name="username" />
+				</t:a>
+			</li>
+		</t:each-tuple>
+
+	</ul>
 
 </t:chloe>

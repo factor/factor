@@ -3,7 +3,8 @@
 USING: calendar html io io.files kernel math math.order
 math.parser http http.server namespaces parser sequences strings
 assocs hashtables debugger http.mime sorting html.elements
-logging calendar.format accessors io.encodings.binary fry ;
+html.templates.fhtml logging calendar.format accessors
+io.encodings.binary fry ;
 IN: http.server.static
 
 ! special maps mime types to quots with effect ( path -- )
@@ -60,15 +61,17 @@ TUPLE: file-responder root hook special allow-listings ;
     dup <a =href a> write </a> ;
 
 : directory. ( path -- )
-    dup file-name [
-        [ <h1> file-name write </h1> ]
-        [
-            <ul>
-                directory sort-keys
-                [ <li> file. </li> ] assoc-each
-            </ul>
-        ] bi
-    ] simple-html-document ;
+    [
+        dup file-name [
+            [ <h1> file-name write </h1> ]
+            [
+                <ul>
+                    directory sort-keys
+                    [ <li> file. </li> ] assoc-each
+                </ul>
+            ] bi
+        ] simple-page
+    ] with-html-stream ;
 
 : list-directory ( directory -- response )
     file-responder get allow-listings>> [
@@ -99,3 +102,9 @@ M: file-responder call-responder* ( path responder -- response )
     file-responder set
     ".." over member?
     [ drop <400> ] [ "/" join serve-object ] if ;
+
+! file responder integration
+: enable-fhtml ( responder -- responder )
+    [ <fhtml> <html-content> ]
+    "application/x-factor-server-page"
+    pick special>> set-at ;

@@ -1,16 +1,17 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences assocs io.files io.sockets
+io.server
 namespaces db db.sqlite smtp
 http.server
 http.server.db
 http.server.flows
 http.server.sessions
-http.server.auth.admin
 http.server.auth.login
 http.server.auth.providers.db
 http.server.boilerplate
-http.server.templating.chloe
+html.templates.chloe
+webapps.user-admin
 webapps.pastebin
 webapps.planet
 webapps.todo ;
@@ -30,12 +31,13 @@ IN: webapps.factor-website
         init-annotations-table
 
         init-blog-table
+        init-postings-table
 
         init-todo-table
     ] with-db ;
 
 : <factor-website> ( -- responder )
-    <dispatcher>
+    <dispatcher> 
         <todo-list> "todo" add-responder
         <pastebin> "pastebin" add-responder
         <planet-factor> "planet" add-responder
@@ -59,7 +61,7 @@ IN: webapps.factor-website
 
     <factor-website> main-responder set-global ;
 
-: start-factor-website
+: start-factor-website ( -- )
     test-db start-expiring-sessions
-    "planet" main-responder get responders>> at test-db start-update-task
+    test-db start-update-task
     8812 httpd ;

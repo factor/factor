@@ -3,7 +3,7 @@
 USING: accessors kernel sequences combinators kernel namespaces
 classes.tuple assocs splitting words arrays memoize
 io io.files io.encodings.utf8 io.streams.string
-unicode.case tuple-syntax mirrors fry
+unicode.case tuple-syntax mirrors fry math
 multiline xml xml.data xml.writer xml.utilities
 html.elements
 html.components
@@ -196,6 +196,27 @@ STRING: button-tag-markup
 : if-tag ( tag -- )
     dup if-satisfied? [ process-tag-children ] [ drop ] if ;
 
+: even-tag ( tag -- )
+    "index" value even? [ process-tag-children ] [ drop ] if ;
+
+: odd-tag ( tag -- )
+    "index" value odd? [ process-tag-children ] [ drop ] if ;
+
+: (each-tag) ( tag quot -- )
+    [
+        [ "values" required-attr value ] keep
+        '[ , process-tag-children ]
+    ] dip call ; inline
+
+: each-tag ( tag -- )
+    [ with-each-value ] (each-tag) ;
+
+: each-tuple-tag ( tag -- )
+    [ with-each-tuple ] (each-tag) ;
+
+: each-assoc-tag ( tag -- )
+    [ with-each-assoc ] (each-tag) ;
+
 : error-message-tag ( tag -- )
     children>string render-error ;
 
@@ -254,6 +275,11 @@ STRING: button-tag-markup
 
         ! Control flow
         { "if" [ if-tag ] }
+        { "even" [ even-tag ] }
+        { "odd" [ odd-tag ] }
+        { "each" [ each-tag ] }
+        { "each-assoc" [ each-assoc-tag ] }
+        { "each-tuple" [ each-tuple-tag ] }
         { "comment" [ drop ] }
         { "call-next-template" [ drop call-next-template ] }
 

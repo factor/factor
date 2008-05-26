@@ -1,12 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces db.tuples math.parser
-accessors fry locals hashtables
+accessors fry locals hashtables validators
 http.server
 http.server.actions
 http.server.components
-http.server.forms
-http.server.validators ;
+http.server.forms ;
 IN: http.server.crud
 
 :: <view-action> ( form ctor -- action )
@@ -18,7 +17,7 @@ IN: http.server.crud
         [ form view-form ] >>display ;
 
 : <id-redirect> ( id next -- response )
-    swap number>string "id" associate <standard-redirect> ;
+    swap "id" associate <standard-redirect> ;
 
 :: <edit-action> ( form ctor next -- action )
     <action>

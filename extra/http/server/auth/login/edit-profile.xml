@@ -10,12 +10,12 @@
 	
 	<tr>
 		<th class="field-label">User name:</th>
-		<td><t:view t:component="username" /></td>
+		<td><t:field t:name="username" /></td>
 	</tr>
 	
 	<tr>
 		<th class="field-label">Real name:</th>
-		<td><t:edit t:component="realname" /></td>
+		<td><t:field t:name="realname" /></td>
 	</tr>
 	
 	<tr>
@@ -25,7 +25,7 @@
 	
 	<tr>
 		<th class="field-label">Current password:</th>
-		<td><t:edit t:component="password" /></td>
+		<td><t:password t:name="password" /></td>
 	</tr>
 	
 	<tr>
@@ -35,12 +35,12 @@
 	
 	<tr>
 		<th class="field-label">New password:</th>
-		<td><t:edit t:component="new-password" /></td>
+		<td><t:password t:name="new-password" /></td>
 	</tr>
 	
 	<tr>
 		<th class="field-label">Verify:</th>
-		<td><t:edit t:component="verify-password" /></td>
+		<td><t:password t:name="verify-password" /></td>
 	</tr>
 	
 	<tr>
@@ -50,7 +50,7 @@
 	
 	<tr>
 		<th class="field-label">E-mail:</th>
-		<td><t:edit t:component="email" /></td>
+		<td><t:field t:name="email" /></td>
 	</tr>
 	
 	<tr>
@@ -62,7 +62,7 @@
 
 	<p>
 		<input type="submit" value="Update" />
-		<t:validation-message />
+		<t:validation-messages />
 	</p>
 
 	</t:form>

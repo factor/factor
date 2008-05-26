@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces io math.parser assocs classes
-classes.tuple words arrays sequences splitting mirrors
-hashtables combinators continuations math strings
+classes.tuple words arrays sequences sequences.lib splitting
+mirrors hashtables combinators continuations math strings
 fry locals calendar calendar.format xml.entities validators
 html.elements html.streams xmode.code2html farkup inspector ;
 IN: html.components
@@ -18,22 +18,52 @@ SYMBOL: values
 : prepare-value ( name object -- value name object )
     [ [ value ] keep ] dip ; inline
 
-: from-tuple <mirror> values set ;
+: from-assoc ( assoc -- ) values get swap update ;
 
-: values-tuple values get object>> ;
+: from-tuple ( tuple -- ) <mirror> from-assoc ;
+
+: deposit-values ( destination names -- )
+    [ dup value ] H{ } map>assoc update ;
+
+: deposit-slots ( destination names -- )
+    [ <mirror> ] dip deposit-values ;
+
+: with-each-index ( seq quot -- )
+    '[
+        [
+            blank-values 1+ "index" set-value @
+        ] with-scope
+    ] each-index ; inline
+
+: with-each-value ( seq quot -- )
+    '[ "value" set-value @ ] with-each-index ; inline
+
+: with-each-assoc ( seq quot -- )
+    '[ from-assoc @ ] with-each-index ; inline
+
+: with-each-tuple ( seq quot -- )
+    '[ from-tuple @ ] with-each-index ; inline
+
+: nest-values ( name quot -- )
+    swap [
+        [
+            H{ } clone [ values set call ] keep
+        ] with-scope
+    ] dip set-value ; inline
 
 : object>string ( object -- string )
     {
         { [ dup real? ] [ number>string ] }
         { [ dup timestamp? ] [ timestamp>string ] }
         { [ dup string? ] [ ] }
+        { [ dup word? ] [ word-name ] }
         { [ dup not ] [ drop "" ] }
     } cond ;
 
 GENERIC: render* ( value name render -- )
 
 : render ( name renderer -- )
-    over validation-messages get at [
+    over named-validation-messages get at [
         [ value>> ] [ message>> ] bi
         [ -rot render* ] dip
         render-error
@@ -103,7 +133,7 @@ TUPLE: choice size multiple choices ;
 
 : render-option ( text selected? -- )
     <option [ "true" =selected ] when option>
-        escape-string write
+        object>string escape-string write
     </option> ;
 
 : render-options ( options selected -- )

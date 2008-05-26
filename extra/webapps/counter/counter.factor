@@ -1,26 +1,25 @@
-USING: math kernel accessors http.server http.server.actions
-http.server.sessions http.server.templating
-http.server.templating.fhtml locals ;
+USING: math kernel accessors html.components
+http.server http.server.actions
+http.server.sessions html.templates.chloe fry ;
 IN: webapps.counter
 
 SYMBOL: count
 
 TUPLE: counter-app < dispatcher ;
 
-M: counter-app init-session*
-    drop 0 count sset ;
+M: counter-app init-session* drop 0 count sset ;
 
-:: <counter-action> ( quot -- action )
-    <action> [
-        count quot schange
-        "" f <standard-redirect>
-    ] >>display ;
+: <counter-action> ( quot -- action )
+    <action>
+        swap '[ count , schange "" f <standard-redirect> ] >>submit ;
 
 : counter-template ( -- template )
-    "resource:extra/webapps/counter/counter.fhtml" <fhtml> ;
+    "resource:extra/webapps/counter/counter.xml" <chloe> ;
 
 : <display-action> ( -- action )
-    <action> [ counter-template serve-template ] >>display ;
+    <page-action>
+        [ count sget "counter" set-value ] >>init
+        counter-template >>template ;
 
 : <counter-app> ( -- responder )
     counter-app new-dispatcher

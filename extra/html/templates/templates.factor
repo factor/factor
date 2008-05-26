@@ -19,12 +19,12 @@ ERROR: template-error template error ;
 
 M: template-error error.
     "Error while processing template " write
-    [ template>> pprint ":" print nl ]
+    [ template>> short. ":" print nl ]
     [ error>> error. ]
     bi ;
 
 : call-template ( template -- )
-    [ call-template* ] [ template-error ] recover ;
+    [ call-template* ] [ \ template-error boa rethrow ] recover ;
 
 SYMBOL: title
 

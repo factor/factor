@@ -168,3 +168,13 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
     [ "object" value [ describe ] with-html-stream ] with-string-writer
     =
 ] unit-test
+
+[ ] [ blank-values ] unit-test
+
+[ ] [
+    "factor" [
+        "concatenative" "model" set-value
+    ] nest-values
+] unit-test
+
+[ H{ { "factor" H{ { "model" "concatenative" } } } } ] [ values get ] unit-test

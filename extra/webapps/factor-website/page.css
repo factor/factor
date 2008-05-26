@@ -21,6 +21,8 @@ a:hover, .link:hover {
 
 .error { color: #a00; }
 
+.errors li { color: #a00; }
+
 .field-label {
 	text-align: right;
 }
@@ -53,3 +55,21 @@ a:hover, .link:hover {
 .description p:last-child {
 	margin-bottom: 0px;
 }
+
+.description table, .description td {
+    border-color: #666;
+    border-style: solid;
+}
+
+.description table {
+    border-width: 0 0 1px 1px;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+.description td {
+    margin: 0;
+    padding: 4px;
+    border-width: 1px 1px 0 0;
+}
+

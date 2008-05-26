@@ -4,7 +4,7 @@
 
 	<t:title>Edit Blog</t:title>
 
-	<t:form t:action="$planet-factor/admin/edit-blog" t:for="id">
+	<t:form t:action="$planet-factor/admin/new-blog">
 
 		<table>
 
@@ -28,7 +28,5 @@
 		<input type="SUBMIT" value="Done" />
 
 	</t:form>
-
-	<t:button t:action="$planet-factor/admin/delete-blog" t:for="id" class="link-button link">Delete</t:button>
 
 </t:chloe>
