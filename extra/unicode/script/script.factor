@@ -10,7 +10,7 @@ SYMBOL: interned
 
 : parse-script ( stream -- assoc )
     ! assoc is code point/range => name
-    lines filter-comments [ split-; ] map >hashtable ;
+    lines filter-comments [ split-; ] map ;
 
 : range, ( value key -- )
     swap interned get
