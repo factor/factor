@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel continuations sequences math namespaces sets
 math.parser assocs regexp fry unicode.categories sequences
-arrays hashtables words combinators mirrors classes quotations ;
+arrays hashtables words combinators mirrors classes quotations
+xmode.catalog ;
 IN: validators
 
 : v-default ( str def -- str )
@@ -33,8 +34,8 @@ IN: validators
 : v-number ( str -- n )
     dup string>number [ ] [ "must be a number" throw ] ?if ;
 
-: v-integer ( n -- n )
-    dup integer? [ "must be an integer" throw ] unless ;
+: v-integer ( str -- n )
+    v-number dup integer? [ "must be an integer" throw ] unless ;
 
 : v-min-value ( x n -- x )
     2dup < [
@@ -70,25 +71,38 @@ IN: validators
     dup empty? [ "must remain blank" throw ] unless ;
 
 : v-one-line ( str -- str )
+    v-required
     dup "\r\n" intersect empty?
     [ "must be a single line" throw ] unless ;
 
 : v-one-word ( str -- str )
+    v-required
     dup [ alpha? ] all?
     [ "must be a single word" throw ] unless ;
 
-SYMBOL: validation-messages
+: v-username ( str -- str )
+    2 v-min-length 16 v-max-length v-one-word ;
 
-: with-validation ( quot -- messages )
-    V{ } clone [
-        validation-messages rot with-variable
-    ] keep ; inline
+: v-password ( str -- str )
+    6 v-min-length 40 v-max-length v-one-line ;
+
+: v-mode ( str -- str )
+    dup mode-names member? [
+        "not a valid syntax mode" throw 
+    ] unless ;
+
+SYMBOL: validation-messages
+SYMBOL: named-validation-messages
+
+: init-validation ( -- )
+    V{ } clone validation-messages set
+    H{ } clone named-validation-messages set ;
 
 : (validation-message) ( obj -- )
     validation-messages get push ;
 
 : (validation-message-for) ( obj name -- )
-    swap 2array (validation-message) ;
+    named-validation-messages get set-at ;
 
 TUPLE: validation-message message ;
 
@@ -100,39 +114,29 @@ C: <validation-message> validation-message
 : validation-message-for ( string name -- )
     [ <validation-message> ] dip (validation-message-for) ;
 
-TUPLE: validation-error value message ;
+TUPLE: validation-error message value ;
 
 C: <validation-error> validation-error
 
-: validation-error ( reason -- )
+: validation-error ( message -- )
     f <validation-error> (validation-message) ;
 
-: validation-error-for ( reason value name -- )
+: validation-error-for ( message value name -- )
     [ <validation-error> ] dip (validation-message-for) ;
 
 : validation-failed? ( -- ? )
-    validation-messages get [
-        dup pair? [ second ] when validation-error?
-    ] contains? ;
+    validation-messages get [ validation-error? ] contains?
+    named-validation-messages get [ nip validation-error? ] assoc-contains?
+    or ;
 
 : define-validators ( class validators -- )
     >hashtable "validators" set-word-prop ;
 
 : validate ( value name quot -- result )
-    [ swap validation-error-for f ] recover ; inline
-
-: validate-value ( value name validators -- result )
-    '[ , at call ] validate ;
+    '[ drop @ ] [ -rot validation-error-for f ] recover ; inline
 
 : required-values ( assoc -- )
-    [ swap [ drop v-required ] validate drop ] assoc-each ;
+    [ swap [ v-required ] validate drop ] assoc-each ;
 
 : validate-values ( assoc validators -- assoc' )
-    '[ over , validate-value ] assoc-map ;
-
-: deposit-values ( destination assoc validators -- )
-    validate-values update ;
-
-: deposit-slots ( tuple assoc -- )
-    [ [ <mirror> ] [ class "validators" word-prop ] bi ] dip
-    swap deposit-values ;
+    swap '[ [ [ dup , at ] keep ] dip validate ] assoc-map ;

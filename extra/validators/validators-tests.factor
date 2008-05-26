@@ -1,8 +1,28 @@
 IN: validators.tests
-USING: kernel sequences tools.test validators accessors ;
+USING: kernel sequences tools.test validators accessors
+namespaces assocs ;
+
+: with-validation ( quot -- messages )
+    [
+        init-validation
+        call
+        validation-messages get
+        named-validation-messages get >alist append
+    ] with-scope ; inline
+
+[ "" v-one-line ] must-fail
+[ "hello world" ] [ "hello world" v-one-line ] unit-test
+[ "hello\nworld" v-one-line ] must-fail
+
+[ "" v-one-word ] must-fail
+[ "hello" ] [ "hello" v-one-word ] unit-test
+[ "hello world" v-one-word ] must-fail
 
 [ "foo" v-number ] must-fail
 [ 123 ] [ "123" v-number ] unit-test
+[ 123 ] [ "123" v-integer ] unit-test
+
+[ "1.0" v-integer ] [ "must be an integer" = ] must-fail-with
 
 [ "slava@factorcode.org" ] [
     "slava@factorcode.org" v-email
@@ -29,13 +49,13 @@ USING: kernel sequences tools.test validators accessors ;
 
 [ 14 V{ } ] [
     [
-        "14" "age" [ drop v-number 13 v-min-value 100 v-max-value ] validate
+        "14" "age" [ v-number 13 v-min-value 100 v-max-value ] validate
     ] with-validation
 ] unit-test
 
 [ f t ] [
     [
-        "140" "age" [ drop v-number 13 v-min-value 100 v-max-value ] validate
+        "140" "age" [ v-number 13 v-min-value 100 v-max-value ] validate
     ] with-validation first
     [ first "age" = ]
     [ second validation-error? ]
@@ -46,25 +66,38 @@ USING: kernel sequences tools.test validators accessors ;
 TUPLE: person name age ;
 
 person {
-    { "name" [ v-required ] }
+    { "name" [ ] }
     { "age" [ v-number 13 v-min-value 100 v-max-value ] }
 } define-validators
 
-[ 14 V{ } ] [
-    [
-        person new dup
-        { { "age" "14" } }
-        deposit-slots
-        age>>
-    ] with-validation
-] unit-test
-
-[ t ] [
+[ t t ] [
     [
         { { "age" "" } } required-values
+        validation-failed?
     ] with-validation first
     [ first "age" = ]
     [ second validation-error? ]
     [ second message>> "required" = ]
     tri and and
+] unit-test
+
+[ H{ { "a" 123 } } f V{ } ] [
+    [
+        H{
+            { "a" "123" }
+            { "b" "c" }
+            { "c" "d" }
+        }
+        H{
+            { "a" [ v-integer ] }
+        } validate-values
+        validation-failed?
+    ] with-validation
+] unit-test
+
+[ t "foo" ] [
+    [
+        "foo" validation-error
+        validation-failed?
+    ] with-validation first message>>
 ] unit-test
