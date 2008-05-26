@@ -463,7 +463,25 @@ must-fail-with
 
 [ [ ] ] [
     2 [
-        "IN: classes.tests DEFER: twice-fails FORGET: twice-fails MIXIN: twice-fails"
+        "IN: parser.tests DEFER: twice-fails FORGET: twice-fails MIXIN: twice-fails"
         <string-reader> "twice-fails-test" parse-stream
     ] times
 ] unit-test
+
+[ [ ] ] [
+    "IN: parser.tests : staging-problem-test-1 1 ; : staging-problem-test-2 staging-problem-test-1 ;"
+    <string-reader> "staging-problem-test" parse-stream
+] unit-test
+
+[ t ] [ "staging-problem-test-1" "parser.tests" lookup >boolean ] unit-test
+
+[ t ] [ "staging-problem-test-2" "parser.tests" lookup >boolean ] unit-test
+
+[ [ ] ] [
+    "IN: parser.tests << : staging-problem-test-1 1 ; >> : staging-problem-test-2 staging-problem-test-1 ;"
+    <string-reader> "staging-problem-test" parse-stream
+] unit-test
+
+[ t ] [ "staging-problem-test-1" "parser.tests" lookup >boolean ] unit-test
+
+[ t ] [ "staging-problem-test-2" "parser.tests" lookup >boolean ] unit-test
