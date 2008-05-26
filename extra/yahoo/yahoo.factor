@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: http.client xml xml.utilities kernel sequences
-namespaces http math.parser help math.order ;
+namespaces http math.parser help math.order locals ;
 IN: yahoo
 
 TUPLE: result title url summary ;
@@ -16,14 +16,21 @@ C: <result> result
     ] map ;
 
 : yahoo-url ( -- str )
-    "http://search.yahooapis.com/WebSearchService/V1/webSearch?appid=Factor-search&query=" ;
+    "http://search.yahooapis.com/WebSearchService/V1/webSearch" ;
 
-: query ( search num -- url )
+:: query ( search num appid -- url )
     [
         yahoo-url %
-        swap url-encode %
-        "&results=" % #
+        "?appid=" % appid %
+        "&query=" % search url-encode %
+        "&results=" % num #
     ] "" make ;
 
-: search-yahoo ( search num -- seq )
+: factor-id
+    "fRrVAKzV34GDyeRw6bUHDhEWHRedwfOC7e61wwXZLgGF80E67spxdQXuugBe2pgIevMmKwA-" ;
+
+: search-yahoo/id ( search num id -- seq )
     query http-get string>xml parse-yahoo ;
+
+: search-yahoo ( search num -- seq )
+    factor-id search-yahoo/id ;

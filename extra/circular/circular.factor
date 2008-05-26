@@ -19,10 +19,6 @@ M: circular length seq>> length ;
 
 M: circular virtual@ circular-wrap seq>> ;
 
-M: circular nth virtual@ nth ;
-
-M: circular set-nth virtual@ set-nth ;
-
 M: circular virtual-seq seq>> ;
 
 : change-circular-start ( n circular -- )
@@ -36,3 +32,20 @@ M: circular virtual-seq seq>> ;
     0 <string> <circular> ;
 
 INSTANCE: circular virtual-sequence
+
+TUPLE: growing-circular < circular length ;
+
+M: growing-circular length length>> ;
+
+: full? ( circular -- ? )
+    [ length ] [ seq>> length ] bi = ;
+
+: set-peek ( elt seq -- )
+    [ length 1- ] keep set-nth ;
+
+: push-growing-circular ( elt circular -- )
+    dup full? [ push-circular ]
+    [ [ 1+ ] change-length set-peek ] if ;
+
+: <growing-circular> ( capacity -- growing-circular )
+    { } new-sequence 0 0 growing-circular boa ;

@@ -1,7 +1,8 @@
 USING: unicode.categories kernel math combinators splitting
 sequences math.parser io.files io assocs arrays namespaces
 math.ranges unicode.normalize values io.encodings.ascii
-unicode.syntax unicode.data compiler.units alien.syntax sets ;
+unicode.syntax unicode.data compiler.units alien.syntax sets
+combinators.lib ;
 IN: unicode.breaks
 
 C-ENUM: Any L V T Extend Control CR LF graphemes ;
@@ -20,22 +21,10 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
         [ drop Control ]
     } case ;
 
-: trim-blank ( str -- newstr )
-    [ blank? ] right-trim ;
-
-: process-other-extend ( lines -- set )
-    [ "#" split1 drop ";" split1 drop trim-blank ] map harvest
-    [ ".." split1 [ dup ] unless* [ hex> ] bi@ [a,b] ] map
-    concat unique ;
-
-: other-extend-lines ( -- lines )
-    "resource:extra/unicode/PropList.txt" ascii file-lines ;
-
-VALUE: other-extend
-
 CATEGORY: (extend) Me Mn ;
 : extend? ( ch -- ? )
-    dup (extend)? [ ] [ other-extend key? ] ?if ;
+    [ (extend)? ]
+    [ "Other_Grapheme_Extend" property? ] or? ;
 
 : grapheme-class ( ch -- class )
     {
@@ -108,10 +97,7 @@ VALUE: grapheme-table
     unclip-last-slice grapheme-class swap
     [ grapheme-class dup rot grapheme-break? ] find-last-index ?1+ nip ;
 
-[
-    other-extend-lines process-other-extend \ other-extend set-value
+init-grapheme-table table
+[ make-grapheme-table finish-table ] with-variable
+\ grapheme-table set-value
 
-    init-grapheme-table table
-    [ make-grapheme-table finish-table ] with-variable
-    \ grapheme-table set-value
-] with-compilation-unit
