@@ -127,12 +127,14 @@ MEMO: table-column ( -- parser )
     text [ "td" surround-with-foo ] action ;
 
 MEMO: table-row ( -- parser )
-    [
-        table-column "|" token hide list-of-many ,
-    ] seq* [ "tr" surround-with-foo ] action ;
+    "|" token hide
+    table-column "|" token hide list-of
+    "|" token hide nl hide optional 4seq
+    [ "tr" surround-with-foo ] action ;
 
 MEMO: table ( -- parser )
-    table-row repeat1 [ "table" surround-with-foo ] action ;
+    table-row repeat1
+    [ "table" surround-with-foo ] action ;
 
 MEMO: code ( -- parser )
     [

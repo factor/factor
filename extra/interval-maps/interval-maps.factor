@@ -44,6 +44,9 @@ PRIVATE>
     >intervals ensure-disjoint >tuple-array
     interval-map boa ;
 
+: <interval-set> ( specification -- map )
+    [ dup 2array ] map <interval-map> ;
+
 :: coalesce ( alist -- specification )
     ! Only works with integer keys, because they're discrete
     ! Makes 2array keys

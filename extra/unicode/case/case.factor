@@ -101,9 +101,6 @@ SYMBOL: locale ! Just casing locale, or overall?
 : >case-fold ( string -- fold )
     >upper >lower ;
 
-: insensitive= ( str1 str2 -- ? )
-    [ >case-fold ] bi@ = ;
-
 : lower? ( string -- ? )
     dup >lower = ;
 : upper? ( string -- ? )

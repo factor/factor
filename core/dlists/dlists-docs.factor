@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel quotations ;
+USING: help.markup help.syntax kernel quotations dlists.private ;
 IN: dlists
 
 ARTICLE: "dlists" "Doubly-linked lists"
@@ -51,38 +51,52 @@ HELP: dlist-empty?
 HELP: push-front
 { $values { "obj" "an object" } { "dlist" dlist } }
 { $description "Push the object onto the front of the " { $link dlist } "." } 
-{ $notes "This operation is O(1)." }
-{ $see-also push-back pop-front pop-front* pop-back pop-back* } ;
+{ $notes "This operation is O(1)." } ;
+
+HELP: push-front*
+{ $values { "obj" "an object" } { "dlist" dlist } { "dlist-node" dlist-node } }
+{ $description "Push the object onto the front of the " { $link dlist } " and return the newly created " { $snippet "dlist-node" } "." } 
+{ $notes "This operation is O(1)." } ;
 
 HELP: push-back
 { $values { "obj" "an object" } { "dlist" dlist } }
 { $description "Push the object onto the back of the " { $link dlist } "." } 
-{ $notes "This operation is O(1)." }
-{ $see-also push-front pop-front pop-front* pop-back pop-back* } ;
+{ $notes "This operation is O(1)." } ;
+
+HELP: push-back*
+{ $values { "obj" "an object" } { "dlist" dlist } { "dlist-node" dlist-node } }
+{ $description "Push the object onto the back of the " { $link dlist } " and return the newly created " { $snippet "dlist-node" } "." } 
+{ $notes "This operation is O(1)." } ;
+
+HELP: peek-front
+{ $values { "dlist" dlist } { "obj" "an object" } }
+{ $description "Returns the object at the front of the " { $link dlist } "." } ;
 
 HELP: pop-front
 { $values { "dlist" dlist } { "obj" "an object" } }
 { $description "Pop the object off the front of the " { $link dlist } " and return the object." }
-{ $notes "This operation is O(1)." }
-{ $see-also push-front push-back pop-front* pop-back pop-back* } ;
+{ $notes "This operation is O(1)." } ;
 
 HELP: pop-front*
 { $values { "dlist" dlist } }
 { $description "Pop the object off the front of the " { $link dlist } "." }
-{ $notes "This operation is O(1)." }
-{ $see-also push-front push-back pop-front pop-back pop-back* } ;
+{ $notes "This operation is O(1)." } ;
+
+HELP: peek-back
+{ $values { "dlist" dlist } { "obj" "an object" } }
+{ $description "Returns the object at the back of the " { $link dlist } "." } ;
 
 HELP: pop-back
 { $values { "dlist" dlist } { "obj" "an object" } }
 { $description "Pop the object off the back of the " { $link dlist } " and return the object." }
-{ $notes "This operation is O(1)." }
-{ $see-also push-front push-back pop-front pop-front* pop-back* } ;
+{ $notes "This operation is O(1)." } ;
 
 HELP: pop-back*
 { $values { "dlist" dlist } }
 { $description "Pop the object off the back of the " { $link dlist } "." }
-{ $notes "This operation is O(1)." }
-{ $see-also push-front push-back pop-front pop-front* pop-back } ;
+{ $notes "This operation is O(1)." } ;
+
+{ push-front push-front* push-back push-back* peek-front pop-front pop-front* peek-back pop-back pop-back* } related-words
 
 HELP: dlist-find
 { $values { "dlist" { $link dlist } } { "quot" quotation } { "obj/f" "an object or " { $link f } } { "?" "a boolean" } }
