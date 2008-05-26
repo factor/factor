@@ -39,6 +39,12 @@ IN: math.functions.tests
 [ 0.0 ] [ 0 sin ] unit-test
 [ 0.0 ] [ 0 asin ] unit-test
 
+[ t ] [ 10 atan real? ] unit-test
+[ f ] [ 10 atanh real? ] unit-test
+
+[ t ] [ 10 asin sin 10 1.e-10 ~ ] unit-test
+[ t ] [ -1 sqrt neg dup acos cos 1.e-10 ~ ] unit-test
+
 [ 100 ] [ 100 100 gcd nip ] unit-test
 [ 100 ] [ 1000 100 gcd nip ] unit-test
 [ 100 ] [ 100 1000 gcd nip ] unit-test
