@@ -44,10 +44,23 @@ SYMBOL: values
 : with-each-tuple ( seq quot -- )
     '[ from-tuple @ ] with-each-index ; inline
 
+: with-assoc-values ( assoc quot -- )
+    '[ blank-values , from-assoc @ ] with-scope ; inline
+
+: with-tuple-values ( assoc quot -- )
+    '[ blank-values , from-tuple @ ] with-scope ; inline
+
 : nest-values ( name quot -- )
     swap [
         [
             H{ } clone [ values set call ] keep
+        ] with-scope
+    ] dip set-value ; inline
+
+: nest-tuple ( name quot -- )
+    swap [
+        [
+            H{ } clone [ <mirror> values set call ] keep
         ] with-scope
     ] dip set-value ; inline
 

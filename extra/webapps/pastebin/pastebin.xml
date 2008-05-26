@@ -13,9 +13,9 @@
 
 		<t:each-tuple t:values="pastes">
 			<tr>
-				<td><t:a t:href="$pastebin/view-paste" t:query="id"><t:field t:name="summary" /></t:a></td>
-				<td><t:field t:name="author" /></td>
-				<td><t:field t:name="date" /></td>
+				<td><t:a t:href="$pastebin/paste" t:query="id"><t:label t:name="summary" /></t:a></td>
+				<td><t:label t:name="author" /></td>
+				<td><t:label t:name="date" /></td>
 			</tr>
 		</t:each-tuple>
 	</table>

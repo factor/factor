@@ -132,6 +132,9 @@ posting "POSTINGS"
 : <id-redirect> ( id next -- response )
     swap "id" associate <standard-redirect> ;
 
+: deposit-blog-slots ( blog -- )
+    { "name" "www-url" "feed-url" } deposit-slots ;
+
 : <new-blog-action> ( -- action )
     <page-action>
         "new-blog" planet-template >>template
@@ -140,9 +143,10 @@ posting "POSTINGS"
 
         [
             f <blog>
-                dup { "name" "www-url" "feed-url" } deposit-slots
+            [ deposit-blog-slots ]
             [ insert-tuple ]
-            [ id>> "$planet-factor/admin/edit-blog" <id-redirect> ] bi
+            [ id>> "$planet-factor/admin/edit-blog" <id-redirect> ]
+            tri
         ] >>submit ;
     
 : <edit-blog-action> ( -- action )
@@ -161,9 +165,10 @@ posting "POSTINGS"
 
         [
             f <blog>
-                dup { "id" "name" "www-url" "feed-url" } deposit-slots
+            [ deposit-blog-slots ]
             [ update-tuple ]
-            [ id>> "$planet-factor/admin" <id-redirect> ] bi
+            [ id>> "$planet-factor/admin" <id-redirect> ]
+            tri
         ] >>submit ;
 
 TUPLE: planet-factor-admin < dispatcher ;

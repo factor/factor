@@ -217,6 +217,18 @@ STRING: button-tag-markup
 : each-assoc-tag ( tag -- )
     [ with-each-assoc ] (each-tag) ;
 
+: (bind-tag) ( tag quot -- )
+    [
+        [ "name" required-attr value ] keep
+        '[ , process-tag-children ]
+    ] dip call ; inline
+
+: bind-tuple-tag ( tag -- )
+    [ with-tuple-values ] (bind-tag) ;
+
+: bind-assoc-tag ( tag -- )
+    [ with-assoc-values ] (bind-tag) ;
+
 : error-message-tag ( tag -- )
     children>string render-error ;
 
@@ -280,6 +292,8 @@ STRING: button-tag-markup
         { "each" [ each-tag ] }
         { "each-assoc" [ each-assoc-tag ] }
         { "each-tuple" [ each-tuple-tag ] }
+        { "bind-assoc" [ bind-assoc-tag ] }
+        { "bind-tuple" [ bind-tuple-tag ] }
         { "comment" [ drop ] }
         { "call-next-template" [ drop call-next-template ] }
 

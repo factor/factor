@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces assocs sorting sequences kernel accessors
-hashtables sequences.lib db.types db.tuples db
+hashtables sequences.lib db.types db.tuples db combinators
 calendar calendar.format math.parser rss xml.writer
 xmode.catalog validators html.components html.templates.chloe
 http.server
@@ -121,7 +121,9 @@ M: annotation entity-link
             validate-integer-id
             "id" value paste from-tuple
 
+            "id" value
             "new-annotation" [
+                "id" set-value
                 mode-names "modes" set-value
                 "factor" "mode" set-value
             ] nest-values
@@ -145,6 +147,19 @@ M: annotation entity-link
         [ validate-integer-id ] >>init
         [ "id" value paste annotations>> paste-feed ] >>feed ;
 
+: validate-paste ( -- )
+    {
+        { "summary" [ v-one-line ] }
+        { "author" [ v-one-line ] }
+        { "mode" [ v-mode ] }
+        { "contents" [ v-required ] }
+        { "captcha" [ v-captcha ] }
+    } validate-params ;
+
+: deposit-paste-slots ( tuple -- )
+    now >>date
+    { "summary" "author" "mode" "contents" } deposit-slots ;
+
 : <new-paste-action> ( -- action )
     <page-action>
         [
@@ -155,19 +170,13 @@ M: annotation entity-link
         "new-paste" pastebin-template >>template
 
         [
-            {
-                { "summary" [ v-one-line ] }
-                { "author" [ v-one-line ] }
-                { "mode" [ v-mode ] }
-                { "contents" [ v-required ] }
-                { "captcha" [ v-captcha ] }
-            } validate-params
+            validate-paste
 
             f <paste>
-                now >>date
-                dup { "summary" "author" "mode" "contents" } deposit-slots
+            [ deposit-paste-slots ]
             [ insert-tuple ]
-            [ id>> "$pastebin/paste" <id-redirect> ] bi
+            [ id>> "$pastebin/paste" <id-redirect> ]
+            tri
         ] >>submit ;
 
 : <delete-paste-action> ( -- action )
@@ -185,26 +194,22 @@ M: annotation entity-link
 ! ! !
 
 : <new-annotation-action> ( -- action )
-    <action>
-        [
-            {
-                { "summary" [ v-one-line ] }
-                { "author" [ v-one-line ] }
-                { "mode" [ v-mode ] }
-                { "contents" [ v-required ] }
-                { "captcha" [ v-captcha ] }
-            } validate-params
-        ] >>validate
+    <page-action>
+        [ validate-paste ] >>validate
+
+        [ "id" param "$pastebin/paste" <id-redirect> ] >>display
 
         [
             f f <annotation>
-                now >>date
-                dup { "summary" "author" "mode" "contents" } deposit-slots
-            [ insert-tuple ]
-            [
-                ! Add anchor here
-                "id" value "$pastebin/paste" <id-redirect>
-            ] bi
+            {
+                [ deposit-paste-slots ]
+                [ { "id" } deposit-slots ]
+                [ insert-tuple ]
+                [
+                    ! Add anchor here
+                    id>> "$pastebin/paste" <id-redirect>
+                ]
+            } cleave
         ] >>submit ;
 
 : <delete-annotation-action> ( -- action )
