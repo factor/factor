@@ -14,7 +14,6 @@ IN: lisp.test
     "-" "math" "-" define-primitive
     
     "list" [ >array ] lisp-define
-    "map" [ [ swap map ] compose call ] lisp-define
     
     { 5 } [
       [ 2 3 ] "+" <lisp-symbol> funcall
@@ -51,4 +50,5 @@ IN: lisp.test
     { { 1 2 3 4 5 } } [
       "(list 1 2 3 4 5)" lisp-eval
     ] unit-test
+
 ] with-interactive-vocabs
