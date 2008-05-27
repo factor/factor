@@ -2,10 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors sequences kernel assocs combinators http.server
 validators http hashtables namespaces fry continuations locals
-boxes xml.entities html.elements html.components io arrays ;
+boxes xml.entities html.elements html.components io arrays math ;
 IN: http.server.actions
 
 SYMBOL: params
+
+SYMBOL: rest-param
 
 : render-validation-messages ( -- )
     validation-messages get
@@ -15,7 +17,7 @@ SYMBOL: params
         </ul>
     ] if ;
 
-TUPLE: action init display validate submit ;
+TUPLE: action rest-param init display validate submit ;
 
 : new-action ( class -- action )
     new
@@ -43,19 +45,27 @@ TUPLE: action init display validate submit ;
     [ validate>> call ]
     [ submit>> call ] bi ;
 
+: handle-rest-param ( arg -- )
+    dup length 1 > action get rest-param>> not or
+    [ <404> exit-with ] [
+        action get rest-param>> associate rest-param set
+    ] if ;
+
 M: action call-responder* ( path action -- response )
     dup action set
     '[
-        , empty? [
-            init-validation
-            ,
-            request get [ request-params params set ] [ method>> ] bi
-            {
-                { "GET" [ handle-get ] }
-                { "HEAD" [ handle-get ] }
-                { "POST" [ handle-post ] }
-            } case
-        ] [ <404> ] if
+        , dup empty? [ drop ] [ handle-rest-param ] if
+
+        init-validation
+        ,
+        request get
+        [ request-params rest-param get assoc-union params set ]
+        [ method>> ] bi
+        {
+            { "GET" [ handle-get ] }
+            { "HEAD" [ handle-get ] }
+            { "POST" [ handle-post ] }
+        } case
     ] with-exit-continuation ;
 
 : param ( name -- value )
