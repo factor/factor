@@ -67,7 +67,7 @@ IN: farkup.tests
 
 [ "<p><img src=\"lol.jpg\"/></p>" ] [ "[[image:lol.jpg]]" convert-farkup ] unit-test
 [ "<p><img src=\"lol.jpg\" alt=\"teh lol\"/></p>" ] [ "[[image:lol.jpg|teh lol]]" convert-farkup ] unit-test
-[ "<p><a href=\"lol.com\"></a></p>" ] [ "[[lol.com]]" convert-farkup ] unit-test
+[ "<p><a href=\"lol.com\">lol.com</a></p>" ] [ "[[lol.com]]" convert-farkup ] unit-test
 [ "<p><a href=\"lol.com\">haha</a></p>" ] [ "[[lol.com|haha]]" convert-farkup ] unit-test
 
 [ ] [ "[{}]" convert-farkup drop ] unit-test

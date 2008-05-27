@@ -6,6 +6,8 @@ splitting io.streams.string peg.parsers
 sequences.deep unicode.categories ;
 IN: farkup
 
+SYMBOL: relative-link-prefix
+
 <PRIVATE
 
 : delimiters ( -- string )
@@ -68,7 +70,9 @@ MEMO: eq ( -- parser )
     CHAR: : over member? [
         dup { "http://" "https://" "ftp://" } [ head? ] with contains?
         [ drop "/" ] unless
-    ] when ;
+    ] [
+        relative-link-prefix get prepend
+    ] if ;
 
 : escape-link ( href text -- href-esc text-esc )
     >r check-url escape-quoted-string r> escape-string ;
@@ -100,7 +104,7 @@ MEMO: simple-link ( -- parser )
         "[[" token hide ,
         [ "|]" member? not ] satisfy repeat1 ,
         "]]" token hide ,
-    ] seq* [ first f make-link ] action ;
+    ] seq* [ first dup make-link ] action ;
 
 MEMO: labelled-link ( -- parser )
     [
