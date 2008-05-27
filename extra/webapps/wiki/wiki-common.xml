@@ -8,6 +8,7 @@
 
 		<t:a t:href="$wiki">Front Page</t:a>
 		| <t:a t:href="$wiki/articles">All Articles</t:a>
+		| <t:a t:href="$wiki/changes">Recent Changes</t:a>
 
 		<t:if t:code="http.server.sessions:uid">
 

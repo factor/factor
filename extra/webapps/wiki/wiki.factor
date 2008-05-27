@@ -127,6 +127,16 @@ revision "REVISIONS" {
 
         "revisions" wiki-template >>template ;
 
+: <list-changes-action> ( -- action )
+    <page-action>
+        [
+            f <revision> select-tuples
+            [ [ date>> ] compare invert-comparison ] sort
+            "changes" set-value
+        ] >>init
+
+        "changes" wiki-template >>template ;
+
 : <delete-action> ( -- action )
     <action>
         [ validate-title ] >>validate
@@ -156,8 +166,23 @@ revision "REVISIONS" {
 
 : <list-articles-action> ( -- action )
     <page-action>
-        [ f <article> select-tuples "articles" set-value ] >>init
+        [
+            f <article> select-tuples
+            [ [ title>> ] compare ] sort
+            "articles" set-value
+        ] >>init
+
         "articles" wiki-template >>template ;
+
+: <user-edits-action> ( -- action )
+    <page-action>
+        [
+            { { "author" [ v-username ] } } validate-params
+            f <revision> "author" value >>author
+            select-tuples "user-edits" set-value
+        ] >>init
+
+        "user-edits" wiki-template >>template ;
 
 TUPLE: wiki < dispatcher ;
 
@@ -167,8 +192,10 @@ TUPLE: wiki < dispatcher ;
         <view-article-action> "view" add-responder
         <view-revision-action> "revision" add-responder
         <list-revisions-action> "revisions" add-responder
+        <user-edits-action> "user-edits" add-responder
         <diff-action> "diff" add-responder
         <list-articles-action> "articles" add-responder
+        <list-changes-action> "changes" add-responder
         <edit-article-action> { } <protected> "edit" add-responder
         <delete-action> { } <protected> "delete" add-responder
     <boilerplate>

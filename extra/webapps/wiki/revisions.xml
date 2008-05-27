@@ -7,9 +7,9 @@
 	<ul>
 		<t:each-tuple t:values="revisions">
 			<li>
-				<t:a t:href="revision" t:query="id">
-					<t:label t:name="date" /> by <t:label t:name="author" />
-				</t:a>
+				<t:a t:href="revision" t:query="id"><t:label t:name="date" /></t:a>
+				by
+				<t:a t:href="user-edits" t:query="author"><t:label t:name="author" /></t:a>
 			</li>
 		</t:each-tuple>
 	</ul>

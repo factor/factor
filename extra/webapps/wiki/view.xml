@@ -13,7 +13,7 @@
 		| <t:a t:href="$wiki/revisions" t:query="title">Revisions</t:a>
 		| <t:a t:href="$wiki/edit" t:query="title">Edit</t:a>
 		| <t:button t:action="$wiki/delete" t:for="title" class="link-button link">Delete</t:button>
-		| This revision created on <t:label t:name="date" /> by <t:label t:name="author" />.
+		| This revision created on <t:label t:name="date" /> by <t:a t:href="user-edits" t:query="author"><t:label t:name="author" /></t:a>.
 	</div>
 
 </t:chloe>
