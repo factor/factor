@@ -1,0 +1,19 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title><t:label t:name="title" /></t:title>
+
+	<div class="description">
+		<t:farkup t:name="content" />
+	</div>
+
+	<div class="navbar">
+		<t:a t:href="$wiki/view" t:query="title">Latest</t:a>
+		| <t:a t:href="$wiki/revisions" t:query="title">Revisions</t:a>
+		| <t:a t:href="$wiki/edit" t:query="title">Edit</t:a>
+		| <t:button t:action="$wiki/delete" t:for="title" class="link-button link">Delete</t:button>
+		| This revision created on <t:label t:name="date" /> by <t:label t:name="author" />.
+	</div>
+
+</t:chloe>

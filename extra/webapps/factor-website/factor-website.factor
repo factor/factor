@@ -11,10 +11,11 @@ http.server.auth.login
 http.server.auth.providers.db
 http.server.boilerplate
 html.templates.chloe
-webapps.user-admin
 webapps.pastebin
 webapps.planet
-webapps.todo ;
+webapps.todo
+webapps.wiki
+webapps.user-admin ;
 IN: webapps.factor-website
 
 : test-db "resource:test.db" sqlite-db ;
@@ -34,6 +35,9 @@ IN: webapps.factor-website
         init-postings-table
 
         init-todo-table
+
+        init-articles-table
+        init-revisions-table
     ] with-db ;
 
 : <factor-website> ( -- responder )
@@ -41,6 +45,7 @@ IN: webapps.factor-website
         <todo-list> "todo" add-responder
         <pastebin> "pastebin" add-responder
         <planet-factor> "planet" add-responder
+        <wiki> "wiki" add-responder
         <user-admin> "user-admin" add-responder
     <login>
         users-in-db >>users
