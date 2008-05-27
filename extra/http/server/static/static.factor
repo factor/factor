@@ -1,10 +1,10 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: calendar html io io.files kernel math math.order
+USING: calendar io io.files kernel math math.order
 math.parser http http.server namespaces parser sequences strings
 assocs hashtables debugger http.mime sorting html.elements
 html.templates.fhtml logging calendar.format accessors
-io.encodings.binary fry ;
+io.encodings.binary fry xml.entities ;
 IN: http.server.static
 
 ! special maps mime types to quots with effect ( path -- )
@@ -58,20 +58,18 @@ TUPLE: file-responder root hook special allow-listings ;
 
 : file. ( name dirp -- )
     [ "/" append ] when
-    dup <a =href a> write </a> ;
+    dup <a =href a> escape-string write </a> ;
 
 : directory. ( path -- )
-    [
-        dup file-name [
-            [ <h1> file-name write </h1> ]
-            [
-                <ul>
-                    directory sort-keys
-                    [ <li> file. </li> ] assoc-each
-                </ul>
-            ] bi
-        ] simple-page
-    ] with-html-stream ;
+    dup file-name [
+        [ <h1> file-name escape-string write </h1> ]
+        [
+            <ul>
+                directory sort-keys
+                [ <li> file. </li> ] assoc-each
+            </ul>
+        ] bi
+    ] simple-page ;
 
 : list-directory ( directory -- response )
     file-responder get allow-listings>> [

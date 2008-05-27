@@ -64,8 +64,8 @@ M: user-saver dispose
     3append <chloe> ;
 
 ! ! ! Login
-: successful-login ( user -- )
-    username>> set-uid ;
+: successful-login ( user -- response )
+    username>> set-uid "$login" end-flow ;
 
 : login-failed ( -- * )
     "invalid username or password" validation-error
@@ -84,9 +84,7 @@ M: user-saver dispose
             "password" value
             "username" value check-login
             [ successful-login ] [ login-failed ] if*
-        ] >>validate
-
-        [ "$login" end-flow ] >>submit ;
+        ] >>submit ;
 
 ! ! ! New user registration
 
