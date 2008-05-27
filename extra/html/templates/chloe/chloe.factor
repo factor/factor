@@ -272,6 +272,7 @@ STRING: button-tag-markup
         { "code" [ code tuple-component-tag ] }
         { "farkup" [ farkup singleton-component-tag ] }
         { "inspector" [ inspector singleton-component-tag ] }
+        { "comparison" [ comparison singleton-component-tag ] }
         { "html" [ html singleton-component-tag ] }
 
         ! Forms

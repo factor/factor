@@ -4,7 +4,8 @@ USING: accessors kernel namespaces io math.parser assocs classes
 classes.tuple words arrays sequences sequences.lib splitting
 mirrors hashtables combinators continuations math strings
 fry locals calendar calendar.format xml.entities validators
-html.elements html.streams xmode.code2html farkup inspector ;
+html.elements html.streams xmode.code2html farkup inspector
+lcs.diff2html ;
 IN: html.components
 
 SYMBOL: values
@@ -210,6 +211,12 @@ SINGLETON: inspector
 
 M: inspector render*
     2drop [ describe ] with-html-stream ;
+
+! Diff component
+SINGLETON: comparison
+
+M: comparison render*
+    2drop htmlize-diff ;
 
 ! HTML component
 SINGLETON: html
