@@ -47,6 +47,21 @@ namespaces assocs ;
 [ "http:/www.factorcode.org" v-url ]
 [ "invalid URL" = ] must-fail-with
 
+[ 4561261212345467 ] [ "4561261212345467" v-credit-card ] unit-test
+
+[ 4561261212345467 ] [ "4561-2612-1234-5467" v-credit-card ] unit-test
+
+[ 0 ] [ "0000000000000000" v-credit-card ] unit-test
+
+[ "000000000" v-credit-card ] must-fail
+
+[ "0000000000000000000000000" v-credit-card ] must-fail
+
+[ "4561_2612_1234_5467" v-credit-card ] must-fail
+
+[ "4561-2621-1234-5467" v-credit-card ] must-fail
+
+
 [ 14 V{ } ] [
     [
         "14" "age" [ v-number 13 v-min-value 100 v-max-value ] validate

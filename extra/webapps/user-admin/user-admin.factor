@@ -12,7 +12,6 @@ http.server.auth.login
 http.server.auth
 http.server.sessions
 http.server.actions
-http.server.crud
 http.server ;
 IN: webapps.user-admin
 

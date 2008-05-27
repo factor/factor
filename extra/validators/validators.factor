@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel continuations sequences math namespaces sets
-math.parser assocs regexp fry unicode.categories sequences
-arrays hashtables words combinators mirrors classes quotations
-xmode.catalog ;
+USING: kernel continuations sequences sequences.lib math
+namespaces sets math.parser math.ranges assocs regexp fry
+unicode.categories arrays hashtables words combinators mirrors
+classes quotations xmode.catalog ;
 IN: validators
 
 : v-default ( str def -- str )
@@ -90,6 +90,23 @@ IN: validators
     dup mode-names member? [
         "not a valid syntax mode" throw 
     ] unless ;
+
+: luhn? ( n -- ? )
+    string>digits <reversed>
+    [ odd? [ 2 * 10 /mod + ] when ] map-index
+    sum 10 mod 0 = ;
+
+: v-credit-card ( str -- n )
+    "- " diff
+    dup CHAR: 0 CHAR: 9 [a,b] diff empty? [
+        13 v-min-length
+        16 v-max-length
+        dup luhn? [ string>number ] [
+            "card number check failed" throw
+        ] if
+    ] [
+        "invalid credit card number format" throw
+    ] if ;
 
 SYMBOL: validation-messages
 SYMBOL: named-validation-messages

@@ -10,7 +10,7 @@
 	
 	<tr>
 		<th class="field-label">User name:</th>
-		<td><t:field t:name="username" /></td>
+		<td><t:label t:name="username" /></td>
 	</tr>
 	
 	<tr>

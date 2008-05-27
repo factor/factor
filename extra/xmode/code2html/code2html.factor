@@ -1,4 +1,4 @@
-USING: xmode.tokens xmode.marker xmode.catalog kernel html
+USING: xmode.tokens xmode.marker xmode.catalog kernel
 html.elements io io.files sequences words io.encodings.utf8
 namespaces xml.entities ;
 IN: xmode.code2html

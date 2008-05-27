@@ -166,10 +166,10 @@ TUPLE: wiki < dispatcher ;
         <main-article-action> "" add-responder
         <view-article-action> "view" add-responder
         <view-revision-action> "revision" add-responder
-        <edit-article-action> { } <protected> "edit" add-responder
         <list-revisions-action> "revisions" add-responder
-        <delete-action> "delete" add-responder
         <diff-action> "diff" add-responder
         <list-articles-action> "articles" add-responder
+        <edit-article-action> { } <protected> "edit" add-responder
+        <delete-action> { } <protected> "delete" add-responder
     <boilerplate>
         "wiki-common" wiki-template >>template ;
