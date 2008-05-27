@@ -16,10 +16,18 @@ IN: farkup.tests
 [ "<p>**</p>" ] [ "\\**" convert-farkup ] unit-test
 
 [ "" ] [ "\n\n" convert-farkup ] unit-test
+[ "" ] [ "\r\n\r\n" convert-farkup ] unit-test
+[ "" ] [ "\r\r\r\r" convert-farkup ] unit-test
+[ "\n" ] [ "\r\r\r" convert-farkup ] unit-test
 [ "\n" ] [ "\n\n\n" convert-farkup ] unit-test
 [ "<p>foo</p><p>bar</p>" ] [ "foo\n\nbar" convert-farkup ] unit-test
+[ "<p>foo</p><p>bar</p>" ] [ "foo\r\n\r\nbar" convert-farkup ] unit-test
+[ "<p>foo</p><p>bar</p>" ] [ "foo\r\rbar" convert-farkup ] unit-test
+[ "<p>foo</p><p>bar</p>" ] [ "foo\r\r\nbar" convert-farkup ] unit-test
 
 [ "\n<p>bar\n</p>" ] [ "\nbar\n" convert-farkup ] unit-test
+[ "\n<p>bar\n</p>" ] [ "\rbar\r" convert-farkup ] unit-test
+[ "\n<p>bar\n</p>" ] [ "\r\nbar\r\n" convert-farkup ] unit-test
 
 [ "<p>foo</p>\n<p>bar</p>" ] [ "foo\n\n\nbar" convert-farkup ] unit-test
 
@@ -28,17 +36,17 @@ IN: farkup.tests
 [ "<p>|a</p>" ]
 [ "|a" convert-farkup ] unit-test
 
-[ "<p>|a|</p>" ]
+[ "<table><tr><td>a</td></tr></table>" ]
 [ "|a|" convert-farkup ] unit-test
 
 [ "<table><tr><td>a</td><td>b</td></tr></table>" ]
-[ "a|b" convert-farkup ] unit-test
+[ "|a|b|" convert-farkup ] unit-test
 
-[ "<table><tr><td>a</td><td>b</td></tr></table>\n<table><tr><td>c</td><td>d</td></tr></table>" ]
-[ "a|b\nc|d" convert-farkup ] unit-test
+[ "<table><tr><td>a</td><td>b</td></tr><tr><td>c</td><td>d</td></tr></table>" ]
+[ "|a|b|\n|c|d|" convert-farkup ] unit-test
 
-[ "<table><tr><td>a</td><td>b</td></tr></table>\n<table><tr><td>c</td><td>d</td></tr></table>\n" ]
-[ "a|b\nc|d\n" convert-farkup ] unit-test
+[ "<table><tr><td>a</td><td>b</td></tr><tr><td>c</td><td>d</td></tr></table>" ]
+[ "|a|b|\n|c|d|\n" convert-farkup ] unit-test
 
 [ "<p><strong>foo</strong>\n</p><h1>aheading</h1>\n<p>adfasd</p>" ]
 [ "*foo*\n=aheading=\nadfasd" convert-farkup ] unit-test

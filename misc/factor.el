@@ -82,6 +82,7 @@
     ("^!.*$" . font-lock-comment-face)
     (" !.*$" . font-lock-comment-face)
     ("( .* )" . font-lock-comment-face)
+    "BIN:"
     "MAIN:"
     "IN:" "USING:" "TUPLE:" "^C:" "^M:"
     "METHOD:"
@@ -89,7 +90,9 @@
     "REQUIRES:"
     "GENERIC:" "GENERIC#" "SYMBOL:" "PREDICATE:" "VAR:" "VARS:"
     "C-STRUCT:"
-    "C-UNION:" "<PRIVATE" "PRIVATE>" "MACRO:" "MACRO::" "DEFER:" "TYPEDEF:"))
+    "C-UNION:" "<PRIVATE" "PRIVATE>" "MACRO:" "MACRO::" "DEFER:" "TYPEDEF:"
+    "SYMBOLS:"
+))
 
 (defun factor-mode ()
   "A mode for editing programs written in the Factor programming language."

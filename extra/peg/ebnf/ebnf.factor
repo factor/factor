@@ -50,7 +50,7 @@ C: <ebnf> ebnf
 : syntax-pack ( begin parser end -- parser )
   #! Parse 'parser' surrounded by syntax elements
   #! begin and end.
-  [ syntax ] dipd syntax pack ;
+  [ syntax ] 2dip syntax pack ;
 
 : 'identifier' ( -- parser )
   #! Return a parser that parses an identifer delimited by

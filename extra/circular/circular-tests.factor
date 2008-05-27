@@ -27,3 +27,15 @@ circular strings ;
 ! This no longer fails
 ! [ "test" <circular> 5 swap nth ] must-fail
 ! [ "foo" <circular> CHAR: b 3 rot set-nth ] must-fail
+
+[ { } ] [ 3 <growing-circular> >array ] unit-test
+[ { 1 2 } ] [
+    3 <growing-circular>
+    [ 1 swap push-growing-circular ] keep
+    [ 2 swap push-growing-circular ] keep >array
+] unit-test
+[ { 3 4 5 } ] [
+    3 <growing-circular> dup { 1 2 3 4 5 } [
+        swap push-growing-circular
+    ] with each >array
+] unit-test

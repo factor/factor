@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Mackenzie Straight, Doug Coleman,
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel math sequences accessors ;
+USING: combinators kernel math sequences accessors inspector ;
 IN: dlists
 
 TUPLE: dlist front back length ;
@@ -47,7 +47,7 @@ C: <dlist-node> dlist-node
 
 : (dlist-find-node) ( dlist-node quot -- node/f ? )
     over [
-        [ >r obj>> r> call ] 2keep rot
+        [ call ] 2keep rot
         [ drop t ] [ >r next>> r> (dlist-find-node) ] if
     ] [ 2drop f f ] if ; inline
 
@@ -55,7 +55,7 @@ C: <dlist-node> dlist-node
     >r front>> r> (dlist-find-node) ; inline
 
 : dlist-each-node ( dlist quot -- )
-    [ t ] compose dlist-find-node 2drop ; inline
+    [ f ] compose dlist-find-node 2drop ; inline
 
 PRIVATE>
 
@@ -84,11 +84,17 @@ PRIVATE>
 : push-all-back ( seq dlist -- )
     [ push-back ] curry each ;
 
+ERROR: empty-dlist ;
+
+M: empty-dlist summary ( dlist -- )
+    drop "Emtpy dlist" ;
+
 : peek-front ( dlist -- obj )
-    front>> obj>> ;
+    front>> [ empty-dlist ] unless* obj>> ;
 
 : pop-front ( dlist -- obj )
-    dup front>> [
+    dup front>> [ empty-dlist ] unless*
+    [
         dup next>>
         f rot (>>next)
         f over set-prev-when
@@ -96,13 +102,15 @@ PRIVATE>
     ] 2keep obj>>
     swap [ normalize-back ] keep dec-length ;
 
-: pop-front* ( dlist -- ) pop-front drop ;
+: pop-front* ( dlist -- )
+    pop-front drop ;
 
 : peek-back ( dlist -- obj )
-    back>> obj>> ;
+    back>> [ empty-dlist ] unless* obj>> ;
 
 : pop-back ( dlist -- obj )
-    dup back>> [
+    dup back>> [ empty-dlist ] unless*
+    [
         dup prev>>
         f rot (>>prev)
         f over set-next-when
@@ -110,9 +118,11 @@ PRIVATE>
     ] 2keep obj>>
     swap [ normalize-front ] keep dec-length ;
 
-: pop-back* ( dlist -- ) pop-back drop ;
+: pop-back* ( dlist -- )
+    pop-back drop ;
 
 : dlist-find ( dlist quot -- obj/f ? )
+    [ obj>> ] prepose
     dlist-find-node [ obj>> t ] [ drop f f ] if ; inline
 
 : dlist-contains? ( dlist quot -- ? )
@@ -141,6 +151,7 @@ PRIVATE>
     ] if ; inline
 
 : delete-node-if ( dlist quot -- obj/f )
+    [ obj>> ] prepose
     delete-node-if* drop ; inline
 
 : dlist-delete ( obj dlist -- obj/f )

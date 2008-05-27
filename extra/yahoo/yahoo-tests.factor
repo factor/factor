@@ -8,4 +8,4 @@ USING: tools.test yahoo kernel io.files xml sequences ;
     "Official site with news, tour dates, discography, store, community, and more."
 } ] [ "resource:extra/yahoo/test-results.xml" file>xml parse-yahoo first ] unit-test
 
-[ "http://search.yahooapis.com/WebSearchService/V1/webSearch?appid=Factor-search&query=hi&results=1" ] [ "hi" 1 query ] unit-test
+[ "http://search.yahooapis.com/WebSearchService/V1/webSearch?appid=Factor-search&query=hi&results=1" ] [ "hi" 1 "Factor-search" query ] unit-test

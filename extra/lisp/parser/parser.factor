@@ -19,12 +19,12 @@ dquote       = '"'
 squote       = "'"
 digit        = [0-9]
 integer      = ("-")? (digit)+                           => [[ first2 append string>number ]]
-float        = integer "." (digit)*                      => [[ first3 >string [ number>string ] dipd 3append string>number ]]
+float        = integer "." (digit)*                      => [[ first3 >string [ number>string ] 2dip 3append string>number ]]
 rational     = integer "/" (digit)+                      => [[ first3 nip string>number / ]]
 number       = float
               | rational
               | integer
-id-specials  = "!" | "$" | "%" | "&" | "*" | "/" | ":" | "<"
+id-specials  = "!" | "$" | "%" | "&" | "*" | "/" | ":" | "<" | "#"
               | " =" | ">" | "?" | "^" | "_" | "~" | "+" | "-" | "." | "@"
 letters      = [a-zA-Z]                                  => [[ 1array >string ]]
 initials     = letters | id-specials
