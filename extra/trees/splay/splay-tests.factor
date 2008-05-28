@@ -8,7 +8,7 @@ IN: trees.splay.tests
     100 [ drop 100 random swap at drop ] with each ;
 
 : make-numeric-splay-tree ( n -- splay-tree )
-    <splay> [ [ dupd set-at ] curry each ] keep ;
+    <splay> [ [ conjoin ] curry each ] keep ;
 
 [ t ] [
     100 make-numeric-splay-tree dup randomize-numeric-splay-tree

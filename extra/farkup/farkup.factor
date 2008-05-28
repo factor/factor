@@ -2,9 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays io io.styles kernel memoize namespaces peg
 sequences strings html.elements xml.entities xmode.code2html
-splitting io.streams.string html peg.parsers html.elements
+splitting io.streams.string peg.parsers
 sequences.deep unicode.categories ;
 IN: farkup
+
+SYMBOL: relative-link-prefix
+SYMBOL: link-no-follow?
 
 <PRIVATE
 
@@ -59,25 +62,30 @@ MEMO: eq ( -- parser )
 : render-code ( string mode -- string' )
     >r string-lines r>
     [
-        [
-            H{ { wrap-margin f } } [
-                htmlize-lines
-            ] with-nesting
-        ] with-html-stream
+        <pre>
+            htmlize-lines
+        </pre>
     ] with-string-writer ;
 
 : check-url ( href -- href' )
     CHAR: : over member? [
         dup { "http://" "https://" "ftp://" } [ head? ] with contains?
         [ drop "/" ] unless
-    ] when ;
+    ] [
+        relative-link-prefix get prepend
+    ] if ;
 
 : escape-link ( href text -- href-esc text-esc )
     >r check-url escape-quoted-string r> escape-string ;
 
 : make-link ( href text -- seq )
     escape-link
-    [ "<a href=\"" , >r , r> "\">" , [ , ] when* "</a>" , ] { } make ;
+    [
+        "<a" ,
+        " href=\"" , >r , r>
+        link-no-follow? get [ " nofollow=\"true\"" , ] when
+        "\">" , , "</a>" ,
+    ] { } make ;
 
 : make-image-link ( href alt -- seq )
     escape-link
@@ -102,7 +110,7 @@ MEMO: simple-link ( -- parser )
         "[[" token hide ,
         [ "|]" member? not ] satisfy repeat1 ,
         "]]" token hide ,
-    ] seq* [ first f make-link ] action ;
+    ] seq* [ first dup make-link ] action ;
 
 MEMO: labelled-link ( -- parser )
     [

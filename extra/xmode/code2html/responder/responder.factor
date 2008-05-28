@@ -8,14 +8,9 @@ IN: xmode.code2html.responder
 : <sources> ( root -- responder )
     [
         drop
-        "text/html" <content> swap
-        [ "last-modified" set-header ]
-        [
-            '[
-                ,
-                dup file-name swap utf8
-                <file-reader>
+         '[
+            , [ file-name ] keep utf8 [
                 [ htmlize-stream ] with-html-stream
-            ] >>body
-        ] bi
+            ] with-file-reader
+        ] <html-content>
     ] <file-responder> ;

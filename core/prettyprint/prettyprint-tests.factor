@@ -342,3 +342,5 @@ INTERSECTION: intersection-see-test sequence number ;
 
 [ ] [ \ compose see ] unit-test
 [ ] [ \ curry see ] unit-test
+
+[ "POSTPONE: [" ] [ \ [ unparse ] unit-test

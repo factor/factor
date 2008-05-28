@@ -216,10 +216,10 @@ unit-test
 ] unit-test
 
 [ V{ 1 2 3 } ]
-[ 3 V{ 1 2 } clone [ push-new ] keep ] unit-test
+[ 3 V{ 1 2 } clone [ adjoin ] keep ] unit-test
 
 [ V{ 1 2 3 } ]
-[ 3 V{ 1 3 2 } clone [ push-new ] keep ] unit-test
+[ 3 V{ 1 3 2 } clone [ adjoin ] keep ] unit-test
 
 ! erg's random tester found this one
 [ SBUF" 12341234" ] [

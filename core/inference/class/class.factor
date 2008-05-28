@@ -152,16 +152,16 @@ M: pair apply-constraint
 M: pair constraint-satisfied?
     first constraint-satisfied? ;
 
-: extract-keys ( seq assoc -- newassoc )
-    [ dupd at ] curry H{ } map>assoc [ nip ] assoc-filter f assoc-like ;
+: valid-keys ( seq assoc -- newassoc )
+    extract-keys [ nip ] assoc-filter f assoc-like ;
 
 : annotate-node ( node -- )
     #! Annotate the node with the currently-inferred set of
     #! value classes.
     dup node-values {
-        [ value-intervals get extract-keys >>intervals ]
-        [ value-classes   get extract-keys >>classes   ]
-        [ value-literals  get extract-keys >>literals  ]
+        [ value-intervals get valid-keys >>intervals ]
+        [ value-classes   get valid-keys >>classes   ]
+        [ value-literals  get valid-keys >>literals  ]
         [ 2drop ]
     } cleave ;
 
@@ -330,7 +330,7 @@ M: #return infer-classes-around
             [ ] [ node-input-classes ] [ in-d>> [ value-class* ] map ] tri
             classes= not [
                 fixed-point? off
-                [ in-d>> value-classes get extract-keys ] keep
+                [ in-d>> value-classes get valid-keys ] keep
                 set-node-classes
             ] [ drop ] if
         ] [ call-next-method ] if

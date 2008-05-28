@@ -44,7 +44,7 @@ M: sliced-groups nth group@ <slice> ;
 
 TUPLE: clumps < abstract-groups ;
 
-: <clumps> ( seq n -- groups )
+: <clumps> ( seq n -- clumps )
     clumps construct-groups ; inline
 
 M: clumps length
@@ -58,7 +58,7 @@ M: clumps group@
 
 TUPLE: sliced-clumps < groups ;
 
-: <sliced-clumps> ( seq n -- groups )
+: <sliced-clumps> ( seq n -- clumps )
     sliced-clumps construct-groups ; inline
 
 M: sliced-clumps nth group@ <slice> ;

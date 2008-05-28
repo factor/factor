@@ -127,7 +127,7 @@ M: nonthrowable execute-statement* ( statement type -- )
 : query-map ( statement quot -- seq )
     accumulator >r query-each r> { } like ; inline
 
-: with-db ( db seq quot -- )
+: with-db ( seq class quot -- )
     >r make-db db-open db r>
     [ db get swap [ drop ] prepose with-disposal ] curry with-variable ;
     inline

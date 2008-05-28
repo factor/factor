@@ -22,8 +22,7 @@ C: <predicate-dispatch-engine> predicate-dispatch-engine
     } cond ;
 
 : sort-methods ( assoc -- assoc' )
-    [ keys sort-classes ]
-    [ [ dupd at ] curry ] bi { } map>assoc ;
+    >alist [ keys sort-classes ] keep extract-keys ;
 
 M: predicate-dispatch-engine engine>quot
     methods>> clone

@@ -1,0 +1,25 @@
+.comparison table, {
+    border-color: #666;
+    border-style: solid;
+}
+
+.comparison th {
+    border-width: 1px;
+    border-color: #666;
+    border-style: solid;
+}
+
+.comparison table {
+    border-width: 1px;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+
+.insert {
+    background-color: #9f9;
+}
+
+.delete {
+    background-color: #f99;
+}

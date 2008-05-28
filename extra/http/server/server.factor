@@ -1,10 +1,11 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel namespaces io io.timeouts strings splitting
-threads sequences prettyprint io.server logging calendar
-http html html.elements accessors math.parser combinators.lib
-tools.vocabs debugger continuations random combinators
-destructors io.encodings.8-bit fry classes words ;
+threads sequences prettyprint io.server logging calendar http
+html.streams html.elements accessors math.parser
+combinators.lib tools.vocabs debugger continuations random
+combinators destructors io.encodings.8-bit fry classes words
+math rss json.writer ;
 IN: http.server
 
 ! path is a sequence of path component strings
@@ -18,14 +19,27 @@ GENERIC: call-responder* ( path responder -- response )
         { "POST" [ post-data>> ] }
     } case ;
 
-: <content> ( content-type -- response )
+: <content> ( body content-type -- response )
     <response>
         200 >>code
         "Document follows" >>message
-        swap >>content-type ;
+        swap >>content-type
+        swap >>body ;
 
-: <html-content> ( quot -- response )
-    "text/html" <content> swap >>body ;
+: <text-content> ( body -- response )
+    "text/plain" <content> ;
+
+: <html-content> ( body -- response )
+    "text/html" <content> ;
+
+: <xml-content> ( body -- response )
+    "text/xml" <content> ;
+
+: <feed-content> ( feed -- response )
+    '[ , feed>xml ] "text/xml" <content> ;
+
+: <json-content> ( obj -- response )
+    '[ , >json ] "application/json" <content> ;
 
 TUPLE: trivial-responder response ;
 
@@ -86,9 +100,7 @@ SYMBOL: link-hook
 : resolve-base-path ( string -- string' )
     "$" ?head [
         [
-            "/" split1 >r
-            base-path [ "/" % % ] each "/" %
-            r> %
+            "/" split1 [ base-path [ "/" % % ] each "/" % ] dip %
         ] "" make
     ] when ;
 
@@ -115,7 +127,7 @@ SYMBOL: form-hook
     request-url ;
 
 : replace-last-component ( path with -- path' )
-    >r "/" last-split1 drop "/" r> 3append ;
+    [ "/" last-split1 drop "/" ] dip 3append ;
 
 : relative-redirect ( to query -- url )
     request get clone
@@ -128,7 +140,7 @@ SYMBOL: form-hook
     {
         { [ over "http://" head? ] [ link>string ] }
         { [ over "/" head? ] [ absolute-redirect ] }
-        { [ over "$" head? ] [ >r resolve-base-path r> derive-url ] }
+        { [ over "$" head? ] [ [ resolve-base-path ] dip derive-url ] }
         [ relative-redirect ]
     } cond ;
 
@@ -163,7 +175,7 @@ TUPLE: dispatcher default responders ;
         [ nip ] [ drop default>> ] if
     ] [
         over first over responders>> at*
-        [ >r drop rest-slice r> ] [ drop default>> ] if
+        [ [ drop rest-slice ] dip ] [ drop default>> ] if
     ] if ;
 
 M: dispatcher call-responder* ( path dispatcher -- response )
@@ -274,9 +286,11 @@ SYMBOL: exit-continuation
     ] with-destructors ;
 
 : httpd ( port -- )
-    internet-server "http.server"
-    latin1 [ handle-client ] with-server ;
+    dup integer? [ internet-server ] when
+    "http.server" latin1
+    [ handle-client ] with-server ;
 
-: httpd-main ( -- ) 8888 httpd ;
+: httpd-main ( -- )
+    8888 httpd ;
 
 MAIN: httpd-main

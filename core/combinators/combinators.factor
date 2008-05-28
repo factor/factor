@@ -95,10 +95,10 @@ M: hashtable hashcode*
 
 : (distribute-buckets) ( buckets pair keys -- )
     dup t eq? [
-        drop [ swap push-new ] curry each
+        drop [ swap adjoin ] curry each
     ] [
         [
-            >r 2dup r> hashcode pick length rem rot nth push-new
+            >r 2dup r> hashcode pick length rem rot nth adjoin
         ] each 2drop
     ] if ;
 

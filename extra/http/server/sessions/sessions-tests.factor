@@ -6,7 +6,7 @@ sequences db db.sqlite continuations ;
 
 : with-session
     [
-        >r [ save-session-after ] [ session set ] bi r> call
+        [ [ save-session-after ] [ session set ] bi ] dip call
     ] with-destructors ; inline
 
 TUPLE: foo ;
@@ -18,7 +18,7 @@ M: foo init-session* drop 0 "x" sset ;
 M: foo call-responder*
     2drop
     "x" [ 1+ ] schange
-    "text/html" <content> [ "x" sget pprint ] >>body ;
+    [ "x" sget pprint ] <html-content> ;
 
 : url-responder-mock-test
     [
@@ -44,9 +44,7 @@ M: foo call-responder*
 
 : <exiting-action>
     <action>
-        [
-            "text/plain" <content> exit-with
-        ] >>display ;
+        [ [ ] <text-content> exit-with ] >>display ;
 
 [ "auth-test.db" temp-file sqlite-db delete-file ] ignore-errors
 
