@@ -19,7 +19,7 @@ ERROR: not-persistent ;
     "db-table" word-prop [ not-persistent ] unless* ;
 
 : db-columns ( class -- obj )
-    "db-columns" word-prop ;
+    superclasses [ "db-columns" word-prop ] map concat ;
 
 : db-relations ( class -- obj )
     "db-relations" word-prop ;
