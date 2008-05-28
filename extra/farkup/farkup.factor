@@ -7,6 +7,7 @@ sequences.deep unicode.categories ;
 IN: farkup
 
 SYMBOL: relative-link-prefix
+SYMBOL: link-no-follow?
 
 <PRIVATE
 
@@ -79,7 +80,12 @@ MEMO: eq ( -- parser )
 
 : make-link ( href text -- seq )
     escape-link
-    [ "<a href=\"" , >r , r> "\">" , [ , ] when* "</a>" , ] { } make ;
+    [
+        "<a" ,
+        " href=\"" , >r , r>
+        link-no-follow? get [ " nofollow=\"true\"" , ] when
+        "\">" , , "</a>" ,
+    ] { } make ;
 
 : make-image-link ( href alt -- seq )
     escape-link
