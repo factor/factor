@@ -35,7 +35,7 @@ IN: reports.noise
         { compose 1/2 }
         { curry 1/3 }
         { dip 1 }
-        { dipd 2 }
+        { 2dip 2 }
         { drop 1/3 }
         { dup 1/3 }
         { if 1/3 }

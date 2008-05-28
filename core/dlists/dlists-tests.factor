@@ -1,6 +1,6 @@
 USING: dlists dlists.private kernel tools.test random assocs
 sets sequences namespaces sorting debugger io prettyprint
-math ;
+math accessors classes ;
 IN: dlists.tests
 
 [ t ] [ <dlist> dlist-empty? ] unit-test
@@ -65,20 +65,17 @@ IN: dlists.tests
 : assert-same-elements
     [ prune natural-sort ] bi@ assert= ;
 
-: dlist-push-all [ push-front ] curry each ;
-
 : dlist-delete-all [ dlist-delete drop ] curry each ;
 
 : dlist>array [ [ , ] dlist-slurp ] { } make ;
 
 [ ] [
     5 [ drop 30 random >fixnum ] map prune
-    6 [ drop 30 random >fixnum ] map prune 2dup nl . . nl
-    [
+    6 [ drop 30 random >fixnum ] map prune [
         <dlist>
-        [ dlist-push-all ] keep
-        [ dlist-delete-all ] keep
-        dlist>array
+        [ push-all-front ]
+        [ dlist-delete-all ]
+        [ dlist>array ] tri
     ] 2keep swap diff assert-same-elements
 ] unit-test
 
@@ -95,3 +92,13 @@ IN: dlists.tests
 
 [ 1 ] [ "d" get dlist-length ] unit-test
 [ 1 ] [ "d" get dlist>array length ] unit-test
+
+[ t ] [ <dlist> 4 over push-back 5 over push-back [ obj>> 4 = ] dlist-find-node drop class dlist-node = ] unit-test
+[ t ] [ <dlist> 4 over push-back 5 over push-back [ obj>> 5 = ] dlist-find-node drop class dlist-node = ] unit-test
+[ t ] [ <dlist> 4 over push-back 5 over push-back* [ = ] curry dlist-find-node drop class dlist-node = ] unit-test
+[ ] [ <dlist> 4 over push-back 5 over push-back [ drop ] dlist-each ] unit-test
+
+[ <dlist> peek-front ] must-fail
+[ <dlist> peek-back ] must-fail
+[ <dlist> pop-front ] [ empty-dlist? ] must-fail-with
+[ <dlist> pop-back ] [ empty-dlist? ] must-fail-with

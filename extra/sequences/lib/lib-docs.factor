@@ -37,3 +37,23 @@ HELP: count
     "100 [1,b] [ even? ] count ."
     "50"
 } ;
+
+HELP: if-seq
+{ $values { "seq" sequence } { "quot1" quotation } { "quot2" quotation } }
+{ $description "Makes an implicit check if the sequence is empty.  If the sequence has any elements, " { $snippet "quot1" } " is called on it.  Otherwise, the empty sequence is dropped and " { $snippet "quot2" } " is called." }
+{ $example
+    "USING: kernel prettyprint sequences sequences.lib ;"
+    "{ 1 2 3 } [ sum ] [ \"empty sequence\" throw ] if-seq ."
+    "6"
+} ;
+
+HELP: if-empty
+{ $values { "seq" sequence } { "quot1" quotation } { "quot2" quotation } }
+{ $description "Makes an implicit check if the sequence is empty. An empty sequence is dropped and " { $snippet "quot1" } " is called. Otherwise, if the sequence has any elements, " { $snippet "quot2" } " is called on it." }
+{ $example
+    "USING: kernel prettyprint sequences sequences.lib ;"
+    "{ 1 2 3 } [ \"empty sequence\" ] [ sum ] if-empty ."
+    "6"
+} ;
+
+{ if-seq if-empty } related-words
