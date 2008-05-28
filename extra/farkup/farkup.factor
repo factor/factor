@@ -113,12 +113,14 @@ MEMO: labelled-link ( -- parser )
         "]]" token hide ,
     ] seq* [ first2 make-link ] action ;
 
-MEMO: link ( -- parser ) [ image-link , simple-link , labelled-link , ] choice* ;
+MEMO: link ( -- parser )
+    [ image-link , simple-link , labelled-link , ] choice* ;
 
 DEFER: line
 MEMO: list-item ( -- parser )
     [
-        "-" token hide , line ,
+        "-" token hide , ! text ,
+        [ "\r\n" member? not ] satisfy repeat1 [ >string escape-string ] action ,
     ] seq* [ "li" surround-with-foo ] action ;
 
 MEMO: list ( -- parser )
@@ -149,6 +151,8 @@ MEMO: code ( -- parser )
 
 MEMO: line ( -- parser )
     [
+        nl table 2seq ,
+        nl list 2seq ,
         text , strong , emphasis , link ,
         superscript , subscript , inline-code ,
         escaped-char , delimiter , eq ,
