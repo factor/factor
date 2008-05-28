@@ -1,5 +1,5 @@
 USING: arrays assocs kernel vectors sequences namespaces
-random math.parser ;
+random math.parser math fry ;
 IN: assocs.lib
 
 : ref-at ( table key -- value ) swap at ;
@@ -40,3 +40,8 @@ IN: assocs.lib
 
 : set-at-unique ( value assoc -- key )
     dup generate-key [ swap set-at ] keep ;
+
+: histogram ( assoc quot -- assoc' )
+    H{ } clone [
+        swap [ change-at ] 2curry assoc-each
+    ] keep ;
