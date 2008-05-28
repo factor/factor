@@ -257,7 +257,7 @@ M:: fixnum next-method-test ( a -- b ) a call-next-method 1 + ;
 
 :: a-word-with-locals ( a b -- ) ;
 
-: new-definition "IN: locals.tests\nUSING: math ;\n: a-word-with-locals ( -- x ) 2 3 + ;\n" ;
+: new-definition "USING: math ;\nIN: locals.tests\n: a-word-with-locals ( -- x ) 2 3 + ;\n" ;
 
 [ ] [ new-definition eval ] unit-test
 

@@ -1,7 +1,7 @@
 ! Copyright (C) 2004 Chris Double.
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: html http http.server io kernel math namespaces
+USING: http http.server io kernel math namespaces
 continuations calendar sequences assocs hashtables
 accessors arrays alarms quotations combinators fry assocs.lib ;
 IN: http.server.callbacks

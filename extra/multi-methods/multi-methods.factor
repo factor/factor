@@ -4,7 +4,7 @@ USING: kernel math sequences vectors classes classes.algebra
 combinators arrays words assocs parser namespaces definitions
 prettyprint prettyprint.backend quotations arrays.lib
 debugger io compiler.units kernel.private effects accessors
-hashtables sorting shuffle math.order ;
+hashtables sorting shuffle math.order sets ;
 IN: multi-methods
 
 ! PART I: Converting hook specializers

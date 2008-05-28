@@ -23,6 +23,9 @@ M: macro definer drop \ MACRO: \ ; ;
 
 M: macro definition "macro" word-prop ;
 
+M: macro reset-word
+    [ f "macro" set-word-prop ] [ call-next-method ] bi ;
+
 : macro-expand ( ... word -- quot ) "macro" word-prop call ;
 
 : n*quot ( n seq -- seq' ) <repetition> concat >quotation ;
