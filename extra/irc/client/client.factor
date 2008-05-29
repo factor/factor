@@ -110,6 +110,9 @@ TUPLE: unhandled < irc-message ;
 ! Server message handling
 ! ======================================
 
+: irc-message-origin ( irc-message -- name )
+    dup name>> irc-client> nick>> name>> = [ sender>> ] [ name>> ] if ;
+
 USE: prettyprint
 
 GENERIC: handle-incoming-irc ( irc-message -- )
@@ -127,8 +130,8 @@ M: nick-in-use handle-incoming-irc ( nick-in-use -- )
     name>> "_" append /NICK ;
 
 M: privmsg handle-incoming-irc ( privmsg -- )
-    dup name>> irc-client> listeners>> at
-    [ in-messages>> mailbox-put ] [ drop ] if* ;
+    dup dup . irc-message-origin irc-client> listeners>> at
+    [ in-messages>> mailbox-put ] [ dup "drop" . . drop ] if* ;
 
 M: join handle-incoming-irc ( join -- )
     irc-client> join-messages>> mailbox-put ;
@@ -222,13 +225,15 @@ M: privmsg handle-outgoing-irc ( privmsg -- )
 GENERIC: add-name ( name obj -- obj )
 M: object add-name nip ;
 M: privmsg add-name swap >>name ;
-    
+
 : listener-loop ( name -- ) ! FIXME: take different values from the stack?
     dup irc-client> listeners>> at [
         out-messages>> mailbox-get add-name
         irc-client> out-messages>>
         mailbox-put
-    ] [ drop ] if* ;
+    ] [
+        drop
+    ] if* ;
 
 : spawn-irc-loop ( quot name -- )
     [ [ irc-client> is-running>> ] compose ] dip
@@ -243,16 +248,25 @@ M: privmsg add-name swap >>name ;
 ! Listener join request handling
 ! ======================================
 
-: make-registered-listener ( join -- listener )
-    <irc-listener> swap trailing>>
-    dup [ listener-loop ] curry "listener" spawn-irc-loop
+: make-registered-listener ( name -- listener )
+    <irc-listener> swap dup
+    [ listener-loop ] curry "listener" spawn-irc-loop
     [ irc-client> listeners>> set-at ] curry keep ;
 
 : make-join-future ( name -- future )
     [ [ swap trailing>> = ] curry ! compare name with channel name
       irc-client> join-messages>> 60 seconds rot mailbox-get-timeout?
-      make-registered-listener ]
+      trailing>> make-registered-listener ]
     curry future ;
+
+: make-user-future ( name -- future )
+    [ make-registered-listener ] curry future ;
+
+: maybe-join ( name password -- ? )
+    over "#" head? [ /JOIN t ] [ 2drop f ] if ;
+
+: make-listener-future ( name channel? -- future )
+    [ make-join-future ] [ make-user-future ] if ;
 
 PRIVATE>
 
@@ -268,7 +282,9 @@ PRIVATE>
     ] with-variable ;
 
 : listen-to ( irc-client name -- future )
-    swap current-irc-client [ [ f /JOIN ] keep make-join-future ] with-variable ;
+    swap current-irc-client [
+        dup f maybe-join make-listener-future
+    ] with-variable ;
 
 ! shorcut for privmsgs, etc
 : sender>> ( obj -- string )
