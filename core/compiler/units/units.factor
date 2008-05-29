@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel continuations assocs namespaces sequences words
-vocabs definitions hashtables init ;
+vocabs definitions hashtables init sets ;
 IN: compiler.units
 
 SYMBOL: old-definitions
@@ -14,7 +14,7 @@ TUPLE: redefine-error def ;
     { { "Continue" t } } throw-restarts drop ;
 
 : add-once ( key assoc -- )
-    2dup key? [ over redefine-error ] when dupd set-at ;
+    2dup key? [ over redefine-error ] when conjoin ;
 
 : (remember-definition) ( definition loc assoc -- )
     >r over set-where r> add-once ;
@@ -83,7 +83,14 @@ SYMBOL: update-tuples-hook
     call-recompile-hook
     call-update-tuples-hook
     dup [ drop compiled-crossref? ] assoc-contains? modify-code-heap
-    updated-definitions notify-definition-observers ;
+     ;
+
+: with-nested-compilation-unit ( quot -- )
+    [
+        H{ } clone changed-definitions set
+        H{ } clone outdated-tuples set
+        [ finish-compilation-unit ] [ ] cleanup
+    ] with-scope ; inline
 
 : with-compilation-unit ( quot -- )
     [
@@ -92,8 +99,11 @@ SYMBOL: update-tuples-hook
         H{ } clone outdated-tuples set
         <definitions> new-definitions set
         <definitions> old-definitions set
-        [ finish-compilation-unit ]
-        [ ] cleanup
+        [
+            finish-compilation-unit
+            updated-definitions
+            notify-definition-observers
+        ] [ ] cleanup
     ] with-scope ; inline
 
 : compile-call ( quot -- )

@@ -7,7 +7,7 @@ IN: lisp.test
 [
     init-env
     
-    "#f" [ f ] lisp-define 
+    "#f" [ f ] lisp-define
     "#t" [ t ] lisp-define
     
     "+" "math" "+" define-primitve

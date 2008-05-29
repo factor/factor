@@ -1,7 +1,7 @@
 USING: values kernel sequences assocs io.files
 io.encodings ascii math.ranges io splitting math.parser 
 namespaces byte-arrays locals math sets io.encodings.ascii
-words compiler.units arrays interval-maps ;
+words compiler.units arrays interval-maps unicode.data ;
 IN: unicode.script
 
 <PRIVATE
@@ -10,9 +10,7 @@ SYMBOL: interned
 
 : parse-script ( stream -- assoc )
     ! assoc is code point/range => name
-    lines [ "#" split1 drop ] map harvest [
-        ";" split1 [ [ blank? ] trim ] bi@
-    ] H{ } map>assoc ;
+    lines filter-comments [ split-; ] map ;
 
 : range, ( value key -- )
     swap interned get

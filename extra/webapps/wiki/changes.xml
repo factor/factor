@@ -1,0 +1,19 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>Recent Changes</t:title>
+
+	<ul>
+		<t:each-tuple t:values="changes">
+			<li>
+				<t:a t:href="title" t:query="title"><t:label t:name="title" /></t:a>
+				on
+				<t:a t:href="revision" t:query="id"><t:label t:name="date" /></t:a>
+				by
+				<t:a t:href="user-edits" t:query="author"><t:label t:name="author" /></t:a>
+			</li>
+		</t:each-tuple>
+	</ul>
+
+</t:chloe>

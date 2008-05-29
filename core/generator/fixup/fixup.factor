@@ -102,13 +102,13 @@ M: frame-required fixup* drop ;
 
 M: integer fixup* , ;
 
-: push-new* ( obj table -- n )
+: adjoin* ( obj table -- n )
     2dup swap [ eq? ] curry find drop
     [ 2nip ] [ dup length >r push r> ] if* ;
 
 SYMBOL: literal-table
 
-: add-literal ( obj -- n ) literal-table get push-new* ;
+: add-literal ( obj -- n ) literal-table get adjoin* ;
 
 : add-dlsym-literals ( symbol dll -- )
     >r string>symbol r> 2array literal-table get push-all ;

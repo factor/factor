@@ -93,7 +93,7 @@ M: download-failed error.
 
 : download-to ( url file -- )
     #! Downloads the contents of a URL to a file.
-    >r http-get r> latin1 [ write ] with-file-writer ;
+    [ http-get ] dip latin1 [ write ] with-file-writer ;
 
 : download ( url -- )
     dup download-name download-to ;
