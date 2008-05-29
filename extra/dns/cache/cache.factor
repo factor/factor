@@ -119,3 +119,31 @@ ERROR: name-error name ;
 : cache-add-rr ( rr -- ) [ rr->query ] [ ] bi cache-add ;
 
 : cache-add-rrs ( rrs -- ) [ cache-add-rr ] each ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! cache-name-error
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: message-soa ( message -- rr/soa )
+  authority-section>> [ type>> SOA = ] filter 1st ;
+
+: cache-name-error ( message -- message )
+  dup
+    [ message-query ] [ message-soa ttl>> ] bi
+  cache-nx ;
+
+: cache-message-records ( message -- message )
+  dup
+    {
+      [ answer-section>>     cache-add-rrs ]
+      [ authority-section>>  cache-add-rrs ]
+      [ additional-section>> cache-add-rrs ]
+    }
+  cleave ;
+
+: cache-message ( message -- message )
+  dup rcode>> NAME-ERROR = [ cache-name-error ] when
+  cache-message-records ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
