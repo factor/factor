@@ -357,10 +357,9 @@ M: staging-violation summary
     "A parsing word cannot be used in the same file it is defined in." ;
 
 : execute-parsing ( word -- )
-    new-definitions get [
-        dupd first key? [ staging-violation ] when
-    ] when*
-    execute ;
+    [ changed-definitions get key? [ staging-violation ] when ]
+    [ execute ]
+    bi ;
 
 : parse-step ( accum end -- accum ? )
     scan-word {

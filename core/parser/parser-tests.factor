@@ -461,10 +461,10 @@ must-fail-with
     "methods" word-prop assoc-size
 ] unit-test
 
-[ [ ] ] [
+[ ] [
     2 [
         "IN: parser.tests DEFER: twice-fails FORGET: twice-fails MIXIN: twice-fails"
-        <string-reader> "twice-fails-test" parse-stream
+        <string-reader> "twice-fails-test" parse-stream drop
     ] times
 ] unit-test
 

@@ -175,7 +175,9 @@ PRIVATE>
 : define-symbol ( word -- )
     dup [ ] curry define-inline ;
 
-: reset-word ( word -- )
+GENERIC: reset-word ( word -- )
+
+M: word reset-word
     {
         "unannotated-def"
         "parsing" "inline" "foldable" "flushable"

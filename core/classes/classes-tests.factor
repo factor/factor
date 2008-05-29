@@ -166,6 +166,6 @@ GENERIC: method-forget-test
 TUPLE: method-forget-class ;
 M: method-forget-class method-forget-test ;
 
-[ f ] [ \ method-forget-test "methods" assoc-empty? ] unit-test
+[ f ] [ \ method-forget-test "methods" word-prop assoc-empty? ] unit-test
 [ ] [ [ \ method-forget-class forget ] with-compilation-unit ] unit-test
-[ t ] [ \ method-forget-test "methods" assoc-empty? ] unit-test
+[ t ] [ \ method-forget-test "methods" word-prop assoc-empty? ] unit-test
