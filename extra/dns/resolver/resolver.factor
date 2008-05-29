@@ -70,7 +70,7 @@ IN: dns.resolver
 
 : name->ip/server ( name -- ip )
   canonical/server
-  dup A IN query boa <query-message> ask* answer-section>>
+  dup A IN query boa query->message ask* answer-section>>
   [ type>> A = ] filter dup empty? not
     [ nip random rdata>> ]
     [ 2drop f ]
