@@ -3,7 +3,8 @@
 USING: alien alien.accessors alien.c-types arrays io kernel libc
 math math.vectors namespaces opengl opengl.gl prettyprint assocs
 sequences io.files io.styles continuations freetype
-ui.gadgets.worlds ui.render ui.backend byte-arrays ;
+ui.gadgets.worlds ui.render ui.backend byte-arrays accessors
+locals ;
 
 IN: ui.freetype
 
@@ -41,8 +42,8 @@ M: font hashcode* drop font hashcode* ;
     ] bind ;
 
 M: freetype-renderer free-fonts ( world -- )
-    dup world-handle select-gl-context
-    world-fonts [ nip second free-sprites ] assoc-each ;
+    [ handle>> select-gl-context ]
+    [ fonts>> [ nip second free-sprites ] assoc-each ] bi ;
 
 : ttf-name ( font style -- name )
     2array H{
@@ -67,7 +68,7 @@ M: freetype-renderer free-fonts ( world -- )
     #! We use FT_New_Memory_Face, not FT_New_Face, since
     #! FT_New_Face only takes an ASCII path name and causes
     #! problems on localized versions of Windows
-    freetype -rot 0 f <void*> [
+    [ freetype ] 2dip 0 f <void*> [
         FT_New_Memory_Face freetype-error
     ] keep *void* ;
 
@@ -85,29 +86,29 @@ SYMBOL: dpi
 : font-units>pixels ( n font -- n )
     face-size face-size-y-scale FT_MulFix ;
 
-: init-ascent ( font face -- )
-    dup face-y-max swap font-units>pixels swap set-font-ascent ;
+: init-ascent ( font face -- font )
+    dup face-y-max swap font-units>pixels >>ascent ; inline
 
-: init-descent ( font face -- )
-    dup face-y-min swap font-units>pixels swap set-font-descent ;
+: init-descent ( font face -- font )
+    dup face-y-min swap font-units>pixels >>descent ; inline
 
-: init-font ( font -- )
-    dup font-handle 2dup init-ascent dupd init-descent
-    dup font-ascent over font-descent - ft-ceil
-    swap set-font-height ;
+: init-font ( font -- font )
+    dup handle>> init-ascent
+    dup handle>> init-descent
+    dup [ ascent>> ] [ descent>> ] bi - ft-ceil >>height ; inline
+
+: set-char-size ( handle size -- )
+    0 swap 6 shift dpi get-global dup FT_Set_Char_Size freetype-error ;
 
 : <font> ( handle -- font )
-    H{ } clone
-    { set-font-handle set-font-widths } font construct
-    dup init-font ;
-
-: (open-font) ( font -- open-font )
-    first3 >r open-face dup 0 r> 6 shift
-    dpi get-global dpi get-global FT_Set_Char_Size
-    freetype-error <font> ;
+    font new
+        H{ } clone >>widths
+        over first2 open-face >>handle
+        dup handle>> rot third set-char-size
+        init-font ;
 
 M: freetype-renderer open-font ( font -- open-font )
-    freetype drop open-fonts get [ (open-font) ] cache ;
+    freetype drop open-fonts get [ <font> ] cache ;
 
 : load-glyph ( font char -- glyph )
     >r font-handle dup r> 0 FT_Load_Char
@@ -132,30 +133,36 @@ M: freetype-renderer string-height ( open-font string -- h )
     load-glyph dup
     FT_RENDER_MODE_NORMAL FT_Render_Glyph freetype-error ;
 
-: copy-pixel ( bit tex -- bit tex )
-    255 f pick set-alien-unsigned-1 1+
-    f pick alien-unsigned-1
-    f pick set-alien-unsigned-1 >r 1+ r> 1+ ;
+:: copy-pixel ( i j bitmap texture -- i j )
+    255 tex j set-alien-unsigned-1
+    i bitmap alien-unsigned-1 j 1 + texture set-alien-unsigned-1
+    i 1 + j 2 + ; inline
 
-: (copy-row) ( bit tex bitend texend -- bitend texend )
-    >r pick over >= [
-        2nip r>
-    ] [
-        >r copy-pixel r> r> (copy-row)
-    ] if ;
+: (copy-row) ( i j bitmap texture end -- )
+    i end < [
+        i j bitmap texture copy-pixel
+        i j bitmap texture end (copy-row)
+    ] when ; inline
 
-: copy-row ( bit tex width width2 -- bitend texend width width2 )
-    [ pick + >r pick + r> (copy-row) ] 2keep ;
+: copy-row ( i j bitmap texture width width2 -- i j )
+    i j bitmap texture i width + (copy-row)
+    i width +
+    j width2 + ; inline
 
-: copy-bitmap ( glyph texture -- )
-    over glyph-bitmap-rows >r
-    over glyph-bitmap-width dup next-power-of-2 2 *
-    >r >r >r glyph-bitmap-buffer alien-address r> r> r> r> 
-    [ copy-row ] times 2drop 2drop ;
+:: copy-bitmap ( glyph texture -- )
+    [let* | texture [ texture alien-address ]
+            bitmap [ glyph glyph-bitmap-buffer alien-address ]
+            rows [ glyph glyph-bitmap-rows ]
+            width [ glyph glyph-bitmap-width ]
+            width2 [ width next-power-of-2 2 * ] |
+        0 0
+        rows [ bitmap texture width width2 copy-row ] times
+        2drop
+    ] ;
 
 : bitmap>texture ( glyph sprite -- id )
     tuck sprite-size2 * 2 * [
-        alien-address [ copy-bitmap ] keep <alien> gray-texture
+        [ copy-bitmap ] keep gray-texture
     ] with-malloc ;
 
 : glyph-texture-loc ( glyph font -- loc )
@@ -163,34 +170,47 @@ M: freetype-renderer string-height ( open-font string -- h )
     font-ascent swap glyph-hori-bearing-y - ft-floor 2array ;
 
 : glyph-texture-size ( glyph -- dim )
-    dup glyph-bitmap-width next-power-of-2
-    swap glyph-bitmap-rows next-power-of-2 2array ;
+    [ glyph-bitmap-width next-power-of-2 ]
+    [ glyph-bitmap-rows next-power-of-2 ]
+    bi 2array ;
 
-: <char-sprite> ( font char -- sprite )
+: <char-sprite> ( open-font char -- sprite )
     over >r render-glyph dup r> glyph-texture-loc
     over glyph-size pick glyph-texture-size <sprite>
     [ bitmap>texture ] keep [ init-sprite ] keep ;
 
-: draw-char ( open-font char sprites -- )
-    [ dupd <char-sprite> ] cache nip
-    sprite-dlist glCallList ;
+:: char-sprite ( open-font sprites char -- sprite )
+    char sprites [ open-font swap <char-sprite> ] cache ;
 
-: (draw-string) ( open-font sprites string loc -- )
+: draw-char ( open-font sprites char loc -- )
+    GL_MODELVIEW [
+        0 0 glTranslated
+        char-sprite sprite-dlist glCallList
+    ] do-matrix ;
+
+: char-widths ( open-font string -- widths )
+    [ char-width ] with { } map-as ;
+
+: scan-sums ( seq -- seq' )
+    0 [ + ] accumulate nip ;
+
+:: (draw-string) ( open-font sprites string loc -- )
     GL_TEXTURE_2D [
-        [
-            [ >r 2dup r> swap draw-char ] each 2drop
+        loc [
+            string open-font string char-widths scan-sums [
+                [ open-font sprites ] 2dip draw-char
+            ] 2each
         ] with-translation
     ] do-enabled ;
 
-: font-sprites ( open-font world -- pair )
-    world-fonts [ open-font H{ } clone 2array ] cache ;
+: font-sprites ( font world -- open-font sprites )
+    world-fonts [ open-font H{ } clone 2array ] cache first2 ;
 
 M: freetype-renderer draw-string ( font string loc -- )
-    >r >r world get font-sprites first2 r> r> (draw-string) ;
+    >r >r world get font-sprites r> r> (draw-string) ;
 
 : run-char-widths ( open-font string -- widths )
-    [ char-width ] with { } map-as
-    dup 0 [ + ] accumulate nip swap 2 v/n v+ ;
+    char-widths [ scan-sums ] [ 2 v/n ] bi v+ ;
 
 M: freetype-renderer x>offset ( x open-font string -- n )
     dup >r run-char-widths [ <= ] with find drop
