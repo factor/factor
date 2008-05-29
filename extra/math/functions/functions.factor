@@ -125,74 +125,90 @@ M: real absq sq ;
 M: number (^)
     swap >polar 3dup ^theta >r ^mag r> polar> ;
 
+: [-1,1]? ( x -- ? )
+    dup complex? [ drop f ] [ abs 1 <= ] if ; inline
+
+: >=1? ( x -- ? )
+    dup complex? [ drop f ] [ 1 >= ] if ; inline
+
 : exp ( x -- y ) >rect swap fexp swap polar> ; inline
 
 : log ( x -- y ) >polar swap flog swap rect> ; inline
 
 : cos ( x -- y )
-    >float-rect 2dup
-    fcosh swap fcos * -rot
-    fsinh swap fsin neg * rect> ; foldable
+    dup complex? [
+        >float-rect 2dup
+        fcosh swap fcos * -rot
+        fsinh swap fsin neg * rect>
+    ] [ fcos ] if ; foldable
 
 : sec ( x -- y ) cos recip ; inline
 
 : cosh ( x -- y )
-    >float-rect 2dup
-    fcos swap fcosh * -rot
-    fsin swap fsinh * rect> ; foldable
+    dup complex? [
+        >float-rect 2dup
+        fcos swap fcosh * -rot
+        fsin swap fsinh * rect>
+    ] [ fcosh ] if ; foldable
 
 : sech ( x -- y ) cosh recip ; inline
 
 : sin ( x -- y )
-    >float-rect 2dup
-    fcosh swap fsin * -rot
-    fsinh swap fcos * rect> ; foldable
+    dup complex? [
+        >float-rect 2dup
+        fcosh swap fsin * -rot
+        fsinh swap fcos * rect>
+    ] [ fsin ] if ; foldable
 
 : cosec ( x -- y ) sin recip ; inline
 
 : sinh ( x -- y )
-    >float-rect 2dup
-    fcos swap fsinh * -rot
-    fsin swap fcosh * rect> ; foldable
+    dup complex? [
+        >float-rect 2dup
+        fcos swap fsinh * -rot
+        fsin swap fcosh * rect>
+    ] [ fsinh ] if ; foldable
 
 : cosech ( x -- y ) sinh recip ; inline
 
-: tan ( x -- y ) dup sin swap cos / ; inline
+: tan ( x -- y )
+    dup complex? [ dup sin swap cos / ] [ ftan ] if ; inline
 
-: tanh ( x -- y ) dup sinh swap cosh / ; inline
+: tanh ( x -- y )
+    dup complex? [ dup sinh swap cosh / ] [ ftanh ] if ; inline
 
-: cot ( x -- y ) dup cos swap sin / ; inline
+: cot ( x -- y ) tan recip ; inline
 
-: coth ( x -- y ) dup cosh swap sinh / ; inline
+: coth ( x -- y ) tanh recip ; inline
 
-: acosh ( x -- y ) dup sq 1- sqrt + log ; inline
+: acosh ( x -- y )
+    dup >=1? [ facosh ] [ dup sq 1- sqrt + log ] if ; inline
 
 : asech ( x -- y ) recip acosh ; inline
 
-: asinh ( x -- y ) dup sq 1+ sqrt + log ; inline
+: asinh ( x -- y )
+    dup complex? [ dup sq 1+ sqrt + log ] [ fasinh ] if ; inline
 
 : acosech ( x -- y ) recip asinh ; inline
 
-: atanh ( x -- y ) dup 1+ swap 1- neg / log 2 / ; inline
+: atanh ( x -- y )
+    dup [-1,1]? [ fatanh ] [ dup 1+ swap 1- neg / log 2 / ] if ; inline
 
 : acoth ( x -- y ) recip atanh ; inline
-
-: [-1,1]? ( x -- ? )
-    dup complex? [ drop f ] [ abs 1 <= ] if ; inline
 
 : i* ( x -- y ) >rect neg swap rect> ;
 
 : -i* ( x -- y ) >rect swap neg rect> ;
 
 : asin ( x -- y )
-    dup [-1,1]? [ >float fasin ] [ i* asinh -i* ] if ; inline
+    dup [-1,1]? [ fasin ] [ i* asinh -i* ] if ; inline
 
 : acos ( x -- y )
-    dup [-1,1]? [ >float facos ] [ asin pi 2 / swap - ] if ;
+    dup [-1,1]? [ facos ] [ asin pi 2 / swap - ] if ;
     inline
 
 : atan ( x -- y )
-    dup [-1,1]? [ >float fatan ] [ i* atanh i* ] if ; inline
+    dup complex? [ i* atanh i* ] [ fatan ] if ; inline
 
 : asec ( x -- y ) recip acos ; inline
 

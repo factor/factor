@@ -1,9 +1,0 @@
-<?xml version='1.0' ?>
-
-<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
-
-	<t:a t:href="$user-admin/edit" t:query="username">
-		<t:view t:component="username" />
-	</t:a>
-
-</t:chloe>

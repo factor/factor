@@ -226,12 +226,6 @@ M: tuple-class reset-class
         } reset-props
     ] bi ;
 
-: reset-tuple-class ( class -- )
-    [ [ reset-class ] [ update-map- ] bi ] each-subclass ;
-
-M: tuple-class forget*
-    [ reset-tuple-class ] [ call-next-method ] bi ;
-
 M: tuple-class rank-class drop 0 ;
 
 M: tuple clone

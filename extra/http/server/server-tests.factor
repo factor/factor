@@ -31,7 +31,7 @@ C: <mock-responder> mock-responder
 M: mock-responder call-responder*
     nip
     path>> on
-    "text/plain" <content> ;
+    [ ] <text-content> ;
 
 : check-dispatch ( tag path -- ? )
     H{ } clone base-paths set
@@ -84,7 +84,7 @@ C: <path-check-responder> path-check-responder
 
 M: path-check-responder call-responder*
     drop
-    "text/plain" <content> swap >array >>body ;
+    >array <text-content> ;
 
 [ { "c" } ] [
     H{ } clone base-paths set
@@ -125,7 +125,7 @@ C: <base-path-check-responder> base-path-check-responder
 M: base-path-check-responder call-responder*
     2drop
     "$funny-dispatcher" resolve-base-path
-    "text/plain" <content> swap >>body ;
+    <text-content> ;
 
 [ ] [
     <dispatcher>

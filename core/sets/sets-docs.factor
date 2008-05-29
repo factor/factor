@@ -16,9 +16,27 @@ $nl
 { $subsection set= }
 "A word used to implement the above:"
 { $subsection unique }
+"Adding elements to sets:"
+{ $subsection adjoin }
+{ $subsection conjoin }
 { $see-also member? memq? contains? all? "assocs-sets" } ;
 
 ABOUT: "sets"
+
+HELP: adjoin
+{ $values { "elt" object } { "seq" "a resizable mutable sequence" } }
+{ $description "Removes all elements equal to " { $snippet "elt" } ", and adds " { $snippet "elt" } " at the end of the sequence." }
+{ $examples
+    { $example
+        "USING: namespaces prettyprint sequences ;"
+        "V{ \"beans\" \"salsa\" \"cheese\" } \"v\" set"
+        "\"nachos\" \"v\" get adjoin"
+        "\"salsa\" \"v\" get adjoin"
+        "\"v\" get ."
+        "V{ \"beans\" \"cheese\" \"nachos\" \"salsa\" }"
+    }
+}
+{ $side-effects "seq" } ;
 
 HELP: unique
 { $values { "seq" "a sequence" } { "assoc" "an assoc" } }

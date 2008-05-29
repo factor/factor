@@ -6,7 +6,7 @@ IN: http.server.db
 
 TUPLE: db-persistence < filter-responder pool ;
 
-: <db-persistence> ( responder db params -- responder' )
+: <db-persistence> ( responder params db -- responder' )
     <db-pool> db-persistence boa ;
 
 M: db-persistence call-responder*

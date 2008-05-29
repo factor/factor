@@ -414,6 +414,25 @@ TUPLE: does-not-persist ;
     [ class \ not-persistent = ] must-fail-with
 ] test-postgresql
 
+
+TUPLE: suparclass a ;
+
+suparclass f {
+    { "id" "ID" +db-assigned-id+ }
+    { "a" "A" INTEGER }
+} define-persistent
+
+TUPLE: subbclass < suparclass b ;
+
+subbclass "SUBCLASS" {
+    { "b" "B" TEXT }
+} define-persistent
+
+: test-db-inheritance ( -- )
+    [ ] [ subbclass ensure-table ] unit-test ;
+
+[ test-db-inheritance ] test-sqlite
+
 ! Don't comment these out. These words must infer
 \ bind-tuple must-infer
 \ insert-tuple must-infer

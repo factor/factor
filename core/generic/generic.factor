@@ -147,12 +147,16 @@ M: method-body forget*
     [ implementors ] [ [ swap 2array ] curry ] bi map forget-all ;
 
 M: class forget* ( class -- )
-    {
-        [ forget-methods ]
-        [ update-map- ]
-        [ reset-class ]
-        [ call-next-method ]
-    } cleave ;
+    [
+        class-usages [
+            drop
+            [ forget-methods ]
+            [ update-map- ]
+            [ reset-class ]
+            tri
+        ] assoc-each
+    ]
+    [ call-next-method ] bi ;
 
 M: assoc update-methods ( assoc -- )
     implementors* [ make-generic ] each ;

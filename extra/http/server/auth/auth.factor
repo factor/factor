@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs namespaces kernel sequences
+USING: accessors assocs namespaces kernel sequences sets
 http.server
 http.server.sessions
 http.server.auth.providers ;
@@ -38,4 +38,4 @@ SYMBOL: capabilities
 
 V{ } clone capabilities set-global
 
-: define-capability ( word -- ) capabilities get push-new ;
+: define-capability ( word -- ) capabilities get adjoin ;

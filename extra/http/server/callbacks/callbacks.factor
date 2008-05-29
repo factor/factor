@@ -1,7 +1,7 @@
 ! Copyright (C) 2004 Chris Double.
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: html http http.server io kernel math namespaces
+USING: http http.server io kernel math namespaces
 continuations calendar sequences assocs hashtables
 accessors arrays alarms quotations combinators fry assocs.lib ;
 IN: http.server.callbacks
@@ -90,7 +90,7 @@ SYMBOL: current-show
     [ restore-request store-current-show ] when* ;
 
 : show-final ( quot -- * )
-    >r redirect-to-here store-current-show r>
+    [ redirect-to-here store-current-show ] dip
     call exit-with ; inline
 
 : resuming-callback ( responder request -- id )
@@ -111,7 +111,7 @@ M: callback-responder call-responder* ( path responder -- response )
     ] with-exit-continuation ;
 
 : show-page ( quot -- )
-    >r redirect-to-here store-current-show r>
+    [ redirect-to-here store-current-show ] dip
     [
         [ ] t register-callback swap call exit-with
     ] callcc1 restore-request ; inline

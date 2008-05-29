@@ -237,7 +237,7 @@ test-db [
 [ ] [
     [
         <dispatcher>
-            <action> [ "text/plain" <content> [ "Hi" write ] >>body ] >>display
+            <action> [ [ "Hi" write ] <text-content> ] >>display
             <login>
             <sessions>
             "" add-responder
