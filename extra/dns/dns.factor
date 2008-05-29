@@ -470,4 +470,9 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
 
 : ask ( message -- message ) dns-server ask-server ;
 
-: <query-message> ( query -- message ) <message> swap {1} >>question-section ;
+: query->message ( query -- message ) <message> swap {1} >>question-section ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: message-query ( message -- query ) question-section>> 1st ;
+

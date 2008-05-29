@@ -170,6 +170,11 @@ METHOD: as-mutate { object object assoc }       set-at ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: index    ( seq obj -- i ) swap sequences:index ;
+: index-of ( obj seq -- i )      sequences:index ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : 1st 0 at ;
 : 2nd 1 at ;
 : 3rd 2 at ;

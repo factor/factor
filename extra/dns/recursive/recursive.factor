@@ -2,6 +2,7 @@
 USING: kernel continuations
        combinators
        sequences
+       math
        random
        unicode.case
        accessors symbols
@@ -28,40 +29,12 @@ IN: dns.recursive
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: cache-message ( message -- message )
-  dup dup rcode>> NAME-ERROR =
-    [
-      [ question-section>> 1st ]
-      [ authority-section>> [ type>> SOA = ] filter random ttl>> ]
-      bi
-      cache-nx
-    ]
-    [
-        {
-          [ answer-section>>     cache-add-rrs ]
-          [ authority-section>>  cache-add-rrs ]
-          [ additional-section>> cache-add-rrs ]
-        }
-      cleave
-    ]
-  if ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: query->message ( query -- message ) <query-message> ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 : {name-type-class} ( obj -- seq )
   [ name>> >lower ] [ type>> ] [ class>> ] tri {3} ;
 
 : rr=query? ( rr query -- ? ) [ {name-type-class} ] bi@ = ;
 
 : rr-filter ( rrs query -- rrs ) [ rr=query? ] curry filter ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: message-query ( message -- query ) question-section>> 1st ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -110,7 +83,7 @@ DEFER: name->ip
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: recursive-query ( query servers -- message )
+: (recursive-query) ( query servers -- message )
   dup random                                 ! query servers server
   pick query->message 0 >>rd                 ! query servers server message
   over ask-server                            ! query servers server message
@@ -128,17 +101,36 @@ DEFER: name->ip
           remove                             ! message query servers
           dup empty?
             [ 2drop ]
-            [ rot drop recursive-query ]
+            [ rot drop (recursive-query) ]
           if
         ]
       }
       [                                      ! query servers server message sym
         drop nip nip                         ! query message
         extract-ns-ips                       ! query ips
-        recursive-query
+        (recursive-query)
       ]
     }
   case ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: cdr-name ( name -- name ) dup CHAR: . index 1+ tail ;
+
+: cache-get-ns ( name -- seq/f ) NS IN query boa cache-get ;
+
+: name->servers ( name -- servers )
+    {
+      { [ dup "" = ]         [ drop root-dns-servers ] }
+      { [ dup cache-get-ns ] [ cache-get-ns [ rdata>> name->ip ] map ] }
+      { [ t ]                [ cdr-name name->servers ] }
+    }
+  cond ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: recursive-query ( query -- message )
+  dup name>> name->servers (recursive-query) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -154,8 +146,19 @@ DEFER: name->ip
 :  name-hits? ( message -- message ? ) dup  name-hits empty? not ;
 : cname-hits? ( message -- message ? ) dup cname-hits empty? not ;
 
+! : name->ip/server ( name -- ip-or-f )
+!   A IN query boa root-dns-servers recursive-query ! message
+!     {
+!       { [ name-hits? ]  [ name-hits  random rdata>>          ] }
+!       { [ cname-hits? ] [ cname-hits random rdata>> name->ip ] }
+!       { [ t           ] [ drop f ] }
+!     }
+!   cond ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : name->ip/server ( name -- ip-or-f )
-  A IN query boa root-dns-servers recursive-query ! message
+  A IN query boa recursive-query ! message
     {
       { [ name-hits? ]  [ name-hits  random rdata>>          ] }
       { [ cname-hits? ] [ cname-hits random rdata>> name->ip ] }
