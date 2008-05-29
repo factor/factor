@@ -134,24 +134,23 @@ M: freetype-renderer string-height ( open-font string -- h )
     FT_RENDER_MODE_NORMAL FT_Render_Glyph freetype-error ;
 
 :: copy-pixel ( i j bitmap texture -- i j )
-    255 tex j set-alien-unsigned-1
-    i bitmap alien-unsigned-1 j 1 + texture set-alien-unsigned-1
+    255 j texture set-char-nth
+    i bitmap char-nth j 1 + texture set-char-nth
     i 1 + j 2 + ; inline
 
-: (copy-row) ( i j bitmap texture end -- )
+:: (copy-row) ( i j bitmap texture end -- )
     i end < [
         i j bitmap texture copy-pixel
-        i j bitmap texture end (copy-row)
+            bitmap texture end (copy-row)
     ] when ; inline
 
-: copy-row ( i j bitmap texture width width2 -- i j )
+:: copy-row ( i j bitmap texture width width2 -- i j )
     i j bitmap texture i width + (copy-row)
     i width +
     j width2 + ; inline
 
 :: copy-bitmap ( glyph texture -- )
-    [let* | texture [ texture alien-address ]
-            bitmap [ glyph glyph-bitmap-buffer alien-address ]
+    [let* | bitmap [ glyph glyph-bitmap-buffer ]
             rows [ glyph glyph-bitmap-rows ]
             width [ glyph glyph-bitmap-width ]
             width2 [ width next-power-of-2 2 * ] |
