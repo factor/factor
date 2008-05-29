@@ -485,3 +485,5 @@ must-fail-with
 [ t ] [ "staging-problem-test-1" "parser.tests" lookup >boolean ] unit-test
 
 [ t ] [ "staging-problem-test-2" "parser.tests" lookup >boolean ] unit-test
+
+[ "DEFER: blah" eval ] [ error>> no-current-vocab? ] must-fail-with

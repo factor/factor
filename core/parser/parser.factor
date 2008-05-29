@@ -236,7 +236,7 @@ PREDICATE: unexpected-eof < unexpected
 ERROR: no-current-vocab ;
 
 M: no-current-vocab summary ( obj -- )
-    drop "Current vocabulary is f, use IN:" ;
+    drop "Not in a vocabulary; IN: form required" ;
 
 : current-vocab ( -- str )
     in get [ no-current-vocab ] unless* ;
