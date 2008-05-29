@@ -68,7 +68,7 @@ SYMBOL: NX
 
 : expired? ( entry -- ? ) time>> time->ttl 0 <= ;
 
-: cache-get ( query -- result )
+: cache-get* ( query -- rrs/NX/f )
   dup table-get               ! query result
     {
       { [ dup f = ]      [ 2drop f ]          } ! not in the cache
@@ -77,6 +77,15 @@ SYMBOL: NX
       { [ t ]            [ query+entry->rrs ] } ! good to go
     }
   cond ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+ERROR: name-error name ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: cache-get ( query -- rrs/f )
+  dup cache-get* dup NX = [ drop name>> name-error ] [ nip ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
