@@ -62,7 +62,7 @@ IN: dns.resolver
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : canonical/server ( name -- name )
-  dup CNAME IN query boa <query-message> ask* answer-section>>
+  dup CNAME IN query boa query->message ask* answer-section>>
   [ type>> CNAME = ] filter dup empty? not
     [ nip 1st rdata>> ]
     [ drop ]
