@@ -113,12 +113,10 @@ TUPLE: unhandled < irc-message ;
 : irc-message-origin ( irc-message -- name )
     dup name>> irc-client> nick>> name>> = [ sender>> ] [ name>> ] if ;
 
-USE: prettyprint
-
 GENERIC: handle-incoming-irc ( irc-message -- )
 
 M: irc-message handle-incoming-irc ( irc-message -- )
-    . ;
+    drop ;
 
 M: logged-in handle-incoming-irc ( logged-in -- )
     name>> irc-client> nick>> (>>name) ;
@@ -130,8 +128,8 @@ M: nick-in-use handle-incoming-irc ( nick-in-use -- )
     name>> "_" append /NICK ;
 
 M: privmsg handle-incoming-irc ( privmsg -- )
-    dup dup . irc-message-origin irc-client> listeners>> at
-    [ in-messages>> mailbox-put ] [ dup "drop" . . drop ] if* ;
+    dup irc-message-origin irc-client> listeners>> at
+    [ in-messages>> mailbox-put ] [ drop ] if* ;
 
 M: join handle-incoming-irc ( join -- )
     irc-client> join-messages>> mailbox-put ;
