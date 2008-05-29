@@ -38,7 +38,7 @@ TUPLE: message
 ! TYPE
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYMBOLS: A NS MD MF CNAME SOA MB MG MR NULL WKS PTR HINFO MINFO MX TXT ;
+SYMBOLS: A NS MD MF CNAME SOA MB MG MR NULL WKS PTR HINFO MINFO MX TXT AAAA ;
 
 : type-table ( -- table )
   {
@@ -58,6 +58,7 @@ SYMBOLS: A NS MD MF CNAME SOA MB MG MR NULL WKS PTR HINFO MINFO MX TXT ;
     { MINFO 14 }
     { MX    15 }
     { TXT   16 }
+    { AAAA  28 }
   } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -125,6 +126,8 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : ip->ba ( ip -- ba ) "." split [ string>number ] map >byte-array ;
+
+: ipv6->ba ( ip -- ba ) ":" split [ 16 base> ] map [ 2 >be ] map concat ;
 
 : label->ba ( label -- ba ) [ >byte-array ] [ length ] bi prefix ;
 
@@ -330,6 +333,13 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
 
 : get-ip ( ba i -- ip ) dup 4 + subseq >array [ number>string ] map "." join ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: get-ipv6 ( ba i -- ip )
+  dup 16 + subseq 2 group [ be> 16 >base ] map ":" join ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : get-rdata ( ba i type -- rdata )
     {
       { CNAME [ get-name ] }
@@ -338,6 +348,7 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
       { MX    [ get-mx   ] }
       { SOA   [ get-soa  ] }
       { A     [ get-ip   ] }
+      { AAAA  [ get-ipv6 ] }
     }
   case ;
 
