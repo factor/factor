@@ -42,4 +42,4 @@ IN: jamshred.tunnel.tests
 [ { 0 1 0 } ] [ simple-collision-up sideways-heading ] unit-test
 [ { 0 0 0 } ] [ simple-collision-up sideways-relative-location ] unit-test
 [ { 0 1 0 } ]
-[ simple-collision-up collision-vector 0 bounce-offset 0 3array v+ ] unit-test
+[ simple-collision-up collision-vector 0 0 0 3array v+ ] unit-test

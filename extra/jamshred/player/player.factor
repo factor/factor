@@ -1,6 +1,7 @@
-! Copyright (C) 2007 Alex Chapman
+! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors combinators jamshred.log jamshred.oint jamshred.sound jamshred.tunnel kernel math math.constants math.order math.ranges shuffle sequences system ;
+USING: accessors colors combinators jamshred.log jamshred.oint jamshred.sound jamshred.tunnel kernel locals math math.constants math.order math.ranges math.vectors math.matrices shuffle sequences system ;
+USE: tools.walker
 IN: jamshred.player
 
 TUPLE: player < oint name sounds tunnel nearest-segment last-move speed ;
@@ -30,6 +31,9 @@ TUPLE: player < oint name sounds tunnel nearest-segment last-move speed ;
     [ tunnel>> ] [ dup nearest-segment>> nearest-segment ]
     [ (>>nearest-segment) ] tri ;
 
+: update-time ( player -- seconds-passed )
+    millis swap [ last-move>> - 1000 / ] [ (>>last-move) ] 2bi ;
+
 : moved ( player -- ) millis swap (>>last-move) ;
 
 : speed-range ( -- range )
@@ -41,38 +45,73 @@ TUPLE: player < oint name sounds tunnel nearest-segment last-move speed ;
 : multiply-player-speed ( n player -- )
     [ * speed-range clamp-to-range ] change-speed drop ; 
 
-: distance-to-move ( player -- distance )
-    [ speed>> ] [ last-move>> millis dup >r swap - 1000 / * r> ]
-    [ (>>last-move) ] tri ;
+: distance-to-move ( seconds-passed player -- distance )
+    speed>> * ;
 
-DEFER: (move-player)
+: bounce ( d-left player -- d-left' player )
+    {
+        [ dup nearest-segment>> bounce-off-wall ]
+        [ sounds>> bang ]
+        [ 3/4 swap multiply-player-speed ]
+        [ ]
+    } cleave ;
 
-: ?bounce ( distance-remaining player -- )
+:: move-player-on-heading ( d-left player distance heading -- d-left' player )
+    [let* | d-to-move [ d-left distance min ]
+            move-v [ d-to-move heading n*v ] |
+        move-v player location+
+        player update-nearest-segment
+        d-left d-to-move - player ] ;
+
+: (distance) ( player -- segments current location )
+    [ tunnel>> ] [ nearest-segment>> ] [ location>> ] tri ;
+
+: distance-to-next-segment ( player -- distance )
+    [ (distance) ] [ forward>> distance-to-heading-segment ] bi ;
+
+: distance-to-collision ( player -- distance )
+    dup nearest-segment>> (distance-to-collision) ;
+
+: move-toward-wall ( d-left player d-to-wall -- d-left' player )
+    over distance-to-next-segment min
+    over forward>> move-player-on-heading ;
+
+: from ( player -- radius distance-from-centre )
+    [ nearest-segment>> dup radius>> swap ] [ location>> ] bi
+    distance-from-centre ;
+
+: distance-from-wall ( player -- distance ) from - ;
+: fraction-from-centre ( player -- fraction ) from swap / ;
+: fraction-from-wall ( player -- fraction )
+    fraction-from-centre 1 swap - ;
+
+: ?move-player-freely ( d-left player -- d-left' player )
+    ! 2dup [ 0 > ] [ fraction-from-wall 0 > ] bi* and [
     over 0 > [
-        {
-            [ dup nearest-segment>> bounce ]
-            [ sounds>> bang ]
-            [ 3/4 swap multiply-player-speed ]
-            [ (move-player) ]
-        } cleave
-    ] [
-        2drop
-    ] if ;
+        dup distance-to-collision dup 0 > [
+            move-toward-wall ?move-player-freely
+        ] [ drop ] if
+    ] when ;
 
-: move-player-distance ( distance-remaining player distance -- distance-remaining player )
-    pick min tuck over go-forward [ - ] dip ;
+: drag-heading ( player -- heading )
+    [ forward>> ] [ nearest-segment>> forward>> proj ] bi ;
 
-: (move-player) ( distance-remaining player -- )
-    over 0 <= [
-        2drop
-    ] [
-        dup dup nearest-segment>> distance-to-collision
-        move-player-distance ?bounce
-    ] if ;
+: drag-distance-to-next-segment ( player -- distance )
+    [ (distance) ] [ drag-heading distance-to-heading-segment ] bi ;
+
+: drag-player ( d-left player -- d-left' player )
+    dup [ drag-distance-to-next-segment ]
+    [ drag-heading move-player-on-heading ] bi ;
+
+: (move-player) ( d-left player -- d-left' player )
+    ?move-player-freely over 0 > [
+        ! bounce
+        drag-player
+        ! (move-player)
+    ] when ;
 
 : move-player ( player -- )
-    [ distance-to-move ] [ (move-player) ] [ update-nearest-segment ] tri ;
+    [ update-time ] [ distance-to-move ] [ (move-player) 2drop ] tri ;
 
 : update-player ( player -- )
-    dup move-player nearest-segment>>
-    white swap set-segment-color ;
+    [ move-player ] [ nearest-segment>> white swap (>>color) ] bi ;
