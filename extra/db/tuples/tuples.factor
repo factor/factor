@@ -77,7 +77,7 @@ M: retryable execute-statement* ( statement type -- )
     ] curry 10 retry drop ;
 
 : resulting-tuple ( row out-params -- tuple )
-    dup first class>> new [
+    dup peek class>> new [
         [
             >r slot-name>> r> set-slot-named
         ] curry 2each
