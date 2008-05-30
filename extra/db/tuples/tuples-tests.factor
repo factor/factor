@@ -198,9 +198,10 @@ TUPLE: annotation n paste-id summary author mode contents ;
 : test-sqlite ( quot -- )
     >r "tuples-test.db" temp-file sqlite-db r> with-db ;
 
-: test-postgresql ( -- )
->r { "localhost" "postgres" "foob" "factor-test" } postgresql-db r> with-db ;
+! : test-postgresql ( quot -- )
+!     >r { "localhost" "postgres" "foob" "factor-test" } postgresql-db r> with-db ;
 
+: test-postgresql drop ;
 : test-repeated-insert
     [ ] [ person ensure-table ] unit-test
     [ ] [ person1 get insert-tuple ] unit-test
@@ -415,7 +416,7 @@ TUPLE: does-not-persist ;
 ] test-postgresql
 
 
-TUPLE: suparclass a ;
+TUPLE: suparclass id a ;
 
 suparclass f {
     { "id" "ID" +db-assigned-id+ }
@@ -429,7 +430,16 @@ subbclass "SUBCLASS" {
 } define-persistent
 
 : test-db-inheritance ( -- )
-    [ ] [ subbclass ensure-table ] unit-test ;
+    [ ] [ subbclass ensure-table ] unit-test
+    
+    [ ] [
+        subbclass new 5 >>a "hi" >>b dup insert-tuple id>> "id" set
+    ] unit-test
+    
+    [ t "hi" 5 ] [
+        subbclass new "id" get >>id select-tuple
+        [ subbclass? ] [ b>> ] [ a>> ] tri
+    ] unit-test ;
 
 [ test-db-inheritance ] test-sqlite
 
