@@ -47,15 +47,9 @@ TUPLE: entry time data ;
 
 SYMBOL: NX
 
-: cache-nx ( query ttl -- )
-  ttl->time NX entry boa
-  table-add ;
+: cache-nx ( query ttl -- ) ttl->time NX entry boa table-add ;
 
-: nx? ( obj -- ? )
-  dup entry?
-    [ data>> NX = ]
-    [ drop f ]
-  if ;
+: nx? ( obj -- ? ) dup entry? [ data>> NX = ] [ drop f ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -72,29 +66,26 @@ SYMBOL: NX
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: entry-expired? ( entry -- ? ) time>> time->ttl 0 <= ;
+: expired? ( entry -- ? ) time>> time->ttl 0 <= ;
 
-: cache-get ( query -- result )
+: cache-get* ( query -- rrs/NX/f )
   dup table-get               ! query result
     {
-      {
-        [ dup f = ] ! not in the cache
-        [ 2drop f ]
-      }
-      {
-        [ dup entry-expired? ] ! here but expired
-        [ drop table-rem f   ]
-      }
-      {
-        [ dup nx?  ] ! negative result has been cached
-        [ 2drop NX ]
-      }
-      {
-        [ t ]
-        [ query+entry->rrs ]
-      }
+      { [ dup f = ]      [ 2drop f ]          } ! not in the cache
+      { [ dup expired? ] [ drop table-rem f ] } ! here but expired
+      { [ dup nx?  ]     [ 2drop NX ]         } ! negative result cached
+      { [ t ]            [ query+entry->rrs ] } ! good to go
     }
   cond ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+ERROR: name-error name ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: cache-get ( query -- rrs/f )
+  dup cache-get* dup NX = [ drop name>> name-error ] [ nip ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -114,22 +105,10 @@ SYMBOL: NX
 : cache-add ( query rr -- )
   over table-get          ! query rr entry
     {
-      {
-        [ dup f = ] ! not in the cache
-        [ drop rr->entry table-add ]
-      }
-      {
-        [ dup nx? ]
-        [ drop over table-rem rr->entry table-add ]
-      }
-      {
-        [ dup entry-expired? ]
-        [ drop rr->entry table-add ]
-      }
-      {
-        [ t ]
-        [ rot drop add-rr-to-entry ]
-      }
+      { [ dup f = ]      [ drop rr->entry table-add ] }
+      { [ dup nx? ]      [ drop over table-rem rr->entry table-add ] }
+      { [ dup expired? ] [ drop rr->entry table-add ] }
+      { [ t ]            [ rot drop add-rr-to-entry ] }
     }
   cond ;
 
@@ -140,3 +119,31 @@ SYMBOL: NX
 : cache-add-rr ( rr -- ) [ rr->query ] [ ] bi cache-add ;
 
 : cache-add-rrs ( rrs -- ) [ cache-add-rr ] each ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! cache-name-error
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: message-soa ( message -- rr/soa )
+  authority-section>> [ type>> SOA = ] filter 1st ;
+
+: cache-name-error ( message -- message )
+  dup
+    [ message-query ] [ message-soa ttl>> ] bi
+  cache-nx ;
+
+: cache-message-records ( message -- message )
+  dup
+    {
+      [ answer-section>>     cache-add-rrs ]
+      [ authority-section>>  cache-add-rrs ]
+      [ additional-section>> cache-add-rrs ]
+    }
+  cleave ;
+
+: cache-message ( message -- message )
+  dup rcode>> NAME-ERROR = [ cache-name-error ] when
+  cache-message-records ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+

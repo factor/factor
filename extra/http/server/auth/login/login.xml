@@ -10,12 +10,12 @@
 
 			<tr>
 				<th class="field-label">User name:</th>
-				<td><t:edit t:component="username" /></td>
+				<td><t:field t:name="username" /></td>
 			</tr>
 
 			<tr>
 				<th class="field-label">Password:</th>
-				<td><t:edit t:component="password" /></td>
+				<td><t:password t:name="password" /></td>
 			</tr>
 
 		</table>
@@ -23,7 +23,7 @@
 		<p>
 
 			<input type="submit" value="Log in" />
-			<t:validation-message />
+			<t:validation-messages />
 
 		</p>
 

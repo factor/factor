@@ -10,17 +10,17 @@
 
 			<tr>
 				<th class="field-label">Blog name:</th>
-				<td><t:edit t:component="name" /></td>
+				<td><t:field t:name="name" /></td>
 			</tr>
 
 			<tr>
 				<th class="field-label">Home page:</th>
-				<td><t:edit t:component="www-url" /></td>
+				<td><t:field t:name="www-url" /></td>
 			</tr>
 
 			<tr>
 				<th class="field-label">Feed:</th>
-				<td><t:edit t:component="feed-url" /></td>
+				<td><t:field t:name="feed-url" /></td>
 			</tr>
 
 		</table>
@@ -30,4 +30,5 @@
 	</t:form>
 
 	<t:button t:action="$planet-factor/admin/delete-blog" t:for="id" class="link-button link">Delete</t:button>
+
 </t:chloe>

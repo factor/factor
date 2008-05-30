@@ -15,6 +15,18 @@ IN: math.libm
     "double" "libm" "atan" { "double" } alien-invoke ;
     foldable
 
+: facosh ( x -- y )
+    "double" "libm" "acosh" { "double" } alien-invoke ;
+    foldable
+
+: fasinh ( x -- y )
+    "double" "libm" "asinh" { "double" } alien-invoke ;
+    foldable
+
+: fatanh ( x -- y )
+    "double" "libm" "atanh" { "double" } alien-invoke ;
+    foldable
+
 : fatan2 ( x y -- z )
     "double" "libm" "atan2" { "double" "double" } alien-invoke ;
     foldable
@@ -27,12 +39,20 @@ IN: math.libm
     "double" "libm" "sin" { "double" } alien-invoke ;
     foldable
 
+: ftan ( x -- y )
+    "double" "libm" "tan" { "double" } alien-invoke ;
+    foldable
+
 : fcosh ( x -- y )
     "double" "libm" "cosh" { "double" } alien-invoke ;
     foldable
 
 : fsinh ( x -- y )
     "double" "libm" "sinh" { "double" } alien-invoke ;
+    foldable
+
+: ftanh ( x -- y )
+    "double" "libm" "tanh" { "double" } alien-invoke ;
     foldable
 
 : fexp ( x -- y )

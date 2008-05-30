@@ -364,12 +364,18 @@ M: lambda-word definer drop \ :: \ ; ;
 M: lambda-word definition
     "lambda" word-prop body>> ;
 
+M: lambda-word reset-word
+    [ f "lambda" set-word-prop ] [ call-next-method ] bi ;
+
 INTERSECTION: lambda-macro macro lambda-word ;
 
 M: lambda-macro definer drop \ MACRO:: \ ; ;
 
 M: lambda-macro definition
     "lambda" word-prop body>> ;
+
+M: lambda-macro reset-word
+    [ f "lambda" set-word-prop ] [ call-next-method ] bi ;
 
 INTERSECTION: lambda-method method-body lambda-word ;
 
@@ -378,12 +384,18 @@ M: lambda-method definer drop \ M:: \ ; ;
 M: lambda-method definition
     "lambda" word-prop body>> ;
 
+M: lambda-method reset-word
+    [ f "lambda" set-word-prop ] [ call-next-method ] bi ;
+
 INTERSECTION: lambda-memoized memoized lambda-word ;
 
 M: lambda-memoized definer drop \ MEMO:: \ ; ;
 
 M: lambda-memoized definition
     "lambda" word-prop body>> ;
+
+M: lambda-memoized reset-word
+    [ f "lambda" set-word-prop ] [ call-next-method ] bi ;
 
 : method-stack-effect ( method -- effect )
     dup "lambda" word-prop vars>>

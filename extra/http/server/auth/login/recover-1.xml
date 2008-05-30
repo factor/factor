@@ -10,25 +10,25 @@
 
 		<table>
 
-		<tr>
-		<th class="field-label">User name:</th>
-		<td><t:edit t:component="username" /></td>
-		</tr>
+			<tr>
+				<th class="field-label">User name:</th>
+				<td><t:field t:name="username" /></td>
+			</tr>
 
-		<tr>
-		<th class="field-label">E-mail:</th>
-		<td><t:edit t:component="email" /></td>
-		</tr>
+			<tr>
+				<th class="field-label">E-mail:</th>
+				<td><t:field t:name="email" /></td>
+			</tr>
 
-		<tr>
-		<th class="field-label">Captcha:</th>
-		<td><t:edit t:component="captcha" /></td>
-		</tr>
+			<tr>
+				<th class="field-label">Captcha:</th>
+				<td><t:field t:name="captcha" /></td>
+			</tr>
 
-		<tr>
-		<td></td>
-		<td>Leave the captcha blank. Spam-bots will fill it indiscriminantly, so their attempts to e-mail you will be blocked.</td>
-		</tr>
+			<tr>
+				<td></td>
+				<td>Leave the captcha blank. Spam-bots will fill it indiscriminantly, so their attempts to e-mail you will be blocked.</td>
+			</tr>
 
 		</table>
 

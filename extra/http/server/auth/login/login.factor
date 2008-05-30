@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors quotations assocs kernel splitting
 combinators sequences namespaces hashtables sets
-fry arrays threads locals qualified random
+fry arrays threads qualified random validators
 io
 io.sockets
 io.encodings.utf8
@@ -12,23 +12,22 @@ continuations
 destructors
 checksums
 checksums.sha2
+validators
+html.components
 html.elements
+html.templates
+html.templates.chloe
 http
 http.server
 http.server.auth
 http.server.auth.providers
 http.server.auth.providers.db
 http.server.actions
-http.server.components
 http.server.flows
-http.server.forms
 http.server.sessions
-http.server.boilerplate
-http.server.templating
-http.server.templating.chloe
-http.server.validators ;
-IN: http.server.auth.login
+http.server.boilerplate ;
 QUALIFIED: smtp
+IN: http.server.auth.login
 
 TUPLE: login < dispatcher users checksum ;
 
@@ -65,149 +64,122 @@ M: user-saver dispose
     3append <chloe> ;
 
 ! ! ! Login
-
-: <login-form>
-    "login" <form>
-        "login" login-template >>edit-template
-        "username" <username>
-            t >>required
-            add-field
-        "password" <password>
-            t >>required
-            add-field ;
-
 : successful-login ( user -- response )
-    username>> set-uid
-    "$login" end-flow ;
+    username>> set-uid "$login" end-flow ;
 
-: login-failed "invalid username or password" validation-failed-with ;
+: login-failed ( -- * )
+    "invalid username or password" validation-error
+    validation-failed ;
 
-:: <login-action> ( -- action )
-    [let | form [ <login-form> ] |
-        <action>
-            [ blank-values ] >>init
+: <login-action> ( -- action )
+    <action>
+        [ "login" login-template <html-content> ] >>display
 
-            [ form edit-form ] >>display
+        [
+            {
+                { "username" [ v-required ] }
+                { "password" [ v-required ] }
+            } validate-params
 
-            [
-                blank-values
-
-                form validate-form
-
-                "password" value "username" value check-login
-                [ successful-login ] [ login-failed ] if*
-            ] >>submit
-    ] ;
+            "password" value
+            "username" value check-login
+            [ successful-login ] [ login-failed ] if*
+        ] >>submit ;
 
 ! ! ! New user registration
 
-: <register-form> ( -- form )
-    "register" <form>
-        "register" login-template >>edit-template
-        "username" <username>
-            t >>required
-            add-field
-        "realname" <string> add-field
-        "new-password" <password>
-            t >>required
-            add-field
-        "verify-password" <password>
-            t >>required
-            add-field
-        "email" <email> add-field
-        "captcha" <captcha> add-field ;
+: user-exists ( -- * )
+    "username taken" validation-error
+    validation-failed ;
 
-: password-mismatch "passwords do not match" validation-failed-with ;
-
-: user-exists "username taken" validation-failed-with ;
+: password-mismatch ( -- * )
+    "passwords do not match" validation-error
+    validation-failed ;
 
 : same-password-twice ( -- )
     "new-password" value "verify-password" value =
     [ password-mismatch ] unless ;
 
-:: <register-action> ( -- action )
-    [let | form [ <register-form> ] |
-        <action>
-            [ blank-values ] >>init
+: <register-action> ( -- action )
+    <page-action>
+        "register" login-template >>template
 
-            [ form edit-form ] >>display
+        [
+            {
+                { "username" [ v-username ] }
+                { "realname" [ [ v-one-line ] v-optional ] }
+                { "new-password" [ v-password ] }
+                { "verify-password" [ v-password ] }
+                { "email" [ [ v-email ] v-optional ] }
+                { "captcha" [ v-captcha ] }
+            } validate-params
 
-            [
-                blank-values
+            same-password-twice
+        ] >>validate
 
-                form validate-form
+        [
+            "username" value <user>
+                "realname" value >>realname
+                "new-password" value >>encoded-password
+                "email" value >>email
+                H{ } clone >>profile
 
-                same-password-twice
+            users new-user [ user-exists ] unless*
 
-                "username" value <user>
-                    "realname" value >>realname
-                    "new-password" value >>encoded-password
-                    "email" value >>email
-                    H{ } clone >>profile
+            login get init-user-profile
 
-                users new-user [ user-exists ] unless*
-
-                successful-login
-
-                login get init-user-profile
-            ] >>submit
-    ] ;
+            successful-login
+        ] >>submit ;
 
 ! ! ! Editing user profile
 
-: <edit-profile-form> ( -- form )
-    "edit-profile" <form>
-        "edit-profile" login-template >>edit-template
-        "username" <username> add-field
-        "realname" <string> add-field
-        "password" <password> add-field
-        "new-password" <password> add-field
-        "verify-password" <password> add-field
-        "email" <email> add-field ;
+: <edit-profile-action> ( -- action )
+    <action>
+        [
+            logged-in-user get
+            [ username>> "username" set-value ]
+            [ realname>> "realname" set-value ]
+            [ email>> "email" set-value ]
+            tri
+        ] >>init
 
-:: <edit-profile-action> ( -- action )
-    [let | form [ <edit-profile-form> ] |
-        <action>
-            [
-                blank-values
+        [ "edit-profile" login-template <html-content> ] >>display
 
-                logged-in-user get
-                [ username>> "username" set-value ]
-                [ realname>> "realname" set-value ]
-                [ email>> "email" set-value ]
-                tri
-            ] >>init
+        [
+            uid "username" set-value
 
-            [ form edit-form ] >>display
+            {
+                { "realname" [ [ v-one-line ] v-optional ] }
+                { "password" [ ] }
+                { "new-password" [ [ v-password ] v-optional ] }
+                { "verify-password" [ [ v-password ] v-optional ] } 
+                { "email" [ [ v-email ] v-optional ] }
+            } validate-params
 
-            [
-                blank-values
-                uid "username" set-value
+            { "password" "new-password" "verify-password" }
+            [ value empty? not ] contains? [
+                "password" value uid check-login
+                [ "incorrect password" validation-error ] unless
 
-                form validate-form
+                same-password-twice
+            ] when
+        ] >>validate
 
-                logged-in-user get
+        [
+            logged-in-user get
 
-                { "password" "new-password" "verify-password" }
-                [ value empty? ] all? [
-                    same-password-twice
+            "new-password" value dup empty?
+            [ drop ] [ >>encoded-password ] if
 
-                    "password" value uid check-login
-                    [ login-failed ] unless
+            "realname" value >>realname
+            "email" value >>email
 
-                    "new-password" value >>encoded-password
-                ] unless
+            t >>changed?
 
-                "realname" value >>realname
-                "email" value >>email
+            drop
 
-                t >>changed?
-
-                drop
-
-                "$login" end-flow
-            ] >>submit
-    ] ;
+            "$login" end-flow
+        ] >>submit ;
 
 ! ! ! Password recovery
 
@@ -250,92 +222,61 @@ SYMBOL: lost-password-from
     '[ , password-email smtp:send-email ]
     "E-mail send thread" spawn drop ;
 
-: <recover-form-1> ( -- form )
-    "register" <form>
-        "recover-1" login-template >>edit-template
-        "username" <username>
-            t >>required
-            add-field
-        "email" <email>
-            t >>required
-            add-field
-        "captcha" <captcha> add-field ;
+: <recover-action-1> ( -- action )
+    <action>
+        [ "recover-1" login-template <html-content> ] >>display
 
-:: <recover-action-1> ( -- action )
-    [let | form [ <recover-form-1> ] |
-        <action>
-            [ blank-values ] >>init
+        [
+            {
+                { "username" [ v-username ] }
+                { "email" [ v-email ] }
+                { "captcha" [ v-captcha ] }
+            } validate-params
+        ] >>validate
 
-            [ form edit-form ] >>display
+        [
+            "email" value "username" value
+            users issue-ticket [
+                send-password-email
+            ] when*
 
-            [
-                blank-values
+            "recover-2" login-template <html-content>
+        ] >>submit ;
 
-                form validate-form
-
-                "email" value "username" value
-                users issue-ticket [
-                    send-password-email
-                ] when*
-
-                "recover-2" login-template serve-template
-            ] >>submit
-    ] ;
-
-: <recover-form-3>
-    "new-password" <form>
-        "recover-3" login-template >>edit-template
-        "username" <username>
-            hidden >>renderer
-            t >>required
-            add-field
-        "new-password" <password>
-            t >>required
-            add-field
-        "verify-password" <password>
-            t >>required
-            add-field
-        "ticket" <string>
-            hidden >>renderer
-            t >>required
-            add-field ;
-
-:: <recover-action-3> ( -- action )
-    [let | form [ <recover-form-3> ] |
-        <action>
-            [
-                { "username" [ v-required ] }
+: <recover-action-3> ( -- action )
+    <action>
+        [
+            {
+                { "username" [ v-username ] }
                 { "ticket" [ v-required ] }
-            ] >>get-params
+            } validate-params
+        ] >>init
 
-            [
-                [
-                    "username" [ get ] keep set
-                    "ticket" [ get ] keep set
-                ] H{ } make-assoc values set
-            ] >>init
+        [ "recover-3" login-template <html-content> ] >>display
 
-            [ <recover-form-3> edit-form ] >>display
+        [
+            {
+                { "username" [ v-username ] }
+                { "ticket" [ v-required ] }
+                { "new-password" [ v-password ] }
+                { "verify-password" [ v-password ] }
+            } validate-params
 
-            [
-                blank-values
+            same-password-twice
+        ] >>validate
 
-                form validate-form
+        [
+            "ticket" value
+            "username" value
+            users claim-ticket [
+                "new-password" value >>encoded-password
+                users update-user
 
-                same-password-twice
-
-                "ticket" value
-                "username" value
-                users claim-ticket [
-                    "new-password" value >>encoded-password
-                    users update-user
-
-                    "recover-4" login-template serve-template
-                ] [
-                    <400>
-                ] if*
-            ] >>submit
-    ] ;
+                "recover-4" login-template <html-content>
+            ] [
+                <400>
+            ] if*
+        ] >>submit ;
 
 ! ! ! Logout
 : <logout-action> ( -- action )

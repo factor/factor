@@ -5,12 +5,12 @@
 	<t:title>View Item</t:title>
 
 	<table>
-		<tr><th class="field-label">Summary:    </th><td><t:view t:component="summary"     /></td></tr>
-		<tr><th class="field-label">Priority:   </th><td><t:view t:component="priority"    /></td></tr>
+		<tr><th class="field-label">Summary: </th><td><t:label t:name="summary" /></td></tr>
+		<tr><th class="field-label">Priority: </th><td><t:label t:name="priority" /></td></tr>
 	</table>
 
 	<div class="description">
-		<t:view t:component="description" />
+		<t:farkup t:name="description" />
 	</div>
 
 	<t:a t:href="$todo-list/edit" t:query="id">Edit</t:a>

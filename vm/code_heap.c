@@ -139,13 +139,14 @@ void apply_relocation(CELL class, CELL offset, F_FIXNUM absolute_value)
 }
 
 /* Perform all fixups on a code block */
-void relocate_code_block(F_COMPILED *relocating, CELL code_start,
-	CELL reloc_start, CELL literals_start)
+void relocate_code_block(F_COMPILED *compiled, CELL code_start, CELL literals_start)
 {
-	if(reloc_start != literals_start)
+	if(compiled->relocation != F)
 	{
-		F_REL *rel = (F_REL *)reloc_start;
-		F_REL *rel_end = (F_REL *)literals_start;
+		F_BYTE_ARRAY *relocation = untag_object(compiled->relocation);
+
+		F_REL *rel = (F_REL *)(relocation + 1);
+		F_REL *rel_end = (F_REL *)((char *)rel + byte_array_capacity(relocation));
 
 		while(rel < rel_end)
 		{
@@ -160,7 +161,7 @@ void relocate_code_block(F_COMPILED *relocating, CELL code_start,
 		}
 	}
 
-	flush_icache(code_start,reloc_start - code_start);
+	flush_icache(code_start,literals_start - code_start);
 }
 
 /* Fixup labels. This is done at compile time, not image load time */
@@ -249,34 +250,32 @@ F_COMPILED *add_compiled_block(
 	CELL type,
 	F_ARRAY *code,
 	F_ARRAY *labels,
-	F_ARRAY *relocation,
+	CELL relocation,
 	F_ARRAY *literals)
 {
 	CELL code_format = compiled_code_format();
 
 	CELL code_length = align8(array_capacity(code) * code_format);
-	CELL rel_length = array_capacity(relocation) * sizeof(unsigned int);
 	CELL literals_length = array_capacity(literals) * CELLS;
 
+	REGISTER_ROOT(relocation);
 	REGISTER_UNTAGGED(code);
 	REGISTER_UNTAGGED(labels);
-	REGISTER_UNTAGGED(relocation);
 	REGISTER_UNTAGGED(literals);
 
-	CELL here = allot_code_block(sizeof(F_COMPILED) + code_length
-		+ rel_length + literals_length);
+	CELL here = allot_code_block(sizeof(F_COMPILED) + code_length + literals_length);
 
 	UNREGISTER_UNTAGGED(literals);
-	UNREGISTER_UNTAGGED(relocation);
 	UNREGISTER_UNTAGGED(labels);
 	UNREGISTER_UNTAGGED(code);
+	UNREGISTER_ROOT(relocation);
 
 	/* compiled header */
 	F_COMPILED *header = (void *)here;
 	header->type = type;
 	header->code_length = code_length;
-	header->reloc_length = rel_length;
 	header->literals_length = literals_length;
+	header->relocation = relocation;
 
 	here += sizeof(F_COMPILED);
 
@@ -285,10 +284,6 @@ F_COMPILED *add_compiled_block(
 	/* code */
 	deposit_integers(here,code,code_format);
 	here += code_length;
-
-	/* relation info */
-	deposit_integers(here,relocation,sizeof(unsigned int));
-	here += rel_length;
 
 	/* literals */
 	deposit_objects(here,literals);
@@ -353,7 +348,7 @@ DEFINE_PRIMITIVE(modify_code_heap)
 			F_ARRAY *compiled_code = untag_array(data);
 
 			F_ARRAY *literals = untag_array(array_nth(compiled_code,0));
-			F_ARRAY *relocation = untag_array(array_nth(compiled_code,1));
+			CELL relocation = array_nth(compiled_code,1);
 			F_ARRAY *labels = untag_array(array_nth(compiled_code,2));
 			F_ARRAY *code = untag_array(array_nth(compiled_code,3));
 

@@ -215,12 +215,6 @@ unit-test
     3 V{ 1 2 3 4 5 6 } clone [ delete-nth ] keep
 ] unit-test
 
-[ V{ 1 2 3 } ]
-[ 3 V{ 1 2 } clone [ push-new ] keep ] unit-test
-
-[ V{ 1 2 3 } ]
-[ 3 V{ 1 3 2 } clone [ push-new ] keep ] unit-test
-
 ! erg's random tester found this one
 [ SBUF" 12341234" ] [
     9 <sbuf> dup "1234" swap push-all dup dup swap push-all

@@ -4,7 +4,7 @@ namespaces quotations sequences.private classes continuations
 generic.standard effects classes.tuple classes.tuple.private
 arrays vectors strings compiler.units accessors classes.algebra
 calendar prettyprint io.streams.string splitting inspector
-columns math.order ;
+columns math.order classes.private ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
@@ -543,6 +543,7 @@ TUPLE: another-forget-accessors-test ;
 ! Missing error check
 [ "IN: classes.tuple.tests USE: words TUPLE: wrong-superclass < word ;" eval ] must-fail
 
+! Class forget messyness
 TUPLE: subclass-forget-test ;
 
 TUPLE: subclass-forget-test-1 < subclass-forget-test ;
@@ -550,6 +551,14 @@ TUPLE: subclass-forget-test-2 < subclass-forget-test ;
 TUPLE: subclass-forget-test-3 < subclass-forget-test-2 ;
 
 [ ] [ "IN: classes.tuple.tests FORGET: subclass-forget-test" eval ] unit-test
+
+[ H{ { subclass-forget-test-2 subclass-forget-test-2 } } ]
+[ subclass-forget-test-2 class-usages ]
+unit-test
+
+[ H{ { subclass-forget-test-3 subclass-forget-test-3 } } ]
+[ subclass-forget-test-3 class-usages ]
+unit-test
 
 [ f ] [ subclass-forget-test-1 tuple-class? ] unit-test
 [ f ] [ subclass-forget-test-2 tuple-class? ] unit-test

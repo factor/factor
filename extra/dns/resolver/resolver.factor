@@ -6,6 +6,8 @@ IN: dns.resolver
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+! Need to cache records even in the case of name error
+
 : cache-message ( message -- message )
   dup dup rcode>> NAME-ERROR =
     [
@@ -60,7 +62,7 @@ IN: dns.resolver
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : canonical/server ( name -- name )
-  dup CNAME IN query boa <query-message> ask* answer-section>>
+  dup CNAME IN query boa query->message ask* answer-section>>
   [ type>> CNAME = ] filter dup empty? not
     [ nip 1st rdata>> ]
     [ drop ]
@@ -68,7 +70,7 @@ IN: dns.resolver
 
 : name->ip/server ( name -- ip )
   canonical/server
-  dup A IN query boa <query-message> ask* answer-section>>
+  dup A IN query boa query->message ask* answer-section>>
   [ type>> A = ] filter dup empty? not
     [ nip random rdata>> ]
     [ 2drop f ]

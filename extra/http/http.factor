@@ -9,7 +9,9 @@ math.parser calendar calendar.format
 io io.streams.string io.encodings.utf8 io.encodings.string
 io.sockets io.sockets.secure
 
-unicode.case unicode.categories qualified ;
+unicode.case unicode.categories qualified
+
+html.templates ;
 
 EXCLUDE: fry => , ;
 
@@ -65,14 +67,14 @@ M: https protocol>string drop "https" ;
     2dup length 2 - >= [
         2drop
     ] [
-        >r 1+ dup 2 + r> subseq  hex> [ , ] when*
+        [ 1+ dup 2 + ] dip subseq  hex> [ , ] when*
     ] if ;
 
 : url-decode-% ( index str -- index str )
-    2dup url-decode-hex >r 3 + r> ;
+    2dup url-decode-hex [ 3 + ] dip ;
 
 : url-decode-+-or-other ( index str ch -- index str )
-    dup CHAR: + = [ drop CHAR: \s ] when , >r 1+ r> ;
+    dup CHAR: + = [ drop CHAR: \s ] when , [ 1+ ] dip ;
 
 : url-decode-iter ( index str -- )
     2dup length >= [
@@ -158,7 +160,7 @@ M: https protocol>string drop "https" ;
     dup [
         "&" split H{ } clone [
             [
-                >r "=" split1 [ dup [ url-decode ] when ] bi@ swap r>
+                [ "=" split1 [ dup [ url-decode ] when ] bi@ swap ] dip
                 add-query-param
             ] curry each
         ] keep
@@ -174,7 +176,7 @@ M: https protocol>string drop "https" ;
     ] assoc-map
     [
         [
-            >r url-encode r>
+            [ url-encode ] dip
             [ url-encode "=" swap 3append , ] with each
         ] assoc-each
     ] { } make "&" join ;
@@ -342,7 +344,7 @@ SYMBOL: max-post-request
     dup "cookie" header [ parse-cookies >>cookies ] when* ;
 
 : parse-content-type-attributes ( string -- attributes )
-    " " split harvest [ "=" split1 >r >lower r> ] { } map>assoc ;
+    " " split harvest [ "=" split1 [ >lower ] dip ] { } map>assoc ;
 
 : parse-content-type ( content-type -- type encoding )
     ";" split1 parse-content-type-attributes "charset" swap at ;
@@ -521,18 +523,8 @@ body ;
     over unparse-content-type "content-type" pick set-at
     write-header ;
 
-GENERIC: write-response-body* ( body -- )
-
-M: f write-response-body* drop ;
-
-M: string write-response-body* write ;
-
-M: callable write-response-body* call ;
-
-M: object write-response-body* output-stream get stream-copy ;
-
 : write-response-body ( response -- response )
-    dup body>> write-response-body* ;
+    dup body>> call-template ;
 
 M: response write-response ( respose -- )
     write-response-version
@@ -547,10 +539,10 @@ M: response write-full-response ( request response -- )
     swap method>> "HEAD" = [ write-response-body ] unless ;
 
 : get-cookie ( request/response name -- cookie/f )
-    >r cookies>> r> '[ , _ name>> = ] find nip ;
+    [ cookies>> ] dip '[ , _ name>> = ] find nip ;
 
 : delete-cookie ( request/response name -- )
-    over cookies>> >r get-cookie r> delete ;
+    over cookies>> [ get-cookie ] dip delete ;
 
 : put-cookie ( request/response cookie -- request/response )
     [ name>> dupd get-cookie [ dupd delete-cookie ] when* ] keep

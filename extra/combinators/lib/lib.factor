@@ -38,8 +38,6 @@ MACRO: napply ( n -- )
 
 : 3apply ( obj obj obj quot -- ) 3 napply ; inline
 
-: dipd ( x y quot -- y ) 2 ndip ; inline
-
 : 2with ( param1 param2 obj quot -- obj curry )
     with with ; inline
 
@@ -79,7 +77,20 @@ MACRO: <--&& ( quots -- )
     [ [ 2dup ] prepend [ not ] append [ f ] ] t short-circuit
     [ 2nip ] append ;
 
+! or
+
 MACRO: || ( quots -- ? ) [ [ t ] ] f short-circuit ;
+
+MACRO: 0|| ( quots -- ? ) [ [ t ] ] f short-circuit ;
+
+MACRO: 1|| ( quots -- ? )
+  [ [ dup ] prepend [ t ] ] f short-circuit [ nip ] append ;
+
+MACRO: 2|| ( quots -- ? )
+  [ [ 2dup ] prepend [ t ] ] f short-circuit [ 2nip ] append ;
+
+MACRO: 3|| ( quots -- ? )
+  [ [ 2dup ] prepend [ t ] ] f short-circuit [ 2nip ] append ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! ifte

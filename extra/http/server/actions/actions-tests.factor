@@ -1,16 +1,10 @@
-USING: http.server.actions http.server.validators
+USING: kernel http.server.actions validators
 tools.test math math.parser multiline namespaces http
 io.streams.string http.server sequences splitting accessors ;
 IN: http.server.actions.tests
 
-[
-    "a" [ v-number ] { { "a" "123" } } validate-param
-    [ 123 ] [ "a" get ] unit-test
-] with-scope
-
 <action>
-    [ "a" get "b" get + ] >>display
-    { { "a" [ v-number ] } { "b" [ v-number ] } } >>get-params
+    [ "a" param "b" param [ string>number ] bi@ + ] >>display
 "action-1" set
 
 : lf>crlf "\n" split "\r\n" join ;

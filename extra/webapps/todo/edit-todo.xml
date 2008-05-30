@@ -6,9 +6,9 @@
 
 	<t:form t:action="$todo-list/edit" t:for="id">
 		<table>
-			<tr><th class="field-label">Summary: </th><td><t:edit t:component="summary" /></td></tr>
-			<tr><th class="field-label">Priority: </th><td><t:edit t:component="priority" /></td></tr>
-			<tr><th class="field-label big-field-label">Description:</th><td><t:edit t:component="description" /></td></tr>
+			<tr><th class="field-label">Summary: </th><td><t:field t:name="summary" /></td></tr>
+			<tr><th class="field-label">Priority: </th><td><t:field t:name="priority" /></td></tr>
+			<tr><th class="field-label big-field-label">Description:</th><td><t:textarea t:name="description" t:rows="20" t:cols="60" /></td></tr>
 		</table>
 
 		<input type="SUBMIT" value="Done" />

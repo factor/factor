@@ -191,7 +191,6 @@ $nl
 "Other destructive words:"
 { $subsection move }
 { $subsection exchange }
-{ $subsection push-new }
 { $subsection copy }
 { $subsection replace-slice }
 { $see-also set-nth push pop "sequences-stacks" } ;
@@ -624,22 +623,7 @@ HELP: replace-slice
 { $errors "Throws an error if " { $snippet "new" } " contains elements whose types are not permissible in " { $snippet "seq" } "." }
 { $side-effects "seq" } ;
 
-HELP: push-new
-{ $values { "elt" object } { "seq" "a resizable mutable sequence" } }
-{ $description "Removes all elements equal to " { $snippet "elt" } ", and adds " { $snippet "elt" } " at the end of the sequence." }
-{ $examples
-    { $example
-        "USING: namespaces prettyprint sequences ;"
-        "V{ \"beans\" \"salsa\" \"cheese\" } \"v\" set"
-        "\"nachos\" \"v\" get push-new"
-        "\"salsa\" \"v\" get push-new"
-        "\"v\" get ."
-        "V{ \"beans\" \"cheese\" \"nachos\" \"salsa\" }"
-    }
-}
-{ $side-effects "seq" } ;
-
-{ push push-new prefix suffix } related-words
+{ push prefix suffix } related-words
 
 HELP: suffix
 { $values { "seq" sequence } { "elt" object } { "newseq" sequence } }

@@ -50,3 +50,15 @@ IN: calendar.format.tests
     "Sun May 04 07:00:00 2008 GMT" cookie-string>timestamp
     timestamp>string
 ] unit-test
+
+[
+    T{ timestamp f
+        2008
+        5
+        26
+        0
+        37
+        42.12345
+        T{ duration f 0 0 0 -5 0 0 }
+    }
+] [ "2008-05-26T00:37:42.12345-05:00" rfc3339>timestamp ] unit-test
