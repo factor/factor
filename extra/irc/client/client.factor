@@ -220,13 +220,13 @@ M: privmsg handle-outgoing-irc ( privmsg -- )
     irc-client> in-messages>> mailbox-get handle-incoming-irc ;
 
 ! FIXME: Hack, this should be handled better
-GENERIC: add-name ( name obj -- obj )
-M: object add-name nip ;
-M: privmsg add-name swap >>name ;
+GENERIC: annotate-message-with-name ( name obj -- obj )
+M: object annotate-message-with-name nip ;
+M: privmsg annotate-message-with-name swap >>name ;
 
 : listener-loop ( name -- ) ! FIXME: take different values from the stack?
     dup irc-client> listeners>> at [
-        out-messages>> mailbox-get add-name
+        out-messages>> mailbox-get annotate-message-with-name
         irc-client> out-messages>>
         mailbox-put
     ] [
