@@ -13,10 +13,10 @@ IN: db.tuples
     "db-columns" set-word-prop
     "db-relations" set-word-prop ;
 
-ERROR: not-persistent ;
+ERROR: not-persistent class ;
 
 : db-table ( class -- obj )
-    "db-table" word-prop [ not-persistent ] unless* ;
+    dup "db-table" word-prop [ ] [ not-persistent ] ?if ;
 
 : db-columns ( class -- obj )
     superclasses [ "db-columns" word-prop ] map concat ;

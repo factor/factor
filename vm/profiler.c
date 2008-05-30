@@ -11,11 +11,12 @@ F_COMPILED *compile_profiling_stub(F_WORD *word)
 	CELL code = array_nth(quadruple,0);
 	REGISTER_ROOT(code);
 
-	CELL rel_type = allot_cell(to_fixnum(array_nth(quadruple,2))
-		| (to_fixnum(array_nth(quadruple,1)) << 8));
-	CELL rel_offset = array_nth(quadruple,3) * compiled_code_format();
+	F_REL rel;
+	rel.type = to_fixnum(array_nth(quadruple,2)) | (to_fixnum(array_nth(quadruple,1)) << 8);
+	rel.offset = to_fixnum(array_nth(quadruple,3)) * compiled_code_format();
 
-	CELL relocation = allot_array_2(rel_type,rel_offset);
+	F_BYTE_ARRAY *relocation = allot_byte_array(sizeof(F_REL));
+	memcpy((void *)BREF(relocation,0),&rel,sizeof(F_REL));
 
 	UNREGISTER_ROOT(code);
 	UNREGISTER_ROOT(literals);
@@ -24,7 +25,7 @@ F_COMPILED *compile_profiling_stub(F_WORD *word)
 		WORD_TYPE,
 		untag_object(code),
 		NULL, /* no labels */
-		untag_object(relocation),
+		tag_object(relocation),
 		untag_object(literals));
 }
 
