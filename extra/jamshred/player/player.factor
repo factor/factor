@@ -56,25 +56,19 @@ TUPLE: player < oint name sounds tunnel nearest-segment last-move speed ;
         [ ]
     } cleave ;
 
-:: move-player-on-heading ( d-left player distance heading -- d-left' player )
-    [let* | d-to-move [ d-left distance min ]
-            move-v [ d-to-move heading n*v ] |
-        move-v player location+
-        player update-nearest-segment
-        d-left d-to-move - player ] ;
+:: (distance) ( heading player -- current next location heading )
+    player nearest-segment>>
+    player [ tunnel>> ] [ nearest-segment>> ] bi heading heading-segment
+    player location>> heading ;
 
-: (distance) ( player -- segments current location )
-    [ tunnel>> ] [ nearest-segment>> ] [ location>> ] tri ;
+: distance-to-heading-segment ( heading player -- distance )
+    (distance) distance-to-next-segment ;
 
-: distance-to-next-segment ( player -- distance )
-    [ (distance) ] [ forward>> distance-to-heading-segment ] bi ;
+: distance-to-heading-segment-area ( heading player -- distance )
+    (distance) distance-to-next-segment-area ;
 
 : distance-to-collision ( player -- distance )
     dup nearest-segment>> (distance-to-collision) ;
-
-: move-toward-wall ( d-left player d-to-wall -- d-left' player )
-    over distance-to-next-segment min
-    over forward>> move-player-on-heading ;
 
 : from ( player -- radius distance-from-centre )
     [ nearest-segment>> dup radius>> swap ] [ location>> ] bi
@@ -85,10 +79,28 @@ TUPLE: player < oint name sounds tunnel nearest-segment last-move speed ;
 : fraction-from-wall ( player -- fraction )
     fraction-from-centre 1 swap - ;
 
+: update-nearest-segment2 ( heading player -- )
+    2dup distance-to-heading-segment-area 0 <= [
+        [ tunnel>> ] [ nearest-segment>> rot heading-segment ]
+        [ (>>nearest-segment) ] tri
+    ] [
+        2drop
+    ] if ;
+
+:: move-player-on-heading ( d-left player distance heading -- d-left' player )
+    [let* | d-to-move [ d-left distance min ]
+            move-v [ d-to-move heading n*v ] |
+        move-v player location+
+        heading player update-nearest-segment2
+        d-left d-to-move - player ] ;
+
+: move-toward-wall ( d-left player d-to-wall -- d-left' player )
+    over [ forward>> ] keep distance-to-heading-segment-area min
+    over forward>> move-player-on-heading ;
+
 : ?move-player-freely ( d-left player -- d-left' player )
-    ! 2dup [ 0 > ] [ fraction-from-wall 0 > ] bi* and [
     over 0 > [
-        dup distance-to-collision dup 0 > [
+        dup distance-to-collision dup 0.2 > [ ! bug! should be 0, not 0.2
             move-toward-wall ?move-player-freely
         ] [ drop ] if
     ] when ;
@@ -96,18 +108,15 @@ TUPLE: player < oint name sounds tunnel nearest-segment last-move speed ;
 : drag-heading ( player -- heading )
     [ forward>> ] [ nearest-segment>> forward>> proj ] bi ;
 
-: drag-distance-to-next-segment ( player -- distance )
-    [ (distance) ] [ drag-heading distance-to-heading-segment ] bi ;
-
 : drag-player ( d-left player -- d-left' player )
-    dup [ drag-distance-to-next-segment ]
+    dup [ [ drag-heading ] keep distance-to-heading-segment-area ]
     [ drag-heading move-player-on-heading ] bi ;
 
 : (move-player) ( d-left player -- d-left' player )
     ?move-player-freely over 0 > [
         ! bounce
         drag-player
-        ! (move-player)
+        (move-player)
     ] when ;
 
 : move-player ( player -- )

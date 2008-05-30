@@ -88,7 +88,7 @@ jamshred-gadget H{
     { T{ mouse-scroll } [ handle-mouse-scroll ] }
 } set-gestures
 
-: jamshred-window ( -- )
-    [ <jamshred> <jamshred-gadget> "Jamshred" open-window ] with-ui ;
+: jamshred-window ( -- jamshred )
+    [ <jamshred> dup <jamshred-gadget> "Jamshred" open-window ] with-ui ;
 
 MAIN: jamshred-window

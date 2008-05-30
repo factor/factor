@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Alex Chapman
+! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators float-arrays kernel jamshred.oint locals math math.constants math.matrices math.order math.ranges math.vectors math.quadratic random sequences vectors ;
 USE: tools.walker
@@ -98,12 +98,14 @@ C: <segment> segment
         { +eq+ [ nip ] } ! current segment
     } case ;
 
-:: distance-to-heading-segment ( segments current location heading -- distance )
-    #! the distance on the oint's current heading until it enters the next
-    #! segment's cross-section
-    [let* | next [ segments current heading heading-segment location>> ]
-            cf   [ current forward>> ] |
-        cf next v. cf location v. - cf heading v. / ] ;
+:: distance-to-next-segment ( current next location heading -- distance )
+    [let | cf [ current forward>> ] |
+        cf next location>> v. cf location v. - cf heading v. / ] ;
+
+:: distance-to-next-segment-area ( current next location heading -- distance )
+    [let | cf [ current forward>> ]
+           h [ next current half-way-between-oints ] |
+        cf h v. cf location v. - cf heading v. / ] ;
 
 : vector-to-centre ( seg loc -- v )
     over location>> swap v- swap forward>> proj-perp ;
@@ -116,6 +118,14 @@ C: <segment> segment
 
 : distant ( -- n ) 1000 ;
 
+: max-real ( a b -- c )
+    #! sometimes collision-coefficient yields complex roots, so we ignore these (hack)
+    dup real? [
+        over real? [ max ] [ nip ] if
+    ] [
+        drop dup real? [ drop distant ] unless
+    ] if ;
+
 :: collision-coefficient ( v w r -- c )
     v norm 0 = [
         distant
@@ -123,7 +133,7 @@ C: <segment> segment
         [let* | a [ v dup v. ]
                 b [ v w v. 2 * ]
                 c [ w dup v. r sq - ] |
-            c b a quadratic max ]
+            c b a quadratic max-real ]
     ] if ;
 
 : sideways-heading ( oint segment -- v )
@@ -132,13 +142,12 @@ C: <segment> segment
 : sideways-relative-location ( oint segment -- loc )
     [ [ location>> ] bi@ v- ] keep forward>> proj-perp ;
 
-: collision-vector ( oint segment -- v )
-    [ sideways-heading ] [ sideways-relative-location ]
-    [ radius>> ] 2tri
-    swap [ collision-coefficient ] dip forward>> n*v ;
-
 : (distance-to-collision) ( oint segment -- distance )
-    collision-vector norm ;
+    [ sideways-heading ] [ sideways-relative-location ]
+    [ nip radius>> ] 2tri collision-coefficient ;
+
+: collision-vector ( oint segment -- v )
+    dupd (distance-to-collision) swap forward>> n*v ;
 
 : bounce-forward ( segment oint -- )
     [ wall-normal ] [ forward>> swap reflect ] [ (>>forward) ] tri ;
