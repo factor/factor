@@ -42,6 +42,8 @@ HOOK: <insert-user-assigned-statement> db ( class -- obj )
 HOOK: <update-tuple-statement> db ( class -- obj )
 HOOK: <delete-tuples-statement> db ( tuple class -- obj )
 HOOK: <select-by-slots-statement> db ( tuple class -- tuple )
+TUPLE: advanced-statement group order offset limit ;
+HOOK: <advanced-select-statement> db ( tuple class advanced -- tuple )
 
 HOOK: insert-tuple* db ( tuple statement -- )
 
@@ -75,7 +77,7 @@ M: retryable execute-statement* ( statement type -- )
     ] curry 10 retry drop ;
 
 : resulting-tuple ( row out-params -- tuple )
-    dup first class>> new [
+    dup peek class>> new [
         [
             >r slot-name>> r> set-slot-named
         ] curry 2each
