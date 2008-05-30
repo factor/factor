@@ -9,6 +9,7 @@ IN: lisp
 DEFER: convert-form
 DEFER: funcall
 DEFER: lookup-var
+DEFER: lisp-macro?
 
 ! Functions to convert s-exps to quotations
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -57,17 +58,25 @@ PRIVATE>
 : convert-quoted ( s-exp -- quot )  
     second 1quotation ;
     
+: form-dispatch ( lisp-symbol -- quot )
+    name>>
+    { { "lambda" [ convert-lambda ] }
+      { "quote" [ convert-quoted ] }
+      { "if" [ convert-if ] }
+      { "begin" [ convert-begin ] }
+      { "cond" [ convert-cond ] }
+     [ drop convert-general-form ]
+    } case ;
+    
+: macro-expand ( s-exp -- quot )
+     ;
+    
 : convert-list-form ( s-exp -- quot )  
-    dup first dup lisp-symbol?
-    [ name>>
-      { { "lambda" [ convert-lambda ] }
-        { "quote" [ convert-quoted ] }
-        { "if" [ convert-if ] }
-        { "begin" [ convert-begin ] }
-        { "cond" [ convert-cond ] }
-       [ drop convert-general-form ]
-      } case ]
-    [ drop convert-general-form ] if ;
+    dup first 
+    { { [ dup lisp-macro?  ] [ macro-expand ] }
+      { [ dup lisp-symbol? ] [ form-dispatch ] } 
+     [ drop convert-general-form ]
+    } cond ;
     
 : convert-form ( lisp-form -- quot )
     { { [ dup s-exp? ] [ body>> convert-list-form ] }
