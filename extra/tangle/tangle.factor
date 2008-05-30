@@ -19,11 +19,8 @@ C: <tangle> tangle
 : with-tangle ( tangle quot -- )
     [ [ db>> ] [ seq>> ] bi ] dip with-db ;
 
-: <text-response> ( text -- response )
-    "text/plain" <content> swap >>body ;
-
 : node-response ( id -- response )
-    load-node [ node-content <text-response> ] [ <404> ] if* ;
+    load-node [ node-content <text-content> ] [ <404> ] if* ;
 
 : display-node ( params -- response )
     [
@@ -39,7 +36,7 @@ C: <tangle> tangle
 : submit-node ( params -- response )
     [
         "node_content" swap at* [
-            create-node id>> number>string <text-response>
+            create-node id>> number>string <text-content>
         ] [
             drop <400>
         ] if
@@ -55,10 +52,7 @@ TUPLE: path-responder ;
 C: <path-responder> path-responder
 
 M: path-responder call-responder* ( path responder -- response )
-    drop path>file [ node-content <text-response> ] [ <404> ] if* ;
-
-: <json-response> ( obj -- response )
-    "application/json" <content> swap >json >>body ;
+    drop path>file [ node-content <text-content> ] [ <404> ] if* ;
 
 TUPLE: tangle-dispatcher < dispatcher tangle ;
 
@@ -67,7 +61,7 @@ TUPLE: tangle-dispatcher < dispatcher tangle ;
     <path-responder> >>default
     "resource:extra/tangle/resources" <static> "resources" add-responder
     <node-responder> "node" add-responder
-    <action> [ all-node-ids <json-response> ] >>display "all" add-responder ;
+    <action> [ all-node-ids <json-content> ] >>display "all" add-responder ;
 
 M: tangle-dispatcher call-responder* ( path dispatcher -- response )
     dup tangle>> [

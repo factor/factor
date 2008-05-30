@@ -15,5 +15,5 @@ M: users-in-memory get-user ( username provider -- user/f )
 M: users-in-memory update-user ( user provider -- ) 2drop ;
 
 M: users-in-memory new-user ( user provider -- user/f )
-    >r dup username>> r> assoc>>
-    2dup key? [ 3drop f ] [ pick >r set-at r> ] if ;
+    [ dup username>> ] dip assoc>>
+    2dup key? [ 3drop f ] [ pick [ set-at ] dip ] if ;

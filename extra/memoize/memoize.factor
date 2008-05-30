@@ -44,7 +44,13 @@ IN: memoize
 PREDICATE: memoized < word "memoize" word-prop ;
 
 M: memoized definer drop \ MEMO: \ ; ;
+
 M: memoized definition "memo-quot" word-prop ;
+
+M: memoized reset-word
+    [ { "memoize" "memo-quot" } reset-props ]
+    [ call-next-method ]
+    bi ;
 
 : memoize-quot ( quot effect -- memo-quot )
     gensym swap dupd "declared-effect" set-word-prop

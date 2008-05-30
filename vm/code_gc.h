@@ -17,9 +17,6 @@ typedef struct _F_BLOCK
 
 	/* Used during compaction */
 	struct _F_BLOCK *forwarding;
-
-	/* Alignment padding */
-	CELL padding[4];
 } F_BLOCK;
 
 typedef struct {

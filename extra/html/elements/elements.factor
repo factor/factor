@@ -57,6 +57,8 @@ SYMBOL: html
 : print-html ( str -- )
     write-html "\n" write-html ;
 
+<<
+
 : html-word ( name def effect -- )
     #! Define 'word creating' word to allow
     #! dynamically creating words.
@@ -137,30 +139,46 @@ SYMBOL: html
     dup "=" prepend swap
     [ write-attr ] curry attribute-effect html-word ;
 
+! Define some closed HTML tags
 [
-    ! Define some closed HTML tags
-    [
-        "h1" "h2" "h3" "h4" "h5" "h6" "h7" "h8" "h9"
-        "ol" "li" "form" "a" "p" "html" "head" "body" "title"
-        "b" "i" "ul" "table" "tbody" "tr" "td" "th" "pre" "textarea"
-        "script" "div" "span" "select" "option" "style" "input"
-    ] [ define-closed-html-word ] each
+    "h1" "h2" "h3" "h4" "h5" "h6" "h7" "h8" "h9"
+    "ol" "li" "form" "a" "p" "html" "head" "body" "title"
+    "b" "i" "ul" "table" "tbody" "tr" "td" "th" "pre" "textarea"
+    "script" "div" "span" "select" "option" "style" "input"
+] [ define-closed-html-word ] each
 
-    ! Define some open HTML tags
-    [
-        "input"
-        "br"
-        "link"
-        "img"
-    ] [ define-open-html-word ] each
+! Define some open HTML tags
+[
+    "input"
+    "br"
+    "link"
+    "img"
+] [ define-open-html-word ] each
 
-    ! Define some attributes
-    [
-        "method" "action" "type" "value" "name"
-        "size" "href" "class" "border" "rows" "cols"
-        "id" "onclick" "style" "valign" "accesskey"
-        "src" "language" "colspan" "onchange" "rel"
-        "width" "selected" "onsubmit" "xmlns" "lang" "xml:lang"
-        "media" "title" "multiple"
-    ] [ define-attribute-word ] each
-] with-compilation-unit
+! Define some attributes
+[
+    "method" "action" "type" "value" "name"
+    "size" "href" "class" "border" "rows" "cols"
+    "id" "onclick" "style" "valign" "accesskey"
+    "src" "language" "colspan" "onchange" "rel"
+    "width" "selected" "onsubmit" "xmlns" "lang" "xml:lang"
+    "media" "title" "multiple"
+] [ define-attribute-word ] each
+
+>>
+
+: xhtml-preamble ( -- )
+    "<?xml version=\"1.0\"?>" write-html
+    "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">" write-html ;
+
+: simple-page ( title quot -- )
+    #! Call the quotation, with all output going to the
+    #! body of an html page with the given title.
+    xhtml-preamble
+    <html "http://www.w3.org/1999/xhtml" =xmlns "en" =xml:lang "en" =lang html>
+        <head> <title> swap write </title> </head>
+        <body> call </body>
+    </html> ;
+
+: render-error ( message -- )
+    <span "error" =class span> escape-string write </span> ;

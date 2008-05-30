@@ -1,6 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math kernel memoize tools.test parser ;
+USING: math kernel memoize tools.test parser
+prettyprint io.streams.string sequences ;
 IN: memoize.tests
 
 MEMO: fib ( m -- n )
@@ -9,3 +10,13 @@ MEMO: fib ( m -- n )
 [ 89 ] [ 10 fib ] unit-test
 
 [ "USING: kernel math memoize ; IN: memoize.tests MEMO: x ( a b c d e -- f g h i j ) >r >r >r >r 1+ r> r> r> r> ;" eval ] must-fail
+
+MEMO: see-test ( a -- b ) reverse ;
+
+[ "USING: memoize sequences ;\nIN: memoize.tests\nMEMO: see-test ( a -- b ) reverse ;\n" ]
+[ [ \ see-test see ] with-string-writer ]
+unit-test
+
+[ ] [ "IN: memoize.tests : fib ;" eval ] unit-test
+
+[ "IN: memoize.tests\n: fib ( -- ) ;\n" ] [ [ \ fib see ] with-string-writer ] unit-test

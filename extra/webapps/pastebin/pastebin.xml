@@ -2,29 +2,22 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-	<t:atom t:title="Pastebin - Atom" t:href="$pastebin/feed.xml" />
+	<t:atom t:title="Pastebin - Atom" t:href="$pastebin/list.atom" />
 
-	<t:style t:include="resource:extra/webapps/pastebin/pastebin.css" />
+	<t:title>Pastebin</t:title>
 
-	<div class="navbar">
-		  <t:a t:href="$pastebin/list">Pastes</t:a>
-		| <t:a t:href="$pastebin/new-paste">New Paste</t:a>
-		| <t:a t:href="$pastebin/feed.xml">Atom Feed</t:a>
+	<table width="100%">
+		<th align="left" width="50%">Summary:</th>
+		<th align="left" width="100">Paste by:</th>
+		<th align="left" width="200">Date:</th>
 
-		<t:if t:code="http.server.sessions:uid">
-
-			<t:if t:code="http.server.auth.login:allow-edit-profile?">
-				| <t:a t:href="$login/edit-profile" t:flow="begin">Edit Profile</t:a>
-			</t:if>
-
-			| <t:button t:action="$login/logout" t:flow="begin" class="link-button link">Logout</t:button>
-
-		</t:if>
-
-	</div>
-
-	<h1><t:write-title /></h1>
-
-        <t:call-next-template />
+		<t:each-tuple t:values="pastes">
+			<tr>
+				<td><t:a t:href="$pastebin/paste" t:query="id"><t:label t:name="summary" /></t:a></td>
+				<td><t:label t:name="author" /></td>
+				<td><t:label t:name="date" /></td>
+			</tr>
+		</t:each-tuple>
+	</table>
 
 </t:chloe>

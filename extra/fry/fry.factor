@@ -46,15 +46,22 @@ DEFER: (shallow-fry)
         shallow-fry
     ] if* ;
 
+: fry-specifier? ( obj -- ? ) { , namespaces:, @ } member? ;
+
+: count-inputs ( quot -- n )
+    [
+        {
+            { [ dup callable? ] [ count-inputs ] }
+            { [ dup fry-specifier? ] [ drop 1 ] }
+            [ drop 0 ]
+        } cond
+    ] map sum ;
+
 : fry ( quot -- quot' )
     [
         [
             dup callable? [
-                [
-                    [ { , namespaces:, @ } member? ] filter length
-                    \ , <repetition> %
-                ]
-                [ fry % ] bi
+                [ count-inputs \ , <repetition> % ] [ fry % ] bi
             ] [ namespaces:, ] if
         ] each
     ] [ ] make deep-fry ;

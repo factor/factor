@@ -236,7 +236,7 @@ PREDICATE: unexpected-eof < unexpected
 ERROR: no-current-vocab ;
 
 M: no-current-vocab summary ( obj -- )
-    drop "Current vocabulary is f, use IN:" ;
+    drop "Not in a vocabulary; IN: form required" ;
 
 : current-vocab ( -- str )
     in get [ no-current-vocab ] unless* ;
@@ -357,10 +357,9 @@ M: staging-violation summary
     "A parsing word cannot be used in the same file it is defined in." ;
 
 : execute-parsing ( word -- )
-    new-definitions get [
-        dupd first key? [ staging-violation ] when
-    ] when*
-    execute ;
+    [ changed-definitions get key? [ staging-violation ] when ]
+    [ execute ]
+    bi ;
 
 : parse-step ( accum end -- accum ? )
     scan-word {

@@ -15,3 +15,9 @@ IN: sets.tests
 
 [ V{ } ] [ { } { } union ] unit-test
 [ V{ 1 2 3 4 } ] [ { 1 2 3 } { 2 3 4 } union ] unit-test
+
+[ V{ 1 2 3 } ]
+[ 3 V{ 1 2 } clone [ adjoin ] keep ] unit-test
+
+[ V{ 1 2 3 } ]
+[ 3 V{ 1 3 2 } clone [ adjoin ] keep ] unit-test

@@ -20,7 +20,7 @@ IN: unicode.collation.tests
     [ execute ] 2with each ;
 
 [ f f f f ] [ "hello" "hi" test-equality ] unit-test
-[ t f f f ] [ "hello" "héllo" test-equality ] unit-test
+[ t f f f ] [ "hello" "h\u0000e9llo" test-equality ] unit-test
 [ t t f f ] [ "hello" "HELLO" test-equality ] unit-test
 [ t t t f ] [ "hello" "h e l l o." test-equality ] unit-test
 [ t t t t ] [ "hello" "\0hello\0" test-equality ] unit-test
