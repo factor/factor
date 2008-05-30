@@ -152,14 +152,14 @@ DEFINE_PRIMITIVE(read_dir)
 			CELL name = tag_object(from_u16_string(find_data.cFileName));
 			CELL dirp = tag_boolean(find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
 			CELL pair = allot_array_2(name,dirp);
-			GROWABLE_ADD(result,pair);
+			GROWABLE_ARRAY_ADD(result,pair);
 		}
 		while (FindNextFile(dir, &find_data));
 		FindClose(dir);
 	}
 
 	UNREGISTER_ROOT(result);
-	GROWABLE_TRIM(result);
+	GROWABLE_ARRAY_TRIM(result);
 
 	dpush(result);
 }
