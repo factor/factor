@@ -1,4 +1,4 @@
-USING: html kernel semantic-db tangle.html tools.test ;
+USING: kernel semantic-db tangle.html tools.test ;
 IN: tangle.html.tests
 
 [ "test" ] [ "test" >html ] unit-test

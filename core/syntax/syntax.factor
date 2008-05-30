@@ -100,7 +100,7 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "DEFER:" [
-        scan in get create
+        scan current-vocab create
         dup old-definitions get [ delete-at ] with each
         set-word
     ] define-syntax

@@ -109,9 +109,7 @@ CELL frame_executing(F_STACK_FRAME *frame)
 {
 	F_COMPILED *compiled = frame_code(frame);
 	CELL code_start = (CELL)(compiled + 1);
-	CELL literal_start = code_start
-		+ compiled->code_length
-		+ compiled->reloc_length;
+	CELL literal_start = code_start + compiled->code_length;
 
 	return get(literal_start);
 }

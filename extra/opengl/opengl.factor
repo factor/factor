@@ -203,9 +203,7 @@ TUPLE: sprite loc dim dim2 dlist texture ;
     dup sprite-loc gl-translate
     GL_TEXTURE_2D over sprite-texture glBindTexture
     init-texture
-    GL_QUADS [ dup sprite-dim2 four-sides ] do-state
-    dup sprite-dim { 1 0 } v*
-    swap sprite-loc v- gl-translate
+    GL_QUADS [ sprite-dim2 four-sides ] do-state
     GL_TEXTURE_2D 0 glBindTexture ;
 
 : rect-vertices ( lower-left upper-right -- )

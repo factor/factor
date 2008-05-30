@@ -4,7 +4,7 @@ USING: calendar io io.files kernel math math.order
 math.parser http http.server namespaces parser sequences strings
 assocs hashtables debugger http.mime sorting html.elements
 html.templates.fhtml logging calendar.format accessors
-io.encodings.binary fry xml.entities ;
+io.encodings.binary fry xml.entities destructors ;
 IN: http.server.static
 
 ! special maps mime types to quots with effect ( path -- )
@@ -29,16 +29,14 @@ TUPLE: file-responder root hook special allow-listings ;
         swap >>root
         H{ } clone >>special ;
 
+: (serve-static) ( path mime-type -- response )
+    [ [ binary <file-reader> &dispose ] dip <content> ]
+    [ drop file-info [ size>> ] [ modified>> ] bi ] 2bi
+    [ "content-length" set-header ]
+    [ "last-modified" set-header ] bi* ;
+
 : <static> ( root -- responder )
-    [
-        <content>
-        swap [
-            file-info
-            [ size>> "content-length" set-header ]
-            [ modified>> "last-modified" set-header ] bi
-        ]
-        [ '[ , binary <file-reader> output-stream get stream-copy ] >>body ] bi
-    ] <file-responder> ;
+    [ (serve-static) ] <file-responder> ;
 
 : serve-static ( filename mime-type -- response )
     over modified-since?

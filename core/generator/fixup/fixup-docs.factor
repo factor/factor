@@ -1,13 +1,9 @@
 USING: help.syntax help.markup generator.fixup math kernel
-words strings alien ;
+words strings alien byte-array ;
 
 HELP: frame-required
 { $values { "n" "a non-negative integer" } }
 { $description "Notify the code generator that the currently compiling code block needs a stack frame with room for at least " { $snippet "n" } " parameters." } ;
-
-HELP: (rel-fixup)
-{ $values { "arg" integer } { "class" "a relocation class" } { "type" "a relocation type" } { "offset" integer } { "pair" "a pair of integers" } }
-{ $description "Creates a relocation instruction for the VM's runtime compiled code linker." } ;
 
 HELP: add-literal
 { $values { "obj" object } { "n" integer } }

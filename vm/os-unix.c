@@ -73,14 +73,14 @@ DEFINE_PRIMITIVE(read_dir)
 		while((file = readdir(dir)) != NULL)
 		{
 			CELL pair = parse_dir_entry(file);
-			GROWABLE_ADD(result,pair);
+			GROWABLE_ARRAY_ADD(result,pair);
 		}
 
 		closedir(dir);
 	}
 
 	UNREGISTER_ROOT(result);
-	GROWABLE_TRIM(result);
+	GROWABLE_ARRAY_TRIM(result);
 
 	dpush(result);
 }
@@ -104,12 +104,12 @@ DEFINE_PRIMITIVE(os_envs)
 	while(*env)
 	{
 		CELL string = tag_object(from_char_string(*env));
-		GROWABLE_ADD(result,string);
+		GROWABLE_ARRAY_ADD(result,string);
 		env++;
 	}
 
 	UNREGISTER_ROOT(result);
-	GROWABLE_TRIM(result);
+	GROWABLE_ARRAY_TRIM(result);
 	dpush(result);
 }
 

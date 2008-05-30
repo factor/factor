@@ -28,7 +28,7 @@ HELP: adjoin
 { $description "Removes all elements equal to " { $snippet "elt" } ", and adds " { $snippet "elt" } " at the end of the sequence." }
 { $examples
     { $example
-        "USING: namespaces prettyprint sequences ;"
+        "USING: namespaces prettyprint sets ;"
         "V{ \"beans\" \"salsa\" \"cheese\" } \"v\" set"
         "\"nachos\" \"v\" get adjoin"
         "\"salsa\" \"v\" get adjoin"

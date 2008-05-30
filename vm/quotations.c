@@ -60,14 +60,9 @@ F_REL rel_to_emit(CELL name, CELL code_format, CELL code_length,
 
 #define EMIT(name,rel_argument) { \
 		bool rel_p; \
-		F_REL rel = rel_to_emit(name,code_format,code_count, \
-			rel_argument,&rel_p); \
-		if(rel_p) \
-		{ \
-			GROWABLE_ADD(relocation,allot_cell(rel.type)); \
-			GROWABLE_ADD(relocation,allot_cell(rel.offset)); \
-		} \
-		GROWABLE_APPEND(code,code_to_emit(name)); \
+		F_REL rel = rel_to_emit(name,code_format,code_count,rel_argument,&rel_p); \
+		if(rel_p) GROWABLE_BYTE_ARRAY_APPEND(relocation,&rel,sizeof(F_REL)); \
+		GROWABLE_ARRAY_APPEND(code,code_to_emit(name)); \
 	}
 
 bool jit_stack_frame_p(F_ARRAY *array)
@@ -110,13 +105,13 @@ void jit_compile(CELL quot, bool relocate)
 	GROWABLE_ARRAY(code);
 	REGISTER_ROOT(code);
 
-	GROWABLE_ARRAY(relocation);
+	GROWABLE_BYTE_ARRAY(relocation);
 	REGISTER_ROOT(relocation);
 
 	GROWABLE_ARRAY(literals);
 	REGISTER_ROOT(literals);
 
-	GROWABLE_ADD(literals,stack_traces_p() ? quot : F);
+	GROWABLE_ARRAY_ADD(literals,stack_traces_p() ? quot : F);
 
 	bool stack_frame = jit_stack_frame_p(untag_object(array));
 
@@ -141,7 +136,7 @@ void jit_compile(CELL quot, bool relocate)
 			current stack frame. */
 			word = untag_object(obj);
 
-			GROWABLE_ADD(literals,array_nth(untag_object(array),i));
+			GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
 
 			if(i == length - 1)
 			{
@@ -157,7 +152,7 @@ void jit_compile(CELL quot, bool relocate)
 			break;
 		case WRAPPER_TYPE:
 			wrapper = untag_object(obj);
-			GROWABLE_ADD(literals,wrapper->object);
+			GROWABLE_ARRAY_ADD(literals,wrapper->object);
 			EMIT(JIT_PUSH_LITERAL,literals_count - 1);
 			break;
 		case FIXNUM_TYPE:
@@ -176,8 +171,8 @@ void jit_compile(CELL quot, bool relocate)
 				if(stack_frame)
 					EMIT(JIT_EPILOG,0);
 
-				GROWABLE_ADD(literals,array_nth(untag_object(array),i));
-				GROWABLE_ADD(literals,array_nth(untag_object(array),i + 1));
+				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
+				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i + 1));
 				EMIT(JIT_IF_JUMP,literals_count - 2);
 
 				i += 2;
@@ -191,7 +186,7 @@ void jit_compile(CELL quot, bool relocate)
 				if(stack_frame)
 					EMIT(JIT_EPILOG,0);
 
-				GROWABLE_ADD(literals,array_nth(untag_object(array),i));
+				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
 				EMIT(JIT_DISPATCH,literals_count - 1);
 
 				i++;
@@ -200,7 +195,7 @@ void jit_compile(CELL quot, bool relocate)
 				break;
 			}
 		default:
-			GROWABLE_ADD(literals,obj);
+			GROWABLE_ARRAY_ADD(literals,obj);
 			EMIT(JIT_PUSH_LITERAL,literals_count - 1);
 			break;
 		}
@@ -214,15 +209,15 @@ void jit_compile(CELL quot, bool relocate)
 		EMIT(JIT_RETURN,0);
 	}
 
-	GROWABLE_TRIM(code);
-	GROWABLE_TRIM(relocation);
-	GROWABLE_TRIM(literals);
+	GROWABLE_ARRAY_TRIM(code);
+	GROWABLE_ARRAY_TRIM(literals);
+	GROWABLE_BYTE_ARRAY_TRIM(relocation);
 
 	F_COMPILED *compiled = add_compiled_block(
 		QUOTATION_TYPE,
 		untag_object(code),
 		NULL,
-		untag_object(relocation),
+		relocation,
 		untag_object(literals));
 
 	set_quot_xt(untag_object(quot),compiled);

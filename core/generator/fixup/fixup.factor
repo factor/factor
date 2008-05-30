@@ -1,9 +1,10 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays generic assocs hashtables
+USING: arrays byte-arrays generic assocs hashtables io.binary
 kernel kernel.private math namespaces sequences words
-quotations strings alien.strings layouts system combinators
-math.bitfields words.private cpu.architecture math.order ;
+quotations strings alien.accessors alien.strings layouts system
+combinators math.bitfields words.private cpu.architecture
+math.order accessors growable ;
 IN: generator.fixup
 
 : no-stack-frame -1 ; inline
@@ -77,26 +78,23 @@ TUPLE: label-fixup label class ;
 : label-fixup ( label class -- ) \ label-fixup boa , ;
 
 M: label-fixup fixup*
-    dup label-fixup-class rc-absolute?
+    dup class>> rc-absolute?
     [ "Absolute labels not supported" throw ] when
-    dup label-fixup-label swap label-fixup-class
-    compiled-offset 4 - rot 3array label-table get push ;
+    dup label>> swap class>> compiled-offset 4 - rot
+    3array label-table get push ;
 
 TUPLE: rel-fixup arg class type ;
 
 : rel-fixup ( arg class type -- ) \ rel-fixup boa , ;
 
-: (rel-fixup) ( arg class type offset -- pair )
-    pick rc-absolute-cell = cell 4 ? -
-    >r { 0 8 16 } bitfield r>
-    2array ;
+: push-4 ( value vector -- )
+    [ length ] [ B{ 0 0 0 0 } swap push-all ] [ underlying ] tri
+    swap set-alien-unsigned-4 ;
 
 M: rel-fixup fixup*
-    dup rel-fixup-arg
-    over rel-fixup-class
-    rot rel-fixup-type
-    compiled-offset (rel-fixup)
-    relocation-table get push-all ;
+    [ [ arg>> ] [ class>> ] [ type>> ] tri { 0 8 16 } bitfield ]
+    [ class>> rc-absolute-cell = cell 4 ? compiled-offset swap - ] bi
+    [ relocation-table get push-4 ] bi@ ;
 
 M: frame-required fixup* drop ;
 
@@ -134,7 +132,7 @@ SYMBOL: literal-table
     0 swap rt-here rel-fixup ;
 
 : init-fixup ( -- )
-    V{ } clone relocation-table set
+    BV{ } clone relocation-table set
     V{ } clone label-table set ;
 
 : resolve-labels ( labels -- labels' )
@@ -150,6 +148,6 @@ SYMBOL: literal-table
         dup stack-frame-size swap [ fixup* ] each drop
 
         literal-table get >array
-        relocation-table get >array
+        relocation-table get >byte-array
         label-table get resolve-labels
     ] { } make ;
