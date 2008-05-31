@@ -43,7 +43,7 @@ HOOK: <update-tuple-statement> db ( class -- obj )
 HOOK: <delete-tuples-statement> db ( tuple class -- obj )
 HOOK: <select-by-slots-statement> db ( tuple class -- tuple )
 TUPLE: advanced-statement group order offset limit ;
-HOOK: <advanced-select-statement> db ( tuple class advanced -- tuple )
+HOOK: <advanced-select-statement> db ( tuple class group order offset limit -- tuple )
 
 HOOK: insert-tuple* db ( tuple statement -- )
 
@@ -143,9 +143,12 @@ M: retryable execute-statement* ( statement type -- )
         [ bind-tuple ] keep execute-statement
     ] with-disposal ;
 
-: select-tuples ( tuple -- tuples )
-    dup dup class <select-by-slots-statement> [
-        [ bind-tuple ] [  query-tuples ] 2bi
-    ] with-disposal ;
+: do-select ( exemplar-tuple statement -- tuples )
+    [ [ bind-tuple ] [ query-tuples ] 2bi ] with-disposal ;
 
-: select-tuple ( tuple -- tuple/f ) select-tuples ?first ;
+: select-tuples ( tuple -- tuples )
+    dup dup class <select-by-slots-statement> do-select ;
+
+: select-tuple ( tuple -- tuple/f )
+    dup dup class f f f 1 <advanced-select-statement>
+    do-select ?first ;

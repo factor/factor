@@ -147,7 +147,8 @@ M: db <select-by-slots-statement> ( tuple class -- statement )
         number>string " limit " prepend append
     ] curry change-sql drop ;
 
-: make-advanced-statement ( tuple advanced -- )
+: make-advanced-statement ( tuple advanced -- tuple' )
+    dupd
     {
         [ group>> [ do-group ] [ drop ] if* ]
         [ order>> [ do-order ] [ drop ] if* ]
@@ -155,6 +156,6 @@ M: db <select-by-slots-statement> ( tuple class -- statement )
         [ offset>> [ do-offset ] [ drop ] if* ]
     } 2cleave ;
 
-M: db <advanced-select-statement> ( tuple class advanced -- tuple )
-    >r <select-by-slots-statement> r>
-    dupd make-advanced-statement ;
+M: db <advanced-select-statement> ( tuple class group order limit offset -- tuple )
+    advanced-statement boa
+    [ <select-by-slots-statement> ] dip make-advanced-statement ;
