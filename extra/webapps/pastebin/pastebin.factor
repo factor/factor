@@ -15,17 +15,21 @@ IN: webapps.pastebin
 ! DOMAIN MODEL
 ! ! !
 
-TUPLE: paste id summary author mode date contents annotations ;
+TUPLE: entity id summary author mode date contents ;
 
-\ paste "PASTE"
+entity f
 {
     { "id" "ID" INTEGER +db-assigned-id+ }
     { "summary" "SUMMARY" { VARCHAR 256 } +not-null+ }
     { "author" "AUTHOR" { VARCHAR 256 } +not-null+ }
     { "mode" "MODE" { VARCHAR 256 } +not-null+ }
-    { "date" "DATE" DATETIME +not-null+ , }
+    { "date" "DATE" DATETIME +not-null+ }
     { "contents" "CONTENTS" TEXT +not-null+ }
 } define-persistent
+
+TUPLE: paste < entity annotations ;
+
+\ paste "PASTES" { } define-persistent
 
 : <paste> ( id -- paste )
     \ paste new
@@ -34,23 +38,17 @@ TUPLE: paste id summary author mode date contents annotations ;
 : pastes ( -- pastes )
     f <paste> select-tuples ;
 
-TUPLE: annotation aid id summary author mode contents date ;
+TUPLE: annotation < entity parent ;
 
-annotation "ANNOTATION"
+annotation "ANNOTATIONS"
 {
-    { "aid" "AID" INTEGER +db-assigned-id+ }
-    { "id" "ID" INTEGER +not-null+ }
-    { "summary" "SUMMARY" { VARCHAR 256 } +not-null+ }
-    { "author" "AUTHOR" { VARCHAR 256 } +not-null+ }
-    { "mode" "MODE" { VARCHAR 256 } +not-null+ }
-    { "date" "DATE" DATETIME +not-null+ }
-    { "contents" "CONTENTS" TEXT +not-null+ }
+    { "parent" "PARENT" INTEGER +not-null+ }
 } define-persistent
 
-: <annotation> ( id aid -- annotation )
+: <annotation> ( parent id -- annotation )
     annotation new
-        swap >>aid
-        swap >>id ;
+        swap >>id
+        swap >>parent ;
 
 : fetch-annotations ( paste -- paste )
     dup annotations>> [
@@ -76,8 +74,8 @@ M: paste entity-link
     id>> "id" associate "$pastebin/paste" swap link>string ;
 
 M: annotation entity-link
-    [ id>> "id" associate "$pastebin/paste" swap link>string ]
-    [ aid>> number>string "#" prepend ] bi
+    [ parent>> "parent" associate "$pastebin/paste" swap link>string ]
+    [ id>> number>string "#" prepend ] bi
     append ;
 
 : pastebin-template ( name -- template )
@@ -147,7 +145,7 @@ M: annotation entity-link
         [ validate-integer-id ] >>init
         [ "id" value paste annotations>> paste-feed ] >>feed ;
 
-: validate-paste ( -- )
+: validate-entity ( -- )
     {
         { "summary" [ v-one-line ] }
         { "author" [ v-one-line ] }
@@ -156,7 +154,7 @@ M: annotation entity-link
         { "captcha" [ v-captcha ] }
     } validate-params ;
 
-: deposit-paste-slots ( tuple -- )
+: deposit-entity-slots ( tuple -- )
     now >>date
     { "summary" "author" "mode" "contents" } deposit-slots ;
 
@@ -170,10 +168,10 @@ M: annotation entity-link
         "new-paste" pastebin-template >>template
 
         [
-            validate-paste
+            validate-entity
 
             f <paste>
-            [ deposit-paste-slots ]
+            [ deposit-entity-slots ]
             [ insert-tuple ]
             [ id>> "$pastebin/paste" <id-redirect> ]
             tri
@@ -195,31 +193,35 @@ M: annotation entity-link
 
 : <new-annotation-action> ( -- action )
     <page-action>
-        [ validate-paste ] >>validate
-
-        [ "id" param "$pastebin/paste" <id-redirect> ] >>display
+        [
+            { { "id" [ v-integer ] } } validate-params
+            "id" value "$pastebin/paste" <id-redirect>
+        ] >>display
 
         [
-            f f <annotation>
-            {
-                [ deposit-paste-slots ]
-                [ { "id" } deposit-slots ]
-                [ insert-tuple ]
-                [
-                    ! Add anchor here
-                    id>> "$pastebin/paste" <id-redirect>
-                ]
-            } cleave
+            { { "id" [ v-integer ] } } validate-params
+            validate-entity
+        ] >>validate
+
+        [
+            "id" value f <annotation>
+            [ deposit-entity-slots ]
+            [ insert-tuple ]
+            [
+                ! Add anchor here
+                parent>> "$pastebin/paste" <id-redirect>
+            ]
+            tri
         ] >>submit ;
 
 : <delete-annotation-action> ( -- action )
     <action>
-        [ { { "aid" [ v-number ] } } validate-params ] >>validate
+        [ { { "id" [ v-number ] } } validate-params ] >>validate
 
         [
-            f "aid" value <annotation> select-tuple
+            f "id" value <annotation> select-tuple
             [ delete-tuples ]
-            [ id>> "$pastebin/paste" <id-redirect> ]
+            [ parent>> "$pastebin/paste" <id-redirect> ]
             bi
         ] >>submit ;
 
