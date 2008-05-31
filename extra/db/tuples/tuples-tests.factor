@@ -436,8 +436,13 @@ subbclass "SUBCLASS" {
     { "b" "B" TEXT }
 } define-persistent
 
+TUPLE: fubbclass < subbclass ;
+
+fubbclass "FUBCLASS" { } define-persistent
+
 : test-db-inheritance ( -- )
     [ ] [ subbclass ensure-table ] unit-test
+    [ ] [ fubbclass ensure-table ] unit-test
     
     [ ] [
         subbclass new 5 >>a "hi" >>b dup insert-tuple id>> "id" set
@@ -446,7 +451,11 @@ subbclass "SUBCLASS" {
     [ t "hi" 5 ] [
         subbclass new "id" get >>id select-tuple
         [ subbclass? ] [ b>> ] [ a>> ] tri
-    ] unit-test ;
+    ] unit-test
+    
+    [ ] [ fubbclass new 0 >>a "hi" >>b insert-tuple ] unit-test
+    
+    [ t ] [ fubbclass new select-tuples [ fubbclass? ] all? ] unit-test ;
 
 [ test-db-inheritance ] test-sqlite
 
