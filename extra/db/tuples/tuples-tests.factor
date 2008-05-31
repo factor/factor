@@ -3,7 +3,8 @@
 USING: io.files kernel tools.test db db.tuples classes
 db.types continuations namespaces math math.ranges
 prettyprint calendar sequences db.sqlite math.intervals
-db.postgresql accessors random math.bitfields.lib ;
+db.postgresql accessors random math.bitfields.lib
+math.ranges strings sequences.lib ;
 IN: db.tuples.tests
 
 TUPLE: person the-id the-name the-number the-real
@@ -224,6 +225,12 @@ TUPLE: serialize-me id data ;
     ] [ T{ serialize-me f 1 } select-tuples ] unit-test ;
 
 TUPLE: exam id name score ; 
+
+: random-exam ( -- exam )
+        f
+        6 [ CHAR: a CHAR: b [a,b] random ] replicate >string
+        100 random
+    exam boa ;
 
 : test-intervals ( -- )
     exam "EXAM"
