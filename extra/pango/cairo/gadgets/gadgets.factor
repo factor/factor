@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Matthew Willis.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: cairo.pango cairo cairo.ffi cairo.gadgets
+USING: pango.cairo cairo cairo.ffi cairo.gadgets
 alien.c-types kernel math ;
-IN: cairo.pango.gadgets
+IN: pango.cairo.gadgets
 
 : (pango-gadget) ( setup show -- gadget )
     [ drop layout-size ]
@@ -23,7 +23,7 @@ threads io.backend io.encodings.utf8 io.files ;
         <pango-gadget> gadget. yield
     ] each
     [ 
-        "resource:extra/cairo/pango/gadgets/gadgets.factor"
+        "resource:extra/pango/cairo/gadgets/gadgets.factor"
         normalize-path utf8 file-contents layout-text
     ] <pango-gadget> gadget. ;
 

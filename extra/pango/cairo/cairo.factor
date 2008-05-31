@@ -5,7 +5,7 @@
 USING: cairo.ffi alien.c-types math
 alien.syntax system combinators alien
 arrays pango pango.fonts ;
-IN: cairo.pango
+IN: pango.cairo
 
 << "pangocairo" {
 !    { [ os winnt? ] [ "libpangocairo-1.dll" ] }
