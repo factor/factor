@@ -175,7 +175,7 @@ M: postgresql-db create-sql-statement ( class -- seq )
 
 : drop-table-sql ( table -- statement )
     [
-        "drop table " 0% 0% ";" 0% drop
+        "drop table " 0% 0% drop
     ] query-make ;
 
 M: postgresql-db drop-sql-statement ( class -- seq )

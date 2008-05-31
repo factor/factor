@@ -38,15 +38,15 @@ M: TLSv1  ssl-method drop TLSv1_method ;
     OpenSSL_add_all_digests
     OpenSSL_add_all_ciphers ;
 
-SYMBOL: ssl-initiazed?
+SYMBOL: ssl-initialized?
 
 : maybe-init-ssl ( -- )
-    ssl-initiazed? get-global [
+    ssl-initialized? get-global [
         init-ssl
-        t ssl-initiazed? set-global
+        t ssl-initialized? set-global
     ] unless ;
 
-[ f ssl-initiazed? set-global ] "openssl" add-init-hook
+[ f ssl-initialized? set-global ] "openssl" add-init-hook
 
 TUPLE: openssl-context < secure-context aliens ;
 

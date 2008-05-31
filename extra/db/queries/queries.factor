@@ -1,9 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math namespaces sequences random
-strings
-math.bitfields.lib namespaces.lib db db.tuples db.types
-math.intervals ;
+strings math.parser math.intervals combinators
+math.bitfields.lib namespaces.lib db db.tuples db.types ;
 IN: db.queries
 
 GENERIC: where ( specs obj -- )
@@ -15,7 +14,7 @@ GENERIC: where ( specs obj -- )
 
 : query-make ( class quot -- )
     >r sql-props r>
-    [ 0 sql-counter rot with-variable ";" 0% ] { "" { } { } } nmake
+    [ 0 sql-counter rot with-variable ] { "" { } { } } nmake
     <simple-statement> maybe-make-retryable ; inline
 
 M: db begin-transaction ( -- ) "BEGIN" sql-command ;
@@ -127,3 +126,36 @@ M: db <select-by-slots-statement> ( tuple class -- statement )
         " from " 0% 0%
         where-clause
     ] query-make ;
+
+: do-group ( tuple groups -- )
+    [
+        ", " join " group by " prepend append
+    ] curry change-sql drop ;
+
+: do-order ( tuple order -- )
+    [
+        ", " join " order by " prepend append
+    ] curry change-sql drop ;
+
+: do-offset ( tuple n -- )
+    [
+        number>string " offset " prepend append
+    ] curry change-sql drop ;
+
+: do-limit ( tuple n -- )
+    [
+        number>string " limit " prepend append
+    ] curry change-sql drop ;
+
+: make-advanced-statement ( tuple advanced -- tuple' )
+    dupd
+    {
+        [ group>> [ do-group ] [ drop ] if* ]
+        [ order>> [ do-order ] [ drop ] if* ]
+        [ limit>> [ do-limit ] [ drop ] if* ]
+        [ offset>> [ do-offset ] [ drop ] if* ]
+    } 2cleave ;
+
+M: db <advanced-select-statement> ( tuple class group order limit offset -- tuple )
+    advanced-statement boa
+    [ <select-by-slots-statement> ] dip make-advanced-statement ;

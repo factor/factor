@@ -3,7 +3,8 @@
 USING: io.files kernel tools.test db db.tuples classes
 db.types continuations namespaces math math.ranges
 prettyprint calendar sequences db.sqlite math.intervals
-db.postgresql accessors random math.bitfields.lib ;
+db.postgresql accessors random math.bitfields.lib
+math.ranges strings sequences.lib ;
 IN: db.tuples.tests
 
 TUPLE: person the-id the-name the-number the-real
@@ -198,9 +199,10 @@ TUPLE: annotation n paste-id summary author mode contents ;
 : test-sqlite ( quot -- )
     >r "tuples-test.db" temp-file sqlite-db r> with-db ;
 
-: test-postgresql ( -- )
->r { "localhost" "postgres" "foob" "factor-test" } postgresql-db r> with-db ;
+! : test-postgresql ( quot -- )
+!     >r { "localhost" "postgres" "foob" "factor-test" } postgresql-db r> with-db ;
 
+: test-postgresql drop ;
 : test-repeated-insert
     [ ] [ person ensure-table ] unit-test
     [ ] [ person1 get insert-tuple ] unit-test
@@ -223,6 +225,12 @@ TUPLE: serialize-me id data ;
     ] [ T{ serialize-me f 1 } select-tuples ] unit-test ;
 
 TUPLE: exam id name score ; 
+
+: random-exam ( -- exam )
+        f
+        6 [ CHAR: a CHAR: b [a,b] random ] replicate >string
+        100 random
+    exam boa ;
 
 : test-intervals ( -- )
     exam "EXAM"
@@ -415,7 +423,7 @@ TUPLE: does-not-persist ;
 ] test-postgresql
 
 
-TUPLE: suparclass a ;
+TUPLE: suparclass id a ;
 
 suparclass f {
     { "id" "ID" +db-assigned-id+ }
@@ -428,8 +436,26 @@ subbclass "SUBCLASS" {
     { "b" "B" TEXT }
 } define-persistent
 
+TUPLE: fubbclass < subbclass ;
+
+fubbclass "FUBCLASS" { } define-persistent
+
 : test-db-inheritance ( -- )
-    [ ] [ subbclass ensure-table ] unit-test ;
+    [ ] [ subbclass ensure-table ] unit-test
+    [ ] [ fubbclass ensure-table ] unit-test
+    
+    [ ] [
+        subbclass new 5 >>a "hi" >>b dup insert-tuple id>> "id" set
+    ] unit-test
+    
+    [ t "hi" 5 ] [
+        subbclass new "id" get >>id select-tuple
+        [ subbclass? ] [ b>> ] [ a>> ] tri
+    ] unit-test
+    
+    [ ] [ fubbclass new 0 >>a "hi" >>b insert-tuple ] unit-test
+    
+    [ t ] [ fubbclass new select-tuples [ fubbclass? ] all? ] unit-test ;
 
 [ test-db-inheritance ] test-sqlite
 
