@@ -48,7 +48,12 @@ pango_layout_get_pixel_size ( PangoLayout* layout, int* width, int* height ) ;
 FUNCTION: void
 pango_font_description_free ( PangoFontDescription* desc ) ;
 
+! glib functions
+
 TYPEDEF: void* gpointer
 
 FUNCTION: void
 g_object_unref ( gpointer object ) ;
+
+FUNCTION: void
+g_free ( gpointer mem ) ;
