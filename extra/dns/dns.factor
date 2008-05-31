@@ -476,3 +476,16 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
 
 : message-query ( message -- query ) question-section>> 1st ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+ERROR: name-error name ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: fully-qualified ( name -- name )
+    {
+      { [ dup empty?         ] [ "." append ] }
+      { [ dup peek CHAR: . = ] [            ] }
+      { [ t                  ] [ "." append ] }
+    }
+  cond ;
