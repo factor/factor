@@ -479,3 +479,13 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ERROR: name-error name ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: fully-qualified ( name -- name )
+    {
+      { [ dup empty?         ] [ "." append ] }
+      { [ dup peek CHAR: . = ] [            ] }
+      { [ t                  ] [ "." append ] }
+    }
+  cond ;

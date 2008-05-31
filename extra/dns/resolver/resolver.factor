@@ -78,16 +78,6 @@ IN: dns.resolver
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: fully-qualified ( name -- name )
-    {
-      { [ dup empty?         ] [ "." append ] }
-      { [ dup peek CHAR: . = ] [            ] }
-      { [ t                  ] [ "." append ] }
-    }
-  cond ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 : name->ip ( name -- ip )
   fully-qualified
   dup name->ip/cache dup
