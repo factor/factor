@@ -76,16 +76,16 @@ M: retryable execute-statement* ( statement type -- )
         [ regenerate-params bind-statement* f ] cleanup
     ] curry 10 retry drop ;
 
-: resulting-tuple ( row out-params -- tuple )
-    dup peek class>> new [
+: resulting-tuple ( class row out-params -- tuple )
+    rot class new [
         [
             >r slot-name>> r> set-slot-named
         ] curry 2each
     ] keep ;
 
-: query-tuples ( statement -- seq )
+: query-tuples ( exemplar-tuple statement -- seq )
     [ out-params>> ] keep query-results [
-        [ sql-row-typed swap resulting-tuple ] with query-map
+        [ sql-row-typed swap resulting-tuple ] with with query-map
     ] with-disposal ;
  
 : query-modify-tuple ( tuple statement -- )
@@ -145,7 +145,7 @@ M: retryable execute-statement* ( statement type -- )
 
 : select-tuples ( tuple -- tuples )
     dup dup class <select-by-slots-statement> [
-        [ bind-tuple ] keep query-tuples
+        [ bind-tuple ] [  query-tuples ] 2bi
     ] with-disposal ;
 
 : select-tuple ( tuple -- tuple/f ) select-tuples ?first ;

@@ -16,7 +16,7 @@ M: sqlite-db make-db* ( path db -- db )
     swap >>path ;
 
 M: sqlite-db db-open ( db -- db )
-    [ path>> sqlite-open ] [ swap >>handle ] bi ;
+    dup path>> sqlite-open >>handle ;
 
 M: sqlite-db db-close ( handle -- ) sqlite-close ;
 M: sqlite-db dispose ( db -- ) dispose-db ;
@@ -197,4 +197,3 @@ M: sqlite-db compound ( str seq -- str' )
         { "default" [ first number>string join-space ] }
         [ 2drop ] 
     } case ;
-

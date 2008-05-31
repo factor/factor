@@ -159,12 +159,11 @@ ERROR: sqlite-sql-error < sql-error n string ;
     dup sqlite-#columns [ sqlite-column ] with map ;
 
 : sqlite-step-has-more-rows? ( prepared -- bool )
-    dup SQLITE_ROW =  [
-        drop t
-    ] [
-        dup SQLITE_DONE =
-        [ drop ] [ sqlite-check-result ] if f
-    ] if ;
+    {
+        { SQLITE_ROW [ t ] }
+        { SQLITE_DONE [ f ] }
+        [ sqlite-check-result f ]
+    } case ;
 
 : sqlite-next ( prepared -- ? )
     sqlite3_step sqlite-step-has-more-rows? ;
