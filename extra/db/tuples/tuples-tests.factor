@@ -199,10 +199,9 @@ TUPLE: annotation n paste-id summary author mode contents ;
 : test-sqlite ( quot -- )
     >r "tuples-test.db" temp-file sqlite-db r> with-db ;
 
-! : test-postgresql ( quot -- )
-!     >r { "localhost" "postgres" "foob" "factor-test" } postgresql-db r> with-db ;
+: test-postgresql ( quot -- )
+    >r { "localhost" "postgres" "foob" "factor-test" } postgresql-db r> with-db ;
 
-: test-postgresql drop ;
 : test-repeated-insert
     [ ] [ person ensure-table ] unit-test
     [ ] [ person1 get insert-tuple ] unit-test
