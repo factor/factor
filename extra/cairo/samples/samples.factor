@@ -142,6 +142,6 @@ IN: cairo.samples
  USING: quotations cairo.gadgets ui.gadgets.panes sequences ;
  : samples ( -- )
     { arc clip clip-image dash gradient text utf8 }
-    [ 256 256 rot 1quotation <cached-cairo> gadget. ] each ;
+    [ { 256 256 } swap 1quotation <cairo-gadget> gadget. ] each ;
  
  MAIN: samples

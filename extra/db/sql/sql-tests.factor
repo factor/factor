@@ -4,9 +4,11 @@ IN: db.sql.tests
 ! TUPLE: person name age ;
 : insert-1
     { insert
-        { table "person" }
-        { columns "name" "age" }
-        { values "erg" 26 }
+        {
+            { table "person" }
+            { columns "name" "age" }
+            { values "erg" 26 }
+        }
     } ;
 
 : update-1

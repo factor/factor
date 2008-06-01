@@ -1,5 +1,6 @@
-USING: help.syntax help.markup generator.fixup math kernel
-words strings alien byte-array ;
+USING: help.syntax help.markup math kernel
+words strings alien ;
+IN: generator.fixup
 
 HELP: frame-required
 { $values { "n" "a non-negative integer" } }
