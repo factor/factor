@@ -2,7 +2,7 @@
 ! USING: kernel quotations namespaces sequences assocs.lib ;
 
 USING: kernel namespaces namespaces.private quotations sequences
-       assocs.lib math.parser math sequences.lib locals ;
+       assocs.lib math.parser math sequences.lib locals mirrors ;
 
 IN: namespaces.lib
 
@@ -58,3 +58,9 @@ MACRO:: nmake ( quot exemplars -- )
             ] with-scope
         ]
     ] ;
+
+: make-object ( quot class -- object )
+    new [ <mirror> swap bind ] keep ; inline
+
+: with-object ( object quot -- )
+    [ <mirror> ] dip bind ; inline

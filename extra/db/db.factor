@@ -39,31 +39,13 @@ TUPLE: statement handle sql in-params out-params bind-params bound? type ;
 TUPLE: simple-statement < statement ;
 TUPLE: prepared-statement < statement ;
 
-SINGLETON: throwable
-SINGLETON: nonthrowable
-
-: make-throwable ( obj -- obj' )
-    dup sequence? [
-        [ make-throwable ] map
-    ] [
-        throwable >>type
-    ] if ;
-
-: make-nonthrowable ( obj -- obj' )
-    dup sequence? [
-        [ make-nonthrowable ] map
-    ] [
-        nonthrowable >>type
-    ] if ;
-
 TUPLE: result-set sql in-params out-params handle n max ;
 
 : construct-statement ( sql in out class -- statement )
     new
         swap >>out-params
         swap >>in-params
-        swap >>sql
-        throwable >>type ;
+        swap >>sql ;
 
 HOOK: <simple-statement> db ( str in out -- statement )
 HOOK: <prepared-statement> db ( str in out -- statement )
@@ -81,11 +63,8 @@ GENERIC: more-rows? ( result-set -- ? )
 
 GENERIC: execute-statement* ( statement type -- )
 
-M: throwable execute-statement* ( statement type -- )
+M: object execute-statement* ( statement type -- )
     drop query-results dispose ;
-
-M: nonthrowable execute-statement* ( statement type -- )
-    drop [ query-results dispose ] [ 2drop ] recover ;
 
 : execute-statement ( statement -- )
     dup sequence? [
