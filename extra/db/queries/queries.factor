@@ -8,9 +8,8 @@ IN: db.queries
 GENERIC: where ( specs obj -- )
 
 : maybe-make-retryable ( statement -- statement )
-    dup in-params>> [ generator-bind? ] contains? [
-        make-retryable
-    ] when ;
+    dup in-params>> [ generator-bind? ] contains?
+    [ make-retryable ] when ;
 
 : query-make ( class quot -- )
     >r sql-props r>
