@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math namespaces sequences random
 strings math.parser math.intervals combinators
-math.bitfields.lib namespaces.lib db db.tuples db.types ;
+math.bitfields.lib namespaces.lib db db.tuples db.types
+sequences.lib ;
 IN: db.queries
 
 GENERIC: where ( specs obj -- )
@@ -99,16 +100,15 @@ M: string where ( spec obj -- ) object-where ;
     ] with filter ;
 
 : where-clause ( tuple specs -- )
-    dupd filter-slots
-    dup empty? [
-        2drop
+    dupd filter-slots [
+        drop
     ] [
         " where " 0% [
             " and " 0%
         ] [
             2dup slot-name>> swap get-slot-named where
         ] interleave drop
-    ] if ;
+    ] if-empty ;
 
 M: db <delete-tuples-statement> ( tuple table -- sql )
     [

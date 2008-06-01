@@ -5,7 +5,9 @@ IN: db.sql
 
 SYMBOLS: insert update delete select distinct columns from as
 where group-by having order-by limit offset is-null desc all
-any count avg table values ;
+any count avg table values ? ;
+
+! Output an s-exp sql statement and an alist of keys/values
 
 : input-spec, 1, ;
 : output-spec, 2, ;

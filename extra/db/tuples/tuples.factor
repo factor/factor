@@ -55,6 +55,7 @@ SINGLETON: retryable
         [ make-retryable ] map
     ] [
         retryable >>type
+        10 >>retries
     ] if ;
 
 : regenerate-params ( statement -- statement )
@@ -69,12 +70,13 @@ SINGLETON: retryable
     ] 2map >>bind-params ;
 
 M: retryable execute-statement* ( statement type -- )
-    drop
-    [
-        [ query-results dispose t ]
-        [ ]
-        [ regenerate-params bind-statement* f ] cleanup
-    ] curry 10 retry drop ;
+    drop [
+        [
+            [ query-results dispose t ]
+            [ ]
+            [ regenerate-params bind-statement* f ] cleanup
+        ] curry
+    ] [ retries>> ] bi retry drop ;
 
 : resulting-tuple ( class row out-params -- tuple )
     rot class new [
