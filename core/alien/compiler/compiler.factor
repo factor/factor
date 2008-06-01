@@ -7,7 +7,7 @@ math.parser classes alien.arrays alien.c-types alien.strings
 alien.structs alien.syntax cpu.architecture alien inspector
 quotations assocs kernel.private threads continuations.private
 libc combinators compiler.errors continuations layouts accessors
-;
+init ;
 IN: alien.compiler
 
 TUPLE: #alien-node < node return parameters abi ;
@@ -336,7 +336,7 @@ M: #alien-indirect generate-node
 ! this hashtable, they will all be blown away by code GC, beware
 SYMBOL: callbacks
 
-callbacks global [ H{ } assoc-like ] change-at
+[ H{ } clone callbacks set-global ] "alien.compiler" add-init-hook
 
 : register-callback ( word -- ) dup callbacks get set-at ;
 
@@ -344,7 +344,7 @@ M: alien-callback-error summary
     drop "Words calling ``alien-callback'' must be compiled with the optimizing compiler." ;
 
 : callback-bottom ( node -- )
-    xt>> [ word-xt drop <alien> ] curry
+    xt>> [ [ register-callback ] [ word-xt drop <alien> ] bi ] curry
     recursive-state get infer-quot ;
 
 \ alien-callback [
@@ -354,7 +354,7 @@ M: alien-callback-error summary
     pop-literal nip >>abi
     pop-parameters >>parameters
     pop-literal nip >>return
-    gensym dup register-callback >>xt
+    gensym >>xt
     callback-bottom
 ] "infer" set-word-prop
 

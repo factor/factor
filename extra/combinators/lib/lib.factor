@@ -90,7 +90,7 @@ MACRO: 2|| ( quots -- ? )
   [ [ 2dup ] prepend [ t ] ] f short-circuit [ 2nip ] append ;
 
 MACRO: 3|| ( quots -- ? )
-  [ [ 2dup ] prepend [ t ] ] f short-circuit [ 2nip ] append ;
+  [ [ 3dup ] prepend [ t ] ] f short-circuit [ 3nip ] append ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! ifte

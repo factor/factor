@@ -23,7 +23,7 @@ namespaces continuations layouts accessors ;
 [ ] [ "sudoku" shake-and-bake ] unit-test
 
 [ t ] [
-    cell 8 = 30 15 ? 100000 * small-enough?
+    cell 8 = 20 10 ? 100000 * small-enough?
 ] unit-test
 
 [ ] [ "hello-ui" shake-and-bake ] unit-test
@@ -35,6 +35,12 @@ namespaces continuations layouts accessors ;
 
 [ t ] [
     cell 8 = 40 20 ? 100000 * small-enough?
+] unit-test
+
+[ ] [ "maze" shake-and-bake ] unit-test
+
+[ t ] [
+    cell 8 = 30 15 ? 100000 * small-enough?
 ] unit-test
 
 [ ] [ "bunny" shake-and-bake ] unit-test
