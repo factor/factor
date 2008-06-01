@@ -8,7 +8,7 @@
 		<tr>
 			<td>
 
-				<t:each-tuple t:values="postings">
+				<t:bind-each t:name="postings">
 
 					<h2 class="posting-title">
 						<t:a t:value="link" t:session="none"><t:label t:name="title" /></t:a>
@@ -22,7 +22,7 @@
 						<t:a t:value="link" t:session="none"><t:label t:name="pub-date" /></t:a>
 					</p>
 
-				</t:each-tuple>
+				</t:bind-each>
 
 			</td>
 
@@ -31,7 +31,7 @@
 				<h2>Blogroll</h2>
 
 				<ul>
-					<t:each t:values="blogroll">
+					<t:each t:name="blogroll">
 						<li>
 							<t:link t:name="value"/>
 						</li>

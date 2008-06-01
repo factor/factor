@@ -5,7 +5,7 @@ classes.tuple words arrays sequences sequences.lib splitting
 mirrors hashtables combinators continuations math strings
 fry locals calendar calendar.format xml.entities validators
 html.elements html.streams xmode.code2html farkup inspector
-lcs.diff2html ;
+lcs.diff2html urls ;
 IN: html.components
 
 SYMBOL: values
@@ -19,9 +19,9 @@ SYMBOL: values
 : prepare-value ( name object -- value name object )
     [ [ value ] keep ] dip ; inline
 
-: from-assoc ( assoc -- ) values get swap update ;
-
-: from-tuple ( tuple -- ) <mirror> from-assoc ;
+: from-object ( object -- )
+    dup assoc? [ <mirror> ] unless
+    values get swap update ;
 
 : deposit-values ( destination names -- )
     [ dup value ] H{ } map>assoc update ;
@@ -32,24 +32,19 @@ SYMBOL: values
 : with-each-index ( seq quot -- )
     '[
         [
-            blank-values 1+ "index" set-value @
+            values [ clone ] change
+            1+ "index" set-value @
         ] with-scope
     ] each-index ; inline
 
 : with-each-value ( seq quot -- )
     '[ "value" set-value @ ] with-each-index ; inline
 
-: with-each-assoc ( seq quot -- )
-    '[ from-assoc @ ] with-each-index ; inline
+: with-each-object ( seq quot -- )
+    '[ from-object @ ] with-each-index ; inline
 
-: with-each-tuple ( seq quot -- )
-    '[ from-tuple @ ] with-each-index ; inline
-
-: with-assoc-values ( assoc quot -- )
-    '[ blank-values , from-assoc @ ] with-scope ; inline
-
-: with-tuple-values ( assoc quot -- )
-    '[ blank-values , from-tuple @ ] with-scope ; inline
+: with-values ( object quot -- )
+    '[ blank-values , from-object @ ] with-scope ; inline
 
 : nest-values ( name quot -- )
     swap [
@@ -57,22 +52,6 @@ SYMBOL: values
             H{ } clone [ values set call ] keep
         ] with-scope
     ] dip set-value ; inline
-
-: nest-tuple ( name quot -- )
-    swap [
-        [
-            H{ } clone [ <mirror> values set call ] keep
-        ] with-scope
-    ] dip set-value ; inline
-
-: object>string ( object -- string )
-    {
-        { [ dup real? ] [ number>string ] }
-        { [ dup timestamp? ] [ timestamp>string ] }
-        { [ dup string? ] [ ] }
-        { [ dup word? ] [ word-name ] }
-        { [ dup not ] [ drop "" ] }
-    } cond ;
 
 GENERIC: render* ( value name render -- )
 
@@ -174,7 +153,7 @@ M: checkbox render*
     <input
         "checkbox" =type
         swap =name
-        swap [ "true" =selected ] when
+        swap [ "true" =checked ] when
     input>
         label>> escape-string write
     </input> ;

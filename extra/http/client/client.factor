@@ -27,8 +27,7 @@ SYMBOL: redirects
         redirects inc
         redirects get max-redirects < [
             request get
-            swap "location" header dup absolute-url?
-            [ request-with-url ] [ request-with-path ] if
+            swap "location" header request-with-url
             "GET" >>method http-request
         ] [
             too-many-redirects
@@ -51,7 +50,7 @@ PRIVATE>
 
 : http-request ( request -- response data )
     dup request [
-        dup request-addr latin1 [
+        dup url>> url-addr latin1 [
             1 minutes timeouts
             write-request
             read-response

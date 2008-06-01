@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel unicode.categories combinators sequences splitting
-fry namespaces assocs arrays strings mirrors
-io.encodings.string io.encodings.utf8
-math math.parser accessors namespaces.lib ;
+fry namespaces assocs arrays strings io.encodings.string
+io.encodings.utf8 math math.parser accessors mirrors parser
+prettyprint.backend hashtables ;
 IN: urls
 
 : url-quotable? ( ch -- ? )
@@ -91,11 +91,13 @@ IN: urls
 
 TUPLE: url protocol host port path query anchor ;
 
+: <url> ( -- url ) url new ;
+
 : query-param ( request key -- value )
     swap query>> at ;
 
 : set-query-param ( request value key -- request )
-    pick query>> set-at ;
+    '[ , , _ ?set-at ] change-query ;
 
 : parse-host ( string -- host port )
     ":" split1 [ url-decode ] [
@@ -105,40 +107,44 @@ TUPLE: url protocol host port path query anchor ;
         ] when
     ] bi* ;
 
-: parse-host-part ( protocol rest -- string' )
-    [ "protocol" set ] [
+: parse-host-part ( url protocol rest -- url string' )
+    [ >>protocol ] [
         "//" ?head [ "Invalid URL" throw ] unless
         "/" split1 [
-            parse-host [ "host" set ] [ "port" set ] bi*
+            parse-host [ >>host ] [ >>port ] bi*
         ] [ "/" prepend ] bi*
     ] bi* ;
 
-: string>url ( string -- url )
-    [
-        ":" split1 [ parse-host-part ] when*
-        "#" split1 [
-            "?" split1 [ query>assoc "query" set ] when*
-            url-decode "path" set
-        ] [
-            url-decode "anchor" set
-        ] bi*
-    ] url make-object ;
+GENERIC: >url ( obj -- url )
 
-: unparse-host-part ( protocol -- )
+M: url >url ;
+
+M: string >url
+    <url> swap
+    ":" split1 [ parse-host-part ] when*
+    "#" split1 [
+        "?" split1
+        [ url-decode >>path ]
+        [ [ query>assoc >>query ] when* ] bi*
+    ]
+    [ url-decode >>anchor ] bi* ;
+
+: unparse-host-part ( url protocol -- )
     %
     "://" %
-    "host" get url-encode %
-    "port" get [ ":" % # ] when*
-    "path" get "/" head? [ "Invalid URL" throw ] unless ;
+    [ host>> url-encode % ]
+    [ port>> [ ":" % # ] when* ]
+    [ path>> "/" head? [ "/" % ] unless ]
+    tri ;
 
 : url>string ( url -- string )
     [
-        <mirror> [
-            "protocol" get [ unparse-host-part ] when*
-            "path" get url-encode %
-            "query" get [ "?" % assoc>query % ] when*
-            "anchor" get [ "#" % url-encode % ] when*
-        ] bind
+        {
+            [ dup protocol>> dup [ unparse-host-part ] [ 2drop ] if ]
+            [ path>> url-encode % ]
+            [ query>> dup assoc-empty? [ drop ] [ "?" % assoc>query % ] if ]
+            [ anchor>> [ "#" % url-encode % ] when* ]
+        } cleave
     ] "" make ;
 
 : url-append-path ( path1 path2 -- path )
@@ -158,3 +164,7 @@ TUPLE: url protocol host port path query anchor ;
 
 : relative-url ( url -- url' )
     clone f >>protocol f >>host f >>port ;
+
+: URL" lexer get skip-blank parse-string >url parsed ; parsing
+
+M: url pprint* dup url>string "URL\" " "\"" pprint-string ;

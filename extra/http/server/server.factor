@@ -2,22 +2,15 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel namespaces io io.timeouts strings splitting
 threads sequences prettyprint io.server logging calendar http
-html.streams html.elements accessors math.parser
-combinators.lib tools.vocabs debugger continuations random
-combinators destructors io.encodings.8-bit fry classes words
-math rss json.writer ;
+html.streams html.components html.elements html.templates
+accessors math.parser combinators.lib tools.vocabs debugger
+continuations random combinators destructors io.streams.string
+io.encodings.8-bit fry classes words math urls
+arrays vocabs.loader ;
 IN: http.server
 
 ! path is a sequence of path component strings
-
 GENERIC: call-responder* ( path responder -- response )
-
-: request-params ( request -- assoc )
-    dup method>> {
-        { "GET" [ query>> ] }
-        { "HEAD" [ query>> ] }
-        { "POST" [ post-data>> ] }
-    } case ;
 
 : <content> ( body content-type -- response )
     <response>
@@ -25,21 +18,6 @@ GENERIC: call-responder* ( path responder -- response )
         "Document follows" >>message
         swap >>content-type
         swap >>body ;
-
-: <text-content> ( body -- response )
-    "text/plain" <content> ;
-
-: <html-content> ( body -- response )
-    "text/html" <content> ;
-
-: <xml-content> ( body -- response )
-    "text/xml" <content> ;
-
-: <feed-content> ( feed -- response )
-    '[ , feed>xml ] "text/xml" <content> ;
-
-: <json-content> ( obj -- response )
-    '[ , >json ] "application/json" <content> ;
 
 TUPLE: trivial-responder response ;
 
@@ -55,7 +33,8 @@ M: trivial-responder call-responder* nip response>> call ;
     </html> ;
 
 : <trivial-response> ( code message -- response )
-    2dup '[ , , trivial-response-body ] <html-content>
+    2dup [ trivial-response-body ] with-string-writer
+    "text/html" <content>
         swap >>message
         swap >>code ;
 
@@ -69,7 +48,7 @@ SYMBOL: 404-responder
 
 [ <404> ] <trivial-responder> 404-responder set-global
 
-SYMBOL: base-paths
+SYMBOL: responder-nesting
 
 : invert-slice ( slice -- slice' )
     dup slice? [
@@ -78,86 +57,81 @@ SYMBOL: base-paths
         drop { }
     ] if ;
 
-: add-base-path ( path dispatcher -- )
-    [ invert-slice ] [ class word-name ] bi*
-    base-paths get set-at ;
+: vocab-path ( vocab -- path )
+    dup vocab-dir vocab-append-path ;
+
+: vocab-path-of ( dispatcher -- path )
+    class word-vocabulary vocab-path ;
+
+: add-responder-path ( path dispatcher -- )
+    [ [ invert-slice ] [ [ vocab-path-of ] keep ] bi* 3array ]
+    [ nip class word-name ] 2bi
+    responder-nesting get set-at ;
 
 : call-responder ( path responder -- response )
-    [ add-base-path ] [ call-responder* ] 2bi ;
+    [ add-responder-path ] [ call-responder* ] 2bi ;
 
-SYMBOL: link-hook
+: nested-responders ( -- seq )
+    responder-nesting get assocs:values [ third ] map ;
 
-: add-link-hook ( quot -- )
-    link-hook [ compose ] change ; inline
+: each-responder ( quot -- )
+   nested-responders swap each ; inline
 
-: modify-query ( query -- query )
-    link-hook get call ;
-
-: base-path ( string -- path )
-    dup base-paths get at
+: responder-path ( string -- pair )
+    dup responder-nesting get at
     [ ] [ "No such responder: " swap append throw ] ?if ;
 
-: resolve-base-path ( string -- string' )
-    "$" ?head [
+: base-path ( string -- path )
+    responder-path first ;
+
+: template-path ( string -- path )
+    responder-path second ;
+
+: resolve-responder-path ( string quot -- string' )
+    [ "$" ?head ] dip '[
         [
-            "/" split1 [ base-path [ "/" % % ] each "/" % ] dip %
+            "/" split1 [ @ [ "/" % % ] each "/" % ] dip %
         ] "" make
-    ] when ;
+    ] when ; inline
 
-: link>string ( url query -- url' )
-    [ resolve-base-path ] [ modify-query ] bi* (link>string) ;
+: resolve-base-path ( string -- string' )
+    [ base-path ] resolve-responder-path ;
 
-: write-link ( url query -- )
-    link>string write ;
+: resolve-template-path ( string -- string' )
+    [ template-path ] resolve-responder-path ;
 
-SYMBOL: form-hook
+GENERIC: modify-query ( query responder -- query' )
 
-: add-form-hook ( quot -- )
-    form-hook [ compose ] change ;
+M: object modify-query drop ;
 
-: hidden-form-field ( -- )
-    form-hook get call ;
+: adjust-url ( url -- url' )
+    clone
+        [ dup [ modify-query ] each-responder ] change-query
+        [ resolve-base-path ] change-path
+    request get url>>
+        clone
+        f >>query
+    swap derive-url ensure-port ;
 
-: absolute-redirect ( to query -- url )
-    #! Same host.
-    request get clone
-    swap [ >>query ] when*
-    swap url-encode >>path
-    [ modify-query ] change-query
-    request-url ;
+: <custom-redirect> ( url code message -- response )
+    <trivial-response>
+        swap dup url? [ adjust-url ] when
+        "location" set-header ;
 
-: replace-last-component ( path with -- path' )
-    [ "/" last-split1 drop "/" ] dip 3append ;
-
-: relative-redirect ( to query -- url )
-    request get clone
-    swap [ >>query ] when*
-    swap [ '[ , replace-last-component ] change-path ] when*
-    [ modify-query ] change-query
-    request-url ;
-
-: derive-url ( to query -- url )
-    {
-        { [ over "http://" head? ] [ link>string ] }
-        { [ over "/" head? ] [ absolute-redirect ] }
-        { [ over "$" head? ] [ [ resolve-base-path ] dip derive-url ] }
-        [ relative-redirect ]
-    } cond ;
-
-: <redirect> ( to query code message -- response )
-    <trivial-response> -rot derive-url "location" set-header ;
-
-\ <redirect> DEBUG add-input-logging
+\ <custom-redirect> DEBUG add-input-logging
 
 : <permanent-redirect> ( to query -- response )
-    301 "Moved Permanently" <redirect> ;
+    301 "Moved Permanently" <custom-redirect> ;
 
 : <temporary-redirect> ( to query -- response )
-    307 "Temporary Redirect" <redirect> ;
+    307 "Temporary Redirect" <custom-redirect> ;
 
-: <standard-redirect> ( to query -- response )
-    request get method>> "POST" =
-    [ <permanent-redirect> ] [ <temporary-redirect> ] if ;
+: <redirect> ( to query -- response )
+    request get method>> {
+        { "GET" [ <temporary-redirect> ] }
+        { "HEAD" [ <temporary-redirect> ] }
+        { "POST" [ <permanent-redirect> ] }
+    } case ;
 
 TUPLE: dispatcher default responders ;
 
@@ -187,7 +161,7 @@ TUPLE: vhost-dispatcher default responders ;
     404-responder get H{ } clone vhost-dispatcher boa ;
 
 : find-vhost ( dispatcher -- responder )
-    request get host>> over responders>> at*
+    request get url>> host>> over responders>> at*
     [ nip ] [ drop default>> ] if ;
 
 M: vhost-dispatcher call-responder* ( path dispatcher -- response )
@@ -242,35 +216,28 @@ SYMBOL: development-mode
 LOG: httpd-hit NOTICE
 
 : log-request ( request -- )
-    { method>> host>> path>> } map-exec-with httpd-hit ;
-
-SYMBOL: exit-continuation
-
-: exit-with exit-continuation get continue-with ;
-
-: with-exit-continuation ( quot -- )
-    '[ exit-continuation set @ ] callcc1 exit-continuation off ;
+    [ method>> ] [ url>> [ host>> ] [ path>> ] bi ] bi 3array httpd-hit ;
 
 : split-path ( string -- path )
     "/" split harvest ;
 
-: init-request ( -- )
-    H{ } clone base-paths set
+: init-request ( request -- )
+    request set
+    H{ } clone responder-nesting set
     [ ] link-hook set
     [ ] form-hook set ;
 
+: dispatch-request ( request -- response )
+    url>> path>> split-path main-responder get call-responder ;
+
 : do-request ( request -- response )
     [
-        init-request
-        [ request set ]
+        [ init-request ]
         [ log-request ]
-        [ path>> split-path main-responder get call-responder ] tri
-        [ <404> ] unless*
-    ] [
-        [ \ do-request log-error ]
-        [ <500> ]
-        bi
-    ] recover ;
+        [ dispatch-request ] tri
+    ]
+    [ [ \ do-request log-error ] [ <500> ] bi ]
+    recover ;
 
 : ?refresh-all ( -- )
     development-mode get-global

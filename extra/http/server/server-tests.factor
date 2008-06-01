@@ -1,27 +1,52 @@
 USING: http.server tools.test kernel namespaces accessors
-io http math sequences assocs arrays classes words ;
+io http math sequences assocs arrays classes words urls ;
 IN: http.server.tests
 
 \ find-responder must-infer
 
 [
     <request>
-    http >>protocol
-    "www.apple.com" >>host
-    "/xxx/bar" >>path
-    { { "a" "b" } } >>query
+        <url>
+            "http" >>protocol
+            "www.apple.com" >>host
+            "/xxx/bar" >>path
+            { { "a" "b" } } >>query
+        >>url
     request set
 
     [ ] link-hook set
 
-    [ "http://www.apple.com:80/xxx/bar?a=b" ] [ f f derive-url ] unit-test
-    [ "http://www.apple.com:80/xxx/baz?a=b" ] [ "baz" f derive-url ] unit-test
-    [ "http://www.apple.com:80/xxx/baz?c=d" ] [ "baz" { { "c" "d" } } derive-url ] unit-test
-    [ "http://www.apple.com:80/xxx/bar?c=d" ] [ f { { "c" "d" } } derive-url ] unit-test
-    [ "http://www.apple.com:80/flip?a=b" ] [ "/flip" f derive-url ] unit-test
-    [ "http://www.apple.com:80/flip?c=d" ] [ "/flip" { { "c" "d" } } derive-url ] unit-test
-    [ "http://www.jedit.org" ] [ "http://www.jedit.org" f derive-url ] unit-test
-    [ "http://www.jedit.org?a=b" ] [ "http://www.jedit.org" { { "a" "b" } } derive-url ] unit-test
+    [ "http://www.apple.com:80/xxx/bar" ] [ 
+        <url> adjust-url url>string 
+    ] unit-test
+
+    [ "http://www.apple.com:80/xxx/baz" ] [
+        <url> "baz" >>path adjust-url url>string
+    ] unit-test
+    
+    [ "http://www.apple.com:80/xxx/baz?c=d" ] [
+        <url> "baz" >>path { { "c" "d" } } >>query adjust-url url>string
+    ] unit-test
+    
+    [ "http://www.apple.com:80/xxx/bar?c=d" ] [
+        <url> { { "c" "d" } } >>query adjust-url url>string
+    ] unit-test
+    
+    [ "http://www.apple.com:80/flip" ] [
+        <url> "/flip" >>path adjust-url url>string
+    ] unit-test
+    
+    [ "http://www.apple.com:80/flip?c=d" ] [
+        <url> "/flip" >>path { { "c" "d" } } >>query adjust-url url>string
+    ] unit-test
+    
+    [ "http://www.jedit.org:80/" ] [
+        "http://www.jedit.org" >url adjust-url url>string
+    ] unit-test
+    
+    [ "http://www.jedit.org:80/?a=b" ] [
+        "http://www.jedit.org" >url { { "a" "b" } } >>query adjust-url url>string
+    ] unit-test
 ] with-scope
 
 TUPLE: mock-responder path ;
@@ -31,7 +56,7 @@ C: <mock-responder> mock-responder
 M: mock-responder call-responder*
     nip
     path>> on
-    [ ] <text-content> ;
+    [ ] "text/plain" <content> ;
 
 : check-dispatch ( tag path -- ? )
     H{ } clone base-paths set
@@ -84,7 +109,7 @@ C: <path-check-responder> path-check-responder
 
 M: path-check-responder call-responder*
     drop
-    >array <text-content> ;
+    >array "text/plain" <content> ;
 
 [ { "c" } ] [
     H{ } clone base-paths set
@@ -125,7 +150,7 @@ C: <base-path-check-responder> base-path-check-responder
 M: base-path-check-responder call-responder*
     2drop
     "$funny-dispatcher" resolve-base-path
-    <text-content> ;
+    "text/plain" <content> ;
 
 [ ] [
     <dispatcher>

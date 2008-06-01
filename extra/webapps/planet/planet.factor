@@ -3,18 +3,15 @@
 USING: kernel accessors sequences sorting math math.order
 calendar alarms logging concurrency.combinators namespaces
 sequences.lib db.types db.tuples db fry locals hashtables
-html.components html.templates.chloe
-rss xml.writer
+html.components
+rss urls xml.writer
 validators
 http.server
-http.server.actions
-http.server.boilerplate
-http.server.auth.login
-http.server.auth ;
+furnace.actions
+furnace.boilerplate
+furnace.auth.login
+furnace.auth ;
 IN: webapps.planet
-
-: planet-template ( name -- template )
-    "resource:extra/webapps/planet/" swap ".xml" 3append <chloe> ;
 
 TUPLE: blog id name www-url feed-url ;
 
@@ -61,7 +58,7 @@ posting "POSTINGS"
 : <edit-blogroll-action> ( -- action )
     <page-action>
         [ blogroll "blogroll" set-value ] >>init
-        "admin" planet-template >>template ;
+        "$planet-factor/admin" >>template ;
 
 : <planet-action> ( -- action )
     <page-action>
@@ -70,7 +67,7 @@ posting "POSTINGS"
             postings "postings" set-value
         ] >>init
 
-        "planet" planet-template >>template ;
+        "$planet-factor/planet" >>template ;
 
 : planet-feed ( -- feed )
     feed new
@@ -110,7 +107,7 @@ posting "POSTINGS"
     <action>
         [
             update-cached-postings
-            "" f <permanent-redirect>
+            URL" $planet-factor/admin" <redirect>
         ] >>submit ;
 
 : <delete-blog-action> ( -- action )
@@ -119,7 +116,7 @@ posting "POSTINGS"
 
         [
             "id" value <blog> delete-tuples
-            "$planet-factor/admin" f <standard-redirect>
+            URL" $planet-factor/admin" <redirect>
         ] >>submit ;
 
 : validate-blog ( -- )
@@ -129,15 +126,12 @@ posting "POSTINGS"
         { "feed-url" [ v-url ] }
     } validate-params ;
 
-: <id-redirect> ( id next -- response )
-    swap "id" associate <standard-redirect> ;
-
 : deposit-blog-slots ( blog -- )
     { "name" "www-url" "feed-url" } deposit-slots ;
 
 : <new-blog-action> ( -- action )
     <page-action>
-        "new-blog" planet-template >>template
+        "$planet-factor/new-blog" >>template
 
         [ validate-blog ] >>validate
 
@@ -145,7 +139,12 @@ posting "POSTINGS"
             f <blog>
             [ deposit-blog-slots ]
             [ insert-tuple ]
-            [ id>> "$planet-factor/admin/edit-blog" <id-redirect> ]
+            [
+                <url>
+                    "$planet-factor/admin/edit-blog" >>path
+                    swap id>> "id" set-query-param
+                <redirect>
+            ]
             tri
         ] >>submit ;
     
@@ -153,10 +152,10 @@ posting "POSTINGS"
     <page-action>
         [
             validate-integer-id
-            "id" value <blog> select-tuple from-tuple
+            "id" value <blog> select-tuple from-object
         ] >>init
 
-        "edit-blog" planet-template >>template
+        "$planet-factor/edit-blog" >>template
 
         [
             validate-integer-id
@@ -167,7 +166,12 @@ posting "POSTINGS"
             f <blog>
             [ deposit-blog-slots ]
             [ update-tuple ]
-            [ id>> "$planet-factor/admin" <id-redirect> ]
+            [
+                <url>
+                    "$planet-factor/admin" >>path
+                    swap id>> "id" set-query-param
+                <redirect>
+            ]
             tri
         ] >>submit ;
 
@@ -193,7 +197,7 @@ TUPLE: planet-factor < dispatcher ;
         <feed-action> "feed.xml" add-responder
         <planet-factor-admin> { can-administer-planet-factor? } <protected> "admin" add-responder
     <boilerplate>
-        "planet-common" planet-template >>template ;
+        "$planet-factor/planet-common" >>template ;
 
 : start-update-task ( db params -- )
     '[ , , [ update-cached-postings ] with-db ] 10 minutes every drop ;

@@ -1,36 +1,12 @@
 USING: http tools.test multiline tuple-syntax
 io.streams.string kernel arrays splitting sequences
-assocs io.sockets db db.sqlite continuations ;
+assocs io.sockets db db.sqlite continuations urls ;
 IN: http.tests
-
-[ "hello%20world" ] [ "hello world" url-encode ] unit-test
-[ "hello world" ] [ "hello%20world" url-decode ] unit-test
-[ "~hello world" ] [ "%7ehello+world" url-decode ] unit-test
-[ f ] [ "%XX%XX%XX" url-decode ] unit-test
-[ f ] [ "%XX%XX%X" url-decode ] unit-test
-
-[ "hello world"   ] [ "hello+world"    url-decode ] unit-test
-[ "hello world"   ] [ "hello%20world"  url-decode ] unit-test
-[ " ! "           ] [ "%20%21%20"      url-decode ] unit-test
-[ "hello world"   ] [ "hello world%"   url-decode ] unit-test
-[ "hello world"   ] [ "hello world%x"  url-decode ] unit-test
-[ "hello%20world" ] [ "hello world"    url-encode ] unit-test
-[ "%20%21%20"     ] [ " ! "            url-encode ] unit-test
-
-[ "\u001234hi\u002045" ] [ "\u001234hi\u002045" url-encode url-decode ] unit-test
 
 [ "/" ] [ "http://foo.com" url>path ] unit-test
 [ "/" ] [ "http://foo.com/" url>path ] unit-test
 [ "/bar" ] [ "http://foo.com/bar" url>path ] unit-test
 [ "/bar" ] [ "/bar" url>path ] unit-test
-
-[ "a=b&a=c" ] [ { { "a" { "b" "c" } } } assoc>query ] unit-test
-
-[ H{ { "a" "b" } } ] [ "a=b" query>assoc ] unit-test
-
-[ H{ { "a" { "b" "c" } } } ] [ "a=b&a=c" query>assoc ] unit-test
-
-[ "a=3" ] [ { { "a" 3 } } assoc>query ] unit-test
 
 : lf>crlf "\n" split "\r\n" join ;
 
@@ -45,11 +21,8 @@ blah
 
 [
     TUPLE{ request
-        protocol: http
-        port: 80
+        url: TUPLE{ url protocol: "http" port: 80 path: "/bar" }
         method: "GET"
-        path: "/bar"
-        query: H{ }
         version: "1.1"
         header: H{ { "some-header" "1; 2" } { "content-length" "4" } }
         post-data: "blah"
@@ -85,14 +58,10 @@ Host: www.sex.com
 
 [
     TUPLE{ request
-        protocol: http
-        port: 80
+        url: TUPLE{ url protocol: "http" port: 80 host: "www.sex.com" path: "/bar" }
         method: "HEAD"
-        path: "/bar"
-        query: H{ }
         version: "1.1"
         header: H{ { "host" "www.sex.com" } }
-        host: "www.sex.com"
         cookies: V{ }
     }
 ] [
@@ -100,6 +69,15 @@ Host: www.sex.com
         read-request
     ] with-string-reader
 ] unit-test
+
+STRING: read-request-test-3
+GET nested HTTP/1.0
+
+;
+
+[ read-request-test-3 [ read-request ] with-string-reader ]
+[ "Bad request: URL" = ]
+must-fail-with
 
 STRING: read-response-test-1
 HTTP/1.1 404 not found
@@ -145,14 +123,14 @@ read-response-test-1' 1array [
 ] unit-test
 
 ! Live-fire exercise
-USING: http.server http.server.static http.server.sessions
-http.server.actions http.server.auth.login http.server.db http.client
+USING: http.server http.server.static furnace.sessions
+furnace.actions furnace.auth.login furnace.db http.client
 io.server io.files io io.encodings.ascii
 accessors namespaces threads ;
 
 : add-quit-action
     <action>
-        [ stop-server [ "Goodbye" write ] <html-content> ] >>display
+        [ stop-server "Goodbye" "text/html" <content> ] >>display
     "quit" add-responder ;
 
 : test-db "test.db" temp-file sqlite-db ;
@@ -171,7 +149,7 @@ test-db [
                 "resource:extra/http/test" <static> >>default
             "nested" add-responder
             <action>
-                [ "redirect-loop" f <standard-redirect> ] >>display
+                [ URL" redirect-loop" <redirect> ] >>display
             "redirect-loop" add-responder
         main-responder set
 
@@ -184,16 +162,6 @@ test-db [
 [ t ] [
     "resource:extra/http/test/foo.html" ascii file-contents
     "http://localhost:1237/nested/foo.html" http-get =
-] unit-test
-
-! Try with a slightly malformed request
-[ t ] [
-    "localhost" 1237 <inet> ascii [
-        "GET nested HTTP/1.0\r\n" write flush
-        "\r\n" write flush
-        read-crlf drop
-        read-header
-    ] with-client "location" swap at "/" head?
 ] unit-test
 
 [ "http://localhost:1237/redirect-loop" http-get ]
@@ -237,7 +205,7 @@ test-db [
 [ ] [
     [
         <dispatcher>
-            <action> [ [ "Hi" write ] <text-content> ] >>display
+            <action> [ [ "Hi" write ] "text/plain" <content> ] >>display
             <login>
             <sessions>
             "" add-responder

@@ -14,12 +14,8 @@
 		<input type="SUBMIT" value="Done" />
 	</t:form>
 
-	<t:if t:value="id">
-	
-		<t:a t:href="$todo-list/view" t:query="id">View</t:a>
-		|
-		<t:button t:action="$todo-list/delete" t:for="id" class="link-button link">Delete</t:button>
-		
-	</t:if>
+	<t:a t:href="$todo-list/view" t:query="id">View</t:a>
+	|
+	<t:button t:action="$todo-list/delete" t:for="id" class="link-button link">Delete</t:button>
 
 </t:chloe>

@@ -27,8 +27,7 @@ IN: html.templates.chloe.tests
 
 : test-template ( name -- template )
     "resource:extra/html/templates/chloe/test/"
-    swap
-    ".xml" 3append <chloe> ;
+    prepend <chloe> ;
 
 [ "Hello world" ] [
     [
@@ -156,6 +155,14 @@ TUPLE: person first-name last-name ;
 
 [ "<table><tr><td>RBaxter</td><td>Unknown</td></tr><tr><td>Doug</td><td>Coleman</td></tr></table>" ] [
     [
-        "test11" test-template call-template
+        "test10" test-template call-template
     ] run-template [ blank? not ] filter
+] unit-test
+
+[ ] [ 1 "id" set-value ] unit-test
+
+[ "<a name=\"1\">Hello</a>" ] [
+    [
+        "test11" test-template call-template
+    ] run-template
 ] unit-test

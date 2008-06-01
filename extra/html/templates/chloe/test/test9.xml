@@ -3,7 +3,7 @@
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
 	<ul>
-		<t:each t:values="numbers">
+		<t:each t:name="numbers">
 			<li><t:label t:name="value"/></li>
 		</t:each>
 	</ul>

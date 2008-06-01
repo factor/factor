@@ -2,34 +2,34 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-	<t:bind-tuple t:name="old">
+	<t:bind t:name="old">
 		<t:title>Diff: <t:label t:name="title" /></t:title>
-	</t:bind-tuple>
+	</t:bind>
 
 	<table>
 		<tr>
 			<th class="field-label">Old revision:</th>
-			<t:bind-tuple t:name="old">
+			<t:bind t:name="old">
 				<td>Created on <t:label t:name="date" /> by <t:a t:href="user-edits" t:query="author"><t:label t:name="author" /></t:a>.</td>
-			</t:bind-tuple>
+			</t:bind>
 		</tr>
 		<tr>
 			<th class="field-label">New revision:</th>
-			<t:bind-tuple t:name="old">
+			<t:bind t:name="old">
 				<td>Created on <t:label t:name="date" /> by <t:a t:href="user-edits" t:query="author"><t:label t:name="author" /></t:a>.</td>
-			</t:bind-tuple>
+			</t:bind>
 		</tr>
 	</table>
 
 	<t:comparison t:name="diff" />
 
-	<t:bind-tuple t:name="old">
+	<t:bind t:name="old">
 		<div class="navbar">
 			<t:a t:href="$wiki/view" t:query="title">Latest</t:a>
 			| <t:a t:href="$wiki/revisions" t:query="title">Revisions</t:a>
 			| <t:a t:href="$wiki/edit" t:query="title">Edit</t:a>
 			| <t:button t:action="$wiki/delete" t:for="title" class="link-button link">Delete</t:button>
 		</div>
-	</t:bind-tuple>
+	</t:bind>
 
 </t:chloe>
