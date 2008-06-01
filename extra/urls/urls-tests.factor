@@ -87,6 +87,18 @@ urls [
     swap [ 1array ] [ [ url>string ] curry ] bi* unit-test
 ] assoc-each
 
+[ "b" ] [ "a" "b" url-append-path ] unit-test
+
+[ "a/b" ] [ "a/c" "b" url-append-path ] unit-test
+
+[ "a/b" ] [ "a/" "b" url-append-path ] unit-test
+
+[ "/b" ] [ "a" "/b" url-append-path ] unit-test
+
+[ "/b" ] [ "a/b/" "/b" url-append-path ] unit-test
+
+[ "/xxx/bar" ] [ "/xxx/baz" "bar" url-append-path ] unit-test
+
 [
     TUPLE{ url
         protocol: "http"
@@ -95,10 +107,6 @@ urls [
         path: "/a/path"
     }
 ] [
-    TUPLE{ url
-        path: "/a/path"
-    }
-
     TUPLE{ url
         protocol: "http"
         host: "www.apple.com"
@@ -106,29 +114,7 @@ urls [
         path: "/foo"
     }
 
-    derive-url
-] unit-test
-
-[
     TUPLE{ url
-        protocol: "http"
-        host: "www.apple.com"
-        port: 1234
-        path: "/a/path/relative/path"
-        query: H{ { "a" "b" } }
-        anchor: "foo"
-    }
-] [
-    TUPLE{ url
-        path: "relative/path"
-        query: H{ { "a" "b" } }
-        anchor: "foo"
-    }
-
-    TUPLE{ url
-        protocol: "http"
-        host: "www.apple.com"
-        port: 1234
         path: "/a/path"
     }
 
@@ -146,16 +132,62 @@ urls [
     }
 ] [
     TUPLE{ url
+        protocol: "http"
+        host: "www.apple.com"
+        port: 1234
+        path: "/a/path/"
+    }
+
+    TUPLE{ url
         path: "relative/path"
         query: H{ { "a" "b" } }
         anchor: "foo"
     }
 
+    derive-url
+] unit-test
+
+[
+    TUPLE{ url
+        protocol: "http"
+        host: "www.apple.com"
+        port: 1234
+        path: "/a/path/relative/path"
+        query: H{ { "a" "b" } }
+        anchor: "foo"
+    }
+] [
     TUPLE{ url
         protocol: "http"
         host: "www.apple.com"
         port: 1234
         path: "/a/path/"
+    }
+
+    TUPLE{ url
+        path: "relative/path"
+        query: H{ { "a" "b" } }
+        anchor: "foo"
+    }
+
+    derive-url
+] unit-test
+
+[
+    TUPLE{ url
+        protocol: "http"
+        host: "www.apple.com"
+        path: "/xxx/baz"
+    }
+] [
+    TUPLE{ url
+        protocol: "http"
+        host: "www.apple.com"
+        path: "/xxx/bar"
+    }
+
+    TUPLE{ url
+        path: "baz"
     }
 
     derive-url

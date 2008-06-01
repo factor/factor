@@ -1,3 +1,5 @@
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel unicode.categories combinators sequences splitting
 fry namespaces assocs arrays strings mirrors
 io.encodings.string io.encodings.utf8
@@ -89,17 +91,25 @@ IN: urls
 
 TUPLE: url protocol host port path query anchor ;
 
+: query-param ( request key -- value )
+    swap query>> at ;
+
+: set-query-param ( request value key -- request )
+    pick query>> set-at ;
+
+: parse-host ( string -- host port )
+    ":" split1 [ url-decode ] [
+        dup [
+            string>number
+            dup [ "Invalid port" throw ] unless
+        ] when
+    ] bi* ;
+
 : parse-host-part ( protocol rest -- string' )
     [ "protocol" set ] [
         "//" ?head [ "Invalid URL" throw ] unless
         "/" split1 [
-            ":" split1
-            [ url-decode "host" set ] [
-                dup [
-                    string>number
-                    dup [ "Invalid port" throw ] unless
-                ] when "port" set
-            ] bi*
+            parse-host [ "host" set ] [ "port" set ] bi*
         ] [ "/" prepend ] bi*
     ] bi* ;
 
@@ -131,13 +141,20 @@ TUPLE: url protocol host port path query anchor ;
         ] bind
     ] "" make ;
 
-: fix-relative-path ( url base -- url base )
-    over path>> '[
-        "/" ?tail drop "/" , 3append
-    ] change-path
-    [ f >>path ] dip ; inline
+: url-append-path ( path1 path2 -- path )
+    {
+        { [ dup "/" head? ] [ nip ] }
+        { [ dup empty? ] [ drop ] }
+        { [ over "/" tail? ] [ append ] }
+        { [ "/" pick start not ] [ nip ] }
+        [ [ "/" last-split1 drop "/" ] dip 3append ]
+    } cond ;
 
-: derive-url ( url base -- url' )
-    clone
-    over path>> "/" head? [ fix-relative-path ] unless
-    [ <mirror> swap <mirror> [ nip ] assoc-filter update ] keep ;
+: derive-url ( base url -- url' )
+    [ clone dup ] dip
+    2dup [ path>> ] bi@ url-append-path
+    [ [ <mirror> ] bi@ [ nip ] assoc-filter update ] dip
+    >>path ;
+
+: relative-url ( url -- url' )
+    clone f >>protocol f >>host f >>port ;
