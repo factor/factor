@@ -108,6 +108,8 @@ IN: tools.deploy.shaker
 
 : stripped-globals ( -- seq )
     [
+        "callbacks" "alien.compiler" lookup ,
+
         {
             bootstrap.stage2:bootstrap-time
             continuations:error
@@ -142,6 +144,7 @@ IN: tools.deploy.shaker
 
             {
                 gensym
+                name>char-hook
                 classes:class-and-cache
                 classes:class-not-cache
                 classes:class-or-cache
@@ -167,6 +170,8 @@ IN: tools.deploy.shaker
                 vocabs:load-vocab-hook
                 word
             } %
+
+            { } { "optimizer.math.partial" } strip-vocab-globals %
         ] when
 
         strip-prettyprint? [

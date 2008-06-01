@@ -930,22 +930,22 @@ DEFINE_PRIMITIVE(gc_stats)
 	for(i = 0; i < MAX_GEN_COUNT; i++)
 	{
 		F_GC_STATS *s = &gc_stats[i];
-		GROWABLE_ADD(stats,allot_cell(s->collections));
-		GROWABLE_ADD(stats,allot_cell(s->gc_time));
-		GROWABLE_ADD(stats,allot_cell(s->max_gc_time));
-		GROWABLE_ADD(stats,allot_cell(s->collections == 0 ? 0 : s->gc_time / s->collections));
-		GROWABLE_ADD(stats,allot_cell(s->object_count));
-		GROWABLE_ADD(stats,tag_bignum(long_long_to_bignum(s->bytes_copied)));
+		GROWABLE_ARRAY_ADD(stats,allot_cell(s->collections));
+		GROWABLE_ARRAY_ADD(stats,allot_cell(s->gc_time));
+		GROWABLE_ARRAY_ADD(stats,allot_cell(s->max_gc_time));
+		GROWABLE_ARRAY_ADD(stats,allot_cell(s->collections == 0 ? 0 : s->gc_time / s->collections));
+		GROWABLE_ARRAY_ADD(stats,allot_cell(s->object_count));
+		GROWABLE_ARRAY_ADD(stats,tag_bignum(long_long_to_bignum(s->bytes_copied)));
 
 		total_gc_time += s->gc_time;
 	}
 
-	GROWABLE_ADD(stats,allot_cell(total_gc_time));
-	GROWABLE_ADD(stats,tag_bignum(long_long_to_bignum(cards_scanned)));
-	GROWABLE_ADD(stats,tag_bignum(long_long_to_bignum(decks_scanned)));
-	GROWABLE_ADD(stats,allot_cell(code_heap_scans));
+	GROWABLE_ARRAY_ADD(stats,allot_cell(total_gc_time));
+	GROWABLE_ARRAY_ADD(stats,tag_bignum(long_long_to_bignum(cards_scanned)));
+	GROWABLE_ARRAY_ADD(stats,tag_bignum(long_long_to_bignum(decks_scanned)));
+	GROWABLE_ARRAY_ADD(stats,allot_cell(code_heap_scans));
 
-	GROWABLE_TRIM(stats);
+	GROWABLE_ARRAY_TRIM(stats);
 	dpush(stats);
 }
 
@@ -986,13 +986,13 @@ CELL find_all_words(void)
 	while((obj = next_object()) != F)
 	{
 		if(type_of(obj) == WORD_TYPE)
-			GROWABLE_ADD(words,obj);
+			GROWABLE_ARRAY_ADD(words,obj);
 	}
 
 	/* End heap scan */
 	gc_off = false;
 
-	GROWABLE_TRIM(words);
+	GROWABLE_ARRAY_TRIM(words);
 
 	return words;
 }

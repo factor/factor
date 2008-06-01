@@ -64,9 +64,11 @@ M: winnt add-completion ( win32-handle -- )
 
 : handle-overlapped ( timeout -- ? )
     wait-for-overlapped [
-        >r drop GetLastError
-        [ 1array ] [ expected-io-error? ] bi
-        [ r> 2drop f ] [ r> resume-callback t ] if
+        dup [
+            >r drop GetLastError 1array r> resume-callback t
+        ] [
+            2drop f
+        ] if
     ] [
         resume-callback t
     ] if ;

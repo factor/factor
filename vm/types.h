@@ -146,6 +146,7 @@ DECLARE_PRIMITIVE(float_array);
 DECLARE_PRIMITIVE(clone);
 
 F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity, CELL fill);
+F_BYTE_ARRAY *reallot_byte_array(F_BYTE_ARRAY *array, CELL capacity);
 DECLARE_PRIMITIVE(resize_array);
 DECLARE_PRIMITIVE(resize_byte_array);
 DECLARE_PRIMITIVE(resize_bit_array);
@@ -193,15 +194,33 @@ DECLARE_PRIMITIVE(wrapper);
 	CELL result##_count = 0; \
 	CELL result = tag_object(allot_array(ARRAY_TYPE,100,F))
 
-F_ARRAY *growable_add(F_ARRAY *result, CELL elt, CELL *result_count);
+F_ARRAY *growable_array_add(F_ARRAY *result, CELL elt, CELL *result_count);
 
-#define GROWABLE_ADD(result,elt) \
-	result = tag_object(growable_add(untag_object(result),elt,&result##_count))
+#define GROWABLE_ARRAY_ADD(result,elt) \
+	result = tag_object(growable_array_add(untag_object(result),elt,&result##_count))
 
-F_ARRAY *growable_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_count);
+F_ARRAY *growable_array_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_count);
 
-#define GROWABLE_APPEND(result,elts) \
-	result = tag_object(growable_append(untag_object(result),elts,&result##_count))
+#define GROWABLE_ARRAY_APPEND(result,elts) \
+	result = tag_object(growable_array_append(untag_object(result),elts,&result##_count))
 
-#define GROWABLE_TRIM(result) \
+#define GROWABLE_ARRAY_TRIM(result) \
 	result = tag_object(reallot_array(untag_object(result),result##_count,F))
+
+/* Macros to simulate a byte vector in C */
+#define GROWABLE_BYTE_ARRAY(result) \
+	CELL result##_count = 0; \
+	CELL result = tag_object(allot_byte_array(100))
+
+F_ARRAY *growable_byte_array_add(F_BYTE_ARRAY *result, CELL elt, CELL *result_count);
+
+#define GROWABLE_BYTE_ARRAY_ADD(result,elt) \
+	result = tag_object(growable_byte_array_add(untag_object(result),elt,&result##_count))
+
+F_ARRAY *growable_byte_array_append(F_BYTE_ARRAY *result, void *elts, CELL len, CELL *result_count);
+
+#define GROWABLE_BYTE_ARRAY_APPEND(result,elts,len) \
+	result = tag_object(growable_byte_array_append(untag_object(result),elts,len,&result##_count))
+
+#define GROWABLE_BYTE_ARRAY_TRIM(result) \
+	result = tag_object(reallot_byte_array(untag_object(result),result##_count))
