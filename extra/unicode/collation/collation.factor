@@ -6,6 +6,7 @@ unicode.syntax macros sequences.deep words unicode.breaks
 quotations ;
 IN: unicode.collation
 
+<PRIVATE
 VALUE: ducet
 
 TUPLE: weight primary secondary tertiary ignorable? ;
@@ -115,6 +116,7 @@ ducet insert-helpers
             [ [ variable-weight ] each ]
         } cleave
     ] { } make ;
+PRIVATE>
 
 : completely-ignorable? ( weight -- ? )
     [ primary>> ] [ secondary>> ] [ tertiary>> ] tri
@@ -131,11 +133,13 @@ ducet insert-helpers
     nfd string>graphemes graphemes>weights
     filter-ignorable weights>bytes ;
 
+<PRIVATE
 : insensitive= ( str1 str2 levels-removed -- ? )
     [
         swap collation-key swap
         [ [ 0 = not ] right-trim but-last ] times
     ] curry bi@ = ;
+PRIVATE>
 
 : primary= ( str1 str2 -- ? )
     3 insensitive= ;
@@ -149,12 +153,14 @@ ducet insert-helpers
 : quaternary= ( str1 str2 -- ? )
     0 insensitive= ;
 
+<PRIVATE
 : compare-collation ( {str1,key} {str2,key} -- <=> )
     2dup [ second ] bi@ <=> dup +eq+ =
     [ drop <=> ] [ 2nip ] if ;
 
 : w/collation-key ( str -- {str,key} )
     dup collation-key 2array ;
+PRIVATE>
 
 : sort-strings ( strings -- sorted )
     [ w/collation-key ] map
