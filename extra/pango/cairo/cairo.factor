@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! pangocairo bindings, from pango/pangocairo.h
-
 USING: cairo.ffi alien.c-types math
-alien.syntax system combinators alien ;
-IN: cairo.pango
+alien.syntax system combinators alien
+arrays pango pango.fonts ;
+IN: pango.cairo
 
 << "pangocairo" {
 !    { [ os winnt? ] [ "libpangocairo-1.dll" ] }
@@ -14,10 +14,6 @@ IN: cairo.pango
 } cond "cdecl" add-library >>
 
 LIBRARY: pangocairo
-
-TYPEDEF: void* PangoCairoFont
-TYPEDEF: void* PangoCairoFontMap
-TYPEDEF: void* PangoFontMap
 
 FUNCTION: PangoFontMap*
 pango_cairo_font_map_new  ( ) ;
@@ -93,49 +89,6 @@ FUNCTION: void
 pango_cairo_error_underline_path ( cairo_t* cr, double x, double y, double width, double height ) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! Helpful functions from other parts of pango
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: PANGO_SCALE 1024 ;
-
-FUNCTION: void
-pango_layout_set_text ( PangoLayout* layout, char* text, int length ) ;
-
-FUNCTION: char*
-pango_layout_get_text ( PangoLayout* layout ) ;
-
-FUNCTION: void
-pango_layout_get_size ( PangoLayout* layout, int* width, int* height ) ;
-
-TYPEDEF: void* PangoFontDescription
-
-FUNCTION: PangoFontDescription*
-pango_font_description_from_string ( char* str ) ;
-
-FUNCTION: char*
-pango_font_description_to_string ( PangoFontDescription* desc ) ;
-
-FUNCTION: char*
-pango_font_description_to_filename ( PangoFontDescription* desc ) ;
-
-FUNCTION: void
-pango_layout_set_font_description ( PangoLayout* layout, PangoFontDescription* desc ) ;
-
-FUNCTION: PangoFontDescription*
-pango_layout_get_font_description ( PangoLayout* layout ) ;
-
-FUNCTION: void
-pango_layout_get_pixel_size ( PangoLayout* layout, int* width, int* height ) ;
-
-FUNCTION: void
-pango_font_description_free ( PangoFontDescription* desc ) ;
-
-TYPEDEF: void* gpointer
-
-FUNCTION: void
-g_object_unref ( gpointer object ) ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Higher level words and combinators
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -162,8 +115,8 @@ M: pango-layout dispose ( alien -- ) alien>> g_object_unref ;
     >r CAIRO_FORMAT_ARGB32 0 0 cairo_image_surface_create
     r> [ with-pango ] curry with-cairo-from-surface ; inline
 
-: layout-size ( quot -- width height )
-    [ layout pango-layout-get-pixel-size ] compose dummy-pango ; inline
+: layout-size ( quot -- dim )
+    [ layout pango-layout-get-pixel-size 2array ] compose dummy-pango ; inline
 
 : layout-font ( str -- )
     pango_font_description_from_string
@@ -173,3 +126,6 @@ M: pango-layout dispose ( alien -- ) alien>> g_object_unref ;
 
 : layout-text ( str -- )
     layout swap -1 pango_layout_set_text ;
+
+: families ( -- families )
+    pango_cairo_font_map_get_default list-families ;

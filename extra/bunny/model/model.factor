@@ -35,10 +35,8 @@ IN: bunny.model
     [ normalize ] map ;
 
 : read-model ( stream -- model )
-    "Reading model" print flush [
-        ascii [ parse-model ] with-file-reader
-        [ normals ] 2keep 3array
-    ] time ;
+    ascii [ parse-model ] with-file-reader
+    [ normals ] 2keep 3array ;
 
 : model-path "bun_zipper.ply" temp-file ;
 

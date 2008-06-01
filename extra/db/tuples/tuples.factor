@@ -13,10 +13,10 @@ IN: db.tuples
     "db-columns" set-word-prop
     "db-relations" set-word-prop ;
 
-ERROR: not-persistent ;
+ERROR: not-persistent class ;
 
 : db-table ( class -- obj )
-    "db-table" word-prop [ not-persistent ] unless* ;
+    dup "db-table" word-prop [ ] [ not-persistent ] ?if ;
 
 : db-columns ( class -- obj )
     superclasses [ "db-columns" word-prop ] map concat ;
@@ -42,6 +42,8 @@ HOOK: <insert-user-assigned-statement> db ( class -- obj )
 HOOK: <update-tuple-statement> db ( class -- obj )
 HOOK: <delete-tuples-statement> db ( tuple class -- obj )
 HOOK: <select-by-slots-statement> db ( tuple class -- tuple )
+TUPLE: advanced-statement group order offset limit ;
+HOOK: <advanced-select-statement> db ( tuple class group order offset limit -- tuple )
 
 HOOK: insert-tuple* db ( tuple statement -- )
 
@@ -74,16 +76,16 @@ M: retryable execute-statement* ( statement type -- )
         [ regenerate-params bind-statement* f ] cleanup
     ] curry 10 retry drop ;
 
-: resulting-tuple ( row out-params -- tuple )
-    dup first class>> new [
+: resulting-tuple ( class row out-params -- tuple )
+    rot class new [
         [
             >r slot-name>> r> set-slot-named
         ] curry 2each
     ] keep ;
 
-: query-tuples ( statement -- seq )
+: query-tuples ( exemplar-tuple statement -- seq )
     [ out-params>> ] keep query-results [
-        [ sql-row-typed swap resulting-tuple ] with query-map
+        [ sql-row-typed swap resulting-tuple ] with with query-map
     ] with-disposal ;
  
 : query-modify-tuple ( tuple statement -- )
@@ -110,8 +112,8 @@ M: retryable execute-statement* ( statement type -- )
 
 : recreate-table ( class -- )
     [
-        drop-sql-statement make-nonthrowable
-        [ execute-statement ] with-disposals
+        [ drop-sql-statement [ execute-statement ] with-disposals
+        ] curry ignore-errors
     ] [ create-table ] bi ;
 
 : ensure-table ( class -- )
@@ -141,9 +143,12 @@ M: retryable execute-statement* ( statement type -- )
         [ bind-tuple ] keep execute-statement
     ] with-disposal ;
 
-: select-tuples ( tuple -- tuples )
-    dup dup class <select-by-slots-statement> [
-        [ bind-tuple ] keep query-tuples
-    ] with-disposal ;
+: do-select ( exemplar-tuple statement -- tuples )
+    [ [ bind-tuple ] [ query-tuples ] 2bi ] with-disposal ;
 
-: select-tuple ( tuple -- tuple/f ) select-tuples ?first ;
+: select-tuples ( tuple -- tuples )
+    dup dup class <select-by-slots-statement> do-select ;
+
+: select-tuple ( tuple -- tuple/f )
+    dup dup class f f f 1 <advanced-select-statement>
+    do-select ?first ;
