@@ -2,10 +2,12 @@
 USING: kernel
        combinators
        vectors
+       sequences
        io.sockets
        accessors
+       combinators.lib
        newfx
-       dns dns.cache ;
+       dns dns.cache dns.misc ;
 
 IN: dns.forwarding
 
@@ -17,7 +19,10 @@ IN: dns.forwarding
 
 : socket ( -- socket ) (socket) 1st ;
 
-: init-socket ( -- ) f 5353 <inet4> <datagram> 0 (socket) as-mutate ;
+: init-socket-on-port ( port -- )
+  f swap <inet4> <datagram> 0 (socket) as-mutate ;
+
+: init-socket ( -- ) 53 init-socket-on-port ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -27,30 +32,37 @@ IN: dns.forwarding
 
 : set-upstream-server ( ip -- ) 0 (upstream-server) as-mutate ;
 
+: init-upstream-server ( -- )
+  upstream-server not
+    [ resolv-conf-server set-upstream-server ]
+  when ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: 1&& <-&& ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: rrs? ( obj -- ? ) { [ NX = not ] [ f = not ] } 1&& ;
+
 : query->answer/cache ( query -- rrs/NX/f )
-    {
-      { [ dup type>> CNAME = ] [ cache-get* ] }
-      {
-        [ dup clone CNAME >>type cache-get* vector? ]
-        [
-          dup clone CNAME >>type cache-get* 1st       ! query rr/cname
-          dup rdata>>                                 ! query rr/cname cname
-          >r swap clone r>                            ! rr/cname query cname
-          >>name                                      ! rr/cname query
-          query->answer/cache                         ! rr/cname rrs/NX/f
-            {
-              { [ dup vector? ] [ clone push-on ] }
-              { [ dup NX = ]    [ nip ] }
-              { [ dup f = ]     [ nip ] }
-            }
-          cond
+  dup cache-get* dup { [ rrs? ] [ NX = ] } 1||
+    [ nip ]
+    [
+      drop
+      dup clone CNAME >>type cache-get* dup { [ NX = ] [ f = ] } 1||
+        [ nip ]
+        [                                       ! query rrs
+          tuck                                  ! rrs query rrs
+          1st                                   ! rrs query rr/cname
+          rdata>>                               ! rrs query name
+          >r clone r> >>name                    ! rrs query
+          query->answer/cache                   ! rrs rrs/NX/f
+          dup rrs? [ append ] [ nip ] if
         ]
-      }
-      { [ t ] [ cache-get* ] }
-    }
-  cond ;
+      if
+    ]
+  if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -89,3 +101,9 @@ IN: dns.forwarding
   swap                                        ! byte-array addr-spec
   socket send
   loop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: start ( -- ) init-socket init-upstream-server loop ;
+
+MAIN: start
