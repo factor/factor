@@ -193,10 +193,7 @@ ARTICLE: "implementing-combinators" "Implementing combinators"
     ": keep ( x quot -- x )"
     "    over >r call r> ; inline"
 }
-"Word inlining is documented in " { $link "declarations" } "."
-$nl
-"A looping combinator:"
-{ $subsection while } ;
+"Word inlining is documented in " { $link "declarations" } "." ;
 
 ARTICLE: "booleans" "Booleans"
 "In Factor, any object that is not " { $link f } " has a true value, and " { $link f } " has a false value. The " { $link t } " object is the canonical true value."

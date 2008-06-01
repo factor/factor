@@ -499,8 +499,6 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 
 : delete ( elt seq -- ) 0 0 rot (delete) nip set-length drop ;
 
-: push-new ( elt seq -- ) [ delete ] 2keep push ;
-
 : prefix ( seq elt -- newseq )
     over >r over length 1+ r> [
         [ 0 swap set-nth-unsafe ] keep
@@ -680,7 +678,7 @@ PRIVATE>
 : unclip ( seq -- rest first )
     [ rest ] [ first ] bi ;
 
-: unclip-last ( seq -- butfirst last )
+: unclip-last ( seq -- butlast last )
     [ but-last ] [ peek ] bi ;
 
 : unclip-slice ( seq -- rest first )

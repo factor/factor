@@ -100,8 +100,8 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "DEFER:" [
-        scan in get create
-        dup old-definitions get first delete-at
+        scan current-vocab create
+        dup old-definitions get [ delete-at ] with each
         set-word
     ] define-syntax
 
@@ -189,8 +189,9 @@ IN: bootstrap.syntax
     "MAIN:" [ scan-word in get vocab set-vocab-main ] define-syntax
 
     "<<" [
-        [ \ >> parse-until >quotation ] with-compilation-unit
-        call
+        [
+            \ >> parse-until >quotation
+        ] with-nested-compilation-unit call
     ] define-syntax
 
     "call-next-method" [

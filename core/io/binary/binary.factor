@@ -10,8 +10,8 @@ IN: io.binary
 
 : nth-byte ( x n -- b ) -8 * shift mask-byte ; inline
 
-: >le ( x n -- str ) [ nth-byte ] with B{ } map-as ;
-: >be ( x n -- str ) >le dup reverse-here ;
+: >le ( x n -- byte-array ) [ nth-byte ] with B{ } map-as ;
+: >be ( x n -- byte-array ) >le dup reverse-here ;
 
 : d>w/w ( d -- w1 w2 )
     dup HEX: ffffffff bitand

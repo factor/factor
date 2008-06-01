@@ -113,8 +113,8 @@ typedef struct
 {
 	CELL type; /* this is WORD_TYPE or QUOTATION_TYPE */
 	CELL code_length; /* # bytes */
-	CELL reloc_length; /* # bytes */
 	CELL literals_length; /* # bytes */
+	CELL relocation; /* tagged pointer to byte-array or f */
 } F_COMPILED;
 
 /* Assembly code makes assumptions about the layout of this struct */

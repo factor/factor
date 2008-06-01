@@ -197,7 +197,7 @@ DEFINE_PRIMITIVE(resize_array)
 	dpush(tag_object(reallot_array(array,capacity,F)));
 }
 
-F_ARRAY *growable_add(F_ARRAY *result, CELL elt, CELL *result_count)
+F_ARRAY *growable_array_add(F_ARRAY *result, CELL elt, CELL *result_count)
 {
 	REGISTER_ROOT(elt);
 
@@ -209,12 +209,12 @@ F_ARRAY *growable_add(F_ARRAY *result, CELL elt, CELL *result_count)
 
 	UNREGISTER_ROOT(elt);
 	set_array_nth(result,*result_count,elt);
-	*result_count = *result_count + 1;
+	(*result_count)++;
 
 	return result;
 }
 
-F_ARRAY *growable_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_count)
+F_ARRAY *growable_array_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_count)
 {
 	REGISTER_UNTAGGED(elts);
 
@@ -228,7 +228,7 @@ F_ARRAY *growable_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_count)
 
 	write_barrier((CELL)result);
 
-	memcpy((void*)AREF(result,*result_count),(void*)AREF(elts,0),elts_size * CELLS);
+	memcpy((void *)AREF(result,*result_count),(void *)AREF(elts,0),elts_size * CELLS);
 
 	*result_count += elts_size;
 
@@ -281,6 +281,33 @@ DEFINE_PRIMITIVE(resize_byte_array)
 	F_BYTE_ARRAY* array = untag_byte_array(dpop());
 	CELL capacity = unbox_array_size();
 	dpush(tag_object(reallot_byte_array(array,capacity)));
+}
+
+F_BYTE_ARRAY *growable_byte_array_add(F_BYTE_ARRAY *result, CELL elt, CELL *result_count)
+{
+	if(*result_count == byte_array_capacity(result))
+	{
+		result = reallot_byte_array(result,*result_count * 2);
+	}
+
+	bput(BREF(result,*result_count),elt);
+	*result_count++;
+
+	return result;
+}
+
+F_BYTE_ARRAY *growable_byte_array_append(F_BYTE_ARRAY *result, void *elts, CELL len, CELL *result_count)
+{
+	CELL new_size = *result_count + len;
+
+	if(new_size >= byte_array_capacity(result))
+		result = reallot_byte_array(result,new_size * 2);
+
+	memcpy((void *)BREF(result,*result_count),elts,len);
+
+	*result_count = new_size;
+
+	return result;
 }
 
 /* Bit arrays */

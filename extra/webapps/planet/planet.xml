@@ -2,24 +2,44 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-	<t:style t:include="resource:extra/webapps/planet/planet.css" />
+	<t:title>Planet Factor</t:title>
 
-	<div class="navbar">
-		  <t:a t:href="$planet-factor/list">Front Page</t:a>
-		| <t:a t:href="$planet-factor/feed.xml">Atom Feed</t:a>
-		| <t:a t:href="$planet-factor/admin">Admin</t:a>
+	<table width="100%" cellpadding="10">
+		<tr>
+			<td>
 
-		<t:if t:code="http.server.sessions:uid">
-			<t:if t:code="http.server.auth.login:allow-edit-profile?">
-				| <t:a t:href="$login/edit-profile" t:flow="begin">Edit Profile</t:a>
-			</t:if>
-	
-			| <t:button t:action="$login/logout" t:flow="begin" class="link-button link">Logout</t:button>
-		</t:if>
-	</div>
+				<t:each-tuple t:values="postings">
 
-	<h1><t:write-title /></h1>
+					<h2 class="posting-title">
+						<t:a t:value="link" t:session="none"><t:label t:name="title" /></t:a>
+					</h2>
 
-        <t:call-next-template />
+					<p class="posting-body">
+						<t:html t:name="description" />
+					</p>
+
+					<p class="posting-date">
+						<t:a t:value="link" t:session="none"><t:label t:name="pub-date" /></t:a>
+					</p>
+
+				</t:each-tuple>
+
+			</td>
+
+			<td valign="top" width="25%" class="infobox">
+
+				<h2>Blogroll</h2>
+
+				<ul>
+					<t:each t:values="blogroll">
+						<li>
+							<t:link t:name="value"/>
+						</li>
+					</t:each>
+				</ul>
+
+			</td>
+		</tr>
+	</table>
 
 </t:chloe>

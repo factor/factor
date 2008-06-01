@@ -1,9 +1,0 @@
-<?xml version='1.0' ?>
-
-<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
-
-	<t:title>Users</t:title>
-
-	<t:summary t:component="list" />
-
-</t:chloe>

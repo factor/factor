@@ -6,7 +6,7 @@ models namespaces parser prettyprint quotations sequences
 strings threads listener classes.tuple ui.commands ui.gadgets
 ui.gadgets.editors ui.gadgets.presentations ui.gadgets.worlds
 ui.gestures definitions calendar concurrency.flags
-concurrency.mailboxes ui.tools.workspace accessors ;
+concurrency.mailboxes ui.tools.workspace accessors sets ;
 IN: ui.tools.interactor
 
 ! If waiting is t, we're waiting for user input, and invoking
@@ -76,7 +76,7 @@ M: interactor model-changed
     ] with-output-stream* ;
 
 : add-interactor-history ( str interactor -- )
-    over empty? [ 2drop ] [ interactor-history push-new ] if ;
+    over empty? [ 2drop ] [ interactor-history adjoin ] if ;
 
 : interactor-continue ( obj interactor -- )
     mailbox>> mailbox-put ;

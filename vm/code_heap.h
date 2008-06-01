@@ -53,8 +53,7 @@ typedef struct {
 	unsigned int offset;
 } F_REL;
 
-void relocate_code_block(F_COMPILED *relocating, CELL code_start,
-	CELL reloc_start, CELL literals_start);
+void relocate_code_block(F_COMPILED *relocating, CELL code_start, CELL literals_start);
 
 void default_word_code(F_WORD *word, bool relocate);
 
@@ -64,7 +63,7 @@ F_COMPILED *add_compiled_block(
 	CELL type,
 	F_ARRAY *code,
 	F_ARRAY *labels,
-	F_ARRAY *rel,
+	CELL relocation,
 	F_ARRAY *literals);
 
 CELL compiled_code_format(void);

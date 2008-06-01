@@ -10,8 +10,10 @@ ARTICLE: "combinators-quot" "Quotation construction utilities"
 { $subsection alist>quot } ;
 
 ARTICLE: "combinators" "Additional combinators"
-"The " { $vocab-link "combinators" } " vocabulary provides generalizations of certain combinators from the " { $vocab-link "kernel" } " vocabulary."
+"The " { $vocab-link "combinators" } " vocabulary provides a few useful combinators."
 $nl
+"A looping combinator:"
+{ $subsection while }
 "Generalization of " { $link bi } " and " { $link tri } ":"
 { $subsection cleave }
 "Generalization of " { $link bi* } " and " { $link tri* } ":"

@@ -288,18 +288,18 @@ void relocate_data()
 	}
 }
 
-void fixup_code_block(F_COMPILED *relocating, CELL code_start,
-	CELL reloc_start, CELL literals_start)
+void fixup_code_block(F_COMPILED *compiled, CELL code_start, CELL literals_start)
 {
 	/* relocate literal table data */
 	CELL scan;
-	CELL literal_end = literals_start + relocating->literals_length;
+	CELL literal_end = literals_start + compiled->literals_length;
+
+	data_fixup(&compiled->relocation);
 
 	for(scan = literals_start; scan < literal_end; scan += CELLS)
 		data_fixup((CELL*)scan);
 
-	if(reloc_start != literals_start)
-		relocate_code_block(relocating,code_start,reloc_start,literals_start);
+	relocate_code_block(compiled,code_start,literals_start);
 }
 
 void relocate_code()

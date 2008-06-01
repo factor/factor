@@ -62,12 +62,23 @@ IN: farkup.tests
 [ "<p>=</p><h2>foo</h2>" ] [ "===foo==" convert-farkup ] unit-test
 [ "<h1>foo</h1><p>=</p>" ] [ "=foo==" convert-farkup ] unit-test
 
-[ "<div style='white-space: pre; font-family: monospace; '><span class='KEYWORD3'>int</span> <span class='FUNCTION'>main</span><span class='OPERATOR'>(</span><span class='OPERATOR'>)</span><br/></div>" ]
+[ "<pre><span class='KEYWORD3'>int</span> <span class='FUNCTION'>main</span><span class='OPERATOR'>(</span><span class='OPERATOR'>)</span>\n</pre>" ]
 [ "[c{int main()}]" convert-farkup ] unit-test
 
 [ "<p><img src=\"lol.jpg\"/></p>" ] [ "[[image:lol.jpg]]" convert-farkup ] unit-test
 [ "<p><img src=\"lol.jpg\" alt=\"teh lol\"/></p>" ] [ "[[image:lol.jpg|teh lol]]" convert-farkup ] unit-test
-[ "<p><a href=\"lol.com\"></a></p>" ] [ "[[lol.com]]" convert-farkup ] unit-test
+[ "<p><a href=\"lol.com\">lol.com</a></p>" ] [ "[[lol.com]]" convert-farkup ] unit-test
 [ "<p><a href=\"lol.com\">haha</a></p>" ] [ "[[lol.com|haha]]" convert-farkup ] unit-test
 
 [ ] [ "[{}]" convert-farkup drop ] unit-test
+
+[
+    "<p>Feature comparison:\n<table><tr><td>a</td><td>Factor</td><td>Java</td><td>Lisp</td></tr><tr><td>Coolness</td><td>Yes</td><td>No</td><td>No</td></tr><tr><td>Badass</td><td>Yes</td><td>No</td><td>No</td></tr><tr><td>Enterprise</td><td>Yes</td><td>Yes</td><td>No</td></tr><tr><td>Kosher</td><td>Yes</td><td>No</td><td>Yes</td></tr></table></p>"
+] [ "Feature comparison:\n|a|Factor|Java|Lisp|\n|Coolness|Yes|No|No|\n|Badass|Yes|No|No|\n|Enterprise|Yes|Yes|No|\n|Kosher|Yes|No|Yes|\n" convert-farkup ] unit-test
+
+[
+    "<p>Feature comparison:\n\n<table><tr><td>a</td><td>Factor</td><td>Java</td><td>Lisp</td></tr><tr><td>Coolness</td><td>Yes</td><td>No</td><td>No</td></tr><tr><td>Badass</td><td>Yes</td><td>No</td><td>No</td></tr><tr><td>Enterprise</td><td>Yes</td><td>Yes</td><td>No</td></tr><tr><td>Kosher</td><td>Yes</td><td>No</td><td>Yes</td></tr></table></p>"
+] [ "Feature comparison:\n\n|a|Factor|Java|Lisp|\n|Coolness|Yes|No|No|\n|Badass|Yes|No|No|\n|Enterprise|Yes|Yes|No|\n|Kosher|Yes|No|Yes|\n" convert-farkup ] unit-test
+
+[ "<p>a-b</p>" ] [ "a-b" convert-farkup ] unit-test
+[ "<ul><li>a-b</li></ul>" ] [ "-a-b" convert-farkup ] unit-test

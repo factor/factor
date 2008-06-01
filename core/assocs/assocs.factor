@@ -150,6 +150,9 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 : map>assoc ( seq quot exemplar -- assoc )
     >r [ 2array ] compose { } map-as r> assoc-like ; inline
 
+: extract-keys ( seq assoc -- subassoc )
+    [ [ dupd at ] curry ] keep map>assoc ;
+
 M: assoc >alist [ 2array ] { } assoc>map ;
 
 : value-at ( value assoc -- key/f )

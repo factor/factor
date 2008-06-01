@@ -25,7 +25,7 @@ DEFINE_PRIMITIVE(os_envs)
 			break;
 
 		CELL string = tag_object(from_u16_string(finger));
-		GROWABLE_ADD(result,string);
+		GROWABLE_ARRAY_ADD(result,string);
 
 		finger = scan + 1;
 	}
@@ -33,7 +33,7 @@ DEFINE_PRIMITIVE(os_envs)
 	FreeEnvironmentStrings(env);
 
 	UNREGISTER_ROOT(result);
-	GROWABLE_TRIM(result);
+	GROWABLE_ARRAY_TRIM(result);
 	dpush(result);
 }
 
