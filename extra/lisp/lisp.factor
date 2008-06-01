@@ -10,6 +10,7 @@ DEFER: convert-form
 DEFER: funcall
 DEFER: lookup-var
 DEFER: lisp-macro?
+DEFER: looku-macro
 
 ! Functions to convert s-exps to quotations
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -69,7 +70,7 @@ PRIVATE>
     } case ;
     
 : macro-expand ( s-exp -- quot )
-     ;
+    unclip-slice lookup-macro macro-call convert-form ;
     
 : convert-list-form ( s-exp -- quot )  
     dup first 
