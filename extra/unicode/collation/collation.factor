@@ -154,18 +154,13 @@ PRIVATE>
     0 insensitive= ;
 
 <PRIVATE
-: compare-collation ( {str1,key} {str2,key} -- <=> )
-    2dup [ second ] bi@ <=> dup +eq+ =
-    [ drop <=> ] [ 2nip ] if ;
-
 : w/collation-key ( str -- {str,key} )
-    dup collation-key 2array ;
+    [ collation-key ] keep 2array ;
 PRIVATE>
 
 : sort-strings ( strings -- sorted )
     [ w/collation-key ] map
-    [ compare-collation ] sort
-    keys ;
+    natural-sort values ;
 
 : string<=> ( str1 str2 -- <=> )
-    [ w/collation-key ] bi@ compare-collation ;
+    [ w/collation-key ] compare ;
