@@ -3,7 +3,7 @@
 USING: arrays combinators concurrency.mailboxes concurrency.futures io
        io.encodings.8-bit io.sockets kernel namespaces sequences
        sequences.lib splitting threads calendar classes.tuple
-       ascii assocs accessors destructors ;
+       classes ascii assocs accessors destructors ;
 IN: irc.client
 
 ! ======================================
@@ -107,43 +107,6 @@ TUPLE: unhandled < irc-message ;
     "PONG " irc-write irc-print ;
 
 ! ======================================
-! Server message handling
-! ======================================
-
-: irc-message-origin ( irc-message -- name )
-    dup name>> irc-client> nick>> name>> = [ sender>> ] [ name>> ] if ;
-
-GENERIC: handle-incoming-irc ( irc-message -- )
-
-M: irc-message handle-incoming-irc ( irc-message -- )
-    drop ;
-
-M: logged-in handle-incoming-irc ( logged-in -- )
-    name>> irc-client> nick>> (>>name) ;
-
-M: ping handle-incoming-irc ( ping -- )
-    trailing>> /PONG ;
-
-M: nick-in-use handle-incoming-irc ( nick-in-use -- )
-    name>> "_" append /NICK ;
-
-M: privmsg handle-incoming-irc ( privmsg -- )
-    dup irc-message-origin irc-client> listeners>> at
-    [ in-messages>> mailbox-put ] [ drop ] if* ;
-
-M: join handle-incoming-irc ( join -- )
-    irc-client> join-messages>> mailbox-put ;
-
-! ======================================
-! Client message handling
-! ======================================
-
-GENERIC: handle-outgoing-irc ( obj -- )
-
-M: privmsg handle-outgoing-irc ( privmsg -- )
-   [ name>> ] [ trailing>> ] bi /PRIVMSG ;
-
-! ======================================
 ! Message parsing
 ! ======================================
 
@@ -190,6 +153,46 @@ M: privmsg handle-outgoing-irc ( privmsg -- )
     [ [ tuple-slots ] [ parameters>> ] bi append ] dip prefix >tuple ;
 
 ! ======================================
+! Server message handling
+! ======================================
+
+: me? ( string -- ? )
+    irc-client> nick>> name>> = ;
+
+: irc-message-origin ( irc-message -- name )
+    dup name>> me? [ prefix>> parse-name ] [ name>> ] if ;
+
+GENERIC: handle-incoming-irc ( irc-message -- )
+
+M: irc-message handle-incoming-irc ( irc-message -- )
+    drop ;
+
+M: logged-in handle-incoming-irc ( logged-in -- )
+    name>> irc-client> nick>> (>>name) ;
+
+M: ping handle-incoming-irc ( ping -- )
+    trailing>> /PONG ;
+
+M: nick-in-use handle-incoming-irc ( nick-in-use -- )
+    name>> "_" append /NICK ;
+
+M: privmsg handle-incoming-irc ( privmsg -- )
+    dup irc-message-origin irc-client> listeners>> at
+    [ in-messages>> mailbox-put ] [ drop ] if* ;
+
+M: join handle-incoming-irc ( join -- )
+    irc-client> join-messages>> mailbox-put ;
+
+! ======================================
+! Client message handling
+! ======================================
+
+GENERIC: handle-outgoing-irc ( obj -- )
+
+M: privmsg handle-outgoing-irc ( privmsg -- )
+   [ name>> ] [ trailing>> ] bi /PRIVMSG ;
+
+! ======================================
 ! Reader/Writer
 ! ======================================
 
@@ -219,19 +222,12 @@ M: privmsg handle-outgoing-irc ( privmsg -- )
 : in-multiplexer-loop ( -- )
     irc-client> in-messages>> mailbox-get handle-incoming-irc ;
 
-! FIXME: Hack, this should be handled better
-GENERIC: annotate-message-with-name ( name obj -- obj )
-M: object annotate-message-with-name nip ;
-M: privmsg annotate-message-with-name swap >>name ;
+: maybe-annotate-with-name ( name obj -- obj )
+    dup privmsg instance? [ swap >>name ] [ nip ] if ;
 
-: listener-loop ( name -- ) ! FIXME: take different values from the stack?
-    dup irc-client> listeners>> at [
-        out-messages>> mailbox-get annotate-message-with-name
-        irc-client> out-messages>>
-        mailbox-put
-    ] [
-        drop
-    ] if* ;
+: listener-loop ( name listener -- )
+    out-messages>> mailbox-get maybe-annotate-with-name
+    irc-client> out-messages>> mailbox-put ;
 
 : spawn-irc-loop ( quot name -- )
     [ [ irc-client> is-running>> ] compose ] dip
@@ -247,9 +243,10 @@ M: privmsg annotate-message-with-name swap >>name ;
 ! ======================================
 
 : make-registered-listener ( name -- listener )
-    <irc-listener> swap dup
-    [ listener-loop ] curry "listener" spawn-irc-loop
-    [ irc-client> listeners>> set-at ] curry keep ;
+    <irc-listener>
+    [ [ listener-loop ] 2curry "listener" spawn-irc-loop ]
+    [ swap [ irc-client> listeners>> set-at ] curry keep ]
+    2bi ;
 
 : make-join-future ( name -- future )
     [ [ swap trailing>> = ] curry ! compare name with channel name
@@ -283,7 +280,3 @@ PRIVATE>
     swap current-irc-client [
         dup f maybe-join make-listener-future
     ] with-variable ;
-
-! shorcut for privmsgs, etc
-: sender>> ( obj -- string )
-    prefix>> parse-name ;
