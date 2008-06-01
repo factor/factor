@@ -154,3 +154,7 @@ M: retryable execute-statement* ( statement type -- )
 : select-tuple ( tuple -- tuple/f )
     dup dup class f f f 1 <advanced-select-statement>
     do-select ?first ;
+
+: advanced-select ( tuple groups order offset limit -- tuples )
+    >r >r >r >r dup dup class r> r> r> r>
+    <advanced-select-statement> do-select ;
