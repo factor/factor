@@ -4,6 +4,7 @@
 ! pangocairo bindings, from pango/pangocairo.h
 USING: cairo.ffi alien.c-types math
 alien.syntax system combinators alien
+memoize
 arrays pango pango.fonts ;
 IN: pango.cairo
 
@@ -111,9 +112,11 @@ M: pango-layout dispose ( alien -- ) alien>> g_object_unref ;
     0 <int> 0 <int> [ pango_layout_get_pixel_size ] 2keep
     [ *int ] bi@ ;
 
+MEMO: dummy-cairo ( -- cr )
+    CAIRO_FORMAT_ARGB32 0 0 cairo_image_surface_create cairo_create ;
+
 : dummy-pango ( quot -- )
-    >r CAIRO_FORMAT_ARGB32 0 0 cairo_image_surface_create
-    r> [ with-pango ] curry with-cairo-from-surface ; inline
+    >r dummy-cairo cairo r> [ with-pango ] curry with-variable ; inline
 
 : layout-size ( quot -- dim )
     [ layout pango-layout-get-pixel-size 2array ] compose dummy-pango ; inline
