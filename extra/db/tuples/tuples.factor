@@ -112,8 +112,8 @@ M: retryable execute-statement* ( statement type -- )
 
 : recreate-table ( class -- )
     [
-        drop-sql-statement make-nonthrowable
-        [ execute-statement ] with-disposals
+        [ drop-sql-statement [ execute-statement ] with-disposals
+        ] curry ignore-errors
     ] [ create-table ] bi ;
 
 : ensure-table ( class -- )
