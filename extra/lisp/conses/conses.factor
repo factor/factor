@@ -20,7 +20,12 @@ TUPLE: cons car cdr ;
     <reversed> cons [ <car> swap >>cdr ] reduce ;
     
 : (map-cons) ( acc cons quot -- seq )    
-    over null? [ 2drop ] [ [ uncons ] dip [ call ] keep swapd [ suffix ] 2dip (map-cons) ] if ;
+    over null? [ 2drop ]
+    [ [ uncons ] dip [ call ] keep swapd [ suffix ] 2dip (map-cons) ] if ;
     
 : map-cons ( cons quot -- seq )
     [ { } clone ] 2dip (map-cons) ;
+    
+: reduce-cons ( cons identity quot -- result )    
+    pick null? [ drop nip ]
+    [ [ uncons ] 2dip swapd [ call ] keep reduce-cons ] if ;
