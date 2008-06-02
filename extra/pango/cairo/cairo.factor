@@ -130,5 +130,8 @@ MEMO: dummy-cairo ( -- cr )
 : layout-text ( str -- )
     layout swap -1 pango_layout_set_text ;
 
+: show-layout ( -- )
+    cr layout pango_cairo_show_layout ;
+
 : families ( -- families )
     pango_cairo_font_map_get_default list-families ;

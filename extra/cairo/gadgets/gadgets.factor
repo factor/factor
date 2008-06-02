@@ -22,8 +22,10 @@ TUPLE: cairo-gadget < texture-gadget quot ;
         swap >>quot
         swap >>dim ;
 
-M: cairo-gadget graft* ( gadget -- )
-    GL_BGRA >>format dup
+M: cairo-gadget format>> drop GL_BGRA ;
+
+M: cairo-gadget render* ( gadget -- )
+    dup
     [ dim>> 2^-bounds ] [ quot>> copy-cairo ] bi
     >>bytes call-next-method ;
 
