@@ -1,4 +1,4 @@
-USING: tools.test yahoo kernel io.files xml sequences accessors ;
+USING: tools.test yahoo kernel io.files xml sequences accessors urls ;
 
 [ T{
     result
@@ -8,4 +8,4 @@ USING: tools.test yahoo kernel io.files xml sequences accessors ;
     "Official site with news, tour dates, discography, store, community, and more."
 } ] [ "resource:extra/yahoo/test-results.xml" file>xml parse-yahoo first ] unit-test
 
-[ "http://search.yahooapis.com/WebSearchService/V1/webSearch?appid=Factor-search&query=hi&results=2&similar_ok=1" ] [ "hi" <search> "Factor-search" >>appid 2 >>results t >>similar-ok query ] unit-test
+[ URL" http://search.yahooapis.com/WebSearchService/V1/webSearch?appid=Factor-search&query=hi&results=2&similar_ok=1" ] [ "hi" <search> "Factor-search" >>appid 2 >>results t >>similar-ok query ] unit-test
