@@ -1,5 +1,6 @@
-USING: math kernel accessors html.components http.server
-furnace.actions furnace.sessions html.templates.chloe
+USING: math kernel accessors http.server http.server.dispatchers
+furnace.actions furnace.sessions
+html.components html.templates.chloe
 fry urls ;
 IN: webapps.counter
 

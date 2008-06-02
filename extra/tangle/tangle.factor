@@ -1,6 +1,10 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs db db.sqlite db.postgresql http http.server furnace.actions http.server.static io io.files json.writer kernel math.parser namespaces semantic-db sequences strings tangle.path ;
+USING: accessors assocs db db.sqlite db.postgresql
+http http.server http.server.dispatchers http.server.responses
+http.server.static furnace.actions furnace.json
+io io.files json.writer kernel math.parser namespaces
+semantic-db sequences strings tangle.path ;
 IN: tangle
 
 GENERIC: render* ( content templater -- output )
