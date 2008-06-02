@@ -6,42 +6,45 @@ vectors syntax lisp.parser assocs parser sequences.lib words quotations
 fry ;
 IN: lisp
 
+: uncons ( cons -- cdr car )
+    [ cdr>> ] [ car>> ] bi ;
+
 DEFER: convert-form
 DEFER: funcall
 DEFER: lookup-var
 DEFER: lisp-macro?
-DEFER: looku-macro
+DEFER: lookup-macro
 
 ! Functions to convert s-exps to quotations
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-: convert-body ( s-exp -- quot )
+: convert-body ( cons -- quot )
     [ ] [ convert-form compose ] reduce ; inline
   
-: convert-if ( s-exp -- quot )
+: convert-if ( cons -- quot )
     rest first3 [ convert-form ] tri@ '[ @ , , if ] ;
     
-: convert-begin ( s-exp -- quot )  
+: convert-begin ( cons -- quot )  
     rest [ convert-form ] [ ] map-as '[ , [ funcall ] each ] ;
     
-: convert-cond ( s-exp -- quot )  
+: convert-cond ( cons -- quot )  
     rest [ body>> first2 [ convert-form ] bi@ [ '[ @ funcall ] ] dip 2array ]
     { } map-as '[ , cond ]  ;
     
-: convert-general-form ( s-exp -- quot )
-    unclip convert-form swap convert-body swap '[ , @ funcall ] ;
+: convert-general-form ( cons -- quot )
+    uncons convert-form swap convert-body swap '[ , @ funcall ] ;
 
 ! words for convert-lambda  
 <PRIVATE  
 : localize-body ( assoc body -- assoc newbody )  
     [ dup lisp-symbol? [ over dupd [ name>> ] dip at swap or ]
-                     [ dup s-exp? [ body>> localize-body <s-exp> ] when ] if
+                     [ dup cons? [ body>> localize-body <s-exp> ] when ] if
                    ] map ;
     
 : localize-lambda ( body vars -- newbody newvars )
     make-locals dup push-locals swap
     [ swap localize-body <s-exp> convert-form swap pop-locals ] dip swap ;
                    
-: split-lambda ( s-exp -- body vars )                   
+: split-lambda ( cons -- body vars )                   
     first3 -rot nip [ body>> ] bi@ [ name>> ] map ; inline
     
 : rest-lambda ( body vars -- quot )  
@@ -53,11 +56,11 @@ DEFER: looku-macro
     localize-lambda <lambda> '[ , compose ] ;
 PRIVATE>
     
-: convert-lambda ( s-exp -- quot )  
+: convert-lambda ( cons -- quot )  
     split-lambda "&rest" over member? [ rest-lambda ] [ normal-lambda ] if ;
     
-: convert-quoted ( s-exp -- quot )  
-    second 1quotation ;
+: convert-quoted ( cons -- quot )  
+    cdr>> 1quotation ;
     
 : form-dispatch ( lisp-symbol -- quot )
     name>>
@@ -69,20 +72,21 @@ PRIVATE>
      [ drop convert-general-form ]
     } case ;
     
-: macro-expand ( s-exp -- quot )
-    unclip-slice lookup-macro macro-call convert-form ;
+: macro-expand ( cons -- quot )
+    uncons lookup-macro macro-call convert-form ;
     
-: convert-list-form ( s-exp -- quot )  
-    dup first 
+: convert-list-form ( cons -- quot )  
+    dup car>>
     { { [ dup lisp-macro?  ] [ macro-expand ] }
       { [ dup lisp-symbol? ] [ form-dispatch ] } 
      [ drop convert-general-form ]
     } cond ;
     
 : convert-form ( lisp-form -- quot )
-    { { [ dup s-exp? ] [ body>> convert-list-form ] }
-    { [ dup lisp-symbol? ] [ '[ , lookup-var ] ] }
-    [ 1quotation ]
+    {
+      { [ dup cons? ] [ convert-list-form ] }
+      { [ dup lisp-symbol? ] [ '[ , lookup-var ] ] }
+     [ 1quotation ]
     } cond ;
     
 : lisp-string>factor ( str -- quot )
