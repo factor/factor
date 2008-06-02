@@ -23,13 +23,11 @@
 
 	<t:comparison t:name="diff" />
 
-	<t:bind t:name="old">
-		<div class="navbar">
-			<t:a t:href="$wiki/view" t:query="title">Latest</t:a>
-			| <t:a t:href="$wiki/revisions" t:query="title">Revisions</t:a>
-			| <t:a t:href="$wiki/edit" t:query="title">Edit</t:a>
-			| <t:button t:action="$wiki/delete" t:for="title" class="link-button link">Delete</t:button>
-		</div>
-	</t:bind>
+	<div class="navbar">
+		<t:a t:href="$wiki/view" t:query="title">Latest</t:a>
+		| <t:a t:href="$wiki/revisions" t:query="title">Revisions</t:a>
+		| <t:a t:href="$wiki/edit" t:query="title">Edit</t:a>
+		| <t:button t:action="$wiki/delete" t:for="title" class="link-button link">Delete</t:button>
+	</div>
 
 </t:chloe>
