@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.files io.encodings.utf8 namespaces http.server
-http.server.static http xmode.code2html kernel sequences
-accessors fry ;
+http.server.responses http.server.static http xmode.code2html
+kernel sequences accessors fry ;
 IN: xmode.code2html.responder
 
 : <sources> ( root -- responder )
@@ -12,5 +12,5 @@ IN: xmode.code2html.responder
             , utf8 [
                 , file-name input-stream get htmlize-stream
             ] with-file-reader
-        ] <html-content>
+        ] "text/html" <content>
     ] <file-responder> ;

@@ -1,6 +1,7 @@
-USING: math kernel accessors html.components
-http.server http.server.actions
-http.server.sessions html.templates.chloe fry ;
+USING: math kernel accessors http.server http.server.dispatchers
+furnace furnace.actions furnace.sessions
+html.components html.templates.chloe
+fry urls ;
 IN: webapps.counter
 
 SYMBOL: count
@@ -11,15 +12,15 @@ M: counter-app init-session* drop 0 count sset ;
 
 : <counter-action> ( quot -- action )
     <action>
-        swap '[ count , schange "" f <standard-redirect> ] >>submit ;
-
-: counter-template ( -- template )
-    "resource:extra/webapps/counter/counter.xml" <chloe> ;
+        swap '[
+            count , schange
+            URL" $counter-app" <redirect>
+        ] >>submit ;
 
 : <display-action> ( -- action )
     <page-action>
         [ count sget "counter" set-value ] >>init
-        counter-template >>template ;
+        { counter-app "counter" } >>template ;
 
 : <counter-app> ( -- responder )
     counter-app new-dispatcher

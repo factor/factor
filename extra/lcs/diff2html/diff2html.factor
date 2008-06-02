@@ -38,7 +38,7 @@ M: delete diff-line
     </tr> ;
 
 : htmlize-diff ( diff -- )
-    <table "comparison" =class table>
+    <table "100%" =width "comparison" =class table>
         <tr> <th> "Old" write </th> <th> "New" write </th> </tr>
         [ diff-line ] each
     </table> ;

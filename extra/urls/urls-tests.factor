@@ -77,10 +77,36 @@ USING: urls tools.test tuple-syntax arrays kernel assocs ;
             }
             "a/relative/path"
         }
+        {
+            TUPLE{ url
+                path: "bar"
+                query: H{ { "a" "b" } }
+            }
+            "bar?a=b"
+        }
+        {
+            TUPLE{ url
+                protocol: "ftp"
+                host: "ftp.kernel.org"
+                username: "slava"
+                path: "/"
+            }
+            "ftp://slava@ftp.kernel.org/"
+        }
+        {
+            TUPLE{ url
+                protocol: "ftp"
+                host: "ftp.kernel.org"
+                username: "slava"
+                password: "secret"
+                path: "/"
+            }
+            "ftp://slava:secret@ftp.kernel.org/"
+        }
     } ;
 
 urls [
-    [ 1array ] [ [ string>url ] curry ] bi* unit-test
+    [ 1array ] [ [ >url ] curry ] bi* unit-test
 ] assoc-each
 
 urls [
@@ -191,4 +217,8 @@ urls [
     }
 
     derive-url
+] unit-test
+
+[ "a" ] [
+    <url> "a" "b" set-query-param "b" query-param
 ] unit-test

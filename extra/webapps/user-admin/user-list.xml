@@ -6,13 +6,13 @@
 
 	<ul>
 
-		<t:each-tuple t:values="users">
+		<t:bind-each t:name="users">
 			<li>
 				<t:a t:href="$user-admin/edit" t:query="username">
 					<t:label t:name="username" />
 				</t:a>
 			</li>
-		</t:each-tuple>
+		</t:bind-each>
 
 	</ul>
 

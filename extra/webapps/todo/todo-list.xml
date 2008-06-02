@@ -13,7 +13,7 @@
 			<th>Edit</th>
 		</tr>
 
-		<t:each-tuple t:values="items">
+		<t:bind-each t:name="items">
 
 			<tr>
 				<td>
@@ -30,7 +30,7 @@
 				</td>
 			</tr>
 
-		</t:each-tuple>
+		</t:bind-each>
 
 	</table>
 

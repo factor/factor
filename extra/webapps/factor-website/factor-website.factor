@@ -4,13 +4,13 @@ USING: accessors kernel sequences assocs io.files io.sockets
 io.server
 namespaces db db.sqlite smtp
 http.server
-http.server.db
-http.server.flows
-http.server.sessions
-http.server.auth.login
-http.server.auth.providers.db
-http.server.boilerplate
-html.templates.chloe
+http.server.dispatchers
+furnace.db
+furnace.flows
+furnace.sessions
+furnace.auth.login
+furnace.auth.providers.db
+furnace.boilerplate
 webapps.pastebin
 webapps.planet
 webapps.todo
@@ -19,9 +19,6 @@ webapps.user-admin ;
 IN: webapps.factor-website
 
 : test-db "resource:test.db" sqlite-db ;
-
-: factor-template ( path -- template )
-    "resource:extra/webapps/factor-website/" swap ".xml" 3append <chloe> ;
 
 : init-factor-db ( -- )
     test-db [
@@ -40,8 +37,10 @@ IN: webapps.factor-website
         init-revisions-table
     ] with-db ;
 
+TUPLE: factor-website < dispatcher ;
+
 : <factor-website> ( -- responder )
-    <dispatcher> 
+    factor-website new-dispatcher 
         <todo-list> "todo" add-responder
         <pastebin> "pastebin" add-responder
         <planet-factor> "planet" add-responder
@@ -53,7 +52,7 @@ IN: webapps.factor-website
         allow-password-recovery
         allow-edit-profile
     <boilerplate>
-        "page" factor-template >>template
+        { factor-website "page" } >>template
     <flows>
     <sessions>
     test-db <db-persistence> ;

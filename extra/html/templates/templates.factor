@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel fry io io.encodings.utf8 io.files
 debugger prettyprint continuations namespaces boxes sequences
-arrays strings html.elements io.streams.string quotations ;
+arrays strings html.elements io.streams.string
+quotations xml.data xml.writer ;
 IN: html.templates
 
 MIXIN: template
@@ -12,6 +13,8 @@ GENERIC: call-template* ( template -- )
 M: string call-template* write ;
 
 M: callable call-template* call ;
+
+M: xml call-template* write-xml ;
 
 M: object call-template* output-stream get stream-copy ;
 
@@ -43,17 +46,17 @@ SYMBOL: style
 : write-style ( -- )
     style get >string write ;
 
-SYMBOL: atom-feed
+SYMBOL: atom-feeds
 
-: set-atom-feed ( title url -- )
-    2array atom-feed get >box ;
+: add-atom-feed ( title url -- )
+    2array atom-feeds get push ;
 
-: write-atom-feed ( -- )
-    atom-feed get value>> [
+: write-atom-feeds ( -- )
+    atom-feeds get [
         <link "alternate" =rel "application/atom+xml" =type
-        [ first =title ] [ second =href ] bi
+        first2 [ =title ] [ =href ] bi*
         link/>
-    ] when* ;
+    ] each ;
 
 SYMBOL: nested-template?
 
@@ -66,9 +69,9 @@ M: f call-template* drop call-next-template ;
 
 : with-boilerplate ( body template -- )
     [
-        title get [ <box> title set ] unless
-        atom-feed get [ <box> atom-feed set ] unless
-        style get [ SBUF" " clone style set ] unless
+        title [ <box> or ] change
+        style [ SBUF" " clone or ] change
+        atom-feeds [ V{ } like ] change
 
         [
             [

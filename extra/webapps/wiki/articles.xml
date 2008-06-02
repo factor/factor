@@ -5,11 +5,11 @@
 	<t:title>All Articles</t:title>
 
 	<ul>
-		<t:each-tuple t:values="articles">
+		<t:bind-each t:name="articles">
 			<li>
 				<t:a t:href="view" t:query="title"><t:label t:name="title"/></t:a>
 			</li>
-		</t:each-tuple>
+		</t:bind-each>
 	</ul>
 
 </t:chloe>

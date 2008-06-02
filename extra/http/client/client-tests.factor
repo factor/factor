@@ -1,5 +1,5 @@
 USING: http.client http.client.private http tools.test
-tuple-syntax namespaces ;
+tuple-syntax namespaces urls ;
 [ "localhost" f ] [ "localhost" parse-host ] unit-test
 [ "localhost" 8888 ] [ "localhost:8888" parse-host ] unit-test
 
@@ -10,36 +10,26 @@ tuple-syntax namespaces ;
 
 [
     TUPLE{ request
-        protocol: http
+        url: TUPLE{ url protocol: "http" host: "www.apple.com" port: 80 path: "/index.html" }
         method: "GET"
-        host: "www.apple.com"
-        port: 80
-        path: "/index.html"
         version: "1.1"
         cookies: V{ }
         header: H{ { "connection" "close" } { "user-agent" "Factor http.client vocabulary" } }
     }
 ] [
-    [
-        "http://www.apple.com/index.html"
-        <get-request>
-    ] with-scope
+    "http://www.apple.com/index.html"
+    <get-request>
 ] unit-test
 
 [
     TUPLE{ request
-        protocol: https
+        url: TUPLE{ url protocol: "https" host: "www.amazon.com" port: 443 path: "/index.html" }
         method: "GET"
-        host: "www.amazon.com"
-        port: 443
-        path: "/index.html"
         version: "1.1"
         cookies: V{ }
         header: H{ { "connection" "close" } { "user-agent" "Factor http.client vocabulary" } }
     }
 ] [
-    [
-        "https://www.amazon.com/index.html"
-        <get-request>
-    ] with-scope
+    "https://www.amazon.com/index.html"
+    <get-request>
 ] unit-test

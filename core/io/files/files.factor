@@ -147,6 +147,9 @@ PRIVATE>
         ] if
     ] unless ;
 
+: file-extension ( filename -- extension )
+    "." last-split1 nip ;
+
 ! File info
 TUPLE: file-info type size permissions modified ;
 
