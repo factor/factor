@@ -80,10 +80,6 @@ SYMBOL: NX
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! ERROR: name-error name ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 : cache-get ( query -- rrs/f )
   dup cache-get* dup NX = [ drop name>> name-error ] [ nip ] if ;
 

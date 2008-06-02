@@ -1,45 +1,59 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors namespaces combinators words
-assocs db.tuples arrays splitting strings validators
+assocs db.tuples arrays splitting strings validators urls
 html.elements
 html.components
-html.templates.chloe
-http.server.boilerplate
-http.server.auth.providers
-http.server.auth.providers.db
-http.server.auth.login
-http.server.auth
-http.server.sessions
-http.server.actions
-http.server ;
+furnace
+furnace.boilerplate
+furnace.auth.providers
+furnace.auth.providers.db
+furnace.auth.login
+furnace.auth
+furnace.sessions
+furnace.actions
+http.server
+http.server.dispatchers ;
 IN: webapps.user-admin
 
-: admin-template ( name -- template )
-    "resource:extra/webapps/user-admin/" swap ".xml" 3append <chloe> ;
+TUPLE: user-admin < dispatcher ;
+
+: word>string ( word -- string )
+    [ word-vocabulary ] [ drop ":" ] [ word-name ] tri 3append ;
 
 : words>strings ( seq -- seq' )
-    [ [ word-vocabulary ] [ drop ":" ] [ word-name ] tri 3append ] map ;
+    [ word>string ] map ;
+
+: string>word ( string -- word )
+    ":" split1 swap lookup ;
 
 : strings>words ( seq -- seq' )
-    [ ":" split1 swap lookup ] map ;
+    [ string>word ] map ;
 
 : <user-list-action> ( -- action )
     <page-action>
         [ f <user> select-tuples "users" set-value ] >>init
-        "user-list" admin-template >>template ;
+        { user-admin "user-list" } >>template ;
+
+: init-capabilities ( -- )
+    capabilities get words>strings "capabilities" set-value ;
+
+: selected-capabilities ( -- seq )
+    "capabilities" value
+    [ param empty? not ] filter
+    [ string>word ] map ;
 
 : <new-user-action> ( -- action )
     <page-action>
         [
-            "username" param <user> from-tuple
-            capabilities get words>strings "all-capabilities" set-value
+            "username" param <user> from-object
+            init-capabilities
         ] >>init
 
-        "new-user" admin-template >>template
+        { user-admin "new-user" } >>template
 
         [
-            capabilities get words>strings "all-capabilities" set-value
+            init-capabilities
 
             {
                 { "username" [ v-username ] }
@@ -62,10 +76,11 @@ IN: webapps.user-admin
                 "email" value >>email
                 "new-password" value >>encoded-password
                 H{ } clone >>profile
+                selected-capabilities >>capabilities
 
             insert-tuple
 
-            "$user-admin" f <standard-redirect>
+            URL" $user-admin" <redirect>
         ] >>submit ;
 
 : validate-username ( -- )
@@ -77,15 +92,16 @@ IN: webapps.user-admin
             validate-username
 
             "username" value <user> select-tuple
-            [ from-tuple ] [ capabilities>> words>strings "capabilities" set-value ] bi
+            [ from-object ]
+            [ capabilities>> [ "true" swap word>string set-value ] each ] bi
 
-            capabilities get words>strings "all-capabilities" set-value
+            capabilities get words>strings "capabilities" set-value
         ] >>init
 
-        "edit-user" admin-template >>template
+        { user-admin "edit-user" } >>template
 
         [
-            capabilities get words>strings "all-capabilities" set-value
+            init-capabilities
 
             {
                 { "username" [ v-username ] }
@@ -93,7 +109,6 @@ IN: webapps.user-admin
                 { "new-password" [ [ v-password ] v-optional ] }
                 { "verify-password" [ [ v-password ] v-optional ] }
                 { "email" [ [ v-email ] v-optional ] }
-                { "capabilities" [ ] }
             } validate-params
 
             "new-password" "verify-password"
@@ -106,19 +121,15 @@ IN: webapps.user-admin
             "username" value <user> select-tuple
                 "realname" value >>realname
                 "email" value >>email
+                selected-capabilities >>capabilities
 
             "new-password" value empty? [
                 "new-password" value >>encoded-password
             ] unless
 
-            "capabilities" value {
-                { [ dup string? ] [ 1array ] }
-                { [ dup array? ] [ ] }
-            } cond strings>words >>capabilities
-
             update-tuple
 
-            "$user-admin" f <standard-redirect>
+            URL" $user-admin" <redirect>
         ] >>submit ;
 
 : <delete-user-action> ( -- action )
@@ -130,10 +141,8 @@ IN: webapps.user-admin
             [ logout-all-sessions ]
             bi
 
-            "$user-admin" f <standard-redirect>
+            URL" $user-admin" <redirect>
         ] >>submit ;
-
-TUPLE: user-admin < dispatcher ;
 
 SYMBOL: can-administer-users?
 
@@ -146,7 +155,7 @@ can-administer-users? define-capability
         <edit-user-action> "edit" add-responder
         <delete-user-action> "delete" add-responder
     <boilerplate>
-        "user-admin" admin-template >>template
+        { user-admin "user-admin" } >>template
     { can-administer-users? } <protected> ;
 
 : make-admin ( username -- )

@@ -4,7 +4,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: io kernel namespaces prettyprint quotations
-sequences strings words xml.entities compiler.units effects ;
+sequences strings words xml.entities compiler.units effects
+urls math math.parser combinators calendar calendar.format ;
 
 IN: html.elements
 
@@ -126,11 +127,22 @@ SYMBOL: html
     dup def-for-html-word-<foo
     def-for-html-word-foo/> ;
 
+: object>string ( object -- string )
+    #! Should this be generic and in the core?
+    {
+        { [ dup real? ] [ number>string ] }
+        { [ dup timestamp? ] [ timestamp>string ] }
+        { [ dup url? ] [ url>string ] }
+        { [ dup string? ] [ ] }
+        { [ dup word? ] [ word-name ] }
+        { [ dup not ] [ drop "" ] }
+    } cond ;
+
 : write-attr ( value name -- )
     " " write-html
     write-html
     "='" write-html
-    escape-quoted-string write-html
+    object>string escape-quoted-string write-html
     "'" write-html ;
 
 : attribute-effect T{ effect f { "string" } 0 } ;
@@ -162,7 +174,7 @@ SYMBOL: html
     "id" "onclick" "style" "valign" "accesskey"
     "src" "language" "colspan" "onchange" "rel"
     "width" "selected" "onsubmit" "xmlns" "lang" "xml:lang"
-    "media" "title" "multiple"
+    "media" "title" "multiple" "checked"
 ] [ define-attribute-word ] each
 
 >>
@@ -178,7 +190,7 @@ SYMBOL: html
     <html "http://www.w3.org/1999/xhtml" =xmlns "en" =xml:lang "en" =lang html>
         <head> <title> swap write </title> </head>
         <body> call </body>
-    </html> ;
+    </html> ; inline
 
 : render-error ( message -- )
     <span "error" =class span> escape-string write </span> ;

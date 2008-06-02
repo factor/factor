@@ -2,8 +2,6 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-	<t:atom t:title="Pastebin - Atom" t:href="$pastebin/list.atom" />
-
 	<t:title>Pastebin</t:title>
 
 	<table width="100%">
@@ -11,13 +9,13 @@
 		<th align="left" width="100">Paste by:</th>
 		<th align="left" width="200">Date:</th>
 
-		<t:each-tuple t:values="pastes">
+		<t:bind-each t:name="pastes">
 			<tr>
 				<td><t:a t:href="$pastebin/paste" t:query="id"><t:label t:name="summary" /></t:a></td>
 				<td><t:label t:name="author" /></td>
 				<td><t:label t:name="date" /></td>
 			</tr>
-		</t:each-tuple>
+		</t:bind-each>
 	</table>
 
 </t:chloe>

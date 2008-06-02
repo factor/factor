@@ -3,15 +3,18 @@
 USING: accessors kernel hashtables calendar
 namespaces splitting sequences sorting math.order
 html.components
-html.templates.chloe
 http.server
-http.server.actions
-http.server.auth
-http.server.auth.login
-http.server.boilerplate
+http.server.dispatchers
+furnace
+furnace.actions
+furnace.auth
+furnace.auth.login
+furnace.boilerplate
 validators
-db.types db.tuples lcs farkup ;
+db.types db.tuples lcs farkup urls ;
 IN: webapps.wiki
+
+TUPLE: wiki < dispatcher ;
 
 TUPLE: article title revision ;
 
@@ -41,18 +44,17 @@ revision "REVISIONS" {
 
 : init-revisions-table revision ensure-table ;
 
-: wiki-template ( name -- template )
-    "resource:extra/webapps/wiki/" swap ".xml" 3append <chloe> ;
-
-: <title-redirect> ( title next -- response )
-    swap "title" associate <standard-redirect> ;
-
 : validate-title ( -- )
     { { "title" [ v-one-line ] } } validate-params ;
 
 : <main-article-action> ( -- action )
     <action>
-        [ "Front Page" "$wiki/view" <title-redirect> ] >>display ;
+        [
+            <url>
+                "$wiki/view" >>path
+                "Front Page" "title" set-query-param
+            <redirect>
+        ] >>display ;
 
 : <view-article-action> ( -- action )
     <action>
@@ -65,10 +67,13 @@ revision "REVISIONS" {
 
         [
             "title" value dup <article> select-tuple [
-                revision>> <revision> select-tuple from-tuple
-                "view" wiki-template <html-content>
+                revision>> <revision> select-tuple from-object
+                { wiki "view" } <chloe-content>
             ] [
-                "$wiki/edit" <title-redirect>
+                <url>
+                    "$wiki/edit" >>path
+                    swap "title" set-query-param
+                <redirect>
             ] ?if
         ] >>display ;
 
@@ -77,10 +82,10 @@ revision "REVISIONS" {
         [
             { { "id" [ v-integer ] } } validate-params
             "id" value <revision>
-            select-tuple from-tuple
+            select-tuple from-object
         ] >>init
 
-        "view" wiki-template >>template ;
+        { wiki "view" } >>template ;
 
 : add-revision ( revision -- )
     [ insert-tuple ]
@@ -97,11 +102,11 @@ revision "REVISIONS" {
         [
             validate-title
             "title" value <article> select-tuple [
-                revision>> <revision> select-tuple from-tuple
+                revision>> <revision> select-tuple from-object
             ] when*
         ] >>init
 
-        "edit" wiki-template >>template
+        { wiki "edit" } >>template
         
         [
             validate-title
@@ -113,7 +118,12 @@ revision "REVISIONS" {
                 logged-in-user get username>> >>author
                 "content" value >>content
             [ add-revision ]
-            [ title>> "$wiki/view" <title-redirect> ] bi
+            [
+                <url>
+                    "$wiki/view" >>path
+                    swap title>> "title" set-query-param
+                <redirect>
+            ] bi
         ] >>submit ;
 
 : <list-revisions-action> ( -- action )
@@ -125,7 +135,24 @@ revision "REVISIONS" {
             "revisions" set-value
         ] >>init
 
-        "revisions" wiki-template >>template ;
+        { wiki "revisions" } >>template ;
+
+: <rollback-action> ( -- action )
+    <action>
+        [
+            { { "id" [ v-integer ] } } validate-params
+        ] >>validate
+        
+        [
+            "id" value <revision> select-tuple clone f >>id
+            [ add-revision ]
+            [
+                <url>
+                    "$wiki/view" >>path
+                    swap title>> "title" set-query-param
+                <redirect>
+            ] bi
+        ] >>submit ;
 
 : <list-changes-action> ( -- action )
     <page-action>
@@ -135,7 +162,7 @@ revision "REVISIONS" {
             "changes" set-value
         ] >>init
 
-        "changes" wiki-template >>template ;
+        { wiki "changes" } >>template ;
 
 : <delete-action> ( -- action )
     <action>
@@ -144,7 +171,7 @@ revision "REVISIONS" {
         [
             "title" value <article> delete-tuples
             f <revision> "title" value >>title delete-tuples
-            "" f <standard-redirect>
+            URL" $wiki" <redirect>
         ] >>submit ;
 
 : <diff-action> ( -- action )
@@ -157,12 +184,15 @@ revision "REVISIONS" {
 
             "old-id" "new-id"
             [ value <revision> select-tuple ] bi@
-            [ [ "old" set-value ] [ "new" set-value ] bi* ]
+            [
+                [ [ title>> "title" set-value ] [ "old" set-value ] bi ]
+                [ "new" set-value ] bi*
+            ]
             [ [ content>> string-lines ] bi@ diff "diff" set-value ]
             2bi
         ] >>init
 
-        "diff" wiki-template >>template ;
+        { wiki "diff" } >>template ;
 
 : <list-articles-action> ( -- action )
     <page-action>
@@ -172,7 +202,7 @@ revision "REVISIONS" {
             "articles" set-value
         ] >>init
 
-        "articles" wiki-template >>template ;
+        { wiki "articles" } >>template ;
 
 : <user-edits-action> ( -- action )
     <page-action>
@@ -182,9 +212,7 @@ revision "REVISIONS" {
             select-tuples "user-edits" set-value
         ] >>init
 
-        "user-edits" wiki-template >>template ;
-
-TUPLE: wiki < dispatcher ;
+        { wiki "user-edits" } >>template ;
 
 : <wiki> ( -- dispatcher )
     wiki new-dispatcher
@@ -192,6 +220,7 @@ TUPLE: wiki < dispatcher ;
         <view-article-action> "view" add-responder
         <view-revision-action> "revision" add-responder
         <list-revisions-action> "revisions" add-responder
+        <rollback-action> "rollback" add-responder
         <user-edits-action> "user-edits" add-responder
         <diff-action> "diff" add-responder
         <list-articles-action> "articles" add-responder
@@ -199,4 +228,4 @@ TUPLE: wiki < dispatcher ;
         <edit-article-action> { } <protected> "edit" add-responder
         <delete-action> { } <protected> "delete" add-responder
     <boilerplate>
-        "wiki-common" wiki-template >>template ;
+        { wiki "wiki-common" } >>template ;

@@ -11,7 +11,7 @@ html.components namespaces ;
 
 TUPLE: color red green blue ;
 
-[ ] [ 1 2 3 color boa from-tuple ] unit-test
+[ ] [ 1 2 3 color boa from-object ] unit-test
 
 [ 1 ] [ "red" value ] unit-test
 
@@ -107,7 +107,7 @@ TUPLE: color red green blue ;
 
 [ ] [ t "delivery" set-value ] unit-test
 
-[ "<input type='checkbox' name='delivery' selected='true'>Delivery</input>" ] [
+[ "<input type='checkbox' name='delivery' checked='true'>Delivery</input>" ] [
     [
         "delivery"
         <checkbox>

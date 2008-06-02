@@ -1,276 +1,73 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs kernel namespaces io io.timeouts strings splitting
-threads sequences prettyprint io.server logging calendar http
-html.streams html.elements accessors math.parser
-combinators.lib tools.vocabs debugger continuations random
-combinators destructors io.encodings.8-bit fry classes words
-math rss json.writer ;
+USING: kernel accessors sequences arrays namespaces splitting
+vocabs.loader http http.server.responses logging calendar
+destructors html.elements html.streams io.server
+io.encodings.8-bit io.timeouts io assocs debugger continuations
+fry tools.vocabs math ;
 IN: http.server
 
+SYMBOL: responder-nesting
+
+SYMBOL: main-responder
+
+SYMBOL: development-mode
+
 ! path is a sequence of path component strings
-
 GENERIC: call-responder* ( path responder -- response )
-
-: request-params ( request -- assoc )
-    dup method>> {
-        { "GET" [ query>> ] }
-        { "HEAD" [ query>> ] }
-        { "POST" [ post-data>> ] }
-    } case ;
-
-: <content> ( body content-type -- response )
-    <response>
-        200 >>code
-        "Document follows" >>message
-        swap >>content-type
-        swap >>body ;
-
-: <text-content> ( body -- response )
-    "text/plain" <content> ;
-
-: <html-content> ( body -- response )
-    "text/html" <content> ;
-
-: <xml-content> ( body -- response )
-    "text/xml" <content> ;
-
-: <feed-content> ( feed -- response )
-    '[ , feed>xml ] "text/xml" <content> ;
-
-: <json-content> ( obj -- response )
-    '[ , >json ] "application/json" <content> ;
 
 TUPLE: trivial-responder response ;
 
 C: <trivial-responder> trivial-responder
 
-M: trivial-responder call-responder* nip response>> call ;
+M: trivial-responder call-responder* nip response>> clone ;
 
-: trivial-response-body ( code message -- )
-    <html>
-        <body>
-            <h1> [ number>string write bl ] [ write ] bi* </h1>
-        </body>
-    </html> ;
-
-: <trivial-response> ( code message -- response )
-    2dup '[ , , trivial-response-body ] <html-content>
-        swap >>message
-        swap >>code ;
-
-: <400> ( -- response )
-    400 "Bad request" <trivial-response> ;
-
-: <404> ( -- response )
-    404 "Not Found" <trivial-response> ;
-
-SYMBOL: 404-responder
-
-[ <404> ] <trivial-responder> 404-responder set-global
-
-SYMBOL: base-paths
+main-responder global [ <404> <trivial-responder> get-global or ] change-at
 
 : invert-slice ( slice -- slice' )
-    dup slice? [
-        [ seq>> ] [ from>> ] bi head-slice
-    ] [
-        drop { }
-    ] if ;
+    dup slice? [ [ seq>> ] [ from>> ] bi head-slice ] [ drop { } ] if ;
 
-: add-base-path ( path dispatcher -- )
-    [ invert-slice ] [ class word-name ] bi*
-    base-paths get set-at ;
+: add-responder-nesting ( path responder -- )
+    [ invert-slice ] dip 2array responder-nesting get push ;
 
 : call-responder ( path responder -- response )
-    [ add-base-path ] [ call-responder* ] 2bi ;
-
-SYMBOL: link-hook
-
-: add-link-hook ( quot -- )
-    link-hook [ compose ] change ; inline
-
-: modify-query ( query -- query )
-    link-hook get call ;
-
-: base-path ( string -- path )
-    dup base-paths get at
-    [ ] [ "No such responder: " swap append throw ] ?if ;
-
-: resolve-base-path ( string -- string' )
-    "$" ?head [
-        [
-            "/" split1 [ base-path [ "/" % % ] each "/" % ] dip %
-        ] "" make
-    ] when ;
-
-: link>string ( url query -- url' )
-    [ resolve-base-path ] [ modify-query ] bi* (link>string) ;
-
-: write-link ( url query -- )
-    link>string write ;
-
-SYMBOL: form-hook
-
-: add-form-hook ( quot -- )
-    form-hook [ compose ] change ;
-
-: hidden-form-field ( -- )
-    form-hook get call ;
-
-: absolute-redirect ( to query -- url )
-    #! Same host.
-    request get clone
-    swap [ >>query ] when*
-    swap url-encode >>path
-    [ modify-query ] change-query
-    request-url ;
-
-: replace-last-component ( path with -- path' )
-    [ "/" last-split1 drop "/" ] dip 3append ;
-
-: relative-redirect ( to query -- url )
-    request get clone
-    swap [ >>query ] when*
-    swap [ '[ , replace-last-component ] change-path ] when*
-    [ modify-query ] change-query
-    request-url ;
-
-: derive-url ( to query -- url )
-    {
-        { [ over "http://" head? ] [ link>string ] }
-        { [ over "/" head? ] [ absolute-redirect ] }
-        { [ over "$" head? ] [ [ resolve-base-path ] dip derive-url ] }
-        [ relative-redirect ]
-    } cond ;
-
-: <redirect> ( to query code message -- response )
-    <trivial-response> -rot derive-url "location" set-header ;
-
-\ <redirect> DEBUG add-input-logging
-
-: <permanent-redirect> ( to query -- response )
-    301 "Moved Permanently" <redirect> ;
-
-: <temporary-redirect> ( to query -- response )
-    307 "Temporary Redirect" <redirect> ;
-
-: <standard-redirect> ( to query -- response )
-    request get method>> "POST" =
-    [ <permanent-redirect> ] [ <temporary-redirect> ] if ;
-
-TUPLE: dispatcher default responders ;
-
-: new-dispatcher ( class -- dispatcher )
-    new
-        404-responder get >>default
-        H{ } clone >>responders ; inline
-
-: <dispatcher> ( -- dispatcher )
-    dispatcher new-dispatcher ;
-
-: find-responder ( path dispatcher -- path responder )
-    over empty? [
-        "" over responders>> at*
-        [ nip ] [ drop default>> ] if
-    ] [
-        over first over responders>> at*
-        [ [ drop rest-slice ] dip ] [ drop default>> ] if
-    ] if ;
-
-M: dispatcher call-responder* ( path dispatcher -- response )
-    find-responder call-responder ;
-
-TUPLE: vhost-dispatcher default responders ;
-
-: <vhost-dispatcher> ( -- dispatcher )
-    404-responder get H{ } clone vhost-dispatcher boa ;
-
-: find-vhost ( dispatcher -- responder )
-    request get host>> over responders>> at*
-    [ nip ] [ drop default>> ] if ;
-
-M: vhost-dispatcher call-responder* ( path dispatcher -- response )
-    find-vhost call-responder ;
-
-: add-responder ( dispatcher responder path -- dispatcher )
-    pick responders>> set-at ;
-
-: add-main-responder ( dispatcher responder path -- dispatcher )
-    [ add-responder drop ]
-    [ drop "" add-responder drop ]
-    [ 2drop ] 3tri ;
-
-TUPLE: filter-responder responder ;
-
-M: filter-responder call-responder*
-    responder>> call-responder ;
-
-SYMBOL: main-responder
-
-main-responder global
-[ drop 404-responder get-global ] cache
-drop
-
-SYMBOL: development-mode
+    [ add-responder-nesting ] [ call-responder* ] 2bi ;
 
 : http-error. ( error -- )
     "Internal server error" [
-        development-mode get [
-            [ print-error nl :c ] with-html-stream
-        ] [
-            500 "Internal server error"
-            trivial-response-body
-        ] if
+        [ print-error nl :c ] with-html-stream
     ] simple-page ;
 
 : <500> ( error -- response )
     500 "Internal server error" <trivial-response>
-    swap '[ , http-error. ] >>body ;
+    development-mode get [ swap '[ , http-error. ] >>body ] [ drop ] if ;
 
 : do-response ( response -- )
     dup write-response
     request get method>> "HEAD" =
-    [ drop ] [
-        '[
-            , write-response-body
-        ] [
-            http-error.
-        ] recover
-    ] if ;
+    [ drop ] [ '[ , write-response-body ] [ http-error. ] recover ] if ;
 
 LOG: httpd-hit NOTICE
 
 : log-request ( request -- )
-    { method>> host>> path>> } map-exec-with httpd-hit ;
-
-SYMBOL: exit-continuation
-
-: exit-with exit-continuation get continue-with ;
-
-: with-exit-continuation ( quot -- )
-    '[ exit-continuation set @ ] callcc1 exit-continuation off ;
+    [ method>> ] [ url>> [ host>> ] [ path>> ] bi ] bi 3array httpd-hit ;
 
 : split-path ( string -- path )
     "/" split harvest ;
 
-: init-request ( -- )
-    H{ } clone base-paths set
-    [ ] link-hook set
-    [ ] form-hook set ;
+: init-request ( request -- )
+    request set
+    V{ } clone responder-nesting set ;
+
+: dispatch-request ( request -- response )
+    url>> path>> split-path main-responder get call-responder ;
 
 : do-request ( request -- response )
     [
-        init-request
-        [ request set ]
+        [ init-request ]
         [ log-request ]
-        [ path>> split-path main-responder get call-responder ] tri
-        [ <404> ] unless*
-    ] [
-        [ \ do-request log-error ]
-        [ <500> ]
-        bi
-    ] recover ;
+        [ dispatch-request ] tri
+    ] [ [ \ do-request log-error ] [ <500> ] bi ] recover ;
 
 : ?refresh-all ( -- )
     development-mode get-global
@@ -287,8 +84,7 @@ SYMBOL: exit-continuation
 
 : httpd ( port -- )
     dup integer? [ internet-server ] when
-    "http.server" latin1
-    [ handle-client ] with-server ;
+    "http.server" latin1 [ handle-client ] with-server ;
 
 : httpd-main ( -- )
     8888 httpd ;

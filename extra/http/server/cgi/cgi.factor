@@ -14,13 +14,12 @@ IN: http.server.cgi
         "HTTP/" request get version>> append "SERVER_PROTOCOL" set
         "Factor" "SERVER_SOFTWARE" set
 
-        dup "PATH_TRANSLATED" set
-        "SCRIPT_FILENAME" set
+        [ "PATH_TRANSLATED" set ] [ "SCRIPT_FILENAME" set ] bi
 
-        request get path>> "SCRIPT_NAME" set
+        request get url>> path>> "SCRIPT_NAME" set
 
-        request get host>> "SERVER_NAME" set
-        request get port>> number>string "SERVER_PORT" set
+        request get url>> host>> "SERVER_NAME" set
+        request get url>> port>> number>string "SERVER_PORT" set
         "" "PATH_INFO" set
         "" "REMOTE_HOST" set
         "" "REMOTE_ADDR" set

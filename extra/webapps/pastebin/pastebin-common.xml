@@ -2,6 +2,8 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
+	<t:atom t:title="Pastebin" t:href="$pastebin/list.atom" />
+
 	<t:style t:include="resource:extra/webapps/pastebin/pastebin.css" />
 
 	<div class="navbar">
@@ -9,9 +11,9 @@
 		  <t:a t:href="$pastebin/list">Pastes</t:a>
 		| <t:a t:href="$pastebin/new-paste">New Paste</t:a>
 
-		<t:if t:code="http.server.sessions:uid">
+		<t:if t:code="furnace.sessions:uid">
 
-			<t:if t:code="http.server.auth.login:allow-edit-profile?">
+			<t:if t:code="furnace.auth.login:allow-edit-profile?">
 				| <t:a t:href="$login/edit-profile" t:flow="begin">Edit Profile</t:a>
 			</t:if>
 

@@ -3,7 +3,7 @@
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
 	<h2 class="posting-title">
-		<t:a t:value="link" t:session="none"><t:view t:component="title" /></t:a>
+		<t:a t:value="link"><t:view t:component="title" /></t:a>
 	</h2>
 
 	<p class="posting-body">
@@ -11,7 +11,7 @@
 	</p>
 
 	<p class="posting-date">
-		<t:a t:value="link" t:session="none"><t:view t:component="pub-date" /></t:a>
+		<t:a t:value="link"><t:view t:component="pub-date" /></t:a>
 	</p>
 
 </t:chloe>
