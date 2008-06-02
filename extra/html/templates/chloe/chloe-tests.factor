@@ -1,7 +1,7 @@
 USING: html.templates html.templates.chloe
 tools.test io.streams.string kernel sequences ascii boxes
 namespaces xml html.components
-splitting unicode.categories ;
+splitting unicode.categories furnace ;
 IN: html.templates.chloe.tests
 
 [ f ] [ f parse-query-attr ] unit-test
@@ -49,7 +49,7 @@ IN: html.templates.chloe.tests
     [
         [
             "test2" test-template call-template
-        ] [ "test3" test-template ] with-boilerplate
+        ] "test3" test-template with-boilerplate
     ] run-template
 ] unit-test
 
@@ -137,7 +137,7 @@ TUPLE: person first-name last-name ;
 
 [ "<table><tr><td>RBaxter</td><td>Unknown</td></tr><tr><td>Doug</td><td>Coleman</td></tr></table>" ] [
     [
-        "test9" test-template call-template
+        "test8" test-template call-template
     ] run-template [ blank? not ] filter
 ] unit-test
 
@@ -145,6 +145,6 @@ TUPLE: person first-name last-name ;
 
 [ "<a name=\"1\">Hello</a>" ] [
     [
-        "test10" test-template call-template
+        "test9" test-template call-template
     ] run-template
 ] unit-test

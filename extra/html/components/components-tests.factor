@@ -1,7 +1,7 @@
 IN: html.components.tests
 USING: tools.test kernel io.streams.string
 io.streams.null accessors inspector html.streams
-html.components namespaces ;
+html.elements html.components namespaces ;
 
 [ ] [ blank-values ] unit-test
 
