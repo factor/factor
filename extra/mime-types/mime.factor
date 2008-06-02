@@ -1,11 +1,7 @@
-! Copyright (C) 2004, 2005 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io assocs kernel sequences math namespaces splitting ;
-
+USING: io.files assocs kernel namespaces ;
 IN: http.mime
-
-: file-extension ( filename -- extension )
-    "." split dup length 1 <= [ drop f ] [ peek ] if ;
 
 : mime-type ( filename -- mime-type )
     file-extension "mime-types" get at "application/octet-stream" or ;
