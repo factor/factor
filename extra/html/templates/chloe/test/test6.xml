@@ -2,8 +2,26 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-	<t:if t:var="html.templates.chloe.tests:test6-aux?">
-		True
-	</t:if>
+	<t:label t:name="label" />
+
+	<t:link t:name="link" />
+
+	<t:code t:name="code" mode="mode" />
+
+	<t:farkup t:name="farkup" />
+
+	<t:inspector t:name="inspector" />
+
+	<t:html t:name="html" />
+
+	<t:field t:name="field" t:size="13" />
+
+	<t:password t:name="password" t:size="10" />
+
+	<t:textarea t:name="textarea" t:rows="5" t:cols="10" />
+
+	<t:choice t:name="choice" t:choices="choices" />
+
+	<t:checkbox t:name="checkbox">Checkbox</t:checkbox>
 
 </t:chloe>

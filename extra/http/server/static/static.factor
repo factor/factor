@@ -1,10 +1,15 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: calendar io io.files kernel math math.order
-math.parser http http.server namespaces parser sequences strings
-assocs hashtables debugger http.mime sorting html.elements
-html.templates.fhtml logging calendar.format accessors
-io.encodings.binary fry xml.entities destructors urls ;
+math.parser namespaces parser sequences strings
+assocs hashtables debugger mime-types sorting logging
+calendar.format accessors
+io.encodings.binary fry xml.entities destructors urls
+html.elements html.templates.fhtml
+http
+http.server
+http.server.responses
+http.server.redirection ;
 IN: http.server.static
 
 ! special maps mime types to quots with effect ( path -- )
@@ -16,12 +21,6 @@ TUPLE: file-responder root hook special allow-listings ;
     ] [
         2drop t
     ] if ;
-
-: <304> ( -- response )
-    304 "Not modified" <trivial-response> ;
-
-: <403> ( -- response )
-    403 "Forbidden" <trivial-response> ;
 
 : <file-responder> ( root hook -- responder )
     file-responder new
@@ -85,7 +84,7 @@ TUPLE: file-responder root hook special allow-listings ;
         find-index [ serve-file ] [ list-directory ] ?if
     ] [
         drop
-        request get url>> clone [ "/" append ] change-path <redirect>
+        request get url>> clone [ "/" append ] change-path <permanent-redirect>
     ] if ;
 
 : serve-object ( filename -- response )

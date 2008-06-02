@@ -7,11 +7,18 @@ html.components
 rss urls xml.writer
 validators
 http.server
+http.server.dispatchers
+furnace
 furnace.actions
 furnace.boilerplate
 furnace.auth.login
-furnace.auth ;
+furnace.auth
+furnace.rss ;
 IN: webapps.planet
+
+TUPLE: planet-factor < dispatcher ;
+
+TUPLE: planet-factor-admin < dispatcher ;
 
 TUPLE: blog id name www-url feed-url ;
 
@@ -58,7 +65,7 @@ posting "POSTINGS"
 : <edit-blogroll-action> ( -- action )
     <page-action>
         [ blogroll "blogroll" set-value ] >>init
-        "$planet-factor/admin" >>template ;
+        { planet-factor "admin" } >>template ;
 
 : <planet-action> ( -- action )
     <page-action>
@@ -67,7 +74,7 @@ posting "POSTINGS"
             postings "postings" set-value
         ] >>init
 
-        "$planet-factor/planet" >>template ;
+        { planet-factor "planet" } >>template ;
 
 : planet-feed ( -- feed )
     feed new
@@ -131,7 +138,7 @@ posting "POSTINGS"
 
 : <new-blog-action> ( -- action )
     <page-action>
-        "$planet-factor/new-blog" >>template
+        { planet-factor "new-blog" } >>template
 
         [ validate-blog ] >>validate
 
@@ -155,7 +162,7 @@ posting "POSTINGS"
             "id" value <blog> select-tuple from-object
         ] >>init
 
-        "$planet-factor/edit-blog" >>template
+        { planet-factor "edit-blog" } >>template
 
         [
             validate-integer-id
@@ -175,8 +182,6 @@ posting "POSTINGS"
             tri
         ] >>submit ;
 
-TUPLE: planet-factor-admin < dispatcher ;
-
 : <planet-factor-admin> ( -- responder )
     planet-factor-admin new-dispatcher
         <edit-blogroll-action> "blogroll" add-main-responder
@@ -189,15 +194,13 @@ SYMBOL: can-administer-planet-factor?
 
 can-administer-planet-factor? define-capability
 
-TUPLE: planet-factor < dispatcher ;
-
 : <planet-factor> ( -- responder )
     planet-factor new-dispatcher
         <planet-action> "list" add-main-responder
         <feed-action> "feed.xml" add-responder
         <planet-factor-admin> { can-administer-planet-factor? } <protected> "admin" add-responder
     <boilerplate>
-        "$planet-factor/planet-common" >>template ;
+        { planet-factor "planet-common" } >>template ;
 
 : start-update-task ( db params -- )
     '[ , , [ update-cached-postings ] with-db ] 10 minutes every drop ;

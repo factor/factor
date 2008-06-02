@@ -4,6 +4,8 @@ USING: accessors kernel hashtables calendar
 namespaces splitting sequences sorting math.order
 html.components
 http.server
+http.server.dispatchers
+furnace
 furnace.actions
 furnace.auth
 furnace.auth.login
@@ -11,6 +13,8 @@ furnace.boilerplate
 validators
 db.types db.tuples lcs farkup urls ;
 IN: webapps.wiki
+
+TUPLE: wiki < dispatcher ;
 
 TUPLE: article title revision ;
 
@@ -64,7 +68,7 @@ revision "REVISIONS" {
         [
             "title" value dup <article> select-tuple [
                 revision>> <revision> select-tuple from-object
-                "$wiki/view" <chloe-content>
+                { wiki "view" } <chloe-content>
             ] [
                 <url>
                     "$wiki/edit" >>path
@@ -81,7 +85,7 @@ revision "REVISIONS" {
             select-tuple from-object
         ] >>init
 
-        "$wiki/view" >>template ;
+        { wiki "view" } >>template ;
 
 : add-revision ( revision -- )
     [ insert-tuple ]
@@ -102,7 +106,7 @@ revision "REVISIONS" {
             ] when*
         ] >>init
 
-        "$wiki/edit" >>template
+        { wiki "edit" } >>template
         
         [
             validate-title
@@ -131,7 +135,7 @@ revision "REVISIONS" {
             "revisions" set-value
         ] >>init
 
-        "$wiki/revisions" >>template ;
+        { wiki "revisions" } >>template ;
 
 : <rollback-action> ( -- action )
     <action>
@@ -158,7 +162,7 @@ revision "REVISIONS" {
             "changes" set-value
         ] >>init
 
-        "$wiki/changes" >>template ;
+        { wiki "changes" } >>template ;
 
 : <delete-action> ( -- action )
     <action>
@@ -185,7 +189,7 @@ revision "REVISIONS" {
             2bi
         ] >>init
 
-        "$wiki/diff" >>template ;
+        { wiki "diff" } >>template ;
 
 : <list-articles-action> ( -- action )
     <page-action>
@@ -195,7 +199,7 @@ revision "REVISIONS" {
             "articles" set-value
         ] >>init
 
-        "$wiki/articles" >>template ;
+        { wiki "articles" } >>template ;
 
 : <user-edits-action> ( -- action )
     <page-action>
@@ -205,9 +209,7 @@ revision "REVISIONS" {
             select-tuples "user-edits" set-value
         ] >>init
 
-        "$wiki/user-edits" >>template ;
-
-TUPLE: wiki < dispatcher ;
+        { wiki "user-edits" } >>template ;
 
 : <wiki> ( -- dispatcher )
     wiki new-dispatcher
@@ -223,4 +225,4 @@ TUPLE: wiki < dispatcher ;
         <edit-article-action> { } <protected> "edit" add-responder
         <delete-action> { } <protected> "delete" add-responder
     <boilerplate>
-        "$wiki/wiki-common" >>template ;
+        { wiki "wiki-common" } >>template ;

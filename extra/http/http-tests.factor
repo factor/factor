@@ -3,11 +3,6 @@ io.streams.string kernel arrays splitting sequences
 assocs io.sockets db db.sqlite continuations urls ;
 IN: http.tests
 
-[ "/" ] [ "http://foo.com" url>path ] unit-test
-[ "/" ] [ "http://foo.com/" url>path ] unit-test
-[ "/bar" ] [ "http://foo.com/bar" url>path ] unit-test
-[ "/bar" ] [ "/bar" url>path ] unit-test
-
 : lf>crlf "\n" split "\r\n" join ;
 
 STRING: read-request-test-1
@@ -126,7 +121,9 @@ read-response-test-1' 1array [
 USING: http.server http.server.static furnace.sessions
 furnace.actions furnace.auth.login furnace.db http.client
 io.server io.files io io.encodings.ascii
-accessors namespaces threads ;
+accessors namespaces threads
+http.server.responses http.server.redirection
+http.server.dispatchers ;
 
 : add-quit-action
     <action>
@@ -149,7 +146,7 @@ test-db [
                 "resource:extra/http/test" <static> >>default
             "nested" add-responder
             <action>
-                [ URL" redirect-loop" <redirect> ] >>display
+                [ URL" redirect-loop" <temporary-redirect> ] >>display
             "redirect-loop" add-responder
         main-responder set
 

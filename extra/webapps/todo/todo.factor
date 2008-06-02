@@ -4,14 +4,18 @@ USING: accessors kernel sequences namespaces
 db db.types db.tuples validators hashtables urls
 html.components
 html.templates.chloe
+http.server
+http.server.dispatchers
+furnace
 furnace.sessions
 furnace.boilerplate
 furnace.auth
 furnace.actions
 furnace.db
-furnace.auth.login
-http.server ;
+furnace.auth.login ;
 IN: webapps.todo
+
+TUPLE: todo-list < dispatcher ;
 
 TUPLE: todo uid id priority summary description ;
 
@@ -38,7 +42,7 @@ todo "TODO"
             "id" value <todo> select-tuple from-object
         ] >>init
         
-        "$todo-list/view-todo" >>template ;
+        { todo-list "view-todo" } >>template ;
 
 : validate-todo ( -- )
     {
@@ -51,7 +55,7 @@ todo "TODO"
     <page-action>
         [ 0 "priority" set-value ] >>init
 
-        "$todo-list/new-todo" >>template
+        { todo-list "new-todo" } >>template
 
         [ validate-todo ] >>validate
 
@@ -75,7 +79,7 @@ todo "TODO"
             "id" value <todo> select-tuple from-object
         ] >>init
 
-        "$todo-list/edit-todo" >>template
+        { todo-list "edit-todo" } >>template
 
         [
             validate-integer-id
@@ -107,9 +111,7 @@ todo "TODO"
 : <list-action> ( -- action )
     <page-action>
         [ f <todo> select-tuples "items" set-value ] >>init
-        "$todo-list/todo-list" >>template ;
-
-TUPLE: todo-list < dispatcher ;
+        { todo-list "todo-list" } >>template ;
 
 : <todo-list> ( -- responder )
     todo-list new-dispatcher
@@ -119,5 +121,5 @@ TUPLE: todo-list < dispatcher ;
         <edit-action>   "edit"   add-responder
         <delete-action> "delete" add-responder
     <boilerplate>
-        "$todo-list/todo" >>template
+        { todo-list "todo" } >>template
     f <protected> ;

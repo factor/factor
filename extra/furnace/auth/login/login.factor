@@ -18,6 +18,10 @@ html.elements
 urls
 http
 http.server
+http.server.dispatchers
+http.server.filters
+http.server.responses
+furnace
 furnace.auth
 furnace.auth.providers
 furnace.auth.providers.db
@@ -60,7 +64,7 @@ M: user-saver dispose
 
 ! ! ! Login
 : successful-login ( user -- response )
-    username>> set-uid "$login" end-flow ;
+    username>> set-uid URL" $login" end-flow ;
 
 : login-failed ( -- * )
     "invalid username or password" validation-error
@@ -68,7 +72,7 @@ M: user-saver dispose
 
 : <login-action> ( -- action )
     <page-action>
-        "$login/login" >>template
+        { login "login" } >>template
 
         [
             {
@@ -97,7 +101,7 @@ M: user-saver dispose
 
 : <register-action> ( -- action )
     <page-action>
-        "$login/register" >>template
+        { login "register" } >>template
 
         [
             {
@@ -138,7 +142,7 @@ M: user-saver dispose
             tri
         ] >>init
 
-        "$login/edit-profile" >>template
+        { login "edit-profile" } >>template
 
         [
             uid "username" set-value
@@ -173,7 +177,7 @@ M: user-saver dispose
 
             drop
 
-            "$login" end-flow
+            URL" $login" end-flow
         ] >>submit ;
 
 ! ! ! Password recovery
@@ -219,7 +223,7 @@ SYMBOL: lost-password-from
 
 : <recover-action-1> ( -- action )
     <page-action>
-        "$login/recover-1" >>template
+        { login "recover-1" } >>template
 
         [
             {
@@ -240,7 +244,7 @@ SYMBOL: lost-password-from
 
 : <recover-action-2> ( -- action )
     <page-action>
-        "$login/recover-2" >>template ;
+        { login "recover-2" } >>template ;
 
 : <recover-action-3> ( -- action )
     <page-action>
@@ -251,7 +255,7 @@ SYMBOL: lost-password-from
             } validate-params
         ] >>init
 
-        "$login/recover-3" >>template
+        { login "recover-3" } >>template
 
         [
             {
@@ -273,20 +277,20 @@ SYMBOL: lost-password-from
 
                 URL" $login/recover-4" <redirect>
             ] [
-                <400>
+                <403>
             ] if*
         ] >>submit ;
 
 : <recover-action-4> ( -- action )
     <page-action>
-        "$login/recover-4" >>template ;
+        { login "recover-4" } >>template ;
 
 ! ! ! Logout
 : <logout-action> ( -- action )
     <action>
         [
             f set-uid
-            "$login/login" end-flow
+            URL" $login" end-flow
         ] >>submit ;
 
 ! ! ! Authentication logic
@@ -320,7 +324,7 @@ M: login call-responder* ( path responder -- response )
 
 : <login-boilerplate> ( responder -- responder' )
     <boilerplate>
-        "$login/boilerplate" >>template ;
+        { login "boilerplate" } >>template ;
 
 : <login> ( responder -- auth )
     login new-dispatcher

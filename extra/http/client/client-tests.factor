@@ -10,30 +10,26 @@ tuple-syntax namespaces urls ;
 
 [
     TUPLE{ request
-        url: TUPLE{ url protocol: "http" host: "www.apple.com" port: 80 path: "/index.html" query: H{ } }
+        url: TUPLE{ url protocol: "http" host: "www.apple.com" port: 80 path: "/index.html" }
         method: "GET"
         version: "1.1"
         cookies: V{ }
         header: H{ { "connection" "close" } { "user-agent" "Factor http.client vocabulary" } }
     }
 ] [
-    [
-        "http://www.apple.com/index.html"
-        <get-request>
-    ] with-scope
+    "http://www.apple.com/index.html"
+    <get-request>
 ] unit-test
 
 [
     TUPLE{ request
-        url: TUPLE{ url protocol: "https" host: "www.amazon.com" port: 443 path: "/index.html" query: H{ } }
+        url: TUPLE{ url protocol: "https" host: "www.amazon.com" port: 443 path: "/index.html" }
         method: "GET"
         version: "1.1"
         cookies: V{ }
         header: H{ { "connection" "close" } { "user-agent" "Factor http.client vocabulary" } }
     }
 ] [
-    [
-        "https://www.amazon.com/index.html"
-        <get-request>
-    ] with-scope
+    "https://www.amazon.com/index.html"
+    <get-request>
 ] unit-test

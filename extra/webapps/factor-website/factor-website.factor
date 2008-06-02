@@ -4,6 +4,7 @@ USING: accessors kernel sequences assocs io.files io.sockets
 io.server
 namespaces db db.sqlite smtp
 http.server
+http.server.dispatchers
 furnace.db
 furnace.flows
 furnace.sessions
@@ -51,7 +52,7 @@ TUPLE: factor-website < dispatcher ;
         allow-password-recovery
         allow-edit-profile
     <boilerplate>
-        "$factor-website/page" >>template
+        { factor-website "page" } >>template
     <flows>
     <sessions>
     test-db <db-persistence> ;

@@ -19,7 +19,7 @@ M: counter-app init-session* drop 0 count sset ;
 : <display-action> ( -- action )
     <page-action>
         [ count sget "counter" set-value ] >>init
-        "$counter-app/counter" >>template ;
+        { counter-app "counter" } >>template ;
 
 : <counter-app> ( -- responder )
     counter-app new-dispatcher

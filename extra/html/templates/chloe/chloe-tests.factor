@@ -49,7 +49,7 @@ IN: html.templates.chloe.tests
     [
         [
             "test2" test-template call-template
-        ] "test3" test-template with-boilerplate
+        ] [ "test3" test-template ] with-boilerplate
     ] run-template
 ] unit-test
 
@@ -66,24 +66,6 @@ IN: html.templates.chloe.tests
 [ "" ] [
     [
         "test5" test-template call-template
-    ] run-template
-] unit-test
-
-SYMBOL: test6-aux?
-
-[ "True" ] [
-    [
-        test6-aux? on
-        "test6" test-template call-template
-    ] run-template
-] unit-test
-
-SYMBOL: test7-aux?
-
-[ "" ] [
-    [
-        test7-aux? off
-        "test7" test-template call-template
     ] run-template
 ] unit-test
 
@@ -127,7 +109,7 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
 
 [ "<ul><li>1</li><li>2</li><li>3</li></ul>" ] [
     [
-        "test9" test-template call-template
+        "test7" test-template call-template
     ] run-template [ blank? not ] filter
 ] unit-test
 
@@ -142,7 +124,7 @@ TUPLE: person first-name last-name ;
 
 [ "<table><tr><td>RBaxter</td><td>Unknown</td></tr><tr><td>Doug</td><td>Coleman</td></tr></table>" ] [
     [
-        "test10" test-template call-template
+        "test8" test-template call-template
     ] run-template [ blank? not ] filter
 ] unit-test
 
@@ -155,7 +137,7 @@ TUPLE: person first-name last-name ;
 
 [ "<table><tr><td>RBaxter</td><td>Unknown</td></tr><tr><td>Doug</td><td>Coleman</td></tr></table>" ] [
     [
-        "test10" test-template call-template
+        "test9" test-template call-template
     ] run-template [ blank? not ] filter
 ] unit-test
 
@@ -163,6 +145,6 @@ TUPLE: person first-name last-name ;
 
 [ "<a name=\"1\">Hello</a>" ] [
     [
-        "test11" test-template call-template
+        "test10" test-template call-template
     ] run-template
 ] unit-test

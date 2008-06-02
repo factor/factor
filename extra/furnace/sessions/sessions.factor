@@ -4,7 +4,8 @@ USING: assocs kernel math.intervals math.parser namespaces
 random accessors quotations hashtables sequences continuations
 fry calendar combinators destructors alarms
 db db.tuples db.types
-http http.server html.elements html.templates.chloe ;
+http http.server http.server.dispatchers http.server.filters
+html.elements furnace ;
 IN: furnace.sessions
 
 TUPLE: session id expires uid namespace changed? ;
@@ -151,11 +152,3 @@ M: sessions call-responder* ( path responder -- response )
 
 : logout-all-sessions ( uid -- )
     session new swap >>uid delete-tuples ;
-
-M: sessions link-attr
-    drop
-    "session" optional-attr {
-        { "none" [ session off flow-id off ] }
-        { "current" [ ] }
-        { f [ ] }
-    } case ;

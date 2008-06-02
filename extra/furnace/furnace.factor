@@ -1,6 +1,68 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: accessors arrays kernel combinators assocs
+continuations namespaces sequences splitting words
+vocabs.loader classes
+fry urls multiline
+xml
+xml.data
+xml.writer
+xml.utilities
+html.components
+html.elements
+html.templates
+html.templates.chloe
+html.templates.chloe.syntax
+http
+http.server
+http.server.redirection
+http.server.responses
+qualified ;
+QUALIFIED-WITH: assocs a
 IN: furnace
+
+: nested-responders ( -- seq )
+    responder-nesting get a:values ;
+
+: each-responder ( quot -- )
+   nested-responders swap each ; inline
+
+: base-path ( string -- pair )
+    dup responder-nesting get
+    [ second class word-name = ] with find nip
+    [ first ] [ "No such responder: " swap append throw ] ?if ;
+
+: resolve-base-path ( string -- string' )
+    "$" ?head [
+        [
+            "/" split1 [ base-path [  "/" % % ] each "/" % ] dip %
+        ] "" make
+    ] when ;
+
+: vocab-path ( vocab -- path )
+    dup vocab-dir vocab-append-path ;
+
+: resolve-template-path ( pair -- path )
+    [
+        first2 [ word-vocabulary vocab-path % ] [ "/" % % ] bi*
+    ] "" make ;
+
+GENERIC: modify-query ( query responder -- query' )
+
+M: object modify-query drop ;
+
+: adjust-url ( url -- url' )
+    clone
+        [ [ modify-query ] each-responder ] change-query
+        [ resolve-base-path ] change-path
+    relative-to-request ;
+
+: <redirect> ( url -- response )
+    adjust-url request get method>> {
+        { "GET" [ <temporary-redirect> ] }
+        { "HEAD" [ <temporary-redirect> ] }
+        { "POST" [ <permanent-redirect> ] }
+    } case ;
 
 GENERIC: hidden-form-field ( responder -- )
 
@@ -12,12 +74,6 @@ M: object hidden-form-field drop ;
         { "HEAD" [ url>> query>> ] }
         { "POST" [ post-data>> ] }
     } case ;
-
-: <feed-content> ( body -- response )
-    feed>xml "application/atom+xml" <content> ;
-
-: <json-content> ( obj -- response )
-    >json "application/json" <content> ;
 
 SYMBOL: exit-continuation
 
@@ -38,7 +94,7 @@ CHLOE: atom
     <url>
         swap >>query
         swap >>path
-    adjust-url
+    adjust-url relative-to-request
     add-atom-feed ;
 
 CHLOE: write-atom drop write-atom-feeds ;
@@ -62,7 +118,7 @@ M: object link-attr 2drop ;
             <url>
                 swap >>query
                 swap >>path
-            adjust-url =href
+            adjust-url relative-to-request =href
         a>
     ] with-scope ;
 
@@ -94,8 +150,6 @@ CHLOE: form
     [ drop </form> ]
     tri ;
 
-DEFER: process-chloe-tag
-
 STRING: button-tag-markup
 <t:form class="inline" xmlns:t="http://factorcode.org/chloe/1.0">
     <button type="submit"></button>
@@ -124,13 +178,6 @@ CHLOE: button
     ] unless ;
 
 : if-satisfied? ( tag -- ? )
-    t swap
-    {
-        [ "code"  optional-attr [ attr>word execute and ] when* ]
-        [  "var"  optional-attr [ attr>var      get and ] when* ]
-        [ "svar"  optional-attr [ attr>var     sget and ] when* ]
-        [ "uvar"  optional-attr [ attr>var     uget and ] when* ]
-        [ "value" optional-attr [ value             and ] when* ]
-    } cleave ;
+    "code" required-attr attr>word execute ;
 
 CHLOE: if dup if-satisfied? [ process-tag-children ] [ drop ] if ;

@@ -11,7 +11,7 @@
 				<t:bind-each t:name="postings">
 
 					<h2 class="posting-title">
-						<t:a t:value="link" t:session="none"><t:label t:name="title" /></t:a>
+						<t:a t:value="link"><t:label t:name="title" /></t:a>
 					</h2>
 
 					<p class="posting-body">
@@ -19,7 +19,7 @@
 					</p>
 
 					<p class="posting-date">
-						<t:a t:value="link" t:session="none"><t:label t:name="pub-date" /></t:a>
+						<t:a t:value="link"><t:label t:name="pub-date" /></t:a>
 					</p>
 
 				</t:bind-each>

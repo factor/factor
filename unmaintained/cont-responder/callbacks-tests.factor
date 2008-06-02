@@ -1,13 +1,12 @@
-IN: furnace.callbacks
-USING: furnace.actions furnace.callbacks accessors
-http.server http tools.test namespaces io fry sequences
+USING: furnace furnace.actions furnace.callbacks accessors
+http http.server http.server.responses tools.test
+namespaces io fry sequences
 splitting kernel hashtables continuations ;
+IN: furnace.callbacks.tests
 
 [ 123 ] [
     [
-        init-request
-
-        <request> "GET" >>method request set
+        <request> "GET" >>method init-request
         [
             exit-continuation set
             { }
@@ -19,8 +18,6 @@ splitting kernel hashtables continuations ;
 ] unit-test
 
 [
-    init-request
-
     <action> [
         [
             "hello" print
@@ -32,9 +29,11 @@ splitting kernel hashtables continuations ;
     <callback-responder> "r" set
 
     [ 123 ] [
+        <request> init-request
+
         [
             exit-continuation set
-            <request> "GET" >>method request set
+            <request> "GET" >>method init-request
             { } "r" get call-responder
         ] callcc1
 
@@ -42,9 +41,9 @@ splitting kernel hashtables continuations ;
 
         <request>
             "GET" >>method
-            swap cont-id associate >>query
-            "/" >>path
-        request set
+            dup url>> rot cont-id associate >>query drop
+            dup url>> "/" >>path drop
+        init-request
 
         [
             exit-continuation set
@@ -55,9 +54,9 @@ splitting kernel hashtables continuations ;
         ! get-post-get
         <request>
             "GET" >>method
-            swap "location" header "=" last-split1 nip cont-id associate >>query
-            "/" >>path
-        request set
+            dup url>> rot "location" header query>> >>query drop
+            dup url>> "/" >>path drop
+        init-request
 
         [
             exit-continuation set

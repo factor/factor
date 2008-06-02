@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors namespaces sequences arrays kernel
 assocs assocs.lib hashtables math.parser urls combinators
-html.elements http http.server furnace.sessions
-html.templates.chloe.syntax ;
+furnace http http.server http.server.filters furnace.sessions
+html.elements html.templates.chloe.syntax ;
 IN: furnace.flows
 
 TUPLE: flows < filter-responder ;

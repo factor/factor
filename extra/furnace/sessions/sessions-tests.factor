@@ -1,8 +1,10 @@
 IN: furnace.sessions.tests
 USING: tools.test http furnace.sessions
-furnace.actions http.server math namespaces kernel accessors
+furnace.actions http.server http.server.responses
+math namespaces kernel accessors
 prettyprint io.streams.string io.files splitting destructors
-sequences db db.sqlite continuations urls ;
+sequences db db.sqlite continuations urls math.parser
+furnace ;
 
 : with-session
     [

@@ -4,6 +4,7 @@ USING: kernel sequences accessors namespaces combinators words
 assocs db.tuples arrays splitting strings validators urls
 html.elements
 html.components
+furnace
 furnace.boilerplate
 furnace.auth.providers
 furnace.auth.providers.db
@@ -11,8 +12,11 @@ furnace.auth.login
 furnace.auth
 furnace.sessions
 furnace.actions
-http.server ;
+http.server
+http.server.dispatchers ;
 IN: webapps.user-admin
+
+TUPLE: user-admin < dispatcher ;
 
 : word>string ( word -- string )
     [ word-vocabulary ] [ drop ":" ] [ word-name ] tri 3append ;
@@ -29,7 +33,7 @@ IN: webapps.user-admin
 : <user-list-action> ( -- action )
     <page-action>
         [ f <user> select-tuples "users" set-value ] >>init
-        "$user-admin/user-list" >>template ;
+        { user-admin "user-list" } >>template ;
 
 : init-capabilities ( -- )
     capabilities get words>strings "capabilities" set-value ;
@@ -46,7 +50,7 @@ IN: webapps.user-admin
             init-capabilities
         ] >>init
 
-        "$user-admin/new-user" >>template
+        { user-admin "new-user" } >>template
 
         [
             init-capabilities
@@ -94,7 +98,7 @@ IN: webapps.user-admin
             capabilities get words>strings "capabilities" set-value
         ] >>init
 
-        "$user-admin/edit-user" >>template
+        { user-admin "edit-user" } >>template
 
         [
             init-capabilities
@@ -140,8 +144,6 @@ IN: webapps.user-admin
             URL" $user-admin" <redirect>
         ] >>submit ;
 
-TUPLE: user-admin < dispatcher ;
-
 SYMBOL: can-administer-users?
 
 can-administer-users? define-capability
@@ -153,7 +155,7 @@ can-administer-users? define-capability
         <edit-user-action> "edit" add-responder
         <delete-user-action> "delete" add-responder
     <boilerplate>
-        "$user-admin/user-admin" >>template
+        { user-admin "user-admin" } >>template
     { can-administer-users? } <protected> ;
 
 : make-admin ( username -- )

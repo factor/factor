@@ -14,11 +14,10 @@ SYMBOL: tags
 
 tags global [ H{ } clone or ] change-at
 
-: define-chloe-tag ( name quot -- ) tags get set-at ;
+: define-chloe-tag ( name quot -- ) swap tags get set-at ;
 
 : CHLOE:
-    scan parse-definition swap define-chloe-tag ;
-    parsing
+    scan parse-definition define-chloe-tag ; parsing
 
 : chloe-ns "http://factorcode.org/chloe/1.0" ; inline
 
@@ -38,7 +37,9 @@ MEMO: chloe-name ( string -- name )
     [ "name" required-attr ] dip render ;
 
 : CHLOE-SINGLETON:
-    scan dup '[ , singleton-component-tag ] define-chloe-tag ;
+    scan-word
+    [ word-name ] [ '[ , singleton-component-tag ] ] bi
+    define-chloe-tag ;
     parsing
 
 : attrs>slots ( tag tuple -- )
@@ -54,5 +55,7 @@ MEMO: chloe-name ( string -- name )
     2bi render ;
 
 : CHLOE-TUPLE:
-    scan dup '[ , tuple-component-tag ] define-chloe-tag ;
+    scan-word
+    [ word-name ] [ '[ , tuple-component-tag ] ] bi
+    define-chloe-tag ;
     parsing

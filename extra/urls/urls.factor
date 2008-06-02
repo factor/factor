@@ -94,10 +94,10 @@ TUPLE: url protocol username password host port path query anchor ;
 
 : <url> ( -- url ) url new ;
 
-: query-param ( request key -- value )
+: query-param ( url key -- value )
     swap query>> at ;
 
-: set-query-param ( request value key -- request )
+: set-query-param ( url value key -- url )
     '[ , , _ ?set-at ] change-query ;
 
 : parse-host ( string -- host port )

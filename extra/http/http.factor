@@ -6,8 +6,7 @@ assocs sequences splitting sorting sets debugger
 strings vectors hashtables quotations arrays byte-arrays
 math.parser calendar calendar.format
 
-io io.streams.string io.encodings.utf8 io.encodings.string
-io.sockets io.sockets.secure io.server
+io io.server io.sockets.secure
 
 unicode.case unicode.categories qualified
 
@@ -16,22 +15,6 @@ urls html.templates ;
 EXCLUDE: fry => , ;
 
 IN: http
-
-: secure-protocol? ( protocol -- ? )
-    "https" = ;
-
-: url-addr ( url -- addr )
-    [ [ host>> ] [ port>> ] bi <inet> ] [ protocol>> ] bi
-    secure-protocol? [ <secure> ] when ;
-
-: protocol-port ( protocol -- port )
-    {
-        { "http" [ 80 ] }
-        { "https" [ 443 ] }
-    } case ;
-
-: ensure-port ( url -- url' )
-    dup protocol>> '[ , protocol-port or ] change-port ;
 
 : crlf "\r\n" write ;
 
@@ -167,19 +150,6 @@ cookies ;
         "close" "connection" set-header
         "Factor http.client vocabulary" "user-agent" set-header ;
 
-: chop-hostname ( str -- str' )
-    ":" split1 "//" ?head drop nip
-    CHAR: / over index over length or tail
-    dup empty? [ drop "/" ] when ;
-
-: url>path ( url -- path )
-    #! Technically, only proxies are meant to support hostnames
-    #! in HTTP requests, but IE sends these sometimes so we
-    #! just chop the hostname part.
-    url-decode
-    dup { "http://" "https://" } [ head? ] with contains?
-    [ chop-hostname ] when ;
-
 : read-method ( request -- request )
     " " read-until [ "Bad request: method" throw ] unless
     >>method ;
@@ -299,9 +269,6 @@ SYMBOL: max-post-request
     flush
     drop ;
 
-: request-with-url ( request url -- request )
-    '[ , >url derive-url ensure-port ] change-url ;
-
 GENERIC: write-response ( response -- )
 
 GENERIC: write-full-response ( request response -- )
@@ -406,7 +373,7 @@ body ;
 
 : <raw-response> ( -- response )
     raw-response new
-    "1.1" >>version ;
+        "1.1" >>version ;
 
 M: raw-response write-response ( respose -- )
     write-response-version

@@ -2,6 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs namespaces kernel sequences sets
 http.server
+http.server.filters
+http.server.dispatchers
 furnace.sessions
 furnace.auth.providers ;
 IN: furnace.auth

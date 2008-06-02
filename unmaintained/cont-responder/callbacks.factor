@@ -3,7 +3,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: http http.server io kernel math namespaces
 continuations calendar sequences assocs hashtables
-accessors arrays alarms quotations combinators fry assocs.lib ;
+accessors arrays alarms quotations combinators fry
+http.server.redirection furnace assocs.lib urls ;
 IN: furnace.callbacks
 
 SYMBOL: responder
@@ -11,9 +12,6 @@ SYMBOL: responder
 TUPLE: callback-responder responder callbacks ;
 
 : <callback-responder> ( responder -- responder' )
-    #! A continuation responder is a special type of session
-    #! manager. However it works entirely differently from
-    #! the URL and cookie session managers.
     H{ } clone callback-responder boa ;
 
 TUPLE: callback cont quot expires alarm responder ;
@@ -44,7 +42,7 @@ TUPLE: callback cont quot expires alarm responder ;
 : register-callback ( cont quot expires? -- id )
     <callback> callback-responder get callbacks>> set-at-unique ;
 
-: forward-to-url ( url query -- * )
+: forward-to-url ( url -- * )
     #! When executed inside a 'show' call, this will force a
     #! HTTP 302 to occur to instruct the browser to forward to
     #! the request URL.
@@ -56,7 +54,8 @@ TUPLE: callback cont quot expires alarm responder ;
     #! When executed inside a 'show' call, this will force a
     #! HTTP 302 to occur to instruct the browser to forward to
     #! the request URL.
-    f swap cont-id associate forward-to-url ;
+    <url>
+        swap cont-id set-query-param forward-to-url ;
 
 : restore-request ( pair -- )
     first3 exit-continuation set request set call ;
@@ -94,7 +93,7 @@ SYMBOL: current-show
     call exit-with ; inline
 
 : resuming-callback ( responder request -- id )
-    cont-id query-param swap callbacks>> at ;
+    url>> cont-id query-param swap callbacks>> at ;
 
 M: callback-responder call-responder* ( path responder -- response )
     '[

@@ -12,6 +12,7 @@ html.templates.chloe.syntax ;
 IN: html.templates.chloe
 
 ! Chloe is Ed's favorite web designer
+SYMBOL: tag-stack
 
 TUPLE: chloe path ;
 
@@ -44,7 +45,8 @@ CHLOE: title children>string set-title ;
 
 CHLOE: write-title
     drop
-    "head" tags get member? "title" tags get member? not and
+    "head" tag-stack get member?
+    "title" tag-stack get member? not and
     [ <title> write-title </title> ] [ write-title ] if ;
 
 CHLOE: style
@@ -92,22 +94,23 @@ CHLOE-SINGLETON: html
 CHLOE-SINGLETON: hidden
 
 CHLOE-TUPLE: field
+CHLOE-TUPLE: textarea
 CHLOE-TUPLE: password
 CHLOE-TUPLE: choice
 CHLOE-TUPLE: checkbox
 CHLOE-TUPLE: code
 
 : process-chloe-tag ( tag -- )
-    dup name-tag tags get at
+    dup name-tag dup tags get at
     [ call ] [ "Unknown chloe tag: " prepend throw ] ?if ;
 
 : process-tag ( tag -- )
     {
-        [ name-tag >lower tags get push ]
+        [ name-tag >lower tag-stack get push ]
         [ write-start-tag ]
         [ process-tag-children ]
         [ write-end-tag ]
-        [ drop tags get pop* ]
+        [ drop tag-stack get pop* ]
     } cleave ;
 
 : expand-attrs ( tag -- tag )
@@ -127,7 +130,7 @@ CHLOE-TUPLE: code
 
 : process-chloe ( xml -- )
     [
-        V{ } clone tags set
+        V{ } clone tag-stack set
 
         nested-template? get [
             process-template

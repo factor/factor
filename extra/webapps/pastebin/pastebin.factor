@@ -3,13 +3,21 @@
 USING: namespaces assocs sorting sequences kernel accessors
 hashtables sequences.lib db.types db.tuples db combinators
 calendar calendar.format math.parser rss urls xml.writer
-xmode.catalog validators html.components html.templates.chloe
+xmode.catalog validators
+html.components
+html.templates.chloe
 http.server
+http.server.dispatchers
+http.server.redirection
+furnace
 furnace.actions
 furnace.auth
 furnace.auth.login
-furnace.boilerplate ;
+furnace.boilerplate
+furnace.rss ;
 IN: webapps.pastebin
+
+TUPLE: pastebin < dispatcher ;
 
 ! ! !
 ! DOMAIN MODEL
@@ -91,7 +99,7 @@ M: annotation entity-link
 : <pastebin-action> ( -- action )
     <page-action>
         [ pastes "pastes" set-value ] >>init
-        "$pastebin/pastebin" >>template ;
+        { pastebin "pastebin" } >>template ;
 
 : pastebin-feed-entries ( seq -- entries )
     <reversed> 20 short head [
@@ -99,7 +107,7 @@ M: annotation entity-link
             swap
             [ summary>> >>title ]
             [ date>> >>pub-date ]
-            [ entity-link adjust-url >>link ]
+            [ entity-link adjust-url relative-to-request >>link ]
             tri
     ] map ;
 
@@ -130,7 +138,7 @@ M: annotation entity-link
             ] nest-values
         ] >>init
 
-        "$pastebin/paste" >>template ;
+        { pastebin "paste" } >>template ;
 
 : paste-feed-entries ( paste -- entries )
     fetch-annotations annotations>> pastebin-feed-entries ;
@@ -139,7 +147,7 @@ M: annotation entity-link
     feed new
         swap
         [ "Paste " swap id>> number>string append >>title ]
-        [ entity-link adjust-url >>link ]
+        [ entity-link adjust-url relative-to-request >>link ]
         [ paste-feed-entries >>entries ]
         tri ;
 
@@ -168,7 +176,9 @@ M: annotation entity-link
             mode-names "modes" set-value
         ] >>init
 
-        "$pastebin/new-paste" >>template
+        { pastebin "new-paste" } >>template
+
+        [ mode-names "modes" set-value ] >>validate
 
         [
             validate-entity
@@ -225,8 +235,6 @@ M: annotation entity-link
             bi
         ] >>submit ;
 
-TUPLE: pastebin < dispatcher ;
-
 SYMBOL: can-delete-pastes?
 
 can-delete-pastes? define-capability
@@ -242,7 +250,7 @@ can-delete-pastes? define-capability
         <new-annotation-action> "new-annotation" add-responder
         <delete-annotation-action> { can-delete-pastes? } <protected> "delete-annotation" add-responder
     <boilerplate>
-        "$pastebin/pastebin-common" >>template ;
+        { pastebin "pastebin-common" } >>template ;
 
 : init-pastes-table \ paste ensure-table ;
 

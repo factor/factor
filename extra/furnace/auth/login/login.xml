@@ -30,11 +30,11 @@
 	</t:form>
 
 	<p>
-		<t:if code="http.server.auth.login:login-failed?">
+		<t:if t:code="furnace.auth.login:allow-registration?">
 			<t:a t:href="register">Register</t:a>
 		</t:if>
 		|
-		<t:if code="http.server.auth.login:allow-password-recovery?">
+		<t:if t:code="furnace.auth.login:allow-password-recovery?">
 			<t:a t:href="recover-password">Recover Password</t:a>
 		</t:if>
 	</p>

@@ -1,9 +1,16 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors sequences kernel assocs combinators http.server
+USING: accessors sequences kernel assocs combinators
 validators http hashtables namespaces fry continuations locals
-boxes xml.entities html.elements html.components
-html.templates.chloe io arrays math ;
+io arrays math boxes
+xml.entities
+http.server
+http.server.responses
+furnace
+html.elements
+html.components
+html.templates.chloe
+html.templates.chloe.syntax ;
 IN: furnace.actions
 
 SYMBOL: params
@@ -92,9 +99,3 @@ TUPLE: page-action < action template ;
 : <page-action> ( -- page )
     page-action new-action
         dup '[ , template>> <chloe-content> ] >>display ;
-
-TUPLE: feed-action < action feed ;
-
-: <feed-action> ( -- feed )
-    feed-action new-action
-        dup '[ , feed>> call <feed-content> ] >>display ;

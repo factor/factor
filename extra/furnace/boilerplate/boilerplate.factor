@@ -1,7 +1,11 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel namespaces http.server html.templates
-html.templates.chloe locals ;
+USING: accessors kernel namespaces
+html.templates html.templates.chloe
+locals
+http.server
+http.server.filters
+furnace ;
 IN: furnace.boilerplate
 
 TUPLE: boilerplate < filter-responder template ;

@@ -190,7 +190,7 @@ SYMBOL: html
     <html "http://www.w3.org/1999/xhtml" =xmlns "en" =xml:lang "en" =lang html>
         <head> <title> swap write </title> </head>
         <body> call </body>
-    </html> ;
+    </html> ; inline
 
 : render-error ( message -- )
     <span "error" =class span> escape-string write </span> ;
