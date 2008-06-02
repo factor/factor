@@ -84,6 +84,25 @@ USING: urls tools.test tuple-syntax arrays kernel assocs ;
             }
             "bar?a=b"
         }
+        {
+            TUPLE{ url
+                protocol: "ftp"
+                host: "ftp.kernel.org"
+                username: "slava"
+                path: "/"
+            }
+            "ftp://slava@ftp.kernel.org/"
+        }
+        {
+            TUPLE{ url
+                protocol: "ftp"
+                host: "ftp.kernel.org"
+                username: "slava"
+                password: "secret"
+                path: "/"
+            }
+            "ftp://slava:secret@ftp.kernel.org/"
+        }
     } ;
 
 urls [

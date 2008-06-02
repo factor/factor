@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel unicode.categories combinators sequences splitting
-fry namespaces assocs arrays strings io.encodings.string
-io.encodings.utf8 math math.parser accessors mirrors parser
+fry namespaces assocs arrays strings io.sockets
+io.sockets.secure io.encodings.string io.encodings.utf8
+math math.parser accessors mirrors parser
 prettyprint.backend hashtables ;
 IN: urls
 
@@ -89,7 +90,7 @@ IN: urls
         ] assoc-each
     ] { } make "&" join ;
 
-TUPLE: url protocol host port path query anchor ;
+TUPLE: url protocol username password host port path query anchor ;
 
 : <url> ( -- url ) url new ;
 
@@ -110,6 +111,11 @@ TUPLE: url protocol host port path query anchor ;
 : parse-host-part ( url protocol rest -- url string' )
     [ >>protocol ] [
         "//" ?head [ "Invalid URL" throw ] unless
+        "@" split1 [
+            [
+                ":" split1 [ >>username ] [ >>password ] bi*
+            ] dip
+        ] when*
         "/" split1 [
             parse-host [ >>host ] [ >>port ] bi*
         ] [ "/" prepend ] bi*
@@ -129,13 +135,20 @@ M: string >url
     ]
     [ url-decode >>anchor ] bi* ;
 
+: unparse-username-password ( url -- )
+    dup username>> dup [
+        % password>> [ ":" % % ] when* "@" %
+    ] [ 2drop ] if ;
+
 : unparse-host-part ( url protocol -- )
     %
     "://" %
-    [ host>> url-encode % ]
-    [ port>> [ ":" % # ] when* ]
-    [ path>> "/" head? [ "/" % ] unless ]
-    tri ;
+    {
+        [ unparse-username-password ]
+        [ host>> url-encode % ]
+        [ port>> [ ":" % # ] when* ]
+        [ path>> "/" head? [ "/" % ] unless ]
+    } cleave ;
 
 : url>string ( url -- string )
     [
@@ -165,6 +178,25 @@ M: string >url
 : relative-url ( url -- url' )
     clone f >>protocol f >>host f >>port ;
 
+! Half-baked stuff follows
+: secure-protocol? ( protocol -- ? )
+    "https" = ;
+
+: url-addr ( url -- addr )
+    [ [ host>> ] [ port>> ] bi <inet> ] [ protocol>> ] bi
+    secure-protocol? [ <secure> ] when ;
+
+: protocol-port ( protocol -- port )
+    {
+        { "http" [ 80 ] }
+        { "https" [ 443 ] }
+        { "ftp" [ 21 ] }
+    } case ;
+
+: ensure-port ( url -- url' )
+    dup protocol>> '[ , protocol-port or ] change-port ;
+
+! Literal syntax
 : URL" lexer get skip-blank parse-string >url parsed ; parsing
 
 M: url pprint* dup url>string "URL\" " "\"" pprint-string ;
