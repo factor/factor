@@ -3,7 +3,7 @@
 USING: arrays combinators concurrency.mailboxes concurrency.futures io
        io.encodings.8-bit io.sockets kernel namespaces sequences
        sequences.lib splitting threads calendar classes.tuple
-       classes ascii assocs accessors destructors ;
+       classes ascii assocs accessors destructors continuations ;
 IN: irc.client
 
 ! ======================================
@@ -26,10 +26,11 @@ TUPLE: nick name channels log ;
 C: <nick> nick
 
 TUPLE: irc-client profile nick stream in-messages out-messages join-messages
-       listeners is-running ;
+       listeners is-running connect ;
 : <irc-client> ( profile -- irc-client )
     f V{ } clone V{ } clone <nick>
-    f <mailbox> <mailbox> <mailbox> H{ } clone f irc-client boa ;
+    f <mailbox> <mailbox> <mailbox> H{ } clone f
+    [ <inet> latin1 <client> ] irc-client boa ;
 
 TUPLE: irc-listener in-messages out-messages ;
 : <irc-listener> ( -- irc-listener )
@@ -79,7 +80,7 @@ TUPLE: unhandled < irc-message ;
     " hostname servername :irc.factor" irc-print ;
 
 : /CONNECT ( server port -- stream )
-    <inet> latin1 <client> drop ;
+    irc-client> connect>> call drop ;
 
 : /JOIN ( channel password -- )
     "JOIN " irc-write
@@ -183,6 +184,9 @@ M: privmsg handle-incoming-irc ( privmsg -- )
 M: join handle-incoming-irc ( join -- )
     irc-client> join-messages>> mailbox-put ;
 
+M: irc-end handle-incoming-irc ( irc-end -- )
+    irc-client> listeners>> values [ in-messages>> mailbox-put ] with each ;
+
 ! ======================================
 ! Client message handling
 ! ======================================
@@ -195,6 +199,9 @@ M: privmsg handle-outgoing-irc ( privmsg -- )
 ! ======================================
 ! Reader/Writer
 ! ======================================
+
+: irc-mailbox-get ( mailbox quot -- )
+    swap 5 seconds  [ mailbox-get-timeout swap call ] 3curry [ drop ] recover ;
 
 : stream-readln-or-close ( stream -- str/f )
     dup stream-readln [ nip ] [ dispose f ] if* ;
@@ -213,14 +220,14 @@ M: privmsg handle-outgoing-irc ( privmsg -- )
     ] if* ;
 
 : writer-loop ( -- )
-    irc-client> out-messages>> mailbox-get handle-outgoing-irc ;
+    irc-client> out-messages>> [ handle-outgoing-irc ] irc-mailbox-get ;
 
 ! ======================================
 ! Processing loops
 ! ======================================
 
 : in-multiplexer-loop ( -- )
-    irc-client> in-messages>> mailbox-get handle-incoming-irc ;
+    irc-client> in-messages>> [ handle-incoming-irc ] irc-mailbox-get ;
 
 : maybe-annotate-with-name ( name obj -- obj )
     dup privmsg instance? [ swap >>name ] [ nip ] if ;
