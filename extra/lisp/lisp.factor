@@ -3,11 +3,8 @@
 USING: kernel peg sequences arrays strings combinators.lib
 namespaces combinators math locals locals.private accessors
 vectors syntax lisp.parser assocs parser sequences.lib words quotations
-fry ;
+fry lisp.conses ;
 IN: lisp
-
-: uncons ( cons -- cdr car )
-    [ cdr>> ] [ car>> ] bi ;
 
 DEFER: convert-form
 DEFER: funcall

@@ -1,22 +1,13 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel peg peg.ebnf peg.expr math.parser sequences arrays strings
-combinators.lib math fry accessors ;
+combinators.lib math fry accessors lisp.conses ;
 
 IN: lisp.parser
 
 TUPLE: lisp-symbol name ;
 C: <lisp-symbol> lisp-symbol
 
-TUPLE: cons car cdr ;
-: cons \ cons new ;
-
-: <car> ( x -- cons )
-    cons swap >>car ;
-
-: seq>cons ( seq -- cons )
-    <reversed> cons [ <car> swap >>cdr ] reduce ;
-    
 EBNF: lisp-expr
 _            = (" " | "\t" | "\n")*
 LPAREN       = "("
