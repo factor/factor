@@ -44,15 +44,21 @@ M: pango-gadget dim>> ( gadget -- dim )
 
 M: pango-gadget graft* ( gadget -- ) [ 1+ ] refcount-change ;
 
-M: pango-gadget ungraft* ( gadget -- ) [ 1- ] refcount-change ;
+: release-texture ( gadget -- )
+    cache-key textures get delete-at* [ delete-texture ] [ drop ] if ;
+
+M: pango-gadget ungraft* ( gadget -- )
+    dup [ 1- ] refcount-change
+    dup cache-key refcounts get at
+    zero? [ release-texture ] [ drop ] if ;
 
 M: pango-gadget render* ( gadget -- ) 
-    [ gen-texture ] [ cache-key textures get set-at ]
-    [ call-next-method ] tri ;
+    [ gen-texture ] [ cache-key textures get set-at ] bi
+    call-next-method ;
 
 M: pango-gadget tex>> ( gadget -- texture )
     dup cache-key textures get at 
-    [ ] [ render* tex>> ] ?if ;
+    [ nip ] [ dup render* tex>> ] if* ;
 
 USE: ui.gadgets.panes
 : hello "Sans 50" "hello" <pango-gadget> gadget. ;
