@@ -17,7 +17,7 @@ IN: math.primes.factors
     dup empty? [ drop ] [ first , ] if ;
 
 : (factors) ( quot list n -- )
-    dup 1 > [ swap uncons >r pick call r> swap (factors) ] [ 3drop ] if ;
+    dup 1 > [ swap uncons swap >r pick call r> swap (factors) ] [ 3drop ] if ;
 
 : (decompose) ( n quot -- seq )
     [ lprimes rot (factors) ] { } make ;
