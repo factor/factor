@@ -65,3 +65,18 @@ HELP: leach
 HELP: lreduce
 { $values { "list" "a cons object" } { "identity" "an object" } { "quot" "a quotation with stack effect ( prev elt -- next )" } { "result" "the final result" } }
 { $description "Combines successive elements of the list using a binary operation, and outputs the final result." } ;
+
+HELP: uncons
+{ $values { "cons" "a cons object" } { "car" "the head of the list" } { "cdr" "the tail of the list" } }
+{ $description "Put the head and tail of the list on the stack." } ;
+
+{ leach lreduce lmap } related-words
+
+HELP: leach
+{ $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( obj -- )" } }
+{ $description "Call the quotation for each item in the list." } ;
+
+HELP: lreduce
+{ $values { "list" "a cons object" } { "identity" "an object" } { "quot" "a quotation with stack effect ( prev elt -- next )" } { "result" "the final result" } }
+{ $description "Combines successive elements of the list using a binary operation, and outputs the final result." } ;
+

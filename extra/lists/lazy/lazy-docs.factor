@@ -28,31 +28,9 @@ HELP: <memoized-cons>
 { $description "Constructs a cons object that wraps an existing cons object. Requests for the car, cdr and nil? will be remembered after the first call, and the previous result returned on subsequent calls." } 
 { $see-also cons car cdr nil nil? } ;
 
-HELP: lnth
-{ $values { "n" "an integer index" } { "list" "a cons object" } { "elt" "the element at the nth index" } }
-{ $description "Outputs the nth element of the list." } 
-{ $see-also llength cons car cdr } ;
+{ lazy-map lazy-map-with ltake lfilter lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lwhile luntil } related-words
 
-HELP: llength
-{ $values { "list" "a cons object" } { "n" "a non-negative integer" } }
-{ $description "Outputs the length of the list. This should not be called on an infinite list." } 
-{ $see-also lnth cons car cdr } ;
-
-HELP: uncons
-{ $values { "cons" "a cons object" } { "car" "the head of the list" } { "cdr" "the tail of the list" } }
-{ $description "Put the head and tail of the list on the stack." } ;
-
-{ leach lreduce lmap lmap-with ltake lfilter lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lreduce lwhile luntil } related-words
-
-HELP: leach
-{ $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( obj -- )" } }
-{ $description "Call the quotation for each item in the list." } ;
-
-HELP: lreduce
-{ $values { "list" "a cons object" } { "identity" "an object" } { "quot" "a quotation with stack effect ( prev elt -- next )" } { "result" "the final result" } }
-{ $description "Combines successive elements of the list using a binary operation, and outputs the final result." } ;
-
-HELP: lmap
+HELP: lazy-map
 { $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( obj -- X )" } { "result" "resulting cons object" } }
 { $description "Perform a similar functionality to that of the " { $link map } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-map> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
 
