@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Matthew Willis and Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: lazy-lists tools.test kernel math io sequences ;
+USING: lists lazy-lists tools.test kernel math io sequences ;
 IN: lazy-lists.tests
 
 [ { 1 2 3 4 } ] [

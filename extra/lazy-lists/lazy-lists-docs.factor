@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: help.markup help.syntax sequences strings ;
+USING: help.markup help.syntax sequences strings lists ;
 IN: lazy-lists 
 
 { car cons cdr nil nil? list? uncons } related-words
