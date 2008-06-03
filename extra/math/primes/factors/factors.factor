@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel lists lists.lazy math math.primes namespaces sequences ;
+USING: arrays kernel lists math math.primes namespaces sequences ;
 IN: math.primes.factors
 
 <PRIVATE

@@ -9,7 +9,7 @@ IN: lists.tests
         T{ cons f 2 
             T{ cons f 3
                 T{ cons f 4
-                T{ cons f f f } } } } } [ 2 + ] map-cons
+                T{ cons f f f } } } } } [ 2 + ] lmap
 ] unit-test
 
 { 10 } [
@@ -17,5 +17,5 @@ IN: lists.tests
         T{ cons f 2 
             T{ cons f 3
                 T{ cons f 4
-                T{ cons f f f } } } } } 0 [ + ] reduce-cons
+                T{ cons f f f } } } } } 0 [ + ] lreduce
 ] unit-test

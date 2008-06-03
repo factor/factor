@@ -34,9 +34,9 @@ HELP: lazy-map
 { $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( obj -- X )" } { "result" "resulting cons object" } }
 { $description "Perform a similar functionality to that of the " { $link map } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-map> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
 
-HELP: lmap-with
+HELP: lazy-map-with
 { $values { "value" "an object" } { "list" "a cons object" } { "quot" "a quotation with stack effect ( obj elt -- X )" } { "result" "resulting cons object" } }
-{ $description "Variant of " { $link lmap } " which pushes a retained object on each invocation of the quotation." } ;
+{ $description "Variant of " { $link lazy-map } " which pushes a retained object on each invocation of the quotation." } ;
 
 HELP: ltake
 { $values { "n" "a non negative integer" } { "list" "a cons object" } { "result" "resulting cons object" } }
@@ -86,7 +86,7 @@ HELP: >list
 { $description "Convert the object into a list. Existing lists are passed through intact, sequences are converted using " { $link seq>list } " and other objects cause an error to be thrown." } 
 { $see-also seq>list } ;
     
-{ leach lreduce lmap lmap-with ltake lfilter lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lreduce lwhile luntil } related-words
+{ leach lreduce lazy-map lazy-map-with ltake lfilter lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lreduce lwhile luntil } related-words
 
 HELP: lconcat
 { $values { "list" "a list of lists" } { "result" "a list" } }
