@@ -216,16 +216,20 @@ revision "REVISIONS" {
 
 : <wiki> ( -- dispatcher )
     wiki new-dispatcher
-        <main-article-action> "" add-responder
-        <view-article-action> "view" add-responder
-        <view-revision-action> "revision" add-responder
-        <list-revisions-action> "revisions" add-responder
+        <dispatcher>
+            <main-article-action> "" add-responder
+            <view-article-action> "view" add-responder
+            <view-revision-action> "revision" add-responder
+            <list-revisions-action> "revisions" add-responder
+            <diff-action> "diff" add-responder
+            <edit-article-action> { } <protected> "edit" add-responder
+        <boilerplate>
+            { wiki "page-common" } >>template
+        >>default
         <rollback-action> "rollback" add-responder
         <user-edits-action> "user-edits" add-responder
-        <diff-action> "diff" add-responder
         <list-articles-action> "articles" add-responder
         <list-changes-action> "changes" add-responder
-        <edit-article-action> { } <protected> "edit" add-responder
         <delete-action> { } <protected> "delete" add-responder
     <boilerplate>
         { wiki "wiki-common" } >>template ;

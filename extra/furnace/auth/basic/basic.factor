@@ -1,9 +1,9 @@
 ! Copyright (c) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors quotations assocs kernel splitting
-base64 html.elements io combinators http.server
-furnace.auth.providers furnace.auth.login
-http sequences ;
+base64 html.elements io combinators sequences
+http http.server.filters http.server.responses http.server
+furnace.auth.providers furnace.auth.login ;
 IN: furnace.auth.basic
 
 TUPLE: basic-auth < filter-responder realm provider ;

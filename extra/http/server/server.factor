@@ -63,7 +63,8 @@ LOG: httpd-hit NOTICE
     url>> path>> split-path main-responder get call-responder ;
 
 : do-request ( request -- response )
-    [
+    '[
+        ,
         [ init-request ]
         [ log-request ]
         [ dispatch-request ] tri
