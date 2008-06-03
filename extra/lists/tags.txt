@@ -1,4 +1,3 @@
-lisp
 cons
 lists
 sequences

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors ;
 
-IN: lisp.conses 
+IN: lists
 
 TUPLE: cons car cdr ;
 : cons \ cons new ;
@@ -25,6 +25,9 @@ TUPLE: cons car cdr ;
     
 : map-cons ( cons quot -- seq )
     [ { } clone ] 2dip (map-cons) ;
+    
+: cons>seq ( cons -- array )    
+    [ ] map-cons ;
     
 : reduce-cons ( cons identity quot -- result )    
     pick null? [ drop nip ]
