@@ -1,17 +1,21 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences namespaces
-db db.types db.tuples validators hashtables
+db db.types db.tuples validators hashtables urls
 html.components
 html.templates.chloe
-http.server.sessions
-http.server.boilerplate
-http.server.auth
-http.server.actions
-http.server.db
-http.server.auth.login
-http.server ;
+http.server
+http.server.dispatchers
+furnace
+furnace.sessions
+furnace.boilerplate
+furnace.auth
+furnace.actions
+furnace.db
+furnace.auth.login ;
 IN: webapps.todo
+
+TUPLE: todo-list < dispatcher ;
 
 TUPLE: todo uid id priority summary description ;
 
@@ -31,20 +35,14 @@ todo "TODO"
         swap >>id
         uid >>uid ;
 
-: todo-template ( name -- template )
-    "resource:extra/webapps/todo/" swap ".xml" 3append <chloe> ;
-
 : <view-action> ( -- action )
     <page-action>
         [
             validate-integer-id
-            "id" value <todo> select-tuple from-tuple
+            "id" value <todo> select-tuple from-object
         ] >>init
         
-        "view-todo" todo-template >>template ;
-
-: <id-redirect> ( id next -- response )
-    swap "id" associate <standard-redirect> ;
+        { todo-list "view-todo" } >>template ;
 
 : validate-todo ( -- )
     {
@@ -57,15 +55,20 @@ todo "TODO"
     <page-action>
         [ 0 "priority" set-value ] >>init
 
-        "edit-todo" todo-template >>template
+        { todo-list "new-todo" } >>template
 
         [ validate-todo ] >>validate
 
         [
             f <todo>
-                dup { "summary" "description" } deposit-slots
+                dup { "summary" "priority" "description" } deposit-slots
             [ insert-tuple ]
-            [ id>> "$todo-list/view" <id-redirect> ]
+            [
+                <url>
+                    "$todo-list/view" >>path
+                    swap id>> "id" set-query-param
+                <redirect>
+            ]
             bi
         ] >>submit ;
 
@@ -73,10 +76,10 @@ todo "TODO"
     <page-action>
         [
             validate-integer-id
-            "id" value <todo> select-tuple from-tuple
+            "id" value <todo> select-tuple from-object
         ] >>init
 
-        "edit-todo" todo-template >>template
+        { todo-list "edit-todo" } >>template
 
         [
             validate-integer-id
@@ -87,7 +90,12 @@ todo "TODO"
             f <todo>
                 dup { "id" "summary" "priority" "description" } deposit-slots
             [ update-tuple ]
-            [ id>> "$todo-list/view" <id-redirect> ]
+            [
+                <url>
+                    "$todo-list/view" >>path
+                    swap id>> "id" set-query-param
+                <redirect>
+            ]
             bi
         ] >>submit ;
 
@@ -97,15 +105,13 @@ todo "TODO"
 
         [
             "id" get <todo> delete-tuples
-            "$todo-list/list" f <standard-redirect>
+            URL" $todo-list/list" <redirect>
         ] >>submit ;
 
 : <list-action> ( -- action )
     <page-action>
         [ f <todo> select-tuples "items" set-value ] >>init
-        "todo-list" todo-template >>template ;
-
-TUPLE: todo-list < dispatcher ;
+        { todo-list "todo-list" } >>template ;
 
 : <todo-list> ( -- responder )
     todo-list new-dispatcher
@@ -115,5 +121,5 @@ TUPLE: todo-list < dispatcher ;
         <edit-action>   "edit"   add-responder
         <delete-action> "delete" add-responder
     <boilerplate>
-        "todo" todo-template >>template
+        { todo-list "todo" } >>template
     f <protected> ;

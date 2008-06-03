@@ -24,6 +24,9 @@ IN: unicode.collation.tests
 [ t t f f ] [ "hello" "HELLO" test-equality ] unit-test
 [ t t t f ] [ "hello" "h e l l o." test-equality ] unit-test
 [ t t t t ] [ "hello" "\0hello\0" test-equality ] unit-test
+[ { "good bye" "goodbye" "hello" "HELLO" } ]
+[ { "HELLO" "goodbye" "good bye" "hello" } sort-strings ]
+unit-test
 
 parse-test 2 <clumps>
 [ [ test-two ] assoc-each ] with-null-writer

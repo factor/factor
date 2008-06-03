@@ -1,14 +1,14 @@
 USING: xmode.tokens xmode.marker xmode.catalog kernel
 html.elements io io.files sequences words io.encodings.utf8
-namespaces xml.entities ;
+namespaces xml.entities accessors ;
 IN: xmode.code2html
 
 : htmlize-tokens ( tokens -- )
     [
-        dup token-str swap token-id [
+        [ str>> ] [ id>> ] bi [
             <span word-name =class span> escape-string write </span>
         ] [
-            write
+            escape-string write
         ] if*
     ] each ;
 
