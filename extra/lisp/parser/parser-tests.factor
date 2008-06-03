@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
-USING: lisp.parser tools.test peg peg.ebnf lisp.conses ;
+USING: lisp.parser tools.test peg peg.ebnf lists ;
 
 IN: lisp.parser.tests
 
