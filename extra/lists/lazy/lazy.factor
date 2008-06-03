@@ -44,21 +44,6 @@ M: lazy-cons nil? ( lazy-cons -- bool )
 : 3lazy-list ( a b c -- lazy-cons )
     2lazy-list 1quotation lazy-cons ;
 
-: lnth ( n list -- elt )
-    swap [ cdr ] times car ;
-
-: (llength) ( list acc -- n )
-    over nil? [ nip ] [ [ cdr ] dip 1+ (llength) ] if ;
-
-: llength ( list -- n )
-    0 (llength) ;
-
-: leach ( list quot -- )
-    over nil? [ 2drop ] [ [ uncons ] dip tuck call leach ] if ; inline
-
-: lreduce ( list identity quot -- result )
-    swapd leach ; inline
-
 TUPLE: memoized-cons original car cdr nil? ;
 
 : not-memoized ( -- obj )
@@ -96,7 +81,7 @@ TUPLE: lazy-map cons quot ;
 
 C: <lazy-map> lazy-map
 
-: lmap ( list quot -- result )
+: lazy-map ( list quot -- result )
         over nil? [ 2drop nil ] [ <lazy-map> <memoized-cons> ] if ;
 
 M: lazy-map car ( lazy-map -- car )
@@ -105,13 +90,13 @@ M: lazy-map car ( lazy-map -- car )
 
 M: lazy-map cdr ( lazy-map -- cdr )
     [ cons>> cdr ] keep
-    quot>> lmap ;
+    quot>> lazy-map ;
 
 M: lazy-map nil? ( lazy-map -- bool )
     cons>> nil? ;
 
-: lmap-with ( value list quot -- result )
-    with lmap ;
+: lazy-map-with ( value list quot -- result )
+    with lazy-map ;
 
 TUPLE: lazy-take n cons ;
 
@@ -323,22 +308,22 @@ M: lazy-concat nil? ( lazy-concat -- bool )
     ] if ;
 
 : lcartesian-product ( list1 list2 -- result )
-    swap [ swap [ 2array ] lmap-with ] lmap-with lconcat ;
+    swap [ swap [ 2array ] lazy-map-with  ] lazy-map-with  lconcat ;
 
 : lcartesian-product* ( lists -- result )
     dup nil? [
         drop nil
     ] [
         [ car ] keep cdr [ car lcartesian-product ] keep cdr list>array swap [
-            swap [ swap [ suffix ] lmap-with ] lmap-with lconcat
+            swap [ swap [ suffix ] lazy-map-with  ] lazy-map-with  lconcat
         ] reduce
     ] if ;
 
 : lcomp ( list quot -- result )
-    [ lcartesian-product* ] dip lmap ;
+    [ lcartesian-product* ] dip lazy-map ;
 
 : lcomp* ( list guards quot -- result )
-    [ [ lcartesian-product* ] dip [ lfilter ] each ] dip lmap ;
+    [ [ lcartesian-product* ] dip [ lfilter ] each ] dip lazy-map ;
 
 DEFER: lmerge
 
