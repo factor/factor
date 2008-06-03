@@ -3,6 +3,7 @@
 !
 ! Updated by Matthew Willis, July 2006
 ! Updated by Chris Double, September 2006
+! Updated by James Cash, June 2008
 !
 USING: kernel sequences math vectors arrays namespaces
 quotations promises combinators io lists accessors ;
