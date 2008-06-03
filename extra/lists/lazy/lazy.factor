@@ -7,7 +7,7 @@
 !
 USING: kernel sequences math vectors arrays namespaces
 quotations promises combinators io lists accessors ;
-IN: lazy-lists
+IN: lists.lazy
 
 M: promise car ( promise -- car )
     force car ;
