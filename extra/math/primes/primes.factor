@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel lists lists.lazy math math.functions math.miller-rabin
+USING: combinators kernel lists.lazy math math.functions math.miller-rabin
        math.order math.primes.list math.ranges sequences sorting ;
 IN: math.primes
 

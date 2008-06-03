@@ -1,4 +1,4 @@
-USING: arrays math.primes tools.test lists lists.lazy ;
+USING: arrays math.primes tools.test lists.lazy ;
 
 { 1237 } [ 1234 next-prime ] unit-test
 { f t } [ 1234 prime? 1237 prime? ] unit-test
