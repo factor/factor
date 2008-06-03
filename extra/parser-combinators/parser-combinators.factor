@@ -1,6 +1,6 @@
 ! Copyright (C) 2004 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: lazy-lists promises kernel sequences strings math
+USING: lists lists.lazy promises kernel sequences strings math
 arrays splitting quotations combinators namespaces
 unicode.case unicode.categories sequences.deep ;
 IN: parser-combinators

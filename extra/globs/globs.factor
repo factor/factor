@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser-combinators regexp lazy-lists sequences kernel
+USING: parser-combinators regexp lists lists.lazy sequences kernel
 promises strings unicode.case ;
 IN: globs
 

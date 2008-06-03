@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: lazy-lists math math.primes ;
+USING: lists lists.lazy math math.primes ;
 IN: project-euler.007
 
 ! http://projecteuler.net/index.php?section=problems&id=7

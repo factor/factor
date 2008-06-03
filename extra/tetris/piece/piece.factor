@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel arrays tetris.tetromino math math.vectors 
-sequences quotations lazy-lists ;
+sequences quotations lists lists.lazy ;
 IN: tetris.piece
 
 #! A piece adds state to the tetromino that is the piece's delegate. The

@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators hashtables kernel lazy-lists math namespaces openal parser-combinators promises sequences strings symbols synth synth.buffers unicode.case ;
+USING: accessors assocs combinators hashtables kernel lists lists.lazy math namespaces openal parser-combinators promises sequences strings symbols synth synth.buffers unicode.case ;
 IN: morse
 
 <PRIVATE
