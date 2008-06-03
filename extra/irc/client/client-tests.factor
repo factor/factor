@@ -1,6 +1,6 @@
 USING: kernel tools.test accessors arrays sequences qualified
-       io.streams.string io.streams.duplex namespaces
-       irc.client.private ;
+       io.streams.string io.streams.duplex namespaces threads
+       calendar irc.client.private ;
 EXCLUDE: irc.client => join ;
 IN: irc.client.tests
 
@@ -11,6 +11,9 @@ IN: irc.client.tests
 : make-client ( lines -- irc-client )
    "someserver" irc-port "factorbot" f <irc-profile> <irc-client>
    swap [ 2nip <test-stream> f ] curry >>connect ;
+
+: set-nick ( irc-client nickname -- )
+     [ nick>> ] dip >>name drop ;
 
 : with-dummy-client ( quot -- )
      rot with-variable ; inline
@@ -37,7 +40,7 @@ privmsg new
 [ ":someuser!n=user@some.where PRIVMSG #factortest :hi"
   parse-irc-line f >>timestamp ] unit-test
 
-{ "" } make-client dup nick>> "factorbot" >>name drop current-irc-client [
+{ "" } make-client dup "factorbot" set-nick current-irc-client [
     { t } [ irc-client> nick>> name>> me? ] unit-test
 
     { "factorbot" } [ irc-client> nick>> name>> ] unit-test
@@ -51,5 +54,26 @@ privmsg new
                      parse-irc-line irc-message-origin ] unit-test
 ] with-variable
 
-! Client tests
-{ } [ { "" } make-client connect-irc ] unit-test
+! Test login and nickname set
+{ "factorbot" } [ { "NOTICE AUTH :*** Looking up your hostname..."
+                    "NOTICE AUTH :*** Checking ident"
+                    "NOTICE AUTH :*** Found your hostname"
+                    "NOTICE AUTH :*** No identd (auth) response"
+                    ":some.where 001 factorbot :Welcome factorbot"
+                  } make-client
+                  [ connect-irc ] keep 1 seconds sleep
+                    nick>> name>> ] unit-test
+
+! TODO: Channel join messages
+! { ":factorbot!n=factorbo@some.where JOIN :#factortest"
+!   ":ircserver.net MODE #factortest +ns"
+!   ":ircserver.net 353 factorbot @ #factortest :@factorbot "
+!   ":ircserver.net 366 factorbot #factortest :End of /NAMES list."
+!   ":ircserver.net 477 factorbot #factortest :[ircserver-info] blah blah"
+! } make-client dup "factorbot" set-nick
+! TODO: user join
+! ":somedude!n=user@isp.net JOIN :#factortest"
+! TODO: channel message
+! ":somedude!n=user@isp.net PRIVMSG #factortest :hello"
+! TODO: direct private message
+! ":somedude!n=user@isp.net PRIVMSG factorbot2 :hello"
