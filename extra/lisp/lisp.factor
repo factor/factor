@@ -36,14 +36,14 @@ DEFER: macro-call
 : localize-body ( assoc body -- assoc newbody )  
     dupd [ dup lisp-symbol? [ tuck name>> swap at swap or ]
                            [ dup cons? [ localize-body ] when nip ] if
-    ] with lmap ;
+    ] with lmap>array ;
     
 : localize-lambda ( body vars -- newbody newvars )
     make-locals dup push-locals swap
     [ swap localize-body seq>cons convert-form swap pop-locals ] dip swap ;
                    
 : split-lambda ( cons -- body-cons vars-seq )                   
-    3car -rot nip [ name>> ] lmap ; inline
+    3car -rot nip [ name>> ] lmap>array ; inline
     
 : rest-lambda ( body vars -- quot )
     "&rest" swap [ index ] [ remove ] 2bi
