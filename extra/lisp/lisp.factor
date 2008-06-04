@@ -60,10 +60,18 @@ PRIVATE>
 : convert-quoted ( cons -- quot )  
     cdr 1quotation ;
     
+: convert-unquoted ( cons -- quot )    
+    "unquote not valid outside of quasiquote!" throw ;
+    
+: convert-quasiquoted ( cons -- newcons )
+    [  ] traverse ;
+    
 : form-dispatch ( lisp-symbol -- quot )
     name>>
     { { "lambda" [ convert-lambda ] }
       { "quote" [ convert-quoted ] }
+      { "unquote" [ convert-unquoted ] }
+      { "quasiquote" [ convert-quasiquoted ] }
       { "if" [ convert-if ] }
       { "begin" [ convert-begin ] }
       { "cond" [ convert-cond ] }
