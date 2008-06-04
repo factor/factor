@@ -3,7 +3,7 @@
 USING: kernel peg sequences arrays strings combinators.lib
 namespaces combinators math locals locals.private accessors
 vectors syntax lisp.parser assocs parser sequences.lib words quotations
-fry lists ;
+fry lists inspector ;
 IN: lisp
 
 DEFER: convert-form
@@ -16,36 +16,36 @@ DEFER: macro-call
 ! Functions to convert s-exps to quotations
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 : convert-body ( cons -- quot )
-    [ ] [ convert-form compose ] reduce-cons ; inline
+    [ ] [ convert-form compose ] lreduce ; inline
   
 : convert-if ( cons -- quot )
-    cdr first3 [ convert-form ] tri@ '[ @ , , if ] ;
+    cdr 3car [ convert-form ] tri@ '[ @ , , if ] ;
     
 : convert-begin ( cons -- quot )  
-    cdr [ convert-form ] [ ] map-as '[ , [ funcall ] each ] ;
+    cdr [ convert-form ] [ ] lmap-as '[ , [ funcall ] each ] ;
     
 : convert-cond ( cons -- quot )  
-    cdr [ body>> first2 [ convert-form ] bi@ [ '[ @ funcall ] ] dip 2array ]
-    { } map-as '[ , cond ]  ;
+    cdr [ 2car [ convert-form ] bi@ [ '[ @ funcall ] ] dip 2array ]
+    { } lmap-as '[ , cond ]  ;
     
 : convert-general-form ( cons -- quot )
-    uncons convert-form swap convert-body swap '[ , @ funcall ] ;
+    uncons [ convert-body ] [ convert-form ] bi* '[ , @ funcall ] ;
 
 ! words for convert-lambda  
 <PRIVATE  
 : localize-body ( assoc body -- assoc newbody )  
-    [ dup lisp-symbol? [ over dupd [ name>> ] dip at swap or ]
-                     [ dup cons? [ localize-body ] when ] if
-                   ] map-cons ;
+    dupd [ dup lisp-symbol? [ tuck name>> swap at swap or ]
+                           [ dup cons? [ localize-body ] when nip ] if
+    ] with lmap ;
     
 : localize-lambda ( body vars -- newbody newvars )
     make-locals dup push-locals swap
-    [ swap localize-body cons convert-form swap pop-locals ] dip swap ;
+    [ swap localize-body seq>cons convert-form swap pop-locals ] dip swap ;
                    
-: split-lambda ( cons -- body vars )                   
-    first3 -rot nip [ body>> ] bi@ [ name>> ] map ; inline
+: split-lambda ( cons -- body-cons vars-seq )                   
+    3car -rot nip [ name>> ] lmap ; inline
     
-: rest-lambda ( body vars -- quot )  
+: rest-lambda ( body vars -- quot )
     "&rest" swap [ index ] [ remove ] 2bi
     localize-lambda <lambda>
     '[ , cut '[ @ , ] , compose ] ;
@@ -97,15 +97,20 @@ PRIVATE>
 
 SYMBOL: lisp-env
 ERROR: no-such-var var ;
+    
+SYMBOL: macro-env
+    
+M: no-such-var summary drop "No such variable" ;
 
 : init-env ( -- )
-    H{ } clone lisp-env set ;
+    H{ } clone lisp-env set
+    H{ } clone macro-env set ;
 
 : lisp-define ( name quot -- )
     swap lisp-env get set-at ;
     
 : lisp-get ( name -- word )
-    dup lisp-env get at [ ] [ no-such-var throw ] ?if ;
+    dup lisp-env get at [ ] [ no-such-var ] ?if ;
     
 : lookup-var ( lisp-symbol -- quot )
     name>> lisp-get ;
@@ -115,3 +120,9 @@ ERROR: no-such-var var ;
     
 : define-primitive ( name vocab word -- )  
     swap lookup 1quotation '[ , compose call ] lisp-define ;
+    
+: lookup-macro ( lisp-symbol -- macro )
+    name>> macro-env get at ;
+    
+: lisp-macro? ( car -- ? )
+    dup lisp-symbol? [ name>> macro-env get key? ] [ drop f ] if ;
