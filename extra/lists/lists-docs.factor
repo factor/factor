@@ -58,7 +58,7 @@ HELP: uncons
 { $values { "cons" "a cons object" } { "car" "the head of the list" } { "cdr" "the tail of the list" } }
 { $description "Put the head and tail of the list on the stack." } ;
 
-{ leach lreduce lmap } related-words
+{ leach lreduce lmap>array } related-words
 
 HELP: leach
 { $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( obj -- )" } }
