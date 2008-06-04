@@ -82,7 +82,7 @@ TUPLE: lazy-map cons quot ;
 C: <lazy-map> lazy-map
 
 : lazy-map ( list quot -- result )
-        over nil? [ 2drop nil ] [ <lazy-map> <memoized-cons> ] if ;
+    over nil? [ 2drop nil ] [ <lazy-map> <memoized-cons> ] if ;
 
 M: lazy-map car ( lazy-map -- car )
     [ cons>> car ] keep
@@ -265,7 +265,7 @@ M: sequence-cons cdr ( sequence-cons -- cdr )
     seq>> seq>list ;
 
 M: sequence-cons nil? ( sequence-cons -- bool )
-        drop f ;
+    drop f ;
 
 : >list ( object -- list )
     {
