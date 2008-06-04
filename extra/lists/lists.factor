@@ -22,10 +22,13 @@ M: cons cdr ( cons -- cdr )
 
 : nil ( -- cons )
   T{ cons f f f } ;
+    
+: uncons ( cons -- cdr car )
+    [ cdr ] [ car ] bi ;
 
-M: cons nil? ( cons -- bool )
-    nil eq? ;
-
+M: cons nil? ( cons -- ? )
+    uncons and not ;
+    
 : 1list ( obj -- cons )
     nil cons ;
     
@@ -40,9 +43,6 @@ M: cons nil? ( cons -- bool )
     
 : 3car ( cons -- car caar caaar )    
     [ car ] [ cdr car ] [ cdr cdr car ] tri ;
-    
-: uncons ( cons -- cdr car )
-    [ cdr ] [ car ] bi ;
 
 : lnth ( n list -- elt )
     swap [ cdr ] times car ;
@@ -57,14 +57,15 @@ M: cons nil? ( cons -- bool )
     over nil? [ 2drop ] [ [ uncons ] dip tuck call leach ] if ; inline
     
 : lreduce ( list identity quot -- result )
-    swapd leach ; inline
+    pick nil? [ drop nip ]
+    [ [ uncons ] 2dip swapd [ call ] keep lreduce ] if ; inline
     
 : (lmap) ( acc cons quot -- seq )    
     over nil? [ 2drop ]
     [ [ uncons ] dip [ call ] keep swapd [ suffix ] 2dip (lmap) ] if ; inline
     
 : lmap ( cons quot -- seq )
-    [ { } clone ] 2dip (lmap) ; inline
+    { } -rot (lmap) ; inline
     
 : lmap-as ( cons quot exemplar -- seq )
     [ lmap ] dip like ;
@@ -76,6 +77,6 @@ M: cons nil? ( cons -- bool )
     [ <reversed> ] keep nil [ tuck same? [ seq>cons ] when f cons swap >>cdr ] with reduce ;
     
 : cons>seq ( cons -- array )    
-    [ ] lmap ;
+    [ dup cons? [ cons>seq ] when ] lmap ;
     
 INSTANCE: cons list
