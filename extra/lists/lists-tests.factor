@@ -9,7 +9,7 @@ IN: lists.tests
         T{ cons f 2 
             T{ cons f 3
                 T{ cons f 4
-                nil } } } } [ 2 + ] lmap
+                T{ cons f f f } } } } } [ 2 + ] lmap
 ] unit-test
 
 { 10 } [
@@ -17,23 +17,23 @@ IN: lists.tests
         T{ cons f 2 
             T{ cons f 3
                 T{ cons f 4
-                nil } } } } 0 [ + ] lreduce
+                T{ cons f f f } } } } } 0 [ + ] lreduce
 ] unit-test
     
-T{
-    cons
-    f
-    1
-    T{
-        cons
-        f
-        2
-        T{
-            cons
-            f
-            T{ cons f 3 T{ cons f 4 T{ cons f 5 nil } } }
-            T{ cons f f f }
-        } } } [
+{ T{ cons f
+      1
+      T{ cons f
+          2
+          T{ cons f
+              T{ cons f
+                  3
+                  T{ cons f
+                      4
+                      T{ cons f
+                          T{ cons f 5 T{ cons f f f } }
+                          T{ cons f f f } } } }
+          T{ cons f f f } } } }
+} [
     { 1 2 { 3 4 { 5 } } } seq>cons
 ] unit-test
     
