@@ -41,6 +41,10 @@ IN: lists.tests
   { 1 2 { 3 4 { 5 } } } seq>cons cons>seq  
 ] unit-test
     
+{ T{ cons f 2 T{ cons f 3 T{ cons f 4 T{ cons f 5 +nil+ } } } } } [
+    { 1 2 3 4 } seq>cons [ 1+ ] lmap
+] unit-test
+    
 ! { { 3 4 { 5 6 { 7 } } } } [
 !   { 1 2 { 3 4 { 5 } } } seq>cons [ 2 + ] traverse cons>seq
 ! ] unit-test

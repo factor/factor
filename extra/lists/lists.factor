@@ -59,9 +59,6 @@ M: object nil? drop f ;
 : lreduce ( list identity quot -- result )
     swapd leach ; inline
     
-! : lmap ( cons quot -- newcons )    
-    
-    
 : (lmap>array) ( acc cons quot -- newcons )
     over nil? [ 2drop ]
     [ [ uncons ] dip [ call ] keep swapd [ suffix ] 2dip (lmap>array) ] if ; inline
@@ -71,6 +68,9 @@ M: object nil? drop f ;
     
 : lmap-as ( cons quot exemplar -- seq )
     [ lmap>array ] dip like ;
+    
+: lmap ( list quot -- newlist )    
+    lmap>array <reversed> nil [ swap cons ] reduce ;
     
 : same? ( obj1 obj2 -- ? ) 
     [ class ] bi@ = ;
@@ -82,6 +82,6 @@ M: object nil? drop f ;
     [ dup cons? [ cons>seq ] when ] lmap>array ;
     
 : traverse ( list quot -- newlist )
-    [ over list? [ traverse ] [ call ] if ] curry  ;
+    [ over list? [ traverse ] [ call ] if ] curry lmap ;
     
 INSTANCE: cons list
