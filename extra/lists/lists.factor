@@ -54,11 +54,10 @@ M: cons nil? ( cons -- ? )
     0 (llength) ;
 
 : leach ( list quot -- )
-    over nil? [ 2drop ] [ [ uncons ] dip tuck call leach ] if ; inline
+    over nil? [ 2drop ] [ [ uncons swap ] dip tuck [ call ] 2dip leach ] if ; inline
     
 : lreduce ( list identity quot -- result )
-    pick nil? [ drop nip ]
-    [ [ uncons ] 2dip swapd [ call ] keep lreduce ] if ; inline
+    swapd leach ; inline
     
 : (lmap) ( acc cons quot -- seq )    
     over nil? [ 2drop ]
