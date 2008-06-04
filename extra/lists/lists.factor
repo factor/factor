@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Chris Double & James Cash
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences accessors math ;
+USING: kernel sequences accessors math arrays vectors classes ;
 
 IN: lists
 
@@ -55,21 +55,27 @@ M: cons nil? ( cons -- bool )
 
 : leach ( list quot -- )
     over nil? [ 2drop ] [ [ uncons ] dip tuck call leach ] if ; inline
-
+    
 : lreduce ( list identity quot -- result )
     swapd leach ; inline
     
-: seq>cons ( seq -- cons )
-    <reversed> nil [ f cons swap >>cdr ] reduce ;
-    
 : (lmap) ( acc cons quot -- seq )    
     over nil? [ 2drop ]
-    [ [ uncons ] dip [ call ] keep swapd [ suffix ] 2dip (map-cons) ] if ; inline
+    [ [ uncons ] dip [ call ] keep swapd [ suffix ] 2dip (lmap) ] if ; inline
     
 : lmap ( cons quot -- seq )
-    [ { } clone ] 2dip (map-cons) ; inline
+    [ { } clone ] 2dip (lmap) ; inline
+    
+: lmap-as ( cons quot exemplar -- seq )
+    [ lmap ] dip like ;
+    
+: same? ( obj1 obj2 -- ? ) 
+    [ class ] bi@ = ;
+    
+: seq>cons ( seq -- cons )
+    [ <reversed> ] keep nil [ tuck same? [ seq>cons ] when f cons swap >>cdr ] with reduce ;
     
 : cons>seq ( cons -- array )    
-    [ ] map-cons ;
+    [ ] lmap ;
     
 INSTANCE: cons list
