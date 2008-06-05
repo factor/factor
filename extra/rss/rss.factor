@@ -14,7 +14,7 @@ TUPLE: feed title url entries ;
 
 : <feed> ( -- feed ) feed new ;
 
-TUPLE: entry title url description pub-date ;
+TUPLE: entry title url description date ;
 
 : set-entries ( feed entries -- feed )
     [ dup url>> ] dip
@@ -35,7 +35,7 @@ TUPLE: entry title url description pub-date ;
         [
             f "date" "http://purl.org/dc/elements/1.1/" <name>
             tag-named dup [ children>string try-parsing-timestamp ] when
-            >>pub-date
+            >>date
         ]
     } cleave ;
 
@@ -55,7 +55,7 @@ TUPLE: entry title url description pub-date ;
         [ "description" tag-named children>string >>description ]
         [
             { "date" "pubDate" } any-tag-named
-            children>string try-parsing-timestamp >>pub-date
+            children>string try-parsing-timestamp >>date
         ]
     } cleave ;
 
@@ -64,7 +64,7 @@ TUPLE: entry title url description pub-date ;
     swap
     "channel" tag-named 
     [ "title" tag-named children>string >>title ]
-    [ "link" tag-named children>string >>link ]
+    [ "link" tag-named children>string >url >>url ]
     [ "item" tags-named [ rss2.0-entry ] map set-entries ]
     tri ;
 
@@ -82,7 +82,7 @@ TUPLE: entry title url description pub-date ;
         [
             { "published" "updated" "issued" "modified" } 
             any-tag-named children>string try-parsing-timestamp
-            >>pub-date
+            >>date
         ]
     } cleave ;
 
@@ -120,7 +120,7 @@ TUPLE: entry title url description pub-date ;
         {
             [ title>> "title" { { "type" "html" } } simple-tag*, ]
             [ url>> present "href" associate "link" swap contained*, ]
-            [ pub-date>> timestamp>rfc3339 "published" simple-tag, ]
+            [ date>> timestamp>rfc3339 "published" simple-tag, ]
             [ description>> [ "content" { { "type" "html" } } simple-tag*, ] when* ]
         } cleave
     ] tag, ;

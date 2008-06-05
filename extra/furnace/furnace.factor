@@ -8,7 +8,6 @@ xml
 xml.data
 xml.entities
 xml.writer
-xml.utilities
 html.components
 html.elements
 html.templates
@@ -20,6 +19,7 @@ http.server.redirection
 http.server.responses
 qualified ;
 QUALIFIED-WITH: assocs a
+EXCLUDE: xml.utilities => children>string ;
 IN: furnace
 
 : nested-responders ( -- seq )
@@ -97,7 +97,7 @@ SYMBOL: exit-continuation
     [ drop f ] [ "," split [ dup value ] H{ } map>assoc ] if ;
 
 CHLOE: atom
-    [ "title" required-attr ]
+    [ children>string ]
     [ "href" required-attr ]
     [ "query" optional-attr parse-query-attr ] tri
     <url>
