@@ -6,6 +6,7 @@ vocabs.loader classes
 fry urls multiline
 xml
 xml.data
+xml.entities
 xml.writer
 xml.utilities
 html.components
@@ -64,15 +65,19 @@ M: object modify-query drop ;
         { "POST" [ <permanent-redirect> ] }
     } case ;
 
-GENERIC: hidden-form-field ( responder -- )
+GENERIC: modify-form ( responder -- )
 
-M: object hidden-form-field drop ;
+M: object modify-form drop ;
 
 : request-params ( request -- assoc )
     dup method>> {
         { "GET" [ url>> query>> ] }
         { "HEAD" [ url>> query>> ] }
-        { "POST" [ post-data>> ] }
+        { "POST" [
+            post-data>>
+            dup content-type>> "application/x-www-form-urlencoded" =
+            [ content>> ] [ drop f ] if
+        ] }
     } case ;
 
 SYMBOL: exit-continuation
@@ -128,20 +133,34 @@ CHLOE: a
     [ drop </a> ]
     tri ;
 
+: hidden-form-field ( value name -- )
+    over [
+        <input
+            "hidden" =type
+            =name
+            object>string =value
+        input/>
+    ] [ 2drop ] if ;
+
+: form-nesting-key "factorformnesting" ;
+
+: form-magic ( tag -- )
+    [ modify-form ] each-responder
+    nested-values get " " join f like form-nesting-key hidden-form-field
+    "for" optional-attr [ hidden render ] when* ;
+
 : form-start-tag ( tag -- )
     [
         [
             <form
-            "POST" =method
-            [ link-attrs ]
-            [ "action" required-attr resolve-base-path =action ]
-            [ tag-attrs non-chloe-attrs-only print-attrs ]
-            tri
+                "POST" =method
+                [ link-attrs ]
+                [ "action" required-attr resolve-base-path =action ]
+                [ tag-attrs non-chloe-attrs-only print-attrs ]
+                tri
             form>
-        ] [
-            [ hidden-form-field ] each-responder
-            "for" optional-attr [ hidden render ] when*
-        ] bi
+        ]
+        [ form-magic ] bi
     ] with-scope ;
 
 CHLOE: form
@@ -167,17 +186,3 @@ CHLOE: button
         [ [ children>string 1array ] dip "button" tag-named set-tag-children ]
         [ nip ]
     } 2cleave process-chloe-tag ;
-
-: attr>word ( value -- word/f )
-    dup ":" split1 swap lookup
-    [ ] [ "No such word: " swap append throw ] ?if ;
-
-: attr>var ( value -- word/f )
-    attr>word dup symbol? [
-        "Must be a symbol: " swap append throw
-    ] unless ;
-
-: if-satisfied? ( tag -- ? )
-    "code" required-attr attr>word execute ;
-
-CHLOE: if dup if-satisfied? [ process-tag-children ] [ drop ] if ;

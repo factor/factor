@@ -68,7 +68,7 @@ CHLOE: odd "index" value odd? [ process-tag-children ] [ drop ] if ;
 
 : (bind-tag) ( tag quot -- )
     [
-        [ "name" required-attr value ] keep
+        [ "name" required-attr ] keep
         '[ , process-tag-children ]
     ] dip call ; inline
 
@@ -84,6 +84,17 @@ CHLOE: bind [ with-values ] (bind-tag) ;
 CHLOE: comment drop ;
 
 CHLOE: call-next-template drop call-next-template ;
+
+: attr>word ( value -- word/f )
+    dup ":" split1 swap lookup
+    [ ] [ "No such word: " swap append throw ] ?if ;
+
+: if-satisfied? ( tag -- ? )
+    [ "code" optional-attr [ attr>word execute ] [ t ] if* ]
+    [ "value" optional-attr [ value ] [ t ] if* ]
+    bi and ;
+
+CHLOE: if dup if-satisfied? [ process-tag-children ] [ drop ] if ;
 
 CHLOE-SINGLETON: label
 CHLOE-SINGLETON: link

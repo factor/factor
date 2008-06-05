@@ -198,7 +198,10 @@ can-administer-planet-factor? define-capability
     planet-factor new-dispatcher
         <planet-action> "list" add-main-responder
         <feed-action> "feed.xml" add-responder
-        <planet-factor-admin> { can-administer-planet-factor? } <protected> "admin" add-responder
+        <planet-factor-admin> <protected>
+            "administer Planet Factor" >>description
+            { can-administer-planet-factor? } >>capabilities
+        "admin" add-responder
     <boilerplate>
         { planet-factor "planet-common" } >>template ;
 

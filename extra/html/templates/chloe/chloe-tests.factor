@@ -148,3 +148,23 @@ TUPLE: person first-name last-name ;
         "test9" test-template call-template
     ] run-template
 ] unit-test
+
+[ ] [ H{ { "a" H{ { "b" "c" } } } } values set ] unit-test
+
+[ "<form method='POST' action='foo'><input type='hidden' name='factorformnesting' value='a'/></form>" ] [
+    [
+        "test10" test-template call-template
+    ] run-template
+] unit-test
+
+[ ] [ blank-values ] unit-test
+
+[ ] [
+    H{ { "first-name" "RBaxter" } { "last-name" "Unknown" } } "person" set-value
+] unit-test
+
+[ "<table><tr><td>RBaxter</td><td>Unknown</td></tr></table>" ] [
+    [
+        "test11" test-template call-template
+    ] run-template [ blank? not ] filter
+] unit-test

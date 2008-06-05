@@ -10,7 +10,7 @@ io io.server io.sockets.secure
 
 unicode.case unicode.categories qualified
 
-urls html.templates ;
+urls html.templates xml xml.data xml.writer ;
 
 EXCLUDE: fry => , ;
 
@@ -132,7 +132,6 @@ url
 version
 header
 post-data
-post-data-type
 cookies ;
 
 : set-header ( request/response value key -- request/response )
@@ -177,32 +176,33 @@ cookies ;
 : header ( request/response key -- value )
     swap header>> at ;
 
-SYMBOL: max-post-request
+TUPLE: post-data raw content content-type ;
 
-1024 256 * max-post-request set-global
+: <post-data> ( raw content-type -- post-data )
+    post-data new
+        swap >>content-type
+        swap >>raw ;
 
-: content-length ( header -- n )
-    "content-length" swap at string>number dup [
-        dup max-post-request get > [
-            "content-length > max-post-request" throw
-        ] when
-    ] when ;
+: parse-post-data ( post-data -- post-data )
+    [ ] [ raw>> ] [ content-type>> ] tri {
+        { "application/x-www-form-urlencoded" [ query>assoc ] }
+        { "text/xml" [ string>xml ] }
+        [ drop ]
+    } case >>content ;
 
 : read-post-data ( request -- request )
-    dup header>> content-length [ read >>post-data ] when* ;
+    dup method>> "POST" = [
+        [ ]
+        [ "content-length" header string>number read ]
+        [ "content-type" header ] tri
+        <post-data> parse-post-data >>post-data
+    ] when ;
 
 : extract-host ( request -- request )
     [ ] [ url>> ] [ "host" header parse-host ] tri
     [ >>host ] [ >>port ] bi*
     ensure-port
     drop ;
-
-: extract-post-data-type ( request -- request )
-    dup "content-type" header >>post-data-type ;
-
-: parse-post-data ( request -- request )
-    dup post-data-type>> "application/x-www-form-urlencoded" =
-    [ dup post-data>> query>assoc >>post-data ] when ;
 
 : extract-cookies ( request -- request )
     dup "cookie" header [ parse-cookies >>cookies ] when* ;
@@ -225,8 +225,6 @@ SYMBOL: max-post-request
     read-post-data
     detect-protocol
     extract-host
-    extract-post-data-type
-    parse-post-data
     extract-cookies ;
 
 : write-method ( request -- request )
@@ -238,12 +236,6 @@ SYMBOL: max-post-request
 : write-version ( request -- request )
     "HTTP/" write dup request-version write crlf ;
 
-: unparse-post-data ( request -- request )
-    dup post-data>> dup sequence? [ drop ] [
-        assoc>query >>post-data
-        "application/x-www-form-urlencoded" >>post-data-type
-    ] if ;
-
 : url-host ( url -- string )
     [ host>> ] [ port>> ] bi dup "http" protocol-port =
     [ drop ] [ ":" swap number>string 3append ] if ;
@@ -251,13 +243,33 @@ SYMBOL: max-post-request
 : write-request-header ( request -- request )
     dup header>> >hashtable
     over url>> host>> [ over url>> url-host "host" pick set-at ] when
-    over post-data>> [ length "content-length" pick set-at ] when*
-    over post-data-type>> [ "content-type" pick set-at ] when*
+    over post-data>> [
+        [ raw>> length "content-length" pick set-at ]
+        [ content-type>> "content-type" pick set-at ]
+        bi
+    ] when*
     over cookies>> f like [ unparse-cookies "cookie" pick set-at ] when*
     write-header ;
 
+GENERIC: >post-data ( object -- post-data )
+
+M: post-data >post-data ;
+
+M: string >post-data "application/octet-stream" <post-data> ;
+
+M: byte-array >post-data "application/octet-stream" <post-data> ;
+
+M: xml >post-data xml>string "text/xml" <post-data> ;
+
+M: assoc >post-data assoc>query "application/x-www-form-urlencoded" <post-data> ;
+
+M: f >post-data ;
+
+: unparse-post-data ( request -- request )
+    [ >post-data ] change-post-data ;
+
 : write-post-data ( request -- request )
-    dup post-data>> [ write ] when* ;
+    dup method>> "POST" = [ dup post-data>> raw>> write ] when ; 
 
 : write-request ( request -- )
     unparse-post-data
@@ -307,7 +319,7 @@ body ;
 
 : read-response-header
     read-header >>header
-    extract-cookies
+    dup "set-cookie" header parse-cookies >>cookies
     dup "content-type" header [
         parse-content-type [ >>content-type ] [ >>content-charset ] bi*
     ] when* ;

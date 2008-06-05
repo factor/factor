@@ -214,6 +214,10 @@ revision "REVISIONS" {
 
         { wiki "user-edits" } >>template ;
 
+SYMBOL: can-delete-wiki-articles?
+
+can-delete-wiki-articles? define-capability
+
 : <wiki> ( -- dispatcher )
     wiki new-dispatcher
         <dispatcher>
@@ -222,7 +226,9 @@ revision "REVISIONS" {
             <view-revision-action> "revision" add-responder
             <list-revisions-action> "revisions" add-responder
             <diff-action> "diff" add-responder
-            <edit-article-action> { } <protected> "edit" add-responder
+            <edit-article-action> <protected>
+                "edit wiki articles" >>description
+                "edit" add-responder
         <boilerplate>
             { wiki "page-common" } >>template
         >>default
@@ -230,6 +236,9 @@ revision "REVISIONS" {
         <user-edits-action> "user-edits" add-responder
         <list-articles-action> "articles" add-responder
         <list-changes-action> "changes" add-responder
-        <delete-action> { } <protected> "delete" add-responder
+        <delete-action> <protected>
+            "delete wiki articles" >>description
+            { can-delete-wiki-articles? } >>capabilities
+        "delete" add-responder
     <boilerplate>
         { wiki "wiki-common" } >>template ;

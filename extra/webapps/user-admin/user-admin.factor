@@ -18,18 +18,6 @@ IN: webapps.user-admin
 
 TUPLE: user-admin < dispatcher ;
 
-: word>string ( word -- string )
-    [ word-vocabulary ] [ drop ":" ] [ word-name ] tri 3append ;
-
-: words>strings ( seq -- seq' )
-    [ word>string ] map ;
-
-: string>word ( string -- word )
-    ":" split1 swap lookup ;
-
-: strings>words ( seq -- seq' )
-    [ string>word ] map ;
-
 : <user-list-action> ( -- action )
     <page-action>
         [ f <user> select-tuples "users" set-value ] >>init
@@ -156,7 +144,9 @@ can-administer-users? define-capability
         <delete-user-action> "delete" add-responder
     <boilerplate>
         { user-admin "user-admin" } >>template
-    { can-administer-users? } <protected> ;
+    <protected>
+        "administer users" >>description
+        { can-administer-users? } >>capabilities ;
 
 : make-admin ( username -- )
     <user>

@@ -132,7 +132,7 @@ M: annotation entity-link
 
             "id" value
             "new-annotation" [
-                "id" set-value
+                "parent" set-value
                 mode-names "modes" set-value
                 "factor" "mode" set-value
             ] nest-values
@@ -212,12 +212,12 @@ M: annotation entity-link
         ] >>display
 
         [
-            { { "id" [ v-integer ] } } validate-params
+            { { "parent" [ v-integer ] } } validate-params
             validate-entity
         ] >>validate
 
         [
-            "id" value f <annotation>
+            "parent" value f <annotation>
             [ deposit-entity-slots ]
             [ insert-tuple ]
             [ entity-link <redirect> ]
@@ -246,9 +246,13 @@ can-delete-pastes? define-capability
         <paste-action> "paste" add-responder
         <paste-feed-action> "paste.atom" add-responder
         <new-paste-action> "new-paste" add-responder
-        <delete-paste-action> { can-delete-pastes? } <protected> "delete-paste" add-responder
+        <delete-paste-action> <protected>
+            "delete pastes" >>description
+            { can-delete-pastes? } >>capabilities "delete-paste" add-responder
         <new-annotation-action> "new-annotation" add-responder
-        <delete-annotation-action> { can-delete-pastes? } <protected> "delete-annotation" add-responder
+        <delete-annotation-action> <protected>
+            "delete annotations" >>description
+            { can-delete-pastes? } >>capabilities "delete-annotation" add-responder
     <boilerplate>
         { pastebin "pastebin-common" } >>template ;
 

@@ -6,7 +6,8 @@ namespaces db db.sqlite smtp
 http.server
 http.server.dispatchers
 furnace.db
-furnace.flows
+furnace.asides
+furnace.flash
 furnace.sessions
 furnace.auth.login
 furnace.auth.providers.db
@@ -53,8 +54,7 @@ TUPLE: factor-website < dispatcher ;
         allow-edit-profile
     <boilerplate>
         { factor-website "page" } >>template
-    <flows>
-    <sessions>
+    <asides> <flash-scopes> <sessions>
     test-db <db-persistence> ;
 
 : init-factor-website ( -- )

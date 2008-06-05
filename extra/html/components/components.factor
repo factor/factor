@@ -29,22 +29,30 @@ SYMBOL: values
 : deposit-slots ( destination names -- )
     [ <mirror> ] dip deposit-values ;
 
-: with-each-index ( seq quot -- )
-    '[
+: with-each-index ( name quot -- )
+    [ value ] dip '[
         [
-            values [ clone ] change
+            blank-values
             1+ "index" set-value @
         ] with-scope
     ] each-index ; inline
 
-: with-each-value ( seq quot -- )
+: with-each-value ( name quot -- )
     '[ "value" set-value @ ] with-each-index ; inline
 
-: with-each-object ( seq quot -- )
+: with-each-object ( name quot -- )
     '[ from-object @ ] with-each-index ; inline
 
-: with-values ( object quot -- )
-    '[ blank-values , from-object @ ] with-scope ; inline
+SYMBOL: nested-values
+
+: with-values ( name quot -- )
+    '[
+        ,
+        [ nested-values [ swap prefix ] change ]
+        [ value blank-values from-object ]
+        bi
+        @
+    ] with-scope ; inline
 
 : nest-values ( name quot -- )
     swap [
