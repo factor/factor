@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Chris Double & James Cash
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences accessors math arrays vectors classes words ;
+USING: kernel sequences accessors math arrays vectors classes words locals ;
 
 IN: lists
 
@@ -23,6 +23,8 @@ M: cons cdr ( cons -- cdr )
 SYMBOL: +nil+
 M: word nil? +nil+ eq? ;
 M: object nil? drop f ;
+    
+: atom? ( obj -- ? ) [ list? ] [ nil? ] bi or not ;
 
 : nil ( -- +nil+ ) +nil+ ; 
     
@@ -38,6 +40,9 @@ M: object nil? drop f ;
 : 3list ( a b c -- cons )
     nil cons cons cons ;
     
+: cadr ( cons -- elt )    
+    cdr car ;
+    
 : 2car ( cons -- car caar )    
     [ car ] [ cdr car ] bi ;
     
@@ -52,12 +57,38 @@ M: object nil? drop f ;
 
 : llength ( list -- n )
     0 (llength) ;
+    
+: (leach) ( list quot -- cdr quot )
+    [ [ car ] dip call ] [ [ cdr ] dip ] 2bi ; inline
 
 : leach ( list quot -- )
-    over nil? [ 2drop ] [ [ uncons swap ] dip tuck [ call ] 2dip leach ] if ; inline
+    over nil? [ 2drop ] [ (leach) leach ] if ; inline
+
+: lmap ( list quot -- result )
+    over nil? [ drop ] [ (leach) lmap cons ] if ; inline
+
+: foldl ( list ident quot -- result ) swapd leach ; inline
+
+: foldr ( list ident quot -- result )
+    pick nil? [ [ drop ] [ ] [ drop ] tri* ] [
+        [ [ cdr ] 2dip foldr ] [ nip [ car ] dip ] 3bi
+        call
+    ] if ; inline
     
-: lreduce ( list identity quot -- result )
-    swapd leach ; inline
+: lreverse ( list -- newlist )    
+    nil [ swap cons ] foldl ;
+    
+: lappend ( list1 list2 -- newlist )
+     ;
+    
+: seq>list ( seq -- list )    
+    <reversed> nil [ swap cons ] reduce ;
+    
+: same? ( obj1 obj2 -- ? ) 
+    [ class ] bi@ = ;
+    
+: seq>cons ( seq -- cons )
+    [ <reversed> ] keep nil [ tuck same? [ seq>cons ] when f cons swap >>cdr ] with reduce ;
     
 : (lmap>array) ( acc cons quot -- newcons )
     over nil? [ 2drop ]
@@ -69,19 +100,14 @@ M: object nil? drop f ;
 : lmap-as ( cons quot exemplar -- seq )
     [ lmap>array ] dip like ;
     
-: lmap ( list quot -- newlist )    
-    lmap>array <reversed> nil [ swap cons ] reduce ;
-    
-: same? ( obj1 obj2 -- ? ) 
-    [ class ] bi@ = ;
-    
-: seq>cons ( seq -- cons )
-    [ <reversed> ] keep nil [ tuck same? [ seq>cons ] when f cons swap >>cdr ] with reduce ;
-    
 : cons>seq ( cons -- array )    
     [ dup cons? [ cons>seq ] when ] lmap>array ;
     
-: traverse ( list quot -- newlist )
-    [ over list? [ traverse ] [ call ] if ] curry lmap ;
+: list>seq ( list -- array )    
+    [ ] lmap>array ;
+    
+: traverse ( list pred quot -- result )
+    [ 2over call [ tuck [ call ] 2dip ] when
+      pick list? [ traverse ] [ 2drop ] if ] 2curry lmap ;
     
 INSTANCE: cons list

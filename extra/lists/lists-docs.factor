@@ -17,7 +17,7 @@ HELP: car
 HELP: cdr
 { $values { "cons" "a cons object" } { "cdr" "a cons object" } }
 { $description "Returns the tail of the list." } ;
-
+    
 HELP: nil 
 { $values { "cons" "An empty cons" } }
 { $description "Returns a representation of an empty list" } ;
@@ -55,16 +55,50 @@ HELP: llength
 { $see-also lnth cons car cdr } ;
 
 HELP: uncons
-{ $values { "cons" "a cons object" } { "car" "the head of the list" } { "cdr" "the tail of the list" } }
+{ $values { "cons" "a cons object" }  { "cdr" "the tail of the list" } { "car" "the head of the list" } }
 { $description "Put the head and tail of the list on the stack." } ;
 
-{ leach lreduce lmap>array } related-words
+{ leach foldl lmap>array } related-words
 
 HELP: leach
 { $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( obj -- )" } }
 { $description "Call the quotation for each item in the list." } ;
 
-HELP: lreduce
+HELP: foldl
 { $values { "list" "a cons object" } { "identity" "an object" } { "quot" "a quotation with stack effect ( prev elt -- next )" } { "result" "the final result" } }
-{ $description "Combines successive elements of the list using a binary operation, and outputs the final result." } ;
+{ $description "Combines successive elements of the list (in a left-assocative order) using a binary operation and outputs the final result." } ;
 
+HELP: foldr
+{ $values { "list" "a cons object" } { "identity" "an object" } { "quot" "a quotation with stack effect ( prev elt -- next )" } { "result" "the final result" } }
+{ $description "Combines successive elements of the list (in a right-assocative order) using a binary operation, and outputs the final result." } ;
+
+HELP: lmap
+{ $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( old -- new )" } { "result" "the final result" } }
+{ $description "Applies the quotation to each element of the list in order, collecting the new elements into a new list." } ;
+    
+HELP: lreverse
+{ $values { "list" "a cons object" } { "newlist" "a new cons object" } }
+{ $description "Reverses the input list, outputing a new, reversed list" } ;
+    
+HELP: list>seq    
+{ $values { "list" "a cons object" } { "array" "an array object" } }
+{ $description "Turns the given cons object into an array, maintaing order." } ;
+    
+HELP: seq>list
+{ $values { "array" "an array object" } { "list" "a cons object" } }
+{ $description "Turns the given array into a cons object, maintaing order." } ;
+    
+HELP: cons>seq
+{ $values { "cons" "a cons object" } { "array" "an array object" } }
+{ $description "Recursively turns the given cons object into an array, maintaing order and also converting nested lists." } ;
+    
+HELP: seq>cons
+{ $values { "seq" "a sequence object" } { "cons" "a cons object" } }
+{ $description "Recursively turns the given sequence into a cons object, maintaing order and also converting nested lists." } ;
+    
+HELP: traverse    
+{ $values { " list"  "a cons object" } { "pred" } { "a quotation with stack effect ( list/elt -- ? )" }
+          { "quot" "a quotation with stack effect ( list/elt -- result)" }  { "result" "a new cons object" } }
+{ $description "Recursively traverses the list object, replacing any elements (which can themselves be sublists) that " { $snippet pred }
+    " returns true for with the result of applying " { $snippet quot } " to." } ;
+    
