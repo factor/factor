@@ -1,5 +1,5 @@
 USING: rss io kernel io.files tools.test io.encodings.utf8
-calendar ;
+calendar urls ;
 IN: rss.tests
 
 : load-news-file ( filename -- feed )
@@ -11,13 +11,13 @@ IN: rss.tests
     feed
     f
     "Meerkat"
-    "http://meerkat.oreillynet.com"
+    URL" http://meerkat.oreillynet.com"
     {
         T{
             entry
             f
             "XML: A Disruptive Technology"
-            "http://c.moreover.com/click/here.pl?r123"
+            URL" http://c.moreover.com/click/here.pl?r123"
             "\n      XML is placing increasingly heavy loads on the existing technical\n      infrastructure of the Internet.\n    "
             f
         }
@@ -27,13 +27,13 @@ IN: rss.tests
     feed
     f
     "dive into mark"
-    "http://example.org/"
+    URL" http://example.org/"
     {
         T{
             entry
             f
             "Atom draft-07 snapshot"
-            "http://example.org/2005/04/02/atom"
+            URL" http://example.org/2005/04/02/atom"
             "\n         <div xmlns=\"http://www.w3.org/1999/xhtml\">\n           <p><i>[Update: The Atom draft is finished.]</i></p>\n         </div>\n       "
 
             T{ timestamp f 2003 12 13 8 29 29 T{ duration f 0 0 0 -4 0 0 } }
