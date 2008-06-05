@@ -1,11 +1,12 @@
 ! Copyright (C) 2006 Chris Double, Daniel Ehrenberg.
+! Portions copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml.utilities kernel assocs xml.generator math.order
     strings sequences xml.data xml.writer
     io.streams.string combinators xml xml.entities io.files io
     http.client namespaces xml.generator hashtables
     calendar.format accessors continuations urls present ;
-IN: rss
+IN: syndication
 
 : any-tag-named ( tag names -- tag-inside )
     f -rot [ tag-named nip dup ] with find 2drop ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel hashtables calendar
 namespaces splitting sequences sorting math.order
-html.components rss
+html.components syndication
 http.server
 http.server.dispatchers
 furnace
@@ -10,7 +10,7 @@ furnace.actions
 furnace.auth
 furnace.auth.login
 furnace.boilerplate
-furnace.rss
+furnace.syndication
 validators
 db.types db.tuples lcs farkup urls ;
 IN: webapps.wiki

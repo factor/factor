@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces assocs sorting sequences kernel accessors
 hashtables sequences.lib db.types db.tuples db combinators
-calendar calendar.format math.parser rss urls xml.writer
+calendar calendar.format math.parser syndication urls xml.writer
 xmode.catalog validators
 html.components
 html.templates.chloe
@@ -14,7 +14,7 @@ furnace.actions
 furnace.auth
 furnace.auth.login
 furnace.boilerplate
-furnace.rss ;
+furnace.syndication ;
 IN: webapps.pastebin
 
 TUPLE: pastebin < dispatcher ;

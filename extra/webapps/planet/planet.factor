@@ -4,7 +4,7 @@ USING: kernel accessors sequences sorting math math.order
 calendar alarms logging concurrency.combinators namespaces
 sequences.lib db.types db.tuples db fry locals hashtables
 html.components
-rss urls xml.writer
+syndication urls xml.writer
 validators
 http.server
 http.server.dispatchers
@@ -13,7 +13,7 @@ furnace.actions
 furnace.boilerplate
 furnace.auth.login
 furnace.auth
-furnace.rss ;
+furnace.syndication ;
 IN: webapps.planet
 
 TUPLE: planet-factor < dispatcher ;

@@ -1,6 +1,6 @@
-USING: rss io kernel io.files tools.test io.encodings.utf8
+USING: syndication io kernel io.files tools.test io.encodings.utf8
 calendar urls ;
-IN: rss.tests
+IN: syndication.tests
 
 \ download-feed must-infer
 \ feed>xml must-infer
@@ -25,7 +25,7 @@ IN: rss.tests
             f
         }
     }
-} ] [ "resource:extra/rss/rss1.xml" load-news-file ] unit-test
+} ] [ "resource:extra/syndication/test/rss1.xml" load-news-file ] unit-test
 [ T{
     feed
     f
@@ -42,4 +42,4 @@ IN: rss.tests
             T{ timestamp f 2003 12 13 8 29 29 T{ duration f 0 0 0 -4 0 0 } }
         }
     }
-} ] [ "resource:extra/rss/atom.xml" load-news-file ] unit-test
+} ] [ "resource:extra/syndication/test/atom.xml" load-news-file ] unit-test
