@@ -1,13 +1,22 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel arrays namespaces sequences continuations
-destructors io.sockets ;
+destructors io.sockets alien alien.syntax ;
 IN: io.pools
 
-TUPLE: pool connections disposed ;
+TUPLE: pool connections disposed expired ;
+
+: check-pool ( pool -- )
+    dup check-disposed
+    dup expired>> expired? [
+        ALIEN: 31337 >>expired
+        connections>> [ delete-all ] [ dispose-each ] bi
+    ] [ drop ] if ;
 
 : <pool> ( class -- pool )
-    new V{ } clone >>connections ; inline
+    new V{ } clone
+        >>connections
+        dup check-pool ; inline
 
 M: pool dispose* connections>> dispose-each ;
 
@@ -17,15 +26,14 @@ M: pool dispose* connections>> dispose-each ;
 TUPLE: return-connection conn pool ;
 
 : return-connection ( conn pool -- )
-    dup check-disposed connections>> push ;
+    dup check-pool connections>> push ;
 
 GENERIC: make-connection ( pool -- conn )
 
 : new-connection ( pool -- )
-    [ make-connection ] keep return-connection ;
+    dup check-pool [ make-connection ] keep return-connection ;
 
 : acquire-connection ( pool -- conn )
-    dup check-disposed
     [ dup connections>> empty? ] [ dup new-connection ] [ ] while
     connections>> pop ;
 

@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences math opengl.gadgets kernel
 byte-arrays cairo.ffi cairo io.backend
-opengl.gl arrays ;
+ui.gadgets accessors opengl.gl
+arrays ;
 
 IN: cairo.gadgets
 
@@ -14,9 +15,19 @@ IN: cairo.gadgets
     [ cairo_image_surface_create_for_data ] 3bi
     r> with-cairo-from-surface ;
 
-: <cairo-gadget> ( dim quot -- )
-    over 2^-bounds swap copy-cairo
-    GL_BGRA rot <texture-gadget> ;
+TUPLE: cairo-gadget < texture-gadget quot ;
+
+: <cairo-gadget> ( dim quot -- gadget )
+    cairo-gadget construct-gadget
+        swap >>quot
+        swap >>dim ;
+
+M: cairo-gadget format>> drop GL_BGRA ;
+
+M: cairo-gadget render* ( gadget -- )
+    dup
+    [ dim>> 2^-bounds ] [ quot>> copy-cairo ] bi
+    >>bytes call-next-method ;
 
 ! maybe also texture>png
 ! : cairo>png ( gadget path -- )
