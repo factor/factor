@@ -2,8 +2,8 @@
 ! Copyright (C) 2004 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: lazy-lists math kernel sequences quotations ;
-IN: lazy-lists.examples
+USING: lists.lazy math kernel sequences quotations ;
+IN: lists.lazy.examples
 
 : naturals 0 lfrom ;
 : positives 1 lfrom ;
