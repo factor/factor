@@ -1,27 +1,13 @@
-! Copyright (C) 2007 Alex Chapman
+! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators float-arrays kernel jamshred.oint locals math math.functions math.constants math.matrices math.order math.ranges math.vectors math.quadratic random sequences vectors ;
+USING: accessors arrays combinators float-arrays kernel jamshred.oint locals math math.constants math.matrices math.order math.ranges math.vectors math.quadratic random sequences vectors ;
+USE: tools.walker
 IN: jamshred.tunnel
 
 : n-segments ( -- n ) 5000 ; inline
 
 TUPLE: segment < oint number color radius ;
 C: <segment> segment
-
-: segment-vertex ( theta segment -- vertex )
-     tuck 2dup up>> swap sin v*n
-     >r left>> swap cos v*n r> v+
-     swap location>> v+ ;
-
-: segment-vertex-normal ( vertex segment -- normal )
-    location>> swap v- normalize ;
-
-: segment-vertex-and-normal ( segment theta -- vertex normal )
-    swap [ segment-vertex ] keep dupd segment-vertex-normal ;
-
-: equally-spaced-radians ( n -- seq )
-    #! return a sequence of n numbers between 0 and 2pi
-    dup [ / pi 2 * * ] curry map ;
 
 : segment-number++ ( segment -- )
     [ number>> 1+ ] keep (>>number) ;
@@ -40,9 +26,7 @@ C: <segment> segment
 : (random-segments) ( segments n -- segments )
     dup 0 > [
         >r dup peek random-segment over push r> 1- (random-segments)
-    ] [
-        drop
-    ] if ;
+    ] [ drop ] if ;
 
 : default-segment-radius ( -- r ) 1 ;
 
@@ -66,7 +50,7 @@ C: <segment> segment
 : <straight-tunnel> ( -- segments )
     n-segments simple-segments ;
 
-: sub-tunnel ( from to sements -- segments )
+: sub-tunnel ( from to segments -- segments )
     #! return segments between from and to, after clamping from and to to
     #! valid values
     [ sequence-index-range [ clamp-to-range ] curry bi@ ] keep <slice> ;
@@ -97,6 +81,32 @@ C: <segment> segment
     [ nearest-segment-forward ] 3keep
     nearest-segment-backward r> nearer-segment ;
 
+: get-segment ( segments n -- segment )
+    over sequence-index-range clamp-to-range swap nth ;
+
+: next-segment ( segments current-segment -- segment )
+    number>> 1+ get-segment ;
+
+: previous-segment ( segments current-segment -- segment )
+    number>> 1- get-segment ;
+
+: heading-segment ( segments current-segment heading -- segment )
+    #! the next segment on the given heading
+    over forward>> v. 0 <=> {
+        { +gt+ [ next-segment ] }
+        { +lt+ [ previous-segment ] }
+        { +eq+ [ nip ] } ! current segment
+    } case ;
+
+:: distance-to-next-segment ( current next location heading -- distance )
+    [let | cf [ current forward>> ] |
+        cf next location>> v. cf location v. - cf heading v. / ] ;
+
+:: distance-to-next-segment-area ( current next location heading -- distance )
+    [let | cf [ current forward>> ]
+           h [ next current half-way-between-oints ] |
+        cf h v. cf location v. - cf heading v. / ] ;
+
 : vector-to-centre ( seg loc -- v )
     over location>> swap v- swap forward>> proj-perp ;
 
@@ -106,19 +116,25 @@ C: <segment> segment
 : wall-normal ( seg oint -- n )
     location>> vector-to-centre normalize ;
 
-: from ( seg loc -- radius d-f-c )
-    dupd location>> distance-from-centre [ radius>> ] dip ;
+: distant ( -- n ) 1000 ;
 
-: distance-from-wall ( seg loc -- distance ) from - ;
-: fraction-from-centre ( seg loc -- fraction ) from / ;
-: fraction-from-wall ( seg loc -- fraction )
-    fraction-from-centre 1 swap - ;
+: max-real ( a b -- c )
+    #! sometimes collision-coefficient yields complex roots, so we ignore these (hack)
+    dup real? [
+        over real? [ max ] [ nip ] if
+    ] [
+        drop dup real? [ drop distant ] unless
+    ] if ;
 
 :: collision-coefficient ( v w r -- c )
-    [let* | a [ v dup v. ]
-            b [ v w v. 2 * ]
-            c [ w dup v. r sq - ] |
-        c b a quadratic max ] ;
+    v norm 0 = [
+        distant
+    ] [
+        [let* | a [ v dup v. ]
+                b [ v w v. 2 * ]
+                c [ w dup v. r sq - ] |
+            c b a quadratic max-real ]
+    ] if ;
 
 : sideways-heading ( oint segment -- v )
     [ forward>> ] bi@ proj-perp ;
@@ -126,18 +142,12 @@ C: <segment> segment
 : sideways-relative-location ( oint segment -- loc )
     [ [ location>> ] bi@ v- ] keep forward>> proj-perp ;
 
-: bounce-offset 0.1 ; inline
-
-: bounce-radius ( segment -- r )
-    radius>> bounce-offset - ; ! bounce before we hit so that we can't see through the wall (hack?)
+: (distance-to-collision) ( oint segment -- distance )
+    [ sideways-heading ] [ sideways-relative-location ]
+    [ nip radius>> ] 2tri collision-coefficient ;
 
 : collision-vector ( oint segment -- v )
-    [ sideways-heading ] [ sideways-relative-location ]
-    [ bounce-radius ] 2tri
-    swap [ collision-coefficient ] dip forward>> n*v ;
-
-: distance-to-collision ( oint segment -- distance )
-    collision-vector norm ;
+    dupd (distance-to-collision) swap forward>> n*v ;
 
 : bounce-forward ( segment oint -- )
     [ wall-normal ] [ forward>> swap reflect ] [ (>>forward) ] tri ;
@@ -151,6 +161,6 @@ C: <segment> segment
     #! must be done after forward and left!
     nip [ forward>> ] [ left>> cross ] [ (>>up) ] tri ;
 
-: bounce ( oint segment -- )
+: bounce-off-wall ( oint segment -- )
     swap [ bounce-forward ] [ bounce-left ] [ bounce-up ] 2tri ;
 
