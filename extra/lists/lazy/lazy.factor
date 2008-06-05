@@ -72,7 +72,7 @@ M: memoized-cons cdr ( memoized-cons -- cdr )
 
 M: memoized-cons nil? ( memoized-cons -- bool )
     dup nil?>> not-memoized? [
-        dup original>> nil? [ >>nil? drop ] keep
+        dup original>> nil?  [ >>nil? drop ] keep
     ] [
         nil?>>
     ] if ;
@@ -157,22 +157,20 @@ TUPLE: lazy-filter cons quot ;
 C: <lazy-filter> lazy-filter
 
 : lfilter ( list quot -- result )
-        over nil? [ 2drop nil ] [ <lazy-filter> <memoized-cons> ] if ;
+    over nil? [ 2drop nil ] [ <lazy-filter> <memoized-cons> ] if ;
 
-: car-filter?    ( lazy-filter -- ? )
-    [ cons>> car ] keep
-    quot>> call ;
+: car-filter? ( lazy-filter -- ? )
+    [ cons>> car ] [ quot>> ] bi call ;
 
 : skip ( lazy-filter -- )
-    dup cons>> cdr >>cons ;
+    dup cons>> cdr >>cons drop ;
 
 M: lazy-filter car ( lazy-filter -- car )
     dup car-filter? [ cons>> ] [ dup skip ] if car ;
 
 M: lazy-filter cdr ( lazy-filter -- cdr )
     dup car-filter? [
-        [ cons>> cdr ] keep
-        quot>> lfilter
+        [ cons>> cdr ] [ quot>> ] bi lfilter
     ] [
         dup skip cdr
     ] if ;
