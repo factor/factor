@@ -526,6 +526,9 @@ HELP: PREDICATE:
         "it satisfies the predicate"
     }
     "Each predicate must be defined as a subclass of some other class. This ensures that predicates inheriting from disjoint classes do not need to be exhaustively tested during method dispatch."
+}
+{ $examples
+    { $code "USING: math ;" "PREDICATE: positive < integer 0 > ;" }
 } ;
 
 HELP: TUPLE:

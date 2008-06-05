@@ -139,7 +139,7 @@ HELP: new-assoc
 
 HELP: assoc-find
 { $values { "assoc" assoc } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "key" "the successful key, or f" } { "value" "the successful value, or f" } { "?" "a boolean" } }
-{ $contract "Applies a predicate quotation to each entry in the assoc. Returns the key or value that the quotation succeeds on, or " { $link f } " for both if the quotation fails. It also returns a boolean describing whether there was anything found." }
+{ $contract "Applies a predicate quotation to each entry in the assoc. Returns the key and value that the quotation succeeds on, or " { $link f } " for both if the quotation fails. It also returns a boolean describing whether there was anything found; this can be used to distinguish between a key and a value equal to " { $link f } ", or nothing being found." }
 { $notes "The " { $link assoc } " mixin has a default implementation for this generic word which first converts the assoc to an association list, then iterates over that with the " { $link find } " combinator for sequences." } ;
 
 HELP: clear-assoc
