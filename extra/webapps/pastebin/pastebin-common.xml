@@ -2,7 +2,7 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-	<t:atom t:title="Pastebin" t:href="$pastebin/list.atom" />
+	<t:atom t:href="$pastebin/list.atom">Pastebin</t:atom>
 
 	<t:style t:include="resource:extra/webapps/pastebin/pastebin.css" />
 

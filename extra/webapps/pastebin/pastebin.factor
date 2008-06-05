@@ -35,6 +35,14 @@ entity f
     { "contents" "CONTENTS" TEXT +not-null+ }
 } define-persistent
 
+GENERIC: entity-url ( entity -- url )
+
+M: entity feed-entry-title summary>> ;
+
+M: entity feed-entry-date date>> ;
+
+M: entity feed-entry-url entity-url ;
+
 TUPLE: paste < entity annotations ;
 
 \ paste "PASTES" { } define-persistent
@@ -58,39 +66,31 @@ annotation "ANNOTATIONS"
         swap >>id
         swap >>parent ;
 
-: fetch-annotations ( paste -- paste )
-    dup annotations>> [
-        dup id>> f <annotation> select-tuples >>annotations
-    ] unless ;
-
 : paste ( id -- paste )
-    <paste> select-tuple fetch-annotations ;
+    [ <paste> select-tuple ]
+    [ f <annotation> select-tuples ]
+    bi >>annotations ;
 
 ! ! !
 ! LINKS, ETC
 ! ! !
 
-: pastebin-link ( -- url )
+: pastebin-url ( -- url )
     URL" $pastebin/list" ;
 
-GENERIC: entity-link ( entity -- url )
+: paste-url ( id -- url )
+    "$pastebin/paste" >url swap "id" set-query-param ;
 
-: paste-link ( id -- url )
-    <url>
-        "$pastebin/paste" >>path
-        swap "id" set-query-param ;
+M: paste entity-url
+    id>> paste-url ;
 
-M: paste entity-link
-    id>> paste-link ;
-
-: annotation-link ( parent id -- url )
-    <url>
-        "$pastebin/paste" >>path
+: annotation-url ( parent id -- url )
+    "$pastebin/paste" >url
         swap number>string >>anchor
         swap "id" set-query-param ;
 
-M: annotation entity-link
-    [ parent>> ] [ id>> ] bi annotation-link ;
+M: annotation entity-url
+    [ parent>> ] [ id>> ] bi annotation-url ;
 
 ! ! !
 ! PASTE LIST
@@ -101,24 +101,11 @@ M: annotation entity-link
         [ pastes "pastes" set-value ] >>init
         { pastebin "pastebin" } >>template ;
 
-: pastebin-feed-entries ( seq -- entries )
-    <reversed> 20 short head [
-        entry new
-            swap
-            [ summary>> >>title ]
-            [ date>> >>pub-date ]
-            [ entity-link adjust-url relative-to-request >>link ]
-            tri
-    ] map ;
-
-: pastebin-feed ( -- feed )
-    feed new
-        "Factor Pastebin" >>title
-        pastebin-link >>link
-        pastes pastebin-feed-entries >>entries ;
-
 : <pastebin-feed-action> ( -- action )
-    <feed-action> [ pastebin-feed ] >>feed ;
+    <feed-action>
+        [ pastebin-url ] >>url
+        [ "Factor Pastebin" ] >>title
+        [ pastes <reversed> ] >>entries ;
 
 ! ! !
 ! PASTES
@@ -140,21 +127,12 @@ M: annotation entity-link
 
         { pastebin "paste" } >>template ;
 
-: paste-feed-entries ( paste -- entries )
-    fetch-annotations annotations>> pastebin-feed-entries ;
-
-: paste-feed ( paste -- feed )
-    feed new
-        swap
-        [ "Paste " swap id>> number>string append >>title ]
-        [ entity-link adjust-url relative-to-request >>link ]
-        [ paste-feed-entries >>entries ]
-        tri ;
-
 : <paste-feed-action> ( -- action )
     <feed-action>
         [ validate-integer-id ] >>init
-        [ "id" value paste paste-feed ] >>feed ;
+        [ "id" value paste-url ] >>url
+        [ "Paste " "id" value number>string append ] >>title
+        [ "id" value f <annotation> select-tuples ] >>entries ;
 
 : validate-entity ( -- )
     {
@@ -186,7 +164,7 @@ M: annotation entity-link
             f <paste>
             [ deposit-entity-slots ]
             [ insert-tuple ]
-            [ id>> paste-link <redirect> ]
+            [ id>> paste-url <redirect> ]
             tri
         ] >>submit ;
 
@@ -207,11 +185,6 @@ M: annotation entity-link
 : <new-annotation-action> ( -- action )
     <action>
         [
-            { { "id" [ v-integer ] } } validate-params
-            "id" value paste-link <redirect>
-        ] >>display
-
-        [
             { { "parent" [ v-integer ] } } validate-params
             validate-entity
         ] >>validate
@@ -220,7 +193,7 @@ M: annotation entity-link
             "parent" value f <annotation>
             [ deposit-entity-slots ]
             [ insert-tuple ]
-            [ entity-link <redirect> ]
+            [ entity-url <redirect> ]
             tri
         ] >>submit ;
 
@@ -231,7 +204,7 @@ M: annotation entity-link
         [
             f "id" value <annotation> select-tuple
             [ delete-tuples ]
-            [ parent>> paste-link <redirect> ]
+            [ parent>> paste-url <redirect> ]
             bi
         ] >>submit ;
 

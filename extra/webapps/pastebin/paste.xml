@@ -2,7 +2,9 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-	<t:atom t:title="This paste" t:href="$pastebin/paste.atom" t:query="id" />
+	<t:atom t:href="$pastebin/paste.atom" t:query="id">
+		Paste: <t:label t:name="summary" />
+	</t:atom>
 
 	<t:title>Paste: <t:label t:name="summary" /></t:title>
 

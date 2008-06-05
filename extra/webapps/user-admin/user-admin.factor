@@ -83,7 +83,7 @@ TUPLE: user-admin < dispatcher ;
             [ from-object ]
             [ capabilities>> [ "true" swap word>string set-value ] each ] bi
 
-            capabilities get words>strings "capabilities" set-value
+            init-capabilities
         ] >>init
 
         { user-admin "edit-user" } >>template
