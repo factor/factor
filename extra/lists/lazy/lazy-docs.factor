@@ -127,4 +127,3 @@ HELP: llines
 { $values { "stream" "a stream" } { "result" "a list" } }
 { $description "Returns a lazy list of all lines in the file. " { $link car } " returns the next lines in the file, " { $link cdr } " returns the remaining lines as a lazy list. " { $link nil? } " indicates end of file." } 
 { $see-also lcontents } ;
-
