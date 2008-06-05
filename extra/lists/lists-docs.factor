@@ -99,6 +99,6 @@ HELP: seq>cons
 HELP: traverse    
 { $values { " list"  "a cons object" } { "pred" } { "a quotation with stack effect ( list/elt -- ? )" }
           { "quot" "a quotation with stack effect ( list/elt -- result)" }  { "result" "a new cons object" } }
-{ $description "Recursively traverses the list object, replacing any elements (which can themselves be sublists) that " { $snippet pred }
-    " returns true for with the result of applying " { $snippet quot } " to." } ;
+{ $description "Recursively traverses the list object, replacing any elements (which can themselves be sublists) that pred" 
+    " returns true for with the result of applying quot to." } ;
     
