@@ -33,7 +33,7 @@ TUPLE: pango-gadget < cairo-gadget text font ;
         swap >>font ;
 
 : setup-layout ( {font,text} -- quot )
-    first2 '[ , layout-font , layout-text ] ;
+    first2 '[ , layout-font , layout-text ] ; inline
 
 M: pango-gadget quot>> ( gadget -- quot )
     cache-key setup-layout [ show-layout ] compose
