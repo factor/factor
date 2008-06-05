@@ -17,7 +17,7 @@ IN: furnace.actions
 
 SYMBOL: params
 
-SYMBOL: rest-param
+SYMBOL: rest
 
 : render-validation-messages ( -- )
     validation-messages get
@@ -29,7 +29,7 @@ SYMBOL: rest-param
 
 CHLOE: validation-messages drop render-validation-messages ;
 
-TUPLE: action rest-param init display validate submit ;
+TUPLE: action rest init display validate submit ;
 
 : new-action ( class -- action )
     new
@@ -83,13 +83,13 @@ TUPLE: action rest-param init display validate submit ;
         [ flashed-variables <flash-redirect> ] [ <403> ] if*
     ] unless* ;
 
-: handle-rest-param ( path action -- assoc )
-    rest-param>> dup [ associate ] [ 2drop f ] if ;
+: handle-rest ( path action -- assoc )
+    rest>> dup [ [ "/" join ] dip associate ] [ 2drop f ] if ;
 
 : init-action ( path action -- )
     blank-values
     init-validation
-    handle-rest-param
+    handle-rest
     request get request-params assoc-union params set ;
 
 M: action call-responder* ( path action -- response )

@@ -4,7 +4,7 @@ USING: kernel unicode.categories combinators sequences splitting
 fry namespaces assocs arrays strings io.sockets
 io.sockets.secure io.encodings.string io.encodings.utf8
 math math.parser accessors mirrors parser
-prettyprint.backend hashtables ;
+prettyprint.backend hashtables present ;
 IN: urls
 
 : url-quotable? ( ch -- ? )
@@ -14,18 +14,24 @@ IN: urls
         { [ dup letter? ] [ t ] }
         { [ dup LETTER? ] [ t ] }
         { [ dup digit? ] [ t ] }
-        { [ dup "/_-.:" member? ] [ t ] }
+        { [ dup "/_-." member? ] [ t ] }
         [ f ]
     } cond nip ; foldable
+
+<PRIVATE
 
 : push-utf8 ( ch -- )
     1string utf8 encode
     [ CHAR: % , >hex 2 CHAR: 0 pad-left % ] each ;
 
+PRIVATE>
+
 : url-encode ( str -- str )
     [
         [ dup url-quotable? [ , ] [ push-utf8 ] if ] each
     ] "" make ;
+
+<PRIVATE
 
 : url-decode-hex ( index str -- )
     2dup length 2 - >= [
@@ -51,8 +57,12 @@ IN: urls
         ] if url-decode-iter
     ] if ;
 
+PRIVATE>
+
 : url-decode ( str -- str )
     [ 0 swap url-decode-iter ] "" make utf8 decode ;
+
+<PRIVATE
 
 : add-query-param ( value key assoc -- )
     [
@@ -64,6 +74,8 @@ IN: urls
             } cond
         ] when*
     ] 2keep set-at ;
+
+PRIVATE>
 
 : query>assoc ( query -- assoc )
     dup [
@@ -77,11 +89,7 @@ IN: urls
 
 : assoc>query ( hash -- str )
     [
-        {
-            { [ dup number? ] [ number>string 1array ] }
-            { [ dup string? ] [ 1array ] }
-            { [ dup sequence? ] [ ] }
-        } cond
+        dup array? [ [ present ] map ] [ present 1array ] if
     ] assoc-map
     [
         [
@@ -108,6 +116,8 @@ TUPLE: url protocol username password host port path query anchor ;
         ] when
     ] bi* ;
 
+<PRIVATE
+
 : parse-host-part ( url protocol rest -- url string' )
     [ >>protocol ] [
         "//" ?head [ "Invalid URL" throw ] unless
@@ -120,6 +130,8 @@ TUPLE: url protocol username password host port path query anchor ;
             parse-host [ >>host ] [ >>port ] bi*
         ] [ "/" prepend ] bi*
     ] bi* ;
+
+PRIVATE>
 
 GENERIC: >url ( obj -- url )
 
@@ -134,6 +146,8 @@ M: string >url
         [ [ query>assoc >>query ] when* ] bi*
     ]
     [ url-decode >>anchor ] bi* ;
+
+<PRIVATE
 
 : unparse-username-password ( url -- )
     dup username>> dup [
@@ -150,7 +164,7 @@ M: string >url
         [ path>> "/" head? [ "/" % ] unless ]
     } cleave ;
 
-: url>string ( url -- string )
+M: url present
     [
         {
             [ dup protocol>> dup [ unparse-host-part ] [ 2drop ] if ]
@@ -168,6 +182,8 @@ M: string >url
         { [ "/" pick start not ] [ nip ] }
         [ [ "/" last-split1 drop "/" ] dip 3append ]
     } cond ;
+
+PRIVATE>
 
 : derive-url ( base url -- url' )
     [ clone dup ] dip
@@ -199,4 +215,4 @@ M: string >url
 ! Literal syntax
 : URL" lexer get skip-blank parse-string >url parsed ; parsing
 
-M: url pprint* dup url>string "URL\" " "\"" pprint-string ;
+M: url pprint* dup present "URL\" " "\"" pprint-string ;

@@ -4,7 +4,7 @@ USING: xml.utilities kernel assocs xml.generator math.order
     strings sequences xml.data xml.writer
     io.streams.string combinators xml xml.entities io.files io
     http.client namespaces xml.generator hashtables
-    calendar.format accessors continuations urls ;
+    calendar.format accessors continuations urls present ;
 IN: rss
 
 : any-tag-named ( tag names -- tag-inside )
@@ -104,7 +104,7 @@ C: <entry> entry
 : entry, ( entry -- )
     "entry" [
         dup title>> "title" { { "type" "html" } } simple-tag*,
-        "link" over link>> dup url? [ url>string ] when "href" associate contained*,
+        "link" over link>> dup url? [ present ] when "href" associate contained*,
         dup pub-date>> timestamp>rfc3339 "published" simple-tag,
         description>> [ "content" { { "type" "html" } } simple-tag*, ] when*
     ] tag, ;
@@ -112,6 +112,6 @@ C: <entry> entry
 : feed>xml ( feed -- xml )
     "feed" { { "xmlns" "http://www.w3.org/2005/Atom" } } [
         dup title>> "title" simple-tag,
-        "link" over link>> dup url? [ url>string ] when "href" associate contained*,
+        "link" over link>> dup url? [ present ] when "href" associate contained*,
         entries>> [ entry, ] each
     ] make-xml* ;

@@ -4,7 +4,7 @@ USING: accessors kernel combinators math namespaces
 
 assocs sequences splitting sorting sets debugger
 strings vectors hashtables quotations arrays byte-arrays
-math.parser calendar calendar.format
+math.parser calendar calendar.format present
 
 io io.server io.sockets.secure
 
@@ -54,11 +54,9 @@ IN: http
 
 : header-value>string ( value -- string )
     {
-        { [ dup number? ] [ number>string ] }
         { [ dup timestamp? ] [ timestamp>http-string ] }
-        { [ dup url? ] [ url>string ] }
-        { [ dup string? ] [ ] }
-        { [ dup sequence? ] [ [ header-value>string ] map "; " join ] }
+        { [ dup array? ] [ [ header-value>string ] map "; " join ] }
+        [ present ]
     } cond ;
 
 : check-header-string ( str -- str )
@@ -231,7 +229,7 @@ TUPLE: post-data raw content content-type ;
     dup method>> write bl ;
 
 : write-request-url ( request -- request )
-    dup url>> relative-url url>string write bl ;
+    dup url>> relative-url present write bl ;
 
 : write-version ( request -- request )
     "HTTP/" write dup request-version write crlf ;

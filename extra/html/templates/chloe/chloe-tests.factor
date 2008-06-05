@@ -151,7 +151,7 @@ TUPLE: person first-name last-name ;
 
 [ ] [ H{ { "a" H{ { "b" "c" } } } } values set ] unit-test
 
-[ "<form method='POST' action='foo'><input type='hidden' name='factorformnesting' value='a'/></form>" ] [
+[ "<form method='POST' action='foo'><input type='hidden' name='__n' value='a'/></form>" ] [
     [
         "test10" test-template call-template
     ] run-template
@@ -167,4 +167,16 @@ TUPLE: person first-name last-name ;
     [
         "test11" test-template call-template
     ] run-template [ blank? not ] filter
+] unit-test
+
+[ ] [
+    blank-values
+    { "a" "b" } "choices" set-value
+    "true" "b" set-value
+] unit-test
+
+[ "<input type='checkbox' name='a'>a</input><input type='checkbox' name='b' checked='true'>b</input>" ] [
+    [
+        "test12" test-template call-template
+    ] run-template
 ] unit-test

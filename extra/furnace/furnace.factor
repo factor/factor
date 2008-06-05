@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel combinators assocs
 continuations namespaces sequences splitting words
-vocabs.loader classes
-fry urls multiline
+vocabs.loader classes strings
+fry urls multiline present
 xml
 xml.data
 xml.entities
@@ -52,11 +52,15 @@ GENERIC: modify-query ( query responder -- query' )
 
 M: object modify-query drop ;
 
-: adjust-url ( url -- url' )
+GENERIC: adjust-url ( url -- url' )
+
+M: url adjust-url
     clone
         [ [ modify-query ] each-responder ] change-query
         [ resolve-base-path ] change-path
     relative-to-request ;
+
+M: string adjust-url ;
 
 : <redirect> ( url -- response )
     adjust-url request get method>> {
@@ -138,11 +142,11 @@ CHLOE: a
         <input
             "hidden" =type
             =name
-            object>string =value
+            present =value
         input/>
     ] [ 2drop ] if ;
 
-: form-nesting-key "factorformnesting" ;
+: form-nesting-key "__n" ;
 
 : form-magic ( tag -- )
     [ modify-form ] each-responder
