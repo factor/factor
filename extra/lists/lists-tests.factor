@@ -57,6 +57,10 @@ IN: lists.tests
     { 1 2 3 4 5 } seq>list lreverse list>seq
 ] unit-test
     
+{ 5 } [
+    { 1 2 3 4 5 } seq>list llength
+] unit-test
+    
 { { 3 4 { 5 6 { 7 } } } } [
   { 1 2 { 3 4 { 5 } } } seq>cons [ atom? ] [ 2 + ] traverse cons>seq
 ] unit-test
