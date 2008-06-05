@@ -19,8 +19,8 @@ HELP: cdr
 { $description "Returns the tail of the list." } ;
     
 HELP: nil 
-{ $values { "cons" "An empty cons" } }
-{ $description "Returns a representation of an empty list" } ;
+{ $values { "symbol" "The empty cons (+nil+)" } }
+{ $description "Returns a symbol representing the empty list" } ;
 
 HELP: nil? 
 { $values { "cons" "a cons object" } { "?" "a boolean" } }
@@ -85,7 +85,7 @@ HELP: list>seq
 { $description "Turns the given cons object into an array, maintaing order." } ;
     
 HELP: seq>list
-{ $values { "array" "an array object" } { "list" "a cons object" } }
+{ $values { "seq" "a sequence" } { "list" "a cons object" } }
 { $description "Turns the given array into a cons object, maintaing order." } ;
     
 HELP: cons>seq
@@ -97,7 +97,7 @@ HELP: seq>cons
 { $description "Recursively turns the given sequence into a cons object, maintaing order and also converting nested lists." } ;
     
 HELP: traverse    
-{ $values { " list"  "a cons object" } { "pred" } { "a quotation with stack effect ( list/elt -- ? )" }
+{ $values { "list"  "a cons object" } { "pred" "a quotation with stack effect ( list/elt -- ? )" }
           { "quot" "a quotation with stack effect ( list/elt -- result)" }  { "result" "a new cons object" } }
 { $description "Recursively traverses the list object, replacing any elements (which can themselves be sublists) that pred" 
     " returns true for with the result of applying quot to." } ;

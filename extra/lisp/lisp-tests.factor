@@ -7,8 +7,8 @@ IN: lisp.test
 [
     init-env
     
-    "#f" [ f ] lisp-define
-    "#t" [ t ] lisp-define
+    [ f ] "#f" lisp-define
+    [ t ] "#t" lisp-define
     
     "+" "math" "+" define-primitive
     "-" "math" "-" define-primitive
@@ -29,6 +29,14 @@ IN: lisp.test
     
     { 42 } [
       "((lambda (x y z) (+ x (- y z))) 40 3 1)" lisp-eval
+    ] unit-test
+    
+    { T{ lisp-symbol f "if" } } [
+        "(defmacro if (pred tr fl) (quasiquote (cond ((unquote pred) (unquote tr)) (#t (unquote fl)))))" lisp-eval
+    ] unit-test
+    
+    { t } [
+        T{ lisp-symbol f "if" } lisp-macro?
     ] unit-test
     
     { 1 } [
