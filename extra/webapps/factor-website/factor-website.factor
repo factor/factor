@@ -16,6 +16,7 @@ webapps.pastebin
 webapps.planet
 webapps.todo
 webapps.wiki
+webapps.wee-url
 webapps.user-admin ;
 IN: webapps.factor-website
 
@@ -36,6 +37,8 @@ IN: webapps.factor-website
 
         init-articles-table
         init-revisions-table
+
+        init-short-url-table
     ] with-db ;
 
 TUPLE: factor-website < dispatcher ;
@@ -46,6 +49,7 @@ TUPLE: factor-website < dispatcher ;
         <pastebin> "pastebin" add-responder
         <planet-factor> "planet" add-responder
         <wiki> "wiki" add-responder
+        <wee-url> "wee-url" add-responder
         <user-admin> "user-admin" add-responder
     <login>
         users-in-db >>users
