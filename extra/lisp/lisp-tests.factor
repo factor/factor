@@ -31,6 +31,10 @@ IN: lisp.test
       "((lambda (x y z) (+ x (- y z))) 40 3 1)" lisp-eval
     ] unit-test
     
+    { T{ lisp-symbol f "if" } } [
+        "(defmacro if (pred tr fl) (quasiquote (cond ((unquote pred) (unquote tr)) (#t (unquote fl)))))" lisp-eval
+    ] unit-test
+    
     { 1 } [
       "(if #t 1 2)" lisp-eval
     ] unit-test
