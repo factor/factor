@@ -26,7 +26,7 @@ M: object nil? drop f ;
     
 : atom? ( obj -- ? ) [ list? ] [ nil? ] bi or not ;
 
-: nil ( -- +nil+ ) +nil+ ; 
+: nil ( -- symbol ) +nil+ ; 
     
 : uncons ( cons -- cdr car )
     [ cdr ] [ car ] bi ;
@@ -61,9 +61,9 @@ M: object nil? drop f ;
 : lmap ( list quot -- result )
     over nil? [ drop ] [ (leach) lmap cons ] if ; inline
 
-: foldl ( list ident quot -- result ) swapd leach ; inline
+: foldl ( list identity quot -- result ) swapd leach ; inline
 
-: foldr ( list ident quot -- result )
+: foldr ( list identity quot -- result )
     pick nil? [ [ drop ] [ ] [ drop ] tri* ] [
         [ [ cdr ] 2dip foldr ] [ nip [ car ] dip ] 3bi
         call
