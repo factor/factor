@@ -104,6 +104,7 @@ M: revision feed-entry-url id>> revision-url ;
             validate-integer-id
             "id" value <revision>
             select-tuple from-object
+            "view?title=" relative-link-prefix set
         ] >>init
 
         { wiki "view" } >>template ;
