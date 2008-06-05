@@ -16,7 +16,7 @@ DEFER: macro-call
 ! Functions to convert s-exps to quotations
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 : convert-body ( cons -- quot )
-    [ ] [ convert-form compose ] lreduce ; inline
+    [ ] [ convert-form compose ] foldl ; inline
   
 : convert-if ( cons -- quot )
     cdr 3car [ convert-form ] tri@ '[ @ , , if ] ;
@@ -64,7 +64,8 @@ PRIVATE>
     "unquote not valid outside of quasiquote!" throw ;
     
 : convert-quasiquoted ( cons -- newcons )
-    [  ] traverse ;
+    [ { [ dup list? ] [ car dup lisp-symbol? ] [ name>> "unquote" equal? dup ] } && nip ]
+    [ cadr ] traverse ;
     
 : form-dispatch ( lisp-symbol -- quot )
     name>>
