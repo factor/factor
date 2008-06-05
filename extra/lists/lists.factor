@@ -51,12 +51,6 @@ M: object nil? drop f ;
 
 : lnth ( n list -- elt )
     swap [ cdr ] times car ;
-
-: (llength) ( list acc -- n )
-    over nil? [ nip ] [ [ cdr ] dip 1+ (llength) ] if ;
-
-: llength ( list -- n )
-    0 (llength) ;
     
 : (leach) ( list quot -- cdr quot )
     [ [ car ] dip call ] [ [ cdr ] dip ] 2bi ; inline
@@ -74,12 +68,12 @@ M: object nil? drop f ;
         [ [ cdr ] 2dip foldr ] [ nip [ car ] dip ] 3bi
         call
     ] if ; inline
+
+: llength ( list -- n )
+    0 [ drop 1+ ] foldl ;
     
 : lreverse ( list -- newlist )    
     nil [ swap cons ] foldl ;
-    
-: lappend ( list1 list2 -- newlist )
-     ;
     
 : seq>list ( seq -- list )    
     <reversed> nil [ swap cons ] reduce ;
