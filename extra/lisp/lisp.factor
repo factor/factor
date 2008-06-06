@@ -9,8 +9,8 @@ IN: lisp
 DEFER: convert-form
 DEFER: funcall
 DEFER: lookup-var
-DEFER: lisp-macro?
 DEFER: lookup-macro
+DEFER: lisp-macro?
 DEFER: macro-expand
 DEFER: define-lisp-macro
     
@@ -110,10 +110,9 @@ PRIVATE>
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SYMBOL: lisp-env
-ERROR: no-such-var variable-name ;
-    
 SYMBOL: macro-env
     
+ERROR: no-such-var variable-name ;
 M: no-such-var summary drop "No such variable" ;
 
 : init-env ( -- )

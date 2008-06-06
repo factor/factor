@@ -8,7 +8,7 @@ IN: lists
 MIXIN: list
 GENERIC: car   ( cons -- car )
 GENERIC: cdr   ( cons -- cdr )
-GENERIC: nil?   ( cons -- ?   )
+GENERIC: nil?  ( object -- ?   )
     
 TUPLE: cons car cdr ;
 
