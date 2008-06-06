@@ -18,6 +18,9 @@ LIBRARY: pango
 
 : PANGO_SCALE 1024 ;
 
+FUNCTION: PangoLayout*
+pango_layout_new ( PangoContext* context ) ;
+
 FUNCTION: void
 pango_layout_set_text ( PangoLayout* layout, char* text, int length ) ;
 
