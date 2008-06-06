@@ -1,7 +1,7 @@
 ! Based on Clojure's PersistentVector by Rich Hickey.
 
 USING: math accessors kernel sequences.private sequences arrays
-combinators parser prettyprint.backend fry debugger ;
+combinators parser prettyprint.backend ;
 IN: persistent-vectors
 
 ERROR: empty-error pvec ;
@@ -64,7 +64,6 @@ M: persistent-vector nth-unsafe
         swap 1array >>children ;
 
 : 2node ( first second -- node )
-    2dup [ level>> ] bi@ assert=
     [ 2array ] [ drop level>> 1+ ] 2bi node boa ;
 
 : new-child ( new-child node -- node' expansion/f )
@@ -102,9 +101,9 @@ M: persistent-vector ppush ( obj pvec -- pvec' )
     clone [ new-nth ] change-children ;
 
 : node-change-nth ( i node quot -- node' )
-    [ clone ] dip '[
-        clone [ , change-nth ] keep
-    ] change-children ; inline
+    [ clone ] dip [
+        [ clone ] dip [ change-nth ] 2keep drop
+    ] curry change-children ; inline
 
 : (new-nth) ( val i node -- node' )
     dup level>> 0 = [
