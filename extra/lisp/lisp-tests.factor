@@ -13,8 +13,6 @@ IN: lisp.test
     "+" "math" "+" define-primitive
     "-" "math" "-" define-primitive
     
-!    "list" [ >array ] lisp-define
-    
     { 5 } [
       [ 2 3 ] "+" <lisp-symbol> funcall
     ] unit-test
@@ -55,8 +53,4 @@ IN: lisp.test
        "((lambda (x) (if x (begin (+ 1 2)) (- 3 5))) #t)" lisp-eval
     ] unit-test
     
-!     { { 1 2 3 4 5 } } [
-!       "(list 1 2 3 4 5)" lisp-eval
-!     ] unit-test
-
 ] with-interactive-vocabs
