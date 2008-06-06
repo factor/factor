@@ -503,6 +503,9 @@ M: windows-ui-backend ui
         ] [ cleanup-win32-ui ] [ ] cleanup
     ] ui-running ;
 
+M: windows-ui-backend beep ( -- )
+    0 MessageBeep drop ;
+
 windows-ui-backend ui-backend set-global
 
 [ "ui" ] main-vocab-hook set-global

@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces opengl opengl.gl ;
+USING: io kernel namespaces opengl opengl.gl ;
 IN: ui.backend
 
 SYMBOL: ui-backend
@@ -22,6 +22,8 @@ HOOK: raise-window* ui-backend ( world -- )
 HOOK: select-gl-context ui-backend ( handle -- )
 
 HOOK: flush-gl-context ui-backend ( handle -- )
+
+HOOK: beep ui-backend ( -- )
 
 : with-gl-context ( handle quot -- )
     swap [ select-gl-context call ] keep

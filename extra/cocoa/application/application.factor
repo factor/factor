@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien io kernel namespaces core-foundation
+USING: alien alien.syntax io kernel namespaces core-foundation
 core-foundation.run-loop cocoa.messages cocoa cocoa.classes
 cocoa.runtime sequences threads debugger init inspector
 kernel.private ;
@@ -18,6 +18,8 @@ IN: cocoa.application
     NSAutoreleasePool -> new slip -> release ; inline
 
 : NSApp ( -- app ) NSApplication -> sharedApplication ;
+
+FUNCTION: void NSBeep ( ) ;
 
 : with-cocoa ( quot -- )
     [ NSApp drop call ] with-autorelease-pool ;
