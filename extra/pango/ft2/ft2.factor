@@ -8,8 +8,8 @@ pango.layouts ;
 IN: pango.ft2
 
 << "pangoft2" {
-!    { [ os winnt? ] [ "libpangocairo-1.dll" ] }
-!    { [ os macosx? ] [ "libpangocairo.dylib" ] }
+    { [ os winnt? ] [ "libpangocairo-1.0-0.dll" ] }
+    { [ os macosx? ] [ "libpangocairo-1.0.0.dylib" ] }
     { [ os unix? ] [ "libpangoft2-1.0.so" ] }
 } cond "cdecl" add-library >>
 
