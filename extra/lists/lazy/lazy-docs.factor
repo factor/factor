@@ -1,48 +1,8 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: help.markup help.syntax sequences strings ;
-IN: lazy-lists 
-
-{ car cons cdr nil nil? list? uncons } related-words
-
-HELP: cons 
-{ $values { "car" "the head of the lazy list" } { "cdr" "the tail of the lazy list" } { "cons" "a cons object" } }
-{ $description "Constructs a cons cell." } ;
-
-HELP: car
-{ $values { "cons" "a cons object" } { "car" "the first item in the list" } }
-{ $description "Returns the first item in the list." } ;
-
-HELP: cdr
-{ $values { "cons" "a cons object" } { "cdr" "a cons object" } }
-{ $description "Returns the tail of the list." } ;
-
-HELP: nil 
-{ $values { "cons" "An empty cons" } }
-{ $description "Returns a representation of an empty list" } ;
-
-HELP: nil? 
-{ $values { "cons" "a cons object" } { "?" "a boolean" } }
-{ $description "Return true if the cons object is the nil cons." } ;
-
-HELP: list? ( object -- ? )
-{ $values { "object" "an object" } { "?" "a boolean" } }
-{ $description "Returns true if the object conforms to the list protocol." } ;
-
-{ 1list 2list 3list } related-words
-
-HELP: 1list
-{ $values { "obj" "an object" } { "cons" "a cons object" } }
-{ $description "Create a list with 1 element." } ;
-
-HELP: 2list
-{ $values { "a" "an object" } { "b" "an object" } { "cons" "a cons object" } }
-{ $description "Create a list with 2 elements." } ;
-
-HELP: 3list
-{ $values { "a" "an object" } { "b" "an object" } { "c" "an object" } { "cons" "a cons object" } }
-{ $description "Create a list with 3 elements." } ;
+USING: help.markup help.syntax sequences strings lists ;
+IN: lists.lazy 
 
 HELP: lazy-cons
 { $values { "car" "a quotation with stack effect ( -- X )" } { "cdr" "a quotation with stack effect ( -- cons )" } { "promise" "the resulting cons object" } }
@@ -68,37 +28,15 @@ HELP: <memoized-cons>
 { $description "Constructs a cons object that wraps an existing cons object. Requests for the car, cdr and nil? will be remembered after the first call, and the previous result returned on subsequent calls." } 
 { $see-also cons car cdr nil nil? } ;
 
-HELP: lnth
-{ $values { "n" "an integer index" } { "list" "a cons object" } { "elt" "the element at the nth index" } }
-{ $description "Outputs the nth element of the list." } 
-{ $see-also llength cons car cdr } ;
+{ lazy-map lazy-map-with ltake lfilter lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lwhile luntil } related-words
 
-HELP: llength
-{ $values { "list" "a cons object" } { "n" "a non-negative integer" } }
-{ $description "Outputs the length of the list. This should not be called on an infinite list." } 
-{ $see-also lnth cons car cdr } ;
-
-HELP: uncons
-{ $values { "cons" "a cons object" } { "car" "the head of the list" } { "cdr" "the tail of the list" } }
-{ $description "Put the head and tail of the list on the stack." } ;
-
-{ leach lreduce lmap lmap-with ltake lfilter lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lreduce lwhile luntil } related-words
-
-HELP: leach
-{ $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( obj -- )" } }
-{ $description "Call the quotation for each item in the list." } ;
-
-HELP: lreduce
-{ $values { "list" "a cons object" } { "identity" "an object" } { "quot" "a quotation with stack effect ( prev elt -- next )" } { "result" "the final result" } }
-{ $description "Combines successive elements of the list using a binary operation, and outputs the final result." } ;
-
-HELP: lmap
+HELP: lazy-map
 { $values { "list" "a cons object" } { "quot" "a quotation with stack effect ( obj -- X )" } { "result" "resulting cons object" } }
 { $description "Perform a similar functionality to that of the " { $link map } " word, but in a lazy manner. No evaluation of the list elements occurs initially but a " { $link <lazy-map> } " object is returned which conforms to the list protocol. Calling " { $link car } ", " { $link cdr } " or " { $link nil? } " on this will evaluate elements as required." } ;
 
-HELP: lmap-with
+HELP: lazy-map-with
 { $values { "value" "an object" } { "list" "a cons object" } { "quot" "a quotation with stack effect ( obj elt -- X )" } { "result" "resulting cons object" } }
-{ $description "Variant of " { $link lmap } " which pushes a retained object on each invocation of the quotation." } ;
+{ $description "Variant of " { $link lazy-map } " which pushes a retained object on each invocation of the quotation." } ;
 
 HELP: ltake
 { $values { "n" "a non negative integer" } { "list" "a cons object" } { "result" "resulting cons object" } }
@@ -147,6 +85,8 @@ HELP: >list
 { $values { "object" "an object" } { "list" "a list" } }
 { $description "Convert the object into a list. Existing lists are passed through intact, sequences are converted using " { $link seq>list } " and other objects cause an error to be thrown." } 
 { $see-also seq>list } ;
+    
+{ leach foldl lazy-map lazy-map-with ltake lfilter lappend lfrom lfrom-by lconcat lcartesian-product lcartesian-product* lcomp lcomp* lmerge lwhile luntil } related-words
 
 HELP: lconcat
 { $values { "list" "a list of lists" } { "result" "a list" } }
@@ -175,7 +115,7 @@ HELP: lmerge
 { $values { "list1" "a list" } { "list2" "a list" } { "result" "lazy list merging list1 and list2" } }
 { $description "Return the result of merging the two lists in a lazy manner." } 
 { $examples
-  { $example "USING: lazy-lists prettyprint ;" "{ 1 2 3 } >list { 4 5 6 } >list lmerge list>array ." "{ 1 4 2 5 3 6 }" }
+  { $example "USING: lists.lazy prettyprint ;" "{ 1 2 3 } >list { 4 5 6 } >list lmerge list>array ." "{ 1 4 2 5 3 6 }" }
 } ;
 
 HELP: lcontents
@@ -187,4 +127,3 @@ HELP: llines
 { $values { "stream" "a stream" } { "result" "a list" } }
 { $description "Returns a lazy list of all lines in the file. " { $link car } " returns the next lines in the file, " { $link cdr } " returns the remaining lines as a lazy list. " { $link nil? } " indicates end of file." } 
 { $see-also lcontents } ;
-

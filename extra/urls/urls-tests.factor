@@ -1,5 +1,7 @@
 IN: urls.tests
-USING: urls tools.test tuple-syntax arrays kernel assocs ;
+USING: urls urls.private tools.test
+tuple-syntax arrays kernel assocs
+present ;
 
 [ "hello%20world" ] [ "hello world" url-encode ] unit-test
 [ "hello world" ] [ "hello%20world" url-decode ] unit-test
@@ -110,7 +112,7 @@ urls [
 ] assoc-each
 
 urls [
-    swap [ 1array ] [ [ url>string ] curry ] bi* unit-test
+    swap [ 1array ] [ [ present ] curry ] bi* unit-test
 ] assoc-each
 
 [ "b" ] [ "a" "b" url-append-path ] unit-test

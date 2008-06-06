@@ -22,7 +22,7 @@ DEFER: http-request
 SYMBOL: redirects
 
 : redirect-url ( request url -- request )
-    '[ , >url derive-url ensure-port ] change-url ;
+    '[ , >url ensure-port derive-url ensure-port ] change-url ;
 
 : do-redirect ( response data -- response data )
     over code>> 300 399 between? [
@@ -100,12 +100,11 @@ M: download-failed error.
 : download ( url -- )
     dup download-name download-to ;
 
-: <post-request> ( content-type content url -- request )
+: <post-request> ( post-data url -- request )
     <request>
         "POST" >>method
         swap >url ensure-port >>url
-        swap >>post-data
-        swap >>post-data-type ;
+        swap >>post-data ;
 
-: http-post ( content-type content url -- response data )
+: http-post ( post-data url -- response data )
     <post-request> http-request ;
