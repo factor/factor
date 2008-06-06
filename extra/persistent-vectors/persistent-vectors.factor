@@ -6,7 +6,7 @@ IN: persistent-vectors
 
 ERROR: empty-error pvec ;
 
-GENERIC: ppush ( obj seq -- seq' )
+GENERIC: ppush ( val seq -- seq' )
 
 M: sequence ppush swap suffix ;
 
@@ -14,7 +14,7 @@ GENERIC: ppop ( seq -- seq' )
 
 M: sequence ppop 1 head* ;
 
-GENERIC: new-nth ( obj i seq -- seq' )
+GENERIC: new-nth ( val i seq -- seq' )
 
 M: sequence new-nth clone [ set-nth ] keep ;
 
@@ -26,39 +26,38 @@ M: persistent-vector length count>> ;
 
 TUPLE: node children level ;
 
-: node-mask HEX: 1f bitand ; inline
-
 : node-size 32 ; inline
 
-: tail-offset [ count>> ] [ tail>> children>> length ] bi - ;
+: node-mask node-size mod ; inline
 
 : node-shift -5 * shift ; inline
 
 : node-nth ( i node -- obj )
-    children>> [ node-mask ] dip nth ; inline
+    [ node-mask ] [ children>> ] bi* nth ; inline
 
-: body-nth ( i node -- obj )
-    dup level>> 0 > [
-        [ drop ] [ [ level>> node-shift ] keep node-nth ] 2bi
-        body-nth
-    ] [
-        node-nth
-    ] if ; inline
+: body-nth ( i node -- i node' )
+    dup level>> [
+        dupd [ level>> node-shift ] keep node-nth
+    ] times ; inline
+
+: tail-offset ( pvec -- n )
+    [ count>> ] [ tail>> children>> length ] bi - ;
 
 M: persistent-vector nth-unsafe
     2dup tail-offset >=
-    [ tail>> node-nth ] [ root>> body-nth ] if ;
+    [ tail>> ] [ root>> body-nth ] if
+    node-nth ;
 
-: node-add ( obj node -- node' )
+: node-add ( val node -- node' )
     clone [ ppush ] change-children ;
 
-: ppush-tail ( obj pvec -- pvec' )
+: ppush-tail ( val pvec -- pvec' )
     [ node-add ] change-tail ;
 
 : full? ( node -- ? )
     children>> length node-size = ;
 
-: 1node ( obj level -- node )
+: 1node ( val level -- node )
     node new
         swap >>level
         swap 1array >>children ;
@@ -69,11 +68,11 @@ M: persistent-vector nth-unsafe
 : new-child ( new-child node -- node' expansion/f )
     dup full? [ tuck level>> 1node ] [ node-add f ] if ;
 
-: pset-last ( val seq -- seq' )
+: new-last ( val seq -- seq' )
     [ length 1- ] keep new-nth ;
 
 : node-set-last ( child node -- node' )
-    clone [ pset-last ] change-children ;
+    clone [ new-last ] change-children ;
 
 : (ppush-new-tail) ( tail node -- node' expansion/f )
     dup level>> 1 = [
@@ -86,12 +85,12 @@ M: persistent-vector nth-unsafe
 : do-expansion ( pvec root expansion/f -- pvec )
     [ 2node ] when* >>root ;
 
-: ppush-new-tail ( obj pvec -- pvec' )
+: ppush-new-tail ( val pvec -- pvec' )
     [ ] [ tail>> ] [ root>> ] tri
     (ppush-new-tail) do-expansion
     swap 0 1node >>tail ;
 
-M: persistent-vector ppush ( obj pvec -- pvec' )
+M: persistent-vector ppush ( val pvec -- pvec' )
     clone
     dup tail>> full?
     [ ppush-new-tail ] [ ppush-tail ] if
@@ -173,7 +172,7 @@ M: persistent-vector like
 M: persistent-vector equal?
     over persistent-vector? [ sequence= ] [ 2drop f ] if ;
 
-: >persistent-vector ( seq -- pvec ) pempty clone-like ; inline
+: >persistent-vector ( seq -- pvec ) pempty like ; inline
 
 : PV{ \ } [ >persistent-vector ] parse-literal ; parsing
 
