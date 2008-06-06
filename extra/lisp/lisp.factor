@@ -96,10 +96,10 @@ PRIVATE>
     convert-form lambda-rewrite call ; inline
     
 : macro-call ( lambda -- cons )
-    call ;
+    call ; inline
     
 : macro-expand ( cons -- quot )
-    uncons lookup-macro macro-call compile-form ;
+    uncons [ list>seq [ ] like ] [ lookup-macro macro-call compile-form  ] bi* call ;
     
 : lisp-string>factor ( str -- quot )
     lisp-expr parse-result-ast compile-form ;
