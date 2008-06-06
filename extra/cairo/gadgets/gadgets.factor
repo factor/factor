@@ -25,11 +25,11 @@ TUPLE: cairo-gadget < texture-gadget dim quot ;
 M: cairo-gadget cache-key* [ dim>> ] [ quot>> ] bi 2array ;
 
 : render-cairo ( dim quot -- bytes format )
-    >r 2^-bounds r> copy-cairo GL_BGRA ;
+    >r 2^-bounds r> copy-cairo GL_BGRA ; inline
 
-M: cairo-gadget render*
-    [ dim>> dup ] [ quot>> ] bi
-    render-cairo render-bytes* ;
+! M: cairo-gadget render*
+!     [ dim>> dup ] [ quot>> ] bi
+!     render-cairo render-bytes* ;
 
 ! maybe also texture>png
 ! : cairo>png ( gadget path -- )
