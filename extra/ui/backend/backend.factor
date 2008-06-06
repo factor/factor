@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io kernel namespaces opengl opengl.gl ;
+USING: kernel namespaces opengl opengl.gl ;
 IN: ui.backend
 
 SYMBOL: ui-backend
