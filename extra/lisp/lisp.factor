@@ -9,8 +9,8 @@ IN: lisp
 DEFER: convert-form
 DEFER: funcall
 DEFER: lookup-var
-DEFER: lisp-macro?
 DEFER: lookup-macro
+DEFER: lisp-macro?
 DEFER: macro-expand
 DEFER: define-lisp-macro
     
@@ -96,10 +96,10 @@ PRIVATE>
     convert-form lambda-rewrite call ; inline
     
 : macro-call ( lambda -- cons )
-    call ;
+    call ; inline
     
 : macro-expand ( cons -- quot )
-    uncons lookup-macro macro-call compile-form ;
+    uncons [ list>seq [ ] like ] [ lookup-macro macro-call compile-form  ] bi* call ;
     
 : lisp-string>factor ( str -- quot )
     lisp-expr parse-result-ast compile-form ;
@@ -110,10 +110,9 @@ PRIVATE>
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SYMBOL: lisp-env
-ERROR: no-such-var variable-name ;
-    
 SYMBOL: macro-env
     
+ERROR: no-such-var variable-name ;
 M: no-such-var summary drop "No such variable" ;
 
 : init-env ( -- )
