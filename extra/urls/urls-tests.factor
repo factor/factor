@@ -1,7 +1,7 @@
 IN: urls.tests
 USING: urls urls.private tools.test
 tuple-syntax arrays kernel assocs
-present ;
+present accessors ;
 
 [ "hello%20world" ] [ "hello world" url-encode ] unit-test
 [ "hello world" ] [ "hello%20world" url-decode ] unit-test
@@ -224,3 +224,5 @@ urls [
 [ "a" ] [
     <url> "a" "b" set-query-param "b" query-param
 ] unit-test
+
+[ "foo#3" ] [ URL" foo" clone 3 >>anchor present ] unit-test

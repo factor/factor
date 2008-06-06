@@ -170,7 +170,7 @@ M: url present
             [ dup protocol>> dup [ unparse-host-part ] [ 2drop ] if ]
             [ path>> url-encode % ]
             [ query>> dup assoc-empty? [ drop ] [ "?" % assoc>query % ] if ]
-            [ anchor>> [ "#" % url-encode % ] when* ]
+            [ anchor>> [ "#" % present url-encode % ] when* ]
         } cleave
     ] "" make ;
 

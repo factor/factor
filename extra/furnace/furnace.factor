@@ -151,7 +151,7 @@ CHLOE: a
 : form-magic ( tag -- )
     [ modify-form ] each-responder
     nested-values get " " join f like form-nesting-key hidden-form-field
-    "for" optional-attr [ hidden render ] when* ;
+    "for" optional-attr [ "," split [ hidden render ] each ] when* ;
 
 : form-start-tag ( tag -- )
     [
