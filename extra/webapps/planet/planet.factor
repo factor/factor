@@ -4,7 +4,7 @@ USING: kernel accessors sequences sorting math math.order
 calendar alarms logging concurrency.combinators namespaces
 sequences.lib db.types db.tuples db fry locals hashtables
 html.components
-rss urls xml.writer
+syndication urls xml.writer
 validators
 http.server
 http.server.dispatchers
@@ -13,7 +13,7 @@ furnace.actions
 furnace.boilerplate
 furnace.auth.login
 furnace.auth
-furnace.rss ;
+furnace.syndication ;
 IN: webapps.planet
 
 TUPLE: planet-factor < dispatcher ;
@@ -34,16 +34,15 @@ blog "BLOGS"
     { "feed-url" "FEEDURL" { VARCHAR 256 } +not-null+ }
 } define-persistent
 
-! TUPLE: posting < entry id ;
-TUPLE: posting id title link description pub-date ;
+TUPLE: posting < entry id ;
 
 posting "POSTINGS"
 {
     { "id" "ID" INTEGER +db-assigned-id+ }
     { "title" "TITLE" { VARCHAR 256 } +not-null+ }
-    { "link" "LINK" { VARCHAR 256 } +not-null+ }
+    { "url" "LINK" { VARCHAR 256 } +not-null+ }
     { "description" "DESCRIPTION" TEXT +not-null+ }
-    { "pub-date" "DATE" TIMESTAMP +not-null+ }
+    { "date" "DATE" TIMESTAMP +not-null+ }
 } define-persistent
 
 : init-blog-table blog ensure-table ;
@@ -60,7 +59,7 @@ posting "POSTINGS"
 
 : postings ( -- seq )
     posting new select-tuples
-    [ [ pub-date>> ] compare invert-comparison ] sort ;
+    [ [ date>> ] compare invert-comparison ] sort ;
 
 : <edit-blogroll-action> ( -- action )
     <page-action>
@@ -76,21 +75,18 @@ posting "POSTINGS"
 
         { planet-factor "planet" } >>template ;
 
-: planet-feed ( -- feed )
-    feed new
-        "Planet Factor" >>title
-        "http://planet.factorcode.org" >>link
-        postings >>entries ;
-
 : <planet-feed-action> ( -- action )
-    <feed-action> [ planet-feed ] >>feed ;
+    <feed-action>
+        [ "Planet Factor" ] >>title
+        [ URL" $planet-factor" ] >>url
+        [ postings ] >>entries ;
 
 :: <posting> ( entry name -- entry' )
     posting new
         name ": " entry title>> 3append >>title
-        entry link>> >>link
+        entry url>> >>url
         entry description>> >>description
-        entry pub-date>> >>pub-date ;
+        entry date>> >>date ;
 
 : fetch-feed ( url -- feed )
     download-feed entries>> ;
@@ -102,7 +98,7 @@ posting "POSTINGS"
     [ '[ , <posting> ] map ] 2map concat ;
 
 : sort-entries ( entries -- entries' )
-    [ [ pub-date>> ] compare invert-comparison ] sort ;
+    [ [ date>> ] compare invert-comparison ] sort ;
 
 : update-cached-postings ( -- )
     blogroll fetch-blogroll sort-entries 8 short head [
@@ -197,8 +193,11 @@ can-administer-planet-factor? define-capability
 : <planet-factor> ( -- responder )
     planet-factor new-dispatcher
         <planet-action> "list" add-main-responder
-        <feed-action> "feed.xml" add-responder
-        <planet-factor-admin> { can-administer-planet-factor? } <protected> "admin" add-responder
+        <planet-feed-action> "feed.xml" add-responder
+        <planet-factor-admin> <protected>
+            "administer Planet Factor" >>description
+            { can-administer-planet-factor? } >>capabilities
+        "admin" add-responder
     <boilerplate>
         { planet-factor "planet-common" } >>template ;
 

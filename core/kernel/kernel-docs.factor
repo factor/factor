@@ -219,6 +219,16 @@ $nl
 { $example "t \\ t eq? ." "t" }
 "Many words which search collections confuse the case of no element being present with an element being found equal to " { $link f } ". If this distinction is imporant, there is usually an alternative word which can be used; for example, compare " { $link at } " with " { $link at* } "." ;
 
+ARTICLE: "conditionals-boolean-equivalence" "Expressing conditionals with boolean logic"
+"Certain simple conditional forms can be expressed in a simpler manner using boolean logic."
+$nl
+"The following two lines are equivalent:"
+{ $code "[ drop f ] unless" "swap and" }
+"The following two lines are equivalent:"
+{ $code "[ ] [ ] ?if" "swap or" }
+"The following two lines are equivalent, where " { $snippet "L" } " is a literal:"
+{ $code "[ L ] unless*" "L or" } ;
+
 ARTICLE: "conditionals" "Conditionals and logic"
 "The basic conditionals:"
 { $subsection if }
@@ -238,6 +248,7 @@ ARTICLE: "conditionals" "Conditionals and logic"
 { $subsection and }
 { $subsection or }
 { $subsection xor }
+{ $subsection "conditionals-boolean-equivalence" }
 "See " { $link "combinators" } " for forms which abstract away common patterns involving multiple nested branches."
 { $see-also "booleans" "bitwise-arithmetic" both? either? } ;
 
@@ -720,9 +731,7 @@ HELP: unless*
 { $description "Variant of " { $link if* } " with no true quotation." }
 { $notes
 "The following two lines are equivalent:"
-{ $code "X [ Y ] unless*" "X dup [ ] [ drop Y ] if" }
-"The following two lines are equivalent, where " { $snippet "L" } " is a literal:"
-{ $code "[ L ] unless*" "L or" } } ;
+{ $code "X [ Y ] unless*" "X dup [ ] [ drop Y ] if" } } ;
 
 HELP: ?if
 { $values { "default" object } { "cond" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } { "false" "a quotation with stack effect " { $snippet "( default -- )" } } }

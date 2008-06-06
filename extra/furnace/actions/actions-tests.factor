@@ -21,3 +21,21 @@ blah
     init-request
     { } "action-1" get call-responder
 ] unit-test
+
+<action>
+    "a" >>rest
+    [ "a" param string>number sq ] >>display
+"action-2" set
+
+STRING: action-request-test-2
+GET http://foo/bar/123 HTTP/1.1
+
+blah
+;
+
+[ 25 ] [
+    action-request-test-2 lf>crlf
+    [ read-request ] with-string-reader
+    init-request
+    { "5" } "action-2" get call-responder
+] unit-test

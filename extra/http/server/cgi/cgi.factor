@@ -35,8 +35,10 @@ IN: http.server.cgi
         request get "accept" header "HTTP_ACCEPT" set
 
         post? [
-            request get post-data-type>> "CONTENT_TYPE" set
-            request get post-data>> length number>string "CONTENT_LENGTH" set
+            request get post-data>> raw>>
+            [ "CONTENT_TYPE" set ]
+            [ length number>string "CONTENT_LENGTH" set ]
+            bi
         ] when
     ] H{ } make-assoc ;
 
@@ -51,7 +53,7 @@ IN: http.server.cgi
     "CGI output follows" >>message
     swap '[
         , output-stream get swap <cgi-process> <process-stream> [
-            post? [ request get post-data>> write flush ] when
+            post? [ request get post-data>> raw>> write flush ] when
             input-stream get swap (stream-copy)
         ] with-stream
     ] >>body ;

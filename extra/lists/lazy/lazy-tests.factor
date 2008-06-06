@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Matthew Willis and Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: lazy-lists tools.test kernel math io sequences ;
-IN: lazy-lists.tests
+USING: lists lists.lazy tools.test kernel math io sequences ;
+IN: lists.lazy.tests
 
 [ { 1 2 3 4 } ] [
   { 1 2 3 4 } >list list>array
@@ -25,5 +25,5 @@ IN: lazy-lists.tests
 ] unit-test
 
 [ { 4 5 6 } ] [ 
-    3 { 1 2 3 } >list [ + ] lmap-with list>array
+    3 { 1 2 3 } >list [ + ] lazy-map-with list>array
 ] unit-test

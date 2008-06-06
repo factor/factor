@@ -5,7 +5,7 @@
 
 USING: io kernel namespaces prettyprint quotations
 sequences strings words xml.entities compiler.units effects
-urls math math.parser combinators calendar calendar.format ;
+urls math math.parser combinators present ;
 
 IN: html.elements
 
@@ -127,22 +127,11 @@ SYMBOL: html
     dup def-for-html-word-<foo
     def-for-html-word-foo/> ;
 
-: object>string ( object -- string )
-    #! Should this be generic and in the core?
-    {
-        { [ dup real? ] [ number>string ] }
-        { [ dup timestamp? ] [ timestamp>string ] }
-        { [ dup url? ] [ url>string ] }
-        { [ dup string? ] [ ] }
-        { [ dup word? ] [ word-name ] }
-        { [ dup not ] [ drop "" ] }
-    } cond ;
-
 : write-attr ( value name -- )
     " " write-html
     write-html
     "='" write-html
-    object>string escape-quoted-string write-html
+    present escape-quoted-string write-html
     "'" write-html ;
 
 : attribute-effect T{ effect f { "string" } 0 } ;

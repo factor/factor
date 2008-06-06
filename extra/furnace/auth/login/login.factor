@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors quotations assocs kernel splitting
 combinators sequences namespaces hashtables sets
-fry arrays threads qualified random validators
+fry arrays threads qualified random validators words
 io
 io.sockets
 io.encodings.utf8
@@ -26,13 +26,28 @@ furnace.auth
 furnace.auth.providers
 furnace.auth.providers.db
 furnace.actions
-furnace.flows
+furnace.asides
+furnace.flash
 furnace.sessions
 furnace.boilerplate ;
 QUALIFIED: smtp
 IN: furnace.auth.login
 
+: word>string ( word -- string )
+    [ word-vocabulary ] [ drop ":" ] [ word-name ] tri 3append ;
+
+: words>strings ( seq -- seq' )
+    [ word>string ] map ;
+
+: string>word ( string -- word )
+    ":" split1 swap lookup ;
+
+: strings>words ( seq -- seq' )
+    [ string>word ] map ;
+
 TUPLE: login < dispatcher users checksum ;
+
+TUPLE: protected < filter-responder description capabilities ;
 
 : users ( -- provider )
     login get users>> ;
@@ -64,7 +79,7 @@ M: user-saver dispose
 
 ! ! ! Login
 : successful-login ( user -- response )
-    username>> set-uid URL" $login" end-flow ;
+    username>> set-uid URL" $login" end-aside ;
 
 : login-failed ( -- * )
     "invalid username or password" validation-error
@@ -72,6 +87,13 @@ M: user-saver dispose
 
 : <login-action> ( -- action )
     <page-action>
+        [
+            protected fget [
+                [ description>> "description" set-value ]
+                [ capabilities>> words>strings "capabilities" set-value ] bi
+            ] when*
+        ] >>init
+
         { login "login" } >>template
 
         [
@@ -177,7 +199,7 @@ M: user-saver dispose
 
             drop
 
-            URL" $login" end-flow
+            URL" $login" end-aside
         ] >>submit ;
 
 ! ! ! Password recovery
@@ -290,23 +312,23 @@ SYMBOL: lost-password-from
     <action>
         [
             f set-uid
-            URL" $login" end-flow
+            URL" $login" end-aside
         ] >>submit ;
 
 ! ! ! Authentication logic
-
-TUPLE: protected < filter-responder capabilities ;
-
-C: <protected> protected
+: <protected> ( responder -- protected )
+    protected new
+        swap >>responder ;
 
 : show-login-page ( -- response )
-    begin-flow
-    URL" $login/login" <redirect> ;
+    begin-aside
+    URL" $login/login" { protected } <flash-redirect> ;
 
 : check-capabilities ( responder user -- ? )
     [ capabilities>> ] bi@ subset? ;
 
 M: protected call-responder* ( path responder -- response )
+    dup protected set
     uid dup [
         users get-user 2dup check-capabilities [
             [ logged-in-user set ] [ save-user-after ] bi
@@ -337,7 +359,9 @@ M: login call-responder* ( path responder -- response )
 ! ! ! Configuration
 
 : allow-edit-profile ( login -- login )
-    <edit-profile-action> f <protected> <login-boilerplate>
+    <edit-profile-action> <protected>
+        "edit your profile" >>description
+    <login-boilerplate>
         "edit-profile" add-responder ;
 
 : allow-registration ( login -- login )

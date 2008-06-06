@@ -1,15 +1,16 @@
 USING: http tools.test multiline tuple-syntax
 io.streams.string kernel arrays splitting sequences
-assocs io.sockets db db.sqlite continuations urls ;
+assocs io.sockets db db.sqlite continuations urls hashtables ;
 IN: http.tests
 
 : lf>crlf "\n" split "\r\n" join ;
 
 STRING: read-request-test-1
-GET http://foo/bar HTTP/1.1
+POST http://foo/bar HTTP/1.1
 Some-Header: 1
 Some-Header: 2
 Content-Length: 4
+Content-type: application/octet-stream
 
 blah
 ;
@@ -17,10 +18,10 @@ blah
 [
     TUPLE{ request
         url: TUPLE{ url protocol: "http" port: 80 path: "/bar" }
-        method: "GET"
+        method: "POST"
         version: "1.1"
-        header: H{ { "some-header" "1; 2" } { "content-length" "4" } }
-        post-data: "blah"
+        header: H{ { "some-header" "1; 2" } { "content-length" "4" } { "content-type" "application/octet-stream" } }
+        post-data: TUPLE{ post-data content: "blah" raw: "blah" content-type: "application/octet-stream" }
         cookies: V{ }
     }
 ] [
@@ -30,8 +31,9 @@ blah
 ] unit-test
 
 STRING: read-request-test-1'
-GET /bar HTTP/1.1
+POST /bar HTTP/1.1
 content-length: 4
+content-type: application/octet-stream
 some-header: 1; 2
 
 blah
@@ -87,7 +89,7 @@ blah
         code: 404
         message: "not found"
         header: H{ { "content-type" "text/html; charset=UTF8" } }
-        cookies: V{ }
+        cookies: { }
         content-type: "text/html"
         content-charset: "UTF8"
     }
@@ -172,7 +174,7 @@ test-db [
 [ ] [
     [
         <dispatcher>
-            <action> f <protected>
+            <action> <protected>
             <login>
             <sessions>
             "" add-responder
@@ -217,5 +219,58 @@ test-db [
 [ ] [ 100 sleep ] unit-test
 
 [ "Hi" ] [ "http://localhost:1237/" http-get ] unit-test
+
+[ "Goodbye" ] [ "http://localhost:1237/quit" http-get ] unit-test
+
+USING: html.components html.elements xml xml.utilities validators
+furnace furnace.flash ;
+
+SYMBOL: a
+
+[ ] [
+    [
+        <dispatcher>
+            <action>
+                [ a get-global "a" set-value ] >>init
+                [ [ <html> "a" <field> render </html> ] "text/html" <content> ] >>display
+                [ { { "a" [ v-integer ] } } validate-params ] >>validate
+                [ "a" value a set-global URL" " <redirect> ] >>submit
+            <flash-scopes>
+            <sessions>
+            >>default
+            add-quit-action
+        test-db <db-persistence>
+        main-responder set
+
+        [ 1237 httpd ] "HTTPD test" spawn drop
+    ] with-scope
+] unit-test
+
+[ ] [ 100 sleep ] unit-test
+
+3 a set-global
+
+: test-a string>xml "input" tag-named "value" swap at ;
+
+[ "3" ] [
+    "http://localhost:1237/" http-get*
+    swap dup cookies>> "cookies" set session-id-key get-cookie
+    value>> "session-id" set test-a
+] unit-test
+
+[ "4" ] [
+    H{ { "a" "4" } { "__u" "http://localhost:1237/" } } "session-id" get session-id-key associate assoc-union
+    "http://localhost:1237/" <post-request> "cookies" get >>cookies http-request nip test-a
+] unit-test
+
+[ 4 ] [ a get-global ] unit-test
+
+! Test flash scope
+[ "xyz" ] [
+    H{ { "a" "xyz" } { "__u" "http://localhost:1237/" } } "session-id" get session-id-key associate assoc-union
+    "http://localhost:1237/" <post-request> "cookies" get >>cookies http-request nip test-a
+] unit-test
+
+[ 4 ] [ a get-global ] unit-test
 
 [ "Goodbye" ] [ "http://localhost:1237/quit" http-get ] unit-test

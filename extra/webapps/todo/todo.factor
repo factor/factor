@@ -122,4 +122,5 @@ todo "TODO"
         <delete-action> "delete" add-responder
     <boilerplate>
         { todo-list "todo" } >>template
-    f <protected> ;
+    <protected>
+        "view your todo list" >>description ;

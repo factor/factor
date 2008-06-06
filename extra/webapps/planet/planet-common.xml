@@ -11,10 +11,10 @@
 
 		<t:if t:code="furnace.sessions:uid">
 			<t:if t:code="furnace.auth.login:allow-edit-profile?">
-				| <t:a t:href="$login/edit-profile" t:flow="begin">Edit Profile</t:a>
+				| <t:a t:href="$login/edit-profile" t:aside="begin">Edit Profile</t:a>
 			</t:if>
 	
-			| <t:button t:action="$login/logout" t:flow="begin" class="link-button link">Logout</t:button>
+			| <t:button t:action="$login/logout" t:aside="begin" class="link-button link">Logout</t:button>
 		</t:if>
 	</div>
 

@@ -19,7 +19,9 @@ TUPLE: texture-gadget bytes format dim tex ;
         swap >>format
         swap >>bytes ;
 
-:: render ( gadget -- )
+GENERIC: render* ( texture-gadget -- )
+
+M:: texture-gadget render* ( gadget -- )
     GL_ENABLE_BIT [
         GL_TEXTURE_2D glEnable
         GL_TEXTURE_2D gadget tex>> glBindTexture
@@ -63,8 +65,8 @@ M: texture-gadget draw-gadget* ( gadget -- )
     ] with-translation ;
 
 M: texture-gadget graft* ( gadget -- )
-    gen-texture >>tex [ render ]
-    [ f >>bytes f >>format drop ] bi ;
+    gen-texture >>tex [ render* ]
+    [ f >>bytes drop ] bi ;
 
 M: texture-gadget ungraft* ( gadget -- )
     tex>> delete-texture ;

@@ -4,6 +4,19 @@
 
 	<t:title>Login</t:title>
 
+	<t:if t:value="description">
+		<p>You must log in to <t:label t:name="description" />.</p>
+	</t:if>
+
+	<t:if t:value="capabilities">
+		<p>Your user must have the following capabilities:</p>
+		<ul>
+			<t:each t:name="capabilities">
+				<li><t:label t:name="value" /></li>
+			</t:each>
+		</ul>
+	</t:if>
+
 	<t:form t:action="login">
 
 		<table>

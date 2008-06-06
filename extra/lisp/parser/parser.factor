@@ -1,15 +1,12 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel peg.ebnf peg.expr math.parser sequences arrays strings
-combinators.lib math ;
+USING: kernel peg peg.ebnf peg.expr math.parser sequences arrays strings
+combinators.lib math fry accessors lists ;
 
 IN: lisp.parser
 
 TUPLE: lisp-symbol name ;
 C: <lisp-symbol> lisp-symbol
-
-TUPLE: s-exp body ;
-C: <s-exp> s-exp
 
 EBNF: lisp-expr
 _            = (" " | "\t" | "\n")*
@@ -24,8 +21,9 @@ rational     = integer "/" (digit)+                      => [[ first3 nip string
 number       = float
               | rational
               | integer
-id-specials  = "!" | "$" | "%" | "&" | "*" | "/" | ":" | "<" | "#"
-              | " =" | ">" | "?" | "^" | "_" | "~" | "+" | "-" | "." | "@"
+id-specials  = "!" | "$" | "%" | "&" | "*" | "/" | ":"
+              | "<" | "#" | " =" | ">" | "?" | "^" | "_"
+              | "~" | "+" | "-" | "." | "@"
 letters      = [a-zA-Z]                                  => [[ 1array >string ]]
 initials     = letters | id-specials
 numbers      = [0-9]                                     => [[ 1array >string ]]
@@ -36,6 +34,6 @@ string       = dquote ( escaped | !(dquote) . )*  dquote => [[ second >string ]]
 atom         = number
               | identifier
               | string
-list-item    = _ (atom|s-expression) _                   => [[ second ]]
-s-expression = LPAREN (list-item)* RPAREN                => [[ second <s-exp> ]]
+list-item    = _ ( atom | s-expression ) _               => [[ second ]]
+s-expression = LPAREN (list-item)* RPAREN                => [[ second seq>cons ]]
 ;EBNF
