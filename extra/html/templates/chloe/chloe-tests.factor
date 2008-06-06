@@ -148,3 +148,35 @@ TUPLE: person first-name last-name ;
         "test9" test-template call-template
     ] run-template
 ] unit-test
+
+[ ] [ H{ { "a" H{ { "b" "c" } } } } values set ] unit-test
+
+[ "<form method='POST' action='foo'><input type='hidden' name='__n' value='a'/></form>" ] [
+    [
+        "test10" test-template call-template
+    ] run-template
+] unit-test
+
+[ ] [ blank-values ] unit-test
+
+[ ] [
+    H{ { "first-name" "RBaxter" } { "last-name" "Unknown" } } "person" set-value
+] unit-test
+
+[ "<table><tr><td>RBaxter</td><td>Unknown</td></tr></table>" ] [
+    [
+        "test11" test-template call-template
+    ] run-template [ blank? not ] filter
+] unit-test
+
+[ ] [
+    blank-values
+    { "a" "b" } "choices" set-value
+    "true" "b" set-value
+] unit-test
+
+[ "<input type='checkbox' name='a'>a</input><input type='checkbox' name='b' checked='true'>b</input>" ] [
+    [
+        "test12" test-template call-template
+    ] run-template
+] unit-test

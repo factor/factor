@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bit-arrays kernel lazy-lists math math.functions math.primes.list
+USING: bit-arrays kernel lists.lazy math math.functions math.primes.list
        math.ranges sequences ;
 IN: math.erato
 

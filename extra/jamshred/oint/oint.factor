@@ -39,8 +39,11 @@ C: <oint> oint
 : random-turn ( oint theta -- )
     2 / 2dup random-float+- left-pivot random-float+- up-pivot ;
 
+: location+ ( v oint -- )
+    [ location>> v+ ] [ (>>location) ] bi ;
+
 : go-forward ( distance oint -- )
-    [ forward>> n*v ] [ location>> v+ ] [ (>>location) ] tri ;
+    [ forward>> n*v ] [ location+ ] bi ;
 
 : distance-vector ( oint oint -- vector )
     [ location>> ] bi@ swap v- ;
@@ -62,3 +65,9 @@ C: <oint> oint
 :: reflect ( v n -- v' )
     #! bounce v on a surface with normal n
     v v n v. n n v. / 2 * n n*v v- ;
+
+: half-way ( p1 p2 -- p3 )
+    over v- 2 v/n v+ ;
+
+: half-way-between-oints ( o1 o2 -- p )
+    [ location>> ] bi@ half-way ;

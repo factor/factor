@@ -40,7 +40,7 @@ main-responder global [ <404> <trivial-responder> or ] change-at
 
 : <500> ( error -- response )
     500 "Internal server error" <trivial-response>
-    development-mode get [ swap '[ , http-error. ] >>body ] [ drop ] if ;
+    swap development-mode get [ '[ , http-error. ] >>body ] [ drop ] if ;
 
 : do-response ( response -- )
     dup write-response

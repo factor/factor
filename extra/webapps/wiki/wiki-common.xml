@@ -2,6 +2,10 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
+	<t:atom t:href="$wiki/changes.atom">
+		Recent Changes
+	</t:atom>
+
 	<t:style t:include="resource:extra/webapps/wiki/wiki.css" />
 
 	<div class="navbar">
@@ -13,10 +17,10 @@
 		<t:if t:code="furnace.sessions:uid">
 
 			<t:if t:code="furnace.auth.login:allow-edit-profile?">
-				| <t:a t:href="$login/edit-profile" t:flow="begin">Edit Profile</t:a>
+				| <t:a t:href="$login/edit-profile" t:aside="begin">Edit Profile</t:a>
 			</t:if>
 
-			| <t:button t:action="$login/logout" t:flow="begin" class="link-button link">Logout</t:button>
+			| <t:button t:action="$login/logout" t:aside="begin" class="link-button link">Logout</t:button>
 
 		</t:if>
 
