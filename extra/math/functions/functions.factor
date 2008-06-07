@@ -182,17 +182,17 @@ M: number (^)
 : coth ( x -- y ) tanh recip ; inline
 
 : acosh ( x -- y )
-    dup >=1? [ facosh ] [ dup sq 1- sqrt + log ] if ; inline
+    dup sq 1- sqrt + log ; inline
 
 : asech ( x -- y ) recip acosh ; inline
 
 : asinh ( x -- y )
-    dup complex? [ dup sq 1+ sqrt + log ] [ fasinh ] if ; inline
+    dup sq 1+ sqrt + log ; inline
 
 : acosech ( x -- y ) recip asinh ; inline
 
 : atanh ( x -- y )
-    dup [-1,1]? [ fatanh ] [ dup 1+ swap 1- neg / log 2 / ] if ; inline
+    dup 1+ swap 1- neg / log 2 / ; inline
 
 : acoth ( x -- y ) recip atanh ; inline
 

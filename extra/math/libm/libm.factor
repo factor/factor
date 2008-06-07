@@ -15,18 +15,6 @@ IN: math.libm
     "double" "libm" "atan" { "double" } alien-invoke ;
     foldable
 
-: facosh ( x -- y )
-    "double" "libm" "acosh" { "double" } alien-invoke ;
-    foldable
-
-: fasinh ( x -- y )
-    "double" "libm" "asinh" { "double" } alien-invoke ;
-    foldable
-
-: fatanh ( x -- y )
-    "double" "libm" "atanh" { "double" } alien-invoke ;
-    foldable
-
 : fatan2 ( x y -- z )
     "double" "libm" "atan2" { "double" "double" } alien-invoke ;
     foldable
@@ -69,4 +57,17 @@ IN: math.libm
 
 : fsqrt ( x -- y )
     "double" "libm" "sqrt" { "double" } alien-invoke ;
+    foldable
+    
+! Windows doesn't have these...
+: facosh ( x -- y )
+    "double" "libm" "acosh" { "double" } alien-invoke ;
+    foldable
+
+: fasinh ( x -- y )
+    "double" "libm" "asinh" { "double" } alien-invoke ;
+    foldable
+
+: fatanh ( x -- y )
+    "double" "libm" "atanh" { "double" } alien-invoke ;
     foldable

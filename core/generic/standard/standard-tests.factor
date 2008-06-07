@@ -3,7 +3,8 @@ USING: tools.test math math.functions math.constants
 generic.standard strings sequences arrays kernel accessors
 words float-arrays byte-arrays bit-arrays parser namespaces
 quotations inference vectors growable hashtables sbufs
-prettyprint byte-vectors bit-vectors float-vectors ;
+prettyprint byte-vectors bit-vectors float-vectors definitions
+generic sets graphs assocs ;
 
 GENERIC: lo-tag-test
 
@@ -287,3 +288,24 @@ M: sbuf no-stack-effect-decl ;
 [ ] [ \ no-stack-effect-decl see ] unit-test
 
 [ ] [ \ no-stack-effect-decl word-def . ] unit-test
+
+! Cross-referencing with generic words
+TUPLE: xref-tuple-1 ;
+TUPLE: xref-tuple-2 < xref-tuple-1 ;
+
+: (xref-test) drop ;
+
+GENERIC: xref-test ( obj -- )
+
+M: xref-tuple-1 xref-test (xref-test) ;
+M: xref-tuple-2 xref-test (xref-test) ;
+
+[ t ] [
+    \ xref-test
+    \ xref-tuple-1 \ xref-test method [ usage unique ] closure key?
+] unit-test
+
+[ t ] [
+    \ xref-test
+    \ xref-tuple-2 \ xref-test method [ usage unique ] closure key?
+] unit-test

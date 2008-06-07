@@ -44,8 +44,13 @@ main-responder global [ <404> <trivial-responder> or ] change-at
 
 : do-response ( response -- )
     dup write-response
-    request get method>> "HEAD" =
-    [ drop ] [ '[ , write-response-body ] [ http-error. ] recover ] if ;
+    request get method>> "HEAD" = [ drop ] [
+        '[ , write-response-body ]
+        [
+            development-mode get
+            [ http-error. ] [ drop "Response error" ] if
+        ] recover
+    ] if ;
 
 LOG: httpd-hit NOTICE
 

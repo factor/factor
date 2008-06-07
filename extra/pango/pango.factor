@@ -9,14 +9,17 @@ IN: pango
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 << "pango" {
-!    { [ os winnt? ] [ "libpango-1.dll" ] }
-!    { [ os macosx? ] [ "libpango.dylib" ] }
+    { [ os winnt? ] [ "libpango-1.0-0.dll" ] }
+    { [ os macosx? ] [ "libpango-1.0.0.dylib" ] }
     { [ os unix? ] [ "libpango-1.0.so" ] }
 } cond "cdecl" add-library >>
 
 LIBRARY: pango
 
 : PANGO_SCALE 1024 ;
+
+FUNCTION: PangoLayout*
+pango_layout_new ( PangoContext* context ) ;
 
 FUNCTION: void
 pango_layout_set_text ( PangoLayout* layout, char* text, int length ) ;

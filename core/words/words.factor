@@ -102,7 +102,7 @@ SYMBOL: compiled-crossref
 compiled-crossref global [ H{ } assoc-like ] change-at
 
 : compiled-xref ( word dependencies -- )
-    [ drop compiled-crossref? ] assoc-filter
+    [ drop crossref? ] assoc-filter
     2dup "compiled-uses" set-word-prop
     compiled-crossref get add-vertex* ;
 
@@ -125,28 +125,9 @@ SYMBOL: +called+
         compiled-usage [ nip +inlined+ eq? ] assoc-filter update
     ] with each keys ;
 
-<PRIVATE
+GENERIC: redefined ( word -- )
 
-SYMBOL: visited
-
-: reset-on-redefine { "inferred-effect" "no-effect" } ; inline
-
-: (redefined) ( word -- )
-    dup visited get key? [ drop ] [
-        [ reset-on-redefine reset-props ]
-        [ dup visited get set-at ]
-        [
-            crossref get at keys
-            [ word? ] filter
-            [ reset-on-redefine [ word-prop ] with contains? ] filter
-            [ (redefined) ] each
-        ] tri
-    ] if ;
-
-PRIVATE>
-
-: redefined ( word -- )
-    H{ } clone visited [ (redefined) ] with-variable ;
+M: object redefined drop ;
 
 : define ( word def -- )
     [ ] like

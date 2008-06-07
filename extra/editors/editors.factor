@@ -53,7 +53,7 @@ M: object find-parse-error
 
 : fix ( word -- )
     [ "Fixing " write pprint " and all usages..." print nl ]
-    [ [ usage ] keep prefix ] bi
+    [ [ smart-usage ] keep prefix ] bi
     [
         [ "Editing " write . ]
         [

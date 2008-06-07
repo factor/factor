@@ -58,7 +58,7 @@ M: method-body (profile.)
     "Call counts for words which call " write
     dup pprint
     ":" print
-    usage [ word? ] filter counters counters. ;
+    smart-usage [ word? ] filter counters counters. ;
 
 : vocabs-profile. ( -- )
     "Call counts for all vocabularies:" print

@@ -59,9 +59,22 @@ PRIVATE>
 : convert-unquoted ( cons -- quot )    
     "unquote not valid outside of quasiquote!" throw ;
     
-: convert-quasiquoted ( cons -- newcons )
+: convert-unquoted-splicing ( cons -- quot )    
+    "unquote-splicing not valid outside of quasiquote!" throw ;
+    
+<PRIVATE    
+: quasiquote-unquote ( cons -- newcons )
     [ { [ dup list? ] [ car dup lisp-symbol? ] [ name>> "unquote" equal? dup ] } && nip ]
     [ cadr ] traverse ;
+    
+: quasiquote-unquote-splicing ( cons -- newcons )    
+    [ { [ dup list? ] [ dup cdr [ cons? ] [ car cons? ] bi and ]
+        [ dup cadr car lisp-symbol? ] [ cadr car name>> "unquote-splicing" equal? dup ] } && nip ]
+    [ dup cadr cdr >>cdr ] traverse ;
+PRIVATE>
+
+: convert-quasiquoted ( cons -- newcons )
+    quasiquote-unquote quasiquote-unquote-splicing ;
     
 : convert-defmacro ( cons -- quot )
     cdr [ car ] keep [ convert-lambda ] [ car name>> ] bi define-lisp-macro 1quotation ;
@@ -72,6 +85,7 @@ PRIVATE>
       { "defmacro" [ convert-defmacro ] }
       { "quote" [ convert-quoted ] }
       { "unquote" [ convert-unquoted ] }
+      { "unquote-splicing" [ convert-unquoted-splicing ] }
       { "quasiquote" [ convert-quasiquoted ] }
       { "begin" [ convert-begin ] }
       { "cond" [ convert-cond ] }
@@ -99,7 +113,7 @@ PRIVATE>
     call ; inline
     
 : macro-expand ( cons -- quot )
-    uncons [ list>seq [ ] like ] [ lookup-macro macro-call compile-form  ] bi* call ;
+    uncons [ list>seq [ ] like ] [ lookup-macro macro-call compile-form  ] bi* ;
     
 : lisp-string>factor ( str -- quot )
     lisp-expr parse-result-ast compile-form ;

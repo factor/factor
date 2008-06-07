@@ -66,7 +66,7 @@ GENERIC: definitions-changed ( assoc obj -- )
 
 : compile ( words -- )
     recompile-hook get call
-    dup [ drop compiled-crossref? ] assoc-contains?
+    dup [ drop crossref? ] assoc-contains?
     modify-code-heap ;
 
 SYMBOL: outdated-tuples
@@ -82,7 +82,7 @@ SYMBOL: update-tuples-hook
 : finish-compilation-unit ( -- )
     call-recompile-hook
     call-update-tuples-hook
-    dup [ drop compiled-crossref? ] assoc-contains? modify-code-heap
+    dup [ drop crossref? ] assoc-contains? modify-code-heap
      ;
 
 : with-nested-compilation-unit ( quot -- )

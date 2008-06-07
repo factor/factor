@@ -152,6 +152,9 @@ M: retryable execute-statement* ( statement type -- )
 : select-tuples ( tuple -- tuples )
     dup dup class <select-by-slots-statement> do-select ;
 
+: count-tuples ( tuple -- n )
+    select-tuples length ;
+
 : select-tuple ( tuple -- tuple/f )
     dup dup class f f f 1 <query>
     do-select ?first ;

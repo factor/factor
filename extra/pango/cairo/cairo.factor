@@ -9,8 +9,8 @@ arrays pango pango.fonts ;
 IN: pango.cairo
 
 << "pangocairo" {
-!    { [ os winnt? ] [ "libpangocairo-1.dll" ] }
-!    { [ os macosx? ] [ "libpangocairo.dylib" ] }
+    { [ os winnt? ] [ "libpangocairo-1.0-0.dll" ] }
+    { [ os macosx? ] [ "libpangocairo-1.0.0.dylib" ] }
     { [ os unix? ] [ "libpangocairo-1.0.so" ] }
 } cond "cdecl" add-library >>
 
@@ -93,42 +93,23 @@ pango_cairo_error_underline_path ( cairo_t* cr, double x, double y, double width
 ! Higher level words and combinators
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-USING: destructors accessors namespaces kernel cairo ;
-
-TUPLE: pango-layout alien ;
-C: <pango-layout> pango-layout
-M: pango-layout dispose ( alien -- ) alien>> g_object_unref ;
-
-: layout ( -- pango-layout ) pango-layout get ;
+USING: pango.layouts
+destructors accessors namespaces kernel cairo ;
 
 : (with-pango) ( layout quot -- )
     >r alien>> pango-layout r> with-variable ; inline
 
-: with-pango ( quot -- )
-    cr pango_cairo_create_layout <pango-layout> swap
-    [ (with-pango) ] curry with-disposal ; inline
-
-: pango-layout-get-pixel-size ( layout -- width height )
-    0 <int> 0 <int> [ pango_layout_get_pixel_size ] 2keep
-    [ *int ] bi@ ;
+: with-pango-cairo ( quot -- )
+    cr pango_cairo_create_layout swap with-layout ; inline
 
 MEMO: dummy-cairo ( -- cr )
     CAIRO_FORMAT_ARGB32 0 0 cairo_image_surface_create cairo_create ;
 
 : dummy-pango ( quot -- )
-    >r dummy-cairo cairo r> [ with-pango ] curry with-variable ; inline
+    >r dummy-cairo cairo r> [ with-pango-cairo ] curry with-variable ; inline
 
 : layout-size ( quot -- dim )
     [ layout pango-layout-get-pixel-size 2array ] compose dummy-pango ; inline
-
-: layout-font ( str -- )
-    pango_font_description_from_string
-    dup zero? [ "pango: not a valid font." throw ] when
-    layout over pango_layout_set_font_description
-    pango_font_description_free ;
-
-: layout-text ( str -- )
-    layout swap -1 pango_layout_set_text ;
 
 : show-layout ( -- )
     cr layout pango_cairo_show_layout ;

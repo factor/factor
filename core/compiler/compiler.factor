@@ -35,7 +35,7 @@ IN: compiler
     [ swap save-effect ]
     [ compiled-unxref ]
     [
-        dup compiled-crossref?
+        dup crossref?
         [ dependencies get compiled-xref ] [ drop ] if
     ] tri ;
 

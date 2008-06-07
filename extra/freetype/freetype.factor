@@ -155,6 +155,16 @@ C-STRUCT: face
     { "face-size*" "size" }
     { "void*" "charmap" } ;
 
+C-STRUCT: FT_Bitmap
+    { "int" "rows" }
+    { "int" "width" }
+    { "int" "pitch" }
+    { "void*" "buffer" }
+    { "short" "num_grays" }
+    { "char" "pixel_mode" }
+    { "char" "palette_mode" }
+    { "void*" "palette" } ;
+
 FUNCTION: FT_Error FT_New_Face ( void* library, FT_Char* font, FT_Long index, face* face ) ;
 
 FUNCTION: FT_Error FT_New_Memory_Face ( void* library, FT_Byte* file_base, FT_Long file_size, FT_Long face_index, FT_Face* aface ) ;
@@ -170,6 +180,15 @@ C-ENUM:
     FT_RENDER_MODE_LCD
     FT_RENDER_MODE_LCD_V ;
 
+C-ENUM:
+    FT_PIXEL_MODE_NONE
+    FT_PIXEL_MODE_MONO
+    FT_PIXEL_MODE_GRAY
+    FT_PIXEL_MODE_GRAY2
+    FT_PIXEL_MODE_GRAY4
+    FT_PIXEL_MODE_LCD
+    FT_PIXEL_MODE_LCD_V ;
+
 FUNCTION: int FT_Render_Glyph ( glyph* slot, int render_mode ) ;
 
 FUNCTION: void FT_Done_Face ( face* face ) ;
@@ -177,3 +196,4 @@ FUNCTION: void FT_Done_Face ( face* face ) ;
 FUNCTION: void FT_Done_FreeType ( void* library ) ;
 
 FUNCTION: FT_Long FT_MulFix ( FT_Long a, FT_Long b ) ;
+
