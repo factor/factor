@@ -43,7 +43,7 @@ DEFER: define-lisp-macro
     
 : rest-lambda ( body vars -- quot )
     "&rest" swap [ index ] [ remove ] 2bi
-    localize-lambda <lambda>
+    swapd localize-lambda <lambda>
     '[ , cut '[ @ , ] , compose ] ;
     
 : normal-lambda ( body vars -- quot )
