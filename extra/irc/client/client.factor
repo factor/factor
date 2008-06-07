@@ -33,14 +33,30 @@ TUPLE: irc-client profile nick stream in-messages out-messages join-messages
     [ <inet> latin1 <client> ] irc-client boa ;
 
 TUPLE: irc-listener in-messages out-messages ;
-: <irc-listener> ( -- irc-listener )
-    <mailbox> <mailbox> irc-listener boa ;
+TUPLE: irc-server-listener < irc-listener ;
+TUPLE: irc-channel-listener < irc-listener name password timeout ;
+TUPLE: irc-nick-listener < irc-listener name ;
+UNION: irc-named-listener irc-nick-listener irc-channel-listener ;
+
+: <irc-listener> ( -- irc-listener ) <mailbox> <mailbox> irc-listener boa ;
+
+: <irc-server-listener> ( -- irc-server-listener )
+     <mailbox> <mailbox> irc-server-listener boa ;
+
+: <irc-channel-listener> ( name -- irc-channel-listener )
+     <mailbox> <mailbox> rot f 60 seconds irc-channel-listener boa ;
+
+: <irc-nick-listener> ( name -- irc-nick-listener )
+     <mailbox> <mailbox> rot irc-nick-listener boa ;
 
 ! ======================================
 ! Message objects
 ! ======================================
 
-SINGLETON: irc-end ! Message used when the client isn't running anymore
+SINGLETON: irc-end  ! Message sent when the client isn't running anymore
+SINGLETON: irc-lost ! Message sent when connection was lost
+SINGLETON: irc-restore ! Message sent when connection was restored
+UNION: irc-broadcasted-message irc-end irc-lost irc-restore ;
 
 TUPLE: irc-message line prefix command parameters trailing timestamp ;
 TUPLE: logged-in < irc-message name ;
@@ -163,6 +179,9 @@ TUPLE: unhandled < irc-message ;
 : irc-message-origin ( irc-message -- name )
     dup name>> me? [ prefix>> parse-name ] [ name>> ] if ;
 
+: broadcast-message-to-listeners ( message -- )
+    irc-client> listeners>> values [ in-messages>> mailbox-put ] with each ;
+
 GENERIC: handle-incoming-irc ( irc-message -- )
 
 M: irc-message handle-incoming-irc ( irc-message -- )
@@ -184,8 +203,8 @@ M: privmsg handle-incoming-irc ( privmsg -- )
 M: join handle-incoming-irc ( join -- )
     irc-client> join-messages>> mailbox-put ;
 
-M: irc-end handle-incoming-irc ( irc-end -- )
-    irc-client> listeners>> values [ in-messages>> mailbox-put ] with each ;
+M: irc-broadcasted-message handle-incoming-irc ( irc-broadcasted-message -- )
+    broadcast-message-to-listeners ;
 
 ! ======================================
 ! Client message handling
@@ -249,26 +268,22 @@ M: privmsg handle-outgoing-irc ( privmsg -- )
 ! Listener join request handling
 ! ======================================
 
-: make-registered-listener ( name -- listener )
-    <irc-listener>
+: set+run-listener ( name irc-listener -- )
     [ [ listener-loop ] 2curry "listener" spawn-irc-loop ]
-    [ swap [ irc-client> listeners>> set-at ] curry keep ]
+    [ swap irc-client> listeners>> set-at ]
     2bi ;
 
-: make-join-future ( name -- future )
-    [ [ swap trailing>> = ] curry ! compare name with channel name
-      irc-client> join-messages>> 60 seconds rot mailbox-get-timeout?
-      trailing>> make-registered-listener ]
-    curry future ;
+GENERIC: (add-listener) ( irc-listener -- )
+M: irc-channel-listener (add-listener) ( irc-channel-listener -- )
+    [ [ name>> ] [ password>> ] bi /JOIN ]
+    [ [ [ drop irc-client> join-messages>> ]
+        [ timeout>> ]
+        [ name>> [ swap trailing>> = ] curry ]
+        tri mailbox-get-timeout? trailing>> ] keep set+run-listener
+    ] bi ;
 
-: make-user-future ( name -- future )
-    [ make-registered-listener ] curry future ;
-
-: maybe-join ( name password -- ? )
-    over "#" head? [ /JOIN t ] [ 2drop f ] if ;
-
-: make-listener-future ( name channel? -- future )
-    [ make-join-future ] [ make-user-future ] if ;
+M: irc-nick-listener (add-listener) ( irc-nick-listener -- )
+   [ name>> ] keep set+run-listener ;
 
 PRIVATE>
 
@@ -283,7 +298,6 @@ PRIVATE>
         spawn-irc
     ] with-variable ;
 
-: listen-to ( irc-client name -- future )
-    swap current-irc-client [
-        dup f maybe-join make-listener-future
-    ] with-variable ;
+GENERIC: add-listener ( irc-client irc-listener -- )
+M: irc-listener add-listener ( irc-client irc-listener -- )
+    current-irc-client swap [ (add-listener) ] curry with-variable ;
