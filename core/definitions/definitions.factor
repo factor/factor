@@ -47,7 +47,17 @@ M: object uses drop f ;
 
 : xref ( defspec -- ) dup uses crossref get add-vertex ;
 
-: usage ( defspec -- seq ) \ f or crossref get at keys ;
+: usage ( defspec -- seq ) crossref get at keys ;
+
+GENERIC: irrelevant? ( defspec -- ? )
+
+M: object irrelevant? drop f ;
+
+GENERIC: smart-usage ( defspec -- seq )
+
+M: f smart-usage drop \ f smart-usage ;
+
+M: object smart-usage usage [ irrelevant? not ] filter ;
 
 : unxref ( defspec -- )
     dup uses crossref get remove-vertex ;

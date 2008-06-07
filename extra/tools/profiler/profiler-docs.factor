@@ -44,7 +44,7 @@ HELP: vocab-profile.
 HELP: usage-profile.
 { $values { "word" word } }
 { $description "Prints a table of call counts from the most recent invocation of " { $link profile } ", for words which directly call " { $snippet "word" } " only." }
-{ $notes "This word obtains the list of static usages with the " { $link usage } " word, and is not aware of dynamic call history. Consider the following scenario. A word " { $snippet "X" } " can execute word " { $snippet "Y" } " in a conditional branch, and " { $snippet "X" } " is executed many times during the profiling run, but this particular branch executing " { $snippet "Y" } " is never taken. However, some other word does execute " { $snippet "Y" } " multiple times. Then " { $snippet "\\ Y usage-profile." } " will list a number of calls to " { $snippet "X" } ", even though " { $snippet "Y" } " was never executed " { $emphasis "from" } " " { $snippet "X" } "." }
+{ $notes "This word obtains the list of static usages with the " { $link smart-usage } " word, and is not aware of dynamic call history. Consider the following scenario. A word " { $snippet "X" } " can execute word " { $snippet "Y" } " in a conditional branch, and " { $snippet "X" } " is executed many times during the profiling run, but this particular branch executing " { $snippet "Y" } " is never taken. However, some other word does execute " { $snippet "Y" } " multiple times. Then " { $snippet "\\ Y usage-profile." } " will list a number of calls to " { $snippet "X" } ", even though " { $snippet "Y" } " was never executed " { $emphasis "from" } " " { $snippet "X" } "." }
 { $examples { $code "\\ + usage-profile." } } ;
 
 HELP: vocabs-profile.

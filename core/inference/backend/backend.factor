@@ -4,7 +4,7 @@ USING: inference.dataflow inference.state arrays generic io
 io.streams.string kernel math namespaces parser prettyprint
 sequences strings vectors words quotations effects classes
 continuations debugger assocs combinators compiler.errors
-generic.standard.engines.tuple accessors math.order ;
+generic.standard.engines.tuple accessors math.order definitions ;
 IN: inference.backend
 
 : recursive-label ( word -- label/f )
@@ -20,6 +20,28 @@ M: engine-word inline?
 
 M: word inline?
     "inline" word-prop ;
+
+SYMBOL: visited
+
+: reset-on-redefine { "inferred-effect" "no-effect" } ; inline
+
+: (redefined) ( word -- )
+    dup visited get key? [ drop ] [
+        [ reset-on-redefine reset-props ]
+        [ dup visited get set-at ]
+        [
+            crossref get at keys
+            [ word? ] filter
+            [
+                [ reset-on-redefine [ word-prop ] with contains? ]
+                [ inline? ]
+                bi or
+            ] filter
+            [ (redefined) ] each
+        ] tri
+    ] if ;
+
+M: word redefined H{ } clone visited [ (redefined) ] with-variable ;
 
 : local-recursive-state ( -- assoc )
     recursive-state get dup keys

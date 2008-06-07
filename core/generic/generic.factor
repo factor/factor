@@ -117,6 +117,9 @@ M: method-spec definition
 M: method-spec forget*
     first2 method forget* ;
 
+M: method-spec smart-usage
+    second smart-usage ;
+
 M: method-body definer
     drop \ M: \ ; ;
 
@@ -133,6 +136,9 @@ M: method-body forget*
         ]
         [ t "forgotten" set-word-prop ] bi
     ] if ;
+
+M: method-body smart-usage
+    "method-generic" word-prop smart-usage ;
 
 : implementors* ( classes -- words )
     all-words [
