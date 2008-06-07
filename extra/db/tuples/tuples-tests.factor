@@ -227,7 +227,7 @@ TUPLE: exam id name score ;
 
 : random-exam ( -- exam )
         f
-        6 [ CHAR: a CHAR: b [a,b] random ] replicate >string
+        6 [ CHAR: a CHAR: z [a,b] random ] replicate >string
         100 random
     exam boa ;
 
@@ -340,7 +340,9 @@ TUPLE: exam id name score ;
         }
     ] [
         T{ exam } select-tuples
-    ] unit-test ;
+    ] unit-test
+
+    [ 4 ] [ T{ exam } count-tuples ] unit-test ;
 
 TUPLE: bignum-test id m n o ;
 : <bignum-test> ( m n o -- obj )

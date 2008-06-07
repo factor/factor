@@ -3,7 +3,7 @@
 USING: accessors kernel math namespaces sequences random
 strings math.parser math.intervals combinators
 math.bitfields.lib namespaces.lib db db.tuples db.types
-sequences.lib ;
+sequences.lib db.sql classes words shuffle arrays ;
 IN: db.queries
 
 GENERIC: where ( specs obj -- )
@@ -146,7 +146,7 @@ M: db <select-by-slots-statement> ( tuple class -- statement )
         number>string " limit " prepend append
     ] curry change-sql drop ;
 
-: make-advanced-statement ( tuple advanced -- tuple' )
+: make-query ( tuple query -- tuple' )
     dupd
     {
         [ group>> [ do-group ] [ drop ] if* ]
@@ -155,6 +155,43 @@ M: db <select-by-slots-statement> ( tuple class -- statement )
         [ offset>> [ do-offset ] [ drop ] if* ]
     } 2cleave ;
 
-M: db <advanced-select-statement> ( tuple class group order limit offset -- tuple )
-    advanced-statement boa
-    [ <select-by-slots-statement> ] dip make-advanced-statement ;
+M: db <query> ( tuple class group order limit offset -- tuple )
+    \ query boa
+    [ <select-by-slots-statement> ] dip make-query ;
+
+! select ID, NAME, SCORE from EXAM limit 1 offset 3
+
+: select-tuples* ( tuple -- statement )
+    dup
+    [
+        select 0,
+        dup class db-columns [ ", " 0, ]
+        [ dup column-name>> 0, 2, ] interleave
+        from 0,
+        class word-name 0,
+    ] { { } { } { } } nmake
+    >r >r parse-sql 4drop r> r>
+    <simple-statement> maybe-make-retryable do-select ;
+
+M: db <count-statement> ( tuple class groups -- statement )
+    f f f \ query boa
+    [ [ "select count(*) from " 0% 0% where-clause ] query-make ]
+    dip make-query ;
+
+: where-clause* ( tuple specs -- )
+    dupd filter-slots [
+        drop
+    ] [
+        \ where 0,
+        [ 2dup slot-name>> swap get-slot-named where ] map 2array 0,
+        drop
+    ] if-empty ;
+
+: delete-tuple* ( tuple -- sql )
+    dup
+    [
+        delete 0, from 0, dup class db-table 0,
+        dup class db-columns where-clause*
+    ] { { } { } { } } nmake
+    >r >r parse-sql 4drop r> r>
+    <simple-statement> maybe-make-retryable do-select ;

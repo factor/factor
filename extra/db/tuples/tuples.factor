@@ -42,8 +42,9 @@ HOOK: <insert-user-assigned-statement> db ( class -- obj )
 HOOK: <update-tuple-statement> db ( class -- obj )
 HOOK: <delete-tuples-statement> db ( tuple class -- obj )
 HOOK: <select-by-slots-statement> db ( tuple class -- tuple )
-TUPLE: advanced-statement group order offset limit ;
-HOOK: <advanced-select-statement> db ( tuple class group order offset limit -- tuple )
+TUPLE: query group order offset limit ;
+HOOK: <query> db ( tuple class group order offset limit -- tuple )
+HOOK: <count-statement> db ( tuple class -- n )
 
 HOOK: insert-tuple* db ( tuple statement -- )
 
@@ -152,9 +153,20 @@ M: retryable execute-statement* ( statement type -- )
     dup dup class <select-by-slots-statement> do-select ;
 
 : select-tuple ( tuple -- tuple/f )
-    dup dup class f f f 1 <advanced-select-statement>
+    dup dup class f f f 1 <query>
     do-select ?first ;
 
-: advanced-select ( tuple groups order offset limit -- tuples )
+: query ( tuple groups order offset limit -- tuples )
     >r >r >r >r dup dup class r> r> r> r>
-    <advanced-select-statement> do-select ;
+    <query> do-select ;
+
+: do-count ( exemplar-tuple statement -- tuples )
+    [
+        [ bind-tuple ] [ nip default-query ] 2bi
+    ] with-disposal ;
+
+: count-tuples ( tuple groups -- n )
+    >r dup dup class r> <count-statement> do-count
+    dup length 1 = [ first first string>number ] [
+        [ first string>number ] map
+    ] if ;
