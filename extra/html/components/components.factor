@@ -5,7 +5,7 @@ classes.tuple words arrays sequences sequences.lib splitting
 mirrors hashtables combinators continuations math strings
 fry locals calendar calendar.format xml.entities validators
 html.elements html.streams xmode.code2html farkup inspector
-lcs.diff2html ;
+lcs.diff2html urls present ;
 IN: html.components
 
 SYMBOL: values
@@ -19,9 +19,9 @@ SYMBOL: values
 : prepare-value ( name object -- value name object )
     [ [ value ] keep ] dip ; inline
 
-: from-assoc ( assoc -- ) values get swap update ;
-
-: from-tuple ( tuple -- ) <mirror> from-assoc ;
+: from-object ( object -- )
+    dup assoc? [ <mirror> ] unless
+    values get swap update ;
 
 : deposit-values ( destination names -- )
     [ dup value ] H{ } map>assoc update ;
@@ -29,27 +29,36 @@ SYMBOL: values
 : deposit-slots ( destination names -- )
     [ <mirror> ] dip deposit-values ;
 
-: with-each-index ( seq quot -- )
-    '[
+: with-each-value ( name quot -- )
+    [ value ] dip '[
         [
-            blank-values 1+ "index" set-value @
+            values [ clone ] change
+            1+ "index" set-value
+            "value" set-value
+            @
         ] with-scope
     ] each-index ; inline
 
-: with-each-value ( seq quot -- )
-    '[ "value" set-value @ ] with-each-index ; inline
+: with-each-object ( name quot -- )
+    [ value ] dip '[
+        [
+            blank-values
+            1+ "index" set-value
+            from-object
+            @
+        ] with-scope
+    ] each-index ; inline
 
-: with-each-assoc ( seq quot -- )
-    '[ from-assoc @ ] with-each-index ; inline
+SYMBOL: nested-values
 
-: with-each-tuple ( seq quot -- )
-    '[ from-tuple @ ] with-each-index ; inline
-
-: with-assoc-values ( assoc quot -- )
-    '[ blank-values , from-assoc @ ] with-scope ; inline
-
-: with-tuple-values ( assoc quot -- )
-    '[ blank-values , from-tuple @ ] with-scope ; inline
+: with-values ( name quot -- )
+    '[
+        ,
+        [ nested-values [ swap prefix ] change ]
+        [ value blank-values from-object ]
+        bi
+        @
+    ] with-scope ; inline
 
 : nest-values ( name quot -- )
     swap [
@@ -57,22 +66,6 @@ SYMBOL: values
             H{ } clone [ values set call ] keep
         ] with-scope
     ] dip set-value ; inline
-
-: nest-tuple ( name quot -- )
-    swap [
-        [
-            H{ } clone [ <mirror> values set call ] keep
-        ] with-scope
-    ] dip set-value ; inline
-
-: object>string ( object -- string )
-    {
-        { [ dup real? ] [ number>string ] }
-        { [ dup timestamp? ] [ timestamp>string ] }
-        { [ dup string? ] [ ] }
-        { [ dup word? ] [ word-name ] }
-        { [ dup not ] [ drop "" ] }
-    } cond ;
 
 GENERIC: render* ( value name render -- )
 
@@ -88,13 +81,13 @@ GENERIC: render* ( value name render -- )
 <PRIVATE
 
 : render-input ( value name type -- )
-    <input =type =name object>string =value input/> ;
+    <input =type =name present =value input/> ;
 
 PRIVATE>
 
 SINGLETON: label
 
-M: label render* 2drop object>string escape-string write ;
+M: label render* 2drop present escape-string write ;
 
 SINGLETON: hidden
 
@@ -103,9 +96,9 @@ M: hidden render* drop "hidden" render-input ;
 : render-field ( value name size type -- )
     <input
         =type
-        [ object>string =size ] when*
+        [ present =size ] when*
         =name
-        object>string =value
+        present =value
     input/> ;
 
 TUPLE: field size ;
@@ -132,11 +125,11 @@ TUPLE: textarea rows cols ;
 
 M: textarea render*
     <textarea
-        [ rows>> [ object>string =rows ] when* ]
-        [ cols>> [ object>string =cols ] when* ] bi
+        [ rows>> [ present =rows ] when* ]
+        [ cols>> [ present =cols ] when* ] bi
         =name
     textarea>
-        object>string escape-string write
+        present escape-string write
     </textarea> ;
 
 ! Choice
@@ -147,7 +140,7 @@ TUPLE: choice size multiple choices ;
 
 : render-option ( text selected? -- )
     <option [ "true" =selected ] when option>
-        object>string escape-string write
+        present escape-string write
     </option> ;
 
 : render-options ( options selected -- )
@@ -156,7 +149,7 @@ TUPLE: choice size multiple choices ;
 M: choice render*
     <select
         swap =name
-        dup size>> [ object>string =size ] when*
+        dup size>> [ present =size ] when*
         dup multiple>> [ "true" =multiple ] when
     select>
         [ choices>> value ] [ multiple>> ] bi
@@ -174,7 +167,7 @@ M: checkbox render*
     <input
         "checkbox" =type
         swap =name
-        swap [ "true" =selected ] when
+        swap [ "true" =checked ] when
     input>
         label>> escape-string write
     </input> ;
@@ -183,12 +176,18 @@ M: checkbox render*
 GENERIC: link-title ( obj -- string )
 GENERIC: link-href ( obj -- url )
 
+M: string link-title ;
+M: string link-href ;
+
+M: url link-title ;
+M: url link-href ;
+
 SINGLETON: link
 
 M: link render*
     2drop
     <a dup link-href =href a>
-        link-title object>string escape-string write
+        link-title present escape-string write
     </a> ;
 
 ! XMode code component

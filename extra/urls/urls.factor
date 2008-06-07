@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel unicode.categories combinators sequences splitting
-fry namespaces assocs arrays strings mirrors
-io.encodings.string io.encodings.utf8
-math math.parser accessors namespaces.lib ;
+fry namespaces assocs arrays strings io.sockets
+io.sockets.secure io.encodings.string io.encodings.utf8
+math math.parser accessors mirrors parser
+prettyprint.backend hashtables present ;
 IN: urls
 
 : url-quotable? ( ch -- ? )
@@ -13,18 +14,24 @@ IN: urls
         { [ dup letter? ] [ t ] }
         { [ dup LETTER? ] [ t ] }
         { [ dup digit? ] [ t ] }
-        { [ dup "/_-.:" member? ] [ t ] }
+        { [ dup "/_-." member? ] [ t ] }
         [ f ]
     } cond nip ; foldable
+
+<PRIVATE
 
 : push-utf8 ( ch -- )
     1string utf8 encode
     [ CHAR: % , >hex 2 CHAR: 0 pad-left % ] each ;
 
+PRIVATE>
+
 : url-encode ( str -- str )
     [
         [ dup url-quotable? [ , ] [ push-utf8 ] if ] each
     ] "" make ;
+
+<PRIVATE
 
 : url-decode-hex ( index str -- )
     2dup length 2 - >= [
@@ -50,8 +57,12 @@ IN: urls
         ] if url-decode-iter
     ] if ;
 
+PRIVATE>
+
 : url-decode ( str -- str )
     [ 0 swap url-decode-iter ] "" make utf8 decode ;
+
+<PRIVATE
 
 : add-query-param ( value key assoc -- )
     [
@@ -63,6 +74,8 @@ IN: urls
             } cond
         ] when*
     ] 2keep set-at ;
+
+PRIVATE>
 
 : query>assoc ( query -- assoc )
     dup [
@@ -76,11 +89,7 @@ IN: urls
 
 : assoc>query ( hash -- str )
     [
-        {
-            { [ dup number? ] [ number>string 1array ] }
-            { [ dup string? ] [ 1array ] }
-            { [ dup sequence? ] [ ] }
-        } cond
+        dup array? [ [ present ] map ] [ present 1array ] if
     ] assoc-map
     [
         [
@@ -89,13 +98,15 @@ IN: urls
         ] assoc-each
     ] { } make "&" join ;
 
-TUPLE: url protocol host port path query anchor ;
+TUPLE: url protocol username password host port path query anchor ;
 
-: query-param ( request key -- value )
+: <url> ( -- url ) url new ;
+
+: query-param ( url key -- value )
     swap query>> at ;
 
-: set-query-param ( request value key -- request )
-    pick query>> set-at ;
+: set-query-param ( url value key -- url )
+    '[ , , _ ?set-at ] change-query ;
 
 : parse-host ( string -- host port )
     ":" split1 [ url-decode ] [
@@ -105,40 +116,62 @@ TUPLE: url protocol host port path query anchor ;
         ] when
     ] bi* ;
 
-: parse-host-part ( protocol rest -- string' )
-    [ "protocol" set ] [
+<PRIVATE
+
+: parse-host-part ( url protocol rest -- url string' )
+    [ >>protocol ] [
         "//" ?head [ "Invalid URL" throw ] unless
+        "@" split1 [
+            [
+                ":" split1 [ >>username ] [ >>password ] bi*
+            ] dip
+        ] when*
         "/" split1 [
-            parse-host [ "host" set ] [ "port" set ] bi*
+            parse-host [ >>host ] [ >>port ] bi*
         ] [ "/" prepend ] bi*
     ] bi* ;
 
-: string>url ( string -- url )
-    [
-        ":" split1 [ parse-host-part ] when*
-        "#" split1 [
-            "?" split1 [ query>assoc "query" set ] when*
-            url-decode "path" set
-        ] [
-            url-decode "anchor" set
-        ] bi*
-    ] url make-object ;
+PRIVATE>
 
-: unparse-host-part ( protocol -- )
+GENERIC: >url ( obj -- url )
+
+M: url >url ;
+
+M: string >url
+    <url> swap
+    ":" split1 [ parse-host-part ] when*
+    "#" split1 [
+        "?" split1
+        [ url-decode >>path ]
+        [ [ query>assoc >>query ] when* ] bi*
+    ]
+    [ url-decode >>anchor ] bi* ;
+
+<PRIVATE
+
+: unparse-username-password ( url -- )
+    dup username>> dup [
+        % password>> [ ":" % % ] when* "@" %
+    ] [ 2drop ] if ;
+
+: unparse-host-part ( url protocol -- )
     %
     "://" %
-    "host" get url-encode %
-    "port" get [ ":" % # ] when*
-    "path" get "/" head? [ "Invalid URL" throw ] unless ;
+    {
+        [ unparse-username-password ]
+        [ host>> url-encode % ]
+        [ port>> [ ":" % # ] when* ]
+        [ path>> "/" head? [ "/" % ] unless ]
+    } cleave ;
 
-: url>string ( url -- string )
+M: url present
     [
-        <mirror> [
-            "protocol" get [ unparse-host-part ] when*
-            "path" get url-encode %
-            "query" get [ "?" % assoc>query % ] when*
-            "anchor" get [ "#" % url-encode % ] when*
-        ] bind
+        {
+            [ dup protocol>> dup [ unparse-host-part ] [ 2drop ] if ]
+            [ path>> url-encode % ]
+            [ query>> dup assoc-empty? [ drop ] [ "?" % assoc>query % ] if ]
+            [ anchor>> [ "#" % present url-encode % ] when* ]
+        } cleave
     ] "" make ;
 
 : url-append-path ( path1 path2 -- path )
@@ -150,6 +183,8 @@ TUPLE: url protocol host port path query anchor ;
         [ [ "/" last-split1 drop "/" ] dip 3append ]
     } cond ;
 
+PRIVATE>
+
 : derive-url ( base url -- url' )
     [ clone dup ] dip
     2dup [ path>> ] bi@ url-append-path
@@ -158,3 +193,26 @@ TUPLE: url protocol host port path query anchor ;
 
 : relative-url ( url -- url' )
     clone f >>protocol f >>host f >>port ;
+
+! Half-baked stuff follows
+: secure-protocol? ( protocol -- ? )
+    "https" = ;
+
+: url-addr ( url -- addr )
+    [ [ host>> ] [ port>> ] bi <inet> ] [ protocol>> ] bi
+    secure-protocol? [ <secure> ] when ;
+
+: protocol-port ( protocol -- port )
+    {
+        { "http" [ 80 ] }
+        { "https" [ 443 ] }
+        { "ftp" [ 21 ] }
+    } case ;
+
+: ensure-port ( url -- url' )
+    dup protocol>> '[ , protocol-port or ] change-port ;
+
+! Literal syntax
+: URL" lexer get skip-blank parse-string >url parsed ; parsing
+
+M: url pprint* dup present "URL\" " "\"" pprint-string ;

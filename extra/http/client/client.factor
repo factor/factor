@@ -4,7 +4,7 @@ USING: assocs http kernel math math.parser namespaces sequences
 io io.sockets io.streams.string io.files io.timeouts strings
 splitting calendar continuations accessors vectors math.order
 io.encodings.8-bit io.encodings.binary io.streams.duplex
-fry debugger inspector ascii ;
+fry debugger inspector ascii urls ;
 IN: http.client
 
 : max-redirects 10 ;
@@ -21,14 +21,16 @@ DEFER: http-request
 
 SYMBOL: redirects
 
+: redirect-url ( request url -- request )
+    '[ , >url ensure-port derive-url ensure-port ] change-url ;
+
 : do-redirect ( response data -- response data )
     over code>> 300 399 between? [
         drop
         redirects inc
         redirects get max-redirects < [
             request get
-            swap "location" header dup absolute-url?
-            [ request-with-url ] [ request-with-path ] if
+            swap "location" header redirect-url
             "GET" >>method http-request
         ] [
             too-many-redirects
@@ -51,7 +53,7 @@ PRIVATE>
 
 : http-request ( request -- response data )
     dup request [
-        dup request-addr latin1 [
+        dup url>> url-addr latin1 [
             1 minutes timeouts
             write-request
             read-response
@@ -62,8 +64,8 @@ PRIVATE>
 
 : <get-request> ( url -- request )
     <request>
-        swap request-with-url
-        "GET" >>method ;
+        "GET" >>method
+        swap >url ensure-port >>url ;
 
 : http-get* ( url -- response data )
     <get-request> http-request ;
@@ -98,12 +100,11 @@ M: download-failed error.
 : download ( url -- )
     dup download-name download-to ;
 
-: <post-request> ( content-type content url -- request )
+: <post-request> ( post-data url -- request )
     <request>
         "POST" >>method
-        swap request-with-url
-        swap >>post-data
-        swap >>post-data-type ;
+        swap >url ensure-port >>url
+        swap >>post-data ;
 
-: http-post ( content-type content url -- response data )
+: http-post ( post-data url -- response data )
     <post-request> http-request ;

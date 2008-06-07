@@ -4,24 +4,24 @@ USING: accessors kernel sequences assocs io.files io.sockets
 io.server
 namespaces db db.sqlite smtp
 http.server
-http.server.db
-http.server.flows
-http.server.sessions
-http.server.auth.login
-http.server.auth.providers.db
-http.server.boilerplate
-html.templates.chloe
+http.server.dispatchers
+furnace.db
+furnace.asides
+furnace.flash
+furnace.sessions
+furnace.auth.login
+furnace.auth.providers.db
+furnace.boilerplate
+webapps.blogs
 webapps.pastebin
 webapps.planet
 webapps.todo
 webapps.wiki
+webapps.wee-url
 webapps.user-admin ;
 IN: webapps.factor-website
 
 : test-db "resource:test.db" sqlite-db ;
-
-: factor-template ( path -- template )
-    "resource:extra/webapps/factor-website/" swap ".xml" 3append <chloe> ;
 
 : init-factor-db ( -- )
     test-db [
@@ -38,14 +38,23 @@ IN: webapps.factor-website
 
         init-articles-table
         init-revisions-table
+
+        init-postings-table
+        init-comments-table
+
+        init-short-url-table
     ] with-db ;
 
+TUPLE: factor-website < dispatcher ;
+
 : <factor-website> ( -- responder )
-    <dispatcher> 
+    factor-website new-dispatcher
+        <blogs> "blogs" add-responder
         <todo-list> "todo" add-responder
         <pastebin> "pastebin" add-responder
         <planet-factor> "planet" add-responder
         <wiki> "wiki" add-responder
+        <wee-url> "wee-url" add-responder
         <user-admin> "user-admin" add-responder
     <login>
         users-in-db >>users
@@ -53,9 +62,8 @@ IN: webapps.factor-website
         allow-password-recovery
         allow-edit-profile
     <boilerplate>
-        "page" factor-template >>template
-    <flows>
-    <sessions>
+        { factor-website "page" } >>template
+    <asides> <flash-scopes> <sessions>
     test-db <db-persistence> ;
 
 : init-factor-website ( -- )

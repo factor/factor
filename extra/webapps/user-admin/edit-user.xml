@@ -35,7 +35,11 @@
 	
 	<tr>
 		<th class="field-label big-field-label">Capabilities:</th>
-		<td><t:choice t:name="capabilities" t:choices="all-capabilities" t:multiple="true" /></td>
+		<td>
+			<t:each t:name="capabilities">
+				<t:checkbox t:name="@value" t:label="@value" /><br/>
+			</t:each>
+		</td>
 	</tr>
 	
 	<tr>

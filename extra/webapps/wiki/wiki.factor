@@ -2,16 +2,35 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel hashtables calendar
 namespaces splitting sequences sorting math.order
-html.components
-html.templates.chloe
+html.components syndication
 http.server
-http.server.actions
-http.server.auth
-http.server.auth.login
-http.server.boilerplate
+http.server.dispatchers
+furnace
+furnace.actions
+furnace.auth
+furnace.auth.login
+furnace.boilerplate
+furnace.syndication
 validators
-db.types db.tuples lcs farkup ;
+db.types db.tuples lcs farkup urls ;
 IN: webapps.wiki
+
+: view-url ( title -- url )
+    "$wiki/view/" prepend >url ;
+
+: edit-url ( title -- url )
+    "$wiki/edit" >url swap "title" set-query-param ;
+
+: revisions-url ( title -- url )
+    "$wiki/revisions" >url swap "title" set-query-param ;
+
+: revision-url ( id -- url )
+    "$wiki/revision" >url swap "id" set-query-param ;
+
+: user-edits-url ( author -- url )
+    "$wiki/user-edits" >url swap "author" set-query-param ;
+
+TUPLE: wiki < dispatcher ;
 
 TUPLE: article title revision ;
 
@@ -36,27 +55,34 @@ revision "REVISIONS" {
     { "content" "CONTENT" TEXT +not-null+ }
 } define-persistent
 
+M: revision feed-entry-title
+    [ title>> ] [ drop " by " ] [ author>> ] tri 3append ;
+
+M: revision feed-entry-date date>> ;
+
+M: revision feed-entry-url id>> revision-url ;
+
+: reverse-chronological-order ( seq -- sorted )
+    [ [ date>> ] compare invert-comparison ] sort ;
+
 : <revision> ( id -- revision )
     revision new swap >>id ;
 
 : init-revisions-table revision ensure-table ;
 
-: wiki-template ( name -- template )
-    "resource:extra/webapps/wiki/" swap ".xml" 3append <chloe> ;
-
-: <title-redirect> ( title next -- response )
-    swap "title" associate <standard-redirect> ;
-
 : validate-title ( -- )
     { { "title" [ v-one-line ] } } validate-params ;
 
+: validate-author ( -- )
+    { { "author" [ v-username ] } } validate-params ;
+
 : <main-article-action> ( -- action )
     <action>
-        [ "Front Page" "$wiki/view" <title-redirect> ] >>display ;
+        [ "Front Page" view-url <redirect> ] >>display ;
 
 : <view-article-action> ( -- action )
     <action>
-        "title" >>rest-param
+        "title" >>rest
 
         [
             validate-title
@@ -65,22 +91,23 @@ revision "REVISIONS" {
 
         [
             "title" value dup <article> select-tuple [
-                revision>> <revision> select-tuple from-tuple
-                "view" wiki-template <html-content>
+                revision>> <revision> select-tuple from-object
+                { wiki "view" } <chloe-content>
             ] [
-                "$wiki/edit" <title-redirect>
+                edit-url <redirect>
             ] ?if
         ] >>display ;
 
 : <view-revision-action> ( -- action )
     <page-action>
         [
-            { { "id" [ v-integer ] } } validate-params
+            validate-integer-id
             "id" value <revision>
-            select-tuple from-tuple
+            select-tuple from-object
+            "view?title=" relative-link-prefix set
         ] >>init
 
-        "view" wiki-template >>template ;
+        { wiki "view" } >>template ;
 
 : add-revision ( revision -- )
     [ insert-tuple ]
@@ -97,11 +124,11 @@ revision "REVISIONS" {
         [
             validate-title
             "title" value <article> select-tuple [
-                revision>> <revision> select-tuple from-tuple
+                revision>> <revision> select-tuple from-object
             ] when*
         ] >>init
 
-        "edit" wiki-template >>template
+        { wiki "edit" } >>template
         
         [
             validate-title
@@ -112,30 +139,52 @@ revision "REVISIONS" {
                 now >>date
                 logged-in-user get username>> >>author
                 "content" value >>content
-            [ add-revision ]
-            [ title>> "$wiki/view" <title-redirect> ] bi
+            [ add-revision ] [ title>> view-url <redirect> ] bi
         ] >>submit ;
+
+: list-revisions ( -- seq )
+    f <revision> "title" value >>title select-tuples
+    reverse-chronological-order ;
 
 : <list-revisions-action> ( -- action )
     <page-action>
         [
             validate-title
-            f <revision> "title" value >>title select-tuples
-            [ [ date>> ] compare invert-comparison ] sort
-            "revisions" set-value
+            list-revisions "revisions" set-value
         ] >>init
+        { wiki "revisions" } >>template ;
 
-        "revisions" wiki-template >>template ;
+: <list-revisions-feed-action> ( -- action )
+    <feed-action>
+        [ validate-title ] >>init
+        [ "Revisions of " "title" value append ] >>title
+        [ "title" value revisions-url ] >>url
+        [ list-revisions ] >>entries ;
+
+: <rollback-action> ( -- action )
+    <action>
+        [ validate-integer-id ] >>validate
+
+        [
+            "id" value <revision> select-tuple clone f >>id
+            [ add-revision ] [ title>> view-url <redirect> ] bi
+        ] >>submit ;
+
+: list-changes ( -- seq )
+    "id" value <revision> select-tuples
+    reverse-chronological-order ;
 
 : <list-changes-action> ( -- action )
     <page-action>
-        [
-            f <revision> select-tuples
-            [ [ date>> ] compare invert-comparison ] sort
-            "changes" set-value
-        ] >>init
+        [ list-changes "changes" set-value ] >>init
 
-        "changes" wiki-template >>template ;
+        { wiki "changes" } >>template ;
+
+: <list-changes-feed-action> ( -- action )
+    <feed-action>
+        [ URL" $wiki/changes" ] >>url
+        [ "All changes" ] >>title
+        [ list-changes ] >>entries ;
 
 : <delete-action> ( -- action )
     <action>
@@ -144,7 +193,7 @@ revision "REVISIONS" {
         [
             "title" value <article> delete-tuples
             f <revision> "title" value >>title delete-tuples
-            "" f <standard-redirect>
+            URL" $wiki" <redirect>
         ] >>submit ;
 
 : <diff-action> ( -- action )
@@ -157,12 +206,15 @@ revision "REVISIONS" {
 
             "old-id" "new-id"
             [ value <revision> select-tuple ] bi@
-            [ [ "old" set-value ] [ "new" set-value ] bi* ]
+            [
+                [ [ title>> "title" set-value ] [ "old" set-value ] bi ]
+                [ "new" set-value ] bi*
+            ]
             [ [ content>> string-lines ] bi@ diff "diff" set-value ]
             2bi
         ] >>init
 
-        "diff" wiki-template >>template ;
+        { wiki "diff" } >>template ;
 
 : <list-articles-action> ( -- action )
     <page-action>
@@ -172,31 +224,55 @@ revision "REVISIONS" {
             "articles" set-value
         ] >>init
 
-        "articles" wiki-template >>template ;
+        { wiki "articles" } >>template ;
+
+: list-user-edits ( -- seq )
+    f <revision> "author" value >>author select-tuples
+    reverse-chronological-order ;
 
 : <user-edits-action> ( -- action )
     <page-action>
         [
-            { { "author" [ v-username ] } } validate-params
-            f <revision> "author" value >>author
-            select-tuples "user-edits" set-value
+            validate-author
+            list-user-edits "user-edits" set-value
         ] >>init
+        { wiki "user-edits" } >>template ;
 
-        "user-edits" wiki-template >>template ;
+: <user-edits-feed-action> ( -- action )
+    <feed-action>
+        [ validate-author ] >>init
+        [ "Edits by " "author" value append ] >>title
+        [ "author" value user-edits-url ] >>url
+        [ list-user-edits ] >>entries ;
 
-TUPLE: wiki < dispatcher ;
+SYMBOL: can-delete-wiki-articles?
+
+can-delete-wiki-articles? define-capability
+
+: <article-boilerplate> ( responder -- responder' )
+    <boilerplate>
+        { wiki "page-common" } >>template ;
 
 : <wiki> ( -- dispatcher )
     wiki new-dispatcher
-        <main-article-action> "" add-responder
-        <view-article-action> "view" add-responder
-        <view-revision-action> "revision" add-responder
-        <list-revisions-action> "revisions" add-responder
+        <main-article-action> <article-boilerplate> "" add-responder
+        <view-article-action> <article-boilerplate> "view" add-responder
+        <view-revision-action> <article-boilerplate> "revision" add-responder
+        <list-revisions-action> <article-boilerplate> "revisions" add-responder
+        <list-revisions-feed-action> "revisions.atom" add-responder
+        <diff-action> <article-boilerplate> "diff" add-responder
+        <edit-article-action> <article-boilerplate> <protected>
+            "edit wiki articles" >>description
+            "edit" add-responder
+        <rollback-action> "rollback" add-responder
         <user-edits-action> "user-edits" add-responder
-        <diff-action> "diff" add-responder
         <list-articles-action> "articles" add-responder
         <list-changes-action> "changes" add-responder
-        <edit-article-action> { } <protected> "edit" add-responder
-        <delete-action> { } <protected> "delete" add-responder
+        <user-edits-feed-action> "user-edits.atom" add-responder
+        <list-changes-feed-action> "changes.atom" add-responder
+        <delete-action> <protected>
+            "delete wiki articles" >>description
+            { can-delete-wiki-articles? } >>capabilities
+        "delete" add-responder
     <boilerplate>
-        "wiki-common" wiki-template >>template ;
+        { wiki "wiki-common" } >>template ;

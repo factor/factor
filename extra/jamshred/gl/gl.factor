@@ -1,8 +1,6 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types colors jamshred.game jamshred.oint
-jamshred.player jamshred.tunnel kernel math math.vectors opengl
-opengl.gl opengl.glu sequences ;
+USING: accessors alien.c-types colors jamshred.game jamshred.oint jamshred.player jamshred.tunnel kernel math math.constants math.functions math.vectors opengl opengl.gl opengl.glu sequences ;
 IN: jamshred.gl
 
 : min-vertices 6 ; inline
@@ -14,6 +12,35 @@ IN: jamshred.gl
 : n-segments-ahead ( -- n ) 60 ; inline
 : n-segments-behind ( -- n ) 40 ; inline
 
+: wall-drawing-offset ( -- n )
+    #! so that we can't see through the wall, we draw it a bit further away
+    0.15 ;
+
+: wall-drawing-radius ( segment -- r )
+    radius>> wall-drawing-offset + ;
+
+: wall-up ( segment -- v )
+    [ wall-drawing-radius ] [ up>> ] bi n*v ;
+
+: wall-left ( segment -- v )
+    [ wall-drawing-radius ] [ left>> ] bi n*v ;
+
+: segment-vertex ( theta segment -- vertex )
+    [
+        [ wall-up swap sin v*n ] [ wall-left swap cos v*n ] 2bi v+
+    ] [
+        location>> v+
+    ] bi ;
+
+: segment-vertex-normal ( vertex segment -- normal )
+    location>> swap v- normalize ;
+
+: segment-vertex-and-normal ( segment theta -- vertex normal )
+    swap [ segment-vertex ] keep dupd segment-vertex-normal ;
+
+: equally-spaced-radians ( n -- seq )
+    #! return a sequence of n numbers between 0 and 2pi
+    dup [ / pi 2 * * ] curry map ;
 : draw-segment-vertex ( segment theta -- )
     over segment-color gl-color segment-vertex-and-normal
     gl-normal gl-vertex ;

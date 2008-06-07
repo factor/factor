@@ -5,15 +5,15 @@
 	<t:title>Recent Changes</t:title>
 
 	<ul>
-		<t:each-tuple t:values="changes">
+		<t:bind-each t:name="changes">
 			<li>
-				<t:a t:href="title" t:query="title"><t:label t:name="title" /></t:a>
+				<t:a t:href="view" t:query="title"><t:label t:name="title" /></t:a>
 				on
 				<t:a t:href="revision" t:query="id"><t:label t:name="date" /></t:a>
 				by
 				<t:a t:href="user-edits" t:query="author"><t:label t:name="author" /></t:a>
 			</li>
-		</t:each-tuple>
+		</t:bind-each>
 	</ul>
 
 </t:chloe>

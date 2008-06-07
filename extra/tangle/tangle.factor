@@ -1,6 +1,10 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs db db.sqlite db.postgresql http http.server http.server.actions http.server.static io io.files json.writer kernel math.parser namespaces semantic-db sequences strings tangle.path ;
+USING: accessors assocs db db.sqlite db.postgresql
+http http.server http.server.dispatchers http.server.responses
+http.server.static furnace.actions furnace.json
+io io.files json.writer kernel math.parser namespaces
+semantic-db sequences strings tangle.path ;
 IN: tangle
 
 GENERIC: render* ( content templater -- output )
@@ -20,7 +24,7 @@ C: <tangle> tangle
     [ [ db>> ] [ seq>> ] bi ] dip with-db ;
 
 : node-response ( id -- response )
-    load-node [ node-content <text-content> ] [ <404> ] if* ;
+    load-node [ node-content "text/plain" <content> ] [ <404> ] if* ;
 
 : display-node ( params -- response )
     [
@@ -36,7 +40,7 @@ C: <tangle> tangle
 : submit-node ( params -- response )
     [
         "node_content" swap at* [
-            create-node id>> number>string <text-content>
+            create-node id>> number>string "text/plain" <content>
         ] [
             drop <400>
         ] if
@@ -52,7 +56,7 @@ TUPLE: path-responder ;
 C: <path-responder> path-responder
 
 M: path-responder call-responder* ( path responder -- response )
-    drop path>file [ node-content <text-content> ] [ <404> ] if* ;
+    drop path>file [ node-content "text/plain" <content> ] [ <404> ] if* ;
 
 TUPLE: tangle-dispatcher < dispatcher tangle ;
 

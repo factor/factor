@@ -1,7 +1,7 @@
 IN: html.components.tests
 USING: tools.test kernel io.streams.string
 io.streams.null accessors inspector html.streams
-html.components namespaces ;
+html.elements html.components namespaces ;
 
 [ ] [ blank-values ] unit-test
 
@@ -11,13 +11,11 @@ html.components namespaces ;
 
 TUPLE: color red green blue ;
 
-[ ] [ 1 2 3 color boa from-tuple ] unit-test
+[ ] [ 1 2 3 color boa from-object ] unit-test
 
 [ 1 ] [ "red" value ] unit-test
 
 [ ] [ "jimmy" "red" set-value ] unit-test
-
-[ "123.5" ] [ 123.5 object>string ] unit-test
 
 [ "jimmy" ] [
     [
@@ -107,7 +105,7 @@ TUPLE: color red green blue ;
 
 [ ] [ t "delivery" set-value ] unit-test
 
-[ "<input type='checkbox' name='delivery' selected='true'>Delivery</input>" ] [
+[ "<input type='checkbox' name='delivery' checked='true'>Delivery</input>" ] [
     [
         "delivery"
         <checkbox>

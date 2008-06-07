@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel sequences sequences.deep splitting
-accessors fry locals combinators namespaces lazy-lists
+accessors fry locals combinators namespaces lists lists.lazy
 shuffle ;
 IN: monads
 
@@ -124,7 +124,7 @@ M: list-monad fail   2drop nil ;
 
 M: list monad-of drop list-monad ;
 
-M: list >>= '[ , _ lmap lconcat ] ;
+M: list >>= '[ , _ lazy-map lconcat ] ;
 
 ! State
 SINGLETON: state-monad

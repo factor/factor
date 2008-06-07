@@ -4,7 +4,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: io kernel namespaces prettyprint quotations
-sequences strings words xml.entities compiler.units effects ;
+sequences strings words xml.entities compiler.units effects
+urls math math.parser combinators present ;
 
 IN: html.elements
 
@@ -130,7 +131,7 @@ SYMBOL: html
     " " write-html
     write-html
     "='" write-html
-    escape-quoted-string write-html
+    present escape-quoted-string write-html
     "'" write-html ;
 
 : attribute-effect T{ effect f { "string" } 0 } ;
@@ -162,7 +163,7 @@ SYMBOL: html
     "id" "onclick" "style" "valign" "accesskey"
     "src" "language" "colspan" "onchange" "rel"
     "width" "selected" "onsubmit" "xmlns" "lang" "xml:lang"
-    "media" "title" "multiple"
+    "media" "title" "multiple" "checked"
 ] [ define-attribute-word ] each
 
 >>
@@ -178,7 +179,7 @@ SYMBOL: html
     <html "http://www.w3.org/1999/xhtml" =xmlns "en" =xml:lang "en" =lang html>
         <head> <title> swap write </title> </head>
         <body> call </body>
-    </html> ;
+    </html> ; inline
 
 : render-error ( message -- )
     <span "error" =class span> escape-string write </span> ;

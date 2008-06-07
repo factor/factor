@@ -16,5 +16,4 @@
 
 	</t:form>
 
-	<t:button t:action="$wiki/delete" t:for="title" class="link-button link">Delete</t:button>
 </t:chloe>

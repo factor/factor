@@ -6,13 +6,13 @@
 
 	<div class="navbar">
 		  <t:a t:href="$todo-list/list">List Items</t:a>
-		| <t:a t:href="$todo-list/edit">Add Item</t:a>
+		| <t:a t:href="$todo-list/new">Add Item</t:a>
 
-		<t:if t:code="http.server.auth.login:allow-edit-profile?">
-			| <t:a t:href="$login/edit-profile" t:flow="begin">Edit Profile</t:a>
+		<t:if t:code="furnace.auth.login:allow-edit-profile?">
+			| <t:a t:href="$login/edit-profile" t:aside="begin">Edit Profile</t:a>
 		</t:if>
 
-		| <t:button t:action="$login/logout" t:flow="begin" class="link-button link">Logout</t:button>
+		| <t:button t:action="$login/logout" t:aside="begin" class="link-button link">Logout</t:button>
 	</div>
 
 	<h1><t:write-title /></h1>

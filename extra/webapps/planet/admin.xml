@@ -5,18 +5,18 @@
 	<t:title>Planet Factor Administration</t:title>
 
 	<ul>
-		<t:each-tuple t:values="blogroll">
+		<t:bind-each t:name="blogroll">
 			<li>
 				<t:a t:href="$planet-factor/admin/edit-blog" t:query="id">
 					<t:label t:name="name" />
 				</t:a>
 			</li>
-		</t:each-tuple>
+		</t:bind-each>
 	</ul>
 
-	<p>
+	<div>
 		<t:a t:href="$planet-factor/admin/new-blog">Add Blog</t:a>
 		| <t:button t:action="$planet-factor/admin/update" class="link-button link">Update</t:button>
-	</p>
+	</div>
 
 </t:chloe>

@@ -2,16 +2,20 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
+	<t:atom t:href="$wiki/user-edits.atom" t:query="author">
+		Edits by <t:label t:name="author" />
+	</t:atom>
+
 	<t:title>Edits by <t:label t:name="author" /></t:title>
 
 	<ul>
-		<t:each-tuple t:values="user-edits">
+		<t:bind-each t:name="user-edits">
 			<li>
 				<t:a t:href="view" t:query="title"><t:label t:name="title" /></t:a>
 				on
 				<t:a t:href="revision" t:query="id"><t:label t:name="date" /></t:a>
 			</li>
-		</t:each-tuple>
+		</t:bind-each>
 	</ul>
 
 </t:chloe>
