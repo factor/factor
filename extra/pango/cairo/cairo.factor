@@ -100,7 +100,7 @@ destructors accessors namespaces kernel cairo ;
     >r alien>> pango-layout r> with-variable ; inline
 
 : with-pango-cairo ( quot -- )
-    cr pango_cairo_create_layout swap with-layout ;
+    cr pango_cairo_create_layout swap with-layout ; inline
 
 MEMO: dummy-cairo ( -- cr )
     CAIRO_FORMAT_ARGB32 0 0 cairo_image_surface_create cairo_create ;

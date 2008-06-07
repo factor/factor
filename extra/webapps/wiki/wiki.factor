@@ -15,14 +15,14 @@ validators
 db.types db.tuples lcs farkup urls ;
 IN: webapps.wiki
 
-: title-url ( title action -- url )
-    "$wiki/" prepend >url swap "title" set-query-param ;
+: view-url ( title -- url )
+    "$wiki/view/" prepend >url ;
 
-: view-url ( title -- url ) "view" title-url ;
+: edit-url ( title -- url )
+    "$wiki/edit" >url swap "title" set-query-param ;
 
-: edit-url ( title -- url ) "edit" title-url ;
-
-: revisions-url ( title -- url ) "revisions" title-url ;
+: revisions-url ( title -- url )
+    "$wiki/revisions" >url swap "title" set-query-param ;
 
 : revision-url ( id -- url )
     "$wiki/revision" >url swap "id" set-query-param ;

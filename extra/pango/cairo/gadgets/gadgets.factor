@@ -18,7 +18,7 @@ M: pango-cairo-backend construct-pango
 
 : setup-layout ( gadget -- quot )
     [ font>> ] [ text>> ] bi
-    '[ , layout-font , layout-text ] ;
+    '[ , layout-font , layout-text ] ; inline
 
 M: pango-cairo-gadget render* ( gadget -- ) 
     setup-layout [ layout-size dup ]

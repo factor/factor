@@ -19,7 +19,7 @@
 					</p>
 
 					<p class="posting-date">
-						<t:a t:value="url"><t:label t:name="pub-date" /></t:a>
+						<t:a t:value="url"><t:label t:name="date" /></t:a>
 					</p>
 
 				</t:bind-each>

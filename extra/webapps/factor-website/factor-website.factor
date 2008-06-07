@@ -12,6 +12,7 @@ furnace.sessions
 furnace.auth.login
 furnace.auth.providers.db
 furnace.boilerplate
+webapps.blogs
 webapps.pastebin
 webapps.planet
 webapps.todo
@@ -38,13 +39,17 @@ IN: webapps.factor-website
         init-articles-table
         init-revisions-table
 
+        init-postings-table
+        init-comments-table
+
         init-short-url-table
     ] with-db ;
 
 TUPLE: factor-website < dispatcher ;
 
 : <factor-website> ( -- responder )
-    factor-website new-dispatcher 
+    factor-website new-dispatcher
+        <blogs> "blogs" add-responder
         <todo-list> "todo" add-responder
         <pastebin> "pastebin" add-responder
         <planet-factor> "planet" add-responder
