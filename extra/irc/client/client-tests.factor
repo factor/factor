@@ -41,9 +41,9 @@ privmsg new
   parse-irc-line f >>timestamp ] unit-test
 
 { "" } make-client dup "factorbot" set-nick current-irc-client [
-    { t } [ irc-client> nick>> name>> me? ] unit-test
+    { t } [ irc> nick>> name>> me? ] unit-test
 
-    { "factorbot" } [ irc-client> nick>> name>> ] unit-test
+    { "factorbot" } [ irc> nick>> name>> ] unit-test
 
     { "someuser" } [ "someuser!n=user@some.where" parse-name ] unit-test
 
