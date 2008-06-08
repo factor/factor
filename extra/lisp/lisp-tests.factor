@@ -29,9 +29,9 @@ IN: lisp.test
       "((lambda (x y z) (+ x (- y z))) 40 3 1)" lisp-eval
     ] unit-test
     
-!     { { 1 2 3 4 } } [
-!         "((lambda (x y) (quasiquote (1 (unquote x) 3 (unquote y)))) 2 4)" lisp-eval list>seq
-!     ] unit-test
+    { { 1 2 3 4 } } [
+        "((lambda (x y) (quasiquote (1 (unquote x) 3 (unquote y)))) 2 4)" lisp-eval list>seq
+    ] unit-test
     
     { T{ lisp-symbol f "if" } } [
         "(defmacro if (pred tr fl) (quasiquote (cond ((unquote pred) (unquote tr)) (#t (unquote fl)))))" lisp-eval
@@ -41,9 +41,9 @@ IN: lisp.test
         T{ lisp-symbol f "if" } lisp-macro?
     ] unit-test
     
-!     { 1 } [
-!       "(if #t 1 2)" lisp-eval
-!     ] unit-test
+    { 1 } [
+      "(if #t 1 2)" lisp-eval
+    ] unit-test
     
     { "b" } [
       "(cond (#f \"a\") (#t \"b\"))" lisp-eval
@@ -53,8 +53,8 @@ IN: lisp.test
       "(begin (+ 1 4))" lisp-eval
     ] unit-test
     
-!     { 3 } [
-!        "((lambda (x) (if x (begin (+ 1 2)) (- 3 5))) #t)" lisp-eval
-!     ] unit-test
+    { 3 } [
+       "((lambda (x) (if x (begin (+ 1 2)) (- 3 5))) #t)" lisp-eval
+    ] unit-test
     
 ] with-interactive-vocabs
