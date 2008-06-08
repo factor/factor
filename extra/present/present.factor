@@ -12,4 +12,6 @@ M: string present ;
 
 M: word present word-name ;
 
+M: effect present effect>string ;
+
 M: f present drop "" ;

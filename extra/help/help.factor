@@ -50,7 +50,7 @@ M: word article-title
         word-name
     ] [
         [ word-name ]
-        [ stack-effect [ effect>string " " prepend ] [ "" if ] if* ] bi
+        [ stack-effect [ effect>string " " prepend ] [ "" ] if* ] bi
         append
     ] if ;
 

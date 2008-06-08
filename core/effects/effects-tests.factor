@@ -1,9 +1,11 @@
 IN: effects.tests
-USING: effects tools.test ;
+USING: effects tools.test prettyprint accessors sequences ;
 
 [ t ] [ 1 1 <effect> 2 2 <effect> effect<= ] unit-test
 [ f ] [ 1 0 <effect> 2 2 <effect> effect<= ] unit-test
 [ t ] [ 2 2 <effect> 2 2 <effect> effect<= ] unit-test
 [ f ] [ 3 3 <effect> 2 2 <effect> effect<= ] unit-test
 [ f ] [ 2 3 <effect> 2 2 <effect> effect<= ] unit-test
-[ t ] [ 2 3 <effect> f effect<= ] unit-test
+[ 2 ] [ (( a b -- c )) in>> length ] unit-test
+[ 1 ] [ (( a b -- c )) out>> length ] unit-test
+[ "(( a b -- c ))" ] [ (( a b -- c )) unparse ] unit-test
