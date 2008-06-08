@@ -6,11 +6,11 @@
 		<t:label t:name="author" />: <t:label t:name="title" />
 	</t:atom>
 
-	<t:atom t:href="$blogs/by" t:query="author">
+	<t:atom t:href="$blogs/by.atom" t:query="author">
 		Recent Posts by <t:label t:name="author" />
 	</t:atom>
 
-	<t:title> <t:label t:name="title" /> </t:title>
+	<t:title> <t:label t:name="author" />: <t:label t:name="title" /> </t:title>
 
 	<p class="posting-body">
 		<t:farkup t:name="content" />

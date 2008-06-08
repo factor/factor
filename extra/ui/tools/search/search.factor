@@ -94,7 +94,7 @@ M: live-search pref-dim* drop { 400 200 } ;
     "Words in " rot vocab-name append show-titled-popup ;
 
 : show-word-usage ( workspace word -- )
-    "" over usage f <definition-search>
+    "" over smart-usage f <definition-search>
     "Words and methods using " rot word-name append
     show-titled-popup ;
 

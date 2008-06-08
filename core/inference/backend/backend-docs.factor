@@ -61,7 +61,7 @@ HELP: effect-error
 { $description "Throws an " { $link effect-error } "." }
 { $error-description "Thrown when a word's inferred stack effect does not match its declared stack effect." } ;
 
-HELP: recursive-declare-error
+HELP: no-recursive-declaration
 { $error-description "Thrown when inference encounters a recursive call to a word lacking a stack effect declaration. Recursive words must declare a stack effect in order to compile. Due to implementation detail, generic words are recursive, and thus the same restriction applies." } ;
 
 HELP: recursive-quotation-error

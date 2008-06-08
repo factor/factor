@@ -24,7 +24,7 @@
 
 	</div>
 
-	<h2><t:write-title /></h2>
+	<h1><t:write-title /></h1>
 
 	<t:call-next-template />
 
