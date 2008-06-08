@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
-USING: lisp lisp.parser tools.test sequences math kernel parser arrays ;
+USING: lisp lisp.parser tools.test sequences math kernel parser arrays lists ;
 
 IN: lisp.test
 
@@ -27,6 +27,10 @@ IN: lisp.test
     
     { 42 } [
       "((lambda (x y z) (+ x (- y z))) 40 3 1)" lisp-eval
+    ] unit-test
+    
+    { { 1 2 3 4 } } [
+        "((lambda (x y) (quasiquote (1 (unquote x) 3 (unquote y)))) 2 4)" lisp-eval list>seq
     ] unit-test
     
     { T{ lisp-symbol f "if" } } [
