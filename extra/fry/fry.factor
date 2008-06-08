@@ -5,9 +5,9 @@ quotations arrays namespaces qualified ;
 QUALIFIED: namespaces
 IN: fry
 
-: , "Only valid inside a fry" throw ;
-: @ "Only valid inside a fry" throw ;
-: _ "Only valid inside a fry" throw ;
+: , ( -- * ) "Only valid inside a fry" throw ;
+: @ ( -- * ) "Only valid inside a fry" throw ;
+: _ ( -- * ) "Only valid inside a fry" throw ;
 
 DEFER: (shallow-fry)
 

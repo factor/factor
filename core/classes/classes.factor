@@ -38,7 +38,7 @@ PREDICATE: tuple-class < class
 : predicate-word ( word -- predicate )
     [ word-name "?" append ] keep word-vocabulary create ;
 
-: predicate-effect 1 { "?" } <effect> ;
+: predicate-effect T{ effect f 1 { "?" } } ;
 
 PREDICATE: predicate < word "predicating" word-prop >boolean ;
 

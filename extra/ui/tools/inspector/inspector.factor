@@ -31,7 +31,7 @@ TUPLE: inspector-gadget object pane ;
 
 \ globals H{ { +nullary+ t } { +listener+ t } } define-command
 
-: inspector-help "ui-inspector" help-window ;
+: inspector-help ( -- ) "ui-inspector" help-window ;
 
 \ inspector-help H{ { +nullary+ t } } define-command
 

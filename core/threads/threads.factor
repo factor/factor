@@ -37,11 +37,11 @@ mailbox variables sleep-entry ;
 : thread-registered? ( thread -- ? )
     id>> threads key? ;
 
-: check-unregistered
+: check-unregistered ( thread -- thread )
     dup thread-registered?
     [ "Thread already stopped" throw ] when ;
 
-: check-registered
+: check-registered ( thread -- thread )
     dup thread-registered?
     [ "Thread is not running" throw ] unless ;
 

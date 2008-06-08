@@ -36,7 +36,7 @@ SYMBOL: main-vocab-hook
         main-vocab-hook get [ call ] [ "listener" ] if*
     ] if ;
 
-: default-cli-args
+: default-cli-args ( -- )
     global [
         "quiet" off
         "script" off

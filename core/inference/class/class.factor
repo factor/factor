@@ -41,11 +41,11 @@ C: <interval-constraint> interval-constraint
 GENERIC: apply-constraint ( constraint -- )
 GENERIC: constraint-satisfied? ( constraint -- ? )
 
-: `input node get in-d>> nth ;
-: `output node get out-d>> nth ;
-: class, <class-constraint> , ;
-: literal, <literal-constraint> , ;
-: interval, <interval-constraint> , ;
+: `input ( n -- value ) node get in-d>> nth ;
+: `output ( n -- value ) node get out-d>> nth ;
+: class, ( class value -- ) <class-constraint> , ;
+: literal, ( literal value -- ) <literal-constraint> , ;
+: interval, ( interval value -- ) <interval-constraint> , ;
 
 M: f apply-constraint drop ;
 

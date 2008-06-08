@@ -80,7 +80,7 @@ M: inet4 make-sockaddr ( inet -- sockaddr )
 
 SYMBOL: port-override
 
-: (port) port-override get swap or ;
+: (port) ( port -- port' ) port-override get swap or ;
 
 PRIVATE>
 

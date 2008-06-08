@@ -22,8 +22,11 @@ HOOK: (pipe) io-backend ( -- pipe )
 
 <PRIVATE
 
-: ?reader [ <input-port> &dispose ] [ input-stream get ] if* ;
-: ?writer [ <output-port> &dispose ] [ output-stream get ] if* ;
+: ?reader ( handle/f -- stream )
+    [ <input-port> &dispose ] [ input-stream get ] if* ;
+
+: ?writer ( handle/f -- stream )
+    [ <output-port> &dispose ] [ output-stream get ] if* ;
 
 GENERIC: run-pipeline-element ( input-fd output-fd obj -- quot )
 

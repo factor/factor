@@ -12,7 +12,7 @@ title status
 fonts handle
 loc ;
 
-: find-world [ world? ] find-parent ;
+: find-world ( gadget -- world ) [ world? ] find-parent ;
 
 M: f world-status ;
 

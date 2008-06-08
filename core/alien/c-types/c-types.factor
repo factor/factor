@@ -5,7 +5,7 @@ assocs kernel kernel.private libc math
 namespaces parser sequences strings words assocs splitting
 math.parser cpu.architecture alien alien.accessors quotations
 layouts system compiler.units io.files io.encodings.binary
-accessors combinators ;
+accessors combinators effects ;
 IN: alien.c-types
 
 DEFER: <int>
@@ -214,7 +214,8 @@ M: long-long-type box-return ( type -- )
     >r ">c-" swap "-array" 3append r> create ;
 
 : define-to-array ( type vocab -- )
-    [ to-array-word ] 2keep >c-array-quot define ;
+    [ to-array-word ] 2keep >c-array-quot
+    (( array -- byte-array )) define-declared ;
 
 : c-array>quot ( type vocab -- quot )
     [
@@ -227,7 +228,8 @@ M: long-long-type box-return ( type -- )
     >r "c-" swap "-array>" 3append r> create ;
 
 : define-from-array ( type vocab -- )
-    [ from-array-word ] 2keep c-array>quot define ;
+    [ from-array-word ] 2keep c-array>quot
+    (( c-ptr n -- array )) define-declared ;
 
 : define-primitive-type ( type name -- )
     "alien.c-types"

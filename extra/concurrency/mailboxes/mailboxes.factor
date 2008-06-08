@@ -84,7 +84,8 @@ M: linked-error error.
 
 C: <linked-error> linked-error
 
-: ?linked dup linked-error? [ rethrow ] when ;
+: ?linked ( message -- message )
+    dup linked-error? [ rethrow ] when ;
 
 TUPLE: linked-thread < thread supervisor ;
 

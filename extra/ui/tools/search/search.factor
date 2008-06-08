@@ -27,9 +27,11 @@ M: live-search handle-gesture* ( gadget gesture delegate -- ? )
         2drop t
     ] if ;
 
-: find-live-search [ [ live-search? ] is? ] find-parent ;
+: find-live-search ( gadget -- search )
+    [ [ live-search? ] is? ] find-parent ;
 
-: find-search-list find-live-search live-search-list ;
+: find-search-list ( gadget -- list )
+    find-live-search live-search-list ;
 
 TUPLE: search-field ;
 

@@ -3,7 +3,8 @@
 
 USING: arrays kernel math math.functions namespaces sequences
 strings system vocabs.loader calendar.backend threads
-accessors combinators locals classes.tuple math.order ;
+accessors combinators locals classes.tuple math.order
+memoize ;
 IN: calendar
 
 TUPLE: timestamp year month day hour minute second gmt-offset ;
@@ -89,7 +90,7 @@ PRIVATE>
 : >time< ( timestamp -- hour minute second )
     [ hour>> ] [ minute>> ] [ second>> ] tri ;
 
-: instant ( -- dt ) 0 0 0 0 0 0 <duration> ;
+MEMO: instant ( -- dt ) 0 0 0 0 0 0 <duration> ;
 : years ( n -- dt ) instant swap >>year ;
 : months ( n -- dt ) instant swap >>month ;
 : days ( n -- dt ) instant swap >>day ;
@@ -273,7 +274,7 @@ M: timestamp time-
 M: duration time-
     before time+ ;
 
-: <zero> 0 0 0 0 0 0 instant <timestamp> ;
+MEMO: <zero> ( -- timestamp ) 0 0 0 0 0 0 instant <timestamp> ;
 
 : valid-timestamp? ( timestamp -- ? )
     clone instant >>gmt-offset

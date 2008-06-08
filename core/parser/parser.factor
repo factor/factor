@@ -221,6 +221,8 @@ ERROR: unexpected want got ;
 PREDICATE: unexpected-eof < unexpected
     unexpected-got not ;
 
+M: parsing-word stack-effect drop (( parsed -- parsed )) ;
+
 : unexpected-eof ( word -- * ) f unexpected ;
 
 : (parse-tokens) ( accum end -- accum )
@@ -366,7 +368,7 @@ M: staging-violation summary
         { [ 2dup eq? ] [ 2drop f ] }
         { [ dup not ] [ drop unexpected-eof t ] }
         { [ dup delimiter? ] [ unexpected t ] }
-        { [ dup parsing? ] [ nip execute-parsing t ] }
+        { [ dup parsing-word? ] [ nip execute-parsing t ] }
         [ pick push drop t ]
     } cond ;
 
@@ -393,15 +395,15 @@ SYMBOL: lexer-factory
     lexer-factory get call (parse-lines) ;
 
 ! Parsing word utilities
-: parse-effect ( -- effect )
-    ")" parse-tokens "(" over member? [
-        "Stack effect declaration must not contain (" throw
-    ] [
+: parse-effect ( end -- effect )
+    parse-tokens dup { "(" "((" } intersect empty? [
         { "--" } split1 dup [
             <effect>
         ] [
             "Stack effect declaration must contain --" throw
         ] if
+    ] [
+        "Stack effect declaration must not contain ( or ((" throw
     ] if ;
 
 ERROR: bad-number ;
@@ -415,7 +417,7 @@ ERROR: bad-number ;
 : parse-definition ( -- quot )
     \ ; parse-until >quotation ;
 
-: (:) CREATE-WORD parse-definition ;
+: (:) ( -- word def ) CREATE-WORD parse-definition ;
 
 SYMBOL: current-class
 SYMBOL: current-generic
@@ -429,11 +431,11 @@ SYMBOL: current-generic
         r> call
     ] with-scope ; inline
 
-: (M:)
+: (M:) ( method def -- )
     CREATE-METHOD [ parse-definition ] with-method-definition ;
 
 : scan-object ( -- object )
-    scan-word dup parsing?
+    scan-word dup parsing-word?
     [ V{ } clone swap execute first ] when ;
 
 GENERIC: expected>string ( obj -- str )

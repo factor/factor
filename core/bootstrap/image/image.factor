@@ -85,13 +85,6 @@ SYMBOL: objects
 : 1-offset              8 ; inline
 : -1-offset             9 ; inline
 
-: array-start 2 bootstrap-cells object tag-number - ;
-: scan@ array-start bootstrap-cell - ;
-: wrapper@ bootstrap-cell object tag-number - ;
-: word-xt@ 8 bootstrap-cells object tag-number - ;
-: quot-array@ bootstrap-cell object tag-number - ;
-: quot-xt@ 3 bootstrap-cells object tag-number - ;
-
 : jit-define ( quot rc rt offset name -- )
     >r { [ { } make ] [ ] [ ] [ ] } spread 4array r> set ;
 
@@ -203,9 +196,9 @@ GENERIC: ' ( obj -- ptr )
 
 ! Bignums
 
-: bignum-bits bootstrap-cell-bits 2 - ;
+: bignum-bits ( -- n ) bootstrap-cell-bits 2 - ;
 
-: bignum-radix bignum-bits 2^ 1- ;
+: bignum-radix ( -- n ) bignum-bits 2^ 1- ;
 
 : bignum>seq ( n -- seq )
     #! n is positive or zero.
@@ -248,15 +241,15 @@ M: float '
 
 ! Padded with fixnums for 8-byte alignment
 
-: t, t t-offset fixup ;
+: t, ( -- ) t t-offset fixup ;
 
 M: f '
     #! f is #define F RETAG(0,F_TYPE)
     drop \ f tag-number ;
 
-:  0,  0 >bignum '  0-offset fixup ;
-:  1,  1 >bignum '  1-offset fixup ;
-: -1, -1 >bignum ' -1-offset fixup ;
+:  0, ( -- )  0 >bignum '  0-offset fixup ;
+:  1, ( -- )  1 >bignum '  1-offset fixup ;
+: -1, ( -- ) -1 >bignum ' -1-offset fixup ;
 
 ! Words
 

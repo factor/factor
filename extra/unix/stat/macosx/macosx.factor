@@ -28,6 +28,6 @@ C-STRUCT: stat
 FUNCTION: int stat  ( char* pathname, stat* buf ) ;
 FUNCTION: int lstat ( char* pathname, stat* buf ) ;
 
-: stat-st_atim stat-st_atimespec ;
-: stat-st_mtim stat-st_mtimespec ;
-: stat-st_ctim stat-st_ctimespec ;
+: stat-st_atim ( stat -- timespec ) stat-st_atimespec ;
+: stat-st_mtim ( stat -- timespec ) stat-st_mtimespec ;
+: stat-st_ctim ( stat -- timespec ) stat-st_ctimespec ;

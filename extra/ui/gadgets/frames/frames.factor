@@ -8,7 +8,7 @@ IN: ui.gadgets.frames
 ! gadgets gets left-over space.
 TUPLE: frame ;
 
-: <frame-grid> 9 [ drop <gadget> ] map 3 group ;
+: <frame-grid> ( -- grid ) 9 [ drop <gadget> ] map 3 group ;
 
 : @center 1 1 ;
 : @left 0 1 ;

@@ -40,16 +40,14 @@ IN: tools.deploy.backend
     my-boot-image-name resource-path exists?
     [ my-arch make-image ] unless ;
 
-: ?, [ , ] [ drop ] if ;
-
 : bootstrap-profile ( -- profile )
-    [
-        "math" deploy-math? get ?,
-        "compiler" deploy-compiler? get ?,
-        "ui" deploy-ui? get ?,
-        "io" native-io? ?,
-        "random" deploy-random? get ?,
-    ] { } make ;
+    {
+        { "math"     deploy-math?     }
+        { "compiler" deploy-compiler? }
+        { "ui"       deploy-ui?       }
+        { "random"   deploy-random?   }
+    } [ nip get ] assoc-filter keys
+    native-io? [ "io" suffix ] when ;
 
 : staging-image-name ( profile -- name )
     "staging."

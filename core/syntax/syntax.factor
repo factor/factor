@@ -182,8 +182,12 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "(" [
-        parse-effect word
+        ")" parse-effect word
         [ swap "declared-effect" set-word-prop ] [ drop ] if*
+    ] define-syntax
+
+    "((" [
+        "))" parse-effect parsed
     ] define-syntax
 
     "MAIN:" [ scan-word in get vocab set-vocab-main ] define-syntax

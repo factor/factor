@@ -192,7 +192,7 @@ unit-test
 [ f ] [ 0 power-of-2? ] unit-test
 [ t ] [ 1 power-of-2? ] unit-test
 
-: ratio>float [ >bignum ] bi@ /f ;
+: ratio>float ( a b -- f ) [ >bignum ] bi@ /f ;
 
 [ 5. ] [ 5 1 ratio>float ] unit-test
 [ 4. ] [ 4 1 ratio>float ] unit-test
@@ -206,7 +206,7 @@ unit-test
 [ HEX: 3fe553522d230931 ]
 [ 61967020039 92984792073 ratio>float double>bits ] unit-test
 
-: random-integer
+: random-integer ( -- n )
     32 random-bits
     1 random zero? [ neg ] when
     1 random zero? [ >bignum ] when ;

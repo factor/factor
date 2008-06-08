@@ -1,8 +1,9 @@
-USING: kernel parser sequences words ;
+USING: kernel parser sequences words effects ;
 IN: values
 
 : VALUE:
-    CREATE-WORD { f } clone [ first ] curry define ; parsing
+    CREATE-WORD { f } clone [ first ] curry
+    (( -- value )) define-declared ; parsing
 
 : set-value ( value word -- )
     word-def first set-first ;

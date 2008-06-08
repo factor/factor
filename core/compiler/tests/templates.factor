@@ -31,7 +31,7 @@ unit-test
 
 [ 2 ] [ 1 2 [ swap fixnum/i ] compile-call ] unit-test
 
-: foo ;
+: foo ( -- ) ;
 
 [ 5 5 ]
 [ 1.2 [ tag [ foo ] keep ] compile-call ]
@@ -103,10 +103,10 @@ unit-test
 
 
 ! Test how dispatch handles the end of a basic block
-: try-breaking-dispatch
+: try-breaking-dispatch ( n a b -- a b str )
     float+ swap { [ "hey" ] [ "bye" ] } dispatch ;
 
-: try-breaking-dispatch-2
+: try-breaking-dispatch-2 ( -- ? )
     1 1.0 2.5 try-breaking-dispatch "bye" = >r 3.5 = r> and ;
 
 [ t ] [
@@ -143,7 +143,7 @@ unit-test
 ] unit-test
 
 ! Regression
-: foox
+: foox ( obj -- obj )
     dup not
     [ drop 3 ] [ dup tuple? [ drop 4 ] [ drop 5 ] if ] if ;
 
@@ -189,7 +189,7 @@ TUPLE: my-tuple ;
 ] unit-test
 
 ! Regression
-: a-dummy drop "hi" print ;
+: a-dummy ( -- ) drop "hi" print ;
 
 [ ] [
     1 [
@@ -203,7 +203,7 @@ TUPLE: my-tuple ;
     ] compile-call
 ] unit-test
 
-: float-spill-bug
+: float-spill-bug ( a -- b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b )
     {
         [ dup float+ ]
         [ dup float+ ]

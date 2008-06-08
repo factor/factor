@@ -413,7 +413,13 @@ HELP: (
 { $syntax "( inputs -- outputs )" }
 { $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
 { $description "Declares the stack effect of the most recently defined word, storing a new " { $link effect } " instance in the " { $snippet "\"declared-effect\"" } " word property." }
-{ $notes "Recursive words must have a declared stack effect to compile. See " { $link "effect-declaration" } " for details." } ;
+{ $notes "Words must have a declared stack effect to compile. See " { $link "effect-declaration" } " for details." } ;
+
+HELP: ((
+{ $syntax "(( inputs -- outputs ))" }
+{ $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
+{ $description "Literal stack effect syntax." }
+{ $notes "Useful for meta-programming with " { $link define-declared } "." } ;
 
 HELP: !
 { $syntax "! comment..." }

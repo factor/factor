@@ -62,7 +62,7 @@ M: walker-gadget focusable-child*
         g walker-gadget-traceback 1 track,
     ] { 0 1 } build-track ;
 
-: walker-help "ui-walker" help-window ;
+: walker-help ( -- ) "ui-walker" help-window ;
 
 \ walker-help H{ { +nullary+ t } } define-command
 

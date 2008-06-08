@@ -48,19 +48,11 @@ IN: inference.tests
 ] must-fail
 
 ! Test inference of termination of control flow
-: termination-test-1
-    "foo" throw ;
+: termination-test-1 ( -- * ) "foo" throw ;
 
-: termination-test-2 [ termination-test-1 ] [ 3 ] if ;
+: termination-test-2 ( ? -- x ) [ termination-test-1 ] [ 3 ] if ;
 
 { 1 1 } [ termination-test-2 ] must-infer-as
-
-: infinite-loop infinite-loop ;
-
-[ [ infinite-loop ] infer ] must-fail
-
-: no-base-case-1 dup [ no-base-case-1 ] [ no-base-case-1 ] if ;
-[ [ no-base-case-1 ] infer ] must-fail
 
 : simple-recursion-1 ( obj -- obj )
     dup [ simple-recursion-1 ] [ ] if ;
@@ -131,7 +123,7 @@ SYMBOL: sym-test
 
 { 0 1 } [ sym-test ] must-infer-as
 
-: terminator-branch
+: terminator-branch ( a -- b )
     dup [
         length
     ] [
@@ -198,11 +190,10 @@ DEFER: blah4
 [ [ [ 1 ] [ ] bad-combinator ] infer ] must-fail
 
 ! Regression
-: bad-input#
+{ 2 2 } [
     dup string? [ 2array throw ] unless
-    over string? [ 2array throw ] unless ;
-
-{ 2 2 } [ bad-input# ] must-infer-as
+    over string? [ 2array throw ] unless
+] must-infer-as
 
 ! Regression
 
@@ -224,7 +215,7 @@ DEFER: do-crap*
 { 2 1 } [ too-deep ] must-infer-as
 
 ! Error reporting is wrong
-MATH: xyz
+MATH: xyz ( a b -- c )
 M: fixnum xyz 2array ;
 M: float xyz
     [ 3 ] bi@ swapd >r 2array swap r> 2array swap ;
@@ -448,7 +439,7 @@ DEFER: bar
 ! Incorrect stack declarations on inline recursive words should
 ! be caught
 : fooxxx ( a b -- c ) over [ foo ] when ; inline
-: barxxx fooxxx ;
+: barxxx ( a b -- c ) fooxxx ;
 
 [ [ barxxx ] infer ] must-fail
 
@@ -472,9 +463,7 @@ M: string my-hook "a string" ;
 
 DEFER: deferred-word
 
-: calls-deferred-word [ deferred-word ] [ 3 ] if ;
-
-{ 1 1 } [ calls-deferred-word ] must-infer-as
+{ 1 1 } [ [ deferred-word ] [ 3 ] if ] must-infer-as
 
 USE: inference.dataflow
 
@@ -557,26 +546,26 @@ ERROR: custom-error ;
 
 [ [ erg's-inference-bug ] infer ] must-fail
 
-: inference-invalidation-a ;
-: inference-invalidation-b [ inference-invalidation-a ] dip call ; inline
-: inference-invalidation-c [ + ] inference-invalidation-b ;
-
-[ 7 ] [ 4 3 inference-invalidation-c ] unit-test
-
-{ 2 1 } [ inference-invalidation-c ] must-infer-as
-
-[ ] [ "IN: inference.tests : inference-invalidation-a 1 2 ;" eval ] unit-test
-
-[ 3 ] [ inference-invalidation-c ] unit-test
-
-{ 0 1 } [ inference-invalidation-c ] must-infer-as
-
-GENERIC: inference-invalidation-d ( obj -- )
-
-M: object inference-invalidation-d inference-invalidation-c 2drop ;
-
-\ inference-invalidation-d must-infer
-
-[ ] [ "IN: inference.tests : inference-invalidation-a ;" eval ] unit-test
-
-[ [ inference-invalidation-d ] infer ] must-fail
+! : inference-invalidation-a ( -- );
+! : inference-invalidation-b ( quot -- ) [ inference-invalidation-a ] dip call ; inline
+! : inference-invalidation-c ( a b -- c ) [ + ] inference-invalidation-b ;
+! 
+! [ 7 ] [ 4 3 inference-invalidation-c ] unit-test
+! 
+! { 2 1 } [ [ + ] inference-invalidation-b ] must-infer-as
+! 
+! [ ] [ "IN: inference.tests : inference-invalidation-a 1 2 ;" eval ] unit-test
+! 
+! [ 3 ] [ inference-invalidation-c ] unit-test
+! 
+! { 0 1 } [ inference-invalidation-c ] must-infer-as
+! 
+! GENERIC: inference-invalidation-d ( obj -- )
+! 
+! M: object inference-invalidation-d inference-invalidation-c 2drop ;
+! 
+! \ inference-invalidation-d must-infer
+! 
+! [ ] [ "IN: inference.tests : inference-invalidation-a ;" eval ] unit-test
+! 
+! [ [ inference-invalidation-d ] infer ] must-fail

@@ -6,7 +6,7 @@ sequences generic arrays generator generator.fixup
 generator.registers system layouts alien ;
 IN: cpu.x86.allot
 
-: allot-reg
+: allot-reg ( -- reg )
     #! We temporarily use the datastack register, since it won't
     #! be accessed inside the quotation given to %allot in any
     #! case.

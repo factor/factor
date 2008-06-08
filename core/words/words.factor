@@ -201,8 +201,7 @@ ERROR: bad-create name vocab ;
 : constructor-word ( name vocab -- word )
     >r "<" swap ">" 3append r> create ;
 
-: parsing? ( obj -- ? )
-    dup word? [ "parsing" word-prop ] [ drop f ] if ;
+PREDICATE: parsing-word < word "parsing" word-prop ;
 
 : delimiter? ( obj -- ? )
     dup word? [ "delimiter" word-prop ] [ drop f ] if ;
@@ -225,6 +224,6 @@ M: word hashcode*
 
 M: word literalize <wrapper> ;
 
-: ?word-name dup word? [ word-name ] when ;
+: ?word-name ( word -- name ) dup word? [ word-name ] when ;
 
 : xref-words ( -- ) all-words [ xref ] each ;
