@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel peg sequences arrays strings combinators.lib
-namespaces combinators math locals locals.private accessors
+namespaces combinators math locals locals.private locals.backend accessors
 vectors syntax lisp.parser assocs parser sequences.lib words
 quotations fry lists inspector ;
 IN: lisp
@@ -11,8 +11,12 @@ DEFER: funcall
 DEFER: lookup-var
 DEFER: lookup-macro
 DEFER: lisp-macro?
+DEFER: lisp-var?
 DEFER: macro-expand
 DEFER: define-lisp-macro
+    
+ERROR: no-such-var variable-name ;
+M: no-such-var summary drop "No such variable" ;
     
 ! Functions to convert s-exps to quotations
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -35,8 +39,8 @@ DEFER: define-lisp-macro
     [ lisp-symbol? ] pick '[ [ name>> , at ] [ ] bi or ] traverse ;
 
 : localize-lambda ( body vars -- newbody newvars )
-    make-locals dup push-locals swap
-    [ swap localize-body convert-form swap pop-locals ] dip swap ;
+    tuck make-locals dup push-locals swap
+    [ swap localize-body swapd convert-form nip swap pop-locals ] dip swap ;
                    
 : split-lambda ( cons -- body-cons vars-seq )                   
     3car -rot nip [ name>> ] lmap>array ; inline
@@ -61,20 +65,6 @@ PRIVATE>
     
 : convert-unquoted-splicing ( cons -- quot )    
     "unquote-splicing not valid outside of quasiquote!" throw ;
-    
-<PRIVATE    
-: quasiquote-unquote ( cons -- newcons )
-    [ { [ dup list? ] [ car dup lisp-symbol? ] [ name>> "unquote" equal? dup ] } 0&& nip ]
-    [ cadr ] traverse ;
-    
-: quasiquote-unquote-splicing ( cons -- newcons )    
-    [ { [ dup list? ] [ dup cdr [ cons? ] [ car cons? ] bi and ]
-        [ dup cadr car lisp-symbol? ] [ cadr car name>> "unquote-splicing" equal? dup ] } 0&& nip ]
-    [ dup cadr cdr >>cdr ] traverse ;
-PRIVATE>
-
-: convert-quasiquoted ( cons -- newcons )
-    quasiquote-unquote quasiquote-unquote-splicing ;
     
 : convert-defmacro ( cons -- quot )
     cdr [ car ] keep [ convert-lambda ] [ car name>> ] bi define-lisp-macro 1quotation ;
@@ -109,11 +99,8 @@ PRIVATE>
 : compile-form ( lisp-ast -- quot )
     convert-form lambda-rewrite call ; inline
     
-: macro-call ( lambda -- cons )
-    call ; inline
-    
 : macro-expand ( cons -- quot )
-    uncons [ list>seq [ ] like ] [ lookup-macro ] bi* call compile-form ;
+    uncons [ list>seq [ ] like ] [ lookup-macro lambda-rewrite call ] bi* call compile-form call ;
     
 : lisp-string>factor ( str -- quot )
     lisp-expr parse-result-ast compile-form ;
@@ -125,9 +112,6 @@ PRIVATE>
 
 SYMBOL: lisp-env
 SYMBOL: macro-env
-    
-ERROR: no-such-var variable-name ;
-M: no-such-var summary drop "No such variable" ;
 
 : init-env ( -- )
     H{ } clone lisp-env set
@@ -141,6 +125,9 @@ M: no-such-var summary drop "No such variable" ;
     
 : lookup-var ( lisp-symbol -- quot )
     name>> lisp-get ;
+    
+: lisp-var? ( lisp-symbol -- ? )    
+    name>> lisp-env get key? ;
     
 : funcall ( quot sym -- * )
     dup lisp-symbol?  [ lookup-var ] when call ; inline
