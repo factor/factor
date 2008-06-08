@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators concurrency.mailboxes concurrency.futures io
+USING: arrays combinators concurrency.mailboxes io
        io.encodings.8-bit io.sockets kernel namespaces sequences
        sequences.lib splitting threads calendar classes.tuple
        classes ascii assocs accessors destructors continuations ;
