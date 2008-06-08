@@ -113,7 +113,7 @@ PRIVATE>
     call ; inline
     
 : macro-expand ( cons -- quot )
-    uncons [ list>seq [ ] like ] [ lookup-macro macro-call compile-form  ] bi* ;
+    uncons [ list>seq [ ] like ] [ lookup-macro ] bi* call compile-form ;
     
 : lisp-string>factor ( str -- quot )
     lisp-expr parse-result-ast compile-form ;
