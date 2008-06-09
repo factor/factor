@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators concurrency.mailboxes fry io
+USING: arrays combinators concurrency.mailboxes fry io strings
        io.encodings.8-bit io.sockets kernel namespaces sequences
        sequences.lib splitting threads calendar classes.tuple
        classes ascii assocs accessors destructors continuations ;
@@ -17,9 +17,6 @@ SYMBOL: current-irc-client
 ! "setup" objects
 TUPLE: irc-profile server port nickname password ;
 C: <irc-profile> irc-profile
-
-TUPLE: irc-channel-profile name password ;
-: <irc-channel-profile> ( -- irc-channel-profile ) irc-channel-profile new ;
 
 ! "live" objects
 TUPLE: nick name channels log ;
@@ -55,7 +52,7 @@ UNION: irc-named-listener irc-nick-listener irc-channel-listener ;
 
 SINGLETON: irc-end          ! sent when the client isn't running anymore
 SINGLETON: irc-disconnected ! sent when connection is lost
-SINGLETON: irc-connected    ! sent when connection is instantiated
+SINGLETON: irc-connected    ! sent when connection is established
 UNION: irc-broadcasted-message irc-end irc-disconnected irc-connected ;
 
 TUPLE: irc-message line prefix command parameters trailing timestamp ;
@@ -73,9 +70,9 @@ TUPLE: mode < irc-message name channel mode ;
 TUPLE: unhandled < irc-message ;
 
 : terminate-irc ( irc-client -- )
-    [ stream>> dispose ]
     [ in-messages>> irc-end swap mailbox-put ]
     [ f >>is-running drop ]
+    [ stream>> dispose ]
     tri ;
 
 <PRIVATE
@@ -227,21 +224,24 @@ M: privmsg handle-outgoing-irc ( privmsg -- )
 ! ======================================
 
 : irc-mailbox-get ( mailbox quot -- )
-    swap 5 seconds  '[ , , , mailbox-get-timeout swap call ] [ drop ] recover ;
-
-: stream-readln-or-close ( stream -- str/f )
-    dup stream-readln [ nip ] [ dispose f ] if* ;
+    swap 5 seconds
+    '[ , , , mailbox-get-timeout swap call ]
+    [ drop ] recover ; inline
 
 : handle-reader-message ( irc-message -- )
     irc> in-messages>> mailbox-put ;
 
 DEFER: (connect-irc)
-: handle-disconnect ( error -- )
-    drop irc>
+
+: (handle-disconnect) ( -- )
+    irc>
         [ in-messages>> irc-disconnected swap mailbox-put ]
-        [ reconnect-time>> sleep (connect-irc) ]
+        [ dup reconnect-time>> sleep (connect-irc) ]
         [ profile>> nickname>> /LOGIN ]
     tri ;
+
+: handle-disconnect ( error -- )
+    drop irc> is-running>> [ (handle-disconnect) ] when ;
 
 : (reader-loop) ( -- )
     irc> stream>> [
@@ -265,15 +265,22 @@ DEFER: (connect-irc)
 : in-multiplexer-loop ( -- )
     irc> in-messages>> [ handle-incoming-irc ] irc-mailbox-get ;
 
+: strings>privmsg ( name string -- privmsg )
+    privmsg new [ (>>trailing) ] keep [ (>>name) ] keep ;
+
 : maybe-annotate-with-name ( name obj -- obj )
-    dup privmsg instance? [ swap >>name ] [ nip ] if ;
+    {
+        { [ dup string? ] [ strings>privmsg ] }
+        { [ dup privmsg instance? ] [ swap >>name ] }
+    } cond ;
 
 : listener-loop ( name listener -- )
-    out-messages>> mailbox-get maybe-annotate-with-name
-    irc> out-messages>> mailbox-put ;
+    out-messages>> swap
+    '[ , swap maybe-annotate-with-name irc> out-messages>> mailbox-put ]
+    irc-mailbox-get ;
 
 : spawn-irc-loop ( quot name -- )
-    [ '[ @ irc> is-running>> ] ] dip
+    [ '[ irc> is-running>> [ @ ] when irc> is-running>> ] ] dip
     spawn-server drop ;
 
 : spawn-irc ( -- )
@@ -306,7 +313,7 @@ M: irc-server-listener (add-listener) ( irc-server-listener -- )
     f swap set+run-listener ;
 
 : (connect-irc) ( irc-client -- )
-    [ profile>> [ server>> ] keep port>> /CONNECT ] keep
+    [ profile>> [ server>> ] [ port>> ] bi /CONNECT ] keep
         swap >>stream
         t >>is-running
     in-messages>> irc-connected swap mailbox-put ;
