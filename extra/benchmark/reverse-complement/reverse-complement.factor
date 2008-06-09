@@ -38,10 +38,10 @@ HINTS: do-line vector string ;
         ] with-file-reader
     ] with-file-writer ;
 
-: reverse-complement-in
+: reverse-complement-in ( -- path )
     "reverse-complement-in.txt" temp-file ;
 
-: reverse-complement-out
+: reverse-complement-out ( -- path )
     "reverse-complement-out.txt" temp-file ;
 
 : reverse-complement-main ( -- )

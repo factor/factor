@@ -319,9 +319,9 @@ HELP: POSTPONE:
 { $notes "This word is used inside parsing words to delegate further action to another parsing word, and to refer to parsing words literally from literal arrays and such." } ;
 
 HELP: :
-{ $syntax ": word definition... ;" }
+{ $syntax ": word ( stack -- effect ) definition... ;" }
 { $values { "word" "a new word to define" } { "definition" "a word definition" } }
-{ $description "Defines a word in the current vocabulary." }
+{ $description "Defines a word with the given stack effect in the current vocabulary. The stack effect is optional for words which only push literals on the stack." }
 { $examples { $code ": ask-name ( -- name )\n    \"What is your name? \" write readln ;\n: greet ( name -- )\n    \"Greetings, \" write print ;\n: friend ( -- )\n    ask-name greet ;" } } ;
 
 { POSTPONE: : POSTPONE: ; define } related-words
@@ -413,13 +413,21 @@ HELP: (
 { $syntax "( inputs -- outputs )" }
 { $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
 { $description "Declares the stack effect of the most recently defined word, storing a new " { $link effect } " instance in the " { $snippet "\"declared-effect\"" } " word property." }
-{ $notes "Words must have a declared stack effect to compile. See " { $link "effect-declaration" } " for details." } ;
+{ $notes "All words except those only pushing literals on the stack must have a stack effect declaration. See " { $link "effect-declaration" } " for details." } ;
 
 HELP: ((
 { $syntax "(( inputs -- outputs ))" }
 { $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
 { $description "Literal stack effect syntax." }
-{ $notes "Useful for meta-programming with " { $link define-declared } "." } ;
+{ $notes "Useful for meta-programming with " { $link define-declared } "." }
+{ $examples
+    { $code
+        "SYMBOL: my-dynamic-word"
+        "USING: math random words ;"
+        "3 { [ + ] [ - ] [ * ] [ / ] } random curry"
+        "(( x -- y )) define-declared"
+    }
+} ;
 
 HELP: !
 { $syntax "! comment..." }

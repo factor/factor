@@ -84,7 +84,7 @@ DEFER: (splay)
 : get-largest ( node -- node )
     dup [ dup node-right [ nip get-largest ] when* ] when ;
 
-: splay-largest
+: splay-largest ( node -- node )
     dup [ dup get-largest node-key swap splay-at ] when ;
 
 : splay-join ( n2 n1 -- node )

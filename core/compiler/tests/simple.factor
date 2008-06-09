@@ -81,11 +81,11 @@ IN: compiler.tests
 
 [ ] [ dummy-if-2 ] unit-test
 
-: dummy-if-3 ( -- ) t [ 1 ] [ 2 ] if ;
+: dummy-if-3 ( -- n ) t [ 1 ] [ 2 ] if ;
 
 [ 1 ] [ dummy-if-3 ] unit-test
 
-: dummy-if-4 ( -- ) f [ 1 ] [ 2 ] if ;
+: dummy-if-4 ( -- n ) f [ 1 ] [ 2 ] if ;
 
 [ 2 ] [ dummy-if-4 ] unit-test
 
@@ -140,12 +140,12 @@ DEFER: countdown-b
 [ 16 ] [ 4 dummy-when-3 ] unit-test
 [ f ] [ f dummy-when-3 ] unit-test
 
-: dummy-when-4 ( a -- b c ) dup [ dup dup fixnum* fixnum* ] when swap ;
+: dummy-when-4 ( a b -- a b ) dup [ dup dup fixnum* fixnum* ] when swap ;
 
 [ 64 f ] [ f 4 dummy-when-4 ] unit-test
 [ f t ] [ t f dummy-when-4 ] unit-test
 
-: dummy-when-5 ( -- ) f [ dup fixnum* ] when ;
+: dummy-when-5 ( a -- b ) f [ dup fixnum* ] when ;
 
 [ f ] [ f dummy-when-5 ] unit-test
 

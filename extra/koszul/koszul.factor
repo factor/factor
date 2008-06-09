@@ -7,7 +7,7 @@ splitting sorting shuffle symbols sets math.order ;
 IN: koszul
 
 ! Utilities
-: -1^ odd? -1 1 ? ;
+: -1^ ( m -- n ) odd? -1 1 ? ;
 
 : >alt ( obj -- vec )
     {
@@ -18,7 +18,7 @@ IN: koszul
         [ 1array >alt ]
     } cond ;
 
-: canonicalize
+: canonicalize ( assoc -- assoc' )
     [ nip zero? not ] assoc-filter ;
 
 SYMBOL: terms
@@ -207,8 +207,8 @@ DEFER: (d)
     [ v- ] 2map ;
 
 ! Laplacian
-: m.m' dup flip m. ;
-: m'.m dup flip swap m. ;
+: m.m' ( matrix -- matrix' ) dup flip m. ;
+: m'.m ( matrix -- matrix' ) dup flip swap m. ;
 
 : empty-matrix? ( matrix -- ? )
     dup empty? [ drop t ] [ first empty? ] if ;

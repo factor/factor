@@ -65,7 +65,7 @@ SYMBOL: html
     #! dynamically creating words.
     >r >r elements-vocab create r> r> define-declared ;
 
-: <foo> "<" swap ">" 3append ;
+: <foo> ( str -- <str> ) "<" swap ">" 3append ;
 
 : def-for-html-word-<foo> ( name -- )
     #! Return the name and code for the <foo> patterned
@@ -73,7 +73,7 @@ SYMBOL: html
     dup <foo> swap [ <foo> write-html ] curry
     (( -- )) html-word ;
 
-: <foo "<" prepend ;
+: <foo ( str -- <str ) "<" prepend ;
 
 : def-for-html-word-<foo ( name -- )
     #! Return the name and code for the <foo patterned
@@ -81,21 +81,21 @@ SYMBOL: html
     <foo dup [ write-html ] curry
     (( -- )) html-word ;
 
-: foo> ">" append ;
+: foo> ( str -- foo> ) ">" append ;
 
 : def-for-html-word-foo> ( name -- )
     #! Return the name and code for the foo> patterned
     #! word.
     foo> [ ">" write-html ] (( -- )) html-word ;
 
-: </foo> "</" swap ">" 3append ;
+: </foo> ( str -- </str> ) "</" swap ">" 3append ;
 
 : def-for-html-word-</foo> ( name -- )
     #! Return the name and code for the </foo> patterned
     #! word.
     </foo> dup [ write-html ] curry (( -- )) html-word ;
 
-: <foo/> "<" swap "/>" 3append ;
+: <foo/> ( str -- <str/> ) "<" swap "/>" 3append ;
 
 : def-for-html-word-<foo/> ( name -- )
     #! Return the name and code for the <foo/> patterned
@@ -103,7 +103,7 @@ SYMBOL: html
     dup <foo/> swap [ <foo/> write-html ] curry
     (( -- )) html-word ;
 
-: foo/> "/>" append ;
+: foo/> ( str -- str/> ) "/>" append ;
 
 : def-for-html-word-foo/> ( name -- )
     #! Return the name and code for the foo/> patterned

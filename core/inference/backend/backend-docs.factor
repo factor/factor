@@ -62,7 +62,7 @@ HELP: effect-error
 { $error-description "Thrown when a word's inferred stack effect does not match its declared stack effect." } ;
 
 HELP: missing-effect
-{ $error-description "Thrown when inference encounters a word lacking a stack effect declaration. Words not declared " { $link POSTPONE: inline } " must declare a stack effect in order to compile." } ;
+{ $error-description "Thrown when inference encounters a word lacking a stack effect declaration. Stack effects of words must be declared, with the exception of words which only push literals on the stack." } ;
 
 HELP: recursive-quotation-error
 { $error-description "Thrown when a quotation calls itself, directly or indirectly, within the same word. Stack effect inference becomes equivalent to the halting problem if quotation recursion has to be taken into account, hence it is not permitted." }

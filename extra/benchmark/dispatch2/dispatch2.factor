@@ -1,7 +1,7 @@
 USING: namespaces math sequences splitting kernel columns ;
 IN: benchmark.dispatch2
 
-: sequences
+: sequences ( -- seq )
     [
         1 ,
         10 >bignum ,
@@ -21,9 +21,9 @@ IN: benchmark.dispatch2
         1 [ + ] curry ,
     ] { } make ;
 
-: don't-flush-me drop ;
+: don't-flush-me ( obj -- ) drop ;
 
-: dispatch-test
+: dispatch-test ( -- )
     1000000 sequences
     [ [ 0 swap nth don't-flush-me ] each ] curry times ;
 

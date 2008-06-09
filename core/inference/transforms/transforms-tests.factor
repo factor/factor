@@ -6,7 +6,7 @@ classes ;
 : compose-n-quot ( word -- quot' ) <repetition> >quotation ;
 : compose-n ( quot -- ) compose-n-quot call ;
 \ compose-n [ compose-n-quot ] 2 define-transform
-: compose-n-test ( -- x ) 2 \ + compose-n ;
+: compose-n-test ( a b c -- x ) 2 \ + compose-n ;
 
 [ 6 ] [ 1 2 3 compose-n-test ] unit-test
 

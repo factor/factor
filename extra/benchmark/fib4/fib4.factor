@@ -17,6 +17,6 @@ C: <box> box
         swap box-i swap box-i + <box>
     ] if ;
 
-: fib-main T{ box f 34 } tuple-fib T{ box f 9227465 } assert= ;
+: fib-main ( -- ) T{ box f 34 } tuple-fib T{ box f 9227465 } assert= ;
 
 MAIN: fib-main

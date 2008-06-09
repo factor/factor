@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs namespaces sequences kernel words ;
+USING: assocs namespaces sequences kernel definitions ;
 IN: inference.state
 
 ! Nesting state to solve recursion

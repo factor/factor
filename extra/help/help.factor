@@ -127,7 +127,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     ":vars - list all variables at error time" print ;
 
 : :help ( -- )
-    error get error-help [ help ] [ "No help for this error. " print ] if
+    error get error-help [ help ] [ "No help for this error. " print ] if*
     :help-debugger ;
 
 : remove-article ( name -- )

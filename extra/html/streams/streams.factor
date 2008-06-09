@@ -135,7 +135,7 @@ TUPLE: html-block-stream < html-sub-stream ;
 M: html-block-stream dispose ( quot style stream -- )
     end-sub-stream a-div format-html-div ;
 
-: border-spacing-css,
+: border-spacing-css, ( pair -- )
     "padding: " % first2 max 2 /i # "px; " % ;
 
 : table-style ( style -- str )

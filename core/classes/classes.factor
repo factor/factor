@@ -67,8 +67,6 @@ GENERIC: reset-class ( class -- )
 
 M: word reset-class drop ;
 
-<PRIVATE
-
 ! update-map
 : class-uses ( class -- seq )
     [
@@ -80,6 +78,8 @@ M: word reset-class drop ;
 
 : class-usages ( class -- assoc )
     [ update-map get at ] closure ;
+
+<PRIVATE
 
 : update-map+ ( class -- )
     dup class-uses update-map get add-vertex ;
@@ -100,6 +100,7 @@ M: word reset-class drop ;
 : (define-class) ( word props -- )
     >r
     dup reset-class
+    dup class? [ dup new-class ] unless
     dup deferred? [ dup define-symbol ] when
     dup word-props
     r> assoc-union over set-word-props
@@ -115,13 +116,13 @@ GENERIC: update-class ( class -- )
 
 M: class update-class drop ;
 
-GENERIC: update-methods ( assoc -- )
+GENERIC: update-methods ( class assoc -- )
 
 : update-classes ( class -- )
-    class-usages
-    [ [ drop update-class ] assoc-each ]
+    dup class-usages
+    [ nip keys [ update-class ] each ]
     [ update-methods ]
-    bi ;
+    2bi ;
 
 : define-class ( word superclass members participants metaclass -- )
     #! If it was already a class, update methods after.

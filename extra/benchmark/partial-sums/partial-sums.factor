@@ -58,6 +58,6 @@ HINTS: gregory fixnum ;
         ] with each
     ] tabular-output ;
 
-: partial-sums-main 2500000 partial-sums ;
+: partial-sums-main ( -- ) 2500000 partial-sums ;
 
 MAIN: partial-sums-main

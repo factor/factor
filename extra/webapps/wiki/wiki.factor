@@ -43,7 +43,7 @@ article "ARTICLES" {
 
 : <article> ( title -- article ) article new swap >>title ;
 
-: init-articles-table article ensure-table ;
+: init-articles-table ( -- ) article ensure-table ;
 
 TUPLE: revision id title author date content ;
 
@@ -68,7 +68,7 @@ M: revision feed-entry-url id>> revision-url ;
 : <revision> ( id -- revision )
     revision new swap >>id ;
 
-: init-revisions-table revision ensure-table ;
+: init-revisions-table ( -- ) revision ensure-table ;
 
 : validate-title ( -- )
     { { "title" [ v-one-line ] } } validate-params ;

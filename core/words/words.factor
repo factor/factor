@@ -114,16 +114,20 @@ compiled-crossref global [ H{ } assoc-like ] change-at
     dup compiled-unxref
     compiled-crossref get delete-at ;
 
-SYMBOL: +inlined+
-SYMBOL: +called+
-
 : compiled-usage ( word -- assoc )
     compiled-crossref get at ;
 
-: compiled-usages ( words -- seq )
-    [ unique dup ] keep [
-        compiled-usage [ nip +inlined+ eq? ] assoc-filter update
-    ] with each keys ;
+: compiled-usages ( assoc -- seq )
+    clone [
+        dup [
+            [
+                [ compiled-usage ] dip
+                +inlined+ eq? [
+                    [ nip +inlined+ eq? ] assoc-filter
+                ] when
+            ] dip swap update
+        ] curry assoc-each
+    ] keep keys ;
 
 GENERIC: redefined ( word -- )
 
@@ -134,7 +138,7 @@ M: object redefined drop ;
     over unxref
     over redefined
     over set-word-def
-    dup changed-definition
+    dup +inlined+ changed-definition
     dup crossref? [ dup xref ] when drop ;
 
 : define-declared ( word def effect -- )

@@ -22,10 +22,11 @@ PREDICATE: union-class < class
 
 M: union-class update-class define-union-predicate ;
 
+: (define-union-class) ( class members -- )
+    f swap f union-class define-class ;
+
 : define-union-class ( class members -- )
-    [ f swap f union-class define-class ]
-    [ drop update-classes ]
-    2bi ;
+    [ (define-union-class) ] [ drop update-classes ] 2bi ;
 
 M: union-class reset-class
     { "class" "metaclass" "members" } reset-props ;

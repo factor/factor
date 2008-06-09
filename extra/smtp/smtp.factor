@@ -23,7 +23,7 @@ LOG: log-smtp-connection NOTICE ( addrspec -- )
         call
     ] with-client ; inline
 
-: crlf "\r\n" write ;
+: crlf ( -- ) "\r\n" write ;
 
 : command ( string -- ) write crlf flush ;
 

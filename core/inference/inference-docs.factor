@@ -108,7 +108,8 @@ $nl
 { $subsection "inference-limitations" }
 { $subsection "inference-errors" }
 { $subsection "dataflow-graphs" }
-{ $subsection "compiler-transforms" } ;
+{ $subsection "compiler-transforms" }
+{ $see-also "effects" } ;
 
 ABOUT: "inference"
 

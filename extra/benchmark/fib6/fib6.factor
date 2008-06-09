@@ -1,7 +1,7 @@
 IN: benchmark.fib6
 USING: math kernel alien ;
 
-: fib
+: fib ( x -- y )
     "int" { "int" } "cdecl" [
         dup 1 <= [ drop 1 ] [
             1- dup fib swap 1- fib +
@@ -9,6 +9,6 @@ USING: math kernel alien ;
     ] alien-callback
     "int" { "int" } "cdecl" alien-indirect ;
 
-: fib-main 25 fib drop ;
+: fib-main ( -- ) 25 fib drop ;
 
 MAIN: fib-main

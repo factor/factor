@@ -4,46 +4,46 @@ combinators accessors debugger
 calendar calendar.format.macros ;
 IN: calendar.format
 
-: pad-00 number>string 2 CHAR: 0 pad-left ;
+: pad-00 ( n -- str ) number>string 2 CHAR: 0 pad-left ;
 
-: pad-0000 number>string 4 CHAR: 0 pad-left ;
+: pad-0000 ( n -- str ) number>string 4 CHAR: 0 pad-left ;
 
-: pad-00000 number>string 5 CHAR: 0 pad-left ;
+: pad-00000 ( n -- str ) number>string 5 CHAR: 0 pad-left ;
 
-: write-00 pad-00 write ;
+: write-00 ( n -- ) pad-00 write ;
 
-: write-0000 pad-0000 write ;
+: write-0000 ( n -- ) pad-0000 write ;
 
-: write-00000 pad-00000 write ;
+: write-00000 ( n -- ) pad-00000 write ;
 
-: hh hour>> write-00 ;
+: hh ( time -- ) hour>> write-00 ;
 
-: mm minute>> write-00 ;
+: mm ( time -- ) minute>> write-00 ;
 
-: ss second>> >integer write-00 ;
+: ss ( time -- ) second>> >integer write-00 ;
 
-: D day>> number>string write ;
+: D ( time -- ) day>> number>string write ;
 
-: DD day>> write-00 ;
+: DD ( time -- ) day>> write-00 ;
 
-: DAY day-of-week day-abbreviations3 nth write ;
+: DAY ( time -- ) day-of-week day-abbreviations3 nth write ;
 
-: MM month>> write-00 ;
+: MM ( time -- ) month>> write-00 ;
 
-: MONTH month>> month-abbreviations nth write ;
+: MONTH ( time -- ) month>> month-abbreviations nth write ;
 
-: YYYY year>> write-0000 ;
+: YYYY ( time -- ) year>> write-0000 ;
 
-: YYYYY year>> write-00000 ;
+: YYYYY ( time -- ) year>> write-00000 ;
 
 : expect ( str -- )
     read1 swap member? [ "Parse error" throw ] unless ;
 
-: read-00 2 read string>number ;
+: read-00 ( -- n ) 2 read string>number ;
 
-: read-000 3 read string>number ;
+: read-000 ( -- n ) 3 read string>number ;
 
-: read-0000 4 read string>number ;
+: read-0000 ( -- n ) 4 read string>number ;
 
 GENERIC: day. ( obj -- )
 
@@ -261,7 +261,7 @@ ERROR: invalid-timestamp-format ;
 : timestamp>ymd ( timestamp -- str )
     [ (timestamp>ymd) ] with-string-writer ;
 
-: (timestamp>hms)
+: (timestamp>hms) ( timestamp -- )
     { hh ":" mm ":" ss } formatted ;
 
 : timestamp>hms ( timestamp -- str )

@@ -21,7 +21,7 @@ webapps.wee-url
 webapps.user-admin ;
 IN: webapps.factor-website
 
-: test-db "resource:test.db" sqlite-db ;
+: test-db ( -- db params ) "resource:test.db" sqlite-db ;
 
 : init-factor-db ( -- )
     test-db [

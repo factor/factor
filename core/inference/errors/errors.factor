@@ -5,13 +5,13 @@ USING: inference.backend inference.dataflow kernel generic
 sequences prettyprint io words arrays inspector effects debugger
 assocs accessors ;
 
+M: inference-error error-help error>> error-help ;
+
 M: inference-error error.
     dup rstate>>
     keys [ dup value? [ value-literal ] when ] map
     dup empty? [ "Word: " write dup peek . ] unless
     swap error>> error. "Nesting: " write . ;
-
-M: inference-error error-help drop f ;
 
 M: unbalanced-branches-error error.
     "Unbalanced branches:" print

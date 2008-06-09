@@ -40,7 +40,7 @@ M: xml-string-error summary ( obj -- str )
     ] with-string-writer ;
 
 TUPLE: mismatched < parsing-error open close ;
-: <mismatched>
+: <mismatched> ( open close -- error )
     \ mismatched parsing-error swap >>close swap >>open ;
 M: mismatched summary ( obj -- str )
     [
@@ -111,7 +111,7 @@ M: extra-attrs summary ( obj -- str )
     ] with-string-writer ;
 
 TUPLE: bad-version < parsing-error num ;
-: <bad-version>
+: <bad-version> ( num -- error )
     \ bad-version parsing-error swap >>num ;
 M: bad-version summary ( obj -- str )
     [

@@ -48,7 +48,7 @@ M: expected summary ( obj -- str )
     ] with-string-writer ;
 
 TUPLE: unexpected-end < parsing-error ;
-: unexpected-end \ unexpected-end parsing-error throw ;
+: unexpected-end ( -- * ) \ unexpected-end parsing-error throw ;
 M: unexpected-end summary ( obj -- str )
     [
         call-next-method write
@@ -56,7 +56,7 @@ M: unexpected-end summary ( obj -- str )
     ] with-string-writer ;
 
 TUPLE: missing-close < parsing-error ;
-: missing-close \ missing-close parsing-error throw ;
+: missing-close ( -- * ) \ missing-close parsing-error throw ;
 M: missing-close summary ( obj -- str )
     [
         call-next-method write
@@ -111,7 +111,7 @@ SYMBOL: prolog-data
     [ dup get-char = ] take-until nip ;
 
 TUPLE: not-enough-characters < parsing-error ;
-: not-enough-characters
+: not-enough-characters ( -- * )
     \ not-enough-characters parsing-error throw ;
 M: not-enough-characters summary ( obj -- str )
     [
