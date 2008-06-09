@@ -42,7 +42,7 @@ nl
 
     underlying
 
-    find-pair-next namestack*
+    namestack*
 
     bitand bitor bitxor bitnot
 } compile-uncompiled
