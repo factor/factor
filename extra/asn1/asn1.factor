@@ -48,7 +48,7 @@ SYMBOL: elements
 
 TUPLE: element syntax id tag tagclass encoding contentlength newobj objtype ;
 
-: <element> element new ;
+: <element> ( -- element ) element new ;
 
 : set-id ( -- boolean )
     read1 dup elements get set-element-id ;

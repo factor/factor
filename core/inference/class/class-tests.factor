@@ -142,7 +142,7 @@ M: object xyz ;
 [ f ] [ [ <reversed> length ] \ slot inlined? ] unit-test
 
 ! We don't want to use = to compare literals
-: foo reverse ;
+: foo ( seq -- seq' ) reverse ;
 
 \ foo [
     [

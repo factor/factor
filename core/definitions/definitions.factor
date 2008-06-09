@@ -7,10 +7,21 @@ ERROR: no-compilation-unit definition ;
 
 SYMBOL: changed-definitions
 
-: changed-definition ( defspec -- )
-    dup changed-definitions get
-    [ no-compilation-unit ] unless*
-    set-at ;
+SYMBOL: +inlined+
+SYMBOL: +called+
+
+: changed-definition ( defspec how -- )
+    swap changed-definitions get
+    [ set-at ] [ no-compilation-unit ] if* ;
+
+SYMBOL: new-classes
+
+: new-class ( word -- )
+    dup new-classes get
+    [ set-at ] [ no-compilation-unit ] if* ;
+
+: new-class? ( word -- ? )
+    new-classes get key? ;
 
 GENERIC: where ( defspec -- loc )
 

@@ -38,9 +38,9 @@ IN: bunny.model
     ascii [ parse-model ] with-file-reader
     [ normals ] 2keep 3array ;
 
-: model-path "bun_zipper.ply" temp-file ;
+: model-path ( -- path ) "bun_zipper.ply" temp-file ;
 
-: model-url "http://factorcode.org/bun_zipper.ply" ;
+: model-url ( -- url ) "http://factorcode.org/bun_zipper.ply" ;
 
 : maybe-download ( -- path )
     model-path dup exists? [

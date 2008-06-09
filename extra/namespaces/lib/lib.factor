@@ -22,25 +22,25 @@ SYMBOL: building-seq
 : get-building-seq ( n -- seq )
     building-seq get nth ;
 
-: n, get-building-seq push ;
-: n% get-building-seq push-all ;
-: n# >r number>string r> n% ;
+: n, ( obj n -- ) get-building-seq push ;
+: n% ( seq n -- ) get-building-seq push-all ;
+: n# ( num n -- ) >r number>string r> n% ;
 
-: 0, 0 n, ;
-: 0% 0 n% ;
-: 0# 0 n# ;
-: 1, 1 n, ;
-: 1% 1 n% ;
-: 1# 1 n# ;
-: 2, 2 n, ;
-: 2% 2 n% ;
-: 2# 2 n# ;
-: 3, 3 n, ;
-: 3% 3 n% ;
-: 3# 3 n# ;
-: 4, 4 n, ;
-: 4% 4 n% ;
-: 4# 4 n# ;
+: 0, ( obj -- ) 0 n, ;
+: 0% ( seq -- ) 0 n% ;
+: 0# ( num -- ) 0 n# ;
+: 1, ( obj -- ) 1 n, ;
+: 1% ( seq -- ) 1 n% ;
+: 1# ( num -- ) 1 n# ;
+: 2, ( obj -- ) 2 n, ;
+: 2% ( seq -- ) 2 n% ;
+: 2# ( num -- ) 2 n# ;
+: 3, ( obj -- ) 3 n, ;
+: 3% ( seq -- ) 3 n% ;
+: 3# ( num -- ) 3 n# ;
+: 4, ( obj -- ) 4 n, ;
+: 4% ( seq -- ) 4 n% ;
+: 4# ( num -- ) 4 n# ;
 
 MACRO:: nmake ( quot exemplars -- )
     [let | n [ exemplars length ] |

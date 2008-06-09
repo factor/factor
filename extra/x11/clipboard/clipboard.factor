@@ -8,9 +8,9 @@ IN: x11.clipboard
 ! This code was based on by McCLIM's Backends/CLX/port.lisp
 ! and http://common-lisp.net/~crhodes/clx/demo/clipboard.lisp.
 
-: XA_CLIPBOARD "CLIPBOARD" x-atom ;
+: XA_CLIPBOARD ( -- atom ) "CLIPBOARD" x-atom ;
 
-: XA_UTF8_STRING "UTF8_STRING" x-atom ;
+: XA_UTF8_STRING ( -- atom ) "UTF8_STRING" x-atom ;
 
 TUPLE: x-clipboard atom contents ;
 

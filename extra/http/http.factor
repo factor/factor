@@ -16,7 +16,7 @@ EXCLUDE: fry => , ;
 
 IN: http
 
-: crlf "\r\n" write ;
+: crlf ( -- ) "\r\n" write ;
 
 : add-header ( value key assoc -- )
     [ at dup [ "; " rot 3append ] [ drop ] if ] 2keep set-at ;
@@ -135,7 +135,7 @@ cookies ;
 : set-header ( request/response value key -- request/response )
     pick header>> set-at ;
 
-: <request>
+: <request> ( -- request )
     request new
         "1.1" >>version
         <url>
@@ -293,7 +293,7 @@ content-type
 content-charset
 body ;
 
-: <response>
+: <response> ( -- response )
     response new
         "1.1" >>version
         H{ } clone >>header
@@ -301,21 +301,21 @@ body ;
         now timestamp>http-string "date" set-header
         V{ } clone >>cookies ;
 
-: read-response-version
+: read-response-version ( response -- response )
     " \t" read-until
     [ "Bad response: version" throw ] unless
     parse-version
     >>version ;
 
-: read-response-code
+: read-response-code ( response -- response )
     " \t" read-until [ "Bad response: code" throw ] unless
     string>number [ "Bad response: code" throw ] unless*
     >>code ;
 
-: read-response-message
+: read-response-message ( response -- response )
     read-crlf >>message ;
 
-: read-response-header
+: read-response-header ( response -- response )
     read-header >>header
     dup "set-cookie" header parse-cookies >>cookies
     dup "content-type" header [

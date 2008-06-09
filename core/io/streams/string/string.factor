@@ -26,7 +26,8 @@ M: growable stream-read1 dup empty? [ drop f ] [ pop ] if ;
 : growable-read-until ( growable n -- str )
     >fixnum dupd tail-slice swap harden-as dup reverse-here ;
 
-: find-last-sep swap [ memq? ] curry find-last drop ;
+: find-last-sep ( seq seps -- n )
+    swap [ memq? ] curry find-last drop ;
 
 M: growable stream-read-until
     [ find-last-sep ] keep over [

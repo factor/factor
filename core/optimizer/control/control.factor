@@ -161,7 +161,8 @@ SYMBOL: potential-loops
         } cond
     ] if ;
 
-: fold-if-branch? dup node-in-d first known-boolean-value? ;
+: fold-if-branch? ( node -- value ? )
+    dup node-in-d first known-boolean-value? ;
 
 : fold-if-branch ( node value -- node' )
     over drop-inputs >r
@@ -214,7 +215,7 @@ SYMBOL: potential-loops
 : clone-node ( node -- newnode )
     clone dup [ clone ] modify-values ;
 
-: lift-branch
+: lift-branch ( node tail -- )
     over
     last-node clone-node
     dup node-in-d \ #merge out-node

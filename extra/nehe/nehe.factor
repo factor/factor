@@ -2,7 +2,7 @@ USING: ui.gadgets.buttons ui.gadgets.packs ui.gadgets ui
 nehe.2 nehe.3 nehe.4 nehe.5 kernel ;
 IN: nehe
 
-: nehe-window
+: nehe-window ( -- )
     [
         [
             "Nehe 2" [ drop run2 ] <bevel-button> gadget,

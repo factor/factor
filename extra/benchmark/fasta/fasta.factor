@@ -105,6 +105,6 @@ HINTS: random fixnum ;
 
     ] ;
 
-: run-fasta 2500000 reverse-complement-in fasta ;
+: run-fasta ( -- ) 2500000 reverse-complement-in fasta ;
 
 MAIN: run-fasta

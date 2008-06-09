@@ -44,7 +44,7 @@ M: trivial-tuple-dispatch-engine engine>quot
     >alist V{ } clone [ hashcode 1array ] distribute-buckets
     [ <trivial-tuple-dispatch-engine> ] map ;
 
-: word-hashcode% [ 1 slot ] % ;
+: word-hashcode% ( -- ) [ 1 slot ] % ;
 
 : class-hash-dispatch-quot ( methods -- quot )
     [
@@ -78,7 +78,7 @@ M: engine-word irrelevant? drop t ;
 : define-engine-word ( quot -- word )
     >r <engine-word> dup r> define ;
 
-: array-nth% 2 + , [ slot { word } declare ] % ;
+: array-nth% ( n -- ) 2 + , [ slot { word } declare ] % ;
 
 : tuple-layout-superclasses ( obj -- array )
     { tuple } declare

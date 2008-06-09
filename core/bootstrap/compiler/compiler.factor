@@ -18,7 +18,8 @@ IN: bootstrap.compiler
 
 enable-compiler
 
-: compile-uncompiled [ compiled? not ] filter compile ;
+: compile-uncompiled ( words -- )
+    [ compiled? not ] filter compile ;
 
 nl
 "Compiling..." write flush
@@ -41,7 +42,7 @@ nl
 
     underlying
 
-    find-pair-next namestack*
+    namestack*
 
     bitand bitor bitxor bitnot
 } compile-uncompiled

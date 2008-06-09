@@ -67,7 +67,7 @@ INSTANCE: temp-reg value
 ! A data stack location.
 TUPLE: ds-loc n class ;
 
-: <ds-loc> f ds-loc boa ;
+: <ds-loc> ( n -- loc ) f ds-loc boa ;
 
 M: ds-loc minimal-ds-loc* ds-loc-n min ;
 M: ds-loc operand-class* ds-loc-class ;
@@ -78,7 +78,7 @@ M: ds-loc live-loc?
 ! A retain stack location.
 TUPLE: rs-loc n class ;
 
-: <rs-loc> f rs-loc boa ;
+: <rs-loc> ( n -- loc ) f rs-loc boa ;
 M: rs-loc operand-class* rs-loc-class ;
 M: rs-loc set-operand-class set-rs-loc-class ;
 M: rs-loc live-loc?
@@ -177,7 +177,7 @@ INSTANCE: constant value
 <PRIVATE
 
 ! Moving values between locations and registers
-: %move-bug "Bug in generator.registers" throw ;
+: %move-bug ( -- * ) "Bug in generator.registers" throw ;
 
 : %unbox-c-ptr ( dst src -- )
     dup operand-class {
@@ -231,7 +231,7 @@ GENERIC: finalize-height ( stack -- )
 : new-phantom-stack ( class -- stack )
     >r 0 V{ } clone r> boa ; inline
 
-: (loc)
+: (loc) ( m stack -- n )
     #! Utility for methods on <loc>
     height>> - ;
 

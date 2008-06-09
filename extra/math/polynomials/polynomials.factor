@@ -54,7 +54,7 @@ PRIVATE>
     #! divide the last two numbers in the sequences
     [ peek ] bi@ / ;
 
-: (p/mod)
+: (p/mod) ( p p -- p p )
     2dup /-last
     2dup , n*p swapd
     p- >vector

@@ -50,18 +50,18 @@ H{ } clone root-cache set-global
 
 SYMBOL: load-help?
 
-: source-was-loaded t swap set-vocab-source-loaded? ;
+: source-was-loaded ( vocab -- ) t swap set-vocab-source-loaded? ;
 
-: source-wasn't-loaded f swap set-vocab-source-loaded? ;
+: source-wasn't-loaded ( vocab -- ) f swap set-vocab-source-loaded? ;
 
 : load-source ( vocab -- )
     [ source-wasn't-loaded ] keep
     [ vocab-source-path [ bootstrap-file ] when* ] keep
     source-was-loaded ;
 
-: docs-were-loaded t swap set-vocab-docs-loaded? ;
+: docs-were-loaded ( vocab -- ) t swap set-vocab-docs-loaded? ;
 
-: docs-weren't-loaded f swap set-vocab-docs-loaded? ;
+: docs-weren't-loaded ( vocab -- ) f swap set-vocab-docs-loaded? ;
 
 : load-docs ( vocab -- )
     load-help? get [

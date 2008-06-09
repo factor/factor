@@ -1079,17 +1079,17 @@ FUNCTION: Status XWithdrawWindow (
 
 ! 17.1.7 - Setting and Reading the WM_NORMAL_HINTS Property
 
-: USPosition    1 0 shift ; inline
-: USSize        1 1 shift ; inline
-: PPosition     1 2 shift ; inline
-: PSize         1 3 shift ; inline
-: PMinSize      1 4 shift ; inline
-: PMaxSize      1 5 shift ; inline
-: PResizeInc    1 6 shift ; inline
-: PAspect       1 7 shift ; inline
-: PBaseSize     1 8 shift ; inline
-: PWinGravity   1 9 shift ; inline
-: PAllHints 
+: USPosition   ( -- n ) 0 2^ ; inline
+: USSize       ( -- n ) 1 2^ ; inline
+: PPosition    ( -- n ) 2 2^ ; inline
+: PSize        ( -- n ) 3 2^ ; inline
+: PMinSize     ( -- n ) 4 2^ ; inline
+: PMaxSize     ( -- n ) 5 2^ ; inline
+: PResizeInc   ( -- n ) 6 2^ ; inline
+: PAspect      ( -- n ) 7 2^ ; inline
+: PBaseSize    ( -- n ) 8 2^ ; inline
+: PWinGravity  ( -- n ) 9 2^ ; inline
+: PAllHints    ( -- n )
     { PPosition PSize PMinSize PMaxSize PResizeInc PAspect } flags ; foldable
 
 C-STRUCT: XSizeHints
@@ -1366,7 +1366,7 @@ SYMBOL: root
 
 : x-atom ( string -- atom ) dpy get swap 0 XInternAtom ;
 
-: check-display
+: check-display ( alien -- alien' )
     [
         "Cannot connect to X server - check $DISPLAY" throw
     ] unless* ;

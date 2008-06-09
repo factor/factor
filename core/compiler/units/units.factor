@@ -73,7 +73,7 @@ SYMBOL: outdated-tuples
 SYMBOL: update-tuples-hook
 
 : call-recompile-hook ( -- )
-    changed-definitions get keys [ word? ] filter
+    changed-definitions get [ drop word? ] assoc-filter
     compiled-usages recompile-hook get call ;
 
 : call-update-tuples-hook ( -- )
@@ -82,8 +82,7 @@ SYMBOL: update-tuples-hook
 : finish-compilation-unit ( -- )
     call-recompile-hook
     call-update-tuples-hook
-    dup [ drop crossref? ] assoc-contains? modify-code-heap
-     ;
+    dup [ drop crossref? ] assoc-contains? modify-code-heap ;
 
 : with-nested-compilation-unit ( quot -- )
     [
@@ -97,6 +96,7 @@ SYMBOL: update-tuples-hook
         H{ } clone changed-definitions set
         H{ } clone forgotten-definitions set
         H{ } clone outdated-tuples set
+        H{ } clone new-classes set
         <definitions> new-definitions set
         <definitions> old-definitions set
         [

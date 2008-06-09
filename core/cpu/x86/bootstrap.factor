@@ -60,7 +60,7 @@ big-endian off
     arg0 \ f tag-number CMP                    ! compare it with f
     arg0 arg1 [] CMOVNE                        ! load true branch if not equal
     arg0 arg1 bootstrap-cell [+] CMOVE         ! load false branch if equal
-    arg0 quot-xt@ [+] JMP                      ! jump to quotation-xt
+    arg0 quot-xt-offset [+] JMP                ! jump to quotation-xt
 ] rc-absolute-cell rt-literal 1 rex-length + jit-if-jump jit-define
 
 [
@@ -70,8 +70,8 @@ big-endian off
     fixnum>slot@                               ! turn it into an array offset
     ds-reg bootstrap-cell SUB                  ! pop index
     arg0 arg1 ADD                              ! compute quotation location
-    arg0 arg0 array-start [+] MOV              ! load quotation
-    arg0 quot-xt@ [+] JMP                      ! execute branch
+    arg0 arg0 array-start-offset [+] MOV       ! load quotation
+    arg0 quot-xt-offset [+] JMP                ! execute branch
 ] rc-absolute-cell rt-literal 1 rex-length + jit-dispatch jit-define
 
 [

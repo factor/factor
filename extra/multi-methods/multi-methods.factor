@@ -187,7 +187,8 @@ M: method-body crossref?
         drop [ <method> dup ] 2keep reveal-method
     ] if ;
 
-: niceify-method [ dup \ f eq? [ drop f ] when ] map ;
+: niceify-method ( seq -- seq )
+    [ dup \ f eq? [ drop f ] when ] map ;
 
 M: no-method error.
     "Type check error" print
@@ -229,10 +230,10 @@ M: no-method error.
 : create-method-in ( specializer generic -- method )
     create-method dup save-location f set-word ;
 
-: CREATE-METHOD
+: CREATE-METHOD ( -- method )
     scan-word scan-object swap create-method-in ;
 
-: (METHOD:) CREATE-METHOD parse-definition ;
+: (METHOD:) ( -- method def ) CREATE-METHOD parse-definition ;
 
 : METHOD: (METHOD:) define ; parsing
 

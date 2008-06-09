@@ -30,7 +30,7 @@ SYMBOL: margin
 
 : overrun? ( width -- ? ) x get + margin get > ;
 
-: zero-vars [ 0 swap set ] each ;
+: zero-vars ( seq -- ) [ 0 swap set ] each ;
 
 : wrap-line ( -- )
     line-height get y +@

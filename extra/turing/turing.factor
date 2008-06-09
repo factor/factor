@@ -59,12 +59,12 @@ SYMBOL: tape
     dup state-dir position [ + ] change
     state-next state set ;
 
-: c
+: c ( -- )
     #! Print current turing machine state.
     state get .
     tape get .
     2 position get 2 * + CHAR: \s <string> write "^" print ;
 
-: n
+: n ( -- )
     #! Do one step and print new state.
     turing-step c ;

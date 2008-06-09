@@ -229,6 +229,6 @@ can-delete-pastes? define-capability
     <boilerplate>
         { pastebin "pastebin-common" } >>template ;
 
-: init-pastes-table \ paste ensure-table ;
+: init-pastes-table ( -- ) \ paste ensure-table ;
 
-: init-annotations-table annotation ensure-table ;
+: init-annotations-table ( -- ) annotation ensure-table ;

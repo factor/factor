@@ -22,9 +22,9 @@ SYMBOL: deploy-io
         { 3 "Level 3 - Non-blocking streams and networking" }
     } ;
 
-: strip-io? deploy-io get 1 = ;
+: strip-io? ( -- ? ) deploy-io get 1 = ;
 
-: native-io? deploy-io get 3 = ;
+: native-io? ( -- ? ) deploy-io get 3 = ;
 
 SYMBOL: deploy-reflection
 
@@ -38,11 +38,11 @@ SYMBOL: deploy-reflection
         { 6 "Level 6 - Full environment" }
     } ;
 
-: strip-word-names? deploy-reflection get 2 < ;
-: strip-prettyprint? deploy-reflection get 3 < ;
-: strip-debugger? deploy-reflection get 4 < ;
-: strip-dictionary? deploy-reflection get 5 < ;
-: strip-globals? deploy-reflection get 6 < ;
+: strip-word-names? ( -- ? ) deploy-reflection get 2 < ;
+: strip-prettyprint? ( -- ? ) deploy-reflection get 3 < ;
+: strip-debugger? ( -- ? ) deploy-reflection get 4 < ;
+: strip-dictionary? ( -- ? ) deploy-reflection get 5 < ;
+: strip-globals? ( -- ? ) deploy-reflection get 6 < ;
 
 SYMBOL: deploy-word-props?
 SYMBOL: deploy-word-defs?

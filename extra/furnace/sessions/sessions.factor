@@ -25,7 +25,7 @@ session "SESSIONS"
 : get-session ( id -- session )
     dup [ <session> select-tuple ] when ;
 
-: init-sessions-table session ensure-table ;
+: init-sessions-table ( -- ) session ensure-table ;
 
 : start-expiring-sessions ( db seq -- )
     '[

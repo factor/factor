@@ -118,18 +118,10 @@ HELP: define-slot-word
 { $description "Defines " { $snippet "word" } " to be a simple type-checking generic word that receives the slot number on the stack as a fixnum." }
 $low-level-note ;
 
-HELP: reader-effect
-{ $values { "class" class } { "spec" slot-spec } { "effect" "an instance of " { $link effect } } }
-{ $description "The stack effect of slot reader words is " { $snippet "( object -- value )" } "." } ;
-
 HELP: define-reader
 { $values { "class" class } { "name" string } { "slot" integer } }
 { $description "Defines a reader word to read a slot from instances of " { $snippet "class" } "." }
 $low-level-note ;
-
-HELP: writer-effect
-{ $values { "class" class } { "spec" slot-spec } { "effect" "an instance of " { $link effect } } }
-{ $description "The stack effect of slot writer words is " { $snippet "( value obj -- )" } "." } ;
 
 HELP: define-writer
 { $values { "class" class } { "name" string } { "slot" integer } }

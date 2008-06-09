@@ -40,7 +40,7 @@ FUNCTION: void* error_message ( DWORD id ) ;
         win32-error-string throw
     ] when ;
 
-: expected-io-errors
+: expected-io-errors ( -- seq )
     ERROR_SUCCESS
     ERROR_IO_INCOMPLETE
     ERROR_IO_PENDING

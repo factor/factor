@@ -5,7 +5,7 @@ combinators arrays io.launcher io http.server.static http.server
 http accessors sequences strings math.parser fry urls ;
 IN: http.server.cgi
 
-: post? request get method>> "POST" = ;
+: post? ( -- ? ) request get method>> "POST" = ;
 
 : cgi-variables ( script-path -- assoc )
     #! This needs some work.

@@ -7,7 +7,7 @@ combinators classes classes.algebra generic.math
 optimizer.math.partial continuations optimizer.def-use
 optimizer.backend generic.standard optimizer.specializers
 optimizer.def-use optimizer.pattern-match generic.standard
-optimizer.control kernel.private ;
+optimizer.control kernel.private definitions ;
 IN: optimizer.inlining
 
 : remember-inlining ( node history -- )
@@ -61,12 +61,8 @@ DEFER: (flat-length)
     [ dispatch# node-class# ] keep specific-method ;
 
 : inline-standard-method ( node word -- node )
-    2dup dispatching-class dup [
-        over +inlined+ depends-on
-        swap method 1quotation f splice-quot
-    ] [
-        3drop t
-    ] if ;
+    2dup dispatching-class dup
+    [ swap method 1quotation f splice-quot ] [ 3drop t ] if ;
 
 ! Partial dispatch of math-generic words
 : normalize-math-class ( class -- class' )

@@ -1,5 +1,5 @@
 USING: assocs math kernel sequences io.files hashtables
-quotations splitting arrays math.parser hash2 math.order
+quotations splitting grouping arrays math.parser hash2 math.order
 byte-arrays words namespaces words compiler.units parser
 io.encodings.ascii values interval-maps ascii sets assocs.lib
 combinators.lib combinators locals math.ranges sorting ;

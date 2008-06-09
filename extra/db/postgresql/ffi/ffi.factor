@@ -281,7 +281,7 @@ FUNCTION: void PQclear ( PGresult* res ) ;
 FUNCTION: void PQfreemem ( void* ptr ) ;
 
 ! Exists for backward compatibility.
-: PQfreeNotify PQfreemem ;
+: PQfreeNotify ( ptr -- ) PQfreemem ;
 
 !
 ! Make an empty PGresult with given status (some apps find this

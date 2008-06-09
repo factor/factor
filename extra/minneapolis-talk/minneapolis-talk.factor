@@ -177,6 +177,6 @@ IN: minneapolis-talk
     { $slide "Questions?" }
 } ;
 
-: minneapolis-talk minneapolis-slides slides-window ;
+: minneapolis-talk ( -- ) minneapolis-slides slides-window ;
 
 MAIN: minneapolis-talk

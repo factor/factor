@@ -1,5 +1,6 @@
 USING: kernel math tools.test namespaces random
-random.blum-blum-shub alien.c-types sequences splitting ;
+random.blum-blum-shub alien.c-types sequences splitting
+grouping ;
 IN: blum-blum-shub.tests
 
 [ 887708070 ] [

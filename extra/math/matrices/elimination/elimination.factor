@@ -69,7 +69,8 @@ SYMBOL: matrix
 : echelon ( matrix -- matrix' )
     [ 0 0 (echelon) ] with-matrix ;
 
-: nonzero-rows [ [ zero? ] all? not ] filter ;
+: nonzero-rows ( matrix -- matrix' )
+    [ [ zero? ] all? not ] filter ;
 
 : null/rank ( matrix -- null rank )
     echelon dup length swap nonzero-rows length [ - ] keep ;

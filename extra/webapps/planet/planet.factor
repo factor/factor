@@ -45,9 +45,9 @@ posting "POSTINGS"
     { "date" "DATE" TIMESTAMP +not-null+ }
 } define-persistent
 
-: init-blog-table blog ensure-table ;
+: init-blog-table ( -- ) blog ensure-table ;
 
-: init-postings-table posting ensure-table ;
+: init-postings-table ( -- ) posting ensure-table ;
 
 : <blog> ( id -- todo )
     blog new

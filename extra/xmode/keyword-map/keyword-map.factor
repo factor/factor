@@ -1,5 +1,5 @@
-USING: kernel strings assocs sequences hashtables sorting
-       unicode.case unicode.categories sets ;
+USING: accessors kernel strings assocs sequences hashtables
+sorting unicode.case unicode.categories sets ;
 IN: xmode.keyword-map
 
 ! Based on org.gjt.sp.jedit.syntax.KeywordMap
@@ -9,7 +9,7 @@ TUPLE: keyword-map no-word-sep ignore-case? ;
     H{ } clone { set-keyword-map-ignore-case? set-delegate }
     keyword-map construct ;
 
-: invalid-no-word-sep f swap set-keyword-map-no-word-sep ;
+: invalid-no-word-sep ( keyword-map -- ) f >>no-word-sep drop ;
 
 : handle-case ( key keyword-map -- key assoc )
     [ keyword-map-ignore-case? [ >upper ] when ] keep
@@ -25,7 +25,7 @@ M: keyword-map clear-assoc
 
 M: keyword-map >alist delegate >alist ;
 
-: (keyword-map-no-word-sep)
+: (keyword-map-no-word-sep) ( assoc -- str )
     keys concat [ alpha? not ] filter prune natural-sort ;
 
 : keyword-map-no-word-sep* ( keyword-map -- str )

@@ -7,7 +7,7 @@ IN: optimizer.report
     >r optimize-1
     [ r> 1+ count-optimization-passes ] [ drop r> ] if ;
 
-: results
+: results ( seq -- )
     [ [ second ] prepose compare ] curry sort 20 tail*
     print
     standard-table-style
@@ -15,7 +15,7 @@ IN: optimizer.report
         [ [ [ pprint-cell ] each ] with-row ] each
     ] tabular-output ;
 
-: optimizer-report
+: optimizer-report ( -- )
     all-words [ compiled? ] filter
     [
         dup [

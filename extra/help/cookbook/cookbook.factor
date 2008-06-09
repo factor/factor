@@ -11,7 +11,7 @@ $nl
 $nl
 "Factor evaluates code left to right, and stores intermediate values on a " { $emphasis "stack" } ". If you think of the stack as a pile of papers, then " { $emphasis "pushing" } " a value on the stack corresponds to placing a piece of paper at the top of the pile, while " { $emphasis "popping" } " a value corresponds to removing the topmost piece."
 $nl
-"Most words have a " { $emphasis "stack effect declaration" } ", for example " { $snippet "( x y -- z )" } " denotes that a word takes two inputs, with " { $snippet "y" } " at the top of the stack, and returns one output. Stack effect declarations can be viewed by browsing source code, or using tools such as " { $link see } ". See " { $link "effect-declaration" } "."
+"All words except those which only push literals on the stack must have a " { $emphasis "stack effect declaration" } ", for example " { $snippet "( x y -- z )" } " denotes that a word takes two inputs, with " { $snippet "y" } " at the top of the stack, and returns one output. Stack effect declarations can be viewed by browsing source code, or using tools such as " { $link see } "; they are also checked by the compiler. See " { $link "effect-declaration" } "."
 $nl
 "Coming back to the example in the beginning of this article, the following series of steps occurs as the code is evaluated:"
 { $table
@@ -41,7 +41,7 @@ ARTICLE: "cookbook-colon-defs" "Shuffle word and definition cookbook"
 "The " { $link dup } " word makes a copy of the value at the top of the stack:"
 { $example "5 dup * ." "25" }
 "The " { $link sq } " word is actually defined as follows:"
-{ $code ": sq dup * ;" }
+{ $code ": sq ( x -- y ) dup * ;" }
 "(You could have looked this up yourself by clicking on the " { $link sq } " word itself.)"
 $nl
 "Note the key elements in a word definition: The colon " { $link POSTPONE: : } " denotes the start of a word definition. The name of the new word must immediately follow. The word definition then continues on until the " { $link POSTPONE: ; } " token signifies the end of the definition. This type of word definition is called a " { $emphasis "compound definition." }
@@ -60,11 +60,13 @@ $nl
     "This syntax will be familiar to anybody who has used Forth before. However the behavior is slightly different. In most Forth systems, the below code prints 2, because the definition of " { $snippet "b" } " still refers to the previous definition of " { $snippet "a" } ":"
     { $code
         ": a 1 ;"
-        ": b a 1 + ;"
+        ": b ( -- x ) a 1 + ;"
         ": a 2 ;"
         "b ."
     }
     "In Factor, this example will print 3 since word redefinition is explicitly supported."
+    $nl
+    "Indeed, redefining a word twice in the same source file is an error; this is almost always a mistake since there's no way to call the first definition. See " { $link "definition-checking" } "."
 }
 { $references
     { "A whole slew of shuffle words can be used to rearrange the stack. There are forms of word definition other than colon definition, words can be defined entirely at runtime, and word definitions can be " { $emphasis "annotated" } " with tracing calls and breakpoints without modifying the source code." }

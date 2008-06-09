@@ -31,6 +31,6 @@ bit-arrays namespaces io ;
     dup 1- 2^ 10000 * nsieve-bits.
     2 - 2^ 10000 * nsieve-bits. ;
 
-: nsieve-bits-main* 11 nsieve-bits-main ;
+: nsieve-bits-main* ( -- ) 11 nsieve-bits-main ;
 
 MAIN: nsieve-bits-main*

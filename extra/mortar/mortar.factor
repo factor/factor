@@ -1,6 +1,6 @@
 
 USING: kernel io parser words namespaces quotations arrays assocs sequences
-       splitting math shuffle ;
+       splitting grouping math shuffle ;
 
 IN: mortar
 

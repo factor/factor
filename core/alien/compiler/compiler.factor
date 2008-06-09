@@ -216,7 +216,8 @@ M: alien-invoke-error summary
     drop
     "Words calling ``alien-invoke'' must be compiled with the optimizing compiler." ;
 
-: pop-parameters pop-literal nip [ expand-constants ] map ;
+: pop-parameters ( -- seq )
+    pop-literal nip [ expand-constants ] map ;
 
 : stdcall-mangle ( symbol node -- symbol )
     "@"
