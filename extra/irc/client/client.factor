@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators concurrency.mailboxes io
+USING: arrays combinators concurrency.mailboxes fry io
        io.encodings.8-bit io.sockets kernel namespaces sequences
        sequences.lib splitting threads calendar classes.tuple
        classes ascii assocs accessors destructors continuations ;
@@ -134,7 +134,7 @@ TUPLE: unhandled < irc-message ;
 ! ======================================
 
 : split-at-first ( seq separators -- before after )
-    dupd [ member? ] curry find
+    dupd '[ , member? ] find
         [ cut 1 tail ]
         [ swap ]
     if ;
@@ -191,7 +191,8 @@ TUPLE: unhandled < irc-message ;
 GENERIC: handle-incoming-irc ( irc-message -- )
 
 M: irc-message handle-incoming-irc ( irc-message -- )
-    drop ;
+    f irc> listeners>> at
+    [ in-messages>> mailbox-put ] [ drop ] if* ;
 
 M: logged-in handle-incoming-irc ( logged-in -- )
     name>> irc> nick>> (>>name) ;
@@ -203,8 +204,8 @@ M: nick-in-use handle-incoming-irc ( nick-in-use -- )
     name>> "_" append /NICK ;
 
 M: privmsg handle-incoming-irc ( privmsg -- )
-    dup irc-message-origin irc> listeners>> at
-    [ in-messages>> mailbox-put ] [ drop ] if* ;
+    dup irc-message-origin irc> listeners>> [ at ] keep
+    '[ f , at ] unless* [ in-messages>> mailbox-put ] [ drop ] if* ;
 
 M: join handle-incoming-irc ( join -- )
     irc> join-messages>> mailbox-put ;
@@ -226,7 +227,7 @@ M: privmsg handle-outgoing-irc ( privmsg -- )
 ! ======================================
 
 : irc-mailbox-get ( mailbox quot -- )
-    swap 5 seconds  [ mailbox-get-timeout swap call ] 3curry [ drop ] recover ;
+    swap 5 seconds  '[ , , , mailbox-get-timeout swap call ] [ drop ] recover ;
 
 : stream-readln-or-close ( stream -- str/f )
     dup stream-readln [ nip ] [ dispose f ] if* ;
@@ -272,7 +273,7 @@ DEFER: (connect-irc)
     irc> out-messages>> mailbox-put ;
 
 : spawn-irc-loop ( quot name -- )
-    [ [ irc> is-running>> ] compose ] dip
+    [ '[ @ irc> is-running>> ] ] dip
     spawn-server drop ;
 
 : spawn-irc ( -- )
@@ -285,7 +286,7 @@ DEFER: (connect-irc)
 ! ======================================
 
 : set+run-listener ( name irc-listener -- )
-    [ [ listener-loop ] 2curry "listener" spawn-irc-loop ]
+    [ '[ , , listener-loop ] "listener" spawn-irc-loop ]
     [ swap irc> listeners>> set-at ]
     2bi ;
 
@@ -294,12 +295,15 @@ M: irc-channel-listener (add-listener) ( irc-channel-listener -- )
     [ [ name>> ] [ password>> ] bi /JOIN ]
     [ [ [ drop irc> join-messages>> ]
         [ timeout>> ]
-        [ name>> [ swap trailing>> = ] curry ]
+        [ name>> '[ trailing>> , = ] ]
         tri mailbox-get-timeout? trailing>> ] keep set+run-listener
     ] bi ;
 
 M: irc-nick-listener (add-listener) ( irc-nick-listener -- )
-   [ name>> ] keep set+run-listener ;
+    [ name>> ] keep set+run-listener ;
+
+M: irc-server-listener (add-listener) ( irc-server-listener -- )
+    f swap set+run-listener ;
 
 : (connect-irc) ( irc-client -- )
     [ profile>> [ server>> ] keep port>> /CONNECT ] keep
@@ -317,4 +321,4 @@ PRIVATE>
 
 GENERIC: add-listener ( irc-client irc-listener -- )
 M: irc-listener add-listener ( irc-client irc-listener -- )
-    current-irc-client swap [ (add-listener) ] curry with-variable ;
+    current-irc-client swap '[ , (add-listener) ] with-variable ;
