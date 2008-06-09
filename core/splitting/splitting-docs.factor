@@ -10,8 +10,7 @@ ARTICLE: "sequences-split" "Splitting sequences"
 { $subsection split1 }
 { $subsection split }
 "Splitting a string into lines:"
-{ $subsection string-lines }
-{ $subsection "groups-clumps" } ;
+{ $subsection string-lines } ;
 
 ABOUT: "sequences-split"
 

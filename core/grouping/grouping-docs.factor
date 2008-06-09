@@ -1,7 +1,7 @@
 USING: help.markup help.syntax sequences strings ;
 IN: grouping
 
-ARTICLE: "groups-clumps" "Groups and clumps"
+ARTICLE: "grouping" "Groups and clumps"
 "A virtual sequence for splitting a sequence into disjoint, fixed-length subsequences:"
 { $subsection groups }
 { $subsection <groups> }
@@ -19,6 +19,9 @@ ARTICLE: "groups-clumps" "Groups and clumps"
         { $unchecked-example "dup n clumps unclip-last >r [ first ] map r> append sequence= ." "t" }
     }
 } ;
+
+ABOUT: "grouping"
+
 HELP: groups
 { $class-description "Instances are virtual sequences whose elements are disjoint fixed-length subsequences of an underlying sequence. Groups are mutable and resizable if the underlying sequence is mutable and resizable, respectively."
 $nl
