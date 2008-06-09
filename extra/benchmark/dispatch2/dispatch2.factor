@@ -1,4 +1,5 @@
-USING: namespaces math sequences splitting kernel columns ;
+USING: namespaces math sequences splitting grouping
+kernel columns ;
 IN: benchmark.dispatch2
 
 : sequences ( -- seq )

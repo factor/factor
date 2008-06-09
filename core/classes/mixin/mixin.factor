@@ -51,9 +51,8 @@ TUPLE: check-mixin-class mixin ;
     #! updated by transitivity; the mixins usages appear in
     #! class-usages of the member, now that it's been added.
     [ 2drop ] [
-        [ [ suffix ] change-mixin-class ] 2keep
-        nip update-classes
-        ! over new-class? [ nip update-classes/new ] [ drop update-classes ] if
+        [ [ suffix ] change-mixin-class ] 2keep drop
+        dup new-class? [ update-classes/new ] [ update-classes ] if
     ] if-mixin-member? ;
 
 : remove-mixin-instance ( class mixin -- )

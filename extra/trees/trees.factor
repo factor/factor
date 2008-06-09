@@ -101,23 +101,15 @@ M: tree set-at ( value key tree -- )
 
 : valid-tree? ( tree -- ? ) root>> valid-node? ;
 
-: tree-call ( node call -- )
-    >r [ node-key ] keep node-value r> call ; inline
- 
-: find-node ( node quot -- key value ? )
-    {
-        { [ over not ] [ 2drop f f f ] }
-        { [ [
-              >r left>> r> find-node
-            ] 2keep rot ]
-          [ 2drop t ] }
-        { [ >r 2nip r> [ tree-call ] 2keep rot ]
-          [ drop [ node-key ] keep node-value t ] }
-        [ >r right>> r> find-node ]
-    } cond ; inline
+: (node>alist) ( node -- )
+    [
+        [ left>> (node>alist) ]
+        [ [ node-key ] [ node-value ] bi 2array , ]
+        [ right>> (node>alist) ]
+        tri
+    ] when* ;
 
-M: tree assoc-find ( tree quot -- key value ? )
-    >r root>> r> find-node ;
+M: tree >alist [ root>> (node>alist) ] { } make ;
 
 M: tree clear-assoc
     0 >>count

@@ -3,7 +3,7 @@
 USING: math kernel io sequences io.buffers io.timeouts generic
 byte-vectors system io.encodings math.order io.backend
 continuations debugger classes byte-arrays namespaces splitting
-dlists assocs io.encodings.binary inspector accessors
+grouping dlists assocs io.encodings.binary inspector accessors
 destructors ;
 IN: io.ports
 

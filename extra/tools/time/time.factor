@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.vectors memory io io.styles prettyprint
-namespaces system sequences splitting assocs strings ;
+namespaces system sequences splitting grouping assocs strings ;
 IN: tools.time
 
 : benchmark ( quot -- runtime )

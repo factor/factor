@@ -1,6 +1,6 @@
-USING: io io.files splitting unicode.collation sequences kernel
-io.encodings.utf8 math.parser math.order tools.test assocs
-io.streams.null words combinators.lib ;
+USING: io io.files splitting grouping unicode.collation
+sequences kernel io.encodings.utf8 math.parser math.order
+tools.test assocs io.streams.null words combinators.lib ;
 IN: unicode.collation.tests
 
 : parse-test ( -- strings )

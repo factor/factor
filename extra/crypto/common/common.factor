@@ -1,6 +1,6 @@
-USING: arrays kernel io io.binary sbufs splitting strings sequences
-namespaces math math.parser parser hints math.bitfields.lib
-assocs ;
+USING: arrays kernel io io.binary sbufs splitting grouping
+strings sequences namespaces math math.parser parser
+hints math.bitfields.lib assocs ;
 IN: crypto.common
 
 : w+ ( int int -- int ) + 32 bits ; inline

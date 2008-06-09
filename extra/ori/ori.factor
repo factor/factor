@@ -1,7 +1,7 @@
 
 USING: kernel namespaces
        math math.constants math.functions math.matrices math.vectors
-       sequences splitting self math.trig ;
+       sequences splitting grouping self math.trig ;
 
 IN: ori
 

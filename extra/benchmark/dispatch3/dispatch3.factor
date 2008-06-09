@@ -1,5 +1,5 @@
-USING: sequences math mirrors splitting kernel namespaces
-assocs alien.syntax columns ;
+USING: sequences math mirrors splitting grouping
+kernel namespaces assocs alien.syntax columns ;
 IN: benchmark.dispatch3
 
 GENERIC: g ( obj -- str )

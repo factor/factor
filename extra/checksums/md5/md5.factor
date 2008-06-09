@@ -1,7 +1,7 @@
 ! See http://www.faqs.org/rfcs/rfc1321.html
 
 USING: kernel io io.binary io.files io.streams.byte-array math
-math.functions math.parser namespaces splitting strings
+math.functions math.parser namespaces splitting grouping strings
 sequences crypto.common byte-arrays locals sequences.private
 io.encodings.binary symbols math.bitfields.lib checksums ;
 IN: checksums.md5

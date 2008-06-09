@@ -1,7 +1,7 @@
 IN: compiler.tests
 USING: compiler tools.test namespaces sequences
 kernel.private kernel math continuations continuations.private
-words splitting sorting ;
+words splitting grouping sorting ;
 
 : symbolic-stack-trace ( -- newseq )
     error-continuation get continuation-call callstack>array

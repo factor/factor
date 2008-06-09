@@ -4,7 +4,7 @@ IN: prettyprint
 USING: arrays generic generic.standard assocs io kernel
 math namespaces sequences strings io.styles io.streams.string
 vectors words prettyprint.backend prettyprint.sections
-prettyprint.config sorting splitting math.parser vocabs
+prettyprint.config sorting splitting grouping math.parser vocabs
 definitions effects classes.builtin classes.tuple io.files
 classes continuations hashtables classes.mixin classes.union
 classes.intersection classes.predicate classes.singleton

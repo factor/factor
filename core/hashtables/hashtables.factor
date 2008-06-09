@@ -1,7 +1,7 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel kernel.private slots.private math assocs
-       math.private sequences sequences.private vectors ;
+math.private sequences sequences.private vectors grouping ;
 IN: hashtables
 
 <PRIVATE
@@ -48,10 +48,6 @@ IN: hashtables
 : new-key@ ( key hash -- array n empty? )
     hash-array 2dup hash@ (new-key@) ; inline
 
-: nth-pair ( n seq -- key value )
-    swap 2 fixnum+fast 2dup slot -rot 1 fixnum+fast slot ;
-    inline
-
 : set-nth-pair ( value key seq n -- )
     2 fixnum+fast [ set-slot ] 2keep
     1 fixnum+fast set-slot ; inline
@@ -67,28 +63,8 @@ IN: hashtables
     [ rot hash-count+ set-nth-pair t ]
     [ rot drop set-nth-pair f ] if ; inline
 
-: find-pair-next >r 2 fixnum+fast r> ; inline
-
-: (find-pair) ( quot i array -- key value ? )
-    2dup array-capacity eq? [
-        3drop f f f
-    ] [
-        2dup array-nth tombstone? [
-            find-pair-next (find-pair)
-        ] [
-            [ nth-pair rot call ] 3keep roll [
-                nth-pair >r nip r> t
-            ] [
-                find-pair-next (find-pair)
-            ] if
-        ] if
-    ] if ; inline
-
-: find-pair ( array quot -- key value ? )
-    0 rot (find-pair) ; inline
-
-: (rehash) ( hash array -- )
-    [ swap pick (set-hash) drop f ] find-pair 2drop 2drop ;
+: (rehash) ( hash alist -- )
+    swap [ swapd (set-hash) drop ] curry assoc-each ;
 
 : hash-large? ( hash -- ? )
     [ hash-count 3 fixnum*fast  ]
@@ -98,7 +74,7 @@ IN: hashtables
     [ hash-deleted 10 fixnum*fast ] [ hash-count ] bi fixnum> ;
 
 : grow-hash ( hash -- )
-    [ dup hash-array swap assoc-size 1+ ] keep
+    [ dup >alist swap assoc-size 1+ ] keep
     [ reset-hash ] keep
     swap (rehash) ;
 
@@ -136,8 +112,8 @@ M: hashtable assoc-size ( hash -- n )
     dup hash-count swap hash-deleted - ;
 
 : rehash ( hash -- )
-    dup hash-array
-    dup length ((empty)) <array> pick set-hash-array
+    dup >alist
+    over hash-array length ((empty)) <array> pick set-hash-array
     0 pick set-hash-count
     0 pick set-hash-deleted
     (rehash) ;
@@ -148,8 +124,8 @@ M: hashtable set-at ( value key hash -- )
 : associate ( value key -- hash )
     2 <hashtable> [ set-at ] keep ;
 
-M: hashtable assoc-find ( hash quot -- key value ? )
-    >r hash-array r> find-pair ;
+M: hashtable >alist
+    hash-array 2 <groups> [ first tombstone? not ] filter ;
 
 M: hashtable clone
     (clone) dup hash-array clone over set-hash-array ;
