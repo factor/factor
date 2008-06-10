@@ -23,7 +23,7 @@ M: winnt root-directory? ( path -- ? )
         { [ dup empty? ] [ f ] }
         { [ dup [ path-separator? ] all? ] [ t ] }
         { [ dup right-trim-separators
-          { [ dup length 2 = ] [ dup second CHAR: : = ] } && nip ] [
+          { [ dup length 2 = ] [ dup second CHAR: : = ] } 0&& nip ] [
             t
         ] }
         [ f ]
@@ -36,7 +36,7 @@ ERROR: not-absolute-path ;
         [ dup length 2 >= ]
         [ dup second CHAR: : = ]
         [ dup first Letter? ]
-    } && [ 2 head ] [ not-absolute-path ] if ;
+    } 0&& [ 2 head ] [ not-absolute-path ] if ;
 
 : prepend-prefix ( string -- string' )
     dup unicode-prefix head? [
