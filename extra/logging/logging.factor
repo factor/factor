@@ -47,7 +47,7 @@ SYMBOL: log-service
         [ dup array? ]
         [ dup length 1 = ]
         [ dup first string? ]
-    } && nip ;
+    } 0&& nip ;
 
 : stack>message ( obj -- inputs>message )
     dup one-string? [ first ] [
