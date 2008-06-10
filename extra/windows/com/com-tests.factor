@@ -1,7 +1,7 @@
 USING: kernel windows.com windows.com.syntax windows.ole32
 alien alien.syntax tools.test libc alien.c-types arrays.lib 
 namespaces arrays continuations accessors math windows.com.wrapper
-windows.com.wrapper.private destructors ;
+windows.com.wrapper.private destructors effects ;
 IN: windows.com.tests
 
 COM-INTERFACE: ISimple IUnknown {216fb341-0eb2-44b1-8edb-60b76e353abc}
@@ -20,6 +20,12 @@ COM-INTERFACE: IUnrelated IUnknown {b06ac3f4-30e4-406b-a7cd-c29cead4552c}
 "{9620ecec-8438-423b-bb14-86f835aa40dd}" string>guid 1array [ IInherited-iid ] unit-test
 "{00000000-0000-0000-C000-000000000046}" string>guid 1array [ IUnknown-iid ] unit-test
 "{b06ac3f4-30e4-406b-a7cd-c29cead4552c}" string>guid 1array [ IUnrelated-iid ] unit-test
+
+{ (( -- iid )) } [ \ ISimple-iid stack-effect ] unit-test
+{ (( this -- HRESULT )) } [ \ ISimple::returnOK stack-effect ] unit-test
+{ (( this -- int )) } [ \ IInherited::getX stack-effect ] unit-test
+{ (( this newX -- )) } [ \ IInherited::setX stack-effect ] unit-test
+{ (( this mul add -- int )) } [ \ IUnrelated::xMulAdd stack-effect ] unit-test
 
 SYMBOL: +test-wrapper+
 SYMBOL: +guinea-pig-implementation+
@@ -49,7 +55,11 @@ dup +test-wrapper+ set [
 
         S_OK 1array [ +guinea-pig-implementation+ get ISimple::returnOK ] unit-test
         E_FAIL <long> *long 1array [ +guinea-pig-implementation+ get ISimple::returnError ] unit-test
-        20 1array [ +guinea-pig-implementation+ get dup 20 IInherited::setX IInherited::getX ] unit-test
+        20 1array [
+            +guinea-pig-implementation+ get
+            [ 20 IInherited::setX ]
+            [ IInherited::getX ] bi
+        ] unit-test
         420 1array [
             +guinea-pig-implementation+ get
             IUnrelated-iid com-query-interface
