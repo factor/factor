@@ -52,3 +52,23 @@ IN: bit-arrays.tests
 [ ?{ t t } ] [ 2 ?{ t t f t f t f t t t f t } resize-bit-array ] unit-test
 
 [ -10 ?{ } resize-bit-array ] must-fail
+
+[ -1 integer>bit-array ] must-fail
+[ ?{ f t } ] [ 2 integer>bit-array ] unit-test
+[ ?{ t t t t t t t t t } ] [ 511 integer>bit-array ] unit-test
+[ ?{ 
+    t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
+    t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
+    t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
+    t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
+} ] [
+    HEX: ffffffffffffffffffffffffffffffff integer>bit-array
+] unit-test
+
+[ 14 ] [ ?{ f t t t } bit-array>integer ] unit-test
+[ HEX: ffffffffffffffffffffffffffffffff ] [ ?{
+    t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
+    t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
+    t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
+    t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
+} bit-array>integer ] unit-test

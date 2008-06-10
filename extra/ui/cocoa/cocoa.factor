@@ -101,6 +101,9 @@ M: cocoa-ui-backend select-gl-context ( handle -- )
 M: cocoa-ui-backend flush-gl-context ( handle -- )
     handle-view -> openGLContext -> flushBuffer ;
 
+M: cocoa-ui-backend beep ( -- )
+    NSBeep ;
+
 SYMBOL: cocoa-init-hook
 
 M: cocoa-ui-backend ui

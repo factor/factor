@@ -257,6 +257,9 @@ M: x11-ui-backend ui ( -- )
         ] with-x
     ] ui-running ;
 
+M: x11-ui-backend beep ( -- )
+    dpy 100 XBell drop ;
+
 x11-ui-backend ui-backend set-global
 
 [ "DISPLAY" system:os-env "ui" "listener" ? ]
