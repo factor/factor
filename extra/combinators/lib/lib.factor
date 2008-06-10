@@ -63,34 +63,68 @@ MACRO: napply ( n -- )
 ! short circuiting words
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: short-circuit ( quots quot default -- quot )
-  1quotation -rot { } map>assoc <reversed> alist>quot ;
+! : short-circuit ( quots quot default -- quot )
+!   1quotation -rot { } map>assoc <reversed> alist>quot ;
 
-MACRO: && ( quots -- ? )
-    [ [ not ] append [ f ] ] t short-circuit ;
+! MACRO: && ( quots -- ? )
+!     [ [ not ] append [ f ] ] t short-circuit ;
 
-MACRO: <-&& ( quots -- )
-    [ [ dup ] prepend [ not ] append [ f ] ] t short-circuit
-    [ nip ] append ;
+! MACRO: <-&& ( quots -- )
+!     [ [ dup ] prepend [ not ] append [ f ] ] t short-circuit
+!     [ nip ] append ;
 
-MACRO: <--&& ( quots -- )
-    [ [ 2dup ] prepend [ not ] append [ f ] ] t short-circuit
-    [ 2nip ] append ;
+! MACRO: <--&& ( quots -- )
+!     [ [ 2dup ] prepend [ not ] append [ f ] ] t short-circuit
+!     [ 2nip ] append ;
 
 ! or
 
-MACRO: || ( quots -- ? ) [ [ t ] ] f short-circuit ;
+! MACRO: || ( quots -- ? ) [ [ t ] ] f short-circuit ;
 
-MACRO: 0|| ( quots -- ? ) [ [ t ] ] f short-circuit ;
+! MACRO: 0|| ( quots -- ? ) [ [ t ] ] f short-circuit ;
 
-MACRO: 1|| ( quots -- ? )
-  [ [ dup ] prepend [ t ] ] f short-circuit [ nip ] append ;
+! MACRO: 1|| ( quots -- ? )
+!   [ [ dup ] prepend [ t ] ] f short-circuit [ nip ] append ;
 
-MACRO: 2|| ( quots -- ? )
-  [ [ 2dup ] prepend [ t ] ] f short-circuit [ 2nip ] append ;
+! MACRO: 2|| ( quots -- ? )
+!   [ [ 2dup ] prepend [ t ] ] f short-circuit [ 2nip ] append ;
 
-MACRO: 3|| ( quots -- ? )
-  [ [ 3dup ] prepend [ t ] ] f short-circuit [ 3nip ] append ;
+! MACRO: 3|| ( quots -- ? )
+!   [ [ 3dup ] prepend [ t ] ] f short-circuit [ 3nip ] append ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+MACRO: 0&& ( quots -- quot )
+  [ '[ drop @ dup not ] [ drop f ] 2array ] map
+  { [ t ] [ ] }                       suffix
+  '[ f , cond ] ;
+
+MACRO: 1&& ( quots -- quot )
+  [ '[ drop dup @ dup not ] [ drop drop f ] 2array ] map
+  { [ t ] [ nip ] }                                  suffix
+  '[ f , cond ] ;
+
+MACRO: 2&& ( quots -- quot )
+  [ '[ drop 2dup @ dup not ] [ drop 2drop f ] 2array ] map
+  { [ t ] [ 2nip ] }                                   suffix
+  '[ f , cond ] ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+MACRO: 0|| ( quots -- quot )
+  [ '[ drop @ dup ] [ ] 2array ] map
+  { [ drop t ] [ f ] } suffix
+  '[ f , cond ] ;
+
+MACRO: 1|| ( quots -- quot )
+  [ '[ drop dup @ dup ] [ nip ] 2array ] map
+  { [ drop drop t ] [ f ] }              suffix
+  '[ f , cond ] ;
+
+MACRO: 2|| ( quots -- quot )
+  [ '[ drop 2dup @ dup ] [ 2nip ] 2array ] map
+  { [ drop 2drop t ] [ f ] }               suffix
+  '[ f , cond ] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! ifte
