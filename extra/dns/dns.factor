@@ -1,5 +1,6 @@
 
-USING: kernel byte-arrays combinators strings arrays sequences splitting 
+USING: kernel byte-arrays combinators strings arrays sequences splitting
+       grouping
        math math.functions math.parser random
        destructors
        io io.binary io.sockets io.encodings.binary
@@ -382,7 +383,7 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: >> neg shift ;
+: >> ( x n -- y ) neg shift ;
 
 : get-header-bits ( ba i -- qr opcode aa tc rd ra z rcode )
     get-double

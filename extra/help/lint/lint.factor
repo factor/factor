@@ -55,7 +55,7 @@ IN: help.lint
             r> assert=
             t
         ]
-    } && 3drop ;
+    } 0&& 3drop ;
 
 : check-see-also ( word element -- )
     nip \ $see-also swap elements [

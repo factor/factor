@@ -6,19 +6,15 @@ USING: kernel
        io.sockets
        unicode.case
        accessors
-       combinators.cleave
+       combinators.cleave combinators.lib
        newfx
-       dns ;
+       dns dns.util ;
 
 IN: dns.server
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : records ( -- vector ) V{ } ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: filter-by-name ( records name -- records ) swap [ name>> = ] with filter ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -32,80 +28,77 @@ IN: dns.server
 : matching-rrs  ( query -- rrs ) records [ rr=query? ] with filter ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: matching-rrs? ( query -- query rrs/f ? ) dup matching-rrs dup empty? not ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: matching-cname? ( query -- query rr/f ? )
-  dup clone CNAME >>type matching-rrs
-  dup empty? [ drop f f ] [ 1st t ] if ;
-
+! query->rrs
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 DEFER: query->rrs
 
-: query-canonical ( query rr -- rrs )
-  tuck [ clone ] [ rdata>> ] bi* >>name query->rrs prefix-on ;
+: matching-rrs? ( query -- rrs/f ) matching-rrs [ empty? ] [ drop f ] [ ] 1if ;
 
-: query->rrs ( query -- rrs/f )
-    {
-      { [      matching-rrs?   ] [ nip ] }
-      { [ drop matching-cname? ] [ query-canonical ] }
-      { [ drop t               ] [ drop f ] }
-    }
-  cond ;
+: matching-cname? ( query -- rrs/f )
+  [ ] [ clone CNAME >>type matching-rrs ] bi ! query rrs
+  [ empty? not ]
+    [ 1st swap clone over rdata>> >>name query->rrs prefix-on ]
+    [ 2drop f ]
+  1if ;
 
+: query->rrs ( query -- rrs/f ) { [ matching-rrs? ] [ matching-cname? ] } 1|| ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! have-answers
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: have-answers ( message -- message/f )
+  dup message-query query->rrs        ! message rrs/f
+  [ empty? ] [ 2drop f ] [ >>answer-section ] 1if ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! have-delegates?
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : cdr-name ( name -- name ) dup CHAR: . index 1+ tail ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+: is-soa? ( name -- ? ) SOA IN query boa matching-rrs empty? not ;
 
-: delegate-servers? ( name -- name rrs ? )
-  dup NS IN query boa matching-rrs dup empty? not ;
+: have-ns? ( name -- rrs/f )
+  NS IN query boa matching-rrs [ empty? ] [ drop f ] [ ] 1if ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+: name->delegates ( name -- rrs-ns )
+  {
+    [ "" =    { } and ]
+    [ is-soa? { } and ]
+    [ have-ns? ]
+    [ cdr-name name->delegates ]
+  }
+    1|| ;
 
-: delegate-servers ( name -- rrs )
-    {
-      { [ dup "" = ]          [ drop { } ] }
-      { [ delegate-servers? ] [ nip ] }
-      { [ drop t ]            [ cdr-name delegate-servers ] }
-    }
-  cond ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: delegate-addresses ( rrs-ns -- rrs-a )
-  [ rdata>> A IN query boa matching-rrs ] map concat ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: have-delegates? ( query -- query rrs-ns ? )
-  dup name>> delegate-servers dup empty? not ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: fill-additional ( message -- message )
-  dup authority-section>> delegate-addresses >>additional-section ;
+: have-delegates ( message -- message/f )
+  dup message-query name>> name->delegates ! message rrs-ns
+  [ empty? ]
+    [ 2drop f ]
+    [
+      dup [ rdata>> A IN query boa matching-rrs ] map concat
+                                           ! message rrs-ns rrs-a
+      [ >>authority-section ]
+      [ >>additional-section ]
+      bi*
+    ]
+  1if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! is-nx
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: no-records-with-name? ( query -- query ? )
-  dup name>> records [ name>> = ] with filter empty? ;
+: is-nx ( message -- message/f )
+  [ message-query name>> records [ name>> = ] with filter empty? ]
+    [ NAME-ERROR >>rcode ]
+    [ drop f ]
+  1if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : find-answer ( message -- message )
-  dup message-query                     ! message query
-    {
-      { [ dup query->rrs dup   ] [ nip >>answer-section 1 >>aa ] }
-      { [ drop have-delegates? ] [ nip >>authority-section fill-additional ] }
-      { [ drop no-records-with-name? ] [ drop NAME-ERROR >>rcode ] }
-      { [ drop t ] [ ] }
-    }
-  cond ;
+    { [ have-answers ] [ have-delegates ] [ is-nx ] [ ] } 1|| ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
