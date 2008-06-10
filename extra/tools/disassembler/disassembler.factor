@@ -6,9 +6,9 @@ system math generator.fixup io.encodings.ascii accessors
 generic ;
 IN: tools.disassembler
 
-: in-file "gdb-in.txt" temp-file ;
+: in-file ( -- path ) "gdb-in.txt" temp-file ;
 
-: out-file "gdb-out.txt" temp-file ;
+: out-file ( -- path ) "gdb-out.txt" temp-file ;
 
 GENERIC: make-disassemble-cmd ( obj -- )
 

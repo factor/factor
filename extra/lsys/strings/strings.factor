@@ -5,7 +5,7 @@ IN: lsys.strings
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: has-param? ( slice -- ? ) { [ length 1 > ] [ second CHAR: ( = ] } <-&& ;
+: has-param? ( slice -- ? ) { [ length 1 > ] [ second CHAR: ( = ] } 1&& ;
 
 : next+rest ( slice -- next rest ) [ 1 head ] [ 1 tail-slice ] bi ;
 

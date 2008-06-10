@@ -6,7 +6,7 @@ inference.state accessors combinators ;
 IN: inference.dataflow
 
 ! Computed value
-: <computed> \ <computed> counter ;
+: <computed> ( -- value ) \ <computed> counter ;
 
 ! Literal value
 TUPLE: value < identity-tuple literal uid recursion ;
@@ -88,7 +88,7 @@ M: object flatten-curry , ;
 : r-tail ( n -- seq )
     dup zero? [ drop f ] [ meta-r get swap tail* ] if ;
 
-: node-child node-children first ;
+: node-child ( node -- child ) node-children first ;
 
 TUPLE: #label < node word loop? returns calls ;
 
@@ -217,9 +217,9 @@ M: #call-label calls-label* param>> eq? ;
 
 SYMBOL: node-stack
 
-: >node node-stack get push ;
-: node> node-stack get pop ;
-: node@ node-stack get peek ;
+: >node ( node -- ) node-stack get push ;
+: node> ( -- node ) node-stack get pop ;
+: node@ ( -- node ) node-stack get peek ;
 
 : iterate-next ( -- node ) node@ successor>> ;
 

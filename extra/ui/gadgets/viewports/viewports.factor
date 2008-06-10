@@ -8,7 +8,8 @@ kernel math namespaces sequences models math.vectors ;
 
 TUPLE: viewport ;
 
-: find-viewport [ viewport? ] find-parent ;
+: find-viewport ( gadget -- viewport )
+    [ viewport? ] find-parent ;
 
 : viewport-dim ( viewport -- dim )
     gadget-child pref-dim viewport-gap 2 v*n v+ ;

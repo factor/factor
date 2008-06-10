@@ -102,9 +102,9 @@ MACRO: firstn ( n -- )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: ,, building get peek push ;
-: v, V{ } clone , ;
-: ,v building get dup peek empty? [ dup pop* ] when drop ;
+: ,, ( obj -- ) building get peek push ;
+: v, ( -- ) V{ } clone , ;
+: ,v ( -- ) building get dup peek empty? [ dup pop* ] when drop ;
 
 : monotonic-split ( seq quot -- newseq )
     [

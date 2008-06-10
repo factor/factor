@@ -334,7 +334,7 @@ HELP: bootstrap-word
 { $values { "word" word } { "target" word } }
 { $description "Looks up a word with the same name and vocabulary as the given word, performing a transformation to handle parsing words in the target dictionary. Used during bootstrap to transfer host words to the target dictionary." } ;
 
-HELP: parsing?
+HELP: parsing-word?
 { $values { "obj" object } { "?" "a boolean" } }
 { $description "Tests if an object is a parsing word declared by " { $link POSTPONE: parsing } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;

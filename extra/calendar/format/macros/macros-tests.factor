@@ -7,7 +7,8 @@ IN: calendar.format.macros
 
 [ { [ 1 throw ] } attempt-all-quots ] [ 1 = ] must-fail-with
 
-: compiled-test-1 { [ 1 throw ] [ 2 ] } attempt-all-quots ;
+: compiled-test-1 ( -- n )
+    { [ 1 throw ] [ 2 ] } attempt-all-quots ;
 
 \ compiled-test-1 must-infer
 

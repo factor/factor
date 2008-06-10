@@ -45,7 +45,7 @@ SYMBOL: tag-handler-word
     CREATE tag-handler-word set
     H{ } clone tag-handlers set ; parsing
 
-: (TAG:) swap tag-handlers get set-at ;
+: (TAG:) ( name quot -- ) swap tag-handlers get set-at ;
 
 : TAG:
     f set-word
@@ -55,4 +55,4 @@ SYMBOL: tag-handler-word
 : TAGS>
     tag-handler-word get
     tag-handlers get >alist [ >r dup name-tag r> case ] curry
-    define ; parsing
+    (( tag -- )) define-declared ; parsing

@@ -22,7 +22,7 @@ IN: cpu.x86.assembler
 : define-registers ( names size -- )
     >r dup length r> [ define-register ] curry 2each ;
 
-: REGISTERS:
+: REGISTERS: ( -- )
     scan-word ";" parse-tokens swap define-registers ; parsing
 
 >>
@@ -76,31 +76,31 @@ TUPLE: indirect base index scale displacement ;
 
 M: indirect extended? base>> extended? ;
 
-: canonicalize-EBP
+: canonicalize-EBP ( indirect -- indirect )
     #! { EBP } ==> { EBP 0 }
     dup base>> { EBP RBP R13 } member? [
         dup displacement>> [ 0 >>displacement ] unless
-    ] when drop ;
+    ] when ;
 
-: canonicalize-ESP
+: canonicalize-ESP ( indirect -- indirect )
     #! { ESP } ==> { ESP ESP }
-    dup base>> { ESP RSP R12 } member? [ ESP >>index ] when drop ;
+    dup base>> { ESP RSP R12 } member? [ ESP >>index ] when ;
 
-: canonicalize ( indirect -- )
+: canonicalize ( indirect -- indirect )
     #! Modify the indirect to work around certain addressing mode
     #! quirks.
-    [ canonicalize-EBP ] [ canonicalize-ESP ] bi ;
+    canonicalize-EBP canonicalize-ESP ;
 
 : <indirect> ( base index scale displacement -- indirect )
-    indirect boa dup canonicalize ;
+    indirect boa canonicalize ;
 
-: reg-code "register" word-prop 7 bitand ;
+: reg-code ( reg -- n ) "register" word-prop 7 bitand ;
 
-: indirect-base* base>> EBP or reg-code ;
+: indirect-base* ( op -- n ) base>> EBP or reg-code ;
 
-: indirect-index* index>> ESP or reg-code ;
+: indirect-index* ( op -- n ) index>> ESP or reg-code ;
 
-: indirect-scale* scale>> 0 or ;
+: indirect-scale* ( op -- n ) scale>> 0 or ;
 
 GENERIC: sib-present? ( op -- ? )
 
@@ -145,10 +145,10 @@ GENERIC# n, 1 ( value n -- )
 
 M: integer n, >le % ;
 M: byte n, >r value>> r> n, ;
-: 1, 1 n, ; inline
-: 4, 4 n, ; inline
-: 2, 2 n, ; inline
-: cell, bootstrap-cell n, ; inline
+: 1, ( n -- ) 1 n, ; inline
+: 4, ( n -- ) 4 n, ; inline
+: 2, ( n -- ) 2 n, ; inline
+: cell, ( n -- ) bootstrap-cell n, ; inline
 
 : mod-r/m, ( reg# indirect -- )
     [ 3 shift ] [ [ modifier 6 shift ] [ r/m ] bi ] bi* bitor bitor , ;
@@ -196,10 +196,10 @@ M: object operand-64? drop f ;
         [ nip operand-64? ]
     } cond and ;
 
-: rex.r
+: rex.r ( m op -- n )
     extended? [ BIN: 00000100 bitor ] when ;
 
-: rex.b
+: rex.b ( m op -- n )
     [ extended? [ BIN: 00000001 bitor ] when ] keep
     dup indirect? [
         index>> extended? [ BIN: 00000010 bitor ] when
@@ -225,7 +225,7 @@ M: object operand-64? drop f ;
     #! the opcode.
     >r dupd prefix-1 reg-code r> + , ;
 
-: opcode, dup array? [ % ] [ , ] if ;
+: opcode, ( opcode -- ) dup array? [ % ] [ , ] if ;
 
 : extended-opcode ( opcode -- opcode' ) OCT: 17 swap 2array ;
 
@@ -240,7 +240,7 @@ M: object operand-64? drop f ;
     #! 'reg' field of the mod-r/m byte.
     first3 >r >r over r> prefix-1 r> opcode, swap addressing ;
 
-: immediate-operand-size-bit
+: immediate-operand-size-bit ( imm dst reg,rex.w,opcode -- imm dst reg,rex.w,opcode )
     pick integer? [ first3 BIN: 1 opcode-or 3array ] when ;
 
 : immediate-1 ( imm dst reg,rex.w,opcode -- )
@@ -249,7 +249,7 @@ M: object operand-64? drop f ;
 : immediate-4 ( imm dst reg,rex.w,opcode -- )
     immediate-operand-size-bit 1-operand 4, ;
 
-: immediate-fits-in-size-bit
+: immediate-fits-in-size-bit ( imm dst reg,rex.w,opcode -- imm dst reg,rex.w,opcode )
     pick integer? [ first3 BIN: 10 opcode-or 3array ] when ;
 
 : immediate-1/4 ( imm dst reg,rex.w,opcode -- )
@@ -320,38 +320,38 @@ M: operand MOV HEX: 88 2-operand ;
 
 ! Control flow
 GENERIC: JMP ( op -- )
-: (JMP) HEX: e9 , 0 4, rc-relative ;
+: (JMP) ( -- rel-class ) HEX: e9 , 0 4, rc-relative ;
 M: callable JMP (JMP) rel-word ;
 M: label JMP (JMP) label-fixup ;
 M: operand JMP { BIN: 100 t HEX: ff } 1-operand ;
 
 GENERIC: CALL ( op -- )
-: (CALL) HEX: e8 , 0 4, rc-relative ;
+: (CALL) ( -- rel-class ) HEX: e8 , 0 4, rc-relative ;
 M: callable CALL (CALL) rel-word ;
 M: label CALL (CALL) label-fixup ;
 M: operand CALL { BIN: 010 t HEX: ff } 1-operand ;
 
 GENERIC# JUMPcc 1 ( addr opcode -- )
-: (JUMPcc) extended-opcode, 0 4, rc-relative ;
+: (JUMPcc) ( n -- rel-class ) extended-opcode, 0 4, rc-relative ;
 M: callable JUMPcc (JUMPcc) rel-word ;
 M: label JUMPcc (JUMPcc) label-fixup ;
 
-: JO  HEX: 80 JUMPcc ;
-: JNO HEX: 81 JUMPcc ;
-: JB  HEX: 82 JUMPcc ;
-: JAE HEX: 83 JUMPcc ;
-: JE  HEX: 84 JUMPcc ; ! aka JZ
-: JNE HEX: 85 JUMPcc ;
-: JBE HEX: 86 JUMPcc ;
-: JA  HEX: 87 JUMPcc ;
-: JS  HEX: 88 JUMPcc ;
-: JNS HEX: 89 JUMPcc ;
-: JP  HEX: 8a JUMPcc ;
-: JNP HEX: 8b JUMPcc ;
-: JL  HEX: 8c JUMPcc ;
-: JGE HEX: 8d JUMPcc ;
-: JLE HEX: 8e JUMPcc ;
-: JG  HEX: 8f JUMPcc ;
+: JO  ( dst -- ) HEX: 80 JUMPcc ;
+: JNO ( dst -- ) HEX: 81 JUMPcc ;
+: JB  ( dst -- ) HEX: 82 JUMPcc ;
+: JAE ( dst -- ) HEX: 83 JUMPcc ;
+: JE  ( dst -- ) HEX: 84 JUMPcc ; ! aka JZ
+: JNE ( dst -- ) HEX: 85 JUMPcc ;
+: JBE ( dst -- ) HEX: 86 JUMPcc ;
+: JA  ( dst -- ) HEX: 87 JUMPcc ;
+: JS  ( dst -- ) HEX: 88 JUMPcc ;
+: JNS ( dst -- ) HEX: 89 JUMPcc ;
+: JP  ( dst -- ) HEX: 8a JUMPcc ;
+: JNP ( dst -- ) HEX: 8b JUMPcc ;
+: JL  ( dst -- ) HEX: 8c JUMPcc ;
+: JGE ( dst -- ) HEX: 8d JUMPcc ;
+: JLE ( dst -- ) HEX: 8e JUMPcc ;
+: JG  ( dst -- ) HEX: 8f JUMPcc ;
 
 : LEAVE ( -- ) HEX: c9 , ;
 
@@ -399,8 +399,8 @@ M: operand CMP OCT: 070 2-operand ;
 : DIV  ( dst -- ) { BIN: 110 t HEX: f7 } 1-operand ;
 : IDIV ( src -- ) { BIN: 111 t HEX: f7 } 1-operand ;
 
-: CDQ HEX: 99 , ;
-: CQO HEX: 48 , CDQ ;
+: CDQ ( -- ) HEX: 99 , ;
+: CQO ( -- ) HEX: 48 , CDQ ;
 
 : ROL ( dst n -- ) swap { BIN: 000 t HEX: c0 } immediate-1 ;
 : ROR ( dst n -- ) swap { BIN: 001 t HEX: c0 } immediate-1 ;
@@ -423,26 +423,26 @@ M: operand IMUL2 OCT: 257 extended-opcode (2-operand) ;
 ! Conditional move
 : MOVcc ( dst src cc -- ) extended-opcode swapd (2-operand) ;
 
-: CMOVO  HEX: 40 MOVcc ;
-: CMOVNO HEX: 41 MOVcc ;
-: CMOVB  HEX: 42 MOVcc ;
-: CMOVAE HEX: 43 MOVcc ;
-: CMOVE  HEX: 44 MOVcc ; ! aka CMOVZ
-: CMOVNE HEX: 45 MOVcc ;
-: CMOVBE HEX: 46 MOVcc ;
-: CMOVA  HEX: 47 MOVcc ;
-: CMOVS  HEX: 48 MOVcc ;
-: CMOVNS HEX: 49 MOVcc ;
-: CMOVP  HEX: 4a MOVcc ;
-: CMOVNP HEX: 4b MOVcc ;
-: CMOVL  HEX: 4c MOVcc ;
-: CMOVGE HEX: 4d MOVcc ;
-: CMOVLE HEX: 4e MOVcc ;
-: CMOVG  HEX: 4f MOVcc ;
+: CMOVO  ( dst src -- ) HEX: 40 MOVcc ;
+: CMOVNO ( dst src -- ) HEX: 41 MOVcc ;
+: CMOVB  ( dst src -- ) HEX: 42 MOVcc ;
+: CMOVAE ( dst src -- ) HEX: 43 MOVcc ;
+: CMOVE  ( dst src -- ) HEX: 44 MOVcc ; ! aka CMOVZ
+: CMOVNE ( dst src -- ) HEX: 45 MOVcc ;
+: CMOVBE ( dst src -- ) HEX: 46 MOVcc ;
+: CMOVA  ( dst src -- ) HEX: 47 MOVcc ;
+: CMOVS  ( dst src -- ) HEX: 48 MOVcc ;
+: CMOVNS ( dst src -- ) HEX: 49 MOVcc ;
+: CMOVP  ( dst src -- ) HEX: 4a MOVcc ;
+: CMOVNP ( dst src -- ) HEX: 4b MOVcc ;
+: CMOVL  ( dst src -- ) HEX: 4c MOVcc ;
+: CMOVGE ( dst src -- ) HEX: 4d MOVcc ;
+: CMOVLE ( dst src -- ) HEX: 4e MOVcc ;
+: CMOVG  ( dst src -- ) HEX: 4f MOVcc ;
 
 ! CPU Identification
 
-: CPUID HEX: a2 extended-opcode, ;
+: CPUID ( -- ) HEX: a2 extended-opcode, ;
 
 ! x87 Floating Point Unit
 

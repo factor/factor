@@ -59,11 +59,11 @@ PRIVATE>
         [ set-at ] [ delete-at drop ] if
     ] [ 2drop ] if ;
 
-: :errors +error+ compiler-errors. ;
+: :errors ( -- ) +error+ compiler-errors. ;
 
-: :warnings +warning+ compiler-errors. ;
+: :warnings ( -- ) +warning+ compiler-errors. ;
 
-: :linkage +linkage+ compiler-errors. ;
+: :linkage ( -- ) +linkage+ compiler-errors. ;
 
 : with-compiler-errors ( quot -- )
     with-compiler-errors? get "quiet" get or [ call ] [

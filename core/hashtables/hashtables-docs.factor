@@ -10,9 +10,7 @@ $nl
 $nl
 "The " { $link hash-count } " slot is the number of entries including deleted entries, and " { $link hash-deleted } " is the number of deleted entries."
 { $subsection <hash-array> }
-{ $subsection nth-pair }
 { $subsection set-nth-pair }
-{ $subsection find-pair }
 "If a hashtable's keys are mutated, or if hashing algorithms change, hashtables can be rehashed:"
 { $subsection rehash } ;
 
@@ -74,23 +72,11 @@ HELP: new-key@
 { $values { "key" "a key" } { "hash" hashtable } { "array" "the underlying array of the hashtable" } { "n" "the index where the key would be stored" } { "empty?" "a boolean indicating whether the location is currently empty" } }
 { $description "Searches the hashtable for the key using a linear probing strategy. If the key is not present in the hashtable, outputs the index where it should be stored." } ;
 
-HELP: nth-pair
-{ $values { "n" "an index in the sequence" } { "seq" "a sequence" } { "key" "the first element of the pair" } { "value" "the second element of the pair" } }
-{ $description "Fetches the elements with index " { $snippet "n" } " and " { $snippet "n+1" } ", respectively." }
-{ $warning "This word is in the " { $vocab-link "hashtables.private" } " vocabulary because it does not perform bounds checks." } ;
-
-{ nth-pair set-nth-pair } related-words
-
 HELP: set-nth-pair
 { $values { "value" "the second element of the pair" } { "key" "the first element of the pair" } { "seq" "a sequence" } { "n" "an index in the sequence" } }
 { $description "Stores a pair of values into the elements with index " { $snippet "n" } " and " { $snippet "n+1" } ", respectively." }
 { $warning "This word is in the " { $vocab-link "hashtables.private" } " vocabulary because it does not perform bounds checks." }
 { $side-effects "seq" } ;
-
-HELP: find-pair
-{ $values { "array" "an array of pairs" } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "key" "the successful key" } { "value" "the successful value" } { "?" "a boolean of whether there was success" } }
-{ $description "Applies a quotation to successive pairs in the array, yielding the first successful pair." }
-{ $warning "This word is in the " { $vocab-link "hashtables.private" } " vocabulary because passing an array of odd length can lead to memory corruption." } ;
 
 HELP: reset-hash
 { $values { "n" "a positive integer specifying hashtable capacity" } { "hash" hashtable } }

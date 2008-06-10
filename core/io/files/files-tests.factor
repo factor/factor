@@ -5,6 +5,8 @@ strings accessors io.encodings.utf8 math destructors ;
 
 \ exists? must-infer
 \ (exists?) must-infer
+\ file-info must-infer
+\ link-info must-infer
 
 [ ] [ "blahblah" temp-file dup exists? [ delete-directory ] [ drop ] if ] unit-test
 [ ] [ "blahblah" temp-file make-directory ] unit-test

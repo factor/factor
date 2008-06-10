@@ -43,7 +43,7 @@ DEFER: base>
 SYMBOL: radix
 SYMBOL: negative?
 
-: sign negative? get "-" "+" ? ;
+: sign ( -- str ) negative? get "-" "+" ? ;
 
 : with-radix ( radix quot -- )
     radix swap with-variable ; inline

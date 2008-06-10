@@ -22,8 +22,8 @@ SYMBOL: span
 SYMBOL: block
 SYMBOL: table
 
-: last-span? last-element get span eq? ;
-: last-block? last-element get block eq? ;
+: last-span? ( -- ? ) last-element get span eq? ;
+: last-block? ( -- ? ) last-element get block eq? ;
 
 : ($span) ( quot -- )
     last-block? [ nl ] when
@@ -58,18 +58,23 @@ M: f print-element drop ;
 
 ! Some spans
 
-: $snippet [ snippet-style get print-element* ] ($span) ;
+: $snippet ( children -- )
+    [ snippet-style get print-element* ] ($span) ;
 
-: $emphasis [ emphasis-style get print-element* ] ($span) ;
+: $emphasis ( children -- )
+    [ emphasis-style get print-element* ] ($span) ;
 
-: $strong [ strong-style get print-element* ] ($span) ;
+: $strong ( children -- )
+    [ strong-style get print-element* ] ($span) ;
 
-: $url [ url-style get print-element* ] ($span) ;
+: $url ( children -- )
+    [ url-style get print-element* ] ($span) ;
 
-: $nl nl nl drop ;
+: $nl ( children -- )
+    nl nl drop ;
 
 ! Some blocks
-: ($heading)
+: ($heading) ( children quot -- )
     last-element get [ nl ] when ($block) ; inline
 
 : $heading ( element -- )
@@ -230,7 +235,7 @@ M: word ($instance)
 M: string ($instance)
     dup a/an write bl $snippet ;
 
-: $instance first ($instance) ;
+: $instance ( children -- ) first ($instance) ;
 
 : values-row ( seq -- seq )
     unclip \ $snippet swap ?word-name 2array
@@ -278,18 +283,18 @@ M: string ($instance)
     drop
     "Shuffle word. Re-arranges the stack according to the stack effect pattern." $description ;
 
-: $low-level-note
+: $low-level-note ( children -- )
     drop
     "Calling this word directly is not necessary in most cases. Higher-level words call it automatically." $notes ;
 
-: $values-x/y
+: $values-x/y ( children -- )
     drop { { "x" number } { "y" number } } $values ;
 
-: $io-error
+: $io-error ( children -- )
     drop
     "Throws an error if the I/O operation fails." $errors ;
 
-: $prettyprinting-note
+: $prettyprinting-note ( children -- )
     drop {
         "This word should only be called from inside the "
         { $link with-pprint } " combinator."

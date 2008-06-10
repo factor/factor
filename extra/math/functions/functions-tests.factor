@@ -73,7 +73,7 @@ IN: math.functions.tests
     gcd nip
 ] unit-test
 
-: verify-gcd
+: verify-gcd ( a b -- ? )
     2dup gcd
     >r rot * swap rem r> = ; 
 

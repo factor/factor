@@ -39,9 +39,7 @@ ARTICLE: "assocs-protocol" "Associative mapping protocol"
 "All associative mappings must implement methods on the following generic words:"
 { $subsection at* }
 { $subsection assoc-size }
-"At least one of the following two generic words must have a method; the " { $link assoc } " mixin has default definitions which are mutually recursive:"
 { $subsection >alist }
-{ $subsection assoc-find }
 "Mutable assocs should implement the following additional words:"
 { $subsection set-at }
 { $subsection delete-at }
@@ -94,6 +92,7 @@ $nl
 $nl
 "The standard functional programming idioms:"
 { $subsection assoc-each }
+{ $subsection assoc-find }
 { $subsection assoc-map }
 { $subsection assoc-push-if }
 { $subsection assoc-filter }
@@ -139,8 +138,7 @@ HELP: new-assoc
 
 HELP: assoc-find
 { $values { "assoc" assoc } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "key" "the successful key, or f" } { "value" "the successful value, or f" } { "?" "a boolean" } }
-{ $contract "Applies a predicate quotation to each entry in the assoc. Returns the key and value that the quotation succeeds on, or " { $link f } " for both if the quotation fails. It also returns a boolean describing whether there was anything found; this can be used to distinguish between a key and a value equal to " { $link f } ", or nothing being found." }
-{ $notes "The " { $link assoc } " mixin has a default implementation for this generic word which first converts the assoc to an association list, then iterates over that with the " { $link find } " combinator for sequences." } ;
+{ $description "Applies a predicate quotation to each entry in the assoc. Returns the key and value that the quotation succeeds on, or " { $link f } " for both if the quotation fails. It also returns a boolean describing whether there was anything found; this can be used to distinguish between a key and a value equal to " { $link f } ", or nothing being found." } ;
 
 HELP: clear-assoc
 { $values { "assoc" assoc } }

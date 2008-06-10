@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.encodings io.backend io.ports io.streams.duplex
-io splitting sequences sequences.lib namespaces kernel
+io splitting grouping sequences sequences.lib namespaces kernel
 destructors math concurrency.combinators accessors
 arrays continuations quotations ;
 IN: io.pipes
@@ -22,8 +22,11 @@ HOOK: (pipe) io-backend ( -- pipe )
 
 <PRIVATE
 
-: ?reader [ <input-port> &dispose ] [ input-stream get ] if* ;
-: ?writer [ <output-port> &dispose ] [ output-stream get ] if* ;
+: ?reader ( handle/f -- stream )
+    [ <input-port> &dispose ] [ input-stream get ] if* ;
+
+: ?writer ( handle/f -- stream )
+    [ <output-port> &dispose ] [ output-stream get ] if* ;
 
 GENERIC: run-pipeline-element ( input-fd output-fd obj -- quot )
 

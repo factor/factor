@@ -20,9 +20,9 @@ alien tools.profiler.private sequences ;
 
 [ ] [ \ + usage-profile. ] unit-test
 
-: callback-test "void" { } "cdecl" [ ] alien-callback ;
+: callback-test ( -- callback ) "void" { } "cdecl" [ ] alien-callback ;
 
-: indirect-test "void" { } "cdecl" alien-indirect ;
+: indirect-test ( callback -- ) "void" { } "cdecl" alien-indirect ;
 
 : foobar ;
 

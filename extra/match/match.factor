@@ -3,7 +3,7 @@
 !
 ! Based on pattern matching code from Paul Graham's book 'On Lisp'.
 USING: parser kernel words namespaces sequences classes.tuple
-combinators macros assocs math ;
+combinators macros assocs math effects ;
 IN: match
 
 SYMBOL: _
@@ -11,7 +11,7 @@ SYMBOL: _
 : define-match-var ( name -- )
     create-in
     dup t "match-var" set-word-prop
-    dup [ get ] curry define ;
+    dup [ get ] curry (( -- value )) define-declared ;
 
 : define-match-vars ( seq -- )
     [ define-match-var ] each ;

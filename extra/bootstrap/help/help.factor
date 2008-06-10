@@ -3,7 +3,7 @@ help.definitions io io.files kernel namespaces vocabs sequences
 parser vocabs.loader ;
 IN: bootstrap.help
 
-: load-help
+: load-help ( -- )
     "alien.syntax" require
     "compiler" require
 

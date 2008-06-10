@@ -86,7 +86,8 @@ M: object modify-form drop ;
 
 SYMBOL: exit-continuation
 
-: exit-with exit-continuation get continue-with ;
+: exit-with ( value -- )
+    exit-continuation get continue-with ;
 
 : with-exit-continuation ( quot -- )
     '[ exit-continuation set @ ] callcc1 exit-continuation off ;

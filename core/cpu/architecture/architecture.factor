@@ -41,12 +41,12 @@ HOOK: stack-frame cpu ( frame-size -- n )
 ! Set up caller stack frame
 HOOK: %prologue cpu ( n -- )
 
-: %prologue-later \ %prologue-later , ;
+: %prologue-later ( -- ) \ %prologue-later , ;
 
 ! Tear down stack frame
 HOOK: %epilogue cpu ( n -- )
 
-: %epilogue-later \ %epilogue-later , ;
+: %epilogue-later ( -- ) \ %epilogue-later , ;
 
 ! Store word XT in stack frame
 HOOK: %save-word-xt cpu ( -- )
@@ -195,7 +195,7 @@ HOOK: %unbox-any-c-ptr cpu ( dst src -- )
 HOOK: %box-alien cpu ( dst src -- )
 
 ! GC check
-HOOK: %gc cpu
+HOOK: %gc cpu ( -- )
 
 : operand ( var -- op ) get v>operand ; inline
 

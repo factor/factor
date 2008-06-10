@@ -36,12 +36,12 @@ M: string error. print ;
 : :vars ( -- )
     error-continuation get continuation-name namestack. ;
 
-: :res ( n -- )
+: :res ( n -- * )
     1- restarts get-global nth f restarts set-global restart ;
 
-: :1 1 :res ;
-: :2 2 :res ;
-: :3 3 :res ;
+: :1 ( -- * ) 1 :res ;
+: :2 ( -- * ) 2 :res ;
+: :3 ( -- * ) 3 :res ;
 
 : restart. ( restart n -- )
     [
@@ -143,15 +143,15 @@ M: relative-overflow summary
 : stack-overflow. ( obj name -- )
     write " stack overflow" print drop ;
 
-: datastack-underflow. "Data" stack-underflow. ;
-: datastack-overflow. "Data" stack-overflow. ;
-: retainstack-underflow. "Retain" stack-underflow. ;
-: retainstack-overflow. "Retain" stack-overflow. ;
+: datastack-underflow. ( obj -- ) "Data" stack-underflow. ;
+: datastack-overflow. ( obj -- ) "Data" stack-overflow. ;
+: retainstack-underflow. ( obj -- ) "Retain" stack-underflow. ;
+: retainstack-overflow. ( obj -- ) "Retain" stack-overflow. ;
 
-: memory-error.
+: memory-error. ( error -- )
     "Memory protection fault at address " write third .h ;
 
-: primitive-error.
+: primitive-error. ( error -- ) 
     "Unimplemented primitive" print drop ;
 
 PREDICATE: kernel-error < array
@@ -161,7 +161,7 @@ PREDICATE: kernel-error < array
         [ second 0 15 between? ]
     } cond ;
 
-: kernel-errors
+: kernel-errors ( error -- n errors )
     second {
         { 0  [ expired-error.          ] }
         { 1  [ io-error.               ] }

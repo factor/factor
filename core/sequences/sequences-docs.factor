@@ -231,6 +231,7 @@ $nl
 { $subsection "sequences-search" }
 { $subsection "sequences-comparing" }
 { $subsection "sequences-split" }
+{ $subsection "grouping" }
 { $subsection "sequences-destructive" }
 { $subsection "sequences-stacks" }
 { $subsection "sequences-sorting" }

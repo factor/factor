@@ -1,6 +1,7 @@
 USING: alien alien.c-types kernel windows.ole32 combinators.lib
-parser splitting sequences.lib sequences namespaces assocs
-quotations shuffle accessors words macros alien.syntax fry ;
+parser splitting grouping sequences.lib sequences namespaces
+assocs quotations shuffle accessors words macros alien.syntax
+fry ;
 IN: windows.com.syntax
 
 <PRIVATE

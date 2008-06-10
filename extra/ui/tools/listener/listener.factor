@@ -172,7 +172,7 @@ M: stack-display tool-scroller
     listener-gadget new dup init-listener
     [ listener-output, listener-input, ] { 0 1 } build-track ;
 
-: listener-help "ui-listener" help-window ;
+: listener-help ( -- ) "ui-listener" help-window ;
 
 \ listener-help H{ { +nullary+ t } } define-command
 

@@ -25,7 +25,7 @@ TUPLE: linux-monitor < monitor wd inotify watches disposed ;
 : <inotify> ( -- port/f )
     inotify_init dup 0 < [ drop f ] [ <fd> <input-port> ] if ;
 
-: inotify-fd inotify get handle>> handle-fd ;
+: inotify-fd ( -- fd ) inotify get handle>> handle-fd ;
 
 : check-existing ( wd -- )
     watches get key? [
@@ -41,7 +41,7 @@ TUPLE: linux-monitor < monitor wd inotify watches disposed ;
     [ (add-watch) ] [ drop ] 2bi r>
     <linux-monitor> [ ] [ ] [ wd>> ] tri watches get set-at ;
 
-: check-inotify
+: check-inotify ( -- )
     inotify get [
         "Calling <monitor> outside with-monitors" throw
     ] unless ;

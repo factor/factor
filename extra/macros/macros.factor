@@ -30,6 +30,6 @@ M: macro reset-word
 
 : n*quot ( n seq -- seq' ) <repetition> concat >quotation ;
 
-: saver \ >r <repetition> >quotation ;
+: saver ( n -- quot ) \ >r <repetition> >quotation ;
 
-: restorer \ r> <repetition> >quotation ;
+: restorer ( n -- quot ) \ r> <repetition> >quotation ;

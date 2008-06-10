@@ -11,8 +11,8 @@ IN: state-machine
 
 TUPLE: state place data ;
 
-TUPLE: missing-state ;
-: missing-state \ missing-state new throw ;
+ERROR: missing-state ;
+
 M: missing-state error.
     drop "Missing state" print ;
 

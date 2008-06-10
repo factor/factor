@@ -10,7 +10,7 @@ IN: furnace.boilerplate
 
 TUPLE: boilerplate < filter-responder template ;
 
-: <boilerplate> f boilerplate boa ;
+: <boilerplate> ( responder -- boilerplate ) f boilerplate boa ;
 
 M:: boilerplate call-responder* ( path responder -- )
     path responder call-next-method

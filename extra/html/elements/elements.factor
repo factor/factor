@@ -65,52 +65,50 @@ SYMBOL: html
     #! dynamically creating words.
     >r >r elements-vocab create r> r> define-declared ;
 
-: <foo> "<" swap ">" 3append ;
-
-: empty-effect T{ effect f 0 0 } ;
+: <foo> ( str -- <str> ) "<" swap ">" 3append ;
 
 : def-for-html-word-<foo> ( name -- )
     #! Return the name and code for the <foo> patterned
     #! word.
     dup <foo> swap [ <foo> write-html ] curry
-    empty-effect html-word ;
+    (( -- )) html-word ;
 
-: <foo "<" prepend ;
+: <foo ( str -- <str ) "<" prepend ;
 
 : def-for-html-word-<foo ( name -- )
     #! Return the name and code for the <foo patterned
     #! word.
     <foo dup [ write-html ] curry
-    empty-effect html-word ;
+    (( -- )) html-word ;
 
-: foo> ">" append ;
+: foo> ( str -- foo> ) ">" append ;
 
 : def-for-html-word-foo> ( name -- )
     #! Return the name and code for the foo> patterned
     #! word.
-    foo> [ ">" write-html ] empty-effect html-word ;
+    foo> [ ">" write-html ] (( -- )) html-word ;
 
-: </foo> "</" swap ">" 3append ;
+: </foo> ( str -- </str> ) "</" swap ">" 3append ;
 
 : def-for-html-word-</foo> ( name -- )
     #! Return the name and code for the </foo> patterned
     #! word.
-    </foo> dup [ write-html ] curry empty-effect html-word ;
+    </foo> dup [ write-html ] curry (( -- )) html-word ;
 
-: <foo/> "<" swap "/>" 3append ;
+: <foo/> ( str -- <str/> ) "<" swap "/>" 3append ;
 
 : def-for-html-word-<foo/> ( name -- )
     #! Return the name and code for the <foo/> patterned
     #! word.
     dup <foo/> swap [ <foo/> write-html ] curry
-    empty-effect html-word ;
+    (( -- )) html-word ;
 
-: foo/> "/>" append ;
+: foo/> ( str -- str/> ) "/>" append ;
 
 : def-for-html-word-foo/> ( name -- )
     #! Return the name and code for the foo/> patterned
     #! word.
-    foo/> [ "/>" write-html ] empty-effect html-word ;
+    foo/> [ "/>" write-html ] (( -- )) html-word ;
 
 : define-closed-html-word ( name -- )
     #! Given an HTML tag name, define the words for
@@ -134,11 +132,9 @@ SYMBOL: html
     present escape-quoted-string write-html
     "'" write-html ;
 
-: attribute-effect T{ effect f { "string" } 0 } ;
-
 : define-attribute-word ( name -- )
     dup "=" prepend swap
-    [ write-attr ] curry attribute-effect html-word ;
+    [ write-attr ] curry (( string -- )) html-word ;
 
 ! Define some closed HTML tags
 [

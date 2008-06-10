@@ -105,7 +105,7 @@ TUPLE: openssl-context < secure-context aliens ;
 
 TUPLE: bio handle disposed ;
 
-: <bio> f bio boa ;
+: <bio> ( handle -- bio ) f bio boa ;
 
 M: bio dispose* handle>> BIO_free ssl-error ;
 
@@ -121,7 +121,7 @@ M: bio dispose* handle>> BIO_free ssl-error ;
 
 TUPLE: rsa handle disposed ;
 
-: <rsa> f rsa boa ;
+: <rsa> ( handle -- rsa ) f rsa boa ;
 
 M: rsa dispose* handle>> RSA_free ;
 

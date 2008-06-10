@@ -1,7 +1,7 @@
 ! See http://www.faqs.org/rfcs/rfc1321.html
 
 USING: kernel io io.binary io.files io.streams.byte-array math
-math.functions math.parser namespaces splitting strings
+math.functions math.parser namespaces splitting grouping strings
 sequences crypto.common byte-arrays locals sequences.private
 io.encodings.binary symbols math.bitfields.lib checksums ;
 IN: checksums.md5
@@ -74,7 +74,7 @@ SYMBOLS: a b c d old-a old-b old-c old-d ;
 : S43 15 ; inline
 : S44 21 ; inline
 
-: (process-md5-block-F)
+: (process-md5-block-F) ( block -- block )
     dup S11 1  0  [ F ] ABCD
     dup S12 2  1  [ F ] DABC
     dup S13 3  2  [ F ] CDAB
@@ -92,7 +92,7 @@ SYMBOLS: a b c d old-a old-b old-c old-d ;
     dup S13 15 14 [ F ] CDAB
     dup S14 16 15 [ F ] BCDA ;
 
-: (process-md5-block-G)
+: (process-md5-block-G) ( block -- block )
     dup S21 17 1  [ G ] ABCD
     dup S22 18 6  [ G ] DABC
     dup S23 19 11 [ G ] CDAB
@@ -110,7 +110,7 @@ SYMBOLS: a b c d old-a old-b old-c old-d ;
     dup S23 31 7  [ G ] CDAB
     dup S24 32 12 [ G ] BCDA ;
 
-: (process-md5-block-H)
+: (process-md5-block-H) ( block -- block )
     dup S31 33 5  [ H ] ABCD
     dup S32 34 8  [ H ] DABC
     dup S33 35 11 [ H ] CDAB
@@ -128,7 +128,7 @@ SYMBOLS: a b c d old-a old-b old-c old-d ;
     dup S33 47 15 [ H ] CDAB
     dup S34 48 2  [ H ] BCDA ;
 
-: (process-md5-block-I)
+: (process-md5-block-I) ( block -- block )
     dup S41 49 0  [ I ] ABCD
     dup S42 50 7  [ I ] DABC
     dup S43 51 14 [ I ] CDAB

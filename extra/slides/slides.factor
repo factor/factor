@@ -53,7 +53,7 @@ IN: slides
         gadget.
     ] ($block) ;
 
-: page-theme
+: page-theme ( gadget -- )
     T{ gradient f { { 0.8 0.8 1.0 1.0 } { 0.8 1.0 1.0 1.0 } } }
     swap set-gadget-interior ;
 

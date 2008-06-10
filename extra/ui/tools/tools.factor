@@ -55,13 +55,13 @@ M: workspace model-changed
 
 [ workspace-window ] ui-hook set-global
 
-: com-listener stack-display select-tool ;
+: com-listener ( workspace -- ) stack-display select-tool ;
 
-: com-browser browser-gadget select-tool ;
+: com-browser ( workspace -- ) browser-gadget select-tool ;
 
-: com-inspector inspector-gadget select-tool ;
+: com-inspector ( workspace -- ) inspector-gadget select-tool ;
 
-: com-profiler profiler-gadget select-tool ;
+: com-profiler ( workspace -- ) profiler-gadget select-tool ;
 
 workspace "tool-switching" f {
     { T{ key-down f { A+ } "1" } com-listener }

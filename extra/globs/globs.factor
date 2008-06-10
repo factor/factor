@@ -6,13 +6,17 @@ IN: globs
 
 <PRIVATE
 
-: 'char' [ ",*?" member? not ] satisfy ;
+: 'char' ( -- parser )
+    [ ",*?" member? not ] satisfy ;
 
-: 'string' 'char' <+> [ >lower token ] <@ ;
+: 'string' ( -- parser )
+    'char' <+> [ >lower token ] <@ ;
 
-: 'escaped-char' "\\" token any-char-parser &> [ 1token ] <@ ;
+: 'escaped-char' ( -- parser )
+    "\\" token any-char-parser &> [ 1token ] <@ ;
 
-: 'escaped-string' 'string' 'escaped-char' <|> ;
+: 'escaped-string' ( -- parser )
+    'string' 'escaped-char' <|> ;
 
 DEFER: 'term'
 
@@ -23,7 +27,7 @@ DEFER: 'term'
     'glob' "," token nonempty-list-of "{" "}" surrounded-by
     [ <or-parser> ] <@ ;
 
-LAZY: 'term'
+LAZY: 'term' ( -- parser )
     'union'
     'character-class' <|>
     "?" token [ drop any-char-parser ] <@ <|>
@@ -32,7 +36,7 @@ LAZY: 'term'
 
 PRIVATE>
 
-: <glob> 'glob' just parse-1 just ;
+: <glob> ( string -- glob ) 'glob' just parse-1 just ;
 
 : glob-matches? ( input glob -- ? )
     [ >lower ] [ <glob> ] bi* parse nil? not ;

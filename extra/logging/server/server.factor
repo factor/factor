@@ -67,7 +67,7 @@ SYMBOL: log-files
 : ?delete-file ( path -- )
     dup exists? [ delete-file ] [ drop ] if ;
 
-: delete-oldest keep-logs log# ?delete-file ;
+: delete-oldest ( service -- ) keep-logs log# ?delete-file ;
 
 : ?move-file ( old new -- )
     over exists? [ move-file ] [ 2drop ] if ;

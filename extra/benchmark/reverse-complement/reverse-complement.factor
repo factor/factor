@@ -1,6 +1,6 @@
 USING: io io.files io.streams.duplex kernel sequences
 sequences.private strings vectors words memoize splitting
-hints unicode.case continuations io.encodings.ascii ;
+grouping hints unicode.case continuations io.encodings.ascii ;
 IN: benchmark.reverse-complement
 
 MEMO: trans-map ( -- str )
@@ -38,10 +38,10 @@ HINTS: do-line vector string ;
         ] with-file-reader
     ] with-file-writer ;
 
-: reverse-complement-in
+: reverse-complement-in ( -- path )
     "reverse-complement-in.txt" temp-file ;
 
-: reverse-complement-out
+: reverse-complement-out ( -- path )
     "reverse-complement-out.txt" temp-file ;
 
 : reverse-complement-main ( -- )

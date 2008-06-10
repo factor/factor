@@ -10,6 +10,7 @@ IN: bootstrap.syntax
     "\""
     "#!"
     "("
+    "(("
     ":"
     ";"
     "<PRIVATE"

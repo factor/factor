@@ -188,7 +188,7 @@ $nl
 
 ABOUT: "parser"
 
-: $parsing-note
+: $parsing-note ( children -- )
     drop
     "This word should only be called from parsing words."
     $notes ;
@@ -431,9 +431,9 @@ HELP: lexer-factory
 { $var-description "A variable holding a quotation with stack effect " { $snippet "( lines -- lexer )" } ". This quotation is called by the parser to create " { $link lexer } " instances. This variable can be rebound to a quotation which outputs a custom tuple delegating to " { $link lexer } " to customize syntax." } ;
 
 HELP: parse-effect
-{ $values { "effect" "an instance of " { $link effect } } }
+{ $values { "end" string } { "effect" "an instance of " { $link effect } } }
 { $description "Parses a stack effect from the current input line." }
-{ $examples "This word is used by " { $link POSTPONE: ( } " to parse stack effect declarations." }
+{ $examples "This word is used by " { $link POSTPONE: ( } " and " { $link POSTPONE: (( } " to parse stack effect declarations." }
 $parsing-note ;
 
 HELP: parse-base

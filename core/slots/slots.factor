@@ -27,36 +27,28 @@ C: <slot-spec> slot-spec
     >r "accessors" create dup r>
     "declared-effect" set-word-prop ;
 
-: reader-effect T{ effect f { "object" } { "value" } } ; inline
-
 : reader-word ( name -- word )
-    ">>" append reader-effect create-accessor ;
+    ">>" append (( object -- value )) create-accessor ;
 
 : define-reader ( class slot name -- )
     reader-word object reader-quot define-slot-word ;
 
-: writer-effect T{ effect f { "value" "object" } { } } ; inline
-
 : writer-word ( name -- word )
-    "(>>" swap ")" 3append writer-effect create-accessor ;
+    "(>>" swap ")" 3append (( value object -- )) create-accessor ;
 
 : define-writer ( class slot name -- )
     writer-word [ set-slot ] define-slot-word ;
 
-: setter-effect T{ effect f { "object" "value" } { "object" } } ; inline
-
 : setter-word ( name -- word )
-    ">>" prepend setter-effect create-accessor ;
+    ">>" prepend (( object value -- object )) create-accessor ;
 
 : define-setter ( name -- )
     dup setter-word dup deferred? [
         [ \ over , swap writer-word , ] [ ] make define-inline
     ] [ 2drop ] if ;
 
-: changer-effect T{ effect f { "object" "quot" } { "object" } } ; inline
-
 : changer-word ( name -- word )
-    "change-" prepend changer-effect create-accessor ;
+    "change-" prepend (( object quot -- object )) create-accessor ;
 
 : define-changer ( name -- )
     dup changer-word dup deferred? [

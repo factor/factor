@@ -583,7 +583,7 @@ set-primitive-effect
 
 \ (set-os-envs) { array } { } <effect> set-primitive-effect
 
-\ do-primitive [ \ do-primitive no-effect ] "infer" set-word-prop
+\ do-primitive [ \ do-primitive cannot-infer-effect ] "infer" set-word-prop
 
 \ dll-valid? { object } { object } <effect> set-primitive-effect
 

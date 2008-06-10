@@ -12,9 +12,9 @@ SYMBOL: upload-images-destination
   "slava@factorcode.org:/var/www/factorcode.org/newsite/images/latest/"
   or ;
 
-: checksums "checksums.txt" temp-file ;
+: checksums ( -- temp ) "checksums.txt" temp-file ;
 
-: boot-image-names images [ boot-image-name ] map ;
+: boot-image-names ( -- seq ) images [ boot-image-name ] map ;
 
 : compute-checksums ( -- )
     checksums ascii [

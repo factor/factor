@@ -1,5 +1,6 @@
 IN: inference.state.tests
-USING: tools.test inference.state words kernel namespaces ;
+USING: tools.test inference.state words kernel namespaces
+definitions ;
 
 : computing-dependencies ( quot -- dependencies )
     H{ } clone [ dependencies rot with-variable ] keep ;

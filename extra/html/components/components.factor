@@ -10,11 +10,11 @@ IN: html.components
 
 SYMBOL: values
 
-: value values get at ;
+: value ( name -- value ) values get at ;
 
-: set-value values get set-at ;
+: set-value ( value name -- ) values get set-at ;
 
-: blank-values H{ } clone values set ;
+: blank-values ( -- ) H{ } clone values set ;
 
 : prepare-value ( name object -- value name object )
     [ [ value ] keep ] dip ; inline

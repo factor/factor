@@ -211,13 +211,13 @@ M: editor draw-gadget*
 M: editor pref-dim*
     dup editor-font* swap control-value text-dim ;
 
-: contents-changed
+: contents-changed ( model editor -- )
     editor-self swap
     over editor-caret [ over validate-loc ] (change-model)
     over editor-mark [ over validate-loc ] (change-model)
     drop relayout ;
 
-: caret/mark-changed
+: caret/mark-changed ( model editor -- )
     nip editor-self dup relayout-1 scroll>caret ;
 
 M: editor model-changed
@@ -325,19 +325,25 @@ M: editor gadget-text* editor-string % ;
     [ drop dup extend-selection dup editor-mark click-loc ]
     [ select-elt ] if ;
 
-: insert-newline "\n" swap user-input ;
+: insert-newline ( editor -- ) "\n" swap user-input ;
 
-: delete-next-character T{ char-elt } editor-delete ;
+: delete-next-character ( editor -- ) 
+    T{ char-elt } editor-delete ;
 
-: delete-previous-character T{ char-elt } editor-backspace ;
+: delete-previous-character ( editor -- ) 
+    T{ char-elt } editor-backspace ;
 
-: delete-previous-word T{ word-elt } editor-delete ;
+: delete-previous-word ( editor -- ) 
+    T{ word-elt } editor-delete ;
 
-: delete-next-word T{ word-elt } editor-backspace ;
+: delete-next-word ( editor -- ) 
+    T{ word-elt } editor-backspace ;
 
-: delete-to-start-of-line T{ one-line-elt } editor-delete ;
+: delete-to-start-of-line ( editor -- ) 
+    T{ one-line-elt } editor-delete ;
 
-: delete-to-end-of-line T{ one-line-elt } editor-backspace ;
+: delete-to-end-of-line ( editor -- ) 
+    T{ one-line-elt } editor-backspace ;
 
 editor "general" f {
     { T{ key-down f f "DELETE" } delete-next-character }
@@ -350,11 +356,11 @@ editor "general" f {
     { T{ key-down f { A+ } "BACKSPACE" } delete-to-end-of-line }
 } define-command-map
 
-: paste clipboard get paste-clipboard ;
+: paste ( editor -- ) clipboard get paste-clipboard ;
 
-: paste-selection selection get paste-clipboard ;
+: paste-selection ( editor -- ) selection get paste-clipboard ;
 
-: cut clipboard get editor-cut ;
+: cut ( editor -- ) clipboard get editor-cut ;
 
 editor "clipboard" f {
     { T{ paste-action } paste }
@@ -380,17 +386,17 @@ editor "clipboard" f {
         T{ char-elt } editor-next
     ] if ;
 
-: previous-line T{ line-elt } editor-prev ;
+: previous-line ( editor -- ) T{ line-elt } editor-prev ;
 
-: next-line T{ line-elt } editor-next ;
+: next-line ( editor -- ) T{ line-elt } editor-next ;
 
-: previous-word T{ word-elt } editor-prev ;
+: previous-word ( editor -- ) T{ word-elt } editor-prev ;
 
-: next-word T{ word-elt } editor-next ;
+: next-word ( editor -- ) T{ word-elt } editor-next ;
 
-: start-of-line T{ one-line-elt } editor-prev ;
+: start-of-line ( editor -- ) T{ one-line-elt } editor-prev ;
 
-: end-of-line T{ one-line-elt } editor-next ;
+: end-of-line ( editor -- ) T{ one-line-elt } editor-next ;
 
 editor "caret-motion" f {
     { T{ button-down } position-caret }
@@ -406,36 +412,46 @@ editor "caret-motion" f {
     { T{ key-down f { C+ } "END" } end-of-document }
 } define-command-map
 
-: select-all T{ doc-elt } select-elt ;
+: select-all ( editor -- ) T{ doc-elt } select-elt ;
 
-: select-line T{ one-line-elt } select-elt ;
+: select-line ( editor -- ) T{ one-line-elt } select-elt ;
 
-: select-word T{ one-word-elt } select-elt ;
+: select-word ( editor -- ) T{ one-word-elt } select-elt ;
 
 : selected-word ( editor -- string )
     dup gadget-selection?
     [ dup select-word ] unless
     gadget-selection ;
 
-: select-previous-character T{ char-elt } editor-select-prev ;
+: select-previous-character ( editor -- ) 
+    T{ char-elt } editor-select-prev ;
 
-: select-next-character T{ char-elt } editor-select-next ;
+: select-next-character ( editor -- ) 
+    T{ char-elt } editor-select-next ;
 
-: select-previous-line T{ line-elt } editor-select-prev ;
+: select-previous-line ( editor -- ) 
+    T{ line-elt } editor-select-prev ;
 
-: select-next-line T{ line-elt } editor-select-next ;
+: select-next-line ( editor -- ) 
+    T{ line-elt } editor-select-next ;
 
-: select-previous-word T{ word-elt } editor-select-prev ;
+: select-previous-word ( editor -- ) 
+    T{ word-elt } editor-select-prev ;
 
-: select-next-word T{ word-elt } editor-select-next ;
+: select-next-word ( editor -- ) 
+    T{ word-elt } editor-select-next ;
 
-: select-start-of-line T{ one-line-elt } editor-select-prev ;
+: select-start-of-line ( editor -- ) 
+    T{ one-line-elt } editor-select-prev ;
 
-: select-end-of-line T{ one-line-elt } editor-select-next ;
+: select-end-of-line ( editor -- ) 
+    T{ one-line-elt } editor-select-next ;
 
-: select-start-of-document T{ doc-elt } editor-select-prev ;
+: select-start-of-document ( editor -- ) 
+    T{ doc-elt } editor-select-prev ;
 
-: select-end-of-document T{ doc-elt } editor-select-next ;
+: select-end-of-document ( editor -- ) 
+    T{ doc-elt } editor-select-next ;
 
 editor "selection" f {
     { T{ button-down f { S+ } } extend-selection }

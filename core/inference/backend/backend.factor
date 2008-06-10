@@ -23,7 +23,7 @@ M: word inline?
 
 SYMBOL: visited
 
-: reset-on-redefine { "inferred-effect" "no-effect" } ; inline
+: reset-on-redefine { "inferred-effect" "cannot-infer" } ; inline
 
 : (redefined) ( word -- )
     dup visited get key? [ drop ] [
@@ -382,18 +382,36 @@ TUPLE: unbalanced-branches-error quots in out ;
         #call consume/produce
     ] if ;
 
-TUPLE: no-effect word ;
+TUPLE: cannot-infer-effect word ;
 
-: no-effect ( word -- * ) \ no-effect inference-warning ;
+: cannot-infer-effect ( word -- * )
+    \ cannot-infer-effect inference-warning ;
 
-TUPLE: effect-error word effect ;
+TUPLE: effect-error word inferred declared ;
 
-: effect-error ( word effect -- * )
+: effect-error ( word inferred declared -- * )
     \ effect-error inference-error ;
 
+TUPLE: missing-effect word ;
+
+: effect-required? ( word -- ? )
+    {
+        { [ dup inline? ] [ drop f ] }
+        { [ dup deferred? ] [ drop f ] }
+        { [ dup crossref? not ] [ drop f ] }
+        [ word-def [ [ word? ] [ primitive? not ] bi and ] contains? ]
+    } cond ;
+
+: ?missing-effect ( word -- )
+    dup effect-required?
+    [ missing-effect inference-error ] [ drop ] if ;
+
 : check-effect ( word effect -- )
-    dup pick stack-effect effect<=
-    [ 2drop ] [ effect-error ] if ;
+    over stack-effect {
+        { [ dup not ] [ 2drop ?missing-effect ] }
+        { [ 2dup effect<= ] [ 3drop ] }
+        [ effect-error ]
+    } cond ;
 
 : finish-word ( word -- )
     current-effect
@@ -412,7 +430,7 @@ TUPLE: effect-error word effect ;
             finish-word
             current-effect
         ] with-scope
-    ] [ ] [ t "no-effect" set-word-prop ] cleanup ;
+    ] [ ] [ t "cannot-infer" set-word-prop ] cleanup ;
 
 : custom-infer ( word -- )
     #! Customized inference behavior
@@ -424,18 +442,16 @@ TUPLE: effect-error word effect ;
 : apply-word ( word -- )
     {
         { [ dup "infer" word-prop ] [ custom-infer ] }
-        { [ dup "no-effect" word-prop ] [ no-effect ] }
+        { [ dup "cannot-infer" word-prop ] [ cannot-infer-effect ] }
         { [ dup "inferred-effect" word-prop ] [ cached-infer ] }
         [ dup infer-word make-call-node ]
     } cond ;
 
-TUPLE: no-recursive-declaration word ;
-
-: declared-infer ( word -- )
+: declared-infer ( word -- )                       
     dup stack-effect [
         make-call-node
     ] [
-        \ no-recursive-declaration inference-error
+        \ missing-effect inference-error
     ] if* ;
 
 GENERIC: collect-label-info* ( label node -- )
@@ -463,9 +479,11 @@ M: #return collect-label-info*
     dup node-param #return node,
     dataflow-graph get 1array over set-node-children ;
 
-: inlined-block? "inlined-block" word-prop ;
+: inlined-block? ( word -- ? )
+    "inlined-block" word-prop ;
 
-: <inlined-block> gensym dup t "inlined-block" set-word-prop ;
+: <inlined-block> ( -- word )
+    gensym dup t "inlined-block" set-word-prop ;
 
 : inline-block ( word -- #label data )
     [
@@ -493,13 +511,15 @@ M: #return collect-label-info*
     namespace swap update ;
 
 : current-stack-height ( -- n )
-    meta-d get length d-in get - ;
+    d-in get meta-d get length - ;
 
 : word-stack-height ( word -- n )
-    stack-effect [ in>> length ] [ out>> length ] bi - ;
+    stack-effect effect-height ;
 
 : bad-recursive-declaration ( word inferred -- )
-    dup 0 < [ 0 ] [ 0 swap ] if <effect> effect-error ;
+    dup 0 < [ 0 swap ] [ 0 ] if <effect>
+    over stack-effect
+    effect-error ;
 
 : check-stack-height ( word height -- )
     over word-stack-height over =

@@ -1,14 +1,14 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic kernel math namespaces sequences words
-splitting math.vectors ui.gadgets.grids ui.gadgets ;
+splitting grouping math.vectors ui.gadgets.grids ui.gadgets ;
 IN: ui.gadgets.frames
 
 ! A frame arranges gadgets in a 3x3 grid, where the center
 ! gadgets gets left-over space.
 TUPLE: frame ;
 
-: <frame-grid> 9 [ drop <gadget> ] map 3 group ;
+: <frame-grid> ( -- grid ) 9 [ drop <gadget> ] map 3 group ;
 
 : @center 1 1 ;
 : @left 0 1 ;

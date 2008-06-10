@@ -5,11 +5,11 @@
 USING: lists.lazy math kernel sequences quotations ;
 IN: lists.lazy.examples
 
-: naturals 0 lfrom ;
-: positives 1 lfrom ;
-: evens 0 [ 2 + ] lfrom-by ;
-: odds 1 lfrom [ 2 mod 1 = ] lfilter ;
-: powers-of-2 1 [ 2 * ] lfrom-by ;
-: ones 1 [ ] lfrom-by ;
-: squares naturals [ dup * ] lazy-map ;
-: first-five-squares 5 squares ltake list>array ;
+: naturals ( -- list ) 0 lfrom ;
+: positives ( -- list ) 1 lfrom ;
+: evens ( -- list ) 0 [ 2 + ] lfrom-by ;
+: odds ( -- list ) 1 lfrom [ 2 mod 1 = ] lfilter ;
+: powers-of-2 ( -- list ) 1 [ 2 * ] lfrom-by ;
+: ones ( -- list ) 1 [ ] lfrom-by ;
+: squares ( -- list ) naturals [ dup * ] lazy-map ;
+: first-five-squares ( -- list ) 5 squares ltake list>array ;

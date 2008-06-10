@@ -42,12 +42,12 @@ SYMBOL: log-service
 
 <PRIVATE
 
-: one-string?
+: one-string? ( obj -- ? )
     {
         [ dup array? ]
         [ dup length 1 = ]
         [ dup first string? ]
-    } && nip ;
+    } 0&& nip ;
 
 : stack>message ( obj -- inputs>message )
     dup one-string? [ first ] [
@@ -77,7 +77,7 @@ PRIVATE>
         3drop
     ] if ; inline
 
-: input# stack-effect in>> length ;
+: input# ( word -- n ) stack-effect in>> length ;
 
 : input-logging-quot ( quot word level -- quot' )
     rot [ [ input# ] keep ] 2dip '[ , , , log-stack @ ] ;
@@ -85,7 +85,7 @@ PRIVATE>
 : add-input-logging ( word level -- )
     [ input-logging-quot ] (define-logging) ;
 
-: output# stack-effect out>> length ;
+: output# ( word -- n ) stack-effect out>> length ;
 
 : output-logging-quot ( quot word level -- quot' )
     [ [ output# ] keep ] dip '[ @ , , , log-stack ] ;
@@ -121,4 +121,4 @@ PRIVATE>
     #! Syntax: name level
     CREATE-WORD dup scan-word
     '[ 1array stack>message , , log-message ]
-    define ; parsing
+    (( message -- )) define-declared ; parsing

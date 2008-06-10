@@ -146,7 +146,7 @@ SYMBOLS: +read-only+ +hidden+ +system+
 : win32-file-type ( n -- symbol )
     FILE_ATTRIBUTE_DIRECTORY mask? +directory+ +regular-file+ ? ;
 
-: WIN32_FIND_DATA>file-info
+: WIN32_FIND_DATA>file-info ( WIN32_FIND_DATA -- file-info )
     {
         [ WIN32_FIND_DATA-dwFileAttributes win32-file-type ]
         [
@@ -167,7 +167,7 @@ SYMBOLS: +read-only+ +hidden+ +system+
         FindClose win32-error=0/f
     ] keep ;
 
-: BY_HANDLE_FILE_INFORMATION>file-info
+: BY_HANDLE_FILE_INFORMATION>file-info ( HANDLE_FILE_INFORMATION -- file-info )
     {
         [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes win32-file-type ]
         [

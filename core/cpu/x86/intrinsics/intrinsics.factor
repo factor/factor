@@ -20,16 +20,16 @@ IN: cpu.x86.intrinsics
 } define-intrinsic
 
 ! Slots
-: %slot-literal-known-tag
+: %slot-literal-known-tag ( -- op )
     "obj" operand
     "n" get cells
     "obj" get operand-tag - [+] ;
 
-: %slot-literal-any-tag
+: %slot-literal-any-tag ( -- op )
     "obj" operand %untag
     "obj" operand "n" get cells [+] ;
 
-: %slot-any
+: %slot-any ( -- op )
     "obj" operand %untag
     "n" operand fixnum>slot@
     "obj" operand "n" operand [+] ;
@@ -399,15 +399,15 @@ IN: cpu.x86.intrinsics
         { +clobber+ { "offset" } }
     } ;
 
-: define-getter
+: define-getter ( word quot reg -- )
     [ %alien-integer-get ] 2curry
     alien-integer-get-template
     define-intrinsic ;
 
-: define-unsigned-getter
+: define-unsigned-getter ( word reg -- )
     [ small-reg dup XOR MOV ] swap define-getter ;
 
-: define-signed-getter
+: define-signed-getter ( word reg -- )
     [ [ >r MOV small-reg r> MOVSX ] curry ] keep define-getter ;
 
 : %alien-integer-set ( quot reg -- )
@@ -429,7 +429,7 @@ IN: cpu.x86.intrinsics
         { +clobber+ { "value" "offset" } }
     } ;
 
-: define-setter
+: define-setter ( word reg -- )
     [ swap MOV ] swap
     [ %alien-integer-set ] 2curry
     alien-integer-set-template

@@ -1,5 +1,5 @@
 USING: math math.parser calendar calendar.format strings words
-kernel ;
+kernel effects ;
 IN: present
 
 GENERIC: present ( object -- string )
@@ -11,5 +11,7 @@ M: timestamp present timestamp>string ;
 M: string present ;
 
 M: word present word-name ;
+
+M: effect present effect>string ;
 
 M: f present drop "" ;

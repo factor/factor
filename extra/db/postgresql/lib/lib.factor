@@ -66,10 +66,10 @@ M: postgresql-result-null summary ( obj -- str )
 : param-types ( statement -- seq )
     in-params>> [ type>> type>oid ] map >c-uint-array ;
 
-: malloc-byte-array/length
+: malloc-byte-array/length ( byte-array -- alien length )
     [ malloc-byte-array &free ] [ length ] bi ;
 
-: default-param-value
+: default-param-value ( obj -- alien n )
     number>string* dup [ utf8 malloc-string &free ] when 0 ;
 
 : param-values ( statement -- seq seq2 )

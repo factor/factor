@@ -34,23 +34,6 @@ unit-test
 
 [ "SBUF\" hello world\"" ] [ SBUF" hello world" unparse ] unit-test
 
-
-[ "( a b -- c d )" ] [
-    { "a" "b" } { "c" "d" } <effect> effect>string
-] unit-test
-
-[ "( -- c d )" ] [
-    { } { "c" "d" } <effect> effect>string
-] unit-test
-
-[ "( a b -- )" ] [
-    { "a" "b" } { } <effect> effect>string
-] unit-test
-
-[ "( -- )" ] [
-    { } { } <effect> effect>string
-] unit-test
-
 [ "W{ \\ + }" ] [ [ W{ \ + } ] first unparse ] unit-test
 
 [ ] [ \ fixnum see ] unit-test

@@ -40,12 +40,12 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
     [ dimensions 2array ] bi@ =
     [ dimensions-not-equal ] unless ;
 
-: 2values [ dimensioned-value ] bi@ ;
+: 2values ( dim dim -- val val ) [ dimensioned-value ] bi@ ;
 
-: <dimension-op
+: <dimension-op ( dim dim -- top bot val val )
     2dup check-dimensions dup dimensions 2swap 2values ;
 
-: dimension-op>
+: dimension-op> ( top bot val -- dim )
     -rot <dimensioned> ;
 
 : d+ ( d d -- d ) <dimension-op + dimension-op> ;

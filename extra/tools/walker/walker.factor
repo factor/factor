@@ -64,9 +64,9 @@ M: object add-breakpoint ;
 
 : (step-into-quot) ( quot -- ) add-breakpoint call ;
 
-: (step-into-if) ? (step-into-quot) ;
+: (step-into-if) ( true false ? -- ) ? (step-into-quot) ;
 
-: (step-into-dispatch) nth (step-into-quot) ;
+: (step-into-dispatch) ( array n -- ) nth (step-into-quot) ;
 
 : (step-into-execute) ( word -- )
     {
@@ -80,7 +80,7 @@ M: object add-breakpoint ;
 
 \ (step-into-execute) t "step-into?" set-word-prop
 
-: (step-into-continuation)
+: (step-into-continuation) ( -- )
     continuation callstack >>call break ;
 
 ! Messages sent to walker thread
@@ -260,4 +260,4 @@ SYMBOL: +stopped+
 ! For convenience
 IN: syntax
 
-: B break ;
+: B ( -- ) break ;

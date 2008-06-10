@@ -18,7 +18,7 @@ user "USERS"
     { "deleted" "DELETED" INTEGER +not-null+ }
 } define-persistent
 
-: init-users-table user ensure-table ;
+: init-users-table ( -- ) user ensure-table ;
 
 SINGLETON: users-in-db
 
