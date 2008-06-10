@@ -2,12 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel combinators assocs
 continuations namespaces sequences splitting words
-vocabs.loader classes
-fry urls multiline
+vocabs.loader classes strings
+fry urls multiline present
 xml
 xml.data
+xml.entities
 xml.writer
-xml.utilities
 html.components
 html.elements
 html.templates
@@ -19,6 +19,7 @@ http.server.redirection
 http.server.responses
 qualified ;
 QUALIFIED-WITH: assocs a
+EXCLUDE: xml.utilities => children>string ;
 IN: furnace
 
 : nested-responders ( -- seq )
@@ -51,11 +52,15 @@ GENERIC: modify-query ( query responder -- query' )
 
 M: object modify-query drop ;
 
-: adjust-url ( url -- url' )
+GENERIC: adjust-url ( url -- url' )
+
+M: url adjust-url
     clone
         [ [ modify-query ] each-responder ] change-query
         [ resolve-base-path ] change-path
     relative-to-request ;
+
+M: string adjust-url ;
 
 : <redirect> ( url -- response )
     adjust-url request get method>> {
@@ -64,20 +69,25 @@ M: object modify-query drop ;
         { "POST" [ <permanent-redirect> ] }
     } case ;
 
-GENERIC: hidden-form-field ( responder -- )
+GENERIC: modify-form ( responder -- )
 
-M: object hidden-form-field drop ;
+M: object modify-form drop ;
 
 : request-params ( request -- assoc )
     dup method>> {
         { "GET" [ url>> query>> ] }
         { "HEAD" [ url>> query>> ] }
-        { "POST" [ post-data>> ] }
+        { "POST" [
+            post-data>>
+            dup content-type>> "application/x-www-form-urlencoded" =
+            [ content>> ] [ drop f ] if
+        ] }
     } case ;
 
 SYMBOL: exit-continuation
 
-: exit-with exit-continuation get continue-with ;
+: exit-with ( value -- )
+    exit-continuation get continue-with ;
 
 : with-exit-continuation ( quot -- )
     '[ exit-continuation set @ ] callcc1 exit-continuation off ;
@@ -88,7 +98,7 @@ SYMBOL: exit-continuation
     [ drop f ] [ "," split [ dup value ] H{ } map>assoc ] if ;
 
 CHLOE: atom
-    [ "title" required-attr ]
+    [ children>string ]
     [ "href" required-attr ]
     [ "query" optional-attr parse-query-attr ] tri
     <url>
@@ -128,20 +138,34 @@ CHLOE: a
     [ drop </a> ]
     tri ;
 
+: hidden-form-field ( value name -- )
+    over [
+        <input
+            "hidden" =type
+            =name
+            present =value
+        input/>
+    ] [ 2drop ] if ;
+
+: form-nesting-key "__n" ;
+
+: form-magic ( tag -- )
+    [ modify-form ] each-responder
+    nested-values get " " join f like form-nesting-key hidden-form-field
+    "for" optional-attr [ "," split [ hidden render ] each ] when* ;
+
 : form-start-tag ( tag -- )
     [
         [
             <form
-            "POST" =method
-            [ link-attrs ]
-            [ "action" required-attr resolve-base-path =action ]
-            [ tag-attrs non-chloe-attrs-only print-attrs ]
-            tri
+                "POST" =method
+                [ link-attrs ]
+                [ "action" required-attr resolve-base-path =action ]
+                [ tag-attrs non-chloe-attrs-only print-attrs ]
+                tri
             form>
-        ] [
-            [ hidden-form-field ] each-responder
-            "for" optional-attr [ hidden render ] when*
-        ] bi
+        ]
+        [ form-magic ] bi
     ] with-scope ;
 
 CHLOE: form
@@ -167,17 +191,3 @@ CHLOE: button
         [ [ children>string 1array ] dip "button" tag-named set-tag-children ]
         [ nip ]
     } 2cleave process-chloe-tag ;
-
-: attr>word ( value -- word/f )
-    dup ":" split1 swap lookup
-    [ ] [ "No such word: " swap append throw ] ?if ;
-
-: attr>var ( value -- word/f )
-    attr>word dup symbol? [
-        "Must be a symbol: " swap append throw
-    ] unless ;
-
-: if-satisfied? ( tag -- ? )
-    "code" required-attr attr>word execute ;
-
-CHLOE: if dup if-satisfied? [ process-tag-children ] [ drop ] if ;

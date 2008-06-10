@@ -81,14 +81,8 @@ ERROR: no-method object generic ;
                 "methods" word-prop
                 [ generic get mangle-method ] assoc-map
                 [ find-default default set ]
-                [
-                    generic get "inline" word-prop [
-                        <predicate-dispatch-engine>
-                    ] [
-                        <big-dispatch-engine>
-                    ] if
-                ] bi
-                engine>quot
+                [ <big-dispatch-engine> ]
+                bi engine>quot
             ]
         } cleave
     ] with-scope ;

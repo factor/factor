@@ -62,7 +62,8 @@ USE: unix
         [ >r >r underlying-handle r> r> redirect ]
     } cond ;
 
-: ?closed dup +closed+ eq? [ drop "/dev/null" ] when ;
+: ?closed ( obj -- obj' )
+    dup +closed+ eq? [ drop "/dev/null" ] when ;
 
 : setup-redirection ( process -- process )
     dup stdin>> ?closed read-flags 0 redirect

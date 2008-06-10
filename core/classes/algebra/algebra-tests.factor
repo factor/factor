@@ -12,11 +12,11 @@ IN: classes.algebra.tests
 \ flatten-class must-infer
 \ flatten-builtin-class must-infer
 
-: class= [ class<= ] [ swap class<= ] 2bi and ;
+: class= ( cls1 cls2 -- ? ) [ class<= ] [ swap class<= ] 2bi and ;
 
-: class-and* >r class-and r> class= ;
+: class-and* ( cls1 cls2 cls3 -- ? ) >r class-and r> class= ;
 
-: class-or* >r class-or r> class= ;
+: class-or* ( cls1 cls2 cls3 -- ? ) >r class-or r> class= ;
 
 [ t ] [ object  object  object class-and* ] unit-test
 [ t ] [ fixnum  object  fixnum class-and* ] unit-test
@@ -193,9 +193,9 @@ UNION: z1 b1 c1 ;
 [ f ] [ null { number fixnum null } min-class ] unit-test
 
 ! Test for hangs?
-: random-class classes random ;
+: random-class ( -- class ) classes random ;
 
-: random-op
+: random-op ( -- word )
     {
         class-and
         class-or
@@ -211,13 +211,13 @@ UNION: z1 b1 c1 ;
     ] unit-test
 ] times
 
-: random-boolean
+: random-boolean ( -- ? )
     { t f } random ;
 
-: boolean>class
+: boolean>class ( ? -- class )
     object null ? ;
 
-: random-boolean-op
+: random-boolean-op ( -- word )
     {
         and
         or
@@ -225,9 +225,10 @@ UNION: z1 b1 c1 ;
         xor
     } random ;
 
-: class-xor [ class-or ] 2keep class-and class-not class-and ;
+: class-xor ( cls1 cls2 -- cls3 )
+    [ class-or ] 2keep class-and class-not class-and ;
 
-: boolean-op>class-op
+: boolean-op>class-op ( word -- word' )
     {
         { and class-and }
         { or class-or }

@@ -17,8 +17,6 @@ TUPLE: color red green blue ;
 
 [ ] [ "jimmy" "red" set-value ] unit-test
 
-[ "123.5" ] [ 123.5 object>string ] unit-test
-
 [ "jimmy" ] [
     [
         "red" label render

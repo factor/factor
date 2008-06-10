@@ -3,10 +3,10 @@ IN: benchmark.typecheck4
 
 TUPLE: hello n ;
 
-: hello-n* 3 slot ;
+: hello-n* ( obj -- val ) 3 slot ;
 
-: foo 0 100000000 [ over hello-n* + ] times ;
+: foo ( obj -- obj n ) 0 100000000 [ over hello-n* + ] times ;
 
-: typecheck-main 0 hello boa foo 2drop ;
+: typecheck-main ( -- ) 0 hello boa foo 2drop ;
 
 MAIN: typecheck-main

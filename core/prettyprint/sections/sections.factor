@@ -190,9 +190,9 @@ M: block short-section ( block -- )
 : if-nonempty ( block quot -- )
     >r dup empty-block? [ drop ] r> if ; inline
 
-: (<block) pprinter-stack get push ;
+: (<block) ( block -- ) pprinter-stack get push ;
 
-: <block f <block> (<block) ;
+: <block ( -- ) f <block> (<block) ;
 
 : <object ( obj -- ) presented associate <block> (<block) ;
 
@@ -288,7 +288,7 @@ M: colon unindent-first-line? drop t ;
 SYMBOL: prev
 SYMBOL: next
 
-: split-groups [ t , ] when ;
+: split-groups ( ? -- ) [ t , ] when ;
 
 M: f section-start-group? drop t ;
 

@@ -4,7 +4,7 @@ USING: kernel classes.tuple.private hashtables assocs sorting
 accessors combinators sequences slots.private math.parser words
 effects namespaces generic generic.standard.engines
 classes.algebra math math.private kernel.private
-quotations arrays ;
+quotations arrays definitions ;
 IN: generic.standard.engines.tuple
 
 TUPLE: echelon-dispatch-engine n methods ;
@@ -44,7 +44,7 @@ M: trivial-tuple-dispatch-engine engine>quot
     >alist V{ } clone [ hashcode 1array ] distribute-buckets
     [ <trivial-tuple-dispatch-engine> ] map ;
 
-: word-hashcode% [ 1 slot ] % ;
+: word-hashcode% ( -- ) [ 1 slot ] % ;
 
 : class-hash-dispatch-quot ( methods -- quot )
     [
@@ -64,8 +64,9 @@ M: engine-word stack-effect
     [ extra-values ] [ stack-effect ] bi
     dup [ clone [ length + ] change-in ] [ 2drop f ] if ;
 
-M: engine-word compiled-crossref?
-    drop t ;
+M: engine-word crossref? drop t ;
+
+M: engine-word irrelevant? drop t ;
 
 : remember-engine ( word -- )
     generic get "engines" word-prop push ;
@@ -77,7 +78,7 @@ M: engine-word compiled-crossref?
 : define-engine-word ( quot -- word )
     >r <engine-word> dup r> define ;
 
-: array-nth% 2 + , [ slot { word } declare ] % ;
+: array-nth% ( n -- ) 2 + , [ slot { word } declare ] % ;
 
 : tuple-layout-superclasses ( obj -- array )
     { tuple } declare

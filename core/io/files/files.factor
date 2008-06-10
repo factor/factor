@@ -260,7 +260,8 @@ HOOK: delete-directory io-backend ( path -- )
         delete-file
     ] if ;
 
-: to-directory over file-name append-path ;
+: to-directory ( from to -- from to' )
+    over file-name append-path ;
 
 ! Moving and renaming files
 HOOK: move-file io-backend ( from to -- )

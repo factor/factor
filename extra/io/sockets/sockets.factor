@@ -5,7 +5,8 @@ USING: generic kernel io.backend namespaces continuations
 sequences arrays io.encodings io.ports io.streams.duplex
 io.encodings.ascii alien.strings io.binary accessors destructors
 classes debugger byte-arrays system combinators parser
-alien.c-types math.parser splitting math assocs inspector ;
+alien.c-types math.parser splitting grouping
+math assocs inspector ;
 IN: io.sockets
 
 << {
@@ -80,7 +81,7 @@ M: inet4 make-sockaddr ( inet -- sockaddr )
 
 SYMBOL: port-override
 
-: (port) port-override get swap or ;
+: (port) ( port -- port' ) port-override get swap or ;
 
 PRIVATE>
 

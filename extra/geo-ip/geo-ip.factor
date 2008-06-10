@@ -4,9 +4,9 @@ math.parser math.vectors math.intervals interval-maps memoize
 csv accessors assocs strings math splitting ;
 IN: geo-ip
 
-: db-path "IpToCountry.csv" temp-file ;
+: db-path ( -- path ) "IpToCountry.csv" temp-file ;
 
-: db-url "http://software77.net/cgi-bin/ip-country/geo-ip.pl?action=download" ;
+: db-url ( -- url ) "http://software77.net/cgi-bin/ip-country/geo-ip.pl?action=download" ;
 
 : download-db ( -- path )
     db-path dup exists? [

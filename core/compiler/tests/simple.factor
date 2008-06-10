@@ -69,31 +69,31 @@ IN: compiler.tests
 
 ! Regression
 
-: empty ;
+: empty ( -- ) ;
 
 [ "b" ] [ 1 [ empty { [ "a" ] [ "b" ] } dispatch ] compile-call ] unit-test
 
-: dummy-if-1 t [ ] [ ] if ;
+: dummy-if-1 ( -- ) t [ ] [ ] if ;
 
 [ ] [ dummy-if-1 ] unit-test
 
-: dummy-if-2 f [ ] [ ] if ;
+: dummy-if-2 ( -- ) f [ ] [ ] if ;
 
 [ ] [ dummy-if-2 ] unit-test
 
-: dummy-if-3 t [ 1 ] [ 2 ] if ;
+: dummy-if-3 ( -- n ) t [ 1 ] [ 2 ] if ;
 
 [ 1 ] [ dummy-if-3 ] unit-test
 
-: dummy-if-4 f [ 1 ] [ 2 ] if ;
+: dummy-if-4 ( -- n ) f [ 1 ] [ 2 ] if ;
 
 [ 2 ] [ dummy-if-4 ] unit-test
 
-: dummy-if-5 0 dup 1 fixnum<= [ drop 1 ] [ ] if ;
+: dummy-if-5 ( -- n ) 0 dup 1 fixnum<= [ drop 1 ] [ ] if ;
 
 [ 1 ] [ dummy-if-5 ] unit-test
 
-: dummy-if-6
+: dummy-if-6 ( n -- n )
     dup 1 fixnum<= [
         drop 1
     ] [
@@ -102,7 +102,7 @@ IN: compiler.tests
 
 [ 17 ] [ 10 dummy-if-6 ] unit-test
 
-: dead-code-rec
+: dead-code-rec ( -- obj )
     t [
         3.2
     ] [
@@ -111,11 +111,11 @@ IN: compiler.tests
 
 [ 3.2 ] [ dead-code-rec ] unit-test
 
-: one-rec [ f one-rec ] [ "hi" ] if ;
+: one-rec ( ? -- obj ) [ f one-rec ] [ "hi" ] if ;
 
 [ "hi" ] [ t one-rec ] unit-test
 
-: after-if-test
+: after-if-test ( -- n )
     t [ ] [ ] if 5 ;
 
 [ 5 ] [ after-if-test ] unit-test
@@ -127,37 +127,37 @@ DEFER: countdown-b
 
 [ ] [ 10 countdown-b ] unit-test
 
-: dummy-when-1 t [ ] when ;
+: dummy-when-1 ( -- ) t [ ] when ;
 
 [ ] [ dummy-when-1 ] unit-test
 
-: dummy-when-2 f [ ] when ;
+: dummy-when-2 ( -- ) f [ ] when ;
 
 [ ] [ dummy-when-2 ] unit-test
 
-: dummy-when-3 dup [ dup fixnum* ] when ;
+: dummy-when-3 ( a -- b ) dup [ dup fixnum* ] when ;
 
 [ 16 ] [ 4 dummy-when-3 ] unit-test
 [ f ] [ f dummy-when-3 ] unit-test
 
-: dummy-when-4 dup [ dup dup fixnum* fixnum* ] when swap ;
+: dummy-when-4 ( a b -- a b ) dup [ dup dup fixnum* fixnum* ] when swap ;
 
 [ 64 f ] [ f 4 dummy-when-4 ] unit-test
 [ f t ] [ t f dummy-when-4 ] unit-test
 
-: dummy-when-5 f [ dup fixnum* ] when ;
+: dummy-when-5 ( a -- b ) f [ dup fixnum* ] when ;
 
 [ f ] [ f dummy-when-5 ] unit-test
 
-: dummy-unless-1 t [ ] unless ;
+: dummy-unless-1 ( -- ) t [ ] unless ;
 
 [ ] [ dummy-unless-1 ] unit-test
 
-: dummy-unless-2 f [ ] unless ;
+: dummy-unless-2 ( -- ) f [ ] unless ;
 
 [ ] [ dummy-unless-2 ] unit-test
 
-: dummy-unless-3 dup [ drop 3 ] unless ;
+: dummy-unless-3 ( a -- b ) dup [ drop 3 ] unless ;
 
 [ 3 ] [ f dummy-unless-3 ] unit-test
 [ 4 ] [ 4 dummy-unless-3 ] unit-test
@@ -201,7 +201,7 @@ DEFER: countdown-b
     ] compile-call
 ] unit-test
 
-GENERIC: single-combination-test
+GENERIC: single-combination-test ( obj1 obj2 -- obj )
 
 M: object single-combination-test drop ;
 M: f single-combination-test nip ;
@@ -214,13 +214,13 @@ M: integer single-combination-test drop ;
 
 DEFER: single-combination-test-2
 
-: single-combination-test-4
+: single-combination-test-4 ( obj -- obj )
     dup [ single-combination-test-2 ] when ;
 
-: single-combination-test-3
+: single-combination-test-3 ( obj -- obj )
     drop 3 ;
 
-GENERIC: single-combination-test-2
+GENERIC: single-combination-test-2 ( obj -- obj )
 M: object single-combination-test-2 single-combination-test-3 ;
 M: f single-combination-test-2 single-combination-test-4 ;
 

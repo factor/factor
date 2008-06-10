@@ -72,7 +72,7 @@ DEFER: if
     >r keep r> call ; inline
 
 : tri ( x p q r -- )
-    >r pick >r bi r> r> call ; inline
+    >r >r keep r> keep r> call ; inline
 
 ! Double cleavers
 : 2bi ( x y p q -- )
@@ -93,7 +93,7 @@ DEFER: if
     >r dip r> call ; inline
 
 : tri* ( x y z p q r -- )
-    >r rot >r bi* r> r> call ; inline
+    >r >r 2dip r> dip r> call ; inline
 
 ! Double spreaders
 : 2bi* ( w x y z p q -- )

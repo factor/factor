@@ -68,7 +68,7 @@ M: 8-bit decode-char
     decode>> decode-8-bit ;
 
 : make-8-bit ( word byte>ch ch>byte -- )
-    [ 8-bit boa ] 2curry dupd curry define ;
+    [ 2drop ] [ 8-bit boa ] 3bi [ ] curry define ;
 
 : define-8-bit-encoding ( name stream -- )
     >r in get create r> parse-file make-8-bit ;

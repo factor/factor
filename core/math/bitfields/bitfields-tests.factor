@@ -10,7 +10,7 @@ IN: math.bitfields.tests
 : a 1 ; inline
 : b 2 ; inline
 
-: foo { a b } flags ;
+: foo ( -- flags ) { a b } flags ;
 
 [ 3 ] [ foo ] unit-test
 [ 3 ] [ { a b } flags ] unit-test

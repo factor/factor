@@ -158,8 +158,7 @@ TAG: array xml>item
 
 : post-rpc ( rpc url -- rpc )
     ! This needs to do something in the event of an error
-    >r "text/xml" swap send-rpc xml>string r> http-post
-    2nip string>xml receive-rpc ;
+    >r send-rpc r> http-post nip string>xml receive-rpc ;
 
 : invoke-method ( params method url -- )
     >r swap <rpc-method> r> post-rpc ;

@@ -15,7 +15,7 @@ IN: qualified
     #! Syntax: QUALIFIED-WITH: vocab prefix
     scan scan define-qualified ; parsing
 
-: expect=> scan "=>" assert= ;
+: expect=> ( -- ) scan "=>" assert= ;
 
 : partial-vocab ( words name -- assoc )
     dupd [

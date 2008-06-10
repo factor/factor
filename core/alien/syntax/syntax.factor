@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays alien alien.c-types alien.structs alien.arrays
 alien.strings kernel math namespaces parser sequences words
-quotations math.parser splitting effects prettyprint
+quotations math.parser splitting grouping effects prettyprint
 prettyprint.sections prettyprint.backend assocs combinators ;
 IN: alien.syntax
 

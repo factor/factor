@@ -146,7 +146,7 @@ GENERIC: lambda-rewrite* ( obj -- )
 
 GENERIC: local-rewrite* ( obj -- )
 
-: lambda-rewrite
+: lambda-rewrite ( quot -- quot' )
     [ local-rewrite* ] [ ] make
     [ [ lambda-rewrite* ] each ] [ ] make ;
 
@@ -273,7 +273,7 @@ M: wlet local-rewrite*
     let-rewrite ;
 
 : parse-locals ( -- vars assoc )
-    parse-effect
+    ")" parse-effect
     word [ over "declared-effect" set-word-prop ] when*
     effect-in make-locals dup push-locals ;
 
@@ -282,9 +282,9 @@ M: wlet local-rewrite*
     2dup "lambda" set-word-prop
     lambda-rewrite first ;
 
-: (::) CREATE-WORD parse-locals-definition ;
+: (::) ( -- word def ) CREATE-WORD parse-locals-definition ;
 
-: (M::)
+: (M::) ( -- word def )
     CREATE-METHOD
     [ parse-locals-definition ] with-method-definition ;
 

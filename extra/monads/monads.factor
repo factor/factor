@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel sequences sequences.deep splitting
-accessors fry locals combinators namespaces lazy-lists
+accessors fry locals combinators namespaces lists lists.lazy
 shuffle ;
 IN: monads
 
@@ -14,7 +14,7 @@ GENERIC# fmap 1 ( functor quot -- functor' ) inline
 MIXIN: monad
 
 GENERIC: monad-of ( mvalue -- singleton )
-GENERIC: return ( string singleton -- mvalue )
+GENERIC: return ( value singleton -- mvalue )
 GENERIC: fail ( value singleton -- mvalue )
 GENERIC: >>= ( mvalue -- quot )
 
@@ -62,7 +62,7 @@ INSTANCE:  maybe-monad monad
 SINGLETON: nothing
 
 TUPLE: just value ;
-: just \ just boa ;
+: just ( value -- just ) \ just boa ;
 
 UNION: maybe just nothing ;
 INSTANCE: maybe monad
@@ -83,10 +83,10 @@ SINGLETON: either-monad
 INSTANCE:  either-monad monad
 
 TUPLE: left value ;
-: left \ left boa ;
+: left ( value -- left ) \ left boa ;
 
 TUPLE: right value ;
-: right \ right boa ;
+: right ( value -- right ) \ right boa ;
 
 UNION: either left right ;
 INSTANCE: either monad
@@ -124,14 +124,14 @@ M: list-monad fail   2drop nil ;
 
 M: list monad-of drop list-monad ;
 
-M: list >>= '[ , _ lmap lconcat ] ;
+M: list >>= '[ , _ lazy-map lconcat ] ;
 
 ! State
 SINGLETON: state-monad
 INSTANCE:  state-monad monad
 
 TUPLE: state quot ;
-: state \ state boa ;
+: state ( quot -- state ) \ state boa ;
 
 INSTANCE: state monad
 
@@ -140,7 +140,7 @@ M: state monad-of drop state-monad ;
 M: state-monad return drop '[ , 2array ] state ;
 M: state-monad fail   "Fail" throw ;
 
-: mcall quot>> call ;
+: mcall ( state -- ) quot>> call ;
 
 M: state >>= '[ , _ '[ , mcall first2 @ mcall ] state ] ;
 
@@ -149,14 +149,14 @@ M: state >>= '[ , _ '[ , mcall first2 @ mcall ] state ] ;
 
 : run-st ( state initial -- ) swap mcall second ;
 
-: return-st state-monad return ;
+: return-st ( value -- mvalue ) state-monad return ;
 
 ! Reader
 SINGLETON: reader-monad
 INSTANCE:  reader-monad monad
 
 TUPLE: reader quot ;
-: reader \ reader boa ;
+: reader ( quot -- reader ) \ reader boa ;
 INSTANCE: reader monad
 
 M: reader monad-of drop reader-monad ;
@@ -176,7 +176,7 @@ SINGLETON: writer-monad
 INSTANCE:  writer-monad monad
 
 TUPLE: writer value log ;
-: writer \ writer boa ;
+: writer ( value log -- writer ) \ writer boa ;
 
 M: writer monad-of drop writer-monad ;
 

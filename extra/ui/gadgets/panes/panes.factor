@@ -16,19 +16,22 @@ TUPLE: pane output current prototype scrolls?
 selection-color caret mark selecting? ;
 
 : clear-selection ( pane -- )
-    f over set-pane-caret
-    f swap set-pane-mark ;
+    f >>caret
+    f >>mark
+    drop ;
 
-: add-output 2dup set-pane-output add-gadget ;
+: add-output ( current pane -- )
+    [ set-pane-output ] [ add-gadget ] 2bi ;
 
-: add-current 2dup set-pane-current add-gadget ;
+: add-current ( current pane -- )
+    [ set-pane-current ] [ add-gadget ] 2bi ;
 
 : prepare-line ( pane -- )
-    dup clear-selection
-    dup pane-prototype clone swap add-current ;
+    [ clear-selection ]
+    [ [ pane-prototype clone ] keep add-current ] bi ;
 
 : pane-caret&mark ( pane -- caret mark )
-    dup pane-caret swap pane-mark ;
+    [ caret>> ] [ mark>> ] bi ;
 
 : selected-children ( pane -- seq )
     [ pane-caret&mark sort-pair ] keep gadget-subtree ;
@@ -39,17 +42,18 @@ M: pane gadget-selection
     selected-children gadget-text ;
 
 : pane-clear ( pane -- )
-    dup clear-selection
-    dup pane-output clear-incremental
-    pane-current clear-gadget ;
+    [ clear-selection ]
+    [ pane-output clear-incremental ]
+    [ pane-current clear-gadget ]
+    tri ;
 
-: pane-theme ( editor -- )
-    selection-color swap set-pane-selection-color ;
+: pane-theme ( pane -- )
+    selection-color >>selection-color drop ;
 
 : <pane> ( -- pane )
     pane new
     <pile> over set-delegate
-    <shelf> over set-pane-prototype
+    <shelf> >>prototype
     <pile> <incremental> over add-output
     dup prepare-line
     dup pane-theme ;

@@ -5,10 +5,12 @@ hashtables io assocs kernel math namespaces sequences strings
 sbufs io.styles vectors words prettyprint.config
 prettyprint.sections quotations io io.files math.parser effects
 classes.tuple math.order classes.tuple.private classes
-float-arrays ;
+float-arrays combinators ;
 IN: prettyprint.backend
 
 GENERIC: pprint* ( obj -- )
+
+M: effect pprint* effect>string "(" swap ")" 3append text ;
 
 : ?effect-height ( word -- n )
     stack-effect [ effect-height ] [ 0 ] if* ;
@@ -26,9 +28,11 @@ GENERIC: pprint* ( obj -- )
 : word-style ( word -- style )
     dup "word-style" word-prop >hashtable [
         [
-            dup presented set
-            dup parsing? over delimiter? rot t eq? or or
-            [ bold font-style set ] when
+            [ presented set ]
+            [
+                [ parsing-word? ] [ delimiter? ] [ t eq? ] tri or or
+                [ bold font-style set ] when
+            ] bi
         ] bind
     ] keep ;
 
@@ -43,13 +47,16 @@ GENERIC: pprint* ( obj -- )
     <block swap pprint-word call block> ; inline
 
 M: word pprint*
-    dup parsing? [
+    dup parsing-word? [
         \ POSTPONE: [ pprint-word ] pprint-prefix
     ] [
-        dup "break-before" word-prop line-break
-        dup pprint-word
-        dup ?start-group dup ?end-group
-        "break-after" word-prop line-break
+        {
+            [ "break-before" word-prop line-break ]
+            [ pprint-word ]
+            [ ?start-group ]
+            [ ?end-group ]
+            [ "break-after" word-prop line-break ]
+        } cleave
     ] if ;
 
 M: real pprint* number>string text ;

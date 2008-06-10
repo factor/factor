@@ -56,8 +56,19 @@ TUPLE: check-method class generic ;
         \ check-method boa throw
     ] unless ; inline
 
-: with-methods ( generic quot -- )
-    swap [ "methods" word-prop swap call ] keep make-generic ;
+: affected-methods ( class generic -- seq )
+    "methods" word-prop swap
+    [ nip classes-intersect? ] curry assoc-filter
+    values ;
+
+: update-generic ( class generic -- )
+    [ affected-methods [ +called+ changed-definition ] each ]
+    [ make-generic ]
+    bi ;
+
+: with-methods ( class generic quot -- )
+    [ [ "methods" word-prop ] dip call ]
+    [ drop update-generic ] 3bi ;
     inline
 
 : method-word-name ( class word -- string )
@@ -117,6 +128,9 @@ M: method-spec definition
 M: method-spec forget*
     first2 method forget* ;
 
+M: method-spec smart-usage
+    second smart-usage ;
+
 M: method-body definer
     drop \ M: \ ; ;
 
@@ -134,14 +148,19 @@ M: method-body forget*
         [ t "forgotten" set-word-prop ] bi
     ] if ;
 
-: implementors* ( classes -- words )
+M: method-body smart-usage
+    "method-generic" word-prop smart-usage ;
+
+GENERIC: implementors ( class/classes -- seq )
+
+M: class implementors
+    all-words [ "methods" word-prop key? ] with filter ;
+
+M: assoc implementors
     all-words [
-        "methods" word-prop keys
+         "methods" word-prop keys
         swap [ key? ] curry contains?
     ] with filter ;
-
-: implementors ( class -- seq )
-    dup associate implementors* ;
 
 : forget-methods ( class -- )
     [ implementors ] [ [ swap 2array ] curry ] bi map forget-all ;
@@ -158,8 +177,8 @@ M: class forget* ( class -- )
     ]
     [ call-next-method ] bi ;
 
-M: assoc update-methods ( assoc -- )
-    implementors* [ make-generic ] each ;
+M: assoc update-methods ( class assoc -- )
+    implementors [ update-generic ] with each ;
 
 : define-generic ( word combination -- )
     over "combination" word-prop over = [

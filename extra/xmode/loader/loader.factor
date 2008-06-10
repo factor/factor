@@ -49,7 +49,8 @@ TAG: KEYWORDS ( rule-set tag -- key value )
 
 TAGS>
 
-: ?<regexp> dup [ ignore-case? get <regexp> ] when ;
+: ?<regexp> ( string/f -- regexp/f )
+    dup [ ignore-case? get <regexp> ] when ;
 
 : (parse-rules-tag) ( tag -- rule-set )
     <rule-set>

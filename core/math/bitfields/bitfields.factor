@@ -3,7 +3,7 @@
 USING: arrays kernel math sequences words ;
 IN: math.bitfields
 
-GENERIC: (bitfield) inline
+GENERIC: (bitfield) ( value accum shift -- newaccum )
 
 M: integer (bitfield) ( value accum shift -- newaccum )
     swapd shift bitor ;

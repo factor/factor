@@ -54,7 +54,7 @@ TUPLE: tax-table single married ;
 : <tax-table> ( single married class -- obj )
     >r tax-table boa r> construct-delegate ;
 
-: tax-bracket-range dup second swap first - ;
+: tax-bracket-range ( pair -- n ) dup second swap first - ;
 
 : tax-bracket ( tax salary triples -- tax salary )
     [ [ tax-bracket-range min ] keep third * + ] 2keep

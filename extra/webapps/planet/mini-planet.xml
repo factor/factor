@@ -5,7 +5,7 @@
 	<t:bind-each t:name="postings">
 
 		<p class="news">
-			<strong><t:view t:component="title" /></strong> <br/>
+			<strong><t:label t:name="title" /></strong> <br/>
 			<t:a value="link" class="more">Read More...</t:a>
 		</p>
 

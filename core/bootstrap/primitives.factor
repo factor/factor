@@ -31,6 +31,7 @@ crossref off
 ! Bring up a bare cross-compiling vocabulary.
 "syntax" vocab vocab-words bootstrap-syntax set
 H{ } clone dictionary set
+H{ } clone new-classes set
 H{ } clone changed-definitions set
 H{ } clone forgotten-definitions set
 H{ } clone root-cache set

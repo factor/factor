@@ -30,10 +30,10 @@ TUPLE: select-mx < mx read-fdset write-fdset ;
 : init-fdset ( fds fdset -- )
     [ >r t swap munge r> set-nth ] curry each ;
 
-: read-fdset/tasks
+: read-fdset/tasks ( mx -- seq fdset )
     [ reads>> keys ] [ read-fdset>> ] bi ;
 
-: write-fdset/tasks
+: write-fdset/tasks ( mx -- seq fdset )
     [ writes>> keys ] [ write-fdset>> ] bi ;
 
 : max-fd ( assoc -- n )

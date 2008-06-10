@@ -51,9 +51,7 @@ M: object find-parse-error
         [ file>> path>> ] [ line>> ] bi edit-location
     ] when* ;
 
-: fix ( word -- )
-    [ "Fixing " write pprint " and all usages..." print nl ]
-    [ [ usage ] keep prefix ] bi
+: edit-each ( seq -- )
     [
         [ "Editing " write . ]
         [
@@ -63,3 +61,8 @@ M: object find-parse-error
             readln
         ] bi
     ] all? drop ;
+
+: fix ( word -- )
+    [ "Fixing " write pprint " and all usages..." print nl ]
+    [ [ smart-usage ] keep prefix ] bi
+    edit-each ;

@@ -6,6 +6,6 @@ IN: tty-server
     "tty-server"
     utf8 [ listener ] with-server ;
 
-: default-tty-server 9999 tty-server ;
+: default-tty-server ( -- ) 9999 tty-server ;
 
 MAIN: default-tty-server

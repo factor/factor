@@ -25,7 +25,7 @@ session "SESSIONS"
 : get-session ( id -- session )
     dup [ <session> select-tuple ] when ;
 
-: init-sessions-table session ensure-table ;
+: init-sessions-table ( -- ) session ensure-table ;
 
 : start-expiring-sessions ( db seq -- )
     '[
@@ -109,14 +109,14 @@ M: session-saver dispose
     [ session set ] [ save-session-after ] bi
     sessions get responder>> call-responder ;
 
-: session-id-key "factorsessid" ;
+: session-id-key "__s" ;
 
 : cookie-session-id ( request -- id/f )
     session-id-key get-cookie
     dup [ value>> string>number ] when ;
 
 : post-session-id ( request -- id/f )
-    session-id-key swap post-data>> at string>number ;
+    session-id-key swap request-params at string>number ;
 
 : request-session-id ( -- id/f )
     request get dup method>> {
@@ -137,13 +137,8 @@ M: session-saver dispose
 : put-session-cookie ( response -- response' )
     session get id>> number>string <session-cookie> put-cookie ;
 
-M: sessions hidden-form-field ( responder -- )
-    drop
-    <input
-        "hidden" =type
-        session-id-key =name
-        session get id>> number>string =value
-    input/> ;
+M: sessions modify-form ( responder -- )
+    drop session get id>> session-id-key hidden-form-field ;
 
 M: sessions call-responder* ( path responder -- response )
     sessions set

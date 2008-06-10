@@ -1,5 +1,5 @@
 USING: assocs math kernel sequences io.files hashtables
-quotations splitting arrays math.parser hash2 math.order
+quotations splitting grouping arrays math.parser hash2 math.order
 byte-arrays words namespaces words compiler.units parser
 io.encodings.ascii values interval-maps ascii sets assocs.lib
 combinators.lib combinators locals math.ranges sorting ;
@@ -46,11 +46,11 @@ VALUE: properties
 
 : (process-data) ( index data -- newdata )
     filter-comments
-    [ [ nth ] keep first swap 2array ] with map
+    [ [ nth ] keep first swap ] with { } map>assoc
     [ >r hex> r> ] assoc-map ;
 
 : process-data ( index data -- hash )
-    (process-data) [ hex> ] assoc-map >hashtable ;
+    (process-data) [ hex> ] assoc-map [ nip ] assoc-filter >hashtable ;
 
 : (chain-decomposed) ( hash value -- newvalue )
     [

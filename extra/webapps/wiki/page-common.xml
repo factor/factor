@@ -2,6 +2,10 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
+	<t:atom t:href="$wiki/revisions.atom" t:query="title">
+		Revisions of <t:label t:name="title" />
+	</t:atom>
+
 	<t:call-next-template />
 
 	<div class="navbar">

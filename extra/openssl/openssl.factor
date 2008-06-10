@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays kernel debugger sequences namespaces math
 math.order combinators init alien alien.c-types alien.strings libc
-continuations destructors debugger inspector
+continuations destructors debugger inspector splitting
 locals unicode.case
 openssl.libcrypto openssl.libssl
 io.backend io.ports io.files io.encodings.8-bit io.sockets.secure
@@ -105,7 +105,7 @@ TUPLE: openssl-context < secure-context aliens ;
 
 TUPLE: bio handle disposed ;
 
-: <bio> f bio boa ;
+: <bio> ( handle -- bio ) f bio boa ;
 
 M: bio dispose* handle>> BIO_free ssl-error ;
 
@@ -121,7 +121,7 @@ M: bio dispose* handle>> BIO_free ssl-error ;
 
 TUPLE: rsa handle disposed ;
 
-: <rsa> f rsa boa ;
+: <rsa> ( handle -- rsa ) f rsa boa ;
 
 M: rsa dispose* handle>> RSA_free ;
 
@@ -188,8 +188,12 @@ M: ssl-handle dispose*
     [ 256 X509_NAME_get_text_by_NID ] keep
     swap -1 = [ drop f ] [ latin1 alien>string ] if ;
 
+: common-names-match? ( expected actual -- ? )
+    [ >lower ] bi@ "*." ?head [ tail? ] [ = ] if ;
+
 : check-common-name ( host ssl-handle -- )
-    SSL_get_peer_certificate common-name 2dup [ >lower ] bi@ =
+    SSL_get_peer_certificate common-name
+    2dup common-names-match?
     [ 2drop ] [ common-name-verify-error ] if ;
 
 M: openssl check-certificate ( host ssl -- )

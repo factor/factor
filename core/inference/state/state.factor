@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs namespaces sequences kernel words ;
+USING: assocs namespaces sequences kernel definitions ;
 IN: inference.state
 
 ! Nesting state to solve recursion
@@ -12,16 +12,16 @@ SYMBOL: d-in
 ! Compile-time data stack
 SYMBOL: meta-d
 
-: push-d meta-d get push ;
-: pop-d meta-d get pop ;
-: peek-d meta-d get peek ;
+: push-d ( obj -- ) meta-d get push ;
+: pop-d  ( -- obj ) meta-d get pop ;
+: peek-d ( -- obj ) meta-d get peek ;
 
 ! Compile-time retain stack
 SYMBOL: meta-r
 
-: push-r meta-r get push ;
-: pop-r meta-r get pop ;
-: peek-r meta-r get peek ;
+: push-r ( obj -- ) meta-r get push ;
+: pop-r  ( -- obj ) meta-r get pop ;
+: peek-r ( -- obj ) meta-r get peek ;
 
 ! Head of dataflow IR
 SYMBOL: dataflow-graph

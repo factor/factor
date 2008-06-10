@@ -27,7 +27,7 @@ TUPLE: grid children gap fill? ;
 : pref-dim-grid ( grid -- dims )
     grid-children [ [ pref-dim ] map ] map ;
 
-: (compute-grid) [ max-dim ] map ;
+: (compute-grid) ( grid -- seq ) [ max-dim ] map ;
 
 : compute-grid ( grid -- horiz vert )
     pref-dim-grid dup flip (compute-grid) swap (compute-grid) ;

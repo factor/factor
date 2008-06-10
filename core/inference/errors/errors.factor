@@ -5,20 +5,18 @@ USING: inference.backend inference.dataflow kernel generic
 sequences prettyprint io words arrays inspector effects debugger
 assocs accessors ;
 
+M: inference-error error-help error>> error-help ;
+
 M: inference-error error.
     dup rstate>>
     keys [ dup value? [ value-literal ] when ] map
     dup empty? [ "Word: " write dup peek . ] unless
     swap error>> error. "Nesting: " write . ;
 
-M: inference-error error-help drop f ;
-
 M: unbalanced-branches-error error.
     "Unbalanced branches:" print
-    dup unbalanced-branches-error-quots
-    over unbalanced-branches-error-in
-    rot unbalanced-branches-error-out [ length ] map
-    3array flip [ [ bl ] [ pprint ] interleave nl ] each ;
+    [ quots>> ] [ in>> ] [ out>> [ length ] map ] tri 3array flip
+    [ [ bl ] [ pprint ] interleave nl ] each ;
 
 M: literal-expected summary
     drop "Literal value expected" ;
@@ -31,25 +29,23 @@ M: too-many-r> summary
     drop
     "Quotation pops retain stack elements which it did not push" ;
 
-M: no-effect error.
-    "Unable to infer stack effect of " write no-effect-word . ;
+M: cannot-infer-effect error.
+    "Unable to infer stack effect of " write word>> . ;
 
-M: recursive-declare-error error.
-    "The recursive word " write
-    recursive-declare-error-word pprint
+M: missing-effect error.
+    "The word " write
+    word>> pprint
     " must declare a stack effect" print ;
 
 M: effect-error error.
     "Stack effects of the word " write
-    dup effect-error-word pprint
-    " do not match." print
-    "Declared: " write
-    dup effect-error-word stack-effect effect>string .
-    "Inferred: " write effect-error-effect effect>string . ;
+    [ word>> pprint " do not match." print ]
+    [ "Inferred: " write inferred>> effect>string . ]
+    [ "Declared: " write declared>> effect>string . ] tri ;
 
 M: recursive-quotation-error error.
     "The quotation " write
-    recursive-quotation-error-quot pprint
+    quot>> pprint
     " calls itself." print
     "Stack effect inference is undecidable when quotation-level recursion is permitted." print ;
 

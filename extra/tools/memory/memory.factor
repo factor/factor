@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences vectors arrays generic assocs io math
 namespaces parser prettyprint strings io.styles vectors words
-system sorting splitting math.parser classes memory combinators ;
+system sorting splitting grouping math.parser classes memory
+combinators ;
 IN: tools.memory
 
 <PRIVATE

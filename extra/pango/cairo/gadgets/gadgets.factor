@@ -1,30 +1,27 @@
 ! Copyright (C) 2008 Matthew Willis.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: pango.cairo cairo cairo.ffi cairo.gadgets
-alien.c-types kernel math ;
+USING: pango.cairo pango.gadgets
+cairo.gadgets arrays namespaces
+fry accessors ui.gadgets
+sequences opengl.gadgets
+kernel pango.layouts ;
+
 IN: pango.cairo.gadgets
 
-: (pango-gadget) ( setup show -- gadget )
-    [ drop layout-size ]
-    [ compose [ with-pango ] curry <cairo-gadget> ] 2bi ;
+TUPLE: pango-cairo-gadget < pango-gadget ;
 
-: <pango-gadget> ( quot -- gadget )
-    [ cr layout pango_cairo_show_layout ] (pango-gadget) ;
+SINGLETON: pango-cairo-backend
+pango-cairo-backend pango-backend set-global
 
-USING: prettyprint sequences ui.gadgets.panes
-threads io.backend io.encodings.utf8 io.files ;
-: hello-pango ( -- )
-    50 [ 6 + ] map [
-        "Sans " swap unparse append
-        [ 
-            cr 0 1 0.2 0.6 cairo_set_source_rgba
-            layout-font "今日は、 Pango!" layout-text
-        ] curry
-        <pango-gadget> gadget. yield
-    ] each
+M: pango-cairo-backend construct-pango
+    pango-cairo-gadget construct-gadget ;
+
+: setup-layout ( gadget -- quot )
+    [ font>> ] [ text>> ] bi
+    '[ , layout-font , layout-text ] ; inline
+
+M: pango-cairo-gadget render* ( gadget -- ) 
+    setup-layout [ layout-size dup ]
     [ 
-        "resource:extra/pango/cairo/gadgets/gadgets.factor"
-        normalize-path utf8 file-contents layout-text
-    ] <pango-gadget> gadget. ;
-
-MAIN: hello-pango
+        '[ [ @ show-layout ] with-pango-cairo ]
+    ] bi render-cairo render-bytes* ;

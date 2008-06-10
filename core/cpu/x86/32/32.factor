@@ -31,21 +31,23 @@ M: int-regs return-reg drop EAX ;
 M: int-regs param-regs drop { } ;
 M: int-regs vregs drop { EAX ECX EDX EBP } ;
 M: int-regs push-return-reg return-reg PUSH ;
-: load/store-int-return return-reg stack-reg rot [+] ;
+: load/store-int-return ( n reg-class -- src dst )
+    return-reg stack-reg rot [+] ;
 M: int-regs load-return-reg load/store-int-return MOV ;
 M: int-regs store-return-reg load/store-int-return swap MOV ;
 
 M: float-regs param-regs drop { } ;
 M: float-regs vregs drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 
-: FSTP 4 = [ FSTPS ] [ FSTPL ] if ;
+: FSTP ( operand size -- ) 4 = [ FSTPS ] [ FSTPL ] if ;
 
 M: float-regs push-return-reg
     stack-reg swap reg-size [ SUB  stack-reg [] ] keep FSTP ;
 
-: FLD 4 = [ FLDS ] [ FLDL ] if ;
+: FLD ( operand size -- ) 4 = [ FLDS ] [ FLDL ] if ;
 
-: load/store-float-return reg-size >r stack@ r> ;
+: load/store-float-return ( n reg-class -- op size )
+    [ stack@ ] [ reg-size ] bi* ;
 M: float-regs load-return-reg load/store-float-return FLD ;
 M: float-regs store-return-reg load/store-float-return FSTP ;
 
@@ -151,7 +153,7 @@ M: x86.32 %box ( n reg-class func -- )
         >r (%box) r> f %alien-invoke
     ] with-aligned-stack ;
     
-: (%box-long-long)
+: (%box-long-long) ( n -- )
     #! If n is f, push the return registers onto the stack; we
     #! are boxing a return value of a C function. If n is an
     #! integer, push [ESP+n]:[ESP+n+4] on the stack; we are
@@ -166,7 +168,7 @@ M: x86.32 %box ( n reg-class func -- )
 
 M: x86.32 %box-long-long ( n func -- )
     8 [
-        >r (%box-long-long) r> f %alien-invoke
+        [ (%box-long-long) ] [ f %alien-invoke ] bi*
     ] with-aligned-stack ;
 
 M: x86.32 %box-large-struct ( n size -- )
@@ -260,7 +262,7 @@ os windows? [
     4 "double" c-type set-c-type-align
 ] unless
 
-: sse2? "Intrinsic" throw ;
+: sse2? ( -- ? ) "Intrinsic" throw ;
 
 \ sse2? [
     { EAX EBX ECX EDX } [ PUSH ] each

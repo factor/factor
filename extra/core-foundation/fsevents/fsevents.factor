@@ -149,7 +149,8 @@ FUNCTION: CFStringRef FSEventStreamCopyDescription ( FSEventStreamRef streamRef 
 
 SYMBOL: event-stream-callbacks
 
-: event-stream-counter \ event-stream-counter counter ;
+: event-stream-counter ( -- n )
+    \ event-stream-counter counter ;
 
 [
     event-stream-callbacks global

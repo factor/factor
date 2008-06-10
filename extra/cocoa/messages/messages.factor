@@ -4,7 +4,7 @@ USING: alien alien.c-types alien.strings alien.compiler
 arrays assocs combinators compiler inference.transforms kernel
 math namespaces parser prettyprint prettyprint.sections
 quotations sequences strings words cocoa.runtime io macros
-memoize debugger io.encodings.ascii ;
+memoize debugger io.encodings.ascii effects ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )
@@ -196,7 +196,8 @@ H{
 : define-objc-class-word ( name quot -- )
     [
         over , , \ unless-defined , dup , \ objc-class ,
-    ] [ ] make >r "cocoa.classes" create r> define ;
+    ] [ ] make >r "cocoa.classes" create r>
+    (( -- class )) define-declared ;
 
 : import-objc-class ( name quot -- )
     2dup unless-defined

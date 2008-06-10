@@ -79,7 +79,7 @@ INSTANCE: integer mx1
 [ \ mx1 forget ] with-compilation-unit
 
 ! Empty unions were causing problems
-GENERIC: empty-union-test
+GENERIC: empty-union-test ( obj -- obj )
 
 UNION: empty-union-1 ;
 
@@ -162,7 +162,7 @@ TUPLE: flat-mx-2-1 ; INSTANCE: flat-mx-2-1 flat-mx-2
 [ t ] [ "hi" \ hi-tag instance? ] unit-test
 
 ! Regression
-GENERIC: method-forget-test
+GENERIC: method-forget-test ( obj -- obj )
 TUPLE: method-forget-class ;
 M: method-forget-class method-forget-test ;
 

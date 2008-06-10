@@ -27,9 +27,11 @@ M: live-search handle-gesture* ( gadget gesture delegate -- ? )
         2drop t
     ] if ;
 
-: find-live-search [ [ live-search? ] is? ] find-parent ;
+: find-live-search ( gadget -- search )
+    [ [ live-search? ] is? ] find-parent ;
 
-: find-search-list find-live-search live-search-list ;
+: find-search-list ( gadget -- list )
+    find-live-search live-search-list ;
 
 TUPLE: search-field ;
 
@@ -94,7 +96,7 @@ M: live-search pref-dim* drop { 400 200 } ;
     "Words in " rot vocab-name append show-titled-popup ;
 
 : show-word-usage ( workspace word -- )
-    "" over usage f <definition-search>
+    "" over smart-usage f <definition-search>
     "Words and methods using " rot word-name append
     show-titled-popup ;
 

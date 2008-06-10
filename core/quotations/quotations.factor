@@ -53,11 +53,13 @@ M: compose length
     [ compose-first length ]
     [ compose-second length ] bi + ;
 
-M: compose nth
+M: compose virtual-seq compose-first ;
+
+M: compose virtual@
     2dup compose-first length < [
         compose-first
     ] [
         [ compose-first length - ] [ compose-second ] bi
-    ] if nth ;
+    ] if ;
 
-INSTANCE: compose immutable-sequence
+INSTANCE: compose virtual-sequence

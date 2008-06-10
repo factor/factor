@@ -8,7 +8,7 @@ SYMBOL: counter
 
 : number-of-requests 1 ;
 
-: server-addr "127.0.0.1" 7777 <inet4> ;
+: server-addr ( -- addr ) "127.0.0.1" 7777 <inet4> ;
 
 : server-loop ( server -- )
     dup accept drop [

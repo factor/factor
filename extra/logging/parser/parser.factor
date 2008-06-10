@@ -6,31 +6,31 @@ namespaces combinators combinators.lib logging.server
 calendar calendar.format ;
 IN: logging.parser
 
-: string-of satisfy <!*> [ >string ] <@ ;
+: string-of ( quot -- parser ) satisfy <!*> [ >string ] <@ ;
 
 SYMBOL: multiline
 
-: 'date'
+: 'date' ( -- parser )
     [ "]" member? not ] string-of [
         dup multiline-header =
         [ drop multiline ] [ rfc3339>timestamp ] if
     ] <@
     "[" "]" surrounded-by ;
 
-: 'log-level'
+: 'log-level' ( -- parser )
     log-levels [
         [ word-name token ] keep [ nip ] curry <@
     ] map <or-parser> ;
 
-: 'word-name'
+: 'word-name' ( -- parser )
     [ " :" member? not ] string-of ;
 
 SYMBOL: malformed
 
-: 'malformed-line'
+: 'malformed-line' ( -- parser )
     [ drop t ] string-of [ malformed swap 2array ] <@ ;
 
-: 'log-message'
+: 'log-message' ( -- parser )
     [ drop t ] string-of [ 1vector ] <@ ;
 
 MEMO: 'log-line' ( -- parser )
@@ -49,7 +49,7 @@ MEMO: 'log-line' ( -- parser )
 : multiline? ( line -- ? )
     first multiline eq? ;
 
-: malformed-line
+: malformed-line ( line -- )
     "Warning: malformed log line:" print
     second print ;
 

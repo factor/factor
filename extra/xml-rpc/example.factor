@@ -22,6 +22,6 @@ USING: kernel hashtables xml-rpc xml calendar sequences
     put-http-response ;
 
 : test-rpc-arith
-    "add" { 1 2 } <rpc-method> send-rpc xml>string
-    "text/xml" swap "http://localhost:8080/responder/rpc/"
+    "add" { 1 2 } <rpc-method> send-rpc
+    "http://localhost:8080/responder/rpc/"
     http-post ;

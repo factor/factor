@@ -1,17 +1,20 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! Copyright (C) 2006, 2007 Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel sequences io.styles ui.gadgets ui.render
 colors ;
 IN: ui.gadgets.theme
 
-: solid-interior <solid> swap set-gadget-interior ;
+: solid-interior ( gadget color -- )
+    <solid> swap set-gadget-interior ;
 
-: solid-boundary <solid> swap set-gadget-boundary ;
+: solid-boundary ( gadget color -- )
+    <solid> swap set-gadget-boundary ;
 
-: faint-boundary gray solid-boundary ;
+: faint-boundary ( gadget -- )
+    gray solid-boundary ;
 
-: selection-color light-purple ;
+: selection-color ( -- color ) light-purple ;
 
 : plain-gradient
     T{ gradient f {

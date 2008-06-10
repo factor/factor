@@ -189,7 +189,7 @@ M: mark-previous-rule handle-rule-start
     dup rule-body-token prev-token,
     rule-match-token* next-token, ;
 
-: do-escaped
+: do-escaped ( -- )
     escaped? get [
         escaped? off
         ! ...

@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings arrays assocs ui
 ui.gadgets ui.backend ui.clipboards ui.gadgets.worlds
-ui.gestures io kernel math math.vectors namespaces prettyprint
+ui.gestures io kernel math math.vectors namespaces
 sequences strings vectors words windows.kernel32 windows.gdi32
 windows.user32 windows.opengl32 windows.messages windows.types
 windows.nt windows threads libc combinators continuations
@@ -13,8 +13,11 @@ IN: ui.windows
 
 SINGLETON: windows-ui-backend
 
-: crlf>lf CHAR: \r swap remove ;
-: lf>crlf [ [ dup CHAR: \n = [ CHAR: \r , ] when , ] each ] "" make ;
+: crlf>lf ( str -- str' )
+    CHAR: \r swap remove ;
+
+: lf>crlf ( str -- str' )
+    [ [ dup CHAR: \n = [ CHAR: \r , ] when , ] each ] "" make ;
 
 : enum-clipboard ( -- seq )
     0
@@ -127,7 +130,7 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
         { 123 "F12" }
     } ;
 
-: key-state-down?
+: key-state-down? ( key -- ? )
     GetKeyState 16 bit? ;
 
 : left-shift? ( -- ? ) VK_LSHIFT key-state-down? ;
@@ -380,7 +383,7 @@ SYMBOL: trace-messages?
     "uint" { "void*" "uint" "long" "long" } "stdcall" [
         [
             pick
-            trace-messages? get-global [ dup windows-message-name . ] when
+            trace-messages? get-global [ dup windows-message-name word-name print flush ] when
             wm-handlers get-global at* [ call ] [ drop DefWindowProc ] if
         ] ui-try
      ] alien-callback ;

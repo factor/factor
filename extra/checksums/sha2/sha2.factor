@@ -1,5 +1,6 @@
-USING: crypto.common kernel splitting math sequences namespaces
-io.binary symbols math.bitfields.lib checksums ;
+USING: crypto.common kernel splitting grouping
+math sequences namespaces io.binary symbols
+math.bitfields.lib checksums ;
 IN: checksums.sha2
 
 <PRIVATE

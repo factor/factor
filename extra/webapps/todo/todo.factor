@@ -28,7 +28,7 @@ todo "TODO"
     { "description" "DESCRIPTION" { VARCHAR 256 } }
 } define-persistent
 
-: init-todo-table todo ensure-table ;
+: init-todo-table ( -- ) todo ensure-table ;
 
 : <todo> ( id -- todo )
     todo new
@@ -51,6 +51,9 @@ todo "TODO"
         { "description" [ v-required ] }
     } validate-params ;
 
+: view-todo-url ( id -- url )
+    <url> "$todo-list/view" >>path swap "id" set-query-param ;
+
 : <new-action> ( -- action )
     <page-action>
         [ 0 "priority" set-value ] >>init
@@ -62,14 +65,7 @@ todo "TODO"
         [
             f <todo>
                 dup { "summary" "priority" "description" } deposit-slots
-            [ insert-tuple ]
-            [
-                <url>
-                    "$todo-list/view" >>path
-                    swap id>> "id" set-query-param
-                <redirect>
-            ]
-            bi
+            [ insert-tuple ] [ id>> view-todo-url <redirect> ] bi
         ] >>submit ;
 
 : <edit-action> ( -- action )
@@ -89,15 +85,11 @@ todo "TODO"
         [
             f <todo>
                 dup { "id" "summary" "priority" "description" } deposit-slots
-            [ update-tuple ]
-            [
-                <url>
-                    "$todo-list/view" >>path
-                    swap id>> "id" set-query-param
-                <redirect>
-            ]
-            bi
+            [ update-tuple ] [ id>> view-todo-url <redirect> ] bi
         ] >>submit ;
+
+: todo-list-url ( -- url )
+    URL" $todo-list/list" ;
 
 : <delete-action> ( -- action )
     <action>
@@ -105,7 +97,7 @@ todo "TODO"
 
         [
             "id" get <todo> delete-tuples
-            URL" $todo-list/list" <redirect>
+            todo-list-url <redirect>
         ] >>submit ;
 
 : <list-action> ( -- action )
@@ -122,4 +114,5 @@ todo "TODO"
         <delete-action> "delete" add-responder
     <boilerplate>
         { todo-list "todo" } >>template
-    f <protected> ;
+    <protected>
+        "view your todo list" >>description ;

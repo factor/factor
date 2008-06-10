@@ -26,7 +26,7 @@ SYMBOL: restarts
     #! with a declaration.
     f { object } declare ;
 
-: init-catchstack V{ } clone 1 setenv ;
+: init-catchstack ( -- ) V{ } clone 1 setenv ;
 
 PRIVATE>
 

@@ -54,7 +54,7 @@ SYMBOL: cols
 : ppm-header ( w h -- )
     "P6\n" % swap # " " % # "\n255\n" % ;
 
-: buf-size width height * 3 * 100 + ;
+: buf-size ( -- n ) width height * 3 * 100 + ;
 
 : mandel ( -- data )
     [

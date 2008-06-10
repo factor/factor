@@ -8,7 +8,7 @@ columns math.order classes.private ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
-: <rect> rect boa ;
+: <rect> ( x y w h -- rect ) rect boa ;
 
 : move ( x rect -- rect )
     [ + ] change-x ;
@@ -69,7 +69,7 @@ C: <predicate-test> predicate-test
 PREDICATE: silly-pred < tuple
     class \ rect = ;
 
-GENERIC: area
+GENERIC: area ( obj -- n )
 M: silly-pred area dup w>> swap h>> * ;
 
 TUPLE: circle radius ;
@@ -164,7 +164,7 @@ C: <t4> t4
 [ 1 ] [ <t4> 1 m2 ] unit-test
 
 ! another combination issue
-GENERIC: silly
+GENERIC: silly ( obj -- obj obj )
 
 UNION: my-union slice repetition column array vector reversed ;
 
@@ -208,8 +208,8 @@ C: <erg's-reshape-problem> erg's-reshape-problem
 
 ! We want to make sure constructors are recompiled when
 ! tuples are reshaped
-: cons-test-1 \ erg's-reshape-problem new ;
-: cons-test-2 \ erg's-reshape-problem boa ;
+: cons-test-1 ( -- tuple ) \ erg's-reshape-problem new ;
+: cons-test-2 ( a b c d -- tuple ) \ erg's-reshape-problem boa ;
 
 "IN: classes.tuple.tests TUPLE: erg's-reshape-problem a b c d e f ;" eval
 
@@ -242,7 +242,7 @@ C: <laptop> laptop
 [ t ] [ "laptop" get computer? ] unit-test
 [ t ] [ "laptop" get tuple? ] unit-test
 
-: test-laptop-slot-values
+: test-laptop-slot-values ( -- )
     [ laptop ] [ "laptop" get class ] unit-test
     [ "Pentium" ] [ "laptop" get cpu>> ] unit-test
     [ 128 ] [ "laptop" get ram>> ] unit-test
@@ -275,7 +275,7 @@ C: <server> server
 [ t ] [ "server" get computer? ] unit-test
 [ t ] [ "server" get tuple? ] unit-test
 
-: test-server-slot-values
+: test-server-slot-values ( -- )
     [ server ] [ "server" get class ] unit-test
     [ "PowerPC" ] [ "server" get cpu>> ] unit-test
     [ 64 ] [ "server" get ram>> ] unit-test
@@ -375,7 +375,7 @@ C: <test2> test2
 
 "a" "b" <test2> "test" set
 
-: test-a/b
+: test-a/b ( -- )
     [ "a" ] [ "test" get a>> ] unit-test
     [ "b" ] [ "test" get b>> ] unit-test ;
 
@@ -403,7 +403,7 @@ TUPLE: move-up-2 < move-up-1 c ;
 
 T{ move-up-2 f "a" "b" "c" } "move-up" set
 
-: test-move-up
+: test-move-up ( -- )
     [ "a" ] [ "move-up" get a>> ] unit-test
     [ "b" ] [ "move-up" get b>> ] unit-test
     [ "c" ] [ "move-up" get c>> ] unit-test ;

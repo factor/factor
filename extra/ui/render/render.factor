@@ -93,7 +93,7 @@ TUPLE: solid color ;
 C: <solid> solid
 
 ! Solid pen
-: (solid)
+: (solid) ( gadget paint -- loc dim )
     solid-color gl-color rect-dim >r origin get dup r> v+ ;
 
 M: solid draw-interior (solid) gl-fill-rect ;

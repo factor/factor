@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes classes.union words kernel sequences
-definitions combinators arrays accessors ;
+definitions combinators arrays assocs generic accessors ;
 IN: classes.mixin
 
 PREDICATE: mixin-class < union-class "mixin" word-prop ;
@@ -12,8 +12,9 @@ M: mixin-class reset-class
 M: mixin-class rank-class drop 3 ;
 
 : redefine-mixin-class ( class members -- )
-    dupd define-union-class
-    t "mixin" set-word-prop ;
+    [ (define-union-class) ]
+    [ drop t "mixin" set-word-prop ]
+    2bi ;
 
 : define-mixin-class ( class -- )
     dup mixin-class? [
@@ -30,17 +31,35 @@ TUPLE: check-mixin-class mixin ;
     ] unless ;
 
 : if-mixin-member? ( class mixin true false -- )
-    >r >r check-mixin-class 2dup members memq? r> r> if ; inline
+    [ check-mixin-class 2dup members memq? ] 2dip if ; inline
 
 : change-mixin-class ( class mixin quot -- )
-    [ members swap bootstrap-word ] prepose keep
+    [ [ members swap bootstrap-word ] dip call ] [ drop ] 2bi
     swap redefine-mixin-class ; inline
 
+: update-classes/new ( mixin -- )
+    class-usages
+    [ keys [ update-class ] each ]
+    [ implementors [ make-generic ] each ] bi ;
+
 : add-mixin-instance ( class mixin -- )
-    [ 2drop ] [ [ suffix ] change-mixin-class ] if-mixin-member? ;
+    #! Note: we call update-classes on the new member, not the
+    #! mixin. This ensures that we only have to update the
+    #! methods whose specializer intersects the new member, not
+    #! the entire mixin (since the other mixin members are not
+    #! affected at all). Also, all usages of the mixin will get
+    #! updated by transitivity; the mixins usages appear in
+    #! class-usages of the member, now that it's been added.
+    [ 2drop ] [
+        [ [ suffix ] change-mixin-class ] 2keep drop
+        dup new-class? [ update-classes/new ] [ update-classes ] if
+    ] if-mixin-member? ;
 
 : remove-mixin-instance ( class mixin -- )
-    [ [ swap remove ] change-mixin-class ] [ 2drop ] if-mixin-member? ;
+    [
+        [ [ swap remove ] change-mixin-class ] keep
+        update-classes
+    ] [ 2drop ] if-mixin-member? ;
 
 ! Definition protocol implementation ensures that removing an
 ! INSTANCE: declaration from a source file updates the mixin.

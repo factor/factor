@@ -30,6 +30,6 @@ arrays namespaces io ;
     dup 1 - 2^ 10000 * nsieve.
     2 - 2^ 10000 * nsieve. ;
 
-: nsieve-main* 9 nsieve-main ;
+: nsieve-main* ( -- ) 9 nsieve-main ;
 
 MAIN: nsieve-main*

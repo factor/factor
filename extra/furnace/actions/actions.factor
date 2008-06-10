@@ -2,12 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors sequences kernel assocs combinators
 validators http hashtables namespaces fry continuations locals
-io arrays math boxes
+io arrays math boxes splitting urls
 xml.entities
 http.server
 http.server.responses
 furnace
+furnace.flash
 html.elements
+html.components
 html.components
 html.templates.chloe
 html.templates.chloe.syntax ;
@@ -15,7 +17,7 @@ IN: furnace.actions
 
 SYMBOL: params
 
-SYMBOL: rest-param
+SYMBOL: rest
 
 : render-validation-messages ( -- )
     validation-messages get
@@ -27,7 +29,7 @@ SYMBOL: rest-param
 
 CHLOE: validation-messages drop render-validation-messages ;
 
-TUPLE: action rest-param init display validate submit ;
+TUPLE: action rest init display validate submit ;
 
 : new-action ( class -- action )
     new
@@ -39,47 +41,67 @@ TUPLE: action rest-param init display validate submit ;
 : <action> ( -- action )
     action new-action ;
 
+: flashed-variables ( -- seq )
+    { validation-messages named-validation-messages } ;
+
 : handle-get ( action -- response )
-    blank-values
-    [ init>> call ]
-    [ display>> call ]
-    bi ;
+    '[
+        ,
+        [ init>> call ]
+        [ drop flashed-variables restore-flash ]
+        [ display>> call ]
+        tri
+    ] with-exit-continuation ;
 
 : validation-failed ( -- * )
-    request get method>> "POST" =
-    [ action get display>> call ] [ <400> ] if exit-with ;
+    request get method>> "POST" = [ f ] [ <400> ] if exit-with ;
 
-: handle-post ( action -- response )
-    init-validation
-    blank-values
-    [ validate>> call ]
-    [ submit>> call ] bi ;
-
-: handle-rest-param ( arg -- )
-    dup length 1 > action get rest-param>> not or
-    [ <404> exit-with ] [
-        action get rest-param>> associate rest-param set
-    ] if ;
-
-M: action call-responder* ( path action -- response )
-    dup action set
-    '[
-        , dup empty? [ drop ] [ handle-rest-param ] if
-
-        init-validation
-        ,
-        request get
-        [ request-params rest-param get assoc-union params set ]
-        [ method>> ] bi
-        {
-            { "GET" [ handle-get ] }
-            { "HEAD" [ handle-get ] }
-            { "POST" [ handle-post ] }
-        } case
-    ] with-exit-continuation ;
+: (handle-post) ( action -- response )
+    [ validate>> call ] [ submit>> call ] bi ;
 
 : param ( name -- value )
     params get at ;
+
+: revalidate-url-key "__u" ;
+
+: check-url ( url -- ? )
+    request get url>>
+    [ [ protocol>> ] [ host>> ] [ port>> ] tri 3array ] bi@ = ;
+
+: revalidate-url ( -- url/f )
+    revalidate-url-key param dup [ >url dup check-url swap and ] when ;
+
+: handle-post ( action -- response )
+    '[
+        form-nesting-key params get at " " split
+        [ , (handle-post) ]
+        [ swap '[ , , nest-values ] ] reduce
+        call
+    ] with-exit-continuation
+    [
+        revalidate-url
+        [ flashed-variables <flash-redirect> ] [ <403> ] if*
+    ] unless* ;
+
+: handle-rest ( path action -- assoc )
+    rest>> dup [ [ "/" join ] dip associate ] [ 2drop f ] if ;
+
+: init-action ( path action -- )
+    blank-values
+    init-validation
+    handle-rest
+    request get request-params assoc-union params set ;
+
+M: action call-responder* ( path action -- response )
+    [ init-action ] keep
+    request get method>> {
+        { "GET" [ handle-get ] }
+        { "HEAD" [ handle-get ] }
+        { "POST" [ handle-post ] }
+    } case ;
+
+M: action modify-form
+    drop request get url>> revalidate-url-key hidden-form-field ;
 
 : check-validation ( -- )
     validation-failed? [ validation-failed ] when ;

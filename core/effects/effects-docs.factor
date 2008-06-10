@@ -2,7 +2,9 @@ USING: help.markup help.syntax math strings words ;
 IN: effects
 
 ARTICLE: "effect-declaration" "Stack effect declaration"
-"It is good practice to declare the stack effects of words using the following syntax:"
+"Stack effects of words must be declared, with the exception of words which only push literals on the stack."
+$nl
+"Stack effects are declared with the following syntax:"
 { $code ": sq ( x -- y ) dup * ;" }
 "A stack effect declaration is written in parentheses and lists word inputs and outputs, separated by " { $snippet "--" } ". Stack effect declarations are read in using a parsing word:"
 { $subsection POSTPONE: ( }
@@ -28,18 +30,21 @@ $nl
 ARTICLE: "effects" "Stack effects"
 "A " { $emphasis "stack effect declaration" } ", for example " { $snippet "( x y -- z )" } " denotes that an operation takes two inputs, with " { $snippet "y" } " at the top of the stack, and returns one output."
 $nl
+"Stack effects of words can be declared."
+{ $subsection "effect-declaration" }
 "Stack effects are first-class, and words for working with them are found in the " { $vocab-link "effects" } " vocabulary."
 { $subsection effect }
 { $subsection effect? }
-"Stack effects of words can be declared."
-{ $subsection "effect-declaration" }
+"There is a literal syntax for stack objects. It is most often used with " { $link define-declared } "."
+{ $subsection POSTPONE: (( }
 "Getting a word's declared stack effect:"
 { $subsection stack-effect }
 "Converting a stack effect to a string form:"
 { $subsection effect>string }
 "Comparing effects:"
 { $subsection effect-height }
-{ $subsection effect<= } ;
+{ $subsection effect<= }
+{ $see-also "inference" } ;
 
 ABOUT: "effects"
 
