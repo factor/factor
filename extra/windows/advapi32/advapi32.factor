@@ -1,4 +1,4 @@
-USING: alien.syntax kernel math windows.types math.bitfields ;
+USING: alias alien.syntax kernel math windows.types math.bitfields ;
 IN: windows.advapi32
 LIBRARY: advapi32
 
@@ -336,8 +336,7 @@ FUNCTION: BOOL CryptAcquireContextW ( HCRYPTPROV* phProv,
                                       DWORD dwProvType,
                                       DWORD dwFlags ) ;
 
-: CryptAcquireContext ( phProv pszContainer pszProvider dwProvType dwFlags -- BOOL )
-    CryptAcquireContextW ;
+ALIAS: CryptAcquireContext CryptAcquireContextW
 
 ! : CryptContextAddRef ;
 ! : CryptCreateHash ;
@@ -498,8 +497,7 @@ FUNCTION: BOOL CryptReleaseContext ( HCRYPTPROV hProv, DWORD dwFlags ) ;
 
 ! : GetUserNameA ;
 FUNCTION: BOOL GetUserNameW ( LPCTSTR lpBuffer, LPDWORD lpnSize ) ;
-: GetUserName ( lpBuffer lpnSize -- BOOL )
-    GetUserNameW ;
+ALIAS: GetUserName GetUserNameW
 
 ! : GetWindowsAccountDomainSid ;
 ! : I_ScIsSecurityProcess ;
@@ -544,8 +542,7 @@ FUNCTION: BOOL InitializeAcl ( PACL pAcl, DWORD nAclLength, DWORD dwAclRevision 
 FUNCTION: BOOL LookupPrivilegeValueW ( LPCTSTR lpSystemName,
                                LPCTSTR lpName,
                                PLUID lpLuid ) ;
-: LookupPrivilegeValue ( lpSystemName lpname lpLuid -- BOOL )
-    LookupPrivilegeValueW ;
+ALIAS: LookupPrivilegeValue LookupPrivilegeValueW
 
 ! : LookupSecurityDescriptorPartsA ;
 ! : LookupSecurityDescriptorPartsW ;

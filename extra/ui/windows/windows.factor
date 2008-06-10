@@ -13,8 +13,11 @@ IN: ui.windows
 
 SINGLETON: windows-ui-backend
 
-: crlf>lf CHAR: \r swap remove ;
-: lf>crlf [ [ dup CHAR: \n = [ CHAR: \r , ] when , ] each ] "" make ;
+: crlf>lf ( str -- str' )
+    CHAR: \r swap remove ;
+
+: lf>crlf ( str -- str' )
+    [ [ dup CHAR: \n = [ CHAR: \r , ] when , ] each ] "" make ;
 
 : enum-clipboard ( -- seq )
     0
@@ -127,7 +130,7 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
         { 123 "F12" }
     } ;
 
-: key-state-down?
+: key-state-down? ( key -- ? )
     GetKeyState 16 bit? ;
 
 : left-shift? ( -- ? ) VK_LSHIFT key-state-down? ;

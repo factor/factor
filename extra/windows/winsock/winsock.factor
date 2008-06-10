@@ -2,7 +2,7 @@
 
 USING: alien alien.c-types alien.strings alien.syntax arrays
 byte-arrays kernel math sequences windows.types windows.kernel32
-windows.errors structs windows math.bitfields ;
+windows.errors structs windows math.bitfields alias ;
 IN: windows.winsock
 
 USE: libc
@@ -74,7 +74,7 @@ TYPEDEF: void* SOCKET
 : AI_PASSIVE     1 ; inline
 : AI_CANONNAME   2 ; inline
 : AI_NUMERICHOST 4 ; inline
-: AI_MASK { AI_PASSIVE AI_CANONNAME AI_NUMERICHOST } flags ;
+: AI_MASK ( -- n ) { AI_PASSIVE AI_CANONNAME AI_NUMERICHOST } flags ;
 
 : NI_NUMERICHOST 1 ;
 : NI_NUMERICSERV 2 ;
@@ -138,7 +138,7 @@ C-STRUCT: addrinfo
     { "sockaddr*" "addr" }
     { "addrinfo*" "next" } ;
 
-: hostent-addr hostent-addr-list *void* ; ! *uint ;
+: hostent-addr ( hostent -- addr ) hostent-addr-list *void* ; ! *uint ;
 
 LIBRARY: winsock
 
@@ -365,7 +365,7 @@ FUNCTION: SOCKET WSASocketW ( int af,
                              LPWSAPROTOCOL_INFOW lpProtocolInfo,
                              GROUP g,
                              DWORD flags ) ;
-: WSASocket WSASocketW ;
+ALIAS: WSASocket WSASocketW
 
 FUNCTION: DWORD WSAWaitForMultipleEvents ( DWORD cEvents,
                                            WSAEVENT* lphEvents,
@@ -384,7 +384,7 @@ FUNCTION: void GetAcceptExSockaddrs ( void* a, int b, int c, int d, void* e, voi
 
 : SIO_GET_EXTENSION_FUNCTION_POINTER -939524090 ; inline
 
-: WSAID_CONNECTEX
+: WSAID_CONNECTEX ( -- GUID )
     "GUID" <c-object>
     HEX: 25a207b9 over set-GUID-Data1
     HEX: ddf3 over set-GUID-Data2

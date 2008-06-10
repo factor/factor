@@ -5,10 +5,10 @@ windows windows.advapi32 windows.kernel32 io.backend system
 accessors locals ;
 IN: io.windows.mmap
 
-: create-file-mapping
+: create-file-mapping ( hFile lpAttributes flProtect dwMaximumSizeHigh dwMaximumSizeLow lpName -- HANDLE )
     CreateFileMapping [ win32-error=0/f ] keep <win32-handle> ;
 
-: map-view-of-file
+: map-view-of-file ( hFileMappingObject dwDesiredAccess dwFileOffsetHigh dwFileOffsetLow dwNumberOfBytesToMap -- HANDLE )
     MapViewOfFile [ win32-error=0/f ] keep ;
 
 :: mmap-open ( path length access-mode create-mode protect access -- handle handle address )
