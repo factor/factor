@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: combinators
 USING: arrays sequences sequences.private math.private
 kernel kernel.private math assocs quotations vectors
-hashtables sorting words sets ;
+hashtables sorting words sets math.order ;
+IN: combinators
 
 : cleave ( x seq -- )
     [ call ] with each ;
@@ -95,10 +95,10 @@ M: hashtable hashcode*
 
 : (distribute-buckets) ( buckets pair keys -- )
     dup t eq? [
-        drop [ swap push-new ] curry each
+        drop [ swap adjoin ] curry each
     ] [
         [
-            >r 2dup r> hashcode pick length rem rot nth push-new
+            >r 2dup r> hashcode pick length rem rot nth adjoin
         ] each 2drop
     ] if ;
 

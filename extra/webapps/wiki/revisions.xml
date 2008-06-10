@@ -1,0 +1,56 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>Revisions of <t:label t:name="title" /></t:title>
+
+	<div class="revisions">
+		<table>
+			<tr>
+				<th>Revision</th>
+				<th>Author</th>
+				<th>Rollback</th>
+			</tr>
+
+			<t:bind-each t:name="revisions">
+				<tr>
+					<td> <t:a t:href="revision" t:query="id"><t:label t:name="date" /></t:a> </td>
+					<td> <t:a t:href="user-edits" t:query="author"><t:label t:name="author" /></t:a> </td>
+					<td> <t:button t:action="rollback" t:for="id" class="link link-button">Rollback</t:button> </td>
+				</tr>
+			</t:bind-each>
+		</table>
+	</div>
+
+	<h2>View Differences</h2>
+
+	<form action="diff" method="get">
+		<table>
+			<tr>
+				<th class="field-label">Old revision:</th>
+				
+				<td>
+					<select name="old-id">
+						<t:bind-each t:name="revisions">
+							<option> <t:label t:name="id" /> </option>
+						</t:bind-each>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th class="field-label">New revision:</th>
+				
+				<td>
+					<select name="new-id">
+						<t:bind-each t:name="revisions">
+							<option> <t:label t:name="id" /> </option>
+						</t:bind-each>
+					</select>
+				</td>
+			</tr>
+		</table>
+
+		<input type="submit" value="View" />
+	</form>
+
+</t:chloe>

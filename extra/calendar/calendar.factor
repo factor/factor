@@ -3,7 +3,8 @@
 
 USING: arrays kernel math math.functions namespaces sequences
 strings system vocabs.loader calendar.backend threads
-accessors combinators locals classes.tuple ;
+accessors combinators locals classes.tuple math.order
+memoize ;
 IN: calendar
 
 TUPLE: timestamp year month day hour minute second gmt-offset ;
@@ -89,14 +90,14 @@ PRIVATE>
 : >time< ( timestamp -- hour minute second )
     [ hour>> ] [ minute>> ] [ second>> ] tri ;
 
-: instant ( -- dt ) 0 0 0 0 0 0 <duration> ;
-: years ( n -- dt ) instant swap >>year ;
-: months ( n -- dt ) instant swap >>month ;
-: days ( n -- dt ) instant swap >>day ;
+MEMO: instant ( -- dt ) 0 0 0 0 0 0 <duration> ;
+: years ( n -- dt ) instant clone swap >>year ;
+: months ( n -- dt ) instant clone swap >>month ;
+: days ( n -- dt ) instant clone swap >>day ;
 : weeks ( n -- dt ) 7 * days ;
-: hours ( n -- dt ) instant swap >>hour ;
-: minutes ( n -- dt ) instant swap >>minute ;
-: seconds ( n -- dt ) instant swap >>second ;
+: hours ( n -- dt ) instant clone swap >>hour ;
+: minutes ( n -- dt ) instant clone swap >>minute ;
+: seconds ( n -- dt ) instant clone swap >>second ;
 : milliseconds ( n -- dt ) 1000 / seconds ;
 
 GENERIC: leap-year? ( obj -- ? )
@@ -273,14 +274,15 @@ M: timestamp time-
 M: duration time-
     before time+ ;
 
-: <zero> 0 0 0 0 0 0 instant <timestamp> ;
+MEMO: <zero> ( -- timestamp )
+0 0 0 0 0 0 instant <timestamp> ;
 
 : valid-timestamp? ( timestamp -- ? )
     clone instant >>gmt-offset
     dup <zero> time- <zero> time+ = ;
 
-: unix-1970 ( -- timestamp )
-    1970 1 1 0 0 0 instant <timestamp> ; foldable
+MEMO: unix-1970 ( -- timestamp )
+    1970 1 1 0 0 0 instant <timestamp> ;
 
 : millis>timestamp ( n -- timestamp )
     >r unix-1970 r> milliseconds time+ ;

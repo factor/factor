@@ -30,16 +30,14 @@ IN: io.encodings.8-bit
 } ;
 
 : encoding-file ( file-name -- stream )
-    "extra/io/encodings/8-bit/" ".TXT"
-    swapd 3append resource-path
-    ascii <file-reader> ;
+    "resource:extra/io/encodings/8-bit/" ".TXT"
+    swapd 3append ascii <file-reader> ;
 
 : tail-if ( seq n -- newseq )
     2dup swap length <= [ tail ] [ drop ] if ;
 
 : process-contents ( lines -- assoc )
-    [ "#" split1 drop ] map
-    [ empty? not ] subset
+    [ "#" split1 drop ] map harvest
     [ "\t" split 2 head [ 2 tail-if hex> ] map ] map ;
 
 : byte>ch ( assoc -- array )
@@ -70,7 +68,7 @@ M: 8-bit decode-char
     decode>> decode-8-bit ;
 
 : make-8-bit ( word byte>ch ch>byte -- )
-    [ 8-bit boa ] 2curry dupd curry define ;
+    [ 2drop ] [ 8-bit boa ] 3bi [ ] curry define ;
 
 : define-8-bit-encoding ( name stream -- )
     >r in get create r> parse-file make-8-bit ;

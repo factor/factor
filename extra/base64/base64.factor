@@ -1,5 +1,5 @@
 USING: kernel math sequences namespaces io.binary splitting
- strings hashtables ;
+grouping strings hashtables ;
 IN: base64
 
 <PRIVATE

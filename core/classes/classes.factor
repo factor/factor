@@ -5,21 +5,21 @@ slots.private namespaces sequences strings words vectors math
 quotations combinators sorting effects graphs vocabs ;
 IN: classes
 
-SYMBOL: class<-cache
+SYMBOL: class<=-cache
 SYMBOL: class-not-cache
 SYMBOL: classes-intersect-cache
 SYMBOL: class-and-cache
 SYMBOL: class-or-cache
 
 : init-caches ( -- )
-    H{ } clone class<-cache set
+    H{ } clone class<=-cache set
     H{ } clone class-not-cache set
     H{ } clone classes-intersect-cache set
     H{ } clone class-and-cache set
     H{ } clone class-or-cache set ;
 
 : reset-caches ( -- )
-    class<-cache get clear-assoc
+    class<=-cache get clear-assoc
     class-not-cache get clear-assoc
     classes-intersect-cache get clear-assoc
     class-and-cache get clear-assoc
@@ -33,12 +33,12 @@ PREDICATE: class < word
 PREDICATE: tuple-class < class
     "metaclass" word-prop tuple-class eq? ;
 
-: classes ( -- seq ) all-words [ class? ] subset ;
+: classes ( -- seq ) all-words [ class? ] filter ;
 
 : predicate-word ( word -- predicate )
     [ word-name "?" append ] keep word-vocabulary create ;
 
-: predicate-effect 1 { "?" } <effect> ;
+: predicate-effect T{ effect f 1 { "?" } } ;
 
 PREDICATE: predicate < word "predicating" word-prop >boolean ;
 
@@ -57,18 +57,29 @@ PREDICATE: predicate < word "predicating" word-prop >boolean ;
     #! Output f for non-classes to work with algebra code
     dup class? [ "members" word-prop ] [ drop f ] if ;
 
+: participants ( class -- seq )
+    #! Output f for non-classes to work with algebra code
+    dup class? [ "participants" word-prop ] [ drop f ] if ;
+
+GENERIC: rank-class ( class -- n )
+
 GENERIC: reset-class ( class -- )
 
 M: word reset-class drop ;
 
-<PRIVATE
-
 ! update-map
 : class-uses ( class -- seq )
-    [ members ] [ superclass ] bi [ suffix ] when* ;
+    [
+        [ members % ]
+        [ participants % ]
+        [ superclass [ , ] when* ]
+        tri
+    ] { } make ;
 
 : class-usages ( class -- assoc )
     [ update-map get at ] closure ;
+
+<PRIVATE
 
 : update-map+ ( class -- )
     dup class-uses update-map get add-vertex ;
@@ -76,17 +87,20 @@ M: word reset-class drop ;
 : update-map- ( class -- )
     dup class-uses update-map get remove-vertex ;
 
-: make-class-props ( superclass members metaclass -- assoc )
+: make-class-props ( superclass members participants metaclass -- assoc )
     [
-        [ dup [ bootstrap-word ] when "superclass" set ]
-        [ [ bootstrap-word ] map "members" set ]
-        [ "metaclass" set ]
-        tri*
+        {
+            [ dup [ bootstrap-word ] when "superclass" set ]
+            [ [ bootstrap-word ] map "members" set ]
+            [ [ bootstrap-word ] map "participants" set ]
+            [ "metaclass" set ]
+        } spread
     ] H{ } make-assoc ;
 
 : (define-class) ( word props -- )
     >r
     dup reset-class
+    dup class? [ dup new-class ] unless
     dup deferred? [ dup define-symbol ] when
     dup word-props
     r> assoc-union over set-word-props
@@ -102,15 +116,15 @@ GENERIC: update-class ( class -- )
 
 M: class update-class drop ;
 
-GENERIC: update-methods ( assoc -- )
+GENERIC: update-methods ( class assoc -- )
 
 : update-classes ( class -- )
-    class-usages
-    [ [ drop update-class ] assoc-each ]
+    dup class-usages
+    [ nip keys [ update-class ] each ]
     [ update-methods ]
-    bi ;
+    2bi ;
 
-: define-class ( word superclass members metaclass -- )
+: define-class ( word superclass members participants metaclass -- )
     #! If it was already a class, update methods after.
     reset-caches
     make-class-props

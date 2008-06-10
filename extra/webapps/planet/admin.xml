@@ -4,10 +4,19 @@
 
 	<t:title>Planet Factor Administration</t:title>
 
-	<t:summary component="blogroll" />
+	<ul>
+		<t:bind-each t:name="blogroll">
+			<li>
+				<t:a t:href="$planet-factor/admin/edit-blog" t:query="id">
+					<t:label t:name="name" />
+				</t:a>
+			</li>
+		</t:bind-each>
+	</ul>
 
-	<p>
-		<t:a href="edit-blog">Add Blog</t:a> | <t:a href="update">Update</t:a>
-	</p>
+	<div>
+		<t:a t:href="$planet-factor/admin/new-blog">Add Blog</t:a>
+		| <t:button t:action="$planet-factor/admin/update" class="link-button link">Update</t:button>
+	</div>
 
 </t:chloe>

@@ -1,41 +1,8 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math namespaces strings arrays vectors sequences
-sets ;
+sets math.order accessors ;
 IN: splitting
-
-TUPLE: groups seq n sliced? ;
-
-: check-groups 0 <= [ "Invalid group count" throw ] when ;
-
-: <groups> ( seq n -- groups )
-    dup check-groups f groups boa ; inline
-
-: <sliced-groups> ( seq n -- groups )
-    <groups> t over set-groups-sliced? ;
-
-M: groups length
-    dup groups-seq length swap groups-n [ + 1- ] keep /i ;
-
-M: groups set-length
-    [ groups-n * ] keep groups-seq set-length ;
-
-: group@ ( n groups -- from to seq )
-    [ groups-n [ * dup ] keep + ] keep
-    groups-seq [ length min ] keep ;
-
-M: groups nth
-    [ group@ ] keep
-    groups-sliced? [ <slice> ] [ subseq ] if ;
-
-M: groups set-nth
-    group@ <slice> 0 swap copy ;
-
-M: groups like drop { } like ;
-
-INSTANCE: groups sequence
-
-: group ( seq n -- array ) <groups> { } like ;
 
 : ?head ( seq begin -- newseq ? )
     2dup head? [ length tail t ] [ drop f ] if ;
@@ -61,7 +28,7 @@ INSTANCE: groups sequence
     dup [ swap ] when ;
 
 : (split) ( separators n seq -- )
-    3dup rot [ member? ] curry find* drop
+    3dup rot [ member? ] curry find-from drop
     [ [ swap subseq , ] 2keep 1+ swap (split) ]
     [ swap dup zero? [ drop ] [ tail ] if , drop ] if* ; inline
 
@@ -74,7 +41,7 @@ INSTANCE: groups sequence
         1array
     ] [
         "\n" split [
-            1 head-slice* [
+            but-last-slice [
                 "\r" ?tail drop "\r" split
             ] map
         ] keep peek "\r" split suffix concat

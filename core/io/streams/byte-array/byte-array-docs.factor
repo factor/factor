@@ -25,10 +25,10 @@ HELP: <byte-writer>
 HELP: with-byte-reader
 { $values { "encoding" "an encoding descriptor" }
     { "quot" quotation } { "byte-array" byte-array } }
-{ $description "Calls the quotation in a new dynamic scope with " { $link stdio } " rebound to an input stream for reading from a byte array using an encoding." } ;
+{ $description "Calls the quotation in a new dynamic scope with " { $link input-stream } " rebound to an input stream for reading from a byte array using an encoding." } ;
 
 HELP: with-byte-writer
 { $values  { "encoding" "an encoding descriptor" }
     { "quot" quotation }
     { "byte-array" byte-array } }
-{ $description "Calls the quotation in a new dynamic scope with " { $link stdio } " rebound to an output stream writing data to a byte array using an encoding." } ;
+{ $description "Calls the quotation in a new dynamic scope with " { $link output-stream } " rebound to an output stream writing data to a byte array using an encoding." } ;

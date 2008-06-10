@@ -1,4 +1,5 @@
-USING: sequences namespaces unicode.data kernel math arrays ;
+USING: sequences namespaces unicode.data kernel math arrays
+locals combinators.lib sequences.lib combinators.lib ;
 IN: unicode.normalize
 
 ! Conjoining Jamo behavior
@@ -26,7 +27,7 @@ IN: unicode.normalize
     hangul-base - final-count /mod final-base +
     >r medial-count /mod medial-base +
     >r initial-base + r> r>
-    dup zero? [ drop 2array ] [ 3array ] if ;
+    dup final-base = [ drop 2array ] [ 3array ] if ;
 
 : jamo>hangul ( initial medial final -- hangul )
     >r >r initial-base - medial-count *
@@ -35,27 +36,12 @@ IN: unicode.normalize
 
 ! Normalization -- Decomposition 
 
-: (insert) ( seq n quot -- )
-    over 0 = [ 3drop ] [
-        [ >r dup 1- rot [ nth ] curry bi@ r> bi@ > ] 3keep
-        roll [ 3drop ]
-        [ >r [ dup 1- rot exchange ] 2keep 1- r> (insert) ] if
-    ] if ; inline
-
-: insert ( seq quot elt n -- )
-    swap rot >r -rot [ swap set-nth ] 2keep r> (insert) ; inline
-
-: insertion-sort ( seq quot -- )
-    ! quot is a transformation on elements
-    over dup length
-    [ >r >r 2dup r> r> insert ] 2each 2drop ; inline
-
 : reorder-slice ( string start -- slice done? )
-    2dup swap [ non-starter? not ] find* drop
+    2dup swap [ non-starter? not ] find-from drop
     [ [ over length ] unless* rot <slice> ] keep not ;
 
 : reorder-next ( string i -- new-i done? )
-    over [ non-starter? ] find* drop [
+    over [ non-starter? ] find-from drop [
         reorder-slice
         >r dup [ combining-class ] insertion-sort slice-to r>
     ] [ length t ] if* ;
@@ -67,17 +53,19 @@ IN: unicode.normalize
     0 reorder-loop ;
 
 : reorder-back ( string i -- )
-    over [ non-starter? not ] find-last* drop ?1+ reorder-next 2drop ;
+    over [ non-starter? not ] find-last-from drop ?1+ reorder-next 2drop ;
 
-: decompose ( string quot -- decomposed )
+:: decompose ( string quot -- decomposed )
     ! When there are 8 and 32-bit strings, this'll be
     ! equivalent to clone on 8 and the contents of the last
     ! main quotation on 32.
-    over [ 127 < ] all? [ drop ] [
-        swap [ [
-            dup hangul? [ hangul>jamo % drop ]
-            [ dup rot call [ % ] [ , ] ?if ] if
-        ] with each ] "" make
+    string [ 127 < ] all? [ string ] [
+        [
+            string [
+                dup hangul? [ hangul>jamo % ]
+                [ dup quot call [ % ] [ , ] ?if ] if
+            ] each
+        ] "" make
         dup reorder
     ] if ; inline
 
@@ -85,7 +73,7 @@ IN: unicode.normalize
     [ canonical-entry ] decompose ;
 
 : nfkd ( string -- string )
-    [ compat-entry ] decompose ;
+    [ compatibility-entry ] decompose ;
 
 : string-append ( s1 s2 -- string )
     ! This could be more optimized,

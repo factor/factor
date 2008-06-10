@@ -2,42 +2,49 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel generic math sequences arrays io namespaces
 prettyprint.private kernel.private assocs random combinators
-parser prettyprint.backend ;
+parser prettyprint.backend math.order accessors ;
 IN: trees
-
-MIXIN: tree-mixin
 
 TUPLE: tree root count ;
 
+: new-tree ( class -- tree )
+    new
+        f >>root
+        0 >>count ; inline
+
 : <tree> ( -- tree )
-    f 0 tree boa ;
+    tree new-tree ;
 
-: construct-tree ( class -- tree )
-    new <tree> over set-delegate ; inline
-
-INSTANCE: tree tree-mixin
-
-INSTANCE: tree-mixin assoc
+INSTANCE: tree assoc
 
 TUPLE: node key value left right ;
+
+: new-node ( key value class -- node )
+    new swap >>value swap >>key ;
+
 : <node> ( key value -- node )
-    f f node boa ;
+    node new-node ;
 
 SYMBOL: current-side
 
-: left -1 ; inline
-: right 1 ; inline
+: left ( -- symbol ) -1 ; inline
+: right ( -- symbol ) 1 ; inline
 
-: go-left? ( -- ? ) current-side get left = ;
+: key-side ( k1 k2 -- n )
+    <=> {
+        { +lt+ [ -1 ] }
+        { +eq+ [ 0 ] }
+        { +gt+ [ 1 ] }
+    } case ;
 
-: inc-count ( tree -- )
-    dup tree-count 1+ swap set-tree-count ;
+: go-left? ( -- ? ) current-side get left eq? ;
 
-: dec-count ( tree -- )
-    dup tree-count 1- swap set-tree-count ;
+: inc-count ( tree -- ) [ 1+ ] change-count drop ;
+
+: dec-count ( tree -- ) [ 1- ] change-count drop ;
 
 : node-link@ ( node ? -- node )
-    go-left? xor [ node-left ] [ node-right ] if ;
+    go-left? xor [ left>> ] [ right>> ] if ;
 : set-node-link@ ( left parent ? -- ) 
     go-left? xor [ set-node-left ] [ set-node-right ] if ;
 
@@ -47,19 +54,13 @@ SYMBOL: current-side
 : set-node+link ( child node -- ) t set-node-link@ ;
 
 : with-side ( side quot -- ) [ swap current-side set call ] with-scope ; inline
-: with-other-side ( quot -- ) current-side get neg swap with-side ; inline
+: with-other-side ( quot -- )
+    current-side get neg swap with-side ; inline
 : go-left ( quot -- ) left swap with-side ; inline
 : go-right ( quot -- ) right swap with-side ; inline
 
-: change-root ( tree quot -- )
-    swap [ tree-root swap call ] keep set-tree-root ; inline
-
 : leaf? ( node -- ? )
-    dup node-left swap node-right or not ;
-
-: key-side ( k1 k2 -- side )
-    #! side is -1 if k1 < k2, 0 if they are equal, or 1 if k1 > k2
-    <=> sgn ;
+    [ left>> ] [ right>> ] bi or not ;
 
 : random-side ( -- side ) left right 2array random ;
 
@@ -76,11 +77,11 @@ SYMBOL: current-side
     ] [ drop f f ] if* ;
 
 M: tree at* ( key tree -- value ? )
-    tree-root node-at* ;
+    root>> node-at* ;
 
 : node-set ( value key node -- node )
-    2dup node-key key-side dup zero? [
-        drop nip [ set-node-value ] keep
+    2dup key>> key-side dup 0 eq? [
+        drop nip swap >>value
     ] [
         [
             [ node-link [ node-set ] [ swap <node> ] if* ] keep
@@ -89,38 +90,30 @@ M: tree at* ( key tree -- value ? )
     ] if ;
 
 M: tree set-at ( value key tree -- )
-    [ [ node-set ] [ swap <node> ] if* ] change-root ;
+    [ [ node-set ] [ swap <node> ] if* ] change-root drop ;
 
 : valid-node? ( node -- ? )
     [
-        dup dup node-left [ node-key swap node-key before? ] when* >r
-        dup dup node-right [ node-key swap node-key after? ] when* r> and swap
-        dup node-left valid-node? swap node-right valid-node? and and
+        dup dup left>> [ node-key swap node-key before? ] when* >r
+        dup dup right>> [ node-key swap node-key after? ] when* r> and swap
+        dup left>> valid-node? swap right>> valid-node? and and
     ] [ t ] if* ;
 
-: valid-tree? ( tree -- ? ) tree-root valid-node? ;
+: valid-tree? ( tree -- ? ) root>> valid-node? ;
 
-: tree-call ( node call -- )
-    >r [ node-key ] keep node-value r> call ; inline
- 
-: find-node ( node quot -- key value ? )
-    {
-        { [ over not ] [ 2drop f f f ] }
-        { [ [
-              >r node-left r> find-node
-            ] 2keep rot ]
-          [ 2drop t ] }
-        { [ >r 2nip r> [ tree-call ] 2keep rot ]
-          [ drop [ node-key ] keep node-value t ] }
-        [ >r node-right r> find-node ]
-    } cond ; inline
+: (node>alist) ( node -- )
+    [
+        [ left>> (node>alist) ]
+        [ [ node-key ] [ node-value ] bi 2array , ]
+        [ right>> (node>alist) ]
+        tri
+    ] when* ;
 
-M: tree-mixin assoc-find ( tree quot -- key value ? )
-    >r tree-root r> find-node ;
+M: tree >alist [ root>> (node>alist) ] { } make ;
 
-M: tree-mixin clear-assoc
-    0 over set-tree-count
-    f swap set-tree-root ;
+M: tree clear-assoc
+    0 >>count
+    f >>root drop ;
 
 : copy-node-contents ( new old -- )
     dup node-key pick set-node-key node-value swap set-node-value ;
@@ -158,29 +151,29 @@ DEFER: delete-node
 
 : delete-node ( node -- node )
     #! delete this node, returning its replacement
-    dup node-left [
-        dup node-right [
+    dup left>> [
+        dup right>> [
             delete-node-with-two-children
         ] [
-            node-left ! left but no right
+            left>> ! left but no right
         ] if
     ] [
-        dup node-right [
-            node-right ! right but not left
+        dup right>> [
+            right>> ! right but not left
         ] [
             drop f ! no children
         ] if
     ] if ;
 
 : delete-bst-node ( key node -- node )
-    2dup node-key key-side dup zero? [
+    2dup node-key key-side dup 0 eq? [
         drop nip delete-node
     ] [
         [ tuck node-link delete-bst-node over set-node-link ] with-side
     ] if ;
 
 M: tree delete-at
-    [ delete-bst-node ] change-root ;
+    [ delete-bst-node ] change-root drop ;
 
 M: tree new-assoc
     2drop <tree> ;
@@ -190,14 +183,12 @@ M: tree clone dup assoc-clone-like ;
 : >tree ( assoc -- tree )
     T{ tree f f 0 } assoc-clone-like ;
 
-M: tree-mixin assoc-like drop dup tree? [ >tree ] unless ;
+M: tree assoc-like drop dup tree? [ >tree ] unless ;
 
 : TREE{
     \ } [ >tree ] parse-literal ; parsing
-
+                                                        
 M: tree pprint-delims drop \ TREE{ \ } ;
-
-M: tree-mixin assoc-size tree-count ;
-M: tree-mixin clone dup assoc-clone-like ;
-M: tree-mixin >pprint-sequence >alist ;
-M: tree-mixin pprint-narrow? drop t ;
+M: tree assoc-size count>> ;
+M: tree >pprint-sequence >alist ;
+M: tree pprint-narrow? drop t ;

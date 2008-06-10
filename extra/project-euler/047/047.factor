@@ -35,8 +35,8 @@ IN: project-euler.047
     pick pick = [
         swap - nip
     ] [
-        dup prime? [ [ drop 0 ] dipd ] [
-            2dup unique-factors length = [ [ 1+ ] dipd ] [ [ drop 0 ] dipd ] if
+        dup prime? [ [ drop 0 ] 2dip ] [
+            2dup unique-factors length = [ [ 1+ ] 2dip ] [ [ drop 0 ] 2dip ] if
         ] if 1+ (consecutive)
     ] if ;
 

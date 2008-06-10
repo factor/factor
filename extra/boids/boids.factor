@@ -3,6 +3,7 @@ USING: kernel namespaces
        math
        math.constants
        math.functions
+       math.order
        math.vectors
        math.trig
        combinators arrays sequences random vars
@@ -113,10 +114,10 @@ over boid-vel -rot relative-position angle-between ;
   { [ cohesion-radius> in-range? ]
     [ cohesion-view-angle> in-view? ]
     [ eq? not ] }
-  <--&& ;
+  2&& ;
 
 : cohesion-neighborhood ( self -- boids )
-  boids> [ within-cohesion-neighborhood? ] with subset ;
+  boids> [ within-cohesion-neighborhood? ] with filter ;
 
 : cohesion-force ( self -- force )
   dup cohesion-neighborhood
@@ -133,10 +134,10 @@ over boid-vel -rot relative-position angle-between ;
   { [ separation-radius> in-range? ]
     [ separation-view-angle> in-view? ]
     [ eq? not ] }
-  <--&& ;
+  2&& ;
 
 : separation-neighborhood ( self -- boids )
-  boids> [ within-separation-neighborhood? ] with subset ;
+  boids> [ within-separation-neighborhood? ] with filter ;
 
 : separation-force ( self -- force )
   dup separation-neighborhood
@@ -153,10 +154,10 @@ over boid-vel -rot relative-position angle-between ;
   { [ alignment-radius> in-range? ]
     [ alignment-view-angle> in-view? ]
     [ eq? not ] }
-  <--&& ;
+  2&& ;
 
 : alignment-neighborhood ( self -- boids )
-boids> [ within-alignment-neighborhood? ] with subset ;
+boids> [ within-alignment-neighborhood? ] with filter ;
 
 : alignment-force ( self -- force )
   alignment-neighborhood

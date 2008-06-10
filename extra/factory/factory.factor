@@ -13,7 +13,7 @@ IN: factory
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : manage-windows ( -- )
-dpy get $default-root <- children [ <- mapped? ] subset
+dpy get $default-root <- children [ <- mapped? ] filter
 [ $id <wm-frame> new* drop ] each ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

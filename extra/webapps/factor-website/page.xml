@@ -10,46 +10,13 @@
 		<head>
 			<t:write-title />
 
-			<t:style>
-				body, button {
-					font:9pt "Lucida Grande", "Lucida Sans Unicode", verdana, geneva, sans-serif;
-					color:#444;
-				}
+			<t:style t:include="resource:extra/xmode/code2html/stylesheet.css" />
 
-				.link-button {
-					padding: 0px;
-					background: none;
-					border: none;
-				}
-
-				a, .link {
-					color: #222;
-					border-bottom:1px dotted #666;
-					text-decoration:none;
-				}
-
-				a:hover, .link:hover {
-					border-bottom:1px solid #66a;
-				}
-
-				.error { color: #a00; }
-
-				.field-label {
-					text-align: right;
-				}
-
-				.inline {
-					display: inline;
-				}
-				
-				.navbar {
-					background-color: #eee;
-					padding: 5px;
-					border: 1px solid #ccc;
-				}
-			</t:style>
+			<t:style t:include="resource:extra/webapps/factor-website/page.css" />
 
 			<t:write-style />
+
+			<t:write-atom />
 		</head>
 
 		<body>

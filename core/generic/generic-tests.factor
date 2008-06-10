@@ -143,7 +143,7 @@ GENERIC: generic-forget-test-1
 M: integer generic-forget-test-1 / ;
 
 [ t ] [
-    \ / usage [ word? ] subset
+    \ / usage [ word? ] filter
     [ word-name "generic-forget-test-1/integer" = ] contains?
 ] unit-test
 
@@ -152,16 +152,16 @@ M: integer generic-forget-test-1 / ;
 ] unit-test
 
 [ f ] [
-    \ / usage [ word? ] subset
+    \ / usage [ word? ] filter
     [ word-name "generic-forget-test-1/integer" = ] contains?
 ] unit-test
 
-GENERIC: generic-forget-test-2
+GENERIC: generic-forget-test-2 ( a b -- c )
 
 M: sequence generic-forget-test-2 = ;
 
 [ t ] [
-    \ = usage [ word? ] subset
+    \ = usage [ word? ] filter
     [ word-name "generic-forget-test-2/sequence" = ] contains?
 ] unit-test
 
@@ -170,11 +170,11 @@ M: sequence generic-forget-test-2 = ;
 ] unit-test
 
 [ f ] [
-    \ = usage [ word? ] subset
+    \ = usage [ word? ] filter
     [ word-name "generic-forget-test-2/sequence" = ] contains?
 ] unit-test
 
-GENERIC: generic-forget-test-3
+GENERIC: generic-forget-test-3 ( a -- b )
 
 M: f generic-forget-test-3 ;
 

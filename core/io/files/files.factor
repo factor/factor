@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.backend io.files.private io hashtables kernel math
 memory namespaces sequences strings assocs arrays definitions
-system combinators splitting sbufs continuations io.encodings
-io.encodings.binary init accessors ;
+system combinators splitting sbufs continuations destructors
+io.encodings io.encodings.binary init accessors math.order ;
 IN: io.files
 
 HOOK: (file-reader) io-backend ( path -- stream )
@@ -25,13 +25,13 @@ HOOK: (file-appender) io-backend ( path -- stream )
     <file-reader> lines ;
 
 : with-file-reader ( path encoding quot -- )
-    >r <file-reader> r> with-stream ; inline
+    >r <file-reader> r> with-input-stream ; inline
 
 : file-contents ( path encoding -- str )
     <file-reader> contents ;
 
 : with-file-writer ( path encoding quot -- )
-    >r <file-writer> r> with-stream ; inline
+    >r <file-writer> r> with-output-stream ; inline
 
 : set-file-lines ( seq path encoding -- )
     [ [ print ] each ] with-file-writer ;
@@ -40,7 +40,7 @@ HOOK: (file-appender) io-backend ( path -- stream )
     [ write ] with-file-writer ;
 
 : with-file-appender ( path encoding quot -- )
-    >r <file-appender> r> with-stream ; inline
+    >r <file-appender> r> with-output-stream ; inline
 
 ! Pathnames
 : path-separator? ( ch -- ? ) os windows? "/\\" "/" ? member? ;
@@ -54,7 +54,7 @@ HOOK: (file-appender) io-backend ( path -- stream )
     [ path-separator? ] left-trim ;
 
 : last-path-separator ( path -- n ? )
-    [ length 1- ] keep [ path-separator? ] find-last* ;
+    [ length 1- ] keep [ path-separator? ] find-last-from ;
 
 HOOK: root-directory? io-backend ( path -- ? )
 
@@ -92,7 +92,7 @@ ERROR: no-parent-directory path ;
 : append-path-empty ( path1 path2 -- path' )
     {
         { [ dup head.? ] [
-            1 tail left-trim-separators append-path-empty
+            rest left-trim-separators append-path-empty
         ] }
         { [ dup head..? ] [ drop no-parent-directory ] }
         [ nip ]
@@ -122,7 +122,7 @@ PRIVATE>
         { [ over empty? ] [ append-path-empty ] }
         { [ dup empty? ] [ drop ] }
         { [ dup absolute-path? ] [ nip ] }
-        { [ dup head.? ] [ 1 tail left-trim-separators append-path ] }
+        { [ dup head.? ] [ rest left-trim-separators append-path ] }
         { [ dup head..? ] [
             2 tail left-trim-separators
             >r parent-directory r> append-path
@@ -142,8 +142,13 @@ PRIVATE>
 : file-name ( path -- string )
     dup root-directory? [
         right-trim-separators
-        dup last-path-separator [ 1+ tail ] [ drop ] if
+        dup last-path-separator [ 1+ tail ] [
+            drop "resource:" ?head [ file-name ] when
+        ] if
     ] unless ;
+
+: file-extension ( filename -- extension )
+    "." last-split1 nip ;
 
 ! File info
 TUPLE: file-info type size permissions modified ;
@@ -170,11 +175,9 @@ SYMBOL: +socket+
 SYMBOL: +unknown+
 
 ! File metadata
-: exists? ( path -- ? )
-    normalize-path (exists?) ;
+: exists? ( path -- ? ) normalize-path (exists?) ;
 
-: directory? ( path -- ? )
-    file-info file-info-type +directory+ = ;
+: directory? ( file-info -- ? ) type>> +directory+ = ;
 
 <PRIVATE
 
@@ -230,9 +233,9 @@ HOOK: make-directory io-backend ( path -- )
 : fixup-directory ( path seq -- newseq )
     [
         dup string?
-        [ tuck append-path directory? 2array ] [ nip ] if
+        [ tuck append-path file-info directory? 2array ] [ nip ] if
     ] with map
-    [ first { "." ".." } member? not ] subset ;
+    [ first { "." ".." } member? not ] filter ;
 
 : directory ( path -- seq )
     normalize-directory dup (directory) fixup-directory ;
@@ -257,7 +260,8 @@ HOOK: delete-directory io-backend ( path -- )
         delete-file
     ] if ;
 
-: to-directory over file-name append-path ;
+: to-directory ( from to -- from to' )
+    over file-name append-path ;
 
 ! Moving and renaming files
 HOOK: move-file io-backend ( from to -- )

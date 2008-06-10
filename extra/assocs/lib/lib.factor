@@ -1,9 +1,6 @@
 USING: arrays assocs kernel vectors sequences namespaces
-random math.parser ;
+random math.parser math fry ;
 IN: assocs.lib
-
-: >set ( seq -- hash )
-    [ dup ] H{ } map>assoc ;
 
 : ref-at ( table key -- value ) swap at ;
 
@@ -38,8 +35,13 @@ IN: assocs.lib
 : insert ( value variable -- ) namespace insert-at ;
 
 : generate-key ( assoc -- str )
-    >r 256 random-bits >hex r>
+    >r 32 random-bits >hex r>
     2dup key? [ nip generate-key ] [ drop ] if ;
 
 : set-at-unique ( value assoc -- key )
     dup generate-key [ swap set-at ] keep ;
+
+: histogram ( assoc quot -- assoc' )
+    H{ } clone [
+        swap [ change-at ] 2curry assoc-each
+    ] keep ;

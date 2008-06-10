@@ -143,7 +143,7 @@ METHOD: as-mutate { object object assoc }       set-at ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: subset-of ( quot seq -- seq ) swap subset ;
+: filter-of ( quot seq -- seq ) swap filter ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -160,15 +160,30 @@ METHOD: as-mutate { object object assoc }       set-at ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: 1st 0 at ;
-: 2nd 1 at ;
-: 3rd 2 at ;
-: 4th 3 at ;
-: 5th 4 at ;
-: 6th 5 at ;
-: 7th 6 at ;
-: 8th 7 at ;
-: 9th 8 at ;
+: subseq ( seq from to -- subseq ) rot sequences:subseq ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: key ( table val -- key ) swap assocs:value-at ;
+
+: key-of ( val table -- key ) assocs:value-at ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: index    ( seq obj -- i ) swap sequences:index ;
+: index-of ( obj seq -- i )      sequences:index ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: 1st ( seq -- obj ) 0 at ;
+: 2nd ( seq -- obj ) 1 at ;
+: 3rd ( seq -- obj ) 2 at ;
+: 4th ( seq -- obj ) 3 at ;
+: 5th ( seq -- obj ) 4 at ;
+: 6th ( seq -- obj ) 5 at ;
+: 7th ( seq -- obj ) 6 at ;
+: 8th ( seq -- obj ) 7 at ;
+: 9th ( seq -- obj ) 8 at ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

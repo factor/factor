@@ -1,6 +1,7 @@
 ! Copyright (c) 2008 Eric Mertens
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences combinators kernel sequences.lib math assocs namespaces ;
+USING: sequences combinators kernel sequences.lib math math.order
+assocs namespaces ;
 IN: project-euler.151
 
 SYMBOL: table

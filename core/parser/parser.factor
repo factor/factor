@@ -63,7 +63,7 @@ t parser-notes set-global
 
 : skip ( i seq ? -- n )
     over >r
-    [ swap CHAR: \s eq? xor ] curry find* drop
+    [ swap CHAR: \s eq? xor ] curry find-from drop
     [ r> drop ] [ r> length ] if* ;
 
 : change-lexer-column ( lexer quot -- )
@@ -132,7 +132,7 @@ name>char-hook global [
     "{" ?head-slice [
         CHAR: } over index cut-slice
         >r >string name>char-hook get call r>
-        1 tail-slice
+        rest-slice
     ] [
         6 cut-slice >r hex> r>
     ] if ;
@@ -146,7 +146,7 @@ name>char-hook global [
 
 : (parse-string) ( str -- m )
     dup [ "\"\\" member? ] find dup [
-        >r cut-slice >r % r> 1 tail-slice r>
+        >r cut-slice >r % r> rest-slice r>
         dup CHAR: " = [
             drop slice-from
         ] [
@@ -207,7 +207,7 @@ SYMBOL: in
 : add-use ( seq -- ) [ use+ ] each ;
 
 : set-use ( seq -- )
-    [ vocab-words ] map [ ] subset >vector use set ;
+    [ vocab-words ] V{ } map-as sift use set ;
 
 : check-vocab-string ( name -- name )
     dup string?
@@ -221,6 +221,8 @@ ERROR: unexpected want got ;
 PREDICATE: unexpected-eof < unexpected
     unexpected-got not ;
 
+M: parsing-word stack-effect drop (( parsed -- parsed )) ;
+
 : unexpected-eof ( word -- * ) f unexpected ;
 
 : (parse-tokens) ( accum end -- accum )
@@ -233,8 +235,16 @@ PREDICATE: unexpected-eof < unexpected
 : parse-tokens ( end -- seq )
     100 <vector> swap (parse-tokens) >array ;
 
-: create-in ( string -- word )
-    in get create dup set-word dup save-location ;
+ERROR: no-current-vocab ;
+
+M: no-current-vocab summary ( obj -- )
+    drop "Not in a vocabulary; IN: form required" ;
+
+: current-vocab ( -- str )
+    in get [ no-current-vocab ] unless* ;
+
+: create-in ( str -- word )
+    current-vocab create dup set-word dup save-location ;
 
 : CREATE ( -- word ) scan create-in ;
 
@@ -243,7 +253,7 @@ PREDICATE: unexpected-eof < unexpected
 : CREATE-WORD ( -- word ) CREATE dup reset-generic ;
 
 : create-class-in ( word -- word )
-    in get create
+    current-vocab create
     dup save-class-location
     dup predicate-word dup set-word save-location ;
 
@@ -262,7 +272,7 @@ M: no-word-error summary
 
 : no-word ( name -- newword )
     dup no-word-error boa
-    swap words-named [ forward-reference? not ] subset
+    swap words-named [ forward-reference? not ] filter
     word-restarts throw-restarts
     dup word-vocabulary (use+) ;
 
@@ -270,7 +280,7 @@ M: no-word-error summary
     dup forward-reference? [
         drop
         use get
-        [ at ] with map [ ] subset
+        [ at ] with map sift
         [ forward-reference? not ] find nip
     ] [
         nip
@@ -337,6 +347,11 @@ M: invalid-slot-name summary
         [ >r tuple parse-tuple-slots r> prefix ]
     } case 3dup check-slot-shadowing ;
 
+ERROR: not-in-a-method-error ;
+
+M: not-in-a-method-error summary
+    drop "call-next-method can only be called in a method definition" ;
+
 ERROR: staging-violation word ;
 
 M: staging-violation summary
@@ -344,9 +359,7 @@ M: staging-violation summary
     "A parsing word cannot be used in the same file it is defined in." ;
 
 : execute-parsing ( word -- )
-    new-definitions get [
-        dupd first key? [ staging-violation ] when
-    ] when*
+    dup changed-definitions get key? [ staging-violation ] when
     execute ;
 
 : parse-step ( accum end -- accum ? )
@@ -354,7 +367,7 @@ M: staging-violation summary
         { [ 2dup eq? ] [ 2drop f ] }
         { [ dup not ] [ drop unexpected-eof t ] }
         { [ dup delimiter? ] [ unexpected t ] }
-        { [ dup parsing? ] [ nip execute-parsing t ] }
+        { [ dup parsing-word? ] [ nip execute-parsing t ] }
         [ pick push drop t ]
     } cond ;
 
@@ -381,15 +394,15 @@ SYMBOL: lexer-factory
     lexer-factory get call (parse-lines) ;
 
 ! Parsing word utilities
-: parse-effect ( -- effect )
-    ")" parse-tokens "(" over member? [
-        "Stack effect declaration must not contain (" throw
-    ] [
+: parse-effect ( end -- effect )
+    parse-tokens dup { "(" "((" } intersect empty? [
         { "--" } split1 dup [
             <effect>
         ] [
             "Stack effect declaration must contain --" throw
         ] if
+    ] [
+        "Stack effect declaration must not contain ( or ((" throw
     ] if ;
 
 ERROR: bad-number ;
@@ -403,22 +416,25 @@ ERROR: bad-number ;
 : parse-definition ( -- quot )
     \ ; parse-until >quotation ;
 
-: (:) CREATE-WORD parse-definition ;
+: (:) ( -- word def ) CREATE-WORD parse-definition ;
 
 SYMBOL: current-class
 SYMBOL: current-generic
 
-: (M:)
-    CREATE-METHOD
+: with-method-definition ( quot -- parsed )
     [
+        >r
         [ "method-class" word-prop current-class set ]
         [ "method-generic" word-prop current-generic set ]
         [ ] tri
-        parse-definition
-    ] with-scope ;
+        r> call
+    ] with-scope ; inline
+
+: (M:) ( method def -- )
+    CREATE-METHOD [ parse-definition ] with-method-definition ;
 
 : scan-object ( -- object )
-    scan-word dup parsing?
+    scan-word dup parsing-word?
     [ V{ } clone swap execute first ] when ;
 
 GENERIC: expected>string ( obj -- str )
@@ -440,8 +456,7 @@ SYMBOL: bootstrap-syntax
 
 : with-file-vocabs ( quot -- )
     [
-        "scratchpad" in set
-        { "syntax" "scratchpad" } set-use
+        f in set { "syntax" } set-use
         bootstrap-syntax get [ use get push ] when*
         call
     ] with-scope ; inline
@@ -506,10 +521,10 @@ SYMBOL: interactive-vocabs
     ] if ;
 
 : filter-moved ( assoc1 assoc2 -- seq )
-    assoc-diff [
+    swap assoc-diff [
         drop where dup [ first ] when
         file get source-file-path =
-    ] assoc-subset keys ;
+    ] assoc-filter keys ;
 
 : removed-definitions ( -- assoc1 assoc2 )
     new-definitions old-definitions
@@ -524,7 +539,7 @@ SYMBOL: interactive-vocabs
 
 : reset-removed-classes ( -- )
     removed-classes
-    filter-moved [ class? ] subset [ reset-class ] each ;
+    filter-moved [ class? ] filter [ reset-class ] each ;
 
 : fix-class-words ( -- )
     #! If a class word had a compound definition which was

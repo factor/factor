@@ -1,7 +1,7 @@
 USING: assocs math kernel shuffle combinators.lib
 words quotations arrays combinators sequences math.vectors
 io.styles prettyprint vocabs sorting io generic locals.private
-math.statistics ;
+math.statistics math.order ;
 IN: reports.noise
 
 : badness ( word -- n )
@@ -35,7 +35,7 @@ IN: reports.noise
         { compose 1/2 }
         { curry 1/3 }
         { dip 1 }
-        { dipd 2 }
+        { 2dip 2 }
         { drop 1/3 }
         { dup 1/3 }
         { if 1/3 }
@@ -85,7 +85,7 @@ IN: reports.noise
         { spread 2 }
     } at 0 or ;
 
-: vsum { 0 0 } [ v+ ] reduce ;
+: vsum ( pairs -- pair ) { 0 0 } [ v+ ] reduce ;
 
 GENERIC: noise ( obj -- pair )
 
@@ -105,7 +105,7 @@ M: quotation noise [ noise ] map vsum { 1/4 1/2 } v+ ;
 
 M: array noise [ noise ] map vsum ;
 
-: noise-factor / 100 * >integer ;
+: noise-factor ( x y -- z ) / 100 * >integer ;
 
 : quot-noise-factor ( quot -- n )
     #! For very short words, noise doesn't count so much

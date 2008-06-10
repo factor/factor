@@ -29,6 +29,6 @@ M: callable dataflow-with
 
 : forget-errors ( -- )
     all-words [
-        dup subwords [ f "no-effect" set-word-prop ] each
-        f "no-effect" set-word-prop
+        dup subwords [ f "cannot-infer" set-word-prop ] each
+        f "cannot-infer" set-word-prop
     ] each ;

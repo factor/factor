@@ -4,11 +4,11 @@ USING: math kernel sequences sbufs vectors namespaces io.binary
 io.encodings combinators splitting io byte-arrays inspector ;
 IN: io.encodings.utf16
 
-TUPLE: utf16be ;
+SINGLETON: utf16be
 
-TUPLE: utf16le ;
+SINGLETON: utf16le
 
-TUPLE: utf16 ;
+SINGLETON: utf16
 
 <PRIVATE
 

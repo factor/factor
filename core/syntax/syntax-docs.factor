@@ -190,7 +190,7 @@ HELP: delimiter
 HELP: parsing
 { $syntax ": foo ... ; parsing" }
 { $description "Declares the most recently defined word as a parsing word." }
-{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example "USE: io" "<< : hello \"Hello parser!\" print ; parsing >>\n: world hello ;" "Hello parser!" } } ;
+{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example "USE: io" "IN: scratchpad" "<< : hello \"Hello parser!\" print ; parsing >>\n: world hello ;" "Hello parser!" } } ;
 
 HELP: inline
 { $syntax ": foo ... ; inline" }
@@ -319,9 +319,9 @@ HELP: POSTPONE:
 { $notes "This word is used inside parsing words to delegate further action to another parsing word, and to refer to parsing words literally from literal arrays and such." } ;
 
 HELP: :
-{ $syntax ": word definition... ;" }
+{ $syntax ": word ( stack -- effect ) definition... ;" }
 { $values { "word" "a new word to define" } { "definition" "a word definition" } }
-{ $description "Defines a word in the current vocabulary." }
+{ $description "Defines a word with the given stack effect in the current vocabulary. The stack effect is optional for words which only push literals on the stack." }
 { $examples { $code ": ask-name ( -- name )\n    \"What is your name? \" write readln ;\n: greet ( name -- )\n    \"Greetings, \" write print ;\n: friend ( -- )\n    ask-name greet ;" } } ;
 
 { POSTPONE: : POSTPONE: ; define } related-words
@@ -338,7 +338,7 @@ HELP: SYMBOL:
 { $syntax "SYMBOL: word" }
 { $values { "word" "a new word to define" } }
 { $description "Defines a new symbol word in the current vocabulary. Symbols push themselves on the stack when executed, and are used to identify variables (see " { $link "namespaces" } ") as well as for storing crufties in word properties (see " { $link "word-props" } ")." }
-{ $examples { $example "USE: prettyprint" "SYMBOL: foo\nfoo ." "foo" } } ;
+{ $examples { $example "USE: prettyprint" "IN: scratchpad" "SYMBOL: foo\nfoo ." "foo" } } ;
 
 { define-symbol POSTPONE: SYMBOL: } related-words
 
@@ -346,7 +346,7 @@ HELP: \
 { $syntax "\\ word" }
 { $values { "word" "a word" } }
 { $description "Reads the next word from the input and appends a wrapper holding the word to the parse tree. When the evaluator encounters a wrapper, it pushes the wrapped word literally on the data stack." }
-{ $examples "The following two lines are equivalent:" { $code "0 \\ <vector> execute\n0 <vector>" } } ;
+{ $examples "The following two lines are equivalent:" { $code "0 \\ <vector> execute\n0 <vector>" } "If " { $snippet "foo" } " is a symbol, the following two lines are equivalent:" { $code "foo" "\\ foo" } } ;
 
 HELP: DEFER:
 { $syntax "DEFER: word" }
@@ -413,7 +413,21 @@ HELP: (
 { $syntax "( inputs -- outputs )" }
 { $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
 { $description "Declares the stack effect of the most recently defined word, storing a new " { $link effect } " instance in the " { $snippet "\"declared-effect\"" } " word property." }
-{ $notes "Recursive words must have a declared stack effect to compile. See " { $link "effect-declaration" } " for details." } ;
+{ $notes "All words except those only pushing literals on the stack must have a stack effect declaration. See " { $link "effect-declaration" } " for details." } ;
+
+HELP: ((
+{ $syntax "(( inputs -- outputs ))" }
+{ $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
+{ $description "Literal stack effect syntax." }
+{ $notes "Useful for meta-programming with " { $link define-declared } "." }
+{ $examples
+    { $code
+        "SYMBOL: my-dynamic-word"
+        "USING: math random words ;"
+        "3 { [ + ] [ - ] [ * ] [ / ] } random curry"
+        "(( x -- y )) define-declared"
+    }
+} ;
 
 HELP: !
 { $syntax "! comment..." }
@@ -472,6 +486,7 @@ HELP: HOOK:
 { $examples
     { $example
         "USING: io namespaces ;"
+        "IN: scratchpad"
         "SYMBOL: transport"
         "TUPLE: land-transport ;"
         "TUPLE: air-transport ;"
@@ -495,14 +510,17 @@ HELP: M:
 HELP: UNION:
 { $syntax "UNION: class members... ;" }
 { $values { "class" "a new class word to define" } { "members" "a list of class words separated by whitespace" } }
-{ $description "Defines a union class. An object is an instance of a union class if it is an instance of one of its members." }
-{ $notes "Union classes are used to associate the same method with several different classes, as well as to conveniently define predicates." } ;
+{ $description "Defines a union class. An object is an instance of a union class if it is an instance of one of its members." } ;
+
+HELP: INTERSECTION:
+{ $syntax "INTERSECTION: class participants... ;" }
+{ $values { "class" "a new class word to define" } { "participants" "a list of class words separated by whitespace" } }
+{ $description "Defines an intersection class. An object is an instance of a union class if it is an instance of all of its participants." } ;
 
 HELP: MIXIN:
 { $syntax "MIXIN: class" }
 { $values { "class" "a new class word to define" } }
 { $description "Defines a mixin class. A mixin is similar to a union class, except it has no members initially, and new members can be added with the " { $link POSTPONE: INSTANCE: } " word." }
-{ $notes "Mixins classes are used to mark implementations of a protocol and define default methods." }
 { $examples "The " { $link sequence } " and " { $link assoc } " mixin classes." } ;
 
 HELP: INSTANCE:
@@ -522,6 +540,9 @@ HELP: PREDICATE:
         "it satisfies the predicate"
     }
     "Each predicate must be defined as a subclass of some other class. This ensures that predicates inheriting from disjoint classes do not need to be exhaustively tested during method dispatch."
+}
+{ $examples
+    { $code "USING: math ;" "PREDICATE: positive < integer 0 > ;" }
 } ;
 
 HELP: TUPLE:

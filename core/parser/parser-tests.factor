@@ -3,6 +3,7 @@ io.streams.string namespaces classes effects source-files
 assocs sequences strings io.files definitions continuations
 sorting classes.tuple compiler.units debugger vocabs
 vocabs.loader accessors ;
+
 IN: parser.tests
 
 [
@@ -429,3 +430,60 @@ must-fail-with
 [
     "USE: this-better-not-exist" eval
 ] must-fail
+
+[ ": foo ;" eval ] [ error>> no-current-vocab? ] must-fail-with
+
+[ 92 ] [ "CHAR: \\" eval ] unit-test
+[ 92 ] [ "CHAR: \\\\" eval ] unit-test
+
+[ ] [
+    {
+        "IN: parser.tests"
+        "USING: math arrays ;"
+        "GENERIC: change-combination"
+        "M: integer change-combination 1 ;"
+        "M: array change-combination 2 ;"
+    } "\n" join <string-reader> "change-combination-test" parse-stream drop
+] unit-test
+
+[ ] [
+    {
+        "IN: parser.tests"
+        "USING: math arrays ;"
+        "GENERIC# change-combination 1"
+        "M: integer change-combination 1 ;"
+        "M: array change-combination 2 ;"
+    } "\n" join <string-reader> "change-combination-test" parse-stream drop
+] unit-test
+
+[ 2 ] [
+    "change-combination" "parser.tests" lookup
+    "methods" word-prop assoc-size
+] unit-test
+
+[ ] [
+    2 [
+        "IN: parser.tests DEFER: twice-fails FORGET: twice-fails MIXIN: twice-fails"
+        <string-reader> "twice-fails-test" parse-stream drop
+    ] times
+] unit-test
+
+[ [ ] ] [
+    "IN: parser.tests : staging-problem-test-1 1 ; : staging-problem-test-2 staging-problem-test-1 ;"
+    <string-reader> "staging-problem-test" parse-stream
+] unit-test
+
+[ t ] [ "staging-problem-test-1" "parser.tests" lookup >boolean ] unit-test
+
+[ t ] [ "staging-problem-test-2" "parser.tests" lookup >boolean ] unit-test
+
+[ [ ] ] [
+    "IN: parser.tests << : staging-problem-test-1 1 ; >> : staging-problem-test-2 staging-problem-test-1 ;"
+    <string-reader> "staging-problem-test" parse-stream
+] unit-test
+
+[ t ] [ "staging-problem-test-1" "parser.tests" lookup >boolean ] unit-test
+
+[ t ] [ "staging-problem-test-2" "parser.tests" lookup >boolean ] unit-test
+
+[ "DEFER: blah" eval ] [ error>> no-current-vocab? ] must-fail-with

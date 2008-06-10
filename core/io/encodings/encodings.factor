@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors namespaces growable
-strings io classes continuations combinators io.styles
-io.streams.plain splitting io.streams.duplex byte-arrays
+strings io classes continuations destructors combinators
+io.styles io.streams.plain splitting byte-arrays
 sequences.private accessors ;
 IN: io.encodings
 
@@ -30,8 +30,7 @@ ERROR: encode-error ;
 
 <PRIVATE
 
-M: tuple-class <decoder> new <decoder> ;
-M: tuple <decoder> f decoder boa ;
+M: object <decoder> f decoder boa ;
 
 : >decoder< ( decoder -- stream encoding )
     [ stream>> ] [ code>> ] bi ;
@@ -104,8 +103,7 @@ M: decoder stream-readln ( stream -- str )
 M: decoder dispose decoder-stream dispose ;
 
 ! Encoding
-M: tuple-class <encoder> new <encoder> ;
-M: tuple <encoder> encoder boa ;
+M: object <encoder> encoder boa ;
 
 : >encoder< ( encoder -- stream encoding )
     [ stream>> ] [ code>> ] bi ;
@@ -121,16 +119,16 @@ M: encoder dispose encoder-stream dispose ;
 M: encoder stream-flush encoder-stream stream-flush ;
 
 INSTANCE: encoder plain-writer
-
-! Rebinding duplex streams which have not read anything yet
-
-: reencode ( stream encoding -- newstream )
-    over encoder? [ >r encoder-stream r> ] when <encoder> ;
-
-: redecode ( stream encoding -- newstream )
-    over decoder? [ >r decoder-stream r> ] when <decoder> ;
-
 PRIVATE>
 
-: <encoder-duplex> ( stream-in stream-out encoding -- duplex )
-    tuck reencode >r redecode r> <duplex-stream> ;
+: re-encode ( stream encoding -- newstream )
+    over encoder? [ >r encoder-stream r> ] when <encoder> ;
+
+: encode-output ( encoding -- )
+    output-stream [ swap re-encode ] change ;
+
+: re-decode ( stream encoding -- newstream )
+    over decoder? [ >r decoder-stream r> ] when <decoder> ;
+
+: decode-input ( encoding -- )
+    input-stream [ swap re-decode ] change ;

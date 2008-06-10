@@ -2,7 +2,7 @@ USING: kernel.private kernel sequences math combinators
 sequences.private ;
 IN: benchmark.dispatch4
 
-: foobar-1
+: foobar-1 ( n -- val )
     dup {
         [ 0 eq? [ 0 ] [ "x" ] if ]
         [ 1 eq? [ 1 ] [ "x" ] if ]
@@ -26,7 +26,7 @@ IN: benchmark.dispatch4
         [ 19 eq? [ 19 ] [ "x" ] if ]
     } dispatch ;
 
-: foobar-2
+: foobar-2 ( n -- val )
     {
         { [ dup 0 eq? ] [ drop 0 ] }
         { [ dup 1 eq? ] [ drop 1 ] }
@@ -50,14 +50,14 @@ IN: benchmark.dispatch4
         { [ dup 19 eq? ] [ drop 19 ] }
     } cond ;
 
-: foobar-test-1
+: foobar-test-1 ( -- )
     20000000 [
         20 [
             foobar-1 drop
         ] each
     ] times ;
 
-: foobar-test-2
+: foobar-test-2 ( -- )
     20000000 [
         20 [
             foobar-2 drop

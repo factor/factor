@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words kernel sequences namespaces assocs hashtables
 definitions kernel.private classes classes.private
-classes.algebra quotations arrays vocabs effects ;
+classes.algebra quotations arrays vocabs effects combinators ;
 IN: generic
 
 ! Method combination protocol
@@ -35,7 +35,7 @@ PREDICATE: method-spec < pair
 GENERIC: effective-method ( ... generic -- method )
 
 : next-method-class ( class generic -- class/f )
-    order [ class< ] with subset reverse dup length 1 =
+    order [ class<= ] with filter reverse dup length 1 =
     [ drop f ] [ second ] if ;
 
 : next-method ( class generic -- class/f )
@@ -56,8 +56,19 @@ TUPLE: check-method class generic ;
         \ check-method boa throw
     ] unless ; inline
 
-: with-methods ( generic quot -- )
-    swap [ "methods" word-prop swap call ] keep make-generic ;
+: affected-methods ( class generic -- seq )
+    "methods" word-prop swap
+    [ nip classes-intersect? ] curry assoc-filter
+    values ;
+
+: update-generic ( class generic -- )
+    [ affected-methods [ +called+ changed-definition ] each ]
+    [ make-generic ]
+    bi ;
+
+: with-methods ( class generic quot -- )
+    [ [ "methods" word-prop ] dip call ]
+    [ drop update-generic ] 3bi ;
     inline
 
 : method-word-name ( class word -- string )
@@ -117,42 +128,57 @@ M: method-spec definition
 M: method-spec forget*
     first2 method forget* ;
 
+M: method-spec smart-usage
+    second smart-usage ;
+
 M: method-body definer
     drop \ M: \ ; ;
 
 M: method-body forget*
     dup "forgotten" word-prop [ drop ] [
         [
-            [   "method-class" word-prop ]
-            [ "method-generic" word-prop ] bi
-            dup generic? [
-                [ delete-at* ] with-methods
-                [ call-next-method ] [ drop ] if
-            ] [ 2drop ] if
+            [ ]
+            [ "method-class" word-prop ]
+            [ "method-generic" word-prop ] tri
+            3dup method eq? [
+                [ delete-at ] with-methods
+                call-next-method
+            ] [ 3drop ] if
         ]
         [ t "forgotten" set-word-prop ] bi
     ] if ;
 
-: implementors* ( classes -- words )
-    all-words [
-        "methods" word-prop keys
-        swap [ key? ] curry contains?
-    ] with subset ;
+M: method-body smart-usage
+    "method-generic" word-prop smart-usage ;
 
-: implementors ( class -- seq )
-    dup associate implementors* ;
+GENERIC: implementors ( class/classes -- seq )
+
+M: class implementors
+    all-words [ "methods" word-prop key? ] with filter ;
+
+M: assoc implementors
+    all-words [
+         "methods" word-prop keys
+        swap [ key? ] curry contains?
+    ] with filter ;
 
 : forget-methods ( class -- )
     [ implementors ] [ [ swap 2array ] curry ] bi map forget-all ;
 
 M: class forget* ( class -- )
-    [ forget-methods ]
-    [ update-map- ]
-    [ call-next-method ]
-    tri ;
+    [
+        class-usages [
+            drop
+            [ forget-methods ]
+            [ update-map- ]
+            [ reset-class ]
+            tri
+        ] assoc-each
+    ]
+    [ call-next-method ] bi ;
 
-M: assoc update-methods ( assoc -- )
-    implementors* [ make-generic ] each ;
+M: assoc update-methods ( class assoc -- )
+    implementors [ update-generic ] with each ;
 
 : define-generic ( word combination -- )
     over "combination" word-prop over = [

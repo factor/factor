@@ -2,7 +2,7 @@
 
 USING: alien alien.c-types alien.strings alien.syntax arrays
 byte-arrays kernel math sequences windows.types windows.kernel32
-windows.errors structs windows math.bitfields ;
+windows.errors structs windows math.bitfields alias ;
 IN: windows.winsock
 
 USE: libc
@@ -74,7 +74,7 @@ TYPEDEF: void* SOCKET
 : AI_PASSIVE     1 ; inline
 : AI_CANONNAME   2 ; inline
 : AI_NUMERICHOST 4 ; inline
-: AI_MASK { AI_PASSIVE AI_CANONNAME AI_NUMERICHOST } flags ;
+: AI_MASK ( -- n ) { AI_PASSIVE AI_CANONNAME AI_NUMERICHOST } flags ;
 
 : NI_NUMERICHOST 1 ;
 : NI_NUMERICSERV 2 ;
@@ -138,7 +138,7 @@ C-STRUCT: addrinfo
     { "sockaddr*" "addr" }
     { "addrinfo*" "next" } ;
 
-: hostent-addr hostent-addr-list *void* ; ! *uint ;
+: hostent-addr ( hostent -- addr ) hostent-addr-list *void* ; ! *uint ;
 
 LIBRARY: winsock
 
@@ -166,6 +166,9 @@ FUNCTION: int closesocket ( SOCKET s ) ;
 FUNCTION: int shutdown ( SOCKET s, int how ) ;
 FUNCTION: int send ( SOCKET s, char* buf, int len, int flags ) ;
 FUNCTION: int recv ( SOCKET s, char* buf, int len, int flags ) ;
+
+FUNCTION: int getsockname ( SOCKET s, sockaddr_in* address, int* addrlen ) ;
+FUNCTION: int getpeername ( SOCKET s, sockaddr_in* address, int* addrlen ) ;
 
 TYPEDEF: uint SERVICETYPE
 TYPEDEF: OVERLAPPED WSAOVERLAPPED
@@ -362,7 +365,7 @@ FUNCTION: SOCKET WSASocketW ( int af,
                              LPWSAPROTOCOL_INFOW lpProtocolInfo,
                              GROUP g,
                              DWORD flags ) ;
-: WSASocket WSASocketW ;
+ALIAS: WSASocket WSASocketW
 
 FUNCTION: DWORD WSAWaitForMultipleEvents ( DWORD cEvents,
                                            WSAEVENT* lphEvents,
@@ -381,7 +384,7 @@ FUNCTION: void GetAcceptExSockaddrs ( void* a, int b, int c, int d, void* e, voi
 
 : SIO_GET_EXTENSION_FUNCTION_POINTER -939524090 ; inline
 
-: WSAID_CONNECTEX
+: WSAID_CONNECTEX ( -- GUID )
     "GUID" <c-object>
     HEX: 25a207b9 over set-GUID-Data1
     HEX: ddf3 over set-GUID-Data2

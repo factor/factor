@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.unix.bsd io.backend io.monitors core-foundation.fsevents
 continuations kernel sequences namespaces arrays system locals
-accessors ;
+accessors destructors ;
 IN: io.unix.macosx
 
 TUPLE: macosx-monitor < monitor handle ;
@@ -13,9 +13,11 @@ TUPLE: macosx-monitor < monitor handle ;
     ] curry each ;
 
 M:: macosx (monitor) ( path recursive? mailbox -- monitor )
-    path mailbox macosx-monitor new-monitor
-    dup [ enqueue-notifications ] curry
-    path 1array 0 0 <event-stream> >>handle ;
+    [let | path [ path normalize-path ] |
+        path mailbox macosx-monitor new-monitor
+        dup [ enqueue-notifications ] curry
+        path 1array 0 0 <event-stream> >>handle
+    ] ;
 
 M: macosx-monitor dispose
     handle>> dispose ;

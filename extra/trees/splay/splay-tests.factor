@@ -1,14 +1,14 @@
 ! Copyright (c) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel tools.test trees.splay math namespaces assocs
-sequences random ;
+sequences random sets ;
 IN: trees.splay.tests
 
 : randomize-numeric-splay-tree ( splay-tree -- )
     100 [ drop 100 random swap at drop ] with each ;
 
 : make-numeric-splay-tree ( n -- splay-tree )
-    <splay> [ [ dupd set-at ] curry each ] keep ;
+    <splay> [ [ conjoin ] curry each ] keep ;
 
 [ t ] [
     100 make-numeric-splay-tree dup randomize-numeric-splay-tree

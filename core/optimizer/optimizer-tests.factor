@@ -101,7 +101,7 @@ TUPLE: pred-test ;
 
 ! regression
 GENERIC: void-generic ( obj -- * )
-: breakage "hi" void-generic ;
+: breakage ( -- * ) "hi" void-generic ;
 [ t ] [ \ breakage compiled? ] unit-test
 [ breakage ] must-fail
 
@@ -116,12 +116,12 @@ GENERIC: void-generic ( obj -- * )
 
 ! another regression
 : constant-branch-fold-0 "hey" ; foldable
-: constant-branch-fold-1 constant-branch-fold-0 "hey" = ; inline
+: constant-branch-fold-1 ( -- ? ) constant-branch-fold-0 "hey" = ; inline
 [ 1 ] [ [ constant-branch-fold-1 [ 1 ] [ 2 ] if ] compile-call ] unit-test
 
 ! another regression
 : foo f ;
-: bar foo 4 4 = and ;
+: bar ( -- ? ) foo 4 4 = and ;
 [ f ] [ bar ] unit-test
 
 ! ensure identities are working in some form
@@ -131,7 +131,7 @@ GENERIC: void-generic ( obj -- * )
 ] unit-test
 
 ! compiling <tuple> with a non-literal class failed
-: <tuple>-regression <tuple> ;
+: <tuple>-regression ( class -- tuple ) <tuple> ;
 
 [ t ] [ \ <tuple>-regression compiled? ] unit-test
 
@@ -254,7 +254,7 @@ TUPLE: silly-tuple a b ;
 [ ] [ [ <tuple> ] dataflow optimize drop ] unit-test
 
 ! Make sure we have sane heuristics
-: should-inline? method flat-length 10 <= ;
+: should-inline? ( generic class -- ? ) method flat-length 10 <= ;
 
 [ t ] [ \ fixnum \ shift should-inline? ] unit-test
 [ f ] [ \ array \ equal? should-inline? ] unit-test
@@ -264,7 +264,7 @@ TUPLE: silly-tuple a b ;
 [ t ] [ \ sbuf \ set-nth-unsafe should-inline? ] unit-test
 
 ! Regression
-: lift-throw-tail-regression
+: lift-throw-tail-regression ( obj -- obj str )
     dup integer? [ "an integer" ] [
         dup string? [ "a string" ] [
             "error" throw
@@ -294,7 +294,7 @@ TUPLE: silly-tuple a b ;
 GENERIC: generic-inline-test ( x -- y )
 M: integer generic-inline-test ;
 
-: generic-inline-test-1
+: generic-inline-test-1 ( -- x )
     1
     generic-inline-test
     generic-inline-test
@@ -319,7 +319,7 @@ M: integer generic-inline-test ;
 
 HINTS: recursive-inline-hang array ;
 
-: recursive-inline-hang-1
+: recursive-inline-hang-1 ( -- a )
     { } recursive-inline-hang ;
 
 [ t ] [ \ recursive-inline-hang-1 compiled? ] unit-test
@@ -350,7 +350,7 @@ USE: sequences.private
 
 [ 2 4 6.0 0 ] [ counter-example' ] unit-test
 
-: member-test { + - * / /i } member? ;
+: member-test ( obj -- ? ) { + - * / /i } member? ;
 
 \ member-test must-infer
 [ ] [ \ member-test word-dataflow optimize 2drop ] unit-test

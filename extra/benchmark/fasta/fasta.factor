@@ -81,7 +81,7 @@ HINTS: random fixnum ;
     write-description
     [let | k! [ 0 ] alu [ ] |
         [| len | k len alu make-repeat-fasta k! ] split-lines
-    ] with-locals ; inline
+    ] ; inline
 
 : fasta ( n out -- )
     homo-sapiens make-cumulative
@@ -103,8 +103,8 @@ HINTS: random fixnum ;
             drop
         ] with-file-writer
 
-    ] with-locals ;
+    ] ;
 
-: run-fasta 2500000 reverse-complement-in fasta ;
+: run-fasta ( -- ) 2500000 reverse-complement-in fasta ;
 
 MAIN: run-fasta

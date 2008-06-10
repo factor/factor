@@ -22,13 +22,13 @@ SYMBOL: bootstrap-time
     xref-sources ;
 
 : load-components ( -- )
-    "exclude" "include"
-    [ get-global " " split [ empty? not ] subset ] bi@
+    "include" "exclude"
+    [ get-global " " split harvest ] bi@
     diff
     [ "bootstrap." prepend require ] each ;
 
 : count-words ( pred -- )
-    all-words swap subset length number>string write ;
+    all-words swap filter length number>string write ;
 
 : print-report ( time -- )
     1000 /i
@@ -43,10 +43,6 @@ SYMBOL: bootstrap-time
     "Bootstrapping is complete." print
     "Now, you can run Factor:" print
     vm write " -i=" write "output-image" get print flush ;
-
-! Wrap everything in a catch which starts a listener so
-! you can see what went wrong, instead of dealing with a
-! fep
 
 ! We time bootstrap
 millis >r
@@ -91,7 +87,7 @@ f error-continuation set-global
             parse-command-line
             run-user-init
             "run" get run
-            stdio get [ stream-flush ] when*
+            output-stream get [ stream-flush ] when*
         ] [ print-error 1 exit ] recover
     ] set-boot-quot
 

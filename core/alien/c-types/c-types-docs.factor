@@ -1,7 +1,7 @@
 IN: alien.c-types
 USING: alien help.syntax help.markup libc kernel.private
 byte-arrays math strings hashtables alien.syntax
-bit-arrays float-arrays debugger ;
+bit-arrays float-arrays debugger destructors ;
 
 HELP: <c-type>
 { $values { "type" hashtable } }
@@ -222,6 +222,9 @@ $nl
 { $subsection realloc }
 "You must always free pointers returned by any of the above words when the block of memory is no longer in use:"
 { $subsection free }
+"Utilities for automatically freeing memory in conjunction with " { $link with-destructors } ":"
+{ $subsection &free }
+{ $subsection |free }
 "You can unsafely copy a range of bytes from one memory location to another:"
 { $subsection memcpy }
 "You can copy a range of bytes from memory into a byte array:"

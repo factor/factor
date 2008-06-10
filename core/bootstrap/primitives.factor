@@ -5,8 +5,9 @@ hashtables.private io kernel math namespaces parser sequences
 strings vectors words quotations assocs layouts classes
 classes.builtin classes.tuple classes.tuple.private
 kernel.private vocabs vocabs.loader source-files definitions
-slots.deprecated classes.union compiler.units
-bootstrap.image.private io.files accessors combinators ;
+slots.deprecated classes.union classes.intersection
+compiler.units bootstrap.image.private io.files accessors
+combinators ;
 IN: bootstrap.primitives
 
 "Creating primitives and basic runtime structures..." print flush
@@ -30,6 +31,7 @@ crossref off
 ! Bring up a bare cross-compiling vocabulary.
 "syntax" vocab vocab-words bootstrap-syntax set
 H{ } clone dictionary set
+H{ } clone new-classes set
 H{ } clone changed-definitions set
 H{ } clone forgotten-definitions set
 H{ } clone root-cache set
@@ -51,6 +53,8 @@ call
 ! After we execute bootstrap/layouts
 num-types get f <array> builtins set
 
+bootstrapping? on
+
 ! Create some empty vocabs where the below primitives and
 ! classes will go
 {
@@ -59,6 +63,7 @@ num-types get f <array> builtins set
     "arrays"
     "bit-arrays"
     "byte-arrays"
+    "byte-vectors"
     "classes.private"
     "classes.tuple"
     "classes.tuple.private"
@@ -124,7 +129,7 @@ num-types get f <array> builtins set
 : register-builtin ( class -- )
     [ dup lookup-type-number "type" set-word-prop ]
     [ dup "type" word-prop builtins get set-nth ]
-    [ f f builtin-class define-class ]
+    [ f f f builtin-class define-class ]
     tri ;
 
 : define-builtin-slots ( symbol slotspec -- )
@@ -157,7 +162,7 @@ num-types get f <array> builtins set
 
 ! Catch-all class for providing a default method.
 "object" "kernel" create
-[ f builtins get [ ] subset union-class define-class ]
+[ f f { } intersection-class define-class ]
 [ [ drop t ] "predicate" set-word-prop ]
 bi
 
@@ -169,7 +174,7 @@ builtins get num-tags get tail define-union-class
 
 ! Empty class with no instances
 "null" "kernel" create
-[ f { } union-class define-class ]
+[ f { } f union-class define-class ]
 [ [ drop f ] "predicate" set-word-prop ]
 bi
 
@@ -452,6 +457,22 @@ tuple
     }
 } define-tuple-class
 
+"byte-vector" "byte-vectors" create
+tuple
+{
+    {
+        { "byte-array" "byte-arrays" }
+        "underlying"
+        { "underlying" "growable" }
+        { "set-underlying" "growable" }
+    } {
+        { "array-capacity" "sequences.private" }
+        "fill"
+        { "length" "sequences" }
+        { "set-fill" "growable" }
+    }
+} define-tuple-class
+
 "curry" "kernel" create
 tuple
 {
@@ -590,7 +611,7 @@ tuple
     { "(exists?)" "io.files.private" }
     { "(directory)" "io.files.private" }
     { "gc" "memory" }
-    { "gc-time" "memory" }
+    { "gc-stats" "memory" }
     { "save-image" "memory" }
     { "save-image-and-exit" "memory" }
     { "datastack" "kernel" }
@@ -685,6 +706,7 @@ tuple
     { "resize-float-array" "float-arrays" }
     { "dll-valid?" "alien" }
     { "unimplemented" "kernel.private" }
+    { "gc-reset" "memory" }
 }
 dup length [ >r first2 r> make-primitive ] 2each
 

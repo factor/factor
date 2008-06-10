@@ -17,7 +17,7 @@ GENERIC: send ( message thread -- )
 M: thread send ( message thread -- )
     check-registered mailbox-of mailbox-put ;
 
-: my-mailbox self mailbox-of ;
+: my-mailbox ( -- mailbox ) self mailbox-of ;
 
 : receive ( -- message )
     my-mailbox mailbox-get ?linked ;

@@ -82,6 +82,7 @@
     ("^!.*$" . font-lock-comment-face)
     (" !.*$" . font-lock-comment-face)
     ("( .* )" . font-lock-comment-face)
+    "BIN:"
     "MAIN:"
     "IN:" "USING:" "TUPLE:" "^C:" "^M:"
     "METHOD:"
@@ -89,7 +90,13 @@
     "REQUIRES:"
     "GENERIC:" "GENERIC#" "SYMBOL:" "PREDICATE:" "VAR:" "VARS:"
     "C-STRUCT:"
-    "C-UNION:" "<PRIVATE" "PRIVATE>" "MACRO:" "MACRO::" "DEFER:" "TYPEDEF:"))
+    "C-UNION:" "<PRIVATE" "PRIVATE>" "MACRO:" "MACRO::" "DEFER:" "TYPEDEF:"
+    "SYMBOLS:"
+))
+
+(defun factor-indent-line ()
+  "Indent current line as Factor code"
+  (indent-line-to (+ (current-indentation) 4)))
 
 (defun factor-mode ()
   "A mode for editing programs written in the Factor programming language."
@@ -104,6 +111,8 @@
   (setq font-lock-defaults
 	'(factor-font-lock-keywords nil nil nil nil))
   (set-syntax-table factor-mode-syntax-table)
+  (make-local-variable 'indent-line-function)
+  (setq indent-line-function 'factor-indent-line)
   (run-hooks 'factor-mode-hook))
 
 (add-to-list 'auto-mode-alist '("\\.factor\\'" . factor-mode))

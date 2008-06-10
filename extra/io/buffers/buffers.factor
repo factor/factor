@@ -1,10 +1,10 @@
 ! Copyright (C) 2004, 2005 Mackenzie Straight.
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: io.buffers
 USING: alien alien.accessors alien.c-types alien.syntax kernel
 kernel.private libc math sequences byte-arrays strings hints
-accessors ;
+accessors math.order ;
+IN: io.buffers
 
 TUPLE: buffer size ptr fill pos ;
 

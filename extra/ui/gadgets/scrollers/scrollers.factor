@@ -11,13 +11,13 @@ TUPLE: scroller viewport x y follows ;
 : find-scroller ( gadget -- scroller/f )
     [ [ scroller? ] is? ] find-parent ;
 
-: scroll-up-page scroller-y -1 swap slide-by-page ;
+: scroll-up-page ( scroller -- ) y>> -1 swap slide-by-page ;
 
-: scroll-down-page scroller-y 1 swap slide-by-page ;
+: scroll-down-page ( scroller -- ) y>> 1 swap slide-by-page ;
 
-: scroll-up-line scroller-y -1 swap slide-by-line ;
+: scroll-up-line ( scroller -- ) y>> -1 swap slide-by-line ;
 
-: scroll-down-line scroller-y 1 swap slide-by-line ;
+: scroll-down-line ( scroller -- ) y>> 1 swap slide-by-line ;
 
 : do-mouse-scroll ( scroller -- )
     scroll-direction get-global first2
@@ -35,9 +35,9 @@ scroller H{
 : <scroller-model> ( -- model )
     0 0 0 0 <range> 0 0 0 0 <range> 2array <compose> ;
 
-: x-model g gadget-model model-dependencies first ;
+: x-model ( -- model ) g gadget-model model-dependencies first ;
 
-: y-model g gadget-model model-dependencies second ;
+: y-model ( -- model ) g gadget-model model-dependencies second ;
 
 : <scroller> ( gadget -- scroller )
     <scroller-model> <frame> scroller construct-control [

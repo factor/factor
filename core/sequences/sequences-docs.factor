@@ -1,5 +1,5 @@
-USING: arrays bit-arrays help.markup help.syntax
-sequences.private vectors strings sbufs kernel math ;
+USING: arrays bit-arrays help.markup help.syntax math
+sequences.private vectors strings sbufs kernel math.order ;
 IN: sequences
 
 ARTICLE: "sequences-unsafe" "Unsafe sequence operations"
@@ -94,6 +94,9 @@ ARTICLE: "sequences-slices" "Subsequences and slices"
 { $subsection tail }
 { $subsection head* }
 { $subsection tail* }
+"Removing the first or last element:"
+{ $subsection rest }
+{ $subsection but-last }
 "Taking a sequence apart into a head and a tail:"
 { $subsection unclip }
 { $subsection cut }
@@ -105,6 +108,8 @@ ARTICLE: "sequences-slices" "Subsequences and slices"
 { $subsection <slice> }
 { $subsection head-slice }
 { $subsection tail-slice }
+{ $subsection but-last-slice }
+{ $subsection rest-slice }
 { $subsection head-slice* }
 { $subsection tail-slice* }
 "Taking a sequence apart into a head and a tail:"
@@ -127,7 +132,7 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
 { $subsection unfold }
 "Filtering:"
 { $subsection push-if }
-{ $subsection subset } ;
+{ $subsection filter } ;
 
 ARTICLE: "sequences-tests" "Testing sequences"
 "Testing for an empty sequence:"
@@ -153,17 +158,17 @@ ARTICLE: "sequences-tests" "Testing sequences"
 ARTICLE: "sequences-search" "Searching sequences"
 "Finding the index of an element:"
 { $subsection index }
-{ $subsection index* }
+{ $subsection index-from }
 { $subsection last-index }
-{ $subsection last-index* }
+{ $subsection last-index-from }
 "Finding the start of a subsequence:"
 { $subsection start }
 { $subsection start* }
 "Finding the index of an element satisfying a predicate:"
 { $subsection find }
-{ $subsection find* }
+{ $subsection find-from }
 { $subsection find-last }
-{ $subsection find-last* } ;
+{ $subsection find-last-from } ;
 
 ARTICLE: "sequences-destructive" "Destructive operations"
 "These words modify their input, instead of creating a new sequence."
@@ -186,7 +191,6 @@ $nl
 "Other destructive words:"
 { $subsection move }
 { $subsection exchange }
-{ $subsection push-new }
 { $subsection copy }
 { $subsection replace-slice }
 { $see-also set-nth push pop "sequences-stacks" } ;
@@ -227,6 +231,7 @@ $nl
 { $subsection "sequences-search" }
 { $subsection "sequences-comparing" }
 { $subsection "sequences-split" }
+{ $subsection "grouping" }
 { $subsection "sequences-destructive" }
 { $subsection "sequences-stacks" }
 { $subsection "sequences-sorting" }
@@ -500,9 +505,9 @@ HELP: find
                    { $snippet "( elt -- ? )" } }
           { "i" "the index of the first match, or f" }
           { "elt" "the first matching element, or " { $link f } } }
-{ $description "A simpler variant of " { $link find* } " where the starting index is 0." } ;
+{ $description "A simpler variant of " { $link find-from } " where the starting index is 0." } ;
 
-HELP: find*
+HELP: find-from
 { $values { "n" "a starting index" }
           { "seq" sequence }
           { "quot" "a quotation with stack effect "
@@ -513,9 +518,9 @@ HELP: find*
 
 HELP: find-last
 { $values { "seq" sequence } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "i" "the index of the first match, or f" } { "elt" "the first matching element, or " { $link f } } }
-{ $description "A simpler variant of " { $link find-last* } " where the starting index is one less than the length of the sequence." } ;
+{ $description "A simpler variant of " { $link find-last-from } " where the starting index is one less than the length of the sequence." } ;
 
-HELP: find-last*
+HELP: find-last-from
 { $values { "n" "a starting index" } { "seq" sequence } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "i" "the index of the first match, or f" } { "elt" "the first matching element, or " { $link f } } }
 { $description "Applies the quotation to each element of the sequence in reverse order, until it outputs a true value or the start of the sequence is reached. If the quotation yields a true value for some sequence element, the word outputs the element index and the element itself. Otherwise, the word outputs an index of f and " { $link f } " as the element." } ;
 
@@ -530,9 +535,9 @@ HELP: all?
 HELP: push-if
 { $values { "elt" object } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "accum" "a resizable mutable sequence" } }
 { $description "Adds the element at the end of the sequence if the quotation yields a true value." } 
-{ $notes "This word is a factor of " { $link subset } "." } ;
+{ $notes "This word is a factor of " { $link filter } "." } ;
 
-HELP: subset
+HELP: filter
 { $values { "seq" sequence } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "subseq" "a new sequence" } }
 { $description "Applies the quotation to each element in turn, and outputs a new sequence containing the elements of the original sequence for which the quotation output a true value." } ;
 
@@ -562,9 +567,9 @@ HELP: index
 { $values { "obj" object } { "seq" sequence } { "n" "an index" } }
 { $description "Outputs the index of the first element in the sequence equal to " { $snippet "obj" } ". If no element is found, outputs " { $link f } "." } ;
 
-{ index index* last-index last-index* member? memq? } related-words
+{ index index-from last-index last-index-from member? memq? } related-words
 
-HELP: index*
+HELP: index-from
 { $values { "obj" object } { "i" "a start index" } { "seq" sequence } { "n" "an index" } }
 { $description "Outputs the index of the first element in the sequence equal to " { $snippet "obj" } ", starting the search from the " { $snippet "i" } "th element. If no element is found, outputs " { $link f } "." } ;
 
@@ -572,7 +577,7 @@ HELP: last-index
 { $values { "obj" object } { "seq" sequence } { "n" "an index" } }
 { $description "Outputs the index of the last element in the sequence equal to " { $snippet "obj" } "; the sequence is traversed back to front. If no element is found, outputs " { $link f } "." } ;
 
-HELP: last-index*
+HELP: last-index-from
 { $values { "obj" object } { "i" "a start index" } { "seq" sequence } { "n" "an index" } }
 { $description "Outputs the index of the last element in the sequence equal to " { $snippet "obj" } ", traversing the sequence backwards starting from the " { $snippet "i" } "th element and finishing at the first. If no element is found, outputs " { $link f } "." } ;
 
@@ -619,22 +624,7 @@ HELP: replace-slice
 { $errors "Throws an error if " { $snippet "new" } " contains elements whose types are not permissible in " { $snippet "seq" } "." }
 { $side-effects "seq" } ;
 
-HELP: push-new
-{ $values { "elt" object } { "seq" "a resizable mutable sequence" } }
-{ $description "Removes all elements equal to " { $snippet "elt" } ", and adds " { $snippet "elt" } " at the end of the sequence." }
-{ $examples
-    { $example
-        "USING: namespaces prettyprint sequences ;"
-        "V{ \"beans\" \"salsa\" \"cheese\" } \"v\" set"
-        "\"nachos\" \"v\" get push-new"
-        "\"salsa\" \"v\" get push-new"
-        "\"v\" get ."
-        "V{ \"beans\" \"cheese\" \"nachos\" \"salsa\" }"
-    }
-}
-{ $side-effects "seq" } ;
-
-{ push push-new prefix suffix } related-words
+{ push prefix suffix } related-words
 
 HELP: suffix
 { $values { "seq" sequence } { "elt" object } { "newseq" sequence } }
@@ -816,8 +806,8 @@ HELP: 3append
 
 HELP: subseq
 { $values { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "seq" sequence } { "subseq" "a new sequence" } }
-{ $description "Outputs a new sequence consisting of all elements starting from and including " { $snippet "m" } ", and up to but not including " { $snippet "n" } "." }
-{ $errors "Throws an error if " { $snippet "m" } " or " { $snippet "n" } " is out of bounds." } ;
+{ $description "Outputs a new sequence consisting of all elements starting from and including " { $snippet "from" } ", and up to but not including " { $snippet "to" } "." }
+{ $errors "Throws an error if " { $snippet "from" } " or " { $snippet "to" } " is out of bounds." } ;
 
 HELP: clone-like
 { $values { "seq" sequence } { "exemplar" sequence } { "newseq" "a new sequence" } }
@@ -833,6 +823,17 @@ HELP: tail-slice
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "slice" "a slice" } }
 { $description "Outputs a virtual sequence sharing storage with all elements from the " { $snippet "n" } "th index until the end of the input sequence." }
 { $errors "Throws an error if the index is out of bounds." } ;
+
+HELP: but-last-slice
+{ $values { "seq" sequence } { "slice" "a slice" } }
+{ $description "Outputs a virtual sequence sharing storage with all but the last element of the input sequence." }
+{ $errors "Throws an error on an empty sequence." } ;
+
+HELP: rest-slice
+{ $values { "seq" sequence } { "slice" "a slice" } }
+{ $description "Outputs a virtual sequence sharing storage with all elements from the 1st index until the end of the input sequence." }
+{ $notes "Equivalent to " { $snippet "1 tail" } }
+{ $errors "Throws an error on an empty sequence." } ;
 
 HELP: head-slice*
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "slice" "a slice" } }
@@ -853,6 +854,16 @@ HELP: tail
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "tailseq" "a new sequence" } }
 { $description "Outputs a new sequence consisting of the input sequence with the first n items removed." }
 { $errors "Throws an error if the index is out of bounds." } ;
+
+HELP: but-last
+{ $values { "seq" sequence } { "headseq" "a new sequence" } }
+{ $description "Outputs a new sequence consisting of the input sequence with the last item removed." }
+{ $errors "Throws an error on an empty sequence." } ;
+
+HELP: rest
+{ $values { "seq" sequence } { "tailseq" "a new sequence" } }
+{ $description "Outputs a new sequence consisting of the input sequence with the first item removed." }
+{ $errors "Throws an error on an empty sequence." } ;
 
 HELP: head*
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "headseq" "a new sequence" } }

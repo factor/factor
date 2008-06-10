@@ -3,7 +3,7 @@
 USING: alien alien.c-types alien.strings alien.syntax kernel
 math sequences namespaces assocs init accessors continuations
 combinators core-foundation core-foundation.run-loop
-io.encodings.utf8 ;
+io.encodings.utf8 destructors ;
 IN: core-foundation.fsevents
 
 ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
@@ -149,11 +149,12 @@ FUNCTION: CFStringRef FSEventStreamCopyDescription ( FSEventStreamRef streamRef 
 
 SYMBOL: event-stream-callbacks
 
-: event-stream-counter \ event-stream-counter counter ;
+: event-stream-counter ( -- n )
+    \ event-stream-counter counter ;
 
 [
     event-stream-callbacks global
-    [ [ drop expired? not ] assoc-subset H{ } assoc-like ] change-at
+    [ [ drop expired? not ] assoc-filter H{ } assoc-like ] change-at
 ] "core-foundation" add-init-hook
 
 : add-event-source-callback ( quot -- id )
@@ -187,7 +188,7 @@ SYMBOL: event-stream-callbacks
         dup [ call drop ] [ 3drop ] if
     ] alien-callback ;
 
-TUPLE: event-stream info handle closed ;
+TUPLE: event-stream info handle disposed ;
 
 : <event-stream> ( quot paths latency flags -- event-stream )
     >r >r >r
@@ -197,13 +198,10 @@ TUPLE: event-stream info handle closed ;
     dup enable-event-stream
     f event-stream boa ;
 
-M: event-stream dispose
-    dup closed>> [ drop ] [
-        t >>closed
-        {
-            [ info>> remove-event-source-callback ]
-            [ handle>> disable-event-stream ]
-            [ handle>> FSEventStreamInvalidate ]
-            [ handle>> FSEventStreamRelease ]
-        } cleave
-    ] if ;
+M: event-stream dispose*
+    {
+        [ info>> remove-event-source-callback ]
+        [ handle>> disable-event-stream ]
+        [ handle>> FSEventStreamInvalidate ]
+        [ handle>> FSEventStreamRelease ]
+    } cleave ;

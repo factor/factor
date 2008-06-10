@@ -1,5 +1,6 @@
-USING: arrays bunny.model continuations kernel multiline opengl opengl.shaders
-    opengl.capabilities opengl.gl sequences sequences.lib ;
+USING: arrays bunny.model continuations destructors kernel
+multiline opengl opengl.shaders opengl.capabilities opengl.gl
+sequences sequences.lib accessors ;
 IN: bunny.cel-shaded
 
 STRING: vertex-shader-source
@@ -68,11 +69,12 @@ TUPLE: bunny-cel-shaded program ;
 : <bunny-cel-shaded> ( gadget -- draw )
     drop
     cel-shading-supported? [
+        bunny-cel-shaded new
         vertex-shader-source <vertex-shader> check-gl-shader
         cel-shaded-fragment-shader-lib-source <fragment-shader> check-gl-shader
         cel-shaded-fragment-shader-main-source <fragment-shader> check-gl-shader
         3array <gl-program> check-gl-program
-        { set-bunny-cel-shaded-program } bunny-cel-shaded construct
+        >>program
     ] [ f ] if ;
 
 : (draw-cel-shaded-bunny) ( geom program -- )
@@ -85,8 +87,8 @@ TUPLE: bunny-cel-shaded program ;
     } [ bunny-geom ] with-gl-program ;
 
 M: bunny-cel-shaded draw-bunny
-    bunny-cel-shaded-program (draw-cel-shaded-bunny) ;
+    program>> (draw-cel-shaded-bunny) ;
 
 M: bunny-cel-shaded dispose
-    bunny-cel-shaded-program delete-gl-program ;
+    program>> delete-gl-program ;
 

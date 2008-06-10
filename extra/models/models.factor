@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: generic kernel math sequences arrays assocs alarms
-calendar ;
+calendar math.order ;
 IN: models
 
 TUPLE: model < identity-tuple
@@ -156,7 +156,7 @@ TUPLE: history back forward ;
 : <history> ( value -- history )
     history construct-model dup reset-history ;
 
-: (add-history)
+: (add-history) ( history to -- )
     swap model-value dup [ swap push ] [ 2drop ] if ;
 
 : go-back/forward ( history to from -- )

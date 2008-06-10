@@ -10,7 +10,8 @@ IN: ui.tools.workspace
 
 TUPLE: workspace book listener popup ;
 
-: find-workspace [ workspace? ] find-parent ;
+: find-workspace ( gadget -- workspace )
+    [ workspace? ] find-parent ;
 
 SYMBOL: workspace-window-hook
 

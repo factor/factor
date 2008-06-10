@@ -1,6 +1,6 @@
 USING: locals math sequences tools.test hashtables words kernel
 namespaces arrays strings prettyprint io.streams.string parser
-;
+accessors ;
 IN: locals.tests
 
 :: foo ( a b -- a a ) a a ;
@@ -55,7 +55,6 @@ IN: locals.tests
 
 [ 5 ] [
     [let | a [ 3 ] | [wlet | func [ a + ] | 2 func ] ]
-    with-locals
 ] unit-test
 
 :: wlet-test-2 ( a b -- seq )
@@ -108,7 +107,7 @@ write-test-2 "q" set
 
 [ 10 20 ]
 [
-    20 10 [| a! | [| b! | a b ] ] with-locals call call
+    20 10 [| a! | [| b! | a b ] ] call call
 ] unit-test
 
 :: write-test-3 ( a! -- q ) [| b | b a! ] ;
@@ -170,16 +169,22 @@ M:: string lambda-generic ( a b -- c ) a b lambda-generic-2 ;
 
 [ ] [ \ lambda-generic see ] unit-test
 
+:: unparse-test-1 ( a -- ) [let | a! [ ] | ] ;
+
 [ "[let | a! [ ] | ]" ] [
-    [let | a! [ ] | ] unparse
+    \ unparse-test-1 "lambda" word-prop body>> first unparse
 ] unit-test
+
+:: unparse-test-2 ( -- ) [wlet | a! [ ] | ] ;
 
 [ "[wlet | a! [ ] | ]" ] [
-    [wlet | a! [ ] | ] unparse
+    \ unparse-test-2 "lambda" word-prop body>> first unparse
 ] unit-test
 
+:: unparse-test-3 ( -- b ) [| a! | ] ;
+
 [ "[| a! | ]" ] [
-    [| a! | ] unparse
+    \ unparse-test-3 "lambda" word-prop body>> first unparse
 ] unit-test
 
 DEFER: xyzzy
@@ -230,3 +235,33 @@ DEFER: xyzzy
 
 [ "xxx" "yyy" ] [ "yyy" "xxx" let*-test-4 ] unit-test
 
+GENERIC: next-method-test ( a -- b )
+
+M: integer next-method-test 3 + ;
+
+M:: fixnum next-method-test ( a -- b ) a call-next-method 1 + ;
+
+[ 5 ] [ 1 next-method-test ] unit-test
+
+: no-with-locals-test { 1 2 3 } [| x | x 3 + ] map ;
+
+[ { 4 5 6 } ] [ no-with-locals-test ] unit-test
+
+{ 3 0 } [| a b c | ] must-infer-as
+
+[ ] [ 1 [let | a [ ] | ] ] unit-test
+
+[ 3 ] [ 1 [let | a [ ] | 3 ] ] unit-test
+
+[ ] [ 1 2 [let | a [ ] b [ ] | ] ] unit-test
+
+:: a-word-with-locals ( a b -- ) ;
+
+: new-definition "USING: math ;\nIN: locals.tests\n: a-word-with-locals ( -- x ) 2 3 + ;\n" ;
+
+[ ] [ new-definition eval ] unit-test
+
+[ t ] [
+    [ \ a-word-with-locals see ] with-string-writer
+    new-definition =
+] unit-test

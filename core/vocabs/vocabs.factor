@@ -76,14 +76,14 @@ SYMBOL: load-vocab-hook ! ( name -- )
 : words-named ( str -- seq )
     dictionary get values
     [ vocab-words at ] with map
-    [ ] subset ;
+    sift ;
 
 : child-vocab? ( prefix name -- ? )
     2dup = pick empty? or
     [ 2drop t ] [ swap CHAR: . suffix head? ] if ;
 
 : child-vocabs ( vocab -- seq )
-    vocab-name vocabs [ child-vocab? ] with subset ;
+    vocab-name vocabs [ child-vocab? ] with filter ;
 
 TUPLE: vocab-link name ;
 

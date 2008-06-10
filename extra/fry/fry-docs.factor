@@ -87,7 +87,7 @@ $nl
 } ;
 
 ARTICLE: "fry.limitations" "Fried quotation limitations"
-"As with " { $link "locals" } ", fried quotations cannot contain " { $link >r } " and " { $link r> } ". Unlike " { $link "locals" } ", using " { $link dip } " is not a suitable workaround since unlike closure conversion, fry conversion is not recursive, and so the quotation passed to " { $link dip } " cannot contain fry specifiers." ;
+"As with " { $vocab-link "locals" } ", fried quotations cannot contain " { $link >r } " and " { $link r> } "." ;
 
 ARTICLE: "fry" "Fried quotations"
 "A " { $emphasis "fried quotation" } " differs from a literal quotation in that when it is evaluated, instead of just pushing itself on the stack, it consumes zero or more stack values and inserts them into the quotation."

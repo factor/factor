@@ -5,7 +5,7 @@ sequences words inference.class quotations alien
 alien.c-types strings sbufs sequences.private
 slots.private combinators definitions compiler.units
 system layouts vectors optimizer.math.partial accessors
-optimizer.inlining ;
+optimizer.inlining math.order ;
 
 [ t ] [ T{ literal-constraint f 1 2 } T{ literal-constraint f 1 2 } equal? ] unit-test
 
@@ -142,7 +142,7 @@ M: object xyz ;
 [ f ] [ [ <reversed> length ] \ slot inlined? ] unit-test
 
 ! We don't want to use = to compare literals
-: foo reverse ;
+: foo ( seq -- seq' ) reverse ;
 
 \ foo [
     [

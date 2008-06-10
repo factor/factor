@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel sequences math math.functions
-math.vectors ;
+math.vectors math.order ;
 IN: math.matrices
 
 ! Matrices
@@ -35,13 +35,13 @@ IN: math.matrices
 
 <PRIVATE
 
-: x first ; inline
-: y second ; inline
-: z third ; inline
+: x ( seq -- elt ) first ; inline
+: y ( seq -- elt ) second ; inline
+: z ( seq -- elt ) third ; inline
 
-: i [ [ y ] [ z ] bi* * ] [ [ z ] [ y ] bi* * ] 2bi - ;
-: j [ [ z ] [ x ] bi* * ] [ [ x ] [ z ] bi* * ] 2bi - ;
-: k [ [ y ] [ x ] bi* * ] [ [ x ] [ y ] bi* * ] 2bi - ;
+: i ( seq1 seq2 -- n ) [ [ y ] [ z ] bi* * ] [ [ z ] [ y ] bi* * ] 2bi - ;
+: j ( seq1 seq2 -- n ) [ [ z ] [ x ] bi* * ] [ [ x ] [ z ] bi* * ] 2bi - ;
+: k ( seq1 seq2 -- n ) [ [ y ] [ x ] bi* * ] [ [ x ] [ y ] bi* * ] 2bi - ;
 
 PRIVATE>
 

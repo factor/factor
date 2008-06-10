@@ -7,10 +7,21 @@ ERROR: no-compilation-unit definition ;
 
 SYMBOL: changed-definitions
 
-: changed-definition ( defspec -- )
-    dup changed-definitions get
-    [ no-compilation-unit ] unless*
-    set-at ;
+SYMBOL: +inlined+
+SYMBOL: +called+
+
+: changed-definition ( defspec how -- )
+    swap changed-definitions get
+    [ set-at ] [ no-compilation-unit ] if* ;
+
+SYMBOL: new-classes
+
+: new-class ( word -- )
+    dup new-classes get
+    [ set-at ] [ no-compilation-unit ] if* ;
+
+: new-class? ( word -- ? )
+    new-classes get key? ;
 
 GENERIC: where ( defspec -- loc )
 
@@ -47,7 +58,17 @@ M: object uses drop f ;
 
 : xref ( defspec -- ) dup uses crossref get add-vertex ;
 
-: usage ( defspec -- seq ) \ f or crossref get at keys ;
+: usage ( defspec -- seq ) crossref get at keys ;
+
+GENERIC: irrelevant? ( defspec -- ? )
+
+M: object irrelevant? drop f ;
+
+GENERIC: smart-usage ( defspec -- seq )
+
+M: f smart-usage drop \ f smart-usage ;
+
+M: object smart-usage usage [ irrelevant? not ] filter ;
 
 : unxref ( defspec -- )
     dup uses crossref get remove-vertex ;

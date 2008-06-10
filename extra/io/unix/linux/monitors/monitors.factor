@@ -1,18 +1,18 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel io.backend io.monitors io.monitors.recursive
-io.files io.buffers io.monitors io.nonblocking io.timeouts
+io.files io.buffers io.monitors io.ports io.timeouts
 io.unix.backend io.unix.select io.encodings.utf8
 unix.linux.inotify assocs namespaces threads continuations init
 math math.bitfields sets alien alien.strings alien.c-types
-vocabs.loader accessors system hashtables ;
+vocabs.loader accessors system hashtables destructors unix ;
 IN: io.unix.linux.monitors
 
 SYMBOL: watches
 
 SYMBOL: inotify
 
-TUPLE: linux-monitor < monitor wd inotify watches ;
+TUPLE: linux-monitor < monitor wd inotify watches disposed ;
 
 : <linux-monitor> ( wd path mailbox -- monitor )
     linux-monitor new-monitor
@@ -23,9 +23,9 @@ TUPLE: linux-monitor < monitor wd inotify watches ;
 : wd>monitor ( wd -- monitor ) watches get at ;
 
 : <inotify> ( -- port/f )
-    inotify_init dup 0 < [ drop f ] [ <reader> ] if ;
+    inotify_init dup 0 < [ drop f ] [ <fd> <input-port> ] if ;
 
-: inotify-fd inotify get handle>> ;
+: inotify-fd ( -- fd ) inotify get handle>> handle-fd ;
 
 : check-existing ( wd -- )
     watches get key? [
@@ -41,7 +41,7 @@ TUPLE: linux-monitor < monitor wd inotify watches ;
     [ (add-watch) ] [ drop ] 2bi r>
     <linux-monitor> [ ] [ ] [ wd>> ] tri watches get set-at ;
 
-: check-inotify
+: check-inotify ( -- )
     inotify get [
         "Calling <monitor> outside with-monitors" throw
     ] unless ;
@@ -54,14 +54,14 @@ M: linux (monitor) ( path recursive? mailbox -- monitor )
         IN_CHANGE_EVENTS swap add-watch
     ] if ;
 
-M: linux-monitor dispose ( monitor -- )
-    dup inotify>> closed>> [ drop ] [
-        [ [ wd>> ] [ watches>> ] bi delete-at ]
-        [
-            [ inotify>> handle>> ] [ wd>> ] bi
+M: linux-monitor dispose* ( monitor -- )
+    [ [ wd>> ] [ watches>> ] bi delete-at ]
+    [
+        dup inotify>> disposed>> [ drop ] [
+            [ inotify>> handle>> handle-fd ] [ wd>> ] bi
             inotify_rm_watch io-error
-        ] bi
-    ] if ;
+        ] if
+    ] bi ;
 
 : ignore-flags? ( mask -- ? )
     {
@@ -110,7 +110,8 @@ M: linux-monitor dispose ( monitor -- )
     ] if ;
 
 : inotify-read-loop ( port -- )
-    dup wait-to-read1
+    dup check-disposed
+    dup wait-to-read drop
     0 over buffer>> parse-file-notifications
     0 over buffer>> buffer-reset
     inotify-read-loop ;

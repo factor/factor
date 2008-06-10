@@ -64,7 +64,7 @@ typedef signed long long s64;
 
 INLINE bool immediate_p(CELL obj)
 {
-	return (TAG(obj) == FIXNUM_TYPE || obj == F);
+	return (obj == F || TAG(obj) == FIXNUM_TYPE);
 }
 
 INLINE F_FIXNUM untag_fixnum_fast(CELL tagged)
@@ -113,8 +113,8 @@ typedef struct
 {
 	CELL type; /* this is WORD_TYPE or QUOTATION_TYPE */
 	CELL code_length; /* # bytes */
-	CELL reloc_length; /* # bytes */
 	CELL literals_length; /* # bytes */
+	CELL relocation; /* tagged pointer to byte-array or f */
 } F_COMPILED;
 
 /* Assembly code makes assumptions about the layout of this struct */

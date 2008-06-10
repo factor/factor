@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ui.gestures ui.gadgets ui.gadgets.buttons
-ui.gadgets.frames ui.gadgets.grids
+ui.gadgets.frames ui.gadgets.grids math.order
 ui.gadgets.theme ui.render kernel math namespaces sequences
 vectors models math.vectors math.functions quotations colors ;
 IN: ui.gadgets.sliders
@@ -22,13 +22,13 @@ TUPLE: slider elevator thumb saved line ;
 
 : min-thumb-dim 15 ;
 
-: slider-value gadget-model range-value >fixnum ;
+: slider-value ( gadget -- n ) gadget-model range-value >fixnum ;
 
-: slider-page gadget-model range-page-value ;
+: slider-page ( gadget -- n ) gadget-model range-page-value ;
 
-: slider-max gadget-model range-max-value ;
+: slider-max ( gadget -- n ) gadget-model range-max-value ;
 
-: slider-max* gadget-model range-max-value* ;
+: slider-max* ( gadget -- n ) gadget-model range-max-value* ;
 
 : thumb-dim ( slider -- h )
     dup slider-page over slider-max 1 max / 1 min
@@ -43,9 +43,9 @@ TUPLE: slider elevator thumb saved line ;
     dup elevator-length over thumb-dim - 1 max
     swap slider-max* 1 max / ;
 
-: slider>screen slider-scale * ;
+: slider>screen ( m scale -- n ) slider-scale * ;
 
-: screen>slider slider-scale / ;
+: screen>slider ( m scale -- n ) slider-scale / ;
 
 M: slider model-changed nip slider-elevator relayout-1 ;
 
@@ -141,8 +141,11 @@ M: elevator layout*
     swap <thumb> g-> set-slider-thumb over add-gadget
     @center frame, ;
 
-: <left-button> { 0 1 } arrow-left -1 <slide-button> ;
-: <right-button> { 0 1 } arrow-right 1 <slide-button> ;
+: <left-button> ( -- button )
+    { 0 1 } arrow-left -1 <slide-button> ;
+
+: <right-button> ( -- button )
+    { 0 1 } arrow-right 1 <slide-button> ;
 
 : build-x-slider ( slider -- )
     [
@@ -151,8 +154,11 @@ M: elevator layout*
         <right-button> @right frame,
     ] with-gadget ;
 
-: <up-button> { 1 0 } arrow-up -1 <slide-button> ;
-: <down-button> { 1 0 } arrow-down 1 <slide-button> ;
+: <up-button> ( -- button )
+    { 1 0 } arrow-up -1 <slide-button> ;
+
+: <down-button> ( -- button )
+    { 1 0 } arrow-down 1 <slide-button> ;
 
 : build-y-slider ( slider -- )
     [

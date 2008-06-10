@@ -4,7 +4,7 @@ USING: threads kernel namespaces continuations combinators
 sequences math namespaces.private continuations.private
 concurrency.messaging quotations kernel.private words
 sequences.private assocs models arrays accessors
-generic generic.standard ;
+generic generic.standard definitions ;
 IN: tools.walker
 
 SYMBOL: show-walker-hook ! ( status continuation thread -- )
@@ -64,22 +64,23 @@ M: object add-breakpoint ;
 
 : (step-into-quot) ( quot -- ) add-breakpoint call ;
 
-: (step-into-if) ? (step-into-quot) ;
+: (step-into-if) ( true false ? -- ) ? (step-into-quot) ;
 
-: (step-into-dispatch) nth (step-into-quot) ;
+: (step-into-dispatch) ( array n -- ) nth (step-into-quot) ;
 
 : (step-into-execute) ( word -- )
     {
         { [ dup "step-into" word-prop ] [ "step-into" word-prop call ] }
         { [ dup standard-generic? ] [ effective-method (step-into-execute) ] }
         { [ dup hook-generic? ] [ effective-method (step-into-execute) ] }
+        { [ dup uses \ suspend swap member? ] [ execute break ] }
         { [ dup primitive? ] [ execute break ] }
         [ word-def (step-into-quot) ]
     } cond ;
 
 \ (step-into-execute) t "step-into?" set-word-prop
 
-: (step-into-continuation)
+: (step-into-continuation) ( -- )
     continuation callstack >>call break ;
 
 ! Messages sent to walker thread
@@ -89,7 +90,6 @@ SYMBOL: step-into
 SYMBOL: step-all
 SYMBOL: step-into-all
 SYMBOL: step-back
-SYMBOL: detach
 SYMBOL: abandon
 SYMBOL: call-in
 
@@ -137,7 +137,7 @@ SYMBOL: +stopped+
 {
     >n ndrop >c c>
     continue continue-with
-    stop yield suspend sleep (spawn)
+    stop suspend (spawn)
 } [
     dup [ execute break ] curry
     "step-into" set-word-prop
@@ -168,10 +168,7 @@ SYMBOL: +stopped+
     +running+ set-status ;
 
 : walker-stopped ( -- )
-    +stopped+ set-status
-    [ status +stopped+ eq? ]
-    [ [ drop f ] handle-synchronous ]
-    [ ] while ;
+    +stopped+ set-status ;
 
 : step-into-all-loop ( -- )
     +running+ set-status
@@ -259,3 +256,8 @@ SYMBOL: +stopped+
     ] 3curry
     "Walker on " self thread-name append spawn
     [ associate-thread ] keep ;
+
+! For convenience
+IN: syntax
+
+: B ( -- ) break ;

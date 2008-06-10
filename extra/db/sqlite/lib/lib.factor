@@ -4,24 +4,25 @@ USING: alien.c-types arrays assocs kernel math math.parser
 namespaces sequences db.sqlite.ffi db combinators
 continuations db.types calendar.format serialize
 io.streams.byte-array byte-arrays io.encodings.binary
-tools.walker io.backend ;
+io.backend db.errors ;
 IN: db.sqlite.lib
 
-: sqlite-error ( n -- * )
-    sqlite-error-messages nth throw ;
+ERROR: sqlite-error < db-error n string ;
+ERROR: sqlite-sql-error < sql-error n string ;
 
-: sqlite-statement-error-string ( -- str )
-    db get db-handle sqlite3_errmsg ;
+: throw-sqlite-error ( n -- * )
+    dup sqlite-error-messages nth sqlite-error ;
 
 : sqlite-statement-error ( -- * )
-    sqlite-statement-error-string throw ;
+    SQLITE_ERROR
+    db get db-handle sqlite3_errmsg sqlite-sql-error ;
 
 : sqlite-check-result ( n -- )
     {
-        { [ dup SQLITE_OK = ] [ drop ] }
-        { [ dup SQLITE_ERROR = ] [ sqlite-statement-error ] }
-        [ sqlite-error ]
-    } cond ;
+        { SQLITE_OK [ ] }
+        { SQLITE_ERROR [ sqlite-statement-error ] }
+        [ throw-sqlite-error ]
+    } case ;
 
 : sqlite-open ( path -- db )
     normalize-path
@@ -106,7 +107,7 @@ IN: db.sqlite.lib
             object>bytes
             sqlite-bind-blob-by-name
         ] }
-        { +native-id+ [ sqlite-bind-int-by-name ] }
+        { +db-assigned-id+ [ sqlite-bind-int-by-name ] }
         { +random-id+ [ sqlite-bind-int64-by-name ] }
         { NULL [ sqlite-bind-null-by-name ] }
         [ no-sql-type ]
@@ -132,7 +133,7 @@ IN: db.sqlite.lib
 : sqlite-column-typed ( handle index type -- obj )
     dup array? [ first ] when
     {
-        { +native-id+ [ sqlite3_column_int64  ] }
+        { +db-assigned-id+ [ sqlite3_column_int64  ] }
         { +random-id+ [ sqlite3-column-uint64 ] }
         { INTEGER [ sqlite3_column_int ] }
         { BIG-INTEGER [ sqlite3_column_int64 ] }
@@ -158,12 +159,11 @@ IN: db.sqlite.lib
     dup sqlite-#columns [ sqlite-column ] with map ;
 
 : sqlite-step-has-more-rows? ( prepared -- bool )
-    dup SQLITE_ROW =  [
-        drop t
-    ] [
-        dup SQLITE_DONE =
-        [ drop ] [ sqlite-check-result ] if f
-    ] if ;
+    {
+        { SQLITE_ROW [ t ] }
+        { SQLITE_DONE [ f ] }
+        [ sqlite-check-result f ]
+    } case ;
 
 : sqlite-next ( prepared -- ? )
     sqlite3_step sqlite-step-has-more-rows? ;

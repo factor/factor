@@ -1,6 +1,6 @@
-USING: arrays combinators kernel lazy-lists math math.parser
+USING: arrays combinators kernel lists math math.parser
 namespaces parser parser-combinators parser-combinators.simple
-promises quotations sequences combinators.lib strings
+promises quotations sequences combinators.lib strings math.order
 assocs prettyprint.backend memoize unicode.case unicode.categories ;
 USE: io
 IN: regexp
@@ -23,9 +23,9 @@ SYMBOL: ignore-case?
 : or-predicates ( quots -- quot )
     [ \ dup prefix ] map [ [ t ] ] f short-circuit \ nip suffix ;
 
-: <@literal [ nip ] curry <@ ;
+: <@literal ( parser obj -- action ) [ nip ] curry <@ ;
 
-: <@delay [ curry ] curry <@ ;
+: <@delay ( parser quot -- action ) [ curry ] curry <@ ;
 
 PRIVATE>
 
@@ -135,10 +135,10 @@ PRIVATE>
     'posix-character-class' <|>
     'simple-escape' <|> &> ;
 
-: 'any-char'
+: 'any-char' ( -- parser )
     "." token [ drop t ] <@literal ;
 
-: 'char'
+: 'char' ( -- parser )
     'any-char' 'escape' 'ordinary-char' <|> <|> [ satisfy ] <@ ;
 
 DEFER: 'regexp'
@@ -291,7 +291,7 @@ TUPLE: regexp source parser ignore-case? ;
 
 : parse-regexp ( accum end -- accum )
     lexer get dup skip-blank
-    [ [ index* dup 1+ swap ] 2keep swapd subseq swap ] change-lexer-column
+    [ [ index-from dup 1+ swap ] 2keep swapd subseq swap ] change-lexer-column
     lexer get dup still-parsing-line?
     [ (parse-token) parse-options ] [ drop f ] if
     <regexp> parsed ;

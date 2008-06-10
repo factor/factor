@@ -3,13 +3,17 @@ hashtables quotations words classes sequences namespaces
 arrays assocs ;
 IN: ui.commands
 
-: command-map-row
+: command-map-row ( children -- seq )
     [
-        dup first gesture>string ,
-        second dup command-name ,
-        dup command-word \ $link swap 2array ,
-        command-description ,
-    ] [ ] make ;
+        [ first gesture>string , ]
+        [
+            second
+            [ command-name , ]
+            [ command-word \ $link swap 2array , ]
+            [ command-description , ]
+            tri
+        ] bi
+    ] { } make ;
 
 : command-map. ( command-map -- )
     [ command-map-row ] map
@@ -18,10 +22,11 @@ IN: ui.commands
     $table ;
 
 : $command-map ( element -- )
-    first2
-    dup (command-name) " commands" append $heading
-    swap command-map
-    dup command-map-blurb print-element command-map. ;
+    [ second (command-name) " commands" append $heading ]
+    [
+        first2 swap command-map
+        [ command-map-blurb print-element ] [ command-map. ] bi
+    ] bi ;
 
 : $command ( element -- )
     reverse first3 command-map value-at gesture>string $snippet ;
@@ -47,6 +52,7 @@ HELP: command-name
 { $examples
     { $example
         "USING: io ui.commands ;"
+        "IN: scratchpad"
         ": com-my-command ;"
         "\\ com-my-command command-name write"
         "My Command"
@@ -105,6 +111,7 @@ HELP: command-string
 { $examples
     { $example
         "USING: io ui.commands ui.gestures ;"
+        "IN: scratchpad"
         ": com-my-command ;"
         "T{ key-down f { C+ } \"s\" } \\ com-my-command command-string write"
         "My Command (C+s)"

@@ -1,17 +1,13 @@
 ! Copyright (C) 2005, 2008 Chris Double, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: concurrency.mailboxes
-USING: dlists threads sequences continuations
+USING: dlists threads sequences continuations destructors
 namespaces random math quotations words kernel arrays assocs
-init system concurrency.conditions accessors ;
+init system concurrency.conditions accessors debugger ;
 
-TUPLE: mailbox threads data closed ;
+TUPLE: mailbox threads data disposed ;
 
-: check-closed ( mailbox -- )
-    closed>> [ "Mailbox closed" throw ] when ; inline
-
-M: mailbox dispose
-    t >>closed threads>> notify-all ;
+M: mailbox dispose* threads>> notify-all ;
 
 : <mailbox> ( -- mailbox )
     <dlist> <dlist> f mailbox boa ;
@@ -27,7 +23,7 @@ M: mailbox dispose
     >r threads>> r> "mailbox" wait ;
 
 : block-unless-pred ( mailbox timeout pred -- )
-    pick check-closed
+    pick check-disposed
     pick data>> over dlist-contains? [
         3drop
     ] [
@@ -35,7 +31,7 @@ M: mailbox dispose
     ] if ; inline
 
 : block-if-empty ( mailbox timeout -- mailbox )
-    over check-closed
+    over check-disposed
     over mailbox-empty? [
         2dup wait-for-mailbox block-if-empty
     ] [
@@ -62,7 +58,7 @@ M: mailbox dispose
 
 : while-mailbox-empty ( mailbox quot -- )
     over mailbox-empty? [
-        dup >r swap slip r> while-mailbox-empty
+        dup >r dip r> while-mailbox-empty
     ] [
         2drop
     ] if ; inline
@@ -75,7 +71,7 @@ M: mailbox dispose
     f swap mailbox-get-timeout? ; inline
 
 : wait-for-close-timeout ( mailbox timeout -- )
-    over closed>>
+    over disposed>>
     [ 2drop ] [ 2dup wait-for-mailbox wait-for-close-timeout ] if ;
 
 : wait-for-close ( mailbox -- )
@@ -83,9 +79,13 @@ M: mailbox dispose
 
 TUPLE: linked-error error thread ;
 
+M: linked-error error.
+    [ thread>> error-in-thread. ] [ error>> error. ] bi ;
+
 C: <linked-error> linked-error
 
-: ?linked dup linked-error? [ rethrow ] when ;
+: ?linked ( message -- message )
+    dup linked-error? [ rethrow ] when ;
 
 TUPLE: linked-thread < thread supervisor ;
 

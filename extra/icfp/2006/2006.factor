@@ -1,8 +1,8 @@
 ! Copyright (C) 2007 Gavin Harrison
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences kernel.private namespaces arrays io
-io.files splitting io.binary math.functions vectors quotations
-combinators io.encodings.binary ;
+io.files splitting grouping io.binary math.functions vectors
+quotations combinators io.encodings.binary ;
 IN: icfp.2006
 
 SYMBOL: regs
@@ -148,4 +148,4 @@ SYMBOL: open-arrays
     init f exec-loop ;
 
 : run-sand ( -- )
-    "extra/icfp/2006/sandmark.umz" resource-path run-prog ;
+    "resource:extra/icfp/2006/sandmark.umz" run-prog ;

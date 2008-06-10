@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: bootstrap.image.download
-USING: http.client crypto.md5 splitting assocs kernel io.files
-bootstrap.image sequences io ;
+USING: http.client checksums checksums.openssl splitting assocs
+kernel io.files bootstrap.image sequences io ;
 
 : url "http://factorcode.org/images/latest/" ;
 
@@ -12,8 +12,11 @@ bootstrap.image sequences io ;
 
 : need-new-image? ( image -- ? )
     dup exists?
-    [ dup file>md5str swap download-checksums at = not ]
-    [ drop t ] if ;
+    [
+        [ openssl-md5 checksum-file hex-string ]
+        [ download-checksums at ]
+        bi = not
+    ] [ drop t ] if ;
 
 : download-image ( arch -- )
     boot-image-name dup need-new-image? [

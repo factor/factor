@@ -1,7 +1,8 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays io kernel math models namespaces sequences strings
-splitting combinators unicode.categories ;
+USING: accessors arrays io kernel math models namespaces
+sequences strings splitting combinators unicode.categories
+math.order ;
 IN: documents
 
 : +col ( loc n -- newloc ) >r first2 r> + 2array ;
@@ -20,9 +21,9 @@ TUPLE: document locs ;
     V{ "" } clone <model> V{ } clone
     { set-delegate set-document-locs } document construct ;
 
-: add-loc document-locs push ;
+: add-loc ( loc document -- ) locs>> push ;
 
-: remove-loc document-locs delete ;
+: remove-loc ( loc document -- ) locs>> delete ;
 
 : update-locs ( loc document -- )
     document-locs [ set-model ] with each ;
@@ -178,16 +179,16 @@ M: one-char-elt next-elt 2drop ;
     >r >r first2 swap r> doc-line r> call
     r> =col ; inline
 
-: ((word-elt)) [ ?nth blank? ] 2keep ;
+: ((word-elt)) ( n seq -- ? n seq ) [ ?nth blank? ] 2keep ;
 
 : break-detector ( ? -- quot )
     [ >r blank? r> xor ] curry ; inline
 
 : (prev-word) ( ? col str -- col )
-    rot break-detector find-last* drop ?1+ ;
+    rot break-detector find-last-from drop ?1+ ;
 
 : (next-word) ( ? col str -- col )
-    [ rot break-detector find* drop ] keep
+    [ rot break-detector find-from drop ] keep
     over not [ nip length ] [ drop ] if ;
 
 TUPLE: one-word-elt ;

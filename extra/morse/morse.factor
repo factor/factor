@@ -1,7 +1,6 @@
-! Copyright (C) 2007 Alex Chapman
+! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs hashtables kernel lazy-lists namespaces openal
-parser-combinators promises sequences strings unicode.case ;
+USING: accessors assocs combinators hashtables kernel lists math namespaces openal parser-combinators promises sequences strings symbols synth synth.buffers unicode.case ;
 IN: morse
 
 <PRIVATE
@@ -85,25 +84,25 @@ PRIVATE>
 
 <PRIVATE
 
-: dot ( -- ch ) CHAR: . ;
-: dash ( -- ch ) CHAR: - ;
-: char-gap ( -- ch ) CHAR: \s ;
-: word-gap ( -- ch ) CHAR: / ;
+: dot-char ( -- ch ) CHAR: . ;
+: dash-char ( -- ch ) CHAR: - ;
+: char-gap-char ( -- ch ) CHAR: \s ;
+: word-gap-char ( -- ch ) CHAR: / ;
 
 : =parser ( obj -- parser )
     [ = ] curry satisfy ;
 
 LAZY: 'dot' ( -- parser )
-    dot =parser ;
+    dot-char =parser ;
 
 LAZY: 'dash' ( -- parser )
-    dash =parser ;
+    dash-char =parser ;
 
 LAZY: 'char-gap' ( -- parser )
-    char-gap =parser ;
+    char-gap-char =parser ;
 
 LAZY: 'word-gap' ( -- parser )
-    word-gap =parser ;
+    word-gap-char =parser ;
 
 LAZY: 'morse-char' ( -- parser )
     'dot' 'dash' <|> <+> ;
@@ -123,3 +122,59 @@ PRIVATE>
         ] map >string
     ] map [ [ CHAR: \s , ] [ % ] interleave ] "" make ;
 
+<PRIVATE
+SYMBOLS: source dot-buffer dash-buffer intra-char-gap-buffer letter-gap-buffer ;
+
+: queue ( symbol -- )
+    get source get swap queue-buffer ;
+
+: dot ( -- ) dot-buffer queue ;
+: dash ( -- ) dash-buffer queue ;
+: intra-char-gap ( -- ) intra-char-gap-buffer queue ;
+: letter-gap ( -- ) letter-gap-buffer queue ;
+
+: beep-freq 880 ;
+
+: <morse-buffer> ( -- buffer )
+    half-sample-freq <8bit-mono-buffer> ;
+
+: sine-buffer ( seconds -- id )
+    beep-freq swap <morse-buffer> >sine-wave-buffer
+    send-buffer id>> ;
+
+: silent-buffer ( seconds -- id )
+    <morse-buffer> >silent-buffer send-buffer id>> ;
+
+: make-buffers ( unit-length -- )
+    {
+        [ sine-buffer dot-buffer set ]
+        [ 3 * sine-buffer dash-buffer set ]
+        [ silent-buffer intra-char-gap-buffer set ]
+        [ 3 * silent-buffer letter-gap-buffer set ]
+    } cleave ;
+
+: playing-morse ( quot unit-length -- )
+    [
+        init-openal 1 gen-sources first source set make-buffers
+        call
+        source get source-play
+    ] with-scope ;
+
+: play-char ( ch -- )
+    [ intra-char-gap ] [
+        {
+            { dot-char [ dot ] }
+            { dash-char [ dash ] }
+            { word-gap-char [ intra-char-gap ] }
+        } case
+    ] interleave ;
+
+PRIVATE>
+
+: play-as-morse* ( str unit-length -- )
+    [
+        [ letter-gap ] [ ch>morse play-char ] interleave
+    ] swap playing-morse ;
+
+: play-as-morse ( str -- )
+    0.05 play-as-morse* ;

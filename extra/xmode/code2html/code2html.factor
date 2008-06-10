@@ -1,14 +1,14 @@
-USING: xmode.tokens xmode.marker xmode.catalog kernel html
+USING: xmode.tokens xmode.marker xmode.catalog kernel
 html.elements io io.files sequences words io.encodings.utf8
-namespaces ;
+namespaces xml.entities accessors ;
 IN: xmode.code2html
 
 : htmlize-tokens ( tokens -- )
     [
-        dup token-str swap token-id [
-            <span word-name =class span> write </span>
+        [ str>> ] [ id>> ] bi [
+            <span word-name =class span> escape-string write </span>
         ] [
-            write
+            escape-string write
         ] if*
     ] each ;
 
@@ -20,8 +20,8 @@ IN: xmode.code2html
 
 : default-stylesheet ( -- )
     <style>
-        "extra/xmode/code2html/stylesheet.css"
-        resource-path utf8 file-contents write
+        "resource:extra/xmode/code2html/stylesheet.css"
+        utf8 file-contents escape-string write
     </style> ;
 
 : htmlize-stream ( path stream -- )
@@ -29,7 +29,7 @@ IN: xmode.code2html
     <html>
         <head>
             default-stylesheet
-            <title> dup write </title>
+            <title> dup escape-string write </title>
         </head>
         <body>
             <pre>
@@ -42,8 +42,7 @@ IN: xmode.code2html
 
 : htmlize-file ( path -- )
     dup utf8 [
-        stdio get
-        over ".html" append utf8 [
-            htmlize-stream
+        dup ".html" append utf8 [
+            input-stream get htmlize-stream
         ] with-file-writer
     ] with-file-reader ;

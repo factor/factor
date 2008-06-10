@@ -28,7 +28,7 @@ IN: project-euler.035
 
 : possible? ( seq -- ? )
     dup length 1 > [
-        dup { 0 2 4 5 6 8 } swap diff =
+        dup { 0 2 4 5 6 8 } diff =
     ] [
         drop t
     ] if ;
@@ -50,7 +50,7 @@ IN: project-euler.035
 PRIVATE>
 
 : euler035 ( -- answer )
-    source-035 [ possible? ] subset [ circular? ] count ;
+    source-035 [ possible? ] filter [ circular? ] count ;
 
 ! [ euler035 ] 100 ave-time
 ! 904 ms run / 86 ms GC ave time - 100 trials

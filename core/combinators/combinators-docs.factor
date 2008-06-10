@@ -10,8 +10,10 @@ ARTICLE: "combinators-quot" "Quotation construction utilities"
 { $subsection alist>quot } ;
 
 ARTICLE: "combinators" "Additional combinators"
-"The " { $vocab-link "combinators" } " vocabulary provides generalizations of certain combinators from the " { $vocab-link "kernel" } " vocabulary."
+"The " { $vocab-link "combinators" } " vocabulary provides a few useful combinators."
 $nl
+"A looping combinator:"
+{ $subsection while }
 "Generalization of " { $link bi } " and " { $link tri } ":"
 { $subsection cleave }
 "Generalization of " { $link bi* } " and " { $link tri* } ":"
@@ -95,7 +97,7 @@ HELP: case
     "If there is no case matching " { $snippet "obj" } ", the default case is taken. If the last element of " { $snippet "cases" } " is a quotation, the quotation is called with " { $snippet "obj" } " on the stack. Otherwise, a " { $link no-cond } " error is rasied."
     $nl
     "The following two phrases are equivalent:"
-    { $code "{ { X [ Y ] } { Y [ T ] } } case" }
+    { $code "{ { X [ Y ] } { Z [ T ] } } case" }
     { $code "dup X = [ drop Y ] [ dup Z = [ drop T ] [ no-case ] if ] if" }
 }
 { $examples

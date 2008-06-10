@@ -3,10 +3,14 @@
 USING: assocs hashtables kernel sequences vectors ;
 IN: sets
 
+: adjoin ( elt seq -- ) [ delete ] [ push ] 2bi ;
+
+: conjoin ( elt assoc -- ) dupd set-at ;
+
 : (prune) ( elt hash vec -- )
-    3dup drop key?
-    [ [ drop dupd set-at ] [ nip push ] [ ] 3tri ] unless
-    3drop ; inline
+    3dup drop key? [ 3drop ] [
+        [ drop conjoin ] [ nip push ] 3bi
+    ] if ; inline
 
 : prune ( seq -- newseq )
     [ ] [ length <hashtable> ] [ length <vector> ] tri
@@ -16,16 +20,22 @@ IN: sets
     [ dup ] H{ } map>assoc ;
 
 : (all-unique?) ( elt hash -- ? )
-    2dup key? [ 2drop f ] [ dupd set-at t ] if ;
+    2dup key? [ 2drop f ] [ conjoin t ] if ;
 
 : all-unique? ( seq -- ? )
     dup length <hashtable> [ (all-unique?) ] curry all? ;
 
 : intersect ( seq1 seq2 -- newseq )
-    unique [ key? ] curry subset ;
+    unique [ key? ] curry filter ;
 
 : diff ( seq1 seq2 -- newseq )
-    swap unique [ key? not ] curry subset ;
+    unique [ key? not ] curry filter ;
 
 : union ( seq1 seq2 -- newseq )
     append prune ;
+
+: subset? ( seq1 seq2 -- ? )
+    unique [ key? ] curry all? ;
+
+: set= ( seq1 seq2 -- ? )
+    [ unique ] bi@ = ;

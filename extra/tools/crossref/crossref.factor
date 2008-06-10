@@ -7,7 +7,7 @@ sorting hashtables vocabs parser source-files ;
 IN: tools.crossref
 
 : usage. ( word -- )
-    usage sorted-definitions. ;
+    smart-usage sorted-definitions. ;
 
 : words-matching ( str -- seq )
     all-words [ dup word-name ] { } map>assoc completions ;

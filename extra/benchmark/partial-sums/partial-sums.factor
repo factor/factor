@@ -3,7 +3,8 @@ prettyprint words hints ;
 IN: benchmark.partial-sums
 
 : summing ( n quot -- y )
-    [ + ] compose 0.0 -rot 1 -rot (each-integer) ; inline
+    [ >float ] swap [ + ] 3compose
+    0.0 -rot 1 -rot (each-integer) ; inline
 
 : 2/3^k ( n -- y ) [ 2.0 3.0 / swap 1- ^ ] summing ;
 
@@ -57,6 +58,6 @@ HINTS: gregory fixnum ;
         ] with each
     ] tabular-output ;
 
-: partial-sums-main 2500000 partial-sums ;
+: partial-sums-main ( -- ) 2500000 partial-sums ;
 
 MAIN: partial-sums-main

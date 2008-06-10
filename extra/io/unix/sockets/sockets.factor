@@ -1,108 +1,96 @@
 ! Copyright (C) 2004, 2008 Slava Pestov, Ivan Tikhonov. 
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings generic kernel math
-namespaces threads sequences byte-arrays io.nonblocking
-io.binary io.unix.backend io.streams.duplex io.sockets.impl
-io.backend io.files io.files.private io.encodings.utf8
-math.parser continuations libc combinators system accessors
-qualified unix ;
+namespaces threads sequences byte-arrays io.ports
+io.binary io.unix.backend io.streams.duplex
+io.backend io.ports io.files io.files.private
+io.encodings.utf8 math.parser continuations libc combinators
+system accessors qualified destructors unix locals ;
 
 EXCLUDE: io => read write close ;
 EXCLUDE: io.sockets => accept ;
 
 IN: io.unix.sockets
 
-: pending-init-error ( port -- )
-    #! We close it here to avoid a resource leak; callers of
-    #! <client> don't set up error handlers until after <client>
-    #! returns (and if they did before, they wouldn't have
-    #! anything to close!)
-    dup port-error dup [ swap dispose throw ] [ 2drop ] if ;
+: socket-fd ( domain type -- fd )
+    0 socket dup io-error <fd> |dispose ;
 
-: socket-fd ( domain type -- socket )
-    0 socket dup io-error dup init-handle ;
-
-: sockopt ( fd level opt -- )
-    1 <int> "int" heap-size setsockopt io-error ;
+: set-socket-option ( fd level opt -- )
+    >r >r handle-fd r> r> 1 <int> "int" heap-size setsockopt io-error ;
 
 M: unix addrinfo-error ( n -- )
     dup zero? [ drop ] [ gai_strerror throw ] if ;
 
 ! Client sockets - TCP and Unix domain
+M: object (get-local-address) ( handle remote -- sockaddr )
+    >r handle-fd r> empty-sockaddr/size <int>
+    [ getsockname io-error ] 2keep drop ;
+
+M: object (get-remote-address) ( handle local -- sockaddr )
+    >r handle-fd r> empty-sockaddr/size <int>
+    [ getpeername io-error ] 2keep drop ;
+
 : init-client-socket ( fd -- )
-    SOL_SOCKET SO_OOBINLINE sockopt ;
-
-TUPLE: connect-task < output-task ;
-
-: <connect-task> ( port continuation -- task )
-    connect-task <io-task> ;
-
-M: connect-task do-io-task
-    port>> dup handle>> f 0 write
-    0 < [ defer-error ] [ drop t ] if ;
+    SOL_SOCKET SO_OOBINLINE set-socket-option ;
 
 : wait-to-connect ( port -- )
-    [ <connect-task> add-io-task ] with-port-continuation drop ;
+    dup handle>> handle-fd f 0 write
+    {
+        { [ 0 = ] [ drop ] }
+        { [ err_no EAGAIN = ] [ dup +output+ wait-for-port wait-to-connect ] }
+        { [ err_no EINTR = ] [ wait-to-connect ] }
+        [ (io-error) ]
+    } cond ;
 
-M: unix ((client)) ( addrspec -- client-in client-out )
-    dup make-sockaddr/size >r >r
-    protocol-family SOCK_STREAM socket-fd
-    dup r> r> connect
-    zero? err_no EINPROGRESS = or [
-        dup init-client-socket
-        dup <reader&writer>
-        dup wait-to-connect
-        dup pending-init-error
-    ] [
-        dup close (io-error)
-    ] if ;
+M: object establish-connection ( client-out remote -- )
+    [ drop ] [ [ handle>> handle-fd ] [ make-sockaddr/size ] bi* connect ] 2bi
+    {
+        { [ 0 = ] [ drop ] }
+        { [ err_no EINPROGRESS = ] [
+            [ +output+ wait-for-port ] [ wait-to-connect ] bi
+        ] }
+        [ (io-error) ]
+    } cond ;
+
+M: object ((client)) ( addrspec -- fd )
+    protocol-family SOCK_STREAM socket-fd dup init-client-socket ;
 
 ! Server sockets - TCP and Unix domain
 : init-server-socket ( fd -- )
-    SOL_SOCKET SO_REUSEADDR sockopt ;
+    SOL_SOCKET SO_REUSEADDR set-socket-option ;
 
-TUPLE: accept-task < input-task ;
-
-: <accept-task> ( port continuation  -- task )
-    accept-task <io-task> ;
-
-: accept-sockaddr ( port -- fd sockaddr )
-    dup port-handle swap server-port-addr sockaddr-type
-    dup <c-object> [ swap heap-size <int> accept ] keep ; inline
-
-: do-accept ( port fd sockaddr -- )
-    rot
-    [ server-port-addr parse-sockaddr ] keep
-    [ set-server-port-client-addr ] keep
-    set-server-port-client ;
-
-M: accept-task do-io-task
-    io-task-port dup accept-sockaddr
-    over 0 >= [ do-accept t ] [ 2drop defer-error ] if ;
-
-: wait-to-accept ( server -- )
-    [ <accept-task> add-io-task ] with-port-continuation drop ;
-
-: server-fd ( addrspec type -- fd )
-    >r dup protocol-family r>  socket-fd
+: server-socket-fd ( addrspec type -- fd )
+    >r dup protocol-family r> socket-fd
     dup init-server-socket
-    dup rot make-sockaddr/size bind
-    zero? [ dup close (io-error) ] unless ;
+    dup handle-fd rot make-sockaddr/size bind io-error ;
 
-M: unix (server) ( addrspec -- handle )
-    SOCK_STREAM server-fd
-    dup 10 listen zero? [ dup close (io-error) ] unless ;
+M: object (server) ( addrspec -- handle )
+    [
+        SOCK_STREAM server-socket-fd
+        dup handle-fd 10 listen io-error
+    ] with-destructors ;
 
-M: unix (accept) ( server -- addrspec handle )
-    #! Wait for a client connection.
-    check-server-port
-    [ wait-to-accept ]
-    [ pending-error ]
-    [ [ client-addr>> ] [ client>> ] bi ] tri ;
+: do-accept ( server addrspec -- fd sockaddr )
+    [ handle>> handle-fd ] [ empty-sockaddr/size <int> ] bi*
+    [ accept ] 2keep drop ; inline
+
+M: object (accept) ( server addrspec -- fd sockaddr )
+    2dup do-accept
+    {
+        { [ over 0 >= ] [ >r 2nip <fd> r> ] }
+        { [ err_no EINTR = ] [ 2drop (accept) ] }
+        { [ err_no EAGAIN = ] [
+            2drop
+            [ drop +input+ wait-for-port ]
+            [ (accept) ]
+            2bi
+        ] }
+        [ (io-error) ]
+    } cond ;
 
 ! Datagram sockets - UDP and Unix domain
-M: unix <datagram>
-    [ SOCK_DGRAM server-fd ] keep <datagram-port> ;
+M: unix (datagram)
+    [ SOCK_DGRAM server-socket-fd ] with-destructors ;
 
 SYMBOL: receive-buffer
 
@@ -110,76 +98,45 @@ SYMBOL: receive-buffer
 
 packet-size <byte-array> receive-buffer set-global
 
-: setup-receive ( port -- s buffer len flags from fromlen )
-    dup port-handle
-    swap datagram-port-addr sockaddr-type
-    dup <c-object> swap heap-size <int>
-    >r >r receive-buffer get-global packet-size 0 r> r> ;
+:: do-receive ( port -- packet sockaddr )
+    port addr>> empty-sockaddr/size [| sockaddr len |
+        port handle>> handle-fd ! s
+        receive-buffer get-global ! buf
+        packet-size ! nbytes
+        0 ! flags
+        sockaddr ! from
+        len <int> ! fromlen
+        recvfrom dup 0 >= [
+            receive-buffer get-global swap head sockaddr
+        ] [
+            drop f f
+        ] if
+    ] call ;
 
-: do-receive ( s buffer len flags from fromlen -- sockaddr data )
-    over >r recvfrom r>
-    over -1 = [
-        2drop f f
-    ] [
-        receive-buffer get-global
-        rot head
+M: unix (receive) ( datagram -- packet sockaddr )
+    dup do-receive dup [ rot drop ] [
+        2drop [ +input+ wait-for-port ] [ (receive) ] bi
     ] if ;
 
-TUPLE: receive-task < input-task ;
+:: do-send ( packet sockaddr len socket datagram -- )
+    socket handle-fd packet dup length 0 sockaddr len sendto
+    0 < [
+        err_no EINTR = [
+            packet sockaddr len socket datagram do-send
+        ] [
+            err_no EAGAIN = [
+                datagram +output+ wait-for-port
+                packet sockaddr len socket datagram do-send
+            ] [
+                (io-error)
+            ] if
+        ] if
+    ] when ;
 
-: <receive-task> ( stream continuation  -- task )
-    receive-task <io-task> ;
+M: unix (send) ( packet addrspec datagram -- )
+    [ make-sockaddr/size ] [ [ handle>> ] keep ] bi* do-send ;
 
-M: receive-task do-io-task
-    io-task-port
-    dup setup-receive do-receive dup [
-        pick set-datagram-port-packet
-        over datagram-port-addr parse-sockaddr
-        swap set-datagram-port-packet-addr
-        t
-    ] [
-        2drop defer-error
-    ] if ;
-
-: wait-receive ( stream -- )
-    [ <receive-task> add-io-task ] with-port-continuation drop ;
-
-M: unix receive ( datagram -- packet addrspec )
-    check-datagram-port
-    [ wait-receive ]
-    [ pending-error ]
-    [ [ packet>> ] [ packet-addr>> ] bi ] tri ;
-
-: do-send ( socket data sockaddr len -- n )
-    >r >r dup length 0 r> r> sendto ;
-
-TUPLE: send-task < output-task packet sockaddr len ;
-
-: <send-task> ( packet sockaddr len stream continuation -- task )
-    send-task <io-task> [
-        {
-            set-send-task-packet
-            set-send-task-sockaddr
-            set-send-task-len
-        } set-slots
-    ] keep ;
-
-M: send-task do-io-task
-    [ io-task-port port-handle ] keep
-    [ send-task-packet ] keep
-    [ send-task-sockaddr ] keep
-    [ send-task-len do-send ] keep
-    swap 0 < [ io-task-port defer-error ] [ drop t ] if ;
-
-: wait-send ( packet sockaddr len stream -- )
-    [ <send-task> add-io-task ] with-port-continuation
-    2drop 2drop ;
-
-M: unix send ( packet addrspec datagram -- )
-    check-datagram-send
-    [ >r make-sockaddr/size r> wait-send ] keep
-    pending-error ;
-
+! Unix domain sockets
 M: local protocol-family drop PF_UNIX ;
 
 M: local sockaddr-type drop "sockaddr-un" c-type ;

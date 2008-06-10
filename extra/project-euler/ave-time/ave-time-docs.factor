@@ -16,9 +16,7 @@ HELP: ave-time
     "This word can be used to compare performance of the non-optimizing and optimizing compilers."
     $nl
     "First, we time a quotation directly; quotations are compiled by the non-optimizing quotation compiler:"
-    { $unchecked-example "[ 1000000 0 [ + ] reduce drop ] 10 ave-time" "1116 ms run / 6 ms GC ave time - 10 trials" }
+    { $unchecked-example "[ 1000000 0 [ + ] reduce drop ] 10 ave-time" "1116 ms run time - 10 trials" }
     "Now we define a word and compile it with the optimizing word compiler. This results is faster execution:"
-    { $unchecked-example ": foo 1000000 0 [ + ] reduce ;" "\\ foo compile" "[ foo drop ] 10 ave-time" "202 ms run / 13 ms GC ave time - 10 trials" }
+    { $unchecked-example ": foo 1000000 0 [ + ] reduce ;" "\\ foo compile" "[ foo drop ] 10 ave-time" "202 ms run time - 10 trials" }
 } ;
-
-{ benchmark collect-benchmarks gc-time millis time ave-time } related-words

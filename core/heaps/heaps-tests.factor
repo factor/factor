@@ -3,7 +3,7 @@
 
 USING: arrays kernel math namespaces tools.test
 heaps heaps.private math.parser random assocs sequences sorting
-accessors ;
+accessors math.order ;
 IN: heaps.tests
 
 [ <min-heap> heap-pop ] must-fail

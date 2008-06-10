@@ -5,7 +5,7 @@ models sequences ui.gadgets.buttons
 ui.gadgets.packs ui.gadgets.labels tools.deploy.config
 namespaces ui.gadgets.editors ui.gadgets.borders ui.gestures
 ui.commands assocs ui.gadgets.tracks ui ui.tools.listener
-tools.deploy vocabs ui.tools.workspace system ;
+tools.deploy vocabs ui.tools.workspace system accessors ;
 IN: ui.tools.deploy
 
 TUPLE: deploy-gadget vocab settings ;
@@ -40,9 +40,10 @@ TUPLE: deploy-gadget vocab settings ;
     deploy-word-defs? get "Retain all word definitions" <checkbox> gadget,
     deploy-c-types? get "Retain all C types" <checkbox> gadget, ;
 
-: deploy-settings-theme
-    { 10 10 } over set-pack-gap
-    1 swap set-pack-fill ;
+: deploy-settings-theme ( gadget -- )
+    { 10 10 } >>gap
+    1 >>fill
+    drop ;
 
 : <deploy-settings> ( vocab -- control )
     default-config [ <model> ] assoc-map [
@@ -57,16 +58,16 @@ TUPLE: deploy-gadget vocab settings ;
         namespace <mapping> over set-gadget-model
     ] bind ;
 
-: find-deploy-gadget
+: find-deploy-gadget ( gadget -- deploy-gadget )
     [ deploy-gadget? ] find-parent ;
 
-: find-deploy-vocab
+: find-deploy-vocab ( gadget -- vocab )
     find-deploy-gadget deploy-gadget-vocab ;
 
-: find-deploy-config
+: find-deploy-config ( gadget -- config )
     find-deploy-vocab deploy-config ;
 
-: find-deploy-settings
+: find-deploy-settings ( gadget -- settings )
     find-deploy-gadget deploy-gadget-settings ;
 
 : com-revert ( gadget -- )
@@ -100,7 +101,7 @@ deploy-gadget "toolbar" f {
     { T{ key-down f f "RET" } com-deploy }
 } define-command-map
 
-: buttons,
+: buttons, ( -- )
     g <toolbar> { 10 10 } over set-pack-gap gadget, ;
 
 : <deploy-gadget> ( vocab -- gadget )

@@ -9,7 +9,7 @@ ARTICLE: "tools.memory" "Object memory tools"
 "You can query memory status:"
 { $subsection data-room }
 { $subsection code-room }
-"There are a pair of combinators, analogous to " { $link each } " and " { $link subset } ", which operate on the entire collection of objects in the object heap:"
+"There are a pair of combinators, analogous to " { $link each } " and " { $link filter } ", which operate on the entire collection of objects in the object heap:"
 { $subsection each-object }
 { $subsection instances }
 "You can check an object's the heap memory usage:"

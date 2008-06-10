@@ -1,38 +1,80 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel sequences io.files io.sockets
-db.sqlite smtp namespaces db
-http.server.db
-http.server.sessions
-http.server.auth.login
-http.server.auth.providers.db
-http.server.sessions.storage.db
-http.server.boilerplate
-http.server.templating.chloe ;
+USING: accessors kernel sequences assocs io.files io.sockets
+io.server
+namespaces db db.sqlite smtp
+http.server
+http.server.dispatchers
+furnace.db
+furnace.asides
+furnace.flash
+furnace.sessions
+furnace.auth.login
+furnace.auth.providers.db
+furnace.boilerplate
+webapps.blogs
+webapps.pastebin
+webapps.planet
+webapps.todo
+webapps.wiki
+webapps.wee-url
+webapps.user-admin ;
 IN: webapps.factor-website
 
-: factor-template ( path -- template )
-    "resource:extra/webapps/factor-website/" swap ".xml" 3append <chloe> ;
+: test-db ( -- db params ) "resource:test.db" sqlite-db ;
 
-: test-db "todo.db" resource-path sqlite-db ;
+: init-factor-db ( -- )
+    test-db [
+        init-users-table
+        init-sessions-table
 
-: <factor-boilerplate> ( responder -- responder' )
+        init-pastes-table
+        init-annotations-table
+
+        init-blog-table
+        init-postings-table
+
+        init-todo-table
+
+        init-articles-table
+        init-revisions-table
+
+        init-postings-table
+        init-comments-table
+
+        init-short-url-table
+    ] with-db ;
+
+TUPLE: factor-website < dispatcher ;
+
+: <factor-website> ( -- responder )
+    factor-website new-dispatcher
+        <blogs> "blogs" add-responder
+        <todo-list> "todo" add-responder
+        <pastebin> "pastebin" add-responder
+        <planet-factor> "planet" add-responder
+        <wiki> "wiki" add-responder
+        <wee-url> "wee-url" add-responder
+        <user-admin> "user-admin" add-responder
     <login>
         users-in-db >>users
         allow-registration
         allow-password-recovery
         allow-edit-profile
     <boilerplate>
-        "page" factor-template >>template
-    <url-sessions>
-        sessions-in-db >>sessions
+        { factor-website "page" } >>template
+    <asides> <flash-scopes> <sessions>
     test-db <db-persistence> ;
 
 : init-factor-website ( -- )
     "factorcode.org" 25 <inet> smtp-server set-global
     "todo@factorcode.org" lost-password-from set-global
 
-    test-db [
-        init-sessions-table
-        init-users-table
-    ] with-db ;
+    init-factor-db
+
+    <factor-website> main-responder set-global ;
+
+: start-factor-website ( -- )
+    test-db start-expiring-sessions
+    test-db start-update-task
+    8812 httpd ;

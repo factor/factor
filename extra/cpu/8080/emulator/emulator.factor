@@ -3,7 +3,7 @@
 !
 USING: kernel math sequences words arrays io io.files namespaces
 math.parser assocs quotations parser parser-combinators
-tools.time io.encodings.binary ;
+tools.time io.encodings.binary sequences.deep symbols combinators ;
 IN: cpu.8080.emulator
 
 TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles ram ;
@@ -563,29 +563,18 @@ SYMBOL: rom-root
     { "M" { flag-m?  } }
   } at ;
 
-SYMBOL: $1
-SYMBOL: $2
-SYMBOL: $3
-SYMBOL: $4
+SYMBOLS: $1 $2 $3 $4 ;
 
 : replace-patterns ( vector tree -- tree )
-  #! Copy the tree, replacing each occurence of 
-  #! $1, $2, etc with the relevant item from the 
-  #! given index.
-  dup quotation? over [ ] = not and [ ! vector tree
-    dup first swap 1 tail ! vector car cdr
-    >r dupd replace-patterns ! vector v R: cdr
-    swap r> replace-patterns >r 1quotation r> append
-  ] [ ! vector value
-    dup $1 = [ drop 0 over nth  ] when 
-    dup $2 = [ drop 1 over nth  ] when 
-    dup $3 = [ drop 2 over nth  ] when 
-    dup $4 = [ drop 3 over nth  ] when 
-    nip
-  ] if ;
-
-: test-rp 
-  { 4 5 3 } [ 1 $2 [ $1 4 ] ] replace-patterns ;
+  [
+    {
+      { $1 [ first ] }
+      { $2 [ second ] }
+      { $3 [ third ] }
+      { $4 [ fourth ] }
+      [ nip ]
+    } case
+  ] with deep-map ;
 
 : (emulate-RST) ( n cpu -- )
   #! RST nn
@@ -766,7 +755,7 @@ SYMBOL: $4
   "H" token  <|>
   "L" token  <|> [ register-lookup ] <@ ;
 
-: all-flags
+: all-flags ( -- parser )
   #! A parser for 16-bit flags. 
   "NZ" token  
   "NC" token <|>
@@ -777,7 +766,7 @@ SYMBOL: $4
   "P" token <|> 
   "M" token <|> [ flag-lookup ] <@ ;
 
-: 16-bit-registers
+: 16-bit-registers ( -- parser )
   #! A parser for 16-bit registers. On a successfull parse the
   #! parse tree contains a vector. The first item in the vector
   #! is the getter word for that register with stack effect
@@ -1098,27 +1087,27 @@ SYMBOL: $4
   16-bit-registers indirect <&>
   just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
   
-: LD-RR,NN-instruction
+: LD-RR,NN-instruction ( -- parser )
   #! LD BC,nn
   "LD-RR,NN" "LD" complex-instruction
   16-bit-registers sp <&>
   ",nn" token <& 
   just [ first2 swap curry ] <@ ;
 
-: LD-R,N-instruction
+: LD-R,N-instruction ( -- parser )
   #! LD B,n
   "LD-R,N" "LD" complex-instruction
   8-bit-registers sp <&>
   ",n" token <& 
   just [ first2 swap curry ] <@ ;
   
-: LD-(RR),N-instruction
+: LD-(RR),N-instruction ( -- parser )
   "LD-(RR),N" "LD" complex-instruction
   16-bit-registers indirect sp <&> 
   ",n" token <&
   just [ first2 swap curry ] <@ ;
 
-: LD-(RR),R-instruction
+: LD-(RR),R-instruction ( -- parser )
   #! LD (BC),A
   "LD-(RR),R" "LD" complex-instruction
   16-bit-registers indirect sp <&> 
@@ -1126,84 +1115,84 @@ SYMBOL: $4
   8-bit-registers <&>
   just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
 
-: LD-R,R-instruction
+: LD-R,R-instruction ( -- parser )
   "LD-R,R" "LD" complex-instruction
   8-bit-registers sp <&> 
   "," token <&
   8-bit-registers <&>
   just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
 
-: LD-RR,RR-instruction
+: LD-RR,RR-instruction ( -- parser )
   "LD-RR,RR" "LD" complex-instruction
   16-bit-registers sp <&> 
   "," token <&
   16-bit-registers <&>
   just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
 
-: LD-R,(RR)-instruction
+: LD-R,(RR)-instruction ( -- parser )
   "LD-R,(RR)" "LD" complex-instruction
   8-bit-registers sp <&> 
   "," token <&
   16-bit-registers indirect <&>
   just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
 
-: LD-(NN),RR-instruction
+: LD-(NN),RR-instruction ( -- parser )
   "LD-(NN),RR" "LD" complex-instruction
   "nn" token indirect sp <&
   "," token <&
   16-bit-registers <&>
   just [ first2 swap curry ] <@ ;
 
-: LD-(NN),R-instruction
+: LD-(NN),R-instruction ( -- parser )
   "LD-(NN),R" "LD" complex-instruction
   "nn" token indirect sp <&
   "," token <&
   8-bit-registers <&>
   just [ first2 swap curry ] <@ ;
 
-: LD-RR,(NN)-instruction
+: LD-RR,(NN)-instruction ( -- parser )
   "LD-RR,(NN)" "LD" complex-instruction
   16-bit-registers sp <&>
   "," token <&
   "nn" token indirect <&
   just [ first2 swap curry ] <@ ;
 
-: LD-R,(NN)-instruction
+: LD-R,(NN)-instruction ( -- parser )
   "LD-R,(NN)" "LD" complex-instruction
   8-bit-registers sp <&>
   "," token <&
   "nn" token indirect <&
   just [ first2 swap curry ] <@ ;
 
-: OUT-(N),R-instruction
+: OUT-(N),R-instruction ( -- parser )
   "OUT-(N),R" "OUT" complex-instruction
   "n" token indirect sp <&
   "," token <&
   8-bit-registers <&>
   just [ first2 swap curry ] <@ ;
 
-: IN-R,(N)-instruction
+: IN-R,(N)-instruction ( -- parser )
   "IN-R,(N)" "IN" complex-instruction
   8-bit-registers sp <&>
   "," token <&
   "n" token indirect <&
   just [ first2 swap curry ] <@ ;
 
-: EX-(RR),RR-instruction
+: EX-(RR),RR-instruction ( -- parser )
   "EX-(RR),RR" "EX" complex-instruction
   16-bit-registers indirect sp <&> 
   "," token <&
   16-bit-registers <&>
   just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
 
-: EX-RR,RR-instruction
+: EX-RR,RR-instruction ( -- parser )
   "EX-RR,RR" "EX" complex-instruction
   16-bit-registers sp <&> 
   "," token <&
   16-bit-registers <&>
   just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
 
-: 8080-generator-parser
+: 8080-generator-parser ( -- parser )
   NOP-instruction 
   RST-0-instruction <|> 
   RST-8-instruction <|> 
@@ -1296,7 +1285,7 @@ SYMBOL: last-opcode
   #! that would implement that instruction.
   dup " " join instruction-quotations
   >r "_" join [ "emulate-" % % ] "" make create-in dup last-instruction global set-at  
-  r> define ;
+  r> (( cpu -- )) define-declared ;
 
 : INSTRUCTION: ";" parse-tokens parse-instructions ; parsing
 

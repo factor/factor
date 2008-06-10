@@ -7,6 +7,7 @@ USE: io.windows.nt.backend
 USE: io.windows.nt.files
 USE: io.windows.nt.launcher
 USE: io.windows.nt.monitors
+USE: io.windows.nt.privileges
 USE: io.windows.nt.sockets
 USE: io.windows.mmap
 USE: io.windows.files

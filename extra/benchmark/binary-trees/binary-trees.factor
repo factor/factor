@@ -1,5 +1,5 @@
 USING: kernel math accessors prettyprint io locals sequences
-math.ranges ;
+math.ranges math.order ;
 IN: benchmark.binary-trees
 
 TUPLE: tree-node item left right ;
@@ -53,3 +53,5 @@ M: f item-check drop 0 ;
 
 : binary-trees-main ( -- )
     16 binary-trees ;
+
+MAIN: binary-trees-main

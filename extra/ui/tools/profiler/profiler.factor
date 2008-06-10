@@ -27,7 +27,7 @@ TUPLE: profiler-gadget pane ;
 : com-method-profile ( gadget -- )
     [ method-profile. ] with-profiler-pane ;
 
-: profiler-help "ui-profiler" help-window ;
+: profiler-help ( -- ) "ui-profiler" help-window ;
 
 \ profiler-help H{ { +nullary+ t } } define-command
 

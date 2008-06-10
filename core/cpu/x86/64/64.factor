@@ -130,7 +130,10 @@ M: x86.64 %prepare-box-struct ( size -- )
 
 M: x86.64 %prepare-var-args RAX RAX XOR ;
 
-M: x86.64 %alien-invoke ( symbol dll -- )
+M: x86.64 %alien-global
+    [ 0 MOV rc-absolute-cell rel-dlsym ] [ dup [] MOV ] bi ;
+
+M: x86.64 %alien-invoke
     0 address-operand >r rc-absolute-cell rel-dlsym r> CALL ;
 
 M: x86.64 %prepare-alien-indirect ( -- )
@@ -181,7 +184,7 @@ stack-params "__stack_value" c-type set-c-type-reg-class >>
 : split-struct ( pairs -- seq )
     [
         [ 8 mod zero? [ t , ] when , ] assoc-each
-    ] { } make { t } split [ empty? not ] subset ;
+    ] { } make { t } split harvest ;
 
 : flatten-large-struct ( type -- )
     heap-size cell align

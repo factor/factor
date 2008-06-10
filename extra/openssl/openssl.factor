@@ -1,154 +1,207 @@
-! Copyright (C) 2007 Elie CHAFTARI
+! Copyright (C) 2007, 2008, Slava Pestov, Elie CHAFTARI.
 ! See http://factorcode.org/license.txt for BSD license.
-!
-! Tested with OpenSSL 0.9.8a_0 on Mac OS X 10.4.9 PowerPC
-
-USING: alien alien.c-types alien.strings assocs kernel libc
-namespaces openssl.libcrypto openssl.libssl sequences
-io.encodings.ascii ;
-
+USING: accessors byte-arrays kernel debugger sequences namespaces math
+math.order combinators init alien alien.c-types alien.strings libc
+continuations destructors debugger inspector splitting
+locals unicode.case
+openssl.libcrypto openssl.libssl
+io.backend io.ports io.files io.encodings.8-bit io.sockets.secure
+io.timeouts ;
 IN: openssl
 
-SYMBOL: bio
-SYMBOL: ssl-bio
+! This code is based on http://www.rtfm.com/openssl-examples/
 
-SYMBOL: ctx
-SYMBOL: dh
-SYMBOL: rsa
+SINGLETON: openssl
 
-! =========================================================
-! Callback routines
-! =========================================================
+GENERIC: ssl-method ( symbol -- method )
 
-: password-cb ( -- alien )
-    "int" { "char*" "int" "int" "void*" } "cdecl"
-    [ 3drop "password" ascii string>alien 1023 memcpy
-    "password" length ] alien-callback ;
+M: SSLv2  ssl-method drop SSLv2_client_method ;
+M: SSLv23 ssl-method drop SSLv23_method ;
+M: SSLv3  ssl-method drop SSLv3_method ;
+M: TLSv1  ssl-method drop TLSv1_method ;
 
-! =========================================================
-! Error-handling routines
-! =========================================================
+: (ssl-error-string) ( n -- string )
+    ERR_clear_error f ERR_error_string ;
 
-: get-error ( -- num )
-    ERR_get_error ;
+: ssl-error-string ( -- string )
+    ERR_get_error ERR_clear_error f ERR_error_string ;
 
-: error-string ( num -- str )
-    f ERR_error_string ;
+: (ssl-error) ( -- * )
+    ssl-error-string throw ;
 
-: check-result ( result -- )
-    1 = [  ] [
-        get-error error-string throw
-    ] if ;
+: ssl-error ( obj -- )
+    { f 0 } member? [ (ssl-error) ] when ;
 
-: ssl-get-error ( ssl ret -- )
-    SSL_get_error error-messages at throw ;
+: init-ssl ( -- )
+    SSL_library_init ssl-error
+    SSL_load_error_strings
+    OpenSSL_add_all_digests
+    OpenSSL_add_all_ciphers ;
 
-! Write errors to a file
-: bio-new-file ( path mode -- )
-    BIO_new_file bio set ;
+SYMBOL: ssl-initialized?
 
-: bio-print ( bio str -- n )
-    BIO_printf ;
+: maybe-init-ssl ( -- )
+    ssl-initialized? get-global [
+        init-ssl
+        t ssl-initialized? set-global
+    ] unless ;
 
-: bio-free ( bio -- )
-    BIO_free check-result ;
+[ f ssl-initialized? set-global ] "openssl" add-init-hook
 
-! =========================================================
-! Initialization routines
-! =========================================================
+TUPLE: openssl-context < secure-context aliens ;
 
-: init ( -- )
-    SSL_library_init drop ; ! always returns 1
+: load-certificate-chain ( ctx -- )
+    dup config>> key-file>> [
+        [ handle>> ] [ config>> key-file>> (normalize-path) ] bi
+        SSL_CTX_use_certificate_chain_file
+        ssl-error
+    ] [ drop ] if ;
 
-: load-error-strings ( -- )
-    SSL_load_error_strings ;
+: password-callback ( -- alien )
+    "int" { "void*" "int" "bool" "void*" } "cdecl"
+    [| buf size rwflag password! |
+        password [ B{ 0 } password! ] unless
 
-: ssl-v23 ( -- method )
-    SSLv23_method ;
+        [let | len [ password strlen ] |
+            buf password len 1+ size min memcpy
+            len
+        ]
+    ] alien-callback ;
 
-: new-ctx ( method -- )
-    SSL_CTX_new ctx set ;
+: default-pasword ( ctx -- alien )
+    [ config>> password>> latin1 malloc-string ] [ aliens>> ] bi
+    [ push ] [ drop ] 2bi ;
 
-: use-cert-chain ( ctx file -- )
-    SSL_CTX_use_certificate_chain_file check-result ;
+: set-default-password ( ctx -- )
+    [ handle>> password-callback SSL_CTX_set_default_passwd_cb ]
+    [
+        [ handle>> ] [ default-pasword ] bi
+        SSL_CTX_set_default_passwd_cb_userdata
+    ] bi ;
 
-: set-default-passwd ( ctx cb -- )
-    SSL_CTX_set_default_passwd_cb ;
+: use-private-key-file ( ctx -- )
+    dup config>> key-file>> [
+        [ handle>> ] [ config>> key-file>> (normalize-path) ] bi
+        SSL_FILETYPE_PEM SSL_CTX_use_PrivateKey_file
+        ssl-error
+    ] [ drop ] if ;
 
-: set-default-passwd-userdata ( ctx passwd -- )
-    SSL_CTX_set_default_passwd_cb_userdata ;
+: load-verify-locations ( ctx -- )
+    dup config>> [ ca-file>> ] [ ca-path>> ] bi or [
+        [ handle>> ]
+        [
+            config>>
+            [ ca-file>> dup [ (normalize-path) ] when ]
+            [ ca-path>> dup [ (normalize-path) ] when ] bi
+        ] bi
+        SSL_CTX_load_verify_locations
+    ] [ handle>> SSL_CTX_set_default_verify_paths ] if ssl-error ;
 
-: use-private-key ( ctx file type -- )
-    SSL_CTX_use_PrivateKey_file check-result ;
+: set-verify-depth ( ctx -- )
+    dup config>> verify-depth>> [
+        [ handle>> ] [ config>> verify-depth>> ] bi
+        SSL_CTX_set_verify_depth
+    ] [ drop ] if ;
 
-: verify-load-locations ( ctx file path -- )
-    SSL_CTX_load_verify_locations check-result ;
+TUPLE: bio handle disposed ;
 
-: set-verify-depth ( ctx depth -- )
-    SSL_CTX_set_verify_depth ;
+: <bio> ( handle -- bio ) f bio boa ;
 
-: read-pem-dh-params ( bio x cb u -- )
-    PEM_read_bio_DHparams dh set ;
+M: bio dispose* handle>> BIO_free ssl-error ;
 
-: set-tmp-dh-callback ( ctx dh -- )
-    SSL_CTX_set_tmp_dh_callback ;
+: <file-bio> ( path -- bio )
+    normalize-path "r" BIO_new_file dup ssl-error <bio> ;
 
-: set-ctx-ctrl ( ctx cmd larg parg -- )
-    SSL_CTX_ctrl check-result ;
+: load-dh-params ( ctx -- )
+    dup config>> dh-file>> [
+        [ handle>> ] [ config>> dh-file>> ] bi <file-bio> &dispose
+        handle>> f f f PEM_read_bio_DHparams dup ssl-error
+        SSL_CTX_set_tmp_dh ssl-error
+    ] [ drop ] if ;
 
-: generate-rsa-key ( n e cb cbarg -- )
-    RSA_generate_key rsa set ;
+TUPLE: rsa handle disposed ;
 
-: set-tmp-rsa-callback ( ctx rsa -- )
-    SSL_CTX_set_tmp_rsa_callback ;
+: <rsa> ( handle -- rsa ) f rsa boa ;
 
-: free-rsa ( rsa -- )
-    RSA_free ;
+M: rsa dispose* handle>> RSA_free ;
 
-: bio-new-socket ( fd flag -- sbio )
-    BIO_new_socket ;
+: generate-eph-rsa-key ( ctx -- )
+    [ handle>> ]
+    [
+        config>> ephemeral-key-bits>> RSA_F4 f f RSA_generate_key
+        dup ssl-error <rsa> &dispose handle>>
+    ] bi
+    SSL_CTX_set_tmp_rsa ssl-error ;
 
-: new-ssl ( ctx -- ssl )
-    SSL_new ;
+M: openssl <secure-context> ( config -- context )
+    maybe-init-ssl
+    [
+        dup method>> ssl-method SSL_CTX_new
+        dup ssl-error f V{ } clone openssl-context boa |dispose
+        {
+            [ load-certificate-chain ]
+            [ set-default-password ]
+            [ use-private-key-file ]
+            [ load-verify-locations ]
+            [ set-verify-depth ]
+            [ load-dh-params ]
+            [ generate-eph-rsa-key ]
+            [ ]
+        } cleave
+    ] with-destructors ;
 
-: set-ssl-bio ( ssl bio bio -- )
-    SSL_set_bio ;
+M: openssl-context dispose*
+    [ aliens>> [ free ] each ]
+    [ handle>> SSL_CTX_free ]
+    bi ;
 
-: set-ssl-fd ( ssl fd -- )
-    SSL_set_fd check-result ;
+TUPLE: ssl-handle file handle connected disposed ;
 
-: ssl-accept ( ssl -- result )
-    SSL_accept ;
+SYMBOL: default-secure-context
 
-! =========================================================
-! Clean-up and termination routines
-! =========================================================
+: context-expired? ( context -- ? )
+    dup [ handle>> expired? ] [ drop t ] if ;
 
-: destroy-ctx ( ctx -- )
-    SSL_CTX_free ;
+: current-secure-context ( -- ctx )
+    secure-context get [
+        default-secure-context get dup context-expired? [
+            drop
+            <secure-config> <secure-context> default-secure-context set-global
+            current-secure-context
+        ] when
+    ] unless* ;
 
-! =========================================================
-! Public routines
-! =========================================================
+: <ssl-handle> ( fd -- ssl )
+    current-secure-context handle>> SSL_new dup ssl-error
+    f f ssl-handle boa ;
 
-: get-bio ( -- bio )
-    bio get ;
+M: ssl-handle dispose*
+    [ handle>> SSL_free ] [ file>> dispose ] bi ;
 
-: get-ssl-bio ( -- bio )
-    ssl-bio get ;
+: check-verify-result ( ssl-handle -- )
+    SSL_get_verify_result dup X509_V_OK =
+    [ drop ] [ verify-message certificate-verify-error ] if ;
 
-: get-ctx ( -- ctx )
-    ctx get ;
+: common-name ( certificate -- host )
+    X509_get_subject_name
+    NID_commonName 256 <byte-array>
+    [ 256 X509_NAME_get_text_by_NID ] keep
+    swap -1 = [ drop f ] [ latin1 alien>string ] if ;
 
-: get-dh ( -- dh )
-    dh get ;
+: common-names-match? ( expected actual -- ? )
+    [ >lower ] bi@ "*." ?head [ tail? ] [ = ] if ;
 
-: get-rsa ( -- rsa )
-    rsa get ;
+: check-common-name ( host ssl-handle -- )
+    SSL_get_peer_certificate common-name
+    2dup common-names-match?
+    [ 2drop ] [ common-name-verify-error ] if ;
 
-: >md5 ( str -- byte-array )
-    dup length 16 "uchar" <c-array> [ MD5 ] keep nip ;
+M: openssl check-certificate ( host ssl -- )
+    current-secure-context config>> verify>> [
+        handle>>
+        [ nip check-verify-result ]
+        [ check-common-name ]
+        2bi
+    ] [ 2drop ] if ;
 
-: >sha1 ( str -- byte-array )
-    dup length 20 "uchar" <c-array> [ SHA1 ] keep nip ;
-
+openssl secure-socket-backend set-global

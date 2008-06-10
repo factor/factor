@@ -1,6 +1,6 @@
 USING: assocs words sequences arrays compiler tools.time
 io.styles io prettyprint vocabs kernel sorting generator
-optimizer math ;
+optimizer math math.order ;
 IN: report.optimizer
 
 : count-optimization-passes ( nodes n -- n )
@@ -8,7 +8,7 @@ IN: report.optimizer
     [ r> 1+ count-optimization-passes ] [ drop r> ] if ;
 
 : results
-    [ [ second ] swap compose compare ] curry sort 20 tail*
+    [ [ second ] prepose compare ] curry sort 20 tail*
     print
     standard-table-style
     [
@@ -16,11 +16,11 @@ IN: report.optimizer
     ] tabular-output ; inline
 
 : optimizer-measurements ( -- alist )
-    all-words [ compiled? ] subset
+    all-words [ compiled? ] filter
     [
         dup [
             word-dataflow nip 1 count-optimization-passes
-        ] benchmark nip 2array
+        ] benchmark 2array
     ] { } map>assoc ;
 
 : optimizer-measurements. ( alist -- )

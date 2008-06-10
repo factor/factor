@@ -1,16 +1,16 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 ! Based on Slate's src/unfinished/interval.slate by Brian Rice.
-USING: kernel sequences arrays math combinators ;
+USING: kernel sequences arrays math combinators math.order ;
 IN: math.intervals
 
 TUPLE: interval from to ;
 
 C: <interval> interval
 
-: open-point f 2array ;
+: open-point ( n -- endpoint ) f 2array ;
 
-: closed-point t 2array ;
+: closed-point ( n -- endpoint ) t 2array ;
 
 : [a,b] ( a b -- interval )
     >r closed-point r> closed-point <interval> ;
@@ -197,7 +197,8 @@ SYMBOL: incomparable
     [ interval-to ] bi@ =
     and and ;
 
-: (interval<) over interval-from over interval-from endpoint< ;
+: (interval<) ( i1 i2 -- i1 i2 ? )
+    over interval-from over interval-from endpoint< ;
 
 : interval< ( i1 i2 -- ? )
     {

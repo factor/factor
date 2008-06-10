@@ -1,4 +1,4 @@
-USING: alien alien.c-types kernel math sequences strings
+USING: unix alien alien.c-types kernel math sequences strings
 io.unix.backend splitting ;
 IN: hardware-info.linux
 
@@ -7,7 +7,7 @@ IN: hardware-info.linux
 
 : uname ( -- seq )
     65536 "char" <c-array> [ (uname) io-error ] keep
-    "\0" split [ empty? not ] subset [ >string ] map
+    "\0" split harvest [ >string ] map
     6 "" pad-right ;
 
 : sysname ( -- string ) uname first ;
@@ -18,4 +18,4 @@ IN: hardware-info.linux
 : domainname ( -- string ) uname 5 swap nth ;
 
 : kernel-version ( -- seq )
-    release ".-" split [ ] subset 5 "" pad-right ;
+    release ".-" split harvest 5 "" pad-right ;

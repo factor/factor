@@ -34,23 +34,6 @@ unit-test
 
 [ "SBUF\" hello world\"" ] [ SBUF" hello world" unparse ] unit-test
 
-
-[ "( a b -- c d )" ] [
-    { "a" "b" } { "c" "d" } <effect> effect>string
-] unit-test
-
-[ "( -- c d )" ] [
-    { } { "c" "d" } <effect> effect>string
-] unit-test
-
-[ "( a b -- )" ] [
-    { "a" "b" } { } <effect> effect>string
-] unit-test
-
-[ "( -- )" ] [
-    { } { } <effect> effect>string
-] unit-test
-
 [ "W{ \\ + }" ] [ [ W{ \ + } ] first unparse ] unit-test
 
 [ ] [ \ fixnum see ] unit-test
@@ -114,7 +97,7 @@ unit-test
             [ parse-fresh drop ] with-compilation-unit
             [
                 "prettyprint.tests" lookup see
-            ] with-string-writer "\n" split 1 head*
+            ] with-string-writer "\n" split but-last
         ] keep =
     ] with-scope ;
 
@@ -334,5 +317,13 @@ PREDICATE: predicate-see-test < integer even? ;
     [ \ predicate-see-test see ] with-string-writer
 ] unit-test
 
+INTERSECTION: intersection-see-test sequence number ;
+
+[ "USING: math sequences ;\nIN: prettyprint.tests\nINTERSECTION: intersection-see-test sequence number ;\n" ] [
+    [ \ intersection-see-test see ] with-string-writer
+] unit-test
+
 [ ] [ \ compose see ] unit-test
 [ ] [ \ curry see ] unit-test
+
+[ "POSTPONE: [" ] [ \ [ unparse ] unit-test

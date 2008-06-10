@@ -45,7 +45,7 @@ TYPEDEF: uchar KeyCode
 ! with button names below.
 
 
-: AnyModifier           1 15 shift ; ! used in GrabButton, GrabKey
+: AnyModifier          ( -- n ) 15 2^ ; ! used in GrabButton, GrabKey
 
 ! button names. Used as arguments to GrabButton and as detail in ButtonPress
 ! and ButtonRelease events.  Not to be confused with button masks above.
@@ -128,8 +128,8 @@ TYPEDEF: uchar KeyCode
 
 ! Used in SetInputFocus, GetInputFocus
 
-: RevertToNone          None ;
-: RevertToPointerRoot   PointerRoot ;
+: RevertToNone         ( -- n ) None ;
+: RevertToPointerRoot  ( -- n ) PointerRoot ;
 : RevertToParent        2 ;
 
 ! *****************************************************************
@@ -307,9 +307,9 @@ TYPEDEF: uchar KeyCode
 
 ! Flags used in StoreNamedColor, StoreColors
 
-: DoRed         1 0 shift ;
-: DoGreen       1 1 shift ;
-: DoBlue        1 2 shift ;
+: DoRed        ( -- n ) 0 2^ ;
+: DoGreen      ( -- n ) 1 2^ ;
+: DoBlue       ( -- n ) 2 2^ ;
 
 ! *****************************************************************
 ! * CURSOR STUFF
@@ -334,14 +334,14 @@ TYPEDEF: uchar KeyCode
 
 ! masks for ChangeKeyboardControl
 
-: KBKeyClickPercent     1 0 shift ;
-: KBBellPercent         1 1 shift ;
-: KBBellPitch           1 2 shift ;
-: KBBellDuration        1 3 shift ;
-: KBLed                 1 4 shift ;
-: KBLedMode             1 5 shift ;
-: KBKey                 1 6 shift ;
-: KBAutoRepeatMode      1 7 shift ;
+: KBKeyClickPercent    ( -- n ) 0 2^ ;
+: KBBellPercent        ( -- n ) 1 2^ ;
+: KBBellPitch          ( -- n ) 2 2^ ;
+: KBBellDuration       ( -- n ) 3 2^ ;
+: KBLed                ( -- n ) 4 2^ ;
+: KBLedMode            ( -- n ) 5 2^ ;
+: KBKey                ( -- n ) 6 2^ ;
+: KBAutoRepeatMode     ( -- n ) 7 2^ ;
 
 : MappingSuccess        0 ;
 : MappingBusy           1 ;

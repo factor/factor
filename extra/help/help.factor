@@ -29,7 +29,7 @@ M: predicate word-help* drop \ $predicate ;
 
 : all-articles ( -- seq )
     articles get keys
-    all-words [ word-help ] subset append ;
+    all-words [ word-help ] filter append ;
 
 : xref-help ( -- )
     all-articles [ xref-article ] each ;
@@ -41,17 +41,17 @@ M: predicate word-help* drop \ $predicate ;
     [ dup article-title ] { } map>assoc sort-values keys ;
 
 : all-errors ( -- seq )
-    all-words [ error? ] subset sort-articles ;
+    all-words [ error? ] filter sort-articles ;
 
 M: word article-name word-name ;
 
 M: word article-title
-    dup parsing? over symbol? or [
+    dup [ parsing-word? ] [ symbol? ] bi or [
         word-name
     ] [
-        dup word-name
-        swap stack-effect
-        [ effect>string " " swap 3append ] when*
+        [ word-name ]
+        [ stack-effect [ effect>string " " prepend ] [ "" ] if* ] bi
+        append
     ] if ;
 
 M: word article-content
@@ -114,15 +114,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
 : $about ( element -- )
     first vocab-help [ 1array $subsection ] when* ;
 
-: (:help-multi)
-    "This error has multiple delegates:" print
-    ($index) nl
-    "Use \\ ... help to get help about a specific delegate." print ;
-
-: (:help-none)
-    drop "No help for this error. " print ;
-
-: (:help-debugger)
+: :help-debugger ( -- )
     nl
     "Debugger commands:" print
     nl
@@ -135,12 +127,8 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     ":vars - list all variables at error time" print ;
 
 : :help ( -- )
-    error get delegates [ error-help ] map [ ] subset
-    {
-        { [ dup empty? ] [ (:help-none) ] }
-        { [ dup length 1 = ] [ first help ] }
-        [ (:help-multi) ]
-    } cond (:help-debugger) ;
+    error get error-help [ help ] [ "No help for this error. " print ] if*
+    :help-debugger ;
 
 : remove-article ( name -- )
     dup articles get key? [

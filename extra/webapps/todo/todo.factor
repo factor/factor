@@ -1,86 +1,118 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel locals sequences namespaces
-db db.types db.tuples
-http.server.components http.server.components.farkup
-http.server.forms http.server.templating.chloe
-http.server.boilerplate http.server.crud http.server.auth
-http.server.actions http.server.db
-http.server.auth.login
+USING: accessors kernel sequences namespaces
+db db.types db.tuples validators hashtables urls
+html.components
+html.templates.chloe
 http.server
-webapps.factor-website ;
+http.server.dispatchers
+furnace
+furnace.sessions
+furnace.boilerplate
+furnace.auth
+furnace.actions
+furnace.db
+furnace.auth.login ;
 IN: webapps.todo
+
+TUPLE: todo-list < dispatcher ;
 
 TUPLE: todo uid id priority summary description ;
 
 todo "TODO"
 {
     { "uid" "UID" { VARCHAR 256 } +not-null+ }
-    { "id" "ID" +native-id+ }
+    { "id" "ID" +db-assigned-id+ }
     { "priority" "PRIORITY" INTEGER +not-null+ }
     { "summary" "SUMMARY" { VARCHAR 256 } +not-null+ }
     { "description" "DESCRIPTION" { VARCHAR 256 } }
 } define-persistent
 
-: init-todo-table todo ensure-table ;
+: init-todo-table ( -- ) todo ensure-table ;
 
 : <todo> ( id -- todo )
     todo new
         swap >>id
         uid >>uid ;
 
-: todo-template ( name -- template )
-    "resource:extra/webapps/todo/" swap ".xml" 3append <chloe> ;
+: <view-action> ( -- action )
+    <page-action>
+        [
+            validate-integer-id
+            "id" value <todo> select-tuple from-object
+        ] >>init
+        
+        { todo-list "view-todo" } >>template ;
 
-: <todo-form> ( -- form )
-    "todo" <form>
-        "view-todo" todo-template >>view-template
-        "edit-todo" todo-template >>edit-template
-        "todo-summary" todo-template >>summary-template
-        "id" <integer>
-            hidden >>renderer
-            add-field
-        "summary" <string>
-            t >>required
-            add-field
-        "priority" <integer>
-            t >>required
-            0 >>default
-            0 >>min-value
-            10 >>max-value
-            add-field
-        "description" <farkup>
-            add-field ;
+: validate-todo ( -- )
+    {
+        { "summary" [ v-one-line ] }
+        { "priority" [ v-integer 0 v-min-value 10 v-max-value ] }
+        { "description" [ v-required ] }
+    } validate-params ;
 
-: <todo-list-form> ( -- form )
-    "todo-list" <form>
-        "todo-list" todo-template >>view-template
-        "list" <todo-form> +plain+ <list>
-        add-field ;
+: view-todo-url ( id -- url )
+    <url> "$todo-list/view" >>path swap "id" set-query-param ;
 
-TUPLE: todo-responder < dispatcher ;
+: <new-action> ( -- action )
+    <page-action>
+        [ 0 "priority" set-value ] >>init
 
-:: <todo-responder> ( -- responder )
-    [let | todo-form [ <todo-form> ]
-           list-form [ <todo-list-form> ]
-           ctor [ [ <todo> ] ] |
-        todo-responder new-dispatcher
-            list-form ctor        <list-action>   "list"   add-main-responder
-            todo-form ctor        <view-action>   "view"   add-responder
-            todo-form ctor "view" <edit-action>   "edit"   add-responder
-                      ctor "list" <delete-action> "delete" add-responder
-        <boilerplate>
-            "todo" todo-template >>template
-    ] ;
+        { todo-list "new-todo" } >>template
 
-: <todo-app> ( -- responder )
-    <todo-responder> <protected> <factor-boilerplate> ;
+        [ validate-todo ] >>validate
 
-: init-todo ( -- )
-    test-db [
-        init-todo-table
-    ] with-db
+        [
+            f <todo>
+                dup { "summary" "priority" "description" } deposit-slots
+            [ insert-tuple ] [ id>> view-todo-url <redirect> ] bi
+        ] >>submit ;
 
-    <dispatcher>
-        <todo-app> "todo" add-responder
-    main-responder set-global ;
+: <edit-action> ( -- action )
+    <page-action>
+        [
+            validate-integer-id
+            "id" value <todo> select-tuple from-object
+        ] >>init
+
+        { todo-list "edit-todo" } >>template
+
+        [
+            validate-integer-id
+            validate-todo
+        ] >>validate
+
+        [
+            f <todo>
+                dup { "id" "summary" "priority" "description" } deposit-slots
+            [ update-tuple ] [ id>> view-todo-url <redirect> ] bi
+        ] >>submit ;
+
+: todo-list-url ( -- url )
+    URL" $todo-list/list" ;
+
+: <delete-action> ( -- action )
+    <action>
+        [ validate-integer-id ] >>validate
+
+        [
+            "id" get <todo> delete-tuples
+            todo-list-url <redirect>
+        ] >>submit ;
+
+: <list-action> ( -- action )
+    <page-action>
+        [ f <todo> select-tuples "items" set-value ] >>init
+        { todo-list "todo-list" } >>template ;
+
+: <todo-list> ( -- responder )
+    todo-list new-dispatcher
+        <list-action>   "list"   add-main-responder
+        <view-action>   "view"   add-responder
+        <new-action>    "new"    add-responder
+        <edit-action>   "edit"   add-responder
+        <delete-action> "delete" add-responder
+    <boilerplate>
+        { todo-list "todo" } >>template
+    <protected>
+        "view your todo list" >>description ;

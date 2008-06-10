@@ -1,5 +1,5 @@
 USING: arrays io io.streams.string kernel math math.parser namespaces
-    prettyprint sequences sequences.lib splitting strings ascii ;
+prettyprint sequences sequences.lib splitting grouping strings ascii ;
 IN: hexdump
 
 <PRIVATE

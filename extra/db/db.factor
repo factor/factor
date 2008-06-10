@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs classes continuations kernel math
+USING: arrays assocs classes continuations destructors kernel math
 namespaces sequences sequences.lib classes.tuple words strings
 tools.walker accessors combinators.lib ;
 IN: db
@@ -25,7 +25,7 @@ GENERIC: make-db* ( seq class -- db )
 GENERIC: db-open ( db -- db )
 HOOK: db-close db ( handle -- )
 
-: dispose-statements ( seq -- ) [ dispose drop ] assoc-each ;
+: dispose-statements ( assoc -- ) values dispose-each ;
 
 : dispose-db ( db -- ) 
     dup db [
@@ -35,27 +35,9 @@ HOOK: db-close db ( handle -- )
         handle>> db-close
     ] with-variable ;
 
-! TUPLE: sql sql in-params out-params ;
 TUPLE: statement handle sql in-params out-params bind-params bound? type ;
 TUPLE: simple-statement < statement ;
 TUPLE: prepared-statement < statement ;
-
-SINGLETON: throwable
-SINGLETON: nonthrowable
-
-: make-throwable ( obj -- obj' )
-    dup sequence? [
-        [ make-throwable ] map
-    ] [
-        throwable >>type
-    ] if ;
-
-: make-nonthrowable ( obj -- obj' )
-    dup sequence? [
-        [ make-nonthrowable ] map
-    ] [
-        nonthrowable >>type
-    ] if ;
 
 TUPLE: result-set sql in-params out-params handle n max ;
 
@@ -63,8 +45,7 @@ TUPLE: result-set sql in-params out-params handle n max ;
     new
         swap >>out-params
         swap >>in-params
-        swap >>sql
-        throwable >>type ;
+        swap >>sql ;
 
 HOOK: <simple-statement> db ( str in out -- statement )
 HOOK: <prepared-statement> db ( str in out -- statement )
@@ -82,11 +63,8 @@ GENERIC: more-rows? ( result-set -- ? )
 
 GENERIC: execute-statement* ( statement type -- )
 
-M: throwable execute-statement* ( statement type -- )
+M: object execute-statement* ( statement type -- )
     drop query-results dispose ;
-
-M: nonthrowable execute-statement* ( statement type -- )
-    drop [ query-results dispose ] [ 2drop ] recover ;
 
 : execute-statement ( statement -- )
     dup sequence? [
@@ -128,9 +106,9 @@ M: nonthrowable execute-statement* ( statement type -- )
 : query-map ( statement quot -- seq )
     accumulator >r query-each r> { } like ; inline
 
-: with-db ( db seq quot -- )
+: with-db ( seq class quot -- )
     >r make-db db-open db r>
-    [ db get swap [ drop ] swap compose with-disposal ] curry with-variable ;
+    [ db get swap [ drop ] prepose with-disposal ] curry with-variable ;
     inline
 
 : default-query ( query -- result-set )

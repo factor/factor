@@ -57,6 +57,8 @@ DEFER: if
 
 : dip ( obj quot -- obj ) swap slip ; inline
 
+: 2dip ( obj1 obj2 quot -- obj1 obj2 ) -rot 2slip ; inline
+
 ! Keepers
 : keep ( x quot -- x ) over slip ; inline
 
@@ -70,7 +72,7 @@ DEFER: if
     >r keep r> call ; inline
 
 : tri ( x p q r -- )
-    >r pick >r bi r> r> call ; inline
+    >r >r keep r> keep r> call ; inline
 
 ! Double cleavers
 : 2bi ( x y p q -- )
@@ -88,14 +90,14 @@ DEFER: if
 
 ! Spreaders
 : bi* ( x y p q -- )
-    >r swap slip r> call ; inline
+    >r dip r> call ; inline
 
 : tri* ( x y z p q r -- )
-    >r rot >r bi* r> r> call ; inline
+    >r >r 2dip r> dip r> call ; inline
 
 ! Double spreaders
 : 2bi* ( w x y z p q -- )
-    >r -rot 2slip r> call ; inline
+    >r 2dip r> call ; inline
 
 ! Appliers
 : bi@ ( x y quot -- )
@@ -133,8 +135,6 @@ M: identity-tuple equal? 2drop f ;
 : = ( obj1 obj2 -- ? )
     2dup eq? [ 2drop t ] [ equal? ] if ; inline
 
-GENERIC: <=> ( obj1 obj2 -- n )
-
 GENERIC: clone ( obj -- cloned )
 
 M: object clone ;
@@ -158,7 +158,10 @@ M: callstack clone (clone) ;
 : with ( param obj quot -- obj curry )
     swapd [ swapd call ] 2curry ; inline
 
-: 3compose ( quot1 quot2 quot3 -- curry )
+: prepose ( quot1 quot2 -- compose )
+    swap compose ; inline
+
+: 3compose ( quot1 quot2 quot3 -- compose )
     compose compose ; inline
 
 ! Booleans
@@ -175,8 +178,6 @@ M: callstack clone (clone) ;
 : both? ( x y quot -- ? ) bi@ and ; inline
 
 : either? ( x y quot -- ? ) bi@ or ; inline
-
-: compare ( obj1 obj2 quot -- n ) bi@ <=> ; inline
 
 : most ( x y quot -- z )
     >r 2dup r> call [ drop ] [ nip ] if ; inline

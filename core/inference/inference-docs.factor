@@ -83,13 +83,13 @@ ARTICLE: "inference-errors" "Inference errors"
 "Main wrapper for all inference errors:"
 { $subsection inference-error }
 "Specific inference errors:"
-{ $subsection no-effect }
+{ $subsection cannot-infer-effect }
 { $subsection literal-expected }
 { $subsection too-many->r }
 { $subsection too-many-r> }
 { $subsection unbalanced-branches-error }
 { $subsection effect-error }
-{ $subsection recursive-declare-error } ;
+{ $subsection missing-effect } ;
 
 ARTICLE: "inference" "Stack effect inference"
 "The stack effect inference tool is used to check correctness of code before it is run. It is also used by the compiler to build a dataflow graph on which optimizations can be performed. Only words for which a stack effect can be inferred will compile."
@@ -108,7 +108,8 @@ $nl
 { $subsection "inference-limitations" }
 { $subsection "inference-errors" }
 { $subsection "dataflow-graphs" }
-{ $subsection "compiler-transforms" } ;
+{ $subsection "compiler-transforms" }
+{ $see-also "effects" } ;
 
 ABOUT: "inference"
 
@@ -135,7 +136,7 @@ HELP: infer
 
 HELP: infer.
 { $values { "quot" "a quotation" } }
-{ $description "Attempts to infer the quotation's stack effect, and prints this data to the " { $link stdio } " stream." }
+{ $description "Attempts to infer the quotation's stack effect, and prints this data to " { $link output-stream } "." }
 { $errors "Throws an " { $link inference-error } " if stack effect inference fails." } ;
 
 { infer infer. } related-words

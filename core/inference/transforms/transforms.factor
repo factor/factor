@@ -3,7 +3,7 @@
 USING: arrays kernel words sequences generic math namespaces
 quotations assocs combinators math.bitfields inference.backend
 inference.dataflow inference.state classes.tuple.private effects
-inspector hashtables classes generic sets ;
+inspector hashtables classes generic sets definitions ;
 IN: inference.transforms
 
 : pop-literals ( n -- rstate seq )
@@ -32,7 +32,7 @@ IN: inference.transforms
         drop [ no-case ]
     ] [
         dup peek quotation? [
-            dup peek swap 1 head*
+            dup peek swap but-last
         ] [
             [ no-case ] swap
         ] if case>quot

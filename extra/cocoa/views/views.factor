@@ -74,3 +74,17 @@ PRIVATE>
     -> locationInWindow f -> convertPoint:fromView:
     dup NSPoint-x swap NSPoint-y
     r> -> frame NSRect-h swap - 2array ;
+
+USE: opengl.gl
+USE: alien.syntax
+
+: NSOpenGLCPSwapInterval 222 ;
+
+LIBRARY: OpenGL
+
+TYPEDEF: int CGLError
+TYPEDEF: void* CGLContextObj
+TYPEDEF: int CGLContextParameter
+
+FUNCTION: CGLError CGLSetParameter ( CGLContextObj ctx, CGLContextParameter pname, GLint* params ) ;
+

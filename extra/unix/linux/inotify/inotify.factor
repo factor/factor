@@ -28,8 +28,8 @@ C-STRUCT: inotify-event
 : IN_Q_OVERFLOW HEX: 4000 ; inline  ! Event queued overflowed
 : IN_IGNORED HEX: 8000 ; inline     ! File was ignored
 
-: IN_CLOSE IN_CLOSE_WRITE IN_CLOSE_NOWRITE bitor ; inline ! close
-: IN_MOVE IN_MOVED_FROM IN_MOVED_TO bitor ; inline        ! moves
+: IN_CLOSE ( -- n ) IN_CLOSE_WRITE IN_CLOSE_NOWRITE bitor ; inline ! close
+: IN_MOVE ( -- n ) IN_MOVED_FROM IN_MOVED_TO bitor ; inline        ! moves
 
 : IN_ONLYDIR HEX: 1000000 ; inline     ! only watch the path if it is a directory
 : IN_DONT_FOLLOW HEX: 2000000 ; inline ! don't follow a sym link
@@ -37,14 +37,14 @@ C-STRUCT: inotify-event
 : IN_ISDIR HEX: 40000000 ; inline      ! event occurred against dir
 : IN_ONESHOT HEX: 80000000 ; inline    ! only send event once
 
-: IN_CHANGE_EVENTS
+: IN_CHANGE_EVENTS ( -- n )
     {
         IN_MODIFY IN_ATTRIB IN_MOVED_FROM
         IN_MOVED_TO IN_DELETE IN_CREATE IN_DELETE_SELF
         IN_MOVE_SELF
     } flags ; foldable
 
-: IN_ALL_EVENTS
+: IN_ALL_EVENTS ( -- n )
     {
         IN_ACCESS IN_MODIFY IN_ATTRIB IN_CLOSE_WRITE
         IN_CLOSE_NOWRITE IN_OPEN IN_MOVED_FROM

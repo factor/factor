@@ -24,7 +24,7 @@ SYMBOL: ignore-case?
         [ string>token ]
     } case ;
 
-: string>rule-set-name "MAIN" or ;
+: string>rule-set-name ( string -- name ) "MAIN" or ;
 
 ! PROP, PROPS
 : parse-prop-tag ( tag -- key value )
@@ -48,30 +48,30 @@ SYMBOL: ignore-case?
     dup children>string ignore-case? get <regexp>
     swap position-attrs <matcher> ;
 
-: shared-tag-attrs
+: shared-tag-attrs ( -- )
     { "TYPE" string>token set-rule-body-token } , ; inline
 
-: delegate-attr
+: delegate-attr ( -- )
     { "DELEGATE" f set-rule-delegate } , ;
 
-: regexp-attr
+: regexp-attr ( -- )
     { "HASH_CHAR" f set-rule-chars } , ;
 
-: match-type-attr
+: match-type-attr ( -- )
     { "MATCH_TYPE" string>match-type set-rule-match-token } , ;
 
-: span-attrs
+: span-attrs ( -- )
     { "NO_LINE_BREAK" string>boolean set-rule-no-line-break? } ,
     { "NO_WORD_BREAK" string>boolean set-rule-no-word-break? } ,
     { "NO_ESCAPE" string>boolean set-rule-no-escape? } , ;
 
-: literal-start
+: literal-start ( -- )
     [ parse-literal-matcher swap set-rule-start ] , ;
 
-: regexp-start
+: regexp-start ( -- )
     [ parse-regexp-matcher swap set-rule-start ] , ;
 
-: literal-end
+: literal-end ( -- )
     [ parse-literal-matcher swap set-rule-end ] , ;
 
 ! SPAN's children
@@ -87,15 +87,15 @@ TAG: END
 
 TAGS>
 
-: parse-begin/end-tags
+: parse-begin/end-tags ( -- )
     [
         ! XXX: handle position attrs on span tag itself
         child-tags [ parse-begin/end-tag ] with each
     ] , ;
 
-: init-span-tag [ drop init-span ] , ;
+: init-span-tag ( -- ) [ drop init-span ] , ;
 
-: init-eol-span-tag [ drop init-eol-span ] , ;
+: init-eol-span-tag ( -- ) [ drop init-eol-span ] , ;
 
 : parse-keyword-tag ( tag keyword-map -- )
     >r dup name-tag string>token swap children>string r> set-at ;

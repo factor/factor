@@ -21,7 +21,7 @@ IN: project-euler.004
 <PRIVATE
 
 : source-004 ( -- seq )
-    100 999 [a,b] [ 10 mod zero? not ] subset ;
+    100 999 [a,b] [ 10 mod zero? not ] filter ;
 
 : max-palindrome ( seq -- palindrome )
     natural-sort [ palindrome? ] find-last nip ;

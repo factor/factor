@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables kernel models math namespaces sequences
 quotations math.vectors combinators sorting vectors dlists
-models threads concurrency.flags ;
+models threads concurrency.flags math.order ;
 IN: ui.gadgets
 
 SYMBOL: ui-notify-flag
@@ -106,7 +106,7 @@ GENERIC: children-on ( rect/point gadget -- seq )
 M: gadget children-on nip gadget-children ;
 
 : (fast-children-on) ( dim axis gadgets -- i )
-    swapd [ rect-loc v- over v. ] binsearch nip ;
+    swapd [ rect-loc v- over v. 0 <=> ] binsearch nip ;
 
 : fast-children-on ( rect axis children -- from to )
     3dup
@@ -204,9 +204,9 @@ DEFER: relayout
     dup gadget-layout-state
     [ drop ] [ dup invalidate layout-later ] if ;
 
-: show-gadget t swap set-gadget-visible? ;
+: show-gadget ( gadget -- ) t swap set-gadget-visible? ;
 
-: hide-gadget f swap set-gadget-visible? ;
+: hide-gadget ( gadget -- ) f swap set-gadget-visible? ;
 
 : (set-rect-dim) ( dim gadget quot -- )
     >r 2dup rect-dim =
@@ -249,7 +249,7 @@ M: gadget layout* drop ;
         dup [ layout ] each-child
     ] when drop ;
 
-: graft-queue \ graft-queue get ;
+: graft-queue ( -- dlist ) \ graft-queue get ;
 
 : unqueue-graft ( gadget -- )
     graft-queue over gadget-graft-node delete-node
@@ -308,7 +308,7 @@ M: gadget ungraft* drop ;
 
 SYMBOL: in-layout?
 
-: not-in-layout
+: not-in-layout ( -- )
     in-layout? get
     [ "Cannot add/remove gadgets in layout*" throw ] when ;
 

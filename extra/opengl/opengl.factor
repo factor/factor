@@ -8,9 +8,11 @@ math.parser opengl.gl opengl.glu combinators arrays sequences
 splitting words byte-arrays assocs combinators.lib ;
 IN: opengl
 
-: coordinates [ first2 ] bi@ ;
+: coordinates ( point1 point2 -- x1 y2 x2 y2 )
+    [ first2 ] bi@ ;
 
-: fix-coordinates [ first2 [ >fixnum ] bi@ ] bi@ ;
+: fix-coordinates ( point1 point2 -- x1 y2 x2 y2 )
+    [ first2 [ >fixnum ] bi@ ] bi@ ;
 
 : gl-color ( color -- ) first4 glColor4d ; inline
 
@@ -73,7 +75,8 @@ MACRO: all-enabled-client-state ( seq quot -- )
     >r { 0.5 0.5 } v+ r> { 0.5 0.5 } v- gl-fill-rect
     GL_FRONT_AND_BACK GL_FILL glPolygonMode ;
 
-: (gl-poly) [ [ gl-vertex ] each ] do-state ;
+: (gl-poly) ( points state -- )
+    [ [ gl-vertex ] each ] do-state ;
 
 : gl-fill-poly ( points -- )
     dup length 2 > GL_POLYGON GL_LINES ? (gl-poly) ;
@@ -81,13 +84,17 @@ MACRO: all-enabled-client-state ( seq quot -- )
 : gl-poly ( points -- )
     GL_LINE_LOOP (gl-poly) ;
 
-: circle-steps dup length v/n 2 pi * v*n ;
+: circle-steps ( steps -- angles )
+    dup length v/n 2 pi * v*n ;
 
-: unit-circle dup [ sin ] map swap [ cos ] map ;
+: unit-circle ( angles -- points1 points2 )
+    [ [ sin ] map ] [ [ cos ] map ] bi ;
 
-: adjust-points [ [ 1 + 0.5 * ] map ] bi@ ;
+: adjust-points ( points1 points2 -- points1' points2' )
+    [ [ 1 + 0.5 * ] map ] bi@ ;
 
-: scale-points 2array flip [ v* ] with map [ v+ ] with map ;
+: scale-points ( loc dim points1 points2 -- points )
+    zip [ v* ] with map [ v+ ] with map ;
 
 : circle-points ( loc dim steps -- points )
     circle-steps unit-circle adjust-points scale-points ;
@@ -154,16 +161,16 @@ MACRO: set-draw-buffers ( buffers -- )
     swap glPushAttrib call glPopAttrib ; inline
 
 : gl-look-at ( eye focus up -- )
-    >r >r first3 r> first3 r> first3 gluLookAt ;
+    [ first3 ] tri@ gluLookAt ;
 
 TUPLE: sprite loc dim dim2 dlist texture ;
 
 : <sprite> ( loc dim dim2 -- sprite )
     f f sprite boa ;
 
-: sprite-size2 sprite-dim2 first2 ;
+: sprite-size2 ( sprite -- w h ) sprite-dim2 first2 ;
 
-: sprite-width sprite-dim first ;
+: sprite-width ( sprite -- w ) sprite-dim first ;
 
 : gray-texture ( sprite pixmap -- id )
     gen-texture [
@@ -203,9 +210,7 @@ TUPLE: sprite loc dim dim2 dlist texture ;
     dup sprite-loc gl-translate
     GL_TEXTURE_2D over sprite-texture glBindTexture
     init-texture
-    GL_QUADS [ dup sprite-dim2 four-sides ] do-state
-    dup sprite-dim { 1 0 } v*
-    swap sprite-loc v- gl-translate
+    GL_QUADS [ sprite-dim2 four-sides ] do-state
     GL_TEXTURE_2D 0 glBindTexture ;
 
 : rect-vertices ( lower-left upper-right -- )

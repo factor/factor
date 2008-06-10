@@ -1,5 +1,5 @@
 USING: arrays assocs kernel math math.intervals namespaces
-sequences combinators.lib money ;
+sequences combinators.lib money math.order ;
 IN: taxes
 
 : monthly ( x -- y ) 12 / ;
@@ -33,6 +33,13 @@ TUPLE: fica-base-unknown ;
 
 ! Employer tax only, not withheld
 : futa-tax-rate ( -- x ) DECIMAL: .062 ; inline
+: futa-base-rate ( -- x ) 7000 ; inline
+: futa-tax-offset-credit ( -- x ) DECIMAL: .054 ; inline
+
+: futa-tax ( salary w4 -- x )
+    drop futa-base-rate min
+    futa-tax-rate futa-tax-offset-credit -
+    * ;
 
 ! No base rate for medicare; all wages subject
 : medicare-tax-rate ( -- x ) DECIMAL: .0145 ; inline
@@ -47,7 +54,7 @@ TUPLE: tax-table single married ;
 : <tax-table> ( single married class -- obj )
     >r tax-table boa r> construct-delegate ;
 
-: tax-bracket-range dup second swap first - ;
+: tax-bracket-range ( pair -- n ) dup second swap first - ;
 
 : tax-bracket ( tax salary triples -- tax salary )
     [ [ tax-bracket-range min ] keep third * + ] 2keep

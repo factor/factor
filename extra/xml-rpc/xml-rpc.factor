@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-IN: xml-rpc
 USING: kernel xml arrays math generic http.client combinators
     hashtables namespaces io base64 sequences strings calendar
     xml.data xml.writer xml.utilities assocs math.parser debugger
-    calendar.format ;
+    calendar.format math.order ;
+IN: xml-rpc
 
 ! * Sending RPC requests
 ! TODO: time
@@ -158,8 +158,7 @@ TAG: array xml>item
 
 : post-rpc ( rpc url -- rpc )
     ! This needs to do something in the event of an error
-    >r "text/xml" swap send-rpc xml>string r> http-post
-    2nip string>xml receive-rpc ;
+    >r send-rpc r> http-post nip string>xml receive-rpc ;
 
 : invoke-method ( params method url -- )
     >r swap <rpc-method> r> post-rpc ;

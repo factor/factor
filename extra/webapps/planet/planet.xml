@@ -2,30 +2,44 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-<t:comment>
-	<t:atom title="Planet Factor - Atom" href="feed.xml" />
-</t:comment>
-	<t:style include="resource:extra/webapps/planet/planet.css" />
+	<t:title>Planet Factor</t:title>
 
-	<div class="navbar">
-		  <t:a href="list">Front Page</t:a>
-		| <t:a href="feed.xml">Atom Feed</t:a>
+	<table width="100%" cellpadding="10">
+		<tr>
+			<td>
 
-		| <t:a href="admin">Admin</t:a>
+				<t:bind-each t:name="postings">
 
-		<t:comment>
-		<t:if code="http.server.auth.login:allow-edit-profile?">
-			| <t:a href="edit-profile">Edit Profile</t:a>
-		</t:if>
+					<h2 class="posting-title">
+						<t:a t:value="url"><t:label t:name="title" /></t:a>
+					</h2>
 
-		<t:form action="logout" class="inline">
-			| <button type="submit" class="link-button link">Logout</button>
-		</t:form>
-		</t:comment>
-	</div>
+					<p class="posting-body">
+						<t:html t:name="description" />
+					</p>
 
-	<h1><t:write-title /></h1>
+					<p class="posting-date">
+						<t:a t:value="url"><t:label t:name="date" /></t:a>
+					</p>
 
-        <t:call-next-template />
+				</t:bind-each>
+
+			</td>
+
+			<td valign="top" width="25%" class="infobox">
+
+				<h2>Blogroll</h2>
+
+				<ul>
+					<t:each t:name="blogroll">
+						<li>
+							<t:link t:name="value"/>
+						</li>
+					</t:each>
+				</ul>
+
+			</td>
+		</tr>
+	</table>
 
 </t:chloe>

@@ -1,5 +1,5 @@
-USING: kernel math math.constants math.functions tools.test
-prettyprint ;
+USING: kernel math math.constants math.functions math.order
+tools.test prettyprint ;
 IN: math.complex.tests
 
 [ 1 C{ 0 1 } rect> ] must-fail

@@ -2,21 +2,17 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-	<t:style include="resource:extra/webapps/todo/todo.css" />
-
-	<t:style include="resource:extra/xmode/code2html/stylesheet.css" />
+	<t:style t:include="resource:extra/webapps/todo/todo.css" />
 
 	<div class="navbar">
-		  <t:a href="list">List Items</t:a>
-		| <t:a href="edit">Add Item</t:a>
+		  <t:a t:href="$todo-list/list">List Items</t:a>
+		| <t:a t:href="$todo-list/new">Add Item</t:a>
 
-		<t:if code="http.server.auth.login:allow-edit-profile?">
-			| <t:a href="edit-profile">Edit Profile</t:a>
+		<t:if t:code="furnace.auth.login:allow-edit-profile?">
+			| <t:a t:href="$login/edit-profile" t:aside="begin">Edit Profile</t:a>
 		</t:if>
 
-		<t:form action="logout" class="inline">
-			| <button type="submit" class="link-button link">Logout</button>
-		</t:form>
+		| <t:button t:action="$login/logout" t:aside="begin" class="link-button link">Logout</t:button>
 	</div>
 
 	<h1><t:write-title /></h1>

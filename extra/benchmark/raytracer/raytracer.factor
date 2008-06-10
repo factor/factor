@@ -169,7 +169,7 @@ DEFER: create ( level c r -- scene )
         [ [ oversampling sq / pgm-pixel ] each ] each
     ] B{ } make ;
 
-: raytracer-main
+: raytracer-main ( -- )
     run "raytracer.pnm" temp-file binary set-file-contents ;
 
 MAIN: raytracer-main

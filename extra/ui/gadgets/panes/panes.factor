@@ -6,28 +6,32 @@ ui.gadgets.paragraphs ui.gadgets.incremental ui.gadgets.packs
 ui.gadgets.theme ui.clipboards ui.gestures ui.traverse ui.render
 hashtables io kernel namespaces sequences io.styles strings
 quotations math opengl combinators math.vectors
-io.streams.duplex sorting splitting io.streams.nested assocs
+sorting splitting io.streams.nested assocs
 ui.gadgets.presentations ui.gadgets.slots ui.gadgets.grids
-ui.gadgets.grid-lines classes.tuple models continuations ;
+ui.gadgets.grid-lines classes.tuple models continuations
+destructors accessors ;
 IN: ui.gadgets.panes
 
 TUPLE: pane output current prototype scrolls?
 selection-color caret mark selecting? ;
 
 : clear-selection ( pane -- )
-    f over set-pane-caret
-    f swap set-pane-mark ;
+    f >>caret
+    f >>mark
+    drop ;
 
-: add-output 2dup set-pane-output add-gadget ;
+: add-output ( current pane -- )
+    [ set-pane-output ] [ add-gadget ] 2bi ;
 
-: add-current 2dup set-pane-current add-gadget ;
+: add-current ( current pane -- )
+    [ set-pane-current ] [ add-gadget ] 2bi ;
 
 : prepare-line ( pane -- )
-    dup clear-selection
-    dup pane-prototype clone swap add-current ;
+    [ clear-selection ]
+    [ [ pane-prototype clone ] keep add-current ] bi ;
 
 : pane-caret&mark ( pane -- caret mark )
-    dup pane-caret swap pane-mark ;
+    [ caret>> ] [ mark>> ] bi ;
 
 : selected-children ( pane -- seq )
     [ pane-caret&mark sort-pair ] keep gadget-subtree ;
@@ -38,17 +42,18 @@ M: pane gadget-selection
     selected-children gadget-text ;
 
 : pane-clear ( pane -- )
-    dup clear-selection
-    dup pane-output clear-incremental
-    pane-current clear-gadget ;
+    [ clear-selection ]
+    [ pane-output clear-incremental ]
+    [ pane-current clear-gadget ]
+    tri ;
 
-: pane-theme ( editor -- )
-    selection-color swap set-pane-selection-color ;
+: pane-theme ( pane -- )
+    selection-color >>selection-color drop ;
 
 : <pane> ( -- pane )
     pane new
     <pile> over set-delegate
-    <shelf> over set-pane-prototype
+    <shelf> >>prototype
     <pile> <incremental> over add-output
     dup prepare-line
     dup pane-theme ;
@@ -113,14 +118,14 @@ GENERIC: write-gadget ( gadget stream -- )
 M: pane-stream write-gadget
     pane-stream-pane pane-current add-gadget ;
 
-M: duplex-stream write-gadget
-    duplex-stream-out write-gadget ;
+M: style-stream write-gadget
+    stream>> write-gadget ;
 
 : print-gadget ( gadget stream -- )
     tuck write-gadget stream-nl ;
 
 : gadget. ( gadget -- )
-    stdio get print-gadget ;
+    output-stream get print-gadget ;
 
 : ?nl ( stream -- )
     dup pane-stream-pane pane-current gadget-children empty?
@@ -129,7 +134,7 @@ M: duplex-stream write-gadget
 : with-pane ( pane quot -- )
     over scroll>top
     over pane-clear >r <pane-stream> r>
-    over >r with-stream* r> ?nl ; inline
+    over >r with-output-stream* r> ?nl ; inline
 
 : make-pane ( quot -- gadget )
     <pane> [ swap with-pane ] keep smash-pane ; inline

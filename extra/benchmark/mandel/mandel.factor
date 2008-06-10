@@ -1,5 +1,5 @@
 IN: benchmark.mandel
-USING: arrays io kernel math namespaces sequences
+USING: arrays io kernel math math.order namespaces sequences
 byte-arrays byte-vectors math.functions math.parser io.files
 colors.hsv io.encodings.binary ;
 
@@ -54,7 +54,7 @@ SYMBOL: cols
 : ppm-header ( w h -- )
     "P6\n" % swap # " " % # "\n255\n" % ;
 
-: buf-size width height * 3 * 100 + ;
+: buf-size ( -- n ) width height * 3 * 100 + ;
 
 : mandel ( -- data )
     [

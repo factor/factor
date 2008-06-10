@@ -1,4 +1,4 @@
-USING: alien.syntax kernel math windows.types math.bitfields ;
+USING: alias alien.syntax kernel math windows.types math.bitfields ;
 IN: windows.advapi32
 LIBRARY: advapi32
 
@@ -164,9 +164,9 @@ TYPEDEF: ACCESS_ALLOWED_CALLBACK_ACE* PACCESS_ALLOWED_CALLBACK_ACE
 : TOKEN_QUERY                  HEX: 0008 ; inline
 : TOKEN_QUERY_SOURCE           HEX: 0010 ; inline
 : TOKEN_ADJUST_DEFAULT         HEX: 0080 ; inline
-: TOKEN_READ STANDARD_RIGHTS_READ TOKEN_QUERY bitor ;
+: TOKEN_READ ( -- n ) STANDARD_RIGHTS_READ TOKEN_QUERY bitor ;
 
-: TOKEN_WRITE
+: TOKEN_WRITE ( -- n )
     {
         STANDARD_RIGHTS_WRITE
         TOKEN_ADJUST_PRIVILEGES
@@ -174,7 +174,7 @@ TYPEDEF: ACCESS_ALLOWED_CALLBACK_ACE* PACCESS_ALLOWED_CALLBACK_ACE
         TOKEN_ADJUST_DEFAULT
     } flags ; foldable
 
-: TOKEN_ALL_ACCESS
+: TOKEN_ALL_ACCESS ( -- n )
     {
         STANDARD_RIGHTS_REQUIRED
         TOKEN_ASSIGN_PRIMARY
@@ -336,7 +336,8 @@ FUNCTION: BOOL CryptAcquireContextW ( HCRYPTPROV* phProv,
                                       DWORD dwProvType,
                                       DWORD dwFlags ) ;
 
-: CryptAcquireContext CryptAcquireContextW ;
+ALIAS: CryptAcquireContext CryptAcquireContextW
+
 ! : CryptContextAddRef ;
 ! : CryptCreateHash ;
 ! : CryptDecrypt ;
@@ -496,7 +497,7 @@ FUNCTION: BOOL CryptReleaseContext ( HCRYPTPROV hProv, DWORD dwFlags ) ;
 
 ! : GetUserNameA ;
 FUNCTION: BOOL GetUserNameW ( LPCTSTR lpBuffer, LPDWORD lpnSize ) ;
-: GetUserName GetUserNameW ;
+ALIAS: GetUserName GetUserNameW
 
 ! : GetWindowsAccountDomainSid ;
 ! : I_ScIsSecurityProcess ;
@@ -541,7 +542,7 @@ FUNCTION: BOOL InitializeAcl ( PACL pAcl, DWORD nAclLength, DWORD dwAclRevision 
 FUNCTION: BOOL LookupPrivilegeValueW ( LPCTSTR lpSystemName,
                                LPCTSTR lpName,
                                PLUID lpLuid ) ;
-: LookupPrivilegeValue LookupPrivilegeValueW ;
+ALIAS: LookupPrivilegeValue LookupPrivilegeValueW
 
 ! : LookupSecurityDescriptorPartsA ;
 ! : LookupSecurityDescriptorPartsW ;

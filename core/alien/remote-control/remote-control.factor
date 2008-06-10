@@ -4,14 +4,14 @@ USING: alien alien.c-types alien.strings parser threads words
 kernel.private kernel io.encodings.utf8 ;
 IN: alien.remote-control
 
-: eval-callback
+: eval-callback ( -- callback )
     "void*" { "char*" } "cdecl"
     [ eval>string utf8 malloc-string ] alien-callback ;
 
-: yield-callback
+: yield-callback ( -- callback )
     "void" { } "cdecl" [ yield ] alien-callback ;
 
-: sleep-callback
+: sleep-callback ( -- callback )
     "void" { "long" } "cdecl" [ sleep ] alien-callback ;
 
 : ?callback ( word -- alien )

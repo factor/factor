@@ -36,3 +36,6 @@ IN: cpu.x86.assembler.tests
 
 [ { HEX: 0f HEX: be HEX: c3 } ] [ [ EAX BL MOVSX ] { } make ] unit-test
 [ { HEX: 0f HEX: bf HEX: c3 } ] [ [ EAX BX MOVSX ] { } make ] unit-test
+
+[ { HEX: 80 HEX: 08 HEX: 05 } ] [ [ EAX [] 5 <byte> OR ] { } make ] unit-test
+[ { HEX: c6 HEX: 00 HEX: 05 } ] [ [ EAX [] 5 <byte> MOV ] { } make ] unit-test

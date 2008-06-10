@@ -50,14 +50,16 @@ M: curry nth
 INSTANCE: curry immutable-sequence
 
 M: compose length
-    dup compose-first length
-    swap compose-second length + ;
+    [ compose-first length ]
+    [ compose-second length ] bi + ;
 
-M: compose nth
+M: compose virtual-seq compose-first ;
+
+M: compose virtual@
     2dup compose-first length < [
         compose-first
     ] [
-        [ compose-first length - ] keep compose-second
-    ] if nth ;
+        [ compose-first length - ] [ compose-second ] bi
+    ] if ;
 
-INSTANCE: compose immutable-sequence
+INSTANCE: compose virtual-sequence

@@ -36,4 +36,4 @@ VAR: headers
   { "gcc" c-file "-o" exe } to-strings
   [ "Error compiling generated C program" print ] run-or-bail
 
-  exe ascii <process-stream> contents string>number ;
+  exe ascii <process-reader> contents string>number ;

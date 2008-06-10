@@ -38,7 +38,7 @@ HELP: render-glyph
 { $description "Renders a character and outputs a pointer to the bitmap." } ;
 
 HELP: <char-sprite>
-{ $values { "font" font } { "char" "a non-negative integer" } { "sprite" sprite } }
+{ $values { "open-font" font } { "char" "a non-negative integer" } { "sprite" sprite } }
 { $description "Renders a character to an OpenGL texture and records a display list which draws a quad with this texture. This word allocates native resources which must be freed by " { $link free-sprites } "." } ;
 
 HELP: (draw-string)

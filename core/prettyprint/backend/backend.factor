@@ -1,13 +1,16 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays byte-arrays bit-arrays generic hashtables io
-assocs kernel math namespaces sequences strings sbufs io.styles
-vectors words prettyprint.config prettyprint.sections quotations
-io io.files math.parser effects classes.tuple
-classes.tuple.private classes float-arrays ;
+USING: arrays byte-arrays byte-vectors bit-arrays generic
+hashtables io assocs kernel math namespaces sequences strings
+sbufs io.styles vectors words prettyprint.config
+prettyprint.sections quotations io io.files math.parser effects
+classes.tuple math.order classes.tuple.private classes
+float-arrays combinators ;
 IN: prettyprint.backend
 
 GENERIC: pprint* ( obj -- )
+
+M: effect pprint* effect>string "(" swap ")" 3append text ;
 
 : ?effect-height ( word -- n )
     stack-effect [ effect-height ] [ 0 ] if* ;
@@ -25,9 +28,11 @@ GENERIC: pprint* ( obj -- )
 : word-style ( word -- style )
     dup "word-style" word-prop >hashtable [
         [
-            dup presented set
-            dup parsing? over delimiter? rot t eq? or or
-            [ bold font-style set ] when
+            [ presented set ]
+            [
+                [ parsing-word? ] [ delimiter? ] [ t eq? ] tri or or
+                [ bold font-style set ] when
+            ] bi
         ] bind
     ] keep ;
 
@@ -42,13 +47,16 @@ GENERIC: pprint* ( obj -- )
     <block swap pprint-word call block> ; inline
 
 M: word pprint*
-    dup parsing? [
+    dup parsing-word? [
         \ POSTPONE: [ pprint-word ] pprint-prefix
     ] [
-        dup "break-before" word-prop line-break
-        dup pprint-word
-        dup ?start-group dup ?end-group
-        "break-after" word-prop line-break
+        {
+            [ "break-before" word-prop line-break ]
+            [ pprint-word ]
+            [ ?start-group ]
+            [ ?end-group ]
+            [ "break-after" word-prop line-break ]
+        } cleave
     ] if ;
 
 M: real pprint* number>string text ;
@@ -140,6 +148,7 @@ M: compose pprint-delims drop \ [ \ ] ;
 M: array pprint-delims drop \ { \ } ;
 M: byte-array pprint-delims drop \ B{ \ } ;
 M: bit-array pprint-delims drop \ ?{ \ } ;
+M: byte-vector pprint-delims drop \ BV{ \ } ;
 M: float-array pprint-delims drop \ F{ \ } ;
 M: vector pprint-delims drop \ V{ \ } ;
 M: hashtable pprint-delims drop \ H{ \ } ;
@@ -152,6 +161,7 @@ GENERIC: >pprint-sequence ( obj -- seq )
 M: object >pprint-sequence ;
 
 M: vector >pprint-sequence ;
+M: byte-vector >pprint-sequence ;
 M: curry >pprint-sequence ;
 M: compose >pprint-sequence ;
 M: hashtable >pprint-sequence >alist ;

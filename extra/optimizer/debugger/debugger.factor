@@ -4,7 +4,7 @@ USING: classes inference inference.dataflow io kernel
 kernel.private math.parser namespaces optimizer prettyprint
 prettyprint.backend sequences words arrays match macros
 assocs sequences.private optimizer.specializers generic
-combinators sorting math quotations ;
+combinators sorting math quotations accessors ;
 IN: optimizer.debugger
 
 ! A simple tool for turning dataflow IR into quotations, for
@@ -33,12 +33,12 @@ M: comment pprint*
 
 : effect-str ( node -- str )
     [
-        " " over node-in-d values%
-        " r: " over node-in-r values%
+        " " over in-d>> values%
+        " r: " over in-r>> values%
         " --" %
-        " " over node-out-d values%
-        " r: " swap node-out-r values%
-    ] "" make 1 tail ;
+        " " over out-d>> values%
+        " r: " swap out-r>> values%
+    ] "" make rest ;
 
 MACRO: match-choose ( alist -- )
     [ [ ] curry ] assoc-map [ match-cond ] curry ;
@@ -63,18 +63,19 @@ MATCH-VARS: ?a ?b ?c ;
     } match-choose ;
 
 M: #shuffle node>quot
-    dup node-in-d over node-out-d pretty-shuffle
+    dup [ in-d>> ] [ out-d>> ] bi pretty-shuffle
     [ , ] [ >r drop t r> ] if*
     dup effect-str "#shuffle: " prepend comment, ;
 
-: pushed-literals node-out-d [ value-literal literalize ] map ;
+: pushed-literals ( node -- seq )
+    out-d>> [ value-literal literalize ] map ;
 
 M: #push node>quot nip pushed-literals % ;
 
 DEFER: dataflow>quot
 
 : #call>quot ( ? node -- )
-    dup node-param dup ,
+    dup param>> dup ,
     [ dup effect-str ] [ "empty call" ] if comment, ;
 
 M: #call node>quot #call>quot ;
@@ -83,38 +84,38 @@ M: #call-label node>quot #call>quot ;
 
 M: #label node>quot
     [
-        dup node-param literalize ,
+        dup param>> literalize ,
         dup #label-loop? "#loop: " "#label: " ?
-        over node-param word-name append comment,
+        over param>> word-name append comment,
     ] 2keep
     node-child swap dataflow>quot , \ call ,  ;
 
 M: #if node>quot
     [ "#if" comment, ] 2keep
-    node-children swap [ dataflow>quot ] curry map %
+    children>> swap [ dataflow>quot ] curry map %
     \ if , ;
 
 M: #dispatch node>quot
     [ "#dispatch" comment, ] 2keep
-    node-children swap [ dataflow>quot ] curry map ,
+    children>> swap [ dataflow>quot ] curry map ,
     \ dispatch , ;
 
-M: #>r node>quot nip node-in-d length \ >r <array> % ;
+M: #>r node>quot nip in-d>> length \ >r <array> % ;
 
-M: #r> node>quot nip node-out-d length \ r> <array> % ;
+M: #r> node>quot nip out-d>> length \ r> <array> % ;
 
 M: object node>quot
     [
         dup class word-name %
         " " %
-        dup node-param unparse %
+        dup param>> unparse %
         " " %
         dup effect-str %
     ] "" make comment, ;
 
 : (dataflow>quot) ( ? node -- )
     dup [
-        2dup node>quot node-successor (dataflow>quot)
+        2dup node>quot successor>> (dataflow>quot)
     ] [
         2drop
     ] if ;
@@ -145,7 +146,7 @@ SYMBOL: node-count
         0 swap [
             >r 1+ r>
             dup #call? [
-                node-param {
+                param>> {
                     { [ dup "intrinsics" word-prop over "if-intrinsics" word-prop or ] [ intrinsics-called ] }
                     { [ dup generic? ] [ generics-called ] }
                     { [ dup method-body? ] [ methods-called ] }

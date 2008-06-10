@@ -1,5 +1,5 @@
 USING: calendar.format calendar kernel math tools.test
-io.streams.string accessors io ;
+io.streams.string accessors io math.order ;
 IN: calendar.format.tests
 
 [ 0 ] [
@@ -43,3 +43,22 @@ IN: calendar.format.tests
 ] unit-test
 
 [ t ] [ now dup timestamp>rfc822 rfc822>timestamp time- 1 seconds before? ] unit-test
+
+[ t ] [ now dup timestamp>cookie-string cookie-string>timestamp time- 1 seconds before? ] unit-test
+
+[ "Sun, 4 May 2008 07:00:00" ] [
+    "Sun May 04 07:00:00 2008 GMT" cookie-string>timestamp
+    timestamp>string
+] unit-test
+
+[
+    T{ timestamp f
+        2008
+        5
+        26
+        0
+        37
+        42.12345
+        T{ duration f 0 0 0 -5 0 0 }
+    }
+] [ "2008-05-26T00:37:42.12345-05:00" rfc3339>timestamp ] unit-test

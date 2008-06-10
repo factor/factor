@@ -5,7 +5,8 @@ kernel math math.parser namespaces prettyprint quotations
 sequences debugger db db.postgresql.lib db.postgresql.ffi
 db.tuples db.types tools.annotations math.ranges
 combinators sequences.lib classes locals words tools.walker
-namespaces.lib accessors random db.queries ;
+namespaces.lib accessors random db.queries destructors ;
+USE: tools.walker
 IN: db.postgresql
 
 TUPLE: postgresql-db < db
@@ -48,7 +49,8 @@ M: literal-bind postgresql-bind-conversion ( tuple literal-bind -- obj )
     nip value>> <low-level-binding> ;
 
 M: generator-bind postgresql-bind-conversion ( tuple generate-bind -- obj )
-    nip singleton>> eval-generator <low-level-binding> ;
+    dup generator-singleton>> eval-generator
+    [ swap slot-name>> rot set-slot-named ] [ <low-level-binding> ] bi ;
 
 M: postgresql-statement bind-tuple ( tuple statement -- )
     tuck in-params>>
@@ -158,7 +160,7 @@ M: postgresql-db bind# ( spec obj -- )
 M: postgresql-db create-sql-statement ( class -- seq )
     [
         [ create-table-sql , ] keep
-        dup db-columns find-primary-key native-id?
+        dup db-columns find-primary-key db-assigned-id-spec?
         [ create-function-sql , ] [ drop ] if
     ] { } make ;
 
@@ -173,17 +175,17 @@ M: postgresql-db create-sql-statement ( class -- seq )
 
 : drop-table-sql ( table -- statement )
     [
-        "drop table " 0% 0% ";" 0% drop
+        "drop table " 0% 0% drop
     ] query-make ;
 
 M: postgresql-db drop-sql-statement ( class -- seq )
     [
         [ drop-table-sql , ] keep
-        dup db-columns find-primary-key native-id?
+        dup db-columns find-primary-key db-assigned-id-spec?
         [ drop-function-sql , ] [ drop ] if
     ] { } make ;
 
-M: postgresql-db <insert-native-statement> ( class -- statement )
+M: postgresql-db <insert-db-assigned-statement> ( class -- statement )
     [
         "select add_" 0% 0%
         "(" 0%
@@ -193,7 +195,7 @@ M: postgresql-db <insert-native-statement> ( class -- statement )
         ");" 0%
     ] query-make ;
 
-M: postgresql-db <insert-nonnative-statement> ( class -- statement )
+M: postgresql-db <insert-user-assigned-statement> ( class -- statement )
     [
         "insert into " 0% 0%
         "(" 0%
@@ -204,8 +206,10 @@ M: postgresql-db <insert-nonnative-statement> ( class -- statement )
         [ ", " 0% ] [
             dup type>> +random-id+ = [
                 [
-                    drop bind-name%
-                    f random-id-generator
+                    bind-name%
+                    slot-name>>
+                    f
+                    random-id-generator
                 ] [ type>> ] bi <generator-bind> 1,
             ] [
                 bind%
@@ -219,8 +223,8 @@ M: postgresql-db insert-tuple* ( tuple statement -- )
 
 M: postgresql-db persistent-table ( -- hashtable )
     H{
-        { +native-id+ { "integer" "serial primary key" f } }
-        { +assigned-id+ { f f "primary key" } }
+        { +db-assigned-id+ { "integer" "serial primary key" f } }
+        { +user-assigned-id+ { f f "primary key" } }
         { +random-id+ { "bigint" "bigint primary key" f } }
         { TEXT { "text" "text" f } }
         { VARCHAR { "varchar" "varchar" f } }

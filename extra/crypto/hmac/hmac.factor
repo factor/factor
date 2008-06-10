@@ -1,18 +1,19 @@
-USING: arrays combinators crypto.common crypto.md5 crypto.sha1
-crypto.md5.private io io.binary io.files io.streams.byte-array
-kernel math math.vectors memoize sequences io.encodings.binary ;
+USING: arrays combinators crypto.common checksums checksums.md5
+checksums.sha1 checksums.md5.private io io.binary io.files
+io.streams.byte-array kernel math math.vectors memoize sequences
+io.encodings.binary ;
 IN: crypto.hmac
 
 : sha1-hmac ( Ko Ki -- hmac )
     initialize-sha1 process-sha1-block
-    (stream>sha1) get-sha1
+    stream>sha1 get-sha1
     initialize-sha1
     >r process-sha1-block r>
     process-sha1-block get-sha1 ;
 
 : md5-hmac ( Ko Ki -- hmac )
     initialize-md5 process-md5-block
-    (stream>md5) get-md5
+    stream>md5 get-md5
     initialize-md5
     >r process-md5-block r>
     process-md5-block get-md5 ;
@@ -29,7 +30,7 @@ MEMO: opad ( -- seq ) 64 HEX: 5c <array> ;
     ipad seq-bitxor ;
 
 : stream>sha1-hmac ( K stream -- hmac )
-    [ init-hmac sha1-hmac ] with-stream ;
+    [ init-hmac sha1-hmac ] with-input-stream ;
 
 : file>sha1-hmac ( K path -- hmac )
     binary <file-reader> stream>sha1-hmac ;
@@ -38,7 +39,7 @@ MEMO: opad ( -- seq ) 64 HEX: 5c <array> ;
     binary <byte-reader> stream>sha1-hmac ;
 
 : stream>md5-hmac ( K stream -- hmac )
-    [ init-hmac md5-hmac ] with-stream ;
+    [ init-hmac md5-hmac ] with-input-stream ;
 
 : file>md5-hmac ( K path -- hmac )
     binary <file-reader> stream>md5-hmac ;

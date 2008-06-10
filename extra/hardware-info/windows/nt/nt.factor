@@ -35,7 +35,8 @@ M: winnt total-virtual-mem ( -- n )
 M: winnt available-virtual-mem ( -- n )
     memory-status MEMORYSTATUSEX-ullAvailVirtual ;
 
-: pull-win32-string [ utf16n alien>string ] keep free ;
+: pull-win32-string ( alien -- string )
+    [ utf16n alien>string ] keep free ;
 
 : computer-name ( -- string )
     MAX_COMPUTERNAME_LENGTH 1+ [ malloc ] keep

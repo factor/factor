@@ -47,7 +47,7 @@ TUPLE: board width height rows ;
     ] if ;
 
 : remove-full-rows ( board -- )
-    dup board-rows [ row-not-full? ] subset swap set-board-rows ;
+    dup board-rows [ row-not-full? ] filter swap set-board-rows ;
 
 : check-rows ( board -- n )
     #! remove full rows, then add blank ones at the top, returning the number

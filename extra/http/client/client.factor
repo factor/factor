@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs http kernel math math.parser namespaces sequences
 io io.sockets io.streams.string io.files io.timeouts strings
-splitting calendar continuations accessors vectors
-io.encodings.8-bit io.encodings.binary fry debugger inspector ;
+splitting calendar continuations accessors vectors math.order
+io.encodings.8-bit io.encodings.binary io.streams.duplex
+fry debugger inspector ascii urls ;
 IN: http.client
 
 : max-redirects 10 ;
@@ -18,81 +19,56 @@ DEFER: http-request
 
 <PRIVATE
 
-: parse-url ( url -- resource host port )
-    "http://" ?head [ "Only http:// supported" throw ] unless
-    "/" split1 [ "/" prepend ] [ "/" ] if*
-    swap parse-host ;
-
-: store-path ( request path -- request )
-    "?" split1 >r >>path r> dup [ query>assoc ] when >>query ;
-
-: request-with-url ( url request -- request )
-    swap parse-url >r >r store-path r> >>host r> >>port ;
-
-! This is all pretty complex because it needs to handle
-! HTTP redirects, which might be absolute or relative
-: absolute-redirect ( url -- request )
-    request get request-with-url ;
-
-: relative-redirect ( path -- request )
-    request get swap store-path ;
-
 SYMBOL: redirects
 
-: absolute-url? ( url -- ? )
-    [ "http://" head? ] [ "https://" head? ] bi or ;
+: redirect-url ( request url -- request )
+    '[ , >url ensure-port derive-url ensure-port ] change-url ;
 
-: do-redirect ( response -- response stream )
-    dup response-code 300 399 between? [
-        stdio get dispose
+: do-redirect ( response data -- response data )
+    over code>> 300 399 between? [
+        drop
         redirects inc
         redirects get max-redirects < [
-            header>> "location" swap at
-            dup absolute-url? [
-                absolute-redirect
-            ] [
-                relative-redirect
-            ] if "GET" >>method http-request
+            request get
+            swap "location" header redirect-url
+            "GET" >>method http-request
         ] [
             too-many-redirects
         ] if
-    ] [
-        stdio get
-    ] if ;
-
-: close-on-error ( stream quot -- )
-    '[ , with-stream* ] [ ] pick '[ , dispose ] cleanup ; inline
+    ] when ;
 
 PRIVATE>
 
-: http-request ( request -- response stream )
-    dup request [
-        dup request-addr latin1 <client>
-        1 minutes over set-timeout
-        [
-            write-request flush
-            read-response
-            do-redirect
-        ] close-on-error
-    ] with-variable ;
+: read-chunk-size ( -- n )
+    read-crlf ";" split1 drop [ blank? ] right-trim
+    hex> [ "Bad chunk size" throw ] unless* ;
 
 : read-chunks ( -- )
-    read-crlf ";" split1 drop hex> dup { f 0 } member?
+    read-chunk-size dup zero?
     [ drop ] [ read % read-crlf "" assert= read-chunks ] if ;
 
-: do-chunked-encoding ( response stream -- response stream/string )
-    over "transfer-encoding" header "chunked" = [
-        [ [ read-chunks ] "" make ] with-stream
-    ] when ;
+: read-response-body ( response -- response data )
+    dup "transfer-encoding" header "chunked" =
+    [ [ read-chunks ] "" make ] [ input-stream get contents ] if ;
+
+: http-request ( request -- response data )
+    dup request [
+        dup url>> url-addr latin1 [
+            1 minutes timeouts
+            write-request
+            read-response
+            read-response-body
+        ] with-client
+        do-redirect
+    ] with-variable ;
 
 : <get-request> ( url -- request )
-    <request> request-with-url "GET" >>method ;
+    <request>
+        "GET" >>method
+        swap >url ensure-port >>url ;
 
-: string-or-contents ( stream/string -- string )
-    dup string? [ contents ] unless ;
-
-: http-get-stream ( url -- response stream/string )
-    <get-request> http-request do-chunked-encoding ;
+: http-get* ( url -- response data )
+    <get-request> http-request ;
 
 : success? ( code -- ? ) 200 = ;
 
@@ -112,29 +88,23 @@ M: download-failed error.
     over code>> success? [ nip ] [ download-failed ] if ;
 
 : http-get ( url -- string )
-    http-get-stream string-or-contents check-response ;
+    http-get* check-response ;
 
 : download-name ( url -- name )
     file-name "?" split1 drop "/" ?tail drop ;
 
 : download-to ( url file -- )
     #! Downloads the contents of a URL to a file.
-    swap http-get-stream check-response
-    dup string? [
-        latin1 [ write ] with-file-writer
-    ] [
-        [ swap latin1 <file-writer> stream-copy ] with-disposal
-    ] if ;
+    [ http-get ] dip latin1 [ write ] with-file-writer ;
 
 : download ( url -- )
     dup download-name download-to ;
 
-: <post-request> ( content-type content url -- request )
+: <post-request> ( post-data url -- request )
     <request>
-    request-with-url
-    "POST" >>method
-    swap >>post-data
-    swap >>post-data-type ;
+        "POST" >>method
+        swap >url ensure-port >>url
+        swap >>post-data ;
 
-: http-post ( content-type content url -- response string )
-    <post-request> http-request do-chunked-encoding string-or-contents ;
+: http-post ( post-data url -- response data )
+    <post-request> http-request ;

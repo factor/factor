@@ -123,8 +123,8 @@ $nl
 { $code "\"A man, a plan, a canal: Panama.\"" }
 "Now, place a quotation containing " { $link Letter? } " on the stack; quoting code places it on the stack instead of executing it immediately:"
 { $code "[ Letter? ]" }
-"Finally, pass the string and the quotation to the " { $link subset } " word:"
-{ $code "subset" }
+"Finally, pass the string and the quotation to the " { $link filter } " word:"
+{ $code "filter" }
 "Now the stack should contain the following string:"
 { "\"AmanaplanacanalPanama\"" }
 "This is almost what we want; we just need to convert the string to lower case now. This can be done by calling " { $link >lower } "; the " { $snippet ">" } " prefix is a naming convention for conversion operations, and should be read as ``to'':"
@@ -132,10 +132,10 @@ $nl
 "Finally, let's print the top of the stack and discard it:"
 { $code "." }
 "This will output " { $snippet "amanaplanacanalpanama" } ". This string is in the form that we want, and we evaluated the following code to get it into this form:"
-{ $code "[ Letter? ] subset >lower" }
+{ $code "[ Letter? ] filter >lower" }
 "This code starts with a string on the stack, removes non-alphabetical characters, and converts the result to lower case, leaving a new string on the stack. We put this code in a new word, and add the new word to " { $snippet "palindrome.factor" } ":"
-{ $code ": normalize ( str -- newstr ) [ Letter? ] subset >lower ;" }
-"You will need to add " { $vocab-link "unicode.categories" } " to the vocabulary search path, so that " { $link Letter? } " can be used in the source file."
+{ $code ": normalize ( str -- newstr ) [ Letter? ] filter >lower ;" }
+"You will need to add " { $vocab-link "unicode.case" } " and " { $vocab-link "unicode.categories" } " to the vocabulary search path, so that " { $link Letter? } " can be used in the source file."
 $nl
 "We modify " { $snippet "palindrome?" } " to first apply " { $snippet "normalize" } " to its input:"
 { $code ": palindrome? ( str -- ? ) normalize dup reverse = ;" }

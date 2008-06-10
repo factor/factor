@@ -1,36 +1,37 @@
-USING: io.files io.streams.string io
-tools.test kernel io.encodings.ascii ;
+USING: io.files io.streams.string io io.streams.byte-array
+tools.test kernel io.encodings.ascii io.encodings.utf8
+namespaces accessors io.encodings ;
 IN: io.streams.encodings.tests
 
-: <resource-reader> ( resource -- stream )
-    resource-path ascii <file-reader> ;
-    
 [ { } ]
-[ "core/io/test/empty-file.txt" <resource-reader> lines ]
+[ "resource:core/io/test/empty-file.txt" ascii <file-reader> lines ]
 unit-test
 
 : lines-test ( stream -- line1 line2 )
-    [ readln readln ] with-stream ;
+    [ readln readln ] with-input-stream ;
 
 [
     "This is a line."
     "This is another line."
 ] [
-    "core/io/test/windows-eol.txt" <resource-reader> lines-test
+    "resource:core/io/test/windows-eol.txt"
+    ascii <file-reader> lines-test
 ] unit-test
 
 [
     "This is a line."
     "This is another line."
 ] [
-    "core/io/test/mac-os-eol.txt" <resource-reader> lines-test
+    "resource:core/io/test/mac-os-eol.txt"
+    ascii <file-reader> lines-test
 ] unit-test
 
 [
     "This is a line."
     "This is another line."
 ] [
-    "core/io/test/unix-eol.txt" <resource-reader> lines-test
+    "resource:core/io/test/unix-eol.txt"
+    ascii <file-reader> lines-test
 ] unit-test
 
 [
@@ -55,4 +56,20 @@ unit-test
      "Hello world\r\n1234" <string-reader>
      dup stream-readln drop
      stream-read1
+] unit-test
+
+[ utf8 ascii ] [
+    "foo" utf8 [
+        input-stream get code>>
+        ascii decode-input
+        input-stream get code>>
+    ] with-byte-reader
+] unit-test
+
+[ utf8 ascii ] [
+    utf8 [
+        output-stream get code>>
+        ascii encode-output
+        output-stream get code>>
+    ] with-byte-writer drop
 ] unit-test

@@ -105,8 +105,8 @@ C: <vocab-author> vocab-author
 
 : vocab-xref ( vocab quot -- vocabs )
     >r dup vocab-name swap words r> map
-    [ [ word? ] subset [ word-vocabulary ] map ] map>set
-    remove [ ] subset [ vocab ] map ; inline
+    [ [ word? ] filter [ word-vocabulary ] map ] map>set
+    remove sift [ vocab ] map ; inline
 
 : vocab-uses ( vocab -- vocabs ) [ uses ] vocab-xref ;
 
@@ -143,7 +143,7 @@ C: <vocab-author> vocab-author
 : keyed-vocabs ( str quot -- seq )
     all-vocabs [
         swap >r
-        [ >r 2dup r> swap call member? ] subset
+        [ >r 2dup r> swap call member? ] filter
         r> swap
     ] assoc-map 2nip ; inline
 

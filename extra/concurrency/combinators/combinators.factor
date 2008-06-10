@@ -4,14 +4,27 @@ USING: concurrency.futures concurrency.count-downs sequences
 kernel ;
 IN: concurrency.combinators
 
-: parallel-map ( seq quot -- newseq )
-    [ curry future ] curry map dup [ ?future ] change-each ;
-    inline
+: (parallel-each) ( n quot -- )
+    >r <count-down> r> keep await ; inline
 
 : parallel-each ( seq quot -- )
-    over length <count-down>
-    [ [ >r curry r> spawn-stage ] 2curry each ] keep await ;
+    over length [
+        [ >r curry r> spawn-stage ] 2curry each
+    ] (parallel-each) ; inline
+
+: 2parallel-each ( seq1 seq2 quot -- )
+    2over min-length [
+        [ >r 2curry r> spawn-stage ] 2curry 2each
+    ] (parallel-each) ; inline
+
+: parallel-filter ( seq quot -- newseq )
+    over >r pusher >r each r> r> like ; inline
+
+: future-values dup [ ?future ] change-each ; inline
+
+: parallel-map ( seq quot -- newseq )
+    [ curry future ] curry map future-values ;
     inline
 
-: parallel-subset ( seq quot -- newseq )
-    over >r pusher >r each r> r> like ; inline
+: 2parallel-map ( seq1 seq2 quot -- newseq )
+    [ 2curry future ] curry 2map future-values ;

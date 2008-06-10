@@ -1,8 +1,44 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser generic kernel classes words slots assocs sequences arrays
-vectors definitions prettyprint combinators.lib math sets ;
+USING: parser generic kernel classes words slots assocs
+sequences arrays vectors definitions prettyprint combinators.lib
+math hashtables sets ;
 IN: delegate
+
+: protocol-words ( protocol -- words )
+    \ protocol-words word-prop ;
+
+: protocol-consult ( protocol -- consulters )
+    \ protocol-consult word-prop ;
+
+GENERIC: group-words ( group -- words )
+
+M: tuple-class group-words
+    "slot-names" word-prop [
+        [ reader-word ] [ writer-word ] bi
+        2array [ 0 2array ] map
+    ] map concat ;
+
+! Consultation
+
+: consult-method ( word class quot -- )
+    [ drop swap first create-method ]
+    [ nip swap first2 swapd [ ndip ] 2curry swap suffix ] 3bi
+    define ;
+
+: change-word-prop ( word prop quot -- )
+    rot word-props swap change-at ; inline
+
+: register-protocol ( group class quot -- )
+    rot \ protocol-consult [ swapd ?set-at ] change-word-prop ;
+
+: define-consult ( group class quot -- )
+    [ register-protocol ]
+    [ rot group-words -rot [ consult-method ] 2curry each ]
+    3bi ;
+
+: CONSULT:
+    scan-word scan-word parse-definition define-consult ; parsing
 
 ! Protocols
 
@@ -10,38 +46,50 @@ IN: delegate
     [ with each ] 2curry each ; inline
 
 : forget-all-methods ( classes words -- )
-    [ 2array forget ] cross-2each ;
-
-: protocol-words ( protocol -- words )
-    "protocol-words" word-prop ;
+    [ first method forget ] cross-2each ;
 
 : protocol-users ( protocol -- users )
-    "protocol-users" word-prop ;
+    protocol-consult keys ;
 
-: users-and-words ( protocol -- users words )
-    [ protocol-users ] [ protocol-words ] bi ;
+: lost-words ( protocol wordlist -- lost-words )
+    >r protocol-words r> diff ;
 
 : forget-old-definitions ( protocol new-wordlist -- )
-    >r users-and-words r>
-    diff forget-all-methods ;
+    [ drop protocol-users ] [ lost-words ] 2bi
+    forget-all-methods ;
 
-: define-protocol ( protocol wordlist -- )
-    ! 2dup forget-old-definitions
-    { } like "protocol-words" set-word-prop ;
+: added-words ( protocol wordlist -- added-words )
+    swap protocol-words diff ;
+
+: add-new-definitions ( protocol wordlist -- )
+    [ drop protocol-consult >alist ] [ added-words ] 2bi
+    [ swap first2 consult-method ] cross-2each ;
+
+: initialize-protocol-props ( protocol wordlist -- )
+    [
+        drop \ protocol-consult
+        [ H{ } assoc-like ] change-word-prop
+    ] [ { } like \ protocol-words set-word-prop ] 2bi ;
 
 : fill-in-depth ( wordlist -- wordlist' )
     [ dup word? [ 0 2array ] when ] map ;
 
+: define-protocol ( protocol wordlist -- )
+    fill-in-depth
+    [ forget-old-definitions ]
+    [ add-new-definitions ]
+    [ initialize-protocol-props ] 2tri ;
+
 : PROTOCOL:
     CREATE-WORD
-    dup define-symbol
-    dup f "inline" set-word-prop
-    parse-definition fill-in-depth define-protocol ; parsing
+    [ define-symbol ]
+    [ f "inline" set-word-prop ]
+    [ parse-definition define-protocol ] tri ; parsing
 
 PREDICATE: protocol < word protocol-words ; ! Subclass of symbol?
 
 M: protocol forget*
-    [ users-and-words forget-all-methods ] [ call-next-method ] bi ;
+    [ f forget-old-definitions ] [ call-next-method ] bi ;
 
 : show-words ( wordlist' -- wordlist )
     [ dup second zero? [ first ] when ] map ;
@@ -52,51 +100,4 @@ M: protocol definer drop \ PROTOCOL: \ ; ;
 
 M: protocol synopsis* word-synopsis ; ! Necessary?
 
-GENERIC: group-words ( group -- words )
-
-M: protocol group-words
-    "protocol-words" word-prop ;
-
-M: tuple-class group-words
-    "slot-names" word-prop [
-        [ reader-word ] [ writer-word ] bi
-        2array [ 0 2array ] map
-    ] map concat ;
-
-! Consultation
-
-: define-consult-method ( word class quot -- )
-    [ drop swap first create-method ]
-    [ nip swap first2 swapd [ ndip ] 2curry swap suffix ] 3bi define ;
-
-: change-word-prop ( word prop quot -- )
-    >r swap word-props r> change-at ; inline
-
-: add ( item vector/f -- vector )
-    2dup member? [ nip ] [ ?push ] if ;
-
-: use-protocol ( class group -- )
-    "protocol-users" [ add ] change-word-prop ;
-
-: define-consult ( group class quot -- )
-    swapd >r 2dup use-protocol group-words swap r>
-    [ define-consult-method ] 2curry each ;
-
-: CONSULT:
-    scan-word scan-word parse-definition define-consult ; parsing
-
-! Mimic still needs to be updated
-
-: mimic-method ( mimicker mimicked generic -- )
-    tuck method 
-    [ [ create-method-in ] [ word-def ] bi* define ]
-    [ 2drop ] if* ;
-
-: define-mimic ( group mimicker mimicked -- )
-    [ drop swap use-protocol ] [
-        rot group-words -rot
-        [ rot first mimic-method ] 2curry each
-    ] 3bi ;
-
-: MIMIC:
-    scan-word scan-word scan-word define-mimic ; parsing
+M: protocol group-words protocol-words ;

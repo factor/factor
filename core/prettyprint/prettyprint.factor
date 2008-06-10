@@ -4,11 +4,11 @@ IN: prettyprint
 USING: arrays generic generic.standard assocs io kernel
 math namespaces sequences strings io.styles io.streams.string
 vectors words prettyprint.backend prettyprint.sections
-prettyprint.config sorting splitting math.parser vocabs
+prettyprint.config sorting splitting grouping math.parser vocabs
 definitions effects classes.builtin classes.tuple io.files
 classes continuations hashtables classes.mixin classes.union
-classes.predicate classes.singleton combinators quotations
-sets ;
+classes.intersection classes.predicate classes.singleton
+combinators quotations sets accessors ;
 
 : make-pprint ( obj quot -- block in use )
     [
@@ -45,7 +45,7 @@ sets ;
     ] if ;
 
 : vocabs. ( in use -- )
-    dupd remove [ { "syntax" "scratchpad" } member? not ] subset
+    dupd remove [ { "syntax" "scratchpad" } member? not ] filter
     use. in. ;
 
 : with-use ( obj quot -- )
@@ -145,46 +145,51 @@ GENERIC: see ( defspec -- )
     definer drop pprint-word ;
 
 : stack-effect. ( word -- )
-    dup parsing? over symbol? or not swap stack-effect and
+    [ [ parsing-word? ] [ symbol? ] bi or not ] [ stack-effect ] bi and
     [ effect>string comment. ] when* ;
 
 : word-synopsis ( word -- )
-    dup seeing-word
-    dup definer.
-    dup pprint-word
-    stack-effect. ;
+    {
+        [ seeing-word ]
+        [ definer. ]
+        [ pprint-word ]
+        [ stack-effect. ] 
+    } cleave ;
 
 M: word synopsis* word-synopsis ;
 
 M: simple-generic synopsis* word-synopsis ;
 
 M: standard-generic synopsis*
-    dup definer.
-    dup seeing-word
-    dup pprint-word
-    dup dispatch# pprint*
-    stack-effect. ;
+    {
+        [ definer. ]
+        [ seeing-word ]
+        [ pprint-word ]
+        [ dispatch# pprint* ]
+        [ stack-effect. ]
+    } cleave ;
 
 M: hook-generic synopsis*
-    dup definer.
-    dup seeing-word
-    dup pprint-word
-    dup "combination" word-prop hook-combination-var pprint*
-    stack-effect. ;
+    {
+        [ definer. ]
+        [ seeing-word ]
+        [ pprint-word ]
+        [ "combination" word-prop hook-combination-var pprint* ]
+        [ stack-effect. ]
+    } cleave ;
 
 M: method-spec synopsis*
     first2 method synopsis* ;
 
 M: method-body synopsis*
-    dup dup
-    definer.
-    "method-class" word-prop pprint-word
-    "method-generic" word-prop pprint-word ;
+    [ definer. ]
+    [ "method-class" word-prop pprint-word ]
+    [ "method-generic" word-prop pprint-word ] tri ;
 
 M: mixin-instance synopsis*
-    dup definer.
-    dup mixin-instance-class pprint-word
-    mixin-instance-mixin pprint-word ;
+    [ definer. ]
+    [ class>> pprint-word ]
+    [ mixin>> pprint-word ] tri ;
 
 M: pathname synopsis* pprint* ;
 
@@ -220,7 +225,7 @@ M: word declarations.
         POSTPONE: flushable
     } [ declaration. ] with each ;
 
-: pprint-; \ ; pprint-word ;
+: pprint-; ( -- ) \ ; pprint-word ;
 
 : (see) ( spec -- )
     <colon dup synopsis*
@@ -237,6 +242,11 @@ M: union-class see-class*
     <colon \ UNION: pprint-word
     dup pprint-word
     members pprint-elements pprint-; block> ;
+
+M: intersection-class see-class*
+    <colon \ INTERSECTION: pprint-word
+    dup pprint-word
+    participants pprint-elements pprint-; block> ;
 
 M: mixin-class see-class*
     <block \ MIXIN: pprint-word

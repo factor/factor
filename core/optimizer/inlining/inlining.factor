@@ -7,7 +7,7 @@ combinators classes classes.algebra generic.math
 optimizer.math.partial continuations optimizer.def-use
 optimizer.backend generic.standard optimizer.specializers
 optimizer.def-use optimizer.pattern-match generic.standard
-optimizer.control kernel.private ;
+optimizer.control kernel.private definitions ;
 IN: optimizer.inlining
 
 : remember-inlining ( node history -- )
@@ -61,12 +61,8 @@ DEFER: (flat-length)
     [ dispatch# node-class# ] keep specific-method ;
 
 : inline-standard-method ( node word -- node )
-    2dup dispatching-class dup [
-        over +inlined+ depends-on
-        swap method 1quotation f splice-quot
-    ] [
-        3drop t
-    ] if ;
+    2dup dispatching-class dup
+    [ swap method 1quotation f splice-quot ] [ 3drop t ] if ;
 
 ! Partial dispatch of math-generic words
 : normalize-math-class ( class -- class' )
@@ -77,7 +73,7 @@ DEFER: (flat-length)
         float real
         complex number
         object
-    } [ class< ] with find nip ;
+    } [ class<= ] with find nip ;
 
 : inlining-math-method ( #call word -- quot/f )
     swap node-input-classes
@@ -111,7 +107,7 @@ DEFER: (flat-length)
 : comparable? ( actual testing -- ? )
     #! If actual is a subset of testing or if the two classes
     #! are disjoint, return t.
-    2dup class< >r classes-intersect? not r> or ;
+    2dup class<= >r classes-intersect? not r> or ;
 
 : optimize-predicate? ( #call -- ? )
     dup node-param "predicating" word-prop dup [
@@ -132,7 +128,7 @@ DEFER: (flat-length)
 
 : evaluate-predicate ( #call -- ? )
     dup node-param "predicating" word-prop >r
-    node-class-first r> class< ;
+    node-class-first r> class<= ;
 
 : optimize-predicate ( #call -- node )
     #! If the predicate is followed by a branch we fold it

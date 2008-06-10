@@ -35,7 +35,7 @@ unit-test
             "J" read-until 2array ,
             "i" read-until 2array ,
             "X" read-until 2array ,
-        ] with-stream
+        ] with-input-stream
     ] { } make
 ] unit-test
 

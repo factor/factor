@@ -356,13 +356,13 @@ M: object infer-call
 
 \ setenv { object fixnum } { } <effect> set-primitive-effect
 
-\ exists? { string } { object } <effect> set-primitive-effect
+\ (exists?) { string } { object } <effect> set-primitive-effect
 
 \ (directory) { string } { array } <effect> set-primitive-effect
 
 \ gc { } { } <effect> set-primitive-effect
 
-\ gc-time { } { integer } <effect> set-primitive-effect
+\ gc-stats { } { array } <effect> set-primitive-effect
 
 \ save-image { string } { } <effect> set-primitive-effect
 
@@ -372,7 +372,7 @@ M: object infer-call
 t over set-effect-terminated?
 set-primitive-effect
 
-\ data-room { } { integer array } <effect> set-primitive-effect
+\ data-room { } { integer integer array } <effect> set-primitive-effect
 \ data-room make-flushable
 
 \ code-room { } { integer integer integer integer } <effect> set-primitive-effect
@@ -583,7 +583,7 @@ set-primitive-effect
 
 \ (set-os-envs) { array } { } <effect> set-primitive-effect
 
-\ do-primitive [ \ do-primitive no-effect ] "infer" set-word-prop
+\ do-primitive [ \ do-primitive cannot-infer-effect ] "infer" set-word-prop
 
 \ dll-valid? { object } { object } <effect> set-primitive-effect
 

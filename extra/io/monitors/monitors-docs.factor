@@ -1,5 +1,5 @@
 IN: io.monitors
-USING: help.markup help.syntax continuations
+USING: help.markup help.syntax continuations destructors
 concurrency.mailboxes quotations ;
 
 HELP: with-monitors

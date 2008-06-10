@@ -10,6 +10,18 @@ IN: ui
 ! Assoc mapping aliens to gadgets
 SYMBOL: windows
 
+SYMBOL: stop-after-last-window?
+
+: event-loop? ( -- ? )
+    {
+        { [ stop-after-last-window? get not ] [ t ] }
+        { [ graft-queue dlist-empty? not ] [ t ] }
+        { [ windows get-global empty? not ] [ t ] }
+        [ f ]
+    } cond ;
+
+: event-loop ( -- ) [ event-loop? ] [ do-events ] [ ] while ;
+
 : window ( handle -- world ) windows get-global at ;
 
 : window-focus ( handle -- gadget ) window world-focus ;
@@ -26,11 +38,12 @@ SYMBOL: windows
     [ [ length 1- dup 1- ] keep exchange ] [ drop ] if ;
 
 : unregister-window ( handle -- )
-    windows global [ [ first = not ] with subset ] change-at ;
+    windows global [ [ first = not ] with filter ] change-at ;
 
 : raised-window ( world -- )
-    windows get-global [ second eq? ] with find drop
-    windows get-global [ length 1- ] keep exchange ;
+    windows get-global
+    [ [ second eq? ] with find drop ] keep
+    [ nth ] [ delete-nth ] [ nip ] 2tri push ;
 
 : focus-gestures ( new old -- )
     drop-prefix <reversed>
@@ -201,5 +214,9 @@ MAIN: ui
         call
     ] [
         f windows set-global
-        ui-hook [ ui ] with-variable
+        [
+            ui-hook set
+            stop-after-last-window? on
+            ui
+        ] with-scope
     ] if ;

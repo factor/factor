@@ -1,6 +1,6 @@
 IN: optimizer.def-use.tests
 USING: inference inference.dataflow optimizer optimizer.def-use
-namespaces assocs kernel sequences math tools.test words ;
+namespaces assocs kernel sequences math tools.test words sets ;
 
 [ 3 { 1 1 1 } ] [
     [ 1 2 3 ] dataflow compute-def-use drop
@@ -10,10 +10,6 @@ namespaces assocs kernel sequences math tools.test words ;
 : kill-set ( quot -- seq )
     dataflow compute-def-use drop compute-dead-literals keys
     [ value-literal ] map ;
-
-: subset? [ member? ] curry all? ;
-
-: set= 2dup subset? >r swap subset? r> and ;
 
 [ { [ + ] } ] [
     [ [ 1 2 3 ] [ + ] over drop drop ] kill-set

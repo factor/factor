@@ -5,16 +5,16 @@ quotations arrays namespaces qualified ;
 QUALIFIED: namespaces
 IN: fry
 
-: , "Only valid inside a fry" throw ;
-: @ "Only valid inside a fry" throw ;
-: _ "Only valid inside a fry" throw ;
+: , ( -- * ) "Only valid inside a fry" throw ;
+: @ ( -- * ) "Only valid inside a fry" throw ;
+: _ ( -- * ) "Only valid inside a fry" throw ;
 
 DEFER: (shallow-fry)
 
 : ((shallow-fry)) ( accum quot adder -- result )
     >r [ ] swap (shallow-fry) r>
     append swap dup empty? [ drop ] [
-        [ swap compose ] curry append
+        [ prepose ] curry append
     ] if ; inline
 
 : (shallow-fry) ( accum quot -- result )
@@ -46,15 +46,22 @@ DEFER: (shallow-fry)
         shallow-fry
     ] if* ;
 
+: fry-specifier? ( obj -- ? ) { , namespaces:, @ } member? ;
+
+: count-inputs ( quot -- n )
+    [
+        {
+            { [ dup callable? ] [ count-inputs ] }
+            { [ dup fry-specifier? ] [ drop 1 ] }
+            [ drop 0 ]
+        } cond
+    ] map sum ;
+
 : fry ( quot -- quot' )
     [
         [
             dup callable? [
-                [
-                    [ { , namespaces:, @ } member? ] subset length
-                    \ , <repetition> %
-                ]
-                [ deep-fry % ] bi
+                [ count-inputs \ , <repetition> % ] [ fry % ] bi
             ] [ namespaces:, ] if
         ] each
     ] [ ] make deep-fry ;

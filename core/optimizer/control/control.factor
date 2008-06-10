@@ -75,7 +75,7 @@ USE: prettyprint
 M: #call-label collect-label-info*
     node-param label-info get at
     node-stack get over third tail
-    [ [ #label? ] subset [ node-param ] map ] keep
+    [ [ #label? ] filter [ node-param ] map ] keep
     [ node-successor #tail? ] all? 2array
     swap second push ;
 
@@ -91,7 +91,7 @@ SYMBOL: potential-loops
 
 : remove-non-tail-calls ( -- )
     label-info get
-    [ nip second [ second ] all? ] assoc-subset
+    [ nip second [ second ] all? ] assoc-filter
     [ first ] assoc-map
     potential-loops set ;
 
@@ -154,14 +154,15 @@ SYMBOL: potential-loops
         node-literal t
     ] [
         node-class {
-            { [ dup null class< ] [ drop f f ] }
-            { [ dup \ f class-not class< ] [ drop t t ] }
-            { [ dup \ f class< ] [ drop f t ] }
+            { [ dup null class<= ] [ drop f f ] }
+            { [ dup \ f class-not class<= ] [ drop t t ] }
+            { [ dup \ f class<= ] [ drop f t ] }
             [ drop f f ]
         } cond
     ] if ;
 
-: fold-if-branch? dup node-in-d first known-boolean-value? ;
+: fold-if-branch? ( node -- value ? )
+    dup node-in-d first known-boolean-value? ;
 
 : fold-if-branch ( node value -- node' )
     over drop-inputs >r
@@ -214,7 +215,7 @@ SYMBOL: potential-loops
 : clone-node ( node -- newnode )
     clone dup [ clone ] modify-values ;
 
-: lift-branch
+: lift-branch ( node tail -- )
     over
     last-node clone-node
     dup node-in-d \ #merge out-node

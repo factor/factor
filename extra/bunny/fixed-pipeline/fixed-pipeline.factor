@@ -1,4 +1,4 @@
-USING: alien.c-types continuations kernel
+USING: alien.c-types continuations destructors kernel
 opengl opengl.gl bunny.model ;
 IN: bunny.fixed-pipeline
 
@@ -6,7 +6,7 @@ TUPLE: bunny-fixed-pipeline ;
 
 : <bunny-fixed-pipeline> ( gadget -- draw )
     drop
-    { } bunny-fixed-pipeline construct ;
+    bunny-fixed-pipeline new ;
 
 M: bunny-fixed-pipeline draw-bunny
     drop
