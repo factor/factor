@@ -157,12 +157,17 @@ ARTICLE: "collections" "Collections"
 { $subsection "hashtables" }
 { $subsection "alists" }
 { $subsection "enums" }
+{ $heading "Double-ended queues" }
+{ $subsection "dequeues" }
+"Implementations:"
+{ $subsection "dlists" }
+{ $subsection "search-dequeues" }
 { $heading "Other collections" }
 { $subsection "boxes" }
-{ $subsection "dlists" }
 { $subsection "heaps" }
 { $subsection "graphs" }
-{ $subsection "buffers" } ;
+{ $subsection "buffers" }
+"There are many other collections in " { $snippet "extra/" } ", such as " { $vocab-link "disjoint-set" } ", " { $vocab-link "persistent-vectors" } ", and " { $vocab-link "tuple-arrays" } "." ;
 
 USING: io.sockets io.launcher io.mmap io.monitors
 io.encodings.utf8 io.encodings.utf16 io.encodings.binary io.encodings.ascii io.files ;
