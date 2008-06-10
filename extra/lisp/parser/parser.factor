@@ -34,6 +34,6 @@ string       = dquote ( escaped | !(dquote) . )*  dquote => [[ second >string ]]
 atom         = number
               | identifier
               | string
-list-item    = _ ( atom | s-expression ) _               => [[ second ]]
 s-expression = LPAREN (list-item)* RPAREN                => [[ second seq>cons ]]
+list-item    = _ ( atom | s-expression ) _               => [[ second ]]
 ;EBNF
