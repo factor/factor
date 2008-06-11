@@ -183,13 +183,7 @@ IN: bootstrap.syntax
 
     "(" [
         ")" parse-effect
-        word dup [
-            swap
-            [ "declared-effect" set-word-prop ]
-            [ drop redefined ]
-            [ drop +inlined+ changed-definition ]
-            2tri
-        ] [ 2drop ] if
+        word dup [ set-stack-effect ] [ 2drop ] if
     ] define-syntax
 
     "((" [

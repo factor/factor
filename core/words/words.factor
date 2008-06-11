@@ -144,6 +144,14 @@ M: object redefined drop ;
     dup +inlined+ changed-definition
     dup crossref? [ dup xref ] when drop ;
 
+: set-stack-effect ( effect word -- )
+    2dup "declared-effect" word-prop = [ 2drop ] [
+        swap
+        [ "declared-effect" set-word-prop ]
+        [ drop [ redefined ] [ +inlined+ changed-definition ] bi ]
+        2bi
+    ] if ;
+
 : define-declared ( word def effect -- )
     pick swap "declared-effect" set-word-prop
     define ;
