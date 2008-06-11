@@ -64,12 +64,12 @@ PRIVATE>
     
 <PRIVATE    
 : quasiquote-unquote ( cons -- newcons )
-    [ { [ dup list? ] [ car dup lisp-symbol? ] [ name>> "unquote" equal? dup ] } && nip ]
+    [ { [ dup list? ] [ car dup lisp-symbol? ] [ name>> "unquote" equal? dup ] } 0&& nip ]
     [ cadr ] traverse ;
     
 : quasiquote-unquote-splicing ( cons -- newcons )    
     [ { [ dup list? ] [ dup cdr [ cons? ] [ car cons? ] bi and ]
-        [ dup cadr car lisp-symbol? ] [ cadr car name>> "unquote-splicing" equal? dup ] } && nip ]
+        [ dup cadr car lisp-symbol? ] [ cadr car name>> "unquote-splicing" equal? dup ] } 0&& nip ]
     [ dup cadr cdr >>cdr ] traverse ;
 PRIVATE>
 
