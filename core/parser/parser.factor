@@ -539,7 +539,8 @@ SYMBOL: interactive-vocabs
 
 : reset-removed-classes ( -- )
     removed-classes
-    filter-moved [ class? ] filter [ reset-class ] each ;
+    filter-moved [ class? ] filter
+    [ [ forget-methods ] [ reset-class ] bi ] each ;
 
 : fix-class-words ( -- )
     #! If a class word had a compound definition which was
