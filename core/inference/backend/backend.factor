@@ -421,6 +421,9 @@ TUPLE: missing-effect word ;
     [ "inferred-effect" set-word-prop ]
     2tri ;
 
+: maybe-cannot-infer ( word quot -- )
+    [ ] [ t "cannot-infer" set-word-prop ] cleanup ; inline
+
 : infer-word ( word -- effect )
     [
         [
@@ -431,7 +434,7 @@ TUPLE: missing-effect word ;
             finish-word
             current-effect
         ] with-scope
-    ] [ ] [ t "cannot-infer" set-word-prop ] cleanup ;
+    ] maybe-cannot-infer ;
 
 : custom-infer ( word -- )
     #! Customized inference behavior

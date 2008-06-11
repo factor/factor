@@ -157,31 +157,31 @@ GENERIC: implementors ( class/classes -- seq )
 M: class implementors
     all-words [ "methods" word-prop key? ] with filter ;
 
-M: assoc implementors
+M: sequence implementors
     all-words [
          "methods" word-prop keys
-        swap [ key? ] curry contains?
+        swap [ memq? ] curry contains?
     ] with filter ;
 
 : forget-methods ( class -- )
     [ implementors ] [ [ swap 2array ] curry ] bi map forget-all ;
 
-M: class forget* ( class -- )
-    [
-        class-usages [
-            drop
+: forget-class ( class -- )
+    class-usages [
+        {
+            [ "predicate" word-prop [ forget ] each ]
             [ forget-methods ]
             [ update-map- ]
             [ reset-class ]
-            tri
-        ] assoc-each
-    ]
-    [ call-next-method ] bi ;
+        } cleave
+    ] each ;
 
-M: assoc update-methods ( class assoc -- )
+M: class forget* ( class -- )
+    [ forget-class ] [ call-next-method ] bi ;
+
+M: sequence update-methods ( class seq -- )
     implementors [
-        [ update-generic ]
-        [ make-generic drop ] 2bi
+        [ update-generic ] [ make-generic drop ] 2bi
     ] with each ;
 
 : define-generic ( word combination -- )

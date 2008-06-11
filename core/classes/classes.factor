@@ -76,8 +76,8 @@ M: word reset-class drop ;
         tri
     ] { } make ;
 
-: class-usages ( class -- assoc )
-    [ update-map get at ] closure ;
+: class-usages ( class -- seq )
+    [ update-map get at ] closure keys ;
 
 <PRIVATE
 
@@ -116,13 +116,11 @@ GENERIC: update-class ( class -- )
 
 M: class update-class drop ;
 
-GENERIC: update-methods ( class assoc -- )
+GENERIC: update-methods ( class seq -- )
 
 : update-classes ( class -- )
     dup class-usages
-    [ nip keys [ update-class ] each ]
-    [ update-methods ]
-    2bi ;
+    [ nip [ update-class ] each ] [ update-methods ] 2bi ;
 
 : define-class ( word superclass members participants metaclass -- )
     #! If it was already a class, update methods after.
