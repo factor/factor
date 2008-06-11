@@ -24,10 +24,10 @@ M: no-such-var summary drop "No such variable" ;
     [ ] [ convert-form compose ] foldl ; inline
     
 : convert-begin ( cons -- quot )  
-    cdr [ convert-form ] [ ] lmap-as '[ , [ funcall ] each ] ;
+    cdr [ convert-form ] [ ] lmap-as '[ , [ call ] each ] ;
     
 : convert-cond ( cons -- quot )  
-    cdr [ 2car [ convert-form ] bi@ [ '[ @ funcall ] ] dip 2array ]
+    cdr [ 2car [ convert-form ] bi@ [ '[ @ call ] ] dip 2array ]
     { } lmap-as '[ , cond ]  ;
     
 : convert-general-form ( cons -- quot )
@@ -36,35 +36,33 @@ M: no-such-var summary drop "No such variable" ;
 ! words for convert-lambda  
 <PRIVATE  
 : localize-body ( assoc body -- assoc newbody )  
-    [ lisp-symbol? ] pick '[ [ name>> , at ] [ ] bi or ] traverse ;
+    {
+      { [ dup list? ] [ [ lisp-symbol? ] pick '[ [ name>> , at ] [ ] bi or ] traverse ] }
+      { [ dup lisp-symbol? ] [ name>> over at ] }
+     [ ]
+    } cond ;
 
-: localize-lambda ( body vars -- newbody newvars )
-    tuck make-locals dup push-locals swap
-    [ swap localize-body swapd convert-form nip swap pop-locals ] dip swap ;
+: localize-lambda ( body vars -- newvars newbody )
+    make-locals dup push-locals swap
+    [ swap localize-body convert-form swap pop-locals ] dip swap ;
                    
-: split-lambda ( cons -- body-cons vars-seq )                   
-    3car -rot nip [ name>> ] lmap>array ; inline
+: split-lambda ( cons -- body-cons vars-seq )
+    cdr uncons [ car ] [ [ name>> ] lmap>array ] bi* ; inline
     
 : rest-lambda ( body vars -- quot )
     "&rest" swap [ index ] [ remove ] 2bi
     swapd localize-lambda <lambda>
-    '[ , cut '[ @ , ] , compose ] ;
+    '[ , cut '[ @ , seq>list ] call , call ] ;
     
 : normal-lambda ( body vars -- quot )
-    localize-lambda <lambda> '[ , compose ] ;
+    localize-lambda <lambda> lambda-rewrite [ compose call ] compose 1quotation ;
 PRIVATE>
     
 : convert-lambda ( cons -- quot )  
     split-lambda "&rest" over member? [ rest-lambda ] [ normal-lambda ] if ;
     
 : convert-quoted ( cons -- quot )  
-    cdr 1quotation ;
-    
-: convert-unquoted ( cons -- quot )    
-    "unquote not valid outside of quasiquote!" throw ;
-    
-: convert-unquoted-splicing ( cons -- quot )    
-    "unquote-splicing not valid outside of quasiquote!" throw ;
+    cadr 1quotation ;
     
 : convert-defmacro ( cons -- quot )
     cdr [ car ] keep [ convert-lambda ] [ car name>> ] bi define-lisp-macro 1quotation ;
@@ -74,9 +72,6 @@ PRIVATE>
     { { "lambda" [ convert-lambda ] }
       { "defmacro" [ convert-defmacro ] }
       { "quote" [ convert-quoted ] }
-      { "unquote" [ convert-unquoted ] }
-      { "unquote-splicing" [ convert-unquoted-splicing ] }
-      { "quasiquote" [ convert-quasiquoted ] }
       { "begin" [ convert-begin ] }
       { "cond" [ convert-cond ] }
      [ drop convert-general-form ]
@@ -92,6 +87,7 @@ PRIVATE>
 : convert-form ( lisp-form -- quot )
     {
       { [ dup cons? ] [ convert-list-form ] }
+      { [ dup lisp-var? ] [ lookup-var 1quotation ] }
       { [ dup lisp-symbol? ] [ '[ , lookup-var ] ] }
      [ 1quotation ]
     } cond ;
@@ -120,20 +116,27 @@ SYMBOL: macro-env
 : lisp-define ( quot name -- )
     lisp-env get set-at ;
     
+: defun ( name quot -- name )    
+    over name>> lisp-define ;
+    
 : lisp-get ( name -- word )
     dup lisp-env get at [ ] [ no-such-var ] ?if ;
     
 : lookup-var ( lisp-symbol -- quot )
     name>> lisp-get ;
     
-: lisp-var? ( lisp-symbol -- ? )    
-    name>> lisp-env get key? ;
+: lisp-var? ( lisp-symbol -- ? )
+    dup lisp-symbol? [ name>> lisp-env get key? ] [ drop f ] if ;
+    
+: funcall-arg-list ( args -- newargs )    
+    [ ] [ dup \ funcall = [ drop 2 cut* [ funcall ] compose call ] when suffix ] reduce ;
     
 : funcall ( quot sym -- * )
-    dup lisp-symbol?  [ lookup-var ] when call ; inline
+    [ funcall-arg-list ] dip
+    dup lisp-symbol? [ lookup-var ] when curry call ; inline
     
 : define-primitive ( name vocab word -- )  
-    swap lookup 1quotation '[ , compose call ] swap lisp-define ;
+    swap lookup 1quotation '[ , compose call ] swap lisp-define ; ! '[ , compose call ] swap lisp-define ;
     
 : lookup-macro ( lisp-symbol -- lambda )
     name>> macro-env get at ;
