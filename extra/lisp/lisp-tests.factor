@@ -41,9 +41,9 @@ IN: lisp.test
       "((lambda (x y) (+ x y)) 1 2)" lisp-eval
     ] unit-test
     
-    { 42 } [
-      "((lambda (x y z) (+ x (- y z))) 40 3 1)" lisp-eval
-    ] unit-test
+!     { 42 } [
+!       "((lambda (x y z) (+ x (- y z))) 40 3 1)" lisp-eval
+!     ] unit-test
     
     { "b" } [
       "(cond (#f \"a\") (#t \"b\"))" lisp-eval
