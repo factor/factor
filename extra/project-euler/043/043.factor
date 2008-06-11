@@ -47,7 +47,7 @@ IN: project-euler.043
         [ 5 4 pick subseq-divisible? ]
         [ 3 3 pick subseq-divisible? ]
         [ 2 2 pick subseq-divisible? ]
-    } && nip ;
+    } 0&& nip ;
 
 PRIVATE>
 

@@ -59,7 +59,7 @@ PRIVATE>
 <PRIVATE
 
 : worth-calculating? ( n -- ? )
-    { [ dup 1- 3 mod zero? ] [ dup 1- 3 / even? ] } && nip ;
+    { [ dup 1- 3 mod zero? ] [ dup 1- 3 / even? ] } 0&& nip ;
 
 PRIVATE>
 

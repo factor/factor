@@ -1,4 +1,4 @@
-USING: lists.lazy.examples lazy-lists tools.test ;
+USING: lists.lazy.examples lists.lazy tools.test ;
 IN: lists.lazy.examples.tests
 
 [ { 1 3 5 7 } ] [ 4 odds ltake list>array ] unit-test

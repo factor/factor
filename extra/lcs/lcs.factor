@@ -56,7 +56,7 @@ TUPLE: trace-state old new table i j ;
     {
         [ i>> 0 > ] [ j>> 0 > ]
         [ [ old-nth ] [ new-nth ] bi = ]
-    } <-&& ;
+    } 1&& ;
 
 : do-retain ( state -- state )
     dup old-nth retain boa ,

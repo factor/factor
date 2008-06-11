@@ -64,3 +64,7 @@ IN: lists.tests
 { { 3 4 { 5 6 { 7 } } } } [
   { 1 2 { 3 4 { 5 } } } seq>cons [ atom? ] [ 2 + ] traverse cons>seq
 ] unit-test
+    
+{ { 1 2 3 4 5 6 } } [
+    { 1 2 3 } seq>list { 4 5 6 } seq>list lappend list>seq
+] unit-test

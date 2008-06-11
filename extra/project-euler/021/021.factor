@@ -27,7 +27,7 @@ IN: project-euler.021
 
 : amicable? ( n -- ? )
     dup sum-proper-divisors
-    { [ 2dup = not ] [ 2dup sum-proper-divisors = ] } && 2nip ;
+    { [ 2dup = not ] [ 2dup sum-proper-divisors = ] } 0&& 2nip ;
 
 : euler021 ( -- answer )
     10000 [1,b] [ dup amicable? [ drop 0 ] unless ] sigma ;
