@@ -1,7 +1,7 @@
 USING: kernel sequences io.files io.launcher io.encodings.ascii
 io.streams.string http.client sequences.lib combinators
 math.parser math.vectors math.intervals interval-maps memoize
-csv accessors assocs strings math splitting ;
+csv accessors assocs strings math splitting grouping arrays ;
 IN: geo-ip
 
 : db-path ( -- path ) "IpToCountry.csv" temp-file ;
@@ -32,15 +32,20 @@ MEMO: ip-db ( -- seq )
     [ "#" head? not ] filter "\n" join <string-reader> csv
     [ parse-ip-entry ] map ;
 
+: filter-overlaps ( alist -- alist' )
+    2 clump
+    [ first2 [ first second ] [ first first ] bi* < ] filter
+    [ first ] map ;
+
 MEMO: ip-intervals ( -- interval-map )
-    ip-db [ [ [ from>> ] [ to>> ] bi [a,b] ] keep ] { } map>assoc
-    <interval-map> ;
+    ip-db [ [ [ from>> ] [ to>> ] bi 2array ] keep ] { } map>assoc
+    filter-overlaps <interval-map> ;
 
 GENERIC: lookup-ip ( ip -- ip-entry )
 
 M: string lookup-ip
     "." split [ string>number ] map
-    { HEX: 1000000 HEX: 10000 HEX: 100 1 } v.
+    { HEX: 1000000 HEX: 10000 HEX: 100 HEX: 1 } v.
     lookup-ip ;
 
 M: integer lookup-ip ip-intervals interval-at ;
