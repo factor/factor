@@ -114,7 +114,7 @@ over boid-vel -rot relative-position angle-between ;
   { [ cohesion-radius> in-range? ]
     [ cohesion-view-angle> in-view? ]
     [ eq? not ] }
-  <--&& ;
+  2&& ;
 
 : cohesion-neighborhood ( self -- boids )
   boids> [ within-cohesion-neighborhood? ] with filter ;
@@ -134,7 +134,7 @@ over boid-vel -rot relative-position angle-between ;
   { [ separation-radius> in-range? ]
     [ separation-view-angle> in-view? ]
     [ eq? not ] }
-  <--&& ;
+  2&& ;
 
 : separation-neighborhood ( self -- boids )
   boids> [ within-separation-neighborhood? ] with filter ;
@@ -154,7 +154,7 @@ over boid-vel -rot relative-position angle-between ;
   { [ alignment-radius> in-range? ]
     [ alignment-view-angle> in-view? ]
     [ eq? not ] }
-  <--&& ;
+  2&& ;
 
 : alignment-neighborhood ( self -- boids )
 boids> [ within-alignment-neighborhood? ] with filter ;

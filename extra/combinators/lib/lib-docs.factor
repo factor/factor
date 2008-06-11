@@ -47,10 +47,10 @@ HELP: nkeep
 }
 { $see-also keep nslip } ;
 
-HELP: &&
-{ $values { "quots" "a sequence of quotations with stack effect " { $snippet "( ... -- ... ? )" } } { "?" "a boolean" } }
-{ $description "Calls each quotation in turn; outputs " { $link f } " if one of the quotations output " { $link f } ", otherwise outputs " { $link t } ". As soon as a quotation outputs " { $link f } ", evaluation stops and subsequent quotations are not called." } ;
+! HELP: &&
+! { $values { "quots" "a sequence of quotations with stack effect " { $snippet "( ... -- ... ? )" } } { "?" "a boolean" } }
+! { $description "Calls each quotation in turn; outputs " { $link f } " if one of the quotations output " { $link f } ", otherwise outputs " { $link t } ". As soon as a quotation outputs " { $link f } ", evaluation stops and subsequent quotations are not called." } ;
 
-HELP: ||
-{ $values { "quots" "a sequence of quotations with stack effect " { $snippet "( ... -- ... ? )" } } { "?" "a boolean" } }
-{ $description "Calls each quotation in turn; outputs " { $link t } " if one of the quotations output " { $link t } ", otherwise outputs " { $link f } ". As soon as a quotation outputs " { $link t } ", evaluation stops and subsequent quotations are not called." } ;
+! HELP: ||
+! { $values { "quots" "a sequence of quotations with stack effect " { $snippet "( ... -- ... ? )" } } { "?" "a boolean" } }
+! { $description "Calls each quotation in turn; outputs " { $link t } " if one of the quotations output " { $link t } ", otherwise outputs " { $link f } ". As soon as a quotation outputs " { $link t } ", evaluation stops and subsequent quotations are not called." } ;
