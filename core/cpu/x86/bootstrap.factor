@@ -9,7 +9,7 @@ big-endian off
 
 1 jit-code-format set
 
-: stack-frame-size 4 bootstrap-cells ;
+: stack-frame-size ( -- n ) 4 bootstrap-cells ;
 
 [
     ! Load word
