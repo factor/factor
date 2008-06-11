@@ -4,7 +4,8 @@ USING: inference.dataflow inference.state arrays generic io
 io.streams.string kernel math namespaces parser prettyprint
 sequences strings vectors words quotations effects classes
 continuations debugger assocs combinators compiler.errors
-generic.standard.engines.tuple accessors math.order definitions ;
+generic.standard.engines.tuple accessors math.order definitions
+sets ;
 IN: inference.backend
 
 : recursive-label ( word -- label/f )
@@ -28,7 +29,7 @@ SYMBOL: visited
 : (redefined) ( word -- )
     dup visited get key? [ drop ] [
         [ reset-on-redefine reset-props ]
-        [ dup visited get set-at ]
+        [ visited get conjoin ]
         [
             crossref get at keys
             [ word? ] filter

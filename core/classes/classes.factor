@@ -99,8 +99,8 @@ M: word reset-class drop ;
 
 : (define-class) ( word props -- )
     >r
-    dup reset-class
     dup class? [ dup new-class ] unless
+    dup reset-class
     dup deferred? [ dup define-symbol ] when
     dup word-props
     r> assoc-union over set-word-props

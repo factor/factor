@@ -80,8 +80,7 @@ GENERIC# (quot-uses) 1 ( obj assoc -- )
 
 M: object (quot-uses) 2drop ;
 
-M: word (quot-uses)
-    >r dup crossref? [ dup r> set-at ] [ r> 2drop ] if ;
+M: word (quot-uses) over crossref? [ conjoin ] [ 2drop ] if ;
 
 : seq-uses ( seq assoc -- ) [ (quot-uses) ] curry each ;
 
@@ -103,12 +102,16 @@ compiled-crossref global [ H{ } assoc-like ] change-at
 
 : compiled-xref ( word dependencies -- )
     [ drop crossref? ] assoc-filter
-    2dup "compiled-uses" set-word-prop
-    compiled-crossref get add-vertex* ;
+    [ "compiled-uses" set-word-prop ]
+    [ compiled-crossref get add-vertex* ]
+    2bi ;
 
 : compiled-unxref ( word -- )
-    dup "compiled-uses" word-prop
-    compiled-crossref get remove-vertex* ;
+    [
+        dup "compiled-uses" word-prop
+        compiled-crossref get remove-vertex*
+    ]
+    [ f "compiled-uses" set-word-prop ] bi ;
 
 : delete-compiled-xref ( word -- )
     dup compiled-unxref
@@ -177,9 +180,10 @@ GENERIC: subwords ( word -- seq )
 M: word subwords drop f ;
 
 : reset-generic ( word -- )
-    dup subwords forget-all
-    dup reset-word
-    { "methods" "combination" "default-method" } reset-props ;
+    [ subwords forget-all ]
+    [ reset-word ]
+    [ { "methods" "combination" "default-method" } reset-props ]
+    tri ;
 
 : gensym ( -- word )
     "( gensym )" f <word> ;
@@ -216,12 +220,12 @@ M: word where "loc" word-prop ;
 M: word set-where swap "loc" set-word-prop ;
 
 M: word forget*
-    dup "forgotten" word-prop [
-        dup delete-xref
-        dup delete-compiled-xref
-        dup word-name over word-vocabulary vocab-words delete-at
-        dup t "forgotten" set-word-prop
-    ] unless drop ;
+    dup "forgotten" word-prop [ drop ] [
+        [ delete-xref ]
+        [ [ word-name ] [ word-vocabulary vocab-words ] bi delete-at ]
+        [ t "forgotten" set-word-prop ]
+        tri
+    ] if ;
 
 M: word hashcode*
     nip 1 slot { fixnum } declare ;

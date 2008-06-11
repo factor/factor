@@ -1,21 +1,20 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: dlists dlists.private threads kernel arrays sequences
-alarms ;
+USING: dequeues threads kernel arrays sequences alarms ;
 IN: concurrency.conditions
 
-: notify-1 ( dlist -- )
-    dup dlist-empty? [ drop ] [ pop-back resume-now ] if ;
+: notify-1 ( dequeue -- )
+    dup dequeue-empty? [ drop ] [ pop-back resume-now ] if ;
 
-: notify-all ( dlist -- )
-    [ resume-now ] dlist-slurp ;
+: notify-all ( dequeue -- )
+    [ resume-now ] slurp-dequeue ;
 
 : queue-timeout ( queue timeout -- alarm )
     #! Add an alarm which removes the current thread from the
     #! queue, and resumes it, passing it a value of t.
-    >r self over push-front* [
-        tuck delete-node
-        dlist-node-obj t swap resume-with
+    >r [ self swap push-front* ] keep [
+        [ delete-node ] [ drop node-value ] 2bi
+        t swap resume-with
     ] 2curry r> later ;
 
 : wait ( queue timeout status -- )

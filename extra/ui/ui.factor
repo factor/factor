@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs io kernel math models namespaces
-prettyprint dlists sequences threads sequences words
+prettyprint dlists dequeues sequences threads sequences words
 debugger ui.gadgets ui.gadgets.worlds ui.gadgets.tracks
 ui.gestures ui.backend ui.render continuations init combinators
 hashtables concurrency.flags sets ;
@@ -15,7 +15,7 @@ SYMBOL: stop-after-last-window?
 : event-loop? ( -- ? )
     {
         { [ stop-after-last-window? get not ] [ t ] }
-        { [ graft-queue dlist-empty? not ] [ t ] }
+        { [ graft-queue dequeue-empty? not ] [ t ] }
         { [ windows get-global empty? not ] [ t ] }
         [ f ]
     } cond ;
@@ -126,7 +126,7 @@ SYMBOL: ui-hook
         in-layout? on
         layout-queue [
             dup layout find-world [ , ] when*
-        ] dlist-slurp
+        ] slurp-dequeue
     ] { } make prune ;
 
 : redraw-worlds ( seq -- )
@@ -141,7 +141,7 @@ SYMBOL: ui-hook
     } case ;
 
 : notify-queued ( -- )
-    graft-queue [ notify ] dlist-slurp ;
+    graft-queue [ notify ] slurp-dequeue ;
 
 : update-ui ( -- )
     [ notify-queued layout-queued redraw-worlds ] assert-depth ;

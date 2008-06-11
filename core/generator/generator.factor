@@ -1,11 +1,11 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+ ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes combinators cpu.architecture
 effects generator.fixup generator.registers generic hashtables
 inference inference.backend inference.dataflow io kernel
 kernel.private layouts math namespaces optimizer
 optimizer.specializers prettyprint quotations sequences system
-threads words vectors ;
+threads words vectors sets dequeues ;
 IN: generator
 
 SYMBOL: compile-queue
@@ -16,7 +16,7 @@ SYMBOL: compiled
         { [ dup compiled get key? ] [ drop ] }
         { [ dup inlined-block? ] [ drop ] }
         { [ dup primitive? ] [ drop ] }
-        [ dup compile-queue get set-at ]
+        [ compile-queue get push-front ]
     } cond ;
 
 : maybe-compile ( word -- )

@@ -10,6 +10,8 @@ $nl
 "Default implementation:"
 { $subsection <hashed-dlist> } ;
 
+ABOUT: "search-dequeues"
+
 HELP: <search-dequeue> ( assoc dequeue -- search-dequeue )
 { $values { "assoc" assoc } { "dequeue" dequeue } { "search-dequeue" search-dequeue } }
 { $description "Creates a new " { $link search-dequeue } "." } ;
