@@ -8,22 +8,23 @@ math.ranges strings sequences.lib ;
 IN: db.tuples.tests
 
 TUPLE: person the-id the-name the-number the-real
-ts date time blob factor-blob ;
+ts date time blob factor-blob url ;
 
-: <person> ( name age real ts date time blob factor-blob -- person )
-    {
-        set-person-the-name
-        set-person-the-number
-        set-person-the-real
-        set-person-ts
-        set-person-date
-        set-person-time
-        set-person-blob
-        set-person-factor-blob
-    } person construct ;
+: <person> ( name age real ts date time blob factor-blob url -- person )
+    person new
+        swap >>url
+        swap >>factor-blob
+        swap >>blob
+        swap >>time
+        swap >>date
+        swap >>ts
+        swap >>the-real
+        swap >>the-number
+        swap >>the-name ;
 
-: <user-assigned-person> ( id name age real ts date time blob factor-blob -- person )
-    <person> [ set-person-the-id ] keep ;
+: <user-assigned-person> ( id name age real ts date time blob factor-blob url -- person )
+    <person>
+        swap >>the-id ;
 
 SYMBOL: person1
 SYMBOL: person2
@@ -120,19 +121,20 @@ SYMBOL: person4
         { "time" "T" TIME }
         { "blob" "B" BLOB }
         { "factor-blob" "FB" FACTOR-BLOB }
+        { "url" "U" URL }
     } define-persistent
-    "billy" 10 3.14 f f f f f <person> person1 set
-    "johnny" 10 3.14 f f f f f <person> person2 set
+    "billy" 10 3.14 f f f f f f <person> person1 set
+    "johnny" 10 3.14 f f f f f f <person> person2 set
     "teddy" 10 3.14
         T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
         T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
         T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
-        B{ 115 116 111 114 101 105 110 97 98 108 111 98 } f <person> person3 set
+        B{ 115 116 111 114 101 105 110 97 98 108 111 98 } f f <person> person3 set
     "eddie" 10 3.14
         T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
         T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
         T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
-        f H{ { 1 2 } { 3 4 } { 5 "lol" } } <person> person4 set ;
+        f H{ { 1 2 } { 3 4 } { 5 "lol" } } f <person> person4 set ;
 
 : user-assigned-person-schema ( -- )
     person "PERSON"
@@ -146,20 +148,21 @@ SYMBOL: person4
         { "time" "T" TIME }
         { "blob" "B" BLOB }
         { "factor-blob" "FB" FACTOR-BLOB }
+        { "url" "U" URL }
     } define-persistent
-    1 "billy" 10 3.14 f f f f f <user-assigned-person> person1 set
-    2 "johnny" 10 3.14 f f f f f <user-assigned-person> person2 set
+    1 "billy" 10 3.14 f f f f f f <user-assigned-person> person1 set
+    2 "johnny" 10 3.14 f f f f f f <user-assigned-person> person2 set
     3 "teddy" 10 3.14
         T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
         T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
         T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
         B{ 115 116 111 114 101 105 110 97 98 108 111 98 }
-        f <user-assigned-person> person3 set
+        f f <user-assigned-person> person3 set
     4 "eddie" 10 3.14
         T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
         T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
         T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
-        f H{ { 1 2 } { 3 4 } { 5 "lol" } } <user-assigned-person> person4 set ;
+        f H{ { 1 2 } { 3 4 } { 5 "lol" } } f <user-assigned-person> person4 set ;
 
 TUPLE: paste n summary author channel mode contents timestamp annotations ;
 TUPLE: annotation n paste-id summary author mode contents ;

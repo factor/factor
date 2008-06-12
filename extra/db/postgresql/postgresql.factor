@@ -239,7 +239,7 @@ M: postgresql-db persistent-table ( -- hashtable )
         { TIMESTAMP { "timestamp" "timestamp" f } }
         { BLOB { "bytea" "bytea" f } }
         { FACTOR-BLOB { "bytea" "bytea" f } }
-        { URL { "string" "string" f } }
+        { URL { "varchar" "varchar" f } }
         { +foreign-id+ { f f "references" } }
         { +autoincrement+ { f f "autoincrement" } }
         { +unique+ { f f "unique" } }
