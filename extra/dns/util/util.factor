@@ -1,5 +1,5 @@
 
-USING: kernel macros fry ;
+USING: kernel sequences sorting math math.order macros fry ;
 
 IN: dns.util
 
@@ -9,3 +9,11 @@ IN: dns.util
 MACRO: 1if ( test then else -- ) '[ dup @ , , if ] ;
 
 ! : 1if ( test then else -- ) >r >r >r dup r> call r> r> if ; inline ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: sort-largest-first ( seq -- seq ) [ [ length ] compare ] sort reverse ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: longer? ( seq seq -- ? ) [ length ] bi@ > ; 
