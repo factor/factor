@@ -166,7 +166,7 @@ M: tuple-class update-class
     3tri ;
 
 : subclasses ( class -- classes )
-    class-usages keys [ tuple-class? ] filter ;
+    class-usages [ tuple-class? ] filter ;
 
 : each-subclass ( class quot -- )
     >r subclasses r> each ; inline

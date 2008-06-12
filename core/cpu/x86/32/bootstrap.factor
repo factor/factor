@@ -6,13 +6,13 @@ IN: bootstrap.x86
 
 4 \ cell set
 
-: arg0 EAX ;
-: arg1 EDX ;
-: temp-reg EBX ;
-: stack-reg ESP ;
-: ds-reg ESI ;
-: fixnum>slot@ arg0 1 SAR ;
-: rex-length 0 ;
+: arg0 ( -- reg ) EAX ;
+: arg1 ( -- reg ) EDX ;
+: temp-reg ( -- reg ) EBX ;
+: stack-reg ( -- reg ) ESP ;
+: ds-reg ( -- reg ) ESI ;
+: fixnum>slot@ ( -- ) arg0 1 SAR ;
+: rex-length ( -- n ) 0 ;
 
 << "resource:core/cpu/x86/bootstrap.factor" parse-file parsed >>
 call

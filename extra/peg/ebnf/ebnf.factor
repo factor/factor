@@ -87,7 +87,7 @@ C: <ebnf> ebnf
       [ dup CHAR: ? = ]
       [ dup CHAR: : = ]
       [ dup CHAR: ~ = ]
-    } || not nip    
+    } 0|| not nip    
   ] satisfy repeat1 [ >string <ebnf-non-terminal> ] action ;
 
 : 'terminal' ( -- parser )

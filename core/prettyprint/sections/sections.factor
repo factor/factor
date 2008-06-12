@@ -3,7 +3,7 @@
 USING: arrays generic hashtables io kernel math assocs
 namespaces sequences strings io.styles vectors words
 prettyprint.config splitting classes continuations
-io.streams.nested accessors ;
+io.streams.nested accessors sets ;
 IN: prettyprint.sections
 
 ! State
@@ -20,7 +20,7 @@ TUPLE: pprinter last-newline line-count indent ;
 : <pprinter> ( -- pprinter ) 0 1 0 pprinter boa ;
 
 : record-vocab ( word -- )
-    word-vocabulary [ dup pprinter-use get set-at ] when* ;
+    word-vocabulary [ pprinter-use get conjoin ] when* ;
 
 ! Utility words
 : line-limit? ( -- ? )

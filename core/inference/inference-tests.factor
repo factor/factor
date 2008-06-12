@@ -546,26 +546,26 @@ ERROR: custom-error ;
 
 [ [ erg's-inference-bug ] infer ] must-fail
 
-! : inference-invalidation-a ( -- );
-! : inference-invalidation-b ( quot -- ) [ inference-invalidation-a ] dip call ; inline
-! : inference-invalidation-c ( a b -- c ) [ + ] inference-invalidation-b ;
-! 
-! [ 7 ] [ 4 3 inference-invalidation-c ] unit-test
-! 
-! { 2 1 } [ [ + ] inference-invalidation-b ] must-infer-as
-! 
-! [ ] [ "IN: inference.tests : inference-invalidation-a 1 2 ;" eval ] unit-test
-! 
-! [ 3 ] [ inference-invalidation-c ] unit-test
-! 
-! { 0 1 } [ inference-invalidation-c ] must-infer-as
-! 
-! GENERIC: inference-invalidation-d ( obj -- )
-! 
-! M: object inference-invalidation-d inference-invalidation-c 2drop ;
-! 
-! \ inference-invalidation-d must-infer
-! 
-! [ ] [ "IN: inference.tests : inference-invalidation-a ;" eval ] unit-test
-! 
-! [ [ inference-invalidation-d ] infer ] must-fail
+: inference-invalidation-a ( -- ) ;
+: inference-invalidation-b ( quot -- ) [ inference-invalidation-a ] dip call ; inline
+: inference-invalidation-c ( a b -- c ) [ + ] inference-invalidation-b ; inline
+
+[ 7 ] [ 4 3 inference-invalidation-c ] unit-test
+
+{ 2 1 } [ [ + ] inference-invalidation-b ] must-infer-as
+
+[ ] [ "IN: inference.tests : inference-invalidation-a ( -- a b ) 1 2 ;" eval ] unit-test
+
+[ 3 ] [ inference-invalidation-c ] unit-test
+
+{ 0 1 } [ inference-invalidation-c ] must-infer-as
+
+GENERIC: inference-invalidation-d ( obj -- )
+
+M: object inference-invalidation-d inference-invalidation-c 2drop ;
+
+\ inference-invalidation-d must-infer
+
+[ ] [ "IN: inference.tests : inference-invalidation-a ( -- ) ;" eval ] unit-test
+
+[ [ inference-invalidation-d ] infer ] must-fail

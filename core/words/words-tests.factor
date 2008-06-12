@@ -183,3 +183,16 @@ SYMBOL: quot-uses-b
 [ t ] [ "decl-forget-test" "words.tests" lookup "flushable" word-prop ] unit-test
 [ ] [ "IN: words.tests : decl-forget-test ;" eval ] unit-test
 [ f ] [ "decl-forget-test" "words.tests" lookup "flushable" word-prop ] unit-test
+
+[ { } ]
+[
+    all-words [
+        "compiled-uses" word-prop
+        keys [ "forgotten" word-prop ] contains?
+    ] filter
+] unit-test
+
+[ { } ] [
+    crossref get keys
+    [ word? ] filter [ "forgotten" word-prop ] filter
+] unit-test

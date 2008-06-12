@@ -5,7 +5,7 @@ words strings classes tools.vocabs namespaces io
 io.streams.string prettyprint definitions arrays vectors
 combinators splitting debugger hashtables sorting effects vocabs
 vocabs.loader assocs editors continuations classes.predicate
-macros combinators.lib sequences.lib math sets ;
+macros math sets ;
 IN: help.lint
 
 : check-example ( element -- )
@@ -46,16 +46,15 @@ IN: help.lint
 
 : check-values ( word element -- )
     {
-        [ over "declared-effect" word-prop ]
-        [ dup contains-funky-elements? not ]
-        [ over macro? not ]
+        { [ over "declared-effect" word-prop ] [ 2drop ] }
+        { [ dup contains-funky-elements? not ] [ 2drop ] }
+        { [ over macro? not ] [ 2drop ] }
         [
-            2dup extract-values >array
-            >r effect-values >array
-            r> assert=
-            t
+            [ effect-values >array ]
+            [ extract-values >array ]
+            bi* assert=
         ]
-    } 0&& 3drop ;
+    } cond ;
 
 : check-see-also ( word element -- )
     nip \ $see-also swap elements [
@@ -114,7 +113,10 @@ M: help-error error.
     vocabs [ dup vocab-docs-path swap ] H{ } map>assoc
     H{ } clone [
         [
-            >r >r dup >link where ?first r> at r> [ ?push ] change-at
+            >r >r dup >link where dup
+            [ first r> at r> [ ?push ] change-at ]
+            [ r> r> 2drop 2drop ]
+            if
         ] 2curry each
     ] keep ;
 

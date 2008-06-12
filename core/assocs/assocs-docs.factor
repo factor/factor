@@ -79,7 +79,6 @@ ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
 ARTICLE: "assocs-mutation" "Storing keys and values in assocs"
 "Utility operations built up from the " { $link "assocs-protocol" } ":"
 { $subsection delete-at* }
-{ $subsection delete-any }
 { $subsection rename-at }
 { $subsection change-at }
 { $subsection at+ }
@@ -241,12 +240,6 @@ HELP: delete-at*
 { $values { "key" "a key" } { "assoc" assoc } { "old" "the previous value or " { $link f } } { "?" "a boolean" } }
 { $description "Removes an entry from the assoc and outputs the previous value together with a boolean indicating whether it was present." }
 { $side-effects "assoc" } ;
-
-HELP: delete-any
-{ $values { "assoc" assoc } { "key" "a key" } { "value" "a value" } }
-{ $description "Removes an undetermined entry from the assoc and outputs it." }
-{ $errors "Throws an error if the assoc is empty." }
-{ $notes "This word is useful when using an assoc as an unordered queue which requires constant-time membership tests. Entries are enqueued with " { $link set-at } " and dequeued with " { $link delete-any } "." } ;
 
 HELP: rename-at
 { $values { "newkey" object } { "key" object } { "assoc" assoc } }

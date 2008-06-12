@@ -21,7 +21,7 @@ HELP: macro-expand
 { $values { "..." "inputs to a macro" } { "word" macro } { "quot" quotation } }
 { $description "Expands a macro. Useful for debugging." }
 { $examples
-    { $code "{ [ dup integer? ] [ dup 0 > ] [ dup 13 mod zero? ] } \ && macro-expand ." }
+    { $code "USING: math macros combinators.lib ;" "{ [ integer? ] [ 0 > ] [ 13 mod zero? ] } \ 1&& macro-expand ." }
 } ;
 
 ARTICLE: "macros" "Macros"
@@ -31,9 +31,6 @@ $nl
 { $subsection POSTPONE: MACRO: }
 "Expanding macros for debugging purposes:"
 { $subsection macro-expand }
-! "Two sample macros which implement short-circuiting boolean operators (as found in C, Java and similar languages):"
-! { $subsection && }
-! { $subsection || }
 "Macros are really just a very thin layer of syntax sugar over " { $link "compiler-transforms" } "." ;
 
 ABOUT: "macros"

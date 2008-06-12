@@ -10,7 +10,10 @@ SYMBOL: time
     1000 sleep (time-thread) ;
 
 : time-thread ( -- )
-    [ (time-thread) ] "Time model update" spawn drop ;
+    [
+        init-namespaces
+        (time-thread)
+    ] "Time model update" spawn drop ;
 
 f <model> time set-global
 [ time-thread ] "calendar.model" add-init-hook

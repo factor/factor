@@ -4,7 +4,7 @@
 USING: arrays hashtables heaps kernel kernel.private math
 namespaces sequences vectors continuations continuations.private
 dlists assocs system combinators init boxes accessors
-math.order ;
+math.order dequeues ;
 IN: threads
 
 SYMBOL: initial-thread
@@ -86,7 +86,7 @@ PRIVATE>
 
 : sleep-time ( -- ms/f )
     {
-        { [ run-queue dlist-empty? not ] [ 0 ] }
+        { [ run-queue dequeue-empty? not ] [ 0 ] }
         { [ sleep-queue heap-empty? ] [ f ] }
         [ sleep-queue heap-peek nip millis [-] ]
     } cond ;
@@ -146,7 +146,7 @@ DEFER: next
 
 : next ( -- * )
     expire-sleep-loop
-    run-queue dup dlist-empty? [
+    run-queue dup dequeue-empty? [
         drop no-runnable-threads
     ] [
         pop-back dup array? [ first2 ] [ f swap ] if (next)

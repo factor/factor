@@ -64,7 +64,7 @@ M: engine-word stack-effect
     [ extra-values ] [ stack-effect ] bi
     dup [ clone [ length + ] change-in ] [ 2drop f ] if ;
 
-M: engine-word crossref? drop t ;
+M: engine-word crossref? "forgotten" word-prop not ;
 
 M: engine-word irrelevant? drop t ;
 

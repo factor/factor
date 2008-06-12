@@ -4,20 +4,25 @@ USING: kernel namespaces arrays sequences io inference.backend
 inference.state generator debugger words compiler.units
 continuations vocabs assocs alien.compiler dlists optimizer
 definitions math compiler.errors threads graphs generic
-inference combinators ;
+inference combinators dequeues search-dequeues ;
 IN: compiler
 
-: ripple-up ( word -- )
-    compiled-usage [ drop queue-compile ] assoc-each ;
+SYMBOL: +failed+
+
+: ripple-up ( words -- )
+    dup "compiled-effect" word-prop +failed+ eq?
+    [ usage [ word? ] filter ] [ compiled-usage keys ] if
+    [ queue-compile ] each ;
+
+: ripple-up? ( word effect -- ? )
+    #! If the word has previously been compiled and had a
+    #! different stack effect, we have to recompile any callers.
+    swap "compiled-effect" word-prop [ = not ] keep and ;
 
 : save-effect ( word effect -- )
-    [
-        over "compiled-effect" word-prop = [
-            dup "compiled-uses" word-prop
-            [ dup ripple-up ] when
-        ] unless drop
-    ]
-    [ "compiled-effect" set-word-prop ] 2bi ;
+    [ dupd ripple-up? [ ripple-up ] [ drop ] if ]
+    [ "compiled-effect" set-word-prop ]
+    2bi ;
 
 : compile-begins ( word -- )
     f swap compiler-error ;
@@ -26,9 +31,10 @@ IN: compiler
     [ swap compiler-error ]
     [
         drop
+        [ compiled-unxref ]
         [ f swap compiled get set-at ]
-        [ f save-effect ]
-        bi
+        [ +failed+ save-effect ]
+        tri
     ] 2bi ;
 
 : compile-succeeded ( effect word -- )
@@ -40,6 +46,7 @@ IN: compiler
     ] tri ;
 
 : (compile) ( word -- )
+    dup dup "compile-count" word-prop 0 or 1 + "compile-count" set-word-prop
     [
         H{ } clone dependencies set
 
@@ -54,19 +61,15 @@ IN: compiler
         } cleave
     ] curry with-return ;
 
-: compile-loop ( assoc -- )
-    dup assoc-empty? [ drop ] [
-        dup delete-any drop (compile)
-        yield
-        compile-loop
-    ] if ;
+: compile-loop ( dequeue -- )
+    [ (compile) yield ] slurp-dequeue ;
 
 : decompile ( word -- )
     f 2array 1array t modify-code-heap ;
 
 : optimized-recompile-hook ( words -- alist )
     [
-        H{ } clone compile-queue set
+        <hashed-dlist> compile-queue set
         H{ } clone compiled set
         [ queue-compile ] each
         compile-queue get compile-loop

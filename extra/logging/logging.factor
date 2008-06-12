@@ -4,7 +4,7 @@ USING: logging.server sequences namespaces concurrency.messaging
 words kernel arrays shuffle tools.annotations
 prettyprint.config prettyprint debugger io.streams.string
 splitting continuations effects arrays.lib parser strings
-combinators.lib quotations fry symbols accessors ;
+quotations fry symbols accessors ;
 IN: logging
 
 SYMBOLS: DEBUG NOTICE WARNING ERROR CRITICAL ;
@@ -42,21 +42,18 @@ SYMBOL: log-service
 
 <PRIVATE
 
-: one-string? ( obj -- ? )
-    {
-        [ dup array? ]
-        [ dup length 1 = ]
-        [ dup first string? ]
-    } 0&& nip ;
+PREDICATE: one-string-array < array
+    [ length 1 = ] [ [ string? ] all? ] bi and ;
 
 : stack>message ( obj -- inputs>message )
-    dup one-string? [ first ] [
-        H{
-            { string-limit f }
-            { line-limit 1 }
-            { nesting-limit 3 }
-            { margin 0 }
-        } clone [ unparse ] bind
+    dup one-string-array? [ first ] [
+        [
+            string-limit off
+            1 line-limit set
+            3 nesting-limit set
+            0 margin set
+            unparse
+        ] with-scope
     ] if ;
 
 PRIVATE>
