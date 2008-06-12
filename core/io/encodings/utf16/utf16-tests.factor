@@ -1,5 +1,6 @@
 USING: kernel tools.test io.encodings.utf16 arrays sbufs
-io.streams.byte-array sequences io.encodings io unicode
+io.streams.byte-array sequences io.encodings io
+bootstrap.unicode
 io.encodings.string alien.c-types alien.strings accessors classes ;
 IN: io.encodings.utf16.tests
 

@@ -3,12 +3,8 @@ sequences math.order ;
 IN: sorting
 
 ARTICLE: "sequences-sorting" "Sorting and binary search"
-"Sorting and binary search combinators all take comparator quotations with stack effect " { $snippet "( elt1 elt2 -- n )" } " that order the two given elements and output a value whose sign denotes the result:"
-{ $list
-    { "positive - indicates that " { $snippet "elt1" } " follows " { $snippet "elt2" } }
-    { "zero - indicates that " { $snippet "elt1" } " is ordered equivalently to " { $snippet "elt2" } }
-    { "negative - indicates that " { $snippet "elt1" } " precedes " { $snippet "elt2" } }
-}
+"Sorting and binary search combinators all take comparator quotations with stack effect " { $snippet "( elt1 elt2 -- <=> )" } ", where the output value is one of the three " { $link "order-specifiers" } "."
+$nl
 "Sorting a sequence with a custom comparator:"
 { $subsection sort }
 "Sorting a sequence with common comparators:"
@@ -19,8 +15,10 @@ ARTICLE: "sequences-sorting" "Sorting and binary search"
 { $subsection binsearch }
 { $subsection binsearch* } ;
 
+ABOUT: "sequences-sorting"
+
 HELP: sort
-{ $values { "seq" "a sequence" } { "quot" "a comparator quotation" } { "sortedseq" "a new sorted sequence" } }
+{ $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( obj1 obj2 -- <=> )" } } { "sortedseq" "a new sorted sequence" } }
 { $description "Sorts the elements into a new sequence of the same class as " { $snippet "seq" } "." } ;
 
 HELP: sort-keys
@@ -52,13 +50,13 @@ HELP: partition
 { $description "Outputs a slice of the first or second half of the sequence, respectively, depending on the integer's sign." } ;
 
 HELP: binsearch
-{ $values { "elt" object } { "seq" "a sorted sequence" } { "quot" "a comparator quotation" } { "i" "the index of the search result" } }
+{ $values { "elt" object } { "seq" "a sorted sequence" } { "quot" "a quotation with stack effect " { $snippet "( obj1 obj2 -- <=> )" } } { "i" "the index of the search result" } }
 { $description "Given a sequence that is sorted with respect to the " { $snippet "quot" } " comparator, searches for an element equal to " { $snippet "elt" } ", or failing that, the greatest element smaller than " { $snippet "elt" } ". Comparison is performed with " { $snippet "quot" } "."
 $nl
 "Outputs f if the sequence is empty. If the sequence has at least one element, this word always outputs a valid index." } ;
 
 HELP: binsearch*
-{ $values { "elt" object } { "seq" "a sorted sequence" } { "quot" "a comparator quotation" } { "result" "the search result" } }
+{ $values { "elt" object } { "seq" "a sorted sequence" } { "quot" "a quotation with stack effect " { $snippet "( obj1 obj2 -- <=> )" } } { "result" "the search result" } }
 { $description "Variant of " { $link binsearch } " which outputs the found element rather than its index in the sequence."
 $nl
 "Outputs " { $link f } " if the sequence is empty. If the sequence has at least one element, this word always outputs a sequence element." } ;

@@ -107,7 +107,7 @@ TUPLE: entry title url description date ;
 
 : download-feed ( url -- feed )
     #! Retrieve an news syndication file, return as a feed tuple.
-    http-get read-feed ;
+    http-get nip read-feed ;
 
 ! Atom generation
 : simple-tag, ( content name -- )

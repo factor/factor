@@ -3,7 +3,7 @@
 ! Copyright (C) 2007, 2008 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien assocs continuations destructors init kernel
-namespaces accessors ;
+namespaces accessors sets ;
 IN: libc
 
 <PRIVATE
@@ -38,7 +38,7 @@ ERROR: realloc-error ptr size ;
 [ H{ } clone mallocs set-global ] "libc" add-init-hook
 
 : add-malloc ( alien -- )
-    dup mallocs get-global set-at ;
+    mallocs get-global conjoin ;
 
 : delete-malloc ( alien -- )
     [

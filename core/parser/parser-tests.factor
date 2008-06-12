@@ -421,8 +421,6 @@ must-fail-with
     ] unit-test
 ] times
 
-[ ] [ "parser" reload ] unit-test
-
 [ ] [
     [ "this-better-not-exist" forget-vocab ] with-compilation-unit
 ] unit-test

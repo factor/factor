@@ -182,8 +182,8 @@ IN: bootstrap.syntax
     ] define-syntax
 
     "(" [
-        ")" parse-effect word
-        [ swap "declared-effect" set-word-prop ] [ drop ] if*
+        ")" parse-effect
+        word dup [ set-stack-effect ] [ 2drop ] if
     ] define-syntax
 
     "((" [

@@ -1,9 +1,9 @@
 ! Copyright (C) 2007 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators concurrency.mailboxes concurrency.futures io
+USING: arrays combinators concurrency.mailboxes fry io strings
        io.encodings.8-bit io.sockets kernel namespaces sequences
        sequences.lib splitting threads calendar classes.tuple
-       ascii assocs accessors destructors ;
+       classes ascii assocs accessors destructors continuations ;
 IN: irc.client
 
 ! ======================================
@@ -18,28 +18,42 @@ SYMBOL: current-irc-client
 TUPLE: irc-profile server port nickname password ;
 C: <irc-profile> irc-profile
 
-TUPLE: irc-channel-profile name password ;
-: <irc-channel-profile> ( -- irc-channel-profile ) irc-channel-profile new ;
-
 ! "live" objects
 TUPLE: nick name channels log ;
 C: <nick> nick
 
 TUPLE: irc-client profile nick stream in-messages out-messages join-messages
-       listeners is-running ;
+       listeners is-running connect reconnect-time ;
 : <irc-client> ( profile -- irc-client )
     f V{ } clone V{ } clone <nick>
-    f <mailbox> <mailbox> <mailbox> H{ } clone f irc-client boa ;
+    f <mailbox> <mailbox> <mailbox> H{ } clone f
+    [ <inet> latin1 <client> ] 15 seconds irc-client boa ;
 
 TUPLE: irc-listener in-messages out-messages ;
-: <irc-listener> ( -- irc-listener )
-    <mailbox> <mailbox> irc-listener boa ;
+TUPLE: irc-server-listener < irc-listener ;
+TUPLE: irc-channel-listener < irc-listener name password timeout ;
+TUPLE: irc-nick-listener < irc-listener name ;
+UNION: irc-named-listener irc-nick-listener irc-channel-listener ;
+
+: <irc-listener> ( -- irc-listener ) <mailbox> <mailbox> irc-listener boa ;
+
+: <irc-server-listener> ( -- irc-server-listener )
+     <mailbox> <mailbox> irc-server-listener boa ;
+
+: <irc-channel-listener> ( name -- irc-channel-listener )
+     <mailbox> <mailbox> rot f 60 seconds irc-channel-listener boa ;
+
+: <irc-nick-listener> ( name -- irc-nick-listener )
+     <mailbox> <mailbox> rot irc-nick-listener boa ;
 
 ! ======================================
 ! Message objects
 ! ======================================
 
-SINGLETON: irc-end ! Message used when the client isn't running anymore
+SINGLETON: irc-end          ! sent when the client isn't running anymore
+SINGLETON: irc-disconnected ! sent when connection is lost
+SINGLETON: irc-connected    ! sent when connection is established
+UNION: irc-broadcasted-message irc-end irc-disconnected irc-connected ;
 
 TUPLE: irc-message line prefix command parameters trailing timestamp ;
 TUPLE: logged-in < irc-message name ;
@@ -55,14 +69,20 @@ TUPLE: notice < irc-message type ;
 TUPLE: mode < irc-message name channel mode ;
 TUPLE: unhandled < irc-message ;
 
+: terminate-irc ( irc-client -- )
+    [ in-messages>> irc-end swap mailbox-put ]
+    [ f >>is-running drop ]
+    [ stream>> dispose ]
+    tri ;
+
 <PRIVATE
 
 ! ======================================
 ! Shortcuts
 ! ======================================
 
-: irc-client> ( -- irc-client ) current-irc-client get ;
-: irc-stream> ( -- stream ) irc-client> stream>> ;
+: irc> ( -- irc-client ) current-irc-client get ;
+: irc-stream> ( -- stream ) irc> stream>> ;
 : irc-write ( s -- ) irc-stream> stream-write ;
 : irc-print ( s -- ) irc-stream> [ stream-print ] keep stream-flush ;
 
@@ -79,7 +99,7 @@ TUPLE: unhandled < irc-message ;
     " hostname servername :irc.factor" irc-print ;
 
 : /CONNECT ( server port -- stream )
-    <inet> latin1 <client> drop ;
+    irc> connect>> call drop ;
 
 : /JOIN ( channel password -- )
     "JOIN " irc-write
@@ -107,47 +127,11 @@ TUPLE: unhandled < irc-message ;
     "PONG " irc-write irc-print ;
 
 ! ======================================
-! Server message handling
-! ======================================
-
-USE: prettyprint
-
-GENERIC: handle-incoming-irc ( irc-message -- )
-
-M: irc-message handle-incoming-irc ( irc-message -- )
-    . ;
-
-M: logged-in handle-incoming-irc ( logged-in -- )
-    name>> irc-client> nick>> (>>name) ;
-
-M: ping handle-incoming-irc ( ping -- )
-    trailing>> /PONG ;
-
-M: nick-in-use handle-incoming-irc ( nick-in-use -- )
-    name>> "_" append /NICK ;
-
-M: privmsg handle-incoming-irc ( privmsg -- )
-    dup name>> irc-client> listeners>> at
-    [ in-messages>> mailbox-put ] [ drop ] if* ;
-
-M: join handle-incoming-irc ( join -- )
-    irc-client> join-messages>> mailbox-put ;
-
-! ======================================
-! Client message handling
-! ======================================
-
-GENERIC: handle-outgoing-irc ( obj -- )
-
-M: privmsg handle-outgoing-irc ( privmsg -- )
-   [ name>> ] [ trailing>> ] bi /PRIVMSG ;
-
-! ======================================
 ! Message parsing
 ! ======================================
 
 : split-at-first ( seq separators -- before after )
-    dupd [ member? ] curry find
+    dupd '[ , member? ] find
         [ cut 1 tail ]
         [ swap ]
     if ;
@@ -189,49 +173,114 @@ M: privmsg handle-outgoing-irc ( privmsg -- )
     [ [ tuple-slots ] [ parameters>> ] bi append ] dip prefix >tuple ;
 
 ! ======================================
+! Server message handling
+! ======================================
+
+: me? ( string -- ? )
+    irc> nick>> name>> = ;
+
+: irc-message-origin ( irc-message -- name )
+    dup name>> me? [ prefix>> parse-name ] [ name>> ] if ;
+
+: broadcast-message-to-listeners ( message -- )
+    irc> listeners>> values [ in-messages>> mailbox-put ] with each ;
+
+GENERIC: handle-incoming-irc ( irc-message -- )
+
+M: irc-message handle-incoming-irc ( irc-message -- )
+    f irc> listeners>> at
+    [ in-messages>> mailbox-put ] [ drop ] if* ;
+
+M: logged-in handle-incoming-irc ( logged-in -- )
+    name>> irc> nick>> (>>name) ;
+
+M: ping handle-incoming-irc ( ping -- )
+    trailing>> /PONG ;
+
+M: nick-in-use handle-incoming-irc ( nick-in-use -- )
+    name>> "_" append /NICK ;
+
+M: privmsg handle-incoming-irc ( privmsg -- )
+    dup irc-message-origin irc> listeners>> [ at ] keep
+    '[ f , at ] unless* [ in-messages>> mailbox-put ] [ drop ] if* ;
+
+M: join handle-incoming-irc ( join -- )
+    irc> join-messages>> mailbox-put ;
+
+M: irc-broadcasted-message handle-incoming-irc ( irc-broadcasted-message -- )
+    broadcast-message-to-listeners ;
+
+! ======================================
+! Client message handling
+! ======================================
+
+GENERIC: handle-outgoing-irc ( obj -- )
+
+M: privmsg handle-outgoing-irc ( privmsg -- )
+   [ name>> ] [ trailing>> ] bi /PRIVMSG ;
+
+! ======================================
 ! Reader/Writer
 ! ======================================
 
-: stream-readln-or-close ( stream -- str/f )
-    dup stream-readln [ nip ] [ dispose f ] if* ;
+: irc-mailbox-get ( mailbox quot -- )
+    swap 5 seconds
+    '[ , , , mailbox-get-timeout swap call ]
+    [ drop ] recover ; inline
 
 : handle-reader-message ( irc-message -- )
-    irc-client> in-messages>> mailbox-put ;
+    irc> in-messages>> mailbox-put ;
 
-: handle-stream-close ( -- )
-    irc-client> f >>is-running in-messages>> irc-end swap mailbox-put ;
+DEFER: (connect-irc)
+
+: (handle-disconnect) ( -- )
+    irc>
+        [ in-messages>> irc-disconnected swap mailbox-put ]
+        [ dup reconnect-time>> sleep (connect-irc) ]
+        [ profile>> nickname>> /LOGIN ]
+    tri ;
+
+: handle-disconnect ( error -- )
+    drop irc> is-running>> [ (handle-disconnect) ] when ;
+
+: (reader-loop) ( -- )
+    irc> stream>> [
+        |dispose stream-readln [
+            parse-irc-line handle-reader-message
+        ] [
+            irc> terminate-irc
+        ] if*
+    ] with-destructors ;
 
 : reader-loop ( -- )
-    irc-client> stream>> stream-readln-or-close [
-        parse-irc-line handle-reader-message
-    ] [
-        handle-stream-close
-    ] if* ;
+    [ (reader-loop) ] [ handle-disconnect ] recover ;
 
 : writer-loop ( -- )
-    irc-client> out-messages>> mailbox-get handle-outgoing-irc ;
+    irc> out-messages>> [ handle-outgoing-irc ] irc-mailbox-get ;
 
 ! ======================================
 ! Processing loops
 ! ======================================
 
 : in-multiplexer-loop ( -- )
-    irc-client> in-messages>> mailbox-get handle-incoming-irc ;
+    irc> in-messages>> [ handle-incoming-irc ] irc-mailbox-get ;
 
-! FIXME: Hack, this should be handled better
-GENERIC: add-name ( name obj -- obj )
-M: object add-name nip ;
-M: privmsg add-name swap >>name ;
-    
-: listener-loop ( name -- ) ! FIXME: take different values from the stack?
-    dup irc-client> listeners>> at [
-        out-messages>> mailbox-get add-name
-        irc-client> out-messages>>
-        mailbox-put
-    ] [ drop ] if* ;
+: strings>privmsg ( name string -- privmsg )
+    privmsg new [ (>>trailing) ] keep [ (>>name) ] keep ;
+
+: maybe-annotate-with-name ( name obj -- obj )
+    {
+        { [ dup string? ] [ strings>privmsg ] }
+        { [ dup privmsg instance? ] [ swap >>name ] }
+    } cond ;
+
+: listener-loop ( name listener -- )
+    out-messages>> swap
+    '[ , swap maybe-annotate-with-name irc> out-messages>> mailbox-put ]
+    irc-mailbox-get ;
 
 : spawn-irc-loop ( quot name -- )
-    [ [ irc-client> is-running>> ] compose ] dip
+    [ '[ irc> is-running>> [ @ ] when irc> is-running>> ] ] dip
     spawn-server drop ;
 
 : spawn-irc ( -- )
@@ -243,23 +292,33 @@ M: privmsg add-name swap >>name ;
 ! Listener join request handling
 ! ======================================
 
-: make-registered-listener ( join -- listener )
-    <irc-listener> swap trailing>>
-    dup [ listener-loop ] curry "listener" spawn-irc-loop
-    [ irc-client> listeners>> set-at ] curry keep ;
+: set+run-listener ( name irc-listener -- )
+    [ '[ , , listener-loop ] "listener" spawn-irc-loop ]
+    [ swap irc> listeners>> set-at ]
+    2bi ;
 
-: make-join-future ( name -- future )
-    [ [ swap trailing>> = ] curry ! compare name with channel name
-      irc-client> join-messages>> 60 seconds rot mailbox-get-timeout?
-      make-registered-listener ]
-    curry future ;
+GENERIC: (add-listener) ( irc-listener -- )
+M: irc-channel-listener (add-listener) ( irc-channel-listener -- )
+    [ [ name>> ] [ password>> ] bi /JOIN ]
+    [ [ [ drop irc> join-messages>> ]
+        [ timeout>> ]
+        [ name>> '[ trailing>> , = ] ]
+        tri mailbox-get-timeout? trailing>> ] keep set+run-listener
+    ] bi ;
 
-PRIVATE>
+M: irc-nick-listener (add-listener) ( irc-nick-listener -- )
+    [ name>> ] keep set+run-listener ;
+
+M: irc-server-listener (add-listener) ( irc-server-listener -- )
+    f swap set+run-listener ;
 
 : (connect-irc) ( irc-client -- )
-    [ profile>> [ server>> ] keep port>> /CONNECT ] keep
-    swap >>stream
-    t >>is-running drop ;
+    [ profile>> [ server>> ] [ port>> ] bi /CONNECT ] keep
+        swap >>stream
+        t >>is-running
+    in-messages>> irc-connected swap mailbox-put ;
+
+PRIVATE>
 
 : connect-irc ( irc-client -- )
     dup current-irc-client [
@@ -267,9 +326,6 @@ PRIVATE>
         spawn-irc
     ] with-variable ;
 
-: listen-to ( irc-client name -- future )
-    swap current-irc-client [ [ f /JOIN ] keep make-join-future ] with-variable ;
-
-! shorcut for privmsgs, etc
-: sender>> ( obj -- string )
-    prefix>> parse-name ;
+GENERIC: add-listener ( irc-client irc-listener -- )
+M: irc-listener add-listener ( irc-client irc-listener -- )
+    current-irc-client swap '[ , (add-listener) ] with-variable ;

@@ -1,4 +1,4 @@
-USING: help.markup help.syntax byte-arrays alien ;
+USING: help.markup help.syntax byte-arrays alien destructors ;
 IN: io.buffers
 
 ARTICLE: "buffers" "Locked I/O buffers"
@@ -7,8 +7,8 @@ $nl
 "Buffer words are found in the " { $vocab-link "buffers" } " vocabulary."
 { $subsection buffer }
 { $subsection <buffer> }
-"Buffers must be manually deallocated:"
-{ $subsection buffer-free }
+"Buffers must be manually deallocated by calling " { $link dispose } "."
+$nl
 "Buffer operations:"
 { $subsection buffer-reset }
 { $subsection buffer-length }
@@ -40,11 +40,6 @@ HELP: <buffer>
 { $values { "n" "a non-negative integer" } { "buffer" buffer } }
 { $description "Creates a buffer with an initial capacity of " { $snippet "n" } " bytes." } ;
 
-HELP: buffer-free
-{ $values { "buffer" buffer } }
-{ $description "De-allocates a buffer's underlying storage. The buffer may not be used after being freed." }
-{ $warning "You " { $emphasis "must" } " free a buffer using this word, before letting the GC collect the buffer tuple instance." } ;
-
 HELP: buffer-reset
 { $values { "n" "a non-negative integer" } { "buffer" buffer } }
 { $description "Resets the fill pointer to 0 and the position to " { $snippet "count" } "." } ;
@@ -60,10 +55,6 @@ HELP: buffer@
 HELP: buffer-end
 { $values { "buffer" buffer } { "alien" alien } }
 { $description "Outputs the memory address of the current fill-pointer." } ;
-
-HELP: (buffer-read)
-{ $values { "n" "a non-negative integer" } { "buffer" buffer } { "byte-array" byte-array } }
-{ $description "Outputs a byte array of the first " { $snippet "n" } " bytes at the buffer's current position. If there are less than " { $snippet "n" } " bytes available, the output is truncated." } ;
 
 HELP: buffer-read
 { $values { "n" "a non-negative integer" } { "buffer" buffer } { "byte-array" byte-array } }

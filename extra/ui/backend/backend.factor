@@ -23,6 +23,8 @@ HOOK: select-gl-context ui-backend ( handle -- )
 
 HOOK: flush-gl-context ui-backend ( handle -- )
 
+HOOK: beep ui-backend ( -- )
+
 : with-gl-context ( handle quot -- )
     swap [ select-gl-context call ] keep
     glFlush flush-gl-context gl-error ; inline

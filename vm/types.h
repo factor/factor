@@ -212,11 +212,6 @@ F_ARRAY *growable_array_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_coun
 	CELL result##_count = 0; \
 	CELL result = tag_object(allot_byte_array(100))
 
-F_ARRAY *growable_byte_array_add(F_BYTE_ARRAY *result, CELL elt, CELL *result_count);
-
-#define GROWABLE_BYTE_ARRAY_ADD(result,elt) \
-	result = tag_object(growable_byte_array_add(untag_object(result),elt,&result##_count))
-
 F_ARRAY *growable_byte_array_append(F_BYTE_ARRAY *result, void *elts, CELL len, CELL *result_count);
 
 #define GROWABLE_BYTE_ARRAY_APPEND(result,elts,len) \

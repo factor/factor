@@ -14,7 +14,7 @@ GENERIC: encode-char ( char stream encoding -- )
 
 GENERIC: <decoder> ( stream encoding -- newstream )
 
-: replacement-char HEX: fffd ;
+: replacement-char HEX: fffd ; inline
 
 TUPLE: decoder stream code cr ;
 
@@ -121,14 +121,28 @@ M: encoder stream-flush encoder-stream stream-flush ;
 INSTANCE: encoder plain-writer
 PRIVATE>
 
-: re-encode ( stream encoding -- newstream )
-    over encoder? [ >r encoder-stream r> ] when <encoder> ;
+GENERIC# re-encode 1 ( stream encoding -- newstream )
+
+M: object re-encode <encoder> ;
+
+M: encoder re-encode [ stream>> ] dip re-encode ;
 
 : encode-output ( encoding -- )
     output-stream [ swap re-encode ] change ;
 
-: re-decode ( stream encoding -- newstream )
-    over decoder? [ >r decoder-stream r> ] when <decoder> ;
+: with-encoded-output ( encoding quot -- )
+    [ [ output-stream get ] dip re-encode ] dip
+    with-output-stream* ; inline
+
+GENERIC# re-decode 1 ( stream encoding -- newstream )
+
+M: object re-decode <decoder> ;
+
+M: decoder re-decode [ stream>> ] dip re-decode ;
 
 : decode-input ( encoding -- )
     input-stream [ swap re-decode ] change ;
+
+: with-decoded-input ( encoding quot -- )
+    [ [ input-stream get ] dip re-decode ] dip
+    with-input-stream* ; inline

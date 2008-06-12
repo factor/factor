@@ -1,10 +1,21 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences arrays namespaces splitting
-vocabs.loader http http.server.responses logging calendar
-destructors html.elements html.streams io.server
-io.encodings.8-bit io.timeouts io assocs debugger continuations
-fry tools.vocabs math ;
+vocabs.loader destructors assocs debugger continuations
+tools.vocabs math
+io
+io.server
+io.encodings
+io.encodings.utf8
+io.encodings.ascii
+io.encodings.binary
+io.streams.limited
+io.timeouts
+fry logging calendar
+http
+http.server.responses
+html.elements
+html.streams ;
 IN: http.server
 
 SYMBOL: responder-nesting
@@ -43,19 +54,29 @@ main-responder global [ <404> <trivial-responder> or ] change-at
     swap development-mode get [ '[ , http-error. ] >>body ] [ drop ] if ;
 
 : do-response ( response -- )
-    dup write-response
-    request get method>> "HEAD" = [ drop ] [
-        '[ , write-response-body ]
-        [
-            development-mode get
-            [ http-error. ] [ drop "Response error" ] if
-        ] recover
-    ] if ;
+    [ write-response ]
+    [
+        request get method>> "HEAD" = [ drop ] [
+            '[
+                ,
+                [ content-charset>> encode-output ]
+                [ write-response-body ]
+                bi
+            ]
+            [
+                utf8 [
+                    development-mode get
+                    [ http-error. ] [ drop "Response error" throw ] if
+                ] with-encoded-output
+            ] recover
+        ] if
+    ] bi ;
 
 LOG: httpd-hit NOTICE
 
 : log-request ( request -- )
-    [ method>> ] [ url>> [ host>> ] [ path>> ] bi ] bi 3array httpd-hit ;
+    [ method>> ] [ url>> [ host>> ] [ path>> ] bi ] bi
+    3array httpd-hit ;
 
 : split-path ( string -- path )
     "/" split harvest ;
@@ -79,9 +100,15 @@ LOG: httpd-hit NOTICE
     development-mode get-global
     [ global [ refresh-all ] bind ] when ;
 
+: setup-limits ( -- )
+    1 minutes timeouts
+    64 1024 * limit-input ;
+
 : handle-client ( -- )
     [
-        1 minutes timeouts
+        setup-limits
+        ascii decode-input
+        ascii encode-output
         ?refresh-all
         read-request
         do-request
@@ -90,7 +117,7 @@ LOG: httpd-hit NOTICE
 
 : httpd ( port -- )
     dup integer? [ internet-server ] when
-    "http.server" latin1 [ handle-client ] with-server ;
+    "http.server" binary [ handle-client ] with-server ;
 
 : httpd-main ( -- )
     8888 httpd ;
