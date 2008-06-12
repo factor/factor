@@ -2,16 +2,18 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences arrays namespaces splitting
 vocabs.loader destructors assocs debugger continuations
-tools.vocabs math
+combinators tools.vocabs math
 io
 io.server
+io.sockets
+io.sockets.secure
 io.encodings
 io.encodings.utf8
 io.encodings.ascii
 io.encodings.binary
 io.streams.limited
 io.timeouts
-fry logging calendar
+fry logging calendar urls
 http
 http.server.responses
 html.elements
@@ -88,12 +90,26 @@ LOG: httpd-hit NOTICE
 : dispatch-request ( request -- response )
     url>> path>> split-path main-responder get call-responder ;
 
+: prepare-request ( request -- request )
+    [
+        local-address get
+        [ secure? "https" "http" ? >>protocol ]
+        [ port>> '[ , or ] change-port ]
+        bi
+    ] change-url ;
+
+: valid-request? ( request -- ? )
+    url>> port>> local-address get port>> = ;
+
 : do-request ( request -- response )
     '[
         ,
-        [ init-request ]
-        [ log-request ]
-        [ dispatch-request ] tri
+        {
+            [ init-request ]
+            [ prepare-request ]
+            [ log-request ]
+            [ dup valid-request? [ dispatch-request ] [ drop <400> ] if ]
+        } cleave
     ] [ [ \ do-request log-error ] [ <500> ] bi ] recover ;
 
 : ?refresh-all ( -- )

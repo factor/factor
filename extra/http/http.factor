@@ -6,8 +6,7 @@ assocs sequences splitting sorting sets debugger
 strings vectors hashtables quotations arrays byte-arrays
 math.parser calendar calendar.format present
 
-io io.server io.sockets.secure
-io.encodings.iana io.encodings.binary io.encodings.8-bit
+io io.encodings.iana io.encodings.binary io.encodings.8-bit
 
 unicode.case unicode.categories qualified
 
@@ -142,7 +141,6 @@ cookies ;
     request new
         "1.1" >>version
         <url>
-            "http" >>protocol
             H{ } clone >>query
         >>url
         H{ } clone >>header
@@ -202,7 +200,6 @@ TUPLE: post-data raw content content-type ;
 : extract-host ( request -- request )
     [ ] [ url>> ] [ "host" header parse-host ] tri
     [ >>host ] [ >>port ] bi*
-    ensure-port
     drop ;
 
 : extract-cookies ( request -- request )
@@ -214,9 +211,6 @@ TUPLE: post-data raw content content-type ;
 : parse-content-type ( content-type -- type encoding )
     ";" split1 parse-content-type-attributes "charset" swap at ;
 
-: detect-protocol ( request -- request )
-    dup url>> remote-address get secure? "https" "http" ? >>protocol drop ;
-
 : read-request ( -- request )
     <request>
     read-method
@@ -224,7 +218,6 @@ TUPLE: post-data raw content content-type ;
     read-request-version
     read-request-header
     read-post-data
-    detect-protocol
     extract-host
     extract-cookies ;
 
