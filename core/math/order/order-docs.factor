@@ -3,9 +3,9 @@ math.private words ;
 IN: math.order
 
 HELP: <=>
-{ $values { "obj1" object } { "obj2" object } { "symbol" symbol } }
+{ $values { "obj1" object } { "obj2" object } { "<=>" "an ordering specifier" } }
 { $contract
-    "Compares two objects using an intrinsic total order, for example, the natural order for real numbers and lexicographic order for strings."
+    "Compares two objects using an intrinsic linear order, for example, the natural order for real numbers and lexicographic order for strings."
     $nl
     "The output value is one of the following:"
     { $list
@@ -16,23 +16,23 @@ HELP: <=>
 } ;
 
 HELP: +lt+
-{ $description "Returned by " { $link <=> } " when the first object is strictly less than the second object." } ;
+{ $description "Output by " { $link <=> } " when the first object is strictly less than the second object." } ;
 
 HELP: +eq+
-{ $description "Returned by " { $link <=> } " when the first object is equal to the second object." } ;
+{ $description "Output by " { $link <=> } " when the first object is equal to the second object." } ;
 
 HELP: +gt+
-{ $description "Returned by " { $link <=> } " when the first object is strictly greater than the second object." } ;
+{ $description "Output by " { $link <=> } " when the first object is strictly greater than the second object." } ;
 
 HELP: invert-comparison
-{ $values { "symbol" symbol }
-          { "new-symbol" symbol } }
-{ $description "Invert the comparison symbol returned by " { $link <=> } ". The output for the symbol " { $snippet "+eq+" } " is itself." }
+{ $values { "<=>" symbol }
+          { "<=>'" symbol } }
+{ $description "Invert the comparison symbol returned by " { $link <=> } "." }
 { $examples
     { $example "USING: math.order prettyprint ;" "+lt+ invert-comparison ." "+gt+" } } ;
 
 HELP: compare
-{ $values { "obj1" object } { "obj2" object } { "quot" "a quotation with stack effect " { $snippet "( obj -- newobj )" } } { "symbol" "a comparison symbol, +lt+, +eq+, or +gt+" } }
+{ $values { "obj1" object } { "obj2" object } { "quot" "a quotation with stack effect " { $snippet "( obj -- newobj )" } } { "<=>" "an ordering specifier" } }
 { $description "Compares the results of applying the quotation to both objects via " { $link <=> } "." }
 { $examples { $example "USING: kernel math.order prettyprint sequences ;" "\"hello\" \"hi\" [ length ] compare ." "+gt+" }
 } ;
@@ -76,19 +76,24 @@ HELP: [-]
 { $values { "x" real } { "y" real } { "z" real } }
 { $description "Subtracts " { $snippet "y" } " from " { $snippet "x" } ". If the result is less than zero, outputs zero." } ;
 
-ARTICLE: "math.order" "Ordered objects"
+ARTICLE: "order-specifiers" "Ordering specifiers"
+"Ordering words such as " { $link <=> } " output one of the following values, indicating that of two objects being compared, the first is less than the second, the two are equal, or that the first is greater than the second:"
+{ $subsection +lt+ }
+{ $subsection +eq+ }
+{ $subsection +gt+ } ;
+    
+ARTICLE: "math.order" "Linear order protocol"
 "Some classes have an intrinsic order amongst instances:"
 { $subsection <=> }
 { $subsection compare }
 { $subsection invert-comparison }
-"The above words return one of the following symbols:"
-{ $subsection +lt+ }
-{ $subsection +eq+ }
-{ $subsection +gt+ }
+"The above words output order specifiers."
+{ $subsection "order-specifiers" }
 "Utilities for comparing objects:"
 { $subsection after? }
 { $subsection before? }
 { $subsection after=? }
-{ $subsection before=? } ;
+{ $subsection before=? }
+{ $see-also "sequences-sorting" } ;
 
 ABOUT: "math.order"
