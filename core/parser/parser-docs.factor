@@ -117,14 +117,18 @@ $nl
 { $subsection parse-tokens } ;
 
 ARTICLE: "parsing-words" "Parsing words"
-"The Factor parser is follows a simple recursive-descent design. The parser reads successive tokens from the input; if the token identifies a number or an ordinary word, it is added to an accumulator vector. Otherwise if the token identifies a parsing word, the parsing word is executed immediately."
+"The Factor parser follows a simple recursive-descent design. The parser reads successive tokens from the input; if the token identifies a number or an ordinary word, it is added to an accumulator vector. Otherwise if the token identifies a parsing word, the parsing word is executed immediately."
 $nl
 "Parsing words are marked by suffixing the definition with a " { $link POSTPONE: parsing } " declaration. Here is the simplest possible parsing word; it prints a greeting at parse time:"
 { $code ": hello \"Hello world\" print ; parsing" }
-"Parsing words must have stack effect " { $snippet "( accum -- accum )" } ", where " { $snippet "accum" } " is the accumulator vector supplied by the parser. Parsing words can read input, add word definitions to the dictionary, and do anything an ordinary word can."
+"Parsing words must not pop or push items from the stack; however, they are permitted to access the accumulator vector supplied by the parser at the top of the stack. That is, parsing words must have stack effect " { $snippet "( accum -- accum )" } ", where " { $snippet "accum" } " is the accumulator vector supplied by the parser."
+$nl
+"Parsing words can read input, add word definitions to the dictionary, and do anything an ordinary word can."
+$nl
+"Because of the stack restriction, parsing words cannot pass data to other words by leaving values on the stack; instead, use " { $link parsed } " to add the data to the parse tree so that it can be evaluated later."
 $nl
 "Parsing words cannot be called from the same source file where they are defined, because new definitions are only compiled at the end of the source file. An attempt to use a parsing word in its own source file raises an error:"
-{ $link staging-violation }
+{ $subsection staging-violation }
 "Tools for implementing parsing words:"
 { $subsection "reading-ahead" }
 { $subsection "parsing-word-nest" }
