@@ -12,7 +12,7 @@ IN: ui.x11
 
 SINGLETON: x11-ui-backend
 
-: XA_NET_WM_NAME "_NET_WM_NAME" x-atom ;
+: XA_NET_WM_NAME ( -- atom ) "_NET_WM_NAME" x-atom ;
 
 TUPLE: x11-handle window glx xic ;
 

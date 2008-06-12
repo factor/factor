@@ -131,6 +131,14 @@ GENERIC: update-methods ( class seq -- )
     [ drop update-map+ ]
     2tri ;
 
+: forget-predicate ( class -- )
+    dup "predicate" word-prop
+    dup length 1 = [
+        first
+        tuck "predicating" word-prop =
+        [ forget ] [ drop ] if
+    ] [ 2drop ] if ;
+
 GENERIC: class ( object -- class )
 
 : instance? ( obj class -- ? )

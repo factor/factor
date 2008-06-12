@@ -136,17 +136,16 @@ M: method-body definer
 M: method-body forget*
     dup "forgotten" word-prop [ drop ] [
         [
-            dup "default" word-prop [ call-next-method ] [
-                dup
-                [ "method-class" word-prop ]
-                [ "method-generic" word-prop ] bi
-                3dup method eq? [
-                    [ delete-at ] with-methods
-                    call-next-method
-                ] [ 3drop ] if
+            dup "default" word-prop [ drop ] [
+                [
+                    [ "method-class" word-prop ]
+                    [ "method-generic" word-prop ] bi
+                    2dup method
+                ] keep eq?
+                [ [ delete-at ] with-methods ] [ 2drop ] if
             ] if
         ]
-        [ t "forgotten" set-word-prop ] bi
+        [ call-next-method ] bi
     ] if ;
 
 M: method-body smart-usage
@@ -169,7 +168,7 @@ M: sequence implementors
 : forget-class ( class -- )
     class-usages [
         {
-            [ "predicate" word-prop [ forget ] each ]
+            [ forget-predicate ]
             [ forget-methods ]
             [ update-map- ]
             [ reset-class ]
