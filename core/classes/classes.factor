@@ -76,8 +76,8 @@ M: word reset-class drop ;
         tri
     ] { } make ;
 
-: class-usages ( class -- assoc )
-    [ update-map get at ] closure ;
+: class-usages ( class -- seq )
+    [ update-map get at ] closure keys ;
 
 <PRIVATE
 
@@ -99,8 +99,8 @@ M: word reset-class drop ;
 
 : (define-class) ( word props -- )
     >r
-    dup reset-class
     dup class? [ dup new-class ] unless
+    dup reset-class
     dup deferred? [ dup define-symbol ] when
     dup word-props
     r> assoc-union over set-word-props
@@ -116,13 +116,11 @@ GENERIC: update-class ( class -- )
 
 M: class update-class drop ;
 
-GENERIC: update-methods ( class assoc -- )
+GENERIC: update-methods ( class seq -- )
 
 : update-classes ( class -- )
     dup class-usages
-    [ nip keys [ update-class ] each ]
-    [ update-methods ]
-    2bi ;
+    [ nip [ update-class ] each ] [ update-methods ] 2bi ;
 
 : define-class ( word superclass members participants metaclass -- )
     #! If it was already a class, update methods after.
@@ -132,6 +130,14 @@ GENERIC: update-methods ( class assoc -- )
     [ (define-class) ]
     [ drop update-map+ ]
     2tri ;
+
+: forget-predicate ( class -- )
+    dup "predicate" word-prop
+    dup length 1 = [
+        first
+        tuck "predicating" word-prop =
+        [ forget ] [ drop ] if
+    ] [ 2drop ] if ;
 
 GENERIC: class ( object -- class )
 

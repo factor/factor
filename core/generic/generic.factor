@@ -58,18 +58,17 @@ TUPLE: check-method class generic ;
 
 : affected-methods ( class generic -- seq )
     "methods" word-prop swap
-    [ nip classes-intersect? ] curry assoc-filter
+    [ nip [ classes-intersect? ] [ class<= ] 2bi or ] curry assoc-filter
     values ;
 
 : update-generic ( class generic -- )
-    [ affected-methods [ +called+ changed-definition ] each ]
-    [ make-generic ]
-    bi ;
+    affected-methods [ +called+ changed-definition ] each ;
 
 : with-methods ( class generic quot -- )
+    [ drop update-generic ]
     [ [ "methods" word-prop ] dip call ]
-    [ drop update-generic ] 3bi ;
-    inline
+    [ drop make-generic drop ]
+    3tri ; inline
 
 : method-word-name ( class word -- string )
     word-name "/" rot word-name 3append ;
@@ -81,7 +80,7 @@ M: method-body stack-effect
     "method-generic" word-prop stack-effect ;
 
 M: method-body crossref?
-    drop t ;
+    "forgotten" word-prop not ;
 
 : method-word-props ( class generic -- assoc )
     [
@@ -106,8 +105,8 @@ M: method-body crossref?
     ] if ;
 
 : <default-method> ( generic combination -- method )
-    object bootstrap-word pick <method>
-    [ -rot make-default-method define ] keep ;
+    [ drop object bootstrap-word swap <method> ] [ make-default-method ] 2bi
+    [ define ] [ drop t "default" set-word-prop ] [ drop ] 2tri ;
 
 : define-default-method ( generic combination -- )
     dupd <default-method> "default-method" set-word-prop ;
@@ -137,15 +136,16 @@ M: method-body definer
 M: method-body forget*
     dup "forgotten" word-prop [ drop ] [
         [
-            [ ]
-            [ "method-class" word-prop ]
-            [ "method-generic" word-prop ] tri
-            3dup method eq? [
-                [ delete-at ] with-methods
-                call-next-method
-            ] [ 3drop ] if
+            dup "default" word-prop [ drop ] [
+                [
+                    [ "method-class" word-prop ]
+                    [ "method-generic" word-prop ] bi
+                    2dup method
+                ] keep eq?
+                [ [ delete-at ] with-methods ] [ 2drop ] if
+            ] if
         ]
-        [ t "forgotten" set-word-prop ] bi
+        [ call-next-method ] bi
     ] if ;
 
 M: method-body smart-usage
@@ -156,29 +156,32 @@ GENERIC: implementors ( class/classes -- seq )
 M: class implementors
     all-words [ "methods" word-prop key? ] with filter ;
 
-M: assoc implementors
+M: sequence implementors
     all-words [
          "methods" word-prop keys
-        swap [ key? ] curry contains?
+        swap [ memq? ] curry contains?
     ] with filter ;
 
 : forget-methods ( class -- )
     [ implementors ] [ [ swap 2array ] curry ] bi map forget-all ;
 
-M: class forget* ( class -- )
-    [
-        class-usages [
-            drop
+: forget-class ( class -- )
+    class-usages [
+        {
+            [ forget-predicate ]
             [ forget-methods ]
             [ update-map- ]
             [ reset-class ]
-            tri
-        ] assoc-each
-    ]
-    [ call-next-method ] bi ;
+        } cleave
+    ] each ;
 
-M: assoc update-methods ( class assoc -- )
-    implementors [ update-generic ] with each ;
+M: class forget* ( class -- )
+    [ forget-class ] [ call-next-method ] bi ;
+
+M: sequence update-methods ( class seq -- )
+    implementors [
+        [ update-generic ] [ make-generic drop ] 2bi
+    ] with each ;
 
 : define-generic ( word combination -- )
     over "combination" word-prop over = [

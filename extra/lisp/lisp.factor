@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel peg sequences arrays strings combinators.lib
-namespaces combinators math locals locals.private accessors
+namespaces combinators math locals locals.private locals.backend accessors
 vectors syntax lisp.parser assocs parser sequences.lib words
 quotations fry lists inspector ;
 IN: lisp
@@ -11,8 +11,12 @@ DEFER: funcall
 DEFER: lookup-var
 DEFER: lookup-macro
 DEFER: lisp-macro?
+DEFER: lisp-var?
 DEFER: macro-expand
 DEFER: define-lisp-macro
+    
+ERROR: no-such-var variable-name ;
+M: no-such-var summary drop "No such variable" ;
     
 ! Functions to convert s-exps to quotations
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -20,10 +24,10 @@ DEFER: define-lisp-macro
     [ ] [ convert-form compose ] foldl ; inline
     
 : convert-begin ( cons -- quot )  
-    cdr [ convert-form ] [ ] lmap-as '[ , [ funcall ] each ] ;
+    cdr [ convert-form ] [ ] lmap-as '[ , [ call ] each ] ;
     
 : convert-cond ( cons -- quot )  
-    cdr [ 2car [ convert-form ] bi@ [ '[ @ funcall ] ] dip 2array ]
+    cdr [ 2car [ convert-form ] bi@ [ '[ @ call ] ] dip 2array ]
     { } lmap-as '[ , cond ]  ;
     
 : convert-general-form ( cons -- quot )
@@ -32,49 +36,33 @@ DEFER: define-lisp-macro
 ! words for convert-lambda  
 <PRIVATE  
 : localize-body ( assoc body -- assoc newbody )  
-    [ lisp-symbol? ] pick '[ [ name>> , at ] [ ] bi or ] traverse ;
+    {
+      { [ dup list? ] [ [ lisp-symbol? ] pick '[ [ name>> , at ] [ ] bi or ] traverse ] }
+      { [ dup lisp-symbol? ] [ name>> over at ] }
+     [ ]
+    } cond ;
 
-: localize-lambda ( body vars -- newbody newvars )
+: localize-lambda ( body vars -- newvars newbody )
     make-locals dup push-locals swap
     [ swap localize-body convert-form swap pop-locals ] dip swap ;
                    
-: split-lambda ( cons -- body-cons vars-seq )                   
-    3car -rot nip [ name>> ] lmap>array ; inline
+: split-lambda ( cons -- body-cons vars-seq )
+    cdr uncons [ car ] [ [ name>> ] lmap>array ] bi* ; inline
     
 : rest-lambda ( body vars -- quot )
     "&rest" swap [ index ] [ remove ] 2bi
-    localize-lambda <lambda>
-    '[ , cut '[ @ , ] , compose ] ;
+    swapd localize-lambda <lambda>
+    '[ , cut '[ @ , seq>list ] call , call ] ;
     
 : normal-lambda ( body vars -- quot )
-    localize-lambda <lambda> '[ , compose ] ;
+    localize-lambda <lambda> lambda-rewrite [ compose call ] compose 1quotation ;
 PRIVATE>
     
 : convert-lambda ( cons -- quot )  
     split-lambda "&rest" over member? [ rest-lambda ] [ normal-lambda ] if ;
     
 : convert-quoted ( cons -- quot )  
-    cdr 1quotation ;
-    
-: convert-unquoted ( cons -- quot )    
-    "unquote not valid outside of quasiquote!" throw ;
-    
-: convert-unquoted-splicing ( cons -- quot )    
-    "unquote-splicing not valid outside of quasiquote!" throw ;
-    
-<PRIVATE    
-: quasiquote-unquote ( cons -- newcons )
-    [ { [ dup list? ] [ car dup lisp-symbol? ] [ name>> "unquote" equal? dup ] } 0&& nip ]
-    [ cadr ] traverse ;
-    
-: quasiquote-unquote-splicing ( cons -- newcons )    
-    [ { [ dup list? ] [ dup cdr [ cons? ] [ car cons? ] bi and ]
-        [ dup cadr car lisp-symbol? ] [ cadr car name>> "unquote-splicing" equal? dup ] } 0&& nip ]
-    [ dup cadr cdr >>cdr ] traverse ;
-PRIVATE>
-
-: convert-quasiquoted ( cons -- newcons )
-    quasiquote-unquote quasiquote-unquote-splicing ;
+    cadr 1quotation ;
     
 : convert-defmacro ( cons -- quot )
     cdr [ car ] keep [ convert-lambda ] [ car name>> ] bi define-lisp-macro 1quotation ;
@@ -84,9 +72,6 @@ PRIVATE>
     { { "lambda" [ convert-lambda ] }
       { "defmacro" [ convert-defmacro ] }
       { "quote" [ convert-quoted ] }
-      { "unquote" [ convert-unquoted ] }
-      { "unquote-splicing" [ convert-unquoted-splicing ] }
-      { "quasiquote" [ convert-quasiquoted ] }
       { "begin" [ convert-begin ] }
       { "cond" [ convert-cond ] }
      [ drop convert-general-form ]
@@ -102,6 +87,7 @@ PRIVATE>
 : convert-form ( lisp-form -- quot )
     {
       { [ dup cons? ] [ convert-list-form ] }
+      { [ dup lisp-var? ] [ lookup-var 1quotation ] }
       { [ dup lisp-symbol? ] [ '[ , lookup-var ] ] }
      [ 1quotation ]
     } cond ;
@@ -109,11 +95,8 @@ PRIVATE>
 : compile-form ( lisp-ast -- quot )
     convert-form lambda-rewrite call ; inline
     
-: macro-call ( lambda -- cons )
-    call ; inline
-    
 : macro-expand ( cons -- quot )
-    uncons [ list>seq [ ] like ] [ lookup-macro macro-call compile-form  ] bi* ;
+    uncons [ list>seq [ ] like ] [ lookup-macro lambda-rewrite call ] bi* call compile-form call ;
     
 : lisp-string>factor ( str -- quot )
     lisp-expr parse-result-ast compile-form ;
@@ -125,9 +108,6 @@ PRIVATE>
 
 SYMBOL: lisp-env
 SYMBOL: macro-env
-    
-ERROR: no-such-var variable-name ;
-M: no-such-var summary drop "No such variable" ;
 
 : init-env ( -- )
     H{ } clone lisp-env set
@@ -136,17 +116,27 @@ M: no-such-var summary drop "No such variable" ;
 : lisp-define ( quot name -- )
     lisp-env get set-at ;
     
+: defun ( name quot -- name )    
+    over name>> lisp-define ;
+    
 : lisp-get ( name -- word )
     dup lisp-env get at [ ] [ no-such-var ] ?if ;
     
 : lookup-var ( lisp-symbol -- quot )
     name>> lisp-get ;
     
+: lisp-var? ( lisp-symbol -- ? )
+    dup lisp-symbol? [ name>> lisp-env get key? ] [ drop f ] if ;
+    
+: funcall-arg-list ( args -- newargs )    
+    [ ] [ dup \ funcall = [ drop 2 cut* [ funcall ] compose call ] when suffix ] reduce ;
+    
 : funcall ( quot sym -- * )
-    dup lisp-symbol?  [ lookup-var ] when call ; inline
+    [ funcall-arg-list ] dip
+    dup lisp-symbol? [ lookup-var ] when curry call ; inline
     
 : define-primitive ( name vocab word -- )  
-    swap lookup 1quotation '[ , compose call ] swap lisp-define ;
+    swap lookup 1quotation '[ , compose call ] swap lisp-define ; ! '[ , compose call ] swap lisp-define ;
     
 : lookup-macro ( lisp-symbol -- lambda )
     name>> macro-env get at ;

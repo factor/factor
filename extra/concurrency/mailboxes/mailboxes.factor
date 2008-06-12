@@ -1,9 +1,10 @@
 ! Copyright (C) 2005, 2008 Chris Double, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: concurrency.mailboxes
-USING: dlists threads sequences continuations destructors
-namespaces random math quotations words kernel arrays assocs
-init system concurrency.conditions accessors debugger ;
+USING: dlists dequeues threads sequences continuations
+destructors namespaces random math quotations words kernel
+arrays assocs init system concurrency.conditions accessors
+debugger ;
 
 TUPLE: mailbox threads data disposed ;
 
@@ -13,7 +14,7 @@ M: mailbox dispose* threads>> notify-all ;
     <dlist> <dlist> f mailbox boa ;
 
 : mailbox-empty? ( mailbox -- bool )
-    data>> dlist-empty? ;
+    data>> dequeue-empty? ;
 
 : mailbox-put ( obj mailbox -- )
     [ data>> push-front ]

@@ -51,4 +51,17 @@ M: bit-array equal?
 M: bit-array resize
     resize-bit-array ;
 
+: integer>bit-array ( int -- bit-array ) 
+    [ log2 1+ <bit-array> 0 ] keep
+    [ dup zero? not ] [
+        [ -8 shift ] [ 255 bitand ] bi
+        -roll [ [ set-alien-unsigned-1 ] 2keep 1+ ] dip
+    ] [ ] while
+    2drop ;
+
+: bit-array>integer ( bit-array -- int )
+    dup >r length 7 + n>byte 0 r> [
+        swap alien-unsigned-1 swap 8 shift bitor
+    ] curry reduce ;
+
 INSTANCE: bit-array sequence

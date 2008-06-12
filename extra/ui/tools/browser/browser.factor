@@ -14,7 +14,7 @@ TUPLE: browser-gadget pane history ;
     >r >link r> history>> set-model ;
 
 : <help-pane> ( browser-gadget -- gadget )
-    history>> [ [ dup help ] try drop ] <pane-control> ;
+    history>> [ [ help ] curry try ] <pane-control> ;
 
 : init-history ( browser-gadget -- )
     "handbook" >link <history> >>history drop ;

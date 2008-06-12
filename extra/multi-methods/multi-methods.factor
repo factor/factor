@@ -154,7 +154,7 @@ M: method-body stack-effect
     "multi-method-generic" word-prop stack-effect ;
 
 M: method-body crossref?
-    drop t ;
+    "forgotten" word-prop not ;
 
 : method-word-name ( specializer generic -- string )
     [ word-name % "-" % unparse % ] "" make ;
