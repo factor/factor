@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel hashtables calendar
-namespaces splitting sequences sorting math.order
+namespaces splitting sequences sorting math.order present
 html.components syndication
 http.server
 http.server.dispatchers
@@ -15,20 +15,19 @@ validators
 db.types db.tuples lcs farkup urls ;
 IN: webapps.wiki
 
-: view-url ( title -- url )
-    "$wiki/view/" prepend >url ;
+: wiki-url ( rest path -- url )
+    [ "$wiki/" % % "/" % % ] "" make
+    <url> swap >>path ;
 
-: edit-url ( title -- url )
-    "$wiki/edit" >url swap "title" set-query-param ;
+: view-url ( title -- url ) "view" wiki-url ;
 
-: revisions-url ( title -- url )
-    "$wiki/revisions" >url swap "title" set-query-param ;
+: edit-url ( title -- url ) "edit" wiki-url ;
 
-: revision-url ( id -- url )
-    "$wiki/revision" >url swap "id" set-query-param ;
+: revisions-url ( title -- url ) "revisions" wiki-url ;
 
-: user-edits-url ( author -- url )
-    "$wiki/user-edits" >url swap "author" set-query-param ;
+: revision-url ( id -- url ) "revision" wiki-url ;
+
+: user-edits-url ( author -- url ) "user-edits" wiki-url ;
 
 TUPLE: wiki < dispatcher ;
 
@@ -83,12 +82,9 @@ M: revision feed-entry-url id>> revision-url ;
 : <view-article-action> ( -- action )
     <action>
         "title" >>rest
-
         [
             validate-title
-            "view?title=" relative-link-prefix set
         ] >>init
-
         [
             "title" value dup <article> select-tuple [
                 revision>> <revision> select-tuple from-object
@@ -100,13 +96,13 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <view-revision-action> ( -- action )
     <page-action>
+        "id" >>rest
         [
             validate-integer-id
             "id" value <revision>
             select-tuple from-object
-            "view?title=" relative-link-prefix set
+            URL" $wiki/view/" adjust-url present relative-link-prefix set
         ] >>init
-
         { wiki "view" } >>template ;
 
 : add-revision ( revision -- )
@@ -121,15 +117,14 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <edit-article-action> ( -- action )
     <page-action>
+        "title" >>rest
         [
             validate-title
             "title" value <article> select-tuple [
                 revision>> <revision> select-tuple from-object
             ] when*
         ] >>init
-
         { wiki "edit" } >>template
-        
         [
             validate-title
             { { "content" [ v-required ] } } validate-params
@@ -148,6 +143,7 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <list-revisions-action> ( -- action )
     <page-action>
+        "title" >>rest
         [
             validate-title
             list-revisions "revisions" set-value
@@ -156,6 +152,7 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <list-revisions-feed-action> ( -- action )
     <feed-action>
+        "title" >>rest
         [ validate-title ] >>init
         [ "Revisions of " "title" value append ] >>title
         [ "title" value revisions-url ] >>url
@@ -164,20 +161,18 @@ M: revision feed-entry-url id>> revision-url ;
 : <rollback-action> ( -- action )
     <action>
         [ validate-integer-id ] >>validate
-
         [
             "id" value <revision> select-tuple clone f >>id
             [ add-revision ] [ title>> view-url <redirect> ] bi
         ] >>submit ;
 
 : list-changes ( -- seq )
-    "id" value <revision> select-tuples
+    f <revision> select-tuples
     reverse-chronological-order ;
 
 : <list-changes-action> ( -- action )
     <page-action>
         [ list-changes "changes" set-value ] >>init
-
         { wiki "changes" } >>template ;
 
 : <list-changes-feed-action> ( -- action )
@@ -189,7 +184,6 @@ M: revision feed-entry-url id>> revision-url ;
 : <delete-action> ( -- action )
     <action>
         [ validate-title ] >>validate
-
         [
             "title" value <article> delete-tuples
             f <revision> "title" value >>title delete-tuples
@@ -213,7 +207,6 @@ M: revision feed-entry-url id>> revision-url ;
             [ [ content>> string-lines ] bi@ diff "diff" set-value ]
             2bi
         ] >>init
-
         { wiki "diff" } >>template ;
 
 : <list-articles-action> ( -- action )
@@ -223,7 +216,6 @@ M: revision feed-entry-url id>> revision-url ;
             [ [ title>> ] compare ] sort
             "articles" set-value
         ] >>init
-
         { wiki "articles" } >>template ;
 
 : list-user-edits ( -- seq )
@@ -232,6 +224,7 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <user-edits-action> ( -- action )
     <page-action>
+        "author" >>rest
         [
             validate-author
             list-user-edits "user-edits" set-value
@@ -240,6 +233,7 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <user-edits-feed-action> ( -- action )
     <feed-action>
+        "author" >>rest
         [ validate-author ] >>init
         [ "Edits by " "author" value append ] >>title
         [ "author" value user-edits-url ] >>url

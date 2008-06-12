@@ -164,6 +164,8 @@ M: comment entity-url
 
 : <edit-post-action> ( -- action )
     <page-action>
+        "id" >>rest
+
         [
             validate-integer-id
             "id" value <post> select-tuple from-object
