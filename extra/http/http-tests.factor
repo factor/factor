@@ -1,5 +1,6 @@
 USING: http tools.test multiline tuple-syntax
-io.streams.string io.encodings.utf8 kernel arrays splitting sequences
+io.streams.string io.encodings.utf8 io.encodings.string
+kernel arrays splitting sequences
 assocs io.sockets db db.sqlite continuations urls hashtables ;
 IN: http.tests
 
@@ -160,7 +161,7 @@ test-db [
 
 [ t ] [
     "resource:extra/http/test/foo.html" ascii file-contents
-    "http://localhost:1237/nested/foo.html" http-get nip =
+    "http://localhost:1237/nested/foo.html" http-get nip ascii decode =
 ] unit-test
 
 [ "http://localhost:1237/redirect-loop" http-get nip ]

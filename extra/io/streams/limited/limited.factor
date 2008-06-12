@@ -6,14 +6,14 @@ IN: io.streams.limited
 
 TUPLE: limited-stream stream count limit ;
 
-: <limited-stream> ( limit stream -- stream' )
+: <limited-stream> ( stream limit -- stream' )
     limited-stream new
-        swap >>stream
         swap >>limit
+        swap >>stream
         0 >>count ;
 
 : limit-input ( limit -- )
-    input-stream [ <limited-stream> ] change ;
+    input-stream [ swap <limited-stream> ] change ;
 
 ERROR: limit-exceeded ;
 
