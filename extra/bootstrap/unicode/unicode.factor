@@ -4,6 +4,7 @@ USE: unicode.breaks
 USE: unicode.case
 USE: unicode.categories
 USE: unicode.collation
+USE: unicode.data
 USE: unicode.normalize
 USE: unicode.script
 

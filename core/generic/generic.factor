@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words kernel sequences namespaces assocs hashtables
 definitions kernel.private classes classes.private
-classes.algebra quotations arrays vocabs effects combinators ;
+classes.algebra quotations arrays vocabs effects combinators
+sets ;
 IN: generic
 
 ! Method combination protocol
@@ -94,8 +95,13 @@ M: method-body crossref?
     method-word-name f <word>
     [ set-word-props ] keep ;
 
+: with-implementors ( class generic quot -- )
+    [ swap implementors-map get at ] dip call ; inline
+
 : reveal-method ( method class generic -- )
-    [ set-at ] with-methods ;
+    [ [ conjoin ] with-implementors ]
+    [ [ set-at ] with-methods ]
+    2bi ;
 
 : create-method ( class generic -- method )
     2dup method dup [
@@ -142,7 +148,11 @@ M: method-body forget*
                     [ "method-generic" word-prop ] bi
                     2dup method
                 ] keep eq?
-                [ [ delete-at ] with-methods ] [ 2drop ] if
+                [
+                    [ [ delete-at ] with-methods ]
+                    [ [ delete-at ] with-implementors ]
+                    2bi
+                ] [ 2drop ] if
             ] if
         ]
         [ call-next-method ] bi
@@ -150,33 +160,6 @@ M: method-body forget*
 
 M: method-body smart-usage
     "method-generic" word-prop smart-usage ;
-
-GENERIC: implementors ( class/classes -- seq )
-
-M: class implementors
-    all-words [ "methods" word-prop key? ] with filter ;
-
-M: sequence implementors
-    all-words [
-         "methods" word-prop keys
-        swap [ memq? ] curry contains?
-    ] with filter ;
-
-: forget-methods ( class -- )
-    [ implementors ] [ [ swap 2array ] curry ] bi map forget-all ;
-
-: forget-class ( class -- )
-    class-usages [
-        {
-            [ forget-predicate ]
-            [ forget-methods ]
-            [ update-map- ]
-            [ reset-class ]
-        } cleave
-    ] each ;
-
-M: class forget* ( class -- )
-    [ forget-class ] [ call-next-method ] bi ;
 
 M: sequence update-methods ( class seq -- )
     implementors [
@@ -188,6 +171,7 @@ M: sequence update-methods ( class seq -- )
         2drop
     ] [
         2dup "combination" set-word-prop
+        over "methods" word-prop values forget-all
         over H{ } clone "methods" set-word-prop
         dupd define-default-method
         make-generic
