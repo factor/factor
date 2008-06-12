@@ -89,7 +89,8 @@ HINTS: byte>buffer fixnum buffer ;
         over buffer-read
         swap buffer-pop
     ] [
-        buffer>> f
+        [ buffer-length ] keep
+        buffer-read f
     ] if* ;
 
 : buffer-until ( separators buffer -- byte-array separator )
