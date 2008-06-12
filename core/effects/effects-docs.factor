@@ -11,6 +11,7 @@ $nl
 "Stack elements in a stack effect are ordered so that the top of the stack is on the right side. Each value can be named by a data type or description. The following are some examples of value names:"
 { $table
     { { { $snippet "?" } } "a boolean" }
+    { { { $snippet "<=>" } } { "an ordering sepcifier; see " { $link "order-specifiers" } } }
     { { { $snippet "elt" } } "an object which is an element of a sequence" }
     { { { $snippet "m" } ", " { $snippet "n" } } "an integer" }
     { { { $snippet "obj" } } "an object" }

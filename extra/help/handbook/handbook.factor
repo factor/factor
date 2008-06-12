@@ -40,8 +40,8 @@ $nl
 "Common terminology and abbreviations used throughout Factor and its documentation:"
 { $table
     { "Term" "Definition" }
-    { "alist" { "an association list. See " { $link "alists" } } }
-    { "assoc" "an associative mapping" }
+    { "alist" { "an association list; see " { $link "alists" } } }
+    { "assoc" { "an associative mapping; see " { $link "assocs" } } }
     { "associative mapping" { "an object whose class implements the " { $link "assocs-protocol" } } }
     { "boolean"               { { $link t } " or " { $link f } } }
     { "class"                 { "a set of objects identified by a " { $emphasis "class word" } " together with a discriminating predicate. See " { $link "classes" } } }
@@ -50,8 +50,9 @@ $nl
     { "generic word"          { "a word whose behavior depends can be specialized on the class of one of its inputs. See " { $link "generic" } } }
     { "method"                { "a specialized behavior of a generic word on a class. See " { $link "generic" } } }
     { "object"                { "any datum which can be identified" } }
+    { "ordering specifier"    { "see " { $link "order-specifiers" } } }
     { "pathname string"       { "an OS-specific pathname which identifies a file" } }
-    { "sequence" { "an object whose class implements the " { $link "sequence-protocol" } } }
+    { "sequence" { "a sequence; see " { $link "sequence-protocol" } } }
     { "slot"                  { "a component of an object which can store a value" } }
     { "stack effect"          { "a pictorial representation of a word's inputs and outputs, for example " { $snippet "+ ( x y -- z )" } ". See " { $link "effects" } } }
     { "true value"            { "any object not equal to " { $link f } } }
