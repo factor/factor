@@ -1,5 +1,5 @@
 USING: http tools.test multiline tuple-syntax
-io.streams.string kernel arrays splitting sequences
+io.streams.string io.encodings.utf8 kernel arrays splitting sequences
 assocs io.sockets db db.sqlite continuations urls hashtables ;
 IN: http.tests
 
@@ -78,7 +78,7 @@ must-fail-with
 
 STRING: read-response-test-1
 HTTP/1.1 404 not found
-Content-Type: text/html; charset=UTF8
+Content-Type: text/html; charset=UTF-8
 
 blah
 ;
@@ -88,10 +88,10 @@ blah
         version: "1.1"
         code: 404
         message: "not found"
-        header: H{ { "content-type" "text/html; charset=UTF8" } }
+        header: H{ { "content-type" "text/html; charset=UTF-8" } }
         cookies: { }
         content-type: "text/html"
-        content-charset: "UTF8"
+        content-charset: utf8
     }
 ] [
     read-response-test-1 lf>crlf
@@ -101,7 +101,7 @@ blah
 
 STRING: read-response-test-1'
 HTTP/1.1 404 not found
-content-type: text/html; charset=UTF8
+content-type: text/html; charset=UTF-8
 
 
 ;
@@ -160,14 +160,14 @@ test-db [
 
 [ t ] [
     "resource:extra/http/test/foo.html" ascii file-contents
-    "http://localhost:1237/nested/foo.html" http-get =
+    "http://localhost:1237/nested/foo.html" http-get nip =
 ] unit-test
 
-[ "http://localhost:1237/redirect-loop" http-get ]
+[ "http://localhost:1237/redirect-loop" http-get nip ]
 [ too-many-redirects? ] must-fail-with
 
 [ "Goodbye" ] [
-    "http://localhost:1237/quit" http-get
+    "http://localhost:1237/quit" http-get nip
 ] unit-test
 
 ! Dispatcher bugs
@@ -194,12 +194,12 @@ test-db [
 : 404? [ download-failed? ] [ response>> code>> 404 = ] bi and ;
 
 ! This should give a 404 not an infinite redirect loop
-[ "http://localhost:1237/d/blah" http-get ] [ 404? ] must-fail-with
+[ "http://localhost:1237/d/blah" http-get nip ] [ 404? ] must-fail-with
 
 ! This should give a 404 not an infinite redirect loop
-[ "http://localhost:1237/blah/" http-get ] [ 404? ] must-fail-with
+[ "http://localhost:1237/blah/" http-get nip ] [ 404? ] must-fail-with
 
-[ "Goodbye" ] [ "http://localhost:1237/quit" http-get ] unit-test
+[ "Goodbye" ] [ "http://localhost:1237/quit" http-get nip ] unit-test
 
 [ ] [
     [
@@ -218,9 +218,9 @@ test-db [
 
 [ ] [ 100 sleep ] unit-test
 
-[ "Hi" ] [ "http://localhost:1237/" http-get ] unit-test
+[ "Hi" ] [ "http://localhost:1237/" http-get nip ] unit-test
 
-[ "Goodbye" ] [ "http://localhost:1237/quit" http-get ] unit-test
+[ "Goodbye" ] [ "http://localhost:1237/quit" http-get nip ] unit-test
 
 USING: html.components html.elements xml xml.utilities validators
 furnace furnace.flash ;
@@ -253,7 +253,7 @@ SYMBOL: a
 : test-a string>xml "input" tag-named "value" swap at ;
 
 [ "3" ] [
-    "http://localhost:1237/" http-get*
+    "http://localhost:1237/" http-get
     swap dup cookies>> "cookies" set session-id-key get-cookie
     value>> "session-id" set test-a
 ] unit-test
@@ -273,4 +273,4 @@ SYMBOL: a
 
 [ 4 ] [ a get-global ] unit-test
 
-[ "Goodbye" ] [ "http://localhost:1237/quit" http-get ] unit-test
+[ "Goodbye" ] [ "http://localhost:1237/quit" http-get nip ] unit-test
