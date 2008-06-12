@@ -258,7 +258,7 @@ M: x11-ui-backend ui ( -- )
     ] ui-running ;
 
 M: x11-ui-backend beep ( -- )
-    dpy 100 XBell drop ;
+    dpy get 100 XBell drop ;
 
 x11-ui-backend ui-backend set-global
 
