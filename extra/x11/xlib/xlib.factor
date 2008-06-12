@@ -1257,8 +1257,8 @@ FUNCTION: Status XSetStandardProperties (
 
 FUNCTION: void XFree ( void* data ) ;
 FUNCTION: int XStoreName ( Display* display, Window w, char* window_name ) ;
-
 FUNCTION: void XSetWMNormalHints ( Display* display, Window w, XSizeHints* hints ) ;
+FUNCTION: int XBell ( Display* display, int percent ) ;
 
 ! !!! INPUT METHODS
 

@@ -79,9 +79,15 @@ SYMBOL: update-tuples-hook
 : call-update-tuples-hook ( -- )
     update-tuples-hook get call ;
 
+: unxref-forgotten-definitions ( -- )
+    forgotten-definitions get
+    keys [ word? ] filter
+    [ delete-compiled-xref ] each ;
+
 : finish-compilation-unit ( -- )
     call-recompile-hook
     call-update-tuples-hook
+    unxref-forgotten-definitions
     dup [ drop crossref? ] assoc-contains? modify-code-heap ;
 
 : with-nested-compilation-unit ( quot -- )

@@ -12,7 +12,7 @@ IN: ui.x11
 
 SINGLETON: x11-ui-backend
 
-: XA_NET_WM_NAME "_NET_WM_NAME" x-atom ;
+: XA_NET_WM_NAME ( -- atom ) "_NET_WM_NAME" x-atom ;
 
 TUPLE: x11-handle window glx xic ;
 
@@ -256,6 +256,9 @@ M: x11-ui-backend ui ( -- )
             ] with-xim
         ] with-x
     ] ui-running ;
+
+M: x11-ui-backend beep ( -- )
+    dpy get 100 XBell drop ;
 
 x11-ui-backend ui-backend set-global
 

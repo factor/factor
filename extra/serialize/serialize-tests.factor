@@ -4,7 +4,7 @@
 USING: tools.test kernel serialize io io.streams.byte-array math
 alien arrays byte-arrays sequences math prettyprint parser
 classes math.constants io.encodings.binary random
-combinators.lib assocs ;
+assocs ;
 IN: serialize.tests
 
 : test-serialize-cell
@@ -15,12 +15,11 @@ IN: serialize.tests
 [ t ] [
     100 [
         drop
-        {
-            [ 40 [        test-serialize-cell ] all? ]
-            [  4 [ 40 *   test-serialize-cell ] all? ]
-            [  4 [ 400 *  test-serialize-cell ] all? ]
-            [  4 [ 4000 * test-serialize-cell ] all? ]
-        } &&
+        40 [        test-serialize-cell ] all?
+         4 [ 40 *   test-serialize-cell ] all?
+         4 [ 400 *  test-serialize-cell ] all?
+         4 [ 4000 * test-serialize-cell ] all?
+        and and and
     ] all?
 ] unit-test
 

@@ -33,7 +33,7 @@ HELP: group
 { $description "Splits the sequence into disjoint groups of " { $snippet "n" } " elements and collects the groups into a new array." }
 { $notes "If the sequence length is not a multiple of " { $snippet "n" } ", the final subsequence in the list will be shorter than " { $snippet "n" } " elements." }
 { $examples
-    { $example "USING: splitting prettyprint ;" "{ 3 1 3 3 7 } 2 group ." "{ { 3 1 } { 3 3 } { 7 } }" }
+    { $example "USING: grouping prettyprint ;" "{ 3 1 3 3 7 } 2 group ." "{ { 3 1 } { 3 3 } { 7 } }" }
 } ;
 
 HELP: <groups>
@@ -41,7 +41,7 @@ HELP: <groups>
 { $description "Outputs a virtual sequence whose elements are disjoint subsequences of " { $snippet "n" } " elements from the underlying sequence." }
 { $examples
     { $example
-        "USING: arrays kernel prettyprint sequences splitting ;"
+        "USING: arrays kernel prettyprint sequences grouping ;"
         "9 >array 3 <groups> dup reverse-here concat >array ." "{ 6 7 8 3 4 5 0 1 2 }"
     }
 } ;
@@ -51,7 +51,7 @@ HELP: <sliced-groups>
 { $description "Outputs a virtual sequence whose elements are overlapping subsequences of " { $snippet "n" } " elements from the underlying sequence." }
 { $examples
     { $example
-        "USING: arrays kernel prettyprint sequences splitting ;"
+        "USING: arrays kernel prettyprint sequences grouping ;"
         "9 >array 3 <sliced-groups>"
         "dup [ reverse-here ] each concat >array ."
         "{ 2 1 0 5 4 3 8 7 6 }"
@@ -68,7 +68,7 @@ HELP: clump
 { $description "Splits the sequence into overlapping clumps of " { $snippet "n" } " elements and collects the clumps into a new array." }
 { $errors "Throws an error if " { $snippet "n" } " is smaller than the length of the sequence." }
 { $examples
-    { $example "USING: splitting prettyprint ;" "{ 3 1 3 3 7 } 2 clump ." "{ { 3 1 } { 1 3 } { 3 3 } { 3 7 } }" }
+    { $example "USING: grouping prettyprint ;" "{ 3 1 3 3 7 } 2 clump ." "{ { 3 1 } { 1 3 } { 3 3 } { 3 7 } }" }
 } ;
 
 HELP: <clumps>
@@ -77,7 +77,7 @@ HELP: <clumps>
 { $examples
     "Running averages:"
     { $example
-        "USING: splitting sequences math prettyprint kernel ;"
+        "USING: grouping sequences math prettyprint kernel ;"
         "IN: scratchpad"
         ": share-price"
         "    { 13/50 51/100 13/50 1/10 4/5 17/20 33/50 3/25 19/100 3/100 } ;"

@@ -3,9 +3,9 @@
 USING: kernel math.private ;
 IN: math
 
-GENERIC: >fixnum ( x -- y ) foldable
-GENERIC: >bignum ( x -- y ) foldable
-GENERIC: >integer ( x -- y ) foldable
+GENERIC: >fixnum ( x -- n ) foldable
+GENERIC: >bignum ( x -- n ) foldable
+GENERIC: >integer ( x -- n ) foldable
 GENERIC: >float ( x -- y ) foldable
 
 MATH: number= ( x y -- ? ) foldable

@@ -63,8 +63,8 @@ MACRO: napply ( n -- )
 ! short circuiting words
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! : short-circuit ( quots quot default -- quot )
-!   1quotation -rot { } map>assoc <reversed> alist>quot ;
+: short-circuit ( quots quot default -- quot )
+    1quotation -rot { } map>assoc <reversed> alist>quot ;
 
 ! MACRO: && ( quots -- ? )
 !     [ [ not ] append [ f ] ] t short-circuit ;

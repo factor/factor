@@ -3,7 +3,7 @@ kernel math namespaces parser prettyprint sequences strings
 tools.test vectors words quotations classes
 classes.private classes.union classes.mixin classes.predicate
 classes.algebra vectors definitions source-files
-compiler.units kernel.private ;
+compiler.units kernel.private sorting vocabs ;
 IN: classes.tests
 
 ! DEFER: bah
@@ -169,3 +169,9 @@ M: method-forget-class method-forget-test ;
 [ f ] [ \ method-forget-test "methods" word-prop assoc-empty? ] unit-test
 [ ] [ [ \ method-forget-class forget ] with-compilation-unit ] unit-test
 [ t ] [ \ method-forget-test "methods" word-prop assoc-empty? ] unit-test
+
+[ t ] [
+    all-words [ class? ] filter
+    implementors-map get keys
+    [ natural-sort ] bi@ =
+] unit-test

@@ -243,6 +243,3 @@ unit-test
 [ "asdf" ] [ " asdf " [ CHAR: \s = ] trim ] unit-test
 [ "asdf " ] [ " asdf " [ CHAR: \s = ] left-trim ] unit-test
 [ " asdf" ] [ " asdf " [ CHAR: \s = ] right-trim ] unit-test
-
-! Hardcore
-[ ] [ "sequences" reload ] unit-test

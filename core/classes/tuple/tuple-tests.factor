@@ -109,6 +109,7 @@ TUPLE: yo-momma ;
 [
     [ t ] [ \ yo-momma class? ] unit-test
     [ ] [ \ yo-momma forget ] unit-test
+    [ ] [ \ <yo-momma> forget ] unit-test
     [ f ] [ \ yo-momma update-map get values memq? ] unit-test
 
     [ f ] [ \ yo-momma crossref get at ] unit-test
@@ -552,11 +553,11 @@ TUPLE: subclass-forget-test-3 < subclass-forget-test-2 ;
 
 [ ] [ "IN: classes.tuple.tests FORGET: subclass-forget-test" eval ] unit-test
 
-[ H{ { subclass-forget-test-2 subclass-forget-test-2 } } ]
+[ { subclass-forget-test-2 } ]
 [ subclass-forget-test-2 class-usages ]
 unit-test
 
-[ H{ { subclass-forget-test-3 subclass-forget-test-3 } } ]
+[ { subclass-forget-test-3 } ]
 [ subclass-forget-test-3 class-usages ]
 unit-test
 
@@ -565,3 +566,32 @@ unit-test
 [ subclass-forget-test-3 new ] must-fail
 
 [ "IN: classes.tuple.tests TUPLE: subclass-forget-test-4 < subclass-forget-test-2 ;" eval ] must-fail
+
+! More
+DEFER: subclass-reset-test
+DEFER: subclass-reset-test-1
+DEFER: subclass-reset-test-2
+DEFER: subclass-reset-test-3
+
+GENERIC: break-me ( obj -- )
+
+[ ] [ [ { integer break-me } forget ] with-compilation-unit ] unit-test
+
+[ ] [ "IN: classes.tuple.tests TUPLE: subclass-reset-test ;" <string-reader> "subclass-reset-test" parse-stream drop ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: subclass-reset-test-1 < subclass-reset-test ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: subclass-reset-test-2 < subclass-reset-test ;" eval ] unit-test
+[ ] [ "IN: classes.tuple.tests TUPLE: subclass-reset-test-3 < subclass-reset-test-2 ;" eval ] unit-test
+
+[ ] [ "IN: classes.tuple.tests USE: kernel M: subclass-reset-test-1 break-me drop ;" eval ] unit-test
+
+[ ] [ "IN: classes.tuple.tests : subclass-reset-test ;" <string-reader> "subclass-reset-test" parse-stream drop ] unit-test
+
+[ f ] [ subclass-reset-test-1 tuple-class? ] unit-test
+[ f ] [ subclass-reset-test-2 tuple-class? ] unit-test
+[ subclass-forget-test-3 new ] must-fail
+
+[ t ] [ \ break-me "methods" word-prop assoc-empty? ] unit-test
+
+[ ] [ "IN: classes.tuple.tests USE: math USE: kernel M: integer break-me drop ;" eval ] unit-test
+
+[ f ] [ \ break-me "methods" word-prop assoc-empty? ] unit-test

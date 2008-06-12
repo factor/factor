@@ -71,6 +71,28 @@ M: input-port stream-read
         ] [ 2nip ] if
     ] [ 2nip ] if ;
 
+: read-until-step ( separators port -- string/f separator/f )
+    dup wait-to-read [ 2drop f f ] [ buffer>> buffer-until ] if ;
+
+: read-until-loop ( seps port buf -- separator/f )
+    2over read-until-step over [
+        >r over push-all r> dup [
+            >r 3drop r>
+        ] [
+            drop read-until-loop
+        ] if
+    ] [
+        >r 2drop 2drop r>
+    ] if ;
+
+M: input-port stream-read-until ( seps port -- str/f sep/f )
+    2dup read-until-step dup [ >r 2nip r> ] [
+        over [
+            drop
+            BV{ } like [ read-until-loop ] keep B{ } like swap
+        ] [ >r 2nip r> ] if
+    ] if ;
+
 TUPLE: output-port < buffered-port ;
 
 : <output-port> ( handle -- output-port )
@@ -121,7 +143,7 @@ M: output-port dispose*
 
 M: buffered-port dispose*
     [ call-next-method ]
-    [ [ [ buffer-free ] when* f ] change-buffer drop ]
+    [ [ [ dispose ] when* f ] change-buffer drop ]
     bi ;
 
 M: port cancel-operation handle>> cancel-operation ;

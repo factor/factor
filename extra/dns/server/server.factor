@@ -1,14 +1,9 @@
 
-USING: kernel
-       combinators
-       sequences
-       math
-       io.sockets
-       unicode.case
-       accessors
+USING: kernel combinators sequences sets math
+       io.sockets unicode.case accessors
        combinators.cleave combinators.lib
        newfx
-       dns dns.util ;
+       dns dns.util dns.misc ;
 
 IN: dns.server
 
@@ -26,6 +21,53 @@ IN: dns.server
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : matching-rrs  ( query -- rrs ) records [ rr=query? ] with filter ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! zones
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: zones    ( -- names ) records [ type>> NS  = ] filter [ name>> ] map prune ;
+: my-zones ( -- names ) records [ type>> SOA = ] filter [ name>> ] map ;
+
+: delegated-zones ( -- names ) zones my-zones diff ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! name->zone
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: name->zone ( name -- zone/f )
+  zones sort-largest-first [ name-in-domain? ] with find nip ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! fill-authority
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: fill-authority ( message -- message )
+  [ ]
+  [ message-query name>> name->zone NS IN query boa matching-rrs ]
+  [ answer-section>> ]
+  tri
+  diff >>authority-section ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! fill-additional
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: rr->rdata-names ( rr -- names/f )
+    {
+      { [ dup type>> NS = ] [ rdata>>            {1} ] }
+      { [ dup type>> MX = ] [ rdata>> exchange>> {1} ] }
+      { [ t ]               [ drop f ] }
+    }
+  cond ;
+
+: fill-additional ( message -- message )
+  dup
+  [ answer-section>> ] [ authority-section>> ] bi append
+  [ rr->rdata-names ] map concat
+  [ A IN query boa matching-rrs ] map concat prune
+  over answer-section>> diff
+  >>additional-section ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! query->rrs
@@ -48,9 +90,16 @@ DEFER: query->rrs
 ! have-answers
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+! : have-answers ( message -- message/f )
+!   dup message-query query->rrs        ! message rrs/f
+!   [ empty? ] [ 2drop f ] [ >>answer-section ] 1if ;
+
 : have-answers ( message -- message/f )
-  dup message-query query->rrs        ! message rrs/f
-  [ empty? ] [ 2drop f ] [ >>answer-section ] 1if ;
+  dup message-query query->rrs
+  [ empty? ]
+    [ 2drop f ]
+    [ >>answer-section fill-authority fill-additional ]
+  1if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! have-delegates?
@@ -64,13 +113,13 @@ DEFER: query->rrs
   NS IN query boa matching-rrs [ empty? ] [ drop f ] [ ] 1if ;
 
 : name->delegates ( name -- rrs-ns )
-  {
-    [ "" =    { } and ]
-    [ is-soa? { } and ]
-    [ have-ns? ]
-    [ cdr-name name->delegates ]
-  }
-    1|| ;
+    {
+      [ "" =    { } and ]
+      [ is-soa? { } and ]
+      [ have-ns? ]
+      [ cdr-name name->delegates ]
+    }
+  1|| ;
 
 : have-delegates ( message -- message/f )
   dup message-query name>> name->delegates ! message rrs-ns
@@ -86,19 +135,48 @@ DEFER: query->rrs
   1if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! outsize-zones
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: outside-zones ( message -- message/f )
+  dup message-query name>> name->zone f =
+    [ ]
+    [ drop f ]
+  if ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! is-nx
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : is-nx ( message -- message/f )
   [ message-query name>> records [ name>> = ] with filter empty? ]
-    [ NAME-ERROR >>rcode ]
+    [
+      NAME-ERROR >>rcode
+      dup
+        message-query name>> name->zone SOA IN query boa matching-rrs
+      >>authority-section
+    ]
     [ drop f ]
   1if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: none-of-type ( message -- message )
+  dup
+    message-query name>> name->zone SOA IN query boa matching-rrs
+  >>authority-section ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : find-answer ( message -- message )
-    { [ have-answers ] [ have-delegates ] [ is-nx ] [ ] } 1|| ;
+    {
+      [ have-answers   ]
+      [ have-delegates ]
+      [ outside-zones  ]
+      [ is-nx          ]
+      [ none-of-type   ]
+    }
+  1|| ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
