@@ -42,8 +42,9 @@ HOOK: <insert-user-assigned-statement> db ( class -- obj )
 HOOK: <update-tuple-statement> db ( class -- obj )
 HOOK: <delete-tuples-statement> db ( tuple class -- obj )
 HOOK: <select-by-slots-statement> db ( tuple class -- tuple )
-TUPLE: advanced-statement group order offset limit ;
-HOOK: <advanced-select-statement> db ( tuple class group order offset limit -- tuple )
+TUPLE: query group order offset limit ;
+HOOK: <query> db ( tuple class query -- statement' )
+HOOK: <count-statement> db ( tuple class groups -- n )
 
 HOOK: insert-tuple* db ( tuple statement -- )
 
@@ -55,6 +56,7 @@ SINGLETON: retryable
         [ make-retryable ] map
     ] [
         retryable >>type
+        10 >>retries
     ] if ;
 
 : regenerate-params ( statement -- statement )
@@ -69,12 +71,13 @@ SINGLETON: retryable
     ] 2map >>bind-params ;
 
 M: retryable execute-statement* ( statement type -- )
-    drop
-    [
-        [ query-results dispose t ]
-        [ ]
-        [ regenerate-params bind-statement* f ] cleanup
-    ] curry 10 retry drop ;
+    drop [
+        [
+            [ query-results dispose t ]
+            [ ]
+            [ regenerate-params bind-statement* f ] cleanup
+        ] curry
+    ] [ retries>> ] bi retry drop ;
 
 : resulting-tuple ( class row out-params -- tuple )
     rot class new [
@@ -146,12 +149,21 @@ M: retryable execute-statement* ( statement type -- )
 : do-select ( exemplar-tuple statement -- tuples )
     [ [ bind-tuple ] [ query-tuples ] 2bi ] with-disposal ;
 
+: query ( tuple query -- tuples )
+    >r dup dup class r> <query> do-select ;
+
 : select-tuples ( tuple -- tuples )
     dup dup class <select-by-slots-statement> do-select ;
 
-: count-tuples ( tuple -- n )
-    select-tuples length ;
-
 : select-tuple ( tuple -- tuple/f )
-    dup dup class f f f 1 <advanced-select-statement>
-    do-select ?first ;
+    dup dup class \ query new 1 >>limit <query> do-select ?first ;
+
+: do-count ( exemplar-tuple statement -- tuples )
+    [
+        [ bind-tuple ] [ nip default-query ] 2bi
+    ] with-disposal ;
+
+: count-tuples ( tuple groups -- n )
+    >r dup dup class r> <count-statement> do-count
+    dup length 1 =
+    [ first first string>number ] [ [ first string>number ] map ] if ;
