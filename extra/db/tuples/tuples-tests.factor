@@ -4,7 +4,7 @@ USING: io.files kernel tools.test db db.tuples classes
 db.types continuations namespaces math math.ranges
 prettyprint calendar sequences db.sqlite math.intervals
 db.postgresql accessors random math.bitfields.lib
-math.ranges strings sequences.lib ;
+math.ranges strings sequences.lib urls ;
 IN: db.tuples.tests
 
 TUPLE: person the-id the-name the-number the-real
@@ -104,6 +104,7 @@ SYMBOL: person4
             T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
             f
             H{ { 1 2 } { 3 4 } { 5 "lol" } }
+            URL" http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search"
         }
     ] [ T{ person f 4 } select-tuple ] unit-test
 
@@ -134,7 +135,7 @@ SYMBOL: person4
         T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
         T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
         T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
-        f H{ { 1 2 } { 3 4 } { 5 "lol" } } f <person> person4 set ;
+        f H{ { 1 2 } { 3 4 } { 5 "lol" } } URL" http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search"  <person> person4 set ;
 
 : user-assigned-person-schema ( -- )
     person "PERSON"
@@ -162,7 +163,7 @@ SYMBOL: person4
         T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
         T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
         T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
-        f H{ { 1 2 } { 3 4 } { 5 "lol" } } f <user-assigned-person> person4 set ;
+        f H{ { 1 2 } { 3 4 } { 5 "lol" } } URL" http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search" <user-assigned-person> person4 set ;
 
 TUPLE: paste n summary author channel mode contents timestamp annotations ;
 TUPLE: annotation n paste-id summary author mode contents ;
