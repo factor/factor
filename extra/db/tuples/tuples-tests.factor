@@ -342,7 +342,7 @@ TUPLE: exam id name score ;
         T{ exam } select-tuples
     ] unit-test
 
-    [ 4 ] [ T{ exam } count-tuples ] unit-test ;
+    [ 4 ] [ T{ exam } f count-tuples ] unit-test ;
 
 TUPLE: bignum-test id m n o ;
 : <bignum-test> ( m n o -- obj )

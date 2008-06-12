@@ -43,8 +43,8 @@ HOOK: <update-tuple-statement> db ( class -- obj )
 HOOK: <delete-tuples-statement> db ( tuple class -- obj )
 HOOK: <select-by-slots-statement> db ( tuple class -- tuple )
 TUPLE: query group order offset limit ;
-HOOK: <query> db ( tuple class group order offset limit -- tuple )
-HOOK: <count-statement> db ( tuple class -- n )
+HOOK: <query> db ( tuple class query -- statement' )
+HOOK: <count-statement> db ( tuple class groups -- n )
 
 HOOK: insert-tuple* db ( tuple statement -- )
 
@@ -149,19 +149,14 @@ M: retryable execute-statement* ( statement type -- )
 : do-select ( exemplar-tuple statement -- tuples )
     [ [ bind-tuple ] [ query-tuples ] 2bi ] with-disposal ;
 
+: query ( tuple query -- tuples )
+    >r dup dup class r> <query> do-select ;
+
 : select-tuples ( tuple -- tuples )
     dup dup class <select-by-slots-statement> do-select ;
 
-: count-tuples ( tuple -- n )
-    select-tuples length ;
-
 : select-tuple ( tuple -- tuple/f )
-    dup dup class f f f 1 <query>
-    do-select ?first ;
-
-: query ( tuple groups order offset limit -- tuples )
-    >r >r >r >r dup dup class r> r> r> r>
-    <query> do-select ;
+    dup dup class \ query new 1 >>limit <query> do-select ?first ;
 
 : do-count ( exemplar-tuple statement -- tuples )
     [
@@ -170,6 +165,5 @@ M: retryable execute-statement* ( statement type -- )
 
 : count-tuples ( tuple groups -- n )
     >r dup dup class r> <count-statement> do-count
-    dup length 1 = [ first first string>number ] [
-        [ first string>number ] map
-    ] if ;
+    dup length 1 =
+    [ first first string>number ] [ [ first string>number ] map ] if ;

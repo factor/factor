@@ -149,14 +149,13 @@ M: db <select-by-slots-statement> ( tuple class -- statement )
 : make-query ( tuple query -- tuple' )
     dupd
     {
-        [ group>> [ do-group ] [ drop ] if* ]
-        [ order>> [ do-order ] [ drop ] if* ]
+        [ group>> [ do-group ] [ drop ] if-seq ]
+        [ order>> [ do-order ] [ drop ] if-seq ]
         [ limit>> [ do-limit ] [ drop ] if* ]
         [ offset>> [ do-offset ] [ drop ] if* ]
     } 2cleave ;
 
-M: db <query> ( tuple class group order limit offset -- tuple )
-    \ query boa
+M: db <query> ( tuple class query -- tuple )
     [ <select-by-slots-statement> ] dip make-query ;
 
 ! select ID, NAME, SCORE from EXAM limit 1 offset 3
@@ -174,7 +173,8 @@ M: db <query> ( tuple class group order limit offset -- tuple )
     <simple-statement> maybe-make-retryable do-select ;
 
 M: db <count-statement> ( tuple class groups -- statement )
-    f f f \ query boa
+    \ query new
+        swap >>group
     [ [ "select count(*) from " 0% 0% where-clause ] query-make ]
     dip make-query ;
 
