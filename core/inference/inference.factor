@@ -9,19 +9,22 @@ IN: inference
 GENERIC: infer ( quot -- effect )
 
 M: callable infer ( quot -- effect )
-    [ f infer-quot ] with-infer drop ;
+    [ recursive-state get infer-quot ] with-infer drop ;
 
 : infer. ( quot -- )
+    #! Safe to call from inference transforms.
     infer effect>string print ;
 
 GENERIC: dataflow ( quot -- dataflow )
 
 M: callable dataflow
+    #! Not safe to call from inference transforms.
     [ f infer-quot ] with-infer nip ;
 
 GENERIC# dataflow-with 1 ( quot stack -- dataflow )
 
 M: callable dataflow-with
+    #! Not safe to call from inference transforms.
     [
         V{ } like meta-d set
         f infer-quot

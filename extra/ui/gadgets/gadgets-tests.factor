@@ -1,6 +1,6 @@
 IN: ui.gadgets.tests
 USING: ui.gadgets ui.gadgets.packs ui.gadgets.worlds tools.test
-namespaces models kernel dlists math sets
+namespaces models kernel dlists dequeues math sets
 math.parser ui sequences hashtables assocs io arrays
 prettyprint io.streams.string ;
 
@@ -130,26 +130,26 @@ M: mock-gadget ungraft*
 [
     <dlist> \ graft-queue [
         [ ] [ <mock-gadget> dup queue-graft unqueue-graft ] unit-test
-        [ t ] [ graft-queue dlist-empty? ] unit-test
+        [ t ] [ graft-queue dequeue-empty? ] unit-test
     ] with-variable
 
     <dlist> \ graft-queue [
-        [ t ] [ graft-queue dlist-empty? ] unit-test
+        [ t ] [ graft-queue dequeue-empty? ] unit-test
 
         <mock-gadget> "g" set
         [ ] [ "g" get queue-graft ] unit-test
-        [ f ] [ graft-queue dlist-empty? ] unit-test
+        [ f ] [ graft-queue dequeue-empty? ] unit-test
         [ { f t } ] [ "g" get gadget-graft-state ] unit-test
         [ ] [ "g" get graft-later ] unit-test
         [ { f t } ] [ "g" get gadget-graft-state ] unit-test
         [ ] [ "g" get ungraft-later ] unit-test
         [ { f f } ] [ "g" get gadget-graft-state ] unit-test
-        [ t ] [ graft-queue dlist-empty? ] unit-test
+        [ t ] [ graft-queue dequeue-empty? ] unit-test
         [ ] [ "g" get ungraft-later ] unit-test
         [ ] [ "g" get graft-later ] unit-test
         [ ] [ notify-queued ] unit-test
         [ { t t } ] [ "g" get gadget-graft-state ] unit-test
-        [ t ] [ graft-queue dlist-empty? ] unit-test
+        [ t ] [ graft-queue dequeue-empty? ] unit-test
         [ ] [ "g" get graft-later ] unit-test
         [ 1 ] [ "g" get mock-gadget-graft-called ] unit-test
         [ ] [ "g" get ungraft-later ] unit-test
@@ -185,7 +185,7 @@ M: mock-gadget ungraft*
             [ { f t } ] [ "1" get gadget-graft-state ] unit-test
             [ { f t } ] [ "2" get gadget-graft-state ] unit-test
             [ { f t } ] [ "3" get gadget-graft-state ] unit-test
-            [ ] [ [ "x" print notify ] graft-queue swap dlist-slurp ] unit-test
+            [ ] [ graft-queue [ "x" print notify ] slurp-dequeue ] unit-test
             [ ] [ notify-queued ] unit-test
             [ V{ { t t } } ] [ status-flags ] unit-test
         ] with-variable ;

@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Chris Double & James Cash
+! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors math arrays vectors classes words locals ;
 
@@ -74,6 +74,9 @@ M: object nil? drop f ;
     
 : lreverse ( list -- newlist )    
     nil [ swap cons ] foldl ;
+    
+: lappend ( list1 list2 -- newlist )    
+    [ lreverse ] dip [ swap cons ] foldl ;
     
 : seq>list ( seq -- list )    
     <reversed> nil [ swap cons ] reduce ;

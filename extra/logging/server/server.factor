@@ -93,7 +93,12 @@ SYMBOL: log-files
     } case log-server-loop ;
 
 : log-server ( -- )
-    [ [ log-server-loop ] [ error. (close-logs) ] recover t ]
+    [
+        init-namespaces
+        [ log-server-loop ]
+        [ error. (close-logs) ]
+        recover t
+    ]
     "Log server" spawn-server
     "log-server" set-global ;
 

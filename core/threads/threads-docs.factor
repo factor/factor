@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel kernel.private io
 threads.private continuations dlists init quotations strings
-assocs heaps boxes namespaces ;
+assocs heaps boxes namespaces dequeues ;
 IN: threads
 
 ARTICLE: "threads-start/stop" "Starting and stopping threads"

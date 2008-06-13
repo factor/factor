@@ -6,7 +6,7 @@ IN: html.parser.analyzer
 TUPLE: link attributes clickable ;
 
 : scrape-html ( url -- vector )
-    http-get parse-html ;
+    http-get nip parse-html ;
 
 : (find-relative)
     [ >r + dup r> ?nth* [ 2drop f f ] unless ] [ 2drop f ] if ; inline

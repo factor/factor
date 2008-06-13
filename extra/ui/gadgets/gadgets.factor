@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays hashtables kernel models math namespaces sequences
-quotations math.vectors combinators sorting vectors dlists
-models threads concurrency.flags math.order ;
+USING: accessors arrays hashtables kernel models math namespaces
+sequences quotations math.vectors combinators sorting vectors
+dlists dequeues models threads concurrency.flags math.order ;
 IN: ui.gadgets
 
 SYMBOL: ui-notify-flag
@@ -252,13 +252,12 @@ M: gadget layout* drop ;
 : graft-queue ( -- dlist ) \ graft-queue get ;
 
 : unqueue-graft ( gadget -- )
-    graft-queue over gadget-graft-node delete-node
-    dup gadget-graft-state first { t t } { f f } ?
-    swap set-gadget-graft-state ;
+    [ graft-node>> graft-queue delete-node ]
+    [ [ first { t t } { f f } ? ] change-graft-state drop ] bi ;
 
 : (queue-graft) ( gadget flags -- )
-    over set-gadget-graft-state
-    dup graft-queue push-front* swap set-gadget-graft-node
+    >>graft-state
+    dup graft-queue push-front* >>graft-node drop
     notify-ui-thread ;
 
 : queue-graft ( gadget -- )

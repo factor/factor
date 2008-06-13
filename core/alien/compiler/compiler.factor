@@ -7,7 +7,7 @@ math.parser classes alien.arrays alien.c-types alien.strings
 alien.structs alien.syntax cpu.architecture alien inspector
 quotations assocs kernel.private threads continuations.private
 libc combinators compiler.errors continuations layouts accessors
-init ;
+init sets ;
 IN: alien.compiler
 
 TUPLE: #alien-node < node return parameters abi ;
@@ -339,7 +339,7 @@ SYMBOL: callbacks
 
 [ H{ } clone callbacks set-global ] "alien.compiler" add-init-hook
 
-: register-callback ( word -- ) dup callbacks get set-at ;
+: register-callback ( word -- ) callbacks get conjoin ;
 
 M: alien-callback-error summary
     drop "Words calling ``alien-callback'' must be compiled with the optimizing compiler." ;

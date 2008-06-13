@@ -12,3 +12,6 @@ unit-test
     "USING: math ;\nIN: macros.tests\n: see-test ( a b -- c ) - ;\n" dup eval
     [ \ see-test see ] with-string-writer =
 ] unit-test
+
+[ ] [ "USING: macros inference kernel ; IN: hanging-macro MACRO: c ( quot -- ) infer drop [ ] ; : a ( -- ) [ a ] c ;" eval ] unit-test
+

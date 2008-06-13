@@ -44,6 +44,7 @@ uses definitions ;
     \ source-file construct ;
 
 : source-file ( path -- source-file )
+    dup string? [ "Invalid source file path" throw ] unless
     source-files get [ <source-file> ] cache ;
 
 : reset-checksums ( -- )

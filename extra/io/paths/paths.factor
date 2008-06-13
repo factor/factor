@@ -1,5 +1,5 @@
 USING: io.files kernel sequences accessors
-dlists arrays sequences.lib ;
+dlists dequeues arrays sequences.lib ;
 IN: io.paths
 
 TUPLE: directory-iterator path bfs queue ;
@@ -18,7 +18,7 @@ TUPLE: directory-iterator path bfs queue ;
     dup path>> over push-directory ;
 
 : next-file ( iter -- file/f )
-    dup queue>> dlist-empty? [ drop f ] [
+    dup queue>> dequeue-empty? [ drop f ] [
         dup queue>> pop-back first2
         [ over push-directory next-file ] [ nip ] if
     ] if ;

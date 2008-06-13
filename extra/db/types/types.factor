@@ -65,7 +65,7 @@ SYMBOLS: +autoincrement+ +serial+ +unique+ +default+ +null+ +not-null+
 
 SYMBOLS: INTEGER BIG-INTEGER SIGNED-BIG-INTEGER UNSIGNED-BIG-INTEGER
 DOUBLE REAL BOOLEAN TEXT VARCHAR DATE TIME DATETIME TIMESTAMP BLOB
-FACTOR-BLOB NULL ;
+FACTOR-BLOB NULL URL ;
 
 : spec>tuple ( class spec -- tuple )
     3 f pad-right

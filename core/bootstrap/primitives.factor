@@ -37,6 +37,7 @@ H{ } clone forgotten-definitions set
 H{ } clone root-cache set
 H{ } clone source-files set
 H{ } clone update-map set
+H{ } clone implementors-map set
 init-caches
 
 ! Vocabulary for slot accessors
@@ -492,7 +493,8 @@ tuple
 "curry" "kernel" lookup
 [ f "inline" set-word-prop ]
 [ ]
-[ tuple-layout [ <tuple-boa> ] curry ] tri define
+[ tuple-layout [ <tuple-boa> ] curry ] tri
+(( obj quot -- curry )) define-declared
 
 "compose" "kernel" create
 tuple
@@ -513,7 +515,8 @@ tuple
 "compose" "kernel" lookup
 [ f "inline" set-word-prop ]
 [ ]
-[ tuple-layout [ <tuple-boa> ] curry ] tri define
+[ tuple-layout [ <tuple-boa> ] curry ] tri
+(( quot1 quot2 -- compose )) define-declared
 
 ! Primitive words
 : make-primitive ( word vocab n -- )

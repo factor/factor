@@ -77,7 +77,7 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
     { [ word? ] [ primitive? not ] [
         { "inverse" "math-inverse" "pop-inverse" }
         [ word-prop ] with contains? not
-    ] } <-&& ; 
+    ] } 1&& ; 
 
 : (flatten) ( quot -- )
     [ dup flattenable? [ word-def (flatten) ] [ , ] if ] each ;

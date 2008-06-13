@@ -291,14 +291,11 @@ MEMO: all-vocabs-seq ( -- seq )
         [ vocab-dir? ] with filter
     ] curry map concat ;
 
-: map>set ( seq quot -- )
-    map concat prune natural-sort ; inline
-
 MEMO: all-tags ( -- seq )
-    all-vocabs-seq [ vocab-tags ] map>set ;
+    all-vocabs-seq [ vocab-tags ] gather natural-sort ;
 
 MEMO: all-authors ( -- seq )
-    all-vocabs-seq [ vocab-authors ] map>set ;
+    all-vocabs-seq [ vocab-authors ] gather natural-sort ;
 
 : reset-cache ( -- )
     root-cache get-global clear-assoc

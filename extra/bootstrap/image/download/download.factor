@@ -7,7 +7,7 @@ kernel io.files bootstrap.image sequences io ;
 : url "http://factorcode.org/images/latest/" ;
 
 : download-checksums ( -- alist )
-    url "checksums.txt" append http-get
+    url "checksums.txt" append http-get nip
     string-lines [ " " split1 ] { } map>assoc ;
 
 : need-new-image? ( image -- ? )

@@ -29,7 +29,7 @@ unless
             >r find-com-interface-definition family-tree
             r> 1quotation [ >r iid>> r> 2array ] curry map
         ] map-index concat
-        [ f ] suffix ,
+        [ drop f ] suffix ,
         \ case ,
         "void*" heap-size
         [ * rot <displaced-alien> com-add-ref 0 rot set-void*-nth S_OK ]
@@ -69,13 +69,14 @@ unless
 
 : compile-alien-callback ( return parameters abi quot -- alien )
     [ alien-callback ] 4 ncurry
-    [ gensym [ swap define ] keep ] with-compilation-unit
+    [ gensym [ swap (( -- alien )) define-declared ] keep ]
+    with-compilation-unit
     execute ;
 
 : (make-vtbl) ( interface-name quots iunknown-methods n -- )
     (thunk) (thunked-quots)
     swap find-com-interface-definition family-tree-functions [
-        { return>> parameters>> } get-slots
+        [ return>> ] [ parameters>> [ first ] map ] bi
         dup length 1- roll [
             first dup empty?
             [ 2drop [ ] ]

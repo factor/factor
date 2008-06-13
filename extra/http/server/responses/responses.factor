@@ -1,13 +1,14 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: html.elements math.parser http accessors kernel
-io io.streams.string ;
+io io.streams.string io.encodings.utf8 ;
 IN: http.server.responses
 
 : <content> ( body content-type -- response )
     <response>
         200 >>code
         "Document follows" >>message
+        utf8 >>content-charset
         swap >>content-type
         swap >>body ;
     

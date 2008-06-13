@@ -23,12 +23,27 @@ DEFER: sql%
 : sql-function, ( seq function -- )
     sql% "(" sql% unclip sql% ")" sql% [ sql% ] each ;
 
+: sql-where ( seq -- )
+B
+    [
+        [ second 0, ]
+        [ first 0, ]
+        [ third 1, \ ? 0, ] tri
+    ] each ;
+
 : sql-array% ( array -- )
+B
     unclip
     {
+        { \ create [ "create table" sql% ] }
+        { \ drop [ "drop table" sql% ] }
+        { \ insert [ "insert into" sql% ] }
+        { \ update [ "update" sql% ] }
+        { \ delete [ "delete" sql% ] }
+        { \ select [ B "select" sql% "," (sql-interleave) ] }
         { \ columns [ "," (sql-interleave) ] }
         { \ from [ "from" "," sql-interleave ] }
-        { \ where [ "where" "and" sql-interleave ] }
+        { \ where [ B "where" 0, sql-where ] }
         { \ group-by [ "group by" "," sql-interleave ] }
         { \ having [ "having" "," sql-interleave ] }
         { \ order-by [ "order by" "," sql-interleave ] }
@@ -49,7 +64,7 @@ DEFER: sql%
 ERROR: no-sql-match ;
 : sql% ( obj -- )
     {
-        { [ dup string? ] [ " " 0% 0% ] }
+        { [ dup string? ] [ 0, ] }
         { [ dup array? ] [ sql-array% ] }
         { [ dup number? ] [ number>string sql% ] }
         { [ dup symbol? ] [ unparse sql% ] }
@@ -59,13 +74,4 @@ ERROR: no-sql-match ;
     } cond ;
 
 : parse-sql ( obj -- sql in-spec out-spec in out )
-    [
-        unclip {
-            { \ create [ "create table" sql% ] }
-            { \ drop [ "drop table" sql% ] }
-            { \ insert [ "insert into" sql% ] }
-            { \ update [ "update" sql% ] }
-            { \ delete [ "delete" sql% ] }
-            { \ select [ "select" sql% ] }
-        } case [ sql% ] each
-    ] { "" { } { } { } { } } nmake ;
+    [ [ sql% ] each ] { { } { } { } } nmake ;
