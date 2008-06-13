@@ -3,8 +3,13 @@
 USING: assocs http kernel math math.parser namespaces sequences
 io io.sockets io.streams.string io.files io.timeouts strings
 splitting calendar continuations accessors vectors math.order
-io.encodings.8-bit io.encodings.binary io.streams.duplex
-fry debugger inspector ascii urls ;
+io.encodings
+io.encodings.string
+io.encodings.ascii
+io.encodings.8-bit
+io.encodings.binary
+io.streams.duplex
+fry debugger inspector ascii urls present ;
 IN: http.client
 
 : max-redirects 10 ;
@@ -15,7 +20,7 @@ M: too-many-redirects summary
     drop
     [ "Redirection limit of " % max-redirects # " exceeded" % ] "" make ;
 
-DEFER: http-request
+DEFER: (http-request)
 
 <PRIVATE
 
@@ -31,7 +36,7 @@ SYMBOL: redirects
         redirects get max-redirects < [
             request get
             swap "location" header redirect-url
-            "GET" >>method http-request
+            "GET" >>method (http-request)
         ] [
             too-many-redirects
         ] if
@@ -45,15 +50,21 @@ PRIVATE>
 
 : read-chunks ( -- )
     read-chunk-size dup zero?
-    [ drop ] [ read % read-crlf "" assert= read-chunks ] if ;
+    [ drop ] [ read % read-crlf B{ } assert= read-chunks ] if ;
 
 : read-response-body ( response -- response data )
-    dup "transfer-encoding" header "chunked" =
-    [ [ read-chunks ] "" make ] [ input-stream get contents ] if ;
+    dup "transfer-encoding" header "chunked" = [
+        binary decode-input
+        [ read-chunks ] B{ } make
+        over content-charset>> decode
+    ] [
+        dup content-charset>> decode-input
+        input-stream get contents
+    ] if ;
 
-: http-request ( request -- response data )
+: (http-request) ( request -- response data )
     dup request [
-        dup url>> url-addr latin1 [
+        dup url>> url-addr ascii [
             1 minutes timeouts
             write-request
             read-response
@@ -61,14 +72,6 @@ PRIVATE>
         ] with-client
         do-redirect
     ] with-variable ;
-
-: <get-request> ( url -- request )
-    <request>
-        "GET" >>method
-        swap >url ensure-port >>url ;
-
-: http-get* ( url -- response data )
-    <get-request> http-request ;
 
 : success? ( code -- ? ) 200 = ;
 
@@ -84,18 +87,28 @@ M: download-failed error.
     ]
     [ body>> write ] bi ;
 
-: check-response ( response string -- string )
-    over code>> success? [ nip ] [ download-failed ] if ;
+: check-response ( response data -- response data )
+    over code>> success? [ download-failed ] unless ;
 
-: http-get ( url -- string )
-    http-get* check-response ;
+: http-request ( request -- response data )
+    (http-request) check-response ;
+
+: <get-request> ( url -- request )
+    <request>
+        "GET" >>method
+        swap >url ensure-port >>url ;
+
+: http-get ( url -- response data )
+    <get-request> http-request ;
 
 : download-name ( url -- name )
-    file-name "?" split1 drop "/" ?tail drop ;
+    present file-name "?" split1 drop "/" ?tail drop ;
 
 : download-to ( url file -- )
     #! Downloads the contents of a URL to a file.
-    [ http-get ] dip latin1 [ write ] with-file-writer ;
+    swap http-get
+    [ content-charset>> ] [ '[ , write ] ] bi*
+    with-file-writer ;
 
 : download ( url -- )
     dup download-name download-to ;

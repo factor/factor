@@ -29,7 +29,10 @@ TUPLE: file-responder root hook special allow-listings ;
         H{ } clone >>special ;
 
 : (serve-static) ( path mime-type -- response )
-    [ [ binary <file-reader> &dispose ] dip <content> ]
+    [
+        [ binary <file-reader> &dispose ] dip
+        <content> binary >>content-charset
+    ]
     [ drop file-info [ size>> ] [ modified>> ] bi ] 2bi
     [ "content-length" set-header ]
     [ "last-modified" set-header ] bi* ;

@@ -3,7 +3,7 @@
 USING: kernel combinators vocabs vocabs.loader tools.vocabs io
 io.files io.styles help.markup help.stylesheet sequences assocs
 help.topics namespaces prettyprint words sorting definitions
-arrays inspector ;
+arrays inspector sets ;
 IN: tools.vocabs.browser
 
 : vocab-status-string ( vocab -- string )
@@ -105,7 +105,7 @@ C: <vocab-author> vocab-author
 
 : vocab-xref ( vocab quot -- vocabs )
     >r dup vocab-name swap words r> map
-    [ [ word? ] filter [ word-vocabulary ] map ] map>set
+    [ [ word? ] filter [ word-vocabulary ] map ] gather natural-sort
     remove sift [ vocab ] map ; inline
 
 : vocab-uses ( vocab -- vocabs ) [ uses ] vocab-xref ;

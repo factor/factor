@@ -1,7 +1,7 @@
 USING: assocs circular combinators continuations hashtables
 hashtables.private io kernel math
 namespaces prettyprint quotations sequences splitting
-state-parser strings ;
+state-parser strings sequences.lib ;
 IN: html.parser.utils
 
 : string-parse-end?
@@ -13,7 +13,7 @@ IN: html.parser.utils
     dup length rot length 1- - head next* ;
 
 : trim1 ( seq ch -- newseq )
-    [ ?head drop ] keep ?tail drop ;
+    [ ?head drop ] [ ?tail drop ] bi ;
 
 : single-quote ( str -- newstr )
     >r "'" r> "'" 3append ;
@@ -26,11 +26,7 @@ IN: html.parser.utils
     [ double-quote ] [ single-quote ] if ;
 
 : quoted? ( str -- ? )
-    dup length 1 > [
-        [ first ] keep peek [ = ] keep "'\"" member? and
-    ] [
-        drop f
-    ] if ;
+    [ [ first ] [ peek ] bi [ = ] keep "'\"" member? and ] [ f ] if-seq ;
 
 : ?quote ( str -- newstr )
     dup quoted? [ quote ] unless ;
@@ -39,4 +35,3 @@ IN: html.parser.utils
     dup quoted? [ but-last-slice rest-slice >string ] when ;
 
 : quote? ( ch -- ? ) "'\"" member? ;
-

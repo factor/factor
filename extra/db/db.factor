@@ -35,7 +35,7 @@ HOOK: db-close db ( handle -- )
         handle>> db-close
     ] with-variable ;
 
-TUPLE: statement handle sql in-params out-params bind-params bound? type ;
+TUPLE: statement handle sql in-params out-params bind-params bound? type retries ;
 TUPLE: simple-statement < statement ;
 TUPLE: prepared-statement < statement ;
 
@@ -89,7 +89,7 @@ M: object execute-statement* ( statement type -- )
         swap >>out-params
         swap >>in-params
         swap >>sql ;
-    
+
 : sql-row ( result-set -- seq )
     dup #columns [ row-column ] with map ;
 

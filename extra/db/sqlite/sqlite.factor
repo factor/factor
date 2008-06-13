@@ -182,6 +182,7 @@ M: sqlite-db persistent-table ( -- assoc )
         { DOUBLE { "real" "real" } }
         { BLOB { "blob" "blob" } }
         { FACTOR-BLOB { "blob" "blob" } }
+        { URL { "text" "text" } }
         { +autoincrement+ { f f "autoincrement" } }
         { +unique+ { f f "unique" } }
         { +default+ { f f "default" } }

@@ -5,7 +5,7 @@
 USING: alien alien.c-types continuations kernel libc math macros
 namespaces math.vectors math.constants math.functions
 math.parser opengl.gl opengl.glu combinators arrays sequences
-splitting words byte-arrays assocs combinators.lib ;
+splitting words byte-arrays assocs ;
 IN: opengl
 
 : coordinates ( point1 point2 -- x1 y2 x2 y2 )

@@ -401,7 +401,7 @@ HELP: clone
 { $values { "obj" object } { "cloned" "a new object" } }
 { $contract "Outputs a new object equal to the given object. This is not guaranteed to actually copy the object; it does nothing with immutable objects, and does not copy words either. However, sequences and tuples can be cloned to obtain a shallow copy of the original." } ;
 
-HELP: ? ( ? true false -- true/false )
+HELP: ?
 { $values { "?" "a generalized boolean" } { "true" object } { "false" object } { "true/false" "one two input objects" } }
 { $description "Chooses between two values depending on the boolean value of " { $snippet "cond" } "." } ;
 
@@ -409,7 +409,7 @@ HELP: >boolean
 { $values { "obj" "a generalized boolean" } { "?" "a boolean" } }
 { $description "Convert a generalized boolean into a boolean. That is, " { $link f } " retains its value, whereas anything else becomes " { $link t } "." } ;
 
-HELP: not ( obj -- ? )
+HELP: not
 { $values { "obj" "a generalized boolean" } { "?" "a boolean" } }
 { $description "For " { $link f } " outputs " { $link t } " and for anything else outputs " { $link f } "." }
 { $notes "This word implements boolean not, so applying it to integers will not yield useful results (all integers have a true value). Bitwise not is the " { $link bitnot } " word." } ;
@@ -692,26 +692,26 @@ HELP: tri@
     }
 } ;
 
-HELP: if ( cond true false -- )
-{ $values { "cond" "a generalized boolean" } { "true" quotation } { "false" quotation } }
+HELP: if
+{ $values { "?" "a generalized boolean" } { "true" quotation } { "false" quotation } }
 { $description "If " { $snippet "cond" } " is " { $link f } ", calls the " { $snippet "false" } " quotation. Otherwise calls the " { $snippet "true" } " quotation."
 $nl
 "The " { $snippet "cond" } " value is removed from the stack before either quotation is called." } ;
 
 HELP: when
-{ $values { "cond" "a generalized boolean" } { "true" quotation } }
+{ $values { "?" "a generalized boolean" } { "true" quotation } }
 { $description "If " { $snippet "cond" } " is not " { $link f } ", calls the " { $snippet "true" } " quotation."
 $nl
 "The " { $snippet "cond" } " value is removed from the stack before the quotation is called." } ;
 
 HELP: unless
-{ $values { "cond" "a generalized boolean" } { "false" quotation } }
+{ $values { "?" "a generalized boolean" } { "false" quotation } }
 { $description "If " { $snippet "cond" } " is " { $link f } ", calls the " { $snippet "false" } " quotation."
 $nl
 "The " { $snippet "cond" } " value is removed from the stack before the quotation is called." } ;
 
 HELP: if*
-{ $values { "cond" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } { "false" quotation } }
+{ $values { "?" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } { "false" quotation } }
 { $description "Alternative conditional form that preserves the " { $snippet "cond" } " value if it is true."
 $nl
 "If the condition is true, it is retained on the stack before the " { $snippet "true" } " quotation is called. Otherwise, the condition is removed from the stack and the " { $snippet "false" } " quotation is called."
@@ -720,14 +720,14 @@ $nl
 { $code "X [ Y ] [ Z ] if*" "X dup [ Y ] [ drop Z ] if" } } ;
 
 HELP: when*
-{ $values { "cond" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } }
+{ $values { "?" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } }
 { $description "Variant of " { $link if* } " with no false quotation."
 $nl
 "The following two lines are equivalent:"
 { $code "X [ Y ] when*" "X dup [ Y ] [ drop ] if" } } ;
 
 HELP: unless*
-{ $values { "cond" "a generalized boolean" } { "false" "a quotation " } }
+{ $values { "?" "a generalized boolean" } { "false" "a quotation " } }
 { $description "Variant of " { $link if* } " with no true quotation." }
 { $notes
 "The following two lines are equivalent:"
@@ -794,7 +794,7 @@ HELP: most
 { $values { "x" object } { "y" object } { "quot" "a quotation with stack effect " { $snippet "( x y -- ? )" } } { "z" "either " { $snippet "x" } " or " { $snippet "y" } } }
 { $description "If the quotation yields a true value when applied to " { $snippet "x" } " and " { $snippet "y" } ", outputs " { $snippet "x" } ", otherwise outputs " { $snippet "y" } "." } ;
 
-HELP: curry ( obj quot -- curry )
+HELP: curry
 { $values { "obj" object } { "quot" callable } { "curry" curry } }
 { $description "Partial application. Outputs a " { $link callable } " which first pushes " { $snippet "obj" } " and then calls " { $snippet "quot" } "." }
 { $class-description "The class of objects created by " { $link curry } ". These objects print identically to quotations and implement the sequence protocol, however they only use two cells of storage; a reference to the object and a reference to the underlying quotation." }
@@ -832,7 +832,7 @@ HELP: with
     { $example "USING: kernel math prettyprint sequences ;" "2 { 1 2 3 } [ - ] with map ." "{ 1 0 -1 }" }
 } ;
 
-HELP: compose ( quot1 quot2 -- compose )
+HELP: compose
 { $values { "quot1" callable } { "quot2" callable } { "compose" compose } }
 { $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot1" } " followed by " { $snippet "quot2" } "." }
 { $notes

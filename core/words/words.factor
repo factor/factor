@@ -148,8 +148,12 @@ M: object redefined drop ;
     2dup "declared-effect" word-prop = [ 2drop ] [
         swap
         [ "declared-effect" set-word-prop ]
-        [ drop [ redefined ] [ +inlined+ changed-definition ] bi ]
-        2bi
+        [
+            drop
+            dup primitive? [ drop ] [
+                [ redefined ] [ +inlined+ changed-definition ] bi
+            ] if
+        ] 2bi
     ] if ;
 
 : define-declared ( word def effect -- )

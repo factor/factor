@@ -24,7 +24,7 @@ ABOUT: "floats"
 HELP: float
 { $class-description "The class of double-precision floating point numbers." } ;
 
-HELP: >float ( x -- y )
+HELP: >float
 { $values { "x" real } { "y" float } }
 { $description "Converts a real to a float. This is the identity on floats, and performs a floating point division on rationals." } ;
 
