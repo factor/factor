@@ -24,7 +24,7 @@ M: color-preview model-changed
     [ [ 256 /f ] map 1 suffix <solid> ] <filter> ;
 
 : <color-sliders> ( -- model gadget )
-    3 [ drop 0 0 0 255 <range> ] map
+    3 [ 0 0 0 255 <range> ] replicate
     dup [ range-model ] map <compose>
     swap [ [ <color-slider> gadget, ] each ] make-filled-pile ;
 

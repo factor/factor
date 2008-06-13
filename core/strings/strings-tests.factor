@@ -98,7 +98,7 @@ unit-test
 [ ] [
     [
         4 [
-            100 [ drop "obdurak" clone ] map
+            100 [ "obdurak" clone ] replicate
             gc
             dup [
                 1234 0 rot set-string-nth

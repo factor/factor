@@ -26,7 +26,7 @@ short-url "SHORT_URLS" {
     3append ; foldable
 
 : random-url ( -- string )
-    1 6 [a,b] random [ drop letter-bank random ] "" map-as ;
+    1 6 [a,b] random [ letter-bank random ] "" replicate-as ;
 
 : insert-short-url ( short-url -- short-url )
     '[ , dup random-url >>short insert-tuple ] 10 retry ;

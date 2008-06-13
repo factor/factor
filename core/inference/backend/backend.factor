@@ -80,7 +80,7 @@ M: object value-literal \ literal-expected inference-warning ;
     1 #drop node,
     pop-d dup value-literal >r value-recursion r> ;
 
-: value-vector ( n -- vector ) [ drop <computed> ] V{ } map-as ;
+: value-vector ( n -- vector ) [ <computed> ] V{ } replicate-as ;
 
 : add-inputs ( seq stack -- n stack )
     tuck [ length ] bi@ - dup 0 >
@@ -162,7 +162,7 @@ TUPLE: too-many-r> ;
     dup ensure-values
     #>r
     over 0 pick node-inputs
-    over [ drop pop-d ] map reverse [ push-r ] each
+    over [ pop-d ] replicate reverse [ push-r ] each
     0 pick pick node-outputs
     node,
     drop ;
@@ -171,7 +171,7 @@ TUPLE: too-many-r> ;
     dup check-r>
     #r>
     0 pick pick node-inputs
-    over [ drop pop-r ] map reverse [ push-d ] each
+    over [ pop-r ] replicate reverse [ push-d ] each
     over 0 pick node-outputs
     node,
     drop ;

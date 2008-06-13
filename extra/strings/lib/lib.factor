@@ -30,5 +30,4 @@ IN: strings.lib
     alphanumeric-chars random ;
 
 : random-alphanumeric-string ( length -- str )
-    [ drop random-alphanumeric-char ] map "" like ;
-
+    [ random-alphanumeric-char ] "" replicate-as ;

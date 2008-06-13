@@ -62,7 +62,7 @@ VALUE: properties
     dup [ swap (chain-decomposed) ] curry assoc-map ;
 
 : first* ( seq -- ? )
-    second [ empty? ] [ first ] or? ;
+    second { [ empty? ] [ first ] } 1|| ;
 
 : (process-decomposed) ( data -- alist )
     5 swap (process-data)
@@ -107,7 +107,7 @@ VALUE: properties
 
 :: fill-ranges ( table -- table )
     name-map >alist sort-values keys
-    [ [ "first>" tail? ] [ "last>" tail? ] or? ] filter
+    [ { [ "first>" tail? ] [ "last>" tail? ] } 1|| ] filter
     2 group [
         [ name>char ] bi@ [ [a,b] ] [ table ?nth ] bi
         [ swap table ?set-nth ] curry each

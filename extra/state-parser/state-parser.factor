@@ -144,7 +144,7 @@ M: not-enough-characters summary ( obj -- str )
     ] if next ;
 
 : expect-string ( string -- )
-    dup [ drop get-char next ] map 2dup =
+    dup [ get-char next ] replicate 2dup =
     [ 2drop ] [ expected ] if ;
 
 : init-parser ( -- )

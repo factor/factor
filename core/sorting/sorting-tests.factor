@@ -11,7 +11,7 @@ unit-test
 [ t ] [
     100 [
         drop
-        100 [ drop 20 random [ drop 1000 random ] map ] map natural-sort [ before=? ] monotonic?
+        100 [ 20 random [ 1000 random ] replicate ] replicate natural-sort [ before=? ] monotonic?
     ] all?
 ] unit-test
 
