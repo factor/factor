@@ -8,6 +8,6 @@
 		<t:farkup t:name="content" />
 	</div>
 
-	<p><em>This revision created on <t:label t:name="date" /> by <t:a t:href="user-edits" t:query="author"><t:label t:name="author" /></t:a>.</em></p>
+	<p><em>This revision created on <t:label t:name="date" /> by <t:a t:href="$wiki/user-edits" t:rest="author"><t:label t:name="author" /></t:a>.</em></p>
 
 </t:chloe>

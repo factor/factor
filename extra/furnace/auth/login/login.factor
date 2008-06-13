@@ -49,6 +49,10 @@ TUPLE: login < dispatcher users checksum ;
 
 TUPLE: protected < filter-responder description capabilities ;
 
+: <protected> ( responder -- protected )
+    protected new
+        swap >>responder ;
+
 : users ( -- provider )
     login get users>> ;
 
@@ -85,13 +89,17 @@ M: user-saver dispose
     "invalid username or password" validation-error
     validation-failed ;
 
+SYMBOL: description
+SYMBOL: capabilities
+
+: flashed-variables { description capabilities } ;
+
 : <login-action> ( -- action )
     <page-action>
         [
-            protected fget [
-                [ description>> "description" set-value ]
-                [ capabilities>> words>strings "capabilities" set-value ] bi
-            ] when*
+            flashed-variables restore-flash
+            description get "description" set-value
+            capabilities get words>strings "capabilities" set-value
         ] >>init
 
         { login "login" } >>template
@@ -200,7 +208,10 @@ M: user-saver dispose
             drop
 
             URL" $login" end-aside
-        ] >>submit ;
+        ] >>submit
+
+    <protected>
+        "edit your profile" >>description ;
 
 ! ! ! Password recovery
 
@@ -316,32 +327,36 @@ SYMBOL: lost-password-from
         ] >>submit ;
 
 ! ! ! Authentication logic
-: <protected> ( responder -- protected )
-    protected new
-        swap >>responder ;
-
 : show-login-page ( -- response )
     begin-aside
-    URL" $login/login" { protected } <flash-redirect> ;
+    protected get description>> description set
+    protected get capabilities>> capabilities set
+    URL" $login/login" flashed-variables <flash-redirect> ;
 
-: check-capabilities ( responder user -- ? )
-    [ capabilities>> ] bi@ subset? ;
+: login-required ( -- * )
+    show-login-page exit-with ;
+
+: have-capability? ( capability -- ? )
+    logged-in-user get capabilities>> member? ;
+
+: check-capabilities ( responder user/f -- ? )
+    dup [ [ capabilities>> ] bi@ subset? ] [ 2drop f ] if ;
 
 M: protected call-responder* ( path responder -- response )
     dup protected set
-    uid dup [
-        users get-user 2dup check-capabilities [
-            [ logged-in-user set ] [ save-user-after ] bi
-            call-next-method
-        ] [
-            3drop show-login-page
-        ] if
-    ] [
-        3drop show-login-page
-    ] if ;
+    dup logged-in-user get check-capabilities
+    [ call-next-method ] [ 2drop show-login-page ] if ;
+
+: init-user ( -- )
+    uid [
+        users get-user
+        [ logged-in-user set ]
+        [ save-user-after ] bi
+    ] when* ;
 
 M: login call-responder* ( path responder -- response )
     dup login set
+    init-user
     call-next-method ;
 
 : <login-boilerplate> ( responder -- responder' )
@@ -359,10 +374,7 @@ M: login call-responder* ( path responder -- response )
 ! ! ! Configuration
 
 : allow-edit-profile ( login -- login )
-    <edit-profile-action> <protected>
-        "edit your profile" >>description
-    <login-boilerplate>
-        "edit-profile" add-responder ;
+    <edit-profile-action> <login-boilerplate> "edit-profile" add-responder ;
 
 : allow-registration ( login -- login )
     <register-action> <login-boilerplate>

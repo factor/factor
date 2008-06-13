@@ -19,6 +19,10 @@ IN: webapps.pastebin
 
 TUPLE: pastebin < dispatcher ;
 
+SYMBOL: can-delete-pastes?
+
+can-delete-pastes? define-capability
+
 ! ! !
 ! DOMAIN MODEL
 ! ! !
@@ -170,13 +174,20 @@ M: annotation entity-url
 
 : <delete-paste-action> ( -- action )
     <action>
+
         [ validate-integer-id ] >>validate
 
         [
-            "id" value <paste> delete-tuples
-            "id" value f <annotation> delete-tuples
+            [
+                "id" value <paste> delete-tuples
+                "id" value f <annotation> delete-tuples
+            ] with-transaction
             URL" $pastebin/list" <redirect>
-        ] >>submit ;
+        ] >>submit
+
+        <protected>
+            "delete pastes" >>description
+            { can-delete-pastes? } >>capabilities ;
 
 ! ! !
 ! ANNOTATIONS
@@ -199,6 +210,7 @@ M: annotation entity-url
 
 : <delete-annotation-action> ( -- action )
     <action>
+
         [ { { "id" [ v-number ] } } validate-params ] >>validate
 
         [
@@ -206,11 +218,11 @@ M: annotation entity-url
             [ delete-tuples ]
             [ parent>> paste-url <redirect> ]
             bi
-        ] >>submit ;
+        ] >>submit
 
-SYMBOL: can-delete-pastes?
-
-can-delete-pastes? define-capability
+    <protected>
+        "delete annotations" >>description
+        { can-delete-pastes? } >>capabilities ;
 
 : <pastebin> ( -- responder )
     pastebin new-dispatcher
@@ -219,13 +231,9 @@ can-delete-pastes? define-capability
         <paste-action> "paste" add-responder
         <paste-feed-action> "paste.atom" add-responder
         <new-paste-action> "new-paste" add-responder
-        <delete-paste-action> <protected>
-            "delete pastes" >>description
-            { can-delete-pastes? } >>capabilities "delete-paste" add-responder
+        <delete-paste-action> "delete-paste" add-responder
         <new-annotation-action> "new-annotation" add-responder
-        <delete-annotation-action> <protected>
-            "delete annotations" >>description
-            { can-delete-pastes? } >>capabilities "delete-annotation" add-responder
+        <delete-annotation-action> "delete-annotation" add-responder
     <boilerplate>
         { pastebin "pastebin-common" } >>template ;
 

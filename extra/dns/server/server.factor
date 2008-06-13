@@ -39,18 +39,13 @@ IN: dns.server
   zones sort-largest-first [ name-in-domain? ] with find nip ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! fill-authority
+! name->authority
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: fill-authority ( message -- message )
-  [ ]
-  [ message-query name>> name->zone NS IN query boa matching-rrs ]
-  [ answer-section>> ]
-  tri
-  diff >>authority-section ;
+: name->authority ( name -- rrs-ns ) name->zone NS IN query boa matching-rrs ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! fill-additional
+! extract-names
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : rr->rdata-names ( rr -- names/f )
@@ -61,12 +56,33 @@ IN: dns.server
     }
   cond ;
 
+: extract-rdata-names ( message -- names )
+  [ answer-section>> ] [ authority-section>> ] bi append
+  [ rr->rdata-names ] map concat ;
+
+: extract-names ( message -- names )
+  [ message-query name>> ] [ extract-rdata-names ] bi prefix-on ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! fill-authority
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: fill-authority ( message -- message )
+  dup
+    extract-names [ name->authority ] map concat prune
+    over answer-section>> diff
+  >>authority-section ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! fill-additional
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: name->rrs-a ( name -- rrs-a ) A IN query boa matching-rrs ;
+
 : fill-additional ( message -- message )
   dup
-  [ answer-section>> ] [ authority-section>> ] bi append
-  [ rr->rdata-names ] map concat
-  [ A IN query boa matching-rrs ] map concat prune
-  over answer-section>> diff
+    extract-rdata-names [ name->rrs-a ] map concat prune
+    over answer-section>> diff
   >>additional-section ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -89,10 +105,6 @@ DEFER: query->rrs
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! have-answers
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! : have-answers ( message -- message/f )
-!   dup message-query query->rrs        ! message rrs/f
-!   [ empty? ] [ 2drop f ] [ >>answer-section ] 1if ;
 
 : have-answers ( message -- message/f )
   dup message-query query->rrs

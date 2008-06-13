@@ -97,15 +97,22 @@ SYMBOL: exit-continuation
     dup empty?
     [ drop f ] [ "," split [ dup value ] H{ } map>assoc ] if ;
 
-CHLOE: atom
-    [ children>string ]
-    [ "href" required-attr ]
-    [ "query" optional-attr parse-query-attr ] tri
-    <url>
-        swap >>query
-        swap >>path
-    adjust-url relative-to-request
-    add-atom-feed ;
+: a-url-path ( tag -- string )
+    [ "href" required-attr ] [ "rest" optional-attr value ] bi
+    [ [ "/" ?tail drop "/" ] dip present 3append ] when* ;
+
+: a-url ( tag -- url )
+    dup "value" optional-attr
+    [ value ] [
+        <url>
+            swap
+            [ a-url-path >>path ]
+            [ "query" optional-attr parse-query-attr >>query ]
+            bi
+        adjust-url relative-to-request
+    ] ?if ;
+
+CHLOE: atom [ children>string ] [ a-url ] bi add-atom-feed ;
 
 CHLOE: write-atom drop write-atom-feeds ;
 
@@ -114,23 +121,11 @@ GENERIC: link-attr ( tag responder -- )
 M: object link-attr 2drop ;
 
 : link-attrs ( tag -- )
+    #! Side-effects current namespace.
     '[ , _ link-attr ] each-responder ;
 
 : a-start-tag ( tag -- )
-    [
-        <a
-            dup link-attrs
-            dup "value" optional-attr [ value f ] [
-                [ "href" required-attr ]
-                [ "query" optional-attr parse-query-attr ]
-                bi
-            ] ?if
-            <url>
-                swap >>query
-                swap >>path
-            adjust-url relative-to-request =href
-        a>
-    ] with-scope ;
+    [ <a [ link-attrs ] [ a-url =href ] bi a> ] with-scope ;
 
 CHLOE: a
     [ a-start-tag ]
@@ -158,11 +153,12 @@ CHLOE: a
     [
         [
             <form
-                "POST" =method
-                [ link-attrs ]
-                [ "action" required-attr resolve-base-path =action ]
-                [ tag-attrs non-chloe-attrs-only print-attrs ]
-                tri
+                {
+                    [ link-attrs ]
+                    [ "method" optional-attr "post" or =method ]
+                    [ "action" required-attr resolve-base-path =action ]
+                    [ tag-attrs non-chloe-attrs-only print-attrs ]
+                } cleave
             form>
         ]
         [ form-magic ] bi

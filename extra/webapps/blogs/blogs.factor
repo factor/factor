@@ -1,24 +1,33 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences sorting math.order math.parser
-urls validators html.components db.types db.tuples calendar
-http.server.dispatchers
-furnace furnace.actions furnace.auth.login furnace.boilerplate
-furnace.sessions furnace.syndication ;
+urls validators html.components db db.types db.tuples calendar
+present http.server.dispatchers
+furnace
+furnace.actions
+furnace.auth
+furnace.auth.login
+furnace.boilerplate
+furnace.sessions
+furnace.syndication ;
 IN: webapps.blogs
 
 TUPLE: blogs < dispatcher ;
 
+SYMBOL: can-administer-blogs?
+
+can-administer-blogs? define-capability
+
 : view-post-url ( id -- url )
-    number>string "$blogs/post/" prepend >url ;
+    present "$blogs/post/" prepend >url ;
 
 : view-comment-url ( parent id -- url )
     [ view-post-url ] dip >>anchor ;
 
 : list-posts-url ( -- url )
-    URL" $blogs/" ;
+    "$blogs/" >url ;
 
-: user-posts-url ( author -- url )
+: posts-by-url ( author -- url )
     "$blogs/by/" prepend >url ;
 
 TUPLE: entity id author date content ;
@@ -39,7 +48,7 @@ M: entity feed-entry-date date>> ;
 TUPLE: post < entity title comments ;
 
 M: post feed-entry-title
-    [ author>> ] [ drop ": " ] [ title>> ] tri 3append ;
+    [ author>> ] [ title>> ] bi ": " swap 3append ;
 
 M: post entity-url
     id>> view-post-url ;
@@ -79,19 +88,16 @@ M: comment entity-url
     [ [ date>> ] compare invert-comparison ] sort ;
 
 : validate-author ( -- )
-    { { "author" [ [ v-username ] v-optional ] } } validate-params ;
+    { { "author" [ v-username ] } } validate-params ;
 
 : list-posts ( -- posts )
     f <post> "author" value >>author
-    select-tuples [ dup id>> f <comment> count-tuples >>comments ] map
+    select-tuples [ dup id>> f <comment> f count-tuples >>comments ] map
     reverse-chronological-order ;
 
 : <list-posts-action> ( -- action )
     <page-action>
-        [
-            list-posts "posts" set-value
-        ] >>init
-
+        [ list-posts "posts" set-value ] >>init
         { blogs "list-posts" } >>template ;
 
 : <list-posts-feed-action> ( -- action )
@@ -100,21 +106,24 @@ M: comment entity-url
         [ list-posts ] >>entries
         [ list-posts-url ] >>url ;
 
-: <user-posts-action> ( -- action )
+: <posts-by-action> ( -- action )
     <page-action>
+
         "author" >>rest
+
         [
             validate-author
             list-posts "posts" set-value
         ] >>init
-        { blogs "user-posts" } >>template ;
 
-: <user-posts-feed-action> ( -- action )
+        { blogs "posts-by" } >>template ;
+
+: <posts-by-feed-action> ( -- action )
     <feed-action>
         [ validate-author ] >>init
         [ "Recent Posts by " "author" value append ] >>title
         [ list-posts ] >>entries
-        [ "author" value user-posts-url ] >>url ;
+        [ "author" value posts-by-url ] >>url ;
 
 : <post-feed-action> ( -- action )
     <feed-action>
@@ -125,6 +134,7 @@ M: comment entity-url
 
 : <view-post-action> ( -- action )
     <page-action>
+
         "id" >>rest
 
         [
@@ -147,6 +157,7 @@ M: comment entity-url
 
 : <new-post-action> ( -- action )
     <page-action>
+
         [
             validate-post
             uid "author" set-value
@@ -160,38 +171,76 @@ M: comment entity-url
             [ insert-tuple ] [ entity-url <redirect> ] bi
         ] >>submit
 
-        { blogs "new-post" } >>template ;
+        { blogs "new-post" } >>template
+
+     <protected>
+        "make a new blog post" >>description ;
+
+: authorize-author ( author -- )
+    uid = can-administer-blogs? have-capability? or
+    [ login-required ] unless ;
+
+: do-post-action ( -- )
+    validate-integer-id
+    "id" value <post> select-tuple from-object ;
 
 : <edit-post-action> ( -- action )
     <page-action>
-        [
-            validate-integer-id
-            "id" value <post> select-tuple from-object
-        ] >>init
+
+        "id" >>rest
+
+        [ do-post-action ] >>init
+
+        [ do-post-action validate-post ] >>validate
+
+        [ "author" value authorize-author ] >>authorize
 
         [
-            validate-integer-id
-            validate-post
-        ] >>validate
-
-        [
-            "id" value <post> select-tuple
-                dup { "title" "content" } deposit-slots
+            "id" value <post>
+            dup { "title" "author" "date" "content" } deposit-slots
             [ update-tuple ] [ entity-url <redirect> ] bi
         ] >>submit
 
-        { blogs "edit-post" } >>template ;
-    
+        { blogs "edit-post" } >>template
+
+    <protected>
+        "edit a blog post" >>description ;
+
+: delete-post ( id -- )
+    [ <post> delete-tuples ] [ f <comment> delete-tuples ] bi ;
+
 : <delete-post-action> ( -- action )
     <action>
+
+        [ do-post-action ] >>validate
+
+        [ "author" value authorize-author ] >>authorize
+
         [
-            validate-integer-id
-            { { "author" [ v-username ] } } validate-params
-        ] >>validate
+            [ "id" value delete-post ] with-transaction
+            "author" value posts-by-url <redirect>
+        ] >>submit
+
+     <protected>
+        "delete a blog post" >>description ;
+
+: <delete-author-action> ( -- action )
+    <action>
+
+        [ validate-author ] >>validate
+
+        [ "author" value authorize-author ] >>authorize
+
         [
-            "id" value <post> delete-tuples
-            "author" value user-posts-url <redirect>
-        ] >>submit ;
+            [
+                f <post> "author" value >>author select-tuples [ id>> delete-post ] each
+                f f <comment> "author" value >>author delete-tuples
+            ] with-transaction
+            "author" value posts-by-url <redirect>
+        ] >>submit
+
+     <protected>
+        "delete a blog post" >>description ;
 
 : validate-comment ( -- )
     {
@@ -213,41 +262,44 @@ M: comment entity-url
                 uid >>author
                 now >>date
             [ insert-tuple ] [ entity-url <redirect> ] bi
-        ] >>submit ;
-    
+        ] >>submit
+
+     <protected>
+        "make a comment" >>description ;
+
 : <delete-comment-action> ( -- action )
     <action>
+
         [
             validate-integer-id
             { { "parent" [ v-integer ] } } validate-params
         ] >>validate
+
+        [
+            "parent" value <post> select-tuple
+            author>> authorize-author
+        ] >>authorize
+
         [
             f "id" value <comment> delete-tuples
             "parent" value view-post-url <redirect>
-        ] >>submit ;
-    
+        ] >>submit
+
+        <protected>
+            "delete a comment" >>description ;
+
 : <blogs> ( -- dispatcher )
     blogs new-dispatcher
         <list-posts-action> "" add-responder
         <list-posts-feed-action> "posts.atom" add-responder
-        <user-posts-action> "by" add-responder
-        <user-posts-feed-action> "by.atom" add-responder
+        <posts-by-action> "by" add-responder
+        <posts-by-feed-action> "by.atom" add-responder
         <view-post-action> "post" add-responder
         <post-feed-action> "post.atom" add-responder
-        <new-post-action> <protected>
-            "make a new blog post" >>description
-            "new-post" add-responder
-        <edit-post-action> <protected>
-            "edit a blog post" >>description
-            "edit-post" add-responder
-        <delete-post-action> <protected>
-            "delete a blog post" >>description
-            "delete-post" add-responder
-        <new-comment-action> <protected>
-            "make a comment" >>description
-            "new-comment" add-responder
-        <delete-comment-action> <protected>
-            "delete a comment" >>description
-            "delete-comment" add-responder
+        <new-post-action> "new-post" add-responder
+        <edit-post-action> "edit-post" add-responder
+        <delete-post-action> "delete-post" add-responder
+        <new-comment-action> "new-comment" add-responder
+        <delete-comment-action> "delete-comment" add-responder
     <boilerplate>
         { blogs "blogs-common" } >>template ;

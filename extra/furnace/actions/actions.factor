@@ -29,14 +29,10 @@ SYMBOL: rest
 
 CHLOE: validation-messages drop render-validation-messages ;
 
-TUPLE: action rest init display validate submit ;
+TUPLE: action rest authorize init display validate submit ;
 
 : new-action ( class -- action )
-    new
-        [ ] >>init
-        [ <400> ] >>display
-        [ ] >>validate
-        [ <400> ] >>submit ;
+    new [ ] >>init [ ] >>validate [ ] >>authorize ; inline
 
 : <action> ( -- action )
     action new-action ;
@@ -46,18 +42,28 @@ TUPLE: action rest init display validate submit ;
 
 : handle-get ( action -- response )
     '[
-        ,
-        [ init>> call ]
-        [ drop flashed-variables restore-flash ]
-        [ display>> call ]
-        tri
+        , dup display>> [
+            {
+                [ init>> call ]
+                [ authorize>> call ]
+                [ drop flashed-variables restore-flash ]
+                [ display>> call ]
+            } cleave
+        ] [ drop <400> ] if
     ] with-exit-continuation ;
 
 : validation-failed ( -- * )
     request get method>> "POST" = [ f ] [ <400> ] if exit-with ;
 
 : (handle-post) ( action -- response )
-    [ validate>> call ] [ submit>> call ] bi ;
+    '[
+        , dup submit>> [
+            [ validate>> call ]
+            [ authorize>> call ]
+            [ submit>> call ]
+            tri
+        ] [ drop <400> ] if
+    ] with-exit-continuation ;
 
 : param ( name -- value )
     params get at ;
