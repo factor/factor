@@ -66,32 +66,6 @@ MACRO: napply ( n -- )
 : short-circuit ( quots quot default -- quot )
     1quotation -rot { } map>assoc <reversed> alist>quot ;
 
-! MACRO: && ( quots -- ? )
-!     [ [ not ] append [ f ] ] t short-circuit ;
-
-! MACRO: <-&& ( quots -- )
-!     [ [ dup ] prepend [ not ] append [ f ] ] t short-circuit
-!     [ nip ] append ;
-
-! MACRO: <--&& ( quots -- )
-!     [ [ 2dup ] prepend [ not ] append [ f ] ] t short-circuit
-!     [ 2nip ] append ;
-
-! or
-
-! MACRO: || ( quots -- ? ) [ [ t ] ] f short-circuit ;
-
-! MACRO: 0|| ( quots -- ? ) [ [ t ] ] f short-circuit ;
-
-! MACRO: 1|| ( quots -- ? )
-!   [ [ dup ] prepend [ t ] ] f short-circuit [ nip ] append ;
-
-! MACRO: 2|| ( quots -- ? )
-!   [ [ 2dup ] prepend [ t ] ] f short-circuit [ 2nip ] append ;
-
-! MACRO: 3|| ( quots -- ? )
-!   [ [ 3dup ] prepend [ t ] ] f short-circuit [ 3nip ] append ;
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 MACRO: 0&& ( quots -- quot )
