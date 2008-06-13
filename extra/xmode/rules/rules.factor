@@ -42,7 +42,7 @@ MEMO: standard-rule-set ( id -- ruleset )
     rule-set-imports push ;
 
 : inverted-index ( hashes key index -- )
-    [ swapd [ ?push ] change-at ] 2curry each ;
+    [ swapd push-at ] 2curry each ;
 
 : ?push-all ( seq1 seq2 -- seq1+seq2 )
     [
