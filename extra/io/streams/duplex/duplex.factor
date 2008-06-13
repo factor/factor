@@ -5,9 +5,6 @@ io.encodings.private io.timeouts debugger inspector listener
 accessors delegate delegate.protocols ;
 IN: io.streams.duplex
 
-! We ensure that the stream can only be closed once, to preserve
-! integrity of duplex I/O ports.
-
 TUPLE: duplex-stream in out ;
 
 C: <duplex-stream> duplex-stream

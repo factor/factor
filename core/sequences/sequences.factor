@@ -361,6 +361,12 @@ PRIVATE>
 : map ( seq quot -- newseq )
     over map-as ; inline
 
+: replicate ( seq quot -- newseq )
+    [ drop ] prepose map ; inline
+
+: replicate-as ( seq quot exemplar -- newseq )
+    >r [ drop ] prepose r> map-as ; inline
+
 : change-each ( seq quot -- )
     over map-into ; inline
 

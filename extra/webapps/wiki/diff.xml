@@ -8,13 +8,13 @@
 		<tr>
 			<th class="field-label">Old revision:</th>
 			<t:bind t:name="old">
-				<td>Created on <t:label t:name="date" /> by <t:a t:href="user-edits" t:query="author"><t:label t:name="author" /></t:a>.</td>
+				<td>Created on <t:label t:name="date" /> by <t:a t:href="user-edits" t:rest="author"><t:label t:name="author" /></t:a>.</td>
 			</t:bind>
 		</tr>
 		<tr>
 			<th class="field-label">New revision:</th>
 			<t:bind t:name="old">
-				<td>Created on <t:label t:name="date" /> by <t:a t:href="user-edits" t:query="author"><t:label t:name="author" /></t:a>.</td>
+				<td>Created on <t:label t:name="date" /> by <t:a t:href="user-edits" t:rest="author"><t:label t:name="author" /></t:a>.</td>
 			</t:bind>
 		</tr>
 	</table>

@@ -58,8 +58,7 @@ ducet insert-helpers
     HEX: 7FFF bitand HEX: 8000 bitor 0 0 f weight boa ;
 
 : illegal? ( char -- ? )
-    [ "Noncharacter_Code_Point" property? ]
-    [ category "Cs" = ] or? ;
+    { [ "Noncharacter_Code_Point" property? ] [ category "Cs" = ] } 1|| ;
 
 : derive-weight ( char -- weights )
     first dup illegal?

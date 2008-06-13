@@ -7,7 +7,7 @@ IN: http.tests
 : lf>crlf "\n" split "\r\n" join ;
 
 STRING: read-request-test-1
-POST http://foo/bar HTTP/1.1
+POST /bar HTTP/1.1
 Some-Header: 1
 Some-Header: 2
 Content-Length: 4
@@ -18,7 +18,7 @@ blah
 
 [
     TUPLE{ request
-        url: TUPLE{ url protocol: "http" port: 80 path: "/bar" }
+        url: TUPLE{ url path: "/bar" }
         method: "POST"
         version: "1.1"
         header: H{ { "some-header" "1; 2" } { "content-length" "4" } { "content-type" "application/octet-stream" } }
@@ -49,14 +49,14 @@ read-request-test-1' 1array [
 ] unit-test
 
 STRING: read-request-test-2
-HEAD  http://foo/bar   HTTP/1.1
+HEAD  /bar   HTTP/1.1
 Host: www.sex.com
 
 ;
 
 [
     TUPLE{ request
-        url: TUPLE{ url protocol: "http" port: 80 host: "www.sex.com" path: "/bar" }
+        url: TUPLE{ url host: "www.sex.com" path: "/bar" }
         method: "HEAD"
         version: "1.1"
         header: H{ { "host" "www.sex.com" } }

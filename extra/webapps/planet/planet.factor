@@ -18,6 +18,10 @@ IN: webapps.planet
 
 TUPLE: planet-factor < dispatcher ;
 
+SYMBOL: can-administer-planet-factor?
+
+can-administer-planet-factor? define-capability
+
 TUPLE: planet-factor-admin < dispatcher ;
 
 TUPLE: blog id name www-url feed-url ;
@@ -30,8 +34,8 @@ blog "BLOGS"
 {
     { "id" "ID" INTEGER +db-assigned-id+ }
     { "name" "NAME" { VARCHAR 256 } +not-null+ }
-    { "www-url" "WWWURL" { VARCHAR 256 } +not-null+ }
-    { "feed-url" "FEEDURL" { VARCHAR 256 } +not-null+ }
+    { "www-url" "WWWURL" URL +not-null+ }
+    { "feed-url" "FEEDURL" URL +not-null+ }
 } define-persistent
 
 TUPLE: posting < entry id ;
@@ -40,7 +44,7 @@ posting "POSTINGS"
 {
     { "id" "ID" INTEGER +db-assigned-id+ }
     { "title" "TITLE" { VARCHAR 256 } +not-null+ }
-    { "url" "LINK" { VARCHAR 256 } +not-null+ }
+    { "url" "LINK" URL +not-null+ }
     { "description" "DESCRIPTION" TEXT +not-null+ }
     { "date" "DATE" TIMESTAMP +not-null+ }
 } define-persistent
@@ -134,6 +138,7 @@ posting "POSTINGS"
 
 : <new-blog-action> ( -- action )
     <page-action>
+
         { planet-factor "new-blog" } >>template
 
         [ validate-blog ] >>validate
@@ -150,9 +155,10 @@ posting "POSTINGS"
             ]
             tri
         ] >>submit ;
-    
+
 : <edit-blog-action> ( -- action )
     <page-action>
+
         [
             validate-integer-id
             "id" value <blog> select-tuple from-object
@@ -184,20 +190,16 @@ posting "POSTINGS"
         <update-action> "update" add-responder
         <new-blog-action> "new-blog" add-responder
         <edit-blog-action> "edit-blog" add-responder
-        <delete-blog-action> "delete-blog" add-responder ;
-
-SYMBOL: can-administer-planet-factor?
-
-can-administer-planet-factor? define-capability
+        <delete-blog-action> "delete-blog" add-responder
+    <protected>
+        "administer Planet Factor" >>description
+        { can-administer-planet-factor? } >>capabilities ;
 
 : <planet-factor> ( -- responder )
     planet-factor new-dispatcher
         <planet-action> "list" add-main-responder
         <planet-feed-action> "feed.xml" add-responder
-        <planet-factor-admin> <protected>
-            "administer Planet Factor" >>description
-            { can-administer-planet-factor? } >>capabilities
-        "admin" add-responder
+        <planet-factor-admin> "admin" add-responder
     <boilerplate>
         { planet-factor "planet-common" } >>template ;
 

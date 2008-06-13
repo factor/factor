@@ -4,7 +4,7 @@ USING: io io.sockets io.sockets.secure io.files
 io.streams.duplex logging continuations destructors kernel math
 math.parser namespaces parser sequences strings prettyprint
 debugger quotations calendar threads concurrency.combinators
-assocs fry ;
+assocs fry accessors ;
 IN: io.server
 
 SYMBOL: servers
@@ -15,9 +15,10 @@ SYMBOL: remote-address
 
 LOG: accepted-connection NOTICE
 
-: with-connection ( client remote quot -- )
+: with-connection ( client remote local quot -- )
     '[
         , [ remote-address set ] [ accepted-connection ] bi
+        , local-address set
         @
     ] with-stream ; inline
 
@@ -25,7 +26,8 @@ LOG: accepted-connection NOTICE
 
 : accept-loop ( server quot -- )
     [
-        >r accept r> '[ , , , with-connection ] "Client" spawn drop
+        [ [ accept ] [ addr>> ] bi ] dip
+        '[ , , , , with-connection ] "Client" spawn drop
     ] 2keep accept-loop ; inline
 
 : server-loop ( addrspec encoding quot -- )
@@ -59,7 +61,7 @@ LOG: received-datagram NOTICE
 
 : datagram-loop ( quot datagram -- )
     [
-        [ receive dup received-datagram >r swap call r> ] keep
+        [ receive dup received-datagram [ swap call ] dip ] keep
         pick [ send ] [ 3drop ] if
     ] 2keep datagram-loop ; inline
 

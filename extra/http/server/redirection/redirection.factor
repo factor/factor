@@ -1,10 +1,14 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors combinators namespaces
+USING: kernel accessors combinators namespaces strings
 logging urls http http.server http.server.responses ;
 IN: http.server.redirection
 
-: relative-to-request ( url -- url' )
+GENERIC: relative-to-request ( url -- url' )
+
+M: string relative-to-request ;
+
+M: url relative-to-request
     request get url>>
         clone
         f >>query

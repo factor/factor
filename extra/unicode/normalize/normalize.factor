@@ -1,5 +1,5 @@
 USING: sequences namespaces unicode.data kernel math arrays
-locals combinators.lib sequences.lib combinators.lib ;
+locals combinators.lib sorting.insertion combinators.lib ;
 IN: unicode.normalize
 
 ! Conjoining Jamo behavior

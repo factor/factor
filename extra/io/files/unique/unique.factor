@@ -15,7 +15,7 @@ IN: io.files.unique
     [ 10 random CHAR: 0 + ] [ random-letter ] if ;
 
 : random-name ( n -- string )
-    [ drop random-ch ] "" map-as ;
+    [ random-ch ] "" replicate-as ;
 
 : unique-length ( -- n ) 10 ; inline
 : unique-retries ( -- n ) 10 ; inline

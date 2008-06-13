@@ -1,8 +1,8 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser generic kernel classes words slots assocs
-sequences arrays vectors definitions prettyprint combinators.lib
-math hashtables sets ;
+sequences arrays vectors definitions prettyprint
+math hashtables sets macros namespaces ;
 IN: delegate
 
 : protocol-words ( protocol -- words )
@@ -23,7 +23,15 @@ M: tuple-class group-words
 
 : consult-method ( word class quot -- )
     [ drop swap first create-method ]
-    [ nip swap first2 swapd [ ndip ] 2curry swap suffix ] 3bi
+    [
+        nip
+        [
+            over second saver %
+            %
+            dup second restorer %
+            first ,
+        ] [ ] make
+    ] 3bi
     define ;
 
 : change-word-prop ( word prop quot -- )

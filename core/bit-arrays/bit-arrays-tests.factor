@@ -38,7 +38,7 @@ IN: bit-arrays.tests
 
 [ t ] [
     100 [
-        drop 100 [ drop 2 random zero? ] map
+        drop 100 [ 2 random zero? ] replicate
         dup >bit-array >array =
     ] all?
 ] unit-test

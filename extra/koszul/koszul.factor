@@ -142,7 +142,7 @@ DEFER: (d)
 
 ! Computing a basis
 : graded ( seq -- seq )
-    dup 0 [ length max ] reduce 1+ [ drop V{ } clone ] map
+    dup 0 [ length max ] reduce 1+ [ V{ } clone ] replicate
     [ dup length pick nth push ] reduce ;
 
 : nth-basis-elt ( generators n -- elt )

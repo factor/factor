@@ -151,7 +151,7 @@ TUPLE: person first-name last-name ;
 
 [ ] [ H{ { "a" H{ { "b" "c" } } } } values set ] unit-test
 
-[ "<form method='POST' action='foo'><input type='hidden' name='__n' value='a'/></form>" ] [
+[ "<form method='post' action='foo'><input type='hidden' name='__n' value='a'/></form>" ] [
     [
         "test10" test-template call-template
     ] run-template

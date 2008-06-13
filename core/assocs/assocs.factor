@@ -150,6 +150,9 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 : value-at ( value assoc -- key/f )
     swap [ = nip ] curry assoc-find 2drop ;
 
+: push-at ( value key assoc -- )
+    [ ?push ] change-at ;
+
 : zip ( keys values -- alist )
     2array flip ; inline
 
