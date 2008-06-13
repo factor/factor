@@ -68,7 +68,7 @@ main-responder global [ <404> <trivial-responder> or ] change-at
             [
                 utf8 [
                     development-mode get
-                    [ http-error. ] [ drop "Response error" throw ] if
+                    [ http-error. ] [ drop "Response error" rethrow ] if
                 ] with-encoded-output
             ] recover
         ] if

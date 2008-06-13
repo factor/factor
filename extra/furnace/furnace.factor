@@ -102,14 +102,15 @@ SYMBOL: exit-continuation
     [ [ "/" ?tail drop "/" ] dip present 3append ] when* ;
 
 : a-url ( tag -- url )
-    dup "value" optional-attr [ ] [
+    dup "value" optional-attr
+    [ value ] [
         <url>
             swap
             [ a-url-path >>path ]
             [ "query" optional-attr parse-query-attr >>query ]
             bi
-    ] ?if
-    adjust-url relative-to-request ;
+        adjust-url relative-to-request
+    ] ?if ;
 
 CHLOE: atom [ children>string ] [ a-url ] bi add-atom-feed ;
 

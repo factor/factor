@@ -31,6 +31,10 @@ IN: webapps.wiki
 
 TUPLE: wiki < dispatcher ;
 
+SYMBOL: can-delete-wiki-articles?
+
+can-delete-wiki-articles? define-capability
+
 TUPLE: article title revision ;
 
 article "ARTICLES" {
@@ -81,10 +85,13 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <view-article-action> ( -- action )
     <action>
+
         "title" >>rest
+
         [
             validate-title
         ] >>init
+
         [
             "title" value dup <article> select-tuple [
                 revision>> <revision> select-tuple from-object
@@ -96,13 +103,16 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <view-revision-action> ( -- action )
     <page-action>
+
         "id" >>rest
+
         [
             validate-integer-id
             "id" value <revision>
             select-tuple from-object
             URL" $wiki/view/" adjust-url present relative-link-prefix set
         ] >>init
+
         { wiki "view" } >>template ;
 
 : add-revision ( revision -- )
@@ -117,14 +127,18 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <edit-article-action> ( -- action )
     <page-action>
+
         "title" >>rest
+
         [
             validate-title
             "title" value <article> select-tuple [
                 revision>> <revision> select-tuple from-object
             ] when*
         ] >>init
+
         { wiki "edit" } >>template
+
         [
             validate-title
             { { "content" [ v-required ] } } validate-params
@@ -135,7 +149,10 @@ M: revision feed-entry-url id>> revision-url ;
                 logged-in-user get username>> >>author
                 "content" value >>content
             [ add-revision ] [ title>> view-url <redirect> ] bi
-        ] >>submit ;
+        ] >>submit
+
+    <protected>
+        "edit wiki articles" >>description ;
 
 : list-revisions ( -- seq )
     f <revision> "title" value >>title select-tuples
@@ -143,24 +160,34 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <list-revisions-action> ( -- action )
     <page-action>
+
         "title" >>rest
+
         [
             validate-title
             list-revisions "revisions" set-value
         ] >>init
+
         { wiki "revisions" } >>template ;
 
 : <list-revisions-feed-action> ( -- action )
     <feed-action>
+
         "title" >>rest
+
         [ validate-title ] >>init
+
         [ "Revisions of " "title" value append ] >>title
+
         [ "title" value revisions-url ] >>url
+
         [ list-revisions ] >>entries ;
 
 : <rollback-action> ( -- action )
     <action>
+
         [ validate-integer-id ] >>validate
+
         [
             "id" value <revision> select-tuple clone f >>id
             [ add-revision ] [ title>> view-url <redirect> ] bi
@@ -183,12 +210,18 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <delete-action> ( -- action )
     <action>
+
         [ validate-title ] >>validate
+
         [
             "title" value <article> delete-tuples
             f <revision> "title" value >>title delete-tuples
             URL" $wiki" <redirect>
-        ] >>submit ;
+        ] >>submit
+
+     <protected>
+        "delete wiki articles" >>description
+        { can-delete-wiki-articles? } >>capabilities ;
 
 : <diff-action> ( -- action )
     <page-action>
@@ -207,15 +240,18 @@ M: revision feed-entry-url id>> revision-url ;
             [ [ content>> string-lines ] bi@ diff "diff" set-value ]
             2bi
         ] >>init
+
         { wiki "diff" } >>template ;
 
 : <list-articles-action> ( -- action )
     <page-action>
+
         [
             f <article> select-tuples
             [ [ title>> ] compare ] sort
             "articles" set-value
         ] >>init
+
         { wiki "articles" } >>template ;
 
 : list-user-edits ( -- seq )
@@ -224,11 +260,14 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <user-edits-action> ( -- action )
     <page-action>
+
         "author" >>rest
+
         [
             validate-author
             list-user-edits "user-edits" set-value
         ] >>init
+
         { wiki "user-edits" } >>template ;
 
 : <user-edits-feed-action> ( -- action )
@@ -238,10 +277,6 @@ M: revision feed-entry-url id>> revision-url ;
         [ "Edits by " "author" value append ] >>title
         [ "author" value user-edits-url ] >>url
         [ list-user-edits ] >>entries ;
-
-SYMBOL: can-delete-wiki-articles?
-
-can-delete-wiki-articles? define-capability
 
 : <article-boilerplate> ( responder -- responder' )
     <boilerplate>
@@ -255,18 +290,13 @@ can-delete-wiki-articles? define-capability
         <list-revisions-action> <article-boilerplate> "revisions" add-responder
         <list-revisions-feed-action> "revisions.atom" add-responder
         <diff-action> <article-boilerplate> "diff" add-responder
-        <edit-article-action> <article-boilerplate> <protected>
-            "edit wiki articles" >>description
-            "edit" add-responder
+        <edit-article-action> <article-boilerplate> "edit" add-responder
         <rollback-action> "rollback" add-responder
         <user-edits-action> "user-edits" add-responder
         <list-articles-action> "articles" add-responder
         <list-changes-action> "changes" add-responder
         <user-edits-feed-action> "user-edits.atom" add-responder
         <list-changes-feed-action> "changes.atom" add-responder
-        <delete-action> <protected>
-            "delete wiki articles" >>description
-            { can-delete-wiki-articles? } >>capabilities
-        "delete" add-responder
+        <delete-action> "delete" add-responder
     <boilerplate>
         { wiki "wiki-common" } >>template ;

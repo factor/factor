@@ -33,7 +33,7 @@
 		<hr/>
 
 		<p class="comment-header">
-			Comment by <t:label t:name="author" /> on <t:label t:name="date" />:
+			<a name="@id">Comment by <t:label t:name="author" /> on <t:label t:name="date" />:</a>
 		</p>
 
 		<p class="posting-body">
