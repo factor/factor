@@ -195,3 +195,12 @@ M: db <count-statement> ( tuple class groups -- statement )
     ] { { } { } { } } nmake
     >r >r parse-sql 4drop r> r>
     <simple-statement> maybe-make-retryable do-select ;
+
+: create-index ( index-name table-name columns -- )
+    [
+        >r >r "create index " % % r> " on " % % r> "(" %
+        "," join % ")" %
+    ] "" make sql-command ;
+
+: drop-index ( index-name -- )
+    [ "drop index " % % ] "" make sql-command ;
