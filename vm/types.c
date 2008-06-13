@@ -283,19 +283,6 @@ DEFINE_PRIMITIVE(resize_byte_array)
 	dpush(tag_object(reallot_byte_array(array,capacity)));
 }
 
-F_BYTE_ARRAY *growable_byte_array_add(F_BYTE_ARRAY *result, CELL elt, CELL *result_count)
-{
-	if(*result_count == byte_array_capacity(result))
-	{
-		result = reallot_byte_array(result,*result_count * 2);
-	}
-
-	bput(BREF(result,*result_count),elt);
-	*result_count++;
-
-	return result;
-}
-
 F_BYTE_ARRAY *growable_byte_array_append(F_BYTE_ARRAY *result, void *elts, CELL len, CELL *result_count)
 {
 	CELL new_size = *result_count + len;

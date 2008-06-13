@@ -41,6 +41,13 @@ PRIVATE>
         [ second ] map { "None" } diff
     ] map ;
 
+: more-aliases ( -- assoc )
+    H{
+        { "UTF8" utf8 }
+        { "utf8" utf8 }
+        { "utf-8" utf8 }
+    } ;
+
 : make-n>e ( stream -- n>e )
     parse-iana [ [
         dup [
@@ -48,7 +55,7 @@ PRIVATE>
             [ swap [ set ] with each ]
             [ drop ] if*
         ] with each
-    ] each ] H{ } make-assoc ;
+    ] each ] H{ } make-assoc more-aliases assoc-union ;
 PRIVATE>
 
 "resource:extra/io/encodings/iana/character-sets"

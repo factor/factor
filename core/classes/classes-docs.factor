@@ -68,7 +68,10 @@ HELP: tuple-class
 { $examples { $example "USING: classes prettyprint ;" "IN: scratchpad" "TUPLE: name title first last ;" "name tuple-class? ." "t" } } ;
 
 HELP: update-map
-{ $var-description "Hashtable mapping each class to a set of classes defined in terms of this class. The " { $link define-class } " word uses this information to update generic words when classes are redefined." } ;
+{ $var-description "Assoc mapping each class to a set of classes defined in terms of this class. The " { $link define-class } " word uses this information to update generic words when classes are redefined." } ;
+
+! HELP: implementors-map
+! { $var-description "Assoc mapping each class to a set of generic words defining methods on this class." } ;
 
 HELP: predicate-word
 { $values { "word" "a word" } { "predicate" "a predicate word" } }

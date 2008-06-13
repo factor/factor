@@ -7,6 +7,7 @@ strings vectors hashtables quotations arrays byte-arrays
 math.parser calendar calendar.format present
 
 io io.server io.sockets.secure
+io.encodings.iana io.encodings.binary io.encodings.8-bit
 
 unicode.case unicode.categories qualified
 
@@ -28,7 +29,8 @@ IN: http
         "header" get
         add-header
     ] [
-        ": " split1 dup [
+        ":" split1 dup [
+            [ blank? ] left-trim
             swap >lower dup "last-header" set
             "header" get add-header
         ] [
@@ -36,20 +38,20 @@ IN: http
         ] if
     ] if ;
 
-: read-lf ( -- string )
+: read-lf ( -- bytes )
     "\n" read-until CHAR: \n assert= ;
 
-: read-crlf ( -- string )
+: read-crlf ( -- bytes )
     "\r" read-until
     [ CHAR: \r assert= read1 CHAR: \n assert= ] when* ;
 
-: read-header-line ( -- )
+: (read-header) ( -- )
     read-crlf dup
-    empty? [ drop ] [ header-line read-header-line ] if ;
+    empty? [ drop ] [ header-line (read-header) ] if ;
 
 : read-header ( -- assoc )
     H{ } clone [
-        "header" [ read-header-line ] with-variable
+        "header" [ (read-header) ] with-variable
     ] keep ;
 
 : header-value>string ( value -- string )
@@ -66,7 +68,8 @@ IN: http
 
 : write-header ( assoc -- )
     >alist sort-keys [
-        swap url-encode write ": " write
+        swap
+        check-header-string write ": " write
         header-value>string check-header-string write crlf
     ] assoc-each crlf ;
 
@@ -299,6 +302,7 @@ body ;
         H{ } clone >>header
         "close" "connection" set-header
         now timestamp>http-string "date" set-header
+        latin1 >>content-charset
         V{ } clone >>cookies ;
 
 : read-response-version ( response -- response )
@@ -319,7 +323,9 @@ body ;
     read-header >>header
     dup "set-cookie" header parse-cookies >>cookies
     dup "content-type" header [
-        parse-content-type [ >>content-type ] [ >>content-charset ] bi*
+        parse-content-type
+        [ >>content-type ]
+        [ name>encoding binary or >>content-charset ] bi*
     ] when* ;
 
 : read-response ( -- response )
@@ -341,7 +347,8 @@ body ;
 
 : unparse-content-type ( request -- content-type )
     [ content-type>> "application/octet-stream" or ]
-    [ content-charset>> ] bi
+    [ content-charset>> encoding>name ]
+    bi
     [ "; charset=" swap 3append ] when* ;
 
 : write-response-header ( response -- response )

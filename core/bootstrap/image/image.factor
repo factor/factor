@@ -397,7 +397,7 @@ M: quotation '
     [
         {
             dictionary source-files builtins
-            update-map class<=-cache
+            update-map implementors-map class<=-cache
             class-not-cache classes-intersect-cache class-and-cache
             class-or-cache
         } [ dup get swap bootstrap-word set ] each

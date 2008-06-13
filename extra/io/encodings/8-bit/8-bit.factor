@@ -73,6 +73,13 @@ M: 8-bit decode-char
 : define-8-bit-encoding ( name stream -- )
     >r in get create r> parse-file make-8-bit ;
 
+PREDICATE: 8-bit-encoding < word
+    word-def dup length 1 = [ first 8-bit? ] [ drop f ] if ;
+
+M: 8-bit-encoding <encoder> word-def first <encoder> ;
+
+M: 8-bit-encoding <decoder> word-def first <decoder> ;
+
 PRIVATE>
 
 [

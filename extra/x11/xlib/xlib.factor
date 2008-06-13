@@ -1354,8 +1354,6 @@ FUNCTION: Bool XSupportsLocale ( ) ;
 
 FUNCTION: char* XSetLocaleModifiers ( char* modifier_list ) ;
 
-FUNCTION: int XBell ( Display* dpy, int percent ) ;
-
 SYMBOL: dpy
 SYMBOL: scr
 SYMBOL: root

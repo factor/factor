@@ -95,10 +95,8 @@ SYMBOL: +editable+
 : describe ( obj -- ) H{ } describe* ;
 
 : namestack. ( seq -- )
-    [
-        [ global eq? not ] filter
-        [ keys ] map concat prune
-    ] keep [ dupd assoc-stack ] curry H{ } map>assoc describe ;
+    [ [ global eq? not ] filter [ keys ] gather ] keep
+    [ dupd assoc-stack ] curry H{ } map>assoc describe ;
 
 : .vars ( -- )
     namestack namestack. ;

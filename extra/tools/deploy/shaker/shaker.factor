@@ -150,6 +150,7 @@ IN: tools.deploy.shaker
                 classes:class-or-cache
                 classes:class<=-cache
                 classes:classes-intersect-cache
+                classes:implementors-map
                 classes:update-map
                 command-line:main-vocab-hook
                 compiled-crossref

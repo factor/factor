@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions assocs kernel kernel.private
 slots.private namespaces sequences strings words vectors math
-quotations combinators sorting effects graphs vocabs ;
+quotations combinators sorting effects graphs vocabs sets ;
 IN: classes
 
 SYMBOL: class<=-cache
@@ -27,24 +27,24 @@ SYMBOL: class-or-cache
 
 SYMBOL: update-map
 
+SYMBOL: implementors-map
+
 PREDICATE: class < word
     "class" word-prop ;
 
 PREDICATE: tuple-class < class
     "metaclass" word-prop tuple-class eq? ;
 
-: classes ( -- seq ) all-words [ class? ] filter ;
+: classes ( -- seq ) implementors-map get keys ;
 
 : predicate-word ( word -- predicate )
     [ word-name "?" append ] keep word-vocabulary create ;
-
-: predicate-effect T{ effect f 1 { "?" } } ;
 
 PREDICATE: predicate < word "predicating" word-prop >boolean ;
 
 : define-predicate ( class quot -- )
     >r "predicate" word-prop first
-    r> predicate-effect define-declared ;
+    r> (( object -- ? )) define-declared ;
 
 : superclass ( class -- super )
     #! Output f for non-classes to work with algebra code
@@ -67,6 +67,8 @@ GENERIC: reset-class ( class -- )
 
 M: word reset-class drop ;
 
+GENERIC: implementors ( class/classes -- seq )
+
 ! update-map
 : class-uses ( class -- seq )
     [
@@ -87,6 +89,16 @@ M: word reset-class drop ;
 : update-map- ( class -- )
     dup class-uses update-map get remove-vertex ;
 
+M: class implementors implementors-map get at keys ;
+
+M: sequence implementors [ implementors ] gather ;
+
+: implementors-map+ ( class -- )
+    H{ } clone swap implementors-map get set-at ;
+
+: implementors-map- ( class -- )
+    implementors-map get delete-at ;
+
 : make-class-props ( superclass members participants metaclass -- assoc )
     [
         {
@@ -99,7 +111,7 @@ M: word reset-class drop ;
 
 : (define-class) ( word props -- )
     >r
-    dup class? [ dup new-class ] unless
+    dup class? [ dup [ implementors-map+ ] [ new-class ] bi ] unless
     dup reset-class
     dup deferred? [ dup define-symbol ] when
     dup word-props
@@ -138,6 +150,23 @@ GENERIC: update-methods ( class seq -- )
         tuck "predicating" word-prop =
         [ forget ] [ drop ] if
     ] [ 2drop ] if ;
+
+: forget-methods ( class -- )
+    [ implementors ] [ [ swap 2array ] curry ] bi map forget-all ;
+
+: forget-class ( class -- )
+    class-usages [
+        {
+            [ forget-predicate ]
+            [ forget-methods ]
+            [ implementors-map- ]
+            [ update-map- ]
+            [ reset-class ]
+        } cleave
+    ] each ;
+
+M: class forget* ( class -- )
+    [ forget-class ] [ call-next-method ] bi ;
 
 GENERIC: class ( object -- class )
 

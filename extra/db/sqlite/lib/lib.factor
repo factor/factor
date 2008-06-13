@@ -4,7 +4,7 @@ USING: alien.c-types arrays assocs kernel math math.parser
 namespaces sequences db.sqlite.ffi db combinators
 continuations db.types calendar.format serialize
 io.streams.byte-array byte-arrays io.encodings.binary
-io.backend db.errors ;
+io.backend db.errors present urls ;
 IN: db.sqlite.lib
 
 ERROR: sqlite-error < db-error n string ;
@@ -107,6 +107,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
             object>bytes
             sqlite-bind-blob-by-name
         ] }
+        { URL [ present sqlite-bind-text-by-name ] }
         { +db-assigned-id+ [ sqlite-bind-int-by-name ] }
         { +random-id+ [ sqlite-bind-int64-by-name ] }
         { NULL [ sqlite-bind-null-by-name ] }
@@ -147,6 +148,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
         { TIMESTAMP [ sqlite3_column_text dup [ ymdhms>timestamp ] when ] }
         { DATETIME [ sqlite3_column_text dup [ ymdhms>timestamp ] when ] }
         { BLOB [ sqlite-column-blob ] }
+        { URL [ sqlite3_column_text dup [ >url ] when ] }
         { FACTOR-BLOB [
             sqlite-column-blob
             dup [ bytes>object ] when

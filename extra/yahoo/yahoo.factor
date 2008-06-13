@@ -59,4 +59,4 @@ format similar-ok language country site subscription license ;
         swap >>query ;
 
 : search-yahoo ( search -- seq )
-    query http-get string>xml parse-yahoo ;
+    query http-get nip string>xml parse-yahoo ;
