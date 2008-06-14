@@ -200,10 +200,20 @@ M: code render*
     [ string-lines ] [ drop ] [ mode>> value ] tri* htmlize-lines ;
 
 ! Farkup component
-SINGLETON: farkup
+TUPLE: farkup no-follow disable-images ;
+
+: string>boolean ( string -- boolean )
+    {
+        { "true" [ t ] }
+        { "false" [ f ] }
+    } case ;
 
 M: farkup render*
-    2drop string-lines "\n" join convert-farkup write ;
+    [
+        [ no-follow>> [ string>boolean link-no-follow? set ] when* ]
+        [ disable-images>> [ string>boolean disable-images? set ] when* ] bi
+        drop string-lines "\n" join convert-farkup write
+    ] with-scope ;
 
 ! Inspector component
 SINGLETON: inspector
