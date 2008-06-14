@@ -8,8 +8,6 @@ SINGLETON: gvim
 M: gvim vim-command ( file line -- string )
     [ gvim-path , swap , "+" swap number>string append , ] { } make ;
 
-t vim-detach set-global ! don't block the ui
-
 gvim vim-editor set-global
 
 {

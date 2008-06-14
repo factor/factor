@@ -3,7 +3,6 @@ namespaces parser prettyprint sequences editors accessors ;
 IN: editors.vim
 
 SYMBOL: vim-path
-SYMBOL: vim-detach
 
 SYMBOL: vim-editor
 HOOK: vim-command vim-editor ( file line -- array )
@@ -16,10 +15,7 @@ M: vim vim-command
     ] { } make ;
 
 : vim-location ( file line -- )
-    vim-command
-    <process> swap >>command
-    vim-detach get-global [ t >>detached ] when
-    try-process ;
+    vim-command try-process ;
 
 "vim" vim-path set-global
 [ vim-location ] edit-hook set-global
