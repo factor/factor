@@ -5,36 +5,23 @@ random accessors quotations hashtables sequences continuations
 fry calendar combinators destructors alarms
 db db.tuples db.types
 http http.server http.server.dispatchers http.server.filters
-html.elements furnace ;
+html.elements
+furnace furnace.cache ;
 IN: furnace.sessions
 
-TUPLE: session id expires uid namespace changed? ;
+TUPLE: session < server-state uid namespace changed? ;
 
 : <session> ( id -- session )
-    session new
-        swap >>id ;
+    session new-server-state ;
 
 session "SESSIONS"
 {
-    { "id" "ID" +random-id+ system-random-generator }
-    { "expires" "EXPIRES" TIMESTAMP +not-null+ }
     { "uid" "UID" { VARCHAR 255 } }
-    { "namespace" "NAMESPACE" FACTOR-BLOB }
+    { "namespace" "NAMESPACE" FACTOR-BLOB +not-null+ }
 } define-persistent
 
 : get-session ( id -- session )
-    dup [ <session> select-tuple ] when ;
-
-: init-sessions-table ( -- ) session ensure-table ;
-
-: start-expiring-sessions ( db seq -- )
-    '[
-        , , [
-            session new
-                -1.0/0.0 now [a,b] >>expires
-            delete-tuples
-        ] with-db
-    ] 5 minutes every drop ;
+    dup [ session get-state ] when ;
 
 GENERIC: init-session* ( responder -- )
 
@@ -47,9 +34,7 @@ M: filter-responder init-session* responder>> init-session* ;
 TUPLE: sessions < filter-responder timeout domain ;
 
 : <sessions> ( responder -- responder' )
-    sessions new
-        swap >>responder
-        20 minutes >>timeout ;
+    sessions new-server-state-manager ;
 
 : (session-changed) ( session -- )
     t >>changed? drop ;
@@ -78,11 +63,8 @@ TUPLE: sessions < filter-responder timeout domain ;
 : init-session ( session -- )
     session [ sessions get init-session* ] with-variable ;
 
-: cutoff-time ( -- time )
-    sessions get timeout>> from-now ;
-
 : touch-session ( session -- )
-    cutoff-time >>expires drop ;
+    sessions get touch-state ;
 
 : empty-session ( -- session )
     f <session>

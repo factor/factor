@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences assocs io.files io.sockets
 io.server
-namespaces db db.sqlite smtp
+namespaces db db.tuples db.sqlite smtp
 http.server
 http.server.dispatchers
+furnace.alloy
 furnace.db
 furnace.asides
 furnace.flash
@@ -25,24 +26,16 @@ IN: webapps.factor-website
 
 : init-factor-db ( -- )
     test-db [
-        init-users-table
-        init-sessions-table
+        init-furnace-tables
 
-        init-pastes-table
-        init-annotations-table
-
-        init-blog-table
-        init-postings-table
-
-        init-todo-table
-
-        init-articles-table
-        init-revisions-table
-
-        init-postings-table
-        init-comments-table
-
-        init-short-url-table
+        {
+            post comment
+            paste annotation
+            blog posting
+            todo
+            short-url
+            article revision
+        } ensure-tables
     ] with-db ;
 
 TUPLE: factor-website < dispatcher ;
@@ -63,8 +56,7 @@ TUPLE: factor-website < dispatcher ;
         allow-edit-profile
     <boilerplate>
         { factor-website "page" } >>template
-    <asides> <flash-scopes> <sessions>
-    test-db <db-persistence> ;
+    test-db <alloy> ;
 
 : init-factor-website ( -- )
     "factorcode.org" 25 <inet> smtp-server set-global
@@ -75,6 +67,6 @@ TUPLE: factor-website < dispatcher ;
     <factor-website> main-responder set-global ;
 
 : start-factor-website ( -- )
-    test-db start-expiring-sessions
+    test-db start-expiring
     test-db start-update-task
     8812 httpd ;

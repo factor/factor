@@ -28,8 +28,6 @@ todo "TODO"
     { "description" "DESCRIPTION" { VARCHAR 256 } }
 } define-persistent
 
-: init-todo-table ( -- ) todo ensure-table ;
-
 : <todo> ( id -- todo )
     todo new
         swap >>id

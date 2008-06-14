@@ -59,8 +59,6 @@ M: post entity-url
 
 : <post> ( id -- post ) \ post new swap >>id ;
 
-: init-posts-table ( -- ) \ post ensure-table ;
-
 TUPLE: comment < entity parent ;
 
 comment "COMMENTS" {
@@ -77,8 +75,6 @@ M: comment entity-url
     comment new
         swap >>id
         swap >>parent ;
-
-: init-comments-table ( -- ) comment ensure-table ;
 
 : post ( id -- post )
     [ <post> select-tuple ] [ f <comment> select-tuples ] bi

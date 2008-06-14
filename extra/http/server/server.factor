@@ -90,13 +90,13 @@ LOG: httpd-hit NOTICE
 : dispatch-request ( request -- response )
     url>> path>> split-path main-responder get call-responder ;
 
-: prepare-request ( request -- request )
+: prepare-request ( request -- )
     [
         local-address get
         [ secure? "https" "http" ? >>protocol ]
         [ port>> '[ , or ] change-port ]
         bi
-    ] change-url ;
+    ] change-url drop ;
 
 : valid-request? ( request -- ? )
     url>> port>> local-address get port>> = ;

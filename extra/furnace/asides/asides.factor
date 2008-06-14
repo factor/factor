@@ -2,37 +2,60 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors namespaces sequences arrays kernel
 assocs assocs.lib hashtables math.parser urls combinators
-furnace http http.server http.server.filters furnace.sessions
-html.elements html.templates.chloe.syntax ;
+html.elements html.templates.chloe.syntax db.types db.tuples
+http http.server http.server.filters 
+furnace furnace.cache furnace.sessions ;
 IN: furnace.asides
 
-TUPLE: asides < filter-responder ;
+TUPLE: aside < server-state session method url post-data ;
 
-C: <asides> asides
+: <aside> ( id -- aside )
+    aside new-server-state ;
+
+aside "ASIDES"
+{
+    { "session" "SESSION" BIG-INTEGER +not-null+ }
+    { "method" "METHOD" { VARCHAR 10 } +not-null+ }
+    { "url" "URL" URL +not-null+ }
+    { "post-data" "POST_DATA" FACTOR-BLOB }
+} define-persistent
+
+TUPLE: asides < server-state-manager ;
+
+: <asides> ( responder -- responder' )
+    asides new-server-state-manager ;
 
 : begin-aside* ( -- id )
-    request get
-    [ url>> ] [ post-data>> ] [ method>> ] tri 3array
-    asides sget set-at-unique
-    session-changed ;
+    f <aside>
+        session get id>> >>session
+        request get
+        [ method>> >>method ]
+        [ url>> >>url ]
+        [ post-data>> >>post-data ]
+        tri
+    [ asides get touch-state ] [ insert-tuple ] [ id>> ] tri ;
 
-: end-aside-post ( url post-data -- response )
+: end-aside-post ( aside -- response )
     request [
         clone
-            swap >>post-data
-            swap >>url
+            over post-data>> >>post-data
+            over url>> >>url
     ] change
-    request get url>> path>> split-path
+    url>> path>> split-path
     asides get responder>> call-responder ;
 
 ERROR: end-aside-in-get-error ;
 
+: get-aside ( id -- aside )
+    dup [ aside get-state ] when
+    dup [ dup session>> session get id>> = [ drop f ] unless ] when ;
+
 : end-aside* ( url id -- response )
     request get method>> "POST" = [ end-aside-in-get-error ] unless
-    asides sget at [
-        first3 {
-            { "GET" [ drop <redirect> ] }
-            { "HEAD" [ drop <redirect> ] }
+    aside get-state [
+        dup method>> {
+            { "GET" [ url>> <redirect> ] }
+            { "HEAD" [ url>> <redirect> ] }
             { "POST" [ end-aside-post ] }
         } case
     ] [ <redirect> ] ?if ;
@@ -47,13 +70,12 @@ SYMBOL: aside-id
 : end-aside ( default -- response )
     aside-id [ f ] change end-aside* ;
 
+: request-aside-id ( request -- aside-id )
+    aside-id-key swap request-params at string>number ;
+
 M: asides call-responder*
     dup asides set
-    aside-id-key request get request-params at aside-id set
-    call-next-method ;
-
-M: asides init-session*
-    H{ } clone asides sset
+    request get request-aside-id aside-id set
     call-next-method ;
 
 M: asides link-attr ( tag -- )

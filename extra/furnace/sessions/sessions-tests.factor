@@ -3,7 +3,7 @@ USING: tools.test http furnace.sessions
 furnace.actions http.server http.server.responses
 math namespaces kernel accessors
 prettyprint io.streams.string io.files splitting destructors
-sequences db db.sqlite continuations urls math.parser
+sequences db db.tuples db.sqlite continuations urls math.parser
 furnace ;
 
 : with-session
@@ -54,7 +54,7 @@ M: foo call-responder*
 "auth-test.db" temp-file sqlite-db [
 
     <request> init-request
-    init-sessions-table
+    session ensure-table
 
     [ ] [
         <foo> <sessions>
