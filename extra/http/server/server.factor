@@ -78,9 +78,15 @@ main-responder global [ <404> <trivial-responder> or ] change-at
 
 LOG: httpd-hit NOTICE
 
+LOG: httpd-header NOTICE
+
+: log-header ( headers name -- )
+    tuck header 2array httpd-header ;
+
 : log-request ( request -- )
-    [ method>> ] [ url>> [ host>> ] [ path>> ] bi ] bi
-    3array httpd-hit ;
+    [ [ method>> ] [ url>> [ host>> ] [ path>> ] bi ] bi 3array httpd-hit ]
+    [ { "user-agent" "x-forwarded-for" } [ log-header ] with each ]
+    bi ;
 
 : split-path ( string -- path )
     "/" split harvest ;
