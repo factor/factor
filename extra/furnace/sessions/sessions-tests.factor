@@ -65,7 +65,7 @@ M: foo call-responder*
 
     [
         [ ] [
-           empty-session
+            empty-session
                 123 >>id session set
         ] unit-test
 
