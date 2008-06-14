@@ -190,3 +190,8 @@ METHOD: as-mutate { object object assoc }       set-at ;
 ! A note about the 'mutate' qualifier. Other words also technically mutate
 ! their primary object. However, the 'mutate' qualifier is supposed to
 ! indicate that this is the main objective of the word, as a side effect.
+
+: adjoin      ( seq elt -- seq ) over sets:adjoin ;
+: adjoin-on   ( elt seq -- seq )      sets:adjoin ;
+: adjoined    ( set elt -- set ) swap sets:adjoin ;
+: adjoined-on ( elt set --     )      sets:adjoin ;
