@@ -1,11 +1,12 @@
 
-USING: kernel sequences assocs qualified circular ;
+USING: kernel sequences assocs qualified circular sets ;
 
 USING: math multi-methods ;
 
 QUALIFIED: sequences
 QUALIFIED: assocs
 QUALIFIED: circular
+QUALIFIED: sets
 
 IN: newfx
 
