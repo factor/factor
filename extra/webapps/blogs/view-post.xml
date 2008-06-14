@@ -37,7 +37,7 @@
 		</p>
 
 		<p class="posting-body">
-			<t:farkup t:name="content" />
+			<t:farkup t:name="content" t:no-follow="true" t:disable-images="true" />
 		</p>
 		
 		<t:button t:action="$blogs/delete-comment" t:for="id,parent" class="link-button link">Delete Comment</t:button>
