@@ -8,7 +8,7 @@ SYMBOL: vim-detach
 SYMBOL: vim-editor
 HOOK: vim-command vim-editor ( file line -- array )
 
-TUPLE: vim ;
+SINGLETON: vim
 
 M: vim vim-command
     [
@@ -23,4 +23,4 @@ M: vim vim-command
 
 "vim" vim-path set-global
 [ vim-location ] edit-hook set-global
-T{ vim } vim-editor set-global
+vim vim-editor set-global
