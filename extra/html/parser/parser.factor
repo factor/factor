@@ -122,7 +122,7 @@ SYMBOL: tagstack
 : parse-attributes ( -- hashtable )
     [ (parse-attributes) ] { } make >hashtable ;
 
-: (parse-tag)
+: (parse-tag) ( string -- string' hashtable )
     [
         read-token >lower
         parse-attributes
