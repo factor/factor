@@ -156,7 +156,7 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
 [ ] [ "-foo\n-bar" "farkup" set-value ] unit-test
 
 [ "<ul><li>foo</li><li>bar</li></ul>" ] [
-    [ "farkup" farkup render ] with-string-writer
+    [ "farkup" T{ farkup } render ] with-string-writer
 ] unit-test
 
 [ ] [ { 1 2 3 } "object" set-value ] unit-test
