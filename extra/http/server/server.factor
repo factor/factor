@@ -13,7 +13,7 @@ io.encodings.ascii
 io.encodings.binary
 io.streams.limited
 io.timeouts
-fry logging calendar urls
+fry logging logging.insomniac calendar urls
 http
 http.server.responses
 html.elements
@@ -139,5 +139,8 @@ LOG: httpd-hit NOTICE
 
 : httpd-main ( -- )
     8888 httpd ;
+
+: httpd-insomniac ( -- )
+    "http.server" { httpd-hit } schedule-insomniac ;
 
 MAIN: httpd-main
