@@ -16,7 +16,7 @@
 				<tr>
 					<td> <t:a t:href="$wiki/revision" t:rest="id"><t:label t:name="date" /></t:a> </td>
 					<td> <t:a t:href="$wiki/user-edits" t:rest="author"><t:label t:name="author" /></t:a> </td>
-					<td> <t:button t:action="rollback" t:for="id" class="link link-button">Rollback</t:button> </td>
+					<td> <t:button t:action="$wiki/rollback" t:for="id" class="link link-button">Rollback</t:button> </td>
 				</tr>
 			</t:bind-each>
 		</table>
