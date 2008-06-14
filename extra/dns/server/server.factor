@@ -50,9 +50,10 @@ IN: dns.server
 
 : rr->rdata-names ( rr -- names/f )
     {
-      { [ dup type>> NS = ] [ rdata>>            {1} ] }
-      { [ dup type>> MX = ] [ rdata>> exchange>> {1} ] }
-      { [ t ]               [ drop f ] }
+      { [ dup type>> NS    = ] [ rdata>>            {1} ] }
+      { [ dup type>> MX    = ] [ rdata>> exchange>> {1} ] }
+      { [ dup type>> CNAME = ] [ rdata>>            {1} ] }
+      { [ t ]                  [ drop f ] }
     }
   cond ;
 
