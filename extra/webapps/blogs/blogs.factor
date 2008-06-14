@@ -116,6 +116,7 @@ M: comment entity-url
 
 : <posts-by-feed-action> ( -- action )
     <feed-action>
+        "author" >>rest
         [ validate-author ] >>init
         [ "Recent Posts by " "author" value append ] >>title
         [ list-posts ] >>entries
@@ -123,6 +124,7 @@ M: comment entity-url
 
 : <post-feed-action> ( -- action )
     <feed-action>
+        "id" >>rest
         [ validate-integer-id "id" value post "post" set-value ] >>init
         [ "post" value feed-entry-title ] >>title
         [ "post" value entity-url ] >>url
