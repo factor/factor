@@ -51,7 +51,7 @@ ERROR: end-aside-in-get-error ;
     dup [ dup session>> session get id>> = [ drop f ] unless ] when ;
 
 : end-aside* ( url id -- response )
-    request get method>> "POST" = [ end-aside-in-get-error ] unless
+    post-request? [ end-aside-in-get-error ] unless
     aside get-state [
         dup method>> {
             { "GET" [ url>> <redirect> ] }

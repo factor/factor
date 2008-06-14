@@ -135,6 +135,8 @@ PRIVATE>
 
 GENERIC: >url ( obj -- url )
 
+M: f >url drop <url> ;
+
 M: url >url ;
 
 M: string >url

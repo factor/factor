@@ -61,9 +61,7 @@ TUPLE: factor-website < dispatcher ;
 : init-factor-website ( -- )
     "factorcode.org" 25 <inet> smtp-server set-global
     "todo@factorcode.org" lost-password-from set-global
-
     init-factor-db
-
     <factor-website> main-responder set-global ;
 
 : start-factor-website ( -- )

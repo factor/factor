@@ -269,7 +269,7 @@ SYMBOL: a
 ! Test flash scope
 [ "xyz" ] [
     H{ { "a" "xyz" } { "__u" "http://localhost:1237/" } } "session-id" get session-id-key associate assoc-union
-    "http://localhost:1237/" <post-request> "cookies" get >>cookies B http-request nip test-a
+    "http://localhost:1237/" <post-request> "cookies" get >>cookies http-request nip test-a
 ] unit-test
 
 [ 4 ] [ a get-global ] unit-test

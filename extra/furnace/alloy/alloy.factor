@@ -5,12 +5,19 @@ furnace.cache
 furnace.asides
 furnace.flash
 furnace.sessions
+furnace.referrer
 furnace.db
 furnace.auth.providers ;
 IN: furnace.alloy
 
 : <alloy> ( responder db params -- responder' )
-    [ <asides> <flash-scopes> <sessions> ] 2dip <db-persistence> ;
+    '[
+        <asides>
+        <flash-scopes>
+        <sessions>
+        , , <db-persistence>
+        <check-form-submissions>
+    ] call ;
 
 : state-classes { session flash-scope aside } ; inline
 

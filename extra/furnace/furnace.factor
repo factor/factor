@@ -84,6 +84,17 @@ M: object modify-form drop ;
         ] }
     } case ;
 
+: referrer ( -- referrer )
+    #! Typo is intentional, its in the HTTP spec!
+    "referer" request get header>> at >url ;
+
+: user-agent ( -- user-agent )
+    "user-agent" request get header>> at "" or ;
+
+: same-host? ( url -- ? )
+    request get url>>
+    [ [ protocol>> ] [ host>> ] [ port>> ] tri 3array ] bi@ = ;
+
 SYMBOL: exit-continuation
 
 : exit-with ( value -- )

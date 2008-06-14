@@ -20,6 +20,8 @@ html.elements
 html.streams ;
 IN: http.server
 
+: post-request? ( -- ? ) request get method>> "POST" = ;
+
 SYMBOL: responder-nesting
 
 SYMBOL: main-responder

@@ -5,8 +5,6 @@ combinators arrays io.launcher io http.server.static http.server
 http accessors sequences strings math.parser fry urls ;
 IN: http.server.cgi
 
-: post? ( -- ? ) request get method>> "POST" = ;
-
 : cgi-variables ( script-path -- assoc )
     #! This needs some work.
     [
@@ -34,7 +32,7 @@ IN: http.server.cgi
         request get "user-agent" header "HTTP_USER_AGENT" set
         request get "accept" header "HTTP_ACCEPT" set
 
-        post? [
+        post-request? [
             request get post-data>> raw>>
             [ "CONTENT_TYPE" set ]
             [ length number>string "CONTENT_LENGTH" set ]
@@ -53,7 +51,7 @@ IN: http.server.cgi
     "CGI output follows" >>message
     swap '[
         , output-stream get swap <cgi-process> <process-stream> [
-            post? [ request get post-data>> raw>> write flush ] when
+            post-request? [ request get post-data>> raw>> write flush ] when
             input-stream get swap (stream-copy)
         ] with-stream
     ] >>body ;
