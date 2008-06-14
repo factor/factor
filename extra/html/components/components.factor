@@ -10,9 +10,12 @@ IN: html.components
 
 SYMBOL: values
 
-: value ( name -- value ) values get at ;
+: check-value-name ( name -- name )
+    dup string? [ "Value name not a string" throw ] unless ;
 
-: set-value ( value name -- ) values get set-at ;
+: value ( name -- value ) check-value-name values get at ;
+
+: set-value ( value name -- ) check-value-name values get set-at ;
 
 : blank-values ( -- ) H{ } clone values set ;
 
