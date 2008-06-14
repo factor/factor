@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel math.intervals math.parser namespaces
 random accessors quotations hashtables sequences continuations
-fry calendar combinators destructors alarms io.server
+fry calendar combinators combinators.lib destructors alarms io.server
 db db.tuples db.types
 http http.server http.server.dispatchers http.server.filters
 html.elements
@@ -69,7 +69,11 @@ TUPLE: sessions < server-state-manager domain verify? ;
 : touch-session ( session -- )
     sessions get touch-state ;
 
-: remote-host ( -- string ) remote-address get host>> ;
+: remote-host ( -- string )
+    {
+        [ request get "x-forwarded-for" header ]
+        [ remote-address get host>> ]
+    } 0|| ;
 
 : empty-session ( -- session )
     f <session>

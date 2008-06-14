@@ -76,7 +76,7 @@ TUPLE: action rest authorize init display validate submit ;
 
 : handle-post ( action -- response )
     '[
-        form-nesting-key params get at " " split
+        form-nesting-key params get at " " split harvest
         [ , (handle-post) ]
         [ swap '[ , , nest-values ] ] reduce
         call

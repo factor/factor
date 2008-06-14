@@ -109,7 +109,8 @@ SYMBOL: exit-continuation
     [ drop f ] [ "," split [ dup value ] H{ } map>assoc ] if ;
 
 : a-url-path ( tag -- string )
-    [ "href" required-attr ] [ "rest" optional-attr value ] bi
+    [ "href" required-attr ]
+    [ "rest" optional-attr dup [ value ] when ] bi
     [ [ "/" ?tail drop "/" ] dip present 3append ] when* ;
 
 : a-url ( tag -- url )
