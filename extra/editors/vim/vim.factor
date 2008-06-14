@@ -6,11 +6,11 @@ SYMBOL: vim-path
 SYMBOL: vim-detach
 
 SYMBOL: vim-editor
-HOOK: vim-command vim-editor
+HOOK: vim-command vim-editor ( file line -- array )
 
 TUPLE: vim ;
 
-M: vim vim-command ( file line -- array )
+M: vim vim-command
     [
         vim-path get , swap , "+" swap number>string append ,
     ] { } make ;
