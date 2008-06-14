@@ -7,6 +7,7 @@ sequences.deep unicode.categories ;
 IN: farkup
 
 SYMBOL: relative-link-prefix
+SYMBOL: disable-images?
 SYMBOL: link-no-follow?
 
 <PRIVATE
@@ -88,18 +89,22 @@ MEMO: eq ( -- parser )
     escape-link
     [
         "<a" ,
-        " href=\"" , >r , r>
+        " href=\"" , >r , r> "\"" ,
         link-no-follow? get [ " nofollow=\"true\"" , ] when
-        "\">" , , "</a>" ,
+        ">" , , "</a>" ,
     ] { } make ;
 
 : make-image-link ( href alt -- seq )
-    escape-link
-    [
-        "<img src=\"" , swap , "\"" ,
-        dup empty? [ drop ] [ " alt=\"" , , "\"" , ] if
-        "/>" , ]
-    { } make ;
+    disable-images? get [
+        2drop "<strong>Images are not allowed</strong>"
+    ] [
+        escape-link
+        [
+            "<img src=\"" , swap , "\"" ,
+            dup empty? [ drop ] [ " alt=\"" , , "\"" , ] if
+            "/>" ,
+        ] { } make
+    ] if ;
 
 MEMO: image-link ( -- parser )
     [
