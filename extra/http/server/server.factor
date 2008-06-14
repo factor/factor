@@ -13,12 +13,14 @@ io.encodings.ascii
 io.encodings.binary
 io.streams.limited
 io.timeouts
-fry logging calendar urls
+fry logging logging.insomniac calendar urls
 http
 http.server.responses
 html.elements
 html.streams ;
 IN: http.server
+
+: post-request? ( -- ? ) request get method>> "POST" = ;
 
 SYMBOL: responder-nesting
 
@@ -76,9 +78,15 @@ main-responder global [ <404> <trivial-responder> or ] change-at
 
 LOG: httpd-hit NOTICE
 
+LOG: httpd-header NOTICE
+
+: log-header ( headers name -- )
+    tuck header 2array httpd-header ;
+
 : log-request ( request -- )
-    [ method>> ] [ url>> [ host>> ] [ path>> ] bi ] bi
-    3array httpd-hit ;
+    [ [ method>> ] [ url>> [ host>> ] [ path>> ] bi ] bi 3array httpd-hit ]
+    [ { "user-agent" "x-forwarded-for" } [ log-header ] with each ]
+    bi ;
 
 : split-path ( string -- path )
     "/" split harvest ;
@@ -90,13 +98,13 @@ LOG: httpd-hit NOTICE
 : dispatch-request ( request -- response )
     url>> path>> split-path main-responder get call-responder ;
 
-: prepare-request ( request -- request )
+: prepare-request ( request -- )
     [
         local-address get
         [ secure? "https" "http" ? >>protocol ]
         [ port>> '[ , or ] change-port ]
         bi
-    ] change-url ;
+    ] change-url drop ;
 
 : valid-request? ( request -- ? )
     url>> port>> local-address get port>> = ;
@@ -137,5 +145,8 @@ LOG: httpd-hit NOTICE
 
 : httpd-main ( -- )
     8888 httpd ;
+
+: httpd-insomniac ( -- )
+    "http.server" { httpd-hit } schedule-insomniac ;
 
 MAIN: httpd-main

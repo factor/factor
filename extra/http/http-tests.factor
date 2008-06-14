@@ -121,12 +121,12 @@ read-response-test-1' 1array [
 ] unit-test
 
 ! Live-fire exercise
-USING: http.server http.server.static furnace.sessions
+USING: http.server http.server.static furnace.sessions furnace.alloy
 furnace.actions furnace.auth.login furnace.db http.client
 io.server io.files io io.encodings.ascii
 accessors namespaces threads
 http.server.responses http.server.redirection
-http.server.dispatchers ;
+http.server.dispatchers db.tuples ;
 
 : add-quit-action
     <action>
@@ -138,7 +138,7 @@ http.server.dispatchers ;
 [ test-db drop delete-file ] ignore-errors
 
 test-db [
-    init-sessions-table
+    init-furnace-tables
 ] with-db
 
 [ ] [

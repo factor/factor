@@ -10,9 +10,12 @@ IN: html.components
 
 SYMBOL: values
 
-: value ( name -- value ) values get at ;
+: check-value-name ( name -- name )
+    dup string? [ "Value name not a string" throw ] unless ;
 
-: set-value ( value name -- ) values get set-at ;
+: value ( name -- value ) check-value-name values get at ;
+
+: set-value ( value name -- ) check-value-name values get set-at ;
 
 : blank-values ( -- ) H{ } clone values set ;
 
@@ -200,10 +203,20 @@ M: code render*
     [ string-lines ] [ drop ] [ mode>> value ] tri* htmlize-lines ;
 
 ! Farkup component
-SINGLETON: farkup
+TUPLE: farkup no-follow disable-images ;
+
+: string>boolean ( string -- boolean )
+    {
+        { "true" [ t ] }
+        { "false" [ f ] }
+    } case ;
 
 M: farkup render*
-    2drop string-lines "\n" join convert-farkup write ;
+    [
+        [ no-follow>> [ string>boolean link-no-follow? set ] when* ]
+        [ disable-images>> [ string>boolean disable-images? set ] when* ] bi
+        drop string-lines "\n" join convert-farkup write
+    ] with-scope ;
 
 ! Inspector component
 SINGLETON: inspector

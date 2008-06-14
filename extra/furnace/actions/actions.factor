@@ -53,7 +53,7 @@ TUPLE: action rest authorize init display validate submit ;
     ] with-exit-continuation ;
 
 : validation-failed ( -- * )
-    request get method>> "POST" = [ f ] [ <400> ] if exit-with ;
+    post-request? [ f ] [ <400> ] if exit-with ;
 
 : (handle-post) ( action -- response )
     '[
@@ -70,16 +70,13 @@ TUPLE: action rest authorize init display validate submit ;
 
 : revalidate-url-key "__u" ;
 
-: check-url ( url -- ? )
-    request get url>>
-    [ [ protocol>> ] [ host>> ] [ port>> ] tri 3array ] bi@ = ;
-
 : revalidate-url ( -- url/f )
-    revalidate-url-key param dup [ >url dup check-url swap and ] when ;
+    revalidate-url-key param
+    dup [ >url [ same-host? ] keep and ] when ;
 
 : handle-post ( action -- response )
     '[
-        form-nesting-key params get at " " split
+        form-nesting-key params get at " " split harvest
         [ , (handle-post) ]
         [ swap '[ , , nest-values ] ] reduce
         call

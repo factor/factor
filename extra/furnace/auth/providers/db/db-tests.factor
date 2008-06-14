@@ -14,7 +14,7 @@ login set
 
 "auth-test.db" temp-file sqlite-db [
 
-    init-users-table
+    user ensure-table
 
     [ t ] [
         "slava" <user>

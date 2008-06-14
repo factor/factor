@@ -42,11 +42,9 @@ SYMBOL: log-service
 
 <PRIVATE
 
-PREDICATE: one-string-array < array
-    [ length 1 = ] [ [ string? ] all? ] bi and ;
-
 : stack>message ( obj -- inputs>message )
-    dup one-string-array? [ first ] [
+    dup array? [ dup length 1 = [ first ] when ] when
+    dup string? [
         [
             string-limit off
             1 line-limit set
@@ -54,7 +52,7 @@ PREDICATE: one-string-array < array
             0 margin set
             unparse
         ] with-scope
-    ] if ;
+    ] unless ;
 
 PRIVATE>
 

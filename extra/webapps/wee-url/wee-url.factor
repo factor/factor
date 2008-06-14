@@ -16,9 +16,6 @@ short-url "SHORT_URLS" {
     { "url" "URL" TEXT +not-null+ }
 } define-persistent
 
-: init-short-url-table ( -- )
-    short-url ensure-table ;
-
 : letter-bank ( -- seq )
     CHAR: a CHAR: z [a,b]
     CHAR: A CHAR: Z [a,b]

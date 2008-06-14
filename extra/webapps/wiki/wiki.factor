@@ -39,14 +39,10 @@ TUPLE: article title revision ;
 
 article "ARTICLES" {
     { "title" "TITLE" { VARCHAR 256 } +not-null+ +user-assigned-id+ }
-    ! { "AUTHOR" INTEGER +not-null+ } ! uid
-    ! { "PROTECTED" BOOLEAN +not-null+ }
     { "revision" "REVISION" INTEGER +not-null+ } ! revision id
 } define-persistent
 
 : <article> ( title -- article ) article new swap >>title ;
-
-: init-articles-table ( -- ) article ensure-table ;
 
 TUPLE: revision id title author date content ;
 
@@ -70,8 +66,6 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <revision> ( id -- revision )
     revision new swap >>id ;
-
-: init-revisions-table ( -- ) revision ensure-table ;
 
 : validate-title ( -- )
     { { "title" [ v-one-line ] } } validate-params ;
@@ -115,14 +109,17 @@ M: revision feed-entry-url id>> revision-url ;
 
         { wiki "view" } >>template ;
 
+: amend-article ( revision article -- )
+    swap id>> >>revision update-tuple ;
+
+: add-article ( revision -- )
+    [ title>> ] [ id>> ] bi article boa insert-tuple ;
+
 : add-revision ( revision -- )
     [ insert-tuple ]
     [
-        dup title>> <article> select-tuple [
-            swap id>> >>revision update-tuple
-        ] [
-            [ title>> ] [ id>> ] bi article boa insert-tuple
-        ] if*
+        dup title>> <article> select-tuple
+        [ amend-article ] [ add-article ] if*
     ] bi ;
 
 : <edit-article-action> ( -- action )

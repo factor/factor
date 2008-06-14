@@ -24,7 +24,7 @@ random namespaces vectors math math.order ;
     [ t ] swap [ dup >persistent-vector sequence= ] curry unit-test
 ] each
 
-[ ] [ 10000 [ drop 16 random-bits ] PV{ } map-as "1" set ] unit-test
+[ ] [ 10000 [ 16 random-bits ] PV{ } replicate-as "1" set ] unit-test
 [ ] [ "1" get >vector "2" set ] unit-test
 
 [ t ] [

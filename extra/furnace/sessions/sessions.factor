@@ -2,39 +2,28 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel math.intervals math.parser namespaces
 random accessors quotations hashtables sequences continuations
-fry calendar combinators destructors alarms
+fry calendar combinators combinators.lib destructors alarms io.server
 db db.tuples db.types
 http http.server http.server.dispatchers http.server.filters
-html.elements furnace ;
+html.elements
+furnace furnace.cache ;
 IN: furnace.sessions
 
-TUPLE: session id expires uid namespace changed? ;
+TUPLE: session < server-state uid namespace user-agent client changed? ;
 
 : <session> ( id -- session )
-    session new
-        swap >>id ;
+    session new-server-state ;
 
 session "SESSIONS"
 {
-    { "id" "ID" +random-id+ system-random-generator }
-    { "expires" "EXPIRES" TIMESTAMP +not-null+ }
     { "uid" "UID" { VARCHAR 255 } }
-    { "namespace" "NAMESPACE" FACTOR-BLOB }
+    { "namespace" "NAMESPACE" FACTOR-BLOB +not-null+ }
+    { "user-agent" "USER_AGENT" TEXT +not-null+ }
+    { "client" "CLIENT" TEXT +not-null+ }
 } define-persistent
 
 : get-session ( id -- session )
-    dup [ <session> select-tuple ] when ;
-
-: init-sessions-table ( -- ) session ensure-table ;
-
-: start-expiring-sessions ( db seq -- )
-    '[
-        , , [
-            session new
-                -1.0/0.0 now [a,b] >>expires
-            delete-tuples
-        ] with-db
-    ] 5 minutes every drop ;
+    dup [ session get-state ] when ;
 
 GENERIC: init-session* ( responder -- )
 
@@ -44,12 +33,11 @@ M: dispatcher init-session* default>> init-session* ;
 
 M: filter-responder init-session* responder>> init-session* ;
 
-TUPLE: sessions < filter-responder timeout domain ;
+TUPLE: sessions < server-state-manager domain verify? ;
 
 : <sessions> ( responder -- responder' )
-    sessions new
-        swap >>responder
-        20 minutes >>timeout ;
+    sessions new-server-state-manager
+        t >>verify? ;
 
 : (session-changed) ( session -- )
     t >>changed? drop ;
@@ -78,15 +66,20 @@ TUPLE: sessions < filter-responder timeout domain ;
 : init-session ( session -- )
     session [ sessions get init-session* ] with-variable ;
 
-: cutoff-time ( -- time )
-    sessions get timeout>> from-now ;
-
 : touch-session ( session -- )
-    cutoff-time >>expires drop ;
+    sessions get touch-state ;
+
+: remote-host ( -- string )
+    {
+        [ request get "x-forwarded-for" header ]
+        [ remote-address get host>> ]
+    } 0|| ;
 
 : empty-session ( -- session )
     f <session>
         H{ } clone >>namespace
+        remote-host >>client
+        user-agent >>user-agent
         dup touch-session ;
 
 : begin-session ( -- session )
@@ -125,8 +118,18 @@ M: session-saver dispose
         { "POST" [ post-session-id ] }
     } case ;
 
+: verify-session ( session -- session )
+    sessions get verify?>> [
+        dup [
+            dup
+            [ client>> remote-host = ]
+            [ user-agent>> user-agent = ]
+            bi and [ drop f ] unless
+        ] when
+    ] when ;
+
 : request-session ( -- session/f )
-    request-session-id get-session ;
+    request-session-id get-session verify-session ;
 
 : <session-cookie> ( id -- cookie )
     session-id-key <cookie>

@@ -59,8 +59,6 @@ M: post entity-url
 
 : <post> ( id -- post ) \ post new swap >>id ;
 
-: init-posts-table ( -- ) \ post ensure-table ;
-
 TUPLE: comment < entity parent ;
 
 comment "COMMENTS" {
@@ -77,8 +75,6 @@ M: comment entity-url
     comment new
         swap >>id
         swap >>parent ;
-
-: init-comments-table ( -- ) comment ensure-table ;
 
 : post ( id -- post )
     [ <post> select-tuple ] [ f <comment> select-tuples ] bi
@@ -120,6 +116,7 @@ M: comment entity-url
 
 : <posts-by-feed-action> ( -- action )
     <feed-action>
+        "author" >>rest
         [ validate-author ] >>init
         [ "Recent Posts by " "author" value append ] >>title
         [ list-posts ] >>entries
@@ -127,6 +124,7 @@ M: comment entity-url
 
 : <post-feed-action> ( -- action )
     <feed-action>
+        "id" >>rest
         [ validate-integer-id "id" value post "post" set-value ] >>init
         [ "post" value feed-entry-title ] >>title
         [ "post" value entity-url ] >>url

@@ -98,12 +98,12 @@ CHLOE: if dup if-satisfied? [ process-tag-children ] [ drop ] if ;
 
 CHLOE-SINGLETON: label
 CHLOE-SINGLETON: link
-CHLOE-SINGLETON: farkup
 CHLOE-SINGLETON: inspector
 CHLOE-SINGLETON: comparison
 CHLOE-SINGLETON: html
 CHLOE-SINGLETON: hidden
 
+CHLOE-TUPLE: farkup
 CHLOE-TUPLE: field
 CHLOE-TUPLE: textarea
 CHLOE-TUPLE: password

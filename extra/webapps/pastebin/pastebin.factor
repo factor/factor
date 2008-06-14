@@ -236,7 +236,3 @@ M: annotation entity-url
         <delete-annotation-action> "delete-annotation" add-responder
     <boilerplate>
         { pastebin "pastebin-common" } >>template ;
-
-: init-pastes-table ( -- ) \ paste ensure-table ;
-
-: init-annotations-table ( -- ) annotation ensure-table ;
