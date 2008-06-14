@@ -192,6 +192,6 @@ METHOD: as-mutate { object object assoc }       set-at ;
 ! indicate that this is the main objective of the word, as a side effect.
 
 : adjoin      ( seq elt -- seq ) over sets:adjoin ;
-: adjoin-on   ( elt seq -- seq )      sets:adjoin ;
-: adjoined    ( set elt -- set ) swap sets:adjoin ;
+: adjoin-on   ( elt seq -- seq ) tuck sets:adjoin ;
+: adjoined    ( set elt --     ) swap sets:adjoin ;
 : adjoined-on ( elt set --     )      sets:adjoin ;
