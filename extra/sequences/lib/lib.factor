@@ -201,9 +201,6 @@ USE: continuations
     >r >r 0 max r> r>
     [ length tuck min >r min r> ] keep subseq ;
 
-: accumulator ( quot -- quot vec )
-    V{ } clone [ [ push ] curry compose ] keep ; inline
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! List the positions of obj in seq
