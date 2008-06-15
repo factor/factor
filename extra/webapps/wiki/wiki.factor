@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel hashtables calendar
 namespaces splitting sequences sorting math.order present
-html.components syndication
+syndication
+html.components html.forms
 http.server
 http.server.dispatchers
 furnace
