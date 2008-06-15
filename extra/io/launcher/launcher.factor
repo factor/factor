@@ -4,7 +4,7 @@ USING: system kernel namespaces strings hashtables sequences
 assocs combinators vocabs.loader init threads continuations
 math accessors concurrency.flags destructors
 io io.backend io.timeouts io.pipes io.pipes.private io.encodings
-io.streams.duplex io.ports ;
+io.streams.duplex io.ports debugger prettyprint inspector ;
 IN: io.launcher
 
 TUPLE: process < identity-tuple
@@ -131,11 +131,16 @@ HOOK: run-process* io-backend ( process -- handle )
     run-detached
     dup detached>> [ dup wait-for-process drop ] unless ;
 
-ERROR: process-failed code ;
+ERROR: process-failed process code ;
+
+M: process-failed error.
+    dup "Process exited with error code " write code>> . nl
+    "Launch descriptor:" print nl
+    process>> describe ;
 
 : try-process ( desc -- )
-    run-process wait-for-process dup zero?
-    [ drop ] [ process-failed ] if ;
+    run-process dup wait-for-process dup zero?
+    [ 2drop ] [ process-failed ] if ;
 
 HOOK: kill-process* io-backend ( handle -- )
 
