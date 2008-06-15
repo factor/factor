@@ -1,8 +1,8 @@
 
-USING: kernel combinators sequences sets math
+USING: kernel combinators sequences sets math threads
        io.sockets unicode.case accessors
        combinators.cleave combinators.lib
-       newfx
+       newfx fry
        dns dns.util dns.misc ;
 
 IN: dns.server
@@ -50,9 +50,10 @@ IN: dns.server
 
 : rr->rdata-names ( rr -- names/f )
     {
-      { [ dup type>> NS = ] [ rdata>>            {1} ] }
-      { [ dup type>> MX = ] [ rdata>> exchange>> {1} ] }
-      { [ t ]               [ drop f ] }
+      { [ dup type>> NS    = ] [ rdata>>            {1} ] }
+      { [ dup type>> MX    = ] [ rdata>> exchange>> {1} ] }
+      { [ dup type>> CNAME = ] [ rdata>>            {1} ] }
+      { [ t ]                  [ drop f ] }
     }
   cond ;
 
@@ -203,15 +204,18 @@ DEFER: query->rrs
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: loop ( -- )
-  socket receive
-  swap
+: (handle-request) ( byte-array addr-spec -- )
+  >r
   parse-message
   find-answer
   message->ba
-  swap
-  socket send
-  loop ;
+  r>
+  socket send ;
+
+: handle-request ( byte-array addr-spec -- )
+  '[ , , (handle-request) ] in-thread ;
+
+: loop ( -- ) socket receive handle-request loop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
