@@ -78,6 +78,10 @@ M: revision feed-entry-url id>> revision-url ;
     <action>
         [ "Front Page" view-url <redirect> ] >>display ;
 
+: latest-revision ( title -- revision/f )
+    <article> select-tuple
+    dup [ revision>> <revision> select-tuple ] when ;
+
 : <view-article-action> ( -- action )
     <action>
 
@@ -88,8 +92,8 @@ M: revision feed-entry-url id>> revision-url ;
         ] >>init
 
         [
-            "title" value dup <article> select-tuple [
-                revision>> <revision> select-tuple from-object
+            "title" value dup latest-revision [
+                from-object
                 { wiki "view" } <chloe-content>
             ] [
                 edit-url <redirect>
@@ -297,4 +301,5 @@ M: revision feed-entry-url id>> revision-url ;
         <list-changes-feed-action> "changes.atom" add-responder
         <delete-action> "delete" add-responder
     <boilerplate>
+        [ "sidebar" [ "Sidebar" latest-revision from-object ] nest-form ] >>init
         { wiki "wiki-common" } >>template ;

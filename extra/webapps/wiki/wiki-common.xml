@@ -28,6 +28,23 @@
 
 	<h1><t:write-title /></h1>
 
-        <t:call-next-template />
+	<table width="100%">
+		<tr>
+			<td> <t:call-next-template /> </td>
+			<t:if t:value="sidebar">
+				<td valign="top">
+					<t:bind t:name="sidebar">
+						<h2>
+							<t:a t:href="$wiki/view" t:query="title">
+								<t:label t:name="title" />
+							</t:a>
+						</h2>
+		
+						<t:farkup t:name="content" />
+					</t:bind>
+				</td>
+			</t:if>
+		</tr>
+	</table>
 
 </t:chloe>
