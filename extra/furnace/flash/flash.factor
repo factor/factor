@@ -25,7 +25,9 @@ TUPLE: flash-scopes < server-state-manager ;
 
 SYMBOL: flash-scope
 
-: fget ( key -- value ) flash-scope get at ;
+: fget ( key -- value )
+    flash-scope get dup
+    [ namespace>> at ] [ 2drop f ] if ;
 
 : get-flash-scope ( id -- flash-scope )
     dup [ flash-scope get-state ] when

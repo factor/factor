@@ -10,6 +10,7 @@ xml.entities
 xml.writer
 html.components
 html.elements
+html.forms
 html.templates
 html.templates.chloe
 html.templates.chloe.syntax
@@ -154,11 +155,11 @@ CHLOE: a
         input/>
     ] [ 2drop ] if ;
 
-: form-nesting-key "__n" ;
+: nested-forms-key "__n" ;
 
 : form-magic ( tag -- )
     [ modify-form ] each-responder
-    nested-values get " " join f like form-nesting-key hidden-form-field
+    nested-forms get " " join f like nested-forms-key hidden-form-field
     "for" optional-attr [ "," split [ hidden render ] each ] when* ;
 
 : form-start-tag ( tag -- )

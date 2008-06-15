@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences namespaces
 db db.types db.tuples validators hashtables urls
+html.forms
 html.components
 html.templates.chloe
 http.server
@@ -62,7 +63,7 @@ todo "TODO"
 
         [
             f <todo>
-                dup { "summary" "priority" "description" } deposit-slots
+                dup { "summary" "priority" "description" } to-object
             [ insert-tuple ] [ id>> view-todo-url <redirect> ] bi
         ] >>submit ;
 
@@ -82,7 +83,7 @@ todo "TODO"
 
         [
             f <todo>
-                dup { "id" "summary" "priority" "description" } deposit-slots
+                dup { "id" "summary" "priority" "description" } to-object
             [ update-tuple ] [ id>> view-todo-url <redirect> ] bi
         ] >>submit ;
 

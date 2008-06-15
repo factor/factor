@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors namespaces combinators words
 assocs db.tuples arrays splitting strings validators urls
+html.forms
 html.elements
 html.components
 furnace
@@ -26,10 +27,19 @@ TUPLE: user-admin < dispatcher ;
 : init-capabilities ( -- )
     capabilities get words>strings "capabilities" set-value ;
 
-: selected-capabilities ( -- seq )
+: validate-capabilities ( -- )
     "capabilities" value
-    [ param empty? not ] filter
-    [ string>word ] map ;
+    [ [ param empty? not ] keep set-value ] each ;
+
+: selected-capabilities ( -- seq )
+    "capabilities" value [ value ] filter [ string>word ] map ;
+
+: validate-user ( -- )
+    {
+        { "username" [ v-username ] }
+        { "realname" [ [ v-one-line ] v-optional ] }
+        { "email" [ [ v-email ] v-optional ] }
+    } validate-params ;
 
 : <new-user-action> ( -- action )
     <page-action>
@@ -42,14 +52,13 @@ TUPLE: user-admin < dispatcher ;
 
         [
             init-capabilities
+            validate-capabilities
+
+            validate-user
 
             {
-                { "username" [ v-username ] }
-                { "realname" [ v-one-line ] }
                 { "new-password" [ v-password ] }
                 { "verify-password" [ v-password ] }
-                { "email" [ [ v-email ] v-optional ] }
-                { "capabilities" [ ] }
             } validate-params
 
             same-password-twice
@@ -74,14 +83,16 @@ TUPLE: user-admin < dispatcher ;
 : validate-username ( -- )
     { { "username" [ v-username ] } } validate-params ;
 
+: select-capabilities ( seq -- )
+    [ t swap word>string set-value ] each ;
+
 : <edit-user-action> ( -- action )
     <page-action>
         [
             validate-username
 
             "username" value <user> select-tuple
-            [ from-object ]
-            [ capabilities>> [ "true" swap word>string set-value ] each ] bi
+            [ from-object ] [ capabilities>> select-capabilities ] bi
 
             init-capabilities
         ] >>init
@@ -89,14 +100,17 @@ TUPLE: user-admin < dispatcher ;
         { user-admin "edit-user" } >>template
 
         [
+            "username" value <user> select-tuple
+            [ from-object ] [ capabilities>> select-capabilities ] bi
+
             init-capabilities
+            validate-capabilities
+
+            validate-user
 
             {
-                { "username" [ v-username ] }
-                { "realname" [ v-one-line ] }
                 { "new-password" [ [ v-password ] v-optional ] }
                 { "verify-password" [ [ v-password ] v-optional ] }
-                { "email" [ [ v-email ] v-optional ] }
             } validate-params
 
             "new-password" "verify-password"

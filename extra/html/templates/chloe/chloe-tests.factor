@@ -9,13 +9,13 @@ IN: html.templates.chloe.tests
 [ f ] [ "" parse-query-attr ] unit-test
 
 [ H{ { "a" "b" } } ] [
-    blank-values
+    begin-form
     "b" "a" set-value
     "a" parse-query-attr
 ] unit-test
 
 [ H{ { "a" "b" } { "c" "d" } } ] [
-    blank-values
+    begin-form
     "b" "a" set-value
     "d" "c" set-value
     "a,c" parse-query-attr
@@ -69,7 +69,7 @@ IN: html.templates.chloe.tests
     ] run-template
 ] unit-test
 
-[ ] [ blank-values ] unit-test
+[ ] [ begin-form ] unit-test
 
 [ ] [ "A label" "label" set-value ] unit-test
 
@@ -157,7 +157,7 @@ TUPLE: person first-name last-name ;
     ] run-template
 ] unit-test
 
-[ ] [ blank-values ] unit-test
+[ ] [ begin-form ] unit-test
 
 [ ] [
     H{ { "first-name" "RBaxter" } { "last-name" "Unknown" } } "person" set-value
@@ -170,7 +170,7 @@ TUPLE: person first-name last-name ;
 ] unit-test
 
 [ ] [
-    blank-values
+    begin-form
     { "a" "b" } "choices" set-value
     "true" "b" set-value
 ] unit-test

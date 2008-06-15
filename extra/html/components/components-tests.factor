@@ -1,9 +1,9 @@
 IN: html.components.tests
 USING: tools.test kernel io.streams.string
 io.streams.null accessors inspector html.streams
-html.elements html.components namespaces ;
+html.elements html.components html.forms namespaces ;
 
-[ ] [ blank-values ] unit-test
+[ ] [ begin-form ] unit-test
 
 [ ] [ 3 "hi" set-value ] unit-test
 
@@ -63,7 +63,7 @@ TUPLE: color red green blue ;
     ] with-null-writer
 ] unit-test
 
-[ ] [ blank-values ] unit-test
+[ ] [ begin-form ] unit-test
 
 [ ] [ "new york" "city1" set-value ] unit-test
 
@@ -101,7 +101,7 @@ TUPLE: color red green blue ;
     ] with-null-writer
 ] unit-test
 
-[ ] [ blank-values ] unit-test
+[ ] [ begin-form ] unit-test
 
 [ ] [ t "delivery" set-value ] unit-test
 
@@ -167,12 +167,19 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
     =
 ] unit-test
 
-[ ] [ blank-values ] unit-test
+[ ] [ begin-form ] unit-test
 
 [ ] [
     "factor" [
         "concatenative" "model" set-value
-    ] nest-values
+    ] nest-form
 ] unit-test
 
-[ H{ { "factor" H{ { "model" "concatenative" } } } } ] [ values get ] unit-test
+[
+    H{
+        {
+            "factor"
+            T{ form f V{ } H{ { "model" "concatenative" } } }
+        }
+    }
+] [ values ] unit-test

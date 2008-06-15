@@ -223,7 +223,8 @@ test-db [
 
 [ "Goodbye" ] [ "http://localhost:1237/quit" http-get nip ] unit-test
 
-USING: html.components html.elements xml xml.utilities validators
+USING: html.components html.elements html.forms
+xml xml.utilities validators
 furnace furnace.flash ;
 
 SYMBOL: a

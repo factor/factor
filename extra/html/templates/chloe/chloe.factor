@@ -5,6 +5,7 @@ classes.tuple assocs splitting words arrays memoize
 io io.files io.encodings.utf8 io.streams.string
 unicode.case tuple-syntax mirrors fry math urls present
 multiline xml xml.data xml.writer xml.utilities
+html.forms
 html.elements
 html.components
 html.templates
@@ -76,7 +77,7 @@ CHLOE: each [ with-each-value ] (bind-tag) ;
 
 CHLOE: bind-each [ with-each-object ] (bind-tag) ;
 
-CHLOE: bind [ with-values ] (bind-tag) ;
+CHLOE: bind [ with-form ] (bind-tag) ;
 
 : error-message-tag ( tag -- )
     children>string render-error ;

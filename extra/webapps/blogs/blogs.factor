@@ -1,8 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences sorting math.order math.parser
-urls validators html.components db db.types db.tuples calendar
-present http.server.dispatchers
+urls validators db db.types db.tuples calendar present
+html.forms
+html.components
+http.server.dispatchers
 furnace
 furnace.actions
 furnace.auth
@@ -142,7 +144,7 @@ M: comment entity-url
             "id" value
             "new-comment" [
                 "parent" set-value
-            ] nest-values
+            ] nest-form
         ] >>init
 
         { blogs "view-post" } >>template ;
@@ -163,7 +165,7 @@ M: comment entity-url
 
         [
             f <post>
-                dup { "title" "content" } deposit-slots
+                dup { "title" "content" } to-object
                 uid >>author
                 now >>date
             [ insert-tuple ] [ entity-url <redirect> ] bi
@@ -195,7 +197,7 @@ M: comment entity-url
 
         [
             "id" value <post>
-            dup { "title" "author" "date" "content" } deposit-slots
+            dup { "title" "author" "date" "content" } to-object
             [ update-tuple ] [ entity-url <redirect> ] bi
         ] >>submit
 
