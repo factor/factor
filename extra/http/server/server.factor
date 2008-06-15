@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences arrays namespaces splitting
 vocabs.loader destructors assocs debugger continuations
-combinators tools.vocabs math
+combinators tools.vocabs tools.time math
 io
 io.server
 io.sockets
@@ -26,7 +26,9 @@ SYMBOL: responder-nesting
 
 SYMBOL: main-responder
 
-SYMBOL: development-mode
+SYMBOL: development?
+
+SYMBOL: benchmark?
 
 ! path is a sequence of path component strings
 GENERIC: call-responder* ( path responder -- response )
@@ -55,7 +57,7 @@ main-responder global [ <404> <trivial-responder> or ] change-at
 
 : <500> ( error -- response )
     500 "Internal server error" <trivial-response>
-    swap development-mode get [ '[ , http-error. ] >>body ] [ drop ] if ;
+    swap development? get [ '[ , http-error. ] >>body ] [ drop ] if ;
 
 : do-response ( response -- )
     [ write-response ]
@@ -69,7 +71,7 @@ main-responder global [ <404> <trivial-responder> or ] change-at
             ]
             [
                 utf8 [
-                    development-mode get
+                    development? get
                     [ http-error. ] [ drop "Response error" rethrow ] if
                 ] with-encoded-output
             ] recover
@@ -84,7 +86,7 @@ LOG: httpd-header NOTICE
     tuck header 2array httpd-header ;
 
 : log-request ( request -- )
-    [ [ method>> ] [ url>> [ host>> ] [ path>> ] bi ] bi 3array httpd-hit ]
+    [ [ method>> ] [ url>> ] bi 2array httpd-hit ]
     [ { "user-agent" "x-forwarded-for" } [ log-header ] with each ]
     bi ;
 
@@ -121,12 +123,19 @@ LOG: httpd-header NOTICE
     ] [ [ \ do-request log-error ] [ <500> ] bi ] recover ;
 
 : ?refresh-all ( -- )
-    development-mode get-global
-    [ global [ refresh-all ] bind ] when ;
+    development? get-global [ global [ refresh-all ] bind ] when ;
 
 : setup-limits ( -- )
     1 minutes timeouts
     64 1024 * limit-input ;
+
+LOG: httpd-benchmark DEBUG
+
+: ?benchmark ( quot -- )
+    benchmark? get [
+        [ benchmark ] [ first ] bi request get url>> rot 3array
+        httpd-benchmark
+    ] [ call ] if ; inline
 
 : handle-client ( -- )
     [
@@ -135,8 +144,8 @@ LOG: httpd-header NOTICE
         ascii encode-output
         ?refresh-all
         read-request
-        do-request
-        do-response
+        [ do-request ] ?benchmark
+        [ do-response ] ?benchmark
     ] with-destructors ;
 
 : httpd ( port -- )

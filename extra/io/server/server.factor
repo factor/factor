@@ -4,7 +4,7 @@ USING: io io.sockets io.sockets.secure io.files
 io.streams.duplex logging continuations destructors kernel math
 math.parser namespaces parser sequences strings prettyprint
 debugger quotations calendar threads concurrency.combinators
-assocs fry accessors ;
+assocs fry accessors arrays ;
 IN: io.server
 
 SYMBOL: servers
@@ -17,12 +17,12 @@ LOG: accepted-connection NOTICE
 
 : with-connection ( client remote local quot -- )
     '[
-        , [ remote-address set ] [ accepted-connection ] bi
-        , local-address set
+        , ,
+        [ [ remote-address set ] [ local-address set ] bi* ]
+        [ 2array accepted-connection ]
+        2bi
         @
     ] with-stream ; inline
-
-\ with-connection DEBUG add-error-logging
 
 : accept-loop ( server quot -- )
     [
