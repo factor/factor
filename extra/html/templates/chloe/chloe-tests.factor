@@ -1,7 +1,7 @@
 USING: html.templates html.templates.chloe
 tools.test io.streams.string kernel sequences ascii boxes
-namespaces xml html.components
-splitting unicode.categories furnace ;
+namespaces xml html.components html.forms
+splitting unicode.categories furnace accessors ;
 IN: html.templates.chloe.tests
 
 [ f ] [ f parse-query-attr ] unit-test
@@ -160,7 +160,7 @@ TUPLE: person first-name last-name ;
 [ ] [ begin-form ] unit-test
 
 [ ] [
-    H{ { "first-name" "RBaxter" } { "last-name" "Unknown" } } "person" set-value
+    <form> H{ { "first-name" "RBaxter" } { "last-name" "Unknown" } } >>values "person" set-value
 ] unit-test
 
 [ "<table><tr><td>RBaxter</td><td>Unknown</td></tr></table>" ] [
