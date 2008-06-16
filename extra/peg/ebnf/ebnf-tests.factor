@@ -365,3 +365,36 @@ main = Primary
   "ab c ab c" [EBNF a="a" "b" foo=(a "c")* EBNF] call ast>>
 ] unit-test
 
+{ V{ "a" "a" "a" } } [
+  "aaa" [EBNF a=('a')* b=!('b') a:x => [[ drop x ]] EBNF] call ast>>
+] unit-test
+
+{ t } [
+  "aaa" [EBNF a=('a')* b=!('b') a:x => [[ drop x ]] EBNF] call ast>>
+  "aaa" [EBNF a=('a')* b=!('b') (a):x => [[ drop x ]] EBNF] call ast>> =
+] unit-test
+
+{ V{ "a" "a" "a" } } [
+  "aaa" [EBNF a=('a')* b=a:x => [[ drop x ]] EBNF] call ast>>
+] unit-test
+
+{ t } [
+  "aaa" [EBNF a=('a')* b=a:x => [[ drop x ]] EBNF] call ast>>
+  "aaa" [EBNF a=('a')* b=(a):x => [[ drop x ]] EBNF] call ast>> =
+] unit-test
+
+{ t } [
+  "number=(digit)+:n 'a'" 'ebnf' parse remaining>> length zero?
+] unit-test
+
+{ t } [
+  "number=(digit)+ 'a'" 'ebnf' parse remaining>> length zero?
+] unit-test
+
+{ t } [
+  "number=digit+ 'a'" 'ebnf' parse remaining>> length zero?
+] unit-test
+
+{ t } [
+  "number=digit+:n 'a'" 'ebnf' parse remaining>> length zero?
+] unit-test
