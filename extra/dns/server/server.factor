@@ -1,6 +1,6 @@
 
-USING: kernel combinators sequences sets math threads
-       io.sockets unicode.case accessors
+USING: kernel combinators sequences sets math threads namespaces continuations
+       debugger io io.sockets unicode.case accessors destructors
        combinators.cleave combinators.lib
        newfx fry
        dns dns.util dns.misc ;
@@ -193,34 +193,14 @@ DEFER: query->rrs
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: (socket) ( -- vec ) V{ f } ;
+: (handle-request) ( packet -- )
+  [ [ find-answer ] with-message-bytes ] change-data respond ;
 
-: socket ( -- socket ) (socket) 1st ;
+: handle-request ( packet -- ) [ (handle-request) ] curry in-thread ;
 
-: init-socket-on-port ( port -- )
-  f swap <inet4> <datagram> 0 (socket) as-mutate ;
+: receive-loop ( socket -- )
+  [ receive-packet handle-request ] [ receive-loop ] bi ;
 
-: init-socket ( -- ) 53 init-socket-on-port ;
+: loop ( addr-spec -- )
+  [ <datagram> '[ , [ receive-loop ] with-disposal ] try ] [ loop ] bi ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: (handle-request) ( byte-array addr-spec -- )
-  >r
-  parse-message
-  find-answer
-  message->ba
-  r>
-  socket send ;
-
-: handle-request ( byte-array addr-spec -- )
-  '[ , , (handle-request) ] in-thread ;
-
-: loop ( -- ) socket receive handle-request loop ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: start ( -- ) init-socket loop ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-MAIN: start
