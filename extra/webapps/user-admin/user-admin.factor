@@ -11,8 +11,8 @@ furnace.auth.providers
 furnace.auth.providers.db
 furnace.auth.login
 furnace.auth
-furnace.sessions
 furnace.actions
+furnace.utilities
 http.server
 http.server.dispatchers ;
 IN: webapps.user-admin
@@ -138,11 +138,7 @@ TUPLE: user-admin < dispatcher ;
     <action>
         [
             validate-username
-
-            [ <user> select-tuple 1 >>deleted update-tuple ]
-            [ logout-all-sessions ]
-            bi
-
+            <user> select-tuple 1 >>deleted update-tuple
             URL" $user-admin" <redirect>
         ] >>submit ;
 

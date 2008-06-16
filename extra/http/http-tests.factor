@@ -122,7 +122,7 @@ read-response-test-1' 1array [
 
 ! Live-fire exercise
 USING: http.server http.server.static furnace.sessions furnace.alloy
-furnace.actions furnace.auth.login furnace.db http.client
+furnace.actions furnace.auth furnace.auth.login furnace.db http.client
 io.server io.files io io.encodings.ascii
 accessors namespaces threads
 http.server.responses http.server.redirection
@@ -176,7 +176,7 @@ test-db [
     [
         <dispatcher>
             <action> <protected>
-            <login>
+            "Test" <login-realm>
             <sessions>
             "" add-responder
             add-quit-action
@@ -206,7 +206,7 @@ test-db [
     [
         <dispatcher>
             <action> [ [ "Hi" write ] "text/plain" <content> ] >>display
-            <login>
+            "Test" <login-realm>
             <sessions>
             "" add-responder
             add-quit-action

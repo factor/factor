@@ -1,41 +1,27 @@
 ! Copyright (c) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors quotations assocs kernel splitting
-base64 html.elements io combinators sequences
-http http.server.filters http.server.responses http.server
-furnace.auth.providers furnace.auth.login ;
+USING: accessors kernel splitting base64 namespaces
+http http.server.responses furnace.auth ;
 IN: furnace.auth.basic
 
-TUPLE: basic-auth < filter-responder realm provider ;
+TUPLE: basic-auth-realm < realm ;
 
-C: <basic-auth> basic-auth
+C: <basic-auth-realm> basic-auth-realm
 
-: authorization-ok? ( provider header -- ? )
-    #! Given the realm and the 'Authorization' header,
-    #! authenticate the user.
+: parse-basic-auth ( header -- username/f password/f )
     dup [
         " " split1 swap "Basic" = [
-            base64> ":" split1 spin check-login
-        ] [
-            2drop f
-        ] if
-    ] [
-        2drop f
-    ] if ;
+            base64> ":" split1
+        ] [ drop f f ] if
+    ] [ drop f f ] if ;
 
 : <401> ( realm -- response )
-    401 "Unauthorized" <trivial-response>
-    "Basic realm=\"" rot "\"" 3append
-    "WWW-Authenticate" set-header
-    [
-        <html> <body>
-            "Username or Password is invalid" write
-        </body> </html>
-    ] >>body ;
+    401 "Invalid username or password" <trivial-response>
+    [ "Basic realm=\"" % swap % "\"" % ] "" make "WWW-Authenticate" set-header ;
 
-: logged-in? ( request responder -- ? )
-    provider>> swap "authorization" header authorization-ok? ;
+M: basic-auth-realm login-required* ( realm -- response )
+    name>> <401> ;
 
-M: basic-auth call-responder* ( request path responder -- response )
-    pick over logged-in?
-    [ call-next-method ] [ 2nip realm>> <401> ] if ;
+M: basic-auth-realm logged-in-username ( realm -- uid )
+    request get "authorization" header parse-basic-auth
+    dup [ over realm get check-login swap and ] [ 2drop f ] if ;

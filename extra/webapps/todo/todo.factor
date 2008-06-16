@@ -8,7 +8,6 @@ html.templates.chloe
 http.server
 http.server.dispatchers
 furnace
-furnace.sessions
 furnace.boilerplate
 furnace.auth
 furnace.actions
@@ -32,7 +31,7 @@ todo "TODO"
 : <todo> ( id -- todo )
     todo new
         swap >>id
-        uid >>uid ;
+        logged-in-user get username>> >>uid ;
 
 : <view-action> ( -- action )
     <page-action>

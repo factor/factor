@@ -147,7 +147,7 @@ cookies ;
         H{ } clone >>header
         V{ } clone >>cookies
         "close" "connection" set-header
-        "Factor http.client vocabulary" "user-agent" set-header ;
+        "Factor http.client" "user-agent" set-header ;
 
 : read-method ( request -- request )
     " " read-until [ "Bad request: method" throw ] unless
@@ -296,6 +296,7 @@ body ;
         H{ } clone >>header
         "close" "connection" set-header
         now timestamp>http-string "date" set-header
+        "Factor http.server" "server" set-header
         latin1 >>content-charset
         V{ } clone >>cookies ;
 

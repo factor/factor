@@ -57,12 +57,6 @@ TUPLE: sessions < server-state-manager domain verify? ;
     [ namespace>> swap change-at ] keep
     (session-changed) ; inline
 
-: uid ( -- uid )
-    session get uid>> ;
-
-: set-uid ( uid -- )
-    session get [ (>>uid) ] [ (session-changed) ] bi ;
-
 : init-session ( session -- )
     session [ sessions get init-session* ] with-variable ;
 
@@ -147,6 +141,3 @@ M: sessions call-responder* ( path responder -- response )
     sessions set
     request-session [ begin-session ] unless*
     existing-session put-session-cookie ;
-
-: logout-all-sessions ( uid -- )
-    session new swap >>uid delete-tuples ;
