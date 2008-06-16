@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel hashtables calendar
 namespaces splitting sequences sorting math.order present
-html.components syndication
+syndication
+html.components html.forms
 http.server
 http.server.dispatchers
 furnace
@@ -77,6 +78,10 @@ M: revision feed-entry-url id>> revision-url ;
     <action>
         [ "Front Page" view-url <redirect> ] >>display ;
 
+: latest-revision ( title -- revision/f )
+    <article> select-tuple
+    dup [ revision>> <revision> select-tuple ] when ;
+
 : <view-article-action> ( -- action )
     <action>
 
@@ -87,8 +92,8 @@ M: revision feed-entry-url id>> revision-url ;
         ] >>init
 
         [
-            "title" value dup <article> select-tuple [
-                revision>> <revision> select-tuple from-object
+            "title" value dup latest-revision [
+                from-object
                 { wiki "view" } <chloe-content>
             ] [
                 edit-url <redirect>
@@ -231,8 +236,8 @@ M: revision feed-entry-url id>> revision-url ;
             "old-id" "new-id"
             [ value <revision> select-tuple ] bi@
             [
-                [ [ title>> "title" set-value ] [ "old" set-value ] bi ]
-                [ "new" set-value ] bi*
+                [ [ title>> "title" set-value ] [ "old" [ from-object ] nest-form ] bi ]
+                [ "new" [ from-object ] nest-form ] bi*
             ]
             [ [ content>> string-lines ] bi@ diff "diff" set-value ]
             2bi
@@ -279,6 +284,11 @@ M: revision feed-entry-url id>> revision-url ;
     <boilerplate>
         { wiki "page-common" } >>template ;
 
+: init-sidebar ( -- )
+    "Sidebar" latest-revision [
+        "sidebar" [ from-object ] nest-form
+    ] when* ;
+
 : <wiki> ( -- dispatcher )
     wiki new-dispatcher
         <main-article-action> <article-boilerplate> "" add-responder
@@ -296,4 +306,5 @@ M: revision feed-entry-url id>> revision-url ;
         <list-changes-feed-action> "changes.atom" add-responder
         <delete-action> "delete" add-responder
     <boilerplate>
+        [ init-sidebar ] >>init
         { wiki "wiki-common" } >>template ;

@@ -7,7 +7,8 @@ furnace.flash
 furnace.sessions
 furnace.referrer
 furnace.db
-furnace.auth.providers ;
+furnace.auth.providers
+furnace.auth.login.permits ;
 IN: furnace.alloy
 
 : <alloy> ( responder db params -- responder' )
@@ -19,7 +20,7 @@ IN: furnace.alloy
         <check-form-submissions>
     ] call ;
 
-: state-classes { session flash-scope aside } ; inline
+: state-classes { session flash-scope aside permit } ; inline
 
 : init-furnace-tables ( -- )
     state-classes ensure-tables

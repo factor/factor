@@ -1,4 +1,4 @@
-! Copysecond (C) 2008 Slava Pestov.
+! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs sequences sorting math math.order
 arrays combinators kernel ;

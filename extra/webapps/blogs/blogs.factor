@@ -1,14 +1,15 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences sorting math.order math.parser
-urls validators html.components db db.types db.tuples calendar
-present http.server.dispatchers
+urls validators db db.types db.tuples calendar present namespaces
+html.forms
+html.components
+http.server.dispatchers
 furnace
 furnace.actions
 furnace.auth
 furnace.auth.login
 furnace.boilerplate
-furnace.sessions
 furnace.syndication ;
 IN: webapps.blogs
 
@@ -142,7 +143,7 @@ M: comment entity-url
             "id" value
             "new-comment" [
                 "parent" set-value
-            ] nest-values
+            ] nest-form
         ] >>init
 
         { blogs "view-post" } >>template ;
@@ -158,13 +159,13 @@ M: comment entity-url
 
         [
             validate-post
-            uid "author" set-value
+            logged-in-user get username>> "author" set-value
         ] >>validate
 
         [
             f <post>
-                dup { "title" "content" } deposit-slots
-                uid >>author
+                dup { "title" "content" } to-object
+                logged-in-user get username>> >>author
                 now >>date
             [ insert-tuple ] [ entity-url <redirect> ] bi
         ] >>submit
@@ -175,7 +176,8 @@ M: comment entity-url
         "make a new blog post" >>description ;
 
 : authorize-author ( author -- )
-    uid = can-administer-blogs? have-capability? or
+    logged-in-user get username>> =
+    can-administer-blogs? have-capability? or
     [ login-required ] unless ;
 
 : do-post-action ( -- )
@@ -195,7 +197,7 @@ M: comment entity-url
 
         [
             "id" value <post>
-            dup { "title" "author" "date" "content" } deposit-slots
+            dup { "title" "author" "date" "content" } to-object
             [ update-tuple ] [ entity-url <redirect> ] bi
         ] >>submit
 
@@ -251,13 +253,13 @@ M: comment entity-url
 
         [
             validate-comment
-            uid "author" set-value
+            logged-in-user get username>> "author" set-value
         ] >>validate
 
         [
             "parent" value f <comment>
                 "content" value >>content
-                uid >>author
+                logged-in-user get username>> >>author
                 now >>date
             [ insert-tuple ] [ entity-url <redirect> ] bi
         ] >>submit

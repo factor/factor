@@ -1,11 +1,11 @@
 IN: furnace.auth.providers.assoc.tests
-USING: furnace.actions furnace.auth.providers 
+USING: furnace.actions furnace.auth furnace.auth.providers 
 furnace.auth.providers.assoc furnace.auth.login
 tools.test namespaces accessors kernel ;
 
-<action> <login>
+<action> "Test" <login-realm>
     <users-in-memory> >>users
-login set
+realm set
 
 [ t ] [
     "slava" <user>

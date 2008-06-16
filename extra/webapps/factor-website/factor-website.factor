@@ -7,12 +7,11 @@ logging.insomniac
 http.server
 http.server.dispatchers
 furnace.alloy
-furnace.db
-furnace.asides
-furnace.flash
-furnace.sessions
 furnace.auth.login
 furnace.auth.providers.db
+furnace.auth.features.edit-profile
+furnace.auth.features.recover-password
+furnace.auth.features.registration
 furnace.boilerplate
 webapps.blogs
 webapps.pastebin
@@ -50,8 +49,8 @@ TUPLE: factor-website < dispatcher ;
         <wiki> "wiki" add-responder
         <wee-url> "wee-url" add-responder
         <user-admin> "user-admin" add-responder
-    <login>
-        users-in-db >>users
+    "Factor website" <login-realm>
+        "Factor website" >>name
         allow-registration
         allow-password-recovery
         allow-edit-profile

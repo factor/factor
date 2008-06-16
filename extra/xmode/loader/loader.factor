@@ -7,15 +7,15 @@ IN: xmode.loader
 ! Based on org.gjt.sp.jedit.XModeHandler
 
 ! RULES and its children
-<TAGS: parse-rule-tag
+<TAGS: parse-rule-tag ( rule-set tag -- )
 
-TAG: PROPS ( rule-set tag -- )
+TAG: PROPS
     parse-props-tag swap set-rule-set-props ;
 
-TAG: IMPORT ( rule-set tag -- )
+TAG: IMPORT
     "DELEGATE" swap at swap import-rule-set ;
 
-TAG: TERMINATE ( rule-set tag -- )
+TAG: TERMINATE
     "AT_CHAR" swap at string>number swap set-rule-set-terminate-char ;
 
 RULE: SEQ seq-rule

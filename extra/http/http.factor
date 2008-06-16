@@ -6,7 +6,8 @@ assocs sequences splitting sorting sets debugger
 strings vectors hashtables quotations arrays byte-arrays
 math.parser calendar calendar.format present
 
-io io.encodings.iana io.encodings.binary io.encodings.8-bit
+io io.encodings io.encodings.iana io.encodings.binary
+io.encodings.8-bit
 
 unicode.case unicode.categories qualified
 
@@ -98,23 +99,29 @@ TUPLE: cookie name value path domain expires max-age http-only ;
         drop
     ] { } make ;
 
+: check-cookie-string ( string -- string' )
+    dup "=;'\"" intersect empty?
+    [ "Bad cookie name or value" throw ] unless ;
+
 : (unparse-cookie) ( key value -- )
     {
         { f [ drop ] }
-        { t [ , ] }
+        { t [ check-cookie-string , ] }
         [
             {
                 { [ dup timestamp? ] [ timestamp>cookie-string ] }
                 { [ dup duration? ] [ dt>seconds number>string ] }
+                { [ dup real? ] [ number>string ] }
                 [ ]
             } cond
-            "=" swap 3append ,
+            check-cookie-string "=" swap check-cookie-string 3append ,
         ]
     } case ;
 
 : unparse-cookie ( cookie -- strings )
     [
-        dup name>> >lower over value>> (unparse-cookie)
+        dup name>> check-cookie-string >lower
+        over value>> (unparse-cookie)
         "path" over path>> (unparse-cookie)
         "domain" over domain>> (unparse-cookie)
         "expires" over expires>> (unparse-cookie)
@@ -146,7 +153,7 @@ cookies ;
         H{ } clone >>header
         V{ } clone >>cookies
         "close" "connection" set-header
-        "Factor http.client vocabulary" "user-agent" set-header ;
+        "Factor http.client" "user-agent" set-header ;
 
 : read-method ( request -- request )
     " " read-until [ "Bad request: method" throw ] unless
@@ -295,8 +302,14 @@ body ;
         H{ } clone >>header
         "close" "connection" set-header
         now timestamp>http-string "date" set-header
+        "Factor http.server" "server" set-header
         latin1 >>content-charset
         V{ } clone >>cookies ;
+
+M: response clone
+    call-next-method
+        [ clone ] change-header
+        [ clone ] change-cookies ;
 
 : read-response-version ( response -- response )
     " \t" read-until
@@ -363,7 +376,11 @@ M: response write-response ( respose -- )
 
 M: response write-full-response ( request response -- )
     dup write-response
-    swap method>> "HEAD" = [ write-response-body ] unless ;
+    swap method>> "HEAD" = [
+        [ content-charset>> encode-output ]
+        [ write-response-body ]
+        bi
+    ] unless ;
 
 : get-cookie ( request/response name -- cookie/f )
     [ cookies>> ] dip '[ , _ name>> = ] find nip ;

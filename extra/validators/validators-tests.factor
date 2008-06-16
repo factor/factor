@@ -2,14 +2,6 @@ IN: validators.tests
 USING: kernel sequences tools.test validators accessors
 namespaces assocs ;
 
-: with-validation ( quot -- messages )
-    [
-        init-validation
-        call
-        validation-messages get
-        named-validation-messages get >alist append
-    ] with-scope ; inline
-
 [ "" v-one-line ] must-fail
 [ "hello world" ] [ "hello world" v-one-line ] unit-test
 [ "hello\nworld" v-one-line ] must-fail
@@ -60,59 +52,3 @@ namespaces assocs ;
 [ "4561_2612_1234_5467" v-credit-card ] must-fail
 
 [ "4561-2621-1234-5467" v-credit-card ] must-fail
-
-
-[ 14 V{ } ] [
-    [
-        "14" "age" [ v-number 13 v-min-value 100 v-max-value ] validate
-    ] with-validation
-] unit-test
-
-[ f t ] [
-    [
-        "140" "age" [ v-number 13 v-min-value 100 v-max-value ] validate
-    ] with-validation first
-    [ first "age" = ]
-    [ second validation-error? ]
-    [ second value>> "140" = ]
-    tri and and
-] unit-test
-
-TUPLE: person name age ;
-
-person {
-    { "name" [ ] }
-    { "age" [ v-number 13 v-min-value 100 v-max-value ] }
-} define-validators
-
-[ t t ] [
-    [
-        { { "age" "" } } required-values
-        validation-failed?
-    ] with-validation first
-    [ first "age" = ]
-    [ second validation-error? ]
-    [ second message>> "required" = ]
-    tri and and
-] unit-test
-
-[ H{ { "a" 123 } } f V{ } ] [
-    [
-        H{
-            { "a" "123" }
-            { "b" "c" }
-            { "c" "d" }
-        }
-        H{
-            { "a" [ v-integer ] }
-        } validate-values
-        validation-failed?
-    ] with-validation
-] unit-test
-
-[ t "foo" ] [
-    [
-        "foo" validation-error
-        validation-failed?
-    ] with-validation first message>>
-] unit-test

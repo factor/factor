@@ -122,7 +122,7 @@ read-response-test-1' 1array [
 
 ! Live-fire exercise
 USING: http.server http.server.static furnace.sessions furnace.alloy
-furnace.actions furnace.auth.login furnace.db http.client
+furnace.actions furnace.auth furnace.auth.login furnace.db http.client
 io.server io.files io io.encodings.ascii
 accessors namespaces threads
 http.server.responses http.server.redirection
@@ -176,7 +176,7 @@ test-db [
     [
         <dispatcher>
             <action> <protected>
-            <login>
+            "Test" <login-realm>
             <sessions>
             "" add-responder
             add-quit-action
@@ -206,7 +206,7 @@ test-db [
     [
         <dispatcher>
             <action> [ [ "Hi" write ] "text/plain" <content> ] >>display
-            <login>
+            "Test" <login-realm>
             <sessions>
             "" add-responder
             add-quit-action
@@ -223,7 +223,8 @@ test-db [
 
 [ "Goodbye" ] [ "http://localhost:1237/quit" http-get nip ] unit-test
 
-USING: html.components html.elements xml xml.utilities validators
+USING: html.components html.elements html.forms
+xml xml.utilities validators
 furnace furnace.flash ;
 
 SYMBOL: a
@@ -275,3 +276,7 @@ SYMBOL: a
 [ 4 ] [ a get-global ] unit-test
 
 [ "Goodbye" ] [ "http://localhost:1237/quit" http-get nip ] unit-test
+
+! Test cloning
+[ f ] [ <404> dup clone "b" "a" set-header drop "a" header ] unit-test
+[ f ] [ <404> dup clone "b" "a" <cookie> put-cookie drop "a" get-cookie ] unit-test

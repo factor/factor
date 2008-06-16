@@ -75,7 +75,7 @@ SYMBOL: ignore-case?
     [ parse-literal-matcher swap set-rule-end ] , ;
 
 ! SPAN's children
-<TAGS: parse-begin/end-tag
+<TAGS: parse-begin/end-tag ( rule tag -- )
 
 TAG: BEGIN
     ! XXX

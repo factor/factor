@@ -9,14 +9,13 @@ html.elements
 furnace furnace.cache ;
 IN: furnace.sessions
 
-TUPLE: session < server-state uid namespace user-agent client changed? ;
+TUPLE: session < server-state namespace user-agent client changed? ;
 
 : <session> ( id -- session )
     session new-server-state ;
 
 session "SESSIONS"
 {
-    { "uid" "UID" { VARCHAR 255 } }
     { "namespace" "NAMESPACE" FACTOR-BLOB +not-null+ }
     { "user-agent" "USER_AGENT" TEXT +not-null+ }
     { "client" "CLIENT" TEXT +not-null+ }
@@ -56,12 +55,6 @@ TUPLE: sessions < server-state-manager domain verify? ;
     session get
     [ namespace>> swap change-at ] keep
     (session-changed) ; inline
-
-: uid ( -- uid )
-    session get uid>> ;
-
-: set-uid ( uid -- )
-    session get [ (>>uid) ] [ (session-changed) ] bi ;
 
 : init-session ( session -- )
     session [ sessions get init-session* ] with-variable ;
@@ -104,20 +97,6 @@ M: session-saver dispose
 
 : session-id-key "__s" ;
 
-: cookie-session-id ( request -- id/f )
-    session-id-key get-cookie
-    dup [ value>> string>number ] when ;
-
-: post-session-id ( request -- id/f )
-    session-id-key swap request-params at string>number ;
-
-: request-session-id ( -- id/f )
-    request get dup method>> {
-        { "GET" [ cookie-session-id ] }
-        { "HEAD" [ cookie-session-id ] }
-        { "POST" [ post-session-id ] }
-    } case ;
-
 : verify-session ( session -- session )
     sessions get verify?>> [
         dup [
@@ -129,16 +108,18 @@ M: session-saver dispose
     ] when ;
 
 : request-session ( -- session/f )
-    request-session-id get-session verify-session ;
+    session-id-key
+    client-state dup [ string>number ] when
+    get-session verify-session ;
 
-: <session-cookie> ( id -- cookie )
-    session-id-key <cookie>
+: <session-cookie> ( -- cookie )
+    session get id>> session-id-key <cookie>
         "$sessions" resolve-base-path >>path
         sessions get timeout>> from-now >>expires
         sessions get domain>> >>domain ;
 
 : put-session-cookie ( response -- response' )
-    session get id>> number>string <session-cookie> put-cookie ;
+    <session-cookie> put-cookie ;
 
 M: sessions modify-form ( responder -- )
     drop session get id>> session-id-key hidden-form-field ;
@@ -147,6 +128,3 @@ M: sessions call-responder* ( path responder -- response )
     sessions set
     request-session [ begin-session ] unless*
     existing-session put-session-cookie ;
-
-: logout-all-sessions ( uid -- )
-    session new swap >>uid delete-tuples ;

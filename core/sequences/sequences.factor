@@ -419,10 +419,11 @@ PRIVATE>
 : interleave ( seq between quot -- )
     [ (interleave) ] 2curry >r dup length swap r> 2each ; inline
 
+: accumulator ( quot -- quot' vec )
+    V{ } clone [ [ push ] curry compose ] keep ; inline
+
 : unfold ( pred quot tail -- seq )
-    V{ } clone [
-        swap >r [ push ] curry compose r> while
-    ] keep { } like ; inline
+    swap accumulator >r swap while r> { } like ; inline
 
 : follow ( obj quot -- seq )
     >r [ dup ] r> [ keep ] curry [ ] unfold nip ; inline
