@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays kernel debugger sequences namespaces math
 math.order combinators init alien alien.c-types alien.strings libc
-continuations destructors debugger inspector splitting
-locals unicode.case
+continuations destructors debugger inspector splitting assocs
+random math.parser locals unicode.case
 openssl.libcrypto openssl.libssl
 io.backend io.ports io.files io.encodings.8-bit io.sockets.secure
 io.timeouts ;
@@ -48,7 +48,13 @@ SYMBOL: ssl-initialized?
 
 [ f ssl-initialized? set-global ] "openssl" add-init-hook
 
-TUPLE: openssl-context < secure-context aliens ;
+TUPLE: openssl-context < secure-context aliens sessions ;
+
+: set-session-cache ( ctx -- )
+    handle>>
+    [ SSL_SESS_CACHE_BOTH SSL_CTX_set_session_cache_mode ssl-error ]
+    [ 32 random-bits >hex dup length SSL_CTX_set_session_id_context ssl-error ]
+    bi ;
 
 : load-certificate-chain ( ctx -- )
     dup config>> key-file>> [
@@ -133,12 +139,20 @@ M: rsa dispose* handle>> RSA_free ;
     ] bi
     SSL_CTX_set_tmp_rsa ssl-error ;
 
+: <openssl-context> ( config ctx -- context )
+    openssl-context new
+        swap >>handle
+        swap >>config
+        V{ } clone >>aliens
+        H{ } clone >>sessions ;
+
 M: openssl <secure-context> ( config -- context )
     maybe-init-ssl
     [
         dup method>> ssl-method SSL_CTX_new
-        dup ssl-error f V{ } clone openssl-context boa |dispose
+        dup ssl-error <openssl-context> |dispose
         {
+            [ set-session-cache ]
             [ load-certificate-chain ]
             [ set-default-password ]
             [ use-private-key-file ]
@@ -152,8 +166,9 @@ M: openssl <secure-context> ( config -- context )
 
 M: openssl-context dispose*
     [ aliens>> [ free ] each ]
+    [ sessions>> values [ SSL_SESSION_free ] each ]
     [ handle>> SSL_CTX_free ]
-    bi ;
+    tri ;
 
 TUPLE: ssl-handle file handle connected disposed ;
 
@@ -203,5 +218,12 @@ M: openssl check-certificate ( host ssl -- )
         [ check-common-name ]
         2bi
     ] [ 2drop ] if ;
+
+: get-session ( addrspec -- session/f )
+    current-secure-context sessions>> at
+    dup expired? [ drop f ] when ;
+
+: save-session ( session addrspec -- )
+    current-secure-context sessions>> set-at ;
 
 openssl secure-socket-backend set-global

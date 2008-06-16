@@ -118,13 +118,27 @@ M: secure (get-local-address) addrspec>> (get-local-address) ;
     dup dup handle>> SSL_connect check-connect-response dup
     [ dupd wait-for-fd do-ssl-connect ] [ 2drop ] if ;
 
+: resume-session ( ssl-handle ssl-session -- )
+    [ [ handle>> ] dip SSL_set_session ssl-error ]
+    [ drop do-ssl-connect ]
+    2bi ;
+
+: begin-session ( ssl-handle addrspec -- )
+    [ drop do-ssl-connect ]
+    [ [ handle>> SSL_get1_session ] dip save-session ]
+    2bi ;
+
+: secure-connection ( ssl-handle addrspec -- )
+    dup get-session [ resume-session ] [ begin-session ] ?if ;
+
 M: secure establish-connection ( client-out remote -- )
-    [ addrspec>> establish-connection ]
+    addrspec>>
+    [ establish-connection ]
     [
-        drop handle>>
-        [ [ do-ssl-connect ] with-timeout ]
-        [ t >>connected drop ]
-        bi
+        [ handle>> ] dip
+        [ [ secure-connection ] curry with-timeout ]
+        [ drop t >>connected drop ]
+        2bi
     ] 2bi ;
 
 M: secure (server) addrspec>> (server) ;
