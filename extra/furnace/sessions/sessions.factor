@@ -9,14 +9,13 @@ html.elements
 furnace furnace.cache ;
 IN: furnace.sessions
 
-TUPLE: session < server-state uid namespace user-agent client changed? ;
+TUPLE: session < server-state namespace user-agent client changed? ;
 
 : <session> ( id -- session )
     session new-server-state ;
 
 session "SESSIONS"
 {
-    { "uid" "UID" { VARCHAR 255 } }
     { "namespace" "NAMESPACE" FACTOR-BLOB +not-null+ }
     { "user-agent" "USER_AGENT" TEXT +not-null+ }
     { "client" "CLIENT" TEXT +not-null+ }
