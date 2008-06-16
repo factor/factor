@@ -236,8 +236,8 @@ M: revision feed-entry-url id>> revision-url ;
             "old-id" "new-id"
             [ value <revision> select-tuple ] bi@
             [
-                [ [ title>> "title" set-value ] [ "old" set-value ] bi ]
-                [ "new" set-value ] bi*
+                [ [ title>> "title" set-value ] [ "old" [ from-object ] nest-form ] bi ]
+                [ "new" [ from-object ] nest-form ] bi*
             ]
             [ [ content>> string-lines ] bi@ diff "diff" set-value ]
             2bi
