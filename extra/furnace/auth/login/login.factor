@@ -1,28 +1,57 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors namespaces validators urls
-html.forms
-http.server.dispatchers
+USING: kernel accessors namespaces sequences math.parser
+calendar validators urls html.forms
+http http.server http.server.dispatchers
+furnace
 furnace.auth
 furnace.flash
 furnace.asides
 furnace.actions
 furnace.sessions
-furnace.utilities ;
+furnace.utilities
+furnace.auth.login.permits ;
 IN: furnace.auth.login
 
-TUPLE: login-realm < realm ;
+SYMBOL: permit-id
+
+: permit-id-key ( realm -- string )
+    [ >hex 2 CHAR: 0 pad-left ] { } map-as concat
+    "__p_" prepend ;
+
+: client-permit-id ( realm -- id/f )
+    permit-id-key client-state dup [ string>number ] when ;
+
+TUPLE: login-realm < realm timeout domain ;
+
+M: login-realm call-responder*
+    [ name>> client-permit-id permit-id set ]
+    [ call-next-method ]
+    bi ;
 
 M: login-realm logged-in-username
-    drop session get uid>> ;
+    drop permit-id get dup [ get-permit-uid ] when ;
 
-: set-uid ( username -- )
-    session get [ (>>uid) ] [ (session-changed) ] bi ;
+M: login-realm modify-form ( responder -- )
+    drop permit-id get realm get name>> permit-id-key hidden-form-field ;
+
+: <permit-cookie> ( -- cookie )
+    permit-id get realm get name>> permit-id-key <cookie>
+        "$login-realm" resolve-base-path >>path
+        realm get timeout>> from-now >>expires
+        realm get domain>> >>domain ;
+
+: put-permit-cookie ( response -- response' )
+    <permit-cookie> put-cookie ;
 
 : successful-login ( user -- response )
-    username>> set-uid URL" $realm" end-aside ;
+    [ username>> make-permit permit-id set ] [ init-user ] bi
+    URL" $realm" end-aside
+    put-permit-cookie ;
 
-: logout ( -- ) f set-uid URL" $realm" end-aside ;
+: logout ( -- )
+    permit-id get [ delete-permit ] when*
+    URL" $realm" end-aside ;
 
 SYMBOL: description
 SYMBOL: capabilities
@@ -56,7 +85,9 @@ SYMBOL: capabilities
 
 : <logout-action> ( -- action )
     <action>
-        [ logout ] >>submit ;
+        [ logout ] >>submit
+    <protected>
+        "logout" >>description ;
 
 M: login-realm login-required*
     drop
@@ -68,4 +99,5 @@ M: login-realm login-required*
 : <login-realm> ( responder name -- auth )
     login-realm new-realm
         <login-action> <auth-boilerplate> "login" add-responder
-        <logout-action> "logout" add-responder ;
+        <logout-action> "logout" add-responder
+        20 minutes >>timeout ;

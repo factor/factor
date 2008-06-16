@@ -284,6 +284,11 @@ M: revision feed-entry-url id>> revision-url ;
     <boilerplate>
         { wiki "page-common" } >>template ;
 
+: init-sidebar ( -- )
+    "Sidebar" latest-revision [
+        "sidebar" [ from-object ] nest-form
+    ] when* ;
+
 : <wiki> ( -- dispatcher )
     wiki new-dispatcher
         <main-article-action> <article-boilerplate> "" add-responder
@@ -301,5 +306,5 @@ M: revision feed-entry-url id>> revision-url ;
         <list-changes-feed-action> "changes.atom" add-responder
         <delete-action> "delete" add-responder
     <boilerplate>
-        [ "sidebar" [ "Sidebar" latest-revision from-object ] nest-form ] >>init
+        [ init-sidebar ] >>init
         { wiki "wiki-common" } >>template ;

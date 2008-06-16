@@ -7,7 +7,7 @@ IN: furnace.auth.features.registration
 
 : <register-action> ( -- action )
     <page-action>
-        { realm "register" } >>template
+        { realm "features/registration/register" } >>template
 
         [
             {

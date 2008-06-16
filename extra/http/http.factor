@@ -99,23 +99,29 @@ TUPLE: cookie name value path domain expires max-age http-only ;
         drop
     ] { } make ;
 
+: check-cookie-string ( string -- string' )
+    dup "=;'\"" intersect empty?
+    [ "Bad cookie name or value" throw ] unless ;
+
 : (unparse-cookie) ( key value -- )
     {
         { f [ drop ] }
-        { t [ , ] }
+        { t [ check-cookie-string , ] }
         [
             {
                 { [ dup timestamp? ] [ timestamp>cookie-string ] }
                 { [ dup duration? ] [ dt>seconds number>string ] }
+                { [ dup real? ] [ number>string ] }
                 [ ]
             } cond
-            "=" swap 3append ,
+            check-cookie-string "=" swap check-cookie-string 3append ,
         ]
     } case ;
 
 : unparse-cookie ( cookie -- strings )
     [
-        dup name>> >lower over value>> (unparse-cookie)
+        dup name>> check-cookie-string >lower
+        over value>> (unparse-cookie)
         "path" over path>> (unparse-cookie)
         "domain" over domain>> (unparse-cookie)
         "expires" over expires>> (unparse-cookie)

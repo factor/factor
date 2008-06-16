@@ -82,15 +82,12 @@ M: user-saver dispose
 : save-user-after ( user -- )
     <user-saver> &dispose drop ;
 
-: init-user ( realm -- )
-    logged-in-username [
-        users get-user
-        [ logged-in-user set ] [ save-user-after ] bi
-    ] when* ;
+: init-user ( user -- )
+    [ [ logged-in-user set ] [ save-user-after ] bi ] when* ;
 
 M: realm call-responder* ( path responder -- response )
     dup realm set
-    dup init-user
+    dup logged-in-username dup [ users get-user ] when init-user
     call-next-method ;
 
 : encode-password ( string salt -- bytes )

@@ -96,6 +96,19 @@ M: object modify-form drop ;
     request get url>>
     [ [ protocol>> ] [ host>> ] [ port>> ] tri 3array ] bi@ = ;
 
+: cookie-client-state ( key request -- value/f )
+    swap get-cookie dup [ value>> ] when ;
+
+: post-client-state ( key request -- value/f )
+    request-params at ;
+
+: client-state ( key -- value/f )
+    request get dup method>> {
+        { "GET" [ cookie-client-state ] }
+        { "HEAD" [ cookie-client-state ] }
+        { "POST" [ post-client-state ] }
+    } case ;
+
 SYMBOL: exit-continuation
 
 : exit-with ( value -- )
