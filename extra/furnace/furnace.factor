@@ -31,7 +31,7 @@ IN: furnace
 
 : base-path ( string -- pair )
     dup responder-nesting get
-    [ second class word-name = ] with find nip
+    [ second class superclasses [ word-name = ] with contains? ] with find nip
     [ first ] [ "No such responder: " swap append throw ] ?if ;
 
 : resolve-base-path ( string -- string' )

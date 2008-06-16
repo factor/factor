@@ -4,7 +4,7 @@
 
 	<t:title>Edit Profile</t:title>
 
-	<t:form t:action="$login/edit-profile">
+	<t:form t:action="$realm/edit-profile">
 
 	<table>
 	

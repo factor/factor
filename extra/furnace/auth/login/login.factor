@@ -13,13 +13,16 @@ IN: furnace.auth.login
 
 TUPLE: login-realm < realm ;
 
+M: login-realm logged-in-username
+    drop session get uid>> ;
+
 : set-uid ( username -- )
     session get [ (>>uid) ] [ (session-changed) ] bi ;
 
 : successful-login ( user -- response )
     username>> set-uid URL" $realm" end-aside ;
 
-: logout ( -- ) f set-uid ;
+: logout ( -- ) f set-uid URL" $realm" end-aside ;
 
 SYMBOL: description
 SYMBOL: capabilities
@@ -53,17 +56,14 @@ SYMBOL: capabilities
 
 : <logout-action> ( -- action )
     <action>
-        [ logout URL" $login-realm" end-aside ] >>submit ;
+        [ logout ] >>submit ;
 
 M: login-realm login-required*
     drop
     begin-aside
     protected get description>> description set
     protected get capabilities>> capabilities set
-    URL" $login/login" flashed-variables <flash-redirect> ;
-
-M: login-realm logged-in-username
-    drop session get uid>> ;
+    URL" $realm/login" flashed-variables <flash-redirect> ;
 
 : <login-realm> ( responder name -- auth )
     login-realm new-realm

@@ -64,4 +64,4 @@ IN: furnace.auth.features.edit-profile
     <edit-profile-action> <auth-boilerplate> "edit-profile" add-responder ;
 
 : allow-edit-profile? ( -- ? )
-    realm get get responders>> "edit-profile" swap key? ;
+    realm get responders>> "edit-profile" swap key? ;

@@ -17,6 +17,8 @@ IN: furnace.auth
 
 SYMBOL: logged-in-user
 
+: logged-in? ( -- ? ) logged-in-user get >boolean ;
+
 GENERIC: init-user-profile ( responder -- )
 
 M: object init-user-profile drop ;
@@ -114,7 +116,7 @@ TUPLE: protected < filter-responder description capabilities ;
 : check-capabilities ( responder user/f -- ? )
     {
         { [ dup not ] [ 2drop f ] }
-        { [ dup deleted>> ] [ 2drop f ] }
+        { [ dup deleted>> 1 = ] [ 2drop f ] }
         [ [ capabilities>> ] bi@ subset? ]
     } cond ;
 
