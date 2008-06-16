@@ -276,3 +276,7 @@ SYMBOL: a
 [ 4 ] [ a get-global ] unit-test
 
 [ "Goodbye" ] [ "http://localhost:1237/quit" http-get nip ] unit-test
+
+! Test cloning
+[ f ] [ <404> dup clone "b" "a" set-header drop "a" header ] unit-test
+[ f ] [ <404> dup clone "b" "a" <cookie> put-cookie drop "a" get-cookie ] unit-test

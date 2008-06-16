@@ -60,23 +60,16 @@ main-responder global [ <404> <trivial-responder> or ] change-at
     swap development? get [ '[ , http-error. ] >>body ] [ drop ] if ;
 
 : do-response ( response -- )
-    [ write-response ]
+    [ request get swap write-full-response ]
     [
-        request get method>> "HEAD" = [ drop ] [
-            '[
-                ,
-                [ content-charset>> encode-output ]
-                [ write-response-body ]
-                bi
-            ]
-            [
-                utf8 [
-                    development? get
-                    [ http-error. ] [ drop "Response error" rethrow ] if
-                ] with-encoded-output
-            ] recover
-        ] if
-    ] bi ;
+        [ \ do-response log-error ]
+        [
+            utf8 [
+                development? get
+                [ http-error. ] [ drop "Response error" write ] if
+            ] with-encoded-output
+        ] bi
+    ] recover ;
 
 LOG: httpd-hit NOTICE
 

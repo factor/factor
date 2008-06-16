@@ -6,7 +6,8 @@ assocs sequences splitting sorting sets debugger
 strings vectors hashtables quotations arrays byte-arrays
 math.parser calendar calendar.format present
 
-io io.encodings.iana io.encodings.binary io.encodings.8-bit
+io io.encodings io.encodings.iana io.encodings.binary
+io.encodings.8-bit
 
 unicode.case unicode.categories qualified
 
@@ -298,6 +299,11 @@ body ;
         latin1 >>content-charset
         V{ } clone >>cookies ;
 
+M: response clone
+    call-next-method
+        [ clone ] change-header
+        [ clone ] change-cookies ;
+
 : read-response-version ( response -- response )
     " \t" read-until
     [ "Bad response: version" throw ] unless
@@ -363,7 +369,11 @@ M: response write-response ( respose -- )
 
 M: response write-full-response ( request response -- )
     dup write-response
-    swap method>> "HEAD" = [ write-response-body ] unless ;
+    swap method>> "HEAD" = [
+        [ content-charset>> encode-output ]
+        [ write-response-body ]
+        bi
+    ] unless ;
 
 : get-cookie ( request/response name -- cookie/f )
     [ cookies>> ] dip '[ , _ name>> = ] find nip ;
