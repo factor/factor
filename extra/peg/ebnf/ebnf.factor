@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel compiler.units parser words arrays strings math.parser sequences 
        quotations vectors namespaces math assocs continuations peg
-       peg.parsers unicode.categories multiline combinators.lib 
-       splitting accessors effects sequences.deep peg.search ;
+       peg.parsers unicode.categories multiline combinators combinators.lib 
+       splitting accessors effects sequences.deep peg.search inference ;
 IN: peg.ebnf
 
 TUPLE: ebnf-non-terminal symbol ;
@@ -340,9 +340,16 @@ M: ebnf-var build-locals ( code ast -- )
 M: object build-locals ( code ast -- )
   drop ;
    
+: check-action-effect ( quot -- quot )
+  dup infer {
+    { [ dup (( a -- b )) effect<= ] [ drop ] }
+    { [ dup (( -- b )) effect<= ] [ drop [ drop ] prepose ] }
+    [ "Bad effect: " swap effect>string append throw ]
+  } cond ;
+ 
 M: ebnf-action (transform) ( ast -- parser )
   [ parser>> (transform) ] [ code>> ] [ parser>> ] tri build-locals 
-  string-lines parse-lines action ;
+  string-lines parse-lines check-action-effect action ;
 
 M: ebnf-semantic (transform) ( ast -- parser )
   [ parser>> (transform) ] [ code>> ] [ parser>> ] tri build-locals 
