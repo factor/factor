@@ -28,23 +28,62 @@ ERROR: encode-error ;
 
 ! Decoding
 
-<PRIVATE
-
 M: object <decoder> f decoder boa ;
 
+<PRIVATE
+
+: cr+ t >>cr drop ; inline
+
+: cr- f >>cr drop ; inline
+
 : >decoder< ( decoder -- stream encoding )
-    [ stream>> ] [ code>> ] bi ;
+    [ stream>> ] [ code>> ] bi ; inline
 
-: cr+ t swap set-decoder-cr ; inline
+: fix-read1 ( stream char -- char )
+    over cr>> [
+        over cr-
+        dup CHAR: \n = [
+            drop dup stream-read1
+        ] when
+    ] when nip ; inline
 
-: cr- f swap set-decoder-cr ; inline
+M: decoder stream-read1
+    dup >decoder< decode-char fix-read1 ;
+
+: fix-read ( stream string -- string )
+    over cr>> [
+        over cr-
+        "\n" ?head [
+            over stream-read1 [ suffix ] when*
+        ] when
+    ] when nip ; inline
+
+: (read) ( n quot -- n string )
+    over 0 <string> [
+        [
+            >r call dup
+            [ swap r> set-nth-unsafe f ] [ r> 3drop t ] if
+        ] 2curry find-integer
+    ] keep ; inline
+
+: finish-read ( n string -- string/f )
+    {
+        { [ over 0 = ] [ 2drop f ] }
+        { [ over not ] [ nip ] }
+        [ swap head ]
+    } cond ; inline
+
+M: decoder stream-read
+    tuck >decoder< [ decode-char ] 2curry (read) finish-read fix-read ;
+
+M: decoder stream-read-partial stream-read ;
 
 : line-ends/eof ( stream str -- str ) f like swap cr- ; inline
 
 : line-ends\r ( stream str -- str ) swap cr+ ; inline
 
 : line-ends\n ( stream str -- str )
-    over decoder-cr over empty? and
+    over cr>> over empty? and
     [ drop dup cr- stream-readln ] [ swap cr- ] if ; inline
 
 : handle-readln ( stream str ch -- str )
@@ -52,61 +91,30 @@ M: object <decoder> f decoder boa ;
         { f [ line-ends/eof ] }
         { CHAR: \r [ line-ends\r ] }
         { CHAR: \n [ line-ends\n ] }
-    } case ;
+    } case ; inline
 
-: fix-read ( stream string -- string )
-    over decoder-cr [
-        over cr-
-        "\n" ?head [
-            over stream-read1 [ suffix ] when*
-        ] when
-    ] when nip ;
-
-: read-loop ( n stream -- string )
-    SBUF" " clone [
-        [
-            >r nip stream-read1 dup
-            [ r> push f ] [ r> 2drop t ] if
-        ] 2curry find-integer drop
-    ] keep "" like f like ;
-
-M: decoder stream-read
-    tuck read-loop fix-read ;
-
-M: decoder stream-read-partial stream-read ;
-
-: (read-until) ( buf quot -- string/f sep/f )
+: ((read-until)) ( buf quot -- string/f sep/f )
     ! quot: -- char stop?
     dup call
     [ >r drop "" like r> ]
-    [ pick push (read-until) ] if ; inline
+    [ pick push ((read-until)) ] if ; inline
 
-M: decoder stream-read-until
+: (read-until) ( seps stream -- string/f sep/f )
     SBUF" " clone -rot >decoder<
-    [ decode-char [ dup rot memq? ] [ drop f t ] if* ] 3curry
-    (read-until) ;
+    [ decode-char dup [ dup rot member? ] [ 2drop f t ] if ] 3curry
+    ((read-until)) ; inline
 
-: fix-read1 ( stream char -- char )
-    over decoder-cr [
-        over cr-
-        dup CHAR: \n = [
-            drop dup stream-read1
-        ] when
-    ] when nip ;
+M: decoder stream-read-until (read-until) ;
 
-M: decoder stream-read1
-    dup >decoder< decode-char fix-read1 ;
+M: decoder stream-readln "\r\n" over (read-until) handle-readln ;
 
-M: decoder stream-readln ( stream -- str )
-    "\r\n" over stream-read-until handle-readln ;
-
-M: decoder dispose decoder-stream dispose ;
+M: decoder dispose stream>> dispose ;
 
 ! Encoding
 M: object <encoder> encoder boa ;
 
 : >encoder< ( encoder -- stream encoding )
-    [ stream>> ] [ code>> ] bi ;
+    [ stream>> ] [ code>> ] bi ; inline
 
 M: encoder stream-write1
     >encoder< encode-char ;

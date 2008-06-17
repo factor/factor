@@ -9,7 +9,7 @@ io.streams.string layouts splitting math.intervals
 math.floats.private classes.tuple classes.tuple.private classes
 classes.algebra optimizer.def-use optimizer.backend
 optimizer.pattern-match optimizer.inlining float-arrays
-sequences.private combinators ;
+sequences.private combinators byte-arrays byte-vectors ;
 
 { <tuple> <tuple-boa> } [
     [
@@ -59,15 +59,19 @@ sequences.private combinators ;
     node-in-d peek dup value?
     [ value-literal sequence? ] [ drop f ] if ;
 
-: member-quot ( seq -- newquot )
-    [ literalize [ t ] ] { } map>assoc
-    [ drop f ] suffix [ nip case ] curry ;
+: member-quot ( seq predicate -- newquot )
+    [ curry [ dup ] prepose [ drop t ] ] curry { } map>assoc
+    [ drop f ] suffix [ nip cond ] curry ;
 
-: expand-member ( #call -- )
-    dup node-in-d peek value-literal member-quot f splice-quot ;
+: expand-member ( #call predicate -- )
+    >r dup node-in-d peek value-literal r> member-quot f splice-quot ;
 
 \ member? {
-    { [ dup literal-member? ] [ expand-member ] }
+    { [ dup literal-member? ] [ [ = ] expand-member ] }
+} define-optimizers
+
+\ memq? {
+    { [ dup literal-member? ] [ [ eq? ] expand-member ] }
 } define-optimizers
 
 ! if the result of eq? is t and the second input is a literal,
@@ -97,7 +101,7 @@ sequences.private combinators ;
 ] each
 
 \ push-all
-{ { string sbuf } { array vector } }
+{ { string sbuf } { array vector } { byte-array byte-vector } }
 "specializer" set-word-prop
 
 \ append
