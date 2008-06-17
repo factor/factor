@@ -154,7 +154,7 @@ Unary              =   "-" Postfix:p                    => [[ p "-" ast-unop boa
 Postfix            =   PrimExpr:p SpacesNoNl "++"       => [[ p "++" ast-postop boa ]]
                      | PrimExpr:p SpacesNoNl "--"       => [[ p "--" ast-postop boa ]]
                      | PrimExpr
-Args               =   Expr ("," Expr => [[ second ]])*      => [[ first2 swap prefix ]]
+Args               =   (Expr ("," Expr => [[ second ]])* => [[ first2 swap prefix ]])?
 PrimExpr           =   PrimExpr:p "[" Expr:i "]"             => [[ i p ast-getp boa ]]
                      | PrimExpr:p "." Name:m "(" Args:as ")" => [[ m p as ast-send boa ]]
                      | PrimExpr:p "." Name:f                 => [[ f p ast-getp boa ]]
@@ -169,18 +169,18 @@ PrimExprHd         =   "(" Expr:e ")"                        => [[ e ]]
                      | "new" Name:n "(" Args:as ")"          => [[ n as ast-new boa ]]
                      | "[" Args:es "]"                       => [[ es ast-array boa ]]
                      | Json
-JsonBindings        = JsonBinding ("," JsonBinding => [[ second ]])*  => [[ first2 swap prefix ]]
+JsonBindings        = (JsonBinding ("," JsonBinding => [[ second ]])* => [[ first2 swap prefix ]])?
 Json               = "{" JsonBindings:bs "}"                  => [[ bs ast-json boa ]]
 JsonBinding        = JsonPropName:n ":" Expr:v               => [[ n v ast-binding boa ]]
 JsonPropName       = Name | Number | String
 Formal             = Spaces Name
-Formals            = Formal ("," Formal => [[ second ]])*     => [[ first2 swap prefix ]]
+Formals            = (Formal ("," Formal => [[ second ]])*  => [[ first2 swap prefix ]])?
 FuncRest           = "(" Formals:fs ")" "{" SrcElems:body "}" => [[ fs body ast-func boa ]]
 Sc                 = SpacesNoNl ("\n" | "}")| ";"
 Binding            =   Name:n "=" Expr:v                      => [[ n v ast-var boa ]]
                      | Name:n                                 => [[ n "undefined" ast-get boa ast-var boa ]]
 Block              = "{" SrcElems:ss "}"                      => [[ ss ]]
-Bindings           = Binding ("," Binding => [[ second ]])*   => [[ first2 swap prefix ]]
+Bindings           = (Binding ("," Binding => [[ second ]])* => [[ first2 swap prefix ]])?
 For1               =   "var" Binding => [[ second ]] 
                      | Expr 
                      | Spaces => [[ "undefined" ast-get boa ]] 
