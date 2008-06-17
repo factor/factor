@@ -86,13 +86,13 @@ M: threaded-server handle-client* handler>> call ;
         if*
     ] [ accept-loop ] bi ; inline
 
-\ accept-loop ERROR add-error-logging
-
 : start-accept-loop ( server -- )
     threaded-server get encoding>> <server>
     [ threaded-server get sockets>> push ]
     [ [ accept-loop ] with-disposal ]
     bi ;
+
+\ start-accept-loop ERROR add-error-logging
 
 : init-server ( threaded-server -- threaded-server )
     dup semaphore>> [

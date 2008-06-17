@@ -20,6 +20,7 @@ SYMBOL: local-node
             binary >>encoding
             "concurrency.distributed" >>name
             [ handle-node-client ] >>handler
+        start-server
     ] curry "Distributed concurrency server" spawn drop ;
 
 : start-node ( port -- )

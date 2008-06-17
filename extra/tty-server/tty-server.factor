@@ -1,4 +1,5 @@
-USING: listener io.servers.connection io.encodings.utf8 ;
+USING: listener io.servers.connection io.encodings.utf8
+accessors kernel ;
 IN: tty-server
 
 : <tty-server> ( port -- )
@@ -6,8 +7,9 @@ IN: tty-server
         "tty-server" >>name
         utf8 >>encoding
         swap local-server >>insecure
-        [ listener ] >>handler ;
+        [ listener ] >>handler
+    start-server ;
 
-: tty-server ( -- ) 9999 tty-server ;
+: tty-server ( -- ) 9999 <tty-server> ;
 
 MAIN: tty-server
