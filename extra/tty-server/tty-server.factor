@@ -1,11 +1,13 @@
-USING: listener io.server io.encodings.utf8 ;
+USING: listener io.servers.connection io.encodings.utf8 ;
 IN: tty-server
 
-: tty-server ( port -- )
-    local-server
-    "tty-server"
-    utf8 [ listener ] with-server ;
+: <tty-server> ( port -- )
+    <threaded-server>
+        "tty-server" >>name
+        utf8 >>encoding
+        swap local-server >>insecure
+        [ listener ] >>handler ;
 
-: default-tty-server ( -- ) 9999 tty-server ;
+: tty-server ( -- ) 9999 tty-server ;
 
-MAIN: default-tty-server
+MAIN: tty-server
