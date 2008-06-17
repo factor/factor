@@ -410,7 +410,7 @@ M: ebnf-var (transform) ( ast -- parser )
   parser>> (transform) ;
 
 M: ebnf-terminal (transform) ( ast -- parser )
-  symbol>> token ;
+  symbol>> [ token ] keep [ = ] curry satisfy 2choice ;
 
 M: ebnf-foreign (transform) ( ast -- parser )
   dup word>> search

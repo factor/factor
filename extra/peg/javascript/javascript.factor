@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel arrays strings math.parser sequences sequences.deep
-peg peg.ebnf peg.parsers memoize namespaces math ;
+peg peg.ebnf peg.parsers memoize namespaces math accessors ;
 IN: peg.javascript
 
 #! Grammar for JavaScript. Based on OMeta-JS example from:
@@ -81,7 +81,7 @@ Keyword           =  ("break"
                     | "var"
                     | "void"
                     | "while"
-                    | "with") => [[ ast-keyword boa ]]
+                    | "with") 
 Name              = !(Keyword) (iName):n => [[ n ast-name boa ]]
 Number            =   Digits:ws '.' Digits:fs => [[ ws "." fs 3array concat >string string>number ast-number boa ]]
                     | Digits => [[ >string string>number ast-number boa ]]  
@@ -105,61 +105,11 @@ Toks               = (Tok)* Spaces
 ;EBNF
 
 EBNF: javascript
-Letter            = [a-zA-Z]
-Digit             = [0-9]
-Digits            = (Digit)+
-SingleLineComment = "//" (!("\n") .)* "\n" => [[ ignore ]]
-MultiLineComment  = "/*" (!("*/") .)* "*/" => [[ ignore ]]
-Space             = " " | "\t" | "\n" | SingleLineComment | MultiLineComment
+Space             = " " | "\t" | "\n" 
 Spaces            = (Space)* => [[ ignore ]]
-NameFirst         = Letter | "$" | "_"
-NameRest          = NameFirst | Digit
-iName             = NameFirst (NameRest)* => [[ first2 swap prefix >string ]]
-Keyword           =  ("break"
-                    | "case"
-                    | "catch"
-                    | "continue"
-                    | "default"
-                    | "delete"
-                    | "do"
-                    | "else"
-                    | "finally"
-                    | "for"
-                    | "function"
-                    | "if"
-                    | "in"
-                    | "instanceof"
-                    | "new"
-                    | "return"
-                    | "switch"
-                    | "this"
-                    | "throw"
-                    | "try"
-                    | "typeof"
-                    | "var"
-                    | "void"
-                    | "while"
-                    | "with") => [[ ast-keyword boa ]]
-Name              = !(Keyword) (iName):n => [[ n ast-name boa ]]
-Number            =   Digits:ws '.' Digits:fs => [[ ws "." fs 3array concat >string string>number ast-number boa ]]
-                    | Digits => [[ >string string>number ast-number boa ]]  
-
-EscapeChar        =   "\\n" => [[ 10 ]] 
-                    | "\\r" => [[ 13 ]]
-                    | "\\t" => [[ 9 ]]
-StringChars1       = (EscapeChar | !('"""') .)* => [[ >string ]]
-StringChars2       = (EscapeChar | !('"') .)* => [[ >string ]]
-StringChars3       = (EscapeChar | !("'") .)* => [[ >string ]]
-Str                =   '"""' StringChars1:cs '"""' => [[ cs ast-string boa ]]
-                     | '"' StringChars2:cs '"' => [[ cs ast-string boa ]]
-                     | "'" StringChars3:cs "'" => [[ cs ast-string boa ]]
-Special            =   "("   | ")"   | "{"   | "}"   | "["   | "]"   | ","   | ";"
-                     | "?"   | ":"   | "!==" | "~="  | "===" | "=="  | "="   | ">="
-                     | ">"   | "<="  | "<"   | "++"  | "+="  | "+"   | "--"  | "-="
-                     | "-"   | "*="  | "*"   | "/="  | "/"   | "%="  | "%"   | "&&="
-                     | "&&"  | "||=" | "||"  | "."   | "!"
-Tok                = Spaces (Name | Keyword | Number | Str | Special )
-Toks               = (Tok)* Spaces 
+Name               = . ?[ ast-name?   ]?   => [[ value>> ]] 
+Number             = . ?[ ast-number? ]?   => [[ value>> ]]
+String             = . ?[ ast-string? ]?   => [[ value>> ]]
 SpacesNoNl         = (!("\n") Space)* => [[ ignore ]]
 
 Expr               =   OrExpr:e "?" Expr:t ":" Expr:f   => [[ e t f ast-cond-expr boa ]]
@@ -214,7 +164,7 @@ PrimExprHd         =   "(" Expr:e ")"                        => [[ e ]]
                      | "this"                                => [[ ast-this boa ]]
                      | Name                                  => [[ ast-get boa ]]
                      | Number                                => [[ ast-number boa ]]
-                     | Str                                   => [[ ast-string boa ]]
+                     | String                                => [[ ast-string boa ]]
                      | "function" FuncRest:fr                => [[ fr ]]
                      | "new" Name:n "(" Args:as ")"          => [[ n as ast-new boa ]]
                      | "[" Args:es "]"                       => [[ es ast-array boa ]]
@@ -222,7 +172,7 @@ PrimExprHd         =   "(" Expr:e ")"                        => [[ e ]]
 JsonBindings        = JsonBinding ("," JsonBinding)*          => [[ first2 swap prefix ]]
 Json               = "{" JsonBindings:bs "}"                  => [[ bs ast-json boa ]]
 JsonBinding        = JsonPropName:n ":" Expr:v               => [[ n v ast-binding boa ]]
-JsonPropName       = Name | Number | Str
+JsonPropName       = Name | Number | String
 Formal             = Spaces Name
 Formals            = Formal ("," Formal)*                    => [[ first2 swap prefix ]]
 FuncRest           = "(" Formals:fs ")" "{" SrcElems:body "}" => [[ fs body ast-func boa ]]
