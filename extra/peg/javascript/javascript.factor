@@ -46,6 +46,64 @@ TUPLE: ast-return e ;
 TUPLE: ast-case c cs ;
 TUPLE: ast-default cs ;
 
+EBNF: tokenizer 
+Letter            = [a-zA-Z]
+Digit             = [0-9]
+Digits            = (Digit)+
+SingleLineComment = "//" (!("\n") .)* "\n" => [[ ignore ]]
+MultiLineComment  = "/*" (!("*/") .)* "*/" => [[ ignore ]]
+Space             = " " | "\t" | "\n" | SingleLineComment | MultiLineComment
+Spaces            = (Space)* => [[ ignore ]]
+NameFirst         = Letter | "$" | "_"
+NameRest          = NameFirst | Digit
+iName             = NameFirst (NameRest)* => [[ first2 swap prefix >string ]]
+Keyword           =  ("break"
+                    | "case"
+                    | "catch"
+                    | "continue"
+                    | "default"
+                    | "delete"
+                    | "do"
+                    | "else"
+                    | "finally"
+                    | "for"
+                    | "function"
+                    | "if"
+                    | "in"
+                    | "instanceof"
+                    | "new"
+                    | "return"
+                    | "switch"
+                    | "this"
+                    | "throw"
+                    | "try"
+                    | "typeof"
+                    | "var"
+                    | "void"
+                    | "while"
+                    | "with") => [[ ast-keyword boa ]]
+Name              = !(Keyword) (iName):n => [[ n ast-name boa ]]
+Number            =   Digits:ws '.' Digits:fs => [[ ws "." fs 3array concat >string string>number ast-number boa ]]
+                    | Digits => [[ >string string>number ast-number boa ]]  
+
+EscapeChar        =   "\\n" => [[ 10 ]] 
+                    | "\\r" => [[ 13 ]]
+                    | "\\t" => [[ 9 ]]
+StringChars1       = (EscapeChar | !('"""') .)* => [[ >string ]]
+StringChars2       = (EscapeChar | !('"') .)* => [[ >string ]]
+StringChars3       = (EscapeChar | !("'") .)* => [[ >string ]]
+Str                =   '"""' StringChars1:cs '"""' => [[ cs ast-string boa ]]
+                     | '"' StringChars2:cs '"' => [[ cs ast-string boa ]]
+                     | "'" StringChars3:cs "'" => [[ cs ast-string boa ]]
+Special            =   "("   | ")"   | "{"   | "}"   | "["   | "]"   | ","   | ";"
+                     | "?"   | ":"   | "!==" | "~="  | "===" | "=="  | "="   | ">="
+                     | ">"   | "<="  | "<"   | "++"  | "+="  | "+"   | "--"  | "-="
+                     | "-"   | "*="  | "*"   | "/="  | "/"   | "%="  | "%"   | "&&="
+                     | "&&"  | "||=" | "||"  | "."   | "!"
+Tok                = Spaces (Name | Keyword | Number | Str | Special )
+Toks               = (Tok)* Spaces 
+;EBNF
+
 EBNF: javascript
 Letter            = [a-zA-Z]
 Digit             = [0-9]
