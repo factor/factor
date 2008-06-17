@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel symbols namespaces continuations
-destructors io.sockets sequences inspector calendar ;
+destructors io.sockets sequences inspector calendar delegate ;
 IN: io.sockets.secure
 
 SYMBOL: secure-socket-timeout
@@ -42,8 +42,10 @@ TUPLE: secure addrspec ;
 
 C: <secure> secure
 
-: resolve-secure-host ( host port passive? -- seq )
-    resolve-host [ <secure> ] map ;
+CONSULT: inet secure addrspec>> ;
+
+M: secure resolve-host ( secure -- seq )
+    addrspec>> resolve-host [ <secure> ] map ;
 
 HOOK: check-certificate secure-socket-backend ( host handle -- )
 
@@ -53,9 +55,8 @@ PREDICATE: secure-inet < secure addrspec>> inet? ;
 
 M: secure-inet (client)
     [
-        addrspec>>
-        [ [ host>> ] [ port>> ] bi f resolve-secure-host (client) >r |dispose r> ] keep
-        host>> pick handle>> check-certificate
+        [ resolve-host (client) [ |dispose ] dip ] keep
+        addrspec>> host>> pick handle>> check-certificate
     ] with-destructors ;
 
 PRIVATE>
