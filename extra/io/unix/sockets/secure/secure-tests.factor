@@ -14,7 +14,7 @@ concurrency.promises byte-arrays locals calendar io.timeouts ;
         "resource:extra/openssl/test/server.pem" >>key-file
         "resource:extra/openssl/test/dh1024.pem" >>dh-file
         "password" >>password
-    swap with-secure-context ;
+    swap with-secure-context ; inline
 
 :: server-test ( quot -- )
     [
