@@ -3,7 +3,8 @@
 USING: kernel compiler.units parser words arrays strings math.parser sequences 
        quotations vectors namespaces math assocs continuations peg
        peg.parsers unicode.categories multiline combinators combinators.lib 
-       splitting accessors effects sequences.deep peg.search inference ;
+       splitting accessors effects sequences.deep peg.search inference 
+       io.streams.string io prettyprint ;
 IN: peg.ebnf
 
 TUPLE: ebnf-non-terminal symbol ;
@@ -324,7 +325,7 @@ M: ebnf-sequence build-locals ( code ast -- code )
         ] 2each
         " | " %
         %  
-        " ]" %     
+        " nip ]" %     
     ] "" make 
   ] if ;
 
@@ -334,7 +335,7 @@ M: ebnf-var build-locals ( code ast -- )
     name>> % " [ dup ] " %
     " | " %
     %  
-    " ]" %     
+    " nip ]" %     
   ] "" make ;
 
 M: object build-locals ( code ast -- )
@@ -344,7 +345,12 @@ M: object build-locals ( code ast -- )
   dup infer {
     { [ dup (( a -- b )) effect<= ] [ drop ] }
     { [ dup (( -- b )) effect<= ] [ drop [ drop ] prepose ] }
-    [ "Bad effect: " swap effect>string append throw ]
+    [
+      [ 
+        "Bad effect: " write effect>string write 
+        " for quotation " write pprint
+      ] with-string-writer throw
+    ]
   } cond ;
  
 M: ebnf-action (transform) ( ast -- parser )
