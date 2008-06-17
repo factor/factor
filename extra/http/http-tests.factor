@@ -123,7 +123,7 @@ read-response-test-1' 1array [
 ! Live-fire exercise
 USING: http.server http.server.static furnace.sessions furnace.alloy
 furnace.actions furnace.auth furnace.auth.login furnace.db http.client
-io.server io.files io io.encodings.ascii
+io.servers.connection io.files io io.encodings.ascii
 accessors namespaces threads
 http.server.responses http.server.redirection
 http.server.dispatchers db.tuples ;

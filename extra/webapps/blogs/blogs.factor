@@ -7,6 +7,7 @@ html.components
 http.server.dispatchers
 furnace
 furnace.actions
+furnace.redirection
 furnace.auth
 furnace.auth.login
 furnace.boilerplate

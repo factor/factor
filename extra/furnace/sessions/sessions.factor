@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel math.intervals math.parser namespaces
-random accessors quotations hashtables sequences continuations
-fry calendar combinators combinators.lib destructors alarms io.server
+strings random accessors quotations hashtables sequences continuations
+fry calendar combinators combinators.lib destructors alarms
+io.servers.connection
 db db.tuples db.types
 http http.server http.server.dispatchers http.server.filters
 html.elements
@@ -109,7 +110,7 @@ M: session-saver dispose
 
 : request-session ( -- session/f )
     session-id-key
-    client-state dup [ string>number ] when
+    client-state dup string? [ string>number ] when
     get-session verify-session ;
 
 : <session-cookie> ( -- cookie )

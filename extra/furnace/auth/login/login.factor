@@ -10,6 +10,7 @@ furnace.asides
 furnace.actions
 furnace.sessions
 furnace.utilities
+furnace.redirection
 furnace.auth.login.permits ;
 IN: furnace.auth.login
 
@@ -94,7 +95,7 @@ M: login-realm login-required*
     begin-aside
     protected get description>> description set
     protected get capabilities>> capabilities set
-    URL" $realm/login" flashed-variables <flash-redirect> ;
+    URL" $realm/login" >secure-url flashed-variables <flash-redirect> ;
 
 : <login-realm> ( responder name -- auth )
     login-realm new-realm

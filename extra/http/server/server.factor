@@ -4,7 +4,6 @@ USING: kernel accessors sequences arrays namespaces splitting
 vocabs.loader destructors assocs debugger continuations
 combinators tools.vocabs tools.time math
 io
-io.server
 io.sockets
 io.sockets.secure
 io.encodings
@@ -12,6 +11,7 @@ io.encodings.utf8
 io.encodings.ascii
 io.encodings.binary
 io.streams.limited
+io.servers.connection
 io.timeouts
 fry logging logging.insomniac calendar urls
 http
@@ -118,10 +118,6 @@ LOG: httpd-header NOTICE
 : ?refresh-all ( -- )
     development? get-global [ global [ refresh-all ] bind ] when ;
 
-: setup-limits ( -- )
-    1 minutes timeouts
-    64 1024 * limit-input ;
-
 LOG: httpd-benchmark DEBUG
 
 : ?benchmark ( quot -- )
@@ -130,25 +126,23 @@ LOG: httpd-benchmark DEBUG
         httpd-benchmark
     ] [ call ] if ; inline
 
-: handle-client ( -- )
+TUPLE: http-server < threaded-server ;
+
+M: http-server handle-client*
+    drop
     [
-        setup-limits
-        ascii decode-input
-        ascii encode-output
+        64 1024 * limit-input
         ?refresh-all
         read-request
         [ do-request ] ?benchmark
         [ do-response ] ?benchmark
     ] with-destructors ;
 
-: httpd ( port -- )
-    dup integer? [ internet-server ] when
-    "http.server" binary [ handle-client ] with-server ;
+: <http-server> ( -- server )
+    http-server new-threaded-server
+        "http.server" >>name
+        "http" protocol-port >>insecure
+        "https" protocol-port >>secure ;
 
-: httpd-main ( -- )
-    8888 httpd ;
-
-: httpd-insomniac ( -- )
-    "http.server" { httpd-hit } schedule-insomniac ;
-
-MAIN: httpd-main
+: http-insomniac ( -- )
+    "http.server" { "httpd-hit" } schedule-insomniac ;

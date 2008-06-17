@@ -11,6 +11,7 @@ furnace
 furnace.boilerplate
 furnace.auth
 furnace.actions
+furnace.redirection
 furnace.db
 furnace.auth.login ;
 IN: webapps.todo

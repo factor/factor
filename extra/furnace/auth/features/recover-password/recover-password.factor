@@ -3,7 +3,8 @@
 USING: namespaces accessors kernel assocs arrays io.sockets threads
 fry urls smtp validators html.forms
 http http.server.responses http.server.dispatchers
-furnace furnace.actions furnace.auth furnace.auth.providers ;
+furnace furnace.actions furnace.auth furnace.auth.providers
+furnace.redirection ;
 IN: furnace.auth.features.recover-password
 
 SYMBOL: lost-password-from

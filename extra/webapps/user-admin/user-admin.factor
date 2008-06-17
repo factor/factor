@@ -12,6 +12,7 @@ furnace.auth.providers.db
 furnace.auth.login
 furnace.auth
 furnace.actions
+furnace.redirection
 furnace.utilities
 http.server
 http.server.dispatchers ;

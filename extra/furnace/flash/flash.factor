@@ -3,7 +3,7 @@
 USING: namespaces assocs assocs.lib kernel sequences accessors
 urls db.types db.tuples math.parser fry
 http http.server http.server.filters http.server.redirection
-furnace furnace.cache furnace.sessions ;
+furnace furnace.cache furnace.sessions furnace.redirection ;
 IN: furnace.flash
 
 TUPLE: flash-scope < server-state session namespace ;

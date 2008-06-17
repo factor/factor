@@ -4,7 +4,7 @@ USING: accessors namespaces sequences arrays kernel
 assocs assocs.lib hashtables math.parser urls combinators
 html.elements html.templates.chloe.syntax db.types db.tuples
 http http.server http.server.filters 
-furnace furnace.cache furnace.sessions ;
+furnace furnace.cache furnace.sessions furnace.redirection ;
 IN: furnace.asides
 
 TUPLE: aside < server-state session method url post-data ;
