@@ -125,7 +125,7 @@ USING: http.server http.server.static furnace.sessions furnace.alloy
 furnace.actions furnace.auth furnace.auth.login furnace.db http.client
 io.servers.connection io.files io io.encodings.ascii
 accessors namespaces threads
-http.server.responses http.server.redirection
+http.server.responses http.server.redirection furnace.redirection
 http.server.dispatchers db.tuples ;
 
 : add-quit-action

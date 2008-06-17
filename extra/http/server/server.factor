@@ -144,5 +144,11 @@ M: http-server handle-client*
         "http" protocol-port >>insecure
         "https" protocol-port >>secure ;
 
+: httpd ( port -- )
+    <http-server>
+        swap >>insecure
+        f >>secure
+    start-server ;
+
 : http-insomniac ( -- )
     "http.server" { "httpd-hit" } schedule-insomniac ;
