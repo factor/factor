@@ -571,10 +571,10 @@ M: parse-failed error.
 
 : PEG:
   (:)
-  [let | word [ ] def [ ] |
+  [let | def [ ] word [ ] |
     [
       [
-        [let | compiled-def [ def call compile ]
+        [let | compiled-def [ def call compile ] |
           [
             dup compiled-def compiled-parse
             [ ast>> ] [ word parse-failed ] ?if
