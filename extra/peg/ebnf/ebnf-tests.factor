@@ -399,6 +399,16 @@ main = Primary
   "number=digit+:n 'a'" 'ebnf' parse remaining>> length zero?
 ] unit-test
 
+{ t } [
+  "foo=(name):n !(keyword) => [[ n ]]" 'rule' parse ast>>
+  "foo=name:n !(keyword) => [[ n ]]" 'rule' parse ast>> =
+] unit-test
+
+{ t } [
+  "foo=!(keyword) (name):n => [[ n ]]" 'rule' parse ast>>
+  "foo=!(keyword) name:n => [[ n ]]" 'rule' parse ast>> =
+] unit-test
+
 <<
 EBNF: parser1 
 foo='a' 
