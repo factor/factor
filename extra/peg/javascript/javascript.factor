@@ -52,7 +52,7 @@ Digit             = [0-9]
 Digits            = Digit+
 SingleLineComment = "//" (!("\n") .)* "\n" => [[ ignore ]]
 MultiLineComment  = "/*" (!("*/") .)* "*/" => [[ ignore ]]
-Space             = " " | "\t" | "\n" | SingleLineComment | MultiLineComment
+Space             = " " | "\t" | "\r" | "\n" | SingleLineComment | MultiLineComment
 Spaces            = Space* => [[ ignore ]]
 NameFirst         = Letter | "$" | "_"
 NameRest          = NameFirst | Digit
