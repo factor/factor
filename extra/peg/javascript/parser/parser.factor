@@ -7,6 +7,7 @@ IN: peg.javascript.parser
 #! http://jarrett.cs.ucla.edu/ometa-js/#JavaScript_Compiler 
 
 EBNF: javascript
+End               = !(.)
 Space             = " " | "\t" | "\n" 
 Spaces            = Space* => [[ ignore ]]
 Name               = . ?[ ast-name?   ]?   => [[ value>> ]] 
@@ -78,7 +79,7 @@ JsonPropName       = Name | Number | String
 Formal             = Spaces Name
 Formals            = (Formal ("," Formal => [[ second ]])*  => [[ first2 swap prefix ]])?
 FuncRest           = "(" Formals:fs ")" "{" SrcElems:body "}" => [[ fs body ast-func boa ]]
-Sc                 = SpacesNoNl ("\n" | &("}"))| ";"
+Sc                 = SpacesNoNl ("\n" | &("}") | End)| ";"
 Binding            =   Name:n "=" Expr:v                      => [[ n v ast-var boa ]]
                      | Name:n                                 => [[ n "undefined" ast-get boa ast-var boa ]]
 Block              = "{" SrcElems:ss "}"                      => [[ ss ]]

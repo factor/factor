@@ -35,3 +35,14 @@ function foldl(f, initial, seq) {
 }
 "> tokenizer ast>> javascript remaining>> length zero?
 ] unit-test
+
+{ t } [ 
+<"
+ParseState.prototype.from = function(index) {
+    var r = new ParseState(this.input, this.index + index);
+    r.cache = this.cache;
+    r.length = this.length - index;
+    return r;
+}
+"> tokenizer ast>> javascript remaining>> length zero?
+] unit-test
