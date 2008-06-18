@@ -79,13 +79,9 @@ ERROR: download-failed response body ;
 
 M: download-failed error.
     "HTTP download failed:" print nl
-    [
-        response>>
-            write-response-code
-            write-response-message nl
-        drop
-    ]
-    [ body>> write ] bi ;
+    [ response>> write-response-line nl drop ]
+    [ body>> write ]
+    bi ;
 
 : check-response ( response data -- response data )
     over code>> success? [ download-failed ] unless ;
