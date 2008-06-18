@@ -27,7 +27,7 @@ $nl
     { { $link inet4 } " - a TCP/IP connection to an IPv4 address and port number; no name lookup is performed" }
     { { $link inet6 } " - a TCP/IP connection to an IPv6 address and port number; no name lookup is performed" }
 }
-"The " { $vocab-link "io.server" } " library defines a nice high-level wrapper around " { $link <server> } " which makes it easy to listen for IPv4 and IPv6 connections simultaneously, perform logging, and optionally only allow connections from the loopback interface."
+"The " { $vocab-link "io.servers.connection" } " library defines high-level wrappers around " { $link <server> } " which makes it easy to listen for IPv4, IPv6 and secure socket connections simultaneously, perform logging, and optionally only allow connections from the loopback interface."
 { $see-also "io.sockets.secure" } ;
 
 ARTICLE: "network-packet" "Packet-oriented networking"
@@ -79,7 +79,7 @@ HELP: inet
 HELP: inet4
 { $class-description "IPv4 address/port number specifier for TCP/IP and UDP/IP connections. The " { $snippet "host" } " and " { $snippet "port" } " slots hold the IPv4 address and port number, respectively. New instances are created by calling " { $link <inet4> } "." }
 { $notes
-"New instances should not be created directly; instead, use " { $link resolve-host } " to look up the address associated to a host name. Also, try to support IPv6 where possible."
+"Most applications do not operate on IPv4 addresses directly, and instead should use " { $link resolve-host } " to look up the address associated to a host name. Also, try to support IPv6 where possible."
 }
 { $examples
     { $code "\"127.0.0.1\" 8080 <inet4>" }
@@ -88,7 +88,7 @@ HELP: inet4
 HELP: inet6
 { $class-description "IPv6 address/port number specifier for TCP/IP and UDP/IP connections. The " { $snippet "host" } " and " { $snippet "port" } " slots hold the IPv6 address and port number, respectively. New instances are created by calling " { $link <inet6> } "." }
 { $notes
-"New instances should not be created directly; instead, use " { $link resolve-host } " to look up the address associated to a host name." }
+"Most applications do not operate on IPv6 addresses directly, and instead should use " { $link resolve-host } " to look up the address associated to a host name." }
 { $examples
     { $code "\"::1\" 8080 <inet6>" }
 } ;
@@ -118,10 +118,10 @@ HELP: <server>
 }
 { $notes
     "To start a TCP/IP server which listens for connections from any host, use an address specifier returned by the following code, where 1234 is the desired port number:"
-    { $code "f 1234 t resolve-host" }
+    { $code "f 1234 <inet> resolve-host" }
     "To start a server which listens for connections from the loopback interface only, use an address specifier returned by the following code, where 1234 is the desired port number:"
-    { $code "\"localhost\" 1234 t resolve-host" }
-    "Since " { $link resolve-host } " can return multiple address specifiers, your server code must listen on them all to work properly. The " { $vocab-link "io.server" } " vocabulary can be used to help with this."
+    { $code "\"localhost\" 1234 <inet> resolve-host" }
+    "Since " { $link resolve-host } " can return multiple address specifiers, your server code must listen on them all to work properly. The " { $vocab-link "io.servers.connection" } " vocabulary can be used to help with this."
     $nl
     "To start a TCP/IP server which listens for connections on a randomly-assigned port, set the port number in the address specifier to 0, and then read the " { $snippet "addr" } " slot of the server instance to obtain the actual port number it is listening on:"
     { $unchecked-example
@@ -148,9 +148,9 @@ HELP: <datagram>
 }
 { $notes
     "To accept UDP/IP packets from any host, use an address specifier returned by the following code, where 1234 is the desired port number:"
-    { $code "f 1234 t resolve-host" }
+    { $code "f 1234 <inet> resolve-host" }
     "To accept UDP/IP packets from the loopback interface only, use an address specifier returned by the following code, where 1234 is the desired port number:"
-    { $code "\"localhost\" 1234 t resolve-host" }
+    { $code "\"localhost\" 1234 <inet> resolve-host" }
     "Since " { $link resolve-host } " can return multiple address specifiers, your code must create a datagram socket for each one and co-ordinate packet sending accordingly."
     "Datagrams are low-level binary ports that don't map onto streams, so the constructor does not use an encoding"
 }
@@ -165,3 +165,7 @@ HELP: send
 { $values { "packet" byte-array } { "addrspec" "an address specifier" } { "datagram" "a datagram socket" } }
 { $description "Sends a packet to the given address." }
 { $errors "Throws an error if the packet could not be sent." } ;
+
+HELP: resolve-host
+{ $values { "addrspec" "an address specifier" } { "seq" "a sequence of address specifiers" } }
+{ $description "Resolves host names to IP addresses." } ;

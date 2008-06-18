@@ -10,6 +10,7 @@ xml.entities
 xml.writer
 html.components
 html.elements
+html.forms
 html.templates
 html.templates.chloe
 html.templates.chloe.syntax
@@ -30,7 +31,7 @@ IN: furnace
 
 : base-path ( string -- pair )
     dup responder-nesting get
-    [ second class word-name = ] with find nip
+    [ second class superclasses [ word-name = ] with contains? ] with find nip
     [ first ] [ "No such responder: " swap append throw ] ?if ;
 
 : resolve-base-path ( string -- string' )
@@ -62,13 +63,6 @@ M: url adjust-url
 
 M: string adjust-url ;
 
-: <redirect> ( url -- response )
-    adjust-url request get method>> {
-        { "GET" [ <temporary-redirect> ] }
-        { "HEAD" [ <temporary-redirect> ] }
-        { "POST" [ <permanent-redirect> ] }
-    } case ;
-
 GENERIC: modify-form ( responder -- )
 
 M: object modify-form drop ;
@@ -95,6 +89,19 @@ M: object modify-form drop ;
     request get url>>
     [ [ protocol>> ] [ host>> ] [ port>> ] tri 3array ] bi@ = ;
 
+: cookie-client-state ( key request -- value/f )
+    swap get-cookie dup [ value>> ] when ;
+
+: post-client-state ( key request -- value/f )
+    request-params at ;
+
+: client-state ( key -- value/f )
+    request get dup method>> {
+        { "GET" [ cookie-client-state ] }
+        { "HEAD" [ cookie-client-state ] }
+        { "POST" [ post-client-state ] }
+    } case ;
+
 SYMBOL: exit-continuation
 
 : exit-with ( value -- )
@@ -109,7 +116,8 @@ SYMBOL: exit-continuation
     [ drop f ] [ "," split [ dup value ] H{ } map>assoc ] if ;
 
 : a-url-path ( tag -- string )
-    [ "href" required-attr ] [ "rest" optional-attr value ] bi
+    [ "href" required-attr ]
+    [ "rest" optional-attr dup [ value ] when ] bi
     [ [ "/" ?tail drop "/" ] dip present 3append ] when* ;
 
 : a-url ( tag -- url )
@@ -153,11 +161,11 @@ CHLOE: a
         input/>
     ] [ 2drop ] if ;
 
-: form-nesting-key "__n" ;
+: nested-forms-key "__n" ;
 
 : form-magic ( tag -- )
     [ modify-form ] each-responder
-    nested-values get " " join f like form-nesting-key hidden-form-field
+    nested-forms get " " join f like nested-forms-key hidden-form-field
     "for" optional-attr [ "," split [ hidden render ] each ] when* ;
 
 : form-start-tag ( tag -- )

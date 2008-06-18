@@ -98,11 +98,9 @@ TUPLE: output-port < buffered-port ;
 : <output-port> ( handle -- output-port )
     output-port <buffered-port> ;
 
-: can-write? ( len buffer -- ? )
-    [ buffer-fill + ] keep buffer-capacity <= ;
-
 : wait-to-write ( len port -- )
-    tuck buffer>> can-write? [ drop ] [ stream-flush ] if ;
+    tuck buffer>> buffer-capacity <=
+    [ drop ] [ stream-flush ] if ;
 
 M: output-port stream-write1
     dup check-disposed

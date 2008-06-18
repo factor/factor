@@ -1,7 +1,7 @@
 IN: furnace.sessions.tests
 USING: tools.test http furnace.sessions
 furnace.actions http.server http.server.responses
-math namespaces kernel accessors io.sockets io.server
+math namespaces kernel accessors io.sockets io.servers.connection
 prettyprint io.streams.string io.files splitting destructors
 sequences db db.tuples db.sqlite continuations urls math.parser
 furnace ;
@@ -65,7 +65,7 @@ M: foo call-responder*
 
     [
         [ ] [
-           empty-session
+            empty-session
                 123 >>id session set
         ] unit-test
 

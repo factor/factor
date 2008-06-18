@@ -5,7 +5,7 @@
 
 USING: io kernel namespaces prettyprint quotations
 sequences strings words xml.entities compiler.units effects
-urls math math.parser combinators present ;
+urls math math.parser combinators present fry ;
 
 IN: html.elements
 
@@ -70,7 +70,7 @@ SYMBOL: html
 : def-for-html-word-<foo> ( name -- )
     #! Return the name and code for the <foo> patterned
     #! word.
-    dup <foo> swap [ <foo> write-html ] curry
+    dup <foo> swap '[ , <foo> write-html ]
     (( -- )) html-word ;
 
 : <foo ( str -- <str ) "<" prepend ;
@@ -78,7 +78,7 @@ SYMBOL: html
 : def-for-html-word-<foo ( name -- )
     #! Return the name and code for the <foo patterned
     #! word.
-    <foo dup [ write-html ] curry
+    <foo dup '[ , write-html ]
     (( -- )) html-word ;
 
 : foo> ( str -- foo> ) ">" append ;
@@ -93,14 +93,14 @@ SYMBOL: html
 : def-for-html-word-</foo> ( name -- )
     #! Return the name and code for the </foo> patterned
     #! word.
-    </foo> dup [ write-html ] curry (( -- )) html-word ;
+    </foo> dup '[ , write-html ] (( -- )) html-word ;
 
 : <foo/> ( str -- <str/> ) "<" swap "/>" 3append ;
 
 : def-for-html-word-<foo/> ( name -- )
     #! Return the name and code for the <foo/> patterned
     #! word.
-    dup <foo/> swap [ <foo/> write-html ] curry
+    dup <foo/> swap '[ , <foo/> write-html ]
     (( -- )) html-word ;
 
 : foo/> ( str -- str/> ) "/>" append ;
@@ -134,7 +134,7 @@ SYMBOL: html
 
 : define-attribute-word ( name -- )
     dup "=" prepend swap
-    [ write-attr ] curry (( string -- )) html-word ;
+    '[ , write-attr ] (( string -- )) html-word ;
 
 ! Define some closed HTML tags
 [

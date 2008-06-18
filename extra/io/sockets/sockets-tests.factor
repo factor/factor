@@ -45,7 +45,7 @@ concurrency.promises threads io.streams.string ;
 [ "1:2:0:0:0:0:3:4" ]
 [ B{ 0 1 0 2 0 0 0 0 0 0 0 0 0 3 0 4 } T{ inet6 } inet-ntop ] unit-test
 
-[ t ] [ "localhost" 80 f resolve-host length 1 >= ] unit-test
+[ t ] [ "localhost" 80 <inet> resolve-host length 1 >= ] unit-test
 
 ! Smoke-test UDP
 [ ] [ "127.0.0.1" 0 <inet4> <datagram> "datagram1" set ] unit-test

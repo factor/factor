@@ -4,6 +4,7 @@ USING: namespaces assocs sorting sequences kernel accessors
 hashtables sequences.lib db.types db.tuples db combinators
 calendar calendar.format math.parser syndication urls xml.writer
 xmode.catalog validators
+html.forms
 html.components
 html.templates.chloe
 http.server
@@ -11,6 +12,7 @@ http.server.dispatchers
 http.server.redirection
 furnace
 furnace.actions
+furnace.redirection
 furnace.auth
 furnace.auth.login
 furnace.boilerplate
@@ -126,7 +128,7 @@ M: annotation entity-url
                 "parent" set-value
                 mode-names "modes" set-value
                 "factor" "mode" set-value
-            ] nest-values
+            ] nest-form
         ] >>init
 
         { pastebin "paste" } >>template ;
@@ -149,7 +151,7 @@ M: annotation entity-url
 
 : deposit-entity-slots ( tuple -- )
     now >>date
-    { "summary" "author" "mode" "contents" } deposit-slots ;
+    { "summary" "author" "mode" "contents" } to-object ;
 
 : <new-paste-action> ( -- action )
     <page-action>
@@ -160,11 +162,12 @@ M: annotation entity-url
 
         { pastebin "new-paste" } >>template
 
-        [ mode-names "modes" set-value ] >>validate
+        [
+            mode-names "modes" set-value
+            validate-entity
+        ] >>validate
 
         [
-            validate-entity
-
             f <paste>
             [ deposit-entity-slots ]
             [ insert-tuple ]
@@ -196,6 +199,7 @@ M: annotation entity-url
 : <new-annotation-action> ( -- action )
     <action>
         [
+            mode-names "modes" set-value
             { { "parent" [ v-integer ] } } validate-params
             validate-entity
         ] >>validate

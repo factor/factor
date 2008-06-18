@@ -424,6 +424,10 @@ SYMBOLS: NO-ERROR FORMAT-ERROR SERVER-FAILURE NAME-ERROR NOT-IMPLEMENTED
   }
     2cleave message boa ;
 
+: ba->message ( ba -- message ) parse-message ;
+
+: with-message-bytes ( ba quot -- ) >r ba->message r> call message->ba ; inline
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : send-receive-udp ( ba server -- ba )

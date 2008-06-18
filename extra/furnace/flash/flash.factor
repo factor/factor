@@ -3,7 +3,7 @@
 USING: namespaces assocs assocs.lib kernel sequences accessors
 urls db.types db.tuples math.parser fry
 http http.server http.server.filters http.server.redirection
-furnace furnace.cache furnace.sessions ;
+furnace furnace.cache furnace.sessions furnace.redirection ;
 IN: furnace.flash
 
 TUPLE: flash-scope < server-state session namespace ;
@@ -25,7 +25,9 @@ TUPLE: flash-scopes < server-state-manager ;
 
 SYMBOL: flash-scope
 
-: fget ( key -- value ) flash-scope get at ;
+: fget ( key -- value )
+    flash-scope get dup
+    [ namespace>> at ] [ 2drop f ] if ;
 
 : get-flash-scope ( id -- flash-scope )
     dup [ flash-scope get-state ] when

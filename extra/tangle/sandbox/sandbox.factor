@@ -12,7 +12,7 @@ IN: tangle.sandbox
     ] with-tangle ;
 
 : new-sandbox ( -- )
-    development-mode on
+    development? on
     delete-db sandbox-db f <tangle>
     [ make-sandbox ] [ <tangle-dispatcher> ] bi
     main-responder set ;

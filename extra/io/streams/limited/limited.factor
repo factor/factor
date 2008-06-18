@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math io destructors accessors sequences
-namespaces ;
+USING: kernel math io io.encodings destructors accessors
+sequences namespaces ;
 IN: io.streams.limited
 
 TUPLE: limited-stream stream count limit ;
@@ -12,8 +12,13 @@ TUPLE: limited-stream stream count limit ;
         swap >>stream
         0 >>count ;
 
-: limit-input ( limit -- )
-    input-stream [ swap <limited-stream> ] change ;
+GENERIC# limit 1 ( stream limit -- stream' )
+
+M: decoder limit [ clone ] dip [ limit ] curry change-stream ;
+
+M: object limit <limited-stream> ;
+
+: limit-input ( limit -- ) input-stream [ swap limit ] change ;
 
 ERROR: limit-exceeded ;
 

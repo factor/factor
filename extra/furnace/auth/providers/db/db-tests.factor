@@ -1,14 +1,13 @@
 IN: furnace.auth.providers.db.tests
 USING: furnace.actions
+furnace.auth
 furnace.auth.login
 furnace.auth.providers
 furnace.auth.providers.db tools.test
 namespaces db db.sqlite db.tuples continuations
 io.files accessors kernel ;
 
-<action> <login>
-    users-in-db >>users
-login set
+<action> "test" <login-realm> realm set
 
 [ "auth-test.db" temp-file delete-file ] ignore-errors
 

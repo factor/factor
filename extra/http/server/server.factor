@@ -2,9 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences arrays namespaces splitting
 vocabs.loader destructors assocs debugger continuations
-combinators tools.vocabs math
+combinators tools.vocabs tools.time math
 io
-io.server
 io.sockets
 io.sockets.secure
 io.encodings
@@ -12,8 +11,9 @@ io.encodings.utf8
 io.encodings.ascii
 io.encodings.binary
 io.streams.limited
+io.servers.connection
 io.timeouts
-fry logging calendar urls
+fry logging logging.insomniac calendar urls
 http
 http.server.responses
 html.elements
@@ -26,7 +26,9 @@ SYMBOL: responder-nesting
 
 SYMBOL: main-responder
 
-SYMBOL: development-mode
+SYMBOL: development?
+
+SYMBOL: benchmark?
 
 ! path is a sequence of path component strings
 GENERIC: call-responder* ( path responder -- response )
@@ -55,32 +57,31 @@ main-responder global [ <404> <trivial-responder> or ] change-at
 
 : <500> ( error -- response )
     500 "Internal server error" <trivial-response>
-    swap development-mode get [ '[ , http-error. ] >>body ] [ drop ] if ;
+    swap development? get [ '[ , http-error. ] >>body ] [ drop ] if ;
 
 : do-response ( response -- )
-    [ write-response ]
+    [ request get swap write-full-response ]
     [
-        request get method>> "HEAD" = [ drop ] [
-            '[
-                ,
-                [ content-charset>> encode-output ]
-                [ write-response-body ]
-                bi
-            ]
-            [
-                utf8 [
-                    development-mode get
-                    [ http-error. ] [ drop "Response error" rethrow ] if
-                ] with-encoded-output
-            ] recover
-        ] if
-    ] bi ;
+        [ \ do-response log-error ]
+        [
+            utf8 [
+                development? get
+                [ http-error. ] [ drop "Response error" write ] if
+            ] with-encoded-output
+        ] bi
+    ] recover ;
 
 LOG: httpd-hit NOTICE
 
+LOG: httpd-header NOTICE
+
+: log-header ( headers name -- )
+    tuck header 2array httpd-header ;
+
 : log-request ( request -- )
-    [ method>> ] [ url>> [ host>> ] [ path>> ] bi ] bi
-    3array httpd-hit ;
+    [ [ method>> ] [ url>> ] bi 2array httpd-hit ]
+    [ { "user-agent" "x-forwarded-for" } [ log-header ] with each ]
+    bi ;
 
 : split-path ( string -- path )
     "/" split harvest ;
@@ -115,29 +116,39 @@ LOG: httpd-hit NOTICE
     ] [ [ \ do-request log-error ] [ <500> ] bi ] recover ;
 
 : ?refresh-all ( -- )
-    development-mode get-global
-    [ global [ refresh-all ] bind ] when ;
+    development? get-global [ global [ refresh-all ] bind ] when ;
 
-: setup-limits ( -- )
-    1 minutes timeouts
-    64 1024 * limit-input ;
+LOG: httpd-benchmark DEBUG
 
-: handle-client ( -- )
+: ?benchmark ( quot -- )
+    benchmark? get [
+        [ benchmark ] [ first ] bi request get url>> rot 3array
+        httpd-benchmark
+    ] [ call ] if ; inline
+
+TUPLE: http-server < threaded-server ;
+
+M: http-server handle-client*
+    drop
     [
-        setup-limits
-        ascii decode-input
-        ascii encode-output
+        64 1024 * limit-input
         ?refresh-all
         read-request
-        do-request
-        do-response
+        [ do-request ] ?benchmark
+        [ do-response ] ?benchmark
     ] with-destructors ;
 
+: <http-server> ( -- server )
+    http-server new-threaded-server
+        "http.server" >>name
+        "http" protocol-port >>insecure
+        "https" protocol-port >>secure ;
+
 : httpd ( port -- )
-    dup integer? [ internet-server ] when
-    "http.server" binary [ handle-client ] with-server ;
+    <http-server>
+        swap >>insecure
+        f >>secure
+    start-server ;
 
-: httpd-main ( -- )
-    8888 httpd ;
-
-MAIN: httpd-main
+: http-insomniac ( -- )
+    "http.server" { "httpd-hit" } schedule-insomniac ;

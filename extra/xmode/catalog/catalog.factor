@@ -5,7 +5,7 @@ IN: xmode.catalog
 
 TUPLE: mode file file-name-glob first-line-glob ;
 
-<TAGS: parse-mode-tag
+<TAGS: parse-mode-tag ( modes tag -- )
 
 TAG: MODE
     "NAME" over at >r

@@ -3,13 +3,14 @@
 USING: kernel accessors sequences sorting math math.order
 calendar alarms logging concurrency.combinators namespaces
 sequences.lib db.types db.tuples db fry locals hashtables
+syndication urls xml.writer validators
+html.forms
 html.components
-syndication urls xml.writer
-validators
 http.server
 http.server.dispatchers
 furnace
 furnace.actions
+furnace.redirection
 furnace.boilerplate
 furnace.auth.login
 furnace.auth
@@ -130,7 +131,7 @@ posting "POSTINGS"
     } validate-params ;
 
 : deposit-blog-slots ( blog -- )
-    { "name" "www-url" "feed-url" } deposit-slots ;
+    { "name" "www-url" "feed-url" } to-object ;
 
 : <new-blog-action> ( -- action )
     <page-action>

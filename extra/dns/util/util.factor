@@ -16,4 +16,15 @@ MACRO: 1if ( test then else -- ) '[ dup @ , , if ] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: longer? ( seq seq -- ? ) [ length ] bi@ > ; 
+: longer? ( seq seq -- ? ) [ length ] bi@ > ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USING: io.sockets accessors ;
+
+TUPLE: packet data addr socket ;
+
+: receive-packet ( socket -- packet ) [ receive ] keep packet boa ;
+
+: respond ( packet -- ) [ data>> ] [ addr>> ] [ socket>> ] tri send ;
+
