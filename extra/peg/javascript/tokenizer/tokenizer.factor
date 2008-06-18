@@ -44,7 +44,7 @@ Keyword           =  ("break"
                     | "void"
                     | "while"
                     | "with") 
-Name              = !(Keyword) (iName):n => [[ n ast-name boa ]]
+Name              = iName !(Keyword) => [[ ast-name boa ]]
 Number            =   Digits:ws '.' Digits:fs => [[ ws "." fs 3array concat >string string>number ast-number boa ]]
                     | Digits => [[ >string string>number ast-number boa ]]  
 
