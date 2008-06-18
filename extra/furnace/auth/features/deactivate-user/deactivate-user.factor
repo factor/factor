@@ -16,7 +16,9 @@ IN: furnace.auth.features.deactivate-user
         ] >>submit ;
     
 : allow-deactivation ( realm -- realm )
-    <deactivate-user-action> "deactivate-user" add-responder ;
+    <deactivate-user-action> <protected>
+        "delete your profile" >>description
+    "deactivate-user" add-responder ;
 
 : allow-deactivation? ( -- ? )
     realm get responders>> "deactivate-user" swap key? ;
