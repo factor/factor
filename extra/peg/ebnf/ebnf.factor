@@ -1,14 +1,19 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel compiler.units parser words arrays strings math.parser sequences 
+USING: kernel compiler.units words arrays strings math.parser sequences 
        quotations vectors namespaces math assocs continuations peg
        peg.parsers unicode.categories multiline combinators combinators.lib 
        splitting accessors effects sequences.deep peg.search inference 
-       io.streams.string io prettyprint ;
+       io.streams.string io prettyprint parser ;
 IN: peg.ebnf
+
+: rule ( name word -- parser )
+  #! Given an EBNF word produced from EBNF: return the EBNF rule
+  "ebnf-parser" word-prop at ;
 
 TUPLE: ebnf-non-terminal symbol ;
 TUPLE: ebnf-terminal symbol ;
+TUPLE: ebnf-foreign word rule ;
 TUPLE: ebnf-any-character ;
 TUPLE: ebnf-range pattern ;
 TUPLE: ebnf-ensure group ;
@@ -27,6 +32,7 @@ TUPLE: ebnf rules ;
 
 C: <ebnf-non-terminal> ebnf-non-terminal
 C: <ebnf-terminal> ebnf-terminal
+C: <ebnf-foreign> ebnf-foreign
 C: <ebnf-any-character> ebnf-any-character
 C: <ebnf-range> ebnf-range
 C: <ebnf-ensure> ebnf-ensure
@@ -88,6 +94,8 @@ C: <ebnf> ebnf
       [ dup CHAR: ? = ]
       [ dup CHAR: : = ]
       [ dup CHAR: ~ = ]
+      [ dup CHAR: < = ]
+      [ dup CHAR: > = ]
     } 0|| not nip    
   ] satisfy repeat1 [ >string <ebnf-non-terminal> ] action ;
 
@@ -95,6 +103,24 @@ C: <ebnf> ebnf
   #! A terminal is an identifier enclosed in quotations
   #! and it represents the literal value of the identifier.
   'identifier' [ <ebnf-terminal> ] action ;
+
+: 'foreign-name' ( -- parser )
+  #! Parse a valid foreign parser name
+  [
+    {
+      [ dup blank?    ]
+      [ dup CHAR: > = ]
+    } 0|| not nip    
+  ] satisfy repeat1 [ >string ] action ;
+
+: 'foreign' ( -- parser )
+  #! A foreign call is a call to a rule in another ebnf grammar
+  [
+    "<foreign" syntax ,
+    'foreign-name' sp ,
+    'foreign-name' sp optional ,
+    ">" syntax ,
+  ] seq* [ first2 <ebnf-foreign> ] action ;
 
 : 'any-character' ( -- parser )
   #! A parser to match the symbol for any character match.
@@ -117,6 +143,7 @@ C: <ebnf> ebnf
     [ 
       'non-terminal' ,
       'terminal' ,
+      'foreign' ,
       'range-parser' ,
       'any-character' ,
     ] choice* ,
@@ -367,6 +394,15 @@ M: ebnf-var (transform) ( ast -- parser )
 M: ebnf-terminal (transform) ( ast -- parser )
   symbol>> token ;
 
+M: ebnf-foreign (transform) ( ast -- parser )
+  dup word>> search
+  [ "Foreign word " swap word>> append " not found" append throw ] unless*
+  swap rule>> dup [
+    swap rule  
+  ] [
+    execute
+  ] if ;
+
 : parser-not-found ( name -- * )
   [
     "Parser " % % " not found." %
@@ -411,6 +447,3 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
   ";EBNF" parse-multiline-string replace-escapes
   ebnf>quot swapd 1 1 <effect> define-declared "ebnf-parser" set-word-prop ; parsing
 
-: rule ( name word -- parser )
-  #! Given an EBNF word produced from EBNF: return the EBNF rule
-  "ebnf-parser" word-prop at ;
