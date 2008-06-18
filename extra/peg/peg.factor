@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences strings fry namespaces math assocs shuffle 
+USING: kernel sequences strings fry namespaces math assocs shuffle debugger io
        vectors arrays math.parser math.order
        unicode.categories compiler.units parser
        words quotations effects memoize accessors locals effects splitting ;
@@ -563,11 +563,22 @@ PRIVATE>
   #! to fix boxes so this isn't needed...
   box-parser boa next-id f <parser> over set-delegate [ ] action ;
 
+ERROR: parse-failed input word ;
+
+M: parse-failed error.
+  "The " write dup word>> pprint " word could not parse the following input:" print nl
+  input>> . ;
+
 : PEG:
-  (:) [
+  (:)
+  [let* | def [ ] word [ ] compiled-def [ def call compile ] |
     [
-        call compile [ compiled-parse ] curry
-        [ dup [ parse-result-ast ] [ "Parse failed" throw ] if ]
-        append define
-    ] with-compilation-unit
-  ] 2curry over push-all ; parsing
+      [
+        [
+          dup compiled-def compiled-parse
+          [ ast>> ] [ word parse-failed ] ?if
+        ]
+        word swap define
+      ] with-compilation-unit
+    ] over push-all
+  ] ; parsing
