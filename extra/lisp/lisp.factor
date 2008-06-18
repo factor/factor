@@ -15,9 +15,6 @@ DEFER: lisp-var?
 DEFER: macro-expand
 DEFER: define-lisp-macro
     
-ERROR: no-such-var variable-name ;
-M: no-such-var summary drop "No such variable" ;
-    
 ! Functions to convert s-exps to quotations
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 : convert-body ( cons -- quot )
@@ -51,7 +48,7 @@ M: no-such-var summary drop "No such variable" ;
     
 : rest-lambda ( body vars -- quot )
     "&rest" swap [ index ] [ remove ] 2bi
-    swapd localize-lambda <lambda>
+    swapd localize-lambda <lambda> lambda-rewrite call
     '[ , cut '[ @ , seq>list ] call , call ] ;
     
 : normal-lambda ( body vars -- quot )
@@ -92,11 +89,8 @@ PRIVATE>
      [ 1quotation ]
     } cond ;
     
-: compile-form ( lisp-ast -- quot )
-    convert-form lambda-rewrite call ; inline
-    
 : macro-expand ( cons -- quot )
-    uncons [ list>seq [ ] like ] [ lookup-macro lambda-rewrite call ] bi* call compile-form call ;
+    uncons [ list>seq >quotation ] [ lookup-macro ] bi* call convert-form call ;
     
 : lisp-string>factor ( str -- quot )
     lisp-expr compile-form ;
@@ -108,6 +102,9 @@ PRIVATE>
 
 SYMBOL: lisp-env
 SYMBOL: macro-env
+    
+ERROR: no-such-var variable-name ;
+M: no-such-var summary drop "No such variable" ;
 
 : init-env ( -- )
     H{ } clone lisp-env set
@@ -128,11 +125,8 @@ SYMBOL: macro-env
 : lisp-var? ( lisp-symbol -- ? )
     dup lisp-symbol? [ name>> lisp-env get key? ] [ drop f ] if ;
     
-: funcall-arg-list ( args -- newargs )    
-    [ ] [ dup \ funcall = [ drop 2 cut* [ funcall ] compose call ] when suffix ] reduce ;
-    
 : funcall ( quot sym -- * )
-    [ funcall-arg-list ] dip
+    [ 1array [ call ] with-datastack >quotation ] dip
     dup lisp-symbol? [ lookup-var ] when curry call ; inline
     
 : define-primitive ( name vocab word -- )  
