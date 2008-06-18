@@ -49,6 +49,10 @@ C: <ebnf-var> ebnf-var
 C: <ebnf-semantic> ebnf-semantic
 C: <ebnf> ebnf
 
+: filter-hidden ( seq -- seq )
+  #! Remove elements that produce no AST from sequence
+  [ ebnf-ensure-not? not ] filter [ ebnf-ensure? not ] filter ;
+
 : syntax ( string -- parser )
   #! Parses the string, ignoring white space, and
   #! does not put the result in the AST.
@@ -140,18 +144,26 @@ C: <ebnf> ebnf
   #! The latter indicates that it is the beginning of a
   #! new rule.
   [
-    [ 
-      'non-terminal' ,
-      'terminal' ,
-      'foreign' ,
-      'range-parser' ,
-      'any-character' ,
+    [
+      [ 
+        'non-terminal' ,
+        'terminal' ,
+        'foreign' ,
+        'range-parser' ,
+        'any-character' ,
+      ] choice* 
+      [ dup , "*" token hide , ] seq* [ first <ebnf-repeat0> ] action ,
+      [ dup , "+" token hide , ] seq* [ first <ebnf-repeat1> ] action ,
+      [ dup , "?[" token ensure-not , "?" token hide , ] seq* [ first <ebnf-optional> ] action ,
+      ,
     ] choice* ,
     [
       "=" syntax ensure-not ,
       "=>" syntax ensure ,
     ] choice* ,
   ] seq* [ first ] action ;
+
+DEFER: 'action'
 
 : 'element' ( -- parser )
   [
@@ -256,7 +268,7 @@ DEFER: 'choice'
   ] choice* ;
   
 : 'choice' ( -- parser )
-  'actioned-sequence' sp "|" token sp list-of [ 
+  'actioned-sequence' sp repeat1 [ dup length 1 = [ first ] [ <ebnf-sequence> ] if  ] action "|" token sp list-of [ 
     dup length 1 = [ first ] [ <ebnf-choice> ] if
   ] action ;
  
@@ -337,23 +349,29 @@ M: ebnf-whitespace (transform) ( ast -- parser )
 GENERIC: build-locals ( code ast -- code )
 
 M: ebnf-sequence build-locals ( code ast -- code )
-  elements>> dup [ ebnf-var? ] filter empty? [
-    drop 
-  ] [ 
-    [
-      "USING: locals sequences ;  [let* | " %
-        dup length swap [
-          dup ebnf-var? [
-            name>> % 
-            " [ " % # " over nth ] " %
-          ] [
-            2drop
-          ] if
-        ] 2each
-        " | " %
-        %  
-        " nip ]" %     
-    ] "" make 
+  #! Note the need to filter out this ebnf items that
+  #! leave nothing in the AST
+  elements>> filter-hidden dup length 1 = [ 
+    first build-locals 
+  ]  [
+    dup [ ebnf-var? ] filter empty? [
+      drop 
+    ] [ 
+      [
+        "USING: locals sequences ;  [let* | " %
+          dup length swap [
+            dup ebnf-var? [
+              name>> % 
+              " [ " % # " over nth ] " %
+            ] [
+              2drop
+            ] if
+          ] 2each
+          " | " %
+          %  
+          " nip ]" %     
+      ] "" make 
+    ] if
   ] if ;
 
 M: ebnf-var build-locals ( code ast -- )
@@ -381,7 +399,7 @@ M: object build-locals ( code ast -- )
   } cond ;
  
 M: ebnf-action (transform) ( ast -- parser )
-  [ parser>> (transform) ] [ code>> ] [ parser>> ] tri build-locals 
+  [ parser>> (transform) ] [ code>> ] [ parser>> ] tri build-locals  
   string-lines parse-lines check-action-effect action ;
 
 M: ebnf-semantic (transform) ( ast -- parser )
