@@ -63,8 +63,8 @@ TUPLE: factor-website < dispatcher ;
 
 : init-factor-website ( -- )
     "factorcode.org" 25 <inet> smtp-server set-global
-    "todo@factorcode.org" lost-password-from set-global
-    "website@factorcode.org" insomniac-sender set-global
+    "noreply@concatenative.org" lost-password-from set-global
+    "website@concatenative.org" insomniac-sender set-global
     "slava@factorcode.org" insomniac-recipients set-global
     init-factor-db
     <factor-website> main-responder set-global ;
