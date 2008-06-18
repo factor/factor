@@ -6,7 +6,8 @@ models namespaces parser prettyprint quotations sequences
 strings threads listener classes.tuple ui.commands ui.gadgets
 ui.gadgets.editors ui.gadgets.presentations ui.gadgets.worlds
 ui.gestures definitions calendar concurrency.flags
-concurrency.mailboxes ui.tools.workspace accessors sets ;
+concurrency.mailboxes ui.tools.workspace accessors sets
+destructors ;
 IN: ui.tools.interactor
 
 ! If waiting is t, we're waiting for user input, and invoking
@@ -110,9 +111,11 @@ M: interactor model-changed
         } cleave
     ] [ drop f ] if ;
 
+: interactor-read ( interactor -- lines )
+    [ interactor-yield ] [ interactor-finish ] bi ;
+
 M: interactor stream-readln
-    [ interactor-yield ] [ interactor-finish ] bi
-    dup [ first ] when ;
+    interactor-read dup [ first ] when ;
 
 : interactor-call ( quot interactor -- )
     dup interactor-busy? [
@@ -124,11 +127,21 @@ M: interactor stream-read
     swap dup zero? [
         2drop ""
     ] [
-        >r stream-readln dup length r> min head
+        >r interactor-read dup [ "\n" join ] when r> short head
     ] if ;
 
 M: interactor stream-read-partial
     stream-read ;
+
+M: interactor stream-read1
+    dup interactor-read {
+        { [ dup not ] [ 2drop f ] }
+        { [ dup empty? ] [ drop stream-read1 ] }
+        { [ dup first empty? ] [ 2drop CHAR: \n ] }
+        [ nip first first ]
+    } cond ;
+
+M: interactor dispose drop ;
 
 : go-to-error ( interactor error -- )
     [ line>> 1- ] [ column>> ] bi 2array
