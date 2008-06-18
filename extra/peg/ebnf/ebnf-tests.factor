@@ -164,23 +164,23 @@ IN: peg.ebnf.tests
 ] unit-test
 
 { 6 } [
-  "4+2" [EBNF num=[0-9] => [[ digit> ]] foo=num:x '+' num:y => [[ drop x y + ]] EBNF] call ast>>
+  "4+2" [EBNF num=[0-9] => [[ digit> ]] foo=num:x '+' num:y => [[ x y + ]] EBNF] call ast>>
 ] unit-test
 
 { 6 } [
-  "4+2" [EBNF foo=[0-9]:x '+' [0-9]:y => [[ drop x digit> y digit> + ]] EBNF] call ast>>
+  "4+2" [EBNF foo=[0-9]:x '+' [0-9]:y => [[ x digit> y digit> + ]] EBNF] call ast>>
 ] unit-test
 
 { 10 } [
-  { 1 2 3 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ drop x y + ]] | num EBNF] call ast>>
+  { 1 2 3 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ x y + ]] | num EBNF] call ast>>
 ] unit-test
 
 { f } [
-  { "a" 2 3 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ drop x y + ]] | num EBNF] call 
+  { "a" 2 3 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ x y + ]] | num EBNF] call 
 ] unit-test
 
 { 3 } [
-  { 1 2 "a" 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ drop x y + ]] | num EBNF] call ast>>
+  { 1 2 "a" 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ x y + ]] | num EBNF] call ast>>
 ] unit-test
 
 { f } [
@@ -251,7 +251,7 @@ IN: peg.ebnf.tests
 ] unit-test
 
 { t } [
-  "abcd='9' | ('8'):x => [[ drop x ]]" 'ebnf' parse parse-result-remaining empty?
+  "abcd='9' | ('8'):x => [[ x ]]" 'ebnf' parse parse-result-remaining empty?
 ] unit-test
 
 EBNF: primary 
@@ -366,21 +366,21 @@ main = Primary
 ] unit-test
 
 { V{ "a" "a" "a" } } [
-  "aaa" [EBNF a=('a')* b=!('b') a:x => [[ drop x ]] EBNF] call ast>>
+  "aaa" [EBNF a=('a')* b=!('b') a:x => [[ x ]] EBNF] call ast>>
 ] unit-test
 
 { t } [
-  "aaa" [EBNF a=('a')* b=!('b') a:x => [[ drop x ]] EBNF] call ast>>
-  "aaa" [EBNF a=('a')* b=!('b') (a):x => [[ drop x ]] EBNF] call ast>> =
+  "aaa" [EBNF a=('a')* b=!('b') a:x => [[ x ]] EBNF] call ast>>
+  "aaa" [EBNF a=('a')* b=!('b') (a):x => [[ x ]] EBNF] call ast>> =
 ] unit-test
 
 { V{ "a" "a" "a" } } [
-  "aaa" [EBNF a=('a')* b=a:x => [[ drop x ]] EBNF] call ast>>
+  "aaa" [EBNF a=('a')* b=a:x => [[ x ]] EBNF] call ast>>
 ] unit-test
 
 { t } [
-  "aaa" [EBNF a=('a')* b=a:x => [[ drop x ]] EBNF] call ast>>
-  "aaa" [EBNF a=('a')* b=(a):x => [[ drop x ]] EBNF] call ast>> =
+  "aaa" [EBNF a=('a')* b=a:x => [[ x ]] EBNF] call ast>>
+  "aaa" [EBNF a=('a')* b=(a):x => [[ x ]] EBNF] call ast>> =
 ] unit-test
 
 { t } [
