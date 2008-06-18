@@ -571,14 +571,16 @@ M: parse-failed error.
 
 : PEG:
   (:)
-  [let* | def [ ] word [ ] compiled-def [ def call compile ] |
+  [let | word [ ] def [ ] |
     [
       [
-        [
-          dup compiled-def compiled-parse
-          [ ast>> ] [ word parse-failed ] ?if
+        [let | compiled-def [ def call compile ]
+          [
+            dup compiled-def compiled-parse
+            [ ast>> ] [ word parse-failed ] ?if
+          ]
+          word swap define
         ]
-        word swap define
       ] with-compilation-unit
     ] over push-all
   ] ; parsing
