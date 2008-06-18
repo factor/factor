@@ -8,11 +8,13 @@ IN: lisp.test
 [
     init-env
     
-    [ f ] "#f" lisp-define
-    [ t ] "#t" lisp-define
+    f "#f" lisp-define
+    t "#t" lisp-define
     
     "+" "math" "+" define-primitive
     "-" "math" "-" define-primitive
+    "<" "math" "<" define-primitive
+    ">" "math" ">" define-primitive
     
     "cons" "lists" "cons" define-primitive
     "car" "lists" "car" define-primitive
@@ -47,6 +49,10 @@ IN: lisp.test
     
     { "b" } [
       "(cond (#f \"a\") (#t \"b\"))" lisp-eval
+    ] unit-test
+    
+    { "b" } [
+      "(cond ((< 1 2) \"b\") (#t \"a\"))" lisp-eval
     ] unit-test
     
     { 5 } [
