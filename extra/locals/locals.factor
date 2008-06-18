@@ -405,8 +405,8 @@ M: lambda-memoized reset-word
 
 M: lambda-method synopsis*
     dup dup dup definer.
-    "method-specializer" word-prop pprint*
-    "method-generic" word-prop pprint*
+    "method-class" word-prop pprint-word
+    "method-generic" word-prop pprint-word
     method-stack-effect effect>string comment. ;
 
 PRIVATE>
