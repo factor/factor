@@ -139,7 +139,7 @@ TUPLE: user-admin < dispatcher ;
     <action>
         [
             validate-username
-            <user> select-tuple 1 >>deleted update-tuple
+            "username" value <user> select-tuple 1 >>deleted update-tuple
             URL" $user-admin" <redirect>
         ] >>submit ;
 
