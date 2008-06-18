@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: kernel tools.test peg peg.ebnf words math math.parser 
-       sequences accessors ;
+       sequences accessors peg.parsers ;
 IN: peg.ebnf.tests
 
 { T{ ebnf-non-terminal f "abc" } } [
@@ -397,4 +397,38 @@ main = Primary
 
 { t } [
   "number=digit+:n 'a'" 'ebnf' parse remaining>> length zero?
+] unit-test
+
+<<
+EBNF: parser1 
+foo='a' 
+;EBNF
+>>
+
+EBNF: parser2
+foo=<foreign parser1 foo> 'b'
+;EBNF
+
+EBNF: parser3
+foo=<foreign parser1> 'c'
+;EBNF
+
+EBNF: parser4
+foo=<foreign any-char> 'd'
+;EBNF
+
+{ "a" } [
+  "a" parser1 ast>>
+] unit-test
+
+{ V{ "a" "b" } } [
+  "ab" parser2 ast>>
+] unit-test
+
+{ V{ "a" "c" } } [
+  "ac" parser3 ast>>
+] unit-test
+
+{ V{ CHAR: a "d" } } [
+  "ad" parser4 ast>>
 ] unit-test

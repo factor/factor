@@ -415,11 +415,11 @@ M: ebnf-terminal (transform) ( ast -- parser )
 M: ebnf-foreign (transform) ( ast -- parser )
   dup word>> search
   [ "Foreign word " swap word>> append " not found" append throw ] unless*
-  swap rule>> dup [
-    swap rule  
+  swap rule>> [ main ] unless* dupd swap rule [
+    nip
   ] [
     execute
-  ] if ;
+  ] if* ;
 
 : parser-not-found ( name -- * )
   [
