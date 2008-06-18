@@ -234,9 +234,6 @@ PRIVATE>
 : remove-nth ( seq n -- seq' )
     cut-slice rest-slice append ;
 
-: short ( seq n -- seq n' )
-    over length min ; inline
-
 : if-seq ( seq quot1 quot2 -- )
     [ f like ] 2dip if* ; inline
 
