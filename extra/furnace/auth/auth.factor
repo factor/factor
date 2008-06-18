@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs namespaces kernel sequences sets
-destructors combinators
+destructors combinators fry
 io.encodings.utf8 io.encodings.string io.binary random
 checksums checksums.sha2
 html.forms
@@ -10,6 +10,7 @@ http.server.filters
 http.server.dispatchers
 furnace
 furnace.actions
+furnace.redirection
 furnace.boilerplate
 furnace.auth.providers
 furnace.auth.providers.db ;
@@ -54,7 +55,7 @@ V{ } clone capabilities set-global
 
 : define-capability ( word -- ) capabilities get adjoin ;
 
-TUPLE: realm < dispatcher name users checksum ;
+TUPLE: realm < dispatcher name users checksum secure ;
 
 GENERIC: login-required* ( realm -- response )
 
@@ -67,7 +68,8 @@ GENERIC: logged-in-username ( realm -- username )
         swap >>name
         swap >>default
         users-in-db >>users
-        sha-256 >>checksum ; inline
+        sha-256 >>checksum
+        t >>secure ; inline
 
 : users ( -- provider )
     realm get users>> ;
@@ -104,6 +106,16 @@ M: realm call-responder* ( path responder -- response )
 : check-login ( password username -- user/f )
     users get-user dup [ [ valid-login? ] keep and ] [ 2drop f ] if ;
 
+: if-secure-realm ( quot -- )
+    realm get secure>> [ if-secure ] [ call ] if ; inline
+
+TUPLE: secure-realm-only < filter-responder ;
+
+C: <secure-realm-only> secure-realm-only
+
+M: secure-realm-only call-responder*
+    '[ , , call-next-method ] if-secure-realm ;
+
 TUPLE: protected < filter-responder description capabilities ;
 
 : <protected> ( responder -- protected )
@@ -118,9 +130,12 @@ TUPLE: protected < filter-responder description capabilities ;
     } cond ;
 
 M: protected call-responder* ( path responder -- response )
-    dup protected set
-    dup logged-in-user get check-capabilities
-    [ call-next-method ] [ 2drop realm get login-required* ] if ;
+    '[
+        , ,
+        dup protected set
+        dup logged-in-user get check-capabilities
+        [ call-next-method ] [ 2drop realm get login-required* ] if
+    ] if-secure-realm ;
 
 : <auth-boilerplate> ( responder -- responder' )
     <boilerplate> { realm "boilerplate" } >>template ;

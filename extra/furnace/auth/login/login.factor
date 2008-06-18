@@ -39,8 +39,11 @@ M: login-realm modify-form ( responder -- )
 : <permit-cookie> ( -- cookie )
     permit-id get realm get name>> permit-id-key <cookie>
         "$login-realm" resolve-base-path >>path
-        realm get timeout>> from-now >>expires
-        realm get domain>> >>domain ;
+        realm get
+        [ timeout>> from-now >>expires ]
+        [ domain>> >>domain ]
+        [ secure>> >>secure ]
+        tri ;
 
 : put-permit-cookie ( response -- response' )
     <permit-cookie> put-cookie ;
@@ -82,7 +85,9 @@ SYMBOL: capabilities
             "password" value
             "username" value check-login
             [ successful-login ] [ login-failed ] if*
-        ] >>submit ;
+        ] >>submit
+    <auth-boilerplate>
+    <secure-realm-only> ;
 
 : <logout-action> ( -- action )
     <action>
@@ -99,6 +104,6 @@ M: login-realm login-required*
 
 : <login-realm> ( responder name -- auth )
     login-realm new-realm
-        <login-action> <auth-boilerplate> "login" add-responder
+        <login-action> "login" add-responder
         <logout-action> "logout" add-responder
         20 minutes >>timeout ;

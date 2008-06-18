@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors combinators namespaces
+USING: kernel accessors combinators namespaces fry
 io.servers.connection
-http http.server http.server.redirection
+http http.server http.server.redirection http.server.filters
 furnace ;
 IN: furnace.redirection
 
@@ -27,3 +27,15 @@ TUPLE: redirect-responder to ;
     redirect-responder boa ;
 
 M: redirect-responder call-responder* nip to>> <redirect> ;
+
+TUPLE: secure-only < filter-responder ;
+
+C: <secure-only> secure-only
+
+: if-secure ( quot -- )
+    >r request get url>> protocol>> "http" =
+    [ request get url>> <secure-redirect> ]
+    r> if ; inline
+
+M: secure-only call-responder*
+    '[ , , call-next-method ] if-secure ;
