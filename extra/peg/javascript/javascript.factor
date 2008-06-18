@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Chris Double.
+! Copyright (C) 2008 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel arrays strings math.parser sequences sequences.deep
 peg peg.ebnf peg.parsers memoize namespaces math accessors ;
@@ -49,14 +49,14 @@ TUPLE: ast-default cs ;
 EBNF: tokenizer 
 Letter            = [a-zA-Z]
 Digit             = [0-9]
-Digits            = (Digit)+
+Digits            = Digit+
 SingleLineComment = "//" (!("\n") .)* "\n" => [[ ignore ]]
 MultiLineComment  = "/*" (!("*/") .)* "*/" => [[ ignore ]]
 Space             = " " | "\t" | "\n" | SingleLineComment | MultiLineComment
-Spaces            = (Space)* => [[ ignore ]]
+Spaces            = Space* => [[ ignore ]]
 NameFirst         = Letter | "$" | "_"
 NameRest          = NameFirst | Digit
-iName             = NameFirst (NameRest)* => [[ first2 swap prefix >string ]]
+iName             = NameFirst NameRest* => [[ first2 swap prefix >string ]]
 Keyword           =  ("break"
                     | "case"
                     | "catch"
@@ -101,12 +101,12 @@ Special            =   "("   | ")"   | "{"   | "}"   | "["   | "]"   | ","   | "
                      | "-"   | "*="  | "*"   | "/="  | "/"   | "%="  | "%"   | "&&="
                      | "&&"  | "||=" | "||"  | "."   | "!"
 Tok                = Spaces (Name | Keyword | Number | Str | Special )
-Toks               = (Tok)* Spaces 
+Toks               = Tok* Spaces 
 ;EBNF
 
 EBNF: javascript
 Space             = " " | "\t" | "\n" 
-Spaces            = (Space)* => [[ ignore ]]
+Spaces            = Space* => [[ ignore ]]
 Name               = . ?[ ast-name?   ]?   => [[ value>> ]] 
 Number             = . ?[ ast-number? ]?   => [[ value>> ]]
 String             = . ?[ ast-string? ]?   => [[ value>> ]]
@@ -192,7 +192,7 @@ ForIn1             =   "var" Name:n => [[ n "undefined" ast-get boa ast-var boa 
                      | Expr
 Switch1            =   "case" Expr:c ":" SrcElems:cs => [[ c cs ast-case boa ]]
                      | "default" ":" SrcElems:cs => [[ cs ast-default boa ]]  
-SwitchBody         = (Switch1)*
+SwitchBody         = Switch1*
 Finally            =   "finally" Block:b => [[ b ]]
                      | Spaces => [[ "undefined" ast-get boa ]]
 Stmt               =   Block                     
@@ -214,6 +214,6 @@ Stmt               =   Block
                      | ";"                                           => [[ "undefined" ast-get boa ]]
 SrcElem            =   "function" Name:n FuncRest:f                  => [[ n f ast-var boa ]]
                      | Stmt
-SrcElems           = (SrcElem)*                                      => [[ ast-begin boa ]]
+SrcElems           = SrcElem*                                      => [[ ast-begin boa ]]
 TopLevel           = SrcElems Spaces                               
 ;EBNF
