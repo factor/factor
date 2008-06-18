@@ -28,6 +28,14 @@ IN: peg.javascript.parser.tests
 
 { t } [ 
 <"
+var x=5
+var y=10
+"> tokenizer ast>> javascript remaining>> length zero?
+] unit-test
+
+
+{ t } [ 
+<"
 function foldl(f, initial, seq) {
    for(var i=0; i< seq.length; ++i)
      initial = f(initial, seq[i]);
@@ -46,3 +54,4 @@ ParseState.prototype.from = function(index) {
 }
 "> tokenizer ast>> javascript remaining>> length zero?
 ] unit-test
+
