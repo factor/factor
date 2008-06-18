@@ -63,19 +63,33 @@ TUPLE: factor-website < dispatcher ;
         { factor-website "page" } >>template
     test-db <alloy> ;
 
-: init-factor-website ( -- )
-    "factorcode.org" 25 <inet> smtp-server set-global
+SYMBOL: key-password
+SYMBOL: key-file
+SYMBOL: dh-file
+
+: common-configuration ( -- )
+    "concatenative.org" 25 <inet> smtp-server set-global
     "noreply@concatenative.org" lost-password-from set-global
     "website@concatenative.org" insomniac-sender set-global
     "slava@factorcode.org" insomniac-recipients set-global
-    init-factor-db
-    <factor-website> main-responder set-global ;
+    <factor-website> main-responder set-global
+    init-factor-db ;
+
+: init-testing ( -- )
+    "resource:extra/openssl/test/dh1024.pem" dh-file set-global
+    "resource:extra/openssl/test/server.pem" key-file set-global
+    "password" key-password set-global
+    common-configuration ;
+
+: init-production ( -- )
+    "/home/slava/cert/host.pem" key-file set-global
+    common-configuration ;
 
 : <factor-secure-config> ( -- config )
     <secure-config>
-        "resource:extra/openssl/test/server.pem" >>key-file
-        "resource:extra/openssl/test/dh1024.pem" >>dh-file
-        "password" >>password ;
+        key-file get >>key-file
+        dh-file get >>dh-file
+        key-password get >>password ;
 
 : <factor-website-server> ( -- threaded-server )
     <http-server>
@@ -83,7 +97,7 @@ TUPLE: factor-website < dispatcher ;
         8080 >>insecure
         8431 >>secure ;
 
-: start-factor-website ( -- )
+: start-website ( -- )
     test-db start-expiring
     test-db start-update-task
     http-insomniac
