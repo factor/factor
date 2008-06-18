@@ -35,10 +35,11 @@ IN: furnace.auth.features.registration
             realm get init-user-profile
 
             URL" $realm" <redirect>
-        ] >>submit ;
+        ] >>submit
+    <auth-boilerplate> ;
 
 : allow-registration ( login -- login )
-    <register-action> <auth-boilerplate> "register" add-responder ;
+    <register-action> "register" add-responder ;
 
 : allow-registration? ( -- ? )
     realm get responders>> "register" swap key? ;

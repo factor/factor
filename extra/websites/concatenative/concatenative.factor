@@ -13,6 +13,7 @@ furnace.auth.providers.db
 furnace.auth.features.edit-profile
 furnace.auth.features.recover-password
 furnace.auth.features.registration
+furnace.auth.features.deactivate-user
 furnace.boilerplate
 furnace.redirection
 webapps.blogs
@@ -57,6 +58,7 @@ TUPLE: factor-website < dispatcher ;
         allow-registration
         allow-password-recovery
         allow-edit-profile
+        allow-deactivation
     <boilerplate>
         { factor-website "page" } >>template
     test-db <alloy> ;
