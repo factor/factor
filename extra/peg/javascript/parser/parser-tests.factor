@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: kernel tools.test peg peg.javascript.ast peg.javascript.tokenizer  
-       peg.javascript.parser accessors ;
+       peg.javascript.parser accessors multiline sequences math ;
 IN: peg.javascript.parser.tests
 
 \ javascript must-infer
@@ -24,4 +24,14 @@ IN: peg.javascript.parser.tests
   }
 } [
   "123; 'hello'; foo(x);" tokenizer ast>> javascript ast>>
+] unit-test
+
+{ t } [ 
+<"
+function foldl(f, initial, seq) {
+   for(var i=0; i< seq.length; ++i)
+     initial = f(initial, seq[i]);
+   return initial;
+}
+"> tokenizer ast>> javascript remaining>> length zero?
 ] unit-test
