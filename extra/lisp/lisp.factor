@@ -12,7 +12,6 @@ DEFER: lookup-var
 DEFER: lookup-macro
 DEFER: lisp-macro?
 DEFER: lisp-var?
-DEFER: macro-expand
 DEFER: define-lisp-macro
     
 ! Functions to convert s-exps to quotations
@@ -24,7 +23,7 @@ DEFER: define-lisp-macro
     cdr [ convert-form ] [ ] lmap-as '[ , [ call ] each ] ;
     
 : convert-cond ( cons -- quot )  
-    cdr [ 2car [ convert-form ] bi@ [ '[ @ call ] ] dip 2array ]
+    cdr [ 2car [ convert-form ] bi@ 2array ]
     { } lmap-as '[ , cond ]  ;
     
 : convert-general-form ( cons -- quot )
@@ -64,6 +63,9 @@ PRIVATE>
 : convert-defmacro ( cons -- quot )
     cdr [ car ] keep [ convert-lambda ] [ car name>> ] bi define-lisp-macro 1quotation ;
     
+: macro-expand ( cons -- quot )
+    uncons [ list>seq >quotation ] [ lookup-macro call ] bi* call call convert-form ;
+    
 : form-dispatch ( cons lisp-symbol -- quot )
     name>>
     { { "lambda" [ convert-lambda ] }
@@ -88,9 +90,6 @@ PRIVATE>
       { [ dup lisp-symbol? ] [ '[ , lookup-var ] ] }
      [ 1quotation ]
     } cond ;
-    
-: macro-expand ( cons -- quot )
-    uncons [ list>seq >quotation ] [ lookup-macro ] bi* call convert-form call ;
     
 : lisp-string>factor ( str -- quot )
     lisp-expr compile-form ;
@@ -117,10 +116,10 @@ M: no-such-var summary drop "No such variable" ;
     over name>> lisp-define ;
     
 : lisp-get ( name -- word )
-    dup lisp-env get at [ ] [ no-such-var ] ?if ;
+    lisp-env get at ;
     
 : lookup-var ( lisp-symbol -- quot )
-    name>> lisp-get ;
+    [ name>> ] [ lisp-var? ] bi [ lisp-get ] [ no-such-var ] if ;
     
 : lisp-var? ( lisp-symbol -- ? )
     dup lisp-symbol? [ name>> lisp-env get key? ] [ drop f ] if ;
