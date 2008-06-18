@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer.known-words
 USING: alien arrays generic hashtables inference.dataflow
-inference.class kernel assocs math math.private kernel.private
-sequences words parser vectors strings sbufs io namespaces
-assocs quotations sequences.private io.binary
+inference.class kernel assocs math math.order math.private
+kernel.private sequences words parser vectors strings sbufs io
+namespaces assocs quotations sequences.private io.binary
 io.streams.string layouts splitting math.intervals
 math.floats.private classes.tuple classes.tuple.private classes
 classes.algebra optimizer.def-use optimizer.backend
@@ -59,19 +59,59 @@ sequences.private combinators byte-arrays byte-vectors ;
     node-in-d peek dup value?
     [ value-literal sequence? ] [ drop f ] if ;
 
-: member-quot ( seq predicate -- newquot )
-    [ curry [ dup ] prepose [ drop t ] ] curry { } map>assoc
-    [ drop f ] suffix [ nip cond ] curry ;
+: expand-member ( #call quot -- )
+    >r dup node-in-d peek value-literal r> call f splice-quot ;
 
-: expand-member ( #call predicate -- )
-    >r dup node-in-d peek value-literal r> member-quot f splice-quot ;
+: bit-member-n 256 ; inline
+
+: bit-member? ( seq -- ? )
+    #! Can we use a fast byte array test here?
+    {
+        { [ dup length 8 < ] [ f ] }
+        { [ dup [ integer? not ] contains? ] [ f ] }
+        { [ dup [ 0 < ] contains? ] [ f ] }
+        { [ dup [ bit-member-n >= ] contains? ] [ f ] }
+        [ t ]
+    } cond nip ;
+
+: bit-member-seq ( seq -- flags )
+    bit-member-n swap [ member? 1 0 ? ] curry B{ } map-as ;
+
+: exact-float? ( f -- ? )
+    dup float? [ dup >integer >float = ] [ drop f ] if ; inline
+
+: bit-member-quot ( seq -- newquot )
+    [
+        [ drop ] % ! drop the sequence itself; we don't use it at run time
+        bit-member-seq ,
+        [
+            {
+                { [ over fixnum? ] [ ?nth 1 eq? ] }
+                { [ over bignum? ] [ ?nth 1 eq? ] }
+                { [ over exact-float? ] [ ?nth 1 eq? ] }
+                [ 2drop f ]
+            } cond
+        ] %
+    ] [ ] make ;
+
+: member-quot ( seq -- newquot )
+    dup bit-member? [
+        bit-member-quot
+    ] [
+        [ [ t ] ] { } map>assoc
+        [ drop f ] suffix [ nip case ] curry
+    ] if ;
 
 \ member? {
-    { [ dup literal-member? ] [ [ = ] expand-member ] }
+    { [ dup literal-member? ] [ [ member-quot ] expand-member ] }
 } define-optimizers
 
+: memq-quot ( seq -- newquot )
+    [ [ dupd eq? ] curry [ drop t ] ] { } map>assoc
+    [ drop f ] suffix [ nip cond ] curry ;
+
 \ memq? {
-    { [ dup literal-member? ] [ [ eq? ] expand-member ] }
+    { [ dup literal-member? ] [ [ memq-quot ] expand-member ] }
 } define-optimizers
 
 ! if the result of eq? is t and the second input is a literal,
