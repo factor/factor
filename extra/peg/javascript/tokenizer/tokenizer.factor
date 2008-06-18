@@ -6,6 +6,8 @@ IN: peg.javascript.tokenizer
 #! Grammar for JavaScript. Based on OMeta-JS example from:
 #! http://jarrett.cs.ucla.edu/ometa-js/#JavaScript_Compiler 
 
+USE: prettyprint
+
 EBNF: tokenizer 
 Letter            = [a-zA-Z]
 Digit             = [0-9]
@@ -14,7 +16,7 @@ SingleLineComment = "//" (!("\n") .)* "\n" => [[ ignore ]]
 MultiLineComment  = "/*" (!("*/") .)* "*/" => [[ ignore ]]
 Space             = " " | "\t" | "\r" | "\n" | SingleLineComment | MultiLineComment
 Spaces            = Space* => [[ ignore ]]
-NameFirst         = Letter | "$" | "_"
+NameFirst         = Letter | "$" => [[ CHAR: $ ]] | "_" => [[ CHAR: _ ]]
 NameRest          = NameFirst | Digit
 iName             = NameFirst NameRest* => [[ first2 swap prefix >string ]]
 Keyword           =  ("break"
