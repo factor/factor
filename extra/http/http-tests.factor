@@ -1,7 +1,8 @@
 USING: http tools.test multiline tuple-syntax
 io.streams.string io.encodings.utf8 io.encodings.string
 kernel arrays splitting sequences
-assocs io.sockets db db.sqlite continuations urls hashtables ;
+assocs io.sockets db db.sqlite continuations urls hashtables
+accessors ;
 IN: http.tests
 
 : lf>crlf "\n" split "\r\n" join ;
@@ -73,9 +74,20 @@ GET nested HTTP/1.0
 
 ;
 
-[ read-request-test-3 [ read-request ] with-string-reader ]
+[ read-request-test-3 lf>crlf [ read-request ] with-string-reader ]
 [ "Bad request: URL" = ]
 must-fail-with
+
+STRING: read-request-test-4
+GET /blah HTTP/1.0
+Host: "www.amazon.com"
+;
+
+[ "www.amazon.com" ]
+[
+    read-request-test-4 lf>crlf [ read-request ] with-string-reader
+    "host" header
+] unit-test
 
 STRING: read-response-test-1
 HTTP/1.1 404 not found
@@ -117,7 +129,38 @@ read-response-test-1' 1array [
 
 [ t ] [
     "rmid=732423sdfs73242; path=/; domain=.example.net; expires=Fri, 31-Dec-2010 23:59:59 GMT"
-    dup parse-cookies unparse-cookies =
+    dup parse-set-cookie first unparse-set-cookie =
+] unit-test
+
+[ t ] [
+    "a="
+    dup parse-set-cookie first unparse-set-cookie =
+] unit-test
+
+STRING: read-response-test-2
+HTTP/1.1 200 Content follows
+Set-Cookie: oo="bar; a=b"; httponly=yes; sid=123456
+
+
+;
+
+[ 2 ] [
+    read-response-test-2 lf>crlf
+    [ read-response ] with-string-reader
+    cookies>> length
+] unit-test
+
+STRING: read-response-test-3
+HTTP/1.1 200 Content follows
+Set-Cookie: oo="bar; a=b"; comment="your mom"; httponly=yes
+
+
+;
+
+[ 1 ] [
+    read-response-test-3 lf>crlf
+    [ read-response ] with-string-reader
+    cookies>> length
 ] unit-test
 
 ! Live-fire exercise
