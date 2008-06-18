@@ -98,7 +98,7 @@ sequences.private combinators byte-arrays byte-vectors ;
     dup bit-member? [
         bit-member-quot
     ] [
-        [ [ t ] ] { } map>assoc
+        [ literalize [ t ] ] { } map>assoc
         [ drop f ] suffix [ nip case ] curry
     ] if ;
 
