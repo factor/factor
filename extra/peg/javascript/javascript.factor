@@ -176,7 +176,7 @@ JsonPropName       = Name | Number | String
 Formal             = Spaces Name
 Formals            = (Formal ("," Formal => [[ second ]])*  => [[ first2 swap prefix ]])?
 FuncRest           = "(" Formals:fs ")" "{" SrcElems:body "}" => [[ fs body ast-func boa ]]
-Sc                 = SpacesNoNl ("\n" | "}")| ";"
+Sc                 = SpacesNoNl ("\n" | &("}"))| ";"
 Binding            =   Name:n "=" Expr:v                      => [[ n v ast-var boa ]]
                      | Name:n                                 => [[ n "undefined" ast-get boa ast-var boa ]]
 Block              = "{" SrcElems:ss "}"                      => [[ ss ]]
