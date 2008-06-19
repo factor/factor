@@ -13,7 +13,7 @@ SYMBOL: def-use
     used-by empty? ;
 
 : uses-values ( node seq -- )
-    [ def-use get [ ?push ] change-at ] with each ;
+    [ def-use get push-at ] with each ;
 
 : defs-values ( seq -- )
     #! If there is no value, set it to a new empty vector,
@@ -132,5 +132,4 @@ M: #r> kill-node*
     #! degree of accuracy; the new values should be marked as
     #! having _some_ usage, so that flushing doesn't erronously
     #! flush them away.
-    nest-def-use keys
-    def-use get [ [ t swap ?push ] change-at ] curry each ;
+    nest-def-use keys def-use get [ t -rot push-at ] curry each ;

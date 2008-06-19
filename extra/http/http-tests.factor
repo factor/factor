@@ -1,13 +1,14 @@
 USING: http tools.test multiline tuple-syntax
 io.streams.string io.encodings.utf8 io.encodings.string
 kernel arrays splitting sequences
-assocs io.sockets db db.sqlite continuations urls hashtables ;
+assocs io.sockets db db.sqlite continuations urls hashtables
+accessors ;
 IN: http.tests
 
 : lf>crlf "\n" split "\r\n" join ;
 
 STRING: read-request-test-1
-POST http://foo/bar HTTP/1.1
+POST /bar HTTP/1.1
 Some-Header: 1
 Some-Header: 2
 Content-Length: 4
@@ -18,7 +19,7 @@ blah
 
 [
     TUPLE{ request
-        url: TUPLE{ url protocol: "http" port: 80 path: "/bar" }
+        url: TUPLE{ url path: "/bar" }
         method: "POST"
         version: "1.1"
         header: H{ { "some-header" "1; 2" } { "content-length" "4" } { "content-type" "application/octet-stream" } }
@@ -49,14 +50,14 @@ read-request-test-1' 1array [
 ] unit-test
 
 STRING: read-request-test-2
-HEAD  http://foo/bar   HTTP/1.1
+HEAD  /bar   HTTP/1.1
 Host: www.sex.com
 
 ;
 
 [
     TUPLE{ request
-        url: TUPLE{ url protocol: "http" port: 80 host: "www.sex.com" path: "/bar" }
+        url: TUPLE{ url host: "www.sex.com" path: "/bar" }
         method: "HEAD"
         version: "1.1"
         header: H{ { "host" "www.sex.com" } }
@@ -73,9 +74,20 @@ GET nested HTTP/1.0
 
 ;
 
-[ read-request-test-3 [ read-request ] with-string-reader ]
+[ read-request-test-3 lf>crlf [ read-request ] with-string-reader ]
 [ "Bad request: URL" = ]
 must-fail-with
+
+STRING: read-request-test-4
+GET /blah HTTP/1.0
+Host: "www.amazon.com"
+;
+
+[ "www.amazon.com" ]
+[
+    read-request-test-4 lf>crlf [ read-request ] with-string-reader
+    "host" header
+] unit-test
 
 STRING: read-response-test-1
 HTTP/1.1 404 not found
@@ -117,16 +129,47 @@ read-response-test-1' 1array [
 
 [ t ] [
     "rmid=732423sdfs73242; path=/; domain=.example.net; expires=Fri, 31-Dec-2010 23:59:59 GMT"
-    dup parse-cookies unparse-cookies =
+    dup parse-set-cookie first unparse-set-cookie =
+] unit-test
+
+[ t ] [
+    "a="
+    dup parse-set-cookie first unparse-set-cookie =
+] unit-test
+
+STRING: read-response-test-2
+HTTP/1.1 200 Content follows
+Set-Cookie: oo="bar; a=b"; httponly=yes; sid=123456
+
+
+;
+
+[ 2 ] [
+    read-response-test-2 lf>crlf
+    [ read-response ] with-string-reader
+    cookies>> length
+] unit-test
+
+STRING: read-response-test-3
+HTTP/1.1 200 Content follows
+Set-Cookie: oo="bar; a=b"; comment="your mom"; httponly=yes
+
+
+;
+
+[ 1 ] [
+    read-response-test-3 lf>crlf
+    [ read-response ] with-string-reader
+    cookies>> length
 ] unit-test
 
 ! Live-fire exercise
-USING: http.server http.server.static furnace.sessions
-furnace.actions furnace.auth.login furnace.db http.client
-io.server io.files io io.encodings.ascii
+USING: http.server http.server.static furnace.sessions furnace.alloy
+furnace.actions furnace.auth furnace.auth.login furnace.db http.client
+io.servers.connection io.files io io.encodings.ascii
 accessors namespaces threads
-http.server.responses http.server.redirection
-http.server.dispatchers ;
+http.server.responses http.server.redirection furnace.redirection
+http.server.dispatchers db.tuples ;
 
 : add-quit-action
     <action>
@@ -138,7 +181,7 @@ http.server.dispatchers ;
 [ test-db drop delete-file ] ignore-errors
 
 test-db [
-    init-sessions-table
+    init-furnace-tables
 ] with-db
 
 [ ] [
@@ -176,7 +219,7 @@ test-db [
     [
         <dispatcher>
             <action> <protected>
-            <login>
+            "Test" <login-realm>
             <sessions>
             "" add-responder
             add-quit-action
@@ -206,7 +249,7 @@ test-db [
     [
         <dispatcher>
             <action> [ [ "Hi" write ] "text/plain" <content> ] >>display
-            <login>
+            "Test" <login-realm>
             <sessions>
             "" add-responder
             add-quit-action
@@ -223,7 +266,8 @@ test-db [
 
 [ "Goodbye" ] [ "http://localhost:1237/quit" http-get nip ] unit-test
 
-USING: html.components html.elements xml xml.utilities validators
+USING: html.components html.elements html.forms
+xml xml.utilities validators
 furnace furnace.flash ;
 
 SYMBOL: a
@@ -275,3 +319,7 @@ SYMBOL: a
 [ 4 ] [ a get-global ] unit-test
 
 [ "Goodbye" ] [ "http://localhost:1237/quit" http-get nip ] unit-test
+
+! Test cloning
+[ f ] [ <404> dup clone "b" "a" set-header drop "a" header ] unit-test
+[ f ] [ <404> dup clone "b" "a" <cookie> put-cookie drop "a" get-cookie ] unit-test

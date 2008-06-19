@@ -5,6 +5,7 @@ classes.tuple assocs splitting words arrays memoize
 io io.files io.encodings.utf8 io.streams.string
 unicode.case tuple-syntax mirrors fry math urls present
 multiline xml xml.data xml.writer xml.utilities
+html.forms
 html.elements
 html.components
 html.templates
@@ -76,7 +77,7 @@ CHLOE: each [ with-each-value ] (bind-tag) ;
 
 CHLOE: bind-each [ with-each-object ] (bind-tag) ;
 
-CHLOE: bind [ with-values ] (bind-tag) ;
+CHLOE: bind [ with-form ] (bind-tag) ;
 
 : error-message-tag ( tag -- )
     children>string render-error ;
@@ -86,11 +87,10 @@ CHLOE: comment drop ;
 CHLOE: call-next-template drop call-next-template ;
 
 : attr>word ( value -- word/f )
-    dup ":" split1 swap lookup
-    [ ] [ "No such word: " swap append throw ] ?if ;
+    ":" split1 swap lookup ;
 
 : if-satisfied? ( tag -- ? )
-    [ "code" optional-attr [ attr>word execute ] [ t ] if* ]
+    [ "code" optional-attr [ attr>word dup [ execute ] when ] [ t ] if* ]
     [ "value" optional-attr [ value ] [ t ] if* ]
     bi and ;
 
@@ -98,12 +98,12 @@ CHLOE: if dup if-satisfied? [ process-tag-children ] [ drop ] if ;
 
 CHLOE-SINGLETON: label
 CHLOE-SINGLETON: link
-CHLOE-SINGLETON: farkup
 CHLOE-SINGLETON: inspector
 CHLOE-SINGLETON: comparison
 CHLOE-SINGLETON: html
 CHLOE-SINGLETON: hidden
 
+CHLOE-TUPLE: farkup
 CHLOE-TUPLE: field
 CHLOE-TUPLE: textarea
 CHLOE-TUPLE: password

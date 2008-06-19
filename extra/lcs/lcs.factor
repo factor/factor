@@ -63,15 +63,19 @@ TUPLE: trace-state old new table i j ;
     [ 1- ] change-i [ 1- ] change-j ;
 
 : inserted? ( state -- ? )
-    [ j>> 0 > ]
-    [ [ i>> zero? ] [ top-beats-side? ] or? ] and? ;
+    {
+        [ j>> 0 > ]
+        [ { [ i>> zero? ] [ top-beats-side? ] } 1|| ]
+    } 1&& ;
 
 : do-insert ( state -- state )
     dup new-nth insert boa , [ 1- ] change-j ;
 
 : deleted? ( state -- ? )
-    [ i>> 0 > ]
-    [ [ j>> zero? ] [ top-beats-side? not ] or? ] and? ;
+    {
+        [ i>> 0 > ]
+        [ { [ j>> zero? ] [ top-beats-side? not ] } 1|| ]
+    } 1&& ;
 
 : do-delete ( state -- state )
     dup old-nth delete boa , [ 1- ] change-i ;

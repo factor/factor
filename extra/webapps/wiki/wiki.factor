@@ -1,12 +1,14 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel hashtables calendar
-namespaces splitting sequences sorting math.order
-html.components syndication
+namespaces splitting sequences sorting math.order present
+syndication
+html.components html.forms
 http.server
 http.server.dispatchers
 furnace
 furnace.actions
+furnace.redirection
 furnace.auth
 furnace.auth.login
 furnace.boilerplate
@@ -15,35 +17,34 @@ validators
 db.types db.tuples lcs farkup urls ;
 IN: webapps.wiki
 
-: view-url ( title -- url )
-    "$wiki/view/" prepend >url ;
+: wiki-url ( rest path -- url )
+    [ "$wiki/" % % "/" % % ] "" make
+    <url> swap >>path ;
 
-: edit-url ( title -- url )
-    "$wiki/edit" >url swap "title" set-query-param ;
+: view-url ( title -- url ) "view" wiki-url ;
 
-: revisions-url ( title -- url )
-    "$wiki/revisions" >url swap "title" set-query-param ;
+: edit-url ( title -- url ) "edit" wiki-url ;
 
-: revision-url ( id -- url )
-    "$wiki/revision" >url swap "id" set-query-param ;
+: revisions-url ( title -- url ) "revisions" wiki-url ;
 
-: user-edits-url ( author -- url )
-    "$wiki/user-edits" >url swap "author" set-query-param ;
+: revision-url ( id -- url ) "revision" wiki-url ;
+
+: user-edits-url ( author -- url ) "user-edits" wiki-url ;
 
 TUPLE: wiki < dispatcher ;
+
+SYMBOL: can-delete-wiki-articles?
+
+can-delete-wiki-articles? define-capability
 
 TUPLE: article title revision ;
 
 article "ARTICLES" {
     { "title" "TITLE" { VARCHAR 256 } +not-null+ +user-assigned-id+ }
-    ! { "AUTHOR" INTEGER +not-null+ } ! uid
-    ! { "PROTECTED" BOOLEAN +not-null+ }
     { "revision" "REVISION" INTEGER +not-null+ } ! revision id
 } define-persistent
 
 : <article> ( title -- article ) article new swap >>title ;
-
-: init-articles-table ( -- ) article ensure-table ;
 
 TUPLE: revision id title author date content ;
 
@@ -68,8 +69,6 @@ M: revision feed-entry-url id>> revision-url ;
 : <revision> ( id -- revision )
     revision new swap >>id ;
 
-: init-revisions-table ( -- ) revision ensure-table ;
-
 : validate-title ( -- )
     { { "title" [ v-one-line ] } } validate-params ;
 
@@ -80,18 +79,22 @@ M: revision feed-entry-url id>> revision-url ;
     <action>
         [ "Front Page" view-url <redirect> ] >>display ;
 
+: latest-revision ( title -- revision/f )
+    <article> select-tuple
+    dup [ revision>> <revision> select-tuple ] when ;
+
 : <view-article-action> ( -- action )
     <action>
+
         "title" >>rest
 
         [
             validate-title
-            "view?title=" relative-link-prefix set
         ] >>init
 
         [
-            "title" value dup <article> select-tuple [
-                revision>> <revision> select-tuple from-object
+            "title" value dup latest-revision [
+                from-object
                 { wiki "view" } <chloe-content>
             ] [
                 edit-url <redirect>
@@ -100,27 +103,36 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <view-revision-action> ( -- action )
     <page-action>
+
+        "id" >>rest
+
         [
             validate-integer-id
             "id" value <revision>
             select-tuple from-object
-            "view?title=" relative-link-prefix set
+            URL" $wiki/view/" adjust-url present relative-link-prefix set
         ] >>init
 
         { wiki "view" } >>template ;
 
+: amend-article ( revision article -- )
+    swap id>> >>revision update-tuple ;
+
+: add-article ( revision -- )
+    [ title>> ] [ id>> ] bi article boa insert-tuple ;
+
 : add-revision ( revision -- )
     [ insert-tuple ]
     [
-        dup title>> <article> select-tuple [
-            swap id>> >>revision update-tuple
-        ] [
-            [ title>> ] [ id>> ] bi article boa insert-tuple
-        ] if*
+        dup title>> <article> select-tuple
+        [ amend-article ] [ add-article ] if*
     ] bi ;
 
 : <edit-article-action> ( -- action )
     <page-action>
+
+        "title" >>rest
+
         [
             validate-title
             "title" value <article> select-tuple [
@@ -129,7 +141,7 @@ M: revision feed-entry-url id>> revision-url ;
         ] >>init
 
         { wiki "edit" } >>template
-        
+
         [
             validate-title
             { { "content" [ v-required ] } } validate-params
@@ -140,7 +152,10 @@ M: revision feed-entry-url id>> revision-url ;
                 logged-in-user get username>> >>author
                 "content" value >>content
             [ add-revision ] [ title>> view-url <redirect> ] bi
-        ] >>submit ;
+        ] >>submit
+
+    <protected>
+        "edit wiki articles" >>description ;
 
 : list-revisions ( -- seq )
     f <revision> "title" value >>title select-tuples
@@ -148,21 +163,32 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <list-revisions-action> ( -- action )
     <page-action>
+
+        "title" >>rest
+
         [
             validate-title
             list-revisions "revisions" set-value
         ] >>init
+
         { wiki "revisions" } >>template ;
 
 : <list-revisions-feed-action> ( -- action )
     <feed-action>
+
+        "title" >>rest
+
         [ validate-title ] >>init
+
         [ "Revisions of " "title" value append ] >>title
+
         [ "title" value revisions-url ] >>url
+
         [ list-revisions ] >>entries ;
 
 : <rollback-action> ( -- action )
     <action>
+
         [ validate-integer-id ] >>validate
 
         [
@@ -171,13 +197,12 @@ M: revision feed-entry-url id>> revision-url ;
         ] >>submit ;
 
 : list-changes ( -- seq )
-    "id" value <revision> select-tuples
+    f <revision> select-tuples
     reverse-chronological-order ;
 
 : <list-changes-action> ( -- action )
     <page-action>
         [ list-changes "changes" set-value ] >>init
-
         { wiki "changes" } >>template ;
 
 : <list-changes-feed-action> ( -- action )
@@ -188,13 +213,18 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <delete-action> ( -- action )
     <action>
+
         [ validate-title ] >>validate
 
         [
             "title" value <article> delete-tuples
             f <revision> "title" value >>title delete-tuples
             URL" $wiki" <redirect>
-        ] >>submit ;
+        ] >>submit
+
+     <protected>
+        "delete wiki articles" >>description
+        { can-delete-wiki-articles? } >>capabilities ;
 
 : <diff-action> ( -- action )
     <page-action>
@@ -207,8 +237,8 @@ M: revision feed-entry-url id>> revision-url ;
             "old-id" "new-id"
             [ value <revision> select-tuple ] bi@
             [
-                [ [ title>> "title" set-value ] [ "old" set-value ] bi ]
-                [ "new" set-value ] bi*
+                [ [ title>> "title" set-value ] [ "old" [ from-object ] nest-form ] bi ]
+                [ "new" [ from-object ] nest-form ] bi*
             ]
             [ [ content>> string-lines ] bi@ diff "diff" set-value ]
             2bi
@@ -218,6 +248,7 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <list-articles-action> ( -- action )
     <page-action>
+
         [
             f <article> select-tuples
             [ [ title>> ] compare ] sort
@@ -232,26 +263,32 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <user-edits-action> ( -- action )
     <page-action>
+
+        "author" >>rest
+
         [
             validate-author
             list-user-edits "user-edits" set-value
         ] >>init
+
         { wiki "user-edits" } >>template ;
 
 : <user-edits-feed-action> ( -- action )
     <feed-action>
+        "author" >>rest
         [ validate-author ] >>init
         [ "Edits by " "author" value append ] >>title
         [ "author" value user-edits-url ] >>url
         [ list-user-edits ] >>entries ;
 
-SYMBOL: can-delete-wiki-articles?
-
-can-delete-wiki-articles? define-capability
-
 : <article-boilerplate> ( responder -- responder' )
     <boilerplate>
         { wiki "page-common" } >>template ;
+
+: init-sidebar ( -- )
+    "Sidebar" latest-revision [
+        "sidebar" [ from-object ] nest-form
+    ] when* ;
 
 : <wiki> ( -- dispatcher )
     wiki new-dispatcher
@@ -261,18 +298,14 @@ can-delete-wiki-articles? define-capability
         <list-revisions-action> <article-boilerplate> "revisions" add-responder
         <list-revisions-feed-action> "revisions.atom" add-responder
         <diff-action> <article-boilerplate> "diff" add-responder
-        <edit-article-action> <article-boilerplate> <protected>
-            "edit wiki articles" >>description
-            "edit" add-responder
+        <edit-article-action> <article-boilerplate> "edit" add-responder
         <rollback-action> "rollback" add-responder
         <user-edits-action> "user-edits" add-responder
         <list-articles-action> "articles" add-responder
         <list-changes-action> "changes" add-responder
         <user-edits-feed-action> "user-edits.atom" add-responder
         <list-changes-feed-action> "changes.atom" add-responder
-        <delete-action> <protected>
-            "delete wiki articles" >>description
-            { can-delete-wiki-articles? } >>capabilities
-        "delete" add-responder
+        <delete-action> "delete" add-responder
     <boilerplate>
+        [ init-sidebar ] >>init
         { wiki "wiki-common" } >>template ;

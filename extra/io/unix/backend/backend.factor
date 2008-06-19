@@ -44,14 +44,11 @@ TUPLE: mx fd reads writes ;
 
 GENERIC: add-input-callback ( thread fd mx -- )
 
-: add-callback ( thread fd assoc -- )
-    [ ?push ] change-at ;
-
-M: mx add-input-callback reads>> add-callback ;
+M: mx add-input-callback reads>> push-at ;
 
 GENERIC: add-output-callback ( thread fd mx -- )
 
-M: mx add-output-callback writes>> add-callback ;
+M: mx add-output-callback writes>> push-at ;
 
 GENERIC: remove-input-callbacks ( fd mx -- callbacks )
 

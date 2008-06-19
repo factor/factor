@@ -20,26 +20,25 @@ GENERIC: assoc-clone-like ( assoc exemplar -- newassoc )
 
 GENERIC: >alist ( assoc -- newassoc )
 
+: (assoc-each) ( assoc quot -- seq quot' )
+    >r >alist r> [ first2 ] prepose ; inline
+
 : assoc-find ( assoc quot -- key value ? )
-    >r >alist r> [ first2 ] prepose find swap
-    [ first2 t ] [ drop f f f ] if ; inline
+    (assoc-each) find swap [ first2 t ] [ drop f f f ] if ; inline
 
 : key? ( key assoc -- ? ) at* nip ; inline
 
 : assoc-each ( assoc quot -- )
-    [ f ] compose assoc-find 3drop ; inline
-
-: (assoc>map) ( quot accum -- quot' )
-    [ push ] curry compose ; inline
+    (assoc-each) each ; inline
 
 : assoc>map ( assoc quot exemplar -- seq )
-    >r over assoc-size
-    <vector> [ (assoc>map) assoc-each ] keep
-    r> like ; inline
+    >r accumulator >r assoc-each r> r> like ; inline
+
+: assoc-map-as ( assoc quot exemplar -- newassoc )
+    >r [ 2array ] compose V{ } assoc>map r> assoc-like ; inline
 
 : assoc-map ( assoc quot -- newassoc )
-    over >r [ 2array ] compose V{ } assoc>map r> assoc-like ;
-    inline
+    over assoc-map-as ; inline
 
 : assoc-push-if ( key value quot accum -- )
     >r 2keep r> roll
@@ -149,6 +148,9 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 
 : value-at ( value assoc -- key/f )
     swap [ = nip ] curry assoc-find 2drop ;
+
+: push-at ( value key assoc -- )
+    [ ?push ] change-at ;
 
 : zip ( keys values -- alist )
     2array flip ; inline

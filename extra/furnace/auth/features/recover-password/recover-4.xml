@@ -4,6 +4,6 @@
 
 	<t:title>Recover lost password: step 4 of 4</t:title>
 
-	<p>Your password has been reset. You may now <t:a t:href="login">log in</t:a>.</p>
+	<p>Your password has been reset. You may now <t:a t:href="$realm">proceed</t:a>.</p>
 
 </t:chloe>

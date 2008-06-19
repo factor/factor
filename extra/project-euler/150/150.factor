@@ -17,9 +17,6 @@ IN: project-euler.150
 : partial-sum-infimum ( seq -- seq )
     0 0 rot [ (partial-sum-infimum) ] each drop ; inline
 
-: generate ( n quot -- seq )
-    [ drop ] prepose map ; inline
-
 : map-infimum ( seq quot -- min )
     [ min ] compose 0 swap reduce ; inline
 
@@ -30,7 +27,7 @@ IN: project-euler.150
     615949 * 797807 + 20 2^ rem dup 19 2^ - ; inline
 
 : sums-triangle ( -- seq )
-    0 1000 [ 1+ [ next ] generate partial-sums ] map nip ; 
+    0 1000 [ 1+ [ next ] replicate partial-sums ] map nip ; 
 
 PRIVATE>
 

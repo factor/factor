@@ -56,7 +56,7 @@ M: clumps set-length
 M: clumps group@
     [ n>> over + ] [ seq>> ] bi ;
 
-TUPLE: sliced-clumps < groups ;
+TUPLE: sliced-clumps < clumps ;
 
 : <sliced-clumps> ( seq n -- clumps )
     sliced-clumps new-groups ; inline

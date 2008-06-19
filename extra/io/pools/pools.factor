@@ -10,7 +10,7 @@ TUPLE: pool connections disposed expired ;
     dup check-disposed
     dup expired>> expired? [
         ALIEN: 31337 >>expired
-        connections>> [ delete-all ] [ dispose-each ] bi
+        connections>> delete-all
     ] [ drop ] if ;
 
 : <pool> ( class -- pool )
@@ -34,6 +34,7 @@ GENERIC: make-connection ( pool -- conn )
     dup check-pool [ make-connection ] keep return-connection ;
 
 : acquire-connection ( pool -- conn )
+    dup check-pool
     [ dup connections>> empty? ] [ dup new-connection ] [ ] while
     connections>> pop ;
 

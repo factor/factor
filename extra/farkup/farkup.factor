@@ -1,12 +1,13 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays io io.styles kernel memoize namespaces peg
-sequences strings html.elements xml.entities xmode.code2html
-splitting io.streams.string peg.parsers
+USING: arrays io io.styles kernel memoize namespaces peg math
+combinators sequences strings html.elements xml.entities
+xmode.code2html splitting io.streams.string peg.parsers
 sequences.deep unicode.categories ;
 IN: farkup
 
 SYMBOL: relative-link-prefix
+SYMBOL: disable-images?
 SYMBOL: link-no-follow?
 
 <PRIVATE
@@ -67,13 +68,19 @@ MEMO: eq ( -- parser )
         </pre>
     ] with-string-writer ;
 
+: invalid-url "javascript:alert('Invalid URL in farkup');" ;
+
 : check-url ( href -- href' )
-    CHAR: : over member? [
-        dup { "http://" "https://" "ftp://" } [ head? ] with contains?
-        [ drop "/" ] unless
-    ] [
-        relative-link-prefix get prepend
-    ] if ;
+    {
+        { [ dup empty? ] [ drop invalid-url ] }
+        { [ dup [ 127 > ] contains? ] [ drop invalid-url ] }
+        { [ dup first "/\\" member? ] [ drop invalid-url ] }
+        { [ CHAR: : over member? ] [
+            dup { "http://" "https://" "ftp://" } [ head? ] with contains?
+            [ drop invalid-url ] unless
+        ] }
+        [ relative-link-prefix get prepend ]
+    } cond ;
 
 : escape-link ( href text -- href-esc text-esc )
     >r check-url escape-quoted-string r> escape-string ;
@@ -82,18 +89,22 @@ MEMO: eq ( -- parser )
     escape-link
     [
         "<a" ,
-        " href=\"" , >r , r>
+        " href=\"" , >r , r> "\"" ,
         link-no-follow? get [ " nofollow=\"true\"" , ] when
-        "\">" , , "</a>" ,
+        ">" , , "</a>" ,
     ] { } make ;
 
 : make-image-link ( href alt -- seq )
-    escape-link
-    [
-        "<img src=\"" , swap , "\"" ,
-        dup empty? [ drop ] [ " alt=\"" , , "\"" , ] if
-        "/>" , ]
-    { } make ;
+    disable-images? get [
+        2drop "<strong>Images are not allowed</strong>"
+    ] [
+        escape-link
+        [
+            "<img src=\"" , swap , "\"" ,
+            dup empty? [ drop ] [ " alt=\"" , , "\"" , ] if
+            "/>" ,
+        ] { } make
+    ] if ;
 
 MEMO: image-link ( -- parser )
     [

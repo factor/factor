@@ -1,38 +1,61 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces assocs assocs.lib kernel sequences urls
+USING: namespaces assocs assocs.lib kernel sequences accessors
+urls db.types db.tuples math.parser fry
 http http.server http.server.filters http.server.redirection
-furnace furnace.sessions ;
+furnace furnace.cache furnace.sessions furnace.redirection ;
 IN: furnace.flash
+
+TUPLE: flash-scope < server-state session namespace ;
+
+: <flash-scope> ( id -- aside )
+    flash-scope new-server-state ;
+
+flash-scope "FLASH_SCOPES" {
+    { "session" "SESSION" BIG-INTEGER +not-null+ }
+    { "namespace" "NAMESPACE" FACTOR-BLOB +not-null+ }
+} define-persistent
 
 : flash-id-key "__f" ;
 
-TUPLE: flash-scopes < filter-responder ;
+TUPLE: flash-scopes < server-state-manager ;
 
-C: <flash-scopes> flash-scopes
+: <flash-scopes> ( responder -- responder' )
+    flash-scopes new-server-state-manager ;
 
 SYMBOL: flash-scope
 
-: fget ( key -- value ) flash-scope get at ;
+: fget ( key -- value )
+    flash-scope get dup
+    [ namespace>> at ] [ 2drop f ] if ;
+
+: get-flash-scope ( id -- flash-scope )
+    dup [ flash-scope get-state ] when
+    dup [ dup session>> session get id>> = [ drop f ] unless ] when ;
+
+: request-flash-scope ( request -- flash-scope )
+    flash-id-key swap request-params at string>number get-flash-scope ;
 
 M: flash-scopes call-responder*
-    flash-id-key
-    request get request-params at
-    flash-scopes sget at flash-scope set
-    call-next-method ;
-
-M: flash-scopes init-session*
-    H{ } clone flash-scopes sset
+    dup flash-scopes set
+    request get request-flash-scope flash-scope set
     call-next-method ;
 
 : make-flash-scope ( seq -- id )
-    [ dup get ] H{ } map>assoc flash-scopes sget set-at-unique
-    session-changed ;
+    f <flash-scope>
+        session get id>> >>session
+        swap [ dup get ] H{ } map>assoc >>namespace
+    [ flash-scopes get touch-state ] [ insert-tuple ] [ id>> ] tri ;
 
 : <flash-redirect> ( url seq -- response )
-    make-flash-scope
-    [ clone ] dip flash-id-key set-query-param
+    [ clone ] dip
+    make-flash-scope flash-id-key set-query-param
     <redirect> ;
 
 : restore-flash ( seq -- )
-    [ flash-scope get key? ] filter [ [ fget ] keep set ] each ;
+    flash-scope get dup [
+        namespace>>
+        [ '[ , key? ] filter ]
+        [ '[ [ , at ] keep set ] each ]
+        bi
+    ] [ 2drop ] if ;

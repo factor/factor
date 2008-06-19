@@ -131,10 +131,6 @@ MACRO: firstn ( n -- )
     [ find drop [ head-slice ] when* ] curry
     [ dup ] prepose keep like ;
 
-: replicate ( seq quot -- newseq )
-    #! quot: ( -- obj )
-    [ drop ] prepose map ; inline
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 <PRIVATE
@@ -205,9 +201,6 @@ USE: continuations
     >r >r 0 max r> r>
     [ length tuck min >r min r> ] keep subseq ;
 
-: accumulator ( quot -- quot vec )
-    V{ } clone [ [ push ] curry compose ] keep ; inline
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! List the positions of obj in seq
@@ -243,20 +236,6 @@ PRIVATE>
 
 : short ( seq n -- seq n' )
     over length min ; inline
-
-<PRIVATE
-:: insert ( seq quot n -- )
-    n zero? [
-        n n 1- [ seq nth quot call ] bi@ >= [
-            n n 1- seq exchange
-            seq quot n 1- insert
-        ] unless
-    ] unless ; inline
-PRIVATE>
-
-: insertion-sort ( seq quot -- )
-    ! quot is a transformation on elements
-    over length [ insert ] 2with each ; inline
 
 : if-seq ( seq quot1 quot2 -- )
     [ f like ] 2dip if* ; inline

@@ -3,8 +3,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math.ranges sequences random accessors combinators.lib
 kernel namespaces fry db.types db.tuples urls validators
-html.components http http.server.dispatchers furnace
-furnace.actions furnace.boilerplate ;
+html.components html.forms http http.server.dispatchers furnace
+furnace.actions furnace.boilerplate furnace.redirection ;
 IN: webapps.wee-url
 
 TUPLE: wee-url < dispatcher ;
@@ -16,9 +16,6 @@ short-url "SHORT_URLS" {
     { "url" "URL" TEXT +not-null+ }
 } define-persistent
 
-: init-short-url-table ( -- )
-    short-url ensure-table ;
-
 : letter-bank ( -- seq )
     CHAR: a CHAR: z [a,b]
     CHAR: A CHAR: Z [a,b]
@@ -26,7 +23,7 @@ short-url "SHORT_URLS" {
     3append ; foldable
 
 : random-url ( -- string )
-    1 6 [a,b] random [ drop letter-bank random ] "" map-as ;
+    1 6 [a,b] random [ letter-bank random ] "" replicate-as ;
 
 : insert-short-url ( short-url -- short-url )
     '[ , dup random-url >>short insert-tuple ] 10 retry ;

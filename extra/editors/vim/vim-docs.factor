@@ -11,7 +11,5 @@ $nl
 "USE: vim"
 "\"c:\\\\program files\\\\vim\\\\vim70\\\\gvim\" vim-path set-global"
 }
-"On Unix, you may omit the last line if " { $snippet "\"vim\"" } " is in your " { $snippet "$PATH" } "."
-$nl
-"If you are running the terminal version of Vim, you want it to block Factor until exiting, but for GVim the opposite is desired, so that one can work in Factor and GVim concurrently. The " { $link vim-detach } " global variable can be set to " { $link t } " to detach the Vim process. The default is " { $link f } "." ;
+"On Unix, you may omit the last line if " { $snippet "\"vim\"" } " is in your " { $snippet "$PATH" } "." ;
 

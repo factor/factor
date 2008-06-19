@@ -10,3 +10,5 @@ IN: grouping.tests
     2 over set-length
     >array
 ] unit-test
+
+[ { { 1 2 } { 2 3 } } ] [ { 1 2 3 } 2 <sliced-clumps> [ >array ] map ] unit-test

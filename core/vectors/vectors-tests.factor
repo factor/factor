@@ -26,7 +26,7 @@ IN: vectors.tests
 [ V{ 1 2 } ] [ [ 1 2 ] >vector ] unit-test
 
 [ t ] [
-    100 [ drop 100 random ] map >vector
+    100 [ 100 random ] V{ } replicate-as
     dup >array >vector =
 ] unit-test
 

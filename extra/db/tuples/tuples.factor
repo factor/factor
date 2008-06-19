@@ -122,6 +122,9 @@ M: retryable execute-statement* ( statement type -- )
 : ensure-table ( class -- )
     [ create-table ] curry ignore-errors ;
 
+: ensure-tables ( classes -- )
+    [ ensure-table ] each ;
+
 : insert-db-assigned-statement ( tuple -- )
     dup class
     db get db-insert-statements [ <insert-db-assigned-statement> ] cache

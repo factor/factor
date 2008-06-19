@@ -259,20 +259,26 @@ HOOK: (send) io-backend ( packet addrspec datagram -- )
     [ addrinfo>addrspec ] map
     sift ;
 
-: prepare-resolve-host ( host serv passive? -- host' serv' flags )
+: prepare-resolve-host ( addrspec -- host' serv' flags )
     #! If the port is a number, we resolve for 'http' then
     #! change it later. This is a workaround for a FreeBSD
     #! getaddrinfo() limitation -- on Windows, Linux and Mac,
     #! we can convert a number to a string and pass that as the
     #! service name, but on FreeBSD this gives us an unknown
     #! service error.
-    >r
-    dup integer? [ port-override set "http" ] when
-    r> AI_PASSIVE 0 ? ;
+    [ host>> ]
+    [ port>> dup integer? [ port-override set "http" ] when ] bi
+    over 0 AI_PASSIVE ? ;
 
 HOOK: addrinfo-error io-backend ( n -- )
 
-: resolve-host ( host serv passive? -- seq )
+GENERIC: resolve-host ( addrspec -- seq )
+
+TUPLE: inet host port ;
+
+C: <inet> inet
+
+M: inet resolve-host
     [
         prepare-resolve-host
         "addrinfo" <c-object>
@@ -284,17 +290,16 @@ HOOK: addrinfo-error io-backend ( n -- )
         freeaddrinfo
     ] with-scope ;
 
+M: f resolve-host drop { } ;
+
+M: object resolve-host 1array ;
+
 : host-name ( -- string )
     256 <byte-array> dup dup length gethostname
     zero? [ "gethostname failed" throw ] unless
     ascii alien>string ;
 
-TUPLE: inet host port ;
-
-C: <inet> inet
-
-M: inet (client)
-    [ host>> ] [ port>> ] bi f resolve-host (client) ;
+M: inet (client) resolve-host (client) ;
 
 ERROR: invalid-inet-server addrspec ;
 

@@ -82,7 +82,7 @@ TUPLE: file-responder root hook special allow-listings ;
     "index.html" append-path dup exists? [ drop f ] unless ;
 
 : serve-directory ( filename -- response )
-    request get path>> "/" tail? [
+    request get url>> path>> "/" tail? [
         dup
         find-index [ serve-file ] [ list-directory ] ?if
     ] [

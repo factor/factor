@@ -1,15 +1,17 @@
 
-USING: kernel combinators sequences sets math
-       io.sockets unicode.case accessors
+USING: kernel combinators sequences sets math threads namespaces continuations
+       debugger io io.sockets unicode.case accessors destructors
        combinators.cleave combinators.lib
-       newfx
+       newfx fry
        dns dns.util dns.misc ;
 
 IN: dns.server
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: records ( -- vector ) V{ } ;
+SYMBOL: records-var
+
+: records ( -- records ) records-var get ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -50,9 +52,10 @@ IN: dns.server
 
 : rr->rdata-names ( rr -- names/f )
     {
-      { [ dup type>> NS = ] [ rdata>>            {1} ] }
-      { [ dup type>> MX = ] [ rdata>> exchange>> {1} ] }
-      { [ t ]               [ drop f ] }
+      { [ dup type>> NS    = ] [ rdata>>            {1} ] }
+      { [ dup type>> MX    = ] [ rdata>> exchange>> {1} ] }
+      { [ dup type>> CNAME = ] [ rdata>>            {1} ] }
+      { [ t ]                  [ drop f ] }
     }
   cond ;
 
@@ -192,31 +195,14 @@ DEFER: query->rrs
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: (socket) ( -- vec ) V{ f } ;
+: (handle-request) ( packet -- )
+  [ [ find-answer ] with-message-bytes ] change-data respond ;
 
-: socket ( -- socket ) (socket) 1st ;
+: handle-request ( packet -- ) [ (handle-request) ] curry in-thread ;
 
-: init-socket-on-port ( port -- )
-  f swap <inet4> <datagram> 0 (socket) as-mutate ;
+: receive-loop ( socket -- )
+  [ receive-packet handle-request ] [ receive-loop ] bi ;
 
-: init-socket ( -- ) 53 init-socket-on-port ;
+: loop ( addr-spec -- )
+  [ <datagram> '[ , [ receive-loop ] with-disposal ] try ] [ loop ] bi ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: loop ( -- )
-  socket receive
-  swap
-  parse-message
-  find-answer
-  message->ba
-  swap
-  socket send
-  loop ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: start ( -- ) init-socket loop ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-MAIN: start

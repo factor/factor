@@ -1,7 +1,7 @@
 USING: html.templates html.templates.chloe
 tools.test io.streams.string kernel sequences ascii boxes
-namespaces xml html.components
-splitting unicode.categories furnace ;
+namespaces xml html.components html.forms
+splitting unicode.categories furnace accessors ;
 IN: html.templates.chloe.tests
 
 [ f ] [ f parse-query-attr ] unit-test
@@ -9,13 +9,13 @@ IN: html.templates.chloe.tests
 [ f ] [ "" parse-query-attr ] unit-test
 
 [ H{ { "a" "b" } } ] [
-    blank-values
+    begin-form
     "b" "a" set-value
     "a" parse-query-attr
 ] unit-test
 
 [ H{ { "a" "b" } { "c" "d" } } ] [
-    blank-values
+    begin-form
     "b" "a" set-value
     "d" "c" set-value
     "a,c" parse-query-attr
@@ -69,7 +69,7 @@ IN: html.templates.chloe.tests
     ] run-template
 ] unit-test
 
-[ ] [ blank-values ] unit-test
+[ ] [ begin-form ] unit-test
 
 [ ] [ "A label" "label" set-value ] unit-test
 
@@ -151,16 +151,16 @@ TUPLE: person first-name last-name ;
 
 [ ] [ H{ { "a" H{ { "b" "c" } } } } values set ] unit-test
 
-[ "<form method='POST' action='foo'><input type='hidden' name='__n' value='a'/></form>" ] [
+[ "<form method='post' action='foo'><input type='hidden' name='__n' value='a'/></form>" ] [
     [
         "test10" test-template call-template
     ] run-template
 ] unit-test
 
-[ ] [ blank-values ] unit-test
+[ ] [ begin-form ] unit-test
 
 [ ] [
-    H{ { "first-name" "RBaxter" } { "last-name" "Unknown" } } "person" set-value
+    <form> H{ { "first-name" "RBaxter" } { "last-name" "Unknown" } } >>values "person" set-value
 ] unit-test
 
 [ "<table><tr><td>RBaxter</td><td>Unknown</td></tr></table>" ] [
@@ -170,7 +170,7 @@ TUPLE: person first-name last-name ;
 ] unit-test
 
 [ ] [
-    blank-values
+    begin-form
     { "a" "b" } "choices" set-value
     "true" "b" set-value
 ] unit-test

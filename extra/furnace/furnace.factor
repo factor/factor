@@ -10,6 +10,7 @@ xml.entities
 xml.writer
 html.components
 html.elements
+html.forms
 html.templates
 html.templates.chloe
 html.templates.chloe.syntax
@@ -30,7 +31,7 @@ IN: furnace
 
 : base-path ( string -- pair )
     dup responder-nesting get
-    [ second class word-name = ] with find nip
+    [ second class superclasses [ word-name = ] with contains? ] with find nip
     [ first ] [ "No such responder: " swap append throw ] ?if ;
 
 : resolve-base-path ( string -- string' )
@@ -62,13 +63,6 @@ M: url adjust-url
 
 M: string adjust-url ;
 
-: <redirect> ( url -- response )
-    adjust-url request get method>> {
-        { "GET" [ <temporary-redirect> ] }
-        { "HEAD" [ <temporary-redirect> ] }
-        { "POST" [ <permanent-redirect> ] }
-    } case ;
-
 GENERIC: modify-form ( responder -- )
 
 M: object modify-form drop ;
@@ -84,6 +78,30 @@ M: object modify-form drop ;
         ] }
     } case ;
 
+: referrer ( -- referrer )
+    #! Typo is intentional, its in the HTTP spec!
+    "referer" request get header>> at >url ;
+
+: user-agent ( -- user-agent )
+    "user-agent" request get header>> at "" or ;
+
+: same-host? ( url -- ? )
+    request get url>>
+    [ [ protocol>> ] [ host>> ] [ port>> ] tri 3array ] bi@ = ;
+
+: cookie-client-state ( key request -- value/f )
+    swap get-cookie dup [ value>> ] when ;
+
+: post-client-state ( key request -- value/f )
+    request-params at ;
+
+: client-state ( key -- value/f )
+    request get dup method>> {
+        { "GET" [ cookie-client-state ] }
+        { "HEAD" [ cookie-client-state ] }
+        { "POST" [ post-client-state ] }
+    } case ;
+
 SYMBOL: exit-continuation
 
 : exit-with ( value -- )
@@ -97,15 +115,23 @@ SYMBOL: exit-continuation
     dup empty?
     [ drop f ] [ "," split [ dup value ] H{ } map>assoc ] if ;
 
-CHLOE: atom
-    [ children>string ]
+: a-url-path ( tag -- string )
     [ "href" required-attr ]
-    [ "query" optional-attr parse-query-attr ] tri
-    <url>
-        swap >>query
-        swap >>path
-    adjust-url relative-to-request
-    add-atom-feed ;
+    [ "rest" optional-attr dup [ value ] when ] bi
+    [ [ "/" ?tail drop "/" ] dip present 3append ] when* ;
+
+: a-url ( tag -- url )
+    dup "value" optional-attr
+    [ value ] [
+        <url>
+            swap
+            [ a-url-path >>path ]
+            [ "query" optional-attr parse-query-attr >>query ]
+            bi
+        adjust-url relative-to-request
+    ] ?if ;
+
+CHLOE: atom [ children>string ] [ a-url ] bi add-atom-feed ;
 
 CHLOE: write-atom drop write-atom-feeds ;
 
@@ -114,23 +140,11 @@ GENERIC: link-attr ( tag responder -- )
 M: object link-attr 2drop ;
 
 : link-attrs ( tag -- )
+    #! Side-effects current namespace.
     '[ , _ link-attr ] each-responder ;
 
 : a-start-tag ( tag -- )
-    [
-        <a
-            dup link-attrs
-            dup "value" optional-attr [ value f ] [
-                [ "href" required-attr ]
-                [ "query" optional-attr parse-query-attr ]
-                bi
-            ] ?if
-            <url>
-                swap >>query
-                swap >>path
-            adjust-url relative-to-request =href
-        a>
-    ] with-scope ;
+    [ <a [ link-attrs ] [ a-url =href ] bi a> ] with-scope ;
 
 CHLOE: a
     [ a-start-tag ]
@@ -147,22 +161,23 @@ CHLOE: a
         input/>
     ] [ 2drop ] if ;
 
-: form-nesting-key "__n" ;
+: nested-forms-key "__n" ;
 
 : form-magic ( tag -- )
     [ modify-form ] each-responder
-    nested-values get " " join f like form-nesting-key hidden-form-field
+    nested-forms get " " join f like nested-forms-key hidden-form-field
     "for" optional-attr [ "," split [ hidden render ] each ] when* ;
 
 : form-start-tag ( tag -- )
     [
         [
             <form
-                "POST" =method
-                [ link-attrs ]
-                [ "action" required-attr resolve-base-path =action ]
-                [ tag-attrs non-chloe-attrs-only print-attrs ]
-                tri
+                {
+                    [ link-attrs ]
+                    [ "method" optional-attr "post" or =method ]
+                    [ "action" required-attr resolve-base-path =action ]
+                    [ tag-attrs non-chloe-attrs-only print-attrs ]
+                } cleave
             form>
         ]
         [ form-magic ] bi

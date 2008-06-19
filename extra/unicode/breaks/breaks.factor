@@ -23,8 +23,7 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
 
 CATEGORY: (extend) Me Mn ;
 : extend? ( ch -- ? )
-    [ (extend)? ]
-    [ "Other_Grapheme_Extend" property? ] or? ;
+    { [ (extend)? ] [ "Other_Grapheme_Extend" property? ] } 1|| ;
 
 : grapheme-class ( ch -- class )
     {
@@ -35,7 +34,7 @@ CATEGORY: (extend) Me Mn ;
     } cond ;
 
 : init-grapheme-table ( -- table )
-    graphemes [ drop graphemes f <array> ] map ;
+    graphemes [ graphemes f <array> ] replicate ;
 
 SYMBOL: table
 

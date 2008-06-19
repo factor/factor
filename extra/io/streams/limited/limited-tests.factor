@@ -30,3 +30,11 @@ namespaces tools.test strings kernel ;
 [ "abc" CHAR: \n ] [ "\n" "limited" get stream-read-until [ >string ] dip ] unit-test
 
 [ "\n" "limited" get stream-read-until ] [ limit-exceeded? ] must-fail-with
+
+[ "he" CHAR: l ] [
+    B{ CHAR: h CHAR: e CHAR: l CHAR: l CHAR: o }
+    ascii <byte-reader> [
+        5 limit-input
+        "l" read-until
+    ] with-input-stream
+] unit-test

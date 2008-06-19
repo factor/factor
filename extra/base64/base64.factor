@@ -1,11 +1,10 @@
-USING: kernel math sequences namespaces io.binary splitting
-grouping strings hashtables ;
+USING: kernel math sequences io.binary splitting grouping ;
 IN: base64
 
 <PRIVATE
 
 : count-end ( seq quot -- count )
-    >r [ length ] keep r> find-last drop dup [ - 1- ] [ 2drop 0 ] if ;
+    >r [ length ] keep r> find-last drop dup [ - 1- ] [ 2drop 0 ] if ; inline
 
 : ch>base64 ( ch -- ch )
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" nth ;
@@ -20,28 +19,26 @@ IN: base64
     } nth ;
 
 : encode3 ( seq -- seq )
-    be> 4 [ 3 swap - -6 * shift HEX: 3f bitand ch>base64 ] with map ;
+    be> 4 <reversed> [ -6 * shift HEX: 3f bitand ch>base64 ] with B{ } map-as ;
 
 : decode4 ( str -- str )
-    [ base64>ch ] map 0 [ swap 6 shift bitor ] reduce 3 >be ;
+    0 [ base64>ch swap 6 shift bitor ] reduce 3 >be ;
 
 : >base64-rem ( str -- str )
-    [ 3 0 pad-right encode3 ] keep length 1+ head 4 CHAR: = pad-right ;
+    [ 3 0 pad-right encode3 ] [ length 1+ ] bi head 4 CHAR: = pad-right ;
 
 PRIVATE>
 
 : >base64 ( seq -- base64 )
     #! cut string into two pieces, convert 3 bytes at a time
     #! pad string with = when not enough bits
-    dup length dup 3 mod - cut swap
-    [
-        3 <groups> [ encode3 % ] each
-        dup empty? [ drop ] [ >base64-rem % ] if
-    ] "" make ;
+    dup length dup 3 mod - cut
+    [ 3 <groups> [ encode3 ] map concat ]
+    [ dup empty? [ drop "" ] [ >base64-rem ] if ]
+    bi* append ;
 
 : base64> ( base64 -- str )
     #! input length must be a multiple of 4
-    [
-        [ 4 <groups> [ decode4 % ] each ] keep [ CHAR: = = not ] count-end 
-    ] SBUF" " make swap [ dup pop* ] times >string ;
-
+    [ 4 <groups> [ decode4 ] map concat ]
+    [ [ CHAR: = = not ] count-end ]
+    bi head* ;

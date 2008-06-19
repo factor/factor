@@ -1,9 +1,9 @@
 IN: furnace.sessions.tests
 USING: tools.test http furnace.sessions
 furnace.actions http.server http.server.responses
-math namespaces kernel accessors
+math namespaces kernel accessors io.sockets io.servers.connection
 prettyprint io.streams.string io.files splitting destructors
-sequences db db.sqlite continuations urls math.parser
+sequences db db.tuples db.sqlite continuations urls math.parser
 furnace ;
 
 : with-session
@@ -54,7 +54,9 @@ M: foo call-responder*
 "auth-test.db" temp-file sqlite-db [
 
     <request> init-request
-    init-sessions-table
+    session ensure-table
+
+    "127.0.0.1" 1234 <inet4> remote-address set
 
     [ ] [
         <foo> <sessions>

@@ -14,7 +14,7 @@ tuple-syntax namespaces urls ;
         method: "GET"
         version: "1.1"
         cookies: V{ }
-        header: H{ { "connection" "close" } { "user-agent" "Factor http.client vocabulary" } }
+        header: H{ { "connection" "close" } { "user-agent" "Factor http.client" } }
     }
 ] [
     "http://www.apple.com/index.html"
@@ -27,7 +27,7 @@ tuple-syntax namespaces urls ;
         method: "GET"
         version: "1.1"
         cookies: V{ }
-        header: H{ { "connection" "close" } { "user-agent" "Factor http.client vocabulary" } }
+        header: H{ { "connection" "close" } { "user-agent" "Factor http.client" } }
     }
 ] [
     "https://www.amazon.com/index.html"
