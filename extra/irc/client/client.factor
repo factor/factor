@@ -326,6 +326,5 @@ PRIVATE>
         spawn-irc
     ] with-variable ;
 
-GENERIC: add-listener ( irc-client irc-listener -- )
-M: irc-listener add-listener ( irc-client irc-listener -- )
-    current-irc-client swap '[ , (add-listener) ] with-variable ;
+: irc-listener add-listener ( irc-listener irc-client -- )
+    current-irc-client '[ , (add-listener) ] with-variable ;
