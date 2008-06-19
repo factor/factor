@@ -232,14 +232,18 @@ DEFER: 'choice'
 : ('sequence') ( -- parser )
   #! A sequence of terminals and non-terminals, including
   #! groupings of those. 
-  [ 
-    'ensure-not' sp ,
-    'ensure' sp ,
-    'element' sp ,
-    'group' sp , 
-    'repeat0' sp ,
-    'repeat1' sp ,
-    'optional' sp , 
+  [
+    [ 
+      'ensure-not' sp ,
+      'ensure' sp ,
+      'element' sp ,
+      'group' sp , 
+      'repeat0' sp ,
+      'repeat1' sp ,
+      'optional' sp , 
+    ] choice* 
+    [ dup  , ":" syntax , "a-zA-Z" range-pattern repeat1 [ >string ] action , ] seq* [ first2 <ebnf-var> ] action ,
+    ,
   ] choice* ;
 
 : 'action' ( -- parser )
