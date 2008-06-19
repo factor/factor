@@ -416,7 +416,7 @@ M: ebnf-terminal (transform) ( ast -- parser )
 
 M: ebnf-foreign (transform) ( ast -- parser )
   dup word>> search
-  [ "Foreign word " swap word>> append " not found" append throw ] unless*
+  [ "Foreign word '" swap word>> append "' not found" append throw ] unless*
   swap rule>> [ main ] unless* dupd swap rule [
     nip
   ] [
@@ -425,7 +425,7 @@ M: ebnf-foreign (transform) ( ast -- parser )
 
 : parser-not-found ( name -- * )
   [
-    "Parser " % % " not found." %
+    "Parser '" % % "' not found." %
   ] "" make throw ;
 
 M: ebnf-non-terminal (transform) ( ast -- parser )
