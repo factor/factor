@@ -49,12 +49,16 @@ namespaces continuations layouts accessors ;
     cell 8 = 50 30 ? 100000 * small-enough?
 ] unit-test
 
-[ ] [
-    "tools.deploy.test.1" shake-and-bake
-    vm "-i=" "test.image" temp-file append 2array try-process
-] unit-test
-
-[ ] [
-    "tools.deploy.test.2" shake-and-bake
-    vm "-i=" "test.image" temp-file append 2array try-process
-] unit-test
+{
+    "tools.deploy.test.1"
+    "tools.deploy.test.2"
+    "tools.deploy.test.3"
+    "tools.deploy.test.4"
+} [
+    [ ] swap [
+        shake-and-bake
+        vm
+        "-i=" "test.image" temp-file append
+        2array try-process
+    ] curry unit-test
+] each
