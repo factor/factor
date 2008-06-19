@@ -446,3 +446,7 @@ foo=<foreign any-char> 'd'
 { V{ "a" "\n" } } [
   "a\n" [EBNF foo='a' '\n'  => [[ drop '\n' ]] EBNF] call ast>>
 ] unit-test
+
+{ t } [
+  [EBNF foo='a' foo='b' EBNF] drop t
+] unit-test
