@@ -64,7 +64,7 @@ PRIVATE>
     cdr [ car ] keep [ convert-lambda ] [ car name>> ] bi define-lisp-macro 1quotation ;
     
 : macro-expand ( cons -- quot )
-    uncons [ list>seq >quotation ] [ lookup-macro call ] bi* call call convert-form ;
+    uncons [ list>seq >quotation ] [ lookup-macro call ] bi* call convert-form ;
     
 : form-dispatch ( cons lisp-symbol -- quot )
     name>>
@@ -129,7 +129,7 @@ M: no-such-var summary drop "No such variable" ;
     dup lisp-symbol? [ lookup-var ] when curry call ; inline
     
 : define-primitive ( name vocab word -- )  
-    swap lookup 1quotation '[ , compose call ] swap lisp-define ; ! '[ , compose call ] swap lisp-define ;
+    swap lookup 1quotation '[ , compose call ] swap lisp-define ;
     
 : lookup-macro ( lisp-symbol -- lambda )
     name>> macro-env get at ;
