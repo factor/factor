@@ -442,3 +442,7 @@ foo=<foreign any-char> 'd'
 { V{ CHAR: a "d" } } [
   "ad" parser4 ast>>
 ] unit-test
+
+{ V{ "a" "\n" } } [
+  "a\n" [EBNF foo='a' '\n'  => [[ drop '\n' ]] EBNF] call ast>>
+] unit-test
