@@ -13,7 +13,7 @@ TUPLE: labelled-gadget content ;
 : <labelled-gadget> ( gadget title -- newgadget )
     labelled-gadget new
     [
-        <label> dup reverse-video-theme f track,
+        <label> reverse-video-theme f track,
         g-> set-labelled-gadget-content 1 track,
     ] { 0 1 } build-track ;
 

@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ui.commands ui.gestures ui.render ui.gadgets
+USING: accessors ui.commands ui.gestures ui.render ui.gadgets
 ui.gadgets.labels ui.gadgets.scrollers
 kernel sequences models opengl math math.order namespaces
 ui.gadgets.presentations ui.gadgets.viewports ui.gadgets.packs
@@ -27,17 +27,18 @@ TUPLE: list index presenter color hook ;
     swap set-list-index ;
 
 : list-presentation-hook ( list -- quot )
-    list-hook [ [ [ list? ] is? ] find-parent ] prepend ;
+    hook>> [ [ [ list? ] is? ] find-parent ] prepend ;
 
 : <list-presentation> ( hook elt presenter -- gadget )
     keep <presentation>
-    [ set-presentation-hook ] keep
-    [ text-theme ] keep ;
+    swap >>hook
+    text-theme ; inline
 
 : <list-items> ( list -- seq )
-    dup list-presentation-hook
-    over list-presenter
-    rot control-value [
+    [ list-presentation-hook ]
+    [ presenter>> ]
+    [ control-value ]
+    tri [
         >r 2dup r> swap <list-presentation>
     ] map 2nip ;
 

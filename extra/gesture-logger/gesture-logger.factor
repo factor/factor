@@ -8,9 +8,9 @@ TUPLE: gesture-logger stream ;
 
 : <gesture-logger> ( stream -- gadget )
     \ gesture-logger construct-gadget
-    [ set-gesture-logger-stream ] keep
-    { 100 100 } over set-rect-dim
-    dup black solid-interior ;
+    swap >>stream
+    { 100 100 } >>dim
+    black solid-interior ;
 
 M: gesture-logger handle-gesture*
     drop

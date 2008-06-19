@@ -41,7 +41,7 @@ button H{
 
 : <button> ( gadget quot -- button )
     button new
-    [ set-button-quot ] keep
+    swap >>quot
     [ set-gadget-delegate ] keep ;
 
 TUPLE: button-paint plain rollover pressed selected ;
@@ -53,10 +53,10 @@ C: <button-paint> button-paint
 
 : button-paint ( button paint -- button paint )
     over find-button {
-        { [ dup button-pressed? ] [ drop button-paint-pressed ] }
-        { [ dup button-selected? ] [ drop button-paint-selected ] }
-        { [ dup button-rollover? ] [ drop button-paint-rollover ] }
-        [ drop button-paint-plain ]
+        { [ dup pressed?>> ] [ drop pressed>> ] }
+        { [ dup selected?>> ] [ drop selected>> ] }
+        { [ dup button-rollover? ] [ drop rollover>> ] }
+        [ drop plain>> ]
     } cond ;
 
 M: button-paint draw-interior
@@ -65,25 +65,26 @@ M: button-paint draw-interior
 M: button-paint draw-boundary
     button-paint draw-boundary ;
 
-: roll-button-theme ( button -- )
-    f black <solid> dup f <button-paint>
-    swap set-gadget-boundary ;
+: roll-button-theme ( button -- button )
+    f black <solid> dup f <button-paint> >>boundary ; inline
 
 : <roll-button> ( label quot -- button )
-    >r >label r>
-    <button> dup roll-button-theme ;
+    >r >label r> <button> roll-button-theme ;
 
-: bevel-button-theme ( gadget -- )
+: <bevel-button-paint> ( -- paint )
     plain-gradient
     rollover-gradient
     pressed-gradient
     selected-gradient
-    <button-paint> over set-gadget-interior
-    faint-boundary ;
+    <button-paint> ;
+
+: bevel-button-theme ( gadget -- gadget )
+    <bevel-button-paint> >>interior
+    faint-boundary ; inline
 
 : <bevel-button> ( label quot -- button )
     >r >label 5 <border> r>
-    <button> dup bevel-button-theme ;
+    <button> bevel-button-theme ;
 
 TUPLE: repeat-button ;
 
