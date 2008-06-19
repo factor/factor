@@ -68,7 +68,7 @@ IN: lisp.test
     ] unit-test
     
     { T{ lisp-symbol f "if" } } [
-        "(defmacro if (pred tr fl) (list (quote cond) (list (list pred tr) (list #t fl))))" lisp-eval
+        "(defmacro if (pred tr fl) (list (quote cond) (list pred tr) (list #t fl)))" lisp-eval
     ] unit-test
     
     { t } [
