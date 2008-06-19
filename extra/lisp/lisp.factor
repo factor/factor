@@ -19,9 +19,6 @@ DEFER: define-lisp-macro
 : convert-body ( cons -- quot )
     [ ] [ convert-form compose ] foldl ; inline
     
-: convert-begin ( cons -- quot )  
-    cdr [ convert-form ] [ ] lmap-as '[ , [ call ] each ] ;
-    
 : convert-cond ( cons -- quot )  
     cdr [ 2car [ convert-form ] bi@ 2array ]
     { } lmap-as '[ , cond ]  ;
@@ -71,7 +68,6 @@ PRIVATE>
     { { "lambda" [ convert-lambda ] }
       { "defmacro" [ convert-defmacro ] }
       { "quote" [ convert-quoted ] }
-      { "begin" [ convert-begin ] }
       { "cond" [ convert-cond ] }
      [ drop convert-general-form ]
     } case ;
