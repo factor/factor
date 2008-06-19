@@ -30,15 +30,12 @@ IN: io.encodings.8-bit
 } ;
 
 : encoding-file ( file-name -- stream )
-    "resource:extra/io/encodings/8-bit/" ".TXT"
-    swapd 3append ascii <file-reader> ;
-
-: tail-if ( seq n -- newseq )
-    2dup swap length <= [ tail ] [ drop ] if ;
+    "resource:extra/io/encodings/8-bit/" swap ".TXT"
+    3append ascii <file-reader> ;
 
 : process-contents ( lines -- assoc )
     [ "#" split1 drop ] map harvest
-    [ "\t" split 2 head [ 2 tail-if hex> ] map ] map ;
+    [ "\t" split 2 head [ 2 short tail hex> ] map ] map ;
 
 : byte>ch ( assoc -- array )
     256 replacement-char <array>
@@ -51,39 +48,40 @@ IN: io.encodings.8-bit
     lines process-contents
     [ byte>ch ] [ ch>byte ] bi ;
 
-TUPLE: 8-bit name decode encode ;
+SYMBOL: 8-bit-encodings
+
+TUPLE: 8-bit decode encode ;
 
 : encode-8-bit ( char stream assoc -- )
-    swapd at* [ encode-error ] unless swap stream-write1 ;
+    swap >r at*
+    [ r> stream-write1 ] [ r> drop encode-error ] if ; inline
 
-M: 8-bit encode-char
-    encode>> encode-8-bit ;
+M: 8-bit encode-char encode>> encode-8-bit ;
 
 : decode-8-bit ( stream array -- char/f )
-    swap stream-read1 dup
-    [ swap nth [ replacement-char ] unless* ]
-    [ nip ] if ;
+    >r stream-read1 dup
+    [ r> nth [ replacement-char ] unless* ] [ r> 2drop f ] if ; inline
 
-M: 8-bit decode-char
-    decode>> decode-8-bit ;
-
-: make-8-bit ( word byte>ch ch>byte -- )
-    [ 2drop ] [ 8-bit boa ] 3bi [ ] curry define ;
-
-: define-8-bit-encoding ( name stream -- )
-    >r in get create r> parse-file make-8-bit ;
+M: 8-bit decode-char decode>> decode-8-bit ;
 
 PREDICATE: 8-bit-encoding < word
-    word-def dup length 1 = [ first 8-bit? ] [ drop f ] if ;
+    8-bit-encodings get-global key? ;
 
-M: 8-bit-encoding <encoder> word-def first <encoder> ;
+M: 8-bit-encoding <encoder>
+    8-bit-encodings get-global at <encoder> ;
 
-M: 8-bit-encoding <decoder> word-def first <decoder> ;
+M: 8-bit-encoding <decoder>
+    8-bit-encodings get-global at <decoder> ;
 
 PRIVATE>
 
 [
-    "io.encodings.8-bit" in [
-        mappings [ encoding-file define-8-bit-encoding ] assoc-each
-    ] with-variable
+    mappings [
+        [ "io.encodings.8-bit" create ]
+        [ encoding-file parse-file 8-bit boa ]
+        bi*
+    ] assoc-map
+    [ 8-bit-encodings set-global ]
+    [ [ [ ] curry define ] assoc-each ]
+    bi
 ] with-compilation-unit
