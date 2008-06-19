@@ -266,8 +266,6 @@ DEFER: 'choice'
 : 'actioned-sequence' ( -- parser )
   [
     [ 'sequence' , "=>" syntax , 'action' , ] seq* [ first2 <ebnf-action> ] action ,
-    [ 'sequence' , ":" syntax , "a-zA-Z" range-pattern repeat1 [ >string ] action , "=>" syntax , 'action' , ] seq* [ first3 >r <ebnf-var> r> <ebnf-action> ] action ,
-    [ 'sequence' , ":" syntax , "a-zA-Z" range-pattern repeat1 [ >string ] action , ] seq* [ first2 <ebnf-var> ] action ,
     'sequence' ,
   ] choice* ;
   
