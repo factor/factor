@@ -48,6 +48,10 @@ random namespaces vectors math math.order ;
 [ ] [ PV{ } "1" set ] unit-test
 [ ] [ V{ } clone "2" set ] unit-test
 
+: push/pop-test ( vec -- vec' ) 3 swap ppush 3 swap ppush ppop ;
+
+[ ] [ PV{ } 10000 [ push/pop-test ] times drop ] unit-test
+
 [ t ] [
     100 [
         drop
