@@ -305,7 +305,7 @@ M: ebnf (transform) ( ast -- parser )
 M: ebnf-rule (transform) ( ast -- parser )
   dup elements>> 
   (transform) [
-    swap symbol>> set
+    swap symbol>> dup get [ "Rule '" over append "' defined more than once" append throw ] [ set ] if
   ] keep ;
 
 M: ebnf-sequence (transform) ( ast -- parser )
