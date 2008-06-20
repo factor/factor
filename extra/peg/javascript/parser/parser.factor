@@ -6,7 +6,21 @@ IN: peg.javascript.parser
 #! Grammar for JavaScript. Based on OMeta-JS example from:
 #! http://jarrett.cs.ucla.edu/ometa-js/#JavaScript_Compiler 
 
+#! The interesting thing about this parser is the mixing of
+#! a default and non-default tokenizer. The JavaScript tokenizer
+#! removes all newlines. So when operating on tokens there is no
+#! need for newline and space skipping in the grammar. But JavaScript
+#! uses the newline in the 'automatic semicolon insertion' rule. 
+#!
+#! If a statement ends in a newline, sometimes the semicolon can be
+#! skipped. So we define an 'nl' rule using the default tokenizer. 
+#! This operates a character at a time. Using this 'nl' in the parser
+#! allows us to detect newlines when we need to for the semicolon
+#! insertion rule, but ignore it in all other places.
 EBNF: javascript
+tokenizer         = default 
+nl                = "\n"
+
 tokenizer         = <foreign tokenize-javascript Tok>
 End               = !(.)
 Space             = " " | "\t" | "\n" 
@@ -14,7 +28,7 @@ Spaces            = Space* => [[ ignore ]]
 Name               = . ?[ ast-name?   ]?   => [[ value>> ]] 
 Number             = . ?[ ast-number? ]?   => [[ value>> ]]
 String             = . ?[ ast-string? ]?   => [[ value>> ]]
-SpacesNoNl         = (!("\n") Space)* => [[ ignore ]]
+SpacesNoNl         = (!(nl) Space)* => [[ ignore ]]
 
 Expr               =   OrExpr:e "?" Expr:t ":" Expr:f   => [[ e t f ast-cond-expr boa ]]
                      | OrExpr:e "=" Expr:rhs            => [[ e rhs ast-set boa ]]
@@ -80,7 +94,7 @@ JsonPropName       = Name | Number | String
 Formal             = Spaces Name
 Formals            = (Formal ("," Formal => [[ second ]])*  => [[ first2 swap prefix ]])?
 FuncRest           = "(" Formals:fs ")" "{" SrcElems:body "}" => [[ fs body ast-func boa ]]
-Sc                 = SpacesNoNl ("\n" | &("}") | End)| ";"
+Sc                 = SpacesNoNl (nl | &("}") | End)| ";"
 Binding            =   Name:n "=" Expr:v                      => [[ n v ast-var boa ]]
                      | Name:n                                 => [[ n "undefined" ast-get boa ast-var boa ]]
 Block              = "{" SrcElems:ss "}"                      => [[ ss ]]
