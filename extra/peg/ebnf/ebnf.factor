@@ -63,12 +63,17 @@ C: <ebnf> ebnf
   #! begin and end.
   [ syntax ] 2dip syntax pack ;
 
-: replace-escapes ( string -- string )
+#! Don't want to use 'replace' in an action since replace doesn't infer.
+#! Do the compilation of the peg at parse time and call (replace).
+PEG: escaper ( string -- ast )
   [
     "\\t" token [ drop "\t" ] action ,
     "\\n" token [ drop "\n" ] action ,
     "\\r" token [ drop "\r" ] action ,
-  ] choice* replace ;
+  ] choice* any-char-parser 2array choice repeat0 ;
+
+: replace-escapes ( string -- string )
+  escaper sift [ [ tree-write ] each ] with-string-writer ;
 
 : insert-escapes ( string -- string )
   [
@@ -319,7 +324,11 @@ M: ebnf (transform) ( ast -- parser )
 M: ebnf-rule (transform) ( ast -- parser )
   dup elements>> 
   (transform) [
-    swap symbol>> dup get [ "Rule '" over append "' defined more than once" append throw ] [ set ] if
+    swap symbol>> dup get { [ tuple? ] [ delegate parser? ] } 1&& [ 
+      "Rule '" over append "' defined more than once" append throw 
+    ] [ 
+      set 
+    ] if
   ] keep ;
 
 M: ebnf-sequence (transform) ( ast -- parser )

@@ -448,7 +448,7 @@ foo=<foreign any-char> 'd'
 ] unit-test
 
 [
-  "USING: peg.ebnf ; [EBNF foo='a' foo='b' EBNF]" eval 
+  "USING: peg.ebnf ; [EBNF foo='a' foo='b' EBNF]" eval drop
 ] must-fail
 
 
