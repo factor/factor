@@ -24,12 +24,23 @@ IN: builder.release.archive
 
 : windows-archive-cmd ( -- cmd ) { "zip" "-r" archive-name "factor" } ;
 
+! : macosx-archive-cmd ( -- cmd )
+!   { "hdiutil" "create"
+!               "-srcfolder" "factor"
+!               "-fs" "HFS+"
+!               "-volname" "factor"
+!               archive-name } ;
+
 : macosx-archive-cmd ( -- cmd )
+  { "mkdir" "dmg-root" }                         try-process
+  { "cp" "-r" "factor" "dmg-root" }              try-process
   { "hdiutil" "create"
-              "-srcfolder" "factor"
+              "-srcfolder" "dmg-root"
               "-fs" "HFS+"
               "-volname" "factor"
-              archive-name } ;
+              archive-name }          to-strings try-process
+  { "rm" "-rf" "dmg-root" }                      try-process
+  { "true" } ;
 
 : unix-archive-cmd ( -- cmd ) { "tar" "-cvzf" archive-name "factor" } ;
 
