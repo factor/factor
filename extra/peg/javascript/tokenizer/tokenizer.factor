@@ -8,7 +8,7 @@ IN: peg.javascript.tokenizer
 
 USE: prettyprint
 
-EBNF: javascript-tokenizer 
+EBNF: tokenize-javascript 
 Letter            = [a-zA-Z]
 Digit             = [0-9]
 Digits            = Digit+

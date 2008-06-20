@@ -5,7 +5,7 @@ USING: kernel tools.test peg peg.javascript.ast peg.javascript.tokenizer
        peg.javascript.parser accessors multiline sequences math ;
 IN: peg.javascript.parser.tests
 
-\ javascript must-infer
+\ parse-javascript must-infer
 
 {
   T{
@@ -23,14 +23,14 @@ IN: peg.javascript.parser.tests
       }
   }
 } [
-  "123; 'hello'; foo(x);" tokenizer ast>> javascript ast>>
+  "123; 'hello'; foo(x);" tokenize-javascript ast>> parse-javascript ast>>
 ] unit-test
 
 { t } [ 
 <"
 var x=5
 var y=10
-"> tokenizer ast>> javascript remaining>> length zero?
+"> tokenize-javascript ast>> parse-javascript remaining>> length zero?
 ] unit-test
 
 
@@ -41,7 +41,7 @@ function foldl(f, initial, seq) {
      initial = f(initial, seq[i]);
    return initial;
 }
-"> tokenizer ast>> javascript remaining>> length zero?
+"> tokenize-javascript ast>> parse-javascript remaining>> length zero?
 ] unit-test
 
 { t } [ 
@@ -52,6 +52,6 @@ ParseState.prototype.from = function(index) {
     r.length = this.length - index;
     return r;
 }
-"> tokenizer ast>> javascript remaining>> length zero?
+"> tokenize-javascript ast>> parse-javascript remaining>> length zero?
 ] unit-test
 

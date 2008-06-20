@@ -520,20 +520,10 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
   parse-result-ast transform dup dup parser [ main swap at compile ] with-variable
   [ compiled-parse ] curry [ with-scope ] curry ;
 
-: [EBNF 
-  scan {
-    { "+" [ scan-word execute "" swap ] }
-    [ " " append default-tokenizer ]
-  } case \ tokenizer set-global
-  [ "EBNF]" parse-multiline-string ] [ drop "" ] recover append ebnf>quot nip parsed 
-  reset-tokenizer ; parsing
+: [EBNF "EBNF]" reset-tokenizer parse-multiline-string ebnf>quot nip parsed reset-tokenizer ; parsing
 
 : EBNF: 
-  CREATE-WORD scan {
-    { "+" [ scan-word execute "" swap ] }
-    [ " " append default-tokenizer ]
-  } case \ tokenizer set-global
-  dupd [ ";EBNF" parse-multiline-string ] [ drop "" ] recover append 
+  reset-tokenizer CREATE-WORD dup ";EBNF" parse-multiline-string  
   ebnf>quot swapd 1 1 <effect> define-declared "ebnf-parser" set-word-prop 
   reset-tokenizer ; parsing
 

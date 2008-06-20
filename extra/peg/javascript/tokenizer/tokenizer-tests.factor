@@ -4,7 +4,7 @@
 USING: kernel tools.test peg peg.javascript.ast peg.javascript.tokenizer accessors ;
 IN: peg.javascript.tokenizer.tests
 
-\ tokenizer must-infer
+\ tokenize-javascript must-infer
 
 {
   V{
@@ -19,5 +19,5 @@ IN: peg.javascript.tokenizer.tests
     ";"
   }    
 } [
-  "123; 'hello'; foo(x);" tokenizer ast>>
+  "123; 'hello'; foo(x);" tokenize-javascript ast>>
 ] unit-test

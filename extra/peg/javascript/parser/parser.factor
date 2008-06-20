@@ -6,7 +6,7 @@ IN: peg.javascript.parser
 #! Grammar for JavaScript. Based on OMeta-JS example from:
 #! http://jarrett.cs.ucla.edu/ometa-js/#JavaScript_Compiler 
 
-EBNF: javascript
+EBNF: parse-javascript
 End               = !(.)
 Space             = " " | "\t" | "\n" 
 Spaces            = Space* => [[ ignore ]]
