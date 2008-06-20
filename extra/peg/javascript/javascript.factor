@@ -4,13 +4,8 @@ USING: kernel accessors peg.javascript.tokenizer peg.javascript.parser ;
 IN: peg.javascript
 
 : parse-javascript ( string -- ast )
-  tokenize-javascript [
-    ast>> javascript [
-      ast>>
-    ] [
-      "Unable to parse JavaScript" throw
-    ] if*
+  javascript [
+    ast>>
   ] [
-    "Unable to tokenize JavaScript" throw
+    "Unable to parse JavaScript" throw
   ] if* ;
-
