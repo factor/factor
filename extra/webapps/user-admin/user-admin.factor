@@ -12,6 +12,7 @@ furnace.auth.providers.db
 furnace.auth.login
 furnace.auth
 furnace.actions
+furnace.redirection
 furnace.utilities
 http.server
 http.server.dispatchers ;
@@ -138,7 +139,7 @@ TUPLE: user-admin < dispatcher ;
     <action>
         [
             validate-username
-            <user> select-tuple 1 >>deleted update-tuple
+            "username" value <user> delete-tuples
             URL" $user-admin" <redirect>
         ] >>submit ;
 

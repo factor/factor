@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators io io.encodings.8-bit
 io.encodings io.encodings.binary io.encodings.utf8 io.files
-io.server io.sockets kernel math.parser namespaces sequences
+io.sockets kernel math.parser namespaces sequences
 ftp io.unix.launcher.parser unicode.case splitting assocs
-classes io.server destructors calendar io.timeouts
+classes io.servers.connection destructors calendar io.timeouts
 io.streams.duplex threads continuations math
 concurrency.promises byte-arrays ;
 IN: ftp.server
@@ -305,7 +305,10 @@ ERROR: not-a-directory ;
         [ drop unrecognized-command t ]
     } case [ handle-client-loop ] when ;
 
-: handle-client ( -- )
+TUPLE: ftp-server < threaded-server ;
+
+M: ftp-server handle-client* ( server -- )
+    drop
     [
         "" [
             host-name <ftp-client> client set
@@ -313,9 +316,14 @@ ERROR: not-a-directory ;
         ] with-directory
     ] with-destructors ;
 
+: <ftp-server> ( port -- server )
+    ftp-server new-threaded-server
+        swap >>insecure
+        "ftp.server" >>name
+        latin1 >>encoding ;
+
 : ftpd ( port -- )
-    internet-server "ftp.server"
-    latin1 [ handle-client ] with-server ;
+    <ftp-server> start-server ;
 
 : ftpd-main ( -- ) 2100 ftpd ;
 

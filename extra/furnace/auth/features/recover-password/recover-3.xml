@@ -6,7 +6,7 @@
 
 	<p>Choose a new password for your account.</p>
 
-	<t:form t:action="new-password">
+	<t:form t:action="$realm/recover-3">
 
 		<table>
 

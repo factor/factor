@@ -67,4 +67,7 @@
 
 	</t:form>
 	
+	<t:if t:code="furnace.auth.features.deactivate-user:allow-deactivation?">
+		<t:button t:action="$realm/deactivate-user">Delete User</t:button>
+	</t:if>
 </t:chloe>

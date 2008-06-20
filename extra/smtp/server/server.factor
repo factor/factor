@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Elie CHAFTARI
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel prettyprint io io.timeouts io.server
+USING: combinators kernel prettyprint io io.timeouts
 sequences namespaces io.sockets continuations calendar
 io.encodings.ascii io.streams.duplex destructors ;
 IN: smtp.server

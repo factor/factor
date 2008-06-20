@@ -4,7 +4,7 @@
 USING: math.ranges sequences random accessors combinators.lib
 kernel namespaces fry db.types db.tuples urls validators
 html.components html.forms http http.server.dispatchers furnace
-furnace.actions furnace.boilerplate ;
+furnace.actions furnace.boilerplate furnace.redirection ;
 IN: webapps.wee-url
 
 TUPLE: wee-url < dispatcher ;

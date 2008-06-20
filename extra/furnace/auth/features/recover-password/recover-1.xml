@@ -6,7 +6,7 @@
 
 	<p>Enter the username and e-mail address you used to register for this site, and you will receive a link for activating a new password.</p>
 
-	<t:form t:action="recover-password">
+	<t:form t:action="$realm/recover-password">
 
 		<table>
 

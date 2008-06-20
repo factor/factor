@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel namespaces validators html.forms urls
 http.server.dispatchers
-furnace furnace.auth furnace.auth.providers furnace.actions ;
+furnace furnace.auth furnace.auth.providers furnace.actions
+furnace.redirection ;
 IN: furnace.auth.features.registration
 
 : <register-action> ( -- action )
@@ -34,10 +35,11 @@ IN: furnace.auth.features.registration
             realm get init-user-profile
 
             URL" $realm" <redirect>
-        ] >>submit ;
+        ] >>submit
+    <auth-boilerplate> ;
 
 : allow-registration ( login -- login )
-    <register-action> <auth-boilerplate> "register" add-responder ;
+    <register-action> "register" add-responder ;
 
 : allow-registration? ( -- ? )
     realm get responders>> "register" swap key? ;

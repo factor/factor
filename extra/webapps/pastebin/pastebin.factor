@@ -12,6 +12,7 @@ http.server.dispatchers
 http.server.redirection
 furnace
 furnace.actions
+furnace.redirection
 furnace.auth
 furnace.auth.login
 furnace.boilerplate

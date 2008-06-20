@@ -1,9 +1,11 @@
 ! Copyright (c) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces accessors kernel assocs arrays io.sockets threads
-fry urls smtp validators html.forms
-http http.server.responses http.server.dispatchers
-furnace furnace.actions furnace.auth furnace.auth.providers ;
+fry urls smtp validators html.forms present
+http http.server.responses http.server.redirection
+http.server.dispatchers
+furnace furnace.actions furnace.auth furnace.auth.providers
+furnace.redirection ;
 IN: furnace.auth.features.recover-password
 
 SYMBOL: lost-password-from
@@ -12,13 +14,12 @@ SYMBOL: lost-password-from
     request get url>> host>> host-name or ;
 
 : new-password-url ( user -- url )
-    "recover-3"
-    swap [
-        [ username>> "username" set ]
-        [ ticket>> "ticket" set ]
+    URL" recover-3" clone
+        swap
+        [ username>> "username" set-query-param ]
+        [ ticket>> "ticket" set-query-param ]
         bi
-    ] H{ } make-assoc
-    derive-url ;
+    adjust-url relative-to-request ;
 
 : password-email ( user -- email )
     <email>
@@ -34,7 +35,7 @@ SYMBOL: lost-password-from
             "If you believe that this request was legitimate, you may click the below link in\n" %
             "your browser to set a new password for your account:\n" %
             "\n" %
-            swap new-password-url %
+            swap new-password-url present %
             "\n\n" %
             "Love,\n" %
             "\n" %
@@ -47,7 +48,7 @@ SYMBOL: lost-password-from
 
 : <recover-action-1> ( -- action )
     <page-action>
-        { realm "recover-1" } >>template
+        { realm "features/recover-password/recover-1" } >>template
 
         [
             {
@@ -63,12 +64,12 @@ SYMBOL: lost-password-from
                 send-password-email
             ] when*
 
-            URL" $login/recover-2" <redirect>
+            URL" $realm/recover-2" <redirect>
         ] >>submit ;
 
 : <recover-action-2> ( -- action )
     <page-action>
-        { realm "recover-2" } >>template ;
+        { realm "features/recover-password/recover-2" } >>template ;
 
 : <recover-action-3> ( -- action )
     <page-action>
@@ -79,7 +80,7 @@ SYMBOL: lost-password-from
             } validate-params
         ] >>init
 
-        { realm "recover-3" } >>template
+        { realm "features/recover-password/recover-3" } >>template
 
         [
             {
@@ -99,7 +100,7 @@ SYMBOL: lost-password-from
                 "new-password" value >>encoded-password
                 users update-user
 
-                URL" $login/recover-4" <redirect>
+                URL" $realm/recover-4" <redirect>
             ] [
                 <403>
             ] if*
@@ -107,7 +108,7 @@ SYMBOL: lost-password-from
 
 : <recover-action-4> ( -- action )
     <page-action>
-        { realm "recover-4" } >>template ;
+        { realm "features/recover-password/recover-4" } >>template ;
 
 : allow-password-recovery ( login -- login )
     <recover-action-1> <auth-boilerplate>

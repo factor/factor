@@ -5,12 +5,11 @@ IN: io.encodings.ascii
 
 <PRIVATE
 : encode-if< ( char stream encoding max -- )
-    nip 1- pick < [ encode-error ] [ stream-write1 ] if ;
+    nip 1- pick < [ encode-error ] [ stream-write1 ] if ; inline
 
 : decode-if< ( stream encoding max -- character )
-    nip swap stream-read1
-    [ tuck > [ drop replacement-char ] unless ]
-    [ drop f ] if* ;
+    nip swap stream-read1 dup
+    [ tuck > [ drop replacement-char ] unless ] [ 2drop f ] if ; inline
 PRIVATE>
 
 SINGLETON: ascii

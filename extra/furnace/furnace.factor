@@ -63,13 +63,6 @@ M: url adjust-url
 
 M: string adjust-url ;
 
-: <redirect> ( url -- response )
-    adjust-url request get method>> {
-        { "GET" [ <temporary-redirect> ] }
-        { "HEAD" [ <temporary-redirect> ] }
-        { "POST" [ <permanent-redirect> ] }
-    } case ;
-
 GENERIC: modify-form ( responder -- )
 
 M: object modify-form drop ;

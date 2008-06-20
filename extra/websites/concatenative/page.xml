@@ -12,7 +12,7 @@
 
 			<t:style t:include="resource:extra/xmode/code2html/stylesheet.css" />
 
-			<t:style t:include="resource:extra/webapps/factor-website/page.css" />
+			<t:style t:include="resource:extra/websites/concatenative/page.css" />
 
 			<t:write-style />
 
