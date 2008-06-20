@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: kernel tools.test peg peg.ebnf words math math.parser 
-       sequences accessors ;
+       sequences accessors peg.parsers parser namespaces arrays 
+       strings ;
 IN: peg.ebnf.tests
 
 { T{ ebnf-non-terminal f "abc" } } [
@@ -164,23 +165,23 @@ IN: peg.ebnf.tests
 ] unit-test
 
 { 6 } [
-  "4+2" [EBNF num=[0-9] => [[ digit> ]] foo=num:x '+' num:y => [[ drop x y + ]] EBNF] call ast>>
+  "4+2" [EBNF num=[0-9] => [[ digit> ]] foo=num:x '+' num:y => [[ x y + ]] EBNF] call ast>>
 ] unit-test
 
 { 6 } [
-  "4+2" [EBNF foo=[0-9]:x '+' [0-9]:y => [[ drop x digit> y digit> + ]] EBNF] call ast>>
+  "4+2" [EBNF foo=[0-9]:x '+' [0-9]:y => [[ x digit> y digit> + ]] EBNF] call ast>>
 ] unit-test
 
 { 10 } [
-  { 1 2 3 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ drop x y + ]] | num EBNF] call ast>>
+  { 1 2 3 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ x y + ]] | num EBNF] call ast>>
 ] unit-test
 
 { f } [
-  { "a" 2 3 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ drop x y + ]] | num EBNF] call 
+  { "a" 2 3 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ x y + ]] | num EBNF] call 
 ] unit-test
 
 { 3 } [
-  { 1 2 "a" 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ drop x y + ]] | num EBNF] call ast>>
+  { 1 2 "a" 4 } [EBNF num=. ?[ number? ]? list=list:x num:y => [[ x y + ]] | num EBNF] call ast>>
 ] unit-test
 
 { f } [
@@ -251,7 +252,7 @@ IN: peg.ebnf.tests
 ] unit-test
 
 { t } [
-  "abcd='9' | ('8'):x => [[ drop x ]]" 'ebnf' parse parse-result-remaining empty?
+  "abcd='9' | ('8'):x => [[ x ]]" 'ebnf' parse parse-result-remaining empty?
 ] unit-test
 
 EBNF: primary 
@@ -365,3 +366,153 @@ main = Primary
   "ab c ab c" [EBNF a="a" "b" foo=(a "c")* EBNF] call ast>>
 ] unit-test
 
+{ V{ "a" "a" "a" } } [
+  "aaa" [EBNF a=('a')* b=!('b') a:x => [[ x ]] EBNF] call ast>>
+] unit-test
+
+{ t } [
+  "aaa" [EBNF a=('a')* b=!('b') a:x => [[ x ]] EBNF] call ast>>
+  "aaa" [EBNF a=('a')* b=!('b') (a):x => [[ x ]] EBNF] call ast>> =
+] unit-test
+
+{ V{ "a" "a" "a" } } [
+  "aaa" [EBNF a=('a')* b=a:x => [[ x ]] EBNF] call ast>>
+] unit-test
+
+{ t } [
+  "aaa" [EBNF a=('a')* b=a:x => [[ x ]] EBNF] call ast>>
+  "aaa" [EBNF a=('a')* b=(a):x => [[ x ]] EBNF] call ast>> =
+] unit-test
+
+{ t } [
+  "number=(digit)+:n 'a'" 'ebnf' parse remaining>> length zero?
+] unit-test
+
+{ t } [
+  "number=(digit)+ 'a'" 'ebnf' parse remaining>> length zero?
+] unit-test
+
+{ t } [
+  "number=digit+ 'a'" 'ebnf' parse remaining>> length zero?
+] unit-test
+
+{ t } [
+  "number=digit+:n 'a'" 'ebnf' parse remaining>> length zero?
+] unit-test
+
+{ t } [
+  "foo=(name):n !(keyword) => [[ n ]]" 'rule' parse ast>>
+  "foo=name:n !(keyword) => [[ n ]]" 'rule' parse ast>> =
+] unit-test
+
+{ t } [
+  "foo=!(keyword) (name):n => [[ n ]]" 'rule' parse ast>>
+  "foo=!(keyword) name:n => [[ n ]]" 'rule' parse ast>> =
+] unit-test
+
+<<
+EBNF: parser1 
+foo='a' 
+;EBNF
+>>
+
+EBNF: parser2
+foo=<foreign parser1 foo> 'b'
+;EBNF
+
+EBNF: parser3
+foo=<foreign parser1> 'c'
+;EBNF
+
+EBNF: parser4
+foo=<foreign any-char> 'd'
+;EBNF
+
+{ "a" } [
+  "a" parser1 ast>>
+] unit-test
+
+{ V{ "a" "b" } } [
+  "ab" parser2 ast>>
+] unit-test
+
+{ V{ "a" "c" } } [
+  "ac" parser3 ast>>
+] unit-test
+
+{ V{ CHAR: a "d" } } [
+  "ad" parser4 ast>>
+] unit-test
+
+{ t } [
+ "USING: kernel peg.ebnf ; [EBNF foo='a' '\n'  => [[ drop \"\n\" ]] EBNF]" eval drop t
+] unit-test
+
+[
+  "USING: peg.ebnf ; [EBNF foo='a' foo='b' EBNF]" eval drop
+] must-fail
+
+{ t } [
+  #! Rule lookup occurs in a namespace. This causes an incorrect duplicate rule
+  #! if a var in a namespace is set. This unit test is to remind me to fix this.
+  [ "fail" "foo" set "foo='a'" 'ebnf' parse ast>> transform drop t ] with-scope
+] unit-test
+
+#! Tokenizer tests
+{ V{ "a" CHAR: b } } [
+  "ab" [EBNF tokenizer=default foo="a" . EBNF] call ast>>
+] unit-test
+
+TUPLE: ast-number value ;
+
+EBNF: a-tokenizer 
+Letter            = [a-zA-Z]
+Digit             = [0-9]
+Digits            = Digit+
+SingleLineComment = "//" (!("\n") .)* "\n" => [[ ignore ]]
+MultiLineComment  = "/*" (!("*/") .)* "*/" => [[ ignore ]]
+Space             = " " | "\t" | "\r" | "\n" | SingleLineComment | MultiLineComment
+Spaces            = Space* => [[ ignore ]]
+Number            = Digits:ws '.' Digits:fs => [[ ws "." fs 3array concat >string string>number ast-number boa ]]
+                    | Digits => [[ >string string>number ast-number boa ]]  
+Special            =   "("   | ")"   | "{"   | "}"   | "["   | "]"   | ","   | ";"
+                     | "?"   | ":"   | "!==" | "~="  | "===" | "=="  | "="   | ">="
+                     | ">"   | "<="  | "<"   | "++"  | "+="  | "+"   | "--"  | "-="
+                     | "-"   | "*="  | "*"   | "/="  | "/"   | "%="  | "%"   | "&&="
+                     | "&&"  | "||=" | "||"  | "."   | "!"
+Tok                = Spaces (Number | Special )
+;EBNF
+
+{ V{ CHAR: 1 T{ ast-number f 23 } ";" CHAR: x } } [
+  "123;x" [EBNF bar = . 
+                tokenizer = <foreign a-tokenizer Tok>  foo=. 
+                tokenizer=default baz=. 
+                main = bar foo foo baz 
+          EBNF] call ast>>
+] unit-test
+
+{ V{ CHAR: 5 "+" CHAR: 2 } } [
+  "5+2" [EBNF 
+          space=(" " | "\n") 
+          number=[0-9] 
+          operator=("*" | "+") 
+          spaces=space* => [[ ignore ]] 
+          tokenizer=spaces (number | operator) 
+          main= . . . 
+        EBNF] call ast>> 
+] unit-test
+
+{ V{ CHAR: 5 "+" CHAR: 2 } } [
+  "5 + 2" [EBNF 
+          space=(" " | "\n") 
+          number=[0-9] 
+          operator=("*" | "+") 
+          spaces=space* => [[ ignore ]] 
+          tokenizer=spaces (number | operator) 
+          main= . . . 
+        EBNF] call ast>> 
+] unit-test
+
+{ "++" } [
+  "++--" [EBNF tokenizer=("++" | "--") main="++" EBNF] call ast>>
+] unit-test
