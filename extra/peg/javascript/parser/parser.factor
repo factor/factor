@@ -28,6 +28,7 @@ Spaces            = Space* => [[ ignore ]]
 Name               = . ?[ ast-name?   ]?   => [[ value>> ]] 
 Number             = . ?[ ast-number? ]?   => [[ value>> ]]
 String             = . ?[ ast-string? ]?   => [[ value>> ]]
+RegExp             = . ?[ ast-regexp? ]?   => [[ value>> ]]
 SpacesNoNl         = (!(nl) Space)* => [[ ignore ]]
 
 Expr               =   OrExpr:e "?" Expr:t ":" Expr:f   => [[ e t f ast-cond-expr boa ]]
@@ -83,6 +84,7 @@ PrimExprHd         =   "(" Expr:e ")"                        => [[ e ]]
                      | Name                                  => [[ ast-get boa ]]
                      | Number                                => [[ ast-number boa ]]
                      | String                                => [[ ast-string boa ]]
+                     | RegExp                                => [[ ast-regexp boa ]]
                      | "function" FuncRest:fr                => [[ fr ]]
                      | "new" Name:n "(" Args:as ")"          => [[ n as ast-new boa ]]
                      | "[" Args:es "]"                       => [[ es ast-array boa ]]
@@ -90,7 +92,7 @@ PrimExprHd         =   "(" Expr:e ")"                        => [[ e ]]
 JsonBindings        = (JsonBinding ("," JsonBinding => [[ second ]])* => [[ first2 swap prefix ]])?
 Json               = "{" JsonBindings:bs "}"                  => [[ bs ast-json boa ]]
 JsonBinding        = JsonPropName:n ":" Expr:v               => [[ n v ast-binding boa ]]
-JsonPropName       = Name | Number | String
+JsonPropName       = Name | Number | String | RegExp
 Formal             = Spaces Name
 Formals            = (Formal ("," Formal => [[ second ]])*  => [[ first2 swap prefix ]])?
 FuncRest           = "(" Formals:fs ")" "{" SrcElems:body "}" => [[ fs body ast-func boa ]]
