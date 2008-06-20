@@ -41,4 +41,4 @@ IN: assocs.lib
 : histogram ( assoc quot -- assoc' )
     H{ } clone [
         swap [ change-at ] 2curry assoc-each
-    ] keep ;
+    ] keep ; inline
