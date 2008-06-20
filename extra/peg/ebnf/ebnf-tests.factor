@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: kernel tools.test peg peg.ebnf words math math.parser 
-       sequences accessors peg.parsers ;
+       sequences accessors peg.parsers parser namespaces ;
 IN: peg.ebnf.tests
 
 { T{ ebnf-non-terminal f "abc" } } [
@@ -443,10 +443,17 @@ foo=<foreign any-char> 'd'
   "ad" parser4 ast>>
 ] unit-test
 
-{ V{ "a" "\n" } } [
-  "a\n" [EBNF foo='a' '\n'  => [[ drop '\n' ]] EBNF] call ast>>
+{ t } [
+ "USING: kernel peg.ebnf ; [EBNF foo='a' '\n'  => [[ drop '\n' ]] EBNF]" eval drop t
 ] unit-test
 
+[
+  "USING: peg.ebnf ; [EBNF foo='a' foo='b' EBNF]" eval 
+] must-fail
+
+
 { t } [
-  [EBNF foo='a' foo='b' EBNF] drop t
+  #! Rule lookup occurs in a namespace. This causes an incorrect duplicate rule
+  #! if a var in a namespace is set. This unit test is to remind me to fix this.
+  [ "fail" "foo" set "foo='a'" 'ebnf' parse ast>> transform drop t ] with-scope
 ] unit-test
