@@ -11,6 +11,31 @@ IN: peg.ebnf
   #! Given an EBNF word produced from EBNF: return the EBNF rule
   "ebnf-parser" word-prop at ;
 
+TUPLE: tokenizer any one many ;
+
+: default-tokenizer ( -- tokenizer )
+  T{ tokenizer f 
+    [ [ drop t ] satisfy ]
+    [ token ]
+    [ [ = ] curry satisfy ]
+  } ;
+
+: parser-tokenizer ( parser -- tokenizer )
+  1quotation [ [ = ] curry satisfy ] dup tokenizer boa ;
+
+: rule-tokenizer ( name word -- tokenizer )
+  rule parser-tokenizer ;
+
+: tokenizer ( -- word )
+  \ tokenizer get [ default-tokenizer ] unless* ;
+
+: reset-tokenizer ( -- )
+  default-tokenizer \ tokenizer set-global ;
+
+: TOKENIZER: 
+  scan search [ "Tokenizer not found" throw ] unless*
+  execute \ tokenizer set-global ; parsing
+
 TUPLE: ebnf-non-terminal symbol ;
 TUPLE: ebnf-terminal symbol ;
 TUPLE: ebnf-foreign word rule ;
@@ -344,7 +369,7 @@ M: ebnf-choice (transform) ( ast -- parser )
   options>> [ (transform) ] map choice ;
 
 M: ebnf-any-character (transform) ( ast -- parser )
-  drop any-char ;
+  drop [ tokenizer any>> call ] box ;
 
 M: ebnf-range (transform) ( ast -- parser )
   pattern>> range-pattern ;
@@ -435,7 +460,7 @@ M: ebnf-var (transform) ( ast -- parser )
   parser>> (transform) ;
 
 M: ebnf-terminal (transform) ( ast -- parser )
-  symbol>> [ token ] keep [ = ] curry satisfy 2choice ;
+  symbol>> [ tokenizer one>> call ] curry box ;
 
 M: ebnf-foreign (transform) ( ast -- parser )
   dup word>> search
@@ -476,10 +501,22 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
   parse-result-ast transform dup dup parser [ main swap at compile ] with-variable
   [ compiled-parse ] curry [ with-scope ] curry ;
 
-: [EBNF "EBNF]" parse-multiline-string ebnf>quot nip parsed ; parsing
+: [EBNF 
+  scan {
+    { "+" [ scan-word execute "" swap ] }
+    [ " " append default-tokenizer ]
+  } case \ tokenizer [
+    [ "EBNF]" parse-multiline-string ] [ drop "" ] recover append ebnf>quot nip parsed 
+  ] with-variable ; parsing
 
 : EBNF: 
-  CREATE-WORD dup 
-  ";EBNF" parse-multiline-string 
-  ebnf>quot swapd 1 1 <effect> define-declared "ebnf-parser" set-word-prop ; parsing
+  CREATE-WORD scan {
+    { "+" [ scan-word execute "" swap ] }
+    [ " " append default-tokenizer ]
+  } case \ tokenizer [
+    dupd [ ";EBNF" parse-multiline-string ] [ drop "" ] recover append 
+    ebnf>quot swapd 1 1 <effect> define-declared "ebnf-parser" set-word-prop 
+  ] with-variable ; parsing
+
+
 
