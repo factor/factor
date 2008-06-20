@@ -63,6 +63,20 @@ C: <ebnf> ebnf
   #! begin and end.
   [ syntax ] 2dip syntax pack ;
 
+: replace-escapes ( string -- string )
+  [
+    "\\t" token [ drop "\t" ] action ,
+    "\\n" token [ drop "\n" ] action ,
+    "\\r" token [ drop "\r" ] action ,
+  ] choice* replace ;
+
+: insert-escapes ( string -- string )
+  [
+    "\t" token [ drop "\\t" ] action ,
+    "\n" token [ drop "\\n" ] action ,
+    "\r" token [ drop "\\r" ] action ,
+  ] choice* replace ;
+
 : 'identifier' ( -- parser )
   #! Return a parser that parses an identifer delimited by
   #! a quotation character. The quotation can be single
@@ -71,7 +85,7 @@ C: <ebnf> ebnf
   [
     [ CHAR: " = not ] satisfy repeat1 "\"" "\"" surrounded-by ,
     [ CHAR: ' = not ] satisfy repeat1 "'" "'" surrounded-by ,
-  ] choice* [ >string ] action ;
+  ] choice* [ >string replace-escapes ] action ;
   
 : 'non-terminal' ( -- parser )
   #! A non-terminal is the name of another rule. It can
@@ -401,11 +415,11 @@ M: object build-locals ( code ast -- )
   } cond ;
  
 M: ebnf-action (transform) ( ast -- parser )
-  [ parser>> (transform) ] [ code>> ] [ parser>> ] tri build-locals  
+  [ parser>> (transform) ] [ code>> insert-escapes ] [ parser>> ] tri build-locals  
   string-lines parse-lines check-action-effect action ;
 
 M: ebnf-semantic (transform) ( ast -- parser )
-  [ parser>> (transform) ] [ code>> ] [ parser>> ] tri build-locals 
+  [ parser>> (transform) ] [ code>> insert-escapes ] [ parser>> ] tri build-locals 
   string-lines parse-lines semantic ;
 
 M: ebnf-var (transform) ( ast -- parser )
@@ -453,17 +467,10 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
   parse-result-ast transform dup dup parser [ main swap at compile ] with-variable
   [ compiled-parse ] curry [ with-scope ] curry ;
 
-: replace-escapes ( string -- string )
-  [
-    "\\t" token [ drop "\t" ] action ,
-    "\\n" token [ drop "\n" ] action ,
-    "\\r" token [ drop "\r" ] action ,
-  ] choice* replace ;
-
-: [EBNF "EBNF]" parse-multiline-string replace-escapes ebnf>quot nip parsed ; parsing
+: [EBNF "EBNF]" parse-multiline-string ebnf>quot nip parsed ; parsing
 
 : EBNF: 
   CREATE-WORD dup 
-  ";EBNF" parse-multiline-string replace-escapes
+  ";EBNF" parse-multiline-string 
   ebnf>quot swapd 1 1 <effect> define-declared "ebnf-parser" set-word-prop ; parsing
 

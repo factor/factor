@@ -444,7 +444,7 @@ foo=<foreign any-char> 'd'
 ] unit-test
 
 { t } [
- "USING: kernel peg.ebnf ; [EBNF foo='a' '\n'  => [[ drop '\n' ]] EBNF]" eval drop t
+ "USING: kernel peg.ebnf ; [EBNF foo='a' '\n'  => [[ drop \"\n\" ]] EBNF]" eval drop t
 ] unit-test
 
 [
