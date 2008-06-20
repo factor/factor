@@ -69,6 +69,9 @@ Unary              =   "-" Postfix:p                    => [[ p "-" ast-unop boa
                      | "++" Postfix:p                   => [[ p "++" ast-preop boa ]]
                      | "--" Postfix:p                   => [[ p "--" ast-preop boa ]]
                      | "!" Postfix:p                    => [[ p "!" ast-unop boa ]]
+                     | "typeof" Postfix:p               => [[ p "typeof" ast-unop boa ]]
+                     | "void" Postfix:p                 => [[ p "void" ast-unop boa ]]
+                     | "delete" Postfix:p               => [[ p "delete" ast-unop boa ]]
                      | Postfix
 Postfix            =   PrimExpr:p SpacesNoNl "++"       => [[ p "++" ast-postop boa ]]
                      | PrimExpr:p SpacesNoNl "--"       => [[ p "--" ast-postop boa ]]
