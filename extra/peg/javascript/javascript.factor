@@ -5,7 +5,7 @@ IN: peg.javascript
 
 : parse-javascript ( string -- ast )
   tokenize-javascript [
-    ast>> parse-javascript [
+    ast>> javascript [
       ast>>
     ] [
       "Unable to parse JavaScript" throw

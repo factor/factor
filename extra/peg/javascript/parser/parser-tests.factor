@@ -1,11 +1,11 @@
 ! Copyright (C) 2008 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test peg peg.javascript.ast peg.javascript.tokenizer  
-       peg.javascript.parser accessors multiline sequences math ;
+USING: kernel tools.test peg peg.javascript.ast peg.javascript.parser 
+       accessors multiline sequences math ;
 IN: peg.javascript.parser.tests
 
-\ parse-javascript must-infer
+\ javascript must-infer
 
 {
   T{
@@ -23,14 +23,14 @@ IN: peg.javascript.parser.tests
       }
   }
 } [
-  "123; 'hello'; foo(x);" tokenize-javascript ast>> parse-javascript ast>>
+  "123; 'hello'; foo(x);" javascript ast>>
 ] unit-test
 
 { t } [ 
 <"
 var x=5
 var y=10
-"> tokenize-javascript ast>> parse-javascript remaining>> length zero?
+"> javascript remaining>> length zero?
 ] unit-test
 
 
@@ -41,7 +41,7 @@ function foldl(f, initial, seq) {
      initial = f(initial, seq[i]);
    return initial;
 }
-"> tokenize-javascript ast>> parse-javascript remaining>> length zero?
+"> javascript remaining>> length zero?
 ] unit-test
 
 { t } [ 
@@ -52,6 +52,6 @@ ParseState.prototype.from = function(index) {
     r.length = this.length - index;
     return r;
 }
-"> tokenize-javascript ast>> parse-javascript remaining>> length zero?
+"> javascript remaining>> length zero?
 ] unit-test
 

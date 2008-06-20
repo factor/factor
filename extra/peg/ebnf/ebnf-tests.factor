@@ -512,3 +512,7 @@ Tok                = Spaces (Number | Special )
           main= . . . 
         EBNF] call ast>> 
 ] unit-test
+
+{ "++" } [
+  "++--" [EBNF tokenizer=("++" | "--") main="++" EBNF] call ast>>
+] unit-test

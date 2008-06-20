@@ -15,13 +15,14 @@ TUPLE: tokenizer any one many ;
 
 : default-tokenizer ( -- tokenizer )
   T{ tokenizer f 
-    [ [ drop t ] satisfy ]
+    [ any-char ]
     [ token ]
-    [ [ = ] curry satisfy ]
+    [ [ = ] curry any-char swap semantic ]
   } ;
 
 : parser-tokenizer ( parser -- tokenizer )
-  1quotation [ [ = ] curry satisfy ] dup tokenizer boa ;
+  [ 1quotation ] keep
+  [ swap [ = ] curry semantic ] curry dup tokenizer boa ;
 
 : rule-tokenizer ( name word -- tokenizer )
   rule parser-tokenizer ;
