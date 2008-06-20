@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: kernel tools.test peg peg.ebnf words math math.parser 
-       sequences accessors peg.parsers parser namespaces ;
+       sequences accessors peg.parsers parser namespaces arrays 
+       strings ;
 IN: peg.ebnf.tests
 
 { T{ ebnf-non-terminal f "abc" } } [
@@ -451,9 +452,63 @@ foo=<foreign any-char> 'd'
   "USING: peg.ebnf ; [EBNF foo='a' foo='b' EBNF]" eval drop
 ] must-fail
 
-
 { t } [
   #! Rule lookup occurs in a namespace. This causes an incorrect duplicate rule
   #! if a var in a namespace is set. This unit test is to remind me to fix this.
   [ "fail" "foo" set "foo='a'" 'ebnf' parse ast>> transform drop t ] with-scope
+] unit-test
+
+#! Tokenizer tests
+{ V{ "a" CHAR: b } } [
+  "ab" [EBNF tokenizer=default foo="a" . EBNF] call ast>>
+] unit-test
+
+TUPLE: ast-number value ;
+
+EBNF: a-tokenizer 
+Letter            = [a-zA-Z]
+Digit             = [0-9]
+Digits            = Digit+
+SingleLineComment = "//" (!("\n") .)* "\n" => [[ ignore ]]
+MultiLineComment  = "/*" (!("*/") .)* "*/" => [[ ignore ]]
+Space             = " " | "\t" | "\r" | "\n" | SingleLineComment | MultiLineComment
+Spaces            = Space* => [[ ignore ]]
+Number            = Digits:ws '.' Digits:fs => [[ ws "." fs 3array concat >string string>number ast-number boa ]]
+                    | Digits => [[ >string string>number ast-number boa ]]  
+Special            =   "("   | ")"   | "{"   | "}"   | "["   | "]"   | ","   | ";"
+                     | "?"   | ":"   | "!==" | "~="  | "===" | "=="  | "="   | ">="
+                     | ">"   | "<="  | "<"   | "++"  | "+="  | "+"   | "--"  | "-="
+                     | "-"   | "*="  | "*"   | "/="  | "/"   | "%="  | "%"   | "&&="
+                     | "&&"  | "||=" | "||"  | "."   | "!"
+Tok                = Spaces (Number | Special )
+;EBNF
+
+{ V{ CHAR: 1 T{ ast-number f 23 } ";" CHAR: x } } [
+  "123;x" [EBNF bar = . 
+                tokenizer = <foreign a-tokenizer Tok>  foo=. 
+                tokenizer=default baz=. 
+                main = bar foo foo baz 
+          EBNF] call ast>>
+] unit-test
+
+{ V{ CHAR: 5 "+" CHAR: 2 } } [
+  "5+2" [EBNF 
+          space=(" " | "\n") 
+          number=[0-9] 
+          operator=("*" | "+") 
+          spaces=space* => [[ ignore ]] 
+          tokenizer=spaces (number | operator) 
+          main= . . . 
+        EBNF] call ast>> 
+] unit-test
+
+{ V{ CHAR: 5 "+" CHAR: 2 } } [
+  "5 + 2" [EBNF 
+          space=(" " | "\n") 
+          number=[0-9] 
+          operator=("*" | "+") 
+          spaces=space* => [[ ignore ]] 
+          tokenizer=spaces (number | operator) 
+          main= . . . 
+        EBNF] call ast>> 
 ] unit-test

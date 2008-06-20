@@ -27,7 +27,7 @@ TUPLE: tokenizer any one many ;
   rule parser-tokenizer ;
 
 : tokenizer ( -- word )
-  \ tokenizer get [ default-tokenizer ] unless* ;
+  \ tokenizer get-global [ default-tokenizer ] unless* ;
 
 : reset-tokenizer ( -- )
   default-tokenizer \ tokenizer set-global ;
@@ -49,6 +49,7 @@ TUPLE: ebnf-repeat0 group ;
 TUPLE: ebnf-repeat1 group ;
 TUPLE: ebnf-optional group ;
 TUPLE: ebnf-whitespace group ;
+TUPLE: ebnf-tokenizer elements ;
 TUPLE: ebnf-rule symbol elements ;
 TUPLE: ebnf-action parser code ;
 TUPLE: ebnf-var parser name ;
@@ -68,6 +69,7 @@ C: <ebnf-repeat0> ebnf-repeat0
 C: <ebnf-repeat1> ebnf-repeat1
 C: <ebnf-optional> ebnf-optional
 C: <ebnf-whitespace> ebnf-whitespace
+C: <ebnf-tokenizer> ebnf-tokenizer
 C: <ebnf-rule> ebnf-rule
 C: <ebnf-action> ebnf-action
 C: <ebnf-var> ebnf-var
@@ -318,8 +320,17 @@ DEFER: 'choice'
     dup length 1 = [ first ] [ <ebnf-choice> ] if
   ] action ;
  
+: 'tokenizer' ( -- parser )
+  [
+    "tokenizer" syntax ,
+    "=" syntax ,
+    ">" token ensure-not ,
+    [ "default" token sp , 'choice' , ] choice* ,
+  ] seq* [ first <ebnf-tokenizer> ] action ;
+
 : 'rule' ( -- parser )
   [
+    "tokenizer" token ensure-not , 
     'non-terminal' [ symbol>> ] action  ,
     "=" syntax  ,
     ">" token ensure-not ,
@@ -327,7 +338,7 @@ DEFER: 'choice'
   ] seq* [ first2 <ebnf-rule> ] action ;
 
 : 'ebnf' ( -- parser )
-  'rule' sp repeat1 [ <ebnf> ] action ;
+  [ 'tokenizer' sp , 'rule' sp , ] choice* repeat1 [ <ebnf> ] action ;
 
 GENERIC: (transform) ( ast -- parser )
 
@@ -345,6 +356,14 @@ SYMBOL: ignore-ws
 
 M: ebnf (transform) ( ast -- parser )
   rules>> [ (transform) ] map peek ;
+
+M: ebnf-tokenizer (transform) ( ast -- parser )
+  elements>> dup "default" = [
+    drop default-tokenizer \ tokenizer set-global any-char
+  ] [
+  (transform) 
+  dup parser-tokenizer \ tokenizer set-global
+  ] if ;
   
 M: ebnf-rule (transform) ( ast -- parser )
   dup elements>> 
@@ -369,7 +388,7 @@ M: ebnf-choice (transform) ( ast -- parser )
   options>> [ (transform) ] map choice ;
 
 M: ebnf-any-character (transform) ( ast -- parser )
-  drop [ tokenizer any>> call ] box ;
+  drop tokenizer any>> call ;
 
 M: ebnf-range (transform) ( ast -- parser )
   pattern>> range-pattern ;
@@ -460,7 +479,7 @@ M: ebnf-var (transform) ( ast -- parser )
   parser>> (transform) ;
 
 M: ebnf-terminal (transform) ( ast -- parser )
-  symbol>> [ tokenizer one>> call ] curry box ;
+  symbol>> tokenizer one>> call ;
 
 M: ebnf-foreign (transform) ( ast -- parser )
   dup word>> search
@@ -505,18 +524,18 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
   scan {
     { "+" [ scan-word execute "" swap ] }
     [ " " append default-tokenizer ]
-  } case \ tokenizer [
-    [ "EBNF]" parse-multiline-string ] [ drop "" ] recover append ebnf>quot nip parsed 
-  ] with-variable ; parsing
+  } case \ tokenizer set-global
+  [ "EBNF]" parse-multiline-string ] [ drop "" ] recover append ebnf>quot nip parsed 
+  reset-tokenizer ; parsing
 
 : EBNF: 
   CREATE-WORD scan {
     { "+" [ scan-word execute "" swap ] }
     [ " " append default-tokenizer ]
-  } case \ tokenizer [
-    dupd [ ";EBNF" parse-multiline-string ] [ drop "" ] recover append 
-    ebnf>quot swapd 1 1 <effect> define-declared "ebnf-parser" set-word-prop 
-  ] with-variable ; parsing
+  } case \ tokenizer set-global
+  dupd [ ";EBNF" parse-multiline-string ] [ drop "" ] recover append 
+  ebnf>quot swapd 1 1 <effect> define-declared "ebnf-parser" set-word-prop 
+  reset-tokenizer ; parsing
 
 
 
