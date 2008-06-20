@@ -19,7 +19,7 @@ IN: peg.javascript.parser
 #! insertion rule, but ignore it in all other places.
 EBNF: javascript
 tokenizer         = default 
-nl                = "\n"
+nl                = "\r" "\n" | "\n"
 
 tokenizer         = <foreign tokenize-javascript Tok>
 End               = !(.)
