@@ -89,7 +89,8 @@ PrimExprHd         =   "(" Expr:e ")"                        => [[ e ]]
                      | String                                => [[ ast-string boa ]]
                      | RegExp                                => [[ ast-regexp boa ]]
                      | "function" FuncRest:fr                => [[ fr ]]
-                     | "new" Name:n "(" Args:as ")"          => [[ n as ast-new boa ]]
+                     | "new" PrimExpr:n "(" Args:as ")"      => [[ n as ast-new boa ]]
+                     | "new" PrimExpr:n                      => [[ n f  ast-new boa ]]
                      | "[" Args:es "]"                       => [[ es ast-array boa ]]
                      | Json
 JsonBindings        = (JsonBinding ("," JsonBinding => [[ second ]])* => [[ first2 swap prefix ]])?
