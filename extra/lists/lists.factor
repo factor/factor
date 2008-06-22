@@ -98,7 +98,7 @@ M: object nil? drop f ;
     [ lmap>array ] dip like ;
     
 : cons>seq ( cons -- array )    
-    [ dup cons? [ cons>seq ] when ] lmap>array ;
+    [ dup cons? [ cons>seq ] when dup nil? [ drop { } ] when ] lmap>array ;
     
 : list>seq ( list -- array )    
     [ ] lmap>array ;
