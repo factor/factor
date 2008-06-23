@@ -60,9 +60,9 @@ RelExpr            =   RelExpr:x ">" AddExpr:y          => [[ x y ">" ast-binop 
 AddExpr            =   AddExpr:x "+" MulExpr:y          => [[ x y "+" ast-binop boa ]]
                      | AddExpr:x "-" MulExpr:y          => [[ x y "-" ast-binop boa ]]
                      | MulExpr
-MulExpr            =   MulExpr:x "*" MulExpr:y          => [[ x y "*" ast-binop boa ]]
-                     | MulExpr:x "/" MulExpr:y          => [[ x y "/" ast-binop boa ]]
-                     | MulExpr:x "%" MulExpr:y          => [[ x y "%" ast-binop boa ]]
+MulExpr            =   MulExpr:x "*" Unary:y            => [[ x y "*" ast-binop boa ]]
+                     | MulExpr:x "/" Unary:y            => [[ x y "/" ast-binop boa ]]
+                     | MulExpr:x "%" Unary:y            => [[ x y "%" ast-binop boa ]]
                      | Unary
 Unary              =   "-" Postfix:p                    => [[ p "-" ast-unop boa ]]
                      | "+" Postfix:p                    => [[ p ]]
