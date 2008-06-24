@@ -3,7 +3,8 @@
 USING: kernel compiler.units parser words arrays strings math.parser sequences 
        quotations vectors namespaces math assocs continuations peg
        peg.parsers unicode.categories multiline combinators.lib 
-       splitting accessors effects sequences.deep peg.search ;
+       splitting accessors effects sequences.deep peg.search
+       combinators.short-circuit ;
 IN: peg.ebnf
 
 TUPLE: ebnf-non-terminal symbol ;

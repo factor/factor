@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators io io.encodings.8-bit
+USING: combinators.short-circuit accessors combinators io io.encodings.8-bit
 io.encodings io.encodings.binary io.encodings.utf8 io.files
 io.sockets kernel math.parser namespaces sequences
 ftp io.unix.launcher.parser unicode.case splitting assocs

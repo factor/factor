@@ -6,7 +6,7 @@ quotations combinators combinators.lib logging calendar assocs
 fry accessors arrays io io.sockets io.encodings.ascii
 io.sockets.secure io.files io.streams.duplex io.timeouts
 io.encodings threads concurrency.combinators
-concurrency.semaphores ;
+concurrency.semaphores combinators.short-circuit ;
 IN: io.servers.connection
 
 TUPLE: threaded-server
