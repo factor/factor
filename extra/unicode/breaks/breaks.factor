@@ -1,4 +1,4 @@
-USING: unicode.categories kernel math combinators splitting
+USING: combinators.short-circuit unicode.categories kernel math combinators splitting
 sequences math.parser io.files io assocs arrays namespaces
 math.ranges unicode.normalize values io.encodings.ascii
 unicode.syntax unicode.data compiler.units alien.syntax sets
