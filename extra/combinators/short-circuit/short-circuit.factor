@@ -1,5 +1,6 @@
 
-USING: kernel combinators quotations arrays sequences assocs macros fry ;
+USING: kernel combinators quotations arrays sequences assocs
+       locals shuffle macros fry newfx ;
 
 IN: combinators.short-circuit
 
@@ -10,34 +11,28 @@ IN: combinators.short-circuit
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-MACRO: 0&& ( quots -- quot )
-  [ '[ drop @ dup not ] [ drop f ] 2array ] map
-  { [ t ] [ ] }                       suffix
-  '[ f , cond ] ;
+:: n&&-rewrite ( quots N -- quot )
+   quots
+     [ '[ drop N ndup @ dup not ] [ drop N ndrop f ] 2array ]
+   map
+   [ t ] [ N nnip ] 2array suffix
+   '[ f , cond ] ;
 
-MACRO: 1&& ( quots -- quot )
-  [ '[ drop dup @ dup not ] [ drop drop f ] 2array ] map
-  { [ t ] [ nip ] }                                  suffix
-  '[ f , cond ] ;
-
-MACRO: 2&& ( quots -- quot )
-  [ '[ drop 2dup @ dup not ] [ drop 2drop f ] 2array ] map
-  { [ t ] [ 2nip ] }                                   suffix
-  '[ f , cond ] ;
+MACRO: 0&& ( quots -- quot ) 0 n&&-rewrite ;
+MACRO: 1&& ( quots -- quot ) 1 n&&-rewrite ;
+MACRO: 2&& ( quots -- quot ) 2 n&&-rewrite ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-MACRO: 0|| ( quots -- quot )
-  [ '[ drop @ dup ] [ ] 2array ] map
-  { [ drop t ] [ f ] } suffix
-  '[ f , cond ] ;
+:: n||-rewrite ( quots N -- quot )
+   quots
+     [ '[ drop N ndup @ dup ] [ N nnip ] 2array ]
+   map
+   [ drop N ndrop t ] [ f ] 2array suffix
+   '[ f , cond ] ;
 
-MACRO: 1|| ( quots -- quot )
-  [ '[ drop dup @ dup ] [ nip ] 2array ] map
-  { [ drop drop t ] [ f ] }              suffix
-  '[ f , cond ] ;
+MACRO: 0|| ( quots -- quot ) 0 n||-rewrite ;
+MACRO: 1|| ( quots -- quot ) 1 n||-rewrite ;
+MACRO: 2|| ( quots -- quot ) 2 n||-rewrite ;
 
-MACRO: 2|| ( quots -- quot )
-  [ '[ drop 2dup @ dup ] [ 2nip ] 2array ] map
-  { [ drop 2drop t ] [ f ] }               suffix
-  '[ f , cond ] ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
