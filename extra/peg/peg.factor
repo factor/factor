@@ -1,36 +1,47 @@
 ! Copyright (C) 2007, 2008 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings fry namespaces math assocs shuffle debugger io
-       vectors arrays math.parser math.order
-       unicode.categories compiler.units parser
+       vectors arrays math.parser math.order vectors combinators combinators.lib
+       sets unicode.categories compiler.units parser
        words quotations effects memoize accessors locals effects splitting ;
 IN: peg
 
 USE: prettyprint
 
 TUPLE: parse-result remaining ast ;
-TUPLE: parse-error details ; 
-TUPLE: error-details remaining message ;
+TUPLE: parse-error position messages ; 
 TUPLE: parser id compiled ;
 M: parser equal? [ id>> ] bi@ = ;
 
 M: parser hashcode* id>> hashcode* ;
 
 C: <parse-result>  parse-result
-C: <error-details> error-details
+C: <parse-error> parse-error
 C: <parser>        parser
 
-SYMBOL: errors
+SYMBOL: error-stack
 
-: <parse-error> ( -- parse-error )
-  V{ } clone parse-error boa ;
+: (merge-errors) ( a b -- c )
+  {
+    { [ over position>> not ] [ nip ] } 
+    { [ dup  position>> not ] [ drop ] } 
+    [ 2dup [ position>> ] bi@ <=> {
+        { +lt+ [ nip ] }
+        { +gt+ [ drop ] }
+        { +eq+ [ messages>> over messages>> union [ position>> ] dip <parse-error> ] }
+      } case 
+    ]
+  } cond ;
+
+: merge-errors ( -- )
+  error-stack get dup length 1 >  [
+    dup pop over pop swap (merge-errors) swap push
+  ] [
+    drop
+  ] if ;
 
 : add-error ( remaining message -- )
-  errors get [  
-    [ <error-details> ] [ details>> ] bi* push 
-  ] [
-    2drop
-  ] if* ;
+  <parse-error> error-stack get push ;
   
 SYMBOL: ignore 
 
@@ -218,7 +229,7 @@ C: <head> peg-head
     input set
     0 pos set
     f lrstack set
-    <parse-error> errors set
+    V{ } clone error-stack set
     H{ } clone heads set
     H{ } clone packrat set
   ] H{ } make-assoc swap bind ; inline
@@ -269,7 +280,7 @@ SYMBOL: delayed
   ] with-compilation-unit ;
 
 : compiled-parse ( state word -- result )
-  swap [ execute [ errors get throw ] unless* ] with-packrat ; inline 
+  swap [ execute [ error-stack get throw ] unless* ] with-packrat ; inline 
 
 : parse ( input parser -- result )
   dup word? [ compile ] unless compiled-parse ;
@@ -298,9 +309,9 @@ TUPLE: token-parser symbol ;
 : parse-token ( input string -- result )
   #! Parse the string, returning a parse result
   dup >r ?head-slice [
-    r> <parse-result> 
+    r> <parse-result> f f add-error
   ] [
-    drop input-slice "Expected token '" r> append "'" append add-error f
+    drop input-slice input-from "Expected token '" r> append "'" append 1vector add-error f
   ] if ;
 
 M: token-parser (compile) ( parser -- quot )
@@ -366,7 +377,8 @@ TUPLE: seq-parser parsers ;
 M: seq-parser (compile) ( parser -- quot )
   [
     [ input-slice V{ } clone <parse-result> ] %
-    parsers>> [ compiled-parser 1quotation , \ parse-seq-element , ] each 
+    parsers>> unclip compiled-parser 1quotation , \ parse-seq-element , [ 
+      compiled-parser 1quotation [ merge-errors ] compose , \ parse-seq-element , ] each 
   ] [ ] make ;
 
 TUPLE: choice-parser parsers ;
@@ -374,7 +386,8 @@ TUPLE: choice-parser parsers ;
 M: choice-parser (compile) ( parser -- quot )
   [ 
     f ,
-    parsers>> [ compiled-parser 1quotation , \ unless* , ] each
+    parsers>> [ compiled-parser ] map 
+    unclip 1quotation , \ unless* , [ 1quotation [ merge-errors ] compose , \ unless* , ] each
   ] [ ] make ;
 
 TUPLE: repeat0-parser p1 ;
