@@ -1,13 +1,8 @@
 
 USING: kernel combinators quotations arrays sequences assocs
-       locals shuffle macros fry newfx ;
+       locals shuffle macros fry ;
 
 IN: combinators.short-circuit
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: short-circuit ( quots quot default -- quot )
-    1quotation -rot { } map>assoc <reversed> alist>quot ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

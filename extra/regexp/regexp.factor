@@ -21,9 +21,6 @@ SYMBOL: ignore-case?
     [ [ between? ] ]
     if 2curry ;
 
-: or-predicates ( quots -- quot )
-    [ \ dup prefix ] map [ [ t ] ] f short-circuit \ nip suffix ;
-
 : <@literal ( parser obj -- action ) [ nip ] curry <@ ;
 
 : <@delay ( parser quot -- action ) [ curry ] curry <@ ;
@@ -180,7 +177,7 @@ C: <group-result> group-result
 : 'positive-character-class' ( -- parser )
     "]" token [ CHAR: ] = ] <@literal 'character-class-term' <*> <&:>
     'character-class-term' <+> <|>
-    [ or-predicates ] <@ ;
+    [ [ 1|| ] curry ] <@ ;
 
 : 'negative-character-class' ( -- parser )
     "^" token 'positive-character-class' &>

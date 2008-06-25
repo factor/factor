@@ -1,7 +1,7 @@
-USING: combinators.short-circuit sequences io.files io.encodings.ascii kernel values
-splitting accessors math.parser ascii io assocs strings math
-namespaces sorting combinators math.order arrays
-unicode.normalize unicode.data combinators.lib locals
+USING: combinators.short-circuit sequences io.files
+io.encodings.ascii kernel values splitting accessors math.parser
+ascii io assocs strings math namespaces sorting combinators
+math.order arrays unicode.normalize unicode.data locals
 unicode.syntax macros sequences.deep words unicode.breaks
 quotations ;
 IN: unicode.collation
@@ -86,7 +86,7 @@ ducet insert-helpers
 : add ( char -- )
     dup blocked? [ 1string , ] [
         dup possible-bases dup length
-        [ ?combine ] 2with contains?
+        [ ?combine ] with with contains?
         [ drop ] [ 1string , ] if
     ] if ;
 

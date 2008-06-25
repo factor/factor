@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel opengl.gl alien.c-types continuations namespaces
 assocs alien alien.strings libc opengl math sequences combinators
-combinators.lib macros arrays io.encodings.ascii ;
+macros arrays io.encodings.ascii ;
 IN: opengl.shaders
 
 : with-gl-shader-source-ptr ( string quot -- )

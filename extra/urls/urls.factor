@@ -1,11 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel unicode.categories combinators combinators.lib
-sequences splitting
-fry namespaces assocs arrays strings io.sockets
-io.sockets.secure io.encodings.string io.encodings.utf8
-math math.parser accessors mirrors parser strings.parser lexer
-prettyprint.backend hashtables present ;
+USING: kernel unicode.categories combinators
+combinators.short-circuit sequences splitting fry namespaces
+assocs arrays strings io.sockets io.sockets.secure
+io.encodings.string io.encodings.utf8 math math.parser accessors
+mirrors parser strings.parser lexer prettyprint.backend
+hashtables present ;
 IN: urls
 
 : url-quotable? ( ch -- ? )

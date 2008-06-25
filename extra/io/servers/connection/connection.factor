@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations destructors kernel math math.parser
 namespaces parser sequences strings prettyprint debugger
-quotations combinators combinators.lib logging calendar assocs
+quotations combinators logging calendar assocs
 fry accessors arrays io io.sockets io.encodings.ascii
 io.sockets.secure io.files io.streams.duplex io.timeouts
 io.encodings threads concurrency.combinators

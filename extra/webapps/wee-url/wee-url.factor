@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math.ranges sequences random accessors combinators.lib
+USING: math.ranges sequences random accessors
 kernel namespaces fry db.types db.tuples urls validators
 html.components html.forms http http.server.dispatchers furnace
 furnace.actions furnace.boilerplate furnace.redirection ;

@@ -1,8 +1,8 @@
-USING: combinators.short-circuit assocs math kernel sequences io.files hashtables
-quotations splitting grouping arrays math.parser hash2 math.order
-byte-arrays words namespaces words compiler.units parser
-io.encodings.ascii values interval-maps ascii sets
-combinators.lib combinators locals math.ranges sorting ;
+USING: combinators.short-circuit assocs math kernel sequences
+io.files hashtables quotations splitting grouping arrays
+math.parser hash2 math.order byte-arrays words namespaces words
+compiler.units parser io.encodings.ascii values interval-maps
+ascii sets combinators locals math.ranges sorting ;
 IN: unicode.data
 
 VALUE: simple-lower
