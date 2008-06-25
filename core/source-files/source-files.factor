@@ -82,11 +82,10 @@ TUPLE: source-file-error file error ;
         file get >>file
         swap >>error ;
 
-: file. ( file -- ) path>> <pathname> pprint ;
+: file. ( file -- ) path>> <pathname> . ;
 
 M: source-file-error error.
-    "Error while parsing " write
-    [ file>> file. nl ] [ error>> error. ] bi ;
+    [ file>> file. ] [ error>> error. ] bi ;
 
 M: source-file-error summary
     error>> summary ;

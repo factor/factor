@@ -1,8 +1,8 @@
-USING: http tools.test multiline tuple-syntax
-io.streams.string io.encodings.utf8 io.encodings.string
-kernel arrays splitting sequences
-assocs io.sockets db db.sqlite continuations urls hashtables
-accessors ;
+USING: http tools.test multiline tuple-syntax io.streams.string
+io.encodings.utf8 io.encodings.8-bit io.encodings.binary
+io.encodings.string kernel arrays splitting sequences assocs
+io.sockets db db.sqlite continuations urls hashtables accessors
+;
 IN: http.tests
 
 [ "text/plain" latin1 ] [ "text/plain" parse-content-type ] unit-test

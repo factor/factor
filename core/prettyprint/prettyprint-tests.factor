@@ -167,9 +167,11 @@ unit-test
     "another-retain-layout" another-retain-layout-test check-see
 ] unit-test
 
+DEFER: parse-error-file
+
 : another-soft-break-test
     {
-        "USING: namespaces parser sequences ;"
+        "USING: namespaces sequences ;"
         "IN: prettyprint.tests"
         ": another-soft-break-layout ( node -- quot )"
         "    parse-error-file"
@@ -183,7 +185,7 @@ unit-test
 
 : string-layout
     {
-        "USING: io kernel parser ;"
+        "USING: io kernel lexer ;"
         "IN: prettyprint.tests"
         ": string-layout-test ( error -- )"
         "    \"Expected \" write dup unexpected-want expected>string write"

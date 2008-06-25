@@ -198,7 +198,7 @@ IN: parser.tests
     [
         "IN: parser.tests : x ; : y 3 throw ; this is an error"
         <string-reader> "a" parse-stream
-    ] [ parse-error? ] must-fail-with
+    ] [ source-file-error? ] must-fail-with
 
     [ t ] [
         "y" "parser.tests" lookup >boolean
@@ -298,12 +298,12 @@ IN: parser.tests
     [
         "IN: parser.tests TUPLE: another-pred-test ; GENERIC: another-pred-test?"
         <string-reader> "removing-the-predicate" parse-stream
-    ] [ error>> error>> redefine-error? ] must-fail-with
+    ] [ error>> error>> error>> redefine-error? ] must-fail-with
 
     [
         "IN: parser.tests TUPLE: class-redef-test ; TUPLE: class-redef-test ;"
         <string-reader> "redefining-a-class-1" parse-stream
-    ] [ error>> error>> redefine-error? ] must-fail-with
+    ] [ error>> error>> error>> redefine-error? ] must-fail-with
 
     [ ] [
         "IN: parser.tests TUPLE: class-redef-test ; SYMBOL: class-redef-test"
@@ -313,7 +313,7 @@ IN: parser.tests
     [
         "IN: parser.tests TUPLE: class-redef-test ; SYMBOL: class-redef-test : class-redef-test ;"
         <string-reader> "redefining-a-class-3" parse-stream drop
-    ] [ error>> error>> redefine-error? ] must-fail-with
+    ] [ error>> error>> error>> redefine-error? ] must-fail-with
 
     [ ] [
         "IN: parser.tests TUPLE: class-fwd-test ;"
@@ -323,7 +323,7 @@ IN: parser.tests
     [
         "IN: parser.tests \\ class-fwd-test"
         <string-reader> "redefining-a-class-3" parse-stream drop
-    ] [ error>> error>> no-word-error? ] must-fail-with
+    ] [ error>> error>> error>> no-word-error? ] must-fail-with
 
     [ ] [
         "IN: parser.tests TUPLE: class-fwd-test ; SYMBOL: class-fwd-test"
@@ -333,12 +333,12 @@ IN: parser.tests
     [
         "IN: parser.tests \\ class-fwd-test"
         <string-reader> "redefining-a-class-3" parse-stream drop
-    ] [ error>> error>> no-word-error? ] must-fail-with
+    ] [ error>> error>> error>> no-word-error? ] must-fail-with
 
     [
         "IN: parser.tests : foo ; TUPLE: foo ;"
         <string-reader> "redefining-a-class-4" parse-stream drop
-    ] [ error>> error>> redefine-error? ] must-fail-with
+    ] [ error>> error>> error>> redefine-error? ] must-fail-with
 
     [ ] [
         "IN: parser.tests : foo ( x y -- z ) 1 2 ; : bar ( a -- b ) ;" eval

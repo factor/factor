@@ -17,7 +17,7 @@ IN: unicode.collation.tests
 
 : test-equality
     { primary= secondary= tertiary= quaternary= }
-    [ execute ] 2with each ;
+    [ execute ] with with each ;
 
 [ f f f f ] [ "hello" "hi" test-equality ] unit-test
 [ t f f f ] [ "hello" "h\u0000e9llo" test-equality ] unit-test
