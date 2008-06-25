@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel kernel.private
-continuations.private parser vectors arrays namespaces
-assocs words quotations ;
+continuations.private vectors arrays namespaces
+assocs words quotations lexer ;
 IN: continuations
 
 ARTICLE: "errors-restartable" "Restartable errors"
@@ -169,8 +169,8 @@ HELP: rethrow
     "This word is intended to be used in conjunction with " { $link recover } " to implement error handlers which perform an action and pass the error to the next outermost error handler."
 }
 { $examples
-    "The " { $link with-parser } " catches errors, annotates them with file name and line number information, and rethrows them:"
-    { $see with-parser }
+    "The " { $link with-lexer } " word catches errors, annotates them with the current line and column number, and rethrows them:"
+    { $see with-lexer }
 } ;
 
 HELP: throw-restarts

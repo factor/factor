@@ -217,13 +217,9 @@ M: tuple-class reset-class
             [ writer-word method forget ] 2bi
         ] with each
     ] [
-        {
-            "class"
-            "metaclass"
-            "superclass"
-            "layout"
-            "slots"
-        } reset-props
+        [ call-next-method ]
+        [ { "layout" "slots" } reset-props ]
+        bi
     ] bi ;
 
 M: tuple-class rank-class drop 0 ;

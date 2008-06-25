@@ -1,4 +1,4 @@
-USING: parser kernel namespaces ;
+USING: strings.parser kernel namespaces ;
 
 USE: unicode.breaks
 USE: unicode.case

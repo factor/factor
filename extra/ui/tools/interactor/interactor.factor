@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators continuations documents
 hashtables io io.styles kernel math math.order math.vectors
-models namespaces parser prettyprint quotations sequences
+models namespaces parser lexer prettyprint quotations sequences
 strings threads listener classes.tuple ui.commands ui.gadgets
 ui.gadgets.editors ui.gadgets.presentations ui.gadgets.worlds
 ui.gestures definitions calendar concurrency.flags
@@ -149,7 +149,7 @@ M: interactor dispose drop ;
     mark>caret ;
 
 : handle-parse-error ( interactor error -- )
-    dup parse-error? [ 2dup go-to-error error>> ] when
+    dup lexer-error? [ 2dup go-to-error error>> ] when
     swap find-workspace debugger-popup ;
 
 : try-parse ( lines interactor -- quot/error/f )
@@ -157,7 +157,7 @@ M: interactor dispose drop ;
         drop parse-lines-interactive
     ] [
         2nip
-        dup parse-error? [
+        dup lexer-error? [
             dup error>> unexpected-eof? [ drop f ] when
         ] when
     ] recover ;

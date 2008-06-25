@@ -4,37 +4,16 @@ USING: arrays definitions generic assocs kernel math namespaces
 prettyprint sequences strings vectors words quotations inspector
 io.styles io combinators sorting splitting math.parser effects
 continuations debugger io.files io.streams.string vocabs
-io.encodings.utf8 source-files classes classes.tuple hashtables
-compiler.errors compiler.units accessors sets ;
+io.encodings.utf8 source-files classes hashtables
+compiler.errors compiler.units accessors sets lexer ;
 IN: parser
 
-TUPLE: lexer text line line-text line-length column ;
-
-: next-line ( lexer -- )
-    dup [ line>> ] [ text>> ] bi ?nth >>line-text
-    dup line-text>> length >>line-length
-    [ 1+ ] change-line
-    0 >>column
-    drop ;
-
-: new-lexer ( text class -- lexer )
-    new
-        0 >>line
-        swap >>text
-    dup next-line ; inline
-
-: <lexer> ( text -- lexer )
-    lexer new-lexer ;
-
 : location ( -- loc )
-    file get lexer get lexer-line 2dup and
-    [ >r source-file-path r> 2array ] [ 2drop f ] if ;
+    file get lexer get line>> 2dup and
+    [ >r path>> r> 2array ] [ 2drop f ] if ;
 
 : save-location ( definition -- )
     location remember-definition ;
-
-: save-class-location ( class -- )
-    location remember-class ;
 
 SYMBOL: parser-notes
 
@@ -42,13 +21,6 @@ t parser-notes set-global
 
 : parser-notes? ( -- ? )
     parser-notes get "quiet" get not and ;
-
-: file. ( file -- )
-    [
-        source-file-path <pathname> pprint
-    ] [
-        "<interactive>" write
-    ] if* ":" write ;
 
 : note. ( str -- )
     parser-notes? [
@@ -61,142 +33,8 @@ t parser-notes set-global
         "Note: " write dup print
     ] when drop ;
 
-: skip ( i seq ? -- n )
-    over >r
-    [ swap CHAR: \s eq? xor ] curry find-from drop
-    [ r> drop ] [ r> length ] if* ;
-
-: change-lexer-column ( lexer quot -- )
-    swap
-    [ dup lexer-column swap lexer-line-text rot call ] keep
-    set-lexer-column ; inline
-
-GENERIC: skip-blank ( lexer -- )
-
-M: lexer skip-blank ( lexer -- )
-    [ t skip ] change-lexer-column ;
-
-GENERIC: skip-word ( lexer -- )
-
-M: lexer skip-word ( lexer -- )
-    [
-        2dup nth CHAR: " eq? [ drop 1+ ] [ f skip ] if
-    ] change-lexer-column ;
-
-: still-parsing? ( lexer -- ? )
-    dup lexer-line swap lexer-text length <= ;
-
-: still-parsing-line? ( lexer -- ? )
-    dup lexer-column swap lexer-line-length < ;
-
-: (parse-token) ( lexer -- str )
-    [ lexer-column ] keep
-    [ skip-word ] keep
-    [ lexer-column ] keep
-    lexer-line-text subseq ;
-
-:  parse-token ( lexer -- str/f )
-    dup still-parsing? [
-        dup skip-blank
-        dup still-parsing-line?
-        [ (parse-token) ] [ dup next-line parse-token ] if
-    ] [ drop f ] if ;
-
-: scan ( -- str/f ) lexer get parse-token ;
-
-ERROR: bad-escape ;
-
-M: bad-escape summary drop "Bad escape code" ;
-
-: escape ( escape -- ch )
-    H{
-        { CHAR: a  CHAR: \a }
-        { CHAR: e  CHAR: \e }
-        { CHAR: n  CHAR: \n }
-        { CHAR: r  CHAR: \r }
-        { CHAR: t  CHAR: \t }
-        { CHAR: s  CHAR: \s }
-        { CHAR: \s CHAR: \s }
-        { CHAR: 0  CHAR: \0 }
-        { CHAR: \\ CHAR: \\ }
-        { CHAR: \" CHAR: \" }
-    } at [ bad-escape ] unless* ;
-
-SYMBOL: name>char-hook
-
-name>char-hook global [
-    [ "Unicode support not available" throw ] or
-] change-at
-
-: unicode-escape ( str -- ch str' )
-    "{" ?head-slice [
-        CHAR: } over index cut-slice
-        >r >string name>char-hook get call r>
-        rest-slice
-    ] [
-        6 cut-slice >r hex> r>
-    ] if ;
-
-: next-escape ( str -- ch str' )
-    "u" ?head-slice [
-        unicode-escape
-    ] [
-        unclip-slice escape swap
-    ] if ;
-
-: (parse-string) ( str -- m )
-    dup [ "\"\\" member? ] find dup [
-        >r cut-slice >r % r> rest-slice r>
-        dup CHAR: " = [
-            drop slice-from
-        ] [
-            drop next-escape >r , r> (parse-string)
-        ] if
-    ] [
-        "Unterminated string" throw
-    ] if ;
-
-: parse-string ( -- str )
-    lexer get [
-        [ swap tail-slice (parse-string) ] "" make swap
-    ] change-lexer-column ;
-
-TUPLE: parse-error file line column line-text error ;
-
-: <parse-error> ( msg -- error )
-    \ parse-error new
-        file get >>file
-        lexer get line>> >>line
-        lexer get column>> >>column
-        lexer get line-text>> >>line-text
-        swap >>error ;
-
-: parse-dump ( error -- )
-    {
-        [ file>> file. ]
-        [ line>> number>string print ]
-        [ line-text>> dup string? [ print ] [ drop ] if ]
-        [ column>> 0 or CHAR: \s <string> write ]
-    } cleave
-    "^" print ;
-
-M: parse-error error.
-    [ parse-dump ] [ error>> error. ] bi ;
-
-M: parse-error summary
-    error>> summary ;
-
-M: parse-error compute-restarts
-    error>> compute-restarts ;
-
-M: parse-error error-help
-    error>> error-help ;
-
 SYMBOL: use
 SYMBOL: in
-
-: word/vocab% ( word -- )
-    "(" % dup word-vocabulary % " " % word-name % ")" % ;
 
 : (use+) ( vocab -- )
     vocab-words use get push ;
@@ -216,24 +54,7 @@ SYMBOL: in
 : set-in ( name -- )
     check-vocab-string dup in set create-vocab (use+) ;
 
-ERROR: unexpected want got ;
-
-PREDICATE: unexpected-eof < unexpected
-    unexpected-got not ;
-
 M: parsing-word stack-effect drop (( parsed -- parsed )) ;
-
-: unexpected-eof ( word -- * ) f unexpected ;
-
-: (parse-tokens) ( accum end -- accum )
-    scan 2dup = [
-        2drop
-    ] [
-        [ pick push (parse-tokens) ] [ unexpected-eof ] if*
-    ] if ;
-
-: parse-tokens ( end -- seq )
-    100 <vector> swap (parse-tokens) >array ;
 
 ERROR: no-current-vocab ;
 
@@ -248,17 +69,7 @@ M: no-current-vocab summary ( obj -- )
 
 : CREATE ( -- word ) scan create-in ;
 
-: CREATE-GENERIC ( -- word ) CREATE dup reset-word ;
-
 : CREATE-WORD ( -- word ) CREATE dup reset-generic ;
-
-: create-class-in ( word -- word )
-    current-vocab create
-    dup save-class-location
-    dup predicate-word dup set-word save-location ;
-
-: CREATE-CLASS ( -- word )
-    scan create-class-in ;
 
 : word-restarts ( possibilities -- restarts )
     natural-sort [
@@ -296,62 +107,6 @@ M: no-word-error summary
         ] ?if
     ] when ;
 
-: create-method-in ( class generic -- method )
-    create-method f set-word dup save-location ;
-
-: CREATE-METHOD ( -- method )
-    scan-word bootstrap-word scan-word create-method-in ;
-
-: shadowed-slots ( superclass slots -- shadowed )
-    >r all-slot-names r> intersect ;
-
-: check-slot-shadowing ( class superclass slots -- )
-    shadowed-slots [
-        [
-            "Definition of slot ``" %
-            %
-            "'' in class ``" %
-            word-name %
-            "'' shadows a superclass slot" %
-        ] "" make note.
-    ] with each ;
-
-ERROR: invalid-slot-name name ;
-
-M: invalid-slot-name summary
-    drop
-    "Invalid slot name" ;
-
-: (parse-tuple-slots) ( -- )
-    #! This isn't meant to enforce any kind of policy, just
-    #! to check for mistakes of this form:
-    #!
-    #! TUPLE: blahblah foo bing
-    #!
-    #! : ...
-    scan {
-        { [ dup not ] [ unexpected-eof ] }
-        { [ dup { ":" "(" "<" } member? ] [ invalid-slot-name ] }
-        { [ dup ";" = ] [ drop ] }
-        [ , (parse-tuple-slots) ]
-    } cond ;
-
-: parse-tuple-slots ( -- seq )
-    [ (parse-tuple-slots) ] { } make ;
-
-: parse-tuple-definition ( -- class superclass slots )
-    CREATE-CLASS
-    scan {
-        { ";" [ tuple f ] }
-        { "<" [ scan-word parse-tuple-slots ] }
-        [ >r tuple parse-tuple-slots r> prefix ]
-    } case 3dup check-slot-shadowing ;
-
-ERROR: not-in-a-method-error ;
-
-M: not-in-a-method-error summary
-    drop "call-next-method can only be called in a method definition" ;
-
 ERROR: staging-violation word ;
 
 M: staging-violation summary
@@ -361,6 +116,10 @@ M: staging-violation summary
 : execute-parsing ( word -- )
     dup changed-definitions get key? [ staging-violation ] when
     execute ;
+
+: scan-object ( -- object )
+    scan-word dup parsing-word?
+    [ V{ } clone swap execute-parsing first ] when ;
 
 : parse-step ( accum end -- accum ? )
     scan-word {
@@ -379,36 +138,11 @@ M: staging-violation summary
 
 : parsed ( accum obj -- accum ) over push ;
 
-: with-parser ( lexer quot -- newquot )
-    swap lexer set
-    [ call >quotation ] [ <parse-error> rethrow ] recover ;
-
 : (parse-lines) ( lexer -- quot )
-    [ f parse-until ] with-parser ;
-
-SYMBOL: lexer-factory
-
-[ <lexer> ] lexer-factory set-global
+    [ f parse-until >quotation ] with-lexer ;
 
 : parse-lines ( lines -- quot )
     lexer-factory get call (parse-lines) ;
-
-! Parsing word utilities
-: parse-effect ( end -- effect )
-    parse-tokens dup { "(" "((" } intersect empty? [
-        { "--" } split1 dup [
-            <effect>
-        ] [
-            "Stack effect declaration must contain --" throw
-        ] if
-    ] [
-        "Stack effect declaration must not contain ( or ((" throw
-    ] if ;
-
-ERROR: bad-number ;
-
-: parse-base ( parsed base -- parsed )
-    scan swap base> [ bad-number ] unless* parsed ;
 
 : parse-literal ( accum end quot -- accum )
     >r parse-until r> call parsed ; inline
@@ -418,39 +152,13 @@ ERROR: bad-number ;
 
 : (:) ( -- word def ) CREATE-WORD parse-definition ;
 
-SYMBOL: current-class
-SYMBOL: current-generic
-
-: with-method-definition ( quot -- parsed )
-    [
-        >r
-        [ "method-class" word-prop current-class set ]
-        [ "method-generic" word-prop current-generic set ]
-        [ ] tri
-        r> call
-    ] with-scope ; inline
-
-: (M:) ( method def -- )
-    CREATE-METHOD [ parse-definition ] with-method-definition ;
-
-: scan-object ( -- object )
-    scan-word dup parsing-word?
-    [ V{ } clone swap execute first ] when ;
-
-GENERIC: expected>string ( obj -- str )
-
-M: f expected>string drop "end of input" ;
-M: word expected>string word-name ;
-M: string expected>string ;
-
-M: unexpected error.
-    "Expected " write
-    dup unexpected-want expected>string write
-    " but got " write
-    unexpected-got expected>string print ;
+ERROR: bad-number ;
 
 M: bad-number summary
     drop "Bad number literal" ;
+
+: parse-base ( parsed base -- parsed )
+    scan swap base> [ bad-number ] unless* parsed ;
 
 SYMBOL: bootstrap-syntax
 

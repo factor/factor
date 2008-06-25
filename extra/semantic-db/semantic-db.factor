@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.cleave combinators.lib
 continuations db db.tuples db.types db.sqlite kernel math
-math.parser namespaces parser sets sequences sequences.deep
+math.parser namespaces parser lexer sets sequences sequences.deep
 sequences.lib strings words destructors ;
 IN: semantic-db
 

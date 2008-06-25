@@ -1,8 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generator.fixup io.binary kernel
-combinators kernel.private math namespaces parser sequences
-words system layouts math.order accessors ;
+combinators kernel.private math namespaces sequences
+words system layouts math.order accessors
+cpu.x86.assembler.syntax ;
 IN: cpu.x86.assembler
 
 ! A postfix assembler for x86 and AMD64.
@@ -12,21 +13,6 @@ IN: cpu.x86.assembler
 ! Beware!
 
 ! Register operands -- eg, ECX
-<<
-
-: define-register ( name num size -- )
-    >r >r "cpu.x86.assembler" create dup define-symbol r> r>
-    >r dupd "register" set-word-prop r>
-    "register-size" set-word-prop ;
-
-: define-registers ( names size -- )
-    >r dup length r> [ define-register ] curry 2each ;
-
-: REGISTERS: ( -- )
-    scan-word ";" parse-tokens swap define-registers ; parsing
-
->>
-
 REGISTERS: 8 AL CL DL BL ;
 
 REGISTERS: 16 AX CX DX BX SP BP SI DI ;

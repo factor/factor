@@ -1,5 +1,5 @@
 USING: arrays combinators kernel lists math math.parser
-namespaces parser parser-combinators parser-combinators.simple
+namespaces parser lexer parser-combinators parser-combinators.simple
 promises quotations sequences combinators.lib strings math.order
 assocs prettyprint.backend memoize unicode.case unicode.categories ;
 USE: io

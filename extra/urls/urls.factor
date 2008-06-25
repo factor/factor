@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel unicode.categories combinators sequences splitting
+USING: kernel unicode.categories combinators combinators.lib
+sequences splitting
 fry namespaces assocs arrays strings io.sockets
 io.sockets.secure io.encodings.string io.encodings.utf8
-math math.parser accessors mirrors parser
+math math.parser accessors mirrors parser strings.parser lexer
 prettyprint.backend hashtables present ;
 IN: urls
 
@@ -11,12 +12,11 @@ IN: urls
     #! In a URL, can this character be used without
     #! URL-encoding?
     {
-        { [ dup letter? ] [ t ] }
-        { [ dup LETTER? ] [ t ] }
-        { [ dup digit? ] [ t ] }
-        { [ dup "/_-." member? ] [ t ] }
-        [ f ]
-    } cond nip ; foldable
+        [ letter? ]
+        [ LETTER? ]
+        [ digit? ]
+        [ "/_-." member? ]
+    } 1|| ; foldable
 
 <PRIVATE
 

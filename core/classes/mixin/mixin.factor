@@ -7,7 +7,7 @@ IN: classes.mixin
 PREDICATE: mixin-class < union-class "mixin" word-prop ;
 
 M: mixin-class reset-class
-    { "class" "metaclass" "members" "mixin" } reset-props ;
+    [ call-next-method ] [ { "mixin" } reset-props ] bi ;
 
 M: mixin-class rank-class drop 3 ;
 

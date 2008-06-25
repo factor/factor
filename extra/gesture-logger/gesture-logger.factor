@@ -1,7 +1,8 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io kernel prettyprint ui ui.gadgets ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.theme ui.gestures colors ;
+ui.gadgets.scrollers ui.gadgets.theme ui.gestures colors
+accessors ;
 IN: gesture-logger
 
 TUPLE: gesture-logger stream ;

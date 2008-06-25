@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces sequences words io assocs
-quotations strings parser arrays xml.data xml.writer debugger
+quotations strings parser lexer arrays xml.data xml.writer debugger
 splitting vectors sequences.deep ;
 IN: xml.utilities
 

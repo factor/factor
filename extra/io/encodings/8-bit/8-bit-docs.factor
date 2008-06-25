@@ -24,19 +24,12 @@ ARTICLE: "io.encodings.8-bit" "8-bit encodings"
 { $subsection koi8-r }
 { $subsection windows-1252 }
 { $subsection ebcdic }
-{ $subsection mac-roman }
-"Words used in defining these"
-{ $subsection 8-bit }
-{ $subsection define-8-bit-encoding } ;
+{ $subsection mac-roman } ;
 
 ABOUT: "io.encodings.8-bit"
 
 HELP: 8-bit
 { $class-description "Describes an 8-bit encoding, including its name (a symbol) and a table used for encoding and decoding." } ;
-
-HELP: define-8-bit-encoding
-{ $values { "name" string } { "stream" "an input stream" } }
-{ $description "Creates a new encoding. The stream should be in a similar format to those at " { $url "ftp://ftp.unicode.org/Public/MAPPINGS/ISO8859/" } } ;
 
 HELP: latin1
 { $description "This is the ISO-8859-1 encoding, also called Latin-1: Western European. It is an 8-bit superset of ASCII which is the default for a mimetype starting with 'text' and provides the characters necessary for most western European languages." } 

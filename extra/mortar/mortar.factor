@@ -1,5 +1,5 @@
 
-USING: kernel io parser words namespaces quotations arrays assocs sequences
+USING: kernel io parser lexer words namespaces quotations arrays assocs sequences
        splitting grouping math shuffle ;
 
 IN: mortar
