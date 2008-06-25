@@ -13,8 +13,6 @@ concurrency.messaging continuations accessors prettyprint ;
 
 [ ] [ test-node dup (start-node) ] unit-test
 
-[ ] [ 1000 sleep ] unit-test
-
 [ ] [
     [
         receive first2 >r 3 + r> send
@@ -29,7 +27,5 @@ concurrency.messaging continuations accessors prettyprint ;
 
     receive
 ] unit-test
-
-[ ] [ 1000 sleep ] unit-test
 
 [ ] [ test-node stop-node ] unit-test

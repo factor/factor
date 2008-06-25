@@ -190,6 +190,13 @@ test-db [
     init-furnace-tables
 ] with-db
 
+: test-httpd ( -- )
+    #! Return as soon as server is running.
+    <http-server>
+        1237 >>insecure
+        f >>secure
+    start-server* ;
+
 [ ] [
     [
         <dispatcher>
@@ -202,11 +209,9 @@ test-db [
             "redirect-loop" add-responder
         main-responder set
 
-        [ 1237 httpd ] "HTTPD test" spawn drop
+        test-httpd
     ] with-scope
 ] unit-test
-
-[ ] [ 100 sleep ] unit-test
 
 [ t ] [
     "resource:extra/http/test/foo.html" ascii file-contents
@@ -235,11 +240,9 @@ test-db [
         test-db <db-persistence>
         main-responder set
 
-        [ 1237 httpd ] "HTTPD test" spawn drop
+        test-httpd
     ] with-scope
 ] unit-test
-
-[ ] [ 100 sleep ] unit-test
 
 : 404? [ download-failed? ] [ response>> code>> 404 = ] bi and ;
 
@@ -262,11 +265,9 @@ test-db [
         test-db <db-persistence>
         main-responder set
 
-        [ 1237 httpd ] "HTTPD test" spawn drop
+        test-httpd
     ] with-scope
 ] unit-test
-
-[ ] [ 100 sleep ] unit-test
 
 [ "Hi" ] [ "http://localhost:1237/" http-get nip ] unit-test
 
@@ -293,11 +294,9 @@ SYMBOL: a
         test-db <db-persistence>
         main-responder set
 
-        [ 1237 httpd ] "HTTPD test" spawn drop
+        test-httpd
     ] with-scope
 ] unit-test
-
-[ ] [ 100 sleep ] unit-test
 
 3 a set-global
 

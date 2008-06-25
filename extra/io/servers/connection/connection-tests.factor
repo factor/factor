@@ -30,17 +30,21 @@ concurrency.promises io.encodings.ascii io threads calendar ;
 [ ] [ <promise> "p" set ] unit-test
 
 [ ] [
+    <threaded-server>
+        5 >>max-connections
+        1237 >>insecure
+        [ "Hello world." write stop-server ] >>handler
+    "server" set
+] unit-test
+
+[ ] [
     [
-        <threaded-server>
-            5 >>max-connections
-            1237 >>insecure
-            [ "Hello world." write stop-server ] >>handler
-        start-server
+        "server" get start-server
         t "p" get fulfill
     ] in-thread
 ] unit-test
 
-[ ] [ 100 sleep ] unit-test
+[ ] [ "server" get wait-for-server ] unit-test
 
 [ "Hello world." ] [ "localhost" 1237 <inet> ascii <client> drop contents ] unit-test
 
