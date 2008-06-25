@@ -2,11 +2,6 @@ IN: lexer
 USING: help.markup help.syntax kernel math sequences strings
 words quotations ;
 
-: $parsing-note ( children -- )
-    drop
-    "This word should only be called from parsing words."
-    $notes ;
-
 HELP: lexer
 { $var-description "Stores the current " { $link lexer } " instance." }
 { $class-description "An object for tokenizing parser input. It has the following slots:"

@@ -290,6 +290,11 @@ M: string ($instance)
 : $values-x/y ( children -- )
     drop { { "x" number } { "y" number } } $values ;
 
+: $parsing-note ( children -- )
+    drop
+    "This word should only be called from parsing words."
+    $notes ;
+
 : $io-error ( children -- )
     drop
     "Throws an error if the I/O operation fails." $errors ;
