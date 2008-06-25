@@ -9,19 +9,30 @@ IN: peg
 USE: prettyprint
 
 TUPLE: parse-result remaining ast ;
-
+TUPLE: parse-error details ; 
+TUPLE: error-details remaining message ;
 TUPLE: parser id compiled ;
-
 M: parser equal? [ id>> ] bi@ = ;
 
 M: parser hashcode* id>> hashcode* ;
 
-C: <parser> parser
+C: <parse-result>  parse-result
+C: <error-details> error-details
+C: <parser>        parser
 
+SYMBOL: errors
+
+: <parse-error> ( -- parse-error )
+  V{ } clone parse-error boa ;
+
+: add-error ( remaining message -- )
+  errors get [  
+    [ <error-details> ] [ details>> ] bi* push 
+  ] [
+    2drop
+  ] if* ;
+  
 SYMBOL: ignore 
-
-: <parse-result> ( remaining ast -- parse-result )
-  parse-result boa ;
 
 SYMBOL: packrat
 SYMBOL: pos
@@ -207,6 +218,7 @@ C: <head> peg-head
     input set
     0 pos set
     f lrstack set
+    <parse-error> errors set
     H{ } clone heads set
     H{ } clone packrat set
   ] H{ } make-assoc swap bind ; inline
@@ -257,7 +269,7 @@ SYMBOL: delayed
   ] with-compilation-unit ;
 
 : compiled-parse ( state word -- result )
-  swap [ execute ] with-packrat ; inline 
+  swap [ execute [ errors get throw ] unless* ] with-packrat ; inline 
 
 : parse ( input parser -- result )
   dup word? [ compile ] unless compiled-parse ;
@@ -288,7 +300,7 @@ TUPLE: token-parser symbol ;
   dup >r ?head-slice [
     r> <parse-result> 
   ] [
-    r> 2drop f
+    drop input-slice "Expected token '" r> append "'" append add-error f
   ] if ;
 
 M: token-parser (compile) ( parser -- quot )
