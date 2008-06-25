@@ -2,7 +2,7 @@ USING: kernel words inspector slots quotations sequences assocs
 math arrays inference effects shuffle continuations debugger
 classes.tuple namespaces vectors bit-arrays byte-arrays strings
 sbufs math.functions macros sequences.private combinators
-mirrors combinators.lib ;
+mirrors combinators.lib combinators.short-circuit ;
 IN: inverse
 
 TUPLE: fail ;

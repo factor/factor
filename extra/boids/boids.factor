@@ -1,5 +1,5 @@
 
-USING: kernel namespaces
+USING: combinators.short-circuit kernel namespaces
        math
        math.constants
        math.functions

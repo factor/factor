@@ -16,7 +16,8 @@ USING: kernel namespaces threads math math.order math.vectors
        vars rewrite-closures
        self pos ori turtle opengl.camera
        lsys.tortoise lsys.tortoise.graphics
-       lsys.strings.rewrite lsys.strings.interpret ;
+       lsys.strings.rewrite lsys.strings.interpret
+       combinators.short-circuit ;
 
        ! lsys.strings
        ! lsys.strings.rewrite

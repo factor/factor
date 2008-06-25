@@ -1,5 +1,5 @@
 
-USING: kernel sequences math combinators.lib ;
+USING: kernel sequences math combinators.lib combinators.short-circuit ;
 
 IN: lsys.strings
 

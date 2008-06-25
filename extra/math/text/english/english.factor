@@ -1,7 +1,8 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.lib kernel math math.functions math.parser namespaces
-    sequences splitting grouping sequences.lib ;
+    sequences splitting grouping sequences.lib
+    combinators.short-circuit ;
 IN: math.text.english
 
 <PRIVATE

@@ -1,4 +1,4 @@
-USING: sequences io.files io.encodings.ascii kernel values
+USING: combinators.short-circuit sequences io.files io.encodings.ascii kernel values
 splitting accessors math.parser ascii io assocs strings math
 namespaces sorting combinators math.order arrays
 unicode.normalize unicode.data combinators.lib locals
