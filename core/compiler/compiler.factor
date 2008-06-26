@@ -46,7 +46,6 @@ SYMBOL: +failed+
     ] tri ;
 
 : (compile) ( word -- )
-    dup dup "compile-count" word-prop 0 or 1 + "compile-count" set-word-prop
     [
         H{ } clone dependencies set
 
