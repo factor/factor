@@ -215,7 +215,7 @@ test-db [
 
 [ t ] [
     "resource:extra/http/test/foo.html" ascii file-contents
-    "http://localhost:1237/nested/foo.html" http-get nip ascii decode =
+    "http://localhost:1237/nested/foo.html" http-get nip =
 ] unit-test
 
 [ "http://localhost:1237/redirect-loop" http-get nip ]
