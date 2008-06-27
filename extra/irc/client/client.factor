@@ -1,8 +1,8 @@
-! Copyright (C) 2007 Doug Coleman, Slava Pestov.
+! Copyright (C) 2008 Bruno Deferrari, Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators concurrency.mailboxes fry io strings
+USING: combinators concurrency.mailboxes fry io strings
        io.encodings.8-bit io.sockets kernel namespaces sequences
-       sequences.lib splitting threads calendar classes.tuple
+       splitting threads calendar classes.tuple
        classes ascii assocs accessors destructors continuations ;
 IN: irc.client
 
