@@ -23,7 +23,7 @@ TUPLE: tokenizer any one many ;
 
 : parser-tokenizer ( parser -- tokenizer )
   [ 1quotation ] keep
-  [ swap [ = ] curry semantic ] curry dup tokenizer boa ;
+  [ swap [ = ] curry semantic ] curry dup \ tokenizer boa ;
 
 : rule-tokenizer ( name word -- tokenizer )
   rule parser-tokenizer ;
