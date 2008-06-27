@@ -30,3 +30,4 @@ C-STRUCT: timespec
 
 FUNCTION: time_t time ( time_t* t ) ;
 FUNCTION: tm* localtime ( time_t* clock ) ;
+FUNCTION: int gettimeofday ( timespec* TP, void* TZP ) ;
