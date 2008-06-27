@@ -1,7 +1,8 @@
 USING: kernel tools.test accessors arrays sequences qualified
        io.streams.string io.streams.duplex namespaces threads
-       calendar irc.client.private ;
+       calendar irc.client.private concurrency.mailboxes classes ;
 EXCLUDE: irc.client => join ;
+RENAME: join irc.client => join_
 IN: irc.client.tests
 
 ! Utilities
@@ -64,13 +65,16 @@ privmsg new
                   [ connect-irc ] keep 1 seconds sleep
                     nick>> name>> ] unit-test
 
-! TODO: Channel join messages
-! { ":factorbot!n=factorbo@some.where JOIN :#factortest"
-!   ":ircserver.net MODE #factortest +ns"
-!   ":ircserver.net 353 factorbot @ #factortest :@factorbot "
-!   ":ircserver.net 366 factorbot #factortest :End of /NAMES list."
-!   ":ircserver.net 477 factorbot #factortest :[ircserver-info] blah blah"
-! } make-client dup "factorbot" set-nick
+{ join_ "#factortest" } [
+             { ":factorbot!n=factorbo@some.where JOIN :#factortest"
+             ":ircserver.net MODE #factortest +ns"
+             ":ircserver.net 353 factorbot @ #factortest :@factorbot "
+             ":ircserver.net 366 factorbot #factortest :End of /NAMES list."
+             ":ircserver.net 477 factorbot #factortest :[ircserver-info] blah blah"
+             } make-client dup "factorbot" set-nick
+             [ connect-irc ] keep 1 seconds sleep
+             join-messages>> 5 seconds mailbox-get-timeout
+             [ class ] [ trailing>> ] bi ] unit-test
 ! TODO: user join
 ! ":somedude!n=user@isp.net JOIN :#factortest"
 ! TODO: channel message
