@@ -1,7 +1,8 @@
 USING: arrays combinators kernel lists math math.parser
-namespaces parser parser-combinators parser-combinators.simple
+namespaces parser lexer parser-combinators parser-combinators.simple
 promises quotations sequences combinators.lib strings math.order
-assocs prettyprint.backend memoize unicode.case unicode.categories ;
+assocs prettyprint.backend memoize unicode.case unicode.categories
+combinators.short-circuit ;
 USE: io
 IN: regexp
 
@@ -19,9 +20,6 @@ SYMBOL: ignore-case?
     [ [ ch>upper ] bi@ [ >r >r ch>upper r> r> between? ] ]
     [ [ between? ] ]
     if 2curry ;
-
-: or-predicates ( quots -- quot )
-    [ \ dup prefix ] map [ [ t ] ] f short-circuit \ nip suffix ;
 
 : <@literal ( parser obj -- action ) [ nip ] curry <@ ;
 
@@ -179,7 +177,7 @@ C: <group-result> group-result
 : 'positive-character-class' ( -- parser )
     "]" token [ CHAR: ] = ] <@literal 'character-class-term' <*> <&:>
     'character-class-term' <+> <|>
-    [ or-predicates ] <@ ;
+    [ [ 1|| ] curry ] <@ ;
 
 : 'negative-character-class' ( -- parser )
     "^" token 'positive-character-class' &>

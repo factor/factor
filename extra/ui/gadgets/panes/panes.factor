@@ -182,7 +182,7 @@ M: pane-stream make-span-stream
     foreground [ over set-label-color ] apply-style ;
 
 : apply-background-style ( style gadget -- style gadget )
-    background [ dupd solid-interior ] apply-style ;
+    background [ solid-interior ] apply-style ;
 
 : specified-font ( style -- font )
     [ font swap at "monospace" or ] keep
@@ -207,15 +207,15 @@ M: pane-stream make-span-stream
 
 : apply-wrap-style ( style pane -- style pane )
     wrap-margin [
-        2dup <paragraph> swap set-pane-prototype
-        <paragraph> over set-pane-current
+        2dup <paragraph> >>prototype drop
+        <paragraph> >>current
     ] apply-style ;
 
 : apply-border-color-style ( style gadget -- style gadget )
-    border-color [ dupd solid-boundary ] apply-style ;
+    border-color [ solid-boundary ] apply-style ;
 
 : apply-page-color-style ( style gadget -- style gadget )
-    page-color [ dupd solid-interior ] apply-style ;
+    page-color [ solid-interior ] apply-style ;
 
 : apply-path-style ( style gadget -- style gadget )
     presented-path [ <editable-slot> ] apply-style ;
@@ -224,9 +224,7 @@ M: pane-stream make-span-stream
     border-width [ <border> ] apply-style ;
 
 : apply-printer-style ( style gadget -- style gadget )
-    presented-printer [
-        [ make-pane ] curry over set-editable-slot-printer
-    ] apply-style ;
+    presented-printer [ [ make-pane ] curry >>printer ] apply-style ;
 
 : style-pane ( style pane -- pane )
     apply-border-width-style
@@ -294,11 +292,8 @@ M: pack dispose drop ;
 M: paragraph dispose drop ;
 
 : gadget-write ( string gadget -- )
-    over empty? [
-        2drop
-    ] [
-        >r <label> dup text-theme r> add-gadget
-    ] if ;
+    over empty?
+    [ 2drop ] [ >r <label> text-theme r> add-gadget ] if ;
 
 M: pack stream-write gadget-write ;
 
@@ -372,11 +367,11 @@ M: f sloppy-pick-up*
 
 : extend-selection ( pane -- )
     hand-moved? [
-        dup pane-selecting? [
+        dup selecting?>> [
             dup move-caret
         ] [
             dup hand-clicked get child? [
-                t over set-pane-selecting?
+                t >>selecting?
                 dup hand-clicked set-global
                 dup move-caret
                 dup caret>mark
@@ -386,10 +381,9 @@ M: f sloppy-pick-up*
     ] when drop ;
 
 : end-selection ( pane -- )
-    f over set-pane-selecting?
+    f >>selecting?
     hand-moved? [
-        dup com-copy-selection
-        request-focus
+        [ com-copy-selection ] [ request-focus ] bi
     ] [
         relayout-1
     ] if ;

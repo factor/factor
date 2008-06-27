@@ -4,8 +4,8 @@ USING: kernel namespaces sequences sequences.private assocs math
 inference.transforms parser words quotations debugger macros
 arrays macros splitting combinators prettyprint.backend
 definitions prettyprint hashtables prettyprint.sections sets
-sequences.private effects generic compiler.units accessors
-locals.backend memoize ;
+sequences.private effects effects.parser generic generic.parser
+compiler.units accessors locals.backend memoize lexer ;
 IN: locals
 
 ! Inspired by
@@ -405,8 +405,8 @@ M: lambda-memoized reset-word
 
 M: lambda-method synopsis*
     dup dup dup definer.
-    "method-specializer" word-prop pprint*
-    "method-generic" word-prop pprint*
+    "method-class" word-prop pprint-word
+    "method-generic" word-prop pprint-word
     method-stack-effect effect>string comment. ;
 
 PRIVATE>

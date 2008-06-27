@@ -1,4 +1,4 @@
-USING: kernel parser strings math namespaces sequences words io
+USING: kernel parser lexer strings math namespaces sequences words io
 arrays quotations debugger kernel.private sequences.private ;
 IN: state-machine
 

@@ -1,7 +1,7 @@
 IN: inference.transforms.tests
 USING: sequences inference.transforms tools.test math kernel
 quotations inference accessors combinators words arrays
-classes ;
+classes classes.tuple ;
 
 : compose-n-quot ( word -- quot' ) <repetition> >quotation ;
 : compose-n ( quot -- ) compose-n-quot call ;
@@ -46,3 +46,9 @@ C: <color> color
 [ 16 -3 1/6 ] [ 4 3 6 \ spread-test word-def call ] unit-test
 
 [ fixnum instance? ] must-infer
+
+: bad-new-test ( -- obj ) V{ } new ;
+
+[ bad-new-test ] must-infer
+
+[ bad-new-test ] [ T{ not-a-tuple-class f V{ } } = ] must-fail-with

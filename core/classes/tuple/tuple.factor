@@ -9,31 +9,31 @@ IN: classes.tuple
 
 M: tuple class 1 slot 2 slot { word } declare ;
 
-ERROR: no-tuple-class class ;
+ERROR: not-a-tuple object ;
+
+: check-tuple ( object -- tuple )
+    dup tuple? [ not-a-tuple ] unless ; inline
+
+ERROR: not-a-tuple-class class ;
+
+: check-tuple-class ( class -- class )
+    dup tuple-class? [ not-a-tuple-class ] unless ; inline
 
 <PRIVATE
 
-GENERIC: tuple-layout ( object -- layout )
+: tuple-layout ( class -- layout )
+    check-tuple-class "layout" word-prop ;
 
-M: tuple-class tuple-layout "layout" word-prop ;
-
-M: tuple tuple-layout 1 slot ;
-
-M: tuple-layout tuple-layout ;
-
-: tuple-size tuple-layout layout-size ; inline
+: tuple-size ( tuple -- size )
+    1 slot layout-size ; inline
 
 : prepare-tuple>array ( tuple -- n tuple layout )
-    [ tuple-size ] [ ] [ tuple-layout ] tri ;
+    check-tuple [ tuple-size ] [ ] [ 1 slot ] tri ;
 
 : copy-tuple-slots ( n tuple -- array )
     [ array-nth ] curry map ;
 
 PRIVATE>
-
-: check-tuple ( class -- )
-    dup tuple-class?
-    [ drop ] [ no-tuple-class ] if ;
 
 : tuple>array ( tuple -- array )
     prepare-tuple>array
@@ -63,7 +63,7 @@ ERROR: bad-superclass class ;
 <PRIVATE
 
 : tuple= ( tuple1 tuple2 -- ? )
-    2dup [ tuple-layout ] bi@ eq? [
+    2dup [ 1 slot ] bi@ eq? [
         [ drop tuple-size ]
         [ [ [ drop array-nth ] [ nip array-nth ] 3bi = ] 2curry ]
         2bi all-integers?
@@ -217,13 +217,9 @@ M: tuple-class reset-class
             [ writer-word method forget ] 2bi
         ] with each
     ] [
-        {
-            "class"
-            "metaclass"
-            "superclass"
-            "layout"
-            "slots"
-        } reset-props
+        [ call-next-method ]
+        [ { "layout" "slots" } reset-props ]
+        bi
     ] bi ;
 
 M: tuple-class rank-class drop 0 ;

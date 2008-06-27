@@ -7,7 +7,7 @@ html.templates.chloe
 locals
 http.server
 http.server.filters
-furnace ;
+furnace combinators.short-circuit ;
 IN: furnace.boilerplate
 
 TUPLE: boilerplate < filter-responder template init ;

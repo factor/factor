@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel xml.data xml.utilities assocs splitting
-sequences parser quotations sequences.lib xml.utilities ;
+sequences parser lexer quotations sequences.lib xml.utilities ;
 IN: xml.generator
 
 : comment, ( string -- ) <comment> , ;
@@ -36,7 +36,7 @@ IN: xml.generator
     [ \ contained*, parsed ] [
         scan-word \ [ =
         [ POSTPONE: [ \ tag*, parsed ]
-        [ "Expected [ missing" <parse-error> throw ] if
+        [ "Expected [ missing" throw ] if
     ] if ;
 
 DEFER: >>

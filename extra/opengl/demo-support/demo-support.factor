@@ -1,4 +1,4 @@
-USING: arrays combinators.lib kernel math math.functions
+USING: arrays kernel math math.functions
 math.order math.vectors namespaces opengl opengl.gl sequences ui
 ui.gadgets ui.gestures ui.render accessors ;
 IN: opengl.demo-support

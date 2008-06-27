@@ -24,11 +24,8 @@ PREDICATE: predicate-class < class
     ] 3tri ;
 
 M: predicate-class reset-class
-    {
-        "class"
-        "metaclass"
-        "predicate-definition"
-        "superclass"
-    } reset-props ;
+    [ call-next-method ]
+    [ { "predicate-definition" } reset-props ]
+    bi ;
 
 M: predicate-class rank-class drop 1 ;

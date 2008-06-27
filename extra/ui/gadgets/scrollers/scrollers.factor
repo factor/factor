@@ -46,7 +46,7 @@ scroller H{
             y-model <y-slider> g-> set-scroller-y @right frame,
             viewport,
         ] with-gadget
-    ] keep t over set-gadget-root? dup faint-boundary ;
+    ] keep t >>root? faint-boundary ;
 
 : scroll ( value scroller -- )
     [

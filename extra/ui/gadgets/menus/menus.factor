@@ -42,11 +42,11 @@ M: menu-glass layout* gadget-child prefer ;
     [ hand-clicked get find-world hide-glass ]
     3append <roll-button> ;
 
-: menu-theme ( gadget -- )
-    dup light-gray solid-interior
+: menu-theme ( gadget -- gadget )
+    light-gray solid-interior
     faint-boundary ;
 
 : <commands-menu> ( hook target commands -- gadget )
     [
         [ >r 2dup r> <menu-item> gadget, ] each 2drop
-    ] make-filled-pile 5 <border> dup menu-theme ;
+    ] make-filled-pile 5 <border> menu-theme ;

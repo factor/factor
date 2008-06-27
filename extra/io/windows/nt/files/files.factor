@@ -3,7 +3,7 @@ io.timeouts io.ports io.windows io.windows.files
 io.windows.nt.backend windows windows.kernel32
 kernel libc math threads system
 alien.c-types alien.arrays alien.strings sequences combinators
-combinators.lib sequences.lib ascii splitting alien strings
+combinators.short-circuit ascii splitting alien strings
 assocs namespaces io.files.private accessors ;
 IN: io.windows.nt.files
 
@@ -22,21 +22,18 @@ M: winnt root-directory? ( path -- ? )
     {
         { [ dup empty? ] [ f ] }
         { [ dup [ path-separator? ] all? ] [ t ] }
-        { [ dup right-trim-separators
-          { [ dup length 2 = ] [ dup second CHAR: : = ] } 0&& nip ] [
-            t
-        ] }
+        { [ dup right-trim-separators { [ length 2 = ] [ second CHAR: : = ] } 1&& ] [ t ] }
         [ f ]
     } cond nip ;
 
 ERROR: not-absolute-path ;
 
 : root-directory ( string -- string' )
-    {
-        [ dup length 2 >= ]
-        [ dup second CHAR: : = ]
-        [ dup first Letter? ]
-    } 0&& [ 2 head ] [ not-absolute-path ] if ;
+    dup {
+        [ length 2 >= ]
+        [ second CHAR: : = ]
+        [ first Letter? ]
+    } 1&& [ 2 head ] [ not-absolute-path ] if ;
 
 : prepend-prefix ( string -- string' )
     dup unicode-prefix head? [

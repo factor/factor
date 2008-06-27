@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: qualified io.streams.c init fry namespaces assocs kernel
-parser tools.deploy.config vocabs sequences words words.private
-memory kernel.private continuations io prettyprint
-vocabs.loader debugger system strings sets ;
+parser lexer strings.parser tools.deploy.config vocabs sequences
+words words.private memory kernel.private continuations io
+prettyprint vocabs.loader debugger system strings sets ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes
 QUALIFIED: command-line
@@ -66,28 +66,72 @@ IN: tools.deploy.shaker
 
 : strip-word-defs ( words -- )
     "Stripping symbolic word definitions" show
+    [ "no-def-strip" word-prop not ] filter
     [ [ ] swap set-word-def ] each ;
 
-: strip-word-props ( retain-props words -- )
+: strip-word-props ( stripped-props words -- )
     "Stripping word properties" show
     [
         [
             word-props swap
-            '[ , nip member? ] assoc-filter
+            '[ , nip member? not ] assoc-filter
             f assoc-like
         ] keep set-word-props
     ] with each ;
 
-: retained-props ( -- seq )
+: stripped-word-props ( -- seq )
     [
-        "class" ,
-        "metaclass" ,
-        "layout" ,
-        deploy-ui? get [
-            "gestures" ,
-            "commands" ,
-            { "+nullary+" "+listener+" "+description+" }
-            [ "ui.commands" lookup , ] each
+        strip-dictionary? [
+            {
+                "coercer"
+                "compiled-effect"
+                "compiled-uses"
+                "constraints"
+                "declared-effect"
+                "default-output-classes"
+                "identities"
+                "if-intrinsics"
+                "infer"
+                "inferred-effect"
+                "interval"
+                "intrinsics"
+                "loc"
+                "members"
+                "methods"
+                "combination"
+                "cannot-infer"
+                "default-method"
+                "optimizer-hooks"
+                "output-classes"
+                "participants"
+                "predicate"
+                "predicate-definition"
+                "predicating"
+                "slots"
+                "slot-names"
+                "specializer"
+                "step-into"
+                "step-into?"
+                "superclass"
+                "reading"
+                "writing"
+                "type"
+                "engines"
+            } %
+        ] when
+        
+        strip-prettyprint? [
+            {
+                "delimiter"
+                "flushable"
+                "foldable"
+                "inline"
+                "lambda"
+                "macro"
+                "memo-quot"
+                "parsing"
+                "word-style"
+            } %
         ] when
     ] { } make ;
 
@@ -133,11 +177,11 @@ IN: tools.deploy.shaker
 
         strip-io? [ io.backend:io-backend , ] when
 
-        [
-            io.backend:io-backend ,
-            "default-buffer-size" "io.ports" lookup ,
-        ] { } make
-        { "alarms" "io" "tools" } strip-vocab-globals %
+        { } {
+            "alarms"
+            "tools"
+            "io.launcher"
+        } strip-vocab-globals %
 
         strip-dictionary? [
             { } { "cpu" } strip-vocab-globals %
@@ -242,7 +286,7 @@ SYMBOL: deploy-vocab
     strip-recompile-hook
     strip-init-hooks
     deploy-vocab get vocab-main set-boot-quot*
-    retained-props >r
+    stripped-word-props >r
     stripped-globals strip-globals
     r> strip-words ;
 

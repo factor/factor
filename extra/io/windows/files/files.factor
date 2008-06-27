@@ -4,7 +4,7 @@ USING: alien.c-types io.binary io.backend io.files io.buffers
 io.windows kernel math splitting
 windows windows.kernel32 windows.time calendar combinators
 math.functions sequences namespaces words symbols system
-combinators.lib io.ports destructors accessors
+io.ports destructors accessors
 math.bitfields math.bitfields.lib ;
 IN: io.windows.files
 
@@ -216,11 +216,11 @@ M: winnt link-info ( path -- info )
         "FILETIME" <c-object>
         "FILETIME" <c-object>
         [ GetFileTime win32-error=0/f ] 3keep
-        [ FILETIME>timestamp >local-time ] 3apply
+        [ FILETIME>timestamp >local-time ] tri@
     ] with-destructors ;
 
 : (set-file-times) ( handle timestamp/f timestamp/f timestamp/f -- )
-    [ timestamp>FILETIME ] 3apply
+    [ timestamp>FILETIME ] tri@
     SetFileTime win32-error=0/f ;
 
 : set-file-times ( path timestamp/f timestamp/f timestamp/f -- )

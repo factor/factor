@@ -9,7 +9,7 @@ TUPLE: canvas dlist ;
 
 : <canvas> ( -- canvas )
     canvas construct-gadget
-    dup black solid-interior ;
+    black solid-interior ;
 
 : delete-canvas-dlist ( canvas -- )
     dup find-gl-context

@@ -36,8 +36,6 @@ MACRO: napply ( n -- )
     '[ , ntuck , nslip ] ]
   map concat >quotation [ call ] append ;
 
-: 3apply ( obj obj obj quot -- ) 3 napply ; inline
-
 : 2with ( param1 param2 obj quot -- obj curry )
     with with ; inline
 
@@ -58,47 +56,6 @@ MACRO: napply ( n -- )
 
 : assoc-map-with ( obj assoc quot -- assoc )
     with* assoc-map ; inline
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! short circuiting words
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: short-circuit ( quots quot default -- quot )
-    1quotation -rot { } map>assoc <reversed> alist>quot ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-MACRO: 0&& ( quots -- quot )
-  [ '[ drop @ dup not ] [ drop f ] 2array ] map
-  { [ t ] [ ] }                       suffix
-  '[ f , cond ] ;
-
-MACRO: 1&& ( quots -- quot )
-  [ '[ drop dup @ dup not ] [ drop drop f ] 2array ] map
-  { [ t ] [ nip ] }                                  suffix
-  '[ f , cond ] ;
-
-MACRO: 2&& ( quots -- quot )
-  [ '[ drop 2dup @ dup not ] [ drop 2drop f ] 2array ] map
-  { [ t ] [ 2nip ] }                                   suffix
-  '[ f , cond ] ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-MACRO: 0|| ( quots -- quot )
-  [ '[ drop @ dup ] [ ] 2array ] map
-  { [ drop t ] [ f ] } suffix
-  '[ f , cond ] ;
-
-MACRO: 1|| ( quots -- quot )
-  [ '[ drop dup @ dup ] [ nip ] 2array ] map
-  { [ drop drop t ] [ f ] }              suffix
-  '[ f , cond ] ;
-
-MACRO: 2|| ( quots -- quot )
-  [ '[ drop 2dup @ dup ] [ 2nip ] 2array ] map
-  { [ drop 2drop t ] [ f ] }               suffix
-  '[ f , cond ] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! ifte

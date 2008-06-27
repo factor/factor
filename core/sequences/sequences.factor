@@ -206,6 +206,8 @@ M: slice virtual@ [ slice-from + ] [ slice-seq ] bi ;
 
 M: slice length dup slice-to swap slice-from - ;
 
+: short ( seq n -- seq n' ) over length min ; inline
+
 : head-slice ( seq n -- slice ) (head) <slice> ;
 
 : tail-slice ( seq n -- slice ) (tail) <slice> ;

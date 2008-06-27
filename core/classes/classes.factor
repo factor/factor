@@ -65,6 +65,15 @@ GENERIC: rank-class ( class -- n )
 
 GENERIC: reset-class ( class -- )
 
+M: class reset-class
+    {
+        "class"
+        "metaclass"
+        "superclass"
+        "members"
+        "participants"
+    } reset-props ;
+
 M: word reset-class drop ;
 
 GENERIC: implementors ( class/classes -- seq )

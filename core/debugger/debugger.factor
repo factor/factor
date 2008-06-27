@@ -209,8 +209,11 @@ M: inconsistent-next-method summary
 M: check-method summary
     drop "Invalid parameters for create-method" ;
 
-M: no-tuple-class summary
-    drop "BOA constructors can only be defined for tuple classes" ;
+M: not-a-tuple summary
+    drop "Not a tuple" ;
+
+M: not-a-tuple-class summary
+    drop "Not a tuple class" ;
 
 M: bad-superclass summary
     drop "Tuple classes can only inherit from other tuple classes" ;

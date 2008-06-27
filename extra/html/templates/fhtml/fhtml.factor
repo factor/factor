@@ -4,7 +4,7 @@
 USING: continuations sequences kernel namespaces debugger
 combinators math quotations generic strings splitting
 accessors assocs fry
-parser io io.files io.streams.string io.encodings.utf8
+parser lexer io io.files io.streams.string io.encodings.utf8
 html.elements
 html.templates ;
 IN: html.templates.fhtml
@@ -55,8 +55,8 @@ DEFER: <% delimiter
 
 : parse-template-lines ( lines -- quot )
     <template-lexer> [
-        V{ } clone lexer get parse-%> f (parse-until)
-    ] with-parser ;
+        V{ } clone lexer get parse-%> f (parse-until) >quotation
+    ] with-lexer ;
 
 : parse-template ( string -- quot )
     [

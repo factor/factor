@@ -1,4 +1,4 @@
-USING: unicode.data kernel math sequences parser bit-arrays
+USING: unicode.data kernel math sequences parser lexer bit-arrays
 namespaces sequences.private arrays quotations assocs
 classes.predicate math.order ;
 IN: unicode.syntax

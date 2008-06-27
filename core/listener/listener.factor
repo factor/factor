@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables io kernel math math.parser memory
-namespaces parser sequences strings io.styles
+namespaces parser lexer sequences strings io.styles
 vectors words generic system combinators continuations debugger
 definitions compiler.units accessors ;
 IN: listener
@@ -51,7 +51,7 @@ SYMBOL: error-hook
     listener-hook get call prompt.
     [ read-quot [ [ error-hook get call ] recover ] [ bye ] if* ]
     [
-        dup parse-error? [
+        dup lexer-error? [
             error-hook get call
         ] [
             rethrow

@@ -1,15 +1,15 @@
 USING: tools.deploy.config ;
 H{
-    { deploy-word-defs? f }
+    { deploy-math? t }
+    { deploy-reflection 2 }
+    { deploy-io 3 }
+    { deploy-c-types? f }
     { deploy-random? f }
+    { deploy-ui? t }
     { deploy-name "Bunny" }
+    { deploy-word-defs? f }
+    { "stop-after-last-window?" t }
     { deploy-threads? t }
     { deploy-compiler? t }
-    { deploy-math? t }
-    { deploy-c-types? f }
-    { deploy-io 3 }
-    { deploy-reflection 1 }
-    { deploy-ui? t }
-    { "stop-after-last-window?" t }
     { deploy-word-props? f }
 }

@@ -2,17 +2,17 @@
 ! Copyright (C) 2006, 2007 Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel sequences io.styles ui.gadgets ui.render
-colors ;
+colors accessors ;
 IN: ui.gadgets.theme
 
-: solid-interior ( gadget color -- )
-    <solid> swap set-gadget-interior ;
+: solid-interior ( gadget color -- gadget )
+    <solid> >>interior ; inline
 
-: solid-boundary ( gadget color -- )
-    <solid> swap set-gadget-boundary ;
+: solid-boundary ( gadget color -- gadget )
+    <solid> >>boundary ; inline
 
-: faint-boundary ( gadget -- )
-    gray solid-boundary ;
+: faint-boundary ( gadget -- gadget )
+    gray solid-boundary ; inline
 
 : selection-color ( -- color ) light-purple ;
 

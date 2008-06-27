@@ -28,7 +28,4 @@ M: union-class update-class define-union-predicate ;
 : define-union-class ( class members -- )
     [ (define-union-class) ] [ drop update-classes ] 2bi ;
 
-M: union-class reset-class
-    { "class" "metaclass" "members" } reset-props ;
-
 M: union-class rank-class drop 2 ;
