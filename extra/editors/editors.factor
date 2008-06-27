@@ -39,19 +39,29 @@ GENERIC: error-file ( error -- file )
 
 GENERIC: error-line ( error -- line )
 
-M: lexer-error error-line line>> ;
+M: lexer-error error-file
+    error>> error-file ;
 
-M: source-file-error error-file file>> path>> ;
+M: lexer-error error-line
+    [ error>> error-line ] [ line>> ] bi or ;
 
-M: source-file-error error-line error>> error-line ;
+M: source-file-error error-file
+    [ error>> error-file ] [ file>> path>> ] bi or ;
 
-M: condition error-file error>> error-file ;
+M: source-file-error error-line
+    error>> error-line ;
 
-M: condition error-line error>> error-line ;
+M: condition error-file
+    error>> error-file ;
 
-M: object error-file drop f ;
+M: condition error-line
+    error>> error-line ;
 
-M: object error-line drop f ;
+M: object error-file
+    drop f ;
+
+M: object error-line
+    drop f ;
 
 : :edit ( -- )
     error get [ error-file ] [ error-line ] bi
