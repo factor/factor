@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces sequences words io assocs
 quotations strings parser lexer arrays xml.data xml.writer debugger
-splitting vectors sequences.deep ;
+splitting vectors sequences.deep combinators ;
 IN: xml.utilities
 
 ! * System for words specialized on tag names
@@ -48,10 +48,11 @@ M: process-missing error.
     standard-prolog { } rot { } <xml> ;
 
 : children>string ( tag -- string )
-    tag-children
-    dup [ string? ] all?
-    [ "XML tag unexpectedly contains non-text children" throw ] unless
-    concat ;
+    tag-children {
+        { [ dup empty? ] [ drop "" ] }
+        { [ dup [ string? not ] contains? ] [ "XML tag unexpectedly contains non-text children" throw ] }
+        [ concat ]
+    } cond ;
 
 : children-tags ( tag -- sequence )
     tag-children [ tag? ] filter ;
