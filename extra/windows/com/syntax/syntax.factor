@@ -1,4 +1,4 @@
-USING: alien alien.c-types effects kernel windows.ole32 combinators.lib
+USING: alien alien.c-types effects kernel windows.ole32
 parser lexer splitting grouping sequences.lib sequences namespaces
 assocs quotations shuffle accessors words macros alien.syntax
 fry arrays ;

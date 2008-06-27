@@ -36,10 +36,10 @@ TUPLE: arc id subject object relation ;
 : delete-arc ( arc -- ) delete-tuples ;
 
 : create-arc ( subject object relation -- )
-    [ id>> ] 3apply <arc> insert-tuple ;
+    [ id>> ] tri@ <arc> insert-tuple ;
 
 : nodes>arc ( subject object relation -- arc )
-    [ [ id>> ] [ f ] if* ] 3apply <arc> ;
+    [ [ id>> ] [ f ] if* ] tri@ <arc> ;
 
 : select-arcs ( subject object relation -- arcs )
     nodes>arc select-tuples ;

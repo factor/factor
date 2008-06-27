@@ -1,5 +1,5 @@
 USING: alien alien.syntax alien.c-types alien.strings math
-kernel sequences windows windows.types combinators.lib
+kernel sequences windows windows.types
 math.order ;
 IN: windows.ole32
 
@@ -132,5 +132,5 @@ FUNCTION: void ReleaseStgMedium ( LPSTGMEDIUM pmedium ) ;
     utf16n string>alien "GUID" <c-object> [ CLSIDFromString ole32-error ] keep ;
 : guid>string ( guid -- string )
     GUID-STRING-LENGTH 1+ [ "ushort" <c-array> ] keep
-    [ StringFromGUID2 drop ] { 2 } multikeep utf16n alien>string ;
+    [ StringFromGUID2 drop ] 2keep drop utf16n alien>string ;
 

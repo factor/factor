@@ -2,8 +2,8 @@ USING: alien alien.c-types windows.com.syntax
 windows.com.syntax.private windows.com continuations kernel
 sequences.lib namespaces windows.ole32 libc vocabs
 assocs accessors arrays sequences quotations combinators
-math combinators.lib words compiler.units destructors fry
-math.parser ;
+math words compiler.units destructors fry
+math.parser combinators.lib ;
 IN: windows.com.wrapper
 
 TUPLE: com-wrapper vtbls disposed ;
@@ -84,7 +84,7 @@ unless
     swap append ;
 
 : compile-alien-callback ( word return parameters abi quot -- alien )
-    [ alien-callback ] 4 ncurry
+    '[ , , , , alien-callback ]
     [ [ (( -- alien )) define-declared ] pick slip ]
     with-compilation-unit
     execute ;

@@ -36,8 +36,6 @@ MACRO: napply ( n -- )
     '[ , ntuck , nslip ] ]
   map concat >quotation [ call ] append ;
 
-: 3apply ( obj obj obj quot -- ) 3 napply ; inline
-
 : 2with ( param1 param2 obj quot -- obj curry )
     with with ; inline
 

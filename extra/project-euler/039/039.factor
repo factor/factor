@@ -44,7 +44,7 @@ SYMBOL: p-count
     dup sum max-p < [
         dup sum adjust-p-count
         [ u-transform ] [ a-transform ] [ d-transform ] tri
-        [ (count-perimeters) ] 3apply
+        [ (count-perimeters) ] tri@
     ] [
         drop
     ] if ;
