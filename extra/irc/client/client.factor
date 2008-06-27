@@ -33,7 +33,6 @@ TUPLE: irc-listener in-messages out-messages ;
 TUPLE: irc-server-listener < irc-listener ;
 TUPLE: irc-channel-listener < irc-listener name password timeout ;
 TUPLE: irc-nick-listener < irc-listener name ;
-UNION: irc-named-listener irc-nick-listener irc-channel-listener ;
 
 : <irc-listener> ( -- irc-listener ) <mailbox> <mailbox> irc-listener boa ;
 
@@ -78,13 +77,19 @@ TUPLE: unhandled < irc-message ;
 <PRIVATE
 
 ! ======================================
-! Shortcuts
+! Utils
 ! ======================================
 
 : irc> ( -- irc-client ) current-irc-client get ;
 : irc-stream> ( -- stream ) irc> stream>> ;
 : irc-write ( s -- ) irc-stream> stream-write ;
 : irc-print ( s -- ) irc-stream> [ stream-print ] keep stream-flush ;
+: listener> ( name -- listener/f ) irc> listeners>> at ;
+: unregister-listener ( name -- ) irc> listeners>> delete-at ;
+
+: to-listener ( message name -- )
+    listener> [ f listener> ] unless*
+    [ in-messages>> mailbox-put ] [ drop ] if* ;
 
 ! ======================================
 ! IRC client messages
@@ -188,8 +193,7 @@ TUPLE: unhandled < irc-message ;
 GENERIC: handle-incoming-irc ( irc-message -- )
 
 M: irc-message handle-incoming-irc ( irc-message -- )
-    f irc> listeners>> at
-    [ in-messages>> mailbox-put ] [ drop ] if* ;
+    f listener> [ in-messages>> mailbox-put ] [ drop ] if* ;
 
 M: logged-in handle-incoming-irc ( logged-in -- )
     name>> irc> nick>> (>>name) ;
@@ -201,11 +205,15 @@ M: nick-in-use handle-incoming-irc ( nick-in-use -- )
     name>> "_" append /NICK ;
 
 M: privmsg handle-incoming-irc ( privmsg -- )
-    dup irc-message-origin irc> listeners>> [ at ] keep
-    '[ f , at ] unless* [ in-messages>> mailbox-put ] [ drop ] if* ;
+    dup irc-message-origin to-listener ;
 
 M: join handle-incoming-irc ( join -- )
-    irc> join-messages>> mailbox-put ;
+    dup trailing>> listener>
+    [ irc> join-messages>> ] unless* mailbox-put ;
+
+M: kick handle-incoming-irc ( kick -- )
+    [ ] [ channel>> ] [ who>> ] tri me? [ dup unregister-listener ] when
+    to-listener ;
 
 M: irc-broadcasted-message handle-incoming-irc ( irc-broadcasted-message -- )
     broadcast-message-to-listeners ;
@@ -326,5 +334,5 @@ PRIVATE>
         spawn-irc
     ] with-variable ;
 
-: irc-listener add-listener ( irc-listener irc-client -- )
-    current-irc-client '[ , (add-listener) ] with-variable ;
+: add-listener ( irc-listener irc-client -- )
+    current-irc-client rot '[ , (add-listener) ] with-variable ;
