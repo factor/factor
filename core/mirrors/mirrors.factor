@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables kernel sequences generic words
 arrays classes slots slots.private classes.tuple math vectors
-quotations sorting prettyprint accessors ;
+quotations accessors ;
 IN: mirrors
 
 : all-slots ( class -- slots )
@@ -47,13 +47,8 @@ M: mirror assoc-size mirror-slots length ;
 
 INSTANCE: mirror assoc
 
-: sort-assoc ( assoc -- alist )
-    >alist
-    [ [ first unparse-short ] keep ] { } map>assoc
-    sort-keys values ;
-
 GENERIC: make-mirror ( obj -- assoc )
-M: hashtable make-mirror sort-assoc ;
+M: hashtable make-mirror ;
 M: integer make-mirror drop f ;
 M: array make-mirror <enum> ;
 M: vector make-mirror <enum> ;
