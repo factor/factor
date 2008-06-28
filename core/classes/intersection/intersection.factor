@@ -27,7 +27,4 @@ M: intersection-class update-class define-intersection-predicate ;
     [ drop update-classes ]
     2bi ;
 
-M: intersection-class reset-class
-    { "class" "metaclass" "participants" } reset-props ;
-
 M: intersection-class rank-class drop 2 ;

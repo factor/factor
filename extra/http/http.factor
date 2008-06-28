@@ -211,7 +211,8 @@ TUPLE: post-data raw content content-type ;
     " " split harvest [ "=" split1 [ >lower ] dip ] { } map>assoc ;
 
 : parse-content-type ( content-type -- type encoding )
-    ";" split1 parse-content-type-attributes "charset" swap at ;
+    ";" split1 parse-content-type-attributes "charset" swap at
+    name>encoding over "text/" head? latin1 binary ? or ;
 
 : read-request ( -- request )
     <request>
@@ -310,7 +311,7 @@ M: response clone
     dup "content-type" header [
         parse-content-type
         [ >>content-type ]
-        [ name>encoding binary or >>content-charset ] bi*
+        [ >>content-charset ] bi*
     ] when* ;
 
 : read-response ( -- response )

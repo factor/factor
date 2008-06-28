@@ -1,6 +1,6 @@
 USING: alien alien.syntax combinators kernel parser sequences
 system words namespaces hashtables init math arrays assocs
-continuations ;
+continuations lexer ;
 IN: opengl.gl.extensions
 
 ERROR: unknown-gl-platform ;

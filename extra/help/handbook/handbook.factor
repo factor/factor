@@ -3,7 +3,7 @@ namespaces words sequences classes assocs vocabs kernel arrays
 prettyprint.backend kernel.private io generic math system
 strings sbufs vectors byte-arrays bit-arrays float-arrays
 quotations io.streams.byte-array io.encodings.string
-classes.builtin parser ;
+classes.builtin parser lexer ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"

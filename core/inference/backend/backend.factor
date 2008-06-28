@@ -228,7 +228,7 @@ M: object constructor drop f ;
         1 infer->r
         peek-d reify-curry
         1 infer-r>
-        2 1 <effect> swap #call consume/produce
+        (( obj quot -- curry )) swap #call consume/produce
     ] when* ;
 
 : reify-curries ( n -- )

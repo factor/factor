@@ -3,7 +3,8 @@
 USING: arrays alien alien.c-types alien.structs alien.arrays
 alien.strings kernel math namespaces parser sequences words
 quotations math.parser splitting grouping effects prettyprint
-prettyprint.sections prettyprint.backend assocs combinators ;
+prettyprint.sections prettyprint.backend assocs combinators
+lexer strings.parser ;
 IN: alien.syntax
 
 <PRIVATE

@@ -1,5 +1,5 @@
 
-USING: kernel
+USING: combinators.short-circuit kernel
        combinators
        vectors
        sequences

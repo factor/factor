@@ -3,7 +3,7 @@
 USING: arrays generic hashtables io kernel assocs math
 namespaces prettyprint sequences strings io.styles vectors words
 quotations mirrors splitting math.parser classes vocabs refs
-sets ;
+sets sorting ;
 IN: inspector
 
 GENERIC: summary ( object -- string )
@@ -78,10 +78,17 @@ SYMBOL: +editable+
 
 : summary. ( obj -- ) [ summary ] keep write-object nl ;
 
+: sorted-keys ( assoc -- alist )
+    dup mirror? [ keys ] [
+        keys
+        [ [ unparse-short ] keep ] { } map>assoc
+        sort-keys values
+    ] if ;
+
 : describe* ( obj flags -- )
     clone [
         dup summary.
-        make-mirror dup keys dup empty? [
+        make-mirror dup sorted-keys dup empty? [
             2drop
         ] [
             dup enum? [ +sequence+ on ] when

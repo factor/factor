@@ -1,7 +1,7 @@
 ! Based on Clojure's PersistentVector by Rich Hickey.
 
 USING: math accessors kernel sequences.private sequences arrays
-combinators parser prettyprint.backend ;
+combinators combinators.short-circuit parser prettyprint.backend ;
 IN: persistent-vectors
 
 ERROR: empty-error pvec ;
@@ -123,30 +123,39 @@ M: persistent-vector new-nth ( obj i pvec -- pvec' )
         ] if
     ] if ;
 
+: ppop-tail ( pvec -- pvec' )
+    [ clone [ ppop ] change-children ] change-tail ;
+
 : (ppop-contraction) ( node -- node' tail' )
     clone [ unclip-last swap ] change-children swap ;
 
 : ppop-contraction ( node -- node' tail' )
-    [ (ppop-contraction) ] [ level>> 1 = ] bi swap and ;
+    dup children>> length 1 =
+    [ children>> peek f swap ]
+    [ (ppop-contraction) ]
+    if ;
 
 : (ppop-new-tail) ( root -- root' tail' )
     dup level>> 1 > [
-        dup children>> peek (ppop-new-tail) over children>> empty?
-        [ 2drop ppop-contraction ] [ [ swap node-set-last ] dip ] if
+        dup children>> peek (ppop-new-tail) over
+        [ [ swap node-set-last ] dip ]
+        [ 2drop ppop-contraction ]
+        if
     ] [
         ppop-contraction
     ] if ;
 
-: ppop-tail ( pvec -- pvec' )
-    [ clone [ ppop ] change-children ] change-tail ;
+: trivial? ( node -- ? )
+    { [ level>> 1 > ] [ children>> length 1 = ] } 1&& ;
 
 : ppop-new-tail ( pvec -- pvec' )
-    dup root>> (ppop-new-tail)
-    [
-        dup [ level>> 1 > ] [ children>> length 1 = ] bi and 
-        [ children>> first ] when
-    ] dip
-    [ >>root ] [ >>tail ] bi* ;
+    dup root>> (ppop-new-tail) [
+        {
+            { [ dup not ] [ drop T{ node f { } 1 } ] }
+            { [ dup trivial? ] [ children>> first ] }
+            [ ]
+        } cond
+    ] dip [ >>root ] [ >>tail ] bi* ;
 
 PRIVATE>
 

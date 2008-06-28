@@ -1,4 +1,4 @@
-USING: help.markup help.syntax parser vocabs.loader ;
+USING: help.markup help.syntax parser source-files vocabs.loader ;
 IN: editors
 
 ARTICLE: "editor" "Editor integration"
@@ -35,4 +35,4 @@ HELP: no-edit-hook
 { $error-description "Thrown when " { $link edit } " is called when the " { $link edit-hook } " variable is not set. See " { $link "editor" } "." } ;
 
 HELP: :edit
-{ $description "If the most recent error was a " { $link parse-error } " thrown while parsing a source file, opens the source file at the failing line in the default editor using the " { $link edit-hook } ". See " { $link "editor" } "." } ;
+{ $description "If the most recent error was a " { $link source-file-error } " thrown while parsing a source file, opens the source file at the failing line in the default editor using the " { $link edit-hook } ". See " { $link "editor" } "." } ;

@@ -1,9 +1,15 @@
-USING: http tools.test multiline tuple-syntax
-io.streams.string io.encodings.utf8 io.encodings.string
-kernel arrays splitting sequences
-assocs io.sockets db db.sqlite continuations urls hashtables
-accessors ;
+USING: http tools.test multiline tuple-syntax io.streams.string
+io.encodings.utf8 io.encodings.8-bit io.encodings.binary
+io.encodings.string kernel arrays splitting sequences assocs
+io.sockets db db.sqlite continuations urls hashtables accessors
+;
 IN: http.tests
+
+[ "text/plain" latin1 ] [ "text/plain" parse-content-type ] unit-test
+
+[ "text/html" utf8 ] [ "text/html;  charset=UTF-8" parse-content-type ] unit-test
+
+[ "application/octet-stream" binary ] [ "application/octet-stream" parse-content-type ] unit-test
 
 : lf>crlf "\n" split "\r\n" join ;
 
@@ -184,6 +190,13 @@ test-db [
     init-furnace-tables
 ] with-db
 
+: test-httpd ( -- )
+    #! Return as soon as server is running.
+    <http-server>
+        1237 >>insecure
+        f >>secure
+    start-server* ;
+
 [ ] [
     [
         <dispatcher>
@@ -196,15 +209,13 @@ test-db [
             "redirect-loop" add-responder
         main-responder set
 
-        [ 1237 httpd ] "HTTPD test" spawn drop
+        test-httpd
     ] with-scope
 ] unit-test
 
-[ ] [ 100 sleep ] unit-test
-
 [ t ] [
     "resource:extra/http/test/foo.html" ascii file-contents
-    "http://localhost:1237/nested/foo.html" http-get nip ascii decode =
+    "http://localhost:1237/nested/foo.html" http-get nip =
 ] unit-test
 
 [ "http://localhost:1237/redirect-loop" http-get nip ]
@@ -229,11 +240,9 @@ test-db [
         test-db <db-persistence>
         main-responder set
 
-        [ 1237 httpd ] "HTTPD test" spawn drop
+        test-httpd
     ] with-scope
 ] unit-test
-
-[ ] [ 100 sleep ] unit-test
 
 : 404? [ download-failed? ] [ response>> code>> 404 = ] bi and ;
 
@@ -256,11 +265,9 @@ test-db [
         test-db <db-persistence>
         main-responder set
 
-        [ 1237 httpd ] "HTTPD test" spawn drop
+        test-httpd
     ] with-scope
 ] unit-test
-
-[ ] [ 100 sleep ] unit-test
 
 [ "Hi" ] [ "http://localhost:1237/" http-get nip ] unit-test
 
@@ -287,11 +294,9 @@ SYMBOL: a
         test-db <db-persistence>
         main-responder set
 
-        [ 1237 httpd ] "HTTPD test" spawn drop
+        test-httpd
     ] with-scope
 ] unit-test
-
-[ ] [ 100 sleep ] unit-test
 
 3 a set-global
 

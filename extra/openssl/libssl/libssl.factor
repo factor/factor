@@ -2,7 +2,7 @@
 ! Portions copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.syntax combinators kernel system namespaces
-assocs parser sequences words quotations math.bitfields ;
+assocs parser lexer sequences words quotations math.bitfields ;
 
 IN: openssl.libssl
 

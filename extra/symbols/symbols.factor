@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser sequences words kernel classes.singleton ;
+USING: parser lexer sequences words kernel classes.singleton
+classes.parser ;
 IN: symbols
 
 : SYMBOLS:

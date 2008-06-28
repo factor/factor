@@ -110,7 +110,6 @@ M: cocoa-ui-backend ui
     "UI" assert.app [
         [
             init-clipboard
-            stop-after-last-window? off
             cocoa-init-hook get [ call ] when*
             start-ui
             finish-launching

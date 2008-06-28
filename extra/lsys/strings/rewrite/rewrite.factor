@@ -1,6 +1,6 @@
 
 USING: kernel sbufs strings sequences assocs math
-       combinators.lib vars lsys.strings ;
+       combinators.lib vars lsys.strings combinators.short-circuit ;
 
 IN: lsys.strings.rewrite
 

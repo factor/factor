@@ -1,7 +1,7 @@
 
 USING: kernel combinators sequences sets math threads namespaces continuations
        debugger io io.sockets unicode.case accessors destructors
-       combinators.cleave combinators.lib
+       combinators.cleave combinators.lib combinators.short-circuit 
        newfx fry
        dns dns.util dns.misc ;
 

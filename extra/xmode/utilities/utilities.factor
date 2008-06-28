@@ -1,5 +1,5 @@
 USING: sequences assocs kernel quotations namespaces xml.data
-xml.utilities combinators macros parser words ;
+xml.utilities combinators macros parser lexer words ;
 IN: xmode.utilities
 
 : implies >r not r> or ; inline

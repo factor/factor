@@ -1,5 +1,7 @@
-USING: kernel sequences assocs hashtables parser vocabs words namespaces
-vocabs.loader debugger sets ;
+! Copyright (C) 2007, 2008 Daniel Ehrenberg.
+! See http://factorcode.org/license.txt for BSD license.
+USING: kernel sequences assocs hashtables parser lexer
+vocabs words namespaces vocabs.loader debugger sets ;
 IN: qualified
 
 : define-qualified ( vocab-name prefix-name -- )

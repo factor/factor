@@ -1,6 +1,6 @@
 USING: locals math sequences tools.test hashtables words kernel
 namespaces arrays strings prettyprint io.streams.string parser
-accessors ;
+accessors generic ;
 IN: locals.tests
 
 :: foo ( a b -- a a ) a a ;
@@ -264,4 +264,15 @@ M:: fixnum next-method-test ( a -- b ) a call-next-method 1 + ;
 [ t ] [
     [ \ a-word-with-locals see ] with-string-writer
     new-definition =
+] unit-test
+
+: method-definition "USING: locals locals.tests sequences ;\nM:: sequence method-with-locals ( a -- y ) a reverse ;\n" ;
+
+GENERIC: method-with-locals ( x -- y )
+
+M:: sequence method-with-locals ( a -- y ) a reverse ;
+
+[ t ] [
+    [ \ sequence \ method-with-locals method see ] with-string-writer
+    method-definition =
 ] unit-test

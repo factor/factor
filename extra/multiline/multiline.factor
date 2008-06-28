@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces parser kernel sequences words quotations math ;
+USING: namespaces parser lexer kernel sequences words quotations math ;
 IN: multiline
 
 : next-line-text ( -- str )

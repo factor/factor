@@ -1,4 +1,4 @@
-USING: kernel sequences slots parser words classes
+USING: kernel sequences slots parser lexer words classes
 slots.private mirrors ;
 IN: tuple-syntax
 

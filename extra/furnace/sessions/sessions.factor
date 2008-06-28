@@ -7,7 +7,7 @@ io.servers.connection
 db db.tuples db.types
 http http.server http.server.dispatchers http.server.filters
 html.elements
-furnace furnace.cache ;
+furnace furnace.cache combinators.short-circuit ;
 IN: furnace.sessions
 
 TUPLE: session < server-state namespace user-agent client changed? ;

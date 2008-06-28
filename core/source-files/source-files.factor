@@ -75,11 +75,35 @@ M: pathname forget*
 
 SYMBOL: file
 
+TUPLE: source-file-error file error ;
+
+: <source-file-error> ( msg -- error )
+    \ source-file-error new
+        file get >>file
+        swap >>error ;
+
+: file. ( file -- ) path>> <pathname> . ;
+
+M: source-file-error error.
+    [ file>> file. ] [ error>> error. ] bi ;
+
+M: source-file-error summary
+    error>> summary ;
+
+M: source-file-error compute-restarts
+    error>> compute-restarts ;
+
+M: source-file-error error-help
+    error>> error-help ;
+
 : with-source-file ( name quot -- )
     #! Should be called from inside with-compilation-unit.
     [
         swap source-file
         dup file set
         source-file-definitions old-definitions set
-        [ ] [ file get rollback-source-file ] cleanup
+        [
+            file get rollback-source-file
+            <source-file-error> rethrow
+        ] recover
     ] with-scope ; inline

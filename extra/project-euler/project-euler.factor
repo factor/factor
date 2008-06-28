@@ -17,7 +17,7 @@ USING: definitions io io.files kernel math math.parser project-euler.ave-time
     project-euler.052 project-euler.053 project-euler.056 project-euler.059
     project-euler.067 project-euler.075 project-euler.079 project-euler.092
     project-euler.097 project-euler.134 project-euler.169 project-euler.173
-    project-euler.175 ;
+    project-euler.175 combinators.short-circuit ;
 IN: project-euler
 
 <PRIVATE
