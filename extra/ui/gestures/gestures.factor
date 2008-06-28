@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs kernel math models namespaces
+USING: accessors arrays assocs kernel math models namespaces
 sequences words strings system hashtables math.parser
 math.vectors classes.tuple classes ui.gadgets boxes
 calendar alarms symbols combinators sets columns ;
@@ -262,7 +262,7 @@ SYMBOL: drag-timer
 GENERIC: gesture>string ( gesture -- string/f )
 
 : modifiers>string ( modifiers -- string )
-    [ word-name ] map concat >string ;
+    [ name>> ] map concat >string ;
 
 M: key-down gesture>string
     dup key-down-mods modifiers>string

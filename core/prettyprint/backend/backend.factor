@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays byte-arrays byte-vectors bit-arrays generic
+USING: accessors arrays byte-arrays byte-vectors bit-arrays generic
 hashtables io assocs kernel math namespaces sequences strings
 sbufs io.styles vectors words prettyprint.config
 prettyprint.sections quotations io io.files math.parser effects
@@ -37,7 +37,7 @@ M: effect pprint* effect>string "(" swap ")" 3append text ;
     ] keep ;
 
 : word-name* ( word -- str )
-    word-name "( no name )" or ;
+    name>> "( no name )" or ;
 
 : pprint-word ( word -- )
     dup record-vocab
@@ -117,7 +117,7 @@ M: pathname pprint*
 : check-recursion ( obj quot -- )
     nesting-limit? [
         drop
-        "~" over class word-name "~" 3append
+        "~" over class name>> "~" 3append
         swap present-text
     ] [
         over recursion-check get memq? [
@@ -166,7 +166,7 @@ M: curry >pprint-sequence ;
 M: compose >pprint-sequence ;
 M: hashtable >pprint-sequence >alist ;
 M: tuple >pprint-sequence tuple>array ;
-M: wrapper >pprint-sequence wrapped 1array ;
+M: wrapper >pprint-sequence wrapped>> 1array ;
 M: callstack >pprint-sequence callstack>array ;
 
 GENERIC: pprint-narrow? ( obj -- ? )
@@ -190,19 +190,19 @@ M: tuple pprint-narrow? drop t ;
 M: object pprint* pprint-object ;
 
 M: curry pprint*
-    dup curry-quot callable? [ pprint-object ] [
+    dup quot>> callable? [ pprint-object ] [
         "( invalid curry )" swap present-text
     ] if ;
 
 M: compose pprint*
-    dup compose-first over compose-second [ callable? ] both?
+    dup [ first>> callable? ] [ second>> callable? ] bi and
     [ pprint-object ] [
         "( invalid compose )" swap present-text
     ] if ;
 
 M: wrapper pprint*
-    dup wrapped word? [
-        <block \ \ pprint-word wrapped pprint-word block>
+    dup wrapped>> word? [
+        <block \ \ pprint-word wrapped>> pprint-word block>
     ] [
         pprint-object
     ] if ;

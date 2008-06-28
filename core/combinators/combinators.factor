@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays sequences sequences.private math.private
+USING: accessors arrays sequences sequences.private math.private
 kernel kernel.private math assocs quotations vectors
 hashtables sorting words sets math.order ;
 IN: combinators
@@ -45,7 +45,7 @@ ERROR: no-case ;
             dupd first dup word? [
                 execute
             ] [
-                dup wrapper? [ wrapped ] when
+                dup wrapper? [ wrapped>> ] when
             ] if =
         ] [ quotation? ] if
     ] find nip ;

@@ -109,7 +109,7 @@ GENERIC: com-stack-effect ( obj -- )
 
 M: quotation com-stack-effect infer. ;
 
-M: word com-stack-effect word-def com-stack-effect ;
+M: word com-stack-effect def>> com-stack-effect ;
 
 [ word? ] \ com-stack-effect H{
     { +listener+ t }

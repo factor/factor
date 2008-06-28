@@ -92,11 +92,11 @@ HELP: slot-spec
 $nl
 "The slots of a slot specification are:"
 { $list
-    { { $link slot-spec-type } " - a " { $link class } " declaring the set of possible values for the slot." }
-    { { $link slot-spec-name } " - a " { $link string } " identifying the slot." }
-    { { $link slot-spec-offset } " - an " { $link integer } " offset specifying where the slot value is stored inside instances of the relevant class. This is an implementation detail." }
-    { { $link slot-spec-reader } " - a " { $link word } " for reading the value of this slot." }
-    { { $link slot-spec-writer } " - a " { $link word } " for writing the value of this slot." }
+    { { $snippet "name" } " - a " { $link string } " identifying the slot." }
+    { { $snippet "offset" } " - an " { $link integer } " offset specifying where the slot value is stored inside instances of the relevant class. This is an implementation detail." }
+    { { $snippet "class" } " - a " { $link class } " declaring the set of possible values for the slot." }
+    { { $snippet "initial" } " - an initial value for the slot." }
+    { { $snippet "read-only" } " - a boolean indicating whether the slot is read only, or can be written to." }
 } } ;
 
 HELP: define-typecheck
@@ -111,7 +111,7 @@ HELP: define-typecheck
     }
     "It checks if the top of the stack is an instance of " { $snippet "class" } ", and if so, executes the quotation. Delegation is respected."
 }
-{ $notes "This word is used internally to wrap low-level code that does not do type-checking in safe user-visible words. For example, see how " { $link word-name } " is implemented." } ;
+{ $notes "This word is used internally to wrap unsafe low-level code in a type-checking stub." } ;
 
 HELP: define-slot-word
 { $values { "class" class } { "slot" "a positive integer" } { "word" word } { "quot" quotation } }

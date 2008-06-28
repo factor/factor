@@ -4,6 +4,10 @@ USING: arrays kernel kernel.private math sequences
 sequences.private growable byte-arrays ;
 IN: byte-vectors
 
+TUPLE: byte-vector
+{ "underlying" byte-array }
+{ "length" array-capacity } ;
+
 <PRIVATE
 
 : byte-array>vector ( byte-array length -- byte-vector )

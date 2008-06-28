@@ -7,11 +7,11 @@ USING: kernel parser lexer words namespaces sequences quotations ;
 IN: vars
 
 : define-var-getter ( word -- )
-    [ word-name ">" append create-in ] [ [ get ] curry ] bi
+    [ name>> ">" append create-in ] [ [ get ] curry ] bi
     (( -- value )) define-declared ;
 
 : define-var-setter ( word -- )
-    [ word-name ">" prepend create-in ] [ [ set ] curry ] bi
+    [ name>> ">" prepend create-in ] [ [ set ] curry ] bi
     (( value -- )) define-declared ;
 
 : define-var ( str -- )

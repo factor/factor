@@ -33,7 +33,7 @@ concurrency.promises byte-arrays locals calendar io.timeouts ;
         "127.0.0.1" "port" get ?promise <inet4> <secure> ascii <client> drop contents
     ] with-secure-context ;
 
-[ ] [ [ class word-name write ] server-test ] unit-test
+[ ] [ [ class name>> write ] server-test ] unit-test
 
 [ "secure" ] [ client-test ] unit-test
 

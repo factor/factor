@@ -45,6 +45,7 @@ IN: bootstrap.syntax
     "SINGLETON:"
     "SYMBOL:"
     "TUPLE:"
+    "SLOT:"
     "T{"
     "UNION:"
     "INTERSECTION:"
@@ -68,6 +69,8 @@ IN: bootstrap.syntax
     "<<"
     ">>"
     "call-next-method"
+    "initial:"
+    "read-only:"
 } [ "syntax" create drop ] each
 
 "t" "syntax" lookup define-symbol

@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.accessors arrays bit-arrays byte-arrays
+USING: accessors alien alien.accessors arrays bit-arrays byte-arrays
 classes sequences.private continuations.private effects
 float-arrays generic hashtables hashtables.private
 inference.state inference.backend inference.dataflow io
@@ -137,7 +137,7 @@ M: object infer-call
 ! Variadic tuple constructor
 \ <tuple-boa> [
     \ <tuple-boa>
-    peek-d value-literal layout-size { tuple } <effect>
+    peek-d value-literal size>> { tuple } <effect>
     make-call-node
 ] "infer" set-word-prop
 

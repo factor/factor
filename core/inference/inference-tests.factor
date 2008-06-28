@@ -271,7 +271,7 @@ DEFER: #1
 : #4 ( a -- ) dup [ drop ] [ dup #4 dup #3 call ] if ;
 : #1 ( a -- ) dup [ dup #4 dup #3 ] [ ] if drop ;
 
-[ \ #4 word-def infer ] must-fail
+[ \ #4 def>> infer ] must-fail
 [ [ #1 ] infer ] must-fail
 
 ! Similar

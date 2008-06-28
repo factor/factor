@@ -91,7 +91,7 @@ namespaces assocs kernel sequences math tools.test words sets ;
     {
         [ swapd * -rot p2 +@ ]
         [ 2swap [ swapd * -rot p2 +@ ] 2keep ]
-    } \ regression-1 word-def kill-set [ member? ] curry map
+    } \ regression-1 def>> kill-set [ member? ] curry map
 ] unit-test
 
 : regression-2 ( x y -- x.y )
@@ -121,6 +121,6 @@ namespaces assocs kernel sequences math tools.test words sets ;
             ] with assoc-each
         ]
     }
-    \ regression-2 word-def kill-set
+    \ regression-2 def>> kill-set
     [ member? ] curry map
 ] unit-test

@@ -1,4 +1,4 @@
-USING: system words sequences vocabs.loader ;
+USING: accessors system words sequences vocabs.loader ;
 
 {
     "io.unix.backend"
@@ -10,4 +10,4 @@ USING: system words sequences vocabs.loader ;
     "io.unix.pipes"
 } [ require ] each
 
-"io.unix." os word-name append require
+"io.unix." os name>> append require

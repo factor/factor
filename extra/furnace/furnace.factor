@@ -31,7 +31,7 @@ IN: furnace
 
 : base-path ( string -- pair )
     dup responder-nesting get
-    [ second class superclasses [ word-name = ] with contains? ] with find nip
+    [ second class superclasses [ name>> = ] with contains? ] with find nip
     [ first ] [ "No such responder: " swap append throw ] ?if ;
 
 : resolve-base-path ( string -- string' )
@@ -46,7 +46,7 @@ IN: furnace
 
 : resolve-template-path ( pair -- path )
     [
-        first2 [ word-vocabulary vocab-path % ] [ "/" % % ] bi*
+        first2 [ vocabulary>> vocab-path % ] [ "/" % % ] bi*
     ] "" make ;
 
 GENERIC: modify-query ( query responder -- query' )

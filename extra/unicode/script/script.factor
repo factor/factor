@@ -1,4 +1,4 @@
-USING: values kernel sequences assocs io.files
+USING: accessors values kernel sequences assocs io.files
 io.encodings ascii math.ranges io splitting math.parser 
 namespaces byte-arrays locals math sets io.encodings.ascii
 words compiler.units arrays interval-maps unicode.data ;
@@ -14,7 +14,7 @@ SYMBOL: interned
 
 : range, ( value key -- )
     swap interned get
-    [ word-name = ] with find nip 2array , ;
+    [ name>> = ] with find nip 2array , ;
 
 : expand-ranges ( assoc -- interval-map )
     [

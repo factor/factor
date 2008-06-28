@@ -6,7 +6,7 @@ IN: descriptive
 ERROR: descriptive-error args underlying word ;
 
 M: descriptive-error summary
-    word>> "The " swap word-name " word encountered an error."
+    word>> "The " swap name>> " word encountered an error."
     3append ;
 
 <PRIVATE

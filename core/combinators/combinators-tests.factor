@@ -140,7 +140,7 @@ IN: combinators.tests
 [ "two" ] [ 2 case-test-1 ] unit-test
 
 ! Interpreted
-[ "two" ] [ 2 \ case-test-1 word-def call ] unit-test
+[ "two" ] [ 2 \ case-test-1 def>> call ] unit-test
 
 [ "x" case-test-1 ] must-fail
 
@@ -158,7 +158,7 @@ IN: combinators.tests
 [ 25 ] [ 5 case-test-2 ] unit-test
 
 ! Interpreted
-[ 25 ] [ 5 \ case-test-2 word-def call ] unit-test
+[ 25 ] [ 5 \ case-test-2 def>> call ] unit-test
 
 : case-test-3 ( obj -- obj' )
     {
@@ -288,7 +288,7 @@ IN: combinators.tests
 ] unit-test
 
 ! Interpreted
-[ "a hashtable" ] [ H{ } \ case-test-3 word-def call ] unit-test
+[ "a hashtable" ] [ H{ } \ case-test-3 def>> call ] unit-test
 
 [ 1 3 t ] [ { 1 3 2 } contiguous-range? ] unit-test
 [ f ] [ { 1 2 2 4 } contiguous-range? 2nip ] unit-test

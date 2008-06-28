@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math.private sequences kernel.private
+USING: accessors kernel math.private sequences kernel.private
 math sequences.private slots.private byte-arrays
 alien.accessors ;
 IN: strings
@@ -30,6 +30,9 @@ M: string hashcode*
     nip dup string-hashcode [ ]
     [ dup rehash-string string-hashcode ] ?if ;
 
+M: string length
+    length>> ;
+
 M: string nth-unsafe
     >r >fixnum r> string-nth ;
 
@@ -38,7 +41,7 @@ M: string set-nth-unsafe
     >r >fixnum >r >fixnum r> r> set-string-nth ;
 
 M: string clone
-    (clone) dup string-aux clone over set-string-aux ;
+    (clone) [ clone ] change-aux ;
 
 M: string resize resize-string ;
 

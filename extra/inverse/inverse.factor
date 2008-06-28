@@ -80,7 +80,7 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
     ] } 1&& ; 
 
 : (flatten) ( quot -- )
-    [ dup flattenable? [ word-def (flatten) ] [ , ] if ] each ;
+    [ dup flattenable? [ def>> (flatten) ] [ , ] if ] each ;
 
  : retain-stack-overflow? ( error -- ? )
     { "kernel-error" 14 f f } = ;

@@ -245,13 +245,13 @@ TUPLE: my-tuple ;
         [ dup float+ ]
     } cleave ;
 
-[ t ] [ \ float-spill-bug compiled? ] unit-test
+[ t ] [ \ float-spill-bug compiled>> ] unit-test
 
 ! Regression
 : dispatch-alignment-regression ( -- c )
     { tuple vector } 3 slot { word } declare
     dup 1 slot 0 fixnum-bitand { [ ] } dispatch ;
 
-[ t ] [ \ dispatch-alignment-regression compiled? ] unit-test
+[ t ] [ \ dispatch-alignment-regression compiled>> ] unit-test
 
 [ vector ] [ dispatch-alignment-regression ] unit-test

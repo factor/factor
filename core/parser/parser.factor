@@ -81,7 +81,7 @@ M: no-word-error summary
     dup no-word-error boa
     swap words-named [ forward-reference? not ] filter
     word-restarts throw-restarts
-    dup word-vocabulary (use+) ;
+    dup vocabulary>> (use+) ;
 
 : check-forward ( str word -- word/f )
     dup forward-reference? [

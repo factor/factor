@@ -12,8 +12,8 @@ io.encodings.binary math.order accessors ;
 IN: bootstrap.image
 
 : my-arch ( -- arch )
-    cpu word-name
-    dup "ppc" = [ >r os word-name "-" r> 3append ] when ;
+    cpu name>> 
+    dup "ppc" = [ >r os name>> "-" r> 3append ] when ;
 
 : boot-image-name ( arch -- string )
     "boot." swap ".image" 3append ;
@@ -260,10 +260,10 @@ M: f '
             [
                 {
                     [ hashcode , ]
-                    [ word-name , ]
-                    [ word-vocabulary , ]
-                    [ word-def , ]
-                    [ word-props , ]
+                    [ name>> , ]
+                    [ vocabulary>> , ]
+                    [ def>> , ]
+                    [ props>> , ]
                 } cleave
                 f ,
                 0 , ! count
@@ -277,7 +277,7 @@ M: f '
     ] keep put-object ;
 
 : word-error ( word msg -- * )
-    [ % dup word-vocabulary % " " % word-name % ] "" make throw ;
+    [ % dup vocabulary>> % " " % name>> % ] "" make throw ;
 
 : transfer-word ( word -- word )
     [ target-word ] keep or ;
@@ -294,7 +294,7 @@ M: word ' ;
 ! Wrappers
 
 M: wrapper '
-    wrapped ' wrapper type-number object tag-number
+    wrapped>> ' wrapper type-number object tag-number
     [ emit ] emit-object ;
 
 ! Strings
@@ -345,7 +345,7 @@ M: float-array ' float-array emit-dummy-array ;
     tuple type-number dup [ emit-seq ] emit-object ;
 
 : emit-tuple ( tuple -- pointer )
-    dup class word-name "tombstone" =
+    dup class name>> "tombstone" =
     [ [ (emit-tuple) ] cache-object ] [ (emit-tuple) ] if ;
 
 M: tuple ' emit-tuple ;
@@ -354,11 +354,11 @@ M: tuple-layout '
     [
         [
             {
-                [ layout-hashcode , ]
-                [ layout-class , ]
-                [ layout-size , ]
-                [ layout-superclasses , ]
-                [ layout-echelon , ]
+                [ hashcode>> , ]
+                [ class>> , ]
+                [ size>> , ]
+                [ superclasses>> , ]
+                [ echelon>> , ]
             } cleave
         ] { } make [ ' ] map
         \ tuple-layout type-number
@@ -368,7 +368,7 @@ M: tuple-layout '
 M: tombstone '
     delegate
     "((tombstone))" "((empty))" ? "hashtables.private" lookup
-    word-def first [ emit-tuple ] cache-object ;
+    def>> first [ emit-tuple ] cache-object ;
 
 ! Arrays
 M: array '
@@ -379,10 +379,10 @@ M: array '
 
 M: quotation '
     [
-        quotation-array '
+        array>> '
         quotation type-number object tag-number [
             emit ! array
-            f ' emit ! compiled?
+            f ' emit ! compiled>>
             0 emit ! xt
             0 emit ! code
         ] emit-object

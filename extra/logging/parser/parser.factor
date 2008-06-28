@@ -19,7 +19,7 @@ SYMBOL: multiline
 
 : 'log-level' ( -- parser )
     log-levels [
-        [ word-name token ] keep [ nip ] curry <@
+        [ name>> token ] keep [ nip ] curry <@
     ] map <or-parser> ;
 
 : 'word-name' ( -- parser )

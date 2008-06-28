@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays generic hashtables io kernel assocs math
+USING: accessors arrays generic hashtables io kernel assocs math
 namespaces prettyprint sequences strings io.styles vectors words
 quotations mirrors splitting math.parser classes vocabs refs
 sets sorting ;
@@ -9,7 +9,7 @@ IN: inspector
 GENERIC: summary ( object -- string )
 
 : object-summary ( object -- string )
-    class word-name " instance" append ;
+    class name>> " instance" append ;
 
 M: object summary object-summary ;
 
@@ -24,7 +24,7 @@ M: word summary synopsis ;
 
 M: sequence summary
     [
-        dup class word-name %
+        dup class name>> %
         " with " %
         length #
         " elements" %
@@ -32,7 +32,7 @@ M: sequence summary
 
 M: assoc summary
     [
-        dup class word-name %
+        dup class name>> %
         " with " %
         assoc-size #
         " entries" %

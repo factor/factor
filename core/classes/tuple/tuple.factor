@@ -25,7 +25,7 @@ ERROR: not-a-tuple-class class ;
     check-tuple-class "layout" word-prop ;
 
 : tuple-size ( tuple -- size )
-    1 slot layout-size ; inline
+    1 slot size>> ; inline
 
 : prepare-tuple>array ( tuple -- n tuple layout )
     check-tuple [ tuple-size ] [ ] [ 1 slot ] tri ;
@@ -38,7 +38,7 @@ PRIVATE>
 : tuple>array ( tuple -- array )
     prepare-tuple>array
     >r copy-tuple-slots r>
-    layout-class prefix ;
+    class>> prefix ;
 
 : tuple-slots ( tuple -- seq )
     prepare-tuple>array drop copy-tuple-slots ;
@@ -78,10 +78,10 @@ ERROR: bad-superclass class ;
     #! 5 slot == layout-echelon
     [
         [ 1 slot dup 5 slot ] %
-        dup tuple-layout layout-echelon ,
+        dup tuple-layout echelon>> ,
         [ fixnum>= ] %
         [
-            dup tuple-layout layout-echelon ,
+            dup tuple-layout echelon>> ,
             [ swap 4 slot array-nth ] %
             literalize ,
             [ eq? ] %
@@ -106,7 +106,7 @@ ERROR: bad-superclass class ;
     [ slot-names length ] map sum ;
 
 : generate-tuple-slots ( class slots -- slot-specs )
-    over superclass-size 2 + simple-slots ;
+    over superclass-size 2 + make-slots deprecated-slots ;
 
 : define-tuple-slots ( class -- )
     dup dup "slot-names" word-prop generate-tuple-slots
@@ -212,13 +212,14 @@ M: tuple-class define-tuple-class
 
 M: tuple-class reset-class
     [
-        dup "slot-names" word-prop [
+        dup "slots" word-prop [
+            name>>
             [ reader-word method forget ]
             [ writer-word method forget ] 2bi
         ] with each
     ] [
         [ call-next-method ]
-        [ { "layout" "slots" } reset-props ]
+        [ { "layout" "slots" "slot-names" } reset-props ]
         bi
     ] bi ;
 

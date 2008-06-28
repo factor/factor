@@ -21,7 +21,7 @@ ERROR: no-such-state name ;
 M: no-such-state summary drop "No such state" ;
 
 MEMO: string>state ( string -- state )
-    dup states [ word-name = ] with find nip
+    dup states [ name>> = ] with find nip
     [ ] [ no-such-state ] ?if ;
 
 TUPLE: city

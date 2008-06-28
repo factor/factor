@@ -242,11 +242,10 @@ M: long-long-type box-return ( type -- )
     } 2cleave ;
 
 : expand-constants ( c-type -- c-type' )
-    #! We use word-def call instead of execute to get around
+    #! We use def>> call instead of execute to get around
     #! staging violations
     dup array? [
-        unclip >r [ dup word? [ word-def call ] when ] map
-        r> prefix
+        unclip >r [ dup word? [ def>> call ] when ] map r> prefix
     ] when ;
 
 : malloc-file-contents ( path -- alien len )

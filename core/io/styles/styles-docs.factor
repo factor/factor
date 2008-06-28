@@ -94,7 +94,7 @@ HELP: font-style
 { $description "Character style. Font style, one of " { $link plain } ", " { $link bold } ", " { $link italic } ", or " { $link bold-italic } "." }
 { $examples
     "This example outputs text in all three styles:"
-    { $code "{ plain bold italic bold-italic }\n[ [ word-name ] keep font-style associate format nl ] each" }
+    { $code "{ plain bold italic bold-italic }\n[ [ name>> ] keep font-style associate format nl ] each" }
 }  ;
 
 HELP: presented

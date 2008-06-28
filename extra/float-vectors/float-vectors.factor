@@ -5,15 +5,9 @@ sequences.private growable float-arrays prettyprint.backend
 parser accessors ;
 IN: float-vectors
 
-TUPLE: float-vector underlying fill ;
-
-M: float-vector underlying underlying>> { float-array } declare ;
-
-M: float-vector set-underlying (>>underlying) ;
-
-M: float-vector length fill>> { array-capacity } declare ;
-
-M: float-vector set-fill (>>fill) ;
+TUPLE: float-vector
+{ "underlying" float-array }
+{ "length" array-capacity } ;
 
 <PRIVATE
 

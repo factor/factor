@@ -8,7 +8,7 @@ generic.standard generic.math generic.parser classes io.files
 vocabs float-arrays classes.parser classes.union
 classes.intersection classes.mixin classes.predicate
 classes.singleton classes.tuple.parser compiler.units
-combinators debugger effects.parser ;
+combinators debugger effects.parser slots ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -166,6 +166,10 @@ IN: bootstrap.syntax
         parse-tuple-definition define-tuple-class
     ] define-syntax
 
+    "SLOT:" [
+        scan define-protocol-slot
+    ] define-syntax
+
     "C:" [
         CREATE-WORD
         scan-word check-tuple-class
@@ -208,4 +212,8 @@ IN: bootstrap.syntax
             not-in-a-method-error
         ] if
     ] define-syntax
+    
+    "initial:" "syntax" lookup define-symbol
+    
+    "read-only:" "syntax" lookup define-symbol
 ] with-compilation-unit

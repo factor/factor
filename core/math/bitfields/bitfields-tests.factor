@@ -14,4 +14,4 @@ IN: math.bitfields.tests
 
 [ 3 ] [ foo ] unit-test
 [ 3 ] [ { a b } flags ] unit-test
-[ t ] [ \ foo compiled? ] unit-test
+[ t ] [ \ foo compiled>> ] unit-test

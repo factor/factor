@@ -99,7 +99,7 @@ SYMBOL: ->
 "word-style" set-word-prop
 
 : remove-step-into ( word -- )
-    building get dup empty? [ drop ] [ nip pop wrapped ] if , ;
+    building get dup empty? [ drop ] [ nip pop wrapped>> ] if , ;
 
 : (remove-breakpoints) ( quot -- newquot )
     [
@@ -139,7 +139,7 @@ GENERIC: see ( defspec -- )
     [ H{ { font-style italic } } styled-text ] when* ;
 
 : seeing-word ( word -- )
-    word-vocabulary pprinter-in set ;
+    vocabulary>> pprinter-in set ;
 
 : definer. ( defspec -- )
     definer drop pprint-word ;
@@ -214,7 +214,7 @@ GENERIC: declarations. ( obj -- )
 M: object declarations. drop ;
 
 : declaration. ( word prop -- )
-    tuck word-name word-prop [ pprint-word ] [ drop ] if ;
+    tuck name>> word-prop [ pprint-word ] [ drop ] if ;
 
 M: word declarations.
     {

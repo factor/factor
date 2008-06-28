@@ -3,6 +3,10 @@
 USING: arrays kernel math sequences sequences.private growable ;
 IN: vectors
 
+TUPLE: vector
+{ "underlying" array }
+{ "length" array-capacity } ;
+
 <PRIVATE
 
 : array>vector ( array length -- vector )

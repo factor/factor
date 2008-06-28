@@ -1,11 +1,12 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: compiler cpu.architecture vocabs.loader system sequences
-namespaces parser kernel kernel.private classes classes.private
-arrays hashtables vectors classes.tuple sbufs inference.dataflow
-hashtables.private sequences.private math classes.tuple.private
-growable namespaces.private assocs words generator command-line
-vocabs io prettyprint libc compiler.units math.order ;
+USING: accessors compiler cpu.architecture vocabs.loader system
+sequences namespaces parser kernel kernel.private classes
+classes.private arrays hashtables vectors classes.tuple sbufs
+inference.dataflow hashtables.private sequences.private math
+classes.tuple.private growable namespaces.private assocs words
+generator command-line vocabs io prettyprint libc compiler.units
+math.order ;
 IN: bootstrap.compiler
 
 ! Don't bring this in when deploying, since it will store a
@@ -14,12 +15,12 @@ IN: bootstrap.compiler
     "alien.remote-control" require
 ] unless
 
-"cpu." cpu word-name append require
+"cpu." cpu name>> append require
 
 enable-compiler
 
 : compile-uncompiled ( words -- )
-    [ compiled? not ] filter compile ;
+    [ compiled>> not ] filter compile ;
 
 nl
 "Compiling..." write flush
@@ -39,8 +40,6 @@ nl
     array-capacity array-nth set-array-nth
 
     wrap probe
-
-    underlying
 
     namestack*
 

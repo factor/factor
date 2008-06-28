@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sets namespaces sequences inspector parser
-lexer combinators words classes.parser classes.tuple ;
+USING: accessors kernel sets namespaces sequences inspector parser
+lexer combinators words classes.parser classes.tuple arrays ;
 IN: classes.tuple.parser
 
 : shadowed-slots ( superclass slots -- shadowed )
@@ -13,7 +13,7 @@ IN: classes.tuple.parser
             "Definition of slot ``" %
             %
             "'' in class ``" %
-            word-name %
+            name>> %
             "'' shadows a superclass slot" %
         ] "" make note.
     ] with each ;
@@ -24,27 +24,27 @@ M: invalid-slot-name summary
     drop
     "Invalid slot name" ;
 
-: (parse-tuple-slots) ( -- )
+: parse-slot-name ( string/f -- ? )
     #! This isn't meant to enforce any kind of policy, just
     #! to check for mistakes of this form:
     #!
     #! TUPLE: blahblah foo bing
     #!
     #! : ...
-    scan {
+    {
         { [ dup not ] [ unexpected-eof ] }
-        { [ dup { ":" "(" "<" } member? ] [ invalid-slot-name ] }
-        { [ dup ";" = ] [ drop ] }
-        [ , (parse-tuple-slots) ]
+        { [ dup { ":" "(" "<" "\"" } member? ] [ invalid-slot-name ] }
+        { [ dup ";" = ] [ drop f ] }
+        [ dup "{" = [ drop \ } parse-until >array ] when , t ]
     } cond ;
 
-: parse-tuple-slots ( -- seq )
-    [ (parse-tuple-slots) ] { } make ;
+: parse-tuple-slots ( -- )
+    scan parse-slot-name [ parse-tuple-slots ] when ;
 
 : parse-tuple-definition ( -- class superclass slots )
     CREATE-CLASS
     scan {
         { ";" [ tuple f ] }
-        { "<" [ scan-word parse-tuple-slots ] }
-        [ >r tuple parse-tuple-slots r> prefix ]
+        { "<" [ scan-word [ parse-tuple-slots ] { } make ] }
+        [ tuple swap [ parse-slot-name [ parse-tuple-slots ] when ] { } make ]
     } case 3dup check-slot-shadowing ;

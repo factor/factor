@@ -128,7 +128,7 @@ M: array noise [ noise ] map vsum ;
 GENERIC: word-noise-factor ( word -- factor )
 
 M: word word-noise-factor
-    word-def quot-noise-factor ;
+    def>> quot-noise-factor ;
 
 M: lambda-word word-noise-factor
     "lambda" word-prop quot-noise-factor ;

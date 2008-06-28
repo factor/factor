@@ -62,7 +62,7 @@ IN: tools.deploy.shaker
 
 : strip-word-names ( words -- )
     "Stripping word names" show
-    [ f over set-word-name f swap set-word-vocabulary ] each ;
+    [ f over set-word-name f swap set-vocabulary>> ] each ;
 
 : strip-word-defs ( words -- )
     "Stripping symbolic word definitions" show
@@ -73,8 +73,8 @@ IN: tools.deploy.shaker
     "Stripping word properties" show
     [
         [
-            word-props swap
-            '[ , nip member? not ] assoc-filter
+            props>> swap
+            '[ drop , member? not ] assoc-filter
             f assoc-like
         ] keep set-word-props
     ] with each ;

@@ -41,7 +41,7 @@ SYMBOL: terms
         nip number>string
     ] [
         num-alt.
-        swap [ word-name ] map "." join
+        swap [ name>> ] map "." join
         append
     ] if ;
 

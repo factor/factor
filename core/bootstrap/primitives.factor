@@ -5,7 +5,7 @@ hashtables.private io kernel math namespaces parser sequences
 strings vectors words quotations assocs layouts classes
 classes.builtin classes.tuple classes.tuple.private
 kernel.private vocabs vocabs.loader source-files definitions
-slots.deprecated classes.union classes.intersection
+slots classes.union classes.intersection
 compiler.units bootstrap.image.private io.files accessors
 combinators ;
 IN: bootstrap.primitives
@@ -133,9 +133,12 @@ bootstrapping? on
     [ f f f builtin-class define-class ]
     tri ;
 
-: define-builtin-slots ( symbol slotspec -- )
-    [ drop ] [ 1 simple-slots ] 2bi
-    [ "slots" set-word-prop ] [ define-slots ] 2bi ;
+: prepare-slots ( slots -- slots' )
+    [ [ dup array? [ first2 create ] when ] map ] map ;
+
+: define-builtin-slots ( class slots -- )
+    prepare-slots 1 make-slots
+    [ "slots" set-word-prop ] [ define-accessors ] 2bi ;
 
 : define-builtin ( symbol slotspec -- )
     >r [ define-builtin-predicate ] keep
@@ -189,16 +192,14 @@ bi
 
 "ratio" "math" create {
     {
-        { "integer" "math" }
         "numerator"
-        { "numerator" "math" }
-        f
+        { "integer" "math" }
+        read-only: t
     }
     {
-        { "integer" "math" }
         "denominator"
-        { "denominator" "math" }
-        f
+        { "integer" "math" }
+        read-only: t
     }
 } define-builtin
 
@@ -207,16 +208,14 @@ bi
 
 "complex" "math" create {
     {
+        "real"
         { "real" "math" }
-        "real-part"
-        { "real-part" "math" }
-        f
+        read-only: t
     }
     {
+        "imaginary"
         { "real" "math" }
-        "imaginary-part"
-        { "imaginary-part" "math" }
-        f
+        read-only: t
     }
 } define-builtin
 
@@ -226,104 +225,87 @@ bi
 
 "wrapper" "kernel" create {
     {
-        { "object" "kernel" }
         "wrapped"
-        { "wrapped" "kernel" }
-        f
+        { "object" "kernel" }
+        read-only: t
     }
 } define-builtin
 
 "string" "strings" create {
     {
-        { "array-capacity" "sequences.private" }
         "length"
-        { "length" "sequences" }
-        f
+        { "array-capacity" "sequences.private" }
+        read-only: t
     } {
-        { "object" "kernel" }
         "aux"
-        { "string-aux" "strings.private" }
-        { "set-string-aux" "strings.private" }
+        { "object" "kernel" }
     }
 } define-builtin
 
 "quotation" "quotations" create {
     {
-        { "object" "kernel" }
         "array"
-        { "quotation-array" "quotations.private" }
-        f
+        { "object" "kernel" }
+        read-only: t
     }
     {
+        "compiled"
         { "object" "kernel" }
-        "compiled?"
-        { "quotation-compiled?" "quotations" }
-        f
+        read-only: t
     }
 } define-builtin
 
 "dll" "alien" create {
     {
-        { "byte-array" "byte-arrays" }
-        "path"
-        { "(dll-path)" "alien" }
-        f
+       "path"
+         { "byte-array" "byte-arrays" }
+        read-only: t
     }
 }
 define-builtin
 
 "alien" "alien" create {
     {
+        "underlying"
         { "c-ptr" "alien" }
-        "alien"
-        { "underlying-alien" "alien" }
-        f
+        read-only: t
     } {
-        { "object" "kernel" }
         "expired?"
-        { "expired?" "alien" }
-        f
+        { "object" "kernel" }
+        read-only: t
     }
 }
 define-builtin
 
 "word" "words" create {
-    f
     {
-        { "object" "kernel" }
-        "name"
-        { "word-name" "words" }
-        { "set-word-name" "words" }
-    }
-    {
-        { "object" "kernel" }
-        "vocabulary"
-        { "word-vocabulary" "words" }
-        { "set-word-vocabulary" "words" }
-    }
-    {
-        { "quotation" "quotations" }
-        "def"
-        { "word-def" "words" }
-        { "set-word-def" "words.private" }
-    }
-    {
-        { "object" "kernel" }
-        "props"
-        { "word-props" "words" }
-        { "set-word-props" "words" }
-    }
-    {
-        { "object" "kernel" }
-        "compiled?"
-        { "compiled?" "words" }
-        f
-    }
-    {
+        "hashcode"
         { "fixnum" "math" }
+    }
+    {
+        "name"
+        { "object" "kernel" }
+    }
+    {
+        "vocabulary"
+        { "object" "kernel" }
+    }
+    {
+        "def"
+        { "quotation" "quotations" }
+    }
+    {
+        "props"
+        { "object" "kernel" }
+    }
+    {
+        "compiled"
+        { "object" "kernel" }
+        read-only: t
+    }
+    {
         "counter"
-        { "profile-counter" "tools.profiler.private" }
-        { "set-profile-counter" "tools.profiler.private" }
+        { "fixnum" "math" }
     }
 } define-builtin
 
@@ -337,34 +319,29 @@ define-builtin
 
 "tuple-layout" "classes.tuple.private" create {
     {
-        { "fixnum" "math" }
         "hashcode"
-        { "layout-hashcode" "classes.tuple.private" }
-        f
+        { "fixnum" "math" }
+        read-only: t
     }
     {
-        { "word" "words" }
         "class"
-        { "layout-class" "classes.tuple.private" }
-        f
+        { "word" "words" }
+        read-only: t
     }
     {
-        { "fixnum" "math" }
         "size"
-        { "layout-size" "classes.tuple.private" }
-        f
-    }
-    {
-        { "array" "arrays" }
-        "superclasses"
-        { "layout-superclasses" "classes.tuple.private" }
-        f
-    }
-    {
         { "fixnum" "math" }
+        read-only: t
+    }
+    {
+        "superclasses"
+        { "array" "arrays" }
+        read-only: t
+    }
+    {
         "echelon"
-        { "layout-echelon" "classes.tuple.private" }
-        f
+        { "fixnum" "math" }
+        read-only: t
     }
 } define-builtin
 
@@ -375,15 +352,13 @@ define-builtin
     [
         {
             {
-                { "object" "kernel" }
                 "delegate"
-                { "delegate" "kernel" }
-                { "set-delegate" "kernel" }
+                { "object" "kernel" }
             }
-        }
+        } prepare-slots
         [ drop ] [ generate-tuple-slots ] 2bi
         [ "slots" set-word-prop ]
-        [ define-slots ]
+        [ define-accessors ]
         2bi
     ]
 } cleave
@@ -405,90 +380,19 @@ tuple
 2array >tuple 1quotation define-inline
 
 ! Some tuple classes
-"hashtable" "hashtables" create
-tuple
-{
-    {
-        { "array-capacity" "sequences.private" }
-        "count"
-        { "hash-count" "hashtables.private" }
-        { "set-hash-count" "hashtables.private" }
-    } {
-        { "array-capacity" "sequences.private" }
-        "deleted"
-        { "hash-deleted" "hashtables.private" }
-        { "set-hash-deleted" "hashtables.private" }
-    } {
-        { "array" "arrays" }
-        "array"
-        { "hash-array" "hashtables.private" }
-        { "set-hash-array" "hashtables.private" }
-    }
-} define-tuple-class
-
-"sbuf" "sbufs" create
-tuple
-{
-    {
-        { "string" "strings" }
-        "underlying"
-        { "underlying" "growable" }
-        { "set-underlying" "growable" }
-    } {
-        { "array-capacity" "sequences.private" }
-        "length"
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    }
-} define-tuple-class
-
-"vector" "vectors" create
-tuple
-{
-    {
-        { "array" "arrays" }
-        "underlying"
-        { "underlying" "growable" }
-        { "set-underlying" "growable" }
-    } {
-        { "array-capacity" "sequences.private" }
-        "fill"
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    }
-} define-tuple-class
-
-"byte-vector" "byte-vectors" create
-tuple
-{
-    {
-        { "byte-array" "byte-arrays" }
-        "underlying"
-        { "underlying" "growable" }
-        { "set-underlying" "growable" }
-    } {
-        { "array-capacity" "sequences.private" }
-        "fill"
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    }
-} define-tuple-class
-
 "curry" "kernel" create
 tuple
 {
     {
-        { "object" "kernel" }
         "obj"
-        { "curry-obj" "kernel" }
-        f
-    } {
         { "object" "kernel" }
+        read-only: t
+    } {
         "quot"
-        { "curry-quot" "kernel" }
-        f
+        { "object" "kernel" }
+        read-only: t
     }
-} define-tuple-class
+} prepare-slots define-tuple-class
 
 "curry" "kernel" lookup
 [ f "inline" set-word-prop ]
@@ -500,17 +404,15 @@ tuple
 tuple
 {
     {
-        { "object" "kernel" }
         "first"
-        { "compose-first" "kernel" }
-        f
-    } {
         { "object" "kernel" }
+        read-only: t
+    } {
         "second"
-        { "compose-second" "kernel" }
-        f
+        { "object" "kernel" }
+        read-only: t
     }
-} define-tuple-class
+} prepare-slots define-tuple-class
 
 "compose" "kernel" lookup
 [ f "inline" set-word-prop ]

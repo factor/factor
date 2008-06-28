@@ -1,7 +1,7 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences parser kernel help help.markup help.topics
-words strings classes tools.vocabs namespaces io
+USING: accessors sequences parser kernel help help.markup
+help.topics words strings classes tools.vocabs namespaces io
 io.streams.string prettyprint definitions arrays vectors
 combinators splitting debugger hashtables sorting effects vocabs
 vocabs.loader assocs editors continuations classes.predicate
@@ -27,13 +27,10 @@ IN: help.lint
     ] unless ;
 
 : effect-values ( word -- seq )
-    stack-effect dup effect-in swap effect-out append [
-        {
-            { [ dup word? ] [ word-name ] }
-            { [ dup integer? ] [ drop "object" ] }
-            { [ dup string? ] [ ] }
-        } cond
-    ] map prune natural-sort ;
+    stack-effect
+    [ in>> ] [ out>> ] bi append
+    [ (stack-picture) ] map
+    prune natural-sort ;
 
 : contains-funky-elements? ( element -- ? )
     {

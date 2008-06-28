@@ -547,8 +547,46 @@ HELP: PREDICATE:
 
 HELP: TUPLE:
 { $syntax "TUPLE: class slots... ;" "TUPLE: class < superclass slots ... ;" }
-{ $values { "class" "a new tuple class to define" } { "slots" "a list of slot names" } }
-{ $description "Defines a new tuple class. The superclass is optional; if left unspecified, it defaults to " { $link tuple } "." } ;
+{ $values { "class" "a new tuple class to define" } { "slots" "a list of slot specifiers" } }
+{ $description "Defines a new tuple class."
+$nl
+"The superclass is optional; if left unspecified, it defaults to " { $link tuple } "."
+$nl
+"Slot specifiers take one of the following three forms:"
+{ $list
+    { { $snippet "name" } " - a slot which can hold any object, with no attributes" }
+    { { $snippet "{ \"name\" attributes... }" } " - a slot which can hold any object, with optional attributes" }
+    { { $snippet "{ \"name\" class attributes... }" } " - a slot specialized to a specific class, with optional attributes" }
+}
+"Slot attributes are lists of slot attribute specifiers followed by values; a slot attribute specifier is one of " { $link initial: } " or " { $link read-only: } "." }
+{ $examples
+    "A simple tuple class:"
+    { $code "TUPLE: color red green blue ;" }
+    "Declaring slots to be integer-valued:"
+    { $code "TUPLE: color" "{ \"red\" integer }" "{ \"green\" integer }" "{ \"blue\" integer } ;" }
+    "An example mixing short and long slot specifiers:"
+    { $code "TUPLE: person" "{ \"age\" integer initial: 0 }" "{ \"department\" string initial: \"Marketing\" }" "manager ;" }
+} ;
+
+HELP: initial:
+{ $syntax "TUPLE: ... { \"slot\" initial: value } ... ;" }
+{ $values { "slot" "a slot name" } { "value" "any literal" } }
+{ $description "Specifies an initial value for a tuple slot." } ;
+
+HELP: read-only:
+{ $syntax "TUPLE: ... { \"slot\" read-only: ? } ... ;" }
+{ $values { "slot" "a slot name" } { "?" "a boolean" } }
+{ $description "Defines a tuple slot to be read-only. If a tuple has read-only slots, instances of the tuple should only be created by calling " { $link boa } ", instead of " { $link new } ". Using " { $link boa } " is the only way to set the value of a read-only slot." } ;
+
+{ initial: read-only: } related-words
+
+HELP: SLOT:
+{ $syntax "SLOT: name" }
+{ $values { "name" "a slot name" } }
+{ $description "Defines a protocol slot; that is, defines the accessor words for a slot named " { $snippet "slot" } " without associating it with any specific tuple." }
+{ $notes
+    "Protocol slots are used where the implementation of a superclass needs to assume that each subclass defines certain slots, however the slots of each subclass are potentially declared with different class specializers, thus preventing the slots from being defined in the superclass."
+} ;
 
 HELP: ERROR:
 { $syntax "ERROR: class slots... ;" }

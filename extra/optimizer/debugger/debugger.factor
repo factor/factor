@@ -86,7 +86,7 @@ M: #label node>quot
     [
         dup param>> literalize ,
         dup #label-loop? "#loop: " "#label: " ?
-        over param>> word-name append comment,
+        over param>> name>> append comment,
     ] 2keep
     node-child swap dataflow>quot , \ call ,  ;
 
@@ -106,7 +106,7 @@ M: #r> node>quot nip out-d>> length \ r> <array> % ;
 
 M: object node>quot
     [
-        dup class word-name %
+        dup class name>> %
         " " %
         dup param>> unparse %
         " " %
@@ -163,7 +163,7 @@ SYMBOL: node-count
     dataflow optimize dataflow>report ;
 
 : word-optimize-report ( word -- report )
-    word-def quot-optimize-report ;
+    def>> quot-optimize-report ;
 
 : report. ( report -- )
     [

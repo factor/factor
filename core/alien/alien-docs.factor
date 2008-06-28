@@ -10,7 +10,7 @@ HELP: alien
 HELP: dll
 { $class-description "The class of native library handles. See " { $link "syntax-aliens" } " for syntax and " { $link "dll.private" } " for general information." } ;
 
-HELP: expired? ( c-ptr -- ? )
+HELP: expired?
 { $values { "c-ptr" "an alien, byte array, or " { $link f } } { "?" "a boolean" } }
 { $description "Tests if the alien is a relic from an earlier session. When an image is loaded, any alien objects which persisted in the image are marked as being expired."
 $nl

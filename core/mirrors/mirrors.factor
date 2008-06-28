@@ -26,10 +26,10 @@ M: mirror at*
 
 M: mirror set-at ( val key mirror -- )
     [ nip object>> ] [ drop ] [ slots>> slot-named ] 2tri dup [
-        dup writer>> [
-            nip offset>> set-slot
-        ] [
+        dup read-only>> [
             drop immutable-slot
+        ] [
+            nip offset>> set-slot
         ] if
     ] [
         drop no-such-slot

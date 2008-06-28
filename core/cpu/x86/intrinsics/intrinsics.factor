@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.accessors arrays cpu.x86.assembler
+USING: accessors alien alien.accessors arrays cpu.x86.assembler
 cpu.x86.allot cpu.x86.architecture cpu.architecture kernel
 kernel.private math math.private namespaces quotations sequences
 words generic byte-arrays hashtables hashtables.private
@@ -290,12 +290,12 @@ IN: cpu.x86.intrinsics
 } define-intrinsic
 
 \ <tuple> [
-    tuple "layout" get layout-size 2 + cells [
+    tuple "layout" get size>> 2 + cells [
         ! Store layout
         "layout" get "scratch" get load-literal
         1 object@ "scratch" operand MOV
         ! Zero out the rest of the tuple
-        "layout" get layout-size [
+        "layout" get size>> [
             2 + object@ f v>operand MOV
         ] each
         ! Store tagged ptr in reg

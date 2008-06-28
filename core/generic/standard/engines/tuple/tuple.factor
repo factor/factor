@@ -18,7 +18,7 @@ C: <trivial-tuple-dispatch-engine> trivial-tuple-dispatch-engine
 TUPLE: tuple-dispatch-engine echelons ;
 
 : push-echelon ( class method assoc -- )
-    >r swap dup "layout" word-prop layout-echelon r>
+    >r swap dup "layout" word-prop echelon>> r>
     [ ?set-at ] change-at ;
 
 : echelon-sort ( assoc -- assoc' )
@@ -54,7 +54,7 @@ M: trivial-tuple-dispatch-engine engine>quot
     ] [ ] make ;
 
 : engine-word-name ( -- string )
-    generic get word-name "/tuple-dispatch-engine" append ;
+    generic get name>> "/tuple-dispatch-engine" append ;
 
 PREDICATE: engine-word < word
     "tuple-dispatch-generic" word-prop generic? ;

@@ -178,7 +178,7 @@ stack-params "__stack_value" c-type set-c-type-reg-class >>
 
 : struct-types&offset ( struct-type -- pairs )
     struct-type-fields [
-        dup slot-spec-type swap slot-spec-offset 2array
+        [ type>> ] [ offset>> ] bi 2array
     ] map ;
 
 : split-struct ( pairs -- seq )

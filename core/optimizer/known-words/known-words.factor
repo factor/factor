@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer.known-words
-USING: alien arrays generic hashtables inference.dataflow
+USING: accessors alien arrays generic hashtables inference.dataflow
 inference.class kernel assocs math math.order math.private
 kernel.private sequences words parser vectors strings sbufs io
 namespaces assocs quotations sequences.private io.binary
@@ -14,7 +14,7 @@ sequences.private combinators byte-arrays byte-vectors ;
 { <tuple> <tuple-boa> } [
     [
         dup node-in-d peek node-literal
-        dup tuple-layout? [ layout-class ] [ drop tuple ] if
+        dup tuple-layout? [ class>> ] [ drop tuple ] if
         1array f
     ] "output-classes" set-word-prop
 ] each

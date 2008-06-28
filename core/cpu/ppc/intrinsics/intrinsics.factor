@@ -438,13 +438,13 @@ IN: cpu.ppc.intrinsics
 } define-intrinsic
 
 \ <tuple> [
-    tuple "layout" get layout-size 2 + cells %allot
+    tuple "layout" get size>> 2 + cells %allot
     ! Store layout
     "layout" get 12 load-indirect
     12 11 cell STW
     ! Zero out the rest of the tuple
     f v>operand 12 LI
-    "layout" get layout-size [ 12 11 rot 2 + cells STW ] each
+    "layout" get size>> [ 12 11 rot 2 + cells STW ] each
     ! Store tagged ptr in reg
     "tuple" get tuple %store-tagged
 ] H{

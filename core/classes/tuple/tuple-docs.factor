@@ -1,6 +1,7 @@
 USING: generic help.markup help.syntax kernel
 classes.tuple.private classes slots quotations words arrays
-generic.standard sequences definitions compiler.units ;
+generic.standard sequences definitions compiler.units
+growable vectors sbufs ;
 IN: classes.tuple
 
 ARTICLE: "parametrized-constructors" "Parameterized constructors"
@@ -242,6 +243,34 @@ $nl
 }
 "Note that if a slot is moved from a class to its superclass (or vice versa) in the same compilation unit, the value of the slot is preserved in existing instances, because tuple instance update always runs at the end of a compilation unit. However, if it is removed in one compilation unit and added in another, the value in existing instances is lost." ;
 
+ARTICLE: "protocol-slots" "Protocol slots"
+"A " { $emphasis "protocol slot" } " is one which is assumed to exist by the implementation of a class, without being defined on the class itself. The burden is on subclasses (or mixin instances) to provide this slot."
+$nl
+"Protocol slots are defined using a parsing word:"
+{ $subsection POSTPONE: SLOT: }
+"Protocol slots are used where the implementation of a superclass needs to assume that each subclass defines certain slots, however the slots of each subclass are potentially declared with different class specializers, thus preventing the slots from being defined in the superclass."
+$nl
+"For example, the " { $link growable } " mixin provides an implementation of the sequence protocol which wraps an underlying sequence, resizing it as necessary when elements are added beyond the length of the sequence. It assumes that the concrete mixin instances define two slots, " { $snippet "length" } " and " { $snippet "underlying" } ". These slots are defined as protocol slots:"
+{ $snippet "SLOT: length" "SLOT: underlying" }
+"An alternate approach would be to define " { $link growable } " as a tuple class with these two slots, and have other classes subclass it as required. However, this rules out subclasses defining these slots with custom type declarations."
+$nl
+"For example, compare the definitions of the " { $link sbuf } " class,"
+{ $code
+    "TUPLE: sbuf"
+    "{ \"underlying\" string }"
+    "{ \"length\" array-capacity } ;"
+    ""
+    "INSTANCE: sbuf growable"
+}
+"with that of the " { $link vector } " class:"
+{ $code
+    "TUPLE: vector"
+    "{ \"underlying\" array }"
+    "{ \"length\" array-capacity } ;"
+    ""
+    "INSTANCE: vector growable"
+} ;
+
 ARTICLE: "tuples" "Tuples"
 "Tuples are user-defined classes composed of named slots."
 { $subsection "tuple-examples" }
@@ -255,6 +284,8 @@ $nl
 { $subsection "tuple-constructors" }
 "Expressing relationships through the object system:"
 { $subsection "tuple-subclassing" }
+"Protocol slots:"
+{ $subsection "protocol-slots" }
 "Introspection:"
 { $subsection "tuple-introspection" }
 "Tuple classes can be redefined; this updates existing instances:"

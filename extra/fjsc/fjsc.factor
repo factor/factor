@@ -322,10 +322,10 @@ M: number (parse-factor-quotation) ( object -- ast )
   <ast-number> ;
 
 M: symbol (parse-factor-quotation) ( object -- ast )
-  dup >string swap word-vocabulary <ast-identifier> ;
+  dup >string swap vocabulary>> <ast-identifier> ;
 
 M: word (parse-factor-quotation) ( object -- ast )
-  dup word-name swap word-vocabulary <ast-identifier> ;
+  dup name>> swap vocabulary>> <ast-identifier> ;
 
 M: string (parse-factor-quotation) ( object -- ast )
   <ast-string> ;
@@ -346,7 +346,7 @@ M: hashtable (parse-factor-quotation) ( object -- ast )
   ] { } make <ast-hashtable> ;
 
 M: wrapper (parse-factor-quotation) ( object -- ast )
-  wrapped dup word-name swap word-vocabulary <ast-word> ;
+  wrapped dup name>> swap vocabulary>> <ast-word> ;
 
 GENERIC: fjsc-parse ( object -- ast )
 

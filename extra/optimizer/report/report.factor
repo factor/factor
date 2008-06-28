@@ -16,7 +16,7 @@ IN: optimizer.report
     ] tabular-output ;
 
 : optimizer-report ( -- )
-    all-words [ compiled? ] filter
+    all-words [ compiled>> ] filter
     [
         dup [
             word-dataflow nip 1 count-optimization-passes

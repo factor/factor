@@ -17,7 +17,7 @@ IN: optimizer.tests
 GENERIC: xyz ( obj -- obj )
 M: array xyz xyz ;
 
-[ t ] [ \ xyz compiled? ] unit-test
+[ t ] [ \ xyz compiled>> ] unit-test
 
 ! Test predicate inlining
 : pred-test-1
@@ -102,7 +102,7 @@ TUPLE: pred-test ;
 ! regression
 GENERIC: void-generic ( obj -- * )
 : breakage ( -- * ) "hi" void-generic ;
-[ t ] [ \ breakage compiled? ] unit-test
+[ t ] [ \ breakage compiled>> ] unit-test
 [ breakage ] must-fail
 
 ! regression
@@ -133,7 +133,7 @@ GENERIC: void-generic ( obj -- * )
 ! compiling <tuple> with a non-literal class failed
 : <tuple>-regression ( class -- tuple ) <tuple> ;
 
-[ t ] [ \ <tuple>-regression compiled? ] unit-test
+[ t ] [ \ <tuple>-regression compiled>> ] unit-test
 
 GENERIC: foozul ( a -- b )
 M: reversed foozul ;
@@ -247,7 +247,7 @@ TUPLE: silly-tuple a b ;
 : node-successor-f-bug ( x -- * )
     [ 3 throw ] [ empty-compound ] compose [ 3 throw ] if ;
 
-[ t ] [ \ node-successor-f-bug compiled? ] unit-test
+[ t ] [ \ node-successor-f-bug compiled>> ] unit-test
 
 [ ] [ [ new ] dataflow optimize drop ] unit-test
 
@@ -271,7 +271,7 @@ TUPLE: silly-tuple a b ;
         ] if
     ] if ;
 
-[ t ] [ \ lift-throw-tail-regression compiled? ] unit-test
+[ t ] [ \ lift-throw-tail-regression compiled>> ] unit-test
 [ 3 "an integer" ] [ 3 lift-throw-tail-regression ] unit-test
 [ "hi" "a string" ] [ "hi" lift-throw-tail-regression ] unit-test
 
@@ -309,7 +309,7 @@ M: integer generic-inline-test ;
 
 ! Inlining all of the above should only take two passes
 [ { t f } ] [
-    \ generic-inline-test-1 word-def dataflow
+    \ generic-inline-test-1 def>> dataflow
     [ optimize-1 , optimize-1 , drop ] { } make
 ] unit-test
 
@@ -322,7 +322,7 @@ HINTS: recursive-inline-hang array ;
 : recursive-inline-hang-1 ( -- a )
     { } recursive-inline-hang ;
 
-[ t ] [ \ recursive-inline-hang-1 compiled? ] unit-test
+[ t ] [ \ recursive-inline-hang-1 compiled>> ] unit-test
 
 DEFER: recursive-inline-hang-3
 

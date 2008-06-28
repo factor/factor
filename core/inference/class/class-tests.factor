@@ -159,7 +159,7 @@ DEFER: blah
         [ dup V{ } eq? [ foo ] when ] dup second dup push define
     ] with-compilation-unit
 
-    \ blah word-def dataflow optimize drop
+    \ blah def>> dataflow optimize drop
 ] unit-test
 
 GENERIC: detect-fx ( n -- n )

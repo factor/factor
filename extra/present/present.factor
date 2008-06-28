@@ -10,7 +10,7 @@ M: timestamp present timestamp>string ;
 
 M: string present ;
 
-M: word present word-name ;
+M: word present name>> ;
 
 M: effect present effect>string ;
 

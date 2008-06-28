@@ -71,7 +71,7 @@ ERROR: unexpected want got ;
 GENERIC: expected>string ( obj -- str )
 
 M: f expected>string drop "end of input" ;
-M: word expected>string word-name ;
+M: word expected>string name>> ;
 M: string expected>string ;
 
 M: unexpected error.

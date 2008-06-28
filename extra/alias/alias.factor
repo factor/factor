@@ -7,7 +7,7 @@ M: alias reset-word
     [ call-next-method ] [ f "alias" set-word-prop ] bi ;
 
 M: alias stack-effect
-    word-def first stack-effect ;
+    def>> first stack-effect ;
 
 : define-alias ( new old -- )
     [ 1quotation define-inline ]

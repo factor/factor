@@ -23,7 +23,7 @@ SYMBOL: log-service
 : log-message ( msg word level -- )
     check-log-message
     log-service get dup [
-        [ [ string-lines ] [ word-name ] [ word-name ] tri* ] dip
+        [ [ string-lines ] [ name>> ] [ name>> ] tri* ] dip
         4array "log-message" send-to-log-server
     ] [
         4drop

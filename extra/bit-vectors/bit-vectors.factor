@@ -5,15 +5,9 @@ sequences.private growable bit-arrays prettyprint.backend
 parser accessors ;
 IN: bit-vectors
 
-TUPLE: bit-vector underlying fill ;
-
-M: bit-vector underlying underlying>> { bit-array } declare ;
-
-M: bit-vector set-underlying (>>underlying) ;
-
-M: bit-vector length fill>> { array-capacity } declare ;
-
-M: bit-vector set-fill (>>fill) ;
+TUPLE: bit-vector
+{ "underlying" bit-array }
+{ "length" array-capacity } ;
 
 <PRIVATE
 

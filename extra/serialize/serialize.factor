@@ -168,21 +168,21 @@ M: string (serialize) ( obj -- )
     [
         CHAR: G write1
         [ add-object ]
-        [ word-def (serialize) ]
-        [ word-props (serialize) ]
+        [ def>> (serialize) ]
+        [ props>> (serialize) ]
         tri
     ] serialize-shared ;
 
 : serialize-word ( word -- )
     CHAR: w write1
-    [ word-name (serialize) ]
-    [ word-vocabulary (serialize) ]
+    [ name>> (serialize) ]
+    [ vocabulary>> (serialize) ]
     bi ;
 
 M: word (serialize) ( obj -- )
     {
         { [ dup t eq? ] [ serialize-true ] }
-        { [ dup word-vocabulary not ] [ serialize-gensym ] }
+        { [ dup vocabulary>> not ] [ serialize-gensym ] }
         [ serialize-word ]
     } cond ;
 

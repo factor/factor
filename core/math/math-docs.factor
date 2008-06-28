@@ -302,11 +302,11 @@ HELP: fp-nan?
 { $values { "x" real } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " is an IEEE Not-a-Number value. While " { $snippet "x" } " can be any real number, this word will only ever yield true if " { $snippet "x" } " is a " { $link float } "." } ;
 
-HELP: real-part ( z -- x )
+HELP: real-part
 { $values { "z" number } { "x" real } }
 { $description "Outputs the real part of a complex number. This acts as the identity on real numbers." } ;
 
-HELP: imaginary-part ( z -- y )
+HELP: imaginary-part
 { $values { "z" number } { "y" real } }
 { $description "Outputs the imaginary part of a complex number. This outputs zero for real numbers." } ;
 

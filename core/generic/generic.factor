@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: words kernel sequences namespaces assocs hashtables
-definitions kernel.private classes classes.private
+USING: accessors words kernel sequences namespaces assocs
+hashtables definitions kernel.private classes classes.private
 classes.algebra quotations arrays vocabs effects combinators
 sets ;
 IN: generic
@@ -72,7 +72,7 @@ TUPLE: check-method class generic ;
     3tri ; inline
 
 : method-word-name ( class word -- string )
-    word-name "/" rot word-name 3append ;
+    [ name>> ] bi@ "=>" swap 3append ;
 
 PREDICATE: method-body < word
     "method-generic" word-prop >boolean ;
@@ -93,7 +93,7 @@ M: method-body crossref?
     check-method
     [ method-word-props ] 2keep
     method-word-name f <word>
-    [ set-word-props ] keep ;
+    swap >>props ;
 
 : with-implementors ( class generic quot -- )
     [ swap implementors-map get at ] dip call ; inline

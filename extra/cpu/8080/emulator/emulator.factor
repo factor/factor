@@ -512,7 +512,7 @@ SYMBOL: rom-root
   [ " A: " write cpu-a 16 >base 2 CHAR: \s pad-left write ] keep 
   [ " SP: " write cpu-sp 16 >base 4 CHAR: \s pad-left write ] keep 
   [ " cycles: " write cpu-cycles number>string 5 CHAR: \s pad-left write ] keep 
-  [ " " write peek-instruction word-name write " " write ] keep
+  [ " " write peek-instruction name>> write " " write ] keep
   nl drop ;
 
 : cpu*. ( cpu -- )

@@ -88,13 +88,13 @@ C: <empty> empty
 [ t length ] [ object>> t eq? ] must-fail-with
 
 [ "<constructor-test>" ]
-[ "IN: classes.tuple.test TUPLE: constructor-test ; C: <constructor-test> constructor-test" eval word word-name ] unit-test
+[ "IN: classes.tuple.test TUPLE: constructor-test ; C: <constructor-test> constructor-test" eval word name>> ] unit-test
 
 TUPLE: size-test a b c d ;
 
 [ t ] [
     T{ size-test } tuple-size
-    size-test tuple-layout layout-size =
+    size-test tuple-layout size>> =
 ] unit-test
 
 GENERIC: <yo-momma>
@@ -253,8 +253,8 @@ test-laptop-slot-values
 
 [ laptop ] [
     "laptop" get 1 slot
-    dup layout-echelon swap
-    layout-superclasses nth
+    dup echelon>> swap
+    superclasses>> nth
 ] unit-test
 
 [ "TUPLE: laptop < computer battery ;" ] [

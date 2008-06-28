@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays generic assocs inference inference.class
+USING: accessors arrays generic assocs inference inference.class
 inference.dataflow inference.backend inference.state io kernel
 math namespaces sequences vectors words quotations hashtables
 combinators classes classes.algebra generic.math
@@ -37,7 +37,7 @@ DEFER: (flat-length)
         ! not inline
         { [ dup inline? not ] [ drop 1 ] }
         ! inline
-        [ dup dup set word-def (flat-length) ]
+        [ dup dup set def>> (flat-length) ]
     } cond ;
 
 : (flat-length) ( seq -- n )
@@ -51,7 +51,7 @@ DEFER: (flat-length)
     ] map sum ;
 
 : flat-length ( seq -- n )
-    [ word-def (flat-length) ] with-scope ;
+    [ def>> (flat-length) ] with-scope ;
 
 ! Single dispatch method inlining optimization
 : node-class# ( node n -- class )
@@ -201,7 +201,7 @@ DEFER: (flat-length)
 
 : splice-word-def ( #call word -- node )
     dup +inlined+ depends-on
-    dup word-def swap 1array splice-quot ;
+    dup def>> swap 1array splice-quot ;
 
 : optimistic-inline ( #call -- node )
     dup node-param over node-history memq? [

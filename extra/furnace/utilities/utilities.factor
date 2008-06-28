@@ -4,7 +4,7 @@ USING: words kernel sequences splitting ;
 IN: furnace.utilities
 
 : word>string ( word -- string )
-    [ word-vocabulary ] [ word-name ] bi ":" swap 3append ;
+    [ vocabulary>> ] [ name>> ] bi ":" swap 3append ;
 
 : words>strings ( seq -- seq' )
     [ word>string ] map ;
