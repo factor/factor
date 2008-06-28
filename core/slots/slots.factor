@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel kernel.private math namespaces
 sequences strings words effects generic generic.standard
-classes slots.private combinators ;
+classes slots.private combinators accessors ;
 IN: slots
 
 TUPLE: slot-spec type name offset reader writer ;
@@ -10,8 +10,10 @@ TUPLE: slot-spec type name offset reader writer ;
 C: <slot-spec> slot-spec
 
 : define-typecheck ( class generic quot -- )
-    over define-simple-generic
-    >r create-method r> define ;
+    [
+        dup define-simple-generic
+        create-method
+    ] dip define ;
 
 : define-slot-word ( class slot word quot -- )
     rot >fixnum prefix define-typecheck ;
@@ -30,14 +32,26 @@ C: <slot-spec> slot-spec
 : reader-word ( name -- word )
     ">>" append (( object -- value )) create-accessor ;
 
-: define-reader ( class slot name -- )
-    reader-word object reader-quot define-slot-word ;
+: define-reader ( class slot name decl -- )
+    [ reader-word ] dip reader-quot define-slot-word ;
 
 : writer-word ( name -- word )
     "(>>" swap ")" 3append (( value object -- )) create-accessor ;
 
-: define-writer ( class slot name -- )
-    writer-word [ set-slot ] define-slot-word ;
+ERROR: bad-slot-value value object index ;
+
+: writer-quot ( decl -- quot )
+    [
+        dup object bootstrap-word eq?
+        [ drop \ set-slot , ] [
+            \ pick ,
+            "predicate" word-prop %
+            [ [ set-slot ] [ bad-slot-value ] if ] %
+        ] if
+    ] [ ] make ;
+
+: define-writer ( class slot name decl -- )
+    [ writer-word ] dip writer-quot define-slot-word ;
 
 : setter-word ( name -- word )
     ">>" prepend (( object value -- object )) create-accessor ;
@@ -60,17 +74,16 @@ C: <slot-spec> slot-spec
         ] [ ] make define-inline
     ] [ 2drop ] if ;
 
-: define-slot-methods ( class slot name -- )
-    dup define-changer
-    dup define-setter
-    3dup define-reader
-    define-writer ;
+: define-slot-methods ( class slot-spec -- )
+    {
+        [ [ drop ] [ name>> ] bi* define-changer ]
+        [ [ drop ] [ name>> ] bi* define-setter ]
+        [ [ offset>> ] [ name>> ] [ type>> ] tri define-reader ]
+        [ [ offset>> ] [ name>> ] [ type>> ] tri define-writer ]
+    } 2cleave ;
 
 : define-accessors ( class specs -- )
-    [
-        dup slot-spec-offset swap slot-spec-name
-        define-slot-methods
-    ] with each ;
+    [ define-slot-methods ] with each ;
 
 : slot-named ( name specs -- spec/f )
     [ slot-spec-name = ] with find nip ;
