@@ -17,7 +17,7 @@ C: <ori> ori
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: make-matrix ( quot width -- matrix ) >r { } make r> group ;
+: make-matrix ( quot width -- matrix ) >r { } make r> group ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
