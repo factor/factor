@@ -10,7 +10,7 @@ IN: io.windows.files
 
 : open-file ( path access-mode create-mode flags -- handle )
     [
-        >r >r share-mode security-attributes-inherit r> r>
+        >r >r share-mode default-security-attributes r> r>
         CreateFile-flags f CreateFile opened-file
     ] with-destructors ;
 
