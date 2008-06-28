@@ -108,34 +108,4 @@ os { winnt linux macosx } member? [
         [ [ t ] [ "m" get next-change 2drop ] [ ] while ] must-fail
         [ ] [ "m" get dispose ] unit-test
     ] with-monitors
-    
-    ! On Linux, a notification on the directory itself would report an invalid
-    ! path name
-    [
-        [ ] [ "monitor-test-self" temp-file make-directories ] unit-test
-        
-        ! Non-recursive
-        [ ] [ "monitor-test-self" temp-file f <monitor> "m" set ] unit-test
-
-        [ ] [ "monitor-test-self" temp-file touch-file ] unit-test
-
-        [ t ] [
-            "m" get next-change drop
-            [ "." = ] [ "monitor-test-self" temp-file = ] bi or
-        ] unit-test
-
-        [ ] [ "m" get dispose ] unit-test
-        
-        ! Recursive
-        [ ] [ "monitor-test-self" temp-file t <monitor> "m" set ] unit-test
-
-        [ ] [ "monitor-test-self" temp-file touch-file ] unit-test
-
-        [ t ] [
-            "m" get next-change drop
-            [ "." = ] [ "monitor-test-self" temp-file = ] bi or
-        ] unit-test
-
-        [ ] [ "m" get dispose ] unit-test
-    ] with-monitors
 ] when

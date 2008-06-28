@@ -85,7 +85,7 @@ M: linux-monitor dispose* ( monitor -- )
 
 : parse-event-name ( event -- name )
     dup inotify-event-len zero?
-    [ drop "." ] [ inotify-event-name utf8 alien>string ] if ;
+    [ drop "" ] [ inotify-event-name utf8 alien>string ] if ;
 
 : parse-file-notify ( buffer -- path changed )
     dup inotify-event-mask ignore-flags? [
