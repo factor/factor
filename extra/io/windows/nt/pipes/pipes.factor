@@ -16,13 +16,13 @@ IN: io.windows.nt.pipes
     4096
     4096
     0
-    security-attributes-inherit
+    default-security-attributes
     CreateNamedPipe opened-file ;
 
 : open-other-end ( name -- handle )
     GENERIC_WRITE
     { FILE_SHARE_READ FILE_SHARE_WRITE } flags
-    security-attributes-inherit
+    default-security-attributes
     OPEN_EXISTING
     FILE_FLAG_OVERLAPPED
     f

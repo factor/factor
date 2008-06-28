@@ -7,8 +7,7 @@ HOOK: WSASocket-flags io-backend ( -- DWORD )
 TUPLE: win32-socket < win32-file ;
 
 : <win32-socket> ( handle -- win32-socket )
-    win32-socket new
-        swap >>handle ;
+    win32-socket new-win32-handle ;
 
 M: win32-socket dispose ( stream -- )
     handle>> closesocket drop ;

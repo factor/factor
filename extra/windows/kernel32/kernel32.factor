@@ -1182,7 +1182,8 @@ FUNCTION: BOOL IsProcessorFeaturePresent ( DWORD ProcessorFeature ) ;
 ! FUNCTION: LeaveCriticalSection
 ! FUNCTION: LoadLibraryA
 ! FUNCTION: LoadLibraryExA
-! FUNCTION: LoadLibraryExW
+FUNCTION: HMODULE LoadLibraryExW ( LPCTSTR lpFile, HANDLE hFile, DWORD flags ) ;
+ALIAS: LoadLibraryEx LoadLibraryExW
 ! FUNCTION: LoadLibraryW
 ! FUNCTION: LoadModule
 ! FUNCTION: LoadResource

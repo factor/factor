@@ -12,6 +12,7 @@ USE: io.windows.nt.sockets
 USE: io.windows.mmap
 USE: io.windows.files
 USE: io.backend
+USE: openssl
 USE: system
 
 winnt set-io-backend

@@ -8,10 +8,13 @@ windows.shell32 windows.types windows.winsock splitting
 continuations math.bitfields system accessors ;
 IN: io.windows
 
+: set-inherit ( handle ? -- )
+    >r HANDLE_FLAG_INHERIT r> >BOOLEAN SetHandleInformation win32-error=0/f ;
+
 TUPLE: win32-handle handle disposed ;
 
 : new-win32-handle ( handle class -- win32-handle )
-    new swap >>handle ;
+    new swap [ >>handle ] [ f set-inherit ] bi ;
 
 : <win32-handle> ( handle -- win32-handle )
     win32-handle new-win32-handle ;
@@ -49,7 +52,3 @@ HOOK: add-completion io-backend ( port -- )
     "SECURITY_ATTRIBUTES" <c-object>
     "SECURITY_ATTRIBUTES" heap-size
     over set-SECURITY_ATTRIBUTES-nLength ;
-
-: security-attributes-inherit ( -- obj )
-    default-security-attributes
-    TRUE over set-SECURITY_ATTRIBUTES-bInheritHandle ; foldable
