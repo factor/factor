@@ -15,7 +15,7 @@ threads calendar prettyprint destructors io.timeouts ;
 
     [ t ] [
         "m" get next-change drop
-        [ "." = ] [ "monitor-test-self" temp-file = ] bi or
+        [ "" = ] [ "monitor-test-self" temp-file = ] bi or
     ] unit-test
 
     [ ] [ "m" get dispose ] unit-test
