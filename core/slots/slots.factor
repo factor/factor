@@ -1,8 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel kernel.private math namespaces
-sequences strings words effects generic generic.standard
-classes slots.private combinators accessors words ;
+USING: arrays bit-arrays byte-arrays float-arrays kernel
+kernel.private math namespaces sequences strings words effects
+generic generic.standard classes classes.algebra slots.private
+combinators accessors words ;
 IN: slots
 
 TUPLE: slot-spec name offset class initial read-only reader writer ;
@@ -45,14 +46,28 @@ TUPLE: slot-spec name offset class initial read-only reader writer ;
 
 ERROR: bad-slot-value value object index ;
 
+: writer-quot/object ( decl -- )
+    drop \ set-slot , ;
+
+: writer-quot/coerce ( decl -- )
+    [ rot ] % "coercer" word-prop % [ -rot set-slot ] % ;
+
+: writer-quot/check ( decl -- )
+    \ pick ,
+    "predicate" word-prop %
+    [ [ set-slot ] [ bad-slot-value ] if ] % ;
+
+: writer-quot/fixnum ( decl -- )
+    [ rot >fixnum -rot ] % writer-quot/check ;
+
 : writer-quot ( decl -- quot )
     [
-        dup object bootstrap-word eq?
-        [ drop \ set-slot , ] [
-            \ pick ,
-            "predicate" word-prop %
-            [ [ set-slot ] [ bad-slot-value ] if ] %
-        ] if
+        {
+            { [ dup object bootstrap-word eq? ] [ writer-quot/object ] }
+            { [ dup "coercer" word-prop ] [ writer-quot/coerce ] }
+            { [ dup fixnum class<= ] [ writer-quot/fixnum ] }
+            [ writer-quot/check ]
+        } cond
     ] [ ] make ;
 
 : define-writer ( class slot-spec -- )
@@ -104,6 +119,20 @@ ERROR: bad-slot-value value object index ;
         [ changer-word drop ]
     } cleave ;
 
+ERROR: no-initial-value class ;
+
+: initial-value ( class -- object )
+    {
+        { [ \ f over class<= ] [ f ] }
+        { [ fixnum over class<= ] [ 0 ] }
+        { [ float over class<= ] [ 0.0 ] }
+        { [ array over class<= ] [ { } ] }
+        { [ bit-array over class<= ] [ ?{ } ] }
+        { [ byte-array over class<= ] [ B{ } ] }
+        { [ float-array over class<= ] [ F{ } ] }
+        [ no-initial-value ]
+    } cond nip ;
+
 GENERIC: make-slot ( desc -- slot-spec )
 
 M: string make-slot
@@ -115,27 +144,39 @@ M: string make-slot
 
 : peel-off-class ( slot-spec array -- slot-spec array )
     dup empty? [
-        ! We'd use class? here, but during bootstrap, we sometimes
-        ! create slots whose class hasn't been defined yet.
-        dup first name>> ":" tail? not [
+        dup first class? [
             [ first >>class ] [ rest ] bi
         ] when
     ] unless ;
+
+ERROR: bad-slot-attribute key ;
 
 : peel-off-attributes ( slot-spec array -- slot-spec array )
     dup empty? [
         unclip {
             { initial: [ [ first >>initial ] [ rest ] bi ] }
             { read-only: [ [ first >>read-only ] [ rest ] bi ] }
+            [ bad-slot-attribute ]
         } case
     ] unless ;
+
+ERROR: bad-initial-value name ;
+
+: check-initial-value ( slot-spec -- slot-spec )
+    dup initial>> [
+        dup [ initial>> ] [ class>> ] bi instance?
+        [ name>> bad-initial-value ] unless
+    ] [
+        dup class>> initial-value >>initial
+    ] if ;
 
 M: array make-slot
     <slot-spec>
         swap
         peel-off-name
         peel-off-class
-        [ dup empty? not ] [ peel-off-attributes ] [ ] while drop ;
+        [ dup empty? not ] [ peel-off-attributes ] [ ] while drop
+    check-initial-value ;
 
 : make-slots ( slots base -- specs )
     over length [ + ] with map

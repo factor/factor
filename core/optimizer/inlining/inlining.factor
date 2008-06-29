@@ -32,10 +32,10 @@ DEFER: (flat-length)
         ! heuristic: { ... } declare comes up in method bodies
         ! and we don't care about it
         { [ dup \ declare eq? ] [ drop -2 ] }
-        ! recursive
-        { [ dup get ] [ drop 1 ] }
         ! not inline
         { [ dup inline? not ] [ drop 1 ] }
+        ! recursive and inline
+        { [ dup get ] [ drop 1 ] }
         ! inline
         [ dup dup set def>> (flat-length) ]
     } cond ;
@@ -50,19 +50,19 @@ DEFER: (flat-length)
         } cond
     ] map sum ;
 
-: flat-length ( seq -- n )
+: flat-length ( word -- n )
     [ def>> (flat-length) ] with-scope ;
 
 ! Single dispatch method inlining optimization
-: node-class# ( node n -- class )
-    over node-in-d <reversed> ?nth node-class ;
+: dispatching-class ( node generic -- method/f )
+    tuck dispatch# over in-d>> <reversed> ?nth 2dup node-literal?
+    [ node-literal swap single-effective-method ]
+    [ node-class swap specific-method ]
+    if ;
 
-: dispatching-class ( node word -- class )
-    [ dispatch# node-class# ] keep specific-method ;
-
-: inline-standard-method ( node word -- node )
-    2dup dispatching-class dup
-    [ swap method 1quotation f splice-quot ] [ 3drop t ] if ;
+: inline-standard-method ( node generic -- node )
+    dupd dispatching-class dup
+    [ 1quotation f splice-quot ] [ 2drop t ] if ;
 
 ! Partial dispatch of math-generic words
 : normalize-math-class ( class -- class' )

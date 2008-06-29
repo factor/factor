@@ -28,3 +28,6 @@ M: intersection-class update-class define-intersection-predicate ;
     2bi ;
 
 M: intersection-class rank-class drop 2 ;
+
+M: intersection-class instance?
+    "participants" word-prop [ instance? ] with all? ;

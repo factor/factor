@@ -1,13 +1,13 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions generic hashtables inspector io kernel
-math namespaces prettyprint prettyprint.config sequences assocs
-sequences.private strings io.styles vectors words system
+USING: slots arrays definitions generic hashtables inspector io
+kernel math namespaces prettyprint prettyprint.config sequences
+assocs sequences.private strings io.styles vectors words system
 splitting math.parser classes.tuple continuations
-continuations.private combinators generic.math
-classes.builtin classes compiler.units generic.standard vocabs
-threads threads.private init kernel.private libc io.encodings
-mirrors accessors math.order destructors ;
+continuations.private combinators generic.math classes.builtin
+classes compiler.units generic.standard vocabs threads
+threads.private init kernel.private libc io.encodings mirrors
+accessors math.order destructors ;
 IN: debugger
 
 GENERIC: error. ( error -- )
@@ -190,12 +190,38 @@ M: no-method summary
 
 M: no-method error.
     "Generic word " write
-    dup no-method-generic pprint
+    dup generic>> pprint
     " does not define a method for the " write
-    dup no-method-object class pprint
+    dup object>> class pprint
     " class." print
-    "Allowed classes: " write dup no-method-generic order .
-    "Dispatching on object: " write no-method-object short. ;
+    "Dispatching on object: " write object>> short. ;
+
+M: bad-slot-value error.
+    "Bad store to specialized slot" print
+    dup [ index>> 2 - ] [ object>> class all-slots ] bi nth
+    standard-table-style [
+        [
+            [ "Object" write ] with-cell
+            [ over object>> short. ] with-cell
+        ] with-row
+        [
+            [ "Slot" write ] with-cell
+            [ dup name>> short. ] with-cell
+        ] with-row
+        [
+            [ "Slot class" write ] with-cell
+            [ dup class>> short. ] with-cell
+        ] with-row
+        [
+            [ "Value" write ] with-cell
+            [ over value>> short. ] with-cell
+        ] with-row
+        [
+            [ "Value class" write ] with-cell
+            [ over value>> class short. ] with-cell
+        ] with-row
+    ] tabular-output
+    2drop ;
 
 M: no-math-method summary
     drop "No suitable arithmetic method" ;
@@ -297,7 +323,7 @@ M: decode-error summary drop "Character decoding error" ;
 
 M: no-such-slot summary drop "No such slot" ;
 
-M: immutable-slot summary drop "Slot is immutable" ;
+M: read-only-slot summary drop "Slot is declared read-only" ;
 
 M: bad-create summary drop "Bad parameters to create" ;
 

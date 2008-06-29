@@ -1,6 +1,7 @@
+USING: accessors inference inference.dataflow optimizer
+optimizer.def-use namespaces assocs kernel sequences math
+tools.test words sets ;
 IN: optimizer.def-use.tests
-USING: inference inference.dataflow optimizer optimizer.def-use
-namespaces assocs kernel sequences math tools.test words sets ;
 
 [ 3 { 1 1 1 } ] [
     [ 1 2 3 ] dataflow compute-def-use drop

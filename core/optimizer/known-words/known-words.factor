@@ -1,15 +1,16 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: optimizer.known-words
-USING: accessors alien arrays generic hashtables inference.dataflow
-inference.class kernel assocs math math.order math.private
-kernel.private sequences words parser vectors strings sbufs io
-namespaces assocs quotations sequences.private io.binary
-io.streams.string layouts splitting math.intervals
-math.floats.private classes.tuple classes.tuple.private classes
-classes.algebra optimizer.def-use optimizer.backend
-optimizer.pattern-match optimizer.inlining float-arrays
-sequences.private combinators byte-arrays byte-vectors ;
+USING: accessors alien arrays generic hashtables definitions
+inference.dataflow inference.state inference.class kernel assocs
+math math.order math.private kernel.private sequences words
+parser vectors strings sbufs io namespaces assocs quotations
+sequences.private io.binary io.streams.string layouts splitting
+math.intervals math.floats.private classes.tuple classes.predicate
+classes.tuple.private classes classes.algebra optimizer.def-use
+optimizer.backend optimizer.pattern-match optimizer.inlining
+float-arrays sequences.private combinators byte-arrays
+byte-vectors ;
 
 { <tuple> <tuple-boa> } [
     [
@@ -126,6 +127,33 @@ sequences.private combinators byte-arrays byte-vectors ;
         2drop
     ] if
 ] "constraints" set-word-prop
+
+! if the input to new is a literal tuple class, we can expand it
+: literal-new? ( #call -- ? )
+    dup in-d>> first node-literal tuple-class? ;
+
+: expand-new ( #call -- node )
+    dup dup in-d>> first node-literal
+    [ +inlined+ depends-on ] [ tuple-layout [ nip <tuple> ] curry ] bi
+    f splice-quot ;
+
+\ new {
+    { [ dup literal-new? ] [ expand-new ] }
+} define-optimizers
+
+! open-code instance? checks on predicate classes
+: literal-predicate-class? ( #call -- ? )
+    dup in-d>> second node-literal predicate-class? ;
+
+: expand-predicate-instance ( #call -- node )
+    dup dup in-d>> second node-literal
+    [ +inlined+ depends-on ]
+    [ "predicate-definition" word-prop [ drop ] prepose ] bi
+    f splice-quot ;
+
+\ predicate-instance? {
+    { [ dup literal-predicate-class? ] [ expand-predicate-instance ] }
+} define-optimizers
 
 ! eq? on the same object is always t
 { eq? = } {

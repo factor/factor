@@ -1,13 +1,12 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays byte-arrays generic hashtables
-hashtables.private io kernel math namespaces parser sequences
-strings vectors words quotations assocs layouts classes
-classes.builtin classes.tuple classes.tuple.private
+hashtables.private io kernel math math.order namespaces parser
+sequences strings vectors words quotations assocs layouts
+classes classes.builtin classes.tuple classes.tuple.private
 kernel.private vocabs vocabs.loader source-files definitions
-slots classes.union classes.intersection
-compiler.units bootstrap.image.private io.files accessors
-combinators ;
+slots classes.union classes.intersection classes.predicate
+compiler.units bootstrap.image.private io.files accessors combinators ;
 IN: bootstrap.primitives
 
 "Creating primitives and basic runtime structures..." print flush
@@ -105,24 +104,8 @@ bootstrapping? on
 } [ create-vocab drop ] each
 
 ! Builtin classes
-: lo-tag-eq-quot ( n -- quot )
-    [ \ tag , , \ eq? , ] [ ] make ;
-
-: hi-tag-eq-quot ( n -- quot )
-    [
-        [ dup tag ] % \ hi-tag tag-number , \ eq? ,
-        [ [ hi-tag ] % , \ eq? , ] [ ] make ,
-        [ drop f ] ,
-        \ if ,
-    ] [ ] make ;
-
-: builtin-predicate-quot ( class -- quot )
-    "type" word-prop
-    dup tag-mask get <
-    [ lo-tag-eq-quot ] [ hi-tag-eq-quot ] if ;
-
 : define-builtin-predicate ( class -- )
-    dup builtin-predicate-quot define-predicate ;
+    dup class>type [ builtin-instance? ] curry define-predicate ;
 
 : lookup-type-number ( word -- n )
     global [ target-word ] bind type-number ;
@@ -164,6 +147,45 @@ bootstrapping? on
 "byte-array" "byte-arrays" create register-builtin
 "tuple-layout" "classes.tuple.private" create register-builtin
 
+! We need this before defining c-ptr below
+"f" "syntax" lookup { } define-builtin
+
+"f" "syntax" create [ not ] "predicate" set-word-prop
+"f?" "syntax" vocab-words delete-at
+
+! Some unions
+"integer" "math" create
+"fixnum" "math" lookup
+"bignum" "math" lookup
+2array
+define-union-class
+
+"rational" "math" create
+"integer" "math" lookup
+"ratio" "math" lookup
+2array
+define-union-class
+
+"real" "math" create
+"rational" "math" lookup
+"float" "math" lookup
+2array
+define-union-class
+
+"c-ptr" "alien" create [
+    "alien" "alien" lookup ,
+    "f" "syntax" lookup ,
+    "byte-array" "byte-arrays" lookup ,
+    "bit-array" "bit-arrays" lookup ,
+    "float-array" "float-arrays" lookup ,
+] { } make define-union-class
+
+! A predicate class used for declarations
+"array-capacity" "sequences.private" create
+"fixnum" "math" lookup
+0 bootstrap-max-array-capacity [ between? ] 2curry
+define-predicate-class
+
 ! Catch-all class for providing a default method.
 "object" "kernel" create
 [ f f { } intersection-class define-class ]
@@ -191,122 +213,53 @@ bi
 "bignum" "math" create ">bignum" "math" create 1quotation "coercer" set-word-prop
 
 "ratio" "math" create {
-    {
-        "numerator"
-        { "integer" "math" }
-        read-only: t
-    }
-    {
-        "denominator"
-        { "integer" "math" }
-        read-only: t
-    }
+    { "numerator" { "integer" "math" } read-only: t }
+    { "denominator" { "integer" "math" } read-only: t }
 } define-builtin
 
 "float" "math" create { } define-builtin
 "float" "math" create ">float" "math" create 1quotation "coercer" set-word-prop
 
 "complex" "math" create {
-    {
-        "real"
-        { "real" "math" }
-        read-only: t
-    }
-    {
-        "imaginary"
-        { "real" "math" }
-        read-only: t
-    }
+    { "real" { "real" "math" } read-only: t }
+    { "imaginary" { "real" "math" } read-only: t }
 } define-builtin
-
-"f" "syntax" lookup { } define-builtin
 
 "array" "arrays" create { } define-builtin
 
 "wrapper" "kernel" create {
-    {
-        "wrapped"
-        { "object" "kernel" }
-        read-only: t
-    }
+    { "wrapped" read-only: t }
 } define-builtin
 
 "string" "strings" create {
-    {
-        "length"
-        { "array-capacity" "sequences.private" }
-        read-only: t
-    } {
-        "aux"
-        { "object" "kernel" }
-    }
+    { "length" { "array-capacity" "sequences.private" } read-only: t }
+    "aux"
 } define-builtin
 
 "quotation" "quotations" create {
-    {
-        "array"
-        { "object" "kernel" }
-        read-only: t
-    }
-    {
-        "compiled"
-        { "object" "kernel" }
-        read-only: t
-    }
+    { "array" { "array" "arrays" } read-only: t }
+    { "compiled" read-only: t }
 } define-builtin
 
 "dll" "alien" create {
-    {
-       "path"
-         { "byte-array" "byte-arrays" }
-        read-only: t
-    }
+    { "path" { "byte-array" "byte-arrays" } read-only: t }
 }
 define-builtin
 
 "alien" "alien" create {
-    {
-        "underlying"
-        { "c-ptr" "alien" }
-        read-only: t
-    } {
-        "expired?"
-        { "object" "kernel" }
-        read-only: t
-    }
+    { "underlying" { "c-ptr" "alien" } read-only: t }
+    { "expired?" read-only: t }
 }
 define-builtin
 
 "word" "words" create {
-    {
-        "hashcode"
-        { "fixnum" "math" }
-    }
-    {
-        "name"
-        { "object" "kernel" }
-    }
-    {
-        "vocabulary"
-        { "object" "kernel" }
-    }
-    {
-        "def"
-        { "quotation" "quotations" }
-    }
-    {
-        "props"
-        { "object" "kernel" }
-    }
-    {
-        "compiled"
-        { "object" "kernel" }
-        read-only: t
-    }
-    {
-        "counter"
-        { "fixnum" "math" }
-    }
+    { "hashcode" { "fixnum" "math" } }
+    "name"
+    "vocabulary"
+    { "def" { "quotation" "quotations" } }
+    "props"
+    { "compiled" read-only: t }
+    { "counter" { "fixnum" "math" } }
 } define-builtin
 
 "byte-array" "byte-arrays" create { } define-builtin
@@ -318,31 +271,11 @@ define-builtin
 "callstack" "kernel" create { } define-builtin
 
 "tuple-layout" "classes.tuple.private" create {
-    {
-        "hashcode"
-        { "fixnum" "math" }
-        read-only: t
-    }
-    {
-        "class"
-        { "word" "words" }
-        read-only: t
-    }
-    {
-        "size"
-        { "fixnum" "math" }
-        read-only: t
-    }
-    {
-        "superclasses"
-        { "array" "arrays" }
-        read-only: t
-    }
-    {
-        "echelon"
-        { "fixnum" "math" }
-        read-only: t
-    }
+    { "hashcode" { "fixnum" "math" } read-only: t }
+    { "class" { "word" "words" } read-only: t }
+    { "size" { "fixnum" "math" } read-only: t }
+    { "superclasses" { "array" "arrays" } read-only: t }
+    { "echelon" { "fixnum" "math" } read-only: t }
 } define-builtin
 
 "tuple" "kernel" create {
@@ -350,21 +283,13 @@ define-builtin
     [ { "delegate" } "slot-names" set-word-prop ]
     [ define-tuple-layout ]
     [
-        {
-            {
-                "delegate"
-                { "object" "kernel" }
-            }
-        } prepare-slots
+        { "delegate" }
         [ drop ] [ generate-tuple-slots ] 2bi
         [ "slots" set-word-prop ]
         [ define-accessors ]
         2bi
     ]
 } cleave
-
-"f" "syntax" create [ not ] "predicate" set-word-prop
-"f?" "syntax" vocab-words delete-at
 
 ! Create special tombstone values
 "tombstone" "hashtables.private" create
@@ -383,15 +308,8 @@ tuple
 "curry" "kernel" create
 tuple
 {
-    {
-        "obj"
-        { "object" "kernel" }
-        read-only: t
-    } {
-        "quot"
-        { "object" "kernel" }
-        read-only: t
-    }
+    { "obj" read-only: t }
+    { "quot" read-only: t }
 } prepare-slots define-tuple-class
 
 "curry" "kernel" lookup
@@ -403,15 +321,8 @@ tuple
 "compose" "kernel" create
 tuple
 {
-    {
-        "first"
-        { "object" "kernel" }
-        read-only: t
-    } {
-        "second"
-        { "object" "kernel" }
-        read-only: t
-    }
+    { "first" read-only: t }
+    { "second" read-only: t }
 } prepare-slots define-tuple-class
 
 "compose" "kernel" lookup

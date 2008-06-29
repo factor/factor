@@ -97,7 +97,7 @@ ERROR: no-next-method class generic ;
         [
             2dup next-method
             [ 2nip 1quotation ]
-            [ [ no-next-method ] 2curry ] if* ,
+            [ [ no-next-method ] 2curry [ ] like ] if* ,
         ]
         [ [ inconsistent-next-method ] 2curry , ]
         2tri

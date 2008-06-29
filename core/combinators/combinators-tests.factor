@@ -1,5 +1,6 @@
 USING: alien strings kernel math tools.test io prettyprint
-namespaces combinators words classes sequences ;
+namespaces combinators words classes sequences accessors 
+math.functions ;
 IN: combinators.tests
 
 ! Compiled
@@ -257,11 +258,13 @@ IN: combinators.tests
 
 : do-not-call "do not call" throw ;
 
-: test-case-6
+: test-case-6 ( obj -- value )
     {
         { \ do-not-call [ "do-not-call" ] }
         { 3 [ "three" ] }
     } case ;
+
+\ test-case-6 must-infer
 
 [ "three" ] [ 3 test-case-6 ] unit-test
 [ "do-not-call" ] [ \ do-not-call test-case-6 ] unit-test
@@ -290,9 +293,24 @@ IN: combinators.tests
 ! Interpreted
 [ "a hashtable" ] [ H{ } \ case-test-3 def>> call ] unit-test
 
-[ 1 3 t ] [ { 1 3 2 } contiguous-range? ] unit-test
-[ f ] [ { 1 2 2 4 } contiguous-range? 2nip ] unit-test
-[ f ] [ { + 3 2 } contiguous-range? 2nip ] unit-test
-[ f ] [ { 1 0 7 } contiguous-range? 2nip ] unit-test
-[ f ] [ { 1 1 3 7 } contiguous-range? 2nip ] unit-test
-[ 4 8 t ] [ { 7 6 4 8 5 } contiguous-range? ] unit-test
+[ t ] [ { 1 3 2 } contiguous-range? ] unit-test
+[ f ] [ { 1 2 2 4 } contiguous-range? ] unit-test
+[ f ] [ { + 3 2 } contiguous-range? ] unit-test
+[ f ] [ { 1 0 7 } contiguous-range? ] unit-test
+[ f ] [ { 1 1 3 7 } contiguous-range? ] unit-test
+[ t ] [ { 7 6 4 8 5 } contiguous-range? ] unit-test
+
+: test-case-7 ( obj -- str )
+    {
+        { \ + [ "plus" ] }
+        { \ - [ "minus" ] }
+        { \ * [ "times" ] }
+        { \ / [ "divide" ] }
+        { \ ^ [ "power" ] }
+        { \ [ [ "obama" ] }
+        { \ ] [ "KFC" ] }
+    } case ;
+
+\ test-case-7 must-infer
+
+[ "plus" ] [ \ + test-case-7 ] unit-test

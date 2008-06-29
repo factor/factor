@@ -24,11 +24,14 @@ ERROR: not-a-tuple-class class ;
 : tuple-layout ( class -- layout )
     check-tuple-class "layout" word-prop ;
 
+: layout-of ( tuple -- layout )
+    1 slot { tuple-layout } declare ; inline
+
 : tuple-size ( tuple -- size )
-    1 slot size>> ; inline
+    layout-of size>> ; inline
 
 : prepare-tuple>array ( tuple -- n tuple layout )
-    check-tuple [ tuple-size ] [ ] [ 1 slot ] tri ;
+    check-tuple [ tuple-size ] [ ] [ layout-of ] tri ;
 
 : copy-tuple-slots ( n tuple -- array )
     [ array-nth ] curry map ;
@@ -52,8 +55,7 @@ PRIVATE>
     unclip slots>tuple ;
 
 : slot-names ( class -- seq )
-    "slot-names" word-prop
-    [ dup array? [ second ] when ] map ;
+    "slot-names" word-prop ;
 
 : all-slot-names ( class -- slots )
     superclasses [ slot-names ] map concat \ class prefix ;
@@ -63,43 +65,25 @@ ERROR: bad-superclass class ;
 <PRIVATE
 
 : tuple= ( tuple1 tuple2 -- ? )
-    2dup [ 1 slot ] bi@ eq? [
+    2dup [ layout-of ] bi@ eq? [
         [ drop tuple-size ]
         [ [ [ drop array-nth ] [ nip array-nth ] 3bi = ] 2curry ]
         2bi all-integers?
     ] [
         2drop f
-    ] if ;
+    ] if ; inline
 
-! Predicate generation. We optimize at the expense of simplicity
-
-: (tuple-predicate-quot) ( class -- quot )
-    #! 4 slot == layout-superclasses
-    #! 5 slot == layout-echelon
-    [
-        [ 1 slot dup 5 slot ] %
-        dup tuple-layout echelon>> ,
-        [ fixnum>= ] %
+: tuple-instance? ( object class -- ? )
+    over tuple? [
         [
-            dup tuple-layout echelon>> ,
-            [ swap 4 slot array-nth ] %
-            literalize ,
-            [ eq? ] %
-        ] [ ] make ,
-        [ drop f ] ,
-        \ if ,
-    ] [ ] make ;
-
-: tuple-predicate-quot ( class -- quot )
-    [
-        [ dup tuple? ] %
-        (tuple-predicate-quot) ,
-        [ drop f ] ,
-        \ if ,
-    ] [ ] make ;
+            [ layout-of superclasses>> ]
+            [ tuple-layout echelon>> ] bi*
+            swap ?nth
+        ] keep eq?
+    ] [ 2drop f ] if ; inline
 
 : define-tuple-predicate ( class -- )
-    dup tuple-predicate-quot define-predicate ;
+    dup [ tuple-instance? ] curry define-predicate ;
 
 : superclass-size ( class -- n )
     superclasses but-last-slice
@@ -224,6 +208,9 @@ M: tuple-class reset-class
     ] bi ;
 
 M: tuple-class rank-class drop 0 ;
+
+M: tuple-class instance?
+    tuple-instance? ;
 
 M: tuple clone
     (clone) dup delegate clone over set-delegate ;

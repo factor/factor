@@ -35,7 +35,7 @@ M: growable set-length ( n seq -- )
     ] [
         2dup capacity > [ 2dup expand ] when
     ] if
-    swap >fixnum >>length drop ;
+    (>>length) ;
 
 : new-size ( old -- new ) 1+ 3 * ; inline
 
@@ -44,7 +44,7 @@ M: growable set-length ( n seq -- )
     2dup length >= [
         2dup capacity >= [ over new-size over expand ] when
         >r >fixnum r>
-        2dup swap 1 fixnum+fast >>length drop
+        over 1 fixnum+fast over (>>length)
     ] [
         >r >fixnum r>
     ] if ; inline
@@ -56,7 +56,7 @@ M: growable clone (clone) [ clone ] change-underlying ;
 M: growable lengthen ( n seq -- )
     2dup length > [
         2dup capacity > [ over new-size over expand ] when
-        2dup swap >fixnum >>length drop
+        2dup (>>length)
     ] when 2drop ;
 
 INSTANCE: growable sequence

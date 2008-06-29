@@ -11,9 +11,6 @@ PREDICATE: simple-alien < alien underlying>> not ;
 UNION: simple-c-ptr
 simple-alien POSTPONE: f byte-array bit-array float-array ;
 
-UNION: c-ptr
-alien POSTPONE: f byte-array bit-array float-array ;
-
 DEFER: pinned-c-ptr?
 
 PREDICATE: pinned-alien < alien underlying>> pinned-c-ptr? ;

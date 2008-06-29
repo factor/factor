@@ -51,6 +51,14 @@ must-fail-with
 [ error>> unexpected-eof? ]
 must-fail-with
 
+[ "IN: classes.tuple.parser.tests USE: alien TUPLE: foo { \"slot\" alien } ;" eval ]
+[ error>> no-initial-value? ]
+must-fail-with
+
+[ "IN: classes.tuple.parser.tests USE: arrays TUPLE: foo { \"slot\" array initial: 5 } ;" eval ]
+[ error>> bad-initial-value? ]
+must-fail-with
+
 [ ] [
     [
         { test-1 test-2 test-3 test-4 test-5 test-6 test-7 test-8 }

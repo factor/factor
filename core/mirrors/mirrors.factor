@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables kernel sequences generic words
 arrays classes slots slots.private classes.tuple math vectors
-quotations accessors ;
+quotations accessors combinators ;
 IN: mirrors
 
 : all-slots ( class -- slots )
@@ -16,27 +16,29 @@ TUPLE: mirror object slots ;
 : <mirror> ( object -- mirror )
     dup object-slots mirror boa ;
 
-ERROR: no-such-slot object name ;
-
-ERROR: immutable-slot object name ;
-
 M: mirror at*
     [ nip object>> ] [ slots>> slot-named ] 2bi
     dup [ offset>> slot t ] [ 2drop f f ] if ;
 
+: check-set-slot ( val slot -- val offset )
+    {
+        { [ dup not ] [ "No such slot" throw ] }
+        { [ dup read-only>> ] [ "Read only slot" throw ] }
+        { [ 2dup class>> instance? not ] [ "Bad store to specialized slot" throw ] }
+        [ offset>> ]
+    } cond ; inline
+
 M: mirror set-at ( val key mirror -- )
-    [ nip object>> ] [ drop ] [ slots>> slot-named ] 2tri dup [
-        dup read-only>> [
-            drop immutable-slot
-        ] [
-            nip offset>> set-slot
-        ] if
-    ] [
-        drop no-such-slot
-    ] if ;
+    [ slots>> slot-named check-set-slot ] [ object>> ] bi
+    swap set-slot ;
 
 M: mirror delete-at ( key mirror -- )
     f -rot set-at ;
+
+M: mirror clear-assoc ( mirror -- )
+    [ object>> ] [ slots>> ] bi [
+        [ initial>> ] [ offset>> ] bi swapd set-slot
+    ] with each ;
 
 M: mirror >alist ( mirror -- alist )
     [ slots>> [ name>> ] map ]

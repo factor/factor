@@ -57,13 +57,6 @@ INSTANCE: immutable-sequence sequence
 
 <PRIVATE
 
-: max-array-capacity ( -- n )
-    #! A bit of a pain; can't call cell-bits here
-    7 getenv 8 * 5 - 2^ 1- ; foldable
-
-PREDICATE: array-capacity < fixnum
-    0 max-array-capacity between? ;
-
 : array-capacity ( array -- n )
     1 slot { array-capacity } declare ; inline
 

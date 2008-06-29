@@ -42,7 +42,11 @@ nl
     wrap probe
 
     namestack*
+} compile-uncompiled
 
+"." write flush
+
+{
     bitand bitor bitxor bitnot
 } compile-uncompiled
 

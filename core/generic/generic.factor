@@ -30,8 +30,8 @@ PREDICATE: method-spec < pair
 : order ( generic -- seq )
     "methods" word-prop keys sort-classes ;
 
-: specific-method ( class word -- class )
-    order min-class ;
+: specific-method ( class generic -- method/f )
+    tuck order min-class dup [ swap method ] [ 2drop f ] if ;
 
 GENERIC: effective-method ( ... generic -- method )
 
@@ -42,7 +42,7 @@ GENERIC: effective-method ( ... generic -- method )
 : next-method ( class generic -- class/f )
     [ next-method-class ] keep method ;
 
-GENERIC: next-method-quot* ( class generic -- quot )
+GENERIC: next-method-quot* ( class generic combination -- quot )
 
 : next-method-quot ( class generic -- quot )
     dup "combination" word-prop next-method-quot* ;

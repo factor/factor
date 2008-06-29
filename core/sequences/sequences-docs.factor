@@ -1,5 +1,6 @@
 USING: arrays bit-arrays help.markup help.syntax math
-sequences.private vectors strings sbufs kernel math.order ;
+sequences.private vectors strings sbufs kernel math.order
+layouts ;
 IN: sequences
 
 ARTICLE: "sequences-unsafe" "Unsafe sequence operations"
@@ -413,6 +414,7 @@ HELP: first4
 
 HELP: array-capacity
 { $values { "array" "an array" } { "n" "a non-negative fixnum" } }
+{ $class-description "A predicate class whose instances are valid array sizes for the current architecture. The minimum value is zero and the maximum value is " { $link max-array-capacity } "." }
 { $description "Low-level array length accessor." }
 { $warning "This word is in the " { $vocab-link "sequences.private" } " vocabulary because it is unsafe. It does not check types, so improper use can corrupt memory." } ;
 

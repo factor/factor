@@ -5,7 +5,7 @@ sequences words inference.class quotations alien
 alien.c-types strings sbufs sequences.private
 slots.private combinators definitions compiler.units
 system layouts vectors optimizer.math.partial accessors
-optimizer.inlining math.order ;
+optimizer.inlining math.order hashtables classes ;
 
 [ t ] [ T{ literal-constraint f 1 2 } T{ literal-constraint f 1 2 } equal? ] unit-test
 
@@ -565,6 +565,25 @@ M: integer detect-integer ;
 [ t ] [
     [ { integer } declare bitnot detect-integer ]
     \ detect-integer inlined?
+] unit-test
+
+[ t ] [
+    [ hashtable new ] \ new inlined?
+] unit-test
+
+[ t ] [
+    [ dup hashtable eq? [ new ] when ] \ new inlined?
+] unit-test
+
+[ t ] [
+    [ hashtable instance? ] \ instance? inlined?
+] unit-test
+
+TUPLE: declared-fixnum { "x" fixnum } ;
+
+[ t ] [
+    [ { declared-fixnum } declare [ 1 + ] change-x ]
+    { + fixnum+ >fixnum } inlined?
 ] unit-test
 
 ! Later

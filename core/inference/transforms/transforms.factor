@@ -92,25 +92,6 @@ M: duplicated-slots-error summary
     ] if
 ] 1 define-transform
 
-\ new [
-    1 ensure-values
-    peek-d value? [
-        pop-literal dup tuple-class? [
-            dup +inlined+ depends-on
-            tuple-layout [ <tuple> ] curry
-            swap infer-quot
-        ] [
-            \ not-a-tuple-class boa time-bomb drop
-        ] if
-    ] [
-        \ new (( class -- tuple )) make-call-node
-    ] if
-] "infer" set-word-prop
-
-\ instance? [
-    [ +inlined+ depends-on ] [ "predicate" word-prop ] bi
-] 1 define-transform
-
 \ (call-next-method) [
     [ [ +inlined+ depends-on ] bi@ ] [ next-method-quot ] 2bi
 ] 2 define-transform

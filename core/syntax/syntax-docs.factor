@@ -583,10 +583,7 @@ HELP: read-only:
 HELP: SLOT:
 { $syntax "SLOT: name" }
 { $values { "name" "a slot name" } }
-{ $description "Defines a protocol slot; that is, defines the accessor words for a slot named " { $snippet "slot" } " without associating it with any specific tuple." }
-{ $notes
-    "Protocol slots are used where the implementation of a superclass needs to assume that each subclass defines certain slots, however the slots of each subclass are potentially declared with different class specializers, thus preventing the slots from being defined in the superclass."
-} ;
+{ $description "Defines a protocol slot; that is, defines the accessor words for a slot named " { $snippet "slot" } " without associating it with any specific tuple." } ;
 
 HELP: ERROR:
 { $syntax "ERROR: class slots... ;" }

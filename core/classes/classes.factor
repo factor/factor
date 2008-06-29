@@ -175,9 +175,8 @@ GENERIC: update-methods ( class seq -- )
     ] each ;
 
 M: class forget* ( class -- )
-    [ forget-class ] [ call-next-method ] bi ;
+    [ call-next-method ] [ forget-class ] bi ;
 
 GENERIC: class ( object -- class )
 
-: instance? ( obj class -- ? )
-    "predicate" word-prop call ;
+GENERIC: instance? ( object class -- ? )

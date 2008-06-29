@@ -1,9 +1,9 @@
-USING: arrays compiler.units generic hashtables inference kernel
-kernel.private math optimizer generator prettyprint sequences
-sbufs strings tools.test vectors words sequences.private
-quotations optimizer.backend classes classes.algebra
-inference.dataflow classes.tuple.private continuations growable
-optimizer.inlining namespaces hints ;
+USING: accessors arrays compiler.units generic hashtables
+inference kernel kernel.private math optimizer generator
+prettyprint sequences sbufs strings tools.test vectors words
+sequences.private quotations optimizer.backend classes
+classes.algebra inference.dataflow classes.tuple.private
+continuations growable optimizer.inlining namespaces hints ;
 IN: optimizer.tests
 
 [ H{ { 1 5 } { 3 4 } { 2 5 } } ] [
@@ -140,7 +140,11 @@ M: reversed foozul ;
 M: integer foozul ;
 M: slice foozul ;
 
-[ reversed ] [ reversed \ foozul specific-method ] unit-test
+[ t ] [
+    reversed \ foozul specific-method
+    reversed \ foozul method
+    eq?
+] unit-test
 
 ! regression
 : constant-fold-2 f ; foldable
@@ -253,16 +257,6 @@ TUPLE: silly-tuple a b ;
 
 [ ] [ [ <tuple> ] dataflow optimize drop ] unit-test
 
-! Make sure we have sane heuristics
-: should-inline? ( generic class -- ? ) method flat-length 10 <= ;
-
-[ t ] [ \ fixnum \ shift should-inline? ] unit-test
-[ f ] [ \ array \ equal? should-inline? ] unit-test
-[ f ] [ \ sequence \ hashcode* should-inline? ] unit-test
-[ t ] [ \ array \ nth-unsafe should-inline? ] unit-test
-[ t ] [ \ growable \ nth-unsafe should-inline? ] unit-test
-[ t ] [ \ sbuf \ set-nth-unsafe should-inline? ] unit-test
-
 ! Regression
 : lift-throw-tail-regression ( obj -- obj str )
     dup integer? [ "an integer" ] [
@@ -356,3 +350,16 @@ USE: sequences.private
 [ ] [ \ member-test word-dataflow optimize 2drop ] unit-test
 [ t ] [ \ + member-test ] unit-test
 [ f ] [ \ append member-test ] unit-test
+
+! Infinite expansion
+TUPLE: cons car cdr ;
+
+UNION: improper-list cons POSTPONE: f ;
+
+PREDICATE: list < improper-list
+    [ cdr>> list instance? ] [ t ] if* ;
+
+[ t ] [
+    T{ cons f 1 T{ cons f 2 T{ cons f 3 f } } }
+    [ list instance? ] compile-call
+] unit-test

@@ -274,7 +274,7 @@ M: tuple-class see-class*
     dup superclass tuple eq? [
         "<" text dup superclass pprint-word
     ] unless
-    slot-names [ text ] each
+    slot-names [ dup string? [ text ] [ pprint* ] if ] each
     pprint-; block> ;
 
 M: word see-class* drop ;

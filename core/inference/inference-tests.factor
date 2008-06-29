@@ -396,6 +396,8 @@ DEFER: bar
 \ define-tuple-class must-infer
 \ define-union-class must-infer
 \ define-predicate-class must-infer
+\ instance? must-infer
+\ next-method-quot must-infer
 
 ! Test words with continuations
 { 0 0 } [ [ drop ] callcc0 ] must-infer-as
