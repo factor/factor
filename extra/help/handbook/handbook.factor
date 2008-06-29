@@ -3,7 +3,8 @@ namespaces words sequences classes assocs vocabs kernel arrays
 prettyprint.backend kernel.private io generic math system
 strings sbufs vectors byte-arrays bit-arrays float-arrays
 quotations io.streams.byte-array io.encodings.string
-classes.builtin parser lexer ;
+classes.builtin parser lexer classes.predicate classes.union
+classes.intersection classes.singleton classes.tuple ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
@@ -250,7 +251,18 @@ ARTICLE: "type-index" "Type index"
 { $index [ builtins get sift ] } ;
 
 ARTICLE: "class-index" "Class index"
-{ $index [ classes ] } ;
+{ $heading "Built-in classes" }
+{ $index [ classes [ builtin-class? ] filter ] }
+{ $heading "Tuple classes" }
+{ $index [ classes [ tuple-class? ] filter ] }
+{ $heading "Singleton classes" }
+{ $index [ classes [ singleton-class? ] filter ] }
+{ $heading "Union classes" }
+{ $index [ classes [ union-class? ] filter ] }
+{ $heading "Intersection classes" }
+{ $index [ classes [ intersection-class? ] filter ] }
+{ $heading "Predicate classes" }
+{ $index [ classes [ predicate-class? ] filter ] } ;
 
 ARTICLE: "program-org" "Program organization"
 { $subsection "definitions" }
