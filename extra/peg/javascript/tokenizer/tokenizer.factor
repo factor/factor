@@ -57,8 +57,9 @@ StringChars3       = (EscapeChar | !("'") .)* => [[ >string ]]
 Str                =   '"""' StringChars1:cs '"""' => [[ cs ast-string boa ]]
                      | '"' StringChars2:cs '"' => [[ cs ast-string boa ]]
                      | "'" StringChars3:cs "'" => [[ cs ast-string boa ]]
+RegExpFlags        = NameRest*
 RegExpBody         = (!("/" | "\n" | "\r") .)* => [[ >string ]]
-RegExp             = "/" RegExpBody:r "/" => [[ r ast-regexp boa ]]
+RegExp             = "/" RegExpBody:b "/" RegExpFlags:fl => [[ b fl ast-regexp boa ]]
 Special            =   "("   | ")"   | "{"   | "}"   | "["   | "]"   | ","   | ";"
                      | "?"   | ":"   | "!==" | "!="  | "===" | "=="  | "="   | ">="
                      | ">"   | "<="  | "<"   | "++"  | "+="  | "+"   | "--"  | "-="

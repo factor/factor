@@ -26,9 +26,9 @@ End               = !(.)
 Space             = " " | "\t" | "\n" 
 Spaces            = Space* => [[ ignore ]]
 Name               = . ?[ ast-name?   ]?   => [[ value>> ]] 
-Number             = . ?[ ast-number? ]?   => [[ value>> ]]
-String             = . ?[ ast-string? ]?   => [[ value>> ]]
-RegExp             = . ?[ ast-regexp? ]?   => [[ value>> ]]
+Number             = . ?[ ast-number? ]?
+String             = . ?[ ast-string? ]?
+RegExp             = . ?[ ast-regexp? ]?   
 SpacesNoNl         = (!(nl) Space)* => [[ ignore ]]
 
 Expr               =   OrExpr:e "?" Expr:t ":" Expr:f   => [[ e t f ast-cond-expr boa ]]
@@ -85,9 +85,9 @@ PrimExpr           =   PrimExpr:p "[" Expr:i "]"             => [[ i p ast-getp 
 PrimExprHd         =   "(" Expr:e ")"                        => [[ e ]]
                      | "this"                                => [[ ast-this boa ]]
                      | Name                                  => [[ ast-get boa ]]
-                     | Number                                => [[ ast-number boa ]]
-                     | String                                => [[ ast-string boa ]]
-                     | RegExp                                => [[ ast-regexp boa ]]
+                     | Number
+                     | String
+                     | RegExp
                      | "function" FuncRest:fr                => [[ fr ]]
                      | "new" PrimExpr:n "(" Args:as ")"      => [[ n as ast-new boa ]]
                      | "new" PrimExpr:n                      => [[ n f  ast-new boa ]]

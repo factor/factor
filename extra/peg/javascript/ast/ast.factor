@@ -7,7 +7,7 @@ TUPLE: ast-keyword value ;
 TUPLE: ast-name value ;
 TUPLE: ast-number value ;
 TUPLE: ast-string value ;
-TUPLE: ast-regexp value ;
+TUPLE: ast-regexp body flags ;
 TUPLE: ast-cond-expr condition then else ;
 TUPLE: ast-set lhs rhs ;
 TUPLE: ast-get value ;
