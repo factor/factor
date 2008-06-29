@@ -105,7 +105,7 @@ Binding            =   Name:n "=" Expr:v                      => [[ n v ast-var 
                      | Name:n                                 => [[ n "undefined" ast-get boa ast-var boa ]]
 Block              = "{" SrcElems:ss "}"                      => [[ ss ]]
 Bindings           = (Binding ("," Binding => [[ second ]])* => [[ first2 swap prefix ]])?
-For1               =   "var" Binding => [[ second ]] 
+For1               =   "var" Bindings => [[ second ]] 
                      | Expr 
                      | Spaces => [[ "undefined" ast-get boa ]] 
 For2               =   Expr
