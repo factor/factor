@@ -110,7 +110,7 @@ M: output-port stream-write1
 M: output-port stream-write
     dup check-disposed
     over length over buffer>> buffer-size > [
-        [ buffer>> buffer-size <groups> ]
+        [ buffer>> size>> <groups> ]
         [ [ stream-write ] curry ] bi
         each
     ] [

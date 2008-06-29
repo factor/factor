@@ -6,7 +6,12 @@ alien.syntax kernel libc math sequences byte-arrays strings
 hints accessors math.order destructors combinators ;
 IN: io.buffers
 
-TUPLE: buffer size ptr fill pos disposed ;
+TUPLE: buffer
+{ "size" fixnum }
+{ "ptr" simple-alien }
+{ "fill" fixnum }
+{ "pos" fixnum }
+disposed ;
 
 : <buffer> ( n -- buffer )
     dup malloc 0 0 f buffer boa ;
@@ -48,35 +53,25 @@ HINTS: buffer-pop buffer ;
 
 HINTS: buffer-read fixnum buffer ;
 
-: extend-buffer ( n buffer -- )
-    2dup ptr>> swap realloc >>ptr swap >>size drop ;
-    inline
-
-: check-overflow ( n buffer -- )
-    2dup buffer-capacity > [ extend-buffer ] [ 2drop ] if ;
-    inline
-
 : buffer-end ( buffer -- alien )
     [ fill>> ] [ ptr>> ] bi <displaced-alien> ; inline
 
 : n>buffer ( n buffer -- )
-    [ + ] change-fill
-    [ fill>> ] [ size>> ] bi >
-    [ "Buffer overflow" throw ] when ; inline
+    [ + ] change-fill drop ; inline
+
+HINTS: n>buffer fixnum buffer ;
 
 : >buffer ( byte-array buffer -- )
-    [ [ length ] dip check-overflow ]
     [ buffer-end byte-array>memory ]
     [ [ length ] dip n>buffer ]
-    2tri ;
+    2bi ;
 
 HINTS: >buffer byte-array buffer ;
 
 : byte>buffer ( byte buffer -- )
-    [ 1 swap check-overflow ]
     [ [ ptr>> ] [ fill>> ] bi set-alien-unsigned-1 ]
     [ 1 swap n>buffer ]
-    tri ;
+    bi ;
 
 HINTS: byte>buffer fixnum buffer ;
 
