@@ -321,10 +321,6 @@ M: encode-error summary drop "Character encoding error" ;
 
 M: decode-error summary drop "Character decoding error" ;
 
-M: no-such-slot summary drop "No such slot" ;
-
-M: read-only-slot summary drop "Slot is declared read-only" ;
-
 M: bad-create summary drop "Bad parameters to create" ;
 
 M: attempt-all-error summary drop "Nothing to attempt" ;
