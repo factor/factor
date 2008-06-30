@@ -81,8 +81,9 @@ M: mixin-instance hashcode*
     [ class>> ] [ mixin>> ] bi 2array hashcode* ;
 
 : <mixin-instance> ( class mixin -- definition )
-    { set-mixin-instance-class set-mixin-instance-mixin }
-    mixin-instance construct ;
+    mixin-instance new
+        swap >>mixin
+        swap >>class ;
 
 M: mixin-instance where mixin-instance-loc ;
 

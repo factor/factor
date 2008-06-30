@@ -39,9 +39,9 @@ uses definitions ;
     new-definitions get swap set-source-file-definitions ;
 
 : <source-file> ( path -- source-file )
-    <definitions>
-    { set-source-file-path set-source-file-definitions }
-    \ source-file construct ;
+    \ source-file new
+        swap >>path
+        <definitions> >>definitions ;
 
 : source-file ( path -- source-file )
     dup string? [ "Invalid source file path" throw ] unless

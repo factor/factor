@@ -195,7 +195,9 @@ INSTANCE: constant value
     #! temp then temp to the destination.
     temp-reg over %move
     operand-class temp-reg
-    { set-operand-class set-tagged-vreg } tagged construct
+    tagged new
+        swap >>vreg
+        swap >>class
     %move ;
 
 : %move ( dst src -- )

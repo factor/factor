@@ -11,14 +11,5 @@ TUPLE: color red green blue ;
     [ { color-red color-blue } get-slots ] compile-call
 ] unit-test
 
-[ T{ color f 10 2 20 } ] [
-    10 20
-    1 2 3 color boa [
-        [
-            { set-color-red set-color-blue } set-slots
-        ] compile-call
-    ] keep
-] unit-test
-
 [ T{ color f f f f } ]
 [ [ color new ] compile-call ] unit-test
