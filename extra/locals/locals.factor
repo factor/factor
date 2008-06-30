@@ -365,7 +365,7 @@ M: lambda-word definition
     "lambda" word-prop body>> ;
 
 M: lambda-word reset-word
-    [ f "lambda" set-word-prop ] [ call-next-method ] bi ;
+    [ call-next-method ] [ f "lambda" set-word-prop ] bi ;
 
 INTERSECTION: lambda-macro macro lambda-word ;
 

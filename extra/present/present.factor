@@ -1,5 +1,7 @@
-USING: math math.parser calendar calendar.format strings words
-kernel effects ;
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors math math.parser calendar calendar.format
+strings words kernel effects ;
 IN: present
 
 GENERIC: present ( object -- string )

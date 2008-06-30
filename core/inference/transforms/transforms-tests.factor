@@ -51,4 +51,4 @@ C: <color> color
 
 [ bad-new-test ] must-infer
 
-[ bad-new-test ] [ T{ not-a-tuple-class f V{ } } = ] must-fail-with
+[ bad-new-test ] must-fail

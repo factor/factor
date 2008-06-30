@@ -1,4 +1,4 @@
-USING: arrays generic inference inference.backend
+USING: accessors arrays generic inference inference.backend
 inference.dataflow kernel classes kernel.private math
 math.parser math.private namespaces namespaces.private parser
 sequences strings vectors words quotations effects tools.test

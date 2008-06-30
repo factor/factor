@@ -83,12 +83,14 @@ IN: cpu.x86.intrinsics
     {
         [ %slot-literal-known-tag "val" operand MOV generate-write-barrier ] H{
             { +input+ { { f "val" } { f "obj" known-tag } { [ small-slot? ] "n" } } }
+            { +clobber+ { "obj" } }
         }
     }
     ! Slot number is literal
     {
         [ %slot-literal-any-tag "val" operand MOV generate-write-barrier ] H{
             { +input+ { { f "val" } { f "obj" } { [ small-slot? ] "n" } } }
+            { +clobber+ { "obj" } }
         }
     }
     ! Slot number in a register

@@ -1,4 +1,4 @@
-USING: arrays compiler.units kernel kernel.private math
+USING: accessors arrays compiler.units kernel kernel.private math
 math.constants math.private sequences strings tools.test words
 continuations sequences.private hashtables.private byte-arrays
 strings.private system random layouts vectors.private

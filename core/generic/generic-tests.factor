@@ -1,4 +1,4 @@
-USING: alien arrays definitions generic generic.standard
+USING: accessors alien arrays definitions generic generic.standard
 generic.math assocs hashtables io kernel math namespaces parser
 prettyprint sequences strings tools.test vectors words
 quotations classes classes.algebra continuations layouts

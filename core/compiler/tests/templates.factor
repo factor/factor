@@ -1,5 +1,5 @@
 ! Black box testing of templating optimization
-USING: arrays compiler kernel kernel.private math
+USING: accessors arrays compiler kernel kernel.private math
 hashtables.private math.private namespaces sequences
 sequences.private tools.test namespaces.private slots.private
 sequences.private byte-arrays alien alien.accessors layouts
@@ -138,7 +138,7 @@ unit-test
     0 swap hellish-bug-2 drop ;
 
 [ ] [
-    H{ { 1 2 } { 3 4 } } dup hash-array
+    H{ { 1 2 } { 3 4 } } dup array>>
     [ 0 swap hellish-bug-2 drop ] compile-call
 ] unit-test
 
