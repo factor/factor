@@ -1,7 +1,8 @@
 IN: io.files.tests
 USING: tools.test io.files io.files.private io threads kernel
 continuations io.encodings.ascii io.files.unique sequences
-strings accessors io.encodings.utf8 math destructors ;
+strings accessors io.encodings.utf8 math destructors
+namespaces ;
 
 \ exists? must-infer
 \ (exists?) must-infer
@@ -276,3 +277,12 @@ strings accessors io.encodings.utf8 math destructors ;
 
 [ "touch-twice-test" temp-file delete-file ] ignore-errors
 [ ] [ 2 [ "touch-twice-test" temp-file touch-file ] times ] unit-test
+
+! aum's bug
+[
+    "." current-directory set
+    ".." "resource-path" set
+    [ "../core/bootstrap/stage2.factor" ]
+    [ "resource:core/bootstrap/stage2.factor" (normalize-path) ]
+    unit-test
+] with-scope

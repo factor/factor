@@ -46,7 +46,7 @@ IN: io.windows.nt.launcher
     path normalize-path
     access-mode
     share-mode
-    security-attributes-inherit
+    default-security-attributes
     create-mode
     FILE_ATTRIBUTE_NORMAL ! flags and attributes
     f ! template file
@@ -58,11 +58,8 @@ IN: io.windows.nt.launcher
     redirect-file
     dup 0 FILE_END set-file-pointer ;
 
-: set-inherit ( handle ? -- )
-    >r HANDLE_FLAG_INHERIT r> >BOOLEAN SetHandleInformation win32-error=0/f ;
-
 : redirect-handle ( handle access-mode create-mode -- handle )
-    2drop handle>> duplicate-handle dup t set-inherit ;
+    2drop handle>> duplicate-handle ;
 
 : redirect-stream ( stream access-mode create-mode -- handle )
     >r >r underlying-handle handle>> r> r> redirect-handle ;
@@ -75,7 +72,8 @@ IN: io.windows.nt.launcher
         { [ pick appender? ] [ redirect-append ] }
         { [ pick win32-file? ] [ redirect-handle ] }
         [ redirect-stream ]
-    } cond ;
+    } cond
+    dup [ dup t set-inherit ] when ;
 
 : redirect-stdout ( process args -- handle )
     drop

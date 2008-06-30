@@ -62,3 +62,38 @@ namespaces continuations layouts accessors ;
         2array try-process
     ] curry unit-test
 ] each
+
+USING: http.client furnace.actions http.server http.server.dispatchers
+http.server.responses http.server.static io.servers.connection ;
+
+: add-quit-action
+    <action>
+        [ stop-server "Goodbye" "text/html" <content> ] >>display
+    "quit" add-responder ;
+
+: test-httpd ( -- )
+    #! Return as soon as server is running.
+    <http-server>
+        1237 >>insecure
+        f >>secure
+    start-server* ;
+
+[ ] [
+    [
+        <dispatcher>
+            add-quit-action
+            "resource:extra/http/test" <static> >>default
+        main-responder set
+
+        test-httpd
+    ] with-scope
+] unit-test
+
+[ ] [
+    "tools.deploy.test.5" shake-and-bake
+    vm
+    "-i=" "test.image" temp-file append
+    2array try-process
+] unit-test
+
+[ ] [ "http://localhost:1237/quit" http-get 2drop ] unit-test

@@ -81,7 +81,7 @@ PRIVATE>
         [ encoding-file parse-file 8-bit boa ]
         bi*
     ] assoc-map
+    [ keys [ define-symbol ] each ]
     [ 8-bit-encodings set-global ]
-    [ [ [ ] curry define ] assoc-each ]
     bi
 ] with-compilation-unit

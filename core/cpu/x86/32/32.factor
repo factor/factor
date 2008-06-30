@@ -5,7 +5,7 @@ cpu.x86.architecture cpu.x86.intrinsics cpu.x86.allot
 cpu.architecture kernel kernel.private math namespaces sequences
 generator.registers generator.fixup generator system layouts
 alien.compiler combinators command-line
-compiler compiler.units io vocabs.loader accessors ;
+compiler compiler.units io vocabs.loader accessors init ;
 IN: cpu.x86.32
 
 ! We implement the FFI for Linux, OS X and Windows all at once.
@@ -262,9 +262,11 @@ os windows? [
     4 "double" c-type set-c-type-align
 ] unless
 
-: sse2? ( -- ? ) "Intrinsic" throw ;
+: (sse2?) ( -- ? ) "Intrinsic" throw ;
 
-\ sse2? [
+<<
+
+\ (sse2?) [
     { EAX EBX ECX EDX } [ PUSH ] each
     EAX 1 MOV
     CPUID
@@ -274,6 +276,10 @@ os windows? [
     JE
 ] { } define-if-intrinsic
 
+>>
+
+: sse2? ( -- ? ) (sse2?) ;
+
 "-no-sse2" cli-args member? [
     "Checking if your CPU supports SSE2..." print flush
     [ optimized-recompile-hook ] recompile-hook [
@@ -282,6 +288,14 @@ os windows? [
     [
         " - yes" print
         "cpu.x86.sse2" require
+        [
+            sse2? [
+                "This image was built to use SSE2, which your CPU does not support." print
+                "You will need to bootstrap Factor again." print
+                flush
+                1 exit
+            ] unless
+        ] "cpu.x86" add-init-hook
     ] [
         " - no" print
     ] if

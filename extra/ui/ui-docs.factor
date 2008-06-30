@@ -89,8 +89,8 @@ ARTICLE: "building-ui" "Building user interfaces"
 { $subsection "ui-geometry" }
 { $subsection "ui-layouts" }
 { $subsection "gadgets" }
-{ $subsection "models" }
-{ $subsection "ui-windows" } ;
+{ $subsection "ui-windows" }
+{ $see-also "models" } ;
 
 ARTICLE: "gadgets" "Pre-made UI gadgets"
 { $subsection "ui.gadgets.labels" }

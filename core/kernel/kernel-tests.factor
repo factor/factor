@@ -117,3 +117,8 @@ IN: kernel.tests
 : total-failure-2 [ ] (call) unimplemented ;
 
 [ total-failure-2 ] must-fail
+
+! From combinators.lib
+[ 1 1 2 2 3 3 ] [ 1 2 3 [ dup ] tri@ ] unit-test
+[ 1 4 9 ] [ 1 2 3 [ sq ] tri@ ] unit-test
+[ [ sq ] tri@ ] must-infer

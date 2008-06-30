@@ -168,7 +168,7 @@ IN: bootstrap.syntax
 
     "C:" [
         CREATE-WORD
-        scan-word dup check-tuple
+        scan-word check-tuple-class
         [ boa ] curry define-inline
     ] define-syntax
 

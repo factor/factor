@@ -53,7 +53,7 @@ TUPLE: entry title url description date ;
     swap {
         [ "title" tag-named children>string >>title ]
         [ { "link" "guid" } any-tag-named children>string >url >>url ]
-        [ "description" tag-named children>string >>description ]
+        [ { "description" "encoded" } any-tag-named children>string >>description ]
         [
             { "date" "pubDate" } any-tag-named
             children>string try-parsing-timestamp >>date

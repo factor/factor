@@ -83,12 +83,15 @@ M: linux-monitor dispose* ( monitor -- )
         drop
     ] { } make prune ;
 
+: parse-event-name ( event -- name )
+    dup inotify-event-len zero?
+    [ drop "" ] [ inotify-event-name utf8 alien>string ] if ;
+
 : parse-file-notify ( buffer -- path changed )
     dup inotify-event-mask ignore-flags? [
         drop f f
     ] [
-        [ inotify-event-name utf8 alien>string ]
-        [ inotify-event-mask parse-action ] bi
+        [ parse-event-name ] [ inotify-event-mask parse-action ] bi
     ] if ;
 
 : events-exhausted? ( i buffer -- ? )

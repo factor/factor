@@ -121,6 +121,7 @@ PRIVATE>
     {
         { [ over empty? ] [ append-path-empty ] }
         { [ dup empty? ] [ drop ] }
+        { [ over right-trim-separators "." = ] [ nip ] }
         { [ dup absolute-path? ] [ nip ] }
         { [ dup head.? ] [ rest left-trim-separators append-path ] }
         { [ dup head..? ] [

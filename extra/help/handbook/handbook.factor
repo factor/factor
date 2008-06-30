@@ -88,6 +88,7 @@ $nl
 $nl
 "The basic building blocks:"
 { $subsection "threads" }
+{ $subsection "alarms" }
 "High-level abstractions:"
 { $subsection "concurrency.combinators" }
 { $subsection "concurrency.promises" }
@@ -274,6 +275,7 @@ ARTICLE: "handbook" "Factor documentation"
 { $heading "Library reference" }
 { $subsection "numbers" }
 { $subsection "collections" }
+{ $subsection "models" }
 { $subsection "io" }
 { $subsection "concurrency" }
 { $subsection "system" }
@@ -288,8 +290,8 @@ ARTICLE: "handbook" "Factor documentation"
 { $subsection "compiler" }
 { $subsection "layouts" }
 { $heading "User interface" }
-{ $about "ui" }
-{ $about "ui.tools" }
+{ $subsection "ui" }
+{ $subsection "ui-tools" }
 { $heading "Index" }
 { $subsection "primitive-index" }
 { $subsection "error-index" }

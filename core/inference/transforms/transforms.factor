@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel words sequences generic math namespaces
 quotations assocs combinators math.bitfields inference.backend
-inference.dataflow inference.state classes.tuple.private effects
-inspector hashtables classes generic sets definitions ;
+inference.dataflow inference.state classes.tuple
+classes.tuple.private effects inspector hashtables classes
+generic sets definitions ;
 IN: inference.transforms
 
 : pop-literals ( n -- rstate seq )
@@ -83,19 +84,26 @@ M: duplicated-slots-error summary
 ] 1 define-transform
 
 \ boa [
-    dup +inlined+ depends-on
-    tuple-layout [ <tuple-boa> ] curry
+    dup tuple-class? [
+        dup +inlined+ depends-on
+        tuple-layout [ <tuple-boa> ] curry
+    ] [
+        [ not-a-tuple-class ] curry time-bomb
+    ] if
 ] 1 define-transform
 
 \ new [
     1 ensure-values
     peek-d value? [
-        pop-literal
-        dup +inlined+ depends-on
-        tuple-layout [ <tuple> ] curry
-        swap infer-quot
+        pop-literal dup tuple-class? [
+            dup +inlined+ depends-on
+            tuple-layout [ <tuple> ] curry
+            swap infer-quot
+        ] [
+            \ not-a-tuple-class boa time-bomb drop
+        ] if
     ] [
-        \ new 1 1 <effect> make-call-node
+        \ new (( class -- tuple )) make-call-node
     ] if
 ] "infer" set-word-prop
 

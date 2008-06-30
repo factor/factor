@@ -31,11 +31,11 @@ IN: project-euler.032
 
 : 1and4 ( n -- ? )
     number>string 1 cut-slice 4 cut-slice
-    [ string>number ] 3apply [ * ] dip = ;
+    [ string>number ] tri@ [ * ] dip = ;
 
 : 2and3 ( n -- ? )
     number>string 2 cut-slice 3 cut-slice
-    [ string>number ] 3apply [ * ] dip = ;
+    [ string>number ] tri@ [ * ] dip = ;
 
 : valid? ( n -- ? )
     dup 1and4 swap 2and3 or ;
@@ -65,7 +65,7 @@ PRIVATE>
 
 ! multiplicand/multiplier/product
 : mmp ( pair -- n )
-    first2 2dup * [ number>string ] 3apply 3append string>number ;
+    first2 2dup * [ number>string ] tri@ 3append string>number ;
 
 PRIVATE>
 

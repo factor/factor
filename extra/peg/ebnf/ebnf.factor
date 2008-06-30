@@ -4,7 +4,8 @@ USING: kernel compiler.units words arrays strings math.parser sequences
        quotations vectors namespaces math assocs continuations peg
        peg.parsers unicode.categories multiline combinators.lib 
        splitting accessors effects sequences.deep peg.search
-       combinators.short-circuit ;
+       combinators.short-circuit lexer io.streams.string inference io
+       prettyprint combinators parser ;
 IN: peg.ebnf
 
 : rule ( name word -- parser )
@@ -22,7 +23,7 @@ TUPLE: tokenizer any one many ;
 
 : parser-tokenizer ( parser -- tokenizer )
   [ 1quotation ] keep
-  [ swap [ = ] curry semantic ] curry dup tokenizer boa ;
+  [ swap [ = ] curry semantic ] curry dup \ tokenizer boa ;
 
 : rule-tokenizer ( name word -- tokenizer )
   rule parser-tokenizer ;

@@ -20,7 +20,6 @@ IN: reports.noise
         { 2swap 3 }
         { 2with 2 }
         { 2with* 3 }
-        { 3apply 1/2 }
         { 3curry 2 }
         { 3drop 1 }
         { 3dup 2 }

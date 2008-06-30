@@ -59,7 +59,7 @@ PREDICATE: math-partial < word
 : define-integer-op-word ( word fix-word big-word -- )
     [
         [ integer-op-word ] [ integer-op-quot ] 3bi
-        2 1 <effect> define-declared
+        (( x y -- z )) define-declared
     ]
     [
         [ integer-op-word ] [ 2drop ] 3bi

@@ -12,16 +12,15 @@ SYMBOL: local-node
     deserialize
     [ first2 get-process send ] [ stop-server ] if* ;
 
+: <node-server> ( addrspec -- threaded-server )
+    <threaded-server>
+        swap >>insecure
+        binary >>encoding
+        "concurrency.distributed" >>name
+        [ handle-node-client ] >>handler ;
+
 : (start-node) ( addrspec addrspec -- )
-    local-node set-global
-    [
-        <threaded-server>
-            swap >>insecure
-            binary >>encoding
-            "concurrency.distributed" >>name
-            [ handle-node-client ] >>handler
-        start-server
-    ] curry "Distributed concurrency server" spawn drop ;
+    local-node set-global <node-server> start-server* ;
 
 : start-node ( port -- )
     host-name over <inet> (start-node) ;

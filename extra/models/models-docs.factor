@@ -232,8 +232,10 @@ HELP: move-by-page
 { $side-effects "range" } ;
 
 ARTICLE: "models" "Models"
-"The Factor UI provides basic support for dataflow programming via " { $emphasis "models" } " and " { $emphasis "controls" } ". A model is an observable value. Changing a model's value notifies other objects which depend on the model automatically, and models may depend on each other's values."
+"The " { $vocab-link "models" } " vocabulary provides basic support for dataflow programming. A model is an observable value. Changing a model's value notifies other objects which depend on the model automatically, and models may depend on each other's values."
 $nl
+"The class of models:"
+{ $subsection model }
 "Creating models:"
 { $subsection <model> }
 "Adding and removing connections:"
