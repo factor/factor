@@ -57,15 +57,15 @@ StringChars3       = (EscapeChar | !("'") .)* => [[ >string ]]
 Str                =   '"""' StringChars1:cs '"""' => [[ cs ast-string boa ]]
                      | '"' StringChars2:cs '"' => [[ cs ast-string boa ]]
                      | "'" StringChars3:cs "'" => [[ cs ast-string boa ]]
-RegExpFlags        = NameRest*
+RegExpFlags        = NameRest* => [[ >string ]]
 NonTerminator      = !("\n" | "\r") .
-BackslashSequence  = "\\" NonTerminator
+BackslashSequence  = "\\" NonTerminator => [[ second ]]
 RegExpFirstChar    =   !("*" | "\\" | "/") NonTerminator
                      | BackslashSequence
 RegExpChar         =   !("\\" | "/") NonTerminator
                      | BackslashSequence
 RegExpChars        = RegExpChar*
-RegExpBody         = RegExpFirstChar RegExpChars
+RegExpBody         = RegExpFirstChar RegExpChars => [[ first2 swap prefix >string ]]
 RegExp             = "/" RegExpBody:b "/" RegExpFlags:fl => [[ b fl ast-regexp boa ]]
 Special            =   "("   | ")"   | "{"   | "}"   | "["   | "]"   | ","   | ";"
                      | "?"   | ":"   | "!==" | "!="  | "===" | "=="  | "="   | ">="
