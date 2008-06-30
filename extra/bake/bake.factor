@@ -1,14 +1,8 @@
 
 USING: kernel parser combinators sequences splitting quotations arrays macros
-       arrays.lib combinators.cleave newfx dns.util ;
+       arrays.lib combinators.cleave combinators.conditional newfx ;
 
 IN: bake
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-MACRO: 1cond ( tbl -- )
-  [ [ 1st [ dup ] prepend ] [ 2nd ] bi {2} ] map
-  [ cond ] prefix-on ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
