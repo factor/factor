@@ -196,3 +196,7 @@ METHOD: as-mutate { object object assoc }       set-at ;
 : adjoin-on   ( elt seq -- seq ) tuck sets:adjoin ;
 : adjoined    ( set elt --     ) swap sets:adjoin ;
 : adjoined-on ( elt set --     )      sets:adjoin ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: start ( seq subseq -- i ) swap sequences:start ;
