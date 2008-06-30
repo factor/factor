@@ -188,7 +188,7 @@ M: word (serialize) ( obj -- )
 
 M: wrapper (serialize) ( obj -- )
     CHAR: W write1
-    wrapped (serialize) ;
+    wrapped>> (serialize) ;
 
 DEFER: (deserialize) ( -- obj )
 
@@ -239,7 +239,7 @@ SYMBOL: deserialized
     gensym {
         [ intern-object ]
         [ (deserialize) define ]
-        [ (deserialize) swap set-word-props ]
+        [ (deserialize) >>props drop ]
         [ ]
     } cleave ;
 

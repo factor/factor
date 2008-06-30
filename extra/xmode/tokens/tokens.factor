@@ -1,4 +1,4 @@
-USING: parser words sequences namespaces kernel assocs
+USING: accessors parser words sequences namespaces kernel assocs
 compiler.units ;
 IN: xmode.tokens
 

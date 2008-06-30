@@ -1,5 +1,5 @@
-USING: kernel sequences slots parser lexer words classes
-slots.private mirrors ;
+USING: classes.tuple accessors kernel sequences slots parser
+lexer words classes slots.private mirrors ;
 IN: tuple-syntax
 
 ! TUPLE: foo bar baz ;
@@ -7,7 +7,7 @@ IN: tuple-syntax
 
 : parse-slot-writer ( tuple -- slot# )
     scan dup "}" = [ 2drop f ] [
-        but-last swap object-slots slot-named slot-spec-offset
+        but-last swap class all-slots slot-named offset>>
     ] if ;
 
 : parse-slots ( accum tuple -- accum tuple )
