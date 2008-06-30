@@ -3,7 +3,7 @@
 USING: arrays bit-arrays byte-arrays float-arrays kernel
 kernel.private math namespaces sequences strings words effects
 generic generic.standard classes classes.algebra slots.private
-combinators accessors words ;
+combinators accessors words sequences.private assocs ;
 IN: slots
 
 TUPLE: slot-spec name offset class initial read-only reader writer ;
@@ -12,69 +12,71 @@ TUPLE: slot-spec name offset class initial read-only reader writer ;
     slot-spec new
         object bootstrap-word >>class ;
 
-: define-typecheck ( class generic quot -- )
-    [
-        dup define-simple-generic
-        create-method
-    ] dip define ;
-
-: define-slot-word ( class offset word quot -- )
-    rot >fixnum prefix define-typecheck ;
+: define-typecheck ( class generic quot props -- )
+    [ dup define-simple-generic create-method ] 2dip
+    [ [ props>> ] [ drop ] [ [ t ] H{ } map>assoc ] tri* update ]
+    [ drop define ]
+    3bi ;
 
 : create-accessor ( name effect -- word )
     >r "accessors" create dup r>
     "declared-effect" set-word-prop ;
 
-: reader-quot ( decl -- quot )
+: reader-quot ( slot-spec -- quot )
     [
+        dup offset>> ,
         \ slot ,
-        dup object bootstrap-word eq?
-        [ drop ] [ 1array , \ declare , ] if
+        dup class>> object bootstrap-word eq?
+        [ drop ] [ class>> 1array , \ declare , ] if
     ] [ ] make ;
 
 : reader-word ( name -- word )
     ">>" append (( object -- value )) create-accessor ;
 
+: reader-props ( slot-spec -- seq )
+    read-only>> { "foldable" "flushable" } { "flushable" } ? ;
+
 : define-reader ( class slot-spec -- )
-    [ offset>> ]
-    [ name>> reader-word ]
-    [ class>> reader-quot ]
-    tri define-slot-word ;
+    [ name>> reader-word ] [ reader-quot ] [ reader-props ] tri
+    define-typecheck ;
 
 : writer-word ( name -- word )
     "(>>" swap ")" 3append (( value object -- )) create-accessor ;
 
 ERROR: bad-slot-value value object index ;
 
-: writer-quot/object ( decl -- )
-    drop \ set-slot , ;
+: writer-quot/object ( slot-spec -- )
+    offset>> , \ set-slot , ;
 
-: writer-quot/coerce ( decl -- )
-    [ rot ] % "coercer" word-prop % [ -rot set-slot ] % ;
+: writer-quot/coerce ( slot-spec -- )
+    [ \ >r , class>> "coercer" word-prop % \ r> , ]
+    [ offset>> , \ set-slot , ]
+    bi ;
 
-: writer-quot/check ( decl -- )
-    \ pick ,
-    "predicate" word-prop %
-    [ [ set-slot ] [ bad-slot-value ] if ] % ;
+: writer-quot/check ( slot-spec -- )
+    [ offset>> , ]
+    [
+        \ pick ,
+        class>> "predicate" word-prop %
+        [ [ set-slot ] [ bad-slot-value ] if ] %
+    ]
+    bi ;
 
-: writer-quot/fixnum ( decl -- )
-    [ rot >fixnum -rot ] % writer-quot/check ;
+: writer-quot/fixnum ( slot-spec -- )
+    [ >r >fixnum r> ] % writer-quot/check ;
 
-: writer-quot ( decl -- quot )
+: writer-quot ( slot-spec -- quot )
     [
         {
-            { [ dup object bootstrap-word eq? ] [ writer-quot/object ] }
-            { [ dup "coercer" word-prop ] [ writer-quot/coerce ] }
-            { [ dup fixnum class<= ] [ writer-quot/fixnum ] }
+            { [ dup class>> object bootstrap-word eq? ] [ writer-quot/object ] }
+            { [ dup class>> "coercer" word-prop ] [ writer-quot/coerce ] }
+            { [ dup class>> fixnum bootstrap-word class<= ] [ writer-quot/fixnum ] }
             [ writer-quot/check ]
         } cond
     ] [ ] make ;
 
 : define-writer ( class slot-spec -- )
-    [ offset>> ]
-    [ name>> writer-word ]
-    [ class>> writer-quot ]
-    tri define-slot-word ;
+    [ name>> writer-word ] [ writer-quot ] bi { } define-typecheck ;
 
 : setter-word ( name -- word )
     ">>" prepend (( object value -- object )) create-accessor ;
@@ -123,13 +125,14 @@ ERROR: no-initial-value class ;
 
 : initial-value ( class -- object )
     {
-        { [ \ f over class<= ] [ f ] }
-        { [ fixnum over class<= ] [ 0 ] }
-        { [ float over class<= ] [ 0.0 ] }
-        { [ array over class<= ] [ { } ] }
-        { [ bit-array over class<= ] [ ?{ } ] }
-        { [ byte-array over class<= ] [ B{ } ] }
-        { [ float-array over class<= ] [ F{ } ] }
+        { [ \ f bootstrap-word over class<= ] [ f ] }
+        { [ \ array-capacity bootstrap-word over class<= ] [ 0 ] }
+        { [ float bootstrap-word over class<= ] [ 0.0 ] }
+        { [ string bootstrap-word over class<= ] [ "" ] }
+        { [ array bootstrap-word over class<= ] [ { } ] }
+        { [ bit-array bootstrap-word over class<= ] [ ?{ } ] }
+        { [ byte-array bootstrap-word over class<= ] [ B{ } ] }
+        { [ float-array bootstrap-word over class<= ] [ F{ } ] }
         [ no-initial-value ]
     } cond nip ;
 
@@ -164,8 +167,10 @@ ERROR: bad-initial-value name ;
 
 : check-initial-value ( slot-spec -- slot-spec )
     dup initial>> [
-        dup [ initial>> ] [ class>> ] bi instance?
-        [ name>> bad-initial-value ] unless
+        [ ] [
+            dup [ initial>> ] [ class>> ] bi instance?
+            [ name>> bad-initial-value ] unless
+        ] if-bootstrapping
     ] [
         dup class>> initial-value >>initial
     ] if ;

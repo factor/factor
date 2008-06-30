@@ -7,10 +7,10 @@ hints accessors math.order destructors combinators ;
 IN: io.buffers
 
 TUPLE: buffer
-{ "size" fixnum }
-{ "ptr" simple-alien }
-{ "fill" fixnum }
-{ "pos" fixnum }
+{ size fixnum }
+{ ptr simple-alien initial: ALIEN: -1 }
+{ fill fixnum }
+{ pos fixnum }
 disposed ;
 
 : <buffer> ( n -- buffer )

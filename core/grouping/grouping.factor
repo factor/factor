@@ -4,7 +4,7 @@ USING: kernel math math.order strings arrays vectors sequences
 accessors ;
 IN: grouping
 
-TUPLE: abstract-groups seq n ;
+TUPLE: abstract-groups { seq read-only: t } { n read-only: t } ;
 
 : check-groups dup 0 <= [ "Invalid group count" throw ] when ; inline
 

@@ -79,11 +79,11 @@ SYMBOL: +editable+
 : summary. ( obj -- ) [ summary ] keep write-object nl ;
 
 : sorted-keys ( assoc -- alist )
-    dup mirror? [ keys ] [
+    dup hashtable? [
         keys
         [ [ unparse-short ] keep ] { } map>assoc
         sort-keys values
-    ] if ;
+    ] [ keys ] if ;
 
 : describe* ( obj flags -- )
     clone [

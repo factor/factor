@@ -268,13 +268,22 @@ M: predicate-class see-class*
 M: singleton-class see-class* ( class -- )
     \ SINGLETON: pprint-word pprint-word ;
 
+GENERIC: pprint-slot-name ( object -- )
+
+M: string pprint-slot-name text ;
+
+M: array pprint-slot-name
+    <flow \ { pprint-word
+    f <inset unclip text pprint-elements block>
+    \ } pprint-word block> ;
+
 M: tuple-class see-class*
     <colon \ TUPLE: pprint-word
     dup pprint-word
     dup superclass tuple eq? [
         "<" text dup superclass pprint-word
     ] unless
-    slot-names [ dup string? [ text ] [ pprint* ] if ] each
+    <block slot-names [ pprint-slot-name ] each block>
     pprint-; block> ;
 
 M: word see-class* drop ;
@@ -282,23 +291,12 @@ M: word see-class* drop ;
 M: builtin-class see-class*
     drop "! Built-in class" comment. ;
 
-: see-all ( seq -- )
-    natural-sort [ nl see ] each ;
-
-: see-implementors ( class -- seq )
-    dup implementors
-    [ method ] with map
-    natural-sort ;
-
 : see-class ( class -- )
     dup class? [
         [
             dup seeing-word dup see-class*
         ] with-use nl
     ] when drop ;
-
-: see-methods ( generic -- seq )
-    "methods" word-prop values natural-sort ;
 
 M: word see
     dup see-class
@@ -308,8 +306,20 @@ M: word see
     dup class? over symbol? and not [
         [ dup (see) ] with-use nl
     ] when
+    drop ;
+
+: see-all ( seq -- )
+    natural-sort [ nl ] [ see ] interleave ;
+
+: (see-implementors) ( class -- seq )
+    dup implementors [ method ] with map natural-sort ;
+
+: (see-methods) ( generic -- seq )
+    "methods" word-prop values natural-sort ;
+
+: see-methods ( word -- )
     [
-        dup class? [ dup see-implementors % ] when
-        dup generic? [ dup see-methods % ] when
+        dup class? [ dup (see-implementors) % ] when
+        dup generic? [ dup (see-methods) % ] when
         drop
     ] { } make prune see-all ;

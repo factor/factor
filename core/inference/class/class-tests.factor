@@ -579,11 +579,16 @@ M: integer detect-integer ;
     [ hashtable instance? ] \ instance? inlined?
 ] unit-test
 
-TUPLE: declared-fixnum { "x" fixnum } ;
+TUPLE: declared-fixnum { x fixnum } ;
 
 [ t ] [
     [ { declared-fixnum } declare [ 1 + ] change-x ]
     { + fixnum+ >fixnum } inlined?
+] unit-test
+
+[ t ] [
+    [ { declared-fixnum } declare x>> drop ]
+    { slot } inlined?
 ] unit-test
 
 ! Later

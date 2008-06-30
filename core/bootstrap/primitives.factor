@@ -67,6 +67,7 @@ bootstrapping? on
     "classes.private"
     "classes.tuple"
     "classes.tuple.private"
+    "classes.predicate"
     "compiler.units"
     "continuations.private"
     "float-arrays"
@@ -117,7 +118,7 @@ bootstrapping? on
     tri ;
 
 : prepare-slots ( slots -- slots' )
-    [ [ dup array? [ first2 create ] when ] map ] map ;
+    [ [ dup pair? [ first2 create ] when ] map ] map ;
 
 : define-builtin-slots ( class slots -- )
     prepare-slots 1 make-slots
@@ -146,6 +147,9 @@ bootstrapping? on
 "word" "words" create register-builtin
 "byte-array" "byte-arrays" create register-builtin
 "tuple-layout" "classes.tuple.private" create register-builtin
+
+! For predicate classes
+"predicate-instance?" "classes.predicate" create drop
 
 ! We need this before defining c-ptr below
 "f" "syntax" lookup { } define-builtin
@@ -256,7 +260,7 @@ define-builtin
     { "hashcode" { "fixnum" "math" } }
     "name"
     "vocabulary"
-    { "def" { "quotation" "quotations" } }
+    { "def" { "quotation" "quotations" } initial: [ ] }
     "props"
     { "compiled" read-only: t }
     { "counter" { "fixnum" "math" } }
@@ -272,9 +276,9 @@ define-builtin
 
 "tuple-layout" "classes.tuple.private" create {
     { "hashcode" { "fixnum" "math" } read-only: t }
-    { "class" { "word" "words" } read-only: t }
+    { "class" { "word" "words" } initial: t read-only: t }
     { "size" { "fixnum" "math" } read-only: t }
-    { "superclasses" { "array" "arrays" } read-only: t }
+    { "superclasses" { "array" "arrays" } initial: { } read-only: t }
     { "echelon" { "fixnum" "math" } read-only: t }
 } define-builtin
 

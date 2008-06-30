@@ -6,8 +6,8 @@ parser accessors ;
 IN: bit-vectors
 
 TUPLE: bit-vector
-{ "underlying" bit-array }
-{ "length" array-capacity } ;
+{ underlying bit-array }
+{ length array-capacity } ;
 
 <PRIVATE
 

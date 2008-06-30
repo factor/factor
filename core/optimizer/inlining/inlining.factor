@@ -54,11 +54,15 @@ DEFER: (flat-length)
     [ def>> (flat-length) ] with-scope ;
 
 ! Single dispatch method inlining optimization
+! : dispatching-class ( node generic -- method/f )
+!     tuck dispatch# over in-d>> <reversed> ?nth 2dup node-literal?
+!     [ node-literal swap single-effective-method ]
+!     [ node-class swap specific-method ]
+!     if ;
+
 : dispatching-class ( node generic -- method/f )
-    tuck dispatch# over in-d>> <reversed> ?nth 2dup node-literal?
-    [ node-literal swap single-effective-method ]
-    [ node-class swap specific-method ]
-    if ;
+    tuck dispatch# over in-d>> <reversed> ?nth
+    node-class swap specific-method ;
 
 : inline-standard-method ( node generic -- node )
     dupd dispatching-class dup

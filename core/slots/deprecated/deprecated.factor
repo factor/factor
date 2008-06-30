@@ -16,12 +16,17 @@ PREDICATE: slot-reader < word "reading" word-prop >boolean ;
     swap "declared-effect" set-word-prop
     slot-spec-reader swap "reading" set-word-prop ;
 
+: define-slot-word ( class word quot -- )
+    [
+        dup define-simple-generic
+        create-method
+    ] dip define ;
+
 : define-reader ( class spec -- )
     dup slot-spec-reader [
         [ set-reader-props ] 2keep
-        dup slot-spec-offset
-        over slot-spec-reader
-        rot slot-spec-class reader-quot
+        dup slot-spec-reader
+        swap reader-quot
         define-slot-word
     ] [
         2drop
@@ -41,9 +46,8 @@ PREDICATE: slot-writer < word "writing" word-prop >boolean ;
 : define-writer ( class spec -- )
     dup slot-spec-writer [
         [ set-writer-props ] 2keep
-        dup slot-spec-offset
-        swap slot-spec-writer
-        [ set-slot ]
+        dup slot-spec-writer
+        swap writer-quot
         define-slot-word
     ] [
         2drop

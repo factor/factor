@@ -31,7 +31,7 @@ C: <foo> foo
 [ gensym <mirror> [ "compiled" off ] bind ] must-fail
 
 TUPLE: declared-mirror-test
-{ "a" integer initial: 0 } ;
+{ a integer initial: 0 } ;
 
 [ 5 ] [
     3 declared-mirror-test boa <mirror> [
@@ -43,9 +43,9 @@ TUPLE: declared-mirror-test
 [ 3 declared-mirror-test boa <mirror> [ t "a" set ] bind ] must-fail
 
 TUPLE: color
-{ "red" integer }
-{ "green" integer }
-{ "blue" integer } ;
+{ red integer }
+{ green integer }
+{ blue integer } ;
 
 [ T{ color f 0 0 0 } ] [
     1 2 3 color boa [ <mirror> clear-assoc ] keep

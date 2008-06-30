@@ -21,21 +21,21 @@ TUPLE: test-4 < test-3 b ;
 
 [ { "b" } ] [ test-4 "slot-names" word-prop ] unit-test
 
-TUPLE: test-5 { "a" integer } ;
+TUPLE: test-5 { a integer } ;
 
 [ { { "a" integer } } ] [ test-5 "slot-names" word-prop ] unit-test
 
-TUPLE: test-6 < test-5 { "b" integer } ;
+TUPLE: test-6 < test-5 { b integer } ;
 
 [ integer ] [ "b" test-6 "slots" word-prop slot-named class>> ] unit-test
 
 [ { { "b" integer } } ] [ test-6 "slot-names" word-prop ] unit-test
 
-TUPLE: test-7 { "b" integer initial: 3 } ;
+TUPLE: test-7 { b integer initial: 3 } ;
 
 [ 3 ] [ "b" test-7 "slots" word-prop slot-named initial>> ] unit-test
 
-TUPLE: test-8 { "b" integer read-only: t } ;
+TUPLE: test-8 { b integer read-only: t } ;
 
 [ t ] [ "b" test-8 "slots" word-prop slot-named read-only>> ] unit-test
 
@@ -51,11 +51,11 @@ must-fail-with
 [ error>> unexpected-eof? ]
 must-fail-with
 
-[ "IN: classes.tuple.parser.tests USE: alien TUPLE: foo { \"slot\" alien } ;" eval ]
+[ "IN: classes.tuple.parser.tests USE: alien TUPLE: foo { slot alien } ;" eval ]
 [ error>> no-initial-value? ]
 must-fail-with
 
-[ "IN: classes.tuple.parser.tests USE: arrays TUPLE: foo { \"slot\" array initial: 5 } ;" eval ]
+[ "IN: classes.tuple.parser.tests USE: arrays TUPLE: foo { slot array initial: 5 } ;" eval ]
 [ error>> bad-initial-value? ]
 must-fail-with
 

@@ -33,7 +33,7 @@ PREDICATE: method-spec < pair
 : specific-method ( class generic -- method/f )
     tuck order min-class dup [ swap method ] [ 2drop f ] if ;
 
-GENERIC: effective-method ( ... generic -- method )
+GENERIC: effective-method ( generic -- method )
 
 : next-method-class ( class generic -- class/f )
     order [ class<= ] with filter reverse dup length 1 =

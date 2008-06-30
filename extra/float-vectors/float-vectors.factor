@@ -6,8 +6,8 @@ parser accessors ;
 IN: float-vectors
 
 TUPLE: float-vector
-{ "underlying" float-array }
-{ "length" array-capacity } ;
+{ underlying float-array }
+{ length array-capacity } ;
 
 <PRIVATE
 

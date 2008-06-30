@@ -4,8 +4,8 @@ USING: arrays kernel math sequences sequences.private growable ;
 IN: vectors
 
 TUPLE: vector
-{ "underlying" array }
-{ "length" array-capacity } ;
+{ underlying array }
+{ length array-capacity } ;
 
 <PRIVATE
 

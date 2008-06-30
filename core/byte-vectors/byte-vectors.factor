@@ -5,8 +5,8 @@ sequences.private growable byte-arrays ;
 IN: byte-vectors
 
 TUPLE: byte-vector
-{ "underlying" byte-array }
-{ "length" array-capacity } ;
+{ underlying byte-array }
+{ length array-capacity } ;
 
 <PRIVATE
 

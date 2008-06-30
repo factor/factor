@@ -24,6 +24,9 @@ M: invalid-slot-name summary
     drop
     "Invalid slot name" ;
 
+: parse-long-slot-name ( -- )
+    [ scan , \ } parse-until % ] { } make ;
+
 : parse-slot-name ( string/f -- ? )
     #! This isn't meant to enforce any kind of policy, just
     #! to check for mistakes of this form:
@@ -35,7 +38,7 @@ M: invalid-slot-name summary
         { [ dup not ] [ unexpected-eof ] }
         { [ dup { ":" "(" "<" "\"" } member? ] [ invalid-slot-name ] }
         { [ dup ";" = ] [ drop f ] }
-        [ dup "{" = [ drop \ } parse-until >array ] when , t ]
+        [ dup "{" = [ drop parse-long-slot-name ] when , t ]
     } cond ;
 
 : parse-tuple-slots ( -- )

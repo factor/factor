@@ -5,8 +5,8 @@ strings growable strings.private ;
 IN: sbufs
 
 TUPLE: sbuf
-{ "underlying" string }
-{ "length" array-capacity } ;
+{ underlying string }
+{ length array-capacity } ;
 
 <PRIVATE
 

@@ -113,11 +113,6 @@ HELP: define-typecheck
 }
 { $notes "This word is used internally to wrap unsafe low-level code in a type-checking stub." } ;
 
-HELP: define-slot-word
-{ $values { "class" class } { "slot" "a positive integer" } { "word" word } { "quot" quotation } }
-{ $description "Defines " { $snippet "word" } " to be a simple type-checking generic word that receives the slot number on the stack as a fixnum." }
-$low-level-note ;
-
 HELP: define-reader
 { $values { "class" class } { "name" string } { "slot" integer } }
 { $description "Defines a reader word to read a slot from instances of " { $snippet "class" } "." }
