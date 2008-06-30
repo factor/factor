@@ -21,7 +21,7 @@ DEFER: define-lisp-macro
     
 : convert-cond ( cons -- quot )  
     cdr [ 2car [ convert-form ] bi@ 2array ]
-    { } lmap-as '[ , cond ]  ;
+    { } lmap-as '[ , cond ] ;
     
 : convert-general-form ( cons -- quot )
     uncons [ convert-body ] [ convert-form ] bi* '[ , @ funcall ] ;
@@ -61,7 +61,7 @@ PRIVATE>
     cdr [ car ] keep [ convert-lambda ] [ car name>> ] bi define-lisp-macro 1quotation ;
     
 : macro-expand ( cons -- quot )
-    uncons [ list>seq >quotation ] [ lookup-macro call ] bi* call convert-form ;
+    uncons [ list>seq >quotation ] [ lookup-macro ] bi* call convert-form ;
     
 : form-dispatch ( cons lisp-symbol -- quot )
     name>>
