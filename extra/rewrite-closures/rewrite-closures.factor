@@ -14,8 +14,11 @@ IN: rewrite-closures
 
 \ set-parameters [ [set-parameters] ] 1 define-transform
 
-: parametric-quot ( parameters quot -- quot )
-[ [ swap ] set-parameters [ ] call ] make* ;
+! : parametric-quot ( parameters quot -- quot )
+! [ [ swap ] set-parameters [ ] call ] make* ;
+
+: parametric-quot ( parameters quot -- quot ) '[ , set-parameters , call ] ;
+
 
 : scoped-quot ( quot -- quot ) [ with-scope ] curry ;
 
