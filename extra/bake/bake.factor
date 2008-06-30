@@ -1,61 +1,65 @@
 
-USING: kernel parser namespaces quotations arrays vectors strings
-       sequences assocs classes.tuple math combinators ;
+USING: kernel parser combinators sequences splitting quotations arrays macros
+       arrays.lib combinators.cleave newfx dns.util ;
 
 IN: bake
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: insert-quot expr ;
-
-C: <insert-quot> insert-quot 
-
-: ,[ \ ] [ >quotation <insert-quot> ] parse-literal ; parsing
+MACRO: 1cond ( tbl -- )
+  [ [ 1st [ dup ] prepend ] [ 2nd ] bi {2} ] map
+  [ cond ] prefix-on ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: splice-quot expr ;
+SYMBOL: ,
+SYMBOL: @
 
-C: <splice-quot> splice-quot
-
-: %[ \ ] [ >quotation <splice-quot> ] parse-literal ; parsing
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: ,u ( seq -- seq ) unclip building get push ;
+: comma? ( obj -- ? ) , = ;
+: atsym? ( obj -- ? ) @ = ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYMBOL: exemplar
+DEFER: [bake-array]
 
-: reset-building ( -- ) 1024 <vector> building set ;
-
-: save-exemplar ( seq -- seq ) dup exemplar set ;
-
-: finish-baking ( -- seq ) building get exemplar get like ;
-
-DEFER: bake
-
-: bake-item ( item -- )
-  { { [ dup \ , = ]        [ drop , ] }
-    { [ dup \ % = ]        [ drop % ] }
-    { [ dup \ ,u = ]       [ drop ,u ] }
-    { [ dup insert-quot? ] [ insert-quot-expr call , ] }
-    { [ dup splice-quot? ] [ splice-quot-expr call % ] }
-    { [ dup integer? ]     [ , ] }
-    { [ dup string? ]      [ , ] }
-    { [ dup tuple? ]       [ tuple>array bake >tuple , ] }
-    { [ dup assoc? ]       [ [ >alist bake ] keep assoc-like , ] }
-    { [ dup sequence? ]    [ bake , ] }
-    { [ t ]                [ , ] } }
-  cond ;
-
-: bake-items ( seq -- ) [ bake-item ] each ;
-
-: bake ( seq -- seq )
-  [ reset-building save-exemplar bake-items finish-baking ] with-scope ;
+: broil-element ( obj -- quot )
+    {
+      { [ comma? ] [ drop [ >r ]               ] }
+      { [ array? ] [ [bake-array] [ >r ] append ] }
+      { [ drop t ] [ [ >r ] prefix-on          ] }
+    }
+  1cond ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: `{ \ } [ >array ] parse-literal \ bake parsed ; parsing
+: [broil] ( array -- quot )
+    [ reverse [ broil-element ] map concat ]
+    [ length [ drop [ r> ] ] map concat ]
+    [ length [ narray ] prefix-on ]
+  tri append append
+  >quotation ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: [simmer] ( array -- quot )
+
+  { @ } split reverse
+    [        [ [bake-array] [ append ] append [ >r ] append ] map concat ]
+    [ length [ drop [ r> append ]                          ] map concat ]
+  bi
+
+  >r 2 head* [ >r ] append r> ! remove the last append
+
+  [ { } ] swap append
+
+  append ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: [bake-array] ( array -- quot ) [ @ member? ] [ [simmer] ] [ [broil] ] 1if ;
+
+MACRO: bake-array ( array -- quot ) [bake-array] ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: `{ \ } [ >array ] parse-literal \ bake-array parsed ; parsing
