@@ -1,8 +1,8 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel alien alien.strings alien.syntax combinators
-alien.c-types strings sequences namespaces words math threads
-io.encodings.ascii ;
+USING: accessors kernel alien alien.strings alien.syntax
+combinators alien.c-types strings sequences namespaces words
+math threads io.encodings.ascii ;
 IN: odbc
 
 << "odbc" "odbc32.dll" "stdcall" add-library >>

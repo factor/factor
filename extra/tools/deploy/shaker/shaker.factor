@@ -1,9 +1,10 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: qualified io.streams.c init fry namespaces assocs kernel
-parser lexer strings.parser tools.deploy.config vocabs sequences
-words words.private memory kernel.private continuations io
-prettyprint vocabs.loader debugger system strings sets ;
+USING: accessors qualified io.streams.c init fry namespaces
+assocs kernel parser lexer strings.parser tools.deploy.config
+vocabs sequences words words.private memory kernel.private
+continuations io prettyprint vocabs.loader debugger system
+strings sets ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes
 QUALIFIED: command-line
@@ -62,12 +63,12 @@ IN: tools.deploy.shaker
 
 : strip-word-names ( words -- )
     "Stripping word names" show
-    [ f over set-word-name f swap set-vocabulary>> ] each ;
+    [ f >>name f >>vocabulary drop ] each ;
 
 : strip-word-defs ( words -- )
     "Stripping symbolic word definitions" show
     [ "no-def-strip" word-prop not ] filter
-    [ [ ] swap set-word-def ] each ;
+    [ [ ] >>def drop ] each ;
 
 : strip-word-props ( stripped-props words -- )
     "Stripping word properties" show
@@ -76,7 +77,7 @@ IN: tools.deploy.shaker
             props>> swap
             '[ drop , member? not ] assoc-filter
             f assoc-like
-        ] keep set-word-props
+        ] keep (>>props)
     ] with each ;
 
 : stripped-word-props ( -- seq )

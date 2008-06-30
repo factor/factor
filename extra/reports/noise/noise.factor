@@ -1,4 +1,4 @@
-USING: assocs math kernel shuffle combinators.lib
+USING: accessors assocs math kernel shuffle combinators.lib
 words quotations arrays combinators sequences math.vectors
 io.styles prettyprint vocabs sorting io generic locals.private
 math.statistics math.order ;
@@ -90,7 +90,7 @@ GENERIC: noise ( obj -- pair )
 
 M: word noise badness 1 2array ;
 
-M: wrapper noise wrapped noise ;
+M: wrapper noise wrapped>> noise ;
 
 M: let noise let-body noise ;
 

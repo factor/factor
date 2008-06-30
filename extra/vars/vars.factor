@@ -2,7 +2,7 @@
 
 ! Thanks to Mackenzie Straight for the idea
 
-USING: kernel parser lexer words namespaces sequences quotations ;
+USING: accessors kernel parser lexer words namespaces sequences quotations ;
 
 IN: vars
 

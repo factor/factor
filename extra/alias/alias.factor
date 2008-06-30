@@ -1,4 +1,6 @@
-USING: words quotations kernel effects sequences parser ;
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors words quotations kernel effects sequences parser ;
 IN: alias
 
 PREDICATE: alias < word "alias" word-prop ;

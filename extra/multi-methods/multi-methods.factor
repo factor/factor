@@ -168,7 +168,7 @@ M: method-body crossref?
 : <method> ( specializer generic -- word )
     [ method-word-props ] 2keep
     method-word-name f <word>
-    [ set-word-props ] keep ;
+    swap >>props ;
 
 : with-methods ( word quot -- )
     over >r >r "multi-methods" word-prop

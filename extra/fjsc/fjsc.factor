@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel peg strings promises sequences math math.parser
-       namespaces words quotations arrays hashtables io
-       io.streams.string assocs memoize ascii peg.parsers ;
+USING: accessors kernel peg strings promises sequences math
+math.parser namespaces words quotations arrays hashtables io
+io.streams.string assocs memoize ascii peg.parsers ;
 IN: fjsc
 
 TUPLE: ast-number value ;
@@ -346,7 +346,7 @@ M: hashtable (parse-factor-quotation) ( object -- ast )
   ] { } make <ast-hashtable> ;
 
 M: wrapper (parse-factor-quotation) ( object -- ast )
-  wrapped dup name>> swap vocabulary>> <ast-word> ;
+  wrapped>> dup name>> swap vocabulary>> <ast-word> ;
 
 GENERIC: fjsc-parse ( object -- ast )
 

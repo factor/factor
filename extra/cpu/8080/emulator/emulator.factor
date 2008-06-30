@@ -1,9 +1,10 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel math sequences words arrays io io.files namespaces
-math.parser assocs quotations parser lexer parser-combinators
-tools.time io.encodings.binary sequences.deep symbols combinators ;
+USING: accessors kernel math sequences words arrays io io.files
+namespaces math.parser assocs quotations parser lexer
+parser-combinators tools.time io.encodings.binary sequences.deep
+symbols combinators ;
 IN: cpu.8080.emulator
 
 TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles ram ;

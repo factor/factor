@@ -1,4 +1,4 @@
-USING: xmode.tokens xmode.keyword-map kernel
+USING: accessors xmode.tokens xmode.keyword-map kernel
 sequences vectors assocs strings memoize regexp unicode.case ;
 IN: xmode.rules
 
