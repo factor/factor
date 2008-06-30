@@ -56,6 +56,7 @@ RelExpr            =   RelExpr:x ">" ShiftExpr:y          => [[ x y ">" ast-bino
                      | RelExpr:x "<" ShiftExpr:y          => [[ x y "<" ast-binop boa ]]
                      | RelExpr:x "<=" ShiftExpr:y         => [[ x y "<=" ast-binop boa ]]
                      | RelExpr:x "instanceof" ShiftExpr:y => [[ x y "instanceof" ast-binop boa ]]
+                     | RelExpr:x "in" ShiftExpr:y         => [[ x y "in" ast-binop boa ]]
                      | ShiftExpr
 ShiftExpr          =   ShiftExpr:x "<<" AddExpr:y       => [[ x y "<<" ast-binop boa ]]
                      | ShiftExpr:x ">>>" AddExpr:y      => [[ x y ">>>" ast-binop boa ]]
