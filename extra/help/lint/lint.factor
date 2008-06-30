@@ -73,14 +73,13 @@ IN: help.lint
 : all-word-help ( words -- seq )
     [ word-help ] filter ;
 
-TUPLE: help-error topic ;
+TUPLE: help-error topic error ;
 
-: <help-error> ( topic delegate -- error )
-    { set-help-error-topic set-delegate } help-error construct ;
+C: <help-error> help-error
 
 M: help-error error.
-    "In " write dup help-error-topic ($link) nl
-    delegate error. ;
+    "In " write dup topic>> pprint nl
+    error>> error. ;
 
 : check-something ( obj quot -- )
     flush [ <help-error> , ] recover ; inline
@@ -117,11 +116,16 @@ M: help-error error.
         ] 2curry each
     ] keep ;
 
+: check-about ( vocab -- )
+    [ vocab-help [ article drop ] when* ] check-something ;
+
 : check-vocab ( vocab -- seq )
     "Checking " write dup write "..." print
     [
-        dup words [ check-word ] each
-        "vocab-articles" get at [ check-article ] each
+        [ check-about ]
+        [ words [ check-word ] each ]
+        [ "vocab-articles" get at [ check-article ] each ]
+        tri
     ] { } make ;
 
 : run-help-lint ( prefix -- alist )
