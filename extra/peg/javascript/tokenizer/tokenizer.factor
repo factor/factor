@@ -58,7 +58,14 @@ Str                =   '"""' StringChars1:cs '"""' => [[ cs ast-string boa ]]
                      | '"' StringChars2:cs '"' => [[ cs ast-string boa ]]
                      | "'" StringChars3:cs "'" => [[ cs ast-string boa ]]
 RegExpFlags        = NameRest*
-RegExpBody         = (!("/" | "\n" | "\r") .)* => [[ >string ]]
+NonTerminator      = !("\n" | "\r") .
+BackslashSequence  = "\\" NonTerminator
+RegExpFirstChar    =   !("*" | "\\" | "/") NonTerminator
+                     | BackslashSequence
+RegExpChar         =   !("\\" | "/") NonTerminator
+                     | BackslashSequence
+RegExpChars        = RegExpChar*
+RegExpBody         = RegExpFirstChar RegExpChars
 RegExp             = "/" RegExpBody:b "/" RegExpFlags:fl => [[ b fl ast-regexp boa ]]
 Special            =   "("   | ")"   | "{"   | "}"   | "["   | "]"   | ","   | ";"
                      | "?"   | ":"   | "!==" | "!="  | "===" | "=="  | "="   | ">="

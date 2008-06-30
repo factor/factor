@@ -99,6 +99,7 @@ PEG: escaper ( string -- ast )
     "\\t" token [ drop "\t" ] action ,
     "\\n" token [ drop "\n" ] action ,
     "\\r" token [ drop "\r" ] action ,
+    "\\\\" token [ drop "\\" ] action ,
   ] choice* any-char-parser 2array choice repeat0 ;
 
 : replace-escapes ( string -- string )
