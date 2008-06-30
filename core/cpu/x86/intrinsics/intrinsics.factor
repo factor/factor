@@ -63,6 +63,8 @@ IN: cpu.x86.intrinsics
 : generate-write-barrier ( -- )
     #! Mark the card pointed to by vreg.
     "val" get operand-immediate? "obj" get fresh-object? or [
+        "obj" operand PUSH
+
         ! Mark the card
         "obj" operand card-bits SHR
         "cards_offset" f temp-reg v>operand %alien-global
@@ -72,6 +74,8 @@ IN: cpu.x86.intrinsics
         "obj" operand deck-bits card-bits - SHR
         "decks_offset" f temp-reg v>operand %alien-global
         temp-reg v>operand "obj" operand [+] card-mark <byte> MOV
+
+        "obj" operand POP
     ] unless ;
 
 \ set-slot {
@@ -79,21 +83,19 @@ IN: cpu.x86.intrinsics
     {
         [ %slot-literal-known-tag "val" operand MOV generate-write-barrier ] H{
             { +input+ { { f "val" } { f "obj" known-tag } { [ small-slot? ] "n" } } }
-            { +clobber+ { "obj" } }
         }
     }
     ! Slot number is literal
     {
         [ %slot-literal-any-tag "val" operand MOV generate-write-barrier ] H{
             { +input+ { { f "val" } { f "obj" } { [ small-slot? ] "n" } } }
-            { +clobber+ { "obj" } }
         }
     }
     ! Slot number in a register
     {
         [ %slot-any "val" operand MOV generate-write-barrier ] H{
             { +input+ { { f "val" } { f "obj" } { f "n" } } }
-            { +clobber+ { "obj" "n" } }
+            { +clobber+ { "n" } }
         }
     }
 } define-intrinsics

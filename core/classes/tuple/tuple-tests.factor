@@ -4,7 +4,7 @@ namespaces quotations sequences.private classes continuations
 generic.standard effects classes.tuple classes.tuple.private
 arrays vectors strings compiler.units accessors classes.algebra
 calendar prettyprint io.streams.string splitting inspector
-columns math.order classes.private slots.private ;
+columns math.order classes.private slots slots.private ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
@@ -190,15 +190,6 @@ M: vector silly "z" ;
 ! Typo
 SYMBOL: not-a-tuple-class
 
-[
-    "IN: classes.tuple.tests C: <not-a-tuple-class> not-a-tuple-class"
-    eval
-] must-fail
-
-[ t ] [
-    "not-a-tuple-class" "classes.tuple.tests" lookup symbol?
-] unit-test
-
 ! Missing check
 [ not-a-tuple-class boa ] must-fail
 [ not-a-tuple-class new ] must-fail
@@ -217,10 +208,6 @@ C: <erg's-reshape-problem> erg's-reshape-problem
 [ ] [ 1 2 3 4 5 6 cons-test-2 "a" set ] unit-test
 
 [ t ] [ cons-test-1 tuple-size "a" get tuple-size = ] unit-test
-
-[
-    "IN: classes.tuple.tests SYMBOL: not-a-class C: <not-a-class> not-a-class" eval
-] [ error>> not-a-tuple-class? ] must-fail-with
 
 ! Inheritance
 TUPLE: computer cpu ram ;
@@ -490,7 +477,7 @@ USE: vocabs
     ] with-compilation-unit
 ] unit-test
 
-[ "USE: words T{ word }" eval ] [ error>> not-a-tuple-class? ] must-fail-with
+[ "USE: words T{ word }" eval ] [ error>> T{ no-method f word new } = ] must-fail-with
 
 ! Accessors not being forgotten...
 [ [ ] ] [
@@ -598,3 +585,39 @@ GENERIC: break-me ( obj -- )
 
 ! Insufficient type checking
 [ \ vocab tuple>array drop ] must-fail
+
+! Check type declarations
+TUPLE: declared-types { n fixnum } { m string } ;
+
+[ T{ declared-types f 0 "hi" } ]
+[ { declared-types f 0 "hi" } >tuple ]
+unit-test
+
+[ { declared-types f "hi" 0 } >tuple ]
+[ T{ bad-slot-value f "hi" fixnum } = ]
+must-fail-with
+
+[ T{ declared-types f 0 "hi" } ]
+[ 0.0 "hi" declared-types boa ] unit-test
+
+: foo ( a b -- c ) declared-types boa ;
+
+\ foo must-infer
+
+[ T{ declared-types f 0 "hi" } ] [ 0.0 "hi" foo ] unit-test
+
+[ "hi" 0.0 declared-types boa ]
+[ T{ no-method f "hi" >fixnum } = ]
+must-fail-with
+
+[ 0 { } declared-types boa ]
+[ T{ bad-slot-value f { } string } = ]
+must-fail-with
+
+[ "hi" 0.0 foo ]
+[ T{ no-method f "hi" >fixnum } = ]
+must-fail-with
+
+[ 0 { } foo ]
+[ T{ bad-slot-value f { } string } = ]
+must-fail-with

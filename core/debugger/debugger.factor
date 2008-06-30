@@ -196,32 +196,7 @@ M: no-method error.
     " class." print
     "Dispatching on object: " write object>> short. ;
 
-M: bad-slot-value error.
-    "Bad store to specialized slot" print
-    dup [ index>> 2 - ] [ object>> class all-slots ] bi nth
-    standard-table-style [
-        [
-            [ "Object" write ] with-cell
-            [ over object>> short. ] with-cell
-        ] with-row
-        [
-            [ "Slot" write ] with-cell
-            [ dup name>> short. ] with-cell
-        ] with-row
-        [
-            [ "Slot class" write ] with-cell
-            [ dup class>> short. ] with-cell
-        ] with-row
-        [
-            [ "Value" write ] with-cell
-            [ over value>> short. ] with-cell
-        ] with-row
-        [
-            [ "Value class" write ] with-cell
-            [ over value>> class short. ] with-cell
-        ] with-row
-    ] tabular-output
-    2drop ;
+M: bad-slot-value summary drop "Bad store to specialized slot" ;
 
 M: no-math-method summary
     drop "No suitable arithmetic method" ;
@@ -237,9 +212,6 @@ M: check-method summary
 
 M: not-a-tuple summary
     drop "Not a tuple" ;
-
-M: not-a-tuple-class summary
-    drop "Not a tuple class" ;
 
 M: bad-superclass summary
     drop "Tuple classes can only inherit from other tuple classes" ;

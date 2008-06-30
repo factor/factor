@@ -70,7 +70,7 @@ IN: bootstrap.syntax
     ">>"
     "call-next-method"
     "initial:"
-    "read-only:"
+    "read-only"
 } [ "syntax" create drop ] each
 
 "t" "syntax" lookup define-symbol

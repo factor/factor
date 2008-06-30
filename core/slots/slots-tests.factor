@@ -4,7 +4,7 @@ tools.test generic words parser ;
 
 TUPLE: r/w-test foo ;
 
-TUPLE: r/o-test { foo read-only: t } ;
+TUPLE: r/o-test { foo read-only } ;
 
 [ r/o-test new 123 >>foo ] [ no-method? ] must-fail-with
 
@@ -25,12 +25,12 @@ TUPLE: hello length ;
 [ t ] [ r/w-test \ foo>> method "flushable" word-prop ] unit-test
 
 ! See if declarations are cleared on redefinition
-[ ] [ "IN: slots.tests TUPLE: r/w-test { foo read-only: t } ;" eval ] unit-test
+[ ] [ "IN: slots.tests TUPLE: r/w-test { foo read-only } ;" eval ] unit-test
 
 [ t ] [ r/w-test \ foo>> method "foldable" word-prop ] unit-test
 [ t ] [ r/w-test \ foo>> method "flushable" word-prop ] unit-test
 
-[ ] [ "IN: slots.tests TUPLE: r/w-test { foo read-only: f } ;" eval ] unit-test
+[ ] [ "IN: slots.tests TUPLE: r/w-test foo ;" eval ] unit-test
 
 [ f ] [ r/w-test \ foo>> method "foldable" word-prop ] unit-test
 [ t ] [ r/w-test \ foo>> method "flushable" word-prop ] unit-test

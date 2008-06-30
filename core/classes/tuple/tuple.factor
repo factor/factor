@@ -14,15 +14,10 @@ ERROR: not-a-tuple object ;
 : check-tuple ( object -- tuple )
     dup tuple? [ not-a-tuple ] unless ; inline
 
-ERROR: not-a-tuple-class class ;
-
-: check-tuple-class ( class -- class )
-    dup tuple-class? [ not-a-tuple-class ] unless ; inline
-
 <PRIVATE
 
 : tuple-layout ( class -- layout )
-    check-tuple-class "layout" word-prop ;
+    "layout" word-prop ;
 
 : layout-of ( tuple -- layout )
     1 slot { tuple-layout } declare ; inline
@@ -46,12 +41,26 @@ PRIVATE>
 : tuple-slots ( tuple -- seq )
     prepare-tuple>array drop copy-tuple-slots ;
 
-: slots>tuple ( tuple class -- array )
-    tuple-layout <tuple> [
-        [ tuple-size ] [ [ set-array-nth ] curry ] bi 2each
+: all-slots ( class -- slots )
+    superclasses [ "slots" word-prop ] map concat ;
+
+: check-slots ( seq class -- seq class )
+    [ ] [
+        2dup all-slots [
+            class>> 2dup instance?
+            [ 2drop ] [ bad-slot-value ] if
+        ] 2each
+    ] if-bootstrapping ; inline
+
+: slots>tuple ( seq class -- tuple )
+    check-slots
+    new [
+        [ tuple-size ]
+        [ [ set-array-nth ] curry ]
+        bi 2each
     ] keep ;
 
-: >tuple ( tuple -- seq )
+: >tuple ( seq -- tuple )
     unclip slots>tuple ;
 
 : slot-names ( class -- seq )
@@ -73,21 +82,42 @@ ERROR: bad-superclass class ;
         2drop f
     ] if ; inline
 
-: tuple-instance? ( object class -- ? )
-    over tuple? [
-        [
-            [ layout-of superclasses>> ]
-            [ tuple-layout echelon>> ] bi*
-            swap ?nth
-        ] keep eq?
-    ] [ 2drop f ] if ; inline
+: tuple-instance? ( object class echelon -- ? )
+    #! 4 slot == superclasses>>
+    rot dup tuple? [
+        layout-of 4 slot
+        2dup array-capacity fixnum<
+        [ array-nth eq? ] [ 3drop f ] if
+    ] [ 3drop f ] if ; inline
 
 : define-tuple-predicate ( class -- )
-    dup [ tuple-instance? ] curry define-predicate ;
+    dup dup tuple-layout echelon>>
+    [ tuple-instance? ] 2curry define-predicate ;
 
 : superclass-size ( class -- n )
     superclasses but-last-slice
     [ slot-names length ] map sum ;
+
+: (instance-check-quot) ( class -- quot )
+    [
+        \ dup ,
+        [ "predicate" word-prop % ]
+        [ [ bad-slot-value ] curry , ] bi
+        \ unless ,
+    ] [ ] make ;
+
+: instance-check-quot ( class -- quot )
+    {
+        { [ dup object bootstrap-word eq? ] [ drop [ ] ] }
+        { [ dup "coercer" word-prop ] [ "coercer" word-prop ] }
+        [ (instance-check-quot) ]
+    } cond ;
+
+: boa-check-quot ( class -- quot )
+    all-slots 1 tail [ class>> instance-check-quot ] map spread>quot ;
+
+: define-boa-check ( class -- )
+    dup boa-check-quot "boa-check" set-word-prop ;
 
 : generate-tuple-slots ( class slots -- slot-specs )
     over superclass-size 2 + make-slots deprecated-slots ;
@@ -138,10 +168,12 @@ ERROR: bad-superclass class ;
     outdated-tuples get [ all-slot-names ] cache drop ;
 
 M: tuple-class update-class
-    [ define-tuple-layout ]
-    [ define-tuple-slots ]
-    [ define-tuple-predicate ]
-    tri ;
+    {
+        [ define-tuple-layout ]
+        [ define-tuple-slots ]
+        [ define-tuple-predicate ]
+        [ define-boa-check ]
+    } cleave ;
 
 : define-new-tuple-class ( class superclass slots -- )
     [ drop f f tuple-class define-class ]
@@ -210,7 +242,7 @@ M: tuple-class reset-class
 M: tuple-class rank-class drop 0 ;
 
 M: tuple-class instance?
-    tuple-instance? ;
+    dup tuple-layout echelon>> tuple-instance? ;
 
 M: tuple clone
     (clone) dup delegate clone over set-delegate ;
@@ -225,6 +257,13 @@ M: tuple hashcode*
             swapd array-nth hashcode* sequence-hashcode-step
         ] 2curry each
     ] recursive-hashcode ;
+
+M: tuple-class new tuple-layout <tuple> ;
+
+M: tuple-class boa
+    [ "boa-check" word-prop call ]
+    [ tuple-layout ]
+    bi <tuple-boa> ;
 
 ! Deprecated
 M: object get-slots ( obj slots -- ... )

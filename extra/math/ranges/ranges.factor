@@ -3,9 +3,9 @@ sequences.private accessors ;
 IN: math.ranges
 
 TUPLE: range
-{ from read-only: t }
-{ length read-only: t }
-{ step read-only: t } ;
+{ from read-only }
+{ length read-only }
+{ step read-only } ;
 
 : <range> ( a b step -- range )
     >r over - r>

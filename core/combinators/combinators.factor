@@ -28,9 +28,10 @@ IN: combinators
 
 ! spread
 : spread>quot ( seq -- quot )
-    [ length [ >r ] <repetition> concat ]
-    [ [ [ r> ] prepend ] map concat ] bi
-    append [ ] like ;
+    [ ] [
+        [ dup empty? [ [ >r ] swap [ r> ] 3append ] unless ] dip
+        append
+    ] reduce ;
 
 : spread ( objs... seq -- )
     spread>quot call ;

@@ -5,16 +5,10 @@ arrays classes slots slots.private classes.tuple math vectors
 quotations accessors combinators ;
 IN: mirrors
 
-: all-slots ( class -- slots )
-    superclasses [ "slots" word-prop ] map concat ;
-
-: object-slots ( obj -- seq )
-    class all-slots ;
-
-TUPLE: mirror object slots ;
+TUPLE: mirror { object read-only } { slots read-only } ;
 
 : <mirror> ( object -- mirror )
-    dup object-slots mirror boa ;
+    dup class all-slots mirror boa ;
 
 M: mirror at*
     [ nip object>> ] [ slots>> slot-named ] 2bi
@@ -24,7 +18,7 @@ M: mirror at*
     {
         { [ dup not ] [ "No such slot" throw ] }
         { [ dup read-only>> ] [ "Read only slot" throw ] }
-        { [ 2dup class>> instance? not ] [ "Bad store to specialized slot" throw ] }
+        { [ 2dup class>> instance? not ] [ class>> bad-slot-value ] }
         [ offset>> ]
     } cond ; inline
 

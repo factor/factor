@@ -172,8 +172,7 @@ IN: bootstrap.syntax
 
     "C:" [
         CREATE-WORD
-        scan-word check-tuple-class
-        [ boa ] curry define-inline
+        scan-word [ boa ] curry define-inline
     ] define-syntax
 
     "ERROR:" [
@@ -215,5 +214,5 @@ IN: bootstrap.syntax
     
     "initial:" "syntax" lookup define-symbol
     
-    "read-only:" "syntax" lookup define-symbol
+    "read-only" "syntax" lookup define-symbol
 ] with-compilation-unit

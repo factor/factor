@@ -43,7 +43,7 @@ TUPLE: slot-spec name offset class initial read-only reader writer ;
 : writer-word ( name -- word )
     "(>>" swap ")" 3append (( value object -- )) create-accessor ;
 
-ERROR: bad-slot-value value object index ;
+ERROR: bad-slot-value value class ;
 
 : writer-quot/object ( slot-spec -- )
     offset>> , \ set-slot , ;
@@ -57,8 +57,10 @@ ERROR: bad-slot-value value object index ;
     [ offset>> , ]
     [
         \ pick ,
-        class>> "predicate" word-prop %
-        [ [ set-slot ] [ bad-slot-value ] if ] %
+        dup class>> "predicate" word-prop %
+        [ set-slot ] ,
+        class>> [ 2nip bad-slot-value ] curry [ ] like ,
+        \ if ,
     ]
     bi ;
 
@@ -158,7 +160,7 @@ ERROR: bad-slot-attribute key ;
     dup empty? [
         unclip {
             { initial: [ [ first >>initial ] [ rest ] bi ] }
-            { read-only: [ [ first >>read-only ] [ rest ] bi ] }
+            { read-only [ [ t >>read-only ] dip ] }
             [ bad-slot-attribute ]
         } case
     ] unless ;

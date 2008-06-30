@@ -217,42 +217,42 @@ bi
 "bignum" "math" create ">bignum" "math" create 1quotation "coercer" set-word-prop
 
 "ratio" "math" create {
-    { "numerator" { "integer" "math" } read-only: t }
-    { "denominator" { "integer" "math" } read-only: t }
+    { "numerator" { "integer" "math" } read-only }
+    { "denominator" { "integer" "math" } read-only }
 } define-builtin
 
 "float" "math" create { } define-builtin
 "float" "math" create ">float" "math" create 1quotation "coercer" set-word-prop
 
 "complex" "math" create {
-    { "real" { "real" "math" } read-only: t }
-    { "imaginary" { "real" "math" } read-only: t }
+    { "real" { "real" "math" } read-only }
+    { "imaginary" { "real" "math" } read-only }
 } define-builtin
 
 "array" "arrays" create { } define-builtin
 
 "wrapper" "kernel" create {
-    { "wrapped" read-only: t }
+    { "wrapped" read-only }
 } define-builtin
 
 "string" "strings" create {
-    { "length" { "array-capacity" "sequences.private" } read-only: t }
+    { "length" { "array-capacity" "sequences.private" } read-only }
     "aux"
 } define-builtin
 
 "quotation" "quotations" create {
-    { "array" { "array" "arrays" } read-only: t }
-    { "compiled" read-only: t }
+    { "array" { "array" "arrays" } read-only }
+    { "compiled" read-only }
 } define-builtin
 
 "dll" "alien" create {
-    { "path" { "byte-array" "byte-arrays" } read-only: t }
+    { "path" { "byte-array" "byte-arrays" } read-only }
 }
 define-builtin
 
 "alien" "alien" create {
-    { "underlying" { "c-ptr" "alien" } read-only: t }
-    { "expired?" read-only: t }
+    { "underlying" { "c-ptr" "alien" } read-only }
+    { "expired?" read-only }
 }
 define-builtin
 
@@ -262,7 +262,7 @@ define-builtin
     "vocabulary"
     { "def" { "quotation" "quotations" } initial: [ ] }
     "props"
-    { "compiled" read-only: t }
+    { "compiled" read-only }
     { "counter" { "fixnum" "math" } }
 } define-builtin
 
@@ -275,11 +275,11 @@ define-builtin
 "callstack" "kernel" create { } define-builtin
 
 "tuple-layout" "classes.tuple.private" create {
-    { "hashcode" { "fixnum" "math" } read-only: t }
-    { "class" { "word" "words" } initial: t read-only: t }
-    { "size" { "fixnum" "math" } read-only: t }
-    { "superclasses" { "array" "arrays" } initial: { } read-only: t }
-    { "echelon" { "fixnum" "math" } read-only: t }
+    { "hashcode" { "fixnum" "math" } read-only }
+    { "class" { "word" "words" } initial: t read-only }
+    { "size" { "fixnum" "math" } read-only }
+    { "superclasses" { "array" "arrays" } initial: { } read-only }
+    { "echelon" { "fixnum" "math" } read-only }
 } define-builtin
 
 "tuple" "kernel" create {
@@ -312,8 +312,8 @@ tuple
 "curry" "kernel" create
 tuple
 {
-    { "obj" read-only: t }
-    { "quot" read-only: t }
+    { "obj" read-only }
+    { "quot" read-only }
 } prepare-slots define-tuple-class
 
 "curry" "kernel" lookup
@@ -325,8 +325,8 @@ tuple
 "compose" "kernel" create
 tuple
 {
-    { "first" read-only: t }
-    { "second" read-only: t }
+    { "first" read-only }
+    { "second" read-only }
 } prepare-slots define-tuple-class
 
 "compose" "kernel" lookup

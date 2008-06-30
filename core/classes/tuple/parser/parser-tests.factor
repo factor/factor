@@ -35,7 +35,7 @@ TUPLE: test-7 { b integer initial: 3 } ;
 
 [ 3 ] [ "b" test-7 "slots" word-prop slot-named initial>> ] unit-test
 
-TUPLE: test-8 { b integer read-only: t } ;
+TUPLE: test-8 { b integer read-only } ;
 
 [ t ] [ "b" test-8 "slots" word-prop slot-named read-only>> ] unit-test
 

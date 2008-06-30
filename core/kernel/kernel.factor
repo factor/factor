@@ -142,11 +142,9 @@ M: object clone ;
 M: callstack clone (clone) ;
 
 ! Tuple construction
-: new ( class -- tuple )
-    tuple-layout <tuple> ;
+GENERIC: new ( class -- tuple )
 
-: boa ( ... class -- tuple )
-    tuple-layout <tuple-boa> ;
+GENERIC: boa ( ... class -- tuple )
 
 ! Quotation building
 : 2curry ( obj1 obj2 quot -- curry )

@@ -558,7 +558,7 @@ $nl
     { { $snippet "{ \"name\" attributes... }" } " - a slot which can hold any object, with optional attributes" }
     { { $snippet "{ \"name\" class attributes... }" } " - a slot specialized to a specific class, with optional attributes" }
 }
-"Slot attributes are lists of slot attribute specifiers followed by values; a slot attribute specifier is one of " { $link initial: } " or " { $link read-only: } "." }
+"Slot attributes are lists of slot attribute specifiers followed by values; a slot attribute specifier is one of " { $link initial: } " or " { $link read-only } "." }
 { $examples
     "A simple tuple class:"
     { $code "TUPLE: color red green blue ;" }
@@ -573,12 +573,12 @@ HELP: initial:
 { $values { "slot" "a slot name" } { "value" "any literal" } }
 { $description "Specifies an initial value for a tuple slot." } ;
 
-HELP: read-only:
-{ $syntax "TUPLE: ... { \"slot\" read-only: ? } ... ;" }
-{ $values { "slot" "a slot name" } { "?" "a boolean" } }
+HELP: read-only
+{ $syntax "TUPLE: ... { \"slot\" read-only } ... ;" }
+{ $values { "slot" "a slot name" } }
 { $description "Defines a tuple slot to be read-only. If a tuple has read-only slots, instances of the tuple should only be created by calling " { $link boa } ", instead of " { $link new } ". Using " { $link boa } " is the only way to set the value of a read-only slot." } ;
 
-{ initial: read-only: } related-words
+{ initial: read-only } related-words
 
 HELP: SLOT:
 { $syntax "SLOT: name" }

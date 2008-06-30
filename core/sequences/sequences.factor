@@ -161,7 +161,7 @@ M: virtual-sequence new-sequence virtual-seq new-sequence ;
 INSTANCE: virtual-sequence sequence
 
 ! A reversal of an underlying sequence.
-TUPLE: reversed { seq read-only: t } ;
+TUPLE: reversed { seq read-only } ;
 
 C: <reversed> reversed
 
@@ -177,9 +177,9 @@ INSTANCE: reversed virtual-sequence
 
 ! A slice of another sequence.
 TUPLE: slice
-{ from read-only: t }
-{ to read-only: t }
-{ seq read-only: t } ;
+{ from read-only }
+{ to read-only }
+{ seq read-only } ;
 
 : collapse-slice ( m n slice -- m' n' seq )
     [ from>> ] [ seq>> ] bi >r tuck + >r + r> r> ; inline
@@ -219,7 +219,7 @@ M: slice length [ to>> ] [ from>> ] bi - ;
 INSTANCE: slice virtual-sequence
 
 ! One element repeated many times
-TUPLE: repetition { len read-only: t } { elt read-only: t } ;
+TUPLE: repetition { len read-only } { elt read-only } ;
 
 C: <repetition> repetition
 

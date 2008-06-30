@@ -5,16 +5,16 @@ slots.private classes strings math ;
 IN: slots
 
 ARTICLE: "accessors" "Slot accessors"
-"For each tuple slot, methods are defined on two accessor words in the " { $vocab-link "accessors" } " vocabulary:"
-{ $list
-    { "The " { $emphasis "reader" } " is named " { $snippet { $emphasis "slot" } ">>" } " and pushes the value of a slot on the stack." }
-    { "The " { $emphasis "writer" } " is named " { $snippet "(>>" { $emphasis "slot" } ")" } " and stores a value into a slot. It has stack effect " { $snippet "( value object -- )" } "." }
-}
-"In addition, two utility words are defined for each distinct slot name used in the system:"
-{ $list
-    { "The " { $emphasis "setter" } " is named " { $snippet ">>" { $emphasis "slot" } } " and stores a value into a slot. It has stack effect " { $snippet "( object value -- object )" } "." }
-    { "The " { $emphasis "changer" } " is named " { $snippet "change-" { $emphasis "slot" } } ". It applies a quotation to the current slot value and stores the result back in the slot; it has stack effect " { $snippet "( object quot -- object )" } "." }
-}
+"For every tuple slot, a " { $emphasis "reader" } " method is defined in the " { $vocab-link "accessors" } " vocabulary. The reader is named " { $snippet { $emphasis "slot" } ">>" } " and given a tuple, pushes the slot value on the stack."
+$nl
+"Writable slots - that is, those not attributed " { $link read-only } " - also have a " { $emphasis "writer" } ". The writer is named " { $snippet "(>>" { $emphasis "slot" } ")" } " and stores a value into a slot. It has stack effect " { $snippet "( value object -- )" } ". If the slot is specialized to a specific class, the writer checks that the value being written into the slot is an instance of that class first."
+$nl
+"In addition, two utility words are defined for each writable slot."
+$nl
+"The " { $emphasis "setter" } " is named " { $snippet ">>" { $emphasis "slot" } } " and stores a value into a slot. It has stack effect " { $snippet "( object value -- object )" } "."
+$nl
+"The " { $emphasis "changer" } " is named " { $snippet "change-" { $emphasis "slot" } } ". It applies a quotation to the current slot value and stores the result back in the slot; it has stack effect " { $snippet "( object quot -- object )" } "."
+$nl
 "Since the reader and writer are generic, words can be written which do not depend on the specific class of tuple passed in, but instead work on any tuple that defines slots with certain names."
 $nl
 "In most cases, using the setter is preferred over the writer because the stack effect is better suited to the common case where the tuple is needed again, and where the new slot value was just computed and so is at the top of the stack. For example, consider the case where you want to create a tuple and fill in the slots with literals. The following version uses setters:"
@@ -96,7 +96,7 @@ $nl
     { { $snippet "offset" } " - an " { $link integer } " offset specifying where the slot value is stored inside instances of the relevant class. This is an implementation detail." }
     { { $snippet "class" } " - a " { $link class } " declaring the set of possible values for the slot." }
     { { $snippet "initial" } " - an initial value for the slot." }
-    { { $snippet "read-only" } " - a boolean indicating whether the slot is read only, or can be written to." }
+    { { $snippet "read-only" } " - a boolean indicating whether the slot is read only or not. Read only slots do not have a writer method associated with them." }
 } } ;
 
 HELP: define-typecheck
