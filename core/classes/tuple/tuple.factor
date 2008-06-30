@@ -16,6 +16,18 @@ ERROR: not-a-tuple object ;
 
 <PRIVATE
 
+: (tuple) ( layout -- tuple )
+    #! In non-optimized code, this word simply calls the
+    #! <tuple> primitive. In optimized code, an intrinsic
+    #! is generated which allocates a tuple but does not set
+    #! any of its slots. This means that any code that uses
+    #! (tuple) must fill in the slots before the next
+    #! call to GC.
+    #!
+    #! This word is only used in the expansion of <tuple-boa>,
+    #! where this invariant is guaranteed to hold.
+    <tuple> ;
+
 : tuple-layout ( class -- layout )
     "layout" word-prop ;
 
@@ -52,9 +64,11 @@ PRIVATE>
         ] 2each
     ] if-bootstrapping ; inline
 
-: slots>tuple ( seq class -- tuple )
+GENERIC: slots>tuple ( seq class -- tuple )
+
+M: tuple-class slots>tuple
     check-slots
-    new [
+    tuple-layout <tuple> [
         [ tuple-size ]
         [ [ set-array-nth ] curry ]
         bi 2each
@@ -119,6 +133,12 @@ ERROR: bad-superclass class ;
 : define-boa-check ( class -- )
     dup boa-check-quot "boa-check" set-word-prop ;
 
+: tuple-prototype ( class -- prototype )
+    [ all-slots [ initial>> ] map ] keep slots>tuple ;
+
+: define-tuple-prototype ( class -- )
+    dup tuple-prototype "prototype" set-word-prop ;
+
 : generate-tuple-slots ( class slots -- slot-specs )
     over superclass-size 2 + make-slots deprecated-slots ;
 
@@ -172,6 +192,7 @@ M: tuple-class update-class
         [ define-tuple-layout ]
         [ define-tuple-slots ]
         [ define-tuple-predicate ]
+        [ define-tuple-prototype ]
         [ define-boa-check ]
     } cleave ;
 
@@ -235,8 +256,11 @@ M: tuple-class reset-class
         ] with each
     ] [
         [ call-next-method ]
-        [ { "layout" "slots" "slot-names" } reset-props ]
-        bi
+        [
+            {
+                "layout" "slots" "slot-names" "boa-check" "prototype"
+            } reset-props
+        ] bi
     ] bi ;
 
 M: tuple-class rank-class drop 0 ;
@@ -258,7 +282,8 @@ M: tuple hashcode*
         ] 2curry each
     ] recursive-hashcode ;
 
-M: tuple-class new tuple-layout <tuple> ;
+M: tuple-class new
+    "prototype" word-prop (clone) ;
 
 M: tuple-class boa
     [ "boa-check" word-prop call ]

@@ -12,7 +12,7 @@ optimizer.backend optimizer.pattern-match optimizer.inlining
 float-arrays sequences.private combinators byte-arrays
 byte-vectors ;
 
-{ <tuple> <tuple-boa> } [
+{ <tuple> <tuple-boa> (tuple) } [
     [
         dup node-in-d peek node-literal
         dup tuple-layout? [ class>> ] [ drop tuple ] if
@@ -24,6 +24,23 @@ byte-vectors ;
     dup node-in-d peek node-literal
     dup class? [ drop tuple ] unless 1array f
 ] "output-classes" set-word-prop
+
+! if the input to new is a literal tuple class, we can expand it
+: literal-new? ( #call -- ? )
+    dup in-d>> first node-literal tuple-class? ;
+
+: new-quot ( class -- quot )
+    dup all-slots 1 tail ! delegate slot
+    [ [ initial>> literalize , ] each literalize , \ boa , ] [ ] make ;
+
+: expand-new ( #call -- node )
+    dup dup in-d>> first node-literal
+    [ +inlined+ depends-on ] [ new-quot ] bi
+    f splice-quot ;
+
+\ new {
+    { [ dup literal-new? ] [ expand-new ] }
+} define-optimizers
 
 ! the output of clone has the same type as the input
 { clone (clone) } [
@@ -127,19 +144,6 @@ byte-vectors ;
         2drop
     ] if
 ] "constraints" set-word-prop
-
-! if the input to new is a literal tuple class, we can expand it
-: literal-new? ( #call -- ? )
-    dup in-d>> first node-literal tuple-class? ;
-
-: expand-new ( #call -- node )
-    dup dup in-d>> first node-literal
-    [ +inlined+ depends-on ] [ tuple-layout [ nip <tuple> ] curry ] bi
-    f splice-quot ;
-
-\ new {
-    { [ dup literal-new? ] [ expand-new ] }
-} define-optimizers
 
 ! open-code instance? checks on predicate classes
 : literal-predicate-class? ( #call -- ? )

@@ -477,7 +477,9 @@ USE: vocabs
     ] with-compilation-unit
 ] unit-test
 
-[ "USE: words T{ word }" eval ] [ error>> T{ no-method f word new } = ] must-fail-with
+[ "USE: words T{ word }" eval ]
+[ error>> T{ no-method f word slots>tuple } = ]
+must-fail-with
 
 ! Accessors not being forgotten...
 [ [ ] ] [
@@ -621,3 +623,11 @@ must-fail-with
 [ 0 { } foo ]
 [ T{ bad-slot-value f { } string } = ]
 must-fail-with
+
+[ T{ declared-types f 0 "" } ] [ declared-types new ] unit-test
+
+: blah ( -- vec ) vector new ;
+
+\ blah must-infer
+
+[ V{ } ] [ blah ] unit-test

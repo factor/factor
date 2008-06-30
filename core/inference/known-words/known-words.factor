@@ -550,6 +550,9 @@ set-primitive-effect
 \ <tuple> { tuple-layout } { tuple } <effect> set-primitive-effect
 \ <tuple> make-flushable
 
+\ (tuple) { tuple-layout } { tuple } <effect> set-primitive-effect
+\ (tuple) make-flushable
+
 \ <tuple-layout> { word fixnum array fixnum } { tuple-layout } <effect> set-primitive-effect
 \ <tuple-layout> make-foldable
 

@@ -291,15 +291,11 @@ IN: cpu.x86.intrinsics
     { +clobber+ { "n" } }
 } define-intrinsic
 
-\ <tuple> [
+\ (tuple) [
     tuple "layout" get size>> 2 + cells [
         ! Store layout
         "layout" get "scratch" get load-literal
         1 object@ "scratch" operand MOV
-        ! Zero out the rest of the tuple
-        "layout" get size>> [
-            2 + object@ f v>operand MOV
-        ] each
         ! Store tagged ptr in reg
         "tuple" get tuple %store-tagged
     ] %allot

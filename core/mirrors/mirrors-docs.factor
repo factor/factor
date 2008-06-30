@@ -13,10 +13,6 @@ $nl
 
 ABOUT: "mirrors"
 
-HELP: object-slots
-{ $values { "obj" object } { "seq" "a sequence of " { $link slot-spec } " instances" } }
-{ $description "Outputs a sequence of slot specifiers for the object." } ;
-
 HELP: mirror
 { $class-description "An associative structure which wraps an object and presents itself as a mapping from slot names to the object's slot values. Mirrors are used to build reflective developer tools."
 $nl
