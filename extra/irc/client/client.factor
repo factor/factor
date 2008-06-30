@@ -14,18 +14,12 @@ SYMBOL: current-irc-client
 
 : irc-port 6667 ; ! Default irc port
 
-! "setup" objects
 TUPLE: irc-profile server port nickname password ;
 C: <irc-profile> irc-profile
 
-! "live" objects
-TUPLE: nick name channels log ;
-C: <nick> nick
-
-TUPLE: irc-client profile nick stream in-messages out-messages join-messages
+TUPLE: irc-client profile stream in-messages out-messages join-messages
        listeners is-running connect reconnect-time ;
 : <irc-client> ( profile -- irc-client )
-    f V{ } clone V{ } clone <nick>
     f <mailbox> <mailbox> <mailbox> H{ } clone f
     [ <inet> latin1 <client> ] 15 seconds irc-client boa ;
 
@@ -182,7 +176,7 @@ TUPLE: unhandled < irc-message ;
 ! ======================================
 
 : me? ( string -- ? )
-    irc> nick>> name>> = ;
+    irc> profile>> nickname>> = ;
 
 : irc-message-origin ( irc-message -- name )
     dup name>> me? [ prefix>> parse-name ] [ name>> ] if ;
@@ -196,7 +190,7 @@ M: irc-message handle-incoming-irc ( irc-message -- )
     f listener> [ in-messages>> mailbox-put ] [ drop ] if* ;
 
 M: logged-in handle-incoming-irc ( logged-in -- )
-    name>> irc> nick>> (>>name) ;
+    name>> irc> profile>> (>>nickname) ;
 
 M: ping handle-incoming-irc ( ping -- )
     trailing>> /PONG ;
