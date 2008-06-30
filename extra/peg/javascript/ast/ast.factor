@@ -38,5 +38,6 @@ TUPLE: ast-continue ;
 TUPLE: ast-throw e ;
 TUPLE: ast-try t e c f ;
 TUPLE: ast-return e ;
+TUPLE: ast-with expr body ;
 TUPLE: ast-case c cs ;
 TUPLE: ast-default cs ;

@@ -189,6 +189,7 @@ Stmt               =   Block
                      | "try" Block:t "catch" "(" Name:e ")" Block:c Finally:f => [[ t e c f ast-try boa ]]
                      | "return" Expr:e Sc                            => [[ e ast-return boa ]]
                      | "return" Sc                                   => [[ "undefined" ast-get boa ast-return boa ]]
+                     | "with" "(" Expr:e ")" Stmt:b                  => [[ e b ast-with boa ]]
                      | Expr:e Sc                                     => [[ e ]]
                      | ";"                                           => [[ "undefined" ast-get boa ]]
 SrcElem            =   "function" Name:n FuncRest:f                  => [[ n f ast-var boa ]]
