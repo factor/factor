@@ -40,6 +40,12 @@ Expr               =   OrExpr:e "?" Expr:t ":" Expr:f   => [[ e t f ast-cond-exp
                      | OrExpr:e "%=" Expr:rhs           => [[ e rhs "%" ast-mset boa ]]
                      | OrExpr:e "&&=" Expr:rhs          => [[ e rhs "&&" ast-mset boa ]]
                      | OrExpr:e "||=" Expr:rhs          => [[ e rhs "||" ast-mset boa ]]
+                     | OrExpr:e "^=" Expr:rhs           => [[ e rhs "^" ast-mset boa ]]
+                     | OrExpr:e "&=" Expr:rhs           => [[ e rhs "&" ast-mset boa ]]
+                     | OrExpr:e "|=" Expr:rhs           => [[ e rhs "|" ast-mset boa ]]
+                     | OrExpr:e "<<=" Expr:rhs          => [[ e rhs "<<" ast-mset boa ]]
+                     | OrExpr:e ">>=" Expr:rhs          => [[ e rhs ">>" ast-mset boa ]]
+                     | OrExpr:e ">>>=" Expr:rhs         => [[ e rhs ">>>" ast-mset boa ]]
                      | OrExpr:e                         => [[ e ]]
 
 ExprNoIn           =   OrExprNoIn:e "?" ExprNoIn:t ":" ExprNoIn:f => [[ e t f ast-cond-expr boa ]]
@@ -51,15 +57,33 @@ ExprNoIn           =   OrExprNoIn:e "?" ExprNoIn:t ":" ExprNoIn:f => [[ e t f as
                      | OrExprNoIn:e "%=" ExprNoIn:rhs             => [[ e rhs "%" ast-mset boa ]]
                      | OrExprNoIn:e "&&=" ExprNoIn:rhs            => [[ e rhs "&&" ast-mset boa ]]
                      | OrExprNoIn:e "||=" ExprNoIn:rhs            => [[ e rhs "||" ast-mset boa ]]
+                     | OrExprNoIn:e "^=" ExprNoIn:rhs             => [[ e rhs "^" ast-mset boa ]]
+                     | OrExprNoIn:e "&=" ExprNoIn:rhs             => [[ e rhs "&" ast-mset boa ]]
+                     | OrExprNoIn:e "|=" ExprNoIn:rhs             => [[ e rhs "|" ast-mset boa ]]
+                     | OrExprNoIn:e "<<=" ExprNoIn:rhs            => [[ e rhs "<<" ast-mset boa ]]
+                     | OrExprNoIn:e ">>=" ExprNoIn:rhs            => [[ e rhs ">>" ast-mset boa ]]
+                     | OrExprNoIn:e ">>>=" ExprNoIn:rhs           => [[ e rhs ">>>" ast-mset boa ]]
                      | OrExprNoIn:e                               => [[ e ]]
 
 OrExpr             =   OrExpr:x "||" AndExpr:y          => [[ x y "||" ast-binop boa ]]
                      | AndExpr
 OrExprNoIn         =   OrExprNoIn:x "||" AndExprNoIn:y  => [[ x y "||" ast-binop boa ]]
                      | AndExprNoIn
-AndExpr            =   AndExpr:x "&&" EqExpr:y          => [[ x y "&&" ast-binop boa ]]
+AndExpr            =   AndExpr:x "&&" BitOrExpr:y       => [[ x y "&&" ast-binop boa ]]
+                     | BitOrExpr
+AndExprNoIn        =   AndExprNoIn:x "&&" BitOrExprNoIn:y => [[ x y "&&" ast-binop boa ]]
+                     | BitOrExprNoIn
+BitOrExpr          =   BitOrExpr:x "|" BitXORExpr:y     => [[ x y "|" ast-binop boa ]]
+                     | BitXORExpr
+BitOrExprNoIn      =   BitOrExprNoIn:x "|" BitXORExprNoIn:y => [[ x y "|" ast-binop boa ]]
+                     | BitXORExprNoIn
+BitXORExpr         =   BitXORExpr:x "^" BitANDExpr:y    => [[ x y "^" ast-binop boa ]]
+                     | BitANDExpr
+BitXORExprNoIn     =   BitXORExprNoIn:x "^" BitANDExprNoIn:y => [[ x y "^" ast-binop boa ]]
+                     | BitANDExprNoIn
+BitANDExpr         =   BitANDExpr:x "&" EqExpr:y        => [[ x y "&" ast-binop boa ]]
                      | EqExpr
-AndExprNoIn        =   AndExprNoIn:x "&&" EqExprNoIn:y  => [[ x y "&&" ast-binop boa ]]
+BitANDExprNoIn     =   BitANDExprNoIn:x "&" EqExprNoIn:y => [[ x y "&" ast-binop boa ]]
                      | EqExprNoIn
 EqExpr             =   EqExpr:x "==" RelExpr:y          => [[ x y "==" ast-binop boa ]]
                      | EqExpr:x "!=" RelExpr:y          => [[ x y "!=" ast-binop boa ]]

@@ -67,11 +67,13 @@ RegExpChar         =   !("\\" | "/") NonTerminator
 RegExpChars        = RegExpChar*
 RegExpBody         = RegExpFirstChar RegExpChars => [[ first2 swap prefix >string ]]
 RegExp             = "/" RegExpBody:b "/" RegExpFlags:fl => [[ b fl ast-regexp boa ]]
-Special            =   "("   | ")"   | "{"   | "}"   | "["   | "]"   | ","   | ";"
-                     | "?"   | ":"   | "!==" | "!="  | "===" | "=="  | "="   | ">="
-                     | ">>>" | ">>"  | ">"   | "<="  | "<<"  | "<"   | "++"  | "+="
-                     | "+"   | "--"  | "-="  | "-"   | "*="  | "*"   | "/="  | "/"
-                     | "%="  | "%"   | "&&=" | "&&"  | "||=" | "||"  | "."   | "!"
+Special            =   "("    | ")"   | "{"   | "}"   | "["   | "]"   | ","   | ";"
+                     | "?"    | ":"   | "!==" | "!="  | "===" | "=="  | "="   | ">="
+                     | ">>>=" | ">>>" | ">>=" | ">>"  | ">"   | "<="  | "<<=" | "<<"
+                     | "<"    | "++"  | "+="  | "+"   | "--"  | "-="  | "-"   | "*="
+                     | "*"    | "/="  | "/"   | "%="  | "%"   | "&&=" | "&&"  | "||="
+                     | "||"   | "."   | "!"   | "&="  | "&"   | "|="  | "|"   | "^="
+                     | "^"
 Tok                = Spaces (Name | Keyword | Number | Str | RegExp | Special )
 Toks               = Tok* Spaces 
 ;EBNF
