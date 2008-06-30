@@ -51,11 +51,15 @@ EqExpr             =   EqExpr:x "==" RelExpr:y          => [[ x y "==" ast-binop
                      | EqExpr:x "===" RelExpr:y         => [[ x y "===" ast-binop boa ]]
                      | EqExpr:x "!==" RelExpr:y         => [[ x y "!==" ast-binop boa ]]
                      | RelExpr
-RelExpr            =   RelExpr:x ">" AddExpr:y          => [[ x y ">" ast-binop boa ]]
-                     | RelExpr:x ">=" AddExpr:y         => [[ x y ">=" ast-binop boa ]]
-                     | RelExpr:x "<" AddExpr:y          => [[ x y "<" ast-binop boa ]]
-                     | RelExpr:x "<=" AddExpr:y         => [[ x y "<=" ast-binop boa ]]
-                     | RelExpr:x "instanceof" AddExpr:y => [[ x y "instanceof" ast-binop boa ]]
+RelExpr            =   RelExpr:x ">" ShiftExpr:y          => [[ x y ">" ast-binop boa ]]
+                     | RelExpr:x ">=" ShiftExpr:y         => [[ x y ">=" ast-binop boa ]]
+                     | RelExpr:x "<" ShiftExpr:y          => [[ x y "<" ast-binop boa ]]
+                     | RelExpr:x "<=" ShiftExpr:y         => [[ x y "<=" ast-binop boa ]]
+                     | RelExpr:x "instanceof" ShiftExpr:y => [[ x y "instanceof" ast-binop boa ]]
+                     | ShiftExpr
+ShiftExpr          =   ShiftExpr:x "<<" AddExpr:y       => [[ x y "<<" ast-binop boa ]]
+                     | ShiftExpr:x ">>>" AddExpr:y      => [[ x y ">>>" ast-binop boa ]]
+                     | ShiftExpr:x ">>" AddExpr:y       => [[ x y ">>" ast-binop boa ]]
                      | AddExpr
 AddExpr            =   AddExpr:x "+" MulExpr:y          => [[ x y "+" ast-binop boa ]]
                      | AddExpr:x "-" MulExpr:y          => [[ x y "-" ast-binop boa ]]
