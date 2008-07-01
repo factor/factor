@@ -1,13 +1,13 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: bootstrap.image.download
 USING: http.client checksums checksums.openssl splitting assocs
-kernel io.files bootstrap.image sequences io ;
+kernel io.files bootstrap.image sequences io urls ;
+IN: bootstrap.image.download
 
-: url "http://factorcode.org/images/latest/" ;
+: url URL" http://factorcode.org/images/latest/" ;
 
 : download-checksums ( -- alist )
-    url "checksums.txt" append http-get nip
+    url "checksums.txt" >url derive-url http-get nip
     string-lines [ " " split1 ] { } map>assoc ;
 
 : need-new-image? ( image -- ? )
@@ -21,7 +21,10 @@ kernel io.files bootstrap.image sequences io ;
 : download-image ( arch -- )
     boot-image-name dup need-new-image? [
         "Downloading " write dup write "..." print
-        url prepend download
+         url over >url derive-url download
+         need-new-image? [
+             "Boot image corrupt, or checksums.txt on server out of date" throw
+         ] when
     ] [
         "Boot image up to date" print
         drop
