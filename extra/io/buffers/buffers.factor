@@ -8,7 +8,7 @@ IN: io.buffers
 
 TUPLE: buffer
 { size fixnum }
-{ ptr simple-alien initial: ALIEN: -1 }
+{ ptr simple-alien }
 { fill fixnum }
 { pos fixnum }
 disposed ;

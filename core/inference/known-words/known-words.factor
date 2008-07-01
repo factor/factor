@@ -529,9 +529,6 @@ set-primitive-effect
 
 \ fclose { alien } { } <effect> set-primitive-effect
 
-\ expired? { object } { object } <effect> set-primitive-effect
-\ expired? make-flushable
-
 \ <wrapper> { object } { wrapper } <effect> set-primitive-effect
 \ <wrapper> make-foldable
 

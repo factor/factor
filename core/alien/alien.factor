@@ -18,14 +18,17 @@ PREDICATE: pinned-alien < alien underlying>> pinned-c-ptr? ;
 UNION: pinned-c-ptr
     pinned-alien POSTPONE: f ;
 
-GENERIC: expired? ( c-ptr -- ? )
+GENERIC: expired? ( c-ptr -- ? ) flushable
 
-M: alien expired? expired?>> ;
+M: alien expired? expired>> ;
 
 M: f expired? drop t ;
 
 : <alien> ( address -- alien )
     f <displaced-alien> { simple-c-ptr } declare ; inline
+
+: <bad-alien> ( -- alien )
+    -1 <alien> t >>expired ; inline
 
 M: alien equal?
     over alien? [

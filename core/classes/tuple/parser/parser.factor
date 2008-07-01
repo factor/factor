@@ -5,7 +5,9 @@ lexer combinators words classes.parser classes.tuple arrays ;
 IN: classes.tuple.parser
 
 : shadowed-slots ( superclass slots -- shadowed )
-    >r all-slot-names r> intersect ;
+    [ all-slots [ name>> ] map ]
+    [ [ dup array? [ first ] when ] map ]
+    bi* intersect ;
 
 : check-slot-shadowing ( class superclass slots -- )
     shadowed-slots [

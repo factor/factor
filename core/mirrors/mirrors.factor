@@ -1,8 +1,9 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs hashtables kernel sequences generic words
-arrays classes slots slots.private classes.tuple math vectors
-quotations accessors combinators ;
+arrays classes slots slots.private classes.tuple
+classes.tuple.private math vectors quotations accessors
+combinators ;
 IN: mirrors
 
 TUPLE: mirror { object read-only } ;
@@ -40,7 +41,7 @@ M: mirror >alist ( mirror -- alist )
     [ object>> [ swap slot ] curry ] bi
     map zip ;
 
-M: mirror assoc-size mirror-slots length ;
+M: mirror assoc-size object>> layout-of size>> ;
 
 INSTANCE: mirror assoc
 

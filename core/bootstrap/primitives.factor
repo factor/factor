@@ -247,14 +247,12 @@ bi
 
 "dll" "alien" create {
     { "path" { "byte-array" "byte-arrays" } read-only }
-}
-define-builtin
+} define-builtin
 
 "alien" "alien" create {
     { "underlying" { "c-ptr" "alien" } read-only }
-    { "expired?" read-only }
-}
-define-builtin
+    "expired"
+} define-builtin
 
 "word" "words" create {
     { "hashcode" { "fixnum" "math" } }
