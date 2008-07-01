@@ -5,13 +5,14 @@ arrays classes slots slots.private classes.tuple math vectors
 quotations accessors combinators ;
 IN: mirrors
 
-TUPLE: mirror { object read-only } { slots read-only } ;
+TUPLE: mirror { object read-only } ;
 
-: <mirror> ( object -- mirror )
-    dup class all-slots mirror boa ;
+C: <mirror> mirror
+
+: object-slots ( mirror -- slots ) object>> class all-slots ; inline
 
 M: mirror at*
-    [ nip object>> ] [ slots>> slot-named ] 2bi
+    [ nip object>> ] [ object-slots slot-named ] 2bi
     dup [ offset>> slot t ] [ 2drop f f ] if ;
 
 : check-set-slot ( val slot -- val offset )
@@ -23,21 +24,21 @@ M: mirror at*
     } cond ; inline
 
 M: mirror set-at ( val key mirror -- )
-    [ slots>> slot-named check-set-slot ] [ object>> ] bi
+    [ object-slots slot-named check-set-slot ] [ object>> ] bi
     swap set-slot ;
 
 M: mirror delete-at ( key mirror -- )
     f -rot set-at ;
 
 M: mirror clear-assoc ( mirror -- )
-    [ object>> ] [ slots>> ] bi [
+    [ object>> ] [ object-slots ] bi [
         [ initial>> ] [ offset>> ] bi swapd set-slot
     ] with each ;
 
 M: mirror >alist ( mirror -- alist )
-    [ slots>> [ name>> ] map ]
-    [ [ object>> ] [ slots>> ] bi [ offset>> slot ] with map ] bi
-    zip ;
+    [ object-slots [ [ name>> ] map ] [ [ offset>> ] map ] bi ]
+    [ object>> [ swap slot ] curry ] bi
+    map zip ;
 
 M: mirror assoc-size mirror-slots length ;
 

@@ -101,7 +101,7 @@ GENERIC: <yo-momma>
 
 TUPLE: yo-momma ;
 
-"IN: classes.tuple.tests C: <yo-momma> yo-momma" eval
+[ ] [ "IN: classes.tuple.tests C: <yo-momma> yo-momma" eval ] unit-test
 
 [ f ] [ \ <yo-momma> generic? ] unit-test
 
@@ -203,7 +203,7 @@ C: <erg's-reshape-problem> erg's-reshape-problem
 : cons-test-1 ( -- tuple ) \ erg's-reshape-problem new ;
 : cons-test-2 ( a b c d -- tuple ) \ erg's-reshape-problem boa ;
 
-"IN: classes.tuple.tests TUPLE: erg's-reshape-problem a b c d e f ;" eval
+[ ] [ "IN: classes.tuple.tests TUPLE: erg's-reshape-problem a b c d e f ;" eval ] unit-test
 
 [ ] [ 1 2 3 4 5 6 cons-test-2 "a" set ] unit-test
 
@@ -348,7 +348,7 @@ test-server-slot-values
 [ 110 ] [ "server" get voltage>> ] unit-test
 
 ! Reshaping superclass and subclass simultaneously
-"IN: classes.tuple.tests TUPLE: electronic-device voltage ; TUPLE: computer < electronic-device cpu ram ;" eval
+[ ] [ "IN: classes.tuple.tests TUPLE: electronic-device voltage ; TUPLE: computer < electronic-device cpu ram ;" eval ] unit-test
 
 test-laptop-slot-values
 test-server-slot-values
@@ -631,3 +631,24 @@ must-fail-with
 \ blah must-infer
 
 [ V{ } ] [ blah ] unit-test
+
+! Test reshaping with type declarations and slot attributes
+TUPLE: reshape-test x ;
+
+T{ reshape-test f "hi" } "tuple" set
+
+[ ] [ "IN: classes.tuple.tests TUPLE: reshape-test { x read-only } ;" eval ] unit-test
+
+[ f ] [ \ reshape-test \ (>>x) method ] unit-test
+
+[ "tuple" get 5 >>x ] must-fail
+
+[ "hi" ] [ "tuple" get x>> ] unit-test
+
+[ ] [ "IN: classes.tuple.tests USE: math TUPLE: reshape-test { x integer read-only } ;" eval ] unit-test
+
+[ 0 ] [ "tuple" get x>> ] unit-test
+
+[ ] [ "IN: classes.tuple.tests USE: math TUPLE: reshape-test { x fixnum initial: 4 read-only } ;" eval ] unit-test
+
+[ 0 ] [ "tuple" get x>> ] unit-test

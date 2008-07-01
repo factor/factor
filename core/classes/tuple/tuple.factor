@@ -80,9 +80,6 @@ M: tuple-class slots>tuple
 : slot-names ( class -- seq )
     "slot-names" word-prop ;
 
-: all-slot-names ( class -- slots )
-    superclasses [ slot-names ] map concat \ class prefix ;
-
 ERROR: bad-superclass class ;
 
 <PRIVATE
@@ -158,34 +155,45 @@ ERROR: bad-superclass class ;
 : define-tuple-layout ( class -- )
     dup make-tuple-layout "layout" set-word-prop ;
 
-: compute-slot-permutation ( class old-slot-names -- permutation )
-    >r all-slot-names r> [ index ] curry map ;
+: compute-slot-permutation ( new-slots old-slots -- triples )
+    [ [ [ name>> ] map ] bi@ [ index ] curry map ]
+    [ drop [ class>> ] map ]
+    [ drop [ initial>> ] map ]
+    2tri 3array flip ;
 
-: apply-slot-permutation ( old-values permutation -- new-values )
-    [ [ swap ?nth ] [ drop f ] if* ] with map ;
+: update-slot ( old-values n class initial -- value )
+    pick [
+        >r >r swap nth dup r> instance?
+        [ r> drop ] [ drop r> ] if
+    ] [ >r 3drop r> ] if ;
 
-: permute-slots ( old-values -- new-values )
-    dup first dup outdated-tuples get at
+: apply-slot-permutation ( old-values triples -- new-values )
+    [ first3 update-slot ] with map ;
+
+: permute-slots ( old-values layout -- new-values )
+    [ class>> all-slots ] [ outdated-tuples get at ] bi
     compute-slot-permutation
     apply-slot-permutation ;
 
-: change-tuple ( tuple quot -- newtuple )
-    >r tuple>array r> call >tuple ; inline
-
 : update-tuple ( tuple -- newtuple )
-    [ permute-slots ] change-tuple ;
+    [ tuple-slots ] [ layout-of ] bi
+    [ permute-slots ] [ class>> ] bi
+    slots>tuple ;
 
 : update-tuples ( -- )
     outdated-tuples get
     dup assoc-empty? [ drop ] [
-        [ >r class r> key? ] curry instances
+        [
+            over tuple?
+            [ >r layout-of r> key? ] [ 2drop f ] if
+        ] curry instances
         dup [ update-tuple ] map become
     ] if ;
 
 [ update-tuples ] update-tuples-hook set-global
 
 : update-tuples-after ( class -- )
-    outdated-tuples get [ all-slot-names ] cache drop ;
+    [ all-slots ] [ tuple-layout ] bi outdated-tuples get set-at ;
 
 M: tuple-class update-class
     {
@@ -239,9 +247,9 @@ M: word define-tuple-class
     define-new-tuple-class ;
 
 M: tuple-class define-tuple-class
+    over check-superclass
     3dup tuple-class-unchanged?
-    [ over check-superclass 3dup redefine-tuple-class ] unless
-    3drop ;
+    [ 3drop ] [ redefine-tuple-class ] if ;
 
 : define-error-class ( class superclass slots -- )
     [ define-tuple-class ] [ 2drop ] 3bi
