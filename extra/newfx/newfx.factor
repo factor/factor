@@ -200,3 +200,22 @@ METHOD: as-mutate { object object assoc }       set-at ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : start ( seq subseq -- i ) swap sequences:start ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: pluck         ( seq i   -- seq ) cut-slice rest-slice append ;
+: pluck-from    ( i   seq -- seq ) swap pluck ;
+: pluck!        ( seq i   -- seq ) over delete-nth ;
+: pluck-from!   ( i   seq -- seq ) tuck delete-nth ;
+: plucked!      ( seq i   --     ) swap delete-nth ;
+: plucked-from! ( i   seq --     )      delete-nth ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: snip          ( seq a b -- seq ) >r over r> [ head ] [ tail ] 2bi* append ;
+: snip-this     ( a b seq -- seq ) -rot snip ;
+: snip!         ( seq a b -- seq )      pick delete-slice ;
+: snip-this!    ( a b seq -- seq ) -rot pick delete-slice ;
+: snipped!      ( seq a b --     )       rot delete-slice ;
+: snipped-from! ( a b seq --     )           delete-slice ;
+
