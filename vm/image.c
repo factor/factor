@@ -28,8 +28,14 @@ INLINE void load_data_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
 
 	F_ZONE *tenured = &data_heap->generations[TENURED];
 
-	if(fread((void*)tenured->start,h->data_size,1,file) != 1)
+	long int bytes_read = fread((void*)tenured->start,1,h->data_size,file);
+
+	if(bytes_read != h->data_size)
+	{
+		fprintf(stderr,"truncated image: %ld bytes read, %ld bytes expected\n",
+			bytes_read,h->data_size);
 		fatal_error("load_data_heap failed",0);
+	}
 
 	tenured->here = tenured->start + h->data_size;
 	data_relocation_base = h->data_relocation_base;
@@ -44,9 +50,16 @@ INLINE void load_code_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
 
 	init_code_heap(p->code_size);
 
-	if(h->code_size != 0
-		&& fread(first_block(&code_heap),h->code_size,1,file) != 1)
-		fatal_error("load_code_heap failed",0);
+	if(h->code_size != 0)
+	{
+		long int bytes_read = fread(first_block(&code_heap),1,h->code_size,file);
+		if(bytes_read != h->code_size)
+		{
+			fprintf(stderr,"truncated image: %ld bytes read, %ld bytes expected\n",
+				bytes_read,h->code_size);
+			fatal_error("load_code_heap failed",0);
+		}
+	}
 
 	code_relocation_base = h->code_relocation_base;
 	build_free_list(&code_heap,h->code_size);

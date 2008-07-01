@@ -1,6 +1,6 @@
 
 USING: kernel parser math quotations namespaces sequences namespaces.lib 
-       inference.transforms ;
+       inference.transforms fry ;
 
 IN: rewrite-closures
 
@@ -19,15 +19,17 @@ IN: rewrite-closures
 
 : parametric-quot ( parameters quot -- quot ) '[ , set-parameters , call ] ;
 
-
 : scoped-quot ( quot -- quot ) [ with-scope ] curry ;
 
+! : closed-quot ( quot -- quot )
+! [ namestack >r [ namestack ] set-namestack [ ] call r> set-namestack ] make* ;
+
 : closed-quot ( quot -- quot )
-[ namestack >r [ namestack ] set-namestack [ ] call r> set-namestack ] make* ;
+  namestack swap '[ namestack [ , set-namestack @ ] dip set-namestack ] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: lambda ( parameters quot -- ) parametric-quot scoped-quot closed-quot ;
+: lambda ( parameters quot -- quot ) parametric-quot scoped-quot closed-quot ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
