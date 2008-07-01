@@ -161,16 +161,8 @@ M: long-long-type flatten-value-type ( type -- )
     dup return>> "void" = 0 1 ?
     swap produce-values ;
 
-: (param-prep-quot) ( parameters -- )
-    dup empty? [
-        drop
-    ] [
-        unclip c-type c-type-unboxer-quot %
-        \ >r , (param-prep-quot) \ r> ,
-    ] if ;
-
 : param-prep-quot ( node -- quot )
-    parameters>> [ <reversed> (param-prep-quot) ] [ ] make ;
+    parameters>> [ c-type c-type-unboxer-quot ] map spread>quot ;
 
 : unbox-parameters ( offset node -- )
     parameters>> [
@@ -198,19 +190,11 @@ M: long-long-type flatten-value-type ( type -- )
 : box-return* ( node -- )
     return>> [ ] [ box-return ] if-void ;
 
-: (return-prep-quot) ( parameters -- )
-    dup empty? [
-        drop
-    ] [
-        unclip c-type c-type-boxer-quot %
-        \ >r , (return-prep-quot) \ r> ,
-    ] if ;
-
 : callback-prep-quot ( node -- quot )
-    parameters>> [ <reversed> (return-prep-quot) ] [ ] make ;
+    parameters>> [ c-type c-type-boxer-quot ] map spread>quot ;
 
 : return-prep-quot ( node -- quot )
-    [ return>> [ ] [ 1array (return-prep-quot) ] if-void ] [ ] make ;
+    return>> [ [ ] ] [ c-type c-type-boxer-quot ] if-void ;
 
 M: alien-invoke-error summary
     drop
