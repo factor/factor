@@ -54,6 +54,7 @@ IN: bit-arrays.tests
 [ -10 ?{ } resize-bit-array ] must-fail
 
 [ -1 integer>bit-array ] must-fail
+[ ?{ } ] [ 0 integer>bit-array ] unit-test
 [ ?{ f t } ] [ 2 integer>bit-array ] unit-test
 [ ?{ t t t t t t t t t } ] [ 511 integer>bit-array ] unit-test
 [ ?{ 
@@ -66,6 +67,7 @@ IN: bit-arrays.tests
 ] unit-test
 
 [ 14 ] [ ?{ f t t t } bit-array>integer ] unit-test
+[ 0 ] [ ?{ } bit-array>integer ] unit-test
 [ HEX: ffffffffffffffffffffffffffffffff ] [ ?{
     t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
     t t t t t t t t   t t t t t t t t   t t t t t t t t  t t t t t t t t
