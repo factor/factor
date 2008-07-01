@@ -52,7 +52,3 @@ HOOK: add-completion io-backend ( port -- )
     "SECURITY_ATTRIBUTES" <c-object>
     "SECURITY_ATTRIBUTES" heap-size
     over set-SECURITY_ATTRIBUTES-nLength ;
-
-: security-attributes-inherit ( -- obj )
-    default-security-attributes
-    TRUE over set-SECURITY_ATTRIBUTES-bInheritHandle ; foldable

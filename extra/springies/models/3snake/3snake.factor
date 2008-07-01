@@ -1,5 +1,5 @@
 
-USING: kernel namespaces arrays sequences threads math ui random bake
+USING: kernel namespaces arrays sequences threads math ui random fry
        springies springies.ui ;
 
 IN: springies.models.3snake
@@ -158,8 +158,10 @@ times
 
 ;
 
-: go* ( quot -- )
-  [ [ [ springies-window* 1000 sleep % ] with-scope ] with-ui ] bake call ;
+! : go* ( quot -- )
+!   [ [ [ springies-window* 1000 sleep % ] with-scope ] with-ui ] bake call ;
+
+: go* ( quot -- ) '[ [ springies-window* 1000 sleep @ ] with-scope ] with-ui ;
 
 ! : go ( -- ) [ [ springies-window* 1000 sleep model ] with-scope ] with-ui ;
 
