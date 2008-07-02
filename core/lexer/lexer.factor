@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors namespaces math words strings
-debugger io vectors arrays math.parser combinators inspector
+debugger io vectors arrays math.parser combinators summary
 continuations ;
 IN: lexer
 

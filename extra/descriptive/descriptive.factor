@@ -1,6 +1,6 @@
 USING: words kernel sequences combinators.lib locals
 locals.private accessors parser namespaces continuations
-inspector definitions arrays.lib arrays ;
+summary definitions arrays.lib arrays ;
 IN: descriptive
 
 ERROR: descriptive-error args underlying word ;

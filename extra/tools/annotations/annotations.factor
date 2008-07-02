@@ -1,8 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel words parser io inspector quotations
+USING: accessors kernel words parser io summary quotations
 sequences prettyprint continuations effects definitions
-compiler.units namespaces assocs tools.walker generic ;
+compiler.units namespaces assocs tools.walker generic
+inspector ;
 IN: tools.annotations
 
 GENERIC: reset ( word -- )

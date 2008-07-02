@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic assocs kernel math namespaces
-prettyprint sequences strings vectors words quotations inspector
+prettyprint sequences strings vectors words quotations summary
 io.styles io combinators sorting splitting math.parser effects
 continuations debugger io.files io.streams.string vocabs
 io.encodings.utf8 source-files classes hashtables

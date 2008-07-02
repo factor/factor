@@ -13,7 +13,6 @@ QUALIFIED: compiler.units
 QUALIFIED: continuations
 QUALIFIED: definitions
 QUALIFIED: init
-QUALIFIED: inspector
 QUALIFIED: io.backend
 QUALIFIED: io.thread
 QUALIFIED: layouts
@@ -155,6 +154,8 @@ IN: tools.deploy.shaker
     [
         "callbacks" "alien.compiler" lookup ,
 
+        "inspector-hook" "inspector" lookup ,
+
         {
             bootstrap.stage2:bootstrap-time
             continuations:error
@@ -163,7 +164,6 @@ IN: tools.deploy.shaker
             continuations:restarts
             listener:error-hook
             init:init-hooks
-            inspector:inspector-hook
             io.thread:io-thread
             libc.private:mallocs
             source-files:source-files

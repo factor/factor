@@ -3,45 +3,8 @@
 USING: accessors arrays generic hashtables io kernel assocs math
 namespaces prettyprint sequences strings io.styles vectors words
 quotations mirrors splitting math.parser classes vocabs refs
-sets sorting ;
+sets sorting summary debugger continuations ;
 IN: inspector
-
-GENERIC: summary ( object -- string )
-
-: object-summary ( object -- string )
-    class name>> " instance" append ;
-
-M: object summary object-summary ;
-
-M: input summary
-    [
-        "Input: " %
-        input-string "\n" split1 swap %
-        "..." "" ? %
-    ] "" make ;
-
-M: word summary synopsis ;
-
-M: sequence summary
-    [
-        dup class name>> %
-        " with " %
-        length #
-        " elements" %
-    ] "" make ;
-
-M: assoc summary
-    [
-        dup class name>> %
-        " with " %
-        assoc-size #
-        " entries" %
-    ] "" make ;
-
-! Override sequence => integer instance
-M: f summary object-summary ;
-
-M: integer summary object-summary ;
 
 : value-editor ( path -- )
     [
@@ -101,12 +64,17 @@ SYMBOL: +editable+
 
 : describe ( obj -- ) H{ } describe* ;
 
+M: tuple error. describe ;
+
 : namestack. ( seq -- )
     [ [ global eq? not ] filter [ keys ] gather ] keep
     [ dupd assoc-stack ] curry H{ } map>assoc describe ;
 
 : .vars ( -- )
     namestack namestack. ;
+
+: :vars ( -- )
+    error-continuation get continuation-name namestack. ;
 
 SYMBOL: inspector-hook
 

@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel inspector assocs namespaces splitting sequences
+USING: kernel summary assocs namespaces splitting sequences
 strings math.parser lexer ;
 IN: strings.parser
 

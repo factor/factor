@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: system kernel namespaces strings hashtables sequences 
 assocs combinators vocabs.loader init threads continuations
-math accessors concurrency.flags destructors
+math accessors concurrency.flags destructors inspector
 io io.backend io.timeouts io.pipes io.pipes.private io.encodings
-io.streams.duplex io.ports debugger prettyprint inspector ;
+io.streams.duplex io.ports debugger prettyprint summary ;
 IN: io.launcher
 
 TUPLE: process < identity-tuple

@@ -107,19 +107,6 @@ DEFER: (flat-length)
         [ 2drop t ]
     } cond ;
 
-! Resolve type checks at compile time where possible
-: comparable? ( actual testing -- ? )
-    #! If actual is a subset of testing or if the two classes
-    #! are disjoint, return t.
-    2dup class<= >r classes-intersect? not r> or ;
-
-: optimize-predicate? ( #call -- ? )
-    dup node-param "predicating" word-prop dup [
-        >r node-class-first r> comparable?
-    ] [
-        2drop f
-    ] if ;
-
 : literal-quot ( node literals -- quot )
     #! Outputs a quotation which drops the node's inputs, and
     #! pushes some literals.
@@ -130,33 +117,40 @@ DEFER: (flat-length)
     #! Make #shuffle -> #push -> #return -> successor
     dupd literal-quot f splice-quot ;
 
-: evaluate-predicate ( #call -- ? )
-    dup node-param "predicating" word-prop >r
-    node-class-first r> class<= ;
+! Resolve type checks at compile time where possible
+: comparable? ( actual testing -- ? )
+    #! If actual is a subset of testing or if the two classes
+    #! are disjoint, return t.
+    2dup class<= >r classes-intersect? not r> or ;
 
-: optimize-predicate ( #call -- node )
+: optimize-check? ( #call value class -- ? )
+    >r node-class r> comparable? ;
+
+: evaluate-check ( node value class -- ? )
+    >r node-class r> class<= ;
+
+: optimize-check ( #call value class -- node )
     #! If the predicate is followed by a branch we fold it
     #! immediately
-    dup evaluate-predicate swap
-    dup node-successor #if? [
+    [ evaluate-check ] [ 2drop ] 3bi
+    dup successor>> #if? [
         dup drop-inputs >r
-        node-successor swap 0 1 ? fold-branch
-        r> [ set-node-successor ] keep
+        successor>> swap 0 1 ? fold-branch
+        r> swap >>successor
     ] [
         swap 1array inline-literals
     ] if ;
 
-: optimizer-hooks ( node -- conditions )
-    node-param "optimizer-hooks" word-prop ;
+: (optimize-predicate) ( #call -- #call value class )
+    [ ] [ in-d>> first ] [ param>> "predicating" word-prop ] tri ;
 
-: optimizer-hook ( node -- pair/f )
-    dup optimizer-hooks [ first call ] find 2nip ;
+: optimize-predicate? ( #call -- ? )
+    dup param>> "predicating" word-prop [
+        (optimize-predicate) optimize-check?
+    ] [ drop f ] if ;
 
-: optimize-hook ( node -- )
-    dup optimizer-hook second call ;
-
-: define-optimizers ( word optimizers -- )
-    "optimizer-hooks" set-word-prop ;
+: optimize-predicate ( #call -- node )
+    (optimize-predicate) optimize-check ;
 
 : flush-eval? ( #call -- ? )
     dup node-param "flushable" word-prop [

@@ -3,7 +3,7 @@
 USING: accessors kernel combinators vocabs vocabs.loader
 tools.vocabs io io.files io.styles help.markup help.stylesheet
 sequences assocs help.topics namespaces prettyprint words
-sorting definitions arrays inspector sets ;
+sorting definitions arrays summary sets ;
 IN: tools.vocabs.browser
 
 : vocab-status-string ( vocab -- string )

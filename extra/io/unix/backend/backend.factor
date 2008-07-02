@@ -4,7 +4,7 @@ USING: alien generic assocs kernel kernel.private math
 io.ports sequences strings structs sbufs threads unix
 vectors io.buffers io.backend io.encodings math.parser
 continuations system libc qualified namespaces io.timeouts
-io.encodings.utf8 destructors accessors inspector combinators ;
+io.encodings.utf8 destructors accessors summary combinators ;
 QUALIFIED: io
 IN: io.unix.backend
 

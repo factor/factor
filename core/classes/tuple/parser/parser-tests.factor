@@ -51,7 +51,7 @@ must-fail-with
 [ error>> unexpected-eof? ]
 must-fail-with
 
-[ "IN: classes.tuple.parser.tests USE: alien TUPLE: foo { slot alien } ;" eval ]
+[ "IN: classes.tuple.parser.tests USE: generic.standard TUPLE: foo { slot no-method } ;" eval ]
 [ error>> no-initial-value? ]
 must-fail-with
 

@@ -1,6 +1,7 @@
 USING: vocabs.loader sequences ;
 
 {
+    "inspector"
     "bootstrap.image"
     "tools.annotations"
     "tools.crossref"

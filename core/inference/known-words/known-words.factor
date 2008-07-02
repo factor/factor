@@ -10,7 +10,7 @@ namespaces.private parser prettyprint quotations
 quotations.private sbufs sbufs.private sequences
 sequences.private slots.private strings strings.private system
 threads.private classes.tuple classes.tuple.private vectors
-vectors.private words words.private assocs inspector
+vectors.private words words.private assocs summary
 compiler.units system.private ;
 IN: inference.known-words
 

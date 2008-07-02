@@ -93,7 +93,7 @@ ERROR: no-next-method class generic ;
 
 : single-next-method-quot ( class generic -- quot )
     [
-        [ drop [ instance? ] curry % ]
+        [ drop "predicate" word-prop % ]
         [
             2dup next-method
             [ 2nip 1quotation ]

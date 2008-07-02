@@ -54,7 +54,7 @@ TUPLE: zoom-in-action ;  C: <zoom-in-action> zoom-in-action
 TUPLE: zoom-out-action ; C: <zoom-out-action> zoom-out-action
 
 : generalize-gesture ( gesture -- newgesture )
-    tuple>array but-last >tuple ;
+    clone f >># ;
 
 ! Modifiers
 SYMBOLS: C+ A+ M+ S+ ;

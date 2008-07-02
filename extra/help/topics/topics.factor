@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.x
 USING: arrays definitions generic assocs
 io kernel namespaces prettyprint prettyprint.sections
-sequences words inspector classes strings vocabs ;
+sequences words summary classes strings vocabs ;
 IN: help.topics
 
 TUPLE: link name ;

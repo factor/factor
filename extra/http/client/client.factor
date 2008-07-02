@@ -9,7 +9,7 @@ io.encodings.ascii
 io.encodings.8-bit
 io.encodings.binary
 io.streams.duplex
-fry debugger inspector ascii urls present ;
+fry debugger summary ascii urls present ;
 IN: http.client
 
 : max-redirects 10 ;

@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser kernel words generic namespaces inspector ;
+USING: parser kernel words generic namespaces summary ;
 IN: generic.parser
 
 ERROR: not-in-a-method-error ;

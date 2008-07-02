@@ -3,7 +3,7 @@ math.constants parser sequences tools.test words assocs
 namespaces quotations sequences.private classes continuations
 generic.standard effects classes.tuple classes.tuple.private
 arrays vectors strings compiler.units accessors classes.algebra
-calendar prettyprint io.streams.string splitting inspector
+calendar prettyprint io.streams.string splitting summary
 columns math.order classes.private slots slots.private ;
 IN: classes.tuple.tests
 

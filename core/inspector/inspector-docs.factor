@@ -22,9 +22,7 @@ $nl
 { $subsection inspector-hook }
 "A description of an object can be printed without starting the inspector:"
 { $subsection describe }
-{ $subsection describe* }
-"A word for getting very brief descriptions of words and general objects:"
-{ $subsection summary } ;
+{ $subsection describe* } ;
 
 ABOUT: "inspector"
 
@@ -53,10 +51,6 @@ $nl
     { { $link +sequence+ } " - if set to a true value, keys will not be printed, only values." }
 } }
 { $notes "This word is a factor of " { $link describe } " and " { $link inspect } "." } ;
-
-HELP: summary
-{ $values { "object" object } { "string" "a string" } }
-{ $contract "Outputs a brief description of the object." } ;
 
 HELP: inspector-stack
 { $var-description "If the inspector is running, this variable holds previously-inspected objects." } ;

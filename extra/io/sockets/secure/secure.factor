@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel symbols namespaces continuations
-destructors io.sockets sequences inspector calendar delegate ;
+destructors io.sockets sequences summary calendar delegate ;
 IN: io.sockets.secure
 
 SYMBOL: secure-socket-timeout

@@ -4,7 +4,7 @@ USING: arrays generator generator.registers generator.fixup
 hashtables kernel math namespaces sequences words
 inference.state inference.backend inference.dataflow system
 math.parser classes alien.arrays alien.c-types alien.strings
-alien.structs alien.syntax cpu.architecture alien inspector
+alien.structs alien.syntax cpu.architecture alien summary
 quotations assocs kernel.private threads continuations.private
 libc combinators compiler.errors continuations layouts accessors
 init sets ;

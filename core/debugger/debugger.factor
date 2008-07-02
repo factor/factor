@@ -1,12 +1,12 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: slots arrays definitions generic hashtables inspector io
+USING: slots arrays definitions generic hashtables summary io
 kernel math namespaces prettyprint prettyprint.config sequences
 assocs sequences.private strings io.styles vectors words system
 splitting math.parser classes.tuple continuations
 continuations.private combinators generic.math classes.builtin
 classes compiler.units generic.standard vocabs threads
-threads.private init kernel.private libc io.encodings mirrors
+threads.private init kernel.private libc io.encodings
 accessors math.order destructors ;
 IN: debugger
 
@@ -16,7 +16,6 @@ GENERIC: error-help ( error -- topic )
 M: object error. . ;
 M: object error-help drop f ;
 
-M: tuple error. describe ;
 M: tuple error-help class ;
 
 M: string error. print ;
@@ -32,9 +31,6 @@ M: string error. print ;
 
 : :get ( variable -- value )
     error-continuation get continuation-name assoc-stack ;
-
-: :vars ( -- )
-    error-continuation get continuation-name namestack. ;
 
 : :res ( n -- * )
     1- restarts get-global nth f restarts set-global restart ;

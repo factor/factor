@@ -1,5 +1,5 @@
 USING: arrays io kernel math namespaces splitting prettyprint
-sequences sorting vectors words inverse inspector shuffle
+sequences sorting vectors words inverse summary shuffle
 math.functions sets ;
 IN: units
 

@@ -3,7 +3,7 @@
 USING: accessors arrays kernel words sequences generic math
 namespaces quotations assocs combinators math.bitfields
 inference.backend inference.dataflow inference.state
-classes.tuple classes.tuple.private effects inspector hashtables
+classes.tuple classes.tuple.private effects summary hashtables
 classes generic sets definitions generic.standard slots.private ;
 IN: inference.transforms
 

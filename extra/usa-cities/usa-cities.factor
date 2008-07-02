@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files io.encodings.ascii sequences sequences.lib
-math.parser combinators kernel memoize csv symbols inspector
+math.parser combinators kernel memoize csv symbols summary
 words accessors math.order sorting ;
 IN: usa-cities
 

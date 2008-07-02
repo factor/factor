@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors namespaces io.binary
-io.encodings combinators splitting io byte-arrays inspector ;
+io.encodings combinators splitting io byte-arrays summary ;
 IN: io.encodings.utf16
 
 SINGLETON: utf16be

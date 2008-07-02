@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions assocs io kernel
 math namespaces prettyprint sequences strings io.styles words
-generic tools.completion quotations parser inspector
+generic tools.completion quotations parser summary
 sorting hashtables vocabs parser source-files ;
 IN: tools.crossref
 

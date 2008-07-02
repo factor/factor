@@ -1,4 +1,4 @@
-USING: editors help.markup help.syntax inspector io listener
+USING: editors help.markup help.syntax summary inspector io listener
 parser prettyprint tools.profiler tools.walker ui.commands
 ui.gadgets.editors ui.gadgets.panes ui.gadgets.presentations
 ui.gadgets.slots ui.operations ui.tools.browser

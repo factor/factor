@@ -145,18 +145,19 @@ byte-vectors ;
     ] if
 ] "constraints" set-word-prop
 
-! open-code instance? checks on predicate classes
-: literal-predicate-class? ( #call -- ? )
-    dup in-d>> second node-literal predicate-class? ;
+! Eliminate instance? checks when the outcome is known at compile time
+: (optimize-instance) ( #call -- #call value class/f )
+    [ ] [ in-d>> first ] [ dup in-d>> second node-literal ] tri ;
 
-: expand-predicate-instance ( #call -- node )
-    dup dup in-d>> second node-literal
-    [ +inlined+ depends-on ]
-    [ "predicate-definition" word-prop [ drop ] prepose ] bi
-    f splice-quot ;
+: optimize-instance? ( #call -- ? )
+    (optimize-instance) dup class?
+    [ optimize-check? ] [ 3drop f ] if ;
 
-\ predicate-instance? {
-    { [ dup literal-predicate-class? ] [ expand-predicate-instance ] }
+: optimize-instance ( #call -- node )
+    (optimize-instance) optimize-check ;
+
+\ instance? {
+    { [ dup optimize-instance? ] [ optimize-instance ] }
 } define-optimizers
 
 ! eq? on the same object is always t

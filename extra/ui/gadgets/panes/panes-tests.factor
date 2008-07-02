@@ -2,7 +2,7 @@ IN: ui.gadgets.panes.tests
 USING: alien ui.gadgets.panes ui.gadgets namespaces
 kernel sequences io io.styles io.streams.string tools.test
 prettyprint definitions help help.syntax help.markup
-help.stylesheet splitting tools.test.ui models math inspector ;
+help.stylesheet splitting tools.test.ui models math summary ;
 
 : #children "pane" get gadget-children length ;
 
