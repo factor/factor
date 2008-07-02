@@ -10,9 +10,10 @@ IN: fry
 : _ ( -- * ) "Only valid inside a fry" throw ;
 
 DEFER: (shallow-fry)
+DEFER: shallow-fry
 
 : ((shallow-fry)) ( accum quot adder -- result )
-    >r [ ] swap (shallow-fry) r>
+    >r shallow-fry r>
     append swap dup empty? [ drop ] [
         [ prepose ] curry append
     ] if ; inline
