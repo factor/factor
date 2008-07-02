@@ -42,13 +42,15 @@ M: bunny-gadget ungraft* ( gadget -- )
     [ draw-seq>> [ [ dispose ] when* ] each ] bi ;
 
 M: bunny-gadget draw-gadget* ( gadget -- )
-    0.15 0.15 0.15 1.0 glClearColor
-    GL_DEPTH_BUFFER_BIT GL_COLOR_BUFFER_BIT bitor glClear
-    dup demo-gadget-set-matrices
-    GL_MODELVIEW glMatrixMode
-    0.02 -0.105 0.0 glTranslatef
-    { geom>> bunny-gadget-draw } get-slots
-    draw-bunny ;
+    dup draw-seq>> empty? [ drop ] [
+        0.15 0.15 0.15 1.0 glClearColor
+        GL_DEPTH_BUFFER_BIT GL_COLOR_BUFFER_BIT bitor glClear
+        dup demo-gadget-set-matrices
+        GL_MODELVIEW glMatrixMode
+        0.02 -0.105 0.0 glTranslatef
+        { geom>> bunny-gadget-draw } get-slots
+        draw-bunny
+    ] if ;
 
 M: bunny-gadget pref-dim* ( gadget -- dim )
     drop { 640 480 } ;
