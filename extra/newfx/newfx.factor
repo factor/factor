@@ -219,3 +219,6 @@ METHOD: as-mutate { object object assoc }       set-at ;
 : snipped!      ( seq a b --     )       rot delete-slice ;
 : snipped-from! ( a b seq --     )           delete-slice ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: invert-index ( seq i -- seq i ) >r dup length 1 - r> - ;
