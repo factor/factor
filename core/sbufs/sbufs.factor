@@ -8,26 +8,19 @@ TUPLE: sbuf
 { underlying string }
 { length array-capacity } ;
 
-<PRIVATE
-
-: string>sbuf ( string length -- sbuf )
-    sbuf boa ; inline
-
-PRIVATE>
-
-: <sbuf> ( n -- sbuf ) 0 <string> 0 string>sbuf ; inline
+: <sbuf> ( n -- sbuf ) 0 <string> 0 sbuf boa ; inline
 
 M: sbuf set-nth-unsafe
     [ >fixnum ] [ >fixnum ] [ underlying>> ] tri* set-string-nth ;
 
 M: sbuf new-sequence
-    drop [ 0 <string> ] [ >fixnum ] bi string>sbuf ;
+    drop [ 0 <string> ] [ >fixnum ] bi sbuf boa ;
 
 : >sbuf ( seq -- sbuf ) SBUF" " clone-like ; inline
 
 M: sbuf like
     drop dup sbuf? [
-        dup string? [ dup length string>sbuf ] [ >sbuf ] if
+        dup string? [ dup length sbuf boa ] [ >sbuf ] if
     ] unless ;
 
 M: sbuf new-resizable drop <sbuf> ;

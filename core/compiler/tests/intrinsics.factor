@@ -332,11 +332,11 @@ cell 8 = [
 ] unit-test
 
 [ V{ 1 2 } ] [
-    { 1 2 3 } 2 [ array>vector ] compile-call
+    { 1 2 3 } 2 [ vector boa ] compile-call
 ] unit-test
 
 [ SBUF" hello" ] [
-    "hello world" 5 [ string>sbuf ] compile-call
+    "hello world" 5 [ sbuf boa ] compile-call
 ] unit-test
 
 [ [ 3 + ] ] [

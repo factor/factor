@@ -30,11 +30,6 @@ HELP: >float-vector
 { $description "Outputs a freshly-allocated float vector with the same elements as a given sequence." }
 { $errors "Throws an error if the sequence contains elements other than real numbers." } ;
 
-HELP: float-array>vector
-{ $values { "float-array" "an array" } { "length" "a non-negative integer" } { "float-vector" float-vector } }
-{ $description "Creates a new float vector using the array for underlying storage with the specified initial length." }
-{ $warning "This word is in the " { $vocab-link "float-vectors.private" } " vocabulary because it does not perform type or bounds checks. User code should call " { $link >float-vector } " instead." } ;
-
 HELP: FV{
 { $syntax "FV{ elements... }" }
 { $values { "elements" "a list of real numbers" } }

@@ -9,15 +9,8 @@ TUPLE: float-vector
 { underlying float-array }
 { length array-capacity } ;
 
-<PRIVATE
-
-: float-array>vector ( float-array length -- float-vector )
-    float-vector boa ; inline
-
-PRIVATE>
-
 : <float-vector> ( n -- float-vector )
-    0.0 <float-array> 0 float-array>vector ; inline
+    0.0 <float-array> 0 float-vector boa ; inline
 
 : >float-vector ( seq -- float-vector )
     T{ float-vector f F{ } 0 } clone-like ;
@@ -25,11 +18,11 @@ PRIVATE>
 M: float-vector like
     drop dup float-vector? [
         dup float-array?
-        [ dup length float-array>vector ] [ >float-vector ] if
+        [ dup length float-vector boa ] [ >float-vector ] if
     ] unless ;
 
 M: float-vector new-sequence
-    drop [ 0.0 <float-array> ] keep >fixnum float-array>vector ;
+    drop [ 0.0 <float-array> ] [ >fixnum ] bi float-vector boa ;
 
 M: float-vector equal?
     over float-vector? [ sequence= ] [ 2drop f ] if ;
