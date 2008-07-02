@@ -1,6 +1,6 @@
 
 USING: kernel namespaces arrays sequences threads math math.vectors
-       ui random bake springies springies.ui ;
+       ui random springies springies.ui ;
 
 IN: springies.models.2x2snake
 
