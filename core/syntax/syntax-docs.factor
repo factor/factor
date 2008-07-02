@@ -138,14 +138,6 @@ ARTICLE: "syntax-quots" "Quotation syntax"
 { $subsection POSTPONE: ] }
 "Quotations are documented in " { $link "quotations" } "." ;
 
-ARTICLE: "syntax-bit-arrays" "Bit array syntax"
-{ $subsection POSTPONE: ?{ }
-"Bit arrays are documented in " { $link "bit-arrays" } "." ;
-
-ARTICLE: "syntax-float-arrays" "Float array syntax"
-{ $subsection POSTPONE: F{ }
-"Float arrays are documented in " { $link "float-arrays" } "." ;
-
 ARTICLE: "syntax-byte-arrays" "Byte array syntax"
 { $subsection POSTPONE: B{ }
 "Byte arrays are documented in " { $link "byte-arrays" } "." ;
@@ -165,9 +157,7 @@ $nl
 { $subsection "syntax-quots" }
 { $subsection "syntax-arrays" }
 { $subsection "syntax-strings" }
-{ $subsection "syntax-bit-arrays" }
 { $subsection "syntax-byte-arrays" }
-{ $subsection "syntax-float-arrays" }
 { $subsection "syntax-vectors" }
 { $subsection "syntax-sbufs" }
 { $subsection "syntax-hashtables" }
@@ -275,18 +265,6 @@ HELP: B{
 { $values { "elements" "a list of integers" } }
 { $description "Marks the beginning of a literal byte array. Literal byte arrays are terminated by " { $link POSTPONE: } } "." } 
 { $examples { $code "B{ 1 2 3 }" } } ;
-
-HELP: ?{
-{ $syntax "?{ elements... }" }
-{ $values { "elements" "a list of booleans" } }
-{ $description "Marks the beginning of a literal bit array. Literal bit arrays are terminated by " { $link POSTPONE: } } "." } 
-{ $examples { $code "?{ t f t }" } } ;
-
-HELP: F{
-{ $syntax "F{ elements... }" }
-{ $values { "elements" "a list of real numbers" } }
-{ $description "Marks the beginning of a literal float array. Literal float arrays are terminated by " { $link POSTPONE: } } "." } 
-{ $examples { $code "F{ 1.0 2.0 3.0 }" } } ;
 
 HELP: H{
 { $syntax "H{ { key value }... }" }

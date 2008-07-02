@@ -1,4 +1,4 @@
-USING: arrays byte-arrays bit-arrays help.markup
+USING: arrays byte-arrays help.markup
 help.syntax kernel sbufs strings quotations sequences.private
 vectors.private combinators ;
 IN: vectors

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic kernel kernel.private math memory
 namespaces sequences layouts system hashtables classes alien
-byte-arrays bit-arrays float-arrays combinators words sets ;
+byte-arrays combinators words sets ;
 IN: cpu.architecture
 
 ! Register classes

@@ -1,5 +1,5 @@
 USING: arrays kernel math namespaces sequences kernel.private
-sequences.private strings sbufs tools.test vectors bit-arrays
+sequences.private strings sbufs tools.test vectors
 generic vocabs.loader ;
 IN: sequences.tests
 

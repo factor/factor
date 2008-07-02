@@ -1,11 +1,11 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays byte-arrays byte-vectors bit-arrays generic
+USING: accessors arrays byte-arrays byte-vectors generic
 hashtables io assocs kernel math namespaces sequences strings
 sbufs io.styles vectors words prettyprint.config
 prettyprint.sections quotations io io.files math.parser effects
 classes.tuple math.order classes.tuple.private classes
-float-arrays combinators ;
+combinators ;
 IN: prettyprint.backend
 
 GENERIC: pprint* ( obj -- )
@@ -147,9 +147,7 @@ M: curry pprint-delims drop \ [ \ ] ;
 M: compose pprint-delims drop \ [ \ ] ;
 M: array pprint-delims drop \ { \ } ;
 M: byte-array pprint-delims drop \ B{ \ } ;
-M: bit-array pprint-delims drop \ ?{ \ } ;
 M: byte-vector pprint-delims drop \ BV{ \ } ;
-M: float-array pprint-delims drop \ F{ \ } ;
 M: vector pprint-delims drop \ V{ \ } ;
 M: hashtable pprint-delims drop \ H{ \ } ;
 M: tuple pprint-delims drop \ T{ \ } ;

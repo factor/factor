@@ -49,16 +49,14 @@ typedef signed long long s64;
 /*** Header types ***/
 #define ARRAY_TYPE 8
 #define WRAPPER_TYPE 9
-#define FLOAT_ARRAY_TYPE 10
+#define BYTE_ARRAY_TYPE 10
 #define CALLSTACK_TYPE 11
 #define STRING_TYPE 12
-#define BIT_ARRAY_TYPE 13
+#define TUPLE_LAYOUT_TYPE 13
 #define QUOTATION_TYPE 14
 #define DLL_TYPE 15
 #define ALIEN_TYPE 16
 #define WORD_TYPE 17
-#define BYTE_ARRAY_TYPE 18
-#define TUPLE_LAYOUT_TYPE 19
 
 #define TYPE_COUNT 20
 
@@ -92,10 +90,6 @@ typedef struct {
 } F_ARRAY;
 
 typedef F_ARRAY F_BYTE_ARRAY;
-
-typedef F_ARRAY F_BIT_ARRAY;
-
-typedef F_ARRAY F_FLOAT_ARRAY;
 
 /* Assembly code makes assumptions about the layout of this struct */
 typedef struct {

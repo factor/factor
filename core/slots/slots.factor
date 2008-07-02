@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays bit-arrays byte-arrays float-arrays kernel
-kernel.private math namespaces sequences strings words effects
-generic generic.standard classes classes.algebra slots.private
-combinators accessors words sequences.private assocs alien ;
+USING: arrays byte-arrays kernel kernel.private math namespaces
+sequences strings words effects generic generic.standard classes
+classes.algebra slots.private combinators accessors words
+sequences.private assocs alien ;
 IN: slots
 
 TUPLE: slot-spec name offset class initial read-only reader writer ;
@@ -132,9 +132,7 @@ ERROR: no-initial-value class ;
         { [ float bootstrap-word over class<= ] [ 0.0 ] }
         { [ string bootstrap-word over class<= ] [ "" ] }
         { [ array bootstrap-word over class<= ] [ { } ] }
-        { [ bit-array bootstrap-word over class<= ] [ ?{ } ] }
         { [ byte-array bootstrap-word over class<= ] [ B{ } ] }
-        { [ float-array bootstrap-word over class<= ] [ F{ } ] }
         { [ simple-alien bootstrap-word over class<= ] [ <bad-alien> ] }
         [ no-initial-value ]
     } cond nip ;

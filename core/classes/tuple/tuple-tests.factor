@@ -652,3 +652,7 @@ T{ reshape-test f "hi" } "tuple" set
 [ ] [ "IN: classes.tuple.tests USE: math TUPLE: reshape-test { x fixnum initial: 4 read-only } ;" eval ] unit-test
 
 [ 0 ] [ "tuple" get x>> ] unit-test
+
+TUPLE: boa-coercer-test { x array-capacity } ;
+
+[ fixnum ] [ 0 >bignum boa-coercer-test boa x>> ] unit-test

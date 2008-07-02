@@ -61,7 +61,6 @@ bootstrapping? on
     "alien"
     "alien.accessors"
     "arrays"
-    "bit-arrays"
     "byte-arrays"
     "byte-vectors"
     "classes.private"
@@ -70,7 +69,6 @@ bootstrapping? on
     "classes.predicate"
     "compiler.units"
     "continuations.private"
-    "float-arrays"
     "generator"
     "growable"
     "hashtables"
@@ -137,10 +135,8 @@ bootstrapping? on
 "f" "syntax" lookup register-builtin
 "array" "arrays" create register-builtin
 "wrapper" "kernel" create register-builtin
-"float-array" "float-arrays" create register-builtin
 "callstack" "kernel" create register-builtin
 "string" "strings" create register-builtin
-"bit-array" "bit-arrays" create register-builtin
 "quotation" "quotations" create register-builtin
 "dll" "alien" create register-builtin
 "alien" "alien" create register-builtin
@@ -180,8 +176,6 @@ define-union-class
     "alien" "alien" lookup ,
     "f" "syntax" lookup ,
     "byte-array" "byte-arrays" lookup ,
-    "bit-array" "bit-arrays" lookup ,
-    "float-array" "float-arrays" lookup ,
 ] { } make define-union-class
 
 ! A predicate class used for declarations
@@ -265,10 +259,6 @@ bi
 } define-builtin
 
 "byte-array" "byte-arrays" create { } define-builtin
-
-"bit-array" "bit-arrays" create { } define-builtin
-
-"float-array" "float-arrays" create { } define-builtin
 
 "callstack" "kernel" create { } define-builtin
 
@@ -449,7 +439,6 @@ tuple
     { "dlsym" "alien" }
     { "dlclose" "alien" }
     { "<byte-array>" "byte-arrays" }
-    { "<bit-array>" "bit-arrays" }
     { "<displaced-alien>" "alien" }
     { "alien-signed-cell" "alien.accessors" }
     { "set-alien-signed-cell" "alien.accessors" }
@@ -508,7 +497,6 @@ tuple
     { "profiling" "tools.profiler.private" }
     { "become" "kernel.private" }
     { "(sleep)" "threads.private" }
-    { "<float-array>" "float-arrays" }
     { "<tuple-boa>" "classes.tuple.private" }
     { "callstack>array" "kernel" }
     { "innermost-frame-quot" "kernel.private" }
@@ -520,8 +508,6 @@ tuple
     { "unset-os-env" "system" }
     { "(set-os-envs)" "system.private" }
     { "resize-byte-array" "byte-arrays" }
-    { "resize-bit-array" "bit-arrays" }
-    { "resize-float-array" "float-arrays" }
     { "dll-valid?" "alien" }
     { "unimplemented" "kernel.private" }
     { "gc-reset" "memory" }

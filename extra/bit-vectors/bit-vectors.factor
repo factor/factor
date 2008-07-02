@@ -6,7 +6,7 @@ parser accessors ;
 IN: bit-vectors
 
 TUPLE: bit-vector
-{ underlying bit-array }
+{ underlying bit-array initial: ?{ } }
 { length array-capacity } ;
 
 : <bit-vector> ( n -- bit-vector )

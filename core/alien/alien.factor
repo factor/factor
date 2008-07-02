@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs kernel math namespaces sequences system
-kernel.private bit-arrays byte-arrays float-arrays arrays ;
+kernel.private byte-arrays arrays ;
 IN: alien
 
 ! Some predicate classes used by the compiler for optimization
@@ -9,7 +9,7 @@ IN: alien
 PREDICATE: simple-alien < alien underlying>> not ;
 
 UNION: simple-c-ptr
-simple-alien POSTPONE: f byte-array bit-array float-array ;
+simple-alien POSTPONE: f byte-array ;
 
 DEFER: pinned-c-ptr?
 

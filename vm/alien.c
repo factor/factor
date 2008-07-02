@@ -9,8 +9,6 @@ void *alien_offset(CELL object)
 	switch(type_of(object))
 	{
 	case BYTE_ARRAY_TYPE:
-	case BIT_ARRAY_TYPE:
-	case FLOAT_ARRAY_TYPE:
 		byte_array = untag_object(object);
 		return byte_array + 1;
 	case ALIEN_TYPE:
@@ -96,8 +94,6 @@ DEFINE_PRIMITIVE(displaced_alien)
 		switch(type_of(alien))
 		{
 		case BYTE_ARRAY_TYPE:
-		case BIT_ARRAY_TYPE:
-		case FLOAT_ARRAY_TYPE:
 		case ALIEN_TYPE:
 		case F_TYPE:
 			dpush(allot_alien(alien,displacement));

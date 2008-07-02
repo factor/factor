@@ -1,11 +1,11 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays bit-arrays byte-arrays byte-vectors
+USING: alien arrays byte-arrays byte-vectors
 definitions generic hashtables kernel math namespaces parser
 lexer sequences strings strings.parser sbufs vectors
 words quotations io assocs splitting classes.tuple
 generic.standard generic.math generic.parser classes io.files
-vocabs float-arrays classes.parser classes.union
+vocabs classes.parser classes.union
 classes.intersection classes.mixin classes.predicate
 classes.singleton classes.tuple.parser compiler.units
 combinators debugger effects.parser slots ;
@@ -82,8 +82,6 @@ IN: bootstrap.syntax
     "V{" [ \ } [ >vector ] parse-literal ] define-syntax
     "B{" [ \ } [ >byte-array ] parse-literal ] define-syntax
     "BV{" [ \ } [ >byte-vector ] parse-literal ] define-syntax
-    "?{" [ \ } [ >bit-array ] parse-literal ] define-syntax
-    "F{" [ \ } [ >float-array ] parse-literal ] define-syntax
     "H{" [ \ } [ >hashtable ] parse-literal ] define-syntax
     "T{" [ \ } [ >tuple ] parse-literal ] define-syntax
     "W{" [ \ } [ first <wrapper> ] parse-literal ] define-syntax

@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions hashtables kernel
-kernel.private math namespaces sequences sequences.private
-strings vectors words quotations memory combinators generic
-classes classes.private slots.deprecated slots.private slots
+USING: arrays definitions hashtables kernel kernel.private math
+namespaces sequences sequences.private strings vectors words
+quotations memory combinators generic classes classes.algebra
+classes.private slots.deprecated slots.private slots
 compiler.units math.private accessors assocs ;
 IN: classes.tuple
 
@@ -117,10 +117,14 @@ ERROR: bad-superclass class ;
         \ unless ,
     ] [ ] make ;
 
+: (fixnum-check-quot) ( class -- quot )
+    (instance-check-quot) fixnum "coercer" word-prop prepend ;
+
 : instance-check-quot ( class -- quot )
     {
         { [ dup object bootstrap-word eq? ] [ drop [ ] ] }
         { [ dup "coercer" word-prop ] [ "coercer" word-prop ] }
+        { [ dup \ fixnum class<= ] [ (fixnum-check-quot) ] }
         [ (instance-check-quot) ]
     } cond ;
 

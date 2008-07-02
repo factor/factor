@@ -8,7 +8,7 @@ generator generator.registers generator.fixup sequences.private
 sbufs vectors system layouts math.floats.private
 classes classes.tuple classes.tuple.private sbufs.private
 vectors.private strings.private slots.private combinators
-bit-arrays float-arrays compiler.constants ;
+compiler.constants ;
 IN: cpu.ppc.intrinsics
 
 : %slot-literal-known-tag

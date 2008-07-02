@@ -6,11 +6,11 @@ parser accessors ;
 IN: float-vectors
 
 TUPLE: float-vector
-{ underlying float-array }
+{ underlying float-array initial: F{ } }
 { length array-capacity } ;
 
 : <float-vector> ( n -- float-vector )
-    0.0 <float-array> 0 float-vector boa ; inline
+    <float-array> 0 float-vector boa ; inline
 
 : >float-vector ( seq -- float-vector )
     T{ float-vector f F{ } 0 } clone-like ;
@@ -22,7 +22,7 @@ M: float-vector like
     ] unless ;
 
 M: float-vector new-sequence
-    drop [ 0.0 <float-array> ] [ >fixnum ] bi float-vector boa ;
+    drop [ <float-array> ] [ >fixnum ] bi float-vector boa ;
 
 M: float-vector equal?
     over float-vector? [ sequence= ] [ 2drop f ] if ;

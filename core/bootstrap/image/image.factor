@@ -1,12 +1,12 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays bit-arrays byte-arrays generic assocs
-hashtables assocs hashtables.private io kernel kernel.private
-math namespaces parser prettyprint sequences sequences.private
-strings sbufs vectors words quotations assocs system layouts
-splitting grouping growable classes classes.builtin classes.tuple
+USING: alien arrays byte-arrays generic assocs hashtables assocs
+hashtables.private io kernel kernel.private math namespaces
+parser prettyprint sequences sequences.private strings sbufs
+vectors words quotations assocs system layouts splitting
+grouping growable classes classes.builtin classes.tuple
 classes.tuple.private words.private io.binary io.files vocabs
-vocabs.loader source-files definitions debugger float-arrays
+vocabs.loader source-files definitions debugger
 quotations.private sequences.private combinators
 io.encodings.binary math.order accessors ;
 IN: bootstrap.image
@@ -333,10 +333,6 @@ M: byte-array '
         dup length emit-fixnum
         pad-bytes emit-bytes
     ] emit-object ;
-
-M: bit-array ' bit-array emit-dummy-array ;
-
-M: float-array ' float-array emit-dummy-array ;
 
 ! Tuples
 : (emit-tuple) ( tuple -- pointer )

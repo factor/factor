@@ -9,8 +9,7 @@ sequences.private io.binary io.streams.string layouts splitting
 math.intervals math.floats.private classes.tuple classes.predicate
 classes.tuple.private classes classes.algebra optimizer.def-use
 optimizer.backend optimizer.pattern-match optimizer.inlining
-float-arrays sequences.private combinators byte-arrays
-byte-vectors ;
+sequences.private combinators byte-arrays byte-vectors ;
 
 { <tuple> <tuple-boa> (tuple) } [
     [

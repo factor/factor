@@ -1,4 +1,4 @@
-USING: arrays bit-arrays help.markup help.syntax math
+USING: arrays help.markup help.syntax math
 sequences.private vectors strings sbufs kernel math.order
 layouts ;
 IN: sequences

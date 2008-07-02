@@ -8,11 +8,11 @@
 !
 USING: namespaces sequences kernel math io math.functions
 io.binary strings classes words sbufs classes.tuple arrays
-vectors byte-arrays bit-arrays quotations hashtables assocs
-help.syntax help.markup float-arrays splitting
-io.streams.byte-array io.encodings.string io.encodings.utf8
-io.encodings.binary combinators accessors locals prettyprint
-compiler.units sequences.private classes.tuple.private ;
+vectors byte-arrays quotations hashtables assocs help.syntax
+help.markup splitting io.streams.byte-array io.encodings.string
+io.encodings.utf8 io.encodings.binary combinators accessors
+locals prettyprint compiler.units sequences.private
+classes.tuple.private ;
 IN: serialize
 
 ! Variable holding a assoc of objects already serialized
@@ -130,24 +130,12 @@ M: hashtable (serialize) ( obj -- )
         [ add-object ] [ >alist (serialize) ] bi
     ] serialize-shared ;
 
-M: bit-array (serialize) ( obj -- )
-    CHAR: b serialize-seq ;
-
 M: byte-array (serialize) ( obj -- )
     [
         CHAR: A write1
         [ add-object ]
         [ length serialize-cell ]
         [ write ] tri
-    ] serialize-shared ;
-
-M: float-array (serialize) ( obj -- )
-    [
-        CHAR: f write1
-        [ add-object ]
-        [ length serialize-cell ]
-        [ [ double>bits 8 >be write ] each ]
-        tri
     ] serialize-shared ;
 
 M: string (serialize) ( obj -- )
