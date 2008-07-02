@@ -1,8 +1,8 @@
 USING: accessors arrays compiler.units kernel kernel.private math
 math.constants math.private sequences strings tools.test words
 continuations sequences.private hashtables.private byte-arrays
-strings.private system random layouts vectors.private
-sbufs.private strings.private slots.private alien math.order
+strings.private system random layouts vectors
+sbufs strings.private slots.private alien math.order
 alien.accessors alien.c-types alien.syntax alien.strings
 namespaces libc sequences.private io.encodings.ascii ;
 IN: compiler.tests

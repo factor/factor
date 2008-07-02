@@ -1,5 +1,5 @@
 USING: arrays float-arrays help.markup help.syntax kernel
-float-vectors.private combinators ;
+combinators ;
 IN: float-vectors
 
 ARTICLE: "float-vectors" "Float vectors"

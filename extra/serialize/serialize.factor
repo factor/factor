@@ -248,12 +248,6 @@ SYMBOL: deserialized
 : deserialize-byte-array ( -- byte-array )
     B{ } [ read1 ] (deserialize-seq) ;
 
-: deserialize-bit-array ( -- bit-array )
-    ?{ } [ (deserialize) ] (deserialize-seq) ;
-
-: deserialize-float-array ( -- float-array )
-    F{ } [ 8 read be> bits>double ] (deserialize-seq) ;
-
 : deserialize-hashtable ( -- hashtable )
     H{ } clone
     [ intern-object ]
@@ -284,9 +278,7 @@ SYMBOL: deserialized
             { CHAR: T [ deserialize-tuple ] }
             { CHAR: W [ deserialize-wrapper ] }
             { CHAR: a [ deserialize-array ] }
-            { CHAR: b [ deserialize-bit-array ] }
             { CHAR: c [ deserialize-complex ] }
-            { CHAR: f [ deserialize-float-array ] }
             { CHAR: h [ deserialize-hashtable ] }
             { CHAR: m [ deserialize-negative-integer ] }
             { CHAR: n [ deserialize-false ] }

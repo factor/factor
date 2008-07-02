@@ -34,7 +34,7 @@ namespaces continuations layouts accessors ;
 ] unit-test
 
 [ t ] [
-    cell 8 = 40 20 ? 100000 * small-enough?
+    cell 8 = 35 17 ? 100000 * small-enough?
 ] unit-test
 
 [ ] [ "maze" shake-and-bake ] unit-test

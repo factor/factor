@@ -4,8 +4,9 @@ inference.dataflow optimizer tools.test kernel.private generic
 sequences words inference.class quotations alien
 alien.c-types strings sbufs sequences.private
 slots.private combinators definitions compiler.units
-system layouts vectors optimizer.math.partial accessors
-optimizer.inlining math.order hashtables classes ;
+system layouts vectors optimizer.math.partial
+optimizer.inlining optimizer.backend math.order
+accessors hashtables classes assocs ;
 
 [ t ] [ T{ literal-constraint f 1 2 } T{ literal-constraint f 1 2 } equal? ] unit-test
 
@@ -576,7 +577,15 @@ M: integer detect-integer ;
 ] unit-test
 
 [ t ] [
-    [ hashtable instance? ] \ instance? inlined?
+    [ { hashtable } declare hashtable instance? ] \ instance? inlined?
+] unit-test
+
+[ t ] [
+    [ { vector } declare hashtable instance? ] \ instance? inlined?
+] unit-test
+
+[ f ] [
+    [ { assoc } declare hashtable instance? ] \ instance? inlined?
 ] unit-test
 
 TUPLE: declared-fixnum { x fixnum } ;

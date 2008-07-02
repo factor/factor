@@ -1,5 +1,5 @@
 USING: arrays bit-arrays help.markup help.syntax kernel
-bit-vectors.private combinators ;
+combinators ;
 IN: bit-vectors
 
 ARTICLE: "bit-vectors" "Bit vectors"

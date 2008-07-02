@@ -47,6 +47,8 @@ IN: bit-arrays.tests
     1 2 { t f t f } <slice> >bit-array
 ] unit-test
 
+[ ?{ f t } ] [ 0 2 ?{ f t f } subseq ] unit-test
+
 [ ?{ t f t f f f } ] [ 6 ?{ t f t } resize ] unit-test
 
 [ ?{ t t } ] [ 2 ?{ t t f t f t f t t t f t } resize ] unit-test

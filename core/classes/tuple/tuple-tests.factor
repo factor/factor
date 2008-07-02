@@ -655,4 +655,4 @@ T{ reshape-test f "hi" } "tuple" set
 
 TUPLE: boa-coercer-test { x array-capacity } ;
 
-[ fixnum ] [ 0 >bignum boa-coercer-test boa x>> ] unit-test
+[ fixnum ] [ 0 >bignum boa-coercer-test boa x>> class ] unit-test

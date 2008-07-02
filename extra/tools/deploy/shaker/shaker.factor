@@ -25,8 +25,11 @@ QUALIFIED: threads
 QUALIFIED: vocabs
 IN: tools.deploy.shaker
 
+! This file is some hairy shit.
+
 : strip-init-hooks ( -- )
     "Stripping startup hooks" show
+    "cpu.x86" init-hooks get delete-at
     "command-line" init-hooks get delete-at
     "libc" init-hooks get delete-at
     deploy-threads? get [
@@ -69,13 +72,15 @@ IN: tools.deploy.shaker
     [ "no-def-strip" word-prop not ] filter
     [ [ ] >>def drop ] each ;
 
+: sift-assoc ( assoc -- assoc' ) [ nip ] assoc-filter ;
+
 : strip-word-props ( stripped-props words -- )
     "Stripping word properties" show
     [
         [
             props>> swap
             '[ drop , member? not ] assoc-filter
-            f assoc-like
+            sift-assoc f assoc-like
         ] keep (>>props)
     ] with each ;
 
@@ -255,6 +260,7 @@ IN: tools.deploy.shaker
         global swap
         '[ drop , member? not ] assoc-filter
         [ drop string? not ] assoc-filter ! strip CLI args
+        sift-assoc
         dup keys unparse show
         21 setenv
     ] [ drop ] if ;
