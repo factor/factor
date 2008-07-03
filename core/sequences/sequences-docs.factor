@@ -957,3 +957,23 @@ HELP: unfold
     "The " { $snippet "tail" } " quotation is used when the predicate produces more than one output value. In this case, we have to drop this value even if the predicate fails in order for stack inference to calculate a stack effect for the " { $link unfold } " call:"
     { $unchecked-example "USING: kernel prettyprint random sequences ;" "[ 10 random dup 1 > ] [ ] [ drop ] unfold ." "{ 8 2 2 9 }" }
 } ;
+
+HELP: sigma
+{ $values { "seq" sequence } { "quot" quotation } { "n" number } }
+{ $description "Like map sum, but without creating an intermediate sequence." }
+{ $example
+    "! Find the sum of the squares [0,99]"
+    "USING: math math.ranges sequences.lib prettyprint ;"
+    "100 [1,b] [ sq ] sigma ."
+    "338350"
+} ;
+
+HELP: count
+{ $values { "seq" sequence } { "quot" quotation } { "n" integer } }
+{ $description "Efficiently returns the number of elements that the predicate quotation matches." }
+{ $example
+    "USING: math math.ranges sequences.lib prettyprint ;"
+    "100 [1,b] [ even? ] count ."
+    "50"
+} ;
+
