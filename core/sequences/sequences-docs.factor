@@ -1,5 +1,6 @@
 USING: arrays help.markup help.syntax math
-sequences.private vectors strings kernel math.order ;
+sequences.private vectors strings kernel math.order layouts
+quotations ;
 IN: sequences
 
 ARTICLE: "sequences-unsafe" "Unsafe sequence operations"
