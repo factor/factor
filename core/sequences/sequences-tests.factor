@@ -246,5 +246,5 @@ unit-test
 
 [ 328350 ] [ 100 [ sq ] sigma ] unit-test
 
-[ 50 ] [ 100 [1,b] [ even? ] count ] unit-test
-[ 50 ] [ 100 [1,b] [ odd? ] count ] unit-test
+[ 50 ] [ 100 [ even? ] count ] unit-test
+[ 50 ] [ 100 [ odd?  ] count ] unit-test
