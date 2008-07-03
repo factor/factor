@@ -280,7 +280,7 @@ SYMBOL: delayed
   ] with-compilation-unit ;
 
 : compiled-parse ( state word -- result )
-  swap [ execute [ error-stack get throw ] unless* ] with-packrat ; inline 
+  swap [ execute [ error-stack get first throw ] unless* ] with-packrat ; inline 
 
 : parse ( input parser -- result )
   dup word? [ compile ] unless compiled-parse ;
