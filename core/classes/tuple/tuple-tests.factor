@@ -668,7 +668,7 @@ ERROR: error-class-test a b c ;
 
 DEFER: error-y
 
-[ ] [ [ \ error-y forget-class ] with-compilation-unit ] unit-test
+[ ] [ [ \ error-y dup class? [ forget-class ] [ drop ] if ] with-compilation-unit ] unit-test
 
 [ ] [ "IN: classes.tuple.tests GENERIC: error-y" eval ] unit-test
 
