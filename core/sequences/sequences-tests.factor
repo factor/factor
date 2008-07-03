@@ -241,3 +241,8 @@ unit-test
 [ "asdf" ] [ " asdf " [ CHAR: \s = ] trim ] unit-test
 [ "asdf " ] [ " asdf " [ CHAR: \s = ] left-trim ] unit-test
 [ " asdf" ] [ " asdf " [ CHAR: \s = ] right-trim ] unit-test
+
+[ 328350 ] [ 100 [ sq ] sigma ] unit-test
+
+[ 50 ] [ 100 [ even? ] count ] unit-test
+[ 50 ] [ 100 [ odd?  ] count ] unit-test

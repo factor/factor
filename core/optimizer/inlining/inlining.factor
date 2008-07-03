@@ -48,7 +48,7 @@ DEFER: (flat-length)
             { [ dup word? ] [ word-flat-length ] }
             [ drop 1 ]
         } cond
-    ] map sum ;
+    ] sigma ;
 
 : flat-length ( word -- n )
     [ def>> (flat-length) ] with-scope ;

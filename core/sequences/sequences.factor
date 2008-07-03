@@ -718,3 +718,8 @@ PRIVATE>
         dup [ length ] map infimum
         swap [ [ nth-unsafe ] with { } map-as ] curry { } map-as
     ] unless ;
+
+: sigma ( seq quot -- n ) [ + ] compose 0 swap reduce ; inline
+
+: count ( seq quot -- n ) [ 1 0 ? ] compose sigma ; inline
+

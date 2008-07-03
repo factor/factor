@@ -107,7 +107,7 @@ ERROR: bad-superclass class ;
 
 : superclass-size ( class -- n )
     superclasses but-last-slice
-    [ slot-names length ] map sum ;
+    [ slot-names length ] sigma ;
 
 : (instance-check-quot) ( class -- quot )
     [
