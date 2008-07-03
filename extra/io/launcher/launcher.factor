@@ -232,3 +232,10 @@ M: encoder underlying-handle
 
 M: decoder underlying-handle
     stream>> underlying-handle ;
+
+{
+    { [ os unix? ] [ "io.unix.launcher" require ] }
+    { [ os winnt? ] [ "io.windows.nt.launcher" require ] }
+    { [ os wince? ] [ "io.windows.launcher" require ] }
+    [ ]
+} cond

@@ -1,7 +1,7 @@
 USING: alien alien.c-types arrays sequences math math.vectors
 math.matrices math.parser io io.files kernel opengl opengl.gl
 opengl.glu io.encodings.ascii opengl.capabilities shuffle
-http.client vectors splitting tools.time system combinators
+http.client vectors splitting system combinators
 float-arrays continuations destructors namespaces sequences.lib
 accessors ;
 IN: bunny.model

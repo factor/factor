@@ -172,7 +172,7 @@ ARTICLE: "collections" "Collections"
 { $subsection "buffers" }
 "There are many other collections in " { $snippet "extra/" } ", such as " { $vocab-link "disjoint-set" } ", " { $vocab-link "persistent-vectors" } ", and " { $vocab-link "tuple-arrays" } "." ;
 
-USING: io.sockets io.launcher io.mmap io.monitors
+USING: io.sockets io.sockets.secure io.launcher io.mmap io.monitors
 io.encodings.utf8 io.encodings.utf16 io.encodings.binary io.encodings.ascii io.files ;
 
 ARTICLE: "encodings-introduction" "An introduction to encodings"

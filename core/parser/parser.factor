@@ -293,9 +293,6 @@ SYMBOL: interactive-vocabs
 : ?run-file ( path -- )
     dup exists? [ run-file ] [ drop ] if ;
 
-: bootstrap-file ( path -- )
-    [ parse-file % ] [ run-file ] if-bootstrapping ;
-
 : eval ( str -- )
     [ string-lines parse-fresh ] with-compilation-unit call ;
 

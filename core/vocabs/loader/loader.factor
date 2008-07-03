@@ -54,9 +54,11 @@ SYMBOL: load-help?
 : source-wasn't-loaded ( vocab -- ) f swap set-vocab-source-loaded? ;
 
 : load-source ( vocab -- )
-    [ source-wasn't-loaded ] keep
-    [ vocab-source-path [ bootstrap-file ] when* ] keep
-    source-was-loaded ;
+    [ source-wasn't-loaded ]
+    [ vocab-source-path [ parse-file ] [ [ ] ] if* ]
+    [ source-was-loaded ]
+    tri
+    [ % ] [ call ] if-bootstrapping ;
 
 : docs-were-loaded ( vocab -- ) t swap set-vocab-docs-loaded? ;
 
@@ -64,9 +66,10 @@ SYMBOL: load-help?
 
 : load-docs ( vocab -- )
     load-help? get [
-        [ docs-weren't-loaded ] keep
-        [ vocab-docs-path [ ?run-file ] when* ] keep
-        docs-were-loaded
+        [ docs-weren't-loaded ]
+        [ vocab-docs-path [ ?run-file ] when* ]
+        [ docs-were-loaded ]
+        tri
     ] [ drop ] if ;
 
 : reload ( name -- )

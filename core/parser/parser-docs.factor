@@ -139,7 +139,6 @@ ARTICLE: "parser-files" "Parsing source files"
 "The parser can run source files:"
 { $subsection run-file }
 { $subsection parse-file }
-{ $subsection bootstrap-file }
 "The parser cross-references source files and definitions. This allows it to keep track of removed definitions, and prevent forward references and accidental redefinitions."
 $nl
 "While the above words are useful for one-off experiments, real programs should be written to use the vocabulary system instead; see " { $link "vocabs.loader" } "."
@@ -358,10 +357,6 @@ HELP: run-file
 HELP: ?run-file
 { $values { "path" "a pathname string" } }
 { $description "If the file exists, runs it with " { $link run-file } ", otherwise does nothing." } ;
-
-HELP: bootstrap-file
-{ $values { "path" "a pathname string" } }
-{ $description "If bootstrapping, parses the source file and adds its top level form to the quotation being constructed with " { $link make } "; the bootstrap code uses this to build up a boot quotation to be run on image startup. If not bootstrapping, just runs the file normally." } ;
 
 HELP: eval>string
 { $values { "str" string } { "output" string } }

@@ -2,11 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences arrays namespaces splitting
 vocabs.loader destructors assocs debugger continuations
-combinators tools.vocabs tools.time math
-io
+combinators tools.vocabs tools.time math math.parser present
+io vectors
 io.sockets
 io.sockets.secure
 io.encodings
+io.encodings.iana
 io.encodings.utf8
 io.encodings.ascii
 io.encodings.binary
@@ -15,10 +16,111 @@ io.servers.connection
 io.timeouts
 fry logging logging.insomniac calendar urls
 http
+http.parsers
 http.server.responses
+html.templates
 html.elements
 html.streams ;
 IN: http.server
+
+: check-absolute ( url -- url )
+    dup path>> "/" head? [ "Bad request: URL" throw ] unless ; inline
+
+: read-request-line ( request -- request )
+    read-crlf parse-request-line first3
+    [ >>method ] [ >url check-absolute >>url ] [ >>version ] tri* ;
+
+: read-request-header ( request -- request )
+    read-header >>header ;
+
+: parse-post-data ( post-data -- post-data )
+    [ ] [ raw>> ] [ content-type>> ] tri
+    "application/x-www-form-urlencoded" = [ query>assoc ] when
+    >>content ;
+
+: read-post-data ( request -- request )
+    dup method>> "POST" = [
+        [ ]
+        [ "content-length" header string>number read ]
+        [ "content-type" header ] tri
+        <post-data> parse-post-data >>post-data
+    ] when ;
+
+: extract-host ( request -- request )
+    [ ] [ url>> ] [ "host" header parse-host ] tri
+    [ >>host ] [ >>port ] bi*
+    drop ;
+
+: extract-cookies ( request -- request )
+    dup "cookie" header [ parse-cookie >>cookies ] when* ;
+
+: read-request ( -- request )
+    <request>
+    read-request-line
+    read-request-header
+    read-post-data
+    extract-host
+    extract-cookies ;
+
+GENERIC: write-response ( response -- )
+
+GENERIC: write-full-response ( request response -- )
+
+: write-response-line ( response -- response )
+    dup
+    [ "HTTP/" write version>> write bl ]
+    [ code>> present write bl ]
+    [ message>> write crlf ]
+    tri ;
+
+: unparse-content-type ( request -- content-type )
+    [ content-type>> "application/octet-stream" or ]
+    [ content-charset>> encoding>name ]
+    bi
+    [ "; charset=" swap 3append ] when* ;
+
+: ensure-domain ( cookie -- cookie )
+    [
+        request get url>>
+        host>> dup "localhost" =
+        [ drop ] [ or ] if
+    ] change-domain ;
+
+: write-response-header ( response -- response )
+    #! We send one set-cookie header per cookie, because that's
+    #! what Firefox expects.
+    dup header>> >alist >vector
+    over unparse-content-type "content-type" pick set-at
+    over cookies>> [
+        ensure-domain unparse-set-cookie
+        "set-cookie" swap 2array over push
+    ] each
+    write-header ;
+
+: write-response-body ( response -- response )
+    dup body>> call-template ;
+
+M: response write-response ( respose -- )
+    write-response-line
+    write-response-header
+    flush
+    drop ;
+
+M: response write-full-response ( request response -- )
+    dup write-response
+    swap method>> "HEAD" = [
+        [ content-charset>> encode-output ]
+        [ write-response-body ]
+        bi
+    ] unless ;
+
+M: raw-response write-response ( respose -- )
+    write-response-line
+    write-response-body
+    drop ;
+
+M: raw-response write-full-response ( response -- )
+    write-response ;
 
 : post-request? ( -- ? ) request get method>> "POST" = ;
 

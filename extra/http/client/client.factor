@@ -1,16 +1,84 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs http kernel math math.parser namespaces sequences
-io io.sockets io.streams.string io.files io.timeouts strings
-splitting calendar continuations accessors vectors math.order
+USING: accessors assocs kernel math math.parser namespaces
+sequences io io.sockets io.streams.string io.files io.timeouts
+strings splitting calendar continuations accessors vectors
+math.order hashtables byte-arrays prettyprint
 io.encodings
 io.encodings.string
 io.encodings.ascii
 io.encodings.8-bit
 io.encodings.binary
 io.streams.duplex
-fry debugger summary ascii urls present ;
+fry debugger summary ascii urls present
+http http.parsers ;
 IN: http.client
+
+: write-request-line ( request -- request )
+    dup
+    [ method>> write bl ]
+    [ url>> relative-url present write bl ]
+    [ "HTTP/" write version>> write crlf ]
+    tri ;
+
+: url-host ( url -- string )
+    [ host>> ] [ port>> ] bi dup "http" protocol-port =
+    [ drop ] [ ":" swap number>string 3append ] if ;
+
+: write-request-header ( request -- request )
+    dup header>> >hashtable
+    over url>> host>> [ over url>> url-host "host" pick set-at ] when
+    over post-data>> [
+        [ raw>> length "content-length" pick set-at ]
+        [ content-type>> "content-type" pick set-at ]
+        bi
+    ] when*
+    over cookies>> f like [ unparse-cookie "cookie" pick set-at ] when*
+    write-header ;
+
+GENERIC: >post-data ( object -- post-data )
+
+M: post-data >post-data ;
+
+M: string >post-data "application/octet-stream" <post-data> ;
+
+M: byte-array >post-data "application/octet-stream" <post-data> ;
+
+M: assoc >post-data assoc>query "application/x-www-form-urlencoded" <post-data> ;
+
+M: f >post-data ;
+
+: unparse-post-data ( request -- request )
+    [ >post-data ] change-post-data ;
+
+: write-post-data ( request -- request )
+    dup method>> "POST" = [ dup post-data>> raw>> write ] when ; 
+
+: write-request ( request -- )
+    unparse-post-data
+    write-request-line
+    write-request-header
+    write-post-data
+    flush
+    drop ;
+
+: read-response-line ( response -- response )
+    read-crlf parse-response-line first3
+    [ >>version ] [ >>code ] [ >>message ] tri* ;
+
+: read-response-header ( response -- response )
+    read-header >>header
+    dup "set-cookie" header parse-set-cookie >>cookies
+    dup "content-type" header [
+        parse-content-type
+        [ >>content-type ]
+        [ >>content-charset ] bi*
+    ] when* ;
+
+: read-response ( -- response )
+    <response>
+    read-response-line
+    read-response-header ;
 
 : max-redirects 10 ;
 
@@ -79,9 +147,7 @@ ERROR: download-failed response body ;
 
 M: download-failed error.
     "HTTP download failed:" print nl
-    [ response>> write-response-line nl drop ]
-    [ body>> write ]
-    bi ;
+    [ response>> . nl ] [ body>> write ] bi ;
 
 : check-response ( response data -- response data )
     over code>> success? [ download-failed ] unless ;

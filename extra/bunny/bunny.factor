@@ -1,7 +1,7 @@
 USING: alien alien.c-types arrays sequences math math.vectors
 math.matrices math.parser io io.files kernel opengl opengl.gl
 opengl.glu shuffle http.client vectors namespaces ui.gadgets
-ui.gadgets.canvas ui.render ui splitting combinators tools.time
+ui.gadgets.canvas ui.render ui splitting combinators
 system combinators.lib float-arrays continuations
 opengl.demo-support multiline ui.gestures bunny.fixed-pipeline
 bunny.cel-shaded bunny.outlined bunny.model accessors destructors ;
