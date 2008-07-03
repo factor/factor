@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences combinators parser splitting math
-quotations arrays namespaces qualified sequences.deep sequences.lib ;
+quotations arrays namespaces qualified ;
 QUALIFIED: namespaces
 IN: fry
 
