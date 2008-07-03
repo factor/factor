@@ -2,9 +2,6 @@ USING: arrays help.markup help.syntax kernel
 kernel.private math prettyprint strings vectors sbufs ;
 IN: bit-arrays
 
-ARTICLE: "syntax-bit-arrays" "Bit array syntax"
-"Bit arrays are documented in " { $link "bit-arrays" } "." ;
-
 ARTICLE: "bit-arrays" "Bit arrays"
 "Bit array are a fixed-size mutable sequences (" { $link "sequence-protocol" } ") whose elements are either " { $link t } " or " { $link f } ". Each element only uses one bit of storage, hence the name. The literal syntax is covered in " { $link "syntax-bit-arrays" } "."
 $nl

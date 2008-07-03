@@ -28,13 +28,22 @@ HELP: group-words
 { $values { "group" "a group" } { "words" "an array of words" } }
 { $description "Given a protocol or tuple class, this returns the corresponding generic words that this group contains." } ;
 
-ARTICLE: { "delegate" "intro" } "Delegation module"
-"This vocabulary defines methods for consultation and mimicry, independent of the current Factor object system; it is a replacement for Factor's builtin delegation system. Fundamental to the concept of generic word groups, which can be specific protocols, generic words or tuple slot accessors. Fundamentally, a group is a word which has a method for " { $link group-words } ". One type of group is a tuple, which consists of the slot words. To define a group as a set of words, use"
+ARTICLE: { "delegate" "intro" } "Delegation"
+"The " { $vocab-link "delegate" } " vocabulary implements run-time consultation for method dispatch."
+$nl
+"Fundamental to the concept of " { $emphasis "protocols" } ", which are groups of tuple slot accessors, or groups of arbtirary generic words."
+$nl
+"This allows an object to implement a certain protocol by passing the method calls to another object."
+$nl
+"Unlike " { $link "tuple-subclassing" } ", which expresses " { $emphasis "is-a" } " relationships by statically including the methods and slots of the superclass in all subclasses, consultation forwards generic word calls to another distinct object."
+$nl
+"Fundamentally, a protocol is a word which has a method for " { $link group-words } ". One type of protocol is a tuple, which consists of the slot accessors. To define a protocol as a set of words, use"
 { $subsection POSTPONE: PROTOCOL: }
 { $subsection define-protocol }
-"One method of object extension which this vocabulary defines is consultation. This is slightly different from the current Factor concept of delegation, in that instead of delegating for all generic words not implemented, only generic words included in a specific group are consulted. Additionally, instead of using a single hard-coded delegate slot, you can specify any quotation to execute in order to retrieve who to consult. The literal syntax and defining word are"
+"The literal syntax and defining word are:"
 { $subsection POSTPONE: CONSULT: }
-{ $subsection define-consult } ;
+{ $subsection define-consult }
+"The " { $vocab-link "delegate.protocols" } " vocabulary defines formal protocols for the various informal protocols used in the Factor core, such as " { $link "sequence-protocol" } ", " { $link "assocs-protocol" } " or " { $link "stream-protocol" } ;
 
 IN: delegate
 ABOUT: { "delegate" "intro" }

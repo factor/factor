@@ -3,7 +3,7 @@ USING: help.syntax help.markup ;
 
 IN: opengl.gl
 
-ARTICLE: "opengl-low-level" "OpenGL Library (low level)"
+ARTICLE: "opengl-low-level" "OpenGL binding"
   { $subsection "opengl-specifying-vertices" }
   { $subsection "opengl-geometric-primitives" }
   { $subsection "opengl-modeling-transformations" } ;

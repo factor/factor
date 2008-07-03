@@ -1,8 +1,8 @@
 USING: help help.markup help.syntax help.definitions help.topics
 namespaces words sequences classes assocs vocabs kernel arrays
 prettyprint.backend kernel.private io generic math system
-strings sbufs vectors byte-arrays bit-arrays float-arrays
-quotations io.streams.byte-array io.encodings.string
+strings sbufs vectors byte-arrays
+quotations io.streams.byte-array
 classes.builtin parser lexer classes.predicate classes.union
 classes.intersection classes.singleton classes.tuple ;
 IN: help.handbook
@@ -72,38 +72,6 @@ ARTICLE: "evaluator" "Evaluation semantics"
 "If the last action performed is the execution of a word, the current quotation is not saved on the call stack; this is known as " { $snippet "tail-recursion" } " and allows iterative algorithms to execute without incurring unbounded call stack usage."
 { $see-also "compiler" } ;
 
-USING: concurrency.combinators
-concurrency.messaging
-concurrency.promises
-concurrency.futures
-concurrency.locks
-concurrency.semaphores
-concurrency.count-downs
-concurrency.exchangers
-concurrency.flags ;
-
-ARTICLE: "concurrency" "Concurrency"
-"Factor supports a variety of concurrency abstractions, however they are mostly used to multiplex input/output operations since the thread scheduling is co-operative and only one CPU is used at a time."
-$nl
-"Factor's concurrency support was insipired by Erlang, Termite, Scheme48 and Java's " { $snippet "java.util.concurrent" } " library."
-$nl
-"The basic building blocks:"
-{ $subsection "threads" }
-{ $subsection "alarms" }
-"High-level abstractions:"
-{ $subsection "concurrency.combinators" }
-{ $subsection "concurrency.promises" }
-{ $subsection "concurrency.futures" }
-{ $subsection "concurrency.mailboxes" }
-{ $subsection "concurrency.messaging" }
-"Shared-state abstractions:"
-{ $subsection "concurrency.locks" }
-{ $subsection "concurrency.semaphores" }
-{ $subsection "concurrency.count-downs" }
-{ $subsection "concurrency.exchangers" }
-{ $subsection "concurrency.flags" }
-"Other concurrency abstractions include " { $vocab-link "concurrency.distributed" } " and " { $vocab-link "channels" } "." ;
-
 ARTICLE: "objects" "Objects"
 "An " { $emphasis "object" } " is any datum which may be identified. All values are objects in Factor. Each object carries type information, and types are checked at runtime; Factor is dynamically typed."
 { $subsection "equality" }
@@ -131,7 +99,9 @@ ARTICLE: "numbers" "Numbers"
 "Advanced features:"
 { $subsection "math-vectors" }
 { $subsection "math-intervals" }
-{ $subsection "math-bitfields" } ;
+{ $subsection "math-bitfields" }
+"Implementation:"
+{ $subsection "math.libm" } ;
 
 USE: io.buffers
 
@@ -143,19 +113,16 @@ ARTICLE: "collections" "Collections"
 { $subsection "quotations" }
 "Fixed-length specialized sequences:"
 { $subsection "strings" }
-{ $subsection "bit-arrays" }
 { $subsection "byte-arrays" }
-{ $subsection "float-arrays" }
-"Resizable sequence:"
+"Resizable sequences:"
 { $subsection "vectors" }
-"Resizable specialized sequences:"
+{ $subsection "byte-vectors" }
 { $subsection "sbufs" }
-{ $vocab-subsection "Bit vectors" "bit-vectors" }
-{ $vocab-subsection "Byte vectors" "byte-vectors" }
-{ $vocab-subsection "Float vectors" "float-vectors" }
+{ $subsection "growable" }
 { $heading "Associative mappings" }
 { $subsection "assocs" }
 { $subsection "namespaces" }
+{ $subsection "refs" }
 "Implementations:"
 { $subsection "hashtables" }
 { $subsection "alists" }
@@ -172,8 +139,7 @@ ARTICLE: "collections" "Collections"
 { $subsection "buffers" }
 "There are many other collections in " { $snippet "extra/" } ", such as " { $vocab-link "disjoint-set" } ", " { $vocab-link "persistent-vectors" } ", and " { $vocab-link "tuple-arrays" } "." ;
 
-USING: io.sockets io.sockets.secure io.launcher io.mmap io.monitors
-io.encodings.utf8 io.encodings.utf16 io.encodings.binary io.encodings.ascii io.files ;
+USING: io.encodings.utf8 io.encodings.utf16 io.encodings.binary io.encodings.ascii io.files ;
 
 ARTICLE: "encodings-introduction" "An introduction to encodings"
 "In order to express text in terms of binary, some sort of encoding has to be used. In a modern context, this is understood as a two-way mapping between Unicode code points (characters) and some amount of binary. Since English isn't the only language in the world, ASCII is not sufficient as a mapping from binary to Unicode; it can't even express em-dashes or curly quotes. Unicode was designed as a universal character set that could potentially represent everything." $nl
@@ -194,6 +160,10 @@ $nl
 ARTICLE: "io" "Input and output"
 { $heading "Streams" }
 { $subsection "streams" }
+{ $subsection "io.files" }
+{ $heading "Encodings" }
+{ $subsection "encodings-introduction" }
+{ $subsection "io.encodings" }
 "Wrapper streams:"
 { $subsection "io.streams.duplex" }
 { $subsection "io.streams.plain" }
@@ -202,21 +172,10 @@ ARTICLE: "io" "Input and output"
 "Utilities:"
 { $subsection "stream-binary" }
 { $subsection "styles" }
-{ $heading "Encodings" }
-{ $subsection "encodings-introduction" }
-{ $subsection "io.encodings" }
-{ $subsection "io.encodings.string" }
-{ $heading "Files" }
-{ $subsection "io.files" }
-{ $subsection "io.mmap" }
-{ $subsection "io.monitors" }
-{ $heading "Communications" }
-{ $subsection "network-streams" }
-{ $subsection "io.launcher" }
-{ $subsection "io.pipes" }
-{ $heading "Other features" }
-{ $subsection "io.timeouts" }
 { $subsection "checksums" }
+"Implementation:"
+{ $subsection "io.streams.c" }
+{ $subsection "io.ports" }
 { $see-also "destructors" } ;
 
 ARTICLE: "tools" "Developer tools"
@@ -226,6 +185,8 @@ ARTICLE: "tools" "Developer tools"
 { $subsection "listener" }
 { $subsection "tools.crossref" }
 { $subsection "inspector" }
+{ $subsection "tools.completion" }
+{ $subsection "summary" }
 "Debugging tools:"
 { $subsection "tools.annotations" }
 { $subsection "tools.test" }
@@ -268,50 +229,54 @@ ARTICLE: "program-org" "Program organization"
 { $subsection "definitions" }
 { $subsection "vocabularies" }
 { $subsection "parser" }
-{ $subsection "vocabs.loader" } ;
+{ $subsection "vocabs.loader" }
+{ $subsection "source-files" } ;
 
 USING: help.cookbook help.tutorial ;
 
-ARTICLE: "handbook" "Factor documentation"
-"Welcome to Factor."
-{ $heading "Starting points" }
-{ $subsection "cookbook" }
-{ $subsection "first-program" }
-{ $subsection "vocab-index" }
-{ $heading "Language reference" }
+ARTICLE: "handbook-language-reference" "Language reference"
 { $subsection "conventions" }
 { $subsection "syntax" }
 { $subsection "dataflow" }
 { $subsection "objects" }
 { $subsection "program-org" }
-{ $heading "Library reference" }
 { $subsection "numbers" }
 { $subsection "collections" }
-{ $subsection "models" }
-{ $subsection "io" }
-{ $subsection "concurrency" }
-{ $subsection "system" }
-{ $subsection "alien" }
-{ $heading "Environment reference" }
-{ $subsection "cli" }
-{ $subsection "images" }
+{ $subsection "io" } ;
+
+ARTICLE: "handbook-environment-reference" "Environment reference"
 { $subsection "prettyprint" }
 { $subsection "tools" }
+{ $subsection "cli" }
 { $subsection "help" }
 { $subsection "inference" }
 { $subsection "compiler" }
-{ $subsection "layouts" }
-{ $heading "User interface" }
-{ $subsection "ui" }
-{ $subsection "ui-tools" }
-{ $heading "Index" }
+{ $subsection "system" }
+{ $subsection "images" }
+{ $subsection "alien" }
+{ $subsection "init" }
+{ $subsection "layouts" } ;
+
+ARTICLE: "handbook-library-reference" "Library reference"
+"This index only includes articles from loaded vocabularies. To explore more vocabularies, see " { $link "vocab-index" } "."
+{ $index [ "handbook" orphan-articles remove ] } ;
+
+ARTICLE: "handbook" "Factor documentation"
+"Welcome to Factor."
+$nl
+"Explore the code base:"
+{ $subsection "vocab-index" }
+"Learn the language:"
+{ $subsection "cookbook" }
+{ $subsection "first-program" }
+{ $subsection "handbook-language-reference" }
+{ $subsection "handbook-environment-reference" }
+{ $subsection "handbook-library-reference" }
+"The below indices only include articles from loaded vocabularies. To explore more vocabularies, see " { $link "vocab-index" } "."
+{ $subsection "article-index" }
 { $subsection "primitive-index" }
 { $subsection "error-index" }
 { $subsection "type-index" }
 { $subsection "class-index" } ;
 
-{ <array> <string> <sbuf> <vector> <byte-array> <bit-array> <float-array> }
-related-words
-
-{ >array >quotation >string >sbuf >vector >byte-array >bit-array >float-array }
-related-words
+ABOUT: "handbook"

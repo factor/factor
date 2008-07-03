@@ -253,4 +253,4 @@ $nl
 "New C types can be defined:"
 { $subsection "c-structs" }
 { $subsection "c-unions" }
-{ $subsection "reading-writing-memory" } ;
+{ $see-also "aliens" } ;

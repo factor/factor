@@ -31,6 +31,10 @@ M: predicate word-help* drop \ $predicate ;
     articles get keys
     all-words [ word-help ] filter append ;
 
+: orphan-articles ( -- seq )
+    articles get keys
+    [ article-parent not ] filter ;
+
 : xref-help ( -- )
     all-articles [ xref-article ] each ;
 
@@ -109,7 +113,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
 
 : $index ( element -- )
     first call dup empty?
-    [ drop ] [ [ ($index) ] ($block) ] if ;
+    [ drop ] [ ($index) ] if ;
 
 : $about ( element -- )
     first vocab-help [ 1array $subsection ] when* ;

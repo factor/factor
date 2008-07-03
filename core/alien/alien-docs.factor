@@ -154,7 +154,11 @@ ARTICLE: "aliens" "Alien addresses"
 { $subsection expired? }
 "Anywhere that a " { $link alien } " instance is accepted, the " { $link f } " singleton may be passed in to denote a null pointer."
 $nl
-"Usually alien objects do not have to created and dereferenced directly; instead declaring C function parameters and return values as having a pointer type such as " { $snippet "void*" } " takes care of the details. See " { $link "c-types-specs" } "." ;
+"Usually alien objects do not have to created and dereferenced directly; instead declaring C function parameters and return values as having a pointer type such as " { $snippet "void*" } " takes care of the details."
+{ $subsection "syntax-aliens" }
+"When higher-level abstractions won't do:"
+{ $subsection "reading-writing-memory" }
+{ $see-also "c-data" "c-types-specs" } ;
 
 ARTICLE: "reading-writing-memory" "Reading and writing memory directly"
 "Numerical values can be read from memory addresses and converted to Factor objects using the various typed memory accessor words:"
@@ -293,6 +297,7 @@ $nl
 "C library interface words are found in the " { $vocab-link "alien" } " vocabulary."
 { $warning "C does not perform runtime type checking, automatic memory management or array bounds checks. Incorrect usage of C library functions can lead to crashes, data corruption, and security exploits." }
 { $subsection "loading-libs" }
+{ $subsection "aliens" }
 { $subsection "alien-invoke" }
 { $subsection "alien-callback" }
 { $subsection "c-data" }

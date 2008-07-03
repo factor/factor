@@ -3,7 +3,7 @@ IN: unicode.collation
 
 ABOUT: "unicode.collation"
 
-ARTICLE: "unicode.collation" "Unicode collation algorithm"
+ARTICLE: "unicode.collation" "Unicode collation algorithm (UCA)"
 "The Unicode Collation Algorithm (UTS #10) forms a reasonable way to sort strings when accouting for all of the characters in Unicode. At the moment, only the default Unicode collation element table (DUCET) is used, but a more accurate collation would take locale into account. The following words are defined:"
 { $subsection sort-strings }
 { $subsection collation-key }

@@ -19,6 +19,7 @@ ARTICLE: "concurrency.count-downs" "Count-down latches"
 "The " { $vocab-link "concurrency.count-downs" } " vocabulary implements the " { $emphasis "count-down latch" } " data type, whichis a wrapper for a non-negative integer value which tends towards zero. A thread can either decrement the value, or wait for it to become zero."
 { $subsection <count-down> }
 { $subsection count-down }
-{ $subsection await } ;
+{ $subsection await }
+"The vocabulary was modelled after a similar feature in Java's " { $snippet "java.util.concurrent" } " library." ;
 
 ABOUT: "concurrency.count-downs"

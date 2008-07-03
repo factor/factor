@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel kernel.private
-namespaces sequences words arrays layouts help effects math
+namespaces sequences words arrays layouts effects math
 layouts classes.private classes.union classes.mixin
 classes.predicate quotations ;
 IN: classes
@@ -32,6 +32,8 @@ $nl
 { $subsection class }
 "Testing if an object is an instance of a class:"
 { $subsection instance? }
+"Class predicates can be used to test instances directly:"
+{ $subsection "class-predicates" }
 "There is a universal class which all objects are an instance of, and an empty class with no instances:"
 { $subsection object }
 { $subsection null }
