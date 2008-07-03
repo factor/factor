@@ -28,7 +28,13 @@ void default_parameters(F_PARAMETERS *p)
 
 	p->secure_gc = false;
 	p->fep = false;
+
+#ifdef WINDOWS
 	p->console = false;
+#else
+	p->console = true;
+#endif
+
 	p->stack_traces = true;
 }
 
@@ -91,6 +97,9 @@ void init_factor(F_PARAMETERS *p)
 	load_image(p);
 	init_c_io();
 	init_signals();
+
+	if(p->console)
+		open_console();
 
 	stack_chain = NULL;
 	profiling_p = false;
@@ -179,9 +188,6 @@ void init_factor_from_args(F_CHAR *image, int argc, F_CHAR **argv, bool embedded
 
 	userenv[EXECUTABLE_ENV] = tag_object(from_native_string(executable_path));
 	userenv[EMBEDDED_ENV] = (embedded ? T : F);
-
-	if(p.console)
-		open_console();
 
 	if(p.fep)
 		factorbug();

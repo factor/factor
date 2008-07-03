@@ -13,7 +13,7 @@ EXCLUDE: io.sockets => accept ;
 IN: io.unix.sockets
 
 : socket-fd ( domain type -- fd )
-    0 socket dup io-error <fd> |dispose ;
+    0 socket dup io-error <fd> init-fd |dispose ;
 
 : set-socket-option ( fd level opt -- )
     >r >r handle-fd r> r> 1 <int> "int" heap-size setsockopt io-error ;
@@ -77,7 +77,7 @@ M: object (server) ( addrspec -- handle )
 M: object (accept) ( server addrspec -- fd sockaddr )
     2dup do-accept
     {
-        { [ over 0 >= ] [ >r 2nip <fd> r> ] }
+        { [ over 0 >= ] [ >r 2nip <fd> init-fd r> ] }
         { [ err_no EINTR = ] [ 2drop (accept) ] }
         { [ err_no EAGAIN = ] [
             2drop

@@ -38,5 +38,4 @@ void dump_stack_signal(int signal, siginfo_t* siginfo, void* uap);
 s64 current_millis(void);
 void sleep_millis(CELL msec);
 
-void reset_stdio(void);
 void open_console(void);
