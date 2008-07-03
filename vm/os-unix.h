@@ -6,6 +6,7 @@
 #include <sys/time.h>
 #include <dlfcn.h>
 #include <signal.h>
+#include <pthread.h>
 
 typedef char F_CHAR;
 typedef char F_SYMBOL;
