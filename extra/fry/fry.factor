@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences combinators parser splitting
-quotations arrays namespaces qualified ;
+USING: kernel sequences combinators parser splitting math
+quotations arrays namespaces qualified sequences.deep sequences.lib ;
 QUALIFIED: namespaces
 IN: fry
 
@@ -35,26 +35,22 @@ DEFER: shallow-fry
 
 : shallow-fry ( quot -- quot' ) [ ] swap (shallow-fry) ;
 
-: deep-fry ( quot -- quot' )
-    { _ } last-split1 [
-        [
-            shallow-fry %
-            [ >r ] %
-            deep-fry %
-            [ [ dip ] curry r> compose ] %
-        ] [ ] make
+: deep-fry ( quot -- quot )
+    { _ } last-split1 dup [
+      shallow-fry [ >r ] rot
+      deep-fry    [ [ dip ] curry r> compose ] 4array concat
     ] [
-        shallow-fry
-    ] if* ;
+        drop shallow-fry
+    ] if ;
 
 : fry-specifier? ( obj -- ? ) { , namespaces:, @ } member? ;
 
 : count-inputs ( quot -- n )
     [
         {
-            { [ dup callable? ] [ count-inputs ] }
-            { [ dup fry-specifier? ] [ drop 1 ] }
-            [ drop 0 ]
+            { [ dup callable?      ] [ count-inputs ] }
+            { [ dup fry-specifier? ] [ drop 1       ] }
+                                     [ drop 0       ]
         } cond
     ] map sum ;
 
