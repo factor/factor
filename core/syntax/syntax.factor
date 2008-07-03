@@ -175,6 +175,7 @@ IN: bootstrap.syntax
 
     "ERROR:" [
         parse-tuple-definition
+        pick reset-generic
         pick save-location
         define-error-class
     ] define-syntax

@@ -4,7 +4,7 @@ USING: arrays definitions hashtables kernel kernel.private math
 namespaces sequences sequences.private strings vectors words
 quotations memory combinators generic classes classes.algebra
 classes.private slots.deprecated slots.private slots
-compiler.units math.private accessors assocs ;
+compiler.units math.private accessors assocs effects ;
 IN: classes.tuple
 
 M: tuple class 1 slot 2 slot { word } declare ;
@@ -255,9 +255,13 @@ M: tuple-class define-tuple-class
     3dup tuple-class-unchanged?
     [ 3drop ] [ redefine-tuple-class ] if ;
 
+: thrower-effect ( slots -- effect )
+    [ dup array? [ first ] when ] map f <effect> t >>terminated? ;
+
 : define-error-class ( class superclass slots -- )
-    [ define-tuple-class ] [ 2drop ] 3bi
-    dup [ boa throw ] curry define ;
+    [ define-tuple-class ]
+    [ [ dup [ boa throw ] curry ] [ drop ] [ thrower-effect ] tri* ] 3bi
+    define-declared ;
 
 M: tuple-class reset-class
     [

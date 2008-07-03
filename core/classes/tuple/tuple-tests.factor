@@ -656,3 +656,28 @@ T{ reshape-test f "hi" } "tuple" set
 TUPLE: boa-coercer-test { x array-capacity } ;
 
 [ fixnum ] [ 0 >bignum boa-coercer-test boa x>> class ] unit-test
+
+! Test error classes
+ERROR: error-class-test a b c ;
+
+[ "( a b c -- * )" ] [ \ error-class-test stack-effect effect>string ] unit-test
+[ f ] [ \ error-class-test "inline" word-prop ] unit-test
+
+[ "IN: classes.tuple.tests ERROR: error-x ; : error-x 3 ;" eval ]
+[ error>> error>> redefine-error? ] must-fail-with
+
+DEFER: error-y
+
+[ ] [ [ \ error-y forget-class ] with-compilation-unit ] unit-test
+
+[ ] [ "IN: classes.tuple.tests GENERIC: error-y" eval ] unit-test
+
+[ f ] [ \ error-y tuple-class? ] unit-test
+
+[ t ] [ \ error-y generic? ] unit-test
+
+[ ] [ "IN: classes.tuple.tests ERROR: error-y ;" eval ] unit-test
+
+[ t ] [ \ error-y tuple-class? ] unit-test
+
+[ f ] [ \ error-y generic? ] unit-test
