@@ -19,25 +19,6 @@ HELP: each-withn
 } 
 { $see-also map-withn } ;
 
-HELP: sigma
-{ $values { "seq" sequence } { "quot" quotation } { "n" number } }
-{ $description "Like map sum, but without creating an intermediate sequence." }
-{ $example
-    "! Find the sum of the squares [0,99]"
-    "USING: math math.ranges sequences.lib prettyprint ;"
-    "100 [1,b] [ sq ] sigma ."
-    "338350"
-} ;
-
-HELP: count
-{ $values { "seq" sequence } { "quot" quotation } { "n" integer } }
-{ $description "Efficiently returns the number of elements that the predicate quotation matches." }
-{ $example
-    "USING: math math.ranges sequences.lib prettyprint ;"
-    "100 [1,b] [ even? ] count ."
-    "50"
-} ;
-
 HELP: if-seq
 { $values { "seq" sequence } { "quot1" quotation } { "quot2" quotation } }
 { $description "Makes an implicit check if the sequence is empty.  If the sequence has any elements, " { $snippet "quot1" } " is called on it.  Otherwise, the empty sequence is dropped and " { $snippet "quot2" } " is called." }
