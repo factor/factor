@@ -19,6 +19,10 @@ C: <parse-result>  parse-result
 C: <parse-error> parse-error
 C: <parser>        parser
 
+M: parse-error error.
+  "Peg parsing error at character position " write dup position>> number>string write 
+  "." print "Expected " write messages>> [ " or " write ] [ write ] interleave nl ;
+
 SYMBOL: error-stack
 
 : (merge-errors) ( a b -- c )
@@ -311,7 +315,7 @@ TUPLE: token-parser symbol ;
   dup >r ?head-slice [
     r> <parse-result> f f add-error
   ] [
-    drop input-slice input-from "Expected token '" r> append "'" append 1vector add-error f
+    drop input-slice input-from "token '" r> append "'" append 1vector add-error f
   ] if ;
 
 M: token-parser (compile) ( parser -- quot )
