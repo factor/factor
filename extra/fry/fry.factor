@@ -53,7 +53,7 @@ DEFER: shallow-fry
                                      [ drop 0       ]
         } cond
     ] map sum ;
-
+    
 : fry ( quot -- quot' )
     [
         [
