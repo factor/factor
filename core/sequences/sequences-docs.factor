@@ -1,5 +1,5 @@
 USING: arrays bit-arrays help.markup help.syntax math
-sequences.private vectors strings sbufs kernel math.order ;
+sequences.private vectors strings quotations sbufs kernel math.order ;
 IN: sequences
 
 ARTICLE: "sequences-unsafe" "Unsafe sequence operations"
