@@ -28,7 +28,7 @@ SYMBOL: bootstrap-time
     [ "bootstrap." prepend require ] each ;
 
 : count-words ( pred -- )
-    all-words swap filter length number>string write ;
+    all-words swap count number>string write ;
 
 : print-report ( time -- )
     1000 /i

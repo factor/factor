@@ -103,7 +103,7 @@ ERROR: bad-superclass class ;
 
 : superclass-size ( class -- n )
     superclasses but-last-slice
-    [ slot-names length ] map sum ;
+    [ slot-names length ] sigma ;
 
 : generate-tuple-slots ( class slots -- slot-specs )
     over superclass-size 2 + simple-slots ;

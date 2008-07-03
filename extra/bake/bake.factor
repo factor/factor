@@ -1,6 +1,7 @@
 
-USING: kernel parser combinators sequences splitting quotations arrays macros
-       arrays.lib combinators.cleave combinators.conditional newfx ;
+USING: kernel parser namespaces sequences quotations arrays vectors splitting
+       math
+       macros arrays.lib combinators.lib combinators.conditional newfx ;
 
 IN: bake
 
@@ -14,46 +15,79 @@ SYMBOL: @
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-DEFER: [bake-array]
+DEFER: [bake]
 
 : broil-element ( obj -- quot )
     {
-      { [ comma? ] [ drop [ >r ]               ] }
-      { [ array? ] [ [bake-array] [ >r ] append ] }
-      { [ drop t ] [ [ >r ] prefix-on          ] }
+      { [ comma?    ] [ drop [ >r ]          ] }
+      { [ integer?  ] [ [ >r ] prefix-on     ] }
+      { [ sequence? ] [ [bake] [ >r ] append ] }
+      { [ drop t    ] [ [ >r ] prefix-on     ] }
     }
   1cond ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: [broil] ( array -- quot )
+: constructor ( seq -- quot )
+    {
+      { [ array? ]     [ length [ narray ] prefix-on ] }
+      { [ quotation? ] [ length [ ncurry ] prefix-on [ ] prefix ] }
+      { [ vector? ]    [ length [ narray >vector ] prefix-on ] }
+    }
+  1cond ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: [broil] ( seq -- quot )
     [ reverse [ broil-element ] map concat ]
-    [ length [ drop [ r> ] ] map concat ]
-    [ length [ narray ] prefix-on ]
+    [ length  [ drop [ r> ]   ] map concat ]
+    [ constructor ]
   tri append append
   >quotation ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: [simmer] ( array -- quot )
+SYMBOL: saved-sequence
+
+: [connector] ( -- quot )
+  saved-sequence get quotation? [ [ compose ] ] [ [ append ] ] if ;
+
+: [starter] ( -- quot )
+  saved-sequence get
+    {
+      { [ quotation? ] [ drop [  [ ] ] ] }
+      { [ array?     ] [ drop [  { } ] ] }
+      { [ vector?    ] [ drop [ V{ } ] ] }
+    }
+  1cond ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: [simmer] ( seq -- quot )
+
+  dup saved-sequence set
 
   { @ } split reverse
-    [        [ [bake-array] [ append ] append [ >r ] append ] map concat ]
-    [ length [ drop [ r> append ]                          ] map concat ]
+    [ [ [bake] [connector] append [ >r ] append ] map concat ]
+    [ length [ drop [ r> ] [connector] append   ] map concat ]
   bi
 
-  >r 2 head* [ >r ] append r> ! remove the last append
+  >r 1 invert-index pluck r> ! remove the last append/compose
 
-  [ { } ] swap append
+  [starter] prepend
 
   append ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: [bake-array] ( array -- quot ) [ @ member? ] [ [simmer] ] [ [broil] ] 1if ;
-
-MACRO: bake-array ( array -- quot ) [bake-array] ;
+: [bake] ( seq -- quot ) [ @ member? ] [ [simmer] ] [ [broil] ] 1if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: `{ \ } [ >array ] parse-literal \ bake-array parsed ; parsing
+MACRO: bake ( seq -- quot ) [bake] ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: `{  \ } [ >array     ] parse-literal \ bake parsed ; parsing
+: `V{ \ } [ >vector    ] parse-literal \ bake parsed ; parsing
+: `[  \ ] [ >quotation ] parse-literal \ bake parsed ; parsing
