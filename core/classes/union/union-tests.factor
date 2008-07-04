@@ -11,7 +11,7 @@ IN: classes.union.tests
 UNION: bah fixnum alien ;
 [ bah ] [ \ bah? "predicating" word-prop ] unit-test
 
-[ "USING: alien math ;\nIN: classes.tests\nUNION: bah fixnum alien ;\n" ]
+[ "USING: alien math ;\nIN: classes.union.tests\nUNION: bah fixnum alien ;\n" ]
 [ [ \ bah see ] with-string-writer ] unit-test
 
 ! Test redefinition of classes
