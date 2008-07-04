@@ -9,13 +9,12 @@ sequences growable sbufs vectors sequences.private accessors kernel ;
 \ dispatching-class must-infer
 
 ! Make sure we have sane heuristics
-: should-inline? ( generic class -- ? ) method flat-length 10 <= ;
-
-[ t ] [ \ fixnum \ shift should-inline? ] unit-test
-[ f ] [ \ array \ equal? should-inline? ] unit-test
-[ f ] [ \ sequence \ hashcode* should-inline? ] unit-test
-[ t ] [ \ array \ nth-unsafe should-inline? ] unit-test
-[ t ] [ \ growable \ nth-unsafe should-inline? ] unit-test
-[ t ] [ \ sbuf \ set-nth-unsafe should-inline? ] unit-test
-[ t ] [ \ growable \ set-nth-unsafe should-inline? ] unit-test
-[ t ] [ \ vector \ (>>length) should-inline? ] unit-test
+[ t ] [ \ fixnum \ shift method should-inline? ] unit-test
+[ f ] [ \ array \ equal? method should-inline? ] unit-test
+[ f ] [ \ sequence \ hashcode* method should-inline? ] unit-test
+[ t ] [ \ array \ nth-unsafe method should-inline? ] unit-test
+[ t ] [ \ growable \ nth-unsafe method should-inline? ] unit-test
+[ t ] [ \ sbuf \ set-nth-unsafe method should-inline? ] unit-test
+[ t ] [ \ growable \ set-nth-unsafe method should-inline? ] unit-test
+[ t ] [ \ growable \ set-nth method should-inline? ] unit-test
+[ t ] [ \ vector \ (>>length) method should-inline? ] unit-test

@@ -7,7 +7,7 @@ combinators classes classes.algebra generic.math
 optimizer.math.partial continuations optimizer.def-use
 optimizer.backend generic.standard optimizer.specializers
 optimizer.def-use optimizer.pattern-match generic.standard
-optimizer.control kernel.private definitions ;
+optimizer.control kernel.private definitions sets ;
 IN: optimizer.inlining
 
 : remember-inlining ( node history -- )
@@ -25,19 +25,17 @@ IN: optimizer.inlining
     tuck splice-node ;
 
 ! A heuristic to avoid excessive inlining
+SYMBOL: recursive-calls
 DEFER: (flat-length)
 
 : word-flat-length ( word -- n )
     {
-        ! heuristic: { ... } declare comes up in method bodies
-        ! and we don't care about it
-        { [ dup \ declare eq? ] [ drop -2 ] }
         ! not inline
-        { [ dup inline? not ] [ drop 1 ] }
+        { [ dup inline? not ] [ drop 0 ] }
         ! recursive and inline
-        { [ dup get ] [ drop 1 ] }
+        { [ dup recursive-calls get key? ] [ drop 4 ] }
         ! inline
-        [ dup dup set def>> (flat-length) ]
+        [ [ recursive-calls get conjoin ] [ def>> (flat-length) ] bi ]
     } cond ;
 
 : (flat-length) ( seq -- n )
@@ -46,12 +44,16 @@ DEFER: (flat-length)
             { [ dup quotation? ] [ (flat-length) 1+ ] }
             { [ dup array? ] [ (flat-length) ] }
             { [ dup word? ] [ word-flat-length ] }
-            [ drop 1 ]
+            [ drop 0 ]
         } cond
     ] sigma ;
 
 : flat-length ( word -- n )
-    [ def>> (flat-length) ] with-scope ;
+    H{ } clone recursive-calls [
+        [ recursive-calls get conjoin ]
+        [ def>> (flat-length) ]
+        bi
+    ] with-variable ;
 
 ! Single dispatch method inlining optimization
 ! : dispatching-class ( node generic -- method/f )
@@ -208,9 +210,11 @@ DEFER: (flat-length)
         dup node-param splice-word-def
     ] if ;
 
+: should-inline? ( word -- ? )
+    flat-length 11 <= ;
+
 : method-body-inline? ( #call -- ? )
-    node-param dup method-body?
-    [ flat-length 10 <= ] [ drop f ] if ;
+    node-param dup method-body? [ should-inline? ] [ drop f ] if ;
 
 M: #call optimize-node*
     {
