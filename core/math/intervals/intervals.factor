@@ -240,7 +240,7 @@ SYMBOL: incomparable
     from>> first (a,inf] interval-intersect ;
 
 : assume>= ( i1 i2 -- i3 )
-    to>> first [a,inf] interval-intersect ;
+    from>> first [a,inf] interval-intersect ;
 
 : integral-closure ( i1 -- i2 )
     [ from>> first2 [ 1+ ] unless ]

@@ -222,3 +222,15 @@ IN: math.intervals.tests
     ] if ;
 
 [ t ] [ 40000 [ drop comparison-test ] all? ] unit-test
+
+[ t ] [ -10 10 [a,b] 0 100 [a,b] assume> 0 10 (a,b] = ] unit-test
+
+[ t ] [ -10 10 [a,b] 0 100 [a,b] assume>= 0 10 [a,b] = ] unit-test
+
+[ t ] [ -10 10 [a,b] 0 100 [a,b] assume< -10 10 [a,b] = ] unit-test
+
+[ t ] [ -10 10 [a,b] -100 0 [a,b] assume< -10 0 [a,b) = ] unit-test
+
+[ t ] [ -10 10 [a,b] -100 0 [a,b] assume<= -10 0 [a,b] = ] unit-test
+
+[ t ] [ -10 10 [a,b] 0 100 [a,b] assume<= -10 10 [a,b] = ] unit-test
