@@ -75,7 +75,7 @@ M: object add-breakpoint ;
         { [ dup hook-generic? ] [ effective-method (step-into-execute) ] }
         { [ dup uses \ suspend swap member? ] [ execute break ] }
         { [ dup primitive? ] [ execute break ] }
-        [ word-def (step-into-quot) ]
+        [ def>> (step-into-quot) ]
     } cond ;
 
 \ (step-into-execute) t "step-into?" set-word-prop

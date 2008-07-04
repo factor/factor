@@ -3,7 +3,7 @@
 USING: alien.syntax system sequences vocabs.loader words ;
 IN: unix.kqueue
 
-<< "unix.kqueue." os word-name append require >>
+<< "unix.kqueue." os name>> append require >>
 
 FUNCTION: int kqueue ( ) ;
 

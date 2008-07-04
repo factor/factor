@@ -1,6 +1,6 @@
 
 USING: kernel parser namespaces sequences quotations arrays vectors splitting
-       math
+       words math
        macros arrays.lib combinators.lib combinators.conditional newfx ;
 
 IN: bake
@@ -22,6 +22,7 @@ DEFER: [bake]
       { [ comma?    ] [ drop [ >r ]          ] }
       { [ integer?  ] [ [ >r ] prefix-on     ] }
       { [ sequence? ] [ [bake] [ >r ] append ] }
+      { [ word?     ] [ literalize [ >r ] prefix-on ] }
       { [ drop t    ] [ [ >r ] prefix-on     ] }
     }
   1cond ;
@@ -31,8 +32,9 @@ DEFER: [bake]
 : constructor ( seq -- quot )
     {
       { [ array? ]     [ length [ narray ] prefix-on ] }
-      { [ quotation? ] [ length [ ncurry ] prefix-on [ ] prefix ] }
-      { [ vector? ]    [ length [ narray >vector ] prefix-on ] }
+!      { [ quotation? ] [ length [ ncurry ] prefix-on [ ] prefix ] }
+      { [ quotation? ] [ length [ narray >quotation ] prefix-on ] }
+      { [ vector? ]    [ length [ narray >vector    ] prefix-on ] }
     }
   1cond ;
 
@@ -90,4 +92,3 @@ MACRO: bake ( seq -- quot ) [bake] ;
 
 : `{  \ } [ >array     ] parse-literal \ bake parsed ; parsing
 : `V{ \ } [ >vector    ] parse-literal \ bake parsed ; parsing
-: `[  \ ] [ >quotation ] parse-literal \ bake parsed ; parsing

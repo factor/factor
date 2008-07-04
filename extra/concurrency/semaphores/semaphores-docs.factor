@@ -30,7 +30,7 @@ HELP: with-semaphore
 { $description "Calls the quotation with the semaphore held." } ;
 
 ARTICLE: "concurrency.semaphores" "Counting semaphores"
-"Counting semaphores are used to ensure that no more than a fixed number of threads are executing in a critical section at a time; as such, they generalize " { $link "concurrency.locks.mutex" } ", since locks can be thought of as semaphores with an initial count of 1."
+"Counting semaphores are used to ensure that no more than a fixed number of threads are executing in a critical section at a time; as such, they generalize " { $vocab-link "concurrency.locks" } ", since locks can be thought of as semaphores with an initial count of 1."
 $nl
 "A use-case would be a batch processing server which runs a large number of jobs which perform calculations but then need to fire off expensive external processes or perform heavy network I/O. While for most of the time, the threads can all run in parallel, it might be desired that the expensive operation is not run by more than 10 threads at once, to avoid thrashing swap space or saturating the network. This can be accomplished with a counting semaphore:"
 { $code

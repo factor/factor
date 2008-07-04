@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors byte-arrays kernel debugger sequences namespaces math
 math.order combinators init alien alien.c-types alien.strings libc
-continuations destructors debugger inspector splitting assocs
+continuations destructors debugger summary splitting assocs
 random math.parser locals unicode.case
 openssl.libcrypto openssl.libssl
 io.backend io.ports io.files io.encodings.8-bit io.sockets.secure

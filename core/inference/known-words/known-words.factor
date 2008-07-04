@@ -1,16 +1,15 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.accessors arrays bit-arrays byte-arrays
-classes sequences.private continuations.private effects
-float-arrays generic hashtables hashtables.private
-inference.state inference.backend inference.dataflow io
-io.backend io.files io.files.private io.streams.c kernel
-kernel.private math math.private memory namespaces
-namespaces.private parser prettyprint quotations
+USING: accessors alien alien.accessors arrays byte-arrays
+classes sequences.private continuations.private effects generic
+hashtables hashtables.private inference.state inference.backend
+inference.dataflow io io.backend io.files io.files.private
+io.streams.c kernel kernel.private math math.private memory
+namespaces namespaces.private parser prettyprint quotations
 quotations.private sbufs sbufs.private sequences
 sequences.private slots.private strings strings.private system
 threads.private classes.tuple classes.tuple.private vectors
-vectors.private words words.private assocs inspector
+vectors.private words words.private assocs summary
 compiler.units system.private ;
 IN: inference.known-words
 
@@ -137,7 +136,7 @@ M: object infer-call
 ! Variadic tuple constructor
 \ <tuple-boa> [
     \ <tuple-boa>
-    peek-d value-literal layout-size { tuple } <effect>
+    peek-d value-literal size>> { tuple } <effect>
     make-call-node
 ] "infer" set-word-prop
 
@@ -399,12 +398,6 @@ set-primitive-effect
 \ <byte-array> { integer } { byte-array } <effect> set-primitive-effect
 \ <byte-array> make-flushable
 
-\ <bit-array> { integer } { bit-array } <effect> set-primitive-effect
-\ <bit-array> make-flushable
-
-\ <float-array> { integer float } { float-array } <effect> set-primitive-effect
-\ <float-array> make-flushable
-
 \ <displaced-alien> { integer c-ptr } { c-ptr } <effect> set-primitive-effect
 \ <displaced-alien> make-flushable
 
@@ -492,12 +485,6 @@ set-primitive-effect
 \ resize-byte-array { integer byte-array } { byte-array } <effect> set-primitive-effect
 \ resize-byte-array make-flushable
 
-\ resize-bit-array { integer bit-array } { bit-array } <effect> set-primitive-effect
-\ resize-bit-array make-flushable
-
-\ resize-float-array { integer float-array } { float-array } <effect> set-primitive-effect
-\ resize-float-array make-flushable
-
 \ resize-string { integer string } { string } <effect> set-primitive-effect
 \ resize-string make-flushable
 
@@ -529,9 +516,6 @@ set-primitive-effect
 
 \ fclose { alien } { } <effect> set-primitive-effect
 
-\ expired? { object } { object } <effect> set-primitive-effect
-\ expired? make-flushable
-
 \ <wrapper> { object } { wrapper } <effect> set-primitive-effect
 \ <wrapper> make-foldable
 
@@ -549,6 +533,9 @@ set-primitive-effect
 
 \ <tuple> { tuple-layout } { tuple } <effect> set-primitive-effect
 \ <tuple> make-flushable
+
+\ (tuple) { tuple-layout } { tuple } <effect> set-primitive-effect
+\ (tuple) make-flushable
 
 \ <tuple-layout> { word fixnum array fixnum } { tuple-layout } <effect> set-primitive-effect
 \ <tuple-layout> make-foldable

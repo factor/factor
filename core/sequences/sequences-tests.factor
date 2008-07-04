@@ -1,5 +1,5 @@
 USING: arrays kernel math namespaces sequences kernel.private
-sequences.private strings sbufs tools.test vectors bit-arrays
+sequences.private strings sbufs tools.test vectors
 generic vocabs.loader ;
 IN: sequences.tests
 
@@ -222,8 +222,6 @@ unit-test
 
 [ f ] [ f V{ } like f V{ } like eq? ] unit-test
 
-[ ?{ f t } ] [ 0 2 ?{ f t f } subseq ] unit-test
-
 [ V{ f f f } ] [ 3 V{ } new-sequence ] unit-test
 [ SBUF" \0\0\0" ] [ 3 SBUF" " new-sequence ] unit-test
 
@@ -246,5 +244,5 @@ unit-test
 
 [ 328350 ] [ 100 [ sq ] sigma ] unit-test
 
-[ 50 ] [ 100 [1,b] [ even? ] count ] unit-test
-[ 50 ] [ 100 [1,b] [ odd? ] count ] unit-test
+[ 50 ] [ 100 [ even? ] count ] unit-test
+[ 50 ] [ 100 [ odd?  ] count ] unit-test

@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser-combinators memoize kernel sequences
+USING: accessors parser-combinators memoize kernel sequences
 logging arrays words strings vectors io io.files
 namespaces combinators combinators.lib logging.server
 calendar calendar.format ;
@@ -19,7 +19,7 @@ SYMBOL: multiline
 
 : 'log-level' ( -- parser )
     log-levels [
-        [ word-name token ] keep [ nip ] curry <@
+        [ name>> token ] keep [ nip ] curry <@
     ] map <or-parser> ;
 
 : 'word-name' ( -- parser )

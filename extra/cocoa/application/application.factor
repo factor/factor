@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.syntax io kernel namespaces core-foundation
 core-foundation.run-loop cocoa.messages cocoa cocoa.classes
-cocoa.runtime sequences threads debugger init inspector
+cocoa.runtime sequences threads debugger init summary
 kernel.private ;
 IN: cocoa.application
 

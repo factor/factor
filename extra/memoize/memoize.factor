@@ -48,8 +48,8 @@ M: memoized definer drop \ MEMO: \ ; ;
 M: memoized definition "memo-quot" word-prop ;
 
 M: memoized reset-word
-    [ { "memoize" "memo-quot" } reset-props ]
     [ call-next-method ]
+    [ { "memoize" "memo-quot" } reset-props ]
     bi ;
 
 : memoize-quot ( quot effect -- memo-quot )

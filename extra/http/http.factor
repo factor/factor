@@ -10,7 +10,7 @@ io.encodings.8-bit
 
 unicode.case unicode.categories qualified
 
-urls html.templates xml xml.data xml.writer
+urls
 
 http.parsers ;
 
@@ -147,13 +147,6 @@ header
 post-data
 cookies ;
 
-: check-url ( string -- url )
-    >url dup path>> "/" head? [ "Bad request: URL" throw ] unless ; inline
-
-: read-request-line ( request -- request )
-    read-crlf parse-request-line first3
-    [ >>method ] [ check-url >>url ] [ >>version ] tri* ;
-
 : set-header ( request/response value key -- request/response )
     pick header>> set-at ;
 
@@ -168,113 +161,8 @@ cookies ;
         "close" "connection" set-header
         "Factor http.client" "user-agent" set-header ;
 
-: check-absolute ( url -- url )
-    dup path>> "/" head? [ "Bad request: URL" throw ] unless ; inline
-
-: read-request-header ( request -- request )
-    read-header >>header ;
-
 : header ( request/response key -- value )
     swap header>> at ;
-
-TUPLE: post-data raw content content-type ;
-
-: <post-data> ( raw content-type -- post-data )
-    post-data new
-        swap >>content-type
-        swap >>raw ;
-
-: parse-post-data ( post-data -- post-data )
-    [ ] [ raw>> ] [ content-type>> ] tri {
-        { "application/x-www-form-urlencoded" [ query>assoc ] }
-        { "text/xml" [ string>xml ] }
-        [ drop ]
-    } case >>content ;
-
-: read-post-data ( request -- request )
-    dup method>> "POST" = [
-        [ ]
-        [ "content-length" header string>number read ]
-        [ "content-type" header ] tri
-        <post-data> parse-post-data >>post-data
-    ] when ;
-
-: extract-host ( request -- request )
-    [ ] [ url>> ] [ "host" header parse-host ] tri
-    [ >>host ] [ >>port ] bi*
-    drop ;
-
-: extract-cookies ( request -- request )
-    dup "cookie" header [ parse-cookie >>cookies ] when* ;
-
-: parse-content-type-attributes ( string -- attributes )
-    " " split harvest [ "=" split1 [ >lower ] dip ] { } map>assoc ;
-
-: parse-content-type ( content-type -- type encoding )
-    ";" split1 parse-content-type-attributes "charset" swap at
-    name>encoding over "text/" head? latin1 binary ? or ;
-
-: read-request ( -- request )
-    <request>
-    read-request-line
-    read-request-header
-    read-post-data
-    extract-host
-    extract-cookies ;
-
-: write-request-line ( request -- request )
-    dup
-    [ method>> write bl ]
-    [ url>> relative-url present write bl ]
-    [ "HTTP/" write version>> write crlf ]
-    tri ;
-
-: url-host ( url -- string )
-    [ host>> ] [ port>> ] bi dup "http" protocol-port =
-    [ drop ] [ ":" swap number>string 3append ] if ;
-
-: write-request-header ( request -- request )
-    dup header>> >hashtable
-    over url>> host>> [ over url>> url-host "host" pick set-at ] when
-    over post-data>> [
-        [ raw>> length "content-length" pick set-at ]
-        [ content-type>> "content-type" pick set-at ]
-        bi
-    ] when*
-    over cookies>> f like [ unparse-cookie "cookie" pick set-at ] when*
-    write-header ;
-
-GENERIC: >post-data ( object -- post-data )
-
-M: post-data >post-data ;
-
-M: string >post-data "application/octet-stream" <post-data> ;
-
-M: byte-array >post-data "application/octet-stream" <post-data> ;
-
-M: xml >post-data xml>string "text/xml" <post-data> ;
-
-M: assoc >post-data assoc>query "application/x-www-form-urlencoded" <post-data> ;
-
-M: f >post-data ;
-
-: unparse-post-data ( request -- request )
-    [ >post-data ] change-post-data ;
-
-: write-post-data ( request -- request )
-    dup method>> "POST" = [ dup post-data>> raw>> write ] when ; 
-
-: write-request ( request -- )
-    unparse-post-data
-    write-request-line
-    write-request-header
-    write-post-data
-    flush
-    drop ;
-
-GENERIC: write-response ( response -- )
-
-GENERIC: write-full-response ( request response -- )
 
 TUPLE: response
 version
@@ -301,72 +189,6 @@ M: response clone
         [ clone ] change-header
         [ clone ] change-cookies ;
 
-: read-response-line ( response -- response )
-    read-crlf parse-response-line first3
-    [ >>version ] [ >>code ] [ >>message ] tri* ;
-
-: read-response-header ( response -- response )
-    read-header >>header
-    dup "set-cookie" header parse-set-cookie >>cookies
-    dup "content-type" header [
-        parse-content-type
-        [ >>content-type ]
-        [ >>content-charset ] bi*
-    ] when* ;
-
-: read-response ( -- response )
-    <response>
-    read-response-line
-    read-response-header ;
-
-: write-response-line ( response -- response )
-    dup
-    [ "HTTP/" write version>> write bl ]
-    [ code>> present write bl ]
-    [ message>> write crlf ]
-    tri ;
-
-: unparse-content-type ( request -- content-type )
-    [ content-type>> "application/octet-stream" or ]
-    [ content-charset>> encoding>name ]
-    bi
-    [ "; charset=" swap 3append ] when* ;
-
-: ensure-domain ( cookie -- cookie )
-    [
-        request get url>>
-        host>> dup "localhost" =
-        [ drop ] [ or ] if
-    ] change-domain ;
-
-: write-response-header ( response -- response )
-    #! We send one set-cookie header per cookie, because that's
-    #! what Firefox expects.
-    dup header>> >alist >vector
-    over unparse-content-type "content-type" pick set-at
-    over cookies>> [
-        ensure-domain unparse-set-cookie
-        "set-cookie" swap 2array over push
-    ] each
-    write-header ;
-
-: write-response-body ( response -- response )
-    dup body>> call-template ;
-
-M: response write-response ( respose -- )
-    write-response-line
-    write-response-header
-    flush
-    drop ;
-
-M: response write-full-response ( request response -- )
-    dup write-response
-    swap method>> "HEAD" = [
-        [ content-charset>> encode-output ]
-        [ write-response-body ]
-        bi
-    ] unless ;
-
 : get-cookie ( request/response name -- cookie/f )
     [ cookies>> ] dip '[ , _ name>> = ] find nip ;
 
@@ -387,10 +209,16 @@ body ;
     raw-response new
         "1.1" >>version ;
 
-M: raw-response write-response ( respose -- )
-    write-response-line
-    write-response-body
-    drop ;
+TUPLE: post-data raw content content-type ;
 
-M: raw-response write-full-response ( response -- )
-    write-response nip ;
+: <post-data> ( raw content-type -- post-data )
+    post-data new
+        swap >>content-type
+        swap >>raw ;
+
+: parse-content-type-attributes ( string -- attributes )
+    " " split harvest [ "=" split1 [ >lower ] dip ] { } map>assoc ;
+
+: parse-content-type ( content-type -- type encoding )
+    ";" split1 parse-content-type-attributes "charset" swap at
+    name>encoding over "text/" head? latin1 binary ? or ;

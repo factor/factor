@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private math math.private words
+USING: accessors kernel kernel.private math math.private words
 sequences parser namespaces assocs quotations arrays
 generic generic.math hashtables effects ;
 IN: optimizer.math.partial
@@ -40,16 +40,16 @@ PREDICATE: math-partial < word
 <<
 : integer-op-combinator ( triple -- word )
     [
-        [ second word-name % "-" % ]
-        [ third word-name % "-op" % ]
+        [ second name>> % "-" % ]
+        [ third name>> % "-op" % ]
         bi
     ] "" make in get lookup ;
 
 : integer-op-word ( triple fix-word big-word -- word )
     [
         drop
-        word-name "fast" tail? >r
-        [ "-" % ] [ word-name % ] interleave
+        name>> "fast" tail? >r
+        [ "-" % ] [ name>> % ] interleave
         r> [ "-fast" % ] when
     ] "" make in get create ;
 
@@ -86,7 +86,7 @@ PREDICATE: math-partial < word
     { fixnum bignum float }
     [ [ dup 3array ] [ swap method ] 2bi ] with { } map>assoc
     [ nip ] assoc-filter
-    [ word-def peek ] assoc-map % ;
+    [ def>> peek ] assoc-map % ;
 
 SYMBOL: math-ops
 

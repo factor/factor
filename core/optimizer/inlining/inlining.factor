@@ -1,13 +1,13 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays generic assocs inference inference.class
+USING: accessors arrays generic assocs inference inference.class
 inference.dataflow inference.backend inference.state io kernel
 math namespaces sequences vectors words quotations hashtables
 combinators classes classes.algebra generic.math
 optimizer.math.partial continuations optimizer.def-use
 optimizer.backend generic.standard optimizer.specializers
 optimizer.def-use optimizer.pattern-match generic.standard
-optimizer.control kernel.private definitions ;
+optimizer.control kernel.private definitions sets ;
 IN: optimizer.inlining
 
 : remember-inlining ( node history -- )
@@ -25,19 +25,17 @@ IN: optimizer.inlining
     tuck splice-node ;
 
 ! A heuristic to avoid excessive inlining
+SYMBOL: recursive-calls
 DEFER: (flat-length)
 
 : word-flat-length ( word -- n )
     {
-        ! heuristic: { ... } declare comes up in method bodies
-        ! and we don't care about it
-        { [ dup \ declare eq? ] [ drop -2 ] }
-        ! recursive
-        { [ dup get ] [ drop 1 ] }
         ! not inline
-        { [ dup inline? not ] [ drop 1 ] }
+        { [ dup inline? not ] [ drop 0 ] }
+        ! recursive and inline
+        { [ dup recursive-calls get key? ] [ drop 4 ] }
         ! inline
-        [ dup dup set word-def (flat-length) ]
+        [ [ recursive-calls get conjoin ] [ def>> (flat-length) ] bi ]
     } cond ;
 
 : (flat-length) ( seq -- n )
@@ -46,23 +44,31 @@ DEFER: (flat-length)
             { [ dup quotation? ] [ (flat-length) 1+ ] }
             { [ dup array? ] [ (flat-length) ] }
             { [ dup word? ] [ word-flat-length ] }
-            [ drop 1 ]
+            [ drop 0 ]
         } cond
     ] sigma ;
 
-: flat-length ( seq -- n )
-    [ word-def (flat-length) ] with-scope ;
+: flat-length ( word -- n )
+    H{ } clone recursive-calls [
+        [ recursive-calls get conjoin ]
+        [ def>> (flat-length) ]
+        bi
+    ] with-variable ;
 
 ! Single dispatch method inlining optimization
-: node-class# ( node n -- class )
-    over node-in-d <reversed> ?nth node-class ;
+! : dispatching-class ( node generic -- method/f )
+!     tuck dispatch# over in-d>> <reversed> ?nth 2dup node-literal?
+!     [ node-literal swap single-effective-method ]
+!     [ node-class swap specific-method ]
+!     if ;
 
-: dispatching-class ( node word -- class )
-    [ dispatch# node-class# ] keep specific-method ;
+: dispatching-class ( node generic -- method/f )
+    tuck dispatch# over in-d>> <reversed> ?nth
+    node-class swap specific-method ;
 
-: inline-standard-method ( node word -- node )
-    2dup dispatching-class dup
-    [ swap method 1quotation f splice-quot ] [ 3drop t ] if ;
+: inline-standard-method ( node generic -- node )
+    dupd dispatching-class dup
+    [ 1quotation f splice-quot ] [ 2drop t ] if ;
 
 ! Partial dispatch of math-generic words
 : normalize-math-class ( class -- class' )
@@ -103,19 +109,6 @@ DEFER: (flat-length)
         [ 2drop t ]
     } cond ;
 
-! Resolve type checks at compile time where possible
-: comparable? ( actual testing -- ? )
-    #! If actual is a subset of testing or if the two classes
-    #! are disjoint, return t.
-    2dup class<= >r classes-intersect? not r> or ;
-
-: optimize-predicate? ( #call -- ? )
-    dup node-param "predicating" word-prop dup [
-        >r node-class-first r> comparable?
-    ] [
-        2drop f
-    ] if ;
-
 : literal-quot ( node literals -- quot )
     #! Outputs a quotation which drops the node's inputs, and
     #! pushes some literals.
@@ -126,33 +119,40 @@ DEFER: (flat-length)
     #! Make #shuffle -> #push -> #return -> successor
     dupd literal-quot f splice-quot ;
 
-: evaluate-predicate ( #call -- ? )
-    dup node-param "predicating" word-prop >r
-    node-class-first r> class<= ;
+! Resolve type checks at compile time where possible
+: comparable? ( actual testing -- ? )
+    #! If actual is a subset of testing or if the two classes
+    #! are disjoint, return t.
+    2dup class<= >r classes-intersect? not r> or ;
 
-: optimize-predicate ( #call -- node )
+: optimize-check? ( #call value class -- ? )
+    >r node-class r> comparable? ;
+
+: evaluate-check ( node value class -- ? )
+    >r node-class r> class<= ;
+
+: optimize-check ( #call value class -- node )
     #! If the predicate is followed by a branch we fold it
     #! immediately
-    dup evaluate-predicate swap
-    dup node-successor #if? [
+    [ evaluate-check ] [ 2drop ] 3bi
+    dup successor>> #if? [
         dup drop-inputs >r
-        node-successor swap 0 1 ? fold-branch
-        r> [ set-node-successor ] keep
+        successor>> swap 0 1 ? fold-branch
+        r> swap >>successor
     ] [
         swap 1array inline-literals
     ] if ;
 
-: optimizer-hooks ( node -- conditions )
-    node-param "optimizer-hooks" word-prop ;
+: (optimize-predicate) ( #call -- #call value class )
+    [ ] [ in-d>> first ] [ param>> "predicating" word-prop ] tri ;
 
-: optimizer-hook ( node -- pair/f )
-    dup optimizer-hooks [ first call ] find 2nip ;
+: optimize-predicate? ( #call -- ? )
+    dup param>> "predicating" word-prop [
+        (optimize-predicate) optimize-check?
+    ] [ drop f ] if ;
 
-: optimize-hook ( node -- )
-    dup optimizer-hook second call ;
-
-: define-optimizers ( word optimizers -- )
-    "optimizer-hooks" set-word-prop ;
+: optimize-predicate ( #call -- node )
+    (optimize-predicate) optimize-check ;
 
 : flush-eval? ( #call -- ? )
     dup node-param "flushable" word-prop [
@@ -201,7 +201,7 @@ DEFER: (flat-length)
 
 : splice-word-def ( #call word -- node )
     dup +inlined+ depends-on
-    dup word-def swap 1array splice-quot ;
+    dup def>> swap 1array splice-quot ;
 
 : optimistic-inline ( #call -- node )
     dup node-param over node-history memq? [
@@ -210,9 +210,11 @@ DEFER: (flat-length)
         dup node-param splice-word-def
     ] if ;
 
+: should-inline? ( word -- ? )
+    flat-length 11 <= ;
+
 : method-body-inline? ( #call -- ? )
-    node-param dup method-body?
-    [ flat-length 10 <= ] [ drop f ] if ;
+    node-param dup method-body? [ should-inline? ] [ drop f ] if ;
 
 M: #call optimize-node*
     {

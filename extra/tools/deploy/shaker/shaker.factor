@@ -1,9 +1,10 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: qualified io.streams.c init fry namespaces assocs kernel
-parser lexer strings.parser tools.deploy.config vocabs sequences
-words words.private memory kernel.private continuations io
-prettyprint vocabs.loader debugger system strings sets ;
+USING: accessors qualified io.streams.c init fry namespaces
+assocs kernel parser lexer strings.parser tools.deploy.config
+vocabs sequences words words.private memory kernel.private
+continuations io prettyprint vocabs.loader debugger system
+strings sets ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes
 QUALIFIED: command-line
@@ -12,7 +13,6 @@ QUALIFIED: compiler.units
 QUALIFIED: continuations
 QUALIFIED: definitions
 QUALIFIED: init
-QUALIFIED: inspector
 QUALIFIED: io.backend
 QUALIFIED: io.thread
 QUALIFIED: layouts
@@ -25,8 +25,11 @@ QUALIFIED: threads
 QUALIFIED: vocabs
 IN: tools.deploy.shaker
 
+! This file is some hairy shit.
+
 : strip-init-hooks ( -- )
     "Stripping startup hooks" show
+    "cpu.x86" init-hooks get delete-at
     "command-line" init-hooks get delete-at
     "libc" init-hooks get delete-at
     deploy-threads? get [
@@ -62,21 +65,23 @@ IN: tools.deploy.shaker
 
 : strip-word-names ( words -- )
     "Stripping word names" show
-    [ f over set-word-name f swap set-word-vocabulary ] each ;
+    [ f >>name f >>vocabulary drop ] each ;
 
 : strip-word-defs ( words -- )
     "Stripping symbolic word definitions" show
     [ "no-def-strip" word-prop not ] filter
-    [ [ ] swap set-word-def ] each ;
+    [ [ ] >>def drop ] each ;
+
+: sift-assoc ( assoc -- assoc' ) [ nip ] assoc-filter ;
 
 : strip-word-props ( stripped-props words -- )
     "Stripping word properties" show
     [
         [
-            word-props swap
-            '[ , nip member? not ] assoc-filter
-            f assoc-like
-        ] keep set-word-props
+            props>> swap
+            '[ drop , member? not ] assoc-filter
+            sift-assoc f assoc-like
+        ] keep (>>props)
     ] with each ;
 
 : stripped-word-props ( -- seq )
@@ -154,6 +159,8 @@ IN: tools.deploy.shaker
     [
         "callbacks" "alien.compiler" lookup ,
 
+        "inspector-hook" "inspector" lookup ,
+
         {
             bootstrap.stage2:bootstrap-time
             continuations:error
@@ -162,7 +169,6 @@ IN: tools.deploy.shaker
             continuations:restarts
             listener:error-hook
             init:init-hooks
-            inspector:inspector-hook
             io.thread:io-thread
             libc.private:mallocs
             source-files:source-files
@@ -254,6 +260,7 @@ IN: tools.deploy.shaker
         global swap
         '[ drop , member? not ] assoc-filter
         [ drop string? not ] assoc-filter ! strip CLI args
+        sift-assoc
         dup keys unparse show
         21 setenv
     ] [ drop ] if ;

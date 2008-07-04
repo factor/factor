@@ -23,7 +23,7 @@ SYMBOL: log-service
 : log-message ( msg word level -- )
     check-log-message
     log-service get dup [
-        [ [ string-lines ] [ word-name ] [ word-name ] tri* ] dip
+        [ [ string-lines ] [ name>> ] [ name>> ] tri* ] dip
         4array "log-message" send-to-log-server
     ] [
         4drop
@@ -117,3 +117,9 @@ PRIVATE>
     CREATE-WORD dup scan-word
     '[ 1array stack>message , , log-message ]
     (( message -- )) define-declared ; parsing
+
+USE: vocabs.loader
+
+"logging.parser" require
+"logging.analysis" require
+"logging.insomniac" require

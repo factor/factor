@@ -4,7 +4,7 @@ USING: system kernel namespaces strings hashtables sequences
 assocs combinators vocabs.loader init threads continuations
 math accessors concurrency.flags destructors
 io io.backend io.timeouts io.pipes io.pipes.private io.encodings
-io.streams.duplex io.ports debugger prettyprint inspector ;
+io.streams.duplex io.ports debugger prettyprint summary ;
 IN: io.launcher
 
 TUPLE: process < identity-tuple
@@ -136,7 +136,7 @@ ERROR: process-failed process code ;
 M: process-failed error.
     dup "Process exited with error code " write code>> . nl
     "Launch descriptor:" print nl
-    process>> describe ;
+    process>> . ;
 
 : try-process ( desc -- )
     run-process dup wait-for-process dup zero?
@@ -232,3 +232,10 @@ M: encoder underlying-handle
 
 M: decoder underlying-handle
     stream>> underlying-handle ;
+
+{
+    { [ os unix? ] [ "io.unix.launcher" require ] }
+    { [ os winnt? ] [ "io.windows.nt.launcher" require ] }
+    { [ os wince? ] [ "io.windows.launcher" require ] }
+    [ ]
+} cond

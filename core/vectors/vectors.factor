@@ -3,23 +3,21 @@
 USING: arrays kernel math sequences sequences.private growable ;
 IN: vectors
 
-<PRIVATE
+TUPLE: vector
+{ underlying array }
+{ length array-capacity } ;
 
-: array>vector ( array length -- vector )
-    vector boa ; inline
-
-PRIVATE>
-
-: <vector> ( n -- vector ) f <array> 0 array>vector ; inline
+: <vector> ( n -- vector ) f <array> 0 vector boa ; inline
 
 : >vector ( seq -- vector ) V{ } clone-like ;
 
 M: vector like
     drop dup vector? [
-        dup array? [ dup length array>vector ] [ >vector ] if
+        dup array? [ dup length vector boa ] [ >vector ] if
     ] unless ;
 
-M: vector new-sequence drop [ f <array> ] keep >fixnum array>vector ;
+M: vector new-sequence
+    drop [ f <array> ] [ >fixnum ] bi vector boa ;
 
 M: vector equal?
     over vector? [ sequence= ] [ 2drop f ] if ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors namespaces math words strings
-debugger io vectors arrays math.parser combinators inspector
+debugger io vectors arrays math.parser combinators summary
 continuations ;
 IN: lexer
 
@@ -71,7 +71,7 @@ ERROR: unexpected want got ;
 GENERIC: expected>string ( obj -- str )
 
 M: f expected>string drop "end of input" ;
-M: word expected>string word-name ;
+M: word expected>string name>> ;
 M: string expected>string ;
 
 M: unexpected error.

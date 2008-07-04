@@ -101,7 +101,7 @@ void load_image(F_PARAMETERS *p)
 }
 
 /* Save the current image to disk */
-void save_image(const F_CHAR *filename)
+bool save_image(const F_CHAR *filename)
 {
 	FILE* file;
 	F_HEADER h;
@@ -112,7 +112,7 @@ void save_image(const F_CHAR *filename)
 	if(file == NULL)
 	{
 		fprintf(stderr,"Cannot open image file: %s\n",strerror(errno));
-		return;
+		return false;
 	}
 
 	F_ZONE *tenured = &data_heap->generations[TENURED];
@@ -143,20 +143,22 @@ void save_image(const F_CHAR *filename)
 	if(fwrite((void*)tenured->start,h.data_size,1,file) != 1)
 	{
 		fprintf(stderr,"Save data heap failed: %s\n",strerror(errno));
-		return;
+		return false;
 	}
 
 	if(fwrite(first_block(&code_heap),h.code_size,1,file) != 1)
 	{
 		fprintf(stderr,"Save code heap failed: %s\n",strerror(errno));
-		return;
+		return false;
 	}
 
 	if(fclose(file))
 	{
 		fprintf(stderr,"Failed to close image file: %s\n",strerror(errno));
-		return;
+		return false;
 	}
+
+	return true;
 }
 
 DEFINE_PRIMITIVE(save_image)
@@ -187,10 +189,10 @@ DEFINE_PRIMITIVE(save_image_and_exit)
 	UNREGISTER_C_STRING(path);
 
 	/* Save the image */
-	save_image(path);
-
-	/* now exit; we cannot continue executing like this */
-	exit(0);
+	if(save_image(path))
+		exit(0);
+	else
+		exit(1);
 }
 
 void fixup_word(F_WORD *word)

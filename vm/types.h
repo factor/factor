@@ -26,30 +26,6 @@ INLINE CELL byte_array_size(CELL size)
 	return sizeof(F_BYTE_ARRAY) + size;
 }
 
-DEFINE_UNTAG(F_BIT_ARRAY,BIT_ARRAY_TYPE,bit_array)
-
-INLINE CELL bit_array_capacity(F_BIT_ARRAY *array)
-{
-	return untag_fixnum_fast(array->capacity);
-}
-
-INLINE CELL bit_array_size(CELL size)
-{
-	return sizeof(F_BIT_ARRAY) + (size + 7) / 8;
-}
-
-DEFINE_UNTAG(F_FLOAT_ARRAY,FLOAT_ARRAY_TYPE,float_array)
-
-INLINE CELL float_array_capacity(F_FLOAT_ARRAY *array)
-{
-	return untag_fixnum_fast(array->capacity);
-}
-
-INLINE CELL float_array_size(CELL size)
-{
-	return sizeof(F_FLOAT_ARRAY) + size * sizeof(double);
-}
-
 INLINE CELL callstack_size(CELL size)
 {
 	return sizeof(F_CALLSTACK) + size;
@@ -141,16 +117,12 @@ DECLARE_PRIMITIVE(tuple);
 DECLARE_PRIMITIVE(tuple_boa);
 DECLARE_PRIMITIVE(tuple_layout);
 DECLARE_PRIMITIVE(byte_array);
-DECLARE_PRIMITIVE(bit_array);
-DECLARE_PRIMITIVE(float_array);
 DECLARE_PRIMITIVE(clone);
 
 F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity, CELL fill);
 F_BYTE_ARRAY *reallot_byte_array(F_BYTE_ARRAY *array, CELL capacity);
 DECLARE_PRIMITIVE(resize_array);
 DECLARE_PRIMITIVE(resize_byte_array);
-DECLARE_PRIMITIVE(resize_bit_array);
-DECLARE_PRIMITIVE(resize_float_array);
 
 F_STRING* allot_string_internal(CELL capacity);
 F_STRING* allot_string(CELL capacity, CELL fill);

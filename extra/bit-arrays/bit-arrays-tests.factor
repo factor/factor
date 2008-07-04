@@ -1,5 +1,5 @@
-USING: sequences arrays bit-arrays kernel tools.test math
-random ;
+USING: sequences sequences.private arrays bit-arrays kernel
+tools.test math random ;
 IN: bit-arrays.tests
 
 [ 100 ] [ 100 <bit-array> length ] unit-test
@@ -47,11 +47,13 @@ IN: bit-arrays.tests
     1 2 { t f t f } <slice> >bit-array
 ] unit-test
 
-[ ?{ t f t f f f } ] [ 6 ?{ t f t } resize-bit-array ] unit-test
+[ ?{ f t } ] [ 0 2 ?{ f t f } subseq ] unit-test
 
-[ ?{ t t } ] [ 2 ?{ t t f t f t f t t t f t } resize-bit-array ] unit-test
+[ ?{ t f t f f f } ] [ 6 ?{ t f t } resize ] unit-test
 
-[ -10 ?{ } resize-bit-array ] must-fail
+[ ?{ t t } ] [ 2 ?{ t t f t f t f t t t f t } resize ] unit-test
+
+[ -10 ?{ } resize ] must-fail
 
 [ -1 integer>bit-array ] must-fail
 [ ?{ f t } ] [ 2 integer>bit-array ] unit-test

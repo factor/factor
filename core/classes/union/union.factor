@@ -29,3 +29,6 @@ M: union-class update-class define-union-predicate ;
     [ (define-union-class) ] [ drop update-classes ] 2bi ;
 
 M: union-class rank-class drop 2 ;
+
+M: union-class instance?
+    "members" word-prop [ instance? ] with contains? ;

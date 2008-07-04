@@ -6,7 +6,7 @@ IN: xmode.code2html
 : htmlize-tokens ( tokens -- )
     [
         [ str>> ] [ id>> ] bi [
-            <span word-name =class span> escape-string write </span>
+            <span name>> =class span> escape-string write </span>
         ] [
             escape-string write
         ] if*

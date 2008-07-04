@@ -1,6 +1,9 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types colors jamshred.game jamshred.oint jamshred.player jamshred.tunnel kernel math math.constants math.functions math.vectors opengl opengl.gl opengl.glu sequences ;
+USING: accessors alien.c-types colors jamshred.game
+jamshred.oint jamshred.player jamshred.tunnel kernel math
+math.constants math.functions math.vectors opengl opengl.gl
+opengl.glu sequences float-arrays ;
 IN: jamshred.gl
 
 : min-vertices 6 ; inline

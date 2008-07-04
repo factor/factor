@@ -1,7 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bit-arrays byte-arrays float-arrays arrays
-assocs kernel kernel.private libc math
+USING: byte-arrays arrays assocs kernel kernel.private libc math
 namespaces parser sequences strings words assocs splitting
 math.parser cpu.architecture alien alien.accessors quotations
 layouts system compiler.units io.files io.encodings.binary
@@ -118,11 +117,7 @@ M: c-type stack-size c-type-size ;
 
 GENERIC: byte-length ( seq -- n ) flushable
 
-M: bit-array byte-length length 7 + -3 shift ;
-
 M: byte-array byte-length length ;
-
-M: float-array byte-length length "double" heap-size * ;
 
 : c-getter ( name -- quot )
     c-type c-type-getter [
@@ -242,11 +237,10 @@ M: long-long-type box-return ( type -- )
     } 2cleave ;
 
 : expand-constants ( c-type -- c-type' )
-    #! We use word-def call instead of execute to get around
+    #! We use def>> call instead of execute to get around
     #! staging violations
     dup array? [
-        unclip >r [ dup word? [ word-def call ] when ] map
-        r> prefix
+        unclip >r [ dup word? [ def>> call ] when ] map r> prefix
     ] when ;
 
 : malloc-file-contents ( path -- alien len )

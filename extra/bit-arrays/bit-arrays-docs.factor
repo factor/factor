@@ -3,7 +3,7 @@ kernel.private math prettyprint strings vectors sbufs ;
 IN: bit-arrays
 
 ARTICLE: "bit-arrays" "Bit arrays"
-"Bit array are a fixed-size mutable sequences (" { $link "sequence-protocol" } ") whose elements are either " { $link t } " or " { $link f } ". Each element only uses one bit of storage, hence the name. The literal syntax is covered in " { $link "syntax-bit-arrays" } "."
+"Bit array are a fixed-size mutable sequences (" { $link "sequence-protocol" } ") whose elements are either " { $link t } " or " { $link f } ". Each element only uses one bit of storage, hence the name."
 $nl
 "Bit array words are in the " { $vocab-link "bit-arrays" } " vocabulary."
 $nl
@@ -20,12 +20,20 @@ $nl
 { $subsection clear-bits }
 "Converting between unsigned integers and their binary representation:"
 { $subsection integer>bit-array }
-{ $subsection bit-array>integer } ;
+{ $subsection bit-array>integer }
+"Bit array literal syntax:"
+{ $subsection POSTPONE: ?{ } ;
 
 ABOUT: "bit-arrays"
 
+HELP: ?{
+{ $syntax "?{ elements... }" }
+{ $values { "elements" "a list of booleans" } }
+{ $description "Marks the beginning of a literal bit array. Literal bit arrays are terminated by " { $link POSTPONE: } } "." } 
+{ $examples { $code "?{ t f t }" } } ;
+
 HELP: bit-array
-{ $description "The class of fixed-length bit arrays. See " { $link "syntax-bit-arrays" } " for syntax and " { $link "bit-arrays" } " for general information." } ;
+{ $description "The class of fixed-length bit arrays." } ;
 
 HELP: <bit-array> ( n -- bit-array )
 { $values { "n" "a non-negative integer" } { "bit-array" "a new " { $link bit-array } } }

@@ -121,7 +121,8 @@ ARTICLE: "io.files" "Basic file operations"
 { $subsection "file-streams" }
 { $subsection "fs-meta" }
 { $subsection "directories" }
-{ $subsection "delete-move-copy" } ;
+{ $subsection "delete-move-copy" }
+{ $subsection "symbolic-links" } ;
 
 ABOUT: "io.files"
 

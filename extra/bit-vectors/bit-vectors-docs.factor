@@ -1,5 +1,5 @@
 USING: arrays bit-arrays help.markup help.syntax kernel
-bit-vectors.private combinators ;
+combinators ;
 IN: bit-vectors
 
 ARTICLE: "bit-vectors" "Bit vectors"
@@ -28,11 +28,6 @@ HELP: <bit-vector>
 HELP: >bit-vector
 { $values { "seq" "a sequence" } { "bit-vector" bit-vector } }
 { $description "Outputs a freshly-allocated bit vector with the same elements as a given sequence." } ;
-
-HELP: bit-array>vector
-{ $values { "bit-array" "an array" } { "length" "a non-negative integer" } { "bit-vector" bit-vector } }
-{ $description "Creates a new bit vector using the array for underlying storage with the specified initial length." }
-{ $warning "This word is in the " { $vocab-link "bit-vectors.private" } " vocabulary because it does not perform type or bounds checks. User code should call " { $link >bit-vector } " instead." } ;
 
 HELP: ?V{
 { $syntax "?V{ elements... }" }

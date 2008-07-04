@@ -8,11 +8,11 @@
 !
 USING: namespaces sequences kernel math io math.functions
 io.binary strings classes words sbufs classes.tuple arrays
-vectors byte-arrays bit-arrays quotations hashtables assocs
-help.syntax help.markup float-arrays splitting
-io.streams.byte-array io.encodings.string io.encodings.utf8
-io.encodings.binary combinators accessors locals prettyprint
-compiler.units sequences.private classes.tuple.private ;
+vectors byte-arrays quotations hashtables assocs help.syntax
+help.markup splitting io.streams.byte-array io.encodings.string
+io.encodings.utf8 io.encodings.binary combinators accessors
+locals prettyprint compiler.units sequences.private
+classes.tuple.private ;
 IN: serialize
 
 ! Variable holding a assoc of objects already serialized
@@ -130,24 +130,12 @@ M: hashtable (serialize) ( obj -- )
         [ add-object ] [ >alist (serialize) ] bi
     ] serialize-shared ;
 
-M: bit-array (serialize) ( obj -- )
-    CHAR: b serialize-seq ;
-
 M: byte-array (serialize) ( obj -- )
     [
         CHAR: A write1
         [ add-object ]
         [ length serialize-cell ]
         [ write ] tri
-    ] serialize-shared ;
-
-M: float-array (serialize) ( obj -- )
-    [
-        CHAR: f write1
-        [ add-object ]
-        [ length serialize-cell ]
-        [ [ double>bits 8 >be write ] each ]
-        tri
     ] serialize-shared ;
 
 M: string (serialize) ( obj -- )
@@ -168,27 +156,27 @@ M: string (serialize) ( obj -- )
     [
         CHAR: G write1
         [ add-object ]
-        [ word-def (serialize) ]
-        [ word-props (serialize) ]
+        [ def>> (serialize) ]
+        [ props>> (serialize) ]
         tri
     ] serialize-shared ;
 
 : serialize-word ( word -- )
     CHAR: w write1
-    [ word-name (serialize) ]
-    [ word-vocabulary (serialize) ]
+    [ name>> (serialize) ]
+    [ vocabulary>> (serialize) ]
     bi ;
 
 M: word (serialize) ( obj -- )
     {
         { [ dup t eq? ] [ serialize-true ] }
-        { [ dup word-vocabulary not ] [ serialize-gensym ] }
+        { [ dup vocabulary>> not ] [ serialize-gensym ] }
         [ serialize-word ]
     } cond ;
 
 M: wrapper (serialize) ( obj -- )
     CHAR: W write1
-    wrapped (serialize) ;
+    wrapped>> (serialize) ;
 
 DEFER: (deserialize) ( -- obj )
 
@@ -239,7 +227,7 @@ SYMBOL: deserialized
     gensym {
         [ intern-object ]
         [ (deserialize) define ]
-        [ (deserialize) swap set-word-props ]
+        [ (deserialize) >>props drop ]
         [ ]
     } cleave ;
 
@@ -259,12 +247,6 @@ SYMBOL: deserialized
 
 : deserialize-byte-array ( -- byte-array )
     B{ } [ read1 ] (deserialize-seq) ;
-
-: deserialize-bit-array ( -- bit-array )
-    ?{ } [ (deserialize) ] (deserialize-seq) ;
-
-: deserialize-float-array ( -- float-array )
-    F{ } [ 8 read be> bits>double ] (deserialize-seq) ;
 
 : deserialize-hashtable ( -- hashtable )
     H{ } clone
@@ -296,9 +278,7 @@ SYMBOL: deserialized
             { CHAR: T [ deserialize-tuple ] }
             { CHAR: W [ deserialize-wrapper ] }
             { CHAR: a [ deserialize-array ] }
-            { CHAR: b [ deserialize-bit-array ] }
             { CHAR: c [ deserialize-complex ] }
-            { CHAR: f [ deserialize-float-array ] }
             { CHAR: h [ deserialize-hashtable ] }
             { CHAR: m [ deserialize-negative-integer ] }
             { CHAR: n [ deserialize-false ] }

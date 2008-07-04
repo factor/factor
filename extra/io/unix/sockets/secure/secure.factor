@@ -6,7 +6,7 @@ continuations destructors
 openssl openssl.libcrypto openssl.libssl
 io.files io.ports io.unix.backend io.unix.sockets
 io.encodings.ascii io.buffers io.sockets io.sockets.secure
-io.timeouts system inspector ;
+io.timeouts system summary ;
 IN: io.unix.sockets.secure
 
 M: ssl-handle handle-fd file>> handle-fd ;

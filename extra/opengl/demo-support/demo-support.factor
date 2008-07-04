@@ -12,8 +12,10 @@ SYMBOL: last-drag-loc
 TUPLE: demo-gadget yaw pitch distance ;
 
 : <demo-gadget> ( yaw pitch distance -- gadget )
-    demo-gadget construct-gadget 
-    [ { (>>yaw) (>>pitch) (>>distance) } set-slots ] keep ;
+    demo-gadget construct-gadget
+        swap >>distance
+        swap >>pitch
+        swap >>yaw ;
 
 GENERIC: far-plane ( gadget -- z )
 GENERIC: near-plane ( gadget -- z )

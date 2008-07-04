@@ -1,47 +1,10 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays generic hashtables io kernel assocs math
+USING: accessors arrays generic hashtables io kernel assocs math
 namespaces prettyprint sequences strings io.styles vectors words
 quotations mirrors splitting math.parser classes vocabs refs
-sets sorting ;
+sets sorting summary debugger continuations ;
 IN: inspector
-
-GENERIC: summary ( object -- string )
-
-: object-summary ( object -- string )
-    class word-name " instance" append ;
-
-M: object summary object-summary ;
-
-M: input summary
-    [
-        "Input: " %
-        input-string "\n" split1 swap %
-        "..." "" ? %
-    ] "" make ;
-
-M: word summary synopsis ;
-
-M: sequence summary
-    [
-        dup class word-name %
-        " with " %
-        length #
-        " elements" %
-    ] "" make ;
-
-M: assoc summary
-    [
-        dup class word-name %
-        " with " %
-        assoc-size #
-        " entries" %
-    ] "" make ;
-
-! Override sequence => integer instance
-M: f summary object-summary ;
-
-M: integer summary object-summary ;
 
 : value-editor ( path -- )
     [
@@ -79,11 +42,11 @@ SYMBOL: +editable+
 : summary. ( obj -- ) [ summary ] keep write-object nl ;
 
 : sorted-keys ( assoc -- alist )
-    dup mirror? [ keys ] [
+    dup hashtable? [
         keys
         [ [ unparse-short ] keep ] { } map>assoc
         sort-keys values
-    ] if ;
+    ] [ keys ] if ;
 
 : describe* ( obj flags -- )
     clone [
@@ -101,12 +64,17 @@ SYMBOL: +editable+
 
 : describe ( obj -- ) H{ } describe* ;
 
+M: tuple error. describe ;
+
 : namestack. ( seq -- )
     [ [ global eq? not ] filter [ keys ] gather ] keep
     [ dupd assoc-stack ] curry H{ } map>assoc describe ;
 
 : .vars ( -- )
     namestack namestack. ;
+
+: :vars ( -- )
+    error-continuation get continuation-name namestack. ;
 
 SYMBOL: inspector-hook
 

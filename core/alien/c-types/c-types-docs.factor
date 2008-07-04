@@ -1,7 +1,7 @@
 IN: alien.c-types
 USING: alien help.syntax help.markup libc kernel.private
 byte-arrays math strings hashtables alien.syntax
-bit-arrays float-arrays debugger destructors ;
+debugger destructors ;
 
 HELP: <c-type>
 { $values { "type" hashtable } }
@@ -200,7 +200,7 @@ $nl
 "Structure and union types are specified by the name of the structure or union." ;
 
 ARTICLE: "c-byte-arrays" "Passing data in byte arrays"
-"Instances of the " { $link byte-array } ", " { $link bit-array } " and " { $link float-array } " class can be passed to C functions; the C function receives a pointer to the first element of the array."
+"Instances of the " { $link byte-array } " class can be passed to C functions; the C function receives a pointer to the first element of the array."
 $nl
 "Byte arrays can be allocated directly with a byte count using the " { $link <byte-array> } " word. However in most cases, instead of computing a size in bytes directly, it is easier to use a higher-level word which expects C type and outputs a byte array large enough to hold that type:"
 { $subsection <c-object> }
@@ -253,4 +253,4 @@ $nl
 "New C types can be defined:"
 { $subsection "c-structs" }
 { $subsection "c-unions" }
-{ $subsection "reading-writing-memory" } ;
+{ $see-also "aliens" } ;

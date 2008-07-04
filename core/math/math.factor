@@ -8,6 +8,12 @@ GENERIC: >bignum ( x -- n ) foldable
 GENERIC: >integer ( x -- n ) foldable
 GENERIC: >float ( x -- y ) foldable
 
+GENERIC: numerator ( a/b -- a )
+GENERIC: denominator ( a/b -- b )
+
+GENERIC: real-part ( z -- x )
+GENERIC: imaginary-part ( z -- y )
+
 MATH: number= ( x y -- ? ) foldable
 
 M: object number= 2drop f ;

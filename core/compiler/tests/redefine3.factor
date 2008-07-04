@@ -1,7 +1,7 @@
 IN: compiler.tests
-USING: compiler compiler.units tools.test math parser kernel
-sequences sequences.private classes.mixin generic definitions
-arrays words assocs ;
+USING: accessors compiler compiler.units tools.test math parser
+kernel sequences sequences.private classes.mixin generic
+definitions arrays words assocs ;
 
 GENERIC: sheeple ( obj -- x )
 
@@ -14,7 +14,7 @@ M: empty-mixin sheeple drop "wake up" ;
 : sheeple-test ( -- string ) { } sheeple ;
 
 [ "sheeple" ] [ sheeple-test ] unit-test
-[ t ] [ \ sheeple-test compiled? ] unit-test
+[ t ] [ \ sheeple-test compiled>> ] unit-test
 [ t ] [ object \ sheeple method \ sheeple-test "compiled-uses" word-prop key? ] unit-test
 [ f ] [ empty-mixin \ sheeple method \ sheeple-test "compiled-uses" word-prop key? ] unit-test
 
@@ -27,6 +27,6 @@ M: empty-mixin sheeple drop "wake up" ;
 [ ] [ [ array empty-mixin remove-mixin-instance ] with-compilation-unit ] unit-test
 
 [ "sheeple" ] [ sheeple-test ] unit-test
-[ t ] [ \ sheeple-test compiled? ] unit-test
+[ t ] [ \ sheeple-test compiled>> ] unit-test
 [ t ] [ object \ sheeple method \ sheeple-test "compiled-uses" word-prop key? ] unit-test
 [ f ] [ empty-mixin \ sheeple method \ sheeple-test "compiled-uses" word-prop key? ] unit-test

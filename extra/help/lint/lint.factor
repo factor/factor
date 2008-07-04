@@ -1,7 +1,7 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences parser kernel help help.markup help.topics
-words strings classes tools.vocabs namespaces io
+USING: accessors sequences parser kernel help help.markup
+help.topics words strings classes tools.vocabs namespaces io
 io.streams.string prettyprint definitions arrays vectors
 combinators splitting debugger hashtables sorting effects vocabs
 vocabs.loader assocs editors continuations classes.predicate
@@ -27,13 +27,10 @@ IN: help.lint
     ] unless ;
 
 : effect-values ( word -- seq )
-    stack-effect dup effect-in swap effect-out append [
-        {
-            { [ dup word? ] [ word-name ] }
-            { [ dup integer? ] [ drop "object" ] }
-            { [ dup string? ] [ ] }
-        } cond
-    ] map prune natural-sort ;
+    stack-effect
+    [ in>> ] [ out>> ] bi append
+    [ (stack-picture) ] map
+    prune natural-sort ;
 
 : contains-funky-elements? ( element -- ? )
     {
@@ -76,14 +73,13 @@ IN: help.lint
 : all-word-help ( words -- seq )
     [ word-help ] filter ;
 
-TUPLE: help-error topic ;
+TUPLE: help-error topic error ;
 
-: <help-error> ( topic delegate -- error )
-    { set-help-error-topic set-delegate } help-error construct ;
+C: <help-error> help-error
 
 M: help-error error.
-    "In " write dup help-error-topic ($link) nl
-    delegate error. ;
+    "In " write dup topic>> pprint nl
+    error>> error. ;
 
 : check-something ( obj quot -- )
     flush [ <help-error> , ] recover ; inline
@@ -120,11 +116,16 @@ M: help-error error.
         ] 2curry each
     ] keep ;
 
+: check-about ( vocab -- )
+    [ vocab-help [ article drop ] when* ] check-something ;
+
 : check-vocab ( vocab -- seq )
     "Checking " write dup write "..." print
     [
-        dup words [ check-word ] each
-        "vocab-articles" get at [ check-article ] each
+        [ check-about ]
+        [ words [ check-word ] each ]
+        [ "vocab-articles" get at [ check-article ] each ]
+        tri
     ] { } make ;
 
 : run-help-lint ( prefix -- alist )

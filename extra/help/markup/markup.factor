@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions generic io kernel assocs hashtables
-namespaces parser prettyprint sequences strings io.styles
-vectors words math sorting splitting classes
-slots vocabs help.stylesheet help.topics vocabs.loader ;
+USING: accessors arrays definitions generic io kernel assocs
+hashtables namespaces parser prettyprint sequences strings
+io.styles vectors words math sorting splitting classes slots
+vocabs help.stylesheet help.topics vocabs.loader ;
 IN: help.markup
 
 ! Simple markup language.
@@ -178,7 +178,7 @@ M: f print-element drop ;
     first dup vocab-name swap ($vocab-link) ;
 
 : $vocabulary ( element -- )
-    first word-vocabulary [
+    first vocabulary>> [
         "Vocabulary" $heading nl dup ($vocab-link)
     ] when* ;
 
@@ -230,7 +230,7 @@ M: f print-element drop ;
 GENERIC: ($instance) ( element -- )
 
 M: word ($instance)
-    dup word-name a/an write bl ($link) ;
+    dup name>> a/an write bl ($link) ;
 
 M: string ($instance)
     dup a/an write bl $snippet ;

@@ -3,7 +3,7 @@
 USING: kernel peg sequences arrays strings combinators.lib
 namespaces combinators math locals locals.private locals.backend accessors
 vectors syntax lisp.parser assocs parser sequences.lib words
-quotations fry lists inspector combinators.short-circuit ;
+quotations fry lists summary combinators.short-circuit ;
 IN: lisp
 
 DEFER: convert-form

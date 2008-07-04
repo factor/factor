@@ -1,4 +1,4 @@
-USING: xmode.tokens xmode.keyword-map kernel
+USING: accessors xmode.tokens xmode.keyword-map kernel
 sequences vectors assocs strings memoize regexp unicode.case ;
 IN: xmode.rules
 
@@ -23,17 +23,11 @@ no-word-sep
 finalized?
 ;
 
-: init-rule-set ( ruleset -- )
-    #! Call after constructor.
-    >r H{ } clone H{ } clone V{ } clone r>
-    {
-        set-rule-set-rules
-        set-rule-set-props
-        set-rule-set-imports
-    } set-slots ;
-
 : <rule-set> ( -- ruleset )
-    rule-set new dup init-rule-set ;
+    rule-set new
+        H{ } clone >>rules
+        H{ } clone >>props
+        V{ } clone >>imports ;
 
 MEMO: standard-rule-set ( id -- ruleset )
     <rule-set> [ set-rule-set-default ] keep ;

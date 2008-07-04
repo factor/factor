@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel macros sequences slots words mirrors ;
+USING: kernel macros sequences slots words classes.tuple ;
 IN: classes.tuple.lib
 
 : reader-slots ( seq -- quot )

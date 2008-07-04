@@ -3,7 +3,7 @@
 USING: math kernel io sequences io.buffers io.timeouts generic
 byte-vectors system io.encodings math.order io.backend
 continuations debugger classes byte-arrays namespaces splitting
-grouping dlists assocs io.encodings.binary inspector accessors
+grouping dlists assocs io.encodings.binary summary accessors
 destructors ;
 IN: io.ports
 
@@ -110,7 +110,7 @@ M: output-port stream-write1
 M: output-port stream-write
     dup check-disposed
     over length over buffer>> buffer-size > [
-        [ buffer>> buffer-size <groups> ]
+        [ buffer>> size>> <groups> ]
         [ [ stream-write ] curry ] bi
         each
     ] [

@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic assocs kernel math namespaces
-prettyprint sequences strings vectors words quotations inspector
+prettyprint sequences strings vectors words quotations summary
 io.styles io combinators sorting splitting math.parser effects
 continuations debugger io.files io.streams.string vocabs
 io.encodings.utf8 source-files classes hashtables
@@ -81,7 +81,7 @@ M: no-word-error summary
     dup no-word-error boa
     swap words-named [ forward-reference? not ] filter
     word-restarts throw-restarts
-    dup word-vocabulary (use+) ;
+    dup vocabulary>> (use+) ;
 
 : check-forward ( str word -- word/f )
     dup forward-reference? [
@@ -292,9 +292,6 @@ SYMBOL: interactive-vocabs
 
 : ?run-file ( path -- )
     dup exists? [ run-file ] [ drop ] if ;
-
-: bootstrap-file ( path -- )
-    [ parse-file % ] [ run-file ] if-bootstrapping ;
 
 : eval ( str -- )
     [ string-lines parse-fresh ] with-compilation-unit call ;

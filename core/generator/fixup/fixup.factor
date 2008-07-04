@@ -88,7 +88,7 @@ TUPLE: rel-fixup arg class type ;
 : rel-fixup ( arg class type -- ) \ rel-fixup boa , ;
 
 : push-4 ( value vector -- )
-    [ length ] [ B{ 0 0 0 0 } swap push-all ] [ underlying ] tri
+    [ length ] [ B{ 0 0 0 0 } swap push-all ] [ underlying>> ] tri
     swap set-alien-unsigned-4 ;
 
 M: rel-fixup fixup*
@@ -120,7 +120,7 @@ SYMBOL: literal-table
     >r add-literal r> rt-xt rel-fixup ;
 
 : rel-primitive ( word class -- )
-    >r word-def first r> rt-primitive rel-fixup ;
+    >r def>> first r> rt-primitive rel-fixup ;
 
 : rel-literal ( literal class -- )
     >r add-literal r> rt-literal rel-fixup ;

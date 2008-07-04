@@ -2,7 +2,10 @@ USING: kernel layouts math math.order namespaces sequences
 sequences.private accessors ;
 IN: math.ranges
 
-TUPLE: range from length step ;
+TUPLE: range
+{ from read-only }
+{ length read-only }
+{ step read-only } ;
 
 : <range> ( a b step -- range )
     >r over - r>
@@ -23,19 +26,19 @@ INSTANCE: range immutable-sequence
 
 : ,b) dup neg rot + swap ; inline
 
-: [a,b] ( a b -- range ) twiddle <range> ;
+: [a,b] ( a b -- range ) twiddle <range> ; foldable
 
-: (a,b] ( a b -- range ) twiddle (a, <range> ;
+: (a,b] ( a b -- range ) twiddle (a, <range> ; foldable
 
-: [a,b) ( a b -- range ) twiddle ,b) <range> ;
+: [a,b) ( a b -- range ) twiddle ,b) <range> ; foldable
 
-: (a,b) ( a b -- range ) twiddle (a, ,b) <range> ;
+: (a,b) ( a b -- range ) twiddle (a, ,b) <range> ; foldable
 
-: [0,b] ( b -- range ) 0 swap [a,b] ;
+: [0,b] ( b -- range ) 0 swap [a,b] ; foldable
 
-: [1,b] ( b -- range ) 1 swap [a,b] ;
+: [1,b] ( b -- range ) 1 swap [a,b] ; foldable
 
-: [0,b) ( b -- range ) 0 swap [a,b) ;
+: [0,b) ( b -- range ) 0 swap [a,b) ; foldable
 
 : range-increasing? ( range -- ? )
     step>> 0 > ;

@@ -18,7 +18,7 @@ $nl
 HELP: complex
 { $class-description "The class of complex numbers with non-zero imaginary part." } ;
 
-ABOUT: "math.complex"
+ABOUT: "complex-numbers"
 
 HELP: 2>rect
 { $values { "x" "a complex number" } { "y" "a complex number" } { "xr" "real part of " { $snippet "x" } } { "xi" "imaginary part of " { $snippet "x" } } { "yr" "real part of " { $snippet "y" } } { "yi" "imaginary part of " { $snippet "y" } } }

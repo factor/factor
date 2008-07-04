@@ -48,18 +48,6 @@ C: <duration> duration
 : minutes-per-year 5259492/10 ; inline
 : seconds-per-year 31556952 ; inline
 
-<PRIVATE
-
-SYMBOL: a
-SYMBOL: b
-SYMBOL: c
-SYMBOL: d
-SYMBOL: e
-SYMBOL: y
-SYMBOL: m
-
-PRIVATE>
-
 :: julian-day-number ( year month day -- n )
     #! Returns a composite date number
     #! Not valid before year -4800

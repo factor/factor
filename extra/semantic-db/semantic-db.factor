@@ -189,7 +189,7 @@ C: <relation-definition> relation-definition
 
 <PRIVATE
 
-: default-word-name ( relate-word-name word-type -- word-name )
+: default-word-name ( relate-word-name word-type -- name>> )
     {
         { "relate" [ ] }
         { "id-word" [ "-relation" append ] }
@@ -199,14 +199,14 @@ C: <relation-definition> relation-definition
         { "objects" [ "-objects" append ] }
     } case ;
 
-: choose-word-name ( relation-definition given-word-name word-type -- word-name )
+: choose-word-name ( relation-definition given-word-name word-type -- name>> )
     over string? [
         drop nip
     ] [
         nip [ relate>> ] dip default-word-name
     ] if ;
 
-: (define-relation-word) ( id-word word-name definition -- id-word )
+: (define-relation-word) ( id-word name>> definition -- id-word )
     >r create-in over [ execute ] curry r> compose define ;
 
 : define-relation-word ( relation-definition id-word given-word-name word-type definition -- relation-definition id-word )
@@ -225,7 +225,7 @@ C: <relation-definition> relation-definition
     2drop ;
 
 : define-id-word ( relation-definition id-word -- )
-    [ relate>> ] dip tuck word-vocabulary
+    [ relate>> ] dip tuck vocabulary>>
     [ ensure-context ensure-relation ] 2curry define ;
 
 : create-id-word ( relation-definition -- id-word )

@@ -1,5 +1,5 @@
 USING: help.markup help.crossref help.stylesheet help.topics
-help.syntax definitions io prettyprint inspector arrays math
+help.syntax definitions io prettyprint summary arrays math
 sequences vocabs ;
 IN: help
 
@@ -84,6 +84,7 @@ $nl
     { "or an array of the form " { $snippet "{ $directive content... }" } ", where " { $snippet "$directive" } " is a markup word whose name starts with " { $snippet "$" } ", and " { $snippet "content..." } " is a series of markup elements" }
 }
 { $subsection "element-types" }
+{ $subsection "printing-elements" }
 "Related words can be cross-referenced:"
 { $subsection related-words }
 { $see-also "help.lint" } ;

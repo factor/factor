@@ -167,7 +167,7 @@ M: db <query> ( tuple class query -- tuple )
         dup class db-columns [ ", " 0, ]
         [ dup column-name>> 0, 2, ] interleave
         from 0,
-        class word-name 0,
+        class name>> 0,
     ] { { } { } { } } nmake
     >r >r parse-sql 4drop r> r>
     <simple-statement> maybe-make-retryable do-select ;

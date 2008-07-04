@@ -1,12 +1,15 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: math.complex.private
-USING: kernel kernel.private math math.private
+USING: accessors kernel kernel.private math math.private
 math.libm math.functions prettyprint.backend arrays
 math.functions.private sequences parser ;
+IN: math.complex.private
 
 M: real real-part ;
 M: real imaginary-part drop 0 ;
+
+M: complex real-part real>> ;
+M: complex imaginary-part imaginary>> ;
 
 M: complex absq >rect [ sq ] bi@ + ;
 

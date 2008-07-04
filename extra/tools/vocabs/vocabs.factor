@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files kernel io.encodings.utf8 vocabs.loader vocabs
 sequences namespaces math.parser arrays hashtables assocs
-memoize inspector sorting splitting combinators source-files
+memoize summary sorting splitting combinators source-files
 io debugger continuations compiler.errors init
 checksums checksums.crc32 sets ;
 IN: tools.vocabs

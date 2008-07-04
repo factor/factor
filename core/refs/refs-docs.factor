@@ -4,7 +4,7 @@ USING: help.markup help.syntax kernel ;
 IN: refs
 
 ARTICLE: "refs" "References to assoc entries"
-"A " { $emphasis "reference" } " is an object encapsulating an assoc and a key; the reference then refers to either the key itself, or the value associated to the key. References can be read, written, and deleted."
+"A " { $emphasis "reference" } " is an object encapsulating an assoc and a key; the reference then refers to either the key itself, or the value associated to the key. References can be read, written, and deleted. References are defined in the " { $vocab-link "refs" } " vocabulary."
 { $subsection get-ref }
 { $subsection set-ref }
 { $subsection delete-ref }

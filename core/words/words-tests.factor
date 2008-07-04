@@ -37,7 +37,7 @@ DEFER: plist-test
 ] with-scope
 
 [ "test-scope" ] [
-    "test-scope" "scratchpad" lookup word-name
+    "test-scope" "scratchpad" lookup name>> 
 ] unit-test
 
 [ t ] [ vocabs array? ] unit-test
@@ -120,7 +120,7 @@ DEFER: x
 [ f ] [ "no-loc-2" "words.tests" lookup where ] unit-test
 
 [ ] [ "IN: words.tests : test-last ( -- ) ;" eval ] unit-test
-[ "test-last" ] [ word word-name ] unit-test
+[ "test-last" ] [ word name>> ] unit-test
 
 ! regression
 SYMBOL: quot-uses-a

@@ -9,7 +9,7 @@ HELP: start-node
 { $description "Starts a node server for receiving messages from remote Factor instances." } ;
 
 ARTICLE: "concurrency.distributed" "Distributed message passing"
-"The " { $vocab-link "concurrency.distributed" } " implements transparent distributed message passing."
+"The " { $vocab-link "concurrency.distributed" } " implements transparent distributed message passing, inspired by Erlang and Termite."
 { $subsection start-node }
 "Instances of " { $link thread } " can be sent to remote processes, at which point they are converted to objects holding the thread ID and the current node's host name:"
 { $subsection remote-process }

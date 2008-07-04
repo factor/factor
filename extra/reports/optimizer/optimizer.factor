@@ -1,6 +1,8 @@
-USING: assocs words sequences arrays compiler tools.time
-io.styles io prettyprint vocabs kernel sorting generator
-optimizer math math.order ;
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors assocs words sequences arrays compiler
+tools.time io.styles io prettyprint vocabs kernel sorting
+generator optimizer math math.order ;
 IN: report.optimizer
 
 : count-optimization-passes ( nodes n -- n )
@@ -16,7 +18,7 @@ IN: report.optimizer
     ] tabular-output ; inline
 
 : optimizer-measurements ( -- alist )
-    all-words [ compiled? ] filter
+    all-words [ compiled>> ] filter
     [
         dup [
             word-dataflow nip 1 count-optimization-passes

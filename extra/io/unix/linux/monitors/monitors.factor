@@ -23,7 +23,7 @@ TUPLE: linux-monitor < monitor wd inotify watches disposed ;
 : wd>monitor ( wd -- monitor ) watches get at ;
 
 : <inotify> ( -- port/f )
-    inotify_init dup 0 < [ drop f ] [ <fd> <input-port> ] if ;
+    inotify_init dup 0 < [ drop f ] [ <fd> init-fd <input-port> ] if ;
 
 : inotify-fd ( -- fd ) inotify get handle>> handle-fd ;
 
