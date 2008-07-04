@@ -12,7 +12,7 @@ bool to_boolean(CELL value)
 	return value != F;
 }
 
-CELL clone(CELL object)
+CELL clone_object(CELL object)
 {
 	CELL size = object_size(object);
 	if(size == 0)
@@ -31,7 +31,7 @@ CELL clone(CELL object)
 
 DEFINE_PRIMITIVE(clone)
 {
-	drepl(clone(dpeek()));
+	drepl(clone_object(dpeek()));
 }
 
 F_WORD *allot_word(CELL vocab, CELL name)
