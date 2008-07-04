@@ -504,7 +504,7 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
   ] [ ] make box ;
 
 : transform-ebnf ( string -- object )
-  'ebnf' parse parse-result-ast transform ;
+  'ebnf' parse transform ;
 
 : check-parse-result ( result -- result )
   dup [
@@ -519,7 +519,7 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
   ] if ;
 
 : parse-ebnf ( string -- hashtable )
-  'ebnf' parse check-parse-result ast>> transform ;
+  'ebnf' (parse) check-parse-result ast>> transform ;
 
 : ebnf>quot ( string -- hashtable quot )
   parse-ebnf dup dup parser [ main swap at compile ] with-variable

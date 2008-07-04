@@ -286,8 +286,11 @@ SYMBOL: delayed
 : compiled-parse ( state word -- result )
   swap [ execute [ error-stack get first throw ] unless* ] with-packrat ; inline 
 
-: parse ( input parser -- result )
+: (parse) ( input parser -- result )
   dup word? [ compile ] unless compiled-parse ;
+
+: parse ( input parser -- ast )
+  (parse) ast>> ;
 
 <PRIVATE
 

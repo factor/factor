@@ -7,11 +7,11 @@ USING: kernel tools.test peg peg.ebnf words math math.parser
 IN: peg.ebnf.tests
 
 { T{ ebnf-non-terminal f "abc" } } [
-  "abc" 'non-terminal' parse ast>> 
+  "abc" 'non-terminal' parse 
 ] unit-test
 
 { T{ ebnf-terminal f "55" } } [
-  "'55'" 'terminal' parse ast>> 
+  "'55'" 'terminal' parse 
 ] unit-test
 
 {
@@ -22,7 +22,7 @@ IN: peg.ebnf.tests
      }
   } 
 } [
-  "digit = '1' | '2'" 'rule' parse ast>>
+  "digit = '1' | '2'" 'rule' parse
 ] unit-test
 
 {
@@ -33,7 +33,7 @@ IN: peg.ebnf.tests
      }
   }   
 } [
-  "digit = '1' '2'" 'rule' parse ast>>
+  "digit = '1' '2'" 'rule' parse
 ] unit-test
 
 {
@@ -46,7 +46,7 @@ IN: peg.ebnf.tests
      }
   } 
 } [
-  "one two | three" 'choice' parse ast>>
+  "one two | three" 'choice' parse
 ] unit-test
 
 {
@@ -61,7 +61,7 @@ IN: peg.ebnf.tests
      }
   } 
 } [
-  "one {two | three}" 'choice' parse ast>>
+  "one {two | three}" 'choice' parse
 ] unit-test
 
 {
@@ -81,7 +81,7 @@ IN: peg.ebnf.tests
      }
   } 
 } [
-  "one ((two | three) four)*" 'choice' parse ast>>
+  "one ((two | three) four)*" 'choice' parse
 ] unit-test
 
 {
@@ -93,23 +93,23 @@ IN: peg.ebnf.tests
      }
   } 
 } [
-  "one ( two )? three" 'choice' parse ast>>
+  "one ( two )? three" 'choice' parse
 ] unit-test
 
 { "foo" } [
-  "\"foo\"" 'identifier' parse ast>>
+  "\"foo\"" 'identifier' parse
 ] unit-test
 
 { "foo" } [
-  "'foo'" 'identifier' parse ast>>
+  "'foo'" 'identifier' parse
 ] unit-test
 
 { "foo" } [
-  "foo" 'non-terminal' parse ast>> ebnf-non-terminal-symbol
+  "foo" 'non-terminal' parse ebnf-non-terminal-symbol
 ] unit-test
 
 { "foo" } [
-  "foo]" 'non-terminal' parse ast>> ebnf-non-terminal-symbol
+  "foo]" 'non-terminal' parse ebnf-non-terminal-symbol
 ] unit-test
 
 { V{ "a" "b" } } [
@@ -252,7 +252,7 @@ IN: peg.ebnf.tests
 ] unit-test
 
 { t } [
-  "abcd='9' | ('8'):x => [[ x ]]" 'ebnf' parse parse-result-remaining empty?
+  "abcd='9' | ('8'):x => [[ x ]]" 'ebnf' (parse) remaining>> empty?
 ] unit-test
 
 EBNF: primary 
@@ -385,29 +385,29 @@ main = Primary
 ] unit-test
 
 { t } [
-  "number=(digit)+:n 'a'" 'ebnf' parse remaining>> length zero?
+  "number=(digit)+:n 'a'" 'ebnf' (parse) remaining>> length zero?
 ] unit-test
 
 { t } [
-  "number=(digit)+ 'a'" 'ebnf' parse remaining>> length zero?
+  "number=(digit)+ 'a'" 'ebnf' (parse) remaining>> length zero?
 ] unit-test
 
 { t } [
-  "number=digit+ 'a'" 'ebnf' parse remaining>> length zero?
+  "number=digit+ 'a'" 'ebnf' (parse) remaining>> length zero?
 ] unit-test
 
 { t } [
-  "number=digit+:n 'a'" 'ebnf' parse remaining>> length zero?
+  "number=digit+:n 'a'" 'ebnf' (parse) remaining>> length zero?
 ] unit-test
 
 { t } [
-  "foo=(name):n !(keyword) => [[ n ]]" 'rule' parse ast>>
-  "foo=name:n !(keyword) => [[ n ]]" 'rule' parse ast>> =
+  "foo=(name):n !(keyword) => [[ n ]]" 'rule' parse
+  "foo=name:n !(keyword) => [[ n ]]" 'rule' parse =
 ] unit-test
 
 { t } [
-  "foo=!(keyword) (name):n => [[ n ]]" 'rule' parse ast>>
-  "foo=!(keyword) name:n => [[ n ]]" 'rule' parse ast>> =
+  "foo=!(keyword) (name):n => [[ n ]]" 'rule' parse
+  "foo=!(keyword) name:n => [[ n ]]" 'rule' parse =
 ] unit-test
 
 <<
@@ -455,7 +455,7 @@ foo=<foreign any-char> 'd'
 { t } [
   #! Rule lookup occurs in a namespace. This causes an incorrect duplicate rule
   #! if a var in a namespace is set. This unit test is to remind me to fix this.
-  [ "fail" "foo" set "foo='a'" 'ebnf' parse ast>> transform drop t ] with-scope
+  [ "fail" "foo" set "foo='a'" 'ebnf' parse transform drop t ] with-scope
 ] unit-test
 
 #! Tokenizer tests
