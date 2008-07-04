@@ -58,7 +58,7 @@ BEGIN
       x := x + 1;
    END
 END.
-"> pl0 remaining>> empty?
+"> main \ pl0 rule (parse) remaining>> empty?
 ] unit-test
 
 { f } [
@@ -124,5 +124,5 @@ BEGIN
   y := 36;
   CALL gcd;
 END.
-  "> pl0 remaining>> empty?
+  "> main \ pl0 rule (parse) remaining>> empty?
 ] unit-test

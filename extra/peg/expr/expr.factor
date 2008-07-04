@@ -18,7 +18,3 @@ exp      =   exp "+" fac    => [[ first3 nip + ]]
            | exp "-" fac    => [[ first3 nip - ]]
            | fac
 ;EBNF
-
-: eval-expr ( string -- number )
-  expr ast>> ;
-
