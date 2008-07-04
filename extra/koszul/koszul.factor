@@ -265,9 +265,10 @@ DEFER: (d)
 
 : bigraded-triple ( u-deg z-deg bigraded-basis -- triple )
     #! d: C(u,z) ---> C(u+2,z-1)
-    [ >r >r 2 - r> 1 + r> ?nth ?nth ] 3keep
-    [ ?nth ?nth ] 3keep
-    >r >r 2 + r> 1 - r> ?nth ?nth
+    [ [ 2 - ] [ 1 + ] [ ] tri* ?nth ?nth ] 
+    [ ?nth ?nth ] 
+    [ [ 2 + ] [ 1 - ] [ ] tri* ?nth ?nth ]
+    3tri
     3array ;
 
 : bigraded-triples ( grid -- triples )
