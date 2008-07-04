@@ -1,6 +1,7 @@
 
 USING: kernel combinators arrays vectors quotations sequences splitting
-       parser macros sequences.deep combinators.conditional bake newfx ;
+       parser macros sequences.deep
+       combinators.short-circuit combinators.conditional bake newfx ;
 
 IN: bake.fry
 
@@ -53,28 +54,22 @@ DEFER: shallow-fry
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: bakeable? ( obj -- ? ) { [ array? ] [ vector? ] } 1|| ;
+
 : fry-specifier? ( obj -- ? ) { , @ } member-of? ;
 
 : count-inputs ( quot -- n ) flatten [ fry-specifier? ] count ;
 
+: commas ( n -- seq ) , <repetition> ;
+
 : [fry] ( quot -- quot' )
     [
-      {
         {
-          [ callable? ]
-          [ [ count-inputs \ , <repetition> ] [ [fry] ] bi append ]
+          { [ callable? ] [ [ count-inputs commas ] [ [fry]  ] bi append ] }
+          { [ bakeable? ] [ [ count-inputs commas ] [ [bake] ] bi append ] }
+          { [ drop t    ] [ 1quotation                                   ] }
         }
-        {
-          [ array? ]
-          [ [ count-inputs \ , <repetition> ] [ [bake] ] bi append ]
-        }
-        {
-          [ vector? ]
-          [ [ count-inputs \ , <repetition> ] [ [bake] ] bi append ]
-        }
-        { [ drop t ] [ 1quotation   ] }
-      }
-        1cond
+      1cond
     ]
   map concat deep-fry ;
 
