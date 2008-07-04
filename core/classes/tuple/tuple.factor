@@ -260,8 +260,13 @@ M: tuple-class define-tuple-class
 
 : define-error-class ( class superclass slots -- )
     [ define-tuple-class ]
-    [ [ dup [ boa throw ] curry ] [ drop ] [ thrower-effect ] tri* ] 3bi
-    define-declared ;
+    [ 2drop reset-generic ]
+    [
+        [ dup [ boa throw ] curry ]
+        [ drop ]
+        [ thrower-effect ]
+        tri* define-declared
+    ] 3tri ;
 
 M: tuple-class reset-class
     [

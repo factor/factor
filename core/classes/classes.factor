@@ -72,6 +72,7 @@ M: class reset-class
         "superclass"
         "members"
         "participants"
+        "predicate"
     } reset-props ;
 
 M: word reset-class drop ;
@@ -87,8 +88,9 @@ GENERIC: implementors ( class/classes -- seq )
         tri
     ] { } make ;
 
-: class-usages ( class -- seq )
-    [ update-map get at ] closure keys ;
+: class-usage ( class -- seq ) update-map get at ;
+
+: class-usages ( class -- seq ) [ class-usage ] closure keys ;
 
 <PRIVATE
 
@@ -163,16 +165,20 @@ GENERIC: update-methods ( class seq -- )
 : forget-methods ( class -- )
     [ implementors ] [ [ swap 2array ] curry ] bi map forget-all ;
 
+GENERIC: class-forgotten ( use class -- )
+
 : forget-class ( class -- )
-    class-usages [
-        {
-            [ forget-predicate ]
-            [ forget-methods ]
-            [ implementors-map- ]
-            [ update-map- ]
-            [ reset-class ]
-        } cleave
-    ] each ;
+    {
+        [ dup class-usage keys [ class-forgotten ] with each ]
+        [ forget-predicate ]
+        [ forget-methods ]
+        [ implementors-map- ]
+        [ update-map- ]
+        [ reset-class ]
+    } cleave ;
+
+M: class class-forgotten
+    nip forget-class ;
 
 M: class forget* ( class -- )
     [ call-next-method ] [ forget-class ] bi ;

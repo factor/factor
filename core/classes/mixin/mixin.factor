@@ -65,6 +65,8 @@ TUPLE: check-mixin-class mixin ;
         update-classes
     ] [ 2drop ] if-mixin-member? ;
 
+M: mixin-class class-forgotten remove-mixin-instance ;
+
 ! Definition protocol implementation ensures that removing an
 ! INSTANCE: declaration from a source file updates the mixin.
 TUPLE: mixin-instance loc class mixin ;
