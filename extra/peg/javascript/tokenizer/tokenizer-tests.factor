@@ -19,9 +19,9 @@ IN: peg.javascript.tokenizer.tests
     ";"
   }    
 } [
-  "123; 'hello'; foo(x);" tokenize-javascript ast>>
+  "123; 'hello'; foo(x);" tokenize-javascript
 ] unit-test
 
 { V{ T{ ast-regexp f "<(w+)[^>]*?)/>" "g" } } } [
-  "/<(\\w+)[^>]*?)\\/>/g" tokenize-javascript ast>>
+  "/<(\\w+)[^>]*?)\\/>/g" tokenize-javascript
 ] unit-test

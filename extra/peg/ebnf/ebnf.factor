@@ -523,7 +523,7 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
 
 : ebnf>quot ( string -- hashtable quot )
   parse-ebnf dup dup parser [ main swap at compile ] with-variable
-  [ compiled-parse ] curry [ with-scope ] curry ;
+  [ compiled-parse ] curry [ with-scope ast>> ] curry ;
 
 : <EBNF "EBNF>" reset-tokenizer parse-multiline-string parse-ebnf main swap at  
   parsed reset-tokenizer ; parsing
