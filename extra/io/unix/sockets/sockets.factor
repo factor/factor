@@ -5,7 +5,7 @@ namespaces threads sequences byte-arrays io.ports
 io.binary io.unix.backend io.streams.duplex
 io.backend io.ports io.files io.files.private
 io.encodings.utf8 math.parser continuations libc combinators
-system accessors qualified destructors unix locals ;
+system accessors qualified destructors unix locals init ;
 
 EXCLUDE: io => read write close ;
 EXCLUDE: io.sockets => accept ;
@@ -96,7 +96,7 @@ SYMBOL: receive-buffer
 
 : packet-size 65536 ; inline
 
-packet-size <byte-array> receive-buffer set-global
+[ packet-size malloc receive-buffer set-global ] "io.unix.sockets" add-init-hook
 
 :: do-receive ( port -- packet sockaddr )
     port addr>> empty-sockaddr/size [| sockaddr len |
@@ -107,7 +107,7 @@ packet-size <byte-array> receive-buffer set-global
         sockaddr ! from
         len <int> ! fromlen
         recvfrom dup 0 >= [
-            receive-buffer get-global swap head sockaddr
+            receive-buffer get-global swap memory>byte-array sockaddr
         ] [
             drop f f
         ] if
