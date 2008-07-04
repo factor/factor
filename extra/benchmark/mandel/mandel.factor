@@ -1,19 +1,19 @@
-IN: benchmark.mandel
 USING: arrays io kernel math math.order namespaces sequences
-byte-arrays byte-vectors math.functions math.parser io.files
-colors.hsv io.encodings.binary ;
+       byte-arrays byte-vectors math.functions math.parser io.files
+       colors.hsv io.encodings.binary ;
 
-: max-color 360 ; inline
-: zoom-fact 0.8 ; inline
-: width 640 ; inline
-: height 480 ; inline
-: nb-iter 40 ; inline
-: center -0.65 ; inline
+IN: benchmark.mandel
+
+: max-color 360   ; inline
+: zoom-fact 0.8   ; inline
+: width     640   ; inline
+: height    480   ; inline
+: nb-iter   40    ; inline
+: center    -0.65 ; inline
 
 : scale 255 * >fixnum ; inline
 
-: scale-rgb ( r g b -- n )
-    rot scale rot scale rot scale 3array ;
+: scale-rgb ( r g b -- n ) [ scale ] tri@ 3array ;
 
 : sat 0.85 ; inline
 : val 0.85 ; inline
@@ -30,7 +30,7 @@ colors.hsv io.encodings.binary ;
 
 SYMBOL: cols
 
-: x-inc width 200000 zoom-fact * / ; inline
+: x-inc width  200000 zoom-fact * / ; inline
 : y-inc height 150000 zoom-fact * / ; inline
 
 : c ( i j -- c )
