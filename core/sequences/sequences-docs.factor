@@ -965,7 +965,7 @@ HELP: sigma
 { $description "Like map sum, but without creating an intermediate sequence." }
 { $example
     "! Find the sum of the squares [0,99]"
-    "USING: math math.ranges sequences.lib prettyprint ;"
+    "USING: math math.ranges sequences prettyprint ;"
     "100 [1,b] [ sq ] sigma ."
     "338350"
 } ;
@@ -974,7 +974,7 @@ HELP: count
 { $values { "seq" sequence } { "quot" quotation } { "n" integer } }
 { $description "Efficiently returns the number of elements that the predicate quotation matches." }
 { $example
-    "USING: math math.ranges sequences.lib prettyprint ;"
+    "USING: math math.ranges sequences prettyprint ;"
     "100 [1,b] [ even? ] count ."
     "50"
 } ;

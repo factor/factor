@@ -3,7 +3,7 @@ kernel help.markup help.syntax math ;
 IN: float-arrays
 
 ARTICLE: "float-arrays" "Float arrays"
-"Float arrays are fixed-size mutable sequences (" { $link "sequence-protocol" } ") whose elements are instances of " { $link float } ". Elements are unboxed, hence the memory usage is lower than an equivalent " { $link array } " of floats. The literal syntax is covered in " { $link "syntax-float-arrays" } "."
+"Float arrays are fixed-size mutable sequences (" { $link "sequence-protocol" } ") whose elements are instances of " { $link float } ". Elements are unboxed, hence the memory usage is lower than an equivalent " { $link array } " of floats."
 $nl
 "Float array words are in the " { $vocab-link "float-arrays" } " vocabulary."
 $nl
@@ -32,7 +32,7 @@ HELP: F{
 { $examples { $code "F{ 1.0 2.0 3.0 }" } } ;
 
 HELP: float-array
-{ $description "The class of float arrays. See " { $link "syntax-float-arrays" } " for syntax and " { $link "float-arrays" } " for general information." } ;
+{ $description "The class of float arrays." } ;
 
 HELP: <float-array> ( n -- float-array )
 { $values { "n" "a non-negative integer" } { "float-array" "a new float array" } }
