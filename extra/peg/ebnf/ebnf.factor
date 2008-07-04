@@ -523,7 +523,8 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
   parse-result-ast transform dup dup parser [ main swap at compile ] with-variable
   [ compiled-parse ] curry [ with-scope ] curry ;
 
-: [EBNF "EBNF]" reset-tokenizer parse-multiline-string ebnf>quot nip parsed reset-tokenizer ; parsing
+: [EBNF "EBNF]" reset-tokenizer parse-multiline-string ebnf>quot nip 
+  parsed \ call parsed reset-tokenizer ; parsing
 
 : EBNF: 
   reset-tokenizer CREATE-WORD dup ";EBNF" parse-multiline-string  
