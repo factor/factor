@@ -94,17 +94,6 @@ M: duplicated-slots-error summary
     ] if
 ] 1 define-transform
 
-: [tuple-boa] ( layout -- quot )
-    [ [ (tuple) ] curry ]
-    [
-        size>> 1 - [ 3 + ] map <reversed>
-        [ [ set-slot ] curry [ keep ] curry ] map concat
-    ] bi
-    [ f over 2 set-slot ]
-    3append ;
-
-\ <tuple-boa> [ [tuple-boa] ] 1 define-transform
-
 \ (call-next-method) [
     [ [ +inlined+ depends-on ] bi@ ] [ next-method-quot ] 2bi
 ] 2 define-transform

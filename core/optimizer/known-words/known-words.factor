@@ -1,6 +1,5 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: optimizer.known-words
 USING: accessors alien arrays generic hashtables definitions
 inference.dataflow inference.state inference.class kernel assocs
 math math.order math.private kernel.private sequences words
@@ -9,7 +8,9 @@ sequences.private io.binary io.streams.string layouts splitting
 math.intervals math.floats.private classes.tuple classes.predicate
 classes.tuple.private classes classes.algebra optimizer.def-use
 optimizer.backend optimizer.pattern-match optimizer.inlining
-sequences.private combinators byte-arrays byte-vectors ;
+sequences.private combinators byte-arrays byte-vectors
+slots.private ;
+IN: optimizer.known-words
 
 { <tuple> <tuple-boa> (tuple) } [
     [
@@ -39,6 +40,20 @@ sequences.private combinators byte-arrays byte-vectors ;
 
 \ new {
     { [ dup literal-new? ] [ expand-new ] }
+} define-optimizers
+
+: tuple-boa-quot ( layout -- quot )
+    [ (tuple) ]
+    swap size>> 1 - [ 3 + ] map <reversed>
+    [ [ set-slot ] curry [ keep ] curry ] map concat
+    [ f over 2 set-slot ]
+    3append ;
+
+: expand-tuple-boa ( #call -- node )
+    dup in-d>> peek value-literal tuple-boa-quot f splice-quot ;
+
+\ <tuple-boa> {
+    { [ t ] [ expand-tuple-boa ] }
 } define-optimizers
 
 ! the output of clone has the same type as the input
