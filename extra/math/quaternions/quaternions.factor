@@ -74,5 +74,4 @@ PRIVATE>
     >r -0.5 * dup cos c>q swap sin r> n*v v- ;
 
 : euler ( phi theta psi -- q )
-    qk (euler) >r qj (euler) >r qi (euler) r> q* r> q* ;
-
+  [ qi (euler) ] [ qj (euler) ] [ qk (euler) ] tri* q* q* ;
