@@ -1,1 +1,1 @@
-Basic Linear Algebra words for accelerated vector and matrix math
+BLAS level 1 vector operations

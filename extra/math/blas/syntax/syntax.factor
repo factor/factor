@@ -1,4 +1,4 @@
-USING: kernel math.blas.vectors parser prettyprint.backend ;
+USING: kernel math.blas.vectors parser ;
 IN: math.blas.syntax
 
 : svector{ ( accum -- accum )

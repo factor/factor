@@ -1,5 +1,5 @@
-USING: accessors alien alien.c-types arrays byte-arrays fry
-kernel macros math math.blas.cblas math.complex math.functions
+USING: accessors alien alien.c-types arrays byte-arrays combinators
+fry kernel macros math math.blas.cblas math.complex math.functions
 math.order multi-methods qualified sequences sequences.private
 shuffle ;
 QUALIFIED: syntax
@@ -21,8 +21,6 @@ C: <double-blas-vector> double-blas-vector
 C: <float-complex-blas-vector> float-complex-blas-vector
 C: <double-complex-blas-vector> double-complex-blas-vector
 
-GENERIC: zero-vector ( v -- zero )
-
 GENERIC: n*V+V-in-place ( n v1 v2 -- v2=n*v1+v2 )
 GENERIC: n*V-in-place   ( n v -- v=n*v )
 
@@ -34,18 +32,29 @@ GENERIC: Vswap ( v1 v2 -- v1=v2 v2=v1 )
 
 GENERIC: Viamax ( v -- abs-max-index )
 
+GENERIC: element-type ( v -- type )
+
+METHOD: element-type { float-blas-vector }
+    drop "float" ;
+METHOD: element-type { double-blas-vector }
+    drop "double" ;
+METHOD: element-type { float-complex-blas-vector }
+    drop "CBLAS_C" ;
+METHOD: element-type { double-complex-blas-vector }
+    drop "CBLAS_Z" ;
+
 <PRIVATE
 
-GENERIC: (vector-c-type) ( v -- type )
+GENERIC: (blas-vector-like) ( data length inc exemplar -- vector )
 
-METHOD: (vector-c-type) { float-blas-vector }
-    drop "float" ;
-METHOD: (vector-c-type) { double-blas-vector }
-    drop "double" ;
-METHOD: (vector-c-type) { float-complex-blas-vector }
-    drop "CBLAS_C" ;
-METHOD: (vector-c-type) { double-complex-blas-vector }
-    drop "CBLAS_Z" ;
+METHOD: (blas-vector-like) { object object object float-blas-vector }
+    drop <float-blas-vector> ;
+METHOD: (blas-vector-like) { object object object double-blas-vector }
+    drop <double-blas-vector> ;
+METHOD: (blas-vector-like) { object object object float-complex-blas-vector }
+    drop <float-complex-blas-vector> ;
+METHOD: (blas-vector-like) { object object object double-complex-blas-vector }
+    drop <double-complex-blas-vector> ;
 
 : (prepare-copy) ( v element-size -- length v-data v-inc v-dest-data v-dest-inc )
     [ [ length>> ] [ data>> ] [ inc>> ] tri ] dip
@@ -121,14 +130,15 @@ MACRO: (set-complex-nth) ( set-nth-quot -- )
 
 PRIVATE>
 
-METHOD: zero-vector { float-blas-vector }
-    length>> 0.0 <float> swap 0 <float-blas-vector> ;
-METHOD: zero-vector { double-blas-vector }
-    length>> 0.0 <double> swap 0 <double-blas-vector> ;
-METHOD: zero-vector { float-complex-blas-vector }
-    length>> "CBLAS_C" <c-object> swap 0 <float-complex-blas-vector> ;
-METHOD: zero-vector { double-complex-blas-vector }
-    length>> "CBLAS_Z" <c-object> swap 0 <double-complex-blas-vector> ;
+: zero-vector ( exemplar -- zero )
+    [ element-type <c-object> ]
+    [ length>> 0 ]
+    [ (blas-vector-like) ] tri ;
+
+: empty-vector ( exemplar -- empty-vector )
+    [ [ length>> ] [ element-type ] bi <c-array> ]
+    [ length>> 1 ]
+    [ (blas-vector-like) ] tri ;
 
 syntax:M: blas-vector-base length
     length>> ;
@@ -158,9 +168,11 @@ syntax:M: double-complex-blas-vector set-nth-unsafe
 : >double-blas-vector ( seq -- v )
     [ >c-double-array ] [ length ] bi 1 <double-blas-vector> ;
 : >float-complex-blas-vector ( seq -- v )
-    [ (flatten-complex-sequence) >c-float-array ] [ length ] bi 1 <float-complex-blas-vector> ;
+    [ (flatten-complex-sequence) >c-float-array ] [ length ] bi
+    1 <float-complex-blas-vector> ;
 : >double-complex-blas-vector ( seq -- v )
-    [ (flatten-complex-sequence) >c-double-array ] [ length ] bi 1 <double-complex-blas-vector> ;
+    [ (flatten-complex-sequence) >c-double-array ] [ length ] bi
+    1 <double-complex-blas-vector> ;
 
 syntax:M: float-blas-vector clone
     "float" heap-size (prepare-copy)
@@ -206,14 +218,13 @@ METHOD: n*V-in-place { number double-complex-blas-vector }
     [ (>z-complex) ] dip
     (prepare-scal) [ cblas_zscal ] dip ;
 
-
-
 : n*V+V ( n v1 v2 -- n*v1+v2 ) clone n*V+V-in-place ;
 : n*V ( n v1 -- n*v1 ) clone n*V-in-place ;
+! : n*V ( n v1 -- n*v1 ) dup empty-vector n*V+V-in-place ; ! XXX which is faster?
 
 : V+ ( v1 v2 -- v1+v2 )
     1.0 -rot n*V+V ;
-: V- ( v1 v2 -- v1+v2 )
+: V- ( v1 v2 -- v1-v2 )
     -1.0 spin n*V+V ;
 
 : Vneg ( v1 -- -v1 )
