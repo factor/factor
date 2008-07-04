@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs hashtables kernel math namespaces words
+USING: accessors assocs hashtables kernel math namespaces words
 windows.types vocabs sequences ;
 IN: windows.messages
 

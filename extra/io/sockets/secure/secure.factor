@@ -79,5 +79,5 @@ M: common-name-verify-error summary
 
 {
     { [ os unix? ] [ "io.unix.sockets.secure" require ] }
-    { [ os windows? ] [ ] }
+    { [ os windows? ] [ "openssl" require ] }
 } cond
