@@ -24,7 +24,7 @@ PRIVATE>
 
 : q* ( u v -- u*v )
     #! Multiply quaternions.
-    [ q*a ] 2keep q*b 2array ;
+    [ q*a ] [ q*b ] 2bi 2array ;
 
 : qconjugate ( u -- u' )
     #! Quaternion conjugate.
