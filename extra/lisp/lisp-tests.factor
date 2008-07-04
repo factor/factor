@@ -66,7 +66,7 @@ IN: lisp.test
     ] unit-test
 
     { T{ lisp-symbol f "begin" } } [
-        "(defmacro begin (&rest body) (list (list (quote lambda) (list) body)))" lisp-eval
+        "(defmacro begin (&rest body) (list (cons (quote lambda) (cons (list) body))))" lisp-eval
     ] unit-test
     
     { t } [
