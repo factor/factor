@@ -63,13 +63,16 @@ namespaces continuations layouts accessors ;
     ] curry unit-test
 ] each
 
-USING: http.client furnace.actions http.server http.server.dispatchers
+USING: http.client http.server http.server.dispatchers
 http.server.responses http.server.static io.servers.connection ;
 
-: add-quit-action
-    <action>
-        [ stop-server "Goodbye" "text/html" <content> ] >>display
-    "quit" add-responder ;
+SINGLETON: quit-responder
+
+M: quit-responder call-responder*
+    2drop stop-server "Goodbye" "text/html" <content> ;
+
+: add-quot-responder ( responder -- responder )
+    quit-responder "quit" add-responder ;
 
 : test-httpd ( -- )
     #! Return as soon as server is running.
@@ -81,7 +84,7 @@ http.server.responses http.server.static io.servers.connection ;
 [ ] [
     [
         <dispatcher>
-            add-quit-action
+            add-quot-responder
             "resource:extra/http/test" <static> >>default
         main-responder set
 
