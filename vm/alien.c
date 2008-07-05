@@ -62,7 +62,7 @@ CELL allot_alien(CELL delegate, CELL displacement)
 	{
 		F_ALIEN *delegate_alien = untag_object(delegate);
 		displacement += delegate_alien->displacement;
-		alien->alien = F;
+		alien->alien = delegate_alien->alien;
 	}
 	else
 		alien->alien = delegate;
