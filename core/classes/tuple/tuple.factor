@@ -3,9 +3,12 @@
 USING: arrays definitions hashtables kernel kernel.private math
 namespaces sequences sequences.private strings vectors words
 quotations memory combinators generic classes classes.algebra
-classes.private slots.deprecated slots.private slots
-compiler.units math.private accessors assocs effects ;
+classes.builtin classes.private slots.deprecated slots.private
+slots compiler.units math.private accessors assocs effects ;
 IN: classes.tuple
+
+PREDICATE: tuple-class < class
+    "metaclass" word-prop tuple-class eq? ;
 
 M: tuple class 1 slot 2 slot { word } declare ;
 
@@ -135,7 +138,8 @@ ERROR: bad-superclass class ;
     dup boa-check-quot "boa-check" set-word-prop ;
 
 : tuple-prototype ( class -- prototype )
-    [ all-slots [ initial>> ] map ] keep slots>tuple ;
+    [ all-slots [ initial>> ] map ] keep
+    over [ ] contains? [ slots>tuple ] [ 2drop f ] if ;
 
 : define-tuple-prototype ( class -- )
     dup tuple-prototype "prototype" set-word-prop ;
@@ -289,6 +293,16 @@ M: tuple-class rank-class drop 0 ;
 M: tuple-class instance?
     dup tuple-layout echelon>> tuple-instance? ;
 
+M: tuple-class (flatten-class) dup set ;
+
+M: tuple-class (classes-intersect?)
+    {
+        { [ over tuple eq? ] [ 2drop t ] }
+        { [ over builtin-class? ] [ 2drop f ] }
+        { [ over tuple-class? ] [ [ class<= ] [ swap class<= ] 2bi or ] }
+        [ swap classes-intersect? ]
+    } cond ;
+
 M: tuple clone
     (clone) dup delegate clone over set-delegate ;
 
@@ -304,7 +318,8 @@ M: tuple hashcode*
     ] recursive-hashcode ;
 
 M: tuple-class new
-    "prototype" word-prop (clone) ;
+    dup "prototype" word-prop
+    [ (clone) ] [ tuple-layout <tuple> ] ?if ;
 
 M: tuple-class boa
     [ "boa-check" word-prop call ]

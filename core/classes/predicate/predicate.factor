@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes kernel namespaces words sequences quotations
-arrays kernel.private assocs combinators ;
+USING: classes classes.algebra kernel namespaces words sequences
+quotations arrays kernel.private assocs combinators ;
 IN: classes.predicate
 
 PREDICATE: predicate-class < class
@@ -51,3 +51,9 @@ M: predicate-class rank-class drop 1 ;
 M: predicate-class instance?
     2dup superclass instance?
     [ predicate-instance? ] [ 2drop f ] if ;
+
+M: predicate-class (flatten-class)
+    superclass (flatten-class) ;
+
+M: predicate-class (classes-intersect?)
+    superclass classes-intersect? ;

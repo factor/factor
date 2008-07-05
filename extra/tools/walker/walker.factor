@@ -83,6 +83,9 @@ M: object add-breakpoint ;
 : (step-into-continuation) ( -- )
     continuation callstack >>call break ;
 
+: (step-into-call-next-method) ( class generic -- )
+    next-method-quot (step-into-quot) ;
+
 ! Messages sent to walker thread
 SYMBOL: step
 SYMBOL: step-out
@@ -132,6 +135,7 @@ SYMBOL: +stopped+
     { if [ (step-into-if) ] }
     { dispatch [ (step-into-dispatch) ] }
     { continuation [ (step-into-continuation) ] }
+    { (call-next-method) [ (step-into-call-next-method) ] }
 } [ "step-into" set-word-prop ] assoc-each
 
 {

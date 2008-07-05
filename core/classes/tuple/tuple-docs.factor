@@ -332,6 +332,10 @@ $nl
 
 ABOUT: "tuples"
 
+HELP: tuple-class
+{ $class-description "The class of tuple class words." }
+{ $examples { $example "USING: classes prettyprint ;" "IN: scratchpad" "TUPLE: name title first last ;" "name tuple-class? ." "t" } } ;
+
 HELP: tuple=
 { $values { "tuple1" tuple } { "tuple2" tuple } { "?" "a boolean" } }
 { $description "Low-level tuple equality test. User code should use " { $link = } " instead." }
