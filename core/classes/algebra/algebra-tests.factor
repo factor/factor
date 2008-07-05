@@ -3,7 +3,8 @@ kernel math namespaces parser prettyprint sequences strings
 tools.test vectors words quotations classes classes.algebra
 classes.private classes.union classes.mixin classes.predicate
 vectors definitions source-files compiler.units growable
-random inference effects kernel.private sbufs math.order ;
+random inference effects kernel.private sbufs math.order
+classes.tuple ;
 IN: classes.algebra.tests
 
 \ class< must-infer
