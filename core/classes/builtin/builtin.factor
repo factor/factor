@@ -43,8 +43,7 @@ M: builtin-class (classes-intersect?)
     } cond ;
 
 M: anonymous-intersection (flatten-class)
-    participants>>
-    participants [ flatten-builtin-class ] map
+    participants>> [ flatten-builtin-class ] map
     dup empty? [
         drop builtins get sift [ (flatten-class) ] each
     ] [
