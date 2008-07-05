@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: io.unix.bsd
 USING: namespaces system kernel accessors assocs continuations
-unix
-io.backend io.unix.backend io.unix.select io.monitors ;
+unix io.backend io.unix.backend io.unix.select ;
 
 M: bsd init-io ( -- )
     <select-mx> mx set-global ;

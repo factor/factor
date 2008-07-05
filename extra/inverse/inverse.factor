@@ -1,8 +1,11 @@
-USING: kernel words inspector slots quotations sequences assocs
-math arrays inference effects shuffle continuations debugger
-classes.tuple namespaces vectors bit-arrays byte-arrays strings
-sbufs math.functions macros sequences.private combinators
-mirrors combinators.lib combinators.short-circuit ;
+! Copyright (C) 2007, 2008 Daniel Ehrenberg.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors kernel words summary slots quotations
+sequences assocs math arrays inference effects shuffle
+continuations debugger classes.tuple namespaces vectors
+bit-arrays byte-arrays strings sbufs math.functions macros
+sequences.private combinators mirrors combinators.lib
+combinators.short-circuit ;
 IN: inverse
 
 TUPLE: fail ;
@@ -80,7 +83,7 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
     ] } 1&& ; 
 
 : (flatten) ( quot -- )
-    [ dup flattenable? [ word-def (flatten) ] [ , ] if ] each ;
+    [ dup flattenable? [ def>> (flatten) ] [ , ] if ] each ;
 
  : retain-stack-overflow? ( error -- ? )
     { "kernel-error" 14 f f } = ;
@@ -209,7 +212,7 @@ DEFER: _
     [ ] like [ drop ] compose ;
 
 : ?wrapped ( object -- wrapped )
-    dup wrapper? [ wrapped ] when ;
+    dup wrapper? [ wrapped>> ] when ;
 
 : boa-inverse ( class -- quot )
     [ deconstruct-pred ] keep slot-readers compose ;

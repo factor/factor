@@ -28,5 +28,21 @@ $nl
 { $subsection send }
 { $subsection super-send } ;
 
+ARTICLE: "cocoa" "Cocoa bridge"
+"The " { $vocab-link "cocoa" } " vocabulary implements a Factor-Cocoa bridge for Mac OS X (GNUstep is not supported)."
+$nl
+"The lowest layer uses the " { $link "alien" } " to define bindings for the various functions in Apple's Objective-C runtime. This is defined in the " { $vocab-link "cocoa.runtime" } " vocabulary."
+$nl
+"On top of this, a dynamic message send facility is built:"
+{ $subsection "objc-calling" }
+{ $subsection "objc-subclassing" }
+"A utility library is built to faciliate the development of Cocoa applications in Factor:"
+{ $subsection "cocoa-types" }
+{ $subsection "cocoa-application-utils" }
+{ $subsection "cocoa-dialogs" }
+{ $subsection "cocoa-pasteboard-utils" }
+{ $subsection "cocoa-view-utils" }
+{ $subsection "cocoa-window-utils" } ;
+
 IN: cocoa
-ABOUT: "objc-calling"
+ABOUT: "cocoa"

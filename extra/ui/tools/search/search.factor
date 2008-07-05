@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs ui.tools.interactor ui.tools.listener
+USING: accessors assocs ui.tools.interactor ui.tools.listener
 ui.tools.workspace help help.topics io.files io.styles kernel
 models namespaces prettyprint quotations sequences sorting
 source-files definitions strings tools.completion tools.crossref
@@ -82,7 +82,7 @@ M: live-search pref-dim* drop { 400 200 } ;
     >r definition-candidates r> [ synopsis ] <live-search> ;
 
 : word-candidates ( words -- candidates )
-    [ dup word-name >lower ] { } map>assoc ;
+    [ dup name>> >lower ] { } map>assoc ;
 
 : <word-search> ( string words limited? -- gadget )
     >r word-candidates r> [ synopsis ] <live-search> ;
@@ -97,7 +97,7 @@ M: live-search pref-dim* drop { 400 200 } ;
 
 : show-word-usage ( workspace word -- )
     "" over smart-usage f <definition-search>
-    "Words and methods using " rot word-name append
+    "Words and methods using " rot name>> append
     show-titled-popup ;
 
 : help-candidates ( seq -- candidates )

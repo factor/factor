@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private slots.private math math.private
-math.order ;
+USING: accessors kernel kernel.private slots.private math
+math.private math.order ;
 IN: sequences
 
 MIXIN: sequence
@@ -56,13 +56,6 @@ M: immutable-sequence set-nth immutable ;
 INSTANCE: immutable-sequence sequence
 
 <PRIVATE
-
-: max-array-capacity ( -- n )
-    #! A bit of a pain; can't call cell-bits here
-    7 getenv 8 * 5 - 2^ 1- ; foldable
-
-PREDICATE: array-capacity < fixnum
-    0 max-array-capacity between? ;
 
 : array-capacity ( array -- n )
     1 slot { array-capacity } declare ; inline
@@ -168,25 +161,28 @@ M: virtual-sequence new-sequence virtual-seq new-sequence ;
 INSTANCE: virtual-sequence sequence
 
 ! A reversal of an underlying sequence.
-TUPLE: reversed seq ;
+TUPLE: reversed { seq read-only } ;
 
 C: <reversed> reversed
 
-M: reversed virtual-seq reversed-seq ;
+M: reversed virtual-seq seq>> ;
 
-M: reversed virtual@ reversed-seq [ length swap - 1- ] keep ;
+M: reversed virtual@ seq>> [ length swap - 1- ] keep ;
 
-M: reversed length reversed-seq length ;
+M: reversed length seq>> length ;
 
 INSTANCE: reversed virtual-sequence
 
 : reverse ( seq -- newseq ) [ <reversed> ] [ like ] bi ;
 
 ! A slice of another sequence.
-TUPLE: slice from to seq ;
+TUPLE: slice
+{ from read-only }
+{ to read-only }
+{ seq read-only } ;
 
 : collapse-slice ( m n slice -- m' n' seq )
-    dup slice-from swap slice-seq >r tuck + >r + r> r> ; inline
+    [ from>> ] [ seq>> ] bi >r tuck + >r + r> r> ; inline
 
 ERROR: slice-error reason ;
 
@@ -200,11 +196,11 @@ ERROR: slice-error reason ;
     check-slice
     slice boa ; inline
 
-M: slice virtual-seq slice-seq ;
+M: slice virtual-seq seq>> ;
 
-M: slice virtual@ [ slice-from + ] [ slice-seq ] bi ;
+M: slice virtual@ [ from>> + ] [ seq>> ] bi ;
 
-M: slice length dup slice-to swap slice-from - ;
+M: slice length [ to>> ] [ from>> ] bi - ;
 
 : short ( seq n -- seq n' ) over length min ; inline
 
@@ -223,12 +219,12 @@ M: slice length dup slice-to swap slice-from - ;
 INSTANCE: slice virtual-sequence
 
 ! One element repeated many times
-TUPLE: repetition len elt ;
+TUPLE: repetition { len read-only } { elt read-only } ;
 
 C: <repetition> repetition
 
-M: repetition length repetition-len ;
-M: repetition nth-unsafe nip repetition-elt ;
+M: repetition length len>> ;
+M: repetition nth-unsafe nip elt>> ;
 
 INSTANCE: repetition immutable-sequence
 
@@ -722,3 +718,8 @@ PRIVATE>
         dup [ length ] map infimum
         swap [ [ nth-unsafe ] with { } map-as ] curry { } map-as
     ] unless ;
+
+: sigma ( seq quot -- n ) [ + ] compose 0 swap reduce ; inline
+
+: count ( seq quot -- n ) [ 1 0 ? ] compose sigma ; inline
+

@@ -20,7 +20,7 @@ TUPLE: pprinter last-newline line-count indent ;
 : <pprinter> ( -- pprinter ) 0 1 0 pprinter boa ;
 
 : record-vocab ( word -- )
-    word-vocabulary [ pprinter-use get conjoin ] when* ;
+    vocabulary>> [ pprinter-use get conjoin ] when* ;
 
 ! Utility words
 : line-limit? ( -- ? )

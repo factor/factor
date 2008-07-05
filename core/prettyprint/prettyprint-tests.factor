@@ -101,11 +101,20 @@ unit-test
         ] keep =
     ] with-scope ;
 
-: method-test
+GENERIC: method-layout
+
+M: complex method-layout
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ;
+
+M: fixnum method-layout ;
+
+M: integer method-layout ;
+
+M: object method-layout ;
+
+[
     {
-        "IN: prettyprint.tests"
-        "GENERIC: method-layout"
-        ""
         "USING: math prettyprint.tests ;"
         "M: complex method-layout"
         "    \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\""
@@ -119,10 +128,10 @@ unit-test
         ""
         "USING: kernel prettyprint.tests ;"
         "M: object method-layout ;"
-    } ;
-
-[ t ] [
-    "method-layout" method-test check-see
+        ""
+    }
+] [
+    [ \ method-layout see-methods ] with-string-writer "\n" split
 ] unit-test
 
 : retain-stack-test
@@ -255,7 +264,16 @@ DEFER: parse-error-file
     "another-narrow-layout" another-narrow-test check-see
 ] unit-test
 
-: class-see-test
+IN: prettyprint.tests
+TUPLE: class-see-layout ;
+
+IN: prettyprint.tests
+GENERIC: class-see-layout ( x -- y )
+
+USING: prettyprint.tests ;
+M: class-see-layout class-see-layout ;
+
+[
     {
         "IN: prettyprint.tests"
         "TUPLE: class-see-layout ;"
@@ -263,12 +281,19 @@ DEFER: parse-error-file
         "IN: prettyprint.tests"
         "GENERIC: class-see-layout ( x -- y )"
         ""
+    }
+] [
+    [ \ class-see-layout see ] with-string-writer "\n" split
+] unit-test
+
+[
+    {
         "USING: prettyprint.tests ;"
         "M: class-see-layout class-see-layout ;"
-    } ;
-
-[ t ] [
-    "class-see-layout" class-see-test check-see
+        ""
+    }
+] [
+    [ \ class-see-layout see-methods ] with-string-writer "\n" split
 ] unit-test
 
 [ ] [ \ effect-in synopsis drop ] unit-test

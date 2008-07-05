@@ -1,20 +1,21 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: accessors alien arrays generic hashtables definitions
+inference.dataflow inference.state inference.class kernel assocs
+math math.order math.private kernel.private sequences words
+parser vectors strings sbufs io namespaces assocs quotations
+sequences.private io.binary io.streams.string layouts splitting
+math.intervals math.floats.private classes.tuple classes.predicate
+classes.tuple.private classes classes.algebra optimizer.def-use
+optimizer.backend optimizer.pattern-match optimizer.inlining
+sequences.private combinators byte-arrays byte-vectors
+slots.private ;
 IN: optimizer.known-words
-USING: alien arrays generic hashtables inference.dataflow
-inference.class kernel assocs math math.order math.private
-kernel.private sequences words parser vectors strings sbufs io
-namespaces assocs quotations sequences.private io.binary
-io.streams.string layouts splitting math.intervals
-math.floats.private classes.tuple classes.tuple.private classes
-classes.algebra optimizer.def-use optimizer.backend
-optimizer.pattern-match optimizer.inlining float-arrays
-sequences.private combinators byte-arrays byte-vectors ;
 
-{ <tuple> <tuple-boa> } [
+{ <tuple> <tuple-boa> (tuple) } [
     [
         dup node-in-d peek node-literal
-        dup tuple-layout? [ layout-class ] [ drop tuple ] if
+        dup tuple-layout? [ class>> ] [ drop tuple ] if
         1array f
     ] "output-classes" set-word-prop
 ] each
@@ -23,6 +24,37 @@ sequences.private combinators byte-arrays byte-vectors ;
     dup node-in-d peek node-literal
     dup class? [ drop tuple ] unless 1array f
 ] "output-classes" set-word-prop
+
+! if the input to new is a literal tuple class, we can expand it
+: literal-new? ( #call -- ? )
+    dup in-d>> first node-literal tuple-class? ;
+
+: new-quot ( class -- quot )
+    dup all-slots 1 tail ! delegate slot
+    [ [ initial>> literalize , ] each literalize , \ boa , ] [ ] make ;
+
+: expand-new ( #call -- node )
+    dup dup in-d>> first node-literal
+    [ +inlined+ depends-on ] [ new-quot ] bi
+    f splice-quot ;
+
+\ new {
+    { [ dup literal-new? ] [ expand-new ] }
+} define-optimizers
+
+: tuple-boa-quot ( layout -- quot )
+    [ (tuple) ]
+    swap size>> 1 - [ 3 + ] map <reversed>
+    [ [ set-slot ] curry [ keep ] curry ] map concat
+    [ f over 2 set-slot ]
+    3append ;
+
+: expand-tuple-boa ( #call -- node )
+    dup in-d>> peek value-literal tuple-boa-quot f splice-quot ;
+
+\ <tuple-boa> {
+    { [ t ] [ expand-tuple-boa ] }
+} define-optimizers
 
 ! the output of clone has the same type as the input
 { clone (clone) } [
@@ -126,6 +158,21 @@ sequences.private combinators byte-arrays byte-vectors ;
         2drop
     ] if
 ] "constraints" set-word-prop
+
+! Eliminate instance? checks when the outcome is known at compile time
+: (optimize-instance) ( #call -- #call value class/f )
+    [ ] [ in-d>> first ] [ dup in-d>> second node-literal ] tri ;
+
+: optimize-instance? ( #call -- ? )
+    (optimize-instance) dup class?
+    [ optimize-check? ] [ 3drop f ] if ;
+
+: optimize-instance ( #call -- node )
+    (optimize-instance) optimize-check ;
+
+\ instance? {
+    { [ dup optimize-instance? ] [ optimize-instance ] }
+} define-optimizers
 
 ! eq? on the same object is always t
 { eq? = } {

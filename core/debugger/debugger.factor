@@ -1,13 +1,13 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions generic hashtables inspector io kernel
-math namespaces prettyprint prettyprint.config sequences assocs
-sequences.private strings io.styles vectors words system
+USING: slots arrays definitions generic hashtables summary io
+kernel math namespaces prettyprint prettyprint.config sequences
+assocs sequences.private strings io.styles vectors words system
 splitting math.parser classes.tuple continuations
-continuations.private combinators generic.math
-classes.builtin classes compiler.units generic.standard vocabs
-threads threads.private init kernel.private libc io.encodings
-mirrors accessors math.order destructors ;
+continuations.private combinators generic.math classes.builtin
+classes compiler.units generic.standard vocabs threads
+threads.private init kernel.private libc io.encodings
+accessors math.order destructors ;
 IN: debugger
 
 GENERIC: error. ( error -- )
@@ -16,7 +16,6 @@ GENERIC: error-help ( error -- topic )
 M: object error. . ;
 M: object error-help drop f ;
 
-M: tuple error. describe ;
 M: tuple error-help class ;
 
 M: string error. print ;
@@ -32,9 +31,6 @@ M: string error. print ;
 
 : :get ( variable -- value )
     error-continuation get continuation-name assoc-stack ;
-
-: :vars ( -- )
-    error-continuation get continuation-name namestack. ;
 
 : :res ( n -- * )
     1- restarts get-global nth f restarts set-global restart ;
@@ -190,12 +186,13 @@ M: no-method summary
 
 M: no-method error.
     "Generic word " write
-    dup no-method-generic pprint
+    dup generic>> pprint
     " does not define a method for the " write
-    dup no-method-object class pprint
+    dup object>> class pprint
     " class." print
-    "Allowed classes: " write dup no-method-generic order .
-    "Dispatching on object: " write no-method-object short. ;
+    "Dispatching on object: " write object>> short. ;
+
+M: bad-slot-value summary drop "Bad store to specialized slot" ;
 
 M: no-math-method summary
     drop "No suitable arithmetic method" ;
@@ -211,9 +208,6 @@ M: check-method summary
 
 M: not-a-tuple summary
     drop "Not a tuple" ;
-
-M: not-a-tuple-class summary
-    drop "Not a tuple class" ;
 
 M: bad-superclass summary
     drop "Tuple classes can only inherit from other tuple classes" ;
@@ -294,10 +288,6 @@ M: thread error-in-thread ( error thread -- )
 M: encode-error summary drop "Character encoding error" ;
 
 M: decode-error summary drop "Character decoding error" ;
-
-M: no-such-slot summary drop "No such slot" ;
-
-M: immutable-slot summary drop "Slot is immutable" ;
 
 M: bad-create summary drop "Bad parameters to create" ;
 

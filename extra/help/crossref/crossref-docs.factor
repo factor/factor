@@ -13,7 +13,7 @@ HELP: help-path
 { $values { "topic" "an article name or a word" } { "seq" "a new sequence" } }
 { $description "Outputs a sequence of all help articles which contain " { $snippet "topic" } " as a subsection, traversing all the way up to the root." }
 { $examples
-    { $example "USING: help.crossref prettyprint ;" "\"sequences\" help-path ." "{ \"collections\" \"handbook\" }" }
+    { $example "USING: help.crossref prettyprint ;" "\"sequences\" help-path ." "{ \"collections\" \"handbook-language-reference\" \"handbook\" }" }
 } ;
 
 HELP: xref-article

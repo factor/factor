@@ -12,10 +12,5 @@ USING: tools.test parser vocabs help.syntax namespaces ;
         "help.syntax.tests" vocab vocab-help
     ] unit-test
     
-    SYMBOL: xyz
-    
-    [ xyz ] [
-        "IN: help.syntax.tests USE: help.syntax ABOUT: xyz" eval
-        "help.syntax.tests" vocab vocab-help
-    ] unit-test
+    [ ] [ f "help.syntax.tests" vocab set-vocab-help ] unit-test
 ] with-file-vocabs

@@ -142,11 +142,9 @@ M: object clone ;
 M: callstack clone (clone) ;
 
 ! Tuple construction
-: new ( class -- tuple )
-    tuple-layout <tuple> ;
+GENERIC: new ( class -- tuple )
 
-: boa ( ... class -- tuple )
-    tuple-layout <tuple-boa> ;
+GENERIC: boa ( ... class -- tuple )
 
 ! Quotation building
 : 2curry ( obj1 obj2 quot -- curry )
@@ -197,7 +195,15 @@ M: callstack clone (clone) ;
 PRIVATE>
 
 ! Deprecated
+GENERIC: delegate ( obj -- delegate )
+
+M: tuple delegate 2 slot ;
+
 M: object delegate drop f ;
+
+GENERIC: set-delegate ( delegate tuple -- )
+
+M: tuple set-delegate 2 set-slot ;
 
 GENERIC# get-slots 1 ( tuple slots -- ... )
 

@@ -1,6 +1,6 @@
  ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs classes combinators cpu.architecture
+USING: accessors arrays assocs classes combinators cpu.architecture
 effects generator.fixup generator.registers generic hashtables
 inference inference.backend inference.dataflow io kernel
 kernel.private layouts math namespaces optimizer
@@ -20,7 +20,7 @@ SYMBOL: compiled
     } cond ;
 
 : maybe-compile ( word -- )
-    dup compiled? [ drop ] [ queue-compile ] if ;
+    dup compiled>> [ drop ] [ queue-compile ] if ;
 
 SYMBOL: compiling-word
 

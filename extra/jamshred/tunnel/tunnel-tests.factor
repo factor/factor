@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays jamshred.oint jamshred.tunnel kernel math.vectors sequences tools.test ;
+USING: arrays jamshred.oint jamshred.tunnel kernel math.vectors sequences tools.test float-arrays ;
 IN: jamshred.tunnel.tests
 
 [ 0 ] [ T{ segment f { 0 0 0 } f f f 0 }

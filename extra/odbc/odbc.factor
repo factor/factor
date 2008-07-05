@@ -1,8 +1,8 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel alien alien.strings alien.syntax combinators
-alien.c-types strings sequences namespaces words math threads
-io.encodings.ascii ;
+USING: accessors kernel alien alien.strings alien.syntax
+combinators alien.c-types strings sequences namespaces words
+math threads io.encodings.ascii ;
 IN: odbc
 
 << "odbc" "odbc32.dll" "stdcall" add-library >>
@@ -227,7 +227,7 @@ C: <column> column
     { SQL-DOUBLE [ *double ] }
     { SQL-TINYINT [ *char  ] }
     { SQL-BIGINT [ *longlong ] }
-    [ nip [ "Unknown SQL Type: " % word-name % ] "" make ]
+    [ nip [ "Unknown SQL Type: " % name>> % ] "" make ]
   } case ;
 
 TUPLE: field value column ;
@@ -245,7 +245,7 @@ C: <field> field
     r> drop r> [
       "SQLGetData Failed for Column: " %
       dup column-name %
-      " of type: " % dup column-type word-name %
+      " of type: " % dup column-type name>> %
     ] "" make swap <field>
   ] if ;
 

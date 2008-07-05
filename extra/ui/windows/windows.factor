@@ -383,7 +383,7 @@ SYMBOL: trace-messages?
     "uint" { "void*" "uint" "long" "long" } "stdcall" [
         [
             pick
-            trace-messages? get-global [ dup windows-message-name word-name print flush ] when
+            trace-messages? get-global [ dup windows-message-name name>> print flush ] when
             wm-handlers get-global at* [ call ] [ drop DefWindowProc ] if
         ] ui-try
      ] alien-callback ;

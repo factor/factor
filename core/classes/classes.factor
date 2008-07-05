@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions assocs kernel kernel.private
+USING: accessors arrays definitions assocs kernel kernel.private
 slots.private namespaces sequences strings words vectors math
 quotations combinators sorting effects graphs vocabs sets ;
 IN: classes
@@ -38,7 +38,7 @@ PREDICATE: tuple-class < class
 : classes ( -- seq ) implementors-map get keys ;
 
 : predicate-word ( word -- predicate )
-    [ word-name "?" append ] keep word-vocabulary create ;
+    [ name>> "?" append ] [ vocabulary>> ] bi create ;
 
 PREDICATE: predicate < word "predicating" word-prop >boolean ;
 
@@ -72,6 +72,7 @@ M: class reset-class
         "superclass"
         "members"
         "participants"
+        "predicate"
     } reset-props ;
 
 M: word reset-class drop ;
@@ -87,8 +88,9 @@ GENERIC: implementors ( class/classes -- seq )
         tri
     ] { } make ;
 
-: class-usages ( class -- seq )
-    [ update-map get at ] closure keys ;
+: class-usage ( class -- seq ) update-map get at ;
+
+: class-usages ( class -- seq ) [ class-usage ] closure keys ;
 
 <PRIVATE
 
@@ -123,8 +125,8 @@ M: sequence implementors [ implementors ] gather ;
     dup class? [ dup [ implementors-map+ ] [ new-class ] bi ] unless
     dup reset-class
     dup deferred? [ dup define-symbol ] when
-    dup word-props
-    r> assoc-union over set-word-props
+    dup props>>
+    r> assoc-union >>props
     dup predicate-word
     [ 1quotation "predicate" set-word-prop ]
     [ swap "predicating" set-word-prop ]
@@ -163,21 +165,24 @@ GENERIC: update-methods ( class seq -- )
 : forget-methods ( class -- )
     [ implementors ] [ [ swap 2array ] curry ] bi map forget-all ;
 
+GENERIC: class-forgotten ( use class -- )
+
 : forget-class ( class -- )
-    class-usages [
-        {
-            [ forget-predicate ]
-            [ forget-methods ]
-            [ implementors-map- ]
-            [ update-map- ]
-            [ reset-class ]
-        } cleave
-    ] each ;
+    {
+        [ dup class-usage keys [ class-forgotten ] with each ]
+        [ forget-predicate ]
+        [ forget-methods ]
+        [ implementors-map- ]
+        [ update-map- ]
+        [ reset-class ]
+    } cleave ;
+
+M: class class-forgotten
+    nip forget-class ;
 
 M: class forget* ( class -- )
-    [ forget-class ] [ call-next-method ] bi ;
+    [ call-next-method ] [ forget-class ] bi ;
 
 GENERIC: class ( object -- class )
 
-: instance? ( obj class -- ? )
-    "predicate" word-prop call ;
+GENERIC: instance? ( object class -- ? )

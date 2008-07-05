@@ -4,8 +4,9 @@ inference.dataflow optimizer tools.test kernel.private generic
 sequences words inference.class quotations alien
 alien.c-types strings sbufs sequences.private
 slots.private combinators definitions compiler.units
-system layouts vectors optimizer.math.partial accessors
-optimizer.inlining math.order ;
+system layouts vectors optimizer.math.partial
+optimizer.inlining optimizer.backend math.order
+accessors hashtables classes assocs ;
 
 [ t ] [ T{ literal-constraint f 1 2 } T{ literal-constraint f 1 2 } equal? ] unit-test
 
@@ -159,7 +160,7 @@ DEFER: blah
         [ dup V{ } eq? [ foo ] when ] dup second dup push define
     ] with-compilation-unit
 
-    \ blah word-def dataflow optimize drop
+    \ blah def>> dataflow optimize drop
 ] unit-test
 
 GENERIC: detect-fx ( n -- n )
@@ -565,6 +566,38 @@ M: integer detect-integer ;
 [ t ] [
     [ { integer } declare bitnot detect-integer ]
     \ detect-integer inlined?
+] unit-test
+
+[ t ] [
+    [ hashtable new ] \ new inlined?
+] unit-test
+
+[ t ] [
+    [ dup hashtable eq? [ new ] when ] \ new inlined?
+] unit-test
+
+[ t ] [
+    [ { hashtable } declare hashtable instance? ] \ instance? inlined?
+] unit-test
+
+[ t ] [
+    [ { vector } declare hashtable instance? ] \ instance? inlined?
+] unit-test
+
+[ f ] [
+    [ { assoc } declare hashtable instance? ] \ instance? inlined?
+] unit-test
+
+TUPLE: declared-fixnum { x fixnum } ;
+
+[ t ] [
+    [ { declared-fixnum } declare [ 1 + ] change-x ]
+    { + fixnum+ >fixnum } inlined?
+] unit-test
+
+[ t ] [
+    [ { declared-fixnum } declare x>> drop ]
+    { slot } inlined?
 ] unit-test
 
 ! Later

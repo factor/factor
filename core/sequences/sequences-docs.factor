@@ -1,5 +1,6 @@
-USING: arrays bit-arrays help.markup help.syntax math
-sequences.private vectors strings sbufs kernel math.order ;
+USING: arrays help.markup help.syntax math
+sequences.private vectors strings kernel math.order layouts
+quotations ;
 IN: sequences
 
 ARTICLE: "sequences-unsafe" "Unsafe sequence operations"
@@ -413,6 +414,7 @@ HELP: first4
 
 HELP: array-capacity
 { $values { "array" "an array" } { "n" "a non-negative fixnum" } }
+{ $class-description "A predicate class whose instances are valid array sizes for the current architecture. The minimum value is zero and the maximum value is " { $link max-array-capacity } "." }
 { $description "Low-level array length accessor." }
 { $warning "This word is in the " { $vocab-link "sequences.private" } " vocabulary because it is unsafe. It does not check types, so improper use can corrupt memory." } ;
 
@@ -957,3 +959,23 @@ HELP: unfold
     "The " { $snippet "tail" } " quotation is used when the predicate produces more than one output value. In this case, we have to drop this value even if the predicate fails in order for stack inference to calculate a stack effect for the " { $link unfold } " call:"
     { $unchecked-example "USING: kernel prettyprint random sequences ;" "[ 10 random dup 1 > ] [ ] [ drop ] unfold ." "{ 8 2 2 9 }" }
 } ;
+
+HELP: sigma
+{ $values { "seq" sequence } { "quot" quotation } { "n" number } }
+{ $description "Like map sum, but without creating an intermediate sequence." }
+{ $example
+    "! Find the sum of the squares [0,99]"
+    "USING: math math.ranges sequences prettyprint ;"
+    "100 [1,b] [ sq ] sigma ."
+    "338350"
+} ;
+
+HELP: count
+{ $values { "seq" sequence } { "quot" quotation } { "n" integer } }
+{ $description "Efficiently returns the number of elements that the predicate quotation matches." }
+{ $example
+    "USING: math math.ranges sequences prettyprint ;"
+    "100 [1,b] [ even? ] count ."
+    "50"
+} ;
+

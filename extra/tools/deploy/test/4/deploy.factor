@@ -1,6 +1,6 @@
 USING: tools.deploy.config ;
 H{
-    { deploy-math? f }
+    { deploy-math? t }
     { deploy-reflection 1 }
     { deploy-io 2 }
     { deploy-c-types? f }

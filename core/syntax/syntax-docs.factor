@@ -138,14 +138,6 @@ ARTICLE: "syntax-quots" "Quotation syntax"
 { $subsection POSTPONE: ] }
 "Quotations are documented in " { $link "quotations" } "." ;
 
-ARTICLE: "syntax-bit-arrays" "Bit array syntax"
-{ $subsection POSTPONE: ?{ }
-"Bit arrays are documented in " { $link "bit-arrays" } "." ;
-
-ARTICLE: "syntax-float-arrays" "Float array syntax"
-{ $subsection POSTPONE: F{ }
-"Float arrays are documented in " { $link "float-arrays" } "." ;
-
 ARTICLE: "syntax-byte-arrays" "Byte array syntax"
 { $subsection POSTPONE: B{ }
 "Byte arrays are documented in " { $link "byte-arrays" } "." ;
@@ -165,9 +157,7 @@ $nl
 { $subsection "syntax-quots" }
 { $subsection "syntax-arrays" }
 { $subsection "syntax-strings" }
-{ $subsection "syntax-bit-arrays" }
 { $subsection "syntax-byte-arrays" }
-{ $subsection "syntax-float-arrays" }
 { $subsection "syntax-vectors" }
 { $subsection "syntax-sbufs" }
 { $subsection "syntax-hashtables" }
@@ -275,18 +265,6 @@ HELP: B{
 { $values { "elements" "a list of integers" } }
 { $description "Marks the beginning of a literal byte array. Literal byte arrays are terminated by " { $link POSTPONE: } } "." } 
 { $examples { $code "B{ 1 2 3 }" } } ;
-
-HELP: ?{
-{ $syntax "?{ elements... }" }
-{ $values { "elements" "a list of booleans" } }
-{ $description "Marks the beginning of a literal bit array. Literal bit arrays are terminated by " { $link POSTPONE: } } "." } 
-{ $examples { $code "?{ t f t }" } } ;
-
-HELP: F{
-{ $syntax "F{ elements... }" }
-{ $values { "elements" "a list of real numbers" } }
-{ $description "Marks the beginning of a literal float array. Literal float arrays are terminated by " { $link POSTPONE: } } "." } 
-{ $examples { $code "F{ 1.0 2.0 3.0 }" } } ;
 
 HELP: H{
 { $syntax "H{ { key value }... }" }
@@ -547,8 +525,43 @@ HELP: PREDICATE:
 
 HELP: TUPLE:
 { $syntax "TUPLE: class slots... ;" "TUPLE: class < superclass slots ... ;" }
-{ $values { "class" "a new tuple class to define" } { "slots" "a list of slot names" } }
-{ $description "Defines a new tuple class. The superclass is optional; if left unspecified, it defaults to " { $link tuple } "." } ;
+{ $values { "class" "a new tuple class to define" } { "slots" "a list of slot specifiers" } }
+{ $description "Defines a new tuple class."
+$nl
+"The superclass is optional; if left unspecified, it defaults to " { $link tuple } "."
+$nl
+"Slot specifiers take one of the following three forms:"
+{ $list
+    { { $snippet "name" } " - a slot which can hold any object, with no attributes" }
+    { { $snippet "{ \"name\" attributes... }" } " - a slot which can hold any object, with optional attributes" }
+    { { $snippet "{ \"name\" class attributes... }" } " - a slot specialized to a specific class, with optional attributes" }
+}
+"Slot attributes are lists of slot attribute specifiers followed by values; a slot attribute specifier is one of " { $link initial: } " or " { $link read-only } ". See " { $link "tuple-declarations" } " for details." }
+{ $examples
+    "A simple tuple class:"
+    { $code "TUPLE: color red green blue ;" }
+    "Declaring slots to be integer-valued:"
+    { $code "TUPLE: color" "{ \"red\" integer }" "{ \"green\" integer }" "{ \"blue\" integer } ;" }
+    "An example mixing short and long slot specifiers:"
+    { $code "TUPLE: person" "{ \"age\" integer initial: 0 }" "{ \"department\" string initial: \"Marketing\" }" "manager ;" }
+} ;
+
+HELP: initial:
+{ $syntax "TUPLE: ... { \"slot\" initial: value } ... ;" }
+{ $values { "slot" "a slot name" } { "value" "any literal" } }
+{ $description "Specifies an initial value for a tuple slot." } ;
+
+HELP: read-only
+{ $syntax "TUPLE: ... { \"slot\" read-only } ... ;" }
+{ $values { "slot" "a slot name" } }
+{ $description "Defines a tuple slot to be read-only. If a tuple has read-only slots, instances of the tuple should only be created by calling " { $link boa } ", instead of " { $link new } ". Using " { $link boa } " is the only way to set the value of a read-only slot." } ;
+
+{ initial: read-only } related-words
+
+HELP: SLOT:
+{ $syntax "SLOT: name" }
+{ $values { "name" "a slot name" } }
+{ $description "Defines a protocol slot; that is, defines the accessor words for a slot named " { $snippet "slot" } " without associating it with any specific tuple." } ;
 
 HELP: ERROR:
 { $syntax "ERROR: class slots... ;" }

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: inference.errors
 USING: inference.backend inference.dataflow kernel generic
-sequences prettyprint io words arrays inspector effects debugger
+sequences prettyprint io words arrays summary effects debugger
 assocs accessors ;
 
 M: inference-error error-help error>> error-help ;

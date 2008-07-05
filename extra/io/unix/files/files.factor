@@ -19,7 +19,7 @@ M: unix cd ( path -- ) [ chdir ] unix-system-call drop ;
 : open-read ( path -- fd ) O_RDONLY file-mode open-file ;
 
 M: unix (file-reader) ( path -- stream )
-    open-read <fd> <input-port> ;
+    open-read <fd> init-fd <input-port> ;
 
 : write-flags { O_WRONLY O_CREAT O_TRUNC } flags ; inline
 
@@ -27,7 +27,7 @@ M: unix (file-reader) ( path -- stream )
     write-flags file-mode open-file ;
 
 M: unix (file-writer) ( path -- stream )
-    open-write <fd> <output-port> ;
+    open-write <fd> init-fd <output-port> ;
 
 : append-flags { O_WRONLY O_APPEND O_CREAT } flags ; inline
 
@@ -38,7 +38,7 @@ M: unix (file-writer) ( path -- stream )
     ] with-destructors ;
 
 M: unix (file-appender) ( path -- stream )
-    open-append <fd> <output-port> ;
+    open-append <fd> init-fd <output-port> ;
 
 : touch-mode ( -- n )
     { O_WRONLY O_APPEND O_CREAT O_EXCL } flags ; foldable

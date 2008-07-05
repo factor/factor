@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: alien arrays byte-arrays combinators inspector
+USING: alien arrays byte-arrays combinators summary
 io.backend graphics.viewer io io.binary io.files kernel libc
 math math.functions namespaces opengl opengl.gl prettyprint
 sequences strings ui ui.gadgets.panes io.encodings.binary ;

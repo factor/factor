@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations destructors io.backend kernel quotations
 sequences system alien alien.accessors accessors
-sequences.private ;
+sequences.private system vocabs.loader combinators ;
 IN: io.mmap
 
 TUPLE: mapped-file address handle length disposed ;
@@ -29,3 +29,8 @@ M: mapped-file dispose* ( mmap -- ) close-mapped-file ;
 
 : with-mapped-file ( path length quot -- )
     >r <mapped-file> r> with-disposal ; inline
+
+{
+    { [ os unix? ] [ "io.unix.mmap" require ] }
+    { [ os winnt? ] [ "io.windows.mmap" require ] }
+} cond

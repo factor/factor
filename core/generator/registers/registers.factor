@@ -3,7 +3,7 @@
 USING: arrays assocs classes classes.private classes.algebra
 combinators cpu.architecture generator.fixup hashtables kernel
 layouts math namespaces quotations sequences system vectors
-words effects alien byte-arrays bit-arrays float-arrays
+words effects alien byte-arrays
 accessors sets math.order ;
 IN: generator.registers
 
@@ -184,8 +184,6 @@ INSTANCE: constant value
         { [ dup \ f class<= ] [ drop %unbox-f ] }
         { [ dup simple-alien class<= ] [ drop %unbox-alien ] }
         { [ dup byte-array class<= ] [ drop %unbox-byte-array ] }
-        { [ dup bit-array class<= ] [ drop %unbox-byte-array ] }
-        { [ dup float-array class<= ] [ drop %unbox-byte-array ] }
         [ drop %unbox-any-c-ptr ]
     } cond ; inline
 
@@ -195,7 +193,9 @@ INSTANCE: constant value
     #! temp then temp to the destination.
     temp-reg over %move
     operand-class temp-reg
-    { set-operand-class set-tagged-vreg } tagged construct
+    tagged new
+        swap >>vreg
+        swap >>class
     %move ;
 
 : %move ( dst src -- )

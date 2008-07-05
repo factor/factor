@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces sequences words io assocs
+USING: accessors kernel namespaces sequences words io assocs
 quotations strings parser lexer arrays xml.data xml.writer debugger
 splitting vectors sequences.deep combinators ;
 IN: xml.utilities
@@ -12,7 +12,7 @@ M: process-missing error.
     "Tag <" write
     dup process-missing-tag print-name
     "> not implemented on process process " write
-    process-missing-process word-name print ;
+    process-missing-process name>> print ;
 
 : run-process ( tag word -- )
     2dup "xtable" word-prop

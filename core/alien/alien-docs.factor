@@ -1,6 +1,6 @@
 USING: byte-arrays arrays help.syntax help.markup
 alien.syntax compiler definitions math libc
-debugger parser io io.backend system bit-arrays float-arrays
+debugger parser io io.backend system
 alien.accessors ;
 IN: alien
 
@@ -10,7 +10,7 @@ HELP: alien
 HELP: dll
 { $class-description "The class of native library handles. See " { $link "syntax-aliens" } " for syntax and " { $link "dll.private" } " for general information." } ;
 
-HELP: expired? ( c-ptr -- ? )
+HELP: expired?
 { $values { "c-ptr" "an alien, byte array, or " { $link f } } { "?" "a boolean" } }
 { $description "Tests if the alien is a relic from an earlier session. When an image is loaded, any alien objects which persisted in the image are marked as being expired."
 $nl
@@ -154,7 +154,11 @@ ARTICLE: "aliens" "Alien addresses"
 { $subsection expired? }
 "Anywhere that a " { $link alien } " instance is accepted, the " { $link f } " singleton may be passed in to denote a null pointer."
 $nl
-"Usually alien objects do not have to created and dereferenced directly; instead declaring C function parameters and return values as having a pointer type such as " { $snippet "void*" } " takes care of the details. See " { $link "c-types-specs" } "." ;
+"Usually alien objects do not have to created and dereferenced directly; instead declaring C function parameters and return values as having a pointer type such as " { $snippet "void*" } " takes care of the details."
+{ $subsection "syntax-aliens" }
+"When higher-level abstractions won't do:"
+{ $subsection "reading-writing-memory" }
+{ $see-also "c-data" "c-types-specs" } ;
 
 ARTICLE: "reading-writing-memory" "Reading and writing memory directly"
 "Numerical values can be read from memory addresses and converted to Factor objects using the various typed memory accessor words:"
@@ -293,6 +297,7 @@ $nl
 "C library interface words are found in the " { $vocab-link "alien" } " vocabulary."
 { $warning "C does not perform runtime type checking, automatic memory management or array bounds checks. Incorrect usage of C library functions can lead to crashes, data corruption, and security exploits." }
 { $subsection "loading-libs" }
+{ $subsection "aliens" }
 { $subsection "alien-invoke" }
 { $subsection "alien-callback" }
 { $subsection "c-data" }

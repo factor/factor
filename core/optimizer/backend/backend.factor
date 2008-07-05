@@ -115,3 +115,15 @@ M: f set-node-successor 2drop ;
 
 : drop-inputs ( node -- #shuffle )
     node-in-d clone \ #shuffle in-node ;
+
+: optimizer-hooks ( node -- conditions )
+    param>> "optimizer-hooks" word-prop ;
+
+: optimizer-hook ( node -- pair/f )
+    dup optimizer-hooks [ first call ] find 2nip ;
+
+: optimize-hook ( node -- )
+    dup optimizer-hook second call ;
+
+: define-optimizers ( word optimizers -- )
+    "optimizer-hooks" set-word-prop ;

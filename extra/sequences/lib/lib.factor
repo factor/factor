@@ -2,7 +2,7 @@
 !                    Eduardo Cavazos, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.lib kernel sequences math namespaces assocs 
-random sequences.private shuffle math.functions mirrors
+random sequences.private shuffle math.functions
 arrays math.parser math.private sorting strings ascii macros
 assocs.lib quotations hashtables math.order locals ;
 IN: sequences.lib
@@ -48,14 +48,6 @@ MACRO: firstn ( n -- )
   [ 1+ ] prepose
   r> compose
   2each ;                       inline
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: sigma ( seq quot -- n )
-    [ + ] compose 0 swap reduce ; inline
-
-: count ( seq quot -- n )
-    [ 1 0 ? ] compose sigma ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

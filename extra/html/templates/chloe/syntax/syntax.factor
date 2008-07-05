@@ -38,7 +38,7 @@ MEMO: chloe-name ( string -- name )
 
 : CHLOE-SINGLETON:
     scan-word
-    [ word-name ] [ '[ , singleton-component-tag ] ] bi
+    [ name>> ] [ '[ , singleton-component-tag ] ] bi
     define-chloe-tag ;
     parsing
 
@@ -56,6 +56,6 @@ MEMO: chloe-name ( string -- name )
 
 : CHLOE-TUPLE:
     scan-word
-    [ word-name ] [ '[ , tuple-component-tag ] ] bi
+    [ name>> ] [ '[ , tuple-component-tag ] ] bi
     define-chloe-tag ;
     parsing

@@ -1,4 +1,4 @@
-USING: math math.bitfields tools.test kernel words ;
+USING: accessors math math.bitfields tools.test kernel words ;
 IN: math.bitfields.tests
 
 [ 0 ] [ { } bitfield ] unit-test
@@ -14,4 +14,4 @@ IN: math.bitfields.tests
 
 [ 3 ] [ foo ] unit-test
 [ 3 ] [ { a b } flags ] unit-test
-[ t ] [ \ foo compiled? ] unit-test
+\ foo must-infer

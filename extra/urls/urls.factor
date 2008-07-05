@@ -1,11 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel unicode.categories combinators
-combinators.short-circuit sequences splitting fry namespaces
-assocs arrays strings io.sockets io.sockets.secure
-io.encodings.string io.encodings.utf8 math math.parser accessors
-mirrors parser strings.parser lexer prettyprint.backend
-hashtables present ;
+USING: kernel ascii combinators combinators.short-circuit
+sequences splitting fry namespaces assocs arrays strings
+io.sockets io.sockets.secure io.encodings.string
+io.encodings.utf8 math math.parser accessors parser
+strings.parser lexer prettyprint.backend hashtables present ;
 IN: urls
 
 : url-quotable? ( ch -- ? )
@@ -188,13 +187,22 @@ M: url present
 PRIVATE>
 
 : derive-url ( base url -- url' )
-    [ clone dup ] dip
-    2dup [ path>> ] bi@ url-append-path
-    [ [ <mirror> ] bi@ [ nip ] assoc-filter update ] dip
-    >>path ;
+    [ clone ] dip over {
+        [ [ protocol>> ] either? >>protocol ]
+        [ [ username>> ] either? >>username ]
+        [ [ password>> ] either? >>password ]
+        [ [ host>>     ] either? >>host ]
+        [ [ port>>     ] either? >>port ]
+        [ [ path>>     ] bi@ swap url-append-path >>path ]
+        [ [ query>>    ] either? >>query ]
+        [ [ anchor>>   ] either? >>anchor ]
+    } 2cleave ;
 
 : relative-url ( url -- url' )
-    clone f >>protocol f >>host f >>port ;
+    clone
+        f >>protocol
+        f >>host
+        f >>port ;
 
 ! Half-baked stuff follows
 : secure-protocol? ( protocol -- ? )

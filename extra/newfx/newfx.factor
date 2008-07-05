@@ -159,6 +159,11 @@ METHOD: as-mutate { object object assoc }       set-at ;
 : prefix-on ( elt seq -- seq ) swap prefix ;
 : suffix-on ( elt seq -- seq ) swap suffix ;
 
+: suffix!      ( seq elt -- seq ) over sequences:push ;
+: suffix-on!   ( elt seq -- seq ) tuck sequences:push ;
+: suffixed!    ( seq elt --     ) swap sequences:push ;
+: suffixed-on! ( elt seq --     )      sequences:push ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : subseq ( seq from to -- subseq ) rot sequences:subseq ;
@@ -219,3 +224,16 @@ METHOD: as-mutate { object object assoc }       set-at ;
 : snipped!      ( seq a b --     )       rot delete-slice ;
 : snipped-from! ( a b seq --     )           delete-slice ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: invert-index ( seq i -- seq i ) >r dup length 1 - r> - ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: append!      ( a b -- ab )      over sequences:push-all ;
+: append-to!   ( b a -- ab ) swap over sequences:push-all ;
+: appended!    ( a b --    ) swap      sequences:push-all ;
+: appended-to! ( b a --    )           sequences:push-all ;
+
+: prepend!   ( a b -- ba  ) over append 0 pick copy ;
+: prepended! ( a b --     ) over append 0 rot  copy ;

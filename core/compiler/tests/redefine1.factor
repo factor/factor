@@ -1,7 +1,7 @@
 IN: compiler.tests
-USING: compiler compiler.units tools.test math parser kernel
-sequences sequences.private classes.mixin generic definitions
-arrays words assocs ;
+USING: accessors compiler compiler.units tools.test math parser
+kernel sequences sequences.private classes.mixin generic
+definitions arrays words assocs ;
 
 GENERIC: method-redefine-test ( a -- b )
 
@@ -23,13 +23,13 @@ M: integer method-redefine-test 3 + ;
 : hey ( -- ) ;
 : there ( -- ) hey ;
 
-[ t ] [ \ hey compiled? ] unit-test
-[ t ] [ \ there compiled? ] unit-test
+[ t ] [ \ hey compiled>> ] unit-test
+[ t ] [ \ there compiled>> ] unit-test
 [ ] [ "IN: compiler.tests : hey ( -- ) 3 ;" eval ] unit-test
-[ f ] [ \ hey compiled? ] unit-test
-[ f ] [ \ there compiled? ] unit-test
+[ f ] [ \ hey compiled>> ] unit-test
+[ f ] [ \ there compiled>> ] unit-test
 [ ] [ "IN: compiler.tests : hey ( -- ) ;" eval ] unit-test
-[ t ] [ \ there compiled? ] unit-test
+[ t ] [ \ there compiled>> ] unit-test
 
 ! Just changing the stack effect didn't mark a word for recompilation
 DEFER: change-effect
@@ -44,24 +44,24 @@ DEFER: change-effect
 : bad ( -- ) good ;
 : ugly ( -- ) bad ;
 
-[ t ] [ \ good compiled? ] unit-test
-[ t ] [ \ bad compiled? ] unit-test
-[ t ] [ \ ugly compiled? ] unit-test
+[ t ] [ \ good compiled>> ] unit-test
+[ t ] [ \ bad compiled>> ] unit-test
+[ t ] [ \ ugly compiled>> ] unit-test
 
 [ f ] [ \ good compiled-usage assoc-empty? ] unit-test
 
 [ ] [ "IN: compiler.tests : good ( -- ) 3 ;" eval ] unit-test
 
-[ f ] [ \ good compiled? ] unit-test
-[ f ] [ \ bad compiled? ] unit-test
-[ f ] [ \ ugly compiled? ] unit-test
+[ f ] [ \ good compiled>> ] unit-test
+[ f ] [ \ bad compiled>> ] unit-test
+[ f ] [ \ ugly compiled>> ] unit-test
 
 [ t ] [ \ good compiled-usage assoc-empty? ] unit-test
 
 [ ] [ "IN: compiler.tests : good ( -- ) ;" eval ] unit-test
 
-[ t ] [ \ good compiled? ] unit-test
-[ t ] [ \ bad compiled? ] unit-test
-[ t ] [ \ ugly compiled? ] unit-test
+[ t ] [ \ good compiled>> ] unit-test
+[ t ] [ \ bad compiled>> ] unit-test
+[ t ] [ \ ugly compiled>> ] unit-test
 
 [ f ] [ \ good compiled-usage assoc-empty? ] unit-test

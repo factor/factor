@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel continuations assocs namespaces sequences words
-vocabs definitions hashtables init sets ;
+USING: accessors kernel continuations assocs namespaces
+sequences words vocabs definitions hashtables init sets ;
 IN: compiler.units
 
 SYMBOL: old-definitions
@@ -54,7 +54,7 @@ GENERIC: definitions-changed ( assoc obj -- )
 
 : changed-vocabs ( assoc -- vocabs )
     [ drop word? ] assoc-filter
-    [ drop word-vocabulary dup [ vocab ] when dup ] assoc-map ;
+    [ drop vocabulary>> dup [ vocab ] when dup ] assoc-map ;
 
 : updated-definitions ( -- assoc )
     H{ } clone

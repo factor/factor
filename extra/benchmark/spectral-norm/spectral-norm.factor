@@ -33,7 +33,7 @@ IN: benchmark.spectral-norm
     [ eval-A-times-u ] [ eval-At-times-u ] bi ; inline
 
 :: u/v ( n -- u v )
-    n 1.0 <float-array> dup
+    n 1.0 <repetition> >float-array dup
     10 [
         drop
         n eval-AtA-times-u

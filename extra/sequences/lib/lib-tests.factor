@@ -2,10 +2,6 @@ USING: arrays kernel sequences sequences.lib math math.functions math.ranges
     tools.test strings ;
 IN: sequences.lib.tests
 
-[ 50 ] [ 100 [1,b] [ even? ] count ] unit-test
-[ 50 ] [ 100 [1,b] [ odd? ] count ] unit-test
-[ 328350 ] [ 100 [ sq ] sigma ] unit-test
-
 [ 1 2 { 3 4 } [ + + drop ] 2 each-withn  ] must-infer
 { 13 } [ 1 2 { 3 4 } [ + + ] 2 each-withn + ] unit-test
 
@@ -63,10 +59,6 @@ IN: sequences.lib.tests
 [ 2 ] [ { 1 2 3 } ?second ] unit-test
 [ 3 ] [ { 1 2 3 } ?third ] unit-test
 [ f ] [ { 1 2 3 } ?fourth ] unit-test
-
-[ 50 ] [ 100 [1,b] [ even? ] count ] unit-test
-[ 50 ] [ 100 [1,b] [ odd? ] count ] unit-test
-[ 328350 ] [ 100 [ sq ] sigma ] unit-test
 
 [ 1 2 { 3 4 } [ + + ] 2 map-withn ] must-infer
 { { 6 7 } } [ 1 2 { 3 4 } [ + + ] 2 map-withn ] unit-test

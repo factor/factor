@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs hashtables assocs io kernel math
+USING: accessors arrays assocs hashtables assocs io kernel math
 math.vectors math.matrices math.matrices.elimination namespaces
 parser prettyprint sequences words combinators math.parser
 splitting sorting shuffle symbols sets math.order ;
@@ -41,7 +41,7 @@ SYMBOL: terms
         nip number>string
     ] [
         num-alt.
-        swap [ word-name ] map "." join
+        swap [ name>> ] map "." join
         append
     ] if ;
 
@@ -265,9 +265,10 @@ DEFER: (d)
 
 : bigraded-triple ( u-deg z-deg bigraded-basis -- triple )
     #! d: C(u,z) ---> C(u+2,z-1)
-    [ >r >r 2 - r> 1 + r> ?nth ?nth ] 3keep
-    [ ?nth ?nth ] 3keep
-    >r >r 2 + r> 1 - r> ?nth ?nth
+    [ [ 2 - ] [ 1 + ] [ ] tri* ?nth ?nth ] 
+    [ ?nth ?nth ] 
+    [ [ 2 + ] [ 1 - ] [ ] tri* ?nth ?nth ]
+    3tri
     3array ;
 
 : bigraded-triples ( grid -- triples )

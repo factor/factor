@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs kernel math models namespaces
+USING: accessors arrays assocs kernel math models namespaces
 sequences words strings system hashtables math.parser
 math.vectors classes.tuple classes ui.gadgets boxes
 calendar alarms symbols combinators sets columns ;
@@ -54,7 +54,7 @@ TUPLE: zoom-in-action ;  C: <zoom-in-action> zoom-in-action
 TUPLE: zoom-out-action ; C: <zoom-out-action> zoom-out-action
 
 : generalize-gesture ( gesture -- newgesture )
-    tuple>array but-last >tuple ;
+    clone f >># ;
 
 ! Modifiers
 SYMBOLS: C+ A+ M+ S+ ;
@@ -192,7 +192,7 @@ SYMBOL: drag-timer
     dup hand-last-button get = ;
 
 : multi-click-position? ( -- ? )
-    hand-loc get hand-click-loc get v- norm 10 <= ;
+    hand-loc get hand-click-loc get v- norm-sq 100 <= ;
 
 : multi-click? ( button -- ? )
     {
@@ -262,7 +262,7 @@ SYMBOL: drag-timer
 GENERIC: gesture>string ( gesture -- string/f )
 
 : modifiers>string ( modifiers -- string )
-    [ word-name ] map concat >string ;
+    [ name>> ] map concat >string ;
 
 M: key-down gesture>string
     dup key-down-mods modifiers>string

@@ -3,8 +3,8 @@ math.constants parser sequences tools.test words assocs
 namespaces quotations sequences.private classes continuations
 generic.standard effects classes.tuple classes.tuple.private
 arrays vectors strings compiler.units accessors classes.algebra
-calendar prettyprint io.streams.string splitting inspector
-columns math.order classes.private slots.private ;
+calendar prettyprint io.streams.string splitting summary
+columns math.order classes.private slots slots.private ;
 IN: classes.tuple.tests
 
 TUPLE: rect x y w h ;
@@ -88,20 +88,20 @@ C: <empty> empty
 [ t length ] [ object>> t eq? ] must-fail-with
 
 [ "<constructor-test>" ]
-[ "IN: classes.tuple.test TUPLE: constructor-test ; C: <constructor-test> constructor-test" eval word word-name ] unit-test
+[ "IN: classes.tuple.test TUPLE: constructor-test ; C: <constructor-test> constructor-test" eval word name>> ] unit-test
 
 TUPLE: size-test a b c d ;
 
 [ t ] [
     T{ size-test } tuple-size
-    size-test tuple-layout layout-size =
+    size-test tuple-layout size>> =
 ] unit-test
 
 GENERIC: <yo-momma>
 
 TUPLE: yo-momma ;
 
-"IN: classes.tuple.tests C: <yo-momma> yo-momma" eval
+[ ] [ "IN: classes.tuple.tests C: <yo-momma> yo-momma" eval ] unit-test
 
 [ f ] [ \ <yo-momma> generic? ] unit-test
 
@@ -190,15 +190,6 @@ M: vector silly "z" ;
 ! Typo
 SYMBOL: not-a-tuple-class
 
-[
-    "IN: classes.tuple.tests C: <not-a-tuple-class> not-a-tuple-class"
-    eval
-] must-fail
-
-[ t ] [
-    "not-a-tuple-class" "classes.tuple.tests" lookup symbol?
-] unit-test
-
 ! Missing check
 [ not-a-tuple-class boa ] must-fail
 [ not-a-tuple-class new ] must-fail
@@ -212,15 +203,11 @@ C: <erg's-reshape-problem> erg's-reshape-problem
 : cons-test-1 ( -- tuple ) \ erg's-reshape-problem new ;
 : cons-test-2 ( a b c d -- tuple ) \ erg's-reshape-problem boa ;
 
-"IN: classes.tuple.tests TUPLE: erg's-reshape-problem a b c d e f ;" eval
+[ ] [ "IN: classes.tuple.tests TUPLE: erg's-reshape-problem a b c d e f ;" eval ] unit-test
 
 [ ] [ 1 2 3 4 5 6 cons-test-2 "a" set ] unit-test
 
 [ t ] [ cons-test-1 tuple-size "a" get tuple-size = ] unit-test
-
-[
-    "IN: classes.tuple.tests SYMBOL: not-a-class C: <not-a-class> not-a-class" eval
-] [ error>> not-a-tuple-class? ] must-fail-with
 
 ! Inheritance
 TUPLE: computer cpu ram ;
@@ -253,8 +240,8 @@ test-laptop-slot-values
 
 [ laptop ] [
     "laptop" get 1 slot
-    dup layout-echelon swap
-    layout-superclasses nth
+    dup echelon>> swap
+    superclasses>> nth
 ] unit-test
 
 [ "TUPLE: laptop < computer battery ;" ] [
@@ -361,7 +348,7 @@ test-server-slot-values
 [ 110 ] [ "server" get voltage>> ] unit-test
 
 ! Reshaping superclass and subclass simultaneously
-"IN: classes.tuple.tests TUPLE: electronic-device voltage ; TUPLE: computer < electronic-device cpu ram ;" eval
+[ ] [ "IN: classes.tuple.tests TUPLE: electronic-device voltage ; TUPLE: computer < electronic-device cpu ram ;" eval ] unit-test
 
 test-laptop-slot-values
 test-server-slot-values
@@ -490,7 +477,9 @@ USE: vocabs
     ] with-compilation-unit
 ] unit-test
 
-[ "USE: words T{ word }" eval ] [ error>> not-a-tuple-class? ] must-fail-with
+[ "USE: words T{ word }" eval ]
+[ error>> T{ no-method f word slots>tuple } = ]
+must-fail-with
 
 ! Accessors not being forgotten...
 [ [ ] ] [
@@ -598,3 +587,97 @@ GENERIC: break-me ( obj -- )
 
 ! Insufficient type checking
 [ \ vocab tuple>array drop ] must-fail
+
+! Check type declarations
+TUPLE: declared-types { n fixnum } { m string } ;
+
+[ T{ declared-types f 0 "hi" } ]
+[ { declared-types f 0 "hi" } >tuple ]
+unit-test
+
+[ { declared-types f "hi" 0 } >tuple ]
+[ T{ bad-slot-value f "hi" fixnum } = ]
+must-fail-with
+
+[ T{ declared-types f 0 "hi" } ]
+[ 0.0 "hi" declared-types boa ] unit-test
+
+: foo ( a b -- c ) declared-types boa ;
+
+\ foo must-infer
+
+[ T{ declared-types f 0 "hi" } ] [ 0.0 "hi" foo ] unit-test
+
+[ "hi" 0.0 declared-types boa ]
+[ T{ no-method f "hi" >fixnum } = ]
+must-fail-with
+
+[ 0 { } declared-types boa ]
+[ T{ bad-slot-value f { } string } = ]
+must-fail-with
+
+[ "hi" 0.0 foo ]
+[ T{ no-method f "hi" >fixnum } = ]
+must-fail-with
+
+[ 0 { } foo ]
+[ T{ bad-slot-value f { } string } = ]
+must-fail-with
+
+[ T{ declared-types f 0 "" } ] [ declared-types new ] unit-test
+
+: blah ( -- vec ) vector new ;
+
+\ blah must-infer
+
+[ V{ } ] [ blah ] unit-test
+
+! Test reshaping with type declarations and slot attributes
+TUPLE: reshape-test x ;
+
+T{ reshape-test f "hi" } "tuple" set
+
+[ ] [ "IN: classes.tuple.tests TUPLE: reshape-test { x read-only } ;" eval ] unit-test
+
+[ f ] [ \ reshape-test \ (>>x) method ] unit-test
+
+[ "tuple" get 5 >>x ] must-fail
+
+[ "hi" ] [ "tuple" get x>> ] unit-test
+
+[ ] [ "IN: classes.tuple.tests USE: math TUPLE: reshape-test { x integer read-only } ;" eval ] unit-test
+
+[ 0 ] [ "tuple" get x>> ] unit-test
+
+[ ] [ "IN: classes.tuple.tests USE: math TUPLE: reshape-test { x fixnum initial: 4 read-only } ;" eval ] unit-test
+
+[ 0 ] [ "tuple" get x>> ] unit-test
+
+TUPLE: boa-coercer-test { x array-capacity } ;
+
+[ fixnum ] [ 0 >bignum boa-coercer-test boa x>> class ] unit-test
+
+! Test error classes
+ERROR: error-class-test a b c ;
+
+[ "( a b c -- * )" ] [ \ error-class-test stack-effect effect>string ] unit-test
+[ f ] [ \ error-class-test "inline" word-prop ] unit-test
+
+[ "IN: classes.tuple.tests ERROR: error-x ; : error-x 3 ;" eval ]
+[ error>> error>> redefine-error? ] must-fail-with
+
+DEFER: error-y
+
+[ ] [ [ \ error-y dup class? [ forget-class ] [ drop ] if ] with-compilation-unit ] unit-test
+
+[ ] [ "IN: classes.tuple.tests GENERIC: error-y" eval ] unit-test
+
+[ f ] [ \ error-y tuple-class? ] unit-test
+
+[ t ] [ \ error-y generic? ] unit-test
+
+[ ] [ "IN: classes.tuple.tests ERROR: error-y ;" eval ] unit-test
+
+[ t ] [ \ error-y tuple-class? ] unit-test
+
+[ f ] [ \ error-y generic? ] unit-test

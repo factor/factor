@@ -1,10 +1,10 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: words kernel sequences splitting ;
+USING: accessors words kernel sequences splitting ;
 IN: furnace.utilities
 
 : word>string ( word -- string )
-    [ word-vocabulary ] [ word-name ] bi ":" swap 3append ;
+    [ vocabulary>> ] [ name>> ] bi ":" swap 3append ;
 
 : words>strings ( seq -- seq' )
     [ word>string ] map ;

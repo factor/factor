@@ -24,7 +24,7 @@ TUPLE: effect in out terminated? ;
 
 GENERIC: (stack-picture) ( obj -- str )
 M: string (stack-picture) ;
-M: word (stack-picture) word-name ;
+M: word (stack-picture) name>> ;
 M: integer (stack-picture) drop "object" ;
 
 : stack-picture ( seq -- string )
@@ -46,7 +46,7 @@ M: symbol stack-effect drop (( -- symbol )) ;
 
 M: word stack-effect
     { "declared-effect" "inferred-effect" }
-    swap word-props [ at ] curry map [ ] find nip ;
+    swap props>> [ at ] curry map [ ] find nip ;
 
 M: effect clone
     [ in>> clone ] [ out>> clone ] bi <effect> ;

@@ -3,7 +3,7 @@ kernel help.markup help.syntax math ;
 IN: float-arrays
 
 ARTICLE: "float-arrays" "Float arrays"
-"Float arrays are fixed-size mutable sequences (" { $link "sequence-protocol" } ") whose elements are instances of " { $link float } ". Elements are unboxed, hence the memory usage is lower than an equivalent " { $link array } " of floats. The literal syntax is covered in " { $link "syntax-float-arrays" } "."
+"Float arrays are fixed-size mutable sequences (" { $link "sequence-protocol" } ") whose elements are instances of " { $link float } ". Elements are unboxed, hence the memory usage is lower than an equivalent " { $link array } " of floats."
 $nl
 "Float array words are in the " { $vocab-link "float-arrays" } " vocabulary."
 $nl
@@ -19,16 +19,24 @@ $nl
 { $subsection 1float-array }
 { $subsection 2float-array }
 { $subsection 3float-array }
-{ $subsection 4float-array } ;
+{ $subsection 4float-array }
+"Float array literal syntax:"
+{ $subsection POSTPONE: F{ } ;
 
 ABOUT: "float-arrays"
 
-HELP: float-array
-{ $description "The class of float arrays. See " { $link "syntax-float-arrays" } " for syntax and " { $link "float-arrays" } " for general information." } ;
+HELP: F{
+{ $syntax "F{ elements... }" }
+{ $values { "elements" "a list of real numbers" } }
+{ $description "Marks the beginning of a literal float array. Literal float arrays are terminated by " { $link POSTPONE: } } "." } 
+{ $examples { $code "F{ 1.0 2.0 3.0 }" } } ;
 
-HELP: <float-array> ( n initial -- float-array )
-{ $values { "n" "a non-negative integer" } { "initial" float } { "float-array" "a new float array" } }
-{ $description "Creates a new float array holding " { $snippet "n" } " floats with the specified initial element." } ;
+HELP: float-array
+{ $description "The class of float arrays." } ;
+
+HELP: <float-array> ( n -- float-array )
+{ $values { "n" "a non-negative integer" } { "float-array" "a new float array" } }
+{ $description "Creates a new float array holding " { $snippet "n" } " floats with all elements initially set to " { $snippet "0.0" } "." } ;
 
 HELP: >float-array
 { $values { "seq" "a sequence" } { "float-array" float-array } }

@@ -1,32 +1,34 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs kernel math namespaces sequences system
-kernel.private bit-arrays byte-arrays float-arrays arrays ;
+USING: accessors assocs kernel math namespaces sequences system
+kernel.private byte-arrays arrays ;
 IN: alien
 
 ! Some predicate classes used by the compiler for optimization
 ! purposes
-PREDICATE: simple-alien < alien
-    underlying-alien not ;
+PREDICATE: simple-alien < alien underlying>> not ;
 
 UNION: simple-c-ptr
-simple-alien POSTPONE: f byte-array bit-array float-array ;
-
-UNION: c-ptr
-alien POSTPONE: f byte-array bit-array float-array ;
+simple-alien POSTPONE: f byte-array ;
 
 DEFER: pinned-c-ptr?
 
-PREDICATE: pinned-alien < alien
-    underlying-alien pinned-c-ptr? ;
+PREDICATE: pinned-alien < alien underlying>> pinned-c-ptr? ;
 
 UNION: pinned-c-ptr
     pinned-alien POSTPONE: f ;
+
+GENERIC: expired? ( c-ptr -- ? ) flushable
+
+M: alien expired? expired>> ;
 
 M: f expired? drop t ;
 
 : <alien> ( address -- alien )
     f <displaced-alien> { simple-c-ptr } declare ; inline
+
+: <bad-alien> ( -- alien )
+    -1 <alien> t >>expired ; inline
 
 M: alien equal?
     over alien? [

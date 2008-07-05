@@ -214,7 +214,7 @@ PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
     [ "Topological sort failed" throw ] unless* ;
 
 : sort-classes ( seq -- newseq )
-    [ [ word-name ] compare ] sort >vector
+    [ [ name>> ] compare ] sort >vector
     [ dup empty? not ]
     [ dup largest-class >r over delete-nth r> ]
     [ ] unfold nip ;

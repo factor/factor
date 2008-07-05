@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser lexer kernel namespaces sequences definitions
-io.files inspector continuations tools.crossref tools.vocabs io
+io.files summary continuations tools.crossref tools.vocabs io
 prettyprint source-files assocs vocabs vocabs.loader io.backend
 splitting accessors ;
 IN: editors

@@ -5,7 +5,7 @@ namespaces threads sequences byte-arrays io.ports
 io.binary io.unix.backend io.streams.duplex
 io.backend io.ports io.files io.files.private
 io.encodings.utf8 math.parser continuations libc combinators
-system accessors qualified destructors unix locals ;
+system accessors qualified destructors unix locals init ;
 
 EXCLUDE: io => read write close ;
 EXCLUDE: io.sockets => accept ;
@@ -13,7 +13,7 @@ EXCLUDE: io.sockets => accept ;
 IN: io.unix.sockets
 
 : socket-fd ( domain type -- fd )
-    0 socket dup io-error <fd> |dispose ;
+    0 socket dup io-error <fd> init-fd |dispose ;
 
 : set-socket-option ( fd level opt -- )
     >r >r handle-fd r> r> 1 <int> "int" heap-size setsockopt io-error ;
@@ -77,7 +77,7 @@ M: object (server) ( addrspec -- handle )
 M: object (accept) ( server addrspec -- fd sockaddr )
     2dup do-accept
     {
-        { [ over 0 >= ] [ >r 2nip <fd> r> ] }
+        { [ over 0 >= ] [ >r 2nip <fd> init-fd r> ] }
         { [ err_no EINTR = ] [ 2drop (accept) ] }
         { [ err_no EAGAIN = ] [
             2drop
@@ -96,7 +96,7 @@ SYMBOL: receive-buffer
 
 : packet-size 65536 ; inline
 
-packet-size <byte-array> receive-buffer set-global
+[ packet-size malloc receive-buffer set-global ] "io.unix.sockets" add-init-hook
 
 :: do-receive ( port -- packet sockaddr )
     port addr>> empty-sockaddr/size [| sockaddr len |
@@ -107,7 +107,7 @@ packet-size <byte-array> receive-buffer set-global
         sockaddr ! from
         len <int> ! fromlen
         recvfrom dup 0 >= [
-            receive-buffer get-global swap head sockaddr
+            receive-buffer get-global swap memory>byte-array sockaddr
         ] [
             drop f f
         ] if

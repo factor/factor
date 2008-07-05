@@ -1,20 +1,21 @@
 USING: help.markup help.syntax generic kernel.private parser
 words kernel quotations namespaces sequences words arrays
-effects generic.standard classes.tuple classes.builtin
-slots.private classes strings math ;
+effects generic.standard classes.builtin
+slots.private classes strings math assocs byte-arrays alien
+math ;
 IN: slots
 
 ARTICLE: "accessors" "Slot accessors"
-"For each tuple slot, methods are defined on two accessor words in the " { $vocab-link "accessors" } " vocabulary:"
-{ $list
-    { "The " { $emphasis "reader" } " is named " { $snippet { $emphasis "slot" } ">>" } " and pushes the value of a slot on the stack." }
-    { "The " { $emphasis "writer" } " is named " { $snippet "(>>" { $emphasis "slot" } ")" } " and stores a value into a slot. It has stack effect " { $snippet "( value object -- )" } "." }
-}
-"In addition, two utility words are defined for each distinct slot name used in the system:"
-{ $list
-    { "The " { $emphasis "setter" } " is named " { $snippet ">>" { $emphasis "slot" } } " and stores a value into a slot. It has stack effect " { $snippet "( object value -- object )" } "." }
-    { "The " { $emphasis "changer" } " is named " { $snippet "change-" { $emphasis "slot" } } ". It applies a quotation to the current slot value and stores the result back in the slot; it has stack effect " { $snippet "( object quot -- object )" } "." }
-}
+"For every tuple slot, a " { $emphasis "reader" } " method is defined in the " { $vocab-link "accessors" } " vocabulary. The reader is named " { $snippet { $emphasis "slot" } ">>" } " and given a tuple, pushes the slot value on the stack."
+$nl
+"Writable slots - that is, those not attributed " { $link read-only } " - also have a " { $emphasis "writer" } ". The writer is named " { $snippet "(>>" { $emphasis "slot" } ")" } " and stores a value into a slot. It has stack effect " { $snippet "( value object -- )" } ". If the slot is specialized to a specific class, the writer checks that the value being written into the slot is an instance of that class first. See " { $link "tuple-declarations" } " for details."
+$nl
+"In addition, two utility words are defined for each writable slot."
+$nl
+"The " { $emphasis "setter" } " is named " { $snippet ">>" { $emphasis "slot" } } " and stores a value into a slot. It has stack effect " { $snippet "( object value -- object )" } "."
+$nl
+"The " { $emphasis "changer" } " is named " { $snippet "change-" { $emphasis "slot" } } ". It applies a quotation to the current slot value and stores the result back in the slot; it has stack effect " { $snippet "( object quot -- object )" } "."
+$nl
 "Since the reader and writer are generic, words can be written which do not depend on the specific class of tuple passed in, but instead work on any tuple that defines slots with certain names."
 $nl
 "In most cases, using the setter is preferred over the writer because the stack effect is better suited to the common case where the tuple is needed again, and where the new slot value was just computed and so is at the top of the stack. For example, consider the case where you want to create a tuple and fill in the slots with literals. The following version uses setters:"
@@ -61,6 +62,26 @@ $nl
 }
 { $see-also "slots" "mirrors" } ;
 
+ARTICLE: "slot-initial-values" "Initial values of slots"
+"An initial value for a slot can be specified with the " { $link initial: } " slot declaration attribute. For certain classes, the initial value is optional; in these cases, it does not need to be specified. For others, it is required. Initial values can be used independently of class declaration, but if specified, the value must satisfy the class predicate."
+$nl
+"The following classes have default initial values:"
+{ $table
+    { { { $link f } } { $link f } }
+    { { { $link fixnum } } { $snippet "0" } }
+    { { { $link float } } { $snippet "0.0" } }
+    { { { $link string } } { $snippet "\"\"" } }
+    { { { $link byte-array } } { $snippet "B{ }" } }
+    { { { $link simple-alien } } { $snippet "BAD-ALIEN" } }
+}
+"All other classes are handled with one of two cases:"
+{ $list
+    { "If the class is a union or mixin class which " { $emphasis "contains" } " one of the above known classes, then the initial value of the class is that of the known class, with preference given to classes earlier in the list. For example, if the slot is declared " { $link object } " (this is the default), the initial value is " { $link f } ". Similarly for " { $link sequence } " and " { $link assoc } "." }
+    { "Otherwise, a " { $link no-initial-value } " error is thrown. In this case, an initial value must be specified explicitly using " { $link initial: } "." }
+}
+"A word can be used to check if a class has an initial value or not:"
+{ $subsection initial-value } ;
+
 ARTICLE: "slots" "Slots"
 "A " { $emphasis "slot" } " is a component of an object which can store a value."
 $nl
@@ -92,11 +113,11 @@ HELP: slot-spec
 $nl
 "The slots of a slot specification are:"
 { $list
-    { { $link slot-spec-type } " - a " { $link class } " declaring the set of possible values for the slot." }
-    { { $link slot-spec-name } " - a " { $link string } " identifying the slot." }
-    { { $link slot-spec-offset } " - an " { $link integer } " offset specifying where the slot value is stored inside instances of the relevant class. This is an implementation detail." }
-    { { $link slot-spec-reader } " - a " { $link word } " for reading the value of this slot." }
-    { { $link slot-spec-writer } " - a " { $link word } " for writing the value of this slot." }
+    { { $snippet "name" } " - a " { $link string } " identifying the slot." }
+    { { $snippet "offset" } " - an " { $link integer } " offset specifying where the slot value is stored inside instances of the relevant class. This is an implementation detail." }
+    { { $snippet "class" } " - a " { $link class } " declaring the set of possible values for the slot." }
+    { { $snippet "initial" } " - an initial value for the slot." }
+    { { $snippet "read-only" } " - a boolean indicating whether the slot is read only or not. Read only slots do not have a writer method associated with them." }
 } } ;
 
 HELP: define-typecheck
@@ -111,12 +132,7 @@ HELP: define-typecheck
     }
     "It checks if the top of the stack is an instance of " { $snippet "class" } ", and if so, executes the quotation. Delegation is respected."
 }
-{ $notes "This word is used internally to wrap low-level code that does not do type-checking in safe user-visible words. For example, see how " { $link word-name } " is implemented." } ;
-
-HELP: define-slot-word
-{ $values { "class" class } { "slot" "a positive integer" } { "word" word } { "quot" quotation } }
-{ $description "Defines " { $snippet "word" } " to be a simple type-checking generic word that receives the slot number on the stack as a fixnum." }
-$low-level-note ;
+{ $notes "This word is used internally to wrap unsafe low-level code in a type-checking stub." } ;
 
 HELP: define-reader
 { $values { "class" class } { "name" string } { "slot" integer } }

@@ -6,7 +6,7 @@ sequences arrays io.encodings io.ports io.streams.duplex
 io.encodings.ascii alien.strings io.binary accessors destructors
 classes debugger byte-arrays system combinators parser
 alien.c-types math.parser splitting grouping
-math assocs inspector ;
+math assocs summary system vocabs.loader combinators ;
 IN: io.sockets
 
 << {
@@ -308,3 +308,9 @@ M: invalid-inet-server summary
 
 M: inet (server)
     invalid-inet-server ;
+
+{
+    { [ os unix? ] [ "io.unix.sockets" require ] }
+    { [ os winnt? ] [ "io.windows.nt.sockets" require ] }
+    { [ os wince? ] [ "io.windows.ce.sockets" require ] }
+} cond

@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 ! 
 USING: tools.test kernel serialize io io.streams.byte-array math
-alien arrays byte-arrays sequences math prettyprint parser
-classes math.constants io.encodings.binary random
-assocs ;
+alien arrays byte-arrays bit-arrays float-arrays sequences math
+prettyprint parser classes math.constants io.encodings.binary
+random assocs ;
 IN: serialize.tests
 
 : test-serialize-cell

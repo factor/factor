@@ -28,7 +28,8 @@ $nl
     { { $link inet6 } " - a TCP/IP connection to an IPv6 address and port number; no name lookup is performed" }
 }
 "The " { $vocab-link "io.servers.connection" } " library defines high-level wrappers around " { $link <server> } " which makes it easy to listen for IPv4, IPv6 and secure socket connections simultaneously, perform logging, and optionally only allow connections from the loopback interface."
-{ $see-also "io.sockets.secure" } ;
+$nl
+"The " { $vocab-link "io.sockets.secure" } " vocabulary implements secure, encrypted sockets via SSL and TLS." ;
 
 ARTICLE: "network-packet" "Packet-oriented networking"
 "A packet-oriented socket can be opened with this word:"

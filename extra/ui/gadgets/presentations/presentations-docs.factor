@@ -1,5 +1,5 @@
 USING: help.markup help.syntax ui.gadgets.buttons
-ui.gadgets.menus models ui.operations inspector kernel
+ui.gadgets.menus models ui.operations summary kernel
 ui.gadgets.worlds ui.gadgets ;
 IN: ui.gadgets.presentations
 

@@ -21,6 +21,9 @@ global [
     sent-messages off
     super-sent-messages off
 
+    alien>objc-types off
+    objc>alien-types off
+
     ! We need this for strip-stack-traces to work fully
     { message-senders super-message-senders }
     [ get values compile ] each

@@ -1,9 +1,9 @@
-USING: arrays compiler.units generic hashtables inference kernel
-kernel.private math optimizer generator prettyprint sequences
-sbufs strings tools.test vectors words sequences.private
-quotations optimizer.backend classes classes.algebra
-inference.dataflow classes.tuple.private continuations growable
-optimizer.inlining namespaces hints ;
+USING: accessors arrays compiler.units generic hashtables
+inference kernel kernel.private math optimizer generator
+prettyprint sequences sbufs strings tools.test vectors words
+sequences.private quotations optimizer.backend classes
+classes.algebra inference.dataflow classes.tuple.private
+continuations growable optimizer.inlining namespaces hints ;
 IN: optimizer.tests
 
 [ H{ { 1 5 } { 3 4 } { 2 5 } } ] [
@@ -17,7 +17,7 @@ IN: optimizer.tests
 GENERIC: xyz ( obj -- obj )
 M: array xyz xyz ;
 
-[ t ] [ \ xyz compiled? ] unit-test
+[ t ] [ \ xyz compiled>> ] unit-test
 
 ! Test predicate inlining
 : pred-test-1
@@ -102,7 +102,7 @@ TUPLE: pred-test ;
 ! regression
 GENERIC: void-generic ( obj -- * )
 : breakage ( -- * ) "hi" void-generic ;
-[ t ] [ \ breakage compiled? ] unit-test
+[ t ] [ \ breakage compiled>> ] unit-test
 [ breakage ] must-fail
 
 ! regression
@@ -133,14 +133,18 @@ GENERIC: void-generic ( obj -- * )
 ! compiling <tuple> with a non-literal class failed
 : <tuple>-regression ( class -- tuple ) <tuple> ;
 
-[ t ] [ \ <tuple>-regression compiled? ] unit-test
+[ t ] [ \ <tuple>-regression compiled>> ] unit-test
 
 GENERIC: foozul ( a -- b )
 M: reversed foozul ;
 M: integer foozul ;
 M: slice foozul ;
 
-[ reversed ] [ reversed \ foozul specific-method ] unit-test
+[ t ] [
+    reversed \ foozul specific-method
+    reversed \ foozul method
+    eq?
+] unit-test
 
 ! regression
 : constant-fold-2 f ; foldable
@@ -247,21 +251,11 @@ TUPLE: silly-tuple a b ;
 : node-successor-f-bug ( x -- * )
     [ 3 throw ] [ empty-compound ] compose [ 3 throw ] if ;
 
-[ t ] [ \ node-successor-f-bug compiled? ] unit-test
+[ t ] [ \ node-successor-f-bug compiled>> ] unit-test
 
 [ ] [ [ new ] dataflow optimize drop ] unit-test
 
 [ ] [ [ <tuple> ] dataflow optimize drop ] unit-test
-
-! Make sure we have sane heuristics
-: should-inline? ( generic class -- ? ) method flat-length 10 <= ;
-
-[ t ] [ \ fixnum \ shift should-inline? ] unit-test
-[ f ] [ \ array \ equal? should-inline? ] unit-test
-[ f ] [ \ sequence \ hashcode* should-inline? ] unit-test
-[ t ] [ \ array \ nth-unsafe should-inline? ] unit-test
-[ t ] [ \ growable \ nth-unsafe should-inline? ] unit-test
-[ t ] [ \ sbuf \ set-nth-unsafe should-inline? ] unit-test
 
 ! Regression
 : lift-throw-tail-regression ( obj -- obj str )
@@ -271,7 +265,7 @@ TUPLE: silly-tuple a b ;
         ] if
     ] if ;
 
-[ t ] [ \ lift-throw-tail-regression compiled? ] unit-test
+[ t ] [ \ lift-throw-tail-regression compiled>> ] unit-test
 [ 3 "an integer" ] [ 3 lift-throw-tail-regression ] unit-test
 [ "hi" "a string" ] [ "hi" lift-throw-tail-regression ] unit-test
 
@@ -309,7 +303,7 @@ M: integer generic-inline-test ;
 
 ! Inlining all of the above should only take two passes
 [ { t f } ] [
-    \ generic-inline-test-1 word-def dataflow
+    \ generic-inline-test-1 def>> dataflow
     [ optimize-1 , optimize-1 , drop ] { } make
 ] unit-test
 
@@ -322,7 +316,7 @@ HINTS: recursive-inline-hang array ;
 : recursive-inline-hang-1 ( -- a )
     { } recursive-inline-hang ;
 
-[ t ] [ \ recursive-inline-hang-1 compiled? ] unit-test
+[ t ] [ \ recursive-inline-hang-1 compiled>> ] unit-test
 
 DEFER: recursive-inline-hang-3
 
@@ -356,3 +350,28 @@ USE: sequences.private
 [ ] [ \ member-test word-dataflow optimize 2drop ] unit-test
 [ t ] [ \ + member-test ] unit-test
 [ f ] [ \ append member-test ] unit-test
+
+! Infinite expansion
+TUPLE: cons car cdr ;
+
+UNION: improper-list cons POSTPONE: f ;
+
+PREDICATE: list < improper-list
+    [ cdr>> list instance? ] [ t ] if* ;
+
+[ t ] [
+    T{ cons f 1 T{ cons f 2 T{ cons f 3 f } } }
+    [ list instance? ] compile-call
+] unit-test
+
+! Regression
+: interval-inference-bug ( obj -- obj x )
+    dup "a" get { array-capacity } declare >=
+    [ dup "b" get { array-capacity } declare >= [ 3 ] [ 4 ] if ] [ 5 ] if ;
+
+\ interval-inference-bug must-infer
+
+[ ] [ 1 "a" set 2 "b" set ] unit-test
+[ 2 3 ] [ 2 interval-inference-bug ] unit-test
+[ 1 4 ] [ 1 interval-inference-bug ] unit-test
+[ 0 5 ] [ 0 interval-inference-bug ] unit-test

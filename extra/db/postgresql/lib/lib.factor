@@ -5,7 +5,7 @@ quotations sequences db.postgresql.ffi alien alien.c-types
 db.types tools.walker ascii splitting math.parser combinators
 libc shuffle calendar.format byte-arrays destructors prettyprint
 accessors strings serialize io.encodings.binary io.encodings.utf8
-alien.strings io.streams.byte-array inspector present urls ;
+alien.strings io.streams.byte-array summary present urls ;
 IN: db.postgresql.lib
 
 : postgresql-result-error-message ( res -- str/f )

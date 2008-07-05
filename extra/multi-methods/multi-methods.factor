@@ -157,7 +157,7 @@ M: method-body crossref?
     "forgotten" word-prop not ;
 
 : method-word-name ( specializer generic -- string )
-    [ word-name % "-" % unparse % ] "" make ;
+    [ name>> % "-" % unparse % ] "" make ;
 
 : method-word-props ( specializer generic -- assoc )
     [
@@ -168,7 +168,7 @@ M: method-body crossref?
 : <method> ( specializer generic -- word )
     [ method-word-props ] 2keep
     method-word-name f <word>
-    [ set-word-props ] keep ;
+    swap >>props ;
 
 : with-methods ( word quot -- )
     over >r >r "multi-methods" word-prop

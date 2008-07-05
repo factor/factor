@@ -1,19 +1,14 @@
-USING: alien.c-types io io.files io.ports kernel
-namespaces random io.encodings.binary init
-accessors system ;
+USING: alien.c-types io io.files kernel namespaces random
+io.encodings.binary init accessors system ;
 IN: random.unix
 
-TUPLE: unix-random path ;
+TUPLE: unix-random reader ;
 
-C: <unix-random> unix-random
-
-: file-read-unbuffered ( n path -- bytes )
-    over default-buffer-size [
-        binary [ read ] with-file-reader
-    ] with-variable ;
+: <unix-random> ( path -- random )
+    binary <file-reader> unix-random boa ;
 
 M: unix-random random-bytes* ( n tuple -- byte-array )
-    path>> file-read-unbuffered ;
+    reader>> stream-read ;
 
 os openbsd? [
     [

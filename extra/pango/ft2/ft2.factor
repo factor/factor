@@ -35,13 +35,13 @@ pango_ft2_render_layout ( FT_Bitmap* bitmap, PangoLayout* layout, int x, int y )
     FT_PIXEL_MODE_GRAY
     "FT_Bitmap" <c-object> dup >r
     {
-        set-FT_Bitmap-rows
-        set-FT_Bitmap-width
-        set-FT_Bitmap-pitch
-        set-FT_Bitmap-buffer
-        set-FT_Bitmap-num_grays
-        set-FT_Bitmap-pixel_mode
-    } set-slots r> ;
+        [ set-FT_Bitmap-pixel_mode ]
+        [ set-FT_Bitmap-num_grays  ]
+        [ set-FT_Bitmap-buffer     ]
+        [ set-FT_Bitmap-pitch      ]
+        [ set-FT_Bitmap-width      ]
+        [ set-FT_Bitmap-rows       ]
+    } cleave r> ;
 
 : render-layout ( layout -- dims alien )
     [ 

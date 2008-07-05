@@ -1,12 +1,12 @@
 USING: words kernel sequences combinators.lib locals
 locals.private accessors parser namespaces continuations
-inspector definitions arrays.lib arrays ;
+summary definitions arrays.lib arrays ;
 IN: descriptive
 
 ERROR: descriptive-error args underlying word ;
 
 M: descriptive-error summary
-    word>> "The " swap word-name " word encountered an error."
+    word>> "The " swap name>> " word encountered an error."
     3append ;
 
 <PRIVATE

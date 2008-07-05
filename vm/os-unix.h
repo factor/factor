@@ -6,6 +6,7 @@
 #include <sys/time.h>
 #include <dlfcn.h>
 #include <signal.h>
+#include <pthread.h>
 
 typedef char F_CHAR;
 typedef char F_SYMBOL;
@@ -38,5 +39,4 @@ void dump_stack_signal(int signal, siginfo_t* siginfo, void* uap);
 s64 current_millis(void);
 void sleep_millis(CELL msec);
 
-void reset_stdio(void);
 void open_console(void);

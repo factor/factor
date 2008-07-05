@@ -287,7 +287,7 @@ M: sbuf no-stack-effect-decl ;
 
 [ ] [ \ no-stack-effect-decl see ] unit-test
 
-[ ] [ \ no-stack-effect-decl word-def . ] unit-test
+[ ] [ \ no-stack-effect-decl def>> . ] unit-test
 
 ! Cross-referencing with generic words
 TUPLE: xref-tuple-1 ;

@@ -123,9 +123,12 @@ HELP: with-translation
 { $values { "loc" "a pair of integers" } { "quot" quotation } }
 { $description "Calls the quotation with a translation by " { $snippet "loc" } " pixels applied to the current " { $link GL_MODELVIEW } " matrix, restoring the matrix when the quotation is done." } ;
 
+
 ARTICLE: "gl-utilities" "OpenGL utility words"
-"In addition to the full OpenGL API, the " { $vocab-link "opengl" } " vocabulary includes some utility words to give OpenGL a more Factor-like feel."
+"The " { $vocab-link "opengl" } " vocabulary implements some utility words to give OpenGL a more Factor-like feel."
 $nl
+"The " { $vocab-link "opengl.gl" } " and " { $vocab-link "opengl.glu" } " vocabularies have the actual OpenGL bindings."
+{ $subsection "opengl-low-level" }
 "Wrappers:"
 { $subsection gl-color }
 { $subsection gl-vertex }

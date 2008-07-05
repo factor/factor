@@ -5,25 +5,12 @@ sequences.private growable float-arrays prettyprint.backend
 parser accessors ;
 IN: float-vectors
 
-TUPLE: float-vector underlying fill ;
-
-M: float-vector underlying underlying>> { float-array } declare ;
-
-M: float-vector set-underlying (>>underlying) ;
-
-M: float-vector length fill>> { array-capacity } declare ;
-
-M: float-vector set-fill (>>fill) ;
-
-<PRIVATE
-
-: float-array>vector ( float-array length -- float-vector )
-    float-vector boa ; inline
-
-PRIVATE>
+TUPLE: float-vector
+{ underlying float-array initial: F{ } }
+{ length array-capacity } ;
 
 : <float-vector> ( n -- float-vector )
-    0.0 <float-array> 0 float-array>vector ; inline
+    <float-array> 0 float-vector boa ; inline
 
 : >float-vector ( seq -- float-vector )
     T{ float-vector f F{ } 0 } clone-like ;
@@ -31,11 +18,11 @@ PRIVATE>
 M: float-vector like
     drop dup float-vector? [
         dup float-array?
-        [ dup length float-array>vector ] [ >float-vector ] if
+        [ dup length float-vector boa ] [ >float-vector ] if
     ] unless ;
 
 M: float-vector new-sequence
-    drop [ 0.0 <float-array> ] keep >fixnum float-array>vector ;
+    drop [ <float-array> ] [ >fixnum ] bi float-vector boa ;
 
 M: float-vector equal?
     over float-vector? [ sequence= ] [ 2drop f ] if ;

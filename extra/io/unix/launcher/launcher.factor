@@ -30,17 +30,14 @@ USE: unix
         } at set-priority
     ] when* ;
 
+: reset-fd ( fd -- )
+    [ F_SETFL 0 fcntl io-error ] [ F_SETFD 0 fcntl io-error ] bi ;
+
 : redirect-fd ( oldfd fd -- )
     2dup = [ 2drop ] [ dup2 io-error ] if ;
 
-: reset-fd ( fd -- )
-    #! We drop the error code because on *BSD, fcntl of
-    #! /dev/null fails.
-    [ F_SETFL 0 fcntl drop ]
-    [ F_SETFD 0 fcntl drop ] bi ;
-
 : redirect-inherit ( obj mode fd -- )
-    2nip reset-fd ;
+    3drop ;
 
 : redirect-file ( obj mode fd -- )
     >r >r normalize-path r> file-mode
