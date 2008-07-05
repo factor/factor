@@ -37,7 +37,7 @@ namespaces continuations layouts accessors ;
 
 [ ] [ "tetris" shake-and-bake ] unit-test
 
-[ t ] [ 1200000 small-enough? ] unit-test
+[ t ] [ 1500000 small-enough? ] unit-test
 
 [ ] [ "bunny" shake-and-bake ] unit-test
 
