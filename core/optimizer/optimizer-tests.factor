@@ -363,3 +363,15 @@ PREDICATE: list < improper-list
     T{ cons f 1 T{ cons f 2 T{ cons f 3 f } } }
     [ list instance? ] compile-call
 ] unit-test
+
+! Regression
+: interval-inference-bug ( obj -- obj x )
+    dup "a" get { array-capacity } declare >=
+    [ dup "b" get { array-capacity } declare >= [ 3 ] [ 4 ] if ] [ 5 ] if ;
+
+\ interval-inference-bug must-infer
+
+[ ] [ 1 "a" set 2 "b" set ] unit-test
+[ 2 3 ] [ 2 interval-inference-bug ] unit-test
+[ 1 4 ] [ 1 interval-inference-bug ] unit-test
+[ 0 5 ] [ 0 interval-inference-bug ] unit-test

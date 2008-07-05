@@ -1,5 +1,5 @@
 IN: alien.tests
-USING: alien alien.accessors alien.syntax byte-arrays arrays
+USING: accessors alien alien.accessors alien.syntax byte-arrays arrays
 kernel kernel.private namespaces tools.test sequences libc math
 system prettyprint layouts ;
 
@@ -64,6 +64,10 @@ cell 8 = [
 [ 1 1 <displaced-alien> ] must-fail
 
 [ f ] [ 0 B{ 1 2 3 } <displaced-alien> pinned-c-ptr? ] unit-test
+
+[ f ] [ 0 B{ 1 2 3 } <displaced-alien> 1 swap <displaced-alien> pinned-c-ptr? ] unit-test
+
+[ t ] [ 0 B{ 1 2 3 } <displaced-alien> 1 swap <displaced-alien> underlying>> byte-array? ] unit-test
 
 [ "( displaced alien )" ] [ 0 B{ 1 2 3 } <displaced-alien> unparse ] unit-test
 

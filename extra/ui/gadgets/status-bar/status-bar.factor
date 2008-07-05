@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors models sequences ui.gadgets.labels
-ui.gadgets.theme ui.gadgets.tracks ui.gadgets.worlds ui.gadgets
-ui kernel calendar ;
+USING: accessors models models.delay models.filter
+sequences ui.gadgets.labels ui.gadgets.theme ui.gadgets.tracks
+ui.gadgets.worlds ui.gadgets ui kernel calendar ;
 IN: ui.gadgets.status-bar
 
 : <status-bar> ( model -- gadget )

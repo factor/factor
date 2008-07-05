@@ -105,7 +105,9 @@ ERROR: no-next-method class generic ;
     ] [ ] make ;
 
 : single-effective-method ( obj word -- method )
-    [ order [ instance? ] with find-last nip ] keep method ;
+    [ [ order [ instance? ] with find-last nip ] keep method ]
+    [ "default-method" word-prop ]
+    bi or ;
 
 TUPLE: standard-combination # ;
 

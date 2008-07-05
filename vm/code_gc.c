@@ -308,6 +308,8 @@ DEFINE_PRIMITIVE(code_room)
 /* Dump all code blocks for debugging */
 void dump_heap(F_HEAP *heap)
 {
+	CELL size = 0;
+
 	F_BLOCK *scan = first_block(heap);
 
 	while(scan)
@@ -319,9 +321,11 @@ void dump_heap(F_HEAP *heap)
 			status = "free";
 			break;
 		case B_ALLOCATED:
+			size += object_size(block_to_compiled(scan)->relocation);
 			status = "allocated";
 			break;
 		case B_MARKED:
+			size += object_size(block_to_compiled(scan)->relocation);
 			status = "marked";
 			break;
 		default:
@@ -333,6 +337,8 @@ void dump_heap(F_HEAP *heap)
 
 		scan = next_block(heap,scan);
 	}
+	
+	printf("%ld bytes of relocation data\n",size);
 }
 
 /* Compute where each block is going to go, after compaction */

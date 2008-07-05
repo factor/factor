@@ -4,7 +4,7 @@ USING: accessors qualified io.streams.c init fry namespaces
 assocs kernel parser lexer strings.parser tools.deploy.config
 vocabs sequences words words.private memory kernel.private
 continuations io prettyprint vocabs.loader debugger system
-strings sets ;
+strings sets vectors quotations byte-arrays ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes
 QUALIFIED: command-line
@@ -79,8 +79,8 @@ IN: tools.deploy.shaker
     [
         [
             props>> swap
-            '[ drop , member? not ] assoc-filter
-            sift-assoc f assoc-like
+            '[ drop , member? not ] assoc-filter sift-assoc
+            dup assoc-empty? [ drop f ] [ >alist >vector ] if
         ] keep (>>props)
     ] with each ;
 
@@ -93,7 +93,10 @@ IN: tools.deploy.shaker
                 "compiled-uses"
                 "constraints"
                 "declared-effect"
+                "default"
+                "default-method"
                 "default-output-classes"
+                "derived-from"
                 "identities"
                 "if-intrinsics"
                 "infer"
@@ -103,15 +106,18 @@ IN: tools.deploy.shaker
                 "loc"
                 "members"
                 "methods"
+                "method-class"
+                "method-generic"
                 "combination"
                 "cannot-infer"
-                "default-method"
+                "no-compile"
                 "optimizer-hooks"
                 "output-classes"
                 "participants"
                 "predicate"
                 "predicate-definition"
                 "predicating"
+                "tuple-dispatch-generic"
                 "slots"
                 "slot-names"
                 "specializer"
@@ -127,6 +133,8 @@ IN: tools.deploy.shaker
         
         strip-prettyprint? [
             {
+                "break-before"
+                "break-after"
                 "delimiter"
                 "flushable"
                 "foldable"
@@ -265,13 +273,27 @@ IN: tools.deploy.shaker
         21 setenv
     ] [ drop ] if ;
 
+: compress ( pred string -- )
+    "Compressing " prepend show
+    instances
+    dup H{ } clone [ [ ] cache ] curry map
+    become ; inline
+
+: compress-byte-arrays ( -- )
+    [ byte-array? ] "byte arrays" compress ;
+
+: compress-quotations ( -- )
+    [ quotation? ] "quotations" compress ;
+
+: compress-strings ( -- )
+    [ string? ] "strings" compress ;
+
 : finish-deploy ( final-image -- )
     "Finishing up" show
     >r { } set-datastack r>
     { } set-retainstack
     V{ } set-namestack
     V{ } set-catchstack
-    
     "Saving final image" show
     [ save-image-and-exit ] call-clear ;
 
@@ -295,7 +317,10 @@ SYMBOL: deploy-vocab
     deploy-vocab get vocab-main set-boot-quot*
     stripped-word-props >r
     stripped-globals strip-globals
-    r> strip-words ;
+    r> strip-words
+    compress-byte-arrays
+    compress-quotations
+    compress-strings ;
 
 : (deploy) ( final-image vocab config -- )
     #! Does the actual work of a deployment in the slave
