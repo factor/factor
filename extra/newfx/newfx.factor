@@ -237,3 +237,9 @@ METHOD: as-mutate { object object assoc }       set-at ;
 
 : prepend!   ( a b -- ba  ) over append 0 pick copy ;
 : prepended! ( a b --     ) over append 0 rot  copy ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: insert ( seq i obj -- seq ) >r cut r> prefix append ;
+
+: splice ( seq i seq -- seq ) >r cut r> prepend append ;
