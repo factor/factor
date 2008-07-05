@@ -32,9 +32,6 @@ SYMBOL: implementors-map
 PREDICATE: class < word
     "class" word-prop ;
 
-PREDICATE: tuple-class < class
-    "metaclass" word-prop tuple-class eq? ;
-
 : classes ( -- seq ) implementors-map get keys ;
 
 : predicate-word ( word -- predicate )

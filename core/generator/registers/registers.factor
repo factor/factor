@@ -563,7 +563,7 @@ M: loc lazy-store
     ] if ;
 
 : class-tag ( class -- tag/f )
-    class-tags dup length 1 = [ first ] [ drop f ] if ;
+    dup [ class-tags dup length 1 = [ first ] [ drop f ] if ] when ;
 
 : class-matches? ( actual expected -- ? )
     {
