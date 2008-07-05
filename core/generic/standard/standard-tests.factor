@@ -309,3 +309,11 @@ M: xref-tuple-2 xref-test (xref-test) ;
     \ xref-test
     \ xref-tuple-2 \ xref-test method [ usage unique ] closure key?
 ] unit-test
+
+[ t ] [
+    { } \ nth effective-method nip \ sequence \ nth method eq?
+] unit-test
+
+[ t ] [
+    \ + \ nth effective-method nip dup \ nth "default-method" word-prop eq? and
+] unit-test
