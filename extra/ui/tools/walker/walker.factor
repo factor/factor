@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel concurrency.messaging inspector ui.tools.listener
 ui.tools.traceback ui.gadgets.buttons ui.gadgets.status-bar
-ui.gadgets.tracks ui.commands ui.gadgets models
+ui.gadgets.tracks ui.commands ui.gadgets models models.filter
 ui.tools.workspace ui.gestures ui.gadgets.labels ui threads
 namespaces tools.walker assocs combinators ;
 IN: ui.tools.walker

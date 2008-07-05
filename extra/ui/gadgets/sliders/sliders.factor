@@ -3,7 +3,8 @@
 USING: accessors arrays ui.gestures ui.gadgets ui.gadgets.buttons
 ui.gadgets.frames ui.gadgets.grids math.order
 ui.gadgets.theme ui.render kernel math namespaces sequences
-vectors models math.vectors math.functions quotations colors ;
+vectors models models.range math.vectors math.functions
+quotations colors ;
 IN: ui.gadgets.sliders
 
 TUPLE: elevator direction ;
