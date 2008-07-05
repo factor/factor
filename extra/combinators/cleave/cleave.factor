@@ -1,7 +1,15 @@
 
-USING: kernel arrays sequences macros combinators ;
+USING: kernel combinators quotations arrays sequences locals macros
+       shuffle combinators.lib ;
 
 IN: combinators.cleave
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+:: [ncleave] ( SEQ N -- quot )
+   SEQ [ [ N nkeep ] curry ] map concat [ N ndrop ] append >quotation ;
+
+MACRO: ncleave ( seq n -- quot ) [ncleave] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Cleave into array
