@@ -21,16 +21,16 @@ C: <double-blas-vector> double-blas-vector
 C: <float-complex-blas-vector> float-complex-blas-vector
 C: <double-complex-blas-vector> double-complex-blas-vector
 
-GENERIC: n*V+V-in-place ( n v1 v2 -- v2=n*v1+v2 )
-GENERIC: n*V-in-place   ( n v -- v=n*v )
+GENERIC: n*V+V-in-place ( alpha x y -- y=alpha*x+y )
+GENERIC: n*V-in-place   ( alpha x -- x=alpha*x )
 
-GENERIC: V. ( v1 v2 -- v1.v2 )
-GENERIC: V.conj ( v1 v2 -- v1^H.v2 )
-GENERIC: Vnorm ( v -- norm )
-GENERIC: Vasum ( v -- abs-sum )
-GENERIC: Vswap ( v1 v2 -- v1=v2 v2=v1 )
+GENERIC: V. ( x y -- x.y )
+GENERIC: V.conj ( x y -- xconj.y )
+GENERIC: Vnorm ( x -- norm2(x) )
+GENERIC: Vasum ( x -- sum(norm1(x[i]))
+GENERIC: Vswap ( x y -- x=y y=x )
 
-GENERIC: Viamax ( v -- abs-max-index )
+GENERIC: Viamax ( x -- i-where-x[i]=max(norm1(x[i])) )
 
 GENERIC: element-type ( v -- type )
 
@@ -130,12 +130,12 @@ MACRO: (set-complex-nth) ( set-nth-quot -- )
 
 PRIVATE>
 
-: zero-vector ( exemplar -- zero )
+: <zero-vector> ( exemplar -- zero )
     [ element-type <c-object> ]
     [ length>> 0 ]
     [ (blas-vector-like) ] tri ;
 
-: empty-vector ( length exemplar -- empty-vector )
+: <empty-vector> ( length exemplar -- <empty-vector> )
     [ element-type <c-array> ]
     [ 1 swap ] 2bi
     (blas-vector-like) ;
@@ -224,20 +224,20 @@ METHOD: n*V-in-place { number double-complex-blas-vector }
     [ (>z-complex) ] dip
     (prepare-scal) [ cblas_zscal ] dip ;
 
-: n*V+V ( n v1 v2 -- n*v1+v2 ) clone n*V+V-in-place ; inline
-: n*V ( n v1 -- n*v1 ) clone n*V-in-place ; inline
+: n*V+V ( alpha x y -- alpha*x+y ) clone n*V+V-in-place ; inline
+: n*V ( alpha x -- alpha*x ) clone n*V-in-place ; inline
 
-: V+ ( v1 v2 -- v1+v2 )
+: V+ ( x y -- x+y )
     1.0 -rot n*V+V ; inline
-: V- ( v1 v2 -- v1-v2 )
+: V- ( x y -- x-y )
     -1.0 spin n*V+V ; inline
 
-: Vneg ( v1 -- -v1 )
-    [ zero-vector ] keep V- ; inline
+: Vneg ( x -- -x )
+    -1.0 swap n*V ; inline
 
-: V*n ( v n -- v*n )
+: V*n ( x alpha -- x*alpha )
     swap n*V ; inline
-: V/n ( v n -- v*n )
+: V/n ( x alpha -- x/alpha )
     recip swap n*V ; inline
 
 METHOD: V. { float-blas-vector float-blas-vector }

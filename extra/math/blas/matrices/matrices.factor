@@ -200,7 +200,7 @@ syntax:M: blas-matrix-base clone
     ] keep (blas-matrix-like) ;
 
 ! XXX try rounding stride to next 128 bit bound for better vectorizin'
-: empty-matrix ( rows cols exemplar -- matrix )
+: <empty-matrix> ( rows cols exemplar -- matrix )
     [ element-type [ * ] dip <c-array> ]
     [ 2drop ]
     [ f swap (blas-matrix-like) ] 3tri ;
@@ -222,10 +222,10 @@ syntax:M: blas-matrix-base clone
     1.0 -rot n*M.V ; inline
 
 : n*V(*)V ( n x y -- n*x(*)y )
-    2dup [ length>> ] bi@ pick empty-matrix
+    2dup [ length>> ] bi@ pick <empty-matrix>
     n*V(*)V+M-in-place ;
 : n*V(*)Vconj ( n x y -- n*x(*)yconj )
-    2dup [ length>> ] bi@ pick empty-matrix
+    2dup [ length>> ] bi@ pick <empty-matrix>
     n*V(*)Vconj+M-in-place ;
 
 : V(*) ( x y -- x(*)y )
@@ -234,7 +234,7 @@ syntax:M: blas-matrix-base clone
     1.0 -rot n*V(*)Vconj ; inline
 
 : n*M.M ( n A B -- n*A.B )
-    2dup [ Mheight ] [ Mwidth ] bi* pick empty-matrix 
+    2dup [ Mheight ] [ Mwidth ] bi* pick <empty-matrix> 
     1.0 swap n*M.M+n*M-in-place ;
 
 : M. ( A B -- A.B )
