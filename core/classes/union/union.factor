@@ -32,3 +32,6 @@ M: union-class rank-class drop 2 ;
 
 M: union-class instance?
     "members" word-prop [ instance? ] with contains? ;
+
+M: union-class (flatten-class)
+    members <anonymous-union> (flatten-class) ;

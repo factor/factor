@@ -31,3 +31,6 @@ M: intersection-class rank-class drop 2 ;
 
 M: intersection-class instance?
     "participants" word-prop [ instance? ] with all? ;
+
+M: intersection-class (flatten-class)
+    participants <anonymous-intersection> (flatten-class) ;

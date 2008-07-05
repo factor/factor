@@ -207,9 +207,6 @@ GENERIC: (flatten-class) ( class -- )
 M: anonymous-union (flatten-class)
     members>> [ (flatten-class) ] each ;
 
-M: word (flatten-class)
-    normalize-class (flatten-class) ;
-
 : flatten-class ( class -- assoc )
     [ (flatten-class) ] H{ } make-assoc ;
 
