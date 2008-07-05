@@ -1,7 +1,7 @@
 USING: accessors alien alien.c-types arrays byte-arrays combinators
-fry kernel macros math math.blas.cblas math.complex math.functions
-math.order multi-methods qualified sequences sequences.private
-shuffle ;
+combinators.short-circuit fry kernel macros math math.blas.cblas
+math.complex math.functions math.order multi-methods qualified
+sequences sequences.private shuffle ;
 QUALIFIED: syntax
 IN: math.blas.vectors
 
@@ -135,10 +135,10 @@ PRIVATE>
     [ length>> 0 ]
     [ (blas-vector-like) ] tri ;
 
-: empty-vector ( exemplar -- empty-vector )
-    [ [ length>> ] [ element-type ] bi <c-array> ]
-    [ length>> 1 ]
-    [ (blas-vector-like) ] tri ;
+: empty-vector ( length exemplar -- empty-vector )
+    [ element-type <c-array> ]
+    [ 1 swap ] 2bi
+    (blas-vector-like) ;
 
 syntax:M: blas-vector-base length
     length>> ;
@@ -162,6 +162,12 @@ syntax:M: double-complex-blas-vector nth-unsafe
     (prepare-nth) (z-complex-nth) ;
 syntax:M: double-complex-blas-vector set-nth-unsafe
     (prepare-nth) (set-z-complex-nth) ;
+
+syntax:M: blas-vector-base equal?
+    {
+        [ [ length ] bi@ = ]
+        [ [ = ] 2all? ]
+    } 2&& ;
 
 : >float-blas-vector ( seq -- v )
     [ >c-float-array ] [ length ] bi 1 <float-blas-vector> ;
@@ -218,22 +224,21 @@ METHOD: n*V-in-place { number double-complex-blas-vector }
     [ (>z-complex) ] dip
     (prepare-scal) [ cblas_zscal ] dip ;
 
-: n*V+V ( n v1 v2 -- n*v1+v2 ) clone n*V+V-in-place ;
-: n*V ( n v1 -- n*v1 ) clone n*V-in-place ;
-! : n*V ( n v1 -- n*v1 ) dup empty-vector n*V+V-in-place ; ! XXX which is faster?
+: n*V+V ( n v1 v2 -- n*v1+v2 ) clone n*V+V-in-place ; inline
+: n*V ( n v1 -- n*v1 ) clone n*V-in-place ; inline
 
 : V+ ( v1 v2 -- v1+v2 )
-    1.0 -rot n*V+V ;
+    1.0 -rot n*V+V ; inline
 : V- ( v1 v2 -- v1-v2 )
-    -1.0 spin n*V+V ;
+    -1.0 spin n*V+V ; inline
 
 : Vneg ( v1 -- -v1 )
-    [ zero-vector ] keep V- ;
+    [ zero-vector ] keep V- ; inline
 
 : V*n ( v n -- v*n )
-    swap n*V ;
+    swap n*V ; inline
 : V/n ( v n -- v*n )
-    recip swap n*V ;
+    recip swap n*V ; inline
 
 METHOD: V. { float-blas-vector float-blas-vector }
     (prepare-dot) cblas_sdot ;
@@ -281,4 +286,4 @@ METHOD: Viamax { double-complex-blas-vector }
     (prepare-nrm2) cblas_izamax ;
 
 : Vamax ( v -- max )
-    [ Viamax ] keep nth ;
+    [ Viamax ] keep nth ; inline

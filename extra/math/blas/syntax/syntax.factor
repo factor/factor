@@ -1,4 +1,4 @@
-USING: kernel math.blas.vectors parser ;
+USING: kernel math.blas.matrices math.blas.vectors parser ;
 IN: math.blas.syntax
 
 : svector{ ( accum -- accum )
@@ -10,3 +10,11 @@ IN: math.blas.syntax
 : zvector{ ( accum -- accum )
     \ } [ >double-complex-blas-vector ] parse-literal ; parsing
 
+: smatrix{ ( accum -- accum )
+    \ } [ >float-blas-matrix ] parse-literal ; parsing
+: dmatrix{ ( accum -- accum )
+    \ } [ >double-blas-matrix ] parse-literal ; parsing
+: cmatrix{ ( accum -- accum )
+    \ } [ >float-complex-blas-matrix ] parse-literal ; parsing
+: zmatrix{ ( accum -- accum )
+    \ } [ >double-complex-blas-matrix ] parse-literal ; parsing
