@@ -81,17 +81,17 @@ HELP: Mheight
 HELP: n*M.V+n*V-in-place
 { $values { "alpha" "a number" } { "A" "an M-row, N-column BLAS matrix inherited from " { $link blas-matrix-base } } { "x" "an N-element BLAS vector inherited from " { $link blas-vector-base } } { "beta" "a number" } { "y" "an M-element BLAS vector inherited from " { $link blas-vector-base } } }
 { $description "Calculate the matrix-vector product " { $snippet "αAx + βy" } ", and overwrite the current contents of " { $snippet "y" } " with the result. The width of " { $snippet "A" } " must match the length of " { $snippet "x" } ", and the height must match the length of " { $snippet "y" } ". Corresponds to the xGEMV routines in BLAS." }
-{ $side-effects "The memory used by " { $snippet "y" } " is overwritten with the result." } ;
+{ $side-effects "y" } ;
 
 HELP: n*V(*)V+M-in-place
 { $values { "alpha" "a number" } { "x" "an M-element BLAS vector inherited from " { $link blas-vector-base } } { "y" "an N-element BLAS vector inherited from " { $link blas-vector-base } } { "A" "an M-row, N-column BLAS matrix inherited from " { $link blas-matrix-base } } }
 { $description "Calculate the outer product " { $snippet "αx⊗y + A" } " and overwrite the current contents of A with the result. The width of " { $snippet "A" } " must match the length of " { $snippet "y" } ", and its height must match the length of " { $snippet "x" } ". Corresponds to the xGER and xGERU routines in BLAS." }
-{ $side-effects "The memory used by " { $snippet "A" } " is overwritten with the result." } ;
+{ $side-effects "A" } ;
 
 HELP: n*V(*)Vconj+M-in-place
 { $values { "alpha" "a number" } { "x" "an M-element complex BLAS vector inherited from " { $link blas-vector-base } } { "y" "an N-element complex BLAS vector inherited from " { $link blas-vector-base } } { "A" "an M-row, N-column complex BLAS matrix inherited from " { $link blas-matrix-base } } }
 { $description "Calculate the conjugate outer product " { $snippet "αx⊗y̅ + A" } " and overwrite the current contents of A with the result. The width of " { $snippet "A" } " must match the length of " { $snippet "y" } ", and its height must match the length of " { $snippet "x" } ". Corresponds to the xGERC routines in BLAS." }
-{ $side-effects "The memory used by " { $snippet "A" } " is overwritten with the result." } ;
+{ $side-effects "A" } ;
 
 HELP: n*M.M+n*M-in-place
 { $values { "alpha" "a number" } { "A" "an M-row, K-column BLAS matrix inherited from " { $link blas-matrix-base } } { "B" "a K-row, N-column BLAS matrix inherited from " { $link blas-matrix-base } } { "beta" "a number" } { "C" "an M-row, N-column BLAS matrix inherited from " { $link blas-matrix-base } } }
@@ -172,7 +172,7 @@ HELP: Mcols
 HELP: n*M-in-place
 { $values { "n" "a number" } { "A" "A BLAS matrix inheriting from " { $link blas-matrix-base } } }
 { $description "Calculate the scalar-matrix product " { $snippet "nA" } " and overwrite the current contents of A with the result." }
-{ $side-effects "The memory used by " { $snippet "A" } " is overwritten with the result." } ;
+{ $side-effects "A" } ;
 
 HELP: n*M
 { $values { "n" "a number" } { "A" "A BLAS matrix inheriting from " { $link blas-matrix-base } } }
@@ -191,3 +191,12 @@ HELP: M/n
 HELP: Mtranspose
 { $values { "matrix" "A BLAS matrix inheriting from " { $link blas-matrix-base } } }
 { $description "Returns the transpose of " { $snippet "matrix" } ". The returned matrix shares storage with the original matrix." } ;
+
+HELP: element-type
+{ $values { "v" "a BLAS vector inheriting from " { $link blas-vector-base } ", or a BLAS matrix inheriting from " { $link blas-matrix-base } } }
+{ $description "Return the C type of the elements in the given BLAS vector or matrix." } ;
+
+HELP: <empty-vector>
+{ $values { "length" "The length of the new vector" } { "exemplar" "a BLAS vector inheriting from " { $link blas-vector-base } ", or a BLAS matrix inheriting from " { $link blas-matrix-base } } }
+{ $description "Return a vector of zeros with the given length and the same element type as " { $snippet "v" } "." } ;
+

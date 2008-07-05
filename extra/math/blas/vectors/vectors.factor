@@ -26,11 +26,11 @@ GENERIC: n*V-in-place   ( alpha x -- x=alpha*x )
 
 GENERIC: V. ( x y -- x.y )
 GENERIC: V.conj ( x y -- xconj.y )
-GENERIC: Vnorm ( x -- norm2(x) )
-GENERIC: Vasum ( x -- sum(norm1(x[i]))
+GENERIC: Vnorm ( x -- norm )
+GENERIC: Vasum ( x -- sum )
 GENERIC: Vswap ( x y -- x=y y=x )
 
-GENERIC: Viamax ( x -- i-where-x[i]=max(norm1(x[i])) )
+GENERIC: Viamax ( x -- max-i )
 
 GENERIC: element-type ( v -- type )
 

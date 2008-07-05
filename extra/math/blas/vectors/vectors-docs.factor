@@ -21,19 +21,19 @@ HELP: float-blas-vector
 HELP: double-blas-vector
 { $class-description "A vector of double-precision floating-point values. For details on the tuple layout, see " { $link blas-vector-base } "." } ;
 HELP: float-complex-blas-vector
-{ $class-description "A vector of single-precision floating-point complex values. Complex values are stored in memory as two consecutive float values, real part then imaginary part. For details on the tuple layout, see " { $link blas-matrix-base } "." } ;
+{ $class-description "A vector of single-precision floating-point complex values. Complex values are stored in memory as two consecutive float values, real part then imaginary part. For details on the tuple layout, see " { $link blas-vector-base } "." } ;
 HELP: double-complex-blas-vector
-{ $class-description "A vector of single-precision floating-point complex values. Complex values are stored in memory as two consecutive float values, real part then imaginary part. For details on the tuple layout, see " { $link blas-matrix-base } "." } ;
+{ $class-description "A vector of single-precision floating-point complex values. Complex values are stored in memory as two consecutive float values, real part then imaginary part. For details on the tuple layout, see " { $link blas-vector-base } "." } ;
 
 HELP: n*V+V-in-place
 { $values { "alpha" "a number" } { "x" "a BLAS vector inheriting from " { $link blas-vector-base } } { "y" "a BLAS vector inheriting from " { $link blas-vector-base } } }
 { $description "Calculate the vector sum " { $snippet "αx + y" } " and replace the existing contents of y with the result. Corresponds to the xAXPY routines in BLAS." }
-{ $side-effects "The memory used by y is overwritten with the result." } ;
+{ $side-effects "y" } ;
 
 HELP: n*V-in-place
 { $values { "alpha" "a number" } { "x" "a BLAS vector inheriting from " { $link blas-vector-base } } }
 { $description "Calculate the scalar-vector product " { $snippet "αx" } " and replace the existing contents of x with the result. Corresponds to the xSCAL routines in BLAS." }
-{ $side-effects "The memory used by x is overwritten with the result." } ;
+{ $side-effects "x" } ;
 
 HELP: V.
 { $values { "x" "a BLAS vector inheriting from " { $link blas-vector-base } } { "y" "a BLAS vector inheriting from " { $link blas-vector-base } } }
@@ -54,7 +54,7 @@ HELP: Vasum
 HELP: Vswap
 { $values { "x" "a BLAS vector inheriting from " { $link blas-vector-base } } { "y" "a BLAS vector inheriting from " { $link blas-vector-base } } }
 { $description "Swap the contents of " { $snippet "x" } " and " { $snippet "y" } " in place. Corresponds to the xSWAP routines in BLAS." }
-{ $side-effects "The memory contents of the two vectors are exchanged." } ;
+{ $side-effects "x" "y" } ;
 
 HELP: Viamax
 { $values { "x" "a BLAS vector inheriting from " { $link blas-vector-base } } }
@@ -66,17 +66,9 @@ HELP: Vamax
 
 { Viamax Vamax } related-words
 
-HELP: element-type
-{ $values { "v" "a BLAS vector inheriting from " { $link blas-vector-base } ", or a BLAS matrix inheriting from " { $link blas-matrix-base } } }
-{ $description "Return the C type of the elements in the given BLAS vector or matrix." } ;
-
 HELP: <zero-vector>
-{ $values { "exemplar" "a BLAS vector inheriting from " { $link blas-vector-base } " } }
+{ $values { "exemplar" "a BLAS vector inheriting from " { $link blas-vector-base } } }
 { $description "Return a vector of zeros with the same length and element type as " { $snippet "v" } ". The vector is constructed with an " { $snippet "inc" } " of zero, so it is not suitable for receiving results from BLAS functions; it is intended to be used as a term in other vector calculations. To construct an empty vector that can be used to receive results, see " { $link <empty-vector> } "." } ;
-
-HELP: <empty-vector>
-{ $values { "length" "The length of the new vector" } { "exemplar" "a BLAS vector inheriting from " { $link blas-vector-base } " } }
-{ $description "Return a vector of zeros with the given length and the same element type as " { $snippet "v" } "." } ;
 
 HELP: n*V+V
 { $values { "alpha" "a number" } { "x" "a BLAS vector inheriting from " { $link blas-vector-base } } { "y" "a BLAS vector inheriting from " { $link blas-vector-base } } }
