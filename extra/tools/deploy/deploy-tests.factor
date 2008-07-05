@@ -16,15 +16,15 @@ namespaces continuations layouts accessors ;
 
 [ ] [ "hello-world" shake-and-bake ] unit-test
 
-[ t ] [ 50000 small-enough? ] unit-test
+[ t ] [ 500000 small-enough? ] unit-test
 
 [ ] [ "sudoku" shake-and-bake ] unit-test
 
-[ t ] [ 80000 small-enough? ] unit-test
+[ t ] [ 800000 small-enough? ] unit-test
 
 [ ] [ "hello-ui" shake-and-bake ] unit-test
 
-[ t ] [ 130000 small-enough? ] unit-test
+[ t ] [ 1300000 small-enough? ] unit-test
 
 [ "staging.math-compiler-ui-strip.image" ] [
     "hello-ui" deploy-config
@@ -33,15 +33,15 @@ namespaces continuations layouts accessors ;
 
 [ ] [ "maze" shake-and-bake ] unit-test
 
-[ t ] [ 120000 small-enough? ] unit-test
+[ t ] [ 1200000 small-enough? ] unit-test
 
 [ ] [ "tetris" shake-and-bake ] unit-test
 
-[ t ] [ 120000 small-enough? ] unit-test
+[ t ] [ 1200000 small-enough? ] unit-test
 
 [ ] [ "bunny" shake-and-bake ] unit-test
 
-[ t ] [ 250000 small-enough? ] unit-test
+[ t ] [ 2500000 small-enough? ] unit-test
 
 {
     "tools.deploy.test.1"
