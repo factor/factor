@@ -73,12 +73,14 @@ M: bit-array byte-length length 7 + -3 shift ;
     \ } [ >bit-array ] parse-literal ; parsing
 
 : integer>bit-array ( int -- bit-array ) 
-    [ log2 1+ <bit-array> 0 ] keep
-    [ dup zero? not ] [
-        [ -8 shift ] [ 255 bitand ] bi
-        -roll [ [ >r underlying>> r> set-alien-unsigned-1 ] 2keep 1+ ] dip
-    ] [ ] while
-    2drop ;
+    dup zero? [ drop 0 <bit-array> ] [
+        [ log2 1+ <bit-array> 0 ] keep
+        [ dup zero? not ] [
+            [ -8 shift ] [ 255 bitand ] bi
+            -roll [ [ set-alien-unsigned-1 ] 2keep 1+ ] dip
+        ] [ ] while
+        2drop
+    ] if ;
 
 : bit-array>integer ( bit-array -- int )
     0 swap underlying>> [ length ] keep [
