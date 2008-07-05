@@ -288,6 +288,8 @@ INTERSECTION: generic-class generic class ;
     generic-class flatten-class
 ] unit-test
 
+[ \ + flatten-class ] must-fail
+
 INTERSECTION: empty-intersection ;
 
 [ t ] [ object empty-intersection class<= ] unit-test
