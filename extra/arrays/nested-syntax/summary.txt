@@ -1,1 +1,0 @@
-Shorthand syntax for defining arrays of quotations or arrays of arrays
