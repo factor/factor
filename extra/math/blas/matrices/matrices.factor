@@ -215,7 +215,7 @@ syntax:M: blas-matrix-base clone
     clone n*M.M+n*M-in-place ;
 
 : n*M.V ( alpha A x -- alpha*A.x )
-    1.0 2over [ Mheight ] dip empty-vector
+    1.0 2over [ Mheight ] dip <empty-vector>
     n*M.V+n*V-in-place ; inline
 
 : M.V ( A x -- A.x )

@@ -2,9 +2,9 @@ USING: alien alien.c-types alien.syntax kernel system combinators ;
 IN: math.blas.cblas
 
 << "cblas" {
-    { [ os macosx? ] [ "libcblas.dylib" "cdecl" add-library ] }
-    { [ os windows? ] [ "cblas.dll" "cdecl" add-library ] }
-    [ drop "libcblas.so" "cdecl" add-library ]
+    { [ os macosx? ] [ "libblas.dylib" "cdecl" add-library ] }
+    { [ os windows? ] [ "blas.dll" "cdecl" add-library ] }
+    [ "libblas.so" "cdecl" add-library ]
 } cond >>
 
 LIBRARY: cblas
