@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: init command-line namespaces words debugger io
+USING: accessors init command-line namespaces words debugger io
 kernel.private math memory continuations kernel io.files
 io.backend system parser vocabs sequences prettyprint
 vocabs.loader combinators splitting source-files strings
@@ -22,13 +22,13 @@ SYMBOL: bootstrap-time
     xref-sources ;
 
 : load-components ( -- )
-    "exclude" "include"
-    [ get-global " " split [ empty? not ] subset ] bi@
+    "include" "exclude"
+    [ get-global " " split harvest ] bi@
     diff
     [ "bootstrap." prepend require ] each ;
 
 : count-words ( pred -- )
-    all-words swap subset length number>string write ;
+    all-words swap count number>string write ;
 
 : print-report ( time -- )
     1000 /i
@@ -36,7 +36,7 @@ SYMBOL: bootstrap-time
     "Bootstrap completed in " write number>string write
     " minutes and " write number>string write " seconds." print
 
-    [ compiled? ] count-words " compiled words" print
+    [ compiled>> ] count-words " compiled words" print
     [ symbol? ] count-words " symbol words" print
     [ ] count-words " words total" print
 
@@ -44,16 +44,12 @@ SYMBOL: bootstrap-time
     "Now, you can run Factor:" print
     vm write " -i=" write "output-image" get print flush ;
 
-! Wrap everything in a catch which starts a listener so
-! you can see what went wrong, instead of dealing with a
-! fep
-
 ! We time bootstrap
 millis >r
 
 default-image-name "output-image" set-global
 
-"math compiler help random tools ui ui.tools io handbook" "include" set-global
+"math compiler help io random tools ui ui.tools unicode handbook" "include" set-global
 "" "exclude" set-global
 
 parse-command-line
@@ -91,7 +87,7 @@ f error-continuation set-global
             parse-command-line
             run-user-init
             "run" get run
-            stdio get [ stream-flush ] when*
+            output-stream get [ stream-flush ] when*
         ] [ print-error 1 exit ] recover
     ] set-boot-quot
 

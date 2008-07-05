@@ -1,6 +1,6 @@
 
 USING: kernel sequences quotations assocs math math.parser
-       combinators.lib vars lsys.strings ;
+       combinators.lib vars lsys.strings combinators.short-circuit ;
 
 IN: lsys.strings.interpret
 
@@ -22,7 +22,7 @@ VAR: command-table
 : exec-command* ( string -- )
   [ parameter ] [ command ] bi
   command-table> at dup
-  [ 1 tail* call ] [ 3drop ] if ;
+  [ 1 tail* call ] [ 2drop ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

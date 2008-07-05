@@ -20,6 +20,7 @@ DECLARE_PRIMITIVE(next_object);
 DECLARE_PRIMITIVE(end_scan);
 
 void gc(void);
+DLLEXPORT void minor_gc(void);
 
 /* generational copying GC divides memory into zones */
 typedef struct {
@@ -43,8 +44,14 @@ typedef struct {
 	F_ZONE *generations;
 	F_ZONE* semispaces;
 
+	CELL *allot_markers;
+	CELL *allot_markers_end;
+
 	CELL *cards;
 	CELL *cards_end;
+
+	CELL *decks;
+	CELL *decks_end;
 } F_DATA_HEAP;
 
 F_DATA_HEAP *data_heap;
@@ -61,34 +68,45 @@ the offset of the first object is set by the allocator. */
 #define CARD_POINTS_TO_NURSERY 0x80
 #define CARD_POINTS_TO_AGING 0x40
 #define CARD_MARK_MASK (CARD_POINTS_TO_NURSERY | CARD_POINTS_TO_AGING)
-#define CARD_BASE_MASK 0x3f
 typedef u8 F_CARD;
 
-/* A card is 64 bytes. 6 bits is sufficient to represent every
-offset within the card */
-#define CARD_SIZE 64
-#define CARD_BITS 6
+#define CARD_BITS 8
+#define CARD_SIZE (1<<CARD_BITS)
 #define ADDR_CARD_MASK (CARD_SIZE-1)
 
-INLINE void clear_card(F_CARD *c)
-{
-	*c = CARD_BASE_MASK; /* invalid value */
-}
-
 DLLEXPORT CELL cards_offset;
-void init_cards_offset(void);
 
 #define ADDR_TO_CARD(a) (F_CARD*)(((CELL)(a) >> CARD_BITS) + cards_offset)
 #define CARD_TO_ADDR(c) (CELL*)(((CELL)(c) - cards_offset)<<CARD_BITS)
 
-/* this is an inefficient write barrier. compiled definitions use a more
-efficient one hand-coded in assembly. the write barrier must be called
-any time we are potentially storing a pointer from an older generation
-to a younger one */
+typedef u8 F_DECK;
+
+#define DECK_BITS (CARD_BITS + 10)
+#define DECK_SIZE (1<<DECK_BITS)
+#define ADDR_DECK_MASK (DECK_SIZE-1)
+
+DLLEXPORT CELL decks_offset;
+
+#define ADDR_TO_DECK(a) (F_DECK*)(((CELL)(a) >> DECK_BITS) + decks_offset)
+#define DECK_TO_ADDR(c) (CELL*)(((CELL)(c) - decks_offset) << DECK_BITS)
+
+#define DECK_TO_CARD(d) (F_CARD*)((((CELL)(d) - decks_offset) << (DECK_BITS - CARD_BITS)) + cards_offset)
+
+#define ADDR_TO_ALLOT_MARKER(a) (F_CARD*)(((CELL)(a) >> CARD_BITS) + allot_markers_offset)
+#define CARD_OFFSET(c) (*((c) - (CELL)data_heap->cards + (CELL)data_heap->allot_markers))
+
+#define INVALID_ALLOT_MARKER 0xff
+
+DLLEXPORT CELL allot_markers_offset;
+
+void init_card_decks(void);
+
+/* the write barrier must be called any time we are potentially storing a
+pointer from an older generation to a younger one */
 INLINE void write_barrier(CELL address)
 {
-	F_CARD *c = ADDR_TO_CARD(address);
-	*c |= (CARD_POINTS_TO_NURSERY | CARD_POINTS_TO_AGING);
+	*ADDR_TO_CARD(address) = CARD_MARK_MASK;
+	*ADDR_TO_DECK(address) = CARD_MARK_MASK;
 }
 
 #define SLOT(obj,slot) (UNTAG(obj) + (slot) * CELLS)
@@ -102,11 +120,9 @@ INLINE void set_slot(CELL obj, CELL slot, CELL value)
 /* we need to remember the first object allocated in the card */
 INLINE void allot_barrier(CELL address)
 {
-	F_CARD *ptr = ADDR_TO_CARD(address);
-	F_CARD c = *ptr;
-	CELL b = (c & CARD_BASE_MASK);
-	CELL a = (address & ADDR_CARD_MASK);
-	*ptr = ((c & CARD_MARK_MASK) | ((b < a) ? b : a));
+	F_CARD *ptr = ADDR_TO_ALLOT_MARKER(address);
+	if(*ptr == INVALID_ALLOT_MARKER)
+		*ptr = (address & ADDR_CARD_MASK);
 }
 
 void clear_cards(CELL from, CELL to);
@@ -121,11 +137,13 @@ void collect_cards(void);
 /* the oldest generation */
 #define TENURED (data_heap->gen_count-1)
 
+#define MAX_GEN_COUNT 3
+
 /* used during garbage collection only */
 F_ZONE *newspace;
 
 /* new objects are allocated here */
-DLLEXPORT F_ZONE *nursery;
+DLLEXPORT F_ZONE nursery;
 
 INLINE bool in_zone(F_ZONE *z, CELL pointer)
 {
@@ -141,10 +159,18 @@ void init_data_heap(CELL gens,
 	bool secure_gc_);
 
 /* statistics */
-s64 gc_time;
-CELL nursery_collections;
-CELL aging_collections;
-CELL cards_scanned;
+typedef struct {
+	CELL collections;
+	CELL gc_time;
+	CELL max_gc_time;
+	CELL object_count;
+	u64 bytes_copied;
+} F_GC_STATS;
+
+F_GC_STATS gc_stats[MAX_GEN_COUNT];
+u64 cards_scanned;
+u64 decks_scanned;
+CELL code_heap_scans;
 
 /* only meaningful during a GC */
 bool performing_gc;
@@ -200,7 +226,7 @@ INLINE bool should_copy(CELL untagged)
 	else if(HAVE_AGING_P && collecting_gen == AGING)
 		return !in_zone(&data_heap->generations[TENURED],untagged);
 	else if(HAVE_NURSERY_P && collecting_gen == NURSERY)
-		return in_zone(&data_heap->generations[NURSERY],untagged);
+		return in_zone(&nursery,untagged);
 	else
 	{
 		critical_error("Bug in should_copy",untagged);
@@ -315,13 +341,15 @@ INLINE void* allot_object(CELL type, CELL a)
 {
 	CELL *object;
 
-	if(HAVE_NURSERY_P && nursery->size - ALLOT_BUFFER_ZONE > a)
+	if(HAVE_NURSERY_P && nursery.size - ALLOT_BUFFER_ZONE > a)
 	{
 		/* If there is insufficient room, collect the nursery */
-		if(nursery->here + ALLOT_BUFFER_ZONE + a > nursery->end)
+		if(nursery.here + ALLOT_BUFFER_ZONE + a > nursery.end)
 			garbage_collection(NURSERY,false,0);
 
-		object = allot_zone(nursery,a);
+		CELL h = nursery.here;
+		nursery.here = h + align8(a);
+		object = (void*)h;
 	}
 	/* If the object is bigger than the nursery, allocate it in
 	tenured space */
@@ -360,10 +388,9 @@ INLINE void* allot_object(CELL type, CELL a)
 
 CELL collect_next(CELL scan);
 
-DLLEXPORT void simple_gc(void);
-
 DECLARE_PRIMITIVE(gc);
-DECLARE_PRIMITIVE(gc_time);
+DECLARE_PRIMITIVE(gc_stats);
+DECLARE_PRIMITIVE(gc_reset);
 DECLARE_PRIMITIVE(become);
 
 CELL find_all_words(void);

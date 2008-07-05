@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel sequences math math.functions hints
-float-arrays ;
+math.order ;
 IN: math.vectors
 
 : vneg ( u -- v ) [ neg ] map ;
@@ -27,20 +27,20 @@ IN: math.vectors
 : set-axis ( u v axis -- w )
     dup length [ >r zero? 2over ? r> swap nth ] 2map 2nip ;
 
-HINTS: vneg { float-array } { array } ;
-HINTS: norm-sq { float-array } { array } ;
-HINTS: norm { float-array } { array } ;
-HINTS: normalize { float-array } { array } ;
+HINTS: vneg { array } ;
+HINTS: norm-sq { array } ;
+HINTS: norm { array } ;
+HINTS: normalize { array } ;
 
-HINTS: n*v { object float-array } { object array } ;
-HINTS: v*n { float-array object } { array object } ;
-HINTS: n/v { object float-array } { array } ;
-HINTS: v/n { float-array object } { array object } ;
+HINTS: n*v { object array } ;
+HINTS: v*n { array object } ;
+HINTS: n/v { array } ;
+HINTS: v/n { array object } ;
 
-HINTS: v+ { float-array float-array } { array array } ;
-HINTS: v- { float-array float-array } { array array } ;
-HINTS: v* { float-array float-array } { array array } ;
-HINTS: v/ { float-array float-array } { array array } ;
-HINTS: vmax { float-array float-array } { array array } ;
-HINTS: vmin { float-array float-array } { array array } ;
-HINTS: v. { float-array float-array } { array array } ;
+HINTS: v+ { array array } ;
+HINTS: v- { array array } ;
+HINTS: v* { array array } ;
+HINTS: v/ { array array } ;
+HINTS: vmax { array array } ;
+HINTS: vmin { array array } ;
+HINTS: v. { array array } ;

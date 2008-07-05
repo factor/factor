@@ -1,0 +1,1 @@
+Double-ended queues with sub-linear membership testing

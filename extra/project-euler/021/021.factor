@@ -1,7 +1,8 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.lib kernel math math.functions math.ranges namespaces
-    project-euler.common sequences sequences.lib ;
+    project-euler.common sequences sequences.lib
+    combinators.short-circuit ;
 IN: project-euler.021
 
 ! http://projecteuler.net/index.php?section=problems&id=21
@@ -27,7 +28,7 @@ IN: project-euler.021
 
 : amicable? ( n -- ? )
     dup sum-proper-divisors
-    { [ 2dup = not ] [ 2dup sum-proper-divisors = ] } && 2nip ;
+    { [ 2dup = not ] [ 2dup sum-proper-divisors = ] } 0&& 2nip ;
 
 : euler021 ( -- answer )
     10000 [1,b] [ dup amicable? [ drop 0 ] unless ] sigma ;

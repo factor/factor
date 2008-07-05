@@ -3,12 +3,12 @@
 USING: continuations definitions ui.tools.browser
 ui.tools.interactor ui.tools.listener ui.tools.profiler
 ui.tools.search ui.tools.traceback ui.tools.workspace generic
-help.topics inference inspector io.files io.styles kernel
+help.topics inference summary inspector io.files io.styles kernel
 namespaces parser prettyprint quotations tools.annotations
 editors tools.profiler tools.test tools.time tools.walker
 ui.commands ui.gadgets.editors ui.gestures ui.operations
 ui.tools.deploy vocabs vocabs.loader words sequences
-tools.vocabs classes compiler.units ;
+tools.vocabs classes compiler.units accessors ;
 IN: ui.tools.operations
 
 V{ } clone operations set-global
@@ -19,25 +19,25 @@ V{ } clone operations set-global
     { +listener+ t }
 } define-operation
 
-: com-prettyprint . ;
+: com-prettyprint ( obj -- ) . ;
 
 [ drop t ] \ com-prettyprint H{
     { +listener+ t }
 } define-operation
 
-: com-push ;
+: com-push ( obj -- obj ) ;
 
 [ drop t ] \ com-push H{
     { +listener+ t }
 } define-operation
 
-: com-unparse unparse listener-input ;
+: com-unparse ( obj -- ) unparse listener-input ;
 
 [ drop t ] \ com-unparse H{ } define-operation
 
 ! Input
 
-: com-input input-string listener-input ;
+: com-input ( obj -- ) string>> listener-input ;
 
 [ input? ] \ com-input H{
     { +primary+ t }
@@ -58,7 +58,7 @@ V{ } clone operations set-global
 } define-operation
 
 ! Pathnames
-: edit-file edit ;
+: edit-file ( pathname -- ) edit ;
 
 [ pathname? ] \ edit-file H{
     { +keyboard+ T{ key-down f { C+ } "E" } }
@@ -109,28 +109,29 @@ GENERIC: com-stack-effect ( obj -- )
 
 M: quotation com-stack-effect infer. ;
 
-M: word com-stack-effect word-def com-stack-effect ;
+M: word com-stack-effect def>> com-stack-effect ;
 
 [ word? ] \ com-stack-effect H{
     { +listener+ t }
 } define-operation
 
 ! Vocabularies
-: com-vocab-words get-workspace swap show-vocab-words ;
+: com-vocab-words ( vocab -- )
+    get-workspace swap show-vocab-words ;
 
 [ vocab? ] \ com-vocab-words H{
     { +secondary+ t }
     { +keyboard+ T{ key-down f { C+ } "B" } }
 } define-operation
 
-: com-enter-in vocab-name set-in ;
+: com-enter-in ( vocab -- ) vocab-name set-in ;
 
 [ vocab? ] \ com-enter-in H{
     { +keyboard+ T{ key-down f { C+ } "I" } }
     { +listener+ t }
 } define-operation
 
-: com-use-vocab vocab-name use+ ;
+: com-use-vocab ( vocab -- ) vocab-name use+ ;
 
 [ vocab-spec? ] \ com-use-vocab H{
     { +secondary+ t }
@@ -165,7 +166,8 @@ M: word com-stack-effect word-def com-stack-effect ;
     { +listener+ t }
 } define-operation
 
-: com-show-profile profiler-gadget call-tool ;
+: com-show-profile ( workspace -- )
+    profiler-gadget call-tool ;
 
 : com-profile ( quot -- ) profile f com-show-profile ;
 

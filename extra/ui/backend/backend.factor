@@ -5,6 +5,8 @@ IN: ui.backend
 
 SYMBOL: ui-backend
 
+HOOK: do-events ui-backend ( -- )
+
 HOOK: set-title ui-backend ( string world -- )
 
 HOOK: set-fullscreen* ui-backend ( ? world -- )
@@ -20,6 +22,8 @@ HOOK: raise-window* ui-backend ( world -- )
 HOOK: select-gl-context ui-backend ( handle -- )
 
 HOOK: flush-gl-context ui-backend ( handle -- )
+
+HOOK: beep ui-backend ( -- )
 
 : with-gl-context ( handle quot -- )
     swap [ select-gl-context call ] keep

@@ -1,5 +1,5 @@
-USING: kernel math math.constants math.functions math.private
-math.libm tools.test ;
+USING: kernel math math.constants math.functions math.order
+math.private math.libm tools.test ;
 IN: math.functions.tests
 
 [ t ] [ 4 4 .00000001 ~ ] unit-test
@@ -39,6 +39,16 @@ IN: math.functions.tests
 [ 0.0 ] [ 0 sin ] unit-test
 [ 0.0 ] [ 0 asin ] unit-test
 
+[ t ] [ 10 atan real? ] unit-test
+[ f ] [ 10 atanh real? ] unit-test
+
+[ t ] [ 10 asin sin 10 1.e-10 ~ ] unit-test
+[ t ] [ -1 sqrt neg dup acos cos 1.e-10 ~ ] unit-test
+[ t ] [ -100 atan tan -100 1.e-10 ~ ] unit-test
+[ t ] [ 10 asinh sinh 10 1.e-10 ~ ] unit-test
+[ t ] [ 10 atanh tanh 10 1.e-10 ~ ] unit-test
+[ t ] [ 0.5 atanh tanh 0.5 1.e-10 ~ ] unit-test
+
 [ 100 ] [ 100 100 gcd nip ] unit-test
 [ 100 ] [ 1000 100 gcd nip ] unit-test
 [ 100 ] [ 100 1000 gcd nip ] unit-test
@@ -63,7 +73,7 @@ IN: math.functions.tests
     gcd nip
 ] unit-test
 
-: verify-gcd
+: verify-gcd ( a b -- ? )
     2dup gcd
     >r rot * swap rem r> = ; 
 
@@ -80,9 +90,6 @@ IN: math.functions.tests
 [ 1/8 ] [ 1/2 3 ^ ] unit-test
 [ 1/8 ] [ 2 -3 ^ ] unit-test
 [ t ] [ 1 100 shift 2 100 ^ = ] unit-test
-
-[ t ] [ 256 power-of-2? ] unit-test
-[ f ] [ 123 power-of-2? ] unit-test
 
 [ 1 ] [ 7/8 ceiling ] unit-test
 [ 2 ] [ 3/2 ceiling ] unit-test

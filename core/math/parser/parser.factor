@@ -43,7 +43,7 @@ DEFER: base>
 SYMBOL: radix
 SYMBOL: negative?
 
-: sign negative? get "-" "+" ? ;
+: sign ( -- str ) negative? get "-" "+" ? ;
 
 : with-radix ( radix quot -- )
     radix swap with-variable ; inline
@@ -140,9 +140,9 @@ M: ratio >base
 
 M: float >base
     drop {
+        { [ dup fp-nan? ] [ drop "0.0/0.0" ] }
         { [ dup 1.0/0.0 = ] [ drop "1.0/0.0" ] }
         { [ dup -1.0/0.0 = ] [ drop "-1.0/0.0" ] }
-        { [ dup fp-nan? ] [ drop "0.0/0.0" ] }
         [ float>string fix-float ]
     } cond ;
 

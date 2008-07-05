@@ -1,4 +1,4 @@
-USING: parser kernel math sequences namespaces assocs inspector
+USING: parser lexer kernel math sequences namespaces assocs summary
 words splitting math.parser arrays sequences.next mirrors
 shuffle compiler.units ;
 IN: bitfields
@@ -93,7 +93,7 @@ M: check< summary drop "Number exceeds upper bound" ;
     >r keys r> define-slots ;
 
 : filter-pad ( slots -- slots )
-    [ drop padding-name? not ] assoc-subset ;
+    [ drop padding-name? not ] assoc-filter ;
 
 : define-bitfield ( classname slots -- ) 
     [
@@ -101,7 +101,7 @@ M: check< summary drop "Number exceeds upper bound" ;
         >ranges filter-pad [ define-setters ] 2keep define-accessors
     ] with-compilation-unit ;
 
-: parse-bitfield 
+: parse-bitfield ( -- )
     scan ";" parse-tokens parse-slots define-bitfield ;
 
 : BITFIELD:

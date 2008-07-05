@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays float-arrays kernel math math.constants math.functions math.matrices math.vectors math.quaternions random sequences ;
+USING: accessors arrays float-arrays kernel locals math math.constants math.functions math.matrices math.vectors math.quaternions random sequences ;
 IN: jamshred.oint
 
 ! An oint is a point with three linearly independent unit vectors
@@ -9,47 +9,28 @@ IN: jamshred.oint
 ! segment's location and orientation are given by an oint.
 
 TUPLE: oint location forward up left ;
-
-: <oint> ( location forward up left -- oint )
-    oint boa ;
-
-! : x-rotation ( theta -- matrix )
-!     #! construct this matrix:
-!     #! { { 1           0          0 }
-!     #!   { 0  cos(theta) sin(theta) }
-!     #!   { 0 -sin(theta) cos(theta) } }
-!     dup sin neg swap cos 2dup 0 -rot 3float-array >r
-!     swap neg 0 -rot 3float-array >r
-!     { 1 0 0 } r> r> 3float-array ;
-! 
-! : y-rotation ( theta -- matrix )
-!     #! costruct this matrix:
-!     #! { { cos(theta) 0 -sin(theta) }
-!     #!   {          0 1           0 }
-!     #!   { sin(theta) 0  cos(theta) } }
-!     dup sin swap cos 2dup
-!     0 swap 3float-array >r
-!     { 0 1 0 } >r
-!     0 rot neg 3float-array r> r> 3float-array ;
-
-: apply-to-oint ( oint quot -- )
-    #! apply quot to each of forward, up, and left, storing the results
-    over oint-forward over call pick set-oint-forward
-    over oint-up over call pick set-oint-up
-    over oint-left swap call swap set-oint-left ;
+C: <oint> oint
 
 : rotation-quaternion ( theta axis -- quaternion )
     swap 2 / dup cos swap sin rot n*v first3 rect> >r rect> r> 2array ;
 
+: rotate-vector ( q qrecip v -- v )
+    v>q swap q* q* q>v ;
+
 : rotate-oint ( oint theta axis -- )
-    rotation-quaternion dup qrecip
-    [ rot v>q swap q* q* q>v ] curry curry apply-to-oint ;
+    rotation-quaternion dup qrecip pick
+    [ forward>> rotate-vector >>forward ]
+    [ up>> rotate-vector >>up ]
+    [ left>> rotate-vector >>left ] 3tri drop ;
 
 : left-pivot ( oint theta -- )
-    over oint-left rotate-oint ;
+    over left>> rotate-oint ;
 
 : up-pivot ( oint theta -- )
-    over oint-up rotate-oint ;
+    over up>> rotate-oint ;
+
+: forward-pivot ( oint theta -- )
+    over forward>> rotate-oint ;
 
 : random-float+- ( n -- m )
     #! find a random float between -n/2 and n/2
@@ -58,11 +39,14 @@ TUPLE: oint location forward up left ;
 : random-turn ( oint theta -- )
     2 / 2dup random-float+- left-pivot random-float+- up-pivot ;
 
+: location+ ( v oint -- )
+    [ location>> v+ ] [ (>>location) ] bi ;
+
 : go-forward ( distance oint -- )
-    tuck oint-forward n*v over oint-location v+ swap set-oint-location ;
+    [ forward>> n*v ] [ location+ ] bi ;
 
 : distance-vector ( oint oint -- vector )
-    oint-location swap oint-location v- ;
+    [ location>> ] bi@ swap v- ;
 
 : distance ( oint oint -- distance )
     distance-vector norm ;
@@ -71,6 +55,19 @@ TUPLE: oint location forward up left ;
     #! the scalar projection of v1 onto v2
     tuck v. swap norm / ;
 
+: proj-perp ( u v -- w )
+    dupd proj v- ;
+
 : perpendicular-distance ( oint oint -- distance )
-    tuck distance-vector swap 2dup oint-left scalar-projection abs
-    -rot oint-up scalar-projection abs + ;
+    tuck distance-vector swap 2dup left>> scalar-projection abs
+    -rot up>> scalar-projection abs + ;
+
+:: reflect ( v n -- v' )
+    #! bounce v on a surface with normal n
+    v v n v. n n v. / 2 * n n*v v- ;
+
+: half-way ( p1 p2 -- p3 )
+    over v- 2 v/n v+ ;
+
+: half-way-between-oints ( o1 o2 -- p )
+    [ location>> ] bi@ half-way ;

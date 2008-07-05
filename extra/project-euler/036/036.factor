@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.lib kernel math.parser math.ranges project-euler.common
-    sequences ;
+    sequences combinators.short-circuit ;
 IN: project-euler.036
 
 ! http://projecteuler.net/index.php?section=problems&id=36
@@ -27,12 +27,12 @@ IN: project-euler.036
 
 : both-bases? ( n -- ? )
     { [ dup palindrome? ]
-      [ dup >bin dup reverse = ] } && nip ;
+      [ dup >bin dup reverse = ] } 0&& nip ;
 
 PRIVATE>
 
 : euler036 ( -- answer )
-    1 1000000 2 <range> [ both-bases? ] subset sum ;
+    1 1000000 2 <range> [ both-bases? ] filter sum ;
 
 ! [ euler036 ] 100 ave-time
 ! 3891 ms run / 173 ms GC ave time - 100 trials

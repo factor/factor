@@ -1,11 +1,10 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: bit-arrays byte-arrays float-arrays arrays
-generator.registers assocs kernel kernel.private libc math
+USING: byte-arrays arrays assocs kernel kernel.private libc math
 namespaces parser sequences strings words assocs splitting
 math.parser cpu.architecture alien alien.accessors quotations
 layouts system compiler.units io.files io.encodings.binary
-accessors combinators ;
+accessors combinators effects ;
 IN: alien.c-types
 
 DEFER: <int>
@@ -14,7 +13,7 @@ DEFER: *char
 : little-endian? ( -- ? ) 1 <int> *char 1 = ; foldable
 
 TUPLE: c-type
-boxer prep unboxer
+boxer boxer-quot unboxer unboxer-quot
 getter setter
 reg-class size align stack-align? ;
 
@@ -118,11 +117,7 @@ M: c-type stack-size c-type-size ;
 
 GENERIC: byte-length ( seq -- n ) flushable
 
-M: bit-array byte-length length 7 + -3 shift ;
-
 M: byte-array byte-length length ;
-
-M: float-array byte-length length "double" heap-size * ;
 
 : c-getter ( name -- quot )
     c-type c-type-getter [
@@ -149,22 +144,11 @@ M: float-array byte-length length "double" heap-size * ;
 : malloc-byte-array ( byte-array -- alien )
     dup length dup malloc [ -rot memcpy ] keep ;
 
-: malloc-char-string ( string -- alien )
-    string>char-alien malloc-byte-array ;
-
-: malloc-u16-string ( string -- alien )
-    string>u16-alien malloc-byte-array ;
-
 : memory>byte-array ( alien len -- byte-array )
     dup <byte-array> [ -rot memcpy ] keep ;
 
 : byte-array>memory ( byte-array base -- )
     swap dup length memcpy ;
-
-DEFER: >c-ushort-array
-
-: string>u16-memory ( string base -- )
-    >r >c-ushort-array r> byte-array>memory ;
 
 : (define-nth) ( word type quot -- )
     >r heap-size [ rot * ] swap prefix r> append define-inline ;
@@ -225,7 +209,8 @@ M: long-long-type box-return ( type -- )
     >r ">c-" swap "-array" 3append r> create ;
 
 : define-to-array ( type vocab -- )
-    [ to-array-word ] 2keep >c-array-quot define ;
+    [ to-array-word ] 2keep >c-array-quot
+    (( array -- byte-array )) define-declared ;
 
 : c-array>quot ( type vocab -- quot )
     [
@@ -238,7 +223,8 @@ M: long-long-type box-return ( type -- )
     >r "c-" swap "-array>" 3append r> create ;
 
 : define-from-array ( type vocab -- )
-    [ from-array-word ] 2keep c-array>quot define ;
+    [ from-array-word ] 2keep c-array>quot
+    (( c-ptr n -- array )) define-declared ;
 
 : define-primitive-type ( type name -- )
     "alien.c-types"
@@ -251,11 +237,10 @@ M: long-long-type box-return ( type -- )
     } 2cleave ;
 
 : expand-constants ( c-type -- c-type' )
-    #! We use word-def call instead of execute to get around
+    #! We use def>> call instead of execute to get around
     #! staging violations
     dup array? [
-        unclip >r [ dup word? [ word-def call ] when ] map
-        r> prefix
+        unclip >r [ dup word? [ def>> call ] when ] map r> prefix
     ] when ;
 
 : malloc-file-contents ( path -- alien len )
@@ -378,7 +363,7 @@ M: long-long-type box-return ( type -- )
         "box_float" >>boxer
         "to_float" >>unboxer
         single-float-regs >>reg-class
-        [ >float ] >>prep
+        [ >float ] >>unboxer-quot
     "float" define-primitive-type
 
     <c-type>
@@ -389,30 +374,10 @@ M: long-long-type box-return ( type -- )
         "box_double" >>boxer
         "to_double" >>unboxer
         double-float-regs >>reg-class
-        [ >float ] >>prep
+        [ >float ] >>unboxer-quot
     "double" define-primitive-type
 
-    <c-type>
-        [ alien-cell alien>char-string ] >>getter
-        [ set-alien-cell ] >>setter
-        bootstrap-cell >>size
-        bootstrap-cell >>align
-        "box_char_string" >>boxer
-        "alien_offset" >>unboxer
-        [ string>char-alien ] >>prep
-    "char*" define-primitive-type
-
-    "char*" "uchar*" typedef
-
-    <c-type>
-        [ alien-cell alien>u16-string ] >>getter
-        [ set-alien-cell ] >>setter
-        4 >>size
-        4 >>align
-        "box_u16_string" >>boxer
-        "alien_offset" >>unboxer
-        [ string>u16-alien ] >>prep
-    "ushort*" define-primitive-type
-
     os winnt? cpu x86.64? and "longlong" "long" ? "ptrdiff_t" typedef
+
+    "ulong" "size_t" typedef
 ] with-compilation-unit

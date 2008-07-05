@@ -1,10 +1,11 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel alien alien.syntax combinators alien.c-types
-       strings sequences namespaces words math threads ;
+USING: accessors kernel alien alien.strings alien.syntax
+combinators alien.c-types strings sequences namespaces words
+math threads io.encodings.ascii ;
 IN: odbc
 
-"odbc" "odbc32.dll" "stdcall" add-library
+<< "odbc" "odbc32.dll" "stdcall" add-library >>
 
 LIBRARY: odbc
 
@@ -150,7 +151,7 @@ FUNCTION: SQLRETURN SQLGetData ( SQLHSTMT statementHandle, SQLUSMALLINT columnNu
   SQL-HANDLE-STMT swap alloc-handle ;
 
 : temp-string ( length -- byte-array length )
-  [ CHAR: \space  <string> string>char-alien ] keep ;
+  [ CHAR: \space  <string> ascii string>alien ] keep ;
 
 : odbc-init ( -- env )
   alloc-env-handle
@@ -192,7 +193,7 @@ C: <column> column
 
 : odbc-describe-column ( statement n -- column )
   dup >r
-  1024 CHAR: \space <string> string>char-alien dup >r
+  1024 CHAR: \space <string> ascii string>alien dup >r
   1024
   0 <short>
   0 <short> dup >r
@@ -204,7 +205,7 @@ C: <column> column
     r> *short
     r> *uint
     r> *short convert-sql-type
-    r> alien>char-string
+    r> ascii alien>string
     r> <column>
   ] [
     r> drop r> drop r> drop r> drop r> drop r> drop
@@ -213,12 +214,12 @@ C: <column> column
 
 : dereference-type-pointer ( byte-array column -- object )
   column-type {
-    { SQL-CHAR [ alien>char-string ] }
-    { SQL-VARCHAR [ alien>char-string ] }
-    { SQL-LONGVARCHAR [ alien>char-string ] }
-    { SQL-WCHAR [ alien>char-string ] }
-    { SQL-WCHARVAR [ alien>char-string ] }
-    { SQL-WLONGCHARVAR [ alien>char-string ] }
+    { SQL-CHAR [ ascii alien>string ] }
+    { SQL-VARCHAR [ ascii alien>string ] }
+    { SQL-LONGVARCHAR [ ascii alien>string ] }
+    { SQL-WCHAR [ ascii alien>string ] }
+    { SQL-WCHARVAR [ ascii alien>string ] }
+    { SQL-WLONGCHARVAR [ ascii alien>string ] }
     { SQL-SMALLINT [ *short ] }
     { SQL-INTEGER [ *long ] }
     { SQL-REAL [ *float ] }
@@ -226,7 +227,7 @@ C: <column> column
     { SQL-DOUBLE [ *double ] }
     { SQL-TINYINT [ *char  ] }
     { SQL-BIGINT [ *longlong ] }
-    [ nip [ "Unknown SQL Type: " % word-name % ] "" make ]
+    [ nip [ "Unknown SQL Type: " % name>> % ] "" make ]
   } case ;
 
 TUPLE: field value column ;
@@ -236,7 +237,7 @@ C: <field> field
 : odbc-get-field ( statement column -- field )
   dup column? [ dupd odbc-describe-column ] unless dup >r column-number
   SQL-C-DEFAULT
-  8192 CHAR: \space <string> string>char-alien dup >r
+  8192 CHAR: \space <string> ascii string>alien dup >r
   8192
   f SQLGetData succeeded? [
     r> r> [ dereference-type-pointer ] keep <field>
@@ -244,7 +245,7 @@ C: <field> field
     r> drop r> [
       "SQLGetData Failed for Column: " %
       dup column-name %
-      " of type: " % dup column-type word-name %
+      " of type: " % dup column-type name>> %
     ] "" make swap <field>
   ] if ;
 

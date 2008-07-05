@@ -4,7 +4,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: io kernel namespaces prettyprint quotations
-sequences strings words xml.entities compiler.units effects ;
+sequences strings words xml.entities compiler.units effects
+urls math math.parser combinators present fry ;
 
 IN: html.elements
 
@@ -57,57 +58,57 @@ SYMBOL: html
 : print-html ( str -- )
     write-html "\n" write-html ;
 
+<<
+
 : html-word ( name def effect -- )
     #! Define 'word creating' word to allow
     #! dynamically creating words.
     >r >r elements-vocab create r> r> define-declared ;
 
-: <foo> "<" swap ">" 3append ;
-
-: empty-effect T{ effect f 0 0 } ;
+: <foo> ( str -- <str> ) "<" swap ">" 3append ;
 
 : def-for-html-word-<foo> ( name -- )
     #! Return the name and code for the <foo> patterned
     #! word.
-    dup <foo> swap [ <foo> write-html ] curry
-    empty-effect html-word ;
+    dup <foo> swap '[ , <foo> write-html ]
+    (( -- )) html-word ;
 
-: <foo "<" prepend ;
+: <foo ( str -- <str ) "<" prepend ;
 
 : def-for-html-word-<foo ( name -- )
     #! Return the name and code for the <foo patterned
     #! word.
-    <foo dup [ write-html ] curry
-    empty-effect html-word ;
+    <foo dup '[ , write-html ]
+    (( -- )) html-word ;
 
-: foo> ">" append ;
+: foo> ( str -- foo> ) ">" append ;
 
 : def-for-html-word-foo> ( name -- )
     #! Return the name and code for the foo> patterned
     #! word.
-    foo> [ ">" write-html ] empty-effect html-word ;
+    foo> [ ">" write-html ] (( -- )) html-word ;
 
-: </foo> "</" swap ">" 3append ;
+: </foo> ( str -- </str> ) "</" swap ">" 3append ;
 
 : def-for-html-word-</foo> ( name -- )
     #! Return the name and code for the </foo> patterned
     #! word.
-    </foo> dup [ write-html ] curry empty-effect html-word ;
+    </foo> dup '[ , write-html ] (( -- )) html-word ;
 
-: <foo/> "<" swap "/>" 3append ;
+: <foo/> ( str -- <str/> ) "<" swap "/>" 3append ;
 
 : def-for-html-word-<foo/> ( name -- )
     #! Return the name and code for the <foo/> patterned
     #! word.
-    dup <foo/> swap [ <foo/> write-html ] curry
-    empty-effect html-word ;
+    dup <foo/> swap '[ , <foo/> write-html ]
+    (( -- )) html-word ;
 
-: foo/> "/>" append ;
+: foo/> ( str -- str/> ) "/>" append ;
 
 : def-for-html-word-foo/> ( name -- )
     #! Return the name and code for the foo/> patterned
     #! word.
-    foo/> [ "/>" write-html ] empty-effect html-word ;
+    foo/> [ "/>" write-html ] (( -- )) html-word ;
 
 : define-closed-html-word ( name -- )
     #! Given an HTML tag name, define the words for
@@ -128,39 +129,53 @@ SYMBOL: html
     " " write-html
     write-html
     "='" write-html
-    escape-quoted-string write-html
+    present escape-quoted-string write-html
     "'" write-html ;
-
-: attribute-effect T{ effect f { "string" } 0 } ;
 
 : define-attribute-word ( name -- )
     dup "=" prepend swap
-    [ write-attr ] curry attribute-effect html-word ;
+    '[ , write-attr ] (( string -- )) html-word ;
 
+! Define some closed HTML tags
 [
-    ! Define some closed HTML tags
-    [
-        "h1" "h2" "h3" "h4" "h5" "h6" "h7" "h8" "h9"
-        "ol" "li" "form" "a" "p" "html" "head" "body" "title"
-        "b" "i" "ul" "table" "tbody" "tr" "td" "th" "pre" "textarea"
-        "script" "div" "span" "select" "option" "style"
-    ] [ define-closed-html-word ] each
+    "h1" "h2" "h3" "h4" "h5" "h6" "h7" "h8" "h9"
+    "ol" "li" "form" "a" "p" "html" "head" "body" "title"
+    "b" "i" "ul" "table" "tbody" "tr" "td" "th" "pre" "textarea"
+    "script" "div" "span" "select" "option" "style" "input"
+] [ define-closed-html-word ] each
 
-    ! Define some open HTML tags
-    [
-        "input"
-        "br"
-        "link"
-        "img"
-    ] [ define-open-html-word ] each
+! Define some open HTML tags
+[
+    "input"
+    "br"
+    "link"
+    "img"
+] [ define-open-html-word ] each
 
-    ! Define some attributes
-    [
-        "method" "action" "type" "value" "name"
-        "size" "href" "class" "border" "rows" "cols"
-        "id" "onclick" "style" "valign" "accesskey"
-        "src" "language" "colspan" "onchange" "rel"
-        "width" "selected" "onsubmit" "xmlns" "lang" "xml:lang"
-        "media" "title"
-    ] [ define-attribute-word ] each
-] with-compilation-unit
+! Define some attributes
+[
+    "method" "action" "type" "value" "name"
+    "size" "href" "class" "border" "rows" "cols"
+    "id" "onclick" "style" "valign" "accesskey"
+    "src" "language" "colspan" "onchange" "rel"
+    "width" "selected" "onsubmit" "xmlns" "lang" "xml:lang"
+    "media" "title" "multiple" "checked"
+] [ define-attribute-word ] each
+
+>>
+
+: xhtml-preamble ( -- )
+    "<?xml version=\"1.0\"?>" write-html
+    "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">" write-html ;
+
+: simple-page ( title quot -- )
+    #! Call the quotation, with all output going to the
+    #! body of an html page with the given title.
+    xhtml-preamble
+    <html "http://www.w3.org/1999/xhtml" =xmlns "en" =xml:lang "en" =lang html>
+        <head> <title> swap write </title> </head>
+        <body> call </body>
+    </html> ; inline
+
+: render-error ( message -- )
+    <span "error" =class span> escape-string write </span> ;

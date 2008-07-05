@@ -10,11 +10,12 @@ USING: alien alien.syntax combinators kernel system ;
 IN: openssl.libcrypto
 
 <<
-"libcrypto" {
-    { [ os winnt? ]  [ "libeay32.dll" "cdecl" ] }
-    { [ os macosx? ] [ "libcrypto.dylib" "cdecl" ] }
-    { [ os unix? ]   [ "libcrypto.so" "cdecl" ] }
-} cond add-library
+{
+    { [ os openbsd? ] [ ] } ! VM is linked with it
+    { [ os winnt? ] [ "libcrypto" "libeay32.dll" "cdecl" add-library ] }
+    { [ os macosx? ] [ "libcrypto" "libcrypto.dylib" "cdecl" add-library ] }
+    { [ os unix? ] [ "libcrypto" "libcrypto.so" "cdecl" add-library ] }
+} cond
 >>
 
 C-STRUCT: bio-method
@@ -88,6 +89,8 @@ FUNCTION: int BIO_puts ( void* bp, char* buf ) ;
 
 FUNCTION: ulong ERR_get_error (  ) ;
 
+FUNCTION: void ERR_clear_error ( ) ;
+
 FUNCTION: char* ERR_error_string ( ulong e, void* buf ) ;
 
 FUNCTION: void* BIO_f_buffer (  ) ;
@@ -95,6 +98,17 @@ FUNCTION: void* BIO_f_buffer (  ) ;
 ! ===============================================
 ! evp.h
 ! ===============================================
+
+: EVP_MAX_MD_SIZE 64 ;
+
+C-STRUCT: EVP_MD_CTX
+    { "EVP_MD*" "digest" }
+    { "ENGINE*" "engine" }
+    { "ulong" "flags" }
+    { "void*" "md_data" } ;
+
+TYPEDEF: void* EVP_MD*
+TYPEDEF: void* ENGINE*
 
 ! Initialize ciphers and digest tables
 FUNCTION: void OpenSSL_add_all_ciphers (  ) ;
@@ -104,18 +118,34 @@ FUNCTION: void OpenSSL_add_all_digests (  ) ;
 ! Clean them up before exiting
 FUNCTION: void EVP_cleanup (  ) ;
 
-FUNCTION: void* EVP_get_digestbyname ( char* name ) ;
+FUNCTION: EVP_MD* EVP_get_digestbyname ( char* name ) ;
 
-FUNCTION: void EVP_MD_CTX_init ( void* ctx ) ;
+FUNCTION: void EVP_MD_CTX_init ( EVP_MD* ctx ) ;
+
+FUNCTION: int EVP_MD_CTX_cleanup ( EVP_MD_CTX* ctx ) ;
+
+FUNCTION: EVP_MD_CTX* EVP_MD_CTX_create ( ) ;
+
+FUNCTION: void EVP_MD_CTX_destroy ( EVP_MD_CTX* ctx ) ;
+
+FUNCTION: int EVP_MD_CTX_copy_ex ( EVP_MD_CTX* out, EVP_MD_CTX* in ) ;  
+
+FUNCTION: int EVP_DigestInit_ex ( EVP_MD_CTX* ctx, EVP_MD* type, ENGINE* impl ) ;
+
+FUNCTION: int EVP_DigestUpdate ( EVP_MD_CTX* ctx, void* d, uint cnt ) ;
+
+FUNCTION: int EVP_DigestFinal_ex ( EVP_MD_CTX* ctx, void* md, uint* s ) ;
+
+FUNCTION: int EVP_Digest ( void* data, uint count, void* md, uint* size, EVP_MD* type, ENGINE* impl ) ;
+
+FUNCTION: int EVP_MD_CTX_copy ( EVP_MD_CTX* out, EVP_MD_CTX* in ) ;  
+
+FUNCTION: int EVP_DigestInit ( EVP_MD_CTX* ctx, EVP_MD* type ) ;
+
+FUNCTION: int EVP_DigestFinal ( EVP_MD_CTX* ctx, void* md, uint* s ) ;
 
 FUNCTION: void* PEM_read_bio_DHparams ( void* bp, void* x, void* cb,
                                         void* u ) ;
-
-! ===============================================
-! md5.h
-! ===============================================
-
-FUNCTION: uchar* MD5 ( uchar* d, ulong n, uchar* md ) ;
 
 ! ===============================================
 ! rsa.h

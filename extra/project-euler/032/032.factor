@@ -31,11 +31,11 @@ IN: project-euler.032
 
 : 1and4 ( n -- ? )
     number>string 1 cut-slice 4 cut-slice
-    [ string>number ] 3apply [ * ] dip = ;
+    [ string>number ] tri@ [ * ] dip = ;
 
 : 2and3 ( n -- ? )
     number>string 2 cut-slice 3 cut-slice
-    [ string>number ] 3apply [ * ] dip = ;
+    [ string>number ] tri@ [ * ] dip = ;
 
 : valid? ( n -- ? )
     dup 1and4 swap 2and3 or ;
@@ -46,7 +46,7 @@ IN: project-euler.032
 PRIVATE>
 
 : euler032 ( -- answer )
-    source-032 [ valid? ] subset products prune sum ;
+    source-032 [ valid? ] filter products prune sum ;
 
 ! [ euler032 ] 10 ave-time
 ! 23922 ms run / 1505 ms GC ave time - 10 trials
@@ -65,12 +65,12 @@ PRIVATE>
 
 ! multiplicand/multiplier/product
 : mmp ( pair -- n )
-    first2 2dup * [ number>string ] 3apply 3append string>number ;
+    first2 2dup * [ number>string ] tri@ 3append string>number ;
 
 PRIVATE>
 
 : euler032a ( -- answer )
-    source-032a [ mmp ] map [ pandigital? ] subset products prune sum ;
+    source-032a [ mmp ] map [ pandigital? ] filter products prune sum ;
 
 ! [ euler032a ] 100 ave-time
 ! 5978 ms run / 327 ms GC ave time - 100 trials

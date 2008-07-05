@@ -6,28 +6,32 @@ ui.gadgets.paragraphs ui.gadgets.incremental ui.gadgets.packs
 ui.gadgets.theme ui.clipboards ui.gestures ui.traverse ui.render
 hashtables io kernel namespaces sequences io.styles strings
 quotations math opengl combinators math.vectors
-io.streams.duplex sorting splitting io.streams.nested assocs
+sorting splitting io.streams.nested assocs
 ui.gadgets.presentations ui.gadgets.slots ui.gadgets.grids
-ui.gadgets.grid-lines classes.tuple models continuations ;
+ui.gadgets.grid-lines classes.tuple models continuations
+destructors accessors ;
 IN: ui.gadgets.panes
 
 TUPLE: pane output current prototype scrolls?
 selection-color caret mark selecting? ;
 
 : clear-selection ( pane -- )
-    f over set-pane-caret
-    f swap set-pane-mark ;
+    f >>caret
+    f >>mark
+    drop ;
 
-: add-output 2dup set-pane-output add-gadget ;
+: add-output ( current pane -- )
+    [ set-pane-output ] [ add-gadget ] 2bi ;
 
-: add-current 2dup set-pane-current add-gadget ;
+: add-current ( current pane -- )
+    [ set-pane-current ] [ add-gadget ] 2bi ;
 
 : prepare-line ( pane -- )
-    dup clear-selection
-    dup pane-prototype clone swap add-current ;
+    [ clear-selection ]
+    [ [ pane-prototype clone ] keep add-current ] bi ;
 
 : pane-caret&mark ( pane -- caret mark )
-    dup pane-caret swap pane-mark ;
+    [ caret>> ] [ mark>> ] bi ;
 
 : selected-children ( pane -- seq )
     [ pane-caret&mark sort-pair ] keep gadget-subtree ;
@@ -38,17 +42,18 @@ M: pane gadget-selection
     selected-children gadget-text ;
 
 : pane-clear ( pane -- )
-    dup clear-selection
-    dup pane-output clear-incremental
-    pane-current clear-gadget ;
+    [ clear-selection ]
+    [ pane-output clear-incremental ]
+    [ pane-current clear-gadget ]
+    tri ;
 
-: pane-theme ( editor -- )
-    selection-color swap set-pane-selection-color ;
+: pane-theme ( pane -- )
+    selection-color >>selection-color drop ;
 
 : <pane> ( -- pane )
     pane new
     <pile> over set-delegate
-    <shelf> over set-pane-prototype
+    <shelf> >>prototype
     <pile> <incremental> over add-output
     dup prepare-line
     dup pane-theme ;
@@ -113,14 +118,14 @@ GENERIC: write-gadget ( gadget stream -- )
 M: pane-stream write-gadget
     pane-stream-pane pane-current add-gadget ;
 
-M: duplex-stream write-gadget
-    duplex-stream-out write-gadget ;
+M: style-stream write-gadget
+    stream>> write-gadget ;
 
 : print-gadget ( gadget stream -- )
     tuck write-gadget stream-nl ;
 
 : gadget. ( gadget -- )
-    stdio get print-gadget ;
+    output-stream get print-gadget ;
 
 : ?nl ( stream -- )
     dup pane-stream-pane pane-current gadget-children empty?
@@ -129,7 +134,7 @@ M: duplex-stream write-gadget
 : with-pane ( pane quot -- )
     over scroll>top
     over pane-clear >r <pane-stream> r>
-    over >r with-stream* r> ?nl ; inline
+    over >r with-output-stream* r> ?nl ; inline
 
 : make-pane ( quot -- gadget )
     <pane> [ swap with-pane ] keep smash-pane ; inline
@@ -177,7 +182,7 @@ M: pane-stream make-span-stream
     foreground [ over set-label-color ] apply-style ;
 
 : apply-background-style ( style gadget -- style gadget )
-    background [ dupd solid-interior ] apply-style ;
+    background [ solid-interior ] apply-style ;
 
 : specified-font ( style -- font )
     [ font swap at "monospace" or ] keep
@@ -202,15 +207,15 @@ M: pane-stream make-span-stream
 
 : apply-wrap-style ( style pane -- style pane )
     wrap-margin [
-        2dup <paragraph> swap set-pane-prototype
-        <paragraph> over set-pane-current
+        2dup <paragraph> >>prototype drop
+        <paragraph> >>current
     ] apply-style ;
 
 : apply-border-color-style ( style gadget -- style gadget )
-    border-color [ dupd solid-boundary ] apply-style ;
+    border-color [ solid-boundary ] apply-style ;
 
 : apply-page-color-style ( style gadget -- style gadget )
-    page-color [ dupd solid-interior ] apply-style ;
+    page-color [ solid-interior ] apply-style ;
 
 : apply-path-style ( style gadget -- style gadget )
     presented-path [ <editable-slot> ] apply-style ;
@@ -219,9 +224,7 @@ M: pane-stream make-span-stream
     border-width [ <border> ] apply-style ;
 
 : apply-printer-style ( style gadget -- style gadget )
-    presented-printer [
-        [ make-pane ] curry over set-editable-slot-printer
-    ] apply-style ;
+    presented-printer [ [ make-pane ] curry >>printer ] apply-style ;
 
 : style-pane ( style pane -- pane )
     apply-border-width-style
@@ -289,11 +292,8 @@ M: pack dispose drop ;
 M: paragraph dispose drop ;
 
 : gadget-write ( string gadget -- )
-    over empty? [
-        2drop
-    ] [
-        >r <label> dup text-theme r> add-gadget
-    ] if ;
+    over empty?
+    [ 2drop ] [ >r <label> text-theme r> add-gadget ] if ;
 
 M: pack stream-write gadget-write ;
 
@@ -367,11 +367,11 @@ M: f sloppy-pick-up*
 
 : extend-selection ( pane -- )
     hand-moved? [
-        dup pane-selecting? [
+        dup selecting?>> [
             dup move-caret
         ] [
             dup hand-clicked get child? [
-                t over set-pane-selecting?
+                t >>selecting?
                 dup hand-clicked set-global
                 dup move-caret
                 dup caret>mark
@@ -381,10 +381,9 @@ M: f sloppy-pick-up*
     ] when drop ;
 
 : end-selection ( pane -- )
-    f over set-pane-selecting?
+    f >>selecting?
     hand-moved? [
-        dup com-copy-selection
-        request-focus
+        [ com-copy-selection ] [ request-focus ] bi
     ] [
         relayout-1
     ] if ;

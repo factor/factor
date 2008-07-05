@@ -1,6 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.lib kernel math project-euler.common sequences sorting ;
+USING: combinators.lib kernel math project-euler.common sequences
+sorting combinators.short-circuit ;
 IN: project-euler.052
 
 ! http://projecteuler.net/index.php?section=problems&id=52
@@ -29,7 +30,7 @@ IN: project-euler.052
     [ number>digits natural-sort ] map all-equal? ;
 
 : candidate? ( n -- ? )
-    { [ dup odd? ] [ dup 3 mod zero? ] } && nip ;
+    { [ dup odd? ] [ dup 3 mod zero? ] } 0&& nip ;
 
 : next-all-same ( x n -- n )
     dup candidate? [

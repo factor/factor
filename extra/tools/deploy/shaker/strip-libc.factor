@@ -1,10 +1,10 @@
 USING: libc.private ;
 IN: libc
 
-: malloc (malloc) check-ptr ;
+: malloc ( size -- newalien ) (malloc) check-ptr ;
 
-: realloc (realloc) check-ptr ;
+: realloc ( alien size -- newalien ) (realloc) check-ptr ;
 
-: calloc (calloc) check-ptr ;
+: calloc ( size count -- newalien ) (calloc) check-ptr ;
 
-: free (free) ;
+: free ( alien -- ) (free) ;

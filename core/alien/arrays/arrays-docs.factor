@@ -18,7 +18,6 @@ ARTICLE: "c-arrays-factor" "Converting C arrays to and from Factor arrays"
 { $subsection >c-ushort-array    }
 { $subsection >c-void*-array     }
 { $subsection c-bool-array>      }
-{ $subsection c-char*-array>     }
 { $subsection c-char-array>      }
 { $subsection c-double-array>    }
 { $subsection c-float-array>     }
@@ -30,7 +29,6 @@ ARTICLE: "c-arrays-factor" "Converting C arrays to and from Factor arrays"
 { $subsection c-uint-array>      }
 { $subsection c-ulong-array>     }
 { $subsection c-ulonglong-array> }
-{ $subsection c-ushort*-array>   }
 { $subsection c-ushort-array>    }
 { $subsection c-void*-array>     } ;
 
@@ -61,9 +59,7 @@ ARTICLE: "c-arrays-get/set" "Reading and writing elements in C arrays"
 { $subsection double-nth }
 { $subsection set-double-nth }
 { $subsection void*-nth }
-{ $subsection set-void*-nth }
-{ $subsection char*-nth }
-{ $subsection ushort*-nth } ;
+{ $subsection set-void*-nth } ;
 
 ARTICLE: "c-arrays" "C arrays"
 "C arrays are allocated in the same manner as other C data; see " { $link "c-byte-arrays" } " and " { $link "malloc" } "."

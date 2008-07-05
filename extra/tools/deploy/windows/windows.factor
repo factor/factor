@@ -2,13 +2,15 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.files kernel namespaces sequences system
 tools.deploy.backend tools.deploy.config assocs hashtables
-prettyprint windows.shell32 windows.user32 ;
+prettyprint combinators windows.shell32 windows.user32 ;
 IN: tools.deploy.windows
 
 : copy-dlls ( bundle-name -- )
-    { "freetype6.dll" "zlib1.dll" "factor.dll" }
-    [ resource-path ] map
-    swap copy-files-into ;
+    {
+        "resource:freetype6.dll"
+        "resource:zlib1.dll"
+        "resource:factor.dll"
+    } swap copy-files-into ;
 
 : create-exe-dir ( vocab bundle-name -- vm )
     dup copy-dlls
@@ -16,11 +18,15 @@ IN: tools.deploy.windows
     ".exe" copy-vm ;
 
 M: winnt deploy*
-    "." resource-path [
-        dup deploy-config [
-            [ deploy-name get create-exe-dir ] keep
-            [ deploy-name get image-name ] keep
-            [ namespace make-deploy-image ] keep
-            (normalize-path) open-in-explorer
-        ] bind
+    "resource:" [
+        deploy-name over deploy-config at
+        [
+            {
+                [ create-exe-dir ]
+                [ image-name ]
+                [ drop ]
+                [ drop deploy-config ]
+            } 2cleave make-deploy-image
+        ]
+        [ nip open-in-explorer ] 2bi
     ] with-directory ;

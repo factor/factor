@@ -14,18 +14,13 @@ C: <handle> handle
 
 SINGLETON: cocoa-ui-backend
 
-SYMBOL: stop-after-last-window?
-
-: event-loop? ( -- ? )
-    stop-after-last-window? get-global
-    [ windows get-global empty? not ] [ t ] if ;
-
-: event-loop ( -- )
-    event-loop? [
+M: cocoa-ui-backend do-events ( -- )
+    [
         [
-            [ NSApp do-events ui-wait ] ui-try
-        ] with-autorelease-pool event-loop
-    ] when ;
+            NSApp [ dup do-event ] [ ] [ ] while drop
+            ui-wait
+        ] ui-try
+    ] with-autorelease-pool ;
 
 TUPLE: pasteboard handle ;
 
@@ -105,6 +100,9 @@ M: cocoa-ui-backend select-gl-context ( handle -- )
 
 M: cocoa-ui-backend flush-gl-context ( handle -- )
     handle-view -> openGLContext -> flushBuffer ;
+
+M: cocoa-ui-backend beep ( -- )
+    NSBeep ;
 
 SYMBOL: cocoa-init-hook
 

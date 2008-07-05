@@ -12,7 +12,7 @@ bool to_boolean(CELL value)
 	return value != F;
 }
 
-CELL clone(CELL object)
+CELL clone_object(CELL object)
 {
 	CELL size = object_size(object);
 	if(size == 0)
@@ -31,7 +31,7 @@ CELL clone(CELL object)
 
 DEFINE_PRIMITIVE(clone)
 {
-	drepl(clone(dpeek()));
+	drepl(clone_object(dpeek()));
 }
 
 F_WORD *allot_word(CELL vocab, CELL name)
@@ -197,7 +197,7 @@ DEFINE_PRIMITIVE(resize_array)
 	dpush(tag_object(reallot_array(array,capacity,F)));
 }
 
-F_ARRAY *growable_add(F_ARRAY *result, CELL elt, CELL *result_count)
+F_ARRAY *growable_array_add(F_ARRAY *result, CELL elt, CELL *result_count)
 {
 	REGISTER_ROOT(elt);
 
@@ -209,12 +209,12 @@ F_ARRAY *growable_add(F_ARRAY *result, CELL elt, CELL *result_count)
 
 	UNREGISTER_ROOT(elt);
 	set_array_nth(result,*result_count,elt);
-	*result_count = *result_count + 1;
+	(*result_count)++;
 
 	return result;
 }
 
-F_ARRAY *growable_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_count)
+F_ARRAY *growable_array_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_count)
 {
 	REGISTER_UNTAGGED(elts);
 
@@ -228,7 +228,7 @@ F_ARRAY *growable_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_count)
 
 	write_barrier((CELL)result);
 
-	memcpy((void*)AREF(result,*result_count),(void*)AREF(elts,0),elts_size * CELLS);
+	memcpy((void *)AREF(result,*result_count),(void *)AREF(elts,0),elts_size * CELLS);
 
 	*result_count += elts_size;
 
@@ -283,106 +283,18 @@ DEFINE_PRIMITIVE(resize_byte_array)
 	dpush(tag_object(reallot_byte_array(array,capacity)));
 }
 
-/* Bit arrays */
-
-/* size is in bits */
-
-F_BIT_ARRAY *allot_bit_array_internal(CELL size)
+F_BYTE_ARRAY *growable_byte_array_append(F_BYTE_ARRAY *result, void *elts, CELL len, CELL *result_count)
 {
-	F_BIT_ARRAY *array = allot_object(BIT_ARRAY_TYPE,bit_array_size(size));
-	array->capacity = tag_fixnum(size);
-	return array;
-}
+	CELL new_size = *result_count + len;
 
-F_BIT_ARRAY *allot_bit_array(CELL size)
-{
-	F_BIT_ARRAY *array = allot_bit_array_internal(size);
-	memset(array + 1,0,bit_array_size(size));
-	return array;
-}
+	if(new_size >= byte_array_capacity(result))
+		result = reallot_byte_array(result,new_size * 2);
 
-/* push a new bit array on the stack */
-DEFINE_PRIMITIVE(bit_array)
-{
-	CELL size = unbox_array_size();
-	dpush(tag_object(allot_bit_array(size)));
-}
+	memcpy((void *)BREF(result,*result_count),elts,len);
 
-F_BIT_ARRAY *reallot_bit_array(F_BIT_ARRAY *array, CELL capacity)
-{
-	CELL to_copy = array_capacity(array);
-	if(capacity < to_copy)
-		to_copy = capacity;
+	*result_count = new_size;
 
-	REGISTER_UNTAGGED(array);
-	F_BIT_ARRAY *new_array = allot_bit_array(capacity);
-	UNREGISTER_UNTAGGED(array);
-
-	memcpy(new_array + 1,array + 1,bit_array_size(to_copy));
-
-	return new_array;
-}
-
-DEFINE_PRIMITIVE(resize_bit_array)
-{
-	F_BYTE_ARRAY* array = untag_bit_array(dpop());
-	CELL capacity = unbox_array_size();
-	dpush(tag_object(reallot_bit_array(array,capacity)));
-}
-
-/* Float arrays */
-
-/* size is in 8-byte doubles */
-F_FLOAT_ARRAY *allot_float_array_internal(CELL size)
-{
-	F_FLOAT_ARRAY *array = allot_object(FLOAT_ARRAY_TYPE,
-		float_array_size(size));
-	array->capacity = tag_fixnum(size);
-	return array;
-}
-
-F_FLOAT_ARRAY *allot_float_array(CELL size, double initial)
-{
-	F_FLOAT_ARRAY *array = allot_float_array_internal(size);
-
-	double *elements = (double *)AREF(array,0);
-	int i;
-	for(i = 0; i < size; i++)
-		elements[i] = initial;
-
-	return array;
-}
-
-/* push a new float array on the stack */
-DEFINE_PRIMITIVE(float_array)
-{
-	double initial = untag_float(dpop());
-	CELL size = unbox_array_size();
-	dpush(tag_object(allot_float_array(size,initial)));
-}
-
-F_ARRAY *reallot_float_array(F_FLOAT_ARRAY* array, CELL capacity)
-{
-	F_FLOAT_ARRAY* new_array;
-
-	CELL to_copy = array_capacity(array);
-	if(capacity < to_copy)
-		to_copy = capacity;
-
-	REGISTER_UNTAGGED(array);
-	new_array = allot_float_array(capacity,0.0);
-	UNREGISTER_UNTAGGED(array);
-
-	memcpy(new_array + 1,array + 1,to_copy * sizeof(double));
-
-	return new_array;
-}
-
-DEFINE_PRIMITIVE(resize_float_array)
-{
-	F_FLOAT_ARRAY* array = untag_float_array(dpop());
-	CELL capacity = unbox_array_size();
-	dpush(tag_object(reallot_float_array(array,capacity)));
+	return result;
 }
 
 /* Tuple layouts */
@@ -608,10 +520,6 @@ DEFINE_PRIMITIVE(resize_string)
 	void box_##type##_string(const type *str) \
 	{ \
 		dpush(str ? tag_object(from_##type##_string(str)) : F); \
-	} \
-	DEFINE_PRIMITIVE(alien_to_##type##_string) \
-	{ \
-		drepl(tag_object(from_##type##_string(alien_offset(dpeek())))); \
 	}
 
 MEMORY_TO_STRING(char,u8)
@@ -671,14 +579,6 @@ F_BYTE_ARRAY *allot_c_string(CELL capacity, CELL size)
 	type *unbox_##type##_string(void) \
 	{ \
 		return to_##type##_string(untag_string(dpop()),true); \
-	} \
-	DEFINE_PRIMITIVE(string_to_##type##_alien) \
-	{ \
-		CELL string, t; \
-		string = dpeek(); \
-		t = type_of(string); \
-		if(t != ALIEN_TYPE && t != BYTE_ARRAY_TYPE && t != F_TYPE) \
-			drepl(tag_object(string_to_##type##_alien(untag_string(string),true))); \
 	}
 
 STRING_TO_MEMORY(char);

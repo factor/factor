@@ -1,8 +1,9 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs continuations kernel math models
 namespaces opengl sequences io combinators math.vectors
-ui.gadgets ui.gestures ui.render ui.backend inspector ;
+ui.gadgets ui.gestures ui.render ui.backend summary
+debugger ;
 IN: ui.gadgets.worlds
 
 TUPLE: world < identity-tuple
@@ -12,7 +13,7 @@ title status
 fonts handle
 loc ;
 
-: find-world [ world? ] find-parent ;
+: find-world ( gadget -- world ) [ world? ] find-parent ;
 
 M: f world-status ;
 
@@ -48,9 +49,6 @@ M: world request-focus-on ( child gadget -- )
 
 M: world hashcode* drop world hashcode* ;
 
-M: world pref-dim*
-    delegate pref-dim* [ >fixnum ] map { 1024 768 } vmin ;
-
 M: world layout*
     dup delegate layout*
     dup world-glass [
@@ -81,7 +79,8 @@ TUPLE: world-error world ;
 
 SYMBOL: ui-error-hook
 
-: ui-error ( error -- ) ui-error-hook get call ;
+: ui-error ( error -- )
+    ui-error-hook get [ call ] [ print-error ] if* ;
 
 [ rethrow ] ui-error-hook set-global
 

@@ -1,0 +1,34 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>Edit Blog</t:title>
+
+	<t:form t:action="$planet-factor/admin/edit-blog" t:for="id">
+
+		<table>
+
+			<tr>
+				<th class="field-label">Blog name:</th>
+				<td><t:field t:name="name" /></td>
+			</tr>
+
+			<tr>
+				<th class="field-label">Home page:</th>
+				<td><t:field t:name="www-url" /></td>
+			</tr>
+
+			<tr>
+				<th class="field-label">Feed:</th>
+				<td><t:field t:name="feed-url" /></td>
+			</tr>
+
+		</table>
+
+		<input type="SUBMIT" value="Done" />
+
+	</t:form>
+
+	<t:button t:action="$planet-factor/admin/delete-blog" t:for="id" class="link-button link">Delete</t:button>
+
+</t:chloe>

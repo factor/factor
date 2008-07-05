@@ -1,8 +1,8 @@
-! Copyright (C) 2003, 2007 Slava Pestov.
+! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io kernel math namespaces sequences sbufs strings
-generic splitting growable continuations io.streams.plain
-io.encodings io.encodings.private ;
+USING: accessors io kernel math namespaces sequences sbufs
+strings generic splitting continuations destructors
+io.streams.plain io.encodings math.order growable ;
 IN: io.streams.string
 
 M: growable dispose drop ;
@@ -15,18 +15,19 @@ M: growable stream-flush drop ;
     512 <sbuf> ;
 
 : with-string-writer ( quot -- str )
-    <string-writer> swap [ stdio get ] compose with-stream*
+    <string-writer> swap [ output-stream get ] compose with-output-stream*
     >string ; inline
 
 M: growable stream-read1 dup empty? [ drop f ] [ pop ] if ;
 
 : harden-as ( seq growble-exemplar -- newseq )
-    underlying like ;
+    underlying>> like ;
 
 : growable-read-until ( growable n -- str )
     >fixnum dupd tail-slice swap harden-as dup reverse-here ;
 
-: find-last-sep swap [ memq? ] curry find-last drop ;
+: find-last-sep ( seq seps -- n )
+    swap [ memq? ] curry find-last drop ;
 
 M: growable stream-read-until
     [ find-last-sep ] keep over [
@@ -49,14 +50,14 @@ M: growable stream-read
 M: growable stream-read-partial
     stream-read ;
 
-TUPLE: null ;
+SINGLETON: null
 M: null decode-char drop stream-read1 ;
 
 : <string-reader> ( str -- stream )
     >sbuf dup reverse-here null <decoder> ;
 
 : with-string-reader ( str quot -- )
-    >r <string-reader> r> with-stream ; inline
+    >r <string-reader> r> with-input-stream ; inline
 
 INSTANCE: growable plain-writer
 
@@ -67,17 +68,13 @@ INSTANCE: growable plain-writer
     ] unless ;
 
 : map-last ( seq quot -- seq )
-    swap dup length <reversed>
-    [ zero? rot [ call ] keep swap ] 2map nip ; inline
+    >r dup length <reversed> [ zero? ] r> compose 2map ; inline
 
 : format-table ( table -- seq )
     flip [ format-column ] map-last
     flip [ " " join ] map ;
 
 M: plain-writer stream-write-table
-    [ drop format-table [ print ] each ] with-stream* ;
+    [ drop format-table [ print ] each ] with-output-stream* ;
 
 M: plain-writer make-cell-stream 2drop <string-writer> ;
-
-M: growable stream-readln ( stream -- str )
-    "\r\n" over stream-read-until handle-readln ;

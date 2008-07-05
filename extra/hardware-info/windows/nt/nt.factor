@@ -1,4 +1,4 @@
-USING: alien alien.c-types
+USING: alien alien.c-types alien.strings
 kernel libc math namespaces hardware-info.backend
 windows windows.advapi32 windows.kernel32 system ;
 IN: hardware-info.windows.nt
@@ -35,12 +35,15 @@ M: winnt total-virtual-mem ( -- n )
 M: winnt available-virtual-mem ( -- n )
     memory-status MEMORYSTATUSEX-ullAvailVirtual ;
 
+: pull-win32-string ( alien -- string )
+    [ utf16n alien>string ] keep free ;
+
 : computer-name ( -- string )
     MAX_COMPUTERNAME_LENGTH 1+ [ malloc ] keep
     <int> dupd GetComputerName zero? [
         free win32-error f
     ] [
-        [ alien>u16-string ] keep free
+        pull-win32-string
     ] if ;
  
 : username ( -- string )
@@ -48,5 +51,5 @@ M: winnt available-virtual-mem ( -- n )
     <int> dupd GetUserName zero? [
         free win32-error f
     ] [
-        [ alien>u16-string ] keep free
+        pull-win32-string
     ] if ;

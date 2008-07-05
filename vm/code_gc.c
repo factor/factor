@@ -257,11 +257,12 @@ void iterate_code_heap(CODE_HEAP_ITERATOR iter)
 }
 
 /* Copy all literals referenced from a code block to newspace */
-void collect_literals_step(F_COMPILED *compiled, CELL code_start,
-	CELL reloc_start, CELL literals_start)
+void collect_literals_step(F_COMPILED *compiled, CELL code_start, CELL literals_start)
 {
 	CELL scan;
 	CELL literal_end = literals_start + compiled->literals_length;
+
+	copy_handle(&compiled->relocation);
 
 	for(scan = literals_start; scan < literal_end; scan += CELLS)
 		copy_handle((CELL*)scan);

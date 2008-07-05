@@ -1,8 +1,9 @@
 ! Copyright (C) 2004, 2005 Mackenzie Straight
-! Copyright (C) 2007 Slava Pestov
-! Copyright (C) 2007 Doug Coleman
+! Copyright (C) 2007, 2008 Slava Pestov
+! Copyright (C) 2007, 2008 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien assocs continuations init kernel namespaces ;
+USING: alien assocs continuations destructors init kernel
+namespaces accessors sets ;
 IN: libc
 
 <PRIVATE
@@ -37,7 +38,7 @@ ERROR: realloc-error ptr size ;
 [ H{ } clone mallocs set-global ] "libc" add-init-hook
 
 : add-malloc ( alien -- )
-    dup mallocs get-global set-at ;
+    mallocs get-global conjoin ;
 
 : delete-malloc ( alien -- )
     [
@@ -73,3 +74,21 @@ PRIVATE>
 
 : with-malloc ( size quot -- )
     swap 1 calloc [ swap keep ] [ free ] [ ] cleanup ; inline
+
+: strlen ( alien -- len )
+    "size_t" "libc" "strlen" { "char*" } alien-invoke ;
+
+<PRIVATE
+
+! Memory allocations
+TUPLE: memory-destructor alien disposed ;
+
+M: memory-destructor dispose* alien>> free ;
+
+PRIVATE>
+
+: &free ( alien -- alien )
+    dup f memory-destructor boa &dispose drop ; inline
+
+: |free ( alien -- alien )
+    dup f memory-destructor boa |dispose drop ; inline

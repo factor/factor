@@ -5,7 +5,7 @@ IN: ui.clipboards
 
 ! Two text transfer buffers
 TUPLE: clipboard contents ;
-: <clipboard> "" clipboard boa ;
+: <clipboard> ( -- clipboard ) "" clipboard boa ;
 
 GENERIC: paste-clipboard ( gadget clipboard -- )
 
@@ -26,6 +26,6 @@ SYMBOL: selection
         2drop
     ] if ;
 
-: com-copy clipboard get gadget-copy ;
+: com-copy ( gadget -- ) clipboard get gadget-copy ;
 
-: com-copy-selection selection get gadget-copy ;
+: com-copy-selection ( gadget -- ) selection get gadget-copy ;

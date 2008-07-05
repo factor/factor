@@ -1,7 +1,7 @@
-! Copyright (C) 2004, 2006 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: accessors kernel kernel.private math math.functions math.private ;
 IN: math.ratios
-USING: kernel kernel.private math math.functions math.private ;
 
 : >fraction ( a/b -- a b )
     dup numerator swap denominator ; inline
@@ -37,6 +37,9 @@ M: ratio >fixnum >fraction /i >fixnum ;
 M: ratio >bignum >fraction /i >bignum ;
 M: ratio >float >fraction /f ;
 
+M: ratio numerator numerator>> ;
+M: ratio denominator denominator>> ;
+
 M: ratio < scale < ;
 M: ratio <= scale <= ;
 M: ratio > scale > ;
@@ -47,5 +50,6 @@ M: ratio - 2dup scale - -rot ratio+d / ;
 M: ratio * 2>fraction * >r * r> / ;
 M: ratio / scale / ;
 M: ratio /i scale /i ;
+M: ratio /f scale /f ;
 M: ratio mod 2dup >r >r /i r> r> rot * - ;
 M: ratio /mod [ /i ] 2keep mod ;

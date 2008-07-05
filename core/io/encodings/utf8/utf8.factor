@@ -6,7 +6,7 @@ IN: io.encodings.utf8
 
 ! Decoding UTF-8
 
-TUPLE: utf8 ;
+SINGLETON: utf8
 
 <PRIVATE 
 

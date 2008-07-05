@@ -18,21 +18,21 @@ IN: sequences.deep
     [ call ] keep over branch?
     [ [ deep-map ] curry map ] [ drop ] if ; inline
 
-: deep-subset ( obj quot -- seq )
+: deep-filter ( obj quot -- seq )
     over >r
     pusher >r deep-each r>
     r> dup branch? [ like ] [ drop ] if ; inline
 
-: deep-find* ( obj quot -- elt ? )
+: deep-find-from ( obj quot -- elt ? )
     [ call ] 2keep rot [ drop t ] [
         over branch? [
-            f -rot [ >r nip r> deep-find* ] curry find drop >boolean
+            f -rot [ >r nip r> deep-find-from ] curry find drop >boolean
         ] [ 2drop f f ] if  
     ] if ; inline
 
-: deep-find ( obj quot -- elt ) deep-find* drop ; inline
+: deep-find ( obj quot -- elt ) deep-find-from drop ; inline
 
-: deep-contains? ( obj quot -- ? ) deep-find* nip ; inline
+: deep-contains? ( obj quot -- ? ) deep-find-from nip ; inline
 
 : deep-all? ( obj quot -- ? )
     [ not ] compose deep-contains? not ; inline
@@ -43,4 +43,4 @@ IN: sequences.deep
     ] curry change-each ] [ 2drop ] if ; inline
 
 : flatten ( obj -- seq )
-    [ branch? not ] deep-subset ;
+    [ branch? not ] deep-filter ;

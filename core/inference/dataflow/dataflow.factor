@@ -6,7 +6,7 @@ inference.state accessors combinators ;
 IN: inference.dataflow
 
 ! Computed value
-: <computed> \ <computed> counter ;
+: <computed> ( -- value ) \ <computed> counter ;
 
 ! Literal value
 TUPLE: value < identity-tuple literal uid recursion ;
@@ -88,9 +88,9 @@ M: object flatten-curry , ;
 : r-tail ( n -- seq )
     dup zero? [ drop f ] [ meta-r get swap tail* ] if ;
 
-: node-child node-children first ;
+: node-child ( node -- child ) node-children first ;
 
-TUPLE: #label < node word loop? ;
+TUPLE: #label < node word loop? returns calls ;
 
 : #label ( word label -- node )
     \ #label param-node swap >>word ;
@@ -217,9 +217,9 @@ M: #call-label calls-label* param>> eq? ;
 
 SYMBOL: node-stack
 
-: >node node-stack get push ;
-: node> node-stack get pop ;
-: node@ node-stack get peek ;
+: >node ( node -- ) node-stack get push ;
+: node> ( -- node ) node-stack get pop ;
+: node@ ( -- node ) node-stack get peek ;
 
 : iterate-next ( -- node ) node@ successor>> ;
 
@@ -290,6 +290,9 @@ SYMBOL: node-stack
 : node-input-classes ( node -- seq )
     dup in-d>> [ node-class ] with map ;
 
+: node-output-classes ( node -- seq )
+    dup out-d>> [ node-class ] with map ;
+
 : node-input-intervals ( node -- seq )
     dup in-d>> [ node-interval ] with map ;
 
@@ -297,7 +300,7 @@ SYMBOL: node-stack
     dup in-d>> first node-class ;
 
 : active-children ( node -- seq )
-    children>> [ last-node ] map [ #terminate? not ] subset ;
+    children>> [ last-node ] map [ #terminate? not ] filter ;
 
 DEFER: #tail?
 

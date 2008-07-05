@@ -1,5 +1,19 @@
 #include "master.h"
 
+void start_thread(void *(*start_routine)(void *))
+{
+	pthread_attr_t attr;
+	pthread_t thread;
+
+	if (pthread_attr_init (&attr) != 0)
+		fatal_error("pthread_attr_init() failed",0);
+	if (pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_DETACHED) != 0)
+		fatal_error("pthread_attr_setdetachstate() failed",0);
+	if (pthread_create (&thread, &attr, start_routine, NULL) != 0)
+		fatal_error("pthread_create() failed",0);
+	pthread_attr_destroy (&attr);
+}
+
 static void *null_dll;
 
 s64 current_millis(void)
@@ -73,14 +87,14 @@ DEFINE_PRIMITIVE(read_dir)
 		while((file = readdir(dir)) != NULL)
 		{
 			CELL pair = parse_dir_entry(file);
-			GROWABLE_ADD(result,pair);
+			GROWABLE_ARRAY_ADD(result,pair);
 		}
 
 		closedir(dir);
 	}
 
 	UNREGISTER_ROOT(result);
-	GROWABLE_TRIM(result);
+	GROWABLE_ARRAY_TRIM(result);
 
 	dpush(result);
 }
@@ -104,12 +118,12 @@ DEFINE_PRIMITIVE(os_envs)
 	while(*env)
 	{
 		CELL string = tag_object(from_char_string(*env));
-		GROWABLE_ADD(result,string);
+		GROWABLE_ARRAY_ADD(result,string);
 		env++;
 	}
 
 	UNREGISTER_ROOT(result);
-	GROWABLE_TRIM(result);
+	GROWABLE_ARRAY_TRIM(result);
 	dpush(result);
 }
 
@@ -264,10 +278,128 @@ void unix_init_signals(void)
 	sigaction_safe(SIGPIPE,&ignore_sigaction,NULL);
 }
 
-void reset_stdio(void)
+/* On Unix, shared fds such as stdin cannot be set to non-blocking mode
+(http://homepages.tesco.net/J.deBoynePollard/FGA/dont-set-shared-file-descriptors-to-non-blocking-mode.html)
+so we kludge around this by spawning a thread, which waits on a control pipe
+for a signal, upon receiving this signal it reads one block of data from stdin
+and writes it to a data pipe. Upon completion, it writes a 4-byte integer to
+the size pipe, indicating how much data was written to the data pipe.
+
+The read end of the size pipe can be set to non-blocking. */
+__attribute__((visibility("default"))) int stdin_read;
+__attribute__((visibility("default"))) int stdin_write;
+
+__attribute__((visibility("default"))) int control_read;
+__attribute__((visibility("default"))) int control_write;
+
+__attribute__((visibility("default"))) int size_read;
+__attribute__((visibility("default"))) int size_write;
+
+void safe_close(int fd)
 {
-	fcntl(0,F_SETFL,0);
-	fcntl(1,F_SETFL,0);
+	if(close(fd) < 0)
+		fatal_error("error closing fd",errno);
 }
 
-void open_console(void) { }
+bool check_write(int fd, void *data, size_t size)
+{
+	if(write(fd,data,size) == size)
+		return true;
+	else
+	{
+		if(errno == EINTR)
+			return check_write(fd,data,size);
+		else
+			return false;
+	}
+}
+
+void safe_write(int fd, void *data, size_t size)
+{
+	if(!check_write(fd,data,size))
+		fatal_error("error writing fd",errno);
+}
+
+void safe_read(int fd, void *data, size_t size)
+{
+	if(read(fd,data,size) != size)
+		fatal_error("error reading fd",errno);
+}
+
+void *stdin_loop(void *arg)
+{
+	unsigned char buf[4096];
+	bool loop_running = true;
+
+	while(loop_running)
+	{
+		safe_read(control_read,buf,1);
+		if(buf[0] != 'X')
+			fatal_error("stdin_loop: bad data on control fd",buf[0]);
+
+		for(;;)
+		{
+			size_t bytes = read(0,buf,sizeof(buf));
+			if(bytes < 0)
+			{
+				if(errno == EINTR)
+					continue;
+				else
+				{
+					loop_running = false;
+					break;
+				}
+			}
+			else if(bytes >= 0)
+			{
+				safe_write(size_write,&bytes,sizeof(bytes));
+
+				if(write(stdin_write,buf,bytes) != bytes)
+					loop_running = false;
+				break;
+			}
+		}
+	}
+
+
+	safe_close(stdin_write);
+	safe_close(control_write);
+
+	return NULL;
+}
+
+void open_console(void)
+{
+	int filedes[2];
+
+	if(pipe(filedes) < 0)
+		fatal_error("Error opening control pipe",errno);
+
+	control_read = filedes[0];
+	control_write = filedes[1];
+
+	if(pipe(filedes) < 0)
+		fatal_error("Error opening size pipe",errno);
+
+	size_read = filedes[0];
+	size_write = filedes[1];
+
+	if(pipe(filedes) < 0)
+		fatal_error("Error opening stdin pipe",errno);
+
+	stdin_read = filedes[0];
+	stdin_write = filedes[1];
+
+	start_thread(stdin_loop);
+}
+
+DLLEXPORT void wait_for_stdin(void)
+{
+	if(write(control_write,"X",1) != 1)
+	{
+		if(errno == EINTR)
+			wait_for_stdin();
+		else
+			fatal_error("Error writing control fd",errno);
+	}
+}

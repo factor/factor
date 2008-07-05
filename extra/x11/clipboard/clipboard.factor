@@ -1,16 +1,16 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.syntax arrays kernel math
-namespaces sequences io.encodings.string io.encodings.utf8 x11.xlib
-x11.constants ;
+USING: alien alien.c-types alien.strings alien.syntax arrays
+kernel math namespaces sequences io.encodings.string
+io.encodings.utf8 io.encodings.ascii x11.xlib x11.constants ;
 IN: x11.clipboard
 
 ! This code was based on by McCLIM's Backends/CLX/port.lisp
 ! and http://common-lisp.net/~crhodes/clx/demo/clipboard.lisp.
 
-: XA_CLIPBOARD "CLIPBOARD" x-atom ;
+: XA_CLIPBOARD ( -- atom ) "CLIPBOARD" x-atom ;
 
-: XA_UTF8_STRING "UTF8_STRING" x-atom ;
+: XA_UTF8_STRING ( -- atom ) "UTF8_STRING" x-atom ;
 
 TUPLE: x-clipboard atom contents ;
 
@@ -25,7 +25,7 @@ TUPLE: x-clipboard atom contents ;
     CurrentTime XConvertSelection drop ;
 
 : snarf-property ( prop-return -- string )
-    dup *void* [ *char* ] [ drop f ] if ;
+    dup *void* [ *void* ascii alien>string ] [ drop f ] if ;
 
 : window-property ( win prop delete? -- string )
     >r dpy get -rot 0 -1 r> AnyPropertyType

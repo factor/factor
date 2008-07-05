@@ -5,12 +5,13 @@ sequences ui ui.backend ui.tools.debugger ui.gadgets
 ui.gadgets.books ui.gadgets.buttons ui.gadgets.labelled
 ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.tracks
 ui.gadgets.worlds ui.gadgets.presentations ui.gadgets.status-bar
-ui.commands ui.gestures assocs arrays namespaces ;
+ui.commands ui.gestures assocs arrays namespaces accessors ;
 IN: ui.tools.workspace
 
 TUPLE: workspace book listener popup ;
 
-: find-workspace [ workspace? ] find-parent ;
+: find-workspace ( gadget -- workspace )
+    [ workspace? ] find-parent ;
 
 SYMBOL: workspace-window-hook
 
@@ -49,7 +50,10 @@ M: gadget tool-scroller drop f ;
     get-workspace find-tool nip ;
 
 : help-window ( topic -- )
-    [ <pane> [ [ help ] with-pane ] keep <scroller> ] keep
+    [
+        <pane> [ [ help ] with-pane ] keep
+        <limited-scroller> { 550 700 } >>dim
+    ] keep
     article-title open-window ;
 
 : hide-popup ( workspace -- )

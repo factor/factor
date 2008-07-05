@@ -1,5 +1,5 @@
 USING: arrays kernel math namespaces sequences kernel.private
-sequences.private strings sbufs tools.test vectors bit-arrays
+sequences.private strings sbufs tools.test vectors
 generic vocabs.loader ;
 IN: sequences.tests
 
@@ -27,7 +27,7 @@ IN: sequences.tests
 [ "hello world" "aeiou" [ member? ] curry find ] unit-test
 
 [ 4 CHAR: o ]
-[ 3 "hello world" "aeiou" [ member? ] curry find* ] unit-test
+[ 3 "hello world" "aeiou" [ member? ] curry find-from ] unit-test
 
 [ f         ] [ 3 [ ]     member? ] unit-test
 [ f         ] [ 3 [ 1 2 ] member? ] unit-test
@@ -39,18 +39,18 @@ IN: sequences.tests
 
 [ 4 ] [ CHAR: x "tuvwxyz" >vector index ] unit-test 
 
-[ f ] [ CHAR: x 5 "tuvwxyz" >vector index* ] unit-test 
+[ f ] [ CHAR: x 5 "tuvwxyz" >vector index-from ] unit-test 
 
-[ f ] [ CHAR: a 0 "tuvwxyz" >vector index* ] unit-test
+[ f ] [ CHAR: a 0 "tuvwxyz" >vector index-from ] unit-test
 
 [ f ] [ [ "Hello" { } 0.75 ] [ string? ] all? ] unit-test
 [ t ] [ [ ] [ ] all? ] unit-test
 [ t ] [ [ "hi" t 0.5 ] [ ] all? ] unit-test
 
-[ [ 1 2 3 ] ] [ [ 1 4 2 5 3 6 ] [ 4 < ] subset ] unit-test
-[ { 4 2 6 } ] [ { 1 4 2 5 3 6 } [ 2 mod 0 = ] subset ] unit-test
+[ [ 1 2 3 ] ] [ [ 1 4 2 5 3 6 ] [ 4 < ] filter ] unit-test
+[ { 4 2 6 } ] [ { 1 4 2 5 3 6 } [ 2 mod 0 = ] filter ] unit-test
 
-[ [ 3 ] ] [ [ 1 2 3 ] 2 [ swap < ] curry subset ] unit-test
+[ [ 3 ] ] [ [ 1 2 3 ] 2 [ swap < ] curry filter ] unit-test
 
 [ "hello world how are you" ]
 [ { "hello" "world" "how" "are" "you" } " " join ]
@@ -169,9 +169,9 @@ unit-test
 
 [ 3 "a" ] [ { "a" "b" "c" "a" "d" } [ "a" = ] find-last ] unit-test
 
-[ f f ] [ 100 { 1 2 3 } [ 1 = ] find* ] unit-test
-[ f f ] [ 100 { 1 2 3 } [ 1 = ] find-last* ] unit-test
-[ f f ] [ -1 { 1 2 3 } [ 1 = ] find* ] unit-test
+[ f f ] [ 100 { 1 2 3 } [ 1 = ] find-from ] unit-test
+[ f f ] [ 100 { 1 2 3 } [ 1 = ] find-last-from ] unit-test
+[ f f ] [ -1 { 1 2 3 } [ 1 = ] find-from ] unit-test
 
 [ 0 ] [ { "a" "b" "c" } { "A" "B" "C" } mismatch ] unit-test
 
@@ -186,9 +186,6 @@ unit-test
 [ -1 1 "abc" <slice> ] must-fail
 
 [ V{ "a" "b" } V{ } ] [ { "X" "a" "b" } { "X" } drop-prefix [ >vector ] bi@ ] unit-test
-
-[ -1 ] [ "ab" "abc" <=> ] unit-test
-[ 1 ] [ "abc" "ab" <=> ] unit-test
 
 [ 1 4 9 16 16 V{ f 1 4 9 16 } ] [
     V{ } clone "cache-test" set
@@ -218,27 +215,12 @@ unit-test
     3 V{ 1 2 3 4 5 6 } clone [ delete-nth ] keep
 ] unit-test
 
-[ V{ 1 2 3 } ]
-[ 3 V{ 1 2 } clone [ push-new ] keep ] unit-test
-
-[ V{ 1 2 3 } ]
-[ 3 V{ 1 3 2 } clone [ push-new ] keep ] unit-test
-
-! Columns
-{ { 1 2 3 } { 4 5 6 } { 7 8 9 } } [ clone ] map "seq" set
-
-[ { 1 4 7 } ] [ "seq" get 0 <column> >array ] unit-test
-[ ] [ "seq" get 1 <column> [ sq ] change-each ] unit-test
-[ { 4 25 64 } ] [ "seq" get 1 <column> >array ] unit-test
-
 ! erg's random tester found this one
 [ SBUF" 12341234" ] [
     9 <sbuf> dup "1234" swap push-all dup dup swap push-all
 ] unit-test
 
 [ f ] [ f V{ } like f V{ } like eq? ] unit-test
-
-[ ?{ f t } ] [ 0 2 ?{ f t f } subseq ] unit-test
 
 [ V{ f f f } ] [ 3 V{ } new-sequence ] unit-test
 [ SBUF" \0\0\0" ] [ 3 SBUF" " new-sequence ] unit-test
@@ -260,5 +242,7 @@ unit-test
 [ "asdf " ] [ " asdf " [ CHAR: \s = ] left-trim ] unit-test
 [ " asdf" ] [ " asdf " [ CHAR: \s = ] right-trim ] unit-test
 
-! Hardcore
-[ ] [ "sequences" reload ] unit-test
+[ 328350 ] [ 100 [ sq ] sigma ] unit-test
+
+[ 50 ] [ 100 [ even? ] count ] unit-test
+[ 50 ] [ 100 [ odd?  ] count ] unit-test

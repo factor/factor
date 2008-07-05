@@ -1,4 +1,0 @@
-demos
-network
-tools
-applications

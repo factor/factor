@@ -5,7 +5,7 @@ H{
     { deploy-name "Sudoku" }
     { deploy-threads? f }
     { deploy-compiler? t }
-    { deploy-math? f }
+    { deploy-math? t }
     { deploy-c-types? f }
     { deploy-io 2 }
     { deploy-reflection 1 }

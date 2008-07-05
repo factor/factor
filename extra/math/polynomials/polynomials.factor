@@ -1,5 +1,5 @@
 USING: arrays kernel sequences vectors math math.vectors namespaces
-shuffle splitting sequences.lib ;
+shuffle splitting sequences.lib math.order ;
 IN: math.polynomials
 
 ! Polynomials are vectors with the highest powers on the right:
@@ -54,11 +54,11 @@ PRIVATE>
     #! divide the last two numbers in the sequences
     [ peek ] bi@ / ;
 
-: (p/mod)
+: (p/mod) ( p p -- p p )
     2dup /-last
     2dup , n*p swapd
     p- >vector
-    dup pop* swap 1 tail-slice ;
+    dup pop* swap rest-slice ;
 
 PRIVATE>
 

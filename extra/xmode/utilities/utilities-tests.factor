@@ -35,7 +35,7 @@ TAGS>
         { { "type" >upper set-company-type } }
         init-from-tag dup
     ] keep
-    tag-children [ tag? ] subset
+    tag-children [ tag? ] filter
     [ parse-employee-tag ] with each ;
 
 [
@@ -48,6 +48,6 @@ TAGS>
         "This is a great company"
     }
 ] [
-    "extra/xmode/utilities/test.xml"
-    resource-path file>xml parse-company-tag
+    "resource:extra/xmode/utilities/test.xml"
+    file>xml parse-company-tag
 ] unit-test

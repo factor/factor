@@ -1,5 +1,5 @@
 
-USING: kernel alien.c-types combinators sequences splitting
+USING: kernel alien.c-types combinators sequences splitting grouping
        opengl.gl ui.gadgets ui.render
        math math.vectors accessors ;
 

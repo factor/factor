@@ -1,9 +1,10 @@
 USING: namespaces io tools.test threads kernel
-concurrency.combinators math ;
+concurrency.combinators concurrency.promises locals math
+words ;
 IN: threads.tests
 
 3 "x" set
-namespace [ [ yield 2 "x" set ] bind ] curry "Test" spawn drop
+[ 2 "x" set ] "Test" spawn drop
 [ 2 ] [ yield "x" get ] unit-test
 [ ] [ [ flush ] "flush test" spawn drop flush ] unit-test
 [ ] [ [ "Errors, errors" throw ] "error test" spawn drop ] unit-test
@@ -27,3 +28,16 @@ yield
         "i" tget
     ] parallel-map
 ] unit-test
+
+[ [ 3 throw ] "A" suspend ] [ 3 = ] must-fail-with
+
+:: spawn-namespace-test ( -- )
+    [let | p [ <promise> ] g [ gensym ] |
+        [
+            g "x" set
+            [ "x" get p fulfill ] "B" spawn drop
+        ] with-scope
+        p ?promise g eq?
+    ] ;
+
+[ t ] [ spawn-namespace-test ] unit-test

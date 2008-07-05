@@ -1,8 +1,11 @@
-USING: kernel words inspector slots quotations sequences assocs
-math arrays inference effects shuffle continuations debugger
-classes.tuple namespaces vectors bit-arrays byte-arrays strings
-sbufs math.functions macros sequences.private combinators
-mirrors combinators.lib ;
+! Copyright (C) 2007, 2008 Daniel Ehrenberg.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors kernel words summary slots quotations
+sequences assocs math arrays inference effects shuffle
+continuations debugger classes.tuple namespaces vectors
+bit-arrays byte-arrays strings sbufs math.functions macros
+sequences.private combinators mirrors combinators.lib
+combinators.short-circuit ;
 IN: inverse
 
 TUPLE: fail ;
@@ -77,10 +80,10 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
     { [ word? ] [ primitive? not ] [
         { "inverse" "math-inverse" "pop-inverse" }
         [ word-prop ] with contains? not
-    ] } <-&& ; 
+    ] } 1&& ; 
 
 : (flatten) ( quot -- )
-    [ dup flattenable? [ word-def (flatten) ] [ , ] if ] each ;
+    [ dup flattenable? [ def>> (flatten) ] [ , ] if ] each ;
 
  : retain-stack-overflow? ( error -- ? )
     { "kernel-error" 14 f f } = ;
@@ -197,19 +200,19 @@ DEFER: _
 
 \ prefix [ unclip ] define-inverse
 \ unclip [ prefix ] define-inverse
-\ suffix [ dup 1 head* swap peek ] define-inverse
+\ suffix [ dup but-last swap peek ] define-inverse
 
 ! Constructor inverse
 : deconstruct-pred ( class -- quot )
     "predicate" word-prop [ dupd call assure ] curry ;
 
 : slot-readers ( class -- quot )
-    all-slots 1 tail ! tail gets rid of delegate
+    all-slots rest ! tail gets rid of delegate
     [ slot-spec-reader 1quotation [ keep ] curry ] map concat
     [ ] like [ drop ] compose ;
 
 : ?wrapped ( object -- wrapped )
-    dup wrapper? [ wrapped ] when ;
+    dup wrapper? [ wrapped>> ] when ;
 
 : boa-inverse ( class -- quot )
     [ deconstruct-pred ] keep slot-readers compose ;
@@ -218,7 +221,7 @@ DEFER: _
 
 : empty-inverse ( class -- quot )
     deconstruct-pred
-    [ tuple>array 1 tail [ ] contains? [ fail ] when ]
+    [ tuple>array rest [ ] contains? [ fail ] when ]
     compose ;
 
 \ new 1 [ ?wrapped empty-inverse ] define-pop-inverse

@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays ui.commands ui.gadgets ui.gadgets.borders
+USING: accessors arrays ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.labels ui.gadgets.theme
 ui.gadgets.tracks ui.gadgets.packs ui.gadgets.worlds ui.gestures
 ui.render kernel math models namespaces sequences strings
@@ -41,21 +41,22 @@ button H{
 
 : <button> ( gadget quot -- button )
     button new
-    [ set-button-quot ] keep
+    swap >>quot
     [ set-gadget-delegate ] keep ;
 
 TUPLE: button-paint plain rollover pressed selected ;
 
 C: <button-paint> button-paint
 
-: find-button [ [ button? ] is? ] find-parent ;
+: find-button ( gadget -- button )
+    [ [ button? ] is? ] find-parent ;
 
 : button-paint ( button paint -- button paint )
     over find-button {
-        { [ dup button-pressed? ] [ drop button-paint-pressed ] }
-        { [ dup button-selected? ] [ drop button-paint-selected ] }
-        { [ dup button-rollover? ] [ drop button-paint-rollover ] }
-        [ drop button-paint-plain ]
+        { [ dup pressed?>> ] [ drop pressed>> ] }
+        { [ dup selected?>> ] [ drop selected>> ] }
+        { [ dup button-rollover? ] [ drop rollover>> ] }
+        [ drop plain>> ]
     } cond ;
 
 M: button-paint draw-interior
@@ -64,25 +65,26 @@ M: button-paint draw-interior
 M: button-paint draw-boundary
     button-paint draw-boundary ;
 
-: roll-button-theme ( button -- )
-    f black <solid> dup f <button-paint>
-    swap set-gadget-boundary ;
+: roll-button-theme ( button -- button )
+    f black <solid> dup f <button-paint> >>boundary ; inline
 
 : <roll-button> ( label quot -- button )
-    >r >label r>
-    <button> dup roll-button-theme ;
+    >r >label r> <button> roll-button-theme ;
 
-: bevel-button-theme ( gadget -- )
+: <bevel-button-paint> ( -- paint )
     plain-gradient
     rollover-gradient
     pressed-gradient
     selected-gradient
-    <button-paint> over set-gadget-interior
-    faint-boundary ;
+    <button-paint> ;
+
+: bevel-button-theme ( gadget -- gadget )
+    <bevel-button-paint> >>interior
+    faint-boundary ; inline
 
 : <bevel-button> ( label quot -- button )
     >r >label 5 <border> r>
-    <button> dup bevel-button-theme ;
+    <button> bevel-button-theme ;
 
 TUPLE: repeat-button ;
 
@@ -126,10 +128,11 @@ M: checkmark-paint draw-interior
 : toggle-model ( model -- )
     [ not ] change-model ;
 
-: checkbox-theme
-    f over set-gadget-interior
-    { 5 5 } over set-pack-gap
-    1/2 swap set-pack-align ;
+: checkbox-theme ( gadget -- )
+    f >>interior
+    { 5 5 } >>gap
+    1/2 >>align
+    drop ;
 
 TUPLE: checkbox ;
 
@@ -187,16 +190,18 @@ M: radio-control model-changed
     #! quot has stack effect ( value model label -- )
     swapd [ swapd call gadget, ] 2curry assoc-each ; inline
 
-: radio-button-theme
-    { 5 5 } over set-pack-gap 1/2 swap set-pack-align ;
+: radio-button-theme ( gadget -- )
+    { 5 5 } >>gap
+    1/2 >>align
+    drop ;
 
 : <radio-button> ( value model label -- gadget )
     <radio-knob> label-on-right
     [ <button> ] <radio-control>
     dup radio-button-theme ;
 
-: radio-buttons-theme
-    { 5 5 } swap set-pack-gap ;
+: radio-buttons-theme ( gadget -- )
+    { 5 5 } >>gap drop ;
 
 : <radio-buttons> ( model assoc -- gadget )
     [ [ <radio-button> ] <radio-controls> ] make-filled-pile

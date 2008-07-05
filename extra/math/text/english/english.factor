@@ -1,7 +1,8 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.lib kernel math math.functions math.parser namespaces
-    sequences splitting sequences.lib ;
+    sequences splitting grouping sequences.lib
+    combinators.short-circuit ;
 IN: math.text.english
 
 <PRIVATE
@@ -26,7 +27,7 @@ IN: math.text.english
 
 SYMBOL: and-needed?
 : set-conjunction ( seq -- )
-    first { [ dup 100 < ] [ dup 0 > ] } && and-needed? set drop ;
+    first { [ dup 100 < ] [ dup 0 > ] } 0&& and-needed? set drop ;
 
 : negative-text ( n -- str )
     0 < "Negative " "" ? ;

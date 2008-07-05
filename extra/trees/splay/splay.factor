@@ -1,15 +1,13 @@
 ! Copyright (c) 2005 Mackenzie Straight.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math namespaces sequences assocs parser
-prettyprint.backend trees generic ;
+prettyprint.backend trees generic math.order ;
 IN: trees.splay
 
-TUPLE: splay ;
+TUPLE: splay < tree ;
 
 : <splay> ( -- tree )
-    \ splay construct-tree ;
-
-INSTANCE: splay tree-mixin
+    \ splay new-tree ;
 
 : rotate-right ( node -- node )
     dup node-left
@@ -30,13 +28,13 @@ INSTANCE: splay tree-mixin
     drop dup node-right swapd r> swap ;
 
 : cmp ( key node -- obj node -1/0/1 )
-    2dup node-key <=> ;
+    2dup node-key key-side ;
 
 : lcmp ( key node -- obj node -1/0/1 ) 
-    2dup node-left node-key <=> ;
+    2dup node-left node-key key-side ;
 
 : rcmp ( key node -- obj node -1/0/1 ) 
-    2dup node-right node-key <=> ;
+    2dup node-right node-key key-side ;
 
 DEFER: (splay)
 
@@ -86,7 +84,7 @@ DEFER: (splay)
 : get-largest ( node -- node )
     dup [ dup node-right [ nip get-largest ] when* ] when ;
 
-: splay-largest
+: splay-largest ( node -- node )
     dup [ dup get-largest node-key swap splay-at ] when ;
 
 : splay-join ( n2 n1 -- node )
@@ -131,7 +129,7 @@ M: splay new-assoc
     2drop <splay> ;
 
 : >splay ( assoc -- tree )
-    T{ splay T{ tree f f 0 } } assoc-clone-like ;
+    T{ splay f f 0 } assoc-clone-like ;
 
 : SPLAY{
     \ } [ >splay ] parse-literal ; parsing

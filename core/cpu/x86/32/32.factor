@@ -5,7 +5,7 @@ cpu.x86.architecture cpu.x86.intrinsics cpu.x86.allot
 cpu.architecture kernel kernel.private math namespaces sequences
 generator.registers generator.fixup generator system layouts
 alien.compiler combinators command-line
-compiler compiler.units io vocabs.loader accessors ;
+compiler compiler.units io vocabs.loader accessors init ;
 IN: cpu.x86.32
 
 ! We implement the FFI for Linux, OS X and Windows all at once.
@@ -17,32 +17,37 @@ M: x86.32 ds-reg ESI ;
 M: x86.32 rs-reg EDI ;
 M: x86.32 stack-reg ESP ;
 M: x86.32 stack-save-reg EDX ;
+M: x86.32 temp-reg-1 EAX ;
+M: x86.32 temp-reg-2 ECX ;
 
 M: temp-reg v>operand drop EBX ;
 
-M: x86.32 %alien-invoke ( symbol dll -- )
-    (CALL) rel-dlsym ;
+M: x86.32 %alien-global 0 [] MOV rc-absolute-cell rel-dlsym ;
+
+M: x86.32 %alien-invoke (CALL) rel-dlsym ;
 
 ! On x86, parameters are never passed in registers.
 M: int-regs return-reg drop EAX ;
 M: int-regs param-regs drop { } ;
 M: int-regs vregs drop { EAX ECX EDX EBP } ;
 M: int-regs push-return-reg return-reg PUSH ;
-: load/store-int-return return-reg stack-reg rot [+] ;
+: load/store-int-return ( n reg-class -- src dst )
+    return-reg stack-reg rot [+] ;
 M: int-regs load-return-reg load/store-int-return MOV ;
 M: int-regs store-return-reg load/store-int-return swap MOV ;
 
 M: float-regs param-regs drop { } ;
 M: float-regs vregs drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 
-: FSTP 4 = [ FSTPS ] [ FSTPL ] if ;
+: FSTP ( operand size -- ) 4 = [ FSTPS ] [ FSTPL ] if ;
 
 M: float-regs push-return-reg
     stack-reg swap reg-size [ SUB  stack-reg [] ] keep FSTP ;
 
-: FLD 4 = [ FLDS ] [ FLDL ] if ;
+: FLD ( operand size -- ) 4 = [ FLDS ] [ FLDL ] if ;
 
-: load/store-float-return reg-size >r stack@ r> ;
+: load/store-float-return ( n reg-class -- op size )
+    [ stack@ ] [ reg-size ] bi* ;
 M: float-regs load-return-reg load/store-float-return FLD ;
 M: float-regs store-return-reg load/store-float-return FSTP ;
 
@@ -148,7 +153,7 @@ M: x86.32 %box ( n reg-class func -- )
         >r (%box) r> f %alien-invoke
     ] with-aligned-stack ;
     
-: (%box-long-long)
+: (%box-long-long) ( n -- )
     #! If n is f, push the return registers onto the stack; we
     #! are boxing a return value of a C function. If n is an
     #! integer, push [ESP+n]:[ESP+n+4] on the stack; we are
@@ -163,7 +168,7 @@ M: x86.32 %box ( n reg-class func -- )
 
 M: x86.32 %box-long-long ( n func -- )
     8 [
-        >r (%box-long-long) r> f %alien-invoke
+        [ (%box-long-long) ] [ f %alien-invoke ] bi*
     ] with-aligned-stack ;
 
 M: x86.32 %box-large-struct ( n size -- )
@@ -257,9 +262,11 @@ os windows? [
     4 "double" c-type set-c-type-align
 ] unless
 
-: sse2? "Intrinsic" throw ;
+: (sse2?) ( -- ? ) "Intrinsic" throw ;
 
-\ sse2? [
+<<
+
+\ (sse2?) [
     { EAX EBX ECX EDX } [ PUSH ] each
     EAX 1 MOV
     CPUID
@@ -269,6 +276,10 @@ os windows? [
     JE
 ] { } define-if-intrinsic
 
+>>
+
+: sse2? ( -- ? ) (sse2?) ;
+
 "-no-sse2" cli-args member? [
     "Checking if your CPU supports SSE2..." print flush
     [ optimized-recompile-hook ] recompile-hook [
@@ -277,6 +288,14 @@ os windows? [
     [
         " - yes" print
         "cpu.x86.sse2" require
+        [
+            sse2? [
+                "This image was built to use SSE2, which your CPU does not support." print
+                "You will need to bootstrap Factor again." print
+                flush
+                1 exit
+            ] unless
+        ] "cpu.x86" add-init-hook
     ] [
         " - no" print
     ] if

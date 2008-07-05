@@ -115,9 +115,9 @@ ARTICLE: "logging" "Logging framework"
 { $subsection "logging.levels" }
 { $subsection "logging.messages" }
 { $subsection "logging.rotation" }
-{ $vocab-subsection "Log file parser" "logging.parser" }
-{ $vocab-subsection "Log analysis" "logging.analysis" }
-{ $vocab-subsection "Automated log analysis" "logging.insomniac" }
+{ $subsection "logging.parser" }
+{ $subsection "logging.analysis" }
+{ $subsection "logging.insomniac" }
 { $subsection "logging.server" } ;
 
 ABOUT: "logging"

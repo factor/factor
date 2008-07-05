@@ -1,10 +1,10 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: jamshred.oint jamshred.tunnel kernel sequences tools.test ;
+USING: arrays jamshred.oint jamshred.tunnel kernel math.vectors sequences tools.test float-arrays ;
 IN: jamshred.tunnel.tests
 
-[ 0 ] [ T{ segment T{ oint f { 0 0 0 } } 0 }
-        T{ segment T{ oint f { 1 1 1 } } 1 }
+[ 0 ] [ T{ segment f { 0 0 0 } f f f 0 }
+        T{ segment f { 1 1 1 } f f f 1 }
         T{ oint f { 0 0 0.25 } }
         nearer-segment segment-number ] unit-test
 
@@ -15,3 +15,31 @@ IN: jamshred.tunnel.tests
 [ 3 ] [ <straight-tunnel> T{ oint f { 0 0 -3.25 } } 0 nearest-segment-forward segment-number ] unit-test
 
 [ F{ 0 0 0 } ] [ <straight-tunnel> T{ oint f { 0 0 -0.25 } } over first nearest-segment oint-location ] unit-test
+
+: test-segment-oint ( -- oint )
+    { 0 0 0 } { 0 0 -1 } { 0 1 0 } { -1 0 0 } <oint> ;
+
+[ { -1 0 0 } ] [ test-segment-oint { 1 0 0 } vector-to-centre ] unit-test
+[ { 1 0 0 } ] [ test-segment-oint { -1 0 0 } vector-to-centre ] unit-test
+[ { 0 -1 0 } ] [ test-segment-oint { 0 1 0 } vector-to-centre ] unit-test
+[ { 0 1 0 } ] [ test-segment-oint { 0 -1 0 } vector-to-centre ] unit-test
+[ { -1 0 0 } ] [ test-segment-oint { 1 0 -1 } vector-to-centre ] unit-test
+[ { 1 0 0 } ] [ test-segment-oint { -1 0 -1 } vector-to-centre ] unit-test
+[ { 0 -1 0 } ] [ test-segment-oint { 0 1 -1 } vector-to-centre ] unit-test
+[ { 0 1 0 } ] [ test-segment-oint { 0 -1 -1 } vector-to-centre ] unit-test
+
+: simplest-straight-ahead ( -- oint segment )
+    { 0 0 0 } { 0 0 -1 } { 0 1 0 } { -1 0 0 } <oint>
+    initial-segment ;
+
+[ { 0 0 0 } ] [ simplest-straight-ahead sideways-heading ] unit-test
+[ { 0 0 0 } ] [ simplest-straight-ahead sideways-relative-location ] unit-test
+
+: simple-collision-up ( -- oint segment )
+    { 0 0 0 } { 0 1 0 } { 0 0 1 } { -1 0 0 } <oint>
+    initial-segment ;
+
+[ { 0 1 0 } ] [ simple-collision-up sideways-heading ] unit-test
+[ { 0 0 0 } ] [ simple-collision-up sideways-relative-location ] unit-test
+[ { 0 1 0 } ]
+[ simple-collision-up collision-vector 0 0 0 3array v+ ] unit-test

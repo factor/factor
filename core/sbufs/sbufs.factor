@@ -1,28 +1,26 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math strings sequences.private sequences strings
-growable strings.private ;
+USING: accessors kernel math strings sequences.private sequences
+strings growable strings.private ;
 IN: sbufs
 
-<PRIVATE
+TUPLE: sbuf
+{ underlying string }
+{ length array-capacity } ;
 
-: string>sbuf ( string length -- sbuf )
-    sbuf boa ; inline
-
-PRIVATE>
-
-: <sbuf> ( n -- sbuf ) 0 <string> 0 string>sbuf ; inline
+: <sbuf> ( n -- sbuf ) 0 <string> 0 sbuf boa ; inline
 
 M: sbuf set-nth-unsafe
-    underlying >r >r >fixnum r> >fixnum r> set-string-nth ;
+    [ >fixnum ] [ >fixnum ] [ underlying>> ] tri* set-string-nth ;
 
-M: sbuf new-sequence drop [ 0 <string> ] keep >fixnum string>sbuf ;
+M: sbuf new-sequence
+    drop [ 0 <string> ] [ >fixnum ] bi sbuf boa ;
 
 : >sbuf ( seq -- sbuf ) SBUF" " clone-like ; inline
 
 M: sbuf like
     drop dup sbuf? [
-        dup string? [ dup length string>sbuf ] [ >sbuf ] if
+        dup string? [ dup length sbuf boa ] [ >sbuf ] if
     ] unless ;
 
 M: sbuf new-resizable drop <sbuf> ;
@@ -35,8 +33,8 @@ M: string new-resizable drop <sbuf> ;
 M: string like
     drop dup string? [
         dup sbuf? [
-            dup length over underlying length number= [
-                underlying dup reset-string-hashcode
+            dup length over underlying>> length number= [
+                underlying>> dup reset-string-hashcode
             ] [
                 >string
             ] if

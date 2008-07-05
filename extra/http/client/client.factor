@@ -1,98 +1,185 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs http kernel math math.parser namespaces sequences
-io io.sockets io.streams.string io.files io.timeouts strings
-splitting calendar continuations accessors vectors
-io.encodings.8-bit io.encodings.binary fry ;
+USING: accessors assocs kernel math math.parser namespaces
+sequences io io.sockets io.streams.string io.files io.timeouts
+strings splitting calendar continuations accessors vectors
+math.order hashtables byte-arrays prettyprint
+io.encodings
+io.encodings.string
+io.encodings.ascii
+io.encodings.8-bit
+io.encodings.binary
+io.streams.duplex
+fry debugger summary ascii urls present
+http http.parsers ;
 IN: http.client
 
-DEFER: http-request
+: write-request-line ( request -- request )
+    dup
+    [ method>> write bl ]
+    [ url>> relative-url present write bl ]
+    [ "HTTP/" write version>> write crlf ]
+    tri ;
+
+: url-host ( url -- string )
+    [ host>> ] [ port>> ] bi dup "http" protocol-port =
+    [ drop ] [ ":" swap number>string 3append ] if ;
+
+: write-request-header ( request -- request )
+    dup header>> >hashtable
+    over url>> host>> [ over url>> url-host "host" pick set-at ] when
+    over post-data>> [
+        [ raw>> length "content-length" pick set-at ]
+        [ content-type>> "content-type" pick set-at ]
+        bi
+    ] when*
+    over cookies>> f like [ unparse-cookie "cookie" pick set-at ] when*
+    write-header ;
+
+GENERIC: >post-data ( object -- post-data )
+
+M: post-data >post-data ;
+
+M: string >post-data "application/octet-stream" <post-data> ;
+
+M: byte-array >post-data "application/octet-stream" <post-data> ;
+
+M: assoc >post-data assoc>query "application/x-www-form-urlencoded" <post-data> ;
+
+M: f >post-data ;
+
+: unparse-post-data ( request -- request )
+    [ >post-data ] change-post-data ;
+
+: write-post-data ( request -- request )
+    dup method>> "POST" = [ dup post-data>> raw>> write ] when ; 
+
+: write-request ( request -- )
+    unparse-post-data
+    write-request-line
+    write-request-header
+    write-post-data
+    flush
+    drop ;
+
+: read-response-line ( response -- response )
+    read-crlf parse-response-line first3
+    [ >>version ] [ >>code ] [ >>message ] tri* ;
+
+: read-response-header ( response -- response )
+    read-header >>header
+    dup "set-cookie" header parse-set-cookie >>cookies
+    dup "content-type" header [
+        parse-content-type
+        [ >>content-type ]
+        [ >>content-charset ] bi*
+    ] when* ;
+
+: read-response ( -- response )
+    <response>
+    read-response-line
+    read-response-header ;
+
+: max-redirects 10 ;
+
+ERROR: too-many-redirects ;
+
+M: too-many-redirects summary
+    drop
+    [ "Redirection limit of " % max-redirects # " exceeded" % ] "" make ;
+
+DEFER: (http-request)
 
 <PRIVATE
 
-: parse-url ( url -- resource host port )
-    "http://" ?head [ "Only http:// supported" throw ] unless
-    "/" split1 [ "/" prepend ] [ "/" ] if*
-    swap parse-host ;
+SYMBOL: redirects
 
-: store-path ( request path -- request )
-    "?" split1 >r >>path r> dup [ query>assoc ] when >>query ;
+: redirect-url ( request url -- request )
+    '[ , >url ensure-port derive-url ensure-port ] change-url ;
 
-: request-with-url ( url request -- request )
-    swap parse-url >r >r store-path r> >>host r> >>port ;
-
-! This is all pretty complex because it needs to handle
-! HTTP redirects, which might be absolute or relative
-: absolute-redirect ( url -- request )
-    request get request-with-url ;
-
-: relative-redirect ( path -- request )
-    request get swap store-path ;
-
-: do-redirect ( response -- response stream )
-    dup response-code 300 399 between? [
-        stdio get dispose
-        header>> "location" swap at
-        dup "http://" head? [
-            absolute-redirect
+: do-redirect ( response data -- response data )
+    over code>> 300 399 between? [
+        drop
+        redirects inc
+        redirects get max-redirects < [
+            request get
+            swap "location" header redirect-url
+            "GET" >>method (http-request)
         ] [
-            relative-redirect
-        ] if "GET" >>method http-request
-    ] [
-        stdio get
-    ] if ;
-
-: request-addr ( request -- addr )
-    dup host>> swap port>> <inet> ;
-
-: close-on-error ( stream quot -- )
-    '[ , with-stream* ] [ ] pick '[ , dispose ] cleanup ; inline
+            too-many-redirects
+        ] if
+    ] when ;
 
 PRIVATE>
 
-: http-request ( request -- response stream )
+: read-chunk-size ( -- n )
+    read-crlf ";" split1 drop [ blank? ] right-trim
+    hex> [ "Bad chunk size" throw ] unless* ;
+
+: read-chunks ( -- )
+    read-chunk-size dup zero?
+    [ drop ] [ read % read-crlf B{ } assert= read-chunks ] if ;
+
+: read-response-body ( response -- response data )
+    dup "transfer-encoding" header "chunked" = [
+        binary decode-input
+        [ read-chunks ] B{ } make
+        over content-charset>> decode
+    ] [
+        dup content-charset>> decode-input
+        input-stream get contents
+    ] if ;
+
+: (http-request) ( request -- response data )
     dup request [
-        dup request-addr latin1 <client>
-        1 minutes over set-timeout
-        [
-            write-request flush
+        dup url>> url-addr ascii [
+            1 minutes timeouts
+            write-request
             read-response
-            do-redirect
-        ] close-on-error
+            read-response-body
+        ] with-client
+        do-redirect
     ] with-variable ;
-
-: <get-request> ( url -- request )
-    <request> request-with-url "GET" >>method ;
-
-: http-get-stream ( url -- response stream )
-    <get-request> http-request ;
 
 : success? ( code -- ? ) 200 = ;
 
-: check-response ( response -- )
-    code>> success?
-    [ "HTTP download failed" throw ] unless ;
+ERROR: download-failed response body ;
 
-: http-get ( url -- string )
-    http-get-stream contents swap check-response ;
+M: download-failed error.
+    "HTTP download failed:" print nl
+    [ response>> . nl ] [ body>> write ] bi ;
+
+: check-response ( response data -- response data )
+    over code>> success? [ download-failed ] unless ;
+
+: http-request ( request -- response data )
+    (http-request) check-response ;
+
+: <get-request> ( url -- request )
+    <request>
+        "GET" >>method
+        swap >url ensure-port >>url ;
+
+: http-get ( url -- response data )
+    <get-request> http-request ;
 
 : download-name ( url -- name )
-    file-name "?" split1 drop "/" ?tail drop ;
+    present file-name "?" split1 drop "/" ?tail drop ;
 
 : download-to ( url file -- )
     #! Downloads the contents of a URL to a file.
-    swap http-get-stream swap check-response
-    [ swap latin1 <file-writer> stream-copy ] with-disposal ;
+    swap http-get
+    [ content-charset>> ] [ '[ , write ] ] bi*
+    with-file-writer ;
 
 : download ( url -- )
     dup download-name download-to ;
 
-: <post-request> ( content-type content url -- request )
+: <post-request> ( post-data url -- request )
     <request>
-    request-with-url
-    "POST" >>method
-    swap >>post-data
-    swap >>post-data-type ;
+        "POST" >>method
+        swap >url ensure-port >>url
+        swap >>post-data ;
 
-: http-post ( content-type content url -- response string )
-    <post-request> http-request contents ;
+: http-post ( post-data url -- response data )
+    <post-request> http-request ;

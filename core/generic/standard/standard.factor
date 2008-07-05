@@ -81,14 +81,8 @@ ERROR: no-method object generic ;
                 "methods" word-prop
                 [ generic get mangle-method ] assoc-map
                 [ find-default default set ]
-                [
-                    generic get "inline" word-prop [
-                        <predicate-dispatch-engine>
-                    ] [
-                        <big-dispatch-engine>
-                    ] if
-                ] bi
-                engine>quot
+                [ <big-dispatch-engine> ]
+                bi engine>quot
             ]
         } cleave
     ] with-scope ;
@@ -99,11 +93,11 @@ ERROR: no-next-method class generic ;
 
 : single-next-method-quot ( class generic -- quot )
     [
-        [ drop [ instance? ] curry % ]
+        [ drop "predicate" word-prop % ]
         [
             2dup next-method
             [ 2nip 1quotation ]
-            [ [ no-next-method ] 2curry ] if* ,
+            [ [ no-next-method ] 2curry [ ] like ] if* ,
         ]
         [ [ inconsistent-next-method ] 2curry , ]
         2tri

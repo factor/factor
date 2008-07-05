@@ -9,7 +9,7 @@ HELP: deep-map
 { $values { "obj" "an object" } { "quot" "a quotation ( elt -- newelt )" } { "newobj" "the mapped object" } }
 { $description "Execute a quotation on each nested element of an object and its children, in preorder. That is, the result of the execution of the quotation on the outer is used to map the inner elements." } ;
 
-HELP: deep-subset
+HELP: deep-filter
 { $values { "obj" "an object" } { "quot" "a quotation ( elt -- ? )" } { "seq" "a sequence" } }
 { $description "Creates a sequence of sub-nodes in the object which satisfy the given quotation, in preorder. This includes the object itself, if it passes the quotation." } ;
 

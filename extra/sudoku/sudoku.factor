@@ -1,17 +1,17 @@
 ! Based on http://www.ffconsultancy.com/ocaml/sudoku/index.html
 USING: sequences namespaces kernel math math.parser io
-io.styles combinators ;
+io.styles combinators columns ;
 IN: sudoku
 
 SYMBOL: solutions
 SYMBOL: board
 
-: pair+ swapd + >r + r> ;
+: pair+ ( a b c d -- a+b c+d ) swapd + >r + r> ;
 
-: row board get nth ;
-: board> row nth ;
-: >board row set-nth ;
-: f>board f -rot >board ;
+: row ( n -- row ) board get nth ;
+: board> ( m n -- x ) row nth ;
+: >board ( row m n -- ) row set-nth ;
+: f>board ( m n -- ) f -rot >board ;
 
 : row-contains? ( n y -- ? ) row member? ;
 : col-contains? ( n x -- ? ) board get swap <column> member? ;

@@ -1,9 +1,10 @@
 USING: help help.markup help.syntax help.definitions help.topics
 namespaces words sequences classes assocs vocabs kernel arrays
 prettyprint.backend kernel.private io generic math system
-strings sbufs vectors byte-arrays bit-arrays float-arrays
-quotations io.streams.byte-array io.encodings.string
-classes.builtin parser ;
+strings sbufs vectors byte-arrays
+quotations io.streams.byte-array
+classes.builtin parser lexer classes.predicate classes.union
+classes.intersection classes.singleton classes.tuple ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
@@ -31,7 +32,7 @@ $nl
     { { $snippet "set-" { $emphasis "foo" } } { "sets " { $snippet "foo" } " to a new value" } { $links set-length } }
     { { $snippet { $emphasis "foo" } "-" { $emphasis "bar" } } { "(tuple accessors) outputs the value of the " { $snippet "bar" } " slot of the " { $snippet "foo" } " at the top of the stack" } { } }
     { { $snippet "set-" { $emphasis "foo" } "-" { $emphasis "bar" } } { "(tuple mutators) sets the value of the " { $snippet "bar" } " slot of the " { $snippet "foo" } " at the top of the stack" } { } }
-    { { $snippet "with-" { $emphasis "foo" } } { "performs some kind of initialization and cleanup related to " { $snippet "foo" } ", usually in a new dynamic scope" } { $links with-scope with-stream } }
+    { { $snippet "with-" { $emphasis "foo" } } { "performs some kind of initialization and cleanup related to " { $snippet "foo" } ", usually in a new dynamic scope" } { $links with-scope with-input-stream with-output-stream } }
     { { $snippet "$" { $emphasis "foo" } } { "help markup" } { $links $heading $emphasis } }
 }
 { $heading "Stack effect conventions" }
@@ -40,8 +41,8 @@ $nl
 "Common terminology and abbreviations used throughout Factor and its documentation:"
 { $table
     { "Term" "Definition" }
-    { "alist" { "an association list. See " { $link "alists" } } }
-    { "assoc" "an associative mapping" }
+    { "alist" { "an association list; see " { $link "alists" } } }
+    { "assoc" { "an associative mapping; see " { $link "assocs" } } }
     { "associative mapping" { "an object whose class implements the " { $link "assocs-protocol" } } }
     { "boolean"               { { $link t } " or " { $link f } } }
     { "class"                 { "a set of objects identified by a " { $emphasis "class word" } " together with a discriminating predicate. See " { $link "classes" } } }
@@ -50,8 +51,9 @@ $nl
     { "generic word"          { "a word whose behavior depends can be specialized on the class of one of its inputs. See " { $link "generic" } } }
     { "method"                { "a specialized behavior of a generic word on a class. See " { $link "generic" } } }
     { "object"                { "any datum which can be identified" } }
+    { "ordering specifier"    { "see " { $link "order-specifiers" } } }
     { "pathname string"       { "an OS-specific pathname which identifies a file" } }
-    { "sequence" { "an object whose class implements the " { $link "sequence-protocol" } } }
+    { "sequence" { "a sequence; see " { $link "sequence-protocol" } } }
     { "slot"                  { "a component of an object which can store a value" } }
     { "stack effect"          { "a pictorial representation of a word's inputs and outputs, for example " { $snippet "+ ( x y -- z )" } ". See " { $link "effects" } } }
     { "true value"            { "any object not equal to " { $link f } } }
@@ -70,40 +72,11 @@ ARTICLE: "evaluator" "Evaluation semantics"
 "If the last action performed is the execution of a word, the current quotation is not saved on the call stack; this is known as " { $snippet "tail-recursion" } " and allows iterative algorithms to execute without incurring unbounded call stack usage."
 { $see-also "compiler" } ;
 
-USING: concurrency.combinators
-concurrency.messaging
-concurrency.promises
-concurrency.futures
-concurrency.locks
-concurrency.semaphores
-concurrency.count-downs
-concurrency.exchangers
-concurrency.flags ;
-
-ARTICLE: "concurrency" "Concurrency"
-"Factor supports a variety of concurrency abstractions, however they are mostly used to multiplex input/output operations since the thread scheduling is co-operative and only one CPU is used at a time."
-$nl
-"Factor's concurrency support was insipired by Erlang, Termite, Scheme48 and Java's " { $snippet "java.util.concurrent" } " library."
-$nl
-"The basic building blocks:"
-{ $subsection "threads" }
-"High-level abstractions:"
-{ $subsection "concurrency.combinators" }
-{ $subsection "concurrency.promises" }
-{ $subsection "concurrency.futures" }
-{ $subsection "concurrency.mailboxes" }
-{ $subsection "concurrency.messaging" }
-"Shared-state abstractions:"
-{ $subsection "concurrency.locks" }
-{ $subsection "concurrency.semaphores" }
-{ $subsection "concurrency.count-downs" }
-{ $subsection "concurrency.exchangers" }
-{ $subsection "concurrency.flags" }
-"Other concurrency abstractions include " { $vocab-link "concurrency.distributed" } " and " { $vocab-link "channels" } "." ;
-
 ARTICLE: "objects" "Objects"
 "An " { $emphasis "object" } " is any datum which may be identified. All values are objects in Factor. Each object carries type information, and types are checked at runtime; Factor is dynamically typed."
 { $subsection "equality" }
+{ $subsection "math.order" }
+{ $subsection "destructors" }
 { $subsection "classes" }
 { $subsection "tuples" }
 { $subsection "generic" }
@@ -126,7 +99,9 @@ ARTICLE: "numbers" "Numbers"
 "Advanced features:"
 { $subsection "math-vectors" }
 { $subsection "math-intervals" }
-{ $subsection "math-bitfields" } ;
+{ $subsection "math-bitfields" }
+"Implementation:"
+{ $subsection "math.libm" } ;
 
 USE: io.buffers
 
@@ -138,32 +113,33 @@ ARTICLE: "collections" "Collections"
 { $subsection "quotations" }
 "Fixed-length specialized sequences:"
 { $subsection "strings" }
-{ $subsection "bit-arrays" }
 { $subsection "byte-arrays" }
-{ $subsection "float-arrays" }
-"Resizable sequence:"
+"Resizable sequences:"
 { $subsection "vectors" }
-"Resizable specialized sequences:"
-{ $subsection "sbufs" }
-{ $subsection "bit-vectors" }
 { $subsection "byte-vectors" }
-{ $subsection "float-vectors" }
+{ $subsection "sbufs" }
+{ $subsection "growable" }
 { $heading "Associative mappings" }
 { $subsection "assocs" }
 { $subsection "namespaces" }
+{ $subsection "refs" }
 "Implementations:"
 { $subsection "hashtables" }
 { $subsection "alists" }
 { $subsection "enums" }
+{ $heading "Double-ended queues" }
+{ $subsection "dequeues" }
+"Implementations:"
+{ $subsection "dlists" }
+{ $subsection "search-dequeues" }
 { $heading "Other collections" }
 { $subsection "boxes" }
-{ $subsection "dlists" }
 { $subsection "heaps" }
 { $subsection "graphs" }
-{ $subsection "buffers" } ;
+{ $subsection "buffers" }
+"There are many other collections in " { $snippet "extra/" } ", such as " { $vocab-link "disjoint-set" } ", " { $vocab-link "persistent-vectors" } ", and " { $vocab-link "tuple-arrays" } "." ;
 
-USING: io.sockets io.launcher io.mmap io.monitors
-io.encodings.utf8 io.encodings.binary io.encodings.ascii io.files ;
+USING: io.encodings.utf8 io.encodings.utf16 io.encodings.binary io.encodings.ascii io.files ;
 
 ARTICLE: "encodings-introduction" "An introduction to encodings"
 "In order to express text in terms of binary, some sort of encoding has to be used. In a modern context, this is understood as a two-way mapping between Unicode code points (characters) and some amount of binary. Since English isn't the only language in the world, ASCII is not sufficient as a mapping from binary to Unicode; it can't even express em-dashes or curly quotes. Unicode was designed as a universal character set that could potentially represent everything." $nl
@@ -184,6 +160,10 @@ $nl
 ARTICLE: "io" "Input and output"
 { $heading "Streams" }
 { $subsection "streams" }
+{ $subsection "io.files" }
+{ $heading "Encodings" }
+{ $subsection "encodings-introduction" }
+{ $subsection "io.encodings" }
 "Wrapper streams:"
 { $subsection "io.streams.duplex" }
 { $subsection "io.streams.plain" }
@@ -192,18 +172,11 @@ ARTICLE: "io" "Input and output"
 "Utilities:"
 { $subsection "stream-binary" }
 { $subsection "styles" }
-{ $heading "Files" }
-{ $subsection "io.files" }
-{ $subsection "io.mmap" }
-{ $subsection "io.monitors" }
-{ $heading "Encodings" }
-{ $subsection "encodings-introduction" }
-{ $subsection "io.encodings" }
-{ $subsection "io.encodings.string" }
-{ $heading "Other features" }
-{ $subsection "network-streams" }
-{ $subsection "io.launcher" }
-{ $subsection "io.timeouts" } ;
+{ $subsection "checksums" }
+"Implementation:"
+{ $subsection "io.streams.c" }
+{ $subsection "io.ports" }
+{ $see-also "destructors" } ;
 
 ARTICLE: "tools" "Developer tools"
 { $subsection "tools.vocabs" }
@@ -212,6 +185,8 @@ ARTICLE: "tools" "Developer tools"
 { $subsection "listener" }
 { $subsection "tools.crossref" }
 { $subsection "inspector" }
+{ $subsection "tools.completion" }
+{ $subsection "summary" }
 "Debugging tools:"
 { $subsection "tools.annotations" }
 { $subsection "tools.test" }
@@ -228,64 +203,80 @@ ARTICLE: "article-index" "Article index"
 { $index [ articles get keys ] } ;
 
 ARTICLE: "primitive-index" "Primitive index"
-{ $index [ all-words [ primitive? ] subset ] } ;
+{ $index [ all-words [ primitive? ] filter ] } ;
 
 ARTICLE: "error-index" "Error index"
 { $index [ all-errors ] } ;
 
 ARTICLE: "type-index" "Type index"
-{ $index [ builtins get [ ] subset ] } ;
+{ $index [ builtins get sift ] } ;
 
 ARTICLE: "class-index" "Class index"
-{ $index [ classes ] } ;
+{ $heading "Built-in classes" }
+{ $index [ classes [ builtin-class? ] filter ] }
+{ $heading "Tuple classes" }
+{ $index [ classes [ tuple-class? ] filter ] }
+{ $heading "Singleton classes" }
+{ $index [ classes [ singleton-class? ] filter ] }
+{ $heading "Union classes" }
+{ $index [ classes [ union-class? ] filter ] }
+{ $heading "Intersection classes" }
+{ $index [ classes [ intersection-class? ] filter ] }
+{ $heading "Predicate classes" }
+{ $index [ classes [ predicate-class? ] filter ] } ;
 
 ARTICLE: "program-org" "Program organization"
 { $subsection "definitions" }
 { $subsection "vocabularies" }
 { $subsection "parser" }
-{ $subsection "vocabs.loader" } ;
+{ $subsection "vocabs.loader" }
+{ $subsection "source-files" } ;
 
 USING: help.cookbook help.tutorial ;
 
-ARTICLE: "handbook" "Factor documentation"
-"Welcome to Factor."
-{ $heading "Starting points" }
-{ $subsection "cookbook" }
-{ $subsection "first-program" }
-{ $subsection "vocab-index" }
-{ $heading "Language reference" }
+ARTICLE: "handbook-language-reference" "Language reference"
 { $subsection "conventions" }
 { $subsection "syntax" }
 { $subsection "dataflow" }
 { $subsection "objects" }
 { $subsection "program-org" }
-{ $heading "Library reference" }
 { $subsection "numbers" }
 { $subsection "collections" }
-{ $subsection "io" }
-{ $subsection "concurrency" }
-{ $subsection "system" }
-{ $subsection "alien" }
-{ $heading "Environment reference" }
-{ $subsection "cli" }
-{ $subsection "images" }
+{ $subsection "io" } ;
+
+ARTICLE: "handbook-environment-reference" "Environment reference"
 { $subsection "prettyprint" }
 { $subsection "tools" }
+{ $subsection "cli" }
 { $subsection "help" }
 { $subsection "inference" }
 { $subsection "compiler" }
-{ $subsection "layouts" }
-{ $heading "User interface" }
-{ $about "ui" }
-{ $about "ui.tools" }
-{ $heading "Index" }
+{ $subsection "system" }
+{ $subsection "images" }
+{ $subsection "alien" }
+{ $subsection "init" }
+{ $subsection "layouts" } ;
+
+ARTICLE: "handbook-library-reference" "Library reference"
+"This index only includes articles from loaded vocabularies. To explore more vocabularies, see " { $link "vocab-index" } "."
+{ $index [ "handbook" orphan-articles remove ] } ;
+
+ARTICLE: "handbook" "Factor documentation"
+"Welcome to Factor."
+$nl
+"Explore the code base:"
+{ $subsection "vocab-index" }
+"Learn the language:"
+{ $subsection "cookbook" }
+{ $subsection "first-program" }
+{ $subsection "handbook-language-reference" }
+{ $subsection "handbook-environment-reference" }
+{ $subsection "handbook-library-reference" }
+"The below indices only include articles from loaded vocabularies. To explore more vocabularies, see " { $link "vocab-index" } "."
+{ $subsection "article-index" }
 { $subsection "primitive-index" }
 { $subsection "error-index" }
 { $subsection "type-index" }
 { $subsection "class-index" } ;
 
-{ <array> <string> <sbuf> <vector> <byte-array> <bit-array> <float-array> }
-related-words
-
-{ >array >quotation >string >sbuf >vector >byte-array >bit-array >float-array }
-related-words
+ABOUT: "handbook"

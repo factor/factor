@@ -1,5 +1,5 @@
 IN: io.monitors
-USING: help.markup help.syntax continuations
+USING: help.markup help.syntax continuations destructors
 concurrency.mailboxes quotations ;
 
 HELP: with-monitors
@@ -55,23 +55,31 @@ ARTICLE: "io.monitors.descriptors" "File system change descriptors"
 { $subsection +rename-file+ } ;
 
 ARTICLE: "io.monitors.platforms" "Monitors on different platforms"
-"Whether the " { $snippet "path" } " output value of " { $link next-change } " contains an absolute path or a path relative to the path given to " { $link <monitor> } " is platform-specific. User code should not assume either case."
+"Whether the " { $snippet "path" } " output value of " { $link next-change } " contains an absolute path or a path relative to the path given to " { $link <monitor> } " is unspecified, and may even vary on the same platform. User code should not assume either case."
+$nl
+"If the immediate path being monitored was changed, then " { $snippet "path" } " will equal " { $snippet "\"\"" } "; however this condition is not reported on all platforms. See below."
 { $heading "Mac OS X" }
 "Factor uses " { $snippet "FSEventStream" } "s to implement monitors on Mac OS X. This requires Mac OS X 10.5 or later."
 $nl
 { $snippet "FSEventStream" } "s always monitor directory hierarchies recursively, and the " { $snippet "recursive?" } " parameter to " { $link <monitor> } " has no effect."
 $nl
 "The " { $snippet "changed" } " output value of the " { $link next-change } " word always outputs " { $link +modify-file+ } " and the " { $snippet "path" } " output value is always the directory containing the file that changed. Unlike other platforms, fine-grained information is not available."
+$nl
+"Only directories may be monitored, not individual files. Changes to the directory itself (permissions, modification time, and so on) are not reported; only changes to children are reported."
 { $heading "Windows" }
 "Factor uses " { $snippet "ReadDirectoryChanges" } " to implement monitors on Windows."
 $nl
 "Both recursive and non-recursive monitors are directly supported by the operating system."
+$nl
+"Only directories may be monitored, not individual files. Changes to the directory itself (permissions, modification time, and so on) are not reported; only changes to children are reported."
 { $heading "Linux" }
 "Factor uses " { $snippet "inotify" } " to implement monitors on Linux. This requires Linux kernel version 2.6.16 or later."
 $nl
 "Factor simulates recursive monitors by creating a hierarchy of monitors for every subdirectory, since " { $snippet "inotify" } " can only monitor a single directory. This is transparent to user code."
 $nl
 "Inside a single " { $link with-monitors } " scope, only one monitor may be created for any given directory."
+$nl
+"Both directories and files may be monitored. Unlike Mac OS X and Windows, changes to the immediate directory being monitored (permissions, modification time, and so on) are reported."
 { $heading "BSD" }
 "Factor uses " { $snippet "kqueue" } " to implement monitors on BSD."
 $nl

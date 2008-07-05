@@ -11,8 +11,9 @@
 ! modify, just find the function or data structure in the manual
 ! and note the section.
 
-USING: kernel arrays alien alien.c-types alien.syntax
-math math.bitfields words sequences namespaces continuations ;
+USING: kernel arrays alien alien.c-types alien.strings
+alien.syntax math math.bitfields words sequences namespaces
+continuations io.encodings.ascii ;
 IN: x11.xlib
 
 LIBRARY: xlib
@@ -1078,17 +1079,17 @@ FUNCTION: Status XWithdrawWindow (
 
 ! 17.1.7 - Setting and Reading the WM_NORMAL_HINTS Property
 
-: USPosition    1 0 shift ; inline
-: USSize        1 1 shift ; inline
-: PPosition     1 2 shift ; inline
-: PSize         1 3 shift ; inline
-: PMinSize      1 4 shift ; inline
-: PMaxSize      1 5 shift ; inline
-: PResizeInc    1 6 shift ; inline
-: PAspect       1 7 shift ; inline
-: PBaseSize     1 8 shift ; inline
-: PWinGravity   1 9 shift ; inline
-: PAllHints 
+: USPosition   ( -- n ) 0 2^ ; inline
+: USSize       ( -- n ) 1 2^ ; inline
+: PPosition    ( -- n ) 2 2^ ; inline
+: PSize        ( -- n ) 3 2^ ; inline
+: PMinSize     ( -- n ) 4 2^ ; inline
+: PMaxSize     ( -- n ) 5 2^ ; inline
+: PResizeInc   ( -- n ) 6 2^ ; inline
+: PAspect      ( -- n ) 7 2^ ; inline
+: PBaseSize    ( -- n ) 8 2^ ; inline
+: PWinGravity  ( -- n ) 9 2^ ; inline
+: PAllHints    ( -- n )
     { PPosition PSize PMinSize PMaxSize PResizeInc PAspect } flags ; foldable
 
 C-STRUCT: XSizeHints
@@ -1256,8 +1257,8 @@ FUNCTION: Status XSetStandardProperties (
 
 FUNCTION: void XFree ( void* data ) ;
 FUNCTION: int XStoreName ( Display* display, Window w, char* window_name ) ;
-
 FUNCTION: void XSetWMNormalHints ( Display* display, Window w, XSizeHints* hints ) ;
+FUNCTION: int XBell ( Display* display, int percent ) ;
 
 ! !!! INPUT METHODS
 
@@ -1365,14 +1366,14 @@ SYMBOL: root
 
 : x-atom ( string -- atom ) dpy get swap 0 XInternAtom ;
 
-: check-display
+: check-display ( alien -- alien' )
     [
         "Cannot connect to X server - check $DISPLAY" throw
     ] unless* ;
 
 : initialize-x ( display-string -- )
     init-locale
-    dup [ string>char-alien ] when
+    dup [ ascii string>alien ] when
     XOpenDisplay check-display dpy set-global
     dpy get XDefaultScreen scr set-global
     dpy get scr get XRootWindow root set-global ;

@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Alex Chapman All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs assocs.lib kernel gap-buffer generic trees trees.avl math
+USING: assocs kernel gap-buffer generic trees trees.avl math
 sequences quotations ;
 IN: gap-buffer.cursortree
 
@@ -21,7 +21,7 @@ TUPLE: right-cursor ;
 
 : cursor-index ( cursor -- i ) cursor-i ;
 
-: add-cursor ( cursortree cursor -- ) dup cursor-index rot insert-at ; 
+: add-cursor ( cursortree cursor -- ) dup cursor-index rot push-at ; 
 
 : remove-cursor ( cursortree cursor -- )
     tuck cursor-index swap cursortree-cursors at* [ delete ] [ 2drop ] if ;

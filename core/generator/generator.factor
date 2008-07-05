@@ -1,11 +1,11 @@
-! Copyright (C) 2004, 2008 Slava Pestov.
+ ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs classes combinators cpu.architecture
+USING: accessors arrays assocs classes combinators cpu.architecture
 effects generator.fixup generator.registers generic hashtables
 inference inference.backend inference.dataflow io kernel
 kernel.private layouts math namespaces optimizer
 optimizer.specializers prettyprint quotations sequences system
-threads words vectors ;
+threads words vectors sets dequeues ;
 IN: generator
 
 SYMBOL: compile-queue
@@ -16,11 +16,11 @@ SYMBOL: compiled
         { [ dup compiled get key? ] [ drop ] }
         { [ dup inlined-block? ] [ drop ] }
         { [ dup primitive? ] [ drop ] }
-        [ dup compile-queue get set-at ]
+        [ compile-queue get push-front ]
     } cond ;
 
 : maybe-compile ( word -- )
-    dup compiled? [ drop ] [ queue-compile ] if ;
+    dup compiled>> [ drop ] [ queue-compile ] if ;
 
 SYMBOL: compiling-word
 
@@ -40,16 +40,16 @@ SYMBOL: current-label-start
     compiled-stack-traces?
     compiling-word get f ?
     1vector literal-table set
-    f compiling-word get compiled get set-at ;
+    f compiling-label get compiled get set-at ;
 
-: finish-compiling ( literals relocation labels code -- )
+: save-machine-code ( literals relocation labels code -- )
     4array compiling-label get compiled get set-at ;
 
 : with-generator ( node word label quot -- )
     [
         >r begin-compiling r>
         { } make fixup
-        finish-compiling
+        save-machine-code
     ] with-scope ; inline
 
 GENERIC: generate-node ( node -- next )
@@ -72,9 +72,12 @@ GENERIC: generate-node ( node -- next )
 
 : word-dataflow ( word -- effect dataflow )
     [
-        dup "no-effect" word-prop [ no-effect ] when
-        dup specialized-def over dup 2array 1array infer-quot
-        finish-word
+        [
+            dup "cannot-infer" word-prop [ cannot-infer-effect ] when
+            dup "no-compile" word-prop [ cannot-infer-effect ] when
+            dup specialized-def over dup 2array 1array infer-quot
+            finish-word
+        ] maybe-cannot-infer
     ] with-infer ;
 
 : intrinsics ( #call -- quot )

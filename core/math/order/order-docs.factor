@@ -1,0 +1,99 @@
+USING: help.markup help.syntax kernel math quotations
+math.private words ;
+IN: math.order
+
+HELP: <=>
+{ $values { "obj1" object } { "obj2" object } { "<=>" "an ordering specifier" } }
+{ $contract
+    "Compares two objects using an intrinsic linear order, for example, the natural order for real numbers and lexicographic order for strings."
+    $nl
+    "The output value is one of the following:"
+    { $list
+        { { $link +lt+ } " - indicating that " { $snippet "obj1" } " precedes " { $snippet "obj2" } }
+        { { $link +eq+ } " - indicating that " { $snippet "obj1" } " is equal to " { $snippet "obj2" } }
+        { { $link +gt+ } " - indicating that " { $snippet "obj1" } " follows " { $snippet "obj2" } }
+    }
+} ;
+
+HELP: +lt+
+{ $description "Output by " { $link <=> } " when the first object is strictly less than the second object." } ;
+
+HELP: +eq+
+{ $description "Output by " { $link <=> } " when the first object is equal to the second object." } ;
+
+HELP: +gt+
+{ $description "Output by " { $link <=> } " when the first object is strictly greater than the second object." } ;
+
+HELP: invert-comparison
+{ $values { "<=>" symbol }
+          { "<=>'" symbol } }
+{ $description "Invert the comparison symbol returned by " { $link <=> } "." }
+{ $examples
+    { $example "USING: math.order prettyprint ;" "+lt+ invert-comparison ." "+gt+" } } ;
+
+HELP: compare
+{ $values { "obj1" object } { "obj2" object } { "quot" "a quotation with stack effect " { $snippet "( obj -- newobj )" } } { "<=>" "an ordering specifier" } }
+{ $description "Compares the results of applying the quotation to both objects via " { $link <=> } "." }
+{ $examples { $example "USING: kernel math.order prettyprint sequences ;" "\"hello\" \"hi\" [ length ] compare ." "+gt+" }
+} ;
+
+HELP: max
+{ $values { "x" real } { "y" real } { "z" real } }
+{ $description "Outputs the greatest of two real numbers." } ;
+
+HELP: min
+{ $values { "x" real } { "y" real } { "z" real } }
+{ $description "Outputs the smallest of two real numbers." } ;
+
+HELP: between?
+{ $values { "x" real } { "y" real } { "z" real } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "x" } " is in the interval " { $snippet "[y,z]" } "." }
+{ $notes "As per the closed interval notation, the end-points are included in the interval." } ;
+
+HELP: before?
+{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "obj1" } " comes before " { $snippet "obj2" } " using an intrinsic total order." }
+{ $notes "Implemented using " { $link <=> } "." } ;
+
+HELP: after?
+{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "obj1" } " comes after " { $snippet "obj2" } " using an intrinsic total order." }
+{ $notes "Implemented using " { $link <=> } "." } ;
+
+HELP: before=?
+{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "obj1" } " comes before or equals " { $snippet "obj2" } " using an intrinsic total order." }
+{ $notes "Implemented using " { $link <=> } "." } ;
+
+HELP: after=?
+{ $values { "obj1" "an object" } { "obj2" "an object" } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "obj1" } " comes after or equals " { $snippet "obj2" } " using an intrinsic total order." }
+{ $notes "Implemented using " { $link <=> } "." } ;
+
+{ before? after? before=? after=? } related-words
+
+HELP: [-]
+{ $values { "x" real } { "y" real } { "z" real } }
+{ $description "Subtracts " { $snippet "y" } " from " { $snippet "x" } ". If the result is less than zero, outputs zero." } ;
+
+ARTICLE: "order-specifiers" "Ordering specifiers"
+"Ordering words such as " { $link <=> } " output one of the following values, indicating that of two objects being compared, the first is less than the second, the two are equal, or that the first is greater than the second:"
+{ $subsection +lt+ }
+{ $subsection +eq+ }
+{ $subsection +gt+ } ;
+    
+ARTICLE: "math.order" "Linear order protocol"
+"Some classes have an intrinsic order amongst instances:"
+{ $subsection <=> }
+{ $subsection compare }
+{ $subsection invert-comparison }
+"The above words output order specifiers."
+{ $subsection "order-specifiers" }
+"Utilities for comparing objects:"
+{ $subsection after? }
+{ $subsection before? }
+{ $subsection after=? }
+{ $subsection before=? }
+{ $see-also "sequences-sorting" } ;
+
+ABOUT: "math.order"

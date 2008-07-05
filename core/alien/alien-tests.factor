@@ -58,8 +58,6 @@ cell 8 = [
 [ "ALIEN: 1234" ] [ 1234 <alien> unparse ] unit-test
 
 [ ] [ 0 B{ 1 2 3 } <displaced-alien> drop ] unit-test
-[ ] [ 0 F{ 1 2 3 } <displaced-alien> drop ] unit-test
-[ ] [ 0 ?{ t f t } <displaced-alien> drop ] unit-test
 
 [ 0 B{ 1 2 3 } <displaced-alien> alien-address ] must-fail
 

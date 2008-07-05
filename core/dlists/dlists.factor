@@ -1,22 +1,25 @@
 ! Copyright (C) 2007, 2008 Mackenzie Straight, Doug Coleman,
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel math sequences accessors ;
+USING: combinators kernel math sequences accessors summary
+dequeues ;
 IN: dlists
 
 TUPLE: dlist front back length ;
 
 : <dlist> ( -- obj )
     dlist new
-    0 >>length ;
+        0 >>length ;
 
-: dlist-empty? ( dlist -- ? ) front>> not ;
+M: dlist dequeue-length length>> ;
 
 <PRIVATE
 
 TUPLE: dlist-node obj prev next ;
 
 C: <dlist-node> dlist-node
+
+M: dlist-node node-value obj>> ;
 
 : inc-length ( dlist -- )
     [ 1+ ] change-length drop ; inline
@@ -47,7 +50,7 @@ C: <dlist-node> dlist-node
 
 : (dlist-find-node) ( dlist-node quot -- node/f ? )
     over [
-        [ >r obj>> r> call ] 2keep rot
+        [ call ] 2keep rot
         [ drop t ] [ >r next>> r> (dlist-find-node) ] if
     ] [ 2drop f f ] if ; inline
 
@@ -55,84 +58,83 @@ C: <dlist-node> dlist-node
     >r front>> r> (dlist-find-node) ; inline
 
 : dlist-each-node ( dlist quot -- )
-    [ t ] compose dlist-find-node 2drop ; inline
+    [ f ] compose dlist-find-node 2drop ; inline
+
+: unlink-node ( dlist-node -- )
+    dup prev>> over next>> set-prev-when
+    dup next>> swap prev>> set-next-when ;
 
 PRIVATE>
 
-: push-front* ( obj dlist -- dlist-node )
+M: dlist push-front* ( obj dlist -- dlist-node )
     [ front>> f swap <dlist-node> dup dup set-next-prev ] keep
     [ (>>front) ] keep
     [ set-back-to-front ] keep
     inc-length ;
 
-: push-front ( obj dlist -- )
-    push-front* drop ;
-
-: push-all-front ( seq dlist -- )
-    [ push-front ] curry each ;
-
-: push-back* ( obj dlist -- dlist-node )
+M: dlist push-back* ( obj dlist -- dlist-node )
     [ back>> f <dlist-node> ] keep
     [ back>> set-next-when ] 2keep
     [ (>>back) ] 2keep
     [ set-front-to-back ] keep
     inc-length ;
 
-: push-back ( obj dlist -- )
-    push-back* drop ;
+ERROR: empty-dlist ;
 
-: push-all-back ( seq dlist -- )
-    [ push-back ] curry each ;
+M: empty-dlist summary ( dlist -- )
+    drop "Empty dlist" ;
 
-: peek-front ( dlist -- obj )
-    front>> obj>> ;
+M: dlist peek-front ( dlist -- obj )
+    front>> [ obj>> ] [ empty-dlist ] if* ;
 
-: pop-front ( dlist -- obj )
-    dup front>> [
+M: dlist pop-front* ( dlist -- )
+    dup front>> [ empty-dlist ] unless
+    [
+        dup front>>
         dup next>>
         f rot (>>next)
         f over set-prev-when
         swap (>>front)
-    ] 2keep obj>>
-    swap [ normalize-back ] keep dec-length ;
+    ] keep
+    [ normalize-back ] keep
+    dec-length ;
 
-: pop-front* ( dlist -- ) pop-front drop ;
+M: dlist peek-back ( dlist -- obj )
+    back>> [ obj>> ] [ empty-dlist ] if* ;
 
-: peek-back ( dlist -- obj )
-    back>> obj>> ;
-
-: pop-back ( dlist -- obj )
-    dup back>> [
+M: dlist pop-back* ( dlist -- )
+    dup back>> [ empty-dlist ] unless
+    [
+        dup back>>
         dup prev>>
         f rot (>>prev)
         f over set-next-when
         swap (>>back)
-    ] 2keep obj>>
-    swap [ normalize-front ] keep dec-length ;
-
-: pop-back* ( dlist -- ) pop-back drop ;
+    ] keep
+    [ normalize-front ] keep
+    dec-length ;
 
 : dlist-find ( dlist quot -- obj/f ? )
+    [ obj>> ] prepose
     dlist-find-node [ obj>> t ] [ drop f f ] if ; inline
 
 : dlist-contains? ( dlist quot -- ? )
     dlist-find nip ; inline
 
-: unlink-node ( dlist-node -- )
-    dup prev>> over next>> set-prev-when
-    dup next>> swap prev>> set-next-when ;
+M: dlist dequeue-member? ( value dlist -- ? )
+    [ = ] curry dlist-contains? ;
 
-: delete-node ( dlist dlist-node -- )
+M: dlist delete-node ( dlist-node dlist -- )
     {
-        { [ over front>> over eq? ] [ drop pop-front* ] }
-        { [ over back>> over eq? ] [ drop pop-back* ] }
-        [ unlink-node dec-length ]
+        { [ 2dup front>> eq? ] [ nip pop-front* ] }
+        { [ 2dup back>> eq? ] [ nip pop-back* ] }
+        [ dec-length unlink-node ]
     } cond ;
 
 : delete-node-if* ( dlist quot -- obj/f ? )
     dupd dlist-find-node [
         dup [
-            [ delete-node ] keep obj>> t
+            [ swap delete-node ] keep obj>> t
         ] [
             2drop f f
         ] if
@@ -141,23 +143,17 @@ PRIVATE>
     ] if ; inline
 
 : delete-node-if ( dlist quot -- obj/f )
-    delete-node-if* drop ; inline
+    [ obj>> ] prepose delete-node-if* drop ; inline
 
-: dlist-delete ( obj dlist -- obj/f )
-    swap [ eq? ] curry delete-node-if ;
-
-: dlist-delete-all ( dlist -- )
+M: dlist clear-dequeue ( dlist -- )
     f >>front
     f >>back
     0 >>length
     drop ;
 
 : dlist-each ( dlist quot -- )
-    [ obj>> ] swap compose dlist-each-node ; inline
-
-: dlist-slurp ( dlist quot -- )
-    over dlist-empty?
-    [ 2drop ] [ [ >r pop-back r> call ] 2keep dlist-slurp ] if ;
-    inline
+    [ obj>> ] prepose dlist-each-node ; inline
 
 : 1dlist ( obj -- dlist ) <dlist> [ push-front ] keep ;
+
+INSTANCE: dlist dequeue

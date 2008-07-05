@@ -1,8 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generator.fixup io.binary kernel
-combinators kernel.private math namespaces parser sequences
-words system layouts ;
+combinators kernel.private math namespaces sequences
+words system layouts math.order accessors
+cpu.x86.assembler.syntax ;
 IN: cpu.x86.assembler
 
 ! A postfix assembler for x86 and AMD64.
@@ -11,27 +12,7 @@ IN: cpu.x86.assembler
 ! In 64-bit mode, { 1234 } is RIP-relative.
 ! Beware!
 
-: n, >le % ; inline
-: 4, 4 n, ; inline
-: 2, 2 n, ; inline
-: cell, bootstrap-cell n, ; inline
-
 ! Register operands -- eg, ECX
-<<
-
-: define-register ( name num size -- )
-    >r >r "cpu.x86.assembler" create dup define-symbol r> r>
-    >r dupd "register" set-word-prop r>
-    "register-size" set-word-prop ;
-
-: define-registers ( names size -- )
-    >r dup length r> [ define-register ] curry 2each ;
-
-: REGISTERS:
-    scan-word ";" parse-tokens swap define-registers ; parsing
-
->>
-
 REGISTERS: 8 AL CL DL BL ;
 
 REGISTERS: 16 AX CX DX BX SP BP SI DI ;
@@ -44,6 +25,10 @@ RAX RCX RDX RBX RSP RBP RSI RDI R8 R9 R10 R11 R12 R13 R14 R15 ;
 REGISTERS: 128
 XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7
 XMM8 XMM9 XMM10 XMM11 XMM12 XMM13 XMM14 XMM15 ;
+
+TUPLE: byte value ;
+
+C: <byte> byte
 
 <PRIVATE
 
@@ -75,50 +60,38 @@ M: register extended? "register" word-prop 7 > ;
 ! Addressing modes
 TUPLE: indirect base index scale displacement ;
 
-M: indirect extended? indirect-base extended? ;
+M: indirect extended? base>> extended? ;
 
-: canonicalize-EBP
+: canonicalize-EBP ( indirect -- indirect )
     #! { EBP } ==> { EBP 0 }
-    dup indirect-base { EBP RBP R13 } memq? [
-        dup indirect-displacement [
-            drop
-        ] [
-            0 swap set-indirect-displacement
-        ] if
-    ] [
-        drop
-    ] if ;
+    dup base>> { EBP RBP R13 } member? [
+        dup displacement>> [ 0 >>displacement ] unless
+    ] when ;
 
-: canonicalize-ESP
+: canonicalize-ESP ( indirect -- indirect )
     #! { ESP } ==> { ESP ESP }
-    dup indirect-base { ESP RSP R12 } memq? [
-        ESP swap set-indirect-index
-    ] [
-        drop
-    ] if ;
+    dup base>> { ESP RSP R12 } member? [ ESP >>index ] when ;
 
-: canonicalize ( indirect -- )
+: canonicalize ( indirect -- indirect )
     #! Modify the indirect to work around certain addressing mode
     #! quirks.
-    dup canonicalize-EBP
-    canonicalize-ESP ;
+    canonicalize-EBP canonicalize-ESP ;
 
 : <indirect> ( base index scale displacement -- indirect )
-    indirect boa dup canonicalize ;
+    indirect boa canonicalize ;
 
-: reg-code "register" word-prop 7 bitand ;
+: reg-code ( reg -- n ) "register" word-prop 7 bitand ;
 
-: indirect-base* indirect-base EBP or reg-code ;
+: indirect-base* ( op -- n ) base>> EBP or reg-code ;
 
-: indirect-index* indirect-index ESP or reg-code ;
+: indirect-index* ( op -- n ) index>> ESP or reg-code ;
 
-: indirect-scale* indirect-scale 0 or ;
+: indirect-scale* ( op -- n ) scale>> 0 or ;
 
 GENERIC: sib-present? ( op -- ? )
 
 M: indirect sib-present?
-    dup indirect-base { ESP RSP } memq?
-    over indirect-index rot indirect-scale or or ;
+    [ base>> { ESP RSP } member? ] [ index>> ] [ scale>> ] tri or or ;
 
 M: register sib-present? drop f ;
 
@@ -130,16 +103,23 @@ M: indirect r/m
 
 M: register r/m reg-code ;
 
-: byte? -128 127 between? ;
+! Immediate operands
+UNION: immediate byte integer ;
+
+GENERIC: fits-in-byte? ( value -- ? )
+
+M: byte fits-in-byte? drop t ;
+
+M: integer fits-in-byte? -128 127 between? ;
 
 GENERIC: modifier ( op -- n )
 
 M: indirect modifier
-    dup indirect-base [
-        indirect-displacement {
-            { [ dup not ]      [ BIN: 00 ] }
-            { [ dup byte? ]    [ BIN: 01 ] }
-            { [ dup integer? ] [ BIN: 10 ] }
+    dup base>> [
+        displacement>> {
+            { [ dup not ] [ BIN: 00 ] }
+            { [ dup fits-in-byte? ] [ BIN: 01 ] }
+            { [ dup immediate? ] [ BIN: 10 ] }
         } cond nip
     ] [
         drop BIN: 00
@@ -147,14 +127,23 @@ M: indirect modifier
 
 M: register modifier drop BIN: 11 ;
 
+GENERIC# n, 1 ( value n -- )
+
+M: integer n, >le % ;
+M: byte n, >r value>> r> n, ;
+: 1, ( n -- ) 1 n, ; inline
+: 4, ( n -- ) 4 n, ; inline
+: 2, ( n -- ) 2 n, ; inline
+: cell, ( n -- ) bootstrap-cell n, ; inline
+
 : mod-r/m, ( reg# indirect -- )
-    dup modifier 6 shift rot 3 shift rot r/m bitor bitor , ;
+    [ 3 shift ] [ [ modifier 6 shift ] [ r/m ] bi ] bi* bitor bitor , ;
 
 : sib, ( indirect -- )
     dup sib-present? [
-        dup indirect-base*
-        over indirect-index* 3 shift bitor
-        swap indirect-scale* 6 shift bitor ,
+        [ indirect-base* ]
+        [ indirect-index* 3 shift ]
+        [ indirect-scale* 6 shift ] tri bitor bitor ,
     ] [
         drop
     ] if ;
@@ -162,9 +151,9 @@ M: register modifier drop BIN: 11 ;
 GENERIC: displacement, ( op -- )
 
 M: indirect displacement,
-    dup indirect-displacement dup [
-        swap indirect-base
-        [ dup byte? [ , ] [ 4, ] if ] [ 4, ] if
+    dup displacement>> dup [
+        swap base>>
+        [ dup fits-in-byte? [ , ] [ 4, ] if ] [ 4, ] if
     ] [
         2drop
     ] if ;
@@ -172,18 +161,19 @@ M: indirect displacement,
 M: register displacement, drop ;
 
 : addressing ( reg# indirect -- )
-    [ mod-r/m, ] keep [ sib, ] keep displacement, ;
+    [ mod-r/m, ] [ sib, ] [ displacement, ] tri ;
 
 ! Utilities
 UNION: operand register indirect ;
 
-: operand-64? ( operand -- ? )
-    dup indirect? [
-        dup indirect-base register-64?
-        swap indirect-index register-64? or
-    ] [
-        register-64?
-    ] if ;
+GENERIC: operand-64? ( operand -- ? )
+
+M: indirect operand-64?
+    [ base>> ] [ index>> ] bi [ operand-64? ] either? ;
+
+M: register-64 operand-64? drop t ;
+
+M: object operand-64? drop f ;
 
 : rex.w? ( rex.w reg r/m -- ? )
     {
@@ -192,14 +182,13 @@ UNION: operand register indirect ;
         [ nip operand-64? ]
     } cond and ;
 
-: rex.r
+: rex.r ( m op -- n )
     extended? [ BIN: 00000100 bitor ] when ;
 
-: rex.b
+: rex.b ( m op -- n )
     [ extended? [ BIN: 00000001 bitor ] when ] keep
     dup indirect? [
-        indirect-index extended?
-        [ BIN: 00000010 bitor ] when
+        index>> extended? [ BIN: 00000010 bitor ] when
     ] [
         drop
     ] if ;
@@ -222,7 +211,7 @@ UNION: operand register indirect ;
     #! the opcode.
     >r dupd prefix-1 reg-code r> + , ;
 
-: opcode, dup array? [ % ] [ , ] if ;
+: opcode, ( opcode -- ) dup array? [ % ] [ , ] if ;
 
 : extended-opcode ( opcode -- opcode' ) OCT: 17 swap 2array ;
 
@@ -230,25 +219,34 @@ UNION: operand register indirect ;
 
 : opcode-or ( opcode mask -- opcode' )
     swap dup array?
-    [ 1 cut* first rot bitor suffix ] [ bitor ] if ;
+    [ unclip-last rot bitor suffix ] [ bitor ] if ;
 
-: 1-operand ( op reg rex.w opcode -- )
+: 1-operand ( op reg,rex.w,opcode -- )
     #! The 'reg' is not really a register, but a value for the
     #! 'reg' field of the mod-r/m byte.
-    >r >r over r> prefix-1 r> opcode, swap addressing ;
+    first3 >r >r over r> prefix-1 r> opcode, swap addressing ;
 
-: immediate-1 ( imm dst reg rex.w opcode -- )
-    1-operand , ;
+: immediate-operand-size-bit ( imm dst reg,rex.w,opcode -- imm dst reg,rex.w,opcode )
+    pick integer? [ first3 BIN: 1 opcode-or 3array ] when ;
 
-: immediate-1/4 ( imm dst reg rex.w opcode -- )
+: immediate-1 ( imm dst reg,rex.w,opcode -- )
+    immediate-operand-size-bit 1-operand 1, ;
+
+: immediate-4 ( imm dst reg,rex.w,opcode -- )
+    immediate-operand-size-bit 1-operand 4, ;
+
+: immediate-fits-in-size-bit ( imm dst reg,rex.w,opcode -- imm dst reg,rex.w,opcode )
+    pick integer? [ first3 BIN: 10 opcode-or 3array ] when ;
+
+: immediate-1/4 ( imm dst reg,rex.w,opcode -- )
     #! If imm is a byte, compile the opcode and the byte.
-    #! Otherwise, set the 32-bit operand flag in the opcode, and
+    #! Otherwise, set the 8-bit operand flag in the opcode, and
     #! compile the cell. The 'reg' is not really a register, but
     #! a value for the 'reg' field of the mod-r/m byte.
-    >r >r pick byte? [
-        r> r> BIN: 10 opcode-or immediate-1
+    pick fits-in-byte? [
+        immediate-fits-in-size-bit immediate-1
     ] [
-        r> r> 1-operand 4,
+        immediate-4
     ] if ;
 
 : (2-operand) ( dst src op -- )
@@ -283,22 +281,24 @@ PRIVATE>
 ! Moving stuff
 GENERIC: PUSH ( op -- )
 M: register PUSH f HEX: 50 short-operand ;
-M: integer PUSH HEX: 68 , 4, ;
-M: operand PUSH BIN: 110 f HEX: ff 1-operand ;
+M: immediate PUSH HEX: 68 , 4, ;
+M: operand PUSH { BIN: 110 f HEX: ff } 1-operand ;
 
 GENERIC: POP ( op -- )
 M: register POP f HEX: 58 short-operand ;
-M: operand POP BIN: 000 f HEX: 8f 1-operand ;
+M: operand POP { BIN: 000 f HEX: 8f } 1-operand ;
 
 ! MOV where the src is immediate.
 GENERIC: (MOV-I) ( src dst -- )
 M: register (MOV-I) t HEX: b8 short-operand cell, ;
-M: operand (MOV-I) BIN: 000 t HEX: c7 1-operand 4, ;
+M: operand (MOV-I)
+    { BIN: 000 t HEX: c6 }
+    pick byte? [ immediate-1 ] [ immediate-4 ] if ;
 
 PREDICATE: callable < word register? not ;
 
 GENERIC: MOV ( dst src -- )
-M: integer MOV swap (MOV-I) ;
+M: immediate MOV swap (MOV-I) ;
 M: callable MOV 0 rot (MOV-I) rc-absolute-cell rel-word ;
 M: operand MOV HEX: 88 2-operand ;
 
@@ -306,38 +306,38 @@ M: operand MOV HEX: 88 2-operand ;
 
 ! Control flow
 GENERIC: JMP ( op -- )
-: (JMP) HEX: e9 , 0 4, rc-relative ;
+: (JMP) ( -- rel-class ) HEX: e9 , 0 4, rc-relative ;
 M: callable JMP (JMP) rel-word ;
 M: label JMP (JMP) label-fixup ;
-M: operand JMP BIN: 100 t HEX: ff 1-operand ;
+M: operand JMP { BIN: 100 t HEX: ff } 1-operand ;
 
 GENERIC: CALL ( op -- )
-: (CALL) HEX: e8 , 0 4, rc-relative ;
+: (CALL) ( -- rel-class ) HEX: e8 , 0 4, rc-relative ;
 M: callable CALL (CALL) rel-word ;
 M: label CALL (CALL) label-fixup ;
-M: operand CALL BIN: 010 t HEX: ff 1-operand ;
+M: operand CALL { BIN: 010 t HEX: ff } 1-operand ;
 
 GENERIC# JUMPcc 1 ( addr opcode -- )
-: (JUMPcc) extended-opcode, 0 4, rc-relative ;
+: (JUMPcc) ( n -- rel-class ) extended-opcode, 0 4, rc-relative ;
 M: callable JUMPcc (JUMPcc) rel-word ;
 M: label JUMPcc (JUMPcc) label-fixup ;
 
-: JO  HEX: 80 JUMPcc ;
-: JNO HEX: 81 JUMPcc ;
-: JB  HEX: 82 JUMPcc ;
-: JAE HEX: 83 JUMPcc ;
-: JE  HEX: 84 JUMPcc ; ! aka JZ
-: JNE HEX: 85 JUMPcc ;
-: JBE HEX: 86 JUMPcc ;
-: JA  HEX: 87 JUMPcc ;
-: JS  HEX: 88 JUMPcc ;
-: JNS HEX: 89 JUMPcc ;
-: JP  HEX: 8a JUMPcc ;
-: JNP HEX: 8b JUMPcc ;
-: JL  HEX: 8c JUMPcc ;
-: JGE HEX: 8d JUMPcc ;
-: JLE HEX: 8e JUMPcc ;
-: JG  HEX: 8f JUMPcc ;
+: JO  ( dst -- ) HEX: 80 JUMPcc ;
+: JNO ( dst -- ) HEX: 81 JUMPcc ;
+: JB  ( dst -- ) HEX: 82 JUMPcc ;
+: JAE ( dst -- ) HEX: 83 JUMPcc ;
+: JE  ( dst -- ) HEX: 84 JUMPcc ; ! aka JZ
+: JNE ( dst -- ) HEX: 85 JUMPcc ;
+: JBE ( dst -- ) HEX: 86 JUMPcc ;
+: JA  ( dst -- ) HEX: 87 JUMPcc ;
+: JS  ( dst -- ) HEX: 88 JUMPcc ;
+: JNS ( dst -- ) HEX: 89 JUMPcc ;
+: JP  ( dst -- ) HEX: 8a JUMPcc ;
+: JNP ( dst -- ) HEX: 8b JUMPcc ;
+: JL  ( dst -- ) HEX: 8c JUMPcc ;
+: JGE ( dst -- ) HEX: 8d JUMPcc ;
+: JLE ( dst -- ) HEX: 8e JUMPcc ;
+: JG  ( dst -- ) HEX: 8f JUMPcc ;
 
 : LEAVE ( -- ) HEX: c9 , ;
 
@@ -347,57 +347,57 @@ M: label JUMPcc (JUMPcc) label-fixup ;
 ! Arithmetic
 
 GENERIC: ADD ( dst src -- )
-M: integer ADD swap BIN: 000 t HEX: 81 immediate-1/4 ;
+M: immediate ADD swap { BIN: 000 t HEX: 80 } immediate-1/4 ;
 M: operand ADD OCT: 000 2-operand ;
 
 GENERIC: OR ( dst src -- )
-M: integer OR swap BIN: 001 t HEX: 81 immediate-1/4 ;
+M: immediate OR swap { BIN: 001 t HEX: 80 } immediate-1/4 ;
 M: operand OR OCT: 010 2-operand ;
 
 GENERIC: ADC ( dst src -- )
-M: integer ADC swap BIN: 010 t HEX: 81 immediate-1/4 ;
+M: immediate ADC swap { BIN: 010 t HEX: 80 } immediate-1/4 ;
 M: operand ADC OCT: 020 2-operand ;
 
 GENERIC: SBB ( dst src -- )
-M: integer SBB swap BIN: 011 t HEX: 81 immediate-1/4 ;
+M: immediate SBB swap { BIN: 011 t HEX: 80 } immediate-1/4 ;
 M: operand SBB OCT: 030 2-operand ;
 
 GENERIC: AND ( dst src -- )
-M: integer AND swap BIN: 100 t HEX: 81 immediate-1/4 ;
+M: immediate AND swap { BIN: 100 t HEX: 80 } immediate-1/4 ;
 M: operand AND OCT: 040 2-operand ;
 
 GENERIC: SUB ( dst src -- )
-M: integer SUB swap BIN: 101 t HEX: 81 immediate-1/4 ;
+M: immediate SUB swap { BIN: 101 t HEX: 80 } immediate-1/4 ;
 M: operand SUB OCT: 050 2-operand ;
 
 GENERIC: XOR ( dst src -- )
-M: integer XOR swap BIN: 110 t HEX: 81 immediate-1/4 ;
+M: immediate XOR swap { BIN: 110 t HEX: 80 } immediate-1/4 ;
 M: operand XOR OCT: 060 2-operand ;
 
 GENERIC: CMP ( dst src -- )
-M: integer CMP swap BIN: 111 t HEX: 81 immediate-1/4 ;
+M: immediate CMP swap { BIN: 111 t HEX: 80 } immediate-1/4 ;
 M: operand CMP OCT: 070 2-operand ;
 
-: NOT  ( dst -- ) BIN: 010 t HEX: f7 1-operand ;
-: NEG  ( dst -- ) BIN: 011 t HEX: f7 1-operand ;
-: MUL  ( dst -- ) BIN: 100 t HEX: f7 1-operand ;
-: IMUL ( src -- ) BIN: 101 t HEX: f7 1-operand ;
-: DIV  ( dst -- ) BIN: 110 t HEX: f7 1-operand ;
-: IDIV ( src -- ) BIN: 111 t HEX: f7 1-operand ;
+: NOT  ( dst -- ) { BIN: 010 t HEX: f7 } 1-operand ;
+: NEG  ( dst -- ) { BIN: 011 t HEX: f7 } 1-operand ;
+: MUL  ( dst -- ) { BIN: 100 t HEX: f7 } 1-operand ;
+: IMUL ( src -- ) { BIN: 101 t HEX: f7 } 1-operand ;
+: DIV  ( dst -- ) { BIN: 110 t HEX: f7 } 1-operand ;
+: IDIV ( src -- ) { BIN: 111 t HEX: f7 } 1-operand ;
 
-: CDQ HEX: 99 , ;
-: CQO HEX: 48 , CDQ ;
+: CDQ ( -- ) HEX: 99 , ;
+: CQO ( -- ) HEX: 48 , CDQ ;
 
-: ROL ( dst n -- ) swap BIN: 000 t HEX: c1 immediate-1 ;
-: ROR ( dst n -- ) swap BIN: 001 t HEX: c1 immediate-1 ;
-: RCL ( dst n -- ) swap BIN: 010 t HEX: c1 immediate-1 ;
-: RCR ( dst n -- ) swap BIN: 011 t HEX: c1 immediate-1 ;
-: SHL ( dst n -- ) swap BIN: 100 t HEX: c1 immediate-1 ;
-: SHR ( dst n -- ) swap BIN: 101 t HEX: c1 immediate-1 ;
-: SAR ( dst n -- ) swap BIN: 111 t HEX: c1 immediate-1 ;
+: ROL ( dst n -- ) swap { BIN: 000 t HEX: c0 } immediate-1 ;
+: ROR ( dst n -- ) swap { BIN: 001 t HEX: c0 } immediate-1 ;
+: RCL ( dst n -- ) swap { BIN: 010 t HEX: c0 } immediate-1 ;
+: RCR ( dst n -- ) swap { BIN: 011 t HEX: c0 } immediate-1 ;
+: SHL ( dst n -- ) swap { BIN: 100 t HEX: c0 } immediate-1 ;
+: SHR ( dst n -- ) swap { BIN: 101 t HEX: c0 } immediate-1 ;
+: SAR ( dst n -- ) swap { BIN: 111 t HEX: c0 } immediate-1 ;
 
 GENERIC: IMUL2 ( dst src -- )
-M: integer IMUL2 swap dup reg-code t HEX: 69 immediate-1/4 ;
+M: immediate IMUL2 swap dup reg-code t HEX: 68 3array immediate-1/4 ;
 M: operand IMUL2 OCT: 257 extended-opcode (2-operand) ;
 
 : MOVSX ( dst src -- )
@@ -409,34 +409,34 @@ M: operand IMUL2 OCT: 257 extended-opcode (2-operand) ;
 ! Conditional move
 : MOVcc ( dst src cc -- ) extended-opcode swapd (2-operand) ;
 
-: CMOVO  HEX: 40 MOVcc ;
-: CMOVNO HEX: 41 MOVcc ;
-: CMOVB  HEX: 42 MOVcc ;
-: CMOVAE HEX: 43 MOVcc ;
-: CMOVE  HEX: 44 MOVcc ; ! aka CMOVZ
-: CMOVNE HEX: 45 MOVcc ;
-: CMOVBE HEX: 46 MOVcc ;
-: CMOVA  HEX: 47 MOVcc ;
-: CMOVS  HEX: 48 MOVcc ;
-: CMOVNS HEX: 49 MOVcc ;
-: CMOVP  HEX: 4a MOVcc ;
-: CMOVNP HEX: 4b MOVcc ;
-: CMOVL  HEX: 4c MOVcc ;
-: CMOVGE HEX: 4d MOVcc ;
-: CMOVLE HEX: 4e MOVcc ;
-: CMOVG  HEX: 4f MOVcc ;
+: CMOVO  ( dst src -- ) HEX: 40 MOVcc ;
+: CMOVNO ( dst src -- ) HEX: 41 MOVcc ;
+: CMOVB  ( dst src -- ) HEX: 42 MOVcc ;
+: CMOVAE ( dst src -- ) HEX: 43 MOVcc ;
+: CMOVE  ( dst src -- ) HEX: 44 MOVcc ; ! aka CMOVZ
+: CMOVNE ( dst src -- ) HEX: 45 MOVcc ;
+: CMOVBE ( dst src -- ) HEX: 46 MOVcc ;
+: CMOVA  ( dst src -- ) HEX: 47 MOVcc ;
+: CMOVS  ( dst src -- ) HEX: 48 MOVcc ;
+: CMOVNS ( dst src -- ) HEX: 49 MOVcc ;
+: CMOVP  ( dst src -- ) HEX: 4a MOVcc ;
+: CMOVNP ( dst src -- ) HEX: 4b MOVcc ;
+: CMOVL  ( dst src -- ) HEX: 4c MOVcc ;
+: CMOVGE ( dst src -- ) HEX: 4d MOVcc ;
+: CMOVLE ( dst src -- ) HEX: 4e MOVcc ;
+: CMOVG  ( dst src -- ) HEX: 4f MOVcc ;
 
 ! CPU Identification
 
-: CPUID HEX: a2 extended-opcode, ;
+: CPUID ( -- ) HEX: a2 extended-opcode, ;
 
 ! x87 Floating Point Unit
 
-: FSTPS ( operand -- ) BIN: 011 f HEX: d9 1-operand ;
-: FSTPL ( operand -- ) BIN: 011 f HEX: dd 1-operand ;
+: FSTPS ( operand -- ) { BIN: 011 f HEX: d9 } 1-operand ;
+: FSTPL ( operand -- ) { BIN: 011 f HEX: dd } 1-operand ;
 
-: FLDS ( operand -- ) BIN: 000 f HEX: d9 1-operand ;
-: FLDL ( operand -- ) BIN: 000 f HEX: dd 1-operand ;
+: FLDS ( operand -- ) { BIN: 000 f HEX: d9 } 1-operand ;
+: FLDL ( operand -- ) { BIN: 000 f HEX: dd } 1-operand ;
 
 ! SSE multimedia instructions
 

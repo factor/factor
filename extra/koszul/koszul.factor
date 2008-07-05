@@ -1,13 +1,13 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs hashtables assocs io kernel math
+USING: accessors arrays assocs hashtables assocs io kernel math
 math.vectors math.matrices math.matrices.elimination namespaces
 parser prettyprint sequences words combinators math.parser
-splitting sorting shuffle symbols sets ;
+splitting sorting shuffle symbols sets math.order ;
 IN: koszul
 
 ! Utilities
-: -1^ odd? -1 1 ? ;
+: -1^ ( m -- n ) odd? -1 1 ? ;
 
 : >alt ( obj -- vec )
     {
@@ -18,8 +18,8 @@ IN: koszul
         [ 1array >alt ]
     } cond ;
 
-: canonicalize
-    [ nip zero? not ] assoc-subset ;
+: canonicalize ( assoc -- assoc' )
+    [ nip zero? not ] assoc-filter ;
 
 SYMBOL: terms
 
@@ -41,7 +41,7 @@ SYMBOL: terms
         nip number>string
     ] [
         num-alt.
-        swap [ word-name ] map "." join
+        swap [ name>> ] map "." join
         append
     ] if ;
 
@@ -71,7 +71,7 @@ SYMBOL: terms
     [ natural-sort ] keep [ index ] curry map ;
 
 : (inversions) ( n seq -- n )
-    [ > ] with subset length ;
+    [ > ] with filter length ;
 
 : inversions ( seq -- n )
     0 swap [ length ] keep [
@@ -142,13 +142,13 @@ DEFER: (d)
 
 ! Computing a basis
 : graded ( seq -- seq )
-    dup 0 [ length max ] reduce 1+ [ drop V{ } clone ] map
+    dup 0 [ length max ] reduce 1+ [ V{ } clone ] replicate
     [ dup length pick nth push ] reduce ;
 
 : nth-basis-elt ( generators n -- elt )
     over length [
         3dup bit? [ nth ] [ 2drop f ] if
-    ] map [ ] subset 2nip ;
+    ] map sift 2nip ;
 
 : basis ( generators -- seq )
     natural-sort dup length 2^ [ nth-basis-elt ] with map ;
@@ -184,7 +184,7 @@ DEFER: (d)
     [ length ] keep [ (graded-ker/im-d) ] curry map ;
 
 : graded-betti ( generators -- seq )
-    basis graded graded-ker/im-d flip first2 1 head* 0 prefix v- ;
+    basis graded graded-ker/im-d flip first2 but-last 0 prefix v- ;
 
 ! Bi-graded for two-step complexes
 : (bigraded-ker/im-d) ( u-deg z-deg bigraded-basis -- null/rank )
@@ -203,12 +203,12 @@ DEFER: (d)
     [ basis graded ] bi@ tensor bigraded-ker/im-d
     [ [ [ first ] map ] map ] keep
     [ [ second ] map 2 head* { 0 0 } prepend ] map
-    1 tail dup first length 0 <array> suffix
+    rest dup first length 0 <array> suffix
     [ v- ] 2map ;
 
 ! Laplacian
-: m.m' dup flip m. ;
-: m'.m dup flip swap m. ;
+: m.m' ( matrix -- matrix' ) dup flip m. ;
+: m'.m ( matrix -- matrix' ) dup flip swap m. ;
 
 : empty-matrix? ( matrix -- ? )
     dup empty? [ drop t ] [ first empty? ] if ;
@@ -265,9 +265,10 @@ DEFER: (d)
 
 : bigraded-triple ( u-deg z-deg bigraded-basis -- triple )
     #! d: C(u,z) ---> C(u+2,z-1)
-    [ >r >r 2 - r> 1 + r> ?nth ?nth ] 3keep
-    [ ?nth ?nth ] 3keep
-    >r >r 2 + r> 1 - r> ?nth ?nth
+    [ [ 2 - ] [ 1 + ] [ ] tri* ?nth ?nth ] 
+    [ ?nth ?nth ] 
+    [ [ 2 + ] [ 1 - ] [ ] tri* ?nth ?nth ]
+    3tri
     3array ;
 
 : bigraded-triples ( grid -- triples )
@@ -279,7 +280,7 @@ DEFER: (d)
 
 : bigraded-laplacian ( u-generators z-generators quot -- seq )
     >r [ basis graded ] bi@ tensor bigraded-triples r>
-    [ [ first3 ] swap compose map ] curry map ; inline
+    [ [ first3 ] prepose map ] curry map ; inline
 
 : bigraded-laplacian-betti ( u-generators z-generators -- seq )
     [ laplacian-betti ] bigraded-laplacian ;

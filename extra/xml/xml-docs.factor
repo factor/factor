@@ -42,17 +42,17 @@ HELP: xml-reprint
 
 HELP: write-xml
 { $values { "xml" "an XML document" } }
-{ $description "prints the contents of an XML document (" { $link xml } ") to stdio" }
+{ $description "prints the contents of an XML document (" { $link xml } ") to " { $link output-stream } "." }
 { $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" } ;
 
 HELP: print-xml
 { $values { "xml" "an XML document" } }
-{ $description "prints the contents of an XML document (" { $link xml } ") to stdio, followed by a newline" }
+{ $description "prints the contents of an XML document (" { $link xml } ") to " { $link output-stream } ", followed by a newline" }
 { $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" } ;
 
 HELP: pprint-xml
 { $values { "xml" "an XML document" } }
-{ $description "prints the contents of an XML document (" { $link xml } ") to stdio in a prettyprinted form." }
+{ $description "prints the contents of an XML document (" { $link xml } ") to " { $link output-stream } " in a prettyprinted form." }
 { $notes "does not preserve what type of quotes were used or what data was omitted from version declaration" } ;
 
 HELP: pprint-xml-but
@@ -226,7 +226,7 @@ HELP: pull-xml
 
 HELP: <pull-xml>
 { $values { "pull-xml" "a pull-xml tuple" } }
-{ $description "creates an XML pull-based parser which reads from the " { $link stdio } " stream, executing all initial XML commands to set up the parser." }
+{ $description "creates an XML pull-based parser which reads from " { $link input-stream } ", executing all initial XML commands to set up the parser." }
 { $see-also pull-xml pull-elem pull-event } ;
 
 HELP: pull-elem
@@ -241,12 +241,12 @@ HELP: pull-event
 
 HELP: write-item
 { $values { "object" "an XML element" } }
-{ $description "writes an XML element to the " { $link stdio } " stream." }
+{ $description "writes an XML element to " { $link output-stream } "." }
 { $see-also write-chunk write-xml } ;
 
 HELP: write-chunk
 { $values { "seq" "an XML document fragment" } }
-{ $description "writes an XML document fragment, ie a sequence of XML elements, to the " { $link stdio } " stream." }
+{ $description "writes an XML document fragment, ie a sequence of XML elements, to " { $link output-stream } "." }
 { $see-also write-item write-xml } ;
 
 HELP: deep-tag-named

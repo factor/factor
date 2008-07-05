@@ -1,14 +1,18 @@
-USING: help.markup help.syntax byte-arrays alien ;
+USING: help.markup help.syntax byte-arrays alien destructors ;
 IN: io.buffers
 
 ARTICLE: "buffers" "Locked I/O buffers"
-"I/O buffers are first-in-first-out queues of bytes. Their key feature is that they are backed by manually allocated storage that does not get moved by the garbage collector. They are used to implement native I/O backends."
+"I/O buffers are first-in-first-out queues of bytes."
+$nl
+"Buffers are backed by manually allocated storage that does not get moved by the garbage collector; they are also low-level and sacrifice error checking for efficiency."
+$nl
+"Buffers are used to implement native I/O backends."
 $nl
 "Buffer words are found in the " { $vocab-link "buffers" } " vocabulary."
 { $subsection buffer }
 { $subsection <buffer> }
-"Buffers must be manually deallocated:"
-{ $subsection buffer-free }
+"Buffers must be manually deallocated by calling " { $link dispose } "."
+$nl
 "Buffer operations:"
 { $subsection buffer-reset }
 { $subsection buffer-length }
@@ -20,7 +24,6 @@ $nl
 { $subsection buffer-pop }
 { $subsection buffer-read }
 "Writing to the buffer:"
-{ $subsection extend-buffer }
 { $subsection byte>buffer }
 { $subsection >buffer }
 { $subsection n>buffer } ;
@@ -40,11 +43,6 @@ HELP: <buffer>
 { $values { "n" "a non-negative integer" } { "buffer" buffer } }
 { $description "Creates a buffer with an initial capacity of " { $snippet "n" } " bytes." } ;
 
-HELP: buffer-free
-{ $values { "buffer" buffer } }
-{ $description "De-allocates a buffer's underlying storage. The buffer may not be used after being freed." }
-{ $warning "You " { $emphasis "must" } " free a buffer using this word, before letting the GC collect the buffer tuple instance." } ;
-
 HELP: buffer-reset
 { $values { "n" "a non-negative integer" } { "buffer" buffer } }
 { $description "Resets the fill pointer to 0 and the position to " { $snippet "count" } "." } ;
@@ -60,10 +58,6 @@ HELP: buffer@
 HELP: buffer-end
 { $values { "buffer" buffer } { "alien" alien } }
 { $description "Outputs the memory address of the current fill-pointer." } ;
-
-HELP: (buffer-read)
-{ $values { "n" "a non-negative integer" } { "buffer" buffer } { "byte-array" byte-array } }
-{ $description "Outputs a byte array of the first " { $snippet "n" } " bytes at the buffer's current position. If there are less than " { $snippet "n" } " bytes available, the output is truncated." } ;
 
 HELP: buffer-read
 { $values { "n" "a non-negative integer" } { "buffer" buffer } { "byte-array" byte-array } }
@@ -81,28 +75,20 @@ HELP: buffer-empty?
 { $values { "buffer" buffer } { "?" "a boolean" } }
 { $description "Tests if the buffer contains no more data to be read." } ;
 
-HELP: extend-buffer
-{ $values { "n" "a non-negative integer" } { "buffer" buffer } }
-{ $description "Grows a buffer to fit " { $snippet "n" } " bytes of data." } ;
-
-HELP: check-overflow
-{ $values { "n" "a non-negative integer" } { "buffer" buffer } }
-{ $description "Grows the buffer, if possible, so it can accomodate " { $snippet "n" } " bytes." }
-{ $warning "I/O system implementations should call this word or one of the other words that calls this word, at the beginning of an I/O transaction, when the buffer is empty. Buffers cannot be resized if they contain data; one of the requirements of a buffer is to remain fixed in memory while I/O operations are in progress." }
-{ $errors "Throws an error if the buffer contains unread data, and the new data does not fit." } ;
-
 HELP: >buffer
 { $values { "byte-array" byte-array } { "buffer" buffer } }
-{ $description "Copies a byte array to the buffer's fill pointer, and advances it accordingly." } ;
+{ $description "Copies a byte array to the buffer's fill pointer, and advances it accordingly." }
+{ $warning "This word will corrupt memory if the byte array is larger than the space available in the buffer." } ;
 
 HELP: byte>buffer
 { $values { "byte" "a byte" } { "buffer" buffer } }
-{ $description "Appends a single byte to a buffer." } ;
+{ $description "Appends a single byte to a buffer." }
+{ $warning "This word will corrupt memory if the buffer is full." } ;
 
 HELP: n>buffer
 { $values { "n" "a non-negative integer" } { "buffer" buffer } }
 { $description "Advances the fill pointer by " { $snippet "n" } " bytes." }
-{ $errors "Throws an error if the buffer does not contain " { $snippet "n" } " bytes of data." } ;
+{ $warning "This word will leave the buffer in an invalid state if it does not have " { $snippet "n" } " bytes available." } ;
 
 HELP: buffer-peek
 { $values { "buffer" buffer } { "byte" "a byte" } }

@@ -1,5 +1,7 @@
-USING: kernel sequences assocs hashtables parser vocabs words namespaces
-vocabs.loader debugger sets ;
+! Copyright (C) 2007, 2008 Daniel Ehrenberg.
+! See http://factorcode.org/license.txt for BSD license.
+USING: kernel sequences assocs hashtables parser lexer
+vocabs words namespaces vocabs.loader debugger sets ;
 IN: qualified
 
 : define-qualified ( vocab-name prefix-name -- )
@@ -15,7 +17,7 @@ IN: qualified
     #! Syntax: QUALIFIED-WITH: vocab prefix
     scan scan define-qualified ; parsing
 
-: expect=> scan "=>" assert= ;
+: expect=> ( -- ) scan "=>" assert= ;
 
 : partial-vocab ( words name -- assoc )
     dupd [
@@ -23,7 +25,7 @@ IN: qualified
     ] curry map zip ;
 
 : partial-vocab-ignoring ( words name -- assoc )
-    [ vocab-words keys diff ] keep partial-vocab ;
+    [ load-vocab vocab-words keys swap diff ] keep partial-vocab ;
 
 : EXCLUDE:
     #! Syntax: EXCLUDE: vocab => words ... ;
@@ -32,12 +34,12 @@ IN: qualified
 
 : FROM:
     #! Syntax: FROM: vocab => words... ;
-    scan expect=>
+    scan dup load-vocab drop expect=>
     ";" parse-tokens swap partial-vocab use get push ; parsing
 
 : RENAME:
     #! Syntax: RENAME: word vocab => newname
-    scan scan lookup [ "No such word" throw ] unless*
+    scan scan dup load-vocab drop lookup [ "No such word" throw ] unless*
     expect=>
     scan associate use get push ; parsing
 

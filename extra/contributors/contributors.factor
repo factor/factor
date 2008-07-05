@@ -1,13 +1,13 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files io.launcher io.styles io hashtables kernel
-sequences sequences.lib assocs system sorting math.parser
-sets ;
+USING: io.files io.launcher io.styles io.encodings.ascii io
+hashtables kernel sequences sequences.lib assocs system sorting
+math.parser sets ;
 IN: contributors
 
 : changelog ( -- authors )
     image parent-directory [
-        "git-log --pretty=format:%an" <process-stream> lines
+        "git-log --pretty=format:%an" ascii <process-reader> lines
     ] with-directory ;
 
 : patch-counts ( authors -- assoc )

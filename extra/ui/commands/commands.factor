@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions kernel sequences strings math assocs
-words generic namespaces assocs quotations splitting
+USING: accessors arrays definitions kernel sequences strings
+math assocs words generic namespaces assocs quotations splitting
 ui.gestures unicode.case unicode.categories ;
 IN: ui.commands
 
@@ -37,7 +37,7 @@ GENERIC: command-word ( command -- word )
 : command-gestures ( class -- hash )
     commands values [
         [
-            [ first ] subset
+            [ first ] filter
             [ [ invoke-command ] curry swap set ] assoc-each
         ] each
     ] H{ } make-assoc ;
@@ -54,9 +54,9 @@ GENERIC: command-word ( command -- word )
     { { CHAR: - CHAR: \s } } substitute >title ;
 
 M: word command-name ( word -- str )
-    word-name
+    name>> 
     "com-" ?head drop
-    dup first Letter? [ 1 tail ] unless
+    dup first Letter? [ rest ] unless
     (command-name) ;
 
 M: word command-description ( word -- str )
@@ -66,7 +66,7 @@ M: word command-description ( word -- str )
     H{ { +nullary+ f } { +listener+ f } { +description+ f } } ;
 
 : define-command ( word hash -- )
-    default-flags swap assoc-union >r word-props r> update ;
+    [ props>> ] [ default-flags swap assoc-union ] bi* update ;
 
 : command-quot ( target command -- quot )
     dup 1quotation swap +nullary+ word-prop

@@ -1,6 +1,7 @@
-USING: alien alien.c-types kernel windows.ole32 combinators.lib
-parser splitting sequences.lib sequences namespaces assocs
-quotations shuffle accessors words macros alien.syntax fry ;
+USING: alien alien.c-types effects kernel windows.ole32
+parser lexer splitting grouping sequences.lib sequences namespaces
+assocs quotations shuffle accessors words macros alien.syntax
+fry arrays ;
 IN: windows.com.syntax
 
 <PRIVATE
@@ -40,13 +41,12 @@ unless
 : (parse-com-function) ( tokens -- definition )
     [ second ]
     [ first ]
-    [ 3 tail 2 group [ first ] map "void*" prefix ]
+    [ 3 tail [ CHAR: , swap remove ] map 2 group { "void*" "this" } prefix ]
     tri
     <com-function-definition> ;
 
 : parse-com-functions ( -- functions )
-    ";" parse-tokens { ")" } split
-    [ empty? not ] subset
+    ";" parse-tokens { ")" } split harvest
     [ (parse-com-function) ] map ;
 
 : (iid-word) ( definition -- word )
@@ -57,20 +57,30 @@ unless
 
 : family-tree ( definition -- definitions )
     dup parent>> [ family-tree ] [ { } ] if*
-    swap add ;
+    swap suffix ;
 
 : family-tree-functions ( definition -- functions )
     dup parent>> [ family-tree-functions ] [ { } ] if*
     swap functions>> append ;
 
+: (invocation-quot) ( function return parameters -- quot )
+    [ first ] map [ com-invoke ] 3curry ;
+
+: (stack-effect-from-return-and-parameters) ( return parameters -- stack-effect )
+    swap
+    [ [ second ] map ]
+    [ dup "void" = [ drop { } ] [ 1array ] if ] bi*
+    <effect> ;
+
 : (define-word-for-function) ( function interface n -- )
     -rot [ (function-word) swap ] 2keep drop
     { return>> parameters>> } get-slots
-    [ com-invoke ] 3curry
-    define ;
+    [ (invocation-quot) ] 2keep
+    (stack-effect-from-return-and-parameters)
+    define-declared ;
 
 : define-words-for-com-interface ( definition -- )
-    [ [ (iid-word) ] [ iid>> 1quotation ] bi define ]
+    [ [ (iid-word) ] [ iid>> 1quotation ] bi (( -- iid )) define-declared ]
     [ name>> "com-interface" swap typedef ]
     [
         dup family-tree-functions

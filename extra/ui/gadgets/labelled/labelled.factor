@@ -13,7 +13,7 @@ TUPLE: labelled-gadget content ;
 : <labelled-gadget> ( gadget title -- newgadget )
     labelled-gadget new
     [
-        <label> dup reverse-video-theme f track,
+        <label> reverse-video-theme f track,
         g-> set-labelled-gadget-content 1 track,
     ] { 0 1 } build-track ;
 
@@ -36,7 +36,7 @@ M: labelled-gadget focusable-child* labelled-gadget-content ;
         { 0.65 0.45 1.0 1.0 }
     } } swap set-gadget-interior ;
 
-: <title-label> <label> dup title-theme ;
+: <title-label> ( text -- label ) <label> dup title-theme ;
 
 : <title-bar> ( title quot -- gadget )
     [

@@ -1,8 +1,9 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: optimizer.def-use
 USING: namespaces assocs sequences inference.dataflow
-inference.backend kernel generic assocs classes vectors ;
+inference.backend kernel generic assocs classes vectors
+accessors combinators ;
+IN: optimizer.def-use
 
 SYMBOL: def-use
 
@@ -12,7 +13,7 @@ SYMBOL: def-use
     used-by empty? ;
 
 : uses-values ( node seq -- )
-    [ def-use get [ ?push ] change-at ] with each ;
+    [ def-use get push-at ] with each ;
 
 : defs-values ( seq -- )
     #! If there is no value, set it to a new empty vector,
@@ -21,17 +22,20 @@ SYMBOL: def-use
 
 GENERIC: node-def-use ( node -- )
 
-: compute-def-use ( node -- )
-    H{ } clone def-use set [ node-def-use ] each-node ;
+: compute-def-use ( node -- node )
+    H{ } clone def-use set
+    dup [ node-def-use ] each-node ;
 
 : nest-def-use ( node -- def-use )
-    [ compute-def-use def-use get ] with-scope ;
+    [ compute-def-use drop def-use get ] with-scope ;
 
 : (node-def-use) ( node -- )
-    dup dup node-in-d uses-values
-    dup dup node-in-r uses-values
-    dup node-out-d defs-values
-    node-out-r defs-values ;
+    {
+        [ dup in-d>> uses-values ] 
+        [ dup in-r>> uses-values ] 
+        [ out-d>>    defs-values ] 
+        [ out-r>>    defs-values ]
+    } cleave ;
 
 M: object node-def-use (node-def-use) ;
 
@@ -43,7 +47,7 @@ M: #passthru node-def-use drop ;
 
 M: #return node-def-use
     #! Values returned by local labels can be killed.
-    dup node-param [ drop ] [ (node-def-use) ] if ;
+    dup param>> [ drop ] [ (node-def-use) ] if ;
 
 ! nodes that don't use their values directly
 UNION: #killable
@@ -52,17 +56,17 @@ UNION: #killable
 : purge-invariants ( stacks -- seq )
     #! Output a sequence of values which are not present in the
     #! same position in each sequence of the stacks sequence.
-    unify-lengths flip [ all-eq? not ] subset concat ;
+    unify-lengths flip [ all-eq? not ] filter concat ;
 
 M: #label node-def-use
     [
-        dup node-in-d ,
-        dup node-child node-out-d ,
-        dup collect-recursion [ node-in-d , ] each
+        dup in-d>> ,
+        dup node-child out-d>> ,
+        dup calls>> [ in-d>> , ] each
     ] { } make purge-invariants uses-values ;
 
 : branch-def-use ( #branch -- )
-    active-children [ node-in-d ] map
+    active-children [ in-d>> ] map
     purge-invariants t swap uses-values ;
 
 M: #branch node-def-use
@@ -71,7 +75,7 @@ M: #branch node-def-use
     dup branch-def-use (node-def-use) ;
 
 : compute-dead-literals ( -- values )
-    def-use get [ >r value? r> empty? and ] assoc-subset ;
+    def-use get [ >r value? r> empty? and ] assoc-filter ;
 
 DEFER: kill-nodes
 SYMBOL: dead-literals
@@ -85,16 +89,16 @@ M: node kill-node* drop t ;
     inline
 
 M: #shuffle kill-node* 
-    [
-        dup node-in-d empty? swap node-out-d empty? and
-    ] prune-if ;
+    [ [ in-d>> empty? ] [ out-d>> empty? ] bi and ] prune-if ;
 
 M: #push kill-node* 
-    [ node-out-d empty? ] prune-if ;
+    [ out-d>> empty? ] prune-if ;
 
-M: #>r kill-node* [ node-in-d empty? ] prune-if ;
+M: #>r kill-node*
+    [ in-d>> empty? ] prune-if ;
 
-M: #r> kill-node* [ node-in-r empty? ] prune-if ;
+M: #r> kill-node*
+    [ in-r>> empty? ] prune-if ;
 
 : kill-node ( node -- node )
     dup [
@@ -116,7 +120,7 @@ M: #r> kill-node* [ node-in-r empty? ] prune-if ;
     ] if ;
 
 : sole-consumer ( #call -- node/f )
-    node-out-d first used-by
+    out-d>> first used-by
     dup length 1 = [ first ] [ drop f ] if ;
 
 : splice-def-use ( node -- )
@@ -128,5 +132,4 @@ M: #r> kill-node* [ node-in-r empty? ] prune-if ;
     #! degree of accuracy; the new values should be marked as
     #! having _some_ usage, so that flushing doesn't erronously
     #! flush them away.
-    [ compute-def-use def-use get keys ] with-scope
-    def-use get [ [ t swap ?push ] change-at ] curry each ;
+    nest-def-use keys def-use get [ t -rot push-at ] curry each ;

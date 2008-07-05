@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel kernel.private
-namespaces sequences words arrays layouts help effects math
+namespaces sequences words arrays layouts effects math
 layouts classes.private classes.union classes.mixin
 classes.predicate quotations ;
 IN: classes
@@ -32,6 +32,8 @@ $nl
 { $subsection class }
 "Testing if an object is an instance of a class:"
 { $subsection instance? }
+"Class predicates can be used to test instances directly:"
+{ $subsection "class-predicates" }
 "There is a universal class which all objects are an instance of, and an empty class with no instances:"
 { $subsection object }
 { $subsection null }
@@ -40,6 +42,7 @@ $nl
 "There are several sorts of classes:"
 { $subsection "builtin-classes" }
 { $subsection "unions" }
+{ $subsection "intersections" }
 { $subsection "mixins" }
 { $subsection "predicates" }
 { $subsection "singletons" }
@@ -47,6 +50,7 @@ $nl
 $nl
 "Classes can be inspected and operated upon:"
 { $subsection "class-operations" }
+{ $subsection "class-linearization" }
 { $see-also "class-index" } ;
 
 ABOUT: "classes"
@@ -55,7 +59,7 @@ HELP: class
 { $values { "object" object } { "class" class } }
 { $description "Outputs an object's canonical class. While an object may be an instance of more than one class, the canonical class is either its built-in class, or if the object is a tuple, its tuple class." }
 { $class-description "The class of all class words." }
-{ $examples { $example "USING: classes prettyprint ;" "1.0 class ." "float" } { $example "USING: classes prettyprint ;" "TUPLE: point x y z ;\nT{ point f 1 2 3 } class ." "point" } } ;
+{ $examples { $example "USING: classes prettyprint ;" "1.0 class ." "float" } { $example "USING: classes prettyprint ;" "IN: scratchpad" "TUPLE: point x y z ;\nT{ point f 1 2 3 } class ." "point" } } ;
 
 HELP: classes
 { $values { "seq" "a sequence of class words" } }
@@ -63,10 +67,13 @@ HELP: classes
 
 HELP: tuple-class
 { $class-description "The class of tuple class words." }
-{ $examples { $example "USING: classes prettyprint ;" "TUPLE: name title first last ;" "name tuple-class? ." "t" } } ;
+{ $examples { $example "USING: classes prettyprint ;" "IN: scratchpad" "TUPLE: name title first last ;" "name tuple-class? ." "t" } } ;
 
 HELP: update-map
-{ $var-description "Hashtable mapping each class to a set of classes defined in terms of this class. The " { $link define-class } " word uses this information to update generic words when classes are redefined." } ;
+{ $var-description "Assoc mapping each class to a set of classes defined in terms of this class. The " { $link define-class } " word uses this information to update generic words when classes are redefined." } ;
+
+! HELP: implementors-map
+! { $var-description "Assoc mapping each class to a set of generic words defining methods on this class." } ;
 
 HELP: predicate-word
 { $values { "word" "a word" } { "predicate" "a predicate word" } }
@@ -85,7 +92,11 @@ HELP: members
 { $values { "class" class } { "seq" "a sequence of union members, or " { $link f } } }
 { $description "If " { $snippet "class" } " is a union class, outputs a sequence of its member classes, otherwise outputs " { $link f } "." } ;
 
+HELP: participants
+{ $values { "class" class } { "seq" "a sequence of intersection participants, or " { $link f } } }
+{ $description "If " { $snippet "class" } " is an intersection class, outputs a sequence of its participant classes, otherwise outputs " { $link f } "." } ;
+
 HELP: define-class
-{ $values { "word" word } { "members" "a sequence of class words" } { "superclass" class } { "metaclass" class } }
+{ $values { "word" word } { "superclass" class } { "members" "a sequence of class words" } { "participants" "a sequence of class words" } { "metaclass" class } }
 { $description "Sets a property indicating this word is a class word, thus making it an instance of " { $link class } ", and registers it with " { $link update-map } "." }
 $low-level-note ;

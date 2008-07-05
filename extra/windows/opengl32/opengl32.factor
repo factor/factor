@@ -71,7 +71,7 @@ IN: windows.opengl32
 : WGL_SWAP_UNDERLAY14     HEX: 20000000 ; inline
 : WGL_SWAP_UNDERLAY15     HEX: 40000000 ; inline
 
-: pfd-dwFlags
+: pfd-dwFlags ( -- n )
     { PFD_DRAW_TO_WINDOW PFD_SUPPORT_OPENGL PFD_DOUBLEBUFFER } flags ;
 
 ! TODO: compare to http://www.nullterminator.net/opengl32.html

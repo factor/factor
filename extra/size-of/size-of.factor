@@ -12,15 +12,15 @@ IN: size-of
 VAR: headers
 
 : include-headers ( -- seq )
-  headers> [ { "#include <" , ">" } bake to-string ] map ;
+  headers> [ `{ "#include <" , ">" } to-string ] map ;
 
 : size-of-c-program ( type -- lines )
-  {
+  `{
     "#include <stdio.h>"
     include-headers
     { "main() { printf( \"%i\" , sizeof( " , " ) ) ; }" }
   }
-  bake to-strings ;
+  to-strings ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -36,4 +36,4 @@ VAR: headers
   { "gcc" c-file "-o" exe } to-strings
   [ "Error compiling generated C program" print ] run-or-bail
 
-  exe ascii <process-stream> contents string>number ;
+  exe ascii <process-reader> contents string>number ;

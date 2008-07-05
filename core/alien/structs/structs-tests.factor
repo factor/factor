@@ -1,6 +1,6 @@
 IN: alien.structs.tests
 USING: alien alien.syntax alien.c-types kernel tools.test
-sequences system libc words vocabs namespaces ;
+sequences system libc words vocabs namespaces layouts ;
 
 C-STRUCT: bar
     { "int" "x" }
@@ -9,20 +9,20 @@ C-STRUCT: bar
 [ 36 ] [ "bar" heap-size ] unit-test
 [ t ] [ \ <displaced-alien> "bar" c-type c-type-getter memq? ] unit-test
 
-! This was actually only correct on Windows/x86:
+C-STRUCT: align-test
+    { "int" "x" }
+    { "double" "y" } ;
 
-! C-STRUCT: align-test
-!     { "int" "x" }
-!     { "double" "y" } ;
-! 
-! [ 16 ] [ "align-test" heap-size ] unit-test
-! 
-! cell 4 = [
-!     C-STRUCT: one
-!     { "long" "a" } { "double" "b" } { "int" "c" } ;
-! 
-!     [ 24 ] [ "one" heap-size ] unit-test
-! ] when
+os winnt? cpu x86? and [
+    [ 16 ] [ "align-test" heap-size ] unit-test
+    
+    cell 4 = [
+        C-STRUCT: one
+        { "long" "a" } { "double" "b" } { "int" "c" } ;
+    
+        [ 24 ] [ "one" heap-size ] unit-test
+    ] when
+] when
 
 : MAX_FOOS 30 ;
 

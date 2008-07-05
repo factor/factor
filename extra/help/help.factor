@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays io kernel namespaces parser prettyprint sequences
-words assocs definitions generic quotations effects slots
-continuations classes.tuple debugger combinators vocabs
+USING: accessors arrays io kernel namespaces parser prettyprint
+sequences words assocs definitions generic quotations effects
+slots continuations classes.tuple debugger combinators vocabs
 help.stylesheet help.topics help.crossref help.markup sorting
 classes vocabs.loader ;
 IN: help
@@ -29,7 +29,11 @@ M: predicate word-help* drop \ $predicate ;
 
 : all-articles ( -- seq )
     articles get keys
-    all-words [ word-help ] subset append ;
+    all-words [ word-help ] filter append ;
+
+: orphan-articles ( -- seq )
+    articles get keys
+    [ article-parent not ] filter ;
 
 : xref-help ( -- )
     all-articles [ xref-article ] each ;
@@ -38,20 +42,20 @@ M: predicate word-help* drop \ $predicate ;
     \ $error-description swap word-help elements empty? not ;
 
 : sort-articles ( seq -- newseq )
-    [ dup article-title ] { } map>assoc sort-values 0 <column> ;
+    [ dup article-title ] { } map>assoc sort-values keys ;
 
 : all-errors ( -- seq )
-    all-words [ error? ] subset sort-articles ;
+    all-words [ error? ] filter sort-articles ;
 
-M: word article-name word-name ;
+M: word article-name name>> ;
 
 M: word article-title
-    dup parsing? over symbol? or [
-        word-name
+    dup [ parsing-word? ] [ symbol? ] bi or [
+        name>> 
     ] [
-        dup word-name
-        swap stack-effect
-        [ effect>string " " swap 3append ] when*
+        [ name>> ]
+        [ stack-effect [ effect>string " " prepend ] [ "" ] if* ] bi
+        append
     ] if ;
 
 M: word article-content
@@ -109,20 +113,12 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
 
 : $index ( element -- )
     first call dup empty?
-    [ drop ] [ [ ($index) ] ($block) ] if ;
+    [ drop ] [ ($index) ] if ;
 
 : $about ( element -- )
     first vocab-help [ 1array $subsection ] when* ;
 
-: (:help-multi)
-    "This error has multiple delegates:" print
-    ($index) nl
-    "Use \\ ... help to get help about a specific delegate." print ;
-
-: (:help-none)
-    drop "No help for this error. " print ;
-
-: (:help-debugger)
+: :help-debugger ( -- )
     nl
     "Debugger commands:" print
     nl
@@ -135,12 +131,8 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     ":vars - list all variables at error time" print ;
 
 : :help ( -- )
-    error get delegates [ error-help ] map [ ] subset
-    {
-        { [ dup empty? ] [ (:help-none) ] }
-        { [ dup length 1 = ] [ first help ] }
-        [ (:help-multi) ]
-    } cond (:help-debugger) ;
+    error get error-help [ help ] [ "No help for this error. " print ] if*
+    :help-debugger ;
 
 : remove-article ( name -- )
     dup articles get key? [

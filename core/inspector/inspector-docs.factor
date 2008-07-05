@@ -22,9 +22,7 @@ $nl
 { $subsection inspector-hook }
 "A description of an object can be printed without starting the inspector:"
 { $subsection describe }
-{ $subsection describe* }
-"A word for getting very brief descriptions of words and general objects:"
-{ $subsection summary } ;
+{ $subsection describe* } ;
 
 ABOUT: "inspector"
 
@@ -53,10 +51,6 @@ $nl
     { { $link +sequence+ } " - if set to a true value, keys will not be printed, only values." }
 } }
 { $notes "This word is a factor of " { $link describe } " and " { $link inspect } "." } ;
-
-HELP: summary
-{ $values { "object" object } { "string" "a string" } }
-{ $contract "Outputs a brief description of the object." } ;
 
 HELP: inspector-stack
 { $var-description "If the inspector is running, this variable holds previously-inspected objects." } ;
@@ -108,4 +102,4 @@ HELP: me
 HELP: inspector-hook
 { $var-description "A quotation with stack effect " { $snippet "( obj -- )" } ", called by the inspector to display an overview of an object."
 $nl
-"The default implementation calls " { $link describe } " which outputs on the " { $link stdio } " stream, but the graphical listener sets this variable so that calling " { $link inspect } " in the UI opens the graphical inspector." } ;
+"The default implementation calls " { $link describe } " which outputs on " { $link output-stream } ", but the graphical listener sets this variable so that calling " { $link inspect } " in the UI opens the graphical inspector." } ;

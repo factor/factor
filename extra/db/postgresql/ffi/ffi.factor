@@ -52,7 +52,6 @@ IN: db.postgresql.ffi
 
 : InvalidOid 0 ; inline
 
-TYPEDEF: int size_t
 TYPEDEF: int ConnStatusType
 TYPEDEF: int ExecStatusType 
 TYPEDEF: int PostgresPollingStatusType
@@ -282,7 +281,7 @@ FUNCTION: void PQclear ( PGresult* res ) ;
 FUNCTION: void PQfreemem ( void* ptr ) ;
 
 ! Exists for backward compatibility.
-: PQfreeNotify PQfreemem ;
+: PQfreeNotify ( ptr -- ) PQfreemem ;
 
 !
 ! Make an empty PGresult with given status (some apps find this

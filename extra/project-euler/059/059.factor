@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ascii assocs hashtables io.encodings.ascii io.files kernel math
     math.parser namespaces sequences sequences.lib sequences.private sorting
-    splitting strings sets ;
+    splitting grouping strings sets ;
 IN: project-euler.059
 
 ! http://projecteuler.net/index.php?section=problems&id=59
@@ -52,7 +52,7 @@ IN: project-euler.059
 <PRIVATE
 
 : source-059 ( -- seq )
-    "extra/project-euler/059/cipher1.txt" resource-path
+    "resource:extra/project-euler/059/cipher1.txt"
     ascii file-contents [ blank? ] right-trim "," split
     [ string>number ] map ;
 
@@ -78,7 +78,7 @@ INSTANCE: rollover immutable-sequence
     frequency-analysis sort-values keys peek ;
 
 : crack-key ( seq key-length -- key )
-    [ " " decrypt ] dip group 1 head-slice*
+    [ " " decrypt ] dip group but-last-slice
     flip [ most-frequent ] map ;
 
 PRIVATE>

@@ -1,4 +1,4 @@
-USING: kernel symbols tools.test parser generic words ;
+USING: kernel symbols tools.test parser generic words accessors ;
 IN: symbols.tests
 
 [ ] [ SYMBOLS: a b c ; ] unit-test
@@ -13,3 +13,8 @@ DEFER: blah
 
 [ f ] [ \ blah generic? ] unit-test
 [ t ] [ \ blah symbol? ] unit-test
+
+[ "IN: symbols.tests USE: symbols SINGLETONS: blah blah blah ;" eval ]
+[ error>> error>> def>> \ blah eq? ]
+must-fail-with
+

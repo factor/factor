@@ -1,11 +1,11 @@
 USING: xmode.loader xmode.utilities xmode.rules namespaces
 strings splitting assocs sequences kernel io.files xml memoize
-words globs combinators io.encodings.utf8 ;
+words globs combinators io.encodings.utf8 sorting ;
 IN: xmode.catalog
 
 TUPLE: mode file file-name-glob first-line-glob ;
 
-<TAGS: parse-mode-tag
+<TAGS: parse-mode-tag ( modes tag -- )
 
 TAG: MODE
     "NAME" over at >r
@@ -23,23 +23,21 @@ TAGS>
         swap child-tags [ parse-mode-tag ] with each
     ] keep ;
 
-: load-catalog ( -- modes )
-    "extra/xmode/modes/catalog" resource-path
+MEMO: modes ( -- modes )
+    "resource:extra/xmode/modes/catalog"
     file>xml parse-modes-tag ;
 
-: modes ( -- assoc )
-    \ modes get-global [
-        load-catalog dup \ modes set-global
-    ] unless* ;
+MEMO: mode-names ( -- modes )
+    modes keys natural-sort ;
 
 : reset-catalog ( -- )
-    f \ modes set-global ;
+    \ modes reset-memoized ;
 
 MEMO: (load-mode) ( name -- rule-sets )
     modes at [
         mode-file
-        "extra/xmode/modes/" prepend
-        resource-path utf8 <file-reader> parse-mode
+        "resource:extra/xmode/modes/" prepend
+        utf8 <file-reader> parse-mode
     ] [
         "text" (load-mode)
     ] if* ;

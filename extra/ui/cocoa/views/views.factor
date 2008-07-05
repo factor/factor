@@ -1,10 +1,9 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays assocs cocoa kernel math cocoa.messages
+USING: alien alien.c-types arrays assocs cocoa kernel math cocoa.messages
 cocoa.subclassing cocoa.classes cocoa.views cocoa.application
-cocoa.pasteboard cocoa.types cocoa.windows sequences ui
-ui.gadgets ui.gadgets.worlds ui.gestures core-foundation
-threads combinators ;
+cocoa.pasteboard cocoa.types cocoa.windows sequences ui ui.gadgets
+ui.gadgets.worlds ui.gestures core-foundation threads combinators ;
 IN: ui.cocoa.views
 
 : send-mouse-moved ( view event -- )
@@ -126,6 +125,13 @@ CLASS: {
     { +name+ "FactorView" }
     { +protocols+ { "NSTextInput" } }
 }
+
+! Rendering
+! Rendering
+{ "drawRect:" "void" { "id" "SEL" "id" "NSRect" }
+    [ 3drop window relayout-1 ]
+}
+
 ! Events
 { "acceptsFirstMouse:" "bool" { "id" "SEL" "id" }
     [ 3drop 1 ]
@@ -353,8 +359,14 @@ CLASS: {
     ]
 } ;
 
+: sync-refresh-to-screen ( GLView -- )
+    -> openGLContext -> CGLContextObj NSOpenGLCPSwapInterval 1 <int>
+    CGLSetParameter drop ;
+
 : <FactorView> ( world -- view )
-    FactorView over rect-dim <GLView> [ register-window ] keep ;
+    FactorView over rect-dim <GLView>
+    [ sync-refresh-to-screen ] keep
+    [ register-window ] keep ;
 
 CLASS: {
     { +superclass+ "NSObject" }

@@ -27,11 +27,11 @@ HELP: ratio
 HELP: rational
 { $class-description "The class of rational numbers, a disjoint union of integers and ratios." } ;
 
-HELP: numerator ( a/b -- a )
+HELP: numerator
 { $values { "a/b" rational } { "a" integer } }
 { $description "Outputs the numerator of a rational number. Acts as the identity on integers." } ;
 
-HELP: denominator ( a/b -- b )
+HELP: denominator
 { $values { "a/b" rational } { "b" "a positive integer" } }
 { $description "Outputs the denominator of a rational number. Always outputs 1 with integers." } ;
 

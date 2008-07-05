@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Daniel Ehrenberg and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel sequences
-sequences.private namespaces classes math ;
+sequences.private namespaces math ;
 IN: assocs
 
 ARTICLE: "alists" "Association lists"
@@ -39,9 +39,7 @@ ARTICLE: "assocs-protocol" "Associative mapping protocol"
 "All associative mappings must implement methods on the following generic words:"
 { $subsection at* }
 { $subsection assoc-size }
-"At least one of the following two generic words must have a method; the " { $link assoc } " mixin has default definitions which are mutually recursive:"
 { $subsection >alist }
-{ $subsection assoc-find }
 "Mutable assocs should implement the following additional words:"
 { $subsection set-at }
 { $subsection delete-at }
@@ -68,7 +66,7 @@ ARTICLE: "assocs-lookup" "Lookup and querying of assocs"
 
 ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
 "It is often useful to use the keys of an associative mapping as a set, exploiting the constant or logarithmic lookup time of most implementations (" { $link "alists" } " being a notable exception)."
-{ $subsection subassoc? }
+{ $subsection assoc-subset? }
 { $subsection assoc-intersect }
 { $subsection update }
 { $subsection assoc-union }
@@ -81,7 +79,6 @@ ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
 ARTICLE: "assocs-mutation" "Storing keys and values in assocs"
 "Utility operations built up from the " { $link "assocs-protocol" } ":"
 { $subsection delete-at* }
-{ $subsection delete-any }
 { $subsection rename-at }
 { $subsection change-at }
 { $subsection at+ }
@@ -94,9 +91,10 @@ $nl
 $nl
 "The standard functional programming idioms:"
 { $subsection assoc-each }
+{ $subsection assoc-find }
 { $subsection assoc-map }
 { $subsection assoc-push-if }
-{ $subsection assoc-subset }
+{ $subsection assoc-filter }
 { $subsection assoc-contains? }
 { $subsection assoc-all? }
 "Three additional combinators:"
@@ -139,8 +137,7 @@ HELP: new-assoc
 
 HELP: assoc-find
 { $values { "assoc" assoc } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "key" "the successful key, or f" } { "value" "the successful value, or f" } { "?" "a boolean" } }
-{ $contract "Applies a predicate quotation to each entry in the assoc. Returns the key or value that the quotation succeeds on, or " { $link f } " for both if the quotation fails. It also returns a boolean describing whether there was anything found." }
-{ $notes "The " { $link assoc } " mixin has a default implementation for this generic word which first converts the assoc to an association list, then iterates over that with the " { $link find } " combinator for sequences." } ;
+{ $description "Applies a predicate quotation to each entry in the assoc. Returns the key and value that the quotation succeeds on, or " { $link f } " for both if the quotation fails. It also returns a boolean describing whether there was anything found; this can be used to distinguish between a key and a value equal to " { $link f } ", or nothing being found." } ;
 
 HELP: clear-assoc
 { $values { "assoc" assoc } }
@@ -203,7 +200,7 @@ HELP: assoc-push-if
 { $values { "accum" "a resizable mutable sequence" } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "key" object } { "value" object } }
 { $description "If the quotation yields true when applied to the key/value pair, adds the key/value pair at the end of " { $snippet "accum" } "." } ;
 
-HELP: assoc-subset
+HELP: assoc-filter
 { $values { "assoc" assoc } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "subassoc" "a new assoc" } }
 { $description "Outputs an assoc of the same type as " { $snippet "assoc" } " consisting of all entries for which the predicate quotation yields true." } ;
 
@@ -215,7 +212,7 @@ HELP: assoc-all?
 { $values { "assoc" assoc } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "?" "a boolean" } }
 { $description "Tests if all entries in the assoc satisfy a predicate by applying the quotation to each entry in turn. a predicate quotation to entry in the assoc. Iteration stops if an entry is found for which the quotation outputs " { $link f } ". If the assoc is empty, always outputs " { $link t } "." } ;
 
-HELP: subassoc?
+HELP: assoc-subset?
 { $values { "assoc1" assoc } { "assoc2" assoc } { "?" "a new assoc" } }
 { $description "Tests if " { $snippet "assoc2" } " contains all key/value pairs of " { $snippet "assoc1" } "." } ;
 
@@ -243,12 +240,6 @@ HELP: delete-at*
 { $values { "key" "a key" } { "assoc" assoc } { "old" "the previous value or " { $link f } } { "?" "a boolean" } }
 { $description "Removes an entry from the assoc and outputs the previous value together with a boolean indicating whether it was present." }
 { $side-effects "assoc" } ;
-
-HELP: delete-any
-{ $values { "assoc" assoc } { "key" "a key" } { "value" "a value" } }
-{ $description "Removes an undetermined entry from the assoc and outputs it." }
-{ $errors "Throws an error if the assoc is empty." }
-{ $notes "This word is useful when using an assoc as an unordered queue which requires constant-time membership tests. Entries are enqueued with " { $link set-at } " and dequeued with " { $link delete-any } "." } ;
 
 HELP: rename-at
 { $values { "newkey" object } { "key" object } { "assoc" assoc } }
@@ -281,7 +272,7 @@ HELP: assoc-union
 
 HELP: assoc-diff
 { $values { "assoc1" assoc } { "assoc2" assoc } { "diff" "a new assoc" } }
-{ $description "Outputs an assoc consisting of all entries from " { $snippet "assoc2" } " whose key is not contained in " { $snippet "assoc1" } "." } 
+{ $description "Outputs an assoc consisting of all entries from " { $snippet "assoc1" } " whose key is not contained in " { $snippet "assoc2" } "." } 
 ;
 HELP: remove-all
 { $values { "assoc" assoc } { "seq" "a sequence" } { "subseq" "a new sequence" } }

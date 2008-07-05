@@ -1,9 +1,9 @@
 IN: concurrency.distributed.tests
 USING: tools.test concurrency.distributed kernel io.files
 arrays io.sockets system combinators threads math sequences
-concurrency.messaging continuations ;
+concurrency.messaging continuations accessors prettyprint ;
 
-: test-node
+: test-node ( -- addrspec )
     {
         { [ os unix? ] [ "distributed-concurrency-test" temp-file <local> ] }
         { [ os windows? ] [ "127.0.0.1" 1238 <inet4> ] }
@@ -11,9 +11,7 @@ concurrency.messaging continuations ;
 
 [ ] [ [ "distributed-concurrency-test" temp-file delete-file ] ignore-errors ] unit-test
 
-[ ] [ test-node dup 1array swap (start-node) ] unit-test
-
-[ ] [ yield ] unit-test
+[ ] [ test-node dup (start-node) ] unit-test
 
 [ ] [
     [

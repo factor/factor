@@ -1,10 +1,26 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes kernel namespaces words ;
+USING: classes kernel namespaces words sequences quotations
+arrays kernel.private assocs combinators ;
 IN: classes.predicate
 
 PREDICATE: predicate-class < class
     "metaclass" word-prop predicate-class eq? ;
+
+DEFER: predicate-instance? ( object class -- ? )
+
+: update-predicate-instance ( -- )
+    \ predicate-instance? bootstrap-word
+    classes [ predicate-class? ] filter [
+        [ literalize ]
+        [
+            [ superclass 1array [ declare ] curry ]
+            [ "predicate-definition" word-prop ]
+            bi compose
+        ]
+        bi
+    ] { } map>assoc [ case ] curry
+    define ;
 
 : predicate-quot ( class -- quot )
     [
@@ -14,19 +30,24 @@ PREDICATE: predicate-class < class
     ] [ ] make ;
 
 : define-predicate-class ( class superclass definition -- )
-    [ drop f predicate-class define-class ]
+    [ drop f f predicate-class define-class ]
     [ nip "predicate-definition" set-word-prop ]
     [
         2drop
         [ dup predicate-quot define-predicate ]
         [ update-classes ]
         bi
-    ] 3tri ;
+    ]
+    3tri
+    update-predicate-instance ;
 
 M: predicate-class reset-class
-    {
-        "class"
-        "metaclass"
-        "predicate-definition"
-        "superclass"
-    } reset-props ;
+    [ call-next-method ]
+    [ { "predicate-definition" } reset-props ]
+    bi ;
+
+M: predicate-class rank-class drop 1 ;
+
+M: predicate-class instance?
+    2dup superclass instance?
+    [ predicate-instance? ] [ 2drop f ] if ;

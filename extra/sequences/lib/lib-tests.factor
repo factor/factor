@@ -2,10 +2,6 @@ USING: arrays kernel sequences sequences.lib math math.functions math.ranges
     tools.test strings ;
 IN: sequences.lib.tests
 
-[ 50 ] [ 100 [1,b] [ even? ] count ] unit-test
-[ 50 ] [ 100 [1,b] [ odd? ] count ] unit-test
-[ 328350 ] [ 100 [ sq ] sigma ] unit-test
-
 [ 1 2 { 3 4 } [ + + drop ] 2 each-withn  ] must-infer
 { 13 } [ 1 2 { 3 4 } [ + + ] 2 each-withn + ] unit-test
 
@@ -64,10 +60,6 @@ IN: sequences.lib.tests
 [ 3 ] [ { 1 2 3 } ?third ] unit-test
 [ f ] [ { 1 2 3 } ?fourth ] unit-test
 
-[ 50 ] [ 100 [1,b] [ even? ] count ] unit-test
-[ 50 ] [ 100 [1,b] [ odd? ] count ] unit-test
-[ 328350 ] [ 100 [ sq ] sigma ] unit-test
-
 [ 1 2 { 3 4 } [ + + ] 2 map-withn ] must-infer
 { { 6 7 } } [ 1 2 { 3 4 } [ + + ] 2 map-withn ] unit-test
 { { 16 17 18 19 20 } } [ 1 2 3 4 { 6 7 8 9 10 } [ + + + + ] 4 map-withn ] unit-test
@@ -79,3 +71,9 @@ IN: sequences.lib.tests
 
 [ ] [ { } 0 firstn ] unit-test
 [ "a" ] [ { "a" } 1 firstn ] unit-test
+
+[ "empty" ] [ { } [ "not empty" ] [ "empty" ] if-seq ] unit-test
+[ { 1 } "not empty" ] [ { 1 } [ "not empty" ] [ "empty" ] if-seq ] unit-test
+
+[ "empty" ] [ { } [ "empty" ] [ "not empty" ] if-empty ] unit-test
+[ { 1 } "not empty" ] [ { 1 } [ "empty" ] [ "not empty" ] if-empty ] unit-test

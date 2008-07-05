@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel io calendar sequences io.files
-io.sockets continuations prettyprint assocs math.parser
-words debugger math combinators concurrency.messaging
-threads arrays init math.ranges strings calendar.format
-io.encodings.utf8 ;
+io.sockets continuations destructors prettyprint assocs
+math.parser words debugger math combinators
+concurrency.messaging threads arrays init math.ranges strings
+calendar.format io.encodings.utf8 ;
 IN: logging.server
 
 : log-root ( -- string )
@@ -28,7 +28,7 @@ SYMBOL: log-files
 
 : multiline-header 20 CHAR: - <string> ; foldable
 
-: (write-message) ( msg word-name level multi? -- )
+: (write-message) ( msg name>> level multi? -- )
     [
         "[" write multiline-header write "] " write
     ] [
@@ -36,19 +36,19 @@ SYMBOL: log-files
     ] if
     write bl write ": " write print ;
 
-: write-message ( msg word-name level -- )
-    rot [ empty? not ] subset {
+: write-message ( msg name>> level -- )
+    rot harvest {
         { [ dup empty? ] [ 3drop ] }
         { [ dup length 1 = ] [ first -rot f (write-message) ] }
         [
             [ first -rot f (write-message) ] 3keep
-            1 tail -rot [ t (write-message) ] 2curry each
+            rest -rot [ t (write-message) ] 2curry each
         ]
     } cond ;
 
 : (log-message) ( msg -- )
-    #! msg: { msg word-name level service }
-    first4 log-stream [ write-message flush ] with-stream* ;
+    #! msg: { msg name>> level service }
+    first4 log-stream [ write-message flush ] with-output-stream* ;
 
 : try-dispose ( stream -- )
     [ dispose ] curry [ error. ] recover ;
@@ -67,7 +67,7 @@ SYMBOL: log-files
 : ?delete-file ( path -- )
     dup exists? [ delete-file ] [ drop ] if ;
 
-: delete-oldest keep-logs log# ?delete-file ;
+: delete-oldest ( service -- ) keep-logs log# ?delete-file ;
 
 : ?move-file ( old new -- )
     over exists? [ move-file ] [ 2drop ] if ;
@@ -93,7 +93,12 @@ SYMBOL: log-files
     } case log-server-loop ;
 
 : log-server ( -- )
-    [ [ log-server-loop ] [ error. (close-logs) ] recover t ]
+    [
+        init-namespaces
+        [ log-server-loop ]
+        [ error. (close-logs) ]
+        recover t
+    ]
     "Log server" spawn-server
     "log-server" set-global ;
 

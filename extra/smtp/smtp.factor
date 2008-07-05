@@ -17,13 +17,13 @@ LOG: log-smtp-connection NOTICE ( addrspec -- )
 : with-smtp-connection ( quot -- )
     smtp-server get
     dup log-smtp-connection
-    ascii <client> [
+    ascii [
         smtp-domain [ host-name or ] change
-        read-timeout get stdio get set-timeout
+        read-timeout get timeouts
         call
-    ] with-stream ; inline
+    ] with-client ; inline
 
-: crlf "\r\n" write ;
+: crlf ( -- ) "\r\n" write ;
 
 : command ( string -- ) write crlf flush ;
 
@@ -131,7 +131,7 @@ M: email clone
         "-" %
         millis #
         "@" %
-        smtp-domain get %
+        smtp-domain get [ host-name ] unless* %
         ">" %
     ] "" make ;
 

@@ -1,8 +1,9 @@
 ! Copyright (C) 2007 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types colors jamshred.game jamshred.oint
-jamshred.player jamshred.tunnel kernel math math.vectors opengl
-opengl.gl opengl.glu sequences ;
+USING: accessors alien.c-types colors jamshred.game
+jamshred.oint jamshred.player jamshred.tunnel kernel math
+math.constants math.functions math.vectors opengl opengl.gl
+opengl.glu sequences float-arrays ;
 IN: jamshred.gl
 
 : min-vertices 6 ; inline
@@ -14,6 +15,35 @@ IN: jamshred.gl
 : n-segments-ahead ( -- n ) 60 ; inline
 : n-segments-behind ( -- n ) 40 ; inline
 
+: wall-drawing-offset ( -- n )
+    #! so that we can't see through the wall, we draw it a bit further away
+    0.15 ;
+
+: wall-drawing-radius ( segment -- r )
+    radius>> wall-drawing-offset + ;
+
+: wall-up ( segment -- v )
+    [ wall-drawing-radius ] [ up>> ] bi n*v ;
+
+: wall-left ( segment -- v )
+    [ wall-drawing-radius ] [ left>> ] bi n*v ;
+
+: segment-vertex ( theta segment -- vertex )
+    [
+        [ wall-up swap sin v*n ] [ wall-left swap cos v*n ] 2bi v+
+    ] [
+        location>> v+
+    ] bi ;
+
+: segment-vertex-normal ( vertex segment -- normal )
+    location>> swap v- normalize ;
+
+: segment-vertex-and-normal ( segment theta -- vertex normal )
+    swap [ segment-vertex ] keep dupd segment-vertex-normal ;
+
+: equally-spaced-radians ( n -- seq )
+    #! return a sequence of n numbers between 0 and 2pi
+    dup [ / pi 2 * * ] curry map ;
 : draw-segment-vertex ( segment theta -- )
     over segment-color gl-color segment-vertex-and-normal
     gl-normal gl-vertex ;
@@ -37,10 +67,6 @@ IN: jamshred.gl
 : draw-tunnel ( player -- )
     segments-to-render draw-segments ;
 
-! : draw-tunnel ( player tunnel -- )
-!     tuck swap player-nearest-segment segment-number dup n-segments-behind -
-!     swap n-segments-ahead + rot sub-tunnel draw-segments ;
-
 : init-graphics ( width height -- )
     GL_DEPTH_TEST glEnable
     GL_SCISSOR_TEST glDisable
@@ -55,18 +81,18 @@ IN: jamshred.gl
     GL_LIGHT0 glEnable
     GL_FOG glEnable
     GL_FOG_DENSITY 0.09 glFogf
+    GL_FRONT GL_AMBIENT_AND_DIFFUSE glColorMaterial
     GL_COLOR_MATERIAL glEnable
-    GL_FRONT_AND_BACK GL_AMBIENT_AND_DIFFUSE glColorMaterial
-    GL_LIGHT0 GL_POSITION F{ 0.0 0.0 -3.0 1.0 } >c-float-array glLightfv
+    GL_LIGHT0 GL_POSITION F{ 0.0 0.0 0.0 1.0 } >c-float-array glLightfv
     GL_LIGHT0 GL_AMBIENT F{ 0.2 0.2 0.2 1.0 } >c-float-array glLightfv
     GL_LIGHT0 GL_DIFFUSE F{ 1.0 1.0 1.0 1.0 } >c-float-array glLightfv
     GL_LIGHT0 GL_SPECULAR F{ 1.0 1.0 1.0 1.0 } >c-float-array glLightfv ;
 
 : player-view ( player -- )
-    [ oint-location first3 ] keep
-    [ dup oint-location swap oint-forward v+ first3 ] keep
-    oint-up first3 gluLookAt ;
+    [ location>> ]
+    [ [ location>> ] [ forward>> ] bi v+ ]
+    [ up>> ] tri gl-look-at ;
 
 : draw-jamshred ( jamshred width height -- )
-    init-graphics jamshred-player dup player-view draw-tunnel ;
+    init-graphics jamshred-player [ player-view ] [ draw-tunnel ] bi ;
 

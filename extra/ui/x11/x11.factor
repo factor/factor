@@ -1,17 +1,18 @@
 ! Copyright (C) 2005, 2007 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays ui ui.gadgets ui.gestures
-ui.backend ui.clipboards ui.gadgets.worlds assocs kernel math
-namespaces opengl sequences strings x11.xlib x11.events x11.xim
-x11.glx x11.clipboard x11.constants x11.windows io.encodings.string
+ui.backend ui.clipboards ui.gadgets.worlds ui.render assocs
+kernel math namespaces opengl sequences strings x11.xlib
+x11.events x11.xim x11.glx x11.clipboard x11.constants
+x11.windows io.encodings.string io.encodings.ascii
 io.encodings.utf8 combinators debugger command-line qualified
-ui.render math.vectors classes.tuple opengl.gl threads ;
+math.vectors classes.tuple opengl.gl threads ;
 QUALIFIED: system
 IN: ui.x11
 
 SINGLETON: x11-ui-backend
 
-: XA_NET_WM_NAME "_NET_WM_NAME" x-atom ;
+: XA_NET_WM_NAME ( -- atom ) "_NET_WM_NAME" x-atom ;
 
 TUPLE: x11-handle window glx xic ;
 
@@ -137,8 +138,8 @@ M: world selection-notify-event
     } cond ;
 
 : encode-clipboard ( string type -- bytes )
-    XSelectionRequestEvent-target XA_UTF8_STRING =
-    [ utf8 encode ] [ string>char-alien ] if ;
+    XSelectionRequestEvent-target
+    XA_UTF8_STRING = utf8 ascii ? encode ;
 
 : set-selection-prop ( evt -- )
     dpy get swap
@@ -182,14 +183,9 @@ M: world client-event
         ui-wait wait-event
     ] if ;
 
-: do-events ( -- )
+M: x11-ui-backend do-events
     wait-event dup XAnyEvent-window window dup
     [ [ 2dup handle-event ] assert-depth ] when 2drop ;
-
-: event-loop ( -- )
-    windows get empty? [
-        [ do-events ] ui-try event-loop
-    ] unless ;
 
 : x-clipboard@ ( gadget clipboard -- prop win )
     x-clipboard-atom swap
@@ -253,12 +249,16 @@ M: x11-ui-backend ui ( -- )
     [
         f [
             [
+                stop-after-last-window? on
                 init-clipboard
                 start-ui
                 event-loop
             ] with-xim
         ] with-x
     ] ui-running ;
+
+M: x11-ui-backend beep ( -- )
+    dpy get 100 XBell drop ;
 
 x11-ui-backend ui-backend set-global
 

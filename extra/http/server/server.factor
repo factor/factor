@@ -1,226 +1,256 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs kernel namespaces io io.timeouts strings splitting
-threads http sequences prettyprint io.server logging calendar
-html.elements accessors math.parser combinators.lib
-tools.vocabs debugger html continuations random combinators
-destructors io.encodings.8-bit fry ;
+USING: kernel accessors sequences arrays namespaces splitting
+vocabs.loader destructors assocs debugger continuations
+combinators tools.vocabs tools.time math math.parser present
+io vectors
+io.sockets
+io.sockets.secure
+io.encodings
+io.encodings.iana
+io.encodings.utf8
+io.encodings.ascii
+io.encodings.binary
+io.streams.limited
+io.servers.connection
+io.timeouts
+fry logging logging.insomniac calendar urls
+http
+http.parsers
+http.server.responses
+html.templates
+html.elements
+html.streams ;
 IN: http.server
 
-GENERIC: call-responder ( path responder -- response )
+: check-absolute ( url -- url )
+    dup path>> "/" head? [ "Bad request: URL" throw ] unless ; inline
 
-: request-params ( -- assoc )
-    request get dup method>> {
-        { "GET" [ query>> ] }
-        { "HEAD" [ query>> ] }
-        { "POST" [ post-data>> ] }
-    } case ;
+: read-request-line ( request -- request )
+    read-crlf parse-request-line first3
+    [ >>method ] [ >url check-absolute >>url ] [ >>version ] tri* ;
 
-: <content> ( content-type -- response )
-    <response>
-        200 >>code
-        "Document follows" >>message
-        swap set-content-type ;
+: read-request-header ( request -- request )
+    read-header >>header ;
+
+: parse-post-data ( post-data -- post-data )
+    [ ] [ raw>> ] [ content-type>> ] tri
+    "application/x-www-form-urlencoded" = [ query>assoc ] when
+    >>content ;
+
+: read-post-data ( request -- request )
+    dup method>> "POST" = [
+        [ ]
+        [ "content-length" header string>number read ]
+        [ "content-type" header ] tri
+        <post-data> parse-post-data >>post-data
+    ] when ;
+
+: extract-host ( request -- request )
+    [ ] [ url>> ] [ "host" header parse-host ] tri
+    [ >>host ] [ >>port ] bi*
+    drop ;
+
+: extract-cookies ( request -- request )
+    dup "cookie" header [ parse-cookie >>cookies ] when* ;
+
+: read-request ( -- request )
+    <request>
+    read-request-line
+    read-request-header
+    read-post-data
+    extract-host
+    extract-cookies ;
+
+GENERIC: write-response ( response -- )
+
+GENERIC: write-full-response ( request response -- )
+
+: write-response-line ( response -- response )
+    dup
+    [ "HTTP/" write version>> write bl ]
+    [ code>> present write bl ]
+    [ message>> write crlf ]
+    tri ;
+
+: unparse-content-type ( request -- content-type )
+    [ content-type>> "application/octet-stream" or ]
+    [ content-charset>> encoding>name ]
+    bi
+    [ "; charset=" swap 3append ] when* ;
+
+: ensure-domain ( cookie -- cookie )
+    [
+        request get url>>
+        host>> dup "localhost" =
+        [ drop ] [ or ] if
+    ] change-domain ;
+
+: write-response-header ( response -- response )
+    #! We send one set-cookie header per cookie, because that's
+    #! what Firefox expects.
+    dup header>> >alist >vector
+    over unparse-content-type "content-type" pick set-at
+    over cookies>> [
+        ensure-domain unparse-set-cookie
+        "set-cookie" swap 2array over push
+    ] each
+    write-header ;
+
+: write-response-body ( response -- response )
+    dup body>> call-template ;
+
+M: response write-response ( respose -- )
+    write-response-line
+    write-response-header
+    flush
+    drop ;
+
+M: response write-full-response ( request response -- )
+    dup write-response
+    swap method>> "HEAD" = [
+        [ content-charset>> encode-output ]
+        [ write-response-body ]
+        bi
+    ] unless ;
+
+M: raw-response write-response ( respose -- )
+    write-response-line
+    write-response-body
+    drop ;
+
+M: raw-response write-full-response ( response -- )
+    write-response ;
+
+: post-request? ( -- ? ) request get method>> "POST" = ;
+
+SYMBOL: responder-nesting
+
+SYMBOL: main-responder
+
+SYMBOL: development?
+
+SYMBOL: benchmark?
+
+! path is a sequence of path component strings
+GENERIC: call-responder* ( path responder -- response )
 
 TUPLE: trivial-responder response ;
 
 C: <trivial-responder> trivial-responder
 
-M: trivial-responder call-responder nip response>> call ;
+M: trivial-responder call-responder* nip response>> clone ;
 
-: trivial-response-body ( code message -- )
-    <html>
-        <body>
-            <h1> [ number>string write bl ] [ write ] bi* </h1>
-        </body>
-    </html> ;
+main-responder global [ <404> <trivial-responder> or ] change-at
 
-: <trivial-response> ( code message -- response )
-    2dup '[ , , trivial-response-body ]
-    "text/html" <content>
-        swap >>body
-        swap >>message
-        swap >>code ;
+: invert-slice ( slice -- slice' )
+    dup slice? [ [ seq>> ] [ from>> ] bi head-slice ] [ drop { } ] if ;
 
-: <400> ( -- response )
-    400 "Bad request" <trivial-response> ;
+: add-responder-nesting ( path responder -- )
+    [ invert-slice ] dip 2array responder-nesting get push ;
 
-: <404> ( -- response )
-    404 "Not Found" <trivial-response> ;
+: call-responder ( path responder -- response )
+    [ add-responder-nesting ] [ call-responder* ] 2bi ;
 
-SYMBOL: 404-responder
-
-[ <404> ] <trivial-responder> 404-responder set-global
-
-SYMBOL: link-hook
-
-: modify-query ( query -- query )
-    link-hook get [ ] or call ;
-
-: link>string ( url query -- url' )
-    modify-query (link>string) ;
-
-: write-link ( url query -- )
-    link>string write ;
-
-SYMBOL: form-hook
-
-: hidden-form-field ( -- )
-    form-hook get [ ] or call ;
-
-: absolute-redirect ( to query -- url )
-    #! Same host.
-    request get clone
-        swap [ >>query ] when*
-        swap url-encode >>path
-    request-url ;
-
-: replace-last-component ( path with -- path' )
-    >r "/" last-split1 drop "/" r> 3append ;
-
-: relative-redirect ( to query -- url )
-    request get clone
-    swap [ >>query ] when*
-    swap [ '[ , replace-last-component ] change-path ] when*
-    dup query>> modify-query >>query
-    request-url ;
-
-: derive-url ( to query -- url )
-    {
-        { [ over "http://" head? ] [ link>string ] }
-        { [ over "/" head? ] [ absolute-redirect ] }
-        [ relative-redirect ]
-    } cond ;
-
-: <redirect> ( to query code message -- response )
-    <trivial-response> -rot derive-url "location" set-header ;
-
-\ <redirect> DEBUG add-input-logging
-
-: <permanent-redirect> ( to query -- response )
-    301 "Moved Permanently" <redirect> ;
-
-: <temporary-redirect> ( to query -- response )
-    307 "Temporary Redirect" <redirect> ;
-
-TUPLE: dispatcher default responders ;
-
-: new-dispatcher ( class -- dispatcher )
-    new
-        404-responder get >>default
-        H{ } clone >>responders ; inline
-
-: <dispatcher> ( -- dispatcher )
-    dispatcher new-dispatcher ;
-
-: split-path ( path -- rest first )
-    [ CHAR: / = ] left-trim "/" split1 swap ;
-
-: find-responder ( path dispatcher -- path responder )
-    over split-path pick responders>> at*
-    [ >r >r 2drop r> r> ] [ 2drop default>> ] if ;
-
-: redirect-with-/ ( -- response )
-    request get path>> "/" append f <permanent-redirect> ;
-
-M: dispatcher call-responder ( path dispatcher -- response )
-    over [
-        find-responder call-responder
-    ] [
-        2drop redirect-with-/
-    ] if ;
-
-TUPLE: vhost-dispatcher default responders ;
-
-: <vhost-dispatcher> ( -- dispatcher )
-    404-responder get H{ } clone vhost-dispatcher boa ;
-
-: find-vhost ( dispatcher -- responder )
-    request get host>> over responders>> at*
-    [ nip ] [ drop default>> ] if ;
-
-M: vhost-dispatcher call-responder ( path dispatcher -- response )
-    find-vhost call-responder ;
-
-: set-main ( dispatcher name -- dispatcher )
-    '[ , f <permanent-redirect> ] <trivial-responder>
-    >>default ;
-
-: add-responder ( dispatcher responder path -- dispatcher )
-    pick responders>> set-at ;
-
-: add-main-responder ( dispatcher responder path -- dispatcher )
-    [ add-responder ] keep set-main ;
-
-SYMBOL: main-responder
-
-main-responder global
-[ drop 404-responder get-global ] cache
-drop
-
-SYMBOL: development-mode
+: http-error. ( error -- )
+    "Internal server error" [
+        [ print-error nl :c ] with-html-stream
+    ] simple-page ;
 
 : <500> ( error -- response )
     500 "Internal server error" <trivial-response>
-    swap '[
-        , "Internal server error" [
-            development-mode get [
-                [ print-error nl :c ] with-html-stream
-            ] [
-                500 "Internal server error"
-                trivial-response-body
-            ] if
-        ] simple-page
-    ] >>body ;
+    swap development? get [ '[ , http-error. ] >>body ] [ drop ] if ;
 
 : do-response ( response -- )
-    dup write-response
-    request get method>> "HEAD" =
-    [ drop ] [ write-response-body ] if ;
+    [ request get swap write-full-response ]
+    [
+        [ \ do-response log-error ]
+        [
+            utf8 [
+                development? get
+                [ http-error. ] [ drop "Response error" write ] if
+            ] with-encoded-output
+        ] bi
+    ] recover ;
 
 LOG: httpd-hit NOTICE
 
+LOG: httpd-header NOTICE
+
+: log-header ( headers name -- )
+    tuck header 2array httpd-header ;
+
 : log-request ( request -- )
-    { method>> host>> path>> } map-exec-with httpd-hit ;
+    [ [ method>> ] [ url>> ] bi 2array httpd-hit ]
+    [ { "user-agent" "x-forwarded-for" } [ log-header ] with each ]
+    bi ;
 
-SYMBOL: exit-continuation
+: split-path ( string -- path )
+    "/" split harvest ;
 
-: exit-with exit-continuation get continue-with ;
+: init-request ( request -- )
+    request set
+    V{ } clone responder-nesting set ;
 
-: with-exit-continuation ( quot -- )
-    '[ exit-continuation set @ ] callcc1 exit-continuation off ;
+: dispatch-request ( request -- response )
+    url>> path>> split-path main-responder get call-responder ;
+
+: prepare-request ( request -- )
+    [
+        local-address get
+        [ secure? "https" "http" ? >>protocol ]
+        [ port>> '[ , or ] change-port ]
+        bi
+    ] change-url drop ;
+
+: valid-request? ( request -- ? )
+    url>> port>> local-address get port>> = ;
 
 : do-request ( request -- response )
-    [
-        [ log-request ]
-        [ request set ]
-        [ path>> main-responder get call-responder ] tri
-        [ <404> ] unless*
-    ] [
-        [ \ do-request log-error ]
-        [ <500> ]
-        bi
-    ] recover ;
-
-: default-timeout 1 minutes stdio get set-timeout ;
+    '[
+        ,
+        {
+            [ init-request ]
+            [ prepare-request ]
+            [ log-request ]
+            [ dup valid-request? [ dispatch-request ] [ drop <400> ] if ]
+        } cleave
+    ] [ [ \ do-request log-error ] [ <500> ] bi ] recover ;
 
 : ?refresh-all ( -- )
-    development-mode get-global
-    [ global [ refresh-all ] bind ] when ;
+    development? get-global [ global [ refresh-all ] bind ] when ;
 
-: handle-client ( -- )
+LOG: httpd-benchmark DEBUG
+
+: ?benchmark ( quot -- )
+    benchmark? get [
+        [ benchmark ] [ first ] bi request get url>> rot 3array
+        httpd-benchmark
+    ] [ call ] if ; inline
+
+TUPLE: http-server < threaded-server ;
+
+M: http-server handle-client*
+    drop
     [
-        default-timeout
+        64 1024 * limit-input
         ?refresh-all
         read-request
-        do-request
-        do-response
+        [ do-request ] ?benchmark
+        [ do-response ] ?benchmark
     ] with-destructors ;
 
+: <http-server> ( -- server )
+    http-server new-threaded-server
+        "http.server" >>name
+        "http" protocol-port >>insecure
+        "https" protocol-port >>secure ;
+
 : httpd ( port -- )
-    internet-server "http.server"
-    latin1 [ handle-client ] with-server ;
+    <http-server>
+        swap >>insecure
+        f >>secure
+    start-server ;
 
-: httpd-main ( -- ) 8888 httpd ;
-
-MAIN: httpd-main
+: http-insomniac ( -- )
+    "http.server" { "httpd-hit" } schedule-insomniac ;

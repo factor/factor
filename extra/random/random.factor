@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel math namespaces sequences
 io.backend io.binary combinators system vocabs.loader
-inspector ;
+summary ;
 IN: random
 
 SYMBOL: system-random-generator

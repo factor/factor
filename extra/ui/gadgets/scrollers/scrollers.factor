@@ -1,10 +1,9 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays ui.gadgets
-ui.gadgets.viewports ui.gadgets.frames ui.gadgets.grids
-ui.gadgets.theme ui.gadgets.sliders ui.gestures kernel math
-namespaces sequences models combinators math.vectors
-classes.tuple ;
+USING: accessors arrays ui.gadgets ui.gadgets.viewports
+ui.gadgets.frames ui.gadgets.grids ui.gadgets.theme
+ui.gadgets.sliders ui.gestures kernel math namespaces sequences
+models combinators math.vectors classes.tuple ;
 IN: ui.gadgets.scrollers
 
 TUPLE: scroller viewport x y follows ;
@@ -12,13 +11,13 @@ TUPLE: scroller viewport x y follows ;
 : find-scroller ( gadget -- scroller/f )
     [ [ scroller? ] is? ] find-parent ;
 
-: scroll-up-page scroller-y -1 swap slide-by-page ;
+: scroll-up-page ( scroller -- ) y>> -1 swap slide-by-page ;
 
-: scroll-down-page scroller-y 1 swap slide-by-page ;
+: scroll-down-page ( scroller -- ) y>> 1 swap slide-by-page ;
 
-: scroll-up-line scroller-y -1 swap slide-by-line ;
+: scroll-up-line ( scroller -- ) y>> -1 swap slide-by-line ;
 
-: scroll-down-line scroller-y 1 swap slide-by-line ;
+: scroll-down-line ( scroller -- ) y>> 1 swap slide-by-line ;
 
 : do-mouse-scroll ( scroller -- )
     scroll-direction get-global first2
@@ -36,9 +35,9 @@ scroller H{
 : <scroller-model> ( -- model )
     0 0 0 0 <range> 0 0 0 0 <range> 2array <compose> ;
 
-: x-model g gadget-model model-dependencies first ;
+: x-model ( -- model ) g gadget-model model-dependencies first ;
 
-: y-model g gadget-model model-dependencies second ;
+: y-model ( -- model ) g gadget-model model-dependencies second ;
 
 : <scroller> ( gadget -- scroller )
     <scroller-model> <frame> scroller construct-control [
@@ -47,7 +46,7 @@ scroller H{
             y-model <y-slider> g-> set-scroller-y @right frame,
             viewport,
         ] with-gadget
-    ] keep t over set-gadget-root? dup faint-boundary ;
+    ] keep t >>root? faint-boundary ;
 
 : scroll ( value scroller -- )
     [
@@ -133,3 +132,13 @@ M: scroller focusable-child*
 
 M: scroller model-changed
     nip f swap set-scroller-follows ;
+
+TUPLE: limited-scroller dim ;
+
+: <limited-scroller> ( gadget -- scroller )
+    <scroller>
+    limited-scroller new
+    [ set-gadget-delegate ] keep ;
+
+M: limited-scroller pref-dim*
+    dim>> ;

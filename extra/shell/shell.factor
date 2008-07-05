@@ -1,7 +1,9 @@
 
-USING: kernel words continuations namespaces debugger sequences combinators
-       system io io.files io.launcher sequences.deep
-       accessors multi-methods newfx shell.parser ;
+USING: kernel parser words continuations namespaces debugger
+       sequences combinators splitting prettyprint
+       system io io.files io.launcher io.encodings.utf8 io.pipes sequences.deep
+       accessors multi-methods newfx shell.parser
+       combinators.short-circuit ;
 
 IN: shell
 
@@ -41,6 +43,21 @@ METHOD: expand { glob-expr }
     [ ]
   if ;
 
+METHOD: expand { factor-expr } expr>> eval unparse ;
+
+DEFER: expansion
+
+METHOD: expand { back-quoted-expr }
+  expr>>
+  expr
+  ast>>
+  command>>
+  expansion
+  utf8 <process-stream>
+  contents
+  " \n" split
+  "" remove ;
+
 METHOD: expand { object } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -49,7 +66,8 @@ METHOD: expand { object } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: run-sword ( basic-expr -- ) command>> unclip "shell" lookup execute ;
+: run-sword ( basic-expr -- )
+  command>> expansion unclip "shell" lookup execute ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -78,8 +96,7 @@ METHOD: expand { object } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: pipeline-chant ( pipeline-chant -- )
-  drop "ix: pipelines not supported" print ;
+: pipeline-chant ( pipeline-chant -- ) commands>> run-pipeline drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

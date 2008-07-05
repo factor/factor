@@ -1,12 +1,13 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions generic hashtables inspector io kernel
-math namespaces prettyprint sequences assocs sequences.private
-strings io.styles vectors words system splitting math.parser
-classes.tuple continuations continuations.private combinators
-generic.math io.streams.duplex classes.builtin classes
-compiler.units generic.standard vocabs threads threads.private
-init kernel.private libc io.encodings accessors ;
+USING: slots arrays definitions generic hashtables summary io
+kernel math namespaces prettyprint prettyprint.config sequences
+assocs sequences.private strings io.styles vectors words system
+splitting math.parser classes.tuple continuations
+continuations.private combinators generic.math classes.builtin
+classes compiler.units generic.standard vocabs threads
+threads.private init kernel.private libc io.encodings
+accessors math.order destructors ;
 IN: debugger
 
 GENERIC: error. ( error -- )
@@ -15,7 +16,6 @@ GENERIC: error-help ( error -- topic )
 M: object error. . ;
 M: object error-help drop f ;
 
-M: tuple error. describe ;
 M: tuple error-help class ;
 
 M: string error. print ;
@@ -32,15 +32,12 @@ M: string error. print ;
 : :get ( variable -- value )
     error-continuation get continuation-name assoc-stack ;
 
-: :vars ( -- )
-    error-continuation get continuation-name namestack. ;
-
-: :res ( n -- )
+: :res ( n -- * )
     1- restarts get-global nth f restarts set-global restart ;
 
-: :1 1 :res ;
-: :2 2 :res ;
-: :3 3 :res ;
+: :1 ( -- * ) 1 :res ;
+: :2 ( -- * ) 2 :res ;
+: :3 ( -- * ) 3 :res ;
 
 : restart. ( restart n -- )
     [
@@ -63,17 +60,14 @@ M: string error. print ;
     [ global [ "Error in print-error!" print drop ] bind ]
     recover ;
 
-SYMBOL: error-hook
-
-[
+: print-error-and-restarts ( error -- )
     print-error
     restarts.
     nl
-    "Type :help for debugging help." print flush
-] error-hook set-global
+    "Type :help for debugging help." print flush ;
 
 : try ( quot -- )
-    [ error-hook get call ] recover ;
+    [ print-error-and-restarts ] recover ;
 
 ERROR: assert got expect ;
 
@@ -95,11 +89,11 @@ M: relative-overflow summary
     drop "Superfluous items pushed to data stack" ;
 
 : assert-depth ( quot -- )
-    >r datastack r> swap slip >r datastack r>
-    2dup [ length ] compare sgn {
-        { -1 [ trim-datastacks nip relative-underflow ] }
-        { 0 [ 2drop ] }
-        { 1 [ trim-datastacks drop relative-overflow ] }
+    >r datastack r> dip >r datastack r>
+    2dup [ length ] compare {
+        { +lt+ [ trim-datastacks nip relative-underflow ] }
+        { +eq+ [ 2drop ] }
+        { +gt+ [ trim-datastacks drop relative-overflow ] }
     } case ; inline
 
 : expired-error. ( obj -- )
@@ -145,15 +139,15 @@ M: relative-overflow summary
 : stack-overflow. ( obj name -- )
     write " stack overflow" print drop ;
 
-: datastack-underflow. "Data" stack-underflow. ;
-: datastack-overflow. "Data" stack-overflow. ;
-: retainstack-underflow. "Retain" stack-underflow. ;
-: retainstack-overflow. "Retain" stack-overflow. ;
+: datastack-underflow. ( obj -- ) "Data" stack-underflow. ;
+: datastack-overflow. ( obj -- ) "Data" stack-overflow. ;
+: retainstack-underflow. ( obj -- ) "Retain" stack-underflow. ;
+: retainstack-overflow. ( obj -- ) "Retain" stack-overflow. ;
 
-: memory-error.
+: memory-error. ( error -- )
     "Memory protection fault at address " write third .h ;
 
-: primitive-error.
+: primitive-error. ( error -- ) 
     "Unimplemented primitive" print drop ;
 
 PREDICATE: kernel-error < array
@@ -163,7 +157,7 @@ PREDICATE: kernel-error < array
         [ second 0 15 between? ]
     } cond ;
 
-: kernel-errors
+: kernel-errors ( error -- n errors )
     second {
         { 0  [ expired-error.          ] }
         { 1  [ io-error.               ] }
@@ -192,12 +186,13 @@ M: no-method summary
 
 M: no-method error.
     "Generic word " write
-    dup no-method-generic pprint
+    dup generic>> pprint
     " does not define a method for the " write
-    dup no-method-object class pprint
+    dup object>> class pprint
     " class." print
-    "Allowed classes: " write dup no-method-generic order .
-    "Dispatching on object: " write no-method-object short. ;
+    "Dispatching on object: " write object>> short. ;
+
+M: bad-slot-value summary drop "Bad store to specialized slot" ;
 
 M: no-math-method summary
     drop "No suitable arithmetic method" ;
@@ -208,14 +203,11 @@ M: no-next-method summary
 M: inconsistent-next-method summary
     drop "Executing call-next-method with inconsistent parameters" ;
 
-M: stream-closed-twice summary
-    drop "Attempt to perform I/O on closed stream" ;
-
 M: check-method summary
     drop "Invalid parameters for create-method" ;
 
-M: no-tuple-class summary
-    drop "BOA constructors can only be defined for tuple classes" ;
+M: not-a-tuple summary
+    drop "Not a tuple" ;
 
 M: bad-superclass summary
     drop "Tuple classes can only inherit from other tuple classes" ;
@@ -239,6 +231,15 @@ M: condition summary error>> summary ;
 M: condition error-help error>> error-help ;
 
 M: assert summary drop "Assertion failed" ;
+
+M: assert error.
+    "Assertion failed" print
+    standard-table-style [
+        15 length-limit set
+        5 line-limit set
+        [ expect>> [ [ "Expect:" write ] with-cell pprint-cell ] with-row ]
+        [ got>> [ [ "Got:" write ] with-cell pprint-cell ] with-row ] bi
+    ] tabular-output ;
 
 M: immutable summary drop "Sequence is immutable" ;
 
@@ -266,8 +267,7 @@ M: double-free summary
 M: realloc-error summary
     drop "Memory reallocation failed" ;
 
-: error-in-thread. ( -- )
-    error-thread get-global
+: error-in-thread. ( thread -- )
     "Error in thread " write
     [
         dup thread-id #
@@ -281,13 +281,19 @@ M: thread error-in-thread ( error thread -- )
         die drop
     ] [
         global [
-            error-in-thread. print-error flush
+            error-thread get-global error-in-thread. print-error flush
         ] bind
     ] if ;
 
 M: encode-error summary drop "Character encoding error" ;
 
 M: decode-error summary drop "Character decoding error" ;
+
+M: bad-create summary drop "Bad parameters to create" ;
+
+M: attempt-all-error summary drop "Nothing to attempt" ;
+
+M: already-disposed summary drop "Attempting to operate on disposed object" ;
 
 <PRIVATE
 

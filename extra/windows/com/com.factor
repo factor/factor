@@ -1,5 +1,5 @@
 USING: alien alien.c-types windows.com.syntax windows.ole32
-windows.types continuations kernel alien.syntax ;
+windows.types continuations kernel alien.syntax libc ;
 IN: windows.com
 
 LIBRARY: ole32
@@ -27,9 +27,9 @@ COM-INTERFACE: IDropTarget IUnknown {00000122-0000-0000-C000-000000000046}
     HRESULT Drop ( IDataObject* pDataObject, DWORD grfKeyState, POINTL pt, DWORD* pdwEffect ) ;
 
 : com-query-interface ( interface iid -- interface' )
-    f <void*>
-    [ IUnknown::QueryInterface ole32-error ] keep
-    *void* ;
+    "void*" heap-size [
+        [ IUnknown::QueryInterface ole32-error ] keep *void*
+    ] with-malloc ;
 
 : com-add-ref ( interface -- interface )
      [ IUnknown::AddRef drop ] keep ; inline

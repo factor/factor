@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences namespaces words assocs logging sorting
-prettyprint io io.styles strings logging.parser calendar.format ;
+prettyprint io io.styles strings logging.parser calendar.format
+combinators ;
 IN: logging.analysis
 
 SYMBOL: word-names
@@ -14,7 +15,7 @@ SYMBOL: message-histogram
     dup second CRITICAL eq? [ dup errors get push ] when
     1 over third word-histogram get at+
     dup third word-names get member? [
-        1 over 1 tail message-histogram get at+
+        1 over rest message-histogram get at+
     ] when
     drop ;
 
@@ -41,12 +42,14 @@ SYMBOL: message-histogram
         ] curry assoc-each
     ] tabular-output ;
 
-: log-entry.
+: log-entry. ( entry -- )
     "====== " write
-    dup first (timestamp>string) bl
-    dup second pprint bl
-    dup third write nl
-    fourth "\n" join print ;
+    {
+        [ first (timestamp>string) bl ]
+        [ second pprint bl ]
+        [ third write nl ]
+        [ fourth "\n" join print ]
+    } cleave ;
 
 : errors. ( errors -- )
     [ log-entry. ] each ;

@@ -3,8 +3,8 @@
 USING: arrays assocs classes classes.private classes.algebra
 combinators cpu.architecture generator.fixup hashtables kernel
 layouts math namespaces quotations sequences system vectors
-words effects alien byte-arrays bit-arrays float-arrays
-accessors sets ;
+words effects alien byte-arrays
+accessors sets math.order ;
 IN: generator.registers
 
 SYMBOL: +input+
@@ -12,13 +12,6 @@ SYMBOL: +output+
 SYMBOL: +scratch+
 SYMBOL: +clobber+
 SYMBOL: known-tag
-
-! Register classes
-SINGLETON: int-regs
-SINGLETON: single-float-regs
-SINGLETON: double-float-regs
-UNION: float-regs single-float-regs double-float-regs ;
-UNION: reg-class int-regs float-regs ;
 
 <PRIVATE
 
@@ -74,7 +67,7 @@ INSTANCE: temp-reg value
 ! A data stack location.
 TUPLE: ds-loc n class ;
 
-: <ds-loc> f ds-loc boa ;
+: <ds-loc> ( n -- loc ) f ds-loc boa ;
 
 M: ds-loc minimal-ds-loc* ds-loc-n min ;
 M: ds-loc operand-class* ds-loc-class ;
@@ -85,7 +78,7 @@ M: ds-loc live-loc?
 ! A retain stack location.
 TUPLE: rs-loc n class ;
 
-: <rs-loc> f rs-loc boa ;
+: <rs-loc> ( n -- loc ) f rs-loc boa ;
 M: rs-loc operand-class* rs-loc-class ;
 M: rs-loc set-operand-class set-rs-loc-class ;
 M: rs-loc live-loc?
@@ -184,15 +177,13 @@ INSTANCE: constant value
 <PRIVATE
 
 ! Moving values between locations and registers
-: %move-bug "Bug in generator.registers" throw ;
+: %move-bug ( -- * ) "Bug in generator.registers" throw ;
 
 : %unbox-c-ptr ( dst src -- )
     dup operand-class {
-        { [ dup \ f class< ] [ drop %unbox-f ] }
-        { [ dup simple-alien class< ] [ drop %unbox-alien ] }
-        { [ dup byte-array class< ] [ drop %unbox-byte-array ] }
-        { [ dup bit-array class< ] [ drop %unbox-byte-array ] }
-        { [ dup float-array class< ] [ drop %unbox-byte-array ] }
+        { [ dup \ f class<= ] [ drop %unbox-f ] }
+        { [ dup simple-alien class<= ] [ drop %unbox-alien ] }
+        { [ dup byte-array class<= ] [ drop %unbox-byte-array ] }
         [ drop %unbox-any-c-ptr ]
     } cond ; inline
 
@@ -202,7 +193,9 @@ INSTANCE: constant value
     #! temp then temp to the destination.
     temp-reg over %move
     operand-class temp-reg
-    { set-operand-class set-tagged-vreg } tagged construct
+    tagged new
+        swap >>vreg
+        swap >>class
     %move ;
 
 : %move ( dst src -- )
@@ -238,7 +231,7 @@ GENERIC: finalize-height ( stack -- )
 : new-phantom-stack ( class -- stack )
     >r 0 V{ } clone r> boa ; inline
 
-: (loc)
+: (loc) ( m stack -- n )
     #! Utility for methods on <loc>
     height>> - ;
 
@@ -321,7 +314,7 @@ M: phantom-retainstack finalize-height
 : (live-locs) ( phantom -- seq )
     #! Discard locs which haven't moved
     [ phantom-locs* ] [ stack>> ] bi zip
-    [ live-loc? ] assoc-subset
+    [ live-loc? ] assoc-filter
     values ;
 
 : live-locs ( -- seq )
@@ -379,7 +372,7 @@ M: value (lazy-load)
 : (compute-free-vregs) ( used class -- vector )
     #! Find all vregs in 'class' which are not in 'used'.
     [ vregs length reverse ] keep
-    [ <vreg> ] curry map diff
+    [ <vreg> ] curry map swap diff
     >vector ;
 
 : compute-free-vregs ( -- )
@@ -468,11 +461,6 @@ M: loc lazy-store
 : finalize-contents ( -- )
     finalize-locs finalize-vregs reset-phantoms ;
 
-: %gc ( -- )
-    0 frame-required
-    %prepare-alien-invoke
-    "simple_gc" f %alien-invoke ;
-
 ! Loading stacks to vregs
 : free-vregs? ( int# float# -- ? )
     double-float-regs free-vregs length <=
@@ -496,7 +484,7 @@ M: loc lazy-store
 
 : substitute-vregs ( values vregs -- )
     [ vreg-substitution ] 2map
-    [ substitute-vreg? ] assoc-subset >hashtable
+    [ substitute-vreg? ] assoc-filter >hashtable
     [ >r stack>> r> substitute-here ] curry each-phantom ;
 
 : set-operand ( value var -- )
@@ -581,7 +569,7 @@ M: loc lazy-store
     {
         { f [ drop t ] }
         { known-tag [ class-tag >boolean ] }
-        [ class< ]
+        [ class<= ]
     } case ;
 
 : spec-matches? ( value spec -- ? )
@@ -656,7 +644,7 @@ PRIVATE>
 UNION: immediate fixnum POSTPONE: f ;
 
 : operand-immediate? ( operand -- ? )
-    operand-class immediate class< ;
+    operand-class immediate class<= ;
 
 : phantom-push ( obj -- )
     1 phantom-datastack get adjust-phantom

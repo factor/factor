@@ -6,17 +6,15 @@ USING: kernel words namespaces classes parser continuations
        combinators sequences splitting quotations arrays strings tools.time
        sequences.deep accessors assocs.lib
        io.encodings.utf8
-       combinators.cleave bake calendar calendar.format ;
+       combinators.cleave calendar calendar.format ;
 
 IN: builder.util
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: runtime ( quot -- time ) benchmark nip ;
-
 : minutes>ms ( min -- ms ) 60 * 1000 * ;
 
-: file>string ( file -- string ) utf8 [ stdio get contents ] with-file-reader ;
+: file>string ( file -- string ) utf8 file-contents ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -43,12 +41,17 @@ DEFER: to-strings
 
 : host-name* ( -- name ) host-name "." split first ;
 
+! : datestamp ( -- string )
+!   now `{ ,[ dup timestamp-year   ]
+!          ,[ dup timestamp-month  ]
+!          ,[ dup timestamp-day    ]
+!          ,[ dup timestamp-hour   ]
+!          ,[     timestamp-minute ] }
+!   [ pad-00 ] map "-" join ;
+
 : datestamp ( -- string )
-  now `{ ,[ dup timestamp-year   ]
-         ,[ dup timestamp-month  ]
-         ,[ dup timestamp-day    ]
-         ,[ dup timestamp-hour   ]
-         ,[     timestamp-minute ] }
+  now
+    { year>> month>> day>> hour>> minute>> } <arr>
   [ pad-00 ] map "-" join ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -107,5 +110,5 @@ USE: prettyprint
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : git-id ( -- id )
-  { "git" "show" } utf8 <process-stream> [ readln ] with-stream
+  { "git" "show" } utf8 <process-reader> [ readln ] with-input-stream
   " " split second ;

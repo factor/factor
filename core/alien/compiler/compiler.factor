@@ -3,10 +3,11 @@
 USING: arrays generator generator.registers generator.fixup
 hashtables kernel math namespaces sequences words
 inference.state inference.backend inference.dataflow system
-math.parser classes alien.arrays alien.c-types alien.structs
-alien.syntax cpu.architecture alien inspector quotations assocs
-kernel.private threads continuations.private libc combinators
-compiler.errors continuations layouts accessors ;
+math.parser classes alien.arrays alien.c-types alien.strings
+alien.structs alien.syntax cpu.architecture alien summary
+quotations assocs kernel.private threads continuations.private
+libc combinators compiler.errors continuations layouts accessors
+init sets ;
 IN: alien.compiler
 
 TUPLE: #alien-node < node return parameters abi ;
@@ -20,9 +21,7 @@ TUPLE: #alien-invoke < #alien-node library function ;
 : large-struct? ( ctype -- ? )
     dup c-struct? [
         heap-size struct-small-enough? not
-    ] [
-        drop f
-    ] if ;
+    ] [ drop f ] if ;
 
 : alien-node-parameters* ( node -- seq )
     dup parameters>>
@@ -162,17 +161,8 @@ M: long-long-type flatten-value-type ( type -- )
     dup return>> "void" = 0 1 ?
     swap produce-values ;
 
-: (make-prep-quot) ( parameters -- )
-    dup empty? [
-        drop
-    ] [
-        unclip c-type c-type-prep %
-        \ >r , (make-prep-quot) \ r> ,
-    ] if ;
-
-: make-prep-quot ( node -- quot )
-    parameters>>
-    [ <reversed> (make-prep-quot) ] [ ] make ;
+: param-prep-quot ( node -- quot )
+    parameters>> [ c-type c-type-unboxer-quot ] map spread>quot ;
 
 : unbox-parameters ( offset node -- )
     parameters>> [
@@ -200,11 +190,18 @@ M: long-long-type flatten-value-type ( type -- )
 : box-return* ( node -- )
     return>> [ ] [ box-return ] if-void ;
 
+: callback-prep-quot ( node -- quot )
+    parameters>> [ c-type c-type-boxer-quot ] map spread>quot ;
+
+: return-prep-quot ( node -- quot )
+    return>> [ [ ] ] [ c-type c-type-boxer-quot ] if-void ;
+
 M: alien-invoke-error summary
     drop
     "Words calling ``alien-invoke'' must be compiled with the optimizing compiler." ;
 
-: pop-parameters pop-literal nip [ expand-constants ] map ;
+: pop-parameters ( -- seq )
+    pop-literal nip [ expand-constants ] map ;
 
 : stdcall-mangle ( symbol node -- symbol )
     "@"
@@ -258,15 +255,15 @@ M: no-such-symbol compiler-error-type
     pop-literal nip >>library
     pop-literal nip >>return
     ! Quotation which coerces parameters to required types
-    dup make-prep-quot recursive-state get infer-quot
+    dup param-prep-quot recursive-state get infer-quot
     ! Set ABI
-    dup library>>
-    library [ abi>> ] [ "cdecl" ] if*
-    >>abi
+    dup library>> library [ abi>> ] [ "cdecl" ] if* >>abi
     ! Add node to IR
     dup node,
     ! Magic #: consume exactly the number of inputs
-    0 alien-invoke-stack
+    dup 0 alien-invoke-stack
+    ! Quotation which coerces return value to required type
+    return-prep-quot recursive-state get infer-quot
 ] "infer" set-word-prop
 
 M: #alien-invoke generate-node
@@ -294,11 +291,13 @@ M: alien-indirect-error summary
     pop-parameters >>parameters
     pop-literal nip >>return
     ! Quotation which coerces parameters to required types
-    dup make-prep-quot [ dip ] curry recursive-state get infer-quot
+    dup param-prep-quot [ dip ] curry recursive-state get infer-quot
     ! Add node to IR
     dup node,
     ! Magic #: consume the function pointer, too
-    1 alien-invoke-stack
+    dup 1 alien-invoke-stack
+    ! Quotation which coerces return value to required type
+    return-prep-quot recursive-state get infer-quot
 ] "infer" set-word-prop
 
 M: #alien-indirect generate-node
@@ -322,15 +321,15 @@ M: #alien-indirect generate-node
 ! this hashtable, they will all be blown away by code GC, beware
 SYMBOL: callbacks
 
-callbacks global [ H{ } assoc-like ] change-at
+[ H{ } clone callbacks set-global ] "alien.compiler" add-init-hook
 
-: register-callback ( word -- ) dup callbacks get set-at ;
+: register-callback ( word -- ) callbacks get conjoin ;
 
 M: alien-callback-error summary
     drop "Words calling ``alien-callback'' must be compiled with the optimizing compiler." ;
 
 : callback-bottom ( node -- )
-    xt>> [ word-xt drop <alien> ] curry
+    xt>> [ [ register-callback ] [ word-xt drop <alien> ] bi ] curry
     recursive-state get infer-quot ;
 
 \ alien-callback [
@@ -340,7 +339,7 @@ M: alien-callback-error summary
     pop-literal nip >>abi
     pop-parameters >>parameters
     pop-literal nip >>return
-    gensym dup register-callback >>xt
+    gensym >>xt
     callback-bottom
 ] "infer" set-word-prop
 
@@ -371,16 +370,18 @@ TUPLE: callback-context ;
     slip
     wait-to-return ; inline
 
-: prepare-callback-return ( ctype -- quot )
+: callback-return-quot ( ctype -- quot )
     return>> {
         { [ dup "void" = ] [ drop [ ] ] }
         { [ dup large-struct? ] [ heap-size [ memcpy ] curry ] }
-        [ c-type c-type-prep ]
+        [ c-type c-type-unboxer-quot ]
     } cond ;
 
 : wrap-callback-quot ( node -- quot )
     [
-        [ quot>> ] [ prepare-callback-return ] bi append ,
+        [ callback-prep-quot ]
+        [ quot>> ]
+        [ callback-return-quot ] tri 3append ,
         [ callback-context new do-callback ] %
     ] [ ] make ;
 
@@ -405,9 +406,10 @@ TUPLE: callback-context ;
         init-templates
         %prologue-later
         dup alien-stack-frame [
-            dup registers>objects
-            dup wrap-callback-quot %alien-callback
-            %callback-return
+            [ registers>objects ]
+            [ wrap-callback-quot %alien-callback ]
+            [ %callback-return ]
+            tri
         ] with-stack-frame
     ] with-generator ;
 

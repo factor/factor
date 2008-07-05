@@ -1,9 +1,9 @@
-USING: arrays compiler.units generic hashtables inference kernel
-kernel.private math optimizer prettyprint sequences sbufs
-strings tools.test vectors words sequences.private quotations
-optimizer.backend classes classes.algebra inference.dataflow
-classes.tuple.private continuations growable optimizer.inlining
-namespaces hints ;
+USING: accessors arrays compiler.units generic hashtables
+inference kernel kernel.private math optimizer generator
+prettyprint sequences sbufs strings tools.test vectors words
+sequences.private quotations optimizer.backend classes
+classes.algebra inference.dataflow classes.tuple.private
+continuations growable optimizer.inlining namespaces hints ;
 IN: optimizer.tests
 
 [ H{ { 1 5 } { 3 4 } { 2 5 } } ] [
@@ -14,44 +14,10 @@ IN: optimizer.tests
     H{ { 1 2 } { 3 4 } } H{ { 2 3 } } union*
 ] unit-test
 
-! Test method inlining
-[ f ] [ fixnum { } min-class ] unit-test
-
-[ string ] [
-    \ string
-    [ integer string array reversed sbuf
-    slice vector quotation ]
-    sort-classes min-class
-] unit-test
-
-[ fixnum ] [
-    \ fixnum
-    [ fixnum integer object ]
-    sort-classes min-class
-] unit-test
-
-[ integer ] [
-    \ fixnum
-    [ integer float object ]
-    sort-classes min-class
-] unit-test
-
-[ object ] [
-    \ word
-    [ integer float object ]
-    sort-classes min-class
-] unit-test
-
-[ reversed ] [
-    \ reversed
-    [ integer reversed slice ]
-    sort-classes min-class
-] unit-test
-
 GENERIC: xyz ( obj -- obj )
 M: array xyz xyz ;
 
-[ t ] [ \ xyz compiled? ] unit-test
+[ t ] [ \ xyz compiled>> ] unit-test
 
 ! Test predicate inlining
 : pred-test-1
@@ -135,8 +101,8 @@ TUPLE: pred-test ;
 
 ! regression
 GENERIC: void-generic ( obj -- * )
-: breakage "hi" void-generic ;
-[ t ] [ \ breakage compiled? ] unit-test
+: breakage ( -- * ) "hi" void-generic ;
+[ t ] [ \ breakage compiled>> ] unit-test
 [ breakage ] must-fail
 
 ! regression
@@ -150,12 +116,12 @@ GENERIC: void-generic ( obj -- * )
 
 ! another regression
 : constant-branch-fold-0 "hey" ; foldable
-: constant-branch-fold-1 constant-branch-fold-0 "hey" = ; inline
+: constant-branch-fold-1 ( -- ? ) constant-branch-fold-0 "hey" = ; inline
 [ 1 ] [ [ constant-branch-fold-1 [ 1 ] [ 2 ] if ] compile-call ] unit-test
 
 ! another regression
 : foo f ;
-: bar foo 4 4 = and ;
+: bar ( -- ? ) foo 4 4 = and ;
 [ f ] [ bar ] unit-test
 
 ! ensure identities are working in some form
@@ -165,16 +131,20 @@ GENERIC: void-generic ( obj -- * )
 ] unit-test
 
 ! compiling <tuple> with a non-literal class failed
-: <tuple>-regression <tuple> ;
+: <tuple>-regression ( class -- tuple ) <tuple> ;
 
-[ t ] [ \ <tuple>-regression compiled? ] unit-test
+[ t ] [ \ <tuple>-regression compiled>> ] unit-test
 
 GENERIC: foozul ( a -- b )
 M: reversed foozul ;
 M: integer foozul ;
 M: slice foozul ;
 
-[ reversed ] [ reversed \ foozul specific-method ] unit-test
+[ t ] [
+    reversed \ foozul specific-method
+    reversed \ foozul method
+    eq?
+] unit-test
 
 ! regression
 : constant-fold-2 f ; foldable
@@ -281,31 +251,21 @@ TUPLE: silly-tuple a b ;
 : node-successor-f-bug ( x -- * )
     [ 3 throw ] [ empty-compound ] compose [ 3 throw ] if ;
 
-[ t ] [ \ node-successor-f-bug compiled? ] unit-test
+[ t ] [ \ node-successor-f-bug compiled>> ] unit-test
 
 [ ] [ [ new ] dataflow optimize drop ] unit-test
 
 [ ] [ [ <tuple> ] dataflow optimize drop ] unit-test
 
-! Make sure we have sane heuristics
-: should-inline? method flat-length 10 <= ;
-
-[ t ] [ \ fixnum \ shift should-inline? ] unit-test
-[ f ] [ \ array \ equal? should-inline? ] unit-test
-[ f ] [ \ sequence \ hashcode* should-inline? ] unit-test
-[ t ] [ \ array \ nth-unsafe should-inline? ] unit-test
-[ t ] [ \ growable \ nth-unsafe should-inline? ] unit-test
-[ t ] [ \ sbuf \ set-nth-unsafe should-inline? ] unit-test
-
 ! Regression
-: lift-throw-tail-regression
+: lift-throw-tail-regression ( obj -- obj str )
     dup integer? [ "an integer" ] [
         dup string? [ "a string" ] [
             "error" throw
         ] if
     ] if ;
 
-[ t ] [ \ lift-throw-tail-regression compiled? ] unit-test
+[ t ] [ \ lift-throw-tail-regression compiled>> ] unit-test
 [ 3 "an integer" ] [ 3 lift-throw-tail-regression ] unit-test
 [ "hi" "a string" ] [ "hi" lift-throw-tail-regression ] unit-test
 
@@ -325,11 +285,10 @@ TUPLE: silly-tuple a b ;
 
 [ 1 2 3 ] [ lift-loop-tail-test-2 ] unit-test
 
-! Make sure we don't lose
 GENERIC: generic-inline-test ( x -- y )
 M: integer generic-inline-test ;
 
-: generic-inline-test-1
+: generic-inline-test-1 ( -- x )
     1
     generic-inline-test
     generic-inline-test
@@ -342,8 +301,9 @@ M: integer generic-inline-test ;
     generic-inline-test
     generic-inline-test ;
 
+! Inlining all of the above should only take two passes
 [ { t f } ] [
-    \ generic-inline-test-1 word-def dataflow
+    \ generic-inline-test-1 def>> dataflow
     [ optimize-1 , optimize-1 , drop ] { } make
 ] unit-test
 
@@ -353,10 +313,10 @@ M: integer generic-inline-test ;
 
 HINTS: recursive-inline-hang array ;
 
-: recursive-inline-hang-1
+: recursive-inline-hang-1 ( -- a )
     { } recursive-inline-hang ;
 
-[ t ] [ \ recursive-inline-hang-1 compiled? ] unit-test
+[ t ] [ \ recursive-inline-hang-1 compiled>> ] unit-test
 
 DEFER: recursive-inline-hang-3
 
@@ -374,3 +334,44 @@ HINTS: recursive-inline-hang-3 array ;
 USE: sequences.private
 
 [ ] [ { (3append) } compile ] unit-test
+
+! Wow
+: counter-example ( a b c d -- a' b' c' d' )
+    dup 0 > [ 1 - >r rot 2 * r> counter-example ] when ; inline
+
+: counter-example' ( -- a' b' c' d' )
+    1 2 3.0 3 counter-example ;
+
+[ 2 4 6.0 0 ] [ counter-example' ] unit-test
+
+: member-test ( obj -- ? ) { + - * / /i } member? ;
+
+\ member-test must-infer
+[ ] [ \ member-test word-dataflow optimize 2drop ] unit-test
+[ t ] [ \ + member-test ] unit-test
+[ f ] [ \ append member-test ] unit-test
+
+! Infinite expansion
+TUPLE: cons car cdr ;
+
+UNION: improper-list cons POSTPONE: f ;
+
+PREDICATE: list < improper-list
+    [ cdr>> list instance? ] [ t ] if* ;
+
+[ t ] [
+    T{ cons f 1 T{ cons f 2 T{ cons f 3 f } } }
+    [ list instance? ] compile-call
+] unit-test
+
+! Regression
+: interval-inference-bug ( obj -- obj x )
+    dup "a" get { array-capacity } declare >=
+    [ dup "b" get { array-capacity } declare >= [ 3 ] [ 4 ] if ] [ 5 ] if ;
+
+\ interval-inference-bug must-infer
+
+[ ] [ 1 "a" set 2 "b" set ] unit-test
+[ 2 3 ] [ 2 interval-inference-bug ] unit-test
+[ 1 4 ] [ 1 interval-inference-bug ] unit-test
+[ 0 5 ] [ 0 interval-inference-bug ] unit-test

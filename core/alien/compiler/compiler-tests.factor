@@ -77,7 +77,7 @@ FUNCTION: tiny ffi_test_17 int x ;
 
 [ [ alien-indirect ] infer ] [ inference-error? ] must-fail-with
 
-: indirect-test-1
+: indirect-test-1 ( ptr -- result )
     "int" { } "cdecl" alien-indirect ;
 
 { 1 1 } [ indirect-test-1 ] must-infer-as
@@ -86,7 +86,7 @@ FUNCTION: tiny ffi_test_17 int x ;
 
 [ -1 indirect-test-1 ] must-fail
 
-: indirect-test-2
+: indirect-test-2 ( x y ptr -- result )
     "int" { "int" "int" } "cdecl" alien-indirect gc ;
 
 { 3 1 } [ indirect-test-2 ] must-infer-as
@@ -95,7 +95,7 @@ FUNCTION: tiny ffi_test_17 int x ;
 [ 2 3 "ffi_test_2" f dlsym indirect-test-2 ]
 unit-test
 
-: indirect-test-3
+: indirect-test-3 ( a b c d ptr -- result )
     "int" { "int" "int" "int" "int" } "stdcall" alien-indirect
     gc ;
 
@@ -139,7 +139,7 @@ FUNCTION: void ffi_test_20 double x1, double x2, double x3,
 
 ! Make sure XT doesn't get clobbered in stack frame
 
-: ffi_test_31
+: ffi_test_31 ( a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a a ptr -- result y )
     "void"
     f "ffi_test_31"
     { "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" "int" }
@@ -280,52 +280,56 @@ FUNCTION: double ffi_test_36 ( test-struct-12 x ) ;
 
 [ 1.23456 ] [ 1.23456 make-struct-12 ffi_test_36 ] unit-test
 
+FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
+
+[ t ] [ 31 2^ 32 2^ ffi_test_38 63 2^ = ] unit-test
+
 ! Test callbacks
 
-: callback-1 "void" { } "cdecl" [ ] alien-callback ;
+: callback-1 ( -- callback ) "void" { } "cdecl" [ ] alien-callback ;
 
 [ 0 1 ] [ [ callback-1 ] infer dup effect-in swap effect-out ] unit-test
 
 [ t ] [ callback-1 alien? ] unit-test
 
-: callback_test_1 "void" { } "cdecl" alien-indirect ;
+: callback_test_1 ( ptr -- ) "void" { } "cdecl" alien-indirect ;
 
 [ ] [ callback-1 callback_test_1 ] unit-test
 
-: callback-2 "void" { } "cdecl" [ [ 5 throw ] ignore-errors ] alien-callback ;
+: callback-2 ( -- callback ) "void" { } "cdecl" [ [ 5 throw ] ignore-errors ] alien-callback ;
 
 [ ] [ callback-2 callback_test_1 ] unit-test
 
-: callback-3 "void" { } "cdecl" [ 5 "x" set ] alien-callback ;
+: callback-3 ( -- callback ) "void" { } "cdecl" [ 5 "x" set ] alien-callback ;
 
-[ t ] [ 
+[ t ] [
     namestack*
     3 "x" set callback-3 callback_test_1
     namestack* eq?
 ] unit-test
 
-[ 5 ] [ 
+[ 5 ] [
     [
         3 "x" set callback-3 callback_test_1 "x" get
     ] with-scope
 ] unit-test
 
-: callback-4
+: callback-4 ( -- callback )
     "void" { } "cdecl" [ "Hello world" write ] alien-callback
     gc ;
 
-[ "Hello world" ] [ 
+[ "Hello world" ] [
     [ callback-4 callback_test_1 ] with-string-writer
 ] unit-test
 
-: callback-5
+: callback-5 ( -- callback )
     "void" { } "cdecl" [ gc ] alien-callback ;
 
 [ "testing" ] [
     "testing" callback-5 callback_test_1
 ] unit-test
 
-: callback-5a
+: callback-5a ( -- callback )
     "void" { } "cdecl" [ 8000000 f <array> drop ] alien-callback ;
 
 ! Hack; if we're on ARM, we probably don't have much RAM, so
@@ -336,29 +340,33 @@ FUNCTION: double ffi_test_36 ( test-struct-12 x ) ;
 !     ] unit-test
 ! ] unless
 
-: callback-6
+: callback-6 ( -- callback )
     "void" { } "cdecl" [ [ continue ] callcc0 ] alien-callback ;
 
 [ 1 2 3 ] [ callback-6 callback_test_1 1 2 3 ] unit-test
 
-: callback-7
+: callback-7 ( -- callback )
     "void" { } "cdecl" [ 1000 sleep ] alien-callback ;
 
 [ 1 2 3 ] [ callback-7 callback_test_1 1 2 3 ] unit-test
 
 [ f ] [ namespace global eq? ] unit-test
 
-: callback-8
+: callback-8 ( -- callback )
     "void" { } "cdecl" [
         [ continue ] callcc0
     ] alien-callback ;
 
 [ ] [ callback-8 callback_test_1 ] unit-test
 
-: callback-9
+: callback-9 ( -- callback )
     "int" { "int" "int" "int" } "cdecl" [
         + + 1+
     ] alien-callback ;
+
+FUNCTION: void ffi_test_36_point_5 ( ) ;
+
+[ ] [ ffi_test_36_point_5 ] unit-test
 
 FUNCTION: int ffi_test_37 ( void* func ) ;
 

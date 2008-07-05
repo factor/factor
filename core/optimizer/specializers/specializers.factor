@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays generic hashtables kernel kernel.private math
-namespaces sequences vectors words strings layouts combinators
-sequences.private classes generic.standard
+USING: accessors arrays generic hashtables kernel kernel.private
+math namespaces sequences vectors words strings layouts
+combinators sequences.private classes generic.standard
 generic.standard.engines assocs ;
 IN: optimizer.specializers
 
@@ -12,7 +12,7 @@ IN: optimizer.specializers
 : make-specializer ( classes -- quot )
     dup length <reversed>
     [ (picker) 2array ] 2map
-    [ drop object eq? not ] assoc-subset
+    [ drop object eq? not ] assoc-filter
     dup empty? [ drop [ t ] ] [
         [ (make-specializer) ] { } assoc>map
         unclip [ swap [ f ] \ if 3array append [ ] like ] reduce
@@ -51,7 +51,7 @@ IN: optimizer.specializers
     ] [ drop f ] if ;
 
 : specialized-def ( word -- quot )
-    dup word-def swap {
+    dup def>> swap {
         { [ dup standard-method? ] [ specialize-method ] }
         {
             [ dup "specializer" word-prop ]

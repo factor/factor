@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces parser kernel sequences words quotations math ;
+USING: namespaces parser lexer kernel sequences words quotations math ;
 IN: multiline
 
 : next-line-text ( -- str )
@@ -14,7 +14,7 @@ IN: multiline
     ] [ ";" unexpected-eof ] if* ;
 
 : parse-here ( -- str )
-    [ (parse-here) ] "" make 1 head*
+    [ (parse-here) ] "" make but-last
     lexer get next-line ;
 
 : STRING:
@@ -34,7 +34,7 @@ IN: multiline
     [
         lexer get lexer-column swap (parse-multiline-string)
         lexer get set-lexer-column
-    ] "" make 1 tail 1 head* ;
+    ] "" make rest but-last ;
 
 : <"
     "\">" parse-multiline-string parsed ; parsing

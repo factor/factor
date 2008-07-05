@@ -1,38 +1,36 @@
 ! Copyright (C) 2005 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: serialize sequences concurrency.messaging threads io
-io.server qualified arrays namespaces kernel io.encodings.binary
-accessors ;
-QUALIFIED: io.sockets
+io.servers.connection io.encodings.binary
+qualified arrays namespaces kernel accessors ;
+FROM: io.sockets => host-name <inet> with-client ;
 IN: concurrency.distributed
 
 SYMBOL: local-node
 
 : handle-node-client ( -- )
     deserialize
-    [ first2 get-process send ]
-    [ stop-server ] if* ;
+    [ first2 get-process send ] [ stop-server ] if* ;
 
-: (start-node) ( addrspecs addrspec -- )
-    local-node set-global
-    [
-        "concurrency.distributed"
-        binary
-        [ handle-node-client ] with-server
-    ] curry "Distributed concurrency server" spawn drop ;
+: <node-server> ( addrspec -- threaded-server )
+    <threaded-server>
+        swap >>insecure
+        binary >>encoding
+        "concurrency.distributed" >>name
+        [ handle-node-client ] >>handler ;
+
+: (start-node) ( addrspec addrspec -- )
+    local-node set-global <node-server> start-server* ;
 
 : start-node ( port -- )
-    [ internet-server ]
-    [ io.sockets:host-name swap io.sockets:<inet> ] bi
-    (start-node) ;
+    host-name over <inet> (start-node) ;
 
 TUPLE: remote-process id node ;
 
 C: <remote-process> remote-process
 
 : send-remote-message ( message node -- )
-    binary io.sockets:<client>
-    [ serialize ] with-stream ;
+    binary [ serialize ] with-client ;
 
 M: remote-process send ( message thread -- )
     [ id>> 2array ] [ node>> ] bi

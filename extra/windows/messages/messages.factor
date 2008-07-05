@@ -1,13 +1,13 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs hashtables kernel math namespaces words
+USING: accessors assocs hashtables kernel math namespaces words
 windows.types vocabs sequences ;
 IN: windows.messages
 
 SYMBOL: windows-messages
 
 "windows.messages" words
-[ word-name "windows-message" head? not ] subset
+[ name>> "windows-message" head? not ] filter
 [ dup execute swap ] { } map>assoc
 windows-messages set-global
 

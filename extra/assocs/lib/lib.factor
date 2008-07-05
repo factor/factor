@@ -1,9 +1,6 @@
 USING: arrays assocs kernel vectors sequences namespaces
-random math.parser ;
+random math.parser math fry ;
 IN: assocs.lib
-
-: >set ( seq -- hash )
-    [ dup ] H{ } map>assoc ;
 
 : ref-at ( table key -- value ) swap at ;
 
@@ -20,9 +17,6 @@ IN: assocs.lib
 : replace-at ( assoc value key -- assoc )
     >r >r dup r> 1vector r> rot set-at ;
 
-: insert-at ( value key assoc -- )
-    [ ?push ] change-at ;
-
 : peek-at* ( assoc key -- obj ? )
     swap at* dup [ >r peek r> ] when ;
 
@@ -35,11 +29,16 @@ IN: assocs.lib
 : multi-assoc-each ( assoc quot -- )
     [ with each ] curry assoc-each ; inline
 
-: insert ( value variable -- ) namespace insert-at ;
+: insert ( value variable -- ) namespace push-at ;
 
 : generate-key ( assoc -- str )
-    >r 256 random-bits >hex r>
+    >r 32 random-bits >hex r>
     2dup key? [ nip generate-key ] [ drop ] if ;
 
 : set-at-unique ( value assoc -- key )
     dup generate-key [ swap set-at ] keep ;
+
+: histogram ( assoc quot -- assoc' )
+    H{ } clone [
+        swap [ change-at ] 2curry assoc-each
+    ] keep ; inline

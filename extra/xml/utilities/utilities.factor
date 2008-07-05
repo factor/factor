@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces sequences words io assocs
-quotations strings parser arrays xml.data xml.writer debugger
-splitting vectors sequences.deep ;
+USING: accessors kernel namespaces sequences words io assocs
+quotations strings parser lexer arrays xml.data xml.writer debugger
+splitting vectors sequences.deep combinators ;
 IN: xml.utilities
 
 ! * System for words specialized on tag names
@@ -12,7 +12,7 @@ M: process-missing error.
     "Tag <" write
     dup process-missing-tag print-name
     "> not implemented on process process " write
-    process-missing-process word-name print ;
+    process-missing-process name>> print ;
 
 : run-process ( tag word -- )
     2dup "xtable" word-prop
@@ -48,13 +48,14 @@ M: process-missing error.
     standard-prolog { } rot { } <xml> ;
 
 : children>string ( tag -- string )
-    tag-children
-    dup [ string? ] all?
-    [ "XML tag unexpectedly contains non-text children" throw ] unless
-    concat ;
+    tag-children {
+        { [ dup empty? ] [ drop "" ] }
+        { [ dup [ string? not ] contains? ] [ "XML tag unexpectedly contains non-text children" throw ] }
+        [ concat ]
+    } cond ;
 
 : children-tags ( tag -- sequence )
-    tag-children [ tag? ] subset ;
+    tag-children [ tag? ] filter ;
 
 : first-child-tag ( tag -- tag )
     tag-children [ tag? ] find nip ;
@@ -73,7 +74,7 @@ M: process-missing error.
     assure-name [ swap tag-named? ] curry deep-find ;
 
 : deep-tags-named ( tag name/string -- tags-seq )
-    tags@ [ swap tag-named? ] curry deep-subset ;
+    tags@ [ swap tag-named? ] curry deep-filter ;
 
 : tag-named ( tag name/string -- matching-tag )
     ! like get-name-tag but only looks at direct children,
@@ -81,7 +82,7 @@ M: process-missing error.
     assure-name swap [ tag-named? ] with find nip ;
 
 : tags-named ( tag name/string -- tags-seq )
-    tags@ swap [ tag-named? ] with subset ;
+    tags@ swap [ tag-named? ] with filter ;
 
 : tag-with-attr? ( elem attr-value attr-name -- ? )
     rot dup tag? [ at = ] [ 3drop f ] if ;
@@ -90,13 +91,13 @@ M: process-missing error.
     assure-name [ tag-with-attr? ] 2curry find nip ;
 
 : tags-with-attr ( tag attr-value attr-name -- tags-seq )
-    tags@ [ tag-with-attr? ] 2curry subset tag-children ;
+    tags@ [ tag-with-attr? ] 2curry filter tag-children ;
 
 : deep-tag-with-attr ( tag attr-value attr-name -- matching-tag )
     assure-name [ tag-with-attr? ] 2curry deep-find ;
 
 : deep-tags-with-attr ( tag attr-value attr-name -- tags-seq )
-    tags@ [ tag-with-attr? ] 2curry deep-subset ;
+    tags@ [ tag-with-attr? ] 2curry deep-filter ;
 
 : get-id ( tag id -- elem ) ! elem=tag.getElementById(id)
     "id" deep-tag-with-attr ;

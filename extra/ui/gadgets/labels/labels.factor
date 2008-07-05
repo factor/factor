@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays hashtables io kernel math namespaces
+USING: accessors arrays hashtables io kernel math namespaces
 opengl sequences strings splitting
 ui.gadgets ui.gadgets.tracks ui.gadgets.theme ui.render colors
 models ;
@@ -10,7 +10,7 @@ IN: ui.gadgets.labels
 TUPLE: label text font color ;
 
 : label-string ( label -- string )
-    label-text dup string? [ "\n" join ] unless ; inline
+    text>> dup string? [ "\n" join ] unless ; inline
 
 : set-label-string ( string label -- )
     CHAR: \n pick memq? [
@@ -19,21 +19,21 @@ TUPLE: label text font color ;
         set-label-text
     ] if ; inline
 
-: label-theme ( gadget -- )
-    black over set-label-color
-    sans-serif-font swap set-label-font ;
+: label-theme ( gadget -- gadget )
+    sans-serif-font >>font
+    black >>color ; inline
 
 : <label> ( string -- label )
     label construct-gadget
     [ set-label-string ] keep
-    dup label-theme ;
+    label-theme ;
 
 M: label pref-dim*
-    dup label-font open-font swap label-text text-dim ;
+    [ font>> open-font ] [ text>> ] bi text-dim ;
 
 M: label draw-gadget*
-    dup label-color gl-color
-    dup label-font swap label-text origin get draw-text ;
+    [ color>> gl-color ]
+    [ [ font>> ] [ text>> ] bi origin get draw-text ] bi ;
 
 M: label gadget-text* label-string % ;
 
@@ -45,12 +45,12 @@ M: label-control model-changed
 : <label-control> ( model -- gadget )
     "" <label> label-control construct-control ;
 
-: text-theme ( gadget -- )
-    black over set-label-color
-    monospace-font swap set-label-font ;
+: text-theme ( gadget -- gadget )
+    black >>color
+    monospace-font >>font ;
 
-: reverse-video-theme ( label -- )
-    white over set-label-color
+: reverse-video-theme ( label -- label )
+    white >>color
     black solid-interior ;
 
 GENERIC: >label ( obj -- gadget )

@@ -1,5 +1,6 @@
-USING: sequences math mirrors splitting kernel namespaces
-assocs alien.syntax ;
+USING: sequences math mirrors splitting grouping
+kernel namespaces assocs alien.syntax columns
+float-arrays bit-arrays ;
 IN: benchmark.dispatch3
 
 GENERIC: g ( obj -- str )
@@ -14,7 +15,7 @@ M: number g drop "number" ;
 
 M: object g drop "object" ;
 
-: objects
+: objects ( -- seq )
     [
         H{ } ,
         \ + <mirror> ,
@@ -42,7 +43,7 @@ M: object g drop "object" ;
         ALIEN: 1234 ,
     ] { } make ;
 
-: dispatch-test
+: dispatch-test ( -- )
     2000000 objects [ [ g drop ] each ] curry times ;
 
 MAIN: dispatch-test

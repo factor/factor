@@ -1,19 +1,23 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
+! Portions copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays assocs ui ui.gadgets
-ui.backend ui.clipboards ui.gadgets.worlds ui.gestures io kernel
-math math.vectors namespaces prettyprint sequences strings
-vectors words windows.kernel32 windows.gdi32 windows.user32
-windows.opengl32 windows.messages windows.types windows.nt
-windows threads libc combinators continuations command-line
-shuffle opengl ui.render unicode.case ascii math.bitfields
-locals symbols accessors ;
+USING: alien alien.c-types alien.strings arrays assocs ui
+ui.gadgets ui.backend ui.clipboards ui.gadgets.worlds
+ui.gestures io kernel math math.vectors namespaces
+sequences strings vectors words windows.kernel32 windows.gdi32
+windows.user32 windows.opengl32 windows.messages windows.types
+windows.nt windows threads libc combinators continuations
+command-line shuffle opengl ui.render unicode.case ascii
+math.bitfields locals symbols accessors ;
 IN: ui.windows
 
 SINGLETON: windows-ui-backend
 
-: crlf>lf CHAR: \r swap remove ;
-: lf>crlf [ [ dup CHAR: \n = [ CHAR: \r , ] when , ] each ] "" make ;
+: crlf>lf ( str -- str' )
+    CHAR: \r swap remove ;
+
+: lf>crlf ( str -- str' )
+    [ [ dup CHAR: \n = [ CHAR: \r , ] when , ] each ] "" make ;
 
 : enum-clipboard ( -- seq )
     0
@@ -36,14 +40,14 @@ SINGLETON: windows-ui-backend
             CF_UNICODETEXT GetClipboardData dup win32-error=0/f
             dup GlobalLock dup win32-error=0/f
             GlobalUnlock win32-error=0/f
-            alien>u16-string
+            utf16n alien>string
         ] if
     ] with-clipboard
     crlf>lf ;
 
 : copy ( str -- )
     lf>crlf [
-        string>u16-alien
+        utf16n string>alien
         EmptyClipboard win32-error=0/f
         GMEM_MOVEABLE over length 1+ GlobalAlloc
             dup win32-error=0/f
@@ -126,7 +130,7 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
         { 123 "F12" }
     } ;
 
-: key-state-down?
+: key-state-down? ( key -- ? )
     GetKeyState 16 bit? ;
 
 : left-shift? ( -- ? ) VK_LSHIFT key-state-down? ;
@@ -379,24 +383,19 @@ SYMBOL: trace-messages?
     "uint" { "void*" "uint" "long" "long" } "stdcall" [
         [
             pick
-            trace-messages? get-global [ dup windows-message-name . ] when
+            trace-messages? get-global [ dup windows-message-name name>> print flush ] when
             wm-handlers get-global at* [ call ] [ drop DefWindowProc ] if
         ] ui-try
      ] alien-callback ;
 
 : peek-message? ( msg -- ? ) f 0 0 PM_REMOVE PeekMessage zero? ;
 
-: event-loop ( msg -- )
-    {
-        { [ windows get empty? ] [ drop ] }
-        { [ dup peek-message? ] [ ui-wait event-loop ] }
-        { [ dup MSG-message WM_QUIT = ] [ drop ] }
-        [
-            dup TranslateMessage drop
-            dup DispatchMessage drop
-            event-loop
-        ]
-    } cond ;
+M: windows-ui-backend do-events
+    msg-obj get-global
+    dup peek-message? [ drop ui-wait ] [
+        [ TranslateMessage drop ]
+        [ DispatchMessage drop ] bi
+    ] if ;
 
 : register-wndclassex ( -- class )
     "WNDCLASSEX" <c-object>
@@ -409,7 +408,7 @@ SYMBOL: trace-messages?
         0 over set-WNDCLASSEX-cbClsExtra
         0 over set-WNDCLASSEX-cbWndExtra
         f GetModuleHandle over set-WNDCLASSEX-hInstance
-        f GetModuleHandle "fraptor" string>u16-alien LoadIcon
+        f GetModuleHandle "fraptor" utf16n string>alien LoadIcon
         over set-WNDCLASSEX-hIcon
         f IDC_ARROW LoadCursor over set-WNDCLASSEX-hCursor
 
@@ -447,7 +446,7 @@ SYMBOL: trace-messages?
 : init-win32-ui ( -- )
     V{ } clone nc-buttons set-global
     "MSG" malloc-object msg-obj set-global
-    "Factor-window" malloc-u16-string class-name-ptr set-global
+    "Factor-window" utf16n malloc-string class-name-ptr set-global
     register-wndclassex drop
     GetDoubleClickTime double-click-timeout set-global ;
 
@@ -492,19 +491,23 @@ M: windows-ui-backend raise-window* ( world -- )
 M: windows-ui-backend set-title ( string world -- )
     world-handle
     dup win-title [ free ] when*
-    >r malloc-u16-string r>
+    >r utf16n malloc-string r>
     2dup set-win-title
     win-hWnd WM_SETTEXT 0 roll alien-address SendMessage drop ;
 
 M: windows-ui-backend ui
     [
         [
+            stop-after-last-window? on
             init-clipboard
             init-win32-ui
             start-ui
-            msg-obj get event-loop
+            event-loop
         ] [ cleanup-win32-ui ] [ ] cleanup
     ] ui-running ;
+
+M: windows-ui-backend beep ( -- )
+    0 MessageBeep drop ;
 
 windows-ui-backend ui-backend set-global
 

@@ -23,7 +23,7 @@ HELP: print-gadget
 
 HELP: gadget.
 { $values { "gadget" gadget } }
-{ $description "Writes a gadget followed by a newline to the " { $link stdio } " stream." }
+{ $description "Writes a gadget followed by a newline to " { $link output-stream } "." }
 { $notes "Not all streams support this operation." } ;
 
 HELP: ?nl
@@ -32,11 +32,11 @@ HELP: ?nl
 
 HELP: with-pane
 { $values { "pane" pane } { "quot" quotation } }
-{ $description "Clears the pane and calls the quotation in a new scope where " { $link stdio } " is rebound to a " { $link pane-stream } " writing to the pane." } ;
+{ $description "Clears the pane and calls the quotation in a new scope where " { $link output-stream } " is rebound to a " { $link pane-stream } " writing to the pane." } ;
 
 HELP: make-pane
 { $values { "quot" quotation } { "gadget" "a new " { $link gadget } } }
-{ $description "Calls the quotation in a new scope where " { $link stdio } " is rebound to a " { $link pane-stream } " writing to a new pane. The output area of the new pane is output on the stack after the quotation returns. The pane itself is not output." } ;
+{ $description "Calls the quotation in a new scope where " { $link output-stream } " is rebound to a " { $link pane-stream } " writing to a new pane. The output area of the new pane is output on the stack after the quotation returns. The pane itself is not output." } ;
 
 HELP: <scrolling-pane>
 { $values { "pane" "a new " { $link pane } } }

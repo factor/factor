@@ -4,7 +4,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel combinators fry namespaces quotations hashtables
 sequences assocs arrays inference effects math math.ranges
-arrays.lib shuffle macros bake continuations ;
+arrays.lib shuffle macros continuations locals ;
 
 IN: combinators.lib
 
@@ -20,27 +20,21 @@ MACRO: nslip ( n -- ) dup saver [ call ] rot restorer 3append ;
 
 MACRO: nkeep ( n -- )
   [ ] [ 1+ ] [ ] tri
-  [ [ , ndup ] dip , -nrot , nslip ]
-  bake ;
+  '[ [ , ndup ] dip , -nrot , nslip ] ;
 
 : 4keep ( w x y z quot -- w x y z ) 4 nkeep ; inline 
 
 MACRO: ncurry ( n -- ) [ curry ] n*quot ;
 
-MACRO: nwith ( quot n -- )
-  tuck 1+ dup
-  [ , -nrot [ , nrot , call ] , ncurry ]
-  bake ;
+MACRO:: nwith ( quot n -- )
+  [let | n' [ n 1+ ] |
+    [ n' -nrot [ n' nrot quot call ] n ncurry ] ] ;
 
 MACRO: napply ( n -- )
   2 [a,b]
   [ [ 1- ] [ ] bi
     '[ , ntuck , nslip ] ]
   map concat >quotation [ call ] append ;
-
-: 3apply ( obj obj obj quot -- ) 3 napply ; inline
-
-: dipd ( x y quot -- y ) 2 ndip ; inline
 
 : 2with ( param1 param2 obj quot -- obj curry )
     with with ; inline
@@ -62,26 +56,6 @@ MACRO: napply ( n -- )
 
 : assoc-map-with ( obj assoc quot -- assoc )
     with* assoc-map ; inline
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! short circuiting words
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: short-circuit ( quots quot default -- quot )
-  1quotation -rot { } map>assoc <reversed> alist>quot ;
-
-MACRO: && ( quots -- ? )
-    [ [ not ] append [ f ] ] t short-circuit ;
-
-MACRO: <-&& ( quots -- )
-    [ [ dup ] prepend [ not ] append [ f ] ] t short-circuit
-    [ nip ] append ;
-
-MACRO: <--&& ( quots -- )
-    [ [ 2dup ] prepend [ not ] append [ f ] ] t short-circuit
-    [ 2nip ] append ;
-
-MACRO: || ( quots -- ? ) [ [ t ] ] f short-circuit ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! ifte
@@ -110,8 +84,8 @@ MACRO: switch ( quot -- )
 ! : pcall ( seq quots -- seq ) [ call ] 2map ;
 
 MACRO: parallel-call ( quots -- )
-    [ [ unclip % r> dup >r push ] bake ] map concat
-    [ V{ } clone >r % drop r> >array ] bake ;
+    [ '[ [ unclip @ ] dip [ push ] keep ] ] map concat
+    '[ V{ } clone @ nip >array ] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! map-call and friends
@@ -169,3 +143,8 @@ MACRO: multikeep ( word out-indexes -- ... )
 : generate ( generator predicate -- obj )
     [ dup ] swap [ dup [ nip ] unless not ] 3compose
     swap [ ] do-while ;
+
+MACRO: predicates ( seq -- quot/f )
+    dup [ 1quotation [ drop ] prepend ] map
+    >r [ [ dup ] prepend ] map r> zip [ drop f ] suffix
+    [ cond ] curry ;

@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel kernel.private io
 threads.private continuations dlists init quotations strings
-assocs heaps boxes namespaces ;
+assocs heaps boxes namespaces dequeues ;
 IN: threads
 
 ARTICLE: "threads-start/stop" "Starting and stopping threads"
@@ -116,10 +116,13 @@ $nl
 "Other threads may interrupt the sleep by calling " { $link interrupt } "." } ;
 
 HELP: sleep
-{ $values { "ms" "a non-negative integer" } }
-{ $description "Suspends the current thread for " { $snippet "ms" } " milliseconds."
+{ $values { "dt" "a duration" } }
+{ $description "Suspends the current thread for the given duration."
 $nl
-"Other threads may interrupt the sleep by calling " { $link interrupt } "." } ;
+"Other threads may interrupt the sleep by calling " { $link interrupt } "." }
+{ $examples
+    { $code "USING: threads calendar ;" "10 seconds sleep" }
+} ;
 
 HELP: interrupt
 { $values { "thread" thread } }

@@ -9,7 +9,7 @@ USING: kernel xml tools.test io namespaces sequences xml.errors xml.entities
 \ read-xml must-infer
 
 SYMBOL: xml-file
-[ ] [ "extra/xml/tests/test.xml" resource-path
+[ ] [ "resource:extra/xml/tests/test.xml"
     [ file>xml ] with-html-entities xml-file set ] unit-test
 [ "1.0" ] [ xml-file get xml-prolog prolog-version ] unit-test
 [ f ] [ xml-file get xml-prolog prolog-standalone ] unit-test
@@ -36,7 +36,7 @@ SYMBOL: xml-file
 ] unit-test
 [ "abcd" ] [
     "<main>a<sub>bc</sub>d<nothing/></main>" string>xml
-    [ string? ] deep-subset concat
+    [ string? ] deep-filter concat
 ] unit-test
 [ "foo" ] [
     "<a><b id='c'>foo</b><d id='e'/></a>" string>xml

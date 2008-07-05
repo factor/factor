@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types arrays cpu.x86.assembler
+USING: accessors alien.c-types arrays cpu.x86.assembler
 cpu.x86.architecture cpu.x86.intrinsics cpu.x86.sse2
 cpu.x86.allot cpu.architecture kernel kernel.private math
 namespaces sequences generator.registers generator.fixup system
@@ -12,6 +12,8 @@ M: x86.64 ds-reg R14 ;
 M: x86.64 rs-reg R15 ;
 M: x86.64 stack-reg RSP ;
 M: x86.64 stack-save-reg RSI ;
+M: x86.64 temp-reg-1 RAX ;
+M: x86.64 temp-reg-2 RCX ;
 
 M: temp-reg v>operand drop RBX ;
 
@@ -128,7 +130,10 @@ M: x86.64 %prepare-box-struct ( size -- )
 
 M: x86.64 %prepare-var-args RAX RAX XOR ;
 
-M: x86.64 %alien-invoke ( symbol dll -- )
+M: x86.64 %alien-global
+    [ 0 MOV rc-absolute-cell rel-dlsym ] [ dup [] MOV ] bi ;
+
+M: x86.64 %alien-invoke
     0 address-operand >r rc-absolute-cell rel-dlsym r> CALL ;
 
 M: x86.64 %prepare-alien-indirect ( -- )
@@ -173,13 +178,13 @@ stack-params "__stack_value" c-type set-c-type-reg-class >>
 
 : struct-types&offset ( struct-type -- pairs )
     struct-type-fields [
-        dup slot-spec-type swap slot-spec-offset 2array
+        [ type>> ] [ offset>> ] bi 2array
     ] map ;
 
 : split-struct ( pairs -- seq )
     [
         [ 8 mod zero? [ t , ] when , ] assoc-each
-    ] { } make { t } split [ empty? not ] subset ;
+    ] { } make { t } split harvest ;
 
 : flatten-large-struct ( type -- )
     heap-size cell align

@@ -1,12 +1,14 @@
 USING: kernel namespaces db.sql sequences math ;
 IN: db.sql.tests
 
-TUPLE: person name age ;
+! TUPLE: person name age ;
 : insert-1
     { insert
-        { table "person" }
-        { columns "name" "age" }
-        { values "erg" 26 }
+        {
+            { table "person" }
+            { columns "name" "age" }
+            { values "erg" 26 }
+        }
     } ;
 
 : update-1
@@ -28,7 +30,7 @@ TUPLE: person name age ;
                     { select
                         { columns "salary" }
                         { from "staff" }
-                        { where { "branchno" "b003" } }
+                        { where { "branchno" = "b003" } }
                     }
                 }
                 { "branchno" > 3 } }

@@ -1,5 +1,5 @@
 USING: kernel cpu.8080 cpu.8080.emulator math math io
-tools.time combinators sequences io.files ;
+tools.time combinators sequences io.files io.encodings.ascii ;
 IN: cpu.8080.test
 
 : step ( cpu -- )
@@ -29,7 +29,7 @@ IN: cpu.8080.test
 
 : >ppm ( cpu filename -- cpu )
   #! Dump the current screen image to a ppm image file with the given name.
-  <file-writer> [
+  ascii [
     "P3" print
     "256 224" print
     "1" print
@@ -45,7 +45,7 @@ IN: cpu.8080.test
         ] each-8bit drop
       ] each drop nl
     ] each
-  ] with-stream ;
+  ] with-file-writer ;
 
 : time-test ( -- )
   test-cpu [ 1000000 run-n drop ] time ;

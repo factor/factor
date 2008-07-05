@@ -38,7 +38,7 @@ typedef struct {
 
 void load_image(F_PARAMETERS *p);
 void init_objects(F_HEADER *h);
-void save_image(const F_CHAR *file);
+bool save_image(const F_CHAR *file);
 
 DECLARE_PRIMITIVE(save_image);
 DECLARE_PRIMITIVE(save_image_and_exit);

@@ -1,7 +1,7 @@
 
 USING: kernel namespaces threads sequences math math.vectors
        opengl.gl opengl colors ui ui.gadgets ui.gadgets.slate
-       bake rewrite-closures vars springies ;
+       fry rewrite-closures vars springies ;
 
 IN: springies.ui
 
@@ -62,5 +62,4 @@ DEFER: maybe-loop
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: go* ( quot -- )
-  [ [ [ springies-window* 1000 sleep % ] with-scope ] with-ui ] bake call ;
+: go* ( quot -- ) '[ [ springies-window* 1000 sleep @ ] with-scope ] with-ui ;

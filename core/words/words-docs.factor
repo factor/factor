@@ -11,10 +11,7 @@ $nl
 "Parsing words add definitions to the current vocabulary. When a source file is being parsed, the current vocabulary is initially set to " { $vocab-link "scratchpad" } ". The current vocabulary may be changed with the " { $link POSTPONE: IN: } " parsing word (see " { $link "vocabulary-search" } ")."
 { $subsection create }
 { $subsection create-in }
-{ $subsection lookup }
-"Words can output their name and vocabulary:"
-{ $subsection word-name }
-{ $subsection word-vocabulary } ;
+{ $subsection lookup } ;
 
 ARTICLE: "uninterned-words" "Uninterned words"
 "A word that is not a member of any vocabulary is said to be " { $emphasis "uninterned" } "."
@@ -103,8 +100,6 @@ ARTICLE: "word-props" "Word properties"
 "Each word has a hashtable of properties."
 { $subsection word-prop }
 { $subsection set-word-prop }
-{ $subsection word-props }
-{ $subsection set-word-props }
 "The stack effect of the above two words is designed so that it is most convenient when " { $snippet "name" } " is a literal pushed on the stack right before executing this word."
 $nl
 "The following are some of the properties used by the library:"
@@ -159,9 +154,8 @@ $nl
 } ;
 
 ARTICLE: "word.private" "Word implementation details"
-"Primitive definition accessors:"
-{ $subsection word-def }
-{ $subsection set-word-def }
+"The " { $snippet "def" } " slot of a word holds a " { $link quotation } " instance that is called when the word is executed."
+$nl
 "An " { $emphasis "XT" } " (execution token) is the machine code address of a word:"
 { $subsection word-xt } ;
 
@@ -189,36 +183,12 @@ $nl
 
 ABOUT: "words"
 
-HELP: compiled? ( word -- ? )
-{ $values { "word" word } { "?" "a boolean" } }
-{ $description "Tests if a word has been compiled." } ;
-
 HELP: execute ( word -- )
 { $values { "word" word } }
 { $description "Executes a word." }
 { $examples
-    { $example "USING: kernel io words ;" ": twice dup execute execute ;\n: hello \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
+    { $example "USING: kernel io words ;" "IN: scratchpad" ": twice dup execute execute ;\n: hello \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
 } ;
-
-HELP: word-props ( word -- props )
-{ $values { "word" word } { "props" "an assoc" } }
-{ $description "Outputs a word's property table." } ;
-
-HELP: set-word-props ( props word -- )
-{ $values { "props" "an assoc" } { "word" word } }
-{ $description "Sets a word's property table." }
-{ $notes "The given assoc must not be a literal, since it will be mutated by future calls to " { $link set-word-prop } "." }
-{ $side-effects "word" } ;
-
-HELP: word-def ( word -- obj )
-{ $values { "word" word } { "obj" object } }
-{ $description "Outputs a word's primitive definition." } ;
-
-HELP: set-word-def ( obj word -- )
-{ $values { "obj" object } { "word" word } }
-{ $description "Sets a word's primitive definition." }
-$low-level-note
-{ $side-effects "word" } ;
 
 HELP: deferred
 { $class-description "The class of deferred words created by " { $link POSTPONE: DEFER: } "." } ;
@@ -278,7 +248,7 @@ HELP: reset-generic
 $low-level-note
 { $side-effects "word" } ;
 
-HELP: <word>
+HELP: <word> ( name vocab -- word )
 { $values { "name" string } { "vocab" string } { "word" word } }
 { $description "Allocates an uninterned word with the specified name and vocabulary, and a blank word property hashtable. User code should call " { $link gensym } " to create uninterned words and " { $link create } " to create interned words." } ;
 
@@ -300,7 +270,7 @@ HELP: word
 
 HELP: set-word
 { $values { "word" word } }
-{ $description "Sets the recently defined word. Usually you would call " { $link save-location } " on a newly-defined word instead, which will in turn call this word." } ;
+{ $description "Sets the recently defined word." } ;
 
 HELP: lookup
 { $values { "name" string } { "vocab" string } { "word" "a word or " { $link f } } }
@@ -334,7 +304,7 @@ HELP: bootstrap-word
 { $values { "word" word } { "target" word } }
 { $description "Looks up a word with the same name and vocabulary as the given word, performing a transformation to handle parsing words in the target dictionary. Used during bootstrap to transfer host words to the target dictionary." } ;
 
-HELP: parsing?
+HELP: parsing-word?
 { $values { "obj" object } { "?" "a boolean" } }
 { $description "Tests if an object is a parsing word declared by " { $link POSTPONE: parsing } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;

@@ -1,9 +1,16 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic kernel kernel.private math memory
 namespaces sequences layouts system hashtables classes alien
-byte-arrays bit-arrays float-arrays combinators words sets ;
+byte-arrays combinators words sets ;
 IN: cpu.architecture
+
+! Register classes
+SINGLETON: int-regs
+SINGLETON: single-float-regs
+SINGLETON: double-float-regs
+UNION: float-regs single-float-regs double-float-regs ;
+UNION: reg-class int-regs float-regs ;
 
 ! A pseudo-register class for parameters spilled on the stack
 SINGLETON: stack-params
@@ -34,12 +41,12 @@ HOOK: stack-frame cpu ( frame-size -- n )
 ! Set up caller stack frame
 HOOK: %prologue cpu ( n -- )
 
-: %prologue-later \ %prologue-later , ;
+: %prologue-later ( -- ) \ %prologue-later , ;
 
 ! Tear down stack frame
 HOOK: %epilogue cpu ( n -- )
 
-: %epilogue-later \ %epilogue-later , ;
+: %epilogue-later ( -- ) \ %epilogue-later , ;
 
 ! Store word XT in stack frame
 HOOK: %save-word-xt cpu ( -- )
@@ -186,6 +193,9 @@ HOOK: %unbox-f cpu ( dst src -- )
 HOOK: %unbox-any-c-ptr cpu ( dst src -- )
 
 HOOK: %box-alien cpu ( dst src -- )
+
+! GC check
+HOOK: %gc cpu ( -- )
 
 : operand ( var -- op ) get v>operand ; inline
 

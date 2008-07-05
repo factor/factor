@@ -1,65 +1,54 @@
-USING: http tools.test multiline tuple-syntax
-io.streams.string kernel arrays splitting sequences
-assocs io.sockets ;
+USING: http http.server http.client tools.test multiline
+tuple-syntax io.streams.string io.encodings.utf8
+io.encodings.8-bit io.encodings.binary io.encodings.string
+kernel arrays splitting sequences assocs io.sockets db db.sqlite
+continuations urls hashtables accessors ;
 IN: http.tests
 
-[ "hello%20world" ] [ "hello world" url-encode ] unit-test
-[ "hello world" ] [ "hello%20world" url-decode ] unit-test
-[ "~hello world" ] [ "%7ehello+world" url-decode ] unit-test
-[ f ] [ "%XX%XX%XX" url-decode ] unit-test
-[ f ] [ "%XX%XX%X" url-decode ] unit-test
+[ "text/plain" latin1 ] [ "text/plain" parse-content-type ] unit-test
 
-[ "hello world"   ] [ "hello+world"    url-decode ] unit-test
-[ "hello world"   ] [ "hello%20world"  url-decode ] unit-test
-[ " ! "           ] [ "%20%21%20"      url-decode ] unit-test
-[ "hello world"   ] [ "hello world%"   url-decode ] unit-test
-[ "hello world"   ] [ "hello world%x"  url-decode ] unit-test
-[ "hello%20world" ] [ "hello world"    url-encode ] unit-test
-[ "%20%21%20"     ] [ " ! "            url-encode ] unit-test
+[ "text/html" utf8 ] [ "text/html;  charset=UTF-8" parse-content-type ] unit-test
 
-[ "\u001234hi\u002045" ] [ "\u001234hi\u002045" url-encode url-decode ] unit-test
+[ "application/octet-stream" binary ] [ "application/octet-stream" parse-content-type ] unit-test
 
-[ "/" ] [ "http://foo.com" url>path ] unit-test
-[ "/" ] [ "http://foo.com/" url>path ] unit-test
-[ "/bar" ] [ "http://foo.com/bar" url>path ] unit-test
-[ "/bar" ] [ "/bar" url>path ] unit-test
+: lf>crlf "\n" split "\r\n" join ;
 
 STRING: read-request-test-1
-GET http://foo/bar HTTP/1.1
+POST /bar HTTP/1.1
 Some-Header: 1
 Some-Header: 2
 Content-Length: 4
+Content-type: application/octet-stream
 
 blah
 ;
 
 [
     TUPLE{ request
-        port: 80
-        method: "GET"
-        path: "/bar"
-        query: H{ }
+        url: TUPLE{ url path: "/bar" }
+        method: "POST"
         version: "1.1"
-        header: H{ { "some-header" "1; 2" } { "content-length" "4" } }
-        post-data: "blah"
+        header: H{ { "some-header" "1; 2" } { "content-length" "4" } { "content-type" "application/octet-stream" } }
+        post-data: TUPLE{ post-data content: "blah" raw: "blah" content-type: "application/octet-stream" }
         cookies: V{ }
     }
 ] [
-    read-request-test-1 [
+    read-request-test-1 lf>crlf [
         read-request
     ] with-string-reader
 ] unit-test
 
 STRING: read-request-test-1'
-GET /bar HTTP/1.1
+POST /bar HTTP/1.1
 content-length: 4
+content-type: application/octet-stream
 some-header: 1; 2
 
 blah
 ;
 
 read-request-test-1' 1array [
-    read-request-test-1
+    read-request-test-1 lf>crlf
     [ read-request ] with-string-reader
     [ write-request ] with-string-writer
     ! normalize crlf
@@ -67,30 +56,48 @@ read-request-test-1' 1array [
 ] unit-test
 
 STRING: read-request-test-2
-HEAD  http://foo/bar   HTTP/1.1
+HEAD  /bar   HTTP/1.1
 Host: www.sex.com
+
 ;
 
 [
     TUPLE{ request
-        port: 80
+        url: TUPLE{ url host: "www.sex.com" path: "/bar" }
         method: "HEAD"
-        path: "/bar"
-        query: H{ }
         version: "1.1"
         header: H{ { "host" "www.sex.com" } }
-        host: "www.sex.com"
         cookies: V{ }
     }
 ] [
-    read-request-test-2 [
+    read-request-test-2 lf>crlf [
         read-request
     ] with-string-reader
 ] unit-test
 
+STRING: read-request-test-3
+GET nested HTTP/1.0
+
+;
+
+[ read-request-test-3 lf>crlf [ read-request ] with-string-reader ]
+[ "Bad request: URL" = ]
+must-fail-with
+
+STRING: read-request-test-4
+GET /blah HTTP/1.0
+Host: "www.amazon.com"
+;
+
+[ "www.amazon.com" ]
+[
+    read-request-test-4 lf>crlf [ read-request ] with-string-reader
+    "host" header
+] unit-test
+
 STRING: read-response-test-1
 HTTP/1.1 404 not found
-Content-Type: text/html
+Content-Type: text/html; charset=UTF-8
 
 blah
 ;
@@ -100,24 +107,26 @@ blah
         version: "1.1"
         code: 404
         message: "not found"
-        header: H{ { "content-type" "text/html" } }
-        cookies: V{ }
+        header: H{ { "content-type" "text/html; charset=UTF-8" } }
+        cookies: { }
+        content-type: "text/html"
+        content-charset: utf8
     }
 ] [
-    read-response-test-1
+    read-response-test-1 lf>crlf
     [ read-response ] with-string-reader
 ] unit-test
 
 
 STRING: read-response-test-1'
 HTTP/1.1 404 not found
-content-type: text/html
+content-type: text/html; charset=UTF-8
 
 
 ;
 
 read-response-test-1' 1array [
-    read-response-test-1
+    read-response-test-1 lf>crlf
     [ read-response ] with-string-reader
     [ write-response ] with-string-writer
     ! normalize crlf
@@ -126,44 +135,196 @@ read-response-test-1' 1array [
 
 [ t ] [
     "rmid=732423sdfs73242; path=/; domain=.example.net; expires=Fri, 31-Dec-2010 23:59:59 GMT"
-    dup parse-cookies unparse-cookies =
+    dup parse-set-cookie first unparse-set-cookie =
+] unit-test
+
+[ t ] [
+    "a="
+    dup parse-set-cookie first unparse-set-cookie =
+] unit-test
+
+STRING: read-response-test-2
+HTTP/1.1 200 Content follows
+Set-Cookie: oo="bar; a=b"; httponly=yes; sid=123456
+
+
+;
+
+[ 2 ] [
+    read-response-test-2 lf>crlf
+    [ read-response ] with-string-reader
+    cookies>> length
+] unit-test
+
+STRING: read-response-test-3
+HTTP/1.1 200 Content follows
+Set-Cookie: oo="bar; a=b"; comment="your mom"; httponly=yes
+
+
+;
+
+[ 1 ] [
+    read-response-test-3 lf>crlf
+    [ read-response ] with-string-reader
+    cookies>> length
 ] unit-test
 
 ! Live-fire exercise
-USING: http.server http.server.static http.server.actions
-http.client io.server io.files io accessors namespaces threads
-io.encodings.ascii ;
+USING: http.server http.server.static furnace.sessions furnace.alloy
+furnace.actions furnace.auth furnace.auth.login furnace.db http.client
+io.servers.connection io.files io io.encodings.ascii
+accessors namespaces threads
+http.server.responses http.server.redirection furnace.redirection
+http.server.dispatchers db.tuples ;
+
+: add-quit-action
+    <action>
+        [ stop-server "Goodbye" "text/html" <content> ] >>display
+    "quit" add-responder ;
+
+: test-db "test.db" temp-file sqlite-db ;
+
+[ test-db drop delete-file ] ignore-errors
+
+test-db [
+    init-furnace-tables
+] with-db
+
+: test-httpd ( -- )
+    #! Return as soon as server is running.
+    <http-server>
+        1237 >>insecure
+        f >>secure
+    start-server* ;
+
+[ ] [
+    [
+        <dispatcher>
+            add-quit-action
+            <dispatcher>
+                "resource:extra/http/test" <static> >>default
+            "nested" add-responder
+            <action>
+                [ URL" redirect-loop" <temporary-redirect> ] >>display
+            "redirect-loop" add-responder
+        main-responder set
+
+        test-httpd
+    ] with-scope
+] unit-test
+
+[ t ] [
+    "resource:extra/http/test/foo.html" ascii file-contents
+    "http://localhost:1237/nested/foo.html" http-get nip =
+] unit-test
+
+[ "http://localhost:1237/redirect-loop" http-get nip ]
+[ too-many-redirects? ] must-fail-with
+
+[ "Goodbye" ] [
+    "http://localhost:1237/quit" http-get nip
+] unit-test
+
+! Dispatcher bugs
+[ ] [
+    [
+        <dispatcher>
+            <action> <protected>
+            "Test" <login-realm>
+            <sessions>
+            "" add-responder
+            add-quit-action
+            <dispatcher>
+                <action> "a" add-main-responder
+            "d" add-responder
+        test-db <db-persistence>
+        main-responder set
+
+        test-httpd
+    ] with-scope
+] unit-test
+
+: 404? [ download-failed? ] [ response>> code>> 404 = ] bi and ;
+
+! This should give a 404 not an infinite redirect loop
+[ "http://localhost:1237/d/blah" http-get nip ] [ 404? ] must-fail-with
+
+! This should give a 404 not an infinite redirect loop
+[ "http://localhost:1237/blah/" http-get nip ] [ 404? ] must-fail-with
+
+[ "Goodbye" ] [ "http://localhost:1237/quit" http-get nip ] unit-test
+
+[ ] [
+    [
+        <dispatcher>
+            <action> [ [ "Hi" write ] "text/plain" <content> ] >>display
+            "Test" <login-realm>
+            <sessions>
+            "" add-responder
+            add-quit-action
+        test-db <db-persistence>
+        main-responder set
+
+        test-httpd
+    ] with-scope
+] unit-test
+
+[ "Hi" ] [ "http://localhost:1237/" http-get nip ] unit-test
+
+[ "Goodbye" ] [ "http://localhost:1237/quit" http-get nip ] unit-test
+
+USING: html.components html.elements html.forms
+xml xml.utilities validators
+furnace furnace.flash ;
+
+SYMBOL: a
 
 [ ] [
     [
         <dispatcher>
             <action>
-                [ stop-server "text/html" <content> [ "Goodbye" write ] >>body ] >>display
-            "quit" add-responder
-            <dispatcher>
-                "extra/http/test" resource-path <static> >>default
-            "nested" add-responder
+                [ a get-global "a" set-value ] >>init
+                [ [ <html> "a" <field> render </html> ] "text/html" <content> ] >>display
+                [ { { "a" [ v-integer ] } } validate-params ] >>validate
+                [ "a" value a set-global URL" " <redirect> ] >>submit
+            <flash-scopes>
+            <sessions>
+            >>default
+            add-quit-action
+        test-db <db-persistence>
         main-responder set
 
-        [ 1237 httpd ] "HTTPD test" spawn drop
+        test-httpd
     ] with-scope
 ] unit-test
 
-[ t ] [
-    "extra/http/test/foo.html" resource-path ascii file-contents
-    "http://localhost:1237/nested/foo.html" http-get =
+3 a set-global
+
+: test-a string>xml "input" tag-named "value" swap at ;
+
+[ "3" ] [
+    "http://localhost:1237/" http-get
+    swap dup cookies>> "cookies" set session-id-key get-cookie
+    value>> "session-id" set test-a
 ] unit-test
 
-! Try with a slightly malformed request
-[ t ] [
-    "localhost" 1237 <inet> ascii <client> [
-        "GET nested HTTP/1.0\r\n" write flush
-        "\r\n" write flush
-        readln drop
-        read-header USE: prettyprint
-    ] with-stream dup . "location" swap at "/" head?
+[ "4" ] [
+    H{ { "a" "4" } { "__u" "http://localhost:1237/" } } "session-id" get session-id-key associate assoc-union
+    "http://localhost:1237/" <post-request> "cookies" get >>cookies http-request nip test-a
 ] unit-test
 
-[ "Goodbye" ] [
-    "http://localhost:1237/quit" http-get
+[ 4 ] [ a get-global ] unit-test
+
+! Test flash scope
+[ "xyz" ] [
+    H{ { "a" "xyz" } { "__u" "http://localhost:1237/" } } "session-id" get session-id-key associate assoc-union
+    "http://localhost:1237/" <post-request> "cookies" get >>cookies http-request nip test-a
 ] unit-test
+
+[ 4 ] [ a get-global ] unit-test
+
+[ "Goodbye" ] [ "http://localhost:1237/quit" http-get nip ] unit-test
+
+! Test cloning
+[ f ] [ <404> dup clone "b" "a" set-header drop "a" header ] unit-test
+[ f ] [ <404> dup clone "b" "a" <cookie> put-cookie drop "a" get-cookie ] unit-test

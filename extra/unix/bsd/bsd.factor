@@ -21,7 +21,9 @@ IN: unix
 : SO_SNDTIMEO HEX: 1005 ; inline
 : SO_RCVTIMEO HEX: 1006 ; inline
 
+: F_SETFD 2 ; inline
 : F_SETFL 4 ; inline
+: FD_CLOEXEC 1 ; inline
 : O_NONBLOCK 4 ; inline
 
 C-STRUCT: sockaddr-in
@@ -45,10 +47,6 @@ C-STRUCT: sockaddr-un
     { { "char" 104 } "path" } ;
 
 : max-un-path 104 ; inline
-
-: EINTR HEX: 4 ; inline
-: EAGAIN HEX: 23 ; inline
-: EINPROGRESS HEX: 24 ; inline
 
 : SOCK_STREAM 1 ; inline
 : SOCK_DGRAM 2 ; inline

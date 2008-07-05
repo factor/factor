@@ -1,12 +1,12 @@
 IN: inference.transforms.tests
 USING: sequences inference.transforms tools.test math kernel
 quotations inference accessors combinators words arrays
-classes ;
+classes classes.tuple ;
 
-: compose-n-quot <repetition> >quotation ;
-: compose-n compose-n-quot call ;
+: compose-n-quot ( word -- quot' ) <repetition> >quotation ;
+: compose-n ( quot -- ) compose-n-quot call ;
 \ compose-n [ compose-n-quot ] 2 define-transform
-: compose-n-test 2 \ + compose-n ;
+: compose-n-test ( a b c -- x ) 2 \ + compose-n ;
 
 [ 6 ] [ 1 2 3 compose-n-test ] unit-test
 
@@ -20,42 +20,35 @@ classes ;
 
 [ 512 ] [ 1 { { 1+ 8 } } bitfield-quot call ] unit-test
 
-\ new must-infer
-
-TUPLE: a-tuple x y z ;
-
-: set-slots-test ( x y z -- )
-    { set-a-tuple-x set-a-tuple-y } set-slots ;
-
-\ set-slots-test must-infer
-
-: set-slots-test-2
-    { set-a-tuple-x set-a-tuple-x } set-slots ;
-
-[ [ set-slots-test-2 ] infer ] must-fail
-
 TUPLE: color r g b ;
 
 C: <color> color
 
-: cleave-test { [ r>> ] [ g>> ] [ b>> ] } cleave ;
+: cleave-test ( color -- r g b )
+    { [ r>> ] [ g>> ] [ b>> ] } cleave ;
 
 { 1 3 } [ cleave-test ] must-infer-as
 
 [ 1 2 3 ] [ 1 2 3 <color> cleave-test ] unit-test
 
-[ 1 2 3 ] [ 1 2 3 <color> \ cleave-test word-def call ] unit-test
+[ 1 2 3 ] [ 1 2 3 <color> \ cleave-test def>> call ] unit-test
 
-: 2cleave-test { [ 2array ] [ + ] [ - ] } 2cleave ;
+: 2cleave-test ( a b -- c d e ) { [ 2array ] [ + ] [ - ] } 2cleave ;
 
 [ { 1 2 } 3 -1 ] [ 1 2 2cleave-test ] unit-test
 
-[ { 1 2 } 3 -1 ] [ 1 2 \ 2cleave-test word-def call ] unit-test
+[ { 1 2 } 3 -1 ] [ 1 2 \ 2cleave-test def>> call ] unit-test
 
-: spread-test { [ sq ] [ neg ] [ recip ] } spread ;
+: spread-test ( a b c -- d e f ) { [ sq ] [ neg ] [ recip ] } spread ;
 
 [ 16 -3 1/6 ] [ 4 3 6 spread-test ] unit-test
 
-[ 16 -3 1/6 ] [ 4 3 6 \ spread-test word-def call ] unit-test
+[ 16 -3 1/6 ] [ 4 3 6 \ spread-test def>> call ] unit-test
 
 [ fixnum instance? ] must-infer
+
+: bad-new-test ( -- obj ) V{ } new ;
+
+[ bad-new-test ] must-infer
+
+[ bad-new-test ] must-fail

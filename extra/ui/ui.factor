@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs io kernel math models namespaces
-prettyprint dlists sequences threads sequences words
+prettyprint dlists dequeues sequences threads sequences words
 debugger ui.gadgets ui.gadgets.worlds ui.gadgets.tracks
 ui.gestures ui.backend ui.render continuations init combinators
 hashtables concurrency.flags sets ;
@@ -9,6 +9,18 @@ IN: ui
 
 ! Assoc mapping aliens to gadgets
 SYMBOL: windows
+
+SYMBOL: stop-after-last-window?
+
+: event-loop? ( -- ? )
+    {
+        { [ stop-after-last-window? get not ] [ t ] }
+        { [ graft-queue dequeue-empty? not ] [ t ] }
+        { [ windows get-global empty? not ] [ t ] }
+        [ f ]
+    } cond ;
+
+: event-loop ( -- ) [ event-loop? ] [ do-events ] [ ] while ;
 
 : window ( handle -- world ) windows get-global at ;
 
@@ -26,11 +38,12 @@ SYMBOL: windows
     [ [ length 1- dup 1- ] keep exchange ] [ drop ] if ;
 
 : unregister-window ( handle -- )
-    windows global [ [ first = not ] with subset ] change-at ;
+    windows global [ [ first = not ] with filter ] change-at ;
 
 : raised-window ( world -- )
-    windows get-global [ second eq? ] with find drop
-    windows get-global [ length 1- ] keep exchange ;
+    windows get-global
+    [ [ second eq? ] with find drop ] keep
+    [ nth ] [ delete-nth ] [ nip ] 2tri push ;
 
 : focus-gestures ( new old -- )
     drop-prefix <reversed>
@@ -113,7 +126,7 @@ SYMBOL: ui-hook
         in-layout? on
         layout-queue [
             dup layout find-world [ , ] when*
-        ] dlist-slurp
+        ] slurp-dequeue
     ] { } make prune ;
 
 : redraw-worlds ( seq -- )
@@ -128,7 +141,7 @@ SYMBOL: ui-hook
     } case ;
 
 : notify-queued ( -- )
-    graft-queue [ notify ] dlist-slurp ;
+    graft-queue [ notify ] slurp-dequeue ;
 
 : update-ui ( -- )
     [ notify-queued layout-queued redraw-worlds ] assert-depth ;
@@ -201,5 +214,9 @@ MAIN: ui
         call
     ] [
         f windows set-global
-        ui-hook [ ui ] with-variable
+        [
+            ui-hook set
+            stop-after-last-window? on
+            ui
+        ] with-scope
     ] if ;

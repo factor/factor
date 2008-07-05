@@ -1,6 +1,6 @@
 USING: cocoa cocoa.messages cocoa.application cocoa.nibs
 assocs namespaces kernel words compiler.units sequences
-ui.cocoa ;
+ui ui.cocoa ;
 
 "stop-after-last-window?" get
 global [
@@ -20,6 +20,9 @@ global [
 
     sent-messages off
     super-sent-messages off
+
+    alien>objc-types off
+    objc>alien-types off
 
     ! We need this for strip-stack-traces to work fully
     { message-senders super-message-senders }

@@ -1,6 +1,7 @@
-USING: arrays bunny.model bunny.cel-shaded continuations kernel
-math multiline opengl opengl.shaders opengl.framebuffers
-opengl.gl opengl.capabilities sequences ui.gadgets combinators ;
+USING: arrays bunny.model bunny.cel-shaded continuations
+destructors kernel math multiline opengl opengl.shaders
+opengl.framebuffers opengl.gl opengl.capabilities sequences
+ui.gadgets combinators accessors ;
 IN: bunny.outlined
 
 STRING: outlined-pass1-fragment-shader-main-source
@@ -139,9 +140,9 @@ TUPLE: bunny-outlined
 : <bunny-outlined> ( gadget -- draw )
     outlining-supported? [
         pass1-program pass2-program {
-            set-bunny-outlined-gadget
-            set-bunny-outlined-pass1-program
-            set-bunny-outlined-pass2-program
+            (>>gadget)
+            (>>pass1-program)
+            (>>pass2-program)
         } bunny-outlined construct
     ] [ drop f ] if ;
 
@@ -169,34 +170,33 @@ TUPLE: bunny-outlined
     ] with-framebuffer ;
 
 : dispose-framebuffer ( draw -- )
-    dup bunny-outlined-framebuffer-dim [
+    dup framebuffer-dim>> [
         {
-            [ bunny-outlined-framebuffer    [ delete-framebuffer ] when* ]
-            [ bunny-outlined-color-texture  [ delete-texture ] when* ]
-            [ bunny-outlined-normal-texture [ delete-texture ] when* ]
-            [ bunny-outlined-depth-texture  [ delete-texture ] when* ]
-            [ f swap set-bunny-outlined-framebuffer-dim ]
+            [ framebuffer>>    [ delete-framebuffer ] when* ]
+            [ color-texture>>  [ delete-texture ] when* ]
+            [ normal-texture>> [ delete-texture ] when* ]
+            [ depth-texture>>  [ delete-texture ] when* ]
+            [ f >>framebuffer-dim drop ]
         } cleave
     ] [ drop ] if ;
 
 : remake-framebuffer-if-needed ( draw -- )
-    dup bunny-outlined-gadget rect-dim
-    over bunny-outlined-framebuffer-dim
+    dup [ gadget>> dim>> ] [ framebuffer-dim>> ] bi
     over =
     [ 2drop ] [
-        swap dup dispose-framebuffer >r
-        dup GL_RGBA16F_ARB GL_RGBA (framebuffer-texture)
-        swap dup GL_RGBA16F_ARB GL_RGBA (framebuffer-texture)
-        swap dup GL_DEPTH_COMPONENT32 GL_DEPTH_COMPONENT (framebuffer-texture)
-        swap >r
-        [ (make-framebuffer) ] 3keep
-        r> r> {
-            set-bunny-outlined-framebuffer
-            set-bunny-outlined-color-texture
-            set-bunny-outlined-normal-texture
-            set-bunny-outlined-depth-texture
-            set-bunny-outlined-framebuffer-dim
-        } set-slots
+        [ dup dispose-framebuffer dup ] dip {
+            [
+                GL_RGBA16F_ARB GL_RGBA (framebuffer-texture)
+                [ >>color-texture drop ] keep
+            ] [
+                GL_RGBA16F_ARB GL_RGBA (framebuffer-texture)
+                [ >>normal-texture drop ] keep
+            ] [ 
+                GL_DEPTH_COMPONENT32 GL_DEPTH_COMPONENT (framebuffer-texture)
+                [ >>depth-texture drop ] keep
+            ]
+        } 2cleave
+        (make-framebuffer) >>framebuffer drop
     ] if ;
 
 : clear-framebuffer ( -- )
@@ -208,23 +208,27 @@ TUPLE: bunny-outlined
     GL_COLOR_BUFFER_BIT glClear ;
 
 : (pass1) ( geom draw -- )
-    dup bunny-outlined-framebuffer [
+    dup framebuffer>> [
         clear-framebuffer
         { GL_COLOR_ATTACHMENT0_EXT GL_COLOR_ATTACHMENT1_EXT } set-draw-buffers
-        bunny-outlined-pass1-program (draw-cel-shaded-bunny)
+        pass1-program>> (draw-cel-shaded-bunny)
     ] with-framebuffer ;
 
 : (pass2) ( draw -- )
-    init-matrices
-    dup bunny-outlined-color-texture GL_TEXTURE_2D GL_TEXTURE0 bind-texture-unit
-    dup bunny-outlined-normal-texture GL_TEXTURE_2D GL_TEXTURE1 bind-texture-unit
-    dup bunny-outlined-depth-texture GL_TEXTURE_2D GL_TEXTURE2 bind-texture-unit
-    bunny-outlined-pass2-program {
-        { "colormap"   [ 0 glUniform1i ] }
-        { "normalmap"  [ 1 glUniform1i ] }
-        { "depthmap"   [ 2 glUniform1i ] }
-        { "line_color" [ 0.1 0.0 0.1 1.0 glUniform4f ] }
-    } [ { -1.0 -1.0 } { 1.0 1.0 } rect-vertices ] with-gl-program ;
+    init-matrices {
+        [ color-texture>>  GL_TEXTURE_2D GL_TEXTURE0 bind-texture-unit ]
+        [ normal-texture>> GL_TEXTURE_2D GL_TEXTURE1 bind-texture-unit ]
+        [ depth-texture>>  GL_TEXTURE_2D GL_TEXTURE2 bind-texture-unit ]
+        [
+            pass2-program>> {
+                { "colormap"   [ 0 glUniform1i ] }
+                { "normalmap"  [ 1 glUniform1i ] }
+                { "depthmap"   [ 2 glUniform1i ] }
+                { "line_color" [ 0.1 0.0 0.1 1.0 glUniform4f ] }
+            } [ { -1.0 -1.0 } { 1.0 1.0 } rect-vertices ]
+            with-gl-program
+        ]
+    } cleave ;
 
 M: bunny-outlined draw-bunny
     [ remake-framebuffer-if-needed ]
@@ -232,6 +236,6 @@ M: bunny-outlined draw-bunny
     [ (pass2) ] tri ;
 
 M: bunny-outlined dispose
-    [ bunny-outlined-pass1-program [ delete-gl-program ] when* ]
-    [ bunny-outlined-pass2-program [ delete-gl-program ] when* ]
+    [ pass1-program>> [ delete-gl-program ] when* ]
+    [ pass2-program>> [ delete-gl-program ] when* ]
     [ dispose-framebuffer ] tri ;

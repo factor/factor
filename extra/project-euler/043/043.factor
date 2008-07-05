@@ -1,7 +1,8 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.lib hashtables kernel math math.combinatorics math.parser
-    math.ranges project-euler.common sequences sequences.lib sorting sets ;
+    math.ranges project-euler.common sequences sequences.lib sorting
+    sets combinators.short-circuit ;
 IN: project-euler.043
 
 ! http://projecteuler.net/index.php?section=problems&id=43
@@ -47,13 +48,13 @@ IN: project-euler.043
         [ 5 4 pick subseq-divisible? ]
         [ 3 3 pick subseq-divisible? ]
         [ 2 2 pick subseq-divisible? ]
-    } && nip ;
+    } 0&& nip ;
 
 PRIVATE>
 
 : euler043 ( -- answer )
     1234567890 number>digits all-permutations
-    [ interesting? ] subset [ 10 digits>integer ] map sum ;
+    [ interesting? ] filter [ 10 digits>integer ] map sum ;
 
 ! [ euler043 ] time
 ! 125196 ms run / 19548 ms GC time
@@ -70,20 +71,20 @@ PRIVATE>
 <PRIVATE
 
 : candidates ( n -- seq )
-    1000 over <range> [ number>digits 3 0 pad-left ] map [ all-unique? ] subset ;
+    1000 over <range> [ number>digits 3 0 pad-left ] map [ all-unique? ] filter ;
 
 : overlap? ( seq -- ? )
     dup first 2 tail* swap second 2 head = ;
 
 : clean ( seq -- seq )
-    [ unclip 1 head prefix concat ] map [ all-unique? ] subset ;
+    [ unclip 1 head prefix concat ] map [ all-unique? ] filter ;
 
 : add-missing-digit ( seq -- seq )
-    dup natural-sort 10 diff first prefix ;
+    dup natural-sort 10 swap diff first prefix ;
 
 : interesting-pandigitals ( -- seq )
     17 candidates { 13 11 7 5 3 2 } [
-        candidates swap cartesian-product [ overlap? ] subset clean
+        candidates swap cartesian-product [ overlap? ] filter clean
     ] each [ add-missing-digit ] map ;
 
 PRIVATE>

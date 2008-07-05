@@ -3,6 +3,7 @@ io.streams.string namespaces classes effects source-files
 assocs sequences strings io.files definitions continuations
 sorting classes.tuple compiler.units debugger vocabs
 vocabs.loader accessors ;
+
 IN: parser.tests
 
 [
@@ -197,7 +198,7 @@ IN: parser.tests
     [
         "IN: parser.tests : x ; : y 3 throw ; this is an error"
         <string-reader> "a" parse-stream
-    ] [ parse-error? ] must-fail-with
+    ] [ source-file-error? ] must-fail-with
 
     [ t ] [
         "y" "parser.tests" lookup >boolean
@@ -297,12 +298,12 @@ IN: parser.tests
     [
         "IN: parser.tests TUPLE: another-pred-test ; GENERIC: another-pred-test?"
         <string-reader> "removing-the-predicate" parse-stream
-    ] [ error>> error>> redefine-error? ] must-fail-with
+    ] [ error>> error>> error>> redefine-error? ] must-fail-with
 
     [
         "IN: parser.tests TUPLE: class-redef-test ; TUPLE: class-redef-test ;"
         <string-reader> "redefining-a-class-1" parse-stream
-    ] [ error>> error>> redefine-error? ] must-fail-with
+    ] [ error>> error>> error>> redefine-error? ] must-fail-with
 
     [ ] [
         "IN: parser.tests TUPLE: class-redef-test ; SYMBOL: class-redef-test"
@@ -312,7 +313,7 @@ IN: parser.tests
     [
         "IN: parser.tests TUPLE: class-redef-test ; SYMBOL: class-redef-test : class-redef-test ;"
         <string-reader> "redefining-a-class-3" parse-stream drop
-    ] [ error>> error>> redefine-error? ] must-fail-with
+    ] [ error>> error>> error>> redefine-error? ] must-fail-with
 
     [ ] [
         "IN: parser.tests TUPLE: class-fwd-test ;"
@@ -322,7 +323,7 @@ IN: parser.tests
     [
         "IN: parser.tests \\ class-fwd-test"
         <string-reader> "redefining-a-class-3" parse-stream drop
-    ] [ error>> error>> no-word-error? ] must-fail-with
+    ] [ error>> error>> error>> no-word-error? ] must-fail-with
 
     [ ] [
         "IN: parser.tests TUPLE: class-fwd-test ; SYMBOL: class-fwd-test"
@@ -332,12 +333,12 @@ IN: parser.tests
     [
         "IN: parser.tests \\ class-fwd-test"
         <string-reader> "redefining-a-class-3" parse-stream drop
-    ] [ error>> error>> no-word-error? ] must-fail-with
+    ] [ error>> error>> error>> no-word-error? ] must-fail-with
 
     [
         "IN: parser.tests : foo ; TUPLE: foo ;"
         <string-reader> "redefining-a-class-4" parse-stream drop
-    ] [ error>> error>> redefine-error? ] must-fail-with
+    ] [ error>> error>> error>> redefine-error? ] must-fail-with
 
     [ ] [
         "IN: parser.tests : foo ( x y -- z ) 1 2 ; : bar ( a -- b ) ;" eval
@@ -420,8 +421,6 @@ must-fail-with
     ] unit-test
 ] times
 
-[ ] [ "parser" reload ] unit-test
-
 [ ] [
     [ "this-better-not-exist" forget-vocab ] with-compilation-unit
 ] unit-test
@@ -429,3 +428,66 @@ must-fail-with
 [
     "USE: this-better-not-exist" eval
 ] must-fail
+
+[ ": foo ;" eval ] [ error>> no-current-vocab? ] must-fail-with
+
+[ 92 ] [ "CHAR: \\" eval ] unit-test
+[ 92 ] [ "CHAR: \\\\" eval ] unit-test
+
+[ ] [
+    {
+        "IN: parser.tests"
+        "USING: math arrays ;"
+        "GENERIC: change-combination"
+        "M: integer change-combination 1 ;"
+        "M: array change-combination 2 ;"
+    } "\n" join <string-reader> "change-combination-test" parse-stream drop
+] unit-test
+
+[ ] [
+    {
+        "IN: parser.tests"
+        "USING: math arrays ;"
+        "GENERIC# change-combination 1"
+        "M: integer change-combination 1 ;"
+        "M: array change-combination 2 ;"
+    } "\n" join <string-reader> "change-combination-test" parse-stream drop
+] unit-test
+
+[ 2 ] [
+    "change-combination" "parser.tests" lookup
+    "methods" word-prop assoc-size
+] unit-test
+
+[ ] [
+    2 [
+        "IN: parser.tests DEFER: twice-fails FORGET: twice-fails MIXIN: twice-fails"
+        <string-reader> "twice-fails-test" parse-stream drop
+    ] times
+] unit-test
+
+[ [ ] ] [
+    "IN: parser.tests : staging-problem-test-1 1 ; : staging-problem-test-2 staging-problem-test-1 ;"
+    <string-reader> "staging-problem-test" parse-stream
+] unit-test
+
+[ t ] [ "staging-problem-test-1" "parser.tests" lookup >boolean ] unit-test
+
+[ t ] [ "staging-problem-test-2" "parser.tests" lookup >boolean ] unit-test
+
+[ [ ] ] [
+    "IN: parser.tests << : staging-problem-test-1 1 ; >> : staging-problem-test-2 staging-problem-test-1 ;"
+    <string-reader> "staging-problem-test" parse-stream
+] unit-test
+
+[ t ] [ "staging-problem-test-1" "parser.tests" lookup >boolean ] unit-test
+
+[ t ] [ "staging-problem-test-2" "parser.tests" lookup >boolean ] unit-test
+
+[ "DEFER: blah" eval ] [ error>> no-current-vocab? ] must-fail-with
+
+[
+    "IN: parser.tests : blah ; parsing FORGET: blah" eval
+] [
+    error>> staging-violation?
+] must-fail-with

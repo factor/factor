@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions generic io kernel assocs hashtables
-namespaces parser prettyprint sequences strings io.styles
-vectors words math sorting splitting classes
-slots vocabs help.stylesheet help.topics vocabs.loader ;
+USING: accessors arrays definitions generic io kernel assocs
+hashtables namespaces parser prettyprint sequences strings
+io.styles vectors words math sorting splitting classes slots
+vocabs help.stylesheet help.topics vocabs.loader ;
 IN: help.markup
 
 ! Simple markup language.
@@ -22,8 +22,8 @@ SYMBOL: span
 SYMBOL: block
 SYMBOL: table
 
-: last-span? last-element get span eq? ;
-: last-block? last-element get block eq? ;
+: last-span? ( -- ? ) last-element get span eq? ;
+: last-block? ( -- ? ) last-element get block eq? ;
 
 : ($span) ( quot -- )
     last-block? [ nl ] when
@@ -58,18 +58,23 @@ M: f print-element drop ;
 
 ! Some spans
 
-: $snippet [ snippet-style get print-element* ] ($span) ;
+: $snippet ( children -- )
+    [ snippet-style get print-element* ] ($span) ;
 
-: $emphasis [ emphasis-style get print-element* ] ($span) ;
+: $emphasis ( children -- )
+    [ emphasis-style get print-element* ] ($span) ;
 
-: $strong [ strong-style get print-element* ] ($span) ;
+: $strong ( children -- )
+    [ strong-style get print-element* ] ($span) ;
 
-: $url [ url-style get print-element* ] ($span) ;
+: $url ( children -- )
+    [ url-style get print-element* ] ($span) ;
 
-: $nl nl nl drop ;
+: $nl ( children -- )
+    nl nl drop ;
 
 ! Some blocks
-: ($heading)
+: ($heading) ( children quot -- )
     last-element get [ nl ] when ($block) ; inline
 
 : $heading ( element -- )
@@ -173,7 +178,7 @@ M: f print-element drop ;
     first dup vocab-name swap ($vocab-link) ;
 
 : $vocabulary ( element -- )
-    first word-vocabulary [
+    first vocabulary>> [
         "Vocabulary" $heading nl dup ($vocab-link)
     ] when* ;
 
@@ -225,12 +230,12 @@ M: f print-element drop ;
 GENERIC: ($instance) ( element -- )
 
 M: word ($instance)
-    dup word-name a/an write bl ($link) ;
+    dup name>> a/an write bl ($link) ;
 
 M: string ($instance)
     dup a/an write bl $snippet ;
 
-: $instance first ($instance) ;
+: $instance ( children -- ) first ($instance) ;
 
 : values-row ( seq -- seq )
     unclip \ $snippet swap ?word-name 2array
@@ -278,18 +283,23 @@ M: string ($instance)
     drop
     "Shuffle word. Re-arranges the stack according to the stack effect pattern." $description ;
 
-: $low-level-note
+: $low-level-note ( children -- )
     drop
     "Calling this word directly is not necessary in most cases. Higher-level words call it automatically." $notes ;
 
-: $values-x/y
+: $values-x/y ( children -- )
     drop { { "x" number } { "y" number } } $values ;
 
-: $io-error
+: $parsing-note ( children -- )
+    drop
+    "This word should only be called from parsing words."
+    $notes ;
+
+: $io-error ( children -- )
     drop
     "Throws an error if the I/O operation fails." $errors ;
 
-: $prettyprinting-note
+: $prettyprinting-note ( children -- )
     drop {
         "This word should only be called from inside the "
         { $link with-pprint } " combinator."
@@ -311,7 +321,7 @@ M: array elements*
     [
         swap [
             elements [
-                1 tail [ dup set ] each
+                rest [ dup set ] each
             ] each
         ] curry each
     ] H{ } make-assoc keys ;

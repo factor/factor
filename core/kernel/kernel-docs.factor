@@ -1,7 +1,7 @@
 USING: generic help.markup help.syntax math memory
-namespaces sequences kernel.private layouts sorting classes
+namespaces sequences kernel.private layouts classes
 kernel.private vectors combinators quotations strings words
-assocs arrays ;
+assocs arrays math.order ;
 IN: kernel
 
 ARTICLE: "shuffle-words" "Shuffle words"
@@ -97,6 +97,7 @@ $nl
 "Certain shuffle words can also be expressed in terms of the spread combinators. Internalizing such identities can help with understanding and writing code using spread combinators:"
 { $code
     ": dip   [ ] bi* ;"
+    ": 2dip  [ ] [ ] tri* ;"
     ""
     ": slip  [ call ] [ ] bi* ;"
     ": 2slip [ call ] [ ] [ ] tri* ;"
@@ -148,7 +149,7 @@ $nl
 { $subsection "spread-shuffle-equivalence" } ;
 
 ARTICLE: "apply-combinators" "Apply combinators"
-"The apply combinators apply multiple quotations to multiple values. The " { $snippet "@" } " suffix signifies application."
+"The apply combinators apply a single quotation to multiple values. The " { $snippet "@" } " suffix signifies application."
 $nl
 "Two quotations:"
 { $subsection bi@ }
@@ -164,8 +165,9 @@ ARTICLE: "slip-keep-combinators" "The slip and keep combinators"
 { $subsection slip }
 { $subsection 2slip }
 { $subsection 3slip }
-"The dip combinator invokes the quotation at the top of the stack, hiding the value underneath:"
+"The dip combinators invoke the quotation at the top of the stack, hiding the values underneath:"
 { $subsection dip }
+{ $subsection 2dip }
 "The keep combinators invoke a quotation which takes a number of values off the stack, and then they restore those values:"
 { $subsection keep }
 { $subsection 2keep }
@@ -179,6 +181,7 @@ ARTICLE: "compositional-combinators" "Compositional combinators"
 { $subsection with }
 { $subsection compose }
 { $subsection 3compose }
+{ $subsection prepose }
 "Quotations also implement the sequence protocol, and can be manipulated with sequence words; see " { $link "quotations" } "." ;
 
 ARTICLE: "implementing-combinators" "Implementing combinators"
@@ -190,10 +193,7 @@ ARTICLE: "implementing-combinators" "Implementing combinators"
     ": keep ( x quot -- x )"
     "    over >r call r> ; inline"
 }
-"Word inlining is documented in " { $link "declarations" } "."
-$nl
-"A looping combinator:"
-{ $subsection while } ;
+"Word inlining is documented in " { $link "declarations" } "." ;
 
 ARTICLE: "booleans" "Booleans"
 "In Factor, any object that is not " { $link f } " has a true value, and " { $link f } " has a false value. The " { $link t } " object is the canonical true value."
@@ -219,6 +219,16 @@ $nl
 { $example "t \\ t eq? ." "t" }
 "Many words which search collections confuse the case of no element being present with an element being found equal to " { $link f } ". If this distinction is imporant, there is usually an alternative word which can be used; for example, compare " { $link at } " with " { $link at* } "." ;
 
+ARTICLE: "conditionals-boolean-equivalence" "Expressing conditionals with boolean logic"
+"Certain simple conditional forms can be expressed in a simpler manner using boolean logic."
+$nl
+"The following two lines are equivalent:"
+{ $code "[ drop f ] unless" "swap and" }
+"The following two lines are equivalent:"
+{ $code "[ ] [ ] ?if" "swap or" }
+"The following two lines are equivalent, where " { $snippet "L" } " is a literal:"
+{ $code "[ L ] unless*" "L or" } ;
+
 ARTICLE: "conditionals" "Conditionals and logic"
 "The basic conditionals:"
 { $subsection if }
@@ -238,10 +248,11 @@ ARTICLE: "conditionals" "Conditionals and logic"
 { $subsection and }
 { $subsection or }
 { $subsection xor }
+{ $subsection "conditionals-boolean-equivalence" }
 "See " { $link "combinators" } " for forms which abstract away common patterns involving multiple nested branches."
 { $see-also "booleans" "bitwise-arithmetic" both? either? } ;
 
-ARTICLE: "equality" "Equality and comparison testing"
+ARTICLE: "equality" "Equality"
 "There are two distinct notions of ``sameness'' when it comes to objects. You can test if two references point to the same object (" { $emphasis "identity comparison" } "), or you can test if two objects are equal in a domain-specific sense, usually by being instances of the same class, and having equal slot values (" { $emphasis "value comparison" } "). Both notions of equality are equality relations in the mathematical sense."
 $nl
 "Identity comparison:"
@@ -250,15 +261,8 @@ $nl
 { $subsection = }
 "Custom value comparison methods:"
 { $subsection equal? }
+"Utility class:"
 { $subsection identity-tuple }
-"Some types of objects also have an intrinsic order allowing sorting using " { $link natural-sort } ":"
-{ $subsection <=> }
-{ $subsection compare }
-"Utilities for comparing objects:"
-{ $subsection after? }
-{ $subsection before? }
-{ $subsection after=? }
-{ $subsection before=? }
 "An object can be cloned; the clone has distinct identity but equal value:"
 { $subsection clone } ;
 
@@ -393,34 +397,11 @@ HELP: identity-tuple
     { $unchecked-example "T{ foo } dup clone = ." "f" }
 } ;
 
-HELP: <=>
-{ $values { "obj1" object } { "obj2" object } { "n" real } }
-{ $contract
-    "Compares two objects using an intrinsic total order, for example, the natural order for real numbers and lexicographic order for strings."
-    $nl
-    "The output value is one of the following:"
-    { $list
-        { "positive - indicating that " { $snippet "obj1" } " follows " { $snippet "obj2" } }
-        { "zero - indicating that " { $snippet "obj1" } " is equal to " { $snippet "obj2" } }
-        { "negative - indicating that " { $snippet "obj1" } " precedes " { $snippet "obj2" } }
-    }
-    "The default implementation treats the two objects as sequences, and recursively compares their elements. So no extra work is required to compare sequences lexicographically."
-} ;
-
-{ <=> compare natural-sort sort-keys sort-values } related-words
-
-HELP: compare
-{ $values { "obj1" object } { "obj2" object } { "quot" "a quotation with stack effect " { $snippet "( obj -- newobj )" } } { "n" integer } }
-{ $description "Compares the results of applying the quotation to both objects via " { $link <=> } "." }
-{ $examples
-    { $example "USING: kernel prettyprint sequences ;" "\"hello\" \"hi\" [ length ] compare ." "3" }
-} ;
-
 HELP: clone
 { $values { "obj" object } { "cloned" "a new object" } }
 { $contract "Outputs a new object equal to the given object. This is not guaranteed to actually copy the object; it does nothing with immutable objects, and does not copy words either. However, sequences and tuples can be cloned to obtain a shallow copy of the original." } ;
 
-HELP: ? ( ? true false -- true/false )
+HELP: ?
 { $values { "?" "a generalized boolean" } { "true" object } { "false" object } { "true/false" "one two input objects" } }
 { $description "Chooses between two values depending on the boolean value of " { $snippet "cond" } "." } ;
 
@@ -428,7 +409,7 @@ HELP: >boolean
 { $values { "obj" "a generalized boolean" } { "?" "a boolean" } }
 { $description "Convert a generalized boolean into a boolean. That is, " { $link f } " retains its value, whereas anything else becomes " { $link t } "." } ;
 
-HELP: not ( obj -- ? )
+HELP: not
 { $values { "obj" "a generalized boolean" } { "?" "a boolean" } }
 { $description "For " { $link f } " outputs " { $link t } " and for anything else outputs " { $link f } "." }
 { $notes "This word implements boolean not, so applying it to integers will not yield useful results (all integers have a true value). Bitwise not is the " { $link bitnot } " word." } ;
@@ -659,7 +640,7 @@ HELP: tri*
     "The following two lines are equivalent:"
     { $code
         "[ p ] [ q ] [ r ] tri*"
-        ">r >r q r> q r> r"
+        ">r >r p r> q r> r"
     }
 } ;
 
@@ -711,26 +692,26 @@ HELP: tri@
     }
 } ;
 
-HELP: if ( cond true false -- )
-{ $values { "cond" "a generalized boolean" } { "true" quotation } { "false" quotation } }
+HELP: if
+{ $values { "?" "a generalized boolean" } { "true" quotation } { "false" quotation } }
 { $description "If " { $snippet "cond" } " is " { $link f } ", calls the " { $snippet "false" } " quotation. Otherwise calls the " { $snippet "true" } " quotation."
 $nl
 "The " { $snippet "cond" } " value is removed from the stack before either quotation is called." } ;
 
 HELP: when
-{ $values { "cond" "a generalized boolean" } { "true" quotation } }
+{ $values { "?" "a generalized boolean" } { "true" quotation } }
 { $description "If " { $snippet "cond" } " is not " { $link f } ", calls the " { $snippet "true" } " quotation."
 $nl
 "The " { $snippet "cond" } " value is removed from the stack before the quotation is called." } ;
 
 HELP: unless
-{ $values { "cond" "a generalized boolean" } { "false" quotation } }
+{ $values { "?" "a generalized boolean" } { "false" quotation } }
 { $description "If " { $snippet "cond" } " is " { $link f } ", calls the " { $snippet "false" } " quotation."
 $nl
 "The " { $snippet "cond" } " value is removed from the stack before the quotation is called." } ;
 
 HELP: if*
-{ $values { "cond" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } { "false" quotation } }
+{ $values { "?" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } { "false" quotation } }
 { $description "Alternative conditional form that preserves the " { $snippet "cond" } " value if it is true."
 $nl
 "If the condition is true, it is retained on the stack before the " { $snippet "true" } " quotation is called. Otherwise, the condition is removed from the stack and the " { $snippet "false" } " quotation is called."
@@ -739,25 +720,27 @@ $nl
 { $code "X [ Y ] [ Z ] if*" "X dup [ Y ] [ drop Z ] if" } } ;
 
 HELP: when*
-{ $values { "cond" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } }
+{ $values { "?" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } }
 { $description "Variant of " { $link if* } " with no false quotation."
 $nl
 "The following two lines are equivalent:"
 { $code "X [ Y ] when*" "X dup [ Y ] [ drop ] if" } } ;
 
 HELP: unless*
-{ $values { "cond" "a generalized boolean" } { "false" "a quotation " } }
-{ $description "Variant of " { $link if* } " with no true quotation."
-$nl
+{ $values { "?" "a generalized boolean" } { "false" "a quotation " } }
+{ $description "Variant of " { $link if* } " with no true quotation." }
+{ $notes
 "The following two lines are equivalent:"
 { $code "X [ Y ] unless*" "X dup [ ] [ drop Y ] if" } } ;
 
 HELP: ?if
 { $values { "default" object } { "cond" "a generalized boolean" } { "true" "a quotation with stack effect " { $snippet "( cond -- )" } } { "false" "a quotation with stack effect " { $snippet "( default -- )" } } }
-{ $description "If the condition is " { $link f } ", the " { $snippet "false" } " quotation is called with the " { $snippet "default" } " value on the stack. Otherwise, the " { $snippet "true" } " quotation is called with the condition on the stack."
-$nl
+{ $description "If the condition is " { $link f } ", the " { $snippet "false" } " quotation is called with the " { $snippet "default" } " value on the stack. Otherwise, the " { $snippet "true" } " quotation is called with the condition on the stack." }
+{ $notes
 "The following two lines are equivalent:"
-{ $code "[ X ] [ Y ] ?if" "dup [ nip X ] [ drop Y ] if" } } ;
+{ $code "[ X ] [ Y ] ?if" "dup [ nip X ] [ drop Y ] if" }
+"The following two lines are equivalent:"
+{ $code "[ ] [ ] ?if" "swap or" } } ;
 
 HELP: die
 { $description "Starts the front-end processor (FEP), which is a low-level debugger which can inspect memory addresses and the like. The FEP is also entered when a critical error occurs." }
@@ -811,7 +794,7 @@ HELP: most
 { $values { "x" object } { "y" object } { "quot" "a quotation with stack effect " { $snippet "( x y -- ? )" } } { "z" "either " { $snippet "x" } " or " { $snippet "y" } } }
 { $description "If the quotation yields a true value when applied to " { $snippet "x" } " and " { $snippet "y" } ", outputs " { $snippet "x" } ", otherwise outputs " { $snippet "y" } "." } ;
 
-HELP: curry ( obj quot -- curry )
+HELP: curry
 { $values { "obj" object } { "quot" callable } { "curry" curry } }
 { $description "Partial application. Outputs a " { $link callable } " which first pushes " { $snippet "obj" } " and then calls " { $snippet "quot" } "." }
 { $class-description "The class of objects created by " { $link curry } ". These objects print identically to quotations and implement the sequence protocol, however they only use two cells of storage; a reference to the object and a reference to the underlying quotation." }
@@ -849,7 +832,7 @@ HELP: with
     { $example "USING: kernel math prettyprint sequences ;" "2 { 1 2 3 } [ - ] with map ." "{ 1 0 -1 }" }
 } ;
 
-HELP: compose ( quot1 quot2 -- compose )
+HELP: compose
 { $values { "quot1" callable } { "quot2" callable } { "compose" compose } }
 { $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot1" } " followed by " { $snippet "quot2" } "." }
 { $notes
@@ -865,8 +848,16 @@ HELP: compose ( quot1 quot2 -- compose )
     "However, " { $link compose } " runs in constant time, and the optimizing compiler is able to compile code which calls composed quotations."
 } ;
 
+
+HELP: prepose
+{ $values { "quot1" callable } { "quot2" callable } { "compose" compose } }
+{ $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot2" } " followed by " { $snippet "quot1" } "." }
+{ $notes "See " { $link compose } " for details." } ;
+
+{ compose prepose } related-words
+
 HELP: 3compose
-{ $values { "quot1" callable } { "quot2" callable } { "quot3" callable } { "curry" curry } }
+{ $values { "quot1" callable } { "quot2" callable } { "quot3" callable } { "compose" compose } }
 { $description "Quotation composition. Outputs a " { $link callable } " which calls " { $snippet "quot1" } ", " { $snippet "quot2" } " and then " { $snippet "quot3" } "." }
 { $notes
     "The three quotations must leave the retain stack in the same state on exit as it was on entry, so for example, the following code is not allowed:"
@@ -891,6 +882,14 @@ HELP: dip
 { $notes "The following are equivalent:"
     { $code ">r foo bar r>" }
     { $code "[ foo bar ] dip" }
+} ;
+
+HELP: 2dip
+{ $values { "obj1" object } { "obj2" object } { "quot" quotation } }
+{ $description "Calls " { $snippet "quot" } " with " { $snippet "obj1" } " and " { $snippet "obj2" } " hidden on the retain stack." }
+{ $notes "The following are equivalent:"
+    { $code ">r >r foo bar r> r>" }
+    { $code "[ foo bar ] 2dip" }
 } ;
 
 HELP: while

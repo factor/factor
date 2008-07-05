@@ -1,9 +1,10 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays alien alien.c-types alien.structs alien.arrays
-kernel math namespaces parser sequences words quotations
-math.parser splitting effects prettyprint prettyprint.sections
-prettyprint.backend assocs combinators ;
+USING: accessors arrays alien alien.c-types alien.structs
+alien.arrays alien.strings kernel math namespaces parser
+sequences words quotations math.parser splitting grouping
+effects prettyprint prettyprint.sections prettyprint.backend
+assocs combinators lexer strings.parser ;
 IN: alien.syntax
 
 <PRIVATE
@@ -36,11 +37,13 @@ PRIVATE>
 
 : ALIEN: scan string>number <alien> parsed ; parsing
 
+: BAD-ALIEN <bad-alien> parsed ; parsing
+
 : LIBRARY: scan "c-library" set ; parsing
 
 : FUNCTION:
     scan "c-library" get scan ";" parse-tokens
-    [ "()" subseq? not ] subset
+    [ "()" subseq? not ] filter
     define-function ; parsing
 
 : TYPEDEF:
@@ -66,7 +69,7 @@ PRIVATE>
 
 M: alien pprint*
     {
-        { [ dup expired? ] [ drop "( alien expired )" text ] }
+        { [ dup expired? ] [ drop \ BAD-ALIEN pprint-word ] }
         { [ dup pinned-c-ptr? not ] [ drop "( displaced alien )" text ] }
         [ \ ALIEN: [ alien-address pprint* ] pprint-prefix ]
     } cond ;

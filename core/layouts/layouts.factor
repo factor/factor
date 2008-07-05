@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces math words kernel assocs classes
-kernel.private ;
+math.order kernel.private ;
 IN: layouts
 
 SYMBOL: tag-mask
@@ -49,6 +49,12 @@ SYMBOL: type-numbers
 : most-negative-fixnum ( -- n )
     first-bignum neg ;
 
+: (max-array-capacity) ( b -- n )
+    5 - 2^ 1- ;
+
+: max-array-capacity ( -- n )
+    cell-bits (max-array-capacity) ;
+
 : bootstrap-first-bignum ( -- n )
     bootstrap-cell-bits (first-bignum) ;
 
@@ -57,6 +63,9 @@ SYMBOL: type-numbers
 
 : bootstrap-most-negative-fixnum ( -- n )
     bootstrap-first-bignum neg ;
+
+: bootstrap-max-array-capacity ( -- n )
+    bootstrap-cell-bits (max-array-capacity) ;
 
 M: bignum >integer
     dup most-negative-fixnum most-positive-fixnum between?

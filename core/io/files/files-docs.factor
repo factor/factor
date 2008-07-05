@@ -121,7 +121,8 @@ ARTICLE: "io.files" "Basic file operations"
 { $subsection "file-streams" }
 { $subsection "fs-meta" }
 { $subsection "directories" }
-{ $subsection "delete-move-copy" } ;
+{ $subsection "delete-move-copy" }
+{ $subsection "symbolic-links" } ;
 
 ABOUT: "io.files"
 
@@ -184,8 +185,12 @@ HELP: +unknown+
 { $description "A unknown file type." } ;
 
 HELP: <file-reader>
-{ $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" { "stream" "an input stream" } }
-    { "stream" "an input stream" } }
+{
+  $values
+  { "path" "a pathname string" }
+  { "encoding" "an encoding descriptor" }
+  { "stream" "an input stream" }
+}
 { $description "Outputs an input stream for reading from the specified pathname using the given encoding." }
 { $errors "Throws an error if the file is unreadable." } ;
 
@@ -201,17 +206,17 @@ HELP: <file-appender>
 
 HELP: with-file-reader
 { $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" "a quotation" } }
-{ $description "Opens a file for reading and calls the quotation using " { $link with-stream } "." }
+{ $description "Opens a file for reading and calls the quotation using " { $link with-input-stream } "." }
 { $errors "Throws an error if the file is unreadable." } ;
 
 HELP: with-file-writer
 { $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" "a quotation" } }
-{ $description "Opens a file for writing using the given encoding and calls the quotation using " { $link with-stream } "." }
+{ $description "Opens a file for writing using the given encoding and calls the quotation using " { $link with-output-stream } "." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
 HELP: with-file-appender
 { $values { "path" "a pathname string" } { "encoding" "an encoding descriptor" } { "quot" "a quotation" } }
-{ $description "Opens a file for appending using the given encoding and calls the quotation using " { $link with-stream } "." }
+{ $description "Opens a file for appending using the given encoding and calls the quotation using " { $link with-output-stream } "." }
 { $errors "Throws an error if the file cannot be opened for writing." } ;
 
 HELP: set-file-lines
@@ -269,11 +274,11 @@ $nl
 
 HELP: append-path
 { $values { "str1" "a string" } { "str2" "a string" } { "str" "a string" } }
-{ $description "Concatenates two pathnames." } ;
+{ $description "Appends " { $snippet "str1" } " and " { $snippet "str2" } " to form a pathname." } ;
 
 HELP: prepend-path
 { $values { "str1" "a string" } { "str2" "a string" } { "str" "a string" } }
-{ $description "Concatenates two pathnames." } ;
+{ $description "Appends " { $snippet "str2" } " and " { $snippet "str1" } " to form a pathname." } ;
 
 { append-path prepend-path } related-words
 
@@ -296,8 +301,8 @@ HELP: exists?
 { $description "Tests if the file named by " { $snippet "path" } " exists." } ;
 
 HELP: directory?
-{ $values { "path" "a pathname string" } { "?" "a boolean" } }
-{ $description "Tests if " { $snippet "path" } " names a directory." } ;
+{ $values { "file-info" file-info } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "file-info" } " is a directory." } ;
 
 HELP: (directory)
 { $values { "path" "a pathname string" } { "seq" "a sequence of " { $snippet "{ name dir? }" } " pairs" } }

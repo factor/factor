@@ -4,7 +4,8 @@ USING: inference.dataflow inference.state arrays generic io
 io.streams.string kernel math namespaces parser prettyprint
 sequences strings vectors words quotations effects classes
 continuations debugger assocs combinators compiler.errors
-generic.standard.engines.tuple accessors ;
+generic.standard.engines.tuple accessors math.order definitions
+sets ;
 IN: inference.backend
 
 : recursive-label ( word -- label/f )
@@ -20,6 +21,28 @@ M: engine-word inline?
 
 M: word inline?
     "inline" word-prop ;
+
+SYMBOL: visited
+
+: reset-on-redefine { "inferred-effect" "cannot-infer" } ; inline
+
+: (redefined) ( word -- )
+    dup visited get key? [ drop ] [
+        [ reset-on-redefine reset-props ]
+        [ visited get conjoin ]
+        [
+            crossref get at keys
+            [ word? ] filter
+            [
+                [ reset-on-redefine [ word-prop ] with contains? ]
+                [ inline? ]
+                bi or
+            ] filter
+            [ (redefined) ] each
+        ] tri
+    ] if ;
+
+M: word redefined H{ } clone visited [ (redefined) ] with-variable ;
 
 : local-recursive-state ( -- assoc )
     recursive-state get dup keys
@@ -57,10 +80,10 @@ M: object value-literal \ literal-expected inference-warning ;
     1 #drop node,
     pop-d dup value-literal >r value-recursion r> ;
 
-: value-vector ( n -- vector ) [ drop <computed> ] V{ } map-as ;
+: value-vector ( n -- vector ) [ <computed> ] V{ } replicate-as ;
 
 : add-inputs ( seq stack -- n stack )
-    tuck [ length ] compare dup 0 >
+    tuck [ length ] bi@ - dup 0 >
     [ dup value-vector [ swapd push-all ] keep ]
     [ drop 0 swap ] if ;
 
@@ -68,8 +91,9 @@ M: object value-literal \ literal-expected inference-warning ;
     meta-d [ add-inputs ] change d-in [ + ] change ;
 
 : current-effect ( -- effect )
-    d-in get meta-d get length <effect>
-    terminated? get over set-effect-terminated? ;
+    d-in get
+    meta-d get length <effect>
+    terminated? get >>terminated? ;
 
 : init-inference ( -- )
     terminated? off
@@ -87,19 +111,19 @@ GENERIC: apply-object ( obj -- )
 M: object apply-object apply-literal ;
 
 M: wrapper apply-object
-    wrapped dup +called+ depends-on apply-literal ;
+    wrapped>> dup +called+ depends-on apply-literal ;
 
 : terminate ( -- )
     terminated? on #terminate node, ;
 
 : infer-quot ( quot rstate -- )
-    recursive-state get >r
-    recursive-state set
-    [ apply-object terminated? get not ] all? drop
-    r> recursive-state set ;
+    recursive-state get [
+        recursive-state set
+        [ apply-object terminated? get not ] all? drop
+    ] dip recursive-state set ;
 
 : infer-quot-recursive ( quot word label -- )
-    recursive-state get -rot 2array prefix infer-quot ;
+    2array recursive-state get swap prefix infer-quot ;
 
 : time-bomb ( error -- )
     [ throw ] curry recursive-state get infer-quot ;
@@ -114,9 +138,9 @@ TUPLE: recursive-quotation-error quot ;
         value-literal recursive-quotation-error inference-error
     ] [
         dup value-literal callable? [
-            dup value-literal
-            over value-recursion
-            rot f 2array prefix infer-quot
+            [ value-literal ]
+            [ [ value-recursion ] keep f 2array prefix ]
+            bi infer-quot
         ] [
             drop bad-call
         ] if
@@ -138,7 +162,7 @@ TUPLE: too-many-r> ;
     dup ensure-values
     #>r
     over 0 pick node-inputs
-    over [ drop pop-d ] map reverse [ push-r ] each
+    over [ pop-d ] replicate reverse [ push-r ] each
     0 pick pick node-outputs
     node,
     drop ;
@@ -147,7 +171,7 @@ TUPLE: too-many-r> ;
     dup check-r>
     #r>
     0 pick pick node-inputs
-    over [ drop pop-r ] map reverse [ push-d ] each
+    over [ pop-r ] replicate reverse [ push-d ] each
     over 0 pick node-outputs
     node,
     drop ;
@@ -169,26 +193,26 @@ TUPLE: too-many-r> ;
     meta-d get push-all ;
 
 : if-inline ( word true false -- )
-    >r >r dup inline? r> r> if ; inline
+    [ dup inline? ] 2dip if ; inline
 
 : consume/produce ( effect node -- )
-    over effect-in over consume-values
-    over effect-out over produce-values
-    node,
-    effect-terminated? [ terminate ] when ;
+    [ [ in>> ] dip consume-values ]
+    [ [ out>> ] dip produce-values ]
+    [ node, terminated?>> [ terminate ] when ]
+    2tri ;
 
 GENERIC: constructor ( value -- word/f )
 
 GENERIC: infer-uncurry ( value -- )
 
 M: curried infer-uncurry
-    drop pop-d dup curried-obj push-d curried-quot push-d ;
+    drop pop-d [ obj>> push-d ] [ quot>> push-d ] bi ;
 
 M: curried constructor
     drop \ curry ;
 
 M: composed infer-uncurry
-    drop pop-d dup composed-quot1 push-d composed-quot2 push-d ;
+    drop pop-d [ quot1>> push-d ] [ quot2>> push-d ] bi ;
 
 M: composed constructor
     drop \ compose ;
@@ -204,7 +228,7 @@ M: object constructor drop f ;
         1 infer->r
         peek-d reify-curry
         1 infer-r>
-        2 1 <effect> swap #call consume/produce
+        (( obj quot -- curry )) swap #call consume/produce
     ] when* ;
 
 : reify-curries ( n -- )
@@ -233,13 +257,13 @@ M: object constructor drop f ;
 DEFER: unify-values
 
 : unify-curries ( seq -- value )
-    dup [ curried-obj ] map unify-values
-    swap [ curried-quot ] map unify-values
+    [ [ obj>> ] map unify-values ]
+    [ [ quot>> ] map unify-values ] bi
     <curried> ;
 
 : unify-composed ( seq -- value )
-    dup [ composed-quot1 ] map unify-values
-    swap [ composed-quot2 ] map unify-values
+    [ [ quot1>> ] map unify-values ]
+    [ [ quot2>> ] map unify-values ] bi
     <composed> ;
 
 TUPLE: cannot-unify-specials ;
@@ -261,7 +285,7 @@ TUPLE: cannot-unify-specials ;
 
 : balanced? ( in out -- ? )
     [ dup [ length - ] [ 2drop f ] if ] 2map
-    [ ] subset all-equal? ;
+    sift all-equal? ;
 
 TUPLE: unbalanced-branches-error quots in out ;
 
@@ -270,7 +294,7 @@ TUPLE: unbalanced-branches-error quots in out ;
 
 : unify-inputs ( max-d-in d-in meta-d -- meta-d )
     dup [
-        [ >r - r> length + ] keep add-inputs nip
+        [ [ - ] dip length + ] keep add-inputs nip
     ] [
         2nip
     ] if ;
@@ -281,7 +305,7 @@ TUPLE: unbalanced-branches-error quots in out ;
     2dup balanced? [
         over supremum -rot
         [ >r dupd r> unify-inputs ] 2map
-        [ ] subset unify-stacks
+        sift unify-stacks
         rot drop
     ] [
         unbalanced-branches-error
@@ -296,21 +320,24 @@ TUPLE: unbalanced-branches-error quots in out ;
     [ swap at ] curry map ;
 
 : datastack-effect ( seq -- )
-    dup quotation branch-variable
-    over d-in branch-variable
-    rot meta-d active-variable
-    unify-effect meta-d set d-in set ;
+    [ quotation branch-variable ]
+    [ d-in branch-variable ]
+    [ meta-d active-variable ] tri
+    unify-effect
+    [ d-in set ] [ meta-d set ] bi* ;
 
 : retainstack-effect ( seq -- )
-    dup quotation branch-variable
-    over length 0 <repetition>
-    rot meta-r active-variable
-    unify-effect meta-r set drop ;
+    [ quotation branch-variable ]
+    [ length 0 <repetition> ]
+    [ meta-r active-variable ] tri
+    unify-effect
+    [ drop ] [ meta-r set ] bi* ;
 
 : unify-effects ( seq -- )
-    dup datastack-effect
-    dup retainstack-effect
-    [ terminated? swap at ] all? terminated? set ;
+    [ datastack-effect ]
+    [ retainstack-effect ]
+    [ [ terminated? swap at ] all? terminated? set ]
+    tri ;
 
 : unify-dataflow ( effects -- nodes )
     dataflow-graph branch-variable ;
@@ -325,14 +352,17 @@ TUPLE: unbalanced-branches-error quots in out ;
 : infer-branch ( last value -- namespace )
     [
         copy-inference
-        dup value-literal quotation set
-        infer-quot-value
+
+        [ value-literal quotation set ]
+        [ infer-quot-value ]
+        bi
+
         terminated? get [ drop ] [ call node, ] if
     ] H{ } make-assoc ; inline
 
 : (infer-branches) ( last branches -- list )
     [ infer-branch ] with map
-    dup unify-effects unify-dataflow ; inline
+    [ unify-effects ] [ unify-dataflow ] bi ; inline
 
 : infer-branches ( last branches node -- )
     #! last is a quotation which provides a #return or a #values
@@ -353,41 +383,62 @@ TUPLE: unbalanced-branches-error quots in out ;
         #call consume/produce
     ] if ;
 
-TUPLE: no-effect word ;
+TUPLE: cannot-infer-effect word ;
 
-: no-effect ( word -- * ) \ no-effect inference-warning ;
+: cannot-infer-effect ( word -- * )
+    \ cannot-infer-effect inference-warning ;
 
-TUPLE: effect-error word effect ;
+TUPLE: effect-error word inferred declared ;
 
-: effect-error ( word effect -- * )
+: effect-error ( word inferred declared -- * )
     \ effect-error inference-error ;
 
+TUPLE: missing-effect word ;
+
+: effect-required? ( word -- ? )
+    {
+        { [ dup inline? ] [ drop f ] }
+        { [ dup deferred? ] [ drop f ] }
+        { [ dup crossref? not ] [ drop f ] }
+        [ def>> [ [ word? ] [ primitive? not ] bi and ] contains? ]
+    } cond ;
+
+: ?missing-effect ( word -- )
+    dup effect-required?
+    [ missing-effect inference-error ] [ drop ] if ;
+
 : check-effect ( word effect -- )
-    dup pick stack-effect effect<=
-    [ 2drop ] [ effect-error ] if ;
+    over stack-effect {
+        { [ dup not ] [ 2drop ?missing-effect ] }
+        { [ 2dup effect<= ] [ 3drop ] }
+        [ effect-error ]
+    } cond ;
 
 : finish-word ( word -- )
     current-effect
-    2dup check-effect
-    over recorded get push
-    "inferred-effect" set-word-prop ;
+    [ check-effect ]
+    [ drop recorded get push ]
+    [ "inferred-effect" set-word-prop ]
+    2tri ;
+
+: maybe-cannot-infer ( word quot -- )
+    [ ] [ t "cannot-infer" set-word-prop ] cleanup ; inline
 
 : infer-word ( word -- effect )
     [
         [
             init-inference
             dependencies off
-            dup word-def over dup infer-quot-recursive
+            dup def>> over dup infer-quot-recursive
             end-infer
             finish-word
             current-effect
         ] with-scope
-    ] [ ] [ t "no-effect" set-word-prop ] cleanup ;
+    ] maybe-cannot-infer ;
 
 : custom-infer ( word -- )
     #! Customized inference behavior
-    dup +inlined+ depends-on
-    "infer" word-prop call ;
+    [ +inlined+ depends-on ] [ "infer" word-prop call ] bi ;
 
 : cached-infer ( word -- )
     dup "inferred-effect" word-prop make-call-node ;
@@ -395,19 +446,36 @@ TUPLE: effect-error word effect ;
 : apply-word ( word -- )
     {
         { [ dup "infer" word-prop ] [ custom-infer ] }
-        { [ dup "no-effect" word-prop ] [ no-effect ] }
+        { [ dup "cannot-infer" word-prop ] [ cannot-infer-effect ] }
         { [ dup "inferred-effect" word-prop ] [ cached-infer ] }
         [ dup infer-word make-call-node ]
     } cond ;
 
-TUPLE: recursive-declare-error word ;
-
-: declared-infer ( word -- )
+: declared-infer ( word -- )                       
     dup stack-effect [
         make-call-node
     ] [
-        \ recursive-declare-error inference-error
+        \ missing-effect inference-error
     ] if* ;
+
+GENERIC: collect-label-info* ( label node -- )
+
+M: node collect-label-info* 2drop ;
+
+: (collect-label-info) ( label node vector -- )
+    >r tuck [ param>> ] bi@ eq? r> [ push ] curry [ drop ] if ;
+    inline
+
+M: #call-label collect-label-info*
+    over calls>> (collect-label-info) ;
+
+M: #return collect-label-info*
+    over returns>> (collect-label-info) ;
+
+: collect-label-info ( #label -- )
+    V{ } clone >>calls
+    V{ } clone >>returns
+    dup [ collect-label-info* ] with each-node ;
 
 : nest-node ( -- ) #entry node, ;
 
@@ -415,57 +483,67 @@ TUPLE: recursive-declare-error word ;
     dup node-param #return node,
     dataflow-graph get 1array over set-node-children ;
 
-: inlined-block? "inlined-block" word-prop ;
+: inlined-block? ( word -- ? )
+    "inlined-block" word-prop ;
 
-: <inlined-block> gensym dup t "inlined-block" set-word-prop ;
+: <inlined-block> ( -- word )
+    gensym dup t "inlined-block" set-word-prop ;
 
-: inline-block ( word -- node-block data )
+: inline-block ( word -- #label data )
     [
         copy-inference nest-node
-        dup word-def swap <inlined-block>
+        [ def>> ] [ <inlined-block> ] bi
         [ infer-quot-recursive ] 2keep
         #label unnest-node
+        dup collect-label-info
     ] H{ } make-assoc ;
 
-GENERIC: collect-recursion* ( label node -- )
-
-M: node collect-recursion* 2drop ;
-
-M: #call-label collect-recursion*
-    tuck node-param eq? [ , ] [ drop ] if ;
-
-: collect-recursion ( #label -- seq )
-    dup node-param
-    [ [ swap collect-recursion* ] curry each-node ] { } make ;
-
-: join-values ( node -- )
-    collect-recursion [ node-in-d ] map meta-d get suffix
+: join-values ( #label -- )
+    calls>> [ in-d>> ] map meta-d get suffix
     unify-lengths unify-stacks
     meta-d [ length tail* ] change ;
 
 : splice-node ( node -- )
-    dup node-successor [
-        dup node, penultimate-node f over set-node-successor
-        dup current-node set
-    ] when drop ;
+    dup successor>> [
+        [ node, ] [ penultimate-node ] bi
+        f >>successor
+        current-node set
+    ] [ drop ] if ;
 
-: apply-infer ( hash -- )
-    { meta-d meta-r d-in terminated? }
-    [ swap [ at ] curry map ] keep
-    [ set ] 2each ;
+: apply-infer ( data -- )
+    { meta-d meta-r d-in terminated? } swap extract-keys
+    namespace swap update ;
+
+: current-stack-height ( -- n )
+    d-in get meta-d get length - ;
+
+: word-stack-height ( word -- n )
+    stack-effect effect-height ;
+
+: bad-recursive-declaration ( word inferred -- )
+    dup 0 < [ 0 swap ] [ 0 ] if <effect>
+    over stack-effect
+    effect-error ;
+
+: check-stack-height ( word height -- )
+    over word-stack-height over =
+    [ 2drop ] [ bad-recursive-declaration ] if ;
+
+: inline-recursive-word ( word #label -- )
+    current-stack-height [
+        flatten-meta-d [ join-values inline-block apply-infer ] dip >>in-d
+        [ node, ]
+        [ calls>> [ [ flatten-curries ] modify-values ] each ]
+        [ word>> ]
+        tri
+    ] dip
+    current-stack-height -
+    check-stack-height ;
 
 : inline-word ( word -- )
-    dup inline-block over recursive-label? [
-        flatten-meta-d >r
-        drop join-values inline-block apply-infer
-        r> over set-node-in-d
-        dup node,
-        collect-recursion [
-            [ flatten-curries ] modify-values
-        ] each
-    ] [
-        apply-infer node-child node-successor splice-node drop
-    ] if ;
+    dup inline-block over recursive-label?
+    [ drop inline-recursive-word ]
+    [ apply-infer node-child successor>> splice-node drop ] if ;
 
 M: word apply-object
     [

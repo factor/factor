@@ -227,7 +227,11 @@ void dump_zone(F_ZONE *z)
 void dump_generations(void)
 {
 	int i;
-	for(i = 0; i < data_heap->gen_count; i++)
+
+	printf("Nursery: ");
+	dump_zone(&nursery);
+	
+	for(i = 1; i < data_heap->gen_count; i++)
 	{
 		printf("Generation %d: ",i);
 		dump_zone(&data_heap->generations[i]);
@@ -292,8 +296,7 @@ void find_data_references(CELL look_for_)
 
 CELL look_for;
 
-void find_code_references_step(F_COMPILED *compiled, CELL code_start,
-		CELL reloc_start, CELL literals_start)
+void find_code_references_step(F_COMPILED *compiled, CELL code_start, CELL literals_start)
 {
 	CELL scan;
 	CELL literal_end = literals_start + compiled->literals_length;
@@ -301,9 +304,7 @@ void find_code_references_step(F_COMPILED *compiled, CELL code_start,
 	for(scan = literals_start; scan < literal_end; scan += CELLS)
 	{
 		CELL code_start = (CELL)(compiled + 1);
-		CELL literal_start = code_start
-			+ compiled->code_length
-			+ compiled->reloc_length;
+		CELL literal_start = code_start + compiled->code_length;
 
 		CELL obj = get(literal_start);
 
@@ -324,7 +325,6 @@ void find_code_references(CELL look_for_)
 
 void factorbug(void)
 {
-	reset_stdio();
 	open_console();
 
 	printf("Starting low level debugger...\n");

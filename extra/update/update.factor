@@ -1,5 +1,6 @@
 
 USING: kernel system sequences io.files io.launcher bootstrap.image
+       http.client
        builder.util builder.release.branch ;
 
 IN: update
@@ -21,9 +22,10 @@ IN: update
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : remote-clean-image ( -- url )
-  "http://factorcode.org/images/clean/" my-boot-image-name append ;
+  { "http://factorcode.org/images/clean/" platform "/" my-boot-image-name }
+  to-string ;
 
-: download-clean-image ( -- ) { "wget" remote-clean-image } run-command ;
+: download-clean-image ( -- ) remote-clean-image download ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

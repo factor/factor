@@ -23,10 +23,13 @@ M: macro definer drop \ MACRO: \ ; ;
 
 M: macro definition "macro" word-prop ;
 
+M: macro reset-word
+    [ call-next-method ] [ f "macro" set-word-prop ] bi ;
+
 : macro-expand ( ... word -- quot ) "macro" word-prop call ;
 
 : n*quot ( n seq -- seq' ) <repetition> concat >quotation ;
 
-: saver \ >r <repetition> >quotation ;
+: saver ( n -- quot ) \ >r <repetition> >quotation ;
 
-: restorer \ r> <repetition> >quotation ;
+: restorer ( n -- quot ) \ r> <repetition> >quotation ;

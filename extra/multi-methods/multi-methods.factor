@@ -4,7 +4,7 @@ USING: kernel math sequences vectors classes classes.algebra
 combinators arrays words assocs parser namespaces definitions
 prettyprint prettyprint.backend quotations arrays.lib
 debugger io compiler.units kernel.private effects accessors
-hashtables sorting shuffle ;
+hashtables sorting shuffle math.order sets ;
 IN: multi-methods
 
 ! PART I: Converting hook specializers
@@ -19,13 +19,13 @@ SYMBOL: total
 
 : canonicalize-specializer-1 ( specializer -- specializer' )
     [
-        [ class? ] subset
+        [ class? ] filter
         [ length <reversed> [ 1+ neg ] map ] keep zip
         [ length args [ max ] change ] keep
     ]
     [
-        [ pair? ] subset
-        [ keys [ hooks get push-new ] each ] keep
+        [ pair? ] filter
+        [ keys [ hooks get adjoin ] each ] keep
     ] bi append ;
 
 : canonicalize-specializer-2 ( specializer -- specializer' )
@@ -73,7 +73,7 @@ SYMBOL: total
 ! Part II: Topologically sorting specializers
 : maximal-element ( seq quot -- n elt )
     dupd [
-        swapd [ call 0 < ] 2curry subset empty?
+        swapd [ call +lt+ = ] 2curry filter empty?
     ] 2curry find [ "Topological sort failed" throw ] unless* ;
     inline
 
@@ -82,16 +82,16 @@ SYMBOL: total
     [ dupd maximal-element >r over delete-nth r> ] curry
     [ ] unfold nip ; inline
 
-: classes< ( seq1 seq2 -- -1/0/1 )
+: classes< ( seq1 seq2 -- lt/eq/gt )
     [
         {
-            { [ 2dup eq? ] [ 0 ] }
-            { [ 2dup [ class< ] 2keep swap class< and ] [ 0 ] }
-            { [ 2dup class< ] [ -1 ] }
-            { [ 2dup swap class< ] [ 1 ] }
-            [ 0 ]
+            { [ 2dup eq? ] [ +eq+ ] }
+            { [ 2dup [ class<= ] [ swap class<= ] 2bi and ] [ +eq+ ] }
+            { [ 2dup class<= ] [ +lt+ ] }
+            { [ 2dup swap class<= ] [ +gt+ ] }
+            [ +eq+ ]
         } cond 2nip
-    ] 2map [ zero? not ] find nip 0 or ;
+    ] 2map [ +eq+ eq? not ] find nip +eq+ or ;
 
 : sort-methods ( alist -- alist' )
     [ [ first ] bi@ classes< ] topological-sort ;
@@ -111,7 +111,7 @@ SYMBOL: total
 : multi-predicate ( classes -- quot )
     dup length <reversed>
     [ picker 2array ] 2map
-    [ drop object eq? not ] assoc-subset
+    [ drop object eq? not ] assoc-filter
     dup empty? [ drop [ t ] ] [
         [ (multi-predicate) ] { } assoc>map
         unclip [ swap [ f ] \ if 3array append [ ] like ] reduce
@@ -154,10 +154,10 @@ M: method-body stack-effect
     "multi-method-generic" word-prop stack-effect ;
 
 M: method-body crossref?
-    drop t ;
+    "forgotten" word-prop not ;
 
 : method-word-name ( specializer generic -- string )
-    [ word-name % "-" % unparse % ] "" make ;
+    [ name>> % "-" % unparse % ] "" make ;
 
 : method-word-props ( specializer generic -- assoc )
     [
@@ -168,7 +168,7 @@ M: method-body crossref?
 : <method> ( specializer generic -- word )
     [ method-word-props ] 2keep
     method-word-name f <word>
-    [ set-word-props ] keep ;
+    swap >>props ;
 
 : with-methods ( word quot -- )
     over >r >r "multi-methods" word-prop
@@ -187,7 +187,8 @@ M: method-body crossref?
         drop [ <method> dup ] 2keep reveal-method
     ] if ;
 
-: niceify-method [ dup \ f eq? [ drop f ] when ] map ;
+: niceify-method ( seq -- seq )
+    [ dup \ f eq? [ drop f ] when ] map ;
 
 M: no-method error.
     "Type check error" print
@@ -229,10 +230,10 @@ M: no-method error.
 : create-method-in ( specializer generic -- method )
     create-method dup save-location f set-word ;
 
-: CREATE-METHOD
+: CREATE-METHOD ( -- method )
     scan-word scan-object swap create-method-in ;
 
-: (METHOD:) CREATE-METHOD parse-definition ;
+: (METHOD:) ( -- method def ) CREATE-METHOD parse-definition ;
 
 : METHOD: (METHOD:) define ; parsing
 

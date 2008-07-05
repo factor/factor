@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings namespaces math assocs shuffle 
-     vectors arrays combinators.lib math.parser 
+     vectors arrays math.parser 
      unicode.categories sequences.deep peg peg.private 
      peg.search math.ranges words memoize ;
 IN: peg.parsers
@@ -24,11 +24,9 @@ MEMO: just ( parser -- parser )
 
 : 1token ( ch -- parser ) 1string token ;
 
-<PRIVATE
 : (list-of) ( items separator repeat1? -- parser )
   >r over 2seq r> [ repeat1 ] [ repeat0 ] if [ concat ] action 2seq
   [ unclip 1vector swap first append ] action ;
-PRIVATE>
 
 : list-of ( items separator -- parser )
   hide f (list-of) ;
@@ -107,7 +105,7 @@ MEMO: pack ( begin body end -- parser )
   #! range of characters from the first to the second,
   #! inclusive.
   dup first CHAR: ^ = [
-    1 tail (range-pattern) [ member? not ] curry satisfy 
+    rest (range-pattern) [ member? not ] curry satisfy 
   ] [
     (range-pattern) [ member? ] curry satisfy
   ] if ;

@@ -1,0 +1,15 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>All Articles</t:title>
+
+	<ul>
+		<t:bind-each t:name="articles">
+			<li>
+				<t:a t:href="$wiki/view" t:rest="title"><t:label t:name="title"/></t:a>
+			</li>
+		</t:bind-each>
+	</ul>
+
+</t:chloe>

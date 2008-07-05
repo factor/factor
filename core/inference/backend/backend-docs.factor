@@ -43,14 +43,10 @@ HELP: consume/produce
 { $values { "node" "a dataflow node" } { "effect" "an instance of " { $link effect } } }
 { $description "Adds a node to the dataflow graph that calls " { $snippet "word" } " with a stack effect of " { $snippet "effect" } "." } ;
 
-HELP: no-effect
+HELP: cannot-infer-effect
 { $values { "word" word } }
-{ $description "Throws a " { $link no-effect } " error." }
+{ $description "Throws a " { $link cannot-infer-effect } " error." }
 { $error-description "Thrown when inference encounters a call to a word which is already known not to have a static stack effect, due to a prior inference attempt failing." } ;
-
-HELP: collect-recursion
-{ $values { "#label" "a " { $link #label } " node" } { "seq" "a new sequence" } }
-{ $description "Collect the input stacks of all child " { $link #call-label } " nodes that call the given label." } ;
 
 HELP: inline-word
 { $values { "word" word } }
@@ -65,8 +61,8 @@ HELP: effect-error
 { $description "Throws an " { $link effect-error } "." }
 { $error-description "Thrown when a word's inferred stack effect does not match its declared stack effect." } ;
 
-HELP: recursive-declare-error
-{ $error-description "Thrown when inference encounters a recursive call to a word lacking a stack effect declaration. Recursive words must declare a stack effect in order to compile. Due to implementation detail, generic words are recursive, and thus the same restriction applies." } ;
+HELP: missing-effect
+{ $error-description "Thrown when inference encounters a word lacking a stack effect declaration. Stack effects of words must be declared, with the exception of words which only push literals on the stack." } ;
 
 HELP: recursive-quotation-error
 { $error-description "Thrown when a quotation calls itself, directly or indirectly, within the same word. Stack effect inference becomes equivalent to the halting problem if quotation recursion has to be taken into account, hence it is not permitted." }

@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! Based on pattern matching code from Paul Graham's book 'On Lisp'.
-USING: parser kernel words namespaces sequences classes.tuple
-combinators macros assocs math ;
+USING: parser lexer kernel words namespaces sequences classes.tuple
+combinators macros assocs math effects ;
 IN: match
 
 SYMBOL: _
@@ -11,7 +11,7 @@ SYMBOL: _
 : define-match-var ( name -- )
     create-in
     dup t "match-var" set-word-prop
-    dup [ get ] curry define ;
+    dup [ get ] curry (( -- value )) define-declared ;
 
 : define-match-vars ( seq -- )
     [ define-match-var ] each ;
@@ -67,13 +67,13 @@ MACRO: match-cond ( assoc -- )
     [ replace-patterns ] bind ;
 
 : ?1-tail ( seq -- tail/f )
-    dup length zero? not [ 1 tail ] [ drop f ] if ;
+    dup length zero? not [ rest ] [ drop f ] if ;
 
 : (match-first) ( seq pattern-seq -- bindings leftover/f )
     2dup [ length ] bi@ < [ 2drop f f ]
     [
         2dup length head over match
-        [ nip swap ?1-tail ] [ >r 1 tail r> (match-first) ] if*
+        [ nip swap ?1-tail ] [ >r rest r> (match-first) ] if*
     ] if ;
     
 : match-first ( seq pattern-seq -- bindings )

@@ -1,4 +1,5 @@
-USING: heaps.private help.markup help.syntax kernel math assocs ;
+USING: heaps.private help.markup help.syntax kernel math assocs
+math.order ;
 IN: heaps
 
 ARTICLE: "heaps" "Heaps"

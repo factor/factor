@@ -20,28 +20,25 @@ GENERIC: assoc-clone-like ( assoc exemplar -- newassoc )
 
 GENERIC: >alist ( assoc -- newassoc )
 
-GENERIC# assoc-find 1 ( assoc quot -- key value ? ) inline
+: (assoc-each) ( assoc quot -- seq quot' )
+    >r >alist r> [ first2 ] prepose ; inline
 
-M: assoc assoc-find
-    >r >alist [ first2 ] r> compose find swap
-    [ first2 t ] [ drop f f f ] if ;
+: assoc-find ( assoc quot -- key value ? )
+    (assoc-each) find swap [ first2 t ] [ drop f f f ] if ; inline
 
 : key? ( key assoc -- ? ) at* nip ; inline
 
 : assoc-each ( assoc quot -- )
-    [ f ] compose assoc-find 3drop ; inline
-
-: (assoc>map) ( quot accum -- quot' )
-    [ push ] curry compose ; inline
+    (assoc-each) each ; inline
 
 : assoc>map ( assoc quot exemplar -- seq )
-    >r over assoc-size
-    <vector> [ (assoc>map) assoc-each ] keep
-    r> like ; inline
+    >r accumulator >r assoc-each r> r> like ; inline
+
+: assoc-map-as ( assoc quot exemplar -- newassoc )
+    >r [ 2array ] compose V{ } assoc>map r> assoc-like ; inline
 
 : assoc-map ( assoc quot -- newassoc )
-    over >r [ 2array ] compose V{ } assoc>map r> assoc-like ;
-    inline
+    over assoc-map-as ; inline
 
 : assoc-push-if ( key value quot accum -- )
     >r 2keep r> roll
@@ -50,7 +47,7 @@ M: assoc assoc-find
 : assoc-pusher ( quot -- quot' accum )
     V{ } clone [ [ assoc-push-if ] 2curry ] keep ; inline
 
-: assoc-subset ( assoc quot -- subassoc )
+: assoc-filter ( assoc quot -- subassoc )
     over >r assoc-pusher >r assoc-each r> r> assoc-like ; inline
 
 : assoc-contains? ( assoc quot -- ? )
@@ -78,12 +75,6 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 : rename-at ( newkey key assoc -- )
     tuck delete-at* [ -rot set-at ] [ 3drop ] if ;
 
-: delete-any ( assoc -- key value )
-    [
-        [ 2drop t ] assoc-find
-        [ "Assoc is empty" throw ] unless over
-    ] keep delete-at ;
-
 : assoc-empty? ( assoc -- ? )
     assoc-size zero? ;
 
@@ -98,11 +89,11 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 : assoc-stack ( key seq -- value )
     dup length 1- swap (assoc-stack) ;
 
-: subassoc? ( assoc1 assoc2 -- ? )
+: assoc-subset? ( assoc1 assoc2 -- ? )
     [ swapd at* [ = ] [ 2drop f ] if ] curry assoc-all? ;
 
 : assoc= ( assoc1 assoc2 -- ? )
-    2dup subassoc? >r swap subassoc? r> and ;
+    [ assoc-subset? ] [ swap assoc-subset? ] 2bi and ;
 
 : assoc-hashcode ( n assoc -- code )
     [
@@ -110,7 +101,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     ] { } assoc>map hashcode* ;
 
 : assoc-intersect ( assoc1 assoc2 -- intersection )
-    swap [ nip key? ] curry assoc-subset ;
+    swap [ nip key? ] curry assoc-filter ;
 
 : update ( assoc1 assoc2 -- )
     swap [ swapd set-at ] curry assoc-each ;
@@ -120,10 +111,10 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     [ rot update ] keep [ swap update ] keep ;
 
 : assoc-diff ( assoc1 assoc2 -- diff )
-    swap [ nip key? not ] curry assoc-subset ;
+    [ nip key? not ] curry assoc-filter ;
 
 : remove-all ( assoc seq -- subseq )
-    swap [ key? not ] curry subset ;
+    swap [ key? not ] curry filter ;
 
 : (substitute)
     [ dupd at* [ nip ] [ drop ] if ] curry ; inline
@@ -150,10 +141,16 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 : map>assoc ( seq quot exemplar -- assoc )
     >r [ 2array ] compose { } map-as r> assoc-like ; inline
 
-M: assoc >alist [ 2array ] { } assoc>map ;
+: extract-keys ( seq assoc -- subassoc )
+    [ [ dupd at ] curry ] keep map>assoc ;
+
+! M: assoc >alist [ 2array ] { } assoc>map ;
 
 : value-at ( value assoc -- key/f )
     swap [ = nip ] curry assoc-find 2drop ;
+
+: push-at ( value key assoc -- )
+    [ ?push ] change-at ;
 
 : zip ( keys values -- alist )
     2array flip ; inline

@@ -1,0 +1,1 @@
+Descriptive errors generated automatically for specially defined words

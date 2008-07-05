@@ -89,11 +89,6 @@ set_md5sum() {
 set_gcc() {
     case $OS in
         openbsd) ensure_program_installed egcc; CC=egcc;;
-	netbsd) if [[ $WORD -eq 64 ]] ; then
-			CC=/usr/pkg/gcc34/bin/gcc
-		else
-			CC=gcc
-		fi ;;
         *) CC=gcc;;
     esac
 }
@@ -439,7 +434,7 @@ install_build_system_port() {
 }
 
 usage() {
-    echo "usage: $0 install|install-x11|install-macosx|self-update|quick-update|update|bootstrap|net-bootstrap|make-target"
+    echo "usage: $0 install|install-x11|install-macosx|self-update|quick-update|update|bootstrap|dlls|net-bootstrap|make-target"
     echo "If you are behind a firewall, invoke as:"
     echo "env GIT_PROTOCOL=http $0 <command>"
 }

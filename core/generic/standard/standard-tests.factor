@@ -3,9 +3,10 @@ USING: tools.test math math.functions math.constants
 generic.standard strings sequences arrays kernel accessors
 words float-arrays byte-arrays bit-arrays parser namespaces
 quotations inference vectors growable hashtables sbufs
-prettyprint ;
+prettyprint byte-vectors bit-vectors float-vectors definitions
+generic sets graphs assocs ;
 
-GENERIC: lo-tag-test
+GENERIC: lo-tag-test ( obj -- obj' )
 
 M: integer lo-tag-test 3 + ;
 
@@ -20,7 +21,7 @@ M: complex lo-tag-test sq ;
 [ -1/2 ] [ 1+1/2 lo-tag-test ] unit-test
 [ -16 ] [ C{ 0 4 } lo-tag-test ] unit-test
 
-GENERIC: hi-tag-test
+GENERIC: hi-tag-test ( obj -- obj' )
 
 M: string hi-tag-test ", in bed" append ;
 
@@ -52,7 +53,7 @@ TUPLE: circle < shape radius ;
 
 C: <circle> circle
 
-GENERIC: area
+GENERIC: area ( shape -- n )
 
 M: abstract-rectangle area [ width>> ] [ height>> ] bi * ;
 
@@ -62,15 +63,15 @@ M: circle area radius>> sq pi * ;
 [ 12 ] [ 4 3 2 <parallelogram> area ] unit-test
 [ t ] [ 2 <circle> area 4 pi * = ] unit-test
 
-GENERIC: perimiter
+GENERIC: perimiter ( shape -- n )
 
-: rectangle-perimiter + 2 * ;
+: rectangle-perimiter ( n -- n ) + 2 * ;
 
 M: rectangle perimiter
     [ width>> ] [ height>> ] bi
     rectangle-perimiter ;
 
-: hypotenuse [ sq ] bi@ + sqrt ;
+: hypotenuse ( a b -- c ) [ sq ] bi@ + sqrt ;
 
 M: parallelogram perimiter
     [ width>> ]
@@ -82,7 +83,7 @@ M: circle perimiter 2 * pi * ;
 [ 14 ] [ 4 3 <rectangle> perimiter ] unit-test
 [ 30 ] [ 10 4 3 <parallelogram> perimiter ] unit-test
 
-GENERIC: big-mix-test
+GENERIC: big-mix-test ( obj -- obj' )
 
 M: object big-mix-test drop "object" ;
 
@@ -124,7 +125,7 @@ M: circle big-mix-test drop "circle" ;
 [ "tuple" ] [ H{ } big-mix-test ] unit-test
 [ "object" ] [ \ + big-mix-test ] unit-test
 
-GENERIC: small-lo-tag
+GENERIC: small-lo-tag ( obj -- obj )
 
 M: fixnum small-lo-tag drop "fixnum" ;
 
@@ -225,7 +226,7 @@ M: b funky* "b" , call-next-method ;
 
 M: c funky* "c" , call-next-method ;
 
-: funky [ funky* ] { } make ;
+: funky ( obj -- seq ) [ funky* ] { } make ;
 
 [ { "b" "x" "z" } ] [ T{ b } funky ] unit-test
 
@@ -286,4 +287,25 @@ M: sbuf no-stack-effect-decl ;
 
 [ ] [ \ no-stack-effect-decl see ] unit-test
 
-[ ] [ \ no-stack-effect-decl word-def . ] unit-test
+[ ] [ \ no-stack-effect-decl def>> . ] unit-test
+
+! Cross-referencing with generic words
+TUPLE: xref-tuple-1 ;
+TUPLE: xref-tuple-2 < xref-tuple-1 ;
+
+: (xref-test) ( obj -- ) drop ;
+
+GENERIC: xref-test ( obj -- )
+
+M: xref-tuple-1 xref-test (xref-test) ;
+M: xref-tuple-2 xref-test (xref-test) ;
+
+[ t ] [
+    \ xref-test
+    \ xref-tuple-1 \ xref-test method [ usage unique ] closure key?
+] unit-test
+
+[ t ] [
+    \ xref-test
+    \ xref-tuple-2 \ xref-test method [ usage unique ] closure key?
+] unit-test

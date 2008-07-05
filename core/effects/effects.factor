@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math namespaces sequences strings words assocs
-combinators ;
+combinators accessors ;
 IN: effects
 
 TUPLE: effect in out terminated? ;
@@ -11,21 +11,20 @@ TUPLE: effect in out terminated? ;
     effect boa ;
 
 : effect-height ( effect -- n )
-    dup effect-out length swap effect-in length - ;
+    [ out>> length ] [ in>> length ] bi - ;
 
 : effect<= ( eff1 eff2 -- ? )
     {
-        { [ dup not ] [ t ] }
-        { [ over effect-terminated? ] [ t ] }
-        { [ dup effect-terminated? ] [ f ] }
-        { [ 2dup [ effect-in length ] bi@ > ] [ f ] }
+        { [ over terminated?>> ] [ t ] }
+        { [ dup terminated?>> ] [ f ] }
+        { [ 2dup [ in>> length ] bi@ > ] [ f ] }
         { [ 2dup [ effect-height ] bi@ = not ] [ f ] }
         [ t ]
     } cond 2nip ;
 
 GENERIC: (stack-picture) ( obj -- str )
 M: string (stack-picture) ;
-M: word (stack-picture) word-name ;
+M: word (stack-picture) name>> ;
 M: integer (stack-picture) drop "object" ;
 
 : stack-picture ( seq -- string )
@@ -34,32 +33,32 @@ M: integer (stack-picture) drop "object" ;
 : effect>string ( effect -- string )
     [
         "( " %
-        dup effect-in stack-picture %
-        "-- " %
-        dup effect-out stack-picture %
-        effect-terminated? [ "* " % ] when
+        [ in>> stack-picture % "-- " % ]
+        [ out>> stack-picture % ]
+        [ terminated?>> [ "* " % ] when ]
+        tri
         ")" %
     ] "" make ;
 
 GENERIC: stack-effect ( word -- effect/f )
 
-M: symbol stack-effect drop 0 1 <effect> ;
+M: symbol stack-effect drop (( -- symbol )) ;
 
 M: word stack-effect
     { "declared-effect" "inferred-effect" }
-    swap word-props [ at ] curry map [ ] find nip ;
+    swap props>> [ at ] curry map [ ] find nip ;
 
 M: effect clone
-    [ effect-in clone ] keep effect-out clone <effect> ;
+    [ in>> clone ] [ out>> clone ] bi <effect> ;
 
 : split-shuffle ( stack shuffle -- stack1 stack2 )
-    effect-in length cut* ;
+    in>> length cut* ;
 
 : load-shuffle ( stack shuffle -- )
-    effect-in [ set ] 2each ;
+    in>> [ set ] 2each ;
 
 : shuffled-values ( shuffle -- values )
-    effect-out [ get ] map ;
+    out>> [ get ] map ;
 
 : shuffle* ( stack shuffle -- newstack )
     [ [ load-shuffle ] keep shuffled-values ] with-scope ;

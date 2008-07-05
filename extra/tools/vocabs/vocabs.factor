@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files kernel io.encodings.utf8 vocabs.loader vocabs
 sequences namespaces math.parser arrays hashtables assocs
-memoize inspector sorting splitting combinators source-files
-io debugger continuations compiler.errors init io.crc32 
-sets ;
+memoize summary sorting splitting combinators source-files
+io debugger continuations compiler.errors init
+checksums checksums.crc32 sets ;
 IN: tools.vocabs
 
 : vocab-tests-file ( vocab -- path )
@@ -15,7 +15,7 @@ IN: tools.vocabs
     dup vocab-dir "tests" append-path vocab-append-path dup [
         dup exists? [
             dup directory keys
-            [ ".factor" tail? ] subset
+            [ ".factor" tail? ] filter
             [ append-path ] with map
         ] [ drop f ] if
     ] [ drop f ] if ;
@@ -63,7 +63,7 @@ SYMBOL: failures
     dup source-files get at [
         dup source-file-path
         dup exists? [
-            utf8 file-lines lines-crc32
+            utf8 file-lines crc32 checksum-lines
             swap source-file-checksum = not
         ] [
             2drop f
@@ -90,7 +90,7 @@ SYMBOL: changed-vocabs
     changed-vocabs get dup [ key? ] [ 2drop t ] if ;
 
 : filter-changed ( vocabs -- vocabs' )
-    [ changed-vocab? ] subset ;
+    [ changed-vocab? ] filter ;
 
 SYMBOL: modified-sources
 SYMBOL: modified-docs
@@ -127,7 +127,7 @@ SYMBOL: modified-docs
             modified-sources get
             modified-docs get
         ]
-        [ modified-sources get modified-docs get append swap diff ] bi
+        [ modified-docs get modified-sources get append diff ] bi
     ] with-scope ;
 
 : do-refresh ( modified-sources modified-docs unchanged -- )
@@ -208,7 +208,7 @@ M: vocab-link summary vocab-summary ;
     dup vocab-authors-path set-vocab-file-contents ;
 
 : subdirs ( dir -- dirs )
-    directory [ second ] subset keys natural-sort ;
+    directory [ second ] filter keys natural-sort ;
 
 : (all-child-vocabs) ( root name -- vocabs )
     [ vocab-dir append-path subdirs ] keep
@@ -260,7 +260,7 @@ MEMO: all-vocabs-seq ( -- seq )
     } cond nip ;
 
 : filter-dangerous ( seq -- seq' )
-    [ vocab-name dangerous? not ] subset ;
+    [ vocab-name dangerous? not ] filter ;
 
 : try-everything ( -- failures )
     all-vocabs-seq
@@ -273,10 +273,10 @@ MEMO: all-vocabs-seq ( -- seq )
 : unrooted-child-vocabs ( prefix -- seq )
     dup empty? [ CHAR: . suffix ] unless
     vocabs
-    [ find-vocab-root not ] subset
+    [ find-vocab-root not ] filter
     [
         vocab-name swap ?head CHAR: . rot member? not and
-    ] with subset
+    ] with filter
     [ vocab ] map ;
 
 : all-child-vocabs ( prefix -- assoc )
@@ -288,17 +288,14 @@ MEMO: all-vocabs-seq ( -- seq )
 : all-child-vocabs-seq ( prefix -- assoc )
     vocab-roots get swap [
         dupd (all-child-vocabs)
-        [ vocab-dir? ] with subset
+        [ vocab-dir? ] with filter
     ] curry map concat ;
 
-: map>set ( seq quot -- )
-    map concat prune natural-sort ; inline
-
 MEMO: all-tags ( -- seq )
-    all-vocabs-seq [ vocab-tags ] map>set ;
+    all-vocabs-seq [ vocab-tags ] gather natural-sort ;
 
 MEMO: all-authors ( -- seq )
-    all-vocabs-seq [ vocab-authors ] map>set ;
+    all-vocabs-seq [ vocab-authors ] gather natural-sort ;
 
 : reset-cache ( -- )
     root-cache get-global clear-assoc

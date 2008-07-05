@@ -1,19 +1,19 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays bit-arrays byte-arrays generic assocs
-hashtables assocs hashtables.private io kernel kernel.private
-math namespaces parser prettyprint sequences sequences.private
-strings sbufs vectors words quotations assocs system layouts
-splitting growable classes classes.builtin classes.tuple
+USING: alien arrays byte-arrays generic assocs hashtables assocs
+hashtables.private io kernel kernel.private math namespaces
+parser prettyprint sequences sequences.private strings sbufs
+vectors words quotations assocs system layouts splitting
+grouping growable classes classes.builtin classes.tuple
 classes.tuple.private words.private io.binary io.files vocabs
-vocabs.loader source-files definitions debugger float-arrays
+vocabs.loader source-files definitions debugger
 quotations.private sequences.private combinators
-io.encodings.binary ;
+io.encodings.binary math.order accessors ;
 IN: bootstrap.image
 
 : my-arch ( -- arch )
-    cpu word-name
-    dup "ppc" = [ >r os word-name "-" r> 3append ] when ;
+    cpu name>> 
+    dup "ppc" = [ >r os name>> "-" r> 3append ] when ;
 
 : boot-image-name ( arch -- string )
     "boot." swap ".image" 3append ;
@@ -30,6 +30,43 @@ IN: bootstrap.image
     } ;
 
 <PRIVATE
+
+! Object cache; we only consider numbers equal if they have the
+! same type
+TUPLE: id obj ;
+
+C: <id> id
+
+M: id hashcode* obj>> hashcode* ;
+
+GENERIC: (eql?) ( obj1 obj2 -- ? )
+
+: eql? ( obj1 obj2 -- ? )
+    [ (eql?) ] [ [ class ] bi@ = ] 2bi and ;
+
+M: integer (eql?) = ;
+
+M: sequence (eql?)
+    over sequence? [
+        2dup [ length ] bi@ =
+        [ [ eql? ] 2all? ] [ 2drop f ] if
+    ] [ 2drop f ] if ;
+
+M: object (eql?) = ;
+
+M: id equal?
+    over id? [ [ obj>> ] bi@ eql? ] [ 2drop f ] if ;
+
+SYMBOL: objects
+
+: (objects) <id> objects get ; inline
+
+: lookup-object ( obj -- n/f ) (objects) at ;
+
+: put-object ( n obj -- ) (objects) set-at ;
+
+: cache-object ( obj quot -- value )
+    >r (objects) r> [ obj>> ] prepose cache ; inline
 
 ! Constants
 
@@ -48,21 +85,11 @@ IN: bootstrap.image
 : 1-offset              8 ; inline
 : -1-offset             9 ; inline
 
-: array-start 2 bootstrap-cells object tag-number - ;
-: scan@ array-start bootstrap-cell - ;
-: wrapper@ bootstrap-cell object tag-number - ;
-: word-xt@ 8 bootstrap-cells object tag-number - ;
-: quot-array@ bootstrap-cell object tag-number - ;
-: quot-xt@ 3 bootstrap-cells object tag-number - ;
-
 : jit-define ( quot rc rt offset name -- )
     >r { [ { } make ] [ ] [ ] [ ] } spread 4array r> set ;
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
-
-! Object cache
-SYMBOL: objects
 
 ! Image output format
 SYMBOL: big-endian
@@ -169,9 +196,9 @@ GENERIC: ' ( obj -- ptr )
 
 ! Bignums
 
-: bignum-bits bootstrap-cell-bits 2 - ;
+: bignum-bits ( -- n ) bootstrap-cell-bits 2 - ;
 
-: bignum-radix bignum-bits 2^ 1- ;
+: bignum-radix ( -- n ) bignum-bits 2^ 1- ;
 
 : bignum>seq ( n -- seq )
     #! n is positive or zero.
@@ -187,7 +214,9 @@ GENERIC: ' ( obj -- ptr )
     2tri ;
 
 M: bignum '
-    bignum tag-number dup [ emit-bignum ] emit-object ;
+    [
+        bignum tag-number dup [ emit-bignum ] emit-object
+    ] cache-object ;
 
 ! Fixnums
 
@@ -202,23 +231,25 @@ M: fixnum '
 ! Floats
 
 M: float '
-    float tag-number dup [
-        align-here double>bits emit-64
-    ] emit-object ;
+    [
+        float tag-number dup [
+            align-here double>bits emit-64
+        ] emit-object
+    ] cache-object ;
 
 ! Special objects
 
 ! Padded with fixnums for 8-byte alignment
 
-: t, t t-offset fixup ;
+: t, ( -- ) t t-offset fixup ;
 
 M: f '
     #! f is #define F RETAG(0,F_TYPE)
     drop \ f tag-number ;
 
-:  0,  0 >bignum '  0-offset fixup ;
-:  1,  1 >bignum '  1-offset fixup ;
-: -1, -1 >bignum ' -1-offset fixup ;
+:  0, ( -- )  0 >bignum '  0-offset fixup ;
+:  1, ( -- )  1 >bignum '  1-offset fixup ;
+: -1, ( -- ) -1 >bignum ' -1-offset fixup ;
 
 ! Words
 
@@ -229,10 +260,10 @@ M: f '
             [
                 {
                     [ hashcode , ]
-                    [ word-name , ]
-                    [ word-vocabulary , ]
-                    [ word-def , ]
-                    [ word-props , ]
+                    [ name>> , ]
+                    [ vocabulary>> , ]
+                    [ def>> , ]
+                    [ props>> , ]
                 } cleave
                 f ,
                 0 , ! count
@@ -243,16 +274,16 @@ M: f '
         ] bi
         \ word type-number object tag-number
         [ emit-seq ] emit-object
-    ] keep objects get set-at ;
+    ] keep put-object ;
 
 : word-error ( word msg -- * )
-    [ % dup word-vocabulary % " " % word-name % ] "" make throw ;
+    [ % dup vocabulary>> % " " % name>> % ] "" make throw ;
 
 : transfer-word ( word -- word )
     [ target-word ] keep or ;
 
 : fixup-word ( word -- offset )
-    transfer-word dup objects get at
+    transfer-word dup lookup-object
     [ ] [ "Not in image: " word-error ] ?if ;
 
 : fixup-words ( -- )
@@ -263,16 +294,16 @@ M: word ' ;
 ! Wrappers
 
 M: wrapper '
-    wrapped ' wrapper type-number object tag-number
+    wrapped>> ' wrapper type-number object tag-number
     [ emit ] emit-object ;
 
 ! Strings
-: emit-chars ( seq -- )
+: emit-bytes ( seq -- )
     bootstrap-cell <groups>
     big-endian get [ [ be> ] map ] [ [ le> ] map ] if
     emit-seq ;
 
-: pack-string ( string -- newstr )
+: pad-bytes ( seq -- newseq )
     dup length bootstrap-cell align 0 pad-right ;
 
 : emit-string ( string -- ptr )
@@ -280,13 +311,13 @@ M: wrapper '
         dup length emit-fixnum
         f ' emit
         f ' emit
-        pack-string emit-chars
+        pad-bytes emit-bytes
     ] emit-object ;
 
 M: string '
     #! We pool strings so that each string is only written once
     #! to the image
-    objects get [ emit-string ] cache ;
+    [ emit-string ] cache-object ;
 
 : assert-empty ( seq -- )
     length 0 assert= ;
@@ -297,43 +328,43 @@ M: string '
         [ 0 emit-fixnum ] emit-object
     ] bi* ;
 
-M: byte-array ' byte-array emit-dummy-array ;
-
-M: bit-array ' bit-array emit-dummy-array ;
-
-M: float-array ' float-array emit-dummy-array ;
+M: byte-array '
+    byte-array type-number object tag-number [
+        dup length emit-fixnum
+        pad-bytes emit-bytes
+    ] emit-object ;
 
 ! Tuples
 : (emit-tuple) ( tuple -- pointer )
-    [ tuple>array 1 tail-slice ]
+    [ tuple>array rest-slice ]
     [ class transfer-word tuple-layout ] bi prefix [ ' ] map
     tuple type-number dup [ emit-seq ] emit-object ;
 
 : emit-tuple ( tuple -- pointer )
-    dup class word-name "tombstone" =
-    [ objects get [ (emit-tuple) ] cache ] [ (emit-tuple) ] if ;
+    dup class name>> "tombstone" =
+    [ [ (emit-tuple) ] cache-object ] [ (emit-tuple) ] if ;
 
 M: tuple ' emit-tuple ;
 
 M: tuple-layout '
-    objects get [
+    [
         [
             {
-                [ layout-hashcode , ]
-                [ layout-class , ]
-                [ layout-size , ]
-                [ layout-superclasses , ]
-                [ layout-echelon , ]
+                [ hashcode>> , ]
+                [ class>> , ]
+                [ size>> , ]
+                [ superclasses>> , ]
+                [ echelon>> , ]
             } cleave
         ] { } make [ ' ] map
         \ tuple-layout type-number
         object tag-number [ emit-seq ] emit-object
-    ] cache ;
+    ] cache-object ;
 
 M: tombstone '
     delegate
     "((tombstone))" "((empty))" ? "hashtables.private" lookup
-    word-def first objects get [ emit-tuple ] cache ;
+    def>> first [ emit-tuple ] cache-object ;
 
 ! Arrays
 M: array '
@@ -343,15 +374,15 @@ M: array '
 ! Quotations
 
 M: quotation '
-    objects get [
-        quotation-array '
+    [
+        array>> '
         quotation type-number object tag-number [
             emit ! array
-            f ' emit ! compiled?
+            f ' emit ! compiled>>
             0 emit ! xt
             0 emit ! code
         ] emit-object
-    ] cache ;
+    ] cache-object ;
 
 ! End of the image
 
@@ -362,8 +393,8 @@ M: quotation '
     [
         {
             dictionary source-files builtins
-            update-map class<-cache class-not-cache
-            classes-intersect-cache class-and-cache
+            update-map implementors-map class<=-cache
+            class-not-cache classes-intersect-cache class-and-cache
             class-or-cache
         } [ dup get swap bootstrap-word set ] each
     ] H{ } make-assoc
@@ -433,15 +464,13 @@ M: quotation '
     "Writing image to " write
     architecture get boot-image-name resource-path
     [ write "..." print flush ]
-    [ binary <file-writer> [ (write-image) ] with-stream ] bi ;
+    [ binary [ (write-image) ] with-file-writer ] bi ;
 
 PRIVATE>
 
 : make-image ( arch -- )
     [
         architecture set
-        bootstrapping? on
-        load-help? off
         "resource:/core/bootstrap/stage1.factor" run-file
         build-image
         write-image

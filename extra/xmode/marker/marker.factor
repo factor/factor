@@ -2,7 +2,8 @@ IN: xmode.marker
 USING: kernel namespaces xmode.rules xmode.tokens
 xmode.marker.state xmode.marker.context xmode.utilities
 xmode.catalog sequences math assocs combinators combinators.lib
-strings regexp splitting parser-combinators ascii unicode.case ;
+strings regexp splitting parser-combinators ascii unicode.case
+combinators.short-circuit ;
 
 ! Based on org.gjt.sp.jedit.syntax.TokenMarker
 
@@ -19,7 +20,7 @@ strings regexp splitting parser-combinators ascii unicode.case ;
                 dup [ dupd matches? ] [ drop f ] if
             ] unless*
         ]
-    } && nip ;
+    } 0&& nip ;
 
 : mark-number ( keyword -- id )
     keyword-number? DIGIT and ;
@@ -50,7 +51,7 @@ M: rule match-position drop position get ;
         [ over matcher-at-line-start?     over zero?                implies ]
         [ over matcher-at-whitespace-end? over whitespace-end get = implies ]
         [ over matcher-at-word-start?     over last-offset get =    implies ]
-    } && 2nip ;
+    } 0&& 2nip ;
 
 : rest-of-line ( -- str )
     line get position get tail-slice ;
@@ -189,7 +190,7 @@ M: mark-previous-rule handle-rule-start
     dup rule-body-token prev-token,
     rule-match-token* next-token, ;
 
-: do-escaped
+: do-escaped ( -- )
     escaped? get [
         escaped? off
         ! ...
@@ -273,7 +274,7 @@ M: mark-previous-rule handle-rule-start
             [ check-end-delegate ]
             [ check-every-rule ]
             [ check-word-break ]
-        } || drop
+        } 0|| drop
 
         position inc
         mark-token-loop

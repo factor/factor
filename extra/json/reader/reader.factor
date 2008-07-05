@@ -1,11 +1,13 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel parser-combinators namespaces sequences promises strings 
-       assocs math math.parser math.vectors math.functions
-       lazy-lists hashtables ascii ;
+       assocs math math.parser math.vectors math.functions math.order
+       lists hashtables ascii ;
 IN: json.reader
 
 ! Grammar for JSON from RFC 4627
+
+SYMBOL: json-null
 
 : [<&>] ( quot -- quot )
   { } make unclip [ <&> ] reduce ;
@@ -17,8 +19,7 @@ LAZY: 'ws' ( -- parser )
   " " token 
   "\n" token <|>
   "\r" token <|>
-  "\t" token <|> 
-  "" token <|> ;
+  "\t" token <|> <*> ;
 
 LAZY: spaced ( parser -- parser )
   'ws' swap &> 'ws' <& ;
@@ -42,24 +43,39 @@ LAZY: 'value-separator' ( -- parser )
   "," token spaced ;
 
 LAZY: 'false' ( -- parser )
-  "false" token ;
+  "false" token [ drop f ] <@ ;
 
 LAZY: 'null' ( -- parser )
-  "null" token ;
+  "null" token [ drop json-null ] <@ ;
 
 LAZY: 'true' ( -- parser )
-  "true" token ;
+  "true" token [ drop t ] <@ ;
 
 LAZY: 'quot' ( -- parser )
   "\"" token ;
 
+LAZY: 'hex-digit' ( -- parser )
+  [ digit> ] satisfy [ digit> ] <@ ;
+
+: hex-digits>ch ( digits -- ch )
+    0 [ swap 16 * + ] reduce ;
+
+LAZY: 'string-char' ( -- parser )
+  [ quotable? ] satisfy
+  "\\b" token [ drop 8 ] <@ <|>
+  "\\t" token [ drop CHAR: \t ] <@ <|>
+  "\\n" token [ drop CHAR: \n ] <@ <|>
+  "\\f" token [ drop 12 ] <@ <|>
+  "\\r" token [ drop CHAR: \r ] <@ <|>
+  "\\\"" token [ drop CHAR: " ] <@ <|>
+  "\\/" token [ drop CHAR: / ] <@ <|>
+  "\\\\" token [ drop CHAR: \\ ] <@ <|>
+  "\\u" token 'hex-digit' 4 exactly-n &>
+  [ hex-digits>ch ] <@ <|> ;
+
 LAZY: 'string' ( -- parser )
   'quot' 
-  [ 
-    [ quotable? ] keep
-    [ CHAR: \\ = or ] keep 
-    CHAR: " = not and 
-  ] satisfy <*> &> 
+  'string-char' <*> &> 
   'quot' <& [ >string ] <@  ;
 
 DEFER: 'value'
@@ -85,6 +101,9 @@ LAZY: 'minus' ( -- parser )
 
 LAZY: 'plus' ( -- parser )
   "+" token ;
+
+LAZY: 'sign' ( -- parser )
+  'minus' 'plus' <|> ;
 
 LAZY: 'zero' ( -- parser )
   "0" token [ drop 0 ] <@ ;
@@ -116,11 +135,11 @@ LAZY: 'e' ( -- parser )
 : sign-number ( pair -- number )
   #! Pair is { minus? num }
   #! Convert the json number value to a factor number
-  dup second swap first [ -1 * ] when ;
+  dup second swap first [ first "-" = [ -1 * ] when ] when* ;
 
 LAZY: 'exp' ( -- parser )
     'e' 
-    'minus' 'plus' <|> <?> &>
+    'sign' <?> &>
     'digit0-9' <+> [ decimal>integer ] <@ <&> [ sign-number ] <@ ;
 
 : sequence>frac ( seq -- num ) 
@@ -136,7 +155,7 @@ LAZY: 'frac' ( -- parser )
   dup second dup [ 10 swap first ^ swap first * ] [ drop first ] if ;
 
 LAZY: 'number' ( -- parser )
-  'minus' <?>
+  'sign' <?>
   [ 'int' , 'frac' 0 succeed <|> , ] [<&>] [ sum ] <@ 
   'exp' <?> <&> [ raise-to-power ] <@ <&> [ sign-number ] <@ ;
 
@@ -149,7 +168,7 @@ LAZY: 'value' ( -- parser )
     'object' ,
     'array' ,
     'number' ,
-  ] [<|>] ;
+  ] [<|>] spaced ;
 
 : json> ( string -- object )
   #! Parse a json formatted string to a factor object

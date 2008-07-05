@@ -37,7 +37,7 @@ DEFER: plist-test
 ] with-scope
 
 [ "test-scope" ] [
-    "test-scope" "scratchpad" lookup word-name
+    "test-scope" "scratchpad" lookup name>> 
 ] unit-test
 
 [ t ] [ vocabs array? ] unit-test
@@ -68,7 +68,7 @@ FORGET: another-forgotten
 : foe fee ;
 : fie foe ;
 
-[ t ] [ \ fee usage [ word? ] subset empty? ] unit-test
+[ t ] [ \ fee usage [ word? ] filter empty? ] unit-test
 [ t ] [ \ foe usage empty? ] unit-test
 [ f ] [ \ foe crossref get key? ] unit-test
 
@@ -80,7 +80,7 @@ FORGET: foe
 ] unit-test
 
 [ t ] [
-    \ * usage [ word? ] subset [ crossref? ] all?
+    \ * usage [ word? ] filter [ crossref? ] all?
 ] unit-test
 
 DEFER: calls-a-gensym
@@ -120,7 +120,7 @@ DEFER: x
 [ f ] [ "no-loc-2" "words.tests" lookup where ] unit-test
 
 [ ] [ "IN: words.tests : test-last ( -- ) ;" eval ] unit-test
-[ "test-last" ] [ word word-name ] unit-test
+[ "test-last" ] [ word name>> ] unit-test
 
 ! regression
 SYMBOL: quot-uses-a
@@ -183,3 +183,16 @@ SYMBOL: quot-uses-b
 [ t ] [ "decl-forget-test" "words.tests" lookup "flushable" word-prop ] unit-test
 [ ] [ "IN: words.tests : decl-forget-test ;" eval ] unit-test
 [ f ] [ "decl-forget-test" "words.tests" lookup "flushable" word-prop ] unit-test
+
+[ { } ]
+[
+    all-words [
+        "compiled-uses" word-prop
+        keys [ "forgotten" word-prop ] contains?
+    ] filter
+] unit-test
+
+[ { } ] [
+    crossref get keys
+    [ word? ] filter [ "forgotten" word-prop ] filter
+] unit-test

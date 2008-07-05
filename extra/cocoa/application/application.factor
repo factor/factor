@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien io kernel namespaces core-foundation
+USING: alien alien.syntax io kernel namespaces core-foundation
 core-foundation.run-loop cocoa.messages cocoa cocoa.classes
-cocoa.runtime sequences threads debugger init inspector
+cocoa.runtime sequences threads debugger init summary
 kernel.private ;
 IN: cocoa.application
 
@@ -19,6 +19,8 @@ IN: cocoa.application
 
 : NSApp ( -- app ) NSApplication -> sharedApplication ;
 
+FUNCTION: void NSBeep ( ) ;
+
 : with-cocoa ( quot -- )
     [ NSApp drop call ] with-autorelease-pool ;
 
@@ -28,9 +30,6 @@ IN: cocoa.application
 
 : do-event ( app -- ? )
     dup next-event [ -> sendEvent: t ] [ drop f ] if* ;
-
-: do-events ( app -- )
-    dup do-event [ do-events ] [ drop ] if ;
 
 : add-observer ( observer selector name object -- )
     >r >r >r >r NSNotificationCenter -> defaultCenter

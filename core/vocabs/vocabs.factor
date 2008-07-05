@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs strings kernel sorting namespaces sequences
-definitions ;
+USING: accessors assocs strings kernel sorting namespaces
+sequences definitions ;
 IN: vocabs
 
 SYMBOL: dictionary
@@ -12,9 +12,9 @@ main help
 source-loaded? docs-loaded? ;
 
 : <vocab> ( name -- vocab )
-    H{ } clone
-    { set-vocab-name set-vocab-words }
-    \ vocab construct ;
+    \ vocab new
+        swap >>name
+        H{ } clone >>words ;
 
 GENERIC: vocab ( vocab-spec -- vocab )
 
@@ -76,14 +76,14 @@ SYMBOL: load-vocab-hook ! ( name -- )
 : words-named ( str -- seq )
     dictionary get values
     [ vocab-words at ] with map
-    [ ] subset ;
+    sift ;
 
 : child-vocab? ( prefix name -- ? )
     2dup = pick empty? or
     [ 2drop t ] [ swap CHAR: . suffix head? ] if ;
 
 : child-vocabs ( vocab -- seq )
-    vocab-name vocabs [ child-vocab? ] with subset ;
+    vocab-name vocabs [ child-vocab? ] with filter ;
 
 TUPLE: vocab-link name ;
 

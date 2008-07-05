@@ -1,19 +1,16 @@
+USING: accessors inference inference.dataflow optimizer
+optimizer.def-use namespaces assocs kernel sequences math
+tools.test words sets ;
 IN: optimizer.def-use.tests
-USING: inference inference.dataflow optimizer optimizer.def-use
-namespaces assocs kernel sequences math tools.test words ;
 
 [ 3 { 1 1 1 } ] [
-    [ 1 2 3 ] dataflow compute-def-use
+    [ 1 2 3 ] dataflow compute-def-use drop
     def-use get values dup length swap [ length ] map
 ] unit-test
 
 : kill-set ( quot -- seq )
-    dataflow compute-def-use compute-dead-literals keys
+    dataflow compute-def-use drop compute-dead-literals keys
     [ value-literal ] map ;
-
-: subset? [ member? ] curry all? ;
-
-: set= 2dup subset? >r swap subset? r> and ;
 
 [ { [ + ] } ] [
     [ [ 1 2 3 ] [ + ] over drop drop ] kill-set
@@ -95,7 +92,7 @@ namespaces assocs kernel sequences math tools.test words ;
     {
         [ swapd * -rot p2 +@ ]
         [ 2swap [ swapd * -rot p2 +@ ] 2keep ]
-    } \ regression-1 word-def kill-set [ member? ] curry map
+    } \ regression-1 def>> kill-set [ member? ] curry map
 ] unit-test
 
 : regression-2 ( x y -- x.y )
@@ -125,6 +122,6 @@ namespaces assocs kernel sequences math tools.test words ;
             ] with assoc-each
         ]
     }
-    \ regression-2 word-def kill-set
+    \ regression-2 def>> kill-set
     [ member? ] curry map
 ] unit-test

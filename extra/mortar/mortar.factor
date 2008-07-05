@@ -1,6 +1,6 @@
 
-USING: kernel io parser words namespaces quotations arrays assocs sequences
-       splitting math shuffle ;
+USING: kernel io parser lexer words namespaces quotations arrays assocs sequences
+       splitting grouping math shuffle ;
 
 IN: mortar
 
@@ -122,7 +122,7 @@ over class-class-methods assoc-stack call ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : send-message-next ( object message -- )
-over object-class class-methods 1 head* assoc-stack call ;
+over object-class class-methods but-last assoc-stack call ;
 
 : <-~ scan parsed \ send-message-next parsed ; parsing
 

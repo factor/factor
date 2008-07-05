@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel math sequences ;
+USING: help.markup help.syntax kernel math math.order sequences ;
 IN: math.combinatorics
 
 HELP: factorial

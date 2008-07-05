@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: threads io.files io.monitors init kernel
 vocabs vocabs.loader tools.vocabs namespaces continuations
-sequences splitting assocs command-line ;
+sequences splitting assocs command-line concurrency.messaging io.backend sets ;
 IN: tools.vocabs.monitor
 
 : vocab-dir>vocab-name ( path -- vocab )
@@ -13,30 +13,33 @@ IN: tools.vocabs.monitor
     dup ".factor" tail? [ parent-directory ] when ;
 
 : chop-vocab-root ( path -- path' )
-    "resource:" prepend-path (normalize-path)
+    "resource:" prepend-path normalize-path
     dup vocab-roots get
-    [ (normalize-path) ] map
+    [ normalize-path ] map
     [ head? ] with find nip
     ?head drop ;
 
 : path>vocab ( path -- vocab )
     chop-vocab-root path>vocab-name vocab-dir>vocab-name ;
 
-: monitor-loop ( monitor -- )
+: monitor-loop ( -- )
     #! On OS X, monitors give us the full path, so we chop it
     #! off if its there.
-    dup next-change drop path>vocab changed-vocab
+    receive first path>vocab changed-vocab
     reset-cache
     monitor-loop ;
+
+: add-monitor-for-path ( path -- )
+    dup exists? [ t my-mailbox (monitor) ] when drop ;
 
 : monitor-thread ( -- )
     [
         [
-            "" resource-path t <monitor>
-            
+            vocab-roots get prune [ add-monitor-for-path ] each
+
             H{ } clone changed-vocabs set-global
             vocabs [ changed-vocab ] each
-            
+
             monitor-loop
         ] with-monitors
     ] ignore-errors ;

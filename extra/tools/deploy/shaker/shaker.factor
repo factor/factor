@@ -1,9 +1,10 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: qualified io.streams.c init fry namespaces assocs kernel
-parser tools.deploy.config vocabs sequences words words.private
-memory kernel.private continuations io prettyprint
-vocabs.loader debugger system strings sets ;
+USING: accessors qualified io.streams.c init fry namespaces
+assocs kernel parser lexer strings.parser tools.deploy.config
+vocabs sequences words words.private memory kernel.private
+continuations io prettyprint vocabs.loader debugger system
+strings sets ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes
 QUALIFIED: command-line
@@ -12,7 +13,6 @@ QUALIFIED: compiler.units
 QUALIFIED: continuations
 QUALIFIED: definitions
 QUALIFIED: init
-QUALIFIED: inspector
 QUALIFIED: io.backend
 QUALIFIED: io.thread
 QUALIFIED: layouts
@@ -25,8 +25,11 @@ QUALIFIED: threads
 QUALIFIED: vocabs
 IN: tools.deploy.shaker
 
+! This file is some hairy shit.
+
 : strip-init-hooks ( -- )
     "Stripping startup hooks" show
+    "cpu.x86" init-hooks get delete-at
     "command-line" init-hooks get delete-at
     "libc" init-hooks get delete-at
     deploy-threads? get [
@@ -62,32 +65,78 @@ IN: tools.deploy.shaker
 
 : strip-word-names ( words -- )
     "Stripping word names" show
-    [ f over set-word-name f swap set-word-vocabulary ] each ;
+    [ f >>name f >>vocabulary drop ] each ;
 
 : strip-word-defs ( words -- )
     "Stripping symbolic word definitions" show
-    [ [ ] swap set-word-def ] each ;
+    [ "no-def-strip" word-prop not ] filter
+    [ [ ] >>def drop ] each ;
 
-: strip-word-props ( retain-props words -- )
+: sift-assoc ( assoc -- assoc' ) [ nip ] assoc-filter ;
+
+: strip-word-props ( stripped-props words -- )
     "Stripping word properties" show
     [
         [
-            word-props swap
-            '[ , nip member? ] assoc-subset
-            f assoc-like
-        ] keep set-word-props
+            props>> swap
+            '[ drop , member? not ] assoc-filter
+            sift-assoc f assoc-like
+        ] keep (>>props)
     ] with each ;
 
-: retained-props ( -- seq )
+: stripped-word-props ( -- seq )
     [
-        "class" ,
-        "metaclass" ,
-        "layout" ,
-        deploy-ui? get [
-            "gestures" ,
-            "commands" ,
-            { "+nullary+" "+listener+" "+description+" }
-            [ "ui.commands" lookup , ] each
+        strip-dictionary? [
+            {
+                "coercer"
+                "compiled-effect"
+                "compiled-uses"
+                "constraints"
+                "declared-effect"
+                "default-output-classes"
+                "identities"
+                "if-intrinsics"
+                "infer"
+                "inferred-effect"
+                "interval"
+                "intrinsics"
+                "loc"
+                "members"
+                "methods"
+                "combination"
+                "cannot-infer"
+                "default-method"
+                "optimizer-hooks"
+                "output-classes"
+                "participants"
+                "predicate"
+                "predicate-definition"
+                "predicating"
+                "slots"
+                "slot-names"
+                "specializer"
+                "step-into"
+                "step-into?"
+                "superclass"
+                "reading"
+                "writing"
+                "type"
+                "engines"
+            } %
+        ] when
+        
+        strip-prettyprint? [
+            {
+                "delimiter"
+                "flushable"
+                "foldable"
+                "inline"
+                "lambda"
+                "macro"
+                "memo-quot"
+                "parsing"
+                "word-style"
+            } %
         ] when
     ] { } make ;
 
@@ -104,24 +153,28 @@ IN: tools.deploy.shaker
     set-global ;
 
 : strip-vocab-globals ( except names -- words )
-    [ child-vocabs [ words ] map concat ] map concat diff ;
+    [ child-vocabs [ words ] map concat ] map concat swap diff ;
 
 : stripped-globals ( -- seq )
     [
+        "callbacks" "alien.compiler" lookup ,
+
+        "inspector-hook" "inspector" lookup ,
+
         {
             bootstrap.stage2:bootstrap-time
             continuations:error
             continuations:error-continuation
             continuations:error-thread
             continuations:restarts
-            error-hook
+            listener:error-hook
             init:init-hooks
-            inspector:inspector-hook
             io.thread:io-thread
             libc.private:mallocs
             source-files:source-files
-            stderr
-            stdio
+            input-stream
+            output-stream
+            error-stream
         } %
 
         deploy-threads? [
@@ -130,22 +183,24 @@ IN: tools.deploy.shaker
 
         strip-io? [ io.backend:io-backend , ] when
 
-        [
-            io.backend:io-backend ,
-            "default-buffer-size" "io.nonblocking" lookup ,
-        ] { } make
-        { "alarms" "io" "tools" } strip-vocab-globals %
+        { } {
+            "alarms"
+            "tools"
+            "io.launcher"
+        } strip-vocab-globals %
 
         strip-dictionary? [
             { } { "cpu" } strip-vocab-globals %
 
             {
                 gensym
+                name>char-hook
                 classes:class-and-cache
                 classes:class-not-cache
                 classes:class-or-cache
-                classes:class<-cache
+                classes:class<=-cache
                 classes:classes-intersect-cache
+                classes:implementors-map
                 classes:update-map
                 command-line:main-vocab-hook
                 compiled-crossref
@@ -166,6 +221,8 @@ IN: tools.deploy.shaker
                 vocabs:load-vocab-hook
                 word
             } %
+
+            { } { "optimizer.math.partial" } strip-vocab-globals %
         ] when
 
         strip-prettyprint? [
@@ -201,8 +258,9 @@ IN: tools.deploy.shaker
     strip-globals? [
         "Stripping globals" show
         global swap
-        '[ drop , member? not ] assoc-subset
-        [ drop string? not ] assoc-subset ! strip CLI args
+        '[ drop , member? not ] assoc-filter
+        [ drop string? not ] assoc-filter ! strip CLI args
+        sift-assoc
         dup keys unparse show
         21 setenv
     ] [ drop ] if ;
@@ -235,7 +293,7 @@ SYMBOL: deploy-vocab
     strip-recompile-hook
     strip-init-hooks
     deploy-vocab get vocab-main set-boot-quot*
-    retained-props >r
+    stripped-word-props >r
     stripped-globals strip-globals
     r> strip-words ;
 

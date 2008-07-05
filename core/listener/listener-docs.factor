@@ -32,14 +32,14 @@ HELP: listener-hook
 
 HELP: read-quot
 { $values { "quot/f" "a parsed quotation, or " { $link f } " indicating end of file" } }
-{ $description "Reads a Factor expression which possibly spans more than one line from " { $link stdio } " stream. Additional lines of input are read while the parser stack height is greater than one. Since structural parsing words push partial quotations on the stack, this will keep on reading input until all delimited parsing words are terminated." } ;
+{ $description "Reads a Factor expression which possibly spans more than one line from " { $link input-stream } ". Additional lines of input are read while the parser stack height is greater than one. Since structural parsing words push partial quotations on the stack, this will keep on reading input until all delimited parsing words are terminated." } ;
 
 HELP: listen
-{ $description "Prompts for an expression on the " { $link stdio } " stream and evaluates it. On end of file, " { $link quit-flag } " is set to terminate the listener loop." }
-{ $errors "If the expression input by the user throws an error, the error is printed to the " { $link stdio } " stream and the word returns normally." } ;
+{ $description "Prompts for an expression on " { $link input-stream } " and evaluates it. On end of file, " { $link quit-flag } " is set to terminate the listener loop." }
+{ $errors "If the expression input by the user throws an error, the error is printed to " { $link output-stream } " and the word returns normally." } ;
 
 HELP: listener
-{ $description "Prompts for expressions on the " { $link stdio } " stream and evaluates them until end of file is reached." } ;
+{ $description "Prompts for expressions on " { $link input-stream } " and evaluates them until end of file is reached." } ;
 
 HELP: bye
 { $description "Exits the current listener." }

@@ -1,17 +1,17 @@
 IN: boxes.tests
-USING: boxes namespaces tools.test ;
+USING: boxes namespaces tools.test accessors ;
 
 [ ] [ <box> "b" set ] unit-test
 
 [ ] [ 3 "b" get >box ] unit-test
 
-[ t ] [ "b" get box-full? ] unit-test
+[ t ] [ "b" get occupied>> ] unit-test
 
 [ 4 "b" >box ] must-fail
 
 [ 3 ] [ "b" get box> ] unit-test
 
-[ f ] [ "b" get box-full? ] unit-test
+[ f ] [ "b" get occupied>> ] unit-test
 
 [ "b" get box> ] must-fail
 
@@ -21,4 +21,4 @@ USING: boxes namespaces tools.test ;
 
 [ 12 t ] [ "b" get ?box ] unit-test
 
-[ f ] [ "b" get box-full? ] unit-test
+[ f ] [ "b" get occupied>> ] unit-test

@@ -1,5 +1,5 @@
-USING: math.intervals kernel sequences words math arrays
-prettyprint tools.test random vocabs combinators ;
+USING: math.intervals kernel sequences words math math.order
+arrays prettyprint tools.test random vocabs combinators ;
 IN: math.intervals.tests
 
 [ T{ interval f { 1 t } { 2 t } } ] [ 1 2 [a,b] ] unit-test
@@ -177,7 +177,7 @@ IN: math.intervals.tests
         { 3 [ (a,b] ] }
     } case ;
 
-: random-op
+: random-op ( -- pair )
     {
         { + interval+ }
         { - interval- }
@@ -192,7 +192,7 @@ IN: math.intervals.tests
     ] when
     random ;
 
-: interval-test
+: interval-test ( -- ? )
     random-interval random-interval random-op ! 3dup . . .
     0 pick interval-contains? over first { / /i } member? and [
         3drop t
@@ -204,7 +204,7 @@ IN: math.intervals.tests
 
 [ t ] [ 40000 [ drop interval-test ] all? ] unit-test
 
-: random-comparison
+: random-comparison ( -- pair )
     {
         { < interval< }
         { <= interval<= }
@@ -212,7 +212,7 @@ IN: math.intervals.tests
         { >= interval>= }
     } random ;
 
-: comparison-test
+: comparison-test ( -- ? )
     random-interval random-interval random-comparison
     [ >r [ random-element ] bi@ r> first execute ] 3keep
     second execute dup incomparable eq? [
@@ -222,3 +222,15 @@ IN: math.intervals.tests
     ] if ;
 
 [ t ] [ 40000 [ drop comparison-test ] all? ] unit-test
+
+[ t ] [ -10 10 [a,b] 0 100 [a,b] assume> 0 10 (a,b] = ] unit-test
+
+[ t ] [ -10 10 [a,b] 0 100 [a,b] assume>= 0 10 [a,b] = ] unit-test
+
+[ t ] [ -10 10 [a,b] 0 100 [a,b] assume< -10 10 [a,b] = ] unit-test
+
+[ t ] [ -10 10 [a,b] -100 0 [a,b] assume< -10 0 [a,b) = ] unit-test
+
+[ t ] [ -10 10 [a,b] -100 0 [a,b] assume<= -10 0 [a,b] = ] unit-test
+
+[ t ] [ -10 10 [a,b] 0 100 [a,b] assume<= -10 10 [a,b] = ] unit-test

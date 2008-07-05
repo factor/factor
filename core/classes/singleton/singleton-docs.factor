@@ -18,7 +18,7 @@ HELP: SINGLETON:
     "Defines a new singleton class. The class word itself is the sole instance of the singleton class."
 }
 { $examples
-    { $example "USING: classes.singleton kernel io ;" "SINGLETON: foo\nGENERIC: bar ( obj -- )\nM: foo bar drop \"a foo!\" print ;\nfoo bar" "a foo!" }
+    { $example "USING: classes.singleton kernel io ;" "IN: scratchpad" "SINGLETON: foo\nGENERIC: bar ( obj -- )\nM: foo bar drop \"a foo!\" print ;\nfoo bar" "a foo!" }
 } ;
 
 HELP: define-singleton-class

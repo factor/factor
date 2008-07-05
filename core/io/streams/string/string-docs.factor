@@ -17,7 +17,7 @@ HELP: <string-writer>
 
 HELP: with-string-writer
 { $values { "quot" quotation } { "str" string } }
-{ $description "Calls the quotation in a new dynamic scope with " { $link stdio } " rebound to a new string writer. The accumulated string is output when the quotation returns." } ;
+{ $description "Calls the quotation in a new dynamic scope with " { $link output-stream } " rebound to a new string writer. The accumulated string is output when the quotation returns." } ;
 
 HELP: <string-reader>
 { $values { "str" string } { "stream" "an input stream" } }
@@ -26,4 +26,4 @@ HELP: <string-reader>
 
 HELP: with-string-reader
 { $values { "str" string } { "quot" quotation } }
-{ $description "Calls the quotation in a new dynamic scope with " { $link stdio } " rebound to an input stream reading " { $snippet "str" } " from beginning to end." } ;
+{ $description "Calls the quotation in a new dynamic scope with " { $link input-stream } " rebound to an input stream reading " { $snippet "str" } " from beginning to end." } ;

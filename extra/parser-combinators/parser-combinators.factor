@@ -1,6 +1,6 @@
 ! Copyright (C) 2004 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: lazy-lists promises kernel sequences strings math
+USING: lists lists.lazy promises kernel sequences strings math
 arrays splitting quotations combinators namespaces
 unicode.case unicode.categories sequences.deep ;
 IN: parser-combinators
@@ -147,8 +147,8 @@ TUPLE: and-parser parsers ;
             >r parse-result-parsed r>
             [ parse-result-parsed 2array ] keep
             parse-result-unparsed <parse-result>
-        ] lmap-with
-    ] lmap-with lconcat ;
+        ] lazy-map-with
+    ] lazy-map-with lconcat ;
 
 M: and-parser parse ( input parser -- list )
     #! Parse 'input' by sequentially combining the
@@ -171,13 +171,13 @@ M: or-parser parse ( input parser1 -- list )
     #! of parser1 and parser2 being applied to the same
     #! input. This implements the choice parsing operator.
     or-parser-parsers 0 swap seq>list
-    [ parse ] lmap-with lconcat ;
+    [ parse ] lazy-map-with lconcat ;
 
 : left-trim-slice ( string -- string )
     #! Return a new string without any leading whitespace
     #! from the original string.
     dup empty? [
-        dup first blank? [ 1 tail-slice left-trim-slice ] when
+        dup first blank? [ rest-slice left-trim-slice ] when
     ] unless ;
 
 TUPLE: sp-parser p1 ;
@@ -200,7 +200,7 @@ M: just-parser parse ( input parser -- result )
     #! from the results anything where the remaining
     #! input to be parsed is not empty. So ensures a
     #! fully parsed input string.
-    just-parser-p1 parse [ parse-result-unparsed empty? ] lsubset ;
+    just-parser-p1 parse [ parse-result-unparsed empty? ] lfilter ;
 
 TUPLE: apply-parser p1 quot ;
 
@@ -216,7 +216,7 @@ M: apply-parser parse ( input parser -- result )
     -rot parse [
         [ parse-result-parsed swap call ] keep
         parse-result-unparsed <parse-result>
-    ] lmap-with ;
+    ] lazy-map-with ;
 
 TUPLE: some-parser p1 ;
 

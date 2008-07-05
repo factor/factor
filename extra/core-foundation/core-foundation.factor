@@ -1,6 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.syntax kernel math sequences ;
+USING: alien alien.c-types alien.strings alien.syntax kernel
+math sequences io.encodings.utf16 ;
 IN: core-foundation
 
 TYPEDEF: void* CFAllocatorRef
@@ -31,7 +32,7 @@ FUNCTION: CFURLRef CFURLCreateWithString ( CFAllocatorRef allocator, CFStringRef
 
 FUNCTION: CFURLRef CFURLCopyFileSystemPath ( CFURLRef url, int pathStyle ) ;
 
-FUNCTION: CFStringRef CFStringCreateWithCharacters ( CFAllocatorRef allocator, ushort* cStr, CFIndex numChars ) ;
+FUNCTION: CFStringRef CFStringCreateWithCharacters ( CFAllocatorRef allocator, wchar_t* cStr, CFIndex numChars ) ;
 
 FUNCTION: CFIndex CFStringGetLength ( CFStringRef theString ) ;
 
@@ -57,7 +58,7 @@ FUNCTION: void CFRelease ( void* cf ) ;
 : CF>string ( alien -- string )
     dup CFStringGetLength 1+ "ushort" <c-array> [
         >r 0 over CFStringGetLength r> CFStringGetCharacters
-    ] keep alien>u16-string ;
+    ] keep utf16n alien>string ;
 
 : CF>string-array ( alien -- seq )
     CF>array [ CF>string ] map ;

@@ -4,52 +4,71 @@ USING: kernel namespaces arrays sequences io inference.backend
 inference.state generator debugger words compiler.units
 continuations vocabs assocs alien.compiler dlists optimizer
 definitions math compiler.errors threads graphs generic
-inference ;
+inference combinators dequeues search-dequeues ;
 IN: compiler
 
-: ripple-up ( word -- )
-    compiled-usage [ drop queue-compile ] assoc-each ;
+SYMBOL: +failed+
+
+: ripple-up ( words -- )
+    dup "compiled-effect" word-prop +failed+ eq?
+    [ usage [ word? ] filter ] [ compiled-usage keys ] if
+    [ queue-compile ] each ;
+
+: ripple-up? ( word effect -- ? )
+    #! If the word has previously been compiled and had a
+    #! different stack effect, we have to recompile any callers.
+    swap "compiled-effect" word-prop [ = not ] keep and ;
 
 : save-effect ( word effect -- )
-    over "compiled-uses" word-prop [
-        2dup swap "compiled-effect" word-prop =
-        [ over ripple-up ] unless
-    ] when
-    "compiled-effect" set-word-prop ;
+    [ dupd ripple-up? [ ripple-up ] [ drop ] if ]
+    [ "compiled-effect" set-word-prop ]
+    2bi ;
 
-: finish-compile ( word effect dependencies -- )
-    >r dupd save-effect r>
-    over compiled-unxref
-    over compiled-crossref? [ compiled-xref ] [ 2drop ] if ;
-
-: compile-succeeded ( word -- effect dependencies )
-    [
-        [ word-dataflow optimize ] keep dup generate
-    ] computing-dependencies ;
+: compile-begins ( word -- )
+    f swap compiler-error ;
 
 : compile-failed ( word error -- )
-    f pick compiled get set-at
-    swap compiler-error ;
+    [ swap compiler-error ]
+    [
+        drop
+        [ compiled-unxref ]
+        [ f swap compiled get set-at ]
+        [ +failed+ save-effect ]
+        tri
+    ] 2bi ;
+
+: compile-succeeded ( effect word -- )
+    [ swap save-effect ]
+    [ compiled-unxref ]
+    [
+        dup crossref?
+        [ dependencies get compiled-xref ] [ drop ] if
+    ] tri ;
 
 : (compile) ( word -- )
-    f over compiler-error
-    [ dup compile-succeeded finish-compile ]
-    [ dupd compile-failed f save-effect ]
-    recover ;
+    [
+        H{ } clone dependencies set
 
-: compile-loop ( assoc -- )
-    dup assoc-empty? [ drop ] [
-        dup delete-any drop (compile)
-        yield
-        compile-loop
-    ] if ;
+        {
+            [ compile-begins ]
+            [
+                [ word-dataflow ] [ compile-failed return ] recover
+                optimize
+            ]
+            [ dup generate ]
+            [ compile-succeeded ]
+        } cleave
+    ] curry with-return ;
+
+: compile-loop ( dequeue -- )
+    [ (compile) yield ] slurp-dequeue ;
 
 : decompile ( word -- )
     f 2array 1array t modify-code-heap ;
 
 : optimized-recompile-hook ( words -- alist )
     [
-        H{ } clone compile-queue set
+        <hashed-dlist> compile-queue set
         H{ } clone compiled set
         [ queue-compile ] each
         compile-queue get compile-loop

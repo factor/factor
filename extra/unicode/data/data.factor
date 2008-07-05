@@ -1,15 +1,30 @@
-USING: assocs math kernel sequences io.files hashtables
-quotations splitting arrays math.parser hash2
-byte-arrays words namespaces words compiler.units parser io.encodings.ascii  ;
+USING: combinators.short-circuit assocs math kernel sequences
+io.files hashtables quotations splitting grouping arrays
+math.parser hash2 math.order byte-arrays words namespaces words
+compiler.units parser io.encodings.ascii values interval-maps
+ascii sets combinators locals math.ranges sorting ;
 IN: unicode.data
 
-<<
-: VALUE:
-    CREATE-WORD { f } clone [ first ] curry define ; parsing
+VALUE: simple-lower
+VALUE: simple-upper
+VALUE: simple-title
+VALUE: canonical-map
+VALUE: combine-map
+VALUE: class-map
+VALUE: compatibility-map
+VALUE: category-map
+VALUE: name-map
+VALUE: special-casing
+VALUE: properties
 
-: set-value ( value word -- )
-    word-def first set-first ;
->>
+: canonical-entry ( char -- seq ) canonical-map at ;
+: combine-chars ( a b -- char/f ) combine-map hash2 ;
+: compatibility-entry ( char -- seq ) compatibility-map at  ;
+: combining-class ( char -- n ) class-map at ;
+: non-starter? ( char -- ? ) class-map key? ;
+: name>char ( string -- char ) name-map at ;
+: char>name ( char -- string ) name-map value-at ;
+: property? ( char property -- ? ) properties at interval-key? ;
 
 ! Convenience functions
 : ?between? ( n/f from to -- ? )
@@ -17,19 +32,25 @@ IN: unicode.data
 
 ! Loading data from UnicodeData.txt
 
+: split-; ( line -- array )
+    ";" split [ [ blank? ] trim ] map ;
+
 : data ( filename -- data )
-    ascii file-lines [ ";" split ] map ;
+    ascii file-lines [ split-; ] map ;
 
 : load-data ( -- data )
-    "extra/unicode/UnicodeData.txt" resource-path data ;
+    "resource:extra/unicode/data/UnicodeData.txt" data ;
+
+: filter-comments ( lines -- lines )
+    [ "#@" split first ] map harvest ;
 
 : (process-data) ( index data -- newdata )
-    [ [ nth ] keep first swap 2array ] with map
-    [ second empty? not ] subset
+    filter-comments
+    [ [ nth ] keep first swap ] with { } map>assoc
     [ >r hex> r> ] assoc-map ;
 
 : process-data ( index data -- hash )
-    (process-data) [ hex> ] assoc-map >hashtable ;
+    (process-data) [ hex> ] assoc-map [ nip ] assoc-filter >hashtable ;
 
 : (chain-decomposed) ( hash value -- newvalue )
     [
@@ -41,51 +62,62 @@ IN: unicode.data
     dup [ swap (chain-decomposed) ] curry assoc-map ;
 
 : first* ( seq -- ? )
-    second dup empty? [ ] [ first ] ?if ;
+    second { [ empty? ] [ first ] } 1|| ;
 
 : (process-decomposed) ( data -- alist )
     5 swap (process-data)
     [ " " split [ hex> ] map ] assoc-map ;
 
 : process-canonical ( data -- hash2 hash )
-    (process-decomposed) [ first* ] subset
+    (process-decomposed) [ first* ] filter
     [
-        [ second length 2 = ] subset
+        [ second length 2 = ] filter
         ! using 1009 as the size, the maximum load is 4
         [ first2 first2 rot 3array ] map 1009 alist>hash2
-    ] keep
-    >hashtable chain-decomposed ;
+    ] [ >hashtable chain-decomposed ] bi ;
 
-: process-compat ( data -- hash )
+: process-compatibility ( data -- hash )
     (process-decomposed)
-    [ dup first* [ first2 1 tail 2array ] unless ] map
+    [ dup first* [ first2 rest 2array ] unless ] map
+    [ second empty? not ] filter
     >hashtable chain-decomposed ;
 
 : process-combining ( data -- hash )
     3 swap (process-data)
     [ string>number ] assoc-map
-    [ nip zero? not ] assoc-subset
+    [ nip zero? not ] assoc-filter
     >hashtable ;
 
 : categories ( -- names )
     ! For non-existent characters, use Cn
-    { "Lu" "Ll" "Lt" "Lm" "Lo"
+    { "Cn"
+      "Lu" "Ll" "Lt" "Lm" "Lo"
       "Mn" "Mc" "Me"
       "Nd" "Nl" "No"
       "Pc" "Pd" "Ps" "Pe" "Pi" "Pf" "Po"
       "Sm" "Sc" "Sk" "So"
       "Zs" "Zl" "Zp"
-      "Cc" "Cf" "Cs" "Co" "Cn" } ;
+      "Cc" "Cf" "Cs" "Co" } ;
 
-: unicode-chars HEX: 2FA1E ;
+: num-chars HEX: 2FA1E ;
 ! the maximum unicode char in the first 3 planes
 
-: process-category ( data -- category-listing )
-    2 swap (process-data)
-    unicode-chars <byte-array> swap dupd swap [
-        >r over unicode-chars >= [ r> 3drop ]
-        [ categories index swap r> set-nth ] if
-    ] curry assoc-each ;
+: ?set-nth ( val index seq -- )
+    2dup bounds-check? [ set-nth ] [ 3drop ] if ;
+
+:: fill-ranges ( table -- table )
+    name-map >alist sort-values keys
+    [ { [ "first>" tail? ] [ "last>" tail? ] } 1|| ] filter
+    2 group [
+        [ name>char ] bi@ [ [a,b] ] [ table ?nth ] bi
+        [ swap table ?set-nth ] curry each
+    ] assoc-each table ;
+
+:: process-category ( data -- category-listing )
+    [let | table [ num-chars <byte-array> ] |
+        2 data (process-data) [| char cat |
+            cat categories index char table ?set-nth
+        ] assoc-each table fill-ranges ] ;
 
 : ascii-lower ( string -- lower )
     [ dup CHAR: A CHAR: Z between? [ HEX: 20 + ] when ] map ;
@@ -96,7 +128,7 @@ IN: unicode.data
     ] assoc-map >hashtable ;
 
 : multihex ( hexstring -- string )
-    " " split [ hex> ] map [ ] subset ;
+    " " split [ hex> ] map sift ;
 
 TUPLE: code-point lower title upper ;
 
@@ -106,39 +138,44 @@ C: <code-point> code-point
     4 head [ multihex ] map first4
     <code-point> swap first set ;
 
-VALUE: simple-lower
-VALUE: simple-upper
-VALUE: simple-title
-VALUE: canonical-map
-VALUE: combine-map
-VALUE: class-map
-VALUE: compat-map
-VALUE: category-map
-VALUE: name-map
-VALUE: special-casing
+! Extra properties
+: properties-lines ( -- lines )
+    "resource:extra/unicode/data/PropList.txt"
+    ascii file-lines ;
 
-: canonical-entry ( char -- seq ) canonical-map at ;
-: combine-chars ( a b -- char/f ) combine-map hash2 ;
-: compat-entry ( char -- seq ) compat-map at  ;
-: combining-class ( char -- n ) class-map at ;
-: non-starter? ( char -- ? ) class-map key? ;
-: name>char ( string -- char ) name-map at ;
-: char>name ( char -- string ) name-map value-at ;
+: parse-properties ( -- {{[a,b],prop}} )
+    properties-lines filter-comments [
+        split-; first2
+        [ ".." split1 [ dup ] unless* [ hex> ] bi@ 2array ] dip
+    ] { } map>assoc ;
+
+: properties>intervals ( properties -- assoc[str,interval] )
+    dup values prune [ f ] H{ } map>assoc
+    [ [ push-at ] curry assoc-each ] keep
+    [ <interval-set> ] assoc-map ;
+
+: load-properties ( -- assoc )
+    parse-properties properties>intervals ;
 
 ! Special casing data
 : load-special-casing ( -- special-casing )
-    "extra/unicode/SpecialCasing.txt" resource-path data
-    [ length 5 = ] subset
+    "resource:extra/unicode/data/SpecialCasing.txt" data
+    [ length 5 = ] filter
     [ [ set-code-point ] each ] H{ } make-assoc ;
 
-load-data
-dup process-names \ name-map set-value
-13 over process-data \ simple-lower set-value
-12 over process-data tuck \ simple-upper set-value
-14 over process-data swapd assoc-union \ simple-title set-value
-dup process-combining \ class-map set-value
-dup process-canonical \ canonical-map set-value
-    \ combine-map set-value
-dup process-compat \ compat-map set-value
-process-category \ category-map set-value
+load-data {
+    [ process-names \ name-map set-value ]
+    [ 13 swap process-data \ simple-lower set-value ]
+    [ 12 swap process-data \ simple-upper set-value ]
+    [ 14 swap process-data
+        simple-upper assoc-union \ simple-title set-value ]
+    [ process-combining \ class-map set-value ]
+    [ process-canonical \ canonical-map set-value
+        \ combine-map set-value ]
+    [ process-compatibility \ compatibility-map set-value ]
+    [ process-category \ category-map set-value ]
+} cleave
+
 load-special-casing \ special-casing set-value
+
+load-properties \ properties set-value

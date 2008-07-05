@@ -26,30 +26,6 @@ INLINE CELL byte_array_size(CELL size)
 	return sizeof(F_BYTE_ARRAY) + size;
 }
 
-DEFINE_UNTAG(F_BIT_ARRAY,BIT_ARRAY_TYPE,bit_array)
-
-INLINE CELL bit_array_capacity(F_BIT_ARRAY *array)
-{
-	return untag_fixnum_fast(array->capacity);
-}
-
-INLINE CELL bit_array_size(CELL size)
-{
-	return sizeof(F_BIT_ARRAY) + (size + 7) / 8;
-}
-
-DEFINE_UNTAG(F_FLOAT_ARRAY,FLOAT_ARRAY_TYPE,float_array)
-
-INLINE CELL float_array_capacity(F_FLOAT_ARRAY *array)
-{
-	return untag_fixnum_fast(array->capacity);
-}
-
-INLINE CELL float_array_size(CELL size)
-{
-	return sizeof(F_FLOAT_ARRAY) + size * sizeof(double);
-}
-
 INLINE CELL callstack_size(CELL size)
 {
 	return sizeof(F_CALLSTACK) + size;
@@ -141,15 +117,12 @@ DECLARE_PRIMITIVE(tuple);
 DECLARE_PRIMITIVE(tuple_boa);
 DECLARE_PRIMITIVE(tuple_layout);
 DECLARE_PRIMITIVE(byte_array);
-DECLARE_PRIMITIVE(bit_array);
-DECLARE_PRIMITIVE(float_array);
 DECLARE_PRIMITIVE(clone);
 
 F_ARRAY *reallot_array(F_ARRAY* array, CELL capacity, CELL fill);
+F_BYTE_ARRAY *reallot_byte_array(F_BYTE_ARRAY *array, CELL capacity);
 DECLARE_PRIMITIVE(resize_array);
 DECLARE_PRIMITIVE(resize_byte_array);
-DECLARE_PRIMITIVE(resize_bit_array);
-DECLARE_PRIMITIVE(resize_float_array);
 
 F_STRING* allot_string_internal(CELL capacity);
 F_STRING* allot_string(CELL capacity, CELL fill);
@@ -160,24 +133,20 @@ DECLARE_PRIMITIVE(resize_string);
 F_STRING *memory_to_char_string(const char *string, CELL length);
 F_STRING *from_char_string(const char *c_string);
 DLLEXPORT void box_char_string(const char *c_string);
-DECLARE_PRIMITIVE(alien_to_char_string);
 
 F_STRING *memory_to_u16_string(const u16 *string, CELL length);
 F_STRING *from_u16_string(const u16 *c_string);
 DLLEXPORT void box_u16_string(const u16 *c_string);
-DECLARE_PRIMITIVE(alien_to_u16_string);
 
 void char_string_to_memory(F_STRING *s, char *string);
 F_BYTE_ARRAY *string_to_char_alien(F_STRING *s, bool check);
 char* to_char_string(F_STRING *s, bool check);
 DLLEXPORT char *unbox_char_string(void);
-DECLARE_PRIMITIVE(string_to_char_alien);
 
 void u16_string_to_memory(F_STRING *s, u16 *string);
 F_BYTE_ARRAY *string_to_u16_alien(F_STRING *s, bool check);
 u16* to_u16_string(F_STRING *s, bool check);
 DLLEXPORT u16 *unbox_u16_string(void);
-DECLARE_PRIMITIVE(string_to_u16_alien);
 
 /* String getters and setters */
 CELL string_nth(F_STRING* string, CELL index);
@@ -197,15 +166,28 @@ DECLARE_PRIMITIVE(wrapper);
 	CELL result##_count = 0; \
 	CELL result = tag_object(allot_array(ARRAY_TYPE,100,F))
 
-F_ARRAY *growable_add(F_ARRAY *result, CELL elt, CELL *result_count);
+F_ARRAY *growable_array_add(F_ARRAY *result, CELL elt, CELL *result_count);
 
-#define GROWABLE_ADD(result,elt) \
-	result = tag_object(growable_add(untag_object(result),elt,&result##_count))
+#define GROWABLE_ARRAY_ADD(result,elt) \
+	result = tag_object(growable_array_add(untag_object(result),elt,&result##_count))
 
-F_ARRAY *growable_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_count);
+F_ARRAY *growable_array_append(F_ARRAY *result, F_ARRAY *elts, CELL *result_count);
 
-#define GROWABLE_APPEND(result,elts) \
-	result = tag_object(growable_append(untag_object(result),elts,&result##_count))
+#define GROWABLE_ARRAY_APPEND(result,elts) \
+	result = tag_object(growable_array_append(untag_object(result),elts,&result##_count))
 
-#define GROWABLE_TRIM(result) \
+#define GROWABLE_ARRAY_TRIM(result) \
 	result = tag_object(reallot_array(untag_object(result),result##_count,F))
+
+/* Macros to simulate a byte vector in C */
+#define GROWABLE_BYTE_ARRAY(result) \
+	CELL result##_count = 0; \
+	CELL result = tag_object(allot_byte_array(100))
+
+F_ARRAY *growable_byte_array_append(F_BYTE_ARRAY *result, void *elts, CELL len, CELL *result_count);
+
+#define GROWABLE_BYTE_ARRAY_APPEND(result,elts,len) \
+	result = tag_object(growable_byte_array_append(untag_object(result),elts,len,&result##_count))
+
+#define GROWABLE_BYTE_ARRAY_TRIM(result) \
+	result = tag_object(reallot_byte_array(untag_object(result),result##_count))

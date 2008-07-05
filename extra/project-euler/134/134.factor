@@ -1,7 +1,7 @@
 ! Copyright (c) 2007 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel lazy-lists math.algebra math math.functions math.primes
-    math.ranges project-euler.common sequences ;
+USING: arrays kernel lists lists.lazy math.algebra math math.functions
+    math.order math.primes math.ranges project-euler.common sequences ;
 IN: project-euler.134
 
 ! http://projecteuler.net/index.php?section=problems&id=134
@@ -39,7 +39,7 @@ IN: project-euler.134
 PRIVATE>
 
 : euler134 ( -- answer )
-    0 5 lprimes-from uncons [ 1000000 > ] luntil
+    0 5 lprimes-from uncons swap [ 1000000 > ] luntil
     [ [ s + ] keep ] leach drop ;
 
 ! [ euler134 ] 10 ave-time

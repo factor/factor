@@ -1,9 +1,10 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel words sequences generic math namespaces
-quotations assocs combinators math.bitfields inference.backend
-inference.dataflow inference.state classes.tuple.private effects
-inspector hashtables classes generic sets ;
+USING: accessors arrays kernel words sequences generic math
+namespaces quotations assocs combinators math.bitfields
+inference.backend inference.dataflow inference.state
+classes.tuple classes.tuple.private effects summary hashtables
+classes generic sets definitions generic.standard slots.private ;
 IN: inference.transforms
 
 : pop-literals ( n -- rstate seq )
@@ -32,7 +33,7 @@ IN: inference.transforms
         drop [ no-case ]
     ] [
         dup peek quotation? [
-            dup peek swap 1 head*
+            dup peek swap but-last
         ] [
             [ no-case ] swap
         ] if case>quot
@@ -83,24 +84,14 @@ M: duplicated-slots-error summary
 ] 1 define-transform
 
 \ boa [
-    dup +inlined+ depends-on
-    tuple-layout [ <tuple-boa> ] curry
-] 1 define-transform
-
-\ new [
-    1 ensure-values
-    peek-d value? [
-        pop-literal
+    dup tuple-class? [
         dup +inlined+ depends-on
-        tuple-layout [ <tuple> ] curry
-        swap infer-quot
+        [ "boa-check" word-prop ]
+        [ tuple-layout [ <tuple-boa> ] curry ]
+        bi append
     ] [
-        \ new 1 1 <effect> make-call-node
+        \ boa \ no-method boa time-bomb
     ] if
-] "infer" set-word-prop
-
-\ instance? [
-    [ +inlined+ depends-on ] [ "predicate" word-prop ] bi
 ] 1 define-transform
 
 \ (call-next-method) [

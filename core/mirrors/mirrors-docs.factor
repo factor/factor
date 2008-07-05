@@ -13,10 +13,6 @@ $nl
 
 ABOUT: "mirrors"
 
-HELP: object-slots
-{ $values { "obj" object } { "seq" "a sequence of " { $link slot-spec } " instances" } }
-{ $description "Outputs a sequence of slot specifiers for the object." } ;
-
 HELP: mirror
 { $class-description "An associative structure which wraps an object and presents itself as a mapping from slot names to the object's slot values. Mirrors are used to build reflective developer tools."
 $nl
@@ -24,22 +20,19 @@ $nl
 $nl
 "Mirrors are created by calling " { $link <mirror> } " or " { $link make-mirror } "." } ;
 
-HELP: <mirror>
+HELP: <mirror> ( object -- mirror )
 { $values { "object" object } { "mirror" mirror } } 
 { $description "Creates a " { $link mirror } " reflecting an object." }
 { $examples
     { $example
         "USING: assocs mirrors prettyprint ;"
+        "IN: scratchpad"
         "TUPLE: circle center radius ;"
         "C: <circle> circle"
         "{ 100 50 } 15 <circle> <mirror> >alist ."
         "{ { \"delegate\" f } { \"center\" { 100 50 } } { \"radius\" 15 } }"
     }
 } ;
-
-HELP: >mirror<
-{ $values { "mirror" mirror } { "obj" object } { "slots" "a sequence of " { $link slot-spec } " instances" } }
-{ $description "Pushes the object being viewed in the mirror together with its slots." } ;
 
 HELP: make-mirror
 { $values { "obj" object } { "assoc" assoc } }

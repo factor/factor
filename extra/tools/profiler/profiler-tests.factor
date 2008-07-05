@@ -1,11 +1,11 @@
 IN: tools.profiler.tests
-USING: tools.profiler tools.test kernel memory math threads
-alien tools.profiler.private sequences ;
+USING: accessors tools.profiler tools.test kernel memory math
+threads alien tools.profiler.private sequences ;
 
 [ t ] [
-    \ length profile-counter
+    \ length counter>>
     10 [ { } length drop ] times
-    \ length profile-counter =
+    \ length counter>> =
 ] unit-test
 
 [ ] [ [ 10 [ gc ] times ] profile ] unit-test
@@ -20,9 +20,9 @@ alien tools.profiler.private sequences ;
 
 [ ] [ \ + usage-profile. ] unit-test
 
-: callback-test "void" { } "cdecl" [ ] alien-callback ;
+: callback-test ( -- callback ) "void" { } "cdecl" [ ] alien-callback ;
 
-: indirect-test "void" { } "cdecl" alien-indirect ;
+: indirect-test ( callback -- ) "void" { } "cdecl" alien-indirect ;
 
 : foobar ;
 
@@ -31,7 +31,7 @@ alien tools.profiler.private sequences ;
     foobar
 ] profile
 
-[ 1 ] [ \ foobar profile-counter ] unit-test
+[ 1 ] [ \ foobar counter>> ] unit-test
 
 : fooblah { } [ ] each ;
 
@@ -39,6 +39,6 @@ alien tools.profiler.private sequences ;
 
 [ foobaz ] profile
 
-[ 1 ] [ \ foobaz profile-counter ] unit-test
+[ 1 ] [ \ foobaz counter>> ] unit-test
 
-[ 2 ] [ \ fooblah profile-counter ] unit-test
+[ 2 ] [ \ fooblah counter>> ] unit-test

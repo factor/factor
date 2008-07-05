@@ -46,7 +46,7 @@ debugger "gestures" f {
     { T{ button-down } request-focus }
 } define-command-map
 
-: com-traceback error-continuation get traceback-window ;
+: com-traceback ( -- ) error-continuation get traceback-window ;
 
 \ com-traceback H{ { +nullary+ t } } define-command
 

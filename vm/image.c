@@ -28,8 +28,14 @@ INLINE void load_data_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
 
 	F_ZONE *tenured = &data_heap->generations[TENURED];
 
-	if(fread((void*)tenured->start,h->data_size,1,file) != 1)
+	long int bytes_read = fread((void*)tenured->start,1,h->data_size,file);
+
+	if(bytes_read != h->data_size)
+	{
+		fprintf(stderr,"truncated image: %ld bytes read, %ld bytes expected\n",
+			bytes_read,h->data_size);
 		fatal_error("load_data_heap failed",0);
+	}
 
 	tenured->here = tenured->start + h->data_size;
 	data_relocation_base = h->data_relocation_base;
@@ -44,9 +50,16 @@ INLINE void load_code_heap(FILE *file, F_HEADER *h, F_PARAMETERS *p)
 
 	init_code_heap(p->code_size);
 
-	if(h->code_size != 0
-		&& fread(first_block(&code_heap),h->code_size,1,file) != 1)
-		fatal_error("load_code_heap failed",0);
+	if(h->code_size != 0)
+	{
+		long int bytes_read = fread(first_block(&code_heap),1,h->code_size,file);
+		if(bytes_read != h->code_size)
+		{
+			fprintf(stderr,"truncated image: %ld bytes read, %ld bytes expected\n",
+				bytes_read,h->code_size);
+			fatal_error("load_code_heap failed",0);
+		}
+	}
 
 	code_relocation_base = h->code_relocation_base;
 	build_free_list(&code_heap,h->code_size);
@@ -88,7 +101,7 @@ void load_image(F_PARAMETERS *p)
 }
 
 /* Save the current image to disk */
-void save_image(const F_CHAR *filename)
+bool save_image(const F_CHAR *filename)
 {
 	FILE* file;
 	F_HEADER h;
@@ -99,7 +112,7 @@ void save_image(const F_CHAR *filename)
 	if(file == NULL)
 	{
 		fprintf(stderr,"Cannot open image file: %s\n",strerror(errno));
-		return;
+		return false;
 	}
 
 	F_ZONE *tenured = &data_heap->generations[TENURED];
@@ -130,20 +143,22 @@ void save_image(const F_CHAR *filename)
 	if(fwrite((void*)tenured->start,h.data_size,1,file) != 1)
 	{
 		fprintf(stderr,"Save data heap failed: %s\n",strerror(errno));
-		return;
+		return false;
 	}
 
 	if(fwrite(first_block(&code_heap),h.code_size,1,file) != 1)
 	{
 		fprintf(stderr,"Save code heap failed: %s\n",strerror(errno));
-		return;
+		return false;
 	}
 
 	if(fclose(file))
 	{
 		fprintf(stderr,"Failed to close image file: %s\n",strerror(errno));
-		return;
+		return false;
 	}
+
+	return true;
 }
 
 DEFINE_PRIMITIVE(save_image)
@@ -174,10 +189,10 @@ DEFINE_PRIMITIVE(save_image_and_exit)
 	UNREGISTER_C_STRING(path);
 
 	/* Save the image */
-	save_image(path);
-
-	/* now exit; we cannot continue executing like this */
-	exit(0);
+	if(save_image(path))
+		exit(0);
+	else
+		exit(1);
 }
 
 void fixup_word(F_WORD *word)
@@ -288,18 +303,18 @@ void relocate_data()
 	}
 }
 
-void fixup_code_block(F_COMPILED *relocating, CELL code_start,
-	CELL reloc_start, CELL literals_start)
+void fixup_code_block(F_COMPILED *compiled, CELL code_start, CELL literals_start)
 {
 	/* relocate literal table data */
 	CELL scan;
-	CELL literal_end = literals_start + relocating->literals_length;
+	CELL literal_end = literals_start + compiled->literals_length;
+
+	data_fixup(&compiled->relocation);
 
 	for(scan = literals_start; scan < literal_end; scan += CELLS)
 		data_fixup((CELL*)scan);
 
-	if(reloc_start != literals_start)
-		relocate_code_block(relocating,code_start,reloc_start,literals_start);
+	relocate_code_block(compiled,code_start,literals_start);
 }
 
 void relocate_code()

@@ -1,5 +1,5 @@
 
-USING: kernel namespaces
+USING: combinators.short-circuit kernel namespaces
        math
        math.functions
        math.vectors
@@ -104,11 +104,11 @@ VARS: population-label cohesion-label alignment-label separation-label ;
     C[ [ run ] in-thread ] slate> set-slate-graft
     C[ loop off ]          slate> set-slate-ungraft
 
-  "" <label> dup reverse-video-theme >population-label update-population-label
+  "" <label> reverse-video-theme >population-label update-population-label
 
-  "" <label> dup reverse-video-theme >cohesion-label   update-cohesion-label
-  "" <label> dup reverse-video-theme >alignment-label  update-alignment-label
-  "" <label> dup reverse-video-theme >separation-label update-separation-label
+  "" <label> reverse-video-theme >cohesion-label   update-cohesion-label
+  "" <label> reverse-video-theme >alignment-label  update-alignment-label
+  "" <label> reverse-video-theme >separation-label update-separation-label
 
   <frame>
 

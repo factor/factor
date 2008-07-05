@@ -3,27 +3,27 @@
 USING: arrays generic hashtables kernel kernel.private
 math namespaces sequences words quotations layouts combinators
 sequences.private classes classes.builtin classes.algebra
-definitions ;
+definitions math.order ;
 IN: generic.math
 
 PREDICATE: math-class < class
     dup null bootstrap-word eq? [
         drop f
     ] [
-        number bootstrap-word class<
+        number bootstrap-word class<=
     ] if ;
 
 : last/first ( seq -- pair ) [ peek ] [ first ] bi 2array ;
 
 : math-precedence ( class -- pair )
     {
-        { [ dup null class< ] [ drop { -1 -1 } ] }
+        { [ dup null class<= ] [ drop { -1 -1 } ] }
         { [ dup math-class? ] [ class-types last/first ] }
         [ drop { 100 100 } ]
     } cond ;
     
 : math-class-max ( class class -- class )
-    [ [ math-precedence ] compare 0 > ] most ;
+    [ [ math-precedence ] compare +gt+ eq? ] most ;
 
 : (math-upgrade) ( max class -- quot )
     dupd = [ drop [ ] ] [ "coercer" word-prop [ ] or ] if ;

@@ -1,77 +1,96 @@
 ! Copyright (C) 2004, 2005 Mackenzie Straight.
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: accessors alien alien.accessors alien.c-types
+alien.syntax kernel libc math sequences byte-arrays strings
+hints accessors math.order destructors combinators ;
 IN: io.buffers
-USING: alien alien.accessors alien.c-types alien.syntax kernel
-kernel.private libc math sequences byte-arrays strings hints
-accessors ;
 
-TUPLE: buffer size ptr fill pos ;
+TUPLE: buffer
+{ size fixnum }
+{ ptr simple-alien }
+{ fill fixnum }
+{ pos fixnum }
+disposed ;
 
 : <buffer> ( n -- buffer )
-    dup malloc 0 0 buffer boa ;
+    dup malloc 0 0 f buffer boa ;
 
-: buffer-free ( buffer -- )
-    dup buffer-ptr free  f swap set-buffer-ptr ;
+M: buffer dispose* ptr>> free ;
 
 : buffer-reset ( n buffer -- )
-    0 swap { set-buffer-fill set-buffer-pos } set-slots ;
-
-: buffer-consume ( n buffer -- )
-    [ buffer-pos + ] keep
-    [ buffer-fill min ] keep
-    [ set-buffer-pos ] keep
-    dup buffer-pos over buffer-fill >= [
-        0 over set-buffer-pos
-        0 over set-buffer-fill
-    ] when drop ;
-
-: buffer@ ( buffer -- alien )
-    dup buffer-pos swap buffer-ptr <displaced-alien> ;
-
-: buffer-end ( buffer -- alien )
-    dup buffer-fill swap buffer-ptr <displaced-alien> ;
-
-: buffer-peek ( buffer -- byte )
-    buffer@ 0 alien-unsigned-1 ;
-
-: buffer-pop ( buffer -- byte )
-    dup buffer-peek 1 rot buffer-consume ;
-
-: (buffer-read) ( n buffer -- byte-array )
-    [ [ fill>> ] [ pos>> ] bi - min ] keep
-    buffer@ swap memory>byte-array ;
-
-: buffer-read ( n buffer -- byte-array )
-    [ (buffer-read) ] [ buffer-consume ] 2bi ;
-
-: buffer-length ( buffer -- n )
-    [ fill>> ] [ pos>> ] bi - ;
+    swap >>fill 0 >>pos drop ;
 
 : buffer-capacity ( buffer -- n )
-    [ size>> ] [ fill>> ] bi - ;
+    [ size>> ] [ fill>> ] bi - ; inline
 
 : buffer-empty? ( buffer -- ? )
     fill>> zero? ;
 
-: extend-buffer ( n buffer -- )
-    2dup buffer-ptr swap realloc
-    over set-buffer-ptr set-buffer-size ;
+: buffer-consume ( n buffer -- )
+    [ + ] change-pos
+    dup [ pos>> ] [ fill>> ] bi <
+    [ 0 >>pos 0 >>fill ] unless drop ; inline
 
-: check-overflow ( n buffer -- )
-    2dup buffer-capacity > [ extend-buffer ] [ 2drop ] if ;
+: buffer-peek ( buffer -- byte )
+    [ ptr>> ] [ pos>> ] bi alien-unsigned-1 ; inline
 
-: >buffer ( byte-array buffer -- )
-    over length over check-overflow
-    [ buffer-end byte-array>memory ] 2keep
-    [ buffer-fill swap length + ] keep set-buffer-fill ;
+: buffer-pop ( buffer -- byte )
+    [ buffer-peek ] [ 1 swap buffer-consume ] bi ;
 
-: byte>buffer ( byte buffer -- )
-    1 over check-overflow
-    [ buffer-end 0 set-alien-unsigned-1 ] keep
-    [ 1+ ] change-fill drop ;
+HINTS: buffer-pop buffer ;
+
+: buffer-length ( buffer -- n )
+    [ fill>> ] [ pos>> ] bi - ; inline
+
+: buffer@ ( buffer -- alien )
+    [ pos>> ] [ ptr>> ] bi <displaced-alien> ;
+
+: buffer-read ( n buffer -- byte-array )
+    [ buffer-length min ] keep
+    [ buffer@ ] [ buffer-consume ] 2bi
+    swap memory>byte-array ;
+
+HINTS: buffer-read fixnum buffer ;
+
+: buffer-end ( buffer -- alien )
+    [ fill>> ] [ ptr>> ] bi <displaced-alien> ; inline
 
 : n>buffer ( n buffer -- )
-    [ buffer-fill + ] keep 
-    [ buffer-size > [ "Buffer overflow" throw ] when ] 2keep
-    set-buffer-fill ;
+    [ + ] change-fill drop ; inline
+
+HINTS: n>buffer fixnum buffer ;
+
+: >buffer ( byte-array buffer -- )
+    [ buffer-end byte-array>memory ]
+    [ [ length ] dip n>buffer ]
+    2bi ;
+
+HINTS: >buffer byte-array buffer ;
+
+: byte>buffer ( byte buffer -- )
+    [ [ ptr>> ] [ fill>> ] bi set-alien-unsigned-1 ]
+    [ 1 swap n>buffer ]
+    bi ;
+
+HINTS: byte>buffer fixnum buffer ;
+
+: search-buffer-until ( pos fill ptr separators -- n )
+    [ [ swap alien-unsigned-1 ] dip memq? ] 2curry find-from drop ;
+
+: finish-buffer-until ( buffer n -- byte-array separator )
+    [
+        over pos>> -
+        over buffer-read
+        swap buffer-pop
+    ] [
+        [ buffer-length ] keep
+        buffer-read f
+    ] if* ;
+
+: buffer-until ( separators buffer -- byte-array separator )
+    swap [ { [ ] [ pos>> ] [ fill>> ] [ ptr>> ] } cleave ] dip
+    search-buffer-until
+    finish-buffer-until ;
+
+HINTS: buffer-until { string buffer } ;

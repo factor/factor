@@ -12,8 +12,7 @@ ARTICLE: "io.encodings" "I/O encodings"
 ARTICLE: "encodings-constructors" "Manually constructing an encoded stream"
 "The following words can be used to construct encoded streams. Note that they are usually not used directly, but rather by the stream constructors themselves. Most stream constructors take an encoding descriptor as a parameter and internally call these constructors."
 { $subsection <encoder> }
-{ $subsection <decoder> }
-{ $subsection <encoder-duplex> } ;
+{ $subsection <decoder> } ;
 
 HELP: <encoder>
 { $values { "stream" "an output stream" }
@@ -29,24 +28,15 @@ HELP: <decoder>
 { $description "Wraps the given stream in a new stream using the given encoding for all input. The encoding descriptor can either be a class or an instance of something conforming to the " { $link "encodings-protocol" } "." }
 $low-level-note ;
 
-HELP: <encoder-duplex>
-{ $values { "stream-in" "an input stream" }
-    { "stream-out" "an output stream" }
-    { "encoding" "an encoding descriptor" }
-    { "duplex" "an encoded duplex stream" } }
-{ $description "Wraps the given streams in an encoder or decoder stream, and puts them together in a duplex stream for input and output. If either input stream is already encoded, that encoding is stripped off before it is reencoded. The encoding descriptor must conform to the " { $link "encodings-protocol" } "." }
-$low-level-note ;
-
-{ <encoder> <decoder> <encoder-duplex> } related-words
-
 ARTICLE: "encodings-descriptors" "Encoding descriptors"
 "An encoding descriptor is something which can be used for input or output streams to encode or decode files. It must conform to the " { $link "encodings-protocol" } ". Encodings which you can use are defined in the following vocabularies:"
-{ $vocab-subsection "ASCII" "io.encodings.ascii" }
-{ $vocab-subsection "Binary" "io.encodings.binary" }
+{ $subsection "io.encodings.binary" }
+{ $subsection "io.encodings.utf8" }
+{ $subsection "io.encodings.utf16" }
 { $vocab-subsection "Strict encodings" "io.encodings.strict" }
+"Legacy encodings:"
 { $vocab-subsection "8-bit encodings" "io.encodings.8-bit" }
-{ $vocab-subsection "UTF-8" "io.encodings.utf8" }
-{ $vocab-subsection "UTF-16" "io.encodings.utf16" }
+{ $vocab-subsection "ASCII" "io.encodings.ascii" }
 { $see-also "encodings-introduction" } ;
 
 ARTICLE: "encodings-protocol" "Encoding protocol"

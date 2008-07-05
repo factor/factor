@@ -48,7 +48,7 @@ SYMBOL: elements
 
 TUPLE: element syntax id tag tagclass encoding contentlength newobj objtype ;
 
-: <element> element new ;
+: <element> ( -- element ) element new ;
 
 : set-id ( -- boolean )
     read1 dup elements get set-element-id ;
@@ -98,7 +98,7 @@ DEFER: read-ber
 
 SYMBOL: end
 
-: (read-array) ( stream -- )
+: (read-array) ( -- )
     elements get element-id [
         elements get element-syntax read-ber
         dup end = [ drop ] [ , (read-array) ] if
@@ -106,7 +106,7 @@ SYMBOL: end
 
 : read-array ( -- array ) [ (read-array) ] { } make ;
 
-: set-case ( -- )
+: set-case ( -- object )
     elements get element-newobj
     elements get element-objtype {
         { "boolean" [ "\0" = not ] }

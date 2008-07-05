@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel alien system combinators alien.syntax namespaces
+USING: kernel arrays alien system combinators alien.syntax namespaces
        alien.c-types sequences vocabs.loader shuffle combinators.lib
        openal.backend ;
 IN: openal
@@ -235,17 +235,17 @@ SYMBOL: init
 
 : init-openal ( -- )
   init get-global expired? [
-    f f alutInit drop
+    f f alutInit 0 = [ "Could not initialize OpenAL" throw ] when
     1337 <alien> init set-global
   ] when ;
 
 : exit-openal ( -- )
   init get-global expired? [
-    alutExit drop
+    alutExit 0 = [ "Could not close OpenAL" throw ] when
     f init set-global
   ] unless ;
 
-: <uint-array> "ALuint" <c-array> ;
+: <uint-array> ( n -- byte-array ) "ALuint" <c-array> ;
 
 : gen-sources ( size -- seq )
   dup <uint-array> 2dup alGenSources swap c-uint-array> ;
@@ -265,6 +265,12 @@ os macosx? "openal.macosx" "openal.other" ? require
 : create-buffer-from-wav ( filename -- buffer )
   gen-buffer dup rot load-wav-file
   [ alBufferData ] 4keep alutUnloadWAV ;
+
+: queue-buffers ( source buffers -- )
+    [ length ] [ >c-uint-array ] bi alSourceQueueBuffers ;
+
+: queue-buffer ( source buffer -- )
+    1array queue-buffers ;
 
 : set-source-param ( source param value -- )
   alSourcei ;

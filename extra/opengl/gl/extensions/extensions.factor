@@ -1,6 +1,6 @@
 USING: alien alien.syntax combinators kernel parser sequences
 system words namespaces hashtables init math arrays assocs
-continuations ;
+continuations lexer ;
 IN: opengl.gl.extensions
 
 ERROR: unknown-gl-platform ;
@@ -43,6 +43,6 @@ reset-gl-function-number-counter
     scan drop "}" parse-tokens swap prefix
     gl-function-number
     [ gl-function-pointer ] 2curry swap
-    ";" parse-tokens [ "()" subseq? not ] subset
+    ";" parse-tokens [ "()" subseq? not ] filter
     define-indirect
     ; parsing

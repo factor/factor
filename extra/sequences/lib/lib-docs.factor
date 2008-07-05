@@ -19,21 +19,22 @@ HELP: each-withn
 } 
 { $see-also map-withn } ;
 
-HELP: sigma
-{ $values { "seq" sequence } { "quot" quotation } { "n" number } }
-{ $description "Like map sum, but without creating an intermediate sequence." }
+HELP: if-seq
+{ $values { "seq" sequence } { "quot1" quotation } { "quot2" quotation } }
+{ $description "Makes an implicit check if the sequence is empty.  If the sequence has any elements, " { $snippet "quot1" } " is called on it.  Otherwise, the empty sequence is dropped and " { $snippet "quot2" } " is called." }
 { $example
-    "! Find the sum of the squares [0,99]"
-    "USING: math math.ranges sequences.lib prettyprint ;"
-    "100 [1,b] [ sq ] sigma ."
-    "338350"
+    "USING: kernel prettyprint sequences sequences.lib ;"
+    "{ 1 2 3 } [ sum ] [ \"empty sequence\" throw ] if-seq ."
+    "6"
 } ;
 
-HELP: count
-{ $values { "seq" sequence } { "quot" quotation } { "n" integer } }
-{ $description "Efficiently returns the number of elements that the predicate quotation matches." }
+HELP: if-empty
+{ $values { "seq" sequence } { "quot1" quotation } { "quot2" quotation } }
+{ $description "Makes an implicit check if the sequence is empty. An empty sequence is dropped and " { $snippet "quot1" } " is called. Otherwise, if the sequence has any elements, " { $snippet "quot2" } " is called on it." }
 { $example
-    "USING: math math.ranges sequences.lib prettyprint ;"
-    "100 [1,b] [ even? ] count ."
-    "50"
+    "USING: kernel prettyprint sequences sequences.lib ;"
+    "{ 1 2 3 } [ \"empty sequence\" ] [ sum ] if-empty ."
+    "6"
 } ;
+
+{ if-seq if-empty } related-words

@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs kernel math models namespaces
+USING: accessors arrays assocs kernel math models namespaces
 sequences words strings system hashtables math.parser
 math.vectors classes.tuple classes ui.gadgets boxes
-calendar alarms symbols combinators sets ;
+calendar alarms symbols combinators sets columns ;
 IN: ui.gestures
 
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;
@@ -54,7 +54,7 @@ TUPLE: zoom-in-action ;  C: <zoom-in-action> zoom-in-action
 TUPLE: zoom-out-action ; C: <zoom-out-action> zoom-out-action
 
 : generalize-gesture ( gesture -- newgesture )
-    tuple>array 1 head* >tuple ;
+    clone f >># ;
 
 ! Modifiers
 SYMBOLS: C+ A+ M+ S+ ;
@@ -111,7 +111,8 @@ SYMBOL: double-click-timeout
     ] if ;
 
 : drag-gesture ( -- )
-    hand-buttons get-global first <drag> button-gesture ;
+    hand-buttons get-global
+    dup empty? [ drop ] [ first <drag> button-gesture ] if ;
 
 SYMBOL: drag-timer
 
@@ -172,7 +173,7 @@ SYMBOL: drag-timer
     ] if ;
 
 : modifier ( mod modifiers -- seq )
-    [ second swap bitand 0 > ] with subset
+    [ second swap bitand 0 > ] with filter
     0 <column> prune dup empty? [ drop f ] [ >array ] if ;
 
 : drag-loc ( -- loc )
@@ -191,7 +192,7 @@ SYMBOL: drag-timer
     dup hand-last-button get = ;
 
 : multi-click-position? ( -- ? )
-    hand-loc get hand-click-loc get v- norm 10 <= ;
+    hand-loc get hand-click-loc get v- norm-sq 100 <= ;
 
 : multi-click? ( button -- ? )
     {
@@ -261,7 +262,7 @@ SYMBOL: drag-timer
 GENERIC: gesture>string ( gesture -- string/f )
 
 : modifiers>string ( modifiers -- string )
-    [ word-name ] map concat >string ;
+    [ name>> ] map concat >string ;
 
 M: key-down gesture>string
     dup key-down-mods modifiers>string

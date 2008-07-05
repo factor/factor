@@ -72,7 +72,7 @@ big-endian on
 ] rc-relative-ppc-3 rt-xt 0 jit-word-jump jit-define
 
 : jit-call-quot ( -- )
-    temp-reg quot-reg quot-xt@ LWZ             ! load quotation-xt
+    temp-reg quot-reg quot-xt-offset LWZ       ! load quotation-xt
     temp-reg MTCTR                             ! jump to quotation-xt
     BCTR ;
 
@@ -93,7 +93,7 @@ big-endian on
     temp-reg ds-reg 0 LWZ                      ! load index
     temp-reg dup 1 SRAWI                       ! turn it into an array offset
     quot-reg dup temp-reg ADD                  ! compute quotation location
-    quot-reg dup array-start LWZ               ! load quotation
+    quot-reg dup array-start-offset LWZ        ! load quotation
     ds-reg dup 4 SUBI                          ! pop index
     jit-call-quot
 ] rc-absolute-ppc-2/2 rt-literal 1 jit-dispatch jit-define

@@ -1,7 +1,7 @@
 ! Copyright (C) 2006 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math namespaces sequences words io
-io.streams.string math.vectors ui.gadgets ;
+io.streams.string math.vectors ui.gadgets columns ;
 IN: ui.gadgets.grids
 
 TUPLE: grid children gap fill? ;
@@ -27,7 +27,7 @@ TUPLE: grid children gap fill? ;
 : pref-dim-grid ( grid -- dims )
     grid-children [ [ pref-dim ] map ] map ;
 
-: (compute-grid) [ max-dim ] map ;
+: (compute-grid) ( grid -- seq ) [ max-dim ] map ;
 
 : compute-grid ( grid -- horiz vert )
     pref-dim-grid dup flip (compute-grid) swap (compute-grid) ;

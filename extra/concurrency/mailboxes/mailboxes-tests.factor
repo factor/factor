@@ -1,7 +1,7 @@
 IN: concurrency.mailboxes.tests
 USING: concurrency.mailboxes concurrency.count-downs vectors
 sequences threads tools.test math kernel strings namespaces
-continuations calendar ;
+continuations calendar destructors ;
 
 [ V{ 1 2 3 } ] [
     0 <vector>

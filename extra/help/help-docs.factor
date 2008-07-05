@@ -1,5 +1,5 @@
 USING: help.markup help.crossref help.stylesheet help.topics
-help.syntax definitions io prettyprint inspector arrays math
+help.syntax definitions io prettyprint summary arrays math
 sequences vocabs ;
 IN: help
 
@@ -84,6 +84,7 @@ $nl
     { "or an array of the form " { $snippet "{ $directive content... }" } ", where " { $snippet "$directive" } " is a markup word whose name starts with " { $snippet "$" } ", and " { $snippet "content..." } " is a series of markup elements" }
 }
 { $subsection "element-types" }
+{ $subsection "printing-elements" }
 "Related words can be cross-referenced:"
 { $subsection related-words }
 { $see-also "help.lint" } ;
@@ -113,7 +114,7 @@ ARTICLE: "help" "Help system"
 "The help system maintains documentation written in a simple markup language, along with cross-referencing and search. Documentation can either exist as free-standing " { $emphasis "articles" } " or be associated with words."
 { $subsection "browsing-help" }
 { $subsection "writing-help" }
-{ $subsection "help.lint" }
+{ $vocab-subsection "Help lint tool" "help.lint" }
 { $subsection "help-impl" } ;
 
 IN: help
@@ -126,7 +127,7 @@ HELP: $title
 HELP: help
 { $values { "topic" "an article name or a word" } }
 { $description
-    "Displays a help article or documentation associated to a word on the " { $link stdio } " stream."
+    "Displays a help article or documentation associated to a word on " { $link output-stream } "."
 } ;
 
 HELP: about
@@ -151,7 +152,7 @@ HELP: $index
 
 HELP: ($index)
 { $values { "articles" "a sequence of help articles" } }
-{ $description "Writes a list of " { $link $subsection } " elements to the " { $link stdio } " stream." } ;
+{ $description "Writes a list of " { $link $subsection } " elements to " { $link output-stream } "." } ;
 
 HELP: xref-help
 { $description "Update help cross-referencing. Usually this is done automatically." } ;
@@ -168,11 +169,11 @@ HELP: $predicate
 
 HELP: print-element
 { $values { "element" "a markup element" } }
-{ $description "Prints a markup element to the " { $link stdio } " stream." } ;
+{ $description "Prints a markup element to " { $link output-stream } "." } ;
 
 HELP: print-content
 { $values { "element" "a markup element" } }
-{ $description "Prints a top-level markup element to the " { $link stdio } " stream." } ;
+{ $description "Prints a top-level markup element to " { $link output-stream } "." } ;
 
 HELP: simple-element
 { $class-description "Class of simple elements, which are just arrays of elements." } ;

@@ -1,4 +1,4 @@
-USING: kernel parser strings math namespaces sequences words io
+USING: kernel parser lexer strings math namespaces sequences words io
 arrays quotations debugger kernel.private sequences.private ;
 IN: state-machine
 
@@ -11,8 +11,8 @@ IN: state-machine
 
 TUPLE: state place data ;
 
-TUPLE: missing-state ;
-: missing-state \ missing-state new throw ;
+ERROR: missing-state ;
+
 M: missing-state error.
     drop "Missing state" print ;
 

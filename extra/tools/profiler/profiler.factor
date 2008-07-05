@@ -1,6 +1,6 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: words sequences math prettyprint kernel arrays io
+USING: accessors words sequences math prettyprint kernel arrays io
 io.styles namespaces assocs kernel.private strings combinators
 sorting math.parser vocabs definitions tools.profiler.private
 continuations generic ;
@@ -10,7 +10,7 @@ IN: tools.profiler
     [ t profiling call ] [ f profiling ] [ ] cleanup ;
 
 : counters ( words -- assoc )
-    [ dup profile-counter ] { } map>assoc ;
+    [ dup counter>> ] { } map>assoc ;
 
 GENERIC: (profile.) ( obj -- )
 
@@ -39,7 +39,7 @@ M: method-body (profile.)
     ] with-row ;
 
 : counters. ( assoc -- )
-    [ second 0 > ] subset sort-values
+    [ second 0 > ] filter sort-values
     standard-table-style [
         [ counter. ] assoc-each
     ] tabular-output ;
@@ -58,14 +58,14 @@ M: method-body (profile.)
     "Call counts for words which call " write
     dup pprint
     ":" print
-    usage [ word? ] subset counters counters. ;
+    smart-usage [ word? ] filter counters counters. ;
 
 : vocabs-profile. ( -- )
     "Call counts for all vocabularies:" print
     vocabs [
         dup words
-        [ "predicating" word-prop not ] subset
-        [ profile-counter ] map sum
+        [ "predicating" word-prop not ] filter
+        [ counter>> ] map sum
     ] { } map>assoc counters. ;
 
 : method-profile. ( -- )

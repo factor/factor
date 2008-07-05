@@ -39,13 +39,18 @@ IN: memoize
     over H{ } clone "memoize" set-word-prop
     over make-memoizer define ;
 
-: MEMO:
-    CREATE-WORD parse-definition define-memoized ; parsing
+: MEMO: (:) define-memoized ; parsing
 
 PREDICATE: memoized < word "memoize" word-prop ;
 
 M: memoized definer drop \ MEMO: \ ; ;
+
 M: memoized definition "memo-quot" word-prop ;
+
+M: memoized reset-word
+    [ call-next-method ]
+    [ { "memoize" "memo-quot" } reset-props ]
+    bi ;
 
 : memoize-quot ( quot effect -- memo-quot )
     gensym swap dupd "declared-effect" set-word-prop
@@ -53,3 +58,6 @@ M: memoized definition "memo-quot" word-prop ;
 
 : reset-memoized ( word -- )
     "memoize" word-prop clear-assoc ;
+
+: invalidate-memoized ( inputs... word -- )
+    [ #in packer call ] [ "memoize" word-prop delete-at ] bi ;

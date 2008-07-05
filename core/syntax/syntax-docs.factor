@@ -138,29 +138,9 @@ ARTICLE: "syntax-quots" "Quotation syntax"
 { $subsection POSTPONE: ] }
 "Quotations are documented in " { $link "quotations" } "." ;
 
-ARTICLE: "syntax-bit-arrays" "Bit array syntax"
-{ $subsection POSTPONE: ?{ }
-"Bit arrays are documented in " { $link "bit-arrays" } "." ;
-
-ARTICLE: "syntax-float-arrays" "Float array syntax"
-{ $subsection POSTPONE: F{ }
-"Float arrays are documented in " { $link "float-arrays" } "." ;
-
 ARTICLE: "syntax-byte-arrays" "Byte array syntax"
 { $subsection POSTPONE: B{ }
 "Byte arrays are documented in " { $link "byte-arrays" } "." ;
-
-ARTICLE: "syntax-bit-vectors" "Bit vector syntax"
-{ $subsection POSTPONE: ?V{ }
-"Bit vectors are documented in " { $link "bit-vectors" } "." ;
-
-ARTICLE: "syntax-float-vectors" "Float vector syntax"
-{ $subsection POSTPONE: FV{ }
-"Float vectors are documented in " { $link "float-vectors" } "." ;
-
-ARTICLE: "syntax-byte-vectors" "Byte vector syntax"
-{ $subsection POSTPONE: BV{ }
-"Byte vectors are documented in " { $link "byte-vectors" } "." ;
 
 ARTICLE: "syntax-pathnames" "Pathname syntax"
 { $subsection POSTPONE: P" }
@@ -177,14 +157,9 @@ $nl
 { $subsection "syntax-quots" }
 { $subsection "syntax-arrays" }
 { $subsection "syntax-strings" }
-{ $subsection "syntax-bit-arrays" }
 { $subsection "syntax-byte-arrays" }
-{ $subsection "syntax-float-arrays" }
 { $subsection "syntax-vectors" }
 { $subsection "syntax-sbufs" }
-{ $subsection "syntax-bit-vectors" }
-{ $subsection "syntax-byte-vectors" }
-{ $subsection "syntax-float-vectors" }
 { $subsection "syntax-hashtables" }
 { $subsection "syntax-tuples" }
 { $subsection "syntax-pathnames" } ;
@@ -205,7 +180,7 @@ HELP: delimiter
 HELP: parsing
 { $syntax ": foo ... ; parsing" }
 { $description "Declares the most recently defined word as a parsing word." }
-{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example "USE: io" "<< : hello \"Hello parser!\" print ; parsing >>\n: world hello ;" "Hello parser!" } } ;
+{ $examples "In the below example, the " { $snippet "world" } " word is never called, however its body references a parsing word which executes immediately:" { $example "USE: io" "IN: scratchpad" "<< : hello \"Hello parser!\" print ; parsing >>\n: world hello ;" "Hello parser!" } } ;
 
 HELP: inline
 { $syntax ": foo ... ; inline" }
@@ -291,36 +266,6 @@ HELP: B{
 { $description "Marks the beginning of a literal byte array. Literal byte arrays are terminated by " { $link POSTPONE: } } "." } 
 { $examples { $code "B{ 1 2 3 }" } } ;
 
-HELP: BV{
-{ $syntax "BV{ elements... }" }
-{ $values { "elements" "a list of bytes" } }
-{ $description "Marks the beginning of a literal byte vector. Literal byte vectors are terminated by " { $link POSTPONE: } } "." } 
-{ $examples { $code "BV{ 1 2 3 12 }" } } ;
-
-HELP: ?{
-{ $syntax "?{ elements... }" }
-{ $values { "elements" "a list of booleans" } }
-{ $description "Marks the beginning of a literal bit array. Literal bit arrays are terminated by " { $link POSTPONE: } } "." } 
-{ $examples { $code "?{ t f t }" } } ;
-
-HELP: ?V{
-{ $syntax "?V{ elements... }" }
-{ $values { "elements" "a list of booleans" } }
-{ $description "Marks the beginning of a literal bit vector. Literal bit vectors are terminated by " { $link POSTPONE: } } "." } 
-{ $examples { $code "?V{ t f t }" } } ;
-
-HELP: FV{
-{ $syntax "FV{ elements... }" }
-{ $values { "elements" "a list of real numbers" } }
-{ $description "Marks the beginning of a literal float vector. Literal float vectors are terminated by " { $link POSTPONE: } } "." } 
-{ $examples { $code "FV{ 1.0 2.0 3.0 }" } } ;
-
-HELP: F{
-{ $syntax "F{ elements... }" }
-{ $values { "elements" "a list of real numbers" } }
-{ $description "Marks the beginning of a literal float array. Literal float arrays are terminated by " { $link POSTPONE: } } "." } 
-{ $examples { $code "F{ 1.0 2.0 3.0 }" } } ;
-
 HELP: H{
 { $syntax "H{ { key value }... }" }
 { $values { "key" "an object" } { "value" "an object" } }
@@ -352,9 +297,9 @@ HELP: POSTPONE:
 { $notes "This word is used inside parsing words to delegate further action to another parsing word, and to refer to parsing words literally from literal arrays and such." } ;
 
 HELP: :
-{ $syntax ": word definition... ;" }
+{ $syntax ": word ( stack -- effect ) definition... ;" }
 { $values { "word" "a new word to define" } { "definition" "a word definition" } }
-{ $description "Defines a word in the current vocabulary." }
+{ $description "Defines a word with the given stack effect in the current vocabulary. The stack effect is optional for words which only push literals on the stack." }
 { $examples { $code ": ask-name ( -- name )\n    \"What is your name? \" write readln ;\n: greet ( name -- )\n    \"Greetings, \" write print ;\n: friend ( -- )\n    ask-name greet ;" } } ;
 
 { POSTPONE: : POSTPONE: ; define } related-words
@@ -371,7 +316,7 @@ HELP: SYMBOL:
 { $syntax "SYMBOL: word" }
 { $values { "word" "a new word to define" } }
 { $description "Defines a new symbol word in the current vocabulary. Symbols push themselves on the stack when executed, and are used to identify variables (see " { $link "namespaces" } ") as well as for storing crufties in word properties (see " { $link "word-props" } ")." }
-{ $examples { $example "USE: prettyprint" "SYMBOL: foo\nfoo ." "foo" } } ;
+{ $examples { $example "USE: prettyprint" "IN: scratchpad" "SYMBOL: foo\nfoo ." "foo" } } ;
 
 { define-symbol POSTPONE: SYMBOL: } related-words
 
@@ -379,7 +324,7 @@ HELP: \
 { $syntax "\\ word" }
 { $values { "word" "a word" } }
 { $description "Reads the next word from the input and appends a wrapper holding the word to the parse tree. When the evaluator encounters a wrapper, it pushes the wrapped word literally on the data stack." }
-{ $examples "The following two lines are equivalent:" { $code "0 \\ <vector> execute\n0 <vector>" } } ;
+{ $examples "The following two lines are equivalent:" { $code "0 \\ <vector> execute\n0 <vector>" } "If " { $snippet "foo" } " is a symbol, the following two lines are equivalent:" { $code "foo" "\\ foo" } } ;
 
 HELP: DEFER:
 { $syntax "DEFER: word" }
@@ -446,7 +391,21 @@ HELP: (
 { $syntax "( inputs -- outputs )" }
 { $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
 { $description "Declares the stack effect of the most recently defined word, storing a new " { $link effect } " instance in the " { $snippet "\"declared-effect\"" } " word property." }
-{ $notes "Recursive words must have a declared stack effect to compile. See " { $link "effect-declaration" } " for details." } ;
+{ $notes "All words except those only pushing literals on the stack must have a stack effect declaration. See " { $link "effect-declaration" } " for details." } ;
+
+HELP: ((
+{ $syntax "(( inputs -- outputs ))" }
+{ $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
+{ $description "Literal stack effect syntax." }
+{ $notes "Useful for meta-programming with " { $link define-declared } "." }
+{ $examples
+    { $code
+        "SYMBOL: my-dynamic-word"
+        "USING: math random words ;"
+        "3 { [ + ] [ - ] [ * ] [ / ] } random curry"
+        "(( x -- y )) define-declared"
+    }
+} ;
 
 HELP: !
 { $syntax "! comment..." }
@@ -505,6 +464,7 @@ HELP: HOOK:
 { $examples
     { $example
         "USING: io namespaces ;"
+        "IN: scratchpad"
         "SYMBOL: transport"
         "TUPLE: land-transport ;"
         "TUPLE: air-transport ;"
@@ -528,14 +488,17 @@ HELP: M:
 HELP: UNION:
 { $syntax "UNION: class members... ;" }
 { $values { "class" "a new class word to define" } { "members" "a list of class words separated by whitespace" } }
-{ $description "Defines a union class. An object is an instance of a union class if it is an instance of one of its members." }
-{ $notes "Union classes are used to associate the same method with several different classes, as well as to conveniently define predicates." } ;
+{ $description "Defines a union class. An object is an instance of a union class if it is an instance of one of its members." } ;
+
+HELP: INTERSECTION:
+{ $syntax "INTERSECTION: class participants... ;" }
+{ $values { "class" "a new class word to define" } { "participants" "a list of class words separated by whitespace" } }
+{ $description "Defines an intersection class. An object is an instance of a union class if it is an instance of all of its participants." } ;
 
 HELP: MIXIN:
 { $syntax "MIXIN: class" }
 { $values { "class" "a new class word to define" } }
 { $description "Defines a mixin class. A mixin is similar to a union class, except it has no members initially, and new members can be added with the " { $link POSTPONE: INSTANCE: } " word." }
-{ $notes "Mixins classes are used to mark implementations of a protocol and define default methods." }
 { $examples "The " { $link sequence } " and " { $link assoc } " mixin classes." } ;
 
 HELP: INSTANCE:
@@ -555,12 +518,50 @@ HELP: PREDICATE:
         "it satisfies the predicate"
     }
     "Each predicate must be defined as a subclass of some other class. This ensures that predicates inheriting from disjoint classes do not need to be exhaustively tested during method dispatch."
+}
+{ $examples
+    { $code "USING: math ;" "PREDICATE: positive < integer 0 > ;" }
 } ;
 
 HELP: TUPLE:
 { $syntax "TUPLE: class slots... ;" "TUPLE: class < superclass slots ... ;" }
-{ $values { "class" "a new tuple class to define" } { "slots" "a list of slot names" } }
-{ $description "Defines a new tuple class. The superclass is optional; if left unspecified, it defaults to " { $link tuple } "." } ;
+{ $values { "class" "a new tuple class to define" } { "slots" "a list of slot specifiers" } }
+{ $description "Defines a new tuple class."
+$nl
+"The superclass is optional; if left unspecified, it defaults to " { $link tuple } "."
+$nl
+"Slot specifiers take one of the following three forms:"
+{ $list
+    { { $snippet "name" } " - a slot which can hold any object, with no attributes" }
+    { { $snippet "{ \"name\" attributes... }" } " - a slot which can hold any object, with optional attributes" }
+    { { $snippet "{ \"name\" class attributes... }" } " - a slot specialized to a specific class, with optional attributes" }
+}
+"Slot attributes are lists of slot attribute specifiers followed by values; a slot attribute specifier is one of " { $link initial: } " or " { $link read-only } ". See " { $link "tuple-declarations" } " for details." }
+{ $examples
+    "A simple tuple class:"
+    { $code "TUPLE: color red green blue ;" }
+    "Declaring slots to be integer-valued:"
+    { $code "TUPLE: color" "{ \"red\" integer }" "{ \"green\" integer }" "{ \"blue\" integer } ;" }
+    "An example mixing short and long slot specifiers:"
+    { $code "TUPLE: person" "{ \"age\" integer initial: 0 }" "{ \"department\" string initial: \"Marketing\" }" "manager ;" }
+} ;
+
+HELP: initial:
+{ $syntax "TUPLE: ... { \"slot\" initial: value } ... ;" }
+{ $values { "slot" "a slot name" } { "value" "any literal" } }
+{ $description "Specifies an initial value for a tuple slot." } ;
+
+HELP: read-only
+{ $syntax "TUPLE: ... { \"slot\" read-only } ... ;" }
+{ $values { "slot" "a slot name" } }
+{ $description "Defines a tuple slot to be read-only. If a tuple has read-only slots, instances of the tuple should only be created by calling " { $link boa } ", instead of " { $link new } ". Using " { $link boa } " is the only way to set the value of a read-only slot." } ;
+
+{ initial: read-only } related-words
+
+HELP: SLOT:
+{ $syntax "SLOT: name" }
+{ $values { "name" "a slot name" } }
+{ $description "Defines a protocol slot; that is, defines the accessor words for a slot named " { $snippet "slot" } " without associating it with any specific tuple." } ;
 
 HELP: ERROR:
 { $syntax "ERROR: class slots... ;" }
