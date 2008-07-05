@@ -138,7 +138,8 @@ ERROR: bad-superclass class ;
     dup boa-check-quot "boa-check" set-word-prop ;
 
 : tuple-prototype ( class -- prototype )
-    [ all-slots [ initial>> ] map ] keep slots>tuple ;
+    [ all-slots [ initial>> ] map ] keep
+    over [ ] contains? [ slots>tuple ] [ 2drop f ] if ;
 
 : define-tuple-prototype ( class -- )
     dup tuple-prototype "prototype" set-word-prop ;
@@ -317,7 +318,8 @@ M: tuple hashcode*
     ] recursive-hashcode ;
 
 M: tuple-class new
-    "prototype" word-prop (clone) ;
+    dup "prototype" word-prop
+    [ (clone) ] [ tuple-layout <tuple> ] ?if ;
 
 M: tuple-class boa
     [ "boa-check" word-prop call ]
