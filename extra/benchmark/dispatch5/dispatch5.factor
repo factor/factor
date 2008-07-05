@@ -1,4 +1,4 @@
-USING: classes kernel sequences vocabs math ;
+USING: classes classes.tuple kernel sequences vocabs math ;
 IN: benchmark.dispatch5
 
 MIXIN: g
