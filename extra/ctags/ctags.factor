@@ -4,7 +4,7 @@
 ! Simple Ctags generator
 ! Alfredo Beaumont <alfredo.beaumont@gmail.com>
 
-USING: kernel sequences io io.files io.backend
+USING: arrays kernel sequences io io.files io.backend
 io.encodings.ascii math.parser vocabs definitions
 namespaces words sorting ;
 IN: ctags
@@ -24,7 +24,7 @@ IN: ctags
 : (ctags) ( -- seq )
   { } all-words [
     dup where [
-      { } 2sequence suffix
+      2array suffix
     ] [
       drop
     ] if*
