@@ -228,6 +228,12 @@ M: fixnum '
     bootstrap-most-positive-fixnum between?
     [ tag-fixnum ] [ >bignum ' ] if ;
 
+TUPLE: fake-bignum n ;
+
+C: <fake-bignum> fake-bignum
+
+M: fake-bignum ' n>> tag-fixnum ;
+
 ! Floats
 
 M: float '
