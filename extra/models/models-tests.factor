@@ -1,5 +1,6 @@
 IN: models.tests
-USING: arrays generic kernel math models namespaces sequences assocs
+USING: arrays generic kernel math models models.compose
+namespaces sequences assocs
 tools.test ;
 
 TUPLE: model-tester hit? ;
