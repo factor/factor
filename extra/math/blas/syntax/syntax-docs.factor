@@ -2,10 +2,12 @@ USING: help.markup help.syntax math.blas.matrices math.blas.vectors multiline ;
 IN: math.blas.syntax
 
 ARTICLE: "math.blas.syntax" "BLAS interface literal syntax"
+"Vectors:"
 { $subsection POSTPONE: svector{ }
 { $subsection POSTPONE: dvector{ }
 { $subsection POSTPONE: cvector{ }
 { $subsection POSTPONE: zvector{ }
+"Matrices:"
 { $subsection POSTPONE: smatrix{ }
 { $subsection POSTPONE: dmatrix{ }
 { $subsection POSTPONE: cmatrix{ }
