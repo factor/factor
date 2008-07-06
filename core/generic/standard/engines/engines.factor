@@ -1,15 +1,15 @@
-USING: assocs kernel namespaces quotations generic math
-sequences combinators words classes.algebra ;
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: assocs kernel kernel.private namespaces quotations
+generic math sequences combinators words classes.algebra arrays
+;
 IN: generic.standard.engines
 
 SYMBOL: default
 SYMBOL: assumed
+SYMBOL: (dispatch#)
 
 GENERIC: engine>quot ( engine -- quot )
-
-M: quotation engine>quot ;
-
-M: method-body engine>quot 1quotation ;
 
 : engines>quots ( assoc -- assoc' )
     [ engine>quot ] assoc-map ;
@@ -35,8 +35,6 @@ M: method-body engine>quot 1quotation ;
     ] [
         r> execute r> pick set-at
     ] if ; inline
-
-SYMBOL: (dispatch#)
 
 : (picker) ( n -- quot )
     {

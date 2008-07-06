@@ -4,6 +4,12 @@ USING: math accessors kernel sequences.private sequences arrays
 combinators combinators.short-circuit parser prettyprint.backend ;
 IN: persistent-vectors
 
+<PRIVATE
+
+TUPLE: node { children array } { level fixnum } ;
+
+PRIVATE>
+
 ERROR: empty-error pvec ;
 
 GENERIC: ppush ( val seq -- seq' )
@@ -18,13 +24,12 @@ GENERIC: new-nth ( val i seq -- seq' )
 
 M: sequence new-nth clone [ set-nth ] keep ;
 
-TUPLE: persistent-vector count root tail ;
+TUPLE: persistent-vector
+{ count fixnum }
+{ root node initial: T{ node f { } 1 } }
+{ tail node initial: T{ node f { } 0 } } ;
 
 M: persistent-vector length count>> ;
-
-<PRIVATE
-
-TUPLE: node children level ;
 
 : node-size 32 ; inline
 
@@ -33,12 +38,12 @@ TUPLE: node children level ;
 : node-shift -5 * shift ; inline
 
 : node-nth ( i node -- obj )
-    [ node-mask ] [ children>> ] bi* nth ; inline
+    [ node-mask ] [ children>> ] bi* nth ;
 
 : body-nth ( i node -- i node' )
     dup level>> [
         dupd [ level>> node-shift ] keep node-nth
-    ] times ; inline
+    ] times ;
 
 : tail-offset ( pvec -- n )
     [ count>> ] [ tail>> children>> length ] bi - ;
@@ -58,9 +63,7 @@ M: persistent-vector nth-unsafe
     children>> length node-size = ;
 
 : 1node ( val level -- node )
-    node new
-        swap >>level
-        swap 1array >>children ;
+    [ 1array ] dip node boa ;
 
 : 2node ( first second -- node )
     [ 2array ] [ drop level>> 1+ ] 2bi node boa ;
@@ -123,6 +126,10 @@ M: persistent-vector new-nth ( obj i pvec -- pvec' )
         ] if
     ] if ;
 
+! The pop code is really convoluted. I don't understand Rich Hickey's
+! original code. It uses a 'Box' out parameter which is passed around
+! inside a recursive function, and gets mutated along the way to boot.
+! Super-confusing.
 : ppop-tail ( pvec -- pvec' )
     [ clone [ ppop ] change-children ] change-tail ;
 
@@ -137,10 +144,12 @@ M: persistent-vector new-nth ( obj i pvec -- pvec' )
 
 : (ppop-new-tail) ( root -- root' tail' )
     dup level>> 1 > [
-        dup children>> peek (ppop-new-tail) over
-        [ [ swap node-set-last ] dip ]
-        [ 2drop ppop-contraction ]
-        if
+        dup children>> peek (ppop-new-tail) [
+            dup
+            [ swap node-set-last ]
+            [ drop ppop-contraction drop ]
+            if
+        ] dip
     ] [
         ppop-contraction
     ] if ;
@@ -159,13 +168,10 @@ M: persistent-vector new-nth ( obj i pvec -- pvec' )
 
 PRIVATE>
 
-: pempty ( -- pvec )
-    T{ persistent-vector f 0 T{ node f { } 1 } T{ node f { } 0 } } ; inline
-
 M: persistent-vector ppop ( pvec -- pvec' )
     dup count>> {
         { 0 [ empty-error ] }
-        { 1 [ drop pempty ] }
+        { 1 [ drop T{ persistent-vector } ] }
         [
             [
                 clone
@@ -176,12 +182,13 @@ M: persistent-vector ppop ( pvec -- pvec' )
     } case ;
 
 M: persistent-vector like
-    drop pempty [ swap ppush ] reduce ;
+    drop T{ persistent-vector } [ swap ppush ] reduce ;
 
 M: persistent-vector equal?
     over persistent-vector? [ sequence= ] [ 2drop f ] if ;
 
-: >persistent-vector ( seq -- pvec ) pempty like ; inline
+: >persistent-vector ( seq -- pvec )
+    T{ persistent-vector } like ;
 
 : PV{ \ } [ >persistent-vector ] parse-literal ; parsing
 
