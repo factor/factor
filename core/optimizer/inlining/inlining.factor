@@ -191,6 +191,10 @@ DEFER: (flat-length)
 : apply-identities ( node -- node/f )
     dup find-identity f splice-quot ;
 
+: splice-word-def ( #call word def -- node )
+    [ drop +inlined+ depends-on ] [ swap 1array ] 2bi
+    splice-quot ;
+
 : optimistic-inline? ( #call -- ? )
     dup node-param "specializer" word-prop dup [
         >r node-input-classes r> specialized-length tail*
@@ -199,22 +203,20 @@ DEFER: (flat-length)
         2drop f
     ] if ;
 
-: splice-word-def ( #call word -- node )
-    dup +inlined+ depends-on
-    dup def>> swap 1array splice-quot ;
+: already-inlined? ( #call -- ? )
+    [ param>> ] [ history>> ] bi memq? ;
 
 : optimistic-inline ( #call -- node )
-    dup node-param over node-history memq? [
-        drop t
-    ] [
-        dup node-param splice-word-def
+    dup already-inlined? [ drop t ] [
+        dup param>> dup def>> splice-word-def
     ] if ;
 
 : should-inline? ( word -- ? )
     flat-length 11 <= ;
 
 : method-body-inline? ( #call -- ? )
-    node-param dup method-body? [ should-inline? ] [ drop f ] if ;
+    param>> dup [ method-body? ] [ "default" word-prop not ] bi and
+    [ should-inline? ] [ drop f ] if ;
 
 M: #call optimize-node*
     {

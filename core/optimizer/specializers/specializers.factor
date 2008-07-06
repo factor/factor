@@ -18,13 +18,6 @@ IN: optimizer.specializers
         unclip [ swap [ f ] \ if 3array append [ ] like ] reduce
     ] if ;
 
-: tag-specializer ( quot -- newquot )
-    [
-        [ dup tag ] %
-        num-tags get swap <array> ,
-        \ dispatch ,
-    ] [ ] make ;
-
 : specializer-cases ( quot word -- default alist )
     dup [ array? ] all? [ 1array ] unless [
         [ make-specializer ] keep
@@ -39,11 +32,7 @@ IN: optimizer.specializers
     method-declaration [ declare ] curry prepend ;
 
 : specialize-quot ( quot specializer -- quot' )
-    dup { number } = [
-        drop tag-specializer
-    ] [
-        specializer-cases alist>quot
-    ] if ;
+    specializer-cases alist>quot ;
 
 : standard-method? ( method -- ? )
     dup method-body? [
