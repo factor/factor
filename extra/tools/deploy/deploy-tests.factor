@@ -12,42 +12,36 @@ namespaces continuations layouts accessors ;
     ] with-directory ;
 
 : small-enough? ( n -- ? )
-    >r "test.image" temp-file file-info size>> r> <= ;
+    >r "test.image" temp-file file-info size>> r> cell 4 / * <= ;
 
 [ ] [ "hello-world" shake-and-bake ] unit-test
 
-[ t ] [
-    cell 8 = 8 5 ? 100000 * small-enough?
-] unit-test
+[ t ] [ 500000 small-enough? ] unit-test
 
 [ ] [ "sudoku" shake-and-bake ] unit-test
 
-[ t ] [
-    cell 8 = 20 10 ? 100000 * small-enough?
-] unit-test
+[ t ] [ 800000 small-enough? ] unit-test
 
 [ ] [ "hello-ui" shake-and-bake ] unit-test
+
+[ t ] [ 1300000 small-enough? ] unit-test
 
 [ "staging.math-compiler-ui-strip.image" ] [
     "hello-ui" deploy-config
     [ bootstrap-profile staging-image-name file-name ] bind
 ] unit-test
 
-[ t ] [
-    cell 8 = 35 17 ? 100000 * small-enough?
-] unit-test
-
 [ ] [ "maze" shake-and-bake ] unit-test
 
-[ t ] [
-    cell 8 = 30 15 ? 100000 * small-enough?
-] unit-test
+[ t ] [ 1200000 small-enough? ] unit-test
+
+[ ] [ "tetris" shake-and-bake ] unit-test
+
+[ t ] [ 1500000 small-enough? ] unit-test
 
 [ ] [ "bunny" shake-and-bake ] unit-test
 
-[ t ] [
-    cell 8 = 50 30 ? 100000 * small-enough?
-] unit-test
+[ t ] [ 2500000 small-enough? ] unit-test
 
 {
     "tools.deploy.test.1"

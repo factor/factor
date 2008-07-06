@@ -2,20 +2,31 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs words sequences arrays compiler
 tools.time io.styles io prettyprint vocabs kernel sorting
-generator optimizer math math.order ;
+generator optimizer math math.order math.statistics combinators ;
 IN: report.optimizer
 
 : count-optimization-passes ( nodes n -- n )
     >r optimize-1
     [ r> 1+ count-optimization-passes ] [ drop r> ] if ;
 
-: results
-    [ [ second ] prepose compare ] curry sort 20 tail*
-    print
+: table. ( alist -- )
+    20 short tail*
     standard-table-style
     [
         [ [ [ pprint-cell ] each ] with-row ] each
-    ] tabular-output ; inline
+    ] tabular-output ;
+
+: results ( results quot title -- )
+    print
+    [ second ] prepose
+    [ [ compare ] curry sort table. ]
+    [
+        map
+        [ "Mean: " write mean >float . ]
+        [ "Median: " write median >float . ]
+        [ "Standard deviation: " write std >float . ]
+        tri
+    ] 2bi ; inline
 
 : optimizer-measurements ( -- alist )
     all-words [ compiled>> ] filter
@@ -26,8 +37,10 @@ IN: report.optimizer
     ] { } map>assoc ;
 
 : optimizer-measurements. ( alist -- )
-    [ [ first ] "Worst number of optimizer passes:" results ]
-    [ [ second ] "Worst compile times:" results ] bi ;
+    {
+        [ [ first ] "Optimizer passes:" results ]
+        [ [ second ] "Compile times:" results ]
+    } cleave ;
 
 : optimizer-report ( -- )
     optimizer-measurements optimizer-measurements. ;

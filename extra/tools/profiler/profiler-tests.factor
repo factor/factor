@@ -1,6 +1,6 @@
 IN: tools.profiler.tests
 USING: accessors tools.profiler tools.test kernel memory math
-threads alien tools.profiler.private sequences ;
+threads alien tools.profiler.private sequences compiler.units ;
 
 [ t ] [
     \ length counter>>
@@ -42,3 +42,15 @@ threads alien tools.profiler.private sequences ;
 [ 1 ] [ \ foobaz counter>> ] unit-test
 
 [ 2 ] [ \ fooblah counter>> ] unit-test
+
+: recompile-while-profiling-test ( -- ) ;
+
+[ ] [
+    [
+        333 [ recompile-while-profiling-test ] times
+        { recompile-while-profiling-test } compile
+        333 [ recompile-while-profiling-test ] times
+    ] profile
+] unit-test
+
+[ 666 ] [ \ recompile-while-profiling-test counter>> ] unit-test

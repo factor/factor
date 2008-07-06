@@ -65,10 +65,6 @@ HELP: classes
 { $values { "seq" "a sequence of class words" } }
 { $description "Finds all class words in the dictionary." } ;
 
-HELP: tuple-class
-{ $class-description "The class of tuple class words." }
-{ $examples { $example "USING: classes prettyprint ;" "IN: scratchpad" "TUPLE: name title first last ;" "name tuple-class? ." "t" } } ;
-
 HELP: update-map
 { $var-description "Assoc mapping each class to a set of classes defined in terms of this class. The " { $link define-class } " word uses this information to update generic words when classes are redefined." } ;
 

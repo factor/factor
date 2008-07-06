@@ -1,8 +1,8 @@
 USING: accessors alien arrays definitions generic generic.standard
 generic.math assocs hashtables io kernel math namespaces parser
 prettyprint sequences strings tools.test vectors words
-quotations classes classes.algebra continuations layouts
-classes.union sorting compiler.units ;
+quotations classes classes.algebra classes.tuple continuations
+layouts classes.union sorting compiler.units ;
 IN: generic.tests
 
 GENERIC: foobar ( x -- y )

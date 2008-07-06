@@ -5,10 +5,10 @@ IN: models
 HELP: model
 { $class-description "A mutable cell holding a single value. When the value is changed, a sequence of connected objects are notified. Models have the following slots:"
     { $list
-        { { $link model-value } " - the value of the model. Use " { $link set-model } " to change the value." }
-        { { $link model-connections } " - a sequence of objects implementing the " { $link model-changed } " generic word, to be notified when the model's value changes." }
-        { { $link model-dependencies } " - a sequence of models which should have this model added to their sequence of connections when activated." }
-        { { $link model-ref } " - a reference count tracking the number of models which depend on this one." }
+        { { $snippet "value" } " - the value of the model. Use " { $link set-model } " to change the value." }
+        { { $snippet "connections" } " - a sequence of objects implementing the " { $link model-changed } " generic word, to be notified when the model's value changes." }
+        { { $snippet "dependencies" } " - a sequence of models which should have this model added to their sequence of connections when activated." }
+        { { $snippet "ref" } " - a reference count tracking the number of models which depend on this one." }
     }
 "Other classes may delegate to " { $link model } "."
 } ;
@@ -79,84 +79,6 @@ HELP: (change-model)
 { $description "Applies the quotation to the current value of the model to yield a new value, then changes the value of the model to the new value without notifying any observers registered with " { $link add-connection } "." }
 { $notes "There are very few reasons for user code to call this word. Instead, call " { $link change-model } ", which notifies observers." } ;
 
-HELP: filter
-{ $class-description "Filter model values are computed by applying a quotation to the value of another model. Filters are automatically updated when the underlying model changes. Filters are constructed by " { $link <filter> } "." }
-{ $examples
-    "The following code displays a label showing the result of applying " { $link sq } " to the value 5:"
-    { $code
-        "USING: models ui.gadgets.labels ui.gadgets.panes ;"
-        "5 <model> [ sq ] <filter> [ number>string ] <filter>"
-        "<label-control> gadget."
-    }
-    "An exercise for the reader is to keep the original model around on the stack, and change its value to 6, observing that the label will immediately display 36."
-} ;
-
-HELP: <filter>
-{ $values { "model" model } { "quot" "a quotation with stack effect " { $snippet "( obj -- newobj )" } } { "filter" "a new " { $link filter } } }
-{ $description "Creates a new instance of " { $link filter } ". The value of the new filter model is computed by applying the quotation to the value." }
-{ $examples "See the example in the documentation for " { $link filter } "." } ;
-
-HELP: compose
-{ $class-description "Composed model values are computed by collecting the values from a sequence of underlying models into a new sequence. Composed models are automatically updated when underlying models change. Composed models are constructed by " { $link <compose> } "."
-$nl
-"A composed model whose children are all " { $link "models-range" } " conforms to the " { $link "range-model-protocol" } " and represents a point in n-dimensional space which is bounded by a rectangle." }
-{ $examples
-    "The following code displays a pair of sliders, and an updating label showing their current values:"
-    { $code
-        "USING: models ui.gadgets.labels ui.gadgets.sliders ui.gadgets.panes ;"
-        ": <funny-slider> <x-slider> 100 over set-slider-max ;"
-        "<funny-slider> <funny-slider> 2array"
-        "dup make-pile gadget."
-        "dup [ gadget-model ] map <compose> [ unparse ] <filter>"
-        "<label-control> gadget."
-    }
-} ;
-
-HELP: <compose>
-{ $values { "models" "a sequence of models" } { "compose" "a new " { $link compose } } }
-{ $description "Creates a new instance of " { $link compose } ". The value of the new compose model is obtained by mapping " { $link model-value } " over the given sequence of models." }
-{ $examples "See the example in the documentation for " { $link compose } "." } ;
-
-HELP: history
-{ $class-description "History models record a timeline of previous values on calls to " { $link add-history } ", and can travel back and forth on the timeline with " { $link go-back } " and " { $link go-forward } ". History models are constructed by " { $link <history> } "." } ;
-
-HELP: <history>
-{ $values { "value" object } { "history" "a new " { $link history } } }
-{ $description "Creates a new history model with an initial value." } ;
-
-{ <history> add-history go-back go-forward } related-words
-
-HELP: go-back
-{ $values { "history" history } }
-{ $description "Restores the previous value and calls " { $link model-changed } " on all observers registered with " { $link add-connection } "." } ;
-
-HELP: go-forward
-{ $values { "history" history } }
-{ $description "Restores the value set prior to the last call to " { $link go-back } " and calls " { $link model-changed } " on all observers registered with " { $link add-connection } "." } ;
-
-HELP: add-history
-{ $values { "history" history } }
-{ $description "Adds the current value to the history." } ;
-
-HELP: delay
-{ $class-description "Delay models have the same value as their underlying model, however the value only changes after a timer expires. If the underlying model's value changes again before the timer expires, the timer restarts. Delay models are constructed by " { $link <delay> } "." }
-{ $examples
-    "The following code displays a sliders and a label which is updated half a second after the slider stops changing:"
-    { $code
-        "USING: models ui.gadgets.labels ui.gadgets.sliders ui.gadgets.panes calendar ;"
-        ": <funny-slider>"
-        "    0 0 0 100 <range> <x-slider> 500 over set-slider-max ;"
-        "<funny-slider> dup gadget."
-        "gadget-model 1/2 seconds <delay> [ number>string ] <filter>"
-        "<label-control> gadget."
-    }
-} ;
-
-HELP: <delay>
-{ $values { "model" model } { "timeout" duration } { "delay" delay } }
-{ $description "Creates a new instance of " { $link delay } ". The timeout must elapse from the time the underlying model last changed to when the delay model value is changed and its connections are notified." }
-{ $examples "See the example in the documentation for " { $link delay } "." } ;
-
 HELP: range-value
 { $values { "model" model } { "value" object } }
 { $contract "Outputs the current value of a range model." } ;
@@ -197,40 +119,6 @@ HELP: set-range-max-value
 { $description "Sets the maximum value of a range model." }
 { $side-effects "model" } ;
 
-HELP: range
-{ $class-description "Range models implement the " { $link "range-model-protocol" } " with real numbers as the minimum, current, maximum, and page size. Range models are created with " { $link <range> } "." }
-{ $notes { $link "ui.gadgets.sliders" } " use range models." } ;
-
-HELP: range-model
-{ $values { "range" range } { "model" model } }
-{ $description "Outputs a model holding a range model's current value." }
-{ $notes "This word is not part of the " { $link "range-model-protocol" } ", and can only be used on direct instances of " { $link range } "." } ;
-
-HELP: range-min
-{ $values { "range" range } { "model" model } }
-{ $description "Outputs a model holding a range model's minimum value." }
-{ $notes "This word is not part of the " { $link "range-model-protocol" } ", and can only be used on direct instances of " { $link range } "." } ;
-
-HELP: range-max
-{ $values { "range" range } { "model" model } }
-{ $description "Outputs a model holding a range model's maximum value." }
-{ $notes "This word is not part of the " { $link "range-model-protocol" } ", and can only be used on direct instances of " { $link range } "." } ;
-
-HELP: range-page
-{ $values { "range" range } { "model" model } }
-{ $description "Outputs a model holding a range model's page size." }
-{ $notes "This word is not part of the " { $link "range-model-protocol" } ", and can only be used on direct instances of " { $link range } "." } ;
-
-HELP: move-by
-{ $values { "amount" real } { "range" range } }
-{ $description "Adds a number to a range model's current value." }
-{ $side-effects "range" } ;
-
-HELP: move-by-page
-{ $values { "amount" real } { "range" range } }
-{ $description "Adds a multiple of the page size to a range model's current value." }
-{ $side-effects "range" } ;
-
 ARTICLE: "models" "Models"
 "The " { $vocab-link "models" } " vocabulary provides basic support for dataflow programming. A model is an observable value. Changing a model's value notifies other objects which depend on the model automatically, and models may depend on each other's values."
 $nl
@@ -246,60 +134,10 @@ $nl
 "When using models which are not associated with controls (or when unit testing controls), you must activate and deactivate models manually:"
 { $subsection activate-model }
 { $subsection deactivate-model }
-"Special types of models:"
-{ $subsection "models-filter" }
-{ $subsection "models-compose" }
-{ $subsection "models-history" }
-{ $subsection "models-delay" }
-{ $subsection "models-range" }
 { $subsection "models-impl" } ;
 
-ARTICLE: "models-filter" "Filter models"
-"Filter model values are computed by applying a quotation to the value of another model."
-{ $subsection filter }
-{ $subsection <filter> } ;
-
-ARTICLE: "models-compose" "Composed models"
-"Composed model values are computed by collecting the values from a sequence of underlying models into a new sequence."
-{ $subsection compose }
-{ $subsection <compose> } ;
-
-ARTICLE: "models-history" "History models"
-"History models record previous values."
-{ $subsection history }
-{ $subsection <history> }
-"Recording history:"
-{ $subsection add-history }
-"Navigating the history:"
-{ $subsection go-back }
-{ $subsection go-forward } ;
-
-ARTICLE: "models-delay" "Delay models"
-"Delay models are used to implement delayed updating of gadgets in response to user input."
-{ $subsection delay }
-{ $subsection <delay> } ;
-
-ARTICLE: "models-range" "Range models"
-"Range models ensure their value is a real number within a fixed range."
-{ $subsection range }
-{ $subsection <range> }
-"Range models conform to a protocol for getting and setting the current value, as well as the endpoints of the range."
-{ $subsection "range-model-protocol" } ;
-
-ARTICLE: "range-model-protocol" "Range model protocol"
-"The range model protocol is implemented by the " { $link range } " and " { $link compose } " classes. User-defined models may implement it too."
-{ $subsection range-value          }
-{ $subsection range-page-value     } 
-{ $subsection range-min-value      } 
-{ $subsection range-max-value      } 
-{ $subsection range-max-value*     } 
-{ $subsection set-range-value      } 
-{ $subsection set-range-page-value } 
-{ $subsection set-range-min-value  } 
-{ $subsection set-range-max-value  } ;
-
 ARTICLE: "models-impl" "Implementing models"
-"New types of models can be defined, along the lines of " { $link filter } " and such."
+"New types of models can be defined, for example see " { $vocab-link "models.filter" } "."
 $nl
 "Models can execute hooks when activated:"
 { $subsection model-activated }
