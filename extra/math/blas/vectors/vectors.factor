@@ -135,7 +135,7 @@ PRIVATE>
     [ length>> 0 ]
     [ (blas-vector-like) ] tri ;
 
-: <empty-vector> ( length exemplar -- <empty-vector> )
+: <empty-vector> ( length exemplar -- vector )
     [ element-type <c-array> ]
     [ 1 swap ] 2bi
     (blas-vector-like) ;
@@ -285,5 +285,13 @@ METHOD: Viamax { float-complex-blas-vector }
 METHOD: Viamax { double-complex-blas-vector }
     (prepare-nrm2) cblas_izamax ;
 
-: Vamax ( v -- max )
+: Vamax ( x -- max )
     [ Viamax ] keep nth ; inline
+
+: Vsub ( v start length -- vsub )
+    rot [
+        [
+            nip [ inc>> ] [ element-type heap-size ] [ data>> ] tri
+            [ * * ] dip <displaced-alien>
+        ] [ swap 2nip ] [ 2nip inc>> ] 3tri
+    ] keep (blas-vector-like) ;

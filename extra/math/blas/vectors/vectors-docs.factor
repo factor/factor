@@ -1,6 +1,32 @@
 USING: alien byte-arrays help.markup help.syntax sequences ;
 IN: math.blas.vectors
 
+ARTICLE: "math.blas.vectors" "BLAS interface vector operations"
+"Slicing vectors:"
+{ $subsection Vsub }
+"Taking the norm (magnitude) of a vector:"
+{ $subsection Vnorm }
+"Summing and taking the maximum of elements:"
+{ $subsection Vasum }
+{ $subsection Viamax }
+{ $subsection Vamax }
+"Scalar-vector products:"
+{ $subsection n*V-in-place }
+{ $subsection n*V }
+{ $subsection V*n }
+{ $subsection V/n }
+{ $subsection Vneg }
+"Vector addition:" 
+{ $subsection n*V+V-in-place }
+{ $subsection n*V+V }
+{ $subsection V+ }
+{ $subsection V- }
+"Vector inner products:"
+{ $subsection V. }
+{ $subsection V.conj } ;
+
+ABOUT: "math.blas.vectors"
+
 HELP: blas-vector-base
 { $class-description "The base class for all BLAS vector types. Objects of this type should not be created directly; instead, instantiate one of the typed subclasses:"
 { $list
@@ -100,4 +126,6 @@ HELP: V/n
 
 { n*V+V-in-place n*V-in-place n*V+V n*V V+ V- Vneg V*n V/n } related-words
 
-
+HELP: Vsub
+{ $values { "v" "a BLAS vector inheriting from " { $link blas-vector-base } } { "start" "The index of the first element of the slice" } { "length" "The length of the slice" } }
+{ $description "Slice a subvector out of " { $snippet "v" } " with the given length. The subvector will share storage with the parent vector." } ;

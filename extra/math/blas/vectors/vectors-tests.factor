@@ -171,3 +171,10 @@ unit-test
 [ -6.0 ] [ dvector{ 1.0 -5.0 4.0 -6.0 -1.0 } Vamax ] unit-test
 [ C{ 2.0 -5.0 } ] [ cvector{ C{ 2.0 -5.0 } 4.0 -6.0 -1.0 } Vamax ] unit-test
 [ C{ 2.0 -5.0 } ] [ zvector{ C{ 2.0 -5.0 } 4.0 -6.0 -1.0 } Vamax ] unit-test
+
+! Vsub
+
+[ svector{ -5.0 4.0 -6.0 } ] [ svector{ 1.0 -5.0 4.0 -6.0 -1.0 } 1 3 Vsub ] unit-test
+[ dvector{ -5.0 4.0 -6.0 } ] [ dvector{ 1.0 -5.0 4.0 -6.0 -1.0 } 1 3 Vsub ] unit-test
+[ cvector{ -5.0 C{ 4.0 3.0 } -6.0 } ] [ cvector{ 1.0 -5.0 C{ 4.0 3.0 } -6.0 -1.0 } 1 3 Vsub ] unit-test
+[ zvector{ -5.0 C{ 4.0 3.0 } -6.0 } ] [ zvector{ 1.0 -5.0 C{ 4.0 3.0 } -6.0 -1.0 } 1 3 Vsub ] unit-test

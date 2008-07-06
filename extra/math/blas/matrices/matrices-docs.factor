@@ -1,8 +1,17 @@
 USING: alien byte-arrays help.markup help.syntax math.blas.vectors sequences ;
 IN: math.blas.matrices
 
-ARTICLE: "math.blas" "Basic Linear Algebra Subroutines (BLAS) interface"
+ARTICLE: "math.blas-summary" "Basic Linear Algebra Subroutines (BLAS) interface"
 "Factor provides an interface to high-performance vector and matrix math routines available in the system's BLAS library. A set of specialized types are provided for handling packed, unboxed vector data:"
+{ $subsection "math.blas-types" }
+"Scalar-vector and vector-vector operations are available in the " { $vocab-link "math.blas.vectors" } " vocabulary:"
+{ $subsection "math.blas.vectors" }
+"Vector-matrix and matrix-matrix operations are available in the " { $vocab-link "math.blas.matrices" } " vocabulary:"
+{ $subsection "math.blas.matrices" }
+"The low-level BLAS C interface can be accessed directly through the " { $vocab-link "math.blas.cblas" } " vocabulary." ;
+
+ARTICLE: "math.blas-types" "BLAS interface types"
+"BLAS vectors come in single- and double-precision, real and complex flavors:"
 { $subsection float-blas-vector }
 { $subsection double-blas-vector }
 { $subsection float-complex-blas-vector }
@@ -11,30 +20,54 @@ ARTICLE: "math.blas" "Basic Linear Algebra Subroutines (BLAS) interface"
 { $subsection float-blas-matrix }
 { $subsection double-blas-matrix }
 { $subsection float-complex-blas-matrix }
-{ $subsection double-complex-blas-matrix }
-"Matrices can be transposed, broken down into sequences of row or column vectors, or sliced into rectangular submatrices:"
+{ $subsection double-complex-blas-matrix } 
+"Syntax words are provided for constructing literal vectors and matrices in the " { $vocab-link "math.blas.syntax" } " vocabulary:"
+{ $subsection "math.blas.syntax" }
+"There are BOA constructors for all vector and matrix types, which provide the most flexibility in specifying memory layout:"
+{ $subsection <float-blas-vector> }
+{ $subsection <double-blas-vector> }
+{ $subsection <float-complex-blas-vector> }
+{ $subsection <double-complex-blas-vector> }
+{ $subsection <float-blas-matrix> }
+{ $subsection <double-blas-matrix> }
+{ $subsection <float-complex-blas-matrix> }
+{ $subsection <double-complex-blas-matrix> }
+"For the simple case of creating a dense, zero-filled vector or matrix, simple empty object constructors are provided:"
+{ $subsection <empty-vector> }
+{ $subsection <empty-matrix> } ;
+
+ARTICLE: "math.blas.matrices" "BLAS interface matrix operations"
+"Transposing and slicing matrices:"
 { $subsection Mtranspose }
 { $subsection Mrows }
 { $subsection Mcols }
 { $subsection Msub }
-"Scalar-vector and vector-vector operations are available in the " { $vocab-link "math.blas.vectors" } " vocabulary:"
-{ $subsection Vnorm }
-{ $subsection Vasum }
-{ $subsection Viamax }
-{ $subsection n*V }
-{ $subsection V+ }
-{ $subsection V- }
-{ $subsection V. }
-{ $subsection V.conj }
-"Vector-matrix and matrix-matrix operations are available in the " { $vocab-link "math.blas.matrices" } " vocabulary:"
+"Matrix-vector products:"
+{ $subsection n*M.V+n*V-in-place }
+{ $subsection n*M.V+n*V }
+{ $subsection n*M.V }
 { $subsection M.V }
+"Vector outer products:"
+{ $subsection n*V(*)V+M-in-place }
+{ $subsection n*V(*)Vconj+M-in-place }
+{ $subsection n*V(*)V+M }
+{ $subsection n*V(*)Vconj+M }
+{ $subsection n*V(*)V }
+{ $subsection n*V(*)Vconj }
 { $subsection V(*) }
 { $subsection V(*)conj }
+"Matrix products:"
+{ $subsection n*M.M+n*M-in-place }
+{ $subsection n*M.M+n*M }
+{ $subsection n*M.M }
 { $subsection M. }
+"Scalar-matrix products:"
+{ $subsection n*M-in-place }
 { $subsection n*M }
-"The above operations only operate on the BLAS vector and matrix types. You cannot mix element types in a BLAS operation; for example, you can't use " { $link V. } " to take the dot product of a " { $link float-blas-vector } " and " { $link double-blas-vector } "."
-$nl
-"The low-level BLAS C interface can be accessed directly through the " { $vocab-link "math.blas.cblas" } " vocabulary." ;
+{ $subsection M*n }
+{ $subsection M/n } ;
+
+ABOUT: "math.blas.matrices"
 
 HELP: blas-matrix-base
 { $class-description "The base class for all BLAS matrix types. Objects of this type should not be created directly; instead, instantiate one of the typed subclasses:"
