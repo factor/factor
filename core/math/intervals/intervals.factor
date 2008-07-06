@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 ! Based on Slate's src/unfinished/interval.slate by Brian Rice.
 USING: accessors kernel sequences arrays math math.order
-combinators ;
+combinators generic ;
 IN: math.intervals
 
 TUPLE: interval { from read-only } { to read-only } ;
@@ -176,6 +176,11 @@ C: <interval> interval
 
 : interval/ ( i1 i2 -- i3 )
     [ [ / ] interval-op ] interval-division-op ;
+
+: interval/-safe ( i1 i2 -- i3 )
+    #! Just a hack to make the compiler work if bootstrap.math
+    #! is not loaded.
+    \ integer \ / method [ interval/ ] [ 2drop f ] if ;
 
 : interval/i ( i1 i2 -- i3 )
     [
