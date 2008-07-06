@@ -1,6 +1,8 @@
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: generic.standard.engines generic namespaces kernel
-sequences classes.algebra accessors words combinators
-assocs ;
+kernel.private sequences classes.algebra accessors words
+combinators assocs arrays ;
 IN: generic.standard.engines.predicate
 
 TUPLE: predicate-dispatch-engine methods ;
@@ -24,8 +26,13 @@ C: <predicate-dispatch-engine> predicate-dispatch-engine
 : sort-methods ( assoc -- assoc' )
     >alist [ keys sort-classes ] keep extract-keys ;
 
+: methods-with-default ( engine -- assoc )
+    methods>> clone default get object bootstrap-word pick set-at ;
+
 M: predicate-dispatch-engine engine>quot
-    methods>> clone
-    default get object bootstrap-word pick set-at engines>quots
-    sort-methods prune-redundant-predicates
-    class-predicates alist>quot ;
+    methods-with-default
+    engines>quots
+    sort-methods
+    prune-redundant-predicates
+    class-predicates
+    alist>quot ;

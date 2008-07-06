@@ -16,6 +16,7 @@ IN: combinators.short-circuit
 MACRO: 0&& ( quots -- quot ) 0 n&&-rewrite ;
 MACRO: 1&& ( quots -- quot ) 1 n&&-rewrite ;
 MACRO: 2&& ( quots -- quot ) 2 n&&-rewrite ;
+MACRO: 3&& ( quots -- quot ) 3 n&&-rewrite ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -29,5 +30,6 @@ MACRO: 2&& ( quots -- quot ) 2 n&&-rewrite ;
 MACRO: 0|| ( quots -- quot ) 0 n||-rewrite ;
 MACRO: 1|| ( quots -- quot ) 1 n||-rewrite ;
 MACRO: 2|| ( quots -- quot ) 2 n||-rewrite ;
+MACRO: 3|| ( quots -- quot ) 3 n||-rewrite ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

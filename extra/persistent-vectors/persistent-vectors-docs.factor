@@ -27,10 +27,6 @@ HELP: >persistent-vector
 HELP: persistent-vector
 { $class-description "The class of persistent vectors." } ;
 
-HELP: pempty
-{ $values { "pvec" persistent-vector } }
-{ $description "Outputs an empty " { $link persistent-vector } "." } ;
-
 ARTICLE: "persistent-vectors" "Persistent vectors"
 "A " { $emphasis "persistent vector" } " differs from an ordinary vector (" { $link "vectors" } ") in that it is immutable, and all operations yield new persistent vectors instead of modifying inputs. Unlike immutable operations on ordinary sequences, persistent vector operations are efficient and run in sub-linear time."
 $nl
@@ -42,12 +38,12 @@ $nl
 { $subsection new-nth }
 { $subsection ppush }
 { $subsection ppop }
-"The empty persistent vector, used for building up all other persistent vectors:"
-{ $subsection pempty }
 "Converting a sequence into a persistent vector:"
 { $subsection >persistent-vector }
 "Persistent vectors have a literal syntax:"
 { $subsection POSTPONE: PV{ }
+"The empty persistent vector, written " { $snippet "PV{ }" } ", is used for building up all other persistent vectors."
+$nl
 "This implementation of persistent vectors is based on the " { $snippet "clojure.lang.PersistentVector" } " class from Rich Hickey's Clojure language for the JVM (" { $url "http://clojure.org" } ")." ;
 
 ABOUT: "persistent-vectors"

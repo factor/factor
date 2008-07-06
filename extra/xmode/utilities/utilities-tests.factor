@@ -45,7 +45,6 @@ TAGS>
             T{ employee f "Jane" "CFO" }
         }
         "PUBLIC"
-        "This is a great company"
     }
 ] [
     "resource:extra/xmode/utilities/test.xml"

@@ -657,6 +657,8 @@ TUPLE: boa-coercer-test { x array-capacity } ;
 
 [ fixnum ] [ 0 >bignum boa-coercer-test boa x>> class ] unit-test
 
+[ T{ boa-coercer-test f 0 } ] [ T{ boa-coercer-test } ] unit-test
+
 ! Test error classes
 ERROR: error-class-test a b c ;
 
