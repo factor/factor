@@ -2,7 +2,7 @@ USING: accessors alien alien.c-types arrays byte-arrays combinators
 combinators.lib combinators.short-circuit fry kernel locals macros
 math math.blas.cblas math.blas.vectors math.blas.vectors.private
 math.complex math.functions math.order multi-methods qualified
-sequences sequences.private shuffle symbols ;
+sequences sequences.merged sequences.private shuffle symbols ;
 QUALIFIED: syntax
 IN: math.blas.matrices
 
@@ -137,8 +137,7 @@ METHOD: (blas-vector-like) { object object object double-complex-blas-matrix }
     C f >>transpose ; inline
 
 : (>matrix) ( arrays >c-array -- c-array ld rows cols transpose )
-    [ flip ] dip
-    '[ concat @ ] [ first length dup ] [ length ] tri f ; inline
+    '[ <merged> @ ] [ length dup ] [ first length ] tri f ; inline
 
 PRIVATE>
 
