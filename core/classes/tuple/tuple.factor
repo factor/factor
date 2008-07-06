@@ -17,6 +17,9 @@ ERROR: not-a-tuple object ;
 : check-tuple ( object -- tuple )
     dup tuple? [ not-a-tuple ] unless ; inline
 
+: all-slots ( class -- slots )
+    superclasses [ "slots" word-prop ] map concat ;
+
 <PRIVATE
 
 : (tuple) ( layout -- tuple )
@@ -46,6 +49,20 @@ ERROR: not-a-tuple object ;
 : copy-tuple-slots ( n tuple -- array )
     [ array-nth ] curry map ;
 
+: check-slots ( seq class -- seq class )
+    [ ] [
+        2dup all-slots [
+            class>> 2dup instance?
+            [ 2drop ] [ bad-slot-value ] if
+        ] 2each
+    ] if-bootstrapping ; inline
+
+: initial-values ( class -- slots )
+    all-slots [ initial>> ] map ;
+
+: pad-slots ( slots class -- slots' class )
+    [ initial-values over length tail append ] keep ; inline
+
 PRIVATE>
 
 : tuple>array ( tuple -- array )
@@ -56,21 +73,10 @@ PRIVATE>
 : tuple-slots ( tuple -- seq )
     prepare-tuple>array drop copy-tuple-slots ;
 
-: all-slots ( class -- slots )
-    superclasses [ "slots" word-prop ] map concat ;
-
-: check-slots ( seq class -- seq class )
-    [ ] [
-        2dup all-slots [
-            class>> 2dup instance?
-            [ 2drop ] [ bad-slot-value ] if
-        ] 2each
-    ] if-bootstrapping ; inline
-
 GENERIC: slots>tuple ( seq class -- tuple )
 
 M: tuple-class slots>tuple
-    check-slots
+    check-slots pad-slots
     tuple-layout <tuple> [
         [ tuple-size ]
         [ [ set-array-nth ] curry ]
@@ -138,8 +144,8 @@ ERROR: bad-superclass class ;
     dup boa-check-quot "boa-check" set-word-prop ;
 
 : tuple-prototype ( class -- prototype )
-    [ all-slots [ initial>> ] map ] keep
-    over [ ] contains? [ slots>tuple ] [ 2drop f ] if ;
+    [ initial-values ] keep
+    over [ ] all? [ 2drop f ] [ slots>tuple ] if ;
 
 : define-tuple-prototype ( class -- )
     dup tuple-prototype "prototype" set-word-prop ;
