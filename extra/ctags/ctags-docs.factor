@@ -32,6 +32,18 @@ HELP: ctags-write ( seq path -- )
 { $notes
   { $snippet "tags" } " file will contain a single line: if\\t/path/to/factor/extra/unix/unix.factor\\t91" } ;
 
+HELP: ctag-strings ( alist -- seq )
+{ $values { "alist" alist }
+          { "seq" sequence } }
+{ $description "Converts an " { $snippet "alist" } " with ctag format (a word as key and a sequence whose first element is a resource name and a second element is a line number as value) in a " { $snippet "seq" } " of ctag strings." }
+{ $examples
+  { $example
+    "USING: kernel ctags ;"
+    "{ { if  { \"resource:extra/unix/unix.factor\" 91 } } } ctag-strings"
+    "{ \"if\\t/path/to/factor/extra/unix/unix.factor\\t91\" }"
+  }
+} ;
+
 HELP: ctag ( seq -- str )
 { $values { "seq" sequence }
           { "str" string } }
