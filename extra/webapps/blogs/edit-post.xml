@@ -15,13 +15,13 @@
 
 	<div class="posting-footer">
 		Post by
-		<t:a t:href="$blogs/" t:query="author">
+		<t:a t:href="$blogs/by" t:rest="author">
 			<t:label t:name="author" />
 		</t:a>
 		on
 		<t:label t:name="date" />
 		|
-		<t:a t:href="$blogs/post" t:for="id">View Post</t:a>
+		<t:a t:href="$blogs/post" t:rest="id">View Post</t:a>
 		|
 		<t:button t:action="$blogs/delete-post" t:for="id,author" class="link-button link">Delete Post</t:button>
 	</div>

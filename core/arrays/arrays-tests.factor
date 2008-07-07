@@ -1,4 +1,4 @@
-USING: arrays kernel sequences sequences.private growable
+USING: accessors arrays kernel sequences sequences.private growable
 tools.test vectors layouts system math vectors.private ;
 IN: arrays.tests
 
@@ -11,7 +11,7 @@ IN: arrays.tests
 [ V{ "a" "b" "c" } ] [ { "a" "b" "c" } >vector ] unit-test
 [ f ] [ { "a" "b" "c" } dup >array eq? ] unit-test
 [ t ] [ { "a" "b" "c" } dup { } like eq? ] unit-test
-[ t ] [ { "a" "b" "c" } dup dup length array>vector underlying eq? ] unit-test
+[ t ] [ { "a" "b" "c" } dup dup length vector boa underlying>> eq? ] unit-test
 [ V{ "a" "b" "c" } ] [ { "a" "b" "c" } V{ } like ] unit-test
 [ { "a" "b" "c" } ] [ { "a" } { "b" "c" } append ] unit-test
 [ { "a" "b" "c" "d" "e" } ]

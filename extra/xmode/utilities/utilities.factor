@@ -1,5 +1,5 @@
 USING: sequences assocs kernel quotations namespaces xml.data
-xml.utilities combinators macros parser words ;
+xml.utilities combinators macros parser lexer words ;
 IN: xmode.utilities
 
 : implies >r not r> or ; inline
@@ -48,11 +48,10 @@ SYMBOL: tag-handler-word
 : (TAG:) ( name quot -- ) swap tag-handlers get set-at ;
 
 : TAG:
-    f set-word
     scan parse-definition
     (TAG:) ; parsing
 
 : TAGS>
     tag-handler-word get
     tag-handlers get >alist [ >r dup name-tag r> case ] curry
-    (( tag -- )) define-declared ; parsing
+    define ; parsing

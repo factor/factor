@@ -1,6 +1,6 @@
 USING: io io.files splitting grouping unicode.collation
 sequences kernel io.encodings.utf8 math.parser math.order
-tools.test assocs io.streams.null words combinators.lib ;
+tools.test assocs io.streams.null words ;
 IN: unicode.collation.tests
 
 : parse-test ( -- strings )
@@ -17,7 +17,7 @@ IN: unicode.collation.tests
 
 : test-equality
     { primary= secondary= tertiary= quaternary= }
-    [ execute ] 2with each ;
+    [ execute ] with with each ;
 
 [ f f f f ] [ "hello" "hi" test-equality ] unit-test
 [ t f f f ] [ "hello" "h\u0000e9llo" test-equality ] unit-test

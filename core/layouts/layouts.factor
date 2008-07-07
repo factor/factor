@@ -49,6 +49,12 @@ SYMBOL: type-numbers
 : most-negative-fixnum ( -- n )
     first-bignum neg ;
 
+: (max-array-capacity) ( b -- n )
+    5 - 2^ 1- ;
+
+: max-array-capacity ( -- n )
+    cell-bits (max-array-capacity) ;
+
 : bootstrap-first-bignum ( -- n )
     bootstrap-cell-bits (first-bignum) ;
 
@@ -57,6 +63,9 @@ SYMBOL: type-numbers
 
 : bootstrap-most-negative-fixnum ( -- n )
     bootstrap-first-bignum neg ;
+
+: bootstrap-max-array-capacity ( -- n )
+    bootstrap-cell-bits (max-array-capacity) ;
 
 M: bignum >integer
     dup most-negative-fixnum most-positive-fixnum between?

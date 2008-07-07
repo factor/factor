@@ -16,7 +16,8 @@ USING: kernel namespaces threads math math.order math.vectors
        vars rewrite-closures
        self pos ori turtle opengl.camera
        lsys.tortoise lsys.tortoise.graphics
-       lsys.strings.rewrite lsys.strings.interpret ;
+       lsys.strings.rewrite lsys.strings.interpret
+       combinators.short-circuit ;
 
        ! lsys.strings
        ! lsys.strings.rewrite
@@ -100,17 +101,17 @@ DEFER: empty-model
 
 {
 
-[ "Load" <label> dup reverse-video-theme ]
+[ "Load" <label> reverse-video-theme ]
 
 [ "Models" <label> [ drop model-chooser ] closed-quot <bevel-button> ]
 [ "Scenes" <label> [ drop scene-chooser ] closed-quot <bevel-button> ]
 
-[ "Model" <label> dup reverse-video-theme ]
+[ "Model" <label> reverse-video-theme ]
 
 [ "Iterate" <label> [ drop iterate build-model ] closed-quot <bevel-button> ]
 [ "Build model" <label> [ drop build-model ] closed-quot <bevel-button> ]
 
-[ "Camera" <label> dup reverse-video-theme ]
+[ "Camera" <label> reverse-video-theme ]
 
 [ "Turn left" <label> [ 5 turn-left ] camera-action <bevel-button> ]
 [ "Turn right" <label> [ 5 turn-right ] camera-action <bevel-button> ]

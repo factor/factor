@@ -26,7 +26,9 @@ ARTICLE: "compiler" "Optimizing compiler"
 }
 "The optimizing compiler only compiles words which have a static stack effect. This means that methods defined on fundamental generic words such as " { $link nth } " should have a static stack effect; for otherwise, most of the system would be compiled with the non-optimizing compiler. See " { $link "inference" } " and " { $link "cookbook-pitfalls" } "."
 { $subsection "compiler-usage" }
-{ $subsection "compiler-errors" } ;
+{ $subsection "compiler-errors" }
+{ $subsection "optimizer" }
+{ $subsection "generator" } ;
 
 ABOUT: "compiler"
 

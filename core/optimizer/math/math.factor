@@ -158,7 +158,7 @@ optimizer.math.partial generic.standard system accessors ;
     { + { { fixnum integer } } interval+ }
     { - { { fixnum integer } } interval- }
     { * { { fixnum integer } } interval* }
-    { / { { fixnum rational } { integer rational } } interval/ }
+    { / { { fixnum rational } { integer rational } } interval/-safe }
     { /i { { fixnum integer } } interval/i }
     { shift { { fixnum integer } } interval-shift-safe }
 } [
@@ -256,7 +256,7 @@ optimizer.math.partial generic.standard system accessors ;
     alien-signed-8
     alien-unsigned-8
 } [
-    dup word-name {
+    dup name>> {
         {
             [ "alien-signed-" ?head ]
             [ string>number 8 * 1- 2^ dup neg swap 1- [a,b] ]

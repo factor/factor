@@ -3,7 +3,7 @@
 USING: threads kernel namespaces continuations combinators
 sequences math namespaces.private continuations.private
 concurrency.messaging quotations kernel.private words
-sequences.private assocs models arrays accessors
+sequences.private assocs models models.filter arrays accessors
 generic generic.standard definitions ;
 IN: tools.walker
 
@@ -75,13 +75,16 @@ M: object add-breakpoint ;
         { [ dup hook-generic? ] [ effective-method (step-into-execute) ] }
         { [ dup uses \ suspend swap member? ] [ execute break ] }
         { [ dup primitive? ] [ execute break ] }
-        [ word-def (step-into-quot) ]
+        [ def>> (step-into-quot) ]
     } cond ;
 
 \ (step-into-execute) t "step-into?" set-word-prop
 
 : (step-into-continuation) ( -- )
     continuation callstack >>call break ;
+
+: (step-into-call-next-method) ( class generic -- )
+    next-method-quot (step-into-quot) ;
 
 ! Messages sent to walker thread
 SYMBOL: step
@@ -132,6 +135,7 @@ SYMBOL: +stopped+
     { if [ (step-into-if) ] }
     { dispatch [ (step-into-dispatch) ] }
     { continuation [ (step-into-continuation) ] }
+    { (call-next-method) [ (step-into-call-next-method) ] }
 } [ "step-into" set-word-prop ] assoc-each
 
 {

@@ -1,61 +1,94 @@
 
-USING: kernel parser namespaces quotations arrays vectors strings
-       sequences assocs classes.tuple math combinators ;
+USING: kernel parser namespaces sequences quotations arrays vectors splitting
+       words math
+       macros arrays.lib combinators.lib combinators.conditional newfx ;
 
 IN: bake
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: insert-quot expr ;
+SYMBOL: ,
+SYMBOL: @
 
-C: <insert-quot> insert-quot 
-
-: ,[ \ ] [ >quotation <insert-quot> ] parse-literal ; parsing
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-TUPLE: splice-quot expr ;
-
-C: <splice-quot> splice-quot
-
-: %[ \ ] [ >quotation <splice-quot> ] parse-literal ; parsing
+: comma? ( obj -- ? ) , = ;
+: atsym? ( obj -- ? ) @ = ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: ,u ( seq -- seq ) unclip building get push ;
+DEFER: [bake]
+
+: broil-element ( obj -- quot )
+    {
+      { [ comma?    ] [ drop [ >r ]          ] }
+      { [ integer?  ] [ [ >r ] prefix-on     ] }
+      { [ sequence? ] [ [bake] [ >r ] append ] }
+      { [ word?     ] [ literalize [ >r ] prefix-on ] }
+      { [ drop t    ] [ [ >r ] prefix-on     ] }
+    }
+  1cond ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYMBOL: exemplar
-
-: reset-building ( -- ) 1024 <vector> building set ;
-
-: save-exemplar ( seq -- seq ) dup exemplar set ;
-
-: finish-baking ( -- seq ) building get exemplar get like ;
-
-DEFER: bake
-
-: bake-item ( item -- )
-  { { [ dup \ , = ]        [ drop , ] }
-    { [ dup \ % = ]        [ drop % ] }
-    { [ dup \ ,u = ]       [ drop ,u ] }
-    { [ dup insert-quot? ] [ insert-quot-expr call , ] }
-    { [ dup splice-quot? ] [ splice-quot-expr call % ] }
-    { [ dup integer? ]     [ , ] }
-    { [ dup string? ]      [ , ] }
-    { [ dup tuple? ]       [ tuple>array bake >tuple , ] }
-    { [ dup assoc? ]       [ [ >alist bake ] keep assoc-like , ] }
-    { [ dup sequence? ]    [ bake , ] }
-    { [ t ]                [ , ] } }
-  cond ;
-
-: bake-items ( seq -- ) [ bake-item ] each ;
-
-: bake ( seq -- seq )
-  [ reset-building save-exemplar bake-items finish-baking ] with-scope ;
+: constructor ( seq -- quot )
+    {
+      { [ array? ]     [ length [ narray ] prefix-on ] }
+!      { [ quotation? ] [ length [ ncurry ] prefix-on [ ] prefix ] }
+      { [ quotation? ] [ length [ narray >quotation ] prefix-on ] }
+      { [ vector? ]    [ length [ narray >vector    ] prefix-on ] }
+    }
+  1cond ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: `{ \ } [ >array ] parse-literal \ bake parsed ; parsing
+: [broil] ( seq -- quot )
+    [ reverse [ broil-element ] map concat ]
+    [ length  [ drop [ r> ]   ] map concat ]
+    [ constructor ]
+  tri append append
+  >quotation ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: saved-sequence
+
+: [connector] ( -- quot )
+  saved-sequence get quotation? [ [ compose ] ] [ [ append ] ] if ;
+
+: [starter] ( -- quot )
+  saved-sequence get
+    {
+      { [ quotation? ] [ drop [  [ ] ] ] }
+      { [ array?     ] [ drop [  { } ] ] }
+      { [ vector?    ] [ drop [ V{ } ] ] }
+    }
+  1cond ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: [simmer] ( seq -- quot )
+
+  dup saved-sequence set
+
+  { @ } split reverse
+    [ [ [bake] [connector] append [ >r ] append ] map concat ]
+    [ length [ drop [ r> ] [connector] append   ] map concat ]
+  bi
+
+  >r 1 invert-index pluck r> ! remove the last append/compose
+
+  [starter] prepend
+
+  append ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: [bake] ( seq -- quot ) [ @ member? ] [ [simmer] ] [ [broil] ] 1if ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+MACRO: bake ( seq -- quot ) [bake] ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: `{  \ } [ >array     ] parse-literal \ bake parsed ; parsing
+: `V{ \ } [ >vector    ] parse-literal \ bake parsed ; parsing

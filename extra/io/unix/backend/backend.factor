@@ -1,10 +1,11 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien generic assocs kernel kernel.private math
-io.ports sequences strings structs sbufs threads unix
+USING: alien alien.c-types generic assocs kernel kernel.private
+math io.ports sequences strings structs sbufs threads unix
 vectors io.buffers io.backend io.encodings math.parser
 continuations system libc qualified namespaces io.timeouts
-io.encodings.utf8 destructors accessors inspector combinators ;
+io.encodings.utf8 destructors accessors summary combinators
+locals ;
 QUALIFIED: io
 IN: io.unix.backend
 
@@ -12,17 +13,19 @@ GENERIC: handle-fd ( handle -- fd )
 
 TUPLE: fd fd disposed ;
 
+: init-fd ( fd -- fd )
+    [
+        |dispose
+        dup fd>> F_SETFL O_NONBLOCK fcntl io-error
+        dup fd>> F_SETFD FD_CLOEXEC fcntl io-error
+    ] with-destructors ;
+
 : <fd> ( n -- fd )
     #! We drop the error code rather than calling io-error,
     #! since on OS X 10.3, this operation fails from init-io
     #! when running the Factor.app (presumably because fd 0 and
     #! 1 are closed).
-    fd new
-        swap
-        [ F_SETFL O_NONBLOCK fcntl drop ]
-        [ F_SETFD FD_CLOEXEC fcntl drop ]
-        [ >>fd ]
-        tri ;
+    f fd boa ;
 
 M: fd dispose
     dup disposed>> [ drop ] [
@@ -44,14 +47,11 @@ TUPLE: mx fd reads writes ;
 
 GENERIC: add-input-callback ( thread fd mx -- )
 
-: add-callback ( thread fd assoc -- )
-    [ ?push ] change-at ;
-
-M: mx add-input-callback reads>> add-callback ;
+M: mx add-input-callback reads>> push-at ;
 
 GENERIC: add-output-callback ( thread fd mx -- )
 
-M: mx add-output-callback writes>> add-callback ;
+M: mx add-output-callback writes>> push-at ;
 
 GENERIC: remove-input-callbacks ( fd mx -- callbacks )
 
@@ -149,8 +149,55 @@ M: unix (wait-to-write) ( port -- )
 M: unix io-multiplex ( ms/f -- )
     mx get-global wait-for-events ;
 
+! On Unix, you're not supposed to set stdin to non-blocking
+! because the fd might be shared with another process (either
+! parent or child). So what we do is have the VM start a thread
+! which pumps data from the real stdin to a pipe. We set the
+! pipe to non-blocking, and read from it instead of the real
+! stdin. Very crufty, but it will suffice until we get native
+! threading support at the language level.
+TUPLE: stdin control size data ;
+
+M: stdin dispose
+    [
+        [ control>> &dispose drop ]
+        [ size>> &dispose drop ]
+        [ data>> &dispose drop ]
+        tri
+    ] with-destructors ;
+
+: wait-for-stdin ( stdin -- n )
+    [ control>> CHAR: X over io:stream-write1 io:stream-flush ]
+    [ size>> "ssize_t" heap-size swap io:stream-read *int ]
+    bi ;
+
+:: refill-stdin ( buffer stdin size -- )
+    stdin data>> handle-fd buffer buffer-end size read
+    dup 0 < [
+        drop
+        err_no EINTR = [ buffer stdin size refill-stdin ] [ (io-error) ] if
+    ] [
+        size = [ "Error reading stdin pipe" throw ] unless
+        size buffer n>buffer
+    ] if ;
+
+M: stdin refill
+    [ buffer>> ] [ dup wait-for-stdin ] bi* refill-stdin f ;
+
+: control-write-fd ( -- fd ) "control_write" f dlsym *uint ;
+
+: size-read-fd ( -- fd ) "size_read" f dlsym *uint ;
+
+: data-read-fd ( -- fd ) "stdin_read" f dlsym *uint ;
+
+: <stdin> ( -- stdin )
+    control-write-fd <fd> <output-port>
+    size-read-fd <fd> init-fd <input-port>
+    data-read-fd <fd>
+    stdin boa ;
+
 M: unix (init-stdio) ( -- )
-    0 <fd> <input-port>
+    <stdin> <input-port>
     1 <fd> <output-port>
     2 <fd> <output-port> ;
 

@@ -4,8 +4,8 @@ USING: kernel namespaces sequences sequences.private assocs math
 inference.transforms parser words quotations debugger macros
 arrays macros splitting combinators prettyprint.backend
 definitions prettyprint hashtables prettyprint.sections sets
-sequences.private effects generic compiler.units accessors
-locals.backend memoize ;
+sequences.private effects effects.parser generic generic.parser
+compiler.units accessors locals.backend memoize lexer ;
 IN: locals
 
 ! Inspired by
@@ -48,7 +48,7 @@ PREDICATE: local-reader < word "local-reader?" word-prop ;
 PREDICATE: local-writer < word "local-writer?" word-prop ;
 
 : <local-writer> ( reader -- word )
-    dup word-name "!" append f <word>
+    dup name>> "!" append f <word>
     [ t "local-writer?" set-word-prop ] keep
     [ "local-writer" set-word-prop ] 2keep
     [ swap "local-reader" set-word-prop ] keep ;
@@ -187,15 +187,15 @@ M: object local-rewrite* , ;
 : make-local ( name -- word )
     "!" ?tail [
         <local-reader>
-        dup <local-writer> dup word-name set
+        dup <local-writer> dup name>> set
     ] [ <local> ] if
-    dup dup word-name set ;
+    dup dup name>> set ;
 
 : make-locals ( seq -- words assoc )
     [ [ make-local ] map ] H{ } make-assoc ;
 
 : make-local-word ( name -- word )
-    <local-word> dup dup word-name set ;
+    <local-word> dup dup name>> set ;
 
 : push-locals ( assoc -- )
     use get push ;
@@ -365,7 +365,7 @@ M: lambda-word definition
     "lambda" word-prop body>> ;
 
 M: lambda-word reset-word
-    [ f "lambda" set-word-prop ] [ call-next-method ] bi ;
+    [ call-next-method ] [ f "lambda" set-word-prop ] bi ;
 
 INTERSECTION: lambda-macro macro lambda-word ;
 
@@ -405,8 +405,8 @@ M: lambda-memoized reset-word
 
 M: lambda-method synopsis*
     dup dup dup definer.
-    "method-specializer" word-prop pprint*
-    "method-generic" word-prop pprint*
+    "method-class" word-prop pprint-word
+    "method-generic" word-prop pprint-word
     method-stack-effect effect>string comment. ;
 
 PRIVATE>

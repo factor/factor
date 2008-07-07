@@ -1,0 +1,1 @@
+Microsecond precision clock

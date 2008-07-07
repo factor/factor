@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators combinators.cleave combinators.lib
 continuations db db.tuples db.types db.sqlite kernel math
-math.parser namespaces parser sets sequences sequences.deep
+math.parser namespaces parser lexer sets sequences sequences.deep
 sequences.lib strings words destructors ;
 IN: semantic-db
 
@@ -36,10 +36,10 @@ TUPLE: arc id subject object relation ;
 : delete-arc ( arc -- ) delete-tuples ;
 
 : create-arc ( subject object relation -- )
-    [ id>> ] 3apply <arc> insert-tuple ;
+    [ id>> ] tri@ <arc> insert-tuple ;
 
 : nodes>arc ( subject object relation -- arc )
-    [ [ id>> ] [ f ] if* ] 3apply <arc> ;
+    [ [ id>> ] [ f ] if* ] tri@ <arc> ;
 
 : select-arcs ( subject object relation -- arcs )
     nodes>arc select-tuples ;
@@ -189,7 +189,7 @@ C: <relation-definition> relation-definition
 
 <PRIVATE
 
-: default-word-name ( relate-word-name word-type -- word-name )
+: default-word-name ( relate-word-name word-type -- name>> )
     {
         { "relate" [ ] }
         { "id-word" [ "-relation" append ] }
@@ -199,14 +199,14 @@ C: <relation-definition> relation-definition
         { "objects" [ "-objects" append ] }
     } case ;
 
-: choose-word-name ( relation-definition given-word-name word-type -- word-name )
+: choose-word-name ( relation-definition given-word-name word-type -- name>> )
     over string? [
         drop nip
     ] [
         nip [ relate>> ] dip default-word-name
     ] if ;
 
-: (define-relation-word) ( id-word word-name definition -- id-word )
+: (define-relation-word) ( id-word name>> definition -- id-word )
     >r create-in over [ execute ] curry r> compose define ;
 
 : define-relation-word ( relation-definition id-word given-word-name word-type definition -- relation-definition id-word )
@@ -225,7 +225,7 @@ C: <relation-definition> relation-definition
     2drop ;
 
 : define-id-word ( relation-definition id-word -- )
-    [ relate>> ] dip tuck word-vocabulary
+    [ relate>> ] dip tuck vocabulary>>
     [ ensure-context ensure-relation ] 2curry define ;
 
 : create-id-word ( relation-definition -- id-word )

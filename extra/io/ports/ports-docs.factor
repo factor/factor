@@ -64,7 +64,3 @@ HELP: (wait-to-read)
 HELP: wait-to-read
 { $values { "port" input-port } { "eof?" "a boolean" } }
 { $description "If the port's buffer has unread data, returns immediately, otherwise suspends the current thread until some data is available for reading. If the buffer was empty and no more data could be read, outputs " { $link t } " to indicate end-of-file; otherwise outputs " { $link f } "." } ;
-
-HELP: can-write?
-{ $values { "len" "a positive integer" } { "buffer" buffer } { "?" "a boolean" } }
-{ $description "Tests if the port's output buffer can accomodate " { $snippet "len" } " bytes. If the buffer is empty, this always outputs " { $link t } ", since in that case the buffer will be grown automatically." } ;

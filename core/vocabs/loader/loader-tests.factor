@@ -68,7 +68,7 @@ IN: vocabs.loader.tests
     <string-reader>
     "resource:core/vocabs/loader/test/a/a.factor"
     parse-stream
-] [ error>> error>> no-word-error? ] must-fail-with
+] [ error>> error>> error>> no-word-error? ] must-fail-with
 
 0 "count-me" set-global
 

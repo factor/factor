@@ -1,8 +1,8 @@
-USING: arrays compiler.units kernel kernel.private math
+USING: accessors arrays compiler.units kernel kernel.private math
 math.constants math.private sequences strings tools.test words
 continuations sequences.private hashtables.private byte-arrays
-strings.private system random layouts vectors.private
-sbufs.private strings.private slots.private alien math.order
+strings.private system random layouts vectors
+sbufs strings.private slots.private alien math.order
 alien.accessors alien.c-types alien.syntax alien.strings
 namespaces libc sequences.private io.encodings.ascii ;
 IN: compiler.tests
@@ -332,11 +332,11 @@ cell 8 = [
 ] unit-test
 
 [ V{ 1 2 } ] [
-    { 1 2 3 } 2 [ array>vector ] compile-call
+    { 1 2 3 } 2 [ vector boa ] compile-call
 ] unit-test
 
 [ SBUF" hello" ] [
-    "hello world" 5 [ string>sbuf ] compile-call
+    "hello world" 5 [ sbuf boa ] compile-call
 ] unit-test
 
 [ [ 3 + ] ] [
@@ -377,7 +377,7 @@ cell 8 = [
 [ 252 ] [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-unsigned-1 ] compile-call ] unit-test
 [ -4 ] [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-signed-1 ] compile-call ] unit-test
 
-: xword-def ( word -- def ) word-def [ { fixnum } declare ] prepend ;
+: xword-def ( word -- def ) def>> [ { fixnum } declare ] prepend ;
 
 [ -100 ] [ -100 <char> [ { byte-array } declare *char ] compile-call ] unit-test
 [ 156 ] [ -100 <uchar> [ { byte-array } declare *uchar ] compile-call ] unit-test

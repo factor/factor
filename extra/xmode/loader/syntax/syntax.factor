@@ -1,6 +1,6 @@
 USING: xmode.tokens xmode.rules xmode.keyword-map xml.data
 xml.utilities xml assocs kernel combinators sequences
-math.parser namespaces parser xmode.utilities regexp io.files ;
+math.parser namespaces parser lexer xmode.utilities regexp io.files ;
 IN: xmode.loader.syntax
 
 SYMBOL: ignore-case?
@@ -75,7 +75,7 @@ SYMBOL: ignore-case?
     [ parse-literal-matcher swap set-rule-end ] , ;
 
 ! SPAN's children
-<TAGS: parse-begin/end-tag
+<TAGS: parse-begin/end-tag ( rule tag -- )
 
 TAG: BEGIN
     ! XXX

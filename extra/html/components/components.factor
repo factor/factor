@@ -1,82 +1,26 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces io math.parser assocs classes
-classes.tuple words arrays sequences sequences.lib splitting
-mirrors hashtables combinators continuations math strings
-fry locals calendar calendar.format xml.entities validators
-html.elements html.streams xmode.code2html farkup inspector
-lcs.diff2html urls present ;
+classes.tuple words arrays sequences splitting mirrors
+hashtables combinators continuations math strings inspector
+fry locals calendar calendar.format xml.entities
+validators urls present
+xmode.code2html lcs.diff2html farkup
+html.elements html.streams html.forms ;
 IN: html.components
-
-SYMBOL: values
-
-: value ( name -- value ) values get at ;
-
-: set-value ( value name -- ) values get set-at ;
-
-: blank-values ( -- ) H{ } clone values set ;
-
-: prepare-value ( name object -- value name object )
-    [ [ value ] keep ] dip ; inline
-
-: from-object ( object -- )
-    dup assoc? [ <mirror> ] unless
-    values get swap update ;
-
-: deposit-values ( destination names -- )
-    [ dup value ] H{ } map>assoc update ;
-
-: deposit-slots ( destination names -- )
-    [ <mirror> ] dip deposit-values ;
-
-: with-each-value ( name quot -- )
-    [ value ] dip '[
-        [
-            values [ clone ] change
-            1+ "index" set-value
-            "value" set-value
-            @
-        ] with-scope
-    ] each-index ; inline
-
-: with-each-object ( name quot -- )
-    [ value ] dip '[
-        [
-            blank-values
-            1+ "index" set-value
-            from-object
-            @
-        ] with-scope
-    ] each-index ; inline
-
-SYMBOL: nested-values
-
-: with-values ( name quot -- )
-    '[
-        ,
-        [ nested-values [ swap prefix ] change ]
-        [ value blank-values from-object ]
-        bi
-        @
-    ] with-scope ; inline
-
-: nest-values ( name quot -- )
-    swap [
-        [
-            H{ } clone [ values set call ] keep
-        ] with-scope
-    ] dip set-value ; inline
 
 GENERIC: render* ( value name render -- )
 
 : render ( name renderer -- )
-    over named-validation-messages get at [
-        [ value>> ] [ message>> ] bi
-        [ -rot render* ] dip
-        render-error
-    ] [
-        prepare-value render*
-    ] if* ;
+    prepare-value
+    [
+        dup validation-error?
+        [ [ message>> ] [ value>> ] bi ]
+        [ f swap ]
+        if
+    ] 2dip
+    render*
+    [ render-error ] when* ;
 
 <PRIVATE
 
@@ -200,10 +144,20 @@ M: code render*
     [ string-lines ] [ drop ] [ mode>> value ] tri* htmlize-lines ;
 
 ! Farkup component
-SINGLETON: farkup
+TUPLE: farkup no-follow disable-images ;
+
+: string>boolean ( string -- boolean )
+    {
+        { "true" [ t ] }
+        { "false" [ f ] }
+    } case ;
 
 M: farkup render*
-    2drop string-lines "\n" join convert-farkup write ;
+    [
+        [ no-follow>> [ string>boolean link-no-follow? set ] when* ]
+        [ disable-images>> [ string>boolean disable-images? set ] when* ] bi
+        drop string-lines "\n" join convert-farkup write
+    ] with-scope ;
 
 ! Inspector component
 SINGLETON: inspector

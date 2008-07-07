@@ -22,7 +22,7 @@ HELP: delete
 HELP: insert
 { $class-description "Represents an action in an edit script where an item is added, going from the initial sequence to the final sequence. This has one slot, called item, containing the thing which is inserted" } ;
 
-ARTICLE: "lcs" "LCS, Diffing and Distance"
+ARTICLE: "lcs" "LCS, diffing and distance"
 "This vocabulary provides words for three apparently unrelated but in fact very similar problems: finding a longest common subsequence between two sequences, getting a minimal edit script (diff) between two sequences, and calculating the Levenshtein distance between two sequences. The implementations of these algorithms are very closely related, and all running times are O(nm), where n and m are the lengths of the input sequences."
 { $subsection lcs }
 { $subsection diff }

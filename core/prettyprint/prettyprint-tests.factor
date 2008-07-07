@@ -101,11 +101,20 @@ unit-test
         ] keep =
     ] with-scope ;
 
-: method-test
+GENERIC: method-layout
+
+M: complex method-layout
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ;
+
+M: fixnum method-layout ;
+
+M: integer method-layout ;
+
+M: object method-layout ;
+
+[
     {
-        "IN: prettyprint.tests"
-        "GENERIC: method-layout"
-        ""
         "USING: math prettyprint.tests ;"
         "M: complex method-layout"
         "    \"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\""
@@ -119,10 +128,10 @@ unit-test
         ""
         "USING: kernel prettyprint.tests ;"
         "M: object method-layout ;"
-    } ;
-
-[ t ] [
-    "method-layout" method-test check-see
+        ""
+    }
+] [
+    [ \ method-layout see-methods ] with-string-writer "\n" split
 ] unit-test
 
 : retain-stack-test
@@ -167,9 +176,11 @@ unit-test
     "another-retain-layout" another-retain-layout-test check-see
 ] unit-test
 
+DEFER: parse-error-file
+
 : another-soft-break-test
     {
-        "USING: namespaces parser sequences ;"
+        "USING: namespaces sequences ;"
         "IN: prettyprint.tests"
         ": another-soft-break-layout ( node -- quot )"
         "    parse-error-file"
@@ -183,7 +194,7 @@ unit-test
 
 : string-layout
     {
-        "USING: io kernel parser ;"
+        "USING: io kernel lexer ;"
         "IN: prettyprint.tests"
         ": string-layout-test ( error -- )"
         "    \"Expected \" write dup unexpected-want expected>string write"
@@ -253,7 +264,16 @@ unit-test
     "another-narrow-layout" another-narrow-test check-see
 ] unit-test
 
-: class-see-test
+IN: prettyprint.tests
+TUPLE: class-see-layout ;
+
+IN: prettyprint.tests
+GENERIC: class-see-layout ( x -- y )
+
+USING: prettyprint.tests ;
+M: class-see-layout class-see-layout ;
+
+[
     {
         "IN: prettyprint.tests"
         "TUPLE: class-see-layout ;"
@@ -261,12 +281,19 @@ unit-test
         "IN: prettyprint.tests"
         "GENERIC: class-see-layout ( x -- y )"
         ""
+    }
+] [
+    [ \ class-see-layout see ] with-string-writer "\n" split
+] unit-test
+
+[
+    {
         "USING: prettyprint.tests ;"
         "M: class-see-layout class-see-layout ;"
-    } ;
-
-[ t ] [
-    "class-see-layout" class-see-test check-see
+        ""
+    }
+] [
+    [ \ class-see-layout see-methods ] with-string-writer "\n" split
 ] unit-test
 
 [ ] [ \ effect-in synopsis drop ] unit-test

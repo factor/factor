@@ -1,7 +1,7 @@
-USING: sequences io.files io.encodings.ascii kernel values
-splitting accessors math.parser ascii io assocs strings math
-namespaces sorting combinators math.order arrays
-unicode.normalize unicode.data combinators.lib locals
+USING: combinators.short-circuit sequences io.files
+io.encodings.ascii kernel values splitting accessors math.parser
+ascii io assocs strings math namespaces sorting combinators
+math.order arrays unicode.normalize unicode.data locals
 unicode.syntax macros sequences.deep words unicode.breaks
 quotations ;
 IN: unicode.collation
@@ -58,8 +58,7 @@ ducet insert-helpers
     HEX: 7FFF bitand HEX: 8000 bitor 0 0 f weight boa ;
 
 : illegal? ( char -- ? )
-    [ "Noncharacter_Code_Point" property? ]
-    [ category "Cs" = ] or? ;
+    { [ "Noncharacter_Code_Point" property? ] [ category "Cs" = ] } 1|| ;
 
 : derive-weight ( char -- weights )
     first dup illegal?
@@ -87,7 +86,7 @@ ducet insert-helpers
 : add ( char -- )
     dup blocked? [ 1string , ] [
         dup possible-bases dup length
-        [ ?combine ] 2with contains?
+        [ ?combine ] with with contains?
         [ drop ] [ 1string , ] if
     ] if ;
 

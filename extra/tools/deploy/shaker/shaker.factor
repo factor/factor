@@ -1,9 +1,10 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: qualified io.streams.c init fry namespaces assocs kernel
-parser tools.deploy.config vocabs sequences words words.private
-memory kernel.private continuations io prettyprint
-vocabs.loader debugger system strings sets ;
+USING: accessors qualified io.streams.c init fry namespaces
+assocs kernel parser lexer strings.parser tools.deploy.config
+vocabs sequences words words.private memory kernel.private
+continuations io prettyprint vocabs.loader debugger system
+strings sets vectors quotations byte-arrays ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes
 QUALIFIED: command-line
@@ -12,7 +13,6 @@ QUALIFIED: compiler.units
 QUALIFIED: continuations
 QUALIFIED: definitions
 QUALIFIED: init
-QUALIFIED: inspector
 QUALIFIED: io.backend
 QUALIFIED: io.thread
 QUALIFIED: layouts
@@ -25,8 +25,11 @@ QUALIFIED: threads
 QUALIFIED: vocabs
 IN: tools.deploy.shaker
 
+! This file is some hairy shit.
+
 : strip-init-hooks ( -- )
     "Stripping startup hooks" show
+    "cpu.x86" init-hooks get delete-at
     "command-line" init-hooks get delete-at
     "libc" init-hooks get delete-at
     deploy-threads? get [
@@ -62,32 +65,86 @@ IN: tools.deploy.shaker
 
 : strip-word-names ( words -- )
     "Stripping word names" show
-    [ f over set-word-name f swap set-word-vocabulary ] each ;
+    [ f >>name f >>vocabulary drop ] each ;
 
 : strip-word-defs ( words -- )
     "Stripping symbolic word definitions" show
-    [ [ ] swap set-word-def ] each ;
+    [ "no-def-strip" word-prop not ] filter
+    [ [ ] >>def drop ] each ;
 
-: strip-word-props ( retain-props words -- )
+: sift-assoc ( assoc -- assoc' ) [ nip ] assoc-filter ;
+
+: strip-word-props ( stripped-props words -- )
     "Stripping word properties" show
     [
         [
-            word-props swap
-            '[ , nip member? ] assoc-filter
-            f assoc-like
-        ] keep set-word-props
+            props>> swap
+            '[ drop , member? not ] assoc-filter sift-assoc
+            dup assoc-empty? [ drop f ] [ >alist >vector ] if
+        ] keep (>>props)
     ] with each ;
 
-: retained-props ( -- seq )
+: stripped-word-props ( -- seq )
     [
-        "class" ,
-        "metaclass" ,
-        "layout" ,
-        deploy-ui? get [
-            "gestures" ,
-            "commands" ,
-            { "+nullary+" "+listener+" "+description+" }
-            [ "ui.commands" lookup , ] each
+        strip-dictionary? [
+            {
+                "coercer"
+                "compiled-effect"
+                "compiled-uses"
+                "constraints"
+                "declared-effect"
+                "default"
+                "default-method"
+                "default-output-classes"
+                "derived-from"
+                "identities"
+                "if-intrinsics"
+                "infer"
+                "inferred-effect"
+                "interval"
+                "intrinsics"
+                "loc"
+                "members"
+                "methods"
+                "method-class"
+                "method-generic"
+                "combination"
+                "cannot-infer"
+                "no-compile"
+                "optimizer-hooks"
+                "output-classes"
+                "participants"
+                "predicate"
+                "predicate-definition"
+                "predicating"
+                "tuple-dispatch-generic"
+                "slots"
+                "slot-names"
+                "specializer"
+                "step-into"
+                "step-into?"
+                "superclass"
+                "reading"
+                "writing"
+                "type"
+                "engines"
+            } %
+        ] when
+        
+        strip-prettyprint? [
+            {
+                "break-before"
+                "break-after"
+                "delimiter"
+                "flushable"
+                "foldable"
+                "inline"
+                "lambda"
+                "macro"
+                "memo-quot"
+                "parsing"
+                "word-style"
+            } %
         ] when
     ] { } make ;
 
@@ -110,6 +167,8 @@ IN: tools.deploy.shaker
     [
         "callbacks" "alien.compiler" lookup ,
 
+        "inspector-hook" "inspector" lookup ,
+
         {
             bootstrap.stage2:bootstrap-time
             continuations:error
@@ -118,7 +177,6 @@ IN: tools.deploy.shaker
             continuations:restarts
             listener:error-hook
             init:init-hooks
-            inspector:inspector-hook
             io.thread:io-thread
             libc.private:mallocs
             source-files:source-files
@@ -133,11 +191,11 @@ IN: tools.deploy.shaker
 
         strip-io? [ io.backend:io-backend , ] when
 
-        [
-            io.backend:io-backend ,
-            "default-buffer-size" "io.ports" lookup ,
-        ] { } make
-        { "alarms" "io" "tools" } strip-vocab-globals %
+        { } {
+            "alarms"
+            "tools"
+            "io.launcher"
+        } strip-vocab-globals %
 
         strip-dictionary? [
             { } { "cpu" } strip-vocab-globals %
@@ -210,9 +268,25 @@ IN: tools.deploy.shaker
         global swap
         '[ drop , member? not ] assoc-filter
         [ drop string? not ] assoc-filter ! strip CLI args
+        sift-assoc
         dup keys unparse show
         21 setenv
     ] [ drop ] if ;
+
+: compress ( pred string -- )
+    "Compressing " prepend show
+    instances
+    dup H{ } clone [ [ ] cache ] curry map
+    become ; inline
+
+: compress-byte-arrays ( -- )
+    [ byte-array? ] "byte arrays" compress ;
+
+: compress-quotations ( -- )
+    [ quotation? ] "quotations" compress ;
+
+: compress-strings ( -- )
+    [ string? ] "strings" compress ;
 
 : finish-deploy ( final-image -- )
     "Finishing up" show
@@ -220,7 +294,6 @@ IN: tools.deploy.shaker
     { } set-retainstack
     V{ } set-namestack
     V{ } set-catchstack
-    
     "Saving final image" show
     [ save-image-and-exit ] call-clear ;
 
@@ -242,9 +315,12 @@ SYMBOL: deploy-vocab
     strip-recompile-hook
     strip-init-hooks
     deploy-vocab get vocab-main set-boot-quot*
-    retained-props >r
+    stripped-word-props >r
     stripped-globals strip-globals
-    r> strip-words ;
+    r> strip-words
+    compress-byte-arrays
+    compress-quotations
+    compress-strings ;
 
 : (deploy) ( final-image vocab config -- )
     #! Does the actual work of a deployment in the slave

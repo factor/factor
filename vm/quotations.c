@@ -25,6 +25,13 @@ bool jit_fast_dispatch_p(F_ARRAY *array, CELL i)
 		&& array_nth(array,i + 1) == userenv[JIT_DISPATCH_WORD];
 }
 
+bool jit_ignore_declare_p(F_ARRAY *array, CELL i)
+{
+	return (i + 1) < array_capacity(array)
+		&& type_of(array_nth(array,i)) == ARRAY_TYPE
+		&& array_nth(array,i + 1) == userenv[JIT_DECLARE_WORD];
+}
+
 F_ARRAY *code_to_emit(CELL name)
 {
 	return untag_object(array_nth(untag_object(userenv[name]),0));
@@ -72,8 +79,24 @@ bool jit_stack_frame_p(F_ARRAY *array)
 
 	for(i = 0; i < length - 1; i++)
 	{
-		if(type_of(array_nth(array,i)) == WORD_TYPE)
-			return true;
+		CELL obj = array_nth(array,i);
+		if(type_of(obj) == WORD_TYPE)
+		{
+			if(obj != userenv[JIT_TAG_WORD]
+				&& obj != userenv[JIT_EQP_WORD]
+				&& obj != userenv[JIT_SLOT_WORD]
+				&& obj != userenv[JIT_DROP_WORD]
+				&& obj != userenv[JIT_DUP_WORD]
+				&& obj != userenv[JIT_TO_R_WORD]
+				&& obj != userenv[JIT_FROM_R_WORD]
+				&& obj != userenv[JIT_SWAP_WORD]
+				&& obj != userenv[JIT_OVER_WORD]
+				&& obj != userenv[JIT_FIXNUM_MINUS_WORD]
+				&& obj != userenv[JIT_FIXNUM_GE_WORD])
+			{
+				return true;
+			}
+		}
 	}
 
 	return false;
@@ -131,24 +154,74 @@ void jit_compile(CELL quot, bool relocate)
 		switch(type_of(obj))
 		{
 		case WORD_TYPE:
-			/* Emit the epilog before the primitive call gate
-			so that we save the C stack pointer minus the
-			current stack frame. */
-			word = untag_object(obj);
-
-			GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
-
-			if(i == length - 1)
+			/* Intrinsics */
+			if(obj == userenv[JIT_TAG_WORD])
 			{
-				if(stack_frame)
-					EMIT(JIT_EPILOG,0);
-
-				EMIT(JIT_WORD_JUMP,literals_count - 1);
-
-				tail_call = true;
+				EMIT(JIT_TAG,0);
+			}
+			else if(obj == userenv[JIT_EQP_WORD])
+			{
+				GROWABLE_ARRAY_ADD(literals,T);
+				EMIT(JIT_EQP,literals_count - 1);
+			}
+			else if(obj == userenv[JIT_SLOT_WORD])
+			{
+				EMIT(JIT_SLOT,0);
+			}
+			else if(obj == userenv[JIT_DROP_WORD])
+			{
+				EMIT(JIT_DROP,0);
+			}
+			else if(obj == userenv[JIT_DUP_WORD])
+			{
+				EMIT(JIT_DUP,0);
+			}
+			else if(obj == userenv[JIT_TO_R_WORD])
+			{
+				EMIT(JIT_TO_R,0);
+			}
+			else if(obj == userenv[JIT_FROM_R_WORD])
+			{
+				EMIT(JIT_FROM_R,0);
+			}
+			else if(obj == userenv[JIT_SWAP_WORD])
+			{
+				EMIT(JIT_SWAP,0);
+			}
+			else if(obj == userenv[JIT_OVER_WORD])
+			{
+				EMIT(JIT_OVER,0);
+			}
+			else if(obj == userenv[JIT_FIXNUM_MINUS_WORD])
+			{
+				EMIT(JIT_FIXNUM_MINUS,0);
+			}
+			else if(obj == userenv[JIT_FIXNUM_GE_WORD])
+			{
+				GROWABLE_ARRAY_ADD(literals,T);
+				EMIT(JIT_FIXNUM_GE,literals_count - 1);
 			}
 			else
-				EMIT(JIT_WORD_CALL,literals_count - 1);
+			{
+				/* Emit the epilog before the primitive call gate
+				so that we save the C stack pointer minus the
+				current stack frame. */
+				word = untag_object(obj);
+
+				GROWABLE_ARRAY_ADD(literals,array_nth(untag_object(array),i));
+
+				if(i == length - 1)
+				{
+					if(stack_frame)
+						EMIT(JIT_EPILOG,0);
+
+					EMIT(JIT_WORD_JUMP,literals_count - 1);
+
+					tail_call = true;
+				}
+				else
+					EMIT(JIT_WORD_CALL,literals_count - 1);
+			}
 			break;
 		case WRAPPER_TYPE:
 			wrapper = untag_object(obj);
@@ -192,6 +265,11 @@ void jit_compile(CELL quot, bool relocate)
 				i++;
 
 				tail_call = true;
+				break;
+			}
+			else if(jit_ignore_declare_p(untag_object(array),i))
+			{
+				i++;
 				break;
 			}
 		default:
@@ -261,24 +339,47 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 	for(i = 0; i < length; i++)
 	{
 		CELL obj = array_nth(untag_object(array),i);
-		F_WORD *word;
 
 		switch(type_of(obj))
 		{
 		case WORD_TYPE:
-			word = untag_object(obj);
-
-			if(i == length - 1)
-			{
-				if(stack_frame)
-					COUNT(JIT_EPILOG,i);
-
-				COUNT(JIT_WORD_JUMP,i)
-
-				tail_call = true;
-			}
+			/* Intrinsics */
+			if(obj == userenv[JIT_TAG_WORD])
+				COUNT(JIT_TAG,i)
+			else if(obj == userenv[JIT_EQP_WORD])
+				COUNT(JIT_EQP,i)
+			else if(obj == userenv[JIT_SLOT_WORD])
+				COUNT(JIT_SLOT,i)
+			else if(obj == userenv[JIT_DROP_WORD])
+				COUNT(JIT_DROP,i)
+			else if(obj == userenv[JIT_DUP_WORD])
+				COUNT(JIT_DUP,i)
+			else if(obj == userenv[JIT_TO_R_WORD])
+				COUNT(JIT_TO_R,i)
+			else if(obj == userenv[JIT_FROM_R_WORD])
+				COUNT(JIT_FROM_R,i)
+			else if(obj == userenv[JIT_SWAP_WORD])
+				COUNT(JIT_SWAP,i)
+			else if(obj == userenv[JIT_OVER_WORD])
+				COUNT(JIT_OVER,i)
+			else if(obj == userenv[JIT_FIXNUM_MINUS_WORD])
+				COUNT(JIT_FIXNUM_MINUS,i)
+			else if(obj == userenv[JIT_FIXNUM_GE_WORD])
+				COUNT(JIT_FIXNUM_GE,i)
 			else
-				COUNT(JIT_WORD_CALL,i)
+			{
+				if(i == length - 1)
+				{
+					if(stack_frame)
+						COUNT(JIT_EPILOG,i);
+	
+					COUNT(JIT_WORD_JUMP,i)
+	
+					tail_call = true;
+				}
+				else
+					COUNT(JIT_WORD_CALL,i)
+			}
 			break;
 		case WRAPPER_TYPE:
 			COUNT(JIT_PUSH_LITERAL,i)
@@ -317,6 +418,11 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 				COUNT(JIT_DISPATCH,i)
 
 				tail_call = true;
+				break;
+			}
+			if(jit_ignore_declare_p(untag_object(array),i))
+			{
+				i++;
 				break;
 			}
 		default:

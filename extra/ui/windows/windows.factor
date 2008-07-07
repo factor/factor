@@ -207,9 +207,9 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
     wParam keystroke>gesture <key-up>
     hWnd window-focus send-gesture drop ;
 
-: set-window-active ( hwnd uMsg wParam lParam ? -- n )
-    >r 4dup r> 2nip nip
-    swap window set-world-active? DefWindowProc ;
+:: set-window-active ( hwnd uMsg wParam lParam ? -- n )
+    ? hwnd window set-world-active?
+    hwnd uMsg wParam lParam DefWindowProc ;
 
 : handle-wm-syscommand ( hWnd uMsg wParam lParam -- n )
     {
@@ -383,7 +383,7 @@ SYMBOL: trace-messages?
     "uint" { "void*" "uint" "long" "long" } "stdcall" [
         [
             pick
-            trace-messages? get-global [ dup windows-message-name word-name print flush ] when
+            trace-messages? get-global [ dup windows-message-name name>> print flush ] when
             wm-handlers get-global at* [ call ] [ drop DefWindowProc ] if
         ] ui-try
      ] alien-callback ;

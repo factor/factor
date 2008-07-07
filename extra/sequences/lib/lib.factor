@@ -2,7 +2,7 @@
 !                    Eduardo Cavazos, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.lib kernel sequences math namespaces assocs 
-random sequences.private shuffle math.functions mirrors
+random sequences.private shuffle math.functions
 arrays math.parser math.private sorting strings ascii macros
 assocs.lib quotations hashtables math.order locals ;
 IN: sequences.lib
@@ -48,14 +48,6 @@ MACRO: firstn ( n -- )
   [ 1+ ] prepose
   r> compose
   2each ;                       inline
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: sigma ( seq quot -- n )
-    [ + ] compose 0 swap reduce ; inline
-
-: count ( seq quot -- n )
-    [ 1 0 ? ] compose sigma ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -131,10 +123,6 @@ MACRO: firstn ( n -- )
     [ find drop [ head-slice ] when* ] curry
     [ dup ] prepose keep like ;
 
-: replicate ( seq quot -- newseq )
-    #! quot: ( -- obj )
-    [ drop ] prepose map ; inline
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 <PRIVATE
@@ -205,9 +193,6 @@ USE: continuations
     >r >r 0 max r> r>
     [ length tuck min >r min r> ] keep subseq ;
 
-: accumulator ( quot -- quot vec )
-    V{ } clone [ [ push ] curry compose ] keep ; inline
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! List the positions of obj in seq
@@ -240,23 +225,6 @@ PRIVATE>
 
 : remove-nth ( seq n -- seq' )
     cut-slice rest-slice append ;
-
-: short ( seq n -- seq n' )
-    over length min ; inline
-
-<PRIVATE
-:: insert ( seq quot n -- )
-    n zero? [
-        n n 1- [ seq nth quot call ] bi@ >= [
-            n n 1- seq exchange
-            seq quot n 1- insert
-        ] unless
-    ] unless ; inline
-PRIVATE>
-
-: insertion-sort ( seq quot -- )
-    ! quot is a transformation on elements
-    over length [ insert ] 2with each ; inline
 
 : if-seq ( seq quot1 quot2 -- )
     [ f like ] 2dip if* ; inline

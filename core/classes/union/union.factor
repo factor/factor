@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words sequences kernel assocs combinators classes
-namespaces arrays math quotations ;
+classes.algebra namespaces arrays math quotations ;
 IN: classes.union
 
 PREDICATE: union-class < class
@@ -28,7 +28,10 @@ M: union-class update-class define-union-predicate ;
 : define-union-class ( class members -- )
     [ (define-union-class) ] [ drop update-classes ] 2bi ;
 
-M: union-class reset-class
-    { "class" "metaclass" "members" } reset-props ;
-
 M: union-class rank-class drop 2 ;
+
+M: union-class instance?
+    "members" word-prop [ instance? ] with contains? ;
+
+M: union-class (flatten-class)
+    members <anonymous-union> (flatten-class) ;

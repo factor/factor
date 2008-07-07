@@ -5,25 +5,12 @@ sequences.private growable bit-arrays prettyprint.backend
 parser accessors ;
 IN: bit-vectors
 
-TUPLE: bit-vector underlying fill ;
-
-M: bit-vector underlying underlying>> { bit-array } declare ;
-
-M: bit-vector set-underlying (>>underlying) ;
-
-M: bit-vector length fill>> { array-capacity } declare ;
-
-M: bit-vector set-fill (>>fill) ;
-
-<PRIVATE
-
-: bit-array>vector ( bit-array length -- bit-vector )
-    bit-vector boa ; inline
-
-PRIVATE>
+TUPLE: bit-vector
+{ underlying bit-array initial: ?{ } }
+{ length array-capacity } ;
 
 : <bit-vector> ( n -- bit-vector )
-    <bit-array> 0 bit-array>vector ; inline
+    <bit-array> 0 bit-vector boa ; inline
 
 : >bit-vector ( seq -- bit-vector )
     T{ bit-vector f ?{ } 0 } clone-like ;
@@ -31,11 +18,11 @@ PRIVATE>
 M: bit-vector like
     drop dup bit-vector? [
         dup bit-array?
-        [ dup length bit-array>vector ] [ >bit-vector ] if
+        [ dup length bit-vector boa ] [ >bit-vector ] if
     ] unless ;
 
 M: bit-vector new-sequence
-    drop [ <bit-array> ] keep >fixnum bit-array>vector ;
+    drop [ <bit-array> ] [ >fixnum ] bi bit-vector boa ;
 
 M: bit-vector equal?
     over bit-vector? [ sequence= ] [ 2drop f ] if ;

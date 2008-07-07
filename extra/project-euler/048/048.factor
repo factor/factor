@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions sequences.lib ;
+USING: kernel math math.functions sequences ;
 IN: project-euler.048
 
 ! http://projecteuler.net/index.php?section=problems&id=48

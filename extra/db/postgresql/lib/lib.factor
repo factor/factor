@@ -5,7 +5,7 @@ quotations sequences db.postgresql.ffi alien alien.c-types
 db.types tools.walker ascii splitting math.parser combinators
 libc shuffle calendar.format byte-arrays destructors prettyprint
 accessors strings serialize io.encodings.binary io.encodings.utf8
-alien.strings io.streams.byte-array inspector ;
+alien.strings io.streams.byte-array summary present urls ;
 IN: db.postgresql.lib
 
 : postgresql-result-error-message ( res -- str/f )
@@ -84,6 +84,7 @@ M: postgresql-result-null summary ( obj -- str )
             { TIME [ dup [ timestamp>hms ] when default-param-value ] }
             { DATETIME [ dup [ timestamp>ymdhms ] when default-param-value ] }
             { TIMESTAMP [ dup [ timestamp>ymdhms ] when default-param-value ] }
+            { URL [ dup [ present ] when default-param-value ] }
             [ drop default-param-value ]
         } case 2array
     ] 2map flip dup empty? [
@@ -164,6 +165,7 @@ M: postgresql-malloc-destructor dispose ( obj -- )
         { TIMESTAMP [ pq-get-string dup [ ymdhms>timestamp ] when ] }
         { DATETIME [ pq-get-string dup [ ymdhms>timestamp ] when ] }
         { BLOB [ pq-get-blob ] }
+        { URL [ pq-get-string dup [ >url ] when ] }
         { FACTOR-BLOB [
             pq-get-blob
             dup [ bytes>object ] when ] }

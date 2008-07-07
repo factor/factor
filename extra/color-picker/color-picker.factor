@@ -1,9 +1,9 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions math.parser models sequences
-ui ui.gadgets ui.gadgets.frames
-ui.gadgets.labels ui.gadgets.packs ui.gadgets.sliders ui.render
-;
+USING: kernel math math.functions math.parser models
+models.filter models.range models.compose sequences ui
+ui.gadgets ui.gadgets.frames ui.gadgets.labels ui.gadgets.packs
+ui.gadgets.sliders ui.render ;
 IN: color-picker
 
 ! Simple example demonstrating the use of models.
@@ -24,7 +24,7 @@ M: color-preview model-changed
     [ [ 256 /f ] map 1 suffix <solid> ] <filter> ;
 
 : <color-sliders> ( -- model gadget )
-    3 [ drop 0 0 0 255 <range> ] map
+    3 [ 0 0 0 255 <range> ] replicate
     dup [ range-model ] map <compose>
     swap [ [ <color-slider> gadget, ] each ] make-filled-pile ;
 

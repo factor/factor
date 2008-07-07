@@ -1,9 +1,10 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays ui.gestures ui.gadgets ui.gadgets.buttons
+USING: accessors arrays ui.gestures ui.gadgets ui.gadgets.buttons
 ui.gadgets.frames ui.gadgets.grids math.order
 ui.gadgets.theme ui.render kernel math namespaces sequences
-vectors models math.vectors math.functions quotations colors ;
+vectors models models.range math.vectors math.functions
+quotations colors ;
 IN: ui.gadgets.sliders
 
 TUPLE: elevator direction ;
@@ -65,14 +66,15 @@ thumb H{
     { T{ drag } [ do-drag ] }
 } set-gestures
 
-: thumb-theme ( thumb -- )
-    plain-gradient over set-gadget-interior faint-boundary ;
+: thumb-theme ( thumb -- thumb )
+    plain-gradient >>interior
+    faint-boundary ; inline
 
 : <thumb> ( vector -- thumb )
     thumb construct-gadget
-    t over set-gadget-root?
-    dup thumb-theme
-    [ set-gadget-orientation ] keep ;
+    swap >>orientation
+    t >>root?
+    thumb-theme ;
 
 : slide-by ( amount slider -- )
     gadget-model move-by ;

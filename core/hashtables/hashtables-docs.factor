@@ -8,7 +8,7 @@ ARTICLE: "hashtables.private" "Hashtable implementation details"
 $nl
 "There are two special objects: the " { $link ((tombstone)) } " marker and the " { $link ((empty)) } " marker. Neither of these markers can be used as hashtable keys."
 $nl
-"The " { $link hash-count } " slot is the number of entries including deleted entries, and " { $link hash-deleted } " is the number of deleted entries."
+"The " { $snippet "count" } " slot is the number of entries including deleted entries, and " { $snippet "deleted" } " is the number of deleted entries."
 { $subsection <hash-array> }
 { $subsection set-nth-pair }
 "If a hashtable's keys are mutated, or if hashing algorithms change, hashtables can be rehashed:"

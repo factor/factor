@@ -6,6 +6,7 @@
 #include <sys/time.h>
 #include <dlfcn.h>
 #include <signal.h>
+#include <pthread.h>
 
 typedef char F_CHAR;
 typedef char F_SYMBOL;
@@ -26,6 +27,8 @@ typedef char F_SYMBOL;
 #define OPEN_WRITE(path) fopen(path,"wb")
 #define FPRINTF(stream,format,arg) fprintf(stream,format,arg)
 
+void start_thread(void *(*start_routine)(void *));
+
 void init_ffi(void);
 void ffi_dlopen(F_DLL *dll);
 void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol);
@@ -38,5 +41,4 @@ void dump_stack_signal(int signal, siginfo_t* siginfo, void* uap);
 s64 current_millis(void);
 void sleep_millis(CELL msec);
 
-void reset_stdio(void);
 void open_console(void);

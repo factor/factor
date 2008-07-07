@@ -1,30 +1,30 @@
 IN: persistent-vectors.tests
-USING: tools.test persistent-vectors sequences kernel arrays
-random namespaces vectors math math.order ;
+USING: accessors tools.test persistent-vectors sequences kernel
+arrays random namespaces vectors math math.order ;
 
 \ new-nth must-infer
 \ ppush must-infer
 \ ppop must-infer
 
-[ 0 ] [ pempty length ] unit-test
+[ 0 ] [ PV{ } length ] unit-test
 
-[ 1 ] [ 3 pempty ppush length ] unit-test
+[ 1 ] [ 3 PV{ } ppush length ] unit-test
 
-[ 3 ] [ 3 pempty ppush first ] unit-test
+[ 3 ] [ 3 PV{ } ppush first ] unit-test
 
 [ PV{ 3 1 3 3 7 } ] [
-    pempty { 3 1 3 3 7 } [ swap ppush ] each
+    PV{ } { 3 1 3 3 7 } [ swap ppush ] each
 ] unit-test
 
 [ { 3 1 3 3 7 } ] [
-    pempty { 3 1 3 3 7 } [ swap ppush ] each >array
+    PV{ } { 3 1 3 3 7 } [ swap ppush ] each >array
 ] unit-test
 
 { 100 1060 2000 10000 100000 1000000 } [
     [ t ] swap [ dup >persistent-vector sequence= ] curry unit-test
 ] each
 
-[ ] [ 10000 [ drop 16 random-bits ] PV{ } map-as "1" set ] unit-test
+[ ] [ 10000 [ 16 random-bits ] PV{ } replicate-as "1" set ] unit-test
 [ ] [ "1" get >vector "2" set ] unit-test
 
 [ t ] [
@@ -47,6 +47,20 @@ random namespaces vectors math math.order ;
 
 [ ] [ PV{ } "1" set ] unit-test
 [ ] [ V{ } clone "2" set ] unit-test
+
+: push/pop-test ( vec -- vec' ) 3 swap ppush 3 swap ppush ppop ;
+
+[ ] [ PV{ } 10000 [ push/pop-test ] times drop ] unit-test
+
+[ PV{ } ] [
+    PV{ }
+    10000 [ 1 swap ppush ] times
+    10000 [ ppop ] times
+] unit-test
+
+[ t ] [
+    10000 >persistent-vector 752 [ ppop ] times dup length sequence=
+] unit-test
 
 [ t ] [
     100 [

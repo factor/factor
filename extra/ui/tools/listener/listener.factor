@@ -90,7 +90,7 @@ M: listener-operation invoke-command ( target command -- )
 GENERIC: word-completion-string ( word -- string )
 
 M: word word-completion-string
-    word-name ;
+    name>> ;
 
 M: method-body word-completion-string
     "method-generic" word-prop word-completion-string ;
@@ -101,9 +101,9 @@ M: engine-word word-completion-string
     "engine-generic" word-prop word-completion-string ;
 
 : use-if-necessary ( word seq -- )
-    over word-vocabulary [
+    over vocabulary>> [
         2dup assoc-stack pick = [ 2drop ] [
-            >r word-vocabulary vocab-words r> push
+            >r vocabulary>> vocab-words r> push
         ] if
     ] [ 2drop ] if ;
 

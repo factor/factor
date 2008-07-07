@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.streams.string kernel math namespaces sequences
-strings circular prettyprint debugger ascii sbufs fry inspector
+strings circular prettyprint debugger ascii sbufs fry summary
 accessors sequences.lib ;
 IN: state-parser
 
@@ -144,7 +144,7 @@ M: not-enough-characters summary ( obj -- str )
     ] if next ;
 
 : expect-string ( string -- )
-    dup [ drop get-char next ] map 2dup =
+    dup [ get-char next ] replicate 2dup =
     [ 2drop ] [ expected ] if ;
 
 : init-parser ( -- )

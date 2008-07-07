@@ -1,8 +1,9 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs continuations kernel math models
 namespaces opengl sequences io combinators math.vectors
-ui.gadgets ui.gestures ui.render ui.backend inspector ;
+ui.gadgets ui.gestures ui.render ui.backend summary
+debugger ;
 IN: ui.gadgets.worlds
 
 TUPLE: world < identity-tuple
@@ -78,7 +79,8 @@ TUPLE: world-error world ;
 
 SYMBOL: ui-error-hook
 
-: ui-error ( error -- ) ui-error-hook get call ;
+: ui-error ( error -- )
+    ui-error-hook get [ call ] [ print-error ] if* ;
 
 [ rethrow ] ui-error-hook set-global
 

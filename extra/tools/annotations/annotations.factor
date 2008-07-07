@@ -1,8 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel words parser io inspector quotations sequences
-prettyprint continuations effects definitions compiler.units
-namespaces assocs tools.walker generic ;
+USING: accessors kernel words parser io summary quotations
+sequences prettyprint continuations effects definitions
+compiler.units namespaces assocs tools.walker generic
+inspector ;
 IN: tools.annotations
 
 GENERIC: reset ( word -- )
@@ -24,8 +25,8 @@ M: word reset
         "Cannot annotate a word twice" throw
     ] when
     [
-        over dup word-def "unannotated-def" set-word-prop
-        >r dup word-def r> call define
+        over dup def>> "unannotated-def" set-word-prop
+        >r dup def>> r> call define
     ] with-compilation-unit ; inline
 
 : word-inputs ( word -- seq )

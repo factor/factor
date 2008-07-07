@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel continuations sequences sequences.lib math
-namespaces sets math.parser math.ranges assocs regexp fry
-unicode.categories arrays hashtables words combinators mirrors
+namespaces sets math.parser math.ranges assocs regexp
+unicode.categories arrays hashtables words
 classes quotations xmode.catalog ;
 IN: validators
 
@@ -107,53 +107,3 @@ IN: validators
     ] [
         "invalid credit card number format" throw
     ] if ;
-
-SYMBOL: validation-messages
-SYMBOL: named-validation-messages
-
-: init-validation ( -- )
-    V{ } clone validation-messages set
-    H{ } clone named-validation-messages set ;
-
-: (validation-message) ( obj -- )
-    validation-messages get push ;
-
-: (validation-message-for) ( obj name -- )
-    named-validation-messages get set-at ;
-
-TUPLE: validation-message message ;
-
-C: <validation-message> validation-message
-
-: validation-message ( string -- )
-    <validation-message> (validation-message) ;
-
-: validation-message-for ( string name -- )
-    [ <validation-message> ] dip (validation-message-for) ;
-
-TUPLE: validation-error message value ;
-
-C: <validation-error> validation-error
-
-: validation-error ( message -- )
-    f <validation-error> (validation-message) ;
-
-: validation-error-for ( message value name -- )
-    [ <validation-error> ] dip (validation-message-for) ;
-
-: validation-failed? ( -- ? )
-    validation-messages get [ validation-error? ] contains?
-    named-validation-messages get [ nip validation-error? ] assoc-contains?
-    or ;
-
-: define-validators ( class validators -- )
-    >hashtable "validators" set-word-prop ;
-
-: validate ( value name quot -- result )
-    '[ drop @ ] [ -rot validation-error-for f ] recover ; inline
-
-: required-values ( assoc -- )
-    [ swap [ v-required ] validate drop ] assoc-each ;
-
-: validate-values ( assoc validators -- assoc' )
-    swap '[ [ [ dup , at ] keep ] dip validate ] assoc-map ;

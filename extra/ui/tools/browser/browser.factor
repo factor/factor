@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: debugger ui.tools.workspace help help.topics kernel
-models ui.commands ui.gadgets ui.gadgets.panes
+models models.history ui.commands ui.gadgets ui.gadgets.panes
 ui.gadgets.scrollers ui.gadgets.tracks ui.gestures
 ui.gadgets.buttons compiler.units assocs words vocabs
 accessors ;

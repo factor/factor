@@ -287,7 +287,7 @@ M: sbuf no-stack-effect-decl ;
 
 [ ] [ \ no-stack-effect-decl see ] unit-test
 
-[ ] [ \ no-stack-effect-decl word-def . ] unit-test
+[ ] [ \ no-stack-effect-decl def>> . ] unit-test
 
 ! Cross-referencing with generic words
 TUPLE: xref-tuple-1 ;
@@ -308,4 +308,12 @@ M: xref-tuple-2 xref-test (xref-test) ;
 [ t ] [
     \ xref-test
     \ xref-tuple-2 \ xref-test method [ usage unique ] closure key?
+] unit-test
+
+[ t ] [
+    { } \ nth effective-method nip \ sequence \ nth method eq?
+] unit-test
+
+[ t ] [
+    \ + \ nth effective-method nip dup \ nth "default-method" word-prop eq? and
 ] unit-test

@@ -8,15 +8,15 @@
 		<table>
 			<tr>
 				<th>Revision</th>
-				<th>Author</th>
+				<th>By</th>
 				<th>Rollback</th>
 			</tr>
 
 			<t:bind-each t:name="revisions">
 				<tr>
-					<td> <t:a t:href="revision" t:query="id"><t:label t:name="date" /></t:a> </td>
-					<td> <t:a t:href="user-edits" t:query="author"><t:label t:name="author" /></t:a> </td>
-					<td> <t:button t:action="rollback" t:for="id" class="link link-button">Rollback</t:button> </td>
+					<td> <t:a t:href="$wiki/revision" t:rest="id"><t:label t:name="date" /></t:a> </td>
+					<td> <t:a t:href="$wiki/user-edits" t:rest="author"><t:label t:name="author" /></t:a> </td>
+					<td> <t:button t:action="$wiki/rollback" t:for="id" class="link link-button">Rollback</t:button> </td>
 				</tr>
 			</t:bind-each>
 		</table>
@@ -24,7 +24,7 @@
 
 	<h2>View Differences</h2>
 
-	<form action="diff" method="get">
+	<t:form t:action="$wiki/diff" t:method="get">
 		<table>
 			<tr>
 				<th class="field-label">Old revision:</th>
@@ -51,6 +51,6 @@
 		</table>
 
 		<input type="submit" value="View" />
-	</form>
+	</t:form>
 
 </t:chloe>

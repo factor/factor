@@ -11,6 +11,7 @@ IN: bootstrap.x86
 : temp-reg ( -- reg ) EBX ;
 : stack-reg ( -- reg ) ESP ;
 : ds-reg ( -- reg ) ESI ;
+: rs-reg ( -- reg ) EDI ;
 : fixnum>slot@ ( -- ) arg0 1 SAR ;
 : rex-length ( -- n ) 0 ;
 

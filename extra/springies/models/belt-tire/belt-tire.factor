@@ -1,5 +1,5 @@
 
-USING: kernel namespaces arrays sequences threads math ui random bake
+USING: kernel namespaces arrays sequences threads math ui random
        springies springies.ui ;
 
 IN: springies.models.belt-tire

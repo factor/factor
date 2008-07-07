@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math sequences vectors math.order
-sequences sequences.private growable math.order ;
+USING: accessors arrays kernel math sequences vectors math.order
+sequences sequences.private math.order ;
 IN: sorting
 
 DEFER: sort
@@ -34,7 +34,7 @@ DEFER: sort
 : merge ( sorted1 sorted2 quot -- result )
     >r [ [ <iterator> ] bi@ ] 2keep r>
     rot length rot length + <vector>
-    [ (merge) ] keep underlying ; inline
+    [ (merge) ] [ underlying>> ] bi ; inline
 
 : conquer ( first second quot -- result )
     [ tuck >r >r sort r> r> sort ] keep merge ; inline

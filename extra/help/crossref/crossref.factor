@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic assocs
 io kernel namespaces prettyprint prettyprint.sections
-sequences words inspector classes help.topics help.markup ;
+sequences words summary classes help.topics help.markup ;
 IN: help.crossref
 
 : article-children ( topic -- seq )

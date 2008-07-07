@@ -1,9 +1,21 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel classes classes.builtin combinators accessors
-sequences arrays vectors assocs namespaces words sorting layouts
-math hashtables kernel.private sets math.order ;
+USING: kernel classes combinators accessors sequences arrays
+vectors assocs namespaces words sorting layouts math hashtables
+kernel.private sets math.order ;
 IN: classes.algebra
+
+TUPLE: anonymous-union members ;
+
+C: <anonymous-union> anonymous-union
+
+TUPLE: anonymous-intersection participants ;
+
+C: <anonymous-intersection> anonymous-intersection
+
+TUPLE: anonymous-complement class ;
+
+C: <anonymous-complement> anonymous-complement
 
 : 2cache ( key1 key2 assoc quot -- value )
     >r >r 2array r> [ first2 ] r> compose cache ; inline
@@ -18,10 +30,19 @@ DEFER: (class-not)
 : class-not ( class -- complement )
     class-not-cache get [ (class-not) ] cache ;
 
-DEFER: (classes-intersect?) ( first second -- ? )
+GENERIC: (classes-intersect?) ( first second -- ? )
+
+: normalize-class ( class -- class' )
+    {
+        { [ dup members ] [ members <anonymous-union> ] }
+        { [ dup participants ] [ participants <anonymous-intersection> ] }
+        [ ]
+    } cond ;
 
 : classes-intersect? ( first second -- ? )
-    classes-intersect-cache get [ (classes-intersect?) ] 2cache ;
+    classes-intersect-cache get [
+        normalize-class (classes-intersect?)
+    ] 2cache ;
 
 DEFER: (class-and)
 
@@ -32,18 +53,6 @@ DEFER: (class-or)
 
 : class-or ( first second -- class )
     class-or-cache get [ (class-or) ] 2cache ;
-
-TUPLE: anonymous-union members ;
-
-C: <anonymous-union> anonymous-union
-
-TUPLE: anonymous-intersection participants ;
-
-C: <anonymous-intersection> anonymous-intersection
-
-TUPLE: anonymous-complement class ;
-
-C: <anonymous-complement> anonymous-complement
 
 : superclass<= ( first second -- ? )
     >r superclass r> class<= ;
@@ -62,13 +71,6 @@ C: <anonymous-complement> anonymous-complement
 
 : anonymous-complement<= ( first second -- ? )
     [ class>> ] bi@ swap class<= ;
-
-: normalize-class ( class -- class' )
-    {
-        { [ dup members ] [ members <anonymous-union> ] }
-        { [ dup participants ] [ participants <anonymous-intersection> ] }
-        [ ]
-    } cond ;
 
 : normalize-complement ( class -- class' )
     class>> normalize-class {
@@ -116,39 +118,14 @@ PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
         } cond
     ] if ;
 
-: anonymous-union-intersect? ( first second -- ? )
+M: anonymous-union (classes-intersect?)
     members>> [ classes-intersect? ] with contains? ;
 
-: anonymous-intersection-intersect? ( first second -- ? )
+M: anonymous-intersection (classes-intersect?)
     participants>> [ classes-intersect? ] with all? ;
 
-: anonymous-complement-intersect? ( first second -- ? )
+M: anonymous-complement (classes-intersect?)
     class>> class<= not ;
-
-: tuple-class-intersect? ( first second -- ? )
-    {
-        { [ over tuple eq? ] [ 2drop t ] }
-        { [ over builtin-class? ] [ 2drop f ] }
-        { [ over tuple-class? ] [ [ class<= ] [ swap class<= ] 2bi or ] }
-        [ swap classes-intersect? ]
-    } cond ;
-
-: builtin-class-intersect? ( first second -- ? )
-    {
-        { [ 2dup eq? ] [ 2drop t ] }
-        { [ over builtin-class? ] [ 2drop f ] }
-        [ swap classes-intersect? ]
-    } cond ;
-
-: (classes-intersect?) ( first second -- ? )
-    normalize-class {
-        { [ dup anonymous-union? ] [ anonymous-union-intersect? ] }
-        { [ dup anonymous-intersection? ] [ anonymous-intersection-intersect? ] }
-        { [ dup anonymous-complement? ] [ anonymous-complement-intersect? ] }
-        { [ dup tuple-class? ] [ tuple-class-intersect? ] }
-        { [ dup builtin-class? ] [ builtin-class-intersect? ] }
-        { [ dup superclass ] [ superclass classes-intersect? ] }
-    } cond ;
 
 : anonymous-union-and ( first second -- class )
     members>> [ class-and ] with map <anonymous-union> ;
@@ -214,7 +191,7 @@ PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
     [ "Topological sort failed" throw ] unless* ;
 
 : sort-classes ( seq -- newseq )
-    [ [ word-name ] compare ] sort >vector
+    [ [ name>> ] compare ] sort >vector
     [ dup empty? not ]
     [ dup largest-class >r over delete-nth r> ]
     [ ] unfold nip ;
@@ -225,26 +202,10 @@ PREDICATE: empty-intersection < anonymous-intersection participants>> empty? ;
         tuck [ class<= ] with all? [ peek ] [ drop f ] if
     ] if ;
 
-DEFER: (flatten-class)
-DEFER: flatten-builtin-class
+GENERIC: (flatten-class) ( class -- )
 
-: flatten-intersection-class ( class -- )
-    participants [ flatten-builtin-class ] map
-    dup empty? [
-        drop builtins get [ (flatten-class) ] each
-    ] [
-        unclip [ assoc-intersect ] reduce [ swap set ] assoc-each
-    ] if ;
-
-: (flatten-class) ( class -- )
-    {
-        { [ dup tuple-class? ] [ dup set ] }
-        { [ dup builtin-class? ] [ dup set ] }
-        { [ dup members ] [ members [ (flatten-class) ] each ] }
-        { [ dup participants ] [ flatten-intersection-class ] }
-        { [ dup superclass ] [ superclass (flatten-class) ] }
-        [ drop ]
-    } cond ;
+M: anonymous-union (flatten-class)
+    members>> [ (flatten-class) ] each ;
 
 : flatten-class ( class -- assoc )
     [ (flatten-class) ] H{ } make-assoc ;
@@ -258,8 +219,11 @@ DEFER: flatten-builtin-class
     flatten-builtin-class keys
     [ "type" word-prop ] map natural-sort ;
 
-: class-tags ( class -- tag/f )
+: class-tags ( class -- seq )
     class-types [
         dup num-tags get >=
         [ drop \ hi-tag tag-number ] when
     ] map prune ;
+
+: class-tag ( class -- tag/f )
+    class-tags dup length 1 = [ first ] [ drop f ] if ;

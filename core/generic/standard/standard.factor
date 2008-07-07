@@ -10,7 +10,16 @@ IN: generic.standard
 
 GENERIC: dispatch# ( word -- n )
 
-M: word dispatch# "combination" word-prop dispatch# ;
+M: generic dispatch#
+    "combination" word-prop dispatch# ;
+
+GENERIC: method-declaration ( class generic -- quot )
+
+M: generic method-declaration
+    "combination" word-prop method-declaration ;
+
+M: quotation engine>quot
+    assumed get generic get method-declaration prepend ;
 
 : unpickers
     {
@@ -93,11 +102,11 @@ ERROR: no-next-method class generic ;
 
 : single-next-method-quot ( class generic -- quot )
     [
-        [ drop [ instance? ] curry % ]
+        [ drop "predicate" word-prop % ]
         [
             2dup next-method
             [ 2nip 1quotation ]
-            [ [ no-next-method ] 2curry ] if* ,
+            [ [ no-next-method ] 2curry [ ] like ] if* ,
         ]
         [ [ inconsistent-next-method ] 2curry , ]
         2tri
@@ -105,7 +114,9 @@ ERROR: no-next-method class generic ;
     ] [ ] make ;
 
 : single-effective-method ( obj word -- method )
-    [ order [ instance? ] with find-last nip ] keep method ;
+    [ [ order [ instance? ] with find-last nip ] keep method ]
+    [ "default-method" word-prop ]
+    bi or ;
 
 TUPLE: standard-combination # ;
 
@@ -133,6 +144,9 @@ M: standard-combination perform-combination
 
 M: standard-combination dispatch# #>> ;
 
+M: standard-combination method-declaration
+    dispatch# object <array> swap prefix [ declare ] curry [ ] like ;
+
 M: standard-combination next-method-quot*
     [
         single-next-method-quot picker prepend
@@ -154,6 +168,8 @@ PREDICATE: hook-generic < generic
     ] with-variable ; inline
 
 M: hook-combination dispatch# drop 0 ;
+
+M: hook-combination method-declaration 2drop [ ] ;
 
 M: hook-generic extra-values drop 1 ;
 

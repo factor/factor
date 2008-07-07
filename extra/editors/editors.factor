@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser kernel namespaces sequences definitions io.files
-inspector continuations tools.crossref tools.vocabs 
-io prettyprint source-files assocs vocabs vocabs.loader
-io.backend splitting accessors ;
+USING: parser lexer kernel namespaces sequences definitions
+io.files summary continuations tools.crossref tools.vocabs io
+prettyprint source-files assocs vocabs vocabs.loader io.backend
+splitting accessors ;
 IN: editors
 
 TUPLE: no-edit-hook ;
@@ -35,21 +35,37 @@ SYMBOL: edit-hook
 : edit-vocab ( name -- )
     vocab-source-path 1 edit-location ;
 
-GENERIC: find-parse-error ( error -- error' )
+GENERIC: error-file ( error -- file )
 
-M: parse-error find-parse-error
-    dup error>> find-parse-error [ ] [ ] ?if ;
+GENERIC: error-line ( error -- line )
 
-M: condition find-parse-error
-    error>> find-parse-error ;
+M: lexer-error error-file
+    error>> error-file ;
 
-M: object find-parse-error
+M: lexer-error error-line
+    [ error>> error-line ] [ line>> ] bi or ;
+
+M: source-file-error error-file
+    [ error>> error-file ] [ file>> path>> ] bi or ;
+
+M: source-file-error error-line
+    error>> error-line ;
+
+M: condition error-file
+    error>> error-file ;
+
+M: condition error-line
+    error>> error-line ;
+
+M: object error-file
+    drop f ;
+
+M: object error-line
     drop f ;
 
 : :edit ( -- )
-    error get find-parse-error [
-        [ file>> path>> ] [ line>> ] bi edit-location
-    ] when* ;
+    error get [ error-file ] [ error-line ] bi
+    2dup and [ edit-location ] [ 2drop ] if ;
 
 : edit-each ( seq -- )
     [

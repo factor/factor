@@ -4,7 +4,7 @@ USING: kernel math math.order strings arrays vectors sequences
 accessors ;
 IN: grouping
 
-TUPLE: abstract-groups seq n ;
+TUPLE: abstract-groups { seq read-only } { n read-only } ;
 
 : check-groups dup 0 <= [ "Invalid group count" throw ] when ; inline
 
@@ -56,7 +56,7 @@ M: clumps set-length
 M: clumps group@
     [ n>> over + ] [ seq>> ] bi ;
 
-TUPLE: sliced-clumps < groups ;
+TUPLE: sliced-clumps < clumps ;
 
 : <sliced-clumps> ( seq n -- clumps )
     sliced-clumps new-groups ; inline

@@ -1,10 +1,9 @@
 ! Copyright (C) 2007, 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces sequences io.files kernel assocs words vocabs
-definitions parser continuations inspector debugger io io.styles
-hashtables sorting prettyprint source-files
-arrays combinators strings system math.parser compiler.errors
-splitting init ;
+definitions parser continuations summary debugger io io.styles
+hashtables sorting prettyprint source-files arrays combinators
+strings system math.parser compiler.errors splitting init ;
 IN: vocabs.loader
 
 SYMBOL: vocab-roots
@@ -55,9 +54,11 @@ SYMBOL: load-help?
 : source-wasn't-loaded ( vocab -- ) f swap set-vocab-source-loaded? ;
 
 : load-source ( vocab -- )
-    [ source-wasn't-loaded ] keep
-    [ vocab-source-path [ bootstrap-file ] when* ] keep
-    source-was-loaded ;
+    [ source-wasn't-loaded ]
+    [ vocab-source-path [ parse-file ] [ [ ] ] if* ]
+    [ source-was-loaded ]
+    tri
+    [ % ] [ call ] if-bootstrapping ;
 
 : docs-were-loaded ( vocab -- ) t swap set-vocab-docs-loaded? ;
 
@@ -65,9 +66,10 @@ SYMBOL: load-help?
 
 : load-docs ( vocab -- )
     load-help? get [
-        [ docs-weren't-loaded ] keep
-        [ vocab-docs-path [ ?run-file ] when* ] keep
-        docs-were-loaded
+        [ docs-weren't-loaded ]
+        [ vocab-docs-path [ ?run-file ] when* ]
+        [ docs-were-loaded ]
+        tri
     ] [ drop ] if ;
 
 : reload ( name -- )

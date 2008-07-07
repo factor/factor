@@ -3,7 +3,7 @@
 USING: continuations definitions ui.tools.browser
 ui.tools.interactor ui.tools.listener ui.tools.profiler
 ui.tools.search ui.tools.traceback ui.tools.workspace generic
-help.topics inference inspector io.files io.styles kernel
+help.topics inference summary inspector io.files io.styles kernel
 namespaces parser prettyprint quotations tools.annotations
 editors tools.profiler tools.test tools.time tools.walker
 ui.commands ui.gadgets.editors ui.gestures ui.operations
@@ -109,7 +109,7 @@ GENERIC: com-stack-effect ( obj -- )
 
 M: quotation com-stack-effect infer. ;
 
-M: word com-stack-effect word-def com-stack-effect ;
+M: word com-stack-effect def>> com-stack-effect ;
 
 [ word? ] \ com-stack-effect H{
     { +listener+ t }

@@ -3,7 +3,7 @@ continuations destructors io io.backend io.ports io.timeouts
 io.windows io.windows.files libc kernel math namespaces
 sequences threads classes.tuple.lib windows windows.errors
 windows.kernel32 strings splitting io.files
-io.buffers qualified ascii combinators.lib system
+io.buffers qualified ascii system
 accessors locals ;
 QUALIFIED: windows.winsock
 IN: io.windows.nt.backend

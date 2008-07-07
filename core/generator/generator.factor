@@ -1,6 +1,6 @@
  ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs classes combinators cpu.architecture
+USING: accessors arrays assocs classes combinators cpu.architecture
 effects generator.fixup generator.registers generic hashtables
 inference inference.backend inference.dataflow io kernel
 kernel.private layouts math namespaces optimizer
@@ -13,14 +13,15 @@ SYMBOL: compiled
 
 : queue-compile ( word -- )
     {
-        { [ dup compiled get key? ] [ drop ] }
-        { [ dup inlined-block? ] [ drop ] }
-        { [ dup primitive? ] [ drop ] }
-        [ compile-queue get push-front ]
-    } cond ;
+        { [ dup "forgotten" word-prop ] [ ] }
+        { [ dup compiled get key? ] [ ] }
+        { [ dup inlined-block? ] [ ] }
+        { [ dup primitive? ] [ ] }
+        [ dup compile-queue get push-front ]
+    } cond drop ;
 
 : maybe-compile ( word -- )
-    dup compiled? [ drop ] [ queue-compile ] if ;
+    dup compiled>> [ drop ] [ queue-compile ] if ;
 
 SYMBOL: compiling-word
 
@@ -31,7 +32,7 @@ SYMBOL: compiling-loops
 ! Label of current word, after prologue, makes recursion faster
 SYMBOL: current-label-start
 
-: compiled-stack-traces? ( -- ? ) 36 getenv ;
+: compiled-stack-traces? ( -- ? ) 59 getenv ;
 
 : begin-compiling ( word label -- )
     H{ } clone compiling-loops set

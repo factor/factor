@@ -3,7 +3,8 @@ kernel math namespaces parser prettyprint sequences strings
 tools.test vectors words quotations classes classes.algebra
 classes.private classes.union classes.mixin classes.predicate
 vectors definitions source-files compiler.units growable
-random inference effects kernel.private sbufs math.order ;
+random inference effects kernel.private sbufs math.order
+classes.tuple ;
 IN: classes.algebra.tests
 
 \ class< must-infer
@@ -204,7 +205,7 @@ UNION: z1 b1 c1 ;
 
 10 [
     [ ] [
-        20 [ drop random-op ] map >quotation
+        20 [ random-op ] [ ] replicate-as
         [ infer effect-in [ random-class ] times ] keep
         call
         drop
@@ -238,8 +239,8 @@ UNION: z1 b1 c1 ;
 
 20 [
     [ t ] [
-        20 [ drop random-boolean-op ] [ ] map-as dup .
-        [ infer effect-in [ drop random-boolean ] map dup . ] keep
+        20 [ random-boolean-op ] [ ] replicate-as dup .
+        [ infer effect-in [ random-boolean ] replicate dup . ] keep
         
         [ >r [ ] each r> call ] 2keep
         
@@ -286,6 +287,8 @@ INTERSECTION: generic-class generic class ;
 [ H{ { word word } } ] [ 
     generic-class flatten-class
 ] unit-test
+
+[ \ + flatten-class ] must-fail
 
 INTERSECTION: empty-intersection ;
 

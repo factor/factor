@@ -1,19 +1,19 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays bit-arrays byte-arrays generic assocs
-hashtables assocs hashtables.private io kernel kernel.private
-math namespaces parser prettyprint sequences sequences.private
-strings sbufs vectors words quotations assocs system layouts
-splitting grouping growable classes classes.builtin classes.tuple
+USING: alien arrays byte-arrays generic assocs hashtables assocs
+hashtables.private io kernel kernel.private math namespaces
+parser prettyprint sequences sequences.private strings sbufs
+vectors words quotations assocs system layouts splitting
+grouping growable classes classes.builtin classes.tuple
 classes.tuple.private words.private io.binary io.files vocabs
-vocabs.loader source-files definitions debugger float-arrays
+vocabs.loader source-files definitions debugger
 quotations.private sequences.private combinators
-io.encodings.binary math.order accessors ;
+io.encodings.binary math.order math.private accessors slots.private ;
 IN: bootstrap.image
 
 : my-arch ( -- arch )
-    cpu word-name
-    dup "ppc" = [ >r os word-name "-" r> 3append ] when ;
+    cpu name>> 
+    dup "ppc" = [ >r os name>> "-" r> 3append ] when ;
 
 : boot-image-name ( arch -- string )
     "boot." swap ".image" 3append ;
@@ -75,7 +75,7 @@ SYMBOL: objects
 
 : data-base 1024 ; inline
 
-: userenv-size 64 ; inline
+: userenv-size 70 ; inline
 
 : header-size 10 ; inline
 
@@ -118,6 +118,29 @@ SYMBOL: jit-dispatch
 SYMBOL: jit-epilog
 SYMBOL: jit-return
 SYMBOL: jit-profiling
+SYMBOL: jit-tag
+SYMBOL: jit-tag-word
+SYMBOL: jit-eq?
+SYMBOL: jit-eq?-word
+SYMBOL: jit-slot
+SYMBOL: jit-slot-word
+SYMBOL: jit-declare-word
+SYMBOL: jit-drop
+SYMBOL: jit-drop-word
+SYMBOL: jit-dup
+SYMBOL: jit-dup-word
+SYMBOL: jit->r
+SYMBOL: jit->r-word
+SYMBOL: jit-r>
+SYMBOL: jit-r>-word
+SYMBOL: jit-swap
+SYMBOL: jit-swap-word
+SYMBOL: jit-over
+SYMBOL: jit-over-word
+SYMBOL: jit-fixnum-fast
+SYMBOL: jit-fixnum-fast-word
+SYMBOL: jit-fixnum>=
+SYMBOL: jit-fixnum>=-word
 
 ! Default definition for undefined words
 SYMBOL: undefined-quot
@@ -140,7 +163,30 @@ SYMBOL: undefined-quot
         { jit-epilog 33 }
         { jit-return 34 }
         { jit-profiling 35 }
-        { undefined-quot 37 }
+        { jit-tag 36 }
+        { jit-tag-word 37 }
+        { jit-eq? 38 }
+        { jit-eq?-word 39 }
+        { jit-slot 40 }
+        { jit-slot-word 41 }
+        { jit-declare-word 42 }
+        { jit-drop 43 }
+        { jit-drop-word 44 }
+        { jit-dup 45 }
+        { jit-dup-word 46 }
+        { jit->r 47 }
+        { jit->r-word 48 }
+        { jit-r> 49 }
+        { jit-r>-word 50 }
+        { jit-swap 51 }
+        { jit-swap-word 52 }
+        { jit-over 53 }
+        { jit-over-word 54 }
+        { jit-fixnum-fast 55 }
+        { jit-fixnum-fast-word 56 }
+        { jit-fixnum>= 57 }
+        { jit-fixnum>=-word 58 }
+        { undefined-quot 60 }
     } at header-size + ;
 
 : emit ( cell -- ) image get push ;
@@ -228,6 +274,12 @@ M: fixnum '
     bootstrap-most-positive-fixnum between?
     [ tag-fixnum ] [ >bignum ' ] if ;
 
+TUPLE: fake-bignum n ;
+
+C: <fake-bignum> fake-bignum
+
+M: fake-bignum ' n>> tag-fixnum ;
+
 ! Floats
 
 M: float '
@@ -260,10 +312,10 @@ M: f '
             [
                 {
                     [ hashcode , ]
-                    [ word-name , ]
-                    [ word-vocabulary , ]
-                    [ word-def , ]
-                    [ word-props , ]
+                    [ name>> , ]
+                    [ vocabulary>> , ]
+                    [ def>> , ]
+                    [ props>> , ]
                 } cleave
                 f ,
                 0 , ! count
@@ -277,7 +329,7 @@ M: f '
     ] keep put-object ;
 
 : word-error ( word msg -- * )
-    [ % dup word-vocabulary % " " % word-name % ] "" make throw ;
+    [ % dup vocabulary>> % " " % name>> % ] "" make throw ;
 
 : transfer-word ( word -- word )
     [ target-word ] keep or ;
@@ -294,7 +346,7 @@ M: word ' ;
 ! Wrappers
 
 M: wrapper '
-    wrapped ' wrapper type-number object tag-number
+    wrapped>> ' wrapper type-number object tag-number
     [ emit ] emit-object ;
 
 ! Strings
@@ -334,10 +386,6 @@ M: byte-array '
         pad-bytes emit-bytes
     ] emit-object ;
 
-M: bit-array ' bit-array emit-dummy-array ;
-
-M: float-array ' float-array emit-dummy-array ;
-
 ! Tuples
 : (emit-tuple) ( tuple -- pointer )
     [ tuple>array rest-slice ]
@@ -345,7 +393,7 @@ M: float-array ' float-array emit-dummy-array ;
     tuple type-number dup [ emit-seq ] emit-object ;
 
 : emit-tuple ( tuple -- pointer )
-    dup class word-name "tombstone" =
+    dup class name>> "tombstone" =
     [ [ (emit-tuple) ] cache-object ] [ (emit-tuple) ] if ;
 
 M: tuple ' emit-tuple ;
@@ -354,11 +402,11 @@ M: tuple-layout '
     [
         [
             {
-                [ layout-hashcode , ]
-                [ layout-class , ]
-                [ layout-size , ]
-                [ layout-superclasses , ]
-                [ layout-echelon , ]
+                [ hashcode>> , ]
+                [ class>> , ]
+                [ size>> , ]
+                [ superclasses>> , ]
+                [ echelon>> , ]
             } cleave
         ] { } make [ ' ] map
         \ tuple-layout type-number
@@ -368,7 +416,7 @@ M: tuple-layout '
 M: tombstone '
     delegate
     "((tombstone))" "((empty))" ? "hashtables.private" lookup
-    word-def first [ emit-tuple ] cache-object ;
+    def>> first [ emit-tuple ] cache-object ;
 
 ! Arrays
 M: array '
@@ -379,10 +427,10 @@ M: array '
 
 M: quotation '
     [
-        quotation-array '
+        array>> '
         quotation type-number object tag-number [
             emit ! array
-            f ' emit ! compiled?
+            f ' emit ! compiled>>
             0 emit ! xt
             0 emit ! code
         ] emit-object
@@ -412,6 +460,18 @@ M: quotation '
     \ if jit-if-word set
     \ dispatch jit-dispatch-word set
     \ do-primitive jit-primitive-word set
+    \ tag jit-tag-word set
+    \ eq? jit-eq?-word set
+    \ slot jit-slot-word set
+    \ declare jit-declare-word set
+    \ drop jit-drop-word set
+    \ dup jit-dup-word set
+    \ >r jit->r-word set
+    \ r> jit-r>-word set
+    \ swap jit-swap-word set
+    \ over jit-over-word set
+    \ fixnum-fast jit-fixnum-fast-word set
+    \ fixnum>= jit-fixnum>=-word set
     [ undefined ] undefined-quot set
     {
         jit-code-format
@@ -428,6 +488,27 @@ M: quotation '
         jit-epilog
         jit-return
         jit-profiling
+        jit-tag
+        jit-tag-word
+        jit-eq?
+        jit-eq?-word
+        jit-slot
+        jit-slot-word
+        jit-declare-word
+        jit-drop
+        jit-drop-word
+        jit-dup
+        jit-dup-word
+        jit->r
+        jit->r-word
+        jit-r>
+        jit-r>-word
+        jit-swap
+        jit-swap-word
+        jit-fixnum-fast
+        jit-fixnum-fast-word
+        jit-fixnum>=
+        jit-fixnum>=-word
         undefined-quot
     } [ emit-userenv ] each ;
 

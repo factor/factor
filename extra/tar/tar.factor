@@ -1,6 +1,6 @@
 USING: combinators io io.files io.streams.string kernel math
 math.parser continuations namespaces pack prettyprint sequences
-strings system hexdump io.encodings.binary inspector accessors
+strings system hexdump io.encodings.binary summary accessors
 io.backend symbols byte-arrays ;
 IN: tar
 

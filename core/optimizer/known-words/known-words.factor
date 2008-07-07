@@ -1,20 +1,21 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: accessors alien arrays generic hashtables definitions
+inference.dataflow inference.state inference.class kernel assocs
+math math.order math.private kernel.private sequences words
+parser vectors strings sbufs io namespaces assocs quotations
+sequences.private io.binary io.streams.string layouts splitting
+math.intervals math.floats.private classes.tuple classes.predicate
+classes.tuple.private classes classes.algebra optimizer.def-use
+optimizer.backend optimizer.pattern-match optimizer.inlining
+sequences.private combinators byte-arrays byte-vectors
+slots.private ;
 IN: optimizer.known-words
-USING: alien arrays generic hashtables inference.dataflow
-inference.class kernel assocs math math.private kernel.private
-sequences words parser vectors strings sbufs io namespaces
-assocs quotations sequences.private io.binary
-io.streams.string layouts splitting math.intervals
-math.floats.private classes.tuple classes.tuple.private classes
-classes.algebra optimizer.def-use optimizer.backend
-optimizer.pattern-match optimizer.inlining float-arrays
-sequences.private combinators ;
 
-{ <tuple> <tuple-boa> } [
+{ <tuple> <tuple-boa> (tuple) } [
     [
         dup node-in-d peek node-literal
-        dup tuple-layout? [ layout-class ] [ drop tuple ] if
+        dup tuple-layout? [ class>> ] [ drop tuple ] if
         1array f
     ] "output-classes" set-word-prop
 ] each
@@ -23,6 +24,37 @@ sequences.private combinators ;
     dup node-in-d peek node-literal
     dup class? [ drop tuple ] unless 1array f
 ] "output-classes" set-word-prop
+
+! if the input to new is a literal tuple class, we can expand it
+: literal-new? ( #call -- ? )
+    dup in-d>> first node-literal tuple-class? ;
+
+: new-quot ( class -- quot )
+    dup all-slots 1 tail ! delegate slot
+    [ [ initial>> literalize , ] each literalize , \ boa , ] [ ] make ;
+
+: expand-new ( #call -- node )
+    dup dup in-d>> first node-literal
+    [ +inlined+ depends-on ] [ new-quot ] bi
+    f splice-quot ;
+
+\ new {
+    { [ dup literal-new? ] [ expand-new ] }
+} define-optimizers
+
+: tuple-boa-quot ( layout -- quot )
+    [ (tuple) ]
+    swap size>> 1 - [ 3 + ] map <reversed>
+    [ [ set-slot ] curry [ keep ] curry ] map concat
+    [ f over 2 set-slot ]
+    3append ;
+
+: expand-tuple-boa ( #call -- node )
+    dup in-d>> peek value-literal tuple-boa-quot f splice-quot ;
+
+\ <tuple-boa> {
+    { [ t ] [ expand-tuple-boa ] }
+} define-optimizers
 
 ! the output of clone has the same type as the input
 { clone (clone) } [
@@ -59,15 +91,59 @@ sequences.private combinators ;
     node-in-d peek dup value?
     [ value-literal sequence? ] [ drop f ] if ;
 
-: member-quot ( seq -- newquot )
-    [ literalize [ t ] ] { } map>assoc
-    [ drop f ] suffix [ nip case ] curry ;
+: expand-member ( #call quot -- )
+    >r dup node-in-d peek value-literal r> call f splice-quot ;
 
-: expand-member ( #call -- )
-    dup node-in-d peek value-literal member-quot f splice-quot ;
+: bit-member-n 256 ; inline
+
+: bit-member? ( seq -- ? )
+    #! Can we use a fast byte array test here?
+    {
+        { [ dup length 8 < ] [ f ] }
+        { [ dup [ integer? not ] contains? ] [ f ] }
+        { [ dup [ 0 < ] contains? ] [ f ] }
+        { [ dup [ bit-member-n >= ] contains? ] [ f ] }
+        [ t ]
+    } cond nip ;
+
+: bit-member-seq ( seq -- flags )
+    bit-member-n swap [ member? 1 0 ? ] curry B{ } map-as ;
+
+: exact-float? ( f -- ? )
+    dup float? [ dup >integer >float = ] [ drop f ] if ; inline
+
+: bit-member-quot ( seq -- newquot )
+    [
+        [ drop ] % ! drop the sequence itself; we don't use it at run time
+        bit-member-seq ,
+        [
+            {
+                { [ over fixnum? ] [ ?nth 1 eq? ] }
+                { [ over bignum? ] [ ?nth 1 eq? ] }
+                { [ over exact-float? ] [ ?nth 1 eq? ] }
+                [ 2drop f ]
+            } cond
+        ] %
+    ] [ ] make ;
+
+: member-quot ( seq -- newquot )
+    dup bit-member? [
+        bit-member-quot
+    ] [
+        [ literalize [ t ] ] { } map>assoc
+        [ drop f ] suffix [ nip case ] curry
+    ] if ;
 
 \ member? {
-    { [ dup literal-member? ] [ expand-member ] }
+    { [ dup literal-member? ] [ [ member-quot ] expand-member ] }
+} define-optimizers
+
+: memq-quot ( seq -- newquot )
+    [ [ dupd eq? ] curry [ drop t ] ] { } map>assoc
+    [ drop f ] suffix [ nip cond ] curry ;
+
+\ memq? {
+    { [ dup literal-member? ] [ [ memq-quot ] expand-member ] }
 } define-optimizers
 
 ! if the result of eq? is t and the second input is a literal,
@@ -83,6 +159,21 @@ sequences.private combinators ;
     ] if
 ] "constraints" set-word-prop
 
+! Eliminate instance? checks when the outcome is known at compile time
+: (optimize-instance) ( #call -- #call value class/f )
+    [ ] [ in-d>> first ] [ dup in-d>> second node-literal ] tri ;
+
+: optimize-instance? ( #call -- ? )
+    (optimize-instance) dup class?
+    [ optimize-check? ] [ 3drop f ] if ;
+
+: optimize-instance ( #call -- node )
+    (optimize-instance) optimize-check ;
+
+\ instance? {
+    { [ dup optimize-instance? ] [ optimize-instance ] }
+} define-optimizers
+
 ! eq? on the same object is always t
 { eq? = } {
     { { @ @ } [ 2drop t ] }
@@ -97,7 +188,7 @@ sequences.private combinators ;
 ] each
 
 \ push-all
-{ { string sbuf } { array vector } }
+{ { string sbuf } { array vector } { byte-array byte-vector } }
 "specializer" set-word-prop
 
 \ append

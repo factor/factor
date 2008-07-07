@@ -2,11 +2,11 @@
 
 <t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
 
-	<t:atom t:href="$blogs/post.atom" t:query="id">
+	<t:atom t:href="$blogs/post.atom" t:rest="id">
 		<t:label t:name="author" />: <t:label t:name="title" />
 	</t:atom>
 
-	<t:atom t:href="$blogs/by.atom" t:query="author">
+	<t:atom t:href="$blogs/by.atom" t:rest="author">
 		Recent Posts by <t:label t:name="author" />
 	</t:atom>
 
@@ -18,13 +18,13 @@
 
 	<div class="posting-footer">
 		Post by
-		<t:a t:href="$blogs/" t:query="author">
+		<t:a t:href="$blogs/" t:rest="author">
 			<t:label t:name="author" />
 		</t:a>
 		on
 		<t:label t:name="date" />
 		|
-		<t:a t:href="$blogs/edit-post" t:query="id">Edit Post</t:a>
+		<t:a t:href="$blogs/edit-post" t:rest="id">Edit Post</t:a>
 		|
 		<t:button t:action="$blogs/delete-post" t:for="id,author" class="link-button link">Delete Post</t:button>
 	</div>
@@ -33,11 +33,11 @@
 		<hr/>
 
 		<p class="comment-header">
-			Comment by <t:label t:name="author" /> on <t:label t:name="date" />:
+			<a name="@id">Comment by <t:label t:name="author" /> on <t:label t:name="date" />:</a>
 		</p>
 
 		<p class="posting-body">
-			<t:farkup t:name="content" />
+			<t:farkup t:name="content" t:no-follow="true" t:disable-images="true" />
 		</p>
 		
 		<t:button t:action="$blogs/delete-comment" t:for="id,parent" class="link-button link">Delete Comment</t:button>

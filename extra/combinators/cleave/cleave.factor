@@ -1,17 +1,36 @@
 
-USING: kernel arrays sequences macros combinators ;
+USING: kernel combinators words quotations arrays sequences locals macros
+       shuffle combinators.lib arrays.lib fry ;
 
 IN: combinators.cleave
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: >quot ( obj -- quot ) dup word? [ 1quotation ] when ;
+
+: >quots ( seq -- seq ) [ >quot ] map ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+:: [ncleave] ( SEQ N -- quot )
+   SEQ >quots [ [ N nkeep ] curry ] map concat [ N ndrop ] append >quotation ;
+
+MACRO: ncleave ( seq n -- quot ) [ncleave] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Cleave into array
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-USING: words quotations fry arrays.lib ;
+: [narr] ( seq n -- quot ) over length '[ , , ncleave , narray ] ;
 
-: >quot ( obj -- quot ) dup word? [ 1quotation ] when ;
+MACRO: narr ( seq n -- array ) [narr] ;
 
-: >quots ( seq -- seq ) [ >quot ] map ;
+MACRO: 0arr ( seq -- array ) 0 [narr] ;
+MACRO: 1arr ( seq -- array ) 1 [narr] ;
+MACRO: 2arr ( seq -- array ) 2 [narr] ;
+MACRO: 3arr ( seq -- array ) 3 [narr] ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 MACRO: <arr> ( seq -- )
   [ >quots ] [ length ] bi

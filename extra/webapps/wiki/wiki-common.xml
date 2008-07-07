@@ -14,13 +14,13 @@
 		| <t:a t:href="$wiki/articles">All Articles</t:a>
 		| <t:a t:href="$wiki/changes">Recent Changes</t:a>
 
-		<t:if t:code="furnace.sessions:uid">
+		<t:if t:code="furnace.auth:logged-in?">
 
-			<t:if t:code="furnace.auth.login:allow-edit-profile?">
-				| <t:a t:href="$login/edit-profile" t:aside="begin">Edit Profile</t:a>
+			<t:if t:code="furnace.auth.features.edit-profile:allow-edit-profile?">
+				| <t:a t:href="$realm/edit-profile" t:aside="begin">Edit Profile</t:a>
 			</t:if>
 
-			| <t:button t:action="$login/logout" t:aside="begin" class="link-button link">Logout</t:button>
+			| <t:button t:action="$login-realm/logout" t:aside="begin" class="link-button link">Logout</t:button>
 
 		</t:if>
 
@@ -28,6 +28,23 @@
 
 	<h1><t:write-title /></h1>
 
-        <t:call-next-template />
+	<table width="100%">
+		<tr>
+			<td> <t:call-next-template /> </td>
+			<t:if t:value="sidebar">
+				<td valign="top">
+					<t:bind t:name="sidebar">
+						<h2>
+							<t:a t:href="$wiki/view" t:query="title">
+								<t:label t:name="title" />
+							</t:a>
+						</h2>
+		
+						<t:farkup t:name="content" />
+					</t:bind>
+				</td>
+			</t:if>
+		</tr>
+	</table>
 
 </t:chloe>

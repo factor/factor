@@ -1,4 +1,4 @@
-USING: arrays combinators.lib kernel math math.functions
+USING: arrays kernel math math.functions
 math.order math.vectors namespaces opengl opengl.gl sequences ui
 ui.gadgets ui.gestures ui.render accessors ;
 IN: opengl.demo-support
@@ -12,8 +12,10 @@ SYMBOL: last-drag-loc
 TUPLE: demo-gadget yaw pitch distance ;
 
 : <demo-gadget> ( yaw pitch distance -- gadget )
-    demo-gadget construct-gadget 
-    [ { (>>yaw) (>>pitch) (>>distance) } set-slots ] keep ;
+    demo-gadget construct-gadget
+        swap >>distance
+        swap >>pitch
+        swap >>yaw ;
 
 GENERIC: far-plane ( gadget -- z )
 GENERIC: near-plane ( gadget -- z )

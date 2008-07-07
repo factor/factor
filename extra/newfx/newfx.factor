@@ -1,11 +1,12 @@
 
-USING: kernel sequences assocs qualified circular ;
+USING: kernel sequences assocs qualified circular sets ;
 
 USING: math multi-methods ;
 
 QUALIFIED: sequences
 QUALIFIED: assocs
 QUALIFIED: circular
+QUALIFIED: sets
 
 IN: newfx
 
@@ -158,6 +159,11 @@ METHOD: as-mutate { object object assoc }       set-at ;
 : prefix-on ( elt seq -- seq ) swap prefix ;
 : suffix-on ( elt seq -- seq ) swap suffix ;
 
+: suffix!      ( seq elt -- seq ) over sequences:push ;
+: suffix-on!   ( elt seq -- seq ) tuck sequences:push ;
+: suffixed!    ( seq elt --     ) swap sequences:push ;
+: suffixed-on! ( elt seq --     )      sequences:push ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : subseq ( seq from to -- subseq ) rot sequences:subseq ;
@@ -190,3 +196,50 @@ METHOD: as-mutate { object object assoc }       set-at ;
 ! A note about the 'mutate' qualifier. Other words also technically mutate
 ! their primary object. However, the 'mutate' qualifier is supposed to
 ! indicate that this is the main objective of the word, as a side effect.
+
+: adjoin      ( seq elt -- seq ) over sets:adjoin ;
+: adjoin-on   ( elt seq -- seq ) tuck sets:adjoin ;
+: adjoined    ( set elt --     ) swap sets:adjoin ;
+: adjoined-on ( elt set --     )      sets:adjoin ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: start ( seq subseq -- i ) swap sequences:start ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: pluck         ( seq i   -- seq ) cut-slice rest-slice append ;
+: pluck-from    ( i   seq -- seq ) swap pluck ;
+: pluck!        ( seq i   -- seq ) over delete-nth ;
+: pluck-from!   ( i   seq -- seq ) tuck delete-nth ;
+: plucked!      ( seq i   --     ) swap delete-nth ;
+: plucked-from! ( i   seq --     )      delete-nth ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: snip          ( seq a b -- seq ) >r over r> [ head ] [ tail ] 2bi* append ;
+: snip-this     ( a b seq -- seq ) -rot snip ;
+: snip!         ( seq a b -- seq )      pick delete-slice ;
+: snip-this!    ( a b seq -- seq ) -rot pick delete-slice ;
+: snipped!      ( seq a b --     )       rot delete-slice ;
+: snipped-from! ( a b seq --     )           delete-slice ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: invert-index ( seq i -- seq i ) >r dup length 1 - r> - ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: append!      ( a b -- ab )      over sequences:push-all ;
+: append-to!   ( b a -- ab ) swap over sequences:push-all ;
+: appended!    ( a b --    ) swap      sequences:push-all ;
+: appended-to! ( b a --    )           sequences:push-all ;
+
+: prepend!   ( a b -- ba  ) over append 0 pick copy ;
+: prepended! ( a b --     ) over append 0 rot  copy ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: insert ( seq i obj -- seq ) >r cut r> prefix append ;
+
+: splice ( seq i seq -- seq ) >r cut r> prepend append ;

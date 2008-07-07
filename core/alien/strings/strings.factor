@@ -100,7 +100,7 @@ M: utf16n <encoder> drop utf16n <encoder> ;
     os windows? [ utf16n ] [ utf8 ] if alien>string ;
 
 : dll-path ( dll -- string )
-    (dll-path) alien>native-string ;
+    path>> alien>native-string ;
 
 : string>symbol ( str -- alien )
     [ os wince? [ utf16n ] [ utf8 ] if string>alien ]

@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic assocs kernel math namespaces
-prettyprint sequences strings vectors words quotations inspector
+prettyprint sequences strings vectors words quotations summary
 io.styles io combinators sorting splitting math.parser effects
 continuations debugger io.files checksums checksums.crc32 vocabs
 hashtables graphs compiler.units io.encodings.utf8 accessors ;
@@ -39,9 +39,9 @@ uses definitions ;
     new-definitions get swap set-source-file-definitions ;
 
 : <source-file> ( path -- source-file )
-    <definitions>
-    { set-source-file-path set-source-file-definitions }
-    \ source-file construct ;
+    \ source-file new
+        swap >>path
+        <definitions> >>definitions ;
 
 : source-file ( path -- source-file )
     dup string? [ "Invalid source file path" throw ] unless
@@ -75,11 +75,35 @@ M: pathname forget*
 
 SYMBOL: file
 
+TUPLE: source-file-error file error ;
+
+: <source-file-error> ( msg -- error )
+    \ source-file-error new
+        file get >>file
+        swap >>error ;
+
+: file. ( file -- ) path>> <pathname> . ;
+
+M: source-file-error error.
+    [ file>> file. ] [ error>> error. ] bi ;
+
+M: source-file-error summary
+    error>> summary ;
+
+M: source-file-error compute-restarts
+    error>> compute-restarts ;
+
+M: source-file-error error-help
+    error>> error-help ;
+
 : with-source-file ( name quot -- )
     #! Should be called from inside with-compilation-unit.
     [
         swap source-file
         dup file set
         source-file-definitions old-definitions set
-        [ ] [ file get rollback-source-file ] cleanup
+        [
+            file get rollback-source-file
+            <source-file-error> rethrow
+        ] recover
     ] with-scope ; inline

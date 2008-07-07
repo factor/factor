@@ -1,10 +1,11 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 ! Based on Slate's src/unfinished/interval.slate by Brian Rice.
-USING: kernel sequences arrays math combinators math.order ;
+USING: accessors kernel sequences arrays math math.order
+combinators generic ;
 IN: math.intervals
 
-TUPLE: interval from to ;
+TUPLE: interval { from read-only } { to read-only } ;
 
 C: <interval> interval
 
@@ -13,26 +14,27 @@ C: <interval> interval
 : closed-point ( n -- endpoint ) t 2array ;
 
 : [a,b] ( a b -- interval )
-    >r closed-point r> closed-point <interval> ;
+    >r closed-point r> closed-point <interval> ; foldable
 
 : (a,b) ( a b -- interval )
-    >r open-point r> open-point <interval> ;
+    >r open-point r> open-point <interval> ; foldable
 
 : [a,b) ( a b -- interval )
-    >r closed-point r> open-point <interval> ;
+    >r closed-point r> open-point <interval> ; foldable
 
 : (a,b] ( a b -- interval )
-    >r open-point r> closed-point <interval> ;
+    >r open-point r> closed-point <interval> ; foldable
 
-: [a,a] ( a -- interval ) closed-point dup <interval> ;
+: [a,a] ( a -- interval )
+    closed-point dup <interval> ; foldable
 
-: [-inf,a] ( a -- interval ) -1./0. swap [a,b] ;
+: [-inf,a] ( a -- interval ) -1./0. swap [a,b] ; inline
 
-: [-inf,a) ( a -- interval ) -1./0. swap [a,b) ;
+: [-inf,a) ( a -- interval ) -1./0. swap [a,b) ; inline
 
-: [a,inf] ( a -- interval ) 1./0. [a,b] ;
+: [a,inf] ( a -- interval ) 1./0. [a,b] ; inline
 
-: (a,inf] ( a -- interval ) 1./0. (a,b] ;
+: (a,inf] ( a -- interval ) 1./0. (a,b] ; inline
 
 : compare-endpoints ( p1 p2 quot -- ? )
     >r over first over first r> call [
@@ -58,7 +60,7 @@ C: <interval> interval
 : endpoint-max ( p1 p2 -- p3 ) [ endpoint> ] most ;
 
 : interval>points ( int -- from to )
-    dup interval-from swap interval-to ;
+    [ from>> ] [ to>> ] bi ;
 
 : points>interval ( seq -- interval )
     dup first
@@ -71,11 +73,12 @@ C: <interval> interval
     r> r> [ second ] both? 2array ; inline
 
 : interval-op ( i1 i2 quot -- i3 )
-    pick interval-from pick interval-from pick (interval-op) >r
-    pick interval-to pick interval-from pick (interval-op) >r
-    pick interval-to pick interval-to pick (interval-op) >r
-    pick interval-from pick interval-to pick (interval-op) >r
-    3drop r> r> r> r> 4array points>interval ; inline
+    {
+        [ [ from>> ] [ from>> ] [ ] tri* (interval-op) ]
+        [ [ to>>   ] [ from>> ] [ ] tri* (interval-op) ]
+        [ [ to>>   ] [ to>>   ] [ ] tri* (interval-op) ]
+        [ [ from>> ] [ to>>   ] [ ] tri* (interval-op) ]
+    } 3cleave 4array points>interval ; inline
 
 : interval+ ( i1 i2 -- i3 ) [ + ] interval-op ;
 
@@ -150,7 +153,7 @@ C: <interval> interval
     [ [ shift ] interval-op ] interval-integer-op interval-closure ;
 
 : interval-shift-safe ( i1 i2 -- i3 )
-    dup interval-to first 100 > [
+    dup to>> first 100 > [
         2drop f
     ] [
         interval-shift
@@ -174,6 +177,11 @@ C: <interval> interval
 : interval/ ( i1 i2 -- i3 )
     [ [ / ] interval-op ] interval-division-op ;
 
+: interval/-safe ( i1 i2 -- i3 )
+    #! Just a hack to make the compiler work if bootstrap.math
+    #! is not loaded.
+    \ integer \ / method [ interval/ ] [ 2drop f ] if ;
+
 : interval/i ( i1 i2 -- i3 )
     [
         [ [ /i ] interval-op ] interval-integer-op
@@ -188,17 +196,17 @@ SYMBOL: incomparable
 : left-endpoint-< ( i1 i2 -- ? )
     [ swap interval-subset? ] 2keep
     [ nip interval-singleton? ] 2keep
-    [ interval-from ] bi@ =
+    [ from>> ] bi@ =
     and and ;
 
 : right-endpoint-< ( i1 i2 -- ? )
     [ interval-subset? ] 2keep
     [ drop interval-singleton? ] 2keep
-    [ interval-to ] bi@ =
+    [ to>> ] bi@ =
     and and ;
 
 : (interval<) ( i1 i2 -- i1 i2 ? )
-    over interval-from over interval-from endpoint< ;
+    over from>> over from>> endpoint< ;
 
 : interval< ( i1 i2 -- ? )
     {
@@ -209,10 +217,10 @@ SYMBOL: incomparable
     } cond 2nip ;
 
 : left-endpoint-<= ( i1 i2 -- ? )
-    >r interval-from r> interval-to = ;
+    >r from>> r> to>> = ;
 
 : right-endpoint-<= ( i1 i2 -- ? )
-    >r interval-to r> interval-from = ;
+    >r to>> r> from>> = ;
 
 : interval<= ( i1 i2 -- ? )
     {
@@ -228,18 +236,18 @@ SYMBOL: incomparable
     swap interval<= ;
 
 : assume< ( i1 i2 -- i3 )
-    interval-to first [-inf,a) interval-intersect ;
+    to>> first [-inf,a) interval-intersect ;
 
 : assume<= ( i1 i2 -- i3 )
-    interval-to first [-inf,a] interval-intersect ;
+    to>> first [-inf,a] interval-intersect ;
 
 : assume> ( i1 i2 -- i3 )
-    interval-from first (a,inf] interval-intersect ;
+    from>> first (a,inf] interval-intersect ;
 
 : assume>= ( i1 i2 -- i3 )
-    interval-to first [a,inf] interval-intersect ;
+    from>> first [a,inf] interval-intersect ;
 
 : integral-closure ( i1 -- i2 )
-    dup interval-from first2 [ 1+ ] unless
-    swap interval-to first2 [ 1- ] unless
-    [a,b] ;
+    [ from>> first2 [ 1+ ] unless ]
+    [ to>> first2 [ 1- ] unless ]
+    bi [a,b] ;

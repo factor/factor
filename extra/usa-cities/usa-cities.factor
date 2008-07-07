@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files io.encodings.ascii sequences sequences.lib
-math.parser combinators kernel memoize csv symbols inspector
+math.parser combinators kernel memoize csv symbols summary
 words accessors math.order sorting ;
 IN: usa-cities
 
@@ -21,7 +21,7 @@ ERROR: no-such-state name ;
 M: no-such-state summary drop "No such state" ;
 
 MEMO: string>state ( string -- state )
-    dup states [ word-name = ] with find nip
+    dup states [ name>> = ] with find nip
     [ ] [ no-such-state ] ?if ;
 
 TUPLE: city

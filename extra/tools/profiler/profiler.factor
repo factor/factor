@@ -1,6 +1,6 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: words sequences math prettyprint kernel arrays io
+USING: accessors words sequences math prettyprint kernel arrays io
 io.styles namespaces assocs kernel.private strings combinators
 sorting math.parser vocabs definitions tools.profiler.private
 continuations generic ;
@@ -10,7 +10,7 @@ IN: tools.profiler
     [ t profiling call ] [ f profiling ] [ ] cleanup ;
 
 : counters ( words -- assoc )
-    [ dup profile-counter ] { } map>assoc ;
+    [ dup counter>> ] { } map>assoc ;
 
 GENERIC: (profile.) ( obj -- )
 
@@ -65,7 +65,7 @@ M: method-body (profile.)
     vocabs [
         dup words
         [ "predicating" word-prop not ] filter
-        [ profile-counter ] map sum
+        [ counter>> ] map sum
     ] { } map>assoc counters. ;
 
 : method-profile. ( -- )

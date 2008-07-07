@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: init command-line namespaces words debugger io
+USING: accessors init command-line namespaces words debugger io
 kernel.private math memory continuations kernel io.files
 io.backend system parser vocabs sequences prettyprint
 vocabs.loader combinators splitting source-files strings
@@ -28,7 +28,7 @@ SYMBOL: bootstrap-time
     [ "bootstrap." prepend require ] each ;
 
 : count-words ( pred -- )
-    all-words swap filter length number>string write ;
+    all-words swap count number>string write ;
 
 : print-report ( time -- )
     1000 /i
@@ -36,7 +36,7 @@ SYMBOL: bootstrap-time
     "Bootstrap completed in " write number>string write
     " minutes and " write number>string write " seconds." print
 
-    [ compiled? ] count-words " compiled words" print
+    [ compiled>> ] count-words " compiled words" print
     [ symbol? ] count-words " symbol words" print
     [ ] count-words " words total" print
 

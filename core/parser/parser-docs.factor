@@ -1,7 +1,7 @@
 USING: help.markup help.syntax kernel sequences words
 math strings vectors quotations generic effects classes
 vocabs.loader definitions io vocabs source-files
-quotations namespaces compiler.units assocs ;
+quotations namespaces compiler.units assocs lexer ;
 IN: parser
 
 ARTICLE: "vocabulary-search-shadow" "Shadowing word names"
@@ -117,44 +117,28 @@ $nl
 { $subsection parse-tokens } ;
 
 ARTICLE: "parsing-words" "Parsing words"
-"The Factor parser is follows a simple recursive-descent design. The parser reads successive tokens from the input; if the token identifies a number or an ordinary word, it is added to an accumulator vector. Otherwise if the token identifies a parsing word, the parsing word is executed immediately."
+"The Factor parser follows a simple recursive-descent design. The parser reads successive tokens from the input; if the token identifies a number or an ordinary word, it is added to an accumulator vector. Otherwise if the token identifies a parsing word, the parsing word is executed immediately."
 $nl
 "Parsing words are marked by suffixing the definition with a " { $link POSTPONE: parsing } " declaration. Here is the simplest possible parsing word; it prints a greeting at parse time:"
 { $code ": hello \"Hello world\" print ; parsing" }
-"Parsing words must have stack effect " { $snippet "( accum -- accum )" } ", where " { $snippet "accum" } " is the accumulator vector supplied by the parser. Parsing words can read input, add word definitions to the dictionary, and do anything an ordinary word can."
+"Parsing words must not pop or push items from the stack; however, they are permitted to access the accumulator vector supplied by the parser at the top of the stack. That is, parsing words must have stack effect " { $snippet "( accum -- accum )" } ", where " { $snippet "accum" } " is the accumulator vector supplied by the parser."
+$nl
+"Parsing words can read input, add word definitions to the dictionary, and do anything an ordinary word can."
+$nl
+"Because of the stack restriction, parsing words cannot pass data to other words by leaving values on the stack; instead, use " { $link parsed } " to add the data to the parse tree so that it can be evaluated later."
 $nl
 "Parsing words cannot be called from the same source file where they are defined, because new definitions are only compiled at the end of the source file. An attempt to use a parsing word in its own source file raises an error:"
-{ $link staging-violation }
+{ $subsection staging-violation }
 "Tools for implementing parsing words:"
 { $subsection "reading-ahead" }
 { $subsection "parsing-word-nest" }
 { $subsection "defining-words" }
 { $subsection "parsing-tokens" } ;
 
-ARTICLE: "parser-lexer" "The lexer"
-"Two variables that encapsulate internal parser state:"
-{ $subsection file }
-{ $subsection lexer }
-"Creating a default lexer:"
-{ $subsection <lexer> }
-"A word to test of the end of input has been reached:"
-{ $subsection still-parsing? }
-"A word to advance the lexer to the next line:"
-{ $subsection next-line }
-"Two generic words to override the lexer's token boundary detection:"
-{ $subsection skip-blank }
-{ $subsection skip-word }
-"A utility used when parsing string literals:"
-{ $subsection parse-string }
-"The parser can be invoked with a custom lexer:"
-{ $subsection (parse-lines) }
-{ $subsection with-parser } ;
-
 ARTICLE: "parser-files" "Parsing source files"
 "The parser can run source files:"
 { $subsection run-file }
 { $subsection parse-file }
-{ $subsection bootstrap-file }
 "The parser cross-references source files and definitions. This allows it to keep track of removed definitions, and prevent forward references and accidental redefinitions."
 $nl
 "While the above words are useful for one-off experiments, real programs should be written to use the vocabulary system instead; see " { $link "vocabs.loader" } "."
@@ -188,25 +172,6 @@ $nl
 
 ABOUT: "parser"
 
-: $parsing-note ( children -- )
-    drop
-    "This word should only be called from parsing words."
-    $notes ;
-
-HELP: lexer
-{ $var-description "Stores the current " { $link lexer } " instance." }
-{ $class-description "An object for tokenizing parser input. It has the following slots:"
-    { $list
-        { { $link lexer-text } " - the lines being parsed; an array of strings" }
-        { { $link lexer-line } " - the line number being parsed; unlike most indices this is 1-based for friendlier error reporting and integration with text editors" }
-        { { $link lexer-column } " - the current column position, zero-based" }
-    }
-"Custom lexing can be implemented by delegating a tuple to an instance of this class and implementing the " { $link skip-word } " and " { $link skip-blank } " generic words." } ;
-
-HELP: <lexer>
-{ $values { "text" "a sequence of strings" } { "lexer" lexer } }
-{ $description "Creates a new lexer for tokenizing the given sequence of lines." } ;
-
 HELP: location
 { $values { "loc" "a " { $snippet "{ path line# }" } " pair" } }
 { $description "Outputs the current parser location. This value can be passed to " { $link set-where } " or " { $link remember-definition } "." } ;
@@ -222,72 +187,8 @@ HELP: parser-notes?
 { $values { "?" "a boolean" } }
 { $description "Tests if the parser will print various notes and warnings. To disable parser notes, either set " { $link parser-notes } " to " { $link f } ", or pass the " { $snippet "-quiet" } " command line switch." } ;
 
-HELP: next-line
-{ $values { "lexer" lexer } }
-{ $description "Advances the lexer to the next input line, discarding the remainder of the current line." } ;
-
-HELP: parse-error
-{ $error-description "Thrown when the parser encounters invalid input. A parse error wraps an underlying error and holds the file being parsed, line number, and column number." } ;
-
-HELP: <parse-error>
-{ $values { "msg" "an error" } { "error" parse-error } }
-{ $description "Creates a new " { $link parse-error } ", filling in the location information from the current " { $link lexer } "." } ;
-
-HELP: skip
-{ $values { "i" "a starting index" } { "seq" sequence } { "?" "a boolean" } { "n" integer } }
-{ $description "Skips to the first space character (if " { $snippet "boolean" } " is " { $link f } ") or the first non-space character (otherwise)." } ;
-
-HELP: change-lexer-column
-{ $values { "lexer" lexer } { "quot" "a quotation with stack effect " { $snippet "( col line -- newcol )" } } }
-{ $description "Applies a quotation to the current column and line text to produce a new column, and moves the lexer position." } ;
-
-HELP: skip-blank
-{ $values { "lexer" lexer } }
-{ $contract "Skips whitespace characters." }
-{ $notes "Custom lexers can implement this generic word." } ;
-
-HELP: skip-word
-{ $values { "lexer" lexer } }
-{ $contract
-    "Skips until the end of the current token."
-    $nl
-    "The default implementation treats a single " { $snippet "\"" } " as a word by itself; otherwise it searches forward until a whitespace character or the end of the line."
-}
-{ $notes "Custom lexers can implement this generic word." } ;
-
-HELP: still-parsing-line?
-{ $values { "lexer" lexer } { "?" "a boolean" } }
-{ $description "Outputs " { $link f } " if the end of the current line has been reached, " { $link t } " otherwise." } ;
-
-HELP: parse-token
-{ $values { "lexer" lexer } { "str/f" "a " { $link string } " or " { $link f } } }
-{ $description "Reads the next token from the lexer. Tokens are delimited by whitespace, with the exception that " { $snippet "\"" } " is treated like a single token even when not followed by whitespace." } ;
-
-HELP: scan
-{ $values { "str/f" "a " { $link string } " or " { $link f } } }
-{ $description "Reads the next token from the lexer. See " { $link parse-token } " for details." }
-$parsing-note ;
-
-HELP: bad-escape
-{ $error-description "Indicates the parser encountered an invalid escape code following a backslash (" { $snippet "\\" } ") in a string literal. See " { $link "escape" } " for a list of valid escape codes." } ;
-
 HELP: bad-number
 { $error-description "Indicates the parser encountered an invalid numeric literal." } ;
-
-HELP: escape
-{ $values { "escape" "a single-character escape" } { "ch" "a character" } }
-{ $description "Converts from a single-character escape code and the corresponding character." }
-{ $examples { $example "USING: kernel parser prettyprint ;" "CHAR: n escape CHAR: \\n = ." "t" } } ;
-
-HELP: parse-string
-{ $values { "str" "a new " { $link string } } }
-{ $description "Parses the line until a quote (\"), interpreting escape codes along the way." }
-{ $errors "Throws an error if the string contains an invalid escape sequence." }
-$parsing-note ;
-
-HELP: still-parsing?
-{ $values { "lexer" lexer } { "?" "a boolean" } }
-{ $description "Outputs " { $link f } " if end of input has been reached, " { $link t } " otherwise." } ;
 
 HELP: use
 { $var-description "A variable holding the current vocabulary search path as a sequence of assocs." } ;
@@ -334,12 +235,6 @@ HELP: create-in
 { $description "Creates a word in the current vocabulary. Until re-defined, the word throws an error when invoked." }
 $parsing-note ;
 
-HELP: parse-tokens
-{ $values { "end" string } { "seq" "a new sequence of strings" } }
-{ $description "Reads a sequence of tokens until the first occurrence of " { $snippet "end" } ". The tokens remain as strings and are not processed in any way." }
-{ $examples "This word is used to implement " { $link POSTPONE: USING: } "." }
-$parsing-note ;
-
 HELP: CREATE
 { $values { "word" word } }
 { $description "Reads the next token from the line currently being parsed, and creates a word with that name in the current vocabulary." }
@@ -365,31 +260,6 @@ HELP: scan-word
 { $errors "Throws an error if the token does not name a word, and does not parse as a number." }
 $parsing-note ;
 
-HELP: invalid-slot-name
-{ $values { "name" string } }
-{ $description "Throws an " { $link invalid-slot-name } " error." }
-{ $error-description "Thrown by " { $link POSTPONE: TUPLE: } " and " { $link POSTPONE: ERROR: } " if a suspect token appears as a slot name." }
-{ $notes "The suspect tokens are chosen so that the following code raises this parse error, instead of silently greating a tuple with garbage slots:"
-    { $code
-        "TUPLE: my-mistaken-tuple slot-a slot-b"
-        ""
-        ": some-word ( a b c -- ) ... ;"
-    }
-} ;
-
-HELP: unexpected
-{ $values { "want" "a " { $link word } " or " { $link f } } { "got" word } }
-{ $description "Throws an " { $link unexpected } " error." }
-{ $error-description "Thrown by the parser if an unmatched closing delimiter is encountered." }
-{ $examples
-    "Parsing the following snippet will throw this error:"
-    { $code "[ 1 2 3 }" }
-} ;
-
-HELP: unexpected-eof
-{ $values { "word" "a " { $link word } } }
-{ $description "Throws an " { $link unexpected } " error indicating the parser was looking for an occurrence of " { $snippet "word" } " but encountered end of file." } ;
-
 HELP: parse-step
 { $values { "accum" vector } { "end" word } { "?" "a boolean" } }
 { $description "Parses a token. If the token is a number or an ordinary word, it is added to the accumulator. If it is a parsing word, calls the parsing word with the accumulator on the stack. Outputs " { $link f } " if " { $snippet "end" } " is encountered, " { $link t } " otherwise." }
@@ -413,28 +283,15 @@ HELP: parsed
 { $description "Convenience word for parsing words. It behaves exactly the same as " { $link push } ", except the accumulator remains on the stack." }
 $parsing-note ;
 
-HELP: with-parser
-{ $values { "lexer" lexer } { "quot" "a quotation with stack effect " { $snippet "( -- accum )" } } { "newquot" "a new " { $link quotation } } }
-{ $description "Sets up the parser and calls the quotation. The quotation can make use of parsing words such as " { $link scan } " and " { $link parse-until } ". It must yield a sequence, which is converted to a quotation and output. Any errors thrown by the quotation are wrapped in parse errors." } ;
-
 HELP: (parse-lines)
 { $values { "lexer" lexer } { "quot" "a new " { $link quotation } } }
 { $description "Parses Factor source code using a custom lexer. The vocabulary search path is taken from the current scope." }
-{ $errors "Throws a " { $link parse-error } " if the input is malformed." } ;
+{ $errors "Throws a " { $link lexer-error } " if the input is malformed." } ;
 
 HELP: parse-lines
 { $values { "lines" "a sequence of strings" } { "quot" "a new " { $link quotation } } }
 { $description "Parses Factor source code which has been tokenized into lines. The vocabulary search path is taken from the current scope." }
-{ $errors "Throws a " { $link parse-error } " if the input is malformed." } ;
-
-HELP: lexer-factory
-{ $var-description "A variable holding a quotation with stack effect " { $snippet "( lines -- lexer )" } ". This quotation is called by the parser to create " { $link lexer } " instances. This variable can be rebound to a quotation which outputs a custom tuple delegating to " { $link lexer } " to customize syntax." } ;
-
-HELP: parse-effect
-{ $values { "end" string } { "effect" "an instance of " { $link effect } } }
-{ $description "Parses a stack effect from the current input line." }
-{ $examples "This word is used by " { $link POSTPONE: ( } " and " { $link POSTPONE: (( } " to parse stack effect declarations." }
-$parsing-note ;
+{ $errors "Throws a " { $link lexer-error } " if the input is malformed." } ;
 
 HELP: parse-base
 { $values { "base" "an integer between 2 and 36" } { "parsed" integer } }
@@ -500,10 +357,6 @@ HELP: run-file
 HELP: ?run-file
 { $values { "path" "a pathname string" } }
 { $description "If the file exists, runs it with " { $link run-file } ", otherwise does nothing." } ;
-
-HELP: bootstrap-file
-{ $values { "path" "a pathname string" } }
-{ $description "If bootstrapping, parses the source file and adds its top level form to the quotation being constructed with " { $link make } "; the bootstrap code uses this to build up a boot quotation to be run on image startup. If not bootstrapping, just runs the file normally." } ;
 
 HELP: eval>string
 { $values { "str" string } { "output" string } }

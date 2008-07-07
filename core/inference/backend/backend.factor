@@ -80,7 +80,7 @@ M: object value-literal \ literal-expected inference-warning ;
     1 #drop node,
     pop-d dup value-literal >r value-recursion r> ;
 
-: value-vector ( n -- vector ) [ drop <computed> ] V{ } map-as ;
+: value-vector ( n -- vector ) [ <computed> ] V{ } replicate-as ;
 
 : add-inputs ( seq stack -- n stack )
     tuck [ length ] bi@ - dup 0 >
@@ -111,7 +111,7 @@ GENERIC: apply-object ( obj -- )
 M: object apply-object apply-literal ;
 
 M: wrapper apply-object
-    wrapped dup +called+ depends-on apply-literal ;
+    wrapped>> dup +called+ depends-on apply-literal ;
 
 : terminate ( -- )
     terminated? on #terminate node, ;
@@ -162,7 +162,7 @@ TUPLE: too-many-r> ;
     dup ensure-values
     #>r
     over 0 pick node-inputs
-    over [ drop pop-d ] map reverse [ push-r ] each
+    over [ pop-d ] replicate reverse [ push-r ] each
     0 pick pick node-outputs
     node,
     drop ;
@@ -171,7 +171,7 @@ TUPLE: too-many-r> ;
     dup check-r>
     #r>
     0 pick pick node-inputs
-    over [ drop pop-r ] map reverse [ push-d ] each
+    over [ pop-r ] replicate reverse [ push-d ] each
     over 0 pick node-outputs
     node,
     drop ;
@@ -228,7 +228,7 @@ M: object constructor drop f ;
         1 infer->r
         peek-d reify-curry
         1 infer-r>
-        2 1 <effect> swap #call consume/produce
+        (( obj quot -- curry )) swap #call consume/produce
     ] when* ;
 
 : reify-curries ( n -- )
@@ -400,7 +400,7 @@ TUPLE: missing-effect word ;
         { [ dup inline? ] [ drop f ] }
         { [ dup deferred? ] [ drop f ] }
         { [ dup crossref? not ] [ drop f ] }
-        [ word-def [ [ word? ] [ primitive? not ] bi and ] contains? ]
+        [ def>> [ [ word? ] [ primitive? not ] bi and ] contains? ]
     } cond ;
 
 : ?missing-effect ( word -- )
@@ -429,7 +429,7 @@ TUPLE: missing-effect word ;
         [
             init-inference
             dependencies off
-            dup word-def over dup infer-quot-recursive
+            dup def>> over dup infer-quot-recursive
             end-infer
             finish-word
             current-effect
@@ -492,7 +492,7 @@ M: #return collect-label-info*
 : inline-block ( word -- #label data )
     [
         copy-inference nest-node
-        [ word-def ] [ <inlined-block> ] bi
+        [ def>> ] [ <inlined-block> ] bi
         [ infer-quot-recursive ] 2keep
         #label unnest-node
         dup collect-label-info

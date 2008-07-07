@@ -1,8 +1,8 @@
-USING: alien arrays definitions generic generic.standard
+USING: accessors alien arrays definitions generic generic.standard
 generic.math assocs hashtables io kernel math namespaces parser
 prettyprint sequences strings tools.test vectors words
-quotations classes classes.algebra continuations layouts
-classes.union sorting compiler.units ;
+quotations classes classes.algebra classes.tuple continuations
+layouts classes.union sorting compiler.units ;
 IN: generic.tests
 
 GENERIC: foobar ( x -- y )
@@ -144,7 +144,7 @@ M: integer generic-forget-test-1 / ;
 
 [ t ] [
     \ / usage [ word? ] filter
-    [ word-name "generic-forget-test-1/integer" = ] contains?
+    [ name>> "integer=>generic-forget-test-1" = ] contains?
 ] unit-test
 
 [ ] [
@@ -153,7 +153,7 @@ M: integer generic-forget-test-1 / ;
 
 [ f ] [
     \ / usage [ word? ] filter
-    [ word-name "generic-forget-test-1/integer" = ] contains?
+    [ name>> "integer=>generic-forget-test-1" = ] contains?
 ] unit-test
 
 GENERIC: generic-forget-test-2 ( a b -- c )
@@ -162,7 +162,7 @@ M: sequence generic-forget-test-2 = ;
 
 [ t ] [
     \ = usage [ word? ] filter
-    [ word-name "generic-forget-test-2/sequence" = ] contains?
+    [ name>> "sequence=>generic-forget-test-2" = ] contains?
 ] unit-test
 
 [ ] [
@@ -171,7 +171,7 @@ M: sequence generic-forget-test-2 = ;
 
 [ f ] [
     \ = usage [ word? ] filter
-    [ word-name "generic-forget-test-2/sequence" = ] contains?
+    [ name>> "sequence=>generic-forget-test-2" = ] contains?
 ] unit-test
 
 GENERIC: generic-forget-test-3 ( a -- b )

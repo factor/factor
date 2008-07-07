@@ -3,7 +3,8 @@
 USING: accessors arrays ui.gadgets ui.gadgets.viewports
 ui.gadgets.frames ui.gadgets.grids ui.gadgets.theme
 ui.gadgets.sliders ui.gestures kernel math namespaces sequences
-models combinators math.vectors classes.tuple ;
+models models.range models.compose
+combinators math.vectors classes.tuple ;
 IN: ui.gadgets.scrollers
 
 TUPLE: scroller viewport x y follows ;
@@ -46,7 +47,7 @@ scroller H{
             y-model <y-slider> g-> set-scroller-y @right frame,
             viewport,
         ] with-gadget
-    ] keep t over set-gadget-root? dup faint-boundary ;
+    ] keep t >>root? faint-boundary ;
 
 : scroll ( value scroller -- )
     [

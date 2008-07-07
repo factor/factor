@@ -1,8 +1,7 @@
-USING: unicode.categories kernel math combinators splitting
+USING: combinators.short-circuit unicode.categories kernel math combinators splitting
 sequences math.parser io.files io assocs arrays namespaces
 math.ranges unicode.normalize values io.encodings.ascii
-unicode.syntax unicode.data compiler.units alien.syntax sets
-combinators.lib ;
+unicode.syntax unicode.data compiler.units alien.syntax sets ;
 IN: unicode.breaks
 
 C-ENUM: Any L V T Extend Control CR LF graphemes ;
@@ -23,8 +22,7 @@ CATEGORY: grapheme-control Zl Zp Cc Cf ;
 
 CATEGORY: (extend) Me Mn ;
 : extend? ( ch -- ? )
-    [ (extend)? ]
-    [ "Other_Grapheme_Extend" property? ] or? ;
+    { [ (extend)? ] [ "Other_Grapheme_Extend" property? ] } 1|| ;
 
 : grapheme-class ( ch -- class )
     {
@@ -35,7 +33,7 @@ CATEGORY: (extend) Me Mn ;
     } cond ;
 
 : init-grapheme-table ( -- table )
-    graphemes [ drop graphemes f <array> ] map ;
+    graphemes [ graphemes f <array> ] replicate ;
 
 SYMBOL: table
 

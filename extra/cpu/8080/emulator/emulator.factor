@@ -1,9 +1,10 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel math sequences words arrays io io.files namespaces
-math.parser assocs quotations parser parser-combinators
-tools.time io.encodings.binary sequences.deep symbols combinators ;
+USING: accessors kernel math sequences words arrays io io.files
+namespaces math.parser assocs quotations parser lexer
+parser-combinators tools.time io.encodings.binary sequences.deep
+symbols combinators ;
 IN: cpu.8080.emulator
 
 TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles ram ;
@@ -512,7 +513,7 @@ SYMBOL: rom-root
   [ " A: " write cpu-a 16 >base 2 CHAR: \s pad-left write ] keep 
   [ " SP: " write cpu-sp 16 >base 4 CHAR: \s pad-left write ] keep 
   [ " cycles: " write cpu-cycles number>string 5 CHAR: \s pad-left write ] keep 
-  [ " " write peek-instruction word-name write " " write ] keep
+  [ " " write peek-instruction name>> write " " write ] keep
   nl drop ;
 
 : cpu*. ( cpu -- )

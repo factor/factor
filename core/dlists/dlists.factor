@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Mackenzie Straight, Doug Coleman,
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel math sequences accessors inspector
+USING: combinators kernel math sequences accessors summary
 dequeues ;
 IN: dlists
 

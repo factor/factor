@@ -1,7 +1,8 @@
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: sequences kernel math io calendar calendar.format
-calendar.model arrays models namespaces ui.gadgets
-ui.gadgets.labels
-ui.gadgets.theme ui ;
+calendar.model arrays models models.filter namespaces ui.gadgets
+ui.gadgets.labels ui.gadgets.theme ui ;
 IN: lcd
 
 : lcd-digit ( row digit -- str )

@@ -1,5 +1,5 @@
 USING: namespaces math sequences splitting grouping
-kernel columns ;
+kernel columns float-arrays bit-arrays ;
 IN: benchmark.dispatch2
 
 : sequences ( -- seq )

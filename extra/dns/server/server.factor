@@ -1,15 +1,17 @@
 
-USING: kernel combinators sequences sets math
-       io.sockets unicode.case accessors
-       combinators.cleave combinators.lib
-       newfx
+USING: kernel combinators sequences sets math threads namespaces continuations
+       debugger io io.sockets unicode.case accessors destructors
+       combinators.cleave combinators.lib combinators.short-circuit 
+       newfx fry
        dns dns.util dns.misc ;
 
 IN: dns.server
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: records ( -- vector ) V{ } ;
+SYMBOL: records-var
+
+: records ( -- records ) records-var get ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -39,34 +41,51 @@ IN: dns.server
   zones sort-largest-first [ name-in-domain? ] with find nip ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! name->authority
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: name->authority ( name -- rrs-ns ) name->zone NS IN query boa matching-rrs ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! extract-names
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: rr->rdata-names ( rr -- names/f )
+    {
+      { [ dup type>> NS    = ] [ rdata>>            {1} ] }
+      { [ dup type>> MX    = ] [ rdata>> exchange>> {1} ] }
+      { [ dup type>> CNAME = ] [ rdata>>            {1} ] }
+      { [ t ]                  [ drop f ] }
+    }
+  cond ;
+
+: extract-rdata-names ( message -- names )
+  [ answer-section>> ] [ authority-section>> ] bi append
+  [ rr->rdata-names ] map concat ;
+
+: extract-names ( message -- names )
+  [ message-query name>> ] [ extract-rdata-names ] bi prefix-on ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! fill-authority
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : fill-authority ( message -- message )
-  [ ]
-  [ message-query name>> name->zone NS IN query boa matching-rrs ]
-  [ answer-section>> ]
-  tri
-  diff >>authority-section ;
+  dup
+    extract-names [ name->authority ] map concat prune
+    over answer-section>> diff
+  >>authority-section ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! fill-additional
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: rr->rdata-names ( rr -- names/f )
-    {
-      { [ dup type>> NS = ] [ rdata>>            {1} ] }
-      { [ dup type>> MX = ] [ rdata>> exchange>> {1} ] }
-      { [ t ]               [ drop f ] }
-    }
-  cond ;
+: name->rrs-a ( name -- rrs-a ) A IN query boa matching-rrs ;
 
 : fill-additional ( message -- message )
   dup
-  [ answer-section>> ] [ authority-section>> ] bi append
-  [ rr->rdata-names ] map concat
-  [ A IN query boa matching-rrs ] map concat prune
-  over answer-section>> diff
+    extract-rdata-names [ name->rrs-a ] map concat prune
+    over answer-section>> diff
   >>additional-section ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -89,10 +108,6 @@ DEFER: query->rrs
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! have-answers
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! : have-answers ( message -- message/f )
-!   dup message-query query->rrs        ! message rrs/f
-!   [ empty? ] [ 2drop f ] [ >>answer-section ] 1if ;
 
 : have-answers ( message -- message/f )
   dup message-query query->rrs
@@ -180,31 +195,14 @@ DEFER: query->rrs
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: (socket) ( -- vec ) V{ f } ;
+: (handle-request) ( packet -- )
+  [ [ find-answer ] with-message-bytes ] change-data respond ;
 
-: socket ( -- socket ) (socket) 1st ;
+: handle-request ( packet -- ) [ (handle-request) ] curry in-thread ;
 
-: init-socket-on-port ( port -- )
-  f swap <inet4> <datagram> 0 (socket) as-mutate ;
+: receive-loop ( socket -- )
+  [ receive-packet handle-request ] [ receive-loop ] bi ;
 
-: init-socket ( -- ) 53 init-socket-on-port ;
+: loop ( addr-spec -- )
+  [ <datagram> '[ , [ receive-loop ] with-disposal ] try ] [ loop ] bi ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: loop ( -- )
-  socket receive
-  swap
-  parse-message
-  find-answer
-  message->ba
-  swap
-  socket send
-  loop ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: start ( -- ) init-socket loop ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-MAIN: start

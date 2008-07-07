@@ -1,8 +1,8 @@
-! Copyright (C) 2003, 2007 Slava Pestov.
+! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io kernel math namespaces sequences sbufs strings
-generic splitting growable continuations destructors
-io.streams.plain io.encodings math.order ;
+USING: accessors io kernel math namespaces sequences sbufs
+strings generic splitting continuations destructors
+io.streams.plain io.encodings math.order growable ;
 IN: io.streams.string
 
 M: growable dispose drop ;
@@ -21,7 +21,7 @@ M: growable stream-flush drop ;
 M: growable stream-read1 dup empty? [ drop f ] [ pop ] if ;
 
 : harden-as ( seq growble-exemplar -- newseq )
-    underlying like ;
+    underlying>> like ;
 
 : growable-read-until ( growable n -- str )
     >fixnum dupd tail-slice swap harden-as dup reverse-here ;

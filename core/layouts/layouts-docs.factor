@@ -107,12 +107,15 @@ ARTICLE: "layouts-limits" "Sizes and limits"
 { $subsection max-array-capacity } ;
 
 ARTICLE: "layouts-bootstrap" "Bootstrap support"
-"Bootstrap support:"
+"Processor cell size for the target architecture:"
 { $subsection bootstrap-cell }
 { $subsection bootstrap-cells }
 { $subsection bootstrap-cell-bits }
+"Range of integers representable by " { $link fixnum } "s of the target architecture:"
 { $subsection bootstrap-most-negative-fixnum }
-{ $subsection bootstrap-most-positive-fixnum } ;
+{ $subsection bootstrap-most-positive-fixnum }
+"Maximum array size for the target architecture:"
+{ $subsection bootstrap-max-array-capacity } ;
 
 ARTICLE: "layouts" "VM memory layouts"
 "The words documented in this section do not ever need to be called by user code. They are documented for the benefit of those wishing to explore the internals of Factor's implementation."

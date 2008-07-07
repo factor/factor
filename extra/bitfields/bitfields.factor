@@ -1,4 +1,4 @@
-USING: parser kernel math sequences namespaces assocs inspector
+USING: parser lexer kernel math sequences namespaces assocs summary
 words splitting math.parser arrays sequences.next mirrors
 shuffle compiler.units ;
 IN: bitfields

@@ -8,6 +8,7 @@ http.server
 http.server.responses
 furnace
 furnace.flash
+html.forms
 html.elements
 html.components
 html.components
@@ -20,75 +21,83 @@ SYMBOL: params
 SYMBOL: rest
 
 : render-validation-messages ( -- )
-    validation-messages get
+    form get errors>>
     dup empty? [ drop ] [
         <ul "errors" =class ul>
-            [ <li> message>> escape-string write </li> ] each
+            [ <li> escape-string write </li> ] each
         </ul>
     ] if ;
 
 CHLOE: validation-messages drop render-validation-messages ;
 
-TUPLE: action rest init display validate submit ;
+TUPLE: action rest authorize init display validate submit ;
 
 : new-action ( class -- action )
-    new
-        [ ] >>init
-        [ <400> ] >>display
-        [ ] >>validate
-        [ <400> ] >>submit ;
+    new [ ] >>init [ ] >>validate [ ] >>authorize ; inline
 
 : <action> ( -- action )
     action new-action ;
 
-: flashed-variables ( -- seq )
-    { validation-messages named-validation-messages } ;
+: set-nested-form ( form name -- )
+    dup empty? [
+        drop form set
+    ] [
+        dup length 1 = [
+            first set-value
+        ] [
+            unclip [ set-nested-form ] nest-form
+        ] if
+    ] if ;
+
+: restore-validation-errors ( -- )
+    form fget [
+        nested-forms fget set-nested-form
+    ] when* ;
 
 : handle-get ( action -- response )
     '[
-        ,
-        [ init>> call ]
-        [ drop flashed-variables restore-flash ]
-        [ display>> call ]
-        tri
+        , dup display>> [
+            {
+                [ init>> call ]
+                [ authorize>> call ]
+                [ drop restore-validation-errors ]
+                [ display>> call ]
+            } cleave
+        ] [ drop <400> ] if
     ] with-exit-continuation ;
-
-: validation-failed ( -- * )
-    request get method>> "POST" = [ f ] [ <400> ] if exit-with ;
-
-: (handle-post) ( action -- response )
-    [ validate>> call ] [ submit>> call ] bi ;
 
 : param ( name -- value )
     params get at ;
 
 : revalidate-url-key "__u" ;
 
-: check-url ( url -- ? )
-    request get url>>
-    [ [ protocol>> ] [ host>> ] [ port>> ] tri 3array ] bi@ = ;
-
 : revalidate-url ( -- url/f )
-    revalidate-url-key param dup [ >url dup check-url swap and ] when ;
+    revalidate-url-key param
+    dup [ >url [ same-host? ] keep and ] when ;
+
+: validation-failed ( -- * )
+    post-request? revalidate-url and
+    [
+        nested-forms-key param " " split harvest nested-forms set
+        { form nested-forms } <flash-redirect>
+    ] [ <400> ] if*
+    exit-with ;
 
 : handle-post ( action -- response )
     '[
-        form-nesting-key params get at " " split
-        [ , (handle-post) ]
-        [ swap '[ , , nest-values ] ] reduce
-        call
-    ] with-exit-continuation
-    [
-        revalidate-url
-        [ flashed-variables <flash-redirect> ] [ <403> ] if*
-    ] unless* ;
+        , dup submit>> [
+            [ validate>> call ]
+            [ authorize>> call ]
+            [ submit>> call ]
+            tri
+        ] [ drop <400> ] if
+    ] with-exit-continuation ;
 
 : handle-rest ( path action -- assoc )
     rest>> dup [ [ "/" join ] dip associate ] [ 2drop f ] if ;
 
 : init-action ( path action -- )
-    blank-values
-    init-validation
+    begin-form
     handle-rest
     request get request-params assoc-union params set ;
 
@@ -107,8 +116,7 @@ M: action modify-form
     validation-failed? [ validation-failed ] when ;
 
 : validate-params ( validators -- )
-    params get swap validate-values from-object
-    check-validation ;
+    params get swap validate-values check-validation ;
 
 : validate-integer-id ( -- )
     { { "id" [ v-number ] } } validate-params ;

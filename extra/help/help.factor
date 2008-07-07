@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays io kernel namespaces parser prettyprint sequences
-words assocs definitions generic quotations effects slots
-continuations classes.tuple debugger combinators vocabs
+USING: accessors arrays io kernel namespaces parser prettyprint
+sequences words assocs definitions generic quotations effects
+slots continuations classes.tuple debugger combinators vocabs
 help.stylesheet help.topics help.crossref help.markup sorting
 classes vocabs.loader ;
 IN: help
@@ -31,6 +31,10 @@ M: predicate word-help* drop \ $predicate ;
     articles get keys
     all-words [ word-help ] filter append ;
 
+: orphan-articles ( -- seq )
+    articles get keys
+    [ article-parent not ] filter ;
+
 : xref-help ( -- )
     all-articles [ xref-article ] each ;
 
@@ -43,13 +47,13 @@ M: predicate word-help* drop \ $predicate ;
 : all-errors ( -- seq )
     all-words [ error? ] filter sort-articles ;
 
-M: word article-name word-name ;
+M: word article-name name>> ;
 
 M: word article-title
     dup [ parsing-word? ] [ symbol? ] bi or [
-        word-name
+        name>> 
     ] [
-        [ word-name ]
+        [ name>> ]
         [ stack-effect [ effect>string " " prepend ] [ "" ] if* ] bi
         append
     ] if ;
@@ -109,7 +113,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
 
 : $index ( element -- )
     first call dup empty?
-    [ drop ] [ [ ($index) ] ($block) ] if ;
+    [ drop ] [ ($index) ] if ;
 
 : $about ( element -- )
     first vocab-help [ 1array $subsection ] when* ;

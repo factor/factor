@@ -2,7 +2,7 @@ USING: assocs html.parser html.parser.utils combinators
 continuations hashtables
 hashtables.private io kernel math
 namespaces prettyprint quotations sequences splitting
-state-parser strings ;
+strings ;
 IN: html.parser.printer
 
 SYMBOL: no-section
@@ -16,7 +16,8 @@ TUPLE: state section ;
 TUPLE: text-printer ;
 TUPLE: ui-printer ;
 TUPLE: src-printer ;
-UNION: printer text-printer ui-printer src-printer ;
+TUPLE: html-prettyprinter ;
+UNION: printer text-printer ui-printer src-printer html-prettyprinter ;
 HOOK: print-tag printer ( tag -- )
 HOOK: print-text-tag printer ( tag -- )
 HOOK: print-comment-tag printer ( tag -- )
@@ -47,7 +48,7 @@ M: printer print-comment-tag ( tag -- )
     tag-text write
     "-->" write ;
 
-M: printer print-dtd-tag
+M: printer print-dtd-tag ( tag -- )
     "<!" write
     tag-text write
     ">" write ;
@@ -70,8 +71,8 @@ M: printer print-closing-named-tag ( tag -- )
 
 M: src-printer print-opening-named-tag ( tag -- )
     "<" write
-    dup tag-name write
-    tag-attributes dup assoc-empty? [ drop ] [ print-attributes ] if
+    [ tag-name write ]
+    [ tag-attributes dup assoc-empty? [ drop ] [ print-attributes ] if ] bi
     ">" write ;
 
 M: src-printer print-closing-named-tag ( tag -- )
@@ -79,9 +80,30 @@ M: src-printer print-closing-named-tag ( tag -- )
     tag-name write
     ">" write ;
 
-TUPLE: unknown-tag-error tag ;
+SYMBOL: tab-width
+SYMBOL: #indentations
 
-C: <unknown-tag-error> unknown-tag-error
+: html-pp ( vector -- )
+    [
+        0 #indentations set
+        2 tab-width set
+        
+    ] with-scope ;
+
+: print-tabs ( -- )
+    tab-width get #indentations get * CHAR: \s <repetition> write ; 
+
+M: html-prettyprinter print-opening-named-tag ( tag -- )
+    print-tabs "<" write
+    tag-name write
+    ">\n" write ;
+
+M: html-prettyprinter print-closing-named-tag ( tag -- )
+    "</" write
+    tag-name write
+    ">" write ;
+
+ERROR: unknown-tag-error tag ;
 
 M: printer print-tag ( tag -- )
     {
@@ -92,15 +114,12 @@ M: printer print-tag ( tag -- )
             [ print-closing-named-tag ] }
         { [ dup tag-name string? ]
             [ print-opening-named-tag ] }
-        [ <unknown-tag-error> throw ]
+        [ unknown-tag-error ]
     } cond ;
 
-SYMBOL: tablestack
-
-: with-html-printer
-    [
-        V{ } clone tablestack set
-    ] with-scope ;
+! SYMBOL: tablestack
+! : with-html-printer ( vector quot -- )
+    ! [ V{ } clone tablestack set ] with-scope ;
 
 ! { { 1 2 } { 3 4 } }
 ! H{ { table-gap { 10 10 } } } [

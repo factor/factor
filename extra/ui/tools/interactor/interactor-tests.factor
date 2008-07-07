@@ -1,7 +1,7 @@
 IN: ui.tools.interactor.tests
 USING: ui.tools.interactor ui.gadgets.panes namespaces
 ui.gadgets.editors concurrency.promises threads listener
-tools.test kernel calendar parser accessors ;
+tools.test kernel calendar parser accessors calendar io ;
 
 \ <interactor> must-infer
 
@@ -41,3 +41,47 @@ tools.test kernel calendar parser accessors ;
 [ ] [ 1000 sleep ] unit-test
 
 [ ] [ "interactor" get interactor-eof ] unit-test
+
+[ ] [ <pane> <pane-stream> <interactor> "interactor" set ] unit-test
+
+: text "Hello world.\nThis is a test." ;
+
+[ ] [ text "interactor" get set-editor-string ] unit-test
+
+[ ] [ <promise> "promise" set ] unit-test
+
+[ ] [
+    [
+        "interactor" get register-self
+        "interactor" get contents "promise" get fulfill
+    ] in-thread
+] unit-test
+
+[ ] [ 100 sleep ] unit-test
+
+[ ] [ "interactor" get evaluate-input ] unit-test
+
+[ ] [ 100 sleep ] unit-test
+    
+[ ] [ "interactor" get interactor-eof ] unit-test
+
+[ t ] [ "promise" get 2 seconds ?promise-timeout text = ] unit-test
+
+[ ] [ <pane> <pane-stream> <interactor> "interactor" set ] unit-test
+
+[ ] [ text "interactor" get set-editor-string ] unit-test
+
+[ ] [ <promise> "promise" set ] unit-test
+
+[ ] [
+    [
+        "interactor" get register-self
+        "interactor" get stream-read1 "promise" get fulfill
+    ] in-thread
+] unit-test
+
+[ ] [ 100 sleep ] unit-test
+
+[ ] [ "interactor" get evaluate-input ] unit-test
+
+[ CHAR: H ] [ "promise" get 2 seconds ?promise-timeout ] unit-test

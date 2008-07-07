@@ -325,7 +325,6 @@ void find_code_references(CELL look_for_)
 
 void factorbug(void)
 {
-	reset_stdio();
 	open_console();
 
 	printf("Starting low level debugger...\n");

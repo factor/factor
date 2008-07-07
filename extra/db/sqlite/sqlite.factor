@@ -53,7 +53,7 @@ M: sqlite-result-set dispose ( result-set -- )
 
 M: sqlite-statement low-level-bind ( statement -- )
     [ statement-bind-params ] [ statement-handle ] bi
-    swap [ [ key>> ] [ value>> ] [ type>> ] tri sqlite-bind-type ] with each ;
+    [ swap [ key>> ] [ value>> ] [ type>> ] tri sqlite-bind-type ] curry each ;
 
 M: sqlite-statement bind-statement* ( statement -- )
     sqlite-maybe-prepare
@@ -182,6 +182,7 @@ M: sqlite-db persistent-table ( -- assoc )
         { DOUBLE { "real" "real" } }
         { BLOB { "blob" "blob" } }
         { FACTOR-BLOB { "blob" "blob" } }
+        { URL { "text" "text" } }
         { +autoincrement+ { f f "autoincrement" } }
         { +unique+ { f f "unique" } }
         { +default+ { f f "default" } }

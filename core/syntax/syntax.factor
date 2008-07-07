@@ -1,13 +1,14 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays bit-arrays byte-arrays byte-vectors
-definitions generic hashtables kernel math
-namespaces parser sequences strings sbufs vectors words
-quotations io assocs splitting classes.tuple generic.standard
-generic.math classes io.files vocabs float-arrays
-classes.union classes.intersection classes.mixin
-classes.predicate classes.singleton compiler.units
-combinators debugger ;
+USING: alien arrays byte-arrays byte-vectors
+definitions generic hashtables kernel math namespaces parser
+lexer sequences strings strings.parser sbufs vectors
+words quotations io assocs splitting classes.tuple
+generic.standard generic.math generic.parser classes io.files
+vocabs classes.parser classes.union
+classes.intersection classes.mixin classes.predicate
+classes.singleton classes.tuple.parser compiler.units
+combinators debugger effects.parser slots ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with
@@ -81,8 +82,6 @@ IN: bootstrap.syntax
     "V{" [ \ } [ >vector ] parse-literal ] define-syntax
     "B{" [ \ } [ >byte-array ] parse-literal ] define-syntax
     "BV{" [ \ } [ >byte-vector ] parse-literal ] define-syntax
-    "?{" [ \ } [ >bit-array ] parse-literal ] define-syntax
-    "F{" [ \ } [ >float-array ] parse-literal ] define-syntax
     "H{" [ \ } [ >hashtable ] parse-literal ] define-syntax
     "T{" [ \ } [ >tuple ] parse-literal ] define-syntax
     "W{" [ \ } [ first <wrapper> ] parse-literal ] define-syntax
@@ -165,10 +164,13 @@ IN: bootstrap.syntax
         parse-tuple-definition define-tuple-class
     ] define-syntax
 
+    "SLOT:" [
+        scan define-protocol-slot
+    ] define-syntax
+
     "C:" [
         CREATE-WORD
-        scan-word dup check-tuple
-        [ boa ] curry define-inline
+        scan-word [ boa ] curry define-inline
     ] define-syntax
 
     "ERROR:" [
@@ -207,4 +209,8 @@ IN: bootstrap.syntax
             not-in-a-method-error
         ] if
     ] define-syntax
+    
+    "initial:" "syntax" lookup define-symbol
+    
+    "read-only" "syntax" lookup define-symbol
 ] with-compilation-unit

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: html.templates.chloe.syntax
 USING: accessors kernel sequences combinators kernel namespaces
-classes.tuple assocs splitting words arrays memoize parser
+classes.tuple assocs splitting words arrays memoize parser lexer
 io io.files io.encodings.utf8 io.streams.string
 unicode.case tuple-syntax mirrors fry math urls
 multiline xml xml.data xml.writer xml.utilities
@@ -38,7 +38,7 @@ MEMO: chloe-name ( string -- name )
 
 : CHLOE-SINGLETON:
     scan-word
-    [ word-name ] [ '[ , singleton-component-tag ] ] bi
+    [ name>> ] [ '[ , singleton-component-tag ] ] bi
     define-chloe-tag ;
     parsing
 
@@ -56,6 +56,6 @@ MEMO: chloe-name ( string -- name )
 
 : CHLOE-TUPLE:
     scan-word
-    [ word-name ] [ '[ , tuple-component-tag ] ] bi
+    [ name>> ] [ '[ , tuple-component-tag ] ] bi
     define-chloe-tag ;
     parsing

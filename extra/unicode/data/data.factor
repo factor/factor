@@ -1,8 +1,8 @@
-USING: assocs math kernel sequences io.files hashtables
-quotations splitting grouping arrays math.parser hash2 math.order
-byte-arrays words namespaces words compiler.units parser
-io.encodings.ascii values interval-maps ascii sets assocs.lib
-combinators.lib combinators locals math.ranges sorting ;
+USING: combinators.short-circuit assocs math kernel sequences
+io.files hashtables quotations splitting grouping arrays
+math.parser hash2 math.order byte-arrays words namespaces words
+compiler.units parser io.encodings.ascii values interval-maps
+ascii sets combinators locals math.ranges sorting ;
 IN: unicode.data
 
 VALUE: simple-lower
@@ -62,7 +62,7 @@ VALUE: properties
     dup [ swap (chain-decomposed) ] curry assoc-map ;
 
 : first* ( seq -- ? )
-    second [ empty? ] [ first ] or? ;
+    second { [ empty? ] [ first ] } 1|| ;
 
 : (process-decomposed) ( data -- alist )
     5 swap (process-data)
@@ -107,7 +107,7 @@ VALUE: properties
 
 :: fill-ranges ( table -- table )
     name-map >alist sort-values keys
-    [ [ "first>" tail? ] [ "last>" tail? ] or? ] filter
+    [ { [ "first>" tail? ] [ "last>" tail? ] } 1|| ] filter
     2 group [
         [ name>char ] bi@ [ [a,b] ] [ table ?nth ] bi
         [ swap table ?set-nth ] curry each
@@ -151,7 +151,7 @@ C: <code-point> code-point
 
 : properties>intervals ( properties -- assoc[str,interval] )
     dup values prune [ f ] H{ } map>assoc
-    [ [ insert-at ] curry assoc-each ] keep
+    [ [ push-at ] curry assoc-each ] keep
     [ <interval-set> ] assoc-map ;
 
 : load-properties ( -- assoc )

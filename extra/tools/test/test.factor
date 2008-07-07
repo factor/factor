@@ -3,7 +3,7 @@
 USING: namespaces arrays prettyprint sequences kernel
 vectors quotations words parser assocs combinators
 continuations debugger io io.files vocabs
-vocabs.loader source-files compiler.units inspector
+vocabs.loader source-files compiler.units summary
 inference effects tools.vocabs ;
 IN: tools.test
 

@@ -9,12 +9,12 @@ concurrency.promises byte-arrays locals calendar io.timeouts ;
 
 [ ] [ <promise> "port" set ] unit-test
 
-: with-test-context
+: with-test-context ( quot -- )
     <secure-config>
         "resource:extra/openssl/test/server.pem" >>key-file
         "resource:extra/openssl/test/dh1024.pem" >>dh-file
         "password" >>password
-    swap with-secure-context ;
+    swap with-secure-context ; inline
 
 :: server-test ( quot -- )
     [
@@ -28,12 +28,12 @@ concurrency.promises byte-arrays locals calendar io.timeouts ;
         ] with-test-context
     ] "SSL server test" spawn drop ;
 
-: client-test
+: client-test ( -- string )
     <secure-config> [
         "127.0.0.1" "port" get ?promise <inet4> <secure> ascii <client> drop contents
     ] with-secure-context ;
 
-[ ] [ [ class word-name write ] server-test ] unit-test
+[ ] [ [ class name>> write ] server-test ] unit-test
 
 [ "secure" ] [ client-test ] unit-test
 
