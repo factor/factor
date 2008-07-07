@@ -75,6 +75,90 @@ big-endian off
 ] rc-absolute-cell rt-literal 1 rex-length + jit-dispatch jit-define
 
 [
+    arg1 ds-reg [] MOV                         ! load from stack
+    arg1 tag-mask get AND                      ! compute tag
+    arg1 tag-bits get SHL                      ! tag the tag
+    ds-reg [] arg1 MOV                         ! push to stack
+] f f f jit-tag jit-define
+
+: jit-compare ( -- )
+    arg1 0 MOV                                 ! load t
+    arg1 dup [] MOV
+    temp-reg \ f tag-number MOV                ! load f
+    arg0 ds-reg [] MOV                         ! load first value
+    ds-reg bootstrap-cell SUB                  ! adjust stack pointer
+    ds-reg [] arg0 CMP                         ! compare with second value
+    ;
+
+[
+    jit-compare
+    arg1 temp-reg CMOVNE                       ! not equal?
+    ds-reg [] arg1 MOV                         ! store
+] rc-absolute-cell rt-literal 1 rex-length + jit-eq? jit-define
+
+[
+    arg0 ds-reg [] MOV                         ! load slot number
+    ds-reg bootstrap-cell SUB                  ! adjust stack pointer
+    arg1 ds-reg [] MOV                         ! load object
+    fixnum>slot@                               ! turn slot number into offset
+    arg1 tag-bits get SHR                      ! mask off tag
+    arg1 tag-bits get SHL
+    arg0 arg1 arg0 [+] MOV                     ! load slot value
+    ds-reg [] arg0 MOV                         ! push to stack
+] f f f jit-slot jit-define
+
+[
+    ds-reg bootstrap-cell SUB
+] f f f jit-drop jit-define
+
+[
+    arg0 ds-reg [] MOV
+    ds-reg bootstrap-cell ADD
+    ds-reg [] arg0 MOV
+] f f f jit-dup jit-define
+
+[
+    rs-reg bootstrap-cell ADD
+    arg0 ds-reg [] MOV
+    ds-reg bootstrap-cell SUB
+    rs-reg [] arg0 MOV
+] f f f jit->r jit-define
+
+[
+    ds-reg bootstrap-cell ADD
+    arg0 rs-reg [] MOV
+    rs-reg bootstrap-cell SUB
+    ds-reg [] arg0 MOV
+] f f f jit-r> jit-define
+
+[
+    arg0 ds-reg [] MOV
+    arg1 ds-reg bootstrap-cell neg [+] MOV
+    ds-reg bootstrap-cell neg [+] arg0 MOV
+    ds-reg [] arg1 MOV
+] f f f jit-swap jit-define
+
+[
+    arg0 ds-reg bootstrap-cell neg [+] MOV
+    ds-reg bootstrap-cell ADD
+    ds-reg [] arg0 MOV
+] f f f jit-over jit-define
+
+[
+    arg0 ds-reg [] MOV
+    ds-reg bootstrap-cell SUB
+    arg1 ds-reg [] MOV
+    arg1 arg0 SUB
+    ds-reg [] arg1 MOV
+] f f f jit-fixnum-fast jit-define
+
+[
+    jit-compare
+    arg1 temp-reg CMOVL                        ! not equal?
+    ds-reg [] arg1 MOV                         ! store
+] rc-absolute-cell rt-literal 1 rex-length + jit-fixnum>= jit-define
+
+[
     stack-reg stack-frame-size bootstrap-cell - ADD ! unwind stack frame
 ] f f f jit-epilog jit-define
 

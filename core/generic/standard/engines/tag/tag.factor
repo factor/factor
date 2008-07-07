@@ -44,7 +44,7 @@ C: <hi-tag-dispatch-engine> hi-tag-dispatch-engine
     "type" word-prop num-tags get - ;
 
 : hi-tag-quot ( -- quot )
-    [ hi-tag ] num-tags get [ fixnum-fast ] curry compose ;
+    [ 0 slot ] num-tags get [ fixnum-fast ] curry compose ;
 
 M: hi-tag-dispatch-engine engine>quot
     methods>> engines>quots* [ >r hi-tag-number r> ] assoc-map

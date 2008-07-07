@@ -11,6 +11,7 @@ IN: bootstrap.x86
 : temp-reg ( -- reg ) RBX ;
 : stack-reg ( -- reg ) RSP ;
 : ds-reg ( -- reg ) R14 ;
+: rs-reg ( -- reg ) R15 ;
 : fixnum>slot@ ( -- ) ;
 : rex-length ( -- n ) 1 ;
 

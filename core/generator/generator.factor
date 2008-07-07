@@ -32,7 +32,7 @@ SYMBOL: compiling-loops
 ! Label of current word, after prologue, makes recursion faster
 SYMBOL: current-label-start
 
-: compiled-stack-traces? ( -- ? ) 36 getenv ;
+: compiled-stack-traces? ( -- ? ) 59 getenv ;
 
 : begin-compiling ( word label -- )
     H{ } clone compiling-loops set
