@@ -125,7 +125,8 @@ M: fd refill
     } cond ;
 
 M: unix (wait-to-read) ( port -- )
-    dup dup handle>> refill dup
+    dup
+    dup handle>> dup check-disposed refill dup
     [ dupd wait-for-port (wait-to-read) ] [ 2drop ] if ;
 
 ! Writers
@@ -144,7 +145,9 @@ M: fd drain
     } cond ;
 
 M: unix (wait-to-write) ( port -- )
-    dup dup handle>> drain dup [ wait-for-port ] [ 2drop ] if ;
+    dup
+    dup handle>> dup check-disposed drain
+    dup [ wait-for-port ] [ 2drop ] if ;
 
 M: unix io-multiplex ( ms/f -- )
     mx get-global wait-for-events ;
