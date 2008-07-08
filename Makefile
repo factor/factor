@@ -3,6 +3,7 @@ AR = ar
 LD = ld
 
 EXECUTABLE = factor
+VERSION = 0.92
 
 IMAGE = factor.image
 BUNDLE = Factor.app
