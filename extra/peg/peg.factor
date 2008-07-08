@@ -109,7 +109,7 @@ C: <head> peg-head
 : eval-rule ( rule -- ast )
   #! Evaluate a rule, return an ast resulting from it.
   #! Return fail if the rule failed. The rule has
-  #! stack effect ( input -- parse-result )
+  #! stack effect ( -- parse-result )
   pos get swap execute process-rule-result ; inline
 
 : memo ( pos rule -- memo-entry )
