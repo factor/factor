@@ -10,14 +10,13 @@ USE: prettyprint
 
 TUPLE: parse-result remaining ast ;
 TUPLE: parse-error position messages ; 
-TUPLE: parser id compiled ;
-M: parser equal? [ id>> ] bi@ = ;
+TUPLE: parser peg compiled id ;
 
+M: parser equal?    [ id>> ] bi@ = ;
 M: parser hashcode* id>> hashcode* ;
 
-C: <parse-result>  parse-result
-C: <parse-error> parse-error
-C: <parser>        parser
+C: <parse-result> parse-result
+C: <parse-error>  parse-error
 
 M: parse-error error.
   "Peg parsing error at character position " write dup position>> number>string write 
@@ -59,11 +58,16 @@ SYMBOL: heads
 : failed? ( obj -- ? )
   fail = ;
 
-: delegates ( -- cache )
-  \ delegates get-global [ H{ } clone dup \ delegates set-global ] unless* ;
+: peg-cache ( -- cache )
+  #! Holds a hashtable mapping a peg tuple to
+  #! the parser tuple for that peg. The parser tuple
+  #! holds a unique id and the compiled form of that peg.
+  \ peg-cache get-global [
+    H{ } clone dup \ peg-cache set-global
+  ] unless* ;
 
 : reset-pegs ( -- )
-  H{ } clone \ delegates set-global ;
+  H{ } clone \ peg-cache set-global ;
 
 reset-pegs 
 
@@ -239,7 +243,7 @@ C: <head> peg-head
   ] H{ } make-assoc swap bind ; inline
 
 
-GENERIC: (compile) ( parser -- quot )
+GENERIC: (compile) ( peg -- quot )
 
 : execute-parser ( word -- result )
   pos get apply-rule dup failed? [ 
@@ -251,7 +255,7 @@ GENERIC: (compile) ( parser -- quot )
 : parser-body ( parser -- quot )
   #! Return the body of the word that is the compiled version
   #! of the parser.
-  gensym 2dup swap (compile) 0 1 <effect> define-declared swap dupd "peg" set-word-prop
+  gensym 2dup swap peg>> (compile) 0 1 <effect> define-declared swap dupd "peg" set-word-prop
   [ execute-parser ] curry ;
 
 : compiled-parser ( parser -- word )
@@ -304,12 +308,13 @@ SYMBOL: id
     1 id set-global 0
   ] if* ;
 
-: init-parser ( parser -- parser )
-  #! Set the delegate for the parser. Equivalent parsers
-  #! get a delegate with the same id.
-  dup clone delegates [
-    drop next-id f <parser> 
-  ] cache over set-delegate ;
+: wrap-peg ( peg -- parser )
+  #! Wrap a parser tuple around the peg object.
+  #! Look for an existing parser tuple for that
+  #! peg object.
+  peg-cache [
+    f next-id parser boa 
+  ] cache ;
 
 TUPLE: token-parser symbol ;
 
@@ -321,7 +326,7 @@ TUPLE: token-parser symbol ;
     drop input-slice input-from "token '" r> append "'" append 1vector add-error f
   ] if ;
 
-M: token-parser (compile) ( parser -- quot )
+M: token-parser (compile) ( peg -- quot )
   symbol>> '[ input-slice , parse-token ] ;
    
 TUPLE: satisfy-parser quot ;
@@ -338,7 +343,7 @@ TUPLE: satisfy-parser quot ;
   ] if ; inline
 
 
-M: satisfy-parser (compile) ( parser -- quot )
+M: satisfy-parser (compile) ( peg -- quot )
   quot>> '[ input-slice , parse-satisfy ] ;
 
 TUPLE: range-parser min max ;
@@ -354,7 +359,7 @@ TUPLE: range-parser min max ;
     ] if
   ] if ;
 
-M: range-parser (compile) ( parser -- quot )
+M: range-parser (compile) ( peg -- quot )
   [ min>> ] [ max>> ] bi '[ input-slice , , parse-range ] ;
 
 TUPLE: seq-parser parsers ;
@@ -381,7 +386,7 @@ TUPLE: seq-parser parsers ;
     2drop f
   ] if ; inline
 
-M: seq-parser (compile) ( parser -- quot )
+M: seq-parser (compile) ( peg -- quot )
   [
     [ input-slice V{ } clone <parse-result> ] %
     parsers>> unclip compiled-parser 1quotation , \ parse-seq-element , [ 
@@ -390,7 +395,7 @@ M: seq-parser (compile) ( parser -- quot )
 
 TUPLE: choice-parser parsers ;
 
-M: choice-parser (compile) ( parser -- quot )
+M: choice-parser (compile) ( peg -- quot )
   [ 
     f ,
     parsers>> [ compiled-parser ] map 
@@ -408,7 +413,7 @@ TUPLE: repeat0-parser p1 ;
     nip
   ] if* ; inline
 
-M: repeat0-parser (compile) ( parser -- quot )
+M: repeat0-parser (compile) ( peg -- quot )
   p1>> compiled-parser 1quotation '[ 
     input-slice V{ } clone <parse-result> , swap (repeat) 
   ] ; 
@@ -422,7 +427,7 @@ TUPLE: repeat1-parser p1 ;
     f
   ] if* ;
 
-M: repeat1-parser (compile) ( parser -- quot )
+M: repeat1-parser (compile) ( peg -- quot )
   p1>> compiled-parser 1quotation '[ 
     input-slice V{ } clone <parse-result> , swap (repeat) repeat1-empty-check  
   ] ; 
@@ -432,7 +437,7 @@ TUPLE: optional-parser p1 ;
 : check-optional ( result -- result )
   [ input-slice f <parse-result> ] unless* ;
 
-M: optional-parser (compile) ( parser -- quot )
+M: optional-parser (compile) ( peg -- quot )
   p1>> compiled-parser 1quotation '[ @ check-optional ] ;
 
 TUPLE: semantic-parser p1 quot ;
@@ -444,7 +449,7 @@ TUPLE: semantic-parser p1 quot ;
     drop
   ] if ; inline
 
-M: semantic-parser (compile) ( parser -- quot )
+M: semantic-parser (compile) ( peg -- quot )
   [ p1>> compiled-parser 1quotation ] [ quot>> ] bi  
   '[ @ , check-semantic ] ;
 
@@ -453,7 +458,7 @@ TUPLE: ensure-parser p1 ;
 : check-ensure ( old-input result -- result )
   [ ignore <parse-result> ] [ drop f ] if ;
 
-M: ensure-parser (compile) ( parser -- quot )
+M: ensure-parser (compile) ( peg -- quot )
   p1>> compiled-parser 1quotation '[ input-slice @ check-ensure ] ;
 
 TUPLE: ensure-not-parser p1 ;
@@ -461,7 +466,7 @@ TUPLE: ensure-not-parser p1 ;
 : check-ensure-not ( old-input result -- result )
   [ drop f ] [ ignore <parse-result> ] if ;
 
-M: ensure-not-parser (compile) ( parser -- quot )
+M: ensure-not-parser (compile) ( peg -- quot )
   p1>> compiled-parser 1quotation '[ input-slice @ check-ensure-not ] ;
 
 TUPLE: action-parser p1 quot ;
@@ -473,7 +478,7 @@ TUPLE: action-parser p1 quot ;
     drop
   ] if ; inline
 
-M: action-parser (compile) ( parser -- quot )
+M: action-parser (compile) ( peg -- quot )
   [ p1>> compiled-parser 1quotation ] [ quot>> ] bi '[ @ , check-action ] ;
 
 : left-trim-slice ( string -- string )
@@ -485,14 +490,14 @@ M: action-parser (compile) ( parser -- quot )
 
 TUPLE: sp-parser p1 ;
 
-M: sp-parser (compile) ( parser -- quot )
+M: sp-parser (compile) ( peg -- quot )
   p1>> compiled-parser 1quotation '[ 
     input-slice left-trim-slice input-from pos set @ 
   ] ;
 
 TUPLE: delay-parser quot ;
 
-M: delay-parser (compile) ( parser -- quot )
+M: delay-parser (compile) ( peg -- quot )
   #! For efficiency we memoize the quotation.
   #! This way it is run only once and the 
   #! parser constructed once at run time.
@@ -500,29 +505,26 @@ M: delay-parser (compile) ( parser -- quot )
 
 TUPLE: box-parser quot ;
 
-M: box-parser (compile) ( parser -- quot )
+M: box-parser (compile) ( peg -- quot )
   #! Calls the quotation at compile time
   #! to produce the parser to be compiled.
   #! This differs from 'delay' which calls
-  #! it at run time. Due to using the runtime
-  #! environment at compile time, this parser
-  #! must not be cached, so we clear out the
-  #! delgates cache.
-  f >>compiled quot>> call compiled-parser 1quotation ;
+  #! it at run time.
+  quot>> call compiled-parser 1quotation ;
 
 PRIVATE>
 
 : token ( string -- parser )
-  token-parser boa init-parser ;      
+  token-parser boa wrap-peg ;      
 
 : satisfy ( quot -- parser )
-  satisfy-parser boa init-parser ;
+  satisfy-parser boa wrap-peg ;
 
 : range ( min max -- parser )
-  range-parser boa init-parser ;
+  range-parser boa wrap-peg ;
 
 : seq ( seq -- parser )
-  seq-parser boa init-parser ;
+  seq-parser boa wrap-peg ;
 
 : 2seq ( parser1 parser2 -- parser )
   2array seq ;
@@ -537,7 +539,7 @@ PRIVATE>
   { } make seq ; inline 
 
 : choice ( seq -- parser )
-  choice-parser boa init-parser ;
+  choice-parser boa wrap-peg ;
 
 : 2choice ( parser1 parser2 -- parser )
   2array choice ;
@@ -552,38 +554,38 @@ PRIVATE>
   { } make choice ; inline 
 
 : repeat0 ( parser -- parser )
-  repeat0-parser boa init-parser ;
+  repeat0-parser boa wrap-peg ;
 
 : repeat1 ( parser -- parser )
-  repeat1-parser boa init-parser ;
+  repeat1-parser boa wrap-peg ;
 
 : optional ( parser -- parser )
-  optional-parser boa init-parser ;
+  optional-parser boa wrap-peg ;
 
 : semantic ( parser quot -- parser )
-  semantic-parser boa init-parser ;
+  semantic-parser boa wrap-peg ;
 
 : ensure ( parser -- parser )
-  ensure-parser boa init-parser ;
+  ensure-parser boa wrap-peg ;
 
 : ensure-not ( parser -- parser )
-  ensure-not-parser boa init-parser ;
+  ensure-not-parser boa wrap-peg ;
 
 : action ( parser quot -- parser )
-  action-parser boa init-parser ;
+  action-parser boa wrap-peg ;
 
 : sp ( parser -- parser )
-  sp-parser boa init-parser ;
+  sp-parser boa wrap-peg ;
 
 : hide ( parser -- parser )
   [ drop ignore ] action ;
 
 : delay ( quot -- parser )
-  delay-parser boa init-parser ;
+  delay-parser boa wrap-peg ;
 
 : box ( quot -- parser )
   #! because a box has its quotation run at compile time
-  #! it must always have a new parser delgate created, 
+  #! it must always have a new parser wrapper created, 
   #! not a cached one. This is because the same box,
   #! compiled twice can have a different compiled word
   #! due to running at compile time.
@@ -593,7 +595,7 @@ PRIVATE>
   #! parse. The action adds an indirection with a parser type
   #! that gets memoized and fixes this. Need to rethink how
   #! to fix boxes so this isn't needed...
-  box-parser boa next-id f <parser> over set-delegate [ ] action ;
+  box-parser boa f next-id parser boa [ ] action ;
 
 ERROR: parse-failed input word ;
 
