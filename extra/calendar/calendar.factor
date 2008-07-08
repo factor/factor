@@ -303,41 +303,25 @@ GENERIC: days-in-year ( obj -- n )
 M: integer days-in-year ( year -- n ) leap-year? 366 365 ? ;
 M: timestamp days-in-year ( timestamp -- n ) year>> days-in-year ;
 
-GENERIC: days-in-month ( obj -- n )
+: (days-in-month) ( year month -- n )
+    dup 2 = [ drop leap-year? 29 28 ? ] [ nip day-counts nth ] if ;
 
-M: array days-in-month ( obj -- n )
-    first2 dup 2 = [
-        drop leap-year? 29 28 ?
-    ] [
-        nip day-counts nth
-    ] if ;
+: days-in-month ( timestamp -- n )
+    >date< drop (days-in-month) ;
 
-M: timestamp days-in-month ( timestamp -- n )
-    >date< drop 2array days-in-month ;
-
-GENERIC: day-of-week ( obj -- n )
-
-M: timestamp day-of-week ( timestamp -- n )
+: day-of-week ( timestamp -- n )
     >date< zeller-congruence ;
 
-M: array day-of-week ( array -- n )
-    first3 zeller-congruence ;
-
-GENERIC: day-of-year ( obj -- n )
-
-M: array day-of-year ( array -- n )
-    first3
-    3dup day-counts rot head-slice sum +
-    swap leap-year? [
-        -roll
-        pick 3 1 <date> >r <date> r>
+:: (day-of-year) ( year month day -- n )
+    day-counts month head-slice sum day +
+    year leap-year? [
+        year month day <date>
+        year 3 1 <date>
         after=? [ 1+ ] when
-    ] [
-        >r 3drop r>
-    ] if ;
+    ] when ;
 
-M: timestamp day-of-year ( timestamp -- n )
-    >date< 3array day-of-year ;
+: day-of-year ( timestamp -- n )
+    >date< (day-of-year) ;
 
 : day-offset ( timestamp m -- timestamp n )
     over day-of-week - ; inline
