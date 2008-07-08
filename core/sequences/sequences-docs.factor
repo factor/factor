@@ -43,8 +43,8 @@ ARTICLE: "sequences-integers" "Integer sequences and counted loops"
 $nl
 "For example, the " { $link each } " combinator, given an integer, simply calls a quotation that number of times, pushing a counter on each iteration that ranges from 0 up to that integer:"
 { $example "3 [ . ] each" "0\n1\n2" }
-"A common idiom is to iterate over a sequence, while also maintaining a loop counter. This can be done using " { $link 2each } ":"
-{ $example "{ \"a\" \"b\" \"c\" } dup length [\n    \"Index: \" write . \"Element: \" write .\n] 2each" "Index: 0\nElement: \"a\"\nIndex: 1\nElement: \"b\"\nIndex: 2\nElement: \"c\"" }
+"A common idiom is to iterate over a sequence, while also maintaining a loop counter. This can be done using " { $link each-index } ", " { $link map-index } " and " { $link reduce-index } "."
+$nl
 "Combinators that produce new sequences, such as " { $link map } ", will output an array if the input is an integer." ;
 
 ARTICLE: "sequences-access" "Accessing sequence elements"
