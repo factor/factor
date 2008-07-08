@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.syntax parser namespaces kernel math
-windows.types shuffle math.bitfields alias ;
+windows.types generalizations math.bitfields alias ;
 IN: windows.user32
 
 ! HKL for ActivateKeyboardLayout

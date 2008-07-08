@@ -4,7 +4,7 @@
 USING: alien alien.c-types alien.syntax kernel libc structs sequences
        continuations byte-arrays strings
        math namespaces system combinators vocabs.loader qualified
-       accessors inference macros locals shuffle arrays.lib 
+       accessors inference macros locals generalizations 
        unix.types debugger io prettyprint ;
 
 IN: unix

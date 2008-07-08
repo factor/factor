@@ -1,6 +1,6 @@
 
 USING: kernel combinators quotations arrays sequences assocs
-       locals shuffle macros fry ;
+       locals generalizations macros fry ;
 
 IN: combinators.short-circuit
 
