@@ -22,7 +22,7 @@ IN: ctags
   { } swap [ ctag suffix ] each ;
 
 : ctags-write ( seq path -- )
-  >r ctag-strings r> ascii set-file-lines ;
+  [ ctag-strings ] dip ascii set-file-lines ;
 
 : (ctags) ( -- seq )
   { } all-words [
