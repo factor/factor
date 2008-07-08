@@ -224,3 +224,6 @@ M: anonymous-union (flatten-class)
         dup num-tags get >=
         [ drop \ hi-tag tag-number ] when
     ] map prune ;
+
+: class-tag ( class -- tag/f )
+    class-tags dup length 1 = [ first ] [ drop f ] if ;

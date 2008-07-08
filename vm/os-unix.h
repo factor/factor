@@ -27,6 +27,8 @@ typedef char F_SYMBOL;
 #define OPEN_WRITE(path) fopen(path,"wb")
 #define FPRINTF(stream,format,arg) fprintf(stream,format,arg)
 
+void start_thread(void *(*start_routine)(void *));
+
 void init_ffi(void);
 void ffi_dlopen(F_DLL *dll);
 void *ffi_dlsym(F_DLL *dll, F_SYMBOL *symbol);

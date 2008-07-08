@@ -15,7 +15,7 @@ id
 continuation state runnable
 mailbox variables sleep-entry ;
 
-: self ( -- thread ) 40 getenv ; inline
+: self ( -- thread ) 63 getenv ; inline
 
 ! Thread-local storage
 : tnamespace ( -- assoc )
@@ -30,7 +30,7 @@ mailbox variables sleep-entry ;
 : tchange ( key quot -- )
     tnamespace swap change-at ; inline
 
-: threads 41 getenv ;
+: threads 64 getenv ;
 
 : thread ( id -- thread ) threads at ;
 
@@ -53,7 +53,7 @@ mailbox variables sleep-entry ;
 : unregister-thread ( thread -- )
     check-registered id>> threads delete-at ;
 
-: set-self ( thread -- ) 40 setenv ; inline
+: set-self ( thread -- ) 63 setenv ; inline
 
 PRIVATE>
 
@@ -68,9 +68,9 @@ PRIVATE>
 : <thread> ( quot name -- thread )
     \ thread new-thread ;
 
-: run-queue 42 getenv ;
+: run-queue 65 getenv ;
 
-: sleep-queue 43 getenv ;
+: sleep-queue 66 getenv ;
 
 : resume ( thread -- )
     f >>state
@@ -207,9 +207,9 @@ GENERIC: error-in-thread ( error thread -- )
 <PRIVATE
 
 : init-threads ( -- )
-    H{ } clone 41 setenv
-    <dlist> 42 setenv
-    <min-heap> 43 setenv
+    H{ } clone 64 setenv
+    <dlist> 65 setenv
+    <min-heap> 66 setenv
     initial-thread global
     [ drop f "Initial" <thread> ] cache
     <box> >>continuation

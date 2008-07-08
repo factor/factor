@@ -22,7 +22,11 @@ GENERIC: engine>quot ( engine -- quot )
 
 : linear-dispatch-quot ( alist -- quot )
     default get [ drop ] prepend swap
-    [ >r [ dupd eq? ] curry r> \ drop prefix ] assoc-map
+    [
+        [ [ dup ] swap [ eq? ] curry compose ]
+        [ [ drop ] prepose ]
+        bi* [ ] like
+    ] assoc-map
     alist>quot ;
 
 : split-methods ( assoc class -- first second )
