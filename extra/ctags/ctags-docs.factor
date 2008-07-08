@@ -12,9 +12,9 @@ HELP: ctags ( path -- )
 { $values { "path" "a pathname string" } }
 { $description "Generates a index file in ctags format and stores in " { $snippet "path" } "." }
 { $examples
-  { $example
+  { $unchecked-example
     "USING: ctags ;"
-    "\"tags\" ctags-write"
+    "\"tags\" ctags"
     ""
   }
 } ;
@@ -24,7 +24,7 @@ HELP: ctags-write ( seq path -- )
           { "path" "a pathname string" } }
 { $description "Stores a " { $snippet "alist" } " in " { $snippet "path" } ". " { $snippet "alist" } " must be an association list with ctags format: key must be a valid word and value a sequence whose first element is a resource name and second element is a line number" }
 { $examples
-  { $example
+  { $unchecked-example
     "USING: kernel ctags ;"
     "{ { if  { \"resource:extra/unix/unix.factor\" 91 } } } \"tags\" ctags-write"
     ""
@@ -38,9 +38,9 @@ HELP: ctag-strings ( alist -- seq )
           { "seq" sequence } }
 { $description "Converts an " { $snippet "alist" } " with ctag format (a word as key and a sequence whose first element is a resource name and a second element is a line number as value) in a " { $snippet "seq" } " of ctag strings." }
 { $examples
-  { $example
-    "USING: kernel ctags ;"
-    "{ { if  { \"resource:extra/unix/unix.factor\" 91 } } } ctag-strings"
+  { $unchecked-example
+    "USING: kernel ctags prettyprint ;"
+    "{ { if  { \"resource:extra/unix/unix.factor\" 91 } } } ctag-strings ."
     "{ \"if\\t/path/to/factor/extra/unix/unix.factor\\t91\" }"
   }
 } ;
@@ -50,8 +50,8 @@ HELP: ctag ( seq -- str )
           { "str" string } }
 { $description "Outputs a string " { $snippet "str" } " in ctag format for sequence with two elements, first one must be a valid word and second one a sequence whose first element is a resource name and second element is a line number" }
 { $examples
-  { $example
-    "USING: kernel ctags ;"
+  { $unchecked-example
+    "USING: kernel ctags prettyprint ;"
     "{ if  { \"resource:extra/unix/unix.factor\" 91 } } ctag ."
     "\"if\\t/path/to/factor/extra/unix/unix.factor\\t91\""
   }
