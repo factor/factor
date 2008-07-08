@@ -198,7 +198,7 @@ M: long-long-type box-return ( type -- )
 : c-bool> ( int -- ? )
     zero? not ;
 
-: >c-array ( seq type word -- )
+: >c-array ( seq type word -- byte-array )
     [ [ dup length ] dip <c-array> ] dip
     [ [ execute ] 2curry each-index ] 2keep drop ; inline
 
