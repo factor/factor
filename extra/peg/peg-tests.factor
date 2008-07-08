@@ -181,7 +181,7 @@ IN: peg.tests
 { t } [
   #! Ensure a circular parser doesn't loop infinitely
   [ f , "a" token , ] seq*
-  dup parsers>>
+  dup peg>> parsers>>
   dupd 0 swap set-nth compile word?
 ] unit-test
 

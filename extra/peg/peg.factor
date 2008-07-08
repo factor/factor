@@ -245,12 +245,15 @@ C: <head> peg-head
 
 GENERIC: (compile) ( peg -- quot )
 
-: execute-parser ( word -- result )
-  pos get apply-rule dup failed? [ 
+: process-parser-result ( result -- result )
+  dup failed? [ 
     drop f 
   ] [
     input-slice swap <parse-result>
-  ] if ; inline
+  ] if ;
+    
+: execute-parser ( word -- result )
+  pos get apply-rule process-parser-result ; inline
 
 : parser-body ( parser -- quot )
   #! Return the body of the word that is the compiled version
@@ -323,7 +326,7 @@ TUPLE: token-parser symbol ;
   dup >r ?head-slice [
     r> <parse-result> f f add-error
   ] [
-    drop input-slice input-from "token '" r> append "'" append 1vector add-error f
+    drop pos get "token '" r> append "'" append 1vector add-error f
   ] if ;
 
 M: token-parser (compile) ( peg -- quot )

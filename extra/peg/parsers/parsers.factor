@@ -20,7 +20,7 @@ M: just-parser (compile) ( parser -- quot )
   just-parser-p1 compiled-parser just-pattern curry ;
 
 : just ( parser -- parser )
-  just-parser boa init-parser ;
+  just-parser boa wrap-peg ;
 
 : 1token ( ch -- parser ) 1string token ;
 
