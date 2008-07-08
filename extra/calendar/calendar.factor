@@ -284,7 +284,7 @@ MEMO: unix-1970 ( -- timestamp )
 
 : now ( -- timestamp ) gmt >local-time ;
 
-: from-now ( dt -- timestamp ) now swap time+ ;
+: hence ( dt -- timestamp ) now swap time+ ;
 : ago ( dt -- timestamp ) now swap time- ;
 
 : day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 } ; inline
@@ -357,7 +357,7 @@ M: timestamp days-in-year ( timestamp -- n ) year>> days-in-year ;
 
 M: timestamp sleep-until timestamp>millis sleep-until ;
 
-M: duration sleep from-now sleep-until ;
+M: duration sleep hence sleep-until ;
 
 {
     { [ os unix? ] [ "calendar.unix" ] }

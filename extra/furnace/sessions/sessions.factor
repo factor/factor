@@ -116,7 +116,6 @@ M: session-saver dispose
 : <session-cookie> ( -- cookie )
     session get id>> session-id-key <cookie>
         "$sessions" resolve-base-path >>path
-        sessions get timeout>> from-now >>expires
         sessions get domain>> >>domain ;
 
 : put-session-cookie ( response -- response' )
