@@ -1,4 +1,4 @@
-USING: kernel sequences namespaces math assocs words arrays tools.annotations vocabs sorting prettyprint io micros math.statistics ;
+USING: kernel sequences namespaces math assocs words arrays tools.annotations vocabs sorting prettyprint io micros math.statistics accessors ;
 IN: wordtimer
 
 SYMBOL: *wordtimes*
@@ -15,7 +15,7 @@ SYMBOL: *calling*
   rot [ + ] curry [ 1+ ] bi* ;
 
 : register-time ( utime word -- )
-  word-name
+  name>>
   [ lookup-word-time update-times 2array ] keep *wordtimes* get-global set-at ;
 
 : calling ( word -- )
