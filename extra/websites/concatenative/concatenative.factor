@@ -48,7 +48,7 @@ TUPLE: factor-website < dispatcher ;
         <blogs> "blogs" add-responder
         <todo-list> "todo" add-responder
         <pastebin> "pastebin" add-responder
-        <planet-factor> "planet" add-responder
+        <planet> "planet" add-responder
         <wiki> "wiki" add-responder
         <wee-url> "wee-url" add-responder
         <user-admin> "user-admin" add-responder

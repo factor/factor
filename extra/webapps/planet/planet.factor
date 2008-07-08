@@ -17,13 +17,13 @@ furnace.auth
 furnace.syndication ;
 IN: webapps.planet
 
-TUPLE: planet-factor < dispatcher ;
+TUPLE: planet < dispatcher ;
 
-SYMBOL: can-administer-planet-factor?
+SYMBOL: can-administer-planet?
 
-can-administer-planet-factor? define-capability
+can-administer-planet? define-capability
 
-TUPLE: planet-factor-admin < dispatcher ;
+TUPLE: planet-admin < dispatcher ;
 
 TUPLE: blog id name www-url feed-url ;
 
@@ -65,7 +65,7 @@ posting "POSTINGS"
 : <edit-blogroll-action> ( -- action )
     <page-action>
         [ blogroll "blogroll" set-value ] >>init
-        { planet-factor "admin" } >>template ;
+        { planet "admin" } >>template ;
 
 : <planet-action> ( -- action )
     <page-action>
@@ -74,12 +74,12 @@ posting "POSTINGS"
             postings "postings" set-value
         ] >>init
 
-        { planet-factor "planet" } >>template ;
+        { planet "planet" } >>template ;
 
 : <planet-feed-action> ( -- action )
     <feed-action>
         [ "Planet Factor" ] >>title
-        [ URL" $planet-factor" ] >>url
+        [ URL" $planet" ] >>url
         [ postings ] >>entries ;
 
 :: <posting> ( entry name -- entry' )
@@ -111,7 +111,7 @@ posting "POSTINGS"
     <action>
         [
             update-cached-postings
-            URL" $planet-factor/admin" <redirect>
+            URL" $planet/admin" <redirect>
         ] >>submit ;
 
 : <delete-blog-action> ( -- action )
@@ -120,7 +120,7 @@ posting "POSTINGS"
 
         [
             "id" value <blog> delete-tuples
-            URL" $planet-factor/admin" <redirect>
+            URL" $planet/admin" <redirect>
         ] >>submit ;
 
 : validate-blog ( -- )
@@ -136,7 +136,7 @@ posting "POSTINGS"
 : <new-blog-action> ( -- action )
     <page-action>
 
-        { planet-factor "new-blog" } >>template
+        { planet "new-blog" } >>template
 
         [ validate-blog ] >>validate
 
@@ -146,7 +146,7 @@ posting "POSTINGS"
             [ insert-tuple ]
             [
                 <url>
-                    "$planet-factor/admin/edit-blog" >>path
+                    "$planet/admin/edit-blog" >>path
                     swap id>> "id" set-query-param
                 <redirect>
             ]
@@ -161,7 +161,7 @@ posting "POSTINGS"
             "id" value <blog> select-tuple from-object
         ] >>init
 
-        { planet-factor "edit-blog" } >>template
+        { planet "edit-blog" } >>template
 
         [
             validate-integer-id
@@ -174,15 +174,15 @@ posting "POSTINGS"
             [ update-tuple ]
             [
                 <url>
-                    "$planet-factor/admin" >>path
+                    "$planet/admin" >>path
                     swap id>> "id" set-query-param
                 <redirect>
             ]
             tri
         ] >>submit ;
 
-: <planet-factor-admin> ( -- responder )
-    planet-factor-admin new-dispatcher
+: <planet-admin> ( -- responder )
+    planet-admin new-dispatcher
         <edit-blogroll-action> "blogroll" add-main-responder
         <update-action> "update" add-responder
         <new-blog-action> "new-blog" add-responder
@@ -190,15 +190,15 @@ posting "POSTINGS"
         <delete-blog-action> "delete-blog" add-responder
     <protected>
         "administer Planet Factor" >>description
-        { can-administer-planet-factor? } >>capabilities ;
+        { can-administer-planet? } >>capabilities ;
 
-: <planet-factor> ( -- responder )
-    planet-factor new-dispatcher
+: <planet> ( -- responder )
+    planet new-dispatcher
         <planet-action> "list" add-main-responder
         <planet-feed-action> "feed.xml" add-responder
-        <planet-factor-admin> "admin" add-responder
+        <planet-admin> "admin" add-responder
     <boilerplate>
-        { planet-factor "planet-common" } >>template ;
+        { planet "planet-common" } >>template ;
 
 : start-update-task ( db params -- )
     '[ , , [ update-cached-postings ] with-db ] 10 minutes every drop ;

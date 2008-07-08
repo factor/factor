@@ -33,10 +33,10 @@ IN: tools.memory
     [ [ write-cell ] each ] with-row ;
 
 : (data-room.) ( -- )
-    data-room 2 <groups> dup length [
+    data-room 2 <groups> [
         [ first2 ] [ number>string "Generation " prepend ] bi*
         write-total/used/free
-    ] 2each
+    ] each-index
     "Decks" write-total
     "Cards" write-total ;
 

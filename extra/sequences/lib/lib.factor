@@ -4,7 +4,8 @@
 USING: combinators.lib kernel sequences math namespaces assocs 
 random sequences.private shuffle math.functions
 arrays math.parser math.private sorting strings ascii macros
-assocs.lib quotations hashtables math.order locals ;
+assocs.lib quotations hashtables math.order locals
+generalizations ;
 IN: sequences.lib
 
 : each-withn ( seq quot n -- ) nwith each ; inline
@@ -23,21 +24,6 @@ MACRO: firstn ( n -- )
     [ [ swap nth ] curry [ keep ] curry ] map
     concat >quotation
     [ drop ] compose ;
-
-: prepare-index ( seq quot -- seq n quot )
-    >r dup length r> ; inline
-
-: each-index ( seq quot -- )
-    #! quot: ( elt index -- )
-    prepare-index 2each ; inline
-
-: map-index ( seq quot -- )
-    #! quot: ( elt index -- obj )
-    prepare-index 2map ; inline
-
-: reduce-index ( seq identity quot -- )
-    #! quot: ( prev elt index -- next )
-    swapd each-index ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
