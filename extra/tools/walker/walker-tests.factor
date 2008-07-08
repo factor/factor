@@ -1,7 +1,7 @@
 USING: tools.walker io io.streams.string kernel math
 math.private namespaces prettyprint sequences tools.test
 continuations math.parser threads arrays tools.walker.debug
-generic.standard ;
+generic.standard sequences.private kernel.private ;
 IN: tools.walker.tests
 
 [ { } ] [
@@ -48,6 +48,10 @@ IN: tools.walker.tests
 
 [ { f } ] [
     [ 5 6 number= ] test-walker
+] unit-test
+
+[ { 0 } ] [
+    [ 0 { array-capacity } declare ] test-walker
 ] unit-test
 
 [ { f } ] [
