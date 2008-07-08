@@ -4,7 +4,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel combinators fry namespaces quotations hashtables
 sequences assocs arrays inference effects math math.ranges
-arrays.lib shuffle macros continuations locals ;
+generalizations macros continuations locals ;
 
 IN: combinators.lib
 
@@ -12,29 +12,9 @@ IN: combinators.lib
 ! Generalized versions of core combinators
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-MACRO: ndip ( quot n -- ) dup saver -rot restorer 3append ;
-
-MACRO: nslip ( n -- ) dup saver [ call ] rot restorer 3append ;
-
 : 4slip ( quot a b c d -- a b c d ) 4 nslip ; inline
 
-MACRO: nkeep ( n -- )
-  [ ] [ 1+ ] [ ] tri
-  '[ [ , ndup ] dip , -nrot , nslip ] ;
-
 : 4keep ( w x y z quot -- w x y z ) 4 nkeep ; inline 
-
-MACRO: ncurry ( n -- ) [ curry ] n*quot ;
-
-MACRO:: nwith ( quot n -- )
-  [let | n' [ n 1+ ] |
-    [ n' -nrot [ n' nrot quot call ] n ncurry ] ] ;
-
-MACRO: napply ( n -- )
-  2 [a,b]
-  [ [ 1- ] [ ] bi
-    '[ , ntuck , nslip ] ]
-  map concat >quotation [ call ] append ;
 
 : 2with ( param1 param2 obj quot -- obj curry )
     with with ; inline

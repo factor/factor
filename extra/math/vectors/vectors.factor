@@ -25,7 +25,7 @@ IN: math.vectors
 : normalize ( u -- v ) dup norm v/n ;
 
 : set-axis ( u v axis -- w )
-    dup length [ >r zero? 2over ? r> swap nth ] 2map 2nip ;
+    [ >r zero? 2over ? r> swap nth ] map-index 2nip ;
 
 HINTS: vneg { array } ;
 HINTS: norm-sq { array } ;

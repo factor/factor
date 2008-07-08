@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel hashtables calendar
+USING: accessors kernel hashtables calendar random assocs
 namespaces splitting sequences sorting math.order present
+io.files io.encodings.ascii
 syndication
 html.components html.forms
 http.server
@@ -114,6 +115,14 @@ M: revision feed-entry-url id>> revision-url ;
         ] >>init
 
         { wiki "view" } >>template ;
+
+: <random-article-action> ( -- action )
+    <action>
+        [
+            article new select-tuples random
+            [ title>> ] [ "Front Page" ] if*
+            view-url <redirect>
+        ] >>display ;
 
 : amend-article ( revision article -- )
     swap id>> >>revision update-tuple ;
@@ -286,15 +295,15 @@ M: revision feed-entry-url id>> revision-url ;
         { wiki "page-common" } >>template ;
 
 : init-sidebar ( -- )
-    "Sidebar" latest-revision [
-        "sidebar" [ from-object ] nest-form
-    ] when* ;
+    "Sidebar" latest-revision [ "sidebar" [ from-object ] nest-form ] when*
+    "Footer" latest-revision [ "footer" [ from-object ] nest-form ] when* ;
 
 : <wiki> ( -- dispatcher )
     wiki new-dispatcher
         <main-article-action> <article-boilerplate> "" add-responder
         <view-article-action> <article-boilerplate> "view" add-responder
         <view-revision-action> <article-boilerplate> "revision" add-responder
+        <random-article-action> "random" add-responder
         <list-revisions-action> <article-boilerplate> "revisions" add-responder
         <list-revisions-feed-action> "revisions.atom" add-responder
         <diff-action> <article-boilerplate> "diff" add-responder
@@ -309,3 +318,15 @@ M: revision feed-entry-url id>> revision-url ;
     <boilerplate>
         [ init-sidebar ] >>init
         { wiki "wiki-common" } >>template ;
+
+: init-wiki ( -- )
+    "resource:extra/webapps/wiki/initial-content" directory* keys
+    [
+        [ ascii file-contents ] [ file-name "." split1 drop ] bi
+        f <revision>
+            swap >>title
+            swap >>content
+            "slava" >>author
+            now >>date
+        add-revision
+    ] each ;

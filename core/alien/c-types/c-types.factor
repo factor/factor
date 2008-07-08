@@ -198,9 +198,9 @@ M: long-long-type box-return ( type -- )
 : c-bool> ( int -- ? )
     zero? not ;
 
-: >c-array ( seq type word -- )
-    >r >r dup length dup r> <c-array> dup -roll r>
-    [ execute ] 2curry 2each ; inline
+: >c-array ( seq type word -- byte-array )
+    [ [ dup length ] dip <c-array> ] dip
+    [ [ execute ] 2curry each-index ] 2keep drop ; inline
 
 : >c-array-quot ( type vocab -- quot )
     dupd set-nth-word [ >c-array ] 2curry ;

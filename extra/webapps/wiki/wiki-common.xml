@@ -13,6 +13,7 @@
 		<t:a t:href="$wiki">Front Page</t:a>
 		| <t:a t:href="$wiki/articles">All Articles</t:a>
 		| <t:a t:href="$wiki/changes">Recent Changes</t:a>
+		| <t:a t:href="$wiki/random">Random Article</t:a>
 
 		<t:if t:code="furnace.auth:logged-in?">
 
@@ -44,6 +45,16 @@
 					</t:bind>
 				</td>
 			</t:if>
+		</tr>
+
+		<tr>
+			<td>
+				<t:bind t:name="footer">
+					<small>
+						<t:farkup t:name="content" />
+					</small>
+				</t:bind>
+			</td>
 		</tr>
 	</table>
 

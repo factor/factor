@@ -1,7 +1,7 @@
 USING: accessors alien alien.c-types arrays byte-arrays combinators
 combinators.short-circuit fry kernel macros math math.blas.cblas
 math.complex math.functions math.order multi-methods qualified
-sequences sequences.private shuffle ;
+sequences sequences.private generalizations ;
 QUALIFIED: syntax
 IN: math.blas.vectors
 

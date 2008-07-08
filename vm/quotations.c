@@ -422,7 +422,10 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 			}
 			if(jit_ignore_declare_p(untag_object(array),i))
 			{
+				if(offset == 0) return i;
+
 				i++;
+
 				break;
 			}
 		default:

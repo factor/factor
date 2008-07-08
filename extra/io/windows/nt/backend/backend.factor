@@ -74,7 +74,7 @@ M: winnt add-completion ( win32-handle -- )
     ] if ;
 
 M: win32-handle cancel-operation
-    handle>> CancelIo drop ;
+    [ check-disposed ] [ handle>> CancelIo drop ] bi ;
 
 M: winnt io-multiplex ( ms -- )
     handle-overlapped [ 0 io-multiplex ] when ;

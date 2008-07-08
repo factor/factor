@@ -512,7 +512,7 @@ tuple
     { "unimplemented" "kernel.private" }
     { "gc-reset" "memory" }
 }
-dup length [ >r first2 r> make-primitive ] 2each
+[ >r first2 r> make-primitive ] each-index
 
 ! Bump build number
 "build" "kernel" create build 1+ 1quotation define

@@ -3,7 +3,7 @@
 USING: logging.server sequences namespaces concurrency.messaging
 words kernel arrays shuffle tools.annotations
 prettyprint.config prettyprint debugger io.streams.string
-splitting continuations effects arrays.lib parser strings
+splitting continuations effects generalizations parser strings
 quotations fry symbols accessors ;
 IN: logging
 

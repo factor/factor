@@ -1,9 +1,8 @@
 USING: alien alien.c-types windows.com.syntax
 windows.com.syntax.private windows.com continuations kernel
-sequences.lib namespaces windows.ole32 libc vocabs
-assocs accessors arrays sequences quotations combinators
-math words compiler.units destructors fry
-math.parser combinators.lib ;
+namespaces windows.ole32 libc vocabs assocs accessors arrays
+sequences quotations combinators math words compiler.units
+destructors fry math.parser generalizations ;
 IN: windows.com.wrapper
 
 TUPLE: com-wrapper vtbls disposed ;
