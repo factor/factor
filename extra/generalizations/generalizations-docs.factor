@@ -75,7 +75,7 @@ HELP: nrev
 { $description "A generalization of " { $link spin } " that reverses any number of items at the top of the stack."
 }
 { $examples
-  { $example "USING: prettyprint generalizations ;" "1 2 3 4 nrev .s" "4\n3\n2\n1\n" }
+  { $example "USING: prettyprint generalizations ;" "1 2 3 4 4 nrev .s" "4\n3\n2\n1" }
 }
 { $see-also rot nrot } ;
 
@@ -87,8 +87,8 @@ HELP: ndip
 "stack. The quotation can consume and produce any number of items."
 } 
 { $examples
-  { $example "USING: combinators.lib kernel prettyprint ;" "1 2 [ dup ] 1 ndip .s" "1\n1\n2" }
-  { $example "USING: combinators.lib kernel prettyprint ;" "1 2 3 [ drop ] 2 ndip .s" "2\n3" }
+  { $example "USING: generalizations kernel prettyprint ;" "1 2 [ dup ] 1 ndip .s" "1\n1\n2" }
+  { $example "USING: generalizations kernel prettyprint ;" "1 2 3 [ drop ] 2 ndip .s" "2\n3" }
 }
 { $see-also dip 2dip } ;
 
@@ -99,7 +99,7 @@ HELP: nslip
 "removed from the stack, the quotation called, and the items restored."
 } 
 { $examples
-  { $example "USING: combinators.lib prettyprint ;" "[ 99 ] 1 2 3 4 5 5 nslip .s" "99\n1\n2\n3\n4\n5" }
+  { $example "USING: generalizations prettyprint ;" "[ 99 ] 1 2 3 4 5 5 nslip .s" "99\n1\n2\n3\n4\n5" }
 }
 { $see-also slip nkeep } ;
 
@@ -110,7 +110,7 @@ HELP: nkeep
 "saved, the quotation called, and the items restored."
 } 
 { $examples
-  { $example "USING: combinators.lib kernel prettyprint ;" "1 2 3 4 5 [ drop drop drop drop drop 99 ] 5 nkeep .s" "99\n1\n2\n3\n4\n5" }
+  { $example "USING: generalizations kernel prettyprint ;" "1 2 3 4 5 [ drop drop drop drop drop 99 ] 5 nkeep .s" "99\n1\n2\n3\n4\n5" }
 }
 { $see-also keep nslip } ;
 

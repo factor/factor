@@ -1,4 +1,4 @@
-USING: tools.test generalizations kernel math arrays ;
+USING: tools.test generalizations kernel math arrays sequences ;
 IN: generalizations.tests
 
 { 1 2 3 4 1 } [ 1 2 3 4 4 npick ] unit-test
@@ -30,3 +30,5 @@ IN: generalizations.tests
 [ [ 1 2 3 + ] ] [ 1 2 3 [ + ] 3 ncurry ] unit-test
 [ { 1 2 } { 2 4 } { 3 8 } { 4 16 } { 5 32 } ] [ 1 2 3 4 5 [ dup 2^ 2array ] 5 napply ] unit-test
 [ [ dup 2^ 2array ] 5 napply ] must-infer
+
+[ { "xyc" "xyd" } ] [ "x" "y" { "c" "d" } [ 3append ] 2 nwith map ] unit-test

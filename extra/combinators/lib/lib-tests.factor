@@ -5,8 +5,6 @@ IN: combinators.lib.tests
 [ 5 ] [ [ 10 random ] [ 5 = ] generate ] unit-test
 [ t ] [ [ 10 random ] [ even? ] generate even? ] unit-test
 
-[ { "xyc" "xyd" } ] [ "x" "y" { "c" "d" } [ 3append ] 2 nwith map ] unit-test
-
 [ { "foo" "xbarx" } ]
 [
     { "oof" "bar" } { [ reverse ] [ "x" swap "x" 3append ] } parallel-call
