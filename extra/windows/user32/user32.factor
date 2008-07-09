@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.syntax parser namespaces kernel math
-windows.types shuffle math.bitfields alias ;
+windows.types generalizations math.bitfields alias ;
 IN: windows.user32
 
 ! HKL for ActivateKeyboardLayout
@@ -1285,10 +1285,10 @@ FUNCTION: void SetLastErrorEx ( DWORD dwErrCode, DWORD dwType ) ;
 ! FUNCTION: SetWindowPlacement
 FUNCTION: BOOL SetWindowPos ( HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags ) ;
 
-: HWND_BOTTOM ALIEN: 1 ;
-: HWND_NOTOPMOST ALIEN: -2 ;
-: HWND_TOP ALIEN: 0 ;
-: HWND_TOPMOST ALIEN: -1 ;
+: HWND_BOTTOM ( -- alien ) 1 <alien> ;
+: HWND_NOTOPMOST ( -- alien ) -2 <alien> ;
+: HWND_TOP ( -- alien ) 0 <alien> ;
+: HWND_TOPMOST ( -- alien ) -1 <alien> ;
 
 ! FUNCTION: SetWindowRgn
 ! FUNCTION: SetWindowsHookA

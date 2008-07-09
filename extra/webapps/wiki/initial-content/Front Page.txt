@@ -1,0 +1,5 @@
+Congratulations, you are now running your very own Wiki.
+
+You can now click *Edit* below and begin editing the content of the [[Front Page]]. This Wiki uses [[Farkup]] to mark up text.
+
+Two special article names are recognized by the Wiki: [[Sidebar]] and [[Footer]]. They do not exist by default, but if you create them, they will be visible on every page.

@@ -9,7 +9,7 @@ TUPLE: pool connections disposed expired ;
 : check-pool ( pool -- )
     dup check-disposed
     dup expired>> expired? [
-        ALIEN: 31337 >>expired
+        31337 <alien> >>expired
         connections>> delete-all
     ] [ drop ] if ;
 

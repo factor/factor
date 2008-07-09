@@ -1,23 +1,8 @@
 ! Copyright (C) 2007 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences namespaces math inference.transforms
-       combinators macros quotations math.ranges fry ;
+USING: kernel generalizations ;
 
 IN: shuffle
-
-MACRO: npick ( n -- ) 1- dup saver [ dup ] rot [ r> swap ] n*quot 3append ;
-
-MACRO: ndup ( n -- ) dup [ npick ] curry n*quot ;
-
-MACRO: nrot ( n -- ) 1- dup saver swap [ r> swap ] n*quot append ;
-
-MACRO: -nrot ( n -- ) 1- dup [ swap >r ] n*quot swap restorer append ;
-
-MACRO: ndrop ( n -- ) [ drop ] n*quot ;
-
-: nnip ( n -- ) swap >r ndrop r> ; inline
-
-MACRO: ntuck ( n -- ) 2 + '[ dup , -nrot ] ;
 
 : 2swap ( x y z t -- z t x y ) rot >r rot r> ; inline
 
@@ -32,8 +17,3 @@ MACRO: ntuck ( n -- ) 2 + '[ dup , -nrot ] ;
 : 4drop ( a b c d -- ) 3drop drop ; inline
 
 : tuckd ( x y z -- z x y z ) 2 ntuck ; inline
-
-MACRO: nrev ( n -- quot )
-  [ 1+ ] map
-  reverse
-  [ [ -nrot ] curry ] map concat ;

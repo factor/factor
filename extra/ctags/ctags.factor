@@ -18,8 +18,11 @@ IN: ctags
     second number>string %
   ] "" make ;
 
+: ctag-strings ( seq1 -- seq2 )
+  { } swap [ ctag suffix ] each ;
+
 : ctags-write ( seq path -- )
-  ascii [ [ ctag print ] each ] with-file-writer ;
+  [ ctag-strings ] dip ascii set-file-lines ;
 
 : (ctags) ( -- seq )
   { } all-words [

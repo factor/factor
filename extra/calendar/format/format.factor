@@ -57,9 +57,9 @@ GENERIC: month. ( obj -- )
 
 M: array month. ( pair -- )
     first2
-    [ month-names nth write bl number>string print ] 2keep
-    [ 1 zeller-congruence ] 2keep
-    2array days-in-month day-abbreviations2 " " join print
+    [ month-names nth write bl number>string print ]
+    [ 1 zeller-congruence ]
+    [ (days-in-month) day-abbreviations2 " " join print ] 2tri
     over "   " <repetition> concat write
     [
         [ 1+ day. ] keep

@@ -121,7 +121,7 @@ SYMBOL: drag-timer
 : start-drag-timer ( -- )
     hand-buttons get-global empty? [
         [ drag-gesture ]
-        300 milliseconds from-now
+        300 milliseconds hence
         100 milliseconds
         add-alarm drag-timer get-global >box
     ] when ;

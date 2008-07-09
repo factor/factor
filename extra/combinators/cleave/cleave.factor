@@ -1,6 +1,6 @@
 
 USING: kernel combinators words quotations arrays sequences locals macros
-       shuffle combinators.lib arrays.lib fry ;
+       shuffle combinators.lib generalizations fry ;
 
 IN: combinators.cleave
 

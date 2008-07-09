@@ -10,7 +10,7 @@ HELP: add-alarm
 
 HELP: later
 { $values { "quot" quotation } { "dt" duration } { "alarm" alarm } }
-{ $description "Creates and registers an alarm which calls the quotation once at " { $snippet "time" } { $link from-now } "." } ;
+{ $description "Creates and registers an alarm which calls the quotation once at " { $snippet "time" } " from now." } ;
 
 HELP: cancel-alarm
 { $values { "alarm" alarm } }

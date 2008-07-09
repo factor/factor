@@ -505,6 +505,8 @@ M: quotation '
         jit-r>-word
         jit-swap
         jit-swap-word
+        jit-over
+        jit-over-word
         jit-fixnum-fast
         jit-fixnum-fast-word
         jit-fixnum>=
