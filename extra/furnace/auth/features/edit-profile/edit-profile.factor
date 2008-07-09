@@ -22,7 +22,7 @@ IN: furnace.auth.features.edit-profile
         { realm "features/edit-profile/edit-profile" } >>template
 
         [
-            logged-in-user get username>> "username" set-value
+            username "username" set-value
 
             {
                 { "realname" [ [ v-one-line ] v-optional ] }
@@ -34,7 +34,7 @@ IN: furnace.auth.features.edit-profile
 
             { "password" "new-password" "verify-password" }
             [ value empty? not ] contains? [
-                "password" value logged-in-user get username>> check-login
+                "password" value username check-login
                 [ "incorrect password" validation-error ] unless
 
                 same-password-twice

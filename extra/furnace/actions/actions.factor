@@ -110,7 +110,7 @@ M: action call-responder* ( path action -- response )
     } case ;
 
 M: action modify-form
-    drop request get url>> revalidate-url-key hidden-form-field ;
+    drop url get revalidate-url-key hidden-form-field ;
 
 : check-validation ( -- )
     validation-failed? [ validation-failed ] when ;

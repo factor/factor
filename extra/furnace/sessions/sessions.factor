@@ -2,12 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel math.intervals math.parser namespaces
 strings random accessors quotations hashtables sequences continuations
-fry calendar combinators combinators.lib destructors alarms
+fry calendar combinators combinators.short-circuit destructors alarms
 io.servers.connection
 db db.tuples db.types
 http http.server http.server.dispatchers http.server.filters
 html.elements
-furnace furnace.cache combinators.short-circuit ;
+furnace furnace.cache ;
 IN: furnace.sessions
 
 TUPLE: session < server-state namespace user-agent client changed? ;

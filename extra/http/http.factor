@@ -114,10 +114,13 @@ TUPLE: cookie name value version comment path domain expires max-age http-only s
         ]
     } case ;
 
+: check-cookie-value ( string -- string )
+    [ "Cookie value must not be f" throw ] unless* ;
+
 : (unparse-cookie) ( cookie -- strings )
     [
         dup name>> check-cookie-string >lower
-        over value>> unparse-cookie-value
+        over value>> check-cookie-value unparse-cookie-value
         "$path" over path>> unparse-cookie-value
         "$domain" over domain>> unparse-cookie-value
         drop
@@ -129,7 +132,7 @@ TUPLE: cookie name value version comment path domain expires max-age http-only s
 : unparse-set-cookie ( cookie -- string )
     [
         dup name>> check-cookie-string >lower
-        over value>> unparse-cookie-value
+        over value>> check-cookie-value unparse-cookie-value
         "path" over path>> unparse-cookie-value
         "domain" over domain>> unparse-cookie-value
         "expires" over expires>> unparse-cookie-value

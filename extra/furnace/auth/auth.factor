@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs namespaces kernel sequences sets
-destructors combinators fry
+destructors combinators fry logging
 io.encodings.utf8 io.encodings.string io.binary random
 checksums checksums.sha2
 html.forms
@@ -18,7 +18,11 @@ IN: furnace.auth
 
 SYMBOL: logged-in-user
 
-: logged-in? ( -- ? ) logged-in-user get >boolean ;
+: logged-in? ( -- ? )
+    logged-in-user get >boolean ;
+
+: username ( -- string/f )
+    logged-in-user get dup [ username>> ] when ;
 
 GENERIC: init-user-profile ( responder -- )
 
@@ -29,9 +33,6 @@ M: dispatcher init-user-profile
 
 M: filter-responder init-user-profile
     responder>> init-user-profile ;
-
-: have-capability? ( capability -- ? )
-    logged-in-user get capabilities>> member? ;
 
 : profile ( -- assoc ) logged-in-user get profile>> ;
 
@@ -58,6 +59,8 @@ V{ } clone capabilities set-global
 TUPLE: realm < dispatcher name users checksum secure ;
 
 GENERIC: login-required* ( realm -- response )
+
+GENERIC: init-realm ( realm -- )
 
 GENERIC: logged-in-username ( realm -- username )
 
@@ -87,9 +90,16 @@ M: user-saver dispose
 : init-user ( user -- )
     [ [ logged-in-user set ] [ save-user-after ] bi ] when* ;
 
+\ init-user DEBUG add-input-logging
+
 M: realm call-responder* ( path responder -- response )
     dup realm set
-    dup logged-in-username dup [ users get-user ] when init-user
+    logged-in? [
+        dup init-realm
+        dup logged-in-username
+        dup [ users get-user ] when
+        init-user
+    ] unless
     call-next-method ;
 
 : encode-password ( string salt -- bytes )
@@ -122,18 +132,18 @@ TUPLE: protected < filter-responder description capabilities ;
     protected new
         swap >>responder ;
 
-: check-capabilities ( responder user/f -- ? )
-    {
+: have-capabilities? ( capabilities -- ? )
+    logged-in-user get {
         { [ dup not ] [ 2drop f ] }
         { [ dup deleted>> 1 = ] [ 2drop f ] }
-        [ [ capabilities>> ] bi@ subset? ]
+        [ capabilities>> subset? ]
     } cond ;
 
 M: protected call-responder* ( path responder -- response )
     '[
         , ,
         dup protected set
-        dup logged-in-user get check-capabilities
+        dup capabilities>> have-capabilities?
         [ call-next-method ] [ 2drop realm get login-required* ] if
     ] if-secure-realm ;
 

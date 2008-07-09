@@ -1,10 +1,17 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors namespaces sequences arrays kernel
-assocs assocs.lib hashtables math.parser urls combinators
-html.elements html.templates.chloe.syntax db.types db.tuples
-http http.server http.server.filters 
-furnace furnace.cache furnace.sessions furnace.redirection ;
+assocs hashtables math.parser urls combinators
+logging db.types db.tuples
+html.elements
+html.templates.chloe.syntax
+http
+http.server
+http.server.filters 
+furnace
+furnace.cache
+furnace.sessions
+furnace.redirection ;
 IN: furnace.asides
 
 TUPLE: aside < server-state session method url post-data ;
@@ -43,6 +50,8 @@ TUPLE: asides < server-state-manager ;
     ] change
     url>> path>> split-path
     asides get responder>> call-responder ;
+
+\ end-aside-post DEBUG add-input-logging
 
 ERROR: end-aside-in-get-error ;
 

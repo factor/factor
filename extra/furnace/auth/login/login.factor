@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors namespaces sequences math.parser
-calendar validators urls html.forms
+calendar validators urls logging html.forms
 http http.server http.server.dispatchers
 furnace
 furnace.auth
@@ -25,10 +25,8 @@ SYMBOL: permit-id
 
 TUPLE: login-realm < realm timeout domain ;
 
-M: login-realm call-responder*
-    [ name>> client-permit-id permit-id set ]
-    [ call-next-method ]
-    bi ;
+M: login-realm init-realm
+    name>> client-permit-id permit-id set ;
 
 M: login-realm logged-in-username
     drop permit-id get dup [ get-permit-uid ] when ;
@@ -47,10 +45,14 @@ M: login-realm modify-form ( responder -- )
 : put-permit-cookie ( response -- response' )
     <permit-cookie> put-cookie ;
 
+\ put-permit-cookie DEBUG add-input-logging
+
 : successful-login ( user -- response )
     [ username>> make-permit permit-id set ] [ init-user ] bi
     URL" $realm" end-aside
     put-permit-cookie ;
+
+\ successful-login DEBUG add-input-logging
 
 : logout ( -- )
     permit-id get [ delete-permit ] when*

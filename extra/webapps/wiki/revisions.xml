@@ -4,24 +4,6 @@
 
 	<t:title>Revisions of <t:label t:name="title" /></t:title>
 
-	<div class="revisions">
-		<table>
-			<tr>
-				<th>Revision</th>
-				<th>By</th>
-				<th>Rollback</th>
-			</tr>
-
-			<t:bind-each t:name="revisions">
-				<tr>
-					<td> <t:a t:href="$wiki/revision" t:rest="id"><t:label t:name="date" /></t:a> </td>
-					<td> <t:a t:href="$wiki/user-edits" t:rest="author"><t:label t:name="author" /></t:a> </td>
-					<td> <t:button t:action="$wiki/rollback" t:for="id" class="link link-button">Rollback</t:button> </td>
-				</tr>
-			</t:bind-each>
-		</table>
-	</div>
-
 	<h2>View Differences</h2>
 
 	<t:form t:action="$wiki/diff" t:method="get">

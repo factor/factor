@@ -47,7 +47,7 @@ article "ARTICLES" {
 
 : <article> ( title -- article ) article new swap >>title ;
 
-TUPLE: revision id title author date content ;
+TUPLE: revision id title author date content description ;
 
 revision "REVISIONS" {
     { "id" "ID" INTEGER +db-assigned-id+ }
@@ -55,6 +55,7 @@ revision "REVISIONS" {
     { "author" "AUTHOR" { VARCHAR 256 } +not-null+ } ! uid
     { "date" "DATE" TIMESTAMP +not-null+ }
     { "content" "CONTENT" TEXT +not-null+ }
+    { "description" "DESCRIPTION" TEXT }
 } define-persistent
 
 M: revision feed-entry-title
@@ -75,6 +76,10 @@ M: revision feed-entry-url id>> revision-url ;
 
 : validate-author ( -- )
     { { "author" [ v-username ] } } validate-params ;
+
+: <article-boilerplate> ( responder -- responder' )
+    <boilerplate>
+        { wiki "page-common" } >>template ;
 
 : <main-article-action> ( -- action )
     <action>
@@ -100,7 +105,9 @@ M: revision feed-entry-url id>> revision-url ;
             ] [
                 edit-url <redirect>
             ] ?if
-        ] >>display ;
+        ] >>display
+
+    <article-boilerplate> ;
 
 : <view-revision-action> ( -- action )
     <page-action>
@@ -114,7 +121,9 @@ M: revision feed-entry-url id>> revision-url ;
             URL" $wiki/view/" adjust-url present relative-link-prefix set
         ] >>init
 
-        { wiki "view" } >>template ;
+        { wiki "view" } >>template
+    
+    <article-boilerplate> ;
 
 : <random-article-action> ( -- action )
     <action>
@@ -144,27 +153,46 @@ M: revision feed-entry-url id>> revision-url ;
 
         [
             validate-title
-            "title" value <article> select-tuple [
-                revision>> <revision> select-tuple from-object
-            ] when*
+
+            "title" value <article> select-tuple
+            [ revision>> <revision> select-tuple ]
+            [ f <revision> "title" value >>title ]
+            if*
+
+            [ title>> "title" set-value ]
+            [ content>> "content" set-value ]
+            bi
         ] >>init
 
         { wiki "edit" } >>template
 
+    <article-boilerplate> ;
+
+: <submit-article-action> ( -- action )
+    <action>
         [
             validate-title
-            { { "content" [ v-required ] } } validate-params
+
+            {
+                { "content" [ v-required ] }
+                { "description" [ [ v-one-line ] v-optional ] }
+            } validate-params
 
             f <revision>
                 "title" value >>title
                 now >>date
-                logged-in-user get username>> >>author
+                username >>author
                 "content" value >>content
+                "description" value >>description
             [ add-revision ] [ title>> view-url <redirect> ] bi
         ] >>submit
 
     <protected>
         "edit wiki articles" >>description ;
+
+: <revisions-boilerplate> ( responder -- responder )
+    <boilerplate>
+        { wiki "revisions-common" } >>template ;
 
 : list-revisions ( -- seq )
     f <revision> "title" value >>title select-tuples
@@ -180,7 +208,10 @@ M: revision feed-entry-url id>> revision-url ;
             list-revisions "revisions" set-value
         ] >>init
 
-        { wiki "revisions" } >>template ;
+        { wiki "revisions" } >>template
+
+    <revisions-boilerplate>
+    <article-boilerplate> ;
 
 : <list-revisions-feed-action> ( -- action )
     <feed-action>
@@ -195,15 +226,26 @@ M: revision feed-entry-url id>> revision-url ;
 
         [ list-revisions ] >>entries ;
 
+: rollback-description ( description -- description' )
+    [ "Rollback of '" swap "'" 3append ] [ "Rollback" ] if* ;
+
 : <rollback-action> ( -- action )
     <action>
 
         [ validate-integer-id ] >>validate
 
         [
-            "id" value <revision> select-tuple clone f >>id
-            [ add-revision ] [ title>> view-url <redirect> ] bi
-        ] >>submit ;
+            "id" value <revision> select-tuple
+                f >>id
+                now >>date
+                username >>author
+                [ rollback-description ] change-description
+            [ add-revision ]
+            [ title>> revisions-url <redirect> ] bi
+        ] >>submit
+    
+    <protected>
+        "rollback wiki articles" >>description ;
 
 : list-changes ( -- seq )
     f <revision> select-tuples
@@ -211,8 +253,10 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <list-changes-action> ( -- action )
     <page-action>
-        [ list-changes "changes" set-value ] >>init
-        { wiki "changes" } >>template ;
+        [ list-changes "revisions" set-value ] >>init
+        { wiki "changes" } >>template
+
+    <revisions-boilerplate> ;
 
 : <list-changes-feed-action> ( -- action )
     <feed-action>
@@ -237,6 +281,7 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <diff-action> ( -- action )
     <page-action>
+
         [
             {
                 { "old-id" [ v-integer ] }
@@ -246,14 +291,18 @@ M: revision feed-entry-url id>> revision-url ;
             "old-id" "new-id"
             [ value <revision> select-tuple ] bi@
             [
-                [ [ title>> "title" set-value ] [ "old" [ from-object ] nest-form ] bi ]
-                [ "new" [ from-object ] nest-form ] bi*
+                over title>> "title" set-value
+                [ "old" [ from-object ] nest-form ]
+                [ "new" [ from-object ] nest-form ]
+                bi*
             ]
             [ [ content>> string-lines ] bi@ diff "diff" set-value ]
             2bi
         ] >>init
 
-        { wiki "diff" } >>template ;
+        { wiki "diff" } >>template
+
+    <article-boilerplate> ;
 
 : <list-articles-action> ( -- action )
     <page-action>
@@ -277,10 +326,12 @@ M: revision feed-entry-url id>> revision-url ;
 
         [
             validate-author
-            list-user-edits "user-edits" set-value
+            list-user-edits "revisions" set-value
         ] >>init
 
-        { wiki "user-edits" } >>template ;
+        { wiki "user-edits" } >>template
+
+    <revisions-boilerplate> ;
 
 : <user-edits-feed-action> ( -- action )
     <feed-action>
@@ -290,24 +341,21 @@ M: revision feed-entry-url id>> revision-url ;
         [ "author" value user-edits-url ] >>url
         [ list-user-edits ] >>entries ;
 
-: <article-boilerplate> ( responder -- responder' )
-    <boilerplate>
-        { wiki "page-common" } >>template ;
-
 : init-sidebar ( -- )
     "Sidebar" latest-revision [ "sidebar" [ from-object ] nest-form ] when*
     "Footer" latest-revision [ "footer" [ from-object ] nest-form ] when* ;
 
 : <wiki> ( -- dispatcher )
     wiki new-dispatcher
-        <main-article-action> <article-boilerplate> "" add-responder
-        <view-article-action> <article-boilerplate> "view" add-responder
-        <view-revision-action> <article-boilerplate> "revision" add-responder
+        <main-article-action> "" add-responder
+        <view-article-action> "view" add-responder
+        <view-revision-action> "revision" add-responder
         <random-article-action> "random" add-responder
-        <list-revisions-action> <article-boilerplate> "revisions" add-responder
+        <list-revisions-action> "revisions" add-responder
         <list-revisions-feed-action> "revisions.atom" add-responder
-        <diff-action> <article-boilerplate> "diff" add-responder
-        <edit-article-action> <article-boilerplate> "edit" add-responder
+        <diff-action> "diff" add-responder
+        <edit-article-action> "edit" add-responder
+        <submit-article-action> "submit" add-responder
         <rollback-action> "rollback" add-responder
         <user-edits-action> "user-edits" add-responder
         <list-articles-action> "articles" add-responder

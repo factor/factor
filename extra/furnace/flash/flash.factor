@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces assocs assocs.lib kernel sequences accessors
+USING: namespaces assocs kernel sequences accessors
 urls db.types db.tuples math.parser fry
 http http.server http.server.filters http.server.redirection
 furnace furnace.cache furnace.sessions furnace.redirection ;

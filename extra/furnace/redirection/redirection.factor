@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors combinators namespaces fry
-io.servers.connection
+io.servers.connection urls
 http http.server http.server.redirection http.server.filters
 furnace ;
 IN: furnace.redirection
@@ -33,8 +33,8 @@ TUPLE: secure-only < filter-responder ;
 C: <secure-only> secure-only
 
 : if-secure ( quot -- )
-    >r request get url>> protocol>> "http" =
-    [ request get url>> <secure-redirect> ]
+    >r url get protocol>> "http" =
+    [ url get <secure-redirect> ]
     r> if ; inline
 
 M: secure-only call-responder*
