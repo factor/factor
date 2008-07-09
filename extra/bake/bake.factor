@@ -1,6 +1,6 @@
 
 USING: kernel parser namespaces sequences quotations arrays vectors splitting
-       words math
+       strings words math
        macros arrays.lib combinators.lib combinators.conditional newfx ;
 
 IN: bake
@@ -20,7 +20,9 @@ DEFER: [bake]
 : broil-element ( obj -- quot )
     {
       { [ comma?    ] [ drop [ >r ]          ] }
+      { [ f =       ] [ [ >r ] prefix-on     ] }
       { [ integer?  ] [ [ >r ] prefix-on     ] }
+      { [ string?   ] [ [ >r ] prefix-on     ] }
       { [ sequence? ] [ [bake] [ >r ] append ] }
       { [ word?     ] [ literalize [ >r ] prefix-on ] }
       { [ drop t    ] [ [ >r ] prefix-on     ] }
