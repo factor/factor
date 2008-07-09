@@ -48,12 +48,27 @@ SYMBOL: error-stack
   
 SYMBOL: ignore 
 
-SYMBOL: packrat
+: packrat ( id -- cache )
+  #! The packrat cache is a mapping of parser-id->cache.
+  #! For each parser it maps to a cache holding a mapping
+  #! of position->result. The packrat cache therefore keeps
+  #! track of all parses that have occurred at each position
+  #! of the input string and the results obtained from that
+  #! parser.
+  \ packrat get [ drop H{ } clone ] cache ;
+
 SYMBOL: pos
 SYMBOL: input
 SYMBOL: fail
 SYMBOL: lrstack
-SYMBOL: heads
+
+: heads ( -- cache )
+  #! A mapping from position->peg-head.	It maps a
+  #! position in the input string being parsed to 
+  #! the head of the left recursion which is currently
+  #! being grown. It is 'f' at any position where
+  #! left recursion growth is not underway.
+  \ heads get ;
 
 : failed? ( obj -- ? )
   fail = ;
@@ -71,19 +86,20 @@ SYMBOL: heads
 
 reset-pegs 
 
+#! An entry in the table of memoized parse results
+#! ast = an AST produced from the parse
+#!       or the symbol 'fail'
+#!       or a left-recursion object
+#! pos = the position in the input string of this entry
 TUPLE: memo-entry ans pos ;
-C: <memo-entry> memo-entry
 
-TUPLE: left-recursion seed rule head next ;
-C: <left-recursion> left-recursion
- 
+TUPLE: left-recursion seed rule head next ; 
 TUPLE: peg-head rule involved-set eval-set ;
-C: <head> peg-head
 
-: rule-parser ( rule -- parser ) 
+: rule-id ( word -- id ) 
   #! A rule is the parser compiled down to a word. It has
-  #! a "peg" property containing the original parser.
-  "peg" word-prop ;
+  #! a "peg-id" property containing the id of the original parser.
+  "peg-id" word-prop ;
 
 : input-slice ( -- slice )
   #! Return a slice of the input from the current parse position
@@ -93,11 +109,6 @@ C: <head> peg-head
   #! Return the index from the original string that the
   #! input slice is based on.
   dup slice? [ slice-from ] [ drop 0 ] if ;
-
-: input-cache ( parser -- cache )
-  #! From the packrat cache, obtain the cache for the parser 
-  #! that maps the position to the parser result.
-  id>> packrat get [ drop H{ } clone ] cache ;
 
 : process-rule-result ( p result -- result )
   [
@@ -114,11 +125,13 @@ C: <head> peg-head
 
 : memo ( pos rule -- memo-entry )
   #! Return the result from the memo cache. 
-  rule-parser input-cache at ;
+  rule-id packrat at 
+!  "  memo result " write dup . 
+  ;
 
 : set-memo ( memo-entry pos rule -- )
   #! Store an entry in the cache
-  rule-parser input-cache set-at ;
+  rule-id packrat set-at ;
 
 : update-m ( ast m -- )
   swap >>ans pos get >>pos drop ;
@@ -141,9 +154,9 @@ C: <head> peg-head
   ] if ; inline
  
 : grow-lr ( h p r m -- ast )
-  >r >r [ heads get set-at ] 2keep r> r>
+  >r >r [ heads set-at ] 2keep r> r>
   pick over >r >r (grow-lr) r> r>
-  swap heads get delete-at
+  swap heads delete-at
   dup pos>> pos set ans>>
   ; inline
 
@@ -156,7 +169,7 @@ C: <head> peg-head
 
 :: setup-lr ( r l -- )
   l head>> [
-    r V{ } clone V{ } clone <head> l (>>head)
+    r V{ } clone V{ } clone peg-head boa l (>>head)
   ] unless
   r l lrstack get (setup-lr) ;
 
@@ -179,11 +192,11 @@ C: <head> peg-head
 :: recall ( r p -- memo-entry )
   [let* |
           m [ p r memo ]
-          h [ p heads get at ]
+          h [ p heads at ]
         |
     h [
       m r h involved-set>> h rule>> suffix member? not and [
-        fail p <memo-entry>
+        fail p memo-entry boa
       ] [
         r h eval-set>> member? [
           h [ r swap remove ] change-eval-set drop
@@ -201,8 +214,8 @@ C: <head> peg-head
 
 :: apply-non-memo-rule ( r p -- ast )
   [let* |
-          lr  [ fail r f lrstack get <left-recursion> ]
-          m   [ lr lrstack set lr p <memo-entry> dup p r set-memo ]
+          lr  [ fail r f lrstack get left-recursion boa ]
+          m   [ lr lrstack set lr p memo-entry boa dup p r set-memo ]
           ans [ r eval-rule ]
         |
     lrstack get next>> lrstack set
@@ -224,10 +237,15 @@ C: <head> peg-head
     nip
   ] if ; 
 
+USE: prettyprint
+
 : apply-rule ( r p -- ast )
+!   2dup [ rule-id ] dip 2array "apply-rule: " write .
    2dup recall [
+!     "  memoed" print
      nip apply-memo-rule
    ] [
+!     "  not memoed" print
      apply-non-memo-rule
    ] if* ; inline
 
@@ -238,8 +256,8 @@ C: <head> peg-head
     0 pos set
     f lrstack set
     V{ } clone error-stack set
-    H{ } clone heads set
-    H{ } clone packrat set
+    H{ } clone \ heads set
+    H{ } clone \ packrat set
   ] H{ } make-assoc swap bind ; inline
 
 
@@ -258,7 +276,7 @@ GENERIC: (compile) ( peg -- quot )
 : parser-body ( parser -- quot )
   #! Return the body of the word that is the compiled version
   #! of the parser.
-  gensym 2dup swap peg>> (compile) 0 1 <effect> define-declared swap dupd "peg" set-word-prop
+  gensym 2dup swap peg>> (compile) 0 1 <effect> define-declared swap dupd id>> "peg-id" set-word-prop
   [ execute-parser ] curry ;
 
 : compiled-parser ( parser -- word )
