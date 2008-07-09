@@ -14,18 +14,12 @@ SYMBOL: current-irc-client
 
 : irc-port 6667 ; ! Default irc port
 
-! "setup" objects
 TUPLE: irc-profile server port nickname password ;
 C: <irc-profile> irc-profile
 
-! "live" objects
-TUPLE: nick name channels log ;
-C: <nick> nick
-
-TUPLE: irc-client profile nick stream in-messages out-messages join-messages
+TUPLE: irc-client profile stream in-messages out-messages join-messages
        listeners is-running connect reconnect-time ;
 : <irc-client> ( profile -- irc-client )
-    f V{ } clone V{ } clone <nick>
     f <mailbox> <mailbox> <mailbox> H{ } clone f
     [ <inet> latin1 <client> ] 15 seconds irc-client boa ;
 
@@ -175,14 +169,15 @@ TUPLE: unhandled < irc-message ;
         { "KICK" [ \ kick ] }
         [ drop \ unhandled ]
     } case
-    [ [ tuple-slots ] [ parameters>> ] bi append ] dip prefix >tuple ;
+    [ [ tuple-slots ] [ parameters>> ] bi append ] dip
+    [ all-slots length head ] keep slots>tuple ;
 
 ! ======================================
 ! Server message handling
 ! ======================================
 
 : me? ( string -- ? )
-    irc> nick>> name>> = ;
+    irc> profile>> nickname>> = ;
 
 : irc-message-origin ( irc-message -- name )
     dup name>> me? [ prefix>> parse-name ] [ name>> ] if ;
@@ -196,7 +191,7 @@ M: irc-message handle-incoming-irc ( irc-message -- )
     f listener> [ in-messages>> mailbox-put ] [ drop ] if* ;
 
 M: logged-in handle-incoming-irc ( logged-in -- )
-    name>> irc> nick>> (>>name) ;
+    name>> irc> profile>> (>>nickname) ;
 
 M: ping handle-incoming-irc ( ping -- )
     trailing>> /PONG ;
@@ -210,6 +205,9 @@ M: privmsg handle-incoming-irc ( privmsg -- )
 M: join handle-incoming-irc ( join -- )
     dup trailing>> listener>
     [ irc> join-messages>> ] unless* mailbox-put ;
+
+M: part handle-incoming-irc ( part -- )
+    dup channel>> to-listener ;
 
 M: kick handle-incoming-irc ( kick -- )
     [ ] [ channel>> ] [ who>> ] tri me? [ dup unregister-listener ] when
@@ -226,6 +224,9 @@ GENERIC: handle-outgoing-irc ( obj -- )
 
 M: privmsg handle-outgoing-irc ( privmsg -- )
    [ name>> ] [ trailing>> ] bi /PRIVMSG ;
+
+M: part handle-outgoing-irc ( privmsg -- )
+   [ channel>> ] [ trailing>> "" or ] bi /PART ;
 
 ! ======================================
 ! Reader/Writer
@@ -306,6 +307,7 @@ DEFER: (connect-irc)
     2bi ;
 
 GENERIC: (add-listener) ( irc-listener -- )
+
 M: irc-channel-listener (add-listener) ( irc-channel-listener -- )
     [ [ name>> ] [ password>> ] bi /JOIN ]
     [ [ [ drop irc> join-messages>> ]
@@ -320,19 +322,41 @@ M: irc-nick-listener (add-listener) ( irc-nick-listener -- )
 M: irc-server-listener (add-listener) ( irc-server-listener -- )
     f swap set+run-listener ;
 
+GENERIC: (remove-listener) ( irc-listener -- )
+
+M: irc-nick-listener (remove-listener) ( irc-nick-listener -- )
+    name>> unregister-listener ;
+
+M: irc-channel-listener (remove-listener) ( irc-channel-listener -- )
+    [ [ out-messages>> ] [ name>> ] bi
+      \ part new swap >>channel mailbox-put ] keep
+    name>> unregister-listener ;
+
+M: irc-server-listener (remove-listener) ( irc-server-listener -- )
+   drop f unregister-listener ;
+
 : (connect-irc) ( irc-client -- )
     [ profile>> [ server>> ] [ port>> ] bi /CONNECT ] keep
         swap >>stream
         t >>is-running
     in-messages>> irc-connected swap mailbox-put ;
 
+: with-irc-client ( irc-client quot -- )
+    >r current-irc-client r> with-variable ; inline
+
 PRIVATE>
 
 : connect-irc ( irc-client -- )
-    dup current-irc-client [
+    dup [
         [ (connect-irc) ] [ profile>> nickname>> /LOGIN ] bi
         spawn-irc
-    ] with-variable ;
+    ] with-irc-client ;
 
 : add-listener ( irc-listener irc-client -- )
-    current-irc-client rot '[ , (add-listener) ] with-variable ;
+    swap '[ , (add-listener) ] with-irc-client ;
+
+: remove-listener ( irc-listener irc-client -- )
+    swap '[ , (remove-listener) ] with-irc-client ;
+
+: write-message ( message irc-listener -- ) out-messages>> mailbox-put ;
+: read-message ( irc-listener -- message ) in-messages>> mailbox-get ;
