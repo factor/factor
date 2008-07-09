@@ -52,7 +52,7 @@ TUPLE: irc-message line prefix command parameters trailing timestamp ;
 TUPLE: logged-in < irc-message name ;
 TUPLE: ping < irc-message ;
 TUPLE: join < irc-message ;
-TUPLE: part < irc-message name channel ;
+TUPLE: part < irc-message channel ;
 TUPLE: quit < irc-message ;
 TUPLE: privmsg < irc-message name ;
 TUPLE: kick < irc-message channel who ;
