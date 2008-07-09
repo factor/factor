@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: logging.analysis logging.server logging smtp kernel
 io.files io.streams.string namespaces alarms assocs
-io.encodings.utf8 accessors calendar qualified ;
+io.encodings.utf8 accessors calendar sequences qualified ;
 QUALIFIED: io.sockets
 IN: logging.insomniac
 
@@ -10,11 +10,7 @@ SYMBOL: insomniac-sender
 SYMBOL: insomniac-recipients
 
 : ?analyze-log ( service word-names -- string/f )
-    >r log-path 1 log# dup exists? [
-        utf8 file-lines r> [ analyze-log ] with-string-writer
-    ] [
-        r> 2drop f
-    ] if ;
+    [ analyze-log-file ] with-string-writer ;
 
 : email-subject ( service -- string )
     [
@@ -22,14 +18,14 @@ SYMBOL: insomniac-recipients
     ] "" make ;
 
 : (email-log-report) ( service word-names -- )
-    dupd ?analyze-log dup [
+    dupd ?analyze-log dup empty? [ 2drop ] [
         <email>
             swap >>body
             insomniac-recipients get >>to
             insomniac-sender get >>from
             swap email-subject >>subject
         send-email
-    ] [ 2drop ] if ;
+    ] if ;
 
 \ (email-log-report) NOTICE add-error-logging
 

@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences namespaces words assocs logging sorting
-prettyprint io io.styles strings logging.parser calendar.format
-combinators ;
+prettyprint io io.styles io.files io.encodings.utf8
+strings combinators
+logging.server logging.parser calendar.format ;
 IN: logging.analysis
 
 SYMBOL: word-names
@@ -69,3 +70,6 @@ SYMBOL: message-histogram
 
 : analyze-log ( lines word-names -- )
     >r parse-log r> analyze-entries analysis. ;
+
+: analyze-log-file ( service word-names -- )
+    >r parse-log-file r> analyze-entries analysis. ;
