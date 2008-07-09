@@ -45,7 +45,7 @@ tetris-gadget H{
     dup tetris-gadget-tetris maybe-update relayout-1 ;
 
 M: tetris-gadget graft* ( gadget -- )
-    dup [ tick ] curry 100 milliseconds from-now 100 milliseconds add-alarm
+    dup [ tick ] curry 100 milliseconds every
     swap set-tetris-gadget-alarm ;
 
 M: tetris-gadget ungraft* ( gadget -- )

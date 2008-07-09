@@ -13,11 +13,12 @@ SYMBOL: compiled
 
 : queue-compile ( word -- )
     {
-        { [ dup compiled get key? ] [ drop ] }
-        { [ dup inlined-block? ] [ drop ] }
-        { [ dup primitive? ] [ drop ] }
-        [ compile-queue get push-front ]
-    } cond ;
+        { [ dup "forgotten" word-prop ] [ ] }
+        { [ dup compiled get key? ] [ ] }
+        { [ dup inlined-block? ] [ ] }
+        { [ dup primitive? ] [ ] }
+        [ dup compile-queue get push-front ]
+    } cond drop ;
 
 : maybe-compile ( word -- )
     dup compiled>> [ drop ] [ queue-compile ] if ;
@@ -31,7 +32,7 @@ SYMBOL: compiling-loops
 ! Label of current word, after prologue, makes recursion faster
 SYMBOL: current-label-start
 
-: compiled-stack-traces? ( -- ? ) 36 getenv ;
+: compiled-stack-traces? ( -- ? ) 59 getenv ;
 
 : begin-compiling ( word label -- )
     H{ } clone compiling-loops set

@@ -1,6 +1,6 @@
 USING: kernel opengl.demo-support opengl.gl opengl.shaders opengl.framebuffers
 opengl multiline ui.gadgets accessors sequences ui.render ui math 
-arrays arrays.lib combinators ;
+arrays generalizations combinators ;
 IN: spheres
 
 STRING: plane-vertex-shader

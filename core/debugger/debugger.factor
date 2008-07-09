@@ -52,7 +52,7 @@ M: string error. print ;
         nl
         "The following restarts are available:" print
         nl
-        dup length [ restart. ] 2each
+        [ restart. ] each-index
     ] if ;
 
 : print-error ( error -- )

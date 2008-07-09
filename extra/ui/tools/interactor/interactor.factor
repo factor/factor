@@ -2,12 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs combinators continuations documents
 hashtables io io.styles kernel math math.order math.vectors
-models namespaces parser lexer prettyprint quotations sequences
-strings threads listener classes.tuple ui.commands ui.gadgets
-ui.gadgets.editors ui.gadgets.presentations ui.gadgets.worlds
-ui.gestures definitions calendar concurrency.flags
-concurrency.mailboxes ui.tools.workspace accessors sets
-destructors ;
+models models.delay namespaces parser lexer prettyprint
+quotations sequences strings threads listener classes.tuple
+ui.commands ui.gadgets ui.gadgets.editors
+ui.gadgets.presentations ui.gadgets.worlds ui.gestures
+definitions calendar concurrency.flags concurrency.mailboxes
+ui.tools.workspace accessors sets destructors ;
 IN: ui.tools.interactor
 
 ! If waiting is t, we're waiting for user input, and invoking

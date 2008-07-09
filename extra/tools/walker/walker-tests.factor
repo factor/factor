@@ -1,6 +1,7 @@
 USING: tools.walker io io.streams.string kernel math
 math.private namespaces prettyprint sequences tools.test
-continuations math.parser threads arrays tools.walker.debug ;
+continuations math.parser threads arrays tools.walker.debug
+generic.standard sequences.private kernel.private ;
 IN: tools.walker.tests
 
 [ { } ] [
@@ -47,6 +48,10 @@ IN: tools.walker.tests
 
 [ { f } ] [
     [ 5 6 number= ] test-walker
+] unit-test
+
+[ { 0 } ] [
+    [ 0 { array-capacity } declare ] test-walker
 ] unit-test
 
 [ { f } ] [
@@ -96,6 +101,9 @@ IN: tools.walker.tests
 
 [ { 6 } ]
 [ [ [ 3 throw ] [ 2 * ] recover ] test-walker ] unit-test
+
+[ { T{ no-method f + nth } } ]
+[ [ [ 0 \ + nth ] [ ] recover ] test-walker ] unit-test
 
 [ { } ] [
     [ "a" "b" set "c" "d" set [ ] test-walker ] with-scope

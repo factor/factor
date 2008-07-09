@@ -4,7 +4,7 @@ USING: io.files kernel tools.test db db.tuples classes
 db.types continuations namespaces math math.ranges
 prettyprint calendar sequences db.sqlite math.intervals
 db.postgresql accessors random math.bitfields.lib
-math.ranges strings sequences.lib urls ;
+math.ranges strings sequences.lib urls fry ;
 IN: db.tuples.tests
 
 TUPLE: person the-id the-name the-number the-real
@@ -201,10 +201,10 @@ TUPLE: annotation n paste-id summary author mode contents ;
 ! ] with-db
 
 : test-sqlite ( quot -- )
-    >r "tuples-test.db" temp-file sqlite-db r> with-db ;
+    [ ] swap '[ "tuples-test.db" temp-file sqlite-db , with-db ] unit-test ;
 
 : test-postgresql ( quot -- )
-    >r { "localhost" "postgres" "foob" "factor-test" } postgresql-db r> with-db ;
+    [ ] swap '[ { "localhost" "postgres" "foob" "factor-test" } postgresql-db , with-db ] unit-test ;
 
 : test-repeated-insert
     [ ] [ person ensure-table ] unit-test
@@ -463,6 +463,31 @@ fubbclass "FUBCLASS" { } define-persistent
     [ t ] [ fubbclass new select-tuples [ fubbclass? ] all? ] unit-test ;
 
 [ test-db-inheritance ] test-sqlite
+[ test-db-inheritance ] test-postgresql
+
+
+TUPLE: string-encoding-test id string ;
+
+string-encoding-test "STRING_ENCODING_TEST" {
+    { "id" "ID" +db-assigned-id+ }
+    { "string" "STRING" TEXT }
+} define-persistent
+
+: test-string-encoding ( -- )
+    [ ] [ string-encoding-test ensure-table ] unit-test
+
+    [ ] [
+        string-encoding-test new
+            "\u{copyright-sign}\u{bengali-letter-cha}" >>string
+        [ insert-tuple ] [ id>> "id" set ] bi
+    ] unit-test
+    
+    [ "\u{copyright-sign}\u{bengali-letter-cha}" ] [
+        string-encoding-test new "id" get >>id select-tuple string>>
+    ] unit-test ;
+
+[ test-string-encoding ] test-sqlite
+[ test-string-encoding ] test-postgresql
 
 ! Don't comment these out. These words must infer
 \ bind-tuple must-infer

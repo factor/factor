@@ -37,7 +37,8 @@ FUNCTION: int execve ( char* path, char** argv, char** envp ) ;
     >r [ first ] [ ] bi r> exec-with-env ;
 
 : with-fork ( child parent -- )
-    fork-process dup zero? -roll swap curry if ; inline
+    [ [ fork-process dup zero? ] dip [ drop ] prepose ] dip
+    if ; inline
 
 : SIGKILL 9 ; inline
 : SIGTERM 15 ; inline

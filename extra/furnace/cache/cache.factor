@@ -31,6 +31,6 @@ TUPLE: server-state-manager < filter-responder timeout ;
     new
         swap >>responder
         20 minutes >>timeout ; inline
-    
+
 : touch-state ( state manager -- )
-    timeout>> from-now >>expires drop ;
+    timeout>> hence >>expires drop ;

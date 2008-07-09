@@ -562,13 +562,10 @@ M: loc lazy-store
         2drop t
     ] if ;
 
-: class-tag ( class -- tag/f )
-    class-tags dup length 1 = [ first ] [ drop f ] if ;
-
 : class-matches? ( actual expected -- ? )
     {
         { f [ drop t ] }
-        { known-tag [ class-tag >boolean ] }
+        { known-tag [ dup [ class-tag >boolean ] when ] }
         [ class<= ]
     } case ;
 
@@ -639,7 +636,7 @@ PRIVATE>
     [ second template-matches? ] find nip ;
 
 : operand-tag ( operand -- tag/f )
-    operand-class class-tag ;
+    operand-class dup [ class-tag ] when ;
 
 UNION: immediate fixnum POSTPONE: f ;
 

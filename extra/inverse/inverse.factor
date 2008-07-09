@@ -1,10 +1,10 @@
 ! Copyright (C) 2007, 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel words summary slots quotations
-sequences assocs math arrays inference effects shuffle
+sequences assocs math arrays inference effects generalizations
 continuations debugger classes.tuple namespaces vectors
 bit-arrays byte-arrays strings sbufs math.functions macros
-sequences.private combinators mirrors combinators.lib
+sequences.private combinators mirrors
 combinators.short-circuit ;
 IN: inverse
 

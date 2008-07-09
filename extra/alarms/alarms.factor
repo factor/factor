@@ -82,10 +82,10 @@ PRIVATE>
     <alarm> [ register-alarm ] keep ;
 
 : later ( quot dt -- alarm )
-    from-now f add-alarm ;
+    hence f add-alarm ;
 
 : every ( quot dt -- alarm )
-    [ from-now ] keep add-alarm ;
+    [ hence ] keep add-alarm ;
 
 : cancel-alarm ( alarm -- )
     alarm-entry [ alarms get-global heap-delete ] if-box? ;

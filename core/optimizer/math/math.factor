@@ -158,7 +158,7 @@ optimizer.math.partial generic.standard system accessors ;
     { + { { fixnum integer } } interval+ }
     { - { { fixnum integer } } interval- }
     { * { { fixnum integer } } interval* }
-    { / { { fixnum rational } { integer rational } } interval/ }
+    { / { { fixnum rational } { integer rational } } interval/-safe }
     { /i { { fixnum integer } } interval/i }
     { shift { { fixnum integer } } interval-shift-safe }
 } [

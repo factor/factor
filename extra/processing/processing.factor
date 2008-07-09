@@ -1,7 +1,7 @@
 
 USING: kernel namespaces threads combinators sequences arrays
        math math.functions math.ranges random
-       opengl.gl opengl.glu vars multi-methods shuffle
+       opengl.gl opengl.glu vars multi-methods generalizations shuffle
        ui
        ui.gestures
        ui.gadgets

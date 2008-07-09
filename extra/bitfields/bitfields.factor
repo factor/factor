@@ -1,6 +1,6 @@
 USING: parser lexer kernel math sequences namespaces assocs summary
 words splitting math.parser arrays sequences.next mirrors
-shuffle compiler.units ;
+generalizations compiler.units ;
 IN: bitfields
 
 ! Example:

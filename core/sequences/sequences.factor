@@ -426,6 +426,18 @@ PRIVATE>
 : follow ( obj quot -- seq )
     >r [ dup ] r> [ keep ] curry [ ] unfold nip ; inline
 
+: prepare-index ( seq quot -- seq n quot )
+    >r dup length r> ; inline
+
+: each-index ( seq quot -- )
+    prepare-index 2each ; inline
+
+: map-index ( seq quot -- )
+    prepare-index 2map ; inline
+
+: reduce-index ( seq identity quot -- )
+    swapd each-index ; inline
+
 : index ( obj seq -- n )
     [ = ] with find drop ;
 

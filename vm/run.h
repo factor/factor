@@ -1,4 +1,4 @@
-#define USER_ENV 64
+#define USER_ENV 70
 
 typedef enum {
 	NAMESTACK_ENV,            /* used by library only */
@@ -47,20 +47,43 @@ typedef enum {
 	JIT_EPILOG,
 	JIT_RETURN,
 	JIT_PROFILING,
+	JIT_TAG,
+	JIT_TAG_WORD,
+	JIT_EQP,
+	JIT_EQP_WORD,
+	JIT_SLOT,
+	JIT_SLOT_WORD,
+	JIT_DECLARE_WORD,
+	JIT_DROP,
+	JIT_DROP_WORD,
+	JIT_DUP,
+	JIT_DUP_WORD,
+	JIT_TO_R,
+	JIT_TO_R_WORD,
+	JIT_FROM_R,
+	JIT_FROM_R_WORD,
+	JIT_SWAP,
+	JIT_SWAP_WORD,
+	JIT_OVER,
+	JIT_OVER_WORD,
+	JIT_FIXNUM_MINUS,
+	JIT_FIXNUM_MINUS_WORD,
+	JIT_FIXNUM_GE,
+	JIT_FIXNUM_GE_WORD,
 
-	STACK_TRACES_ENV    = 36,
+	STACK_TRACES_ENV    = 59,
 
-	UNDEFINED_ENV       = 37, /* default quotation for undefined words */
+	UNDEFINED_ENV       = 60, /* default quotation for undefined words */
 
-	STDERR_ENV          = 38, /* stderr FILE* handle */
+	STDERR_ENV          = 61, /* stderr FILE* handle */
 
-	STAGE2_ENV          = 39, /* have we bootstrapped? */
+	STAGE2_ENV          = 62, /* have we bootstrapped? */
 
-	CURRENT_THREAD_ENV  = 40,
+	CURRENT_THREAD_ENV  = 63,
 
-	THREADS_ENV         = 41,
-	RUN_QUEUE_ENV       = 42,
-	SLEEP_QUEUE_ENV     = 43,
+	THREADS_ENV         = 64,
+	RUN_QUEUE_ENV       = 65,
+	SLEEP_QUEUE_ENV     = 66,
 } F_ENVTYPE;
 
 #define FIRST_SAVE_ENV BOOT_ENV

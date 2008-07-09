@@ -322,8 +322,16 @@ void safe_write(int fd, void *data, size_t size)
 
 void safe_read(int fd, void *data, size_t size)
 {
-	if(read(fd,data,size) != size)
-		fatal_error("error reading fd",errno);
+	ssize_t bytes = read(fd,data,size);
+	if(bytes < 0)
+	{
+		if(errno == EINTR)
+			safe_read(fd,data,size);
+		else
+			fatal_error("error reading fd",errno);
+	}
+	else if(bytes != size)
+		fatal_error("unexpected eof on fd",bytes);
 }
 
 void *stdin_loop(void *arg)
@@ -339,7 +347,7 @@ void *stdin_loop(void *arg)
 
 		for(;;)
 		{
-			size_t bytes = read(0,buf,sizeof(buf));
+			ssize_t bytes = read(0,buf,sizeof(buf));
 			if(bytes < 0)
 			{
 				if(errno == EINTR)

@@ -1,6 +1,6 @@
 IN: ui.gadgets.scrollers.tests
-USING: ui.gadgets ui.gadgets.scrollers
-namespaces tools.test kernel models ui.gadgets.viewports
+USING: ui.gadgets ui.gadgets.scrollers namespaces tools.test
+kernel models models.compose models.range ui.gadgets.viewports
 ui.gadgets.labels ui.gadgets.grids ui.gadgets.frames
 ui.gadgets.sliders math math.vectors arrays sequences
 tools.test.ui ;

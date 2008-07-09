@@ -181,7 +181,7 @@ define-union-class
 ! A predicate class used for declarations
 "array-capacity" "sequences.private" create
 "fixnum" "math" lookup
-0 bootstrap-max-array-capacity [ between? ] 2curry
+0 bootstrap-max-array-capacity <fake-bignum> [ between? ] 2curry
 define-predicate-class
 
 ! Catch-all class for providing a default method.
@@ -512,7 +512,7 @@ tuple
     { "unimplemented" "kernel.private" }
     { "gc-reset" "memory" }
 }
-dup length [ >r first2 r> make-primitive ] 2each
+[ >r first2 r> make-primitive ] each-index
 
 ! Bump build number
 "build" "kernel" create build 1+ 1quotation define

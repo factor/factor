@@ -25,7 +25,7 @@ webapps.wee-url
 webapps.user-admin ;
 IN: websites.concatenative
 
-: test-db ( -- db params ) "resource:test.db" sqlite-db ;
+: test-db ( -- params db ) "resource:test.db" sqlite-db ;
 
 : init-factor-db ( -- )
     test-db [
@@ -48,7 +48,7 @@ TUPLE: factor-website < dispatcher ;
         <blogs> "blogs" add-responder
         <todo-list> "todo" add-responder
         <pastebin> "pastebin" add-responder
-        <planet-factor> "planet" add-responder
+        <planet> "planet" add-responder
         <wiki> "wiki" add-responder
         <wee-url> "wee-url" add-responder
         <user-admin> "user-admin" add-responder

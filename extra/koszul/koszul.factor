@@ -257,11 +257,11 @@ DEFER: (d)
     [ laplacian-kernel ] graded-laplacian ;
 
 : graded-basis. ( seq -- )
-    dup length [
+    [
         "=== Degree " write pprint
         ": dimension " write dup length .
         [ alt. ] each
-    ] 2each ;
+    ] each-index ;
 
 : bigraded-triple ( u-deg z-deg bigraded-basis -- triple )
     #! d: C(u,z) ---> C(u+2,z-1)
@@ -289,11 +289,11 @@ DEFER: (d)
     [ laplacian-kernel ] bigraded-laplacian ;
 
 : bigraded-basis. ( seq -- )
-    dup length [
+    [
         "=== U-degree " write .
-        dup length [
+        [
             "  === Z-degree " write pprint
             ": dimension " write dup length .
             [ "  " write alt. ] each
-        ] 2each
-    ] 2each ;
+        ] each-index
+    ] each-index ;

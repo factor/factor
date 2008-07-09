@@ -64,8 +64,7 @@ DEFER: if
 
 : 2keep ( x y quot -- x y ) 2over 2slip ; inline
 
-: 3keep ( x y z quot -- x y z )
-    >r 3dup r> -roll 3slip ; inline
+: 3keep ( x y z quot -- x y z ) >r 3dup r> -roll 3slip ; inline
 
 ! Cleavers
 : bi ( x p q -- )

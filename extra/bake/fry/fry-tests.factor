@@ -1,6 +1,6 @@
 
 USING: tools.test math prettyprint kernel io arrays vectors sequences
-       arrays.lib bake bake.fry ;
+       generalizations bake bake.fry ;
 
 IN: bake.fry.tests
 

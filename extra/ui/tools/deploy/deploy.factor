@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: ui.gadgets colors kernel ui.render namespaces
-models sequences ui.gadgets.buttons
+models models.mapping sequences ui.gadgets.buttons
 ui.gadgets.packs ui.gadgets.labels tools.deploy.config
 namespaces ui.gadgets.editors ui.gadgets.borders ui.gestures
 ui.commands assocs ui.gadgets.tracks ui ui.tools.listener
