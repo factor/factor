@@ -93,8 +93,8 @@ reset-pegs
 #! pos = the position in the input string of this entry
 TUPLE: memo-entry ans pos ;
 
-TUPLE: left-recursion seed rule head next ; 
-TUPLE: peg-head rule involved-set eval-set ;
+TUPLE: left-recursion seed rule-id head next ; 
+TUPLE: peg-head rule-id involved-set eval-set ;
 
 : rule-id ( word -- id ) 
   #! A rule is the parser compiled down to a word. It has
@@ -123,15 +123,15 @@ TUPLE: peg-head rule involved-set eval-set ;
   #! stack effect ( -- parse-result )
   pos get swap execute process-rule-result ; inline
 
-: memo ( pos rule -- memo-entry )
+: memo ( pos id -- memo-entry )
   #! Return the result from the memo cache. 
-  rule-id packrat at 
+  packrat at 
 !  "  memo result " write dup . 
   ;
 
-: set-memo ( memo-entry pos rule -- )
+: set-memo ( memo-entry pos id -- )
   #! Store an entry in the cache
-  rule-id packrat set-at ;
+  packrat set-at ;
 
 : update-m ( ast m -- )
   swap >>ans pos get >>pos drop ;
@@ -163,13 +163,13 @@ TUPLE: peg-head rule involved-set eval-set ;
 :: (setup-lr) ( r l s -- )
   s head>> l head>> eq? [
     l head>> s (>>head)
-    l head>> [ s rule>> suffix ] change-involved-set drop
+    l head>> [ s rule-id>> suffix ] change-involved-set drop
     r l s next>> (setup-lr)
   ] unless ;
 
 :: setup-lr ( r l -- )
   l head>> [
-    r V{ } clone V{ } clone peg-head boa l (>>head)
+    r rule-id V{ } clone V{ } clone peg-head boa l (>>head)
   ] unless
   r l lrstack get (setup-lr) ;
 
@@ -177,7 +177,7 @@ TUPLE: peg-head rule involved-set eval-set ;
   [let* |
           h [ m ans>> head>> ]
         |
-    h rule>> r eq? [
+    h rule-id>> r rule-id eq? [
       m ans>> seed>> m (>>ans)
       m ans>> failed? [
         fail
@@ -191,15 +191,15 @@ TUPLE: peg-head rule involved-set eval-set ;
 
 :: recall ( r p -- memo-entry )
   [let* |
-          m [ p r memo ]
+          m [ p r rule-id memo ]
           h [ p heads at ]
         |
     h [
-      m r h involved-set>> h rule>> suffix member? not and [
+      m r rule-id h involved-set>> h rule-id>> suffix member? not and [
         fail p memo-entry boa
       ] [
-        r h eval-set>> member? [
-          h [ r swap remove ] change-eval-set drop
+        r rule-id h eval-set>> member? [
+          h [ r rule-id swap remove ] change-eval-set drop
           r eval-rule
           m update-m
           m
@@ -214,8 +214,8 @@ TUPLE: peg-head rule involved-set eval-set ;
 
 :: apply-non-memo-rule ( r p -- ast )
   [let* |
-          lr  [ fail r f lrstack get left-recursion boa ]
-          m   [ lr lrstack set lr p memo-entry boa dup p r set-memo ]
+          lr  [ fail r rule-id f lrstack get left-recursion boa ]
+          m   [ lr lrstack set lr p memo-entry boa dup p r rule-id set-memo ]
           ans [ r eval-rule ]
         |
     lrstack get next>> lrstack set
