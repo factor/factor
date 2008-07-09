@@ -23,8 +23,6 @@ IN: lisp.test
     "nil" "lists" "nil" define-primitive
     "nil?" "lists" "nil?" define-primitive
     
-    [ seq>list ] "##list" lisp-define
-    
     "define" "lisp" "defun" define-primitive
     
     "(lambda (&rest xs) xs)" lisp-string>factor "list" lisp-define
