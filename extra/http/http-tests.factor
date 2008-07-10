@@ -275,7 +275,7 @@ test-db [
 
 USING: html.components html.elements html.forms
 xml xml.utilities validators
-furnace furnace.flash ;
+furnace furnace.conversations ;
 
 SYMBOL: a
 
@@ -287,7 +287,7 @@ SYMBOL: a
                 [ [ <html> "a" <field> render </html> ] "text/html" <content> ] >>display
                 [ { { "a" [ v-integer ] } } validate-params ] >>validate
                 [ "a" value a set-global URL" " <redirect> ] >>submit
-            <flash-scopes>
+            <conversations>
             <sessions>
             >>default
             add-quit-action

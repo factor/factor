@@ -179,7 +179,7 @@ M: comment entity-url
 : authorize-author ( author -- )
     username =
     { can-administer-blogs? } have-capabilities? or
-    [ login-required ] unless ;
+    [ "edit a blog post" f login-required ] unless ;
 
 : do-post-action ( -- )
     validate-integer-id
