@@ -14,7 +14,7 @@ IN: irc.client.tests
    swap [ 2nip <test-stream> f ] curry >>connect ;
 
 : set-nick ( irc-client nickname -- )
-     [ nick>> ] dip >>name drop ;
+     swap profile>> (>>nickname) ;
 
 : with-dummy-client ( quot -- )
      rot with-variable ; inline
@@ -42,9 +42,9 @@ privmsg new
   parse-irc-line f >>timestamp ] unit-test
 
 { "" } make-client dup "factorbot" set-nick current-irc-client [
-    { t } [ irc> nick>> name>> me? ] unit-test
+    { t } [ irc> profile>> nickname>> me? ] unit-test
 
-    { "factorbot" } [ irc> nick>> name>> ] unit-test
+    { "factorbot" } [ irc> profile>> nickname>> ] unit-test
 
     { "someuser" } [ "someuser!n=user@some.where" parse-name ] unit-test
 
@@ -63,7 +63,7 @@ privmsg new
                     ":some.where 001 factorbot :Welcome factorbot"
                   } make-client
                   [ connect-irc ] keep 1 seconds sleep
-                    nick>> name>> ] unit-test
+                    profile>> nickname>> ] unit-test
 
 { join_ "#factortest" } [
              { ":factorbot!n=factorbo@some.where JOIN :#factortest"
