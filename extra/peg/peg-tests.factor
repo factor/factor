@@ -193,3 +193,4 @@ IN: peg.tests
   "B" [ drop t ] satisfy [ 66 >= ] semantic parse
 ] unit-test
 
+{ f } [ \ + T{ parser f f f } equal? ] unit-test
