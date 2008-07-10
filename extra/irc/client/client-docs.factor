@@ -1,4 +1,4 @@
-USING: help.markup help.syntax quotations kernel ;
+USING: help.markup help.syntax quotations kernel irc.messages ;
 IN: irc.client
 
 HELP: irc-client "IRC Client object"
