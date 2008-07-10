@@ -80,7 +80,7 @@ SYMBOL: total
 : topological-sort ( seq quot -- newseq )
     >r >vector [ dup empty? not ] r>
     [ dupd maximal-element >r over delete-nth r> ] curry
-    [ ] unfold nip ; inline
+    [ ] produce nip ; inline
 
 : classes< ( seq1 seq2 -- lt/eq/gt )
     [

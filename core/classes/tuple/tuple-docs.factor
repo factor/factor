@@ -393,8 +393,14 @@ HELP: >tuple
 { $values { "seq" sequence } { "tuple" tuple } }
 { $description "Creates a tuple with slot values taken from a sequence. The first element of the sequence must be a tuple class word and the remainder the declared slots."
 $nl
-"If the sequence has too many elements, they are ignored, and if it has too few, the remaining slots in the tuple are set to " { $link f } "." }
-{ $errors "Throws an error if the first element of the sequence is not a tuple class word." } ;
+"If the sequence has too few elements, the remaining slots in the tuple are set to their initial values." }
+{ $errors "Throws an error if one of the following occurs:"
+    { $list
+        "the first element of the sequence is not a tuple class word"
+        "the values in the sequence do not satisfy the slot class predicates"
+        "the sequence is too long"
+    }
+} ;
 
 HELP: tuple>array ( tuple -- array )
 { $values { "tuple" tuple } { "array" array } }

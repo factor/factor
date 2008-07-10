@@ -25,7 +25,7 @@ IN: http
     [ CHAR: \r assert= read1 CHAR: \n assert= ] when* ;
 
 : (read-header) ( -- alist )
-    [ read-crlf dup f like ] [ parse-header-line ] [ drop ] unfold ;
+    [ read-crlf dup f like ] [ parse-header-line ] [ drop ] produce ;
 
 : process-header ( alist -- assoc )
     f swap [ [ swap or dup ] dip swap ] assoc-map nip

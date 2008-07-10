@@ -100,9 +100,9 @@ SYMBOL: error-stream
     presented associate format ;
 
 : lines ( stream -- seq )
-    [ [ readln dup ] [ ] [ drop ] unfold ] with-input-stream ;
+    [ [ readln dup ] [ ] [ drop ] produce ] with-input-stream ;
 
 : contents ( stream -- str )
     [
-        [ 65536 read dup ] [ ] [ drop ] unfold concat f like
+        [ 65536 read dup ] [ ] [ drop ] produce concat f like
     ] with-input-stream ;
