@@ -421,9 +421,10 @@ TUPLE: choice-parser parsers ;
 
 M: choice-parser (compile) ( peg -- quot )
   [ 
-    f ,
-    parsers>> [ compiled-parser ] map 
-    unclip 1quotation , \ unless* , [ 1quotation [ merge-errors ] compose , \ unless* , ] each
+    [
+      parsers>> [ compiled-parser ] map 
+      unclip 1quotation , [ 1quotation [ merge-errors ] compose , ] each
+    ] { } make , \ || ,
   ] [ ] make ;
 
 TUPLE: repeat0-parser p1 ;
