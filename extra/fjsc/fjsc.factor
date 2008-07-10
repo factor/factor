@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel peg strings promises sequences math
 math.parser namespaces words quotations arrays hashtables io
-io.streams.string assocs memoize ascii peg.parsers ;
+io.streams.string assocs ascii peg.parsers ;
 IN: fjsc
 
 TUPLE: ast-number value ;
@@ -41,7 +41,7 @@ C: <ast-hashtable> ast-hashtable
   digit? not
   and and ;
 
-MEMO: 'identifier-ends' ( -- parser )
+: 'identifier-ends' ( -- parser )
   [
     [ blank? not ] keep
     [ CHAR: " = not ] keep
@@ -52,22 +52,22 @@ MEMO: 'identifier-ends' ( -- parser )
     and and and and and
   ] satisfy repeat0 ;
 
-MEMO: 'identifier-middle' ( -- parser )
+: 'identifier-middle' ( -- parser )
   [ identifier-middle? ] satisfy repeat1 ;
 
-MEMO: 'identifier' ( -- parser )
+: 'identifier' ( -- parser )
   [
     'identifier-ends' ,
     'identifier-middle' ,
     'identifier-ends' ,
-  ] { } make seq [
+  ] seq* [
     concat >string f <ast-identifier>
   ] action ;
 
 
 DEFER: 'expression'
 
-MEMO: 'effect-name' ( -- parser )
+: 'effect-name' ( -- parser )
   [
     [ blank? not ] keep
     [ CHAR: ) = not ] keep
@@ -75,98 +75,98 @@ MEMO: 'effect-name' ( -- parser )
     and and
   ] satisfy repeat1 [ >string ] action ;
 
-MEMO: 'stack-effect' ( -- parser )
+: 'stack-effect' ( -- parser )
   [
     "(" token hide ,
     'effect-name' sp repeat0 ,
     "--" token sp hide ,
     'effect-name' sp repeat0 ,
     ")" token sp hide ,
-  ] { } make seq [
+  ] seq* [
     first2 <ast-stack-effect>
   ] action ;
 
-MEMO: 'define' ( -- parser )
+: 'define' ( -- parser )
   [
     ":" token sp hide ,
     'identifier' sp [ ast-identifier-value ] action ,
     'stack-effect' sp optional ,
     'expression' ,
     ";" token sp hide ,
-  ] { } make seq [ first3 <ast-define> ] action ;
+  ] seq* [ first3 <ast-define> ] action ;
 
-MEMO: 'quotation' ( -- parser )
+: 'quotation' ( -- parser )
   [
     "[" token sp hide ,
     'expression' [ ast-expression-values ] action ,
     "]" token sp hide ,
-  ] { } make seq [ first <ast-quotation> ] action ;
+  ] seq* [ first <ast-quotation> ] action ;
 
-MEMO: 'array' ( -- parser )
+: 'array' ( -- parser )
   [
     "{" token sp hide ,
     'expression' [ ast-expression-values ] action ,
     "}" token sp hide ,
-  ] { } make seq [ first <ast-array> ] action ;
+  ] seq* [ first <ast-array> ] action ;
 
-MEMO: 'word' ( -- parser )
+: 'word' ( -- parser )
   [
     "\\" token sp hide ,
     'identifier' sp ,
-  ] { } make seq [ first ast-identifier-value f <ast-word> ] action ;
+  ] seq* [ first ast-identifier-value f <ast-word> ] action ;
 
-MEMO: 'atom' ( -- parser )
+: 'atom' ( -- parser )
   [
     'identifier' ,
     'integer' [ <ast-number> ] action ,
     'string' [ <ast-string> ] action ,
-  ] { } make choice ;
+  ] choice* ;
 
-MEMO: 'comment' ( -- parser )
+: 'comment' ( -- parser )
   [
     [
       "#!" token sp ,
       "!" token sp ,
-    ] { } make choice hide ,
+    ] choice* hide ,
     [
       dup CHAR: \n = swap CHAR: \r = or not
     ] satisfy repeat0 ,
-  ] { } make seq [ drop <ast-comment> ] action ;
+  ] seq* [ drop <ast-comment> ] action ;
 
-MEMO: 'USE:' ( -- parser )
+: 'USE:' ( -- parser )
   [
     "USE:" token sp hide ,
     'identifier' sp ,
-  ] { } make seq [ first ast-identifier-value <ast-use> ] action ;
+  ] seq* [ first ast-identifier-value <ast-use> ] action ;
 
-MEMO: 'IN:' ( -- parser )
+: 'IN:' ( -- parser )
   [
     "IN:" token sp hide ,
     'identifier' sp ,
-  ] { } make seq [ first ast-identifier-value <ast-in> ] action ;
+  ] seq* [ first ast-identifier-value <ast-in> ] action ;
 
-MEMO: 'USING:' ( -- parser )
+: 'USING:' ( -- parser )
   [
     "USING:" token sp hide ,
     'identifier' sp [ ast-identifier-value ] action repeat1 ,
     ";" token sp hide ,
-  ] { } make seq [ first <ast-using> ] action ;
+  ] seq* [ first <ast-using> ] action ;
 
-MEMO: 'hashtable' ( -- parser )
+: 'hashtable' ( -- parser )
   [
     "H{" token sp hide ,
     'expression' [ ast-expression-values ] action ,
     "}" token sp hide ,
-  ] { } make seq [ first <ast-hashtable> ] action ;
+  ] seq* [ first <ast-hashtable> ] action ;
 
-MEMO: 'parsing-word' ( -- parser )
+: 'parsing-word' ( -- parser )
   [
     'USE:' ,
     'USING:' ,
     'IN:' ,
-  ] { } make choice ;
+  ] choice* ;
 
-MEMO: 'expression' ( -- parser )
+: 'expression' ( -- parser )
   [
     [
       'comment' ,
@@ -177,10 +177,10 @@ MEMO: 'expression' ( -- parser )
       'hashtable' sp ,
       'word' sp ,
       'atom' sp ,
-    ] { } make choice repeat0 [ <ast-expression> ] action
+    ] choice* repeat0 [ <ast-expression> ] action
   ] delay ;
 
-MEMO: 'statement' ( -- parser )
+: 'statement' ( -- parser )
   'expression' ;
 
 GENERIC: (compile) ( ast -- )
