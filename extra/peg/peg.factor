@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings fry namespaces math assocs shuffle debugger io
        vectors arrays math.parser math.order vectors combinators combinators.lib
-       combinators.short-circuit classes sets unicode.categories compiler.units parser
-       words quotations effects memoize accessors locals effects splitting ;
+       classes sets unicode.categories compiler.units parser
+       words quotations effects memoize accessors locals effects splitting 
+       combinators.short-circuit combinators.short-circuit.smart ;
 IN: peg
 
 USE: prettyprint
@@ -410,8 +411,10 @@ TUPLE: seq-parser parsers ;
 M: seq-parser (compile) ( peg -- quot )
   [
     [ input-slice V{ } clone <parse-result> ] %
-    parsers>> unclip compiled-parser 1quotation , \ parse-seq-element , [ 
-      compiled-parser 1quotation [ merge-errors ] compose , \ parse-seq-element , ] each 
+    [
+      parsers>> unclip compiled-parser 1quotation [ parse-seq-element ] curry ,
+      [ compiled-parser 1quotation [ merge-errors ] compose [ parse-seq-element ] curry , ] each 
+    ] { } make , \ && , 
   ] [ ] make ;
 
 TUPLE: choice-parser parsers ;
