@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: byte-arrays strings sequences sequences.private
-fry kernel words parser lexer assocs ;
+fry kernel words parser lexer assocs math.order ;
 IN: tr
 
 <PRIVATE
@@ -15,15 +15,17 @@ IN: tr
 : create-tr ( token -- word )
     create-in dup tr-hints ;
 
+: tr-quot ( mapping -- quot )
+    '[ [ dup 0 255 between? [ , nth-unsafe ] when ] map ] ;
+
 : define-tr ( word mapping -- )
-    '[ [ , nth ] map ]
-    (( seq -- translated ))
-    define-declared ;
+    tr-quot (( seq -- translated )) define-declared ;
+
+: fast-tr-quot ( mapping -- quot )
+    '[ [ , nth-unsafe ] change-each ] ;
 
 : define-fast-tr ( word mapping -- )
-    '[ [ , nth-unsafe ] change-each ]
-    (( seq -- ))
-    define-declared ;
+    fast-tr-quot (( seq -- )) define-declared ;
 
 PRIVATE>
 
