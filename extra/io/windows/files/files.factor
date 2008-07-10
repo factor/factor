@@ -61,6 +61,7 @@ C: <FileArgs> FileArgs
 
 : make-FileArgs ( port -- <FileArgs> )
     {
+        [ handle>> check-disposed ]
         [ handle>> handle>> ]
         [ buffer>> ]
         [ buffer>> buffer-length ]

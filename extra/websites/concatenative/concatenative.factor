@@ -25,7 +25,7 @@ webapps.wee-url
 webapps.user-admin ;
 IN: websites.concatenative
 
-: test-db ( -- db params ) "resource:test.db" sqlite-db ;
+: test-db ( -- params db ) "resource:test.db" sqlite-db ;
 
 : init-factor-db ( -- )
     test-db [

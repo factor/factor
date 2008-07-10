@@ -40,10 +40,9 @@ M: login-realm modify-form ( responder -- )
     permit-id get realm get name>> permit-id-key <cookie>
         "$login-realm" resolve-base-path >>path
         realm get
-        [ timeout>> from-now >>expires ]
         [ domain>> >>domain ]
         [ secure>> >>secure ]
-        tri ;
+        bi ;
 
 : put-permit-cookie ( response -- response' )
     <permit-cookie> put-cookie ;

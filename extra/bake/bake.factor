@@ -1,7 +1,7 @@
 
 USING: kernel parser namespaces sequences quotations arrays vectors splitting
-       words math
-       macros generalizations combinators.lib combinators.conditional newfx ;
+       strings words math generalizations
+       macros combinators.lib combinators.conditional newfx ;
 
 IN: bake
 
@@ -20,7 +20,9 @@ DEFER: [bake]
 : broil-element ( obj -- quot )
     {
       { [ comma?    ] [ drop [ >r ]          ] }
+      { [ f =       ] [ [ >r ] prefix-on     ] }
       { [ integer?  ] [ [ >r ] prefix-on     ] }
+      { [ string?   ] [ [ >r ] prefix-on     ] }
       { [ sequence? ] [ [bake] [ >r ] append ] }
       { [ word?     ] [ literalize [ >r ] prefix-on ] }
       { [ drop t    ] [ [ >r ] prefix-on     ] }
@@ -90,5 +92,6 @@ MACRO: bake ( seq -- quot ) [bake] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: `{  \ } [ >array     ] parse-literal \ bake parsed ; parsing
+:  `{ \ } [ >array     ] parse-literal \ bake parsed ; parsing
 : `V{ \ } [ >vector    ] parse-literal \ bake parsed ; parsing
+:  `[ \ } [ >quotation ] parse-literal \ bake parsed ; parsing
