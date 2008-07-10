@@ -210,9 +210,6 @@ PRIVATE>
 : nths ( seq indices -- seq' )
     swap [ nth ] curry map ;
 
-: replace ( str oldseq newseq -- str' )
-    zip >hashtable substitute ;
-
 : remove-nth ( seq n -- seq' )
     cut-slice rest-slice append ;
 

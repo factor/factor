@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions kernel sequences strings
 math assocs words generic namespaces assocs quotations splitting
-ui.gestures unicode.case unicode.categories ;
+ui.gestures unicode.case unicode.categories tr ;
 IN: ui.commands
 
 SYMBOL: +nullary+
@@ -50,8 +50,10 @@ GENERIC: command-word ( command -- word )
     swap pick commands set-at
     update-gestures ;
 
+TR: convert-command-name "-" " " ;
+
 : (command-name) ( string -- newstring )
-    { { CHAR: - CHAR: \s } } substitute >title ;
+    convert-command-name >title ;
 
 M: word command-name ( word -- str )
     name>> 
