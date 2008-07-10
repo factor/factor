@@ -4,7 +4,8 @@ USING: alien.c-types arrays assocs kernel math math.parser
 namespaces sequences db.sqlite.ffi db combinators
 continuations db.types calendar.format serialize
 io.streams.byte-array byte-arrays io.encodings.binary
-io.backend db.errors present urls ;
+io.backend db.errors present urls io.encodings.utf8
+io.encodings.string ;
 IN: db.sqlite.lib
 
 ERROR: sqlite-error < db-error n string ;
@@ -33,7 +34,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
     sqlite3_close sqlite-check-result ;
 
 : sqlite-prepare ( db sql -- handle )
-    dup length "void*" <c-object> "void*" <c-object>
+    utf8 encode dup length "void*" <c-object> "void*" <c-object>
     [ sqlite3_prepare_v2 sqlite-check-result ] 2keep
     drop *void* ;
 
@@ -44,7 +45,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
     >r dupd sqlite-bind-parameter-index r> ;
 
 : sqlite-bind-text ( handle index text -- )
-    dup length SQLITE_TRANSIENT
+    utf8 encode dup length SQLITE_TRANSIENT
     sqlite3_bind_text sqlite-check-result ;
 
 : sqlite-bind-int ( handle i n -- )
