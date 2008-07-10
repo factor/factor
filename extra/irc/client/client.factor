@@ -155,7 +155,7 @@ M: privmsg handle-incoming-irc ( privmsg -- )
 M: join handle-incoming-irc ( join -- )
     [ [ prefix>> parse-name me? ] keep and
       [ irc> join-messages>> mailbox-put ] when* ]
-    [ dup channel>> to-listener ]
+    [ dup trailing>> to-listener ]
     bi ;
 
 M: part handle-incoming-irc ( part -- )
