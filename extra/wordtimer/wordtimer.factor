@@ -75,7 +75,7 @@ SYMBOL: *calling*
   "executing quotation..." print flush
   [ call ] micro-time >r
   "resetting annotations..." print flush
-  swap reset-vocab
+  reset-vocab
   correct-for-timing-overhead
   "total time:" write r> pprint
   print-word-timings ;
