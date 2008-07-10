@@ -84,17 +84,21 @@ MACRO: firstn ( n -- )
 : v, ( -- ) V{ } clone , ;
 : ,v ( -- ) building get dup peek empty? [ dup pop* ] when drop ;
 
-: monotonic-split ( seq quot -- newseq )
+: (monotonic-split) ( seq quot -- newseq )
     [
         >r dup unclip suffix r>
         v, [ pick ,, call [ v, ] unless ] curry 2each ,v
     ] { } make ;
 
+: monotonic-split ( seq quot -- newseq )
+    over empty? [ 2drop { } ] [ (monotonic-split) ] if ;
+
 : delete-random ( seq -- value )
     [ length random ] keep [ nth ] 2keep delete-nth ;
 
+ERROR: element-not-found ;
 : split-around ( seq quot -- before elem after )
-    dupd find over [ "Element not found" throw ] unless
+    dupd find over [ element-not-found ] unless
     >r cut rest r> swap ; inline
 
 : (map-until) ( quot pred -- quot )
