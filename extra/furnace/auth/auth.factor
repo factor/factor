@@ -58,13 +58,14 @@ V{ } clone capabilities set-global
 
 TUPLE: realm < dispatcher name users checksum secure ;
 
-GENERIC: login-required* ( realm -- response )
+GENERIC: login-required* ( description capabilities realm -- response )
 
 GENERIC: init-realm ( realm -- )
 
 GENERIC: logged-in-username ( realm -- username )
 
-: login-required ( -- * ) realm get login-required* exit-with ;
+: login-required ( description capabilities -- * )
+    realm get login-required* exit-with ;
 
 : new-realm ( responder name class -- realm )
     new-dispatcher
@@ -144,7 +145,10 @@ M: protected call-responder* ( path responder -- response )
         , ,
         dup protected set
         dup capabilities>> have-capabilities?
-        [ call-next-method ] [ 2drop realm get login-required* ] if
+        [ call-next-method ] [
+            [ drop ] [ [ description>> ] [ capabilities>> ] bi ] bi*
+            realm get login-required*
+        ] if
     ] if-secure-realm ;
 
 : <auth-boilerplate> ( responder -- responder' )
@@ -152,7 +156,7 @@ M: protected call-responder* ( path responder -- response )
 
 : password-mismatch ( -- * )
     "passwords do not match" validation-error
-    { } validation-failed ;
+    validation-failed ;
 
 : same-password-twice ( -- )
     "new-password" value "verify-password" value =
@@ -160,4 +164,4 @@ M: protected call-responder* ( path responder -- response )
 
 : user-exists ( -- * )
     "username taken" validation-error
-    { } validation-failed ;
+    validation-failed ;

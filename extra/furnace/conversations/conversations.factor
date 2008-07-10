@@ -25,7 +25,7 @@ conversation "CONVERSATIONS" {
     { "post-data" "POST_DATA" FACTOR-BLOB }
 } define-persistent
 
-: conversation-id-key "__f" ;
+: conversation-id-key "__c" ;
 
 TUPLE: conversations < server-state-manager ;
 
@@ -55,28 +55,51 @@ SYMBOL: conversation-id
 : request-conversation ( request -- conversation )
     request-conversation-id get-conversation ;
 
-: init-conversations ( -- )
+: save-conversation-after ( conversation -- )
+    conversations get save-scope-after ;
+
+: set-conversation ( conversation -- )
+    [
+        [ conversation set ]
+        [ id>> conversation-id set ]
+        [ save-conversation-after ]
+        tri
+    ] when* ;
+
+: init-conversations ( conversations -- )
+    conversations set
     request get request-conversation-id
-    [ conversation-id set ]
-    [ get-conversation conversation set ]
-    bi ;
+    get-conversation
+    set-conversation ;
 
 M: conversations call-responder*
-    init-conversations
-    [ conversations set ] [ call-next-method ] bi ;
+    [ init-conversations ]
+    [ conversations set ]
+    [ call-next-method ]
+    tri ;
 
 : empty-conversastion ( -- conversation )
     conversation empty-scope
         session get id>> >>session ;
 
-: add-conversation ( conversation -- id )
-    [ conversations get touch-state ] [ insert-tuple ] [ id>> ] tri ;
+: touch-conversation ( conversation -- )
+    conversations get touch-state ;
 
-: begin-conversation* ( -- id )
-    empty-conversastion add-conversation ;
+: add-conversation ( conversation -- )
+    [ touch-conversation ] [ insert-tuple ] bi ;
+
+: begin-conversation* ( -- conversation )
+    empty-conversastion dup add-conversation ;
 
 : begin-conversation ( -- )
-    conversation-id [ [ begin-conversation* ] unless* ] change ;
+    conversation get [
+        begin-conversation*
+        set-conversation
+    ] unless ;
+
+: end-conversation ( -- )
+    conversation off
+    conversation-id off ;
 
 : <conversation-redirect> ( url seq -- response )
     begin-conversation
@@ -91,17 +114,15 @@ M: conversations call-responder*
         bi
     ] [ 2drop ] if ;
 
-: begin-aside* ( -- id )
-    empty-conversastion
+: begin-aside ( -- )
+    begin-conversation
+    conversation get
         request get
         [ method>> >>method ]
         [ url>> >>url ]
         [ post-data>> >>post-data ]
         tri
-    add-conversation ;
-
-: begin-aside ( -- )
-    begin-aside* conversation-id set ;
+    touch-conversation ;
 
 : end-aside-post ( aside -- response )
     request [
@@ -116,18 +137,24 @@ M: conversations call-responder*
 
 ERROR: end-aside-in-get-error ;
 
-: end-aside* ( url id -- response )
+: move-on ( id -- response )
     post-request? [ end-aside-in-get-error ] unless
-    get-conversation [
-        dup method>> {
-            { "GET" [ url>> <redirect> ] }
-            { "HEAD" [ url>> <redirect> ] }
-            { "POST" [ end-aside-post ] }
-        } case
-    ] [ <redirect> ] ?if ;
+    dup method>> {
+        { "GET" [ url>> <redirect> ] }
+        { "HEAD" [ url>> <redirect> ] }
+        { "POST" [ end-aside-post ] }
+    } case ;
+
+: get-aside ( id -- conversation )
+    get-conversation dup [ dup method>> [ drop f ] unless ] when ;
+
+: end-aside* ( url id -- response )
+    get-aside [ move-on ] [ <redirect> ] ?if ;
 
 : end-aside ( default -- response )
-    conversation-id [ f ] change end-aside* ;
+    conversation-id get
+    end-conversation
+    end-aside* ;
 
 M: conversations link-attr ( tag -- )
     drop

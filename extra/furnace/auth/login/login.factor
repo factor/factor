@@ -5,12 +5,11 @@ calendar validators urls logging html.forms
 http http.server http.server.dispatchers
 furnace
 furnace.auth
-furnace.flash
-furnace.asides
 furnace.actions
 furnace.sessions
 furnace.utilities
 furnace.redirection
+furnace.conversations
 furnace.auth.login.permits ;
 IN: furnace.auth.login
 
@@ -65,14 +64,13 @@ SYMBOL: capabilities
 
 : login-failed ( -- * )
     "invalid username or password" validation-error
-    flashed-variables validation-failed ;
+    validation-failed ;
 
 : <login-action> ( -- action )
     <page-action>
         [
-            flashed-variables restore-flash
-            description get "description" set-value
-            capabilities get words>strings "capabilities" set-value
+            description cget "description" set-value
+            capabilities cget words>strings "capabilities" set-value
         ] >>init
 
         { login-realm "login" } >>template
@@ -92,16 +90,12 @@ SYMBOL: capabilities
 
 : <logout-action> ( -- action )
     <action>
-        [ logout ] >>submit
-    <protected>
-        "logout" >>description ;
+        [ logout ] >>submit ;
 
-M: login-realm login-required*
-    drop
+M: login-realm login-required* ( description capabilities login -- response )
     begin-aside
-    protected get description>> description set
-    protected get capabilities>> capabilities set
-    URL" $realm/login" >secure-url flashed-variables <flash-redirect> ;
+    [ description cset ] [ capabilities cset ] [ drop ] tri*
+    URL" $realm/login" >secure-url <redirect> ;
 
 : <login-realm> ( responder name -- auth )
     login-realm new-realm

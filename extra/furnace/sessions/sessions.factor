@@ -69,7 +69,7 @@ TUPLE: sessions < server-state-manager domain verify? ;
     empty-session [ init-session ] [ insert-tuple ] [ ] tri ;
 
 : save-session-after ( session -- )
-    sessions get <scope-saver> &dispose drop ;
+    sessions get save-scope-after ;
 
 : existing-session ( path session -- response )
     [ session set ] [ save-session-after ] bi
