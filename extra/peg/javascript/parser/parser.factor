@@ -26,9 +26,9 @@ End               = !(.)
 Space             = " " | "\t" | "\n" 
 Spaces            = Space* => [[ ignore ]]
 Name               = . ?[ ast-name?   ]?   => [[ value>> ]] 
-Number             = . ?[ ast-number? ]?   => [[ value>> ]]
-String             = . ?[ ast-string? ]?   => [[ value>> ]]
-RegExp             = . ?[ ast-regexp? ]?   => [[ value>> ]]
+Number             = . ?[ ast-number? ]?
+String             = . ?[ ast-string? ]?
+RegExp             = . ?[ ast-regexp? ]?   
 SpacesNoNl         = (!(nl) Space)* => [[ ignore ]]
 
 Expr               =   OrExpr:e "?" Expr:t ":" Expr:f   => [[ e t f ast-cond-expr boa ]]
@@ -40,22 +40,77 @@ Expr               =   OrExpr:e "?" Expr:t ":" Expr:f   => [[ e t f ast-cond-exp
                      | OrExpr:e "%=" Expr:rhs           => [[ e rhs "%" ast-mset boa ]]
                      | OrExpr:e "&&=" Expr:rhs          => [[ e rhs "&&" ast-mset boa ]]
                      | OrExpr:e "||=" Expr:rhs          => [[ e rhs "||" ast-mset boa ]]
+                     | OrExpr:e "^=" Expr:rhs           => [[ e rhs "^" ast-mset boa ]]
+                     | OrExpr:e "&=" Expr:rhs           => [[ e rhs "&" ast-mset boa ]]
+                     | OrExpr:e "|=" Expr:rhs           => [[ e rhs "|" ast-mset boa ]]
+                     | OrExpr:e "<<=" Expr:rhs          => [[ e rhs "<<" ast-mset boa ]]
+                     | OrExpr:e ">>=" Expr:rhs          => [[ e rhs ">>" ast-mset boa ]]
+                     | OrExpr:e ">>>=" Expr:rhs         => [[ e rhs ">>>" ast-mset boa ]]
                      | OrExpr:e                         => [[ e ]]
+
+ExprNoIn           =   OrExprNoIn:e "?" ExprNoIn:t ":" ExprNoIn:f => [[ e t f ast-cond-expr boa ]]
+                     | OrExprNoIn:e "=" ExprNoIn:rhs              => [[ e rhs ast-set boa ]]
+                     | OrExprNoIn:e "+=" ExprNoIn:rhs             => [[ e rhs "+" ast-mset boa ]]
+                     | OrExprNoIn:e "-=" ExprNoIn:rhs             => [[ e rhs "-" ast-mset boa ]]
+                     | OrExprNoIn:e "*=" ExprNoIn:rhs             => [[ e rhs "*" ast-mset boa ]]
+                     | OrExprNoIn:e "/=" ExprNoIn:rhs             => [[ e rhs "/" ast-mset boa ]]
+                     | OrExprNoIn:e "%=" ExprNoIn:rhs             => [[ e rhs "%" ast-mset boa ]]
+                     | OrExprNoIn:e "&&=" ExprNoIn:rhs            => [[ e rhs "&&" ast-mset boa ]]
+                     | OrExprNoIn:e "||=" ExprNoIn:rhs            => [[ e rhs "||" ast-mset boa ]]
+                     | OrExprNoIn:e "^=" ExprNoIn:rhs             => [[ e rhs "^" ast-mset boa ]]
+                     | OrExprNoIn:e "&=" ExprNoIn:rhs             => [[ e rhs "&" ast-mset boa ]]
+                     | OrExprNoIn:e "|=" ExprNoIn:rhs             => [[ e rhs "|" ast-mset boa ]]
+                     | OrExprNoIn:e "<<=" ExprNoIn:rhs            => [[ e rhs "<<" ast-mset boa ]]
+                     | OrExprNoIn:e ">>=" ExprNoIn:rhs            => [[ e rhs ">>" ast-mset boa ]]
+                     | OrExprNoIn:e ">>>=" ExprNoIn:rhs           => [[ e rhs ">>>" ast-mset boa ]]
+                     | OrExprNoIn:e                               => [[ e ]]
 
 OrExpr             =   OrExpr:x "||" AndExpr:y          => [[ x y "||" ast-binop boa ]]
                      | AndExpr
-AndExpr            =   AndExpr:x "&&" EqExpr:y          => [[ x y "&&" ast-binop boa ]]
+OrExprNoIn         =   OrExprNoIn:x "||" AndExprNoIn:y  => [[ x y "||" ast-binop boa ]]
+                     | AndExprNoIn
+AndExpr            =   AndExpr:x "&&" BitOrExpr:y       => [[ x y "&&" ast-binop boa ]]
+                     | BitOrExpr
+AndExprNoIn        =   AndExprNoIn:x "&&" BitOrExprNoIn:y => [[ x y "&&" ast-binop boa ]]
+                     | BitOrExprNoIn
+BitOrExpr          =   BitOrExpr:x "|" BitXORExpr:y     => [[ x y "|" ast-binop boa ]]
+                     | BitXORExpr
+BitOrExprNoIn      =   BitOrExprNoIn:x "|" BitXORExprNoIn:y => [[ x y "|" ast-binop boa ]]
+                     | BitXORExprNoIn
+BitXORExpr         =   BitXORExpr:x "^" BitANDExpr:y    => [[ x y "^" ast-binop boa ]]
+                     | BitANDExpr
+BitXORExprNoIn     =   BitXORExprNoIn:x "^" BitANDExprNoIn:y => [[ x y "^" ast-binop boa ]]
+                     | BitANDExprNoIn
+BitANDExpr         =   BitANDExpr:x "&" EqExpr:y        => [[ x y "&" ast-binop boa ]]
                      | EqExpr
+BitANDExprNoIn     =   BitANDExprNoIn:x "&" EqExprNoIn:y => [[ x y "&" ast-binop boa ]]
+                     | EqExprNoIn
 EqExpr             =   EqExpr:x "==" RelExpr:y          => [[ x y "==" ast-binop boa ]]
                      | EqExpr:x "!=" RelExpr:y          => [[ x y "!=" ast-binop boa ]]
                      | EqExpr:x "===" RelExpr:y         => [[ x y "===" ast-binop boa ]]
                      | EqExpr:x "!==" RelExpr:y         => [[ x y "!==" ast-binop boa ]]
                      | RelExpr
-RelExpr            =   RelExpr:x ">" AddExpr:y          => [[ x y ">" ast-binop boa ]]
-                     | RelExpr:x ">=" AddExpr:y         => [[ x y ">=" ast-binop boa ]]
-                     | RelExpr:x "<" AddExpr:y          => [[ x y "<" ast-binop boa ]]
-                     | RelExpr:x "<=" AddExpr:y         => [[ x y "<=" ast-binop boa ]]
-                     | RelExpr:x "instanceof" AddExpr:y => [[ x y "instanceof" ast-binop boa ]]
+EqExprNoIn         =   EqExprNoIn:x "==" RelExprNoIn:y    => [[ x y "==" ast-binop boa ]]
+                     | EqExprNoIn:x "!=" RelExprNoIn:y    => [[ x y "!=" ast-binop boa ]]
+                     | EqExprNoIn:x "===" RelExprNoIn:y   => [[ x y "===" ast-binop boa ]]
+                     | EqExprNoIn:x "!==" RelExprNoIn:y   => [[ x y "!==" ast-binop boa ]]
+                     | RelExprNoIn
+RelExpr            =   RelExpr:x ">" ShiftExpr:y          => [[ x y ">" ast-binop boa ]]
+                     | RelExpr:x ">=" ShiftExpr:y         => [[ x y ">=" ast-binop boa ]]
+                     | RelExpr:x "<" ShiftExpr:y          => [[ x y "<" ast-binop boa ]]
+                     | RelExpr:x "<=" ShiftExpr:y         => [[ x y "<=" ast-binop boa ]]
+                     | RelExpr:x "instanceof" ShiftExpr:y => [[ x y "instanceof" ast-binop boa ]]
+                     | RelExpr:x "in" ShiftExpr:y         => [[ x y "in" ast-binop boa ]]
+                     | ShiftExpr
+RelExprNoIn        =   RelExprNoIn:x ">" ShiftExpr:y          => [[ x y ">" ast-binop boa ]]
+                     | RelExprNoIn:x ">=" ShiftExpr:y         => [[ x y ">=" ast-binop boa ]]
+                     | RelExprNoIn:x "<" ShiftExpr:y          => [[ x y "<" ast-binop boa ]]
+                     | RelExprNoIn:x "<=" ShiftExpr:y         => [[ x y "<=" ast-binop boa ]]
+                     | RelExprNoIn:x "instanceof" ShiftExpr:y => [[ x y "instanceof" ast-binop boa ]]
+                     | ShiftExpr
+ShiftExpr          =   ShiftExpr:x "<<" AddExpr:y       => [[ x y "<<" ast-binop boa ]]
+                     | ShiftExpr:x ">>>" AddExpr:y      => [[ x y ">>>" ast-binop boa ]]
+                     | ShiftExpr:x ">>" AddExpr:y       => [[ x y ">>" ast-binop boa ]]
                      | AddExpr
 AddExpr            =   AddExpr:x "+" MulExpr:y          => [[ x y "+" ast-binop boa ]]
                      | AddExpr:x "-" MulExpr:y          => [[ x y "-" ast-binop boa ]]
@@ -64,14 +119,14 @@ MulExpr            =   MulExpr:x "*" Unary:y            => [[ x y "*" ast-binop 
                      | MulExpr:x "/" Unary:y            => [[ x y "/" ast-binop boa ]]
                      | MulExpr:x "%" Unary:y            => [[ x y "%" ast-binop boa ]]
                      | Unary
-Unary              =   "-" Postfix:p                    => [[ p "-" ast-unop boa ]]
-                     | "+" Postfix:p                    => [[ p ]]
-                     | "++" Postfix:p                   => [[ p "++" ast-preop boa ]]
-                     | "--" Postfix:p                   => [[ p "--" ast-preop boa ]]
-                     | "!" Postfix:p                    => [[ p "!" ast-unop boa ]]
-                     | "typeof" Postfix:p               => [[ p "typeof" ast-unop boa ]]
-                     | "void" Postfix:p                 => [[ p "void" ast-unop boa ]]
-                     | "delete" Postfix:p               => [[ p "delete" ast-unop boa ]]
+Unary              =   "-" Unary:p                      => [[ p "-" ast-unop boa ]]
+                     | "+" Unary:p                      => [[ p ]]
+                     | "++" Unary:p                     => [[ p "++" ast-preop boa ]]
+                     | "--" Unary:p                     => [[ p "--" ast-preop boa ]]
+                     | "!" Unary:p                      => [[ p "!" ast-unop boa ]]
+                     | "typeof" Unary:p                 => [[ p "typeof" ast-unop boa ]]
+                     | "void" Unary:p                   => [[ p "void" ast-unop boa ]]
+                     | "delete" Unary:p                 => [[ p "delete" ast-unop boa ]]
                      | Postfix
 Postfix            =   PrimExpr:p SpacesNoNl "++"       => [[ p "++" ast-postop boa ]]
                      | PrimExpr:p SpacesNoNl "--"       => [[ p "--" ast-postop boa ]]
@@ -85,15 +140,15 @@ PrimExpr           =   PrimExpr:p "[" Expr:i "]"             => [[ i p ast-getp 
 PrimExprHd         =   "(" Expr:e ")"                        => [[ e ]]
                      | "this"                                => [[ ast-this boa ]]
                      | Name                                  => [[ ast-get boa ]]
-                     | Number                                => [[ ast-number boa ]]
-                     | String                                => [[ ast-string boa ]]
-                     | RegExp                                => [[ ast-regexp boa ]]
+                     | Number
+                     | String
+                     | RegExp
                      | "function" FuncRest:fr                => [[ fr ]]
                      | "new" PrimExpr:n "(" Args:as ")"      => [[ n as ast-new boa ]]
                      | "new" PrimExpr:n                      => [[ n f  ast-new boa ]]
                      | "[" Args:es "]"                       => [[ es ast-array boa ]]
                      | Json
-JsonBindings        = (JsonBinding ("," JsonBinding => [[ second ]])* => [[ first2 swap prefix ]])?
+JsonBindings       = (JsonBinding ("," JsonBinding => [[ second ]])* => [[ first2 swap prefix ]])?
 Json               = "{" JsonBindings:bs "}"                  => [[ bs ast-json boa ]]
 JsonBinding        = JsonPropName:n ":" Expr:v               => [[ n v ast-binding boa ]]
 JsonPropName       = Name | Number | String | RegExp
@@ -105,15 +160,15 @@ Binding            =   Name:n "=" Expr:v                      => [[ n v ast-var 
                      | Name:n                                 => [[ n "undefined" ast-get boa ast-var boa ]]
 Block              = "{" SrcElems:ss "}"                      => [[ ss ]]
 Bindings           = (Binding ("," Binding => [[ second ]])* => [[ first2 swap prefix ]])?
-For1               =   "var" Binding => [[ second ]] 
-                     | Expr 
+For1               =   "var" Bindings => [[ second ]] 
+                     | ExprNoIn 
                      | Spaces => [[ "undefined" ast-get boa ]] 
 For2               =   Expr
                      | Spaces => [[ "true" ast-get boa ]] 
 For3               =   Expr
                      | Spaces => [[ "undefined" ast-get boa ]] 
 ForIn1             =   "var" Name:n => [[ n "undefined" ast-get boa ast-var boa ]]
-                     | Expr
+                     | PrimExprHd
 Switch1            =   "case" Expr:c ":" SrcElems:cs => [[ c cs ast-case boa ]]
                      | "default" ":" SrcElems:cs => [[ cs ast-default boa ]]  
 SwitchBody         = Switch1*
@@ -134,6 +189,7 @@ Stmt               =   Block
                      | "try" Block:t "catch" "(" Name:e ")" Block:c Finally:f => [[ t e c f ast-try boa ]]
                      | "return" Expr:e Sc                            => [[ e ast-return boa ]]
                      | "return" Sc                                   => [[ "undefined" ast-get boa ast-return boa ]]
+                     | "with" "(" Expr:e ")" Stmt:b                  => [[ e b ast-with boa ]]
                      | Expr:e Sc                                     => [[ e ]]
                      | ";"                                           => [[ "undefined" ast-get boa ]]
 SrcElem            =   "function" Name:n FuncRest:f                  => [[ n f ast-var boa ]]
