@@ -86,7 +86,7 @@ M: object modify-form drop ;
     "user-agent" request get header>> at "" or ;
 
 : same-host? ( url -- ? )
-    request get url>>
+    url get
     [ [ protocol>> ] [ host>> ] [ port>> ] tri 3array ] bi@ = ;
 
 : cookie-client-state ( key request -- value/f )

@@ -160,13 +160,13 @@ M: comment entity-url
 
         [
             validate-post
-            logged-in-user get username>> "author" set-value
+            username "author" set-value
         ] >>validate
 
         [
             f <post>
                 dup { "title" "content" } to-object
-                logged-in-user get username>> >>author
+                username >>author
                 now >>date
             [ insert-tuple ] [ entity-url <redirect> ] bi
         ] >>submit
@@ -177,9 +177,9 @@ M: comment entity-url
         "make a new blog post" >>description ;
 
 : authorize-author ( author -- )
-    logged-in-user get username>> =
-    can-administer-blogs? have-capability? or
-    [ login-required ] unless ;
+    username =
+    { can-administer-blogs? } have-capabilities? or
+    [ "edit a blog post" f login-required ] unless ;
 
 : do-post-action ( -- )
     validate-integer-id
@@ -254,13 +254,13 @@ M: comment entity-url
 
         [
             validate-comment
-            logged-in-user get username>> "author" set-value
+            username "author" set-value
         ] >>validate
 
         [
             "parent" value f <comment>
                 "content" value >>content
-                logged-in-user get username>> >>author
+                username >>author
                 now >>date
             [ insert-tuple ] [ entity-url <redirect> ] bi
         ] >>submit

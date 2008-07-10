@@ -2,7 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel assocs namespaces accessors db db.tuples urls
 http.server.dispatchers
-furnace.asides furnace.actions furnace.auth furnace.auth.providers ;
+furnace.conversations
+furnace.actions
+furnace.auth
+furnace.auth.providers ;
 IN: furnace.auth.features.deactivate-user
 
 : <deactivate-user-action> ( -- action )

@@ -1,12 +1,10 @@
 ! Copyright (c) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors namespaces sequences assocs
-validators urls
-html.forms
-http.server.dispatchers
+validators urls html.forms http.server.dispatchers
 furnace.auth
-furnace.asides
-furnace.actions ;
+furnace.actions
+furnace.conversations ;
 IN: furnace.auth.features.edit-profile
 
 : <edit-profile-action> ( -- action )
@@ -22,7 +20,7 @@ IN: furnace.auth.features.edit-profile
         { realm "features/edit-profile/edit-profile" } >>template
 
         [
-            logged-in-user get username>> "username" set-value
+            username "username" set-value
 
             {
                 { "realname" [ [ v-one-line ] v-optional ] }
@@ -34,7 +32,7 @@ IN: furnace.auth.features.edit-profile
 
             { "password" "new-password" "verify-password" }
             [ value empty? not ] contains? [
-                "password" value logged-in-user get username>> check-login
+                "password" value username check-login
                 [ "incorrect password" validation-error ] unless
 
                 same-password-twice
@@ -54,7 +52,7 @@ IN: furnace.auth.features.edit-profile
 
             drop
 
-            URL" $login" end-aside
+            URL" $realm" end-aside
         ] >>submit
 
     <protected>

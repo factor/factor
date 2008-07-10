@@ -5,8 +5,8 @@ sequences namespaces parser kernel kernel.private classes
 classes.private arrays hashtables vectors classes.tuple sbufs
 inference.dataflow hashtables.private sequences.private math
 classes.tuple.private growable namespaces.private assocs words
-generator command-line vocabs io prettyprint libc compiler.units
-math.order ;
+generator command-line vocabs io io.encodings.string
+prettyprint libc compiler.units math.order ;
 IN: bootstrap.compiler
 
 ! Don't bring this in when deploying, since it will store a

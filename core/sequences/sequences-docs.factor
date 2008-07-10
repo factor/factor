@@ -116,7 +116,7 @@ ARTICLE: "sequences-slices" "Subsequences and slices"
 "Taking a sequence apart into a head and a tail:"
 { $subsection unclip-slice }
 { $subsection cut-slice }
-"A utility for words which use slices as mutable iterators:"
+"A utility for words which use slices as iterators:"
 { $subsection <flat-slice> } ;
 
 ARTICLE: "sequences-combinators" "Sequence combinators"
@@ -130,7 +130,7 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
 { $subsection map }
 { $subsection 2map }
 { $subsection accumulate }
-{ $subsection unfold }
+{ $subsection produce }
 "Filtering:"
 { $subsection push-if }
 { $subsection filter } ;
@@ -748,8 +748,9 @@ HELP: slice-error
 } ;
 
 HELP: slice
-{ $class-description "A virtual sequence which presents a subrange of the elements of an underlying sequence. New instances can be created by calling " { $link <slice> } ". Slices are mutable if the underlying sequence is mutable, and mutating a slice changes the underlying sequence." }
-{ $notes "The slots of a slice should not be changed after the slice has been created, because this can break invariants." } ;
+{ $class-description "A virtual sequence which presents a subrange of the elements of an underlying sequence. New instances can be created by calling " { $link <slice> } "."
+$nl
+"Slices are mutable if the underlying sequence is mutable, and mutating a slice changes the underlying sequence. However, slices cannot be resized after creation." } ;
 
 HELP: check-slice
 { $values { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "seq" sequence } }
@@ -764,10 +765,10 @@ HELP: collapse-slice
 HELP: <flat-slice>
 { $values { "seq" sequence } { "slice" slice } }
 { $description "Outputs a slice with the same elements as " { $snippet "seq" } ", and " { $link slice-from } " equal to 0 and " { $link slice-to } " equal to the length of " { $snippet "seq" } "." }
-{ $notes "Some words create slices then proceed to read and write the " { $link slice-from } " and " { $link slice-to } " slots of the slice. To behave predictably when they are themselves given a slice as input, they apply this word first to get a canonical slice." } ;
+{ $notes "Some words create slices then proceed to read the " { $snippet "to" } " and " { $snippet "from" } " slots of the slice. To behave predictably when they are themselves given a slice as input, they apply this word first to get a canonical slice." } ;
 
 HELP: <slice>
-{ $values { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "seq" sequence } { "slice" "a slice" } }
+{ $values { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "seq" sequence } { "slice" slice } }
 { $description "Outputs a new virtual sequence sharing storage with the subrange of elements in " { $snippet "seq" } " with indices starting from and including " { $snippet "m" } ", and up to but not including " { $snippet "n" } "." }
 { $errors "Throws an error if " { $snippet "m" } " or " { $snippet "n" } " is out of bounds." }
 { $notes "Taking the slice of a slice outputs a slice of the underlying sequence of the original slice. Keep this in mind when writing code which depends on the values of " { $link slice-from } " and " { $link slice-to } " being equal to the inputs to this word. The " { $link <flat-slice> } " word might be helpful in such situations." } ;
@@ -950,14 +951,14 @@ HELP: supremum
 { $description "Outputs the greatest element of " { $snippet "seq" } "." }
 { $errors "Throws an error if the sequence is empty." } ;
 
-HELP: unfold
+HELP: produce
 { $values { "pred" "a quotation with stack effect " { $snippet "( -- ? )" } } { "quot" "a quotation with stack effect " { $snippet "( -- obj )" } } { "tail" "a quotation" } { "seq" "a sequence" } }
 { $description "Calls " { $snippet "pred" } " repeatedly. If the predicate yields " { $link f } ", stops, otherwise, calls " { $snippet "quot" } " to yield a value. Values are accumulated and returned in a sequence at the end." }
 { $examples
     "The following example divides a number by two until we reach zero, and accumulates intermediate results:"
-    { $example "USING: kernel math prettyprint sequences ;" "1337 [ dup 0 > ] [ 2/ dup ] [ ] unfold nip ." "{ 668 334 167 83 41 20 10 5 2 1 0 }" }
-    "The " { $snippet "tail" } " quotation is used when the predicate produces more than one output value. In this case, we have to drop this value even if the predicate fails in order for stack inference to calculate a stack effect for the " { $link unfold } " call:"
-    { $unchecked-example "USING: kernel prettyprint random sequences ;" "[ 10 random dup 1 > ] [ ] [ drop ] unfold ." "{ 8 2 2 9 }" }
+    { $example "USING: kernel math prettyprint sequences ;" "1337 [ dup 0 > ] [ 2/ dup ] [ ] produce nip ." "{ 668 334 167 83 41 20 10 5 2 1 0 }" }
+    "The " { $snippet "tail" } " quotation is used when the predicate produces more than one output value. In this case, we have to drop this value even if the predicate fails in order for stack inference to calculate a stack effect for the " { $link produce } " call:"
+    { $unchecked-example "USING: kernel prettyprint random sequences ;" "[ 10 random dup 1 > ] [ ] [ drop ] produce ." "{ 8 2 2 9 }" }
 } ;
 
 HELP: sigma

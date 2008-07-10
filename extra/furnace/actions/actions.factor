@@ -7,7 +7,8 @@ xml.entities
 http.server
 http.server.responses
 furnace
-furnace.flash
+furnace.redirection
+furnace.conversations
 html.forms
 html.elements
 html.components
@@ -38,20 +39,23 @@ TUPLE: action rest authorize init display validate submit ;
 : <action> ( -- action )
     action new-action ;
 
+: merge-forms ( form -- )
+    form get
+    [ [ errors>> ] bi@ push-all ]
+    [ [ values>> ] bi@ swap update ]
+    [ swap validation-failed>> >>validation-failed drop ]
+    2tri ;
+
 : set-nested-form ( form name -- )
     dup empty? [
-        drop form set
+        drop merge-forms
     ] [
-        dup length 1 = [
-            first set-value
-        ] [
-            unclip [ set-nested-form ] nest-form
-        ] if
+        unclip [ set-nested-form ] nest-form
     ] if ;
 
 : restore-validation-errors ( -- )
-    form fget [
-        nested-forms fget set-nested-form
+    form cget [
+        nested-forms cget set-nested-form
     ] when* ;
 
 : handle-get ( action -- response )
@@ -76,10 +80,11 @@ TUPLE: action rest authorize init display validate submit ;
     dup [ >url [ same-host? ] keep and ] when ;
 
 : validation-failed ( -- * )
-    post-request? revalidate-url and
-    [
-        nested-forms-key param " " split harvest nested-forms set
-        { form nested-forms } <flash-redirect>
+    post-request? revalidate-url and [
+        begin-conversation
+        nested-forms-key param " " split harvest nested-forms cset
+        form get form cset
+        <redirect>
     ] [ <400> ] if*
     exit-with ;
 
@@ -110,7 +115,7 @@ M: action call-responder* ( path action -- response )
     } case ;
 
 M: action modify-form
-    drop request get url>> revalidate-url-key hidden-form-field ;
+    drop url get revalidate-url-key hidden-form-field ;
 
 : check-validation ( -- )
     validation-failed? [ validation-failed ] when ;

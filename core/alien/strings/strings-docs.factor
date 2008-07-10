@@ -1,5 +1,5 @@
 USING: help.markup help.syntax strings byte-arrays alien libc
-debugger ;
+debugger io.encodings.string sequences ;
 IN: alien.strings
 
 HELP: string>alien
@@ -38,7 +38,11 @@ HELP: utf16n
 ARTICLE: "c-strings" "C strings"
 "C string types are arrays with shape " { $snippet "{ \"char*\" encoding }" } ", where " { $snippet "encoding" } " is an encoding descriptor. The type " { $snippet "\"char*\"" } " is an alias for " { $snippet "{ \"char*\" utf8 }" } ". See " { $link "encodings-descriptors" } " for information about encoding descriptors."
 $nl
-"Passing a Factor string to a C function expecting a C string allocates a " { $link byte-array } " in the Factor heap; the string is then converted to the requested format and a raw pointer is passed to the function. If the conversion fails, for example if the string contains null bytes or characters with values higher than 255, a " { $link c-string-error. } " is thrown."
+"Passing a Factor string to a C function expecting a C string allocates a " { $link byte-array } " in the Factor heap; the string is then converted to the requested format and a raw pointer is passed to the function."
+$nl
+"If the conversion fails, for example if the string contains null bytes or characters with values higher than 255, a " { $link c-string-error. } " is thrown."
+$nl
+"Care must be taken if the C function expects a " { $snippet "char*" } " with a length in bytes, rather than a null-terminated " { $snippet "char*" } "; passing the result of calling " { $link length } " on the string object will not suffice. This is because a Factor string of " { $emphasis "n" } " characters will not necessarily encode to " { $emphasis "n" } " bytes. The correct idiom for C functions which take a string with a length is to first encode the string using " { $link encode } ", and then pass the resulting byte array together with the length of this byte array."
 $nl
 "Sometimes a C function has a parameter type of " { $snippet "void*" } ", and various data types, among them strings, can be passed in. In this case, strings are not automatically converted to aliens, and instead you must call one of these words:"
 { $subsection string>alien }

@@ -3,7 +3,7 @@
 USING: io.files io words alien kernel math.parser alien.syntax
 io.launcher system assocs arrays sequences namespaces qualified
 system math generator.fixup io.encodings.ascii accessors
-generic ;
+generic tr ;
 IN: tools.disassembler
 
 : in-file ( -- path ) "gdb-in.txt" temp-file ;
@@ -36,8 +36,7 @@ M: method-spec make-disassemble-cmd
     try-process
     out-file ascii file-lines ;
 
-: tabs>spaces ( str -- str' )
-    { { CHAR: \t CHAR: \s } } substitute ;
+TR: tabs>spaces "\t" "\s" ;
 
 : disassemble ( obj -- )
     make-disassemble-cmd run-gdb

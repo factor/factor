@@ -3,7 +3,7 @@
 USING: kernel sequences strings namespaces math assocs shuffle 
      vectors arrays math.parser 
      unicode.categories sequences.deep peg peg.private 
-     peg.search math.ranges words memoize ;
+     peg.search math.ranges words ;
 IN: peg.parsers
 
 TUPLE: just-parser p1 ;
@@ -19,8 +19,8 @@ TUPLE: just-parser p1 ;
 M: just-parser (compile) ( parser -- quot )
   just-parser-p1 compiled-parser just-pattern curry ;
 
-MEMO: just ( parser -- parser )
-  just-parser boa init-parser ;
+: just ( parser -- parser )
+  just-parser boa wrap-peg ;
 
 : 1token ( ch -- parser ) 1string token ;
 
@@ -45,10 +45,10 @@ MEMO: just ( parser -- parser )
 
 PRIVATE>
 
-MEMO: exactly-n ( parser n -- parser' )
+: exactly-n ( parser n -- parser' )
   swap <repetition> seq ;
 
-MEMO: at-most-n ( parser n -- parser' )
+: at-most-n ( parser n -- parser' )
   dup zero? [
     2drop epsilon
   ] [
@@ -56,15 +56,15 @@ MEMO: at-most-n ( parser n -- parser' )
     -rot 1- at-most-n 2choice
   ] if ;
 
-MEMO: at-least-n ( parser n -- parser' )
+: at-least-n ( parser n -- parser' )
   dupd exactly-n swap repeat0 2seq
   [ flatten-vectors ] action ;
 
-MEMO: from-m-to-n ( parser m n -- parser' )
+: from-m-to-n ( parser m n -- parser' )
   >r [ exactly-n ] 2keep r> swap - at-most-n 2seq
   [ flatten-vectors ] action ;
 
-MEMO: pack ( begin body end -- parser )
+: pack ( begin body end -- parser )
   >r >r hide r> r> hide 3seq [ first ] action ;
 
 : surrounded-by ( parser begin end -- parser' )

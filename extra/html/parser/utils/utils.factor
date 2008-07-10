@@ -4,7 +4,7 @@ namespaces prettyprint quotations sequences splitting
 state-parser strings sequences.lib ;
 IN: html.parser.utils
 
-: string-parse-end?
+: string-parse-end? ( -- ? )
     get-next not ;
 
 : take-string* ( match -- string )
