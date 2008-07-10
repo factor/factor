@@ -5,8 +5,8 @@ quotations ;
 
 IN: lisp.test
 
-[
-    init-env
+: define-lisp-builtins (  --  )    
+   init-env
     
     f "#f" lisp-define
     t "#t" lisp-define
@@ -26,7 +26,11 @@ IN: lisp.test
     "define" "lisp" "defun" define-primitive
     
     "(lambda (&rest xs) xs)" lisp-string>factor "list" lisp-define
-        
+   ;     
+    
+[
+    define-lisp-builtins
+    
     { 5 } [
         "(+ 2 3)" lisp-eval
     ] unit-test
@@ -75,8 +79,12 @@ IN: lisp.test
         "(begin (+ 1 4))" lisp-eval
     ] unit-test
     
+    { 5 } [
+        "(begin (+ 5 6) (+ 1 4))" lisp-eval
+    ] unit-test
+    
     { T{ lisp-symbol f "if" } } [
-        "(defmacro if (pred tr fl) (list (quote cond) (list pred tr) (list (quote #t) fl)))" lisp-eval
+        "(defmacro if (pred tr fl) (list (list (quote cond) (list pred tr) (list (quote #t) fl))))" lisp-eval
     ] unit-test
     
     { t } [
