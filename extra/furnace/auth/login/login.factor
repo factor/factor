@@ -65,7 +65,7 @@ SYMBOL: capabilities
 
 : login-failed ( -- * )
     "invalid username or password" validation-error
-    validation-failed ;
+    flashed-variables validation-failed ;
 
 : <login-action> ( -- action )
     <page-action>

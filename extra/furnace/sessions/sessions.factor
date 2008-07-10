@@ -7,17 +7,16 @@ io.servers.connection
 db db.tuples db.types
 http http.server http.server.dispatchers http.server.filters
 html.elements
-furnace furnace.cache ;
+furnace furnace.cache furnace.scopes ;
 IN: furnace.sessions
 
-TUPLE: session < server-state namespace user-agent client changed? ;
+TUPLE: session < scope user-agent client ;
 
 : <session> ( id -- session )
     session new-server-state ;
 
 session "SESSIONS"
 {
-    { "namespace" "NAMESPACE" FACTOR-BLOB +not-null+ }
     { "user-agent" "USER_AGENT" TEXT +not-null+ }
     { "client" "CLIENT" TEXT +not-null+ }
 } define-persistent
@@ -39,23 +38,14 @@ TUPLE: sessions < server-state-manager domain verify? ;
     sessions new-server-state-manager
         t >>verify? ;
 
-: (session-changed) ( session -- )
-    t >>changed? drop ;
-
 : session-changed ( -- )
-    session get (session-changed) ;
+    session get scope-changed ;
 
-: sget ( key -- value )
-    session get namespace>> at ;
+: sget ( key -- value ) session get scope-get ;
 
-: sset ( value key -- )
-    session get
-    [ namespace>> set-at ] [ (session-changed) ] bi ;
+: sset ( value key -- ) session get scope-set ;
 
-: schange ( key quot -- )
-    session get
-    [ namespace>> swap change-at ] keep
-    (session-changed) ; inline
+: schange ( key quot -- ) session get scope-change ; inline
 
 : init-session ( session -- )
     session [ sessions get init-session* ] with-variable ;
@@ -70,8 +60,7 @@ TUPLE: sessions < server-state-manager domain verify? ;
     } 0|| ;
 
 : empty-session ( -- session )
-    f <session>
-        H{ } clone >>namespace
+    session empty-scope
         remote-host >>client
         user-agent >>user-agent
         dup touch-session ;
@@ -79,18 +68,8 @@ TUPLE: sessions < server-state-manager domain verify? ;
 : begin-session ( -- session )
     empty-session [ init-session ] [ insert-tuple ] [ ] tri ;
 
-! Destructor
-TUPLE: session-saver session ;
-
-C: <session-saver> session-saver
-
-M: session-saver dispose
-    session>> dup changed?>> [
-        [ touch-session ] [ update-tuple ] bi
-    ] [ drop ] if ;
-
 : save-session-after ( session -- )
-    <session-saver> &dispose drop ;
+    sessions get <scope-saver> &dispose drop ;
 
 : existing-session ( path session -- response )
     [ session set ] [ save-session-after ] bi

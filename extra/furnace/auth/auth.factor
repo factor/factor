@@ -152,7 +152,7 @@ M: protected call-responder* ( path responder -- response )
 
 : password-mismatch ( -- * )
     "passwords do not match" validation-error
-    validation-failed ;
+    { } validation-failed ;
 
 : same-password-twice ( -- )
     "new-password" value "verify-password" value =
@@ -160,4 +160,4 @@ M: protected call-responder* ( path responder -- response )
 
 : user-exists ( -- * )
     "username taken" validation-error
-    validation-failed ;
+    { } validation-failed ;

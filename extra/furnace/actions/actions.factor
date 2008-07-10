@@ -75,12 +75,11 @@ TUPLE: action rest authorize init display validate submit ;
     revalidate-url-key param
     dup [ >url [ same-host? ] keep and ] when ;
 
-: validation-failed ( -- * )
-    post-request? revalidate-url and
-    [
+: validation-failed ( flashed -- * )
+    post-request? revalidate-url and dup [
         nested-forms-key param " " split harvest nested-forms set
-        { form nested-forms } <flash-redirect>
-    ] [ <400> ] if*
+        swap { form nested-forms } append <flash-redirect>
+    ] [ 2drop <400> ] if
     exit-with ;
 
 : handle-post ( action -- response )
@@ -113,7 +112,7 @@ M: action modify-form
     drop url get revalidate-url-key hidden-form-field ;
 
 : check-validation ( -- )
-    validation-failed? [ validation-failed ] when ;
+    validation-failed? [ { } validation-failed ] when ;
 
 : validate-params ( validators -- )
     params get swap validate-values check-validation ;
