@@ -24,7 +24,7 @@ SINGLETON: windows-ui-backend
     [ EnumClipboardFormats win32-error dup dup 0 > ]
     [ ]
     [ drop ]
-    unfold nip ;
+    produce nip ;
 
 : with-clipboard ( quot -- )
     f OpenClipboard win32-error=0/f

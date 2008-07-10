@@ -194,13 +194,17 @@ ERROR: bad-superclass class ;
     [ permute-slots ] [ class>> ] bi
     slots>tuple ;
 
+: outdated-tuple? ( tuple assoc -- ? )
+    over tuple? [
+        [ [ layout-of ] dip key? ]
+        [ drop class "forgotten" word-prop not ]
+        2bi and
+    ] [ 2drop f ] if ;
+
 : update-tuples ( -- )
     outdated-tuples get
     dup assoc-empty? [ drop ] [
-        [
-            over tuple?
-            [ >r layout-of r> key? ] [ 2drop f ] if
-        ] curry instances
+        [ outdated-tuple? ] curry instances
         dup [ update-tuple ] map become
     ] if ;
 

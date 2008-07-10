@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings fry namespaces math assocs shuffle debugger io
        vectors arrays math.parser math.order vectors combinators combinators.lib
-       sets unicode.categories compiler.units parser
+       combinators.short-circuit classes sets unicode.categories compiler.units parser
        words quotations effects memoize accessors locals effects splitting ;
 IN: peg
 
@@ -12,7 +12,7 @@ TUPLE: parse-result remaining ast ;
 TUPLE: parse-error position messages ; 
 TUPLE: parser peg compiled id ;
 
-M: parser equal?    [ id>> ] bi@ = ;
+M: parser equal?    { [ [ class ] bi@ = ] [ [ id>> ] bi@ = ] } 2&& ;
 M: parser hashcode* id>> hashcode* ;
 
 C: <parse-result> parse-result

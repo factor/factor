@@ -50,7 +50,7 @@ HELP: intersects?
 
 HELP: gadget-child
 { $values { "gadget" gadget } { "child" gadget } }
-{ $description "Outputs the first child of the gadget. Typicallykernel.private this word is used with gadgets which are known to have an only child." } ;
+{ $description "Outputs the first child of the gadget. Typically this word is used with gadgets which are known to have an only child." } ;
 
 HELP: nth-gadget
 { $values { "n" "a non-negative integer" } { "gadget" gadget } { "child" gadget } }
