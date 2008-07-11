@@ -104,10 +104,10 @@ prettyprint io.streams.string ;
 
 [ t ] [ { 25 25 } "g1" get pick-up "g4" get eq? ] unit-test
 
-TUPLE: mock-gadget graft-called ungraft-called ;
+TUPLE: mock-gadget < gadget graft-called ungraft-called ;
 
 : <mock-gadget> ( -- gadget )
-    0 0 mock-gadget boa <gadget> over set-delegate ;
+    mock-gadget new-gadget 0 >>graft-called 0 >>ungraft-called ;
 
 M: mock-gadget graft*
     dup mock-gadget-graft-called 1+

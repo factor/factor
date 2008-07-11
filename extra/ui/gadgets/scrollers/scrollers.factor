@@ -30,15 +30,15 @@ scroller H{
 } set-gestures
 
 : viewport, ( child -- )
-    g gadget-model <viewport>
+    g model>> <viewport>
     g-> set-scroller-viewport @center frame, ;
 
 : <scroller-model> ( -- model )
     0 0 0 0 <range> 0 0 0 0 <range> 2array <compose> ;
 
-: x-model ( -- model ) g gadget-model model-dependencies first ;
+: x-model ( -- model ) g model>> dependencies>> first ;
 
-: y-model ( -- model ) g gadget-model model-dependencies second ;
+: y-model ( -- model ) g model>> dependencies>> second ;
 
 : new-scroller ( gadget class -- scroller )
     new-frame
