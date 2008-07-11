@@ -9,7 +9,9 @@ SYMBOL: ui-notify-flag
 
 : notify-ui-thread ( -- ) ui-notify-flag get-global raise-flag ;
 
-TUPLE: rect loc dim ;
+TUPLE: rect { loc initial: { 0 0 } } { dim initial: { 0 0 } } ;
+
+: <zero-rect> ( -- rect ) rect new ;
 
 C: <rect> rect
 
@@ -44,11 +46,13 @@ M: array rect-dim drop { 0 0 } ;
 : rect-union ( rect1 rect2 -- newrect )
     (rect-union) <extent-rect> ;
 
-TUPLE: gadget < identity-tuple
+TUPLE: gadget < rect
 pref-dim parent children orientation focus
 visible? root? clipped? layout-state graft-state graft-node
 interior boundary
 model ;
+
+M: gadget equal? 2drop f ;
 
 M: gadget hashcode* drop gadget hashcode* ;
 
@@ -58,18 +62,14 @@ M: gadget model-changed 2drop ;
 
 : nth-gadget ( n gadget -- child ) gadget-children nth ;
 
-: <zero-rect> ( -- rect ) { 0 0 } dup <rect> ;
+: new-gadget ( class -- gadget )
+    new
+        { 0 1 } >>orientation
+        t >>visible?
+        { f f } >>graft-state ; inline
 
 : <gadget> ( -- gadget )
-    <zero-rect> { 0 1 } t { f f } {
-        set-delegate
-        set-gadget-orientation
-        set-gadget-visible?
-        set-gadget-graft-state
-    } gadget construct ;
-
-: construct-gadget ( class -- tuple )
-    >r <gadget> r> construct-delegate ; inline
+    gadget new-gadget ;
 
 : activate-control ( gadget -- )
     dup gadget-model dup [
@@ -136,15 +136,6 @@ M: gadget children-on nip gadget-children ;
 
 : each-child ( gadget quot -- )
     >r gadget-children r> each ; inline
-
-: set-gadget-delegate ( gadget tuple -- )
-    over [
-        dup pick [ set-gadget-parent ] with each-child
-    ] when set-delegate ;
-
-: construct-control ( model gadget class -- control )
-    >r tuck set-gadget-model
-    { set-gadget-delegate } r> construct ; inline
 
 ! Selection protocol
 GENERIC: gadget-selection? ( gadget -- ? )
@@ -414,5 +405,11 @@ M: f request-focus-on 2drop ;
         swap dup \ make-gadget set gadget set call
     ] with-scope ; inline
 
-: build-gadget ( tuple quot gadget -- tuple )
-    pick set-gadget-delegate over >r with-gadget r> ; inline
+! Deprecated
+: set-gadget-delegate ( gadget tuple -- )
+    over [
+        dup pick [ set-gadget-parent ] with each-child
+    ] when set-delegate ;
+
+: construct-gadget ( class -- tuple )
+    >r <gadget> { set-delegate } r> construct ; inline
