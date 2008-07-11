@@ -60,13 +60,12 @@ M: walker-gadget focusable-child*
         swap >>thread
         swap >>continuation
         swap >>status
+        dup continuation>> <traceback-gadget> >>traceback
     [
-        [
-            toolbar,
-            g status>> self <thread-status> f track,
-            g continuation>> <traceback-gadget> 1 track,
-        ] with-gadget
-    ] keep ;
+        toolbar,
+        g status>> self <thread-status> f track,
+        g traceback>> 1 track,
+    ] make-gadget ;
 
 : walker-help ( -- ) "ui-walker" help-window ;
 

@@ -72,12 +72,10 @@ M: value-ref finish-editing
     { 0 1 } slot-editor new-track
         swap >>ref
     [
-        [
-            toolbar,
-            <source-editor> g-> set-slot-editor-text
-            <scroller> 1 track,
-        ] with-gadget
-    ] keep
+        toolbar,
+        <source-editor> g-> set-slot-editor-text
+        <scroller> 1 track,
+    ] make-gadget
     dup revert ;
 
 M: slot-editor pref-dim* call-next-method { 600 200 } vmin ;
