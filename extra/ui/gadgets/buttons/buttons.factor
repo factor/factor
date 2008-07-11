@@ -68,7 +68,8 @@ M: button-paint draw-boundary
     button-paint draw-boundary ;
 
 : roll-button-theme ( button -- button )
-    f black <solid> dup f <button-paint> >>boundary ; inline
+    f black <solid> dup f <button-paint> >>boundary
+    { 0 1/2 } >>align ; inline
 
 : <roll-button> ( label quot -- button )
     <button> roll-button-theme ;
