@@ -6,11 +6,15 @@ IN: ui.gadgets.borders
 
 TUPLE: border < gadget size fill ;
 
-: <border> ( child gap -- border )
-    border new-gadget
-        swap dup 2array >>size
+: new-border ( child class -- border )
+    new-gadget
+        { 0 0 } >>size
         { 0 0 } >>fill
-        [ add-gadget ] keep ;
+        [ add-gadget ] keep ; inline
+
+: <border> ( child gap -- border )
+    swap border new-border
+        swap dup 2array >>size ;
 
 M: border pref-dim*
     [ border-size 2 v*n ] keep

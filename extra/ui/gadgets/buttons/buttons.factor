@@ -4,12 +4,12 @@ USING: accessors arrays kernel math models namespaces sequences
 strings quotations assocs combinators classes colors
 classes.tuple opengl math.vectors
 ui.commands ui.gadgets ui.gadgets.borders
-ui.gadgets.labels ui.gadgets.theme ui.gadgets.wrappers
+ui.gadgets.labels ui.gadgets.theme
 ui.gadgets.tracks ui.gadgets.packs ui.gadgets.worlds ui.gestures
 ui.render ;
 IN: ui.gadgets.buttons
 
-TUPLE: button < wrapper pressed? selected? quot ;
+TUPLE: button < border pressed? selected? quot ;
 
 : buttons-down? ( -- ? )
     hand-buttons get-global empty? not ;
@@ -41,11 +41,9 @@ button H{
 } set-gestures
 
 : new-button ( label quot class -- button )
-    new-gadget
-        swap >>quot
-        [ >r >label r> add-gadget ] keep ; inline
+    [ swap >label ] dip new-border swap >>quot ; inline
 
-: <button> ( gadget quot -- button )
+: <button> ( label quot -- button )
     button new-button ;
 
 TUPLE: button-paint plain rollover pressed selected ;
@@ -84,13 +82,11 @@ M: button-paint draw-boundary
 
 : bevel-button-theme ( gadget -- gadget )
     <bevel-button-paint> >>interior
+    { 5 5 } >>size
     faint-boundary ; inline
 
-: >bevel-label ( label -- gadget )
-    >label 5 <border> ;
-
 : <bevel-button> ( label quot -- button )
-    >r >bevel-label r> <button> bevel-button-theme ;
+    <button> bevel-button-theme ;
 
 TUPLE: repeat-button < button ;
 
@@ -101,7 +97,7 @@ repeat-button H{
 : <repeat-button> ( label quot -- button )
     #! Button that calls the quotation every 100ms as long as
     #! the mouse is held down.
-    >r >bevel-label r> repeat-button new-button bevel-button-theme ;
+    repeat-button new-button bevel-button-theme ;
 
 TUPLE: checkmark-paint color ;
 
@@ -209,7 +205,7 @@ M: radio-control model-changed
     dup radio-buttons-theme ;
 
 : <toggle-button> ( value model label -- gadget )
-    >bevel-label <radio-control> bevel-button-theme ;
+    <radio-control> bevel-button-theme ;
 
 : <toggle-buttons> ( model assoc -- gadget )
     [ [ <toggle-button> ] <radio-controls> ] make-shelf ;
