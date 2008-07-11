@@ -1,7 +1,9 @@
 ! Copyright (C) 2008 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel fry sequences splitting ascii calendar accessors combinators
-       classes.tuple math.order ;
+USING: kernel fry splitting ascii calendar accessors combinators qualified
+       arrays classes.tuple math.order ;
+RENAME: join sequences => sjoin
+EXCLUDE: sequences => join ;
 IN: irc.messages
 
 TUPLE: irc-message line prefix command parameters trailing timestamp ;
@@ -18,6 +20,18 @@ TUPLE: notice < irc-message type ;
 TUPLE: mode < irc-message name channel mode ;
 TUPLE: names-reply < irc-message who = channel ;
 TUPLE: unhandled < irc-message ;
+
+GENERIC: irc-message>client-line ( irc-message -- string )
+
+M: irc-message irc-message>client-line ( irc-message -- string )
+    [ command>> ]
+    [ parameters>> " " sjoin ]
+    [ trailing>> dup [ CHAR: : prefix ] when ]
+    tri 3array " " sjoin ;
+
+GENERIC: irc-message>server-line ( irc-message -- string )
+M: irc-message irc-message>server-line ( irc-message -- string )
+   drop "not implemented yet" ;
 
 <PRIVATE
 ! ======================================
