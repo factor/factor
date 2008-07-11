@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings fry namespaces math assocs shuffle debugger io
        vectors arrays math.parser math.order vectors combinators combinators.lib
-       combinators.short-circuit classes sets unicode.categories compiler.units parser
-       words quotations effects memoize accessors locals effects splitting ;
+       classes sets unicode.categories compiler.units parser
+       words quotations effects memoize accessors locals effects splitting 
+       combinators.short-circuit combinators.short-circuit.smart ;
 IN: peg
 
 USE: prettyprint
@@ -279,7 +280,13 @@ GENERIC: (compile) ( peg -- quot )
   gensym 2dup swap peg>> (compile) 0 1 <effect> define-declared swap dupd id>> "peg-id" set-word-prop
   [ execute-parser ] curry ;
 
-: compiled-parser ( parser -- word )
+: preset-parser-word ( parser -- parser word )
+  gensym [ >>compiled ] keep ;
+
+: define-parser-word ( parser word -- )
+  swap parser-body (( -- result )) define-declared ;
+
+: compile-parser ( parser -- word )
   #! Look to see if the given parser has been compiled.
   #! If not, compile it to a temporary word, cache it,
   #! and return it. Otherwise return the existing one.
@@ -289,7 +296,7 @@ GENERIC: (compile) ( peg -- quot )
   dup compiled>> [
     nip
   ] [
-    gensym tuck >>compiled 2dup parser-body 0 1 <effect> define-declared dupd "peg" set-word-prop
+    preset-parser-word [ define-parser-word ] keep
   ] if* ;
 
 SYMBOL: delayed
@@ -298,13 +305,13 @@ SYMBOL: delayed
   #! Work through all delayed parsers and recompile their
   #! words to have the correct bodies.
   delayed get [
-    call compiled-parser 1quotation 0 1 <effect> define-declared
+    call compile-parser 1quotation 0 1 <effect> define-declared
   ] assoc-each ;
 
 : compile ( parser -- word )
   [
     H{ } clone delayed [ 
-      compiled-parser fixup-delayed 
+      compile-parser fixup-delayed 
     ] with-variable
   ] with-compilation-unit ;
 
@@ -410,17 +417,20 @@ TUPLE: seq-parser parsers ;
 M: seq-parser (compile) ( peg -- quot )
   [
     [ input-slice V{ } clone <parse-result> ] %
-    parsers>> unclip compiled-parser 1quotation , \ parse-seq-element , [ 
-      compiled-parser 1quotation [ merge-errors ] compose , \ parse-seq-element , ] each 
+    [
+      parsers>> unclip compile-parser 1quotation [ parse-seq-element ] curry ,
+      [ compile-parser 1quotation [ merge-errors ] compose [ parse-seq-element ] curry , ] each 
+    ] { } make , \ && , 
   ] [ ] make ;
 
 TUPLE: choice-parser parsers ;
 
 M: choice-parser (compile) ( peg -- quot )
   [ 
-    f ,
-    parsers>> [ compiled-parser ] map 
-    unclip 1quotation , \ unless* , [ 1quotation [ merge-errors ] compose , \ unless* , ] each
+    [
+      parsers>> [ compile-parser ] map 
+      unclip 1quotation , [ 1quotation [ merge-errors ] compose , ] each
+    ] { } make , \ || ,
   ] [ ] make ;
 
 TUPLE: repeat0-parser p1 ;
@@ -435,7 +445,7 @@ TUPLE: repeat0-parser p1 ;
   ] if* ; inline
 
 M: repeat0-parser (compile) ( peg -- quot )
-  p1>> compiled-parser 1quotation '[ 
+  p1>> compile-parser 1quotation '[ 
     input-slice V{ } clone <parse-result> , swap (repeat) 
   ] ; 
 
@@ -449,7 +459,7 @@ TUPLE: repeat1-parser p1 ;
   ] if* ;
 
 M: repeat1-parser (compile) ( peg -- quot )
-  p1>> compiled-parser 1quotation '[ 
+  p1>> compile-parser 1quotation '[ 
     input-slice V{ } clone <parse-result> , swap (repeat) repeat1-empty-check  
   ] ; 
 
@@ -459,7 +469,7 @@ TUPLE: optional-parser p1 ;
   [ input-slice f <parse-result> ] unless* ;
 
 M: optional-parser (compile) ( peg -- quot )
-  p1>> compiled-parser 1quotation '[ @ check-optional ] ;
+  p1>> compile-parser 1quotation '[ @ check-optional ] ;
 
 TUPLE: semantic-parser p1 quot ;
 
@@ -471,7 +481,7 @@ TUPLE: semantic-parser p1 quot ;
   ] if ; inline
 
 M: semantic-parser (compile) ( peg -- quot )
-  [ p1>> compiled-parser 1quotation ] [ quot>> ] bi  
+  [ p1>> compile-parser 1quotation ] [ quot>> ] bi  
   '[ @ , check-semantic ] ;
 
 TUPLE: ensure-parser p1 ;
@@ -480,7 +490,7 @@ TUPLE: ensure-parser p1 ;
   [ ignore <parse-result> ] [ drop f ] if ;
 
 M: ensure-parser (compile) ( peg -- quot )
-  p1>> compiled-parser 1quotation '[ input-slice @ check-ensure ] ;
+  p1>> compile-parser 1quotation '[ input-slice @ check-ensure ] ;
 
 TUPLE: ensure-not-parser p1 ;
 
@@ -488,7 +498,7 @@ TUPLE: ensure-not-parser p1 ;
   [ drop f ] [ ignore <parse-result> ] if ;
 
 M: ensure-not-parser (compile) ( peg -- quot )
-  p1>> compiled-parser 1quotation '[ input-slice @ check-ensure-not ] ;
+  p1>> compile-parser 1quotation '[ input-slice @ check-ensure-not ] ;
 
 TUPLE: action-parser p1 quot ;
 
@@ -500,7 +510,7 @@ TUPLE: action-parser p1 quot ;
   ] if ; inline
 
 M: action-parser (compile) ( peg -- quot )
-  [ p1>> compiled-parser 1quotation ] [ quot>> ] bi '[ @ , check-action ] ;
+  [ p1>> compile-parser 1quotation ] [ quot>> ] bi '[ @ , check-action ] ;
 
 : left-trim-slice ( string -- string )
   #! Return a new string without any leading whitespace
@@ -512,7 +522,7 @@ M: action-parser (compile) ( peg -- quot )
 TUPLE: sp-parser p1 ;
 
 M: sp-parser (compile) ( peg -- quot )
-  p1>> compiled-parser 1quotation '[ 
+  p1>> compile-parser 1quotation '[ 
     input-slice left-trim-slice input-from pos set @ 
   ] ;
 
@@ -531,7 +541,7 @@ M: box-parser (compile) ( peg -- quot )
   #! to produce the parser to be compiled.
   #! This differs from 'delay' which calls
   #! it at run time.
-  quot>> call compiled-parser 1quotation ;
+  quot>> call compile-parser 1quotation ;
 
 PRIVATE>
 
