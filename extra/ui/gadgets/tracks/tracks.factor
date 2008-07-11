@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors io kernel math namespaces
-sequences words math.vectors ui.gadgets ui.gadgets.packs ;
+sequences words math.vectors ui.gadgets ui.gadgets.packs math.geometry.rect ;
 IN: ui.gadgets.tracks
 
 TUPLE: track < pack sizes ;

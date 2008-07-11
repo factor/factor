@@ -3,7 +3,8 @@
 USING: arrays ui.commands ui.gadgets ui.gadgets.buttons
 ui.gadgets.worlds ui.gestures generic hashtables kernel math
 models namespaces opengl sequences math.vectors
-ui.gadgets.theme ui.gadgets.packs ui.gadgets.borders colors ;
+ui.gadgets.theme ui.gadgets.packs ui.gadgets.borders colors
+math.geometry.rect ;
 IN: ui.gadgets.menus
 
 : menu-loc ( world menu -- loc )
