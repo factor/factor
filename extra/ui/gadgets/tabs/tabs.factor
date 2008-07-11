@@ -4,11 +4,11 @@
 USING: accessors kernel fry math math.vectors sequences arrays vectors assocs
        hashtables models models.range models.compose combinators
        ui ui.gadgets ui.gadgets.buttons ui.gadgets.frames ui.gadgets.packs
-       ui.gadgets.incremental ui.gadgets.viewports ui.gadgets.books ;
+       ui.gadgets.grids ui.gadgets.viewports ui.gadgets.books ;
 
 IN: ui.gadgets.tabs
 
-TUPLE: tabbed names model toggler content ;
+TUPLE: tabbed < frame names toggler content ;
 
 DEFER: (del-page)
 
@@ -48,8 +48,9 @@ DEFER: (del-page)
     [ names>> index ] 2keep (del-page) ;
 
 : <tabbed> ( assoc -- tabbed )
-    tabbed new
-    [ <pile> 1 >>fill g-> (>>toggler) @left frame,
-      [ keys >vector g (>>names) ]
-      [ values 0 <model> [ <book> g-> (>>content) @center frame, ] keep ] bi
-      g swap >>model redo-toggler ] build-frame ;
+    tabbed new-frame
+    [ g 0 <model> >>model
+      <pile> 1 >>fill [ >>toggler ] keep swap @left grid-add
+      [ keys g swap >>names ]
+      [ values g model>> <book> [ >>content ] keep swap @center grid-add ] bi
+      g redo-toggler g ] with-gadget ;
