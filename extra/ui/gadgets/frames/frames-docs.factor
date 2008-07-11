@@ -3,7 +3,7 @@ quotations classes.tuple ui.gadgets.grids ;
 IN: ui.gadgets.frames
 
 ARTICLE: "ui-frame-layout" "Frame layouts"
-"Frames resemble " { $link "ui-grid-layout" } " except the size of grid is fixed at 3x3, and the center gadget fills up any available space. Because frames delegate to grids, grid layout words can be used to add and remove children."
+"Frames resemble " { $link "ui-grid-layout" } " except the size of grid is fixed at 3x3, and the center gadget fills up any available space. Because frames inherit from grids, grid layout words can be used to add and remove children."
 { $subsection frame }
 "Creating empty frames:"
 { $subsection <frame> }
@@ -38,7 +38,7 @@ HELP: @bottom-right $ui-frame-constant ;
 HELP: frame
 { $class-description "A frame is a gadget which lays out its children in a 3x3 grid. If the frame is enlarged past its preferred size, the center gadget fills up available room."
 $nl
-"Frames are constructed by calling " { $link <frame> } " and since they delegate to " { $link grid } " instances, children can be managed with " { $link grid-add } " and " { $link grid-remove } "." } ;
+"Frames are constructed by calling " { $link <frame> } " and since they inherit from " { $link grid } ", children can be managed with " { $link grid-add } " and " { $link grid-remove } "." } ;
 
 HELP: <frame>
 { $values { "frame" frame } }

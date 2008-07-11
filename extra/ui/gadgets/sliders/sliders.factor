@@ -149,12 +149,12 @@ M: elevator layout*
 : <right-button> ( -- button )
     { 0 1 } arrow-right 1 <slide-button> ;
 
-: build-x-slider ( slider -- )
+: build-x-slider ( slider -- slider )
     [
         <left-button> @left frame,
         { 0 1 } elevator,
         <right-button> @right frame,
-    ] with-gadget ;
+    ] make-gadget ; inline
 
 : <up-button> ( -- button )
     { 1 0 } arrow-up -1 <slide-button> ;
@@ -162,12 +162,12 @@ M: elevator layout*
 : <down-button> ( -- button )
     { 1 0 } arrow-down 1 <slide-button> ;
 
-: build-y-slider ( slider -- )
+: build-y-slider ( slider -- slider )
     [
         <up-button> @top frame,
         { 1 0 } elevator,
         <down-button> @bottom frame,
-    ] with-gadget ;
+    ] make-gadget ; inline
 
 : <slider> ( range orientation -- slider )
     slider new-frame
@@ -176,10 +176,10 @@ M: elevator layout*
         32 >>line ;
 
 : <x-slider> ( range -- slider )
-    { 1 0 } <slider> dup build-x-slider ;
+    { 1 0 } <slider> build-x-slider ;
 
 : <y-slider> ( range -- slider )
-    { 0 1 } <slider> dup build-y-slider ;
+    { 0 1 } <slider> build-y-slider ;
 
 M: slider pref-dim*
     dup call-next-method

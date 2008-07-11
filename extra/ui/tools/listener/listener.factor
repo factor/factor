@@ -124,12 +124,10 @@ TUPLE: stack-display < track ;
     g workspace-listener
     { 0 1 } stack-display new-track
     [
-        [
-            dup <toolbar> f track,
-            stack>> [ [ stack. ] curry try ]
-            t "Data stack" <labelled-pane> 1 track,
-        ] with-gadget
-    ] keep ;
+        dup <toolbar> f track,
+        stack>> [ [ stack. ] curry try ]
+        t "Data stack" <labelled-pane> 1 track,
+    ] make-gadget ;
 
 M: stack-display tool-scroller
     find-workspace workspace-listener tool-scroller ;
@@ -174,7 +172,7 @@ M: stack-display tool-scroller
 : <listener-gadget> ( -- gadget )
     { 0 1 } listener-gadget new-track
     dup init-listener
-    [ [ listener-output, listener-input, ] with-gadget ] keep ;
+    [ listener-output, listener-input, ] make-gadget ;
 
 : listener-help ( -- ) "ui-listener" help-window ;
 

@@ -480,7 +480,7 @@ multiline-editor "general" f {
     { T{ key-down f f "ENTER" } insert-newline }
 } define-command-map
 
-TUPLE: source-editor < editor ;
+TUPLE: source-editor < multiline-editor ;
 
 : <source-editor> ( -- editor )
     source-editor new-editor ;

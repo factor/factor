@@ -62,12 +62,10 @@ search-field H{
 : <live-search> ( string seq limited? presenter -- gadget )
     { 0 1 } live-search new-track
     [
-        [
-            <search-field> g-> set-live-search-field f track,
-            <search-list> g-> set-live-search-list
-            <scroller> 1 track,
-        ] with-gadget
-    ] keep
+        <search-field> g-> set-live-search-field f track,
+        <search-list> g-> set-live-search-list
+        <scroller> 1 track,
+    ] make-gadget
     [ live-search-field set-editor-string ] keep
     [ live-search-field end-of-document ] keep ;
 

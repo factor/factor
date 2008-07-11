@@ -16,11 +16,9 @@ TUPLE: inspector-gadget < track object pane ;
 : <inspector-gadget> ( -- gadget )
     { 0 1 } inspector-gadget new-track
     [
-        [
-            toolbar,
-            <pane> g-> set-inspector-gadget-pane <scroller> 1 track,
-        ] with-gadget
-    ] keep ;
+        toolbar,
+        <pane> g-> set-inspector-gadget-pane <scroller> 1 track,
+    ] make-gadget ;
 
 : inspect-object ( obj inspector -- )
     [ set-inspector-gadget-object ] keep refresh ;

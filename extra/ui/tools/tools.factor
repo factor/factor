@@ -30,15 +30,13 @@ IN: ui.tools
     { 0 1 } workspace new-track
         0 <model> >>model
     [
-        [
-            <listener-gadget> g set-workspace-listener
-            <workspace-book> g set-workspace-book
-            <workspace-tabs> f track,
-            g workspace-book 1/5 track,
-            g workspace-listener 4/5 track,
-            toolbar,
-        ] with-gadget
-    ] keep ;
+        <listener-gadget> g set-workspace-listener
+        <workspace-book> g set-workspace-book
+        <workspace-tabs> f track,
+        g workspace-book 1/5 track,
+        g workspace-listener 4/5 track,
+        toolbar,
+    ] make-gadget ;
 
 : resize-workspace ( workspace -- )
     dup track-sizes over control-value zero? [
