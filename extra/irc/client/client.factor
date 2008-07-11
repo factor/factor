@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: concurrency.mailboxes kernel io.sockets io.encodings.8-bit calendar
        accessors destructors namespaces io assocs arrays qualified fry
-       continuations threads strings classes combinators
-       irc.messages irc.messages.private ;
+       continuations threads strings classes combinators splitting hashtables
+       ascii irc.messages irc.messages.private ;
 RENAME: join sequences => sjoin
 EXCLUDE: sequences => join ;
 IN: irc.client
@@ -27,7 +27,7 @@ TUPLE: irc-client profile stream in-messages out-messages join-messages
 
 TUPLE: irc-listener in-messages out-messages ;
 TUPLE: irc-server-listener < irc-listener ;
-TUPLE: irc-channel-listener < irc-listener name password timeout ;
+TUPLE: irc-channel-listener < irc-listener name password timeout participants ;
 TUPLE: irc-nick-listener < irc-listener name ;
 SYMBOL: +server-listener+
 
@@ -37,7 +37,7 @@ SYMBOL: +server-listener+
      <mailbox> <mailbox> irc-server-listener boa ;
 
 : <irc-channel-listener> ( name -- irc-channel-listener )
-     <mailbox> <mailbox> rot f 60 seconds irc-channel-listener boa ;
+     <mailbox> <mailbox> rot f 60 seconds H{ } clone irc-channel-listener boa ;
 
 : <irc-nick-listener> ( name -- irc-nick-listener )
      <mailbox> <mailbox> rot irc-nick-listener boa ;
@@ -73,6 +73,18 @@ UNION: irc-broadcasted-message irc-end irc-disconnected irc-connected ;
 : to-listener ( message name -- )
     listener> [ +server-listener+ listener> ] unless*
     [ in-messages>> mailbox-put ] [ drop ] if* ;
+
+: remove-participant ( nick channel -- )
+    listener> [ participants>> delete-at ] [ drop ] if* ;
+
+: add-participant ( nick mode channel -- )
+    listener> [ participants>> set-at ] [ 2drop ] if* ;
+
+DEFER: me?
+
+: maybe-forward-join ( join -- )
+    [ prefix>> parse-name me? ] keep and
+    [ irc> join-messages>> mailbox-put ] when* ;
 
 ! ======================================
 ! IRC client messages
@@ -153,17 +165,30 @@ M: privmsg handle-incoming-irc ( privmsg -- )
     dup irc-message-origin to-listener ;
 
 M: join handle-incoming-irc ( join -- )
-    [ [ prefix>> parse-name me? ] keep and
-      [ irc> join-messages>> mailbox-put ] when* ]
+    [ maybe-forward-join ]
     [ dup trailing>> to-listener ]
-    bi ;
+    [ [ drop f ] [ prefix>> parse-name ] [ trailing>> ] tri add-participant ]
+    tri ;
 
 M: part handle-incoming-irc ( part -- )
-    dup channel>> to-listener ;
+    [ dup channel>> to-listener ] keep
+    [ prefix>> parse-name ] [ channel>> ] bi remove-participant ;
 
 M: kick handle-incoming-irc ( kick -- )
-    [ ] [ channel>> ] [ who>> ] tri me? [ dup unregister-listener ] when
-    to-listener ;
+    [ [ ] [ channel>> ] bi to-listener ]
+    [ [ who>> ] [ channel>> ] bi remove-participant ] 
+    [ [ ] [ who>> ] bi me? [ unregister-listener ] [ drop ] if ]
+    tri ;
+
+: >nick/mode ( string -- nick mode )
+    dup first "+@" member? [ unclip ] [ f ] if ;
+
+: names-reply>participants ( names-reply -- participants )
+    trailing>> [ blank? ] trim " " split
+    [ >nick/mode 2array ] map >hashtable ;
+
+M: names-reply handle-incoming-irc ( names-reply -- )
+    [ names-reply>participants ] [ channel>> listener> ] bi (>>participants) ;
 
 M: irc-broadcasted-message handle-incoming-irc ( irc-broadcasted-message -- )
     broadcast-message-to-listeners ;

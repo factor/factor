@@ -7,7 +7,7 @@ IN: irc.messages
 TUPLE: irc-message line prefix command parameters trailing timestamp ;
 TUPLE: logged-in < irc-message name ;
 TUPLE: ping < irc-message ;
-TUPLE: join < irc-message channel ;
+TUPLE: join < irc-message ;
 TUPLE: part < irc-message channel ;
 TUPLE: quit < irc-message ;
 TUPLE: privmsg < irc-message name ;
@@ -16,6 +16,7 @@ TUPLE: roomlist < irc-message channel names ;
 TUPLE: nick-in-use < irc-message asterisk name ;
 TUPLE: notice < irc-message type ;
 TUPLE: mode < irc-message name channel mode ;
+TUPLE: names-reply < irc-message who = channel ;
 TUPLE: unhandled < irc-message ;
 
 <PRIVATE
@@ -55,6 +56,7 @@ TUPLE: unhandled < irc-message ;
         { "NOTICE" [ \ notice ] }
         { "001" [ \ logged-in ] }
         { "433" [ \ nick-in-use ] }
+        { "353" [ \ names-reply ] }
         { "JOIN" [ \ join ] }
         { "PART" [ \ part ] }
         { "PRIVMSG" [ \ privmsg ] }
