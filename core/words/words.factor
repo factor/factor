@@ -34,7 +34,9 @@ M: symbol definer drop \ SYMBOL: f ;
 M: symbol definition drop f ;
 
 PREDICATE: primitive < word ( obj -- ? )
-    def>> [ do-primitive ] tail? ;
+    [ def>> [ do-primitive ] tail? ]
+    [ sub-primitive>> >boolean ]
+    bi or ;
 M: primitive definer drop \ PRIMITIVE: f ;
 M: primitive definition drop f ;
 

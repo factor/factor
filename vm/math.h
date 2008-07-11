@@ -11,23 +11,12 @@ DECLARE_PRIMITIVE(float_to_fixnum);
 
 DECLARE_PRIMITIVE(fixnum_add);
 DECLARE_PRIMITIVE(fixnum_subtract);
-DECLARE_PRIMITIVE(fixnum_add_fast);
-DECLARE_PRIMITIVE(fixnum_subtract_fast);
 DECLARE_PRIMITIVE(fixnum_multiply);
-DECLARE_PRIMITIVE(fixnum_multiply_fast);
 DECLARE_PRIMITIVE(fixnum_divint);
 DECLARE_PRIMITIVE(fixnum_divmod);
 DECLARE_PRIMITIVE(fixnum_mod);
-DECLARE_PRIMITIVE(fixnum_and);
-DECLARE_PRIMITIVE(fixnum_or);
-DECLARE_PRIMITIVE(fixnum_xor);
 DECLARE_PRIMITIVE(fixnum_shift);
 DECLARE_PRIMITIVE(fixnum_shift_fast);
-DECLARE_PRIMITIVE(fixnum_less);
-DECLARE_PRIMITIVE(fixnum_lesseq);
-DECLARE_PRIMITIVE(fixnum_greater);
-DECLARE_PRIMITIVE(fixnum_greatereq);
-DECLARE_PRIMITIVE(fixnum_not);
 
 CELL bignum_zero;
 CELL bignum_pos_one;

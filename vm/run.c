@@ -90,133 +90,6 @@ void init_stacks(CELL ds_size_, CELL rs_size_)
 	stack_chain = NULL;
 }
 
-DEFINE_PRIMITIVE(drop)
-{
-	dpop();
-}
-
-DEFINE_PRIMITIVE(2drop)
-{
-	ds -= 2 * CELLS;
-}
-
-DEFINE_PRIMITIVE(3drop)
-{
-	ds -= 3 * CELLS;
-}
-
-DEFINE_PRIMITIVE(dup)
-{
-	dpush(dpeek());
-}
-
-DEFINE_PRIMITIVE(2dup)
-{
-	CELL top = dpeek();
-	CELL next = get(ds - CELLS);
-	ds += CELLS * 2;
-	put(ds - CELLS,next);
-	put(ds,top);
-}
-
-DEFINE_PRIMITIVE(3dup)
-{
-	CELL c1 = dpeek();
-	CELL c2 = get(ds - CELLS);
-	CELL c3 = get(ds - CELLS * 2);
-	ds += CELLS * 3;
-	put (ds,c1);
-	put (ds - CELLS,c2);
-	put (ds - CELLS * 2,c3);
-}
-
-DEFINE_PRIMITIVE(rot)
-{
-	CELL c1 = dpeek();
-	CELL c2 = get(ds - CELLS);
-	CELL c3 = get(ds - CELLS * 2);
-	put(ds,c3);
-	put(ds - CELLS,c1);
-	put(ds - CELLS * 2,c2);
-}
-
-DEFINE_PRIMITIVE(_rot)
-{
-	CELL c1 = dpeek();
-	CELL c2 = get(ds - CELLS);
-	CELL c3 = get(ds - CELLS * 2);
-	put(ds,c2);
-	put(ds - CELLS,c3);
-	put(ds - CELLS * 2,c1);
-}
-
-DEFINE_PRIMITIVE(dupd)
-{
-	CELL top = dpeek();
-	CELL next = get(ds - CELLS);
-	put(ds,next);
-	put(ds - CELLS,next);
-	dpush(top);
-}
-
-DEFINE_PRIMITIVE(swapd)
-{
-	CELL top = get(ds - CELLS);
-	CELL next = get(ds - CELLS * 2);
-	put(ds - CELLS,next);
-	put(ds - CELLS * 2,top);
-}
-
-DEFINE_PRIMITIVE(nip)
-{
-	CELL top = dpop();
-	drepl(top);
-}
-
-DEFINE_PRIMITIVE(2nip)
-{
-	CELL top = dpeek();
-	ds -= CELLS * 2;
-	drepl(top);
-}
-
-DEFINE_PRIMITIVE(tuck)
-{
-	CELL top = dpeek();
-	CELL next = get(ds - CELLS);
-	put(ds,next);
-	put(ds - CELLS,top);
-	dpush(top);
-}
-
-DEFINE_PRIMITIVE(over)
-{
-	dpush(get(ds - CELLS));
-}
-
-DEFINE_PRIMITIVE(pick)
-{
-	dpush(get(ds - CELLS * 2));
-}
-
-DEFINE_PRIMITIVE(swap)
-{
-	CELL top = dpeek();
-	CELL next = get(ds - CELLS);
-	put(ds,next);
-	put(ds - CELLS,top);
-}
-
-DEFINE_PRIMITIVE(to_r)
-{
-	rpush(dpop());
-}
-
-DEFINE_PRIMITIVE(from_r)
-{
-	dpush(rpop());
-}
-
 bool stack_to_array(CELL bottom, CELL top)
 {
 	F_FIXNUM depth = (F_FIXNUM)(top - bottom + CELLS);
@@ -280,13 +153,6 @@ DEFINE_PRIMITIVE(exit)
 	exit(to_fixnum(dpop()));
 }
 
-DEFINE_PRIMITIVE(eq)
-{
-	CELL lhs = dpop();
-	CELL rhs = dpeek();
-	drepl((lhs == rhs) ? T : F);
-}
-
 DEFINE_PRIMITIVE(millis)
 {
 	box_unsigned_8(current_millis());
@@ -295,18 +161,6 @@ DEFINE_PRIMITIVE(millis)
 DEFINE_PRIMITIVE(sleep)
 {
 	sleep_millis(to_cell(dpop()));
-}
-
-DEFINE_PRIMITIVE(tag)
-{
-	drepl(tag_fixnum(TAG(dpeek())));
-}
-
-DEFINE_PRIMITIVE(slot)
-{
-	F_FIXNUM slot = untag_fixnum_fast(dpop());
-	CELL obj = dpop();
-	dpush(get(SLOT(obj,slot)));
 }
 
 DEFINE_PRIMITIVE(set_slot)

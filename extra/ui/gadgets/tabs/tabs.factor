@@ -51,6 +51,6 @@ DEFER: (del-page)
     tabbed new-frame
     [ g 0 <model> >>model
       <pile> 1 >>fill [ >>toggler ] keep swap @left grid-add
-      [ keys g swap >>names ]
+      [ keys >vector g swap >>names ]
       [ values g model>> <book> [ >>content ] keep swap @center grid-add ] bi
       g redo-toggler g ] with-gadget ;
