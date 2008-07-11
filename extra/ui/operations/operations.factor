@@ -1,8 +1,8 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions kernel ui.commands ui.gestures
-sequences strings math words generic namespaces hashtables
-help.markup quotations assocs ;
+USING: accessors arrays definitions kernel ui.commands
+ui.gestures sequences strings math words generic namespaces
+hashtables help.markup quotations assocs ;
 IN: ui.operations
 
 SYMBOL: +keyboard+
@@ -12,12 +12,11 @@ SYMBOL: +secondary+
 TUPLE: operation predicate command translator hook listener? ;
 
 : <operation> ( predicate command -- operation )
-    [ ] [ ] {
-        set-operation-predicate
-        set-operation-command
-        set-operation-translator
-        set-operation-hook
-    } operation construct ;
+    operation new
+        [ ] >>hook
+        [ ] >>translator
+        swap >>command
+        swap >>predicate ;
 
 PREDICATE: listener-operation < operation
     dup operation-command listener-command?

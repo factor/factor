@@ -41,8 +41,5 @@ M: frame layout*
 : make-frame ( quot -- frame )
     <frame> make-gadget ; inline
 
-: build-frame ( tuple quot -- tuple )
-    <frame> build-gadget ; inline
-
 : frame, ( gadget i j -- )
     \ make-gadget get -rot grid-add ;

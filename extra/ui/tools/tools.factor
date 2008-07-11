@@ -14,7 +14,7 @@ IN: ui.tools
 
 : <workspace-tabs> ( -- tabs )
     g gadget-model
-    "tool-switching" workspace command-map
+    "tool-switching" workspace command-map commands>>
     [ command-string ] { } assoc>map <enum> >alist
     <toggle-buttons> ;
 

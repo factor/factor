@@ -71,9 +71,6 @@ M: gadget model-changed 2drop ;
 : <gadget> ( -- gadget )
     gadget new-gadget ;
 
-: construct-gadget ( class -- tuple )
-    >r <gadget> r> construct-delegate ; inline
-
 : activate-control ( gadget -- )
     dup gadget-model dup [
         2dup add-connection
@@ -139,11 +136,6 @@ M: gadget children-on nip gadget-children ;
 
 : each-child ( gadget quot -- )
     >r gadget-children r> each ; inline
-
-: set-gadget-delegate ( gadget tuple -- )
-    over [
-        dup pick [ set-gadget-parent ] with each-child
-    ] when set-delegate ;
 
 ! Selection protocol
 GENERIC: gadget-selection? ( gadget -- ? )
@@ -413,5 +405,11 @@ M: f request-focus-on 2drop ;
         swap dup \ make-gadget set gadget set call
     ] with-scope ; inline
 
-: build-gadget ( tuple quot gadget -- tuple )
-    pick set-gadget-delegate over >r with-gadget r> ; inline
+! Deprecated
+: set-gadget-delegate ( gadget tuple -- )
+    over [
+        dup pick [ set-gadget-parent ] with each-child
+    ] when set-delegate ;
+
+: construct-gadget ( class -- tuple )
+    >r <gadget> { set-delegate } r> construct ; inline

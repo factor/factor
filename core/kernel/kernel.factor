@@ -210,6 +210,3 @@ GENERIC# set-slots 1 ( ... tuple slots -- )
 
 : construct ( ... slots class -- tuple )
     new [ swap set-slots ] keep ; inline
-
-: construct-delegate ( delegate class -- tuple )
-    >r { set-delegate } r> construct ; inline

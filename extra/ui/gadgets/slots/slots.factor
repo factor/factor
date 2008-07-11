@@ -13,7 +13,7 @@ TUPLE: update-slot ;
 
 TUPLE: edit-slot ;
 
-TUPLE: slot-editor ref text ;
+TUPLE: slot-editor < track ref text ;
 
 : revert ( slot-editor -- )
     dup slot-editor-ref get-ref unparse-use
@@ -69,16 +69,20 @@ M: value-ref finish-editing
 } define-command
 
 : <slot-editor> ( ref -- gadget )
-    slot-editor new
-    [ set-slot-editor-ref ] keep
+    { 0 1 } slot-editor new-track
+        swap >>ref
     [
-        toolbar,
-        <source-editor> g-> set-slot-editor-text
-        <scroller> 1 track,
-    ] { 0 1 } build-track
+        [
+            toolbar,
+            <source-editor> g-> set-slot-editor-text
+            <scroller> 1 track,
+        ] with-gadget
+    ] keep
     dup revert ;
 
-M: slot-editor pref-dim* delegate pref-dim* { 600 200 } vmin ;
+M: slot-editor pref-dim* call-next-method { 600 200 } vmin ;
+
+M: slot-editor focusable-child* text>> ;
 
 slot-editor "toolbar" f {
     { T{ key-down f { C+ } "RET" } commit }
@@ -100,17 +104,16 @@ TUPLE: editable-slot < track printer ref ;
     [ 1 track, <edit-button> f track, ] with-gadget ;
 
 : update-slot ( editable-slot -- )
-    [
-        dup editable-slot-ref get-ref
-        swap editable-slot-printer call
-    ] keep
-    [ display-slot ] keep
-    scroll>gadget ;
+    [ [ ref>> get-ref ] [ printer>> ] bi call ] keep
+    display-slot ;
 
 : edit-slot ( editable-slot -- )
-    dup clear-track dup [
-        dup editable-slot-ref <slot-editor> 1 track,
-    ] with-gadget scroll>gadget ;
+    [ clear-track ]
+    [
+        dup ref>> <slot-editor>
+        [ swap 1 track-add ]
+        [ [ scroll>gadget ] [ request-focus ] bi* ] 2bi
+    ] bi ;
 
 \ editable-slot H{
     { T{ update-slot } [ update-slot ] }

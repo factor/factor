@@ -65,11 +65,9 @@ M: world children-on nip gadget-children ;
     over world-handle
     rot rect-dim [ 0 > ] all? and and ;
 
-TUPLE: world-error world ;
+TUPLE: world-error error world ;
 
-: <world-error> ( error world -- error )
-    { set-delegate set-world-error-world }
-    world-error construct ;
+C: <world-error> world-error
 
 SYMBOL: ui-error-hook
 

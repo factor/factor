@@ -1,6 +1,6 @@
 USING: help.markup help.syntax ui.gadgets.buttons
 ui.gadgets.menus models ui.operations summary kernel
-ui.gadgets.worlds ui.gadgets ;
+ui.gadgets.worlds ui.gadgets ui.gadgets.status-bar ;
 IN: ui.gadgets.presentations
 
 HELP: presentation
@@ -36,6 +36,8 @@ HELP: <presentation>
 { <button> <bevel-button> <command-button> <roll-button> <presentation> } related-words
 
 { <commands-menu> <toolbar> operations-menu show-menu } related-words
+
+{ <status-bar> show-mouse-help show-status show-summary hide-status } related-words
 
 HELP: show-mouse-help
 { $values { "presentation" presentation } }
