@@ -76,7 +76,7 @@ scroller H{
     ] keep dup scroller-value rot v+ swap scroll ;
 
 : relative-scroll-rect ( rect gadget scroller -- newrect )
-    scroller-viewport gadget-child relative-loc offset-rect ;
+    viewport>> gadget-child relative-loc offset-rect ;
 
 : find-scroller* ( gadget -- scroller )
     dup find-scroller dup [
@@ -119,13 +119,15 @@ scroller H{
 : scroll>top ( gadget -- )
     <zero-rect> swap scroll>rect ;
 
-: update-scroller ( scroller follows -- )
-    {
-        { [ dup t eq? ] [ drop (scroll>bottom) ] }
-        { [ dup rect? ] [ swap (scroll>rect) ] }
-        { [ dup ] [ swap (scroll>gadget) ] }
-        [ drop dup scroller-value swap scroll ]
-    } cond ;
+GENERIC: update-scroller ( scroller follows -- )
+
+M: t update-scroller drop (scroll>bottom) ;
+
+M: gadget update-scroller swap (scroll>gadget) ;
+
+M: rect update-scroller swap (scroll>rect) ;
+
+M: f update-scroller drop dup scroller-value swap scroll ;
 
 M: scroller layout*
     dup call-next-method

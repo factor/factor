@@ -1,8 +1,8 @@
 IN: ui.gadgets.tests
-USING: ui.gadgets ui.gadgets.packs ui.gadgets.worlds tools.test
-namespaces models kernel dlists dequeues math sets
-math.parser ui sequences hashtables assocs io arrays
-prettyprint io.streams.string ;
+USING: accessors ui.gadgets ui.gadgets.packs ui.gadgets.worlds
+tools.test namespaces models kernel dlists dequeues math sets
+math.parser ui sequences hashtables assocs io arrays prettyprint
+io.streams.string ;
 
 [ T{ rect f { 10 10 } { 20 20 } } ]
 [
