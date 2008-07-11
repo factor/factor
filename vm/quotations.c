@@ -1,8 +1,38 @@
 #include "master.h"
 
-/* Simple JIT compiler. This is one of the two compilers implementing Factor;
-the second one is written in Factor and performs a lot of optimizations.
-See core/compiler/compiler.factor */
+/* Simple non-optimizing compiler.
+
+This is one of the two compilers implementing Factor; the second one is written
+in Factor and performs advanced optimizations. See core/compiler/compiler.factor.
+
+The non-optimizing compiler compiles a quotation at a time by concatenating
+machine code chunks; prolog, epilog, call word, jump to word, etc. These machine
+code chunks are generated from Factor code in core/cpu/.../bootstrap.factor.
+
+It actually does do a little bit of very simple optimization:
+
+1) Tail call optimization.
+
+2) If a quotation is determined to not call any other words (except for a few
+special words which are open-coded, see below), then no prolog/epilog is
+generated.
+
+3) When in tail position and immediately preceded by literal arguments, the
+'if' and 'dispatch' conditionals are generated inline, instead of as a call to
+the 'if' word.
+
+4) When preceded by an array, calls to the 'declare' word are optimized out
+entirely. This word is only used by the optimizing compiler, and with the
+non-optimizing compiler it would otherwise just decrease performance to have to
+push the array and immediately drop it after.
+
+5) Sub-primitives are primitive words which are implemented in assembly and not
+in the VM. They are open-coded and no subroutine call is generated. This
+includes stack shufflers, some fixnum arithmetic words, and words such as tag,
+slot and eq?. A primitive call is relatively expensive (two subroutine calls)
+so this results in a big speedup for relatively little effort.
+
+*/
 bool jit_primitive_call_p(F_ARRAY *array, CELL i)
 {
 	return (i + 2) == array_capacity(array)
