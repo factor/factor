@@ -1,43 +1,38 @@
-! Copyright (C) 2006, 2007 Slava Pestov
+! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays documents ui.clipboards ui.commands ui.gadgets
-ui.gadgets.borders ui.gadgets.buttons ui.gadgets.labels
-ui.gadgets.scrollers ui.gadgets.theme ui.render ui.gestures io
-kernel math models namespaces opengl opengl.gl sequences strings
-io.styles math.vectors sorting colors combinators assocs
-math.order ;
+USING: accessors arrays documents io kernel math models
+namespaces opengl opengl.gl sequences strings io.styles
+math.vectors sorting colors combinators assocs math.order
+ui.clipboards ui.commands ui.gadgets ui.gadgets.borders
+ui.gadgets.buttons ui.gadgets.labels ui.gadgets.scrollers
+ui.gadgets.theme ui.gadgets.wrappers ui.render ui.gestures ;
 IN: ui.gadgets.editors
 
-TUPLE: editor
-self
+TUPLE: editor < gadget
 font color caret-color selection-color
 caret mark
 focused? ;
 
 : <loc> ( -- loc ) { 0 0 } <model> ;
 
-: init-editor-locs ( editor -- )
-    <loc> over set-editor-caret
-    <loc> swap set-editor-mark ;
+: init-editor-locs ( editor -- editor )
+    <loc> >>caret
+    <loc> >>mark ; inline
 
-: editor-theme ( editor -- )
-    black over set-editor-color
-    red over set-editor-caret-color
-    selection-color over set-editor-selection-color
-    monospace-font swap set-editor-font ;
+: editor-theme ( editor -- editor )
+    black >>color
+    red >>caret-color
+    selection-color >>selection-color
+    monospace-font >>font ; inline
+
+: new-editor ( class -- editor )
+    new-gadget
+        <document> >>model
+        init-editor-locs
+        editor-theme ; inline
 
 : <editor> ( -- editor )
-    <document> <gadget> editor construct-control
-    dup dup set-editor-self
-    dup init-editor-locs
-    dup editor-theme ;
-
-: field-theme ( gadget -- )
-    gray <solid> swap set-gadget-boundary ;
-
-: construct-editor ( object class -- tuple )
-    >r { set-gadget-delegate } r> construct
-    dup dup set-editor-self ; inline
+    editor new-editor ;
 
 : activate-editor-model ( editor model -- )
     2dup add-connection
@@ -212,19 +207,19 @@ M: editor pref-dim*
     dup editor-font* swap control-value text-dim ;
 
 : contents-changed ( model editor -- )
-    editor-self swap
-    over editor-caret [ over validate-loc ] (change-model)
-    over editor-mark [ over validate-loc ] (change-model)
+    swap
+    over caret>> [ over validate-loc ] (change-model)
+    over mark>> [ over validate-loc ] (change-model)
     drop relayout ;
 
 : caret/mark-changed ( model editor -- )
-    nip editor-self dup relayout-1 scroll>caret ;
+    nip [ relayout-1 ] [ scroll>caret ] bi ;
 
 M: editor model-changed
     {
-        { [ 2dup gadget-model eq? ] [ contents-changed ] }
-        { [ 2dup editor-caret eq? ] [ caret/mark-changed ] }
-        { [ 2dup editor-mark eq? ] [ caret/mark-changed ] }
+        { [ 2dup model>> eq? ] [ contents-changed ] }
+        { [ 2dup caret>> eq? ] [ caret/mark-changed ] }
+        { [ 2dup mark>> eq? ] [ caret/mark-changed ] }
     } cond ;
 
 M: editor gadget-selection?
@@ -474,10 +469,10 @@ editor "selection" f {
 } define-command-map
 
 ! Multi-line editors
-TUPLE: multiline-editor ;
+TUPLE: multiline-editor < editor ;
 
 : <multiline-editor> ( -- editor )
-    <editor> multiline-editor construct-editor ;
+    multiline-editor new-editor ;
 
 multiline-editor "general" f {
     { T{ key-down f f "RET" } insert-newline }
@@ -485,33 +480,34 @@ multiline-editor "general" f {
     { T{ key-down f f "ENTER" } insert-newline }
 } define-command-map
 
-TUPLE: source-editor ;
+TUPLE: source-editor < editor ;
 
 : <source-editor> ( -- editor )
-    <multiline-editor> source-editor construct-editor ;
+    source-editor new-editor ;
 
-! Fields are like editors except they edit an external model
-TUPLE: field model editor ;
+! Fields wrap an editor and edit an external model
+TUPLE: field < wrapper field-model editor ;
+
+: field-theme ( gadget -- gadget )
+    gray <solid> >>boundary ; inline
 
 : <field-border> ( gadget -- border )
     2 <border>
-    { 1 0 } over set-border-fill
-    dup field-theme ;
+        { 1 0 } >>fill
+        field-theme ;
 
 : <field> ( model -- gadget )
-    <editor> dup <field-border>
-    { set-field-model set-field-editor set-gadget-delegate }
-    field construct ;
+    <editor> dup <field-border> field new-wrapper
+        swap >>editor
+        swap >>field-model ;
 
 M: field graft*
-    dup field-model model-value
-    over field-editor set-editor-string
-    dup field-editor gadget-model add-connection ;
+    [ [ field-model>> model-value ] [ editor>> ] bi set-editor-string ]
+    [ dup editor>> model>> add-connection ]
+    bi ;
 
 M: field ungraft*
-    dup field-editor gadget-model remove-connection ;
+    dup editor>> model>> remove-connection ;
 
 M: field model-changed
-    nip
-    dup field-editor editor-string
-    swap field-model set-model ;
+    nip [ editor>> editor-string ] [ field-model>> ] bi set-model ;

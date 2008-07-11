@@ -7,7 +7,7 @@ ui.gadgets.buttons compiler.units assocs words vocabs
 accessors ;
 IN: ui.tools.browser
 
-TUPLE: browser-gadget pane history ;
+TUPLE: browser-gadget < track pane history ;
 
 : show-help ( link help -- )
     dup history>> add-history
@@ -20,12 +20,15 @@ TUPLE: browser-gadget pane history ;
     "handbook" >link <history> >>history drop ;
 
 : <browser-gadget> ( -- gadget )
-    browser-gadget new
-    dup init-history [
-        toolbar,
-        g <help-pane> g-> set-browser-gadget-pane
-        <scroller> 1 track,
-    ] { 0 1 } build-track ;
+    { 0 1 } browser-gadget new-track
+    dup init-history
+    [
+        [
+            toolbar,
+            g <help-pane> g-> set-browser-gadget-pane
+            <scroller> 1 track,
+        ] with-gadget
+    ] keep ;
 
 M: browser-gadget call-tool* show-help ;
 
@@ -33,12 +36,10 @@ M: browser-gadget tool-scroller
     pane>> find-scroller ;
 
 M: browser-gadget graft*
-    dup add-definition-observer
-    delegate graft* ;
+    [ add-definition-observer ] [ call-next-method ] bi ;
 
 M: browser-gadget ungraft*
-    dup delegate ungraft*
-    remove-definition-observer ;
+    [ call-next-method ] [ remove-definition-observer ] bi ;
 
 : showing-definition? ( defspec assoc -- ? )
     [ key? ] 2keep

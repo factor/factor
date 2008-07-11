@@ -6,7 +6,7 @@ IN: ui.gadgets.frames
 
 ! A frame arranges gadgets in a 3x3 grid, where the center
 ! gadgets gets left-over space.
-TUPLE: frame ;
+TUPLE: frame < grid ;
 
 : <frame-grid> ( -- grid ) 9 [ <gadget> ] replicate 3 group ;
 
@@ -21,9 +21,11 @@ TUPLE: frame ;
 : @bottom-left 0 2 ;
 : @bottom-right 2 2 ;
 
+: new-frame ( class -- frame )
+    <frame-grid> swap new-grid ; inline
+
 : <frame> ( -- frame )
-    frame new
-    <frame-grid> <grid> over set-gadget-delegate ;
+    frame new-frame ;
 
 : (fill-center) ( vec n -- )
     over first pick third v+ [v-] 1 rot set-nth ;
@@ -38,9 +40,6 @@ M: frame layout*
 
 : make-frame ( quot -- frame )
     <frame> make-gadget ; inline
-
-: build-frame ( tuple quot -- tuple )
-    <frame> build-gadget ; inline
 
 : frame, ( gadget i j -- )
     \ make-gadget get -rot grid-add ;

@@ -8,7 +8,7 @@ ui.gadgets.worlds ui.gadgets.presentations ui.gadgets.status-bar
 ui.commands ui.gestures assocs arrays namespaces accessors ;
 IN: ui.tools.workspace
 
-TUPLE: workspace book listener popup ;
+TUPLE: workspace < track book listener popup ;
 
 : find-workspace ( gadget -- workspace )
     [ workspace? ] find-parent ;
@@ -52,7 +52,7 @@ M: gadget tool-scroller drop f ;
 : help-window ( topic -- )
     [
         <pane> [ [ help ] with-pane ] keep
-        <limited-scroller> { 550 700 } >>dim
+        { 550 700 } <limited-scroller>
     ] keep
     article-title open-window ;
 

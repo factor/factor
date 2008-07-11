@@ -6,7 +6,7 @@ namespaces models kernel ;
 <gadget> "g1" set
 
 : <test-world> ( gadget -- world )
-    [ gadget, ] make-pile "Hi" f <world> ;
+    "Hi" f <world> ;
 
 [ ] [
     "g1" get <test-world> "w" set
@@ -46,15 +46,15 @@ namespaces models kernel ;
 
 [ t ] [ <gadget> dup <test-world> focusable-child eq? ] unit-test
 
-TUPLE: focusing ;
+TUPLE: focusing < gadget ;
 
 : <focusing>
-    focusing construct-gadget ;
+    focusing new-gadget ;
 
-TUPLE: focus-test ;
+TUPLE: focus-test < gadget ;
 
 : <focus-test>
-    focus-test construct-gadget
+    focus-test new-gadget
     <focusing> over add-gadget ;
 
 M: focus-test focusable-child* gadget-child ;
