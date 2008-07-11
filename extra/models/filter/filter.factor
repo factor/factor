@@ -1,16 +1,17 @@
-USING: models kernel ;
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors models kernel ;
 IN: models.filter
 
-TUPLE: filter model quot ;
+TUPLE: filter < model model quot ;
 
 : <filter> ( model quot -- filter )
-    f filter construct-model
-    [ set-filter-quot ] keep
-    [ set-filter-model ] 2keep
-    [ add-dependency ] keep ;
+    f filter new-model
+        swap >>quot
+        over >>model
+        [ add-dependency ] keep ;
 
 M: filter model-changed
-    swap model-value over filter-quot call
-    swap set-model ;
+    [ [ value>> ] [ quot>> ] bi* call ] [ nip ] 2bi set-model ;
 
-M: filter model-activated dup filter-model swap model-changed ;
+M: filter model-activated [ model>> ] keep model-changed ;

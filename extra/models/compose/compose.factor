@@ -1,19 +1,24 @@
-USING: models kernel sequences ;
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors models kernel sequences ;
 IN: models.compose
 
-TUPLE: compose ;
+TUPLE: compose < model ;
+
+: new-compose ( models class -- compose )
+    f swap new-model
+        swap clone >>dependencies ; inline
 
 : <compose> ( models -- compose )
-    f compose construct-model
-    swap clone over set-model-dependencies ;
+    compose new-compose ;
 
-: composed-value >r model-dependencies r> map ; inline
+: composed-value [ dependencies>> ] dip map ; inline
 
-: set-composed-value >r model-dependencies r> 2each ; inline
+: set-composed-value [ dependencies>> ] dip 2each ; inline
 
 M: compose model-changed
     nip
-    dup [ model-value ] composed-value swap delegate set-model ;
+    [ [ model-value ] composed-value ] keep set-model ;
 
 M: compose model-activated dup model-changed ;
 
