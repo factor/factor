@@ -1,5 +1,5 @@
 
-USING: namespaces io.files bootstrap.image builder.util ;
+USING: namespaces debugger io.files bootstrap.image builder.util ;
 
 IN: update.backup
 
@@ -20,6 +20,9 @@ IN: update.backup
 
 : backup ( -- )
   datestamp "datestamp" set
-  backup-boot-image
-  backup-image
-  backup-vm ;
+    [
+      backup-boot-image
+      backup-image
+      backup-vm
+    ]
+  try ;
