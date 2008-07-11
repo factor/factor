@@ -9,3 +9,10 @@ $nl
 HELP: <book>
 { $values { "pages" "a sequence of gadgets" } { "model" model } { "book" book } }
 { $description "Creates a " { $link book } " control, which contains the gadgets in " { $snippet "pages" } ". A book shows one child at a time, determined by the value of the model, which must be an integer " } ;
+
+ARTICLE: "ui-book-layout" "Book layouts"
+"Books can contain any number of children, and display one child at a time."
+{ $subsection book }
+{ $subsection <book> } ;
+
+ABOUT: "ui-book-layout"

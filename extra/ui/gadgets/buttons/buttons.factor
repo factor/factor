@@ -225,7 +225,7 @@ M: radio-control model-changed
 
 : <toolbar> ( target -- toolbar )
     [
-        "toolbar" over class command-map swap
+        "toolbar" over class command-map commands>> swap
         [ -rot <command-button> gadget, ] curry assoc-each
     ] make-shelf ;
 

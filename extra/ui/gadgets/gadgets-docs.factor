@@ -232,15 +232,11 @@ HELP: focusable-child
 
 HELP: gadget,
 { $values { "gadget" gadget } }
-{ $description "Adds a new child to the gadget being constructed. This word can only be used from a quotation passed to " { $link make-gadget } " or " { $link build-gadget } "." } ;
+{ $description "Adds a new child to the gadget being constructed. This word can only be used from a quotation passed to " { $link make-gadget } "." } ;
 
 HELP: make-gadget
 { $values { "quot" quotation } { "gadget" gadget } }
 { $description "Calls the quotation in a new scope with the gadget stored in the " { $link make-gadget } " variable." } ;
-
-HELP: build-gadget
-{ $values { "tuple" tuple } { "quot" quotation } { "gadget" gadget } }
-{ $description "Delegates the tuple to the gadget, and calls the quotation in a new scope with the tuple stored in the " { $link make-gadget } " and " { $link gadget } " variables." } ;
 
 HELP: with-gadget
 { $values { "gadget" gadget } { "quot" quotation } } 
@@ -248,11 +244,11 @@ HELP: with-gadget
 
 HELP: g
 { $values { "gadget" gadget } }
-{ $description "Outputs the gadget being built. Can only be used inside a quotation passed to " { $link build-gadget } "." } ;
+{ $description "Outputs the gadget being built. Can only be used inside a quotation passed to " { $link with-gadget } "." } ;
 
 HELP: g->
 { $values { "x" object } { "gadget" gadget } }
-{ $description "Duplicates the top of the stack and outputs the gadget being built. Can only be used inside a quotation passed to " { $link build-gadget } "." } ;
+{ $description "Duplicates the top of the stack and outputs the gadget being built. Can only be used inside a quotation passed to " { $link with-gadget } "." } ;
 
 { control-value set-control-value gadget-model } related-words
 

@@ -10,7 +10,7 @@ TUPLE: track < pack sizes ;
     track-sizes
     [ sift sum ] keep [ dup [ over / ] when ] map nip ;
 
-: new-track ( orientation -- track )
+: new-track ( orientation class -- track )
     new-gadget
         swap >>orientation
         V{ } clone >>sizes
@@ -54,9 +54,6 @@ M: track pref-dim*
 
 : make-track ( quot orientation -- track )
     <track> make-gadget ; inline
-
-: build-track ( tuple quot orientation -- tuple )
-    <track> build-gadget ; inline
 
 : track-remove ( gadget track -- )
     over [

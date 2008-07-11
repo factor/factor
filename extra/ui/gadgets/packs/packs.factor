@@ -69,7 +69,3 @@ M: pack children-on ( rect gadget -- seq )
 
 : make-shelf ( quot -- pack )
     <shelf> make-gadget ; inline
-
-: build-pack ( quot quot orientation -- pack )
-    <pack> build-gadget ; inline
-

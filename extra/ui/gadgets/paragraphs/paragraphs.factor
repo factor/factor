@@ -5,10 +5,10 @@ namespaces sequences math.order ;
 IN: ui.gadgets.paragraphs
 
 ! A word break gadget
-TUPLE: word-break-gadget ;
+TUPLE: word-break-gadget < label ;
 
-: <word-break-gadget> ( gadget -- gadget )
-    { set-delegate } word-break-gadget construct ;
+: <word-break-gadget> ( text -- gadget )
+    word-break-gadget new-label ;
 
 M: word-break-gadget draw-gadget* drop ;
 

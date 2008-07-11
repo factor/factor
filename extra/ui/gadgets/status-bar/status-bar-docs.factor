@@ -1,10 +1,8 @@
-USING: ui.gadgets.presentations help.markup help.syntax models
+USING: help.markup help.syntax models
 ui.gadgets ui.gadgets.worlds ;
 IN: ui.gadgets.status-bar
 
 HELP: <status-bar>
 { $values { "model" model } { "gadget" "a new " { $link gadget } } }
 { $description "Creates a new " { $link gadget } " displaying the model value, which must be a string or " { $link f } "." }
-{ $notes "If the " { $snippet "model" } " is " { $link world-status } ", this gadget will display " { $link presentation } " mouse over help." } ;
-
-{ <status-bar> show-mouse-help show-status show-summary hide-status } related-words
+{ $notes "If the " { $snippet "model" } " is " { $link world-status } ", this gadget will display  mouse over help for " { $link "ui.gadgets.presentations" } "." } ;

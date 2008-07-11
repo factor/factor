@@ -10,7 +10,7 @@ prettyprint listener debugger threads boxes concurrency.flags
 math arrays generic accessors combinators assocs ;
 IN: ui.tools.listener
 
-TUPLE: listener-gadget input output stack ;
+TUPLE: listener-gadget < track input output stack ;
 
 : listener-output, ( -- )
     <scrolling-pane> g-> set-listener-gadget-output
@@ -118,15 +118,18 @@ M: engine-word word-completion-string
     dup "\n" join pick add-interactor-history
     swap select-all ;
 
-TUPLE: stack-display ;
+TUPLE: stack-display < track ;
 
 : <stack-display> ( -- gadget )
-    stack-display new
-    g workspace-listener swap [
-        dup <toolbar> f track,
-        stack>> [ [ stack. ] curry try ]
-        t "Data stack" <labelled-pane> 1 track,
-    ] { 0 1 } build-track ;
+    g workspace-listener
+    { 0 1 } stack-display new-track
+    [
+        [
+            dup <toolbar> f track,
+            stack>> [ [ stack. ] curry try ]
+            t "Data stack" <labelled-pane> 1 track,
+        ] with-gadget
+    ] keep ;
 
 M: stack-display tool-scroller
     find-workspace workspace-listener tool-scroller ;
@@ -169,8 +172,9 @@ M: stack-display tool-scroller
     f <model> swap set-listener-gadget-stack ;
 
 : <listener-gadget> ( -- gadget )
-    listener-gadget new dup init-listener
-    [ listener-output, listener-input, ] { 0 1 } build-track ;
+    { 0 1 } listener-gadget new-track
+    dup init-listener
+    [ [ listener-output, listener-input, ] with-gadget ] keep ;
 
 : listener-help ( -- ) "ui-listener" help-window ;
 
@@ -189,7 +193,7 @@ M: listener-gadget handle-gesture* ( gadget gesture delegate -- ? )
     [ default-gesture-handler ] [ 3drop f ] if ;
 
 M: listener-gadget graft*
-    [ delegate graft* ] [ restart-listener ] bi ;
+    [ call-next-method ] [ restart-listener ] bi ;
 
 M: listener-gadget ungraft*
-    [ com-end ] [ delegate ungraft* ] bi ;
+    [ com-end ] [ call-next-method ] bi ;
