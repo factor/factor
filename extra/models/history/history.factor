@@ -1,14 +1,17 @@
-USING: kernel models sequences ;
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors kernel models sequences ;
 IN: models.history
 
-TUPLE: history back forward ;
+TUPLE: history < model back forward ;
 
-: reset-history ( history -- )
-    V{ } clone over set-history-back
-    V{ } clone swap set-history-forward ;
+: reset-history ( history -- history )
+    V{ } clone >>back
+    V{ } clone >>forward ; inline
 
 : <history> ( value -- history )
-    history construct-model dup reset-history ;
+    history new-model
+        reset-history ;
 
 : (add-history) ( history to -- )
     swap model-value dup [ swap push ] [ 2drop ] if ;

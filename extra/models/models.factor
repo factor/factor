@@ -100,9 +100,6 @@ M: model update-model drop ;
 : (change-model) ( model quot -- )
     ((change-model)) set-model-value ; inline
 
-: construct-model ( value class -- instance )
-    >r <model> { set-delegate } r> construct ; inline
-
 GENERIC: range-value ( model -- value )
 GENERIC: range-page-value ( model -- value )
 GENERIC: range-min-value ( model -- value )

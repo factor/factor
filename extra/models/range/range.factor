@@ -1,32 +1,33 @@
-USING: kernel models arrays sequences math math.order
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors kernel models arrays sequences math math.order
 models.compose ;
 IN: models.range
 
-TUPLE: range ;
+TUPLE: range < compose ;
 
 : <range> ( value min max page -- range )
-    4array [ <model> ] map <compose>
-    { set-delegate } range construct ;
+    4array [ <model> ] map range new-compose ;
 
-: range-model ( range -- model ) model-dependencies first ;
-: range-page ( range -- model ) model-dependencies second ;
-: range-min ( range -- model ) model-dependencies third ;
-: range-max ( range -- model ) model-dependencies fourth ;
+: range-model ( range -- model ) dependencies>> first ;
+: range-page ( range -- model ) dependencies>> second ;
+: range-min ( range -- model ) dependencies>> third ;
+: range-max ( range -- model ) dependencies>> fourth ;
 
 M: range range-value
-    [ range-model model-value ] keep clamp-value ;
+    [ range-model value>> ] keep clamp-value ;
 
-M: range range-page-value range-page model-value ;
+M: range range-page-value range-page value>> ;
 
-M: range range-min-value range-min model-value ;
+M: range range-min-value range-min value>> ;
 
-M: range range-max-value range-max model-value ;
+M: range range-max-value range-max value>> ;
 
 M: range range-max-value*
-    dup range-max-value swap range-page-value [-] ;
+    [ range-max-value ] [ range-page-value ] bi [-] ;
 
 M: range set-range-value
-    [ clamp-value ] keep range-model set-model ;
+    [ clamp-value ] [ range-model ] bi set-model ;
 
 M: range set-range-page-value range-page set-model ;
 

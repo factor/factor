@@ -9,7 +9,6 @@ ui.gadgets.theme ui.gadgets.wrappers ui.render ui.gestures ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < gadget
-self
 font color caret-color selection-color
 caret mark
 focused? ;
@@ -30,8 +29,7 @@ focused? ;
     new-gadget
         <document> >>model
         init-editor-locs
-        editor-theme
-        dup dup set-editor-self ; inline
+        editor-theme ; inline
 
 : <editor> ( -- editor )
     editor new-editor ;
@@ -209,19 +207,19 @@ M: editor pref-dim*
     dup editor-font* swap control-value text-dim ;
 
 : contents-changed ( model editor -- )
-    editor-self swap
-    over editor-caret [ over validate-loc ] (change-model)
-    over editor-mark [ over validate-loc ] (change-model)
+    swap
+    over caret>> [ over validate-loc ] (change-model)
+    over mark>> [ over validate-loc ] (change-model)
     drop relayout ;
 
 : caret/mark-changed ( model editor -- )
-    nip editor-self dup relayout-1 scroll>caret ;
+    nip [ relayout-1 ] [ scroll>caret ] bi ;
 
 M: editor model-changed
     {
-        { [ 2dup gadget-model eq? ] [ contents-changed ] }
-        { [ 2dup editor-caret eq? ] [ caret/mark-changed ] }
-        { [ 2dup editor-mark eq? ] [ caret/mark-changed ] }
+        { [ 2dup model>> eq? ] [ contents-changed ] }
+        { [ 2dup caret>> eq? ] [ caret/mark-changed ] }
+        { [ 2dup mark>> eq? ] [ caret/mark-changed ] }
     } cond ;
 
 M: editor gadget-selection?
