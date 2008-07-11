@@ -5,7 +5,8 @@ USING: accessors kernel threads combinators concurrency.mailboxes
        sequences strings hashtables splitting fry assocs hashtables
        ui ui.gadgets.panes ui.gadgets.editors ui.gadgets.scrollers
        ui.commands ui.gadgets.frames ui.gestures ui.gadgets.tabs
-       io io.styles namespaces irc.client irc.messages ;
+       io io.styles namespaces irc.client irc.messages calendar
+       calendar.format ;
 
 IN: irc.ui
 
@@ -27,9 +28,19 @@ GENERIC: write-irc ( irc-message -- )
 M: privmsg write-irc
     "<" blue write-color
     [ prefix>> prefix>nick write ] keep
-    ">" blue write-color
-    " " write
+    "> " blue write-color
     trailing>> write ;
+
+TUPLE: own-message message nick timestamp ;
+
+: <own-message> ( message nick -- own-message )
+    now own-message boa ;
+
+M: own-message write-irc
+    "<" blue write-color
+    [ nick>> bold font-style associate format ] keep
+    "> " blue write-color
+    message>> write ;
 
 M: join write-irc
     "* " green write-color
@@ -63,15 +74,12 @@ M: irc-message write-irc
     drop ; ! catch all unimplemented writes, THIS WILL CHANGE    
 
 : print-irc ( irc-message -- )
-    write-irc nl ;
+    [ timestamp>> timestamp>hms write " " write ]
+    [ write-irc nl ] bi ;
 
 : send-message ( message listener client -- )
-    "<" blue write-color
-    profile>> nickname>> bold font-style associate format
-    ">" blue write-color
-    " " write
-    over write nl
-    out-messages>> mailbox-put ;
+    [ nip profile>> nickname>> <own-message> print-irc ]
+    [ drop write-message ] 3bi ;
 
 : display ( stream listener -- )
     '[ , [ [ t ]
