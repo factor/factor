@@ -21,7 +21,9 @@ IN: ctags.etags
   dup [ first , second second , ] { } make ;
 
 : ctag-add ( ctag hash -- hash )
-  [ ctag-hashvalue ] 2keep [ dup ctag-path [ ctag-value suffix ] dip ] dip [ set-at ] keep ;
+  [ ctag-hashvalue ] 2keep [
+    dup ctag-path [ ctag-value suffix ] dip
+  ] dip [ set-at ] keep ;
     
 : ctag-hash ( seq -- hash )
   H{ } clone swap [ swap ctag-add ] each ;
@@ -30,12 +32,16 @@ IN: ctags.etags
   nth length 1+ ;
 
 : lines>bytes ( n seq -- bytes )
-  over zero? [ line>bytes ] [ [ [ 1 - ] dip lines>bytes ] 2keep line>bytes + ] if ;
+  over zero? [
+    line>bytes ] [
+    [
+      [ 1- ] dip lines>bytes
+    ] 2keep line>bytes +
+  ] if ;
 
 : file>bytes ( n path -- bytes )
   ascii file-lines lines>bytes ;
 
-SYMBOL: resource    
 : etag ( path seq -- str )
   [
     dup first ?word-name %
@@ -51,15 +57,28 @@ SYMBOL: resource
 : vector-length ( vector -- n )
   0 [ length + ] reduce ;
 
-: etag-header ( n path -- str )
+: <header> ( n path -- str )
   [
     %
     1 CHAR: , <string> %
     number>string %
   ] "" make ;
 
+: etag-header ( vec1 n resource -- vec2 )
+  normalize-path <header> prefix
+  1 HEX: 0c <string> prefix ;
+
+SYMBOL: resource    
 : etag-strings ( alist -- seq )
-  { } swap [ etag-entry resource [ second [ resource get swap etag ] map dup vector-length resource get normalize-path etag-header prefix 1 HEX: 0c <string> prefix ] with-variable append ] each ;
+  { } swap [
+    etag-entry resource [
+      second [
+        resource get swap etag
+      ] map dup vector-length
+      resource get
+    ] with-variable
+    etag-header append
+  ] each ;
 
 : etags-write ( alist path -- )
   [ etag-strings ] dip ascii set-file-lines ; 
