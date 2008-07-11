@@ -5,15 +5,15 @@ ui.commands ui.gadgets ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.tracks ui.gestures ui.gadgets.buttons ;
 IN: ui.tools.profiler
 
-TUPLE: profiler-gadget pane ;
+TUPLE: profiler-gadget < track pane ;
 
 : <profiler-gadget> ( -- gadget )
-    profiler-gadget new
+    { 0 1 } profiler-gadget new-track
     [
         toolbar,
         <pane> g-> set-profiler-gadget-pane
         <scroller> 1 track,
-    ] { 0 1 } build-track ;
+    ] make-gadget ;
 
 : with-profiler-pane ( gadget quot -- )
     >r profiler-gadget-pane r> with-pane ;

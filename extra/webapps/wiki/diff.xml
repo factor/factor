@@ -13,7 +13,7 @@
 		</tr>
 		<tr>
 			<th class="field-label">New revision:</th>
-			<t:bind t:name="old">
+			<t:bind t:name="new">
 				<td>Created on <t:label t:name="date" /> by <t:a t:href="user-edits" t:rest="author"><t:label t:name="author" /></t:a>.</td>
 			</t:bind>
 		</tr>

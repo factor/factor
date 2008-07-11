@@ -1,6 +1,6 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays ui ui.commands ui.gestures ui.gadgets
+USING: accessors arrays ui ui.commands ui.gestures ui.gadgets
 ui.gadgets.worlds ui.gadgets.packs ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.panes ui.gadgets.presentations
 ui.gadgets.viewports ui.gadgets.lists ui.gadgets.tracks
@@ -12,7 +12,7 @@ IN: ui.tools.debugger
 : <restart-list> ( restarts restart-hook -- gadget )
     [ restart-name ] rot <model> <list> ;
 
-TUPLE: debugger restarts ;
+TUPLE: debugger < track restarts ;
 
 : <debugger-display> ( restart-list error -- gadget )
     [
@@ -21,12 +21,12 @@ TUPLE: debugger restarts ;
     ] make-filled-pile ;
 
 : <debugger> ( error restarts restart-hook -- gadget )
-    debugger new
+    { 0 1 } debugger new-track
     [
         toolbar,
         <restart-list> g-> set-debugger-restarts
         swap <debugger-display> <scroller> 1 track,
-    ] { 0 1 } build-track ;
+    ] make-gadget ;
 
 M: debugger focusable-child* debugger-restarts ;
 
@@ -38,9 +38,9 @@ M: debugger focusable-child* debugger-restarts ;
 
 M: world-error error.
     "An error occurred while drawing the world " write
-    dup world-error-world pprint-short "." print
+    dup world>> pprint-short "." print
     "This world has been deactivated to prevent cascading errors." print
-    delegate error. ;
+    error>> error. ;
 
 debugger "gestures" f {
     { T{ button-down } request-focus }

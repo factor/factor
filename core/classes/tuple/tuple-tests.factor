@@ -683,3 +683,17 @@ DEFER: error-y
 [ t ] [ \ error-y tuple-class? ] unit-test
 
 [ f ] [ \ error-y generic? ] unit-test
+
+[ ] [
+    "IN: classes.tuple.tests TUPLE: forget-subclass-test ; TUPLE: forget-subclass-test' < forget-subclass-test ;"
+    <string-reader> "forget-subclass-test" parse-stream
+    drop
+] unit-test
+
+[ ] [ "forget-subclass-test'" "classes.tuple.tests" lookup new "bad-object" set ] unit-test
+
+[ ] [
+    "IN: classes.tuple.tests TUPLE: forget-subclass-test a ;"
+    <string-reader> "forget-subclass-test" parse-stream
+    drop
+] unit-test

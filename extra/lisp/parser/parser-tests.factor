@@ -5,43 +5,43 @@ USING: lisp.parser tools.test peg peg.ebnf lists ;
 IN: lisp.parser.tests
 
 { 1234  }  [
-  "1234" "atom" \ lisp-expr rule parse parse-result-ast
+  "1234" "atom" \ lisp-expr rule parse
 ] unit-test
 
 { -42  }  [
-    "-42" "atom" \ lisp-expr rule parse parse-result-ast
+    "-42" "atom" \ lisp-expr rule parse
 ] unit-test
 
 { 37/52 } [
-    "37/52" "atom" \ lisp-expr rule parse parse-result-ast
+    "37/52" "atom" \ lisp-expr rule parse
 ] unit-test
 
 { 123.98 } [
-    "123.98" "atom" \ lisp-expr rule parse parse-result-ast
+    "123.98" "atom" \ lisp-expr rule parse
 ] unit-test
 
 { "" } [
-    "\"\"" "atom" \ lisp-expr rule parse parse-result-ast
+    "\"\"" "atom" \ lisp-expr rule parse
 ] unit-test
 
 { "aoeu" } [
-    "\"aoeu\"" "atom" \ lisp-expr rule parse parse-result-ast
+    "\"aoeu\"" "atom" \ lisp-expr rule parse
 ] unit-test
 
 { "aoeu\"de" } [
-    "\"aoeu\\\"de\"" "atom" \ lisp-expr rule parse parse-result-ast
+    "\"aoeu\\\"de\"" "atom" \ lisp-expr rule parse
 ] unit-test
 
 { T{ lisp-symbol f "foobar" } } [
-    "foobar" "atom" \ lisp-expr rule parse parse-result-ast
+    "foobar" "atom" \ lisp-expr rule parse
 ] unit-test
 
 { T{ lisp-symbol f "+" } } [
-    "+" "atom" \ lisp-expr rule parse parse-result-ast
+    "+" "atom" \ lisp-expr rule parse
 ] unit-test
 
 { +nil+ } [
-    "()" lisp-expr parse-result-ast
+    "()" lisp-expr
 ] unit-test
 
 { T{
@@ -54,7 +54,7 @@ IN: lisp.parser.tests
         1
         T{ cons f 2 T{ cons f "aoeu" +nil+ } }
     } } } [
-    "(foo 1 2 \"aoeu\")" lisp-expr parse-result-ast
+    "(foo 1 2 \"aoeu\")" lisp-expr
 ] unit-test
 
 { T{ cons f
@@ -64,5 +64,5 @@ IN: lisp.parser.tests
            T{ cons f 2 +nil+ } }
    }
 } [
-    "(1 (3 4) 2)" lisp-expr parse-result-ast
+    "(1 (3 4) 2)" lisp-expr
 ] unit-test

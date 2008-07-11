@@ -8,7 +8,7 @@ ui.commands assocs ui.gadgets.tracks ui ui.tools.listener
 tools.deploy vocabs ui.tools.workspace system accessors ;
 IN: ui.tools.deploy
 
-TUPLE: deploy-gadget vocab settings ;
+TUPLE: deploy-gadget < pack vocab settings ;
 
 : bundle-name ( -- )
     deploy-name get <field>
@@ -105,11 +105,14 @@ deploy-gadget "toolbar" f {
     g <toolbar> { 10 10 } over set-pack-gap gadget, ;
 
 : <deploy-gadget> ( vocab -- gadget )
-    f deploy-gadget boa [
-        dup <deploy-settings>
+    deploy-gadget new-gadget
+        swap >>vocab
+        { 0 1 } >>orientation
+    [
+        g vocab>> <deploy-settings>
         g-> set-deploy-gadget-settings gadget,
         buttons,
-    ] { 0 1 } build-pack
+    ] make-gadget
     dup deploy-settings-theme
     dup com-revert ;
 

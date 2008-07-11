@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: accessors kernel math sequences words arrays io io.files
-namespaces math.parser assocs quotations parser lexer
-parser-combinators tools.time io.encodings.binary sequences.deep
-symbols combinators ;
+math.parser assocs quotations parser lexer
+peg peg.ebnf peg.parsers tools.time io.encodings.binary sequences.deep
+symbols combinators fry namespaces ;
 IN: cpu.8080.emulator
 
 TUPLE: cpu b c d e f h l a pc sp halted? last-interrupt cycles ram ;
@@ -748,24 +748,15 @@ SYMBOLS: $1 $2 $3 $4 ;
   #! is the getter word for that register with stack effect
   #! ( cpu -- value ). The second item is the setter word with
   #! stack effect ( value cpu -- ).
-  "A" token 
-  "B" token  <|>
-  "C" token  <|>
-  "D" token  <|>
-  "E" token  <|>
-  "H" token  <|>
-  "L" token  <|> [ register-lookup ] <@ ;
+  <EBNF   
+    main=("A" | "B" | "C" | "D" | "E" | "H" | "L") => [[ register-lookup ]]
+  EBNF> ;   
 
 : all-flags ( -- parser )
   #! A parser for 16-bit flags. 
-  "NZ" token  
-  "NC" token <|>
-  "PO" token <|>
-  "PE" token <|> 
-  "Z" token <|> 
-  "C" token <|> 
-  "P" token <|> 
-  "M" token <|> [ flag-lookup ] <@ ;
+  <EBNF
+    main=("NZ" | "NC" | "PO" | "PE" | "Z" | "C" | "P" | "M") => [[ flag-lookup ]]
+  EBNF> ;
 
 : 16-bit-registers ( -- parser )
   #! A parser for 16-bit registers. On a successfull parse the
@@ -773,23 +764,21 @@ SYMBOLS: $1 $2 $3 $4 ;
   #! is the getter word for that register with stack effect
   #! ( cpu -- value ). The second item is the setter word with
   #! stack effect ( value cpu -- ).
-  "AF" token  
-  "BC" token <|>
-  "DE" token <|>
-  "HL" token <|>
-  "SP" token <|> [ register-lookup ] <@ ;
+  <EBNF
+    main=("AF" | "BC" | "DE" | "HL" | "SP") => [[ register-lookup ]]
+  EBNF> ;
 
 : all-registers ( -- parser )
   #! Return a parser that can parse the format
   #! for 8 bit or 16 bit registers. 
-  8-bit-registers 16-bit-registers <|> ;
+  [ 16-bit-registers , 8-bit-registers , ] choice* ;
 
 : indirect ( parser -- parser )
   #! Given a parser, return a parser which parses the original
   #! wrapped in brackets, representing an indirect reference.
   #! eg. BC -> (BC). The value of the original parser is left in
   #! the parse tree.
-  "(" token swap &> ")" token <& ;
+  "(" ")" surrounded-by ;
 
 : generate-instruction ( vector string -- quot )
   #! Generate the quotation for an instruction, given the instruction in 
@@ -800,89 +789,112 @@ SYMBOLS: $1 $2 $3 $4 ;
   #! Return a parser for then instruction identified by the token. 
   #! The parser return parses the token only and expects no additional
   #! arguments to the instruction.
-  token [ [ { } clone , , \ generate-instruction , ] [ ] make ] <@ ;
+  token [ '[ { } , generate-instruction ] ] action ;
 
 : complex-instruction ( type token -- parser )
   #! Return a parser for an instruction identified by the token. 
   #! The instruction is expected to take additional arguments by 
   #! being combined with other parsers. Then 'type' is used for a lookup
   #! in a pattern hashtable to return the instruction quotation pattern.
-  token swap [ nip [ , \ generate-instruction , ] [ ] make ] curry <@ ;
+  token swap [ nip '[ , generate-instruction ] ] curry action ;
+
+: no-params ( ast -- ast )
+  first { } swap curry ;
+
+: one-param ( ast -- ast )
+  first2 swap curry ;
+
+: two-params ( ast -- ast )
+  first3 append swap curry ;
 
 : NOP-instruction ( -- parser )
   "NOP" simple-instruction ;
 
 : RET-NN-instruction ( -- parser )  
-  "RET-NN" "RET" complex-instruction  
-  "nn" token sp <&
-  just [ { } clone swap curry  ] <@ ;
+  [
+    "RET-NN" "RET" complex-instruction ,
+    "nn" token sp hide ,
+  ] seq* [ no-params ] action ;
 
 : RST-0-instruction ( -- parser )  
-  "RST-0" "RST" complex-instruction  
-  "0" token sp <&
-  just [ { } clone swap curry  ] <@ ;
+  [
+    "RST-0" "RST" complex-instruction ,
+    "0" token sp hide , 
+  ] seq* [ no-params ] action ;
 
 : RST-8-instruction ( -- parser )  
-  "RST-8" "RST" complex-instruction  
-  "8" token sp <&
-  just [ { } clone swap curry  ] <@ ;
+  [
+    "RST-8" "RST" complex-instruction ,
+    "8" token sp hide , 
+  ] seq* [ no-params ] action ;
 
 : RST-10H-instruction ( -- parser )  
-  "RST-10H" "RST" complex-instruction  
-  "10H" token sp <&
-  just [ { } clone swap curry  ] <@ ;
+  [
+    "RST-10H" "RST" complex-instruction ,
+    "10H" token sp hide ,
+  ] seq* [ no-params ] action ;
 
 : RST-18H-instruction ( -- parser )  
-  "RST-18H" "RST" complex-instruction  
-  "18H" token sp <&
-  just [ { } clone swap curry  ] <@ ;
+  [
+    "RST-18H" "RST" complex-instruction ,
+    "18H" token sp hide ,
+  ] seq* [ no-params ] action ;
 
-: RST-20H-instruction ( -- parser )  
-  "RST-20H" "RST" complex-instruction  
-  "20H" token sp <&
-  just [ { } clone swap curry  ] <@ ;
+: RST-20H-instruction ( -- parser )
+  [  
+    "RST-20H" "RST" complex-instruction ,
+    "20H" token sp hide ,
+  ] seq* [ no-params ] action ;
 
-: RST-28H-instruction ( -- parser )  
-  "RST-28H" "RST" complex-instruction  
-  "28H" token sp <&
-  just [ { } clone swap curry  ] <@ ;
+: RST-28H-instruction ( -- parser )
+  [  
+    "RST-28H" "RST" complex-instruction ,
+    "28H" token sp hide ,
+  ] seq* [ no-params ] action ;
 
-: RST-30H-instruction ( -- parser )  
-  "RST-30H" "RST" complex-instruction  
-  "30H" token sp <&
-  just [ { } clone swap curry  ] <@ ;
+: RST-30H-instruction ( -- parser ) 
+  [ 
+    "RST-30H" "RST" complex-instruction ,
+    "30H" token sp hide ,
+  ] seq* [ no-params ] action ;
 
 : RST-38H-instruction ( -- parser )  
-  "RST-38H" "RST" complex-instruction  
-  "38H" token sp <&
-  just [ { } clone swap curry  ] <@ ;
+  [
+    "RST-38H" "RST" complex-instruction ,
+    "38H" token sp hide ,
+  ] seq* [ no-params ] action ;
 
 : JP-NN-instruction ( -- parser )  
-  "JP-NN" "JP" complex-instruction  
-  "nn" token sp <&
-  just [ { } clone swap curry  ] <@ ;
+  [
+    "JP-NN" "JP" complex-instruction ,
+    "nn" token sp hide ,
+  ] seq* [ no-params ] action ;
 
 : JP-F|FF,NN-instruction ( -- parser )
-  "JP-F|FF,NN" "JP" complex-instruction  
-  all-flags sp <&> 
-  ",nn" token <&
-  just [ first2 swap curry ] <@ ;
+  [
+    "JP-F|FF,NN" "JP" complex-instruction ,
+    all-flags sp , 
+    ",nn" token hide ,
+  ] seq* [ one-param ] action ;
 
 : JP-(RR)-instruction ( -- parser )
-  "JP-(RR)" "JP" complex-instruction  
-  16-bit-registers indirect sp <&>
-  just [ first2 swap curry ] <@ ;
+  [
+    "JP-(RR)" "JP" complex-instruction ,
+    16-bit-registers indirect sp ,
+  ] seq* [ one-param ] action ;
 
 : CALL-NN-instruction ( -- parser )  
-  "CALL-NN" "CALL" complex-instruction  
-  "nn" token sp <&
-  just [ { } clone swap curry  ] <@ ;
+  [
+    "CALL-NN" "CALL" complex-instruction ,
+    "nn" token sp hide ,
+  ] seq* [ no-params ] action ;
 
 : CALL-F|FF,NN-instruction ( -- parser )
-  "CALL-F|FF,NN" "CALL" complex-instruction  
-  all-flags sp <&> 
-  ",nn" token <&
-  just [ first2 swap curry ] <@ ;
+  [
+    "CALL-F|FF,NN" "CALL" complex-instruction ,
+    all-flags sp , 
+    ",nn" token hide ,
+  ] seq* [ one-param ] action ;
 
 : RLCA-instruction ( -- parser )
   "RLCA" simple-instruction ;
@@ -918,364 +930,430 @@ SYMBOLS: $1 $2 $3 $4 ;
   "RRA" simple-instruction ;
 
 : DEC-R-instruction ( -- parser )
-  "DEC-R" "DEC" complex-instruction  8-bit-registers sp <&> 
-  just [ first2 swap curry ] <@ ;
+  [
+    "DEC-R" "DEC" complex-instruction ,
+    8-bit-registers sp ,
+  ] seq* [ one-param ] action ;
 
 : DEC-RR-instruction ( -- parser )
-  "DEC-RR" "DEC" complex-instruction  16-bit-registers sp <&> 
-  just [ first2 swap curry ] <@ ;
+  [
+    "DEC-RR" "DEC" complex-instruction ,
+    16-bit-registers sp ,
+  ] seq* [ one-param ] action ;
 
 : DEC-(RR)-instruction ( -- parser )
-  "DEC-(RR)" "DEC" complex-instruction  
-  16-bit-registers indirect sp <&>
-  just [ first2 swap curry ] <@ ;
+  [
+    "DEC-(RR)" "DEC" complex-instruction ,
+    16-bit-registers indirect sp ,
+  ] seq* [ one-param ] action ;
 
 : POP-RR-instruction ( -- parser )
-  "POP-RR" "POP" complex-instruction  all-registers sp <&> 
-  just [ first2 swap curry ] <@ ;
+  [
+    "POP-RR" "POP" complex-instruction ,
+    all-registers sp ,
+  ] seq* [ one-param ] action ;
 
 : PUSH-RR-instruction ( -- parser )
-  "PUSH-RR" "PUSH" complex-instruction  all-registers sp <&> 
-  just [ first2 swap curry ] <@ ;
+  [
+    "PUSH-RR" "PUSH" complex-instruction ,
+    all-registers sp ,
+  ] seq* [ one-param ] action ;
 
 : INC-R-instruction ( -- parser )
-  "INC-R" "INC" complex-instruction  8-bit-registers sp <&> 
-  just [ first2 swap curry ] <@ ;
+  [
+    "INC-R" "INC" complex-instruction ,
+    8-bit-registers sp ,
+  ] seq* [ one-param ] action ;
 
 : INC-RR-instruction ( -- parser )
-  "INC-RR" "INC" complex-instruction  16-bit-registers sp <&> 
-  just [ first2 swap curry ] <@ ;
+  [
+    "INC-RR" "INC" complex-instruction ,
+    16-bit-registers sp ,
+  ] seq* [ one-param ] action ;
    
 : INC-(RR)-instruction  ( -- parser )
-  "INC-(RR)" "INC" complex-instruction
-  all-registers indirect sp <&> just [ first2 swap curry ] <@ ;
+  [
+    "INC-(RR)" "INC" complex-instruction ,
+    all-registers indirect sp ,
+  ] seq* [ one-param ] action ;
 
 : RET-F|FF-instruction ( -- parser )
-  "RET-F|FF" "RET" complex-instruction  all-flags sp <&> 
-  just [ first2 swap curry ] <@ ;
+  [
+    "RET-F|FF" "RET" complex-instruction ,  
+    all-flags sp ,
+  ] seq* [ one-param ] action ;
 
 : AND-N-instruction ( -- parser )
-  "AND-N" "AND" complex-instruction
-  "n" token sp <&
-  just [ { } clone swap curry  ] <@ ;
+  [
+    "AND-N" "AND" complex-instruction ,
+    "n" token sp hide ,
+  ] seq* [ no-params ] action ;
 
 : AND-R-instruction  ( -- parser )
-  "AND-R" "AND" complex-instruction
-  8-bit-registers sp <&> just [ first2 swap curry ] <@ ;
+  [
+    "AND-R" "AND" complex-instruction ,
+    8-bit-registers sp ,
+  ] seq* [ one-param ] action ;
 
 : AND-(RR)-instruction  ( -- parser )
-  "AND-(RR)" "AND" complex-instruction
-  16-bit-registers indirect sp <&> just [ first2 swap curry ] <@ ;
+  [
+    "AND-(RR)" "AND" complex-instruction ,
+    16-bit-registers indirect sp ,
+  ] seq* [ one-param ] action ;
 
 : XOR-N-instruction ( -- parser )
-  "XOR-N" "XOR" complex-instruction
-  "n" token sp <&
-  just [ { } clone swap curry  ] <@ ;
+  [
+    "XOR-N" "XOR" complex-instruction ,
+    "n" token sp hide ,
+  ] seq* [ no-params  ] action ;
 
 : XOR-R-instruction  ( -- parser )
-  "XOR-R" "XOR" complex-instruction
-  8-bit-registers sp <&> just [ first2 swap curry ] <@ ;
+  [
+    "XOR-R" "XOR" complex-instruction ,
+    8-bit-registers sp ,
+  ] seq* [ one-param ] action ;
 
 : XOR-(RR)-instruction  ( -- parser )
-  "XOR-(RR)" "XOR" complex-instruction
-  16-bit-registers indirect sp <&> just [ first2 swap curry ] <@ ;
+  [
+    "XOR-(RR)" "XOR" complex-instruction ,
+    16-bit-registers indirect sp ,
+  ] seq* [ one-param ] action ;
 
 : OR-N-instruction ( -- parser )
-  "OR-N" "OR" complex-instruction
-  "n" token sp <&
-  just [ { } clone swap curry  ] <@ ;
+  [
+    "OR-N" "OR" complex-instruction ,
+    "n" token sp hide ,
+  ] seq* [ no-params  ] action ;
 
 : OR-R-instruction  ( -- parser )
-  "OR-R" "OR" complex-instruction
-  8-bit-registers sp <&> just [ first2 swap curry ] <@ ;
+  [
+    "OR-R" "OR" complex-instruction ,
+    8-bit-registers sp ,
+  ] seq* [ one-param ] action ;
 
 : OR-(RR)-instruction  ( -- parser )
-  "OR-(RR)" "OR" complex-instruction
-  16-bit-registers indirect sp <&> just [ first2 swap curry ] <@ ;
+  [
+    "OR-(RR)" "OR" complex-instruction ,
+    16-bit-registers indirect sp ,
+  ] seq* [ one-param ] action ;
 
 : CP-N-instruction ( -- parser )
-  "CP-N" "CP" complex-instruction
-  "n" token sp <&
-  just [ { } clone swap curry  ] <@ ;
+  [
+    "CP-N" "CP" complex-instruction ,
+    "n" token sp hide ,
+  ] seq* [ no-params ] action ;
 
 : CP-R-instruction  ( -- parser )
-  "CP-R" "CP" complex-instruction
-  8-bit-registers sp <&> just [ first2 swap curry ] <@ ;
+  [
+    "CP-R" "CP" complex-instruction ,
+    8-bit-registers sp ,
+  ] seq* [ one-param ] action ;
 
 : CP-(RR)-instruction  ( -- parser )
-  "CP-(RR)" "CP" complex-instruction
-  16-bit-registers indirect sp <&> just [ first2 swap curry ] <@ ;
+  [
+    "CP-(RR)" "CP" complex-instruction ,
+    16-bit-registers indirect sp ,
+  ] seq* [ one-param ] action ;
 
 : ADC-R,N-instruction ( -- parser )
-  "ADC-R,N" "ADC" complex-instruction
-  8-bit-registers sp <&>
-  ",n" token <& 
-  just [ first2 swap curry ] <@ ;  
+  [
+    "ADC-R,N" "ADC" complex-instruction ,
+    8-bit-registers sp ,
+    ",n" token hide ,
+  ] seq* [ one-param ] action ;  
 
 : ADC-R,R-instruction ( -- parser )
-  "ADC-R,R" "ADC" complex-instruction
-  8-bit-registers sp <&>
-  "," token <& 
-  8-bit-registers <&>
-  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
+  [
+    "ADC-R,R" "ADC" complex-instruction ,
+    8-bit-registers sp ,
+    "," token hide , 
+    8-bit-registers ,
+  ] seq* [ two-params ] action ;  
 
 : ADC-R,(RR)-instruction ( -- parser )
-  "ADC-R,(RR)" "ADC" complex-instruction
-  8-bit-registers sp <&>
-  "," token <& 
-  16-bit-registers indirect <&>
-  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
+  [
+    "ADC-R,(RR)" "ADC" complex-instruction ,
+    8-bit-registers sp ,
+    "," token hide , 
+    16-bit-registers indirect ,
+  ] seq* [ two-params ] action ;  
 
 : SBC-R,N-instruction ( -- parser )
-  "SBC-R,N" "SBC" complex-instruction
-  8-bit-registers sp <&>
-  ",n" token <& 
-  just [ first2 swap curry ] <@ ;  
+  [
+    "SBC-R,N" "SBC" complex-instruction ,
+    8-bit-registers sp ,
+    ",n" token hide ,
+  ] seq* [ one-param ] action ;  
 
 : SBC-R,R-instruction ( -- parser )
-  "SBC-R,R" "SBC" complex-instruction
-  8-bit-registers sp <&>
-  "," token <& 
-  8-bit-registers <&>
-  just [ first2 swap first2 swap >r prepend r> curry  ] <@ ;  
+  [
+    "SBC-R,R" "SBC" complex-instruction ,
+    8-bit-registers sp ,
+    "," token hide ,
+    8-bit-registers ,
+  ] seq* [ two-params  ] action ;  
 
 : SBC-R,(RR)-instruction ( -- parser )
-  "SBC-R,(RR)" "SBC" complex-instruction
-  8-bit-registers sp <&>
-  "," token <& 
-  16-bit-registers indirect  <&>
-  just [ first2 swap first2 swap >r prepend r> curry  ] <@ ;  
+  [
+    "SBC-R,(RR)" "SBC" complex-instruction ,
+    8-bit-registers sp ,
+    "," token hide ,
+    16-bit-registers indirect ,
+  ] seq* [ two-params  ] action ;  
 
 : SUB-R-instruction ( -- parser )
-  "SUB-R" "SUB" complex-instruction
-  8-bit-registers sp <&>
-  just [ first2 swap curry ] <@ ;  
+  [
+    "SUB-R" "SUB" complex-instruction ,
+    8-bit-registers sp ,
+  ] seq* [ one-param ] action ;  
 
 : SUB-(RR)-instruction ( -- parser )
-  "SUB-(RR)" "SUB" complex-instruction
-  16-bit-registers indirect sp <&>
-  just [ first2 swap curry ] <@ ;  
+  [
+    "SUB-(RR)" "SUB" complex-instruction ,
+    16-bit-registers indirect sp ,
+  ] seq* [ one-param ] action ;  
 
 : SUB-N-instruction ( -- parser )
-  "SUB-N" "SUB" complex-instruction
-  "n" token sp <&
-  just [ { } clone swap curry  ] <@ ;
+  [
+    "SUB-N" "SUB" complex-instruction ,
+    "n" token sp hide ,
+  ] seq* [ no-params  ] action ;
 
 : ADD-R,N-instruction ( -- parser )
-  "ADD-R,N" "ADD" complex-instruction
-  8-bit-registers sp <&>
-  ",n" token <& 
-  just [ first2 swap curry ] <@ ;  
+  [
+    "ADD-R,N" "ADD" complex-instruction ,
+    8-bit-registers sp ,
+    ",n" token hide ,
+  ] seq* [ one-param ] action ;  
 
 : ADD-R,R-instruction ( -- parser )
-  "ADD-R,R" "ADD" complex-instruction
-  8-bit-registers sp <&>
-  "," token <& 
-  8-bit-registers <&>
-  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
+  [
+    "ADD-R,R" "ADD" complex-instruction ,
+    8-bit-registers sp ,
+    "," token hide ,
+    8-bit-registers ,
+  ] seq* [ two-params ] action ;  
 
 : ADD-RR,RR-instruction ( -- parser )
-  "ADD-RR,RR" "ADD" complex-instruction
-  16-bit-registers sp <&>
-  "," token <& 
-  16-bit-registers <&>
-  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
+  [
+    "ADD-RR,RR" "ADD" complex-instruction ,
+    16-bit-registers sp ,
+    "," token hide , 
+    16-bit-registers ,
+  ] seq* [ two-params ] action ;  
 
 : ADD-R,(RR)-instruction ( -- parser )
-  "ADD-R,(RR)" "ADD" complex-instruction
-  8-bit-registers sp <&>
-  "," token <& 
-  16-bit-registers indirect <&>
-  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
+  [
+    "ADD-R,(RR)" "ADD" complex-instruction ,
+    8-bit-registers sp ,
+    "," token hide ,
+    16-bit-registers indirect ,
+  ] seq* [ two-params ] action ;  
   
 : LD-RR,NN-instruction ( -- parser )
   #! LD BC,nn
-  "LD-RR,NN" "LD" complex-instruction
-  16-bit-registers sp <&>
-  ",nn" token <& 
-  just [ first2 swap curry ] <@ ;
+  [
+    "LD-RR,NN" "LD" complex-instruction ,
+    16-bit-registers sp ,
+    ",nn" token hide ,
+  ] seq* [ one-param ] action ;
 
 : LD-R,N-instruction ( -- parser )
   #! LD B,n
-  "LD-R,N" "LD" complex-instruction
-  8-bit-registers sp <&>
-  ",n" token <& 
-  just [ first2 swap curry ] <@ ;
+  [
+    "LD-R,N" "LD" complex-instruction ,
+    8-bit-registers sp ,
+    ",n" token hide ,
+  ] seq* [ one-param ] action ;
   
-: LD-(RR),N-instruction ( -- parser )
-  "LD-(RR),N" "LD" complex-instruction
-  16-bit-registers indirect sp <&> 
-  ",n" token <&
-  just [ first2 swap curry ] <@ ;
+: LD-(RR),N-instruction ( -- parser ) 
+  [
+    "LD-(RR),N" "LD" complex-instruction ,
+    16-bit-registers indirect sp , 
+    ",n" token hide ,
+  ] seq* [ one-param ] action ;
 
 : LD-(RR),R-instruction ( -- parser )
   #! LD (BC),A
-  "LD-(RR),R" "LD" complex-instruction
-  16-bit-registers indirect sp <&> 
-  "," token <&
-  8-bit-registers <&>
-  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
+  [
+    "LD-(RR),R" "LD" complex-instruction ,
+    16-bit-registers indirect sp ,
+    "," token hide ,
+    8-bit-registers ,
+  ] seq* [ two-params ] action ;  
 
 : LD-R,R-instruction ( -- parser )
-  "LD-R,R" "LD" complex-instruction
-  8-bit-registers sp <&> 
-  "," token <&
-  8-bit-registers <&>
-  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
+  [
+    "LD-R,R" "LD" complex-instruction ,
+    8-bit-registers sp ,
+    "," token hide ,
+    8-bit-registers ,
+  ] seq* [ two-params ] action ;  
 
 : LD-RR,RR-instruction ( -- parser )
-  "LD-RR,RR" "LD" complex-instruction
-  16-bit-registers sp <&> 
-  "," token <&
-  16-bit-registers <&>
-  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
+  [
+    "LD-RR,RR" "LD" complex-instruction ,
+    16-bit-registers sp ,
+    "," token hide ,
+    16-bit-registers ,
+  ] seq* [ two-params ] action ;  
 
 : LD-R,(RR)-instruction ( -- parser )
-  "LD-R,(RR)" "LD" complex-instruction
-  8-bit-registers sp <&> 
-  "," token <&
-  16-bit-registers indirect <&>
-  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
+  [
+    "LD-R,(RR)" "LD" complex-instruction ,
+    8-bit-registers sp ,
+    "," token hide ,
+    16-bit-registers indirect ,
+  ] seq* [ two-params ] action ;  
 
 : LD-(NN),RR-instruction ( -- parser )
-  "LD-(NN),RR" "LD" complex-instruction
-  "nn" token indirect sp <&
-  "," token <&
-  16-bit-registers <&>
-  just [ first2 swap curry ] <@ ;
+  [
+    "LD-(NN),RR" "LD" complex-instruction ,
+    "nn" token indirect sp hide ,
+    "," token hide ,
+    16-bit-registers ,
+  ] seq* [ one-param ] action ;
 
 : LD-(NN),R-instruction ( -- parser )
-  "LD-(NN),R" "LD" complex-instruction
-  "nn" token indirect sp <&
-  "," token <&
-  8-bit-registers <&>
-  just [ first2 swap curry ] <@ ;
+  [
+    "LD-(NN),R" "LD" complex-instruction ,
+    "nn" token indirect sp hide ,
+    "," token hide ,
+    8-bit-registers ,
+  ] seq* [ one-param ] action ;
 
 : LD-RR,(NN)-instruction ( -- parser )
-  "LD-RR,(NN)" "LD" complex-instruction
-  16-bit-registers sp <&>
-  "," token <&
-  "nn" token indirect <&
-  just [ first2 swap curry ] <@ ;
+  [
+    "LD-RR,(NN)" "LD" complex-instruction ,
+    16-bit-registers sp ,
+    "," token hide ,
+    "nn" token indirect hide ,
+  ] seq* [ one-param ] action ;
 
 : LD-R,(NN)-instruction ( -- parser )
-  "LD-R,(NN)" "LD" complex-instruction
-  8-bit-registers sp <&>
-  "," token <&
-  "nn" token indirect <&
-  just [ first2 swap curry ] <@ ;
+  [
+    "LD-R,(NN)" "LD" complex-instruction ,
+    8-bit-registers sp ,
+    "," token hide ,
+    "nn" token indirect hide ,
+  ] seq* [ one-param ] action ;
 
 : OUT-(N),R-instruction ( -- parser )
-  "OUT-(N),R" "OUT" complex-instruction
-  "n" token indirect sp <&
-  "," token <&
-  8-bit-registers <&>
-  just [ first2 swap curry ] <@ ;
+  [
+    "OUT-(N),R" "OUT" complex-instruction ,
+    "n" token indirect sp hide ,
+    "," token hide ,
+    8-bit-registers ,
+  ] seq* [ one-param ] action ;
 
 : IN-R,(N)-instruction ( -- parser )
-  "IN-R,(N)" "IN" complex-instruction
-  8-bit-registers sp <&>
-  "," token <&
-  "n" token indirect <&
-  just [ first2 swap curry ] <@ ;
+  [
+    "IN-R,(N)" "IN" complex-instruction ,
+    8-bit-registers sp ,
+    "," token hide ,
+    "n" token indirect hide ,
+  ] seq* [ one-param ] action ;
 
 : EX-(RR),RR-instruction ( -- parser )
-  "EX-(RR),RR" "EX" complex-instruction
-  16-bit-registers indirect sp <&> 
-  "," token <&
-  16-bit-registers <&>
-  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
+  [
+    "EX-(RR),RR" "EX" complex-instruction ,
+    16-bit-registers indirect sp , 
+    "," token hide ,
+    16-bit-registers ,
+  ] seq* [ two-params ] action ;  
 
 : EX-RR,RR-instruction ( -- parser )
-  "EX-RR,RR" "EX" complex-instruction
-  16-bit-registers sp <&> 
-  "," token <&
-  16-bit-registers <&>
-  just [ first2 swap first2 swap >r prepend r> curry ] <@ ;  
+  [
+    "EX-RR,RR" "EX" complex-instruction ,
+    16-bit-registers sp , 
+    "," token hide ,
+    16-bit-registers ,
+  ] seq* [ two-params ] action ;  
 
 : 8080-generator-parser ( -- parser )
-  NOP-instruction 
-  RST-0-instruction <|> 
-  RST-8-instruction <|> 
-  RST-10H-instruction <|> 
-  RST-18H-instruction <|> 
-  RST-20H-instruction <|> 
-  RST-28H-instruction <|> 
-  RST-30H-instruction <|> 
-  RST-38H-instruction <|> 
-  JP-F|FF,NN-instruction <|> 
-  JP-NN-instruction <|> 
-  JP-(RR)-instruction <|> 
-  CALL-F|FF,NN-instruction <|> 
-  CALL-NN-instruction <|> 
-  CPL-instruction <|> 
-  CCF-instruction <|> 
-  SCF-instruction <|> 
-  DAA-instruction <|> 
-  RLA-instruction <|> 
-  RRA-instruction <|> 
-  RLCA-instruction <|> 
-  RRCA-instruction <|> 
-  HALT-instruction <|> 
-  DI-instruction <|> 
-  EI-instruction <|> 
-  AND-N-instruction <|> 
-  AND-R-instruction <|> 
-  AND-(RR)-instruction <|> 
-  XOR-N-instruction <|> 
-  XOR-R-instruction <|> 
-  XOR-(RR)-instruction <|> 
-  OR-N-instruction <|> 
-  OR-R-instruction <|> 
-  OR-(RR)-instruction <|> 
-  CP-N-instruction <|> 
-  CP-R-instruction <|> 
-  CP-(RR)-instruction <|> 
-  DEC-RR-instruction <|> 
-  DEC-R-instruction <|> 
-  DEC-(RR)-instruction <|> 
-  POP-RR-instruction <|> 
-  PUSH-RR-instruction <|> 
-  INC-RR-instruction <|> 
-  INC-R-instruction <|> 
-  INC-(RR)-instruction <|>
-  LD-RR,NN-instruction <|> 
-  LD-R,N-instruction <|> 
-  LD-R,R-instruction <|> 
-  LD-RR,RR-instruction <|> 
-  LD-(RR),N-instruction <|> 
-  LD-(RR),R-instruction <|> 
-  LD-R,(RR)-instruction <|> 
-  LD-(NN),RR-instruction <|> 
-  LD-(NN),R-instruction <|> 
-  LD-RR,(NN)-instruction <|> 
-  LD-R,(NN)-instruction <|> 
-  ADC-R,N-instruction <|> 
-  ADC-R,R-instruction <|> 
-  ADC-R,(RR)-instruction <|> 
-  ADD-R,N-instruction <|> 
-  ADD-R,R-instruction <|> 
-  ADD-RR,RR-instruction <|> 
-  ADD-R,(RR)-instruction <|> 
-  SBC-R,N-instruction <|> 
-  SBC-R,R-instruction <|> 
-  SBC-R,(RR)-instruction <|> 
-  SUB-R-instruction <|> 
-  SUB-(RR)-instruction <|> 
-  SUB-N-instruction <|> 
-  RET-F|FF-instruction <|> 
-  RET-NN-instruction <|>
-  OUT-(N),R-instruction <|>
-  IN-R,(N)-instruction <|>
-  EX-(RR),RR-instruction <|>
-  EX-RR,RR-instruction <|>
-  just ;
+  [ 
+    NOP-instruction  ,
+    RST-0-instruction , 
+    RST-8-instruction , 
+    RST-10H-instruction , 
+    RST-18H-instruction , 
+    RST-20H-instruction , 
+    RST-28H-instruction , 
+    RST-30H-instruction , 
+    RST-38H-instruction , 
+    JP-F|FF,NN-instruction , 
+    JP-NN-instruction , 
+    JP-(RR)-instruction , 
+    CALL-F|FF,NN-instruction , 
+    CALL-NN-instruction , 
+    CPL-instruction , 
+    CCF-instruction , 
+    SCF-instruction , 
+    DAA-instruction , 
+    RLA-instruction , 
+    RRA-instruction , 
+    RLCA-instruction , 
+    RRCA-instruction , 
+    HALT-instruction , 
+    DI-instruction , 
+    EI-instruction , 
+    AND-N-instruction , 
+    AND-R-instruction , 
+    AND-(RR)-instruction , 
+    XOR-N-instruction , 
+    XOR-R-instruction , 
+    XOR-(RR)-instruction , 
+    OR-N-instruction , 
+    OR-R-instruction , 
+    OR-(RR)-instruction , 
+    CP-N-instruction , 
+    CP-R-instruction , 
+    CP-(RR)-instruction , 
+    DEC-RR-instruction , 
+    DEC-R-instruction , 
+    DEC-(RR)-instruction , 
+    POP-RR-instruction , 
+    PUSH-RR-instruction , 
+    INC-RR-instruction , 
+    INC-R-instruction , 
+    INC-(RR)-instruction ,
+    LD-RR,NN-instruction , 
+    LD-RR,RR-instruction , 
+    LD-R,N-instruction , 
+    LD-R,R-instruction , 
+    LD-(RR),N-instruction , 
+    LD-(RR),R-instruction , 
+    LD-R,(RR)-instruction , 
+    LD-(NN),RR-instruction , 
+    LD-(NN),R-instruction , 
+    LD-RR,(NN)-instruction , 
+    LD-R,(NN)-instruction , 
+    ADC-R,(RR)-instruction , 
+    ADC-R,N-instruction , 
+    ADC-R,R-instruction , 
+    ADD-R,N-instruction , 
+    ADD-R,(RR)-instruction , 
+    ADD-R,R-instruction , 
+    ADD-RR,RR-instruction , 
+    SBC-R,N-instruction , 
+    SBC-R,R-instruction , 
+    SBC-R,(RR)-instruction , 
+    SUB-R-instruction , 
+    SUB-(RR)-instruction , 
+    SUB-N-instruction , 
+    RET-F|FF-instruction , 
+    RET-NN-instruction ,
+    OUT-(N),R-instruction ,
+    IN-R,(N)-instruction ,
+    EX-(RR),RR-instruction ,
+    EX-RR,RR-instruction ,
+  ] choice* [ call ] action ;
 
 : instruction-quotations ( string -- emulate-quot )
   #! Given an instruction string, return the emulation quotation for
   #! it. This will later be expanded to produce the disassembly and
   #! assembly quotations.
-  8080-generator-parser some parse call ;
+  8080-generator-parser parse ;
 
 SYMBOL: last-instruction
 SYMBOL: last-opcode

@@ -99,6 +99,7 @@ PEG: escaper ( string -- ast )
     "\\t" token [ drop "\t" ] action ,
     "\\n" token [ drop "\n" ] action ,
     "\\r" token [ drop "\r" ] action ,
+    "\\\\" token [ drop "\\" ] action ,
   ] choice* any-char-parser 2array choice repeat0 ;
 
 : replace-escapes ( string -- string )
@@ -503,7 +504,7 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
   ] [ ] make box ;
 
 : transform-ebnf ( string -- object )
-  'ebnf' parse parse-result-ast transform ;
+  'ebnf' parse transform ;
 
 : check-parse-result ( result -- result )
   dup [
@@ -517,12 +518,18 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
     "Could not parse EBNF" throw
   ] if ;
 
-: ebnf>quot ( string -- hashtable quot )
-  'ebnf' parse check-parse-result 
-  parse-result-ast transform dup dup parser [ main swap at compile ] with-variable
-  [ compiled-parse ] curry [ with-scope ] curry ;
+: parse-ebnf ( string -- hashtable )
+  'ebnf' (parse) check-parse-result ast>> transform ;
 
-: [EBNF "EBNF]" reset-tokenizer parse-multiline-string ebnf>quot nip parsed reset-tokenizer ; parsing
+: ebnf>quot ( string -- hashtable quot )
+  parse-ebnf dup dup parser [ main swap at compile ] with-variable
+  [ compiled-parse ] curry [ with-scope ast>> ] curry ;
+
+: <EBNF "EBNF>" reset-tokenizer parse-multiline-string parse-ebnf main swap at  
+  parsed reset-tokenizer ; parsing
+
+: [EBNF "EBNF]" reset-tokenizer parse-multiline-string ebnf>quot nip 
+  parsed \ call parsed reset-tokenizer ; parsing
 
 : EBNF: 
   reset-tokenizer CREATE-WORD dup ";EBNF" parse-multiline-string  

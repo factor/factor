@@ -81,8 +81,7 @@ GENERIC: write-full-response ( request response -- )
 
 : ensure-domain ( cookie -- cookie )
     [
-        request get url>>
-        host>> dup "localhost" =
+        url get host>> dup "localhost" =
         [ drop ] [ or ] if
     ] change-domain ;
 
@@ -189,7 +188,7 @@ LOG: httpd-header NOTICE
     "/" split harvest ;
 
 : init-request ( request -- )
-    request set
+    [ request set ] [ url>> url set ] bi
     V{ } clone responder-nesting set ;
 
 : dispatch-request ( request -- response )
@@ -224,7 +223,7 @@ LOG: httpd-benchmark DEBUG
 
 : ?benchmark ( quot -- )
     benchmark? get [
-        [ benchmark ] [ first ] bi request get url>> rot 3array
+        [ benchmark ] [ first ] bi url get rot 3array
         httpd-benchmark
     ] [ call ] if ; inline
 
@@ -235,7 +234,7 @@ M: http-server handle-client*
     [
         64 1024 * limit-input
         ?refresh-all
-        read-request
+        [ read-request ] ?benchmark
         [ do-request ] ?benchmark
         [ do-response ] ?benchmark
     ] with-destructors ;

@@ -40,7 +40,7 @@ PRIVATE>
 ! -------------------
 
 : fib-upto* ( n -- seq )
-    0 1 [ pick over >= ] [ tuck + dup ] [ ] unfold 3nip
+    0 1 [ pick over >= ] [ tuck + dup ] [ ] produce 3nip
     but-last-slice { 0 1 } prepend ;
 
 : euler002a ( -- answer )

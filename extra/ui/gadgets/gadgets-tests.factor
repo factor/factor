@@ -1,8 +1,8 @@
 IN: ui.gadgets.tests
-USING: ui.gadgets ui.gadgets.packs ui.gadgets.worlds tools.test
-namespaces models kernel dlists dequeues math sets
-math.parser ui sequences hashtables assocs io arrays
-prettyprint io.streams.string ;
+USING: accessors ui.gadgets ui.gadgets.packs ui.gadgets.worlds
+tools.test namespaces models kernel dlists dequeues math sets
+math.parser ui sequences hashtables assocs io arrays prettyprint
+io.streams.string ;
 
 [ T{ rect f { 10 10 } { 20 20 } } ]
 [
@@ -35,13 +35,6 @@ prettyprint io.streams.string ;
     T{ rect f { 120 120 } { 40 40 } }
     intersects?
 ] unit-test
-
-TUPLE: fooey ;
-
-C: <fooey> fooey
-
-[ ] [ <gadget> <fooey> set-gadget-delegate ] unit-test
-[ ] [ f <fooey> set-gadget-delegate ] unit-test
 
 [ { 300 300 } ]
 [
@@ -111,10 +104,10 @@ C: <fooey> fooey
 
 [ t ] [ { 25 25 } "g1" get pick-up "g4" get eq? ] unit-test
 
-TUPLE: mock-gadget graft-called ungraft-called ;
+TUPLE: mock-gadget < gadget graft-called ungraft-called ;
 
-: <mock-gadget>
-    0 0 mock-gadget boa <gadget> over set-delegate ;
+: <mock-gadget> ( -- gadget )
+    mock-gadget new-gadget 0 >>graft-called 0 >>ungraft-called ;
 
 M: mock-gadget graft*
     dup mock-gadget-graft-called 1+

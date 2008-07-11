@@ -1,4 +1,4 @@
-USING: combinators.short-circuit math math.order math.parser kernel combinators.lib
+USING: combinators.short-circuit math math.order math.parser kernel
 sequences sequences.deep peg peg.parsers assocs arrays
 hashtables strings unicode.case namespaces ascii ;
 IN: http.parsers

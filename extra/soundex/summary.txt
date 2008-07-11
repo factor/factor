@@ -1,0 +1,1 @@
+Soundex is a phonetic algorithm for indexing names by sound

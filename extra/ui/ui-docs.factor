@@ -1,8 +1,6 @@
-USING: ui.gadgets.worlds ui.gadgets ui.backend help.markup
-help.syntax strings quotations debugger io.styles namespaces
-ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids
-ui.gadgets.frames ui.gadgets.books ui.gadgets.panes
-ui.gadgets.incremental ;
+USING: help.markup help.syntax strings quotations debugger
+io.styles namespaces ui.backend ui.gadgets ui.gadgets.worlds
+ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids ;
 IN: ui
 
 HELP: windows
@@ -76,14 +74,14 @@ ARTICLE: "ui-glossary" "UI glossary"
             }
         }
     }
-    { "gadget" { "a graphical element which responds to user input. Gadgets are tuples which (directly or indirectly) delegate to " { $link gadget } " instances." } }
+    { "gadget" { "a graphical element which responds to user input. Gadgets are tuples which (directly or indirectly) inherit from " { $link gadget } "." } }
     { "label specifier" { "a string, " { $link f } " or a gadget. See " { $link "ui.gadgets.buttons" } } }
     { "orientation specifier" { "one of " { $snippet "{ 0 1 }" } " or " { $snippet "{ 1 0 }" } ", with the former denoting vertical orientation and the latter denoting horizontal. Using a vector instead of symbolic constants allows these values to be directly useful in co-ordinate calculations" } }
     { "point" "a pair of integers denoting a pixel location on screen" }
 } ;
 
 ARTICLE: "building-ui" "Building user interfaces"
-"A gadget is a graphical element which responds to user input. Gadgets are implemented as tuples which (directly or indirectly) delegate to instances of " { $link gadget } ", which in turn delegates to " { $link rect } "."
+"A gadget is a graphical element which responds to user input. Gadgets are implemented as tuples which (directly or indirectly) inherit from " { $link gadget } ", which in turn inherits from " { $link rect } "."
 { $subsection gadget }
 "Gadgets are arranged in a hierarchy, and all visible gadgets except for instances of " { $link world } " are contained in a parent gadget, stored in the " { $link gadget-parent } " slot."
 { $subsection "ui-geometry" }
@@ -106,7 +104,7 @@ ARTICLE: "gadgets" "Pre-made UI gadgets"
 { $subsection "ui.gadgets.lists" } ;
 
 ARTICLE: "ui-geometry" "Gadget geometry"
-"Instances of " { $link gadget } " (and thus all gadgets) delegate to rectangles which specify the gadget's bounding box:"
+"The " { $link gadget } " class inherits from the " { $link rect } " class, and thus all gadgets have a bounding box:"
 { $subsection rect }
 "Rectangles can be taken apart:"
 { $subsection rect-loc }
@@ -237,104 +235,18 @@ $nl
 $nl
 "Gadget construction combinators whose names are prefixed with " { $snippet "make-" } " construct new gadgets and push them on the stack. The primitive combinator used to define all combinators of this form:"
 { $subsection make-gadget }
-"Words such as " { $link gadget, } " and " { $link track, } " access the gadget through the " { $link make-gadget } " variable."
+"Words such as " { $link gadget, } " and " { $link track, } " access the gadget through the " { $link gadget } " variable."
 $nl
-"Combinators whose names are prefixed with " { $snippet "build-" } " take a tuple as input, and construct a new gadget which the tuple will delegate to. The primitive combinator used to define all combinators of this form:"
-{ $subsection build-gadget }
-"In this case, the new gadget is stored in both the " { $link make-gadget } " and " { $link gadget } " variables."
-$nl
-"A combinator which stores a gadget in the " { $link gadget } " variable; it is used by " { $link build-gadget } ":"
+"A combinator which stores a gadget in the " { $link gadget } " variable:"
 { $subsection with-gadget }
-"The following words access the " { $link gadget } " variable; they can be used from " { $link with-gadget } " and " { $link build-gadget } " to store child gadgets in tuple slots:"
+"The following words access the " { $link gadget } " variable; they can be used from " { $link with-gadget } " to store child gadgets in tuple slots:"
 { $subsection g }
 { $subsection g-> } ;
-
-ARTICLE: "ui-pack-layout" "Pack layouts"
-"Pack gadgets layout their children along a single axis."
-{ $subsection pack }
-"Creating empty packs:"
-{ $subsection <pack> }
-{ $subsection <pile> }
-{ $subsection <shelf> }
-"Creating packs using a combinator:"
-{ $subsection make-pile }
-{ $subsection make-filled-pile }
-{ $subsection make-shelf }
-{ $subsection gadget, }
-"For more control, custom layouts can reuse portions of pack layout logic:"
-{ $subsection pack-pref-dim }
-{ $subsection pack-layout } ;
-
-ARTICLE: "ui-track-layout" "Track layouts"
-"Track gadgets are like " { $link "ui-pack-layout" } " except each child is resized to a fixed multiple of the track's dimension."
-{ $subsection track }
-"Creating empty tracks:"
-{ $subsection <track> }
-"Adding children:"
-{ $subsection track-add }
-"Creating new tracks using a combinator:"
-{ $subsection make-track }
-{ $subsection build-track }
-{ $subsection track, }
-"New gadgets can be defined which delegate to tracks for layout:"
-{ $subsection build-track } ;
-
-ARTICLE: "ui-grid-layout" "Grid layouts"
-"Grid gadgets layout their children in a rectangular grid."
-{ $subsection grid }
-"Creating grids from a fixed set of gadgets:"
-{ $subsection <grid> }
-"Managing chidren:"
-{ $subsection grid-add }
-{ $subsection grid-remove }
-{ $subsection grid-child } ;
-
-ARTICLE: "ui-frame-layout" "Frame layouts"
-"Frames resemble " { $link "ui-grid-layout" } " except the size of grid is fixed at 3x3, and the center gadget fills up any available space. Because frames delegate to grids, grid layout words can be used to add and remove children."
-{ $subsection frame }
-"Creating empty frames:"
-{ $subsection <frame> }
-"Creating new frames using a combinator:"
-{ $subsection make-frame }
-{ $subsection build-frame }
-{ $subsection frame, }
-"New gadgets can be defined which delegate to frames for layout:"
-{ $subsection build-frame }
-"A set of mnemonic words for the positions on a frame's 3x3 grid; these words push values which may be passed to " { $link grid-add } " or " { $link frame, } ":"
-{ $subsection @center }
-{ $subsection @left }
-{ $subsection @right }
-{ $subsection @top }
-{ $subsection @bottom }
-{ $subsection @top-left }
-{ $subsection @top-right }
-{ $subsection @bottom-left }
-{ $subsection @bottom-right } ;
-
-ARTICLE: "ui-book-layout" "Book layouts"
-"Books can contain any number of children, and display one child at a time."
-{ $subsection book }
-{ $subsection <book> } ;
 
 ARTICLE: "ui-null-layout" "Manual layouts"
 "When automatic layout is not appropriate, gadgets can be added to a parent with no layout policy, and then positioned and sized manually:"
 { $subsection set-rect-loc }
 { $subsection set-gadget-dim } ;
-
-ARTICLE: "ui-incremental-layout" "Incremental layouts"
-"Incremental layout gadgets are like " { $link "ui-pack-layout" } " except the relayout operation after adding a new child can be done in constant time."
-$nl
-"With all layouts, relayout requests from consecutive additions and removals are of children are coalesced and result in only one relayout operation being performed, however the run time of the relayout operation itself depends on the number of children."
-$nl
-"Incremental layout is used by " { $link pane } " gadgets to ensure that new lines of output does not take longer to display when the pane already has previous output."
-$nl
-"Incremental layouts are not a general replacement for " { $link "ui-pack-layout" } " and there are some limitations to be aware of."
-{ $subsection incremental }
-{ $subsection <incremental> }
-"Children are added and removed with a special set of words which perform necessary relayout immediately:"
-{ $subsection add-incremental }
-{ $subsection clear-incremental }
-"Calling " { $link unparent } " to remove a child of an incremental layout is permitted, however the relayout following the removal will not be performed in constant time, because all gadgets following the removed gadget need to be moved." ;
 
 ARTICLE: "ui-layout-impl" "Implementing layout gadgets"
 "The relayout process proceeds top-down, with parents laying out their children, which in turn lay out their children. Custom layout policy is implemented by defining a method on a generic word:"
@@ -349,7 +261,7 @@ ARTICLE: "ui-layout-impl" "Implementing layout gadgets"
 { $subsection max-dim }
 { $subsection dim-sum }
 { $warning
-    "When implementing the " { $link layout* } " generic word for a gadget which intends to delegate to another layout, the " { $link children-on } " word might have to be re-implemented as well."
+    "When implementing the " { $link layout* } " generic word for a gadget which inherits from another layout, the " { $link children-on } " word might have to be re-implemented as well."
     $nl
     "For example, suppose you want a " { $link grid } " layout which also displays a popup gadget on top. The implementation of " { $link children-on } " for the " { $link grid } " class determines which children of the grid are visible at one time, and this will never include your popup, so it will not be rendered, nor will it respond to gestures. The solution is to re-implement " { $link children-on } " on your class."
 } ;
@@ -359,10 +271,8 @@ ARTICLE: "new-gadgets" "Implementing new gadgets"
 $nl
 "Bare gadgets can be constructed directly, which is useful if all you need is a custom appearance with no further behavior (see " { $link "ui-pen-protocol" } "):"
 { $subsection <gadget> }
-"You can construct a new tuple which delegates to a bare gadget:"
-{ $subsection construct-gadget }
-"You can also delegate a tuple to an existing gadget:"
-{ $subsection set-gadget-delegate }
+"New gadgets are defined as subclasses of an existing gadget type, perhaps even " { $link gadget } " itself. A parametrized constructor should be used to construct subclasses:"
+{ $subsection new-gadget }
 "Further topics:"
 { $subsection "ui-gestures" }
 { $subsection "ui-paint" }

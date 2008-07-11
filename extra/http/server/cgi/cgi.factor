@@ -14,10 +14,10 @@ IN: http.server.cgi
 
         [ "PATH_TRANSLATED" set ] [ "SCRIPT_FILENAME" set ] bi
 
-        request get url>> path>> "SCRIPT_NAME" set
+        url get path>> "SCRIPT_NAME" set
 
-        request get url>> host>> "SERVER_NAME" set
-        request get url>> port>> number>string "SERVER_PORT" set
+        url get host>> "SERVER_NAME" set
+        url get port>> number>string "SERVER_PORT" set
         "" "PATH_INFO" set
         "" "REMOTE_HOST" set
         "" "REMOTE_ADDR" set
@@ -26,7 +26,7 @@ IN: http.server.cgi
         "" "REMOTE_IDENT" set
 
         request get method>> "REQUEST_METHOD" set
-        request get url>> query>> assoc>query "QUERY_STRING" set
+        url get query>> assoc>query "QUERY_STRING" set
         request get "cookie" header "HTTP_COOKIE" set 
 
         request get "user-agent" header "HTTP_USER_AGENT" set

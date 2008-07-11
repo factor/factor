@@ -4,7 +4,7 @@ io.windows.nt.backend windows windows.kernel32
 kernel libc math threads system
 alien.c-types alien.arrays alien.strings sequences combinators
 combinators.short-circuit ascii splitting alien strings
-assocs namespaces io.files.private accessors ;
+assocs namespaces io.files.private accessors tr ;
 IN: io.windows.nt.files
 
 M: winnt cwd
@@ -40,9 +40,11 @@ ERROR: not-absolute-path ;
         unicode-prefix prepend
     ] unless ;
 
+TR: normalize-separators "/" "\\" ;
+
 M: winnt normalize-path ( string -- string' )
     (normalize-path)
-    { { CHAR: / CHAR: \\ } } substitute
+    normalize-separators
     prepend-prefix ;
 
 M: winnt CreateFile-flags ( DWORD -- DWORD )

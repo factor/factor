@@ -420,11 +420,11 @@ PRIVATE>
 : accumulator ( quot -- quot' vec )
     V{ } clone [ [ push ] curry compose ] keep ; inline
 
-: unfold ( pred quot tail -- seq )
+: produce ( pred quot tail -- seq )
     swap accumulator >r swap while r> { } like ; inline
 
 : follow ( obj quot -- seq )
-    >r [ dup ] r> [ keep ] curry [ ] unfold nip ; inline
+    >r [ dup ] r> [ keep ] curry [ ] produce nip ; inline
 
 : prepare-index ( seq quot -- seq n quot )
     >r dup length r> ; inline

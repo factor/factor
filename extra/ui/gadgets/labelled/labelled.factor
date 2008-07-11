@@ -8,14 +8,14 @@ sequences sequences words classes.tuple ui.gadgets ui.render
 colors ;
 IN: ui.gadgets.labelled
 
-TUPLE: labelled-gadget content ;
+TUPLE: labelled-gadget < track content ;
 
 : <labelled-gadget> ( gadget title -- newgadget )
-    labelled-gadget new
+    { 0 1 } labelled-gadget new-track
     [
         <label> reverse-video-theme f track,
         g-> set-labelled-gadget-content 1 track,
-    ] { 0 1 } build-track ;
+    ] make-gadget ;
 
 M: labelled-gadget focusable-child* labelled-gadget-content ;
 
@@ -44,21 +44,16 @@ M: labelled-gadget focusable-child* labelled-gadget-content ;
         <title-label> @center frame,
     ] make-frame ;
 
-TUPLE: closable-gadget content ;
+TUPLE: closable-gadget < frame content ;
 
 : find-closable-gadget ( parent -- child )
     [ [ closable-gadget? ] is? ] find-parent ;
 
 : <closable-gadget> ( gadget title quot -- gadget )
-    closable-gadget new
+    closable-gadget new-frame 
     [
         <title-bar> @top frame,
         g-> set-closable-gadget-content @center frame,
-    ] build-frame ;
+    ] make-gadget ;
 
 M: closable-gadget focusable-child* closable-gadget-content ;
-
-: build-closable-gadget ( tuple quot title -- tuple )
-    pick >r >r with-gadget
-    r> [ find-closable-gadget unparent ] <closable-gadget> r>
-    [ set-gadget-delegate ] keep ; inline

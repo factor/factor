@@ -159,9 +159,9 @@ M: unix io-multiplex ( ms/f -- )
 ! pipe to non-blocking, and read from it instead of the real
 ! stdin. Very crufty, but it will suffice until we get native
 ! threading support at the language level.
-TUPLE: stdin control size data ;
+TUPLE: stdin control size data disposed ;
 
-M: stdin dispose
+M: stdin dispose*
     [
         [ control>> &dispose drop ]
         [ size>> &dispose drop ]
@@ -194,10 +194,10 @@ M: stdin refill
 : data-read-fd ( -- fd ) "stdin_read" f dlsym *uint ;
 
 : <stdin> ( -- stdin )
-    control-write-fd <fd> <output-port>
-    size-read-fd <fd> init-fd <input-port>
-    data-read-fd <fd>
-    stdin boa ;
+    stdin new
+        control-write-fd <fd> <output-port> >>control
+        size-read-fd <fd> init-fd <input-port> >>size
+        data-read-fd <fd> >>data ;
 
 M: unix (init-stdio) ( -- )
     <stdin> <input-port>

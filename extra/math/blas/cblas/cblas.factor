@@ -4,6 +4,7 @@ IN: math.blas.cblas
 << "cblas" {
     { [ os macosx? ] [ "libblas.dylib" "cdecl" add-library ] }
     { [ os windows? ] [ "blas.dll" "cdecl" add-library ] }
+    { [ os openbsd? ] [ "libcblas.so" "cdecl" add-library ] }
     [ "libblas.so" "cdecl" add-library ]
 } cond >>
 

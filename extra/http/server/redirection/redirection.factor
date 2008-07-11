@@ -9,7 +9,7 @@ GENERIC: relative-to-request ( url -- url' )
 M: string relative-to-request ;
 
 M: url relative-to-request
-    request get url>>
+    url get
         clone
         f >>query
     swap derive-url ensure-port ;

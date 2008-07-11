@@ -1,10 +1,10 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: continuations kernel models namespaces prettyprint ui
-ui.commands ui.gadgets ui.gadgets.labelled assocs
+USING: accessors continuations kernel models namespaces
+prettyprint ui ui.commands ui.gadgets ui.gadgets.labelled assocs
 ui.gadgets.tracks ui.gadgets.buttons ui.gadgets.panes
-ui.gadgets.status-bar ui.gadgets.scrollers
-ui.gestures sequences hashtables inspector ;
+ui.gadgets.status-bar ui.gadgets.scrollers ui.gestures sequences
+hashtables inspector ;
 IN: ui.tools.traceback
 
 : <callstack-display> ( model -- gadget )
@@ -19,34 +19,32 @@ IN: ui.tools.traceback
     [ [ continuation-retain stack. ] when* ]
     t "Retain stack" <labelled-pane> ;
 
-TUPLE: traceback-gadget ;
+TUPLE: traceback-gadget < track ;
 
 M: traceback-gadget pref-dim* drop { 550 600 } ;
 
 : <traceback-gadget> ( model -- gadget )
-    { 0 1 } <track> traceback-gadget construct-control [
+    { 0 1 } traceback-gadget new-track
+        swap >>model
+    [
+        g model>>
         [
             [
-                g gadget-model <datastack-display> 1/2 track,
-                g gadget-model <retainstack-display> 1/2 track,
+                [ <datastack-display> 1/2 track, ]
+                [ <retainstack-display> 1/2 track, ]
+                bi
             ] { 1 0 } make-track 1/3 track,
-            g gadget-model <callstack-display> 2/3 track,
-            toolbar,
-        ] with-gadget
-    ] keep ;
+        ]
+        [ <callstack-display> 2/3 track, ] bi
+        toolbar,
+    ] make-gadget ;
 
 : <namestack-display> ( model -- gadget )
     [ [ continuation-name namestack. ] when* ]
     <pane-control> ;
 
-TUPLE: variables-gadget ;
-
 : <variables-gadget> ( model -- gadget )
-    <namestack-display> <scroller>
-    variables-gadget new
-    [ set-gadget-delegate ] keep ;
-
-M: variables-gadget pref-dim* drop { 400 400 } ;
+    <namestack-display> { 400 400 } <limited-scroller> ;
 
 : variables ( traceback -- )
     gadget-model <variables-gadget>

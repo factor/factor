@@ -2,12 +2,16 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: threads io.files io.monitors init kernel
 vocabs vocabs.loader tools.vocabs namespaces continuations
-sequences splitting assocs command-line concurrency.messaging io.backend sets ;
+sequences splitting assocs command-line concurrency.messaging
+io.backend sets tr ;
 IN: tools.vocabs.monitor
 
+TR: convert-separators "/\\" ".." ;
+
 : vocab-dir>vocab-name ( path -- vocab )
-    left-trim-separators right-trim-separators
-    { { CHAR: / CHAR: . } { CHAR: \\ CHAR: . } } substitute ;
+    left-trim-separators
+    right-trim-separators
+    convert-separators ;
 
 : path>vocab-name ( path -- vocab )
     dup ".factor" tail? [ parent-directory ] when ;

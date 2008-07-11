@@ -250,7 +250,7 @@ GENERIC: ' ( obj -- ptr )
     #! n is positive or zero.
     [ dup 0 > ]
     [ [ bignum-bits neg shift ] [ bignum-radix bitand ] bi ]
-    [ ] unfold nip ;
+    [ ] produce nip ;
 
 : emit-bignum ( n -- )
     dup dup 0 < [ neg ] when bignum>seq

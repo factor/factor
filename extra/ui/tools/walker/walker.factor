@@ -1,22 +1,24 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel concurrency.messaging inspector ui.tools.listener
-ui.tools.traceback ui.gadgets.buttons ui.gadgets.status-bar
-ui.gadgets.tracks ui.commands ui.gadgets models models.filter
-ui.tools.workspace ui.gestures ui.gadgets.labels ui threads
-namespaces tools.walker assocs combinators ;
+USING: accessors kernel concurrency.messaging inspector
+ui.tools.listener ui.tools.traceback ui.gadgets.buttons
+ui.gadgets.status-bar ui.gadgets.tracks ui.commands ui.gadgets
+models models.filter ui.tools.workspace ui.gestures
+ui.gadgets.labels ui threads namespaces tools.walker assocs
+combinators ;
 IN: ui.tools.walker
 
-TUPLE: walker-gadget
+TUPLE: walker-gadget < track
 status continuation thread
 traceback
 closing? ;
 
 : walker-command ( walker msg -- )
     swap
-    dup walker-gadget-thread thread-registered?
-    [ walker-gadget-thread send-synchronous drop ]
-    [ 2drop ] if ;
+    dup thread>> thread-registered?
+    [ thread>> send-synchronous drop ]
+    [ 2drop ]
+    if ;
 
 : com-step ( walker -- ) step walker-command ;
 
@@ -31,12 +33,10 @@ closing? ;
 : com-abandon ( walker -- ) abandon walker-command ;
 
 M: walker-gadget ungraft*
-    [ t swap set-walker-gadget-closing? ]
-    [ com-continue ]
-    [ delegate ungraft* ] tri ;
+    [ t >>closing? drop ] [ com-continue ] [ call-next-method ] tri ;
 
 M: walker-gadget focusable-child*
-    walker-gadget-traceback ;
+    traceback>> ;
 
 : walker-state-string ( status thread -- string )
     [
@@ -56,11 +56,16 @@ M: walker-gadget focusable-child*
     [ walker-state-string ] curry <filter> <label-control> ;
 
 : <walker-gadget> ( status continuation thread -- gadget )
-    over <traceback-gadget> f walker-gadget boa [
+    { 0 1 } walker-gadget new-track
+        swap >>thread
+        swap >>continuation
+        swap >>status
+        dup continuation>> <traceback-gadget> >>traceback
+    [
         toolbar,
-        g walker-gadget-status self <thread-status> f track,
-        g walker-gadget-traceback 1 track,
-    ] { 0 1 } build-track ;
+        g status>> self <thread-status> f track,
+        g traceback>> 1 track,
+    ] make-gadget ;
 
 : walker-help ( -- ) "ui-walker" help-window ;
 
@@ -81,7 +86,7 @@ walker-gadget "toolbar" f {
     {
         { [ dup walker-gadget? not ] [ 2drop f ] }
         { [ dup walker-gadget-closing? ] [ 2drop f ] }
-        [ walker-gadget-thread eq? ]
+        [ thread>> eq? ]
     } cond ;
 
 : find-walker-window ( thread -- world/f )

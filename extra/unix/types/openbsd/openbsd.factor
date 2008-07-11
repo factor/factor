@@ -27,6 +27,6 @@ TYPEDEF: __int64_t      off_t
 TYPEDEF: __int64_t      blkcnt_t
 TYPEDEF: __uint32_t     blksize_t
 TYPEDEF: __uint32_t     fflags_t
-TYPEDEF: int            ssize_t
+TYPEDEF: long           ssize_t
 TYPEDEF: int            pid_t
 TYPEDEF: int            time_t

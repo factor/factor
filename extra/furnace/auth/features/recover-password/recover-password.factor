@@ -11,7 +11,7 @@ IN: furnace.auth.features.recover-password
 SYMBOL: lost-password-from
 
 : current-host ( -- string )
-    request get url>> host>> host-name or ;
+    url get host>> host-name or ;
 
 : new-password-url ( user -- url )
     URL" recover-3" clone

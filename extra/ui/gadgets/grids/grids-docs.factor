@@ -1,6 +1,16 @@
 USING: ui.gadgets help.markup help.syntax arrays ;
 IN: ui.gadgets.grids
 
+ARTICLE: "ui-grid-layout" "Grid layouts"
+"Grid gadgets layout their children in a rectangular grid."
+{ $subsection grid }
+"Creating grids from a fixed set of gadgets:"
+{ $subsection <grid> }
+"Managing chidren:"
+{ $subsection grid-add }
+{ $subsection grid-remove }
+{ $subsection grid-child } ;
+
 HELP: grid
 { $class-description "A grid gadget lays out its children so that all gadgets in a column have equal width and all gadgets in a row have equal height."
 $nl
@@ -30,3 +40,5 @@ HELP: grid-remove
 { $values { "grid" grid } { "i" "non-negative integer" } { "j" "non-negative integer" } }
 { $description "Removes a child gadget from the specified location." }
 { $side-effects "grid" } ;
+
+ABOUT: "ui-grid-layout"

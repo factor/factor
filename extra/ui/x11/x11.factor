@@ -1,8 +1,8 @@
-! Copyright (C) 2005, 2007 Eduardo Cavazos and Slava Pestov
+! Copyright (C) 2005, 2008 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays ui ui.gadgets ui.gestures
-ui.backend ui.clipboards ui.gadgets.worlds ui.render assocs
-kernel math namespaces opengl sequences strings x11.xlib
+USING: accessors alien alien.c-types arrays ui ui.gadgets
+ui.gestures ui.backend ui.clipboards ui.gadgets.worlds ui.render
+assocs kernel math namespaces opengl sequences strings x11.xlib
 x11.events x11.xim x11.glx x11.clipboard x11.constants
 x11.windows io.encodings.string io.encodings.ascii
 io.encodings.utf8 combinators debugger command-line qualified
@@ -21,7 +21,7 @@ C: <x11-handle> x11-handle
 M: world expose-event nip relayout ;
 
 M: world configure-event
-    over configured-loc over set-world-loc
+    over configured-loc over (>>window-loc)
     swap configured-dim over set-gadget-dim
     ! In case dimensions didn't change
     relayout-1 ;
@@ -170,7 +170,7 @@ M: world client-event
     swap close-box? [ ungraft ] [ drop ] if ;
 
 : gadget-window ( world -- )
-    dup world-loc over rect-dim glx-window
+    dup window-loc>> over rect-dim glx-window
     over "Factor" create-xic <x11-handle>
     2dup x11-handle-window register-window
     swap set-world-handle ;

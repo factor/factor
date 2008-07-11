@@ -1,10 +1,13 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences ui.gadgets kernel math math.functions
-math.vectors namespaces math.order ;
+math.vectors namespaces math.order accessors ;
 IN: ui.gadgets.packs
 
-TUPLE: pack align fill gap ;
+TUPLE: pack < gadget
+{ align initial: 0 }
+{ fill initial: 0 }
+{ gap initial: { 0 0 } } ;
 
 : packed-dim-2 ( gadget sizes -- list )
     [ over rect-dim over v- rot pack-fill v*n v+ ] with map ;
@@ -32,13 +35,8 @@ TUPLE: pack align fill gap ;
     >r packed-locs r> [ set-rect-loc ] 2each ;
 
 : <pack> ( orientation -- pack )
-    0 0 { 0 0 } <gadget> {
-        set-gadget-orientation
-        set-pack-align
-        set-pack-fill
-        set-pack-gap
-        set-delegate
-    } pack construct ;
+    pack new-gadget
+        swap >>orientation ;
 
 : <pile> ( -- pack ) { 0 1 } <pack> ;
 
@@ -64,14 +62,10 @@ M: pack children-on ( rect gadget -- seq )
     [ fast-children-on ] keep <slice> ;
 
 : make-pile ( quot -- pack )
-    <pile> make-gadget ; inline
+    <pile> swap make-gadget ; inline
 
 : make-filled-pile ( quot -- pack )
-    <filled-pile> make-gadget ; inline
+    <filled-pile> swap make-gadget ; inline
 
 : make-shelf ( quot -- pack )
-    <shelf> make-gadget ; inline
-
-: build-pack ( quot quot orientation -- pack )
-    <pack> build-gadget ; inline
-
+    <shelf> swap make-gadget ; inline

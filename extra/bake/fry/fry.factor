@@ -77,4 +77,4 @@ DEFER: shallow-fry
 
 MACRO: fry ( seq -- quot ) [fry] ;
 
-: `[ \ ] [ >quotation ] parse-literal \ fry parsed ; parsing
+: '[ \ ] [ >quotation ] parse-literal \ fry parsed ; parsing

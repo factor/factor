@@ -1,12 +1,15 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors parser-combinators memoize kernel sequences
-logging arrays words strings vectors io io.files
+USING: accessors peg peg.parsers memoize kernel sequences
+logging arrays words strings vectors io io.files io.encodings.utf8
 namespaces combinators combinators.lib logging.server
 calendar calendar.format ;
 IN: logging.parser
 
-: string-of ( quot -- parser ) satisfy <!*> [ >string ] <@ ;
+TUPLE: log-entry date level word-name message ;
+
+: string-of ( quot -- parser )
+    satisfy repeat0 [ >string ] action ; inline
 
 SYMBOL: multiline
 
@@ -14,13 +17,13 @@ SYMBOL: multiline
     [ "]" member? not ] string-of [
         dup multiline-header =
         [ drop multiline ] [ rfc3339>timestamp ] if
-    ] <@
+    ] action
     "[" "]" surrounded-by ;
 
 : 'log-level' ( -- parser )
     log-levels [
-        [ name>> token ] keep [ nip ] curry <@
-    ] map <or-parser> ;
+        [ name>> token ] keep [ nip ] curry action
+    ] map choice ;
 
 : 'word-name' ( -- parser )
     [ " :" member? not ] string-of ;
@@ -28,36 +31,42 @@ SYMBOL: multiline
 SYMBOL: malformed
 
 : 'malformed-line' ( -- parser )
-    [ drop t ] string-of [ malformed swap 2array ] <@ ;
+    [ drop t ] string-of
+    [ log-entry new swap >>message malformed >>level ] action ;
 
 : 'log-message' ( -- parser )
-    [ drop t ] string-of [ 1vector ] <@ ;
+    [ drop t ] string-of
+    [ 1vector ] action ;
 
-MEMO: 'log-line' ( -- parser )
-    'date' " " token <&
-    'log-level' " " token <& <&>
-    'word-name' ": " token <& <:&>
-    'log-message' <:&>
-    'malformed-line' <|> ;
+: 'log-line' ( -- parser )
+    [
+        'date' ,
+        " " token hide ,
+        'log-level' ,
+        " " token hide ,
+        'word-name' ,
+        ": " token hide ,
+        'log-message' ,
+    ] seq* [ first4 log-entry boa ] action
+    'malformed-line' 2choice ;
 
-: parse-log-line ( string -- entry )
-    'log-line' parse-1 ;
+PEG: parse-log-line ( string -- entry ) 'log-line' ;
 
 : malformed? ( line -- ? )
-    first malformed eq? ;
+    level>> malformed eq? ;
 
 : multiline? ( line -- ? )
-    first multiline eq? ;
+    level>> multiline eq? ;
 
 : malformed-line ( line -- )
     "Warning: malformed log line:" print
-    second print ;
+    message>> print ;
 
 : add-multiline ( line -- )
     building get empty? [
         "Warning: log begins with multiline entry" print drop
     ] [
-        fourth first building get peek fourth push
+        message>> first building get peek message>> push
     ] if ;
 
 : parse-log ( lines -- entries )
@@ -70,3 +79,7 @@ MEMO: 'log-line' ( -- parser )
             } cond
         ] each
     ] { } make ;
+
+: parse-log-file ( service -- entries )
+    log-path 1 log# dup exists?
+    [ utf8 file-lines parse-log ] [ drop f ] if ;

@@ -78,7 +78,7 @@ PRIVATE>
     ] if ;
 
 : number>digits ( n -- seq )
-    [ dup zero? not ] [ 10 /mod ] [ ] unfold reverse nip ;
+    [ dup zero? not ] [ 10 /mod ] [ ] produce reverse nip ;
 
 : nth-triangle ( n -- n )
     dup 1+ * 2 / ;

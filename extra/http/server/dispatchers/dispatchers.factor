@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces sequences assocs accessors splitting
-unicode.case http http.server http.server.responses ;
+unicode.case urls http http.server http.server.responses ;
 IN: http.server.dispatchers
 
 TUPLE: dispatcher default responders ;
@@ -35,7 +35,7 @@ TUPLE: vhost-dispatcher default responders ;
     >lower "www." ?head drop "." ?tail drop ;
 
 : find-vhost ( dispatcher -- responder )
-    request get url>> host>> canonical-host over responders>> at*
+    url get host>> canonical-host over responders>> at*
     [ nip ] [ drop default>> ] if ;
 
 M: vhost-dispatcher call-responder* ( path dispatcher -- response )

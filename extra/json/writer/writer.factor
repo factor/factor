@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel io.streams.string io strings splitting sequences math 
        math.parser assocs classes words namespaces prettyprint
-       hashtables mirrors ;
+       hashtables mirrors tr ;
 IN: json.writer
 
 #! Writes the object out to a stream in JSON format
@@ -24,10 +24,7 @@ M: number json-print ( num -- )
 M: sequence json-print ( array -- ) 
   CHAR: [ write1 [ >json ] map "," join write CHAR: ] write1 ;
 
-: jsvar-encode ( string -- string )
-  #! Convert the string so that it contains characters usable within
-  #! javascript variable names.
-  { { CHAR: - CHAR: _ } } substitute ;
+TR: jsvar-encode "-" "_" ;
   
 : tuple>fields ( object -- seq )
   <mirror> [

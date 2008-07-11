@@ -47,15 +47,17 @@
 			</t:if>
 		</tr>
 
-		<tr>
-			<td>
-				<t:bind t:name="footer">
-					<small>
-						<t:farkup t:name="content" />
-					</small>
-				</t:bind>
-			</td>
-		</tr>
+		<t:if t:value="footer">
+			<tr>
+				<td>
+					<t:bind t:name="footer">
+						<small>
+							<t:farkup t:name="content" />
+						</small>
+					</t:bind>
+				</td>
+			</tr>
+		</t:if>
 	</table>
 
 </t:chloe>

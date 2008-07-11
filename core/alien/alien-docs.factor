@@ -12,9 +12,7 @@ HELP: dll
 
 HELP: expired?
 { $values { "c-ptr" "an alien, byte array, or " { $link f } } { "?" "a boolean" } }
-{ $description "Tests if the alien is a relic from an earlier session. When an image is loaded, any alien objects which persisted in the image are marked as being expired."
-$nl
-"A byte array is never considered to be expired, whereas passing " { $link f } " always yields true." } ;
+{ $description "Tests if the alien is a relic from an earlier session. A byte array is never considered to have expired, whereas passing " { $link f } " always yields true." } ;
 
 HELP: <displaced-alien> ( displacement c-ptr -- alien )
 { $values { "displacement" "an integer" } { "c-ptr" "an alien, byte array, or " { $link f } } { "alien" "a new alien" } }
@@ -146,16 +144,22 @@ HELP: alien-callback
 
 { alien-invoke alien-indirect alien-callback } related-words
 
+ARTICLE: "alien-expiry" "Alien expiry"
+"When an image is loaded, any alien objects which persisted from the previous session are marked as having expired. This is because the C pointers they contain are almost certainly no longer valid."
+$nl
+"For this reason, the " { $link POSTPONE: ALIEN: } " word should not be used in source files, since loading the source file then saving the image will result in the literal becoming expired. Use " { $link <alien> } " instead, and ensure the word calling " { $link <alien> } " is not declared " { $link POSTPONE: flushable } "."
+{ $subsection expired? } ;
+
 ARTICLE: "aliens" "Alien addresses"
 "Instances of the " { $link alien } " class represent pointers to C data outside the Factor heap:"
 { $subsection <alien> }
 { $subsection <displaced-alien> }
 { $subsection alien-address }
-{ $subsection expired? }
 "Anywhere that a " { $link alien } " instance is accepted, the " { $link f } " singleton may be passed in to denote a null pointer."
 $nl
 "Usually alien objects do not have to created and dereferenced directly; instead declaring C function parameters and return values as having a pointer type such as " { $snippet "void*" } " takes care of the details."
 { $subsection "syntax-aliens" }
+{ $subsection "alien-expiry" }
 "When higher-level abstractions won't do:"
 { $subsection "reading-writing-memory" }
 { $see-also "c-data" "c-types-specs" } ;

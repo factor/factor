@@ -20,8 +20,8 @@ TUPLE: basic-auth-realm < realm ;
     401 "Invalid username or password" <trivial-response>
     [ "Basic realm=\"" % swap % "\"" % ] "" make "WWW-Authenticate" set-header ;
 
-M: basic-auth-realm login-required* ( realm -- response )
-    name>> <401> ;
+M: basic-auth-realm login-required* ( description capabilities realm -- response )
+    2nip name>> <401> ;
 
 M: basic-auth-realm logged-in-username ( realm -- uid )
     drop

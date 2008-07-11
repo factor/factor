@@ -32,7 +32,7 @@ todo "TODO"
 : <todo> ( id -- todo )
     todo new
         swap >>id
-        logged-in-user get username>> >>uid ;
+        username >>uid ;
 
 : <view-action> ( -- action )
     <page-action>

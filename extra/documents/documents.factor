@@ -15,11 +15,11 @@ IN: documents
 
 : lines-equal? ( loc1 loc2 -- ? ) [ first ] bi@ number= ;
 
-TUPLE: document locs ;
+TUPLE: document < model locs ;
 
 : <document> ( -- document )
-    V{ "" } clone <model> V{ } clone
-    { set-delegate set-document-locs } document construct ;
+    V{ "" } clone document new-model
+    V{ } clone >>locs ;
 
 : add-loc ( loc document -- ) locs>> push ;
 

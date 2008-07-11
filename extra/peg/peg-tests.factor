@@ -5,99 +5,99 @@ USING: kernel tools.test strings namespaces arrays sequences
        peg peg.private accessors words math accessors ;
 IN: peg.tests
 
-{ f } [
+[
   "endbegin" "begin" token parse
-] unit-test
+] must-fail
 
 { "begin" "end" } [
-  "beginend" "begin" token parse 
+  "beginend" "begin" token (parse) 
   { ast>> remaining>> } get-slots
   >string
 ] unit-test
 
-{ f } [
+[
   "" CHAR: a CHAR: z range parse
-] unit-test
+] must-fail
 
-{ f } [
+[
   "1bcd" CHAR: a CHAR: z range parse
-] unit-test
+] must-fail
 
 { CHAR: a } [
-  "abcd" CHAR: a CHAR: z range parse ast>>
+  "abcd" CHAR: a CHAR: z range parse
 ] unit-test
 
 { CHAR: z } [
-  "zbcd" CHAR: a CHAR: z range parse ast>>
+  "zbcd" CHAR: a CHAR: z range parse
 ] unit-test
 
-{ f } [
+[
   "bad" "a" token "b" token 2array seq parse
-] unit-test
+] must-fail
 
 { V{ "g" "o" } } [
-  "good" "g" token "o" token 2array seq parse ast>>
+  "good" "g" token "o" token 2array seq parse
 ] unit-test
 
 { "a" } [
-  "abcd" "a" token "b" token 2array choice parse ast>>
+  "abcd" "a" token "b" token 2array choice parse
 ] unit-test
 
 { "b" } [
-  "bbcd" "a" token "b" token 2array choice parse ast>>
+  "bbcd" "a" token "b" token 2array choice parse
 ] unit-test
 
-{ f } [
+[
   "cbcd" "a" token "b" token 2array choice parse 
-] unit-test
+] must-fail
 
-{ f } [
+[
   "" "a" token "b" token 2array choice parse 
+] must-fail
+
+{ 0 } [
+  "" "a" token repeat0 parse length
 ] unit-test
 
 { 0 } [
-  "" "a" token repeat0 parse ast>> length
-] unit-test
-
-{ 0 } [
-  "b" "a" token repeat0 parse ast>> length
+  "b" "a" token repeat0 parse length
 ] unit-test
 
 { V{ "a" "a" "a" } } [
-  "aaab" "a" token repeat0 parse ast>> 
+  "aaab" "a" token repeat0 parse 
 ] unit-test
 
-{ f } [
+[
   "" "a" token repeat1 parse 
-] unit-test
+] must-fail
 
-{ f } [
+[
   "b" "a" token repeat1 parse 
-] unit-test
+] must-fail
 
 { V{ "a" "a" "a" } } [
-  "aaab" "a" token repeat1 parse ast>>
+  "aaab" "a" token repeat1 parse
 ] unit-test
 
 { V{ "a" "b" } } [ 
-  "ab" "a" token optional "b" token 2array seq parse ast>> 
+  "ab" "a" token optional "b" token 2array seq parse 
 ] unit-test
 
 { V{ f "b" } } [ 
-  "b" "a" token optional "b" token 2array seq parse ast>> 
+  "b" "a" token optional "b" token 2array seq parse 
 ] unit-test
 
-{ f } [ 
+[ 
   "cb" "a" token optional "b" token 2array seq parse  
-] unit-test
+] must-fail
 
 { V{ CHAR: a CHAR: b } } [
-  "ab" "a" token ensure CHAR: a CHAR: z range dup 3array seq parse ast>>
+  "ab" "a" token ensure CHAR: a CHAR: z range dup 3array seq parse
 ] unit-test
 
-{ f } [
+[
   "bb" "a" token ensure CHAR: a CHAR: z range 2array seq parse 
-] unit-test
+] must-fail
 
 { t } [
   "a+b" 
@@ -117,47 +117,47 @@ IN: peg.tests
   parse [ t ] [ f ] if
 ] unit-test
 
-{ f } [
+[
   "a++b" 
   "a" token "+" token "++" token 2array choice "b" token 3array seq
   parse [ t ] [ f ] if
-] unit-test
+] must-fail
 
 { 1 } [
-  "a" "a" token [ drop 1 ] action parse ast>> 
+  "a" "a" token [ drop 1 ] action parse 
 ] unit-test
 
 { V{ 1 1 } } [
-  "aa" "a" token [ drop 1 ] action dup 2array seq parse ast>> 
+  "aa" "a" token [ drop 1 ] action dup 2array seq parse 
 ] unit-test
 
-{ f } [
+[
   "b" "a" token [ drop 1 ] action parse 
-] unit-test
+] must-fail
 
-{ f } [ 
+[ 
   "b" [ CHAR: a = ] satisfy parse 
-] unit-test
+] must-fail
 
 { CHAR: a } [ 
-  "a" [ CHAR: a = ] satisfy parse ast>>
+  "a" [ CHAR: a = ] satisfy parse
 ] unit-test
 
 { "a" } [
-  "    a" "a" token sp parse ast>>
+  "    a" "a" token sp parse
 ] unit-test
 
 { "a" } [
-  "a" "a" token sp parse ast>>
+  "a" "a" token sp parse
 ] unit-test
 
 { V{ "a" } } [
-  "[a]" "[" token hide "a" token "]" token hide 3array seq parse ast>>
+  "[a]" "[" token hide "a" token "]" token hide 3array seq parse
 ] unit-test
 
-{ f } [
+[
   "a]" "[" token hide "a" token "]" token hide 3array seq parse 
-] unit-test
+] must-fail
 
 
 { V{ "1" "-" "1" } V{ "1" "+" "1" } } [
@@ -165,8 +165,8 @@ IN: peg.tests
     [ "1" token , "-" token , "1" token , ] seq* ,
     [ "1" token , "+" token , "1" token , ] seq* ,
   ] choice* 
-  "1-1" over parse ast>> swap
-  "1+1" swap parse ast>>
+  "1-1" over parse swap
+  "1+1" swap parse
 ] unit-test
 
 : expr ( -- parser ) 
@@ -175,21 +175,22 @@ IN: peg.tests
   [ expr ] delay "+" token "1" token 3seq "1" token 2choice ;
 
 { V{ V{ "1" "+" "1" } "+" "1" } } [
-  "1+1+1" expr parse ast>>   
+  "1+1+1" expr parse   
 ] unit-test
 
 { t } [
   #! Ensure a circular parser doesn't loop infinitely
   [ f , "a" token , ] seq*
-  dup parsers>>
+  dup peg>> parsers>>
   dupd 0 swap set-nth compile word?
 ] unit-test
 
-{ f } [
+[
   "A" [ drop t ] satisfy [ 66 >= ] semantic parse 
-] unit-test
+] must-fail
 
 { CHAR: B } [
-  "B" [ drop t ] satisfy [ 66 >= ] semantic parse ast>>
+  "B" [ drop t ] satisfy [ 66 >= ] semantic parse
 ] unit-test
 
+{ f } [ \ + T{ parser f f f } equal? ] unit-test

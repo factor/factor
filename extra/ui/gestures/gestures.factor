@@ -11,7 +11,7 @@ IN: ui.gestures
 GENERIC: handle-gesture* ( gadget gesture delegate -- ? )
 
 : default-gesture-handler ( gadget gesture delegate -- ? )
-    class "gestures" word-prop at dup
+    class superclasses [ "gestures" word-prop ] map assoc-stack dup
     [ call f ] [ 2drop t ] if ;
 
 M: object handle-gesture* default-gesture-handler ;

@@ -125,7 +125,7 @@ VALUE: properties
 : process-names ( data -- names-hash )
     1 swap (process-data) [
         ascii-lower { { CHAR: \s CHAR: - } } substitute swap
-    ] assoc-map >hashtable ;
+    ] H{ } assoc-map-as ;
 
 : multihex ( hexstring -- string )
     " " split [ hex> ] map sift ;

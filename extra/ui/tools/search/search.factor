@@ -11,7 +11,7 @@ vocabs words vocabs.loader tools.vocabs unicode.case calendar ui
 ;
 IN: ui.tools.search
 
-TUPLE: live-search field list ;
+TUPLE: live-search < track field list ;
 
 : search-value ( live-search -- value )
     live-search-list list-value ;
@@ -34,10 +34,10 @@ M: live-search handle-gesture* ( gadget gesture delegate -- ? )
 : find-search-list ( gadget -- list )
     find-live-search live-search-list ;
 
-TUPLE: search-field ;
+TUPLE: search-field < editor ;
 
 : <search-field> ( -- gadget )
-    <editor> search-field construct-editor ;
+    search-field new-editor ;
 
 search-field H{
     { T{ key-down f f "UP" } [ find-search-list select-previous ] }
@@ -60,12 +60,12 @@ search-field H{
     swap <list> ;
 
 : <live-search> ( string seq limited? presenter -- gadget )
-    live-search new
+    { 0 1 } live-search new-track
     [
         <search-field> g-> set-live-search-field f track,
         <search-list> g-> set-live-search-list
         <scroller> 1 track,
-    ] { 0 1 } build-track
+    ] make-gadget
     [ live-search-field set-editor-string ] keep
     [ live-search-field end-of-document ] keep ;
 

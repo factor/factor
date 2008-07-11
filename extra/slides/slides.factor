@@ -1,3 +1,5 @@
+! Copyright (C) 2007, 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables help.markup help.stylesheet io
 io.styles kernel math models namespaces sequences ui ui.gadgets
 ui.gadgets.books ui.gadgets.panes ui.gestures ui.render
@@ -70,12 +72,10 @@ IN: slides
     $divider
     $list ;
 
-TUPLE: slides ;
+TUPLE: slides < book ;
 
 : <slides> ( slides -- gadget )
-    [ <page> ] map 0 <model> <book>
-    slides construct-gadget
-    [ set-gadget-delegate ] keep ;
+    [ <page> ] map 0 <model> slides new-book ;
 
 : change-page ( book n -- )
     over control-value + over gadget-children length rem
@@ -103,5 +103,3 @@ TUPLE: slides ;
 
 : slides-window ( slides -- )
     [ <slides> "Slides" open-window ] with-ui ;
-
-MAIN: slides-window

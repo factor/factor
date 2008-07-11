@@ -5,18 +5,18 @@ namespaces sequences math.order ;
 IN: ui.gadgets.paragraphs
 
 ! A word break gadget
-TUPLE: word-break-gadget ;
+TUPLE: word-break-gadget < label ;
 
-: <word-break-gadget> ( gadget -- gadget )
-    { set-delegate } word-break-gadget construct ;
+: <word-break-gadget> ( text -- gadget )
+    word-break-gadget new-label ;
 
 M: word-break-gadget draw-gadget* drop ;
 
 ! A gadget that arranges its children in a word-wrap style.
-TUPLE: paragraph margin ;
+TUPLE: paragraph < gadget margin ;
 
 : <paragraph> ( margin -- gadget )
-    paragraph construct-gadget
+    paragraph new-gadget
     { 1 0 } over set-gadget-orientation
     [ set-paragraph-margin ] keep ;
 

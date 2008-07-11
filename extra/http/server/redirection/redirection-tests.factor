@@ -1,6 +1,6 @@
 IN: http.server.redirection.tests
 USING: http http.server.redirection urls accessors
-namespaces tools.test present ;
+namespaces tools.test present kernel ;
 
 \ relative-to-request must-infer
 
@@ -11,6 +11,7 @@ namespaces tools.test present ;
             "www.apple.com" >>host
             "/xxx/bar" >>path
             { { "a" "b" } } >>query
+        dup url set
         >>url
     request set
 

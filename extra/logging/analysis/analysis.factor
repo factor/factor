@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences namespaces words assocs logging sorting
-prettyprint io io.styles strings logging.parser calendar.format
-combinators ;
+prettyprint io io.styles io.files io.encodings.utf8
+strings combinators accessors arrays
+logging.server logging.parser calendar.format ;
 IN: logging.analysis
 
 SYMBOL: word-names
@@ -11,11 +12,11 @@ SYMBOL: word-histogram
 SYMBOL: message-histogram
 
 : analyze-entry ( entry -- )
-    dup second ERROR eq? [ dup errors get push ] when
-    dup second CRITICAL eq? [ dup errors get push ] when
-    1 over third word-histogram get at+
-    dup third word-names get member? [
-        1 over rest message-histogram get at+
+    dup level>> { ERROR CRITICAL } memq? [ dup errors get push ] when
+    1 over word-name>> word-histogram get at+
+    dup word-name>> word-names get member? [
+        1 over [ level>> ] [ word-name>> ] [ message>> ] tri 3array
+        message-histogram get at+
     ] when
     drop ;
 
@@ -45,10 +46,10 @@ SYMBOL: message-histogram
 : log-entry. ( entry -- )
     "====== " write
     {
-        [ first (timestamp>string) bl ]
-        [ second pprint bl ]
-        [ third write nl ]
-        [ fourth "\n" join print ]
+        [ date>> (timestamp>string) bl ]
+        [ level>> pprint bl ]
+        [ word-name>> write nl ]
+        [ message>> "\n" join print ]
     } cleave ;
 
 : errors. ( errors -- )
@@ -58,7 +59,7 @@ SYMBOL: message-histogram
     "==== INTERESTING MESSAGES:" print nl
     "Total: " write dup values sum . nl
     [
-        dup second write ": " write third "\n" join write
+        dup level>> write ": " write message>> "\n" join write
     ] histogram.
     nl
     "==== WORDS:" print nl
@@ -69,3 +70,6 @@ SYMBOL: message-histogram
 
 : analyze-log ( lines word-names -- )
     >r parse-log r> analyze-entries analysis. ;
+
+: analyze-log-file ( service word-names -- )
+    >r parse-log-file r> analyze-entries analysis. ;
