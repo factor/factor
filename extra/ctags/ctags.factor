@@ -19,19 +19,17 @@ IN: ctags
   ] "" make ;
 
 : ctag-strings ( seq1 -- seq2 )
-  { } swap [ ctag suffix ] each ;
+  [ ctag ] map ;
 
 : ctags-write ( seq path -- )
   [ ctag-strings ] dip ascii set-file-lines ;
 
 : (ctags) ( -- seq )
-  { } all-words [
+  all-words [
     dup where [
-      2array suffix
-    ] [
-      drop
-    ] if*
-  ] each ;
+      2array
+    ] when*
+  ] map [ sequence? ] filter ;
 
 : ctags ( path -- )
   (ctags) sort-keys swap ctags-write ;
