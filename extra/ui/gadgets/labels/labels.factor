@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hashtables io kernel math namespaces
 opengl sequences strings splitting
@@ -7,7 +7,7 @@ models ;
 IN: ui.gadgets.labels
 
 ! A label gadget draws a string.
-TUPLE: label text font color ;
+TUPLE: label < gadget text font color ;
 
 : label-string ( label -- string )
     text>> dup string? [ "\n" join ] unless ; inline
@@ -23,10 +23,13 @@ TUPLE: label text font color ;
     sans-serif-font >>font
     black >>color ; inline
 
-: <label> ( string -- label )
-    label construct-gadget
+: new-label ( string class -- label )
+    new-gadget
     [ set-label-string ] keep
-    label-theme ;
+    label-theme ; inline
+
+: <label> ( string -- label )
+    label new-label ;
 
 M: label pref-dim*
     [ font>> open-font ] [ text>> ] bi text-dim ;
@@ -37,13 +40,14 @@ M: label draw-gadget*
 
 M: label gadget-text* label-string % ;
 
-TUPLE: label-control ;
+TUPLE: label-control < label ;
 
 M: label-control model-changed
     swap model-value over set-label-string relayout ;
 
 : <label-control> ( model -- gadget )
-    "" <label> label-control construct-control ;
+    "" label-control new-label
+        swap >>model ;
 
 : text-theme ( gadget -- gadget )
     black >>color

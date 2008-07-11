@@ -13,10 +13,10 @@ TUPLE: word-break-gadget ;
 M: word-break-gadget draw-gadget* drop ;
 
 ! A gadget that arranges its children in a word-wrap style.
-TUPLE: paragraph margin ;
+TUPLE: paragraph < gadget margin ;
 
 : <paragraph> ( margin -- gadget )
-    paragraph construct-gadget
+    paragraph new-gadget
     { 1 0 } over set-gadget-orientation
     [ set-paragraph-margin ] keep ;
 

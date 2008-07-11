@@ -1,11 +1,11 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math arrays cocoa cocoa.application command-line
-kernel memory namespaces cocoa.messages cocoa.runtime
-cocoa.subclassing cocoa.pasteboard cocoa.types cocoa.windows
-cocoa.classes cocoa.application sequences system ui ui.backend
-ui.clipboards ui.gadgets ui.gadgets.worlds ui.cocoa.views
-core-foundation threads ;
+USING: accessors math arrays cocoa cocoa.application
+command-line kernel memory namespaces cocoa.messages
+cocoa.runtime cocoa.subclassing cocoa.pasteboard cocoa.types
+cocoa.windows cocoa.classes cocoa.application sequences system
+ui ui.backend ui.clipboards ui.gadgets ui.gadgets.worlds
+ui.cocoa.views core-foundation threads ;
 IN: ui.cocoa
 
 TUPLE: handle view window ;
@@ -38,7 +38,7 @@ M: pasteboard set-clipboard-contents
     <clipboard> selection set-global ;
 
 : world>NSRect ( world -- NSRect )
-    dup world-loc first2 rot rect-dim first2 <NSRect> ;
+    dup window-loc>> first2 rot rect-dim first2 <NSRect> ;
 
 : gadget-window ( world -- )
     [
@@ -68,7 +68,7 @@ M: cocoa-ui-backend fullscreen* ( world -- ? )
     world-handle handle-view -> isInFullScreenMode zero? not ;
 
 : auto-position ( world -- )
-    dup world-loc { 0 0 } = [
+    dup window-loc>> { 0 0 } = [
         world-handle handle-window -> center
     ] [
         drop

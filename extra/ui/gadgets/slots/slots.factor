@@ -1,10 +1,10 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces ui.gadgets ui.gestures ui.commands kernel
-ui.gadgets.scrollers parser prettyprint ui.gadgets.buttons
-sequences arrays ui.gadgets.borders ui.gadgets.tracks
-ui.gadgets.editors io math
-definitions math.vectors assocs refs ;
+USING: accessors namespaces kernel parser prettyprint
+sequences arrays io math definitions math.vectors assocs refs
+ui.gadgets ui.gestures ui.commands ui.gadgets.scrollers
+ui.gadgets.buttons ui.gadgets.borders ui.gadgets.tracks
+ui.gadgets.editors ;
 IN: ui.gadgets.slots
 
 TUPLE: update-object ;
@@ -88,7 +88,7 @@ slot-editor "toolbar" f {
     { T{ key-down f f "ESC" } close }
 } define-command-map
 
-TUPLE: editable-slot printer ref ;
+TUPLE: editable-slot < track printer ref ;
 
 : <edit-button> ( -- gadget )
     "..."
@@ -118,8 +118,7 @@ TUPLE: editable-slot printer ref ;
 } set-gestures
 
 : <editable-slot> ( gadget ref -- editable-slot )
-    editable-slot new
-    { 1 0 } <track> over set-gadget-delegate
-    [ drop <gadget> ] over set-editable-slot-printer
-    [ set-editable-slot-ref ] keep
-    [ display-slot ] keep ;
+    { 1 0 } editable-slot new-track
+        swap >>ref
+        [ drop <gadget> ] >>printer
+        [ display-slot ] keep ;

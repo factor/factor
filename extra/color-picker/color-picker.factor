@@ -11,10 +11,10 @@ IN: color-picker
 : <color-slider> ( model -- gadget )
     <x-slider> 1 over set-slider-line ;
 
-TUPLE: color-preview ;
+TUPLE: color-preview < gadget ;
 
 : <color-preview> ( model -- gadget )
-    <gadget> color-preview construct-control
+    color-preview new-gadget
     { 100 100 } over set-rect-dim ;
 
 M: color-preview model-changed

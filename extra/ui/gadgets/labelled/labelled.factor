@@ -57,8 +57,3 @@ TUPLE: closable-gadget content ;
     ] build-frame ;
 
 M: closable-gadget focusable-child* closable-gadget-content ;
-
-: build-closable-gadget ( tuple quot title -- tuple )
-    pick >r >r with-gadget
-    r> [ find-closable-gadget unparent ] <closable-gadget> r>
-    [ set-gadget-delegate ] keep ; inline

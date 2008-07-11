@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors ui.commands ui.gestures ui.render ui.gadgets
 ui.gadgets.labels ui.gadgets.scrollers
@@ -7,17 +7,20 @@ ui.gadgets.presentations ui.gadgets.viewports ui.gadgets.packs
 math.vectors classes.tuple ;
 IN: ui.gadgets.lists
 
-TUPLE: list index presenter color hook ;
+TUPLE: list < pack index presenter color hook ;
 
-: list-theme ( list -- )
-    { 0.8 0.8 1.0 1.0 } swap set-list-color ;
+: list-theme ( list -- list )
+    { 0.8 0.8 1.0 1.0 } >>color ; inline
 
 : <list> ( hook presenter model -- gadget )
-    <filled-pile> list construct-control
-    [ set-list-presenter ] keep
-    [ set-list-hook ] keep
-    0 over set-list-index
-    dup list-theme ;
+    list new-gadget
+        { 0 1 } >>orientation
+        1 >>fill
+        0 >>index
+        swap >>model
+        swap >>presenter
+        swap >>hook
+        list-theme ;
 
 : calc-bounded-index ( n list -- m )
     control-value length 1- min 0 max ;
@@ -30,9 +33,9 @@ TUPLE: list index presenter color hook ;
     hook>> [ [ [ list? ] is? ] find-parent ] prepend ;
 
 : <list-presentation> ( hook elt presenter -- gadget )
-    keep <presentation>
-    swap >>hook
-    text-theme ; inline
+    keep >r >label text-theme r>
+    <presentation>
+    swap >>hook ; inline
 
 : <list-items> ( list -- seq )
     [ list-presentation-hook ]
