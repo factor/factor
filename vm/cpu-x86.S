@@ -1,5 +1,3 @@
-#define JUMP_QUOT jmp *QUOT_XT_OFFSET(ARG0)
-
 DEF(F_FASTCALL void,c_to_factor,(CELL quot)):
 	PUSH_NONVOLATILE
 	push ARG0                             /* Save quot */
@@ -14,20 +12,9 @@ DEF(F_FASTCALL void,c_to_factor,(CELL quot)):
 	POP_NONVOLATILE
 	ret
 
-DEF(F_FASTCALL void,primitive_call,(void)):
-        mov (DS_REG),ARG0                     /* Load quotation from data stack */
-	sub $CELL_SIZE,DS_REG                 /* Pop data stack */
-	JUMP_QUOT
-
-/* Don't mess up EDX, it's the callstack top parameter to primitives. */
-DEF(F_FASTCALL void,primitive_execute,(void)):
-	mov (DS_REG),ARG0                     /* Load word from data stack */
-	sub $CELL_SIZE,DS_REG                 /* Pop data stack */
-        jmp *WORD_XT_OFFSET(ARG0)             /* Load word-xt slot */
-
 DEF(F_FASTCALL void,throw_impl,(CELL quot, F_STACK_FRAME *rewind_to)):
 	mov ARG1,STACK_REG                    /* rewind_to */
-	JUMP_QUOT
+	jmp *QUOT_XT_OFFSET(ARG0)
 
 DEF(FASTCALL void,lazy_jit_compile,(CELL quot)):
 	mov STACK_REG,ARG1           /* Save stack pointer */
@@ -39,7 +26,7 @@ DEF(FASTCALL void,lazy_jit_compile,(CELL quot)):
 	pop ARG1                     /* OK to clobber ARG1 here */
 	pop ARG1
 	pop ARG1
-        JUMP_QUOT                    /* Call the quotation */
+        jmp *QUOT_XT_OFFSET(ARG0)    /* Call the quotation */
 
 #ifdef WINDOWS
 	.section .drectve

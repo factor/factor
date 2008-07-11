@@ -104,6 +104,8 @@ M: object infer-call
     ] if
 ] "infer" set-word-prop
 
+\ execute t "no-compile" set-word-prop
+
 \ if [
     3 ensure-values
     2 d-tail [ special? ] contains? [
@@ -122,6 +124,8 @@ M: object infer-call
     pop-literal nip [ <value> ] map
     [ #dispatch ] infer-branches
 ] "infer" set-word-prop
+
+\ dispatch t "no-compile" set-word-prop
 
 \ curry [
     2 ensure-values
