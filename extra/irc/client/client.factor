@@ -37,10 +37,10 @@ SYMBOL: +server-listener+
      <mailbox> <mailbox> irc-server-listener boa ;
 
 : <irc-channel-listener> ( name -- irc-channel-listener )
-     <mailbox> <mailbox> rot f 60 seconds H{ } clone irc-channel-listener boa ;
+     [ <mailbox> <mailbox> ] dip f 60 seconds H{ } clone irc-channel-listener boa ;
 
 : <irc-nick-listener> ( name -- irc-nick-listener )
-     <mailbox> <mailbox> rot irc-nick-listener boa ;
+     [ <mailbox> <mailbox> ] dip irc-nick-listener boa ;
 
 ! ======================================
 ! Message objects
@@ -52,8 +52,8 @@ SINGLETON: irc-connected    ! sent when connection is established
 UNION: irc-broadcasted-message irc-end irc-disconnected irc-connected ;
 
 : terminate-irc ( irc-client -- )
-    [ in-messages>> irc-end swap mailbox-put ]
-    [ f >>is-running drop ]
+    [ [ irc-end ] dip in-messages>> mailbox-put ]
+    [ [ f ] dip (>>is-running) ]
     [ stream>> dispose ]
     tri ;
 
@@ -77,6 +77,11 @@ UNION: irc-broadcasted-message irc-end irc-disconnected irc-connected ;
 : remove-participant ( nick channel -- )
     listener> [ participants>> delete-at ] [ drop ] if* ;
 
+: remove-participant-from-all ( nick -- )
+    irc> listeners>>
+    [ irc-channel-listener? [ swap remove-participant ] [ 2drop ] if ] with
+    assoc-each ;
+
 : add-participant ( nick mode channel -- )
     listener> [ participants>> set-at ] [ 2drop ] if* ;
 
@@ -89,14 +94,6 @@ DEFER: me?
 ! ======================================
 ! IRC client messages
 ! ======================================
-
-GENERIC: irc-message>string ( irc-message -- string )
-
-M: irc-message irc-message>string ( irc-message -- string )
-    [ command>> ]
-    [ parameters>> " " sjoin ]
-    [ trailing>> dup [ CHAR: : prefix ] when ]
-    tri 3array " " sjoin ;
 
 : /NICK ( nick -- )
     "NICK " irc-write irc-print ;
@@ -111,7 +108,7 @@ M: irc-message irc-message>string ( irc-message -- string )
 
 : /JOIN ( channel password -- )
     "JOIN " irc-write
-    [ " :" swap 3append ] when* irc-print ;
+    [ [ " :" ] dip 3append ] when* irc-print ;
 
 : /PART ( channel text -- )
     [ "PART " irc-write irc-write ] dip
@@ -175,10 +172,14 @@ M: part handle-incoming-irc ( part -- )
     [ prefix>> parse-name ] [ channel>> ] bi remove-participant ;
 
 M: kick handle-incoming-irc ( kick -- )
-    [ [ ] [ channel>> ] bi to-listener ]
+    [ dup channel>>  to-listener ]
     [ [ who>> ] [ channel>> ] bi remove-participant ] 
-    [ [ ] [ who>> ] bi me? [ unregister-listener ] [ drop ] if ]
+    [ dup who>> me? [ unregister-listener ] [ drop ] if ]
     tri ;
+
+M: quit handle-incoming-irc ( quit -- )
+    [ prefix>> parse-name remove-participant-from-all ] keep
+    call-next-method ;
 
 : >nick/mode ( string -- nick mode )
     dup first "+@" member? [ unclip ] [ f ] if ;
@@ -213,8 +214,8 @@ M: part handle-outgoing-irc ( privmsg -- )
 ! ======================================
 
 : irc-mailbox-get ( mailbox quot -- )
-    swap 5 seconds
-    '[ , , , mailbox-get-timeout swap call ]
+    [ 5 seconds ] dip
+    '[ , , ,  [ mailbox-get-timeout ] dip call ]
     [ drop ] recover ; inline
 
 : handle-reader-message ( irc-message -- )
@@ -224,11 +225,12 @@ DEFER: (connect-irc)
 
 : (handle-disconnect) ( -- )
     irc>
-        [ in-messages>> irc-disconnected swap mailbox-put ]
+        [ [ irc-disconnected ] dip in-messages>> mailbox-put ]
         [ dup reconnect-time>> sleep (connect-irc) ]
         [ profile>> nickname>> /LOGIN ]
     tri ;
 
+! FIXME: do something with the exception, store somewhere to help debugging
 : handle-disconnect ( error -- )
     drop irc> is-running>> [ (handle-disconnect) ] when ;
 
@@ -300,7 +302,7 @@ M: irc-nick-listener (add-listener) ( irc-nick-listener -- )
     [ name>> ] keep set+run-listener ;
 
 M: irc-server-listener (add-listener) ( irc-server-listener -- )
-    +server-listener+ swap set+run-listener ;
+    [ +server-listener+ ] dip set+run-listener ;
 
 GENERIC: (remove-listener) ( irc-listener -- )
 
@@ -309,7 +311,7 @@ M: irc-nick-listener (remove-listener) ( irc-nick-listener -- )
 
 M: irc-channel-listener (remove-listener) ( irc-channel-listener -- )
     [ [ out-messages>> ] [ name>> ] bi
-      \ part new swap >>channel mailbox-put ] keep
+      [ \ part new ] dip >>channel mailbox-put ] keep
     name>> unregister-listener ;
 
 M: irc-server-listener (remove-listener) ( irc-server-listener -- )
@@ -319,10 +321,10 @@ M: irc-server-listener (remove-listener) ( irc-server-listener -- )
     [ profile>> [ server>> ] [ port>> ] bi /CONNECT ] keep
         swap >>stream
         t >>is-running
-    in-messages>> irc-connected swap mailbox-put ;
+    in-messages>> [ irc-connected ] dip mailbox-put ;
 
 : with-irc-client ( irc-client quot -- )
-    >r current-irc-client r> with-variable ; inline
+    [ current-irc-client ] dip with-variable ; inline
 
 PRIVATE>
 
