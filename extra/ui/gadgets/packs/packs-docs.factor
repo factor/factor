@@ -34,13 +34,13 @@ HELP: pack
     { { $link pack-fill } " a rational number between 0 and 1, where 0 gives each gadget its preferred size and 1 fills the dimension perpendicular to the pack's orientation" }
     { { $link pack-gap } " a pair of integers, the horizontal and vertical gap between children" }
 }
-"Gadgets can delegate to packs and implement their own " { $link pref-dim* } " and " { $link layout* } " methods, reusing pack layout logic by calling " { $link pack-pref-dim } " and " { $link pack-layout } "." } ;
+"Custom gadgets can inherit from the " { $link pack } " class and implement their own " { $link pref-dim* } " and " { $link layout* } " methods, reusing pack layout logic by calling " { $link pack-pref-dim } " and " { $link pack-layout } "." } ;
 
 HELP: pack-layout
 { $values { "pack" "a new " { $link pack } } { "sizes" "a sequence of pairs of integers" } }
 { $description "Lays out the pack's children along the " { $link gadget-orientation } " of the pack, with each gadget receiving its size from the corresponding index of the " { $snippet "sizes" } " sequence." }
 { $notes
-    "This word is useful if you are writing your own layout gadget which delegates to a " { $link pack } ". This allows you to reuse layout logic while computing gadget sizes using a custom procedure."
+    "This word is useful if you are writing your own layout gadget which inherits from " { $link pack } ". This allows you to reuse layout logic while computing gadget sizes using a custom procedure."
 } ;
 
 HELP: <pack>
@@ -61,7 +61,7 @@ HELP: pack-pref-dim
 { $values { "gadget" gadget } { "sizes" "a sequence of pairs of integers" } { "dim" "a pair of integers" } }
 { $description "Computes the preferred size of a pack, with each gadget receiving its size from the corresponding index of the " { $snippet "sizes" } " sequence." }
 { $notes
-    "This word is useful if you are writing your own layout gadget which delegates to a " { $link pack } ". This allows you to reuse layout logic while computing gadget sizes using a custom procedure."
+    "This word is useful if you are writing your own layout gadget which inherits from " { $link pack } ". This allows you to reuse layout logic while computing gadget sizes using a custom procedure."
 } ;
 
 HELP: make-pile

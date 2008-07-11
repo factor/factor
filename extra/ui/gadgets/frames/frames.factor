@@ -39,7 +39,7 @@ M: frame layout*
     grid-layout ;
 
 : make-frame ( quot -- frame )
-    <frame> make-gadget ; inline
+    <frame> swap make-gadget ; inline
 
 : frame, ( gadget i j -- )
-    \ make-gadget get -rot grid-add ;
+    gadget get -rot grid-add ;

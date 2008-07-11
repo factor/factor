@@ -41,14 +41,6 @@ DEFER: to-strings
 
 : host-name* ( -- name ) host-name "." split first ;
 
-! : datestamp ( -- string )
-!   now `{ ,[ dup timestamp-year   ]
-!          ,[ dup timestamp-month  ]
-!          ,[ dup timestamp-day    ]
-!          ,[ dup timestamp-hour   ]
-!          ,[     timestamp-minute ] }
-!   [ pad-00 ] map "-" join ;
-
 : datestamp ( -- string )
   now
     { year>> month>> day>> hour>> minute>> } <arr>

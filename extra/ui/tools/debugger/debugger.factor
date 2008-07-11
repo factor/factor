@@ -23,12 +23,10 @@ TUPLE: debugger < track restarts ;
 : <debugger> ( error restarts restart-hook -- gadget )
     { 0 1 } debugger new-track
     [
-        [
-            toolbar,
-            <restart-list> g-> set-debugger-restarts
-            swap <debugger-display> <scroller> 1 track,
-        ] with-gadget
-    ] keep ;
+        toolbar,
+        <restart-list> g-> set-debugger-restarts
+        swap <debugger-display> <scroller> 1 track,
+    ] make-gadget ;
 
 M: debugger focusable-child* debugger-restarts ;
 

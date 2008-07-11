@@ -1,5 +1,5 @@
 
-USING: kernel sequences assocs qualified circular sets ;
+USING: kernel sequences assocs qualified circular sets fry sequences.lib ;
 
 USING: math multi-methods ;
 
@@ -243,3 +243,10 @@ METHOD: as-mutate { object object assoc }       set-at ;
 : insert ( seq i obj -- seq ) >r cut r> prefix append ;
 
 : splice ( seq i seq -- seq ) >r cut r> prepend append ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: purge ( seq quot -- seq ) [ not ] compose filter ;
+
+: purge! ( seq quot -- seq )
+  dupd '[ swap @ [ pluck! ] [ drop ] if ] each-index ;

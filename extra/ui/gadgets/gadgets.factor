@@ -391,19 +391,17 @@ M: f request-focus-on 2drop ;
 : focus-path ( world -- seq )
     [ gadget-focus ] follow ;
 
-: make-gadget ( quot gadget -- gadget )
-    [ \ make-gadget rot with-variable ] keep ; inline
-
-: gadget, ( gadget -- ) \ make-gadget get add-gadget ;
+: gadget, ( gadget -- ) gadget get add-gadget ;
 
 : g ( -- gadget ) gadget get ;
 
 : g-> ( x -- x x gadget ) dup g ;
 
 : with-gadget ( gadget quot -- )
-    [
-        swap dup \ make-gadget set gadget set call
-    ] with-scope ; inline
+    gadget swap with-variable ; inline
+
+: make-gadget ( gadget quot -- gadget )
+    [ with-gadget ] [ drop ] 2bi ; inline
 
 ! Deprecated
 : set-gadget-delegate ( gadget tuple -- )

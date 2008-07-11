@@ -62,10 +62,10 @@ M: pack children-on ( rect gadget -- seq )
     [ fast-children-on ] keep <slice> ;
 
 : make-pile ( quot -- pack )
-    <pile> make-gadget ; inline
+    <pile> swap make-gadget ; inline
 
 : make-filled-pile ( quot -- pack )
-    <filled-pile> make-gadget ; inline
+    <filled-pile> swap make-gadget ; inline
 
 : make-shelf ( quot -- pack )
-    <shelf> make-gadget ; inline
+    <shelf> swap make-gadget ; inline

@@ -10,12 +10,10 @@ TUPLE: profiler-gadget < track pane ;
 : <profiler-gadget> ( -- gadget )
     { 0 1 } profiler-gadget new-track
     [
-        [
-            toolbar,
-            <pane> g-> set-profiler-gadget-pane
-            <scroller> 1 track,
-        ] with-gadget
-    ] keep ;
+        toolbar,
+        <pane> g-> set-profiler-gadget-pane
+        <scroller> 1 track,
+    ] make-gadget ;
 
 : with-profiler-pane ( gadget quot -- )
     >r profiler-gadget-pane r> with-pane ;

@@ -73,7 +73,7 @@ HELP: command-word
 HELP: command-map
 { $values { "group" string } { "class" "a class word" } { "command-map" "a " { $link command-map } " or " { $link f } } }
 { $description "Outputs a named command map defined on a class." }
-{ $class-description "A command map stores a group of related commands. Instances of this class delegate to arrays so behave like sequences; additionally the " { $link command-map-blurb } " slot stores a string description of the command group, or " { $link f } "."
+{ $class-description "A command map stores a group of related commands. The " { $snippet "commands" } " slot stores an association list mapping gestures to commands, and the " { $snippet "blurb" } " slot stores an optional one-line description string of this command map."
 $nl
 "Command maps are created by calling " { $link <command-map> } " or " { $link define-command-map } "." } ;
 
