@@ -298,16 +298,16 @@ $nl
 "For example, compare the definitions of the " { $link sbuf } " class,"
 { $code
     "TUPLE: sbuf"
-    "{ \"underlying\" string }"
-    "{ \"length\" array-capacity } ;"
+    "{ underlying string }"
+    "{ length array-capacity } ;"
     ""
     "INSTANCE: sbuf growable"
 }
 "with that of the " { $link vector } " class:"
 { $code
     "TUPLE: vector"
-    "{ \"underlying\" array }"
-    "{ \"length\" array-capacity } ;"
+    "{ underlying array }"
+    "{ length array-capacity } ;"
     ""
     "INSTANCE: vector growable"
 } ;
