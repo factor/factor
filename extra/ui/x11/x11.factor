@@ -1,8 +1,8 @@
-! Copyright (C) 2005, 2007 Eduardo Cavazos and Slava Pestov
+! Copyright (C) 2005, 2008 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays ui ui.gadgets ui.gestures
-ui.backend ui.clipboards ui.gadgets.worlds ui.render assocs
-kernel math namespaces opengl sequences strings x11.xlib
+USING: accessors alien alien.c-types arrays ui ui.gadgets
+ui.gestures ui.backend ui.clipboards ui.gadgets.worlds ui.render
+assocs kernel math namespaces opengl sequences strings x11.xlib
 x11.events x11.xim x11.glx x11.clipboard x11.constants
 x11.windows io.encodings.string io.encodings.ascii
 io.encodings.utf8 combinators debugger command-line qualified
