@@ -5,7 +5,7 @@ ui.gadgets.panes vocabs words tools.test.ui slots.private
 threads arrays generic threads accessors listener ;
 IN: ui.tools.listener.tests
 
-[ f ] [ "word" source-editor command-map empty? ] unit-test
+[ f ] [ "word" source-editor command-map commands>> empty? ] unit-test
 
 [ ] [ <listener-gadget> [ ] with-grafted-gadget ] unit-test
 

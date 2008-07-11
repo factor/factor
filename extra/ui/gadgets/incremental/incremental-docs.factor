@@ -25,3 +25,20 @@ HELP: clear-incremental
 { $values { "incremental" incremental } }
 { $description "Removes all gadgets from the incremental layout and performs relayout immediately in constant time." }
 { $side-effects "incremental" } ;
+
+ARTICLE: "ui-incremental-layout" "Incremental layouts"
+"Incremental layout gadgets are like " { $link "ui-pack-layout" } " except the relayout operation after adding a new child can be done in constant time."
+$nl
+"With all layouts, relayout requests from consecutive additions and removals are of children are coalesced and result in only one relayout operation being performed, however the run time of the relayout operation itself depends on the number of children."
+$nl
+"Incremental layout is used by " { $link "ui.gadgets.panes" } " to ensure that new lines of output does not take longer to display when the pane already has previous output."
+$nl
+"Incremental layouts are not a general replacement for " { $link "ui-pack-layout" } " and there are some limitations to be aware of."
+{ $subsection incremental }
+{ $subsection <incremental> }
+"Children are added and removed with a special set of words which perform necessary relayout immediately:"
+{ $subsection add-incremental }
+{ $subsection clear-incremental }
+"Calling " { $link unparent } " to remove a child of an incremental layout is permitted, however the relayout following the removal will not be performed in constant time, because all gadgets following the removed gadget need to be moved." ;
+
+ABOUT: "ui-incremental-layout"

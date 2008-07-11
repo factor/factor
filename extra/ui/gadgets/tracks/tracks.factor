@@ -1,19 +1,23 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ui.gadgets ui.gadgets.packs io kernel math namespaces
-sequences words math.vectors ;
+USING: accessors io kernel math namespaces
+sequences words math.vectors ui.gadgets ui.gadgets.packs ;
 IN: ui.gadgets.tracks
 
-TUPLE: track sizes ;
+TUPLE: track < pack sizes ;
 
 : normalized-sizes ( track -- seq )
     track-sizes
     [ sift sum ] keep [ dup [ over / ] when ] map nip ;
 
+: new-track ( orientation class -- track )
+    new-gadget
+        swap >>orientation
+        V{ } clone >>sizes
+        1 >>fill ; inline
+
 : <track> ( orientation -- track )
-    <pack> V{ } clone
-    { set-delegate set-track-sizes } track construct
-    1 over set-pack-fill ;
+    track new-track ;
 
 : alloted-dim ( track -- dim )
     dup gadget-children swap track-sizes { 0 0 }
@@ -50,9 +54,6 @@ M: track pref-dim*
 
 : make-track ( quot orientation -- track )
     <track> make-gadget ; inline
-
-: build-track ( tuple quot orientation -- tuple )
-    <track> build-gadget ; inline
 
 : track-remove ( gadget track -- )
     over [

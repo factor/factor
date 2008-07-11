@@ -1,13 +1,14 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions ui.gadgets ui.gadgets.borders
-ui.gadgets.buttons ui.gadgets.labels ui.gadgets.menus
-ui.gadgets.worlds hashtables io kernel prettyprint sequences
-strings io.styles words help math models namespaces quotations
-ui.commands ui.operations ui.gestures ;
+USING: arrays accessors definitions hashtables io kernel
+prettyprint sequences strings io.styles words help math models
+namespaces quotations
+ui.gadgets ui.gadgets.borders ui.gadgets.buttons
+ui.gadgets.labels ui.gadgets.menus ui.gadgets.worlds
+ui.gadgets.status-bar ui.commands ui.operations ui.gestures ;
 IN: ui.gadgets.presentations
 
-TUPLE: presentation object hook ;
+TUPLE: presentation < button object hook ;
 
 : invoke-presentation ( presentation command -- )
     over dup presentation-hook call
@@ -25,15 +26,14 @@ TUPLE: presentation object hook ;
     dup presentation-object over show-summary button-update ;
 
 : <presentation> ( label object -- button )
-    presentation new
-    [ drop ] over set-presentation-hook
-    [ set-presentation-object ] keep
-    swap [ invoke-primary ] <roll-button>
-    over set-gadget-delegate ;
+    swap [ invoke-primary ] presentation new-button
+        swap >>object
+        [ drop ] >>hook
+        roll-button-theme ;
 
 M: presentation ungraft*
     dup hand-gadget get-global child? [ dup hide-status ] when
-    delegate ungraft* ;
+    call-next-method ;
 
 : <operations-menu> ( presentation -- menu )
     dup dup presentation-hook curry

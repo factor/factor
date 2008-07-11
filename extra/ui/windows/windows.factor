@@ -98,7 +98,7 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 : handle-wm-move ( hWnd uMsg wParam lParam -- )
     2nip
     [ lo-word ] keep hi-word 2array
-    swap window set-world-loc ;
+    swap window (>>window-loc) ;
 
 : wm-keydown-codes ( -- key )
     H{
@@ -420,7 +420,7 @@ M: windows-ui-backend do-events
     style 0 ex-style AdjustWindowRectEx win32-error=0/f ;
 
 : make-RECT ( world -- RECT )
-    dup world-loc { 40 40 } vmax dup rot rect-dim v+
+    dup window-loc>> { 40 40 } vmax dup rot rect-dim v+
     "RECT" <c-object>
     over first over set-RECT-right
     swap second over set-RECT-bottom

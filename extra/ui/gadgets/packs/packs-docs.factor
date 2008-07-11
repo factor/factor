@@ -2,6 +2,22 @@ USING: ui.gadgets help.markup help.syntax generic kernel
 classes.tuple quotations ;
 IN: ui.gadgets.packs
 
+ARTICLE: "ui-pack-layout" "Pack layouts"
+"Pack gadgets layout their children along a single axis."
+{ $subsection pack }
+"Creating empty packs:"
+{ $subsection <pack> }
+{ $subsection <pile> }
+{ $subsection <shelf> }
+"Creating packs using a combinator:"
+{ $subsection make-pile }
+{ $subsection make-filled-pile }
+{ $subsection make-shelf }
+{ $subsection gadget, }
+"For more control, custom layouts can reuse portions of pack layout logic:"
+{ $subsection pack-pref-dim }
+{ $subsection pack-layout } ;
+
 HELP: pack
 { $class-description "A gadget which lays out its children along a single axis stored in the " { $link gadget-orientation } " slot. Can be constructed with one of the following words:"
 { $list
@@ -59,3 +75,5 @@ HELP: make-filled-pile
 HELP: make-shelf
 { $values { "quot" quotation } { "pack" "a new " { $link pack } } }
 { $description "Creates a new " { $link pack } " which lays out a sequence of gadgets horizontally. The quotation can add children by calling the " { $link gadget, } " word." } ;
+
+ABOUT: "ui-pack-layout"

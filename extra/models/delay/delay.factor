@@ -1,24 +1,26 @@
-USING: kernel models alarms ;
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors kernel models alarms ;
 IN: models.delay
 
-TUPLE: delay model timeout alarm ;
+TUPLE: delay < model model timeout alarm ;
 
 : update-delay-model ( delay -- )
-    dup delay-model model-value swap set-model ;
+    [ delay-model model-value ] keep set-model ;
 
 : <delay> ( model timeout -- delay )
-    f delay construct-model
-    [ set-delay-timeout ] keep
-    [ set-delay-model ] 2keep
-    [ add-dependency ] keep ;
+    f delay new-model
+        swap >>timeout
+        over >>model
+        [ add-dependency ] keep ;
 
 : cancel-delay ( delay -- )
     delay-alarm [ cancel-alarm ] when* ;
 
 : start-delay ( delay -- )
-    dup [ f over set-delay-alarm update-delay-model ] curry
-    over delay-timeout later
-    swap set-delay-alarm ;
+    dup
+    [ [ f >>alarm update-delay-model ] curry ] [ timeout>> ] bi later
+    >>alarm drop ;
 
 M: delay model-changed nip dup cancel-delay start-delay ;
 

@@ -4,31 +4,31 @@ USING: kernel tools.test peg fjsc ;
 IN: fjsc.tests
 
 { T{ ast-expression f V{ T{ ast-number f 55 } T{ ast-identifier f "2abc1" } T{ ast-number f 100 } } } } [
-  "55 2abc1 100" 'expression' parse parse-result-ast
+  "55 2abc1 100" 'expression' parse
 ] unit-test
 
 { T{ ast-quotation f V{ T{ ast-number f 55 } T{ ast-identifier f "2abc1" } T{ ast-number f 100 } } } } [
-  "[ 55 2abc1 100 ]" 'quotation' parse parse-result-ast
+  "[ 55 2abc1 100 ]" 'quotation' parse
 ] unit-test
 
 { T{ ast-array f V{ T{ ast-number f 55 } T{ ast-identifier f "2abc1" } T{ ast-number f 100 } } } } [
-  "{ 55 2abc1 100 }" 'array' parse parse-result-ast
+  "{ 55 2abc1 100 }" 'array' parse
 ] unit-test
 
 { T{ ast-stack-effect f V{ } V{ "d" "e" "f" } } } [
-  "( -- d e f )" 'stack-effect' parse parse-result-ast
+  "( -- d e f )" 'stack-effect' parse
 ] unit-test
 
 { T{ ast-stack-effect f V{ "a" "b" "c" } V{ "d" "e" "f" } } } [
-  "( a b c -- d e f )" 'stack-effect' parse parse-result-ast
+  "( a b c -- d e f )" 'stack-effect' parse
 ] unit-test
 
 { T{ ast-stack-effect f V{ "a" "b" "c" } V{ } } } [
-  "( a b c -- )" 'stack-effect' parse parse-result-ast
+  "( a b c -- )" 'stack-effect' parse
 ] unit-test
 
 { T{ ast-stack-effect f V{ } V{ } } } [
-  "( -- )" 'stack-effect' parse parse-result-ast
+  "( -- )" 'stack-effect' parse
 ] unit-test
 
 { f } [
@@ -37,18 +37,18 @@ IN: fjsc.tests
 
 
 { T{ ast-expression f V{ T{ ast-string f "abcd" } } } } [
-  "\"abcd\"" 'statement' parse parse-result-ast
+  "\"abcd\"" 'statement' parse
 ] unit-test
 
 { T{ ast-expression f V{ T{ ast-use f "foo" } } } } [
-  "USE: foo" 'statement' parse parse-result-ast
+  "USE: foo" 'statement' parse
 ] unit-test
 
 { T{ ast-expression f V{ T{ ast-in f "foo" } } } } [
-  "IN: foo" 'statement' parse parse-result-ast
+  "IN: foo" 'statement' parse
 ] unit-test
 
 { T{ ast-expression f V{ T{ ast-using f V{ "foo" "bar" }  } } } } [
-  "USING: foo bar ;" 'statement' parse parse-result-ast
+  "USING: foo bar ;" 'statement' parse
 ] unit-test
 

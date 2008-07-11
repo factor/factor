@@ -1,14 +1,15 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays ui.commands ui.gadgets ui.gadgets.borders
+USING: accessors arrays kernel math models namespaces sequences
+strings quotations assocs combinators classes colors
+classes.tuple opengl math.vectors
+ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.labels ui.gadgets.theme
 ui.gadgets.tracks ui.gadgets.packs ui.gadgets.worlds ui.gestures
-ui.render kernel math models namespaces sequences strings
-quotations assocs combinators classes colors classes.tuple
-opengl math.vectors ;
+ui.render ;
 IN: ui.gadgets.buttons
 
-TUPLE: button pressed? selected? quot ;
+TUPLE: button < border pressed? selected? quot ;
 
 : buttons-down? ( -- ? )
     hand-buttons get-global empty? not ;
@@ -39,10 +40,11 @@ button H{
     { T{ mouse-enter } [ button-update ] }
 } set-gestures
 
-: <button> ( gadget quot -- button )
-    button new
-    swap >>quot
-    [ set-gadget-delegate ] keep ;
+: new-button ( label quot class -- button )
+    [ swap >label ] dip new-border swap >>quot ; inline
+
+: <button> ( label quot -- button )
+    button new-button ;
 
 TUPLE: button-paint plain rollover pressed selected ;
 
@@ -66,10 +68,11 @@ M: button-paint draw-boundary
     button-paint draw-boundary ;
 
 : roll-button-theme ( button -- button )
-    f black <solid> dup f <button-paint> >>boundary ; inline
+    f black <solid> dup f <button-paint> >>boundary
+    { 0 1/2 } >>align ; inline
 
 : <roll-button> ( label quot -- button )
-    >r >label r> <button> roll-button-theme ;
+    <button> roll-button-theme ;
 
 : <bevel-button-paint> ( -- paint )
     plain-gradient
@@ -80,13 +83,13 @@ M: button-paint draw-boundary
 
 : bevel-button-theme ( gadget -- gadget )
     <bevel-button-paint> >>interior
+    { 5 5 } >>size
     faint-boundary ; inline
 
 : <bevel-button> ( label quot -- button )
-    >r >label 5 <border> r>
     <button> bevel-button-theme ;
 
-TUPLE: repeat-button ;
+TUPLE: repeat-button < button ;
 
 repeat-button H{
     { T{ drag } [ button-clicked ] }
@@ -95,8 +98,7 @@ repeat-button H{
 : <repeat-button> ( label quot -- button )
     #! Button that calls the quotation every 100ms as long as
     #! the mouse is held down.
-    repeat-button new
-    [ >r <bevel-button> r> set-gadget-delegate ] keep ;
+    repeat-button new-button bevel-button-theme ;
 
 TUPLE: checkmark-paint color ;
 
@@ -128,20 +130,18 @@ M: checkmark-paint draw-interior
 : toggle-model ( model -- )
     [ not ] change-model ;
 
-: checkbox-theme ( gadget -- )
+: checkbox-theme ( gadget -- gadget )
     f >>interior
     { 5 5 } >>gap
-    1/2 >>align
-    drop ;
+    1/2 >>align ; inline
 
-TUPLE: checkbox ;
+TUPLE: checkbox < button ;
 
 : <checkbox> ( model label -- checkbox )
-    <checkmark>
-    label-on-right
-    over [ toggle-model drop ] curry <button>
-    checkbox construct-control
-    dup checkbox-theme ;
+    <checkmark> label-on-right checkbox-theme
+    [ model>> toggle-model ]
+    checkbox new-button
+        swap >>model ;
 
 M: checkbox model-changed
     swap model-value over set-button-selected? relayout-1 ;
@@ -173,12 +173,13 @@ M: radio-paint draw-boundary
     dup radio-knob-theme
     { 16 16 } over set-gadget-dim ;
 
-TUPLE: radio-control value ;
+TUPLE: radio-control < button value ;
 
-: <radio-control> ( value model gadget quot -- control )
-    >r pick [ swap set-control-value ] curry r> call
-    radio-control construct-control
-    tuck set-radio-control-value ; inline
+: <radio-control> ( value model label -- control )
+    [ [ value>> ] keep set-control-value ]
+    radio-control new-button
+        swap >>model
+        swap >>value ; inline
 
 M: radio-control model-changed
     swap model-value
@@ -190,15 +191,12 @@ M: radio-control model-changed
     #! quot has stack effect ( value model label -- )
     swapd [ swapd call gadget, ] 2curry assoc-each ; inline
 
-: radio-button-theme ( gadget -- )
+: radio-button-theme ( gadget -- gadget )
     { 5 5 } >>gap
-    1/2 >>align
-    drop ;
+    1/2 >>align ; inline
 
 : <radio-button> ( value model label -- gadget )
-    <radio-knob> label-on-right
-    [ <button> ] <radio-control>
-    dup radio-button-theme ;
+    <radio-knob> label-on-right radio-button-theme <radio-control> ;
 
 : radio-buttons-theme ( gadget -- )
     { 5 5 } >>gap drop ;
@@ -208,7 +206,7 @@ M: radio-control model-changed
     dup radio-buttons-theme ;
 
 : <toggle-button> ( value model label -- gadget )
-    [ <bevel-button> ] <radio-control> ;
+    <radio-control> bevel-button-theme ;
 
 : <toggle-buttons> ( model assoc -- gadget )
     [ [ <toggle-button> ] <radio-controls> ] make-shelf ;
@@ -224,7 +222,7 @@ M: radio-control model-changed
 
 : <toolbar> ( target -- toolbar )
     [
-        "toolbar" over class command-map swap
+        "toolbar" over class command-map commands>> swap
         [ -rot <command-button> gadget, ] curry assoc-each
     ] make-shelf ;
 

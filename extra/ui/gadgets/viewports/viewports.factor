@@ -1,12 +1,12 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: ui.gadgets.viewports
-USING: arrays ui.gadgets ui.gadgets.borders
+USING: accessors arrays ui.gadgets ui.gadgets.borders
 kernel math namespaces sequences models math.vectors ;
 
 : viewport-gap { 3 3 } ; inline
 
-TUPLE: viewport ;
+TUPLE: viewport < gadget ;
 
 : find-viewport ( gadget -- viewport )
     [ viewport? ] find-parent ;
@@ -15,9 +15,10 @@ TUPLE: viewport ;
     gadget-child pref-dim viewport-gap 2 v*n v+ ;
 
 : <viewport> ( content model -- viewport )
-    <gadget> viewport construct-control
-    t over set-gadget-clipped?
-    [ add-gadget ] keep ;
+    viewport new-gadget
+        swap >>model
+        t >>clipped?
+        [ add-gadget ] keep ;
 
 M: viewport layout*
     dup rect-dim viewport-gap 2 v*n v-

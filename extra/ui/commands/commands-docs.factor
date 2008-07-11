@@ -1,22 +1,21 @@
-USING: ui.gestures help.markup help.syntax strings kernel
+USING: accessors ui.gestures help.markup help.syntax strings kernel
 hashtables quotations words classes sequences namespaces
 arrays assocs ;
 IN: ui.commands
 
-: command-map-row ( children -- seq )
+: command-map-row ( gesture command -- seq )
     [
-        [ first gesture>string , ]
+        [ gesture>string , ]
         [
-            second
             [ command-name , ]
             [ command-word \ $link swap 2array , ]
             [ command-description , ]
             tri
-        ] bi
+        ] bi*
     ] { } make ;
 
-: command-map. ( command-map -- )
-    [ command-map-row ] map
+: command-map. ( alist -- )
+    [ command-map-row ] { } assoc>map
     { "Shortcut" "Command" "Word" "Notes" }
     [ \ $strong swap ] { } map>assoc prefix
     $table ;
@@ -25,11 +24,13 @@ IN: ui.commands
     [ second (command-name) " commands" append $heading ]
     [
         first2 swap command-map
-        [ command-map-blurb print-element ] [ command-map. ] bi
+        [ blurb>> print-element ] [ commands>> command-map. ] bi
     ] bi ;
 
 : $command ( element -- )
-    reverse first3 command-map value-at gesture>string $snippet ;
+    reverse first3 command-map
+    commands>> value-at gesture>string
+    $snippet ;
 
 HELP: +nullary+
 { $description "A key which may be set in the hashtable passed to " { $link define-command } ". If set to a true value, the command does not take any inputs, and the value passed to " { $link invoke-command } " will be ignored. Otherwise, it takes one input." } ;

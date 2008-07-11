@@ -99,7 +99,7 @@ PRIVATE>
     uncons [ list>seq [ ] like ] [ lookup-macro lambda-rewrite call ] bi* call compile-form call ;
     
 : lisp-string>factor ( str -- quot )
-    lisp-expr parse-result-ast compile-form ;
+    lisp-expr compile-form ;
     
 : lisp-eval ( str -- * )    
   lisp-string>factor call ;

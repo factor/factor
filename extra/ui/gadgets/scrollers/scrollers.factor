@@ -7,7 +7,7 @@ models models.range models.compose
 combinators math.vectors classes.tuple ;
 IN: ui.gadgets.scrollers
 
-TUPLE: scroller viewport x y follows ;
+TUPLE: scroller < frame viewport x y follows ;
 
 : find-scroller ( gadget -- scroller/f )
     [ [ scroller? ] is? ] find-parent ;
@@ -40,14 +40,21 @@ scroller H{
 
 : y-model ( -- model ) g gadget-model model-dependencies second ;
 
-: <scroller> ( gadget -- scroller )
-    <scroller-model> <frame> scroller construct-control [
+: new-scroller ( gadget class -- scroller )
+    new-frame
+        t >>root?
+        <scroller-model> >>model
+         faint-boundary
+    [
         [
             x-model <x-slider> g-> set-scroller-x @bottom frame,
             y-model <y-slider> g-> set-scroller-y @right frame,
             viewport,
         ] with-gadget
-    ] keep t >>root? faint-boundary ;
+    ] keep ;
+
+: <scroller> ( gadget -- scroller )
+    scroller new-scroller ;
 
 : scroll ( value scroller -- )
     [
@@ -123,7 +130,7 @@ scroller H{
     } cond ;
 
 M: scroller layout*
-    dup delegate layout*
+    dup call-next-method
     dup scroller-follows
     [ update-scroller ] 2keep
     swap set-scroller-follows ;
@@ -134,12 +141,10 @@ M: scroller focusable-child*
 M: scroller model-changed
     nip f swap set-scroller-follows ;
 
-TUPLE: limited-scroller dim ;
+TUPLE: limited-scroller < scroller fixed-dim ;
 
-: <limited-scroller> ( gadget -- scroller )
-    <scroller>
-    limited-scroller new
-    [ set-gadget-delegate ] keep ;
+: <limited-scroller> ( gadget dim -- scroller )
+    >r limited-scroller new-scroller r> >>fixed-dim ;
 
 M: limited-scroller pref-dim*
-    dim>> ;
+    fixed-dim>> ;

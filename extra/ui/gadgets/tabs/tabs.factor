@@ -24,13 +24,16 @@ DEFER: (del-page)
      [ [ length ] keep ] 2dip
     '[ , _ _ , add-toggle ] 2each ;
 
+: refresh-book ( tabbed -- )
+    model>> [ ] change-model ;
+
 : (del-page) ( n name tabbed -- )
     { [ [ remove ] change-names redo-toggler ]
-      [ [ names>> length ] [ model>> ] bi
+      [ dupd [ names>> length ] [ model>> ] bi
         [ [ = ] keep swap [ 1- ] when
-          [ > ] keep swap [ 1- ] when dup ] change-model ]
+          [ < ] keep swap [ 1- ] when ] change-model ]
       [ content>> nth-gadget unparent ]
-      [ model>> [ ] change-model ] ! refresh
+      [ refresh-book ]
     } cleave ;
 
 : add-page ( page name tabbed -- )
@@ -38,7 +41,8 @@ DEFER: (del-page)
     [ [ model>> swap ]
       [ names>> length 1 - swap ]
       [ toggler>> ] tri add-toggle ]
-    [ content>> add-gadget ] bi ;
+    [ content>> add-gadget ]
+    [ refresh-book ] tri ;
 
 : del-page ( name tabbed -- )
     [ names>> index ] 2keep (del-page) ;

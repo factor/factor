@@ -1,4 +1,4 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions kernel sequences strings
 math assocs words generic namespaces assocs quotations splitting
@@ -15,16 +15,14 @@ GENERIC: invoke-command ( target command -- )
 
 GENERIC: command-name ( command -- str )
 
-TUPLE: command-map blurb ;
+TUPLE: command-map blurb commands ;
 
 GENERIC: command-description ( command -- str/f )
 
 GENERIC: command-word ( command -- word )
 
 : <command-map> ( blurb commands -- command-map )
-    { } like
-    { set-command-map-blurb set-delegate }
-    \ command-map construct ;
+    { } like \ command-map boa ;
 
 : commands ( class -- hash )
     dup "commands" word-prop [ ] [
@@ -37,7 +35,8 @@ GENERIC: command-word ( command -- word )
 : command-gestures ( class -- hash )
     commands values [
         [
-            [ first ] filter
+            commands>>
+            [ drop ] assoc-filter
             [ [ invoke-command ] curry swap set ] assoc-each
         ] each
     ] H{ } make-assoc ;
