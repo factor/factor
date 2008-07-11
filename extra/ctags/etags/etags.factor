@@ -5,7 +5,7 @@
 ! Alfredo Beaumont <alfredo.beaumont@gmail.com>
 USING: kernel sequences sorting assocs words prettyprint ctags
 io.encodings.ascii io.files math math.parser namespaces strings locals
-shuffle io.backend memoize ;
+shuffle io.backend arrays ;
 IN: ctags.etags
 
 : ctag-path ( alist -- path )
@@ -39,20 +39,20 @@ IN: ctags.etags
     ] 2keep line>bytes +
   ] if ;
 
-: file>bytes ( n path -- bytes )
-  ascii file-lines lines>bytes ;
+: file>lines ( resource -- lines )
+  ascii file-lines ;
 
-: etag ( path seq -- str )
+: etag ( lines seq -- str )
   [
     dup first ?word-name %
     1 HEX: 7f <string> %
     second dup number>string %
     1 CHAR: , <string> %
-    2 - swap file>bytes number>string %
+    2 - swap lines>bytes number>string %
   ] "" make ;
 
-: etag-entry ( alist -- alist path )
-  [ first ] keep swap ;
+: etag-entry ( alist -- alist array )
+  [ first ] keep swap [ file>lines ] keep 2array ;
 
 : vector-length ( vector -- n )
   0 [ length + ] reduce ;
@@ -73,9 +73,9 @@ SYMBOL: resource
   { } swap [
     etag-entry resource [
       second [
-        resource get swap etag
+        resource get first swap etag
       ] map dup vector-length
-      resource get
+      resource get second
     ] with-variable
     etag-header append
   ] each ;
