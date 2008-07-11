@@ -82,10 +82,10 @@ M: irc-message write-irc
     <scrolling-pane>
     [ <pane-stream> swap display ] keep ;
 
-TUPLE: irc-editor outstream listener client ;
+TUPLE: irc-editor < editor outstream listener client ;
 
 : <irc-editor> ( pane listener client -- editor )
-    [ <editor> irc-editor construct-editor
+    [ irc-editor new-editor
     swap >>listener swap <pane-stream> >>outstream
     ] dip client>> >>client ;
 
