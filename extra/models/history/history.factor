@@ -5,9 +5,9 @@ IN: models.history
 
 TUPLE: history < model back forward ;
 
-: reset-history ( history -- )
+: reset-history ( history -- history )
     V{ } clone >>back
-    V{ } clone >>forward ;
+    V{ } clone >>forward ; inline
 
 : <history> ( value -- history )
     history new-model
