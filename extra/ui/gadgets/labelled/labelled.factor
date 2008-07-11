@@ -13,11 +13,9 @@ TUPLE: labelled-gadget < track content ;
 : <labelled-gadget> ( gadget title -- newgadget )
     { 0 1 } labelled-gadget new-track
     [
-        [
-            <label> reverse-video-theme f track,
-            g-> set-labelled-gadget-content 1 track,
-        ] with-gadget
-    ] keep ;
+        <label> reverse-video-theme f track,
+        g-> set-labelled-gadget-content 1 track,
+    ] make-gadget ;
 
 M: labelled-gadget focusable-child* labelled-gadget-content ;
 
@@ -54,10 +52,8 @@ TUPLE: closable-gadget < frame content ;
 : <closable-gadget> ( gadget title quot -- gadget )
     closable-gadget new-frame 
     [
-        [
-            <title-bar> @top frame,
-            g-> set-closable-gadget-content @center frame,
-        ] with-gadget
-    ] keep ;
+        <title-bar> @top frame,
+        g-> set-closable-gadget-content @center frame,
+    ] make-gadget ;
 
 M: closable-gadget focusable-child* closable-gadget-content ;

@@ -109,12 +109,10 @@ deploy-gadget "toolbar" f {
         swap >>vocab
         { 0 1 } >>orientation
     [
-        [
-            g vocab>> <deploy-settings>
-            g-> set-deploy-gadget-settings gadget,
-            buttons,
-        ] with-gadget
-    ] keep
+        g vocab>> <deploy-settings>
+        g-> set-deploy-gadget-settings gadget,
+        buttons,
+    ] make-gadget
     dup deploy-settings-theme
     dup com-revert ;
 

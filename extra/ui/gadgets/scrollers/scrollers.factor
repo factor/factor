@@ -46,12 +46,10 @@ scroller H{
         <scroller-model> >>model
          faint-boundary
     [
-        [
-            x-model <x-slider> g-> set-scroller-x @bottom frame,
-            y-model <y-slider> g-> set-scroller-y @right frame,
-            viewport,
-        ] with-gadget
-    ] keep ;
+        x-model <x-slider> g-> set-scroller-x @bottom frame,
+        y-model <y-slider> g-> set-scroller-y @right frame,
+        viewport,
+    ] make-gadget ;
 
 : <scroller> ( gadget -- scroller )
     scroller new-scroller ;

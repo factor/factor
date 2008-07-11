@@ -50,10 +50,10 @@ M: track pref-dim*
     over track-sizes push add-gadget ;
 
 : track, ( gadget constraint -- )
-    \ make-gadget get swap track-add ;
+    gadget get swap track-add ;
 
 : make-track ( quot orientation -- track )
-    <track> make-gadget ; inline
+    <track> swap make-gadget ; inline
 
 : track-remove ( gadget track -- )
     over [
