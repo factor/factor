@@ -1,6 +1,7 @@
-USING: ui.gadgets.editors tools.test kernel io io.streams.plain
-definitions namespaces ui.gadgets ui.gadgets.grids prettyprint
-documents ui.gestures tools.test.ui models ;
+USING: accessors ui.gadgets.editors tools.test kernel io
+io.streams.plain definitions namespaces ui.gadgets
+ui.gadgets.grids prettyprint documents ui.gestures tools.test.ui
+models ;
 
 [ "foo bar" ] [
     <editor> "editor" set
@@ -44,5 +45,5 @@ documents ui.gestures tools.test.ui models ;
 "hello" <model> <field> "field" set
 
 "field" get [
-    [ "hello" ] [ "field" get field-model model-value ] unit-test
+    [ "hello" ] [ "field" get field-model>> model-value ] unit-test
 ] with-grafted-gadget

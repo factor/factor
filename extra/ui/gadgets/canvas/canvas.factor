@@ -5,10 +5,10 @@ ui.gadgets.worlds ui.render opengl opengl.gl kernel namespaces
 classes.tuple colors ;
 IN: ui.gadgets.canvas
 
-TUPLE: canvas dlist ;
+TUPLE: canvas < gadget dlist ;
 
 : <canvas> ( -- canvas )
-    canvas construct-gadget
+    canvas new-gadget
     black solid-interior ;
 
 : delete-canvas-dlist ( canvas -- )

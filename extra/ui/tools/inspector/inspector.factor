@@ -6,7 +6,7 @@ ui.gadgets.slots ui.gadgets.tracks ui.gestures
 ui.gadgets.buttons namespaces ;
 IN: ui.tools.inspector
 
-TUPLE: inspector-gadget object pane ;
+TUPLE: inspector-gadget < track object pane ;
 
 : refresh ( inspector -- )
     dup inspector-gadget-object swap inspector-gadget-pane [
@@ -14,11 +14,13 @@ TUPLE: inspector-gadget object pane ;
     ] with-pane ;
 
 : <inspector-gadget> ( -- gadget )
-    inspector-gadget new
+    { 0 1 } inspector-gadget new-track
     [
-        toolbar,
-        <pane> g-> set-inspector-gadget-pane <scroller> 1 track,
-    ] { 0 1 } build-track ;
+        [
+            toolbar,
+            <pane> g-> set-inspector-gadget-pane <scroller> 1 track,
+        ] with-gadget
+    ] keep ;
 
 : inspect-object ( obj inspector -- )
     [ set-inspector-gadget-object ] keep refresh ;

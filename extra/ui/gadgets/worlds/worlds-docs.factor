@@ -29,15 +29,15 @@ HELP: focus-path
 HELP: world
 { $class-description "A gadget which appears at the top of the gadget hieararchy, and in turn may be displayed in a native window. Worlds delegate to " { $link gadget } " instances and have the following slots:"
     { $list
-        { { $link world-active? } " - if set to " { $link f } ", the world will not be drawn. This slot is set to " { $link f } " if an error is thrown while drawing the world; this prevents multiple debugger windows from being shown." }
-        { { $link world-glass } " - a glass pane in front of the primary gadget, used to implement behaviors such as popup menus which are hidden when the mouse is clicked outside the menu." }
-        { { $link world-title } " - a string to be displayed in the title bar of the native window containing the world." }
-        { { $link world-status } " - a " { $link model } " holding a string to be displayed in the world's status bar." }
-        { { $link world-focus } " - the current owner of the keyboard focus in the world." }
-        { { $link world-focused? } " - a boolean indicating if the native window containing the world has keyboard focus." }
-        { { $link world-fonts } " - a hashtable mapping font instances to vectors of " { $link sprite } " instances." }
-        { { $link world-handle } " - a backend-specific native handle representing the native window containing the world, or " { $link f } " if the world is not grafted." }
-        { { $link world-loc } " - the on-screen location of the native window containing the world. The co-ordinate system here is backend-specific." }
+        { { $snippet "active?" } " - if set to " { $link f } ", the world will not be drawn. This slot is set to " { $link f } " if an error is thrown while drawing the world; this prevents multiple debugger windows from being shown." }
+        { { $snippet "glass" } " - a glass pane in front of the primary gadget, used to implement behaviors such as popup menus which are hidden when the mouse is clicked outside the menu." }
+        { { $snippet "title" } " - a string to be displayed in the title bar of the native window containing the world." }
+        { { $snippet "status" } " - a " { $link model } " holding a string to be displayed in the world's status bar." }
+        { { $snippet "focus" } " - the current owner of the keyboard focus in the world." }
+        { { $snippet "focused?" } " - a boolean indicating if the native window containing the world has keyboard focus." }
+        { { $snippet "fonts" } " - a hashtable mapping font instances to vectors of " { $link sprite } " instances." }
+        { { $snippet "handle" } " - a backend-specific native handle representing the native window containing the world, or " { $link f } " if the world is not grafted." }
+        { { $snippet "window-loc" } " - the on-screen location of the native window containing the world. The co-ordinate system here is backend-specific." }
     }
 } ;
 

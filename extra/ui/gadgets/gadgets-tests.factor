@@ -36,13 +36,6 @@ prettyprint io.streams.string ;
     intersects?
 ] unit-test
 
-TUPLE: fooey ;
-
-C: <fooey> fooey
-
-[ ] [ <gadget> <fooey> set-gadget-delegate ] unit-test
-[ ] [ f <fooey> set-gadget-delegate ] unit-test
-
 [ { 300 300 } ]
 [
     ! c contains b contains a
@@ -113,7 +106,7 @@ C: <fooey> fooey
 
 TUPLE: mock-gadget graft-called ungraft-called ;
 
-: <mock-gadget>
+: <mock-gadget> ( -- gadget )
     0 0 mock-gadget boa <gadget> over set-delegate ;
 
 M: mock-gadget graft*

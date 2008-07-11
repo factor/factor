@@ -1,9 +1,9 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences models ui.gadgets ;
+USING: accessors kernel sequences models ui.gadgets ;
 IN: ui.gadgets.books
 
-TUPLE: book ;
+TUPLE: book < gadget ;
 
 : hide-all ( book -- ) gadget-children [ hide-gadget ] each ;
 
@@ -16,8 +16,13 @@ M: book model-changed
     dup current-page show-gadget
     relayout ;
 
+: new-book ( pages model class -- book )
+    new-gadget
+        swap >>model
+        [ add-gadgets ] keep ; inline
+
 : <book> ( pages model -- book )
-    <gadget> book construct-control [ add-gadgets ] keep ;
+    book new-book ;
 
 M: book pref-dim* gadget-children pref-dims max-dim ;
 

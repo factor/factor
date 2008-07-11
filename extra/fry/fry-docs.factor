@@ -40,9 +40,9 @@ $nl
 }
 "Occurrences of " { $link @ } " are simply syntax sugar for " { $snippet ", call" } ". The following three lines are equivalent:"
 { $code 
-    "{ 10 20 30 } [ sq ] '[ @ . ] map"
-    "{ 10 20 30 } [ sq ] [ . ] compose map"
-    "{ 10 20 30 } [ sq . ] map"
+    "{ 10 20 30 } [ sq ] '[ @ . ] each"
+    "{ 10 20 30 } [ sq ] [ . ] compose each"
+    "{ 10 20 30 } [ sq . ] each"
 }
 "The " { $link , } " and " { $link @ } " specifiers may be freely mixed:"
 { $code

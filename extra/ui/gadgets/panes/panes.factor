@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ui.gadgets ui.gadgets.borders ui.gadgets.buttons
 ui.gadgets.labels ui.gadgets.scrollers
@@ -12,7 +12,8 @@ ui.gadgets.grid-lines classes.tuple models continuations
 destructors accessors ;
 IN: ui.gadgets.panes
 
-TUPLE: pane output current prototype scrolls?
+TUPLE: pane < pack
+output current prototype scrolls?
 selection-color caret mark selecting? ;
 
 : clear-selection ( pane -- )
@@ -47,16 +48,19 @@ M: pane gadget-selection
     [ pane-current clear-gadget ]
     tri ;
 
-: pane-theme ( pane -- )
-    selection-color >>selection-color drop ;
+: pane-theme ( pane -- pane )
+    selection-color >>selection-color ; inline
+
+: new-pane ( class -- pane )
+    new-gadget
+        { 0 1 } >>orientation
+        <shelf> >>prototype
+        <incremental> over add-output
+        dup prepare-line
+        pane-theme ;
 
 : <pane> ( -- pane )
-    pane new
-    <pile> over set-delegate
-    <shelf> >>prototype
-    <pile> <incremental> over add-output
-    dup prepare-line
-    dup pane-theme ;
+    pane new-pane ;
 
 GENERIC: draw-selection ( loc obj -- )
 
@@ -142,14 +146,15 @@ M: style-stream write-gadget
 : <scrolling-pane> ( -- pane )
     <pane> t over set-pane-scrolls? ;
 
-TUPLE: pane-control quot ;
+TUPLE: pane-control < pane quot ;
 
 M: pane-control model-changed
     swap model-value swap dup pane-control-quot with-pane ;
 
 : <pane-control> ( model quot -- pane )
-    >r <pane> pane-control construct-control r>
-    over set-pane-control-quot ;
+    pane-control new-pane
+        swap >>quot
+        swap >>model ;
 
 : do-pane-stream ( pane-stream quot -- )
     >r pane-stream-pane r> keep scroll-pane ; inline
@@ -195,13 +200,15 @@ M: pane-stream make-span-stream
 : apply-presentation-style ( style gadget -- style gadget )
     presented [ <presentation> ] apply-style ;
 
-: <styled-label> ( style text -- gadget )
-    <label>
+: style-label ( style gadget -- gadget )
     apply-foreground-style
     apply-background-style
     apply-font-style
     apply-presentation-style
-    nip ;
+    nip ; inline
+
+: <styled-label> ( style text -- gadget )
+    <label> style-label ;
 
 ! Paragraph styles
 
@@ -235,28 +242,27 @@ M: pane-stream make-span-stream
     apply-printer-style
     nip ;
 
-TUPLE: nested-pane-stream style parent ;
+TUPLE: nested-pane-stream < pane-stream style parent ;
 
-: <nested-pane-stream> ( style parent -- stream )
-    >r <pane> apply-wrap-style <pane-stream> r> {
-        set-nested-pane-stream-style
-        set-delegate
-        set-nested-pane-stream-parent
-    } nested-pane-stream construct ;
+: new-nested-pane-stream ( style parent class -- stream )
+    new
+        swap >>parent
+        swap <pane> apply-wrap-style [ >>style ] [ >>pane ] bi* ;
+    inline
 
 : unnest-pane-stream ( stream -- child parent )
     dup ?nl
-    dup nested-pane-stream-style
-    over pane-stream-pane smash-pane style-pane
-    swap nested-pane-stream-parent ;
+    dup style>>
+    over pane>> smash-pane style-pane
+    swap parent>> ;
 
-TUPLE: pane-block-stream ;
+TUPLE: pane-block-stream < nested-pane-stream ;
 
 M: pane-block-stream dispose
     unnest-pane-stream write-gadget ;
 
 M: pane-stream make-block-stream
-    <nested-pane-stream> pane-block-stream construct-delegate ;
+    pane-block-stream new-nested-pane-stream ;
 
 ! Tables
 : apply-table-gap-style ( style grid -- style grid )
@@ -273,12 +279,12 @@ M: pane-stream make-block-stream
     apply-table-border-style
     nip ;
 
-TUPLE: pane-cell-stream ;
+TUPLE: pane-cell-stream < nested-pane-stream ;
 
 M: pane-cell-stream dispose ?nl ;
 
 M: pane-stream make-cell-stream
-    <nested-pane-stream> pane-cell-stream construct-delegate ;
+    pane-cell-stream new-nested-pane-stream ;
 
 M: pane-stream stream-write-table
     >r
@@ -298,7 +304,7 @@ M: paragraph dispose drop ;
 M: pack stream-write gadget-write ;
 
 : gadget-bl ( style stream -- )
-    >r " " <styled-label> <word-break-gadget> r> add-gadget ;
+    >r " " <word-break-gadget> style-label r> add-gadget ;
 
 M: paragraph stream-write
     swap " " split

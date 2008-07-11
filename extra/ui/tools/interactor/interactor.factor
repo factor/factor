@@ -4,7 +4,7 @@ USING: arrays assocs combinators continuations documents
 hashtables io io.styles kernel math math.order math.vectors
 models models.delay namespaces parser lexer prettyprint
 quotations sequences strings threads listener classes.tuple
-ui.commands ui.gadgets ui.gadgets.editors
+ui.commands ui.gadgets ui.gadgets.editors ui.gadgets.status-bar
 ui.gadgets.presentations ui.gadgets.worlds ui.gestures
 definitions calendar concurrency.flags concurrency.mailboxes
 ui.tools.workspace accessors sets destructors ;
@@ -12,7 +12,8 @@ IN: ui.tools.interactor
 
 ! If waiting is t, we're waiting for user input, and invoking
 ! evaluate-input resumes the thread.
-TUPLE: interactor output history flag mailbox thread waiting help ;
+TUPLE: interactor < source-editor
+output history flag mailbox thread waiting help ;
 
 : register-self ( interactor -- )
     <mailbox> >>mailbox
@@ -39,18 +40,17 @@ TUPLE: interactor output history flag mailbox thread waiting help ;
     editor-caret 1/3 seconds <delay> ;
 
 : <interactor> ( output -- gadget )
-    <source-editor>
-    interactor construct-editor
+    interactor new-editor
         V{ } clone >>history
         <flag> >>flag
         dup <help-model> >>help
         swap >>output ;
 
 M: interactor graft*
-    [ delegate graft* ] [ dup help>> add-connection ] bi ;
+    [ call-next-method ] [ dup help>> add-connection ] bi ;
 
 M: interactor ungraft*
-    [ dup help>> remove-connection ] [ delegate ungraft ] bi ;
+    [ dup help>> remove-connection ] [ call-next-method ] bi ;
 
 : word-at-loc ( loc interactor -- word )
     over [
@@ -64,7 +64,7 @@ M: interactor model-changed
     2dup help>> eq? [
         swap model-value over word-at-loc swap show-summary
     ] [
-        delegate model-changed
+        call-next-method
     ] if ;
 
 : write-input ( string input -- )
@@ -180,7 +180,7 @@ M: interactor stream-read-quot
     } cond ;
 
 M: interactor pref-dim*
-    [ line-height 4 * 0 swap 2array ] [ delegate pref-dim* ] bi
+    [ line-height 4 * 0 swap 2array ] [ call-next-method ] bi
     vmax ;
 
 interactor "interactor" f {
