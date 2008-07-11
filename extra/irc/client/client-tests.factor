@@ -1,8 +1,9 @@
 USING: kernel tools.test accessors arrays sequences qualified
        io.streams.string io.streams.duplex namespaces threads
-       calendar irc.client.private concurrency.mailboxes classes ;
-EXCLUDE: irc.client => join ;
-RENAME: join irc.client => join_
+       calendar irc.client.private irc.client irc.messages.private
+       concurrency.mailboxes classes ;
+EXCLUDE: irc.messages => join ;
+RENAME: join irc.messages => join_
 IN: irc.client.tests
 
 ! Utilities
