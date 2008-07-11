@@ -12,7 +12,8 @@ ui.gadgets.grid-lines classes.tuple models continuations
 destructors accessors ;
 IN: ui.gadgets.panes
 
-TUPLE: pane output current prototype scrolls?
+TUPLE: pane < pack
+output current prototype scrolls?
 selection-color caret mark selecting? ;
 
 : clear-selection ( pane -- )
@@ -47,16 +48,19 @@ M: pane gadget-selection
     [ pane-current clear-gadget ]
     tri ;
 
-: pane-theme ( pane -- )
-    selection-color >>selection-color drop ;
+: pane-theme ( pane -- pane )
+    selection-color >>selection-color ; inline
+
+: new-pane ( class -- pane )
+    new-gadget
+        { 0 1 } >>orientation
+        <shelf> >>prototype
+        <incremental> over add-output
+        dup prepare-line
+        pane-theme ;
 
 : <pane> ( -- pane )
-    pane new
-    <pile> over set-delegate
-    <shelf> >>prototype
-    <pile> <incremental> over add-output
-    dup prepare-line
-    dup pane-theme ;
+    pane new-pane ;
 
 GENERIC: draw-selection ( loc obj -- )
 
@@ -142,14 +146,15 @@ M: style-stream write-gadget
 : <scrolling-pane> ( -- pane )
     <pane> t over set-pane-scrolls? ;
 
-TUPLE: pane-control quot ;
+TUPLE: pane-control < pane quot ;
 
 M: pane-control model-changed
     swap model-value swap dup pane-control-quot with-pane ;
 
 : <pane-control> ( model quot -- pane )
-    >r <pane> pane-control construct-control r>
-    over set-pane-control-quot ;
+    pane-control new-pane
+        swap >>quot
+        swap >>model ;
 
 : do-pane-stream ( pane-stream quot -- )
     >r pane-stream-pane r> keep scroll-pane ; inline

@@ -1,31 +1,33 @@
-! Copyright (C) 2006 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math namespaces sequences words io
-io.streams.string math.vectors ui.gadgets columns ;
+io.streams.string math.vectors ui.gadgets columns accessors ;
 IN: ui.gadgets.grids
 
-TUPLE: grid children gap fill? ;
+TUPLE: grid < gadget
+grid
+{ gap initial: { 0 0 } }
+{ fill? initial: t } ;
 
-: set-grid-children* ( children grid -- )
-    [ set-grid-children ] 2keep >r concat r> add-gadgets ;
+: new-grid ( children class -- grid )
+    new-gadget
+    [ (>>grid) ] [ >r concat r> add-gadgets ] [ nip ] 2tri ;
+    inline
 
 : <grid> ( children -- grid )
-    grid construct-gadget
-    [ set-grid-children* ] keep
-    { 0 0 } over set-grid-gap
-    t over set-grid-fill? ;
+    grid new-grid ;
 
-: grid-child ( grid i j -- gadget ) rot grid-children nth nth ;
+: grid-child ( grid i j -- gadget ) rot grid>> nth nth ;
 
 : grid-add ( gadget grid i j -- )
     >r >r 2dup add-gadget r> r>
-    3dup grid-child unparent rot grid-children nth set-nth ;
+    3dup grid-child unparent rot grid>> nth set-nth ;
 
 : grid-remove ( grid i j -- )
     >r >r >r <gadget> r> r> r> grid-add ;
 
 : pref-dim-grid ( grid -- dims )
-    grid-children [ [ pref-dim ] map ] map ;
+    grid>> [ [ pref-dim ] map ] map ;
 
 : (compute-grid) ( grid -- seq ) [ max-dim ] map ;
 
@@ -49,7 +51,7 @@ M: grid pref-dim*
     gap-sum >r gap-sum r> (pair-up) ;
 
 : do-grid ( dims grid quot -- )
-    -rot grid-children
+    -rot grid>>
     [ [ pick call ] 2each ] 2each
     drop ; inline
 
@@ -65,7 +67,7 @@ M: grid pref-dim*
     pick grid-fill? [
         pair-up swap [ set-layout-dim ] do-grid
     ] [
-        2drop grid-children [ [ prefer ] each ] each
+        2drop grid>> [ [ prefer ] each ] each
     ] if ;
 
 : grid-layout ( grid horiz vert -- )
@@ -77,12 +79,12 @@ M: grid children-on ( rect gadget -- seq )
     dup gadget-children empty? [
         2drop f
     ] [
-        { 0 1 } swap grid-children
+        { 0 1 } swap grid>>
         [ 0 <column> fast-children-on ] keep
         <slice> concat
     ] if ;
 
 M: grid gadget-text*
-    grid-children
+    grid>>
     [ [ gadget-text ] map ] map format-table
     [ CHAR: \n , ] [ % ] interleave ;

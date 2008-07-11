@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors models models.delay models.filter
 sequences ui.gadgets.labels ui.gadgets.theme ui.gadgets.tracks
-ui.gadgets.worlds ui.gadgets ui kernel calendar ;
+ui.gadgets.worlds ui.gadgets ui kernel calendar summary ;
 IN: ui.gadgets.status-bar
 
 : <status-bar> ( model -- gadget )
@@ -11,7 +11,9 @@ IN: ui.gadgets.status-bar
     t >>root? ;
 
 : open-status-window ( gadget title -- )
-    >r [
-        1 track,
-        f <model> dup <status-bar> f track,
-    ] { 0 1 } make-track r> rot <world> open-world-window ;
+    f <model> [ <world> ] keep
+    <status-bar> over f track-add
+    open-world-window ;
+
+: show-summary ( object gadget -- )
+    >r [ summary ] [ "" ] if* r> show-status ;

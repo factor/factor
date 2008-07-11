@@ -24,7 +24,7 @@ TUPLE: listener-gadget input output stack ;
 
 : listener-input, ( -- )
     g <listener-input> g-> set-listener-gadget-input
-    <limited-scroller> { 0 100 } >>dim
+    { 0 100 } <limited-scroller>
     "Input" <labelled-gadget> f track, ;
 
 : welcome. ( -- )

@@ -1,15 +1,16 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays ui.gadgets generic hashtables kernel math
+USING: accessors arrays ui.gadgets kernel math
 namespaces vectors sequences math.vectors ;
 IN: ui.gadgets.borders
 
-TUPLE: border size fill ;
+TUPLE: border < gadget size fill ;
 
 : <border> ( child gap -- border )
-    dup 2array { 0 0 } border boa
-    <gadget> over set-delegate
-    tuck add-gadget ;
+    border new-gadget
+        swap dup 2array >>size
+        { 0 0 } >>fill
+        [ add-gadget ] keep ;
 
 M: border pref-dim*
     [ border-size 2 v*n ] keep

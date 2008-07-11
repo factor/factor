@@ -65,8 +65,6 @@ HELP: <gadget>
 { $values { "gadget" "a new " { $link gadget } } }
 { $description "Creates a new gadget." } ;
 
-{ <gadget> set-gadget-delegate } related-words
-
 HELP: relative-loc
 { $values { "fromgadget" gadget } { "togadget" gadget } { "loc" "a pair of integers" } }
 { $description
@@ -98,11 +96,6 @@ HELP: max-dim
 HELP: each-child
 { $values { "gadget" gadget } { "quot" "a quotation with stack effect " { $snippet "( child -- )" } } }
 { $description "Applies the quotation to each child of the gadget." } ;
-
-HELP: set-gadget-delegate
-{ $values { "gadget" gadget } { "tuple" tuple } }
-{ $description "Sets the delegate of " { $snippet "tuple" } " to " { $snippet "gadget" } ". This is like " { $link set-delegate } ", except that to ensure correct behavior, the parent of each child of " { $snippet "gadget" } " is changed to " { $snippet "tuple" } "." }
-{ $notes "This word should be used instead of " { $link set-delegate } " when setting a tuple's delegate to a gadget." } ;
 
 HELP: gadget-selection?
 { $values { "gadget" gadget } { "?" "a boolean" } }
@@ -261,33 +254,7 @@ HELP: g->
 { $values { "x" object } { "gadget" gadget } }
 { $description "Duplicates the top of the stack and outputs the gadget being built. Can only be used inside a quotation passed to " { $link build-gadget } "." } ;
 
-HELP: construct-control
-{ $values { "model" model } { "gadget" gadget } { "class" class } { "control" gadget } }
-{ $description "Creates a new control linked to the given model. The gadget parameter becomes the control's delegate. The quotation is called when the model value changes." }
-{ $examples
-    "The following example creates a gadget whose fill color is determined by the value of a model:"
-    { $code
-        "USING: ui.gadgets ui.gadgets.panes models ;"
-        ": set-fill-color >r <solid> r> set-gadget-interior ;"
-        ""
-        "TUPLE: color-gadget ;"
-        ""
-        "M: color-gadget model-changed"
-        "    >r model-value r> set-fill-color ;"
-        ""
-        ": <color-gadget> ( model -- gadget )"
-        "    <gadget>"
-        "    { 100 100 } over set-rect-dim"
-        "    color-gadget"
-        "    construct-control ;"
-        ""
-        "{ 1.0 0.0 0.5 1.0 } <model> <color-gadget>"
-        "gadget."
-    }
-    "The " { $vocab-link "color-picker" } " module extends this example into a more elaborate color chooser."
-} ;
-
-{ construct-control control-value set-control-value gadget-model } related-words
+{ control-value set-control-value gadget-model } related-words
 
 HELP: control-value
 { $values { "control" gadget } { "value" object } }
@@ -298,10 +265,8 @@ HELP: set-control-value
 { $description "Sets the value of the control's model." } ;
 
 ARTICLE: "ui-control-impl" "Implementing controls"
-"A " { $emphasis "control" } " is a gadget which is linked to an underlying " { $link model } " by having its " { $link gadget-model } " slot set to a model instance."
+"A " { $emphasis "control" } " is a gadget which is linked to an underlying " { $link model } " by having its " { $link gadget-model } " slot set to a " { $link model } " instance."
 $nl
-"To implement a new control, simply use this word in your constructor:"
-{ $subsection construct-control }
 "Some utility words useful in control implementations:"
 { $subsection gadget-model }
 { $subsection control-value }

@@ -175,7 +175,6 @@ SYMBOL: ui-thread
     dup pref-dim over set-gadget-dim dup relayout graft ;
 
 : open-window ( gadget title -- )
-    >r [ 1 track, ] { 0 1 } make-track r>
     f <world> open-world-window ;
 
 : set-fullscreen? ( ? gadget -- )

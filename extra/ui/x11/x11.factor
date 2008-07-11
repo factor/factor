@@ -21,7 +21,7 @@ C: <x11-handle> x11-handle
 M: world expose-event nip relayout ;
 
 M: world configure-event
-    over configured-loc over set-world-loc
+    over configured-loc over (>>window-loc)
     swap configured-dim over set-gadget-dim
     ! In case dimensions didn't change
     relayout-1 ;
@@ -170,7 +170,7 @@ M: world client-event
     swap close-box? [ ungraft ] [ drop ] if ;
 
 : gadget-window ( world -- )
-    dup world-loc over rect-dim glx-window
+    dup window-loc>> over rect-dim glx-window
     over "Factor" create-xic <x11-handle>
     2dup x11-handle-window register-window
     swap set-world-handle ;

@@ -1,17 +1,17 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs continuations kernel math models
+USING: accessors arrays assocs continuations kernel math models
 namespaces opengl sequences io combinators math.vectors
-ui.gadgets ui.gestures ui.render ui.backend summary
+ui.gadgets ui.gestures ui.render ui.backend ui.gadgets.tracks
 debugger ;
 IN: ui.gadgets.worlds
 
-TUPLE: world < identity-tuple
+TUPLE: world < track
 active? focused?
 glass
 title status
 fonts handle
-loc ;
+window-loc ;
 
 : find-world ( gadget -- world ) [ world? ] find-parent ;
 
@@ -19,9 +19,6 @@ M: f world-status ;
 
 : show-status ( string/f gadget -- )
     find-world world-status [ set-model ] [ drop ] if* ;
-
-: show-summary ( object gadget -- )
-    >r [ summary ] [ "" ] if* r> show-status ;
 
 : hide-status ( gadget -- ) f swap show-status ;
 
@@ -36,21 +33,18 @@ M: world request-focus-on ( child gadget -- )
     [ 2drop ] [ dup world-focused? (request-focus) ] if ;
 
 : <world> ( gadget title status -- world )
-    t H{ } clone { 0 0 } {
-        set-gadget-delegate
-        set-world-title
-        set-world-status
-        set-world-active?
-        set-world-fonts
-        set-world-loc
-    } world construct
-    t over set-gadget-root?
+    { 0 1 } world new-track
+        t >>root?
+        t >>active?
+        H{ } clone >>fonts
+        { 0 0 } >>window-loc
+        swap >>status
+        swap >>title
+        [ 1 track-add ] keep
     dup request-focus ;
 
-M: world hashcode* drop world hashcode* ;
-
 M: world layout*
-    dup delegate layout*
+    dup call-next-method
     dup world-glass [
         >r dup rect-dim r> set-layout-dim
     ] when* drop ;

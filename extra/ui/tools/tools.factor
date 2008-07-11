@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs debugger ui.tools.workspace
+USING: accessors arrays assocs debugger ui.tools.workspace
 ui.tools.operations ui.tools.traceback ui.tools.browser
 ui.tools.inspector ui.tools.listener ui.tools.profiler
 ui.tools.operations inspector io kernel math models namespaces
@@ -27,7 +27,9 @@ IN: ui.tools
     ] { } make g gadget-model <book> ;
 
 : <workspace> ( -- workspace )
-    0 <model> { 0 1 } <track> workspace construct-control [
+    { 0 1 } workspace new-track
+        0 <model> >>model
+    [
         [
             <listener-gadget> g set-workspace-listener
             <workspace-book> g set-workspace-book

@@ -34,10 +34,10 @@ M: live-search handle-gesture* ( gadget gesture delegate -- ? )
 : find-search-list ( gadget -- list )
     find-live-search live-search-list ;
 
-TUPLE: search-field ;
+TUPLE: search-field < editor ;
 
 : <search-field> ( -- gadget )
-    <editor> search-field construct-editor ;
+    search-field new-editor ;
 
 search-field H{
     { T{ key-down f f "UP" } [ find-search-list select-previous ] }

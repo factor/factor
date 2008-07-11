@@ -17,11 +17,9 @@ HELP: gadget
         { { $link gadget-boundary } " - an object whose class implements the " { $link draw-boundary } " generic word." }
         { { $link gadget-model } " - a " { $link model } " or " { $link f } "; see " { $link "ui-control-impl" } }
     }
-"Gadgets delegate to " { $link rect } " instances holding their location and dimensions." }
+"Gadgets subclass the " { $link rect } " class, and thus all instances have " { $snippet "loc" } " and " { $snippet "dim" } " instances holding their location and dimensions." }
 { $notes
-"Other classes may delegate to " { $link gadget } " in order to re-implement generic words such as " { $link draw-gadget* } " and " { $link user-input* } ", or to define gestures with " { $link set-gestures } "." }
-{ $warning
-"When setting a tuple's delegate to be a gadget, " { $link set-gadget-delegate } " should be used instead of " { $link set-delegate } "." } ;
+"Other classes may delegate to " { $link gadget } " in order to re-implement generic words such as " { $link draw-gadget* } " and " { $link user-input* } ", or to define gestures with " { $link set-gestures } "." } ;
 
 HELP: clip
 { $var-description "The current clipping rectangle." } ;

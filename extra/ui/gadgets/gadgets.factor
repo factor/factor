@@ -9,7 +9,9 @@ SYMBOL: ui-notify-flag
 
 : notify-ui-thread ( -- ) ui-notify-flag get-global raise-flag ;
 
-TUPLE: rect loc dim ;
+TUPLE: rect { loc initial: { 0 0 } } { dim initial: { 0 0 } } ;
+
+: <zero-rect> ( -- rect ) rect new ;
 
 C: <rect> rect
 
@@ -44,11 +46,13 @@ M: array rect-dim drop { 0 0 } ;
 : rect-union ( rect1 rect2 -- newrect )
     (rect-union) <extent-rect> ;
 
-TUPLE: gadget < identity-tuple
+TUPLE: gadget < rect
 pref-dim parent children orientation focus
 visible? root? clipped? layout-state graft-state graft-node
 interior boundary
 model ;
+
+M: gadget equal? 2drop f ;
 
 M: gadget hashcode* drop gadget hashcode* ;
 
@@ -58,15 +62,14 @@ M: gadget model-changed 2drop ;
 
 : nth-gadget ( n gadget -- child ) gadget-children nth ;
 
-: <zero-rect> ( -- rect ) { 0 0 } dup <rect> ;
+: new-gadget ( class -- gadget )
+    new
+        { 0 1 } >>orientation
+        t >>visible?
+        { f f } >>graft-state ; inline
 
 : <gadget> ( -- gadget )
-    <zero-rect> { 0 1 } t { f f } {
-        set-delegate
-        set-gadget-orientation
-        set-gadget-visible?
-        set-gadget-graft-state
-    } gadget construct ;
+    gadget new-gadget ;
 
 : construct-gadget ( class -- tuple )
     >r <gadget> r> construct-delegate ; inline
@@ -141,10 +144,6 @@ M: gadget children-on nip gadget-children ;
     over [
         dup pick [ set-gadget-parent ] with each-child
     ] when set-delegate ;
-
-: construct-control ( model gadget class -- control )
-    >r tuck set-gadget-model
-    { set-gadget-delegate } r> construct ; inline
 
 ! Selection protocol
 GENERIC: gadget-selection? ( gadget -- ? )

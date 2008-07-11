@@ -359,10 +359,8 @@ ARTICLE: "new-gadgets" "Implementing new gadgets"
 $nl
 "Bare gadgets can be constructed directly, which is useful if all you need is a custom appearance with no further behavior (see " { $link "ui-pen-protocol" } "):"
 { $subsection <gadget> }
-"You can construct a new tuple which delegates to a bare gadget:"
-{ $subsection construct-gadget }
-"You can also delegate a tuple to an existing gadget:"
-{ $subsection set-gadget-delegate }
+"New gadgets are defined as subclasses of an existing gadget type, perhaps even " { $link gadget } " itself. A parametrized constructor should be used to construct subclasses:"
+{ $subsection new-gadget }
 "Further topics:"
 { $subsection "ui-gestures" }
 { $subsection "ui-paint" }
