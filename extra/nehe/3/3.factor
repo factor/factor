@@ -2,13 +2,13 @@ USING: arrays kernel math opengl opengl.gl opengl.glu ui
 ui.gadgets ui.render ;
 IN: nehe.3
 
-TUPLE: nehe3-gadget ;
+TUPLE: nehe3-gadget < gadget ;
 
 : width 256 ;
 : height 256 ;
 
 : <nehe3-gadget> (  -- gadget )
-  nehe3-gadget construct-gadget ;
+  nehe3-gadget new-gadget ;
 
 M: nehe3-gadget pref-dim* ( gadget -- dim )
   drop width height 2array ;
