@@ -219,7 +219,7 @@ M: gadget layout* drop ;
     { t f } (queue-graft) ;
 
 : graft-later ( gadget -- )
-    dup gadget-graft-state {
+    dup graft-state>> {
         { { f t } [ drop ] }
         { { t t } [ drop ] }
         { { t f } [ unqueue-graft ] }
@@ -227,7 +227,7 @@ M: gadget layout* drop ;
     } case ;
 
 : ungraft-later ( gadget -- )
-    dup gadget-graft-state {
+    dup graft-state>> {
         { { f f } [ drop ] }
         { { t f } [ drop ] }
         { { f t } [ unqueue-graft ] }
@@ -292,7 +292,7 @@ SYMBOL: in-layout?
     over unparent
     dup pick (>>parent)
     [ ((add-gadget)) ] 2keep
-    gadget-graft-state second [ graft ] [ drop ] if ;
+    graft-state>> second [ graft ] [ drop ] if ;
 
 : add-gadget ( gadget parent -- )
     not-in-layout
