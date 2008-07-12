@@ -1,5 +1,5 @@
 USING: ui.gadgets ui.gestures help.markup help.syntax
-kernel classes strings opengl.gl models ;
+kernel classes strings opengl.gl models math.geometry.rect ;
 IN: ui.render
 
 HELP: gadget

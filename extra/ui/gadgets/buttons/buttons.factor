@@ -6,7 +6,7 @@ classes.tuple opengl math.vectors
 ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.labels ui.gadgets.theme
 ui.gadgets.tracks ui.gadgets.packs ui.gadgets.worlds ui.gestures
-ui.render ;
+ui.render math.geometry.rect ;
 IN: ui.gadgets.buttons
 
 TUPLE: button < border pressed? selected? quot ;

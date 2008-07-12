@@ -1,6 +1,6 @@
 USING: help.markup help.syntax strings quotations debugger
 io.styles namespaces ui.backend ui.gadgets ui.gadgets.worlds
-ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids ;
+ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids math.geometry.rect ;
 IN: ui
 
 HELP: windows
