@@ -9,10 +9,10 @@ IN: opengl.demo-support
 
 SYMBOL: last-drag-loc
 
-TUPLE: demo-gadget yaw pitch distance ;
+TUPLE: demo-gadget < gadget yaw pitch distance ;
 
-: <demo-gadget> ( yaw pitch distance -- gadget )
-    demo-gadget construct-gadget
+: new-demo-gadget ( yaw pitch distance class -- gadget )
+    new-gadget
         swap >>distance
         swap >>pitch
         swap >>yaw ;
@@ -31,19 +31,19 @@ M: demo-gadget distance-step ( gadget -- dz )
 : fov-ratio ( gadget -- fov ) dim>> dup first2 min v/n ;
 
 : yaw-demo-gadget ( yaw gadget -- )
-    [ [ demo-gadget-yaw + ] keep set-demo-gadget-yaw ] keep relayout-1 ;
+    [ + ] with change-yaw relayout-1 ;
 
 : pitch-demo-gadget ( pitch gadget -- )
-    [ [ demo-gadget-pitch + ] keep set-demo-gadget-pitch ] keep relayout-1 ;
+    [ + ] with change-pitch relayout-1 ;
 
 : zoom-demo-gadget ( distance gadget -- )
-    [ [ demo-gadget-distance + ] keep set-demo-gadget-distance ] keep relayout-1 ;
+    [ + ] with change-distance relayout-1 ;
 
 M: demo-gadget pref-dim* ( gadget -- dim )
     drop { 640 480 } ;
 
 : -+ ( x -- -x x )
-    dup neg swap ;
+    [ neg ] keep ;
 
 : demo-gadget-frustum ( gadget -- -x x -y y near far )
     [ near-plane ] [ far-plane ] [ fov-ratio ] tri [

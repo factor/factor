@@ -7,28 +7,23 @@ opengl.demo-support multiline ui.gestures bunny.fixed-pipeline
 bunny.cel-shaded bunny.outlined bunny.model accessors destructors ;
 IN: bunny
 
-TUPLE: bunny-gadget model geom draw-seq draw-n ;
+TUPLE: bunny-gadget < demo-gadget model-triangles geom draw-seq draw-n ;
 
 : <bunny-gadget> ( -- bunny-gadget )
-    0.0 0.0 0.375 <demo-gadget>
-    maybe-download read-model {
-        set-delegate
-        (>>model)
-    } bunny-gadget construct ;
+    0.0 0.0 0.375 bunny-gadget new-demo-gadget
+    maybe-download read-model >>model-triangles ;
 
 : bunny-gadget-draw ( gadget -- draw )
-    { draw-n>> draw-seq>> }
-    get-slots nth ;
+    [ draw-n>> ] [ draw-seq>> ] bi nth ;
 
 : bunny-gadget-next-draw ( gadget -- )
-    dup { draw-seq>> draw-n>> }
-    get-slots
+    dup [ draw-seq>> ] [ draw-n>> ] bi
     1+ swap length mod
     >>draw-n relayout-1 ;
 
 M: bunny-gadget graft* ( gadget -- )
     GL_DEPTH_TEST glEnable
-    dup model>> <bunny-geom> >>geom
+    dup model-triangles>> <bunny-geom> >>geom
     dup
     [ <bunny-fixed-pipeline> ]
     [ <bunny-cel-shaded> ]
@@ -48,8 +43,7 @@ M: bunny-gadget draw-gadget* ( gadget -- )
         dup demo-gadget-set-matrices
         GL_MODELVIEW glMatrixMode
         0.02 -0.105 0.0 glTranslatef
-        { geom>> bunny-gadget-draw } get-slots
-        draw-bunny
+        [ geom>> ] [ bunny-gadget-draw ] bi draw-bunny
     ] if ;
 
 M: bunny-gadget pref-dim* ( gadget -- dim )
