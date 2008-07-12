@@ -1,7 +1,7 @@
 ! From http://www.ffconsultancy.com/ocaml/maze/index.html
 USING: sequences namespaces math math.vectors opengl opengl.gl
 arrays kernel random ui ui.gadgets ui.gadgets.canvas ui.render
-math.order ;
+math.order math.geometry.rect ;
 IN: maze
 
 : line-width 8 ;

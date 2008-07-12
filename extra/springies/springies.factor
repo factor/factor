@@ -1,6 +1,6 @@
 
 USING: kernel combinators sequences arrays math math.vectors
-       generalizations vars ;
+       generalizations vars accessors math.physics.vel ;
 
 IN: springies
 
@@ -28,23 +28,29 @@ VAR: gravity
 ! node
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: node mass elas pos vel force ;
+! TUPLE: node mass elas pos vel force ;
+
+TUPLE: node < vel mass elas force ;
 
 C: <node> node
 
-: >>pos ( node pos -- node ) over set-node-pos ;
+! : >>pos ( node pos -- node ) over set-node-pos ;
 
-: >>vel ( node vel -- node ) over set-node-vel ;
+! : >>vel ( node vel -- node ) over set-node-vel ;
 
-: pos-x ( node -- x ) node-pos first ;
-: pos-y ( node -- y ) node-pos second ;
-: vel-x ( node -- y ) node-vel first ;
-: vel-y ( node -- y ) node-vel second ;
+: node-vel ( node -- vel ) vel>> ;
 
-: >>pos-x ( node x -- node ) over node-pos set-first ;
-: >>pos-y ( node y -- node ) over node-pos set-second ;
-: >>vel-x ( node x -- node ) over node-vel set-first ;
-: >>vel-y ( node y -- node ) over node-vel set-second ;
+: set-node-vel ( vel node -- ) swap >>vel drop ;
+
+: pos-x ( node -- x ) pos>> first ;
+: pos-y ( node -- y ) pos>> second ;
+: vel-x ( node -- y ) vel>> first ;
+: vel-y ( node -- y ) vel>> second ;
+
+: >>pos-x ( node x -- node ) over pos>> set-first ;
+: >>pos-y ( node y -- node ) over pos>> set-second ;
+: >>vel-x ( node x -- node ) over vel>> set-first ;
+: >>vel-y ( node y -- node ) over vel>> set-second ;
 
 : apply-force ( node vec -- ) over node-force v+ swap set-node-force ;
 
@@ -61,7 +67,7 @@ TUPLE: spring rest-length k damp node-a node-b ;
 C: <spring> spring
 
 : end-points ( spring -- b-pos a-pos )
-  [ spring-node-b node-pos ] [ spring-node-a node-pos ] bi ;
+  [ spring-node-b pos>> ] [ spring-node-a pos>> ] bi ;
 
 : spring-length ( spring -- length ) end-points v- norm ;
 
@@ -112,10 +118,10 @@ C: <spring> spring
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : relative-velocity-a ( spring -- vel )
-  [ spring-node-a node-vel ] [ spring-node-b node-vel ] bi v- ;
+  [ spring-node-a vel>> ] [ spring-node-b vel>> ] bi v- ;
 
 : unit-vec-b->a ( spring -- vec )
-  [ spring-node-a node-pos ] [ spring-node-b node-pos ] bi v- ;
+  [ spring-node-a pos>> ] [ spring-node-b pos>> ] bi v- ;
 
 : relative-velocity-along-spring-a ( spring -- vel )
   [ relative-velocity-a ] [ unit-vec-b->a ] bi vector-projection ;
@@ -126,10 +132,10 @@ C: <spring> spring
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : relative-velocity-b ( spring -- vel )
-  [ spring-node-b node-vel ] [ spring-node-a node-vel ] bi v- ;
+  [ spring-node-b vel>> ] [ spring-node-a vel>> ] bi v- ;
 
 : unit-vec-a->b ( spring -- vec )
-  [ spring-node-b node-pos ] [ spring-node-a node-pos ] bi v- ;
+  [ spring-node-b pos>> ] [ spring-node-a pos>> ] bi v- ;
 
 : relative-velocity-along-spring-b ( spring -- vel )
   [ relative-velocity-b ] [ unit-vec-a->b ] bi vector-projection ;
@@ -210,9 +216,9 @@ C: <spring> spring
 : calc-acceleration ( node -- vec ) [ node-force ] [ node-mass ] bi v/n ;
 
 : new-vel ( node -- vel )
-  [ node-vel ] [ calc-acceleration time-slice> v*n ] bi v+ ;
+  [ vel>> ] [ calc-acceleration time-slice> v*n ] bi v+ ;
 
-: new-pos ( node -- pos ) [ node-pos ] [ node-vel time-slice> v*n ] bi v+ ;
+: new-pos ( node -- pos ) [ pos>> ] [ vel>> time-slice> v*n ] bi v+ ;
 
 : iterate-node ( node -- )
   dup new-pos >>pos
@@ -231,16 +237,21 @@ C: <spring> spring
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : mass ( id x y x-vel y-vel mass elas -- )
-  7 nrot drop
-  6 nrot 6 nrot 2array
-  5 nrot 5 nrot 2array
-  0 0 2array <node>
-  nodes> swap suffix >nodes ;
+  node new
+    swap >>elas
+    swap >>mass
+    -rot 2array >>vel
+    -rot 2array >>pos
+    0 0  2array >>force
+  nodes> swap suffix >nodes
+  drop ;
 
 : spng ( id id-a id-b k damp rest-length -- )
-  6 nrot drop
-  -rot
-  5 nrot node-id
-  5 nrot node-id
-  <spring>
-  springs> swap suffix >springs ;
+   spring new
+     swap >>rest-length
+     swap >>damp
+     swap >>k
+     swap node-id >>node-b
+     swap node-id >>node-a
+   springs> swap suffix >springs
+   drop ;

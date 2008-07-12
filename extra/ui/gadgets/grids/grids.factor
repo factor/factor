@@ -1,7 +1,8 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math namespaces sequences words io
-io.streams.string math.vectors ui.gadgets columns accessors ;
+io.streams.string math.vectors ui.gadgets columns accessors
+math.geometry.rect ;
 IN: ui.gadgets.grids
 
 TUPLE: grid < gadget

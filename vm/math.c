@@ -35,31 +35,16 @@ DEFINE_PRIMITIVE(float_to_fixnum)
 	F_FIXNUM y = untag_fixnum_fast(dpop()); \
 	F_FIXNUM x = untag_fixnum_fast(dpop());
 
-/* The fixnum arithmetic operations defined in C are relatively slow.
-The Factor compiler has optimized assembly intrinsics for some of these
-operations. */
 DEFINE_PRIMITIVE(fixnum_add)
 {
 	POP_FIXNUMS(x,y)
 	box_signed_cell(x + y);
 }
 
-DEFINE_PRIMITIVE(fixnum_add_fast)
-{
-	POP_FIXNUMS(x,y)
-	dpush(tag_fixnum(x + y));
-}
-
 DEFINE_PRIMITIVE(fixnum_subtract)
 {
 	POP_FIXNUMS(x,y)
 	box_signed_cell(x - y);
-}
-
-DEFINE_PRIMITIVE(fixnum_subtract_fast)
-{
-	POP_FIXNUMS(x,y)
-	dpush(tag_fixnum(x - y));
 }
 
 /* Multiply two integers, and trap overflow.
@@ -87,12 +72,6 @@ DEFINE_PRIMITIVE(fixnum_multiply)
 	}
 }
 
-DEFINE_PRIMITIVE(fixnum_multiply_fast)
-{
-	POP_FIXNUMS(x,y)
-	dpush(tag_fixnum(x * y));
-}
-
 DEFINE_PRIMITIVE(fixnum_divint)
 {
 	POP_FIXNUMS(x,y)
@@ -110,24 +89,6 @@ DEFINE_PRIMITIVE(fixnum_mod)
 {
 	POP_FIXNUMS(x,y)
 	dpush(tag_fixnum(x % y));
-}
-
-DEFINE_PRIMITIVE(fixnum_and)
-{
-	POP_FIXNUMS(x,y)
-	dpush(tag_fixnum(x & y));
-}
-
-DEFINE_PRIMITIVE(fixnum_or)
-{
-	POP_FIXNUMS(x,y)
-	dpush(tag_fixnum(x | y));
-}
-
-DEFINE_PRIMITIVE(fixnum_xor)
-{
-	POP_FIXNUMS(x,y)
-	dpush(tag_fixnum(x ^ y));
 }
 
 /*
@@ -170,35 +131,6 @@ DEFINE_PRIMITIVE(fixnum_shift_fast)
 {
 	POP_FIXNUMS(x,y)
 	dpush(tag_fixnum(y < 0 ? (x >> -y) : (x << y)));
-}
-
-DEFINE_PRIMITIVE(fixnum_less)
-{
-	POP_FIXNUMS(x,y)
-	box_boolean(x < y);
-}
-
-DEFINE_PRIMITIVE(fixnum_lesseq)
-{
-	POP_FIXNUMS(x,y)
-	box_boolean(x <= y);
-}
-
-DEFINE_PRIMITIVE(fixnum_greater)
-{
-	POP_FIXNUMS(x,y)
-	box_boolean(x > y);
-}
-
-DEFINE_PRIMITIVE(fixnum_greatereq)
-{
-	POP_FIXNUMS(x,y)
-	box_boolean(x >= y);
-}
-
-DEFINE_PRIMITIVE(fixnum_not)
-{
-	drepl(tag_fixnum(~untag_fixnum_fast(dpeek())));
 }
 
 /* Bignums */

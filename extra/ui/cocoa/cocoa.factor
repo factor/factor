@@ -5,7 +5,7 @@ command-line kernel memory namespaces cocoa.messages
 cocoa.runtime cocoa.subclassing cocoa.pasteboard cocoa.types
 cocoa.windows cocoa.classes cocoa.application sequences system
 ui ui.backend ui.clipboards ui.gadgets ui.gadgets.worlds
-ui.cocoa.views core-foundation threads ;
+ui.cocoa.views core-foundation threads math.geometry.rect ;
 IN: ui.cocoa
 
 TUPLE: handle view window ;

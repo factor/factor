@@ -6,7 +6,6 @@ and the callstack top is passed in EDX */
 
 #define ARG0 %eax
 #define ARG1 %edx
-#define XT_REG %ecx
 #define STACK_REG %esp
 #define DS_REG %esi
 #define RETURN_REG %eax
@@ -22,9 +21,6 @@ and the callstack top is passed in EDX */
 	pop %ebx
 
 #define QUOT_XT_OFFSET 9
-#define PROFILING_OFFSET 25
-#define WORD_DEF_OFFSET 13
-#define WORD_XT_OFFSET 29
 
 /* We pass a function pointer to memcpy to work around a Mac OS X
 ABI limitation which would otherwise require us to do a bizzaro PC-relative

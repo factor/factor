@@ -19,7 +19,8 @@ USING: combinators.short-circuit kernel namespaces
        ui.gadgets.packs
        ui.gadgets.grids
        ui.gestures
-       assocs.lib vars rewrite-closures boids ;
+       assocs.lib vars rewrite-closures boids accessors
+       math.geometry.rect ;
 
 IN: boids.ui
 
@@ -27,9 +28,9 @@ IN: boids.ui
 ! draw-boid
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: point-a ( boid -- a ) boid-pos ;
+: point-a ( boid -- a ) pos>> ;
 
-: point-b ( boid -- b ) [ boid-pos ] [ boid-vel normalize* 20 v*n ] bi v+ ;
+: point-b ( boid -- b ) [ pos>> ] [ vel>> normalize* 20 v*n ] bi v+ ;
 
 : boid-points ( boid -- point-a point-b ) [ point-a ] [ point-b ] bi ;
 

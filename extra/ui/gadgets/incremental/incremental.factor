@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io kernel math namespaces math.vectors ui.gadgets
-ui.gadgets.packs accessors ;
+ui.gadgets.packs accessors math.geometry.rect ;
 IN: ui.gadgets.incremental
 
 ! Incremental layout allows adding lines to panes to be O(1).

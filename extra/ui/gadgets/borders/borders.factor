@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ui.gadgets kernel math
-namespaces vectors sequences math.vectors ;
+namespaces vectors sequences math.vectors math.geometry.rect ;
 IN: ui.gadgets.borders
 
 TUPLE: border < gadget

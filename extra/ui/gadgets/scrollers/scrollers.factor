@@ -4,7 +4,7 @@ USING: accessors arrays ui.gadgets ui.gadgets.viewports
 ui.gadgets.frames ui.gadgets.grids ui.gadgets.theme
 ui.gadgets.sliders ui.gestures kernel math namespaces sequences
 models models.range models.compose
-combinators math.vectors classes.tuple ;
+combinators math.vectors classes.tuple math.geometry.rect ;
 IN: ui.gadgets.scrollers
 
 TUPLE: scroller < frame viewport x y follows ;
