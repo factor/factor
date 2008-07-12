@@ -444,7 +444,10 @@ most-negative-fixnum most-positive-fixnum [a,b]
 { /f < > <= >= }
 [ { real real } "input-classes" set-word-prop ] each
 
-{ /i bitand bitor bitxor bitnot shift }
+{ /i mod /mod }
+[ { rational rational } "input-classes" set-word-prop ] each
+
+{ bitand bitor bitxor bitnot shift }
 [ { integer integer } "input-classes" set-word-prop ] each
 
 {
