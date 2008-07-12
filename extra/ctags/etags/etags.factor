@@ -28,16 +28,8 @@ IN: ctags.etags
 : ctag-hash ( seq -- hash )
   H{ } clone swap [ swap ctag-add ] each ;
 
-: line>bytes ( n seq -- bytes )
-  nth length 1+ ;
-
-: lines>bytes ( n seq -- bytes )
-  over zero? [
-    line>bytes ] [
-    [
-      [ 1- ] dip lines>bytes
-    ] 2keep line>bytes +
-  ] if ;
+: lines>bytes ( seq n -- bytes )
+  head 0 [ length 1+ + ] reduce ;
 
 : file>lines ( resource -- lines )
   ascii file-lines ;
@@ -48,7 +40,7 @@ IN: ctags.etags
     1 HEX: 7f <string> %
     second dup number>string %
     1 CHAR: , <string> %
-    2 - swap lines>bytes number>string %
+    1- lines>bytes number>string %
   ] "" make ;
 
 : etag-entry ( alist -- alist array )
