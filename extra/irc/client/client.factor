@@ -31,6 +31,15 @@ TUPLE: irc-channel-listener < irc-listener name password timeout participants ;
 TUPLE: irc-nick-listener < irc-listener name ;
 SYMBOL: +server-listener+
 
+! participant modes
+SYMBOL: +operator+
+SYMBOL: +voice+
+SYMBOL: +normal+
+
+: participant-mode ( n -- assoc )
+    H{ { 64 +operator+ } { 43 +voice+ } { 0 +normal+ } } at ;
+
+! listener objects
 : <irc-listener> ( -- irc-listener ) <mailbox> <mailbox> irc-listener boa ;
 
 : <irc-server-listener> ( -- irc-server-listener )
@@ -182,7 +191,7 @@ M: quit handle-incoming-irc ( quit -- )
     call-next-method ;
 
 : >nick/mode ( string -- nick mode )
-    dup first "+@" member? [ unclip ] [ f ] if ;
+    dup first "+@" member? [ unclip ] [ 0 ] if participant-mode ;
 
 : names-reply>participants ( names-reply -- participants )
     trailing>> [ blank? ] trim " " split
