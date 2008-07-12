@@ -15,7 +15,7 @@ USING: kernel namespaces math quotations arrays hashtables sequences threads
        ui.gadgets.grids
        ui.gadgets.theme
        namespaces.lib assocs.lib vars
-       rewrite-closures automata ;
+       rewrite-closures automata math.geometry.rect ;
 
 IN: automata.ui
 
