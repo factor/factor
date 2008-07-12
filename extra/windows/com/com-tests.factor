@@ -16,10 +16,10 @@ COM-INTERFACE: IUnrelated IUnknown {b06ac3f4-30e4-406b-a7cd-c29cead4552c}
     int xPlus ( int y )
     int xMulAdd ( int mul, int add ) ;
 
-"{216fb341-0eb2-44b1-8edb-60b76e353abc}" string>guid 1array [ ISimple-iid ] unit-test
-"{9620ecec-8438-423b-bb14-86f835aa40dd}" string>guid 1array [ IInherited-iid ] unit-test
-"{00000000-0000-0000-C000-000000000046}" string>guid 1array [ IUnknown-iid ] unit-test
-"{b06ac3f4-30e4-406b-a7cd-c29cead4552c}" string>guid 1array [ IUnrelated-iid ] unit-test
+{ GUID: {216fb341-0eb2-44b1-8edb-60b76e353abc} } [ ISimple-iid ] unit-test
+{ GUID: {9620ecec-8438-423b-bb14-86f835aa40dd} } [ IInherited-iid ] unit-test
+{ GUID: {00000000-0000-0000-C000-000000000046} } [ IUnknown-iid ] unit-test
+{ GUID: {b06ac3f4-30e4-406b-a7cd-c29cead4552c} } [ IUnrelated-iid ] unit-test
 
 { (( -- iid )) } [ \ ISimple-iid stack-effect ] unit-test
 { (( this -- HRESULT )) } [ \ ISimple::returnOK stack-effect ] unit-test
