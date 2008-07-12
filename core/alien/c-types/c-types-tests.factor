@@ -48,3 +48,5 @@ TYPEDEF: uchar* MyLPBYTE
 [
     0 B{ 1 2 3 4 } <displaced-alien> <void*>
 ] must-fail
+
+[ t ] [ { t f t } >c-bool-array { 1 0 1 } >c-int-array = ] unit-test
