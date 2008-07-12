@@ -1,14 +1,15 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: effects alien alien.accessors arrays generic hashtables
+kernel assocs math math.libm math.private kernel.private
+sequences words parser inference.class inference.dataflow
+vectors strings sbufs io namespaces assocs quotations
+math.intervals sequences.private combinators splitting layouts
+math.parser classes classes.algebra generic.math
+optimizer.pattern-match optimizer.backend optimizer.def-use
+optimizer.inlining optimizer.math.partial generic.standard
+system accessors ;
 IN: optimizer.math
-USING: alien alien.accessors arrays generic hashtables kernel
-assocs math math.private kernel.private sequences words parser
-inference.class inference.dataflow vectors strings sbufs io
-namespaces assocs quotations math.intervals sequences.private
-combinators splitting layouts math.parser classes
-classes.algebra generic.math optimizer.pattern-match
-optimizer.backend optimizer.def-use optimizer.inlining
-optimizer.math.partial generic.standard system accessors ;
 
 : define-math-identities ( word identities -- )
     >r all-derived-ops r> define-identities ;
@@ -167,6 +168,22 @@ optimizer.math.partial generic.standard system accessors ;
             math-output-class/interval-2
         ] 2curry "output-classes" set-word-prop
     ] 2curry each-derived-op
+] each
+
+: math-output-class/interval-2-fast ( node word -- classes intervals )
+    math-output-interval-2 fixnum [ 1array ] bi@ swap ; inline
+
+[
+    { + interval+ }
+    { - interval- }
+    { * interval* }
+    { shift interval-shift-safe }
+] [
+    first2 [
+        [
+            math-output-class/interval-2-fast
+        ] curry "output-classes" set-word-prop
+    ] curry each-fast-derived-op
 ] each
 
 : real-value? ( value -- n ? )
@@ -420,3 +437,37 @@ most-negative-fixnum most-positive-fixnum [a,b]
         [ fixnumify-bitand ]
     }
 } define-optimizers
+
+{ + - * / }
+[ { number number } "input-classes" set-word-prop ] each
+
+{ /f < > <= >= }
+[ { real real } "input-classes" set-word-prop ] each
+
+{ /i bitand bitor bitxor bitnot shift }
+[ { integer integer } "input-classes" set-word-prop ] each
+
+{
+    fcosh
+    flog
+    fsinh
+    fexp
+    fasin
+    facosh
+    fasinh
+    ftanh
+    fatanh
+    facos
+    fpow
+    fatan
+    fatan2
+    fcos
+    ftan
+    fsin
+    fsqrt
+} [
+    dup stack-effect
+    [ in>> length real <repetition> "input-classes" set-word-prop ]
+    [ out>> length float <repetition> "default-output-classes" set-word-prop ]
+    2bi
+] each

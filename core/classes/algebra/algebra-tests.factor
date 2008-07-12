@@ -306,3 +306,9 @@ INTERSECTION: empty-intersection ;
 [ t ] [ object \ f class-not \ f class-or class<= ] unit-test
 
 [ ] [ object flatten-builtin-class drop ] unit-test
+
+SINGLETON: sa
+SINGLETON: sb
+SINGLETON: sc
+
+[ sa ] [ sa { sa sb sc } min-class ] unit-test

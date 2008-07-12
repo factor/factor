@@ -348,7 +348,7 @@ M: long-long-type box-return ( type -- )
 
     <c-type>
         [ alien-unsigned-4 zero? not ] >>getter
-        [ 1 0 ? set-alien-unsigned-4 ] >>setter
+        [ [ 1 0 ? ] 2dip set-alien-unsigned-4 ] >>setter
         4 >>size
         4 >>align
         "box_boolean" >>boxer
@@ -357,7 +357,7 @@ M: long-long-type box-return ( type -- )
 
     <c-type>
         [ alien-float ] >>getter
-        [ >r >r >float r> r> set-alien-float ] >>setter
+        [ [ >float ] 2dip set-alien-float ] >>setter
         4 >>size
         4 >>align
         "box_float" >>boxer
@@ -368,7 +368,7 @@ M: long-long-type box-return ( type -- )
 
     <c-type>
         [ alien-double ] >>getter
-        [ >r >r >float r> r> set-alien-double ] >>setter
+        [ [ >float ] 2dip set-alien-double ] >>setter
         8 >>size
         8 >>align
         "box_double" >>boxer

@@ -10,7 +10,7 @@ USING: kernel namespaces threads combinators sequences arrays
        combinators.cleave
        rewrite-closures fry accessors newfx
        processing.color
-       processing.gadget ;
+       processing.gadget math.geometry.rect ;
        
 IN: processing
 

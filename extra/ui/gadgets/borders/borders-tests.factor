@@ -1,6 +1,6 @@
 IN: ui.gadgets.borders.tests
 USING: tools.test accessors namespaces kernel
-ui.gadgets ui.gadgets.borders ;
+ui.gadgets ui.gadgets.borders math.geometry.rect ;
 
 [ { 110 210 } ] [ <gadget> { 100 200 } >>dim 5 <border> pref-dim ] unit-test
 

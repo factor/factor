@@ -2,39 +2,7 @@ IN: ui.gadgets.tests
 USING: accessors ui.gadgets ui.gadgets.packs ui.gadgets.worlds
 tools.test namespaces models kernel dlists dequeues math sets
 math.parser ui sequences hashtables assocs io arrays prettyprint
-io.streams.string ;
-
-[ T{ rect f { 10 10 } { 20 20 } } ]
-[
-    T{ rect f { 10 10 } { 50 50 } }
-    T{ rect f { -10 -10 } { 40 40 } }
-    rect-intersect
-] unit-test
-
-[ T{ rect f { 200 200 } { 0 0 } } ]
-[
-    T{ rect f { 100 100 } { 50 50 } }
-    T{ rect f { 200 200 } { 40 40 } }
-    rect-intersect
-] unit-test
-
-[ f ] [
-    T{ rect f { 100 100 } { 50 50 } }
-    T{ rect f { 200 200 } { 40 40 } }
-    intersects?
-] unit-test
-
-[ t ] [
-    T{ rect f { 100 100 } { 50 50 } }
-    T{ rect f { 120 120 } { 40 40 } }
-    intersects?
-] unit-test
-
-[ f ] [
-    T{ rect f { 1000 100 } { 50 50 } }
-    T{ rect f { 120 120 } { 40 40 } }
-    intersects?
-] unit-test
+io.streams.string math.geometry.rect ;
 
 [ { 300 300 } ]
 [
