@@ -1,9 +1,7 @@
-USING: alien alien.c-types arrays sequences math math.vectors
-math.matrices math.parser io io.files kernel opengl opengl.gl
-opengl.glu io.encodings.ascii opengl.capabilities shuffle
-http.client vectors splitting system combinators
-continuations destructors namespaces sequences.lib
-accessors ;
+USING: accessors alien.c-types arrays combinators destructors http.client
+io io.encodings.ascii io.files kernel math math.matrices math.parser
+math.vectors opengl opengl.capabilities opengl.gl sequences sequences.lib
+splitting vectors words ;
 IN: bunny.model
 
 : numbers ( str -- seq )

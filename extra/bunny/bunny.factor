@@ -1,10 +1,6 @@
-USING: alien alien.c-types arrays sequences math math.vectors
-math.matrices math.parser io io.files kernel opengl opengl.gl
-opengl.glu shuffle http.client vectors namespaces ui.gadgets
-ui.gadgets.canvas ui.render ui splitting combinators
-system combinators.lib float-arrays continuations
-opengl.demo-support multiline ui.gestures bunny.fixed-pipeline
-bunny.cel-shaded bunny.outlined bunny.model accessors destructors ;
+USING: accessors arrays bunny.cel-shaded bunny.fixed-pipeline
+bunny.model bunny.outlined destructors kernel math opengl.demo-support
+opengl.gl sequences ui ui.gadgets ui.gestures ui.render words ;
 IN: bunny
 
 TUPLE: bunny-gadget < demo-gadget model-triangles geom draw-seq draw-n ;
