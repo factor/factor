@@ -1,7 +1,7 @@
 
 USING: kernel alien.c-types combinators sequences splitting grouping
        opengl.gl ui.gadgets ui.render
-       math math.vectors accessors ;
+       math math.vectors accessors math.geometry.rect ;
 
 IN: ui.gadgets.frame-buffer
 

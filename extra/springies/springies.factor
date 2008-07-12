@@ -38,6 +38,8 @@ C: <node> node
 
 ! : >>vel ( node vel -- node ) over set-node-vel ;
 
+: node-vel ( node -- vel ) vel>> ;
+
 : set-node-vel ( vel node -- ) swap >>vel drop ;
 
 : pos-x ( node -- x ) pos>> first ;
