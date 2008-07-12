@@ -1,4 +1,4 @@
-USING: kernel ui.gadgets ui.gadgets.tracks tools.test ;
+USING: kernel ui.gadgets ui.gadgets.tracks tools.test math.geometry.rect ;
 IN: ui.gadgets.tracks.tests
 
 [ { 100 100 } ] [
