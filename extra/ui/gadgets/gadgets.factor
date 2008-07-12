@@ -74,9 +74,9 @@ M: gadget children-on nip children>> ;
     swapd [ rect-loc v- over v. 0 <=> ] binsearch nip ;
 
 : fast-children-on ( rect axis children -- from to )
-  [ >r >r rect-loc r> r> (fast-children-on) 0 or ]
-  [ >r >r dup rect-loc swap rect-dim v+ r> r> (fast-children-on) ?1+ ]
-  3bi ;
+    [ >r >r rect-loc r> r> (fast-children-on) 0 or ]
+    [ >r >r dup rect-loc swap rect-dim v+ r> r> (fast-children-on) ?1+ ]
+    3bi ;
 
 : inside? ( bounds gadget -- ? )
     dup visible?>> [ intersects? ] [ 2drop f ] if ;
