@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings fry namespaces math assocs shuffle debugger io
-       vectors arrays math.parser math.order vectors combinators combinators.lib
+       vectors arrays math.parser math.order vectors combinators
        classes sets unicode.categories compiler.units parser
        words quotations effects memoize accessors locals effects splitting 
        combinators.short-circuit combinators.short-circuit.smart ;

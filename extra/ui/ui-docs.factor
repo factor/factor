@@ -1,6 +1,6 @@
 USING: help.markup help.syntax strings quotations debugger
 io.styles namespaces ui.backend ui.gadgets ui.gadgets.worlds
-ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids ;
+ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids math.geometry.rect ;
 IN: ui
 
 HELP: windows
@@ -74,14 +74,14 @@ ARTICLE: "ui-glossary" "UI glossary"
             }
         }
     }
-    { "gadget" { "a graphical element which responds to user input. Gadgets are tuples which (directly or indirectly) delegate to " { $link gadget } " instances." } }
+    { "gadget" { "a graphical element which responds to user input. Gadgets are tuples which (directly or indirectly) inherit from " { $link gadget } "." } }
     { "label specifier" { "a string, " { $link f } " or a gadget. See " { $link "ui.gadgets.buttons" } } }
     { "orientation specifier" { "one of " { $snippet "{ 0 1 }" } " or " { $snippet "{ 1 0 }" } ", with the former denoting vertical orientation and the latter denoting horizontal. Using a vector instead of symbolic constants allows these values to be directly useful in co-ordinate calculations" } }
     { "point" "a pair of integers denoting a pixel location on screen" }
 } ;
 
 ARTICLE: "building-ui" "Building user interfaces"
-"A gadget is a graphical element which responds to user input. Gadgets are implemented as tuples which (directly or indirectly) delegate to instances of " { $link gadget } ", which in turn delegates to " { $link rect } "."
+"A gadget is a graphical element which responds to user input. Gadgets are implemented as tuples which (directly or indirectly) inherit from " { $link gadget } ", which in turn inherits from " { $link rect } "."
 { $subsection gadget }
 "Gadgets are arranged in a hierarchy, and all visible gadgets except for instances of " { $link world } " are contained in a parent gadget, stored in the " { $link gadget-parent } " slot."
 { $subsection "ui-geometry" }
@@ -104,7 +104,7 @@ ARTICLE: "gadgets" "Pre-made UI gadgets"
 { $subsection "ui.gadgets.lists" } ;
 
 ARTICLE: "ui-geometry" "Gadget geometry"
-"Instances of " { $link gadget } " (and thus all gadgets) delegate to rectangles which specify the gadget's bounding box:"
+"The " { $link gadget } " class inherits from the " { $link rect } " class, and thus all gadgets have a bounding box:"
 { $subsection rect }
 "Rectangles can be taken apart:"
 { $subsection rect-loc }
@@ -235,7 +235,7 @@ $nl
 $nl
 "Gadget construction combinators whose names are prefixed with " { $snippet "make-" } " construct new gadgets and push them on the stack. The primitive combinator used to define all combinators of this form:"
 { $subsection make-gadget }
-"Words such as " { $link gadget, } " and " { $link track, } " access the gadget through the " { $link make-gadget } " variable."
+"Words such as " { $link gadget, } " and " { $link track, } " access the gadget through the " { $link gadget } " variable."
 $nl
 "A combinator which stores a gadget in the " { $link gadget } " variable:"
 { $subsection with-gadget }
@@ -261,7 +261,7 @@ ARTICLE: "ui-layout-impl" "Implementing layout gadgets"
 { $subsection max-dim }
 { $subsection dim-sum }
 { $warning
-    "When implementing the " { $link layout* } " generic word for a gadget which intends to delegate to another layout, the " { $link children-on } " word might have to be re-implemented as well."
+    "When implementing the " { $link layout* } " generic word for a gadget which inherits from another layout, the " { $link children-on } " word might have to be re-implemented as well."
     $nl
     "For example, suppose you want a " { $link grid } " layout which also displays a popup gadget on top. The implementation of " { $link children-on } " for the " { $link grid } " class determines which children of the grid are visible at one time, and this will never include your popup, so it will not be rendered, nor will it respond to gestures. The solution is to re-implement " { $link children-on } " on your class."
 } ;

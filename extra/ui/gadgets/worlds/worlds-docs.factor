@@ -27,7 +27,7 @@ HELP: focus-path
 { $notes "This word is used to avoid sending " { $link gain-focus } " gestures to a gadget which requests focus on an unfocused top-level window, so that, for instance, a text editing caret does not appear in this case." } ;
 
 HELP: world
-{ $class-description "A gadget which appears at the top of the gadget hieararchy, and in turn may be displayed in a native window. Worlds delegate to " { $link gadget } " instances and have the following slots:"
+{ $class-description "A gadget which appears at the top of the gadget hieararchy, and in turn may be displayed in a native window. Worlds have the following slots:"
     { $list
         { { $snippet "active?" } " - if set to " { $link f } ", the world will not be drawn. This slot is set to " { $link f } " if an error is thrown while drawing the world; this prevents multiple debugger windows from being shown." }
         { { $snippet "glass" } " - a glass pane in front of the primary gadget, used to implement behaviors such as popup menus which are hidden when the mouse is clicked outside the menu." }

@@ -11,7 +11,7 @@ $nl
 
 HELP: <button>
 { $values { "gadget" gadget } { "quot" "a quotation with stack effect " { $snippet "( button -- )" } } { "button" "a new " { $link button } } }
-{ $description "Creates a new " { $link button } " which calls the quotation when clicked. The given gadget becomes the button's delegate." } ;
+{ $description "Creates a new " { $link button } " which calls the quotation when clicked. The given gadget becomes the button's only child." } ;
 
 HELP: <roll-button>
 { $values { "label" "a label specifier" } { "quot" "a quotation with stack effect " { $snippet "( button -- )" } } { "button" button } }

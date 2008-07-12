@@ -9,7 +9,7 @@ quotations math opengl combinators math.vectors
 sorting splitting io.streams.nested assocs
 ui.gadgets.presentations ui.gadgets.slots ui.gadgets.grids
 ui.gadgets.grid-lines classes.tuple models continuations
-destructors accessors ;
+destructors accessors math.geometry.rect ;
 IN: ui.gadgets.panes
 
 TUPLE: pane < pack

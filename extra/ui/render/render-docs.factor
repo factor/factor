@@ -1,25 +1,25 @@
 USING: ui.gadgets ui.gestures help.markup help.syntax
-kernel classes strings opengl.gl models ;
+kernel classes strings opengl.gl models math.geometry.rect ;
 IN: ui.render
 
 HELP: gadget
 { $class-description "An object which displays itself on the screen and acts on user input gestures. Gadgets have the following slots:"
     { $list
-        { { $link gadget-pref-dim } " - a cached value for " { $link pref-dim } "; do not read or write this slot directly." }
-        { { $link gadget-parent } " - the gadget containing this one, or " { $link f } " if this gadget is not part of the visible gadget hierarchy." }
-        { { $link gadget-children } " - a vector of child gadgets. Do not modify this vector directly, instead use " { $link add-gadget } ", " { $link add-gadgets } ", " { $link unparent } " or " { $link clear-gadget } "." }
-        { { $link gadget-orientation } " - an orientation specifier. This slot is used by layout gadgets." }
-        { { $link gadget-layout-state } " - stores the layout state of the gadget. Do not read or write this slot directly, instead call " { $link relayout } " and " { $link relayout-1 } " if the gadget needs to be re-laid out." }
-        { { $link gadget-visible? } " - a boolean indicating if the gadget should display and receive user input." }
-        { { $link gadget-root? } " - if set to " { $link t } ", layout changes in this gadget will not propagate to the gadget's parent." }
-        { { $link gadget-clipped? } " - a boolean indicating if clipping will be enabled when drawing this gadget's children." }
-        { { $link gadget-interior } " - an object whose class implements the " { $link draw-interior } " generic word." }
-        { { $link gadget-boundary } " - an object whose class implements the " { $link draw-boundary } " generic word." }
-        { { $link gadget-model } " - a " { $link model } " or " { $link f } "; see " { $link "ui-control-impl" } }
+        { { $link "pref-dim" } " - a cached value for " { $link pref-dim } "; do not read or write this slot directly." }
+        { { $link "parent" } " - the gadget containing this one, or " { $link f } " if this gadget is not part of the visible gadget hierarchy." }
+        { { $link "children" } " - a vector of child gadgets. Do not modify this vector directly, instead use " { $link add-gadget } ", " { $link add-gadgets } ", " { $link unparent } " or " { $link clear-gadget } "." }
+        { { $link "orientation" } " - an orientation specifier. This slot is used by layout gadgets." }
+        { { $link "layout-state" } " - stores the layout state of the gadget. Do not read or write this slot directly, instead call " { $link relayout } " and " { $link relayout-1 } " if the gadget needs to be re-laid out." }
+        { { $link "visible?" } " - a boolean indicating if the gadget should display and receive user input." }
+        { { $link "root?" } " - if set to " { $link t } ", layout changes in this gadget will not propagate to the gadget's parent." }
+        { { $link "clipped?" } " - a boolean indicating if clipping will be enabled when drawing this gadget's children." }
+        { { $link "interior" } " - an object whose class implements the " { $link draw-interior } " generic word." }
+        { { $link "boundary" } " - an object whose class implements the " { $link draw-boundary } " generic word." }
+        { { $link "model" } " - a " { $link model } " or " { $link f } "; see " { $link "ui-control-impl" } }
     }
 "Gadgets subclass the " { $link rect } " class, and thus all instances have " { $snippet "loc" } " and " { $snippet "dim" } " instances holding their location and dimensions." }
 { $notes
-"Other classes may delegate to " { $link gadget } " in order to re-implement generic words such as " { $link draw-gadget* } " and " { $link user-input* } ", or to define gestures with " { $link set-gestures } "." } ;
+"Other classes may inherit from " { $link gadget } " in order to re-implement generic words such as " { $link draw-gadget* } " and " { $link user-input* } ", or to define gestures with " { $link set-gestures } "." } ;
 
 HELP: clip
 { $var-description "The current clipping rectangle." } ;

@@ -1,50 +1,15 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hashtables kernel models math namespaces
-sequences quotations math.vectors combinators sorting vectors
-dlists dequeues models threads concurrency.flags math.order ;
+       sequences quotations math.vectors combinators sorting vectors
+       dlists dequeues models threads concurrency.flags
+       math.order math.geometry.rect ;
+
 IN: ui.gadgets
 
 SYMBOL: ui-notify-flag
 
 : notify-ui-thread ( -- ) ui-notify-flag get-global raise-flag ;
-
-TUPLE: rect { loc initial: { 0 0 } } { dim initial: { 0 0 } } ;
-
-: <zero-rect> ( -- rect ) rect new ;
-
-C: <rect> rect
-
-M: array rect-loc ;
-
-M: array rect-dim drop { 0 0 } ;
-
-: rect-bounds ( rect -- loc dim ) dup rect-loc swap rect-dim ;
-
-: rect-extent ( rect -- loc ext ) rect-bounds over v+ ;
-
-: 2rect-extent ( rect rect -- loc1 loc2 ext1 ext2 )
-    [ rect-extent ] bi@ swapd ;
-
-: <extent-rect> ( loc ext -- rect ) over [v-] <rect> ;
-
-: offset-rect ( rect loc -- newrect )
-    over rect-loc v+ swap rect-dim <rect> ;
-
-: (rect-intersect) ( rect rect -- array array )
-    2rect-extent vmin >r vmax r> ;
-
-: rect-intersect ( rect1 rect2 -- newrect )
-    (rect-intersect) <extent-rect> ;
-
-: intersects? ( rect/point rect -- ? )
-    (rect-intersect) [v-] { 0 0 } = ;
-
-: (rect-union) ( rect rect -- array array )
-    2rect-extent vmax >r vmin r> ;
-
-: rect-union ( rect1 rect2 -- newrect )
-    (rect-union) <extent-rect> ;
 
 TUPLE: gadget < rect
 pref-dim parent children orientation focus
@@ -391,19 +356,17 @@ M: f request-focus-on 2drop ;
 : focus-path ( world -- seq )
     [ gadget-focus ] follow ;
 
-: make-gadget ( quot gadget -- gadget )
-    [ \ make-gadget rot with-variable ] keep ; inline
-
-: gadget, ( gadget -- ) \ make-gadget get add-gadget ;
+: gadget, ( gadget -- ) gadget get add-gadget ;
 
 : g ( -- gadget ) gadget get ;
 
 : g-> ( x -- x x gadget ) dup g ;
 
 : with-gadget ( gadget quot -- )
-    [
-        swap dup \ make-gadget set gadget set call
-    ] with-scope ; inline
+    gadget swap with-variable ; inline
+
+: make-gadget ( gadget quot -- gadget )
+    [ with-gadget ] [ drop ] 2bi ; inline
 
 ! Deprecated
 : set-gadget-delegate ( gadget tuple -- )

@@ -85,8 +85,16 @@ SYMBOL: objects
 : 1-offset              8 ; inline
 : -1-offset             9 ; inline
 
+SYMBOL: sub-primitives
+
+: make-jit ( quot rc rt offset -- quad )
+    { [ { } make ] [ ] [ ] [ ] } spread 4array ; inline
+
 : jit-define ( quot rc rt offset name -- )
-    >r { [ { } make ] [ ] [ ] [ ] } spread 4array r> set ;
+    >r make-jit r> set ; inline
+
+: define-sub-primitive ( quot rc rt offset word -- )
+    >r make-jit r> sub-primitives get set-at ;
 
 ! The image being constructed; a vector of word-size integers
 SYMBOL: image
@@ -118,29 +126,7 @@ SYMBOL: jit-dispatch
 SYMBOL: jit-epilog
 SYMBOL: jit-return
 SYMBOL: jit-profiling
-SYMBOL: jit-tag
-SYMBOL: jit-tag-word
-SYMBOL: jit-eq?
-SYMBOL: jit-eq?-word
-SYMBOL: jit-slot
-SYMBOL: jit-slot-word
 SYMBOL: jit-declare-word
-SYMBOL: jit-drop
-SYMBOL: jit-drop-word
-SYMBOL: jit-dup
-SYMBOL: jit-dup-word
-SYMBOL: jit->r
-SYMBOL: jit->r-word
-SYMBOL: jit-r>
-SYMBOL: jit-r>-word
-SYMBOL: jit-swap
-SYMBOL: jit-swap-word
-SYMBOL: jit-over
-SYMBOL: jit-over-word
-SYMBOL: jit-fixnum-fast
-SYMBOL: jit-fixnum-fast-word
-SYMBOL: jit-fixnum>=
-SYMBOL: jit-fixnum>=-word
 
 ! Default definition for undefined words
 SYMBOL: undefined-quot
@@ -163,29 +149,7 @@ SYMBOL: undefined-quot
         { jit-epilog 33 }
         { jit-return 34 }
         { jit-profiling 35 }
-        { jit-tag 36 }
-        { jit-tag-word 37 }
-        { jit-eq? 38 }
-        { jit-eq?-word 39 }
-        { jit-slot 40 }
-        { jit-slot-word 41 }
         { jit-declare-word 42 }
-        { jit-drop 43 }
-        { jit-drop-word 44 }
-        { jit-dup 45 }
-        { jit-dup-word 46 }
-        { jit->r 47 }
-        { jit->r-word 48 }
-        { jit-r> 49 }
-        { jit-r>-word 50 }
-        { jit-swap 51 }
-        { jit-swap-word 52 }
-        { jit-over 53 }
-        { jit-over-word 54 }
-        { jit-fixnum-fast 55 }
-        { jit-fixnum-fast-word 56 }
-        { jit-fixnum>= 57 }
-        { jit-fixnum>=-word 58 }
         { undefined-quot 60 }
     } at header-size + ;
 
@@ -305,6 +269,9 @@ M: f '
 
 ! Words
 
+: word-sub-primitive ( word -- obj )
+    global [ target-word ] bind sub-primitives get at ;
+
 : emit-word ( word -- )
     [
         [ subwords [ emit-word ] each ]
@@ -316,12 +283,13 @@ M: f '
                     [ vocabulary>> , ]
                     [ def>> , ]
                     [ props>> , ]
+                    [ drop f , ]
+                    [ drop 0 , ] ! count
+                    [ word-sub-primitive , ]
+                    [ drop 0 , ] ! xt
+                    [ drop 0 , ] ! code
+                    [ drop 0 , ] ! profiling
                 } cleave
-                f ,
-                0 , ! count
-                0 , ! xt
-                0 , ! code
-                0 , ! profiling
             ] { } make [ ' ] map
         ] bi
         \ word type-number object tag-number
@@ -460,18 +428,7 @@ M: quotation '
     \ if jit-if-word set
     \ dispatch jit-dispatch-word set
     \ do-primitive jit-primitive-word set
-    \ tag jit-tag-word set
-    \ eq? jit-eq?-word set
-    \ slot jit-slot-word set
     \ declare jit-declare-word set
-    \ drop jit-drop-word set
-    \ dup jit-dup-word set
-    \ >r jit->r-word set
-    \ r> jit-r>-word set
-    \ swap jit-swap-word set
-    \ over jit-over-word set
-    \ fixnum-fast jit-fixnum-fast-word set
-    \ fixnum>= jit-fixnum>=-word set
     [ undefined ] undefined-quot set
     {
         jit-code-format
@@ -488,29 +445,7 @@ M: quotation '
         jit-epilog
         jit-return
         jit-profiling
-        jit-tag
-        jit-tag-word
-        jit-eq?
-        jit-eq?-word
-        jit-slot
-        jit-slot-word
         jit-declare-word
-        jit-drop
-        jit-drop-word
-        jit-dup
-        jit-dup-word
-        jit->r
-        jit->r-word
-        jit-r>
-        jit-r>-word
-        jit-swap
-        jit-swap-word
-        jit-over
-        jit-over-word
-        jit-fixnum-fast
-        jit-fixnum-fast-word
-        jit-fixnum>=
-        jit-fixnum>=-word
         undefined-quot
     } [ emit-userenv ] each ;
 

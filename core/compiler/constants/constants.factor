@@ -18,8 +18,8 @@ IN: compiler.constants
 : underlying-alien-offset ( -- n ) bootstrap-cell object tag-number - ;
 : tuple-class-offset ( -- n ) bootstrap-cell tuple tag-number - ;
 : class-hash-offset ( -- n ) bootstrap-cell object tag-number - ;
-: word-xt-offset ( -- n ) 8 bootstrap-cells object tag-number - ;
+: word-xt-offset ( -- n ) 9 bootstrap-cells object tag-number - ;
 : quot-xt-offset ( -- n ) 3 bootstrap-cells object tag-number - ;
-: word-code-offset ( -- n ) 9 bootstrap-cells object tag-number - ;
+: word-code-offset ( -- n ) 10 bootstrap-cells object tag-number - ;
 : array-start-offset ( -- n ) 2 bootstrap-cells object tag-number - ;
 : compiled-header-size ( -- n ) 4 bootstrap-cells ;

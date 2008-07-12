@@ -27,15 +27,17 @@ M: traceback-gadget pref-dim* drop { 550 600 } ;
     { 0 1 } traceback-gadget new-track
         swap >>model
     [
+        g model>>
         [
             [
-                g gadget-model <datastack-display> 1/2 track,
-                g gadget-model <retainstack-display> 1/2 track,
+                [ <datastack-display> 1/2 track, ]
+                [ <retainstack-display> 1/2 track, ]
+                bi
             ] { 1 0 } make-track 1/3 track,
-            g gadget-model <callstack-display> 2/3 track,
-            toolbar,
-        ] with-gadget
-    ] keep ;
+        ]
+        [ <callstack-display> 2/3 track, ] bi
+        toolbar,
+    ] make-gadget ;
 
 : <namestack-display> ( model -- gadget )
     [ [ continuation-name namestack. ] when* ]

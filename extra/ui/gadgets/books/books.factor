@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel sequences models ui.gadgets ;
+USING: accessors kernel sequences models ui.gadgets math.geometry.rect ;
 IN: ui.gadgets.books
 
 TUPLE: book < gadget ;

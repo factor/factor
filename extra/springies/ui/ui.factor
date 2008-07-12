@@ -1,16 +1,16 @@
 
 USING: kernel namespaces threads sequences math math.vectors
        opengl.gl opengl colors ui ui.gadgets ui.gadgets.slate
-       fry rewrite-closures vars springies ;
+       fry rewrite-closures vars springies accessors math.geometry.rect ;
 
 IN: springies.ui
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: draw-node ( node -- ) node-pos { -5 -5 } v+ dup { 10 10 } v+ gl-rect ;
+: draw-node ( node -- ) pos>> { -5 -5 } v+ dup { 10 10 } v+ gl-rect ;
 
 : draw-spring ( spring -- )
-  [ spring-node-a node-pos ] [ spring-node-b node-pos ] bi gl-line ;
+  [ spring-node-a pos>> ] [ spring-node-b pos>> ] bi gl-line ;
 
 : draw-nodes ( -- ) nodes> [ draw-node ] each ;
 

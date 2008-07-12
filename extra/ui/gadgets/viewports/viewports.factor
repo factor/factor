@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 IN: ui.gadgets.viewports
 USING: accessors arrays ui.gadgets ui.gadgets.borders
-kernel math namespaces sequences models math.vectors ;
+kernel math namespaces sequences models math.vectors math.geometry.rect ;
 
 : viewport-gap { 3 3 } ; inline
 

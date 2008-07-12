@@ -4,7 +4,7 @@ USING: accessors arrays ui.gadgets ui.gadgets.viewports
 ui.gadgets.frames ui.gadgets.grids ui.gadgets.theme
 ui.gadgets.sliders ui.gestures kernel math namespaces sequences
 models models.range models.compose
-combinators math.vectors classes.tuple ;
+combinators math.vectors classes.tuple math.geometry.rect ;
 IN: ui.gadgets.scrollers
 
 TUPLE: scroller < frame viewport x y follows ;
@@ -30,15 +30,15 @@ scroller H{
 } set-gestures
 
 : viewport, ( child -- )
-    g gadget-model <viewport>
+    g model>> <viewport>
     g-> set-scroller-viewport @center frame, ;
 
 : <scroller-model> ( -- model )
     0 0 0 0 <range> 0 0 0 0 <range> 2array <compose> ;
 
-: x-model ( -- model ) g gadget-model model-dependencies first ;
+: x-model ( -- model ) g model>> dependencies>> first ;
 
-: y-model ( -- model ) g gadget-model model-dependencies second ;
+: y-model ( -- model ) g model>> dependencies>> second ;
 
 : new-scroller ( gadget class -- scroller )
     new-frame
@@ -46,12 +46,10 @@ scroller H{
         <scroller-model> >>model
          faint-boundary
     [
-        [
-            x-model <x-slider> g-> set-scroller-x @bottom frame,
-            y-model <y-slider> g-> set-scroller-y @right frame,
-            viewport,
-        ] with-gadget
-    ] keep ;
+        x-model <x-slider> g-> set-scroller-x @bottom frame,
+        y-model <y-slider> g-> set-scroller-y @right frame,
+        viewport,
+    ] make-gadget ;
 
 : <scroller> ( gadget -- scroller )
     scroller new-scroller ;
@@ -78,7 +76,7 @@ scroller H{
     ] keep dup scroller-value rot v+ swap scroll ;
 
 : relative-scroll-rect ( rect gadget scroller -- newrect )
-    scroller-viewport gadget-child relative-loc offset-rect ;
+    viewport>> gadget-child relative-loc offset-rect ;
 
 : find-scroller* ( gadget -- scroller )
     dup find-scroller dup [
@@ -121,13 +119,15 @@ scroller H{
 : scroll>top ( gadget -- )
     <zero-rect> swap scroll>rect ;
 
-: update-scroller ( scroller follows -- )
-    {
-        { [ dup t eq? ] [ drop (scroll>bottom) ] }
-        { [ dup rect? ] [ swap (scroll>rect) ] }
-        { [ dup ] [ swap (scroll>gadget) ] }
-        [ drop dup scroller-value swap scroll ]
-    } cond ;
+GENERIC: update-scroller ( scroller follows -- )
+
+M: t update-scroller drop (scroll>bottom) ;
+
+M: gadget update-scroller swap (scroll>gadget) ;
+
+M: rect update-scroller swap (scroll>rect) ;
+
+M: f update-scroller drop dup scroller-value swap scroll ;
 
 M: scroller layout*
     dup call-next-method

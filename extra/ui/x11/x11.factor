@@ -6,7 +6,7 @@ assocs kernel math namespaces opengl sequences strings x11.xlib
 x11.events x11.xim x11.glx x11.clipboard x11.constants
 x11.windows io.encodings.string io.encodings.ascii
 io.encodings.utf8 combinators debugger command-line qualified
-math.vectors classes.tuple opengl.gl threads ;
+math.vectors classes.tuple opengl.gl threads math.geometry.rect ;
 QUALIFIED: system
 IN: ui.x11
 
