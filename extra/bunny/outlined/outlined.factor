@@ -181,10 +181,9 @@ TUPLE: bunny-outlined
     ] [ drop ] if ;
 
 : remake-framebuffer-if-needed ( draw -- )
-    dup [ gadget>> dim>> ] [ framebuffer-dim>> ] bi
-    over =
-    [ 2drop ] [
-        [ dup dispose-framebuffer dup ] dip {
+    dup [ gadget>> dim>> ] [ framebuffer-dim>> ] bi =
+    [ drop ] [
+        [ dispose-framebuffer ] [ dup ] [ gadget>> dim>> ] tri {
             [
                 GL_RGBA16F_ARB GL_RGBA (framebuffer-texture)
                 [ >>color-texture drop ] keep
@@ -196,7 +195,8 @@ TUPLE: bunny-outlined
                 [ >>depth-texture drop ] keep
             ]
         } 2cleave
-        (make-framebuffer) >>framebuffer drop
+        [ (make-framebuffer) >>framebuffer ] [ >>framebuffer-dim ] bi
+        drop
     ] if ;
 
 : clear-framebuffer ( -- )
