@@ -23,9 +23,9 @@ M: gadget hashcode* drop gadget hashcode* ;
 
 M: gadget model-changed 2drop ;
 
-: gadget-child ( gadget -- child ) gadget-children first ;
+: gadget-child ( gadget -- child ) children>> first ;
 
-: nth-gadget ( n gadget -- child ) gadget-children nth ;
+: nth-gadget ( n gadget -- child ) children>> nth ;
 
 : new-gadget ( class -- gadget )
     new
@@ -68,7 +68,7 @@ M: gadget user-input* 2drop t ;
 
 GENERIC: children-on ( rect/point gadget -- seq )
 
-M: gadget children-on nip gadget-children ;
+M: gadget children-on nip children>> ;
 
 : (fast-children-on) ( dim axis gadgets -- i )
     swapd [ rect-loc v- over v. 0 <=> ] binsearch nip ;
@@ -100,7 +100,7 @@ M: gadget children-on nip gadget-children ;
     >r >r gadget-orientation r> r> [ pick set-axis ] 2map nip ;
 
 : each-child ( gadget quot -- )
-    >r gadget-children r> each ; inline
+    >r children>> r> each ; inline
 
 ! Selection protocol
 GENERIC: gadget-selection? ( gadget -- ? )
@@ -124,7 +124,7 @@ M: gadget gadget-text-separator
     [ dup % ] [ gadget-text* ] interleave drop ;
 
 M: gadget gadget-text*
-    dup gadget-children swap gadget-seq-text ;
+    dup children>> swap gadget-seq-text ;
 
 M: array gadget-text*
     [ gadget-text* ] each ;
@@ -273,7 +273,7 @@ SYMBOL: in-layout?
         dup parent>> dup [
             over (unparent)
             [ unfocus-gadget ] 2keep
-            [ gadget-children delete ] keep
+            [ children>> delete ] keep
             relayout
         ] [
             2drop
@@ -283,14 +283,14 @@ SYMBOL: in-layout?
 : (clear-gadget) ( gadget -- )
     dup [ (unparent) ] each-child
     f over set-gadget-focus
-    f swap set-gadget-children ;
+    f swap (>>children) ;
 
 : clear-gadget ( gadget -- )
     not-in-layout
     dup (clear-gadget) relayout ;
 
 : ((add-gadget)) ( gadget box -- )
-    [ gadget-children ?push ] keep set-gadget-children ;
+    [ children>> ?push ] keep (>>children) ;
 
 : (add-gadget) ( gadget box -- )
     over unparent
