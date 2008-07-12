@@ -76,7 +76,7 @@ M: bit-array byte-length length 7 + -3 shift ;
     n zero? [ 0 <bit-array> ] [
         [let | out [ n log2 1+ <bit-array> ] i! [ 0 ] n'! [ n ] |
             [ n' zero? not ] [
-                n' out underlying>> i 255 bitand set-alien-unsigned-1
+                n' out underlying>> i set-alien-unsigned-1
                 n' -8 shift n'!
                 i 1+ i!
             ] [ ] while
