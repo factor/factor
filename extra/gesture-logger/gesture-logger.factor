@@ -5,10 +5,10 @@ ui.gadgets.scrollers ui.gadgets.theme ui.gestures colors
 accessors ;
 IN: gesture-logger
 
-TUPLE: gesture-logger stream ;
+TUPLE: gesture-logger < gadget stream ;
 
 : <gesture-logger> ( stream -- gadget )
-    \ gesture-logger construct-gadget
+    \ gesture-logger new-gadget
     swap >>stream
     { 100 100 } >>dim
     black solid-interior ;

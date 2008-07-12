@@ -336,6 +336,8 @@ M: tuple-class boa
     [ tuple-layout ]
     bi <tuple-boa> ;
 
+M: tuple-class initial-value* new ;
+
 ! Deprecated
 M: object get-slots ( obj slots -- ... )
     [ execute ] with each ;

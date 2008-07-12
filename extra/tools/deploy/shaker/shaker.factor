@@ -101,6 +101,7 @@ IN: tools.deploy.shaker
                 "if-intrinsics"
                 "infer"
                 "inferred-effect"
+                "input-classes"
                 "interval"
                 "intrinsics"
                 "loc"
