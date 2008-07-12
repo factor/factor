@@ -59,4 +59,11 @@ M: growable lengthen ( n seq -- )
         2dup (>>length)
     ] when 2drop ;
 
+M: growable shorten ( n seq -- )
+    growable-check
+    2dup length < [
+        2dup contract
+        2dup (>>length)
+    ] when 2drop ;
+
 INSTANCE: growable sequence

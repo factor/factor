@@ -1,6 +1,6 @@
 
 USING: kernel math math.parser random arrays hashtables assocs sequences
-       vars ;
+       grouping vars ;
 
 IN: automata
 
@@ -32,29 +32,16 @@ dup >rule-number rule-values rule-keys [ rule> set-at ] 2each ;
 ! step-wrapped-line
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: 3nth ( n seq -- slice ) >r dup 3 + r> <slice> ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: map3-i ( seq -- i ) length 2 - ;
-
-: map3-quot ( seq quot -- quot ) >r [ 3nth ] curry r> compose ; inline
-
-: map3 ( seq quot -- seq ) >r dup map3-i swap r> map3-quot map ; inline
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: pattern>state ( {_a_b_c_} -- state ) rule> at ;
+: pattern>state ( {_a_b_c_} -- state ) >array rule> at ;
 
 : cap-line ( line -- 0-line-0 ) { 0 } prepend { 0 } append ;
 
 : wrap-line ( a-line-z -- za-line-za )
 dup peek 1array swap dup first 1array append append ;
 
-: step-line ( line -- new-line ) [ >array pattern>state ] map3 ;
+: step-line ( line -- new-line ) 3 <clumps> [ pattern>state ] map ;
 
-: step-capped-line ( line -- new-line ) cap-line step-line ;
-
+: step-capped-line  ( line -- new-line ) cap-line  step-line ;
 : step-wrapped-line ( line -- new-line ) wrap-line step-line ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

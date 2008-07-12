@@ -72,3 +72,20 @@ INSTANCE: float-array sequence
 M: float-array pprint-delims drop \ F{ \ } ;
 
 M: float-array >pprint-sequence ;
+
+USING: hints math.vectors arrays ;
+
+HINTS: vneg { float-array } { array } ;
+HINTS: v*n { float-array object } { array object } ;
+HINTS: v/n { float-array object } { array object } ;
+HINTS: n/v { object float-array } { object array } ;
+HINTS: v+ { float-array float-array } { array array } ;
+HINTS: v- { float-array float-array } { array array } ;
+HINTS: v* { float-array float-array } { array array } ;
+HINTS: v/ { float-array float-array } { array array } ;
+HINTS: vmax { float-array float-array } { array array } ;
+HINTS: vmin { float-array float-array } { array array } ;
+HINTS: v. { float-array float-array } { array array } ;
+HINTS: norm-sq { float-array } { array } ;
+HINTS: norm { float-array } { array } ;
+HINTS: normalize { float-array } { array } ;

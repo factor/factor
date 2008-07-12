@@ -153,8 +153,10 @@ M: object infer-call
 ] "infer" set-word-prop
 
 :  set-primitive-effect ( word effect -- )
-    2dup effect-out "default-output-classes" set-word-prop
-    dupd [ make-call-node ] 2curry "infer" set-word-prop ;
+    [ in>> "input-classes" set-word-prop ]
+    [ out>> "default-output-classes" set-word-prop ]
+    [ dupd [ make-call-node ] 2curry "infer" set-word-prop ]
+    2tri ;
 
 ! Stack effects for all primitives
 \ fixnum< { fixnum fixnum } { object } <effect> set-primitive-effect
