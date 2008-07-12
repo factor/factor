@@ -37,7 +37,7 @@ M: gadget model-changed 2drop ;
     gadget new-gadget ;
 
 : activate-control ( gadget -- )
-    dup gadget-model dup [
+    dup model>> dup [
         2dup add-connection
         swap model-changed
     ] [
@@ -45,13 +45,13 @@ M: gadget model-changed 2drop ;
     ] if ;
 
 : deactivate-control ( gadget -- )
-    dup gadget-model dup [ 2dup remove-connection ] when 2drop ;
+    dup model>> dup [ 2dup remove-connection ] when 2drop ;
 
 : control-value ( control -- value )
-    gadget-model model-value ;
+    model>> model-value ;
 
 : set-control-value ( value control -- )
-    gadget-model set-model ;
+    model>> set-model ;
 
 : relative-loc ( fromgadget togadget -- loc )
     2dup eq? [
@@ -83,7 +83,7 @@ M: gadget children-on nip children>> ;
     r> ;
 
 : inside? ( bounds gadget -- ? )
-    dup gadget-visible? [ intersects? ] [ 2drop f ] if ;
+    dup visible?>> [ intersects? ] [ 2drop f ] if ;
 
 : (pick-up) ( point gadget -- gadget )
     dupd children-on [ inside? ] with find-last nip ;
@@ -97,7 +97,7 @@ M: gadget children-on nip children>> ;
 : dim-sum ( seq -- dim ) { 0 0 } [ v+ ] reduce ;
 
 : orient ( gadget seq1 seq2 -- seq )
-    >r >r gadget-orientation r> r> [ pick set-axis ] 2map nip ;
+    >r >r orientation>> r> r> [ pick set-axis ] 2map nip ;
 
 : each-child ( gadget quot -- )
     >r children>> r> each ; inline
@@ -117,7 +117,7 @@ GENERIC: gadget-text* ( gadget -- )
 GENERIC: gadget-text-separator ( gadget -- str )
 
 M: gadget gadget-text-separator
-    gadget-orientation { 0 1 } = "\n" "" ? ;
+    orientation>> { 0 1 } = "\n" "" ? ;
 
 : gadget-seq-text ( seq gadget -- )
     gadget-text-separator swap
@@ -132,9 +132,9 @@ M: array gadget-text*
 : gadget-text ( gadget -- string ) [ gadget-text* ] "" make ;
 
 : invalidate ( gadget -- )
-    \ invalidate swap set-gadget-layout-state ;
+    \ invalidate swap (>>layout-state) ;
 
-: forget-pref-dim ( gadget -- ) f swap set-gadget-pref-dim ;
+: forget-pref-dim ( gadget -- ) f swap (>>pref-dim) ;
 
 : layout-queue ( -- queue ) \ layout-queue get ;
 
@@ -147,22 +147,22 @@ M: array gadget-text*
 DEFER: relayout
 
 : invalidate* ( gadget -- )
-    \ invalidate* over set-gadget-layout-state
+    \ invalidate* over (>>layout-state)
     dup forget-pref-dim
     dup gadget-root?
     [ layout-later ] [ parent>> [ relayout ] when* ] if ;
 
 : relayout ( gadget -- )
-    dup gadget-layout-state \ invalidate* eq?
+    dup layout-state>> \ invalidate* eq?
     [ drop ] [ invalidate* ] if ;
 
 : relayout-1 ( gadget -- )
-    dup gadget-layout-state
+    dup layout-state>>
     [ drop ] [ dup invalidate layout-later ] if ;
 
-: show-gadget ( gadget -- ) t swap set-gadget-visible? ;
+: show-gadget ( gadget -- ) t swap (>>visible?) ;
 
-: hide-gadget ( gadget -- ) f swap set-gadget-visible? ;
+: hide-gadget ( gadget -- ) f swap (>>visible?) ;
 
 : (set-rect-dim) ( dim gadget quot -- )
     >r 2dup rect-dim =
@@ -178,11 +178,11 @@ DEFER: relayout
 GENERIC: pref-dim* ( gadget -- dim )
 
 : ?set-gadget-pref-dim ( dim gadget -- )
-    dup gadget-layout-state
-    [ 2drop ] [ set-gadget-pref-dim ] if ;
+    dup layout-state>>
+    [ 2drop ] [ (>>pref-dim) ] if ;
 
 : pref-dim ( gadget -- dim )
-    dup gadget-pref-dim [ ] [
+    dup pref-dim>> [ ] [
         [ pref-dim* dup ] keep ?set-gadget-pref-dim
     ] ?if ;
 
@@ -196,10 +196,10 @@ M: gadget layout* drop ;
 
 : prefer ( gadget -- ) dup pref-dim swap set-layout-dim ;
 
-: validate ( gadget -- ) f swap set-gadget-layout-state ;
+: validate ( gadget -- ) f swap (>>layout-state) ;
 
 : layout ( gadget -- )
-    dup gadget-layout-state [
+    dup layout-state>> [
         dup validate
         dup layout*
         dup [ layout ] each-child
@@ -258,8 +258,8 @@ M: gadget ungraft* drop ;
     f swap (>>parent) ;
 
 : unfocus-gadget ( child gadget -- )
-    tuck gadget-focus eq?
-    [ f swap set-gadget-focus ] [ drop ] if ;
+    tuck focus>> eq?
+    [ f swap (>>focus) ] [ drop ] if ;
 
 SYMBOL: in-layout?
 
@@ -282,7 +282,7 @@ SYMBOL: in-layout?
 
 : (clear-gadget) ( gadget -- )
     dup [ (unparent) ] each-child
-    f over set-gadget-focus
+    f over (>>focus)
     f swap (>>children) ;
 
 : clear-gadget ( gadget -- )
@@ -354,7 +354,7 @@ M: f request-focus-on 2drop ;
     [ focusable-child ] keep request-focus-on ;
 
 : focus-path ( world -- seq )
-    [ gadget-focus ] follow ;
+    [ focus>> ] follow ;
 
 : gadget, ( gadget -- ) gadget get add-gadget ;
 
