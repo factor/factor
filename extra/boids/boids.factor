@@ -73,10 +73,6 @@ VAR: separation-radius
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: distance ( boid boid -- n ) [ pos>> ] [ pos>> ] bi* v- norm ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 : constrain ( n a b -- n ) rot min max ;
 
 : angle-between ( vec vec -- angle )
