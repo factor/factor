@@ -12,10 +12,10 @@ SYMBOL: ui-notify-flag
 : notify-ui-thread ( -- ) ui-notify-flag get-global raise-flag ;
 
 TUPLE: gadget < rect
-pref-dim parent children orientation focus
-visible? root? clipped? layout-state graft-state graft-node
-interior boundary
-model ;
+       pref-dim parent children orientation focus
+       visible? root? clipped? layout-state graft-state graft-node
+       interior boundary
+       model ;
 
 M: gadget equal? 2drop f ;
 
@@ -58,7 +58,7 @@ M: gadget model-changed 2drop ;
         2drop { 0 0 }
     ] [
         over rect-loc >r
-        >r gadget-parent r> relative-loc
+        >r parent>> r> relative-loc
         r> v+
     ] if ;
 
@@ -150,7 +150,7 @@ DEFER: relayout
     \ invalidate* over set-gadget-layout-state
     dup forget-pref-dim
     dup gadget-root?
-    [ layout-later ] [ gadget-parent [ relayout ] when* ] if ;
+    [ layout-later ] [ parent>> [ relayout ] when* ] if ;
 
 : relayout ( gadget -- )
     dup gadget-layout-state \ invalidate* eq?
@@ -255,7 +255,7 @@ M: gadget ungraft* drop ;
 : (unparent) ( gadget -- )
     dup ungraft
     dup forget-pref-dim
-    f swap set-gadget-parent ;
+    f swap (>>parent) ;
 
 : unfocus-gadget ( child gadget -- )
     tuck gadget-focus eq?
@@ -270,7 +270,7 @@ SYMBOL: in-layout?
 : unparent ( gadget -- )
     not-in-layout
     [
-        dup gadget-parent dup [
+        dup parent>> dup [
             over (unparent)
             [ unfocus-gadget ] 2keep
             [ gadget-children delete ] keep
@@ -294,7 +294,7 @@ SYMBOL: in-layout?
 
 : (add-gadget) ( gadget box -- )
     over unparent
-    dup pick set-gadget-parent
+    dup pick (>>parent)
     [ ((add-gadget)) ] 2keep
     gadget-graft-state second [ graft ] [ drop ] if ;
 
@@ -307,7 +307,7 @@ SYMBOL: in-layout?
     swap [ over (add-gadget) ] each relayout ;
 
 : parents ( gadget -- seq )
-    [ gadget-parent ] follow ;
+    [ parent>> ] follow ;
 
 : each-parent ( gadget quot -- ? )
     >r parents r> all? ; inline
@@ -319,7 +319,7 @@ SYMBOL: in-layout?
     parents { 0 0 } [ rect-loc v+ ] reduce ;
 
 : (screen-rect) ( gadget -- loc ext )
-    dup gadget-parent [
+    dup parent>> [
         >r rect-extent r> (screen-rect)
         >r tuck v+ r> vmin >r v+ r>
     ] [
@@ -333,7 +333,7 @@ SYMBOL: in-layout?
     {
         { [ 2dup eq? ] [ 2drop t ] }
         { [ dup not ] [ 2drop f ] }
-        [ gadget-parent child? ]
+        [ parent>> child? ]
     } cond ;
 
 GENERIC: focusable-child* ( gadget -- child/t )
@@ -346,7 +346,7 @@ M: gadget focusable-child* drop t ;
 
 GENERIC: request-focus-on ( child gadget -- )
 
-M: gadget request-focus-on gadget-parent request-focus-on ;
+M: gadget request-focus-on parent>> request-focus-on ;
 
 M: f request-focus-on 2drop ;
 
@@ -371,7 +371,7 @@ M: f request-focus-on 2drop ;
 ! Deprecated
 : set-gadget-delegate ( gadget tuple -- )
     over [
-        dup pick [ set-gadget-parent ] with each-child
+        dup pick [ (>>parent) ] with each-child
     ] when set-delegate ;
 
 : construct-gadget ( class -- tuple )
