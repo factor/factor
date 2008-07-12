@@ -206,7 +206,7 @@ GENERIC: handle-outgoing-irc ( obj -- )
 M: privmsg handle-outgoing-irc ( privmsg -- )
     [ name>> ] [ trailing>> ] bi /PRIVMSG ;
 
-M: part handle-outgoing-irc ( privmsg -- )
+M: part handle-outgoing-irc ( part -- )
     [ channel>> ] [ trailing>> "" or ] bi /PART ;
 
 ! ======================================
@@ -263,6 +263,7 @@ DEFER: (connect-irc)
     {
         { [ dup string? ] [ strings>privmsg ] }
         { [ dup privmsg instance? ] [ swap >>name ] }
+        [ nip ]
     } cond ;
 
 : listener-loop ( name listener -- )
@@ -310,8 +311,8 @@ M: irc-nick-listener (remove-listener) ( irc-nick-listener -- )
     name>> unregister-listener ;
 
 M: irc-channel-listener (remove-listener) ( irc-channel-listener -- )
-    [ [ out-messages>> ] [ name>> ] bi
-      [ \ part new ] dip >>channel mailbox-put ] keep
+    [ [ name>> ] [ out-messages>> ] bi
+      [ [ part new ] dip >>channel ] dip mailbox-put ] keep
     name>> unregister-listener ;
 
 M: irc-server-listener (remove-listener) ( irc-server-listener -- )
