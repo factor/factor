@@ -2,7 +2,7 @@ USING: alien alien.c-types arrays sequences math math.vectors
 math.matrices math.parser io io.files kernel opengl opengl.gl
 opengl.glu io.encodings.ascii opengl.capabilities shuffle
 http.client vectors splitting system combinators
-float-arrays continuations destructors namespaces sequences.lib
+continuations destructors namespaces sequences.lib
 accessors ;
 IN: bunny.model
 
@@ -66,7 +66,7 @@ TUPLE: bunny-buffers array element-array nv ni ;
     {
         [
             [ first concat ] [ second concat ] bi
-            append >c-double-array
+            append >c-float-array
             GL_ARRAY_BUFFER swap GL_STATIC_DRAW <gl-buffer>
         ]
         [
@@ -86,10 +86,10 @@ M: bunny-dlist bunny-geom
 M: bunny-buffers bunny-geom
     dup { array>> element-array>> } get-slots [
         { GL_VERTEX_ARRAY GL_NORMAL_ARRAY } [
-            GL_DOUBLE 0 0 buffer-offset glNormalPointer
+            GL_FLOAT 0 0 buffer-offset glNormalPointer
             [
-                nv>> "double" heap-size * buffer-offset
-                3 GL_DOUBLE 0 roll glVertexPointer
+                nv>> "float" heap-size * buffer-offset
+                3 GL_FLOAT 0 roll glVertexPointer
             ] [
                 ni>>
                 GL_TRIANGLES swap GL_UNSIGNED_INT 0 buffer-offset glDrawElements
