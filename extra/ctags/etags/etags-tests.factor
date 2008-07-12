@@ -38,7 +38,7 @@ IN: ctags.etags.tests
 [ { { if { "path" 1 } } } ctag-hash ] unit-test
 
 [ "if28,704" ]
-[ "resource:core/kernel/kernel.factor" { if 28 } etag ] unit-test
+[ "resource:core/kernel/kernel.factor" file>lines { if 28 } etag ] unit-test
 
 ! [ V{ "" "resource:core/kernel/kernel.factor,22" "if28,704" "unless31,755" } ]
 ! [ { { "resource:core/kernel/kernel.factor"
