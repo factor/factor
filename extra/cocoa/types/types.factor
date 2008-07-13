@@ -64,3 +64,9 @@ C-STRUCT: CGAffineTransform
     { "float" "d" }
     { "float" "tx" }
     { "float" "ty" } ;
+
+C-STRUCT: NSFastEnumerationState
+    { "ulong" "state" }
+    { "id*" "itemsPtr" }
+    { "ulong*" "mutationsPtr" }
+    { "ulong[5]" "extra" } ;
