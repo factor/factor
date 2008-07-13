@@ -22,18 +22,6 @@ ERROR: not-a-tuple object ;
 
 <PRIVATE
 
-: (tuple) ( layout -- tuple )
-    #! In non-optimized code, this word simply calls the
-    #! <tuple> primitive. In optimized code, an intrinsic
-    #! is generated which allocates a tuple but does not set
-    #! any of its slots. This means that any code that uses
-    #! (tuple) must fill in the slots before the next
-    #! call to GC.
-    #!
-    #! This word is only used in the expansion of <tuple-boa>,
-    #! where this invariant is guaranteed to hold.
-    <tuple> ;
-
 : tuple-layout ( class -- layout )
     "layout" word-prop ;
 

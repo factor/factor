@@ -450,33 +450,28 @@ IN: cpu.ppc.intrinsics
     { +output+ { "tuple" } }
 } define-intrinsic
 
-\ <array> [
+\ (array) [
     array "n" get 2 + cells %allot
     ! Store length
     "n" operand 12 LI
     12 11 cell STW
-    ! Store initial element
-    "n" get [ "initial" operand 11 rot 2 + cells STW ] each
     ! Store tagged ptr in reg
     "array" get object %store-tagged
 ] H{
-    { +input+ { { [ inline-array? ] "n" } { f "initial" } } }
+    { +input+ { { [ ] "n" } } }
     { +scratch+ { { f "array" } } }
     { +output+ { "array" } }
 } define-intrinsic
 
-\ <byte-array> [
+\ (byte-array) [
     byte-array "n" get 2 cells + %allot
     ! Store length
     "n" operand 12 LI
     12 11 cell STW
-    ! Store initial element
-    0 12 LI
-    "n" get cell align cell /i [ 12 11 rot 2 + cells STW ] each
     ! Store tagged ptr in reg
     "array" get object %store-tagged
 ] H{
-    { +input+ { { [ inline-array? ] "n" } } }
+    { +input+ { { [ ] "n" } } }
     { +scratch+ { { f "array" } } }
     { +output+ { "array" } }
 } define-intrinsic
