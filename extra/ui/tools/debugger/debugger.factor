@@ -15,10 +15,12 @@ IN: ui.tools.debugger
 TUPLE: debugger < track restarts ;
 
 : <debugger-display> ( restart-list error -- gadget )
-    [
-        <pane> [ [ print-error ] with-pane ] keep gadget,
-        gadget,
-    ] make-filled-pile ;
+  <filled-pile>
+    <pane>
+      swapd tuck [ print-error ] with-pane
+    add-gadget
+
+    swap add-gadget ;
 
 : <debugger> ( error restarts restart-hook -- gadget )
     { 0 1 } debugger new-track
