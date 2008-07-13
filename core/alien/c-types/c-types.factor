@@ -151,7 +151,8 @@ M: byte-array byte-length length ;
     swap dup length memcpy ;
 
 : (define-nth) ( word type quot -- )
-    >r heap-size [ rot * ] swap prefix r> append define-inline ;
+    >r heap-size [ rot * >fixnum ] swap prefix
+    r> append define-inline ;
 
 : nth-word ( name vocab -- word )
     >r "-nth" append r> create ;
