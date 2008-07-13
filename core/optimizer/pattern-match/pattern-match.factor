@@ -1,8 +1,9 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: kernel sequences namespaces generic
+combinators classes classes.algebra
+inference inference.dataflow ;
 IN: optimizer.pattern-match
-USING: kernel sequences inference namespaces generic
-combinators classes classes.algebra inference.dataflow ;
 
 ! Funny pattern matching
 SYMBOL: @

@@ -72,6 +72,7 @@ SYMBOL: label-table
 : rt-xt        4 ;
 : rt-here      5 ;
 : rt-label     6 ;
+: rt-immediate 7 ;
 
 TUPLE: label-fixup label class ;
 

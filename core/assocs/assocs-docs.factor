@@ -57,12 +57,18 @@ ARTICLE: "assocs-lookup" "Lookup and querying of assocs"
 "Utility operations built up from the " { $link "assocs-protocol" } ":"
 { $subsection key? }
 { $subsection at }
-{ $subsection value-at }
 { $subsection assoc-empty? }
 { $subsection keys }
 { $subsection values }
 { $subsection assoc-stack }
 { $see-also at* assoc-size } ;
+
+ARTICLE: "assocs-values" "Transposed assoc operations"
+"Most assoc words take a key and find the corresponding value. The following words take a value and find the corresponding key:"
+{ $subsection value-at }
+{ $subsection value-at* }
+{ $subsection value? }
+"With most assoc implementations, these words runs in linear time, proportional to the number of entries in the assoc. For fast value lookups, use " { $vocab-link "biassocs" } "." ;
 
 ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
 "It is often useful to use the keys of an associative mapping as a set, exploiting the constant or logarithmic lookup time of most implementations (" { $link "alists" } " being a notable exception)."
@@ -111,6 +117,7 @@ $nl
 { $subsection "assocs-protocol" }
 "A large set of utility words work on any object whose class implements the associative mapping protocol."
 { $subsection "assocs-lookup" }
+{ $subsection "assocs-values" }
 { $subsection "assocs-mutation" }
 { $subsection "assocs-combinators" }
 { $subsection "assocs-sets" } ;
@@ -231,10 +238,17 @@ HELP: assoc-stack
 { $description "Searches for the key in successive elements of the sequence, starting from the end. If an assoc containing the key is found, the associated value is output. If no assoc contains the key, outputs " { $link f } "." }
 { $notes "This word is used to implement abstractions such as nested scopes; if the sequence is a stack represented by a vector, then the most recently pushed assoc -- the innermost scope -- will be searched first." } ;
 
+HELP: value-at*
+{ $values { "value" "an object" } { "assoc" assoc } { "key/f" "the key associated to the value, or " { $link f } } { "?" "a boolean" } }
+{ $description "Looks up the key associated with a value. The boolean flag can decide beteen the case of a missing key, and a key of " { $link f } "." } ;
+
 HELP: value-at
 { $values { "value" "an object" } { "assoc" assoc } { "key/f" "the key associated to the value, or " { $link f } } }
-{ $description "Looks up the key associated with a value. No distinction is made between a missing key and a key set to " { $link f } "." }
-{ $notes "This word runs in linear time, proportional to the number of entries in the assoc." } ;
+{ $description "Looks up the key associated with a value. No distinction is made between a missing key and a key set to " { $link f } "." } ;
+
+HELP: value?
+{ $values { "value" "an object" } { "assoc" assoc } { "?" "a boolean" } }
+{ $description "Tests if an assoc contains at least one key with the given value." } ;
 
 HELP: delete-at*
 { $values { "key" "a key" } { "assoc" assoc } { "old" "the previous value or " { $link f } } { "?" "a boolean" } }

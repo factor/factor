@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: effects alien alien.accessors arrays generic hashtables
 kernel assocs math math.libm math.private kernel.private
-sequences words parser inference.class inference.dataflow
-vectors strings sbufs io namespaces assocs quotations
-math.intervals sequences.private combinators splitting layouts
-math.parser classes classes.algebra generic.math
+sequences words parser vectors strings sbufs io namespaces
+assocs quotations math.intervals sequences.private combinators
+splitting layouts math.parser classes classes.algebra
+generic.math inference.class inference.dataflow
 optimizer.pattern-match optimizer.backend optimizer.def-use
 optimizer.inlining optimizer.math.partial generic.standard
 system accessors ;
@@ -444,7 +444,10 @@ most-negative-fixnum most-positive-fixnum [a,b]
 { /f < > <= >= }
 [ { real real } "input-classes" set-word-prop ] each
 
-{ /i bitand bitor bitxor bitnot shift }
+{ /i mod /mod }
+[ { rational rational } "input-classes" set-word-prop ] each
+
+{ bitand bitor bitxor bitnot shift }
 [ { integer integer } "input-classes" set-word-prop ] each
 
 {

@@ -1,15 +1,15 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays generic hashtables definitions
-inference.dataflow inference.state inference.class kernel assocs
-math math.order math.private kernel.private sequences words
-parser vectors strings sbufs io namespaces assocs quotations
-sequences.private io.binary io.streams.string layouts splitting
-math.intervals math.floats.private classes.tuple classes.predicate
-classes.tuple.private classes classes.algebra optimizer.def-use
-optimizer.backend optimizer.pattern-match optimizer.inlining
-sequences.private combinators byte-arrays byte-vectors
-slots.private ;
+kernel assocs math math.order math.private kernel.private
+sequences words parser vectors strings sbufs io namespaces
+assocs quotations sequences.private io.binary io.streams.string
+layouts splitting math.intervals math.floats.private
+classes.tuple classes.predicate classes.tuple.private classes
+classes.algebra sequences.private combinators byte-arrays
+byte-vectors slots.private inference.dataflow inference.state
+inference.class optimizer.def-use optimizer.backend
+optimizer.pattern-match optimizer.inlining ;
 IN: optimizer.known-words
 
 { <tuple> <tuple-boa> (tuple) } [

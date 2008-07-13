@@ -32,7 +32,7 @@ dup >rule-number rule-values rule-keys [ rule> set-at ] 2each ;
 ! step-wrapped-line
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: pattern>state ( {_a_b_c_} -- state ) >array rule> at ;
+: pattern>state ( {_a_b_c_} -- state ) rule> at ;
 
 : cap-line ( line -- 0-line-0 ) { 0 } prepend { 0 } append ;
 

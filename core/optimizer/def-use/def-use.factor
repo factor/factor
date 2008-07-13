@@ -1,8 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces assocs sequences inference.dataflow
-inference.backend kernel generic assocs classes vectors
-accessors combinators ;
+USING: namespaces assocs sequences kernel generic assocs classes
+vectors accessors combinators inference.dataflow inference.backend ;
 IN: optimizer.def-use
 
 SYMBOL: def-use
