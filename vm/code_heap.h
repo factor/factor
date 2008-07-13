@@ -12,7 +12,9 @@ typedef enum {
 	/* current offset */
 	RT_HERE,
 	/* a local label */
-	RT_LABEL
+	RT_LABEL,
+	/* immeditae literal */
+	RT_IMMEDIATE
 } F_RELTYPE;
 
 typedef enum {

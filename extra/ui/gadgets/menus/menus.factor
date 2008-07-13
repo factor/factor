@@ -15,7 +15,7 @@ TUPLE: menu-glass < gadget ;
 : <menu-glass> ( menu world -- glass )
     menu-glass new-gadget
     >r over menu-loc over set-rect-loc r>
-    [ add-gadget ] keep ;
+    [ swap add-gadget drop ] keep ;
 
 M: menu-glass layout* gadget-child prefer ;
 
@@ -26,7 +26,7 @@ M: menu-glass layout* gadget-child prefer ;
 : show-glass ( gadget world -- )
     over hand-clicked set-global
     [ hide-glass ] keep
-    [ add-gadget ] 2keep
+    [ swap add-gadget drop ] 2keep
     set-world-glass ;
 
 : show-menu ( gadget owner -- )
@@ -48,6 +48,7 @@ M: menu-glass layout* gadget-child prefer ;
     faint-boundary ;
 
 : <commands-menu> ( hook target commands -- gadget )
-    [
-        [ >r 2dup r> <menu-item> gadget, ] each 2drop
-    ] make-filled-pile 5 <border> menu-theme ;
+  <filled-pile>
+  -roll
+    [ <menu-item> add-gadget ] with with each
+  5 <border> menu-theme ;

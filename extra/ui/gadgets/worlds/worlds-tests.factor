@@ -18,7 +18,7 @@ namespaces models kernel ;
 
 <gadget> "g1" set
 <gadget> "g2" set
-"g1" get "g2" get add-gadget
+"g1" get "g2" get swap add-gadget drop
 
 [ ] [
     "g2" get <test-world> "w" set
@@ -33,8 +33,8 @@ namespaces models kernel ;
 <gadget> "g1" set
 <gadget> "g2" set
 <gadget> "g3" set
-"g1" get "g3" get add-gadget
-"g2" get "g3" get add-gadget
+"g1" get "g3" get swap add-gadget drop
+"g2" get "g3" get swap add-gadget drop
 
 [ ] [
     "g3" get <test-world> "w" set
@@ -55,7 +55,7 @@ TUPLE: focus-test < gadget ;
 
 : <focus-test>
     focus-test new-gadget
-    <focusing> over add-gadget ;
+    <focusing> over swap add-gadget drop ;
 
 M: focus-test focusable-child* gadget-child ;
 

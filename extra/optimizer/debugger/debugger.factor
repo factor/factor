@@ -1,10 +1,10 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes inference inference.dataflow io kernel
-kernel.private math.parser namespaces optimizer prettyprint
-prettyprint.backend sequences words arrays match macros
-assocs sequences.private optimizer.specializers generic
-combinators sorting math quotations accessors ;
+USING: classes io kernel kernel.private math.parser namespaces
+optimizer prettyprint prettyprint.backend sequences words arrays
+match macros assocs sequences.private generic combinators
+sorting math quotations accessors inference inference.dataflow
+optimizer.specializers ;
 IN: optimizer.debugger
 
 ! A simple tool for turning dataflow IR into quotations, for

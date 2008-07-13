@@ -2,10 +2,14 @@ USING: help.markup help.syntax sequences strings ;
 IN: grouping
 
 ARTICLE: "grouping" "Groups and clumps"
+"Splitting a sequence into disjoint, fixed-length subsequences:"
+{ $subsection group }
 "A virtual sequence for splitting a sequence into disjoint, fixed-length subsequences:"
 { $subsection groups }
 { $subsection <groups> }
 { $subsection <sliced-groups> }
+"Splitting a sequence into overlapping, fixed-length subsequences:"
+{ $subsection clump }
 "A virtual sequence for splitting a sequence into overlapping, fixed-length subsequences:"
 { $subsection clumps }
 { $subsection <clumps> }

@@ -10,7 +10,7 @@ TUPLE: border < gadget
 { align initial: { 1/2 1/2 } } ;
 
 : new-border ( child class -- border )
-    new-gadget [ add-gadget ] keep ; inline
+    new-gadget [ swap add-gadget drop ] keep ; inline
 
 : <border> ( child gap -- border )
     swap border new-border

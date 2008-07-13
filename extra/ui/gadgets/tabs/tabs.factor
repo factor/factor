@@ -16,7 +16,7 @@ DEFER: (del-page)
     [ [ gadget-parent '[ , , , (del-page) ] "X" swap
        <bevel-button> @right frame, ] 3keep 
       [ swapd <toggle-button> @center frame, ] dip ] make-frame
-    swap add-gadget ;
+    add-gadget drop ;
 
 : redo-toggler ( tabbed -- )
      [ names>> ] [ model>> ] [ toggler>> ] tri
@@ -41,7 +41,7 @@ DEFER: (del-page)
     [ [ model>> swap ]
       [ names>> length 1 - swap ]
       [ toggler>> ] tri add-toggle ]
-    [ content>> add-gadget ]
+    [ content>> swap add-gadget drop ]
     [ refresh-book ] tri ;
 
 : del-page ( name tabbed -- )
