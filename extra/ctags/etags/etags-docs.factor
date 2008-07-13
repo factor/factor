@@ -34,6 +34,6 @@ HELP: etags-write ( alist path -- )
 HELP: etag-strings ( alist -- seq )
 { $values { "alist" sequence }
           { "seq" sequence } }
-{ $description "Converts an " { $snippet "alist" } " with etag format (a path as key and a vector containing word/line pairs) in a " { $snippet "seq" } " of strings." }
+{ $description "Converts an " { $snippet "alist" } " with etag format (a path as key and a vector containing word/line pairs) in a " { $snippet "seq" } " of strings." } ;
 
-ABOUT: "etags"
+ABOUT: "etags" ;
