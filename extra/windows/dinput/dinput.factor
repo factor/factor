@@ -370,6 +370,12 @@ FUNCTION: HRESULT DirectInput8Create ( HINSTANCE hinst, DWORD dwVersion, REFIID 
 : DIDFT_ENUMCOLLECTION ( n -- instance ) 8 shift HEX: FFFF bitand ; inline
 : DIDFT_NOCOLLECTION      HEX: 00FFFF00 ; inline
 
+: DISCL_EXCLUSIVE     HEX: 00000001 ; inline
+: DISCL_NONEXCLUSIVE  HEX: 00000002 ; inline
+: DISCL_FOREGROUND    HEX: 00000004 ; inline
+: DISCL_BACKGROUND    HEX: 00000008 ; inline
+: DISCL_NOWINKEY      HEX: 00000010 ; inline
+
 SYMBOL: +dinput+
 
 : create-dinput ( -- )
