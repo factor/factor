@@ -1,12 +1,7 @@
 USING: arrays assocs kernel vectors sequences namespaces
-random math.parser math fry ;
+       random math.parser math fry ;
+
 IN: assocs.lib
-
-: ref-at ( table key -- value ) swap at ;
-
-: put-at* ( table key value -- ) swap rot set-at ;
-
-: put-at ( table key value -- table ) swap pick set-at ;
 
 : set-assoc-stack ( value key seq -- )
     dupd [ key? ] with find-last nip set-at ;
