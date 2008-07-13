@@ -187,9 +187,9 @@ M: radio-control model-changed
     over set-button-selected?
     relayout-1 ;
 
-: <radio-controls> ( model assoc quot -- )
-    #! quot has stack effect ( value model label -- )
-    swapd [ swapd call gadget, ] 2curry assoc-each ; inline
+: <radio-controls> ( parent model assoc quot -- parent )
+  #! quot has stack effect ( value model label -- )
+  swapd [ swapd call add-gadget ] 2curry assoc-each ; inline
 
 : radio-button-theme ( gadget -- gadget )
     { 5 5 } >>gap
@@ -202,14 +202,18 @@ M: radio-control model-changed
     { 5 5 } >>gap drop ;
 
 : <radio-buttons> ( model assoc -- gadget )
-    [ [ <radio-button> ] <radio-controls> ] make-filled-pile
-    dup radio-buttons-theme ;
+  <filled-pile>
+    -rot
+    [ <radio-button> ] <radio-controls>
+  dup radio-buttons-theme ;
 
 : <toggle-button> ( value model label -- gadget )
     <radio-control> bevel-button-theme ;
 
 : <toggle-buttons> ( model assoc -- gadget )
-    [ [ <toggle-button> ] <radio-controls> ] make-shelf ;
+  <shelf>
+    -rot
+    [ <toggle-button> ] <radio-controls> ;
 
 : command-button-quot ( target command -- quot )
     [ invoke-command drop ] 2curry ;
@@ -221,9 +225,9 @@ M: radio-control model-changed
     <bevel-button> ;
 
 : <toolbar> ( target -- toolbar )
-    [
-        "toolbar" over class command-map commands>> swap
-        [ -rot <command-button> gadget, ] curry assoc-each
-    ] make-shelf ;
+  <shelf>
+    swap
+    "toolbar" over class command-map commands>> swap
+    [ -rot <command-button> add-gadget ] curry assoc-each ;
 
 : toolbar, ( -- ) g <toolbar> f track, ;
