@@ -7,7 +7,7 @@ TUPLE: wrapper < gadget ;
 
 : new-wrapper ( child class -- wrapper )
     new-gadget
-        [ add-gadget ] keep ; inline
+        [ swap add-gadget drop ] keep ; inline
 
 : <wrapper> ( child -- border )
     wrapper new-wrapper ;

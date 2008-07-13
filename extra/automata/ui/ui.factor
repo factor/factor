@@ -23,10 +23,7 @@ IN: automata.ui
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-QUALIFIED: ui.gadgets
 QUALIFIED: ui.gadgets.grids
-
-: add-gadget ( parent child -- parent ) over ui.gadgets:add-gadget ;
 
 : grid-add ( grid child i j -- grid )
   >r >r dupd swap r> r> ui.gadgets.grids:grid-add ;

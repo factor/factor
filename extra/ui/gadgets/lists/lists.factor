@@ -48,7 +48,7 @@ TUPLE: list < pack index presenter color hook ;
 M: list model-changed
     nip
     dup clear-gadget
-    dup <list-items> over add-gadgets
+    dup <list-items> over swap add-gadgets drop
     bound-index ;
 
 : selected-rect ( list -- rect )

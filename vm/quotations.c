@@ -386,7 +386,7 @@ F_FIXNUM quot_code_offset_to_scan(CELL quot, F_FIXNUM offset)
 				break;
 			}
 		default:
-			COUNT(userenv[JIT_PUSH_LITERAL],i)
+			COUNT(userenv[immediate_p(obj) ? JIT_PUSH_IMMEDIATE : JIT_PUSH_LITERAL],i)
 			break;
 		}
 	}

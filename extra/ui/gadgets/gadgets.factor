@@ -285,22 +285,27 @@ SYMBOL: in-layout?
     not-in-layout
     dup (clear-gadget) relayout ;
 
-: ((add-gadget)) ( gadget box -- )
-    [ children>> ?push ] keep (>>children) ;
+: ((add-gadget)) ( parent child -- parent )
+    over children>> ?push >>children ;
 
-: (add-gadget) ( gadget box -- )
-    over unparent
-    dup pick (>>parent)
-    [ ((add-gadget)) ] 2keep
-    graft-state>> second [ graft ] [ drop ] if ;
+: (add-gadget) ( parent child -- parent )
+    dup unparent
+    over >>parent
+    tuck ((add-gadget))
+    tuck graft-state>> second
+        [ graft ]
+        [ drop  ]
+    if ;
 
-: add-gadget ( gadget parent -- )
+: add-gadget ( parent child -- parent )
     not-in-layout
-    [ (add-gadget) ] keep relayout ;
-
-: add-gadgets ( seq parent -- )
+    (add-gadget)
+    dup relayout ;
+  
+: add-gadgets ( parent children -- parent )
     not-in-layout
-    swap [ over (add-gadget) ] each relayout ;
+    [ (add-gadget) ] each
+    dup relayout ;
 
 : parents ( gadget -- seq )
     [ parent>> ] follow ;
@@ -352,7 +357,7 @@ M: f request-focus-on 2drop ;
 : focus-path ( world -- seq )
     [ focus>> ] follow ;
 
-: gadget, ( gadget -- ) gadget get add-gadget ;
+: gadget, ( gadget -- ) gadget get swap add-gadget drop ;
 
 : g ( -- gadget ) gadget get ;
 

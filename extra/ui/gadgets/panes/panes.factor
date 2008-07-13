@@ -22,10 +22,10 @@ selection-color caret mark selecting? ;
     drop ;
 
 : add-output ( current pane -- )
-    [ set-pane-output ] [ add-gadget ] 2bi ;
+    [ set-pane-output ] [ swap add-gadget drop ] 2bi ;
 
 : add-current ( current pane -- )
-    [ set-pane-current ] [ add-gadget ] 2bi ;
+    [ set-pane-current ] [ swap add-gadget drop ] 2bi ;
 
 : prepare-line ( pane -- )
     [ clear-selection ]
@@ -120,7 +120,7 @@ C: <pane-stream> pane-stream
 GENERIC: write-gadget ( gadget stream -- )
 
 M: pane-stream write-gadget
-    pane-stream-pane pane-current add-gadget ;
+    pane-stream-pane pane-current swap add-gadget drop ;
 
 M: style-stream write-gadget
     stream>> write-gadget ;
@@ -299,12 +299,12 @@ M: paragraph dispose drop ;
 
 : gadget-write ( string gadget -- )
     over empty?
-    [ 2drop ] [ >r <label> text-theme r> add-gadget ] if ;
+    [ 2drop ] [ >r <label> text-theme r> swap add-gadget drop ] if ;
 
 M: pack stream-write gadget-write ;
 
 : gadget-bl ( style stream -- )
-    >r " " <word-break-gadget> style-label r> add-gadget ;
+    >r " " <word-break-gadget> style-label r> swap add-gadget drop ;
 
 M: paragraph stream-write
     swap " " split
@@ -322,7 +322,7 @@ M: paragraph stream-write1
 
 : gadget-format ( string style stream -- )
     pick empty?
-    [ 3drop ] [ >r swap <styled-label> r> add-gadget ] if ;
+    [ 3drop ] [ >r swap <styled-label> r> swap add-gadget drop ] if ;
 
 M: pack stream-format
     gadget-format ;
