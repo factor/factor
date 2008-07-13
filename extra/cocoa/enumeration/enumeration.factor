@@ -12,8 +12,10 @@ IN: cocoa.enumeration
 :: (NSFastEnumeration-each) ( object quot state stackbuf count -- )
     object state stackbuf count -> countByEnumeratingWithState:objects:count:
     dup zero? [ drop ] [
-        [ stackbuf void*-nth quot call ] each
-        object quot state stackbuf count (NSFastEnumeration-each)
+        [
+            state NSFastEnumerationState-itemsPtr dup stackbuf ?
+            void*-nth quot call
+        ] each object quot state stackbuf count (NSFastEnumeration-each)
     ] if ; inline
 
 : NSFastEnumeration-each ( object quot -- )
