@@ -31,7 +31,7 @@ IN: ctags.etags
 : lines>bytes ( seq n -- bytes )
   head 0 [ length 1+ + ] reduce ;
 
-: file>lines ( resource -- lines )
+: file>lines ( path -- lines )
   ascii file-lines ;
 
 : etag ( lines seq -- str )
@@ -46,7 +46,7 @@ IN: ctags.etags
 : etag-length ( vector -- n )
   0 [ length + ] reduce ;
 
-: <header> ( n path -- str )
+: (etag-header) ( n path -- str )
   [
     %
     1 CHAR: , <string> %
@@ -54,7 +54,7 @@ IN: ctags.etags
   ] "" make ;
 
 : etag-header ( vec1 n resource -- vec2 )
-  normalize-path <header> prefix
+  normalize-path (etag-header) prefix
   1 HEX: 0c <string> prefix ;
 
 : etag-strings ( alist -- seq )
