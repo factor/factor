@@ -15,7 +15,8 @@ TUPLE: color-preview < gadget ;
 
 : <color-preview> ( model -- gadget )
     color-preview new-gadget
-    { 100 100 } over set-rect-dim ;
+      swap        >>model
+      { 100 100 } >>dim ;
 
 M: color-preview model-changed
     swap model-value over set-gadget-interior relayout-1 ;
@@ -26,7 +27,10 @@ M: color-preview model-changed
 : <color-sliders> ( -- model gadget )
     3 [ 0 0 0 255 <range> ] replicate
     dup [ range-model ] map <compose>
-    swap [ [ <color-slider> gadget, ] each ] make-filled-pile ;
+    swap
+    <filled-pile>
+    swap
+      [ <color-slider> add-gadget ] each ;
 
 : <color-picker> ( -- gadget )
     [
