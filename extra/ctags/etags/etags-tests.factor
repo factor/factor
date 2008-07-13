@@ -1,4 +1,4 @@
-USING: kernel ctags.etags tools.test io.backend sequences arrays prettyprint hashtables assocs ;
+USING: kernel ctags ctags.etags tools.test io.backend sequences arrays prettyprint hashtables assocs ;
 IN: ctags.etags.tests
 
 
@@ -15,27 +15,27 @@ IN: ctags.etags.tests
 [ "path" ] [ { if { "path" 1 } } ctag-path ] unit-test
 
 [ V{ } ]
-[ "path" H{ } clone ctag-at ] unit-test
+[ "path" H{ } clone etag-at ] unit-test
 
 [ V{ if { "path" 1 } } ]
-[ "path" H{ { "path" V{ if { "path" 1 } } } } ctag-at ] unit-test
+[ "path" H{ { "path" V{ if { "path" 1 } } } } etag-at ] unit-test
 
 [ { if 28 } ]
-[ { if { "resource:core/kernel/kernel.factor" 28 } } ctag-value ] unit-test
+[ { if { "resource:core/kernel/kernel.factor" 28 } } etag-pair ] unit-test
 
-[ V{ } ] [ { if { "path" 1 } } H{ } clone ctag-hashvalue ] unit-test
+[ V{ } ] [ { if { "path" 1 } } H{ } clone etag-vector ] unit-test
 
 [ V{ if { "path" 1 } } ]
 [ { if { "path" 1 } }
   { { "path" V{ if { "path" 1 } } } } >hashtable
-  ctag-hashvalue
+  etag-vector
 ] unit-test
 
 [ H{ { "path" V{ { if  1 } } } } ]
-[ { if { "path" 1 } } H{ } clone ctag-add ] unit-test
+[ { if { "path" 1 } } H{ } clone [ etag-add ] keep ] unit-test
 
 [ H{ { "path" V{ { if 1 } } } } ]
-[ { { if { "path" 1 } } } ctag-hash ] unit-test
+[ { { if { "path" 1 } } } etag-hash ] unit-test
 
 [ "if28,704" ]
 [ "resource:core/kernel/kernel.factor" file>lines { if 28 } etag ] unit-test

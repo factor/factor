@@ -8,25 +8,25 @@ io.encodings.ascii io.files math math.parser namespaces strings locals
 shuffle io.backend arrays ;
 IN: ctags.etags
 
-: ctag-path ( alist -- path )
-  second first ;
-
-: ctag-at ( key hash -- vector )
+: etag-at ( key hash -- vector )
   at [ V{ } clone ] unless* ;
 
-: ctag-hashvalue ( alist hash -- vector )
-  [ ctag-path ] dip ctag-at ;
+: etag-vector ( alist hash -- vector )
+  [ ctag-path ] dip etag-at ;
 
-: ctag-value ( ctag -- seq )
-  dup [ first , second second , ] { } make ;
+: etag-pair ( ctag -- seq )
+  dup [
+    first ,
+    second second ,
+  ] { } make ;
 
-: ctag-add ( ctag hash -- hash )
-  [ ctag-hashvalue ] 2keep [
-    dup ctag-path [ ctag-value suffix ] dip
-  ] dip [ set-at ] keep ;
+: etag-add ( ctag hash -- )
+  [ etag-vector ] 2keep [
+    [ etag-pair ] [ ctag-path ] bi [ suffix ] dip
+  ] dip set-at ;
     
-: ctag-hash ( seq -- hash )
-  H{ } clone swap [ swap ctag-add ] each ;
+: etag-hash ( seq -- hash )
+  H{ } clone swap [ swap [ etag-add ] keep ] each ;
 
 : lines>bytes ( seq n -- bytes )
   head 0 [ length 1+ + ] reduce ;
@@ -43,10 +43,7 @@ IN: ctags.etags
     1- lines>bytes number>string %
   ] "" make ;
 
-: etag-entry ( alist -- alist array )
-  [ first ] keep swap [ file>lines ] keep 2array ;
-
-: vector-length ( vector -- n )
+: etag-length ( vector -- n )
   0 [ length + ] reduce ;
 
 : <header> ( n path -- str )
@@ -60,15 +57,14 @@ IN: ctags.etags
   normalize-path <header> prefix
   1 HEX: 0c <string> prefix ;
 
-SYMBOL: resource    
 : etag-strings ( alist -- seq )
   { } swap [
-    etag-entry resource [
-      second [
-        resource get first swap etag
-      ] map dup vector-length
-      resource get second
-    ] with-variable
+    [
+      [ first file>lines ]
+      [ second ] bi
+      [ etag ] with map
+      dup etag-length
+    ] keep first 
     etag-header append
   ] each ;
 
@@ -76,4 +72,4 @@ SYMBOL: resource
   [ etag-strings ] dip ascii set-file-lines ; 
 
 : etags ( path -- )
-  (ctags) sort-values ctag-hash >alist swap etags-write ;
+  [ (ctags) sort-values etag-hash >alist ] dip etags-write ;
