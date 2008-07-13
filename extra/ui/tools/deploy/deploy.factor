@@ -41,26 +41,25 @@ TUPLE: deploy-gadget < pack vocab settings ;
     deploy-word-defs? get "Retain all word definitions" <checkbox> add-gadget
     deploy-c-types? get "Retain all C types" <checkbox> add-gadget ;
 
-: deploy-settings-theme ( gadget -- )
-    { 10 10 } >>gap
-    1 >>fill
-    drop ;
+: deploy-settings-theme ( gadget -- gadget )
+  { 10 10 } >>gap
+  1         >>fill ;
 
 : <deploy-settings> ( vocab -- control )
-  default-config [ <model> ] assoc-map
-    [
-      <pile>
-        bundle-name
-        deploy-ui
-        os macosx? [ exit-when-windows-closed ] when
-        io-settings
-        reflection-settings
-        advanced-settings
+    default-config [ <model> ] assoc-map
+        [
+            <pile>
+            bundle-name
+            deploy-ui
+            os macosx? [ exit-when-windows-closed ] when
+            io-settings
+            reflection-settings
+            advanced-settings
 
-      dup deploy-settings-theme
-      namespace <mapping> over set-gadget-model
-    ]
-  bind ;
+            deploy-settings-theme
+            namespace <mapping> over set-gadget-model
+        ]
+    bind ;
 
 : find-deploy-gadget ( gadget -- deploy-gadget )
     [ deploy-gadget? ] find-parent ;
@@ -106,14 +105,14 @@ deploy-gadget "toolbar" f {
 } define-command-map
 
 : <deploy-gadget> ( vocab -- gadget )
-  deploy-gadget new-gadget
-    over                           >>vocab
-    { 0 1 }                        >>orientation
-    swap <deploy-settings>         >>settings    
-    dup settings>>                 add-gadget
-    dup <toolbar> { 10 10 } >>gap  add-gadget
-  dup deploy-settings-theme
-  dup com-revert ;
+    deploy-gadget new-gadget
+      over                           >>vocab
+      { 0 1 }                        >>orientation
+      swap <deploy-settings>         >>settings    
+      dup settings>>                 add-gadget
+      dup <toolbar> { 10 10 } >>gap  add-gadget
+    deploy-settings-theme
+    dup com-revert ;
     
 : deploy-tool ( vocab -- )
     vocab-name dup <deploy-gadget> 10 <border>
