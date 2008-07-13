@@ -1,44 +1,45 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: ui.gadgets colors kernel ui.render namespaces
-models models.mapping sequences ui.gadgets.buttons
-ui.gadgets.packs ui.gadgets.labels tools.deploy.config
-namespaces ui.gadgets.editors ui.gadgets.borders ui.gestures
-ui.commands assocs ui.gadgets.tracks ui ui.tools.listener
-tools.deploy vocabs ui.tools.workspace system accessors ;
+       models models.mapping sequences ui.gadgets.buttons
+       ui.gadgets.packs ui.gadgets.labels tools.deploy.config
+       namespaces ui.gadgets.editors ui.gadgets.borders ui.gestures
+       ui.commands assocs ui.gadgets.tracks ui ui.tools.listener
+       tools.deploy vocabs ui.tools.workspace system accessors ;
+
 IN: ui.tools.deploy
 
 TUPLE: deploy-gadget < pack vocab settings ;
 
-: bundle-name ( -- )
+: bundle-name ( parent -- parent )
     deploy-name get <field>
-    "Executable name:" label-on-left gadget, ;
+    "Executable name:" label-on-left add-gadget ;
 
-: deploy-ui ( -- )
+: deploy-ui ( parent -- parent )
     deploy-ui? get
-    "Include user interface framework" <checkbox> gadget, ;
+    "Include user interface framework" <checkbox> add-gadget ;
 
-: exit-when-windows-closed ( -- )
+: exit-when-windows-closed ( parent -- parent )
     "stop-after-last-window?" get
-    "Exit when last UI window closed" <checkbox> gadget, ;
+    "Exit when last UI window closed" <checkbox> add-gadget ;
 
-: io-settings ( -- )
-    "Input/output support:" <label> gadget,
-    deploy-io get deploy-io-options <radio-buttons> gadget, ;
+: io-settings ( parent -- parent )
+    "Input/output support:" <label> add-gadget
+    deploy-io get deploy-io-options <radio-buttons> add-gadget ;
 
-: reflection-settings ( -- )
-    "Reflection support:" <label> gadget,
-    deploy-reflection get deploy-reflection-options <radio-buttons> gadget, ;
+: reflection-settings ( parent -- parent )
+    "Reflection support:" <label> add-gadget
+    deploy-reflection get deploy-reflection-options <radio-buttons> add-gadget ;
 
-: advanced-settings ( -- )
-    "Advanced:" <label> gadget,
-    deploy-compiler? get "Use optimizing compiler" <checkbox> gadget,
-    deploy-math? get "Rational and complex number support" <checkbox> gadget,
-    deploy-threads? get "Threading support" <checkbox> gadget,
-    deploy-random? get "Random number generator support" <checkbox> gadget,
-    deploy-word-props? get "Retain all word properties" <checkbox> gadget,
-    deploy-word-defs? get "Retain all word definitions" <checkbox> gadget,
-    deploy-c-types? get "Retain all C types" <checkbox> gadget, ;
+: advanced-settings ( parent -- parent )
+    "Advanced:" <label> add-gadget
+    deploy-compiler? get "Use optimizing compiler" <checkbox> add-gadget
+    deploy-math? get "Rational and complex number support" <checkbox> add-gadget
+    deploy-threads? get "Threading support" <checkbox> add-gadget
+    deploy-random? get "Random number generator support" <checkbox> add-gadget
+    deploy-word-props? get "Retain all word properties" <checkbox> add-gadget
+    deploy-word-defs? get "Retain all word definitions" <checkbox> add-gadget
+    deploy-c-types? get "Retain all C types" <checkbox> add-gadget ;
 
 : deploy-settings-theme ( gadget -- )
     { 10 10 } >>gap
@@ -46,17 +47,20 @@ TUPLE: deploy-gadget < pack vocab settings ;
     drop ;
 
 : <deploy-settings> ( vocab -- control )
-    default-config [ <model> ] assoc-map [
-        [
-            bundle-name
-            deploy-ui
-            os macosx? [ exit-when-windows-closed ] when
-            io-settings
-            reflection-settings
-            advanced-settings
-        ] make-pile dup deploy-settings-theme
-        namespace <mapping> over set-gadget-model
-    ] bind ;
+  default-config [ <model> ] assoc-map
+    [
+      <pile>
+        bundle-name
+        deploy-ui
+        os macosx? [ exit-when-windows-closed ] when
+        io-settings
+        reflection-settings
+        advanced-settings
+
+      dup deploy-settings-theme
+      namespace <mapping> over set-gadget-model
+    ]
+  bind ;
 
 : find-deploy-gadget ( gadget -- deploy-gadget )
     [ deploy-gadget? ] find-parent ;
@@ -101,21 +105,16 @@ deploy-gadget "toolbar" f {
     { T{ key-down f f "RET" } com-deploy }
 } define-command-map
 
-: buttons, ( -- )
-    g <toolbar> { 10 10 } over set-pack-gap gadget, ;
-
 : <deploy-gadget> ( vocab -- gadget )
-    deploy-gadget new-gadget
-        swap >>vocab
-        { 0 1 } >>orientation
-    [
-        g vocab>> <deploy-settings>
-        g-> set-deploy-gadget-settings gadget,
-        buttons,
-    ] make-gadget
-    dup deploy-settings-theme
-    dup com-revert ;
-
+  deploy-gadget new-gadget
+    over                           >>vocab
+    { 0 1 }                        >>orientation
+    swap <deploy-settings>         >>settings    
+    dup settings>>                 add-gadget
+    dup <toolbar> { 10 10 } >>gap  add-gadget
+  dup deploy-settings-theme
+  dup com-revert ;
+    
 : deploy-tool ( vocab -- )
     vocab-name dup <deploy-gadget> 10 <border>
     "Deploying \"" rot "\"" 3append open-window ;
