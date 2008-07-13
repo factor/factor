@@ -30,9 +30,8 @@ push the array and immediately drop it after.
 in the VM. They are open-coded and no subroutine call is generated. This
 includes stack shufflers, some fixnum arithmetic words, and words such as tag,
 slot and eq?. A primitive call is relatively expensive (two subroutine calls)
-so this results in a big speedup for relatively little effort.
+so this results in a big speedup for relatively little effort. */
 
-*/
 bool jit_primitive_call_p(F_ARRAY *array, CELL i)
 {
 	return (i + 2) == array_capacity(array)
@@ -253,7 +252,7 @@ void jit_compile(CELL quot, bool relocate)
 			}
 		default:
 			GROWABLE_ARRAY_ADD(literals,obj);
-			EMIT(userenv[JIT_PUSH_LITERAL],literals_count - 1);
+			EMIT(userenv[immediate_p(obj) ? JIT_PUSH_IMMEDIATE : JIT_PUSH_LITERAL],literals_count - 1);
 			break;
 		}
 	}
