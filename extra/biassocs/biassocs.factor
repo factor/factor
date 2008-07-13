@@ -8,7 +8,7 @@ TUPLE: biassoc from to ;
 : <biassoc> ( exemplar -- biassoc )
     [ clone ] [ clone ] bi biassoc boa ;
 
-: <bihash> ( -- bihashtable )
+: <bihash> ( -- biassoc )
     H{ } <biassoc> ;
 
 M: biassoc assoc-size from>> assoc-size ;
