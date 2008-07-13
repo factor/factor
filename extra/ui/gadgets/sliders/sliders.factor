@@ -140,7 +140,7 @@ M: elevator layout*
 
 : elevator, ( orientation -- )
     dup <elevator> g-> set-slider-elevator
-    swap <thumb> g-> set-slider-thumb over add-gadget
+    swap <thumb> g-> set-slider-thumb add-gadget
     @center frame, ;
 
 : <left-button> ( -- button )

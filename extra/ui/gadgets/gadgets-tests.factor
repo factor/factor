@@ -9,9 +9,9 @@ io.streams.string math.geometry.rect ;
     ! c contains b contains a
     <gadget> "a" set
     <gadget> "b" set
-    "a" get "b" get add-gadget
+    "a" get "b" get swap add-gadget drop
     <gadget> "c" set
-    "b" get "c" get add-gadget
+    "b" get "c" get swap add-gadget drop
 
     ! position a and b
     { 100 200 } "a" get set-rect-loc
@@ -33,8 +33,8 @@ io.streams.string math.geometry.rect ;
 <gadget> "g3" set
 { 100 200 } "g3" get set-rect-dim
 
-"g1" get "g2" get add-gadget
-"g2" get "g3" get add-gadget
+"g1" get "g2" get swap add-gadget drop
+"g2" get "g3" get swap add-gadget drop
 
 [ { 30 30 } ] [ "g1" get screen-loc ] unit-test
 [ { 30 30 } ] [ "g1" get screen-rect rect-loc ] unit-test
@@ -49,11 +49,11 @@ io.streams.string math.geometry.rect ;
 <gadget> "g1" set
 { 300 300 } "g1" get set-rect-dim
 <gadget> "g2" set
-"g2" get "g1" get add-gadget
+"g2" get "g1" get swap add-gadget drop
 { 20 20 } "g2" get set-rect-loc
 { 20 20 } "g2" get set-rect-dim
 <gadget> "g3" set
-"g3" get "g1" get add-gadget
+"g3" get "g1" get swap add-gadget drop
 { 100 100 } "g3" get set-rect-loc
 { 20 20 } "g3" get set-rect-dim
 
@@ -66,7 +66,7 @@ io.streams.string math.geometry.rect ;
 [ t ] [ { 110 110 } "g1" get pick-up "g3" get eq? ] unit-test
 
 <gadget> "g4" set
-"g4" get "g2" get add-gadget
+"g4" get "g2" get swap add-gadget drop
 { 5 5 } "g4" get set-rect-loc
 { 1 1 } "g4" get set-rect-dim
 
@@ -123,7 +123,7 @@ M: mock-gadget ungraft*
     : add-some-children
         3 [
             <mock-gadget> over <model> over set-gadget-model
-            dup "g" get add-gadget
+            dup "g" get swap add-gadget drop
             swap 1+ number>string set
         ] each ;
 

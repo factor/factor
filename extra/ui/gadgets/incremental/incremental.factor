@@ -45,7 +45,7 @@ M: incremental pref-dim*
 
 : add-incremental ( gadget incremental -- )
     not-in-layout
-    2dup (add-gadget)
+    2dup swap (add-gadget) drop
     over prefer-incremental
     over layout-later
     2dup incremental-loc

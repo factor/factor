@@ -120,24 +120,24 @@ VARS: population-label cohesion-label alignment-label separation-label ;
     [ "1 - Randomize" [ drop randomize ] button* ]
 
     [ <pile> 1 over set-pack-fill
-      population-label> over add-gadget
-      "3 - Add 10" [ drop add-10-boids ] button* over add-gadget
-      "2 - Sub 10" [ drop sub-10-boids ] button* over add-gadget ]
+      population-label> add-gadget
+      "3 - Add 10" [ drop add-10-boids ] button* add-gadget
+      "2 - Sub 10" [ drop sub-10-boids ] button* add-gadget ]
 
     [ <pile> 1 over set-pack-fill
-      cohesion-label> over add-gadget
-      "q - +0.1" [ drop inc-cohesion-weight ] button* over add-gadget
-      "a - -0.1" [ drop dec-cohesion-weight ] button* over add-gadget ]
+      cohesion-label> add-gadget
+      "q - +0.1" [ drop inc-cohesion-weight ] button* add-gadget
+      "a - -0.1" [ drop dec-cohesion-weight ] button* add-gadget ]
 
     [ <pile> 1 over set-pack-fill
-      alignment-label> over add-gadget
-      "w - +0.1" [ drop inc-alignment-weight ] button* over add-gadget
-      "s - -0.1" [ drop dec-alignment-weight ] button* over add-gadget ]
+      alignment-label> add-gadget
+      "w - +0.1" [ drop inc-alignment-weight ] button* add-gadget
+      "s - -0.1" [ drop dec-alignment-weight ] button* add-gadget ]
 
     [ <pile> 1 over set-pack-fill
-      separation-label> over add-gadget
-      "e - +0.1" [ drop inc-separation-weight ] button* over add-gadget
-      "d - -0.1" [ drop dec-separation-weight ] button* over add-gadget ]
+      separation-label> add-gadget
+      "e - +0.1" [ drop inc-separation-weight ] button* add-gadget
+      "d - -0.1" [ drop dec-separation-weight ] button* add-gadget ]
 
   } [ call ] map [ [ gadget, ] each ] make-shelf
     1 over set-pack-fill

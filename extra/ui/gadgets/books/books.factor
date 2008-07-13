@@ -19,7 +19,7 @@ M: book model-changed
 : new-book ( pages model class -- book )
     new-gadget
         swap >>model
-        [ add-gadgets ] keep ; inline
+        [ swap add-gadgets drop ] keep ; inline
 
 : <book> ( pages model -- book )
     book new-book ;

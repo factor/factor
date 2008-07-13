@@ -18,7 +18,7 @@ TUPLE: viewport < gadget ;
     viewport new-gadget
         swap >>model
         t >>clipped?
-        [ add-gadget ] keep ;
+        [ swap add-gadget drop ] keep ;
 
 M: viewport layout*
     dup rect-dim viewport-gap 2 v*n v-
