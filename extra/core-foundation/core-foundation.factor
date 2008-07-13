@@ -24,7 +24,8 @@ FUNCTION: void CFArraySetValueAtIndex ( CFArrayRef array, CFIndex index, void* v
 
 FUNCTION: CFIndex CFArrayGetCount ( CFArrayRef array ) ;
 
-: kCFURLPOSIXPathStyle 0 ;
+: kCFURLPOSIXPathStyle 0 ; inline
+: kCFAllocatorDefault f ; inline
 
 FUNCTION: CFURLRef CFURLCreateWithFileSystemPath ( CFAllocatorRef allocator, CFStringRef filePath, int pathStyle, Boolean isDirectory ) ;
 
