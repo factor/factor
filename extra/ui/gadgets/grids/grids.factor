@@ -12,7 +12,7 @@ grid
 
 : new-grid ( children class -- grid )
     new-gadget
-    [ (>>grid) ] [ >r concat r> add-gadgets ] [ nip ] 2tri ;
+    [ (>>grid) ] [ >r concat r> swap add-gadgets drop ] [ nip ] 2tri ;
     inline
 
 : <grid> ( children -- grid )
@@ -21,7 +21,7 @@ grid
 : grid-child ( grid i j -- gadget ) rot grid>> nth nth ;
 
 : grid-add ( gadget grid i j -- )
-    >r >r 2dup add-gadget r> r>
+    >r >r 2dup swap add-gadget drop r> r>
     3dup grid-child unparent rot grid>> nth set-nth ;
 
 : grid-remove ( grid i j -- )
