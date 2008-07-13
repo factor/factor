@@ -12,10 +12,10 @@ SYMBOL: ui-notify-flag
 : notify-ui-thread ( -- ) ui-notify-flag get-global raise-flag ;
 
 TUPLE: gadget < rect
-pref-dim parent children orientation focus
-visible? root? clipped? layout-state graft-state graft-node
-interior boundary
-model ;
+       pref-dim parent children orientation focus
+       visible? root? clipped? layout-state graft-state graft-node
+       interior boundary
+       model ;
 
 M: gadget equal? 2drop f ;
 
@@ -23,9 +23,9 @@ M: gadget hashcode* drop gadget hashcode* ;
 
 M: gadget model-changed 2drop ;
 
-: gadget-child ( gadget -- child ) gadget-children first ;
+: gadget-child ( gadget -- child ) children>> first ;
 
-: nth-gadget ( n gadget -- child ) gadget-children nth ;
+: nth-gadget ( n gadget -- child ) children>> nth ;
 
 : new-gadget ( class -- gadget )
     new
@@ -37,7 +37,7 @@ M: gadget model-changed 2drop ;
     gadget new-gadget ;
 
 : activate-control ( gadget -- )
-    dup gadget-model dup [
+    dup model>> dup [
         2dup add-connection
         swap model-changed
     ] [
@@ -45,20 +45,20 @@ M: gadget model-changed 2drop ;
     ] if ;
 
 : deactivate-control ( gadget -- )
-    dup gadget-model dup [ 2dup remove-connection ] when 2drop ;
+    dup model>> dup [ 2dup remove-connection ] when 2drop ;
 
 : control-value ( control -- value )
-    gadget-model model-value ;
+    model>> model-value ;
 
 : set-control-value ( value control -- )
-    gadget-model set-model ;
+    model>> set-model ;
 
 : relative-loc ( fromgadget togadget -- loc )
     2dup eq? [
         2drop { 0 0 }
     ] [
         over rect-loc >r
-        >r gadget-parent r> relative-loc
+        >r parent>> r> relative-loc
         r> v+
     ] if ;
 
@@ -68,22 +68,18 @@ M: gadget user-input* 2drop t ;
 
 GENERIC: children-on ( rect/point gadget -- seq )
 
-M: gadget children-on nip gadget-children ;
+M: gadget children-on nip children>> ;
 
 : (fast-children-on) ( dim axis gadgets -- i )
     swapd [ rect-loc v- over v. 0 <=> ] binsearch nip ;
 
 : fast-children-on ( rect axis children -- from to )
-    3dup
-    >r >r dup rect-loc swap rect-dim v+
-    r> r> (fast-children-on) ?1+
-    >r
-    >r >r rect-loc
-    r> r> (fast-children-on) 0 or
-    r> ;
+    [ >r >r rect-loc r> r> (fast-children-on) 0 or ]
+    [ >r >r dup rect-loc swap rect-dim v+ r> r> (fast-children-on) ?1+ ]
+    3bi ;
 
 : inside? ( bounds gadget -- ? )
-    dup gadget-visible? [ intersects? ] [ 2drop f ] if ;
+    dup visible?>> [ intersects? ] [ 2drop f ] if ;
 
 : (pick-up) ( point gadget -- gadget )
     dupd children-on [ inside? ] with find-last nip ;
@@ -97,10 +93,10 @@ M: gadget children-on nip gadget-children ;
 : dim-sum ( seq -- dim ) { 0 0 } [ v+ ] reduce ;
 
 : orient ( gadget seq1 seq2 -- seq )
-    >r >r gadget-orientation r> r> [ pick set-axis ] 2map nip ;
+    >r >r orientation>> r> r> [ pick set-axis ] 2map nip ;
 
 : each-child ( gadget quot -- )
-    >r gadget-children r> each ; inline
+    >r children>> r> each ; inline
 
 ! Selection protocol
 GENERIC: gadget-selection? ( gadget -- ? )
@@ -117,14 +113,14 @@ GENERIC: gadget-text* ( gadget -- )
 GENERIC: gadget-text-separator ( gadget -- str )
 
 M: gadget gadget-text-separator
-    gadget-orientation { 0 1 } = "\n" "" ? ;
+    orientation>> { 0 1 } = "\n" "" ? ;
 
 : gadget-seq-text ( seq gadget -- )
     gadget-text-separator swap
     [ dup % ] [ gadget-text* ] interleave drop ;
 
 M: gadget gadget-text*
-    dup gadget-children swap gadget-seq-text ;
+    dup children>> swap gadget-seq-text ;
 
 M: array gadget-text*
     [ gadget-text* ] each ;
@@ -132,9 +128,9 @@ M: array gadget-text*
 : gadget-text ( gadget -- string ) [ gadget-text* ] "" make ;
 
 : invalidate ( gadget -- )
-    \ invalidate swap set-gadget-layout-state ;
+    \ invalidate swap (>>layout-state) ;
 
-: forget-pref-dim ( gadget -- ) f swap set-gadget-pref-dim ;
+: forget-pref-dim ( gadget -- ) f swap (>>pref-dim) ;
 
 : layout-queue ( -- queue ) \ layout-queue get ;
 
@@ -147,22 +143,22 @@ M: array gadget-text*
 DEFER: relayout
 
 : invalidate* ( gadget -- )
-    \ invalidate* over set-gadget-layout-state
+    \ invalidate* over (>>layout-state)
     dup forget-pref-dim
     dup gadget-root?
-    [ layout-later ] [ gadget-parent [ relayout ] when* ] if ;
+    [ layout-later ] [ parent>> [ relayout ] when* ] if ;
 
 : relayout ( gadget -- )
-    dup gadget-layout-state \ invalidate* eq?
+    dup layout-state>> \ invalidate* eq?
     [ drop ] [ invalidate* ] if ;
 
 : relayout-1 ( gadget -- )
-    dup gadget-layout-state
+    dup layout-state>>
     [ drop ] [ dup invalidate layout-later ] if ;
 
-: show-gadget ( gadget -- ) t swap set-gadget-visible? ;
+: show-gadget ( gadget -- ) t swap (>>visible?) ;
 
-: hide-gadget ( gadget -- ) f swap set-gadget-visible? ;
+: hide-gadget ( gadget -- ) f swap (>>visible?) ;
 
 : (set-rect-dim) ( dim gadget quot -- )
     >r 2dup rect-dim =
@@ -178,11 +174,11 @@ DEFER: relayout
 GENERIC: pref-dim* ( gadget -- dim )
 
 : ?set-gadget-pref-dim ( dim gadget -- )
-    dup gadget-layout-state
-    [ 2drop ] [ set-gadget-pref-dim ] if ;
+    dup layout-state>>
+    [ 2drop ] [ (>>pref-dim) ] if ;
 
 : pref-dim ( gadget -- dim )
-    dup gadget-pref-dim [ ] [
+    dup pref-dim>> [ ] [
         [ pref-dim* dup ] keep ?set-gadget-pref-dim
     ] ?if ;
 
@@ -196,10 +192,10 @@ M: gadget layout* drop ;
 
 : prefer ( gadget -- ) dup pref-dim swap set-layout-dim ;
 
-: validate ( gadget -- ) f swap set-gadget-layout-state ;
+: validate ( gadget -- ) f swap (>>layout-state) ;
 
 : layout ( gadget -- )
-    dup gadget-layout-state [
+    dup layout-state>> [
         dup validate
         dup layout*
         dup [ layout ] each-child
@@ -223,7 +219,7 @@ M: gadget layout* drop ;
     { t f } (queue-graft) ;
 
 : graft-later ( gadget -- )
-    dup gadget-graft-state {
+    dup graft-state>> {
         { { f t } [ drop ] }
         { { t t } [ drop ] }
         { { t f } [ unqueue-graft ] }
@@ -231,7 +227,7 @@ M: gadget layout* drop ;
     } case ;
 
 : ungraft-later ( gadget -- )
-    dup gadget-graft-state {
+    dup graft-state>> {
         { { f f } [ drop ] }
         { { t f } [ drop ] }
         { { f t } [ unqueue-graft ] }
@@ -255,11 +251,11 @@ M: gadget ungraft* drop ;
 : (unparent) ( gadget -- )
     dup ungraft
     dup forget-pref-dim
-    f swap set-gadget-parent ;
+    f swap (>>parent) ;
 
 : unfocus-gadget ( child gadget -- )
-    tuck gadget-focus eq?
-    [ f swap set-gadget-focus ] [ drop ] if ;
+    tuck focus>> eq?
+    [ f swap (>>focus) ] [ drop ] if ;
 
 SYMBOL: in-layout?
 
@@ -270,10 +266,10 @@ SYMBOL: in-layout?
 : unparent ( gadget -- )
     not-in-layout
     [
-        dup gadget-parent dup [
+        dup parent>> dup [
             over (unparent)
             [ unfocus-gadget ] 2keep
-            [ gadget-children delete ] keep
+            [ children>> delete ] keep
             relayout
         ] [
             2drop
@@ -282,21 +278,21 @@ SYMBOL: in-layout?
 
 : (clear-gadget) ( gadget -- )
     dup [ (unparent) ] each-child
-    f over set-gadget-focus
-    f swap set-gadget-children ;
+    f over (>>focus)
+    f swap (>>children) ;
 
 : clear-gadget ( gadget -- )
     not-in-layout
     dup (clear-gadget) relayout ;
 
 : ((add-gadget)) ( gadget box -- )
-    [ gadget-children ?push ] keep set-gadget-children ;
+    [ children>> ?push ] keep (>>children) ;
 
 : (add-gadget) ( gadget box -- )
     over unparent
-    dup pick set-gadget-parent
+    dup pick (>>parent)
     [ ((add-gadget)) ] 2keep
-    gadget-graft-state second [ graft ] [ drop ] if ;
+    graft-state>> second [ graft ] [ drop ] if ;
 
 : add-gadget ( gadget parent -- )
     not-in-layout
@@ -307,7 +303,7 @@ SYMBOL: in-layout?
     swap [ over (add-gadget) ] each relayout ;
 
 : parents ( gadget -- seq )
-    [ gadget-parent ] follow ;
+    [ parent>> ] follow ;
 
 : each-parent ( gadget quot -- ? )
     >r parents r> all? ; inline
@@ -319,7 +315,7 @@ SYMBOL: in-layout?
     parents { 0 0 } [ rect-loc v+ ] reduce ;
 
 : (screen-rect) ( gadget -- loc ext )
-    dup gadget-parent [
+    dup parent>> [
         >r rect-extent r> (screen-rect)
         >r tuck v+ r> vmin >r v+ r>
     ] [
@@ -333,7 +329,7 @@ SYMBOL: in-layout?
     {
         { [ 2dup eq? ] [ 2drop t ] }
         { [ dup not ] [ 2drop f ] }
-        [ gadget-parent child? ]
+        [ parent>> child? ]
     } cond ;
 
 GENERIC: focusable-child* ( gadget -- child/t )
@@ -346,7 +342,7 @@ M: gadget focusable-child* drop t ;
 
 GENERIC: request-focus-on ( child gadget -- )
 
-M: gadget request-focus-on gadget-parent request-focus-on ;
+M: gadget request-focus-on parent>> request-focus-on ;
 
 M: f request-focus-on 2drop ;
 
@@ -354,7 +350,7 @@ M: f request-focus-on 2drop ;
     [ focusable-child ] keep request-focus-on ;
 
 : focus-path ( world -- seq )
-    [ gadget-focus ] follow ;
+    [ focus>> ] follow ;
 
 : gadget, ( gadget -- ) gadget get add-gadget ;
 
@@ -371,7 +367,7 @@ M: f request-focus-on 2drop ;
 ! Deprecated
 : set-gadget-delegate ( gadget tuple -- )
     over [
-        dup pick [ set-gadget-parent ] with each-child
+        dup pick [ (>>parent) ] with each-child
     ] when set-delegate ;
 
 : construct-gadget ( class -- tuple )

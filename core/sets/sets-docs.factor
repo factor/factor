@@ -38,6 +38,18 @@ HELP: adjoin
 }
 { $side-effects "seq" } ;
 
+HELP: conjoin
+{ $values { "elt" object } { "assoc" "an assoc" } }
+{ $description "Stores a key/value pair, both equal to " { $snippet "elt" } ", into the assoc." }
+{ $examples
+    { $example
+        "USING: kernel prettyprint sets ;"
+        "H{ } clone 1 over conjoin ."
+        "H{ { 1 1 } }"
+    }
+}
+{ $side-effects "assoc" } ;
+
 HELP: unique
 { $values { "seq" "a sequence" } { "assoc" "an assoc" } }
 { $description "Outputs a new assoc where the keys and values are equal." }
