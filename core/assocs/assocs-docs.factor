@@ -44,10 +44,11 @@ ARTICLE: "assocs-protocol" "Associative mapping protocol"
 { $subsection set-at }
 { $subsection delete-at }
 { $subsection clear-assoc }
-"The following two words are optional:"
+"The following three words are optional:"
+{ $subsection value-at* }
 { $subsection new-assoc }
 { $subsection assoc-like }
-"Assocs should also implement methods on the " { $link clone } ", " { $link equal? } " and " { $link hashcode } " generic words. Two utility words will help with the implementation of the last two:"
+"Assocs should also implement methods on the " { $link clone } ", " { $link equal? } " and " { $link hashcode* } " generic words. Two utility words will help with the implementation of the last two:"
 { $subsection assoc= }
 { $subsection assoc-hashcode }
 "Finally, assoc classes should define a word for converting other types of assocs; conventionally, such words are named " { $snippet ">" { $emphasis "class" } } " where " { $snippet { $emphasis "class" } } " is the class name. Such a word can be implemented using a utility:"
