@@ -1,14 +1,20 @@
-! Copyright (C) 2007, 2008 Chris Double, Doug Coleman.
+! Copyright (C) 2007, 2008 Chris Double, Doug Coleman, Eduardo
+! Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private namespaces math math.ranges
 combinators macros quotations fry locals arrays ;
 IN: generalizations
 
 MACRO: narray ( n -- quot )
-    dup [ f <array> ] curry
-    swap <reversed> [
-        [ swap [ set-nth-unsafe ] keep ] curry
-    ] map concat append ;
+    [ <reversed> ] [ '[ , f <array> ] ] bi
+    [ '[ @ [ , swap set-nth-unsafe ] keep ] ] reduce ;
+
+MACRO: firstn ( n -- )
+    dup zero? [ drop [ drop ] ] [
+        [ [ '[ , _ nth-unsafe ] ] map ]
+        [ 1- '[ , _ bounds-check 2drop ] ]
+        bi prefix '[ , cleave ]
+    ] if ;
 
 MACRO: npick ( n -- )
     1- dup saver [ dup ] rot [ r> swap ] n*quot 3append ;

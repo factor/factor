@@ -20,11 +20,6 @@ IN: sequences.lib
 
 : map-with2 ( obj obj list quot -- newseq ) 2 map-withn ; inline
 
-MACRO: firstn ( n -- )
-    [ [ swap nth ] curry [ keep ] curry ] map
-    concat >quotation
-    [ drop ] compose ;
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : each-percent ( seq quot -- )
