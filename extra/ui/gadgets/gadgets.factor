@@ -359,8 +359,6 @@ M: f request-focus-on 2drop ;
 
 : g ( -- gadget ) gadget get ;
 
-: g-> ( x -- x x gadget ) dup g ;
-
 : with-gadget ( gadget quot -- )
     gadget swap with-variable ; inline
 

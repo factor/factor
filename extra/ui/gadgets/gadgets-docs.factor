@@ -186,15 +186,11 @@ HELP: make-gadget
 
 HELP: with-gadget
 { $values { "gadget" gadget } { "quot" quotation } } 
-{ $description "Calls the quotation in a new scope with the " { $link gadget } " and " { $link make-gadget } " variables set to " { $snippet "gadget" } ". The quotation can call " { $link g } " and " { $link g-> } " to access the gadget." } ;
+{ $description "Calls the quotation in a new scope with the " { $link gadget } " and " { $link make-gadget } " variables set to " { $snippet "gadget" } ". The quotation can call " { $link g } " to access the gadget." } ;
 
 HELP: g
 { $values { "gadget" gadget } }
 { $description "Outputs the gadget being built. Can only be used inside a quotation passed to " { $link with-gadget } "." } ;
-
-HELP: g->
-{ $values { "x" object } { "gadget" gadget } }
-{ $description "Duplicates the top of the stack and outputs the gadget being built. Can only be used inside a quotation passed to " { $link with-gadget } "." } ;
 
 { control-value set-control-value gadget-model } related-words
 
