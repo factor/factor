@@ -5,17 +5,16 @@ ui.gadgets.labels ui.gadgets.panes ui.gadgets.scrollers
 ui.gadgets.tracks ui.gadgets.theme ui.gadgets.frames
 ui.gadgets.grids io kernel math models namespaces prettyprint
 sequences sequences words classes.tuple ui.gadgets ui.render
-colors ;
+colors accessors ;
 IN: ui.gadgets.labelled
 
 TUPLE: labelled-gadget < track content ;
 
 : <labelled-gadget> ( gadget title -- newgadget )
-    { 0 1 } labelled-gadget new-track
-    [
-        <label> reverse-video-theme f track,
-        g-> set-labelled-gadget-content 1 track,
-    ] make-gadget ;
+  { 0 1 } labelled-gadget new-track
+    swap <label> reverse-video-theme f track-add*
+    swap >>content
+    dup content>> 1 track-add* ;
 
 M: labelled-gadget focusable-child* labelled-gadget-content ;
 
@@ -50,10 +49,9 @@ TUPLE: closable-gadget < frame content ;
     [ [ closable-gadget? ] is? ] find-parent ;
 
 : <closable-gadget> ( gadget title quot -- gadget )
-    closable-gadget new-frame 
-    [
-        <title-bar> @top frame,
-        g-> set-closable-gadget-content @center frame,
-    ] make-gadget ;
-
+  closable-gadget new-frame
+    -rot <title-bar> @top grid-add*
+    swap >>content
+    dup content>> @center grid-add* ;
+    
 M: closable-gadget focusable-child* closable-gadget-content ;
