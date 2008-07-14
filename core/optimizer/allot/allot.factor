@@ -36,11 +36,13 @@ IN: optimizer.allot
 } define-optimizers
 
 : tuple-boa-quot ( layout -- quot )
-    [ (tuple) ]
-    swap size>> 1 - [ 3 + ] map <reversed>
-    [ [ set-slot ] curry [ keep ] curry ] map concat
-    [ f over 2 set-slot ]
-    3append ;
+    [
+        dup ,
+        [ nip (tuple) ] %
+        size>> 1 - [ 3 + ] map <reversed>
+        [ [ set-slot ] curry [ keep ] curry % ] each
+        [ f over 2 set-slot ] %
+    ] [ ] make ;
 
 : expand-tuple-boa ( #call -- node )
     dup in-d>> peek value-literal tuple-boa-quot f splice-quot ;
@@ -56,7 +58,8 @@ IN: optimizer.allot
 
 : <array>-quot ( n -- quot )
     [
-        [ swap (array) ] %
+        dup ,
+        [ nip (array) ] %
         [ \ 2dup , , [ swap set-array-nth ] % ] each
         \ nip ,
     ] [ ] make ;
@@ -80,7 +83,8 @@ IN: optimizer.allot
 
 : <byte-array>-quot ( n -- quot )
     [
-        \ (byte-array) ,
+        dup ,
+        [ nip (byte-array) ] %
         bytes>cells [ cell * ] map
         [ [ 0 over ] % , [ set-alien-unsigned-cell ] % ] each
     ] [ ] make ;
