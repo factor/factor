@@ -1,7 +1,7 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: generator.fixup generic kernel memory namespaces
-words math math.bitfields math.order io.binary ;
+USING: generator.fixup kernel namespaces words io.binary math
+math.order cpu.ppc.assembler.backend ;
 IN: cpu.ppc.assembler
 
 ! See the Motorola or IBM documentation for details. The opcode
@@ -15,215 +15,195 @@ IN: cpu.ppc.assembler
 !
 ! 14 15 10 STW
 
-: insn ( operand opcode -- ) { 26 0 } bitfield , ;
-: a-form ( d a b c xo rc -- n ) { 0 1 6 11 16 21 } bitfield ;
-: b-form ( bo bi bd aa lk -- n ) { 0 1 2 16 21 } bitfield ;
-: s>u16 ( s -- u ) HEX: ffff bitand ;
-: d-form ( d a simm -- n ) s>u16 { 0 16 21 } bitfield ;
-: sd-form ( d a simm -- n ) s>u16 { 0 21 16 } bitfield ;
-: i-form ( li aa lk -- n ) { 0 1 0 } bitfield ;
-: x-form ( a s b rc xo -- n ) { 1 0 11 21 16 } bitfield ;
-: xfx-form ( d spr xo -- n ) { 1 11 21 } bitfield ;
-: xo-form ( d a b oe rc xo -- n ) { 1 0 10 11 16 21 } bitfield ;
+! D-form
+D: ADDI 14
+D: ADDIC 12
+D: ADDIC. 13
+D: ADDIS 15
+D: CMPI 11
+D: CMPLI 10
+D: LBZ 34
+D: LBZU 35
+D: LFD 50
+D: LFDU 51
+D: LFS 48
+D: LFSU 49
+D: LHA 42
+D: LHAU 43
+D: LHZ 40
+D: LHZU 41
+D: LWZ 32
+D: LWZU 33
+D: MULI 7
+D: MULLI 7
+D: STB 38
+D: STBU 39
+D: STFD 54
+D: STFDU 55
+D: STFS 52
+D: STFSU 53
+D: STH 44
+D: STHU 45
+D: STW 36
+D: STWU 37
 
-: ADDI d-form 14 insn ;   : LI 0 rot ADDI ;   : SUBI neg ADDI ;
-: ADDIS d-form 15 insn ;  : LIS 0 rot ADDIS ;
+! SD-form
+SD: ANDI 28
+SD: ANDIS 29
+SD: ORI 24
+SD: ORIS 25
+SD: XORI 26
+SD: XORIS 27
 
-: ADDIC d-form 12 insn ;  : SUBIC neg ADDIC ;
+! X-form
+X: AND 0 28 31
+X: AND. 1 28 31
+X: CMP 0 0 31
+X: CMPL 0 32 31
+X: EQV 0 284 31
+X: EQV. 1 284 31
+X: FCMPO 0 32 63
+X: FCMPU 0 0 63
+X: LBZUX 0 119 31
+X: LBZX 0 87 31
+X: LHAUX 0 375 31
+X: LHAX 0 343 31
+X: LHZUX 0 311 31
+X: LHZX 0 279 31
+X: LWZUX 0 55 31
+X: LWZX 0 23 31
+X: NAND 0 476 31
+X: NAND. 1 476 31
+X: NOR 0 124 31
+X: NOR. 1 124 31
+X: OR 0 444 31
+X: OR. 1 444 31
+X: ORC 0 412 31
+X: ORC. 1 412 31
+X: SLW 0 24 31
+X: SLW. 1 24 31
+X: SRAW 0 792 31
+X: SRAW. 1 792 31
+X: SRAWI 0 824 31
+X: SRW 0 536 31
+X: SRW. 1 536 31
+X: STBUX 0 247 31
+X: STBX 0 215 31
+X: STHUX 0 439 31
+X: STHX 0 407 31
+X: STWUX 0 183 31
+X: STWX 0 151 31
+X: XOR 0 316 31
+X: XOR. 1 316 31
+X1: EXTSB 0 954 31
+X1: EXTSB. 1 954 31
+: FMR ( a s -- ) 0 -rot 72 0 63 x-insn ;
+: FMR. ( a s -- ) 0 -rot 72 1 63 x-insn ;
+: FCTIWZ ( a s -- ) 0 -rot 0 15 63 x-insn ;
+: FCTIWZ. ( a s -- ) 0 -rot 1 15 63 x-insn ;
 
-: ADDIC. d-form 13 insn ; : SUBIC. neg ADDIC. ;
+! XO-form
+XO: ADD 0 0 266 31
+XO: ADD. 0 1 266 31
+XO: ADDC 0 0 10 31
+XO: ADDC. 0 1 10 31
+XO: ADDCO 1 0 10 31
+XO: ADDCO. 1 1 10 31
+XO: ADDE 0 0 138 31
+XO: ADDE. 0 1 138 31
+XO: ADDEO 1 0 138 31
+XO: ADDEO. 1 1 138 31
+XO: ADDO 1 0 266 31
+XO: ADDO. 1 1 266 31
+XO: DIVW 0 0 491 31
+XO: DIVW. 0 1 491 31
+XO: DIVWO 1 0 491 31
+XO: DIVWO. 1 1 491 31
+XO: DIVWU 0 0 459 31
+XO: DIVWU. 0 1 459 31
+XO: DIVWUO 1 0 459 31
+XO: DIVWUO. 1 1 459 31
+XO: MULHW 0 0 75 31
+XO: MULHW. 0 1 75 31
+XO: MULHWU 0 0 11 31
+XO: MULHWU. 0 1 11 31
+XO: MULLW 0 0 235 31
+XO: MULLW. 0 1 235 31
+XO: MULLWO 1 0 235 31
+XO: MULLWO. 1 1 235 31
+XO: SUBF 0 0 40 31
+XO: SUBF. 0 1 40 31
+XO: SUBFC 0 0 8 31
+XO: SUBFC. 0 1 8 31
+XO: SUBFCO 1 0 8 31
+XO: SUBFCO. 1 1 8 31
+XO: SUBFE 0 0 136 31
+XO: SUBFE. 0 1 136 31
+XO: SUBFEO 1 0 136 31
+XO: SUBFEO. 1 1 136 31
+XO: SUBFO 1 0 40 31
+XO: SUBFO. 1 1 40 31
+XO1: NEG 0 0 104 31
+XO1: NEG. 0 1 104 31
+XO1: NEGO 1 0 104 31
+XO1: NEGO. 1 1 104 31
 
-: MULI d-form 7 insn ;
+! A-form
+: RLWINM ( d a b c xo -- ) 0 21 a-insn ;
+: RLWINM. ( d a b c xo -- ) 1 21 a-insn ;
+: FADD ( d a b -- ) 0 21 0 63 a-insn ;
+: FADD. ( d a b -- ) 0 21 1 63 a-insn ;
+: FSUB ( d a b -- ) 0 20 0 63 a-insn ;
+: FSUB. ( d a b -- ) 0 20 1 63 a-insn ;
+: FMUL ( d a c -- )  0 swap 25 0 63 a-insn ;
+: FMUL. ( d a c -- ) 0 swap 25 1 63 a-insn ;
+: FDIV ( d a b -- ) 0 18 0 63 a-insn ;
+: FDIV. ( d a b -- ) 0 18 1 63 a-insn ;
+: FSQRT ( d b -- ) 0 swap 0 22 0 63 a-insn ;
+: FSQRT. ( d b -- ) 0 swap 0 22 1 63 a-insn ;
 
-: (ADD) 266 xo-form 31 insn ;
-: ADD 0 0 (ADD) ;  : ADD. 0 1 (ADD) ;
-: ADDO 1 0 (ADD) ; : ADDO. 1 1 (ADD) ;
+! Branches
+: B ( dest -- ) 0 0 (B) ;
+: BL ( dest -- ) 0 1 (B) ;
+BC: LT 12 0
+BC: GE 4 0
+BC: GT 12 1
+BC: LE 4 1
+BC: EQ 12 2
+BC: NE 4 2
+BC: O  12 3
+BC: NO 4 3
+B: CLR 0 8 0 0 19
+B: CLRL 0 8 0 1 19
+B: CCTR 0 264 0 0 19
+: BLR ( -- ) 20 BCLR ;
+: BLRL ( -- ) 20 BCLRL ;
+: BCTR ( -- ) 20 BCCTR ;
 
-: (ADDC) 10 xo-form 31 insn ;
-: ADDC 0 0 (ADDC) ;  : ADDC. 0 1 (ADDC) ;
-: ADDCO 1 0 (ADDC) ; : ADDCO. 1 1 (ADDC) ;
+! Special registers
+MFSPR: XER 1
+MFSPR: LR 8
+MFSPR: CTR 9
+MTSPR: XER 1
+MTSPR: LR 8
+MTSPR: CTR 9
 
-: (ADDE) 138 xo-form 31 insn ;
-: ADDE 0 0 (ADDE) ;  : ADDE. 0 1 (ADDE) ;
-: ADDEO 1 0 (ADDE) ; : ADDEO. 1 1 (ADDE) ;
-
-: ANDI sd-form 28 insn ;
-: ANDIS sd-form 29 insn ;
-
-: (AND) 28 x-form 31 insn ;
-: AND 0 (AND) ;  : AND. 0 (AND) ;
-
-: (DIVW) 491 xo-form 31 insn ;
-: DIVW 0 0 (DIVW) ;  : DIVW. 0 1 (DIVW) ;
-: DIVWO 1 0 (DIVW) ; : DIVWO. 1 1 (DIVW) ;
-
-: (DIVWU) 459 xo-form 31 insn ;
-: DIVWU 0 0 (DIVWU) ;  : DIVWU. 0 1 (DIVWU) ;
-: DIVWUO 1 0 (DIVWU) ; : DIVWUO. 1 1 (DIVWU) ;
-
-: (EQV) 284 x-form 31 insn ;
-: EQV 0 (EQV) ;  : EQV. 1 (EQV) ;
-
-: (NAND) 476 x-form 31 insn ;
-: NAND 0 (NAND) ;  : NAND. 1 (NAND) ;
-
-: (NOR) 124 x-form 31 insn ;
-: NOR 0 (NOR) ;  : NOR. 1 (NOR) ;
-
-: NOT dup NOR ;   : NOT. dup NOR. ;
-
-: ORI sd-form 24 insn ;  : ORIS sd-form 25 insn ;
-
-: (OR) 444 x-form 31 insn ;
-: OR 0 (OR) ;  : OR. 1 (OR) ;
-
-: (ORC) 412 x-form 31 insn ;
-: ORC 0 (ORC) ;  : ORC. 1 (ORC) ;
-
-: MR dup OR ;  : MR. dup OR. ;
-
-: (MULHW) 75 xo-form 31 insn ;
-: MULHW 0 0 (MULHW) ;  : MULHW. 0 1 (MULHW) ;
-
-: MULLI d-form 7 insn ;
-
-: (MULHWU) 11 xo-form 31 insn ;
-: MULHWU 0 0 (MULHWU) ;  : MULHWU. 0 1 (MULHWU) ;
-
-: (MULLW) 235 xo-form 31 insn ;
-: MULLW 0 0 (MULLW) ;  : MULLW. 0 1 (MULLW) ;
-: MULLWO 1 0 (MULLW) ; : MULLWO. 1 1 (MULLW) ;
-
-: (SLW) 24 x-form 31 insn ;
-: SLW 0 (SLW) ;  : SLW. 1 (SLW) ;
-
-: (SRAW) 792 x-form 31 insn ;
-: SRAW 0 (SRAW) ;  : SRAW. 1 (SRAW) ;
-
-: (SRW) 536 x-form 31 insn ;
-: SRW 0 (SRW) ;  : SRW. 1 (SRW) ;
-
-: SRAWI 0 824 x-form 31 insn ;
-
-: (SUBF) 40 xo-form 31 insn ;
-: SUBF 0 0 (SUBF) ;  : SUBF. 0 1 (SUBF) ;
-: SUBFO 1 0 (SUBF) ; : SUBFO. 1 1 (SUBF) ;
-
-: (SUBFC) 8 xo-form 31 insn ;
-: SUBFC 0 0 (SUBFC) ;  : SUBFC. 0 1 (SUBFC) ;
-: SUBFCO 1 0 (SUBFC) ; : SUBFCO. 1 1 (SUBFC) ;
-
-: (SUBFE) 136 xo-form 31 insn ;
-: SUBFE 0 0 (SUBFE) ;  : SUBFE. 0 1 (SUBFE) ;
-: SUBFEO 1 0 (SUBFE) ; : SUBFEO. 1 1 (SUBFE) ;
-
-: (EXTSB) 0 swap 954 x-form 31 insn ;
-: EXTSB 0 (EXTSB) ;
-: EXTSB. 1 (EXTSB) ;
-
-: XORI sd-form 26 insn ;  : XORIS sd-form 27 insn ;
-
-: (XOR) 316 x-form 31 insn ;
-: XOR 0 (XOR) ;  : XOR. 1 (XOR) ;
-
-: (NEG) 0 -rot 104 xo-form 31 insn ;
-: NEG 0 0 (NEG) ;  : NEG. 0 1 (NEG) ;
-: NEGO 1 0 (NEG) ; : NEGO. 1 1 (NEG) ;
-
-: CMPI d-form 11 insn ;
-: CMPLI d-form 10 insn ;
-
-: CMP 0 0 x-form 31 insn ;
-: CMPL 0 32 x-form 31 insn ;
-
-: (RLWINM) a-form 21 insn ;
-: RLWINM 0 (RLWINM) ;  : RLWINM. 1 (RLWINM) ;
-
-: (SLWI) 0 31 pick - ;
-: SLWI (SLWI) RLWINM ;  : SLWI. (SLWI) RLWINM. ;
-: (SRWI) 32 over - swap 31 ;
-: SRWI (SRWI) RLWINM ;  : SRWI. (SRWI) RLWINM. ;
-
-: LBZ d-form 34 insn ;  : LBZU d-form 35 insn ;
-: LHA d-form 42 insn ;  : LHAU d-form 43 insn ;
-: LHZ d-form 40 insn ;  : LHZU d-form 41 insn ;
-: LWZ d-form 32 insn ;  : LWZU d-form 33 insn ;
-
-: LBZX 0  87 x-form 31 insn ; : LBZUX 0 119 x-form 31 insn ;
-: LHAX 0 343 x-form 31 insn ; : LHAUX 0 375 x-form 31 insn ;
-: LHZX 0 279 x-form 31 insn ; : LHZUX 0 311 x-form 31 insn ;
-: LWZX 0  23 x-form 31 insn ; : LWZUX 0  55 x-form 31 insn ;
-
-: STB d-form 38 insn ;  : STBU d-form 39 insn ;
-: STH d-form 44 insn ;  : STHU d-form 45 insn ;
-: STW d-form 36 insn ;  : STWU d-form 37 insn ;
-
-: STBX 0 215 x-form 31 insn ; : STBUX 247 x-form 31 insn ;
-: STHX 0 407 x-form 31 insn ; : STHUX 439 x-form 31 insn ;
-: STWX 0 151 x-form 31 insn ; : STWUX 183 x-form 31 insn ;
-
-GENERIC# (B) 2 ( dest aa lk -- )
-M: integer (B) i-form 18 insn ;
-M: word (B) 0 -rot (B) rc-relative-ppc-3 rel-word ;
-M: label (B) 0 -rot (B) rc-relative-ppc-3 label-fixup ;
-
-: B 0 0 (B) ; : BL 0 1 (B) ;
-
-GENERIC: BC ( a b c -- )
-M: integer BC 0 0 b-form 16 insn ;
-M: word BC >r 0 BC r> rc-relative-ppc-2 rel-word ;
-M: label BC >r 0 BC r> rc-relative-ppc-2 label-fixup ;
-
-: BLT 12 0 rot BC ;  : BGE 4 0 rot BC ;
-: BGT 12 1 rot BC ;  : BLE 4 1 rot BC ;
-: BEQ 12 2 rot BC ;  : BNE 4 2 rot BC ;
-: BO  12 3 rot BC ;  : BNO 4 3 rot BC ;
-
-: BCLR 0 8 0 0 b-form 19 insn ;
-: BLR 20 BCLR ;
-: BCLRL 0 8 0 1 b-form 19 insn ;
-: BLRL 20 BCLRL ;
-: BCCTR 0 264 0 0 b-form 19 insn ;
-: BCTR 20 BCCTR ;
-
-: MFSPR 5 shift 339 xfx-form 31 insn ;
-: MFXER 1 MFSPR ;  : MFLR 8 MFSPR ;  : MFCTR 9 MFSPR ;
-
-: MTSPR 5 shift 467 xfx-form 31 insn ;
-: MTXER 1 MTSPR ;  : MTLR 8 MTSPR ;  : MTCTR 9 MTSPR ;
-
-: LOAD32 >r w>h/h r> tuck LIS dup rot ORI ;
-
-: LOAD ( n r -- )
-    #! PowerPC cannot load a 32 bit literal in one instruction.
-   >r dup -32768 32767 between? [ r> LI ] [ r> LOAD32 ] if ;
-
-! Floating point
-: LFS d-form 48 insn ;  : LFSU d-form 49 insn ;
-: LFD d-form 50 insn ;  : LFDU d-form 51 insn ;
-: STFS d-form 52 insn ; : STFSU d-form 53 insn ;
-: STFD d-form 54 insn ; : STFDU d-form 55 insn ;
-
-: (FMR) >r 0 -rot 72 r> x-form 63 insn ;
-: FMR 0 (FMR) ;  : FMR. 1 (FMR) ;
-
-: (FCTIWZ) >r 0 -rot r> 15 x-form 63 insn ;
-: FCTIWZ 0 (FCTIWZ) ;  : FCTIWZ. 1 (FCTIWZ) ;
-
-: (FADD) >r 0 21 r> a-form 63 insn ;
-: FADD 0 (FADD) ;  : FADD. 1 (FADD) ;
-
-: (FSUB) >r 0 20 r> a-form 63 insn ;
-: FSUB 0 (FSUB) ;  : FSUB. 1 (FSUB) ;
-
-: (FMUL) >r 0 swap 25 r> a-form 63 insn ;
-: FMUL 0 (FMUL) ;  : FMUL. 1 (FMUL) ;
-
-: (FDIV) >r 0 18 r> a-form 63 insn ;
-: FDIV 0 (FDIV) ;  : FDIV. 1 (FDIV) ;
-
-: (FSQRT) >r 0 swap 0 22 r> a-form 63 insn ;
-: FSQRT 0 (FSQRT) ;  : FSQRT. 1 (FSQRT) ;
-
-: FCMPU 0 0 x-form 63 insn ;
-: FCMPO 0 32 x-form 63 insn ;
+! Pseudo-instructions
+: LI 0 rot ADDI ; inline
+: SUBI neg ADDI ; inline
+: LIS 0 rot ADDIS ; inline
+: SUBIC neg ADDIC ; inline
+: SUBIC. neg ADDIC. ; inline
+: NOT dup NOR ; inline
+: NOT. dup NOR. ; inline
+: MR dup OR ; inline
+: MR. dup OR. ; inline
+: (SLWI) 0 31 pick - ; inline
+: SLWI ( d a b -- ) (SLWI) RLWINM ;
+: SLWI. ( d a b -- ) (SLWI) RLWINM. ;
+: (SRWI) 32 over - swap 31 ; inline
+: SRWI ( d a b -- ) (SRWI) RLWINM ;
+: SRWI. ( d a b -- ) (SRWI) RLWINM. ;
+: LOAD32 ( n r -- ) >r w>h/h r> tuck LIS dup rot ORI ;
+: immediate? ( n -- ? ) HEX: -8000 HEX: 7fff between? ;
+: LOAD ( n r -- ) over immediate? [ LI ] [ LOAD32 ] if ;
