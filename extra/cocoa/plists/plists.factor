@@ -6,16 +6,25 @@ namespaces io.backend math cocoa.enumeration byte-arrays
 combinators alien.c-types ;
 IN: cocoa.plists
 
-: assoc>NSDictionary ( assoc -- alien )
-    NSMutableDictionary over assoc-size -> dictionaryWithCapacity:
-    [
-        [
-            spin [ <NSString> ] bi@ -> setObject:forKey:
-        ] curry assoc-each
-    ] keep ;
+GENERIC: >plist ( value -- plist )
+
+M: number >plist
+    <NSNumber> ;
+M: t >plist
+    <NSNumber> ;
+M: f >plist
+    <NSNumber> ;
+M: string >plist
+    <NSString> ;
+M: byte-array >plist
+    <NSData> ;
+M: hashtable >plist
+    [ [ >plist ] bi@ ] assoc-map <NSDictionary> ;
+M: sequence >plist
+    [ >plist ] map <NSArray> ;
 
 : write-plist ( assoc path -- )
-    >r assoc>NSDictionary
+    >r >plist
     r> normalize-path <NSString> 0 -> writeToFile:atomically:
     [ "write-plist failed" throw ] unless ;
 
