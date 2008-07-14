@@ -5,7 +5,8 @@ namespaces opengl opengl.gl sequences strings io.styles
 math.vectors sorting colors combinators assocs math.order
 ui.clipboards ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons ui.gadgets.labels ui.gadgets.scrollers
-ui.gadgets.theme ui.gadgets.wrappers ui.render ui.gestures ;
+ui.gadgets.theme ui.gadgets.wrappers ui.render ui.gestures
+math.geometry.rect ;
 IN: ui.gadgets.editors
 
 TUPLE: editor < gadget

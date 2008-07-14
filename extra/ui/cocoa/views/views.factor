@@ -4,7 +4,7 @@ USING: accessors alien alien.c-types arrays assocs cocoa kernel
 math cocoa.messages cocoa.subclassing cocoa.classes cocoa.views
 cocoa.application cocoa.pasteboard cocoa.types cocoa.windows
 sequences ui ui.gadgets ui.gadgets.worlds ui.gestures
-core-foundation threads combinators ;
+core-foundation threads combinators math.geometry.rect ;
 IN: ui.cocoa.views
 
 : send-mouse-moved ( view event -- )

@@ -2,14 +2,14 @@ USING: arrays kernel math opengl opengl.gl opengl.glu ui
 ui.gadgets ui.render threads ;
 IN: nehe.4
 
-TUPLE: nehe4-gadget rtri rquad thread quit? ;
+TUPLE: nehe4-gadget < gadget rtri rquad thread quit? ;
 
 : width 256 ;
 : height 256 ;
 : redraw-interval 10 ;
 
 : <nehe4-gadget> (  -- gadget )
-  nehe4-gadget construct-gadget
+  nehe4-gadget new-gadget
   0.0 over set-nehe4-gadget-rtri
   0.0 over set-nehe4-gadget-rquad ;
 

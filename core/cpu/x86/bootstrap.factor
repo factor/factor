@@ -41,6 +41,12 @@ big-endian off
 ] rc-absolute-cell rt-literal 1 rex-length + jit-push-literal jit-define
 
 [
+    arg0 0 MOV                                 ! load literal
+    ds-reg bootstrap-cell ADD                  ! increment datastack pointer
+    ds-reg [] arg0 MOV                         ! store literal on datastack
+] rc-absolute-cell rt-immediate 1 rex-length + jit-push-immediate jit-define
+
+[
     arg0 0 MOV                                 ! load XT
     arg1 stack-reg MOV                         ! pass callstack pointer as arg 2
     arg0 JMP                                   ! go

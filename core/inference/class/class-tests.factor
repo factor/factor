@@ -5,8 +5,9 @@ sequences words inference.class quotations alien
 alien.c-types strings sbufs sequences.private
 slots.private combinators definitions compiler.units
 system layouts vectors optimizer.math.partial
-optimizer.inlining optimizer.backend math.order
-accessors hashtables classes assocs ;
+optimizer.inlining optimizer.backend math.order math.functions
+accessors hashtables classes assocs io.encodings.utf8
+io.encodings.ascii io.encodings ;
 
 [ t ] [ T{ literal-constraint f 1 2 } T{ literal-constraint f 1 2 } equal? ] unit-test
 
@@ -193,19 +194,15 @@ M: fixnum detect-fx ;
 
 
 [ t ] [
-    [ { string sbuf } declare push-all ] \ push-all inlined?
+    [ { string sbuf } declare ] \ push-all def>> append \ + inlined?
 ] unit-test
 
 [ t ] [
-    [ { string sbuf } declare push-all ] \ + inlined?
+    [ { string sbuf } declare ] \ push-all def>> append \ fixnum+ inlined?
 ] unit-test
 
 [ t ] [
-    [ { string sbuf } declare push-all ] \ fixnum+ inlined?
-] unit-test
-
-[ t ] [
-    [ { string sbuf } declare push-all ] \ >fixnum inlined?
+    [ { string sbuf } declare ] \ push-all def>> append \ >fixnum inlined?
 ] unit-test
 
 [ t ] [
@@ -598,6 +595,29 @@ TUPLE: declared-fixnum { x fixnum } ;
 [ t ] [
     [ { declared-fixnum } declare x>> drop ]
     { slot } inlined?
+] unit-test
+
+[ t ] [
+    [
+        { array } declare length
+        1 + dup 100 fixnum> [ 1 fixnum+ ] when
+    ] \ fixnum+ inlined?
+] unit-test
+ 
+[ t ] [
+    [ [ resize-array ] keep length ] \ length inlined?
+] unit-test
+
+[ t ] [
+    [ dup 0 > [ sqrt ] when ] \ sqrt inlined?
+] unit-test
+
+[ t ] [
+    [ { utf8 } declare decode-char ] \ decode-char inlined?
+] unit-test
+
+[ t ] [
+    [ { ascii } declare decode-char ] \ decode-char inlined?
 ] unit-test
 
 ! Later

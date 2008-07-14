@@ -19,7 +19,7 @@ M: port set-timeout (>>timeout) ;
 : <port> ( handle class -- port )
     new swap >>handle ; inline
 
-TUPLE: buffered-port < port buffer ;
+TUPLE: buffered-port < port { buffer buffer } ;
 
 : <buffered-port> ( handle class -- port )
     <port>
@@ -35,7 +35,7 @@ HOOK: (wait-to-read) io-backend ( port -- )
 : wait-to-read ( port -- eof? )
     dup buffer>> buffer-empty? [
         dup (wait-to-read) buffer>> buffer-empty?
-    ] [ drop f ] if ;
+    ] [ drop f ] if ; inline
 
 M: input-port stream-read1
     dup check-disposed
@@ -140,9 +140,7 @@ M: output-port dispose*
     ] with-destructors ;
 
 M: buffered-port dispose*
-    [ call-next-method ]
-    [ [ [ dispose ] when* f ] change-buffer drop ]
-    bi ;
+    [ call-next-method ] [ buffer>> dispose ] bi ;
 
 M: port cancel-operation handle>> cancel-operation ;
 
@@ -152,3 +150,13 @@ M: port dispose*
         [ handle>> shutdown ]
         bi
     ] with-destructors ;
+
+! Fast-path optimization
+USING: hints strings io.encodings.utf8 io.encodings.ascii
+io.encodings.private ;
+
+HINTS: decoder-read-until { string input-port utf8 } { string input-port ascii } ;
+
+HINTS: decoder-readln { input-port utf8 } { input-port ascii } ;
+
+HINTS: decoder-write { string output-port utf8 } { string output-port ascii } ;

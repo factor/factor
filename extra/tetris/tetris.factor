@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alarms arrays calendar kernel ui.gadgets ui.gadgets.labels
 ui.gadgets.worlds ui.gadgets.status-bar ui.gestures ui.render ui
-tetris.game tetris.gl sequences system math math.parser namespaces ;
+tetris.game tetris.gl sequences system math math.parser namespaces
+math.geometry.rect ;
 IN: tetris
 
 TUPLE: tetris-gadget tetris alarm ;

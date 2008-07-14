@@ -99,14 +99,20 @@ M: decoder stream-read-partial stream-read ;
     [ >r drop "" like r> ]
     [ pick push ((read-until)) ] if ; inline
 
-: (read-until) ( seps stream -- string/f sep/f )
-    SBUF" " clone -rot >decoder<
+: (read-until) ( quot -- string/f sep/f )
+    100 <sbuf> swap ((read-until)) ; inline
+
+: decoder-read-until ( seps stream encoding -- string/f sep/f )
     [ decode-char dup [ dup rot member? ] [ 2drop f t ] if ] 3curry
-    ((read-until)) ; inline
+    (read-until) ;
 
-M: decoder stream-read-until (read-until) ;
+M: decoder stream-read-until >decoder< decoder-read-until ;
 
-M: decoder stream-readln "\r\n" over (read-until) handle-readln ;
+: decoder-readln ( stream encoding -- string/f sep/f )
+    [ decode-char dup [ dup "\r\n" member? ] [ drop f t ] if ] 2curry
+    (read-until) ;
+
+M: decoder stream-readln dup >decoder< decoder-readln handle-readln ;
 
 M: decoder dispose stream>> dispose ;
 
@@ -119,8 +125,11 @@ M: object <encoder> encoder boa ;
 M: encoder stream-write1
     >encoder< encode-char ;
 
+: decoder-write ( string stream encoding -- )
+    [ encode-char ] 2curry each ;
+
 M: encoder stream-write
-    >encoder< [ encode-char ] 2curry each ;
+    >encoder< decoder-write ;
 
 M: encoder dispose encoder-stream dispose ;
 
