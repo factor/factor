@@ -59,9 +59,9 @@ IN: optimizer.allot
 : <array>-quot ( n -- quot )
     [
         dup ,
-        [ nip (array) ] %
+        [ (array) ] %
         [ \ 2dup , , [ swap set-array-nth ] % ] each
-        \ nip ,
+        \ 2nip ,
     ] [ ] make ;
 
 : literal-<array>? ( #call -- ? )
