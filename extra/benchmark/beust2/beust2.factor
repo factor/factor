@@ -3,6 +3,8 @@
 USING: math math.ranges math.parser sequences kernel io locals ;
 IN: benchmark.beust2
 
+! http://crazybob.org/BeustSequence.java.html
+
 :: (count-numbers) ( remaining first value used max listener -- ? )
     10 first - [| i |
         [let* | digit [ i first + ]
