@@ -114,6 +114,8 @@ VARS: population-label cohesion-label alignment-label separation-label ;
 
   <frame>
 
+  <shelf>
+
   {
     [ "ESC - Pause" [ drop toggle-loop ] button* ]
 
@@ -139,7 +141,7 @@ VARS: population-label cohesion-label alignment-label separation-label ;
       "e - +0.1" [ drop inc-separation-weight ] button* add-gadget
       "d - -0.1" [ drop dec-separation-weight ] button* add-gadget ]
 
-  } [ call ] map [ [ gadget, ] each ] make-shelf
+  } [ call ] map [ add-gadget ] each
     1 over set-pack-fill
     over @top grid-add
 

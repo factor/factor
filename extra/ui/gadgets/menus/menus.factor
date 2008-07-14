@@ -48,6 +48,7 @@ M: menu-glass layout* gadget-child prefer ;
     faint-boundary ;
 
 : <commands-menu> ( hook target commands -- gadget )
-    [
-        [ >r 2dup r> <menu-item> gadget, ] each 2drop
-    ] make-filled-pile 5 <border> menu-theme ;
+  <filled-pile>
+  -roll
+    [ <menu-item> add-gadget ] with with each
+  5 <border> menu-theme ;
