@@ -443,36 +443,36 @@ TUPLE: redefinition-problem-2 ;
 ! Hardcore unit tests
 USE: threads
 
-\ thread slot-names "slot-names" set
+\ thread "slots" word-prop "slots" set
 
 [ ] [
     [
-        \ thread tuple { "xxx" } "slot-names" get append
+        \ thread tuple { "xxx" } "slots" get append
         define-tuple-class
     ] with-compilation-unit
 
     [ 1337 sleep ] "Test" spawn drop
 
     [
-        \ thread tuple "slot-names" get
+        \ thread tuple "slots" get
         define-tuple-class
     ] with-compilation-unit
 ] unit-test
 
 USE: vocabs
 
-\ vocab slot-names "slot-names" set
+\ vocab "slots" word-prop "slots" set
 
 [ ] [
     [
-        \ vocab tuple { "xxx" } "slot-names" get append
+        \ vocab tuple { "xxx" } "slots" get append
         define-tuple-class
     ] with-compilation-unit
 
     all-words drop
 
     [
-        \ vocab tuple "slot-names" get
+        \ vocab tuple "slots" get
         define-tuple-class
     ] with-compilation-unit
 ] unit-test

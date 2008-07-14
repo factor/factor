@@ -1,4 +1,4 @@
-USING: help.syntax help.markup kernel prettyprint sequences strings ;
+USING: help.syntax help.markup kernel prettyprint sequences strings words math ;
 IN: ctags
 
 ARTICLE: "ctags" "Ctags file"
@@ -6,7 +6,10 @@ ARTICLE: "ctags" "Ctags file"
 { $subsection ctags }
 { $subsection ctags-write }
 { $subsection ctag-strings }
-{ $subsection ctag } ;
+{ $subsection ctag }
+{ $subsection ctag-word }
+{ $subsection ctag-path }
+{ $subsection ctag-lineno } ;
 
 HELP: ctags ( path -- )
 { $values { "path" "a pathname string" } }
@@ -56,5 +59,42 @@ HELP: ctag ( seq -- str )
     "\"if\\t/path/to/factor/extra/unix/unix.factor\\t91\""
   }
 } ;
+
+HELP: ctag-lineno ( ctag -- n )
+{ $values { "ctag" sequence }
+          { "n" integer } }
+{ $description "Provides de line number " { $snippet "n" } " from a sequence in ctag format " }
+{ $examples
+  { $example
+    "USING: kernel ctags prettyprint ;"
+    "{ if  { \"resource:extra/unix/unix.factor\" 91 } } ctag-lineno ."
+    "91"
+  }
+} ;
+
+HELP: ctag-path ( ctag -- path )
+{ $values { "ctag" sequence }
+          { "path" string } }
+{ $description "Provides a path string " { $snippet "path" } " from a sequence in ctag format" }
+{ $examples
+  { $example
+    "USING: kernel ctags prettyprint ;"
+    "{ if  { \"resource:extra/unix/unix.factor\" 91 } } ctag-path ."
+    "\"resource:extra/unix/unix.factor\""
+  }
+} ;
+
+HELP: ctag-word ( ctag -- word )
+{ $values { "ctag" sequence }
+          { "word" word } }
+{ $description "Provides the " { $snippet "word" } " from a sequence in ctag format " }
+{ $examples
+  { $example
+    "USING: kernel ctags prettyprint ;"
+    "{ if  { \"resource:extra/unix/unix.factor\" 91 } } ctag-word ."
+    "if"
+  }
+} ;
+
 
 ABOUT: "ctags"

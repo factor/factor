@@ -9,29 +9,36 @@ io.encodings.ascii math.parser vocabs definitions
 namespaces words sorting ;
 IN: ctags
 
+: ctag-word ( ctag -- word )
+  first ;
+
+: ctag-path ( ctag -- path )
+  second first ;
+
+: ctag-lineno ( ctag -- n )
+  second second ;
+
 : ctag ( seq -- str )
   [
-    dup first ?word-name %
+    dup ctag-word ?word-name %
     "\t" %
-    second dup first normalize-path %
+    dup ctag-path normalize-path %
     "\t" %
-    second number>string %
+    ctag-lineno number>string %
   ] "" make ;
 
 : ctag-strings ( seq1 -- seq2 )
-  { } swap [ ctag suffix ] each ;
+  [ ctag ] map ;
 
 : ctags-write ( seq path -- )
   [ ctag-strings ] dip ascii set-file-lines ;
 
 : (ctags) ( -- seq )
-  { } all-words [
+  all-words [
     dup where [
-      2array suffix
-    ] [
-      drop
-    ] if*
-  ] each ;
+      2array
+    ] when*
+  ] map [ sequence? ] filter ;
 
 : ctags ( path -- )
   (ctags) sort-keys swap ctags-write ;

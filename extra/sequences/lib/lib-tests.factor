@@ -67,11 +67,6 @@ IN: sequences.lib.tests
 { 13 } [ 1 2 { 3 4 } [ + + ] 2 each-withn + ] unit-test
 [ { 910 911 912 } ] [ 10 900 3 [ + + ] map-with2 ] unit-test
 
-[ 1 2 3 4 ] [ { 1 2 3 4 } 4 firstn ] unit-test
-
-[ ] [ { } 0 firstn ] unit-test
-[ "a" ] [ { "a" } 1 firstn ] unit-test
-
 [ "empty" ] [ { } [ "not empty" ] [ "empty" ] if-seq ] unit-test
 [ { 1 } "not empty" ] [ { 1 } [ "not empty" ] [ "empty" ] if-seq ] unit-test
 

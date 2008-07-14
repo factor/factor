@@ -384,3 +384,10 @@ PREDICATE: list < improper-list
 [ 1 [ "hi" + drop ] compile-call ] must-fail
 
 [ "hi" f [ <array> drop ] compile-call ] must-fail
+
+TUPLE: some-tuple x ;
+
+: allot-regression ( a -- b )
+    [ ] curry some-tuple boa ;
+
+[ T{ some-tuple f [ 3 ] } ] [ 3 allot-regression ] unit-test
