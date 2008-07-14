@@ -29,7 +29,7 @@ TUPLE: listener-gadget < track input output stack ;
 
 : welcome. ( -- )
    "If this is your first time with Factor, please read the " print
-   "cookbook" ($link) "." print nl ;
+   "handbook" ($link) "." print nl ;
 
 M: listener-gadget focusable-child*
     input>> ;
