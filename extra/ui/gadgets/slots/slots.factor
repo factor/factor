@@ -69,15 +69,13 @@ M: value-ref finish-editing
 } define-command
 
 : <slot-editor> ( ref -- gadget )
-    { 0 1 } slot-editor new-track
-        swap >>ref
-    [
-        toolbar,
-        <source-editor> g-> set-slot-editor-text
-        <scroller> 1 track,
-    ] make-gadget
+  { 0 1 } slot-editor new-track
+    swap >>ref
+    dup <toolbar> f track-add*
+    <source-editor> >>text
+    dup text>> <scroller> 1 track-add*
     dup revert ;
-
+    
 M: slot-editor pref-dim* call-next-method { 600 200 } vmin ;
 
 M: slot-editor focusable-child* text>> ;
