@@ -5,8 +5,6 @@ USING: kernel math sequences arrays assocs sequences.private
 growable accessors math.order ;
 IN: heaps
 
-MIXIN: priority-queue
-
 GENERIC: heap-push* ( value key heap -- entry )
 GENERIC: heap-peek ( heap -- value key )
 GENERIC: heap-pop* ( heap -- )
@@ -36,13 +34,10 @@ TUPLE: max-heap < heap ;
 
 : <max-heap> ( -- max-heap ) max-heap <heap> ;
 
-INSTANCE: min-heap priority-queue
-INSTANCE: max-heap priority-queue
-
-M: priority-queue heap-empty? ( heap -- ? )
+M: heap heap-empty? ( heap -- ? )
     data>> empty? ;
 
-M: priority-queue heap-size ( heap -- n )
+M: heap heap-size ( heap -- n )
     data>> length ;
 
 <PRIVATE
@@ -152,7 +147,7 @@ DEFER: down-heap
 
 PRIVATE>
 
-M: priority-queue heap-push* ( value key heap -- entry )
+M: heap heap-push* ( value key heap -- entry )
     [ <entry> dup ] keep [ data-push ] keep up-heap ;
 
 : heap-push ( value key heap -- ) heap-push* drop ;
@@ -163,7 +158,7 @@ M: priority-queue heap-push* ( value key heap -- entry )
 : >entry< ( entry -- key value )
     [ value>> ] [ key>> ] bi ;
 
-M: priority-queue heap-peek ( heap -- value key )
+M: heap heap-peek ( heap -- value key )
     data-first >entry< ;
 
 : entry>index ( entry heap -- n )
@@ -172,7 +167,7 @@ M: priority-queue heap-peek ( heap -- value key )
     ] unless
     entry-index ;
 
-M: priority-queue heap-delete ( entry heap -- )
+M: heap heap-delete ( entry heap -- )
     [ entry>index ] keep
     2dup heap-size 1- = [
         nip data-pop*
@@ -182,10 +177,10 @@ M: priority-queue heap-delete ( entry heap -- )
         down-heap
     ] if ;
 
-M: priority-queue heap-pop* ( heap -- )
+M: heap heap-pop* ( heap -- )
     dup data-first swap heap-delete ;
 
-M: priority-queue heap-pop ( heap -- value key )
+M: heap heap-pop ( heap -- value key )
     dup data-first [ swap heap-delete ] keep >entry< ;
 
 : heap-pop-all ( heap -- alist )

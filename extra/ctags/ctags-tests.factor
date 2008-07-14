@@ -3,17 +3,17 @@ IN: ctags.tests
 
 [ t ] [
   91
-  { { if  { "resource:extra/unix/unix.factor" 91 } } } ctag-lineno =
+  { if  { "resource:extra/unix/unix.factor" 91 } } ctag-lineno =
 ] unit-test
 
 [ t ] [
   "resource:extra/unix/unix.factor"
-  { { if  { "resource:extra/unix/unix.factor" 91 } } } ctag-path =
+  { if  { "resource:extra/unix/unix.factor" 91 } } ctag-path =
 ] unit-test
 
 [ t ] [
-  if
-  { { if  { "resource:extra/unix/unix.factor" 91 } } } ctag-word =
+  \ if
+  { if  { "resource:extra/unix/unix.factor" 91 } } ctag-word =
 ] unit-test
 
 [ t ] [
