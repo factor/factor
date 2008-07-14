@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Daniel Ehrenberg
+! Copyright (C) 2007, 2008 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors parser generic kernel classes classes.tuple
 words slots assocs sequences arrays vectors definitions
@@ -14,9 +14,11 @@ IN: delegate
 GENERIC: group-words ( group -- words )
 
 M: tuple-class group-words
-    "slot-names" word-prop [
-        [ reader-word ] [ writer-word ] bi
-        2array [ 0 2array ] map
+    all-slots [
+        name>>
+        [ reader-word 0 2array ]
+        [ writer-word 0 2array ] bi
+        2array
     ] map concat ;
 
 ! Consultation
