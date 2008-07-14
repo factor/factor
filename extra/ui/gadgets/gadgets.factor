@@ -357,8 +357,6 @@ M: f request-focus-on 2drop ;
 : focus-path ( world -- seq )
     [ focus>> ] follow ;
 
-: gadget, ( gadget -- ) gadget get swap add-gadget drop ;
-
 : g ( -- gadget ) gadget get ;
 
 : g-> ( x -- x x gadget ) dup g ;

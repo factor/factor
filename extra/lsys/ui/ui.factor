@@ -17,7 +17,7 @@ USING: kernel namespaces threads math math.order math.vectors
        self pos ori turtle opengl.camera
        lsys.tortoise lsys.tortoise.graphics
        lsys.strings.rewrite lsys.strings.interpret
-       combinators.short-circuit ;
+       combinators.short-circuit accessors ;
 
        ! lsys.strings
        ! lsys.strings.rewrite
@@ -99,6 +99,8 @@ DEFER: empty-model
 
 : lsys-controller ( -- )
 
+<pile>
+
 {
 
 [ "Load" <label> reverse-video-theme ]
@@ -145,9 +147,11 @@ DEFER: empty-model
   [ pos> norm reset-turtle 45 turn-left 45 pitch-up step-turtle 180 turn-left ]
   camera-action <bevel-button> ]
 
-} make*
-[ [ gadget, ] curry ] map concat ! Hack
-make-pile 1 over set-pack-fill "L-system control" open-window ;
+}
+
+[ call add-gadget ] each
+1 >>fill
+"L-system control" open-window ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -469,7 +473,7 @@ H{ } >rules ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : model-chooser ( -- )
-
+<pile>
 {
 [ "abop-1" <label> [ drop abop-1 build-model ] closed-quot <bevel-button> ]
 [ "abop-2" <label> [ drop abop-2 build-model ] closed-quot <bevel-button> ]
@@ -481,18 +485,21 @@ H{ } >rules ;
 [ "airhorse" <label> [ drop airhorse build-model ] closed-quot <bevel-button> ]
 [ "spiral-0" <label> [ drop spiral-0 build-model ] closed-quot <bevel-button> ]
 [ "koch" <label> [ drop koch build-model ] closed-quot <bevel-button> ]
-} make*
-[ [ gadget, ] curry ] map concat ! Hack
-make-pile 1 over set-pack-fill "L-system models" open-window ;
+}
+[ call add-gadget ] each
+1 >>fill
+"L-system models" open-window ;
 
 : scene-chooser ( -- )
+<pile>
 {
 [ "abop-1" <label> [ drop abop-1-scene ] closed-quot <bevel-button> ]
 [ "abop-2" <label> [ drop abop-2-scene ] closed-quot <bevel-button> ]
 [ "tree-5" <label> [ drop tree-5-scene ] closed-quot <bevel-button> ]
-} make*
-[ [ gadget, ] curry ] map concat ! Hack
-make-pile 1 over set-pack-fill "L-system scenes" open-window ;
+}
+[ call add-gadget ] each
+1 >>fill
+"L-system scenes" open-window ;
 
 : lsys-window* ( -- )
 [ lsys-controller lsys-viewer ] with-ui ;

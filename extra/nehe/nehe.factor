@@ -4,12 +4,12 @@ IN: nehe
 
 : nehe-window ( -- )
     [
-        [
-            "Nehe 2" [ drop run2 ] <bevel-button> gadget,
-            "Nehe 3" [ drop run3 ] <bevel-button> gadget,
-            "Nehe 4" [ drop run4 ] <bevel-button> gadget,
-            "Nehe 5" [ drop run5 ] <bevel-button> gadget,
-        ] make-filled-pile "Nehe examples" open-window
+        <filled-pile>
+            "Nehe 2" [ drop run2 ] <bevel-button> add-gadget
+            "Nehe 3" [ drop run3 ] <bevel-button> add-gadget
+            "Nehe 4" [ drop run4 ] <bevel-button> add-gadget
+            "Nehe 5" [ drop run5 ] <bevel-button> add-gadget
+        "Nehe examples" open-window
     ] with-ui ;
 
 MAIN: nehe-window

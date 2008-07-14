@@ -180,10 +180,6 @@ HELP: focusable-child
 { $values { "gadget" gadget } { "child" gadget } }
 { $description "Outputs the child of the gadget which would prefer to receive keyboard focus." } ;
 
-HELP: gadget,
-{ $values { "gadget" gadget } }
-{ $description "Adds a new child to the gadget being constructed. This word can only be used from a quotation passed to " { $link make-gadget } "." } ;
-
 HELP: make-gadget
 { $values { "gadget" gadget } { "quot" quotation } }
 { $description "Calls the quotation in a new scope with the gadget stored in the " { $link gadget } " variable." } ;
