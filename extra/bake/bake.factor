@@ -94,4 +94,4 @@ MACRO: bake ( seq -- quot ) [bake] ;
 
 :  `{ \ } [ >array     ] parse-literal \ bake parsed ; parsing
 : `V{ \ } [ >vector    ] parse-literal \ bake parsed ; parsing
-:  `[ \ } [ >quotation ] parse-literal \ bake parsed ; parsing
+:  `[ \ ] [ >quotation ] parse-literal \ bake parsed ; parsing
