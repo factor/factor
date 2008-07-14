@@ -383,9 +383,12 @@ PRIVATE>
 : 2reduce ( seq1 seq2 identity quot -- result )
     >r -rot r> 2each ; inline
 
-: 2map ( seq1 seq2 quot -- newseq )
-    pick >r (2each) over r>
+: 2map-as ( seq1 seq2 quot exemplar -- newseq )
+    >r (2each) over r>
     [ [ collect ] keep ] new-like ; inline
+
+: 2map ( seq1 seq2 quot -- newseq )
+    pick 2map-as ; inline
 
 : 2all? ( seq1 seq2 quot -- ? )
     (2each) all-integers? ; inline

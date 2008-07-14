@@ -33,10 +33,10 @@ SYMBOL: +editable+
 : write-value ( mirror key -- )
     <value-ref> write-slot-editor ;
 
-: describe-row ( obj key n -- )
+: describe-row ( mirror key n -- )
     [
         +number-rows+ get [ pprint-cell ] [ drop ] if
-        2dup write-key write-value
+        [ write-key ] [ write-value ] 2bi
     ] with-row ;
 
 : summary. ( obj -- ) [ summary ] keep write-object nl ;
@@ -48,21 +48,19 @@ SYMBOL: +editable+
         sort-keys values
     ] [ keys ] if ;
 
-: describe* ( obj flags -- )
-    clone [
-        dup summary.
-        make-mirror dup sorted-keys dup empty? [
-            2drop
-        ] [
-            dup enum? [ +sequence+ on ] when
-            standard-table-style [
-                dup length
-                rot [ -rot describe-row ] curry 2each
-            ] tabular-output
-        ] if
-    ] bind ;
+: describe* ( obj mirror keys -- )
+    rot summary.
+    dup empty? [
+        2drop
+    ] [
+        dup enum? [ +sequence+ on ] when
+        standard-table-style [
+            swap [ -rot describe-row ] curry each-index
+        ] tabular-output
+    ] if ;
 
-: describe ( obj -- ) H{ } describe* ;
+: describe ( obj -- )
+    dup make-mirror dup sorted-keys describe* ;
 
 M: tuple error. describe ;
 
@@ -78,19 +76,21 @@ M: tuple error. describe ;
 
 SYMBOL: inspector-hook
 
-[ H{ { +number-rows+ t } } describe* ] inspector-hook set-global
+[ t +number-rows+ [ describe* ] with-variable ] inspector-hook set-global
 
 SYMBOL: inspector-stack
 
 SYMBOL: me
 
 : reinspect ( obj -- )
-    dup me set
-    dup make-mirror dup mirror set keys \ keys set
-    inspector-hook get call ;
+    [ me set ]
+    [
+        dup make-mirror dup mirror set dup sorted-keys dup \ keys set
+        inspector-hook get call
+    ] bi ;
 
 : (inspect) ( obj -- )
-    dup inspector-stack get push reinspect ;
+    [ inspector-stack get push ] [ reinspect ] bi ;
 
 : key@ ( n -- key ) \ keys get nth ;
 
@@ -123,6 +123,7 @@ SYMBOL: me
     "&add ( value key -- ) add new slot" print
     "&delete ( n -- ) remove a slot" print
     "&rename ( key n -- ) change a slot's key" print
+    "&globals ( -- ) inspect global namespace" print
     "&help -- display this message" print
     nl ;
 
@@ -133,3 +134,5 @@ SYMBOL: me
 
 : inspect ( obj -- )
     inspector-stack get [ (inspect) ] [ inspector ] if ;
+
+: &globals ( -- ) global inspect ;

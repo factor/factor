@@ -121,7 +121,7 @@ bootstrapping? on
     [ [ dup pair? [ first2 create ] when ] map ] map ;
 
 : define-builtin-slots ( class slots -- )
-    prepare-slots 1 make-slots
+    prepare-slots make-slots 1 finalize-slots
     [ "slots" set-word-prop ] [ define-accessors ] 2bi ;
 
 : define-builtin ( symbol slotspec -- )
@@ -273,18 +273,16 @@ bi
     { "echelon" { "fixnum" "math" } read-only }
 } define-builtin
 
-"tuple" "kernel" create {
-    [ { } define-builtin ]
-    [ { "delegate" } "slot-names" set-word-prop ]
-    [ define-tuple-layout ]
-    [
-        { "delegate" }
-        [ drop ] [ generate-tuple-slots ] 2bi
-        [ "slots" set-word-prop ]
-        [ define-accessors ]
-        2bi
-    ]
-} cleave
+"tuple" "kernel" create
+[ { } define-builtin ]
+[ define-tuple-layout ]
+[
+    { "delegate" } make-slots
+    [ drop ] [ finalize-tuple-slots ] 2bi
+    [ "slots" set-word-prop ]
+    [ define-accessors ]
+    2bi
+] tri
 
 ! Create special tombstone values
 "tombstone" "hashtables.private" create

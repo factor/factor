@@ -188,9 +188,14 @@ M: array make-slot
         [ dup empty? not ] [ peel-off-attributes ] [ ] while drop
     check-initial-value ;
 
-: make-slots ( slots base -- specs )
-    over length [ + ] with map
-    [ [ make-slot ] dip >>offset ] 2map ;
+M: slot-spec make-slot
+    check-initial-value ;
+
+: make-slots ( slots -- specs )
+    [ make-slot ] map ;
+
+: finalize-slots ( specs base -- specs )
+    over length [ + ] with map [ >>offset ] 2map ;
 
 : slot-named ( name specs -- spec/f )
-    [ slot-spec-name = ] with find nip ;
+    [ name>> = ] with find nip ;

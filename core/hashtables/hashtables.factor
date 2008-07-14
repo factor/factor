@@ -20,15 +20,18 @@ TUPLE: hashtable
 : probe ( array i -- array i )
     2 fixnum+fast over wrap ; inline
 
-: (key@) ( key keys i -- array n ? )
+: no-key ( key array -- array n ? ) nip f f ; inline
+
+: (key@) ( key array i -- array n ? )
     3dup swap array-nth
     dup ((empty)) eq?
-    [ 3drop nip f f ] [
+    [ 3drop no-key ] [
         = [ rot drop t ] [ probe (key@) ] if
     ] if ; inline
 
 : key@ ( key hash -- array n ? )
-    array>> 2dup hash@ (key@) ; inline
+    array>> dup array-capacity 0 eq?
+    [ no-key ] [ 2dup hash@ (key@) ] if ; inline
 
 : <hash-array> ( n -- array )
     1+ next-power-of-2 4 * ((empty)) <array> ; inline
@@ -63,25 +66,20 @@ TUPLE: hashtable
 : hash-deleted+ ( hash -- )
     [ 1+ ] change-deleted drop ; inline
 
-: (set-hash) ( value key hash -- new? )
-    2dup new-key@
-    [ rot hash-count+ set-nth-pair t ]
-    [ rot drop set-nth-pair f ] if ; inline
-
 : (rehash) ( hash alist -- )
-    swap [ swapd (set-hash) drop ] curry assoc-each ;
+    swap [ swapd set-at ] curry assoc-each ; inline
 
 : hash-large? ( hash -- ? )
-    [ count>> 3 fixnum*fast  ]
-    [ array>> array-capacity ] bi > ;
+    [ count>> 3 fixnum*fast 1 fixnum+fast ]
+    [ array>> array-capacity ] bi fixnum> ; inline
 
 : hash-stale? ( hash -- ? )
-    [ deleted>> 10 fixnum*fast ] [ count>> ] bi fixnum> ;
+    [ deleted>> 10 fixnum*fast ] [ count>> ] bi fixnum> ; inline
 
 : grow-hash ( hash -- )
     [ dup >alist swap assoc-size 1+ ] keep
     [ reset-hash ] keep
-    swap (rehash) ;
+    swap (rehash) ; inline
 
 : ?grow-hash ( hash -- )
     dup hash-large? [
@@ -122,7 +120,10 @@ M: hashtable assoc-size ( hash -- n )
     r> (rehash) ;
 
 M: hashtable set-at ( value key hash -- )
-    dup >r (set-hash) [ r> ?grow-hash ] [ r> drop ] if ;
+    dup ?grow-hash
+    2dup new-key@
+    [ rot hash-count+ set-nth-pair ]
+    [ rot drop set-nth-pair ] if ;
 
 : associate ( value key -- hash )
     2 <hashtable> [ set-at ] keep ;

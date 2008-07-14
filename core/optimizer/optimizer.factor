@@ -1,8 +1,9 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces optimizer.backend optimizer.def-use
-optimizer.known-words optimizer.math optimizer.control
-optimizer.collect optimizer.inlining inference.class ;
+optimizer.known-words optimizer.math optimizer.allot
+optimizer.control optimizer.collect optimizer.inlining
+inference.class ;
 IN: optimizer
 
 : optimize-1 ( node -- newnode ? )
