@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math namespaces opengl opengl.gl sequences
-math.vectors ui.gadgets ui.gadgets.grids ui.render ;
+math.vectors ui.gadgets ui.gadgets.grids ui.render math.geometry.rect ;
 IN: ui.gadgets.grid-lines
 
 TUPLE: grid-lines color ;

@@ -4,7 +4,7 @@ USING: accessors ui.commands ui.gestures ui.render ui.gadgets
 ui.gadgets.labels ui.gadgets.scrollers
 kernel sequences models opengl math math.order namespaces
 ui.gadgets.presentations ui.gadgets.viewports ui.gadgets.packs
-math.vectors classes.tuple ;
+math.vectors classes.tuple math.geometry.rect ;
 IN: ui.gadgets.lists
 
 TUPLE: list < pack index presenter color hook ;
@@ -48,7 +48,7 @@ TUPLE: list < pack index presenter color hook ;
 M: list model-changed
     nip
     dup clear-gadget
-    dup <list-items> over add-gadgets
+    dup <list-items> over swap add-gadgets drop
     bound-index ;
 
 : selected-rect ( list -- rect )

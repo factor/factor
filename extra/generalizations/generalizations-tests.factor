@@ -32,3 +32,7 @@ IN: generalizations.tests
 [ [ dup 2^ 2array ] 5 napply ] must-infer
 
 [ { "xyc" "xyd" } ] [ "x" "y" { "c" "d" } [ 3append ] 2 nwith map ] unit-test
+
+[ 1 2 3 4 ] [ { 1 2 3 4 } 4 firstn ] unit-test
+[ ] [ { } 0 firstn ] unit-test
+[ "a" ] [ { "a" } 1 firstn ] unit-test

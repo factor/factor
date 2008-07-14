@@ -13,6 +13,8 @@ IN: bootstrap.primitives
 
 crossref off
 
+H{ } clone sub-primitives set
+
 "resource:core/bootstrap/syntax.factor" parse-file
 
 "resource:core/cpu/" architecture get {
@@ -119,7 +121,7 @@ bootstrapping? on
     [ [ dup pair? [ first2 create ] when ] map ] map ;
 
 : define-builtin-slots ( class slots -- )
-    prepare-slots 1 make-slots
+    prepare-slots make-slots 1 finalize-slots
     [ "slots" set-word-prop ] [ define-accessors ] 2bi ;
 
 : define-builtin ( symbol slotspec -- )
@@ -256,6 +258,7 @@ bi
     "props"
     { "compiled" read-only }
     { "counter" { "fixnum" "math" } }
+    { "sub-primitive" read-only }
 } define-builtin
 
 "byte-array" "byte-arrays" create { } define-builtin
@@ -270,18 +273,16 @@ bi
     { "echelon" { "fixnum" "math" } read-only }
 } define-builtin
 
-"tuple" "kernel" create {
-    [ { } define-builtin ]
-    [ { "delegate" } "slot-names" set-word-prop ]
-    [ define-tuple-layout ]
-    [
-        { "delegate" }
-        [ drop ] [ generate-tuple-slots ] 2bi
-        [ "slots" set-word-prop ]
-        [ define-accessors ]
-        2bi
-    ]
-} cleave
+"tuple" "kernel" create
+[ { } define-builtin ]
+[ define-tuple-layout ]
+[
+    { "delegate" } make-slots
+    [ drop ] [ finalize-tuple-slots ] 2bi
+    [ "slots" set-word-prop ]
+    [ define-accessors ]
+    2bi
+] tri
 
 ! Create special tombstone values
 "tombstone" "hashtables.private" create
@@ -323,14 +324,55 @@ tuple
 [ tuple-layout [ <tuple-boa> ] curry ] tri
 (( quot1 quot2 -- compose )) define-declared
 
+! Sub-primitive words
+: make-sub-primitive ( word vocab -- )
+    create
+    dup reset-word
+    dup 1quotation define ;
+
+{
+    { "(execute)" "words.private" }
+    { "(call)" "kernel.private" }
+    { "fixnum+fast" "math.private" }
+    { "fixnum-fast" "math.private" }
+    { "fixnum*fast" "math.private" }
+    { "fixnum-bitand" "math.private" }
+    { "fixnum-bitor" "math.private" }
+    { "fixnum-bitxor" "math.private" }
+    { "fixnum-bitnot" "math.private" }
+    { "fixnum<" "math.private" }
+    { "fixnum<=" "math.private" }
+    { "fixnum>" "math.private" }
+    { "fixnum>=" "math.private" }
+    { "drop" "kernel" }
+    { "2drop" "kernel" }
+    { "3drop" "kernel" }
+    { "dup" "kernel" }
+    { "2dup" "kernel" }
+    { "3dup" "kernel" }
+    { "rot" "kernel" }
+    { "-rot" "kernel" }
+    { "dupd" "kernel" }
+    { "swapd" "kernel" }
+    { "nip" "kernel" }
+    { "2nip" "kernel" }
+    { "tuck" "kernel" }
+    { "over" "kernel" }
+    { "pick" "kernel" }
+    { "swap" "kernel" }
+    { ">r" "kernel" }
+    { "r>" "kernel" }
+    { "eq?" "kernel" }
+    { "tag" "kernel.private" }
+    { "slot" "slots.private" }
+} [ make-sub-primitive ] assoc-each
+
 ! Primitive words
 : make-primitive ( word vocab n -- )
     >r create dup reset-word r>
     [ do-primitive ] curry [ ] like define ;
 
 {
-    { "(execute)" "words.private" }
-    { "(call)" "kernel.private" }
     { "bignum>fixnum" "math.private" }
     { "float>fixnum" "math.private" }
     { "fixnum>bignum" "math.private" }
@@ -346,24 +388,13 @@ tuple
     { "bits>double" "math" }
     { "<complex>" "math.private" }
     { "fixnum+" "math.private" }
-    { "fixnum+fast" "math.private" }
     { "fixnum-" "math.private" }
-    { "fixnum-fast" "math.private" }
     { "fixnum*" "math.private" }
-    { "fixnum*fast" "math.private" }
     { "fixnum/i" "math.private" }
     { "fixnum-mod" "math.private" }
     { "fixnum/mod" "math.private" }
-    { "fixnum-bitand" "math.private" }
-    { "fixnum-bitor" "math.private" }
-    { "fixnum-bitxor" "math.private" }
-    { "fixnum-bitnot" "math.private" }
     { "fixnum-shift" "math.private" }
     { "fixnum-shift-fast" "math.private" }
-    { "fixnum<" "math.private" }
-    { "fixnum<=" "math.private" }
-    { "fixnum>" "math.private" }
-    { "fixnum>=" "math.private" }
     { "bignum=" "math.private" }
     { "bignum+" "math.private" }
     { "bignum-" "math.private" }
@@ -395,25 +426,6 @@ tuple
     { "float>=" "math.private" }
     { "<word>" "words" }
     { "word-xt" "words" }
-    { "drop" "kernel" }
-    { "2drop" "kernel" }
-    { "3drop" "kernel" }
-    { "dup" "kernel" }
-    { "2dup" "kernel" }
-    { "3dup" "kernel" }
-    { "rot" "kernel" }
-    { "-rot" "kernel" }
-    { "dupd" "kernel" }
-    { "swapd" "kernel" }
-    { "nip" "kernel" }
-    { "2nip" "kernel" }
-    { "tuck" "kernel" }
-    { "over" "kernel" }
-    { "pick" "kernel" }
-    { "swap" "kernel" }
-    { ">r" "kernel" }
-    { "r>" "kernel" }
-    { "eq?" "kernel" }
     { "getenv" "kernel.private" }
     { "setenv" "kernel.private" }
     { "(exists?)" "io.files.private" }
@@ -433,7 +445,6 @@ tuple
     { "code-room" "memory" }
     { "os-env" "system" }
     { "millis" "system" }
-    { "tag" "kernel.private" }
     { "modify-code-heap" "compiler.units" }
     { "dlopen" "alien" }
     { "dlsym" "alien" }
@@ -468,7 +479,6 @@ tuple
     { "set-alien-cell" "alien.accessors" }
     { "(throw)" "kernel.private" }
     { "alien-address" "alien" }
-    { "slot" "slots.private" }
     { "set-slot" "slots.private" }
     { "string-nth" "strings.private" }
     { "set-string-nth" "strings.private" }

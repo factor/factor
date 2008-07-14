@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays ui.gadgets kernel math
-namespaces vectors sequences math.vectors ;
+namespaces vectors sequences math.vectors math.geometry.rect ;
 IN: ui.gadgets.borders
 
 TUPLE: border < gadget
@@ -10,7 +10,7 @@ TUPLE: border < gadget
 { align initial: { 1/2 1/2 } } ;
 
 : new-border ( child class -- border )
-    new-gadget [ add-gadget ] keep ; inline
+    new-gadget [ swap add-gadget drop ] keep ; inline
 
 : <border> ( child gap -- border )
     swap border new-border
@@ -33,7 +33,8 @@ M: border pref-dim*
     [ border-major-dim ] [ border-minor-dim ] [ fill>> ] tri scale ;
 
 : border-loc ( border dim -- loc )
-    [ [ size>> ] [ align>> ] [ border-major-dim ] tri ] dip v- v* v+ ;
+    [ [ size>> ] [ align>> ] [ border-major-dim ] tri ] dip
+    v- v* v+ [ >fixnum ] map ;
 
 : border-child-rect ( border -- rect )
     dup border-dim [ border-loc ] keep <rect> ;

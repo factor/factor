@@ -8,6 +8,7 @@ $nl
 { $subsection prune }
 "Test for duplicates:"
 { $subsection all-unique? }
+{ $subsection duplicates }
 "Set operations on sequences:"
 { $subsection diff }
 { $subsection intersect }
@@ -38,6 +39,18 @@ HELP: adjoin
 }
 { $side-effects "seq" } ;
 
+HELP: conjoin
+{ $values { "elt" object } { "assoc" "an assoc" } }
+{ $description "Stores a key/value pair, both equal to " { $snippet "elt" } ", into the assoc." }
+{ $examples
+    { $example
+        "USING: kernel prettyprint sets ;"
+        "H{ } clone 1 over conjoin ."
+        "H{ { 1 1 } }"
+    }
+}
+{ $side-effects "assoc" } ;
+
 HELP: unique
 { $values { "seq" "a sequence" } { "assoc" "an assoc" } }
 { $description "Outputs a new assoc where the keys and values are equal." }
@@ -50,6 +63,13 @@ HELP: prune
 { $description "Outputs a new sequence with each distinct element of " { $snippet "seq" } " appearing only once. Elements are compared for equality using " { $link = } " and elements are ordered according to their position in " { $snippet "seq" } "." }
 { $examples
     { $example "USING: sets prettyprint ;" "{ 1 1 t 3 t } prune ." "V{ 1 t 3 }" }
+} ;
+
+HELP: duplicates
+{ $values { "seq" "a sequence" } { "newseq" "a sequence" } }
+{ $description "Outputs a new sequence consisting of elements which occur more than once in " { $snippet "seq" } "." }
+{ $examples
+    { $example "USING: sets prettyprint ;" "{ 1 2 3 1 2 1 } duplicates ." "{ 1 2 1 }" }
 } ;
 
 HELP: all-unique?

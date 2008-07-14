@@ -20,13 +20,11 @@ TUPLE: browser-gadget < track pane history ;
     "handbook" >link <history> >>history drop ;
 
 : <browser-gadget> ( -- gadget )
-    { 0 1 } browser-gadget new-track
+  { 0 1 } browser-gadget new-track
     dup init-history
-    [
-        toolbar,
-        g <help-pane> g-> set-browser-gadget-pane
-        <scroller> 1 track,
-    ] make-gadget ;
+    dup <toolbar> f track-add*
+    dup <help-pane> >>pane
+    dup pane>> <scroller> 1 track-add* ;
 
 M: browser-gadget call-tool* show-help ;
 

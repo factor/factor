@@ -124,16 +124,28 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
 { $subsection each }
 { $subsection reduce }
 { $subsection interleave }
-{ $subsection 2each }
-{ $subsection 2reduce }
 "Mapping:"
 { $subsection map }
-{ $subsection 2map }
+{ $subsection map-as }
 { $subsection accumulate }
 { $subsection produce }
 "Filtering:"
 { $subsection push-if }
-{ $subsection filter } ;
+{ $subsection filter }
+"Testing if a sequence contains elements satisfying a predicate:"
+{ $subsection contains? }
+{ $subsection all? }
+"Testing how elements are related:"
+{ $subsection monotonic? }
+{ $subsection "sequence-2combinators" } ;
+
+ARTICLE: "sequence-2combinators" "Pair-wise sequence combinators"
+"There is a set of combinators which traverse two sequences pairwise. If one sequence is shorter than the other, than only the prefix having the length of the minimum of the two is examined."
+{ $subsection 2each }
+{ $subsection 2reduce }
+{ $subsection 2map }
+{ $subsection 2map-as }
+{ $subsection 2all? } ;
 
 ARTICLE: "sequences-tests" "Testing sequences"
 "Testing for an empty sequence:"
@@ -147,12 +159,7 @@ ARTICLE: "sequences-tests" "Testing sequences"
 { $subsection head? }
 { $subsection tail? }
 { $subsection subseq? }
-"Testing if a sequence contains elements satisfying a predicate:"
-{ $subsection contains? }
-{ $subsection all? }
-{ $subsection 2all? }
 "Testing how elements are related:"
-{ $subsection monotonic? }
 { $subsection all-eq? }
 { $subsection all-equal? } ;
 
@@ -456,6 +463,15 @@ HELP: map
 { $values { "seq" sequence } { "quot" "a quotation with stack effect " { $snippet "( old -- new )" } } { "newseq" "a new sequence" } }
 { $description "Applies the quotation to each element of the sequence in order. The new elements are collected into a sequence of the same class as the input sequence." } ;
 
+HELP: map-as
+{ $values { "seq" sequence } { "quot" "a quotation with stack effect " { $snippet "( old -- new )" } } { "newseq" "a new sequence" } { "exemplar" sequence } }
+{ $description "Applies the quotation to each element of the sequence in order. The new elements are collected into a sequence of the same class as " { $snippet "exemplar" } "." }
+{ $examples
+    "The following example converts a string into an array of one-element strings:"
+    { $example "USING: prettyprint strings sequences ;" "\"Hello\" [ 1string ] { } map-as ." "{ \"H\" \"e\" \"l\" \"l\" \"o\" }" }
+    "Note that " { $link map } " could not be used here, because it would create another string to hold results, and one-element strings cannot themselves be elements of strings."
+} ;
+
 HELP: change-nth
 { $values { "i" "a non-negative integer" } { "seq" "a mutable sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- newelt )" } } }
 { $description "Applies the quotation to the " { $snippet "i" } "th element of the sequence, storing the result back into the sequence." }
@@ -478,8 +494,7 @@ HELP: max-length
 
 HELP: 2each
 { $values { "seq1" sequence } { "seq2" sequence } { "quot" "a quotation with stack effect " { $snippet "( elt1 elt2 -- )" } } }
-{ $description "Applies the quotation to pairs of elements from " { $snippet "seq1" } " and " { $snippet "seq2" } "." }
-{ $notes "If one sequence is shorter than the other, than only the prefix having the length of the minimum of the two is examined." } ;
+{ $description "Applies the quotation to pairs of elements from " { $snippet "seq1" } " and " { $snippet "seq2" } "." } ;
 
 HELP: 2reduce
 { $values { "seq1" sequence }
@@ -488,18 +503,19 @@ HELP: 2reduce
           { "quot" "a quotation with stack effect "
                    { $snippet "( prev elt1 elt2 -- next )" } }
           { "result" "the final result" } }
-{ $description "Combines successive pairs of elements from the two sequences using a ternary operation. The first input value at each iteration except the first one is the result of the previous iteration. The first input value at the first iteration is " { $snippet "identity" } "." }
-{ $notes "If one sequence is shorter than the other, then only the prefix having the length of the minimum of the two is examined." } ;
+{ $description "Combines successive pairs of elements from the two sequences using a ternary operation. The first input value at each iteration except the first one is the result of the previous iteration. The first input value at the first iteration is " { $snippet "identity" } "." } ;
 
 HELP: 2map
 { $values { "seq1" sequence } { "seq2" sequence } { "quot" "a quotation with stack effect " { $snippet "( elt1 elt2 -- new )" } } { "newseq" "a new sequence" } }
-{ $description "Applies the quotation to each pair of elements in turn, yielding new elements which are collected into a new sequence having the same class as " { $snippet "seq1" } "." }
-{ $notes "If one sequence is shorter than the other, than only the prefix having the length of the minimum of the two is examined." } ;
+{ $description "Applies the quotation to each pair of elements in turn, yielding new elements which are collected into a new sequence having the same class as " { $snippet "seq1" } "." } ;
+
+HELP: 2map-as
+{ $values { "seq1" sequence } { "seq2" sequence } { "quot" "a quotation with stack effect " { $snippet "( elt1 elt2 -- new )" } } { "exemplar" sequence } { "newseq" "a new sequence" } }
+{ $description "Applies the quotation to each pair of elements in turn, yielding new elements which are collected into a new sequence having the same class as " { $snippet "exemplar" } "." } ;
 
 HELP: 2all?
 { $values { "seq1" sequence } { "seq2" sequence } { "quot" "a quotation with stack effect " { $snippet "( elt1 elt2 -- ? )" } } { "?" "a boolean" } }
-{ $description "Tests the predicate pairwise against elements of " { $snippet "seq1" } " and " { $snippet "seq2" } "." }
-{ $notes "If one sequence is shorter than the other, than only the prefix having the length of the minimum of the two is examined." } ;
+{ $description "Tests the predicate pairwise against elements of " { $snippet "seq1" } " and " { $snippet "seq2" } "." } ;
 
 HELP: find
 { $values { "seq" sequence }

@@ -4,7 +4,7 @@ USING: accessors arrays ui.gestures ui.gadgets ui.gadgets.buttons
 ui.gadgets.frames ui.gadgets.grids math.order
 ui.gadgets.theme ui.render kernel math namespaces sequences
 vectors models models.range math.vectors math.functions
-quotations colors ;
+quotations colors math.geometry.rect ;
 IN: ui.gadgets.sliders
 
 TUPLE: elevator < gadget direction ;
@@ -140,7 +140,7 @@ M: elevator layout*
 
 : elevator, ( orientation -- )
     dup <elevator> g-> set-slider-elevator
-    swap <thumb> g-> set-slider-thumb over add-gadget
+    swap <thumb> g-> set-slider-thumb add-gadget
     @center frame, ;
 
 : <left-button> ( -- button )

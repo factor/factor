@@ -63,6 +63,8 @@ INLINE CELL compute_code_rel(F_REL *rel,
 		return (CELL)get_rel_symbol(rel,literals_start);
 	case RT_LITERAL:
 		return CREF(literals_start,REL_ARGUMENT(rel));
+	case RT_IMMEDIATE:
+		return get(CREF(literals_start,REL_ARGUMENT(rel)));
 	case RT_XT:
 		return (CELL)untag_word(get(CREF(literals_start,REL_ARGUMENT(rel))))->xt;
 	case RT_HERE:

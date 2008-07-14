@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors io kernel math namespaces
-sequences words math.vectors ui.gadgets ui.gadgets.packs ;
+sequences words math.vectors ui.gadgets ui.gadgets.packs math.geometry.rect ;
 IN: ui.gadgets.tracks
 
 TUPLE: track < pack sizes ;
@@ -47,7 +47,11 @@ M: track pref-dim*
     rot gadget-orientation set-axis ;
 
 : track-add ( gadget track constraint -- )
-    over track-sizes push add-gadget ;
+    over track-sizes push swap add-gadget drop ;
+
+: track-add* ( track gadget constraint -- track )
+    pick sizes>> push
+    add-gadget ;
 
 : track, ( gadget constraint -- )
     gadget get swap track-add ;

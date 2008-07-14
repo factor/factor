@@ -1,8 +1,20 @@
-! Copyright (C) 2007 Chris Double.
-! See http://factorcode.org/license.txt for BSD license.
 USING: help.syntax help.markup kernel sequences quotations
-math ;
+math arrays ;
 IN: generalizations
+
+HELP: narray
+{ $values { "n" integer } }
+{ $description "A generalization of " { $link 1array } ", "
+{ $link 2array } ", " { $link 3array } " and " { $link 4array } " "
+"that constructs an array from the top " { $snippet "n" } " elements of the stack."
+} ;
+
+HELP: firstn
+{ $values { "n" integer } }
+{ $description "A generalization of " { $link first } ", "
+{ $link first2 } ", " { $link first3 } " and " { $link first4 } " "
+"that pushes the first " { $snippet "n" } " elements of a sequence on the stack."
+} ;
 
 HELP: npick
 { $values { "n" integer } }
@@ -119,6 +131,7 @@ ARTICLE: "generalizations" "Generalized shuffle words and combinators"
 "macros where the arity of the input quotations depends on an "
 "input parameter."
 { $subsection narray }
+{ $subsection firstn }
 { $subsection ndup }
 { $subsection npick }
 { $subsection nrot }

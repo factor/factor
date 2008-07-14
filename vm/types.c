@@ -49,6 +49,7 @@ F_WORD *allot_word(CELL vocab, CELL name)
 	word->props = F;
 	word->counter = tag_fixnum(0);
 	word->compiledp = F;
+	word->subprimitive = F;
 	word->profiling = NULL;
 	word->code = NULL;
 

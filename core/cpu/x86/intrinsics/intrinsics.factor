@@ -6,8 +6,7 @@ kernel.private math math.private namespaces quotations sequences
 words generic byte-arrays hashtables hashtables.private
 generator generator.registers generator.fixup sequences.private
 sbufs sbufs.private vectors vectors.private layouts system
-classes.tuple.private strings.private slots.private
-compiler.constants ;
+strings.private slots.private compiler.constants optimizer.allot ;
 IN: cpu.x86.intrinsics
 
 ! Type checks
@@ -298,37 +297,33 @@ IN: cpu.x86.intrinsics
         "tuple" get tuple %store-tagged
     ] %allot
 ] H{
-    { +input+ { { [ tuple-layout? ] "layout" } } }
+    { +input+ { { [ ] "layout" } } }
     { +scratch+ { { f "tuple" } { f "scratch" } } }
     { +output+ { "tuple" } }
 } define-intrinsic
 
-\ <array> [
+\ (array) [
     array "n" get 2 + cells [
         ! Store length
         1 object@ "n" operand MOV
-        ! Zero out the rest of the tuple
-        "n" get [ 2 + object@ "initial" operand MOV ] each
         ! Store tagged ptr in reg
         "array" get object %store-tagged
     ] %allot
 ] H{
-    { +input+ { { [ inline-array? ] "n" } { f "initial" } } }
+    { +input+ { { [ ] "n" } } }
     { +scratch+ { { f "array" } } }
     { +output+ { "array" } }
 } define-intrinsic
 
-\ <byte-array> [
+\ (byte-array) [
     byte-array "n" get 2 cells + [
         ! Store length
         1 object@ "n" operand MOV
-        ! Store initial element
-        "n" get cell align cell /i [ 2 + object@ 0 MOV ] each
         ! Store tagged ptr in reg
         "array" get object %store-tagged
     ] %allot
 ] H{
-    { +input+ { { [ inline-array? ] "n" } } }
+    { +input+ { { [ ] "n" } } }
     { +scratch+ { { f "array" } } }
     { +output+ { "array" } }
 } define-intrinsic

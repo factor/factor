@@ -129,6 +129,8 @@ typedef struct {
 	CELL compiledp;
 	/* TAGGED call count for profiling */
 	CELL counter;
+	/* TAGGED machine code for sub-primitive */
+	CELL subprimitive;
 	/* UNTAGGED execution token: jump here to execute word */
 	XT xt;
 	/* UNTAGGED compiled code block */

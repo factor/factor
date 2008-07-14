@@ -104,6 +104,8 @@ M: object infer-call
     ] if
 ] "infer" set-word-prop
 
+\ execute t "no-compile" set-word-prop
+
 \ if [
     3 ensure-values
     2 d-tail [ special? ] contains? [
@@ -122,6 +124,8 @@ M: object infer-call
     pop-literal nip [ <value> ] map
     [ #dispatch ] infer-branches
 ] "infer" set-word-prop
+
+\ dispatch t "no-compile" set-word-prop
 
 \ curry [
     2 ensure-values
@@ -149,8 +153,10 @@ M: object infer-call
 ] "infer" set-word-prop
 
 :  set-primitive-effect ( word effect -- )
-    2dup effect-out "default-output-classes" set-word-prop
-    dupd [ make-call-node ] 2curry "infer" set-word-prop ;
+    [ in>> "input-classes" set-word-prop ]
+    [ out>> "default-output-classes" set-word-prop ]
+    [ dupd [ make-call-node ] 2curry "infer" set-word-prop ]
+    2tri ;
 
 ! Stack effects for all primitives
 \ fixnum< { fixnum fixnum } { object } <effect> set-primitive-effect
@@ -533,9 +539,6 @@ set-primitive-effect
 
 \ <tuple> { tuple-layout } { tuple } <effect> set-primitive-effect
 \ <tuple> make-flushable
-
-\ (tuple) { tuple-layout } { tuple } <effect> set-primitive-effect
-\ (tuple) make-flushable
 
 \ <tuple-layout> { word fixnum array fixnum } { tuple-layout } <effect> set-primitive-effect
 \ <tuple-layout> make-foldable

@@ -3,7 +3,7 @@
 USING: accessors arrays assocs continuations kernel math models
 namespaces opengl sequences io combinators math.vectors
 ui.gadgets ui.gestures ui.render ui.backend ui.gadgets.tracks
-debugger ;
+debugger math.geometry.rect ;
 IN: ui.gadgets.worlds
 
 TUPLE: world < track

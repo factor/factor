@@ -1,10 +1,11 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors continuations kernel models namespaces
-prettyprint ui ui.commands ui.gadgets ui.gadgets.labelled assocs
-ui.gadgets.tracks ui.gadgets.buttons ui.gadgets.panes
-ui.gadgets.status-bar ui.gadgets.scrollers ui.gestures sequences
-hashtables inspector ;
+       prettyprint ui ui.commands ui.gadgets ui.gadgets.labelled assocs
+       ui.gadgets.tracks ui.gadgets.buttons ui.gadgets.panes
+       ui.gadgets.status-bar ui.gadgets.scrollers ui.gestures sequences
+       hashtables inspector ;
+
 IN: ui.tools.traceback
 
 : <callstack-display> ( model -- gadget )
@@ -24,20 +25,18 @@ TUPLE: traceback-gadget < track ;
 M: traceback-gadget pref-dim* drop { 550 600 } ;
 
 : <traceback-gadget> ( model -- gadget )
-    { 0 1 } traceback-gadget new-track
-        swap >>model
-    [
-        g model>>
-        [
-            [
-                [ <datastack-display> 1/2 track, ]
-                [ <retainstack-display> 1/2 track, ]
-                bi
-            ] { 1 0 } make-track 1/3 track,
-        ]
-        [ <callstack-display> 2/3 track, ] bi
-        toolbar,
-    ] make-gadget ;
+  { 0 1 } traceback-gadget new-track
+    swap >>model
+
+    dup model>>
+      { 1 0 } <track>
+        over <datastack-display>   1/2 track-add*
+        swap <retainstack-display> 1/2 track-add*
+      1/3 track-add*
+
+    dup model>> <callstack-display> 2/3 track-add*
+
+    dup <toolbar> f track-add* ;
 
 : <namestack-display> ( model -- gadget )
     [ [ continuation-name namestack. ] when* ]

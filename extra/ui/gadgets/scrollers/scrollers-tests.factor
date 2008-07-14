@@ -3,7 +3,7 @@ USING: ui.gadgets ui.gadgets.scrollers namespaces tools.test
 kernel models models.compose models.range ui.gadgets.viewports
 ui.gadgets.labels ui.gadgets.grids ui.gadgets.frames
 ui.gadgets.sliders math math.vectors arrays sequences
-tools.test.ui ;
+tools.test.ui math.geometry.rect ;
 
 [ ] [
     <gadget> "g" set
@@ -61,7 +61,7 @@ tools.test.ui ;
 
 <gadget> { 600 400 } over set-rect-dim "g1" set
 <gadget> { 600 10 } over set-rect-dim "g2" set
-"g2" get "g1" get add-gadget
+"g2" get "g1" get swap add-gadget drop
 
 "g1" get <scroller>
 { 300 300 } over set-rect-dim

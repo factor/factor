@@ -99,14 +99,13 @@ main()
 }
 ;
 
-TUPLE: spheres-gadget
+TUPLE: spheres-gadget < demo-gadget
     plane-program solid-sphere-program texture-sphere-program
     reflection-framebuffer reflection-depthbuffer
     reflection-texture ;
 
 : <spheres-gadget> ( -- gadget )
-    20.0 10.0 20.0 <demo-gadget>
-    { set-delegate } spheres-gadget construct ;
+    20.0 10.0 20.0 spheres-gadget new-demo-gadget ;
 
 M: spheres-gadget near-plane ( gadget -- z )
     drop 1.0 ;

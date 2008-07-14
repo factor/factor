@@ -21,8 +21,11 @@ GENERIC: clone-like ( seq exemplar -- newseq ) flushable
 M: sequence like drop ;
 
 GENERIC: lengthen ( n seq -- )
+GENERIC: shorten ( n seq -- )
 
 M: sequence lengthen 2dup length > [ set-length ] [ 2drop ] if ;
+
+M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ;
 
 : empty? ( seq -- ? ) length zero? ; inline
 : delete-all ( seq -- ) 0 swap set-length ;
@@ -380,9 +383,12 @@ PRIVATE>
 : 2reduce ( seq1 seq2 identity quot -- result )
     >r -rot r> 2each ; inline
 
-: 2map ( seq1 seq2 quot -- newseq )
-    pick >r (2each) over r>
+: 2map-as ( seq1 seq2 quot exemplar -- newseq )
+    >r (2each) over r>
     [ [ collect ] keep ] new-like ; inline
+
+: 2map ( seq1 seq2 quot -- newseq )
+    pick 2map-as ; inline
 
 : 2all? ( seq1 seq2 quot -- ? )
     (2each) all-integers? ; inline
@@ -530,7 +536,7 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 
 : peek ( seq -- elt ) [ length 1- ] [ nth ] bi ;
 
-: pop* ( seq -- ) [ length 1- ] [ set-length ] bi ;
+: pop* ( seq -- ) [ length 1- ] [ shorten ] bi ;
 
 : move-backward ( shift from to seq -- )
     2over number= [
@@ -575,7 +581,7 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
     copy ;
 
 : pop ( seq -- elt )
-    [ length 1- ] [ [ nth ] [ set-length ] 2bi ] bi ;
+    [ length 1- ] [ [ nth ] [ shorten ] 2bi ] bi ;
 
 : all-equal? ( seq -- ? ) [ = ] monotonic? ;
 

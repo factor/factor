@@ -164,3 +164,16 @@ H{ } "x" set
 [ { "one" "two" 3 } ] [
     { 1 2 3 } H{ { 1 "one" } { 2 "two" } } substitute
 ] unit-test
+
+! We want this to work
+[ ] [ hashtable new "h" set ] unit-test
+
+[ 0 ] [ "h" get assoc-size ] unit-test
+
+[ f f ] [ "goo" "h" get at* ] unit-test
+
+[ ] [ 1 2 "h" get set-at ] unit-test
+
+[ 1 ] [ "h" get assoc-size ] unit-test
+
+[ 1 ] [ 2 "h" get at ] unit-test

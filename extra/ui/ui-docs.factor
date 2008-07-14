@@ -1,6 +1,6 @@
 USING: help.markup help.syntax strings quotations debugger
 io.styles namespaces ui.backend ui.gadgets ui.gadgets.worlds
-ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids ;
+ui.gadgets.tracks ui.gadgets.packs ui.gadgets.grids math.geometry.rect ;
 IN: ui
 
 HELP: windows
@@ -235,7 +235,7 @@ $nl
 $nl
 "Gadget construction combinators whose names are prefixed with " { $snippet "make-" } " construct new gadgets and push them on the stack. The primitive combinator used to define all combinators of this form:"
 { $subsection make-gadget }
-"Words such as " { $link gadget, } " and " { $link track, } " access the gadget through the " { $link gadget } " variable."
+"Words such as " { $link track, } " access the gadget through the " { $link gadget } " variable."
 $nl
 "A combinator which stores a gadget in the " { $link gadget } " variable:"
 { $subsection with-gadget }

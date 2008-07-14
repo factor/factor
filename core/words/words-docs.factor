@@ -140,8 +140,6 @@ $nl
     
     { { $snippet "\"constructor\"" } { $link "tuple-constructors" } }
     
-    { { $snippet "\"slot-names\"" } { $link "tuples" } }
-    
     { { $snippet "\"type\"" } { $link "builtin-classes" } }
     
     { { { $snippet "\"superclass\"" } ", " { $snippet "\"predicate-definition\"" } } { $link "predicates" } }

@@ -1,7 +1,8 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic kernel math namespaces sequences words
-splitting grouping math.vectors ui.gadgets.grids ui.gadgets ;
+splitting grouping math.vectors ui.gadgets.grids ui.gadgets
+math.geometry.rect ;
 IN: ui.gadgets.frames
 
 ! A frame arranges gadgets in a 3x3 grid, where the center

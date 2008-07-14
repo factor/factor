@@ -134,7 +134,12 @@ $nl
 "When using models which are not associated with controls (or when unit testing controls), you must activate and deactivate models manually:"
 { $subsection activate-model }
 { $subsection deactivate-model }
-{ $subsection "models-impl" } ;
+{ $subsection "models-impl" }
+{ $subsection "models-filter" }
+{ $subsection "models-compose" }
+{ $subsection "models-history" }
+{ $subsection "models-range" }
+{ $subsection "models-delay" } ;
 
 ARTICLE: "models-impl" "Implementing models"
 "New types of models can be defined, for example see " { $vocab-link "models.filter" } "."

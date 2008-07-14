@@ -144,10 +144,13 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
 : extract-keys ( seq assoc -- subassoc )
     [ [ dupd at ] curry ] keep map>assoc ;
 
-! M: assoc >alist [ 2array ] { } assoc>map ;
+GENERIC: value-at* ( value assoc -- key/f ? )
 
-: value-at ( value assoc -- key/f )
-    swap [ = nip ] curry assoc-find 2drop ;
+M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
+
+: value-at ( value assoc -- key/f ) value-at* drop ;
+
+: value? ( value assoc -- ? ) value-at* nip ;
 
 : push-at ( value key assoc -- )
     [ ?push ] change-at ;

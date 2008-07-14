@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel sequences models ui.gadgets ;
+USING: accessors kernel sequences models ui.gadgets math.geometry.rect ;
 IN: ui.gadgets.books
 
 TUPLE: book < gadget ;
@@ -19,7 +19,7 @@ M: book model-changed
 : new-book ( pages model class -- book )
     new-gadget
         swap >>model
-        [ add-gadgets ] keep ; inline
+        [ swap add-gadgets drop ] keep ; inline
 
 : <book> ( pages model -- book )
     book new-book ;

@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: kernel generic sequences prettyprint io words arrays
+summary effects debugger assocs accessors inference.backend
+inference.dataflow ;
 IN: inference.errors
-USING: inference.backend inference.dataflow kernel generic
-sequences prettyprint io words arrays summary effects debugger
-assocs accessors ;
 
 M: inference-error error-help error>> error-help ;
 

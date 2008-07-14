@@ -162,8 +162,6 @@ PREDICATE: small-slot < integer cells small-enough? ;
 
 PREDICATE: small-tagged < integer v>operand small-enough? ;
 
-PREDICATE: inline-array < integer 32 < ;
-
 : if-small-struct ( n size true false -- ? )
     >r >r over not over struct-small-enough? and
     [ nip r> call r> drop ] [ r> drop r> call ] if ;
