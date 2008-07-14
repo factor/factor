@@ -135,7 +135,6 @@ big-endian on
     3 ds-reg 0 STW
 ] f f f \ slot define-sub-primitive
 
-
 ! Shufflers
 [
     ds-reg dup 4 SUBI
@@ -248,7 +247,7 @@ big-endian on
 ] f f f \ >r define-sub-primitive
 
 [
-    3 rs-reg 0 STW
+    3 rs-reg 0 LWZ
     rs-reg dup 4 SUBI
     3 ds-reg 4 STWU
 ] f f f \ r> define-sub-primitive
@@ -261,11 +260,11 @@ big-endian on
     5 ds-reg -4 LWZU
     5 0 4 CMP
     2 swap execute ! magic number
-    3 \ f tag-number LI
+    \ f tag-number 3 LI
     3 ds-reg 0 STW ;
 
 : define-jit-compare ( insn word -- )
-    [ [ jit-compare ] curry rc-absolute-ppc-2/2 rt-literal 0 ] dip
+    [ [ jit-compare ] curry rc-absolute-ppc-2/2 rt-literal 1 ] dip
     define-sub-primitive ;
 
 \ BEQ \ eq? define-jit-compare
@@ -285,7 +284,13 @@ big-endian on
 
 [ \ SUBF jit-math ] f f f \ fixnum-fast define-sub-primitive
 
-[ \ MULLW jit-math ] f f f \ fixnum*fast define-sub-primitive
+[
+    3 ds-reg 0 LWZ
+    4 ds-reg -4 LWZU
+    4 4 tag-bits get SRAWI
+    5 3 4 MULLW
+    5 ds-reg 0 STW
+] f f f \ fixnum*fast define-sub-primitive
 
 [ \ AND jit-math ] f f f \ fixnum-bitand define-sub-primitive
 
