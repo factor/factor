@@ -2,19 +2,17 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: ui.tools.workspace kernel quotations tools.profiler
 ui.commands ui.gadgets ui.gadgets.panes ui.gadgets.scrollers
-ui.gadgets.tracks ui.gestures ui.gadgets.buttons ;
+ui.gadgets.tracks ui.gestures ui.gadgets.buttons accessors ;
 IN: ui.tools.profiler
 
 TUPLE: profiler-gadget < track pane ;
 
 : <profiler-gadget> ( -- gadget )
-    { 0 1 } profiler-gadget new-track
-    [
-        toolbar,
-        <pane> g-> set-profiler-gadget-pane
-        <scroller> 1 track,
-    ] make-gadget ;
-
+  { 0 1 } profiler-gadget new-track
+    dup <toolbar> f track-add*
+    <pane> >>pane
+    dup pane>> <scroller> 1 track-add* ;
+    
 : with-profiler-pane ( gadget quot -- )
     >r profiler-gadget-pane r> with-pane ;
 

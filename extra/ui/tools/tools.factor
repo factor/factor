@@ -12,31 +12,36 @@ tools.test tools.vocabs ui.gadgets.buttons ui.gadgets.status-bar
 mirrors ;
 IN: ui.tools
 
-: <workspace-tabs> ( -- tabs )
-    g gadget-model
-    "tool-switching" workspace command-map commands>>
+: <workspace-tabs> ( workspace -- tabs )
+  model>>
+  "tool-switching" workspace command-map commands>>
     [ command-string ] { } assoc>map <enum> >alist
-    <toggle-buttons> ;
+  <toggle-buttons> ;
 
-: <workspace-book> ( -- gadget )
-    [
-        <stack-display> ,
-        <browser-gadget> ,
-        <inspector-gadget> ,
-        <profiler-gadget> ,
-    ] { } make g gadget-model <book> ;
+: <workspace-book> ( workspace -- gadget )
 
+  dup
+    <stack-display>
+    <browser-gadget>
+    <inspector-gadget>
+    <profiler-gadget>
+  4array
+
+  swap model>>
+
+  <book> ;
+  
 : <workspace> ( -- workspace )
-    { 0 1 } workspace new-track
-        0 <model> >>model
-    [
-        <listener-gadget> g set-workspace-listener
-        <workspace-book> g set-workspace-book
-        <workspace-tabs> f track,
-        g workspace-book 1/5 track,
-        g workspace-listener 4/5 track,
-        toolbar,
-    ] make-gadget ;
+  { 0 1 } workspace new-track
+
+    0 <model>            >>model
+    <listener-gadget>    >>listener
+    dup <workspace-book> >>book
+    
+    dup <workspace-tabs> f   track-add*
+    dup book>>           1/5 track-add*
+    dup listener>>       4/5 track-add*
+    dup <toolbar>        f   track-add* ;
 
 : resize-workspace ( workspace -- )
     dup track-sizes over control-value zero? [

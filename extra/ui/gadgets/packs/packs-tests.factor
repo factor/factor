@@ -5,10 +5,8 @@ kernel namespaces tools.test math.parser sequences math.geometry.rect ;
 [ t ] [
     { 0 0 } { 100 100 } <rect> clip set
 
-    [
-        100 [ number>string <label> gadget, ] each
-    ] make-pile
-
+    <pile>
+      100 [ number>string <label> add-gadget ] each
     dup layout
 
     visible-children [ label? ] all?

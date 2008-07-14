@@ -120,14 +120,13 @@ M: engine-word word-completion-string
 
 TUPLE: stack-display < track ;
 
-: <stack-display> ( -- gadget )
-    g workspace-listener
-    { 0 1 } stack-display new-track
-    [
-        dup <toolbar> f track,
-        stack>> [ [ stack. ] curry try ]
-        t "Data stack" <labelled-pane> 1 track,
-    ] make-gadget ;
+: <stack-display> ( workspace -- gadget )
+  listener>>
+  { 0 1 } stack-display new-track
+    over <toolbar> f track-add*
+    swap
+      stack>> [ [ stack. ] curry try ] t "Data stack" <labelled-pane>
+    1 track-add* ;
 
 M: stack-display tool-scroller
     find-workspace workspace-listener tool-scroller ;
