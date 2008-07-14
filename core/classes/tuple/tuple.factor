@@ -74,9 +74,6 @@ M: tuple-class slots>tuple
 : >tuple ( seq -- tuple )
     unclip slots>tuple ;
 
-: slot-names ( class -- seq )
-    "slot-names" word-prop ;
-
 ERROR: bad-superclass class ;
 
 <PRIVATE
@@ -104,7 +101,7 @@ ERROR: bad-superclass class ;
 
 : superclass-size ( class -- n )
     superclasses but-last-slice
-    [ slot-names length ] sigma ;
+    [ "slots" word-prop length ] sigma ;
 
 : (instance-check-quot) ( class -- quot )
     [
@@ -138,19 +135,18 @@ ERROR: bad-superclass class ;
 : define-tuple-prototype ( class -- )
     dup tuple-prototype "prototype" set-word-prop ;
 
-: generate-tuple-slots ( class slots -- slot-specs )
-    over superclass-size 2 + make-slots deprecated-slots ;
+: finalize-tuple-slots ( class slots -- slots )
+    over superclass-size 2 + finalize-slots deprecated-slots ;
 
 : define-tuple-slots ( class -- )
-    dup dup "slot-names" word-prop generate-tuple-slots
-    [ "slots" set-word-prop ]
+    dup dup "slots" word-prop finalize-tuple-slots
     [ define-accessors ] ! new
     [ define-slots ] ! old
-    2tri ;
+    2bi ;
 
 : make-tuple-layout ( class -- layout )
     [ ]
-    [ [ superclass-size ] [ slot-names length ] bi + ]
+    [ [ superclass-size ] [ "slots" word-prop length ] bi + ]
     [ superclasses dup length 1- ] tri
     <tuple-layout> ;
 
@@ -211,8 +207,9 @@ M: tuple-class update-class
     } cleave ;
 
 : define-new-tuple-class ( class superclass slots -- )
+    make-slots
     [ drop f f tuple-class define-class ]
-    [ nip "slot-names" set-word-prop ]
+    [ nip "slots" set-word-prop ]
     [ 2drop update-classes ]
     3tri ;
 
@@ -236,7 +233,7 @@ M: tuple-class update-class
     3bi ;
 
 : tuple-class-unchanged? ( class superclass slots -- ? )
-    rot tuck [ superclass = ] [ slot-names = ] 2bi* and ;
+    rot tuck [ superclass = ] [ "slots" word-prop = ] 2bi* and ;
 
 : valid-superclass? ( class -- ? )
     [ tuple-class? ] [ tuple eq? ] bi or ;
@@ -281,7 +278,7 @@ M: tuple-class reset-class
         [ call-next-method ]
         [
             {
-                "layout" "slots" "slot-names" "boa-check" "prototype"
+                "layout" "slots" "boa-check" "prototype"
             } reset-props
         ] bi
     ] bi ;

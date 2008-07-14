@@ -277,13 +277,32 @@ M: array pprint-slot-name
     f <inset unclip text pprint-elements block>
     \ } pprint-word block> ;
 
+: unparse-slot ( slot-spec -- array )
+    [
+        dup name>> ,
+        dup class>> object eq? [
+            dup class>> ,
+            initial: ,
+            dup initial>> ,
+        ] unless
+        dup read-only>> [
+            read-only ,
+        ] when
+        drop
+    ] { } make ;
+
+: pprint-slot ( slot-spec -- )
+    unparse-slot
+    dup length 1 = [ first ] when
+    pprint-slot-name ;
+
 M: tuple-class see-class*
     <colon \ TUPLE: pprint-word
     dup pprint-word
     dup superclass tuple eq? [
         "<" text dup superclass pprint-word
     ] unless
-    <block slot-names [ pprint-slot-name ] each block>
+    <block "slots" word-prop [ pprint-slot ] each block>
     pprint-; block> ;
 
 M: word see-class* drop ;
