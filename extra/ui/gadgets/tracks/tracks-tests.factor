@@ -1,15 +1,16 @@
-USING: kernel ui.gadgets ui.gadgets.tracks tools.test math.geometry.rect ;
+USING: kernel ui.gadgets ui.gadgets.tracks tools.test
+       math.geometry.rect accessors ;
 IN: ui.gadgets.tracks.tests
 
 [ { 100 100 } ] [
-    [
-        <gadget> { 100 100 } over set-rect-dim 1 track,
-    ] { 0 1 } make-track pref-dim
+  { 0 1 } <track>
+    <gadget> { 100 100 } >>dim 1 track-add*
+  pref-dim
 ] unit-test
 
 [ { 100 110 } ] [
-    [
-        <gadget> { 10 10 } over set-rect-dim f track,
-        <gadget> { 100 100 } over set-rect-dim 1 track,
-    ] { 0 1 } make-track pref-dim
+  { 0 1 } <track>
+    <gadget> { 10 10 }   >>dim f track-add*
+    <gadget> { 100 100 } >>dim 1 track-add*
+  pref-dim
 ] unit-test
