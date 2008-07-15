@@ -38,10 +38,9 @@ M: labelled-gadget focusable-child* labelled-gadget-content ;
 : <title-label> ( text -- label ) <label> dup title-theme ;
 
 : <title-bar> ( title quot -- gadget )
-    [
-        [ <close-box> @left frame, ] when*
-        <title-label> @center frame,
-    ] make-frame ;
+  <frame>
+    swap dup [ <close-box> @left grid-add* ] [ drop ] if
+    swap <title-label> @center grid-add* ;
 
 TUPLE: closable-gadget < frame content ;
 
