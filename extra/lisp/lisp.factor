@@ -86,9 +86,12 @@ PRIVATE>
       { [ dup lisp-symbol? ] [ '[ , lookup-var ] ] }
      [ 1quotation ]
     } cond ;
+
+: lisp-string>factor ( str -- quot )
+    lisp-expr convert-form ;
     
-: lisp-eval ( str -- * )    
-    lisp-expr convert-form call ;
+: lisp-eval ( str -- * )
+    lisp-string>factor call ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
