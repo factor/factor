@@ -33,8 +33,10 @@ M: track layout* ( track -- ) dup track-layout pack-layout ;
 : track-pref-dims-1 ( track -- dim ) children>> pref-dims max-dim ;
 
 : track-pref-dims-2 ( track -- dim )
-    dup gadget-children pref-dims swap normalized-sizes
-    [ [ v/n ] when* ] 2map max-dim [ >fixnum ] map ;
+  [ children>> pref-dims ] [ normalized-sizes ] bi
+  [ [ v/n ] when* ] 2map
+  max-dim
+  [ >fixnum ] map ;
 
 M: track pref-dim* ( gadget -- dim )
    [ track-pref-dims-1                           ]
