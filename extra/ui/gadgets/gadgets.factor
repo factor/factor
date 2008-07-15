@@ -360,9 +360,6 @@ M: f request-focus-on 2drop ;
 : with-gadget ( gadget quot -- )
     gadget swap with-variable ; inline
 
-: make-gadget ( gadget quot -- gadget )
-    [ with-gadget ] [ drop ] 2bi ; inline
-
 ! Deprecated
 : set-gadget-delegate ( gadget tuple -- )
     over [
