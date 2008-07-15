@@ -57,9 +57,9 @@ M: gadget tool-scroller drop f ;
     article-title open-window ;
 
 : hide-popup ( workspace -- )
-    dup workspace-popup over track-remove
-    f over set-workspace-popup
-    request-focus ;
+  dup popup>> track-remove
+  f >>popup
+  request-focus ;
 
 : show-popup ( gadget workspace -- )
     dup hide-popup

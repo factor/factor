@@ -52,12 +52,14 @@ M: track pref-dim* ( gadget -- dim )
 : track-add* ( track gadget constraint -- track )
   pick sizes>> push add-gadget ;
 
-: track-remove ( gadget track -- )
-    over [
-        [ gadget-children index ] 2keep
-        swap unparent track-sizes delete-nth
-    ] [
-        2drop
-    ] if ;
+: track-remove ( track gadget -- track )
+  dupd dup
+    [
+      [ swap children>> index ]
+      [ unparent sizes>>      ] 2bi
+      delete-nth 
+    ]
+    [ 2drop ]
+  if ;
 
 : clear-track ( track -- ) V{ } clone >>sizes clear-gadget ;
