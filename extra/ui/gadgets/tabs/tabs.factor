@@ -48,9 +48,13 @@ DEFER: (del-page)
     [ names>> index ] 2keep (del-page) ;
 
 : <tabbed> ( assoc -- tabbed )
-    tabbed new-frame
-    [ g 0 <model> >>model
-      <pile> 1 >>fill [ >>toggler ] keep swap @left grid-add
-      [ keys >vector g swap >>names ]
-      [ values g model>> <book> [ >>content ] keep swap @center grid-add ] bi
-      g redo-toggler g ] with-gadget ;
+  tabbed new-frame
+    0 <model> >>model
+    <pile> 1 >>fill >>toggler
+    dup toggler>> @left grid-add*
+    swap
+      [ keys >vector >>names ]
+      [ values over model>> <book> >>content dup content>> @center grid-add* ]
+    bi
+    dup redo-toggler ;
+    

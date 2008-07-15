@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.functions math.parser models
-models.filter models.range models.compose sequences ui
-ui.gadgets ui.gadgets.frames ui.gadgets.labels ui.gadgets.packs
-ui.gadgets.sliders ui.render math.geometry.rect ;
+       models.filter models.range models.compose sequences ui
+       ui.gadgets ui.gadgets.frames ui.gadgets.labels ui.gadgets.packs
+       ui.gadgets.sliders ui.render math.geometry.rect accessors ;
 IN: color-picker
 
 ! Simple example demonstrating the use of models.

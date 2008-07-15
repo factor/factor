@@ -2,7 +2,7 @@
 ! USING: kernel quotations namespaces sequences assocs.lib ;
 
 USING: kernel namespaces namespaces.private quotations sequences
-       assocs.lib math.parser math sequences.lib locals mirrors ;
+       assocs.lib math.parser math generalizations locals mirrors ;
 
 IN: namespaces.lib
 

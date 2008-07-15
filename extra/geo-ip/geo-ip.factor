@@ -1,5 +1,7 @@
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences io.files io.launcher io.encodings.ascii
-io.streams.string http.client sequences.lib combinators
+io.streams.string http.client generalizations combinators
 math.parser math.vectors math.intervals interval-maps memoize
 csv accessors assocs strings math splitting grouping arrays ;
 IN: geo-ip

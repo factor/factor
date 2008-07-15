@@ -1,14 +1,20 @@
-! Copyright (C) 2007, 2008 Chris Double, Doug Coleman.
+! Copyright (C) 2007, 2008 Chris Double, Doug Coleman, Eduardo
+! Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences sequences.private namespaces math math.ranges
-combinators macros quotations fry locals arrays ;
+USING: kernel sequences sequences.private namespaces math
+math.ranges combinators macros quotations fry arrays ;
 IN: generalizations
 
 MACRO: narray ( n -- quot )
-    dup [ f <array> ] curry
-    swap <reversed> [
-        [ swap [ set-nth-unsafe ] keep ] curry
-    ] map concat append ;
+    [ <reversed> ] [ '[ , f <array> ] ] bi
+    [ '[ @ [ , swap set-nth-unsafe ] keep ] ] reduce ;
+
+MACRO: firstn ( n -- )
+    dup zero? [ drop [ drop ] ] [
+        [ [ '[ , _ nth-unsafe ] ] map ]
+        [ 1- '[ , _ bounds-check 2drop ] ]
+        bi prefix '[ , cleave ]
+    ] if ;
 
 MACRO: npick ( n -- )
     1- dup saver [ dup ] rot [ r> swap ] n*quot 3append ;
@@ -32,7 +38,7 @@ MACRO: ntuck ( n -- )
     2 + [ dupd -nrot ] curry ;
 
 MACRO: nrev ( n -- quot )
-    1 [a,b] [ '[ , -nrot ] ] map concat ;
+    1 [a,b] [ ] [ '[ @ , -nrot ] ] reduce ;
 
 MACRO: ndip ( quot n -- )
     dup saver -rot restorer 3append ;
@@ -44,11 +50,11 @@ MACRO: nkeep ( n -- )
     [ ] [ 1+ ] [ ] tri
     '[ [ , ndup ] dip , -nrot , nslip ] ;
 
-MACRO: ncurry ( n -- ) [ curry ] n*quot ;
+MACRO: ncurry ( n -- )
+    [ curry ] n*quot ;
 
-MACRO:: nwith ( quot n -- )
-    [let | n' [ n 1+ ] |
-        [ n' -nrot [ n' nrot quot call ] n ncurry ] ] ;
+MACRO: nwith ( n -- )
+    [ with ] n*quot ;
 
 MACRO: napply ( n -- )
     2 [a,b]

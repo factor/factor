@@ -1,14 +1,13 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.accessors alien.c-types arrays cpu.ppc.assembler
-cpu.ppc.architecture cpu.ppc.allot cpu.architecture kernel
-kernel.private math math.private namespaces sequences words
-generic quotations byte-arrays hashtables hashtables.private
-generator generator.registers generator.fixup sequences.private
-sbufs vectors system layouts math.floats.private
-classes classes.tuple classes.tuple.private sbufs.private
-vectors.private strings.private slots.private combinators
-compiler.constants ;
+USING: accessors alien alien.accessors alien.c-types arrays
+cpu.ppc.assembler cpu.ppc.architecture cpu.ppc.allot
+cpu.architecture kernel kernel.private math math.private
+namespaces sequences words generic quotations byte-arrays
+hashtables hashtables.private generator generator.registers
+generator.fixup sequences.private sbufs vectors system layouts
+math.floats.private classes slots.private combinators
+compiler.constants optimizer.allot ;
 IN: cpu.ppc.intrinsics
 
 : %slot-literal-known-tag
@@ -445,38 +444,33 @@ IN: cpu.ppc.intrinsics
     ! Store tagged ptr in reg
     "tuple" get tuple %store-tagged
 ] H{
-    { +input+ { { [ tuple-layout? ] "layout" } } }
+    { +input+ { { [ ] "layout" } } }
     { +scratch+ { { f "tuple" } } }
     { +output+ { "tuple" } }
 } define-intrinsic
 
-\ <array> [
+\ (array) [
     array "n" get 2 + cells %allot
     ! Store length
     "n" operand 12 LI
     12 11 cell STW
-    ! Store initial element
-    "n" get [ "initial" operand 11 rot 2 + cells STW ] each
     ! Store tagged ptr in reg
     "array" get object %store-tagged
 ] H{
-    { +input+ { { [ inline-array? ] "n" } { f "initial" } } }
+    { +input+ { { [ ] "n" } } }
     { +scratch+ { { f "array" } } }
     { +output+ { "array" } }
 } define-intrinsic
 
-\ <byte-array> [
+\ (byte-array) [
     byte-array "n" get 2 cells + %allot
     ! Store length
     "n" operand 12 LI
     12 11 cell STW
-    ! Store initial element
-    0 12 LI
-    "n" get cell align cell /i [ 12 11 rot 2 + cells STW ] each
     ! Store tagged ptr in reg
     "array" get object %store-tagged
 ] H{
-    { +input+ { { [ inline-array? ] "n" } } }
+    { +input+ { { [ ] "n" } } }
     { +scratch+ { { f "array" } } }
     { +output+ { "array" } }
 } define-intrinsic

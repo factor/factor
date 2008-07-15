@@ -346,11 +346,9 @@ HELP: tuple
 $nl
 "Tuple classes have additional word properties:"
 { $list
-    { { $snippet "\"constructor\"" } " - a word for creating instances of this tuple class" }
     { { $snippet "\"predicate\"" } " - a quotation which tests if the top of the stack is an instance of this tuple class" }
     { { $snippet "\"slots\"" } " - a sequence of " { $link slot-spec } " instances" }
-    { { $snippet "\"slot-names\"" } " - a sequence of strings naming the tuple's slots" }
-    { { $snippet "\"tuple-size\"" } " - the number of slots" }
+    { { $snippet "\"tuple-layout\"" } " - a " { $link tuple-layout } " instance" }
 } } ;
 
 HELP: define-tuple-predicate

@@ -5,12 +5,10 @@ ui.gadgets.labelled ui.gadgets.presentations
 ui.gadgets.scrollers vocabs tools.test.ui ui ;
 IN: ui.tools.tests
 
+[ f ]
 [
-    [ f ] [
-        0 <model> <gadget> [ set-gadget-model ] keep gadget set
-        <workspace-tabs> gadget-children empty?
-    ] unit-test
-] with-scope
+  <gadget> 0 <model> >>model <workspace-tabs> children>> empty?
+] unit-test
 
 [ ] [ <workspace> "w" set ] unit-test
 [ ] [ "w" get com-scroll-up ] unit-test

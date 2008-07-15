@@ -406,7 +406,7 @@ most-negative-fixnum most-positive-fixnum [a,b]
 
 : convert-mod-to-and ( #call -- node )
     dup
-    dup node-in-d second node-literal 1-
+    dup in-d>> second node-literal 1-
     [ nip bitand ] curry f splice-quot ;
 
 \ mod [
@@ -436,6 +436,19 @@ most-negative-fixnum most-positive-fixnum [a,b]
         [ dup fixnumify-bitand? ]
         [ fixnumify-bitand ]
     }
+} define-optimizers
+
+: convert-*-to-shift? ( #call -- ? )
+    dup in-d>> second node-literal
+    dup integer? [ power-of-2? ] [ drop f ] if ;
+
+: convert-*-to-shift ( #call -- ? )
+    dup dup in-d>> second node-literal log2
+    [ nip fixnum-shift-fast ] curry
+    f splice-quot ;
+
+\ fixnum*fast {
+    { [ dup convert-*-to-shift? ] [ convert-*-to-shift ] }
 } define-optimizers
 
 { + - * / }

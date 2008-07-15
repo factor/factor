@@ -4,8 +4,8 @@ IN: math.ranges
 
 ARTICLE: "ranges" "Ranges"
 
-  "A " { $emphasis "range" } " is a virtual sequence with elements "
-  "ranging from a to b by step."
+  "A " { $emphasis "range" } " is a virtual sequence with real elements "
+  "ranging from " { $emphasis "a" } " to " { $emphasis "b" } " by " { $emphasis "step" } "."
 
   $nl
 

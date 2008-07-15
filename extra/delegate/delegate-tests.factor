@@ -79,3 +79,15 @@ CONSULT: beta hey value>> 1- ;
 [ -1 ] [ 1 <hey> four ] unit-test
 [ ] [ "IN: delegate.tests FORGET: alpha" eval ] unit-test
 [ f ] [ hey \ one method ] unit-test
+
+TUPLE: slot-protocol-test-1 a b ;
+TUPLE: slot-protocol-test-2 < slot-protocol-test-1 { c integer } ;
+
+TUPLE: slot-protocol-test-3 d ;
+
+CONSULT: slot-protocol-test-2 slot-protocol-test-3 d>> ;
+
+[ "a" "b" 5 ] [
+    T{ slot-protocol-test-3 f T{ slot-protocol-test-2 f "a" "b" 5 } }
+    [ a>> ] [ b>> ] [ c>> ] tri
+] unit-test
