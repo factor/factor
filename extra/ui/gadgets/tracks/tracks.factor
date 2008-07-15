@@ -56,9 +56,6 @@ M: track pref-dim*
 : track, ( gadget constraint -- )
     gadget get swap track-add ;
 
-: make-track ( quot orientation -- track )
-    <track> swap make-gadget ; inline
-
 : track-remove ( gadget track -- )
     over [
         [ gadget-children index ] 2keep
