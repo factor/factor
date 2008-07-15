@@ -11,7 +11,6 @@ TYPEDEF: void* CFDictionaryRef
 TYPEDEF: void* CFMutableDictionaryRef
 TYPEDEF: void* CFNumberRef
 TYPEDEF: void* CFBundleRef
-TYPEDEF: void* CFRunLoopRef
 TYPEDEF: void* CFSetRef
 TYPEDEF: void* CFStringRef
 TYPEDEF: void* CFURLRef
@@ -80,9 +79,6 @@ FUNCTION: void CFRelease ( CFTypeRef cf ) ;
 
 FUNCTION: CFTypeID CFGetTypeID ( CFTypeRef cf ) ;
 
-FUNCTION: CFRunLoopRef CFRunLoopGetCurrent ( ) ;
-FUNCTION: CFRunLoopRef CFRunLoopGetMain ( ) ;
-
 : CF>array ( alien -- array )
     dup CFArrayGetCount [ CFArrayGetValueAtIndex ] with map ;
 
@@ -139,4 +135,3 @@ M: f <CFNumber>
         "Cannot load bundled named " prepend throw
     ] ?if ;
 
-: kCFRunLoopDefaultMode "kCFRunLoopDefaultMode" <CFString> ; inline
