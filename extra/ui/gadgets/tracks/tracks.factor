@@ -11,16 +11,16 @@ TUPLE: track < pack sizes ;
     [ sift sum ] keep [ dup [ over / ] when ] map nip ;
 
 : new-track ( orientation class -- track )
-    new-gadget
-        swap >>orientation
-        V{ } clone >>sizes
-        1 >>fill ; inline
+  new-gadget
+    swap       >>orientation
+    V{ } clone >>sizes
+    1          >>fill ; inline
 
 : <track> ( orientation -- track ) track new-track ;
 
 : alloted-dim ( track -- dim )
-    dup gadget-children swap track-sizes { 0 0 }
-    [ [ drop { 0 0 } ] [ pref-dim ] if v+ ] 2reduce ;
+  [ children>> ] [ sizes>> ] bi { 0 0 }
+  [ [ drop { 0 0 } ] [ pref-dim ] if v+ ] 2reduce ;
 
 : available-dim ( track -- dim ) [ dim>> ] [ alloted-dim ] bi v- ;
 
@@ -47,8 +47,7 @@ M: track pref-dim* ( gadget -- dim )
     over track-sizes push swap add-gadget drop ;
 
 : track-add* ( track gadget constraint -- track )
-    pick sizes>> push
-    add-gadget ;
+  pick sizes>> push add-gadget ;
 
 : track-remove ( gadget track -- )
     over [
