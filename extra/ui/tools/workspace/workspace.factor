@@ -60,10 +60,10 @@ M: gadget tool-scroller drop f ;
   request-focus ;
 
 : show-popup ( gadget workspace -- )
-    dup hide-popup
-    2dup set-workspace-popup
-    dupd f track-add
-    request-focus ;
+  dup hide-popup
+  over >>popup
+  over f track-add* drop
+  request-focus ;
 
 : show-titled-popup ( workspace gadget title -- )
     [ find-workspace hide-popup ] <closable-gadget>
