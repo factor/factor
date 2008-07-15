@@ -357,8 +357,6 @@ M: f request-focus-on 2drop ;
 : focus-path ( world -- seq )
     [ focus>> ] follow ;
 
-: g ( -- gadget ) gadget get ;
-
 : with-gadget ( gadget quot -- )
     gadget swap with-variable ; inline
 

@@ -185,12 +185,8 @@ HELP: make-gadget
 { $description "Calls the quotation in a new scope with the gadget stored in the " { $link gadget } " variable." } ;
 
 HELP: with-gadget
-{ $values { "gadget" gadget } { "quot" quotation } } 
-{ $description "Calls the quotation in a new scope with the " { $link gadget } " and " { $link make-gadget } " variables set to " { $snippet "gadget" } ". The quotation can call " { $link g } " to access the gadget." } ;
-
-HELP: g
-{ $values { "gadget" gadget } }
-{ $description "Outputs the gadget being built. Can only be used inside a quotation passed to " { $link with-gadget } "." } ;
+{ $values { "gadget" gadget } { "quot" quotation } }
+{ $description "Calls the quotation in a new scope with the " { $link gadget } " and " { $link make-gadget } " variables set to " { $snippet "gadget" } } ;
 
 { control-value set-control-value gadget-model } related-words
 
