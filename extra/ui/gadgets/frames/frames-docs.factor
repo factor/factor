@@ -8,7 +8,6 @@ ARTICLE: "ui-frame-layout" "Frame layouts"
 "Creating empty frames:"
 { $subsection <frame> }
 "Creating new frames using a combinator:"
-{ $subsection make-frame }
 { $subsection frame, }
 "A set of mnemonic words for the positions on a frame's 3x3 grid; these words push values which may be passed to " { $link grid-add } " or " { $link frame, } ":"
 { $subsection @center }
@@ -44,15 +43,9 @@ HELP: <frame>
 { $values { "frame" frame } }
 { $description "Creates a new " { $link frame } " for laying out gadgets in a 3x3 grid." } ;
 
-{ <frame> make-frame } related-words
-
-HELP: make-frame
-{ $values { "quot" quotation } { "frame" frame } }
-{ $description "Creates a new frame. The quotation can add children by calling the " { $link frame, } " word." } ;
-
 HELP: frame,
 { $values { "gadget" gadget } { "i" "non-negative integer" } { "j" "non-negative integer" } }
-{ $description "Adds a child gadget at the specified location. This word can only be called inside the quotation passed to " { $link make-frame } "." } ;
+{ $description "Adds a child gadget at the specified location. This word can only be called inside the quotation passed to make-frame." } ;
 
 { grid frame } related-words
 
