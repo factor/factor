@@ -1,14 +1,15 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors io kernel math namespaces
-sequences words math.vectors ui.gadgets ui.gadgets.packs math.geometry.rect ;
+       sequences words math.vectors ui.gadgets ui.gadgets.packs
+       math.geometry.rect fry ;
+
 IN: ui.gadgets.tracks
 
 TUPLE: track < pack sizes ;
 
 : normalized-sizes ( track -- seq )
-    track-sizes
-    [ sift sum ] keep [ dup [ over / ] when ] map nip ;
+  sizes>> dup sift sum '[ dup [ , / ] when ] map ;
 
 : new-track ( orientation class -- track )
   new-gadget
@@ -59,5 +60,4 @@ M: track pref-dim* ( gadget -- dim )
         2drop
     ] if ;
 
-: clear-track ( track -- )
-    V{ } clone over set-track-sizes clear-gadget ;
+: clear-track ( track -- ) V{ } clone >>sizes clear-gadget ;
