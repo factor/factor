@@ -238,10 +238,7 @@ $nl
 "Words such as " { $link track, } " access the gadget through the " { $link gadget } " variable."
 $nl
 "A combinator which stores a gadget in the " { $link gadget } " variable:"
-{ $subsection with-gadget }
-"The following words access the " { $link gadget } " variable; they can be used from " { $link with-gadget } " to store child gadgets in tuple slots:"
-{ $subsection g }
- ;
+{ $subsection with-gadget } ;
 
 ARTICLE: "ui-null-layout" "Manual layouts"
 "When automatic layout is not appropriate, gadgets can be added to a parent with no layout policy, and then positioned and sized manually:"
