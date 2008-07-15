@@ -16,8 +16,7 @@ TUPLE: track < pack sizes ;
         V{ } clone >>sizes
         1 >>fill ; inline
 
-: <track> ( orientation -- track )
-    track new-track ;
+: <track> ( orientation -- track ) track new-track ;
 
 : alloted-dim ( track -- dim )
     dup gadget-children swap track-sizes { 0 0 }
@@ -29,21 +28,20 @@ TUPLE: track < pack sizes ;
     dup available-dim over gadget-children rot normalized-sizes
     [ [ over n*v ] [ pref-dim ] ?if ] 2map nip ;
 
-M: track layout*
-    dup track-layout pack-layout ;
+M: track layout* ( track -- ) dup track-layout pack-layout ;
 
-: track-pref-dims-1 ( track -- dim )
-    gadget-children pref-dims max-dim ;
+: track-pref-dims-1 ( track -- dim ) children>> pref-dims max-dim ;
 
 : track-pref-dims-2 ( track -- dim )
     dup gadget-children pref-dims swap normalized-sizes
     [ [ v/n ] when* ] 2map max-dim [ >fixnum ] map ;
 
-M: track pref-dim*
-    dup track-pref-dims-1
-    over alloted-dim
-    pick track-pref-dims-2 v+
-    rot gadget-orientation set-axis ;
+M: track pref-dim* ( gadget -- dim )
+   [ track-pref-dims-1                           ]
+   [ [ alloted-dim ] [ track-pref-dims-1 ] bi v+ ]
+   [ orientation>>                               ]
+   tri
+   set-axis ;
 
 : track-add ( gadget track constraint -- )
     over track-sizes push swap add-gadget drop ;
