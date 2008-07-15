@@ -39,8 +39,5 @@ M: frame layout*
     [ rot rect-dim fill-center ] 3keep
     grid-layout ;
 
-: make-frame ( quot -- frame )
-    <frame> swap make-gadget ; inline
-
 : frame, ( gadget i j -- )
     gadget get -rot grid-add ;

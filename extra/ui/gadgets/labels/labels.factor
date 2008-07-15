@@ -64,7 +64,11 @@ M: object >label ;
 M: f >label drop <gadget> ;
 
 : label-on-left ( gadget label -- button )
-    [ >label f track, 1 track, ] { 1 0 } make-track ;
-
+  { 1 0 } <track>
+    swap >label f track-add*
+    swap        1 track-add* ;
+    
 : label-on-right ( label gadget -- button )
-    [ f track, >label 1 track, ] { 1 0 } make-track ;
+  { 1 0 } <track>
+    swap        f track-add*
+    swap >label 1 track-add* ;

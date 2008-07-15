@@ -29,30 +29,22 @@ scroller H{
     { T{ mouse-scroll } [ do-mouse-scroll ] }
 } set-gestures
 
-: viewport, ( child -- )
-    g model>> <viewport>
-    g-> set-scroller-viewport @center frame, ;
-
 : <scroller-model> ( -- model )
     0 0 0 0 <range> 0 0 0 0 <range> 2array <compose> ;
 
-: x-model ( -- model ) g model>> dependencies>> first ;
-
-: y-model ( -- model ) g model>> dependencies>> second ;
-
 : new-scroller ( gadget class -- scroller )
-    new-frame
-        t >>root?
-        <scroller-model> >>model
-         faint-boundary
-    [
-        x-model <x-slider> g-> set-scroller-x @bottom frame,
-        y-model <y-slider> g-> set-scroller-y @right frame,
-        viewport,
-    ] make-gadget ;
+  new-frame
+    t >>root?
+    <scroller-model> >>model
+    faint-boundary
 
-: <scroller> ( gadget -- scroller )
-    scroller new-scroller ;
+    dup model>> dependencies>> first  <x-slider> >>x dup x>> @bottom grid-add*
+    dup model>> dependencies>> second <y-slider> >>y dup y>> @right  grid-add*
+
+    swap over model>> <viewport> >>viewport
+    dup viewport>> @center grid-add* ;
+    
+: <scroller> ( gadget -- scroller ) scroller new-scroller ;
 
 : scroll ( value scroller -- )
     [

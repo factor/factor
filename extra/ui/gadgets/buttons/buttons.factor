@@ -230,5 +230,3 @@ M: radio-control model-changed
     swap
     "toolbar" over class command-map commands>> swap
     [ -rot <command-button> add-gadget ] curry assoc-each ;
-
-: toolbar, ( -- ) g <toolbar> f track, ;
