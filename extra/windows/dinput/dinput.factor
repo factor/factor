@@ -9,20 +9,33 @@ IN: windows.dinput
 
 LIBRARY: dinput
 
-! callback signature: BOOL DIEnumDevicesCallbackW(LPCDIDEVICEINSTANCEW lpddi, LPVOID pvRef);
 TYPEDEF: void* LPDIENUMDEVICESCALLBACKW
-! Callback signature: BOOL DIEnumDevicesBySemanticsCallbackW(LPCDIDEVICEINSTANCEW lpddi, IDirectInputDevice8W* lpdid, DWORD dwFlags, DWORD dwRemaining, LPVOID pvRef);
+: LPDIENUMDEVICESCALLBACKW ( quot -- alien )
+    [ "BOOL" { "LPCDIDEVICEINSTANCEW" "LPVOID" } "stdcall" ]
+    dip alien-callback ; inline
 TYPEDEF: void* LPDIENUMDEVICESBYSEMANTICSCBW
-! Callback signature: BOOL DIConfigureDevicesCallback(IUnknown* lpDDSTarget, LPVOID pvRef);
+: LPDIENUMDEVICESBYSEMANTICSCBW ( quot -- alien )
+    [ "BOOL" { "LPCDIDEVICEINSTANCEW" "IDirectInputDevice8W*" "DWORD" "DWORD" "LPVOID" } "stdcall" ]
+    dip alien-callback ; inline
 TYPEDEF: void* LPDICONFIGUREDEVICESCALLBACK
-! Callback signature: BOOL DIEnumEffectsCallbackW(LPCDIEFFECTINFOW pdei, LPVOID pvRef);
+: LPDICONFIGUREDEVICESCALLBACK ( quot -- alien )
+    [ "BOOL" { "IUnknown*" "LPVOID" } "stdcall" ]
+    dip alien-callback ; inline
 TYPEDEF: void* LPDIENUMEFFECTSCALLBACKW
-! Callback signature: BOOL DIEnumCreatedEffectObjectsCallback(LPDIRECTINPUTEFFECT peff, LPVOID pvRef);
+: LPDIENUMEFFECTSCALLBACKW ( quot -- alien )
+    [ "BOOL" { "LPCDIEFFECTINFOW" "LPVOID" } "stdcall" ]
+    dip alien-callback ; inline
 TYPEDEF: void* LPDIENUMCREATEDEFFECTOBJECTSCALLBACK
-! Callback signature: BOOL DIEnumEffectsInFileCallback(LPCDIFILEEFFECT lpDiFileEf, LPVOID pvRef);
+: LPDIENUMCREATEDEFFECTOBJECTSCALLBACK
+    [ "BOOL" { "LPDIRECTINPUTEFFECT" "LPVOID" } "stdcall" ]
+    dip alien-callback ; inline
 TYPEDEF: void* LPDIENUMEFFECTSINFILECALLBACK
+    [ "BOOL" { "LPCDIFILEEFFECT" "LPVOID" } "stdcall" ]
+    dip alien-callback ; inline
 ! Callback signaature: BOOL DIEnumDeviceObjectsCallback(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID pvRef);
 TYPEDEF: void* LPDIENUMDEVICEOBJECTSCALLBACKW
+    [ "BOOL" { "LPCDIDEVICEOBJECTINSTANCE" "LPVOID" } "stdcall" ]
+    dip alien-callback ; inline
 
 TYPEDEF: DWORD D3DCOLOR
 
