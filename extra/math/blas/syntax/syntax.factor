@@ -31,4 +31,4 @@ M: float-complex-blas-matrix pprint-delims drop \ cmatrix{ \ } ;
 M: double-complex-blas-matrix pprint-delims drop \ zmatrix{ \ } ;
 
 M: blas-vector-base >pprint-sequence ;
-M: blas-matrix-base >pprint-sequence Mrows [ >array ] map ;
+M: blas-matrix-base >pprint-sequence Mrows ;
