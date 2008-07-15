@@ -25,7 +25,7 @@ TUPLE: track < pack sizes ;
 : available-dim ( track -- dim ) [ dim>> ] [ alloted-dim ] bi v- ;
 
 : track-layout ( track -- sizes )
-    dup available-dim over gadget-children rot normalized-sizes
+    [ available-dim ] [ children>> ] [ normalized-sizes ] tri
     [ [ over n*v ] [ pref-dim ] ?if ] 2map nip ;
 
 M: track layout* ( track -- ) dup track-layout pack-layout ;
