@@ -1,4 +1,4 @@
-USING: alien.syntax alien.c-types cocoa core-foundation system
+USING: alien.syntax alien.c-types core-foundation system
 combinators kernel sequences debugger io accessors ;
 IN: iokit
 
@@ -103,34 +103,36 @@ TYPEDEF: int boolean_t
 TYPEDEF: mach_port_t io_object_t
 TYPEDEF: io_object_t io_iterator_t
 TYPEDEF: io_object_t io_registry_entry_t
+TYPEDEF: io_object_t io_service_t
 TYPEDEF: char[128] io_name_t
 TYPEDEF: char[512] io_string_t
+TYPEDEF: kern_return_t IOReturn
 
 TYPEDEF: uint IOOptionBits
 
 : MACH_PORT_NULL 0 ; inline
 : KERN_SUCCESS 0 ; inline
 
-FUNCTION: kern_return_t IOMasterPort ( mach_port_t bootstrap, mach_port_t* master ) ;
+FUNCTION: IOReturn IOMasterPort ( mach_port_t bootstrap, mach_port_t* master ) ;
 
-FUNCTION: NSDictionary* IOServiceMatching ( char* name ) ;
-FUNCTION: NSDictionary* IOServiceNameMatching ( char* name ) ;
-FUNCTION: NSDictionary* IOBSDNameMatching ( char* name ) ;
+FUNCTION: CFDictionaryRef IOServiceMatching ( char* name ) ;
+FUNCTION: CFDictionaryRef IOServiceNameMatching ( char* name ) ;
+FUNCTION: CFDictionaryRef IOBSDNameMatching ( char* name ) ;
 
-FUNCTION: kern_return_t IOObjectRetain ( io_object_t o ) ;
-FUNCTION: kern_return_t IOObjectRelease ( io_object_t o ) ;
+FUNCTION: IOReturn IOObjectRetain ( io_object_t o ) ;
+FUNCTION: IOReturn IOObjectRelease ( io_object_t o ) ;
 
-FUNCTION: kern_return_t IOServiceGetMatchingServices ( mach_port_t master, NSDictionary* matchingDict, io_iterator_t* iterator ) ;
+FUNCTION: IOReturn IOServiceGetMatchingServices ( mach_port_t master, CFDictionaryRef matchingDict, io_iterator_t* iterator ) ;
 
 FUNCTION: io_object_t IOIteratorNext ( io_iterator_t i ) ;
 FUNCTION: void IOIteratorReset ( io_iterator_t i ) ;
 FUNCTION: boolean_t IOIteratorIsValid ( io_iterator_t i ) ;
 
-FUNCTION: kern_return_t IORegistryEntryGetPath ( io_registry_entry_t entry, io_name_t plane, io_string_t path ) ;
+FUNCTION: IOReturn IORegistryEntryGetPath ( io_registry_entry_t entry, io_name_t plane, io_string_t path ) ;
 
-FUNCTION: kern_return_t IORegistryEntryCreateCFProperties ( io_registry_entry_t entry, NSMutableDictionary** properties, CFAllocatorRef allocator, IOOptionBits options ) ;
+FUNCTION: IOReturn IORegistryEntryCreateCFProperties ( io_registry_entry_t entry, CFMutableDictionaryRef properties, CFAllocatorRef allocator, IOOptionBits options ) ;
 
-FUNCTION: char* mach_error_string ( kern_return_t error ) ;
+FUNCTION: char* mach_error_string ( IOReturn error ) ;
 
 TUPLE: mach-error error-code ;
 C: <mach-error> mach-error
