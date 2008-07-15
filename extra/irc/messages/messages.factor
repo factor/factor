@@ -21,7 +21,7 @@ TUPLE: mode < irc-message name channel mode ;
 TUPLE: names-reply < irc-message who = channel ;
 TUPLE: unhandled < irc-message ;
 
-: make-client-message ( command parameters trailing -- irc-message )
+: <irc-client-message> ( command parameters trailing -- irc-message )
     irc-message new now >>timestamp
     [ [ (>>trailing) ] [ (>>parameters) ] [ (>>command) ] tri ] keep ;
 

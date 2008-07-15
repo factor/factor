@@ -209,8 +209,8 @@ M: irc-broadcasted-message handle-incoming-irc ( irc-broadcasted-message -- )
 
 GENERIC: handle-outgoing-irc ( obj -- )
 
-! M: irc-message handle-outgoing-irc ( irc-message -- )
-!    irc-message>string irc-print ;
+M: irc-message handle-outgoing-irc ( irc-message -- )
+    irc-message>client-line irc-print ;
 
 M: privmsg handle-outgoing-irc ( privmsg -- )
     [ name>> ] [ trailing>> ] bi /PRIVMSG ;
