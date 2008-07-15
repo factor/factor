@@ -10,7 +10,6 @@ ARTICLE: "ui-pack-layout" "Pack layouts"
 { $subsection <pile> }
 { $subsection <shelf> }
 "Creating packs using a combinator:"
-{ $subsection make-pile }
 { $subsection make-filled-pile }
 { $subsection make-shelf }
 
@@ -24,7 +23,6 @@ HELP: pack
     { $link <pack> }
     { $link <pile> }
     { $link <shelf> }
-    { $link make-pile }
     { $link make-filled-pile }
     { $link make-shelf }
 }
@@ -63,10 +61,6 @@ HELP: pack-pref-dim
 { $notes
     "This word is useful if you are writing your own layout gadget which inherits from " { $link pack } ". This allows you to reuse layout logic while computing gadget sizes using a custom procedure."
 } ;
-
-HELP: make-pile
-{ $values { "quot" quotation } { "pack" "a new " { $link pack } } }
-{ $description "Creates a new " { $link pack } " which lays out a sequence of gadgets vertically. The quotation can add children by calling the gadget, word." } ;
 
 HELP: make-filled-pile
 { $values { "quot" quotation } { "pack" "a new " { $link pack } } }
