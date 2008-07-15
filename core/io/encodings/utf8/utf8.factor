@@ -11,21 +11,21 @@ SINGLETON: utf8
 <PRIVATE 
 
 : starts-2? ( char -- ? )
-    dup [ -6 shift BIN: 10 number= ] when ;
+    dup [ -6 shift BIN: 10 number= ] when ; inline
 
 : append-nums ( stream byte -- stream char )
     over stream-read1 dup starts-2?
     [ swap 6 shift swap BIN: 111111 bitand bitor ]
-    [ 2drop replacement-char ] if ;
+    [ 2drop replacement-char ] if ; inline
 
 : double ( stream byte -- stream char )
-    BIN: 11111 bitand append-nums ;
+    BIN: 11111 bitand append-nums ; inline
 
 : triple ( stream byte -- stream char )
-    BIN: 1111 bitand append-nums append-nums ;
+    BIN: 1111 bitand append-nums append-nums ; inline
 
 : quad ( stream byte -- stream char )
-    BIN: 111 bitand append-nums append-nums append-nums ;
+    BIN: 111 bitand append-nums append-nums append-nums ; inline
 
 : begin-utf8 ( stream byte -- stream char )
     {
@@ -34,10 +34,10 @@ SINGLETON: utf8
         { [ dup -4 shift BIN: 1110 number= ] [ triple ] }
         { [ dup -3 shift BIN: 11110 number= ] [ quad ] }
         [ drop replacement-char ]
-    } cond ;
+    } cond ; inline
 
 : decode-utf8 ( stream -- char/f )
-    dup stream-read1 dup [ begin-utf8 ] when nip ;
+    dup stream-read1 dup [ begin-utf8 ] when nip ; inline
 
 M: utf8 decode-char
     drop decode-utf8 ;

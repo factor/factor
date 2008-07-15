@@ -170,3 +170,6 @@ SYMBOL: fast-math-ops
 
 : each-derived-op ( word quot -- )
     >r derived-ops r> each ; inline
+
+: each-fast-derived-op ( word quot -- )
+    >r fast-derived-ops r> each ; inline

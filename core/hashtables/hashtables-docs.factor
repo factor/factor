@@ -93,11 +93,6 @@ HELP: hash-deleted+
 { $description "Called to increment the deleted entry counter when an entry is removed with " { $link delete-at } }
 { $side-effects "hash" } ;
 
-HELP: (set-hash)
-{ $values { "value" "a value" } { "key" "a key to add" } { "hash" hashtable } { "new?" "a boolean" } }
-{ $description "Stores the key/value pair into the hashtable. This word does not grow the hashtable if it exceeds capacity, therefore a hang can result. User code should use " { $link set-at } " instead, which grows the hashtable if necessary." }
-{ $side-effects "hash" } ;
-
 HELP: grow-hash
 { $values { "hash" hashtable } }
 { $description "Enlarges the capacity of a hashtable. User code does not need to call this word directly." }

@@ -9,16 +9,8 @@ TUPLE: float-array
 { length array-capacity read-only }
 { underlying byte-array read-only } ;
 
-<PRIVATE
-
-: floats>bytes 8 * ; inline
-
-: float-array@ underlying>> swap >fixnum floats>bytes ; inline
-
-PRIVATE>
-
 : <float-array> ( n -- float-array )
-    dup floats>bytes <byte-array> float-array boa ; inline
+    dup "double" <c-array> float-array boa ; inline
 
 M: float-array clone
     [ length>> ] [ underlying>> clone ] bi float-array boa ;
@@ -26,13 +18,13 @@ M: float-array clone
 M: float-array length length>> ;
 
 M: float-array nth-unsafe
-    float-array@ alien-double ;
+    underlying>> double-nth ;
 
 M: float-array set-nth-unsafe
-    [ >float ] 2dip float-array@ set-alien-double ;
+    [ >float ] 2dip underlying>> set-double-nth ;
 
 : >float-array ( seq -- float-array )
-    T{ float-array f 0 B{ } } clone-like ; inline
+    T{ float-array } clone-like ; inline
 
 M: float-array like
     drop dup float-array? [ >float-array ] unless ;
@@ -45,7 +37,7 @@ M: float-array equal?
 
 M: float-array resize
     [ drop ] [
-        [ floats>bytes ] [ underlying>> ] bi*
+        [ "double" heap-size * ] [ underlying>> ] bi*
         resize-byte-array
     ] 2bi
     float-array boa ;
@@ -58,13 +50,13 @@ INSTANCE: float-array sequence
     1 <float-array> [ set-first ] keep ; flushable
 
 : 2float-array ( x y -- array )
-    T{ float-array f 0 B{ } } 2sequence ; flushable
+    T{ float-array } 2sequence ; flushable
 
 : 3float-array ( x y z -- array )
-    T{ float-array f 0 B{ } } 3sequence ; flushable
+    T{ float-array } 3sequence ; flushable
 
 : 4float-array ( w x y z -- array )
-    T{ float-array f 0 B{ } } 4sequence ; flushable
+    T{ float-array } 4sequence ; flushable
 
 : F{ ( parsed -- parsed )
     \ } [ >float-array ] parse-literal ; parsing
@@ -72,3 +64,20 @@ INSTANCE: float-array sequence
 M: float-array pprint-delims drop \ F{ \ } ;
 
 M: float-array >pprint-sequence ;
+
+USING: hints math.vectors arrays ;
+
+HINTS: vneg { float-array } { array } ;
+HINTS: v*n { float-array object } { array object } ;
+HINTS: v/n { float-array object } { array object } ;
+HINTS: n/v { object float-array } { object array } ;
+HINTS: v+ { float-array float-array } { array array } ;
+HINTS: v- { float-array float-array } { array array } ;
+HINTS: v* { float-array float-array } { array array } ;
+HINTS: v/ { float-array float-array } { array array } ;
+HINTS: vmax { float-array float-array } { array array } ;
+HINTS: vmin { float-array float-array } { array array } ;
+HINTS: v. { float-array float-array } { array array } ;
+HINTS: norm-sq { float-array } { array } ;
+HINTS: norm { float-array } { array } ;
+HINTS: normalize { float-array } { array } ;

@@ -4,27 +4,26 @@ USING: splitting grouping classes.tuple classes math kernel
 sequences arrays accessors ;
 IN: tuple-arrays
 
-TUPLE: tuple-array seq class ;
+TUPLE: tuple-array { seq read-only } { class read-only } ;
 
-: <tuple-array> ( length example -- tuple-array )
-    [ tuple>array length 1- [ * { } new-sequence ] keep <sliced-groups> ]
-    [ class ] bi tuple-array boa ;
+: <tuple-array> ( length class -- tuple-array )
+    [
+        new tuple>array 1 tail
+        [ <repetition> concat ] [ length ] bi <sliced-groups>
+    ] [ ] bi tuple-array boa ;
 
 M: tuple-array nth
     [ seq>> nth ] [ class>> ] bi prefix >tuple ;
 
-: deconstruct ( tuple -- seq )
-    tuple>array 1 tail ;
-
 M: tuple-array set-nth ( elt n seq -- )
-    >r >r deconstruct r> r> seq>> set-nth ;
+    >r >r tuple>array 1 tail r> r> seq>> set-nth ;
 
 M: tuple-array new-sequence
-    class>> new <tuple-array> ;
+    class>> <tuple-array> ;
 
-: >tuple-array ( seq -- tuple-array/seq )
+: >tuple-array ( seq -- tuple-array )
     dup empty? [
-        0 over first <tuple-array> clone-like
+        0 over first class <tuple-array> clone-like
     ] unless ;
 
 M: tuple-array like 

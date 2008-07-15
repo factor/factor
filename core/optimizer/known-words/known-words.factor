@@ -1,15 +1,15 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien arrays generic hashtables definitions
-inference.dataflow inference.state inference.class kernel assocs
-math math.order math.private kernel.private sequences words
-parser vectors strings sbufs io namespaces assocs quotations
-sequences.private io.binary io.streams.string layouts splitting
-math.intervals math.floats.private classes.tuple classes.predicate
-classes.tuple.private classes classes.algebra optimizer.def-use
-optimizer.backend optimizer.pattern-match optimizer.inlining
-sequences.private combinators byte-arrays byte-vectors
-slots.private ;
+kernel assocs math math.order math.private kernel.private
+sequences words parser vectors strings sbufs io namespaces
+assocs quotations sequences.private io.binary io.streams.string
+layouts splitting math.intervals math.floats.private
+classes.tuple classes.predicate classes.tuple.private classes
+classes.algebra sequences.private combinators byte-arrays
+byte-vectors slots.private inference.dataflow inference.state
+inference.class optimizer.def-use optimizer.backend
+optimizer.pattern-match optimizer.inlining optimizer.allot ;
 IN: optimizer.known-words
 
 { <tuple> <tuple-boa> (tuple) } [
@@ -24,37 +24,6 @@ IN: optimizer.known-words
     dup node-in-d peek node-literal
     dup class? [ drop tuple ] unless 1array f
 ] "output-classes" set-word-prop
-
-! if the input to new is a literal tuple class, we can expand it
-: literal-new? ( #call -- ? )
-    dup in-d>> first node-literal tuple-class? ;
-
-: new-quot ( class -- quot )
-    dup all-slots 1 tail ! delegate slot
-    [ [ initial>> literalize , ] each literalize , \ boa , ] [ ] make ;
-
-: expand-new ( #call -- node )
-    dup dup in-d>> first node-literal
-    [ +inlined+ depends-on ] [ new-quot ] bi
-    f splice-quot ;
-
-\ new {
-    { [ dup literal-new? ] [ expand-new ] }
-} define-optimizers
-
-: tuple-boa-quot ( layout -- quot )
-    [ (tuple) ]
-    swap size>> 1 - [ 3 + ] map <reversed>
-    [ [ set-slot ] curry [ keep ] curry ] map concat
-    [ f over 2 set-slot ]
-    3append ;
-
-: expand-tuple-boa ( #call -- node )
-    dup in-d>> peek value-literal tuple-boa-quot f splice-quot ;
-
-\ <tuple-boa> {
-    { [ t ] [ expand-tuple-boa ] }
-} define-optimizers
 
 ! the output of clone has the same type as the input
 { clone (clone) } [

@@ -138,10 +138,11 @@ M: elevator layout*
     [ swap find-slider slide-by-line ] curry <repeat-button>
     [ set-gadget-orientation ] keep ;
 
-: elevator, ( orientation -- )
-    dup <elevator> g-> set-slider-elevator
-    swap <thumb> g-> set-slider-thumb over add-gadget
-    @center frame, ;
+: elevator, ( gadget orientation -- gadget )
+  tuck <elevator> >>elevator
+  swap <thumb>    >>thumb
+  dup elevator>> over thumb>> add-gadget
+  @center grid-add* ;
 
 : <left-button> ( -- button )
     { 0 1 } arrow-left -1 <slide-button> ;
@@ -149,25 +150,11 @@ M: elevator layout*
 : <right-button> ( -- button )
     { 0 1 } arrow-right 1 <slide-button> ;
 
-: build-x-slider ( slider -- slider )
-    [
-        <left-button> @left frame,
-        { 0 1 } elevator,
-        <right-button> @right frame,
-    ] make-gadget ; inline
-
 : <up-button> ( -- button )
     { 1 0 } arrow-up -1 <slide-button> ;
 
 : <down-button> ( -- button )
     { 1 0 } arrow-down 1 <slide-button> ;
-
-: build-y-slider ( slider -- slider )
-    [
-        <up-button> @top frame,
-        { 1 0 } elevator,
-        <down-button> @bottom frame,
-    ] make-gadget ; inline
 
 : <slider> ( range orientation -- slider )
     slider new-frame
@@ -176,10 +163,16 @@ M: elevator layout*
         32 >>line ;
 
 : <x-slider> ( range -- slider )
-    { 1 0 } <slider> build-x-slider ;
+  { 1 0 } <slider>
+    <left-button> @left grid-add*
+    { 0 1 } elevator,
+    <right-button> @right grid-add* ;
 
 : <y-slider> ( range -- slider )
-    { 0 1 } <slider> build-y-slider ;
+  { 0 1 } <slider>
+    <up-button> @top grid-add*
+    { 1 0 } elevator,
+    <down-button> @bottom grid-add* ;
 
 M: slider pref-dim*
     dup call-next-method

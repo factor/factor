@@ -47,12 +47,12 @@ search-field H{
     { T{ key-down f f "RET" } [ find-search-list invoke-value-action ] }
 } set-gestures
 
-: <search-model> ( producer -- model )
-    >r g live-search-field gadget-model
+: <search-model> ( live-search producer -- live-search filter )
+    >r dup field>> model>>                   ! live-search model :: producer
     ui-running? [ 1/5 seconds <delay> ] when
     [ "\n" join ] r> append <filter> ;
 
-: <search-list> ( seq limited? presenter -- gadget )
+: <search-list> ( live-search seq limited? presenter -- live-search list )
     >r
     [ limited-completions ] [ completions ] ? curry
     <search-model>
@@ -60,14 +60,15 @@ search-field H{
     swap <list> ;
 
 : <live-search> ( string seq limited? presenter -- gadget )
-    { 0 1 } live-search new-track
-    [
-        <search-field> g-> set-live-search-field f track,
-        <search-list> g-> set-live-search-list
-        <scroller> 1 track,
-    ] make-gadget
-    [ live-search-field set-editor-string ] keep
-    [ live-search-field end-of-document ] keep ;
+  { 0 1 } live-search new-track
+    <search-field> >>field
+    dup field>> f track-add*
+    -roll <search-list> >>list
+    dup list>> <scroller> 1 track-add*
+
+  swap                         
+    over field>> set-editor-string
+  dup field>> end-of-document ;
 
 M: live-search focusable-child* live-search-field ;
 

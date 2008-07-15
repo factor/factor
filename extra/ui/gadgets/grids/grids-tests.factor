@@ -1,5 +1,5 @@
 USING: ui.gadgets ui.gadgets.grids tools.test kernel arrays
-namespaces ;
+namespaces math.geometry.rect ;
 IN: ui.gadgets.grids.tests
 
 [ { 0 0 } ] [ { } <grid> pref-dim ] unit-test

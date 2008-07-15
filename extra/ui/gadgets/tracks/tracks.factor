@@ -47,7 +47,11 @@ M: track pref-dim*
     rot gadget-orientation set-axis ;
 
 : track-add ( gadget track constraint -- )
-    over track-sizes push add-gadget ;
+    over track-sizes push swap add-gadget drop ;
+
+: track-add* ( track gadget constraint -- track )
+    pick sizes>> push
+    add-gadget ;
 
 : track, ( gadget constraint -- )
     gadget get swap track-add ;

@@ -4,10 +4,11 @@ USING: accessors kernel sets namespaces sequences summary parser
 lexer combinators words classes.parser classes.tuple arrays ;
 IN: classes.tuple.parser
 
+: slot-names ( slots -- seq )
+    [ dup array? [ first ] when ] map ;
+
 : shadowed-slots ( superclass slots -- shadowed )
-    [ all-slots [ name>> ] map ]
-    [ [ dup array? [ first ] when ] map ]
-    bi* intersect ;
+    [ all-slots [ name>> ] map ] [ slot-names ] bi* intersect ;
 
 : check-slot-shadowing ( class superclass slots -- )
     shadowed-slots [
@@ -20,11 +21,19 @@ IN: classes.tuple.parser
         ] "" make note.
     ] with each ;
 
+ERROR: duplicate-slot-names names ;
+
+M: duplicate-slot-names summary
+    drop "Duplicate slot names" ;
+
+: check-duplicate-slots ( slots -- )
+    slot-names duplicates
+    dup empty? [ drop ] [ duplicate-slot-names ] if ;
+
 ERROR: invalid-slot-name name ;
 
 M: invalid-slot-name summary
-    drop
-    "Invalid slot name" ;
+    drop "Invalid slot name" ;
 
 : parse-long-slot-name ( -- )
     [ scan , \ } parse-until % ] { } make ;
@@ -38,7 +47,7 @@ M: invalid-slot-name summary
     #! : ...
     {
         { [ dup not ] [ unexpected-eof ] }
-        { [ dup { ":" "(" "<" "\"" } member? ] [ invalid-slot-name ] }
+        { [ dup { ":" "(" "<" "\"" "!" } member? ] [ invalid-slot-name ] }
         { [ dup ";" = ] [ drop f ] }
         [ dup "{" = [ drop parse-long-slot-name ] when , t ]
     } cond ;
@@ -52,4 +61,6 @@ M: invalid-slot-name summary
         { ";" [ tuple f ] }
         { "<" [ scan-word [ parse-tuple-slots ] { } make ] }
         [ tuple swap [ parse-slot-name [ parse-tuple-slots ] when ] { } make ]
-    } case 3dup check-slot-shadowing ;
+    } case
+    dup check-duplicate-slots
+    3dup check-slot-shadowing ;

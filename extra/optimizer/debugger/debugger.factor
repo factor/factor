@@ -1,10 +1,10 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes inference inference.dataflow io kernel
-kernel.private math.parser namespaces optimizer prettyprint
-prettyprint.backend sequences words arrays match macros
-assocs sequences.private optimizer.specializers generic
-combinators sorting math quotations accessors ;
+USING: classes io kernel kernel.private math.parser namespaces
+optimizer prettyprint prettyprint.backend sequences words arrays
+match macros assocs sequences.private generic combinators
+sorting math quotations accessors inference inference.dataflow
+optimizer.specializers ;
 IN: optimizer.debugger
 
 ! A simple tool for turning dataflow IR into quotations, for
@@ -47,24 +47,29 @@ MATCH-VARS: ?a ?b ?c ;
 
 : pretty-shuffle ( in out -- word/f )
     2array {
-        { { { ?a } { } } drop }
-        { { { ?a ?b } { } } 2drop }
-        { { { ?a ?b ?c } { } } 3drop }
-        { { { ?a } { ?a ?a } } dup }
-        { { { ?a ?b } { ?a ?b ?a ?b } } 2dup }
-        { { { ?a ?b ?c } { ?a ?b ?c ?a ?b ?c } } 3dup }
-        { { { ?a ?b } { ?a ?b ?a } } over }
-        { { { ?b ?a } { ?a ?b } } swap }
-        { { { ?a ?b ?c } { ?a ?b ?c ?a } } pick }
-        { { { ?a ?b ?c } { ?c ?a ?b } } -rot }
-        { { { ?a ?b ?c } { ?b ?c ?a } } rot }
-        { { { ?a ?b } { ?b } } nip }
+        { { { ?a } { ?a } } [ ] }
+        { { { ?a ?b } { ?a ?b } } [ ] }
+        { { { ?a ?b ?c } { ?a ?b ?c } } [ ] }
+        { { { ?a } { } } [ drop ] }
+        { { { ?a ?b } { } } [ 2drop ] }
+        { { { ?a ?b ?c } { } } [ 3drop ] }
+        { { { ?a } { ?a ?a } } [ dup ] }
+        { { { ?a ?b } { ?a ?b ?a ?b } } [ 2dup ] }
+        { { { ?a ?b ?c } { ?a ?b ?c ?a ?b ?c } } [ 3dup ] }
+        { { { ?a ?b } { ?a ?b ?a } } [ over ] }
+        { { { ?b ?a } { ?a ?b } } [ swap ] }
+        { { { ?a ?b } { ?b ?a ?b } } [ tuck ] }
+        { { { ?a ?b ?c } { ?a ?b ?c ?a } } [ pick ] }
+        { { { ?a ?b ?c } { ?c ?a ?b } } [ -rot ] }
+        { { { ?a ?b ?c } { ?b ?c ?a } } [ rot ] }
+        { { { ?a ?b } { ?b } } [ nip ] }
+        { { { ?a ?b ?c } { ?c } } [ 2nip ] }
         { _ f }
     } match-choose ;
 
 M: #shuffle node>quot
     dup [ in-d>> ] [ out-d>> ] bi pretty-shuffle
-    [ , ] [ >r drop t r> ] if*
+    [ % ] [ >r drop t r> ] if*
     dup effect-str "#shuffle: " prepend comment, ;
 
 : pushed-literals ( node -- seq )

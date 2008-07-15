@@ -129,7 +129,11 @@ GENERIC: infer-classes-before ( node -- )
 
 GENERIC: infer-classes-around ( node -- )
 
+GENERIC: infer-classes-after ( node -- )
+
 M: node infer-classes-before drop ;
+
+M: node infer-classes-after drop ;
 
 M: node child-constraints
     children>> length
@@ -203,10 +207,18 @@ M: pair constraint-satisfied?
     [ ] [ param>> "default-output-classes" word-prop ] ?if
     r> ;
 
-M: #call infer-classes-before
-    [ compute-constraints ] keep
-    [ output-classes ] [ out-d>> ] bi
+: intersect-values ( classes intervals values -- )
     tuck [ intersect-classes ] [ intersect-intervals ] 2bi* ;
+
+M: #call infer-classes-before
+    [ compute-constraints ]
+    [ [ output-classes ] [ out-d>> ] bi intersect-values ] bi ;
+
+: input-classes ( #call -- classes )
+    param>> "input-classes" word-prop ;
+
+M: #call infer-classes-after
+    [ input-classes ] [ in-d>> ] bi intersect-classes ;
 
 M: #push infer-classes-before
     out-d>> [ [ value-literal ] keep set-value-literal* ] each ;
@@ -340,6 +352,7 @@ M: object infer-classes-around
     {
         [ infer-classes-before ]
         [ annotate-node ]
+        [ infer-classes-after ]
         [ infer-children ]
         [ merge-children ]
     } cleave ;

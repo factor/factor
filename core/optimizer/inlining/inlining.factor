@@ -2,12 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays generic assocs inference inference.class
 inference.dataflow inference.backend inference.state io kernel
-math namespaces sequences vectors words quotations hashtables
-combinators classes classes.algebra generic.math
-optimizer.math.partial continuations optimizer.def-use
-optimizer.backend generic.standard optimizer.specializers
-optimizer.def-use optimizer.pattern-match generic.standard
-optimizer.control kernel.private definitions sets ;
+math math.order namespaces sequences vectors words quotations
+hashtables combinators effects classes classes.union
+classes.algebra generic.math optimizer.math.partial
+continuations optimizer.def-use optimizer.backend
+generic.standard optimizer.specializers optimizer.def-use
+optimizer.pattern-match generic.standard optimizer.control
+kernel.private definitions sets summary ;
 IN: optimizer.inlining
 
 : remember-inlining ( node history -- )
@@ -31,9 +32,9 @@ DEFER: (flat-length)
 : word-flat-length ( word -- n )
     {
         ! not inline
-        { [ dup inline? not ] [ drop 0 ] }
+        { [ dup inline? not ] [ drop 1 ] }
         ! recursive and inline
-        { [ dup recursive-calls get key? ] [ drop 4 ] }
+        { [ dup recursive-calls get key? ] [ drop 10 ] }
         ! inline
         [ [ recursive-calls get conjoin ] [ def>> (flat-length) ] bi ]
     } cond ;
@@ -41,7 +42,7 @@ DEFER: (flat-length)
 : (flat-length) ( seq -- n )
     [
         {
-            { [ dup quotation? ] [ (flat-length) 1+ ] }
+            { [ dup quotation? ] [ (flat-length) 2 + ] }
             { [ dup array? ] [ (flat-length) ] }
             { [ dup word? ] [ word-flat-length ] }
             [ drop 0 ]
@@ -51,7 +52,7 @@ DEFER: (flat-length)
 : flat-length ( word -- n )
     H{ } clone recursive-calls [
         [ recursive-calls get conjoin ]
-        [ def>> (flat-length) ]
+        [ def>> (flat-length) 5 /i ]
         bi
     ] with-variable ;
 
@@ -102,7 +103,7 @@ DEFER: (flat-length)
     [ f splice-quot ] [ 2drop t ] if ;
 
 : inline-method ( #call -- node )
-    dup node-param {
+    dup param>> {
         { [ dup standard-generic? ] [ inline-standard-method ] }
         { [ dup math-generic? ] [ inline-math-method ] }
         { [ dup math-partial? ] [ inline-math-partial ] }
@@ -155,15 +156,35 @@ DEFER: (flat-length)
     (optimize-predicate) optimize-check ;
 
 : flush-eval? ( #call -- ? )
-    dup node-param "flushable" word-prop [
-        node-out-d [ unused? ] all?
-    ] [
-        drop f
-    ] if ;
+    dup node-param "flushable" word-prop
+    [ node-out-d [ unused? ] all? ] [ drop f ] if ;
+
+ERROR: flushed-eval-error word ;
+
+M: flushed-eval-error summary
+    drop "Flushed evaluation of word would have thrown an error" ;
+
+: flushed-eval-quot ( #call -- quot )
+    #! A quotation to replace flushed evaluations with. We can't
+    #! just remove the code altogether, because if the optimizer
+    #! knows the input types of a word, it assumes the inputs are
+    #! of this type after the word returns, since presumably
+    #! the word would have checked input types itself. However,
+    #! if the word gets flushed, then it won't do this checking;
+    #! so we have to do it here.
+    [
+        dup param>> "input-classes" word-prop [
+            make-specializer %
+            [ dup param>> literalize , \ flushed-eval-error , ] [ ] make ,
+            \ unless ,
+        ] when*
+        dup in-d>> length [ \ drop , ] times
+        out-d>> length [ f , ] times
+    ] [ ] make ;
 
 : flush-eval ( #call -- node )
-    dup node-param +inlined+ depends-on
-    dup node-out-d length f <repetition> inline-literals ;
+    dup param>> +inlined+ depends-on
+    dup flushed-eval-quot f splice-quot ;
 
 : partial-eval? ( #call -- ? )
     dup node-param "foldable" word-prop [
@@ -195,13 +216,28 @@ DEFER: (flat-length)
     [ drop +inlined+ depends-on ] [ swap 1array ] 2bi
     splice-quot ;
 
+: classes-known? ( #call -- ? )
+    node-input-classes [
+        [ class-types length 1 = ]
+        [ union-class? not ]
+        bi and
+    ] contains? ;
+
+: inlining-rank ( #call -- n )
+    {
+        [ param>> flat-length 24 swap [-] 4 /i ]
+        [ param>> "default" word-prop -4 0 ? ]
+        [ param>> "specializer" word-prop 1 0 ? ]
+        [ param>> method-body? 1 0 ? ]
+        [ classes-known? 2 0 ? ]
+    } cleave + + + + ;
+
+: should-inline? ( #call -- ? )
+    inlining-rank 5 >= ;
+
 : optimistic-inline? ( #call -- ? )
-    dup node-param "specializer" word-prop dup [
-        >r node-input-classes r> specialized-length tail*
-        [ class-types length 1 = ] all?
-    ] [
-        2drop f
-    ] if ;
+    dup param>> "specializer" word-prop
+    [ should-inline? ] [ drop f ] if ;
 
 : already-inlined? ( #call -- ? )
     [ param>> ] [ history>> ] bi memq? ;
@@ -211,11 +247,8 @@ DEFER: (flat-length)
         dup param>> dup def>> splice-word-def
     ] if ;
 
-: should-inline? ( word -- ? )
-    flat-length 11 <= ;
-
 : method-body-inline? ( #call -- ? )
-    param>> dup [ method-body? ] [ "default" word-prop not ] bi and
+    dup param>> method-body?
     [ should-inline? ] [ drop f ] if ;
 
 M: #call optimize-node*

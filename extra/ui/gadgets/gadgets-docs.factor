@@ -180,25 +180,17 @@ HELP: focusable-child
 { $values { "gadget" gadget } { "child" gadget } }
 { $description "Outputs the child of the gadget which would prefer to receive keyboard focus." } ;
 
-HELP: gadget,
-{ $values { "gadget" gadget } }
-{ $description "Adds a new child to the gadget being constructed. This word can only be used from a quotation passed to " { $link make-gadget } "." } ;
-
 HELP: make-gadget
 { $values { "gadget" gadget } { "quot" quotation } }
 { $description "Calls the quotation in a new scope with the gadget stored in the " { $link gadget } " variable." } ;
 
 HELP: with-gadget
 { $values { "gadget" gadget } { "quot" quotation } } 
-{ $description "Calls the quotation in a new scope with the " { $link gadget } " and " { $link make-gadget } " variables set to " { $snippet "gadget" } ". The quotation can call " { $link g } " and " { $link g-> } " to access the gadget." } ;
+{ $description "Calls the quotation in a new scope with the " { $link gadget } " and " { $link make-gadget } " variables set to " { $snippet "gadget" } ". The quotation can call " { $link g } " to access the gadget." } ;
 
 HELP: g
 { $values { "gadget" gadget } }
 { $description "Outputs the gadget being built. Can only be used inside a quotation passed to " { $link with-gadget } "." } ;
-
-HELP: g->
-{ $values { "x" object } { "gadget" gadget } }
-{ $description "Duplicates the top of the stack and outputs the gadget being built. Can only be used inside a quotation passed to " { $link with-gadget } "." } ;
 
 { control-value set-control-value gadget-model } related-words
 

@@ -119,6 +119,7 @@ SYMBOL: jit-primitive
 SYMBOL: jit-word-jump
 SYMBOL: jit-word-call
 SYMBOL: jit-push-literal
+SYMBOL: jit-push-immediate
 SYMBOL: jit-if-word
 SYMBOL: jit-if-jump
 SYMBOL: jit-dispatch-word
@@ -149,6 +150,7 @@ SYMBOL: undefined-quot
         { jit-epilog 33 }
         { jit-return 34 }
         { jit-profiling 35 }
+        { jit-push-immediate 36 }
         { jit-declare-word 42 }
         { undefined-quot 60 }
     } at header-size + ;
@@ -438,6 +440,7 @@ M: quotation '
         jit-word-jump
         jit-word-call
         jit-push-literal
+        jit-push-immediate
         jit-if-word
         jit-if-jump
         jit-dispatch-word

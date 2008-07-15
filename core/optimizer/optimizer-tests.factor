@@ -375,3 +375,19 @@ PREDICATE: list < improper-list
 [ 2 3 ] [ 2 interval-inference-bug ] unit-test
 [ 1 4 ] [ 1 interval-inference-bug ] unit-test
 [ 0 5 ] [ 0 interval-inference-bug ] unit-test
+
+: aggressive-flush-regression ( a -- b )
+    f over >r <array> drop r> 1 + ;
+
+[ 1.0 aggressive-flush-regression drop ] must-fail
+
+[ 1 [ "hi" + drop ] compile-call ] must-fail
+
+[ "hi" f [ <array> drop ] compile-call ] must-fail
+
+TUPLE: some-tuple x ;
+
+: allot-regression ( a -- b )
+    [ ] curry some-tuple boa ;
+
+[ T{ some-tuple f [ 3 ] } ] [ 3 allot-regression ] unit-test
