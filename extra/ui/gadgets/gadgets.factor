@@ -357,9 +357,6 @@ M: f request-focus-on 2drop ;
 : focus-path ( world -- seq )
     [ focus>> ] follow ;
 
-: with-gadget ( gadget quot -- )
-    gadget swap with-variable ; inline
-
 ! Deprecated
 : set-gadget-delegate ( gadget tuple -- )
     over [

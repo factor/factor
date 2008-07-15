@@ -180,10 +180,6 @@ HELP: focusable-child
 { $values { "gadget" gadget } { "child" gadget } }
 { $description "Outputs the child of the gadget which would prefer to receive keyboard focus." } ;
 
-HELP: with-gadget
-{ $values { "gadget" gadget } { "quot" quotation } }
-{ $description "Calls the quotation in a new scope with the " { $link gadget } " variable set to " { $snippet "gadget" } } ;
-
 { control-value set-control-value gadget-model } related-words
 
 HELP: control-value

@@ -235,9 +235,7 @@ $nl
 $nl
 "Gadget construction combinators whose names are prefixed with " { $snippet "make-" } " construct new gadgets and push them on the stack. The primitive combinator used to define all combinators of this form:"
 "Words such as " { $link track, } " access the gadget through the " { $link gadget } " variable."
-$nl
-"A combinator which stores a gadget in the " { $link gadget } " variable:"
-{ $subsection with-gadget } ;
+;
 
 ARTICLE: "ui-null-layout" "Manual layouts"
 "When automatic layout is not appropriate, gadgets can be added to a parent with no layout policy, and then positioned and sized manually:"
