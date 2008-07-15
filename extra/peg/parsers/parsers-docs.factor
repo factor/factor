@@ -11,7 +11,7 @@ HELP: 1token
 } { $description
     "Calls 1string on a character and returns a parser that matches that character."
 } { $examples
-    { $example "USING: peg peg.parsers prettyprint ;" "\"a\" CHAR: a 1token parse parse-result-ast ." "\"a\"" }
+    { $example "USING: peg peg.parsers prettyprint ;" "\"a\" CHAR: a 1token parse ." "\"a\"" }
 } { $see-also 'string' } ;
 
 HELP: (list-of)
@@ -33,8 +33,8 @@ HELP: list-of
     "Returns a parser that returns a list of items separated by the separator parser.  Hides the separators and matches a list of one or more items."
 } { $notes "Use " { $link list-of-many } " to ensure a list contains two or more items." }
 { $examples
-    { $example "USING: peg peg.parsers prettyprint ;" "\"a\" \"a\" token \",\" token list-of parse parse-result-ast ." "V{ \"a\" }" }
-    { $example "USING: peg peg.parsers prettyprint ;" "\"a,a,a,a\" \"a\" token \",\" token list-of parse parse-result-ast ." "V{ \"a\" \"a\" \"a\" \"a\" }" }
+    { $example "USING: peg peg.parsers prettyprint ;" "\"a\" \"a\" token \",\" token list-of parse  ." "V{ \"a\" }" }
+    { $example "USING: peg peg.parsers prettyprint ;" "\"a,a,a,a\" \"a\" token \",\" token list-of parse ." "V{ \"a\" \"a\" \"a\" \"a\" }" }
 } { $see-also list-of-many } ;
     
 HELP: list-of-many
@@ -46,8 +46,8 @@ HELP: list-of-many
     "Returns a parser that returns a list of items separated by the separator parser.  Hides the separators and matches a list of two or more items."
 } { $notes "Use " { $link list-of } " to return a list of only one item."
 } { $examples
-    { $example "USING: peg peg.parsers prettyprint ;" "\"a\" \"a\" token \",\" token list-of-many parse ." "f" }
-    { $example "USING: peg peg.parsers prettyprint ;" "\"a,a,a,a\" \"a\" token \",\" token list-of-many parse parse-result-ast ." "V{ \"a\" \"a\" \"a\" \"a\" }" }
+    { $code "USING: peg peg.parsers prettyprint ;" "\"a\" \"a\" token \",\" token list-of-many parse => exception" }
+    { $example "USING: peg peg.parsers prettyprint ;" "\"a,a,a,a\" \"a\" token \",\" token list-of-many parse ." "V{ \"a\" \"a\" \"a\" \"a\" }" }
 } { $see-also list-of } ;
 
 HELP: epsilon
@@ -72,8 +72,8 @@ HELP: exactly-n
 } { $description
     "Returns a parser that matches an exact repetition of the input parser."
 } { $examples
-    { $example "USING: peg peg.parsers prettyprint ;" "\"aaa\" \"a\" token 4 exactly-n parse ." "f" }
-    { $example "USING: peg peg.parsers prettyprint ;" "\"aaaa\" \"a\" token 4 exactly-n parse parse-result-ast ." "V{ \"a\" \"a\" \"a\" \"a\" }" }
+    { $code "USING: peg peg.parsers prettyprint ;" "\"aaa\" \"a\" token 4 exactly-n parse => exception" }
+    { $example "USING: peg peg.parsers prettyprint ;" "\"aaaa\" \"a\" token 4 exactly-n parse ." "V{ \"a\" \"a\" \"a\" \"a\" }" }
 } { $see-also at-least-n at-most-n from-m-to-n } ;
 
 HELP: at-least-n
@@ -84,9 +84,9 @@ HELP: at-least-n
 } { $description
     "Returns a parser that matches n or more repetitions of the input parser."
 } { $examples
-    { $example "USING: peg peg.parsers prettyprint ;" "\"aaa\" \"a\" token 4 at-least-n parse ." "f" }
-    { $example "USING: peg peg.parsers prettyprint ;" "\"aaaa\" \"a\" token 4 at-least-n parse parse-result-ast ." "V{ \"a\" \"a\" \"a\" \"a\" }" }
-    { $example "USING: peg peg.parsers prettyprint ;" "\"aaaaa\" \"a\" token 4 at-least-n parse parse-result-ast ." "V{ \"a\" \"a\" \"a\" \"a\" \"a\" }" }
+    { $code "USING: peg peg.parsers prettyprint ;" "\"aaa\" \"a\" token 4 at-least-n parse => exception"}
+    { $example "USING: peg peg.parsers prettyprint ;" "\"aaaa\" \"a\" token 4 at-least-n parse ." "V{ \"a\" \"a\" \"a\" \"a\" }" }
+    { $example "USING: peg peg.parsers prettyprint ;" "\"aaaaa\" \"a\" token 4 at-least-n parse ." "V{ \"a\" \"a\" \"a\" \"a\" \"a\" }" }
 } { $see-also exactly-n at-most-n from-m-to-n } ;
 
 HELP: at-most-n
@@ -97,8 +97,8 @@ HELP: at-most-n
 } { $description
     "Returns a parser that matches n or fewer repetitions of the input parser."
 } { $examples
-    { $example "USING: peg peg.parsers prettyprint ;" "\"aaaa\" \"a\" token 4 at-most-n parse parse-result-ast ." "V{ \"a\" \"a\" \"a\" \"a\" }" }
-    { $example "USING: peg peg.parsers prettyprint ;" "\"aaaaa\" \"a\" token 4 at-most-n parse parse-result-ast ." "V{ \"a\" \"a\" \"a\" \"a\" }" }
+    { $example "USING: peg peg.parsers prettyprint ;" "\"aaaa\" \"a\" token 4 at-most-n parse ." "V{ \"a\" \"a\" \"a\" \"a\" }" }
+    { $example "USING: peg peg.parsers prettyprint ;" "\"aaaaa\" \"a\" token 4 at-most-n parse ." "V{ \"a\" \"a\" \"a\" \"a\" }" }
 } { $see-also exactly-n at-least-n from-m-to-n } ;
 
 HELP: from-m-to-n
@@ -110,9 +110,9 @@ HELP: from-m-to-n
 } { $description
     "Returns a parser that matches between and including m to n repetitions of the input parser."
 } { $examples
-    { $example "USING: peg peg.parsers prettyprint ;" "\"aaa\" \"a\" token 3 4 from-m-to-n parse parse-result-ast ." "V{ \"a\" \"a\" \"a\" }" }
-    { $example "USING: peg peg.parsers prettyprint ;" "\"aaaa\" \"a\" token 3 4 from-m-to-n parse parse-result-ast ." "V{ \"a\" \"a\" \"a\" \"a\" }" }
-    { $example "USING: peg peg.parsers prettyprint ;" "\"aaaaa\" \"a\" token 3 4 from-m-to-n parse parse-result-ast ." "V{ \"a\" \"a\" \"a\" \"a\" }" }
+    { $example "USING: peg peg.parsers prettyprint ;" "\"aaa\" \"a\" token 3 4 from-m-to-n parse ." "V{ \"a\" \"a\" \"a\" }" }
+    { $example "USING: peg peg.parsers prettyprint ;" "\"aaaa\" \"a\" token 3 4 from-m-to-n parse ." "V{ \"a\" \"a\" \"a\" \"a\" }" }
+    { $example "USING: peg peg.parsers prettyprint ;" "\"aaaaa\" \"a\" token 3 4 from-m-to-n parse ." "V{ \"a\" \"a\" \"a\" \"a\" }" }
 } { $see-also exactly-n at-most-n at-least-n } ;
 
 HELP: pack
@@ -124,7 +124,7 @@ HELP: pack
 } { $description
     "Returns a parser that parses the begin, body, and end parsers in order.  The begin and end parsers are hidden."
 } { $examples
-    { $example "USING: peg peg.parsers prettyprint ;" "\"hi123bye\" \"hi\" token 'integer' \"bye\" token pack parse parse-result-ast ." "123" }
+    { $example "USING: peg peg.parsers prettyprint ;" "\"hi123bye\" \"hi\" token 'integer' \"bye\" token pack parse ." "123" }
 } { $see-also surrounded-by } ;
 
 HELP: surrounded-by
@@ -136,7 +136,7 @@ HELP: surrounded-by
 } { $description
     "Calls token on begin and end to make them into string parsers.  Returns a parser that parses the begin, body, and end parsers in order.  The begin and end parsers are hidden."
 } { $examples
-    { $example "USING: peg peg.parsers prettyprint ;" "\"hi123bye\" 'integer' \"hi\" \"bye\" surrounded-by parse parse-result-ast ." "123" }
+    { $example "USING: peg peg.parsers prettyprint ;" "\"hi123bye\" 'integer' \"hi\" \"bye\" surrounded-by parse ." "123" }
 } { $see-also pack } ;
 
 HELP: 'digit'
@@ -173,7 +173,7 @@ HELP: range-pattern
 "of characters separated with a dash (-) represents the "
 "range of characters from the first to the second, inclusive."
 { $examples
-    { $example "USING: peg peg.parsers prettyprint strings ;" "\"a\" \"_a-zA-Z\" range-pattern parse parse-result-ast 1string ." "\"a\"" } 
-    { $example "USING: peg peg.parsers prettyprint ;\n\"0\" \"^0-9\" range-pattern parse ." "f" } 
+    { $example "USING: peg peg.parsers prettyprint strings ;" "\"a\" \"_a-zA-Z\" range-pattern parse 1string ." "\"a\"" } 
+    { $code "USING: peg peg.parsers prettyprint ;\n\"0\" \"^0-9\" range-pattern parse => exception"} 
 }
 }  ;

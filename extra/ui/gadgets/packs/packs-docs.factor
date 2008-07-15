@@ -9,9 +9,6 @@ ARTICLE: "ui-pack-layout" "Pack layouts"
 { $subsection <pack> }
 { $subsection <pile> }
 { $subsection <shelf> }
-"Creating packs using a combinator:"
-{ $subsection make-filled-pile }
-{ $subsection make-shelf }
 
 "For more control, custom layouts can reuse portions of pack layout logic:"
 { $subsection pack-pref-dim }
@@ -23,8 +20,6 @@ HELP: pack
     { $link <pack> }
     { $link <pile> }
     { $link <shelf> }
-    { $link make-filled-pile }
-    { $link make-shelf }
 }
 "Packs have the following slots:"
 { $list
@@ -61,13 +56,5 @@ HELP: pack-pref-dim
 { $notes
     "This word is useful if you are writing your own layout gadget which inherits from " { $link pack } ". This allows you to reuse layout logic while computing gadget sizes using a custom procedure."
 } ;
-
-HELP: make-filled-pile
-{ $values { "quot" quotation } { "pack" "a new " { $link pack } } }
-{ $description "Creates a new " { $link pack } " which lays out a sequence of gadgets vertically, such that all gadgets have the same width. The quotation can add children by calling the gadget, word." } ;
-
-HELP: make-shelf
-{ $values { "quot" quotation } { "pack" "a new " { $link pack } } }
-{ $description "Creates a new " { $link pack } " which lays out a sequence of gadgets horizontally. The quotation can add children by calling the gadget, word." } ;
 
 ABOUT: "ui-pack-layout"

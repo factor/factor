@@ -7,11 +7,11 @@ HELP: parse
 { $values 
   { "input" "a string" } 
   { "parser" "a parser" } 
-  { "result" "a parse-result or f" } 
+  { "ast" "an object" } 
 }
 { $description 
-    "Given the input string, parse it using the given parser. The result is a <parse-result> object if "
-    "the parse was successful, otherwise it is f." } 
+    "Given the input string, parse it using the given parser. The result is the abstract "
+    "syntax tree returned by the parser." } 
 { $see-also compile } ;
 
 HELP: compile
@@ -20,7 +20,7 @@ HELP: compile
   { "word" "a word" } 
 }
 { $description 
-    "Compile the parser to a word. The word will have stack effect ( -- result )."
+    "Compile the parser to a word. The word will have stack effect ( -- ast )."
 } 
 { $see-also parse } ;
 
@@ -104,8 +104,7 @@ HELP: semantic
     "Returns a parser that succeeds if the 'p1' parser succeeds and the quotation called with "
     "the AST produced by 'p1' on the stack returns true." }
 { $examples 
-  { $example "USING: kernel math peg prettyprint ;" "\"A\" [ drop t ] satisfy [ 66 > ] semantic parse ." "f" } 
-  { $example "USING: kernel math peg prettyprint ;" "\"C\" [ drop t ] satisfy [ 66 > ] semantic parse parse-result-ast ." "67" } 
+  { $example "USING: kernel math peg prettyprint ;" "\"C\" [ drop t ] satisfy [ 66 > ] semantic parse ." "67" } 
 } ;
 
 HELP: ensure

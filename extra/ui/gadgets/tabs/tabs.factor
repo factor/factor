@@ -4,7 +4,7 @@
 USING: accessors kernel fry math math.vectors sequences arrays vectors assocs
        hashtables models models.range models.compose combinators
        ui ui.gadgets ui.gadgets.buttons ui.gadgets.frames ui.gadgets.packs
-       ui.gadgets.grids ui.gadgets.viewports ui.gadgets.books ;
+       ui.gadgets.grids ui.gadgets.viewports ui.gadgets.books locals ;
 
 IN: ui.gadgets.tabs
 
@@ -12,11 +12,12 @@ TUPLE: tabbed < frame names toggler content ;
 
 DEFER: (del-page)
 
-: add-toggle ( model n name toggler -- )
-    [ [ gadget-parent '[ , , , (del-page) ] "X" swap
-       <bevel-button> @right frame, ] 3keep 
-      [ swapd <toggle-button> @center frame, ] dip ] make-frame
-    add-gadget drop ;
+:: add-toggle ( model n name toggler -- )
+  <frame>
+    n name toggler parent>> '[ , , , (del-page) ] "X" swap <bevel-button>
+      @right grid-add*
+    n model name <toggle-button> @center grid-add*
+  toggler swap add-gadget drop ;
 
 : redo-toggler ( tabbed -- )
      [ names>> ] [ model>> ] [ toggler>> ] tri

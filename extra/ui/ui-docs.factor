@@ -232,13 +232,7 @@ ARTICLE: "ui-layout-combinators" "Creating layouts using combinators"
 "The " { $link make } " combinator provides a convenient way of constructing sequences by keeping the intermediate sequence off the stack until construction is done. The " { $link , } " and " { $link % } " words operate on this implicit sequence, reducing stack noise."
 $nl
 "Similar tools exist for constructing complex gadget hierarchies. Different words are used for different types of gadgets; see " { $link "ui-pack-layout" } ", " { $link "ui-track-layout" } " and " { $link "ui-frame-layout" } " for specifics. This section documents their common factors."
-$nl
-"Gadget construction combinators whose names are prefixed with " { $snippet "make-" } " construct new gadgets and push them on the stack. The primitive combinator used to define all combinators of this form:"
-{ $subsection make-gadget }
-"Words such as " { $link track, } " access the gadget through the " { $link gadget } " variable."
-$nl
-"A combinator which stores a gadget in the " { $link gadget } " variable:"
-{ $subsection with-gadget } ;
+;
 
 ARTICLE: "ui-null-layout" "Manual layouts"
 "When automatic layout is not appropriate, gadgets can be added to a parent with no layout policy, and then positioned and sized manually:"

@@ -96,8 +96,10 @@ TUPLE: editable-slot < track printer ref ;
     <roll-button> ;
 
 : display-slot ( gadget editable-slot -- )
-    dup clear-track
-    [ 1 track, <edit-button> f track, ] with-gadget ;
+  dup clear-track
+    swap          1 track-add*
+    <edit-button> f track-add*
+  drop ;
 
 : update-slot ( editable-slot -- )
     [ [ ref>> get-ref ] [ printer>> ] bi call ] keep

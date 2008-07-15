@@ -60,9 +60,3 @@ M: pack layout*
 M: pack children-on ( rect gadget -- seq )
     dup gadget-orientation swap gadget-children
     [ fast-children-on ] keep <slice> ;
-
-: make-filled-pile ( quot -- pack )
-    <filled-pile> swap make-gadget ; inline
-
-: make-shelf ( quot -- pack )
-    <shelf> swap make-gadget ; inline
