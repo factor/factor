@@ -23,8 +23,7 @@ TUPLE: track < pack sizes ;
     dup gadget-children swap track-sizes { 0 0 }
     [ [ drop { 0 0 } ] [ pref-dim ] if v+ ] 2reduce ;
 
-: available-dim ( track -- dim )
-    dup rect-dim swap alloted-dim v- ;
+: available-dim ( track -- dim ) [ dim>> ] [ alloted-dim ] bi v- ;
 
 : track-layout ( track -- sizes )
     dup available-dim over gadget-children rot normalized-sizes
