@@ -1,25 +1,23 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes continuations help help.topics kernel models
-sequences ui ui.backend ui.tools.debugger ui.gadgets
-ui.gadgets.books ui.gadgets.buttons ui.gadgets.labelled
-ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.tracks
-ui.gadgets.worlds ui.gadgets.presentations ui.gadgets.status-bar
-ui.commands ui.gestures assocs arrays namespaces accessors ;
+       sequences ui ui.backend ui.tools.debugger ui.gadgets
+       ui.gadgets.books ui.gadgets.buttons ui.gadgets.labelled
+       ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.tracks
+       ui.gadgets.worlds ui.gadgets.presentations ui.gadgets.status-bar
+       ui.commands ui.gestures assocs arrays namespaces accessors ;
+
 IN: ui.tools.workspace
 
 TUPLE: workspace < track book listener popup ;
 
-: find-workspace ( gadget -- workspace )
-    [ workspace? ] find-parent ;
+: find-workspace ( gadget -- workspace ) [ workspace? ] find-parent ;
 
 SYMBOL: workspace-window-hook
 
-: workspace-window* ( -- workspace )
-    workspace-window-hook get call ;
+: workspace-window* ( -- workspace ) workspace-window-hook get call ;
 
-: workspace-window ( -- )
-    workspace-window* drop ;
+: workspace-window ( -- ) workspace-window* drop ;
 
 GENERIC: call-tool* ( arg tool -- )
 
