@@ -20,28 +20,6 @@ IN: irc.client.tests
 : with-dummy-client ( quot -- )
      rot with-variable ; inline
 
-! Parsing tests
-irc-message new
-    ":someuser!n=user@some.where PRIVMSG #factortest :hi" >>line
-    "someuser!n=user@some.where" >>prefix
-                       "PRIVMSG" >>command
-               { "#factortest" } >>parameters
-                            "hi" >>trailing
-1array
-[ ":someuser!n=user@some.where PRIVMSG #factortest :hi"
-  string>irc-message f >>timestamp ] unit-test
-
-privmsg new
-    ":someuser!n=user@some.where PRIVMSG #factortest :hi" >>line
-    "someuser!n=user@some.where" >>prefix
-                       "PRIVMSG" >>command
-               { "#factortest" } >>parameters
-                            "hi" >>trailing
-                   "#factortest" >>name
-1array
-[ ":someuser!n=user@some.where PRIVMSG #factortest :hi"
-  parse-irc-line f >>timestamp ] unit-test
-
 { "" } make-client dup "factorbot" set-nick current-irc-client [
     { t } [ irc> profile>> nickname>> me? ] unit-test
 
@@ -67,7 +45,7 @@ privmsg new
                     profile>> nickname>> ] unit-test
 
 { join_ "#factortest" } [
-             { ":factorbot!n=factorbo@some.where JOIN :#factortest"
+           { ":factorbot!n=factorbo@some.where JOIN :#factortest"
              ":ircserver.net MODE #factortest +ns"
              ":ircserver.net 353 factorbot @ #factortest :@factorbot "
              ":ircserver.net 366 factorbot #factortest :End of /NAMES list."
