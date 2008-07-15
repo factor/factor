@@ -3,12 +3,16 @@
 
 USING: accessors kernel threads combinators concurrency.mailboxes
        sequences strings hashtables splitting fry assocs hashtables
-       ui ui.gadgets.panes ui.gadgets.editors ui.gadgets.scrollers
-       ui.commands ui.gadgets.frames ui.gestures ui.gadgets.tabs
-       io io.styles namespaces irc.client irc.messages calendar
-       calendar.format ;
+       ui ui.gadgets ui.gadgets.panes ui.gadgets.editors
+       ui.gadgets.scrollers ui.commands ui.gadgets.frames ui.gestures
+       ui.gadgets.tabs ui.gadgets.grids
+       io io.styles namespaces irc.client irc.client.private
+       irc.messages irc.messages.private irc.ui.commandparser
+       calendar calendar.format ;
 
 IN: irc.ui
+
+SYMBOL: listener
 
 SYMBOL: client
 
@@ -20,14 +24,15 @@ TUPLE: ui-window client tabs ;
 : green { 0 0.5 0 1 } ;
 : blue { 0 0 1 1 } ;
 
-: prefix>nick ( prefix -- nick )
-    "!" split first ;
+: dot-or-parens ( string -- string )
+    dup empty? [ drop "." ]
+    [ "(" prepend ")" append ] if ;
 
 GENERIC: write-irc ( irc-message -- )
 
 M: privmsg write-irc
     "<" blue write-color
-    [ prefix>> prefix>nick write ] keep
+    [ prefix>> parse-name write ] keep
     "> " blue write-color
     trailing>> write ;
 
@@ -44,22 +49,20 @@ M: own-message write-irc
 
 M: join write-irc
     "* " green write-color
-    prefix>> prefix>nick write
+    prefix>> parse-name write
     " has entered the channel." green write-color ;
 
 M: part write-irc
     "* " red write-color
-    [ prefix>> prefix>nick write ] keep
-    " has left the channel(" red write-color
-    trailing>> write
-    ")" red write-color ;
+    [ prefix>> parse-name write ] keep
+    " has left the channel" red write-color
+    trailing>> dot-or-parens red write-color ;
 
 M: quit write-irc
     "* " red write-color
-    [ prefix>> prefix>nick write ] keep
-    " has left IRC(" red write-color
-    trailing>> write
-    ")" red write-color ;
+    [ prefix>> parse-name write ] keep
+    " has left IRC" red write-color
+    trailing>> dot-or-parens red write-color ;
 
 M: irc-end write-irc
     drop "* You have left IRC" red write-color ;
@@ -77,9 +80,9 @@ M: irc-message write-irc
     [ timestamp>> timestamp>hms write " " write ]
     [ write-irc nl ] bi ;
 
-: send-message ( message listener client -- )
-    [ nip profile>> nickname>> <own-message> print-irc ]
-    [ drop write-message ] 3bi ;
+: send-message ( message -- )
+    [ print-irc ]
+    [ listener get write-message ] bi ;
 
 : display ( stream listener -- )
     '[ , [ [ t ]
@@ -95,32 +98,42 @@ TUPLE: irc-editor < editor outstream listener client ;
 : <irc-editor> ( pane listener client -- editor )
     [ irc-editor new-editor
     swap >>listener swap <pane-stream> >>outstream
-    ] dip client>> >>client ;
+    ] dip >>client ;
 
 : editor-send ( irc-editor -- )
     { [ outstream>> ]
-      [ editor-string ]
       [ listener>> ]
       [ client>> ]
+      [ editor-string ]
       [ "" swap set-editor-string ] } cleave
-    '[ , , , send-message ] with-output-stream ;
+     '[ , listener set , client set , parse-message ] with-output-stream ;
 
 irc-editor "general" f {
     { T{ key-down f f "RET" } editor-send }
     { T{ key-down f f "ENTER" } editor-send }
 } define-command-map
 
-: irc-page ( name pane editor tabbed -- )
-    [ [ <scroller> @bottom frame, ! editor
-        <scroller> @center frame, ! pane
-      ] make-frame swap ] dip add-page ;
+TUPLE: irc-page < frame listener client ;
+
+: <irc-page> ( listener client -- irc-page )
+    irc-page new-frame
+    [ g swap client>> >>client swap [ swap (>>listener) ] keep
+      [ <irc-pane> [ <scroller> g @center grid-add ] keep ]
+      [ g client>> <irc-editor> <scroller> g @bottom grid-add ] bi
+      g ] with-gadget ;
+
+M: irc-page graft*
+    [ listener>> ] [ client>> ] bi
+    add-listener ;
+
+M: irc-page ungraft*
+    [ listener>> ] [ client>> ] bi
+    remove-listener ;
 
 : join-channel ( name ui-window -- )
     [ dup <irc-channel-listener> ] dip
-    [ client>> add-listener ]
-    [ drop <irc-pane> dup ]
-    [ [ <irc-editor> ] keep ] 2tri
-    tabs>> irc-page ;
+    [ <irc-page> swap ] keep
+    tabs>> add-page ;
 
 : irc-window ( ui-window -- )
     [ tabs>> ]
