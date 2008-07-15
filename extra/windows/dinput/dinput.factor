@@ -32,7 +32,6 @@ TYPEDEF: void* LPDIENUMCREATEDEFFECTOBJECTSCALLBACK
 TYPEDEF: void* LPDIENUMEFFECTSINFILECALLBACK
     [ "BOOL" { "LPCDIFILEEFFECT" "LPVOID" } "stdcall" ]
     dip alien-callback ; inline
-! Callback signaature: BOOL DIEnumDeviceObjectsCallback(LPCDIDEVICEOBJECTINSTANCE lpddoi, LPVOID pvRef);
 TYPEDEF: void* LPDIENUMDEVICEOBJECTSCALLBACKW
     [ "BOOL" { "LPCDIDEVICEOBJECTINSTANCE" "LPVOID" } "stdcall" ]
     dip alien-callback ; inline
