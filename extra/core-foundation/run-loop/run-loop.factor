@@ -12,6 +12,7 @@ IN: core-foundation.run-loop
 TYPEDEF: void* CFRunLoopRef
 
 FUNCTION: CFRunLoopRef CFRunLoopGetMain ( ) ;
+FUNCTION: CFRunLoopRef CFRunLoopGetCurrent ( ) ;
 
 FUNCTION: SInt32 CFRunLoopRunInMode (
    CFStringRef mode,

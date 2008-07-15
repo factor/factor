@@ -100,3 +100,4 @@ PRIVATE>
     define-words-for-com-interface
     ; parsing
 
+: GUID: scan string>guid parsed ; parsing
