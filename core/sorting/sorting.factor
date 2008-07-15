@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel math sequences vectors math.order
 sequences sequences.private math.order ;
@@ -53,25 +53,3 @@ PRIVATE>
 : sort-values ( seq -- sortedseq ) [ [ second ] compare ] sort ;
 
 : sort-pair ( a b -- c d ) 2dup after? [ swap ] when ;
-
-: midpoint ( seq -- elt )
-    [ midpoint@ ] keep nth-unsafe ; inline
-
-: partition ( seq n -- slice )
-    +gt+ eq? not swap halves ? ; inline
-
-: (binsearch) ( elt quot seq -- i )
-    dup length 1 <= [
-        slice-from 2nip
-    ] [
-        [ midpoint swap call ] 3keep roll dup +eq+ eq?
-        [ drop dup slice-from swap midpoint@ + 2nip ]
-        [ partition (binsearch) ] if
-    ] if ; inline
-
-: binsearch ( elt seq quot -- i )
-    swap dup empty?
-    [ 3drop f ] [ <flat-slice> (binsearch) ] if ; inline
-
-: binsearch* ( elt seq quot -- result )
-    over >r binsearch [ r> ?nth ] [ r> drop f ] if* ; inline

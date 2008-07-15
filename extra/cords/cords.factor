@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs sequences sorting math math.order
-arrays combinators kernel ;
+USING: accessors assocs sequences sorting binary-search math
+math.order arrays combinators kernel ;
 IN: cords
 
 <PRIVATE
@@ -23,7 +23,7 @@ M: multi-cord length count>> ;
 
 M: multi-cord virtual@
     dupd
-    seqs>> [ first <=> ] binsearch*
+    seqs>> [ first <=> ] with search nip
     [ first - ] [ second ] bi ;
 
 M: multi-cord virtual-seq

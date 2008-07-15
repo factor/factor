@@ -50,4 +50,4 @@ MEMO: cities-named-in ( name state -- cities )
     ] with with filter ;
 
 : find-zip-code ( code -- city )
-    cities [ first-zip>> <=> ] binsearch* ;
+    cities [ first-zip>> <=> ] with search nip ;

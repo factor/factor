@@ -16,13 +16,3 @@ unit-test
 ] unit-test
 
 [ ] [ { 1 2 } [ 2drop 1 ] sort drop ] unit-test
-
-[ 3 ] [ { 1 2 3 4 } midpoint ] unit-test
-
-[ f ] [ 3 { } [ <=> ] binsearch ] unit-test
-[ 0 ] [ 3 { 3 } [ <=> ] binsearch ] unit-test
-[ 1 ] [ 2 { 1 2 3 } [ <=> ] binsearch ] unit-test
-[ 3 ] [ 4 { 1 2 3 4 5 6 } [ <=> ] binsearch ] unit-test
-[ 2 ] [ 3.5 { 1 2 3 4 5 6 7 8 } [ <=> ] binsearch ] unit-test
-[ 4 ] [ 5.5 { 1 2 3 4 5 6 7 8 } [ <=> ] binsearch ] unit-test
-[ 10 ] [ 10 20 >vector [ <=> ] binsearch ] unit-test
