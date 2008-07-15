@@ -1,4 +1,5 @@
-USING: iokit alien.syntax alien.c-types kernel system core-foundation ;
+USING: iokit alien alien.syntax alien.c-types kernel
+system core-foundation ;
 IN: iokit.hid
 
 : kIOHIDDeviceKey "IOHIDDevice" ; inline
@@ -128,16 +129,30 @@ TYPEDEF: void* IOHIDTransactionRef
 TYPEDEF: UInt32 IOHIDValueScaleType
 TYPEDEF: UInt32 IOHIDTransactionDirectionType
 
-! Callback signature: void IOHIDCallback(void* context, IOReturn result, void* sender);
 TYPEDEF: void* IOHIDCallback
-! Callback signature: void IOHIDReportCallback(void* context, IOReturn result, void* sender, IOHIDReportType type, UInt32 reportID, uchar * report, CFIndex reportLength);
+: IOHIDCallback ( quot -- alien )
+    [ "void" { "void*" "IOReturn" "void*" } "cdecl" ]
+    dip alien-callback ; inline
+
 TYPEDEF: void* IOHIDReportCallback
-! Callback signature: void IOHIDValueCallback(void* context, IOReturn result, void* sender, IOHIDValueRef value);
+: IOHIDReportCallback ( quot -- alien )
+    [ "void" { "void*" "IOReturn" "void*" "IOHIDReportType" "UInt32" "uchar*" "CFIndex" } "cdecl" ]
+    dip alien-callback ; inline
+
 TYPEDEF: void* IOHIDValueCallback
-! Callback signature: void IOHIDValueMultipleCallback(void* context, IOReturn result, void* sender, CFDictionaryRef multiple);
+: IOHIDValueCallback ( quot -- alien )
+    [ "void" { "void*" "IOReturn" "void*" "IOHIDValueRef" } "cdecl" ]
+    dip alien-callback ; inline
+
 TYPEDEF: void* IOHIDValueMultipleCallback
-! Callback signature: void IOHIDDeviceCallback(void* context, IOReturn result, void* sender, IOHIDDeviceRef device);
+: IOHIDValueMultipleCallback ( quot -- alien )
+    [ "void" { "void*" "IOReturn" "void*" "CFDictionaryRef" } "cdecl" ]
+    dip alien-callback ; inline
+
 TYPEDEF: void* IOHIDDeviceCallback
+: IOHIDDeviceCallback ( quot -- alien )
+    [ "void" { "void*" "IOReturn" "void*" "IOHIDDeviceRef" } "cdecl" ]
+    dip alien-callback ; inline
 
 ! IOHIDDevice
 
