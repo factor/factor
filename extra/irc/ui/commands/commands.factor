@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 William Schlieper
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: kernel irc.client irc.messages irc.ui
+USING: accessors kernel irc.client irc.messages irc.ui namespaces ;
 
 IN: irc.ui.commands
 

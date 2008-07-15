@@ -1,16 +1,17 @@
 ! Copyright (C) 2008 William Schlieper
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: kernel vocabs.loader sequences strings irc.messages ;
+USING: kernel vocabs.loader sequences strings splitting words irc.messages ;
 
 IN: irc.ui.commandparser
 
 "irc.ui.commands" require
 
-: command ( string -- command )
+: command ( string string -- string command )
     dup empty? [ drop "say" ] when
     dup "irc.ui.commands" lookup
-    [ "quote" "irc.ui.commands" lookup ] unless* ;
+    [ nip ]
+    [ " " append prepend "quote" "irc.ui.commands" lookup ] if* ;
 
 : parse-message ( string -- )
-    "/" head? [ " " split1 swap command execute ] when ;
+    "/" ?head [ " " split1 swap command ] [ "say" command ] if execute ;

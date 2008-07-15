@@ -95,10 +95,10 @@ M: irc-message write-irc
 
 TUPLE: irc-editor < editor outstream listener client ;
 
-: <irc-editor> ( pane listener client -- editor )
-    [ irc-editor new-editor
+: <irc-editor> ( page pane listener -- client editor )
+    irc-editor new-editor
     swap >>listener swap <pane-stream> >>outstream
-    ] dip >>client ;
+    over client>> >>client ;
 
 : editor-send ( irc-editor -- )
     { [ outstream>> ]
@@ -117,10 +117,9 @@ TUPLE: irc-page < frame listener client ;
 
 : <irc-page> ( listener client -- irc-page )
     irc-page new-frame
-    [ g swap client>> >>client swap [ swap (>>listener) ] keep
-      [ <irc-pane> [ <scroller> g @center grid-add ] keep ]
-      [ g client>> <irc-editor> <scroller> g @bottom grid-add ] bi
-      g ] with-gadget ;
+    swap client>> >>client swap [ >>listener ] keep
+    [ <irc-pane> [ <scroller> @center grid-add* ] keep ]
+    [ <irc-editor> <scroller> @bottom grid-add* ] bi ;
 
 M: irc-page graft*
     [ listener>> ] [ client>> ] bi
