@@ -31,6 +31,20 @@ TUPLE: irc-channel-listener < irc-listener name password timeout participants ;
 TUPLE: irc-nick-listener < irc-listener name ;
 SYMBOL: +server-listener+
 
+! participant modes
+SYMBOL: +operator+
+SYMBOL: +voice+
+SYMBOL: +normal+
+
+: participant-mode ( n -- mode )
+    H{ { 64 +operator+ } { 43 +voice+ } { 0 +normal+ } } at ;
+
+! participant changed actions
+SYMBOL: +join+
+SYMBOL: +part+
+SYMBOL: +mode+
+
+! listener objects
 : <irc-listener> ( -- irc-listener ) <mailbox> <mailbox> irc-listener boa ;
 
 : <irc-server-listener> ( -- irc-server-listener )
@@ -45,6 +59,9 @@ SYMBOL: +server-listener+
 ! ======================================
 ! Message objects
 ! ======================================
+
+TUPLE: participant-changed nick action ;
+C: <participant-changed> participant-changed
 
 SINGLETON: irc-end          ! sent when the client isn't running anymore
 SINGLETON: irc-disconnected ! sent when connection is lost
@@ -70,19 +87,27 @@ UNION: irc-broadcasted-message irc-end irc-disconnected irc-connected ;
 : listener> ( name -- listener/f ) irc> listeners>> at ;
 : unregister-listener ( name -- ) irc> listeners>> delete-at ;
 
-: to-listener ( message name -- )
+GENERIC: to-listener ( message obj -- )
+
+M: string to-listener ( message string -- )
     listener> [ +server-listener+ listener> ] unless*
-    [ in-messages>> mailbox-put ] [ drop ] if* ;
+    [ to-listener ] [ drop ] if* ;
+
+M: irc-listener to-listener ( message irc-listener -- )
+    in-messages>> mailbox-put ;
 
 : remove-participant ( nick channel -- )
     listener> [ participants>> delete-at ] [ drop ] if* ;
 
-: remove-participant-from-all ( nick -- )
-    irc> listeners>>
-    [ irc-channel-listener? [ swap remove-participant ] [ 2drop ] if ] with
-    assoc-each ;
+: listeners-with-participant ( nick -- seq )
+    irc> listeners>> values
+    [ dup irc-channel-listener? [ participants>> key? ] [ 2drop f ] if ]
+    with filter ;
 
-: add-participant ( nick mode channel -- )
+: remove-participant-from-all ( nick -- )
+    dup listeners-with-participant [ delete-at ] with each ;
+
+: add-participant ( mode nick channel -- )
     listener> [ participants>> set-at ] [ 2drop ] if* ;
 
 DEFER: me?
@@ -142,12 +167,31 @@ DEFER: me?
     dup name>> me? [ prefix>> parse-name ] [ name>> ] if ;
 
 : broadcast-message-to-listeners ( message -- )
-    irc> listeners>> values [ in-messages>> mailbox-put ] with each ;
+    irc> listeners>> values [ to-listener ] with each ;
+
+GENERIC: handle-participant-change ( irc-message -- )
+
+M: join handle-participant-change ( join -- )
+    [ prefix>> parse-name +join+ <participant-changed> ]
+    [ trailing>> ] bi to-listener ;
+
+M: part handle-participant-change ( part -- )
+    [ prefix>> parse-name +part+ <participant-changed> ]
+    [ channel>> ] bi to-listener ;
+
+M: kick handle-participant-change ( kick -- )
+    [ who>> +part+ <participant-changed> ]
+    [ channel>> ] bi to-listener ;
+
+M: quit handle-participant-change ( quit -- )
+    prefix>> parse-name
+    [ +part+ <participant-changed> ] [ listeners-with-participant ] bi
+    [ to-listener ] with each ;
 
 GENERIC: handle-incoming-irc ( irc-message -- )
 
 M: irc-message handle-incoming-irc ( irc-message -- )
-    +server-listener+ listener> [ in-messages>> mailbox-put ] [ drop ] if* ;
+    +server-listener+ listener> [ to-listener ] [ drop ] if* ;
 
 M: logged-in handle-incoming-irc ( logged-in -- )
     name>> irc> profile>> (>>nickname) ;
@@ -162,27 +206,35 @@ M: privmsg handle-incoming-irc ( privmsg -- )
     dup irc-message-origin to-listener ;
 
 M: join handle-incoming-irc ( join -- )
-    [ maybe-forward-join ]
-    [ dup trailing>> to-listener ]
-    [ [ drop f ] [ prefix>> parse-name ] [ trailing>> ] tri add-participant ]
-    tri ;
+    { [ maybe-forward-join ] ! keep
+      [ dup trailing>> to-listener ]
+      [ [ drop f ] [ prefix>> parse-name ] [ trailing>> ] tri add-participant ]
+      [ handle-participant-change ]
+    } cleave ;
 
 M: part handle-incoming-irc ( part -- )
-    [ dup channel>> to-listener ] keep
-    [ prefix>> parse-name ] [ channel>> ] bi remove-participant ;
-
-M: kick handle-incoming-irc ( kick -- )
-    [ dup channel>>  to-listener ]
-    [ [ who>> ] [ channel>> ] bi remove-participant ] 
-    [ dup who>> me? [ unregister-listener ] [ drop ] if ]
+    [ dup channel>> to-listener ]
+    [ [ prefix>> parse-name ] [ channel>> ] bi remove-participant ]
+    [ handle-participant-change ]
     tri ;
 
+M: kick handle-incoming-irc ( kick -- )
+    { [ dup channel>>  to-listener ]
+      [ [ who>> ] [ channel>> ] bi remove-participant ]
+      [ handle-participant-change ]
+      [ dup who>> me? [ unregister-listener ] [ drop ] if ]
+    } cleave ;
+
 M: quit handle-incoming-irc ( quit -- )
-    [ prefix>> parse-name remove-participant-from-all ] keep
-    call-next-method ;
+    { [ dup prefix>> parse-name listeners-with-participant
+        [ to-listener ] with each ]
+      [ handle-participant-change ]
+      [ prefix>> parse-name remove-participant-from-all ]
+      [ ]
+    } cleave call-next-method ;
 
 : >nick/mode ( string -- nick mode )
-    dup first "+@" member? [ unclip ] [ f ] if ;
+    dup first "+@" member? [ unclip ] [ 0 ] if participant-mode ;
 
 : names-reply>participants ( names-reply -- participants )
     trailing>> [ blank? ] trim " " split
@@ -200,8 +252,8 @@ M: irc-broadcasted-message handle-incoming-irc ( irc-broadcasted-message -- )
 
 GENERIC: handle-outgoing-irc ( obj -- )
 
-! M: irc-message handle-outgoing-irc ( irc-message -- )
-!    irc-message>string irc-print ;
+M: irc-message handle-outgoing-irc ( irc-message -- )
+    irc-message>client-line irc-print ;
 
 M: privmsg handle-outgoing-irc ( privmsg -- )
     [ name>> ] [ trailing>> ] bi /PRIVMSG ;
@@ -225,7 +277,7 @@ DEFER: (connect-irc)
 
 : (handle-disconnect) ( -- )
     irc>
-        [ [ irc-disconnected ] dip in-messages>> mailbox-put ]
+        [ [ irc-disconnected ] dip to-listener ]
         [ dup reconnect-time>> sleep (connect-irc) ]
         [ profile>> nickname>> /LOGIN ]
     tri ;
