@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files io.encodings.ascii sequences generalizations
 math.parser combinators kernel memoize csv symbols summary
-words accessors math.order sorting ;
+words accessors math.order binary-search ;
 IN: usa-cities
 
 SINGLETONS: AK AL AR AS AZ CA CO CT DC DE FL GA HI IA ID IL IN
