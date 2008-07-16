@@ -10,7 +10,7 @@ IN: ui.tools.search.tests
     T{ key-down f { C+ } "x" } swap search-gesture
 ] unit-test
 
-: assert-non-empty empty? f assert= ;
+: assert-non-empty ( obj -- ) empty? f assert= ;
 
 : update-live-search ( search -- seq )
     dup [
