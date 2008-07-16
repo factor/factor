@@ -1,4 +1,4 @@
-USING: alien strings arrays help.markup help.syntax ;
+USING: alien strings arrays help.markup help.syntax destructors ;
 IN: core-foundation
 
 HELP: CF>array
@@ -37,6 +37,16 @@ HELP: load-framework
 { $values { "name" "a pathname string" } }
 { $description "Loads a Core Foundation framework." } ;
 
+HELP: &CFRelease
+{ $values { "alien" "Pointer to a Core Foundation object" } }
+{ $description "Marks the given Core Foundation object for unconditional release via " { $link CFRelease } " at the end of the enclosing " { $link with-destructors } " scope." } ;
+
+HELP: |CFRelease
+{ $values { "interface" "Pointer to a Core Foundation object" } }
+{ $description "Marks the given Core Foundation object for release via " { $link CFRelease } " in the event of an error at the end of the enclosing " { $link with-destructors } " scope." } ;
+
+{ CFRelease |CFRelease &CFRelease } related-words
+
 ARTICLE: "core-foundation" "Core foundation utilities"
 "The " { $vocab-link "core-foundation" } " vocabulary defines bindings for some frequently-used Core Foundation functions. It also provides some utility words."
 $nl
@@ -51,7 +61,9 @@ $nl
 { $subsection <CFFileSystemURL> }
 { $subsection <CFURL> }
 "Frameworks:"
-{ $subsection load-framework } ;
+{ $subsection load-framework }
+"Memory management:"
+{ $subsection &CFRelease }
+{ $subsection |CFRelease } ;
 
-IN: core-foundation
 ABOUT: "core-foundation"
