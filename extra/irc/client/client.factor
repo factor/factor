@@ -241,7 +241,8 @@ M: quit handle-incoming-irc ( quit -- )
     [ >nick/mode 2array ] map >hashtable ;
 
 M: names-reply handle-incoming-irc ( names-reply -- )
-    [ names-reply>participants ] [ channel>> listener> ] bi (>>participants) ;
+    [ names-reply>participants ] [ channel>> listener> ] bi
+    [ (>>participants) ] [ drop ] if* ;
 
 M: irc-broadcasted-message handle-incoming-irc ( irc-broadcasted-message -- )
     broadcast-message-to-listeners ;
@@ -264,11 +265,6 @@ M: part handle-outgoing-irc ( part -- )
 ! ======================================
 ! Reader/Writer
 ! ======================================
-
-: irc-mailbox-get ( mailbox quot -- )
-    [ 5 seconds ] dip
-    '[ , , ,  [ mailbox-get-timeout ] dip call ]
-    [ drop ] recover ; inline
 
 : handle-reader-message ( irc-message -- )
     irc> in-messages>> mailbox-put ;
@@ -299,14 +295,14 @@ DEFER: (connect-irc)
     [ (reader-loop) ] [ handle-disconnect ] recover ;
 
 : writer-loop ( -- )
-    irc> out-messages>> [ handle-outgoing-irc ] irc-mailbox-get ;
+    irc> out-messages>> mailbox-get handle-outgoing-irc ;
 
 ! ======================================
 ! Processing loops
 ! ======================================
 
 : in-multiplexer-loop ( -- )
-    irc> in-messages>> [ handle-incoming-irc ] irc-mailbox-get ;
+    irc> in-messages>> mailbox-get handle-incoming-irc ;
 
 : strings>privmsg ( name string -- privmsg )
     privmsg new [ (>>trailing) ] keep [ (>>name) ] keep ;
@@ -319,9 +315,8 @@ DEFER: (connect-irc)
     } cond ;
 
 : listener-loop ( name listener -- )
-    out-messages>> swap
-    '[ , swap maybe-annotate-with-name irc> out-messages>> mailbox-put ]
-    irc-mailbox-get ;
+    out-messages>> mailbox-get maybe-annotate-with-name
+    irc> out-messages>> mailbox-put ;
 
 : spawn-irc-loop ( quot name -- )
     [ '[ irc> is-running>> [ @ ] when irc> is-running>> ] ] dip
