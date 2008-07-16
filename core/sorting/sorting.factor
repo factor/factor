@@ -24,11 +24,23 @@ TUPLE: merge
 { to2    array-capacity } ;
 
 : dump ( from to seq accum -- )
-    #! Optimize common case where to - from = 1.
-    >r >r 2dup swap - 1 =
-    [ drop r> nth-unsafe r> push ]
-    [ r> <slice> r> push-all ]
-    if ; inline
+    #! Optimize common case where to - from = 1, 2, or 3.
+    >r >r 2dup swap - dup 1 =
+    [ 2drop r> nth-unsafe r> push ] [
+        dup 2 = [
+            2drop dup 1+
+            r> [ nth-unsafe ] curry bi@
+            r> [ push ] curry bi@
+        ] [
+            dup 3 = [
+                2drop dup 1+ dup 1+
+                r> [ nth-unsafe ] curry tri@
+                r> [ push ] curry tri@
+            ] [
+                drop r> subseq r> push-all
+            ] if
+        ] if
+    ] if ; inline
 
 : l-elt   [ from1>> ] [ seq>> ] bi nth-unsafe ; inline
 : r-elt   [ from2>> ] [ seq>> ] bi nth-unsafe ; inline
