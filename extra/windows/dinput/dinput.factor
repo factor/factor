@@ -2,9 +2,10 @@ USING: windows.kernel32 windows.ole32 windows.com windows.com.syntax
 alien alien.c-types alien.syntax kernel system namespaces math ;
 IN: windows.dinput
 
-<< os windows?
+<<
+    os windows?
     [ "dinput" "dinput8.dll" "stdcall" add-library ]
-    [ "DirectInput only supported on Windows" throw ] if
+    when
 >>
 
 LIBRARY: dinput
