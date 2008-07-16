@@ -5,7 +5,7 @@ USING: kernel io.files parser editors sequences ;
 
 IN: irc.ui.load
 
-: file-or ( path path -- path ) over exists? ? ;
+: file-or ( path path -- path ) [ [ exists? ] keep ] dip ? ;
 
 : personal-ui-rc ( -- path ) home ".ircui-rc" append-path ;
 

@@ -5,8 +5,8 @@ USING: accessors kernel threads combinators concurrency.mailboxes
        sequences strings hashtables splitting fry assocs hashtables
        ui ui.gadgets ui.gadgets.panes ui.gadgets.editors
        ui.gadgets.scrollers ui.commands ui.gadgets.frames ui.gestures
-       ui.gadgets.tabs ui.gadgets.grids
-       io io.styles namespaces calendar calendar.format
+       ui.gadgets.tabs ui.gadgets.grids ui.gadgets.lists ui.gadgets.labels
+       io io.styles namespaces calendar calendar.format models
        irc.client irc.client.private irc.messages irc.messages.private
        irc.ui.commandparser irc.ui.load ;
 
@@ -18,11 +18,18 @@ SYMBOL: client
 
 TUPLE: ui-window client tabs ;
 
+TUPLE: irc-tab < frame listener client listmodel ;
+
 : write-color ( str color -- )
     foreground associate format ;
 : red { 0.5 0 0 1 } ;
 : green { 0 0.5 0 1 } ;
 : blue { 0 0 1 1 } ;
+: black { 0 0 0 1 } ;
+
+: colors H{ { +operator+ { 0 0.5 0 1 } }
+            { +voice+ { 0 0 1 1 } }
+            { +normal+ { 0 0 0 1 } } } ;
 
 : dot-or-parens ( string -- string )
     dup empty? [ drop "." ]
@@ -64,6 +71,14 @@ M: quit write-irc
     " has left IRC" red write-color
     trailing>> dot-or-parens red write-color ;
 
+M: mode write-irc
+    "* " blue write-color
+    [ name>> write ] keep
+    " has applied mode " blue write-color
+    [ mode>> write ] keep
+    " to " blue write-color
+    channel>> write ;
+
 M: irc-end write-irc
     drop "* You have left IRC" red write-color ;
 
@@ -84,20 +99,39 @@ M: irc-message write-irc
     [ print-irc ]
     [ listener get write-message ] bi ;
 
-: display ( stream listener -- )
+GENERIC: handle-inbox ( tab message -- )
+
+: filter-participants ( assoc val -- alist )
+    [ >alist ] dip
+   '[ second , = ] filter ;
+
+: update-participants ( tab -- )
+    [ listmodel>> ] [ listener>> participants>> ] bi
+    [ +operator+ filter-participants ]
+    [ +voice+ filter-participants ]
+    [ +normal+ filter-participants ] tri
+    append append swap set-model ;
+
+M: participant-changed handle-inbox
+    drop update-participants ;
+
+M: object handle-inbox
+    nip print-irc ;
+
+: display ( stream tab -- )
     '[ , [ [ t ]
-           [ , read-message print-irc ]
+           [ , dup listener>> read-message handle-inbox ]
            [  ] while ] with-output-stream ] "ircv" spawn drop ;
 
-: <irc-pane> ( listener -- pane )
+: <irc-pane> ( tab -- tab pane )
     <scrolling-pane>
-    [ <pane-stream> swap display ] keep ;
+    [ <pane-stream> swap display ] 2keep ;
 
 TUPLE: irc-editor < editor outstream listener client ;
 
-: <irc-editor> ( page pane listener -- client editor )
-    irc-editor new-editor
-    swap >>listener swap <pane-stream> >>outstream
+: <irc-editor> ( tab pane -- tab editor )
+    over irc-editor new-editor
+    swap listener>> >>listener swap <pane-stream> >>outstream
     over client>> >>client ;
 
 : editor-send ( irc-editor -- )
@@ -113,25 +147,36 @@ irc-editor "general" f {
     { T{ key-down f f "ENTER" } editor-send }
 } define-command-map
 
-TUPLE: irc-page < frame listener client ;
+: <irc-list> ( -- gadget model )
+    [ drop ]
+    [ first2 [ <label> ] dip >>color ]
+    { } <model> [ <list> ] keep ;
 
-: <irc-page> ( listener client -- irc-page )
-    irc-page new-frame
-    swap client>> >>client swap [ >>listener ] keep
-    [ <irc-pane> [ <scroller> @center grid-add* ] keep ]
-    [ <irc-editor> <scroller> @bottom grid-add* ] bi ;
+: <irc-tab> ( listener client -- irc-tab )
+    irc-tab new-frame
+    swap client>> >>client swap >>listener
+    <irc-pane> [ <scroller> @center grid-add* ] keep
+    <irc-editor> <scroller> @bottom grid-add* ;
 
-M: irc-page graft*
+: <irc-channel-tab> ( listener client -- irc-tab )
+    <irc-tab>
+    <irc-list> [ <scroller> @right grid-add* ] dip >>listmodel
+    [ update-participants ] keep ;
+
+: <irc-server-tab> ( listener client -- irc-tab )
+    <irc-tab> ;
+
+M: irc-tab graft*
     [ listener>> ] [ client>> ] bi
     add-listener ;
 
-M: irc-page ungraft*
+M: irc-tab ungraft*
     [ listener>> ] [ client>> ] bi
     remove-listener ;
 
 : join-channel ( name ui-window -- )
     [ dup <irc-channel-listener> ] dip
-    [ <irc-page> swap ] keep
+    [ <irc-channel-tab> swap ] keep
     tabs>> add-page ;
 
 : irc-window ( ui-window -- )
@@ -142,12 +187,12 @@ M: irc-page ungraft*
 : ui-connect ( profile -- ui-window )
     <irc-client> ui-window new over >>client swap
     [ connect-irc ]
-    [ listeners>> +server-listener+ swap at <irc-pane> <scroller>
+    [ listeners>> +server-listener+ swap at over <irc-tab>
       "Server" associate <tabbed> >>tabs ] bi ;
 
 : server-open ( server port nick password channels -- )
     [ <irc-profile> ui-connect [ irc-window ] keep ] dip
-    [ over join-channel ] each ;
+    [ over join-channel ] each drop ;
 
 : main-run ( -- ) run-ircui ;
 
