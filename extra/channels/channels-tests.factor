@@ -17,7 +17,7 @@ IN: channels.tests
     from 
 ] unit-test
 
-{ V{ 1 2 3 4 } } [
+{ { 1 2 3 4 } } [
     V{ } clone <channel>
     [ from swap push ] in-thread
     [ from swap push ] in-thread
@@ -30,7 +30,7 @@ IN: channels.tests
     natural-sort
 ] unit-test
 
-{ V{ 1 2 4 9 } } [
+{ { 1 2 4 9 } } [
     V{ } clone <channel>
     [ 4 swap to ] in-thread
     [ 2 swap to ] in-thread

@@ -30,10 +30,3 @@ words splitting grouping sorting ;
     \ + stack-trace-contains?
     \ > stack-trace-contains?
 ] unit-test
-
-: quux ( -- seq ) { 1 2 3 } [ "hi" throw ] sort ;
-
-[ t ] [
-    [ 10 quux ] ignore-errors
-    \ sort stack-trace-contains?
-] unit-test

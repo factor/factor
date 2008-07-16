@@ -49,7 +49,7 @@ kernel strings ;
         { { object ppc object } "b" }
         { { string object windows } "c" }
     }
-    V{ cpu os }
+    { cpu os }
 ] [
     example-1 canonicalize-specializers
 ] unit-test
