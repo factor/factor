@@ -50,13 +50,13 @@ TUPLE: merge
 : dump-r  [ [ from2>> ] [ to2>> ] [ seq>> ] tri ] [ accum>> ] bi dump ; inline
 : l-next  [ [ l-elt ] [ [ 1+ ] change-from1 drop ] bi ] [ accum>> ] bi push ; inline
 : r-next  [ [ r-elt ] [ [ 1+ ] change-from2 drop ] bi ] [ accum>> ] bi push ; inline
-: decide  [ [ l-elt ] [ r-elt ] bi ] dip call +lt+ eq? ; inline
+: decide  [ [ l-elt ] [ r-elt ] bi ] dip call +gt+ eq? ; inline
 
 : (merge) ( merge quot -- )
-    over l-done? [ drop dump-r ] [
-        over r-done? [ drop dump-l ] [
+    over r-done? [ drop dump-l ] [
+        over l-done? [ drop dump-r ] [
             2dup decide
-            [ over l-next ] [ over r-next ] if
+            [ over r-next ] [ over l-next ] if
             (merge)
         ] if
     ] if ; inline

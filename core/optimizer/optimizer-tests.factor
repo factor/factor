@@ -219,7 +219,7 @@ M: number detect-number ;
 
 ! Regression
 USE: sorting
-USE: sorting.private
+USE: binary-search.private
 
 : old-binsearch ( elt quot seq -- elt quot i )
     dup length 1 <= [
@@ -227,7 +227,7 @@ USE: sorting.private
     ] [
         [ midpoint swap call ] 3keep roll dup zero?
         [ drop dup slice-from swap midpoint@ + ]
-        [ partition old-binsearch ] if
+        [ dup midpoint@ cut-slice old-binsearch ] if
     ] if ; inline
 
 [ 10 ] [
