@@ -7,51 +7,56 @@ USING: kernel continuations combinators sequences quotations arrays namespaces
 IN: backtrack
 
 SYMBOL: failure
-V{ } failure set-global
 
 ERROR: amb-failure ;
 
 M: amb-failure summary drop "Backtracking failure" ;
 
 : fail ( -- )
-    failure get dup empty? [ amb-failure ]
-    [ pop continue ] if ;
+    failure get [ continue ]
+    [ amb-failure ] if* ;
 
 : require ( ? -- )
     [ fail ] unless ;
 
 MACRO: checkpoint ( quot -- quot' )
-    '[ [ '[ failure get push , continue ] callcc0 @ ] callcc0 ] ;
+    '[ failure get ,
+       '[ '[ failure set , continue ] callcc0
+          , failure set @ ] callcc0 ] ;
 
 : number-from ( from -- from+n )
     [ 1 + number-from ] checkpoint ;
 
 <PRIVATE
 
+: unsafe-number-from-to ( to from -- to from+n )
+    2dup = [ [ 1 + unsafe-number-from-to ] checkpoint ] unless ;
+
 : number-from-to ( to from -- to from+n )
-    2dup <=>
-    { { +lt+ [ fail ] }
-      { +eq+ [ ] }
-      { +gt+ [ [ 1 + number-from-to ] checkpoint ] } } case ;
+    2dup < [ fail ] when unsafe-number-from-to ;
 
 : amb-integer ( seq -- int )
     length 1 - 0 number-from-to nip ;
+
+MACRO: unsafe-amb ( seq -- quot )
+    dup length 1 =
+    [ first 1quotation ]
+    [ [ first ] [ rest ] bi
+      '[ , [ drop , unsafe-amb ] checkpoint ] ] if ;
 
 PRIVATE> 
 
 : amb-lazy ( seq -- elt )
     [ amb-integer ] [ nth ] bi ;
 
-MACRO: amb ( seq -- quot )
-    dup length
-    { { 0 [ drop [ fail f ] ] }
-      { 1 [ first 1quotation ] }
-      [ drop [ first ] [ rest ] bi
-        '[ , [ drop , amb ] checkpoint ] ] } case ;
+: amb ( seq -- elt )
+    dup empty?
+    [ drop fail f ]
+    [ unsafe-amb ] if ; inline
 
 MACRO: amb-execute ( seq -- quot )
-    [ length ] [ <enum> [ 1quotation ] assoc-map ] bi
-    '[ , amb , case ] ;
+    [ length 1 - ] [ <enum> [ 1quotation ] assoc-map ] bi
+    '[ , 0 unsafe-number-from-to nip , case ] ;
 
 : if-amb ( true false -- )
     [
