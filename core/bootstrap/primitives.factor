@@ -225,7 +225,9 @@ bi
     { "imaginary" { "real" "math" } read-only }
 } define-builtin
 
-"array" "arrays" create { } define-builtin
+"array" "arrays" create {
+    { "length" { "array-capacity" "sequences.private" } read-only }
+} define-builtin
 
 "wrapper" "kernel" create {
     { "wrapped" read-only }
@@ -261,7 +263,9 @@ bi
     { "sub-primitive" read-only }
 } define-builtin
 
-"byte-array" "byte-arrays" create { } define-builtin
+"byte-array" "byte-arrays" create {
+    { "length" { "array-capacity" "sequences.private" } read-only }
+} define-builtin
 
 "callstack" "kernel" create { } define-builtin
 

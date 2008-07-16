@@ -60,9 +60,6 @@ INSTANCE: immutable-sequence sequence
 
 <PRIVATE
 
-: array-capacity ( array -- n )
-    1 slot { array-capacity } declare ; inline
-
 : array-nth ( n array -- elt )
     swap 2 fixnum+fast slot ; inline
 
