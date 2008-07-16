@@ -6,9 +6,9 @@ USING: accessors kernel threads combinators concurrency.mailboxes
        ui ui.gadgets ui.gadgets.panes ui.gadgets.editors
        ui.gadgets.scrollers ui.commands ui.gadgets.frames ui.gestures
        ui.gadgets.tabs ui.gadgets.grids
-       io io.styles namespaces irc.client irc.client.private
-       irc.messages irc.messages.private irc.ui.commandparser
-       calendar calendar.format ;
+       io io.styles namespaces calendar calendar.format
+       irc.client irc.client.private irc.messages irc.messages.private
+       irc.ui.commandparser irc.ui.load ;
 
 IN: irc.ui
 
@@ -145,6 +145,10 @@ M: irc-page ungraft*
     [ listeners>> +server-listener+ swap at <irc-pane> <scroller>
       "Server" associate <tabbed> >>tabs ] bi ;
 
-: freenode-connect ( -- ui-window )
-    "irc.freenode.org" 8001 "factor-irc" f
-    <irc-profile> ui-connect [ irc-window ] keep ;
+: server-open ( server port nick password channels -- )
+    [ <irc-profile> ui-connect [ irc-window ] keep ] dip
+    [ over join-channel ] each ;
+
+: main-run ( -- ) run-ircui ;
+
+MAIN: main-run
