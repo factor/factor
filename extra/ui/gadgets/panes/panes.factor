@@ -332,10 +332,8 @@ M: paragraph stream-format
 
 GENERIC: sloppy-pick-up* ( loc gadget -- n )
 
-M: pack sloppy-pick-up*
-    dup gadget-orientation
-    swap gadget-children
-    (fast-children-on) ;
+M: pack sloppy-pick-up* ( loc gadget -- n )
+   [ orientation>> ] [ children>> ] bi (fast-children-on) ;
 
 M: gadget sloppy-pick-up*
     gadget-children [ inside? ] with find-last drop ;
