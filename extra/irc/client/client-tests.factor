@@ -1,7 +1,7 @@
 USING: kernel tools.test accessors arrays sequences qualified
        io.streams.string io.streams.duplex namespaces threads
        calendar irc.client.private irc.client irc.messages.private
-       concurrency.mailboxes classes ;
+       concurrency.mailboxes classes assocs ;
 EXCLUDE: irc.messages => join ;
 RENAME: join irc.messages => join_
 IN: irc.client.tests
@@ -42,7 +42,7 @@ IN: irc.client.tests
                     ":some.where 001 factorbot :Welcome factorbot"
                   } make-client
                   [ connect-irc ] keep 1 seconds sleep
-                    profile>> nickname>> ] unit-test
+                  profile>> nickname>> ] unit-test
 
 { join_ "#factortest" } [
            { ":factorbot!n=factorbo@some.where JOIN :#factortest"
@@ -52,11 +52,19 @@ IN: irc.client.tests
              ":ircserver.net 477 factorbot #factortest :[ircserver-info] blah blah"
              } make-client dup "factorbot" set-nick
              [ connect-irc ] keep 1 seconds sleep
-             join-messages>> 5 seconds mailbox-get-timeout
+             join-messages>> 1 seconds mailbox-get-timeout
              [ class ] [ trailing>> ] bi ] unit-test
-! TODO: user join
-! ":somedude!n=user@isp.net JOIN :#factortest"
+
+{ +join+ "somebody" } [
+           { ":somebody!n=somebody@some.where JOIN :#factortest"
+             } make-client dup "factorbot" set-nick
+             [ listeners>> [ "#factortest" [ <irc-channel-listener> ] keep ] dip set-at ]
+             [ connect-irc ]
+             [ listeners>> [ "#factortest" ] dip at
+               [ read-message drop ] [ read-message drop ] [ read-message ] tri ] tri
+             [ action>> ] [ nick>> ] bi
+             ] unit-test
 ! TODO: channel message
-! ":somedude!n=user@isp.net PRIVMSG #factortest :hello"
+! ":somebody!n=somebody@some.where PRIVMSG #factortest :hello"
 ! TODO: direct private message
 ! ":somedude!n=user@isp.net PRIVMSG factorbot2 :hello"

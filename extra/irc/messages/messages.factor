@@ -34,6 +34,7 @@ M: irc-message irc-message>client-line ( irc-message -- string )
     tri 3array " " sjoin ;
 
 GENERIC: irc-message>server-line ( irc-message -- string )
+
 M: irc-message irc-message>server-line ( irc-message -- string )
    drop "not implemented yet" ;
 
