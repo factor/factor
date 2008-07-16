@@ -104,12 +104,12 @@ unit-test
 [ svector{ 1.0 2.0 } ] [ svector{ 4.0 8.0 } 4.0 V/n ] unit-test
 [ dvector{ 1.0 2.0 } ] [ dvector{ 4.0 8.0 } 4.0 V/n ] unit-test
 
-[ cvector{ 2.0 1.0 } ]
-[ cvector{ C{ 16.0 4.0 } C{ 8.0 2.0 } } C{ 8.0 2.0 } V/n ]
+[ cvector{ C{ 0.0 -4.0 } 1.0 } ]
+[ cvector{ C{ 4.0 -4.0 } C{ 1.0 1.0 } } C{ 1.0 1.0 } V/n ]
 unit-test
 
-[ cvector{ 2.0 1.0 } ]
-[ cvector{ C{ 16.0 4.0 } C{ 8.0 2.0 } } C{ 8.0 2.0 } V/n ]
+[ zvector{ C{ 0.0 -4.0 } 1.0 } ]
+[ zvector{ C{ 4.0 -4.0 } C{ 1.0 1.0 } } C{ 1.0 1.0 } V/n ]
 unit-test
 
 ! V.

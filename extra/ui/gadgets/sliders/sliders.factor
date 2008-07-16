@@ -9,27 +9,21 @@ IN: ui.gadgets.sliders
 
 TUPLE: elevator < gadget direction ;
 
-: find-elevator ( gadget -- elevator/f )
-    [ elevator? ] find-parent ;
+: find-elevator ( gadget -- elevator/f ) [ elevator? ] find-parent ;
 
 TUPLE: slider < frame elevator thumb saved line ;
 
-: find-slider ( gadget -- slider/f )
-    [ slider? ] find-parent ;
+: find-slider ( gadget -- slider/f ) [ slider? ] find-parent ;
 
 : elevator-length ( slider -- n )
-    dup slider-elevator rect-dim
-    swap gadget-orientation v. ;
+  [ elevator>> dim>> ] [ orientation>> ] bi v. ;
 
 : min-thumb-dim 15 ;
 
 : slider-value ( gadget -- n ) gadget-model range-value >fixnum ;
-
-: slider-page ( gadget -- n ) gadget-model range-page-value ;
-
-: slider-max ( gadget -- n ) gadget-model range-max-value ;
-
-: slider-max* ( gadget -- n ) gadget-model range-max-value* ;
+: slider-page  ( gadget -- n ) gadget-model range-page-value    ;
+: slider-max   ( gadget -- n ) gadget-model range-max-value     ;
+: slider-max*  ( gadget -- n ) gadget-model range-max-value*    ;
 
 : thumb-dim ( slider -- h )
     dup slider-page over slider-max 1 max / 1 min
@@ -45,7 +39,6 @@ TUPLE: slider < frame elevator thumb saved line ;
     swap slider-max* 1 max / ;
 
 : slider>screen ( m scale -- n ) slider-scale * ;
-
 : screen>slider ( m scale -- n ) slider-scale / ;
 
 M: slider model-changed nip slider-elevator relayout-1 ;
@@ -76,11 +69,9 @@ thumb H{
         t >>root?
     thumb-theme ;
 
-: slide-by ( amount slider -- )
-    gadget-model move-by ;
+: slide-by ( amount slider -- ) gadget-model move-by ;
 
-: slide-by-page ( amount slider -- )
-    gadget-model move-by-page ;
+: slide-by-page ( amount slider -- ) gadget-model move-by-page ;
 
 : compute-direction ( elevator -- -1/1 )
     dup find-slider swap hand-click-rel
@@ -100,13 +91,10 @@ elevator H{
     { T{ button-down } [ elevator-click ] }
 } set-gestures
 
-: elevator-theme ( elevator -- )
-    lowered-gradient swap set-gadget-interior ;
-
 : <elevator> ( vector -- elevator )
-    elevator new-gadget
-    [ set-gadget-orientation ] keep
-    dup elevator-theme ;
+  elevator new-gadget
+    swap             >>orientation
+    lowered-gradient >>interior ;
 
 : (layout-thumb) ( slider n -- n thumb )
     over gadget-orientation n*v swap slider-thumb ;
@@ -144,17 +132,10 @@ M: elevator layout*
   dup elevator>> over thumb>> add-gadget
   @center grid-add* ;
 
-: <left-button> ( -- button )
-    { 0 1 } arrow-left -1 <slide-button> ;
-
-: <right-button> ( -- button )
-    { 0 1 } arrow-right 1 <slide-button> ;
-
-: <up-button> ( -- button )
-    { 1 0 } arrow-up -1 <slide-button> ;
-
-: <down-button> ( -- button )
-    { 1 0 } arrow-down 1 <slide-button> ;
+: <left-button>  ( -- button ) { 0 1 } arrow-left -1 <slide-button> ;
+: <right-button> ( -- button ) { 0 1 } arrow-right 1 <slide-button> ;
+: <up-button>    ( -- button ) { 1 0 } arrow-up   -1 <slide-button> ;
+: <down-button>  ( -- button ) { 1 0 } arrow-down  1 <slide-button> ;
 
 : <slider> ( range orientation -- slider )
     slider new-frame

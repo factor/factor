@@ -3,7 +3,8 @@
 USING: kernel math math.functions math.parser models
        models.filter models.range models.compose sequences ui
        ui.gadgets ui.gadgets.frames ui.gadgets.labels ui.gadgets.packs
-       ui.gadgets.sliders ui.render math.geometry.rect accessors ;
+       ui.gadgets.sliders ui.render math.geometry.rect accessors
+       ui.gadgets.grids ;
 IN: color-picker
 
 ! Simple example demonstrating the use of models.
@@ -33,12 +34,16 @@ M: color-preview model-changed
       [ <color-slider> add-gadget ] each ;
 
 : <color-picker> ( -- gadget )
-    [
-        <color-sliders> @top frame,
-        dup <color-model> <color-preview> @center frame,
-        [ [ truncate number>string ] map " " join ] <filter>
-        <label-control> @bottom frame,
-    ] make-frame ;
+  <frame>
+    <color-sliders>
+      swap dup
+      [                               @top    grid-add* ]
+      [ <color-model> <color-preview> @center grid-add* ]
+      [
+        [ [ truncate number>string ] map " " join ] <filter> <label-control>
+        @bottom grid-add*
+      ]
+      tri* ;
 
 : color-picker-window ( -- )
     [ <color-picker> "Color Picker" open-window ] with-ui ;

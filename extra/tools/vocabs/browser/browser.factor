@@ -3,7 +3,7 @@
 USING: accessors kernel combinators vocabs vocabs.loader
 tools.vocabs io io.files io.styles help.markup help.stylesheet
 sequences assocs help.topics namespaces prettyprint words
-sorting definitions arrays summary sets ;
+sorting definitions arrays summary sets generic ;
 IN: tools.vocabs.browser
 
 : vocab-status-string ( vocab -- string )
@@ -104,9 +104,9 @@ C: <vocab-author> vocab-author
     ] unless drop ;
 
 : vocab-xref ( vocab quot -- vocabs )
-    >r dup vocab-name swap words r> map
+    >r dup vocab-name swap words [ generic? not ] filter r> map
     [ [ word? ] filter [ vocabulary>> ] map ] gather natural-sort
-    remove sift [ vocab ] map ; inline
+    remove sift ; inline
 
 : vocab-uses ( vocab -- vocabs ) [ uses ] vocab-xref ;
 
@@ -115,13 +115,13 @@ C: <vocab-author> vocab-author
 : describe-uses ( vocab -- )
     vocab-uses dup empty? [
         "Uses" $heading
-        dup $links
+        dup $vocab-links
     ] unless drop ;
 
 : describe-usage ( vocab -- )
     vocab-usage dup empty? [
         "Used by" $heading
-        dup $links
+        dup $vocab-links
     ] unless drop ;
 
 : $describe-vocab ( element -- )

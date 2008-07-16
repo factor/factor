@@ -3,12 +3,20 @@
 USING: alien alien.syntax io kernel namespaces core-foundation
 core-foundation.run-loop cocoa.messages cocoa cocoa.classes
 cocoa.runtime sequences threads debugger init summary
-kernel.private ;
+kernel.private assocs ;
 IN: cocoa.application
 
 : <NSString> ( str -- alien ) <CFString> -> autorelease ;
-
 : <NSArray> ( seq -- alien ) <CFArray> -> autorelease ;
+: <NSNumber> ( number -- alien ) <CFNumber> -> autorelease ;
+: <NSData> ( byte-array -- alien ) <CFData> -> autorelease ;
+: <NSDictionary> ( assoc -- alien )
+    NSMutableDictionary over assoc-size -> dictionaryWithCapacity:
+    [
+        [
+            spin -> setObject:forKey:
+        ] curry assoc-each
+    ] keep ;
 
 : NSApplicationDelegateReplySuccess 0 ;
 : NSApplicationDelegateReplyCancel  1 ;
