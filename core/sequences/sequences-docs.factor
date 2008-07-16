@@ -243,6 +243,7 @@ $nl
 { $subsection "sequences-destructive" }
 { $subsection "sequences-stacks" }
 { $subsection "sequences-sorting" }
+{ $subsection "binary-search" }
 { $subsection "sets" }
 "For inner loops:"
 { $subsection "sequences-unsafe" } ;
@@ -584,8 +585,6 @@ HELP: cache-nth
 HELP: index
 { $values { "obj" object } { "seq" sequence } { "n" "an index" } }
 { $description "Outputs the index of the first element in the sequence equal to " { $snippet "obj" } ". If no element is found, outputs " { $link f } "." } ;
-
-{ index index-from last-index last-index-from member? memq? } related-words
 
 HELP: index-from
 { $values { "obj" object } { "i" "a start index" } { "seq" sequence } { "n" "an index" } }

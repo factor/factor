@@ -1,5 +1,7 @@
-USING: kernel sequences arrays accessors grouping
-math.order sorting math assocs locals namespaces ;
+! Copyright (C) 2008 Daniel Ehrenberg.
+! See http://factorcode.org/license.txt for BSD license.
+USING: kernel sequences arrays accessors grouping math.order
+sorting binary-search math assocs locals namespaces ;
 IN: interval-maps
 
 TUPLE: interval-map array ;
@@ -7,7 +9,7 @@ TUPLE: interval-map array ;
 <PRIVATE
 
 : find-interval ( key interval-map -- interval-node )
-    [ first <=> ] binsearch* ;
+    [ first <=> ] with search nip ;
 
 : interval-contains? ( key interval-node -- ? )
     first2 between? ;

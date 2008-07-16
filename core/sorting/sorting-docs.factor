@@ -2,18 +2,15 @@ USING: help.markup help.syntax kernel words math
 sequences math.order ;
 IN: sorting
 
-ARTICLE: "sequences-sorting" "Sorting and binary search"
-"Sorting and binary search combinators all take comparator quotations with stack effect " { $snippet "( elt1 elt2 -- <=> )" } ", where the output value is one of the three " { $link "order-specifiers" } "."
+ARTICLE: "sequences-sorting" "Sorting sequences"
+"Sorting combinators all take comparator quotations with stack effect " { $snippet "( elt1 elt2 -- <=> )" } ", where the output value is one of the three " { $link "order-specifiers" } "."
 $nl
 "Sorting a sequence with a custom comparator:"
 { $subsection sort }
 "Sorting a sequence with common comparators:"
 { $subsection natural-sort }
 { $subsection sort-keys }
-{ $subsection sort-values }
-"Binary search:"
-{ $subsection binsearch }
-{ $subsection binsearch* } ;
+{ $subsection sort-values } ;
 
 ABOUT: "sequences-sorting"
 
@@ -40,25 +37,5 @@ HELP: sort-pair
 HELP: midpoint@
 { $values { "seq" "a sequence" } { "n" integer } }
 { $description "Outputs the index of the midpoint of " { $snippet "seq" } "." } ;
-
-HELP: midpoint
-{ $values { "seq" "a sequence" } { "elt" object } }
-{ $description "Outputs the element at the midpoint of a sequence." } ;
-
-HELP: partition
-{ $values { "seq" "a sequence" } { "n" integer } { "slice" slice } }
-{ $description "Outputs a slice of the first or second half of the sequence, respectively, depending on the integer's sign." } ;
-
-HELP: binsearch
-{ $values { "elt" object } { "seq" "a sorted sequence" } { "quot" "a quotation with stack effect " { $snippet "( obj1 obj2 -- <=> )" } } { "i" "the index of the search result" } }
-{ $description "Given a sequence that is sorted with respect to the " { $snippet "quot" } " comparator, searches for an element equal to " { $snippet "elt" } ", or failing that, the greatest element smaller than " { $snippet "elt" } ". Comparison is performed with " { $snippet "quot" } "."
-$nl
-"Outputs f if the sequence is empty. If the sequence has at least one element, this word always outputs a valid index." } ;
-
-HELP: binsearch*
-{ $values { "elt" object } { "seq" "a sorted sequence" } { "quot" "a quotation with stack effect " { $snippet "( obj1 obj2 -- <=> )" } } { "result" "the search result" } }
-{ $description "Variant of " { $link binsearch } " which outputs the found element rather than its index in the sequence."
-$nl
-"Outputs " { $link f } " if the sequence is empty. If the sequence has at least one element, this word always outputs a sequence element." } ;
 
 { <=> compare natural-sort sort-keys sort-values } related-words

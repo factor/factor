@@ -143,6 +143,14 @@ IN: optimizer.known-words
     { [ dup optimize-instance? ] [ optimize-instance ] }
 } define-optimizers
 
+! This is a special-case hack
+: redundant-array-capacity-check? ( #call -- ? )
+    dup in-d>> first node-literal [ 0 = ] [ fixnum? ] bi and ;
+
+\ array-capacity? {
+    { [ dup redundant-array-capacity-check? ] [ [ drop t ] f splice-quot ] }
+} define-optimizers
+
 ! eq? on the same object is always t
 { eq? = } {
     { { @ @ } [ 2drop t ] }
