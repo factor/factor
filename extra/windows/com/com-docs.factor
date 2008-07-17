@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io kernel math quotations
-multiline ;
+multiline destructors ;
 IN: windows.com
 
 HELP: com-query-interface
@@ -13,3 +13,14 @@ HELP: com-add-ref
 HELP: com-release
 { $values { "interface" "Pointer to a COM interface implementing " { $snippet "IUnknown" } } }
 { $description "A small wrapper around " { $link IUnknown::Release } ". Decrements the reference count on " { $snippet "interface" } ", releasing the underlying object if the reference count has reached zero." } ;
+
+HELP: &com-release
+{ $values { "interface" "Pointer to a COM interface implementing " { $snippet "IUnknown" } } }
+{ $description "Marks the given COM interface for unconditional release via " { $link com-release } " at the end of the enclosing " { $link with-destructors } " scope." } ;
+
+HELP: |com-release
+{ $values { "interface" "Pointer to a COM interface implementing " { $snippet "IUnknown" } } }
+{ $description "Marks the given COM interface for release via " { $link com-release } " in the event of an error at the end of the enclosing " { $link with-destructors } " scope." } ;
+
+{ com-release &com-release |com-release } related-words
+

@@ -2,10 +2,11 @@ USING: alien.syntax alien.c-types core-foundation system
 combinators kernel sequences debugger io accessors ;
 IN: iokit
 
-<< {
-    { [ os macosx? ] [ "/System/Library/Frameworks/IOKit.framework" load-framework ] }
-    [ "IOKit only supported on Mac OS X" ]
-} cond >>
+<<
+    os macosx?
+    [ "/System/Library/Frameworks/IOKit.framework" load-framework ]
+    when
+>>
 
 : kIOKitBuildVersionKey   "IOKitBuildVersion" ; inline
 : kIOKitDiagnosticsKey   "IOKitDiagnostics" ; inline

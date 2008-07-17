@@ -63,3 +63,5 @@ MEMO: 24-from-4 ( a b c d -- ? )
         dup pprint " tested " write "memoize" word-prop assoc-size pprint
         " possibilities" print
     ] each ;
+
+MAIN: backtrack-benchmark
