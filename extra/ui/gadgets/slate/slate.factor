@@ -1,29 +1,34 @@
 
-USING: kernel namespaces opengl ui.render ui.gadgets ;
+USING: kernel namespaces opengl ui.render ui.gadgets accessors ;
 
 IN: ui.gadgets.slate
 
-TUPLE: slate action dim graft ungraft
+! TUPLE: slate action dim graft ungraft
+!        button-down
+!        button-up
+!        key-down
+!        key-up ;
+
+TUPLE: slate < gadget
+       action pdim graft ungraft
        button-down
        button-up
        key-down
        key-up ;
 
 : <slate> ( action -- slate )
-  slate construct-gadget
-  tuck set-slate-action
-  { 100 100 } over set-slate-dim
-  [ ] over set-slate-graft
-  [ ] over set-slate-ungraft ;
+  slate new-gadget
+    swap        >>action
+    { 100 100 } >>pdim
+    [ ]         >>graft
+    [ ]         >>ungraft ;
 
-M: slate pref-dim* ( slate -- dim ) slate-dim ;
+M: slate pref-dim* ( slate -- dim ) pdim>> ;
 
-M: slate draw-gadget* ( slate -- )
-   origin get swap slate-action with-translation ;
+M: slate draw-gadget* ( slate -- ) origin get swap action>> with-translation ;
 
-M: slate graft* ( slate -- ) slate-graft call ;
-
-M: slate ungraft* ( slate -- ) slate-ungraft call ;
+M: slate graft*   ( slate -- ) graft>>   call ;
+M: slate ungraft* ( slate -- ) ungraft>> call ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
