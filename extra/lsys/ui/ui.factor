@@ -158,7 +158,7 @@ DEFER: empty-model
 : lsys-viewer ( -- )
 
 [ ] <slate> >slate
-{ 400 400 } clone slate> set-slate-dim
+{ 400 400 } clone slate> set-slate-pdim
 
 {
 

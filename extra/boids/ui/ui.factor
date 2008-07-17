@@ -102,7 +102,7 @@ VARS: population-label cohesion-label alignment-label separation-label ;
 
   C[ display ] <slate> >slate
     t                      slate> set-gadget-clipped?
-    { 600 400 }            slate> set-slate-dim
+    { 600 400 }            slate> set-slate-pdim
     C[ [ run ] in-thread ] slate> set-slate-graft
     C[ loop off ]          slate> set-slate-ungraft
 

@@ -83,7 +83,7 @@ DEFER: automata-window
     @top grid-add
 
     C[ display ] <slate>
-      { 400 400 } >>dim
+      { 400 400 } >>pdim
     dup >slate
 
     @center grid-add
