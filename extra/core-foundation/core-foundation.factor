@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax kernel
-math sequences io.encodings.utf16 ;
+math sequences io.encodings.utf16 destructors accessors ;
 IN: core-foundation
 
 TYPEDEF: void* CFAllocatorRef
@@ -135,3 +135,9 @@ M: f <CFNumber>
         "Cannot load bundled named " prepend throw
     ] ?if ;
 
+TUPLE: CFRelease-destructor alien disposed ;
+M: CFRelease-destructor dispose* alien>> CFRelease ;
+: &CFRelease ( alien -- alien )
+    dup f CFRelease-destructor boa &dispose drop ; inline
+: |CFRelease ( alien -- alien )
+    dup f CFRelease-destructor boa |dispose drop ; inline

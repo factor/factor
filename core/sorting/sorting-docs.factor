@@ -3,6 +3,10 @@ sequences math.order ;
 IN: sorting
 
 ARTICLE: "sequences-sorting" "Sorting sequences"
+"The " { $vocab-link "sorting" } " vocabulary implements the merge-sort algorithm. It runs in " { $snippet "O(n log n)" } " time, and is a " { $emphasis "stable" } " sort, meaning that the order of equal elements is preserved."
+$nl
+"The algorithm only allocates two additional arrays, both the size of the input sequence, and uses iteration rather than recursion, and thus is suitable for sorting large sequences."
+$nl
 "Sorting combinators all take comparator quotations with stack effect " { $snippet "( elt1 elt2 -- <=> )" } ", where the output value is one of the three " { $link "order-specifiers" } "."
 $nl
 "Sorting a sequence with a custom comparator:"

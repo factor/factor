@@ -24,11 +24,23 @@ TUPLE: merge
 { to2    array-capacity } ;
 
 : dump ( from to seq accum -- )
-    #! Optimize common case where to - from = 1.
-    >r >r 2dup swap - 1 =
-    [ drop r> nth-unsafe r> push ]
-    [ r> <slice> r> push-all ]
-    if ; inline
+    #! Optimize common case where to - from = 1, 2, or 3.
+    >r >r 2dup swap - dup 1 =
+    [ 2drop r> nth-unsafe r> push ] [
+        dup 2 = [
+            2drop dup 1+
+            r> [ nth-unsafe ] curry bi@
+            r> [ push ] curry bi@
+        ] [
+            dup 3 = [
+                2drop dup 1+ dup 1+
+                r> [ nth-unsafe ] curry tri@
+                r> [ push ] curry tri@
+            ] [
+                drop r> subseq r> push-all
+            ] if
+        ] if
+    ] if ; inline
 
 : l-elt   [ from1>> ] [ seq>> ] bi nth-unsafe ; inline
 : r-elt   [ from2>> ] [ seq>> ] bi nth-unsafe ; inline
@@ -38,13 +50,13 @@ TUPLE: merge
 : dump-r  [ [ from2>> ] [ to2>> ] [ seq>> ] tri ] [ accum>> ] bi dump ; inline
 : l-next  [ [ l-elt ] [ [ 1+ ] change-from1 drop ] bi ] [ accum>> ] bi push ; inline
 : r-next  [ [ r-elt ] [ [ 1+ ] change-from2 drop ] bi ] [ accum>> ] bi push ; inline
-: decide  [ [ l-elt ] [ r-elt ] bi ] dip call +lt+ eq? ; inline
+: decide  [ [ l-elt ] [ r-elt ] bi ] dip call +gt+ eq? ; inline
 
 : (merge) ( merge quot -- )
-    over l-done? [ drop dump-r ] [
-        over r-done? [ drop dump-l ] [
+    over r-done? [ drop dump-l ] [
+        over l-done? [ drop dump-r ] [
             2dup decide
-            [ over l-next ] [ over r-next ] if
+            [ over r-next ] [ over l-next ] if
             (merge)
         ] if
     ] if ; inline

@@ -1,5 +1,6 @@
 USING: alien alien.c-types windows.com.syntax windows.ole32
-windows.types continuations kernel alien.syntax libc ;
+windows.types continuations kernel alien.syntax libc
+destructors accessors ;
 IN: windows.com
 
 LIBRARY: ole32
@@ -39,3 +40,11 @@ COM-INTERFACE: IDropTarget IUnknown {00000122-0000-0000-C000-000000000046}
 
 : with-com-interface ( interface quot -- )
     over [ slip ] [ com-release ] [ ] cleanup ; inline
+
+TUPLE: com-destructor interface disposed ;
+M: com-destructor dispose* interface>> com-release ;
+
+: &com-release ( interface -- interface )
+    dup f com-destructor boa &dispose drop ;
+: |com-release ( interface -- interface )
+    dup f com-destructor boa |dispose drop ;

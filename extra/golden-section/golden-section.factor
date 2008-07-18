@@ -57,7 +57,7 @@ IN: golden-section
 : golden-section-window ( -- )
     [
         [ display ] <slate>
-        { 600 600 } over set-slate-dim
+        { 600 600 } over set-slate-pdim
         "Golden Section" open-window
     ] with-ui ;
 
