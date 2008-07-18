@@ -51,7 +51,8 @@ SYMBOL: +mode+
      <mailbox> <mailbox> irc-server-listener boa ;
 
 : <irc-channel-listener> ( name -- irc-channel-listener )
-     [ <mailbox> <mailbox> ] dip f 60 seconds H{ } clone irc-channel-listener boa ;
+     [ <mailbox> <mailbox> ] dip f 60 seconds H{ } clone
+     irc-channel-listener boa ;
 
 : <irc-nick-listener> ( name -- irc-nick-listener )
      [ <mailbox> <mailbox> ] dip irc-nick-listener boa ;
@@ -63,7 +64,7 @@ SYMBOL: +mode+
 TUPLE: participant-changed nick action ;
 C: <participant-changed> participant-changed
 
-SINGLETON: irc-listener-end ! send to a listener to top its execution
+SINGLETON: irc-listener-end ! send to a listener to stop its execution
 SINGLETON: irc-end          ! sent when the client isn't running anymore
 SINGLETON: irc-disconnected ! sent when connection is lost
 SINGLETON: irc-connected    ! sent when connection is established

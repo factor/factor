@@ -64,7 +64,23 @@ IN: irc.client.tests
                [ read-message drop ] [ read-message drop ] [ read-message ] tri ] tri
              [ action>> ] [ nick>> ] bi
              ] unit-test
-! TODO: channel message
-! ":somebody!n=somebody@some.where PRIVMSG #factortest :hello"
-! TODO: direct private message
-! ":somedude!n=user@isp.net PRIVMSG factorbot2 :hello"
+
+{ privmsg "#factortest" "hello" } [
+           { ":somebody!n=somebody@some.where PRIVMSG #factortest :hello"
+             } make-client dup "factorbot" set-nick
+             [ listeners>> [ "#factortest" [ <irc-channel-listener> ] keep ] dip set-at ]
+             [ connect-irc ]
+             [ listeners>> [ "#factortest" ] dip at
+               [ read-message drop ] [ read-message ] bi ] tri
+             [ class ] [ name>> ] [ trailing>> ] tri
+             ] unit-test
+
+{ privmsg "factorbot" "hello" } [
+           { ":somedude!n=user@isp.net PRIVMSG factorbot :hello"
+             } make-client dup "factorbot" set-nick
+             [ listeners>> [ "somedude" [ <irc-nick-listener> ] keep ] dip set-at ]
+             [ connect-irc ]
+             [ listeners>> [ "somedude" ] dip at
+               [ read-message drop ] [ read-message ] bi ] tri
+             [ class ] [ name>> ] [ trailing>> ] tri
+             ] unit-test
