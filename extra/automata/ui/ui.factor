@@ -6,7 +6,6 @@ USING: kernel namespaces math quotations arrays hashtables sequences threads
        ui
        ui.gestures
        ui.gadgets
-       ui.gadgets.handler
        ui.gadgets.slate
        ui.gadgets.labels
        ui.gadgets.buttons
@@ -14,6 +13,7 @@ USING: kernel namespaces math quotations arrays hashtables sequences threads
        ui.gadgets.packs
        ui.gadgets.grids
        ui.gadgets.theme
+       ui.gadgets.handler
        accessors
        qualified
        namespaces.lib assocs.lib vars
@@ -88,6 +88,8 @@ DEFER: automata-window
 
     @center grid-add
 
+  <handler>
+
   H{ }
     T{ key-down f f "1" } [ start-center    ] view-action is
     T{ key-down f f "2" } [ start-random    ] view-action is
@@ -95,9 +97,7 @@ DEFER: automata-window
     T{ key-down f f "5" } [ random-rule     ] view-action is
     T{ key-down f f "n" } [ automata-window ] view-action is
 
-  <handler>
-
-    tuck set-gadget-delegate
+  >>table
 
   "Automata" open-window ;
 

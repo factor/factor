@@ -147,6 +147,8 @@ VARS: population-label cohesion-label alignment-label separation-label ;
 
   slate> over @center grid-add
 
+  <handler> 
+
   H{ } clone
     T{ key-down f f "1" } C[ drop randomize    ] is
     T{ key-down f f "2" } C[ drop sub-10-boids ] is
@@ -162,7 +164,10 @@ VARS: population-label cohesion-label alignment-label separation-label ;
     T{ key-down f f "d" } C[ drop dec-separation-weight ] is
 
     T{ key-down f f "ESC" } C[ drop toggle-loop ] is
-  <handler> tuck set-gadget-delegate "Boids" open-window ;
+
+  >>table
+
+  "Boids" open-window ;
 
 : boids-window ( -- ) [ [ boids-window* ] with-scope ] with-ui ;
 
