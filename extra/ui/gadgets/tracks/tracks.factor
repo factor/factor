@@ -46,9 +46,6 @@ M: track pref-dim* ( gadget -- dim )
    tri
    set-axis ;
 
-: track-add ( gadget track constraint -- )
-    over track-sizes push swap add-gadget drop ;
-
 : track-add* ( track gadget constraint -- track )
   pick sizes>> push add-gadget ;
 
