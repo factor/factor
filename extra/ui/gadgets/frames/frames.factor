@@ -38,6 +38,3 @@ M: frame layout*
     dup compute-grid
     [ rot rect-dim fill-center ] 3keep
     grid-layout ;
-
-: frame, ( gadget i j -- )
-    gadget get -rot grid-add ;

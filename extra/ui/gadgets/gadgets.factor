@@ -361,10 +361,6 @@ M: f request-focus-on 2drop ;
     [ focus>> ] follow ;
 
 ! Deprecated
-: set-gadget-delegate ( gadget tuple -- )
-    over [
-        dup pick [ (>>parent) ] with each-child
-    ] when set-delegate ;
 
 : construct-gadget ( class -- tuple )
     >r <gadget> { set-delegate } r> construct ; inline

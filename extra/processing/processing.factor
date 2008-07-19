@@ -374,7 +374,7 @@ SYMBOL: setup-called
   500 sleep
 
   <processing-gadget>
-    size-val get >>dim
+    size-val get >>pdim
     dup "Processing" open-window
 
     500 sleep

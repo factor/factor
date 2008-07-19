@@ -10,9 +10,11 @@ SYMBOL: watched-variables
 
 : watch-var ( sym -- ) watched-variables get push ;
 
-: watch-vars ( sym -- ) watched-variables get [ push ] curry each ;
+: watch-vars ( seq -- ) watched-variables get [ push ] curry each ;
 
 : unwatch-var ( sym -- ) watched-variables get delete ;
+
+: unwatch-vars ( seq -- ) watched-variables get [ delete ] curry each ;
 
 : print-watched-variables ( -- )
   watched-variables get length 0 >
@@ -33,9 +35,9 @@ SYMBOL: watched-variables
     [
       print-watched-variables
       "----------" print
-      .s
+      datastack [ . ] each
       "----------" print
-      retainstack reverse stack.
+      retainstack reverse [ . ] each
     ]
   listener-hook set ;
 
