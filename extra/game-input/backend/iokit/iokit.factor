@@ -80,15 +80,9 @@ SINGLETON: iokit-game-input-backend
     game-devices-matching-seq hid-manager-matching ;
 
 : device-property ( device key -- value )
-    [
-        <NSString> IOHIDDeviceGetProperty
-        [ &CFRelease plist> ] [ f ] if*
-    ] with-destructors ;
+    <NSString> IOHIDDeviceGetProperty plist> ;
 : element-property ( element key -- value )
-    [
-        <NSString> IOHIDElementGetProperty
-        [ &CFRelease plist> ] [ f ] if*
-    ] with-destructors ;
+    <NSString> IOHIDElementGetProperty plist> ;
 : set-element-property ( element key value -- )
     [ <NSString> ] [ >plist ] bi* IOHIDElementSetProperty drop ;
 : transfer-element-property ( element from-key to-key -- )
