@@ -12,7 +12,7 @@ IN: ui.gadgets.status-bar
 
 : open-status-window ( gadget title -- )
     f <model> [ <world> ] keep
-    <status-bar> over f track-add
+    <status-bar> f track-add*
     open-world-window ;
 
 : show-summary ( object gadget -- )
