@@ -17,8 +17,8 @@ M: controller-state clone
 
 SYMBOLS:
     pov-neutral
-    pov-up pov-up-left pov-left pov-down-left
-    pov-down pov-down-right pov-right pov-up-right ;
+    pov-up pov-up-right pov-right pov-down-right
+    pov-down pov-down-left pov-left pov-up-left ;
 
 HOOK: get-controllers game-input-backend ( -- sequence )
 

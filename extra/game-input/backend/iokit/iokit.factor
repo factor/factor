@@ -119,17 +119,20 @@ SINGLETON: iokit-game-input-backend
 : hat-switch? ( {usage-page,usage} -- ? )
     { 1 HEX: 39 } = ;
 
+: pov-values
+    {
+        pov-up pov-up-right pov-right pov-down-right
+        pov-down pov-down-left pov-left pov-up-left
+        pov-neutral
+    } ;
+
 : button-value ( value -- f/(0,1] )
     IOHIDValueGetIntegerValue dup zero? [ drop f ] when ;
 ! XXX calibration
 : axis-value ( value -- [-1,1] )
     kIOHIDValueScaleTypeCalibrated IOHIDValueGetScaledValue ;
-: slider-value ( value -- [0,1] )
-    kIOHIDValueScaleTypeCalibrated IOHIDValueGetScaledValue
-    1.0 + 0.5 * ;
 : pov-value ( value -- pov-direction )
-    ! XXX
-    IOHIDValueGetIntegerValue ;
+    IOHIDValueGetIntegerValue pov-values ?nth [ pov-neutral ] unless* ;
 
 : record-controller ( controller-state value -- )
     dup IOHIDValueGetElement element-usage {
@@ -140,7 +143,7 @@ SINGLETON: iokit-game-input-backend
         { [ dup rx-axis? ] [ drop axis-value >>rx drop ] }
         { [ dup ry-axis? ] [ drop axis-value >>ry drop ] }
         { [ dup rz-axis? ] [ drop axis-value >>rz drop ] }
-        { [ dup slider? ] [ drop slider-value >>slider drop ] }
+        { [ dup slider? ] [ drop axis-value >>slider drop ] }
         { [ dup hat-switch? ] [ drop pov-value >>pov drop ] }
         [ 3drop ]
     } cond ;
