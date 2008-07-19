@@ -40,7 +40,7 @@ M: world request-focus-on ( child gadget -- )
         { 0 0 } >>window-loc
         swap >>status
         swap >>title
-        [ 1 track-add ] keep
+        swap 1 track-add*
     dup request-focus ;
 
 M: world layout*
