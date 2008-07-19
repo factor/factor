@@ -188,6 +188,9 @@ M: f print-element drop ;
 : $links ( topics -- )
     [ [ ($link) ] textual-list ] ($span) ;
 
+: $vocab-links ( vocabs -- )
+    [ vocab ] map $links ;
+
 : $see-also ( topics -- )
     "See also" $heading $links ;
 

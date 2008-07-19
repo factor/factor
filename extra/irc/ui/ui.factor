@@ -3,11 +3,16 @@
 
 USING: accessors kernel threads combinators concurrency.mailboxes
        sequences strings hashtables splitting fry assocs hashtables
-       ui ui.gadgets.panes ui.gadgets.editors ui.gadgets.scrollers
-       ui.commands ui.gadgets.frames ui.gestures ui.gadgets.tabs
-       io io.styles namespaces irc.client irc.messages ;
+       ui ui.gadgets ui.gadgets.panes ui.gadgets.editors
+       ui.gadgets.scrollers ui.commands ui.gadgets.frames ui.gestures
+       ui.gadgets.tabs ui.gadgets.grids
+       io io.styles namespaces calendar calendar.format
+       irc.client irc.client.private irc.messages irc.messages.private
+       irc.ui.commandparser irc.ui.load ;
 
 IN: irc.ui
+
+SYMBOL: listener
 
 SYMBOL: client
 
@@ -19,36 +24,45 @@ TUPLE: ui-window client tabs ;
 : green { 0 0.5 0 1 } ;
 : blue { 0 0 1 1 } ;
 
-: prefix>nick ( prefix -- nick )
-    "!" split first ;
+: dot-or-parens ( string -- string )
+    dup empty? [ drop "." ]
+    [ "(" prepend ")" append ] if ;
 
 GENERIC: write-irc ( irc-message -- )
 
 M: privmsg write-irc
     "<" blue write-color
-    [ prefix>> prefix>nick write ] keep
-    ">" blue write-color
-    " " write
+    [ prefix>> parse-name write ] keep
+    "> " blue write-color
     trailing>> write ;
+
+TUPLE: own-message message nick timestamp ;
+
+: <own-message> ( message nick -- own-message )
+    now own-message boa ;
+
+M: own-message write-irc
+    "<" blue write-color
+    [ nick>> bold font-style associate format ] keep
+    "> " blue write-color
+    message>> write ;
 
 M: join write-irc
     "* " green write-color
-    prefix>> prefix>nick write
+    prefix>> parse-name write
     " has entered the channel." green write-color ;
 
 M: part write-irc
     "* " red write-color
-    [ prefix>> prefix>nick write ] keep
-    " has left the channel(" red write-color
-    trailing>> write
-    ")" red write-color ;
+    [ prefix>> parse-name write ] keep
+    " has left the channel" red write-color
+    trailing>> dot-or-parens red write-color ;
 
 M: quit write-irc
     "* " red write-color
-    [ prefix>> prefix>nick write ] keep
-    " has left IRC(" red write-color
-    trailing>> write
-    ")" red write-color ;
+    [ prefix>> parse-name write ] keep
+    " has left IRC" red write-color
+    trailing>> dot-or-parens red write-color ;
 
 M: irc-end write-irc
     drop "* You have left IRC" red write-color ;
@@ -63,15 +77,12 @@ M: irc-message write-irc
     drop ; ! catch all unimplemented writes, THIS WILL CHANGE    
 
 : print-irc ( irc-message -- )
-    write-irc nl ;
+    [ timestamp>> timestamp>hms write " " write ]
+    [ write-irc nl ] bi ;
 
-: send-message ( message listener client -- )
-    "<" blue write-color
-    profile>> nickname>> bold font-style associate format
-    ">" blue write-color
-    " " write
-    over write nl
-    out-messages>> mailbox-put ;
+: send-message ( message -- )
+    [ print-irc ]
+    [ listener get write-message ] bi ;
 
 : display ( stream listener -- )
     '[ , [ [ t ]
@@ -84,35 +95,44 @@ M: irc-message write-irc
 
 TUPLE: irc-editor < editor outstream listener client ;
 
-: <irc-editor> ( pane listener client -- editor )
-    [ irc-editor new-editor
+: <irc-editor> ( page pane listener -- client editor )
+    irc-editor new-editor
     swap >>listener swap <pane-stream> >>outstream
-    ] dip client>> >>client ;
+    over client>> >>client ;
 
 : editor-send ( irc-editor -- )
     { [ outstream>> ]
-      [ editor-string ]
       [ listener>> ]
       [ client>> ]
+      [ editor-string ]
       [ "" swap set-editor-string ] } cleave
-    '[ , , , send-message ] with-output-stream ;
+     '[ , listener set , client set , parse-message ] with-output-stream ;
 
 irc-editor "general" f {
     { T{ key-down f f "RET" } editor-send }
     { T{ key-down f f "ENTER" } editor-send }
 } define-command-map
 
-: irc-page ( name pane editor tabbed -- )
-    [ [ <scroller> @bottom frame, ! editor
-        <scroller> @center frame, ! pane
-      ] make-frame swap ] dip add-page ;
+TUPLE: irc-page < frame listener client ;
+
+: <irc-page> ( listener client -- irc-page )
+    irc-page new-frame
+    swap client>> >>client swap [ >>listener ] keep
+    [ <irc-pane> [ <scroller> @center grid-add* ] keep ]
+    [ <irc-editor> <scroller> @bottom grid-add* ] bi ;
+
+M: irc-page graft*
+    [ listener>> ] [ client>> ] bi
+    add-listener ;
+
+M: irc-page ungraft*
+    [ listener>> ] [ client>> ] bi
+    remove-listener ;
 
 : join-channel ( name ui-window -- )
     [ dup <irc-channel-listener> ] dip
-    [ client>> add-listener ]
-    [ drop <irc-pane> dup ]
-    [ [ <irc-editor> ] keep ] 2tri
-    tabs>> irc-page ;
+    [ <irc-page> swap ] keep
+    tabs>> add-page ;
 
 : irc-window ( ui-window -- )
     [ tabs>> ]
@@ -125,6 +145,10 @@ irc-editor "general" f {
     [ listeners>> +server-listener+ swap at <irc-pane> <scroller>
       "Server" associate <tabbed> >>tabs ] bi ;
 
-: freenode-connect ( -- ui-window )
-    "irc.freenode.org" 8001 "factor-irc" f
-    <irc-profile> ui-connect [ irc-window ] keep ;
+: server-open ( server port nick password channels -- )
+    [ <irc-profile> ui-connect [ irc-window ] keep ] dip
+    [ over join-channel ] each ;
+
+: main-run ( -- ) run-ircui ;
+
+MAIN: main-run

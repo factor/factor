@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hashtables kernel models math namespaces
-       sequences quotations math.vectors combinators sorting vectors
-       dlists dequeues models threads concurrency.flags
-       math.order math.geometry.rect ;
+       sequences quotations math.vectors combinators sorting
+       binary-search vectors dlists dequeues models threads
+       concurrency.flags math.order math.geometry.rect ;
 
 IN: ui.gadgets
 
@@ -70,12 +70,15 @@ GENERIC: children-on ( rect/point gadget -- seq )
 
 M: gadget children-on nip children>> ;
 
-: (fast-children-on) ( dim axis gadgets -- i )
-    swapd [ rect-loc v- over v. 0 <=> ] binsearch nip ;
+: ((fast-children-on)) ( gadget dim axis -- <=> )
+    [ swap loc>> v- ] dip v. 0 <=> ;
+
+: (fast-children-on) ( dim axis children -- i )
+    -rot [ ((fast-children-on)) ] 2curry search drop ;
 
 : fast-children-on ( rect axis children -- from to )
-    [ >r >r rect-loc r> r> (fast-children-on) 0 or ]
-    [ >r >r dup rect-loc swap rect-dim v+ r> r> (fast-children-on) ?1+ ]
+    [ [ rect-loc ] 2dip (fast-children-on) 0 or ]
+    [ [ rect-bounds v+ ] 2dip (fast-children-on) ?1+ ]
     3bi ;
 
 : inside? ( bounds gadget -- ? )
@@ -358,10 +361,6 @@ M: f request-focus-on 2drop ;
     [ focus>> ] follow ;
 
 ! Deprecated
-: set-gadget-delegate ( gadget tuple -- )
-    over [
-        dup pick [ (>>parent) ] with each-child
-    ] when set-delegate ;
 
 : construct-gadget ( class -- tuple )
     >r <gadget> { set-delegate } r> construct ; inline
