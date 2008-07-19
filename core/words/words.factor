@@ -164,6 +164,9 @@ M: object redefined drop ;
 : make-inline ( word -- )
     t "inline" set-word-prop ;
 
+: make-recursive ( word -- )
+    t "recursive" set-word-prop ;
+
 : make-flushable ( word -- )
     t "flushable" set-word-prop ;
 
@@ -181,7 +184,7 @@ GENERIC: reset-word ( word -- )
 M: word reset-word
     {
         "unannotated-def"
-        "parsing" "inline" "foldable" "flushable"
+        "parsing" "inline" "recursive" "foldable" "flushable"
         "predicating"
         "reading" "writing"
         "constructing"
@@ -221,6 +224,10 @@ ERROR: bad-create name vocab ;
 
 : constructor-word ( name vocab -- word )
     >r "<" swap ">" 3append r> create ;
+
+GENERIC: inline? ( word -- ? )
+
+M: word inline? "inline" word-prop ;
 
 PREDICATE: parsing-word < word "parsing" word-prop ;
 

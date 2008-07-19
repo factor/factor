@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math namespaces sequences strings words assocs
-combinators accessors ;
+combinators accessors arrays ;
 IN: effects
 
 TUPLE: effect in out terminated? ;
@@ -22,15 +22,16 @@ TUPLE: effect in out terminated? ;
         [ t ]
     } cond 2nip ;
 
-GENERIC: (stack-picture) ( obj -- str )
-M: string (stack-picture) ;
-M: word (stack-picture) name>> ;
-M: integer (stack-picture) drop "object" ;
+GENERIC: effect>string ( obj -- str )
+M: string effect>string ;
+M: word effect>string name>> ;
+M: integer effect>string drop "object" ;
+M: pair effect>string first2 [ effect>string ] bi@ ": " swap 3append ;
 
 : stack-picture ( seq -- string )
-    [ [ (stack-picture) % CHAR: \s , ] each ] "" make ;
+    [ [ effect>string % CHAR: \s , ] each ] "" make ;
 
-: effect>string ( effect -- string )
+M: effect effect>string ( effect -- string )
     [
         "( " %
         [ in>> stack-picture % "-- " % ]
@@ -50,6 +51,9 @@ M: word stack-effect
 
 M: effect clone
     [ in>> clone ] [ out>> clone ] bi <effect> ;
+
+: stack-height ( word -- n )
+    stack-effect effect-height ;
 
 : split-shuffle ( stack shuffle -- stack1 stack2 )
     in>> length cut* ;

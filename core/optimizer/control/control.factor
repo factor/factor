@@ -70,8 +70,6 @@ M: #label collect-label-info*
     [ V{ } clone node-stack get length 3array ] keep
     node-param label-info get set-at ;
 
-USE: prettyprint
-
 M: #call-label collect-label-info*
     node-param label-info get at
     node-stack get over third tail

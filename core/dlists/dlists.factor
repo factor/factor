@@ -48,11 +48,11 @@ M: dlist-node node-value obj>> ;
 : set-front-to-back ( dlist -- )
     dup front>> [ dup back>> >>front ] unless drop ;
 
-: (dlist-find-node) ( dlist-node quot -- node/f ? )
+: (dlist-find-node) ( dlist-node quot: ( node -- ? ) -- node/f ? )
     over [
         [ call ] 2keep rot
         [ drop t ] [ >r next>> r> (dlist-find-node) ] if
-    ] [ 2drop f f ] if ; inline
+    ] [ 2drop f f ] if ; inline recursive
 
 : dlist-find-node ( dlist quot -- node/f ? )
     >r front>> r> (dlist-find-node) ; inline

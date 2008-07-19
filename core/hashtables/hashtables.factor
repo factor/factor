@@ -27,7 +27,7 @@ TUPLE: hashtable
     dup ((empty)) eq?
     [ 3drop no-key ] [
         = [ rot drop t ] [ probe (key@) ] if
-    ] if ; inline
+    ] if ; inline recursive
 
 : key@ ( key hash -- array n ? )
     array>> dup length>> 0 eq?
@@ -51,7 +51,7 @@ TUPLE: hashtable
         ] [
             probe (new-key@)
         ] if
-    ] if ; inline
+    ] if ; inline recursive
 
 : new-key@ ( key hash -- array n empty? )
     array>> 2dup hash@ (new-key@) ; inline

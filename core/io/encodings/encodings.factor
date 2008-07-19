@@ -93,11 +93,10 @@ M: decoder stream-read-partial stream-read ;
         { CHAR: \n [ line-ends\n ] }
     } case ; inline
 
-: ((read-until)) ( buf quot -- string/f sep/f )
-    ! quot: -- char stop?
+: ((read-until)) ( buf quot: ( -- char stop? ) -- string/f sep/f )
     dup call
     [ >r drop "" like r> ]
-    [ pick push ((read-until)) ] if ; inline
+    [ pick push ((read-until)) ] if ; inline recursive
 
 : (read-until) ( quot -- string/f sep/f )
     100 <sbuf> swap ((read-until)) ; inline

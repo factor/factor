@@ -84,7 +84,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     ] [
         3dup nth-unsafe at*
         [ >r 3drop r> ] [ drop >r 1- r> (assoc-stack) ] if
-    ] if ; inline
+    ] if ; inline recursive
 
 : assoc-stack ( key seq -- value )
     dup length 1- swap (assoc-stack) ;
