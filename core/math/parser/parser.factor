@@ -73,13 +73,14 @@ PRIVATE>
 
 : base> ( str radix -- n/f )
     [
-        "-" ?head dup negative? set >r
-        {
-            { [ CHAR: / over member? ] [ string>ratio ] }
-            { [ CHAR: . over member? ] [ string>float ] }
-            [ string>integer ]
-        } cond
-        r> [ dup [ neg ] when ] when
+        CHAR: . over member? [
+            string>float
+        ] [
+            "-" ?head dup negative? set >r
+            CHAR: / over member?
+            [ string>ratio ] [ string>integer ] if
+            r> [ dup [ neg ] when ] when
+        ] if
     ] with-radix ;
 
 : string>number ( str -- n/f ) 10 base> ;

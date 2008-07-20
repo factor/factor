@@ -77,10 +77,6 @@ unit-test
 [ "-101.0e-2" string>number number>string ]
 unit-test
 
-[ 5.0 ]
-[ "10.0/2" string>number ]
-unit-test
-
 [ f ]
 [ "1e1/2" string>number ]
 unit-test
@@ -104,3 +100,5 @@ unit-test
 [ "1.0/0.0" ] [ 1.0 0.0 / number>string ] unit-test
 
 [ "-1.0/0.0" ] [ -1.0 0.0 / number>string ] unit-test
+
+[ "-0.0" ] [ -0.0 number>string ] unit-test
