@@ -52,14 +52,14 @@ TUPLE: merge
 : r-next  [ [ r-elt ] [ [ 1+ ] change-from2 drop ] bi ] [ accum>> ] bi push ; inline
 : decide  [ [ l-elt ] [ r-elt ] bi ] dip call +gt+ eq? ; inline
 
-: (merge) ( merge quot -- )
+: (merge) ( merge quot: ( elt1 elt2 -- <=> ) -- )
     over r-done? [ drop dump-l ] [
         over l-done? [ drop dump-r ] [
             2dup decide
             [ over r-next ] [ over l-next ] if
             (merge)
         ] if
-    ] if ; inline
+    ] if ; inline recursive
 
 : flip-accum ( merge -- )
     dup [ accum>> ] [ accum1>> ] bi eq? [
@@ -111,10 +111,9 @@ TUPLE: merge
     [ merge ] 2curry each-chunk ; inline
 
 : sort-loop ( merge quot -- )
-    2 swap
-    [ pick seq>> length pick > ]
-    [ [ dup ] [ 1 shift ] [ ] tri* [ sort-pass ] 2keep ]
-    [ ] while 3drop ; inline
+    [ 2 [ over seq>> length over > ] ] dip
+    [ [ 1 shift 2dup ] dip sort-pass ] curry
+    [ ] while 2drop ; inline
 
 : each-pair ( seq quot -- )
     [ [ length 1+ 2/ ] keep ] dip

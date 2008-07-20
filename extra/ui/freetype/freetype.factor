@@ -142,7 +142,7 @@ M: freetype-renderer string-height ( open-font string -- h )
     i end < [
         i j bitmap texture copy-pixel
             bitmap texture end (copy-row)
-    ] when ; inline
+    ] when ; inline recursive
 
 :: copy-row ( i j bitmap texture width width2 -- i j )
     i j bitmap texture i width + (copy-row)

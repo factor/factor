@@ -16,10 +16,7 @@ SINGLETON: cocoa-ui-backend
 
 M: cocoa-ui-backend do-events ( -- )
     [
-        [
-            NSApp [ dup do-event ] [ ] [ ] while drop
-            ui-wait
-        ] ui-try
+        [ NSApp [ do-event ] curry loop ui-wait ] ui-try
     ] with-autorelease-pool ;
 
 TUPLE: pasteboard handle ;

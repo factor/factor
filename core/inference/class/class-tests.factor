@@ -620,6 +620,8 @@ TUPLE: declared-fixnum { x fixnum } ;
     [ { ascii } declare decode-char ] \ decode-char inlined?
 ] unit-test
 
+[ t ] [ [ { 1 2 } length ] { length length>> slot } inlined? ] unit-test
+
 ! Later
 
 ! [ t ] [

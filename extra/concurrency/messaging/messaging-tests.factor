@@ -47,7 +47,7 @@ SYMBOL: exit
     } match-cond ;
 
 [ -5 ] [
-    [ 0 [ counter ] [ ] [ ] while ] "Counter" spawn "counter" set
+    [ 0 [ counter ] loop ] "Counter" spawn "counter" set
     { increment 10 } "counter" get send
     { decrement 15 } "counter" get send
     [ value , self , ] { } make "counter" get send

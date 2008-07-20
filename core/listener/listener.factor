@@ -59,9 +59,7 @@ SYMBOL: error-hook
     ] recover ;
 
 : until-quit ( -- )
-    quit-flag get
-    [ quit-flag off ]
-    [ listen until-quit ] if ; inline
+    quit-flag get [ quit-flag off ] [ listen until-quit ] if ;
 
 : listener ( -- )
     [ until-quit ] with-interactive-vocabs ;

@@ -11,13 +11,13 @@ IN: cocoa.enumeration
         ] with-malloc
     ] with-malloc ; inline
 
-:: (NSFastEnumeration-each) ( object quot state stackbuf count -- )
+:: (NSFastEnumeration-each) ( object quot: ( elt -- ) state stackbuf count -- )
     object state stackbuf count -> countByEnumeratingWithState:objects:count:
     dup zero? [ drop ] [
         state NSFastEnumerationState-itemsPtr [ stackbuf ] unless*
         '[ , void*-nth quot call ] each
         object quot state stackbuf count (NSFastEnumeration-each)
-    ] if ; inline
+    ] if ; inline recursive
 
 : NSFastEnumeration-each ( object quot -- )
     [ (NSFastEnumeration-each) ] (with-enumeration-buffers) ; inline

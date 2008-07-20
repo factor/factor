@@ -21,6 +21,10 @@ TUPLE: mode < irc-message name channel mode ;
 TUPLE: names-reply < irc-message who = channel ;
 TUPLE: unhandled < irc-message ;
 
+: <irc-client-message> ( command parameters trailing -- irc-message )
+    irc-message new now >>timestamp
+    [ [ (>>trailing) ] [ (>>parameters) ] [ (>>command) ] tri ] keep ;
+
 GENERIC: irc-message>client-line ( irc-message -- string )
 
 M: irc-message irc-message>client-line ( irc-message -- string )
@@ -30,6 +34,7 @@ M: irc-message irc-message>client-line ( irc-message -- string )
     tri 3array " " sjoin ;
 
 GENERIC: irc-message>server-line ( irc-message -- string )
+
 M: irc-message irc-message>server-line ( irc-message -- string )
    drop "not implemented yet" ;
 
@@ -58,6 +63,8 @@ M: irc-message irc-message>server-line ( irc-message -- string )
 : split-trailing ( string -- string string/f )
     ":" split1 ;
 
+PRIVATE>
+
 : string>irc-message ( string -- object )
     dup split-prefix split-trailing
     [ [ blank? ] trim " " split unclip swap ] dip
@@ -82,4 +89,3 @@ M: irc-message irc-message>server-line ( irc-message -- string )
     [ [ tuple-slots ] [ parameters>> ] bi append ] dip
     [ all-slots over [ length ] bi@ min head ] keep slots>tuple ;
 
-PRIVATE>

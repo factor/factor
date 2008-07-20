@@ -124,21 +124,21 @@ M: float fp-nan?
 
 PRIVATE>
 
-: (each-integer) ( i n quot -- )
+: (each-integer) ( i n quot: ( i -- ) -- )
     [ iterate-step iterate-next (each-integer) ]
-    [ 3drop ] if-iterate? ; inline
+    [ 3drop ] if-iterate? ; inline recursive
 
-: (find-integer) ( i n quot -- i )
+: (find-integer) ( i n quot: ( i -- ? ) -- i )
     [
         iterate-step roll
         [ 2drop ] [ iterate-next (find-integer) ] if
-    ] [ 3drop f ] if-iterate? ; inline
+    ] [ 3drop f ] if-iterate? ; inline recursive
 
-: (all-integers?) ( i n quot -- ? )
+: (all-integers?) ( i n quot: ( i -- ? ) -- ? )
     [
         iterate-step roll
         [ iterate-next (all-integers?) ] [ 3drop f ] if
-    ] [ 3drop t ] if-iterate? ; inline
+    ] [ 3drop t ] if-iterate? ; inline recursive
 
 : each-integer ( n quot -- )
     iterate-prep (each-integer) ; inline
@@ -152,7 +152,7 @@ PRIVATE>
 : all-integers? ( n quot -- ? )
     iterate-prep (all-integers?) ; inline
 
-: find-last-integer ( n quot -- i )
+: find-last-integer ( n quot: ( i -- ? ) -- i )
     over 0 < [
         2drop f
     ] [
@@ -161,4 +161,4 @@ PRIVATE>
         ] [
             >r 1- r> find-last-integer
         ] if
-    ] if ; inline
+    ] if ; inline recursive

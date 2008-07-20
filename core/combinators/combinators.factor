@@ -90,10 +90,10 @@ ERROR: no-case ;
 : <buckets> ( initial length -- array )
     next-power-of-2 swap [ nip clone ] curry map ;
 
-: distribute-buckets ( assoc initial quot -- buckets )
-    spin [ length <buckets> ] keep
-    [ >r 2dup r> dup first roll call (distribute-buckets) ] each
-    nip ; inline
+: distribute-buckets ( alist initial quot -- buckets )
+    swapd [ >r dup first r> call 2array ] curry map
+    [ length <buckets> dup ] keep
+    [ first2 (distribute-buckets) ] with each ; inline
 
 : hash-case-table ( default assoc -- array )
     V{ } [ 1array ] distribute-buckets
