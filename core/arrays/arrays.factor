@@ -1,11 +1,11 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private math math.private sequences
-sequences.private ;
+USING: accessors kernel kernel.private math math.private
+sequences sequences.private ;
 IN: arrays
 
 M: array clone (clone) ;
-M: array length array-capacity ;
+M: array length length>> ;
 M: array nth-unsafe >r >fixnum r> array-nth ;
 M: array set-nth-unsafe >r >fixnum r> set-array-nth ;
 M: array resize resize-array ;

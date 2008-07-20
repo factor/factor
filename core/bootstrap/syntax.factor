@@ -59,6 +59,7 @@ IN: bootstrap.syntax
     "flushable"
     "foldable"
     "inline"
+    "recursive"
     "parsing"
     "t"
     "{"

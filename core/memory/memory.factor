@@ -5,9 +5,8 @@ USING: arrays kernel sequences vectors system hashtables
 kernel.private sbufs growable assocs namespaces quotations
 math strings combinators ;
 
-: (each-object) ( quot -- )
-    next-object dup
-    [ swap [ call ] keep (each-object) ] [ 2drop ] if ; inline
+: (each-object) ( quot: ( obj -- ) -- )
+    [ next-object dup ] swap [ drop ] while ; inline
 
 : each-object ( quot -- )
     begin-scan (each-object) end-scan ; inline

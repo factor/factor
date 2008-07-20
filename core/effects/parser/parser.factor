@@ -1,15 +1,31 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: lexer sets sequences kernel splitting effects ;
+USING: lexer sets sequences kernel splitting effects summary
+combinators debugger arrays parser ;
 IN: effects.parser
 
-: parse-effect ( end -- effect )
-    parse-tokens dup { "(" "((" } intersect empty? [
-        { "--" } split1 dup [
-            <effect>
-        ] [
-            "Stack effect declaration must contain --" throw
+DEFER: parse-effect
+
+ERROR: bad-effect ;
+
+M: bad-effect summary
+    drop "Bad stack effect declaration" ;
+
+: parse-effect-token ( end -- token/f )
+    scan tuck = [ drop f ] [
+        dup { f "(" "((" } member? [ bad-effect ] [
+            ":" ?tail [
+                scan-word {
+                    { \ ( [ ")" parse-effect ] }
+                    [ ]
+                } case 2array
+            ] when
         ] if
-    ] [
-        "Stack effect declaration must not contain ( or ((" throw
     ] if ;
+
+: parse-effect-tokens ( end -- tokens )
+    [ parse-effect-token dup ] curry [ ] [ drop ] produce ;
+
+: parse-effect ( end -- effect )
+    parse-effect-tokens { "--" } split1 dup
+    [ <effect> ] [ "Stack effect declaration must contain --" throw ] if ;
