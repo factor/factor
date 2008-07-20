@@ -29,6 +29,8 @@ M: gadget model-changed 2drop ;
 
 : new-gadget ( class -- gadget )
     new
+        { 0 0 } clone >>loc
+        { 0 0 } clone >>dim
         { 0 1 } >>orientation
         t >>visible?
         { f f } >>graft-state ; inline
