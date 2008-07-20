@@ -315,7 +315,7 @@ tuple
     [ f "inline" set-word-prop ]
     [ make-flushable ]
     [ ]
-    [ tuple-layout [ <tuple-boa> ] curry ] tri
+    [ tuple-layout [ <tuple-boa> ] curry ]
 } cleave
 (( obj quot -- curry )) define-declared
 
@@ -331,7 +331,7 @@ tuple
     [ f "inline" set-word-prop ]
     [ make-flushable ]
     [ ]
-    [ tuple-layout [ <tuple-boa> ] curry ] tri
+    [ tuple-layout [ <tuple-boa> ] curry ]
 } cleave
 (( quot1 quot2 -- compose )) define-declared
 
