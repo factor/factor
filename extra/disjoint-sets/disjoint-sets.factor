@@ -1,42 +1,49 @@
 ! Copyright (C) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays hints kernel locals math sequences ;
+USING: accessors arrays hints kernel locals math hashtables
+assocs ;
 
 IN: disjoint-sets
 
+TUPLE: disjoint-set
+{ parents hashtable read-only }
+{ ranks hashtable read-only }
+{ counts hashtable read-only } ;
+
 <PRIVATE
 
-TUPLE: disjoint-set parents ranks counts ;
-
 : count ( a disjoint-set -- n )
-    counts>> nth ; inline
+    counts>> at ; inline
 
 : add-count ( p a disjoint-set -- )
-    [ count [ + ] curry ] keep counts>> swap change-nth ; inline
+    [ count [ + ] curry ] keep counts>> swap change-at ; inline
 
 : parent ( a disjoint-set -- p )
-    parents>> nth ; inline
+    parents>> at ; inline
 
 : set-parent ( p a disjoint-set -- )
-    parents>> set-nth ; inline
+    parents>> set-at ; inline
 
 : link-sets ( p a disjoint-set -- )
-    [ set-parent ]
-    [ add-count ] 3bi ; inline
+    [ set-parent ] [ add-count ] 3bi ; inline
 
 : rank ( a disjoint-set -- r )
-    ranks>> nth ; inline
+    ranks>> at ; inline
 
 : inc-rank ( a disjoint-set -- )
-    ranks>> [ 1+ ] change-nth ; inline
+    ranks>> [ 1+ ] change-at ; inline
 
 : representative? ( a disjoint-set -- ? )
     dupd parent = ; inline
+
+PRIVATE>
 
 : representative ( a disjoint-set -- p )
     2dup representative? [ drop ] [
         [ [ parent ] keep representative dup ] 2keep set-parent
     ] if ;
+
+<PRIVATE
 
 : representatives ( a b disjoint-set -- r r )
     [ representative ] curry bi@ ; inline
@@ -49,11 +56,14 @@ TUPLE: disjoint-set parents ranks counts ;
 
 PRIVATE>
 
-: <disjoint-set> ( n -- disjoint-set )
-    [ >array ]
-    [ 0 <array> ]
-    [ 1 <array> ] tri
-    disjoint-set boa ;
+: <disjoint-set> ( -- disjoint-set )
+    H{ } clone H{ } clone H{ } clone disjoint-set boa ;
+
+: add-atom ( a disjoint-set -- )
+    [ dupd parents>> set-at ]
+    [ 0 -rot ranks>> set-at ]
+    [ 1 -rot counts>> set-at ]
+    2tri ;
 
 : equiv-set-size ( a disjoint-set -- n )
     [ representative ] keep count ;
