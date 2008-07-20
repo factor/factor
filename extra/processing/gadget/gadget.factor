@@ -1,25 +1,14 @@
 
 USING: kernel namespaces combinators
-       ui.gestures qualified accessors ui.gadgets.frame-buffer ;
+       ui.gestures accessors ui.gadgets.frame-buffer ;
 
 IN: processing.gadget
 
-QUALIFIED: ui.gadgets
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: processing-gadget button-down button-up key-down key-up ;
+TUPLE: processing-gadget < frame-buffer button-down button-up key-down key-up ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: set-gadget-delegate ( tuple gadget -- tuple )
-  over ui.gadgets:set-gadget-delegate ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: <processing-gadget> ( -- gadget )
-  processing-gadget new
-    <frame-buffer> set-gadget-delegate ;
+: <processing-gadget> ( -- gadget ) processing-gadget new-frame-buffer ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

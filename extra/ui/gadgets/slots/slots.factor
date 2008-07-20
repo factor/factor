@@ -109,7 +109,7 @@ TUPLE: editable-slot < track printer ref ;
     [ clear-track ]
     [
         dup ref>> <slot-editor>
-        [ swap 1 track-add ]
+        [ 1 track-add* drop ]
         [ [ scroll>gadget ] [ request-focus ] bi* ] 2bi
     ] bi ;
 

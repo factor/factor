@@ -6,7 +6,6 @@ USING: kernel namespaces math quotations arrays hashtables sequences threads
        ui
        ui.gestures
        ui.gadgets
-       ui.gadgets.handler
        ui.gadgets.slate
        ui.gadgets.labels
        ui.gadgets.buttons
@@ -14,19 +13,12 @@ USING: kernel namespaces math quotations arrays hashtables sequences threads
        ui.gadgets.packs
        ui.gadgets.grids
        ui.gadgets.theme
+       ui.gadgets.handler
        accessors
-       qualified
        namespaces.lib assocs.lib vars
        rewrite-closures automata math.geometry.rect newfx ;
 
 IN: automata.ui
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-QUALIFIED: ui.gadgets.grids
-
-: grid-add ( grid child i j -- grid )
-  >r >r dupd swap r> r> ui.gadgets.grids:grid-add ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -80,13 +72,15 @@ DEFER: automata-window
       "5 - Random Rule" [ random-rule     ] view-button add-gadget
       "n - New"         [ automata-window ] view-button add-gadget
 
-    @top grid-add
+    @top grid-add*
 
     C[ display ] <slate>
       { 400 400 } >>pdim
     dup >slate
 
-    @center grid-add
+    @center grid-add*
+
+  <handler>
 
   H{ }
     T{ key-down f f "1" } [ start-center    ] view-action is
@@ -95,9 +89,7 @@ DEFER: automata-window
     T{ key-down f f "5" } [ random-rule     ] view-action is
     T{ key-down f f "n" } [ automata-window ] view-action is
 
-  <handler>
-
-    tuck set-gadget-delegate
+  >>table
 
   "Automata" open-window ;
 

@@ -160,6 +160,8 @@ DEFER: empty-model
 [ ] <slate> >slate
 { 400 400 } clone slate> set-slate-pdim
 
+slate> <handler>
+
 {
 
 { T{ key-down f f "LEFT" }  [ [ 5 turn-left ] camera-action ] }
@@ -194,13 +196,9 @@ DEFER: empty-model
 [ [ pos> norm reset-turtle 45 turn-left 45 pitch-up step-turtle 180 turn-left ]
     camera-action ] }
 
-! } [ make* ] map alist>hash <handler> >handler
+} [ make* ] map >hashtable >>table
 
-} [ make* ] map >hashtable <handler> >handler
-
-slate> handler> set-gadget-delegate
-
-handler> "L-system view" open-window
+"L-system view" open-window
 
 500 sleep
 
