@@ -128,7 +128,6 @@ SINGLETON: iokit-game-input-backend
 
 : button-value ( value -- f/(0,1] )
     IOHIDValueGetIntegerValue dup zero? [ drop f ] when ;
-! XXX calibration
 : axis-value ( value -- [-1,1] )
     kIOHIDValueScaleTypeCalibrated IOHIDValueGetScaledValue ;
 : pov-value ( value -- pov-direction )
@@ -220,6 +219,7 @@ SYMBOLS: +hid-manager+ +keyboard-state+ +controller-states+ ;
     256 f <array> +keyboard-state+ set-global ;
 
 M: iokit-game-input-backend open-game-input
+    +hid-manager+ get-global [ "game-input already open" throw ] when
     hid-manager-matching-game-devices {
         [ initialize-variables ]
         [ device-matched-callback f IOHIDManagerRegisterDeviceMatchingCallback ]
@@ -235,13 +235,19 @@ M: iokit-game-input-backend open-game-input
 ! XXX while game-input is open, we need to reset-game-input and open-game-input as a
 ! boot image hook
 M: iokit-game-input-backend close-game-input
-    +hid-manager+ global [ 
-        [ 0 IOHIDManagerClose drop ]
-        [ CFRelease ] bi
-        f
-    ] change-at
-    f +keyboard-state+ set-global
-    f +controller-states+ set-global ;
+    +hid-manager+ get-global [
+        +hid-manager+ global [ 
+            [
+                CFRunLoopGetMain CFRunLoopDefaultMode
+                IOHIDManagerUnscheduleFromRunLoop
+            ]
+            [ 0 IOHIDManagerClose drop ]
+            [ CFRelease ] tri
+            f
+        ] change-at
+        f +keyboard-state+ set-global
+        f +controller-states+ set-global
+    ] when ;
 
 M: iokit-game-input-backend get-controllers ( -- sequence )
     +controller-states+ get keys [ controller boa ] map ;
