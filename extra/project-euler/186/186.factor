@@ -29,7 +29,10 @@ IN: project-euler.186
         drop nip
     ] if ;
 
+: <relation> ( n -- unionfind )
+    <disjoint-set> [ [ add-atom ] curry each ] keep ;
+
 : euler186 ( -- n )
-    <generator> 0 1000000 <disjoint-set> (p186) ;
+    <generator> 0 1000000 <relation> (p186) ;
 
 MAIN: euler186
