@@ -27,13 +27,13 @@ M: gadget model-changed 2drop ;
 
 : nth-gadget ( n gadget -- child ) children>> nth ;
 
-: new-gadget ( class -- gadget )
-    new
-        { 0 0 } clone >>loc
-        { 0 0 } clone >>dim
-        { 0 1 } >>orientation
-        t >>visible?
-        { f f } >>graft-state ; inline
+: init-gadget ( gadget -- gadget )
+  init-rect
+  { 0 1 } >>orientation
+  t       >>visible?
+  { f f } >>graft-state ; inline
+
+: new-gadget ( class -- gadget ) new init-gadget ; inline
 
 : <gadget> ( -- gadget )
     gadget new-gadget ;
