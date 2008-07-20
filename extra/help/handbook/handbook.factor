@@ -137,7 +137,7 @@ ARTICLE: "collections" "Collections"
 { $subsection "heaps" }
 { $subsection "graphs" }
 { $subsection "buffers" }
-"There are many other collections in " { $snippet "extra/" } ", such as " { $vocab-link "disjoint-set" } ", " { $vocab-link "persistent-vectors" } ", and " { $vocab-link "tuple-arrays" } "." ;
+"There are many other collections in " { $snippet "extra/" } ", such as " { $vocab-link "disjoint-sets" } ", " { $vocab-link "persistent-vectors" } ", and " { $vocab-link "tuple-arrays" } "." ;
 
 USING: io.encodings.utf8 io.encodings.utf16 io.encodings.binary io.encodings.ascii io.files ;
 

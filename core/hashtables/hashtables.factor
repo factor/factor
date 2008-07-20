@@ -12,7 +12,7 @@ TUPLE: hashtable
 <PRIVATE
 
 : wrap ( i array -- n )
-    array-capacity 1 fixnum-fast fixnum-bitand ; inline
+    length>> 1 fixnum-fast fixnum-bitand ; inline
 
 : hash@ ( key array -- i )
     >r hashcode >fixnum dup fixnum+fast r> wrap ; inline
@@ -27,10 +27,10 @@ TUPLE: hashtable
     dup ((empty)) eq?
     [ 3drop no-key ] [
         = [ rot drop t ] [ probe (key@) ] if
-    ] if ; inline
+    ] if ; inline recursive
 
 : key@ ( key hash -- array n ? )
-    array>> dup array-capacity 0 eq?
+    array>> dup length>> 0 eq?
     [ no-key ] [ 2dup hash@ (key@) ] if ; inline
 
 : <hash-array> ( n -- array )
@@ -51,7 +51,7 @@ TUPLE: hashtable
         ] [
             probe (new-key@)
         ] if
-    ] if ; inline
+    ] if ; inline recursive
 
 : new-key@ ( key hash -- array n empty? )
     array>> 2dup hash@ (new-key@) ; inline
@@ -71,7 +71,7 @@ TUPLE: hashtable
 
 : hash-large? ( hash -- ? )
     [ count>> 3 fixnum*fast 1 fixnum+fast ]
-    [ array>> array-capacity ] bi fixnum> ; inline
+    [ array>> length>> ] bi fixnum> ; inline
 
 : hash-stale? ( hash -- ? )
     [ deleted>> 10 fixnum*fast ] [ count>> ] bi fixnum> ; inline

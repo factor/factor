@@ -91,7 +91,7 @@ ERROR: bad-superclass class ;
     #! 4 slot == superclasses>>
     rot dup tuple? [
         layout-of 4 slot
-        2dup array-capacity fixnum<
+        2dup 1 slot fixnum<
         [ array-nth eq? ] [ 3drop f ] if
     ] [ 3drop f ] if ; inline
 

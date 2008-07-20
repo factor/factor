@@ -84,7 +84,7 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     ] [
         3dup nth-unsafe at*
         [ >r 3drop r> ] [ drop >r 1- r> (assoc-stack) ] if
-    ] if ; inline
+    ] if ; inline recursive
 
 : assoc-stack ( key seq -- value )
     dup length 1- swap (assoc-stack) ;
@@ -157,6 +157,9 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
 
 : zip ( keys values -- alist )
     2array flip ; inline
+
+: unzip ( assoc -- keys values )
+    dup assoc-empty? [ drop { } { } ] [ >alist flip first2 ] if ;
 
 : search-alist ( key alist -- pair i )
     [ first = ] with find swap ; inline

@@ -40,7 +40,7 @@ M: fixnum bit? neg shift 1 bitand 0 > ;
 
 : (fixnum-log2) ( accum n -- accum )
     dup 1 number= [ drop ] [ >r 1+ r> 2/ (fixnum-log2) ] if ;
-    inline
+    inline recursive
 
 M: fixnum (log2) 0 swap (fixnum-log2) ;
 

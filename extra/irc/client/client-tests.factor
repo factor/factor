@@ -1,7 +1,7 @@
 USING: kernel tools.test accessors arrays sequences qualified
        io.streams.string io.streams.duplex namespaces threads
        calendar irc.client.private irc.client irc.messages.private
-       concurrency.mailboxes classes ;
+       concurrency.mailboxes classes assocs ;
 EXCLUDE: irc.messages => join ;
 RENAME: join irc.messages => join_
 IN: irc.client.tests
@@ -19,28 +19,6 @@ IN: irc.client.tests
 
 : with-dummy-client ( quot -- )
      rot with-variable ; inline
-
-! Parsing tests
-irc-message new
-    ":someuser!n=user@some.where PRIVMSG #factortest :hi" >>line
-    "someuser!n=user@some.where" >>prefix
-                       "PRIVMSG" >>command
-               { "#factortest" } >>parameters
-                            "hi" >>trailing
-1array
-[ ":someuser!n=user@some.where PRIVMSG #factortest :hi"
-  string>irc-message f >>timestamp ] unit-test
-
-privmsg new
-    ":someuser!n=user@some.where PRIVMSG #factortest :hi" >>line
-    "someuser!n=user@some.where" >>prefix
-                       "PRIVMSG" >>command
-               { "#factortest" } >>parameters
-                            "hi" >>trailing
-                   "#factortest" >>name
-1array
-[ ":someuser!n=user@some.where PRIVMSG #factortest :hi"
-  parse-irc-line f >>timestamp ] unit-test
 
 { "" } make-client dup "factorbot" set-nick current-irc-client [
     { t } [ irc> profile>> nickname>> me? ] unit-test
@@ -64,21 +42,29 @@ privmsg new
                     ":some.where 001 factorbot :Welcome factorbot"
                   } make-client
                   [ connect-irc ] keep 1 seconds sleep
-                    profile>> nickname>> ] unit-test
+                  profile>> nickname>> ] unit-test
 
 { join_ "#factortest" } [
-             { ":factorbot!n=factorbo@some.where JOIN :#factortest"
+           { ":factorbot!n=factorbo@some.where JOIN :#factortest"
              ":ircserver.net MODE #factortest +ns"
              ":ircserver.net 353 factorbot @ #factortest :@factorbot "
              ":ircserver.net 366 factorbot #factortest :End of /NAMES list."
              ":ircserver.net 477 factorbot #factortest :[ircserver-info] blah blah"
              } make-client dup "factorbot" set-nick
              [ connect-irc ] keep 1 seconds sleep
-             join-messages>> 5 seconds mailbox-get-timeout
+             join-messages>> 1 seconds mailbox-get-timeout
              [ class ] [ trailing>> ] bi ] unit-test
-! TODO: user join
-! ":somedude!n=user@isp.net JOIN :#factortest"
+
+{ +join+ "somebody" } [
+           { ":somebody!n=somebody@some.where JOIN :#factortest"
+             } make-client dup "factorbot" set-nick
+             [ listeners>> [ "#factortest" [ <irc-channel-listener> ] keep ] dip set-at ]
+             [ connect-irc ]
+             [ listeners>> [ "#factortest" ] dip at
+               [ read-message drop ] [ read-message drop ] [ read-message ] tri ] tri
+             [ action>> ] [ nick>> ] bi
+             ] unit-test
 ! TODO: channel message
-! ":somedude!n=user@isp.net PRIVMSG #factortest :hello"
+! ":somebody!n=somebody@some.where PRIVMSG #factortest :hello"
 ! TODO: direct private message
 ! ":somedude!n=user@isp.net PRIVMSG factorbot2 :hello"
