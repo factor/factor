@@ -55,8 +55,9 @@ SYMBOL: negative?
     dup [ (base>) ] [ drop 0 swap ] if ;
 
 : string>ratio ( str -- a/b )
+    "-" ?head dup negative? set swap
     "/" split1 (base>) >r whole-part r>
-    3dup and and [ / + ] [ 3drop f ] if ;
+    3dup and and [ / + swap [ neg ] when ] [ 2drop 2drop f ] if ;
 
 : valid-digits? ( seq -- ? )
     {
@@ -66,20 +67,22 @@ SYMBOL: negative?
     } cond ;
 
 : string>integer ( str -- n/f )
+    "-" ?head swap
     string>digits dup valid-digits?
-    [ radix get digits>integer ] [ drop f ] if ;
+    [ radix get digits>integer swap [ neg ] when ] [ 2drop f ] if ;
 
 PRIVATE>
 
 : base> ( str radix -- n/f )
     [
-        CHAR: . over member? [
-            string>float
+        CHAR: / over member? [
+            string>ratio
         ] [
-            "-" ?head dup negative? set >r
-            CHAR: / over member?
-            [ string>ratio ] [ string>integer ] if
-            r> [ dup [ neg ] when ] when
+            CHAR: . over member? [
+                string>float
+            ] [
+                string>integer
+            ] if
         ] if
     ] with-radix ;
 

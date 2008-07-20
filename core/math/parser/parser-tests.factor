@@ -101,4 +101,10 @@ unit-test
 
 [ "-1.0/0.0" ] [ -1.0 0.0 / number>string ] unit-test
 
+[ 0.0/0.0 ] [ "0/0." string>number ] unit-test
+
+[ 1.0/0.0 ] [ "1/0." string>number ] unit-test
+
+[ -1.0/0.0 ] [ "-1/0." string>number ] unit-test
+
 [ "-0.0" ] [ -0.0 number>string ] unit-test
