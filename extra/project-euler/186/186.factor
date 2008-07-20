@@ -1,4 +1,4 @@
-USING: circular disjoint-set kernel math math.ranges
+USING: circular disjoint-sets kernel math math.ranges
        sequences sequences.lib ;
 IN: project-euler.186
 

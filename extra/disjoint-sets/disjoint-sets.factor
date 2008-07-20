@@ -1,6 +1,8 @@
+! Copyright (C) 2008 Eric Mertens.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hints kernel locals math sequences ;
 
-IN: disjoint-set
+IN: disjoint-sets
 
 <PRIVATE
 
