@@ -35,7 +35,7 @@ IN: project-euler.079
     ] { } make ;
 
 : find-source ( seq -- elt )
-    [ keys ] [ values ] bi diff prune
+    unzip diff prune
     dup empty? [ "Topological sort failed" throw ] [ first ] if ;
 
 : remove-source ( seq elt -- seq )
