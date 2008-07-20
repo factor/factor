@@ -1,11 +1,11 @@
 
-USING: kernel arrays math.vectors math.geometry ;
+USING: kernel arrays sequences math.vectors math.geometry accessors ;
 
 IN: math.geometry.rect
 
 TUPLE: rect loc dim ;
 
-: init-rect ( rect -- rect ) { 0 0 } clone { 0 0 } clone <rect> ;
+: init-rect ( rect -- rect ) { 0 0 } clone >>loc { 0 0 } clone >>dim ;
 
 : <rect> ( loc dim -- rect ) rect boa ;
 
