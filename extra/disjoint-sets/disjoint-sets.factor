@@ -38,7 +38,9 @@ TUPLE: disjoint-set
 
 PRIVATE>
 
-: representative ( a disjoint-set -- p )
+GENERIC: representative ( a disjoint-set -- p )
+
+M: disjoint-set representative
     2dup representative? [ drop ] [
         [ [ parent ] keep representative dup ] 2keep set-parent
     ] if ;
@@ -59,26 +61,28 @@ PRIVATE>
 : <disjoint-set> ( -- disjoint-set )
     H{ } clone H{ } clone H{ } clone disjoint-set boa ;
 
-: add-atom ( a disjoint-set -- )
+GENERIC: add-atom ( a disjoint-set -- )
+
+M: disjoint-set add-atom
     [ dupd parents>> set-at ]
     [ 0 -rot ranks>> set-at ]
     [ 1 -rot counts>> set-at ]
     2tri ;
 
-: equiv-set-size ( a disjoint-set -- n )
-    [ representative ] keep count ;
+GENERIC: equiv-set-size ( a disjoint-set -- n )
 
-: equiv? ( a b disjoint-set -- ? )
-    representatives = ; inline
+M: disjoint-set equiv-set-size [ representative ] keep count ;
 
-:: equate ( a b disjoint-set -- )
+GENERIC: equiv? ( a b disjoint-set -- ? )
+
+M: disjoint-set equiv? representatives = ;
+
+GENERIC: equate ( a b disjoint-set -- )
+
+M:: disjoint-set equate ( a b disjoint-set -- )
     a b disjoint-set representatives
     2dup = [ 2drop ] [
         2dup disjoint-set ranks
         [ swap ] [ over disjoint-set inc-rank ] [ ] branch
         disjoint-set link-sets
     ] if ;
-
-HINTS: equate disjoint-set ;
-HINTS: representative disjoint-set ;
-HINTS: equiv-set-size disjoint-set ;
