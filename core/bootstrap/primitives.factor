@@ -6,7 +6,8 @@ sequences strings vectors words quotations assocs layouts
 classes classes.builtin classes.tuple classes.tuple.private
 kernel.private vocabs vocabs.loader source-files definitions
 slots classes.union classes.intersection classes.predicate
-compiler.units bootstrap.image.private io.files accessors combinators ;
+compiler.units bootstrap.image.private io.files accessors
+combinators ;
 IN: bootstrap.primitives
 
 "Creating primitives and basic runtime structures..." print flush
@@ -310,9 +311,12 @@ tuple
 } prepare-slots define-tuple-class
 
 "curry" "kernel" lookup
-[ f "inline" set-word-prop ]
-[ ]
-[ tuple-layout [ <tuple-boa> ] curry ] tri
+{
+    [ f "inline" set-word-prop ]
+    [ make-flushable ]
+    [ ]
+    [ tuple-layout [ <tuple-boa> ] curry ] tri
+} cleave
 (( obj quot -- curry )) define-declared
 
 "compose" "kernel" create
@@ -323,9 +327,12 @@ tuple
 } prepare-slots define-tuple-class
 
 "compose" "kernel" lookup
-[ f "inline" set-word-prop ]
-[ ]
-[ tuple-layout [ <tuple-boa> ] curry ] tri
+{
+    [ f "inline" set-word-prop ]
+    [ make-flushable ]
+    [ ]
+    [ tuple-layout [ <tuple-boa> ] curry ] tri
+} cleave
 (( quot1 quot2 -- compose )) define-declared
 
 ! Sub-primitive words
