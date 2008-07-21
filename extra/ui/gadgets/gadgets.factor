@@ -165,13 +165,6 @@ DEFER: relayout
 
 : hide-gadget ( gadget -- ) f swap (>>visible?) ;
 
-: (set-rect-dim) ( dim gadget quot -- )
-    >r 2dup rect-dim =
-    [ [ 2drop ] [ set-rect-dim ] if ] 2keep
-    [ drop ] r> if ; inline
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 DEFER: in-layout?
 
 : do-invalidate ( gadget -- gadget )
