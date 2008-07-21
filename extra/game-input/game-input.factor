@@ -1,4 +1,5 @@
-USING: arrays accessors continuations kernel symbols ;
+USING: arrays accessors continuations kernel symbols
+combinators.lib sequences ;
 IN: game-input
 
 SYMBOL: game-input-backend
@@ -22,11 +23,17 @@ SYMBOLS:
 
 HOOK: get-controllers game-input-backend ( -- sequence )
 
-HOOK: manufacturer game-input-backend ( controller -- string )
-HOOK: product game-input-backend ( controller -- string )
-HOOK: vendor-id game-input-backend ( controller -- integer )
-HOOK: product-id game-input-backend ( controller -- integer )
-HOOK: location-id game-input-backend ( controller -- integer )
+HOOK: product-string game-input-backend ( controller -- string )
+HOOK: product-id game-input-backend ( controller -- id )
+HOOK: instance-id game-input-backend ( controller -- id )
+
+: find-controller-products ( product-id -- sequence )
+    get-controllers [ product-id = ] with filter ;
+: find-controller-instance ( product-id instance-id -- controller/f )
+    get-controllers [
+        [ product-id  = ]
+        [ instance-id = ] bi+ bi* and
+    ] 2with find nip ;
 
 HOOK: read-controller game-input-backend ( controller -- controller-state )
 HOOK: calibrate-controller game-input-backend ( controller -- )

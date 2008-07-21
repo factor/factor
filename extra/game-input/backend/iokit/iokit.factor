@@ -252,15 +252,15 @@ M: iokit-game-input-backend close-game-input
 M: iokit-game-input-backend get-controllers ( -- sequence )
     +controller-states+ get keys [ controller boa ] map ;
 
-M: iokit-game-input-backend manufacturer ( controller -- string )
-    handle>> kIOHIDManufacturerKey device-property ;
-M: iokit-game-input-backend product ( controller -- string )
-    handle>> kIOHIDProductKey device-property ;
-M: iokit-game-input-backend vendor-id ( controller -- integer )
-    handle>> kIOHIDVendorIDKey device-property ;
+M: iokit-game-input-backend product-string ( controller -- string )
+    handle>>
+    [ kIOHIDManufacturerKey device-property ]
+    [ kIOHIDProductKey      device-property ] bi 2array " " join ;
 M: iokit-game-input-backend product-id ( controller -- integer )
-    handle>> kIOHIDProductIDKey device-property ;
-M: iokit-game-input-backend location-id ( controller -- integer )
+    handle>>
+    [ kIOHIDVendorIDKey  device-property ]
+    [ kIOHIDProductIDKey device-property ] bi 2array ;
+M: iokit-game-input-backend instance-id ( controller -- integer )
     handle>> kIOHIDLocationIDKey device-property ;
 
 M: iokit-game-input-backend read-controller ( controller -- controller-state )
