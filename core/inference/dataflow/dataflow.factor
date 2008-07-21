@@ -144,7 +144,8 @@ TUPLE: #dispatch < #branch ;
 
 : #dispatch ( -- node ) peek-d 1array \ #dispatch in-node ;
 
-TUPLE: #merge < node ;
+! Phi node: merging is a sequence of sequences of values
+TUPLE: #merge < node merging ;
 
 : #merge ( -- node ) \ #merge all-out-node ;
 
@@ -191,7 +192,7 @@ TUPLE: #declare < node ;
 : #drop ( n -- #shuffle )
     d-tail flatten-curries \ #shuffle in-node ;
 
-: node-exists? ( node quot -- ? )
+: node-exists? ( node quot: ( node -- ? ) -- ? )
     over [
         2dup 2slip rot [
             2drop t
@@ -201,7 +202,7 @@ TUPLE: #declare < node ;
         ] if
     ] [
         2drop f
-    ] if ; inline
+    ] if ; inline recursive
 
 GENERIC: calls-label* ( label node -- ? )
 
@@ -223,21 +224,21 @@ SYMBOL: node-stack
 
 : iterate-next ( -- node ) node@ successor>> ;
 
-: iterate-nodes ( node quot -- )
+: iterate-nodes ( node quot: ( -- ) -- )
     over [
         [ swap >node call node> drop ] keep iterate-nodes
     ] [
         2drop
-    ] if ; inline
+    ] if ; inline recursive
 
-: (each-node) ( quot -- next )
+: (each-node) ( quot: ( node -- ) -- next )
     node@ [ swap call ] 2keep
     node-children [
         [
             [ (each-node) ] keep swap
         ] iterate-nodes
     ] each drop
-    iterate-next ; inline
+    iterate-next ; inline recursive
 
 : with-node-iterator ( quot -- )
     >r V{ } clone node-stack r> with-variable ; inline
@@ -260,14 +261,14 @@ SYMBOL: node-stack
         2drop
     ] if ; inline
 
-: (transform-nodes) ( prev node quot -- )
+: (transform-nodes) ( prev node quot: ( node -- newnode ) -- )
     dup >r call dup [
         >>successor
         successor>> dup successor>>
         r> (transform-nodes)
     ] [
         r> 2drop f >>successor drop
-    ] if ; inline
+    ] if ; inline recursive
 
 : transform-nodes ( node quot -- new-node )
     over [

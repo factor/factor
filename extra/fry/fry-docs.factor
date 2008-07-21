@@ -19,10 +19,11 @@ HELP: fry
 
 HELP: '[
 { $syntax "code... ]" }
-{ $description "Literal fried quotation. Expands into code which takes values from the stack and substituting them in." } ;
+{ $description "Literal fried quotation. Expands into code which takes values from the stack and substitutes them in place of the fry specifiers " { $link , } " and " { $link @ } "." }
+{ $examples "See " { $link "fry.examples" } "." } ;
 
 ARTICLE: "fry.examples" "Examples of fried quotations"
-"Conceptually, " { $link fry } " is tricky however the general idea is easy to grasp once presented with examples."
+"The easiest way to understand fried quotations is to look at some examples."
 $nl
 "If a quotation does not contain any fry specifiers, then " { $link POSTPONE: '[ } " behaves just like " { $link POSTPONE: [ } ":"
 { $code "{ 10 20 30 } '[ . ] each" }
@@ -38,9 +39,10 @@ $nl
     "{ 10 20 30 } 5 [ 3 ] swap [ / ] curry compose map"
     "{ 10 20 30 } [ 3 5 / ] map"
 }
-"Occurrences of " { $link @ } " are simply syntax sugar for " { $snippet ", call" } ". The following three lines are equivalent:"
+"Occurrences of " { $link @ } " are simply syntax sugar for " { $snippet ", call" } ". The following four lines are equivalent:"
 { $code 
     "{ 10 20 30 } [ sq ] '[ @ . ] each"
+    "{ 10 20 30 } [ sq ] [ call . ] curry each"
     "{ 10 20 30 } [ sq ] [ . ] compose each"
     "{ 10 20 30 } [ sq . ] each"
 }
@@ -50,16 +52,17 @@ $nl
     "{ 8 13 14 27 } [ even? ] 5 [ dup ] swap [ ? ] curry 3compose map"
     "{ 8 13 14 27 } [ even? dup 5 ? ] map"
 }
-"Occurrences of " { $link _ } " have the effect of enclosing all code to their left with " { $link >r } " and " { $link r> } ":"
+"Occurrences of " { $link _ } " have the effect of enclosing all code to their left in a quotation passed to " { $link dip } ". The following four lines are equivalent:"
 { $code 
     "{ 10 20 30 } 1 '[ , _ / ] map"
+    "{ 10 20 30 } 1 [ [ ] curry dip / ] curry map"
     "{ 10 20 30 } 1 [ swap / ] curry map"
     "{ 10 20 30 } [ 1 swap / ] map"
 }
 "For any quotation body " { $snippet "X" } ", the following two are equivalent:"
 { $code
-    "[ >r X r> ]"
-    "[ X _ ]"
+    "[ [ X ] dip ]"
+    "'[ X _ ]"
 }
 "Here are some built-in combinators rewritten in terms of fried quotations:"
 { $table
@@ -73,8 +76,11 @@ $nl
 } ;
 
 ARTICLE: "fry.philosophy" "Fried quotation philosophy"
-"Fried quotations generalize quotation-building words such as " { $link curry } " and " { $link compose } "."
-$nl
+"Fried quotations generalize quotation-building words such as " { $link curry } " and " { $link compose } ". They can clean up code with lots of currying and composition, particularly when quotations are nested:"
+{ $code
+    "'[ [ , key? ] all? ] filter"
+    "[ [ key? ] curry all? ] curry filter"
+}
 "There is a mapping from fried quotations to lexical closures as defined in the " { $vocab-link "locals" } " vocabulary. Namely, a fried quotation is equivalent to a ``let'' form where each local binding is only used once, and bindings are used in the same order in which they are defined. The following two lines are equivalent:"
 { $code
     "'[ 3 , + 4 , / ]"
@@ -87,7 +93,7 @@ $nl
 } ;
 
 ARTICLE: "fry.limitations" "Fried quotation limitations"
-"As with " { $vocab-link "locals" } ", fried quotations cannot contain " { $link >r } " and " { $link r> } "." ;
+"As with " { $vocab-link "locals" } ", fried quotations cannot contain " { $link >r } " and " { $link r> } ". This is not a real limitation in practice, since " { $link dip } " can be used instead." ;
 
 ARTICLE: "fry" "Fried quotations"
 "A " { $emphasis "fried quotation" } " differs from a literal quotation in that when it is evaluated, instead of just pushing itself on the stack, it consumes zero or more stack values and inserts them into the quotation."

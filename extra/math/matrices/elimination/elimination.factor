@@ -11,7 +11,7 @@ SYMBOL: matrix
 
 : nth-row ( row# -- seq ) matrix get nth ;
 
-: change-row ( row# quot -- | quot: seq -- seq )
+: change-row ( row# quot: ( seq -- seq ) -- )
     matrix get swap change-nth ; inline
 
 : exchange-rows ( row# row# -- ) matrix get exchange ;

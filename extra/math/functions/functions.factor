@@ -23,12 +23,12 @@ GENERIC: sqrt ( x -- y ) foldable
 M: real sqrt
     >float dup 0.0 < [ neg fsqrt 0.0 swap rect> ] [ fsqrt ] if ;
 
-: each-bit ( n quot -- )
+: each-bit ( n quot: ( ? -- ) -- )
     over 0 number= pick -1 number= or [
         2drop
     ] [
         2dup >r >r >r odd? r> call r> 2/ r> each-bit
-    ] if ; inline
+    ] if ; inline recursive
 
 GENERIC: (^) ( x y -- z ) foldable
 

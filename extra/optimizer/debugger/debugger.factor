@@ -3,8 +3,8 @@
 USING: classes io kernel kernel.private math.parser namespaces
 optimizer prettyprint prettyprint.backend sequences words arrays
 match macros assocs sequences.private generic combinators
-sorting math quotations accessors inference inference.dataflow
-optimizer.specializers ;
+sorting math quotations accessors inference inference.backend
+inference.dataflow optimizer.specializers generator ;
 IN: optimizer.debugger
 
 ! A simple tool for turning dataflow IR into quotations, for
@@ -135,14 +135,21 @@ M: object node>quot
 
 : optimized-word. ( word ? -- ) >r specialized-def r> optimized-quot. ;
 
+SYMBOL: pass-count
 SYMBOL: words-called
 SYMBOL: generics-called
 SYMBOL: methods-called
 SYMBOL: intrinsics-called
 SYMBOL: node-count
 
-: dataflow>report ( node -- alist )
+: count-optimization-passes ( node n -- node n )
+    >r optimize-1
+    [ r> 1+ count-optimization-passes ] [ r> ] if ;
+
+: make-report ( word -- assoc )
     [
+        word-dataflow nip 1 count-optimization-passes pass-count set
+
         H{ } clone words-called set
         H{ } clone generics-called set
         H{ } clone methods-called set
@@ -164,14 +171,12 @@ SYMBOL: node-count
         node-count set
     ] H{ } make-assoc ;
 
-: quot-optimize-report ( quot -- report )
-    dataflow optimize dataflow>report ;
-
-: word-optimize-report ( word -- report )
-    def>> quot-optimize-report ;
-
 : report. ( report -- )
     [
+        "==== Optimization passes:" print
+        pass-count get .
+        nl
+
         "==== Total number of dataflow nodes:" print
         node-count get .
 
@@ -186,4 +191,4 @@ SYMBOL: node-count
     ] bind ;
 
 : optimizer-report. ( word -- )
-    word-optimize-report report. ;
+    make-report report. ;

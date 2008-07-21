@@ -60,9 +60,6 @@ INSTANCE: immutable-sequence sequence
 
 <PRIVATE
 
-: array-capacity ( array -- n )
-    1 slot { array-capacity } declare ; inline
-
 : array-nth ( n array -- elt )
     swap 2 fixnum+fast slot ; inline
 
@@ -241,7 +238,8 @@ INSTANCE: repetition immutable-sequence
     ] 3keep ; inline
 
 : (copy) ( dst i src j n -- dst )
-    dup 0 <= [ 2drop 2drop ] [ 1- ((copy)) (copy) ] if ; inline
+    dup 0 <= [ 2drop 2drop ] [ 1- ((copy)) (copy) ] if ;
+    inline recursive
 
 : prepare-subseq ( from to seq -- dst i src j n )
     [ >r swap - r> new-sequence dup 0 ] 3keep
@@ -653,7 +651,7 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 : halves ( seq -- first second )
     dup midpoint@ cut-slice ;
 
-: binary-reduce ( seq start quot -- value )
+: binary-reduce ( seq start quot: ( elt1 elt2 -- newelt ) -- value )
     #! We can't use case here since combinators depends on
     #! sequences
     pick length dup 0 3 between? [
@@ -668,7 +666,7 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
         >r >r halves r> r>
         [ [ binary-reduce ] 2curry bi@ ] keep
         call
-    ] if ; inline
+    ] if ; inline recursive
 
 : cut ( seq n -- before after )
     [ head ] [ tail ] 2bi ;

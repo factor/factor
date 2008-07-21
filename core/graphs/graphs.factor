@@ -37,14 +37,14 @@ SYMBOL: graph
 
 SYMBOL: previous
 
-: (closure) ( obj quot -- )
+: (closure) ( obj quot: ( elt -- assoc ) -- )
     over previous get key? [
         2drop
     ] [
         over previous get conjoin
         dup slip
         [ nip (closure) ] curry assoc-each
-    ] if ; inline
+    ] if ; inline recursive
 
 : closure ( obj quot -- assoc )
     H{ } clone [
