@@ -110,7 +110,7 @@ elevator H{
     dup dup thumb-dim (layout-thumb) >r
     >r dup rect-dim r>
     rot gadget-orientation set-axis [ ceiling ] map
-    r> set-layout-dim ;
+    r> (>>dim) ;
 
 : layout-thumb ( slider -- )
     dup layout-thumb-loc layout-thumb-dim ;

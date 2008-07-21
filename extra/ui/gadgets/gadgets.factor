@@ -198,7 +198,7 @@ GENERIC: layout* ( gadget -- )
 
 M: gadget layout* drop ;
 
-: prefer ( gadget -- ) dup pref-dim swap set-layout-dim ;
+: prefer ( gadget -- ) dup pref-dim swap (>>dim) ;
 
 : validate ( gadget -- ) f swap (>>layout-state) ;
 

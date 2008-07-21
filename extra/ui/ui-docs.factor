@@ -244,7 +244,6 @@ ARTICLE: "ui-layout-impl" "Implementing layout gadgets"
 { $subsection layout* }
 "When a " { $link layout* } " method is called, the size and location of the gadget has already been determined by its parent, and the method's job is to lay out the gadget's children. Children can be positioned and resized with a pair of words:"
 { $subsection set-rect-loc }
-{ $subsection set-layout-dim }
 "Some assorted utility words which are useful for implementing layout logic:"
 { $subsection pref-dim }
 { $subsection pref-dims }
