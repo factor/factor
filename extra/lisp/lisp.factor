@@ -28,27 +28,28 @@ DEFER: define-lisp-macro
 
 ! words for convert-lambda
 <PRIVATE
-: localize-body ( assoc body -- assoc newbody )
+: localize-body ( assoc body -- newbody )
     {
-      { [ dup list? ] [ [ lisp-symbol? ] pick '[ [ name>> , at ] [ ] bi or ] traverse ] }
-      { [ dup lisp-symbol? ] [ name>> over at ] }
-     [ ]
+      { [ dup list? ] [ [ lisp-symbol? ] rot '[ [ name>> , at ] [ ] bi or ] traverse ] }
+      { [ dup lisp-symbol? ] [ name>> swap at ] }
+     [ nip ]
     } cond ;
 
 : localize-lambda ( body vars -- newvars newbody )
-    make-locals dup push-locals swap
-    [ swap localize-body convert-form swap pop-locals ] dip swap ;
+    swap [ make-locals dup push-locals ] dip
+    dupd [ localize-body convert-form ] with lmap>array
+    >quotation swap pop-locals ;
 
 : split-lambda ( cons -- body-cons vars-seq )
-    cdr uncons [ car ] [ [ name>> ] lmap>array ] bi* ; inline
+    cdr uncons [ name>> ] lmap>array ; inline
 
 : rest-lambda ( body vars -- quot )
-    "&rest" swap [ index ] [ remove ] 2bi
-    swapd localize-lambda <lambda> lambda-rewrite call
-    '[ , cut '[ @ , seq>list ] call , call ] ;
+    "&rest" swap [ remove ] [ index ] 2bi
+    [ localize-lambda <lambda> lambda-rewrite call ] dip
+    swap '[ , cut '[ @ , seq>list ] call , call ] ;
 
 : normal-lambda ( body vars -- quot )
-    localize-lambda <lambda> lambda-rewrite [ compose call ] compose 1quotation ;
+    localize-lambda <lambda> lambda-rewrite [ compose call ] compose ;
 PRIVATE>
 
 : convert-lambda ( cons -- quot )
@@ -89,7 +90,7 @@ PRIVATE>
 
 : lisp-string>factor ( str -- quot )
     lisp-expr convert-form ;
-    
+
 : lisp-eval ( str -- * )
     lisp-string>factor call ;
 
