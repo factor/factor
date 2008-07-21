@@ -31,9 +31,11 @@ TYPEDEF: void* LPDIENUMCREATEDEFFECTOBJECTSCALLBACK
     [ "BOOL" { "LPDIRECTINPUTEFFECT" "LPVOID" } "stdcall" ]
     dip alien-callback ; inline
 TYPEDEF: void* LPDIENUMEFFECTSINFILECALLBACK
+: LPDIENUMEFFECTSINFILECALLBACK
     [ "BOOL" { "LPCDIFILEEFFECT" "LPVOID" } "stdcall" ]
     dip alien-callback ; inline
 TYPEDEF: void* LPDIENUMDEVICEOBJECTSCALLBACKW
+: LPDIENUMDEVICEOBJECTSCALLBACKW
     [ "BOOL" { "LPCDIDEVICEOBJECTINSTANCE" "LPVOID" } "stdcall" ]
     dip alien-callback ; inline
 
@@ -389,13 +391,17 @@ FUNCTION: HRESULT DirectInput8Create ( HINSTANCE hinst, DWORD dwVersion, REFIID 
 : DISCL_BACKGROUND    HEX: 00000008 ; inline
 : DISCL_NOWINKEY      HEX: 00000010 ; inline
 
-SYMBOL: +dinput+
+: DI8DEVTYPE_DEVICE           HEX: 11 ; inline
+: DI8DEVTYPE_MOUSE            HEX: 12 ; inline
+: DI8DEVTYPE_KEYBOARD         HEX: 13 ; inline
+: DI8DEVTYPE_JOYSTICK         HEX: 14 ; inline
+: DI8DEVTYPE_GAMEPAD          HEX: 15 ; inline
+: DI8DEVTYPE_DRIVING          HEX: 16 ; inline
+: DI8DEVTYPE_FLIGHT           HEX: 17 ; inline
+: DI8DEVTYPE_1STPERSON        HEX: 18 ; inline
+: DI8DEVTYPE_DEVICECTRL       HEX: 19 ; inline
+: DI8DEVTYPE_SCREENPOINTER    HEX: 1A ; inline
+: DI8DEVTYPE_REMOTE           HEX: 1B ; inline
+: DI8DEVTYPE_SUPPLEMENTAL     HEX: 1C ; inline
 
-: create-dinput ( -- )
-    f GetModuleHandle DIRECTINPUT_VERSION IDirectInput8W-iid
-    f <void*> [ f DirectInput8Create ole32-error ] keep *void*
-    +dinput+ set ;
-
-: delete-dinput ( -- )
-    +dinput+ [ com-release f ] change ;
-
+: GET_DIDEVICE_TYPE ( dwType -- type ) HEX: FF bitand ; inline

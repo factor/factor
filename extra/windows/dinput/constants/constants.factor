@@ -1,7 +1,7 @@
 USING: windows.dinput windows.kernel32 windows.ole32 windows.com
 windows.com.syntax alien alien.c-types alien.syntax kernel system namespaces
 combinators sequences symbols fry math accessors macros words quotations
-libc continuations generalizations splitting locals assocs ;
+libc continuations generalizations splitting locals assocs init ;
 IN: windows.dinput.constants
 
 ! Some global variables aren't provided by the DirectInput DLL (they're in the

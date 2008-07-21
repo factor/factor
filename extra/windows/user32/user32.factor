@@ -528,6 +528,27 @@ C-STRUCT: TRACKMOUSEEVENT
     { "DWORD" "dwHoverTime" } ;
 TYPEDEF: TRACKMOUSEEVENT* LPTRACKMOUSEEVENT
 
+: DBT_DEVICEARRIVAL HEX: 8000 ; inline
+: DBT_DEVICEREMOVECOMPLETE HEX: 8004 ; inline
+
+: DBT_DEVTYP_DEVICEINTERFACE 5 ; inline
+
+: DEVICE_NOTIFY_WINDOW_HANDLE 0 ; inline
+: DEVICE_NOTIFY_SERVICE_HANDLE 1 ; inline
+
+: DEVICE_NOTIFY_ALL_INTERFACE_CLASSES 4 ; inline
+
+C-STRUCT: DEV_BROADCAST_HDR
+    { "DWORD" "dbch_size" }
+    { "DWORD" "dbch_devicetype" }
+    { "DWORD" "dbch_reserved" } ;
+C-STRUCT: DEV_BROADCAST_DEVICEW
+    { "DWORD" "dbcc_size" }
+    { "DWORD" "dbcc_devicetype" }
+    { "DWORD" "dbcc_reserved" }
+    { "GUID"  "dbcc_classguid" }
+    { "WCHAR[1]" "dbcc_name" } ;
+
 LIBRARY: user32
 
 FUNCTION: HKL ActivateKeyboardLayout ( HKL hkl, UINT Flags ) ;
@@ -1176,8 +1197,9 @@ ALIAS: RegisterClassEx RegisterClassExW
 
 ! FUNCTION: RegisterClipboardFormatA
 ! FUNCTION: RegisterClipboardFormatW
-! FUNCTION: RegisterDeviceNotificationA
-! FUNCTION: RegisterDeviceNotificationW
+FUNCTION: HANDLE RegisterDeviceNotificationA ( HANDLE hRecipient, LPVOID NotificationFilter, DWORD Flags ) ;
+FUNCTION: HANDLE RegisterDeviceNotificationW ( HANDLE hRecipient, LPVOID NotificationFilter, DWORD Flags ) ;
+ALIAS: RegisterDeviceNotification RegisterDeviceNotificationW
 ! FUNCTION: RegisterHotKey
 ! FUNCTION: RegisterLogonProcess
 ! FUNCTION: RegisterMessagePumpHook
@@ -1344,7 +1366,7 @@ FUNCTION: BOOL TranslateMessage ( MSG* lpMsg ) ;
 ! FUNCTION: UnpackDDElParam
 FUNCTION: BOOL UnregisterClassW ( LPCWSTR lpClassName, HINSTANCE hInstance ) ;
 ALIAS: UnregisterClass UnregisterClassW
-! FUNCTION: UnregisterDeviceNotification
+FUNCTION: BOOL UnregisterDeviceNotification ( HANDLE hDevNotify ) ;
 ! FUNCTION: UnregisterHotKey
 ! FUNCTION: UnregisterMessagePumpHook
 ! FUNCTION: UnregisterUserApiHook
