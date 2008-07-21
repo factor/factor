@@ -1,4 +1,4 @@
-! Copyright (c) 2007 Aaron Schaefer
+! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators io kernel math math.functions math.parser
     math.statistics namespaces sequences tools.time ;
