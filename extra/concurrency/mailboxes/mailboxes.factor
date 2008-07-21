@@ -23,13 +23,13 @@ M: mailbox dispose* threads>> notify-all ;
 : wait-for-mailbox ( mailbox timeout -- )
     >r threads>> r> "mailbox" wait ;
 
-: block-unless-pred ( mailbox timeout pred -- )
+: block-unless-pred ( mailbox timeout pred: ( message -- ? ) -- )
     pick check-disposed
     pick data>> over dlist-contains? [
         3drop
     ] [
         >r 2dup wait-for-mailbox r> block-unless-pred
-    ] if ; inline
+    ] if ; inline recursive
 
 : block-if-empty ( mailbox timeout -- mailbox )
     over check-disposed
@@ -58,11 +58,7 @@ M: mailbox dispose* threads>> notify-all ;
     f mailbox-get-all-timeout ;
 
 : while-mailbox-empty ( mailbox quot -- )
-    over mailbox-empty? [
-        dup >r dip r> while-mailbox-empty
-    ] [
-        2drop
-    ] if ; inline
+    [ [ mailbox-empty? ] curry ] dip [ ] while ; inline
 
 : mailbox-get-timeout? ( mailbox timeout pred -- obj )
     3dup block-unless-pred

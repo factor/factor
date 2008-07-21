@@ -365,7 +365,8 @@ TUPLE: unbalanced-branches-error quots in out ;
     [ unify-effects ] [ unify-dataflow ] bi ; inline
 
 : infer-branches ( last branches node -- )
-    #! last is a quotation which provides a #return or a #values
+    #! last -> #return or #values
+    #! node -> #if or #dispatch
     1 reify-curries
     call dup node,
     pop-d drop

@@ -16,7 +16,7 @@ IN: binary-search
     [ [ from>> ] [ midpoint@ ] bi + ] [ seq>> ] bi
     [ drop ] [ dup ] [ ] tri* nth ; inline
 
-: (search) ( quot seq -- i elt )
+: (search) ( quot: ( elt -- <=> ) seq -- i elt )
     dup length 1 <= [
         finish
     ] [
@@ -25,7 +25,7 @@ IN: binary-search
             { +lt+ [ dup midpoint@ head-slice (search) ] }
             { +gt+ [ dup midpoint@ tail-slice (search) ] }
         } case
-    ] if ; inline
+    ] if ; inline recursive
 
 PRIVATE>
 

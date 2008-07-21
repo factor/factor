@@ -109,10 +109,13 @@ DEFER: if
 : 2bi@ ( w x y z quot -- )
     dup 2bi* ; inline
 
-: while ( pred body tail -- )
+: loop ( pred: ( -- ? ) -- )
+    dup slip swap [ loop ] [ drop ] if ; inline recursive
+
+: while ( pred: ( -- ? ) body: ( -- ) tail: ( -- ) -- )
     >r >r dup slip r> r> roll
     [ >r tuck 2slip r> while ]
-    [ 2nip call ] if ; inline
+    [ 2nip call ] if ; inline recursive
 
 ! Object protocol
 GENERIC: hashcode* ( depth obj -- code )

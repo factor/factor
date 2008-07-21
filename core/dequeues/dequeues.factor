@@ -37,8 +37,7 @@ GENERIC: node-value ( node -- value )
     [ peek-back ] [ pop-back* ] bi ;
 
 : slurp-dequeue ( dequeue quot -- )
-    over dequeue-empty? [ 2drop ] [
-        [ [ pop-back ] dip call ] [ slurp-dequeue ] 2bi
-    ] if ; inline
+    [ drop [ dequeue-empty? not ] curry ]
+    [ [ pop-back ] prepose curry ] 2bi [ ] while ; inline
 
 MIXIN: dequeue

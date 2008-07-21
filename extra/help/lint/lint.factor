@@ -29,7 +29,7 @@ IN: help.lint
 : effect-values ( word -- seq )
     stack-effect
     [ in>> ] [ out>> ] bi append
-    [ (stack-picture) ] map
+    [ dup pair? [ first ] when effect>string ] map
     prune natural-sort ;
 
 : contains-funky-elements? ( element -- ? )

@@ -1,13 +1,15 @@
 
-USING: kernel arrays math.vectors ;
+USING: kernel arrays sequences math.vectors math.geometry accessors ;
 
 IN: math.geometry.rect
 
-TUPLE: rect { loc initial: { 0 0 } } { dim initial: { 0 0 } } ;
+TUPLE: rect loc dim ;
 
-: <zero-rect> ( -- rect ) rect new ;
+: init-rect ( rect -- rect ) { 0 0 } clone >>loc { 0 0 } clone >>dim ;
 
-C: <rect> rect
+: <rect> ( loc dim -- rect ) rect boa ;
+
+: <zero-rect> ( -- rect ) rect new init-rect ;
 
 M: array rect-loc ;
 
@@ -40,3 +42,8 @@ M: array rect-dim drop { 0 0 } ;
 : rect-union ( rect1 rect2 -- newrect )
     (rect-union) <extent-rect> ;
 
+M: rect width  ( rect -- width  ) dim>> first  ;
+M: rect height ( rect -- height ) dim>> second ;
+
+M: rect set-x! ( rect x -- rect ) over loc>> set-first  ;
+M: rect set-y! ( rect y -- rect ) over loc>> set-second ;

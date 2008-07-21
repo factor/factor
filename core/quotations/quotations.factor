@@ -5,11 +5,19 @@ kernel kernel.private math assocs quotations.private
 slots.private ;
 IN: quotations
 
+<PRIVATE
+
+: uncurry dup 3 slot swap 4 slot ; inline
+
+: uncompose dup 3 slot swap 4 slot ; inline
+
+PRIVATE>
+
 M: quotation call (call) ;
 
-M: curry call dup 3 slot swap 4 slot call ;
+M: curry call uncurry call ;
 
-M: compose call dup 3 slot swap 4 slot slip call ;
+M: compose call uncompose slip call ;
 
 M: wrapper equal?
     over wrapper? [ [ wrapped>> ] bi@ = ] [ 2drop f ] if ;

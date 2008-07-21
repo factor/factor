@@ -12,18 +12,6 @@ IN: benchmark.backtrack
 
 : nop ;
 
-MACRO: amb-execute ( seq -- quot )
-    [ length ] [ <enum> [ 1quotation ] assoc-map ] bi
-    '[ , amb , case ] ;
-
-: if-amb ( true false -- )
-    [
-        [ { t f } amb ]
-        [ '[ @ require t ] ]
-        [ '[ @ f ] ]
-        tri* if
-    ] with-scope ; inline
-
 : do-something ( a b -- c )
     { + - * } amb-execute ;
 

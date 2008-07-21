@@ -37,7 +37,7 @@ nl
     array? hashtable? vector?
     tuple? sbuf? node? tombstone?
 
-    array-capacity array-nth set-array-nth
+    array-nth set-array-nth
 
     wrap probe
 

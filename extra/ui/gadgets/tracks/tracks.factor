@@ -41,13 +41,10 @@ M: track layout* ( track -- ) dup track-layout pack-layout ;
 
 M: track pref-dim* ( gadget -- dim )
    [ track-pref-dims-1                           ]
-   [ [ alloted-dim ] [ track-pref-dims-1 ] bi v+ ]
+   [ [ alloted-dim ] [ track-pref-dims-2 ] bi v+ ]
    [ orientation>>                               ]
    tri
    set-axis ;
-
-: track-add ( gadget track constraint -- )
-    over track-sizes push swap add-gadget drop ;
 
 : track-add* ( track gadget constraint -- track )
   pick sizes>> push add-gadget ;

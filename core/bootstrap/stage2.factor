@@ -56,6 +56,8 @@ parse-command-line
 
 "-no-crossref" cli-args member? [ do-crossref ] unless
 
+"io.thread" require
+
 ! Set dll paths
 os wince? [ "windows.ce" require ] when
 os winnt? [ "windows.nt" require ] when

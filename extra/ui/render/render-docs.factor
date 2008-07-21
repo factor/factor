@@ -5,17 +5,17 @@ IN: ui.render
 HELP: gadget
 { $class-description "An object which displays itself on the screen and acts on user input gestures. Gadgets have the following slots:"
     { $list
-        { { $link "pref-dim" } " - a cached value for " { $link pref-dim } "; do not read or write this slot directly." }
-        { { $link "parent" } " - the gadget containing this one, or " { $link f } " if this gadget is not part of the visible gadget hierarchy." }
-        { { $link "children" } " - a vector of child gadgets. Do not modify this vector directly, instead use " { $link add-gadget } ", " { $link add-gadgets } ", " { $link unparent } " or " { $link clear-gadget } "." }
-        { { $link "orientation" } " - an orientation specifier. This slot is used by layout gadgets." }
-        { { $link "layout-state" } " - stores the layout state of the gadget. Do not read or write this slot directly, instead call " { $link relayout } " and " { $link relayout-1 } " if the gadget needs to be re-laid out." }
-        { { $link "visible?" } " - a boolean indicating if the gadget should display and receive user input." }
-        { { $link "root?" } " - if set to " { $link t } ", layout changes in this gadget will not propagate to the gadget's parent." }
-        { { $link "clipped?" } " - a boolean indicating if clipping will be enabled when drawing this gadget's children." }
-        { { $link "interior" } " - an object whose class implements the " { $link draw-interior } " generic word." }
-        { { $link "boundary" } " - an object whose class implements the " { $link draw-boundary } " generic word." }
-        { { $link "model" } " - a " { $link model } " or " { $link f } "; see " { $link "ui-control-impl" } }
+        { { $snippet "pref-dim" } " - a cached value for " { $link pref-dim } "; do not read or write this slot directly." }
+        { { $snippet "parent" } " - the gadget containing this one, or " { $link f } " if this gadget is not part of the visible gadget hierarchy." }
+        { { $snippet "children" } " - a vector of child gadgets. Do not modify this vector directly, instead use " { $link add-gadget } ", " { $link add-gadgets } ", " { $link unparent } " or " { $link clear-gadget } "." }
+        { { $snippet "orientation" } " - an orientation specifier. This slot is used by layout gadgets." }
+        { { $snippet "layout-state" } " - stores the layout state of the gadget. Do not read or write this slot directly, instead call " { $link relayout } " and " { $link relayout-1 } " if the gadget needs to be re-laid out." }
+        { { $snippet "visible?" } " - a boolean indicating if the gadget should display and receive user input." }
+        { { $snippet "root?" } " - if set to " { $link t } ", layout changes in this gadget will not propagate to the gadget's parent." }
+        { { $snippet "clipped?" } " - a boolean indicating if clipping will be enabled when drawing this gadget's children." }
+        { { $snippet "interior" } " - an object whose class implements the " { $link draw-interior } " generic word." }
+        { { $snippet "boundary" } " - an object whose class implements the " { $link draw-boundary } " generic word." }
+        { { $snippet "model" } " - a " { $link model } " or " { $link f } "; see " { $link "ui-control-impl" } }
     }
 "Gadgets subclass the " { $link rect } " class, and thus all instances have " { $snippet "loc" } " and " { $snippet "dim" } " instances holding their location and dimensions." }
 { $notes

@@ -15,18 +15,10 @@ USING: kernel namespaces math quotations arrays hashtables sequences threads
        ui.gadgets.theme
        ui.gadgets.handler
        accessors
-       qualified
        namespaces.lib assocs.lib vars
        rewrite-closures automata math.geometry.rect newfx ;
 
 IN: automata.ui
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-QUALIFIED: ui.gadgets.grids
-
-: grid-add ( grid child i j -- grid )
-  >r >r dupd swap r> r> ui.gadgets.grids:grid-add ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -80,13 +72,13 @@ DEFER: automata-window
       "5 - Random Rule" [ random-rule     ] view-button add-gadget
       "n - New"         [ automata-window ] view-button add-gadget
 
-    @top grid-add
+    @top grid-add*
 
     C[ display ] <slate>
       { 400 400 } >>pdim
     dup >slate
 
-    @center grid-add
+    @center grid-add*
 
   <handler>
 
