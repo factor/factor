@@ -170,11 +170,21 @@ DEFER: relayout
     [ [ 2drop ] [ set-rect-dim ] if ] 2keep
     [ drop ] r> if ; inline
 
-: set-layout-dim ( dim gadget -- )
-    [ invalidate ] (set-rect-dim) ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: set-gadget-dim ( dim gadget -- )
-    [ invalidate* ] (set-rect-dim) ;
+DEFER: in-layout?
+
+: do-invalidate ( gadget -- gadget )
+  in-layout? get [ dup invalidate ] [ dup invalidate* ] if ;
+
+M: gadget (>>dim) ( dim gadget -- )
+   2dup dim>> =
+     [ 2drop ]
+     [ tuck call-next-method do-invalidate drop ]
+   if ;
+
+: set-layout-dim ( dim gadget -- ) (>>dim) ;
+: set-gadget-dim ( dim gadget -- ) (>>dim) ;
 
 GENERIC: pref-dim* ( gadget -- dim )
 
