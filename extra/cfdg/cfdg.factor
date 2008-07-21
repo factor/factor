@@ -204,7 +204,7 @@ VAR: start-shape
 
 : cfdg-window* ( -- )
   [ display ] closed-quot <slate>
-  { 500 500 } over set-slate-dim
+  { 500 500 } over set-slate-pdim
   dup "CFDG" open-window ;
 
 : cfdg-window ( -- ) [ cfdg-window* ] with-ui ;

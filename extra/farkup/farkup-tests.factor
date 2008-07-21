@@ -1,12 +1,19 @@
-USING: farkup kernel tools.test ;
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
+USING: farkup kernel peg peg.ebnf tools.test ;
 IN: farkup.tests
 
-[ "<ul><li>foo</li></ul>" ] [ "-foo" convert-farkup ] unit-test
-[ "<ul><li>foo</li></ul>\n" ] [ "-foo\n" convert-farkup ] unit-test
-[ "<ul><li>foo</li><li>bar</li></ul>" ] [ "-foo\n-bar" convert-farkup ] unit-test
-[ "<ul><li>foo</li><li>bar</li></ul>\n" ] [ "-foo\n-bar\n" convert-farkup ] unit-test
+[ ] [
+    "abcd-*strong*\nasdifj\nweouh23ouh23"
+    "paragraph" \ farkup rule parse drop
+] unit-test
 
-[ "<ul><li>foo</li></ul>\n<p>bar\n</p>" ] [ "-foo\nbar\n" convert-farkup ] unit-test
+[ ] [
+    "abcd-*strong*\nasdifj\nweouh23ouh23\n"
+    "paragraph" \ farkup rule parse drop
+] unit-test
+
+[ "<p>a-b</p>" ] [ "a-b" convert-farkup ] unit-test
 [ "<p>*foo\nbar\n</p>" ] [ "*foo\nbar\n" convert-farkup ] unit-test
 [ "<p><strong>Wow!</strong></p>" ] [ "*Wow!*" convert-farkup ] unit-test
 [ "<p><em>Wow.</em></p>" ] [ "_Wow._" convert-farkup ] unit-test
@@ -15,11 +22,20 @@ IN: farkup.tests
 [ "<p>*</p>" ] [ "\\*" convert-farkup ] unit-test
 [ "<p>**</p>" ] [ "\\**" convert-farkup ] unit-test
 
-[ "" ] [ "\n\n" convert-farkup ] unit-test
-[ "" ] [ "\r\n\r\n" convert-farkup ] unit-test
-[ "" ] [ "\r\r\r\r" convert-farkup ] unit-test
-[ "\n" ] [ "\r\r\r" convert-farkup ] unit-test
-[ "\n" ] [ "\n\n\n" convert-farkup ] unit-test
+[ "<ul><li>a-b</li></ul>" ] [ "-a-b" convert-farkup ] unit-test
+[ "<ul><li>foo</li></ul>" ] [ "-foo" convert-farkup ] unit-test
+[ "<ul><li>foo</li>\n</ul>" ] [ "-foo\n" convert-farkup ] unit-test
+[ "<ul><li>foo</li>\n<li>bar</li></ul>" ] [ "-foo\n-bar" convert-farkup ] unit-test
+[ "<ul><li>foo</li>\n<li>bar</li>\n</ul>" ] [ "-foo\n-bar\n" convert-farkup ] unit-test
+
+[ "<ul><li>foo</li>\n</ul><p>bar\n</p>" ] [ "-foo\nbar\n" convert-farkup ] unit-test
+
+
+[ "\n\n" ] [ "\n\n" convert-farkup ] unit-test
+[ "\n\n" ] [ "\r\n\r\n" convert-farkup ] unit-test
+[ "\n\n\n\n" ] [ "\r\r\r\r" convert-farkup ] unit-test
+[ "\n\n\n" ] [ "\r\r\r" convert-farkup ] unit-test
+[ "\n\n\n" ] [ "\n\n\n" convert-farkup ] unit-test
 [ "<p>foo</p><p>bar</p>" ] [ "foo\n\nbar" convert-farkup ] unit-test
 [ "<p>foo</p><p>bar</p>" ] [ "foo\r\n\r\nbar" convert-farkup ] unit-test
 [ "<p>foo</p><p>bar</p>" ] [ "foo\r\rbar" convert-farkup ] unit-test
@@ -29,7 +45,7 @@ IN: farkup.tests
 [ "\n<p>bar\n</p>" ] [ "\rbar\r" convert-farkup ] unit-test
 [ "\n<p>bar\n</p>" ] [ "\r\nbar\r\n" convert-farkup ] unit-test
 
-[ "<p>foo</p>\n<p>bar</p>" ] [ "foo\n\n\nbar" convert-farkup ] unit-test
+[ "<p>foo</p><p>bar</p>" ] [ "foo\n\n\nbar" convert-farkup ] unit-test
 
 [ "" ] [ "" convert-farkup ] unit-test
 
@@ -77,8 +93,5 @@ IN: farkup.tests
 ] [ "Feature comparison:\n|a|Factor|Java|Lisp|\n|Coolness|Yes|No|No|\n|Badass|Yes|No|No|\n|Enterprise|Yes|Yes|No|\n|Kosher|Yes|No|Yes|\n" convert-farkup ] unit-test
 
 [
-    "<p>Feature comparison:\n\n<table><tr><td>a</td><td>Factor</td><td>Java</td><td>Lisp</td></tr><tr><td>Coolness</td><td>Yes</td><td>No</td><td>No</td></tr><tr><td>Badass</td><td>Yes</td><td>No</td><td>No</td></tr><tr><td>Enterprise</td><td>Yes</td><td>Yes</td><td>No</td></tr><tr><td>Kosher</td><td>Yes</td><td>No</td><td>Yes</td></tr></table></p>"
+    "<p>Feature comparison:</p><table><tr><td>a</td><td>Factor</td><td>Java</td><td>Lisp</td></tr><tr><td>Coolness</td><td>Yes</td><td>No</td><td>No</td></tr><tr><td>Badass</td><td>Yes</td><td>No</td><td>No</td></tr><tr><td>Enterprise</td><td>Yes</td><td>Yes</td><td>No</td></tr><tr><td>Kosher</td><td>Yes</td><td>No</td><td>Yes</td></tr></table>"
 ] [ "Feature comparison:\n\n|a|Factor|Java|Lisp|\n|Coolness|Yes|No|No|\n|Badass|Yes|No|No|\n|Enterprise|Yes|Yes|No|\n|Kosher|Yes|No|Yes|\n" convert-farkup ] unit-test
-
-[ "<p>a-b</p>" ] [ "a-b" convert-farkup ] unit-test
-[ "<ul><li>a-b</li></ul>" ] [ "-a-b" convert-farkup ] unit-test

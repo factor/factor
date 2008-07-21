@@ -195,7 +195,7 @@ M: real sleep
     <thread> [ (spawn) ] keep ;
 
 : spawn-server ( quot name -- thread )
-    >r [ [ ] [ ] while ] curry r> spawn ;
+    >r [ loop ] curry r> spawn ;
 
 : in-thread ( quot -- )
     >r datastack r>

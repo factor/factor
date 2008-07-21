@@ -6,7 +6,8 @@ sequences strings vectors words quotations assocs layouts
 classes classes.builtin classes.tuple classes.tuple.private
 kernel.private vocabs vocabs.loader source-files definitions
 slots classes.union classes.intersection classes.predicate
-compiler.units bootstrap.image.private io.files accessors combinators ;
+compiler.units bootstrap.image.private io.files accessors
+combinators ;
 IN: bootstrap.primitives
 
 "Creating primitives and basic runtime structures..." print flush
@@ -225,7 +226,9 @@ bi
     { "imaginary" { "real" "math" } read-only }
 } define-builtin
 
-"array" "arrays" create { } define-builtin
+"array" "arrays" create {
+    { "length" { "array-capacity" "sequences.private" } read-only }
+} define-builtin
 
 "wrapper" "kernel" create {
     { "wrapped" read-only }
@@ -261,7 +264,9 @@ bi
     { "sub-primitive" read-only }
 } define-builtin
 
-"byte-array" "byte-arrays" create { } define-builtin
+"byte-array" "byte-arrays" create {
+    { "length" { "array-capacity" "sequences.private" } read-only }
+} define-builtin
 
 "callstack" "kernel" create { } define-builtin
 
@@ -306,9 +311,12 @@ tuple
 } prepare-slots define-tuple-class
 
 "curry" "kernel" lookup
-[ f "inline" set-word-prop ]
-[ ]
-[ tuple-layout [ <tuple-boa> ] curry ] tri
+{
+    [ f "inline" set-word-prop ]
+    [ make-flushable ]
+    [ ]
+    [ tuple-layout [ <tuple-boa> ] curry ]
+} cleave
 (( obj quot -- curry )) define-declared
 
 "compose" "kernel" create
@@ -319,9 +327,12 @@ tuple
 } prepare-slots define-tuple-class
 
 "compose" "kernel" lookup
-[ f "inline" set-word-prop ]
-[ ]
-[ tuple-layout [ <tuple-boa> ] curry ] tri
+{
+    [ f "inline" set-word-prop ]
+    [ make-flushable ]
+    [ ]
+    [ tuple-layout [ <tuple-boa> ] curry ]
+} cleave
 (( quot1 quot2 -- compose )) define-declared
 
 ! Sub-primitive words

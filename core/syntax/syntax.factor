@@ -89,6 +89,7 @@ IN: bootstrap.syntax
     "POSTPONE:" [ scan-word parsed ] define-syntax
     "\\" [ scan-word literalize parsed ] define-syntax
     "inline" [ word make-inline ] define-syntax
+    "recursive" [ word make-recursive ] define-syntax
     "foldable" [ word make-foldable ] define-syntax
     "flushable" [ word make-flushable ] define-syntax
     "delimiter" [ word t "delimiter" set-word-prop ] define-syntax

@@ -25,8 +25,8 @@ TR: soundex-tr
         [ first>upper ]
         [
             soundex-tr
-            trim-first
-            remove-duplicates
+            [ "" ] [ trim-first ] if-empty
+            [ "" ] [ remove-duplicates ] if-empty
             remove-zeroes
         ] bi
         pad-4

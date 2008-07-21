@@ -55,7 +55,7 @@ os { winnt linux macosx } member? [
                     dup print flush
                     dup parent-directory
                     [ right-trim-separators "xyz" tail? ] either? not
-                ] [ ] [ ] while
+                ] loop
 
                 "c1" get count-down
                 
@@ -64,7 +64,7 @@ os { winnt linux macosx } member? [
                     dup print flush
                     dup parent-directory
                     [ right-trim-separators "yxy" tail? ] either? not
-                ] [ ] [ ] while
+                ] loop
 
                 "c2" get count-down
             ] "Monitor test thread" spawn drop

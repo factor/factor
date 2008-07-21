@@ -2,12 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs words sequences arrays compiler
 tools.time io.styles io prettyprint vocabs kernel sorting
-generator optimizer math math.order math.statistics combinators ;
+generator optimizer math math.order math.statistics combinators
+optimizer.debugger ;
 IN: report.optimizer
-
-: count-optimization-passes ( nodes n -- n )
-    >r optimize-1
-    [ r> 1+ count-optimization-passes ] [ drop r> ] if ;
 
 : table. ( alist -- )
     20 short tail*
@@ -28,13 +25,12 @@ IN: report.optimizer
         tri
     ] 2bi ; inline
 
+: optimization-passes ( word -- n )
+    word-dataflow nip 1 count-optimization-passes nip ;
+
 : optimizer-measurements ( -- alist )
     all-words [ compiled>> ] filter
-    [
-        dup [
-            word-dataflow nip 1 count-optimization-passes
-        ] benchmark 2array
-    ] { } map>assoc ;
+    [ dup [ optimization-passes ] benchmark 2array ] { } map>assoc ;
 
 : optimizer-measurements. ( alist -- )
     {

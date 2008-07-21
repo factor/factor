@@ -1,66 +1,55 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ui.gadgets ui.gadgets.borders ui.gadgets.buttons
-ui.gadgets.labels ui.gadgets.scrollers
-ui.gadgets.paragraphs ui.gadgets.incremental ui.gadgets.packs
-ui.gadgets.theme ui.clipboards ui.gestures ui.traverse ui.render
-hashtables io kernel namespaces sequences io.styles strings
-quotations math opengl combinators math.vectors
-sorting splitting io.streams.nested assocs
-ui.gadgets.presentations ui.gadgets.slots ui.gadgets.grids
-ui.gadgets.grid-lines classes.tuple models continuations
-destructors accessors math.geometry.rect ;
+       ui.gadgets.labels ui.gadgets.scrollers
+       ui.gadgets.paragraphs ui.gadgets.incremental ui.gadgets.packs
+       ui.gadgets.theme ui.clipboards ui.gestures ui.traverse ui.render
+       hashtables io kernel namespaces sequences io.styles strings
+       quotations math opengl combinators math.vectors
+       sorting splitting io.streams.nested assocs
+       ui.gadgets.presentations ui.gadgets.slots ui.gadgets.grids
+       ui.gadgets.grid-lines classes.tuple models continuations
+       destructors accessors math.geometry.rect ;
+
 IN: ui.gadgets.panes
 
 TUPLE: pane < pack
-output current prototype scrolls?
-selection-color caret mark selecting? ;
+       output current prototype scrolls?
+       selection-color caret mark selecting? ;
 
-: clear-selection ( pane -- )
-    f >>caret
-    f >>mark
-    drop ;
+: clear-selection ( pane -- pane ) f >>caret f >>mark ;
 
-: add-output ( current pane -- )
-    [ set-pane-output ] [ swap add-gadget drop ] 2bi ;
+: add-output  ( pane current -- pane ) [ >>output  ] [ add-gadget ] bi ;
+: add-current ( pane current -- pane ) [ >>current ] [ add-gadget ] bi ;
 
-: add-current ( current pane -- )
-    [ set-pane-current ] [ swap add-gadget drop ] 2bi ;
+: prepare-line ( pane -- pane )
+  clear-selection
+  dup prototype>> clone add-current ;
 
-: prepare-line ( pane -- )
-    [ clear-selection ]
-    [ [ pane-prototype clone ] keep add-current ] bi ;
-
-: pane-caret&mark ( pane -- caret mark )
-    [ caret>> ] [ mark>> ] bi ;
+: pane-caret&mark ( pane -- caret mark ) [ caret>> ] [ mark>> ] bi ;
 
 : selected-children ( pane -- seq )
     [ pane-caret&mark sort-pair ] keep gadget-subtree ;
 
 M: pane gadget-selection? pane-caret&mark and ;
 
-M: pane gadget-selection
-    selected-children gadget-text ;
+M: pane gadget-selection ( pane -- string/f ) selected-children gadget-text ;
 
 : pane-clear ( pane -- )
-    [ clear-selection ]
-    [ pane-output clear-incremental ]
-    [ pane-current clear-gadget ]
-    tri ;
-
-: pane-theme ( pane -- pane )
-    selection-color >>selection-color ; inline
+  clear-selection
+  [ pane-output clear-incremental ]
+  [ pane-current clear-gadget ]
+  bi ;
 
 : new-pane ( class -- pane )
     new-gadget
         { 0 1 } >>orientation
         <shelf> >>prototype
-        <incremental> over add-output
-        dup prepare-line
-        pane-theme ;
+        <incremental> add-output
+        prepare-line
+        selection-color >>selection-color ;
 
-: <pane> ( -- pane )
-    pane new-pane ;
+: <pane> ( -- pane ) pane new-pane ;
 
 GENERIC: draw-selection ( loc obj -- )
 
@@ -102,25 +91,25 @@ C: <pane-stream> pane-stream
 
 : smash-pane ( pane -- gadget ) pane-output smash-line ;
 
-: pane-nl ( pane -- )
+: pane-nl ( pane -- pane )
     dup pane-current dup unparent smash-line
     over pane-output add-incremental
     prepare-line ;
 
 : pane-write ( pane seq -- )
-    [ dup pane-nl ]
+    [ pane-nl ]
     [ over pane-current stream-write ]
     interleave drop ;
 
 : pane-format ( style pane seq -- )
-    [ dup pane-nl ]
+    [ pane-nl ]
     [ 2over pane-current stream-format ]
     interleave 2drop ;
 
 GENERIC: write-gadget ( gadget stream -- )
 
-M: pane-stream write-gadget
-    pane-stream-pane pane-current swap add-gadget drop ;
+M: pane-stream write-gadget ( gadget pane-stream -- )
+   pane>> current>> swap add-gadget drop ;
 
 M: style-stream write-gadget
     stream>> write-gadget ;
@@ -148,8 +137,8 @@ M: style-stream write-gadget
 
 TUPLE: pane-control < pane quot ;
 
-M: pane-control model-changed
-    swap model-value swap dup pane-control-quot with-pane ;
+M: pane-control model-changed ( model pane-control -- )
+   [ value>> ] [ dup quot>> ] bi* with-pane ;
 
 : <pane-control> ( model quot -- pane )
     pane-control new-pane
@@ -160,7 +149,7 @@ M: pane-control model-changed
     >r pane-stream-pane r> keep scroll-pane ; inline
 
 M: pane-stream stream-nl
-    [ pane-nl ] do-pane-stream ;
+    [ pane-nl drop ] do-pane-stream ;
 
 M: pane-stream stream-write1
     [ pane-current stream-write1 ] do-pane-stream ;
@@ -337,15 +326,14 @@ M: paragraph stream-format
         2drop
     ] if ;
 
-: caret>mark ( pane -- )
-    dup pane-caret over set-pane-mark relayout-1 ;
+: caret>mark ( pane -- pane )
+  dup caret>> >>mark
+  dup relayout-1 ;
 
 GENERIC: sloppy-pick-up* ( loc gadget -- n )
 
-M: pack sloppy-pick-up*
-    dup gadget-orientation
-    swap gadget-children
-    (fast-children-on) ;
+M: pack sloppy-pick-up* ( loc gadget -- n )
+   [ orientation>> ] [ children>> ] bi (fast-children-on) ;
 
 M: gadget sloppy-pick-up*
     gadget-children [ inside? ] with find-last drop ;
@@ -362,25 +350,25 @@ M: f sloppy-pick-up*
     [ 3drop { } ]
     if ;
 
-: move-caret ( pane -- )
-    dup hand-rel
-    over sloppy-pick-up
-    over set-pane-caret
-    relayout-1 ;
+: move-caret ( pane -- pane )
+  dup hand-rel
+  over sloppy-pick-up
+  over set-pane-caret
+  dup relayout-1 ;
 
 : begin-selection ( pane -- )
-    dup move-caret f swap set-pane-mark ;
+    move-caret f swap set-pane-mark ;
 
 : extend-selection ( pane -- )
     hand-moved? [
         dup selecting?>> [
-            dup move-caret
+            move-caret
         ] [
             dup hand-clicked get child? [
                 t >>selecting?
                 dup hand-clicked set-global
-                dup move-caret
-                dup caret>mark
+                move-caret
+                caret>mark
             ] when
         ] if
         dup dup pane-caret gadget-at-path scroll>gadget
@@ -395,8 +383,8 @@ M: f sloppy-pick-up*
     ] if ;
 
 : select-to-caret ( pane -- )
-    dup pane-mark [ dup caret>mark ] unless
-    dup move-caret
+    dup pane-mark [ caret>mark ] unless
+    move-caret
     dup request-focus
     com-copy-selection ;
 

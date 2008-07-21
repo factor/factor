@@ -371,7 +371,7 @@ M: ebnf-tokenizer (transform) ( ast -- parser )
 M: ebnf-rule (transform) ( ast -- parser )
   dup elements>> 
   (transform) [
-    swap symbol>> dup get { [ tuple? ] [ delegate parser? ] } 1&& [ 
+    swap symbol>> dup get parser? [ 
       "Rule '" over append "' defined more than once" append throw 
     ] [ 
       set 

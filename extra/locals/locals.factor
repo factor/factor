@@ -64,8 +64,8 @@ C: <quote> quote
     local-index 1+ [ get-local ] curry ;
 
 : localize-writer ( obj args -- quot )
-  >r "local-reader" word-prop r>
-  read-local-quot [ set-local-value ] append ;
+    >r "local-reader" word-prop r>
+    read-local-quot [ set-local-value ] append ;
 
 : localize ( obj args -- quot )
     {
@@ -275,7 +275,7 @@ M: wlet local-rewrite*
 : parse-locals ( -- vars assoc )
     ")" parse-effect
     word [ over "declared-effect" set-word-prop ] when*
-    effect-in make-locals dup push-locals ;
+    in>> [ dup pair? [ first ] when ] map make-locals dup push-locals ;
 
 : parse-locals-definition ( word -- word quot )
     scan "(" assert= parse-locals \ ; (parse-lambda) <lambda>
