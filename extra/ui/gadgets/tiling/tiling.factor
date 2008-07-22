@@ -1,7 +1,7 @@
 
 USING: kernel sequences math math.order
        ui.gadgets ui.gadgets.tracks ui.gestures
-       accessors ;
+       fry accessors ;
 
 IN: ui.gadgets.tiling
 
@@ -93,6 +93,21 @@ TUPLE: tiling < track gadgets columns first focused ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: exchanged! ( seq a b -- )
+                   [ 0 max ] bi@
+  pick length 1 - '[ , min ] bi@
+  rot exchange ;
+
+: move-left ( tiling -- tiling )
+  dup [ gadgets>> ] [ focused>> 1 - ] [ focused>> ] tri exchanged!
+  focus-left ;
+
+: move-right ( tiling -- tiling )
+  dup [ gadgets>> ] [ focused>> ] [ focused>> 1 + ] tri exchanged!
+  focus-right ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : add-column ( tiling -- tiling )
   dup columns>> 1 + >>columns
   tiling-map-gadgets ;
@@ -110,9 +125,11 @@ M: tiling focusable-child* ( tiling -- child/t )
 
 tiling
  H{
-    { T{ key-down f { A+ } "LEFT"  } [ focus-left  drop ] }
-    { T{ key-down f { A+ } "RIGHT" } [ focus-right drop ] }
-    { T{ key-down f { C+ } "["     } [ del-column  drop ] }
-    { T{ key-down f { C+ } "]"     } [ add-column  drop ] }
+    { T{ key-down f { A+    } "LEFT"  } [ focus-left  drop ] }
+    { T{ key-down f { A+    } "RIGHT" } [ focus-right drop ] }
+    { T{ key-down f { S+ A+ } "LEFT"  } [ move-left   drop ] }
+    { T{ key-down f { S+ A+ } "RIGHT" } [ move-right  drop ] }
+    { T{ key-down f { C+    } "["     } [ del-column  drop ] }
+    { T{ key-down f { C+    } "]"     } [ add-column  drop ] }
   }
 set-gestures
