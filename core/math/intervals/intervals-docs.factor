@@ -62,12 +62,20 @@ ARTICLE: "math-intervals-compare" "Comparing intervals"
 { $subsection assume> }
 { $subsection assume>= } ;
 
+ARTICLE: "math-interval-properties" "Properties of interval arithmetic"
+"For some operations, interval arithmetic yields inaccurate results, either because the result of lifting some operations to intervals does not result in intervals (bitwise operations, for example) or for the sake of simplicity of implementation."
+$nl
+"However, one important property holds for all operations. Suppose " { $emphasis "I, J" } " are intervals and " { $emphasis "op" } " is an operation. If " { $emphasis "x" } " is an element of " { $emphasis "I" } " and " { $emphasis "y" } " is an element of " { $emphasis "J" } ", then " { $emphasis "x op y" } " is an element of " { $emphasis "I op J" } "."
+$nl
+"In other words, the resulting interval might be an overestimate, but it is never an underestimate." ;
+
 ARTICLE: "math-intervals" "Intervals"
 "Interval arithmetic is performed on ranges of real numbers, rather than exact values. It is used by the Factor compiler to convert arbitrary-precision arithmetic to machine arithmetic, by inferring bounds for integer calculations."
-$nl
+{ $subsection "math-interval-properties" }
 "The class of intervals:"
 { $subsection interval }
 { $subsection interval? }
+"Interval operations:"
 { $subsection "math-intervals-new" }
 { $subsection "math-intervals-arithmetic" }
 { $subsection "math-intervals-sets" }
@@ -153,6 +161,26 @@ HELP: interval-max
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
 { $description "Outputs the interval values obtained by lifting the " { $link max } " word to " { $snippet "i1" } " and " { $snippet "i2" } "." } ;
 
+HELP: interval-mod
+{ $values { "i1" interval } { "i2" interval } { "i3" interval } }
+{ $description "Outputs an interval containing all possible values obtained by aplying " { $link mod } " to elements of " { $snippet "i1" } " and " { $snippet "i2" } "." } ;
+
+HELP: interval-rem
+{ $values { "i1" interval } { "i2" interval } { "i3" interval } }
+{ $description "Outputs an interval containing all possible values obtained by aplying " { $link rem } " to elements of " { $snippet "i1" } " and " { $snippet "i2" } "." } ;
+
+HELP: interval-bitand
+{ $values { "i1" interval } { "i2" interval } { "i3" interval } }
+{ $description "Outputs an interval containing all possible values obtained by aplying " { $link bitand } " to elements of " { $snippet "i1" } " and " { $snippet "i2" } "." } ;
+
+HELP: interval-bitor
+{ $values { "i1" interval } { "i2" interval } { "i3" interval } }
+{ $description "Outputs an interval containing all possible values obtained by aplying " { $link bitor } " to elements of " { $snippet "i1" } " and " { $snippet "i2" } "." } ;
+
+HELP: interval-bitxor
+{ $values { "i1" interval } { "i2" interval } { "i3" interval } }
+{ $description "Outputs an interval containing all possible values obtained by aplying " { $link bitxor } " to elements of " { $snippet "i1" } " and " { $snippet "i2" } "." } ;
+
 HELP: interval-min
 { $values { "i1" interval } { "i2" interval } { "i3" interval } }
 { $description "Outputs the interval values obtained by lifting the " { $link min } " word to " { $snippet "i1" } " and " { $snippet "i2" } "." } ;
@@ -168,6 +196,10 @@ HELP: interval-1-
 HELP: interval-neg
 { $values { "i1" interval } { "i2" interval } }
 { $description "Negates an interval." } ;
+
+HELP: interval-abs
+{ $values { "i1" interval } { "i2" interval } }
+{ $description "Absolute value of an interval." } ;
 
 HELP: interval-intersect
 { $values { "i1" interval } { "i2" interval } { "i3" "an " { $link interval  } " or " { $link f } } }
@@ -190,12 +222,16 @@ HELP: interval-closure
 { $description "Outputs the smallest closed interval containing the endpoints of " { $snippet "i1" } "." } ;
 
 HELP: interval/
-{ $values { "i1" interval } { "i2" interval } { "i3" "an " { $link interval } " or " { $link f } } }
-{ $description "Divides " { $snippet "i1" } " by " { $snippet "i2" } ", using " { $link / } " to perform the division. Outputs " { $link f } " if " { $snippet "i2" } " contains points arbitrarily close to zero." } ;
+{ $values { "i1" interval } { "i2" interval } { "i3" interval } }
+{ $description "Divides " { $snippet "i1" } " by " { $snippet "i2" } ", using " { $link / } " to perform the division." } ;
 
 HELP: interval/i
-{ $values { "i1" interval } { "i2" interval } { "i3" "an " { $link interval } " or " { $link f } } }
-{ $description "Divides " { $snippet "i1" } " by " { $snippet "i2" } ", using " { $link /i } " to perform the division. Outputs " { $link f } " if " { $snippet "i2" } " contains points arbitrarily close to zero." } ;
+{ $values { "i1" interval } { "i2" interval } { "i3" interval } }
+{ $description "Divides " { $snippet "i1" } " by " { $snippet "i2" } ", using " { $link /i } " to perform the division." } ;
+
+HELP: interval/f
+{ $values { "i1" interval } { "i2" interval } { "i3" interval } }
+{ $description "Divides " { $snippet "i1" } " by " { $snippet "i2" } ", using " { $link /f } " to perform the division." } ;
 
 HELP: interval-recip
 { $values { "i1" interval } { "i2" interval } }

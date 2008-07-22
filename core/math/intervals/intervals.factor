@@ -36,7 +36,8 @@ C: <interval> interval
 
 : (a,inf] ( a -- interval ) 1./0. (a,b] ; inline
 
-: [-inf,inf] ( -- interval ) -1./0. 1./0. [a,b] ; foldable
+: [-inf,inf] ( -- interval )
+    T{ interval f { -1./0. t } { 1./0. t } } ; inline
 
 : compare-endpoints ( p1 p2 quot -- ? )
     >r over first over first r> call [
