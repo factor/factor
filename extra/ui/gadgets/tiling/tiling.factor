@@ -5,7 +5,7 @@ USING: kernel sequences math math.order
 
 IN: ui.gadgets.tiling
 
-TUPLE: tiling < track gadgets columns first focused ;
+TUPLE: tiling < track gadgets tiles first focused ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -13,15 +13,13 @@ TUPLE: tiling < track gadgets columns first focused ;
   init-track
   { 1 0 }    >>orientation
   V{ } clone >>gadgets
-  2          >>columns
+  2          >>tiles
   0          >>first
   0          >>focused ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: <tiling> ( -- gadget )
-  tiling new
-  init-tiling ;
+: <tiling> ( -- gadget ) tiling new init-tiling ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -34,7 +32,7 @@ TUPLE: tiling < track gadgets columns first focused ;
 : tiling-gadgets-to-map ( tiling -- gadgets )
   [ gadgets>> ]
   [ first>> ]
-  [ [ first>> ] [ columns>> ] bi + ]
+  [ [ first>> ] [ tiles>> ] bi + ]
   tri
   bounded-subseq ;
 
@@ -56,7 +54,7 @@ TUPLE: tiling < track gadgets columns first focused ;
 
 : first-viewable ( tiling -- index ) first>> ;
 
-: last-viewable ( tiling -- index ) [ first>> ] [ columns>> ] bi + 1 - ;
+: last-viewable ( tiling -- index ) [ first>> ] [ tiles>> ] bi + 1 - ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -77,14 +75,14 @@ TUPLE: tiling < track gadgets columns first focused ;
 : check-focused-bounds ( tiling -- tiling )
   dup focused>> 0 max over gadgets>> length 1 - min >>focused ;
 
-: focus-left ( tiling -- tiling )
+: focus-prev ( tiling -- tiling )
   dup focused>> 1 - >>focused
   check-focused-bounds
   make-focused-mapped
   tiling-map-gadgets
   dup request-focus ;
 
-: focus-right ( tiling -- tiling )
+: focus-next ( tiling -- tiling )
   dup focused>> 1 + >>focused
   check-focused-bounds
   make-focused-mapped
@@ -98,22 +96,22 @@ TUPLE: tiling < track gadgets columns first focused ;
   pick length 1 - '[ , min ] bi@
   rot exchange ;
 
-: move-left ( tiling -- tiling )
+: move-prev ( tiling -- tiling )
   dup [ gadgets>> ] [ focused>> 1 - ] [ focused>> ] tri exchanged!
-  focus-left ;
+  focus-prev ;
 
-: move-right ( tiling -- tiling )
+: move-next ( tiling -- tiling )
   dup [ gadgets>> ] [ focused>> ] [ focused>> 1 + ] tri exchanged!
-  focus-right ;
+  focus-next ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: add-column ( tiling -- tiling )
-  dup columns>> 1 + >>columns
+: add-tile ( tiling -- tiling )
+  dup tiles>> 1 + >>tiles
   tiling-map-gadgets ;
 
-: del-column ( tiling -- tiling )
-  dup columns>> 1 - 1 max >>columns
+: del-tile ( tiling -- tiling )
+  dup tiles>> 1 - 1 max >>tiles
   tiling-map-gadgets ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -123,13 +121,33 @@ M: tiling focusable-child* ( tiling -- child/t )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-tiling
+TUPLE: tiling-shelf < tiling ;
+TUPLE: tiling-pile  < tiling ;
+
+: <tiling-shelf> ( -- gadget )
+  tiling-shelf new init-tiling { 1 0 } >>orientation ;
+
+: <tiling-pile> ( -- gadget )
+  tiling-pile new init-tiling { 0 1 } >>orientation ;
+
+tiling-shelf
  H{
-    { T{ key-down f { A+    } "LEFT"  } [ focus-left  drop ] }
-    { T{ key-down f { A+    } "RIGHT" } [ focus-right drop ] }
-    { T{ key-down f { S+ A+ } "LEFT"  } [ move-left   drop ] }
-    { T{ key-down f { S+ A+ } "RIGHT" } [ move-right  drop ] }
-    { T{ key-down f { C+    } "["     } [ del-column  drop ] }
-    { T{ key-down f { C+    } "]"     } [ add-column  drop ] }
+    { T{ key-down f { A+    } "LEFT"  } [ focus-prev  drop ] }
+    { T{ key-down f { A+    } "RIGHT" } [ focus-next drop ] }
+    { T{ key-down f { S+ A+ } "LEFT"  } [ move-prev   drop ] }
+    { T{ key-down f { S+ A+ } "RIGHT" } [ move-next  drop ] }
+    { T{ key-down f { C+    } "["     } [ del-tile  drop ] }
+    { T{ key-down f { C+    } "]"     } [ add-tile  drop ] }
+  }
+set-gestures
+
+tiling-pile
+ H{
+    { T{ key-down f { A+    } "UP"  } [ focus-prev  drop ] }
+    { T{ key-down f { A+    } "DOWN" } [ focus-next drop ] }
+    { T{ key-down f { S+ A+ } "UP"  } [ move-prev   drop ] }
+    { T{ key-down f { S+ A+ } "DOWN" } [ move-next  drop ] }
+    { T{ key-down f { C+    } "["     } [ del-tile  drop ] }
+    { T{ key-down f { C+    } "]"     } [ add-tile  drop ] }
   }
 set-gestures
