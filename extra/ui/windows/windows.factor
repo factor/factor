@@ -93,7 +93,7 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
 : handle-wm-size ( hWnd uMsg wParam lParam -- )
     2nip
     [ lo-word ] keep hi-word 2array
-    dup { 0 0 } = [ 2drop ] [ swap window set-gadget-dim ] if ;
+    dup { 0 0 } = [ 2drop ] [ swap window (>>dim) ] if ;
 
 : handle-wm-move ( hWnd uMsg wParam lParam -- )
     2nip
