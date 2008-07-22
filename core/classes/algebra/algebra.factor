@@ -186,6 +186,9 @@ M: anonymous-complement (classes-intersect?)
         [ [ rank-class ] bi@ < ]
     } cond ;
 
+: class= ( first second -- ? )
+    [ class<= ] [ swap class<= ] 2bi and ;
+
 : largest-class ( seq -- n elt )
     dup [ [ class< ] with contains? not ] curry find-last
     [ "Topological sort failed" throw ] unless* ;

@@ -13,8 +13,6 @@ IN: classes.algebra.tests
 \ flatten-class must-infer
 \ flatten-builtin-class must-infer
 
-: class= ( cls1 cls2 -- ? ) [ class<= ] [ swap class<= ] 2bi and ;
-
 : class-and* ( cls1 cls2 cls3 -- ? ) >r class-and r> class= ;
 
 : class-or* ( cls1 cls2 cls3 -- ? ) >r class-or r> class= ;

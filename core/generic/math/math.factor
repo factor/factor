@@ -22,8 +22,14 @@ PREDICATE: math-class < class
         [ drop { 100 100 } ]
     } cond ;
     
-: math-class-max ( class class -- class )
-    [ [ math-precedence ] compare +gt+ eq? ] most ;
+: math-class<=> ( class1 class2 -- class )
+    [ math-precedence ] compare +gt+ eq? ;
+
+: math-class-max ( class1 class2 -- class )
+    [ math-class<=> ] most ;
+
+: math-class-min ( class1 class2 -- class )
+    [ swap math-class<=> ] most ;
 
 : (math-upgrade) ( max class -- quot )
     dupd = [ drop [ ] ] [ "coercer" word-prop [ ] or ] if ;
