@@ -50,7 +50,7 @@ IN: slides
         <gadget>
         T{ gradient f { { 0.25 0.25 0.25 1.0 } { 1.0 1.0 1.0 0.0 } } }
         over set-gadget-interior
-        { 800 10 } over set-gadget-dim
+        { 800 10 } over (>>dim)
         { 1 0 } over set-gadget-orientation
         gadget.
     ] ($block) ;

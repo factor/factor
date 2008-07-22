@@ -176,8 +176,6 @@ M: gadget (>>dim) ( dim gadget -- )
      [ tuck call-next-method do-invalidate drop ]
    if ;
 
-: set-gadget-dim ( dim gadget -- ) (>>dim) ;
-
 GENERIC: pref-dim* ( gadget -- dim )
 
 : ?set-gadget-pref-dim ( dim gadget -- )

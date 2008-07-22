@@ -236,8 +236,7 @@ $nl
 
 ARTICLE: "ui-null-layout" "Manual layouts"
 "When automatic layout is not appropriate, gadgets can be added to a parent with no layout policy, and then positioned and sized manually:"
-{ $subsection set-rect-loc }
-{ $subsection set-gadget-dim } ;
+{ $subsection set-rect-loc } ;
 
 ARTICLE: "ui-layout-impl" "Implementing layout gadgets"
 "The relayout process proceeds top-down, with parents laying out their children, which in turn lay out their children. Custom layout policy is implemented by defining a method on a generic word:"
