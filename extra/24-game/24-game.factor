@@ -6,19 +6,8 @@ parser io math prettyprint combinators
 vectors words quotations accessors math.parser
 backtrack math.ranges locals fry memoize macros assocs ;
 
-IN: 24
+IN: 24-game
 
-MACRO: amb-execute ( seq -- quot )
-    [ length ] [ <enum> [ 1quotation ] assoc-map ] bi
-    '[ , amb , case ] ;
-: if-amb ( true false -- )
-   [
-    [ { t f } amb ]
-    [ '[ @ require t ] ]
-    [ '[ @ f ] ]
-    tri* if
-] with-scope ; inline
-: nop ;
 : do-something ( a b -- c ) { + - * } amb-execute ;
 : maybe-swap ( a b -- a b ) { nop swap } amb-execute ;
 : some-rots ( a b c -- a b c )
