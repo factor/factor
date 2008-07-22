@@ -163,6 +163,49 @@ C-STRUCT: DIPROPHEADER
     { "DWORD" "dwHow" } ;
 TYPEDEF: DIPROPHEADER* LPDIPROPHEADER
 TYPEDEF: DIPROPHEADER* LPCDIPROPHEADER
+C-STRUCT: DIPROPDWORD
+    { "DIPROPHEADER" "diph" }
+    { "DWORD"        "dwData" } ;
+TYPEDEF: DIPROPDWORD* LPDIPROPDWORD
+TYPEDEF: DIPROPDWORD* LPCDIPROPDWORD
+C-STRUCT: DIPROPPOINTER
+    { "DIPROPHEADER" "diph" }
+    { "UINT_PTR" "uData" } ;
+TYPEDEF: DIPROPPOINTER* LPDIPROPPOINTER
+TYPEDEF: DIPROPPOINTER* LPCDIPROPPOINTER
+C-STRUCT: DIPROPRANGE
+    { "DIPROPHEADER" "diph" }
+    { "LONG" "lMin" }
+    { "LONG" "lMax" } ;
+TYPEDEF: DIPROPRANGE* LPDIPROPRANGE
+TYPEDEF: DIPROPRANGE* LPCDIPROPRANGE
+C-STRUCT: DIPROPCAL
+    { "DIPROPHEADER" "diph" }
+    { "LONG" "lMin" }
+    { "LONG" "lCenter" }
+    { "LONG" "lMax" } ;
+TYPEDEF: DIPROPCAL* LPDIPROPCAL
+TYPEDEF: DIPROPCAL* LPCDIPROPCAL
+C-STRUCT: DIPROPGUIDANDPATH
+    { "DIPROPHEADER" "diph" }
+    { "GUID" "guidClass" }
+    { "WCHAR[260]"   "wszPath" } ;
+TYPEDEF: DIPROPGUIDANDPATH* LPDIPROPGUIDANDPATH
+TYPEDEF: DIPROPGUIDANDPATH* LPCDIPROPGUIDANDPATH
+C-STRUCT: DIPROPSTRING
+    { "DIPROPHEADER" "diph" }
+    { "WCHAR[260]"   "wsz" } ;
+TYPEDEF: DIPROPSTRING* LPDIPROPSTRING
+TYPEDEF: DIPROPSTRING* LPCDIPROPSTRING
+C-STRUCT: CPOINT
+    { "LONG" "lP" }
+    { "DWORD" "dwLog" } ;
+C-STRUCT: DIPROPCPOINTS
+    { "DIPROPHEADER" "diph" }
+    { "DWORD" "dwCPointsNum" }
+    { "CPOINT[8]" "cp" } ;
+TYPEDEF: DIPROPCPOINTS* LPDIPROPCPOINTS
+TYPEDEF: DIPROPCPOINTS* LPCDIPROPCPOINTS
 C-STRUCT: DIENVELOPE
     { "DWORD" "dwSize" }
     { "DWORD" "dwAttackLevel" }
@@ -554,16 +597,6 @@ FUNCTION: HRESULT DirectInput8Create ( HINSTANCE hinst, DWORD dwVersion, REFIID 
 
 : DIK_CIRCUMFLEX      DIK_PREVTRACK ; inline
 
-SYMBOL: +dinput+
-
-: create-dinput ( -- )
-    f GetModuleHandle DIRECTINPUT_VERSION IDirectInput8W-iid
-    f <void*> [ f DirectInput8Create ole32-error ] keep *void*
-    +dinput+ set ;
-
-: delete-dinput ( -- )
-    +dinput+ [ com-release f ] change ;
-
 : DI8DEVTYPE_DEVICE           HEX: 11 ; inline
 : DI8DEVTYPE_MOUSE            HEX: 12 ; inline
 : DI8DEVTYPE_KEYBOARD         HEX: 13 ; inline
@@ -578,3 +611,53 @@ SYMBOL: +dinput+
 : DI8DEVTYPE_SUPPLEMENTAL     HEX: 1C ; inline
 
 : GET_DIDEVICE_TYPE ( dwType -- type ) HEX: FF bitand ; inline
+
+: DIPROPRANGE_NOMIN       HEX: 80000000 ; inline
+: DIPROPRANGE_NOMAX       HEX: 7FFFFFFF ; inline
+: MAXCPOINTSNUM           8 ; inline
+
+: DIPH_DEVICE             0 ; inline
+: DIPH_BYOFFSET           1 ; inline
+: DIPH_BYID               2 ; inline
+: DIPH_BYUSAGE            3 ; inline
+
+: DIMAKEUSAGEDWORD ( UsagePage Usage -- DWORD ) 16 shift bitor ; inline
+
+: DIPROP_BUFFERSIZE           1 <alien> ; inline
+: DIPROP_AXISMODE             2 <alien> ; inline
+
+: DIPROPAXISMODE_ABS      0 ; inline
+: DIPROPAXISMODE_REL      1 ; inline
+
+: DIPROP_GRANULARITY          3 <alien> ; inline
+: DIPROP_RANGE                4 <alien> ; inline
+: DIPROP_DEADZONE             5 <alien> ; inline
+: DIPROP_SATURATION           6 <alien> ; inline
+: DIPROP_FFGAIN               7 <alien> ; inline
+: DIPROP_FFLOAD               8 <alien> ; inline
+: DIPROP_AUTOCENTER           9 <alien> ; inline
+
+: DIPROPAUTOCENTER_OFF    0 ; inline
+: DIPROPAUTOCENTER_ON     1 ; inline
+
+: DIPROP_CALIBRATIONMODE     10 <alien> ; inline
+
+: DIPROPCALIBRATIONMODE_COOKED    0 ; inline
+: DIPROPCALIBRATIONMODE_RAW       1 ; inline
+
+: DIPROP_CALIBRATION         11 <alien> ; inline
+: DIPROP_GUIDANDPATH         12 <alien> ; inline
+: DIPROP_INSTANCENAME        13 <alien> ; inline
+: DIPROP_PRODUCTNAME         14 <alien> ; inline
+: DIPROP_JOYSTICKID          15 <alien> ; inline
+: DIPROP_GETPORTDISPLAYNAME  16 <alien> ; inline
+: DIPROP_PHYSICALRANGE       18 <alien> ; inline
+: DIPROP_LOGICALRANGE        19 <alien> ; inline
+: DIPROP_KEYNAME             20 <alien> ; inline
+: DIPROP_CPOINTS             21 <alien> ; inline
+: DIPROP_APPDATA             22 <alien> ; inline
+: DIPROP_SCANCODE            23 <alien> ; inline
+: DIPROP_VIDPID              24 <alien> ; inline
+: DIPROP_USERNAME            25 <alien> ; inline
+: DIPROP_TYPENAME            26 <alien> ; inline
+
