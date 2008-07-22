@@ -65,10 +65,6 @@ HELP: relayout-1
 
 { relayout relayout-1 } related-words
 
-HELP: set-gadget-dim
-{ $values { "dim" "a pair of integers" } { "gadget" gadget } }
-{ $description "Resizes and relayouts a gadget before the next iteration of the event loop." } ;
-
 HELP: pref-dim*
 { $values { "gadget" gadget } { "dim" "a pair of integers" } }
 { $contract "Outputs the preferred dimensions of the gadget, possibly computing them from the preferred dimensions of the gadget's children." }
