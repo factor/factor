@@ -11,7 +11,7 @@ IN: stack-checker.transforms
     dup zero? [
         drop '[ recursive-state get @ ]
     ] [
-        '[
+        swap '[
             , consume-d
             [ first literal recursion>> ]
             [ [ literal value>> ] each ] bi @

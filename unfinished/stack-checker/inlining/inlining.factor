@@ -104,7 +104,7 @@ SYMBOL: phi-out
     [
         [ call-site-stack ] dip
         [ check-call-site-stack ]
-        [ phi-in>> push ]
+        [ phi-in>> swap [ suffix ] 2change-each ]
         2bi
     ] 2bi ;
 

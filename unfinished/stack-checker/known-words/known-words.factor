@@ -48,7 +48,7 @@ IN: stack-checker.known-words
 
 \ declare [
     pop-literal nip
-    [ length consume-d dup copy-values ] keep
+    [ length consume-d dup copy-values dup output-d ] keep
     #declare,
 ] +infer+ set-word-prop
 
