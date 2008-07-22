@@ -130,38 +130,27 @@ HELP: /
 { $see-also "division-by-zero" } ;
 
 HELP: /i
-{ $values { "x" real } { "y" real } { "z" real } }
+{ $values { "x" real } { "y" real } { "z" integer } }
 { $description
     "Divides " { $snippet "x" } " by " { $snippet "y" } ", truncating the result to an integer."
-    { $list
-        "Integer division of fixnums may overflow and yield a bignum."
-        "Integer division of bignums always yields a bignum."
-        "Integer division of floats always yields a float."
-        "Integer division of ratios and complex numbers proceeds using the relevant mathematical rules."
-    }
 }
 { $see-also "division-by-zero" } ;
 
 HELP: /f
-{ $values { "x" real } { "y" real } { "z" real } }
+{ $values { "x" real } { "y" real } { "z" float } }
 { $description
     "Divides " { $snippet "x" } " by " { $snippet "y" } ", representing the result as a floating point number."
-    { $list 
-        "Integer division of fixnums may overflow and yield a bignum."
-        "Integer division of bignums always yields a bignum."            
-        "Integer division of floats always yields a float."
-        "Integer division of ratios and complex numbers proceeds using the relevant mathematical rules."
-    }
 }
 { $see-also "division-by-zero" } ;
 
 HELP: mod
-{ $values { "x" integer } { "y" integer } { "z" integer } }
+{ $values { "x" rational } { "y" rational } { "z" rational } }
 { $description
     "Computes the remainder of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder being negative if " { $snippet "x" } " is negative."
     { $list 
         "Modulus of fixnums always yields a fixnum."
-        "Modulus of bignums always yields a bignum."            
+        "Modulus of bignums always yields a bignum."    
+        { "Modulus of rationals always yields a rational. In this case, the remainder is computed using the formula " { $snippet "x - (x mod y) * y" } "." }
     }
 }
 { $see-also "division-by-zero" rem } ;
@@ -254,12 +243,13 @@ HELP: recip
 { $errors "Throws an error if " { $snippet "x" } " is the integer 0." } ;
 
 HELP: rem
-{ $values { "x" integer } { "y" integer } { "z" integer } }
+{ $values { "x" rational } { "y" rational } { "z" rational } }
 { $description
     "Computes the remainder of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder always positive."
     { $list 
-        "Modulus of fixnums always yields a fixnum."
-        "Modulus of bignums always yields a bignum."            
+        "Given fixnums, always yields a fixnum."
+        "Given bignums, always yields a bignum."
+        "Given rationals, always yields a rational."    
     }
 }
 { $see-also "division-by-zero" mod } ;

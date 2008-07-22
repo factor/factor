@@ -36,6 +36,9 @@ C: <interval> interval
 
 : (a,inf] ( a -- interval ) 1./0. (a,b] ; inline
 
+: [-inf,inf] ( -- interval )
+    T{ interval f { -1./0. t } { 1./0. t } } ; inline
+
 : compare-endpoints ( p1 p2 quot -- ? )
     >r over first over first r> call [
         2drop t
@@ -154,7 +157,7 @@ C: <interval> interval
 
 : interval-shift-safe ( i1 i2 -- i3 )
     dup to>> first 100 > [
-        2drop f
+        2drop [-inf,inf]
     ] [
         interval-shift
     ] if ;
@@ -172,7 +175,7 @@ C: <interval> interval
 
 : interval-division-op ( i1 i2 quot -- i3 )
     >r 0 over interval-closure interval-contains?
-    [ 2drop f ] r> if ; inline
+    [ 2drop [-inf,inf] ] r> if ; inline
 
 : interval/ ( i1 i2 -- i3 )
     [ [ / ] interval-op ] interval-division-op ;
@@ -187,6 +190,25 @@ C: <interval> interval
         [ [ /i ] interval-op ] interval-integer-op
     ] interval-division-op interval-closure ;
 
+: interval/f ( i1 i2 -- i3 )
+    [ [ /f ] interval-op ] interval-division-op ;
+
+: interval-abs ( i1 -- i2 )
+    interval>points [ first2 [ abs ] dip 2array ] bi@ 2array
+    points>interval ;
+
+: interval-mod ( i1 i2 -- i3 )
+    #! Inaccurate.
+    [
+        nip interval-abs to>> first [ neg ] keep (a,b)
+    ] interval-division-op ;
+
+: interval-rem ( i1 i2 -- i3 )
+    #! Inaccurate.
+    [
+        nip interval-abs to>> first 0 swap [a,b)
+    ] interval-division-op ;
+
 : interval-recip ( i1 -- i2 ) 1 [a,a] swap interval/ ;
 
 : interval-2/ ( i1 -- i2 ) -1 [a,a] interval-shift ;
@@ -194,16 +216,16 @@ C: <interval> interval
 SYMBOL: incomparable
 
 : left-endpoint-< ( i1 i2 -- ? )
-    [ swap interval-subset? ] 2keep
-    [ nip interval-singleton? ] 2keep
-    [ from>> ] bi@ =
-    and and ;
+    [ swap interval-subset? ]
+    [ nip interval-singleton? ]
+    [ [ from>> ] bi@ = ]
+    2tri and and ;
 
 : right-endpoint-< ( i1 i2 -- ? )
-    [ interval-subset? ] 2keep
-    [ drop interval-singleton? ] 2keep
-    [ to>> ] bi@ =
-    and and ;
+    [ interval-subset? ]
+    [ drop interval-singleton? ]
+    [ [ to>> ] bi@ = ]
+    2tri and and ;
 
 : (interval<) ( i1 i2 -- i1 i2 ? )
     over from>> over from>> endpoint< ;
@@ -234,6 +256,27 @@ SYMBOL: incomparable
 
 : interval>= ( i1 i2 -- ? )
     swap interval<= ;
+
+: interval-bitand ( i1 i2 -- i3 )
+    dup 1 [a,a] interval>= [
+        1 [a,a] interval- interval-rem
+    ] [
+        2drop [-inf,inf]
+    ] if ;
+
+: interval-bitor ( i1 i2 -- i3 )
+    #! Inaccurate.
+    2dup [ 0 [a,a] interval>= ] both?
+    [ to>> first 0 swap [a,b] interval-intersect ]
+    [ 2drop [-inf,inf] ]
+    if ;
+
+: interval-bitxor ( i1 i2 -- i3 )
+    #! Inaccurate.
+    2dup [ 0 [a,a] interval>= ] both?
+    [ nip to>> first 0 swap [a,b] ]
+    [ 2drop [-inf,inf] ]
+    if ;
 
 : assume< ( i1 i2 -- i3 )
     to>> first [-inf,a) interval-intersect ;

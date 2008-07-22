@@ -18,8 +18,7 @@ IN: compiler.tree
 ! 3) A value is never used in the same node where it is defined.
 
 TUPLE: node < identity-tuple
-in-d out-d in-r out-r
-classes literals intervals
+in-d out-d in-r out-r info
 history successor children ;
 
 M: node hashcode* drop node hashcode* ;
@@ -31,7 +30,7 @@ M: node hashcode* drop node hashcode* ;
     { [ in-d>> ] [ out-d>> ] [ in-r>> ] [ out-r>> ] } cleave
     4array concat ;
 
-: node-child ( node -- child ) node-children first ;
+: node-child ( node -- child ) children>> first ;
 
 : last-node ( node -- last )
     dup successor>> [ last-node ] [ ] ?if ;
@@ -44,29 +43,14 @@ M: node hashcode* drop node hashcode* ;
         2drop f
     ] if ;
 
-: node-literal? ( node value -- ? )
-    swap literals>> key? ;
+: node-value-info ( node value -- info )
+    swap info>> at ;
 
-: node-literal ( node value -- obj )
-    swap literals>> at ;
+: node-input-infos ( node -- seq )
+    dup in-d>> [ node-value-info ] with map ;
 
-: node-interval ( node value -- interval )
-    swap intervals>> at ;
-
-: node-class ( node value -- class )
-    swap classes>> at ;
-
-: node-input-classes ( node -- seq )
-    dup in-d>> [ node-class ] with map ;
-
-: node-output-classes ( node -- seq )
-    dup out-d>> [ node-class ] with map ;
-
-: node-input-intervals ( node -- seq )
-    dup in-d>> [ node-interval ] with map ;
-
-: node-class-first ( node -- class )
-    dup in-d>> first node-class ;
+: node-output-infos ( node -- seq )
+    dup out-d>> [ node-value-info ] with map ;
 
 TUPLE: #introduce < node values ;
 

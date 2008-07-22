@@ -1,37 +1,28 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences namespaces hashtables
+disjoint-sets
 compiler.tree
 compiler.tree.def-use
-compiler.tree.propagation.constraints
+compiler.tree.propagation.info
+compiler.tree.propagation.nodes
 compiler.tree.propagation.simple
 compiler.tree.propagation.branches
-compiler.tree.propagation.recursive ;
+compiler.tree.propagation.recursive
+compiler.tree.propagation.constraints
+compiler.tree.propagation.known-words ;
 IN: compiler.tree.propagation
 
-: (propagate) ( node -- )
-    [
-        [ node-defs-values [ introduce-value ] each ]
-        [ propagate-around ]
-        [ successor>> ]
-        tri
-        (propagate)
-    ] when* ;
-
-: propagate-with ( node classes literals intervals -- )
+: propagate-with ( node infos -- )
     [
         H{ } clone constraints set
-        >hashtable value-intervals set
-        >hashtable value-literals set
-        >hashtable value-classes set
+        >hashtable value-infos set
+        <disjoint-set> copies set
         (propagate)
     ] with-scope ;
 
 : propagate ( node -- node )
-    dup f f f propagate-with ;
+    dup f propagate-with ;
 
 : propagate/node ( node existing -- )
-    #! Infer classes, using the existing node's class info as a
-    #! starting point.
-    [ classes>> ] [ literals>> ] [ intervals>> ] tri
-    propagate-with ;
+    info>> propagate-with ;

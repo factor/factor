@@ -84,9 +84,9 @@ IN: math.intervals.tests
     1 0 1 (a,b) interval-contains?
 ] unit-test
 
-[ f ] [ -1 1 (a,b) -1 1 (a,b) interval/ ] unit-test
+[ t ] [ -1 1 (a,b) -1 1 (a,b) interval/ [-inf,inf] = ] unit-test
 
-[ f ] [ -1 1 (a,b) 0 1 (a,b) interval/ ] unit-test
+[ t ] [ -1 1 (a,b) 0 1 (a,b) interval/ [-inf,inf] = ] unit-test
 
 "math.ratios.private" vocab [
     [ t ] [
@@ -156,7 +156,7 @@ IN: math.intervals.tests
     interval-contains?
 ] unit-test
 
-[ f ] [ 1 100 [a,b] -1 1 [a,b] interval/i ] unit-test
+[ t ] [ 1 100 [a,b] -1 1 [a,b] interval/i [-inf,inf] = ] unit-test
 
 ! Interval random tester
 : random-element ( interval -- n )
@@ -177,12 +177,43 @@ IN: math.intervals.tests
         { 3 [ (a,b] ] }
     } case ;
 
-: random-op ( -- pair )
+: random-unary-op ( -- pair )
+    {
+        { bitnot interval-bitnot }
+        { abs interval-abs }
+        { 2/ interval-2/ }
+        { 1+ interval-1+ }
+        { 1- interval-1- }
+        { neg interval-neg }
+    }
+    "math.ratios.private" vocab [
+        { recip interval-recip } suffix
+    ] when
+    random ;
+
+: unary-test ( -- ? )
+    random-interval random-unary-op ! 2dup . .
+    0 pick interval-contains? over first \ recip eq? and [
+        2drop t
+    ] [
+        [ >r random-element ! dup .
+        r> first execute ] 2keep
+        second execute interval-contains?
+    ] if ;
+
+[ t ] [ 80000 [ drop unary-test ] all? ] unit-test
+
+: random-binary-op ( -- pair )
     {
         { + interval+ }
         { - interval- }
         { * interval* }
         { /i interval/i }
+        { mod interval-mod }
+        { rem interval-rem }
+        { bitand interval-bitand }
+        { bitor interval-bitor }
+        { bitxor interval-bitxor }
         { shift interval-shift }
         { min interval-min }
         { max interval-max }
@@ -192,8 +223,8 @@ IN: math.intervals.tests
     ] when
     random ;
 
-: interval-test ( -- ? )
-    random-interval random-interval random-op ! 3dup . . .
+: binary-test ( -- ? )
+    random-interval random-interval random-binary-op ! 3dup . . .
     0 pick interval-contains? over first { / /i } member? and [
         3drop t
     ] [
@@ -202,7 +233,7 @@ IN: math.intervals.tests
         second execute interval-contains?
     ] if ;
 
-[ t ] [ 40000 [ drop interval-test ] all? ] unit-test
+[ t ] [ 80000 [ drop binary-test ] all? ] unit-test
 
 : random-comparison ( -- pair )
     {
@@ -215,11 +246,7 @@ IN: math.intervals.tests
 : comparison-test ( -- ? )
     random-interval random-interval random-comparison
     [ >r [ random-element ] bi@ r> first execute ] 3keep
-    second execute dup incomparable eq? [
-        2drop t
-    ] [
-        =
-    ] if ;
+    second execute dup incomparable eq? [ 2drop t ] [ = ] if ;
 
 [ t ] [ 40000 [ drop comparison-test ] all? ] unit-test
 

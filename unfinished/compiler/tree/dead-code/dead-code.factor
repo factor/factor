@@ -77,8 +77,8 @@ M: #shuffle propagate* mapping>> at look-at-value ;
 M: #phi propagate*
     #! If any of the outputs of a #phi are live, then the
     #! corresponding inputs are live too.
-    [ [ out-d>> ] [ phi-in-d>> flip ] bi look-at-corresponding ]
-    [ [ out-r>> ] [ phi-in-r>> flip ] bi look-at-corresponding ]
+    [ [ out-d>> ] [ phi-in-d>> ] bi look-at-corresponding ]
+    [ [ out-r>> ] [ phi-in-r>> ] bi look-at-corresponding ]
     2bi ;
 
 M: node propagate* 2drop ;
@@ -139,15 +139,15 @@ M: #copy remove-dead-values* remove-dead-copies ;
 
 : remove-dead-phi-d ( #phi -- #phi )
     dup
-    [ phi-in-d>> flip ] [ out-d>> ] bi
+    [ phi-in-d>> ] [ out-d>> ] bi
     filter-corresponding-values
-    [ flip >>phi-in-d ] [ >>out-d ] bi* ;
+    [ >>phi-in-d ] [ >>out-d ] bi* ;
 
 : remove-dead-phi-r ( #phi -- #phi )
     dup
-    [ phi-in-r>> flip ] [ out-r>> ] bi
+    [ phi-in-r>> ] [ out-r>> ] bi
     filter-corresponding-values
-    [ flip >>phi-in-r ] [ >>out-r ] bi* ;
+    [ >>phi-in-r ] [ >>out-r ] bi* ;
 
 M: #phi remove-dead-values*
     remove-dead-phi-d
