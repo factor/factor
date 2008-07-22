@@ -165,16 +165,18 @@ DEFER: relayout
 
 : hide-gadget ( gadget -- ) f swap (>>visible?) ;
 
-: (set-rect-dim) ( dim gadget quot -- )
-    >r 2dup rect-dim =
-    [ [ 2drop ] [ set-rect-dim ] if ] 2keep
-    [ drop ] r> if ; inline
+DEFER: in-layout?
 
-: set-layout-dim ( dim gadget -- )
-    [ invalidate ] (set-rect-dim) ;
+: do-invalidate ( gadget -- gadget )
+  in-layout? get [ dup invalidate ] [ dup invalidate* ] if ;
 
-: set-gadget-dim ( dim gadget -- )
-    [ invalidate* ] (set-rect-dim) ;
+M: gadget (>>dim) ( dim gadget -- )
+   2dup dim>> =
+     [ 2drop ]
+     [ tuck call-next-method do-invalidate drop ]
+   if ;
+
+: set-gadget-dim ( dim gadget -- ) (>>dim) ;
 
 GENERIC: pref-dim* ( gadget -- dim )
 
@@ -195,7 +197,7 @@ GENERIC: layout* ( gadget -- )
 
 M: gadget layout* drop ;
 
-: prefer ( gadget -- ) dup pref-dim swap set-layout-dim ;
+: prefer ( gadget -- ) dup pref-dim swap (>>dim) ;
 
 : validate ( gadget -- ) f swap (>>layout-state) ;
 

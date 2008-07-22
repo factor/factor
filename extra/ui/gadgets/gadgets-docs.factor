@@ -65,15 +65,9 @@ HELP: relayout-1
 
 { relayout relayout-1 } related-words
 
-HELP: set-layout-dim
-{ $values { "dim" "a pair of integers" } { "gadget" gadget } }
-{ $description "Resizes a gadget inside a " { $link layout* } " method." }
-{ $warning "Do not call this word outside of a " { $link layout* } " method, or otherwise the gadget will not be relayout automatically. Instead, use " { $link set-gadget-dim } "." } ;
-
 HELP: set-gadget-dim
 { $values { "dim" "a pair of integers" } { "gadget" gadget } }
-{ $description "Resizes and relayouts a gadget before the next iteration of the event loop." }
-{ $warning "Do not call this word inside a " { $link layout* } " method, or otherwise unnecessary work will be done by the UI to ensure the gadget is relayout. Instead, use " { $link set-layout-dim } "." } ;
+{ $description "Resizes and relayouts a gadget before the next iteration of the event loop." } ;
 
 HELP: pref-dim*
 { $values { "gadget" gadget } { "dim" "a pair of integers" } }

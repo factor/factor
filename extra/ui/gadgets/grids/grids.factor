@@ -66,7 +66,7 @@ M: grid pref-dim*
 
 : resize-grid ( grid horiz vert -- )
     pick grid-fill? [
-        pair-up swap [ set-layout-dim ] do-grid
+        pair-up swap [ (>>dim) ] do-grid
     ] [
         2drop grid>> [ [ prefer ] each ] each
     ] if ;

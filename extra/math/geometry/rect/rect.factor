@@ -45,5 +45,8 @@ M: array rect-dim drop { 0 0 } ;
 M: rect width  ( rect -- width  ) dim>> first  ;
 M: rect height ( rect -- height ) dim>> second ;
 
+M: rect set-width!  ( rect width  -- rect ) over dim>> set-first  ;
+M: rect set-height! ( rect height -- rect ) over dim>> set-second ;
+
 M: rect set-x! ( rect x -- rect ) over loc>> set-first  ;
 M: rect set-y! ( rect y -- rect ) over loc>> set-second ;
