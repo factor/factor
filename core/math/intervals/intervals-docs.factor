@@ -14,6 +14,8 @@ ARTICLE: "math-intervals-new" "Creating intervals"
 { $subsection [-inf,a) }
 { $subsection [a,inf] }
 { $subsection (a,inf] }
+"The set of all real numbers with infinities:"
+{ $subsection [-inf,inf] }
 "Another constructor:"
 { $subsection points>interval } ;
 
@@ -24,16 +26,23 @@ ARTICLE: "math-intervals-arithmetic" "Interval arithmetic"
 { $subsection interval* }
 { $subsection interval/ }
 { $subsection interval/i }
-{ $subsection interval-shift }
+{ $subsection interval-mod }
+{ $subsection interval-rem }
 { $subsection interval-min }
 { $subsection interval-max }
+"Bitwise operations on intervals:"
+{ $subsection interval-shift }
+{ $subsection interval-bitand }
+{ $subsection interval-bitor }
+{ $subsection interval-bitxor }
 "Unary operations on intervals:"
 { $subsection interval-1+ }
 { $subsection interval-1- }
 { $subsection interval-neg }
 { $subsection interval-bitnot }
 { $subsection interval-recip }
-{ $subsection interval-2/ } ;
+{ $subsection interval-2/ }
+{ $subsection interval-abs } ;
 
 ARTICLE: "math-intervals-sets" "Set-theoretic operations on intervals"
 { $subsection interval-contains? }
