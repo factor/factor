@@ -104,3 +104,7 @@ SYMBOL: error-counter
 [ ] [ [ return ] with-return ] unit-test
 
 [ { } [ ] attempt-all ] [ attempt-all-error? ] must-fail-with
+
+[ { 4 } ] [ { 2 2 } [ + ] with-datastack ] unit-test
+
+\ with-datastack must-infer
