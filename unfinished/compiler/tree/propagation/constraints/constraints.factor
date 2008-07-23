@@ -38,7 +38,7 @@ M: false-constraint assume
     bi ;
 
 M: false-constraint satisfied?
-    value>> value-info class>> \ f class-not class<= ;
+    value>> value-info class>> \ f class<= ;
 
 ! Class constraints
 TUPLE: class-constraint value class ;

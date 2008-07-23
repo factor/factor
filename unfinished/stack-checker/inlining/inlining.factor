@@ -6,7 +6,8 @@ stack-checker.state
 stack-checker.visitor
 stack-checker.backend
 stack-checker.branches
-stack-checker.errors ;
+stack-checker.errors
+stack-checker.known-words ;
 IN: stack-checker.inlining
 
 ! Code to handle inline words. Much of the complexity stems from

@@ -48,3 +48,9 @@ IN: compiler.tree.propagation.info.tests
     2 3 (a,b] <interval-info> fixnum <class-info>
     value-info-intersect >literal<
 ] unit-test
+
+[ T{ value-info f fixnum empty-interval f f } ] [
+    fixnum -10 0 [a,b] <class/interval-info>
+    fixnum 19 29 [a,b] <class/interval-info>
+    value-info-intersect
+] unit-test

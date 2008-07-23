@@ -27,7 +27,7 @@ SYMBOL: copies
 ! slots read-only to allow cloning followed by writing.
 TUPLE: value-info
 { class initial: null }
-interval
+{ interval initial: empty-interval }
 literal
 literal? ;
 
@@ -36,15 +36,19 @@ literal? ;
     [ +interval+ word-prop [-inf,inf] or ] [ drop f ] if ;
 
 : interval>literal ( class interval -- literal literal? )
-    dup from>> first {
-        { [ over interval-length 0 > ] [ 3drop f f ] }
-        { [ over from>> second not ] [ 3drop f f ] }
-        { [ over to>> second not ] [ 3drop f f ] }
-        { [ pick fixnum class<= ] [ 2nip >fixnum t ] }
-        { [ pick bignum class<= ] [ 2nip >bignum t ] }
-        { [ pick float class<= ] [ 2nip >float t ] }
-        [ 3drop f f ]
-    } cond ;
+    dup empty-interval eq? [
+        2drop f f
+    ] [
+        dup from>> first {
+            { [ over interval-length 0 > ] [ 3drop f f ] }
+            { [ over from>> second not ] [ 3drop f f ] }
+            { [ over to>> second not ] [ 3drop f f ] }
+            { [ pick fixnum class<= ] [ 2nip >fixnum t ] }
+            { [ pick bignum class<= ] [ 2nip >bignum t ] }
+            { [ pick float class<= ] [ 2nip >float t ] }
+            [ 3drop f f ]
+        } cond
+    ] if ;
 
 : <value-info> ( class interval literal literal? -- info )
     [
@@ -55,18 +59,21 @@ literal? ;
         tri t
     ] [
         drop
-        over null class<= [ drop f f f ] [
+        over null class<= [ drop empty-interval f f ] [
             over integer class<= [ integral-closure ] when
             2dup interval>literal
         ] if
     ] if
     \ value-info boa ; foldable
 
+: <class/interval-info> ( class interval -- info )
+    f f <value-info> ; foldable
+
 : <class-info> ( class -- info )
-    [-inf,inf] f f <value-info> ; foldable
+    [-inf,inf] <class/interval-info> ; foldable
 
 : <interval-info> ( interval -- info )
-    real swap f f <value-info> ; foldable
+    real swap <class/interval-info> ; foldable
 
 : <literal-info> ( literal -- info )
     f [-inf,inf] rot t <value-info> ; foldable
@@ -81,22 +88,11 @@ literal? ;
         [ drop >literal< ]
     } cond ;
 
-: interval-intersect' ( i1 i2 -- i3 )
-    #! Change core later.
-    2dup and [ interval-intersect ] [ 2drop f ] if ;
-
 : value-info-intersect ( info1 info2 -- info )
     [ [ class>> ] bi@ class-and ]
-    [ [ interval>> ] bi@ interval-intersect' ]
+    [ [ interval>> ] bi@ interval-intersect ]
     [ intersect-literals ]
     2tri <value-info> ;
-
-: interval-union' ( i1 i2 -- i3 )
-    {
-        { [ dup not ] [ drop ] }
-        { [ over not ] [ nip ] }
-        [ interval-union ]
-    } cond ;
 
 : union-literals ( info1 info2 -- literal literal? )
     2dup [ literal?>> ] both? [
@@ -105,7 +101,7 @@ literal? ;
 
 : value-info-union ( info1 info2 -- info )
     [ [ class>> ] bi@ class-or ]
-    [ [ interval>> ] bi@ interval-union' ]
+    [ [ interval>> ] bi@ interval-union ]
     [ union-literals ]
     2tri <value-info> ;
 

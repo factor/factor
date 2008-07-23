@@ -67,8 +67,19 @@ SYMBOL: quotations
     [ infer-branch ] map
     [ dataflow-visitor branch-variable ] keep ;
 
-: infer-if ( branches -- )
+: (infer-if) ( branches -- )
     infer-branches [ first2 #if, ] dip compute-phi-function ;
 
-: infer-dispatch ( branches -- )
+: infer-if ( -- )
+    2 consume-d
+    dup [ known [ curry? ] [ composed? ] bi or ] contains? [
+        output-d
+        [ rot [ drop call ] [ nip call ] if ]
+        recursive-state get infer-quot
+    ] [
+        [ #drop, ] [ [ literal ] map (infer-if) ] bi
+    ] if ;
+
+: infer-dispatch ( -- )
+    pop-literal nip [ <literal> ] map
     infer-branches [ #dispatch, ] dip compute-phi-function ;

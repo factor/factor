@@ -1,17 +1,6 @@
+IN: compiler.frontend.tests
+USING: compiler.frontend tools.test ;
 
-
-[ ] [ [ 1 ] dataflow [ ] transform-nodes drop ] unit-test
-[ ] [ [ 1 2 3 ] dataflow [ ] transform-nodes drop ] unit-test
-
-USE: inference.dataflow
-
-{ 1 0 } [ [ iterate-next ] iterate-nodes ] must-infer-as
-
-{ 1 0 }
-[
-    [ [ iterate-next ] iterate-nodes ] with-node-iterator
-] must-infer-as
-
-{ 1 0 } [ [ drop ] each-node ] must-infer-as
-
-{ 1 0 } [ [ ] map-children ] must-infer-as
+\ dataflow must-infer
+\ dataflow-with must-infer
+\ word-dataflow must-infer

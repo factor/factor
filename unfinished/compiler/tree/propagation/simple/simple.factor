@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors kernel sequences assocs words namespaces
-classes.algebra combinators classes
+classes.algebra combinators classes continuations
 compiler.tree
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
@@ -49,10 +49,13 @@ M: #copy propagate-before
     [ [ class-not <class-constraint> ] dip if-false ]
     3bi <conjunction> ;
 
-: compute-constraints ( #call -- constraint )
-    dup word>> +constraints+ word-prop [ call assume ] [
-        dup word>> predicate?
-        [
+: custom-constraints ( #call quot -- )
+    [ [ in-d>> ] [ out-d>> ] bi append ] dip
+    with-datastack first assume ;
+
+: compute-constraints ( #call -- )
+    dup word>> +constraints+ word-prop [ custom-constraints ] [
+        dup word>> predicate? [
             [ in-d>> first ]
             [ word>> "predicating" word-prop ]
             [ out-d>> first ]
@@ -70,13 +73,14 @@ M: #copy propagate-before
 : call-outputs-quot ( node quot -- infos )
     [ in-d>> [ value-info ] map ] dip with-datastack ;
 
-: output-value-infos ( node word -- infos )
+: output-value-infos ( node -- infos )
     dup word>> +outputs+ word-prop
     [ call-outputs-quot ] [ default-output-value-infos ] if* ;
 
 M: #call propagate-before
+    [ [ output-value-infos ] [ out-d>> ] bi set-value-infos ]
     [ compute-constraints ]
-    [ [ output-value-infos ] [ out-d>> ] bi set-value-infos ] bi ;
+    bi ;
 
 M: node propagate-before drop ;
 

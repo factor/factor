@@ -1,7 +1,11 @@
 USING: kernel compiler.frontend compiler.tree
-compiler.tree.propagation tools.test math accessors
-sequences arrays kernel.private ;
+compiler.tree.propagation tools.test math math.order
+accessors sequences arrays kernel.private vectors
+alien.accessors alien.c-types ;
 IN: compiler.tree.propagation.tests
+
+\ propagate must-infer
+\ propagate/node must-infer
 
 : final-info ( quot -- seq )
     dataflow propagate last-node node-input-infos ;
@@ -64,7 +68,7 @@ IN: compiler.tree.propagation.tests
     [ { null null } declare + ] final-classes
 ] unit-test
 
-[ V{ fixnum } ] [
+[ V{ null } ] [
     [ { null fixnum } declare + ] final-classes
 ] unit-test
 
@@ -86,4 +90,56 @@ IN: compiler.tree.propagation.tests
 
 [ V{ fixnum } ] [
     [ >fixnum dup 10 > [ 1 - ] when ] final-classes
+] unit-test
+
+[ V{ integer } ] [ [ >fixnum 2 * ] final-classes ] unit-test
+
+[ V{ integer } ] [
+    [ >fixnum dup 10 < drop 2 * ] final-classes
+] unit-test
+
+[ V{ integer } ] [
+    [ >fixnum dup 10 < [ 2 * ] when ] final-classes
+] unit-test
+
+[ V{ integer } ] [
+    [ >fixnum dup 10 < [ 2 * ] [ 2 * ] if ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
+    [ >fixnum dup 10 < [ dup -10 > [ 2 * ] when ] when ] final-classes
+] unit-test
+
+[ V{ f } ] [
+    [ dup 10 < [ dup 8 > [ drop 9 ] unless ] [ drop 9 ] if ] final-literals
+] unit-test
+
+[ V{ 9 } ] [
+    [
+        >fixnum
+        dup 10 < [ dup 8 > [ drop 9 ] unless ] [ drop 9 ] if
+    ] final-literals
+] unit-test
+
+[ V{ fixnum } ] [
+    [
+        >fixnum
+        dup [ 10 < ] [ -10 > ] bi and not [ 2 * ] unless
+    ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
+    [ { fixnum } declare (clone) ] final-classes
+] unit-test
+
+[ V{ vector } ] [
+    [ vector new ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
+    [
+        [ uchar-nth ] 2keep [ uchar-nth ] 2keep uchar-nth
+        >r >r 298 * r> 100 * - r> 208 * - 128 + -8 shift
+        255 min 0 max
+    ] final-classes
 ] unit-test
