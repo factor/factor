@@ -16,6 +16,8 @@ ARTICLE: "math-intervals-new" "Creating intervals"
 { $subsection (a,inf] }
 "The set of all real numbers with infinities:"
 { $subsection [-inf,inf] }
+"The empty set:"
+{ $subsection empty-interval }
 "Another constructor:"
 { $subsection points>interval } ;
 
