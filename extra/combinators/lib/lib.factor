@@ -13,9 +13,9 @@ IN: combinators.lib
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : bi+ ( obj quot quot -- quot' quot' )
-    [ [ curry ] curry ] bi@ bi ;
+    [ [ curry ] curry ] bi@ bi ; inline
 : tri+ ( obj quot quot quot -- quot' quot' quot' )
-    [ [ curry ] curry ] tri@ tri ;
+    [ [ curry ] curry ] tri@ tri ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Generalized versions of core combinators
