@@ -22,7 +22,7 @@ M: world expose-event nip relayout ;
 
 M: world configure-event
     over configured-loc over (>>window-loc)
-    swap configured-dim over set-gadget-dim
+    swap configured-dim over (>>dim)
     ! In case dimensions didn't change
     relayout-1 ;
 

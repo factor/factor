@@ -11,11 +11,15 @@ TUPLE: track < pack sizes ;
 : normalized-sizes ( track -- seq )
   sizes>> dup sift sum '[ dup [ , / ] when ] map ;
 
+: init-track ( track -- track )
+  init-gadget
+  V{ } clone >>sizes
+  1          >>fill ;
+
 : new-track ( orientation class -- track )
-  new-gadget
-    swap       >>orientation
-    V{ } clone >>sizes
-    1          >>fill ; inline
+  new
+    init-track
+    swap >>orientation ;
 
 : <track> ( orientation -- track ) track new-track ;
 

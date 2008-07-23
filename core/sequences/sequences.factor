@@ -326,6 +326,9 @@ M: immutable-sequence clone-like like ;
     >r [ min-length ] 2keep r>
     [ >r 2nth-unsafe r> call ] 3curry ; inline
 
+: 2map-into ( seq1 seq2 quot into -- newseq )
+    >r (2each) r> collect ; inline
+
 : finish-find ( i seq -- i elt )
     over [ dupd nth-unsafe ] [ drop f ] if ; inline
 
@@ -382,11 +385,14 @@ PRIVATE>
     >r -rot r> 2each ; inline
 
 : 2map-as ( seq1 seq2 quot exemplar -- newseq )
-    >r (2each) over r>
-    [ [ collect ] keep ] new-like ; inline
+    >r 2over min-length r>
+    [ [ 2map-into ] keep ] new-like ; inline
 
 : 2map ( seq1 seq2 quot -- newseq )
     pick 2map-as ; inline
+
+: 2change-each ( seq1 seq2 quot -- newseq )
+    pick 2map-into ; inline
 
 : 2all? ( seq1 seq2 quot -- ? )
     (2each) all-integers? ; inline

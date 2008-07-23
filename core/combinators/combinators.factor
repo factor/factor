@@ -138,12 +138,6 @@ ERROR: no-case ;
         [ drop linear-case-quot ]
     } cond ;
 
-! with-datastack
-: with-datastack ( stack quot -- newstack )
-    datastack >r
-    >r >array set-datastack r> call
-    datastack r> swap suffix set-datastack 2nip ; inline
-
 ! recursive-hashcode
 : recursive-hashcode ( n obj quot -- code )
     pick 0 <= [ 3drop 0 ] [ rot 1- -rot call ] if ; inline

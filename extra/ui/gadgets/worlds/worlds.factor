@@ -46,7 +46,7 @@ M: world request-focus-on ( child gadget -- )
 M: world layout*
     dup call-next-method
     dup world-glass [
-        >r dup rect-dim r> set-layout-dim
+        >r dup rect-dim r> (>>dim)
     ] when* drop ;
 
 M: world focusable-child* gadget-child ;

@@ -4,7 +4,7 @@ USING: arrays assocs io kernel math models namespaces
 prettyprint dlists dequeues sequences threads sequences words
 debugger ui.gadgets ui.gadgets.worlds ui.gadgets.tracks
 ui.gestures ui.backend ui.render continuations init combinators
-hashtables concurrency.flags sets ;
+hashtables concurrency.flags sets accessors ;
 IN: ui
 
 ! Assoc mapping aliens to gadgets
@@ -172,7 +172,7 @@ SYMBOL: ui-thread
     "UI update" spawn drop ;
 
 : open-world-window ( world -- )
-    dup pref-dim over set-gadget-dim dup relayout graft ;
+    dup pref-dim over (>>dim) dup relayout graft ;
 
 : open-window ( gadget title -- )
     f <world> open-world-window ;

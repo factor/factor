@@ -126,7 +126,7 @@ M: checkmark-paint draw-interior
 : <checkmark> ( -- gadget )
     <gadget>
     dup checkmark-theme
-    { 14 14 } over set-gadget-dim ;
+    { 14 14 } over (>>dim) ;
 
 : toggle-model ( model -- )
     [ not ] change-model ;
@@ -172,7 +172,7 @@ M: radio-paint draw-boundary
 : <radio-knob> ( -- gadget )
     <gadget>
     dup radio-knob-theme
-    { 16 16 } over set-gadget-dim ;
+    { 16 16 } over (>>dim) ;
 
 TUPLE: radio-control < button value ;
 
