@@ -1,5 +1,5 @@
 ! Copyright © 2008 Reginald Keith Ford II
-! Tools for quickly comparing and evaluating mathematical Factor functions
+! Tools for quickly comparing, transforming, and evaluating mathematical Factor functions
 
 USING: kernel math arrays ;
 IN: math.function-tools 

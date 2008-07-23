@@ -8,6 +8,7 @@ backtrack math.ranges locals fry memoize macros assocs ;
 
 IN: 24-game
 
+: nop ;
 : do-something ( a b -- c ) { + - * } amb-execute ;
 : maybe-swap ( a b -- a b ) { nop swap } amb-execute ;
 : some-rots ( a b c -- a b c )

@@ -1,7 +1,7 @@
 ! Copyright © 2008 Reginald Keith Ford II
 ! Newton's Method of approximating roots
 
-USING: kernel math math.derivatives derivatives ;
+USING: kernel math math.derivatives ;
 IN: newtons-method
 
 <PRIVATE
