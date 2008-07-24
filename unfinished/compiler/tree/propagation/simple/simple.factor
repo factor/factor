@@ -3,6 +3,7 @@
 USING: fry accessors kernel sequences assocs words namespaces
 classes.algebra combinators classes continuations
 compiler.tree
+compiler.tree.def-use
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
 compiler.tree.propagation.constraints ;
@@ -25,29 +26,12 @@ M: #push propagate-before
     [ set-value-info ] 2each ;
 
 M: #declare propagate-before
-    [ [ in-d>> ] [ out-d>> ] bi are-copies-of ]
-    [
-        [ declaration>> class-infos ] [ out-d>> ] bi
-        refine-value-infos
-    ] bi ;
-
-M: #shuffle propagate-before
-    [ out-d>> dup ] [ mapping>> ] bi
-    '[ , at ] map swap are-copies-of ;
-
-M: #>r propagate-before
-    [ in-d>> ] [ out-r>> ] bi are-copies-of ;
-
-M: #r> propagate-before
-    [ in-r>> ] [ out-d>> ] bi are-copies-of ;
-
-M: #copy propagate-before
-    [ in-d>> ] [ out-d>> ] bi are-copies-of ;
+    declaration>> [ <class-info> swap refine-value-info ] assoc-each ;
 
 : predicate-constraints ( value class boolean-value -- constraint )
-    [ [ <class-constraint> ] dip if-true ]
-    [ [ class-not <class-constraint> ] dip if-false ]
-    3bi <conjunction> ;
+    [ [ is-instance-of ] dip t--> ]
+    [ [ class-not is-instance-of ] dip f--> ]
+    3bi /\ ;
 
 : custom-constraints ( #call quot -- )
     [ [ in-d>> ] [ out-d>> ] bi append ] dip
@@ -63,6 +47,24 @@ M: #copy propagate-before
         ] [ drop ] if
     ] if* ;
 
+: call-outputs-quot ( node -- infos )
+    [ in-d>> [ value-info ] map ]
+    [ word>> +outputs+ word-prop ]
+    bi with-datastack ;
+
+: foldable-call? ( #call -- ? )
+    dup word>> "foldable" word-prop [
+        in-d>> [ value-info literal?>> ] all?
+    ] [
+        drop f
+    ] if ;
+
+: fold-call ( #call -- infos )
+    [ in-d>> [ value-info literal>> ] map ]
+    [ word>> [ execute ] curry ]
+    bi with-datastack
+    [ <literal-info> ] map ;
+
 : default-output-value-infos ( node -- infos )
     dup word>> "default-output-classes" word-prop [
         class-infos
@@ -70,12 +72,12 @@ M: #copy propagate-before
         out-d>> length object <class-info> <repetition>
     ] ?if ;
 
-: call-outputs-quot ( node quot -- infos )
-    [ in-d>> [ value-info ] map ] dip with-datastack ;
-
 : output-value-infos ( node -- infos )
-    dup word>> +outputs+ word-prop
-    [ call-outputs-quot ] [ default-output-value-infos ] if* ;
+    {
+        { [ dup foldable-call? ] [ fold-call ] }
+        { [ dup word>> +outputs+ word-prop ] [ call-outputs-quot ] }
+        [ default-output-value-infos ]
+    } cond ;
 
 M: #call propagate-before
     [ [ output-value-infos ] [ out-d>> ] bi set-value-infos ]
@@ -94,7 +96,10 @@ M: #call propagate-after
 M: node propagate-after drop ;
 
 : annotate-node ( node -- )
-    dup node-values [ dup value-info ] H{ } map>assoc >>info drop ;
+    dup
+    [ node-defs-values ] [ node-uses-values ] bi append
+    [ dup value-info ] H{ } map>assoc
+    >>info drop ;
 
 M: node propagate-around
     [ propagate-before ] [ annotate-node ] [ propagate-after ] tri ;

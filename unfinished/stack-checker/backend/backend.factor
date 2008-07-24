@@ -176,7 +176,7 @@ M: object apply-object push-literal ;
         [
             init-inference
             init-known-values
-            dataflow-visitor off
+            stack-visitor off
             dependencies off
             [ [ def>> ] [ ] [ ] tri infer-quot-recursive end-infer ]
             [ finish-word current-effect ]
@@ -202,10 +202,10 @@ M: object apply-object push-literal ;
             V{ } clone recorded set
             init-inference
             init-known-values
-            dataflow-visitor off
+            stack-visitor off
             call
             end-infer
             current-effect
-            dataflow-visitor get
+            stack-visitor get
         ] [ ] [ undo-infer ] cleanup
     ] with-scope ; inline

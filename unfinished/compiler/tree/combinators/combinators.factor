@@ -5,18 +5,6 @@ sequences words vectors math.intervals effects classes
 accessors combinators compiler.tree ;
 IN: compiler.tree.combinators
 
-: node-exists? ( node quot -- ? )
-    over [
-        2dup 2slip rot [
-            2drop t
-        ] [
-            [ [ children>> ] [ successor>> ] bi suffix ] dip
-            '[ , node-exists? ] contains?
-        ] if
-    ] [
-        2drop f
-    ] if ; inline
-
 SYMBOL: node-stack
 
 : >node ( node -- ) node-stack get push ;
@@ -34,8 +22,8 @@ SYMBOL: node-stack
 
 : (each-node) ( quot -- next )
     node@ [ swap call ] 2keep
-    node-children [
-        [
+    children>> [
+        first>> [
             [ (each-node) ] keep swap
         ] iterate-nodes
     ] each drop
@@ -52,15 +40,7 @@ SYMBOL: node-stack
     ] with-node-iterator ; inline
 
 : map-children ( node quot -- )
-    over [
-        over children>> [
-            '[ , map ] change-children drop
-        ] [
-            2drop
-        ] if
-    ] [
-        2drop
-    ] if ; inline
+    [ children>> ] dip '[ , change-first drop ] each ; inline
 
 : (transform-nodes) ( prev node quot -- )
     dup >r call dup [

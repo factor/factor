@@ -3,25 +3,25 @@
 USING: kernel arrays namespaces ;
 IN: stack-checker.visitor
 
-SYMBOL: dataflow-visitor
+SYMBOL: stack-visitor
 
-HOOK: child-visitor dataflow-visitor ( -- visitor )
+HOOK: child-visitor stack-visitor ( -- visitor )
 
-: nest-visitor ( -- ) child-visitor dataflow-visitor set ;
+: nest-visitor ( -- ) child-visitor stack-visitor set ;
 
-HOOK: #introduce, dataflow-visitor ( values -- )
-HOOK: #call, dataflow-visitor ( inputs outputs word -- )
-HOOK: #call-recursive, dataflow-visitor ( inputs outputs word -- )
-HOOK: #push, dataflow-visitor ( literal value -- )
-HOOK: #shuffle, dataflow-visitor ( inputs outputs mapping -- )
-HOOK: #drop, dataflow-visitor ( values -- )
-HOOK: #>r, dataflow-visitor ( inputs outputs -- )
-HOOK: #r>, dataflow-visitor ( inputs outputs -- )
-HOOK: #terminate, dataflow-visitor ( -- )
-HOOK: #if, dataflow-visitor ( ? true false -- )
-HOOK: #dispatch, dataflow-visitor ( n branches -- )
-HOOK: #phi, dataflow-visitor ( d-phi-in d-phi-out r-phi-in r-phi-out -- )
-HOOK: #declare, dataflow-visitor ( inputs outputs declaration -- )
-HOOK: #return, dataflow-visitor ( label stack -- )
-HOOK: #recursive, dataflow-visitor ( word label inputs outputs visitor -- )
-HOOK: #copy, dataflow-visitor ( inputs outputs -- )
+HOOK: #introduce, stack-visitor ( values -- )
+HOOK: #call, stack-visitor ( inputs outputs word -- )
+HOOK: #call-recursive, stack-visitor ( inputs outputs word -- )
+HOOK: #push, stack-visitor ( literal value -- )
+HOOK: #shuffle, stack-visitor ( inputs outputs mapping -- )
+HOOK: #drop, stack-visitor ( values -- )
+HOOK: #>r, stack-visitor ( inputs outputs -- )
+HOOK: #r>, stack-visitor ( inputs outputs -- )
+HOOK: #terminate, stack-visitor ( -- )
+HOOK: #if, stack-visitor ( ? true false -- )
+HOOK: #dispatch, stack-visitor ( n branches -- )
+HOOK: #phi, stack-visitor ( d-phi-in d-phi-out r-phi-in r-phi-out -- )
+HOOK: #declare, stack-visitor ( declaration -- )
+HOOK: #return, stack-visitor ( label stack -- )
+HOOK: #recursive, stack-visitor ( word label inputs outputs visitor -- )
+HOOK: #copy, stack-visitor ( inputs outputs -- )

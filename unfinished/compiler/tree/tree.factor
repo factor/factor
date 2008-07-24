@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic assocs kernel math namespaces parser
 sequences words vectors math.intervals effects classes
-accessors combinators stack-checker.state ;
+accessors combinators stack-checker.state stack-checker.visitor ;
 IN: compiler.tree
 
 ! High-level tree SSA form.
@@ -16,19 +16,11 @@ IN: compiler.tree
 ! case of a #phi node, the sequence of sequences in the phi-in-r
 ! and phi-in-d slots.
 ! 3) A value is never used in the same node where it is defined.
-
 TUPLE: node < identity-tuple
 in-d out-d in-r out-r info
-history successor children ;
+successor children ;
 
 M: node hashcode* drop node hashcode* ;
-
-: node-shuffle ( node -- shuffle )
-    [ in-d>> ] [ out-d>> ] bi <effect> ;
-
-: node-values ( node -- values )
-    { [ in-d>> ] [ out-d>> ] [ in-r>> ] [ out-r>> ] } cleave
-    4array concat ;
 
 : node-child ( node -- child ) children>> first ;
 
@@ -57,7 +49,7 @@ TUPLE: #introduce < node values ;
 : #introduce ( values -- node )
     \ #introduce new swap >>values ;
 
-TUPLE: #call < node word ;
+TUPLE: #call < node word history ;
 
 : #call ( inputs outputs word -- node )
     \ #call new
@@ -137,11 +129,9 @@ TUPLE: #phi < node phi-in-d phi-in-r ;
 
 TUPLE: #declare < node declaration ;
 
-: #declare ( inputs outputs declaration -- node )
+: #declare ( declaration -- node )
     \ #declare new
-        swap >>declaration
-        swap >>out-d
-        swap >>in-d ;
+        swap >>declaration ;
 
 TUPLE: #return < node label ;
 
@@ -172,3 +162,30 @@ DEFER: #tail?
 PREDICATE: #tail-phi < #phi successor>> #tail? ;
 
 UNION: #tail POSTPONE: f #return #tail-phi #terminate ;
+
+TUPLE: node-list first last ;
+
+: node, ( node -- )
+    stack-visitor get swap
+    over last>>
+    [ [ [ last>> ] dip >>successor drop ] [ >>last drop ] 2bi ]
+    [ [ >>first ] [ >>last ] bi drop ]
+    if ;
+
+M: node-list child-visitor node-list new ;
+M: node-list #introduce, #introduce node, ;
+M: node-list #call, #call node, ;
+M: node-list #call-recursive, #call-recursive node, ;
+M: node-list #push, #push node, ;
+M: node-list #shuffle, #shuffle node, ;
+M: node-list #drop, #drop node, ;
+M: node-list #>r, #>r node, ;
+M: node-list #r>, #r> node, ;
+M: node-list #return, #return node, ;
+M: node-list #terminate, #terminate node, ;
+M: node-list #if, #if node, ;
+M: node-list #dispatch, #dispatch node, ;
+M: node-list #phi, #phi node, ;
+M: node-list #declare, #declare node, ;
+M: node-list #recursive, #recursive node, ;
+M: node-list #copy, #copy node, ;

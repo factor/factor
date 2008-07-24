@@ -1,22 +1,14 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel effects accessors math math.private math.libm
-math.partial-dispatch math.intervals math.parser layouts words
-sequences sequences.private arrays assocs classes
+math.partial-dispatch math.intervals math.parser math.order
+layouts words sequences sequences.private arrays assocs classes
 classes.algebra combinators generic.math splitting fry locals
 classes.tuple alien.accessors classes.tuple.private
 compiler.tree.propagation.info compiler.tree.propagation.nodes
-compiler.tree.propagation.constraints ;
+compiler.tree.propagation.constraints
+compiler.tree.comparisons ;
 IN: compiler.tree.propagation.known-words
-
-\ and [
-    [ [ <true-constraint> ] bi@ <conjunction> ] dip if-true
-] +constraints+ set-word-prop
-
-\ not [
-    [ [ <false-constraint> ] [ <true-constraint> ] bi ] dip
-    <conditional>
-] +constraints+ set-word-prop
 
 \ fixnum
 most-negative-fixnum most-positive-fixnum [a,b]
@@ -88,7 +80,7 @@ most-negative-fixnum most-positive-fixnum [a,b]
     ] if ;
 
 : binary-op-interval ( info1 info2 quot -- newinterval )
-    [ [ interval>> ] bi@ 2dup and ] dip [ 2drop f ] if ; inline
+    [ [ interval>> ] bi@ ] dip call ; inline
 
 : won't-overflow? ( class interval -- ? )
     [ fixnum class<= ] [ fixnum fits? ] bi* and ;
@@ -148,36 +140,12 @@ most-negative-fixnum most-positive-fixnum [a,b]
 \ bitor [ [ interval-bitor ] [ integer-valued ] binary-op ] each-derived-op
 \ bitxor [ [ interval-bitxor ] [ integer-valued ] binary-op ] each-derived-op
 
-: assume-interval ( i1 i2 op -- i3 )
-    {
-        { \ < [ assume< ] }
-        { \ > [ assume> ] }
-        { \ <= [ assume<= ] }
-        { \ >= [ assume>= ] }
-    } case ;
-
-: swap-comparison ( op -- op' )
-    {
-        { < > }
-        { > < }
-        { <= >= }
-        { >= <= }
-    } at ;
-
-: negate-comparison ( op -- op' )
-    {
-        { < >= }
-        { > <= }
-        { <= > }
-        { >= < }
-    } at ;
-
 :: (comparison-constraints) ( in1 in2 op -- constraint )
     [let | i1 [ in1 value-info interval>> ]
            i2 [ in2 value-info interval>> ] |
-       in1 i1 i2 op assume-interval <interval-constraint>
-       in2 i2 i1 op swap-comparison assume-interval <interval-constraint>
-       <conjunction>
+       in1 i1 i2 op assumption is-in-interval
+       in2 i2 i1 op swap-comparison assumption is-in-interval
+       /\
     ] ;
 
 : comparison-constraints ( in1 in2 out op -- constraint )
@@ -187,10 +155,35 @@ most-negative-fixnum most-positive-fixnum [a,b]
         3bi
     ] dip <conditional> ;
 
-: comparison-op ( word op -- )
+: define-comparison-constraints ( word op -- )
     '[ , comparison-constraints ] +constraints+ set-word-prop ;
 
-{ < > <= >= } [ dup [ comparison-op ] curry each-derived-op ] each
+comparison-ops
+[ dup '[ , define-comparison-constraints ] each-derived-op ] each
+
+generic-comparison-ops [
+    dup specific-comparison
+    '[ , , define-comparison-constraints ] each-derived-op
+] each
+
+! Remove redundant comparisons
+: fold-comparison ( info1 info2 word -- info )
+    [ [ interval>> ] bi@ ] dip interval-comparison {
+        { incomparable [ object <class-info> ] }
+        { t [ t <literal-info> ] }
+        { f [ f <literal-info> ] }
+    } case ;
+
+comparison-ops [
+    [
+        dup '[ , fold-comparison ] +outputs+ set-word-prop
+    ] each-derived-op
+] each
+
+generic-comparison-ops [
+    dup specific-comparison
+    '[ , fold-comparison ] +outputs+ set-word-prop
+] each
 
 {
     { >fixnum fixnum }

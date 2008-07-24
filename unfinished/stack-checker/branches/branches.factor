@@ -65,7 +65,7 @@ SYMBOL: quotations
 : infer-branches ( branches -- input children data )
     [ pop-d ] dip
     [ infer-branch ] map
-    [ dataflow-visitor branch-variable ] keep ;
+    [ stack-visitor branch-variable ] keep ;
 
 : (infer-if) ( branches -- )
     infer-branches [ first2 #if, ] dip compute-phi-function ;

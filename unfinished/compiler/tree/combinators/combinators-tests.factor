@@ -1,9 +1,9 @@
 IN: compiler.tree.combinators.tests
-USING: compiler.tree.combinators compiler.frontend tools.test
+USING: compiler.tree.combinators compiler.tree.builder tools.test
 kernel ;
 
-[ ] [ [ 1 ] dataflow [ ] transform-nodes drop ] unit-test
-[ ] [ [ 1 2 3 ] dataflow [ ] transform-nodes drop ] unit-test
+[ ] [ [ 1 ] build-tree [ ] transform-nodes drop ] unit-test
+[ ] [ [ 1 2 3 ] build-tree [ ] transform-nodes drop ] unit-test
 
 { 1 0 } [ [ iterate-next ] iterate-nodes ] must-infer-as
 

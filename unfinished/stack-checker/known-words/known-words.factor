@@ -52,7 +52,7 @@ IN: stack-checker.known-words
 
 : infer-declare ( -- )
     pop-literal nip
-    [ length consume-d dup copy-values dup output-d ] keep
+    [ length ensure-d ] keep zip
     #declare, ;
 
 GENERIC: infer-call* ( value known -- )

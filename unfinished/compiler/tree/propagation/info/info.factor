@@ -1,26 +1,19 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs classes classes.algebra kernel accessors math
-math.intervals namespaces disjoint-sets sequences words
-combinators ;
+math.intervals namespaces sequences words combinators arrays
+compiler.tree.copy-equiv ;
 IN: compiler.tree.propagation.info
 
 SYMBOL: +interval+
 
 GENERIC: eql? ( obj1 obj2 -- ? )
 M: object eql? eq? ;
-M: number eql? [ [ class ] bi@ = ] [ number= ] 2bi and ;
-
-! Disjoint set of copy equivalence
-SYMBOL: copies
-
-: is-copy-of ( val copy -- ) copies get equate ;
-
-: are-copies-of ( vals copies -- ) [ is-copy-of ] 2each ;
-
-: resolve-copy ( copy -- val ) copies get representative ;
-
-: introduce-value ( val -- ) copies get add-atom ;
+M: fixnum eql? eq? ;
+M: bignum eql? over bignum? [ = ] [ 2drop f ] if ;
+M: ratio eql? over ratio? [ = ] [ 2drop f ] if ;
+M: float eql? over float? [ [ double>bits ] bi@ = ] [ 2drop f ] if ;
+M: complex eql? over complex? [ = ] [ 2drop f ] if ;
 
 ! Value info represents a set of objects. Don't mutate value infos
 ! you receive, always construct new ones. We don't declare the
@@ -36,16 +29,18 @@ literal? ;
     [ +interval+ word-prop [-inf,inf] or ] [ drop f ] if ;
 
 : interval>literal ( class interval -- literal literal? )
+    #! If interval has zero length and the class is sufficiently
+    #! precise, we can turn it into a literal
     dup empty-interval eq? [
         2drop f f
     ] [
         dup from>> first {
             { [ over interval-length 0 > ] [ 3drop f f ] }
-            { [ over from>> second not ] [ 3drop f f ] }
-            { [ over to>> second not ] [ 3drop f f ] }
-            { [ pick fixnum class<= ] [ 2nip >fixnum t ] }
             { [ pick bignum class<= ] [ 2nip >bignum t ] }
-            { [ pick float class<= ] [ 2nip >float t ] }
+            { [ pick integer class<= ] [ 2nip >fixnum t ] }
+            { [ pick float class<= ] [
+                2nip dup zero? [ drop f f ] [ >float t ] if
+            ] }
             [ 3drop f f ]
         } cond
     ] if ;
@@ -53,13 +48,13 @@ literal? ;
 : <value-info> ( class interval literal literal? -- info )
     [
         2nip
-        [ class ]
-        [ dup real? [ [a,a] ] [ drop [-inf,inf] ] if ]
-        [ ]
-        tri t
+        [ class ] [ dup real? [ [a,a] ] [ drop [-inf,inf] ] if ] [ ] tri
+        t
     ] [
         drop
-        over null class<= [ drop empty-interval f f ] [
+        2dup [ null class<= ] [ empty-interval eq? ] bi* or [
+            2drop null empty-interval f f
+        ] [
             over integer class<= [ integral-closure ] when
             2dup interval>literal
         ] if
@@ -70,13 +65,14 @@ literal? ;
     f f <value-info> ; foldable
 
 : <class-info> ( class -- info )
-    [-inf,inf] <class/interval-info> ; foldable
+    dup word? [ dup +interval+ word-prop ] [ f ] if [-inf,inf] or
+    <class/interval-info> ; foldable
 
 : <interval-info> ( interval -- info )
     real swap <class/interval-info> ; foldable
 
 : <literal-info> ( literal -- info )
-    f [-inf,inf] rot t <value-info> ; foldable
+    f f rot t <value-info> ; foldable
 
 : >literal< ( info -- literal literal? ) [ literal>> ] [ literal?>> ] bi ;
 
@@ -122,3 +118,15 @@ SYMBOL: value-infos
 
 : value-literal ( value -- obj ? )
     value-info >literal< ;
+
+: possible-boolean-values ( info -- values )
+    dup literal?>> [
+        literal>> 1array
+    ] [
+        class>> {
+            { [ dup null class<= ] [ { } ] }
+            { [ dup \ f class-not class<= ] [ { t } ] }
+            { [ dup \ f class<= ] [ { f } ] }
+            [ { t f } ]
+        } cond nip
+    ] if ;

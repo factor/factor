@@ -1,5 +1,6 @@
-USING: kernel compiler.frontend compiler.tree
-compiler.tree.propagation tools.test math math.order
+USING: kernel compiler.tree.builder compiler.tree
+compiler.tree.propagation compiler.tree.copy-equiv
+compiler.tree.def-use tools.test math math.order
 accessors sequences arrays kernel.private vectors
 alien.accessors alien.c-types ;
 IN: compiler.tree.propagation.tests
@@ -8,7 +9,11 @@ IN: compiler.tree.propagation.tests
 \ propagate/node must-infer
 
 : final-info ( quot -- seq )
-    dataflow propagate last-node node-input-infos ;
+    build-tree
+    compute-def-use
+    compute-copy-equiv
+    propagate
+    last-node node-input-infos ;
 
 : final-classes ( quot -- seq )
     final-info [ class>> ] map ;
@@ -116,7 +121,7 @@ IN: compiler.tree.propagation.tests
 
 [ V{ 9 } ] [
     [
-        >fixnum
+        123 bitand
         dup 10 < [ dup 8 > [ drop 9 ] unless ] [ drop 9 ] if
     ] final-literals
 ] unit-test
@@ -142,4 +147,53 @@ IN: compiler.tree.propagation.tests
         >r >r 298 * r> 100 * - r> 208 * - 128 + -8 shift
         255 min 0 max
     ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
+    [ 0 dup 10 > [ 2 * ] when ] final-classes
+] unit-test
+
+[ V{ f } ] [
+    [ [ 0.0 ] [ -0.0 ] if ] final-literals
+] unit-test
+
+[ V{ 1.5 } ] [
+    [ /f 1.5 min 1.5 max ] final-literals
+] unit-test
+
+[ V{ 1.5 } ] [
+    [
+        /f
+        dup 1.5 <= [ dup 1.5 >= [ ] [ drop 1.5 ] if ] [ drop 1.5 ] if
+    ] final-literals
+] unit-test
+
+[ V{ 1.5 } ] [
+    [
+        /f
+        dup 1.5 <= [ dup 10 >= [ ] [ drop 1.5 ] if ] [ drop 1.5 ] if
+    ] final-literals
+] unit-test
+
+[ V{ f } ] [
+    [
+        /f
+        dup 0.0 < [ dup 0.0 > [ drop 0.0 ] unless ] [ drop 0.0 ] if
+    ] final-literals
+] unit-test
+
+[ V{ fixnum } ] [
+    [ 0 dup 10 > [ 100 * ] when ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
+    [ 0 dup 10 > [ drop "foo" ] when ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
+    [ { fixnum } declare 3 3 - + ] final-classes
+] unit-test
+
+[ V{ t } ] [
+    [ dup 10 < [ 3 * 30 < ] [ drop t ] if ] final-literals
 ] unit-test

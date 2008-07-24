@@ -16,9 +16,6 @@ GENERIC: propagate-around ( node -- )
 
 : (propagate) ( node -- )
     [
-        [ node-defs-values [ introduce-value ] each ]
-        [ propagate-around ]
-        [ successor>> ]
-        tri
+        [ propagate-around ] [ successor>> ] bi
         (propagate)
     ] when* ;

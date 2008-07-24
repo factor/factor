@@ -81,7 +81,7 @@ SYMBOL: phi-out
 
         dup recursive-word-inputs
         meta-d get
-        dataflow-visitor get
+        stack-visitor get
     ] with-scope ;
 
 : inline-recursive-word ( word -- )

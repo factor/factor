@@ -2,6 +2,8 @@ USING: accessors math math.intervals sequences classes.algebra
 math kernel tools.test compiler.tree.propagation.info ;
 IN: compiler.tree.propagation.info.tests
 
+[ f ] [ 0.0 -0.0 eql? ] unit-test
+
 [ t ] [
     number <class-info>
     sequence <class-info>
@@ -49,7 +51,7 @@ IN: compiler.tree.propagation.info.tests
     value-info-intersect >literal<
 ] unit-test
 
-[ T{ value-info f fixnum empty-interval f f } ] [
+[ T{ value-info f null empty-interval f f } ] [
     fixnum -10 0 [a,b] <class/interval-info>
     fixnum 19 29 [a,b] <class/interval-info>
     value-info-intersect

@@ -1,4 +1,4 @@
-USING: namespaces assocs sequences compiler.frontend
+USING: namespaces assocs sequences compiler.tree.builder
 compiler.tree.dead-code compiler.tree.def-use compiler.tree
 compiler.tree.combinators tools.test kernel math
 stack-checker.state accessors ;
@@ -7,7 +7,7 @@ IN: compiler.tree.dead-code.tests
 \ remove-dead-code must-infer
 
 : count-live-values ( quot -- n )
-    dataflow
+    build-tree
     compute-def-use
     remove-dead-code
     compute-def-use
