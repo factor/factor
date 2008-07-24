@@ -189,6 +189,7 @@ TUPLE: window-rect < rect window-loc ;
     [ com-release f ] change-at ;
 
 M: dinput-game-input-backend open-game-input
+    +dinput+ get-global [ "game-input already open" throw ] when
     create-dinput
     create-device-change-window
     find-keyboard
@@ -234,25 +235,27 @@ M: dinput-game-input-backend instance-id
 : >slider ( long -- float )
     65535.0 /f ;
 : >pov ( long -- symbol )
-    dup HEX: FFFF and HEX: FFFF =
+    dup HEX: FFFF bitand HEX: FFFF =
     [ drop pov-neutral ]
     [ 4500 + 9000 /i pov-values nth ] if ;
-: >buttons ( alien -- array )
-    128 memory>byte-array >keys ;
+: >buttons ( alien length -- array )
+    memory>byte-array >keys ;
 
-: <controller-state> ( DIJOYSTATE2 -- controller-state )
-    ! XXX only transfer elements that are present on device
+: (fill-if) ( controller-state DIJOYSTATE2 ? quot -- )
+    [ drop ] compose [ 2drop ] if ; inline
+
+: fill-controller-state ( controller-state DIJOYSTATE2 -- controller-state )
     {
-        [ DIJOYSTATE2-lX >axis ]
-        [ DIJOYSTATE2-lY >axis ]
-        [ DIJOYSTATE2-lZ >axis ]
-        [ DIJOYSTATE2-lRx >axis ]
-        [ DIJOYSTATE2-lRy >axis ]
-        [ DIJOYSTATE2-lRz >axis ]
-        [ DIJOYSTATE2-rglSlider *long >slider ]
-        [ DIJOYSTATE2-rgdwPOV *uint >pov ]
-        [ DIJOYSTATE2-rgbButtons >buttons ]
-    } cleave controller-state boa ;
+        [ over x>> [ DIJOYSTATE2-lX >axis >>x ] (fill-if) ]
+        [ over y>> [ DIJOYSTATE2-lY >axis >>y ] (fill-if) ]
+        [ over z>> [ DIJOYSTATE2-lZ >axis >>z ] (fill-if) ]
+        [ over rx>> [ DIJOYSTATE2-lRx >axis >>rx ] (fill-if) ]
+        [ over ry>> [ DIJOYSTATE2-lRy >axis >>ry ] (fill-if) ]
+        [ over rz>> [ DIJOYSTATE2-lRz >axis >>rz ] (fill-if) ]
+        [ over slider>> [ DIJOYSTATE2-rglSlider *long >slider >>slider ] (fill-if) ]
+        [ over pov>> [ DIJOYSTATE2-rgdwPOV *uint >pov >>pov ] (fill-if) ]
+        [ DIJOYSTATE2-rgbButtons over buttons>> length >buttons >>buttons ]
+    } 2cleave ;
 
 : <keyboard-state> ( byte-array -- keyboard-state )
     >keys keyboard-state boa ;
@@ -263,9 +266,10 @@ M: dinput-game-input-backend instance-id
     [ IDirectInputDevice8W::GetDeviceState ole32-error ] keep ;
 
 M: dinput-game-input-backend read-controller
-    handle>> [
-        "DIJOYSTATE2" heap-size get-device-state
-    ] with-acquisition <controller-state> ;
+    handle>> [ +controller-devices+ get at clone ] [
+        [ "DIJOYSTATE2" heap-size get-device-state ]
+        with-acquisition
+    ] bi fill-controller-state ;
 
 M: dinput-game-input-backend calibrate-controller
     handle>> f 0 IDirectInputDevice8W::RunControlPanel ole32-error ;
