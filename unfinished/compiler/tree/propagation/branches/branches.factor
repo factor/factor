@@ -16,7 +16,8 @@ GENERIC: child-constraints ( node -- seq )
 M: #if child-constraints
     in-d>> first [ =t ] [ =f ] bi 2array ;
 
-M: #dispatch child-constraints drop f ;
+M: #dispatch child-constraints
+    children>> length f <repetition> ;
 
 GENERIC: live-children ( #branch -- children )
 
@@ -27,15 +28,22 @@ M: #if live-children
     2bi 2array ;
 
 M: #dispatch live-children
-    children>> ;
+    [ children>> ] [ in-d>> first value-info interval>> ] bi
+    '[ , interval-contains? [ drop f ] unless ] map-index ;
 
 : infer-children ( node -- assocs )
     [ live-children ] [ child-constraints ] bi [
         [
-            value-infos [ clone ] change
-            constraints [ clone ] change
-            assume
-            [ first>> (propagate) ] when*
+            over [
+                value-infos [ clone ] change
+                constraints [ clone ] change
+                assume
+                first>> (propagate)
+            ] [
+                2drop
+                value-infos off
+                constraints off
+            ] if
         ] H{ } make-assoc
     ] 2map ;
 

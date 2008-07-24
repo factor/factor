@@ -56,3 +56,8 @@ IN: compiler.tree.propagation.info.tests
     fixnum 19 29 [a,b] <class/interval-info>
     value-info-intersect
 ] unit-test
+
+[ 3 t ] [
+    3 <literal-info>
+    null <class-info> value-info-union >literal<
+] unit-test

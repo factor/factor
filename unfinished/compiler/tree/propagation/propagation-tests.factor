@@ -2,7 +2,7 @@ USING: kernel compiler.tree.builder compiler.tree
 compiler.tree.propagation compiler.tree.copy-equiv
 compiler.tree.def-use tools.test math math.order
 accessors sequences arrays kernel.private vectors
-alien.accessors alien.c-types ;
+alien.accessors alien.c-types sequences.private ;
 IN: compiler.tree.propagation.tests
 
 \ propagate must-infer
@@ -178,7 +178,7 @@ IN: compiler.tree.propagation.tests
 [ V{ f } ] [
     [
         /f
-        dup 0.0 < [ dup 0.0 > [ drop 0.0 ] unless ] [ drop 0.0 ] if
+        dup 0.0 <= [ dup 0.0 >= [ drop 0.0 ] unless ] [ drop 0.0 ] if
     ] final-literals
 ] unit-test
 
@@ -196,4 +196,27 @@ IN: compiler.tree.propagation.tests
 
 [ V{ t } ] [
     [ dup 10 < [ 3 * 30 < ] [ drop t ] if ] final-literals
+] unit-test
+
+[ V{ "d" } ] [
+    [
+        3 {
+            [ "a" ]
+            [ "b" ]
+            [ "c" ]
+            [ "d" ]
+            [ "e" ]
+            [ "f" ]
+            [ "g" ]
+            [ "h" ]
+        } dispatch
+    ] final-literals
+] unit-test
+
+[ V{ "hi" } ] [
+    [ [ "hi" ] [ 123 3 throw ] if ] final-literals
+] unit-test
+
+[ V{ fixnum } ] [
+    [ >fixnum dup 100 < [ 1+ ] [ "Oops" throw ] if ] final-classes
 ] unit-test

@@ -84,22 +84,36 @@ literal? ;
         [ drop >literal< ]
     } cond ;
 
-: value-info-intersect ( info1 info2 -- info )
+: (value-info-intersect) ( info1 info2 -- info )
     [ [ class>> ] bi@ class-and ]
     [ [ interval>> ] bi@ interval-intersect ]
     [ intersect-literals ]
     2tri <value-info> ;
+
+: value-info-intersect ( info1 info2 -- info )
+    {
+        { [ dup class>> null class<= ] [ nip ] }
+        { [ over class>> null class<= ] [ drop ] }
+        [ (value-info-intersect) ]
+    } cond ;
 
 : union-literals ( info1 info2 -- literal literal? )
     2dup [ literal?>> ] both? [
         [ literal>> ] bi@ 2dup eql? [ drop t ] [ 2drop f f ] if
     ] [ 2drop f f ] if ;
 
-: value-info-union ( info1 info2 -- info )
+: (value-info-union) ( info1 info2 -- info )
     [ [ class>> ] bi@ class-or ]
     [ [ interval>> ] bi@ interval-union ]
     [ union-literals ]
     2tri <value-info> ;
+
+: value-info-union ( info1 info2 -- info )
+    {
+        { [ dup class>> null class<= ] [ drop ] }
+        { [ over class>> null class<= ] [ nip ] }
+        [ (value-info-union) ]
+    } cond ;
 
 : value-infos-union ( infos -- info )
     dup first [ value-info-union ] reduce ;
