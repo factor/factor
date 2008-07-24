@@ -22,7 +22,8 @@ TUPLE: value-info
 { class initial: null }
 { interval initial: empty-interval }
 literal
-literal? ;
+literal?
+length ;
 
 : class-interval ( class -- interval )
     dup real class<=
@@ -45,36 +46,54 @@ literal? ;
         } cond
     ] if ;
 
-: <value-info> ( class interval literal literal? -- info )
-    [
-        2nip
-        [ class ] [ dup real? [ [a,a] ] [ drop [-inf,inf] ] if ] [ ] tri
-        t
+: <value-info> ( -- info ) \ value-info new ;
+
+: init-value-info ( info -- info )
+    dup literal?>> [
+        dup literal>> class >>class
+        dup literal>> dup real? [ [a,a] ] [ drop [-inf,inf] ] if >>interval
     ] [
-        drop
-        2dup [ null class<= ] [ empty-interval eq? ] bi* or [
-            2drop null empty-interval f f
+        dup [ class>> null class<= ] [ interval>> empty-interval eq? ] bi or [
+            null >>class
+            empty-interval >>interval
         ] [
-            over integer class<= [ integral-closure ] when
-            2dup interval>literal
+            dup class>> integer class<= [ [ integral-closure ] change-interval ] when
+            dup [ class>> ] [ interval>> ] bi interval>literal
+            [ >>literal ] [ >>literal? ] bi*
         ] if
-    ] if
-    \ value-info boa ; foldable
+    ] if ;
 
 : <class/interval-info> ( class interval -- info )
-    f f <value-info> ; foldable
+    <value-info>
+        swap >>interval
+        swap >>class
+    init-value-info ; foldable
 
 : <class-info> ( class -- info )
     dup word? [ dup +interval+ word-prop ] [ f ] if [-inf,inf] or
     <class/interval-info> ; foldable
 
 : <interval-info> ( interval -- info )
-    real swap <class/interval-info> ; foldable
+    <value-info>
+        real >>class
+        swap >>interval
+    init-value-info ; foldable
 
 : <literal-info> ( literal -- info )
-    f f rot t <value-info> ; foldable
+    <value-info>
+        swap >>literal
+        t >>literal?
+    init-value-info ; foldable
 
-: >literal< ( info -- literal literal? ) [ literal>> ] [ literal?>> ] bi ;
+: <sequence-info> ( value -- info )
+    <value-info>
+        object >>class
+        [-inf,inf] >>interval
+        swap value-info >>length
+    init-value-info ; foldable
+
+: >literal< ( info -- literal literal? )
+    [ literal>> ] [ literal?>> ] bi ;
 
 : intersect-literals ( info1 info2 -- literal literal? )
     {
@@ -84,11 +103,24 @@ literal? ;
         [ drop >literal< ]
     } cond ;
 
+DEFER: value-info-intersect
+
+: intersect-lengths ( info1 info2 -- length )
+    [ length>> ] bi@ {
+        { [ dup not ] [ drop ] }
+        { [ over not ] [ nip ] }
+        [ value-info-intersect ]
+    } cond ;
+
 : (value-info-intersect) ( info1 info2 -- info )
-    [ [ class>> ] bi@ class-and ]
-    [ [ interval>> ] bi@ interval-intersect ]
-    [ intersect-literals ]
-    2tri <value-info> ;
+    [ <value-info> ] 2dip
+    {
+        [ [ class>> ] bi@ class-and >>class ]
+        [ [ interval>> ] bi@ interval-intersect >>interval ]
+        [ intersect-literals [ >>literal ] [ >>literal? ] bi* ]
+        [ intersect-lengths >>length ]
+    } 2cleave
+    init-value-info ;
 
 : value-info-intersect ( info1 info2 -- info )
     {
@@ -102,11 +134,24 @@ literal? ;
         [ literal>> ] bi@ 2dup eql? [ drop t ] [ 2drop f f ] if
     ] [ 2drop f f ] if ;
 
+DEFER: value-info-union
+
+: union-lengths ( info1 info2 -- length )
+    [ length>> ] bi@ {
+        { [ dup not ] [ nip ] }
+        { [ over not ] [ drop ] }
+        [ value-info-union ]
+    } cond ;
+
 : (value-info-union) ( info1 info2 -- info )
-    [ [ class>> ] bi@ class-or ]
-    [ [ interval>> ] bi@ interval-union ]
-    [ union-literals ]
-    2tri <value-info> ;
+    [ <value-info> ] 2dip
+    {
+        [ [ class>> ] bi@ class-or >>class ]
+        [ [ interval>> ] bi@ interval-union >>interval ]
+        [ union-literals [ >>literal ] [ >>literal? ] bi* ]
+        [ union-lengths >>length ]
+    } 2cleave
+    init-value-info ;
 
 : value-info-union ( info1 info2 -- info )
     {
@@ -144,3 +189,6 @@ SYMBOL: value-infos
             [ { t f } ]
         } cond nip
     ] if ;
+
+: value-is? ( value class -- ? )
+    [ value-info class>> ] dip class<= ;

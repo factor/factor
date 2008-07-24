@@ -2,7 +2,8 @@ USING: kernel compiler.tree.builder compiler.tree
 compiler.tree.propagation compiler.tree.copy-equiv
 compiler.tree.def-use tools.test math math.order
 accessors sequences arrays kernel.private vectors
-alien.accessors alien.c-types sequences.private ;
+alien.accessors alien.c-types sequences.private
+byte-arrays ;
 IN: compiler.tree.propagation.tests
 
 \ propagate must-infer
@@ -232,3 +233,9 @@ IN: compiler.tree.propagation.tests
 [ V{ 2 } ] [
     [ [ 1 ] [ 1 ] if 1 + ] final-literals
 ] unit-test
+
+[ V{ t } ] [ [ 10 f <array> length 10 = ] final-literals ] unit-test
+
+[ V{ t } ] [ [ [ 10 f <array> ] [ 10 <byte-array> ] if length 10 = ] final-literals ] unit-test
+
+[ V{ t } ] [ [ [ 1 f <array> ] [ 2 f <array> ] if length 3 < ] final-literals ] unit-test
