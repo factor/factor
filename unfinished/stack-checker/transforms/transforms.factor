@@ -3,24 +3,43 @@
 USING: fry accessors arrays kernel words sequences generic math
 namespaces quotations assocs combinators classes.tuple
 classes.tuple.private effects summary hashtables classes generic
-sets definitions generic.standard slots.private
+sets definitions generic.standard slots.private continuations
 stack-checker.backend stack-checker.state stack-checker.errors ;
 IN: stack-checker.transforms
 
-: transform-quot ( quot n -- newquot )
+SYMBOL: +transform-quot+
+SYMBOL: +transform-n+
+
+: (apply-transform) ( quot n -- newquot )
     dup zero? [
-        drop '[ recursive-state get @ ]
+        drop recursive-state get 1array
     ] [
-        '[
-            , consume-d
-            [ first literal recursion>> ]
-            [ [ literal value>> ] each ] bi @
-        ]
+        consume-d
+        [ [ literal value>> ] map ]
+        [ first literal recursion>> ] bi prefix
     ] if
-    '[ @ swap infer-quot ] ;
+    swap with-datastack ;
+
+: apply-transform ( word -- )
+    [ +inlined+ depends-on ] [
+        [ +transform-quot+ word-prop ]
+        [ +transform-n+ word-prop ]
+        bi (apply-transform)
+        first2 swap infer-quot
+    ] bi ;
+
+: apply-macro ( word -- )
+    [ +inlined+ depends-on ] [
+        [ "macro" word-prop ]
+        [ "declared-effect" word-prop in>> length ]
+        bi (apply-transform)
+        first2 swap infer-quot
+    ] bi ;
 
 : define-transform ( word quot n -- )
-    transform-quot +infer+ set-word-prop ;
+    [ drop +transform-quot+ set-word-prop ]
+    [ nip +transform-n+ set-word-prop ]
+    3bi ;
 
 ! Combinators
 \ cond [ cond>quot ] 1 define-transform

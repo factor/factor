@@ -6,7 +6,8 @@ stack-checker.state
 stack-checker.visitor
 stack-checker.backend
 stack-checker.branches
-stack-checker.errors ;
+stack-checker.errors
+stack-checker.known-words ;
 IN: stack-checker.inlining
 
 ! Code to handle inline words. Much of the complexity stems from
@@ -80,7 +81,7 @@ SYMBOL: phi-out
 
         dup recursive-word-inputs
         meta-d get
-        dataflow-visitor get
+        stack-visitor get
     ] with-scope ;
 
 : inline-recursive-word ( word -- )
@@ -104,7 +105,7 @@ SYMBOL: phi-out
     [
         [ call-site-stack ] dip
         [ check-call-site-stack ]
-        [ phi-in>> push ]
+        [ phi-in>> swap [ suffix ] 2change-each ]
         2bi
     ] 2bi ;
 

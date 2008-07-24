@@ -12,7 +12,6 @@ TUPLE: wrapper < gadget ;
 
 M: wrapper pref-dim* ( wrapper -- dim ) gadget-child pref-dim ;
 
-M: wrapper layout* ( wrapper -- )
-    [ dim>> ] [ gadget-child ] bi set-layout-dim ;
+M: wrapper layout* ( wrapper -- ) [ dim>> ] [ gadget-child ] bi (>>dim) ;
 
 M: wrapper focusable-child* ( wrapper -- child/t ) gadget-child ;

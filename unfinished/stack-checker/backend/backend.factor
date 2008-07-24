@@ -11,6 +11,8 @@ IN: stack-checker.backend
 ! Word properties we use
 SYMBOL: +inferred-effect+
 SYMBOL: +cannot-infer+
+SYMBOL: +special+
+SYMBOL: +shuffle+
 SYMBOL: +infer+
 
 SYMBOL: visited
@@ -174,7 +176,7 @@ M: object apply-object push-literal ;
         [
             init-inference
             init-known-values
-            dataflow-visitor off
+            stack-visitor off
             dependencies off
             [ [ def>> ] [ ] [ ] tri infer-quot-recursive end-infer ]
             [ finish-word current-effect ]
@@ -191,21 +193,8 @@ M: object apply-object push-literal ;
 : call-recursive-word ( word -- )
     dup required-stack-effect apply-word/effect ;
 
-: custom-infer ( word -- )
-    [ +inlined+ depends-on ] [ +infer+ word-prop call ] bi ;
-
 : cached-infer ( word -- )
     dup +inferred-effect+ word-prop apply-word/effect ;
-
-: non-inline-word ( word -- )
-    dup +called+ depends-on
-    {
-        { [ dup recursive-label ] [ call-recursive-word ] }
-        { [ dup +infer+ word-prop ] [ custom-infer ] }
-        { [ dup +cannot-infer+ word-prop ] [ cannot-infer-effect ] }
-        { [ dup +inferred-effect+ word-prop ] [ cached-infer ] }
-        [ dup infer-word apply-word/effect ]
-    } cond ;
 
 : with-infer ( quot -- effect visitor )
     [
@@ -213,10 +202,10 @@ M: object apply-object push-literal ;
             V{ } clone recorded set
             init-inference
             init-known-values
-            dataflow-visitor off
+            stack-visitor off
             call
             end-infer
             current-effect
-            dataflow-visitor get
+            stack-visitor get
         ] [ ] [ undo-infer ] cleanup
-    ] with-scope ;
+    ] with-scope ; inline

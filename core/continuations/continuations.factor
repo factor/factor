@@ -109,6 +109,14 @@ SYMBOL: return-continuation
 : return ( -- )
     return-continuation get continue ;
 
+: with-datastack ( stack quot -- newstack )
+    [
+        [
+            [ [ { } like set-datastack ] dip call datastack ] dip
+            continue-with
+        ] 3 (throw)
+    ] callcc1 2nip ;
+
 GENERIC: compute-restarts ( error -- seq )
 
 <PRIVATE

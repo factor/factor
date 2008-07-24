@@ -1,6 +1,6 @@
 USING: help.markup help.syntax sequences quotations words 
 compiler.tree stack-checker.errors ;
-IN: compiler.frontend
+IN: compiler.tree.builder
 
 ARTICLE: "specializers" "Word specializers"
 "The optimizer can be passed hints as to the classes of parameters a word is expected to be called with. The optimizer will then generate multiple versions of word when compiling, specialized to each class."
@@ -22,15 +22,15 @@ $nl
 "The specialized version of a word which will be compiled by the compiler can be inspected:"
 { $subsection specialized-def } ;
 
-HELP: dataflow
+HELP: build-tree
 { $values { "quot" quotation } { "dataflow" node } }
-{ $description "Attempts to construct a dataflow graph showing stack flow in the quotation." }
+{ $description "Attempts to construct tree SSA IR from a quotation." }
 { $notes "This is the first stage of the compiler." }
 { $errors "Throws an " { $link inference-error } " if stack effect inference fails." } ;
 
-HELP: dataflow-with
+HELP: build-tree-with
 { $values { "quot" quotation } { "stack" sequence } { "dataflow" node } }
-{ $description "Attempts to construct a dataflow graph showing stack flow in the quotation, starting with an initial data stack of values." }
+{ $description "Attempts to construct tree SSA IR from a quotaiton, starting with an initial data stack of values." }
 { $errors "Throws an " { $link inference-error } " if stack effect inference fails." } ;
 
 HELP: specialized-def

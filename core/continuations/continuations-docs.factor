@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel kernel.private
 continuations.private vectors arrays namespaces
-assocs words quotations lexer ;
+assocs words quotations lexer sequences ;
 IN: continuations
 
 ARTICLE: "errors-restartable" "Restartable errors"
@@ -77,6 +77,8 @@ $nl
 "Another two words resume continuations:"
 { $subsection continue }
 { $subsection continue-with }
+"Reflecting the datastack:"
+{ $subsection with-datastack }
 "Continuations serve as the building block for a number of higher-level abstractions, such as " { $link "errors" } " and " { $link "threads" } "."
 { $subsection "continuations.private" } ;
 
@@ -202,3 +204,10 @@ HELP: save-error
 { $values { "error" "an error" } }
 { $description "Called by the error handler to set the " { $link error } " and " { $link restarts } " global variables after an error was thrown." }
 $low-level-note ;
+
+HELP: with-datastack
+{ $values { "stack" sequence } { "quot" quotation } { "newstack" sequence } }
+{ $description "Executes the quotation with the given data stack contents, and outputs the new data stack after the word returns. The input sequence is not modified. Does not affect the data stack in surrounding code, other than consuming the two inputs and pushing the output." }
+{ $examples
+    { $example "USING: combinators math prettyprint ;" "{ 3 7 } [ + ] with-datastack ." "{ 10 }" }
+} ;

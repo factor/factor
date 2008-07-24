@@ -1,112 +1,105 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors kernel sequences assocs words namespaces
-combinators classes.algebra compiler.tree
+classes.algebra combinators classes continuations
+compiler.tree
+compiler.tree.def-use
+compiler.tree.propagation.info
+compiler.tree.propagation.nodes
 compiler.tree.propagation.constraints ;
 IN: compiler.tree.propagation.simple
 
-GENERIC: propagate-before ( node -- )
-
 M: #introduce propagate-before
-    values>> [ object swap set-value-class ] each ;
+    object <class-info> swap values>> [ set-value-info ] with each ;
 
 M: #push propagate-before
-    [ literal>> ] [ out-d>> first ] bi set-value-literal ;
+    [ literal>> value>> <literal-info> ] [ out-d>> first ] bi
+    set-value-info ;
+
+: refine-value-infos ( classes values -- )
+    [ refine-value-info ] 2each ;
+
+: class-infos ( classes -- infos )
+    [ <class-info> ] map ;
+
+: set-value-infos ( infos values -- )
+    [ set-value-info ] 2each ;
 
 M: #declare propagate-before
-    [ [ in-d>> ] [ out-d>> ] bi are-copies-of ]
-    [ [ declaration>> ] [ out-d>> ] bi [ intersect-value-class ] 2each ]
-    bi ;
+    declaration>> [ <class-info> swap refine-value-info ] assoc-each ;
 
-M: #shuffle propagate-before
-    [ out-r>> dup ] [ mapping>> ] bi '[ , at ] map are-copies-of ;
+: predicate-constraints ( value class boolean-value -- constraint )
+    [ [ is-instance-of ] dip t--> ]
+    [ [ class-not is-instance-of ] dip f--> ]
+    3bi /\ ;
 
-M: #>r propagate-before
-    [ in-d>> ] [ out-r>> ] bi are-copies-of ;
-
-M: #r> propagate-before
-    [ in-r>> ] [ out-d>> ] bi are-copies-of ;
-
-M: #copy propagate-before
-    [ in-d>> ] [ out-d>> ] bi are-copies-of ;
-
-: intersect-classes ( classes values -- )
-    [ intersect-value-class ] 2each ;
-
-: intersect-intervals ( intervals values -- )
-    [ intersect-value-interval ] 2each ;
-
-: predicate-constraints ( class #call -- )
-    [
-        ! If word outputs true, input is an instance of class
-        [
-            0 `input class,
-            \ f class-not 0 `output class,
-        ] set-constraints
-    ] [
-        ! If word outputs false, input is not an instance of class
-        [
-            class-not 0 `input class,
-            \ f 0 `output class,
-        ] set-constraints
-    ] 2bi ;
+: custom-constraints ( #call quot -- )
+    [ [ in-d>> ] [ out-d>> ] bi append ] dip
+    with-datastack first assume ;
 
 : compute-constraints ( #call -- )
-    dup word>> "constraints" word-prop [
-        call
-    ] [
-        dup word>> "predicating" word-prop dup
-        [ swap predicate-constraints ] [ 2drop ] if
+    dup word>> +constraints+ word-prop [ custom-constraints ] [
+        dup word>> predicate? [
+            [ in-d>> first ]
+            [ word>> "predicating" word-prop ]
+            [ out-d>> first ]
+            tri predicate-constraints assume
+        ] [ drop ] if
     ] if* ;
 
-: compute-output-classes ( node word -- classes intervals )
-    dup word>> "output-classes" word-prop
-    dup [ call ] [ 2drop f f ] if ;
+: call-outputs-quot ( node -- infos )
+    [ in-d>> [ value-info ] map ]
+    [ word>> +outputs+ word-prop ]
+    bi with-datastack ;
 
-: output-classes ( node -- classes intervals )
-    dup compute-output-classes [
-        [ ] [ word>> "default-output-classes" word-prop ] ?if
-    ] dip ;
+: foldable-call? ( #call -- ? )
+    dup word>> "foldable" word-prop [
+        in-d>> [ value-info literal?>> ] all?
+    ] [
+        drop f
+    ] if ;
 
-: intersect-values ( classes intervals values -- )
-    tuck [ intersect-classes ] [ intersect-intervals ] 2bi* ;
+: fold-call ( #call -- infos )
+    [ in-d>> [ value-info literal>> ] map ]
+    [ word>> [ execute ] curry ]
+    bi with-datastack
+    [ <literal-info> ] map ;
+
+: default-output-value-infos ( node -- infos )
+    dup word>> "default-output-classes" word-prop [
+        class-infos
+    ] [
+        out-d>> length object <class-info> <repetition>
+    ] ?if ;
+
+: output-value-infos ( node -- infos )
+    {
+        { [ dup foldable-call? ] [ fold-call ] }
+        { [ dup word>> +outputs+ word-prop ] [ call-outputs-quot ] }
+        [ default-output-value-infos ]
+    } cond ;
 
 M: #call propagate-before
+    [ [ output-value-infos ] [ out-d>> ] bi set-value-infos ]
     [ compute-constraints ]
-    [ [ output-classes ] [ out-d>> ] bi intersect-values ] bi ;
+    bi ;
 
 M: node propagate-before drop ;
 
-GENERIC: propagate-after ( node -- )
-
-: input-classes ( #call -- classes )
-    word>> "input-classes" word-prop ;
-
 M: #call propagate-after
-    [ input-classes ] [ in-d>> ] bi intersect-classes ;
+    dup word>> "input-classes" word-prop dup [
+        class-infos swap in-d>> refine-value-infos
+    ] [
+        2drop
+    ] if ;
 
 M: node propagate-after drop ;
 
-GENERIC: propagate-around ( node -- )
-
-: valid-keys ( seq assoc -- newassoc )
-    '[ dup resolve-copy , at ] H{ } map>assoc
-    [ nip ] assoc-filter
-    f assoc-like ;
-
 : annotate-node ( node -- )
-    #! Annotate the node with the currently-inferred set of
-    #! value classes.
-    dup node-values {
-        [ value-intervals get valid-keys >>intervals ]
-        [ value-classes   get valid-keys >>classes   ]
-        [ value-literals  get valid-keys >>literals  ]
-        [ 2drop ]
-    } cleave ;
+    dup
+    [ node-defs-values ] [ node-uses-values ] bi append
+    [ dup value-info ] H{ } map>assoc
+    >>info drop ;
 
-M: object propagate-around
-    {
-        [ propagate-before ]
-        [ annotate-node ]
-        [ propagate-after ]
-    } cleave ;
+M: node propagate-around
+    [ propagate-before ] [ annotate-node ] [ propagate-after ] tri ;

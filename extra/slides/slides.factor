@@ -3,7 +3,7 @@
 USING: arrays hashtables help.markup help.stylesheet io
 io.styles kernel math models namespaces sequences ui ui.gadgets
 ui.gadgets.books ui.gadgets.panes ui.gestures ui.render
-parser ;
+parser accessors ;
 IN: slides
 
 : stylesheet
@@ -48,10 +48,9 @@ IN: slides
 : $divider ( -- )
     [
         <gadget>
-        T{ gradient f { { 0.25 0.25 0.25 1.0 } { 1.0 1.0 1.0 0.0 } } }
-        over set-gadget-interior
-        { 800 10 } over set-gadget-dim
-        { 1 0 } over set-gadget-orientation
+        T{ gradient f { { 0.25 0.25 0.25 1.0 } { 1.0 1.0 1.0 0.0 } } } >>interior
+        { 800 10 } >>dim
+        { 1 0 } >>orientation
         gadget.
     ] ($block) ;
 

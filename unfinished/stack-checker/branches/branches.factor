@@ -12,7 +12,7 @@ IN: stack-checker.branches
 : phi-inputs ( seq -- newseq )
     dup empty? [
         dup [ length ] map supremum
-        '[ , f pad-left ] map
+        '[ , f pad-left ] map flip
     ] unless ;
 
 : unify-values ( values -- phi-out )
@@ -20,7 +20,7 @@ IN: stack-checker.branches
     [ nip first make-known ] [ 2drop <value> ] if ;
 
 : phi-outputs ( phi-in -- stack )
-    flip [ unify-values ] map ;
+    [ unify-values ] map ;
 
 SYMBOL: quotations
 
@@ -47,7 +47,7 @@ SYMBOL: quotations
 : retainstack-phi ( seq -- phi-in phi-out )
     [ length 0 <repetition> ] [ meta-r active-variable ] bi
     unify-branches
-    [ drop ] [ ] [ dup meta-r set ] tri* ;
+    [ drop ] [ ] [ dup >vector meta-r set ] tri* ;
 
 : compute-phi-function ( seq -- )
     [ quotation active-variable sift quotations set ]
@@ -65,10 +65,21 @@ SYMBOL: quotations
 : infer-branches ( branches -- input children data )
     [ pop-d ] dip
     [ infer-branch ] map
-    [ dataflow-visitor branch-variable ] keep ;
+    [ stack-visitor branch-variable ] keep ;
 
-: infer-if ( branches -- )
+: (infer-if) ( branches -- )
     infer-branches [ first2 #if, ] dip compute-phi-function ;
 
-: infer-dispatch ( branches -- )
+: infer-if ( -- )
+    2 consume-d
+    dup [ known [ curry? ] [ composed? ] bi or ] contains? [
+        output-d
+        [ rot [ drop call ] [ nip call ] if ]
+        recursive-state get infer-quot
+    ] [
+        [ #drop, ] [ [ literal ] map (infer-if) ] bi
+    ] if ;
+
+: infer-dispatch ( -- )
+    pop-literal nip [ <literal> ] map
     infer-branches [ #dispatch, ] dip compute-phi-function ;

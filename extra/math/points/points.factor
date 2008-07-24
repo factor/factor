@@ -1,5 +1,4 @@
-
-USING: kernel arrays math.vectors ;
+USING: kernel arrays math.vectors sequences math ;
 
 IN: math.points
 
@@ -20,3 +19,9 @@ PRIVATE>
 : v+z ( seq z -- seq ) Z v+ ;
 : v-z ( seq z -- seq ) Z v- ;
 
+: rise ( pt2 pt1 -- n ) [ second ] bi@ - ;
+: run ( pt2 pt1 -- n ) [ first ] bi@ - ;
+: slope ( pt pt -- slope ) [ rise ] [ run ] 2bi / ;
+: distance ( point point -- float ) v- norm ;
+: midpoint ( point point -- point ) v+ 2 v/n ;
+: linear-solution ( pt pt -- x ) [ drop first2 ] [ slope ] 2bi / - ;

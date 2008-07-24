@@ -1,3 +1,5 @@
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel slots.private inference.known-words
 inference.backend sequences effects words ;
 IN: locals.backend

@@ -2,26 +2,25 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors alien alien.accessors arrays byte-arrays
 classes sequences.private continuations.private effects generic
-hashtables hashtables.private io io.backend io.files io.files.private
-io.streams.c kernel kernel.private math math.private memory
-namespaces namespaces.private parser prettyprint quotations
-quotations.private sbufs sbufs.private sequences
-sequences.private slots.private strings strings.private system
-threads.private classes.tuple classes.tuple.private vectors
-vectors.private words words.private assocs summary
-compiler.units system.private
-stack-checker.state stack-checker.backend stack-checker.branches
-stack-checker.errors stack-checker.visitor ;
+hashtables hashtables.private io io.backend io.files
+io.files.private io.streams.c kernel kernel.private math
+math.private memory namespaces namespaces.private parser
+prettyprint quotations quotations.private sbufs sbufs.private
+sequences sequences.private slots.private strings
+strings.private system threads.private classes.tuple
+classes.tuple.private vectors vectors.private words definitions
+words.private assocs summary compiler.units system.private
+combinators locals.backend stack-checker.state
+stack-checker.backend stack-checker.branches
+stack-checker.errors stack-checker.transforms
+stack-checker.visitor ;
 IN: stack-checker.known-words
 
-: infer-shuffle ( shuffle -- )
-    [ in>> length consume-d ] keep ! inputs shuffle
-    [ drop ] [ shuffle* dup copy-values dup output-d ] 2bi ! inputs outputs copies
-    [ nip ] [ swap zip ] 2bi ! inputs copies mapping
-    #shuffle, ;
-
-: define-shuffle ( word shuffle -- )
-    '[ , infer-shuffle ] +infer+ set-word-prop ;
+: infer-primitive ( word -- )
+    dup
+    [ "input-classes" word-prop ]
+    [ "default-output-classes" word-prop ] bi <effect>
+    apply-word/effect ;
 
 {
     { drop  (( x     --             )) }
@@ -40,19 +39,22 @@ IN: stack-checker.known-words
     { over  (( x y   -- x y x       )) }
     { pick  (( x y z -- x y z x     )) }
     { swap  (( x y   -- y x         )) }
-} [ define-shuffle ] assoc-each
+} [ +shuffle+ set-word-prop ] assoc-each
 
-\ >r [ 1 infer->r ] +infer+ set-word-prop
-\ r> [ 1 infer-r> ] +infer+ set-word-prop
+: infer-shuffle ( shuffle -- )
+    [ in>> length consume-d ] keep ! inputs shuffle
+    [ drop ] [ shuffle* dup copy-values dup output-d ] 2bi ! inputs outputs copies
+    [ nip ] [ swap zip ] 2bi ! inputs copies mapping
+    #shuffle, ;
 
+: infer-shuffle-word ( word -- )
+    +shuffle+ word-prop infer-shuffle ;
 
-\ declare [
+: infer-declare ( -- )
     pop-literal nip
-    [ length consume-d dup copy-values ] keep
-    #declare,
-] +infer+ set-word-prop
+    [ length ensure-d ] keep zip
+    #declare, ;
 
-! Primitive combinators
 GENERIC: infer-call* ( value known -- )
 
 : infer-call ( value -- ) dup known infer-call* ;
@@ -73,495 +75,524 @@ M: composed infer-call*
     [ quot2>> known pop-d [ set-known ] keep ]
     [ quot1>> known pop-d [ set-known ] keep ] bi
     push-d push-d
-    [ slip call ] recursive-state get infer-quot ;
+    1 infer->r pop-d infer-call
+    terminated? get [ 1 infer-r> pop-d infer-call ] unless ;
 
 M: object infer-call*
     \ literal-expected inference-warning ;
 
-\ call [ pop-d infer-call ] +infer+ set-word-prop
-
-\ call t "no-compile" set-word-prop
-
-\ curry [
+: infer-curry ( -- )
     2 consume-d
     dup first2 <curried> make-known
     [ push-d ] [ 1array ] bi
-    \ curry #call,
-] +infer+ set-word-prop
+    \ curry #call, ;
 
-\ compose [
+: infer-compose ( -- )
     2 consume-d
     dup first2 <composed> make-known
     [ push-d ] [ 1array ] bi
-    \ compose #call,
-] +infer+ set-word-prop
+    \ compose #call, ;
 
-\ execute [
+: infer-execute ( -- )
     pop-literal nip
     dup word? [
         apply-object
     ] [
         drop
         "execute must be given a word" time-bomb
-    ] if
-] +infer+ set-word-prop
+    ] if ;
 
-\ execute t "no-compile" set-word-prop
-
-\ if [
-    2 consume-d
-    dup [ known [ curry? ] [ composed? ] bi or ] contains? [
-        output-d
-        [ rot [ drop call ] [ nip call ] if ]
-        recursive-state get infer-quot
-    ] [
-        [ #drop, ] [ [ literal ] map infer-if ] bi
-    ] if
-] +infer+ set-word-prop
-
-\ dispatch [
-    pop-literal nip [ <literal> ] map infer-dispatch
-] +infer+ set-word-prop
-
-\ dispatch t "no-compile" set-word-prop
-
-! Variadic tuple constructor
-\ <tuple-boa> [
+: infer-<tuple-boa> ( -- )
     \ <tuple-boa>
     peek-d literal value>> size>> { tuple } <effect>
-    apply-word/effect
-] +infer+ set-word-prop
+    apply-word/effect ;
 
-! Non-standard control flow
-\ (throw) [
+: infer-(throw) ( -- )
     \ (throw)
     peek-d literal value>> 2 + f <effect> t >>terminated?
-    apply-word/effect
-] +infer+ set-word-prop
+    apply-word/effect ;
 
-:  set-primitive-effect ( word effect -- )
-    [ in>> "input-classes" set-word-prop ]
-    [ out>> "default-output-classes" set-word-prop ]
-    [ dupd '[ , , apply-word/effect ] +infer+ set-word-prop ]
-    2tri ;
+: infer-exit ( -- )
+    \ exit
+    { integer } { } t >>terminated? <effect>
+    apply-word/effect ;
+
+: infer-load-locals ( -- )
+    pop-literal nip
+    [ dup reverse <effect> infer-shuffle ]
+    [ infer->r ]
+    bi ;
+
+: infer-get-local ( -- )
+    pop-literal nip
+    [ infer-r> ]
+    [ dup 0 prefix <effect> infer-shuffle ]
+    [ infer->r ]
+    tri ;
+
+: infer-drop-locals ( -- )
+    pop-literal nip
+    [ infer-r> ]
+    [ { } <effect> infer-shuffle ] bi ;
+
+: infer-special ( word -- )
+    {
+        { \ >r [ 1 infer->r ] }
+        { \ r> [ 1 infer-r> ] }
+        { \ declare [ infer-declare ] }
+        { \ call [ pop-d infer-call ] }
+        { \ curry [ infer-curry ] }
+        { \ compose [ infer-compose ] }
+        { \ execute [ infer-execute ] }
+        { \ if [ infer-if ] }
+        { \ dispatch [ infer-dispatch ] }
+        { \ <tuple-boa> [ infer-<tuple-boa> ] }
+        { \ (throw) [ infer-(throw) ] }
+        { \ exit [ infer-exit ] }
+        { \ load-locals [ infer-load-locals ] }
+        { \ get-local [ infer-get-local ] }
+        { \ drop-locals [ infer-drop-locals ] }
+        { \ do-primitive [ \ do-primitive cannot-infer-effect ] }
+    } case ;
+
+{
+    >r r> declare call curry compose
+    execute if dispatch <tuple-boa>
+    (throw) load-locals get-local drop-locals
+    do-primitive
+} [ t +special+ set-word-prop ] each
+
+{ call execute dispatch load-locals get-local drop-locals }
+[ t "no-compile" set-word-prop ] each
+
+: non-inline-word ( word -- )
+    dup +called+ depends-on
+    {
+        { [ dup +shuffle+ word-prop ] [ infer-shuffle-word ] }
+        { [ dup +special+ word-prop ] [ infer-special ] }
+        { [ dup primitive? ] [ infer-primitive ] }
+        { [ dup +cannot-infer+ word-prop ] [ cannot-infer-effect ] }
+        { [ dup +inferred-effect+ word-prop ] [ cached-infer ] }
+        { [ dup +transform-quot+ word-prop ] [ apply-transform ] }
+        { [ dup "macro" word-prop ] [ apply-macro ] }
+        { [ dup recursive-label ] [ call-recursive-word ] }
+        [ dup infer-word apply-word/effect ]
+    } cond ;
+
+: define-primitive ( word inputs outputs -- )
+    [ drop "input-classes" set-word-prop ]
+    [ nip "default-output-classes" set-word-prop ]
+    3bi ;
 
 ! Stack effects for all primitives
-\ fixnum< { fixnum fixnum } { object } <effect> set-primitive-effect
+\ fixnum< { fixnum fixnum } { object } define-primitive
 \ fixnum< make-foldable
 
-\ fixnum<= { fixnum fixnum } { object } <effect> set-primitive-effect
+\ fixnum<= { fixnum fixnum } { object } define-primitive
 \ fixnum<= make-foldable
 
-\ fixnum> { fixnum fixnum } { object } <effect> set-primitive-effect
+\ fixnum> { fixnum fixnum } { object } define-primitive
 \ fixnum> make-foldable
 
-\ fixnum>= { fixnum fixnum } { object } <effect> set-primitive-effect
+\ fixnum>= { fixnum fixnum } { object } define-primitive
 \ fixnum>= make-foldable
 
-\ eq? { object object } { object } <effect> set-primitive-effect
+\ eq? { object object } { object } define-primitive
 \ eq? make-foldable
 
-\ rehash-string { string } { } <effect> set-primitive-effect
-
-\ bignum>fixnum { bignum } { fixnum } <effect> set-primitive-effect
+\ bignum>fixnum { bignum } { fixnum } define-primitive
 \ bignum>fixnum make-foldable
 
-\ float>fixnum { float } { fixnum } <effect> set-primitive-effect
+\ float>fixnum { float } { fixnum } define-primitive
 \ bignum>fixnum make-foldable
 
-\ fixnum>bignum { fixnum } { bignum } <effect> set-primitive-effect
+\ fixnum>bignum { fixnum } { bignum } define-primitive
 \ fixnum>bignum make-foldable
 
-\ float>bignum { float } { bignum } <effect> set-primitive-effect
+\ float>bignum { float } { bignum } define-primitive
 \ float>bignum make-foldable
 
-\ fixnum>float { fixnum } { float } <effect> set-primitive-effect
+\ fixnum>float { fixnum } { float } define-primitive
 \ fixnum>float make-foldable
 
-\ bignum>float { bignum } { float } <effect> set-primitive-effect
+\ bignum>float { bignum } { float } define-primitive
 \ bignum>float make-foldable
 
-\ <ratio> { integer integer } { ratio } <effect> set-primitive-effect
+\ <ratio> { integer integer } { ratio } define-primitive
 \ <ratio> make-foldable
 
-\ string>float { string } { float } <effect> set-primitive-effect
+\ string>float { string } { float } define-primitive
 \ string>float make-foldable
 
-\ float>string { float } { string } <effect> set-primitive-effect
+\ float>string { float } { string } define-primitive
 \ float>string make-foldable
 
-\ float>bits { real } { integer } <effect> set-primitive-effect
+\ float>bits { real } { integer } define-primitive
 \ float>bits make-foldable
 
-\ double>bits { real } { integer } <effect> set-primitive-effect
+\ double>bits { real } { integer } define-primitive
 \ double>bits make-foldable
 
-\ bits>float { integer } { float } <effect> set-primitive-effect
+\ bits>float { integer } { float } define-primitive
 \ bits>float make-foldable
 
-\ bits>double { integer } { float } <effect> set-primitive-effect
+\ bits>double { integer } { float } define-primitive
 \ bits>double make-foldable
 
-\ <complex> { real real } { complex } <effect> set-primitive-effect
+\ <complex> { real real } { complex } define-primitive
 \ <complex> make-foldable
 
-\ fixnum+ { fixnum fixnum } { integer } <effect> set-primitive-effect
+\ fixnum+ { fixnum fixnum } { integer } define-primitive
 \ fixnum+ make-foldable
 
-\ fixnum+fast { fixnum fixnum } { fixnum } <effect> set-primitive-effect
+\ fixnum+fast { fixnum fixnum } { fixnum } define-primitive
 \ fixnum+fast make-foldable
 
-\ fixnum- { fixnum fixnum } { integer } <effect> set-primitive-effect
+\ fixnum- { fixnum fixnum } { integer } define-primitive
 \ fixnum- make-foldable
 
-\ fixnum-fast { fixnum fixnum } { fixnum } <effect> set-primitive-effect
+\ fixnum-fast { fixnum fixnum } { fixnum } define-primitive
 \ fixnum-fast make-foldable
 
-\ fixnum* { fixnum fixnum } { integer } <effect> set-primitive-effect
+\ fixnum* { fixnum fixnum } { integer } define-primitive
 \ fixnum* make-foldable
 
-\ fixnum*fast { fixnum fixnum } { fixnum } <effect> set-primitive-effect
+\ fixnum*fast { fixnum fixnum } { fixnum } define-primitive
 \ fixnum*fast make-foldable
 
-\ fixnum/i { fixnum fixnum } { integer } <effect> set-primitive-effect
+\ fixnum/i { fixnum fixnum } { integer } define-primitive
 \ fixnum/i make-foldable
 
-\ fixnum-mod { fixnum fixnum } { fixnum } <effect> set-primitive-effect
+\ fixnum-mod { fixnum fixnum } { fixnum } define-primitive
 \ fixnum-mod make-foldable
 
-\ fixnum/mod { fixnum fixnum } { integer fixnum } <effect> set-primitive-effect
+\ fixnum/mod { fixnum fixnum } { integer fixnum } define-primitive
 \ fixnum/mod make-foldable
 
-\ fixnum-bitand { fixnum fixnum } { fixnum } <effect> set-primitive-effect
+\ fixnum-bitand { fixnum fixnum } { fixnum } define-primitive
 \ fixnum-bitand make-foldable
 
-\ fixnum-bitor { fixnum fixnum } { fixnum } <effect> set-primitive-effect
+\ fixnum-bitor { fixnum fixnum } { fixnum } define-primitive
 \ fixnum-bitor make-foldable
 
-\ fixnum-bitxor { fixnum fixnum } { fixnum } <effect> set-primitive-effect
+\ fixnum-bitxor { fixnum fixnum } { fixnum } define-primitive
 \ fixnum-bitxor make-foldable
 
-\ fixnum-bitnot { fixnum } { fixnum } <effect> set-primitive-effect
+\ fixnum-bitnot { fixnum } { fixnum } define-primitive
 \ fixnum-bitnot make-foldable
 
-\ fixnum-shift { fixnum fixnum } { integer } <effect> set-primitive-effect
+\ fixnum-shift { fixnum fixnum } { integer } define-primitive
 \ fixnum-shift make-foldable
 
-\ fixnum-shift-fast { fixnum fixnum } { fixnum } <effect> set-primitive-effect
+\ fixnum-shift-fast { fixnum fixnum } { fixnum } define-primitive
 \ fixnum-shift-fast make-foldable
 
-\ bignum= { bignum bignum } { object } <effect> set-primitive-effect
+\ bignum= { bignum bignum } { object } define-primitive
 \ bignum= make-foldable
 
-\ bignum+ { bignum bignum } { bignum } <effect> set-primitive-effect
+\ bignum+ { bignum bignum } { bignum } define-primitive
 \ bignum+ make-foldable
 
-\ bignum- { bignum bignum } { bignum } <effect> set-primitive-effect
+\ bignum- { bignum bignum } { bignum } define-primitive
 \ bignum- make-foldable
 
-\ bignum* { bignum bignum } { bignum } <effect> set-primitive-effect
+\ bignum* { bignum bignum } { bignum } define-primitive
 \ bignum* make-foldable
 
-\ bignum/i { bignum bignum } { bignum } <effect> set-primitive-effect
+\ bignum/i { bignum bignum } { bignum } define-primitive
 \ bignum/i make-foldable
 
-\ bignum-mod { bignum bignum } { bignum } <effect> set-primitive-effect
+\ bignum-mod { bignum bignum } { bignum } define-primitive
 \ bignum-mod make-foldable
 
-\ bignum/mod { bignum bignum } { bignum bignum } <effect> set-primitive-effect
+\ bignum/mod { bignum bignum } { bignum bignum } define-primitive
 \ bignum/mod make-foldable
 
-\ bignum-bitand { bignum bignum } { bignum } <effect> set-primitive-effect
+\ bignum-bitand { bignum bignum } { bignum } define-primitive
 \ bignum-bitand make-foldable
 
-\ bignum-bitor { bignum bignum } { bignum } <effect> set-primitive-effect
+\ bignum-bitor { bignum bignum } { bignum } define-primitive
 \ bignum-bitor make-foldable
 
-\ bignum-bitxor { bignum bignum } { bignum } <effect> set-primitive-effect
+\ bignum-bitxor { bignum bignum } { bignum } define-primitive
 \ bignum-bitxor make-foldable
 
-\ bignum-bitnot { bignum } { bignum } <effect> set-primitive-effect
+\ bignum-bitnot { bignum } { bignum } define-primitive
 \ bignum-bitnot make-foldable
 
-\ bignum-shift { bignum bignum } { bignum } <effect> set-primitive-effect
+\ bignum-shift { bignum bignum } { bignum } define-primitive
 \ bignum-shift make-foldable
 
-\ bignum< { bignum bignum } { object } <effect> set-primitive-effect
+\ bignum< { bignum bignum } { object } define-primitive
 \ bignum< make-foldable
 
-\ bignum<= { bignum bignum } { object } <effect> set-primitive-effect
+\ bignum<= { bignum bignum } { object } define-primitive
 \ bignum<= make-foldable
 
-\ bignum> { bignum bignum } { object } <effect> set-primitive-effect
+\ bignum> { bignum bignum } { object } define-primitive
 \ bignum> make-foldable
 
-\ bignum>= { bignum bignum } { object } <effect> set-primitive-effect
+\ bignum>= { bignum bignum } { object } define-primitive
 \ bignum>= make-foldable
 
-\ bignum-bit? { bignum integer } { object } <effect> set-primitive-effect
+\ bignum-bit? { bignum integer } { object } define-primitive
 \ bignum-bit? make-foldable
 
-\ bignum-log2 { bignum } { bignum } <effect> set-primitive-effect
+\ bignum-log2 { bignum } { bignum } define-primitive
 \ bignum-log2 make-foldable
 
-\ byte-array>bignum { byte-array } { bignum } <effect> set-primitive-effect
+\ byte-array>bignum { byte-array } { bignum } define-primitive
 \ byte-array>bignum make-foldable
 
-\ float= { float float } { object } <effect> set-primitive-effect
+\ float= { float float } { object } define-primitive
 \ float= make-foldable
 
-\ float+ { float float } { float } <effect> set-primitive-effect
+\ float+ { float float } { float } define-primitive
 \ float+ make-foldable
 
-\ float- { float float } { float } <effect> set-primitive-effect
+\ float- { float float } { float } define-primitive
 \ float- make-foldable
 
-\ float* { float float } { float } <effect> set-primitive-effect
+\ float* { float float } { float } define-primitive
 \ float* make-foldable
 
-\ float/f { float float } { float } <effect> set-primitive-effect
+\ float/f { float float } { float } define-primitive
 \ float/f make-foldable
 
-\ float< { float float } { object } <effect> set-primitive-effect
+\ float< { float float } { object } define-primitive
 \ float< make-foldable
 
-\ float-mod { float float } { float } <effect> set-primitive-effect
+\ float-mod { float float } { float } define-primitive
 \ float-mod make-foldable
 
-\ float<= { float float } { object } <effect> set-primitive-effect
+\ float<= { float float } { object } define-primitive
 \ float<= make-foldable
 
-\ float> { float float } { object } <effect> set-primitive-effect
+\ float> { float float } { object } define-primitive
 \ float> make-foldable
 
-\ float>= { float float } { object } <effect> set-primitive-effect
+\ float>= { float float } { object } define-primitive
 \ float>= make-foldable
 
-\ <word> { object object } { word } <effect> set-primitive-effect
+\ <word> { object object } { word } define-primitive
 \ <word> make-flushable
 
-\ word-xt { word } { integer integer } <effect> set-primitive-effect
+\ word-xt { word } { integer integer } define-primitive
 \ word-xt make-flushable
 
-\ getenv { fixnum } { object } <effect> set-primitive-effect
+\ getenv { fixnum } { object } define-primitive
 \ getenv make-flushable
 
-\ setenv { object fixnum } { } <effect> set-primitive-effect
+\ setenv { object fixnum } { } define-primitive
 
-\ (exists?) { string } { object } <effect> set-primitive-effect
+\ (exists?) { string } { object } define-primitive
 
-\ (directory) { string } { array } <effect> set-primitive-effect
+\ (directory) { string } { array } define-primitive
 
-\ gc { } { } <effect> set-primitive-effect
+\ gc { } { } define-primitive
 
-\ gc-stats { } { array } <effect> set-primitive-effect
+\ gc-stats { } { array } define-primitive
 
-\ save-image { string } { } <effect> set-primitive-effect
+\ save-image { string } { } define-primitive
 
-\ save-image-and-exit { string } { } <effect> set-primitive-effect
+\ save-image-and-exit { string } { } define-primitive
 
-\ exit { integer } { } <effect> t >>terminated? set-primitive-effect
-
-\ data-room { } { integer integer array } <effect> set-primitive-effect
+\ data-room { } { integer integer array } define-primitive
 \ data-room make-flushable
 
-\ code-room { } { integer integer integer integer } <effect> set-primitive-effect
+\ code-room { } { integer integer integer integer } define-primitive
 \ code-room  make-flushable
 
-\ os-env { string } { object } <effect> set-primitive-effect
+\ os-env { string } { object } define-primitive
 
-\ millis { } { integer } <effect> set-primitive-effect
+\ millis { } { integer } define-primitive
 \ millis make-flushable
 
-\ tag { object } { fixnum } <effect> set-primitive-effect
+\ tag { object } { fixnum } define-primitive
 \ tag make-foldable
 
-\ cwd { } { string } <effect> set-primitive-effect
+\ dlopen { string } { dll } define-primitive
 
-\ cd { string } { } <effect> set-primitive-effect
+\ dlsym { string object } { c-ptr } define-primitive
 
-\ dlopen { string } { dll } <effect> set-primitive-effect
+\ dlclose { dll } { } define-primitive
 
-\ dlsym { string object } { c-ptr } <effect> set-primitive-effect
-
-\ dlclose { dll } { } <effect> set-primitive-effect
-
-\ <byte-array> { integer } { byte-array } <effect> set-primitive-effect
+\ <byte-array> { integer } { byte-array } define-primitive
 \ <byte-array> make-flushable
 
-\ <displaced-alien> { integer c-ptr } { c-ptr } <effect> set-primitive-effect
+\ <displaced-alien> { integer c-ptr } { c-ptr } define-primitive
 \ <displaced-alien> make-flushable
 
-\ alien-signed-cell { c-ptr integer } { integer } <effect> set-primitive-effect
+\ alien-signed-cell { c-ptr integer } { integer } define-primitive
 \ alien-signed-cell make-flushable
 
-\ set-alien-signed-cell { integer c-ptr integer } { } <effect> set-primitive-effect
+\ set-alien-signed-cell { integer c-ptr integer } { } define-primitive
 
-\ alien-unsigned-cell { c-ptr integer } { integer } <effect> set-primitive-effect
+\ alien-unsigned-cell { c-ptr integer } { integer } define-primitive
 \ alien-unsigned-cell make-flushable
 
-\ set-alien-unsigned-cell { integer c-ptr integer } { } <effect> set-primitive-effect
+\ set-alien-unsigned-cell { integer c-ptr integer } { } define-primitive
 
-\ alien-signed-8 { c-ptr integer } { integer } <effect> set-primitive-effect
+\ alien-signed-8 { c-ptr integer } { integer } define-primitive
 \ alien-signed-8 make-flushable
 
-\ set-alien-signed-8 { integer c-ptr integer } { } <effect> set-primitive-effect
+\ set-alien-signed-8 { integer c-ptr integer } { } define-primitive
 
-\ alien-unsigned-8 { c-ptr integer } { integer } <effect> set-primitive-effect
+\ alien-unsigned-8 { c-ptr integer } { integer } define-primitive
 \ alien-unsigned-8 make-flushable
 
-\ set-alien-unsigned-8 { integer c-ptr integer } { } <effect> set-primitive-effect
+\ set-alien-unsigned-8 { integer c-ptr integer } { } define-primitive
 
-\ alien-signed-4 { c-ptr integer } { integer } <effect> set-primitive-effect
+\ alien-signed-4 { c-ptr integer } { integer } define-primitive
 \ alien-signed-4 make-flushable
 
-\ set-alien-signed-4 { integer c-ptr integer } { } <effect> set-primitive-effect
+\ set-alien-signed-4 { integer c-ptr integer } { } define-primitive
 
-\ alien-unsigned-4 { c-ptr integer } { integer } <effect> set-primitive-effect
+\ alien-unsigned-4 { c-ptr integer } { integer } define-primitive
 \ alien-unsigned-4 make-flushable
 
-\ set-alien-unsigned-4 { integer c-ptr integer } { } <effect> set-primitive-effect
+\ set-alien-unsigned-4 { integer c-ptr integer } { } define-primitive
 
-\ alien-signed-2 { c-ptr integer } { fixnum } <effect> set-primitive-effect
+\ alien-signed-2 { c-ptr integer } { fixnum } define-primitive
 \ alien-signed-2 make-flushable
 
-\ set-alien-signed-2 { integer c-ptr integer } { } <effect> set-primitive-effect
+\ set-alien-signed-2 { integer c-ptr integer } { } define-primitive
 
-\ alien-unsigned-2 { c-ptr integer } { fixnum } <effect> set-primitive-effect
+\ alien-unsigned-2 { c-ptr integer } { fixnum } define-primitive
 \ alien-unsigned-2 make-flushable
 
-\ set-alien-unsigned-2 { integer c-ptr integer } { } <effect> set-primitive-effect
+\ set-alien-unsigned-2 { integer c-ptr integer } { } define-primitive
 
-\ alien-signed-1 { c-ptr integer } { fixnum } <effect> set-primitive-effect
+\ alien-signed-1 { c-ptr integer } { fixnum } define-primitive
 \ alien-signed-1 make-flushable
 
-\ set-alien-signed-1 { integer c-ptr integer } { } <effect> set-primitive-effect
+\ set-alien-signed-1 { integer c-ptr integer } { } define-primitive
 
-\ alien-unsigned-1 { c-ptr integer } { fixnum } <effect> set-primitive-effect
+\ alien-unsigned-1 { c-ptr integer } { fixnum } define-primitive
 \ alien-unsigned-1 make-flushable
 
-\ set-alien-unsigned-1 { integer c-ptr integer } { } <effect> set-primitive-effect
+\ set-alien-unsigned-1 { integer c-ptr integer } { } define-primitive
 
-\ alien-float { c-ptr integer } { float } <effect> set-primitive-effect
+\ alien-float { c-ptr integer } { float } define-primitive
 \ alien-float make-flushable
 
-\ set-alien-float { float c-ptr integer } { } <effect> set-primitive-effect
+\ set-alien-float { float c-ptr integer } { } define-primitive
 
-\ alien-double { c-ptr integer } { float } <effect> set-primitive-effect
+\ alien-double { c-ptr integer } { float } define-primitive
 \ alien-double make-flushable
 
-\ set-alien-double { float c-ptr integer } { } <effect> set-primitive-effect
+\ set-alien-double { float c-ptr integer } { } define-primitive
 
-\ alien-cell { c-ptr integer } { simple-c-ptr } <effect> set-primitive-effect
+\ alien-cell { c-ptr integer } { simple-c-ptr } define-primitive
 \ alien-cell make-flushable
 
-\ set-alien-cell { c-ptr c-ptr integer } { } <effect> set-primitive-effect
+\ set-alien-cell { c-ptr c-ptr integer } { } define-primitive
 
-\ alien-address { alien } { integer } <effect> set-primitive-effect
+\ alien-address { alien } { integer } define-primitive
 \ alien-address make-flushable
 
-\ slot { object fixnum } { object } <effect> set-primitive-effect
+\ slot { object fixnum } { object } define-primitive
 \ slot make-flushable
 
-\ set-slot { object object fixnum } { } <effect> set-primitive-effect
+\ set-slot { object object fixnum } { } define-primitive
 
-\ string-nth { fixnum string } { fixnum } <effect> set-primitive-effect
+\ string-nth { fixnum string } { fixnum } define-primitive
 \ string-nth make-flushable
 
-\ set-string-nth { fixnum fixnum string } { } <effect> set-primitive-effect
+\ set-string-nth { fixnum fixnum string } { } define-primitive
 
-\ resize-array { integer array } { array } <effect> set-primitive-effect
+\ resize-array { integer array } { array } define-primitive
 \ resize-array make-flushable
 
-\ resize-byte-array { integer byte-array } { byte-array } <effect> set-primitive-effect
+\ resize-byte-array { integer byte-array } { byte-array } define-primitive
 \ resize-byte-array make-flushable
 
-\ resize-string { integer string } { string } <effect> set-primitive-effect
+\ resize-string { integer string } { string } define-primitive
 \ resize-string make-flushable
 
-\ <array> { integer object } { array } <effect> set-primitive-effect
+\ <array> { integer object } { array } define-primitive
 \ <array> make-flushable
 
-\ begin-scan { } { } <effect> set-primitive-effect
+\ begin-scan { } { } define-primitive
 
-\ next-object { } { object } <effect> set-primitive-effect
+\ next-object { } { object } define-primitive
 
-\ end-scan { } { } <effect> set-primitive-effect
+\ end-scan { } { } define-primitive
 
-\ size { object } { fixnum } <effect> set-primitive-effect
+\ size { object } { fixnum } define-primitive
 \ size make-flushable
 
-\ die { } { } <effect> set-primitive-effect
+\ die { } { } define-primitive
 
-\ fopen { string string } { alien } <effect> set-primitive-effect
+\ fopen { string string } { alien } define-primitive
 
-\ fgetc { alien } { object } <effect> set-primitive-effect
+\ fgetc { alien } { object } define-primitive
 
-\ fwrite { string alien } { } <effect> set-primitive-effect
+\ fwrite { string alien } { } define-primitive
 
-\ fputc { object alien } { } <effect> set-primitive-effect
+\ fputc { object alien } { } define-primitive
 
-\ fread { integer string } { object } <effect> set-primitive-effect
+\ fread { integer string } { object } define-primitive
 
-\ fflush { alien } { } <effect> set-primitive-effect
+\ fflush { alien } { } define-primitive
 
-\ fclose { alien } { } <effect> set-primitive-effect
+\ fclose { alien } { } define-primitive
 
-\ <wrapper> { object } { wrapper } <effect> set-primitive-effect
+\ <wrapper> { object } { wrapper } define-primitive
 \ <wrapper> make-foldable
 
-\ (clone) { object } { object } <effect> set-primitive-effect
+\ (clone) { object } { object } define-primitive
 \ (clone) make-flushable
 
-\ <string> { integer integer } { string } <effect> set-primitive-effect
+\ <string> { integer integer } { string } define-primitive
 \ <string> make-flushable
 
-\ array>quotation { array } { quotation } <effect> set-primitive-effect
+\ array>quotation { array } { quotation } define-primitive
 \ array>quotation make-flushable
 
-\ quotation-xt { quotation } { integer } <effect> set-primitive-effect
+\ quotation-xt { quotation } { integer } define-primitive
 \ quotation-xt make-flushable
 
-\ <tuple> { tuple-layout } { tuple } <effect> set-primitive-effect
+\ <tuple> { tuple-layout } { tuple } define-primitive
 \ <tuple> make-flushable
 
-\ <tuple-layout> { word fixnum array fixnum } { tuple-layout } <effect> set-primitive-effect
+\ <tuple-layout> { word fixnum array fixnum } { tuple-layout } define-primitive
 \ <tuple-layout> make-foldable
 
-\ datastack { } { array } <effect> set-primitive-effect
+\ datastack { } { array } define-primitive
 \ datastack make-flushable
 
-\ retainstack { } { array } <effect> set-primitive-effect
+\ retainstack { } { array } define-primitive
 \ retainstack make-flushable
 
-\ callstack { } { callstack } <effect> set-primitive-effect
+\ callstack { } { callstack } define-primitive
 \ callstack make-flushable
 
-\ callstack>array { callstack } { array } <effect> set-primitive-effect
+\ callstack>array { callstack } { array } define-primitive
 \ callstack>array make-flushable
 
-\ (sleep) { integer } { } <effect> set-primitive-effect
+\ (sleep) { integer } { } define-primitive
 
-\ become { array array } { } <effect> set-primitive-effect
+\ become { array array } { } define-primitive
 
-\ innermost-frame-quot { callstack } { quotation } <effect> set-primitive-effect
+\ innermost-frame-quot { callstack } { quotation } define-primitive
 
-\ innermost-frame-scan { callstack } { fixnum } <effect> set-primitive-effect
+\ innermost-frame-scan { callstack } { fixnum } define-primitive
 
-\ set-innermost-frame-quot { quotation callstack } { } <effect> set-primitive-effect
+\ set-innermost-frame-quot { quotation callstack } { } define-primitive
 
-\ (os-envs) { } { array } <effect> set-primitive-effect
+\ (os-envs) { } { array } define-primitive
 
-\ set-os-env { string string } { } <effect> set-primitive-effect
+\ set-os-env { string string } { } define-primitive
 
-\ unset-os-env { string } { } <effect> set-primitive-effect
+\ unset-os-env { string } { } define-primitive
 
-\ (set-os-envs) { array } { } <effect> set-primitive-effect
+\ (set-os-envs) { array } { } define-primitive
 
 \ do-primitive [ \ do-primitive cannot-infer-effect ] +infer+ set-word-prop
 
-\ dll-valid? { object } { object } <effect> set-primitive-effect
+\ dll-valid? { object } { object } define-primitive
 
-\ modify-code-heap { array object } { } <effect> set-primitive-effect
+\ modify-code-heap { array object } { } define-primitive
 
-\ unimplemented { } { } <effect> set-primitive-effect
+\ unimplemented { } { } define-primitive
