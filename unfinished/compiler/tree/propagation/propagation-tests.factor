@@ -220,3 +220,15 @@ IN: compiler.tree.propagation.tests
 [ V{ fixnum } ] [
     [ >fixnum dup 100 < [ 1+ ] [ "Oops" throw ] if ] final-classes
 ] unit-test
+
+[ V{ -1 } ] [
+    [ 0 dup 100 < not [ 1+ ] [ 1- ] if ] final-literals
+] unit-test
+
+[ V{ fixnum } ] [
+    [ [ 1 >r ] [ 2 >r ] if r> 3 + ] final-classes
+] unit-test
+
+[ V{ 2 } ] [
+    [ [ 1 ] [ 1 ] if 1 + ] final-literals
+] unit-test

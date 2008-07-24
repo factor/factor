@@ -44,6 +44,8 @@ M: #introduce node-defs-values values>> ;
 
 M: #>r node-defs-values out-r>> ;
 
+M: #phi node-defs-values [ out-d>> ] [ out-r>> ] bi append ;
+
 M: node node-defs-values out-d>> ;
 
 : node-def-use ( node -- )
