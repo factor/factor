@@ -12,9 +12,9 @@ TUPLE: labelled-gadget < track content ;
 
 : <labelled-gadget> ( gadget title -- newgadget )
   { 0 1 } labelled-gadget new-track
-    swap <label> reverse-video-theme f track-add*
+    swap <label> reverse-video-theme f track-add
     swap >>content
-    dup content>> 1 track-add* ;
+    dup content>> 1 track-add ;
 
 M: labelled-gadget focusable-child* labelled-gadget-content ;
 

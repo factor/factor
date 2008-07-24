@@ -14,7 +14,7 @@ TUPLE: listener-gadget < track input output stack ;
 
 : listener-output, ( listener -- listener )
   <scrolling-pane> >>output
-  dup output>> <scroller> "Output" <labelled-gadget> 1 track-add* ;
+  dup output>> <scroller> "Output" <labelled-gadget> 1 track-add ;
 
 : listener-streams ( listener -- input output )
     [ input>> ] [ output>> <pane-stream> ] bi ;
@@ -27,7 +27,7 @@ TUPLE: listener-gadget < track input output stack ;
   dup input>>
     { 0 100 } <limited-scroller>
     "Input" <labelled-gadget>
-  f track-add* ;
+  f track-add ;
 
 : welcome. ( -- )
    "If this is your first time with Factor, please read the " print
@@ -125,10 +125,10 @@ TUPLE: stack-display < track ;
 : <stack-display> ( workspace -- gadget )
   listener>>
   { 0 1 } stack-display new-track
-    over <toolbar> f track-add*
+    over <toolbar> f track-add
     swap
       stack>> [ [ stack. ] curry try ] t "Data stack" <labelled-pane>
-    1 track-add* ;
+    1 track-add ;
 
 M: stack-display tool-scroller
     find-workspace workspace-listener tool-scroller ;
