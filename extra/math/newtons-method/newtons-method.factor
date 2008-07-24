@@ -2,7 +2,7 @@
 ! Newton's Method of approximating roots
 
 USING: kernel math math.derivatives ;
-IN: newtons-method
+IN: math.newtons-method
 
 <PRIVATE
 : newton-step ( x function -- x2 ) dupd [ call ] [ derivative ] 2bi / - ;
