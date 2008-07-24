@@ -99,32 +99,32 @@ SINGLETON: iokit-game-input-backend
     2array ;
 
 : button? ( {usage-page,usage} -- ? )
-    first 9 = ;
+    first 9 = ; inline
 : keyboard-key? ( {usage-page,usage} -- ? )
-    first 7 = ;
+    first 7 = ; inline
 : x-axis? ( {usage-page,usage} -- ? )
-    { 1 HEX: 30 } = ;
+    { 1 HEX: 30 } = ; inline
 : y-axis? ( {usage-page,usage} -- ? )
-    { 1 HEX: 31 } = ;
+    { 1 HEX: 31 } = ; inline
 : z-axis? ( {usage-page,usage} -- ? )
-    { 1 HEX: 32 } = ;
+    { 1 HEX: 32 } = ; inline
 : rx-axis? ( {usage-page,usage} -- ? )
-    { 1 HEX: 33 } = ;
+    { 1 HEX: 33 } = ; inline
 : ry-axis? ( {usage-page,usage} -- ? )
-    { 1 HEX: 34 } = ;
+    { 1 HEX: 34 } = ; inline
 : rz-axis? ( {usage-page,usage} -- ? )
-    { 1 HEX: 35 } = ;
+    { 1 HEX: 35 } = ; inline
 : slider? ( {usage-page,usage} -- ? )
-    { 1 HEX: 36 } = ;
+    { 1 HEX: 36 } = ; inline
 : hat-switch? ( {usage-page,usage} -- ? )
-    { 1 HEX: 39 } = ;
+    { 1 HEX: 39 } = ; inline
 
 : pov-values
     {
         pov-up pov-up-right pov-right pov-down-right
         pov-down pov-down-left pov-left pov-up-left
         pov-neutral
-    } ;
+    } ; inline
 
 : button-value ( value -- f/(0,1] )
     IOHIDValueGetIntegerValue dup zero? [ drop f ] when ;

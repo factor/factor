@@ -36,7 +36,7 @@ TYPEDEF: void* LPDIENUMEFFECTSINFILECALLBACK
     dip alien-callback ; inline
 TYPEDEF: void* LPDIENUMDEVICEOBJECTSCALLBACKW
 : LPDIENUMDEVICEOBJECTSCALLBACKW
-    [ "BOOL" { "LPCDIDEVICEOBJECTINSTANCE" "LPVOID" } "stdcall" ]
+    [ "BOOL" { "LPCDIDEVICEOBJECTINSTANCEW" "LPVOID" } "stdcall" ]
     dip alien-callback ; inline
 
 TYPEDEF: DWORD D3DCOLOR
@@ -107,29 +107,35 @@ TYPEDEF: DICONFIGUREDEVICESPARAMSW* LPDICONFIGUREDEVICESPARAMSW
 TYPEDEF: DICONFIGUREDEVICESPARAMSW* LPDICONFIGUREDEVICESPARAMSW
 
 C-STRUCT: DIDEVCAPS
-    { "DWORD" "wSize" }
-    { "DWORD" "wFlags" }
-    { "DWORD" "wDevType" }
-    { "DWORD" "wAxes" }
-    { "DWORD" "wButtons" }
-    { "DWORD" "wPOVs" }
-    { "DWORD" "wFFSamplePeriod" }
-    { "DWORD" "wFFMinTimeResolution" }
-    { "DWORD" "wFirmwareRevision" }
-    { "DWORD" "wHardwareRevision" }
-    { "DWORD" "wFFDriverVersion" } ;
+    { "DWORD" "dwSize" }
+    { "DWORD" "dwFlags" }
+    { "DWORD" "dwDevType" }
+    { "DWORD" "dwAxes" }
+    { "DWORD" "dwButtons" }
+    { "DWORD" "dwPOVs" }
+    { "DWORD" "dwFFSamplePeriod" }
+    { "DWORD" "dwFFMinTimeResolution" }
+    { "DWORD" "dwFirmwareRevision" }
+    { "DWORD" "dwHardwareRevision" }
+    { "DWORD" "dwFFDriverVersion" } ;
 TYPEDEF: DIDEVCAPS* LPDIDEVCAPS
 TYPEDEF: DIDEVCAPS* LPCDIDEVCAPS
 C-STRUCT: DIDEVICEOBJECTINSTANCEW
-    { "DWORD"      "dwSize" }
-    { "GUID"       "guidInstance" }
-    { "GUID"       "guidProduct" }
-    { "DWORD"      "dwDevType" }
-    { "WCHAR[260]" "tszInstanceName" }
-    { "WCHAR[260]" "tszProductName" }
-    { "GUID"       "guidFFDriver" }
-    { "WORD"       "wUsagePage" }
-    { "WORD"       "wUsage" } ;
+    { "DWORD" "dwSize" }
+    { "GUID" "guidType" }
+    { "DWORD" "dwOfs" }
+    { "DWORD" "dwType" }
+    { "DWORD" "dwFlags" }
+    { "WCHAR[260]" "tszName" }
+    { "DWORD" "dwFFMaxForce" }
+    { "DWORD" "dwFFForceResolution" }
+    { "WORD" "wCollectionNumber" }
+    { "WORD" "wDesignatorIndex" }
+    { "WORD" "wUsagePage" }
+    { "WORD" "wUsage" }
+    { "DWORD" "dwDimension" }
+    { "WORD" "wExponent" }
+    { "WORD" "wReportId" } ;
 TYPEDEF: DIDEVICEOBJECTINSTANCEW* LPDIDEVICEOBJECTINSTANCEW
 TYPEDEF: DIDEVICEOBJECTINSTANCEW* LPCDIDEVICEOBJECTINSTANCEW
 C-STRUCT: DIDEVICEOBJECTDATA
@@ -661,3 +667,21 @@ FUNCTION: HRESULT DirectInput8Create ( HINSTANCE hinst, DWORD dwVersion, REFIID 
 : DIPROP_USERNAME            25 <alien> ; inline
 : DIPROP_TYPENAME            26 <alien> ; inline
 
+: GUID_XAxis          GUID: {A36D02E0-C9F3-11CF-BFC7-444553540000} ; inline
+: GUID_YAxis          GUID: {A36D02E1-C9F3-11CF-BFC7-444553540000} ; inline
+: GUID_ZAxis          GUID: {A36D02E2-C9F3-11CF-BFC7-444553540000} ; inline
+: GUID_RxAxis         GUID: {A36D02F4-C9F3-11CF-BFC7-444553540000} ; inline
+: GUID_RyAxis         GUID: {A36D02F5-C9F3-11CF-BFC7-444553540000} ; inline
+: GUID_RzAxis         GUID: {A36D02E3-C9F3-11CF-BFC7-444553540000} ; inline
+: GUID_Slider         GUID: {A36D02E4-C9F3-11CF-BFC7-444553540000} ; inline
+: GUID_Button         GUID: {A36D02F0-C9F3-11CF-BFC7-444553540000} ; inline
+: GUID_Key            GUID: {55728220-D33C-11CF-BFC7-444553540000} ; inline
+: GUID_POV            GUID: {A36D02F2-C9F3-11CF-BFC7-444553540000} ; inline
+: GUID_Unknown        GUID: {A36D02F3-C9F3-11CF-BFC7-444553540000} ; inline
+: GUID_SysMouse       GUID: {6F1D2B60-D5A0-11CF-BFC7-444553540000} ; inline
+: GUID_SysKeyboard    GUID: {6F1D2B61-D5A0-11CF-BFC7-444553540000} ; inline
+: GUID_Joystick       GUID: {6F1D2B70-D5A0-11CF-BFC7-444553540000} ; inline
+: GUID_SysMouseEm     GUID: {6F1D2B80-D5A0-11CF-BFC7-444553540000} ; inline
+: GUID_SysMouseEm2    GUID: {6F1D2B81-D5A0-11CF-BFC7-444553540000} ; inline
+: GUID_SysKeyboardEm  GUID: {6F1D2B82-D5A0-11CF-BFC7-444553540000} ; inline
+: GUID_SysKeyboardEm2 GUID: {6F1D2B83-D5A0-11CF-BFC7-444553540000} ; inline

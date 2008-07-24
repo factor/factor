@@ -2,13 +2,14 @@ USING: windows.dinput windows.dinput.constants game-input
 symbols alien.c-types windows.ole32 namespaces assocs kernel
 arrays hashtables windows.kernel32 windows.com windows.dinput
 shuffle windows.user32 windows.messages sequences combinators
-math.geometry.rect ui.windows accessors math windows
-alien.strings io.encodings.utf16 ;
+math.geometry.rect ui.windows accessors math windows alien
+alien.strings io.encodings.utf16 continuations byte-arrays ;
 IN: game-input.backend.dinput
 
 SINGLETON: dinput-game-input-backend
 
-SYMBOLS: +dinput+ +keyboard-device+ +controller-devices+
+SYMBOLS: +dinput+ +keyboard-device+
+    +controller-devices+ +controller-guids+
     +device-change-window+ +device-change-handle+ ;
 
 : create-dinput ( -- )
@@ -23,69 +24,104 @@ SYMBOLS: +dinput+ +keyboard-device+ +controller-devices+
     +dinput+ get swap f <void*>
     [ f IDirectInput8W::CreateDevice ole32-error ] keep *void* ;
 
-: set-coop-level ( device -- device )
-    dup +device-change-window+ get DISCL_BACKGROUND DISCL_NONEXCLUSIVE bitor
+: set-coop-level ( device -- )
+    +device-change-window+ get DISCL_BACKGROUND DISCL_NONEXCLUSIVE bitor
     IDirectInputDevice8W::SetCooperativeLevel ole32-error ;
 
-: configure-keyboard ( keyboard -- keyboard )
-    dup c_dfDIKeyboard_HID IDirectInputDevice8W::SetDataFormat
-    ole32-error set-coop-level ;
-: configure-controller ( controller -- controller )
-    dup c_dfDIJoystick2 IDirectInputDevice8W::SetDataFormat
-    ole32-error set-coop-level ;
+: set-data-format ( device format-symbol -- )
+    get IDirectInputDevice8W::SetDataFormat ole32-error ;
+
+: configure-keyboard ( keyboard -- )
+    [ c_dfDIKeyboard_HID set-data-format ] [ set-coop-level ] bi ;
+: configure-controller ( controller -- )
+    [ c_dfDIJoystick2 set-data-format ] [ set-coop-level ] bi ;
 
 : find-keyboard ( -- )
-    GUID_SysKeyboard get device-for-guid
-    configure-keyboard
-    +keyboard-device+ set-global ;
+    GUID_SysKeyboard device-for-guid
+    [ configure-keyboard ]
+    [ +keyboard-device+ set-global ] bi ;
 
 : device-info ( device -- DIDEVICEIMAGEINFOW )
     "DIDEVICEINSTANCEW" <c-object>
     "DIDEVICEINSTANCEW" heap-size over set-DIDEVICEINSTANCEW-dwSize
     [ IDirectInputDevice8W::GetDeviceInfo ole32-error ] keep ;
-
-: controller-device? ( device -- ? )
-    device-info
-    DIDEVICEINSTANCEW-dwDevType GET_DIDEVICE_TYPE
-    DI8DEVTYPE_KEYBOARD DI8DEVTYPE_MOUSE 2array member? not ;
-
-: device-attached? ( guid -- ? )
-    +dinput+ get swap IDirectInput8W::GetDeviceStatus
-    [ ole32-error ] [ S_OK = ] bi ;
+: device-caps ( device -- DIDEVCAPS )
+    "DIDEVCAPS" <c-object>
+    "DIDEVCAPS" heap-size over set-DIDEVCAPS-dwSize
+    [ IDirectInputDevice8W::GetCapabilities ole32-error ] keep ;
 
 : <guid> ( memory -- byte-array )
     "GUID" heap-size memory>byte-array ;
 
-: add-controller ( guid -- )
-    [ device-for-guid configure-controller ] [ <guid> ] bi
-    over controller-device?
-    [ +controller-devices+ get set-at ]
-    [ drop com-release ] if ;
+: device-guid ( device -- guid )
+    device-info DIDEVICEINSTANCEW-guidInstance <guid> ;
 
-: remove-controller ( guid -- )
-    <guid> +controller-devices+ get [ com-release f ] change-at ;
+: device-attached? ( device -- ? )
+    +dinput+ get swap device-guid
+    IDirectInput8W::GetDeviceStatus S_OK = ;
+
+: find-device-axes-callback ( -- alien )
+    [ ! ( lpddoi pvRef -- BOOL )
+        +controller-devices+ get at
+        swap DIDEVICEOBJECTINSTANCEW-guidType <guid> {
+            { [ dup GUID_XAxis = ] [ drop 0.0 >>x ] }
+            { [ dup GUID_YAxis = ] [ drop 0.0 >>y ] }
+            { [ dup GUID_ZAxis = ] [ drop 0.0 >>z ] }
+            { [ dup GUID_RxAxis = ] [ drop 0.0 >>rx ] }
+            { [ dup GUID_RyAxis = ] [ drop 0.0 >>ry ] }
+            { [ dup GUID_RzAxis = ] [ drop 0.0 >>rz ] }
+            { [ dup GUID_Slider = ] [ drop 0.0 >>slider ] }
+            [ drop ]
+        } cond drop
+        DIENUM_CONTINUE
+    ] LPDIENUMDEVICEOBJECTSCALLBACKW ;
+
+: find-device-axes ( device controller-state -- controller-state )
+    swap [ +controller-devices+ get set-at ] 2keep
+    find-device-axes-callback over DIDFT_AXIS
+    IDirectInputDevice8W::EnumObjects ole32-error ;
+
+: controller-state-template ( device -- controller-state )
+    controller-state new
+    over device-caps
+    [ DIDEVCAPS-dwButtons f <array> >>buttons ]
+    [ DIDEVCAPS-dwPOVs zero? f pov-neutral ? >>pov ] bi
+    find-device-axes ;
+
+: device-known? ( guid -- ? )
+    +controller-guids+ get key? ; inline
+
+: (add-controller) ( guid -- )
+    device-for-guid {
+        [ configure-controller ]
+        [ controller-state-template ]
+        [ dup device-guid +controller-guids+ get set-at ]
+        [ +controller-devices+ get set-at ]
+    } cleave ;
+
+: add-controller ( guid -- )
+    dup <guid> device-known? [ drop ] [ (add-controller) ] if ;
+
+: remove-controller ( device -- )
+    [ +controller-devices+ get delete-at ]
+    [ device-guid +controller-guids+ get delete-at ]
+    [ com-release ] tri ;
 
 : find-controller-callback ( -- alien )
-    [ ! ( lpddi pvRef -- ? )
+    [ ! ( lpddi pvRef -- BOOL )
         drop DIDEVICEINSTANCEW-guidInstance add-controller
         DIENUM_CONTINUE
     ] LPDIENUMDEVICESCALLBACKW ;
 
 : find-controllers ( -- )
-    4 <hashtable> +controller-devices+ set-global
     +dinput+ get DI8DEVCLASS_GAMECTRL find-controller-callback
     f DIEDFL_ATTACHEDONLY IDirectInput8W::EnumDevices ole32-error ;
 
-: find-device ( DEV_BROADCAST_DEVICEW -- guid/f )
-    +dinput+ get swap
-    [ DEV_BROADCAST_DEVICEW-dbcc_classguid ]
-    [ DEV_BROADCAST_DEVICEW-dbcc_name ] bi
-    f <void*>
-    [ IDirectInput8W::FindDevice ] keep *void*
-    swap succeeded? [ drop f ] unless ;
+: set-up-controllers ( -- )
+    4 <hashtable> +controller-devices+ set-global
+    4 <hashtable> +controller-guids+ set-global
+    find-controllers ;
 
-: find-and-add-device ( DEV_BROADCAST_DEVICEW -- )
-    find-device [ add-controller ] when* ;
 : find-and-remove-detached-devices ( -- )
     +controller-devices+ get [
         drop dup device-attached? [ drop ] [ remove-controller ] if
@@ -95,15 +131,15 @@ SYMBOLS: +dinput+ +keyboard-device+ +controller-devices+
     DEV_BROADCAST_HDR-dbch_devicetype DBT_DEVTYP_DEVICEINTERFACE = ;
 
 : device-arrived ( dbt-broadcast-hdr -- )
-    dup device-interface? [ find-and-add-device ] [ drop ] if ;
+    device-interface? [ find-controllers ] when ;
 
 : device-removed ( dbt-broadcast-hdr -- )
     device-interface? [ find-and-remove-detached-devices ] when ;
 
 : handle-wm-devicechange ( hWnd uMsg wParam lParam -- )
     [ 2drop ] 2dip swap {
-        { [ dup DBT_DEVICEARRIVAL = ]         [ drop device-arrived ] }
-        { [ dup DBT_DEVICEREMOVECOMPLETE = ]  [ drop device-removed ] }
+        { [ dup DBT_DEVICEARRIVAL = ]         [ drop <alien> device-arrived ] }
+        { [ dup DBT_DEVICEREMOVECOMPLETE = ]  [ drop <alien> device-removed ] }
         [ 2drop ]
     } cond ;
 
@@ -144,8 +180,9 @@ TUPLE: window-rect < rect window-loc ;
 
 : release-controllers ( -- )
     +controller-devices+ global [
-        [ nip com-release ] assoc-each f
-    ] change-at ;
+        [ drop com-release ] assoc-each f
+    ] change-at
+    f +controller-guids+ set-global ;
 
 : release-keyboard ( -- )
     +keyboard-device+ global
@@ -155,7 +192,7 @@ M: dinput-game-input-backend open-game-input
     create-dinput
     create-device-change-window
     find-keyboard
-    find-controllers
+    set-up-controllers
     add-wm-devicechange ;
 
 M: dinput-game-input-backend close-game-input
@@ -167,30 +204,41 @@ M: dinput-game-input-backend close-game-input
 
 M: dinput-game-input-backend get-controllers
     +controller-devices+ get
-    [ nip controller boa ] { } assoc>map ;
+    [ drop controller boa ] { } assoc>map ;
 
 M: dinput-game-input-backend product-string
     handle>> device-info DIDEVICEINSTANCEW-tszProductName
-    utf16le alien>string ;
+    utf16n alien>string ;
 
 M: dinput-game-input-backend product-id
     handle>> device-info DIDEVICEINSTANCEW-guidProduct <guid> ;
 M: dinput-game-input-backend instance-id
-    handle>> device-info DIDEVICEINSTANCEW-guidInstance <guid> ;
+    handle>> device-guid ;
 
 : with-acquisition ( device quot -- )
     over IDirectInputDevice8W::Acquire ole32-error
     over [ IDirectInputDevice8W::Unacquire ole32-error ] curry
     [ ] cleanup ; inline
 
+: pov-values
+    {
+        pov-up pov-up-right pov-right pov-down-right
+        pov-down pov-down-left pov-left pov-up-left
+    } ; inline
+
+: >keys ( byte-array -- array )
+    [ HEX: 80 bitand c-bool> ] { } map-as ;
+
 : >axis ( long -- float )
-    ;
+    32767 - 32767.0 /f ;
 : >slider ( long -- float )
-    ;
-: >pov ( long -- float )
-    ;
+    65535.0 /f ;
+: >pov ( long -- symbol )
+    dup HEX: FFFF and HEX: FFFF =
+    [ drop pov-neutral ]
+    [ 4500 + 9000 /i pov-values nth ] if ;
 : >buttons ( alien -- array )
-    128 memory>byte-array [ HEX: 80 bitand c-bool> ] { } map-as ;
+    128 memory>byte-array >keys ;
 
 : <controller-state> ( DIJOYSTATE2 -- controller-state )
     ! XXX only transfer elements that are present on device
@@ -207,9 +255,10 @@ M: dinput-game-input-backend instance-id
     } cleave controller-state boa ;
 
 : <keyboard-state> ( byte-array -- keyboard-state )
-    [ c-bool> ] { } map-as keyboard-state boa ;
+    >keys keyboard-state boa ;
 
 : get-device-state ( device state-size -- byte-array )
+    [ dup IDirectInputDevice8W::Poll ole32-error ] dip
     dup <byte-array>
     [ IDirectInputDevice8W::GetDeviceState ole32-error ] keep ;
 
@@ -225,3 +274,5 @@ M: dinput-game-input-backend read-keyboard
     +keyboard-device+ get [ 
         256 get-device-state
     ] with-acquisition <keyboard-state> ;
+
+dinput-game-input-backend game-input-backend set-global
