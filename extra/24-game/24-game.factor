@@ -2,7 +2,7 @@
 ! 24, the Factor game!
 
 USING: kernel random namespaces shuffle sequences
-parser io math prettyprint combinators
+parser io math prettyprint combinators continuations
 vectors words quotations accessors math.parser
 backtrack math.ranges locals fry memoize macros assocs ;
 
