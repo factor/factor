@@ -53,6 +53,9 @@ M: track pref-dim* ( gadget -- dim )
 : track-add* ( track gadget constraint -- track )
   pick sizes>> push add-gadget ;
 
+: track-add ( track gadget constraint -- track )
+  pick sizes>> push add-gadget ;
+
 : track-remove ( track gadget -- track )
   dupd dup
     [
