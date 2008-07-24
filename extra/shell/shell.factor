@@ -50,7 +50,6 @@ DEFER: expansion
 METHOD: expand { back-quoted-expr }
   expr>>
   expr
-  ast>>
   command>>
   expansion
   utf8 <process-stream>
@@ -122,7 +121,7 @@ DEFER: shell
     { [ dup f = ]      [ drop ] }
     { [ dup "exit" = ] [ drop ] }
     { [ dup "" = ]     [ drop shell ] }
-    { [ dup expr ]     [ expr ast>> chant shell ] }
+    { [ dup expr ]     [ expr chant shell ] }
     { [ t ]            [ drop "ix: ignoring input" print shell ] }
   }
     cond ;
