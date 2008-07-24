@@ -1,7 +1,7 @@
 ! Copyright (c) 2007 Aaron Schaefer
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators io kernel math math.functions math.parser
-    math.statistics namespaces sequences tools.time ;
+    math.statistics namespaces sequences tools.time continuations ;
 IN: project-euler.ave-time
 
 : collect-benchmarks ( quot n -- seq )

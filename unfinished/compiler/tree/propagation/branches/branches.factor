@@ -1,8 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry kernel sequences assocs accessors namespaces
-math.intervals arrays classes.algebra
+math.intervals arrays classes.algebra locals
 compiler.tree
+compiler.tree.def-use
+compiler.tree.propagation.info
+compiler.tree.propagation.nodes
 compiler.tree.propagation.simple
 compiler.tree.propagation.constraints ;
 IN: compiler.tree.propagation.branches
@@ -11,60 +14,63 @@ IN: compiler.tree.propagation.branches
 GENERIC: child-constraints ( node -- seq )
 
 M: #if child-constraints
-    [
-        \ f class-not 0 `input class,
-        f 0 `input literal,
-    ] make-constraints ;
+    in-d>> first [ =t ] [ =f ] bi 2array ;
 
 M: #dispatch child-constraints
-    dup [
-        children>> length [ 0 `input literal, ] each
-    ] make-constraints ;
+    children>> length f <repetition> ;
 
-DEFER: (propagate)
+GENERIC: live-children ( #branch -- children )
+
+M: #if live-children
+    [ children>> ] [ in-d>> first value-info possible-boolean-values ] bi
+    [ t swap memq? [ first ] [ drop f ] if ]
+    [ f swap memq? [ second ] [ drop f ] if ]
+    2bi 2array ;
+
+M: #dispatch live-children
+    [ children>> ] [ in-d>> first value-info interval>> ] bi
+    '[ , interval-contains? [ drop f ] unless ] map-index ;
 
 : infer-children ( node -- assocs )
-    [ children>> ] [ child-constraints ] bi [
+    [ live-children ] [ child-constraints ] bi [
         [
-            value-classes [ clone ] change
-            value-literals [ clone ] change
-            value-intervals [ clone ] change
-            constraints [ clone ] change
-            apply-constraint
-            (propagate)
+            over [
+                value-infos [ clone ] change
+                constraints [ clone ] change
+                assume
+                first>> (propagate)
+            ] [
+                2drop
+                value-infos off
+                constraints off
+            ] if
         ] H{ } make-assoc
     ] 2map ;
 
-: merge-classes ( inputs outputs results -- )
-    '[
-        , null
-        [ [ value-class ] bind class-or ] 2reduce
-        _ set-value-class
-    ] 2each ;
+: (merge-value-infos) ( inputs results -- infos )
+    '[ , [ [ value-info ] bind ] 2map value-infos-union ] map ;
 
-: merge-intervals ( inputs outputs results -- )
-    '[
-        , [ [ value-interval ] bind ] 2map
-        dup first [ interval-union ] reduce
-        _ set-value-interval
-    ] 2each ;
+: merge-value-infos ( results inputs outputs -- )
+    [ swap (merge-value-infos) ] dip set-value-infos ;
 
-: merge-literals ( inputs outputs results -- )
-    '[
-        , [ [ value-literal 2array ] bind ] 2map
-        dup all-eq? [ first first2 ] [ drop f f ] if
-        _ swap [ set-value-literal ] [ 2drop ] if
-    ] 2each ;
+: propagate-branch-phi ( results #phi -- )
+    [ [ phi-in-d>> ] [ out-d>> ] bi merge-value-infos ]
+    [ [ phi-in-r>> ] [ out-r>> ] bi merge-value-infos ]
+    2bi ;
 
-: merge-stuff ( inputs outputs results -- )
-    [ merge-classes ] [ merge-intervals ] [ merge-literals ] 3tri ;
+:: branch-phi-constraints ( x #phi -- )
+    #phi [ out-d>> ] [ phi-in-d>> ] bi [
+        first2 2dup and [ USE: prettyprint
+            [ [ =t x =t /\ ] [ =t x =f /\ ] bi* \/ swap t--> dup  . assume ]
+            [ [ =f x =t /\ ] [ =f x =f /\ ] bi* \/ swap f--> dup  . assume ]
+            3bi
+        ] [ 3drop ] if
+    ] 2each ;
 
 : merge-children ( results node -- )
-    successor>> dup #phi? [
-        [ [ phi-in-d>> ] [ out-d>> ] bi rot merge-stuff ]
-        [ [ phi-in-r>> ] [ out-r>> ] bi rot merge-stuff ]
-        2bi
-    ] [ 2drop ] if ;
+    [ successor>> propagate-branch-phi ]
+    [ [ in-d>> first ] [ successor>> ] bi 2drop ] ! branch-phi-constraints ]
+    bi ;
 
 M: #branch propagate-around
     [ infer-children ] [ merge-children ] [ annotate-node ] tri ;

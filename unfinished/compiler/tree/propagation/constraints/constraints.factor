@@ -2,145 +2,123 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs math math.intervals kernel accessors
 sequences namespaces disjoint-sets classes classes.algebra
-combinators words compiler.tree ;
+combinators words
+compiler.tree compiler.tree.propagation.info
+compiler.tree.copy-equiv ;
 IN: compiler.tree.propagation.constraints
 
 ! A constraint is a statement about a value.
 
-! We need a notion of equality which doesn't recurse so cannot
-! infinite loop on circular data
-GENERIC: eql? ( obj1 obj2 -- ? )
-M: object eql? eq? ;
-M: number eql? number= ;
-
-! Maps constraints to constraints
+! Maps constraints to constraints ("A implies B")
 SYMBOL: constraints
 
-TUPLE: literal-constraint literal value ;
+GENERIC: assume ( constraint -- )
+GENERIC: satisfied? ( constraint -- ? )
+GENERIC: satisfiable? ( constraint -- ? )
 
-C: <literal-constraint> literal-constraint
+! Boolean constraints
+TUPLE: true-constraint value ;
 
-M: literal-constraint equal?
-    over literal-constraint? [
-        [ [ literal>> ] bi@ eql? ]
-        [ [ value>>   ] bi@ =    ]
-        2bi and
-    ] [ 2drop f ] if ;
+: =t ( value -- constriant ) resolve-copy true-constraint boa ;
 
-TUPLE: class-constraint class value ;
+M: true-constraint assume
+    [ constraints get at [ assume ] when* ]
+    [ \ f class-not <class-info> swap value>> refine-value-info ]
+    bi ;
 
-C: <class-constraint> class-constraint
+M: true-constraint satisfied?
+    value>> value-info class>> \ f class-not class<= ;
 
-TUPLE: interval-constraint interval value ;
+M: true-constraint satisfiable?
+    value>> value-info class>> \ f class-not classes-intersect? ;
 
-C: <interval-constraint> interval-constraint
+TUPLE: false-constraint value ;
 
-GENERIC: apply-constraint ( constraint -- )
-GENERIC: constraint-satisfied? ( constraint -- ? )
+: =f ( value -- constriant ) resolve-copy false-constraint boa ;
 
-: `input ( n -- value ) node get in-d>> nth ;
-: `output ( n -- value ) node get out-d>> nth ;
-: class, ( class value -- ) <class-constraint> , ;
-: literal, ( literal value -- ) <literal-constraint> , ;
-: interval, ( interval value -- ) <interval-constraint> , ;
+M: false-constraint assume
+    [ constraints get at [ assume ] when* ]
+    [ \ f <class-info> swap value>> refine-value-info ]
+    bi ;
 
-M: f apply-constraint drop ;
+M: false-constraint satisfied?
+    value>> value-info class>> \ f class<= ;
 
-: make-constraints ( node quot -- constraint )
-    [ swap node set call ] { } make ; inline
+M: false-constraint satisfiable?
+    value>> value-info class>> \ f classes-intersect? ;
 
-: set-constraints ( node quot -- )
-    make-constraints
-    unclip [ 2array ] reduce
-    apply-constraint ; inline
+! Class constraints
+TUPLE: class-constraint value class ;
 
-: assume ( constraint -- )
-    constraints get at [ apply-constraint ] when* ;
+: is-instance-of ( value class -- constraint )
+    [ resolve-copy ] dip class-constraint boa ;
 
-! Disjoint set of copy equivalence
-SYMBOL: copies
+M: class-constraint assume
+    [ class>> <class-info> ] [ value>> ] bi refine-value-info ;
 
-: is-copy-of ( val copy -- ) copies get equate ;
+! Interval constraints
+TUPLE: interval-constraint value interval ;
 
-: are-copies-of ( vals copies -- ) [ is-copy-of ] 2each ;
+: is-in-interval ( value interval -- constraint )
+    [ resolve-copy ] dip interval-constraint boa ;
 
-: resolve-copy ( copy -- val ) copies get representative ;
+M: interval-constraint assume
+    [ interval>> <interval-info> ] [ value>> ] bi refine-value-info ;
 
-: introduce-value ( val -- ) copies get add-atom ;
+! Literal constraints
+TUPLE: literal-constraint value literal ;
 
-! Current value --> literal mapping
-SYMBOL: value-literals
+: is-equal-to ( value literal -- constraint )
+    [ resolve-copy ] dip literal-constraint boa ;
 
-! Current value --> interval mapping
-SYMBOL: value-intervals
+M: literal-constraint assume
+    [ literal>> <literal-info> ] [ value>> ] bi refine-value-info ;
 
-! Current value --> class mapping
-SYMBOL: value-classes
+! Implication constraints
+TUPLE: implication p q ;
 
-: value-interval ( value -- interval/f )
-    resolve-copy value-intervals get at ;
+C: --> implication
 
-: set-value-interval ( interval value -- )
-    resolve-copy value-intervals get set-at ;
-
-: intersect-value-interval ( interval value -- )
-    resolve-copy value-intervals get [ interval-intersect ] change-at ;
-
-M: interval-constraint apply-constraint
-    [ interval>> ] [ value>> ] bi intersect-value-interval ;
-
-: set-class-interval ( class value -- )
-    over class? [
-        [ "interval" word-prop ] dip over
-        [ resolve-copy set-value-interval ] [ 2drop ] if
-    ] [ 2drop ] if ;
-
-: value-class ( value -- class )
-    resolve-copy value-classes get at null or ;
-
-: set-value-class ( class value -- )
-    resolve-copy over [
-        dup value-intervals get at [
-            2dup set-class-interval
-        ] unless
-        2dup <class-constraint> assume
-    ] when
-    value-classes get set-at ;
-
-: intersect-value-class ( class value -- )
-    resolve-copy value-classes get [ class-and ] change-at ;
-
-M: class-constraint apply-constraint
-    [ class>> ] [ value>> ] bi intersect-value-class ;
-
-: literal-interval ( value -- interval/f )
-    dup real? [ [a,a] ] [ drop f ] if ;
-
-: value-literal ( value -- obj ? )
-    resolve-copy value-literals get at* ;
-
-: set-value-literal ( literal value -- )
-    resolve-copy {
-        [ [ class ] dip set-value-class ]
-        [ [ literal-interval ] dip set-value-interval ]
-        [ <literal-constraint> assume ]
-        [ value-literals get set-at ]
-    } 2cleave ;
-
-M: literal-constraint apply-constraint
-    [ literal>> ] [ value>> ] bi set-value-literal ;
-
-M: literal-constraint constraint-satisfied?
-    dup value>> value-literal
-    [ swap literal>> eql? ] [ 2drop f ] if ;
-
-M: class-constraint constraint-satisfied?
-    [ value>> value-class ] [ class>> ] bi class<= ;
-
-M: pair apply-constraint
-    first2
+M: implication assume
+    [ q>> ] [ p>> ] bi
     [ constraints get set-at ]
-    [ constraint-satisfied? [ apply-constraint ] [ drop ] if ] 2bi ;
+    [ satisfied? [ assume ] [ drop ] if ] 2bi ;
 
-M: pair constraint-satisfied?
-    first constraint-satisfied? ;
+M: implication satisfiable?
+    [ q>> satisfiable? ] [ p>> satisfiable? not ] bi or ;
+
+! Conjunction constraints
+TUPLE: conjunction p q ;
+
+C: /\ conjunction
+
+M: conjunction assume [ p>> assume ] [ q>> assume ] bi ;
+
+M: conjunction satisfiable?
+    [ p>> satisfiable? ] [ q>> satisfiable? ] bi and ;
+
+! Disjunction constraints
+TUPLE: disjunction p q ;
+
+C: \/ disjunction
+
+M: disjunction assume
+    {
+        { [ dup p>> satisfiable? not ] [ q>> assume ] }
+        { [ dup q>> satisfiable? not ] [ p>> assume ] }
+        [ drop ]
+    } cond ;
+
+M: disjunction satisfiable?
+    [ p>> satisfiable? ] [ q>> satisfiable? ] bi or ;
+
+! No-op
+M: f assume drop ;
+
+! Utilities
+: t--> ( constraint boolean-value -- constraint' ) =t swap --> ;
+
+: f--> ( constraint boolean-value -- constraint' ) =f swap --> ;
+
+: <conditional> ( true-constr false-constr boolean-value -- constraint )
+    tuck [ t--> ] [ f--> ] 2bi* /\ ;

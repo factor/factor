@@ -25,8 +25,6 @@ $nl
 $nl
 "A combinator which can help with implementing methods on " { $link hashcode* } ":"
 { $subsection recursive-hashcode }
-"An oddball combinator:"
-{ $subsection with-datastack }
 { $subsection "combinators-quot" }
 { $see-also "quotations" "dataflow" } ;
 
@@ -115,13 +113,6 @@ HELP: case
 HELP: no-case
 { $description "Throws a " { $link no-case } " error." }
 { $error-description "Thrown by " { $link case } " if the object at the top of the stack does not match any case, and no default case is given." } ;
-
-HELP: with-datastack
-{ $values { "stack" sequence } { "quot" quotation } { "newstack" sequence } }
-{ $description "Executes the quotation with the given data stack contents, and outputs the new data stack after the word returns. The input sequence is not modified. Does not affect the data stack in surrounding code, other than consuming the two inputs and pushing the output." }
-{ $examples
-    { $example "USING: combinators math prettyprint ;" "{ 3 7 } [ + ] with-datastack ." "{ 10 }" }
-} ;
 
 HELP: recursive-hashcode
 { $values { "n" integer } { "obj" object } { "quot" "a quotation with stack effect " { $snippet "( n obj -- code )" } } { "code" integer } }
