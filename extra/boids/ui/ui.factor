@@ -143,9 +143,9 @@ VARS: population-label cohesion-label alignment-label separation-label ;
 
   } [ call ] map [ add-gadget ] each
     1 over set-pack-fill
-    @top grid-add*
+    @top grid-add
 
-  slate> @center grid-add*
+  slate> @center grid-add
 
   <handler> 
 
