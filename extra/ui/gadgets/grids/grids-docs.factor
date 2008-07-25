@@ -7,7 +7,7 @@ ARTICLE: "ui-grid-layout" "Grid layouts"
 "Creating grids from a fixed set of gadgets:"
 { $subsection <grid> }
 "Managing chidren:"
-{ $subsection grid-add* }
+{ $subsection grid-add }
 { $subsection grid-remove }
 { $subsection grid-child } ;
 
@@ -18,7 +18,7 @@ $nl
 $nl
 "The " { $link grid-fill? } " slot stores a boolean, indicating if grid cells should assume their preferred size, or if they should fill the dimensions of the cell. The default is " { $link t } "."
 $nl
-"Grids are created by calling " { $link <grid> } " and children are managed with " { $link grid-add* } " and " { $link grid-remove } "."
+"Grids are created by calling " { $link <grid> } " and children are managed with " { $link grid-add } " and " { $link grid-remove } "."
 $nl
 "The " { $link add-gadget } ", " { $link unparent } " and " { $link clear-gadget } " words should not be used to manage child gadgets of grids." } ;
 
@@ -31,7 +31,7 @@ HELP: grid-child
 { $description "Outputs the child gadget at the " { $snippet "i" } "," { $snippet "j" } "th position of the grid." }
 { $errors "Throws an error if the indices are out of bounds." } ;
 
-HELP: grid-add*
+HELP: grid-add
 { $values { "gadget" gadget } { "grid" grid } { "i" "non-negative integer" } { "j" "non-negative integer" } }
 { $description "Adds a child gadget at the specified location." }
 { $side-effects "grid" } ;
