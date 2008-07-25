@@ -37,11 +37,11 @@ M: color-preview model-changed
   <frame>
     <color-sliders>
       swap dup
-      [                               @top    grid-add* ]
-      [ <color-model> <color-preview> @center grid-add* ]
+      [                               @top    grid-add ]
+      [ <color-model> <color-preview> @center grid-add ]
       [
         [ [ truncate number>string ] map " " join ] <filter> <label-control>
-        @bottom grid-add*
+        @bottom grid-add
       ]
       tri* ;
 

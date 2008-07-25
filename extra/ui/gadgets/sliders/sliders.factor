@@ -130,7 +130,7 @@ M: elevator layout*
   tuck <elevator> >>elevator
   swap <thumb>    >>thumb
   dup elevator>> over thumb>> add-gadget
-  @center grid-add* ;
+  @center grid-add ;
 
 : <left-button>  ( -- button ) { 0 1 } arrow-left -1 <slide-button> ;
 : <right-button> ( -- button ) { 0 1 } arrow-right 1 <slide-button> ;
@@ -145,15 +145,15 @@ M: elevator layout*
 
 : <x-slider> ( range -- slider )
   { 1 0 } <slider>
-    <left-button> @left grid-add*
+    <left-button> @left grid-add
     { 0 1 } elevator,
-    <right-button> @right grid-add* ;
+    <right-button> @right grid-add ;
 
 : <y-slider> ( range -- slider )
   { 0 1 } <slider>
-    <up-button> @top grid-add*
+    <up-button> @top grid-add
     { 1 0 } elevator,
-    <down-button> @bottom grid-add* ;
+    <down-button> @bottom grid-add ;
 
 M: slider pref-dim*
     dup call-next-method

@@ -7,7 +7,7 @@ ARTICLE: "ui-frame-layout" "Frame layouts"
 { $subsection frame }
 "Creating empty frames:"
 { $subsection <frame> }
-"A set of mnemonic words for the positions on a frame's 3x3 grid; these words push values which may be passed to " { $link grid-add* } ":"
+"A set of mnemonic words for the positions on a frame's 3x3 grid; these words push values which may be passed to " { $link grid-add } ":"
 { $subsection @center }
 { $subsection @left }
 { $subsection @right }
@@ -20,7 +20,7 @@ ARTICLE: "ui-frame-layout" "Frame layouts"
 
 : $ui-frame-constant ( element -- )
     drop
-    { $description "Symbolic constant for a common input to " { $link grid-add* } "." } print-element ;
+    { $description "Symbolic constant for a common input to " { $link grid-add } "." } print-element ;
 
 HELP: @center $ui-frame-constant ;
 HELP: @left $ui-frame-constant ;
@@ -35,7 +35,7 @@ HELP: @bottom-right $ui-frame-constant ;
 HELP: frame
 { $class-description "A frame is a gadget which lays out its children in a 3x3 grid. If the frame is enlarged past its preferred size, the center gadget fills up available room."
 $nl
-"Frames are constructed by calling " { $link <frame> } " and since they inherit from " { $link grid } ", children can be managed with " { $link grid-add* } " and " { $link grid-remove } "." } ;
+"Frames are constructed by calling " { $link <frame> } " and since they inherit from " { $link grid } ", children can be managed with " { $link grid-add } " and " { $link grid-remove } "." } ;
 
 HELP: <frame>
 { $values { "frame" frame } }

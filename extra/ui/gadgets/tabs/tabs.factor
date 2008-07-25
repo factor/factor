@@ -15,8 +15,8 @@ DEFER: (del-page)
 :: add-toggle ( model n name toggler -- )
   <frame>
     n name toggler parent>> '[ , , , (del-page) ] "X" swap <bevel-button>
-      @right grid-add*
-    n model name <toggle-button> @center grid-add*
+      @right grid-add
+    n model name <toggle-button> @center grid-add
   toggler swap add-gadget drop ;
 
 : redo-toggler ( tabbed -- )
@@ -52,10 +52,10 @@ DEFER: (del-page)
   tabbed new-frame
     0 <model> >>model
     <pile> 1 >>fill >>toggler
-    dup toggler>> @left grid-add*
+    dup toggler>> @left grid-add
     swap
       [ keys >vector >>names ]
-      [ values over model>> <book> >>content dup content>> @center grid-add* ]
+      [ values over model>> <book> >>content dup content>> @center grid-add ]
     bi
     dup redo-toggler ;
     
