@@ -100,72 +100,68 @@ VARS: population-label cohesion-label alignment-label separation-label ;
 : boids-window* ( -- )
   init-variables init-world-size init-boids loop on
 
-  C[ display ] <slate> >slate
-    t                      slate> set-gadget-clipped?
-    { 600 400 }            slate> set-slate-pdim
-    C[ [ run ] in-thread ] slate> set-slate-graft
-    C[ loop off ]          slate> set-slate-ungraft
-
   "" <label> reverse-video-theme >population-label update-population-label
-
   "" <label> reverse-video-theme >cohesion-label   update-cohesion-label
   "" <label> reverse-video-theme >alignment-label  update-alignment-label
   "" <label> reverse-video-theme >separation-label update-separation-label
 
   <frame>
 
-  <shelf>
+    <shelf>
 
-  {
-    [ "ESC - Pause" [ drop toggle-loop ] button* ]
+       1 >>fill
 
-    [ "1 - Randomize" [ drop randomize ] button* ]
+      "ESC - Pause" [ drop toggle-loop ] button* add-gadget
+    
+      "1 - Randomize" [ drop randomize ] button* add-gadget
+    
+      <pile> 1 over set-pack-fill
+        population-label> add-gadget
+        "3 - Add 10" [ drop add-10-boids ] button* add-gadget
+        "2 - Sub 10" [ drop sub-10-boids ] button* add-gadget
+      add-gadget
+    
+      <pile> 1 over set-pack-fill
+        cohesion-label> add-gadget
+        "q - +0.1" [ drop inc-cohesion-weight ] button* add-gadget
+        "a - -0.1" [ drop dec-cohesion-weight ] button* add-gadget
+      add-gadget
 
-    [ <pile> 1 over set-pack-fill
-      population-label> add-gadget
-      "3 - Add 10" [ drop add-10-boids ] button* add-gadget
-      "2 - Sub 10" [ drop sub-10-boids ] button* add-gadget ]
+      <pile> 1 over set-pack-fill
+        alignment-label> add-gadget
+        "w - +0.1" [ drop inc-alignment-weight ] button* add-gadget
+        "s - -0.1" [ drop dec-alignment-weight ] button* add-gadget
+      add-gadget
 
-    [ <pile> 1 over set-pack-fill
-      cohesion-label> add-gadget
-      "q - +0.1" [ drop inc-cohesion-weight ] button* add-gadget
-      "a - -0.1" [ drop dec-cohesion-weight ] button* add-gadget ]
+      <pile> 1 over set-pack-fill
+        separation-label> add-gadget
+        "e - +0.1" [ drop inc-separation-weight ] button* add-gadget
+        "d - -0.1" [ drop dec-separation-weight ] button* add-gadget
+      add-gadget
 
-    [ <pile> 1 over set-pack-fill
-      alignment-label> add-gadget
-      "w - +0.1" [ drop inc-alignment-weight ] button* add-gadget
-      "s - -0.1" [ drop dec-alignment-weight ] button* add-gadget ]
-
-    [ <pile> 1 over set-pack-fill
-      separation-label> add-gadget
-      "e - +0.1" [ drop inc-separation-weight ] button* add-gadget
-      "d - -0.1" [ drop dec-separation-weight ] button* add-gadget ]
-
-  } [ call ] map [ add-gadget ] each
-    1 over set-pack-fill
     @top grid-add
 
-  slate> @center grid-add
+    C[ display ] <slate>
+      dup                    >slate
+      t                      >>clipped?
+      { 600 400 }            >>pdim
+      C[ [ run ] in-thread ] >>graft
+      C[ loop off ]          >>ungraft
+    @center grid-add
 
   <handler> 
-
-  H{ } clone
-    T{ key-down f f "1" } C[ drop randomize    ] is
-    T{ key-down f f "2" } C[ drop sub-10-boids ] is
-    T{ key-down f f "3" } C[ drop add-10-boids ] is
-
-    T{ key-down f f "q" } C[ drop inc-cohesion-weight ] is
-    T{ key-down f f "a" } C[ drop dec-cohesion-weight ] is
-
-    T{ key-down f f "w" } C[ drop inc-alignment-weight ] is
-    T{ key-down f f "s" } C[ drop dec-alignment-weight ] is
-
-    T{ key-down f f "e" } C[ drop inc-separation-weight ] is
-    T{ key-down f f "d" } C[ drop dec-separation-weight ] is
-
-    T{ key-down f f "ESC" } C[ drop toggle-loop ] is
-
-  >>table
+    H{ } clone
+      T{ key-down f f "1"   } C[ drop randomize             ] is
+      T{ key-down f f "2"   } C[ drop sub-10-boids          ] is
+      T{ key-down f f "3"   } C[ drop add-10-boids          ] is
+      T{ key-down f f "q"   } C[ drop inc-cohesion-weight   ] is
+      T{ key-down f f "a"   } C[ drop dec-cohesion-weight   ] is
+      T{ key-down f f "w"   } C[ drop inc-alignment-weight  ] is
+      T{ key-down f f "s"   } C[ drop dec-alignment-weight  ] is
+      T{ key-down f f "e"   } C[ drop inc-separation-weight ] is
+      T{ key-down f f "d"   } C[ drop dec-separation-weight ] is
+      T{ key-down f f "ESC" } C[ drop toggle-loop           ] is
+    >>table
 
   "Boids" open-window ;
 
