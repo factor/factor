@@ -62,7 +62,7 @@ M: gadget tool-scroller drop f ;
 : show-popup ( gadget workspace -- )
   dup hide-popup
   over >>popup
-  over f track-add* drop
+  over f track-add drop
   request-focus ;
 
 : show-titled-popup ( workspace gadget title -- )

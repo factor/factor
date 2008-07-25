@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry accessors kernel sequences assocs words namespaces
-classes.algebra combinators classes continuations
+USING: fry accessors kernel sequences sequences.private assocs
+words namespaces classes.algebra combinators classes
+continuations arrays byte-arrays strings
 compiler.tree
 compiler.tree.def-use
 compiler.tree.propagation.info
@@ -72,9 +73,29 @@ M: #declare propagate-before
         out-d>> length object <class-info> <repetition>
     ] ?if ;
 
+UNION: fixed-length-sequence array byte-array string ;
+
+: sequence-constructor? ( node -- ? )
+    word>> { <array> <byte-array> <string> } memq? ;
+
+: propagate-sequence-constructor ( node -- infos )
+    [ default-output-value-infos first ]
+    [ in-d>> first <sequence-info> ]
+    bi value-info-intersect 1array ;
+
+: length-accessor? ( node -- ? )
+    dup in-d>> first fixed-length-sequence value-is?
+    [ word>> \ length eq? ] [ drop f ] if ;
+
+: propagate-length ( node -- infos )
+    in-d>> first value-info length>>
+    [ array-capacity <class-info> ] unless* 1array ;
+
 : output-value-infos ( node -- infos )
     {
         { [ dup foldable-call? ] [ fold-call ] }
+        { [ dup sequence-constructor? ] [ propagate-sequence-constructor ] }
+        { [ dup length-accessor? ] [ propagate-length ] }
         { [ dup word>> +outputs+ word-prop ] [ call-outputs-quot ] }
         [ default-output-value-infos ]
     } cond ;
