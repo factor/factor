@@ -3,8 +3,8 @@
 USING: parser layouts system kernel ;
 IN: bootstrap.ppc
 
-: c-area-size 10 bootstrap-cells ;
-: lr-save bootstrap-cell ;
+: c-area-size ( -- n ) 10 bootstrap-cells ;
+: lr-save ( -- n ) bootstrap-cell ;
 
 << "resource:core/cpu/ppc/bootstrap.factor" parse-file parsed >>
 call

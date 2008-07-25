@@ -14,13 +14,13 @@ big-endian on
 : ds-reg 14 ;
 : rs-reg 15 ;
 
-: factor-area-size 4 bootstrap-cells ;
+: factor-area-size ( -- n ) 4 bootstrap-cells ;
 
-: stack-frame
+: stack-frame ( -- n )
     factor-area-size c-area-size + 4 bootstrap-cells align ;
 
-: next-save stack-frame bootstrap-cell - ;
-: xt-save stack-frame 2 bootstrap-cells - ;
+: next-save ( -- n ) stack-frame bootstrap-cell - ;
+: xt-save ( -- n ) stack-frame 2 bootstrap-cells - ;
 
 [
     0 6 LOAD32
