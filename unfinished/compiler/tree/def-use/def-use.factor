@@ -28,6 +28,8 @@ TUPLE: definition value node uses ;
 
 GENERIC: node-uses-values ( node -- values )
 
+M: #declare node-uses-values declaration>> keys ;
+
 M: #phi node-uses-values
     [ phi-in-d>> concat ] [ phi-in-r>> concat ] bi
     append sift prune ;
@@ -41,6 +43,8 @@ GENERIC: node-defs-values ( node -- values )
 M: #introduce node-defs-values values>> ;
 
 M: #>r node-defs-values out-r>> ;
+
+M: #phi node-defs-values [ out-d>> ] [ out-r>> ] bi append ;
 
 M: node node-defs-values out-d>> ;
 

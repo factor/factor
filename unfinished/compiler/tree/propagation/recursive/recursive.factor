@@ -8,6 +8,12 @@ compiler.tree.propagation.simple
 compiler.tree.propagation.branches ;
 IN: compiler.tree.propagation.recursive
 
+! What if we reach a fixed point for the phi but not for the
+! #call-label output?
+
+! We need to compute scalar evolution so that sccp doesn't
+! evaluate loops
+
 : (merge-value-infos) ( inputs -- infos )
     [ [ value-info ] map value-infos-union ] map ;
 
@@ -22,11 +28,9 @@ IN: compiler.tree.propagation.recursive
 
 M: #recursive propagate-around ( #recursive -- )
     dup
-    [ children>> (propagate) ]
-    [ node-child propagate-recursive-phi ] bi
+    node-child
+    [ first>> (propagate) ] [ propagate-recursive-phi ] bi
     [ drop ] [ propagate-around ] if ;
 
 M: #call-recursive propagate-before ( #call-label -- )
-    #! What if we reach a fixed point for the phi but not for the
-    #! #call-label output?
     [ label>> returns>> flip ] [ out-d>> ] bi merge-value-infos drop ;

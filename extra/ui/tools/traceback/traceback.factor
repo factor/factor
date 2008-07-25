@@ -30,13 +30,13 @@ M: traceback-gadget pref-dim* drop { 550 600 } ;
 
     dup model>>
       { 1 0 } <track>
-        over <datastack-display>   1/2 track-add*
-        swap <retainstack-display> 1/2 track-add*
-      1/3 track-add*
+        over <datastack-display>   1/2 track-add
+        swap <retainstack-display> 1/2 track-add
+      1/3 track-add
 
-    dup model>> <callstack-display> 2/3 track-add*
+    dup model>> <callstack-display> 2/3 track-add
 
-    dup <toolbar> f track-add* ;
+    dup <toolbar> f track-add ;
 
 : <namestack-display> ( model -- gadget )
     [ [ continuation-name namestack. ] when* ]

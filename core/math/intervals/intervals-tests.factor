@@ -217,7 +217,7 @@ IN: math.intervals.tests
     ] if ;
 
 : random-interval ( -- interval )
-    1000 random dup 2 1000 random + +
+    2000 random 1000 - dup 2 1000 random + +
     1 random zero? [ [ neg ] bi@ swap ] when
     4 random {
         { 0 [ [a,b] ] }
@@ -274,7 +274,7 @@ IN: math.intervals.tests
 
 : binary-test ( -- ? )
     random-interval random-interval random-binary-op ! 3dup . . .
-    0 pick interval-contains? over first { / /i } member? and [
+    0 pick interval-contains? over first { / /i mod rem } member? and [
         3drop t
     ] [
         [ >r [ random-element ] bi@ ! 2dup . .
@@ -310,3 +310,25 @@ IN: math.intervals.tests
 [ t ] [ -10 10 [a,b] -100 0 [a,b] assume<= -10 0 [a,b] = ] unit-test
 
 [ t ] [ -10 10 [a,b] 0 100 [a,b] assume<= -10 10 [a,b] = ] unit-test
+
+[ t ] [ -10 10 [a,b] interval-abs 0 10 [a,b] = ] unit-test
+
+! Test that commutative interval ops really are
+: random-interval-or-empty ( -- )
+    10 random 0 = [ empty-interval ] [ random-interval ] if ;
+
+: random-commutative-op ( -- op )
+    {
+        interval+ interval*
+        interval-bitor interval-bitand interval-bitxor
+        interval-max interval-min
+    } random ;
+
+[ t ] [
+    80000 [
+        drop
+        random-interval-or-empty random-interval-or-empty
+        random-commutative-op
+        [ execute ] [ swapd execute ] 3bi =
+    ] all?
+] unit-test

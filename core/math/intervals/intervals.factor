@@ -235,11 +235,15 @@ TUPLE: interval { from read-only } { to read-only } ;
 : interval/f ( i1 i2 -- i3 )
     [ [ [ /f ] interval-op ] interval-division-op ] do-empty-interval ;
 
+: (interval-abs) ( i1 -- i2 )
+    interval>points [ first2 [ abs ] dip 2array ] bi@ 2array ;
+
 : interval-abs ( i1 -- i2 )
-    dup empty-interval eq? [
-        interval>points [ first2 [ abs ] dip 2array ] bi@ 2array
-        points>interval
-    ] unless ;
+    {
+        { [ dup empty-interval eq? ] [ ] }
+        { [ 0 over interval-contains? ] [ (interval-abs) { 0 t } suffix points>interval ] }
+        [ (interval-abs) points>interval ]
+    } cond ;
 
 : interval-mod ( i1 i2 -- i3 )
     #! Inaccurate.
@@ -307,30 +311,45 @@ SYMBOL: incomparable
 : interval>= ( i1 i2 -- ? )
     swap interval<= ;
 
+: interval-bitand-pos ( i1 i2 -- ? )
+    [ to>> first ] bi@ min 0 swap [a,b] ;
+
+: interval-bitand-neg ( i1 i2 -- ? )
+    dup from>> first 0 < [ drop ] [ nip ] if
+    0 swap to>> first [a,b] ;
+
+: interval-nonnegative? ( i -- ? )
+    from>> first 0 >= ;
+
 : interval-bitand ( i1 i2 -- i3 )
-    dup 1 [a,a] interval>= [
-        1 [a,a] interval- interval-rem
-    ] [
-        2drop [-inf,inf]
-    ] if ;
+    #! Inaccurate.
+    [
+        {
+            {
+                [ 2dup [ interval-nonnegative? ] both? ]
+                [ interval-bitand-pos ]
+            }
+            {
+                [ 2dup [ interval-nonnegative? ] either? ]
+                [ interval-bitand-neg ]
+            }
+            [ 2drop [-inf,inf] ]
+        } cond
+    ] do-empty-interval ;
 
 : interval-bitor ( i1 i2 -- i3 )
     #! Inaccurate.
     [
-        2dup [ 0 [a,a] interval>= ] both?
-        [ to>> first 0 swap [a,b] interval-intersect ]
-        [ 2drop [-inf,inf] ]
-        if
+        2dup [ interval-nonnegative? ] both?
+        [
+            [ interval>points [ first ] bi@ ] bi@
+            4array supremum 0 swap next-power-of-2 [a,b]
+        ] [ 2drop [-inf,inf] ] if
     ] do-empty-interval ;
 
 : interval-bitxor ( i1 i2 -- i3 )
     #! Inaccurate.
-    [
-        2dup [ 0 [a,a] interval>= ] both?
-        [ nip to>> first 0 swap [a,b] ]
-        [ 2drop [-inf,inf] ]
-        if
-    ] do-empty-interval ;
+    interval-bitor ;
 
 : assume< ( i1 i2 -- i3 )
     dup empty-interval eq? [ drop ] [

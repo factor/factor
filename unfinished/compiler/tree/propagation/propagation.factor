@@ -1,7 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences namespaces hashtables
-disjoint-sets
 compiler.tree
 compiler.tree.def-use
 compiler.tree.propagation.info
@@ -17,7 +16,6 @@ IN: compiler.tree.propagation
     [
         H{ } clone constraints set
         >hashtable value-infos set
-        <disjoint-set> copies set
         (propagate)
     ] with-scope ;
 

@@ -38,7 +38,7 @@ TUPLE: tiling < track gadgets tiles first focused ;
 
 : tiling-map-gadgets ( tiling -- tiling )
   dup clear-track
-  dup tiling-gadgets-to-map [ 1 track-add* ] each ;
+  dup tiling-gadgets-to-map [ 1 track-add ] each ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

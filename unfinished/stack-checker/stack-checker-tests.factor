@@ -9,6 +9,8 @@ threads.private io.streams.string io.timeouts io.thread
 sequences.private destructors combinators ;
 IN: stack-checker.tests
 
+\ infer. must-infer
+
 { 0 2 } [ 2 "Hello" ] must-infer-as
 { 1 2 } [ dup ] must-infer-as
 

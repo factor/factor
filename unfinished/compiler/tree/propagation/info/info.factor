@@ -1,77 +1,99 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs classes classes.algebra kernel accessors math
-math.intervals namespaces disjoint-sets sequences words
-combinators ;
+math.intervals namespaces sequences words combinators arrays
+compiler.tree.copy-equiv ;
 IN: compiler.tree.propagation.info
 
 SYMBOL: +interval+
 
 GENERIC: eql? ( obj1 obj2 -- ? )
 M: object eql? eq? ;
-M: number eql? [ [ class ] bi@ = ] [ number= ] 2bi and ;
-
-! Disjoint set of copy equivalence
-SYMBOL: copies
-
-: is-copy-of ( val copy -- ) copies get equate ;
-
-: are-copies-of ( vals copies -- ) [ is-copy-of ] 2each ;
-
-: resolve-copy ( copy -- val ) copies get representative ;
-
-: introduce-value ( val -- ) copies get add-atom ;
+M: fixnum eql? eq? ;
+M: bignum eql? over bignum? [ = ] [ 2drop f ] if ;
+M: ratio eql? over ratio? [ = ] [ 2drop f ] if ;
+M: float eql? over float? [ [ double>bits ] bi@ = ] [ 2drop f ] if ;
+M: complex eql? over complex? [ = ] [ 2drop f ] if ;
 
 ! Value info represents a set of objects. Don't mutate value infos
 ! you receive, always construct new ones. We don't declare the
 ! slots read-only to allow cloning followed by writing.
 TUPLE: value-info
 { class initial: null }
-interval
+{ interval initial: empty-interval }
 literal
-literal? ;
+literal?
+length ;
 
 : class-interval ( class -- interval )
     dup real class<=
     [ +interval+ word-prop [-inf,inf] or ] [ drop f ] if ;
 
 : interval>literal ( class interval -- literal literal? )
-    dup from>> first {
-        { [ over interval-length 0 > ] [ 3drop f f ] }
-        { [ over from>> second not ] [ 3drop f f ] }
-        { [ over to>> second not ] [ 3drop f f ] }
-        { [ pick fixnum class<= ] [ 2nip >fixnum t ] }
-        { [ pick bignum class<= ] [ 2nip >bignum t ] }
-        { [ pick float class<= ] [ 2nip >float t ] }
-        [ 3drop f f ]
-    } cond ;
-
-: <value-info> ( class interval literal literal? -- info )
-    [
-        2nip
-        [ class ]
-        [ dup real? [ [a,a] ] [ drop [-inf,inf] ] if ]
-        [ ]
-        tri t
+    #! If interval has zero length and the class is sufficiently
+    #! precise, we can turn it into a literal
+    dup empty-interval eq? [
+        2drop f f
     ] [
-        drop
-        over null class<= [ drop f f f ] [
-            over integer class<= [ integral-closure ] when
-            2dup interval>literal
+        dup from>> first {
+            { [ over interval-length 0 > ] [ 3drop f f ] }
+            { [ pick bignum class<= ] [ 2nip >bignum t ] }
+            { [ pick integer class<= ] [ 2nip >fixnum t ] }
+            { [ pick float class<= ] [
+                2nip dup zero? [ drop f f ] [ >float t ] if
+            ] }
+            [ 3drop f f ]
+        } cond
+    ] if ;
+
+: <value-info> ( -- info ) \ value-info new ;
+
+: init-value-info ( info -- info )
+    dup literal?>> [
+        dup literal>> class >>class
+        dup literal>> dup real? [ [a,a] ] [ drop [-inf,inf] ] if >>interval
+    ] [
+        dup [ class>> null class<= ] [ interval>> empty-interval eq? ] bi or [
+            null >>class
+            empty-interval >>interval
+        ] [
+            dup class>> integer class<= [ [ integral-closure ] change-interval ] when
+            dup [ class>> ] [ interval>> ] bi interval>literal
+            [ >>literal ] [ >>literal? ] bi*
         ] if
-    ] if
-    \ value-info boa ; foldable
+    ] if ;
+
+: <class/interval-info> ( class interval -- info )
+    <value-info>
+        swap >>interval
+        swap >>class
+    init-value-info ; foldable
 
 : <class-info> ( class -- info )
-    [-inf,inf] f f <value-info> ; foldable
+    dup word? [ dup +interval+ word-prop ] [ f ] if [-inf,inf] or
+    <class/interval-info> ; foldable
 
 : <interval-info> ( interval -- info )
-    real swap f f <value-info> ; foldable
+    <value-info>
+        real >>class
+        swap >>interval
+    init-value-info ; foldable
 
 : <literal-info> ( literal -- info )
-    f [-inf,inf] rot t <value-info> ; foldable
+    <value-info>
+        swap >>literal
+        t >>literal?
+    init-value-info ; foldable
 
-: >literal< ( info -- literal literal? ) [ literal>> ] [ literal?>> ] bi ;
+: <sequence-info> ( value -- info )
+    <value-info>
+        object >>class
+        [-inf,inf] >>interval
+        swap value-info >>length
+    init-value-info ; foldable
+
+: >literal< ( info -- literal literal? )
+    [ literal>> ] [ literal?>> ] bi ;
 
 : intersect-literals ( info1 info2 -- literal literal? )
     {
@@ -81,21 +103,30 @@ literal? ;
         [ drop >literal< ]
     } cond ;
 
-: interval-intersect' ( i1 i2 -- i3 )
-    #! Change core later.
-    2dup and [ interval-intersect ] [ 2drop f ] if ;
+DEFER: value-info-intersect
 
-: value-info-intersect ( info1 info2 -- info )
-    [ [ class>> ] bi@ class-and ]
-    [ [ interval>> ] bi@ interval-intersect' ]
-    [ intersect-literals ]
-    2tri <value-info> ;
-
-: interval-union' ( i1 i2 -- i3 )
-    {
+: intersect-lengths ( info1 info2 -- length )
+    [ length>> ] bi@ {
         { [ dup not ] [ drop ] }
         { [ over not ] [ nip ] }
-        [ interval-union ]
+        [ value-info-intersect ]
+    } cond ;
+
+: (value-info-intersect) ( info1 info2 -- info )
+    [ <value-info> ] 2dip
+    {
+        [ [ class>> ] bi@ class-and >>class ]
+        [ [ interval>> ] bi@ interval-intersect >>interval ]
+        [ intersect-literals [ >>literal ] [ >>literal? ] bi* ]
+        [ intersect-lengths >>length ]
+    } 2cleave
+    init-value-info ;
+
+: value-info-intersect ( info1 info2 -- info )
+    {
+        { [ dup class>> null class<= ] [ nip ] }
+        { [ over class>> null class<= ] [ drop ] }
+        [ (value-info-intersect) ]
     } cond ;
 
 : union-literals ( info1 info2 -- literal literal? )
@@ -103,11 +134,31 @@ literal? ;
         [ literal>> ] bi@ 2dup eql? [ drop t ] [ 2drop f f ] if
     ] [ 2drop f f ] if ;
 
+DEFER: value-info-union
+
+: union-lengths ( info1 info2 -- length )
+    [ length>> ] bi@ {
+        { [ dup not ] [ nip ] }
+        { [ over not ] [ drop ] }
+        [ value-info-union ]
+    } cond ;
+
+: (value-info-union) ( info1 info2 -- info )
+    [ <value-info> ] 2dip
+    {
+        [ [ class>> ] bi@ class-or >>class ]
+        [ [ interval>> ] bi@ interval-union >>interval ]
+        [ union-literals [ >>literal ] [ >>literal? ] bi* ]
+        [ union-lengths >>length ]
+    } 2cleave
+    init-value-info ;
+
 : value-info-union ( info1 info2 -- info )
-    [ [ class>> ] bi@ class-or ]
-    [ [ interval>> ] bi@ interval-union' ]
-    [ union-literals ]
-    2tri <value-info> ;
+    {
+        { [ dup class>> null class<= ] [ drop ] }
+        { [ over class>> null class<= ] [ nip ] }
+        [ (value-info-union) ]
+    } cond ;
 
 : value-infos-union ( infos -- info )
     dup first [ value-info-union ] reduce ;
@@ -126,3 +177,18 @@ SYMBOL: value-infos
 
 : value-literal ( value -- obj ? )
     value-info >literal< ;
+
+: possible-boolean-values ( info -- values )
+    dup literal?>> [
+        literal>> 1array
+    ] [
+        class>> {
+            { [ dup null class<= ] [ { } ] }
+            { [ dup \ f class-not class<= ] [ { t } ] }
+            { [ dup \ f class<= ] [ { f } ] }
+            [ { t f } ]
+        } cond nip
+    ] if ;
+
+: value-is? ( value class -- ? )
+    [ value-info class>> ] dip class<= ;

@@ -1,13 +1,13 @@
 USING: accessors namespaces assocs kernel sequences math
 tools.test words sets combinators.short-circuit
-stack-checker.state compiler.tree compiler.frontend
+stack-checker.state compiler.tree compiler.tree.builder
 compiler.tree.def-use arrays kernel.private ;
 IN: compiler.tree.def-use.tests
 
 \ compute-def-use must-infer
 
 [ t ] [
-    [ 1 2 3 ] dataflow compute-def-use drop
+    [ 1 2 3 ] build-tree compute-def-use drop
     def-use get {
         [ assoc-size 3 = ]
         [ values [ uses>> [ #return? ] all? ] all? ]
@@ -29,5 +29,5 @@ IN: compiler.tree.def-use.tests
     [ [ 1 ] [ call 2 ] curry call + ]
     [ [ 1 ] [ 2 ] compose swap [ 1 ] [ 2 ] if + * ]
 } [
-    [ ] swap [ dataflow compute-def-use drop ] curry unit-test
+    [ ] swap [ build-tree compute-def-use drop ] curry unit-test
 ] each
