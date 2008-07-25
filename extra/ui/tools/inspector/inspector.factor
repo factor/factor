@@ -17,9 +17,9 @@ TUPLE: inspector-gadget < track object pane ;
 
 : <inspector-gadget> ( -- gadget )
   { 0 1 } inspector-gadget new-track
-    dup <toolbar> f track-add*
+    dup <toolbar> f track-add
     <pane> >>pane
-    dup pane>> <scroller> 1 track-add* ;
+    dup pane>> <scroller> 1 track-add ;
     
 : inspect-object ( obj mirror keys inspector -- )
     2nip swap >>object refresh ;

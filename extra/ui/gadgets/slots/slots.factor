@@ -71,9 +71,9 @@ M: value-ref finish-editing
 : <slot-editor> ( ref -- gadget )
   { 0 1 } slot-editor new-track
     swap >>ref
-    dup <toolbar> f track-add*
+    dup <toolbar> f track-add
     <source-editor> >>text
-    dup text>> <scroller> 1 track-add*
+    dup text>> <scroller> 1 track-add
     dup revert ;
     
 M: slot-editor pref-dim* call-next-method { 600 200 } vmin ;
@@ -97,8 +97,8 @@ TUPLE: editable-slot < track printer ref ;
 
 : display-slot ( gadget editable-slot -- )
   dup clear-track
-    swap          1 track-add*
-    <edit-button> f track-add*
+    swap          1 track-add
+    <edit-button> f track-add
   drop ;
 
 : update-slot ( editable-slot -- )
@@ -109,7 +109,7 @@ TUPLE: editable-slot < track printer ref ;
     [ clear-track ]
     [
         dup ref>> <slot-editor>
-        [ 1 track-add* drop ]
+        [ 1 track-add drop ]
         [ [ scroll>gadget ] [ request-focus ] bi* ] 2bi
     ] bi ;
 
