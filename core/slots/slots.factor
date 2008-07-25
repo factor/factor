@@ -8,13 +8,17 @@ IN: slots
 
 TUPLE: slot-spec name offset class initial read-only reader writer ;
 
+PREDICATE: reader < word "reader" word-prop ;
+
+PREDICATE: writer < word "writer" word-prop ;
+
 : <slot-spec> ( -- slot-spec )
     slot-spec new
         object bootstrap-word >>class ;
 
 : define-typecheck ( class generic quot props -- )
     [ dup define-simple-generic create-method ] 2dip
-    [ [ props>> ] [ drop ] [ [ t ] H{ } map>assoc ] tri* update ]
+    [ [ props>> ] [ drop ] [ ] tri* update ]
     [ drop define ]
     3bi ;
 
@@ -31,17 +35,23 @@ TUPLE: slot-spec name offset class initial read-only reader writer ;
     ] [ ] make ;
 
 : reader-word ( name -- word )
-    ">>" append (( object -- value )) create-accessor ;
+    ">>" append (( object -- value )) create-accessor
+    dup t "reader" set-word-prop ;
 
-: reader-props ( slot-spec -- seq )
-    read-only>> { "foldable" "flushable" } { "flushable" } ? ;
+: reader-props ( slot-spec -- assoc )
+    [
+        [ "reading" set ]
+        [ read-only>> [ t "foldable" set ] when ] bi
+        t "flushable" set
+    ] H{ } make-assoc ;
 
 : define-reader ( class slot-spec -- )
     [ name>> reader-word ] [ reader-quot ] [ reader-props ] tri
     define-typecheck ;
 
 : writer-word ( name -- word )
-    "(>>" swap ")" 3append (( value object -- )) create-accessor ;
+    "(>>" swap ")" 3append (( value object -- )) create-accessor
+    dup t "writer" set-word-prop ;
 
 ERROR: bad-slot-value value class ;
 
@@ -77,8 +87,12 @@ ERROR: bad-slot-value value class ;
         } cond
     ] [ ] make ;
 
+: writer-props ( slot-spec -- assoc )
+    [ "writing" set ] H{ } make-assoc ;
+
 : define-writer ( class slot-spec -- )
-    [ name>> writer-word ] [ writer-quot ] bi { } define-typecheck ;
+    [ name>> writer-word ] [ writer-quot ] [ writer-props ] tri
+    define-typecheck ;
 
 : setter-word ( name -- word )
     ">>" prepend (( object value -- object )) create-accessor ;

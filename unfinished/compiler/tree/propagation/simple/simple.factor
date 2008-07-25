@@ -2,11 +2,13 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors kernel sequences sequences.private assocs
 words namespaces classes.algebra combinators classes
-continuations arrays byte-arrays strings
+classes.tuple classes.tuple.private continuations arrays
+byte-arrays strings math math.private slots
 compiler.tree
 compiler.tree.def-use
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
+compiler.tree.propagation.slots
 compiler.tree.propagation.constraints ;
 IN: compiler.tree.propagation.simple
 
@@ -53,6 +55,17 @@ M: #declare propagate-before
     [ word>> +outputs+ word-prop ]
     bi with-datastack ;
 
+: foldable-word? ( #call -- ? )
+    dup word>> "foldable" word-prop [
+        drop t
+    ] [
+        dup word>> \ <tuple-boa> eq? [
+            in-d>> peek value-info literal>> immutable-tuple-class?
+        ] [
+            drop f
+        ] if
+    ] if ;
+
 : foldable-call? ( #call -- ? )
     dup word>> "foldable" word-prop [
         in-d>> [ value-info literal?>> ] all?
@@ -73,27 +86,11 @@ M: #declare propagate-before
         out-d>> length object <class-info> <repetition>
     ] ?if ;
 
-UNION: fixed-length-sequence array byte-array string ;
-
-: sequence-constructor? ( node -- ? )
-    word>> { <array> <byte-array> <string> } memq? ;
-
-: propagate-sequence-constructor ( node -- infos )
-    [ default-output-value-infos first ]
-    [ in-d>> first <sequence-info> ]
-    bi value-info-intersect 1array ;
-
-: length-accessor? ( node -- ? )
-    dup in-d>> first fixed-length-sequence value-is?
-    [ word>> \ length eq? ] [ drop f ] if ;
-
-: propagate-length ( node -- infos )
-    in-d>> first value-info length>>
-    [ array-capacity <class-info> ] unless* 1array ;
-
 : output-value-infos ( node -- infos )
     {
         { [ dup foldable-call? ] [ fold-call ] }
+        { [ dup tuple-constructor? ] [ propagate-tuple-constructor ] }
+        { [ dup word>> reader? ] [ reader-word-outputs ] }
         { [ dup sequence-constructor? ] [ propagate-sequence-constructor ] }
         { [ dup length-accessor? ] [ propagate-length ] }
         { [ dup word>> +outputs+ word-prop ] [ call-outputs-quot ] }
@@ -107,12 +104,16 @@ M: #call propagate-before
 
 M: node propagate-before drop ;
 
+: propagate-input-classes ( node -- )
+    [ word>> "input-classes" word-prop class-infos ] [ in-d>> ] bi
+    refine-value-infos ;
+
 M: #call propagate-after
-    dup word>> "input-classes" word-prop dup [
-        class-infos swap in-d>> refine-value-infos
-    ] [
-        2drop
-    ] if ;
+    {
+        { [ dup reader? ] [ reader-word-inputs ] }
+        { [ dup word>> "input-classes" word-prop ] [ propagate-input-classes ] }
+        [ drop ]
+    } cond ;
 
 M: node propagate-after drop ;
 
