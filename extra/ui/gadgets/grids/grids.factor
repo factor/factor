@@ -25,6 +25,11 @@ grid
   >r >r 2dup swap add-gadget drop r> r>
   3dup grid-child unparent rot grid>> nth set-nth ;
 
+: grid-add ( grid child i j -- grid )
+  >r >r dupd swap r> r>
+  >r >r 2dup swap add-gadget drop r> r>
+  3dup grid-child unparent rot grid>> nth set-nth ;
+
 : grid-remove ( grid i j -- grid ) <gadget> -rot grid-add* ;
 
 : pref-dim-grid ( grid -- dims )
