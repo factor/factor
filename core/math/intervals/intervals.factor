@@ -135,6 +135,9 @@ TUPLE: interval { from read-only } { to read-only } ;
         ]
     } cond ;
 
+: intervals-intersect? ( i1 i2 -- ? )
+    interval-intersect empty-interval eq? not ;
+
 : interval-union ( i1 i2 -- i3 )
     {
         { [ dup empty-interval eq? ] [ drop ] }
