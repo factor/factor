@@ -7,7 +7,7 @@ stack-checker.backend stack-checker.errors stack-checker.visitor
 IN: stack-checker.branches
 
 : balanced? ( seq -- ? )
-    [ first2 length - ] map all-equal? ;
+    [ second ] filter [ first2 length - ] map all-equal? ;
 
 : phi-inputs ( seq -- newseq )
     dup empty? [
@@ -16,7 +16,7 @@ IN: stack-checker.branches
     ] unless ;
 
 : unify-values ( values -- phi-out )
-    dup [ known ] map dup all-eq?
+    dup sift [ known ] map dup all-eq?
     [ nip first make-known ] [ 2drop <value> ] if ;
 
 : phi-outputs ( phi-in -- stack )
@@ -25,7 +25,7 @@ IN: stack-checker.branches
 SYMBOL: quotations
 
 : unify-branches ( ins stacks -- in phi-in phi-out )
-    zip [ second ] filter dup empty? [ drop 0 { } { } ] [
+    zip dup empty? [ drop 0 { } { } ] [
         dup balanced?
         [ [ keys supremum ] [ values phi-inputs dup phi-outputs ] bi ]
         [ quotations get unbalanced-branches-error ]

@@ -3,7 +3,8 @@ compiler.tree.propagation compiler.tree.copy-equiv
 compiler.tree.def-use tools.test math math.order
 accessors sequences arrays kernel.private vectors
 alien.accessors alien.c-types sequences.private
-byte-arrays ;
+byte-arrays classes.algebra math.functions math.private
+strings ;
 IN: compiler.tree.propagation.tests
 
 \ propagate must-infer
@@ -234,8 +235,100 @@ IN: compiler.tree.propagation.tests
     [ [ 1 ] [ 1 ] if 1 + ] final-literals
 ] unit-test
 
+[ V{ string string } ] [
+    [
+        2dup [ dup string? [ "Oops" throw ] unless ] bi@ 2drop
+    ] final-classes
+] unit-test
+
+! Array length propagation
 [ V{ t } ] [ [ 10 f <array> length 10 = ] final-literals ] unit-test
 
 [ V{ t } ] [ [ [ 10 f <array> ] [ 10 <byte-array> ] if length 10 = ] final-literals ] unit-test
 
 [ V{ t } ] [ [ [ 1 f <array> ] [ 2 f <array> ] if length 3 < ] final-literals ] unit-test
+
+! Slot propagation
+TUPLE: prop-test-tuple { x integer } ;
+
+[ V{ integer } ] [ [ { prop-test-tuple } declare x>> ] final-classes ] unit-test
+
+TUPLE: another-prop-test-tuple { x ratio initial: 1/2 } ;
+
+UNION: prop-test-union prop-test-tuple another-prop-test-tuple ;
+
+[ t ] [
+    [ { prop-test-union } declare x>> ] final-classes first
+    rational class=
+] unit-test
+
+TUPLE: fold-boa-test-tuple { x read-only } { y read-only } { z read-only } ;
+
+[ V{ T{ fold-boa-test-tuple f 1 2 3 } } ]
+[ [ 1 2 3 fold-boa-test-tuple boa ] final-literals ]
+unit-test
+
+TUPLE: immutable-prop-test-tuple { x sequence read-only } ;
+
+[ V{ T{ immutable-prop-test-tuple f "hey" } } ] [
+    [ "hey" immutable-prop-test-tuple boa ] final-literals
+] unit-test
+
+[ V{ { 1 2 } } ] [
+    [ { 1 2 } immutable-prop-test-tuple boa x>> ] final-literals
+] unit-test
+
+[ V{ array } ] [
+    [ { array } declare immutable-prop-test-tuple boa x>> ] final-classes
+] unit-test
+
+[ V{ complex } ] [
+    [ <complex> ] final-classes
+] unit-test
+
+[ V{ complex } ] [
+    [ { float float } declare dup 0.0 <= [ "Oops" throw ] [ rect> ] if ] final-classes
+] unit-test
+
+[ V{ float float } ] [
+    [
+        { float float } declare
+        dup 0.0 <= [ "Oops" throw ] when rect>
+        [ real>> ] [ imaginary>> ] bi
+    ] final-classes
+] unit-test
+
+[ V{ complex } ] [
+    [
+        { float float object } declare
+        [ "Oops" throw ] [ <complex> ] if
+    ] final-classes
+] unit-test
+
+[ V{ number } ] [ [ [ "Oops" throw ] [ 2 + ] if ] final-classes ] unit-test
+[ V{ number } ] [ [ [ 2 + ] [ "Oops" throw ] if ] final-classes ] unit-test
+
+[ V{ POSTPONE: f } ] [
+    [ dup 1.0 <= [ drop f ] [ 0 number= ] if ] final-classes
+] unit-test
+
+! Don't fold this
+TUPLE: mutable-tuple-test { x sequence } ;
+
+[ V{ sequence } ] [
+    [ "hey" mutable-tuple-test boa x>> ] final-classes
+] unit-test
+
+[ V{ sequence } ] [
+    [ T{ mutable-tuple-test f "hey" } x>> ] final-classes
+] unit-test
+
+! Mixed mutable and immutable slots
+TUPLE: mixed-mutable-immutable { x integer } { y sequence read-only } ;
+
+[ V{ integer array } ] [
+    [
+        3 { 2 1 } mixed-mutable-immutable boa
+        [ x>> ] [ y>> ] bi
+    ] final-classes
+] unit-test

@@ -20,6 +20,10 @@ ERROR: not-a-tuple object ;
 : all-slots ( class -- slots )
     superclasses [ "slots" word-prop ] map concat ;
 
+PREDICATE: immutable-tuple-class < tuple-class ( class -- ? )
+    #! Delegation
+    all-slots rest-slice [ read-only>> ] all? ;
+
 <PRIVATE
 
 : tuple-layout ( class -- layout )

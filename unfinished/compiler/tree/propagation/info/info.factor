@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs classes classes.algebra kernel accessors math
-math.intervals namespaces sequences words combinators arrays
-compiler.tree.copy-equiv ;
+USING: assocs classes classes.algebra kernel
+accessors math math.intervals namespaces sequences words
+combinators arrays compiler.tree.copy-equiv ;
 IN: compiler.tree.propagation.info
 
 SYMBOL: +interval+
@@ -17,13 +17,15 @@ M: complex eql? over complex? [ = ] [ 2drop f ] if ;
 
 ! Value info represents a set of objects. Don't mutate value infos
 ! you receive, always construct new ones. We don't declare the
-! slots read-only to allow cloning followed by writing.
+! slots read-only to allow cloning followed by writing, and to
+! simplify constructors.
 TUPLE: value-info
-{ class initial: null }
-{ interval initial: empty-interval }
+class
+interval
 literal
 literal?
-length ;
+length
+slots ;
 
 : class-interval ( class -- interval )
     dup real class<=
@@ -57,6 +59,7 @@ length ;
             null >>class
             empty-interval >>interval
         ] [
+            [ [-inf,inf] or ] change-interval
             dup class>> integer class<= [ [ integral-closure ] change-interval ] when
             dup [ class>> ] [ interval>> ] bi interval>literal
             [ >>literal ] [ >>literal? ] bi*
@@ -88,9 +91,14 @@ length ;
 : <sequence-info> ( value -- info )
     <value-info>
         object >>class
-        [-inf,inf] >>interval
         swap value-info >>length
     init-value-info ; foldable
+
+: <tuple-info> ( slots class -- info )
+    <value-info>
+        swap >>class
+        swap >>slots
+    init-value-info ;
 
 : >literal< ( info -- literal literal? )
     [ literal>> ] [ literal?>> ] bi ;
@@ -112,6 +120,11 @@ DEFER: value-info-intersect
         [ value-info-intersect ]
     } cond ;
 
+: intersect-slots ( info1 info2 -- slots )
+    [ slots>> ] bi@
+    2dup [ length ] bi@ =
+    [ [ value-info-intersect ] 2map ] [ 2drop f ] if ;
+
 : (value-info-intersect) ( info1 info2 -- info )
     [ <value-info> ] 2dip
     {
@@ -119,6 +132,7 @@ DEFER: value-info-intersect
         [ [ interval>> ] bi@ interval-intersect >>interval ]
         [ intersect-literals [ >>literal ] [ >>literal? ] bi* ]
         [ intersect-lengths >>length ]
+        [ intersect-slots >>slots ]
     } 2cleave
     init-value-info ;
 
@@ -143,6 +157,11 @@ DEFER: value-info-union
         [ value-info-union ]
     } cond ;
 
+: union-slots ( info1 info2 -- slots )
+    [ slots>> ] bi@
+    2dup [ length ] bi@ =
+    [ [ value-info-union ] 2map ] [ 2drop f ] if ;
+
 : (value-info-union) ( info1 info2 -- info )
     [ <value-info> ] 2dip
     {
@@ -150,6 +169,7 @@ DEFER: value-info-union
         [ [ interval>> ] bi@ interval-union >>interval ]
         [ union-literals [ >>literal ] [ >>literal? ] bi* ]
         [ union-lengths >>length ]
+        [ union-slots >>slots ]
     } 2cleave
     init-value-info ;
 
@@ -167,7 +187,8 @@ DEFER: value-info-union
 SYMBOL: value-infos
 
 : value-info ( value -- info )
-    resolve-copy value-infos get at T{ value-info } or ;
+    resolve-copy value-infos get at
+    T{ value-info f null empty-interval } or ;
 
 : set-value-info ( info value -- )
     resolve-copy value-infos get set-at ;
