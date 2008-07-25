@@ -185,6 +185,27 @@ generic-comparison-ops [
     '[ , fold-comparison ] +outputs+ set-word-prop
 ] each
 
+: maybe-or-never ( ? -- info )
+    [ object <class-info> ] [ \ f <class-info> ] if ;
+
+: info-intervals-intersect? ( info1 info2 -- ? )
+    [ interval>> ] bi@ intervals-intersect? ;
+
+{ number= bignum= float= } [
+    [
+        info-intervals-intersect? maybe-or-never
+    ] +outputs+ set-word-prop
+] each
+
+: info-classes-intersect? ( info1 info2 -- ? )
+    [ class>> ] bi@ classes-intersect? ;
+
+\ eq? [
+    [ info-intervals-intersect? ]
+    [ info-classes-intersect? ]
+    bi or maybe-or-never
+] +outputs+ set-word-prop
+
 {
     { >fixnum fixnum }
     { >bignum bignum }

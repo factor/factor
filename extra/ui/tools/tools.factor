@@ -38,10 +38,10 @@ IN: ui.tools
     <listener-gadget>    >>listener
     dup <workspace-book> >>book
     
-    dup <workspace-tabs> f   track-add*
-    dup book>>           1/5 track-add*
-    dup listener>>       4/5 track-add*
-    dup <toolbar>        f   track-add* ;
+    dup <workspace-tabs> f   track-add
+    dup book>>           1/5 track-add
+    dup listener>>       4/5 track-add
+    dup <toolbar>        f   track-add ;
 
 : resize-workspace ( workspace -- )
     dup track-sizes over control-value zero? [

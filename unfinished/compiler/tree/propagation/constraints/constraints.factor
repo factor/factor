@@ -26,11 +26,9 @@ M: true-constraint assume
     [ \ f class-not <class-info> swap value>> refine-value-info ]
     bi ;
 
-M: true-constraint satisfied?
-    value>> value-info class>> \ f class-not class<= ;
+M: true-constraint satisfied? value>> \ f class-not value-is? ;
 
-M: true-constraint satisfiable?
-    value>> value-info class>> \ f class-not classes-intersect? ;
+M: true-constraint satisfiable? value>> \ f class-not value-is? ;
 
 TUPLE: false-constraint value ;
 

@@ -183,7 +183,7 @@ M: object run-pipeline-element
             [ |dispose drop ]
             [
                 swap >process
-                    [ swap in>> or ] change-stdout
+                    [ swap in>> or ] change-stdin
                 run-detached
             ]
             [ in>> dispose ]
@@ -200,8 +200,8 @@ M: object run-pipeline-element
             [ [ |dispose drop ] bi@ ]
             [
                 rot >process
-                    [ swap out>> or ] change-stdout
                     [ swap in>> or ] change-stdin
+                    [ swap out>> or ] change-stdout
                 run-detached
             ]
             [ [ out>> dispose ] [ in>> dispose ] bi* ]
