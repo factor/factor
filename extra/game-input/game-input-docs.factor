@@ -65,7 +65,7 @@ HELP: product-id
 
 HELP: instance-id
 { $values { "controller" controller } { "id" "A unique identifier" } }
-{ $description "Returns an identifier uniquely representing the game controller device represented by " { $snippet "controller" } ". This identifier paired with the device's " { $link product-id } " provides a unique identifier for a particular device that persists between reboots (but not necessarily between computers). This unique identifier can be used to find the same device again with the " { $snippet find-controller-instance } " word. Depending on the platform, the instance-id may change if the device is plugged into a different port. The type of the identifier value is platform-specific, but equivalent " { $snippet instance-id } "s are guaranteed to be testable with the " { $link = } " word." } ;
+{ $description "Returns an identifier uniquely representing the game controller device represented by " { $snippet "controller" } ". This identifier paired with the device's " { $link product-id } " provides a unique identifier for a particular device that persists between reboots (but not necessarily between computers). This unique identifier can be used to find the same device again with the " { $snippet "find-controller-instance" } " word. Depending on the platform, the instance-id may change if the device is plugged into a different port. The type of the identifier value is platform-specific, but equivalent " { $snippet "instance-id" } "s are guaranteed to be testable with the " { $link = } " word." } ;
 
 { product-string product-id instance-id find-controller-products find-controller-instance } related-words
 
