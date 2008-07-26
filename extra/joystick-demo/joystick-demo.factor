@@ -109,7 +109,8 @@ M: joystick-demo-gadget ungraft*
     open-window ;
 
 : joystick-demo ( -- )
-    open-game-input [
+    [
+        open-game-input
         get-controllers [ joystick-window ] each
     ] with-ui ;
 
