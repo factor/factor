@@ -10,7 +10,7 @@ IN: csv
 DEFER: quoted-field
 
 VAR: delimiter
-
+    
 ! trims whitespace from either end of string
 : trim-whitespace ( str -- str )
   [ blank? ] trim ; inline
@@ -57,7 +57,7 @@ VAR: delimiter
   [ (csv) ] when ;
 
 : init-vars ( -- )
-  delimiter> [ CHAR: , >delimiter ] unless ; inline
+  delimiter> [ CHAR: , >delimiter ] unless ; inline 
   
 : csv-row ( stream -- row )
   init-vars
@@ -69,3 +69,24 @@ VAR: delimiter
 
 : with-delimiter ( char quot -- )
   delimiter swap with-variable ; inline
+
+
+    
+: needs-escaping? ( cell -- ? )
+  [ "\n\"" delimiter> suffix member? ] contains? ; inline ! "
+
+: escape-quotes ( cell -- cell' )
+  [ [ dup , CHAR: " = [ CHAR: " , ] when ] each ] "" make ; inline
+
+: enclose-in-quotes ( cell -- cell' )
+  CHAR: " [ prefix ] [ suffix ] bi ; inline ! "
+    
+: escape-if-required ( cell -- cell' )
+  dup needs-escaping? [ escape-quotes enclose-in-quotes ] when ; inline
+    
+: write-row ( row -- )
+  [ delimiter> write1 ] [ escape-if-required write ] interleave nl ; inline
+    
+: write-csv ( rows outstream -- )
+  init-vars
+  [ [ write-row ] each ] with-output-stream ;

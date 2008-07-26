@@ -39,8 +39,8 @@ M: labelled-gadget focusable-child* labelled-gadget-content ;
 
 : <title-bar> ( title quot -- gadget )
   <frame>
-    swap dup [ <close-box> @left grid-add* ] [ drop ] if
-    swap <title-label> @center grid-add* ;
+    swap dup [ <close-box> @left grid-add ] [ drop ] if
+    swap <title-label> @center grid-add ;
 
 TUPLE: closable-gadget < frame content ;
 
@@ -49,8 +49,8 @@ TUPLE: closable-gadget < frame content ;
 
 : <closable-gadget> ( gadget title quot -- gadget )
   closable-gadget new-frame
-    -rot <title-bar> @top grid-add*
+    -rot <title-bar> @top grid-add
     swap >>content
-    dup content>> @center grid-add* ;
+    dup content>> @center grid-add ;
     
 M: closable-gadget focusable-child* closable-gadget-content ;
