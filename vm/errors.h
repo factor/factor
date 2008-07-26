@@ -19,6 +19,7 @@ typedef enum
 	ERROR_MEMORY,
 } F_ERRORTYPE;
 
+void out_of_memory(void);
 void fatal_error(char* msg, CELL tagged);
 void critical_error(char* msg, CELL tagged);
 DECLARE_PRIMITIVE(die);
