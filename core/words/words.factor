@@ -187,6 +187,7 @@ M: word reset-word
         "parsing" "inline" "recursive" "foldable" "flushable"
         "predicating"
         "reading" "writing"
+        "reader" "writer"
         "constructing"
         "declared-effect" "constructor-quot" "delimiter"
     } reset-props ;

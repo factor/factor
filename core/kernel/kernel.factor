@@ -165,13 +165,9 @@ GENERIC: boa ( ... class -- tuple )
     compose compose ; inline
 
 ! Booleans
-: not ( obj -- ? )
-    #! Not inline because its special-cased by compiler.
-    f eq? ;
+: not ( obj -- ? ) f t ? ; inline
 
-: and ( obj1 obj2 -- ? )
-    #! Not inline because its special-cased by compiler.
-    over ? ;
+: and ( obj1 obj2 -- ? ) over ? ; inline
 
 : >boolean ( obj -- ? ) t f ? ; inline
 

@@ -1,5 +1,5 @@
-USING: io.streams.string csv tools.test shuffle ;
 IN: csv.tests
+USING: io.streams.string csv tools.test shuffle kernel strings ;
 
 ! I like to name my unit tests
 : named-unit-test ( name output input -- ) 
@@ -68,3 +68,11 @@ IN: csv.tests
 [ { { "foo" "bar" }
     { "1"   "2" } } ]
 [ "foo,\"bar\"\n1,2" <string-reader> csv ] named-unit-test
+
+"can write csv too!"
+[ "foo1,bar1\nfoo2,bar2\n" ]
+[ { { "foo1" "bar1" } { "foo2" "bar2" } } <string-writer> tuck write-csv >string ] named-unit-test
+
+"escapes quotes commas and newlines when writing"
+[ "\"fo\"\"o1\",bar1\n\"fo\no2\",\"b,ar2\"\n" ]
+[ { { "fo\"o1" "bar1" } { "fo\no2" "b,ar2" } } <string-writer> tuck write-csv >string ] named-unit-test ! "

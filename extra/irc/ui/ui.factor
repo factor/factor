@@ -155,12 +155,12 @@ irc-editor "general" f {
 : <irc-tab> ( listener client -- irc-tab )
     irc-tab new-frame
     swap client>> >>client swap >>listener
-    <irc-pane> [ <scroller> @center grid-add* ] keep
-    <irc-editor> <scroller> @bottom grid-add* ;
+    <irc-pane> [ <scroller> @center grid-add ] keep
+    <irc-editor> <scroller> @bottom grid-add ;
 
 : <irc-channel-tab> ( listener client -- irc-tab )
     <irc-tab>
-    <irc-list> [ <scroller> @right grid-add* ] dip >>listmodel
+    <irc-list> [ <scroller> @right grid-add ] dip >>listmodel
     [ update-participants ] keep ;
 
 : <irc-server-tab> ( listener client -- irc-tab )
