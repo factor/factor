@@ -174,7 +174,7 @@ F_SEGMENT *alloc_segment(CELL size)
 		MAP_ANON | MAP_PRIVATE,-1,0);
 
 	if(array == (char*)-1)
-		fatal_error("Out of memory in alloc_segment",0);
+		out_of_memory();
 
 	if(mprotect(array,pagesize,PROT_NONE) == -1)
 		fatal_error("Cannot protect low guard page",(CELL)array);
