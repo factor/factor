@@ -3,7 +3,8 @@ symbols alien.c-types windows.ole32 namespaces assocs kernel
 arrays vectors windows.kernel32 windows.com windows.dinput
 shuffle windows.user32 windows.messages sequences combinators
 math.geometry.rect ui.windows accessors math windows alien
-alien.strings io.encodings.utf16 continuations byte-arrays ;
+alien.strings io.encodings.utf16 continuations byte-arrays
+locals ;
 IN: game-input.backend.dinput
 
 SINGLETON: dinput-game-input-backend
@@ -215,10 +216,13 @@ M: dinput-game-input-backend product-id
 M: dinput-game-input-backend instance-id
     handle>> device-guid ;
 
-: with-acquisition ( device quot -- )
-    over IDirectInputDevice8W::Acquire ole32-error
-    over [ IDirectInputDevice8W::Unacquire ole32-error ] curry
-    [ ] cleanup ; inline
+:: with-acquisition ( device acquired-quot succeeded-quot failed-quot -- result/f )
+    device IDirectInputDevice8W::Acquire succeeded? [
+        device acquired-quot
+        [ device IDirectInputDevice8W::Unacquire ole32-error ]
+        [ ] cleanup
+        succeeded-quot call
+    ] failed-quot if ; inline
 
 : pov-values
     {
@@ -264,19 +268,19 @@ M: dinput-game-input-backend instance-id
     dup <byte-array>
     [ IDirectInputDevice8W::GetDeviceState ole32-error ] keep ;
 
+: (read-controller) ( handle template -- state )
+    clone swap [ "DIJOYSTATE2" heap-size get-device-state ]
+    [ fill-controller-state ] [ drop f ] with-acquisition ;
+
 M: dinput-game-input-backend read-controller
-    ! XXX return f if device was disconnected
-    handle>> [ +controller-devices+ get at clone ] [
-        [ "DIJOYSTATE2" heap-size get-device-state ]
-        with-acquisition
-    ] bi fill-controller-state ;
+    handle>> dup +controller-devices+ get at
+    [ (read-controller) ] [ drop f ] if* ;
 
 M: dinput-game-input-backend calibrate-controller
     handle>> f 0 IDirectInputDevice8W::RunControlPanel ole32-error ;
 
 M: dinput-game-input-backend read-keyboard
-    +keyboard-device+ get [ 
-        256 get-device-state
-    ] with-acquisition <keyboard-state> ;
+    +keyboard-device+ get [ 256 get-device-state ]
+    [ <keyboard-state> ] [ f ] with-acquisition ;
 
 dinput-game-input-backend game-input-backend set-global
