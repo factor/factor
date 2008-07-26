@@ -188,15 +188,14 @@ TUPLE: window-rect < rect window-loc ;
     +keyboard-device+ global
     [ com-release f ] change-at ;
 
-M: dinput-game-input-backend open-game-input
-    +dinput+ get-global [ "game-input already open" throw ] when
+M: dinput-game-input-backend (open-game-input)
     create-dinput
     create-device-change-window
     find-keyboard
     set-up-controllers
     add-wm-devicechange ;
 
-M: dinput-game-input-backend close-game-input
+M: dinput-game-input-backend (close-game-input)
     remove-wm-devicechange
     release-controllers
     release-keyboard

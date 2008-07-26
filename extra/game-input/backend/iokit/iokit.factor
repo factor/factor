@@ -218,8 +218,7 @@ SYMBOLS: +hid-manager+ +keyboard-state+ +controller-states+ ;
     4 <vector> +controller-states+ set-global
     256 f <array> +keyboard-state+ set-global ;
 
-M: iokit-game-input-backend open-game-input
-    +hid-manager+ get-global [ "game-input already open" throw ] when
+M: iokit-game-input-backend (open-game-input)
     hid-manager-matching-game-devices {
         [ initialize-variables ]
         [ device-matched-callback f IOHIDManagerRegisterDeviceMatchingCallback ]
@@ -232,7 +231,7 @@ M: iokit-game-input-backend open-game-input
         ]
     } cleave ;
 
-M: iokit-game-input-backend close-game-input
+M: iokit-game-input-backend (close-game-input)
     +hid-manager+ get-global [
         +hid-manager+ global [ 
             [

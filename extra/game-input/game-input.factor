@@ -1,11 +1,25 @@
 USING: arrays accessors continuations kernel symbols
-combinators.lib sequences ;
+combinators.lib sequences namespaces ;
 IN: game-input
 
-SYMBOL: game-input-backend
+SYMBOLS: game-input-backend game-input-opened ;
 
-HOOK: open-game-input game-input-backend ( -- )
-HOOK: close-game-input game-input-backend ( -- )
+HOOK: (open-game-input)  game-input-backend ( -- )
+HOOK: (close-game-input) game-input-backend ( -- )
+
+: game-input-opened? ( -- ? )
+    game-input-opened get ;
+
+: open-game-input ( -- )
+    game-input-opened? [
+        (open-game-input) 
+        game-input-opened on
+    ] unless ;
+: close-game-input ( -- )
+    game-input-opened? [
+        (close-game-input) 
+        game-input-opened off
+    ] when ;
 
 : with-game-input ( quot -- )
     open-game-input [ close-game-input ] [ ] cleanup ;

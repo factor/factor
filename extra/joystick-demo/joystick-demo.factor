@@ -80,18 +80,37 @@ TUPLE: joystick-demo-gadget < pack axis raxis controller buttons alarm ;
 : update-buttons ( buttons button-states -- )
     [ >>selected? drop ] 2each ;
 
-: update-axes ( gadget -- )
-    dup controller>> read-controller {
-        [ [ axis>>    ] [ [ x>>  ] [ y>>  ] [ z>>  ] tri ] bi* move-axis ]
-        [ [ raxis>>   ] [ [ rx>> ] [ ry>> ] [ rz>> ] tri ] bi* move-axis ]
-        [ [ buttons>> ] [ buttons>>                      ] bi* update-buttons ]
+: kill-update-axes ( gadget -- )
+    gray <solid> >>interior
+    [ cancel-alarm f ] change-alarm
+    relayout-1 ;
+
+: (update-axes) ( gadget controller-state -- )
+    {
+        [ [ axis>>  ] [ [ x>>  ] [ y>>  ] [ z>>  ] tri ] bi* move-axis ]
+        [ [ raxis>> ] [ [ rx>> ] [ ry>> ] [ rz>> ] tri ] bi* move-axis ]
+        [ [ buttons>> ] [ buttons>> ] bi* update-buttons ]
         [ drop relayout-1 ]
     } 2cleave ;
+
+: update-axes ( gadget -- )
+    dup controller>> read-controller
+    [ (update-axes) ] [ kill-update-axes ] if* ;
 
 M: joystick-demo-gadget graft*
     dup '[ , update-axes ] FREQUENCY every >>alarm
     drop ;
 
 M: joystick-demo-gadget ungraft*
-    alarm>> cancel-alarm ;
+    alarm>> [ cancel-alarm ] when* ;
 
+: joystick-window ( controller -- )
+    [ <joystick-demo-gadget> ] [ product-string ] bi
+    open-window ;
+
+: joystick-demo ( -- )
+    open-game-input [
+        get-controllers [ joystick-window ] each
+    ] with-ui ;
+
+MAIN: joystick-demo

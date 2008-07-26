@@ -25,16 +25,20 @@ ARTICLE: "game-input" "Game controller input"
 { $subsection keyboard-state } ;
 
 HELP: open-game-input
-{ $description "Initializes the game input interface. An exception will be thrown if the initialization fails." } ;
+{ $description "Initializes the game input interface. An exception will be thrown if the initialization fails. If the game input interface is already opened, nothing happens." } ;
 
 HELP: close-game-input
-{ $description "Closes the game input interface, releasing any allocated resources. Once this word is called, any remaining " { $link controller } " objects are invalid." } ;
+{ $description "Closes the game input interface, releasing any allocated resources. Once this word is called, any remaining " { $link controller } " objects are invalid. If the game input interface is not opened, nothing happens." } ;
+
+HELP: game-input-opened?
+{ $values { "?" "a boolean" } }
+{ $description "Returns true if the game input interface is open, false otherwise." } ;
 
 HELP: with-game-input
 { $values { "quot" quotation } }
 { $description "Initializes the game input interface for the dynamic extent of " { $snippet "quotation" } "." } ;
 
-{ open-game-input close-game-input with-game-input } related-words
+{ open-game-input close-game-input with-game-input game-input-opened? } related-words
 
 HELP: get-controllers
 { $values { "sequence" "A " { $link sequence } " of " { $link controller } "s" } }
@@ -71,14 +75,16 @@ HELP: calibrate-controller
 
 HELP: read-controller
 { $values { "controller" controller } { "controller-state" controller-state } }
-{ $description "Reads the current state of " { $snippet "controller" } ". See the documentation for the " { $link controller-state } " class for details of the returned value's format. If the device is no longer available, " { $link f } " is returned." } ;
+{ $description "Reads the current state of " { $snippet "controller" } ". See the documentation for the " { $link controller-state } " class for details of the returned value's format. If the device is no longer available, " { $link f } " is returned." }
+{ $warning "For efficiency, the implementation may reuse the returned " { $snippet "controller-state" } " object next time " { $snippet "read-controller" } " is called on the same controller. You should " { $link clone } " any values from the returned tuple you need to preserve." } ;
 
 { controller-state controller read-controller } related-words
 
 HELP: read-keyboard
 { $values { "keyboard-state" keyboard-state } }
 { $description "Reads the current raw state of the keyboard. See the documentation for the " { $link keyboard-state } " class for details on the returned value's format." }
-{ $warning "The keyboard state returned by this word is unprocessed by any keymaps, modifier keys, key repeat settings, or other operating environment postprocessing. Because of this, " { $snippet "read-keyboard" } " should not be used for text entry purposes. The Factor UI's standard gesture mechanism should be used in cases where the logical meaning of keypresses is needed; see " { $link "keyboard-gestures" } "." } ;
+{ $warning "For efficiency, the implementation may reuse the returned " { $snippet "keyboard-state" } " object next time " { $snippet "read-keyboard" } " is called. You should " { $link clone } " any values from the returned tuple you need to preserve."
+$nl "The keyboard state returned by this word is unprocessed by any keymaps, modifier keys, key repeat settings, or other operating environment postprocessing. Because of this, " { $snippet "read-keyboard" } " should not be used for text entry purposes. The Factor UI's standard gesture mechanism should be used in cases where the logical meaning of keypresses is needed; see " { $link "keyboard-gestures" } "." } ;
 
 HELP: controller-state
 { $class-description "The " { $link read-controller } " word returns objects of this class. " { $snippet "controller-state" } " objects have the following slots:"
