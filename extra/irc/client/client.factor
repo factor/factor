@@ -12,8 +12,6 @@ IN: irc.client
 ! Setup and running objects
 ! ======================================
 
-SYMBOL: current-irc-client
-
 : irc-port 6667 ; ! Default irc port
 
 TUPLE: irc-profile server port nickname password ;
@@ -71,12 +69,16 @@ SINGLETON: irc-connected    ! sent when connection is established
 UNION: irc-broadcasted-message irc-end irc-disconnected irc-connected ;
 
 : terminate-irc ( irc-client -- )
-    [ [ irc-end ] dip in-messages>> mailbox-put ]
-    [ [ f ] dip (>>is-running) ]
-    [ stream>> dispose ]
-    tri ;
+    [ is-running>> ] keep and [
+        [ [ irc-end ] dip in-messages>> mailbox-put ]
+        [ [ f ] dip (>>is-running) ]
+        [ stream>> dispose ]
+        tri
+    ] when* ;
 
 <PRIVATE
+
+SYMBOL: current-irc-client
 
 ! ======================================
 ! Utils
@@ -88,7 +90,7 @@ UNION: irc-broadcasted-message irc-end irc-disconnected irc-connected ;
 : irc-print ( s -- ) irc-stream> [ stream-print ] keep stream-flush ;
 : listener> ( name -- listener/f ) irc> listeners>> at ;
 
-: maybe-mailbox-get ( mailbox quot -- )
+: maybe-mailbox-get ( mailbox quot: ( irc-message -- ) -- )
     [ dup mailbox-empty? [ drop yield ] ] dip '[ mailbox-get @ ] if ; inline
 
 GENERIC: to-listener ( message obj -- )
@@ -240,8 +242,8 @@ M: quit handle-incoming-irc ( quit -- )
         [ to-listener ] with each ]
       [ handle-participant-change ]
       [ prefix>> parse-name remove-participant-from-all ]
-      [ ]
-    } cleave call-next-method ;
+      [ call-next-method ]
+    } cleave ;
 
 : >nick/mode ( string -- nick mode )
     dup first "+@" member? [ unclip ] [ 0 ] if participant-mode ;
@@ -266,12 +268,6 @@ GENERIC: handle-outgoing-irc ( obj -- )
 M: irc-message handle-outgoing-irc ( irc-message -- )
     irc-message>client-line irc-print ;
 
-M: privmsg handle-outgoing-irc ( privmsg -- )
-    [ name>> ] [ trailing>> ] bi /PRIVMSG ;
-
-M: part handle-outgoing-irc ( part -- )
-    [ channel>> ] [ trailing>> "" or ] bi /PART ;
-
 ! ======================================
 ! Reader/Writer
 ! ======================================
@@ -283,7 +279,7 @@ DEFER: (connect-irc)
 
 : (handle-disconnect) ( -- )
     irc>
-        [ [ irc-disconnected ] dip to-listener ]
+        [ [ irc-disconnected ] dip in-messages>> mailbox-put ]
         [ dup reconnect-time>> sleep (connect-irc) ]
         [ profile>> nickname>> /LOGIN ]
     tri ;
@@ -318,10 +314,9 @@ DEFER: (connect-irc)
     privmsg new [ (>>trailing) ] keep [ (>>name) ] keep ;
 
 : maybe-annotate-with-name ( name obj -- obj )
-    {
-        { [ dup string? ] [ strings>privmsg ] }
-        { [ dup privmsg instance? ] [ swap >>name ] }
-        [ nip ]
+    { { [ dup string? ] [ strings>privmsg ] }
+      { [ dup privmsg instance? ] [ swap >>name ] }
+      [ nip ]
     } cond ;
 
 : listener-loop ( name -- ? )
@@ -331,7 +326,7 @@ DEFER: (connect-irc)
         maybe-mailbox-get t
     ] [ drop f ] if* ;
 
-: spawn-irc-loop ( quot name -- )
+: spawn-irc-loop ( quot: ( -- ? ) name -- )
     [ '[ irc> is-running>> [ @ ] [ f ] if ] ] dip
     spawn-server drop ;
 
@@ -383,16 +378,15 @@ M: irc-server-listener (remove-listener) ( irc-server-listener -- )
         t >>is-running
     in-messages>> [ irc-connected ] dip mailbox-put ;
 
-: with-irc-client ( irc-client quot -- )
+: with-irc-client ( irc-client quot: ( -- ) -- )
     [ current-irc-client ] dip with-variable ; inline
 
 PRIVATE>
 
 : connect-irc ( irc-client -- )
-    dup [
-        [ (connect-irc) ] [ profile>> nickname>> /LOGIN ] bi
-        spawn-irc
-    ] with-irc-client ;
+    [ irc>
+      [ (connect-irc) ] [ profile>> nickname>> /LOGIN ] bi
+      spawn-irc ] with-irc-client ;
 
 : add-listener ( irc-listener irc-client -- )
     swap '[ , (add-listener) ] with-irc-client ;
