@@ -49,7 +49,7 @@ DEFER: define-lisp-macro
     swap '[ , cut '[ @ , seq>list ] call , call ] ;
 
 : normal-lambda ( body vars -- quot )
-    localize-lambda <lambda> lambda-rewrite [ compose call ] compose ;
+    localize-lambda <lambda> lambda-rewrite [ compose call ] compose 1quotation ;
 PRIVATE>
 
 : convert-lambda ( cons -- quot )
