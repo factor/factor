@@ -1,7 +1,7 @@
 USING: cocoa cocoa.plists core-foundation iokit iokit.hid
 kernel cocoa.enumeration destructors math.parser cocoa.application 
 sequences locals combinators.short-circuit game-input threads
-symbols namespaces assocs hashtables arrays combinators
+symbols namespaces assocs vectors arrays combinators
 core-foundation.run-loop accessors sequences.private
 alien.c-types math ;
 IN: game-input.backend.iokit
@@ -215,7 +215,7 @@ SYMBOLS: +hid-manager+ +keyboard-state+ +controller-states+ ;
 
 : initialize-variables ( manager -- )
     +hid-manager+ set-global
-    4 <hashtable> +controller-states+ set-global
+    4 <vector> +controller-states+ set-global
     256 f <array> +keyboard-state+ set-global ;
 
 M: iokit-game-input-backend open-game-input
@@ -232,8 +232,6 @@ M: iokit-game-input-backend open-game-input
         ]
     } cleave ;
 
-! XXX while game-input is open, we need to reset-game-input and open-game-input as a
-! boot image hook
 M: iokit-game-input-backend close-game-input
     +hid-manager+ get-global [
         +hid-manager+ global [ 
@@ -252,10 +250,13 @@ M: iokit-game-input-backend close-game-input
 M: iokit-game-input-backend get-controllers ( -- sequence )
     +controller-states+ get keys [ controller boa ] map ;
 
+: ?join ( pre post sep -- string )
+    2over start [ swap 2nip ] [ [ 2array ] dip join ] if ;
+
 M: iokit-game-input-backend product-string ( controller -- string )
     handle>>
     [ kIOHIDManufacturerKey device-property ]
-    [ kIOHIDProductKey      device-property ] bi 2array " " join ;
+    [ kIOHIDProductKey      device-property ] bi " " ?join ;
 M: iokit-game-input-backend product-id ( controller -- integer )
     handle>>
     [ kIOHIDVendorIDKey  device-property ]
@@ -270,7 +271,6 @@ M: iokit-game-input-backend read-keyboard ( -- keyboard-state )
     +keyboard-state+ get clone keyboard-state boa ;
 
 M: iokit-game-input-backend calibrate-controller ( controller -- )
-    ! XXX
     drop ;
 
 iokit-game-input-backend game-input-backend set-global

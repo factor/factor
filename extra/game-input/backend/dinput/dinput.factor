@@ -1,6 +1,6 @@
 USING: windows.dinput windows.dinput.constants game-input
 symbols alien.c-types windows.ole32 namespaces assocs kernel
-arrays hashtables windows.kernel32 windows.com windows.dinput
+arrays vectors windows.kernel32 windows.com windows.dinput
 shuffle windows.user32 windows.messages sequences combinators
 math.geometry.rect ui.windows accessors math windows alien
 alien.strings io.encodings.utf16 continuations byte-arrays ;
@@ -118,8 +118,8 @@ SYMBOLS: +dinput+ +keyboard-device+
     f DIEDFL_ATTACHEDONLY IDirectInput8W::EnumDevices ole32-error ;
 
 : set-up-controllers ( -- )
-    4 <hashtable> +controller-devices+ set-global
-    4 <hashtable> +controller-guids+ set-global
+    4 <vector> +controller-devices+ set-global
+    4 <vector> +controller-guids+ set-global
     find-controllers ;
 
 : find-and-remove-detached-devices ( -- )
@@ -266,6 +266,7 @@ M: dinput-game-input-backend instance-id
     [ IDirectInputDevice8W::GetDeviceState ole32-error ] keep ;
 
 M: dinput-game-input-backend read-controller
+    ! XXX return f if device was disconnected
     handle>> [ +controller-devices+ get at clone ] [
         [ "DIJOYSTATE2" heap-size get-device-state ]
         with-acquisition
