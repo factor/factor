@@ -19,8 +19,13 @@ load-help? off
 [
     [
         ! Rehash hashtables, since bootstrap.image creates them
-        ! using the host image's hashing algorithms
-        [ hashtable? ] instances [ rehash ] each
+        ! using the host image's hashing algorithms. We don't
+        ! use each-object here since the catch stack isn't yet
+        ! set up.
+        begin-scan
+        [ hashtable? ] pusher [ (each-object) ] dip
+        end-scan
+        [ rehash ] each
         boot
     ] %
 
