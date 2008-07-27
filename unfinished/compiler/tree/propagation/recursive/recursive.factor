@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences accessors
+USING: kernel sequences accessors arrays
+stack-checker.inlining
 compiler.tree
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
@@ -14,23 +15,48 @@ IN: compiler.tree.propagation.recursive
 ! We need to compute scalar evolution so that sccp doesn't
 ! evaluate loops
 
-: (merge-value-infos) ( inputs -- infos )
+! row polymorphism is causing problems
+
+! infer-branch cloning and subsequent loss of state causing problems
+
+: merge-value-infos ( inputs -- infos )
     [ [ value-info ] map value-infos-union ] map ;
+USE: io
+: compute-fixed-point ( label infos outputs -- )
+    2dup [ length ] bi@ = [ "Wrong length" throw ] unless
+    "compute-fixed-point" print USE: prettyprint
+    2dup [ value-info ] map 2dup . . [ = ] 2all? [ 3drop ] [
+        [ set-value-info ] 2each
+        f >>fixed-point drop
+    ] if ;
 
-: merge-value-infos ( inputs outputs -- fixed-point? )
-    [ (merge-value-infos) ] dip
-    [ 2dup value-info = [ 2drop t ] [ set-value-info f ] if ] 2all? ;
+: propagate-recursive-phi ( label #phi -- )
+    "propagate-recursive-phi" print
+    [ [ phi-in-d>> merge-value-infos ] [ out-d>> ] bi compute-fixed-point ]
+    [ [ phi-in-r>> merge-value-infos ] [ out-r>> ] bi compute-fixed-point ] 2bi ;
 
-: propagate-recursive-phi ( #phi -- fixed-point? )
-    [ [ phi-in-d>> ] [ out-d>> ] bi merge-value-infos ]
-    [ [ phi-in-r>> ] [ out-r>> ] bi merge-value-infos ]
-    bi and ;
-
+USING: namespaces math ;
+SYMBOL: iter-counter
+0 iter-counter set-global
 M: #recursive propagate-around ( #recursive -- )
-    dup
-    node-child
-    [ first>> (propagate) ] [ propagate-recursive-phi ] bi
-    [ drop ] [ propagate-around ] if ;
+    "#recursive" print
+    iter-counter inc
+    iter-counter get 10 > [ "Oops" throw ] when
+    [ label>> ] keep
+    [ node-child first>> propagate-recursive-phi ]
+    [ [ t >>fixed-point drop ] [ node-child first>> (propagate) ] bi* ]
+    [ swap fixed-point>> [ drop ] [ propagate-around ] if ]
+    2tri ; USE: assocs
 
 M: #call-recursive propagate-before ( #call-label -- )
-    [ label>> returns>> flip ] [ out-d>> ] bi merge-value-infos drop ;
+    [ label>> ] [ label>> return>> [ value-info ] map ] [ out-d>> ] tri
+    dup [ dup value-infos get at [ drop ] [ object <class-info> swap set-value-info ] if ] each
+    2dup min-length [ tail* ] curry bi@
+    compute-fixed-point ;
+
+M: #return propagate-before ( #return -- )
+    "#return" print
+    dup label>> [
+        [ label>> ] [ in-d>> [ value-info ] map ] [ in-d>> ] tri
+        compute-fixed-point
+    ] [ drop ] if ;

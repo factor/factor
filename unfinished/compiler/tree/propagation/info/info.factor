@@ -113,6 +113,8 @@ slots ;
 
 DEFER: value-info-intersect
 
+DEFER: (value-info-intersect)
+
 : intersect-lengths ( info1 info2 -- length )
     [ length>> ] bi@ {
         { [ dup not ] [ drop ] }
@@ -120,10 +122,17 @@ DEFER: value-info-intersect
         [ value-info-intersect ]
     } cond ;
 
+: intersect-slot ( info1 info2 -- info )
+    {
+        { [ dup not ] [ nip ] }
+        { [ over not ] [ drop ] }
+        [ (value-info-intersect) ]
+    } cond ;
+
 : intersect-slots ( info1 info2 -- slots )
     [ slots>> ] bi@
     2dup [ length ] bi@ =
-    [ [ value-info-intersect ] 2map ] [ 2drop f ] if ;
+    [ [ intersect-slot ] 2map ] [ 2drop f ] if ;
 
 : (value-info-intersect) ( info1 info2 -- info )
     [ <value-info> ] 2dip
@@ -150,6 +159,8 @@ DEFER: value-info-intersect
 
 DEFER: value-info-union
 
+DEFER: (value-info-union)
+
 : union-lengths ( info1 info2 -- length )
     [ length>> ] bi@ {
         { [ dup not ] [ nip ] }
@@ -157,10 +168,17 @@ DEFER: value-info-union
         [ value-info-union ]
     } cond ;
 
+: union-slot ( info1 info2 -- info )
+    {
+        { [ dup not ] [ nip ] }
+        { [ over not ] [ drop ] }
+        [ (value-info-union) ]
+    } cond ;
+
 : union-slots ( info1 info2 -- slots )
     [ slots>> ] bi@
     2dup [ length ] bi@ =
-    [ [ value-info-union ] 2map ] [ 2drop f ] if ;
+    [ [ union-slot ] 2map ] [ 2drop f ] if ;
 
 : (value-info-union) ( info1 info2 -- info )
     [ <value-info> ] 2dip
@@ -181,7 +199,9 @@ DEFER: value-info-union
     } cond ;
 
 : value-infos-union ( infos -- info )
-    dup first [ value-info-union ] reduce ;
+    dup empty?
+    [ drop null <class-info> ]
+    [ dup first [ value-info-union ] reduce ] if ;
 
 ! Current value --> info mapping
 SYMBOL: value-infos
