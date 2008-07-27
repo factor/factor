@@ -2,7 +2,7 @@ USING: ui ui.gadgets sequences kernel arrays math colors
 ui.render math.vectors accessors fry ui.gadgets.packs game-input
 game-input.backend ui.gadgets.labels ui.gadgets.borders alarms
 calendar locals combinators.lib strings ui.gadgets.buttons
-combinators math.parser assocs ;
+combinators math.parser assocs threads ;
 IN: joystick-demo
 
 : SIZE { 151 151 } ;
@@ -138,6 +138,7 @@ M: joystick-demo-gadget ungraft*
 : joystick-demo ( -- )
     [
         open-game-input
+        0.1 seconds sleep ! It might take a moment to find devices...
         get-controllers [ joystick-window ] each
     ] with-ui ;
 
