@@ -195,6 +195,8 @@ TUPLE: sprite loc dim dim2 dlist texture ;
 
 : gl-translate ( point -- ) first2 0.0 glTranslated ;
 
+<PRIVATE
+
 : top-left drop 0 0 glTexCoord2i 0.0 0.0 glVertex2d ; inline
 
 : top-right 1 0 glTexCoord2i first 0.0 glVertex2d ; inline
@@ -202,6 +204,8 @@ TUPLE: sprite loc dim dim2 dlist texture ;
 : bottom-left 0 1 glTexCoord2i second 0.0 swap glVertex2d ; inline
 
 : bottom-right 1 1 glTexCoord2i gl-vertex ; inline
+
+PRIVATE>
 
 : four-sides ( dim -- )
     dup top-left dup top-right dup bottom-right bottom-left ;
