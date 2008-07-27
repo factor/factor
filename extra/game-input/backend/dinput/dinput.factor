@@ -126,9 +126,9 @@ SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     find-controllers ;
 
 : find-and-remove-detached-devices ( -- )
-    +controller-devices+ get [
-        drop dup device-attached? [ drop ] [ remove-controller ] if
-    ] assoc-each ;
+    +controller-devices+ get keys
+    [ device-attached? not ] filter
+    [ remove-controller ] each ;
 
 : device-interface? ( dbt-broadcast-hdr -- ? )
     DEV_BROADCAST_HDR-dbch_devicetype DBT_DEVTYP_DEVICEINTERFACE = ;
