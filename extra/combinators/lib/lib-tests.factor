@@ -8,6 +8,9 @@ IN: combinators.lib.tests
 [ 5 4 ] [ 5 0 1 [ + ] [ - ] bi*, bi ] unit-test
 [ 5 4 5 ] [ 5 0 1 1 [ + ] [ - ] [ * ] tri*, tri ] unit-test
 
+[ 5 6 ] [ 5 0 1 [ + ] bi@, bi ] unit-test
+[ 5 6 7 ] [ 5 0 1 2 [ + ] tri@, tri ] unit-test
+
 [ 5 ] [ [ 10 random ] [ 5 = ] generate ] unit-test
 [ t ] [ [ 10 random ] [ even? ] generate even? ] unit-test
 
