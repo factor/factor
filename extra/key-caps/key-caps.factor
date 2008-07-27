@@ -1,7 +1,7 @@
 USING: game-input game-input.backend game-input.scancodes
 kernel ui.gadgets ui.gadgets.buttons sequences accessors
 words arrays assocs math calendar fry alarms ui
-ui.gadgets.borders ;
+ui.gadgets.borders ui.gestures ;
 IN: key-caps
 
 : key-locations H{
@@ -167,6 +167,9 @@ M: key-caps-gadget graft*
 
 M: key-caps-gadget ungraft*
     alarm>> [ cancel-alarm ] when* ;
+
+M: key-caps-gadget handle-gesture*
+    drop nip [ key-down? ] [ key-up? ] bi or not ;
 
 : key-caps ( -- )
     [
