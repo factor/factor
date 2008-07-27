@@ -16,6 +16,7 @@ GENERIC: propagate-around ( node -- )
 
 : (propagate) ( node -- )
     [
+        USING: classes prettyprint ; dup class .
         [ propagate-around ] [ successor>> ] bi
         (propagate)
     ] when* ;

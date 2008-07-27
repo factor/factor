@@ -27,6 +27,8 @@ literal?
 length
 slots ;
 
+: null-info T{ value-info f null empty-interval } ; inline
+
 : class-interval ( class -- interval )
     dup real class<=
     [ +interval+ word-prop [-inf,inf] or ] [ drop f ] if ;
@@ -200,15 +202,14 @@ DEFER: (value-info-union)
 
 : value-infos-union ( infos -- info )
     dup empty?
-    [ drop null <class-info> ]
+    [ drop null-info ]
     [ dup first [ value-info-union ] reduce ] if ;
 
 ! Current value --> info mapping
 SYMBOL: value-infos
 
 : value-info ( value -- info )
-    resolve-copy value-infos get at
-    T{ value-info f null empty-interval } or ;
+    resolve-copy value-infos get at null-info or ;
 
 : set-value-info ( info value -- )
     resolve-copy value-infos get set-at ;
@@ -233,3 +234,12 @@ SYMBOL: value-infos
 
 : value-is? ( value class -- ? )
     [ value-info class>> ] dip class<= ;
+
+: node-value-info ( node value -- info )
+    swap info>> at* [ drop null-info ] unless ;
+
+: node-input-infos ( node -- seq )
+    dup in-d>> [ node-value-info ] with map ;
+
+: node-output-infos ( node -- seq )
+    dup out-d>> [ node-value-info ] with map ;

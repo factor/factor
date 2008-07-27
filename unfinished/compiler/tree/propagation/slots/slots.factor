@@ -77,7 +77,7 @@ UNION: fixed-length-sequence array byte-array string ;
     relevant-methods [ nip "reading" word-prop ] { } assoc>map ;
 
 : no-reader-methods ( input slots -- info )
-    2drop null <class-info> ;
+    2drop null-info ;
 
 : same-offset ( slots -- slot/f )
     dup [ dup [ read-only>> ] when ] all? [

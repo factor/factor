@@ -4,7 +4,8 @@ compiler.tree.def-use tools.test math math.order
 accessors sequences arrays kernel.private vectors
 alien.accessors alien.c-types sequences.private
 byte-arrays classes.algebra classes.tuple.private
-math.functions math.private strings layouts ;
+math.functions math.private strings layouts
+compiler.tree.propagation.info ;
 IN: compiler.tree.propagation.tests
 
 \ propagate must-infer
@@ -383,12 +384,25 @@ TUPLE: mixed-mutable-immutable { x integer } { y sequence read-only } ;
     [ { float } declare 10 [ 2.3 * ] times ] final-classes
 ] unit-test
 
+[ V{ fixnum } ] [
+    [ 0 10 [ nip ] each-integer ] final-classes
+] unit-test
+
+[ V{ t } ] [
+    [ t 10 [ nip 0 >= ] each-integer ] final-literals
+] unit-test
+
 : recursive-test-4 ( i n -- )
     2dup < [ >r 1+ r> recursive-test-4 ] [ 2drop ] if ; inline recursive
 
 [ ] [ [ recursive-test-4 ] final-info drop ] unit-test
 
 : recursive-test-5 ( a -- b )
-    dup 2 > [ dup 1 - recursive-test-5 * ] when ; inline recursive
+    dup 1 <= [ drop 1 ] [ dup 1 - recursive-test-5 * ] if ; inline recursive
 
-[ V{ integer } ] [ [ recursive-test-5 ] final-info drop ] unit-test
+[ V{ integer } ] [ [ { integer } declare recursive-test-5 ] final-classes ] unit-test
+
+: recursive-test-6 ( a -- b )
+    dup 1 <= [ drop 1 ] [ dup 1 - recursive-test-6 swap 2 - recursive-test-6 + ] if ; inline recursive
+
+[ V{ integer } ] [ [ { fixnum } declare recursive-test-6 ] final-classes ] unit-test
