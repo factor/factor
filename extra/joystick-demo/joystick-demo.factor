@@ -82,7 +82,7 @@ TUPLE: joystick-demo-gadget < pack axis raxis controller buttons alarm ;
 
 : kill-update-axes ( gadget -- )
     gray <solid> >>interior
-    [ cancel-alarm f ] change-alarm
+    [ [ cancel-alarm ] when* f ] change-alarm
     relayout-1 ;
 
 : (update-axes) ( gadget controller-state -- )

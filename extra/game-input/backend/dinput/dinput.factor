@@ -218,9 +218,7 @@ M: dinput-game-input-backend instance-id
 
 :: with-acquisition ( device acquired-quot succeeded-quot failed-quot -- result/f )
     device IDirectInputDevice8W::Acquire succeeded? [
-        device acquired-quot
-        [ device IDirectInputDevice8W::Unacquire ole32-error ]
-        [ ] cleanup
+        device acquired-quot call
         succeeded-quot call
     ] failed-quot if ; inline
 

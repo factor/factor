@@ -24,12 +24,15 @@ SYMBOLS:
 : (sizeof) ( field struct -- size )
     [ (field-spec-of) class>> "[" split1 drop heap-size ] [ drop 1 ] if* ;
 
-MACRO: (flags) ( array -- )
-    0 [ {
+: (flag) ( thing -- integer )
+    {
         { [ dup word? ] [ execute ] }
         { [ dup callable? ] [ call ] }
         [ ]
-    } cond bitor ] reduce 1quotation ;
+    } cond ;
+
+: (flags) ( array -- )
+    0 [ (flag) bitor ] reduce ;
 
 : (DIOBJECTDATAFORMAT) ( pguid dwOfs dwType dwFlags alien -- alien )
     [ {
@@ -45,7 +48,7 @@ MACRO: (flags) ( array -- )
         [ second rot [ (offsetof) ] [ (sizeof) ] 2bi ]
         [ third * + ]
         [ fourth (flags) ]
-        [ 4 swap nth ]
+        [ 4 swap nth (flag) ]
     } cleave
     "DIOBJECTDATAFORMAT" <c-object> (DIOBJECTDATAFORMAT) ;
 
@@ -245,30 +248,30 @@ MACRO: (flags) ( array -- )
             { f           "rgbButtons" 125 { DIDFT_OPTIONAL DIDFT_BUTTON DIDFT_ANYINSTANCE } 0 }
             { f           "rgbButtons" 126 { DIDFT_OPTIONAL DIDFT_BUTTON DIDFT_ANYINSTANCE } 0 }
             { f           "rgbButtons" 127 { DIDFT_OPTIONAL DIDFT_BUTTON DIDFT_ANYINSTANCE } 0 }
-            { GUID_XAxis_malloced  "lVX"          0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_YAxis_malloced  "lVY"          0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_ZAxis_malloced  "lVZ"          0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_RxAxis_malloced "lVRx"         0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_RyAxis_malloced "lVRy"         0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_RzAxis_malloced "lVRz"         0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_Slider_malloced "rglVSlider"   0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_Slider_malloced "rglVSlider"   1 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_XAxis_malloced  "lAX"          0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_YAxis_malloced  "lAY"          0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_ZAxis_malloced  "lAZ"          0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_RxAxis_malloced "lARx"         0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_RyAxis_malloced "lARy"         0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_RzAxis_malloced "lARz"         0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_Slider_malloced "rglASlider"   0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_Slider_malloced "rglASlider"   1 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_XAxis_malloced  "lFX"          0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_YAxis_malloced  "lFY"          0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_ZAxis_malloced  "lFZ"          0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_RxAxis_malloced "lFRx"         0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_RyAxis_malloced "lFRy"         0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_RzAxis_malloced "lFRz"         0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_Slider_malloced "rglFSlider"   0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
-            { GUID_Slider_malloced "rglFSlider"   1 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } 0 }
+            { GUID_XAxis_malloced  "lVX"          0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTVELOCITY }
+            { GUID_YAxis_malloced  "lVY"          0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTVELOCITY }
+            { GUID_ZAxis_malloced  "lVZ"          0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTVELOCITY }
+            { GUID_RxAxis_malloced "lVRx"         0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTVELOCITY }
+            { GUID_RyAxis_malloced "lVRy"         0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTVELOCITY }
+            { GUID_RzAxis_malloced "lVRz"         0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTVELOCITY }
+            { GUID_Slider_malloced "rglVSlider"   0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTVELOCITY }
+            { GUID_Slider_malloced "rglVSlider"   1 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTVELOCITY }
+            { GUID_XAxis_malloced  "lAX"          0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTACCEL }
+            { GUID_YAxis_malloced  "lAY"          0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTACCEL }
+            { GUID_ZAxis_malloced  "lAZ"          0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTACCEL }
+            { GUID_RxAxis_malloced "lARx"         0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTACCEL }
+            { GUID_RyAxis_malloced "lARy"         0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTACCEL }
+            { GUID_RzAxis_malloced "lARz"         0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTACCEL }
+            { GUID_Slider_malloced "rglASlider"   0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTACCEL }
+            { GUID_Slider_malloced "rglASlider"   1 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTACCEL }
+            { GUID_XAxis_malloced  "lFX"          0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTFORCE }
+            { GUID_YAxis_malloced  "lFY"          0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTFORCE }
+            { GUID_ZAxis_malloced  "lFZ"          0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTFORCE }
+            { GUID_RxAxis_malloced "lFRx"         0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTFORCE }
+            { GUID_RyAxis_malloced "lFRy"         0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTFORCE }
+            { GUID_RzAxis_malloced "lFRz"         0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTFORCE }
+            { GUID_Slider_malloced "rglFSlider"   0 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTFORCE }
+            { GUID_Slider_malloced "rglFSlider"   1 { DIDFT_OPTIONAL DIDFT_AXIS   DIDFT_ANYINSTANCE } DIDOI_ASPECTFORCE }
         } <DIDATAFORMAT>
     ] unless* ] change-at ;
 
