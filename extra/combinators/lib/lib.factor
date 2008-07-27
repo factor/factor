@@ -12,10 +12,15 @@ IN: combinators.lib
 ! Currying cleave combinators
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: bi+ ( obj quot quot -- quot' quot' )
+: bi, ( obj quot quot -- quot' quot' )
     [ [ curry ] curry ] bi@ bi ; inline
-: tri+ ( obj quot quot quot -- quot' quot' quot' )
+: tri, ( obj quot quot quot -- quot' quot' quot' )
     [ [ curry ] curry ] tri@ tri ; inline
+
+: bi*, ( obj obj quot quot -- quot' quot' )
+    [ [ curry ] curry ] bi@ bi* ; inline
+: tri*, ( obj obj obj quot quot quot -- quot' quot' quot' )
+    [ [ curry ] curry ] tri@ tri* ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Generalized versions of core combinators

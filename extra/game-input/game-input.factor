@@ -46,7 +46,7 @@ HOOK: instance-id game-input-backend ( controller -- id )
 : find-controller-instance ( product-id instance-id -- controller/f )
     get-controllers [
         [ product-id  = ]
-        [ instance-id = ] bi+ bi* and
+        [ instance-id = ] bi, bi* and
     ] 2with find nip ;
 
 HOOK: read-controller game-input-backend ( controller -- controller-state )

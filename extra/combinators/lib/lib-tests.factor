@@ -2,6 +2,12 @@ USING: combinators.lib kernel math random sequences tools.test continuations
     arrays vectors ;
 IN: combinators.lib.tests
 
+[ 6 -1 ] [ 5 0 1 [ + ] [ - ] bi, bi* ] unit-test
+[ 6 -1 1 ] [ 5 0 1 1 [ + ] [ - ] [ * ] tri, tri* ] unit-test
+
+[ 5 4 ] [ 5 0 1 [ + ] [ - ] bi*, bi ] unit-test
+[ 5 4 5 ] [ 5 0 1 1 [ + ] [ - ] [ * ] tri*, tri ] unit-test
+
 [ 5 ] [ [ 10 random ] [ 5 = ] generate ] unit-test
 [ t ] [ [ 10 random ] [ even? ] generate even? ] unit-test
 
