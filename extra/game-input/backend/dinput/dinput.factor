@@ -4,12 +4,12 @@ arrays vectors windows.kernel32 windows.com windows.dinput
 shuffle windows.user32 windows.messages sequences combinators
 math.geometry.rect ui.windows accessors math windows alien
 alien.strings io.encodings.utf16 continuations byte-arrays
-locals ;
+locals game-input.backend.dinput.keys-array ;
 IN: game-input.backend.dinput
 
 SINGLETON: dinput-game-input-backend
 
-SYMBOLS: +dinput+ +keyboard-device+
+SYMBOLS: +dinput+ +keyboard-device+ +keyboard-state+
     +controller-devices+ +controller-guids+
     +device-change-window+ +device-change-handle+ ;
 
@@ -40,7 +40,9 @@ SYMBOLS: +dinput+ +keyboard-device+
 : find-keyboard ( -- )
     GUID_SysKeyboard device-for-guid
     [ configure-keyboard ]
-    [ +keyboard-device+ set-global ] bi ;
+    [ +keyboard-device+ set-global ] bi
+    256 <byte-array> <keys-array> keyboard-state boa
+    +keyboard-state+ set-global ;
 
 : device-info ( device -- DIDEVICEIMAGEINFOW )
     "DIDEVICEINSTANCEW" <c-object>
@@ -187,7 +189,8 @@ TUPLE: window-rect < rect window-loc ;
 
 : release-keyboard ( -- )
     +keyboard-device+ global
-    [ com-release f ] change-at ;
+    [ com-release f ] change-at
+    f +keyboard-state+ set-global ;
 
 M: dinput-game-input-backend (open-game-input)
     create-dinput
@@ -228,9 +231,6 @@ M: dinput-game-input-backend instance-id
         pov-down pov-down-left pov-left pov-up-left
     } ; inline
 
-: >keys ( byte-array -- array )
-    [ HEX: 80 bitand c-bool> ] { } map-as ;
-
 : >axis ( long -- float )
     32767 - 32767.0 /f ;
 : >slider ( long -- float )
@@ -240,7 +240,7 @@ M: dinput-game-input-backend instance-id
     [ drop pov-neutral ]
     [ 2750 + 4500 /i pov-values nth ] if ;
 : >buttons ( alien length -- array )
-    memory>byte-array >keys ;
+    memory>byte-array <keys-array> ;
 
 : (fill-if) ( controller-state DIJOYSTATE2 ? quot -- )
     [ drop ] compose [ 2drop ] if ; inline
@@ -258,16 +258,13 @@ M: dinput-game-input-backend instance-id
         [ DIJOYSTATE2-rgbButtons over buttons>> length >buttons >>buttons ]
     } 2cleave ;
 
-: <keyboard-state> ( byte-array -- keyboard-state )
-    >keys keyboard-state boa ;
-
-: get-device-state ( device state-size -- byte-array )
+: get-device-state ( device byte-array -- )
     [ dup IDirectInputDevice8W::Poll ole32-error ] dip
-    dup <byte-array>
-    [ IDirectInputDevice8W::GetDeviceState ole32-error ] keep ;
+    [ length ] keep
+    IDirectInputDevice8W::GetDeviceState ole32-error ;
 
 : (read-controller) ( handle template -- state )
-    clone swap [ "DIJOYSTATE2" heap-size get-device-state ]
+    swap [ "DIJOYSTATE2" heap-size <byte-array> [ get-device-state ] keep ]
     [ fill-controller-state ] [ drop f ] with-acquisition ;
 
 M: dinput-game-input-backend read-controller
@@ -278,7 +275,8 @@ M: dinput-game-input-backend calibrate-controller
     handle>> f 0 IDirectInputDevice8W::RunControlPanel ole32-error ;
 
 M: dinput-game-input-backend read-keyboard
-    +keyboard-device+ get [ 256 get-device-state ]
-    [ <keyboard-state> ] [ f ] with-acquisition ;
+    +keyboard-device+ get
+    [ +keyboard-state+ get [ keys>> underlying>> get-device-state ] keep ]
+    [ ] [ f ] with-acquisition ;
 
 dinput-game-input-backend game-input-backend set-global
