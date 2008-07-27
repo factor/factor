@@ -61,6 +61,7 @@ SYMBOL: super-sent-messages
         "NSOpenGLView"
         "NSOpenPanel"
         "NSPasteboard"
+        "NSPropertyListSerialization"
         "NSResponder"
         "NSSavePanel"
         "NSScreen"
