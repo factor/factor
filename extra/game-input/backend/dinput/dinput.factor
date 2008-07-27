@@ -238,7 +238,7 @@ M: dinput-game-input-backend instance-id
 : >pov ( long -- symbol )
     dup HEX: FFFF bitand HEX: FFFF =
     [ drop pov-neutral ]
-    [ 4500 + 9000 /i pov-values nth ] if ;
+    [ 2750 + 4500 /i pov-values nth ] if ;
 : >buttons ( alien length -- array )
     memory>byte-array >keys ;
 

@@ -2,15 +2,14 @@ USING: ui ui.gadgets sequences kernel arrays math colors
 ui.render math.vectors accessors fry ui.gadgets.packs game-input
 game-input.backend ui.gadgets.labels ui.gadgets.borders alarms
 calendar locals combinators.lib strings ui.gadgets.buttons
-combinators math.parser ;
+combinators math.parser assocs ;
 IN: joystick-demo
 
 : SIZE { 151 151 } ;
-: ZSIZE 75 ;
 : INDICATOR-SIZE { 4 4 } ;
 : FREQUENCY ( -- f ) 30 recip seconds ;
 
-TUPLE: axis-gadget < gadget indicator z-indicator ;
+TUPLE: axis-gadget < gadget indicator z-indicator pov ;
 
 M: axis-gadget pref-dim* drop SIZE ;
 
@@ -22,15 +21,30 @@ M: axis-gadget pref-dim* drop SIZE ;
 : indicator-polygon ( -- polygon )
     { 0 0 } INDICATOR-SIZE (rect-polygon) ;
 
+: pov-polygons
+    V{
+        { pov-neutral    { { 70 75 } { 75 70 } { 80 75 } { 75 80 } } }
+        { pov-up         { { 70 65 } { 75 60 } { 80 65 } } }
+        { pov-up-right   { { 83 60 } { 90 60 } { 90 67 } } }
+        { pov-right      { { 85 70 } { 90 75 } { 85 80 } } }
+        { pov-down-right { { 90 83 } { 90 90 } { 83 90 } } }
+        { pov-down       { { 70 85 } { 75 90 } { 80 85 } } }
+        { pov-down-left  { { 67 90 } { 60 90 } { 60 83 } } }
+        { pov-left       { { 65 70 } { 60 75 } { 65 80 } } }
+        { pov-up-left    { { 67 60 } { 60 60 } { 60 67 } } }
+    } ;
+
 : <indicator-gadget> ( color -- indicator )
     indicator-polygon <polygon-gadget> ;
 
-: (xy>loc) ( x y -- xyloc )
-    2array 0.5 v*n { 0.5 0.5 } v+ SIZE v* [ >integer ] map
+: (>loc) ( axisloc -- windowloc )
+    0.5 v*n { 0.5 0.5 } v+ SIZE v* [ >integer ] map
     INDICATOR-SIZE 2 v/n v- ;
 
-: (z>loc) ( xyloc z -- xyloc zloc )
-    ZSIZE * >integer 0 swap 2array dupd v+ ;
+: (xy>loc) ( x y -- xyloc )
+    2array (>loc) ;
+: (z>loc) ( z -- zloc )
+    0.0 swap 2array (>loc) ;
 
 : (xyz>loc) ( x y z -- xyloc zloc )
     [ [ 0.0 ] unless* ] tri@
@@ -41,11 +55,23 @@ M: axis-gadget pref-dim* drop SIZE ;
     [ indicator>>   (>>loc) ]
     [ z-indicator>> (>>loc) ] bi+ bi* ;
 
+: move-pov ( gadget pov -- )
+    swap pov>> [ interior>> -rot = [ gray ] [ white ] if >>color drop ]
+    with assoc-each ;
+
+:: add-pov-gadget ( gadget direction polygon -- gadget direction gadget )
+    gadget white polygon <polygon-gadget> [ add-gadget ] keep
+    direction swap ;
+
+: add-pov-gadgets ( gadget -- gadget )
+    pov-polygons [ add-pov-gadget ] assoc-map >>pov ;
+
 : <axis-gadget> ( -- gadget )
     axis-gadget new-gadget
-    gray <indicator-gadget> [ >>indicator   ] [ add-gadget ] bi
-    red  <indicator-gadget> [ >>z-indicator ] [ add-gadget ] bi
-    dup 0.0 0.0 0.0 move-axis ;
+    add-pov-gadgets
+    black <indicator-gadget> [ >>z-indicator ] [ add-gadget ] bi
+    red   <indicator-gadget> [ >>indicator   ] [ add-gadget ] bi
+    dup [ 0.0 0.0 0.0 move-axis ] [ f move-pov ] bi ;
 
 TUPLE: joystick-demo-gadget < pack axis raxis controller buttons alarm ;
 
@@ -89,6 +115,7 @@ TUPLE: joystick-demo-gadget < pack axis raxis controller buttons alarm ;
     {
         [ [ axis>>  ] [ [ x>>  ] [ y>>  ] [ z>>  ] tri ] bi* move-axis ]
         [ [ raxis>> ] [ [ rx>> ] [ ry>> ] [ rz>> ] tri ] bi* move-axis ]
+        [ [ axis>>  ] [ pov>> ] bi* move-pov ]
         [ [ buttons>> ] [ buttons>> ] bi* update-buttons ]
         [ drop relayout-1 ]
     } 2cleave ;
