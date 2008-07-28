@@ -4,9 +4,10 @@ USING: kernel effects accessors math math.private math.libm
 math.partial-dispatch math.intervals math.parser math.order
 layouts words sequences sequences.private arrays assocs classes
 classes.algebra combinators generic.math splitting fry locals
-classes.tuple alien.accessors classes.tuple.private
+classes.tuple alien.accessors classes.tuple.private slots.private
 compiler.tree.propagation.info compiler.tree.propagation.nodes
 compiler.tree.propagation.constraints
+compiler.tree.propagation.slots
 compiler.tree.comparisons ;
 IN: compiler.tree.propagation.known-words
 
@@ -258,3 +259,8 @@ generic-comparison-ops [
 
 ! the output of clone has the same type as the input
 { clone (clone) } [ [ ] +outputs+ set-word-prop ] each
+
+\ slot [
+    dup literal?>>
+    [ literal>> swap value-info-slot ] [ 2drop object <class-info> ] if
+] +outputs+ set-word-prop

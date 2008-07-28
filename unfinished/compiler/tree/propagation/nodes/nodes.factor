@@ -14,8 +14,4 @@ GENERIC: propagate-after ( node -- )
 
 GENERIC: propagate-around ( node -- )
 
-: (propagate) ( node -- )
-    [
-        [ propagate-around ] [ successor>> ] bi
-        (propagate)
-    ] when* ;
+: (propagate) ( node -- ) [ [ propagate-around ] each ] when* ;

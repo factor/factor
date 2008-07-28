@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: compiler.tree.dfa.backward
+IN: compiler.tree.dataflow-analysis.backward
 USING: accessors sequences assocs kernel compiler.tree
-compiler.tree.dfa ;
+compiler.tree.dataflow-analysis ;
 
 GENERIC: backward ( value node -- )
 

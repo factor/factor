@@ -34,7 +34,16 @@ ARTICLE: "math.blas-types" "BLAS interface types"
 { $subsection <double-complex-blas-matrix> }
 "For the simple case of creating a dense, zero-filled vector or matrix, simple empty object constructors are provided:"
 { $subsection <empty-vector> }
-{ $subsection <empty-matrix> } ;
+{ $subsection <empty-matrix> }
+"BLAS vectors and matrices can also be constructed from other Factor sequences:"
+{ $subsection >float-blas-vector }
+{ $subsection >double-blas-vector }
+{ $subsection >float-complex-blas-vector }
+{ $subsection >double-complex-blas-vector }
+{ $subsection >float-blas-matrix }
+{ $subsection >double-blas-matrix }
+{ $subsection >float-complex-blas-matrix }
+{ $subsection >double-complex-blas-matrix } ;
 
 ARTICLE: "math.blas.matrices" "BLAS interface matrix operations"
 "Transposing and slicing matrices:"

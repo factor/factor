@@ -221,6 +221,7 @@ M: word declarations.
         POSTPONE: parsing
         POSTPONE: delimiter
         POSTPONE: inline
+        POSTPONE: recursive
         POSTPONE: foldable
         POSTPONE: flushable
     } [ declaration. ] with each ;

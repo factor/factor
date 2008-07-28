@@ -31,21 +31,23 @@ M: #dispatch live-children
     [ children>> ] [ in-d>> first value-info interval>> ] bi
     '[ , interval-contains? [ drop f ] unless ] map-index ;
 
-: infer-children ( node -- assocs )
+SYMBOL: infer-children-data
+
+: infer-children ( node -- )
     [ live-children ] [ child-constraints ] bi [
         [
             over [
                 value-infos [ clone ] change
                 constraints [ clone ] change
                 assume
-                first>> (propagate)
+                (propagate)
             ] [
                 2drop
                 value-infos off
                 constraints off
             ] if
         ] H{ } make-assoc
-    ] 2map ;
+    ] 2map infer-children-data set ;
 
 : (merge-value-infos) ( inputs results -- infos )
     '[ , [ [ value-info ] bind ] 2map value-infos-union ] map ;
@@ -53,7 +55,8 @@ M: #dispatch live-children
 : merge-value-infos ( results inputs outputs -- )
     [ swap (merge-value-infos) ] dip set-value-infos ;
 
-: propagate-branch-phi ( results #phi -- )
+M: #phi propagate-before ( #phi -- )
+    infer-children-data get swap
     [ [ phi-in-d>> ] [ out-d>> ] bi merge-value-infos ]
     [ [ phi-in-r>> ] [ out-r>> ] bi merge-value-infos ]
     2bi ;
@@ -67,10 +70,10 @@ M: #dispatch live-children
         ] [ 3drop ] if
     ] 2each ;
 
-: merge-children ( results node -- )
-    [ successor>> propagate-branch-phi ]
-    [ [ in-d>> first ] [ successor>> ] bi 2drop ] ! branch-phi-constraints ]
-    bi ;
+! : merge-children
+!     [ successor>> propagate-branch-phi ]
+!     [ [ in-d>> first ] [ successor>> ] bi 2drop ] ! branch-phi-constraints ]
+!     bi ;
 
 M: #branch propagate-around
-    [ infer-children ] [ merge-children ] [ annotate-node ] tri ;
+    [ infer-children ] [ annotate-node ] bi ;

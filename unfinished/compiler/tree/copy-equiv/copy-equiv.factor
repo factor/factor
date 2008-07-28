@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces disjoint-sets sequences assocs
+USING: namespaces disjoint-sets sequences assocs math
 kernel accessors fry
 compiler.tree compiler.tree.def-use compiler.tree.combinators ;
 IN: compiler.tree.copy-equiv
@@ -29,6 +29,9 @@ M: #r> compute-copy-equiv*
     [ in-r>> ] [ out-d>> ] bi are-copies-of ;
 
 M: #copy compute-copy-equiv*
+    [ in-d>> ] [ out-d>> ] bi are-copies-of ;
+
+M: #return-recursive compute-copy-equiv*
     [ in-d>> ] [ out-d>> ] bi are-copies-of ;
 
 M: node compute-copy-equiv* drop ;
