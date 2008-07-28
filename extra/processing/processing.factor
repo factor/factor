@@ -9,9 +9,9 @@ USING: kernel namespaces threads combinators sequences arrays
        combinators.lib
        combinators.cleave
        rewrite-closures fry accessors newfx
-       processing.color
        processing.gadget math.geometry.rect
-       processing.shapes ;
+       processing.shapes
+       colors ;
        
 IN: processing
 
@@ -39,27 +39,32 @@ IN: processing
 
 GENERIC: canonical-color-value ( obj -- color )
 
-METHOD: canonical-color-value { number } dup dup 1 4array ;
+METHOD: canonical-color-value { number } dup dup 1 rgba boa ;
 
 METHOD: canonical-color-value { array }
    dup length
    {
-     { 2 [ first2 >r dup dup r> 4array ] }
-     { 3 [ 1 suffix ] }
-     { 4 [ ] }
+     { 2 [ first2 >r dup dup r> rgba boa ] }
+     { 3 [ first3 1             rgba boa ] }
+     { 4 [ first4               rgba boa ] }
    }
    case ;
 
-METHOD: canonical-color-value { rgba }
-  { [ red>> ] [ green>> ] [ blue>> ] [ alpha>> ] } cleave 4array ;
+! METHOD: canonical-color-value { rgba }
+!   { [ red>> ] [ green>> ] [ blue>> ] [ alpha>> ] } cleave 4array ;
+
+METHOD: canonical-color-value { color } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : fill   ( value -- ) canonical-color-value >fill-color   ;
 : stroke ( value -- ) canonical-color-value >stroke-color ;
 
-: no-fill   ( -- ) 0 fill-color>   set-fourth ;
-: no-stroke ( -- ) 0 stroke-color> set-fourth ;
+! : no-fill   ( -- ) 0 fill-color>   set-fourth ;
+! : no-stroke ( -- ) 0 stroke-color> set-fourth ;
+
+: no-fill   ( -- ) fill-color>   0 >>alpha drop ;
+: no-stroke ( -- ) stroke-color> 0 >>alpha drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
