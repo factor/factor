@@ -2,10 +2,12 @@
 ! Portions copyright (C) 2007 Eduardo Cavazos.
 ! Portions copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
+
 USING: alien alien.c-types continuations kernel libc math macros
-namespaces math.vectors math.constants math.functions
-math.parser opengl.gl opengl.glu combinators arrays sequences
-splitting words byte-arrays assocs ;
+       namespaces math.vectors math.constants math.functions
+       math.parser opengl.gl opengl.glu combinators arrays sequences
+       splitting words byte-arrays assocs colors accessors ;
+
 IN: opengl
 
 : coordinates ( point1 point2 -- x1 y2 x2 y2 )
@@ -14,6 +16,8 @@ IN: opengl
 : fix-coordinates ( point1 point2 -- x1 y2 x2 y2 )
     [ first2 [ >fixnum ] bi@ ] bi@ ;
 
+
+
 : gl-color ( color -- ) first4 glColor4d ; inline
 
 : gl-clear-color ( color -- )
@@ -21,6 +25,16 @@ IN: opengl
 
 : gl-clear ( color -- )
     gl-clear-color GL_COLOR_BUFFER_BIT glClear ;
+
+: color>raw ( object -- 4array )
+  >rgba
+    { [ red>> ] [ green>> ] [ blue>> ] [ alpha>> ] } cleave
+  4array ;
+
+: set-color       ( object -- ) color>raw first4 glColor4d ;
+: set-clear-color ( object -- ) color>raw first4 glClearColor ;
+
+
 
 : gl-error ( -- )
     glGetError dup zero? [
