@@ -1,9 +1,8 @@
 
 USING: kernel random math math.constants math.points accessors multi-methods
        processing processing.shapes
-       processing.color
        bubble-chamber.common
-       bubble-chamber.particle ;
+       bubble-chamber.particle colors ;
 
 IN: bubble-chamber.particle.hadron
 
@@ -26,7 +25,7 @@ METHOD: collide { hadron }
 
   [ 0.00001 theta-dd-small? ] [ -0.001 0.001 random-theta-dd ] [ ] while
 
-  0 1 0 <rgb> >>myc
+  0 1 0 1 rgba boa >>myc
 
   drop ;
 
