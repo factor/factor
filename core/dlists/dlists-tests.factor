@@ -71,3 +71,9 @@ IN: dlists.tests
 [ <dlist> peek-back ] [ empty-dlist? ] must-fail-with
 [ <dlist> pop-front ] [ empty-dlist? ] must-fail-with
 [ <dlist> pop-back ] [ empty-dlist? ] must-fail-with
+
+[ t ] [ <dlist> 3 over push-front 4 over push-back 3 swap dequeue-member? ] unit-test
+
+[ f ] [ <dlist> 3 over push-front 4 over push-back -1 swap dequeue-member? ] unit-test
+
+[ f ] [ <dlist> 0 swap dequeue-member? ] unit-test

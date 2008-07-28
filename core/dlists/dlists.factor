@@ -122,7 +122,7 @@ M: dlist pop-back* ( dlist -- )
     dlist-find nip ; inline
 
 M: dlist dequeue-member? ( value dlist -- ? )
-    [ = ] curry dlist-contains? ;
+    [ = ] with dlist-contains? ;
 
 M: dlist delete-node ( dlist-node dlist -- )
     {
