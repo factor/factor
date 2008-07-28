@@ -67,15 +67,6 @@ SYMBOL: infer-children-data
 
 SYMBOL: condition-value
 
-! :: branch-phi-constraints ( x #phi -- )
-!     #phi [ out-d>> ] [ phi-in-d>> ] bi [
-!         first2 2dup and [ USE: prettyprint
-!             [ [ =t x =t /\ ] [ =t x =f /\ ] bi* \/ swap t--> dup  . assume ]
-!             [ [ =f x =t /\ ] [ =f x =f /\ ] bi* \/ swap f--> dup  . assume ]
-!             3bi
-!         ] [ 3drop ] if
-!     ] 2each ;
-
 M: #phi propagate-before ( #phi -- )
     [ annotate-phi-node ]
     [ [ phi-info-d>> ] [ out-d>> ] bi merge-value-infos ]
@@ -108,10 +99,6 @@ M: #phi propagate-before ( #phi -- )
             { { f } { t f } }
             [ second =t condition-value get =f /\ swap t--> assume ]
         }
-        ! {
-        !     { { f } { t f } }
-        !     [ ]
-        ! }
         [ 3drop ]
     } case ;
 
