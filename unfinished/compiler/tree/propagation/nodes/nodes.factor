@@ -14,9 +14,4 @@ GENERIC: propagate-after ( node -- )
 
 GENERIC: propagate-around ( node -- )
 
-: (propagate) ( node -- )
-    [
-        USING: classes prettyprint ; dup class .
-        [ propagate-around ] [ successor>> ] bi
-        (propagate)
-    ] when* ;
+: (propagate) ( node -- ) [ [ propagate-around ] each ] when* ;

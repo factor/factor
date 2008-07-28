@@ -1,6 +1,6 @@
 USING: kernel compiler.tree.builder compiler.tree
 compiler.tree.propagation compiler.tree.copy-equiv
-compiler.tree.def-use tools.test math math.order
+compiler.tree.normalization tools.test math math.order
 accessors sequences arrays kernel.private vectors
 alien.accessors alien.c-types sequences.private
 byte-arrays classes.algebra classes.tuple.private
@@ -13,10 +13,10 @@ IN: compiler.tree.propagation.tests
 
 : final-info ( quot -- seq )
     build-tree
-    compute-def-use
+    normalize
     compute-copy-equiv
     propagate
-    last-node node-input-infos ;
+    peek node-input-infos ;
 
 : final-classes ( quot -- seq )
     final-info [ class>> ] map ;

@@ -59,7 +59,7 @@ M: #recursive propagate-around ( #recursive -- )
     iter-counter inc
     iter-counter get 10 > [ "Oops" throw ] when
     dup label>> t >>fixed-point drop
-    [ node-child first>> [ propagate-recursive-phi ] [ (propagate) ] bi ]
+    [ child>> [ first propagate-recursive-phi ] [ (propagate) ] bi ]
     [ dup label>> fixed-point>> [ drop ] [ propagate-around ] if ]
     bi ;
 

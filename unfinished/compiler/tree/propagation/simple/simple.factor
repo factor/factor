@@ -13,7 +13,7 @@ compiler.tree.propagation.constraints ;
 IN: compiler.tree.propagation.simple
 
 M: #introduce propagate-before
-    object <class-info> swap values>> [ set-value-info ] with each ;
+    value>> object <class-info> swap set-value-info ;
 
 M: #push propagate-before
     [ literal>> value>> <literal-info> ] [ out-d>> first ] bi
