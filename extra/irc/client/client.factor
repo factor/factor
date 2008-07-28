@@ -117,7 +117,7 @@ M: irc-listener to-listener ( message irc-listener -- )
     with filter ;
 
 : remove-participant-from-all ( nick -- )
-    dup listeners-with-participant [ delete-at ] with each ;
+    dup listeners-with-participant [ participants>> delete-at ] with each ;
 
 : add-participant ( mode nick channel -- )
     listener> [ participants>> set-at ] [ 2drop ] if* ;
