@@ -1,18 +1,11 @@
 
-USING: kernel namespaces math math.constants math.functions arrays sequences
+USING: kernel namespaces math math.constants math.functions math.order
+       arrays sequences
        opengl opengl.gl opengl.glu ui ui.render ui.gadgets ui.gadgets.theme
-       ui.gadgets.slate colors accessors combinators.cleave ;
+       ui.gadgets.slate colors accessors combinators.cleave
+       processing.shapes ;
 
 IN: golden-section
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: disk ( radius center -- )
-  glPushMatrix
-  gl-translate
-  dup 0 glScalef
-  gluNewQuadric [ 0 1 20 20 gluDisk ] [ gluDeleteQuadric ] bi
-  glPopMatrix ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -34,12 +27,13 @@ IN: golden-section
 
 : radius ( i -- radius ) pi * 720 / sin 10 * ;
 
-: color ( i -- color ) 360.0 / dup 0.25 1 4array ;
+: color ( i -- i ) dup 360.0 / dup 0.25 1 4array >fill-color ;
 
-: rim   ( i -- ) [ drop black gl-color ] [ radius 1.5 * ] [ center ] tri disk ;
-: inner ( i -- ) [      color gl-color ] [ radius       ] [ center ] tri disk ;
+: line-width ( i -- i ) dup radius 0.5 * 1 max glLineWidth ;
 
-: dot ( i -- ) [ rim ] [ inner ] bi ;
+: draw ( i -- ) [ center ] [ radius 1.5 * 2 * ] bi circle ;
+
+: dot ( i -- ) color line-width draw ;
 
 : golden-section ( -- ) 720 [ dot ] each ;
 
