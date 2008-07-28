@@ -6,18 +6,24 @@ stack-checker.backend stack-checker.errors stack-checker.visitor
 ;
 IN: stack-checker.branches
 
-: balanced? ( seq -- ? )
+: balanced? ( pairs -- ? )
     [ second ] filter [ first2 length - ] map all-equal? ;
 
-: phi-inputs ( seq -- newseq )
-    dup empty? [
-        dup [ length ] map supremum
-        '[ , f pad-left ] map flip
-    ] unless ;
+: unify-inputs ( max-d-in d-in meta-d -- new-meta-d )
+    dup [ [ - f <repetition> ] dip append ] [ 3drop f ] if ;
+
+: phi-inputs ( max-d-in pairs -- newseq )
+    dup empty? [ nip ] [
+        swap '[ , _ first2 unify-inputs ] map
+        dup [ length ] map supremum '[ , f pad-left ] map
+        flip
+    ] if ;
 
 : unify-values ( values -- phi-out )
-    dup sift [ known ] map dup all-eq?
-    [ nip first make-known ] [ 2drop <value> ] if ;
+    sift dup empty? [ drop <value> ] [
+        [ known ] map dup all-eq?
+        [ first make-known ] [ drop <value> ] if
+    ] if ;
 
 : phi-outputs ( phi-in -- stack )
     [ unify-values ] map ;
@@ -26,8 +32,8 @@ SYMBOL: quotations
 
 : unify-branches ( ins stacks -- in phi-in phi-out )
     zip dup empty? [ drop 0 { } { } ] [
-        dup balanced?
-        [ [ keys supremum ] [ values phi-inputs dup phi-outputs ] bi ]
+        [ keys supremum ] [ ] [ balanced? ] tri
+        [ dupd phi-inputs dup phi-outputs ]
         [ quotations get unbalanced-branches-error ]
         if
     ] if ;
@@ -72,7 +78,7 @@ SYMBOL: quotations
 
 : infer-if ( -- )
     2 consume-d
-    dup [ known [ curry? ] [ composed? ] bi or ] contains? [
+    dup [ known [ curried? ] [ composed? ] bi or ] contains? [
         output-d
         [ rot [ drop call ] [ nip call ] if ]
         recursive-state get infer-quot
