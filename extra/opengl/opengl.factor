@@ -124,7 +124,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
     GL_QUAD_STRIP [
         swap >r prepare-gradient r>
         [ length dup 1- v/n ] keep [
-            >r >r 2dup r> r> gl-color v*n
+            >r >r 2dup r> r> set-color v*n
             dup gl-vertex v+ gl-vertex
         ] 2each 2drop
     ] do-state ;
