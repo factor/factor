@@ -187,8 +187,9 @@ M: irc-tab ungraft*
 : ui-connect ( profile -- ui-window )
     <irc-client> ui-window new over >>client swap
     [ connect-irc ]
+    [ [ <irc-server-listener> ] dip add-listener ]
     [ listeners>> +server-listener+ swap at over <irc-tab>
-      "Server" associate <tabbed> >>tabs ] bi ;
+      "Server" associate <tabbed> >>tabs ] tri ;
 
 : server-open ( server port nick password channels -- )
     [ <irc-profile> ui-connect [ irc-window ] keep ] dip
