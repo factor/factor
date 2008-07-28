@@ -1,6 +1,6 @@
 
 USING: kernel random math math.constants math.points accessors multi-methods
-       processing
+       processing processing.shapes
        processing.color
        bubble-chamber.common
        bubble-chamber.particle ;
