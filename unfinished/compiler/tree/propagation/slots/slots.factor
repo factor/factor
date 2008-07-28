@@ -39,15 +39,25 @@ UNION: fixed-length-sequence array byte-array string ;
 : tuple-constructor? ( node -- ? )
     word>> { <tuple-boa> <complex> } memq? ;
 
+: read-only-slots ( values class -- slots )
+    #! Delegation.
+    all-slots rest-slice
+    [ read-only>> [ drop f ] unless ] 2map
+    { f f } prepend ;
+
+: fold-<tuple-boa> ( values class -- info )
+    [ , f , [ literal>> ] map % ] { } make >tuple
+    <literal-info> ;
+
 : propagate-<tuple-boa> ( node -- info )
     #! Delegation
     in-d>> [ value-info ] map unclip-last
-    literal>> class>> dup immutable-tuple-class? [
-        over [ literal?>> ] all?
-        [ [ , f , [ literal>> ] map % ] { } make >tuple <literal-info> ]
-        [ <tuple-info> ]
-        if
-    ] [ nip <class-info> ] if ;
+    literal>> class>> [ read-only-slots ] keep
+    over 2 tail-slice [ dup [ literal?>> ] when ] all? [
+        [ 2 tail-slice ] dip fold-<tuple-boa>
+    ] [
+        <tuple-info>
+    ] if ;
 
 : propagate-<complex> ( node -- info )
     in-d>> [ value-info ] map complex <tuple-info> ;
@@ -67,7 +77,7 @@ UNION: fixed-length-sequence array byte-array string ;
     relevant-methods [ nip "reading" word-prop ] { } assoc>map ;
 
 : no-reader-methods ( input slots -- info )
-    2drop null <class-info> ;
+    2drop null-info ;
 
 : same-offset ( slots -- slot/f )
     dup [ dup [ read-only>> ] when ] all? [
@@ -79,20 +89,29 @@ UNION: fixed-length-sequence array byte-array string ;
     [ [ class>> ] [ object ] if* class-or ] reduce
     <class-info> ;
 
+: tuple>array* ( tuple -- array )
+    prepare-tuple>array
+    >r copy-tuple-slots r>
+    prefix ;
+
+: literal-info-slot ( slot info -- info' )
+    {
+        { [ dup tuple? ] [
+            tuple>array* nth <literal-info>
+        ] }
+        { [ dup complex? ] [
+            [ real-part ] [ imaginary-part ] bi
+            2array nth <literal-info>
+        ] }
+    } cond ;
+
 : value-info-slot ( slot info -- info' )
     #! Delegation.
-    [ class>> complex class<= 1 3 ? - ] keep
-    dup literal?>> [
-        literal>> {
-            { [ dup tuple? ] [
-                tuple-slots 1 tail-slice nth <literal-info>
-            ] }
-            { [ dup complex? ] [
-                [ real-part ] [ imaginary-part ] bi
-                2array nth <literal-info>
-            ] }
-        } cond
-    ] [ slots>> ?nth ] if ;
+    {
+        { [ over 0 = ] [ 2drop fixnum <class-info> ] }
+        { [ dup literal?>> ] [ [ 1- ] [ literal>> ] bi* literal-info-slot ] }
+        [ [ 1- ] [ slots>> ] bi* ?nth ]
+    } cond ;
 
 : reader-word-outputs ( node -- infos )
     [ relevant-slots ] [ in-d>> first ] bi

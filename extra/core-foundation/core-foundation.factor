@@ -43,6 +43,11 @@ TYPEDEF: int CFNumberType
 : kCFNumberCGFloatType 16 ; inline
 : kCFNumberMaxType 16 ; inline
 
+TYPEDEF: int CFPropertyListMutabilityOptions
+: kCFPropertyListImmutable                  0 ; inline
+: kCFPropertyListMutableContainers          1 ; inline
+: kCFPropertyListMutableContainersAndLeaves 2 ; inline
+
 FUNCTION: CFArrayRef CFArrayCreateMutable ( CFAllocatorRef allocator, CFIndex capacity, void* callbacks ) ;
 
 FUNCTION: void* CFArrayGetValueAtIndex ( CFArrayRef array, CFIndex idx ) ;

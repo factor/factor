@@ -1,5 +1,5 @@
 USING: alien alien.syntax alien.c-types alien.strings math
-kernel sequences windows windows.types
+kernel sequences windows windows.types debugger io accessors
 math.order ;
 IN: windows.ole32
 
@@ -115,10 +115,14 @@ FUNCTION: void ReleaseStgMedium ( LPSTGMEDIUM pmedium ) ;
 : succeeded? ( hresult -- ? )
     0 HEX: 7FFFFFFF between? ;
 
+TUPLE: ole32-error error-code ;
+C: <ole32-error> ole32-error
+
+M: ole32-error error.
+    "COM method failed: " print error-code>> (win32-error-string) print ;
+
 : ole32-error ( hresult -- )
-    dup succeeded? [
-        drop
-    ] [ (win32-error-string) throw ] if ;
+    dup succeeded? [ drop ] [ <ole32-error> throw ] if ;
 
 : ole-initialize ( -- )
     f OleInitialize ole32-error ;
