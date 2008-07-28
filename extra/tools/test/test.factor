@@ -1,10 +1,9 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces arrays prettyprint sequences kernel
-vectors quotations words parser assocs combinators
-continuations debugger io io.files vocabs
-vocabs.loader source-files compiler.units summary
-inference effects tools.vocabs ;
+USING: accessors namespaces arrays prettyprint sequences kernel
+vectors quotations words parser assocs combinators continuations
+debugger io io.files vocabs vocabs.loader source-files
+compiler.units summary inference effects tools.vocabs ;
 IN: tools.test
 
 SYMBOL: failures
@@ -31,7 +30,7 @@ SYMBOL: this-test
     ] 2curry (unit-test) ;
 
 : short-effect ( effect -- pair )
-    dup effect-in length swap effect-out length 2array ;
+    [ in>> length ] [ out>> length ] bi 2array ;
 
 : must-infer-as ( effect quot -- )
     >r 1quotation r> [ infer short-effect ] curry unit-test ;
