@@ -1,4 +1,4 @@
-! Copyright (C) 2003, 2007 Slava Pestov.
+! Copyright (C) 2003, 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: kernel combinators sequences arrays
