@@ -20,8 +20,8 @@ IN: iokit.hid
 : kIOHIDPrimaryUsageKey               "PrimaryUsage" ; inline
 : kIOHIDPrimaryUsagePageKey           "PrimaryUsagePage" ; inline
 : kIOHIDMaxInputReportSizeKey         "MaxInputReportSize" ; inline
-: kIOHIDMaxOutputReportSizeKey	      "MaxOutputReportSize" ; inline
-: kIOHIDMaxFeatureReportSizeKey	      "MaxFeatureReportSize" ; inline
+: kIOHIDMaxOutputReportSizeKey       "MaxOutputReportSize" ; inline
+: kIOHIDMaxFeatureReportSizeKey       "MaxFeatureReportSize" ; inline
 : kIOHIDReportIntervalKey             "ReportInterval" ; inline
 
 : kIOHIDElementKey                    "Elements" ; inline
@@ -77,7 +77,7 @@ IN: iokit.hid
 : kIOHIDElementTypeFeature           257 ; inline
 : kIOHIDElementTypeCollection        513 ; inline
 
-: kIOHIDElementCollectionTypePhysical	    HEX: 00 ; inline
+: kIOHIDElementCollectionTypePhysical     HEX: 00 ; inline
 : kIOHIDElementCollectionTypeApplication    HEX: 01 ; inline
 : kIOHIDElementCollectionTypeLogical        HEX: 02 ; inline
 : kIOHIDElementCollectionTypeReport         HEX: 03 ; inline
@@ -90,10 +90,10 @@ IN: iokit.hid
 : kIOHIDReportTypeFeature  2 ; inline
 : kIOHIDReportTypeCount    3 ; inline
 
-: kIOHIDOptionsTypeNone	       HEX: 00 ; inline
+: kIOHIDOptionsTypeNone        HEX: 00 ; inline
 : kIOHIDOptionsTypeSeizeDevice HEX: 01 ; inline
 
-: kIOHIDQueueOptionsTypeNone	   HEX: 00 ; inline
+: kIOHIDQueueOptionsTypeNone    HEX: 00 ; inline
 : kIOHIDQueueOptionsTypeEnqueueAll HEX: 01 ; inline
 
 : kIOHIDElementFlagsConstantMask        HEX: 0001 ; inline
@@ -269,3 +269,4 @@ FUNCTION: IOHIDValueRef IOHIDTransactionGetValue ( IOHIDTransactionRef transacti
 FUNCTION: IOReturn IOHIDTransactionCommit ( IOHIDTransactionRef transaction ) ;
 FUNCTION: IOReturn IOHIDTransactionCommitWithCallback ( IOHIDTransactionRef transaction, CFTimeInterval timeout, IOHIDCallback callback, void* context ) ;
 FUNCTION: void IOHIDTransactionClear ( IOHIDTransactionRef transaction ) ;
+

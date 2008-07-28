@@ -9,6 +9,25 @@ generalizations macros continuations locals ;
 IN: combinators.lib
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Currying cleave combinators
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: bi, ( obj quot quot -- quot' quot' )
+    [ [ curry ] curry ] bi@ bi ; inline
+: tri, ( obj quot quot quot -- quot' quot' quot' )
+    [ [ curry ] curry ] tri@ tri ; inline
+
+: bi*, ( obj obj quot quot -- quot' quot' )
+    [ [ curry ] curry ] bi@ bi* ; inline
+: tri*, ( obj obj obj quot quot quot -- quot' quot' quot' )
+    [ [ curry ] curry ] tri@ tri* ; inline
+
+: bi@, ( obj obj quot -- quot' quot' )
+    [ curry ] curry bi@ ; inline
+: tri@, ( obj obj obj quot -- quot' quot' quot' )
+    [ curry ] curry tri@ ; inline
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Generalized versions of core combinators
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

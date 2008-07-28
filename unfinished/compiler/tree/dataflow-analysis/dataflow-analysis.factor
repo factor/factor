@@ -3,7 +3,7 @@
 USING: fry accessors namespaces assocs dequeues search-dequeues
 kernel sequences words sets stack-checker.inlining compiler.tree
 compiler.tree.def-use compiler.tree.combinators ;
-IN: compiler.tree.dfa
+IN: compiler.tree.dataflow-analysis
 
 ! Dataflow analysis
 SYMBOL: work-list

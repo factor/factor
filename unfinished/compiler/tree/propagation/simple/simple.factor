@@ -13,10 +13,10 @@ compiler.tree.propagation.constraints ;
 IN: compiler.tree.propagation.simple
 
 M: #introduce propagate-before
-    object <class-info> swap values>> [ set-value-info ] with each ;
+    value>> object <class-info> swap set-value-info ;
 
 M: #push propagate-before
-    [ literal>> value>> <literal-info> ] [ out-d>> first ] bi
+    [ literal>> <literal-info> ] [ out-d>> first ] bi
     set-value-info ;
 
 : refine-value-infos ( classes values -- )
@@ -117,10 +117,13 @@ M: #call propagate-after
 
 M: node propagate-after drop ;
 
+: extract-value-info ( values -- assoc )
+    [ dup value-info ] H{ } map>assoc ;
+
 : annotate-node ( node -- )
     dup
     [ node-defs-values ] [ node-uses-values ] bi append
-    [ dup value-info ] H{ } map>assoc
+    extract-value-info
     >>info drop ;
 
 M: node propagate-around

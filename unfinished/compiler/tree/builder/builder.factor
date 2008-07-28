@@ -7,11 +7,11 @@ stack-checker.state stack-checker.visitor stack-checker.errors
 stack-checker.backend compiler.tree ;
 IN: compiler.tree.builder
 
-: with-tree-builder ( quot -- dataflow )
-    [ node-list new stack-visitor set ] prepose
-    with-infer first>> ; inline
+: with-tree-builder ( quot -- nodes )
+    [ V{ } clone stack-visitor set ] prepose
+    with-infer ; inline
 
-GENERIC# build-tree-with 1 ( quot stack -- dataflow )
+GENERIC# build-tree-with 1 ( quot stack -- nodes )
 
 M: callable build-tree-with
     #! Not safe to call from inference transforms.
@@ -20,7 +20,7 @@ M: callable build-tree-with
         f infer-quot
     ] with-tree-builder nip ;
 
-: build-tree ( quot -- dataflow ) f build-tree-with ;
+: build-tree ( quot -- nodes ) f build-tree-with ;
 
 : (make-specializer) ( class picker -- quot )
     swap "predicate" word-prop append ;
@@ -65,7 +65,7 @@ M: callable build-tree-with
         [ drop ]
     } cond ;
 
-: build-tree-from-word ( word -- effect dataflow )
+: build-tree-from-word ( word -- effect nodes )
     [
         [
             dup +cannot-infer+ word-prop [ cannot-infer-effect ] when
