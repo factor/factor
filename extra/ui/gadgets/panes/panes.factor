@@ -68,7 +68,7 @@ M: node draw-selection ( loc node -- )
 
 M: pane draw-gadget*
     dup gadget-selection? [
-        dup pane-selection-color gl-color
+        dup pane-selection-color set-color
         origin get over rect-loc v- swap selected-children
         [ draw-selection ] with each
     ] [

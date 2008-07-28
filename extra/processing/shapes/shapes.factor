@@ -3,7 +3,7 @@ USING: kernel namespaces arrays sequences grouping
        alien.c-types
        math math.vectors math.geometry.rect
        opengl.gl opengl.glu opengl generalizations vars
-       combinators.cleave  ;
+       combinators.cleave colors ;
 
 IN: processing.shapes
 
@@ -12,20 +12,20 @@ IN: processing.shapes
 VAR: fill-color
 VAR: stroke-color
 
-{ 0 0 0 1 } stroke-color set-global
-{ 1 1 1 1 } fill-color   set-global
+T{ rgba f 0 0 0 1 } stroke-color set-global
+T{ rgba f 1 1 1 1 } fill-color   set-global
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : fill-mode ( -- )
   GL_FRONT_AND_BACK GL_FILL glPolygonMode
-  fill-color> gl-color ;
+  fill-color> set-color ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : stroke-mode ( -- )
   GL_FRONT_AND_BACK GL_LINE glPolygonMode
-  stroke-color> gl-color ;
+  stroke-color> set-color ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -101,8 +101,8 @@ VAR: stroke-color
 
 : ellipse ( center dim -- )
   GL_FRONT_AND_BACK GL_FILL glPolygonMode
-  [ stroke-color> gl-color                                 gl-ellipse ]
-  [ fill-color> gl-color gl-get-line-width 2 * dup 2array v- gl-ellipse ] 2bi ;
+  [ stroke-color> set-color                                 gl-ellipse ]
+  [ fill-color> set-color gl-get-line-width 2 * dup 2array v- gl-ellipse ] 2bi ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

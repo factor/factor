@@ -23,14 +23,14 @@ IN: slides
             H{
                 { font "monospace" }
                 { font-size 36 }
-                { page-color { 0.4 0.4 0.4 0.3 } }
+                { page-color T{ rgba f 0.4 0.4 0.4 0.3 } }
             }
         }
         { snippet-style
             H{
                 { font "monospace" }
                 { font-size 36 }
-                { foreground { 0.1 0.1 0.4 1 } }
+                { foreground T{ rgba f 0.1 0.1 0.4 1 } }
             }
         }
         { table-content-style
@@ -48,14 +48,19 @@ IN: slides
 : $divider ( -- )
     [
         <gadget>
-        T{ gradient f { { 0.25 0.25 0.25 1.0 } { 1.0 1.0 1.0 0.0 } } } >>interior
+        T{ gradient f
+           {
+             T{ rgba f 0.25 0.25 0.25 1.0 }
+             T{ rgba f 1.0 1.0 1.0 0.0 }
+           }
+         } >>interior
         { 800 10 } >>dim
         { 1 0 } >>orientation
         gadget.
     ] ($block) ;
 
 : page-theme ( gadget -- )
-    T{ gradient f { { 0.8 0.8 1.0 1.0 } { 0.8 1.0 1.0 1.0 } } }
+    T{ gradient f { T{ rgba f 0.8 0.8 1.0 1.0 } T{ rgba f 0.8 1.0 1.0 1.0 } } }
     swap set-gadget-interior ;
 
 : <page> ( list -- gadget )

@@ -7,6 +7,7 @@ USING: kernel arrays sequences random
        multi-methods accessors
        combinators.cleave
        processing
+       processing.shapes
        bubble-chamber.common
        bubble-chamber.particle
        bubble-chamber.particle.muon.colors ;

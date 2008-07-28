@@ -9,8 +9,9 @@ USING: kernel namespaces threads combinators sequences arrays
        combinators.lib
        combinators.cleave
        rewrite-closures fry accessors newfx
-       processing.color
-       processing.gadget math.geometry.rect ;
+       processing.gadget math.geometry.rect
+       processing.shapes
+       colors ;
        
 IN: processing
 
@@ -36,53 +37,34 @@ IN: processing
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-VAR: fill-color
-VAR: stroke-color
+GENERIC: canonical-color-value ( obj -- color )
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+METHOD: canonical-color-value { number } dup dup 1 rgba boa ;
 
-GENERIC: set-color ( value -- )
-
-METHOD: set-color { number } dup dup glColor3d ;
-
-METHOD: set-color { array }
+METHOD: canonical-color-value { array }
    dup length
    {
-     { 2 [ first2 >r dup dup r> glColor4d ] }
-     { 3 [ first3 glColor3d ] }
-     { 4 [ first4 glColor4d ] }
+     { 2 [ first2 >r dup dup r> rgba boa ] }
+     { 3 [ first3 1             rgba boa ] }
+     { 4 [ first4               rgba boa ] }
    }
    case ;
 
-METHOD: set-color { rgba }
-  { [ red>> ] [ green>> ] [ blue>> ] [ alpha>> ] } cleave glColor4d ;
+! METHOD: canonical-color-value { rgba }
+!   { [ red>> ] [ green>> ] [ blue>> ] [ alpha>> ] } cleave 4array ;
+
+METHOD: canonical-color-value { color } ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: fill   ( value -- )  >fill-color ;
-: stroke ( value -- ) >stroke-color ;
+: fill   ( value -- ) canonical-color-value >fill-color   ;
+: stroke ( value -- ) canonical-color-value >stroke-color ;
 
-: no-fill ( -- )
-  fill-color>
-    {
-      { [ dup number? ] [ 0 2array fill ] }
-      { [ t           ]
-        [
-          [ drop 0 ] [ length 1- ] [ ] tri set-nth
-        ] }
-    }
-  cond ;
+! : no-fill   ( -- ) 0 fill-color>   set-fourth ;
+! : no-stroke ( -- ) 0 stroke-color> set-fourth ;
 
-: no-stroke ( -- )
-  stroke-color>
-    {
-      { [ dup number? ] [ 0 2array stroke ] }
-      { [ t           ]
-        [
-          [ drop 0 ] [ length 1- ] [ ] tri set-nth
-        ] }
-    }
-  cond ;
+: no-fill   ( -- ) fill-color>   0 >>alpha drop ;
+: no-stroke ( -- ) stroke-color> 0 >>alpha drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -90,167 +72,93 @@ METHOD: set-color { rgba }
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: point* ( x y -- )
-  stroke-color> set-color
-  GL_POINTS glBegin
-    glVertex2d
-  glEnd ;
+! : quad-vertices ( x1 y1 x2 y2 x3 y3 x4 y4 -- )
+!   GL_POLYGON glBegin
+!     glVertex2d
+!     glVertex2d
+!     glVertex2d
+!     glVertex2d
+!   glEnd ;
 
-: point ( seq -- ) first2 point* ;
+! : quad ( x1 y1 x2 y2 x3 y3 x4 y4 -- )
 
-: line ( x1 y1 x2 y2 -- )
-  stroke-color> set-color
-  GL_LINES glBegin
-    glVertex2d
-    glVertex2d
-  glEnd ;
+!   8 ndup
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!   GL_FRONT_AND_BACK GL_FILL glPolygonMode
+!   fill-color> set-color
 
-: triangle ( x1 y1 x2 y2 x3 y3 -- )
-
-  GL_FRONT_AND_BACK GL_FILL glPolygonMode
-  fill-color> set-color
-
-  6 ndup
+!   quad-vertices
   
-  GL_TRIANGLES glBegin
-    glVertex2d
-    glVertex2d
-    glVertex2d
-  glEnd
+!   GL_FRONT_AND_BACK GL_LINE glPolygonMode
+!   stroke-color> set-color
 
-  GL_FRONT_AND_BACK GL_LINE glPolygonMode
-  stroke-color> set-color
-
-  GL_TRIANGLES glBegin
-    glVertex2d
-    glVertex2d
-    glVertex2d
-  glEnd ;
+!   quad-vertices ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: quad-vertices ( x1 y1 x2 y2 x3 y3 x4 y4 -- )
-  GL_POLYGON glBegin
-    glVertex2d
-    glVertex2d
-    glVertex2d
-    glVertex2d
-  glEnd ;
+! : ellipse-disk ( x y width height -- )
+!   glPushMatrix
+!     >r >r
+!     0 glTranslated
+!     r> r> 1 glScaled
+!     gluNewQuadric
+!       dup 0 0.5 20 1 gluDisk
+!     gluDeleteQuadric
+!   glPopMatrix ;
 
-: quad ( x1 y1 x2 y2 x3 y3 x4 y4 -- )
+! : ellipse-center ( x y width height -- )
 
-  8 ndup
+!   4dup
 
-  GL_FRONT_AND_BACK GL_FILL glPolygonMode
-  fill-color> set-color
+!   GL_FRONT_AND_BACK GL_FILL glPolygonMode
+!   stroke-color> set-color
 
-  quad-vertices
-  
-  GL_FRONT_AND_BACK GL_LINE glPolygonMode
-  stroke-color> set-color
+!   ellipse-disk
 
-  quad-vertices ;
+!   GL_FRONT_AND_BACK GL_FILL glPolygonMode
+!   fill-color> set-color
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!   [ 2 - ] bi@ ! [ stroke-width 1+ - ] bi@
 
-: rect-vertices ( x y width height -- )
-  GL_POLYGON glBegin
-    [ 2drop                      glVertex2d ] 4keep
-    [ drop swap >r + 1- r>       glVertex2d ] 4keep
-    [ >r swap >r + 1- r> r> + 1- glVertex2d ] 4keep
-    [ nip + 1-                   glVertex2d ] 4keep
-    4drop
-  glEnd ;
-
-: rect ( x y width height -- )
-
-  4dup
-
-  GL_FRONT_AND_BACK GL_FILL glPolygonMode
-  fill-color> set-color
-
-  rect-vertices
-
-  GL_FRONT_AND_BACK GL_LINE glPolygonMode
-  stroke-color> set-color
-
-  rect-vertices ;
+!   ellipse-disk ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: ellipse-disk ( x y width height -- )
-  glPushMatrix
-    >r >r
-    0 glTranslated
-    r> r> 1 glScaled
-    gluNewQuadric
-      dup 0 0.5 20 1 gluDisk
-    gluDeleteQuadric
-  glPopMatrix ;
+! SYMBOL: CENTER
+! SYMBOL: RADIUS
+! SYMBOL: CORNER
+! SYMBOL: CORNERS
 
-: ellipse-center ( x y width height -- )
+! SYMBOL: ellipse-mode-value
 
-  4dup
+! : ellipse-mode ( val -- ) ellipse-mode-value set ;
 
-  GL_FRONT_AND_BACK GL_FILL glPolygonMode
-  stroke-color> set-color
+! : ellipse-radius ( x y hori vert -- ) [ 2 * ] bi@ ellipse-center ;
 
-  ellipse-disk
+! : ellipse-corner ( x y width height -- )
+!   [ drop nip     2 / + ] 4keep
+!   [ nip rot drop 2 / + ] 4keep
+!   [ >r >r 2drop r> r>  ] 4keep
+!   4drop
+!   ellipse-center ;
 
-  GL_FRONT_AND_BACK GL_FILL glPolygonMode
-  fill-color> set-color
+! : ellipse-corners ( x1 y1 x2 y2 -- )
+!   [ drop nip     + 2 /    ] 4keep
+!   [ nip rot drop + 2 /    ] 4keep
+!   [ drop nip     - abs 1+ ] 4keep
+!   [ nip rot drop - abs 1+ ] 4keep
+!   4drop
+!   ellipse-center ;
 
-  [ 2 - ] bi@ ! [ stroke-width 1+ - ] bi@
-
-  ellipse-disk ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-SYMBOL: CENTER
-SYMBOL: RADIUS
-SYMBOL: CORNER
-SYMBOL: CORNERS
-
-SYMBOL: ellipse-mode-value
-
-: ellipse-mode ( val -- ) ellipse-mode-value set ;
-
-: ellipse-radius ( x y hori vert -- ) [ 2 * ] bi@ ellipse-center ;
-
-: ellipse-corner ( x y width height -- )
-  [ drop nip     2 / + ] 4keep
-  [ nip rot drop 2 / + ] 4keep
-  [ >r >r 2drop r> r>  ] 4keep
-  4drop
-  ellipse-center ;
-
-: ellipse-corners ( x1 y1 x2 y2 -- )
-  [ drop nip     + 2 /    ] 4keep
-  [ nip rot drop + 2 /    ] 4keep
-  [ drop nip     - abs 1+ ] 4keep
-  [ nip rot drop - abs 1+ ] 4keep
-  4drop
-  ellipse-center ;
-
-: ellipse ( a b c d -- )
-  ellipse-mode-value get
-    {
-      { CENTER  [ ellipse-center ] }
-      { RADIUS  [ ellipse-radius ] }
-      { CORNER  [ ellipse-corner ] }
-      { CORNERS [ ellipse-corners ] }
-    }
-  case ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: circle ( pos size -- ) [ first2 ] [ dup ] bi* ellipse ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-USING: multi-methods ;
+! : ellipse ( a b c d -- )
+!   ellipse-mode-value get
+!     {
+!       { CENTER  [ ellipse-center ] }
+!       { RADIUS  [ ellipse-radius ] }
+!       { CORNER  [ ellipse-corner ] }
+!       { CORNERS [ ellipse-corners ] }
+!     }
+!   case ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -279,8 +187,8 @@ METHOD: background { array }
 
 : mouse ( -- point ) hand-loc get ;
 
-: mouse-x mouse first  ;
-: mouse-y mouse second ;
+: mouse-x ( -- x ) mouse first  ;
+: mouse-y ( -- y ) mouse second ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -296,9 +204,7 @@ VAR: loop-flag
 
 : defaults ( -- )
   0.8    background
-  0      >stroke-color
-  1      >fill-color
-  CENTER ellipse-mode
+  ! CENTER ellipse-mode
   60 frame-rate ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

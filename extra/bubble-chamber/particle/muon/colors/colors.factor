@@ -1,7 +1,7 @@
 
 USING: kernel sequences math math.constants math.order accessors
        processing
-       processing.color ;
+       colors ;
 
 IN: bubble-chamber.particle.muon.colors
 
