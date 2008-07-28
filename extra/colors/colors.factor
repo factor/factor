@@ -14,7 +14,7 @@ TUPLE: rgba < color red green blue alpha ;
 
 TUPLE: hsva < color hue saturation value alpha ;
 
-TUPLE: grey < color grey alpha ;
+TUPLE: gray < color gray alpha ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -26,7 +26,7 @@ METHOD: >rgba { hsva }
   { [ hue>> ] [ saturation>> ] [ value>> ] [ alpha>> ] } cleave 4array
   [ hsv>rgb ] [ peek ] bi suffix first4 rgba boa ;
 
-METHOD: >rgba { grey } [ grey>> dup dup ] [ alpha>> ] bi rgba boa ;
+METHOD: >rgba { gray } [ gray>> dup dup ] [ alpha>> ] bi rgba boa ;
 
 METHOD: >rgba { array } first4 rgba boa ;
 
