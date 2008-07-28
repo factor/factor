@@ -27,7 +27,7 @@ IN: golden-section
 
 : radius ( i -- radius ) pi * 720 / sin 10 * ;
 
-: color ( i -- i ) dup 360.0 / dup 0.25 1 4array >fill-color ;
+: color ( i -- i ) dup 360.0 / dup 0.25 1 rgba boa >fill-color ;
 
 : line-width ( i -- i ) dup radius 0.5 * 1 max glLineWidth ;
 
