@@ -129,7 +129,7 @@ M: editor ungraft*
 : draw-caret ( -- )
     editor get editor-focused? [
         editor get
-        dup editor-caret-color gl-color
+        dup editor-caret-color set-color
         dup caret-loc origin get v+
         swap caret-dim over v+
         [ { 0.5 -0.5 } v+ ] bi@ gl-line
@@ -173,7 +173,7 @@ M: editor ungraft*
 
 : draw-lines ( -- )
     \ first-visible-line get [
-        editor get dup editor-color gl-color
+        editor get dup editor-color set-color
         dup visible-lines
         [ draw-line 1 translate-lines ] with each
     ] with-editor-translation ;
@@ -192,7 +192,7 @@ M: editor ungraft*
     (draw-selection) ;
 
 : draw-selection ( -- )
-    editor get editor-selection-color gl-color
+    editor get editor-selection-color set-color
     editor get selection-start/end
     over first [
         2dup [
