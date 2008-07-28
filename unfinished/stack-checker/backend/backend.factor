@@ -74,7 +74,7 @@ SYMBOL: visited
 GENERIC: apply-object ( obj -- )
 
 : push-literal ( obj -- )
-    <literal> dup make-known [ nip push-d ] [ #push, ] 2bi ;
+    dup <literal> make-known [ nip push-d ] [ #push, ] 2bi ;
 
 M: wrapper apply-object
     wrapped>>

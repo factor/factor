@@ -7,7 +7,8 @@ compiler.tree
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
 compiler.tree.propagation.simple
-compiler.tree.propagation.branches ;
+compiler.tree.propagation.branches
+compiler.tree.propagation.constraints ;
 IN: compiler.tree.propagation.recursive
 
 : check-fixed-point ( node infos1 infos2 -- node )
@@ -50,10 +51,14 @@ SYMBOL: iter-counter
 M: #recursive propagate-around ( #recursive -- )
     iter-counter inc
     iter-counter get 10 > [ "Oops" throw ] when
-    dup label>> t >>fixed-point drop
-    [ child>> [ first propagate-recursive-phi ] [ (propagate) ] bi ]
-    [ dup label>> fixed-point>> [ drop ] [ propagate-around ] if ]
-    bi ;
+    dup label>> t >>fixed-point drop [
+        [
+            child>>
+            [ first propagate-recursive-phi ]
+            [ (propagate) ]
+            bi
+        ] save-constraints
+    ] [ dup label>> fixed-point>> [ drop ] [ propagate-around ] if ] bi ;
 
 : generalize-return-interval ( info -- info' )
     dup literal?>> [

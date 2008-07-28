@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 ! Based on Slate's src/unfinished/interval.slate by Brian Rice.
 USING: accessors kernel sequences arrays math math.order
@@ -76,9 +76,11 @@ TUPLE: interval { from read-only } { to read-only } ;
     [ from>> ] [ to>> ] bi ;
 
 : points>interval ( seq -- interval )
-    dup first
-    [ [ endpoint-min ] reduce ] 2keep
-    [ endpoint-max ] reduce <interval> ;
+    dup [ first fp-nan? ] contains? [ drop [-inf,inf] ] [
+        dup first
+        [ [ endpoint-min ] reduce ] 2keep
+        [ endpoint-max ] reduce <interval>
+    ] if ;
 
 : (interval-op) ( p1 p2 quot -- p3 )
     [ [ first ] [ first ] [ ] tri* call ]

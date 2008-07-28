@@ -87,7 +87,7 @@ TUPLE: #dispatch < #branch ;
 : #dispatch ( n branches -- node )
     \ #dispatch new-branch ;
 
-TUPLE: #phi < node phi-in-d phi-in-r out-d out-r ;
+TUPLE: #phi < node phi-in-d phi-info-d phi-in-r phi-info-r out-d out-r ;
 
 : #phi ( d-phi-in d-phi-out r-phi-in r-phi-out -- node )
     \ #phi new

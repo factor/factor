@@ -129,6 +129,36 @@ IN: compiler.tree.propagation.tests
     ] final-literals
 ] unit-test
 
+[ V{ string } ] [
+    [ dup string? not [ "Oops" throw ] [ ] if ] final-classes
+] unit-test
+
+[ V{ string } ] [
+    [ dup string? not not >boolean [ ] [ "Oops" throw ] if ] final-classes
+] unit-test
+
+[ V{ string } ] [
+    [ dup string? t xor [ "A" throw ] [ ] if ] final-classes
+] unit-test
+
+[ t ] [ [ t or ] final-classes first true-class? ] unit-test
+
+[ t ] [ [ t swap or ] final-classes first true-class? ] unit-test
+
+[ t ] [ [ f and ] final-classes first false-class? ] unit-test
+
+[ t ] [ [ f swap and ] final-classes first false-class? ] unit-test
+
+[ t ] [ [ dup not or ] final-classes first true-class? ] unit-test
+
+[ t ] [ [ dup not swap or ] final-classes first true-class? ] unit-test
+
+[ t ] [ [ dup not and ] final-classes first false-class? ] unit-test
+
+[ t ] [ [ dup not swap and ] final-classes first false-class? ] unit-test
+
+[ t ] [ [ over [ drop f ] when [ "A" throw ] unless ] final-classes first false-class? ] unit-test
+
 [ V{ fixnum } ] [
     [
         >fixnum
@@ -238,6 +268,12 @@ IN: compiler.tree.propagation.tests
 
 [ V{ object } ] [
     [ 0 * 10 < ] final-classes
+] unit-test
+
+[ V{ 27 } ] [
+    [
+        123 bitand dup 10 < over 8 > and [ 3 * ] [ "B" throw ] if
+    ] final-literals
 ] unit-test
 
 [ V{ string string } ] [
@@ -413,3 +449,5 @@ TUPLE: mixed-mutable-immutable { x integer } { y sequence read-only } ;
 [ V{ fixnum } ] [ [ 0 recursive-test-7 ] final-classes ] unit-test
 
 [ V{ fixnum } ] [ [ 1 10 [ dup 10 < [ 2 * ] when ] times ] final-classes ] unit-test
+
+[ V{ integer } ] [ [ 0 2 100 ^ [ nip ] each-integer ] final-classes ] unit-test

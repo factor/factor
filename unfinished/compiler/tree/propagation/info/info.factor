@@ -220,20 +220,21 @@ SYMBOL: value-infos
 : value-literal ( value -- obj ? )
     value-info >literal< ;
 
+: false-class? ( class -- ? ) \ f class<= ;
+
+: true-class? ( class -- ? ) \ f class-not class<= ;
+
 : possible-boolean-values ( info -- values )
     dup literal?>> [
         literal>> 1array
     ] [
         class>> {
             { [ dup null class<= ] [ { } ] }
-            { [ dup \ f class-not class<= ] [ { t } ] }
-            { [ dup \ f class<= ] [ { f } ] }
+            { [ dup true-class? ] [ { t } ] }
+            { [ dup false-class? ] [ { f } ] }
             [ { t f } ]
         } cond nip
     ] if ;
-
-: value-is? ( value class -- ? )
-    [ value-info class>> ] dip class<= ;
 
 : node-value-info ( node value -- info )
     swap info>> at* [ drop null-info ] unless ;

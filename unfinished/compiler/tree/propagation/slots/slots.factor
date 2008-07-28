@@ -29,7 +29,7 @@ UNION: fixed-length-sequence array byte-array string ;
     bi value-info-intersect 1array ;
 
 : length-accessor? ( node -- ? )
-    dup in-d>> first fixed-length-sequence value-is?
+    dup in-d>> first value-info class>> fixed-length-sequence class<=
     [ word>> \ length eq? ] [ drop f ] if ;
 
 : propagate-length ( node -- infos )
