@@ -37,11 +37,6 @@ IN: processing
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! VAR: fill-color
-! VAR: stroke-color
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 GENERIC: canonical-color-value ( obj -- color )
 
 METHOD: canonical-color-value { number } dup dup 1 4array ;
@@ -72,47 +67,6 @@ METHOD: canonical-color-value { rgba }
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! : point* ( x y -- )
-!   stroke-color> set-color
-!   GL_POINTS glBegin
-!     glVertex2d
-!   glEnd ;
-
-! : point ( seq -- ) first2 point* ;
-
-! : line ( x1 y1 x2 y2 -- )
-!   stroke-color> set-color
-!   GL_LINES glBegin
-!     glVertex2d
-!     glVertex2d
-!   glEnd ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! : triangle ( x1 y1 x2 y2 x3 y3 -- )
-
-!   GL_FRONT_AND_BACK GL_FILL glPolygonMode
-!   fill-color> set-color
-
-!   6 ndup
-  
-!   GL_TRIANGLES glBegin
-!     glVertex2d
-!     glVertex2d
-!     glVertex2d
-!   glEnd
-
-!   GL_FRONT_AND_BACK GL_LINE glPolygonMode
-!   stroke-color> set-color
-
-!   GL_TRIANGLES glBegin
-!     glVertex2d
-!     glVertex2d
-!     glVertex2d
-!   glEnd ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 ! : quad-vertices ( x1 y1 x2 y2 x3 y3 x4 y4 -- )
 !   GL_POLYGON glBegin
 !     glVertex2d
@@ -134,31 +88,6 @@ METHOD: canonical-color-value { rgba }
 !   stroke-color> set-color
 
 !   quad-vertices ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! : rect-vertices ( x y width height -- )
-!   GL_POLYGON glBegin
-!     [ 2drop                      glVertex2d ] 4keep
-!     [ drop swap >r + 1- r>       glVertex2d ] 4keep
-!     [ >r swap >r + 1- r> r> + 1- glVertex2d ] 4keep
-!     [ nip + 1-                   glVertex2d ] 4keep
-!     4drop
-!   glEnd ;
-
-! : rect ( x y width height -- )
-
-!   4dup
-
-!   GL_FRONT_AND_BACK GL_FILL glPolygonMode
-!   fill-color> set-color
-
-!   rect-vertices
-
-!   GL_FRONT_AND_BACK GL_LINE glPolygonMode
-!   stroke-color> set-color
-
-!   rect-vertices ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -228,14 +157,6 @@ METHOD: canonical-color-value { rgba }
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! : circle ( pos size -- ) [ first2 ] [ dup ] bi* ellipse ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-USING: multi-methods ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 GENERIC: background ( value -- )
 
 METHOD: background { number }
@@ -278,8 +199,6 @@ VAR: loop-flag
 
 : defaults ( -- )
   0.8    background
-  ! 0      >stroke-color
-  ! 1      >fill-color
   ! CENTER ellipse-mode
   60 frame-rate ;
 
