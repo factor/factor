@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces sequences math accessors kernel arrays
-stack-checker.backend compiler.tree compiler.tree.combinators ;
+USING: fry namespaces sequences math accessors kernel arrays
+stack-checker.backend stack-checker.inlining compiler.tree
+compiler.tree.combinators ;
 IN: compiler.tree.normalization
 
 ! A transform pass done before optimization can begin to
@@ -13,29 +14,52 @@ IN: compiler.tree.normalization
 !
 ! - We collect #return-recursive and #call-recursive nodes and
 ! store them in the #recursive's label slot.
-
-GENERIC: normalize* ( node -- )
+!
+! - We normalize #call-recursive as follows. The stack checker
+! says that the inputs of a #call-recursive are the entire stack
+! at the time of the call. This is a conservative estimate; we
+! don't know the exact number of stack values it touches until
+! the #return-recursive node has been visited, because of row
+! polymorphism. So in the normalize pass, we split a
+! #call-recursive into a #copy of the unchanged values and a
+! #call-recursive with trimmed inputs and outputs.
 
 ! Collect introductions
 SYMBOL: introductions
 
-GENERIC: collect-introductions* ( node -- )
+GENERIC: count-introductions* ( node -- )
 
-: collect-introductions ( nodes -- n )
+: count-introductions ( nodes -- n )
+    #! Note: we use each, not each-node, since the #branch
+    #! method recurses into children directly and we don't
+    #! recurse into #recursive at all.
     [
         0 introductions set
-        [ collect-introductions* ] each
+        [ count-introductions* ] each
         introductions get
     ] with-scope ;
 
-M: #introduce collect-introductions* drop introductions inc ;
+M: #introduce count-introductions* drop introductions inc ;
 
-M: #branch collect-introductions*
+M: #branch count-introductions*
     children>>
-    [ collect-introductions ] map supremum
+    [ count-introductions ] map supremum
     introductions [ + ] change ;
 
-M: node collect-introductions* drop ;
+M: node count-introductions* drop ;
+
+! Collect label info
+GENERIC: collect-label-info ( node -- )
+
+M: #return-recursive collect-label-info dup label>> (>>return) ;
+
+M: #call-recursive collect-label-info dup label>> calls>> push ;
+
+M: #recursive collect-label-info
+    [ label>> ] [ child>> count-introductions ] bi
+    >>introductions drop ;
+
+M: node collect-label-info drop ;
 
 ! Eliminate introductions
 SYMBOL: introduction-stack
@@ -73,22 +97,29 @@ M: #phi eliminate-introductions*
 M: node eliminate-introductions* ;
 
 : eliminate-introductions ( recursive n -- )
-    make-values introduction-stack set
-    [ fixup-enter-recursive ]
-    [ child>> [ eliminate-introductions* ] change-each ] bi ;
+    make-values introduction-stack [
+        [ fixup-enter-recursive ]
+        [ child>> [ eliminate-introductions* ] change-each ] bi
+    ] with-variable ;
+
+! Normalize
+GENERIC: normalize* ( node -- node' )
 
 M: #recursive normalize*
-    [
-        [ child>> collect-introductions ]
-        [ swap eliminate-introductions ]
-        bi
-    ] with-scope ;
+    dup dup label>> introductions>> eliminate-introductions ;
 
-! Collect label info
-M: #return-recursive normalize* dup label>> (>>return) ;
+: unchanged-underneath ( #call-recursive -- n )
+    [ out-d>> length ] [ label>> return>> in-d>> length ] bi - ;
 
-M: #call-recursive normalize* dup label>> calls>> push ;
+M: #call-recursive normalize*
+    dup unchanged-underneath
+    [ [ [ in-d>> ] [ out-d>> ] bi ] [ '[ , head ] ] bi* bi@ #copy ]
+    [ '[ , tail ] [ change-in-d ] [ change-out-d ] bi ]
+    2bi 2array ;
 
-M: node normalize* drop ;
+M: node normalize* ;
 
-: normalize ( node -- node ) dup [ normalize* ] each-node ;
+: normalize ( nodes -- nodes' )
+    [ [ collect-label-info ] each-node ]
+    [ [ normalize* ] map-nodes ]
+    bi ;

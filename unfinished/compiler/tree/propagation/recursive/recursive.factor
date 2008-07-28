@@ -10,33 +10,25 @@ compiler.tree.propagation.simple
 compiler.tree.propagation.branches ;
 IN: compiler.tree.propagation.recursive
 
-! row polymorphism is causing problems
-
-: longest-suffix ( seq1 seq2 -- seq1' seq2' )
-    2dup min-length [ tail-slice* ] curry bi@ ;
-
-: suffixes= ( seq1 seq2 -- ? )
-    longest-suffix sequence= ;
-
 : check-fixed-point ( node infos1 infos2 -- node )
-    suffixes= [ dup label>> f >>fixed-point drop ] unless ; inline
+    sequence= [ dup label>> f >>fixed-point drop ] unless ; inline
 
 : recursive-stacks ( #enter-recursive -- stacks initial )
-    [ label>> calls>> [ node-input-infos ] map ]
-    [ in-d>> [ value-info ] map ] bi
-    [ length '[ , tail* ] map flip ] keep ;
+    [ label>> calls>> [ node-input-infos ] map flip ]
+    [ in-d>> [ value-info ] map ] bi ;
 
-: generalize-counter-interval ( i1 i2 -- i3 )
+: generalize-counter-interval ( interval initial-interval -- interval' )
     {
-        { [ 2dup interval<= ] [ 1./0. [a,a] ] }
-        { [ 2dup interval>= ] [ -1./0. [a,a] ] }
+        { [ 2dup = ] [ empty-interval ] }
+        { [ over empty-interval eq? ] [ empty-interval ] }
+        { [ 2dup interval>= t eq? ] [ 1./0. [a,a] ] }
+        { [ 2dup interval<= t eq? ] [ -1./0. [a,a] ] }
         [ [-inf,inf] ]
     } cond nip interval-union ;
 
 : generalize-counter ( info' initial -- info )
     [ drop clone ] [ [ interval>> ] bi@ ] 2bi
-    generalize-counter-interval >>interval
-    f >>literal? f >>literal ;
+    generalize-counter-interval >>interval ;
 
 : unify-recursive-stacks ( stacks initial -- infos )
     over empty? [ nip ] [
@@ -72,12 +64,9 @@ M: #recursive propagate-around ( #recursive -- )
     [ generalize-return-interval ] map ;
 
 M: #call-recursive propagate-before ( #call-label -- )
-    dup
-    [ node-output-infos ]
-    [ label>> return>> node-input-infos ]
-    bi check-fixed-point
-    [ label>> return>> node-input-infos generalize-return ] [ out-d>> ] bi
-    longest-suffix set-value-infos ;
+    dup [ node-output-infos ] [ label>> return>> node-input-infos ] bi
+    [ check-fixed-point ] keep
+    generalize-return swap out-d>> set-value-infos ;
 
 M: #return-recursive propagate-before ( #return-recursive -- )
     dup [ node-input-infos ] [ in-d>> [ value-info ] map ] bi

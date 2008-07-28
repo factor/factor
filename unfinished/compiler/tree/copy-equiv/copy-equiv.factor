@@ -34,13 +34,6 @@ M: #copy compute-copy-equiv*
 M: #return-recursive compute-copy-equiv*
     [ in-d>> ] [ out-d>> ] bi are-copies-of ;
 
-: unchanged-underneath ( #call-recursive -- n )
-    [ out-d>> length ] [ label>> return>> in-d>> length ] bi - ;
-
-M: #call-recursive compute-copy-equiv*
-    [ in-d>> ] [ out-d>> ] [ unchanged-underneath ] tri
-    '[ , head ] bi@ are-copies-of ;
-
 M: node compute-copy-equiv* drop ;
 
 : compute-copy-equiv ( node -- node )

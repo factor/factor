@@ -406,3 +406,10 @@ TUPLE: mixed-mutable-immutable { x integer } { y sequence read-only } ;
     dup 1 <= [ drop 1 ] [ dup 1 - recursive-test-6 swap 2 - recursive-test-6 + ] if ; inline recursive
 
 [ V{ integer } ] [ [ { fixnum } declare recursive-test-6 ] final-classes ] unit-test
+
+: recursive-test-7 ( a -- b )
+    dup 10 < [ 1+ recursive-test-7 ] when ; inline recursive
+
+[ V{ fixnum } ] [ [ 0 recursive-test-7 ] final-classes ] unit-test
+
+[ V{ fixnum } ] [ [ 1 10 [ dup 10 < [ 2 * ] when ] times ] final-classes ] unit-test

@@ -17,7 +17,7 @@ IN: stack-checker.inlining
 : (inline-word) ( word label -- )
     [ [ def>> ] keep ] dip infer-quot-recursive ;
 
-TUPLE: inline-recursive word enter-out return calls fixed-point ;
+TUPLE: inline-recursive word enter-out return calls fixed-point introductions ;
 
 : <inline-recursive> ( word -- label )
     inline-recursive new
