@@ -36,6 +36,7 @@ IN: boids.ui
     dup pos>> gl-translate-2d
         vel>> first2 rect> arg rad>deg 0 0 1 glRotated
     { { 0 5 } { 0 -5 } { 20 0 } } triangle
+    fill-mode
   glPopMatrix ;
 
 : draw-boids ( -- ) boids> [ draw-boid ] each ;
@@ -43,9 +44,7 @@ IN: boids.ui
 : boid-color ( -- color ) { 1.0 0 0 0.3 } ;
 
 : display ( -- )
-  white gl-clear
   boid-color >fill-color
-  2 glLineWidth
   draw-boids ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
