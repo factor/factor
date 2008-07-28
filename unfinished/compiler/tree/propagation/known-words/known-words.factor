@@ -149,12 +149,9 @@ most-negative-fixnum most-positive-fixnum [a,b]
        /\
     ] ;
 
-: comparison-constraints ( in1 in2 out op -- constraint )
-    swap [
-        [ (comparison-constraints) ]
-        [ negate-comparison (comparison-constraints) ]
-        3bi
-    ] dip <conditional> ;
+:: comparison-constraints ( in1 in2 out op -- constraint )
+    in1 in2 op (comparison-constraints) out t-->
+    in1 in2 op negate-comparison (comparison-constraints) out f--> /\ ;
 
 : define-comparison-constraints ( word op -- )
     '[ , comparison-constraints ] +constraints+ set-word-prop ;
@@ -204,7 +201,7 @@ generic-comparison-ops [
 \ eq? [
     [ info-intervals-intersect? ]
     [ info-classes-intersect? ]
-    bi or maybe-or-never
+    2bi or maybe-or-never
 ] +outputs+ set-word-prop
 
 {

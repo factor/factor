@@ -18,4 +18,5 @@ IN: compiler.tree.optimizer
     remove-dead-code
     strength-reduce
     detect-loops
-    fuse-branches ;
+    fuse-branches
+    elaborate ;
