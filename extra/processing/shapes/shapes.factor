@@ -19,13 +19,13 @@ VAR: stroke-color
 
 : fill-mode ( -- )
   GL_FRONT_AND_BACK GL_FILL glPolygonMode
-  fill-color> first4 glColor4d ;
+  fill-color> gl-color ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : stroke-mode ( -- )
   GL_FRONT_AND_BACK GL_LINE glPolygonMode
-  stroke-color> first4 glColor4d ;
+  stroke-color> gl-color ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
