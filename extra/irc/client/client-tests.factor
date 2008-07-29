@@ -43,7 +43,7 @@ IN: irc.client.tests
       ":some.where 001 factorbot :Welcome factorbot"
     } make-client
     { [ connect-irc ]
-      [ drop 1 seconds sleep ]
+      [ drop 0.1 seconds sleep ]
       [ profile>> nickname>> ]
       [ terminate-irc ]
     } cleave ] unit-test
@@ -57,8 +57,8 @@ IN: irc.client.tests
     } make-client
     { [ "factorbot" set-nick ]
       [ connect-irc ]
-      [ drop 1 seconds sleep ]
-      [ join-messages>> 1 seconds mailbox-get-timeout ]
+      [ drop 0.1 seconds sleep ]
+      [ join-messages>> 0.1 seconds mailbox-get-timeout ]
       [ terminate-irc ]
     } cleave
     [ class ] [ trailing>> ] bi ] unit-test
@@ -109,7 +109,7 @@ IN: irc.client.tests
       [ listeners>>
         [ "#factortest" [ <irc-channel-listener> ] keep ] dip set-at ]
       [ connect-irc ]
-      [ drop 1 seconds sleep ]
+      [ drop 0.1 seconds sleep ]
       [ listeners>> [ "#factortest" ] dip at participants>> ]
       [ terminate-irc ]
     } cleave
@@ -124,7 +124,7 @@ IN: irc.client.tests
                              { "somedude" f } } clone >>participants ] keep
         ] dip set-at ]
       [ connect-irc ]
-      [ drop 1 seconds sleep ]
+      [ drop 0.1 seconds sleep ]
       [ listeners>> [ "#factortest" ] dip at participants>> ]
       [ terminate-irc ]
     } cleave
@@ -139,7 +139,7 @@ IN: irc.client.tests
                              { "somedude" f } } clone >>participants ] keep
         ] dip set-at ]
       [ connect-irc ]
-      [ drop 1 seconds sleep ]
+      [ drop 0.1 seconds sleep ]
       [ listeners>> [ "#factortest" ] dip at participants>> ]
       [ terminate-irc ]
     } cleave
@@ -154,7 +154,7 @@ IN: irc.client.tests
                              { "somedude" f } } clone >>participants ] keep
         ] dip set-at ]
       [ connect-irc ]
-      [ drop 1 seconds sleep ]
+      [ drop 0.1 seconds sleep ]
       [ listeners>> [ "#factortest" ] dip at participants>> ]
       [ terminate-irc ]
     } cleave
