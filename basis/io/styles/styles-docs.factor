@@ -24,8 +24,14 @@ ARTICLE: "table-styles" "Table styles"
 { $subsection table-gap }
 { $subsection table-border } ;
 
+HELP: write-object
+{ $values { "str" string } { "obj" "an object" } }
+{ $description "Writes a string to " { $link output-stream } ", associating it with the object. If formatted output is supported, the string will become a clickable presentation of the object, otherwise this word behaves like a call to " { $link write } "." }
+$io-error ;
+
 ARTICLE: "presentations" "Presentations"
-"The " { $link presented } " style can be used to emit clickable objects. The " { $link write-object } " word should be used instead of setting this directly." ;
+"The " { $link presented } " style can be used to emit clickable objects. A utility word for outputting this style:"
+{ $subsection write-object } ;
 
 ARTICLE: "styles" "Formatted output"
 "The " { $link stream-format } ", " { $link with-style } ", " { $link with-nesting } " and " { $link tabular-output } " words take a hashtable of style attributes. Output stream implementations are free to ignore style information."

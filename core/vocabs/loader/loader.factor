@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces sequences io.files kernel assocs words vocabs
-definitions parser continuations io io.styles hashtables sorting
+definitions parser continuations io hashtables sorting
 source-files arrays combinators strings system math.parser
 compiler.errors splitting init ;
 IN: vocabs.loader

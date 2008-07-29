@@ -1,5 +1,6 @@
-! Copyright (C) 2005, 2006 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: hashtables io ;
 IN: io.styles
 
 SYMBOL: plain
@@ -39,3 +40,5 @@ SYMBOL: table-border
 TUPLE: input string ;
 
 C: <input> input
+
+: write-object ( str obj -- ) presented associate format ;

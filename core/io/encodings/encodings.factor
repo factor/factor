@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel sequences sbufs vectors namespaces growable
 strings io classes continuations destructors combinators
-io.styles io.streams.plain splitting byte-arrays
+io.streams.plain splitting byte-arrays
 sequences.private accessors ;
 IN: io.encodings
 
