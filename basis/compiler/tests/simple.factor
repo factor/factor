@@ -1,6 +1,6 @@
 USING: compiler.units tools.test kernel kernel.private
 sequences.private math.private math combinators strings
-alien arrays memory vocabs parser ;
+alien arrays memory vocabs parser eval ;
 IN: compiler.tests
 
 ! Test empty word

@@ -1,6 +1,6 @@
 USING: locals math sequences tools.test hashtables words kernel
 namespaces arrays strings prettyprint io.streams.string parser
-accessors generic ;
+accessors generic eval ;
 IN: locals.tests
 
 :: foo ( a b -- a a ) a a ;

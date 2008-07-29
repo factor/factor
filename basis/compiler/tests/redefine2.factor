@@ -1,7 +1,7 @@
 IN: compiler.tests
 USING: compiler compiler.units tools.test math parser kernel
 sequences sequences.private classes.mixin generic definitions
-arrays words assocs ;
+arrays words assocs eval ;
 
 DEFER: blah
 

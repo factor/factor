@@ -7,13 +7,12 @@ init io.files bootstrap.image bootstrap.image.private vocabs
 vocabs.loader system debugger continuations ;
 IN: bootstrap.stage1
 
-{ "resource:core" } vocab-roots set
-
 "Bootstrap stage 1..." print flush
 
 "resource:core/bootstrap/primitives.factor" run-file
 
 load-help? off
+{ "resource:core" } vocab-roots set
 
 ! Create a boot quotation for the target
 [
