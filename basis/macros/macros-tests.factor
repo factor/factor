@@ -1,6 +1,6 @@
 IN: macros.tests
 USING: tools.test macros math kernel arrays
-vectors io.streams.string prettyprint parser ;
+vectors io.streams.string prettyprint parser eval ;
 
 MACRO: see-test ( a b -- c ) + ;
 

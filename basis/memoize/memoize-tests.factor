@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: math kernel memoize tools.test parser
-prettyprint io.streams.string sequences ;
+prettyprint io.streams.string sequences eval ;
 IN: memoize.tests
 
 MEMO: fib ( m -- n )

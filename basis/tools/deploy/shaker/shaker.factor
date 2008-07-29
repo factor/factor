@@ -21,7 +21,6 @@ QUALIFIED: libc.private
 QUALIFIED: listener
 QUALIFIED: prettyprint.config
 QUALIFIED: source-files
-QUALIFIED: threads
 QUALIFIED: vocabs
 IN: tools.deploy.shaker
 
@@ -187,7 +186,7 @@ IN: tools.deploy.shaker
         } %
 
         deploy-threads? [
-            threads:initial-thread ,
+            "initial-thread" "threads" lookup ,
         ] unless
 
         strip-io? [ io.backend:io-backend , ] when

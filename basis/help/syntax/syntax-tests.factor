@@ -1,5 +1,5 @@
 IN: help.syntax.tests
-USING: tools.test parser vocabs help.syntax namespaces ;
+USING: tools.test parser vocabs help.syntax namespaces eval ;
 
 [
     [ "foobar" ] [

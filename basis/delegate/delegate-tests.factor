@@ -1,6 +1,6 @@
 USING: delegate kernel arrays tools.test words math definitions
 compiler.units parser generic prettyprint io.streams.string
-accessors ;
+accessors eval ;
 IN: delegate.tests
 
 TUPLE: hello this that ;

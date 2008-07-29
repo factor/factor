@@ -1,6 +1,6 @@
 USING: io kernel math math.functions math.parser parser lexer
 namespaces sequences splitting grouping combinators
-continuations sequences.lib ;
+continuations sequences.lib eval ;
 IN: money
 
 : dollars/cents ( dollars -- dollars cents )

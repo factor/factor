@@ -42,6 +42,7 @@ IN: tools.deploy.backend
 
 : bootstrap-profile ( -- profile )
     {
+        { "threads"  deploy-threads?  }
         { "math"     deploy-math?     }
         { "compiler" deploy-compiler? }
         { "ui"       deploy-ui?       }

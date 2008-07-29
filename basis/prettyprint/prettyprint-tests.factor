@@ -2,7 +2,7 @@ USING: arrays definitions io.streams.string io.streams.duplex
 kernel math namespaces parser prettyprint prettyprint.config
 prettyprint.sections sequences tools.test vectors words
 effects splitting generic.standard prettyprint.private
-continuations generic compiler.units tools.walker ;
+continuations generic compiler.units tools.walker eval ;
 IN: prettyprint.tests
 
 [ "4" ] [ 4 unparse ] unit-test
@@ -194,7 +194,7 @@ DEFER: parse-error-file
 
 : string-layout
     {
-        "USING: io kernel lexer ;"
+        "USING: debugger io kernel lexer ;"
         "IN: prettyprint.tests"
         ": string-layout-test ( error -- )"
         "    \"Expected \" write dup unexpected-want expected>string write"

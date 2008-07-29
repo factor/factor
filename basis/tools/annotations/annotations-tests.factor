@@ -1,4 +1,4 @@
-USING: tools.test tools.annotations math parser ;
+USING: tools.test tools.annotations math parser eval ;
 IN: tools.annotations.tests
 
 : foo ;

@@ -1,4 +1,5 @@
-USING: kernel symbols tools.test parser generic words accessors ;
+USING: kernel symbols tools.test parser generic words accessors
+eval ;
 IN: symbols.tests
 
 [ ] [ SYMBOLS: a b c ; ] unit-test

@@ -1,6 +1,6 @@
 USING: math definitions help.topics help tools.test
 prettyprint parser io.streams.string kernel source-files
-assocs namespaces words io sequences ;
+assocs namespaces words io sequences eval ;
 IN: help.definitions.tests
 
 [ ] [ \ + >link see ] unit-test

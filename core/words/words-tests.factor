@@ -1,7 +1,7 @@
 USING: arrays generic assocs kernel math namespaces
 sequences tools.test words definitions parser quotations
 vocabs continuations classes.tuple compiler.units
-io.streams.string accessors ;
+io.streams.string accessors eval ;
 IN: words.tests
 
 [ 4 ] [
