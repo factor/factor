@@ -1,11 +1,11 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: bootstrap.stage1
 USING: arrays debugger generic hashtables io assocs
 kernel.private kernel math memory namespaces parser
 prettyprint sequences vectors words system splitting
 init io.files bootstrap.image bootstrap.image.private vocabs
 vocabs.loader system debugger continuations ;
+IN: bootstrap.stage1
 
 { "resource:core" } vocab-roots set
 
@@ -33,10 +33,6 @@ load-help? off
     "math.floats" require
     "memory" require
 
-    ! this must add its init hook before io.backend does
-    "libc" require
-
-    ! "io.thread" require
     "io.streams.c" require
     "vocabs.loader" require
     

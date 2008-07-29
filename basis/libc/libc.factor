@@ -2,7 +2,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov
 ! Copyright (C) 2007, 2008 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien assocs continuations destructors init kernel
+USING: alien assocs continuations destructors kernel
 namespaces accessors sets ;
 IN: libc
 
@@ -20,7 +20,14 @@ IN: libc
 : (realloc) ( alien size -- newalien )
     "void*" "libc" "realloc" { "void*" "ulong" } alien-invoke ;
 
-SYMBOL: mallocs
+SYMBOL: malloc-expiry
+
+: mallocs ( -- assoc )
+    malloc-expiry get-global dup expired? [
+        drop
+        -1 <alien> malloc-expiry set-global
+        H{ } clone dup \ mallocs set-global
+    ] when ;
 
 PRIVATE>
 
@@ -35,19 +42,17 @@ ERROR: realloc-error ptr size ;
 
 <PRIVATE
 
-[ H{ } clone mallocs set-global ] "libc" add-init-hook
-
 : add-malloc ( alien -- )
-    mallocs get-global conjoin ;
+    mallocs conjoin ;
 
 : delete-malloc ( alien -- )
     [
-        mallocs get-global delete-at*
+        mallocs delete-at*
         [ double-free ] unless drop
     ] when* ;
 
 : malloc-exists? ( alien -- ? )
-    mallocs get-global key? ;
+    mallocs key? ;
 
 PRIVATE>
 
