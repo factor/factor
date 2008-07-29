@@ -4,16 +4,22 @@
 USING: arrays hashtables heaps kernel kernel.private math
 namespaces sequences vectors continuations continuations.private
 dlists assocs system combinators init boxes accessors
-math.order dequeues ;
+math.order dequeues strings quotations ;
 IN: threads
 
 SYMBOL: initial-thread
 
 TUPLE: thread
-name quot exit-handler
-id
-continuation state runnable
-mailbox variables sleep-entry ;
+{ name string }
+{ quot callable initial: [ ] }
+{ exit-handler callable initial: [ ] }
+{ id integer }
+continuation
+state
+runnable
+mailbox
+variables
+sleep-entry ;
 
 : self ( -- thread ) 63 getenv ; inline
 
@@ -62,8 +68,7 @@ PRIVATE>
         swap >>name
         swap >>quot
         \ thread counter >>id
-        <box> >>continuation
-        [ ] >>exit-handler ; inline
+        <box> >>continuation ; inline
 
 : <thread> ( quot name -- thread )
     \ thread new-thread ;
@@ -211,7 +216,7 @@ GENERIC: error-in-thread ( error thread -- )
     <dlist> 65 setenv
     <min-heap> 66 setenv
     initial-thread global
-    [ drop f "Initial" <thread> ] cache
+    [ drop [ ] "Initial" <thread> ] cache
     <box> >>continuation
     t >>runnable
     f >>state

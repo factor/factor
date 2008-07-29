@@ -41,3 +41,5 @@ yield
     ] ;
 
 [ t ] [ spawn-namespace-test ] unit-test
+
+[ "a" [ 1 1 + ] spawn 100 sleep ] must-fail
