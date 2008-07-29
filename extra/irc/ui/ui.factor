@@ -6,9 +6,11 @@ USING: accessors kernel threads combinators concurrency.mailboxes
        ui ui.gadgets ui.gadgets.panes ui.gadgets.editors
        ui.gadgets.scrollers ui.commands ui.gadgets.frames ui.gestures
        ui.gadgets.tabs ui.gadgets.grids ui.gadgets.lists ui.gadgets.labels
-       io io.styles namespaces calendar calendar.format models
+       io io.styles namespaces calendar calendar.format models continuations
        irc.client irc.client.private irc.messages irc.messages.private
-       irc.ui.commandparser irc.ui.load ;
+       irc.ui.commandparser irc.ui.load qualified ;
+
+RENAME: join sequences => sjoin
 
 IN: irc.ui
 
@@ -71,13 +73,20 @@ M: quit write-irc
     " has left IRC" red write-color
     trailing>> dot-or-parens red write-color ;
 
+: full-mode ( message -- mode )
+    parameters>> rest " " sjoin ;
+
 M: mode write-irc
     "* " blue write-color
-    [ name>> write ] keep
+    [ prefix>> parse-name write ] keep
     " has applied mode " blue write-color
-    [ mode>> write ] keep
+    [ full-mode write ] keep
     " to " blue write-color
     channel>> write ;
+
+M: unhandled write-irc
+    "UNHANDLED: " write
+    line>> blue write-color ;
 
 M: irc-end write-irc
     drop "* You have left IRC" red write-color ;
@@ -88,11 +97,17 @@ M: irc-disconnected write-irc
 M: irc-connected write-irc
     drop "* Connected" green write-color ;
 
+M: irc-listener-end write-irc
+    drop ;
+
 M: irc-message write-irc
     drop ; ! catch all unimplemented writes, THIS WILL CHANGE    
 
+: time-happened ( irc-message -- timestamp )
+    [ timestamp>> ] [ 2drop now ] recover ;
+
 : print-irc ( irc-message -- )
-    [ timestamp>> timestamp>hms write " " write ]
+    [ time-happened timestamp>hms write " " write ]
     [ write-irc nl ] bi ;
 
 : send-message ( message -- )
