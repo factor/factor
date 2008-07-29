@@ -23,11 +23,12 @@ IN: libc
 SYMBOL: malloc-expiry
 
 : mallocs ( -- assoc )
-    malloc-expiry get-global dup expired? [
-        drop
+    malloc-expiry get-global expired? [
         -1 <alien> malloc-expiry set-global
         H{ } clone dup \ mallocs set-global
-    ] when ;
+    ] [
+        \ mallocs get-global
+    ] if ;
 
 PRIVATE>
 
