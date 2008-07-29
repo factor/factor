@@ -101,3 +101,61 @@ IN: irc.client.tests
     } cleave
     [ class ] [ name>> ] [ trailing>> ] tri
     ] unit-test
+
+! Participants lists tests
+{ H{ { "somedude" f } } } [
+    { ":somedude!n=user@isp.net JOIN :#factortest" } make-client
+    { [ "factorbot" set-nick ]
+      [ listeners>>
+        [ "#factortest" [ <irc-channel-listener> ] keep ] dip set-at ]
+      [ connect-irc ]
+      [ drop 1 seconds sleep ]
+      [ listeners>> [ "#factortest" ] dip at participants>> ]
+      [ terminate-irc ]
+    } cleave
+    ] unit-test
+
+{ H{ { "somedude2" f } } } [
+    { ":somedude!n=user@isp.net PART #factortest" } make-client
+    { [ "factorbot" set-nick ]
+      [ listeners>>
+        [ "#factortest" [ <irc-channel-listener>
+                          H{ { "somedude2" f }
+                             { "somedude" f } } clone >>participants ] keep
+        ] dip set-at ]
+      [ connect-irc ]
+      [ drop 1 seconds sleep ]
+      [ listeners>> [ "#factortest" ] dip at participants>> ]
+      [ terminate-irc ]
+    } cleave
+    ] unit-test
+
+{ H{ { "somedude2" f } } } [
+    { ":somedude!n=user@isp.net QUIT" } make-client
+    { [ "factorbot" set-nick ]
+      [ listeners>>
+        [ "#factortest" [ <irc-channel-listener>
+                          H{ { "somedude2" f }
+                             { "somedude" f } } clone >>participants ] keep
+        ] dip set-at ]
+      [ connect-irc ]
+      [ drop 1 seconds sleep ]
+      [ listeners>> [ "#factortest" ] dip at participants>> ]
+      [ terminate-irc ]
+    } cleave
+    ] unit-test
+
+{ H{ { "somedude2" f } } } [
+    { ":somedude2!n=user2@isp.net KICK #factortest somedude" } make-client
+    { [ "factorbot" set-nick ]
+      [ listeners>>
+        [ "#factortest" [ <irc-channel-listener>
+                          H{ { "somedude2" f }
+                             { "somedude" f } } clone >>participants ] keep
+        ] dip set-at ]
+      [ connect-irc ]
+      [ drop 1 seconds sleep ]
+      [ listeners>> [ "#factortest" ] dip at participants>> ]
+      [ terminate-irc ]
+    } cleave
+    ] unit-test

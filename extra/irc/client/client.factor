@@ -218,7 +218,7 @@ M: privmsg handle-incoming-irc ( privmsg -- )
     dup irc-message-origin to-listener ;
 
 M: join handle-incoming-irc ( join -- )
-    { [ maybe-forward-join ] ! keep
+    { [ maybe-forward-join ]
       [ dup trailing>> to-listener ]
       [ [ drop f ] [ prefix>> parse-name ] [ trailing>> ] tri add-participant ]
       [ handle-participant-change ]
@@ -231,19 +231,18 @@ M: part handle-incoming-irc ( part -- )
     tri ;
 
 M: kick handle-incoming-irc ( kick -- )
-    { [ dup channel>>  to-listener ]
+    { [ dup channel>> to-listener ]
       [ [ who>> ] [ channel>> ] bi remove-participant ]
       [ handle-participant-change ]
       [ dup who>> me? [ unregister-listener ] [ drop ] if ]
     } cleave ;
 
 M: quit handle-incoming-irc ( quit -- )
-    { [ dup prefix>> parse-name listeners-with-participant
-        [ to-listener ] with each ]
-      [ handle-participant-change ]
-      [ prefix>> parse-name remove-participant-from-all ]
-      [ call-next-method ]
-    } cleave ;
+    [ dup prefix>> parse-name listeners-with-participant
+      [ to-listener ] with each ]
+    [ prefix>> parse-name remove-participant-from-all ]
+    [ handle-participant-change ]
+    tri ;
 
 : >nick/mode ( string -- nick mode )
     dup first "+@" member? [ unclip ] [ 0 ] if participant-mode ;
