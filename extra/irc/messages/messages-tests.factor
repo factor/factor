@@ -35,3 +35,13 @@ join new
 [ ":someuser!n=user@some.where JOIN :#factortest"
   parse-irc-line f >>timestamp ] unit-test
 
+mode new
+    ":ircserver.net MODE #factortest +ns" >>line
+                          "ircserver.net" >>prefix
+                                   "MODE" >>command
+                  { "#factortest" "+ns" } >>parameters
+                             "#factortest" >>channel
+                                    "+ns" >>mode
+1array
+[ ":ircserver.net MODE #factortest +ns"
+  parse-irc-line f >>timestamp ] unit-test
