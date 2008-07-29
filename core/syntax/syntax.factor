@@ -8,7 +8,7 @@ generic.standard generic.math generic.parser classes io.files
 vocabs classes.parser classes.union
 classes.intersection classes.mixin classes.predicate
 classes.singleton classes.tuple.parser compiler.units
-combinators debugger effects.parser slots ;
+combinators effects.parser slots ;
 IN: bootstrap.syntax
 
 ! These words are defined as a top-level form, instead of with

@@ -36,6 +36,7 @@ load-help? off
     ! this must add its init hook before io.backend does
     "libc" require
 
+    ! "io.thread" require
     "io.streams.c" require
     "vocabs.loader" require
     
@@ -43,17 +44,9 @@ load-help? off
     "bootstrap.layouts" require
 
     [
-        "resource:core/bootstrap/stage2.factor"
+        "resource:basis/bootstrap/stage2.factor"
         dup exists? [
-            [ run-file ]
-            [
-                :c
-                dup print-error flush
-                "listener" vocab
-                [ restarts. vocab-main execute ]
-                [ die ] if*
-                1 exit
-            ] recover
+            run-file
         ] [
             "Cannot find " write write "." print
             "Please move " write image write " to the same directory as the Factor sources," print
