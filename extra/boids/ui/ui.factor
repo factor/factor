@@ -41,7 +41,7 @@ IN: boids.ui
 
 : draw-boids ( -- ) boids> [ draw-boid ] each ;
 
-: boid-color ( -- color ) { 1.0 0 0 0.3 } ;
+: boid-color ( -- color ) T{ rgba f 1.0 0 0 0.3 } ;
 
 : display ( -- )
   boid-color >fill-color

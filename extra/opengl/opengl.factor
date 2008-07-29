@@ -16,7 +16,7 @@ IN: opengl
 : fix-coordinates ( point1 point2 -- x1 y2 x2 y2 )
     [ first2 [ >fixnum ] bi@ ] bi@ ;
 
-
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : gl-color ( color -- ) first4 glColor4d ; inline
 
@@ -26,15 +26,13 @@ IN: opengl
 : gl-clear ( color -- )
     gl-clear-color GL_COLOR_BUFFER_BIT glClear ;
 
-: color>raw ( object -- 4array )
-  >rgba
-    { [ red>> ] [ green>> ] [ blue>> ] [ alpha>> ] } cleave
-  4array ;
+: color>raw ( object -- r g b a )
+  >rgba { [ red>> ] [ green>> ] [ blue>> ] [ alpha>> ] } cleave ;
 
-: set-color       ( object -- ) color>raw first4 glColor4d ;
-: set-clear-color ( object -- ) color>raw first4 glClearColor ;
+: set-color       ( object -- ) color>raw glColor4d ;
+: set-clear-color ( object -- ) color>raw glClearColor ;
 
-
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : gl-error ( -- )
     glGetError dup zero? [
@@ -126,7 +124,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
     GL_QUAD_STRIP [
         swap >r prepare-gradient r>
         [ length dup 1- v/n ] keep [
-            >r >r 2dup r> r> gl-color v*n
+            >r >r 2dup r> r> set-color v*n
             dup gl-vertex v+ gl-vertex
         ] 2each 2drop
     ] do-state ;
