@@ -21,7 +21,7 @@ HELP: macro-expand
 { $values { "..." "inputs to a macro" } { "word" macro } { "quot" quotation } }
 { $description "Expands a macro. Useful for debugging." }
 { $examples
-    { $code "USING: math macros combinators.lib ;" "{ [ integer? ] [ 0 > ] [ 13 mod zero? ] } \ 1&& macro-expand ." }
+    { $code "USING: math macros combinators.short-circuit ;" "{ [ integer? ] [ 0 > ] [ 13 mod zero? ] } \ 1&& macro-expand ." }
 } ;
 
 ARTICLE: "macros" "Macros"
