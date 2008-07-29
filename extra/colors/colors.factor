@@ -1,8 +1,7 @@
 ! Copyright (C) 2003, 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 
-USING: kernel combinators sequences arrays
-       classes.tuple multi-methods accessors colors.hsv ;
+USING: kernel combinators sequences arrays classes.tuple accessors colors.hsv ;
 
 IN: colors
 
@@ -20,23 +19,19 @@ TUPLE: gray < color gray alpha ;
 
 GENERIC: >rgba ( object -- rgba )
 
-METHOD: >rgba { rgba } ;
+M: rgba >rgba ( rgba -- rgba ) ;
 
-METHOD: >rgba { hsva }
+M: hsva >rgba ( hsva -- rgba )
   { [ hue>> ] [ saturation>> ] [ value>> ] [ alpha>> ] } cleave 4array
   [ hsv>rgb ] [ peek ] bi suffix first4 rgba boa ;
 
-METHOD: >rgba { gray } [ gray>> dup dup ] [ alpha>> ] bi rgba boa ;
+M: gray >rgba ( gray -- rgba ) [ gray>> dup dup ] [ alpha>> ] bi rgba boa ;
 
-METHOD: >rgba { array } first4 rgba boa ;
+M: array >rgba ( array -- rgba ) first4 rgba boa ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-USE: syntax
-
-M: color red>>   >rgba red>> ;
-M: color green>> >rgba green>> ;
-M: color blue>>  >rgba blue>> ;
+M: color ( color -- red   ) red>>   >rgba red>> ;
+M: color ( color -- green ) green>> >rgba green>> ;
+M: color ( color -- blue  ) blue>>  >rgba blue>> ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
