@@ -1,5 +1,5 @@
 USING: arrays accessors continuations kernel symbols
-combinators.lib sequences namespaces ;
+combinators.lib sequences namespaces init ;
 IN: game-input
 
 SYMBOLS: game-input-backend game-input-opened ;
@@ -10,6 +10,16 @@ HOOK: (close-game-input) game-input-backend ( -- )
 : game-input-opened? ( -- ? )
     game-input-opened get ;
 
+<PRIVATE
+
+: reset-game-input ( -- )
+    game-input-opened off ;
+
+[ reset-game-input ] "game-input" add-init-hook
+
+PRIVATE>
+
+
 : open-game-input ( -- )
     game-input-opened? [
         (open-game-input) 
@@ -18,7 +28,7 @@ HOOK: (close-game-input) game-input-backend ( -- )
 : close-game-input ( -- )
     game-input-opened? [
         (close-game-input) 
-        game-input-opened off
+        reset-game-input
     ] when ;
 
 : with-game-input ( quot -- )
