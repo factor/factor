@@ -232,39 +232,15 @@ M: vocab-link summary vocab-summary ;
 MEMO: all-vocabs-seq ( -- seq )
     all-vocabs values concat ;
 
-: dangerous? ( name -- ? )
-    #! Hack
-    {
-        { [ "cpu." ?head ] [ t ] }
-        { [ "io.unix" ?head ] [ t ] }
-        { [ "io.windows" ?head ] [ t ] }
-        { [ "ui.x11" ?head ] [ t ] }
-        { [ "ui.windows" ?head ] [ t ] }
-        { [ "ui.cocoa" ?head ] [ t ] }
-        { [ "cocoa" ?head ] [ t ] }
-        { [ "core-foundation" ?head ] [ t ] }
-        { [ "vocabs.loader.test" ?head ] [ t ] }
-        { [ "editors." ?head ] [ t ] }
-        { [ ".windows" ?tail ] [ t ] }
-        { [ ".unix" ?tail ] [ t ] }
-        { [ "unix" ?head ] [ t ] }
-        { [ ".linux" ?tail ] [ t ] }
-        { [ ".bsd" ?tail ] [ t ] }
-        { [ ".macosx" ?tail ] [ t ] }
-        { [ "windows." ?head ] [ t ] }
-        { [ "cocoa" ?head ] [ t ] }
-        { [ ".test" ?tail ] [ t ] }
-        { [ "raptor" ?head ] [ t ] }
-        { [ dup "tools.deploy.app" = ] [ t ] }
-        [ f ]
-    } cond nip ;
+: unportable? ( name -- ? )
+    vocab-tags "unportable" swap member? ;
 
-: filter-dangerous ( seq -- seq' )
-    [ vocab-name dangerous? not ] filter ;
+: filter-unportable ( seq -- seq' )
+    [ vocab-name unportable? not ] filter ;
 
 : try-everything ( -- failures )
     all-vocabs-seq
-    filter-dangerous
+    filter-unportable
     require-all ;
 
 : load-everything ( -- )

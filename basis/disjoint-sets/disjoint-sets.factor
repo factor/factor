@@ -86,3 +86,7 @@ M:: disjoint-set equate ( a b disjoint-set -- )
         [ swap ] [ over disjoint-set inc-rank ] [ ] branch
         disjoint-set link-sets
     ] if ;
+
+M: disjoint-set clone
+    [ parents>> ] [ ranks>> ] [ counts>> ] tri [ clone ] tri@
+    disjoint-set boa ;

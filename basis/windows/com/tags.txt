@@ -1,3 +1,4 @@
+unportable
 windows
 com
 bindings
