@@ -1,5 +1,5 @@
 USING: help.markup help.syntax help.topics help.crossref help io
-hashtables ;
+io.styles hashtables ;
 
 HELP: articles
 { $var-description "Hashtable mapping article names to " { $link article } " instances." } ;

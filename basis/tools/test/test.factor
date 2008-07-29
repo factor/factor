@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors namespaces arrays prettyprint sequences kernel
 vectors quotations words parser assocs combinators continuations
-debugger io io.files vocabs vocabs.loader source-files
+debugger io io.styles io.files vocabs vocabs.loader source-files
 compiler.units summary inference effects tools.vocabs ;
 IN: tools.test
 

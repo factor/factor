@@ -1,9 +1,9 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.files kernel io.encodings.utf8 vocabs.loader vocabs
-sequences namespaces math.parser arrays hashtables assocs
-memoize summary sorting splitting combinators source-files
-io debugger continuations compiler.errors init
+USING: kernel io io.styles io.files io.encodings.utf8
+vocabs.loader vocabs sequences namespaces math.parser arrays
+hashtables assocs memoize summary sorting splitting combinators
+source-files debugger continuations compiler.errors init
 checksums checksums.crc32 sets ;
 IN: tools.vocabs
 
