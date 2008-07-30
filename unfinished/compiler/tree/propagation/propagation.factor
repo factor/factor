@@ -12,15 +12,9 @@ compiler.tree.propagation.constraints
 compiler.tree.propagation.known-words ;
 IN: compiler.tree.propagation
 
-: propagate-with ( node infos -- )
+: propagate ( node -- node )
     [
         H{ } clone constraints set
-        >hashtable value-infos set
-        (propagate)
+        H{ } clone value-infos set
+        dup (propagate)
     ] with-scope ;
-
-: propagate ( node -- node )
-    dup f propagate-with ;
-
-: propagate/node ( node existing -- )
-    info>> propagate-with ;
