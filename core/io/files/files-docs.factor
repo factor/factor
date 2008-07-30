@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io io.styles strings
+USING: help.markup help.syntax io strings
        io.backend io.files.private quotations ;
 IN: io.files
 
@@ -170,16 +170,16 @@ HELP: +symbolic-link+
 { $description "A symbolic link file.  This type is currently implemented on Unix platforms only. See " { $link "symbolic-links" } " for words operating on symbolic links." } ;
 
 HELP: +character-device+
-{ $description "A Unix character device file. This type exists on unix platforms only." } ;
+{ $description "A Unix character device file. This type exists on Unix platforms only." } ;
 
 HELP: +block-device+
-{ $description "A Unix block device file. This type exists on unix platforms only." } ;
+{ $description "A Unix block device file. This type exists on Unix platforms only." } ;
 
 HELP: +fifo+
-{ $description "A Unix fifo file. This type exists on unix platforms only." } ;
+{ $description "A Unix fifo file. This type exists on Unix platforms only." } ;
 
 HELP: +socket+
-{ $description "A Unix socket file. This type exists on unix platforms only." } ;
+{ $description "A Unix socket file. This type exists on Unix platforms only." } ;
 
 HELP: +unknown+
 { $description "A unknown file type." } ;
@@ -327,7 +327,7 @@ HELP: resource-path
 { $description "Resolve a path relative to the Factor source code location." } ;
 
 HELP: pathname
-{ $class-description "Class of pathname presentations. Path name presentations can be created by calling " { $link <pathname> } ". Instances can be passed to " { $link write-object } " to output a clickable pathname." } ;
+{ $class-description "Class of path name objects. Path name objects can be created by calling " { $link <pathname> } "." } ;
 
 HELP: normalize-directory
 { $values { "str" "a pathname string" } { "newstr" "a new pathname string" } }

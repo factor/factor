@@ -25,8 +25,16 @@ $nl
 $nl
 "A combinator which can help with implementing methods on " { $link hashcode* } ":"
 { $subsection recursive-hashcode }
+{ $subsection "assertions" }
 { $subsection "combinators-quot" }
 { $see-also "quotations" "dataflow" } ;
+
+ARTICLE: "assertions" "Assertions"
+"Some words to make assertions easier to enforce:"
+{ $subsection assert }
+{ $subsection assert= }
+"Runtime stack depth checking:"
+{ $subsection assert-depth } ;
 
 ABOUT: "combinators"
 
@@ -145,3 +153,7 @@ HELP: dispatch ( n array -- )
 { $values { "n" "a fixnum" } { "array" "an array of quotations" } }
 { $description "Calls the " { $snippet "n" } "th quotation in the array." }
 { $warning "This word is in the " { $vocab-link "kernel.private" } " vocabulary because it is an implementation detail used by the generic word system to accelerate method dispatch. It does not perform type or bounds checks, and user code should not need to call it directly." } ;
+
+HELP: assert-depth
+{ $values { "quot" "a quotation" } }
+{ $description "Runs a quotation. Throws an error if the total number of elements on the stack is not the same before and after the quotation runs." } ;

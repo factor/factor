@@ -1,19 +1,18 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: bootstrap.stage1
 USING: arrays debugger generic hashtables io assocs
 kernel.private kernel math memory namespaces parser
 prettyprint sequences vectors words system splitting
 init io.files bootstrap.image bootstrap.image.private vocabs
 vocabs.loader system debugger continuations ;
-
-{ "resource:core" } vocab-roots set
+IN: bootstrap.stage1
 
 "Bootstrap stage 1..." print flush
 
 "resource:core/bootstrap/primitives.factor" run-file
 
 load-help? off
+{ "resource:core" } vocab-roots set
 
 ! Create a boot quotation for the target
 [
@@ -33,9 +32,6 @@ load-help? off
     "math.floats" require
     "memory" require
 
-    ! this must add its init hook before io.backend does
-    "libc" require
-
     "io.streams.c" require
     "vocabs.loader" require
     
@@ -43,17 +39,9 @@ load-help? off
     "bootstrap.layouts" require
 
     [
-        "resource:core/bootstrap/stage2.factor"
+        "resource:basis/bootstrap/stage2.factor"
         dup exists? [
-            [ run-file ]
-            [
-                :c
-                dup print-error flush
-                "listener" vocab
-                [ restarts. vocab-main execute ]
-                [ die ] if*
-                1 exit
-            ] recover
+            run-file
         ] [
             "Cannot find " write write "." print
             "Please move " write image write " to the same directory as the Factor sources," print
