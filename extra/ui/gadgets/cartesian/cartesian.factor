@@ -1,18 +1,9 @@
 
-USING: kernel combinators opengl.gl
+USING: kernel combinators sequences opengl.gl
        ui.render ui.gadgets ui.gadgets.slate
        accessors ;
 
 IN: ui.gadgets.cartesian
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: init-slate ( slate -- slate )
-  init-gadget
-  [ ]         >>action
-  { 200 200 } >>pdim
-  [ ]         >>graft
-  [ ]         >>ungraft ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -45,6 +36,12 @@ M: cartesian draw-gadget* ( cartesian -- )
    GL_MODELVIEW glMatrixMode
    glLoadIdentity
    call-next-method ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: x-range ( cartesian range -- cartesian ) first2 [ >>x-min ] [ >>x-max ] bi* ;
+: y-range ( cartesian range -- cartesian ) first2 [ >>y-min ] [ >>y-max ] bi* ;
+: z-range ( cartesian range -- cartesian ) first2 [ >>z-min ] [ >>z-max ] bi* ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
