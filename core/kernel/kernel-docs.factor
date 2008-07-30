@@ -903,3 +903,8 @@ $nl
     "[ P ] [ Q ] [ ] while T"
 }
 "However, depending on the stack effects of " { $snippet "pred" } " and " { $snippet "quot" } ", the " { $snippet "tail" } " quotation might need to be non-empty in order to balance out the stack effect of branches for stack effect inference." } ;
+
+HELP: assert
+{ $values { "got" "the obtained value" } { "expect" "the expected value" } }
+{ $description "Throws an " { $link assert } " error." }
+{ $error-description "Thrown when a unit test or other assertion fails." } ;

@@ -276,6 +276,14 @@ IN: compiler.tree.propagation.tests
     ] final-literals
 ] unit-test
 
+[ V{ 27 } ] [
+    [
+        dup number? over sequence? and [
+            dup 10 < over 8 <= not and [ 3 * ] [ "A" throw ] if
+        ] [ "B" throw ] if
+    ] final-literals
+] unit-test
+
 [ V{ string string } ] [
     [
         2dup [ dup string? [ "Oops" throw ] unless ] bi@ 2drop

@@ -4,7 +4,7 @@ USING: accessors namespaces kernel parser prettyprint
 sequences arrays io math definitions math.vectors assocs refs
 ui.gadgets ui.gestures ui.commands ui.gadgets.scrollers
 ui.gadgets.buttons ui.gadgets.borders ui.gadgets.tracks
-ui.gadgets.editors ;
+ui.gadgets.editors eval ;
 IN: ui.gadgets.slots
 
 TUPLE: update-object ;
