@@ -520,3 +520,11 @@ M: array iterate first t ;
 [ V{ POSTPONE: f } ] [
     [ 3 string? ] final-classes
 ] unit-test
+
+[ V{ fixnum } ] [
+    [ { fixnum } declare [ ] curry obj>> ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
+    [ { fixnum fixnum } declare [ nth-unsafe ] curry call ] final-classes
+] unit-test

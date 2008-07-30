@@ -195,17 +195,17 @@ GENERIC: annotate-entry-test-1 ( x -- )
 
 M: fixnum annotate-entry-test-1 drop ;
 
-: (annotate-entry-test-2) ( from to quot: ( -- ) -- )
-    2over >= [
-        3drop
+: (annotate-entry-test-2) ( from to -- )
+    2dup >= [
+        2drop
     ] [
-        [ swap >r call dup annotate-entry-test-1 1+ r> ] keep (annotate-entry-test-2)
+        >r dup annotate-entry-test-1 1+ r> (annotate-entry-test-2)
     ] if ; inline recursive
 
 : annotate-entry-test-2 0 -rot (annotate-entry-test-2) ; inline
 
 [ f ] [
-    [ { bignum } declare [ ] annotate-entry-test-2 ]
+    [ { bignum } declare annotate-entry-test-2 ]
     \ annotate-entry-test-1 inlined?
 ] unit-test
 
@@ -375,7 +375,7 @@ cell-bits 32 = [
 
 [ t ] [
     [ { fixnum } declare 0 [ + ] reduce ]
-    { < <-integer-fixnum } inlined?
+    { < <-integer-fixnum nth-unsafe } inlined?
 ] unit-test
 
 [ f ] [

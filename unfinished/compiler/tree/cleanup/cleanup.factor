@@ -22,7 +22,8 @@ GENERIC: cleanup* ( node -- node/nodes )
     [ cleanup* ] map flatten ;
 
 : cleanup-folding? ( #call -- ? )
-    node-output-infos [ literal?>> ] all? ;
+    node-output-infos dup empty?
+    [ drop f ] [ [ literal?>> ] all? ] if ;
 
 : cleanup-folding ( #call -- nodes )
     #! Replace a #call having a known result with a #drop of its
