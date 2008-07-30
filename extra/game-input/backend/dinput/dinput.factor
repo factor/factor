@@ -206,6 +206,13 @@ M: dinput-game-input-backend (close-game-input)
     close-device-change-window
     delete-dinput ;
 
+M: dinput-game-input-backend (reset-game-input)
+    {
+        +dinput+ +keyboard-device+ +keyboard-state+
+        +controller-devices+ +controller-guids+
+        +device-change-window+ +device-change-handle+
+    } [ f swap set-global ] each ;
+
 M: dinput-game-input-backend get-controllers
     +controller-devices+ get
     [ drop controller boa ] { } assoc>map ;
@@ -278,5 +285,3 @@ M: dinput-game-input-backend read-keyboard
     +keyboard-device+ get
     [ +keyboard-state+ get [ keys>> underlying>> get-device-state ] keep ]
     [ ] [ f ] with-acquisition ;
-
-dinput-game-input-backend game-input-backend set-global
