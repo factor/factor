@@ -4,9 +4,10 @@ USING: kernel effects accessors math math.private math.libm
 math.partial-dispatch math.intervals math.parser math.order
 layouts words sequences sequences.private arrays assocs classes
 classes.algebra combinators generic.math splitting fry locals
-classes.tuple alien.accessors classes.tuple.private
+classes.tuple alien.accessors classes.tuple.private slots.private
 compiler.tree.propagation.info compiler.tree.propagation.nodes
 compiler.tree.propagation.constraints
+compiler.tree.propagation.slots
 compiler.tree.comparisons ;
 IN: compiler.tree.propagation.known-words
 
@@ -148,12 +149,9 @@ most-negative-fixnum most-positive-fixnum [a,b]
        /\
     ] ;
 
-: comparison-constraints ( in1 in2 out op -- constraint )
-    swap [
-        [ (comparison-constraints) ]
-        [ negate-comparison (comparison-constraints) ]
-        3bi
-    ] dip <conditional> ;
+:: comparison-constraints ( in1 in2 out op -- constraint )
+    in1 in2 op (comparison-constraints) out t-->
+    in1 in2 op negate-comparison (comparison-constraints) out f--> /\ ;
 
 : define-comparison-constraints ( word op -- )
     '[ , comparison-constraints ] +constraints+ set-word-prop ;
@@ -203,7 +201,7 @@ generic-comparison-ops [
 \ eq? [
     [ info-intervals-intersect? ]
     [ info-classes-intersect? ]
-    bi or maybe-or-never
+    2bi or maybe-or-never
 ] +outputs+ set-word-prop
 
 {
@@ -258,3 +256,8 @@ generic-comparison-ops [
 
 ! the output of clone has the same type as the input
 { clone (clone) } [ [ ] +outputs+ set-word-prop ] each
+
+\ slot [
+    dup literal?>>
+    [ literal>> swap value-info-slot ] [ 2drop object <class-info> ] if
+] +outputs+ set-word-prop

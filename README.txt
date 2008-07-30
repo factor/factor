@@ -146,12 +146,13 @@ usage documentation, enter the following in the UI listener:
 The Factor source tree is organized as follows:
 
   build-support/ - scripts used for compiling Factor
-  core/ - Factor core library and compiler
-  extra/ - more libraries
+  vm/ - sources for the Factor VM, written in C
+  core/ - Factor core library
+  basis/ - Factor basis library, compiler, tools
+  extra/ - more libraries and applications
   fonts/ - TrueType fonts used by UI
   misc/ - editor modes, icons, etc
   unmaintained/ - unmaintained contributions, please help!
-  vm/ - sources for the Factor VM, written in C
 
 * Community
 

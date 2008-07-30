@@ -1,0 +1,4 @@
+unportable
+windows
+com
+bindings

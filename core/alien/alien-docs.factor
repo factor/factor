@@ -1,7 +1,7 @@
 USING: byte-arrays arrays help.syntax help.markup
 alien.syntax compiler definitions math libc
 debugger parser io io.backend system
-alien.accessors ;
+alien.accessors eval ;
 IN: alien
 
 HELP: alien

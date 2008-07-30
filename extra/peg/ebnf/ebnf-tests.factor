@@ -3,7 +3,7 @@
 !
 USING: kernel tools.test peg peg.ebnf words math math.parser 
        sequences accessors peg.parsers parser namespaces arrays 
-       strings ;
+       strings eval ;
 IN: peg.ebnf.tests
 
 { T{ ebnf-non-terminal f "abc" } } [

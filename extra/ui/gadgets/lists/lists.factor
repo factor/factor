@@ -4,13 +4,14 @@ USING: accessors ui.commands ui.gestures ui.render ui.gadgets
 ui.gadgets.labels ui.gadgets.scrollers
 kernel sequences models opengl math math.order namespaces
 ui.gadgets.presentations ui.gadgets.viewports ui.gadgets.packs
-math.vectors classes.tuple math.geometry.rect ;
+math.vectors classes.tuple math.geometry.rect colors ;
+
 IN: ui.gadgets.lists
 
 TUPLE: list < pack index presenter color hook ;
 
 : list-theme ( list -- list )
-    { 0.8 0.8 1.0 1.0 } >>color ; inline
+    T{ rgba f 0.8 0.8 1.0 1.0 } >>color ; inline
 
 : <list> ( hook presenter model -- gadget )
     list new-gadget
@@ -56,7 +57,7 @@ M: list model-changed
 
 M: list draw-gadget*
     origin get [
-        dup list-color gl-color
+        dup list-color set-color
         selected-rect [ rect-extent gl-fill-rect ] when*
     ] with-translation ;
 

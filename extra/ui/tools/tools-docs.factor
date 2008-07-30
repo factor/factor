@@ -1,10 +1,10 @@
-USING: editors help.markup help.syntax summary inspector io listener
-parser prettyprint tools.profiler tools.walker ui.commands
-ui.gadgets.editors ui.gadgets.panes ui.gadgets.presentations
-ui.gadgets.slots ui.operations ui.tools.browser
-ui.tools.interactor ui.tools.inspector ui.tools.listener
-ui.tools.operations ui.tools.profiler ui.tools.walker
-ui.tools.workspace vocabs ;
+USING: editors help.markup help.syntax summary inspector io
+io.styles listener parser prettyprint tools.profiler
+tools.walker ui.commands ui.gadgets.editors ui.gadgets.panes
+ui.gadgets.presentations ui.gadgets.slots ui.operations
+ui.tools.browser ui.tools.interactor ui.tools.inspector
+ui.tools.listener ui.tools.operations ui.tools.profiler
+ui.tools.walker ui.tools.workspace vocabs ;
 IN: ui.tools
 
 ARTICLE: "ui-presentations" "Presentations in the UI"

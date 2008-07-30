@@ -35,7 +35,7 @@ SYMBOL: viewport-translation
     init-clip
     ! white gl-clear is broken w.r.t window resizing
     ! Linux/PPC Radeon 9200
-    white gl-color
+    white set-color
     clip get rect-extent gl-fill-rect ;
 
 GENERIC: draw-gadget* ( gadget -- )
@@ -95,7 +95,7 @@ C: <solid> solid
 
 ! Solid pen
 : (solid) ( gadget paint -- loc dim )
-    solid-color gl-color rect-dim >r origin get dup r> v+ ;
+    solid-color set-color rect-dim >r origin get dup r> v+ ;
 
 M: solid draw-interior (solid) gl-fill-rect ;
 
@@ -121,7 +121,7 @@ C: <polygon> polygon
 
 : draw-polygon ( polygon quot -- )
     origin get [
-        >r dup polygon-color gl-color polygon-points r> call
+        >r dup polygon-color set-color polygon-points r> call
     ] with-translation ; inline
 
 M: polygon draw-boundary

@@ -6,7 +6,7 @@ USING: kernel words namespaces classes parser continuations
        combinators sequences splitting quotations arrays strings tools.time
        sequences.deep accessors assocs.lib
        io.encodings.utf8
-       combinators.cleave calendar calendar.format ;
+       combinators.cleave calendar calendar.format eval ;
 
 IN: builder.util
 

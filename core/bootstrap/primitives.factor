@@ -18,7 +18,7 @@ H{ } clone sub-primitives set
 
 "resource:core/bootstrap/syntax.factor" parse-file
 
-"resource:core/cpu/" architecture get {
+"resource:basis/cpu/" architecture get {
     { "x86.32" "x86/32" }
     { "x86.64" "x86/64" }
     { "linux-ppc" "ppc/linux" }

@@ -31,8 +31,8 @@ M: labelled-gadget focusable-child* labelled-gadget-content ;
 : title-theme ( gadget -- )
     { 1 0 } over set-gadget-orientation
     T{ gradient f {
-        { 0.65 0.65 1.0 1.0 }
-        { 0.65 0.45 1.0 1.0 }
+        T{ rgba f 0.65 0.65 1.0 1.0 }
+        T{ rgba f 0.65 0.45 1.0 1.0 }
     } } swap set-gadget-interior ;
 
 : <title-label> ( text -- label ) <label> dup title-theme ;

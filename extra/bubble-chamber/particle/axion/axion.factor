@@ -1,7 +1,8 @@
 
 USING: kernel sequences random accessors multi-methods
        math math.constants math.ranges math.points combinators.cleave
-       processing bubble-chamber.common bubble-chamber.particle ;
+       processing processing.shapes
+       bubble-chamber.common bubble-chamber.particle ;
 
 IN: bubble-chamber.particle.axion
 

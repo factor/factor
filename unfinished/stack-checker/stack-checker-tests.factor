@@ -9,6 +9,16 @@ threads.private io.streams.string io.timeouts io.thread
 sequences.private destructors combinators ;
 IN: stack-checker.tests
 
+: short-effect ( effect -- pair )
+    [ in>> length ] [ out>> length ] bi 2array ;
+
+: must-infer-as ( effect quot -- )
+    >r 1quotation r> [ infer short-effect ] curry unit-test ;
+
+: must-infer ( word/quot -- )
+    dup word? [ 1quotation ] when
+    [ infer drop ] curry [ ] swap unit-test ;
+
 \ infer. must-infer
 
 { 0 2 } [ 2 "Hello" ] must-infer-as
@@ -560,3 +570,6 @@ M: object inference-invalidation-d inference-invalidation-c 2drop ;
 : bad-recursion-6 ( quot: ( -- ) -- )
     dup bad-recursion-6 call ; inline recursive
 [ [ [ drop f ] bad-recursion-6 ] infer ] must-fail
+
+{ 3 0 } [ [ 2drop "A" throw ] [ ] if 2drop ] must-infer-as
+{ 2 0 } [ drop f f [ 2drop "A" throw ] [ ] if 2drop ] must-infer-as
