@@ -140,8 +140,6 @@ TUPLE: #copy < node in-d out-d ;
         swap >>out-d
         swap >>in-d ;
 
-: in/out ( node -- in-d out-d ) [ in-d>> ] [ out-d>> ] bi ; inline
-
 : node, ( node -- ) stack-visitor get push ;
 
 M: vector child-visitor V{ } clone ;
