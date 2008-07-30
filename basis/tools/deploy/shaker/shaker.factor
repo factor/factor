@@ -16,8 +16,6 @@ QUALIFIED: init
 QUALIFIED: io.backend
 QUALIFIED: io.thread
 QUALIFIED: layouts
-QUALIFIED: libc.private
-QUALIFIED: libc.private
 QUALIFIED: listener
 QUALIFIED: prettyprint.config
 QUALIFIED: source-files
@@ -178,12 +176,13 @@ IN: tools.deploy.shaker
             listener:error-hook
             init:init-hooks
             io.thread:io-thread
-            libc.private:mallocs
             source-files:source-files
             input-stream
             output-stream
             error-stream
         } %
+
+        "mallocs" "libc.private" lookup ,
 
         deploy-threads? [
             "initial-thread" "threads" lookup ,
