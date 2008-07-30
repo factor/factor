@@ -3,7 +3,7 @@
 ! Copyright (C) 2007, 2008 Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien assocs continuations destructors kernel
-namespaces accessors sets ;
+namespaces accessors sets summary ;
 IN: libc
 
 <PRIVATE
@@ -34,12 +34,21 @@ PRIVATE>
 
 ERROR: bad-ptr ;
 
+M: bad-ptr summary
+    drop "Memory allocation failed" ;
+
 : check-ptr ( c-ptr -- c-ptr )
     [ bad-ptr ] unless* ;
 
 ERROR: double-free ;
 
+M: double-free summary
+    drop "Free failed since memory is not allocated" ;
+
 ERROR: realloc-error ptr size ;
+
+M: realloc-error summary
+    drop "Memory reallocation failed" ;
 
 <PRIVATE
 

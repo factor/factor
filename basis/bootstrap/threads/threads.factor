@@ -4,3 +4,4 @@ IN: bootstrap.threads
 
 USE: io.thread
 USE: threads
+USE: debugger.threads
