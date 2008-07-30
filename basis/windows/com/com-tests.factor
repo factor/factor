@@ -45,7 +45,7 @@ C: <test-implementation> test-implementation
     } }
     { "IUnrelated" {
         [ swap x>> + ] ! IUnrelated::xPlus
-        [ spin x>> * + ] ! IUnrealted::xMulAdd
+        [ spin x>> * + ] ! IUnrelated::xMulAdd
     } }
 } <com-wrapper>
 dup +test-wrapper+ set [
