@@ -1,16 +1,20 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry accessors kernel sequences sequences.private assocs
-words namespaces classes.algebra combinators classes
-classes.tuple classes.tuple.private continuations arrays
-byte-arrays strings math math.private slots
+USING: fry accessors kernel sequences sequences.private assocs words
+namespaces classes.algebra combinators classes classes.tuple
+classes.tuple.private continuations arrays byte-arrays strings
+math math.partial-dispatch math.private slots generic
+generic.standard generic.math
 compiler.tree
 compiler.tree.def-use
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
 compiler.tree.propagation.slots
+compiler.tree.propagation.inlining
 compiler.tree.propagation.constraints ;
 IN: compiler.tree.propagation.simple
+
+! Propagation for straight-line code.
 
 M: #introduce propagate-before
     value>> object <class-info> swap set-value-info ;
@@ -40,91 +44,61 @@ M: #declare propagate-before
     [ [ in-d>> ] [ out-d>> ] bi append ] dip
     with-datastack first assume ;
 
-: compute-constraints ( #call -- )
-    dup word>> +constraints+ word-prop [ custom-constraints ] [
-        dup word>> predicate? [
-            [ in-d>> first ]
-            [ word>> "predicating" word-prop ]
-            [ out-d>> first ]
-            tri predicate-constraints assume
-        ] [ drop ] if
+: compute-constraints ( #call word -- )
+    dup +constraints+ word-prop [ nip custom-constraints ] [
+        dup predicate? [
+            [ [ in-d>> first ] [ out-d>> first ] bi ]
+            [ "predicating" word-prop ] bi*
+            swap predicate-constraints assume
+        ] [ 2drop ] if
     ] if* ;
 
-: call-outputs-quot ( node -- infos )
-    [ in-d>> [ value-info ] map ]
-    [ word>> +outputs+ word-prop ]
-    bi with-datastack ;
+: call-outputs-quot ( #call word -- infos )
+    [ in-d>> [ value-info ] map ] [ +outputs+ word-prop ] bi*
+    with-datastack ;
 
-: foldable-word? ( #call -- ? )
-    dup word>> "foldable" word-prop [
-        drop t
-    ] [
-        dup word>> \ <tuple-boa> eq? [
-            in-d>> peek value-info literal>> immutable-tuple-class?
-        ] [
-            drop f
-        ] if
-    ] if ;
+: foldable-call? ( #call word -- ? )
+    "foldable" word-prop
+    [ in-d>> [ value-info literal?>> ] all? ] [ drop f ] if ;
 
-: foldable-call? ( #call -- ? )
-    dup word>> "foldable" word-prop [
-        in-d>> [ value-info literal?>> ] all?
-    ] [
-        drop f
-    ] if ;
-
-: fold-call ( #call -- infos )
+: fold-call ( #call word -- infos )
     [ in-d>> [ value-info literal>> ] map ]
-    [ word>> [ execute ] curry ]
-    bi with-datastack
+    [ [ execute ] curry ]
+    bi* with-datastack
     [ <literal-info> ] map ;
 
-: default-output-value-infos ( node -- infos )
-    dup word>> "default-output-classes" word-prop [
-        class-infos
-    ] [
-        out-d>> length object <class-info> <repetition>
-    ] ?if ;
+: default-output-value-infos ( #call word -- infos )
+    "default-output-classes" word-prop
+    [ class-infos ] [ out-d>> length object <class-info> <repetition> ] ?if ;
 
-: output-value-infos ( node -- infos )
+: output-value-infos ( #call word -- infos )
     {
-        { [ dup foldable-call? ] [ fold-call ] }
+        { [ 2dup foldable-call? ] [ fold-call ] }
         { [ dup tuple-constructor? ] [ propagate-tuple-constructor ] }
-        { [ dup word>> reader? ] [ reader-word-outputs ] }
         { [ dup sequence-constructor? ] [ propagate-sequence-constructor ] }
-        { [ dup length-accessor? ] [ propagate-length ] }
-        { [ dup word>> +outputs+ word-prop ] [ call-outputs-quot ] }
+        { [ dup +outputs+ word-prop ] [ call-outputs-quot ] }
         [ default-output-value-infos ]
     } cond ;
 
-M: #call propagate-before
-    [ [ output-value-infos ] [ out-d>> ] bi set-value-infos ]
-    [ compute-constraints ]
-    bi ;
-
-M: node propagate-before drop ;
-
-: propagate-input-classes ( node -- )
-    [ word>> "input-classes" word-prop class-infos ] [ in-d>> ] bi
-    refine-value-infos ;
-
-M: #call propagate-after
+: do-inlining ( #call word -- ? )
     {
-        { [ dup reader? ] [ reader-word-inputs ] }
-        { [ dup word>> "input-classes" word-prop ] [ propagate-input-classes ] }
-        [ drop ]
+        { [ dup standard-generic? ] [ inline-standard-method ] }
+        { [ dup math-generic? ] [ inline-math-method ] }
+        { [ dup math-partial? ] [ inline-math-partial ] }
+        { [ dup method-body? ] [ inline-method-body ] }
+        [ 2drop f ]
     } cond ;
 
-M: node propagate-after drop ;
+M: #call propagate-before
+    dup word>> 2dup do-inlining [ 2drop ] [
+        [ [ output-value-infos ] [ drop out-d>> ] 2bi set-value-infos ]
+        [ compute-constraints ]
+        2bi
+    ] if ;
 
-: extract-value-info ( values -- assoc )
-    [ dup value-info ] H{ } map>assoc ;
+: propagate-input-classes ( node input-classes -- )
+    class-infos swap in-d>> refine-value-infos ;
 
-: annotate-node ( node -- )
-    dup
-    [ node-defs-values ] [ node-uses-values ] bi append
-    extract-value-info
-    >>info drop ;
-
-M: node propagate-around
-    [ propagate-before ] [ annotate-node ] [ propagate-after ] tri ;
+M: #call propagate-after
+    dup word>> "input-classes" word-prop dup
+    [ propagate-input-classes ] [ 2drop ] if ;

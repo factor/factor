@@ -1,7 +1,8 @@
 ! Copyright (C) 2007, 2008 Mackenzie Straight, Doug Coleman,
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel math sequences accessors dequeues ;
+USING: combinators kernel math sequences accessors dequeues
+summary ;
 IN: dlists
 
 TUPLE: dlist front back length ;
@@ -79,6 +80,9 @@ M: dlist push-back* ( obj dlist -- dlist-node )
     inc-length ;
 
 ERROR: empty-dlist ;
+
+M: empty-dlist summary ( dlist -- )
+    drop "Empty dlist" ;
 
 M: dlist peek-front ( dlist -- obj )
     front>> [ obj>> ] [ empty-dlist ] if* ;

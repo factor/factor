@@ -39,7 +39,7 @@ GENERIC: effective-method ( generic -- method )
     order [ class<= ] with filter reverse dup length 1 =
     [ drop f ] [ second ] if ;
 
-: next-method ( class generic -- class/f )
+: next-method ( class generic -- method/f )
     [ next-method-class ] keep method ;
 
 GENERIC: next-method-quot* ( class generic combination -- quot )

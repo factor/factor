@@ -5,10 +5,10 @@ kernel math namespaces prettyprint prettyprint.config sequences
 assocs sequences.private strings io.styles io.files vectors
 words system splitting math.parser classes.tuple continuations
 continuations.private combinators generic.math classes.builtin
-classes compiler.units generic.standard vocabs threads
-threads.private init kernel.private libc io.encodings accessors
-math.order destructors source-files parser classes.tuple.parser
-effects.parser lexer compiler.errors dlists generic.parser
+classes compiler.units generic.standard vocabs init
+kernel.private io.encodings accessors math.order
+destructors source-files parser classes.tuple.parser
+effects.parser lexer compiler.errors generic.parser
 strings.parser ;
 IN: debugger
 
@@ -245,33 +245,6 @@ M: no-compilation-unit error.
 M: no-vocab summary
     drop "Vocabulary does not exist" ;
 
-M: bad-ptr summary
-    drop "Memory allocation failed" ;
-
-M: double-free summary
-    drop "Free failed since memory is not allocated" ;
-
-M: realloc-error summary
-    drop "Memory reallocation failed" ;
-
-: error-in-thread. ( thread -- )
-    "Error in thread " write
-    [
-        dup thread-id #
-        " (" % dup thread-name %
-        ", " % dup thread-quot unparse-short % ")" %
-    ] "" make swap write-object ":" print nl ;
-
-! Hooks
-M: thread error-in-thread ( error thread -- )
-    initial-thread get-global eq? [
-        die drop
-    ] [
-        global [
-            error-thread get-global error-in-thread. print-error flush
-        ] bind
-    ] if ;
-
 M: encode-error summary drop "Character encoding error" ;
 
 M: decode-error summary drop "Character decoding error" ;
@@ -347,9 +320,6 @@ M: object compiler-error. ( error word -- )
     "While compiling " write pprint ": " print
     nl
     print-error ;
-
-M: empty-dlist summary ( dlist -- )
-    drop "Empty dlist" ;
 
 M: bad-effect summary
     drop "Bad stack effect declaration" ;

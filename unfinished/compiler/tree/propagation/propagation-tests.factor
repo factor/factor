@@ -5,11 +5,10 @@ accessors sequences arrays kernel.private vectors
 alien.accessors alien.c-types sequences.private
 byte-arrays classes.algebra classes.tuple.private
 math.functions math.private strings layouts
-compiler.tree.propagation.info ;
+compiler.tree.propagation.info slots.private ;
 IN: compiler.tree.propagation.tests
 
 \ propagate must-infer
-\ propagate/node must-infer
 
 : final-info ( quot -- seq )
     build-tree
@@ -51,6 +50,10 @@ IN: compiler.tree.propagation.tests
 [ V{ float } ] [ [ /f ] final-classes ] unit-test
 
 [ V{ integer } ] [ [ /i ] final-classes ] unit-test
+
+[ V{ integer } ] [
+    [ { integer } declare bitnot ] final-classes
+] unit-test
 
 [ V{ integer } ] [ [ 255 bitand ] final-classes ] unit-test
 
@@ -316,7 +319,7 @@ cell-bits 32 = [
 ! Array length propagation
 [ V{ t } ] [ [ 10 f <array> length 10 = ] final-literals ] unit-test
 
-[ V{ t } ] [ [ [ 10 f <array> ] [ 10 <byte-array> ] if length 10 = ] final-literals ] unit-test
+[ V{ t } ] [ [ [ 10 f <array> length ] [ 10 <byte-array> length ] if 10 = ] final-literals ] unit-test
 
 [ V{ t } ] [ [ [ 1 f <array> ] [ 2 f <array> ] if length 3 < ] final-literals ] unit-test
 
@@ -324,15 +327,6 @@ cell-bits 32 = [
 TUPLE: prop-test-tuple { x integer } ;
 
 [ V{ integer } ] [ [ { prop-test-tuple } declare x>> ] final-classes ] unit-test
-
-TUPLE: another-prop-test-tuple { x ratio initial: 1/2 } ;
-
-UNION: prop-test-union prop-test-tuple another-prop-test-tuple ;
-
-[ t ] [
-    [ { prop-test-union } declare x>> ] final-classes first
-    rational class=
-] unit-test
 
 TUPLE: fold-boa-test-tuple { x read-only } { y read-only } { z read-only } ;
 
@@ -377,6 +371,8 @@ TUPLE: immutable-prop-test-tuple { x sequence read-only } ;
     ] final-classes
 ] unit-test
 
+[ ] [ [ dup 3 slot swap 4 slot dup 3 slot swap 4 slot ] final-info drop ] unit-test
+
 [ V{ number } ] [ [ [ "Oops" throw ] [ 2 + ] if ] final-classes ] unit-test
 [ V{ number } ] [ [ [ 2 + ] [ "Oops" throw ] if ] final-classes ] unit-test
 
@@ -404,8 +400,13 @@ TUPLE: mixed-mutable-immutable { x integer } { y sequence read-only } ;
 
 [ V{ integer array } ] [
     [
-        3 { 2 1 } mixed-mutable-immutable boa
-        [ x>> ] [ y>> ] bi
+        3 { 2 1 } mixed-mutable-immutable boa [ x>> ] [ y>> ] bi
+    ] final-classes
+] unit-test
+
+[ V{ array integer } ] [
+    [
+        3 { 2 1 } mixed-mutable-immutable boa [ y>> ] [ x>> ] bi
     ] final-classes
 ] unit-test
 
@@ -459,3 +460,18 @@ TUPLE: mixed-mutable-immutable { x integer } { y sequence read-only } ;
 [ V{ fixnum } ] [ [ 1 10 [ dup 10 < [ 2 * ] when ] times ] final-classes ] unit-test
 
 [ V{ integer } ] [ [ 0 2 100 ^ [ nip ] each-integer ] final-classes ] unit-test
+
+[ ] [ [ [ ] [ ] compose curry call ] final-info drop ] unit-test
+
+[ V{ } ] [
+    [ [ drop ] [ drop ] compose curry (each-integer) ] final-classes
+] unit-test
+
+GENERIC: iterate ( obj -- next-obj ? )
+M: fixnum iterate f ;
+M: array iterate first t ;
+
+: dead-loop ( obj -- final-obj )
+    iterate [ dead-loop ] when ; inline recursive
+
+[ V{ fixnum } ] [ [ { fixnum } declare dead-loop ] final-classes ] unit-test

@@ -16,7 +16,7 @@ TUPLE: #introduce < node value ;
 : #introduce ( value -- node )
     \ #introduce new swap >>value ;
 
-TUPLE: #call < node word history in-d out-d ;
+TUPLE: #call < node word in-d out-d body method ;
 
 : #call ( inputs outputs word -- node )
     \ #call new
@@ -70,7 +70,7 @@ TUPLE: #terminate < node in-d ;
     \ #terminate new
         swap >>in-d ;
 
-TUPLE: #branch < node in-d children ;
+TUPLE: #branch < node in-d children live-branches ;
 
 : new-branch ( value children class -- node )
     new

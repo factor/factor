@@ -12,10 +12,13 @@ IN: stack-checker.branches
 : unify-inputs ( max-d-in d-in meta-d -- new-meta-d )
     dup [ [ - f <repetition> ] dip append ] [ 3drop f ] if ;
 
+: pad-with-f ( seq -- newseq )
+    dup [ length ] map supremum '[ , f pad-left ] map ;
+
 : phi-inputs ( max-d-in pairs -- newseq )
     dup empty? [ nip ] [
         swap '[ , _ first2 unify-inputs ] map
-        dup [ length ] map supremum '[ , f pad-left ] map
+        pad-with-f
         flip
     ] if ;
 

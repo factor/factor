@@ -26,7 +26,7 @@ namespaces continuations layouts accessors ;
 
 [ t ] [ 1300000 small-enough? ] unit-test
 
-[ "staging.math-compiler-ui-strip.image" ] [
+[ "staging.threads-math-compiler-ui-strip.image" ] [
     "hello-ui" deploy-config
     [ bootstrap-profile staging-image-name file-name ] bind
 ] unit-test
@@ -79,7 +79,7 @@ M: quit-responder call-responder*
     [
         <dispatcher>
             add-quot-responder
-            "resource:basis/http/test" <static> >>default
+            "resource:extra/http/test" <static> >>default
         main-responder set
 
         test-httpd
