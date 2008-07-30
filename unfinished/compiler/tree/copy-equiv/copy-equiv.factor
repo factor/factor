@@ -5,6 +5,9 @@ kernel accessors fry
 compiler.tree compiler.tree.def-use compiler.tree.combinators ;
 IN: compiler.tree.copy-equiv
 
+! Two values are copy-equivalent if they are always identical
+! at run-time ("DS" relation).
+
 ! Disjoint set of copy equivalence
 SYMBOL: copies
 
@@ -49,10 +52,13 @@ M: #phi compute-copy-equiv*
 
 M: node compute-copy-equiv* drop ;
 
-: compute-copy-equiv ( node -- node )
-    <disjoint-set> copies set
-    dup [
+: amend-copy-equiv ( node -- )
+    [
         [ node-defs-values [ introduce-value ] each ]
         [ compute-copy-equiv* ]
         bi
     ] each-node ;
+
+: compute-copy-equiv ( node -- node )
+    <disjoint-set> copies set
+    dup amend-copy-equiv ;

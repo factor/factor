@@ -132,9 +132,14 @@ DEFER: (value-info-intersect)
     } cond ;
 
 : intersect-slots ( info1 info2 -- slots )
-    [ slots>> ] bi@
-    2dup [ length ] bi@ =
-    [ [ intersect-slot ] 2map ] [ 2drop f ] if ;
+    [ slots>> ] bi@ {
+        { [ dup not ] [ drop ] }
+        { [ over not ] [ nip ] }
+        [
+            2dup [ length ] bi@ =
+            [ [ intersect-slot ] 2map ] [ 2drop f ] if
+        ]
+    } cond ;
 
 : (value-info-intersect) ( info1 info2 -- info )
     [ <value-info> ] 2dip

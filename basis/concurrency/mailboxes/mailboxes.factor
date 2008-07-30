@@ -4,7 +4,7 @@ IN: concurrency.mailboxes
 USING: dlists dequeues threads sequences continuations
 destructors namespaces random math quotations words kernel
 arrays assocs init system concurrency.conditions accessors
-debugger ;
+debugger debugger.threads ;
 
 TUPLE: mailbox threads data disposed ;
 

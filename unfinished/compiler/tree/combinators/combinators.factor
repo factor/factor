@@ -4,7 +4,7 @@ USING: fry kernel accessors sequences sequences.deep
 compiler.tree ;
 IN: compiler.tree.combinators
 
-: each-node ( nodes quot -- )
+: each-node ( nodes quot: ( node -- ) -- )
     dup dup '[
         , [
             dup #branch? [
@@ -15,7 +15,7 @@ IN: compiler.tree.combinators
                 ] [ drop ] if
             ] if
         ] bi
-    ] each ; inline
+    ] each ; inline recursive
 
 : map-nodes ( nodes quot: ( node -- node' ) -- nodes )
     dup dup '[
@@ -28,3 +28,19 @@ IN: compiler.tree.combinators
             ] when
         ] if
     ] map flatten ; inline recursive
+
+: contains-node? ( nodes quot: ( node -- ? ) -- ? )
+    dup dup '[
+        , keep swap [ drop t ] [
+            dup #branch? [
+                children>> [ , contains-node? ] contains?
+            ] [
+                dup #recursive? [
+                    child>> , contains-node?
+                ] [ drop f ] if
+            ] if
+        ] if
+    ] contains? ; inline recursive
+
+: select-children ( seq flags -- seq' )
+    [ [ drop f ] unless ] 2map ;

@@ -173,8 +173,8 @@ generic-comparison-ops [
     } case ;
 
 comparison-ops [
-    [
-        dup '[ , fold-comparison ] +outputs+ set-word-prop
+    dup '[
+        [ , fold-comparison ] +outputs+ set-word-prop
     ] each-derived-op
 ] each
 

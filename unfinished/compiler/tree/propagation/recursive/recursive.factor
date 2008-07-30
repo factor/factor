@@ -4,6 +4,7 @@ USING: kernel sequences accessors arrays fry math.intervals
 combinators
 stack-checker.inlining
 compiler.tree
+compiler.tree.copy-equiv
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
 compiler.tree.propagation.simple
@@ -53,11 +54,14 @@ M: #recursive propagate-around ( #recursive -- )
     iter-counter get 10 > [ "Oops" throw ] when
     dup label>> t >>fixed-point drop [
         [
+            copies [ clone ] change
+            constraints [ clone ] change
+
             child>>
             [ first propagate-recursive-phi ]
             [ (propagate) ]
             bi
-        ] save-constraints
+        ] with-scope
     ] [ dup label>> fixed-point>> [ drop ] [ propagate-around ] if ] bi ;
 
 : generalize-return-interval ( info -- info' )

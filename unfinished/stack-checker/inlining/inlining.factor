@@ -20,9 +20,7 @@ IN: stack-checker.inlining
 TUPLE: inline-recursive word enter-out return calls fixed-point introductions ;
 
 : <inline-recursive> ( word -- label )
-    inline-recursive new
-        swap >>word
-        V{ } clone >>calls ;
+    inline-recursive new swap >>word ;
 
 : quotation-param? ( obj -- ? )
     dup pair? [ second effect? ] [ drop f ] if ;

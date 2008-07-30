@@ -11,16 +11,16 @@ IN: compiler.tree.builder
     [ V{ } clone stack-visitor set ] prepose
     with-infer ; inline
 
-GENERIC# build-tree-with 1 ( quot stack -- nodes )
+: build-tree ( quot -- nodes )
+    #! Not safe to call from inference transforms.
+    [ f infer-quot ] with-tree-builder nip ;
 
-M: callable build-tree-with
+: build-tree-with ( in-stack quot -- nodes out-stack )
     #! Not safe to call from inference transforms.
     [
-        >vector meta-d set
-        f infer-quot
-    ] with-tree-builder nip ;
-
-: build-tree ( quot -- nodes ) f build-tree-with ;
+        [ >vector meta-d set ] [ f infer-quot ] bi*
+    ] with-tree-builder nip
+    unclip-last in-d>> ;
 
 : (make-specializer) ( class picker -- quot )
     swap "predicate" word-prop append ;

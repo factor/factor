@@ -51,13 +51,16 @@ M: node count-introductions* drop ;
 ! Collect label info
 GENERIC: collect-label-info ( node -- )
 
-M: #return-recursive collect-label-info dup label>> (>>return) ;
+M: #return-recursive collect-label-info
+    dup label>> (>>return) ;
 
-M: #call-recursive collect-label-info dup label>> calls>> push ;
+M: #call-recursive collect-label-info
+    dup label>> calls>> push ;
 
 M: #recursive collect-label-info
-    [ label>> ] [ child>> count-introductions ] bi
-    >>introductions drop ;
+    [ label>> V{ } clone >>calls ]
+    [ child>> count-introductions ]
+    bi >>introductions drop ;
 
 M: node collect-label-info drop ;
 

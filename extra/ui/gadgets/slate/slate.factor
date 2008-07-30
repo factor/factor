@@ -5,12 +5,19 @@ IN: ui.gadgets.slate
 
 TUPLE: slate < gadget action pdim graft ungraft ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: init-slate ( slate -- slate )
+  init-gadget
+  [ ]         >>action
+  { 200 200 } >>pdim
+  [ ]         >>graft
+  [ ]         >>ungraft ;
+
 : <slate> ( action -- slate )
-  slate new-gadget
-    swap        >>action
-    { 100 100 } >>pdim
-    [ ]         >>graft
-    [ ]         >>ungraft ;
+  slate new
+    init-slate
+    swap >>action ;
 
 M: slate pref-dim* ( slate -- dim ) pdim>> ;
 

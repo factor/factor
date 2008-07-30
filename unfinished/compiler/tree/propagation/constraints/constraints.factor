@@ -107,6 +107,3 @@ M: sequence assume* [ assume ] each ;
 : t--> ( constraint boolean-value -- constraint' ) =t swap --> ;
 
 : f--> ( constraint boolean-value -- constraint' ) =f swap --> ;
-
-: save-constraints ( quot -- )
-    constraints get clone slip constraints set ; inline

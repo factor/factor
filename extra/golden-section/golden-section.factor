@@ -2,7 +2,7 @@
 USING: kernel namespaces math math.constants math.functions math.order
        arrays sequences
        opengl opengl.gl opengl.glu ui ui.render ui.gadgets ui.gadgets.theme
-       ui.gadgets.slate colors accessors combinators.cleave
+       ui.gadgets.cartesian colors accessors combinators.cleave
        processing.shapes ;
 
 IN: golden-section
@@ -39,20 +39,17 @@ IN: golden-section
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: display ( -- )
-  GL_PROJECTION glMatrixMode
-  glLoadIdentity
-  -400 400 -400 400 -1 1 glOrtho
-  GL_MODELVIEW glMatrixMode
-  glLoadIdentity
-  golden-section ;
-
 : golden-section-window ( -- )
     [
-      [ display ] <slate>
-        { 600 600 } >>pdim
+      <cartesian>
+        {  600 600 }       >>pdim
+        { -400 400 }       x-range
+        { -400 400 }       y-range
+        [ golden-section ] >>action
       "Golden Section" open-window
     ]
   with-ui ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 MAIN: golden-section-window

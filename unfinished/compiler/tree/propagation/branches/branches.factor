@@ -4,6 +4,7 @@ USING: fry kernel sequences assocs accessors namespaces
 math.intervals arrays classes.algebra combinators
 compiler.tree
 compiler.tree.def-use
+compiler.tree.combinators
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
 compiler.tree.propagation.simple
@@ -19,17 +20,22 @@ M: #if child-constraints
 M: #dispatch child-constraints
     children>> length f <repetition> ;
 
-GENERIC: live-children ( #branch -- children )
+GENERIC: live-branches ( #branch -- indices )
 
-M: #if live-children
-    [ children>> ] [ in-d>> first value-info possible-boolean-values ] bi
-    [ t swap memq? [ first ] [ drop f ] if ]
-    [ f swap memq? [ second ] [ drop f ] if ]
-    2bi 2array ;
+M: #if live-branches
+    in-d>> first value-info class>> {
+        { [ dup null class<= ] [ { f f } ] }
+        { [ dup true-class? ] [ { t f } ] }
+        { [ dup false-class? ] [ { f t } ] }
+        [ { t t } ]
+    } cond nip ;
 
-M: #dispatch live-children
-    [ children>> ] [ in-d>> first value-info interval>> ] bi
-    '[ , interval-contains? [ drop f ] unless ] map-index ;
+M: #dispatch live-branches
+    [ children>> length ] [ in-d>> first value-info interval>> ] bi
+    '[ , interval-contains? ] map ;
+
+: live-children ( #branch -- children )
+    [ children>> ] [ live-branches>> ] bi select-children ;
 
 SYMBOL: infer-children-data
 
@@ -56,11 +62,14 @@ SYMBOL: infer-children-data
     infer-children-data get
     '[ , [ [ value-info ] bind ] 2map ] map ;
 
-: annotate-phi-node ( #phi -- )
+: annotate-phi-inputs ( #phi -- )
     dup phi-in-d>> compute-phi-input-infos >>phi-info-d
     dup phi-in-r>> compute-phi-input-infos >>phi-info-r
-    dup [ out-d>> ] [ out-r>> ] bi append extract-value-info >>info
     drop ;
+
+: annotate-phi-outputs ( #phi -- )
+    dup [ out-d>> ] [ out-r>> ] bi append extract-value-info
+    >>info drop ;
 
 : merge-value-infos ( infos outputs -- )
     [ [ value-infos-union ] map ] dip set-value-infos ;
@@ -68,10 +77,12 @@ SYMBOL: infer-children-data
 SYMBOL: condition-value
 
 M: #phi propagate-before ( #phi -- )
-    [ annotate-phi-node ]
-    [ [ phi-info-d>> ] [ out-d>> ] bi merge-value-infos ]
-    [ [ phi-info-r>> ] [ out-r>> ] bi merge-value-infos ]
-    tri ;
+    {
+        [ annotate-phi-inputs ]
+        [ [ phi-info-d>> ] [ out-d>> ] bi merge-value-infos ]
+        [ [ phi-info-r>> ] [ out-r>> ] bi merge-value-infos ]
+        [ annotate-phi-outputs ]
+    } cleave ;
 
 : branch-phi-constraints ( output values booleans -- )
      {
@@ -115,6 +126,7 @@ M: #phi propagate-around ( #phi -- )
     [ propagate-before ] [ propagate-after ] bi ;
 
 M: #branch propagate-around
+    dup live-branches >>live-branches
     [ infer-children ] [ annotate-node ] bi ;
 
 M: #if propagate-around
