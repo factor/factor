@@ -11,8 +11,7 @@ TUPLE: ⋀ x y ;
 TUPLE: ⋁ x y ;
 TUPLE: ¬ x ;
 
-SINGLETON: ⊤
-SINGLETON: ⊥
+SINGLETONS: ⊤ ⊥ ;
 
 SINGLETONS: P Q R S T U V W X Y Z ;
 
