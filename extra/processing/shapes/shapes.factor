@@ -52,6 +52,10 @@ T{ rgba f 1 1 1 1 } fill-color   set-global
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: line-strip ( seq -- ) stroke-mode GL_LINE_STRIP [ gl-vertices-2d ] do-state ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : triangles ( seq -- )
   [ fill-mode   GL_TRIANGLES [ gl-vertices-2d ] do-state ]
   [ stroke-mode GL_TRIANGLES [ gl-vertices-2d ] do-state ] bi ;
