@@ -3,7 +3,7 @@
 USING: fry assocs arrays byte-arrays strings accessors sequences
 kernel slots classes.algebra classes.tuple classes.tuple.private
 words math math.private combinators sequences.private namespaces
-classes compiler.tree.propagation.info ;
+slots.private classes compiler.tree.propagation.info ;
 IN: compiler.tree.propagation.slots
 
 ! Propagation of immutable slots and array lengths
@@ -60,27 +60,13 @@ UNION: fixed-length-sequence array byte-array string ;
         { \ <complex> [ propagate-<complex> ] }
     } case 1array ;
 
-: tuple>array* ( tuple -- array )
-    prepare-tuple>array
-    >r copy-tuple-slots r>
-    prefix ;
-
 : read-only-slot? ( n class -- ? )
     all-slots [ offset>> = ] with find nip
     dup [ read-only>> ] when ;
 
 : literal-info-slot ( slot object -- info/f )
-    2dup class read-only-slot? [
-        {
-            { [ dup tuple? ] [
-                [ 1- ] [ tuple>array* ] bi* nth <literal-info>
-            ] }
-            { [ dup complex? ] [
-                [ 1- ] [ [ real-part ] [ imaginary-part ] bi ] bi*
-                2array nth <literal-info>
-            ] }
-        } cond
-    ] [ 2drop f ] if ;
+    2dup class read-only-slot?
+    [ swap slot <literal-info> ] [ 2drop f ] if ;
 
 : length-accessor? ( slot info -- ? )
     [ 1 = ] [ length>> ] bi* and ;
@@ -92,4 +78,4 @@ UNION: fixed-length-sequence array byte-array string ;
         { [ 2dup length-accessor? ] [ nip length>> ] }
         { [ dup literal?>> ] [ literal>> literal-info-slot ] }
         [ [ 1- ] [ slots>> ] bi* ?nth ]
-    } cond [ object <class-info> ] unless* ;
+    } cond [ object-info ] unless* ;
