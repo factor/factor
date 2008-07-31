@@ -21,8 +21,93 @@ TUPLE: slate < gadget action pdim graft ungraft ;
 
 M: slate pref-dim* ( slate -- dim ) pdim>> ;
 
-M: slate draw-gadget* ( slate -- ) origin get swap action>> with-translation ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USING: combinators arrays sequences math math.geometry
+       opengl.gl ui.gadgets.worlds ;
+
+: screen-y* ( gadget -- loc )
+  {
+    [ find-world height ]
+    [ screen-loc second ]
+    [ height ]
+  }
+  cleave
+  + - ;
+
+: screen-loc* ( gadget -- loc )
+  {
+    [ screen-loc first ]
+    [ screen-y* ]
+  }
+  cleave
+  2array ;
+
+: setup-viewport ( gadget -- gadget )
+  dup
+  {
+    [ screen-loc* ]
+    [ dim>>       ]
+  }
+  cleave
+  gl-viewport ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: default-coordinate-system ( gadget -- gadget )
+  dup
+  {
+    [ drop 0 ]
+    [ width 1 - ]
+    [ height 1 - ]
+    [ drop 0 ]
+  }
+  cleave
+  -1 1
+  glOrtho ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 M: slate graft*   ( slate -- ) graft>>   call ;
 M: slate ungraft* ( slate -- ) ungraft>> call ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+GENERIC: establish-coordinate-system ( gadget -- gadget )
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+M: slate establish-coordinate-system ( slate -- slate )
+   default-coordinate-system ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+GENERIC: draw-slate ( slate -- slate )
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+M: slate draw-slate ( slate -- slate ) dup action>> call ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+M: slate draw-gadget* ( slate -- )
+
+   GL_PROJECTION glMatrixMode glPushMatrix glLoadIdentity
+
+   establish-coordinate-system
+
+   GL_MODELVIEW glMatrixMode glLoadIdentity glPushMatrix
+
+   setup-viewport
+
+   draw-slate
+
+   GL_PROJECTION glMatrixMode glPopMatrix
+   GL_MODELVIEW  glMatrixMode glPopMatrix
+
+   dup
+   find-world
+   default-coordinate-system
+   setup-viewport
+   drop
+   drop ;
