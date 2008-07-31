@@ -5,7 +5,8 @@ accessors sequences arrays kernel.private vectors
 alien.accessors alien.c-types sequences.private
 byte-arrays classes.algebra classes.tuple.private
 math.functions math.private strings layouts
-compiler.tree.propagation.info slots.private ;
+compiler.tree.propagation.info slots.private words hashtables
+classes assocs ;
 IN: compiler.tree.propagation.tests
 
 \ propagate must-infer
@@ -475,3 +476,55 @@ M: array iterate first t ;
     iterate [ dead-loop ] when ; inline recursive
 
 [ V{ fixnum } ] [ [ { fixnum } declare dead-loop ] final-classes ] unit-test
+
+: hang-1 ( m -- x )
+    dup 0 number= [ hang-1 ] unless ; inline recursive
+
+[ ] [ [ 3 hang-1 ] final-info drop ] unit-test
+
+: hang-2 ( m n -- x )
+    over 0 number= [
+        nip
+    ] [
+        dup [
+            drop 1 hang-2
+        ] [
+            dupd hang-2 hang-2
+        ] if
+    ] if ; inline recursive
+
+[ ] [ [ 3 over hang-2 ] final-info drop ] unit-test
+
+[ ] [
+    [
+        dup fixnum? [ 3 over hang-2 ] [ 3 over hang-2 ] if
+    ] final-info drop
+] unit-test
+
+[ V{ word } ] [
+    [ { hashtable } declare hashtable instance? ] final-classes
+] unit-test
+
+[ V{ POSTPONE: f } ] [
+    [ { vector } declare hashtable instance? ] final-classes
+] unit-test
+
+[ V{ object } ] [
+    [ { assoc } declare hashtable instance? ] final-classes
+] unit-test
+
+[ V{ word } ] [
+    [ { string } declare string? ] final-classes
+] unit-test
+
+[ V{ POSTPONE: f } ] [
+    [ 3 string? ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
+    [ { fixnum } declare [ ] curry obj>> ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
+    [ { fixnum fixnum } declare [ nth-unsafe ] curry call ] final-classes
+] unit-test

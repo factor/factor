@@ -24,7 +24,7 @@ GENERIC: live-branches ( #branch -- indices )
 
 M: #if live-branches
     in-d>> first value-info class>> {
-        { [ dup null class<= ] [ { f f } ] }
+        { [ dup null-class? ] [ { f f } ] }
         { [ dup true-class? ] [ { t f } ] }
         { [ dup false-class? ] [ { f t } ] }
         [ { t t } ]

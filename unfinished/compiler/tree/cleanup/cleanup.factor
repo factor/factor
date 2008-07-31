@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences sequences.deep combinators fry
-namespaces
+classes.algebra namespaces assocs math math.private
+math.partial-dispatch
 compiler.tree
 compiler.tree.combinators
 compiler.tree.propagation.info
@@ -20,7 +21,13 @@ GENERIC: cleanup* ( node -- node/nodes )
     #! do it since the logic is a bit more involved
     [ cleanup* ] map flatten ;
 
-: cleanup-constant-folding ( #call -- nodes )
+: cleanup-folding? ( #call -- ? )
+    node-output-infos dup empty?
+    [ drop f ] [ [ literal?>> ] all? ] if ;
+
+: cleanup-folding ( #call -- nodes )
+    #! Replace a #call having a known result with a #drop of its
+    #! inputs followed by #push nodes for the outputs.
     [
         [ node-output-infos ] [ out-d>> ] bi
         [ [ literal>> ] dip #push ] 2map
@@ -30,10 +37,27 @@ GENERIC: cleanup* ( node -- node/nodes )
 : cleanup-inlining ( #call -- nodes )
     body>> cleanup ;
 
+! Removing overflow checks
+: no-overflow-variant ( op -- fast-op )
+    H{
+        { fixnum+ fixnum+fast }
+        { fixnum- fixnum-fast }
+        { fixnum* fixnum*fast }
+        { fixnum-shift fixnum-shift-fast }
+    } at ;
+
+: remove-overflow-check? ( #call -- ? )
+    dup word>> no-overflow-variant
+    [ node-output-infos first class>> fixnum class<= ] [ drop f ] if ;
+
+: remove-overflow-check ( #call -- #call )
+    [ in-d>> ] [ out-d>> ] [ word>> no-overflow-variant ] tri #call cleanup* ;
+
 M: #call cleanup*
     {
-        { [ dup node-output-infos [ literal?>> ] all? ] [ cleanup-constant-folding ] }
         { [ dup body>> ] [ cleanup-inlining ] }
+        { [ dup cleanup-folding? ] [ cleanup-folding ] }
+        { [ dup remove-overflow-check? ] [ remove-overflow-check ] }
         [ ]
     } cond ;
 

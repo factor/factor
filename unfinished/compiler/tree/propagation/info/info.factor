@@ -5,6 +5,12 @@ accessors math math.intervals namespaces sequences words
 combinators arrays compiler.tree.copy-equiv ;
 IN: compiler.tree.propagation.info
 
+: false-class? ( class -- ? ) \ f class<= ;
+
+: true-class? ( class -- ? ) \ f class-not class<= ;
+
+: null-class? ( class -- ? ) null class<= ;
+
 SYMBOL: +interval+
 
 GENERIC: eql? ( obj1 obj2 -- ? )
@@ -28,6 +34,8 @@ length
 slots ;
 
 : null-info T{ value-info f null empty-interval } ; inline
+
+: object-info T{ value-info f object T{ interval f { -1.0/0.0 t } { 1.0/0.0 t } } } ; inline
 
 : class-interval ( class -- interval )
     dup real class<=
@@ -57,7 +65,7 @@ slots ;
         dup literal>> class >>class
         dup literal>> dup real? [ [a,a] ] [ drop [-inf,inf] ] if >>interval
     ] [
-        dup [ class>> null class<= ] [ interval>> empty-interval eq? ] bi or [
+        dup [ class>> null-class? ] [ interval>> empty-interval eq? ] bi or [
             null >>class
             empty-interval >>interval
         ] [
@@ -154,8 +162,8 @@ DEFER: (value-info-intersect)
 
 : value-info-intersect ( info1 info2 -- info )
     {
-        { [ dup class>> null class<= ] [ nip ] }
-        { [ over class>> null class<= ] [ drop ] }
+        { [ dup class>> null-class? ] [ nip ] }
+        { [ over class>> null-class? ] [ drop ] }
         [ (value-info-intersect) ]
     } cond ;
 
@@ -200,8 +208,8 @@ DEFER: (value-info-union)
 
 : value-info-union ( info1 info2 -- info )
     {
-        { [ dup class>> null class<= ] [ drop ] }
-        { [ over class>> null class<= ] [ nip ] }
+        { [ dup class>> null-class? ] [ drop ] }
+        { [ over class>> null-class? ] [ nip ] }
         [ (value-info-union) ]
     } cond ;
 
@@ -225,16 +233,12 @@ SYMBOL: value-infos
 : value-literal ( value -- obj ? )
     value-info >literal< ;
 
-: false-class? ( class -- ? ) \ f class<= ;
-
-: true-class? ( class -- ? ) \ f class-not class<= ;
-
 : possible-boolean-values ( info -- values )
     dup literal?>> [
         literal>> 1array
     ] [
         class>> {
-            { [ dup null class<= ] [ { } ] }
+            { [ dup null-class? ] [ { } ] }
             { [ dup true-class? ] [ { t } ] }
             { [ dup false-class? ] [ { f } ] }
             [ { t f } ]

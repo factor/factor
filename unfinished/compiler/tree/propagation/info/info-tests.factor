@@ -68,6 +68,5 @@ TUPLE: test-tuple { x read-only } ;
 
 [ t ] [
     f f 3 <literal-info> 3array test-tuple <tuple-info> dup
-    object <class-info>
-    value-info-intersect =
+    object-info value-info-intersect =
 ] unit-test

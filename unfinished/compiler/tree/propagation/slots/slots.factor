@@ -3,7 +3,7 @@
 USING: fry assocs arrays byte-arrays strings accessors sequences
 kernel slots classes.algebra classes.tuple classes.tuple.private
 words math math.private combinators sequences.private namespaces
-classes compiler.tree.propagation.info ;
+slots.private classes compiler.tree.propagation.info ;
 IN: compiler.tree.propagation.slots
 
 ! Propagation of immutable slots and array lengths
@@ -29,7 +29,7 @@ UNION: fixed-length-sequence array byte-array string ;
     bi* value-info-intersect 1array ;
 
 : tuple-constructor? ( word -- ? )
-    { <tuple-boa> <complex> } memq? ;
+    { <tuple-boa> curry compose <complex> } memq? ;
 
 : read-only-slots ( values class -- slots )
     #! Delegation.
@@ -41,15 +41,24 @@ UNION: fixed-length-sequence array byte-array string ;
     [ , f , [ literal>> ] map % ] { } make >tuple
     <literal-info> ;
 
-: propagate-<tuple-boa> ( #call -- info )
-    #! Delegation
-    in-d>> [ value-info ] map unclip-last
-    literal>> class>> [ read-only-slots ] keep
+: (propagate-tuple-constructor) ( values class -- info )
+    [ [ value-info ] map ] dip [ read-only-slots ] keep
     over 2 tail-slice [ dup [ literal?>> ] when ] all? [
         [ 2 tail-slice ] dip fold-<tuple-boa>
     ] [
         <tuple-info>
     ] if ;
+
+: propagate-<tuple-boa> ( #call -- info )
+    #! Delegation
+    in-d>> unclip-last
+    value-info literal>> class>> (propagate-tuple-constructor) ;
+
+: propagate-curry ( #call -- info )
+    in-d>> \ curry (propagate-tuple-constructor) ;
+
+: propagate-compose ( #call -- info )
+    in-d>> \ compose (propagate-tuple-constructor) ;
 
 : propagate-<complex> ( #call -- info )
     in-d>> [ value-info ] map complex <tuple-info> ;
@@ -57,30 +66,18 @@ UNION: fixed-length-sequence array byte-array string ;
 : propagate-tuple-constructor ( #call word -- infos )
     {
         { \ <tuple-boa> [ propagate-<tuple-boa> ] }
+        { \ curry [ propagate-curry ] }
+        { \ compose [ propagate-compose ] } 
         { \ <complex> [ propagate-<complex> ] }
     } case 1array ;
-
-: tuple>array* ( tuple -- array )
-    prepare-tuple>array
-    >r copy-tuple-slots r>
-    prefix ;
 
 : read-only-slot? ( n class -- ? )
     all-slots [ offset>> = ] with find nip
     dup [ read-only>> ] when ;
 
 : literal-info-slot ( slot object -- info/f )
-    2dup class read-only-slot? [
-        {
-            { [ dup tuple? ] [
-                [ 1- ] [ tuple>array* ] bi* nth <literal-info>
-            ] }
-            { [ dup complex? ] [
-                [ 1- ] [ [ real-part ] [ imaginary-part ] bi ] bi*
-                2array nth <literal-info>
-            ] }
-        } cond
-    ] [ 2drop f ] if ;
+    2dup class read-only-slot?
+    [ swap slot <literal-info> ] [ 2drop f ] if ;
 
 : length-accessor? ( slot info -- ? )
     [ 1 = ] [ length>> ] bi* and ;
@@ -92,4 +89,4 @@ UNION: fixed-length-sequence array byte-array string ;
         { [ 2dup length-accessor? ] [ nip length>> ] }
         { [ dup literal?>> ] [ literal>> literal-info-slot ] }
         [ [ 1- ] [ slots>> ] bi* ?nth ]
-    } cond [ object <class-info> ] unless* ;
+    } cond [ object-info ] unless* ;

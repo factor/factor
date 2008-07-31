@@ -21,16 +21,18 @@ IN: compiler.tree.propagation.recursive
 
 : generalize-counter-interval ( interval initial-interval -- interval' )
     {
-        { [ 2dup = ] [ empty-interval ] }
+        { [ 2dup interval-subset? ] [ empty-interval ] }
         { [ over empty-interval eq? ] [ empty-interval ] }
         { [ 2dup interval>= t eq? ] [ 1./0. [a,a] ] }
         { [ 2dup interval<= t eq? ] [ -1./0. [a,a] ] }
         [ [-inf,inf] ]
-    } cond nip interval-union ;
+    } cond interval-union nip ;
 
 : generalize-counter ( info' initial -- info )
-    [ drop clone ] [ [ interval>> ] bi@ ] 2bi
-    generalize-counter-interval >>interval ;
+    2dup [ class>> null-class? ] either? [ drop ] [
+        [ drop clone ] [ [ interval>> ] bi@ ] 2bi
+        generalize-counter-interval >>interval
+    ] if ;
 
 : unify-recursive-stacks ( stacks initial -- infos )
     over empty? [ nip ] [
@@ -65,7 +67,7 @@ M: #recursive propagate-around ( #recursive -- )
     ] [ dup label>> fixed-point>> [ drop ] [ propagate-around ] if ] bi ;
 
 : generalize-return-interval ( info -- info' )
-    dup literal?>> [
+    dup [ literal?>> ] [ class>> null-class? ] bi or [
         clone [-inf,inf] >>interval
     ] unless ;
 
