@@ -5,7 +5,7 @@ USING: accessors kernel threads combinators concurrency.mailboxes
        sequences strings hashtables splitting fry assocs hashtables
        ui ui.gadgets ui.gadgets.panes ui.gadgets.editors
        ui.gadgets.scrollers ui.commands ui.gadgets.frames ui.gestures
-       ui.gadgets.tabs ui.gadgets.grids ui.gadgets.lists ui.gadgets.labels
+       ui.gadgets.tabs ui.gadgets.grids ui.gadgets.packs ui.gadgets.labels
        io io.styles namespaces calendar calendar.format models continuations
        irc.client irc.client.private irc.messages irc.messages.private
        irc.ui.commandparser irc.ui.load qualified ;
@@ -20,7 +20,7 @@ SYMBOL: client
 
 TUPLE: ui-window client tabs ;
 
-TUPLE: irc-tab < frame listener client listmodel ;
+TUPLE: irc-tab < frame listener client userlist ;
 
 : write-color ( str color -- )
     foreground associate format ;
@@ -116,16 +116,15 @@ M: irc-message write-irc
 
 GENERIC: handle-inbox ( tab message -- )
 
-: filter-participants ( assoc val -- alist )
-    [ >alist ] dip
-   '[ second , = ] filter ;
+: filter-participants ( pack alist val color -- )
+   '[ , = [ <label> , >>color add-gadget ] [ drop ] if ] assoc-each ;
 
 : update-participants ( tab -- )
-    [ listmodel>> ] [ listener>> participants>> ] bi
-    [ +operator+ filter-participants ]
-    [ +voice+ filter-participants ]
-    [ +normal+ filter-participants ] tri
-    append append swap set-model ;
+    [ userlist>> [ clear-gadget ] keep ]
+    [ listener>> participants>> ] bi
+    [ +operator+ green filter-participants ]
+    [ +voice+ blue filter-participants ]
+    [ +normal+ black filter-participants ] 2tri ;
 
 M: participant-changed handle-inbox
     drop update-participants ;
@@ -162,11 +161,6 @@ irc-editor "general" f {
     { T{ key-down f f "ENTER" } editor-send }
 } define-command-map
 
-: <irc-list> ( -- gadget model )
-    [ drop ]
-    [ first2 [ <label> ] dip >>color ]
-    { } <model> [ <list> ] keep ;
-
 : <irc-tab> ( listener client -- irc-tab )
     irc-tab new-frame
     swap client>> >>client swap >>listener
@@ -175,19 +169,19 @@ irc-editor "general" f {
 
 : <irc-channel-tab> ( listener client -- irc-tab )
     <irc-tab>
-    <irc-list> [ <scroller> @right grid-add ] dip >>listmodel
-    [ update-participants ] keep ;
+    <pile> [ <scroller> @right grid-add ] keep >>userlist ;
 
 : <irc-server-tab> ( listener client -- irc-tab )
     <irc-tab> ;
 
 M: irc-tab graft*
-    [ listener>> ] [ client>> ] bi
-    add-listener ;
+    [ listener>> ] [ client>> ] bi add-listener ;
 
 M: irc-tab ungraft*
-    [ listener>> ] [ client>> ] bi
-    remove-listener ;
+    [ listener>> ] [ client>> ] bi remove-listener ;
+
+M: irc-tab pref-dim*
+    drop { 480 480 } ;
 
 : join-channel ( name ui-window -- )
     [ dup <irc-channel-listener> ] dip
