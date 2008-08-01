@@ -149,5 +149,4 @@ void *primitives[] = {
 	primitive_dll_validp,
 	primitive_unimplemented,
 	primitive_gc_reset,
-    primitive_save_image_shebang,
 };
