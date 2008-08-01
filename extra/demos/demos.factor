@@ -15,7 +15,7 @@ IN: demos
 : <demo-runner> ( -- gadget )
   <pile> 1 >>fill demo-vocabs [ <run-vocab-button> add-gadget ] each ;
 
-: demos ( -- ) <demo-runner> <scroller> "Demos" open-window ;
+: demos ( -- ) [ <demo-runner> <scroller> "Demos" open-window ] with-ui ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
