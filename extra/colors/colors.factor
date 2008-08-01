@@ -27,7 +27,7 @@ M: hsva >rgba ( hsva -- rgba )
 
 M: gray >rgba ( gray -- rgba ) [ gray>> dup dup ] [ alpha>> ] bi rgba boa ;
 
-M: array >rgba ( array -- rgba ) first4 rgba boa ;
+! M: array >rgba ( array -- rgba ) first4 rgba boa ;
 
 M: color red>>   ( color -- red   ) >rgba red>>   ;
 M: color green>> ( color -- green ) >rgba green>> ;
