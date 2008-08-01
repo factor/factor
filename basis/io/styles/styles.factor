@@ -1,6 +1,8 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: hashtables io ;
+
+USING: hashtables io colors ;
+
 IN: io.styles
 
 SYMBOL: plain
