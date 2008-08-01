@@ -103,7 +103,7 @@ IN: irc.client.tests
     ] unit-test
 
 ! Participants lists tests
-{ H{ { "somedude" f } } } [
+{ H{ { "somedude" +normal+ } } } [
     { ":somedude!n=user@isp.net JOIN :#factortest" } make-client
     { [ "factorbot" set-nick ]
       [ listeners>>
@@ -115,13 +115,13 @@ IN: irc.client.tests
     } cleave
     ] unit-test
 
-{ H{ { "somedude2" f } } } [
+{ H{ { "somedude2" +normal+ } } } [
     { ":somedude!n=user@isp.net PART #factortest" } make-client
     { [ "factorbot" set-nick ]
       [ listeners>>
         [ "#factortest" [ <irc-channel-listener>
-                          H{ { "somedude2" f }
-                             { "somedude" f } } clone >>participants ] keep
+                          H{ { "somedude2" +normal+ }
+                             { "somedude" +normal+ } } clone >>participants ] keep
         ] dip set-at ]
       [ connect-irc ]
       [ drop 0.1 seconds sleep ]
@@ -130,13 +130,13 @@ IN: irc.client.tests
     } cleave
     ] unit-test
 
-{ H{ { "somedude2" f } } } [
+{ H{ { "somedude2" +normal+ } } } [
     { ":somedude!n=user@isp.net QUIT" } make-client
     { [ "factorbot" set-nick ]
       [ listeners>>
         [ "#factortest" [ <irc-channel-listener>
-                          H{ { "somedude2" f }
-                             { "somedude" f } } clone >>participants ] keep
+                          H{ { "somedude2" +normal+ }
+                             { "somedude" +normal+ } } clone >>participants ] keep
         ] dip set-at ]
       [ connect-irc ]
       [ drop 0.1 seconds sleep ]
@@ -145,17 +145,31 @@ IN: irc.client.tests
     } cleave
     ] unit-test
 
-{ H{ { "somedude2" f } } } [
+{ H{ { "somedude2" +normal+ } } } [
     { ":somedude2!n=user2@isp.net KICK #factortest somedude" } make-client
     { [ "factorbot" set-nick ]
       [ listeners>>
         [ "#factortest" [ <irc-channel-listener>
-                          H{ { "somedude2" f }
-                             { "somedude" f } } clone >>participants ] keep
+                          H{ { "somedude2" +normal+ }
+                             { "somedude" +normal+ } } clone >>participants ] keep
         ] dip set-at ]
       [ connect-irc ]
       [ drop 0.1 seconds sleep ]
       [ listeners>> [ "#factortest" ] dip at participants>> ]
+      [ terminate-irc ]
+    } cleave
+    ] unit-test
+
+! Namelist notification
+{ T{ participant-changed f f f } } [
+    { ":ircserver.net 353 factorbot @ #factortest :@factorbot "
+      ":ircserver.net 366 factorbot #factortest :End of /NAMES list." } make-client
+    { [ "factorbot" set-nick ]
+      [ listeners>>
+        [ "#factortest" [ <irc-channel-listener> ] keep ] dip set-at ]
+      [ connect-irc ]
+      [ drop 0.1 seconds sleep ]
+      [ listeners>> [ "#factortest" ] dip at [ read-message drop ] [ read-message ] bi ]
       [ terminate-irc ]
     } cleave
     ] unit-test

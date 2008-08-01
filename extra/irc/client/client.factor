@@ -220,7 +220,7 @@ M: privmsg handle-incoming-irc ( privmsg -- )
 M: join handle-incoming-irc ( join -- )
     { [ maybe-forward-join ]
       [ dup trailing>> to-listener ]
-      [ [ drop f ] [ prefix>> parse-name ] [ trailing>> ] tri add-participant ]
+      [ [ drop +normal+ ] [ prefix>> parse-name ] [ trailing>> ] tri add-participant ]
       [ handle-participant-change ]
     } cleave ;
 
@@ -252,8 +252,10 @@ M: quit handle-incoming-irc ( quit -- )
     [ >nick/mode 2array ] map >hashtable ;
 
 M: names-reply handle-incoming-irc ( names-reply -- )
-    [ names-reply>participants ] [ channel>> listener> ] bi
-    [ (>>participants) ] [ drop ] if* ;
+    [ names-reply>participants ] [ channel>> listener> ] bi [
+        [ (>>participants) ]
+        [ [ f f <participant-changed> ] dip name>> to-listener ] bi
+    ] [ drop ] if* ;
 
 M: irc-broadcasted-message handle-incoming-irc ( irc-broadcasted-message -- )
     broadcast-message-to-listeners ;
