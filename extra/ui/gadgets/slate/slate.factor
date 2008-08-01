@@ -96,18 +96,21 @@ M: slate draw-gadget* ( slate -- )
 
    establish-coordinate-system
 
-   GL_MODELVIEW glMatrixMode glLoadIdentity glPushMatrix
+   GL_MODELVIEW glMatrixMode glPushMatrix glLoadIdentity 
 
    setup-viewport
 
    draw-slate
 
-   GL_PROJECTION glMatrixMode glPopMatrix
-   GL_MODELVIEW  glMatrixMode glPopMatrix
+   GL_PROJECTION glMatrixMode glPopMatrix glLoadIdentity
+   GL_MODELVIEW  glMatrixMode glPopMatrix glLoadIdentity
 
    dup
    find-world
-   default-coordinate-system
+   ! The world coordinate system is a little wacky:
+   dup { [ drop 0 ] [ width ] [ height ] [ drop 0 ] } cleave -1 1 glOrtho
    setup-viewport
    drop
    drop ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
