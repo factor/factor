@@ -4,7 +4,7 @@ USING: kernel math math.functions math.parser models
        models.filter models.range models.compose sequences ui
        ui.gadgets ui.gadgets.frames ui.gadgets.labels ui.gadgets.packs
        ui.gadgets.sliders ui.render math.geometry.rect accessors
-       ui.gadgets.grids ;
+       ui.gadgets.grids colors ;
 IN: color-picker
 
 ! Simple example demonstrating the use of models.
@@ -23,7 +23,7 @@ M: color-preview model-changed
     swap model-value over set-gadget-interior relayout-1 ;
 
 : <color-model> ( model -- model )
-    [ [ 256 /f ] map 1 suffix <solid> ] <filter> ;
+    [ [ 256 /f ] map 1 suffix first4 rgba boa <solid> ] <filter> ;
 
 : <color-sliders> ( -- model gadget )
     3 [ 0 0 0 255 <range> ] replicate

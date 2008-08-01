@@ -39,16 +39,15 @@ IN: golden-section
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: <golden-section> ( -- gadget )
+  <cartesian>
+    {  600 600 }       >>pdim
+    { -400 400 }       x-range
+    { -400 400 }       y-range
+    [ golden-section ] >>action ;
+
 : golden-section-window ( -- )
-    [
-      <cartesian>
-        {  600 600 }       >>pdim
-        { -400 400 }       x-range
-        { -400 400 }       y-range
-        [ golden-section ] >>action
-      "Golden Section" open-window
-    ]
-  with-ui ;
+  [ <golden-section> "Golden Section" open-window ] with-ui ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
