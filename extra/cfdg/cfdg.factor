@@ -3,40 +3,16 @@ USING: kernel alien.c-types combinators namespaces arrays
        sequences sequences.lib namespaces.lib splitting
        math math.functions math.vectors math.trig
        opengl.gl opengl.glu opengl ui ui.gadgets.slate
-       vars
-       random-weighted colors.hsv cfdg.gl ;
+       vars colors self self.slots
+       random-weighted colors.hsv cfdg.gl accessors ;
 
 IN: cfdg
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! hsba { hue saturation brightness alpha }
+SELF-SLOTS: hsva
 
-: <hsba> 4array ;
-
-VAR: color
-
-! ( -- val )
-
-: hue>>        0 color> nth ;
-: saturation>> 1 color> nth ;
-: brightness>> 2 color> nth ;
-: alpha>>      3 color> nth ;
-
-! ( val -- )
-
-: >>hue        0 color> set-nth ;
-: >>saturation 1 color> set-nth ;
-: >>brightness 2 color> set-nth ;
-: >>alpha      3 color> set-nth ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: hsva>rgba ( hsva -- rgba ) [ 3 head hsv>rgb ] [ peek ] bi suffix ;
-
-: gl-set-hsba ( hsva -- ) hsva>rgba gl-color ;
-
-: gl-clear-hsba ( hsva -- ) hsva>rgba gl-clear ;
+: clear-color ( color -- ) set-clear-color GL_COLOR_BUFFER_BIT glClear ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -50,18 +26,18 @@ VAR: color
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: hue ( num -- ) hue>> + 360 mod >>hue ;
+: hue ( num -- ) hue-> + 360 mod ->hue ;
 
-: saturation ( num -- ) saturation>> swap adjust >>saturation ;
-: brightness ( num -- ) brightness>> swap adjust >>brightness ;
-: alpha      ( num -- ) alpha>>      swap adjust >>alpha ;
+: saturation ( num -- ) saturation-> swap adjust ->saturation ;
+: brightness ( num -- ) value->      swap adjust ->value ;
+: alpha      ( num -- ) alpha->      swap adjust ->alpha ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: h   hue ;
-: sat saturation ;
-: b   brightness ;
-: a   alpha ;
+: h   ( num -- ) hue ;
+: sat ( num -- ) saturation ;
+: b   ( num -- ) brightness ;
+: a   ( num -- ) alpha ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -69,9 +45,9 @@ VAR: color-stack
 
 : init-color-stack ( -- ) V{ } clone >color-stack ;
 
-: push-color ( -- ) color> color-stack> push   color> clone >color ;
+: push-color ( -- ) self> color-stack> push   self> clone >self ;
 
-: pop-color ( -- ) color-stack> pop dup >color gl-set-hsba ;
+: pop-color ( -- ) color-stack> pop dup >self set-color ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -102,11 +78,11 @@ VAR: threshold
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : circle ( -- )
-  color> gl-set-hsba
+  self> set-color
   gluNewQuadric dup 0 0.5 20 10 gluDisk gluDeleteQuadric ;
 
 : triangle ( -- )
-  color> gl-set-hsba
+  self> set-color
   GL_POLYGON glBegin
     0    0.577 glVertex2d
     0.5 -0.289 glVertex2d
@@ -114,7 +90,7 @@ VAR: threshold
   glEnd ;
 
 : square ( -- )
-  color> gl-set-hsba
+  self> set-color
   GL_POLYGON glBegin
     -0.5  0.5 glVertex2d
      0.5  0.5 glVertex2d
@@ -138,10 +114,10 @@ VAR: threshold
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: s  size ;
-: s* size* ;
-: r  rotate ;
-: f  flip ;
+: s  ( scale -- ) size ;
+: s* ( scale-x scale-y -- ) size* ;
+: r  ( angle -- ) rotate ;
+: f  ( angle -- ) flip ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -162,12 +138,12 @@ VAR: threshold
 
 VAR: background
 
-: set-initial-background ( -- ) { 0 0 1 1 } clone >color ;
+: set-initial-background ( -- ) T{ hsva f 0 0 1 1 } clone >self ;
 
 : set-background ( -- )
   set-initial-background
   background> call
-  color> gl-clear-hsba ;
+  self> clear-color ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -177,7 +153,7 @@ VAR: viewport ! { left width bottom height }
 
 VAR: start-shape
 
-: set-initial-color ( -- ) { 0 0 0 1 } clone >color ;
+: set-initial-color ( -- ) T{ hsva f 0 0 0 1 } clone >self ;
 
 : display ( -- )
 
@@ -198,7 +174,7 @@ VAR: start-shape
 
   set-initial-color
 
-  color> gl-set-hsba
+  self> set-color
 
   start-shape> call ;
 
