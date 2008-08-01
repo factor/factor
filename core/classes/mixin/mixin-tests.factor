@@ -3,7 +3,7 @@ kernel math namespaces parser prettyprint sequences strings
 tools.test vectors words quotations classes
 classes.private classes.union classes.mixin classes.predicate
 classes.algebra vectors definitions source-files
-compiler.units kernel.private sorting vocabs ;
+compiler.units kernel.private sorting vocabs eval ;
 IN: classes.mixin.tests
 
 ! Test mixins

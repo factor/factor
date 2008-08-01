@@ -1,6 +1,6 @@
 IN: slots.tests
 USING: math accessors slots strings generic.standard kernel
-tools.test generic words parser ;
+tools.test generic words parser eval ;
 
 TUPLE: r/w-test foo ;
 

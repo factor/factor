@@ -44,28 +44,23 @@ PREDICATE: math-partial < word
         bi
     ] "" make "math.partial-dispatch" lookup ;
 
-: integer-op-word ( triple fix-word big-word -- word )
-    [
-        drop
-        name>> "fast" tail? >r
-        [ "-" % ] [ name>> % ] interleave
-        r> [ "-fast" % ] when
-    ] "" make "math.partial-dispatch" create ;
+: integer-op-word ( triple -- word )
+    [ name>> ] map "-" join "math.partial-dispatch" create ;
 
-: integer-op-quot ( word fix-word big-word -- quot )
+: integer-op-quot ( triple fix-word big-word -- quot )
     rot integer-op-combinator 1quotation 2curry ;
 
-: define-integer-op-word ( word fix-word big-word -- )
+: define-integer-op-word ( triple fix-word big-word -- )
     [
-        [ integer-op-word ] [ integer-op-quot ] 3bi
+        [ 2drop integer-op-word ] [ integer-op-quot ] 3bi
         (( x y -- z )) define-declared
-    ]
-    [
-        [ integer-op-word ] [ 2drop ] 3bi
+    ] [
+        2drop
+        [ integer-op-word ] keep
         "derived-from" set-word-prop
     ] 3bi ;
 
-: define-integer-op-words ( words fix-word big-word -- )
+: define-integer-op-words ( triples fix-word big-word -- )
     [ define-integer-op-word ] 2curry each ;
 
 : integer-op-triples ( word -- triples )
@@ -78,7 +73,7 @@ PREDICATE: math-partial < word
 : define-integer-ops ( word fix-word big-word -- )
     >r >r integer-op-triples r> r>
     [ define-integer-op-words ]
-    [ [ 2drop ] [ [ integer-op-word ] 2curry map ] 3bi zip % ]
+    [ 2drop [ dup integer-op-word ] { } map>assoc % ]
     3bi ;
 
 : define-math-ops ( op -- )
@@ -160,15 +155,10 @@ SYMBOL: fast-math-ops
         \ number= \ eq? \ bignum= define-integer-ops
     ] { } make >hashtable math-ops set-global
 
-    [
-        { { + fixnum fixnum } fixnum+fast } ,
-        { { - fixnum fixnum } fixnum-fast } ,
-        { { * fixnum fixnum } fixnum*fast } ,
-        { { shift fixnum fixnum } fixnum-shift-fast } ,
-
-        \ + \ fixnum+fast \ bignum+ define-integer-ops
-        \ - \ fixnum-fast \ bignum- define-integer-ops
-        \ * \ fixnum*fast \ bignum* define-integer-ops
-        \ shift \ fixnum-shift-fast \ bignum-shift define-integer-ops
-    ] { } make >hashtable fast-math-ops set-global
+    H{
+        { { + fixnum fixnum } fixnum+fast }
+        { { - fixnum fixnum } fixnum-fast }
+        { { * fixnum fixnum } fixnum*fast }
+        { { shift fixnum fixnum } fixnum-shift-fast }
+    } fast-math-ops set-global
 ] with-compilation-unit

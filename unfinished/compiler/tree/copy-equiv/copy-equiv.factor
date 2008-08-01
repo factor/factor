@@ -5,6 +5,9 @@ kernel accessors fry
 compiler.tree compiler.tree.def-use compiler.tree.combinators ;
 IN: compiler.tree.copy-equiv
 
+! Two values are copy-equivalent if they are always identical
+! at run-time ("DS" relation).
+
 ! Disjoint set of copy equivalence
 SYMBOL: copies
 
@@ -34,19 +37,28 @@ M: #copy compute-copy-equiv*
 M: #return-recursive compute-copy-equiv*
     [ in-d>> ] [ out-d>> ] bi are-copies-of ;
 
-: unchanged-underneath ( #call-recursive -- n )
-    [ out-d>> length ] [ label>> return>> in-d>> length ] bi - ;
+: compute-phi-equiv ( inputs outputs -- )
+    #! An output is a copy of every input if all inputs are
+    #! copies of the same original value.
+    [
+        swap [ resolve-copy ] map sift
+        dup [ all-equal? ] [ empty? not ] bi and
+        [ first swap is-copy-of ] [ 2drop ] if
+    ] 2each ;
 
-M: #call-recursive compute-copy-equiv*
-    [ in-d>> ] [ out-d>> ] [ unchanged-underneath ] tri
-    '[ , head ] bi@ are-copies-of ;
+M: #phi compute-copy-equiv*
+    [ [ phi-in-d>> ] [ out-d>> ] bi compute-phi-equiv ]
+    [ [ phi-in-r>> ] [ out-r>> ] bi compute-phi-equiv ] bi ;
 
 M: node compute-copy-equiv* drop ;
 
-: compute-copy-equiv ( node -- node )
-    <disjoint-set> copies set
-    dup [
+: amend-copy-equiv ( node -- )
+    [
         [ node-defs-values [ introduce-value ] each ]
         [ compute-copy-equiv* ]
         bi
     ] each-node ;
+
+: compute-copy-equiv ( node -- node )
+    <disjoint-set> copies set
+    dup amend-copy-equiv ;

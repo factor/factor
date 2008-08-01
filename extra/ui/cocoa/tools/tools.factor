@@ -4,7 +4,7 @@ USING: alien.syntax cocoa cocoa.nibs cocoa.application
 cocoa.classes cocoa.dialogs cocoa.pasteboard cocoa.subclassing
 core-foundation help.topics kernel memory namespaces parser
 system ui ui.tools.browser ui.tools.listener ui.tools.workspace
-ui.cocoa ;
+ui.cocoa eval ;
 IN: ui.cocoa.tools
 
 : finder-run-files ( alien -- )

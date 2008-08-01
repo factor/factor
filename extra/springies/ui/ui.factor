@@ -23,7 +23,9 @@ IN: springies.ui
   GL_MODELVIEW glMatrixMode
   glLoadIdentity ;
 
-: display ( -- ) set-projection black gl-color draw-nodes draw-springs ;
+! : display ( -- ) set-projection black gl-color draw-nodes draw-springs ;
+
+: display ( -- ) set-projection black set-color draw-nodes draw-springs ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

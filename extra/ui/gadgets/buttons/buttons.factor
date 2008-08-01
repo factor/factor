@@ -106,7 +106,7 @@ TUPLE: checkmark-paint color ;
 C: <checkmark-paint> checkmark-paint
 
 M: checkmark-paint draw-interior
-    checkmark-paint-color gl-color
+    checkmark-paint-color set-color
     origin get [
         rect-dim
         { 0 0 } over gl-line
@@ -152,11 +152,11 @@ TUPLE: radio-paint color ;
 C: <radio-paint> radio-paint
 
 M: radio-paint draw-interior
-    radio-paint-color gl-color
+    radio-paint-color set-color
     origin get { 4 4 } v+ swap rect-dim { 8 8 } v- 12 gl-fill-circle ;
 
 M: radio-paint draw-boundary
-    radio-paint-color gl-color
+    radio-paint-color set-color
     origin get { 1 1 } v+ swap rect-dim { 2 2 } v- 12 gl-circle ;
 
 : radio-knob-theme ( gadget -- )

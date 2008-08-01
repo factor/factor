@@ -1,6 +1,7 @@
 
 USING: combinators.short-circuit kernel namespaces
        math
+       math.trig
        math.functions
        math.vectors
        math.parser
@@ -21,7 +22,8 @@ USING: combinators.short-circuit kernel namespaces
        ui.gestures
        assocs.lib vars rewrite-closures boids accessors
        math.geometry.rect
-       newfx ;
+       newfx
+       processing.shapes ;
 
 IN: boids.ui
 
@@ -29,17 +31,21 @@ IN: boids.ui
 ! draw-boid
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: point-a ( boid -- a ) pos>> ;
-
-: point-b ( boid -- b ) [ pos>> ] [ vel>> normalize* 20 v*n ] bi v+ ;
-
-: boid-points ( boid -- point-a point-b ) [ point-a ] [ point-b ] bi ;
-
-: draw-boid ( boid -- ) boid-points gl-line ;
+: draw-boid ( boid -- )
+  glPushMatrix
+    dup pos>> gl-translate-2d
+        vel>> first2 rect> arg rad>deg 0 0 1 glRotated
+    { { 0 5 } { 0 -5 } { 20 0 } } triangle
+    fill-mode
+  glPopMatrix ;
 
 : draw-boids ( -- ) boids> [ draw-boid ] each ;
 
-: display ( -- ) black gl-color draw-boids ;
+: boid-color ( -- color ) T{ rgba f 1.0 0 0 0.3 } ;
+
+: display ( -- )
+  boid-color >fill-color
+  draw-boids ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

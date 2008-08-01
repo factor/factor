@@ -3,7 +3,8 @@
 USING: accessors slots.private kernel namespaces disjoint-sets
 math sequences assocs classes.tuple.private combinators fry sets
 compiler.tree compiler.tree.combinators compiler.tree.copy-equiv
-compiler.tree.dfa compiler.tree.dfa.backward ;
+compiler.tree.dataflow-analysis
+compiler.tree.dataflow-analysis.backward ;
 IN: compiler.tree.untupling
 
 SYMBOL: escaping-values

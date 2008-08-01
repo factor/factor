@@ -35,7 +35,7 @@ M: label pref-dim*
     [ font>> open-font ] [ text>> ] bi text-dim ;
 
 M: label draw-gadget*
-    [ color>> gl-color ]
+    [ color>> set-color ]
     [ [ font>> ] [ text>> ] bi origin get draw-text ] bi ;
 
 M: label gadget-text* label-string % ;

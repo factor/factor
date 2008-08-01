@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel sets namespaces sequences summary parser
+USING: accessors kernel sets namespaces sequences parser
 lexer combinators words classes.parser classes.tuple arrays ;
 IN: classes.tuple.parser
 
@@ -23,17 +23,11 @@ IN: classes.tuple.parser
 
 ERROR: duplicate-slot-names names ;
 
-M: duplicate-slot-names summary
-    drop "Duplicate slot names" ;
-
 : check-duplicate-slots ( slots -- )
     slot-names duplicates
     dup empty? [ drop ] [ duplicate-slot-names ] if ;
 
 ERROR: invalid-slot-name name ;
-
-M: invalid-slot-name summary
-    drop "Invalid slot name" ;
 
 : parse-long-slot-name ( -- )
     [ scan , \ } parse-until % ] { } make ;
