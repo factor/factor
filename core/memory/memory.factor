@@ -13,3 +13,7 @@ IN: memory
     pusher [ each-object ] dip >array ; inline
 
 : save ( -- ) image save-image ;
+
+: save-image* ( path args -- )
+    "#!" vm append swap "-shebang\n" 3array " " join
+    (save-image*) ; inline

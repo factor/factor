@@ -1,8 +1,13 @@
 #define IMAGE_MAGIC 0x0f0e0d0c
 #define IMAGE_VERSION 4
 
+#define IMAGE_SHEBANG_BLOCK_SIZE 512
+
 typedef struct {
-	CELL magic;
+        union {
+                CELL magic;
+                char magic_bytes[sizeof(CELL)];
+        };
 	CELL version;
 	/* all pointers in the image file are relocated from
 	   relocation_base to here when the image is loaded */
@@ -39,8 +44,10 @@ typedef struct {
 void load_image(F_PARAMETERS *p);
 void init_objects(F_HEADER *h);
 bool save_image(const F_CHAR *file);
+bool save_image_shebang(const F_CHAR *file, const char *shebang);
 
 DECLARE_PRIMITIVE(save_image);
+DECLARE_PRIMITIVE(save_image_shebang);
 DECLARE_PRIMITIVE(save_image_and_exit);
 
 /* relocation base of currently loaded image's data heap */

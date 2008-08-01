@@ -5,6 +5,7 @@ ARTICLE: "images" "Images"
 "The current image can be saved; the image contains a complete dump of all data and code in the current Factor instance:"
 { $subsection save }
 { $subsection save-image }
+{ $subsection save-image* }
 { $subsection save-image-and-exit }
 "To start Factor with a custom image, use the " { $snippet "-i=" { $emphasis "image" } } " command line switch; see " { $link "runtime-cli-args" } "."
 { $see-also "tools.memory" } ;
@@ -55,6 +56,10 @@ HELP: size ( obj -- n )
 HELP: save-image ( path -- )
 { $values { "path" "a pathname string" } }
 { $description "Saves a snapshot of the heap to the given file, overwriting the file if it already exists." } ;
+
+HELP: save-image* ( path arguments -- )
+{ $values { "path" "a pathname string" } { "arguments" "a commandline string" } }
+{ $description "Saves a snapshot of the heap to the given file, overwriting the file if it already exists. The image is formatted so that Unix systems can execute the image directly using the shellscript #! syntax. The saved image will start the current VM with the given commandline arguments when executed." } ;
 
 HELP: save-image-and-exit ( path -- )
 { $values { "path" "a pathname string" } }

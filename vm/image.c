@@ -80,6 +80,12 @@ void load_image(F_PARAMETERS *p)
 	F_HEADER h;
 	fread(&h,sizeof(F_HEADER),1,file);
 
+        if(h.magic_bytes[0] == '#' && h.magic_bytes[1] == '!')
+        {
+                fseek(file,IMAGE_SHEBANG_BLOCK_SIZE,SEEK_SET);
+                fread(&h,sizeof(F_HEADER),1,file);
+        }
+
 	if(h.magic != IMAGE_MAGIC)
 		fatal_error("Bad image: magic number check failed",h.magic);
 
@@ -101,21 +107,10 @@ void load_image(F_PARAMETERS *p)
 }
 
 /* Save the current image to disk */
-bool save_image(const F_CHAR *filename)
+static bool save_image_to_file(FILE *file)
 {
-	FILE* file;
-	F_HEADER h;
-
-	FPRINTF(stderr,"*** Saving %s...\n",filename);
-
-	file = OPEN_WRITE(filename);
-	if(file == NULL)
-	{
-		fprintf(stderr,"Cannot open image file: %s\n",strerror(errno));
-		return false;
-	}
-
 	F_ZONE *tenured = &data_heap->generations[TENURED];
+	F_HEADER h;
 
 	h.magic = IMAGE_MAGIC;
 	h.version = IMAGE_VERSION;
@@ -161,12 +156,66 @@ bool save_image(const F_CHAR *filename)
 	return true;
 }
 
+bool save_image(const F_CHAR *filename)
+{
+	FILE* file;
+
+	FPRINTF(stderr,"*** Saving %s...\n",filename);
+
+	file = OPEN_WRITE(filename);
+	if(file == NULL)
+	{
+		fprintf(stderr,"Cannot open image file: %s\n",strerror(errno));
+		return false;
+	}
+
+
+        return save_image_to_file(file);
+}
+
+bool save_image_shebang(const F_CHAR *filename, const char *shebang)
+{
+	FILE* file;
+
+	FPRINTF(stderr,"*** Saving %s...\n",filename);
+
+	file = OPEN_WRITE(filename);
+	if(file == NULL)
+	{
+		fprintf(stderr,"Cannot open image file: %s\n",strerror(errno));
+		return false;
+	}
+
+        unsigned char shebang_block[IMAGE_SHEBANG_BLOCK_SIZE];
+        strncpy(shebang_block,shebang,IMAGE_SHEBANG_BLOCK_SIZE-1);
+        shebang_block[IMAGE_SHEBANG_BLOCK_SIZE-1] = 0;
+
+        if(fwrite(shebang_block,IMAGE_SHEBANG_BLOCK_SIZE,1,file) != 1)
+        {
+            fprintf(stderr,"Save #! block failed: %s\n",strerror(errno));
+            return false;
+        }
+
+        return save_image_to_file(file);
+}
+
 DEFINE_PRIMITIVE(save_image)
 {
 	/* do a full GC to push everything into tenured space */
 	gc();
 
 	save_image(unbox_native_string());
+}
+
+DEFINE_PRIMITIVE(save_image_shebang)
+{
+	/* do a full GC to push everything into tenured space */
+	gc();
+
+        char *shebang = unbox_char_string();
+        F_CHAR *path = unbox_native_string();
+
+	save_image_shebang(path, shebang);
 }
 
 DEFINE_PRIMITIVE(save_image_and_exit)

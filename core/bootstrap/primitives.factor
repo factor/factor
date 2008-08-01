@@ -532,6 +532,7 @@ tuple
     { "dll-valid?" "alien" }
     { "unimplemented" "kernel.private" }
     { "gc-reset" "memory" }
+    { "(save-image*)" "memory" }
 }
 [ >r first2 r> make-primitive ] each-index
 
