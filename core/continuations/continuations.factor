@@ -184,3 +184,20 @@ M: condition compute-restarts
         [ condition-continuation [ <restart> ] curry ] bi
         { } assoc>map
     ] bi append ;
+
+<PRIVATE
+
+: init-error-handler ( -- )
+    V{ } clone set-catchstack
+    ! VM calls on error
+    [
+        ! 63 = self
+        63 getenv error-thread set-global
+        continuation error-continuation set-global
+        rethrow
+    ] 5 setenv
+    ! VM adds this to kernel errors, so that user-space
+    ! can identify them
+    "kernel-error" 6 setenv ;
+
+PRIVATE>

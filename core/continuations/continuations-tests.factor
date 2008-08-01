@@ -1,6 +1,6 @@
 USING: kernel math namespaces io tools.test sequences vectors
 continuations debugger parser memory arrays words
-kernel.private accessors ;
+kernel.private accessors eval ;
 IN: continuations.tests
 
 : (callcc1-test)

@@ -25,7 +25,7 @@ SYMBOL: grid-dim
 M: grid-lines draw-boundary
     origin get [
         -0.5 -0.5 0.0 glTranslated
-        grid-lines-color gl-color [
+        grid-lines-color set-color [
             dup grid set
             dup rect-dim half-gap v- grid-dim set
             compute-grid

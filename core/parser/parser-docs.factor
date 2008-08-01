@@ -144,12 +144,6 @@ $nl
 "While the above words are useful for one-off experiments, real programs should be written to use the vocabulary system instead; see " { $link "vocabs.loader" } "."
 { $see-also "source-files" } ;
 
-ARTICLE: "parser-usage" "Reflective parser usage"
-"The parser can be called on a string:"
-{ $subsection eval }
-"The parser can also parse from a stream:"
-{ $subsection parse-stream } ;
-
 ARTICLE: "top-level-forms" "Top level forms"
 "Any code outside of a definition is known as a " { $emphasis "top-level form" } "; top-level forms are run after the entire source file has been parsed, regardless of their position in the file."
 $nl
@@ -163,11 +157,12 @@ $nl
 "This section concerns itself with usage and extension of the parser. Standard syntax is described in " { $link "syntax" } "."
 { $subsection "vocabulary-search" }
 { $subsection "parser-files" }
-{ $subsection "parser-usage" }
 { $subsection "top-level-forms" }
 "The parser can be extended."
 { $subsection "parsing-words" }
 { $subsection "parser-lexer" }
+"The parser can be invoked reflectively;"
+{ $subsection parse-stream }
 { $see-also "definitions" "definition-checking" } ;
 
 ABOUT: "parser"
@@ -322,11 +317,6 @@ HELP: parse-fresh
 { $description "Parses Factor source code in a sequence of lines. The initial vocabulary search path is used (see " { $link with-file-vocabs } ")." }
 { $errors "Throws a parse error if the input is malformed." } ;
 
-HELP: eval
-{ $values { "str" string } }
-{ $description "Parses Factor source code from a string, and calls the resulting quotation." }
-{ $errors "Throws an error if the input is malformed, or if the evaluation itself throws an error." } ;
-
 HELP: filter-moved
 { $values { "assoc1" assoc } { "assoc2" assoc } { "seq" "an seqence of definitions" } }
 { $description "Removes all definitions from " { $snippet "assoc2" } " which are in " { $snippet "assoc1" } " or are are no longer present in the current " { $link file } "." } ;
@@ -357,10 +347,6 @@ HELP: run-file
 HELP: ?run-file
 { $values { "path" "a pathname string" } }
 { $description "If the file exists, runs it with " { $link run-file } ", otherwise does nothing." } ;
-
-HELP: eval>string
-{ $values { "str" string } { "output" string } }
-{ $description "Evaluates the Factor code in " { $snippet "str" } " with " { $link output-stream } " rebound to a string output stream, then outputs the resulting string." } ;
 
 HELP: staging-violation
 { $values { "word" word } }

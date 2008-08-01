@@ -138,6 +138,22 @@ ERROR: no-case ;
         [ drop linear-case-quot ]
     } cond ;
 
+! assert-depth
+: trim-datastacks ( seq1 seq2 -- seq1' seq2' )
+    2dup [ length ] bi@ min tuck tail >r tail r> ;
+
+ERROR: relative-underflow stack ;
+
+ERROR: relative-overflow stack ;
+
+: assert-depth ( quot -- )
+    >r datastack r> dip >r datastack r>
+    2dup [ length ] compare {
+        { +lt+ [ trim-datastacks nip relative-underflow ] }
+        { +eq+ [ 2drop ] }
+        { +gt+ [ trim-datastacks drop relative-overflow ] }
+    } case ; inline
+
 ! recursive-hashcode
 : recursive-hashcode ( n obj quot -- code )
     pick 0 <= [ 3drop 0 ] [ rot 1- -rot call ] if ; inline

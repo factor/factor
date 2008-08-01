@@ -41,7 +41,7 @@ SYMBOL: visited
 
 : pop-d  ( -- obj )
     meta-d get dup empty? [
-        drop <value> dup 1array #introduce, d-in inc
+        drop <value> dup #introduce, d-in inc
     ] [ pop ] if ;
 
 : peek-d ( -- obj ) pop-d dup push-d ;
@@ -52,8 +52,11 @@ SYMBOL: visited
 
 : ensure-d ( n -- values ) consume-d dup output-d ;
 
+: make-values ( n -- values )
+    [ <value> ] replicate ;
+
 : produce-d ( n -- values )
-    [ <value> ] replicate dup meta-d get push-all ;
+    make-values dup meta-d get push-all ;
 
 : push-r ( obj -- ) meta-r get push ;
 
@@ -71,7 +74,7 @@ SYMBOL: visited
 GENERIC: apply-object ( obj -- )
 
 : push-literal ( obj -- )
-    <literal> dup make-known [ nip push-d ] [ #push, ] 2bi ;
+    dup <literal> make-known [ nip push-d ] [ #push, ] 2bi ;
 
 M: wrapper apply-object
     wrapped>>

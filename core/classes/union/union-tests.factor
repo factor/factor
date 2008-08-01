@@ -3,7 +3,8 @@ kernel math namespaces parser prettyprint sequences strings
 tools.test vectors words quotations classes
 classes.private classes.union classes.mixin classes.predicate
 classes.algebra vectors definitions source-files
-compiler.units kernel.private sorting vocabs io.streams.string ;
+compiler.units kernel.private sorting vocabs io.streams.string
+eval ;
 IN: classes.union.tests
 
 ! DEFER: bah

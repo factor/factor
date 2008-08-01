@@ -1,11 +1,11 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays definitions generic assocs kernel math namespaces
-prettyprint sequences strings vectors words quotations summary
-io.styles io combinators sorting splitting math.parser effects
-continuations debugger io.files io.streams.string vocabs
-io.encodings.utf8 source-files classes hashtables
-compiler.errors compiler.units accessors sets lexer ;
+sequences strings vectors words quotations io
+combinators sorting splitting math.parser effects continuations
+io.files io.streams.string vocabs io.encodings.utf8 source-files
+classes hashtables compiler.errors compiler.units accessors sets
+lexer ;
 IN: parser
 
 : location ( -- loc )
@@ -24,7 +24,7 @@ t parser-notes set-global
 
 : note. ( str -- )
     parser-notes? [
-        file get [ file. ] when*
+        file get [ path>> write ] when*
         lexer get line>> number>string write ": " write
         "Note: " write dup print
     ] when drop ;
@@ -54,9 +54,6 @@ M: parsing-word stack-effect drop (( parsed -- parsed )) ;
 
 ERROR: no-current-vocab ;
 
-M: no-current-vocab summary ( obj -- )
-    drop "Not in a vocabulary; IN: form required" ;
-
 : current-vocab ( -- str )
     in get [ no-current-vocab ] unless* ;
 
@@ -69,13 +66,12 @@ M: no-current-vocab summary ( obj -- )
 
 : word-restarts ( possibilities -- restarts )
     natural-sort [
-        [ "Use the word " swap summary append ] keep
+        [
+            "Use the " swap vocabulary>> " vocabulary" 3append
+        ] keep
     ] { } map>assoc ;
 
 TUPLE: no-word-error name ;
-
-M: no-word-error summary
-    drop "Word not found in current vocabulary search path" ;
 
 : no-word ( name -- newword )
     dup no-word-error boa
@@ -104,10 +100,6 @@ M: no-word-error summary
     ] when ;
 
 ERROR: staging-violation word ;
-
-M: staging-violation summary
-    drop
-    "A parsing word cannot be used in the same file it is defined in." ;
 
 : execute-parsing ( word -- )
     dup changed-definitions get key? [ staging-violation ] when
@@ -149,9 +141,6 @@ M: staging-violation summary
 : (:) ( -- word def ) CREATE-WORD parse-definition ;
 
 ERROR: bad-number ;
-
-M: bad-number summary
-    drop "Bad number literal" ;
 
 : parse-base ( parsed base -- parsed )
     scan swap base> [ bad-number ] unless* parsed ;
@@ -221,7 +210,7 @@ SYMBOL: interactive-vocabs
     "quiet" get [
         drop
     ] [
-        "Loading " write <pathname> . flush
+        "Loading " write print flush
     ] if ;
 
 : filter-moved ( assoc1 assoc2 -- seq )
@@ -292,12 +281,3 @@ SYMBOL: interactive-vocabs
 
 : ?run-file ( path -- )
     dup exists? [ run-file ] [ drop ] if ;
-
-: eval ( str -- )
-    [ string-lines parse-fresh ] with-compilation-unit call ;
-
-: eval>string ( str -- output )
-    [
-        parser-notes off
-        [ [ eval ] keep ] try drop
-    ] with-string-writer ;

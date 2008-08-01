@@ -2,10 +2,12 @@
 ! Portions copyright (C) 2007 Eduardo Cavazos.
 ! Portions copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
+
 USING: alien alien.c-types continuations kernel libc math macros
-namespaces math.vectors math.constants math.functions
-math.parser opengl.gl opengl.glu combinators arrays sequences
-splitting words byte-arrays assocs ;
+       namespaces math.vectors math.constants math.functions
+       math.parser opengl.gl opengl.glu combinators arrays sequences
+       splitting words byte-arrays assocs colors accessors ;
+
 IN: opengl
 
 : coordinates ( point1 point2 -- x1 y2 x2 y2 )
@@ -14,6 +16,8 @@ IN: opengl
 : fix-coordinates ( point1 point2 -- x1 y2 x2 y2 )
     [ first2 [ >fixnum ] bi@ ] bi@ ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 : gl-color ( color -- ) first4 glColor4d ; inline
 
 : gl-clear-color ( color -- )
@@ -21,6 +25,14 @@ IN: opengl
 
 : gl-clear ( color -- )
     gl-clear-color GL_COLOR_BUFFER_BIT glClear ;
+
+: color>raw ( object -- r g b a )
+  >rgba { [ red>> ] [ green>> ] [ blue>> ] [ alpha>> ] } cleave ;
+
+: set-color       ( object -- ) color>raw glColor4d ;
+: set-clear-color ( object -- ) color>raw glClearColor ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : gl-error ( -- )
     glGetError dup zero? [
@@ -112,7 +124,7 @@ MACRO: all-enabled-client-state ( seq quot -- )
     GL_QUAD_STRIP [
         swap >r prepare-gradient r>
         [ length dup 1- v/n ] keep [
-            >r >r 2dup r> r> gl-color v*n
+            >r >r 2dup r> r> set-color v*n
             dup gl-vertex v+ gl-vertex
         ] 2each 2drop
     ] do-state ;

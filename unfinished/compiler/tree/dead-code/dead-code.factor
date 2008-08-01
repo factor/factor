@@ -3,8 +3,8 @@
 USING: fry accessors namespaces assocs dequeues search-dequeues
 kernel sequences words sets stack-checker.inlining
 compiler.tree
-compiler.tree.dfa
-compiler.tree.dfa.backward
+compiler.tree.dataflow-analysis
+compiler.tree.dataflow-analysis.backward
 compiler.tree.combinators ;
 IN: compiler.tree.dead-code
 

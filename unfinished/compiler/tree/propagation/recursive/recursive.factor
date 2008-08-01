@@ -4,39 +4,35 @@ USING: kernel sequences accessors arrays fry math.intervals
 combinators
 stack-checker.inlining
 compiler.tree
+compiler.tree.copy-equiv
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
 compiler.tree.propagation.simple
-compiler.tree.propagation.branches ;
+compiler.tree.propagation.branches
+compiler.tree.propagation.constraints ;
 IN: compiler.tree.propagation.recursive
 
-! row polymorphism is causing problems
-
-: longest-suffix ( seq1 seq2 -- seq1' seq2' )
-    2dup min-length [ tail-slice* ] curry bi@ ;
-
-: suffixes= ( seq1 seq2 -- ? )
-    longest-suffix sequence= ;
-
 : check-fixed-point ( node infos1 infos2 -- node )
-    suffixes= [ dup label>> f >>fixed-point drop ] unless ; inline
+    sequence= [ dup label>> f >>fixed-point drop ] unless ; inline
 
 : recursive-stacks ( #enter-recursive -- stacks initial )
-    [ label>> calls>> [ node-input-infos ] map ]
-    [ in-d>> [ value-info ] map ] bi
-    [ length '[ , tail* ] map flip ] keep ;
+    [ label>> calls>> [ node-input-infos ] map flip ]
+    [ in-d>> [ value-info ] map ] bi ;
 
-: generalize-counter-interval ( i1 i2 -- i3 )
+: generalize-counter-interval ( interval initial-interval -- interval' )
     {
-        { [ 2dup interval<= ] [ 1./0. [a,a] ] }
-        { [ 2dup interval>= ] [ -1./0. [a,a] ] }
+        { [ 2dup interval-subset? ] [ empty-interval ] }
+        { [ over empty-interval eq? ] [ empty-interval ] }
+        { [ 2dup interval>= t eq? ] [ 1./0. [a,a] ] }
+        { [ 2dup interval<= t eq? ] [ -1./0. [a,a] ] }
         [ [-inf,inf] ]
-    } cond nip interval-union ;
+    } cond interval-union nip ;
 
 : generalize-counter ( info' initial -- info )
-    [ drop clone ] [ [ interval>> ] bi@ ] 2bi
-    generalize-counter-interval >>interval
-    f >>literal? f >>literal ;
+    2dup [ class>> null-class? ] either? [ drop ] [
+        [ drop clone ] [ [ interval>> ] bi@ ] 2bi
+        generalize-counter-interval >>interval
+    ] if ;
 
 : unify-recursive-stacks ( stacks initial -- infos )
     over empty? [ nip ] [
@@ -58,13 +54,20 @@ SYMBOL: iter-counter
 M: #recursive propagate-around ( #recursive -- )
     iter-counter inc
     iter-counter get 10 > [ "Oops" throw ] when
-    dup label>> t >>fixed-point drop
-    [ node-child first>> [ propagate-recursive-phi ] [ (propagate) ] bi ]
-    [ dup label>> fixed-point>> [ drop ] [ propagate-around ] if ]
-    bi ;
+    dup label>> t >>fixed-point drop [
+        [
+            copies [ clone ] change
+            constraints [ clone ] change
+
+            child>>
+            [ first propagate-recursive-phi ]
+            [ (propagate) ]
+            bi
+        ] with-scope
+    ] [ dup label>> fixed-point>> [ drop ] [ propagate-around ] if ] bi ;
 
 : generalize-return-interval ( info -- info' )
-    dup literal?>> [
+    dup [ literal?>> ] [ class>> null-class? ] bi or [
         clone [-inf,inf] >>interval
     ] unless ;
 
@@ -72,12 +75,9 @@ M: #recursive propagate-around ( #recursive -- )
     [ generalize-return-interval ] map ;
 
 M: #call-recursive propagate-before ( #call-label -- )
-    dup
-    [ node-output-infos ]
-    [ label>> return>> node-input-infos ]
-    bi check-fixed-point
-    [ label>> return>> node-input-infos generalize-return ] [ out-d>> ] bi
-    longest-suffix set-value-infos ;
+    dup [ node-output-infos ] [ label>> return>> node-input-infos ] bi
+    [ check-fixed-point ] keep
+    generalize-return swap out-d>> set-value-infos ;
 
 M: #return-recursive propagate-before ( #return-recursive -- )
     dup [ node-input-infos ] [ in-d>> [ value-info ] map ] bi

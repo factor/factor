@@ -1,12 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: parser kernel words generic namespaces summary ;
+USING: parser kernel words generic namespaces ;
 IN: generic.parser
 
 ERROR: not-in-a-method-error ;
-
-M: not-in-a-method-error summary
-    drop "call-next-method can only be called in a method definition" ;
 
 : CREATE-GENERIC ( -- word ) CREATE dup reset-word ;
 
