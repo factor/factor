@@ -3,8 +3,9 @@ compiler.tree.propagation compiler.tree.copy-equiv
 compiler.tree.def-use tools.test math math.order
 accessors sequences arrays kernel.private vectors
 alien.accessors alien.c-types sequences.private
-byte-arrays classes.algebra math.functions math.private
-strings ;
+byte-arrays classes.algebra classes.tuple.private
+math.functions math.private strings layouts
+compiler.tree.propagation.info ;
 IN: compiler.tree.propagation.tests
 
 \ propagate must-infer
@@ -235,11 +236,38 @@ IN: compiler.tree.propagation.tests
     [ [ 1 ] [ 1 ] if 1 + ] final-literals
 ] unit-test
 
+[ V{ object } ] [
+    [ 0 * 10 < ] final-classes
+] unit-test
+
 [ V{ string string } ] [
     [
         2dup [ dup string? [ "Oops" throw ] unless ] bi@ 2drop
     ] final-classes
 ] unit-test
+
+[ V{ float } ] [
+    [ { real float } declare + ] final-classes
+] unit-test
+
+[ V{ float } ] [
+    [ { float real } declare + ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
+    [ { fixnum fixnum } declare 7 bitand neg shift ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
+    [ { fixnum } declare 1 swap 7 bitand shift ] final-classes
+] unit-test
+
+cell-bits 32 = [
+    [ V{ integer } ] [
+        [ { fixnum } declare 1 swap 31 bitand shift ]
+        final-classes
+    ] unit-test
+] when
 
 ! Array length propagation
 [ V{ t } ] [ [ 10 f <array> length 10 = ] final-literals ] unit-test
@@ -323,6 +351,10 @@ TUPLE: mutable-tuple-test { x sequence } ;
     [ T{ mutable-tuple-test f "hey" } x>> ] final-classes
 ] unit-test
 
+[ V{ tuple-layout } ] [
+    [ T{ mutable-tuple-test f "hey" } layout-of ] final-classes
+] unit-test
+
 ! Mixed mutable and immutable slots
 TUPLE: mixed-mutable-immutable { x integer } { y sequence read-only } ;
 
@@ -332,3 +364,45 @@ TUPLE: mixed-mutable-immutable { x integer } { y sequence read-only } ;
         [ x>> ] [ y>> ] bi
     ] final-classes
 ] unit-test
+
+! Recursive propagation
+: recursive-test-1 ( a -- b ) recursive-test-1 ; inline recursive
+
+[ V{ null } ] [ [ recursive-test-1 ] final-classes ] unit-test
+
+: recursive-test-2 ( a -- b ) dup 10 < [ recursive-test-2 ] when ; inline recursive
+
+[ V{ real } ] [ [ recursive-test-2 ] final-classes ] unit-test
+
+: recursive-test-3 ( a -- b ) dup 10 < drop ; inline recursive
+
+[ V{ real } ] [ [ recursive-test-3 ] final-classes ] unit-test
+
+[ V{ real } ] [ [ [ dup 10 < ] [ ] [ ] while ] final-classes ] unit-test
+
+[ V{ float } ] [
+    [ { float } declare 10 [ 2.3 * ] times ] final-classes
+] unit-test
+
+[ V{ fixnum } ] [
+    [ 0 10 [ nip ] each-integer ] final-classes
+] unit-test
+
+[ V{ t } ] [
+    [ t 10 [ nip 0 >= ] each-integer ] final-literals
+] unit-test
+
+: recursive-test-4 ( i n -- )
+    2dup < [ >r 1+ r> recursive-test-4 ] [ 2drop ] if ; inline recursive
+
+[ ] [ [ recursive-test-4 ] final-info drop ] unit-test
+
+: recursive-test-5 ( a -- b )
+    dup 1 <= [ drop 1 ] [ dup 1 - recursive-test-5 * ] if ; inline recursive
+
+[ V{ integer } ] [ [ { integer } declare recursive-test-5 ] final-classes ] unit-test
+
+: recursive-test-6 ( a -- b )
+    dup 1 <= [ drop 1 ] [ dup 1 - recursive-test-6 swap 2 - recursive-test-6 + ] if ; inline recursive
+
+[ V{ integer } ] [ [ { fixnum } declare recursive-test-6 ] final-classes ] unit-test

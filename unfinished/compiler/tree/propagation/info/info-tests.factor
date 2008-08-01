@@ -59,5 +59,7 @@ IN: compiler.tree.propagation.info.tests
 
 [ 3 t ] [
     3 <literal-info>
-    null <class-info> value-info-union >literal<
+    null-info value-info-union >literal<
 ] unit-test
+
+[ ] [ { } value-infos-union drop ] unit-test

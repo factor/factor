@@ -52,12 +52,16 @@ M: node node-defs-values out-d>> ;
     [ dup node-uses-values [ use-value ] with each ]
     [ dup node-defs-values [ def-value ] with each ] bi ;
 
+: check-def ( node -- )
+    [ "No def" throw ] unless ;
+
+: check-use ( uses -- )
+    [ empty? [ "No use" throw ] when ]
+    [ all-unique? [ "Uses not all unique" throw ] unless ] bi ;
+
 : check-def-use ( -- )
     def-use get [
-        nip
-        [ node>> [ "No def" throw ] unless ]
-        [ uses>> all-unique? [ "Uses not all unique" throw ] unless ]
-        bi
+        nip [ node>> check-def ] [ uses>> check-use ] bi
     ] assoc-each ;
 
 : compute-def-use ( node -- node )

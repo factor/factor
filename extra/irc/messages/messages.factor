@@ -12,6 +12,7 @@ TUPLE: ping < irc-message ;
 TUPLE: join < irc-message ;
 TUPLE: part < irc-message channel ;
 TUPLE: quit < irc-message ;
+TUPLE: nick < irc-message ;
 TUPLE: privmsg < irc-message name ;
 TUPLE: kick < irc-message channel who ;
 TUPLE: roomlist < irc-message channel names ;
@@ -34,6 +35,7 @@ M: ping        irc-command-string ( ping -- string )    drop "PING" ;
 M: join        irc-command-string ( join -- string )    drop "JOIN" ;
 M: part        irc-command-string ( part -- string )    drop "PART" ;
 M: quit        irc-command-string ( quit -- string )    drop "QUIT" ;
+M: nick        irc-command-string ( nick -- string )    drop "NICK" ;
 M: privmsg     irc-command-string ( privmsg -- string ) drop "PRIVMSG" ;
 M: notice      irc-command-string ( notice -- string )  drop "NOTICE" ;
 M: mode        irc-command-string ( mode -- string )    drop "MODE" ;
@@ -46,6 +48,7 @@ M: ping        irc-command-parameters ( ping -- seq )    drop { } ;
 M: join        irc-command-parameters ( join -- seq )    drop { } ;
 M: part        irc-command-parameters ( part -- seq )    name>> 1array ;
 M: quit        irc-command-parameters ( quit -- seq )    drop { } ;
+M: nick        irc-command-parameters ( nick -- seq )    drop { } ;
 M: privmsg     irc-command-parameters ( privmsg -- seq ) name>> 1array ;
 M: notice      irc-command-parameters ( norice -- seq )  type>> 1array ;
 M: kick irc-command-parameters ( kick -- seq )
@@ -110,6 +113,7 @@ PRIVATE>
         { "353" [ names-reply ] }
         { "JOIN" [ join ] }
         { "PART" [ part ] }
+        { "NICK" [ nick ] }
         { "PRIVMSG" [ privmsg ] }
         { "QUIT" [ quit ] }
         { "MODE" [ mode ] }

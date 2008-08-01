@@ -29,8 +29,7 @@ M: #call compute-untupling*
         [ drop mark-escaping-values ]
     } case ;
 
-M: #return compute-untupling*
-    dup label>> [ drop ] [ mark-escaping-values ] if ;
+M: #return compute-untupling* mark-escaping-values ;
 
 M: node compute-untupling* drop ;
 

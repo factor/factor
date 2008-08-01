@@ -40,8 +40,18 @@ mode new
                           "ircserver.net" >>prefix
                                    "MODE" >>command
                   { "#factortest" "+ns" } >>parameters
-                             "#factortest" >>channel
+                            "#factortest" >>channel
                                     "+ns" >>mode
 1array
 [ ":ircserver.net MODE #factortest +ns"
+  parse-irc-line f >>timestamp ] unit-test
+
+nick new
+    ":someuser!n=user@some.where NICK :someuser2" >>line
+                     "someuser!n=user@some.where" >>prefix
+                                           "NICK" >>command
+                                              { } >>parameters
+                                      "someuser2" >>trailing
+1array
+[ ":someuser!n=user@some.where NICK :someuser2"
   parse-irc-line f >>timestamp ] unit-test

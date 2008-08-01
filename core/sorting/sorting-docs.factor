@@ -20,7 +20,7 @@ ABOUT: "sequences-sorting"
 
 HELP: sort
 { $values { "seq" "a sequence" } { "quot" "a quotation with stack effect " { $snippet "( obj1 obj2 -- <=> )" } } { "sortedseq" "a new sorted sequence" } }
-{ $description "Sorts the elements into a new sequence of the same class as " { $snippet "seq" } "." } ;
+{ $description "Sorts the elements into a new array." } ;
 
 HELP: sort-keys
 { $values { "seq" "an alist" } { "sortedseq" "a new sorted sequence" } }

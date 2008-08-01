@@ -82,7 +82,7 @@ M: wrapper apply-object
 M: object apply-object push-literal ;
 
 : terminate ( -- )
-    terminated? on #terminate, ;
+    terminated? on meta-d get clone #terminate, ;
 
 : infer-quot ( quot rstate -- )
     recursive-state get [
@@ -113,10 +113,10 @@ M: object apply-object push-literal ;
     ] if ;
 
 : infer->r ( n -- )
-    consume-d [ dup copy-values #>r, ] [ output-r ] bi ;
+    consume-d dup copy-values [ #>r, ] [ nip output-r ] 2bi ;
 
 : infer-r> ( n -- )
-    consume-r [ dup copy-values #r>, ] [ output-d ] bi ;
+    consume-r dup copy-values [ #r>, ] [ nip output-d ] 2bi ;
 
 : undo-infer ( -- )
     recorded get [ f +inferred-effect+ set-word-prop ] each ;
@@ -140,7 +140,7 @@ M: object apply-object push-literal ;
 
 : end-infer ( -- )
     check->r
-    f meta-d get clone #return, ;
+    meta-d get clone #return, ;
 
 : effect-required? ( word -- ? )
     {

@@ -21,9 +21,7 @@ M: #call mark-live-values
     [ drop ] [ [ look-at-inputs ] [ look-at-outputs ] bi ] if ;
 
 M: #return mark-live-values
-    #! Values returned by local #recursive functions can be
-    #! killed if they're unused.
-    dup label>> [ drop ] [ look-at-inputs ] if ;
+    look-at-inputs ;
 
 M: node mark-live-values drop ;
 

@@ -35,15 +35,6 @@ M: node hashcode* drop node hashcode* ;
         2drop f
     ] if ;
 
-: node-value-info ( node value -- info )
-    swap info>> at ;
-
-: node-input-infos ( node -- seq )
-    dup in-d>> [ node-value-info ] with map ;
-
-: node-output-infos ( node -- seq )
-    dup out-d>> [ node-value-info ] with map ;
-
 TUPLE: #introduce < node values ;
 
 : #introduce ( values -- node )
@@ -99,7 +90,9 @@ TUPLE: #r> < node ;
 
 TUPLE: #terminate < node ;
 
-: #terminate ( -- node ) \ #terminate new ;
+: #terminate ( stack -- node )
+    \ #terminate new
+        swap >>in-d ;
 
 TUPLE: #branch < node ;
 
@@ -133,22 +126,36 @@ TUPLE: #declare < node declaration ;
     \ #declare new
         swap >>declaration ;
 
-TUPLE: #return < node label ;
+TUPLE: #return < node ;
 
-: #return ( label stack -- node )
+: #return ( stack -- node )
     \ #return new
-        swap >>in-d
-        swap >>label ;
+        swap >>in-d ;
 
 TUPLE: #recursive < node word label loop? returns calls ;
 
-: #recursive ( word label inputs outputs child -- node )
+: #recursive ( word label inputs child -- node )
     \ #recursive new
         swap 1array >>children
-        swap >>out-d
         swap >>in-d
         swap >>label
         swap >>word ;
+
+TUPLE: #enter-recursive < node label ;
+
+: #enter-recursive ( label inputs outputs -- node )
+    \ #enter-recursive new
+        swap >>out-d
+        swap >>in-d
+        swap >>label ;
+
+TUPLE: #return-recursive < node label ;
+
+: #return-recursive ( label inputs outputs -- node )
+    \ #return-recursive new
+        swap >>out-d
+        swap >>in-d
+        swap >>label ;
 
 TUPLE: #copy < node ;
 
@@ -175,13 +182,15 @@ TUPLE: node-list first last ;
 M: node-list child-visitor node-list new ;
 M: node-list #introduce, #introduce node, ;
 M: node-list #call, #call node, ;
-M: node-list #call-recursive, #call-recursive node, ;
 M: node-list #push, #push node, ;
 M: node-list #shuffle, #shuffle node, ;
 M: node-list #drop, #drop node, ;
 M: node-list #>r, #>r node, ;
 M: node-list #r>, #r> node, ;
 M: node-list #return, #return node, ;
+M: node-list #enter-recursive, #enter-recursive node, ;
+M: node-list #return-recursive, #return-recursive [ node, ] [ dup label>> (>>return) ] bi ;
+M: node-list #call-recursive, #call-recursive [ node, ] [ dup label>> calls>> push ] bi ;
 M: node-list #terminate, #terminate node, ;
 M: node-list #if, #if node, ;
 M: node-list #dispatch, #dispatch node, ;

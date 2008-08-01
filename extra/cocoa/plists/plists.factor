@@ -3,7 +3,7 @@
 USING: strings arrays hashtables assocs sequences
 cocoa.messages cocoa.classes cocoa.application cocoa kernel
 namespaces io.backend math cocoa.enumeration byte-arrays
-combinators alien.c-types ;
+combinators alien.c-types core-foundation ;
 IN: cocoa.plists
 
 GENERIC: >plist ( value -- plist )
@@ -24,8 +24,8 @@ M: sequence >plist
     [ >plist ] map <NSArray> ;
 
 : write-plist ( assoc path -- )
-    >r >plist
-    r> normalize-path <NSString> 0 -> writeToFile:atomically:
+    [ >plist ] [ normalize-path <NSString> ] bi* 0
+    -> writeToFile:atomically:
     [ "write-plist failed" throw ] unless ;
 
 DEFER: plist>
@@ -57,3 +57,13 @@ DEFER: plist>
         { [ dup NSDictionary -> isKindOfClass: c-bool> ] [ (plist-NSDictionary>)  ] }
         [ ]
     } cond ;
+
+: (read-plist) ( NSData -- id )
+    NSPropertyListSerialization swap kCFPropertyListImmutable f f <void*>
+    [ -> propertyListFromData:mutabilityOption:format:errorDescription: ] keep
+    *void* [ -> release "read-plist failed" throw ] when* ;
+
+: read-plist ( path -- assoc )
+    normalize-path <NSString>
+    NSData swap -> dataWithContentsOfFile:
+    [ (read-plist) plist> ] [ "read-plist failed" throw ] if* ;
