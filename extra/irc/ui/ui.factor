@@ -39,10 +39,18 @@ TUPLE: irc-tab < frame listener client userlist ;
 
 GENERIC: write-irc ( irc-message -- )
 
+M: ping write-irc
+    drop "* Ping" blue write-color ;
+
 M: privmsg write-irc
     "<" blue write-color
     [ prefix>> parse-name write ] keep
     "> " blue write-color
+    trailing>> write ;
+
+M: notice write-irc
+    [ type>> blue write-color ] keep
+    ": " blue write-color
     trailing>> write ;
 
 TUPLE: own-message message nick timestamp ;
@@ -116,7 +124,7 @@ M: irc-message write-irc
 
 GENERIC: handle-inbox ( tab message -- )
 
-: filter-participants ( pack alist val color -- )
+: filter-participants ( pack alist val color -- pack )
    '[ , = [ <label> , >>color add-gadget ] [ drop ] if ] assoc-each ;
 
 : update-participants ( tab -- )
@@ -124,7 +132,7 @@ GENERIC: handle-inbox ( tab message -- )
     [ listener>> participants>> ] bi
     [ +operator+ green filter-participants ]
     [ +voice+ blue filter-participants ]
-    [ +normal+ black filter-participants ] 2tri ;
+    [ +normal+ black filter-participants ] tri drop ;
 
 M: participant-changed handle-inbox
     drop update-participants ;
