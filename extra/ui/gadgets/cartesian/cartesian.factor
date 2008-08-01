@@ -22,20 +22,15 @@ TUPLE: cartesian < slate x-min x-max y-min y-max z-min z-max perspective ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-M: cartesian draw-gadget* ( cartesian -- )
-   GL_PROJECTION glMatrixMode
-   glLoadIdentity
+M: cartesian establish-coordinate-system ( cartesian -- cartesian )
    dup
-       {
-         [ x-min>> ] [ x-max>> ]
-         [ y-min>> ] [ y-max>> ]
-         [ z-min>> ] [ z-max>> ]
-       }
-     cleave
-     glOrtho
-   GL_MODELVIEW glMatrixMode
-   glLoadIdentity
-   call-next-method ;
+   {
+     [ x-min>> ] [ x-max>> ]
+     [ y-min>> ] [ y-max>> ]
+     [ z-min>> ] [ z-max>> ]
+   }
+   cleave
+   glOrtho ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

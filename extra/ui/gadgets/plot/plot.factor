@@ -47,12 +47,14 @@ M: function plot-function ( plot function -- plot )
     [ [ drop 0  ] [ y-min>> ] bi 2array ]
     [ [ drop 0  ] [ y-max>> ] bi 2array ] bi line* ;
 
-M: plot draw-gadget* ( plot -- )
-   dup call-next-method
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USING: ui.gadgets.slate ;
+
+M: plot draw-slate ( plot -- plot )
    2 glLineWidth
    draw-axis
    plot-functions
-   drop
    fill-mode
    1 glLineWidth ;
 
