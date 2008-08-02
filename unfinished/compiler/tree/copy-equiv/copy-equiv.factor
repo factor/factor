@@ -1,23 +1,37 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces disjoint-sets sequences assocs math
-kernel accessors fry
-compiler.tree compiler.tree.def-use compiler.tree.combinators ;
+USING: namespaces sequences assocs math kernel accessors fry
+combinators sets locals
+compiler.tree
+compiler.tree.def-use
+compiler.tree.combinators ;
 IN: compiler.tree.copy-equiv
 
 ! Two values are copy-equivalent if they are always identical
 ! at run-time ("DS" relation).
 
-! Disjoint set of copy equivalence
+! Mapping from values to their canonical leader
 SYMBOL: copies
 
-: is-copy-of ( val copy -- ) copies get equate ;
+:: compress-path ( source assoc -- destination )
+    [let | destination [ source assoc at ] |
+        source destination = [ source ] [
+            [let | destination' [ destination assoc compress-path ] |
+                destination' destination = [
+                    destination' source assoc set-at
+                ] unless
+                destination'
+            ]
+        ] if
+    ] ;
+
+: resolve-copy ( copy -- val ) copies get compress-path ;
+
+: is-copy-of ( val copy -- ) copies get set-at ;
 
 : are-copies-of ( vals copies -- ) [ is-copy-of ] 2each ;
 
-: resolve-copy ( copy -- val ) copies get representative ;
-
-: introduce-value ( val -- ) copies get add-atom ;
+: introduce-value ( val -- ) copies get conjoin ;
 
 GENERIC: compute-copy-equiv* ( node -- )
 
@@ -60,5 +74,5 @@ M: node compute-copy-equiv* drop ;
     ] each-node ;
 
 : compute-copy-equiv ( node -- node )
-    <disjoint-set> copies set
+    H{ } clone copies set
     dup amend-copy-equiv ;
