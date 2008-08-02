@@ -325,7 +325,7 @@ cell-bits 32 = [
 [ V{ t } ] [ [ [ 1 f <array> ] [ 2 f <array> ] if length 3 < ] final-literals ] unit-test
 
 [ V{ 10 } ] [
-    [ { fixnum } declare dup 10 = [ "A" throw ] unless ] final-literals
+    [ { fixnum } declare dup 10 eq? [ "A" throw ] unless ] final-literals
 ] unit-test
 
 ! Slot propagation

@@ -94,6 +94,7 @@ M: #declare propagate-before
 
 : do-inlining ( #call word -- ? )
     {
+        { [ dup always-inline-word? ] [ always-inline-word ] }
         { [ dup standard-generic? ] [ inline-standard-method ] }
         { [ dup math-generic? ] [ inline-math-method ] }
         { [ dup math-partial? ] [ inline-math-partial ] }

@@ -29,7 +29,7 @@ UNION: fixed-length-sequence array byte-array string ;
     bi* value-info-intersect 1array ;
 
 : tuple-constructor? ( word -- ? )
-    { <tuple-boa> curry compose <complex> } memq? ;
+    { <tuple-boa> <complex> } memq? ;
 
 : read-only-slots ( values class -- slots )
     #! Delegation.
@@ -54,20 +54,12 @@ UNION: fixed-length-sequence array byte-array string ;
     in-d>> unclip-last
     value-info literal>> class>> (propagate-tuple-constructor) ;
 
-: propagate-curry ( #call -- info )
-    in-d>> \ curry (propagate-tuple-constructor) ;
-
-: propagate-compose ( #call -- info )
-    in-d>> \ compose (propagate-tuple-constructor) ;
-
 : propagate-<complex> ( #call -- info )
     in-d>> [ value-info ] map complex <tuple-info> ;
 
 : propagate-tuple-constructor ( #call word -- infos )
     {
         { \ <tuple-boa> [ propagate-<tuple-boa> ] }
-        { \ curry [ propagate-curry ] }
-        { \ compose [ propagate-compose ] } 
         { \ <complex> [ propagate-<complex> ] }
     } case 1array ;
 
