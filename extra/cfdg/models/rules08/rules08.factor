@@ -17,7 +17,7 @@ DEFER: line
 
 : ligne ( -- )
   {
-    { 1   [ 1.15 0.8 size* 4.5 y -0.3 b line ] do }
+    { 1   [ 4.5 y 1.15 0.8 size* -0.3 b line ] do }
     { 0.5 [ ] }
   }
   call-random-weighted ;
