@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: prettyprint
+
 USING: arrays generic generic.standard assocs io kernel
 math namespaces sequences strings io.styles io.streams.string
 vectors words prettyprint.backend prettyprint.sections
@@ -8,7 +8,9 @@ prettyprint.config sorting splitting grouping math.parser vocabs
 definitions effects classes.builtin classes.tuple io.files
 classes continuations hashtables classes.mixin classes.union
 classes.intersection classes.predicate classes.singleton
-combinators quotations sets accessors ;
+combinators quotations sets accessors colors ;
+
+IN: prettyprint
 
 : make-pprint ( obj quot -- block in use )
     [
@@ -95,7 +97,7 @@ combinators quotations sets accessors ;
 SYMBOL: ->
 
 \ ->
-{ { foreground { 1 1 1 1 } } { background { 0 0 0 1 } } }
+{ { foreground T{ rgba f 1 1 1 1 } } { background T{ rgba f 0 0 0 1 } } }
 "word-style" set-word-prop
 
 : remove-step-into ( word -- )

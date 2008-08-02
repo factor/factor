@@ -56,19 +56,19 @@ ARTICLE: { "concurrency" "synchronous-sends" } "Synchronous sends"
     "USING: concurrency.messaging kernel threads ;"
     ": pong-server ( -- )"
     "    receive >r \"pong\" r> reply-synchronous ;"
-    "[ pong-server t ] spawn-server"
+    "[ pong-server t ] \"pong-server\" spawn-server"
     "\"ping\" swap send-synchronous ."
     "\"pong\""
 } ;
 
 ARTICLE: { "concurrency" "exceptions" } "Linked exceptions"
 "A thread can handle exceptions using the standard Factor exception handling mechanism. If an exception is uncaught the thread will terminate. For example:" 
-{ $code "[ 1 0 / \"This will not print\" print ] spawn" } 
+{ $code "[ 1 0 / \"This will not print\" print ] \"division-by-zero\" spawn" } 
 "Processes can be linked so that a parent thread can receive the exception that caused the child thread to terminate. In this way 'supervisor' threades can be created that are notified when child threades terminate and possibly restart them."
 { $subsection spawn-linked }
 "This will create a unidirectional link, such that if an uncaught exception causes the child to terminate, the parent thread can catch it:"
 { $code "["
-"  [ 1 0 / \"This will not print\" print ] spawn-linked drop"
+"  [ 1 0 / \"This will not print\" print ] \"linked-division\" spawn-linked drop"
 "  receive"
 "] [ \"Exception caught.\" print ] recover" } 
 "Exceptions are only raised in the parent when the parent does a " { $link receive } " or " { $link receive-if } ". This is because the exception is sent from the child to the parent as a message." ;

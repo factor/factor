@@ -173,7 +173,7 @@ GENERIC: boa ( ... class -- tuple )
 
 : or ( obj1 obj2 -- ? ) dupd ? ; inline
 
-: xor ( obj1 obj2 -- ? ) dup not swap ? ; inline
+: xor ( obj1 obj2 -- ? ) [ f swap ? ] when* ; inline
 
 : both? ( x y quot -- ? ) bi@ and ; inline
 

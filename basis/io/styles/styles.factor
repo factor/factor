@@ -1,6 +1,8 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: hashtables io ;
+
+USING: hashtables io colors ;
+
 IN: io.styles
 
 SYMBOL: plain
@@ -33,7 +35,7 @@ SYMBOL: table-border
 : standard-table-style ( -- style )
     H{
         { table-gap { 5 5 } }
-        { table-border { 0.8 0.8 0.8 1.0 } }
+        { table-border T{ rgba f 0.8 0.8 0.8 1.0 } }
     } ;
 
 ! Input history
