@@ -142,3 +142,8 @@ SYMBOL: history
 
 : inline-method-body ( #call word -- ? )
     2dup should-inline? [ inline-word t ] [ 2drop f ] if ;
+
+: always-inline-word? ( word -- ? )
+    { curry compose } memq? ;
+
+: always-inline-word ( #call word -- ? ) inline-word t ;

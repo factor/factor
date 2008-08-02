@@ -106,17 +106,12 @@ SYMBOL: enter-out
     '[ , prepend ] bi@
     <effect> ;
 
-: insert-copy ( effect -- )
-    in>> [ consume-d dup ] keep make-copies
-    [ nip output-d ] [ #copy, ] 2bi ;
-
 : call-recursive-inline-word ( word -- )
     dup "recursive" word-prop [
         [ required-stack-effect adjust-stack-effect ] [ ] [ recursive-label ] tri
-        [ 2drop insert-copy ]
         [ add-call drop ]
         [ nip '[ , #call-recursive, ] consume/produce ]
-        3tri
+        3bi
     ] [ undeclared-recursion-error inference-error ] if ;
 
 : inline-word ( word -- )

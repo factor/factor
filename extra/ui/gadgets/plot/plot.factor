@@ -47,12 +47,14 @@ M: function plot-function ( plot function -- plot )
     [ [ drop 0  ] [ y-min>> ] bi 2array ]
     [ [ drop 0  ] [ y-max>> ] bi 2array ] bi line* ;
 
-M: plot draw-gadget* ( plot -- )
-   dup call-next-method
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USING: ui.gadgets.slate ;
+
+M: plot draw-slate ( plot -- plot )
    2 glLineWidth
    draw-axis
    plot-functions
-   drop
    fill-mode
    1 glLineWidth ;
 
@@ -60,3 +62,76 @@ M: plot draw-gadget* ( plot -- )
 
 : add-function ( plot function -- plot )
   over functions>> swap suffix >>functions ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: x-span ( plot -- span ) [ x-max>> ] [ x-min>> ] bi - ;
+: y-span ( plot -- span ) [ y-max>> ] [ y-min>> ] bi - ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USING: ui.gestures ui.gadgets ;
+
+: left ( plot -- plot )
+  dup [ x-min>> ] [ x-span 1/10 * ] bi - >>x-min
+  dup [ x-max>> ] [ x-span 1/10 * ] bi - >>x-max
+  dup relayout-1 ;
+
+: right ( plot -- plot )
+  dup [ x-min>> ] [ x-span 1/10 * ] bi + >>x-min
+  dup [ x-max>> ] [ x-span 1/10 * ] bi + >>x-max
+  dup relayout-1 ;
+
+: down ( plot -- plot )
+  dup [ y-min>> ] [ y-span 1/10 * ] bi - >>y-min
+  dup [ y-max>> ] [ y-span 1/10 * ] bi - >>y-max
+  dup relayout-1 ;
+
+: up ( plot -- plot )
+  dup [ y-min>> ] [ y-span 1/10 * ] bi + >>y-min
+  dup [ y-max>> ] [ y-span 1/10 * ] bi + >>y-max
+  dup relayout-1 ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: zoom-in-horizontal ( plot -- plot )
+  dup [ x-min>> ] [ x-span 1/10 * ] bi + >>x-min
+  dup [ x-max>> ] [ x-span 1/10 * ] bi - >>x-max ;
+
+: zoom-in-vertical ( plot -- plot )
+  dup [ y-min>> ] [ y-span 1/10 * ] bi + >>y-min
+  dup [ y-max>> ] [ y-span 1/10 * ] bi - >>y-max ;
+
+: zoom-in ( plot -- plot )
+  zoom-in-horizontal
+  zoom-in-vertical
+  dup relayout-1 ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: zoom-out-horizontal ( plot -- plot )
+  dup [ x-min>> ] [ x-span 1/10 * ] bi - >>x-min
+  dup [ x-max>> ] [ x-span 1/10 * ] bi + >>x-max ;
+
+: zoom-out-vertical ( plot -- plot )
+  dup [ y-min>> ] [ y-span 1/10 * ] bi - >>y-min
+  dup [ y-max>> ] [ y-span 1/10 * ] bi + >>y-max ;
+
+: zoom-out ( plot -- plot )
+  zoom-out-horizontal
+  zoom-out-vertical
+  dup relayout-1 ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+plot
+  H{
+    { T{ mouse-enter } [ request-focus ] }
+    { T{ key-down f f "LEFT"  } [ left drop  ] }
+    { T{ key-down f f "RIGHT" } [ right drop ] }
+    { T{ key-down f f "DOWN"  } [ down drop  ] }
+    { T{ key-down f f "UP"    } [ up drop    ] }
+    { T{ key-down f f "a"     } [ zoom-in  drop ] }
+    { T{ key-down f f "z"     } [ zoom-out drop ] }
+  }
+set-gestures

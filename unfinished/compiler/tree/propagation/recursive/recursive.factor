@@ -1,10 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors arrays fry math.intervals
-combinators
+combinators namespaces
 stack-checker.inlining
 compiler.tree
 compiler.tree.copy-equiv
+compiler.tree.combinators
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
 compiler.tree.propagation.simple
@@ -21,16 +22,18 @@ IN: compiler.tree.propagation.recursive
 
 : generalize-counter-interval ( interval initial-interval -- interval' )
     {
-        { [ 2dup = ] [ empty-interval ] }
+        { [ 2dup interval-subset? ] [ empty-interval ] }
         { [ over empty-interval eq? ] [ empty-interval ] }
         { [ 2dup interval>= t eq? ] [ 1./0. [a,a] ] }
         { [ 2dup interval<= t eq? ] [ -1./0. [a,a] ] }
         [ [-inf,inf] ]
-    } cond nip interval-union ;
+    } cond interval-union nip ;
 
 : generalize-counter ( info' initial -- info )
-    [ drop clone ] [ [ interval>> ] bi@ ] 2bi
-    generalize-counter-interval >>interval ;
+    2dup [ class>> null-class? ] either? [ drop ] [
+        [ drop clone ] [ [ interval>> ] bi@ ] 2bi
+        generalize-counter-interval >>interval
+    ] if ;
 
 : unify-recursive-stacks ( stacks initial -- infos )
     over empty? [ nip ] [
@@ -46,28 +49,20 @@ IN: compiler.tree.propagation.recursive
     [ node-output-infos check-fixed-point drop ] 2keep
     out-d>> set-value-infos ;
 
-USING: namespaces math ;
-SYMBOL: iter-counter
-0 iter-counter set-global
 M: #recursive propagate-around ( #recursive -- )
-    iter-counter inc
-    iter-counter get 10 > [ "Oops" throw ] when
-    dup label>> t >>fixed-point drop [
-        [
-            copies [ clone ] change
-            constraints [ clone ] change
+    [
+        copies [ clone ] change
+        constraints [ clone ] change
 
-            child>>
-            [ first propagate-recursive-phi ]
-            [ (propagate) ]
-            bi
-        ] with-scope
-    ] [ dup label>> fixed-point>> [ drop ] [ propagate-around ] if ] bi ;
+        child>>
+        [ first propagate-recursive-phi ]
+        [ (propagate) ]
+        bi
+    ] until-fixed-point ;
 
 : generalize-return-interval ( info -- info' )
-    dup literal?>> [
-        clone [-inf,inf] >>interval
-    ] unless ;
+    dup [ literal?>> ] [ class>> null-class? ] bi or
+    [ clone [-inf,inf] >>interval ] unless ;
 
 : generalize-return ( infos -- infos' )
     [ generalize-return-interval ] map ;

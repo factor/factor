@@ -17,7 +17,7 @@ IN: compiler.tree.propagation.simple
 ! Propagation for straight-line code.
 
 M: #introduce propagate-before
-    value>> object <class-info> swap set-value-info ;
+    value>> object-info swap set-value-info ;
 
 M: #push propagate-before
     [ literal>> <literal-info> ] [ out-d>> first ] bi
@@ -67,21 +67,34 @@ M: #declare propagate-before
     bi* with-datastack
     [ <literal-info> ] map ;
 
+: predicate-output-infos ( info class -- info )
+    [ class>> ] dip {
+        { [ 2dup class<= ] [ t <literal-info> ] }
+        { [ 2dup classes-intersect? not ] [ f <literal-info> ] }
+        [ object-info ]
+    } cond 2nip ;
+
+: propagate-predicate ( #call word -- infos )
+    [ in-d>> first value-info ] [ "predicating" word-prop ] bi*
+    predicate-output-infos 1array ;
+
 : default-output-value-infos ( #call word -- infos )
     "default-output-classes" word-prop
-    [ class-infos ] [ out-d>> length object <class-info> <repetition> ] ?if ;
+    [ class-infos ] [ out-d>> length object-info <repetition> ] ?if ;
 
 : output-value-infos ( #call word -- infos )
     {
         { [ 2dup foldable-call? ] [ fold-call ] }
         { [ dup tuple-constructor? ] [ propagate-tuple-constructor ] }
         { [ dup sequence-constructor? ] [ propagate-sequence-constructor ] }
+        { [ dup predicate? ] [ propagate-predicate ] }
         { [ dup +outputs+ word-prop ] [ call-outputs-quot ] }
         [ default-output-value-infos ]
     } cond ;
 
 : do-inlining ( #call word -- ? )
     {
+        { [ dup always-inline-word? ] [ always-inline-word ] }
         { [ dup standard-generic? ] [ inline-standard-method ] }
         { [ dup math-generic? ] [ inline-math-method ] }
         { [ dup math-partial? ] [ inline-math-partial ] }

@@ -3,7 +3,8 @@
 USING: arrays hashtables io kernel math math.parser memory
 namespaces parser lexer sequences strings io.styles
 vectors words generic system combinators continuations debugger
-definitions compiler.units accessors ;
+definitions compiler.units accessors colors ;
+
 IN: listener
 
 SYMBOL: quit-flag
@@ -41,7 +42,7 @@ M: object stream-read-quot
 
 : prompt. ( -- )
     "( " in get " )" 3append
-    H{ { background { 1 0.7 0.7 1 } } } format bl flush ;
+    H{ { background T{ rgba f 1 0.7 0.7 1 } } } format bl flush ;
 
 SYMBOL: error-hook
 

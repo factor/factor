@@ -5,7 +5,7 @@ hashtables io assocs kernel math namespaces sequences strings
 sbufs io.styles vectors words prettyprint.config
 prettyprint.sections quotations io io.files math.parser effects
 classes.tuple math.order classes.tuple.private classes
-combinators ;
+combinators colors ;
 IN: prettyprint.backend
 
 GENERIC: pprint* ( obj -- )
@@ -89,7 +89,7 @@ M: f pprint* drop \ f pprint-word ;
 : string-style ( obj -- hash )
     [
         presented set
-        { 0.3 0.3 0.3 1.0 } foreground set
+        T{ rgba f 0.3 0.3 0.3 1.0 } foreground set
     ] H{ } make-assoc ;
 
 : unparse-string ( str prefix suffix -- str )

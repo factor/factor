@@ -166,19 +166,6 @@ M: object xyz ;
     \ +-integer-fixnum inlined?
 ] unit-test
 
-
-[ t ] [
-    [ { string sbuf } declare ] \ push-all def>> append \ + inlined?
-] unit-test
-
-[ t ] [
-    [ { string sbuf } declare ] \ push-all def>> append \ fixnum+ inlined?
-] unit-test
-
-[ t ] [
-    [ { string sbuf } declare ] \ push-all def>> append \ >fixnum inlined?
-] unit-test
-
 [ t ] [
     [ { array-capacity } declare 0 < ] \ < inlined?
 ] unit-test
@@ -208,17 +195,17 @@ GENERIC: annotate-entry-test-1 ( x -- )
 
 M: fixnum annotate-entry-test-1 drop ;
 
-: (annotate-entry-test-2) ( from to quot: ( -- ) -- )
-    2over >= [
-        3drop
+: (annotate-entry-test-2) ( from to -- )
+    2dup >= [
+        2drop
     ] [
-        [ swap >r call dup annotate-entry-test-1 1+ r> ] keep (annotate-entry-test-2)
+        >r dup annotate-entry-test-1 1+ r> (annotate-entry-test-2)
     ] if ; inline recursive
 
 : annotate-entry-test-2 0 -rot (annotate-entry-test-2) ; inline
 
 [ f ] [
-    [ { bignum } declare [ ] annotate-entry-test-2 ]
+    [ { bignum } declare annotate-entry-test-2 ]
     \ annotate-entry-test-1 inlined?
 ] unit-test
 
@@ -277,11 +264,6 @@ cell-bits 32 = [
     ] unit-test
 ] when
 
-[ f ] [
-    [ { integer } declare -63 shift 4095 bitand ]
-    \ shift inlined?
-] unit-test
-
 [ t ] [
     [ B{ 1 0 } *short 0 number= ]
     \ number= inlined?
@@ -328,36 +310,6 @@ cell-bits 32 = [
     ] \ + inlined?
 ] unit-test
 
-[ f ] [
-    [
-        256 mod
-    ] { mod fixnum-mod } inlined?
-] unit-test
-
-[ f ] [
-    [
-        dup 0 >= [ 256 mod ] when
-    ] { mod fixnum-mod } inlined?
-] unit-test
-
-[ t ] [
-    [
-        { integer } declare dup 0 >= [ 256 mod ] when
-    ] { mod fixnum-mod } inlined?
-] unit-test
-
-[ t ] [
-    [
-        { integer } declare 256 rem
-    ] { mod fixnum-mod } inlined?
-] unit-test
-
-[ t ] [
-    [
-        { integer } declare [ 256 rem ] map
-    ] { mod fixnum-mod rem } inlined?
-] unit-test
-
 [ t ] [
     [ 1000 [ 1+ ] map ] { 1+ fixnum+ } inlined?
 ] unit-test
@@ -393,21 +345,6 @@ cell-bits 32 = [
     [ 27/2 fib ] { < - } inlined?
 ] unit-test
 
-: hang-regression ( m n -- x )
-    over 0 number= [
-        nip
-    ] [
-        dup [
-            drop 1 hang-regression
-        ] [
-            dupd hang-regression hang-regression
-        ] if
-    ] if ; inline recursive
-
-[ t ] [
-    [ dup fixnum? [ 3 over hang-regression ] [ 3 over hang-regression ] if
-] { } inlined? ] unit-test
-
 [ t ] [
     [ { fixnum } declare 10 [ -1 shift ] times ] \ shift inlined?
 ] unit-test
@@ -419,16 +356,6 @@ cell-bits 32 = [
 [ f ] [
     [ { fixnum } declare 1048575 fixnum-bitand 524288 fixnum- ]
     \ fixnum-bitand inlined?
-] unit-test
-
-[ t ] [
-    [ { integer } declare 127 bitand 3 + ]
-    { + +-integer-fixnum +-integer-fixnum-fast bitand } inlined?
-] unit-test
-
-[ f ] [
-    [ { integer } declare 127 bitand 3 + ]
-    { >fixnum } inlined?
 ] unit-test
 
 [ t ] [
@@ -448,28 +375,12 @@ cell-bits 32 = [
 
 [ t ] [
     [ { fixnum } declare 0 [ + ] reduce ]
-    { < <-integer-fixnum } inlined?
+    { < <-integer-fixnum nth-unsafe } inlined?
 ] unit-test
 
 [ f ] [
     [ { fixnum } declare 0 [ + ] reduce ]
     \ +-integer-fixnum inlined?
-] unit-test
-
-[ t ] [
-    [
-        { integer } declare
-        dup 0 >= [
-            615949 * 797807 + 20 2^ mod dup 19 2^ -
-        ] [ dup ] if
-    ] { * + shift mod fixnum-mod fixnum* fixnum+ fixnum- } inlined?
-] unit-test
-
-[ t ] [
-    [
-        { fixnum } declare
-        615949 * 797807 + 20 2^ mod dup 19 2^ -
-    ] { >fixnum } inlined?
 ] unit-test
 
 [ f ] [
@@ -488,56 +399,6 @@ cell-bits 32 = [
     [
         { integer } declare 1 + { } set-nth-unsafe
     ] \ >fixnum inlined?
-] unit-test
-
-[ t ] [
-    [
-        { integer } declare 0 swap
-        [
-            drop 615949 * 797807 + 20 2^ rem dup 19 2^ -
-        ] map
-    ] { * + shift rem mod fixnum-mod fixnum* fixnum+ fixnum- } inlined?
-] unit-test
-
-[ t ] [
-    [
-        { fixnum } declare 0 swap
-        [
-            drop 615949 * 797807 + 20 2^ rem dup 19 2^ -
-        ] map
-    ] { * + shift rem mod fixnum-mod fixnum* fixnum+ fixnum- >fixnum } inlined?
-] unit-test
-
-[ t ] [
-    [ hashtable new ] \ new inlined?
-] unit-test
-
-[ t ] [
-    [ dup hashtable eq? [ new ] when ] \ new inlined?
-] unit-test
-
-[ t ] [
-    [ { hashtable } declare hashtable instance? ] \ instance? inlined?
-] unit-test
-
-[ t ] [
-    [ { vector } declare hashtable instance? ] \ instance? inlined?
-] unit-test
-
-[ f ] [
-    [ { assoc } declare hashtable instance? ] \ instance? inlined?
-] unit-test
-
-TUPLE: declared-fixnum { x fixnum } ;
-
-[ t ] [
-    [ { declared-fixnum } declare [ 1 + ] change-x ]
-    { + fixnum+ >fixnum } inlined?
-] unit-test
-
-[ t ] [
-    [ { declared-fixnum } declare x>> drop ]
-    { slot } inlined?
 ] unit-test
 
 [ t ] [
@@ -564,12 +425,6 @@ TUPLE: declared-fixnum { x fixnum } ;
 ] unit-test
 
 [ t ] [ [ { 1 2 } length ] { length length>> slot } inlined? ] unit-test
-
-[ t ] [
-    [
-        { integer } declare [ 256 mod ] map
-    ] { mod fixnum-mod } inlined?
-] unit-test
 
 [ t ] [
     [
