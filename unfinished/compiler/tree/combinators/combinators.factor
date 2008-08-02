@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry kernel accessors sequences sequences.deep
+USING: fry kernel accessors sequences sequences.deep arrays
 compiler.tree ;
 IN: compiler.tree.combinators
 
@@ -44,3 +44,9 @@ IN: compiler.tree.combinators
 
 : select-children ( seq flags -- seq' )
     [ [ drop f ] unless ] 2map ;
+
+: (3each) [ 3array flip ] dip [ first3 ] prepose ; inline
+
+: 3each ( seq1 seq2 seq3 quot -- seq ) (3each) each ; inline
+
+: 3map ( seq1 seq2 seq3 quot -- seq ) (3each) map ; inline

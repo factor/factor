@@ -17,7 +17,7 @@ M: f #return-recursive, 3drop ;
 M: f #terminate, drop ;
 M: f #if, 3drop ;
 M: f #dispatch, 2drop ;
-M: f #phi, 2drop 2drop ;
+M: f #phi, drop drop drop drop drop ;
 M: f #declare, drop ;
 M: f #recursive, 2drop 2drop ;
 M: f #copy, 2drop ;
