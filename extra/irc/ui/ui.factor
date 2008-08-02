@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 
 USING: accessors kernel threads combinators concurrency.mailboxes
-       sequences strings hashtables splitting fry assocs hashtables
+       sequences strings hashtables splitting fry assocs hashtables colors
        ui ui.gadgets ui.gadgets.panes ui.gadgets.editors
        ui.gadgets.scrollers ui.commands ui.gadgets.frames ui.gestures
        ui.gadgets.tabs ui.gadgets.grids ui.gadgets.packs ui.gadgets.labels
@@ -24,14 +24,8 @@ TUPLE: irc-tab < frame listener client userlist ;
 
 : write-color ( str color -- )
     foreground associate format ;
-: red { 0.5 0 0 1 } ;
-: green { 0 0.5 0 1 } ;
-: blue { 0 0 1 1 } ;
-: black { 0 0 0 1 } ;
-
-: colors H{ { +operator+ { 0 0.5 0 1 } }
-            { +voice+ { 0 0 1 1 } }
-            { +normal+ { 0 0 0 1 } } } ;
+: dark-red T{ rgba f 0.5 0.0 0.0 1 } ;
+: dark-green T{ rgba f 0.0 0.5 0.0 1 } ;
 
 : dot-or-parens ( string -- string )
     dup empty? [ drop "." ]
@@ -65,21 +59,21 @@ M: own-message write-irc
     message>> write ;
 
 M: join write-irc
-    "* " green write-color
+    "* " dark-green write-color
     prefix>> parse-name write
-    " has entered the channel." green write-color ;
+    " has entered the channel." dark-green write-color ;
 
 M: part write-irc
-    "* " red write-color
+    "* " dark-red write-color
     [ prefix>> parse-name write ] keep
-    " has left the channel" red write-color
-    trailing>> dot-or-parens red write-color ;
+    " has left the channel" dark-red write-color
+    trailing>> dot-or-parens dark-red write-color ;
 
 M: quit write-irc
-    "* " red write-color
+    "* " dark-red write-color
     [ prefix>> parse-name write ] keep
-    " has left IRC" red write-color
-    trailing>> dot-or-parens red write-color ;
+    " has left IRC" dark-red write-color
+    trailing>> dot-or-parens dark-red write-color ;
 
 : full-mode ( message -- mode )
     parameters>> rest " " sjoin ;
@@ -97,13 +91,13 @@ M: unhandled write-irc
     line>> blue write-color ;
 
 M: irc-end write-irc
-    drop "* You have left IRC" red write-color ;
+    drop "* You have left IRC" dark-red write-color ;
 
 M: irc-disconnected write-irc
-    drop "* Disconnected" red write-color ;
+    drop "* Disconnected" dark-red write-color ;
 
 M: irc-connected write-irc
-    drop "* Connected" green write-color ;
+    drop "* Connected" dark-green write-color ;
 
 M: irc-listener-end write-irc
     drop ;
@@ -130,7 +124,7 @@ GENERIC: handle-inbox ( tab message -- )
 : update-participants ( tab -- )
     [ userlist>> [ clear-gadget ] keep ]
     [ listener>> participants>> ] bi
-    [ +operator+ green filter-participants ]
+    [ +operator+ dark-green filter-participants ]
     [ +voice+ blue filter-participants ]
     [ +normal+ black filter-participants ] tri drop ;
 
