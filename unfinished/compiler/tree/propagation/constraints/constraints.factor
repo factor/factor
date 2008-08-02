@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs math math.intervals kernel accessors
-sequences namespaces disjoint-sets classes classes.algebra
+sequences namespaces classes classes.algebra
 combinators words
 compiler.tree compiler.tree.propagation.info
 compiler.tree.copy-equiv ;

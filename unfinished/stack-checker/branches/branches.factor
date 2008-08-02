@@ -58,9 +58,17 @@ SYMBOL: quotations
     unify-branches
     [ drop ] [ ] [ dup >vector meta-r set ] tri* ;
 
+: terminated-phi ( seq -- terminated )
+    terminated? branch-variable ;
+
 : compute-phi-function ( seq -- )
     [ quotation active-variable sift quotations set ]
-    [ [ datastack-phi ] [ retainstack-phi ] bi #phi, ]
+    [
+        [ datastack-phi ]
+        [ retainstack-phi ]
+        [ terminated-phi ]
+        tri #phi,
+    ]
     [ [ terminated? swap at ] all? terminated? set ]
     tri ;
 

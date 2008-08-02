@@ -201,6 +201,12 @@ generic-comparison-ops [
     [ class>> ] bi@ classes-intersect? ;
 
 \ eq? [
+    over value-info literal>> fixnum? [
+        [ value-info literal>> is-equal-to ] dip t-->
+    ] [ 3drop f ] if
+] +constraints+ set-word-prop
+
+\ eq? [
     [ info-intervals-intersect? ]
     [ info-classes-intersect? ]
     2bi or maybe-or-never

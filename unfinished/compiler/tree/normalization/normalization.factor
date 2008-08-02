@@ -9,8 +9,9 @@ IN: compiler.tree.normalization
 ! fix up some oddities in the tree output by the stack checker:
 !
 ! - We rewrite the code is that #introduce nodes only appear
-! at the top level, and not inside #recursive. This enables more
-! accurate type inference for 'row polymorphic' combinators.
+! at the beginning of a program, never having #introduce follow
+! any other type of node or appear inside a #branch or
+! #recursive. This simplifies some types of analysis.
 !
 ! - We collect #return-recursive and #call-recursive nodes and
 ! store them in the #recursive's label slot.
@@ -46,6 +47,10 @@ M: #branch count-introductions*
     [ count-introductions ] map supremum
     introductions [ + ] change ;
 
+M: #recursive count-introductions*
+    [ label>> ] [ child>> count-introductions ] bi
+    >>introductions drop ;
+
 M: node count-introductions* drop ;
 
 ! Collect label info
@@ -58,18 +63,16 @@ M: #call-recursive collect-label-info
     dup label>> calls>> push ;
 
 M: #recursive collect-label-info
-    [ label>> V{ } clone >>calls ]
-    [ child>> count-introductions ]
-    bi >>introductions drop ;
+    label>> V{ } clone >>calls drop ;
 
 M: node collect-label-info drop ;
 
 ! Eliminate introductions
 SYMBOL: introduction-stack
 
-: fixup-enter-recursive ( recursive -- )
+: fixup-enter-recursive ( introductions recursive -- )
     [ child>> first ] [ in-d>> ] bi >>in-d
-    [ introduction-stack get prepend ] change-out-d
+    [ append ] change-out-d
     drop ;
 
 GENERIC: eliminate-introductions* ( node -- node' )
@@ -93,23 +96,37 @@ M: #branch eliminate-introductions*
     [ [ length ] map infimum introduction-stack [ swap head ] change ]
     bi ;
 
+: eliminate-phi-introductions ( introductions seq terminated -- seq' )
+    [ flip ] dip [ [ nip ] [ over length tail append ] if ] 3map flip ;
+
 M: #phi eliminate-introductions*
-    remaining-introductions get swap
-    [ flip [ over length tail append ] 2map flip ] change-phi-in-d ;
+    remaining-introductions get swap dup terminated>>
+    '[ , eliminate-phi-introductions ] change-phi-in-d ;
 
 M: node eliminate-introductions* ;
 
-: eliminate-introductions ( recursive n -- )
-    make-values introduction-stack [
-        [ fixup-enter-recursive ]
-        [ child>> [ eliminate-introductions* ] change-each ] bi
+: eliminate-introductions ( nodes introductions -- nodes )
+    introduction-stack [
+        [ eliminate-introductions* ] map
     ] with-variable ;
+
+: eliminate-toplevel-introductions ( nodes -- nodes' )
+    dup count-introductions make-values
+    [ nip [ #introduce ] map ] [ eliminate-introductions ] 2bi
+    append ;
+
+: eliminate-recursive-introductions ( recursive n -- )
+    make-values
+    [ swap fixup-enter-recursive ]
+    [ '[ , eliminate-introductions ] change-child drop ]
+    2bi ;
 
 ! Normalize
 GENERIC: normalize* ( node -- node' )
 
 M: #recursive normalize*
-    dup dup label>> introductions>> eliminate-introductions ;
+    dup dup label>> introductions>>
+    eliminate-recursive-introductions ;
 
 : unchanged-underneath ( #call-recursive -- n )
     [ out-d>> length ] [ label>> return>> in-d>> length ] bi - ;
@@ -123,6 +140,6 @@ M: #call-recursive normalize*
 M: node normalize* ;
 
 : normalize ( nodes -- nodes' )
-    [ [ collect-label-info ] each-node ]
-    [ [ normalize* ] map-nodes ]
-    bi ;
+    dup [ collect-label-info ] each-node
+    eliminate-toplevel-introductions
+    [ normalize* ] map-nodes ;

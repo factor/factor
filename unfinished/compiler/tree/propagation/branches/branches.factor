@@ -43,18 +43,17 @@ SYMBOL: infer-children-data
     value-infos [ clone ] change
     constraints [ clone ] change ;
 
+: no-value-info ( -- )
+    value-infos off
+    constraints off ;
+
 : infer-children ( node -- )
     [ live-children ] [ child-constraints ] bi [
         [
-            over [
-                copy-value-info
-                assume
-                (propagate)
-            ] [
-                2drop
-                value-infos off
-                constraints off
-            ] if
+            over
+            [ copy-value-info assume (propagate) ]
+            [ 2drop no-value-info ]
+            if
         ] H{ } make-assoc
     ] 2map infer-children-data set ;
 
