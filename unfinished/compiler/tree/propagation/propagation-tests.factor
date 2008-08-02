@@ -324,6 +324,10 @@ cell-bits 32 = [
 
 [ V{ t } ] [ [ [ 1 f <array> ] [ 2 f <array> ] if length 3 < ] final-literals ] unit-test
 
+[ V{ 10 } ] [
+    [ { fixnum } declare dup 10 = [ "A" throw ] unless ] final-literals
+] unit-test
+
 ! Slot propagation
 TUPLE: prop-test-tuple { x integer } ;
 
@@ -527,4 +531,8 @@ M: array iterate first t ;
 
 [ V{ fixnum } ] [
     [ { fixnum fixnum } declare [ nth-unsafe ] curry call ] final-classes
+] unit-test
+
+[ V{ f } ] [
+    [ 10 eq? [ drop 3 ] unless ] final-literals
 ] unit-test
