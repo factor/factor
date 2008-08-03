@@ -14,5 +14,6 @@ IN: compiler.tree.escape-analysis
 : escape-analysis ( node -- node )
     H{ } clone slot-merging set
     H{ } clone allocations set
+    H{ } clone disqualified set
     <hashed-dlist> work-list set
     dup (escape-analysis) ;

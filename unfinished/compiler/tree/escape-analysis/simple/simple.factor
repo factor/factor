@@ -24,6 +24,9 @@ IN: compiler.tree.escape-analysis.simple
     [ in-d>> first ] tri
     over fixnum? [ [ 3 - ] dip record-slot-access ] [ 3drop ] if ;
 
+: add-escaping-values ( values -- )
+    [ allocation [ disqualify ] each ] each ;
+
 M: #call escape-analysis*
     dup word>> {
         { \ <tuple-boa> [ record-tuple-allocation ] }

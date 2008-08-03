@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs namespaces sequences kernel math
+USING: assocs namespaces sequences kernel math combinators sets
 stack-checker.state compiler.tree.copy-equiv ;
 IN: compiler.tree.escape-analysis.allocations
 
@@ -13,7 +13,11 @@ SYMBOL: allocations
     resolve-copy allocations get at ;
 
 : record-allocation ( allocation value -- )
-    allocations get set-at ;
+    {
+        { [ dup not ] [ 2drop ] }
+        { [ over not ] [ allocations get delete-at drop ] }
+        [ allocations get set-at ]
+    } cond ;
 
 : record-allocations ( allocations values -- )
     [ record-allocation ] 2each ;
@@ -25,4 +29,20 @@ SYMBOL: allocations
 SYMBOL: slot-merging
 
 : merge-slots ( values -- value )
-    <value> [ introduce-value ] [ slot-merging get set-at ] [ ] tri ;
+    dup [ ] contains? [
+        <value>
+        [ introduce-value ]
+        [ slot-merging get set-at ]
+        [ ] tri
+    ] [ drop f ] if ;
+
+! If an allocation's slot appears in this set, the allocation
+! is disqualified from unboxing.
+SYMBOL: disqualified
+
+: disqualify ( slot-value -- )
+    [ disqualified get conjoin ]
+    [ slot-merging get at [ disqualify ] each ] bi ;
+
+: escaping-allocation? ( value -- ? )
+    allocation [ [ disqualified get key? ] contains? ] [ t ] if* ;
