@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel namespaces sequences
+USING: accessors kernel namespaces sequences sets
+stack-checker.branches
 compiler.tree
 compiler.tree.propagation.branches
 compiler.tree.escape-analysis.nodes
@@ -12,6 +13,9 @@ SYMBOL: children-escape-data
 M: #branch escape-analysis*
     live-children sift [ (escape-analysis) ] each ;
 
+: disqualify-allocations ( allocations -- )
+    [ [ disqualify ] each ] each ;
+
 : (merge-allocations) ( values -- allocation )
     [
         [ allocation ] map dup [ ] all? [
@@ -19,8 +23,8 @@ M: #branch escape-analysis*
                 flip
                 [ (merge-allocations) ] [ [ merge-slots ] map ] bi
                 [ record-allocations ] keep
-            ] [ drop f ] if
-        ] [ drop f ] if
+            ] [ disqualify-allocations f ] if
+        ] [ disqualify-allocations f ] if
     ] map ;
 
 : merge-allocations ( in-values out-values -- )

@@ -6,7 +6,6 @@ combinators dequeues search-dequeues namespaces fry
 compiler.tree
 compiler.tree.propagation.info
 compiler.tree.escape-analysis.nodes
-compiler.tree.escape-analysis.work-list
 compiler.tree.escape-analysis.allocations ;
 IN: compiler.tree.escape-analysis.simple
 
@@ -23,6 +22,9 @@ IN: compiler.tree.escape-analysis.simple
     [ dup in-d>> second node-value-info literal>> ]
     [ in-d>> first ] tri
     over fixnum? [ [ 3 - ] dip record-slot-access ] [ 3drop ] if ;
+
+: add-escaping-values ( values -- )
+    [ allocation [ disqualify ] each ] each ;
 
 M: #call escape-analysis*
     dup word>> {
