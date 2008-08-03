@@ -3,17 +3,16 @@
 USING: kernel namespaces search-dequeues
 compiler.tree
 compiler.tree.def-use
+compiler.tree.escape-analysis.graph
 compiler.tree.escape-analysis.allocations
 compiler.tree.escape-analysis.recursive
 compiler.tree.escape-analysis.branches
 compiler.tree.escape-analysis.nodes
-compiler.tree.escape-analysis.simple
-compiler.tree.escape-analysis.work-list ;
+compiler.tree.escape-analysis.simple ;
 IN: compiler.tree.escape-analysis
 
 : escape-analysis ( node -- node )
-    H{ } clone slot-merging set
     H{ } clone allocations set
-    H{ } clone disqualified set
-    <hashed-dlist> work-list set
-    dup (escape-analysis) ;
+    <graph> slot-graph set
+    dup (escape-analysis)
+    compute-escaping-allocations ;

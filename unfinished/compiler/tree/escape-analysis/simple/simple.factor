@@ -6,7 +6,6 @@ combinators dequeues search-dequeues namespaces fry
 compiler.tree
 compiler.tree.propagation.info
 compiler.tree.escape-analysis.nodes
-compiler.tree.escape-analysis.work-list
 compiler.tree.escape-analysis.allocations ;
 IN: compiler.tree.escape-analysis.simple
 

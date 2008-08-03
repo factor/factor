@@ -5,7 +5,7 @@ compiler.tree.normalization compiler.tree.copy-equiv
 compiler.tree.propagation compiler.tree.cleanup
 compiler.tree.combinators compiler.tree sequences math
 kernel tools.test accessors slots.private quotations.private
-prettyprint ;
+prettyprint classes.tuple.private ;
 
 \ escape-analysis must-infer
 
@@ -19,9 +19,9 @@ prettyprint ;
     0 swap [
         dup #call?
         [
-            out-d>> dup empty? [ drop ] [
-                first escaping-allocation? [ 1+ ] unless
-            ] if
+            dup word>> \ <tuple-boa> = [
+                out-d>> first escaping-allocation? [ 1+ ] unless
+            ] [ drop ] if
         ] [ drop ] if
     ] each-node ;
 
