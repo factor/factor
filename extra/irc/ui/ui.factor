@@ -3,12 +3,13 @@
 
 USING: accessors kernel threads combinators concurrency.mailboxes
        sequences strings hashtables splitting fry assocs hashtables colors
+       sorting qualified unicode.case math.order
        ui ui.gadgets ui.gadgets.panes ui.gadgets.editors
        ui.gadgets.scrollers ui.commands ui.gadgets.frames ui.gestures
        ui.gadgets.tabs ui.gadgets.grids ui.gadgets.packs ui.gadgets.labels
        io io.styles namespaces calendar calendar.format models continuations
        irc.client irc.client.private irc.messages irc.messages.private
-       irc.ui.commandparser irc.ui.load qualified ;
+       irc.ui.commandparser irc.ui.load ;
 
 RENAME: join sequences => sjoin
 
@@ -86,6 +87,12 @@ M: mode write-irc
     " to " blue write-color
     channel>> write ;
 
+M: nick write-irc
+    "* " blue write-color
+    [ prefix>> parse-name write ] keep
+    " is now known as " blue write-color
+    trailing>> write ;
+
 M: unhandled write-irc
     "UNHANDLED: " write
     line>> blue write-color ;
@@ -118,15 +125,18 @@ M: irc-message write-irc
 
 GENERIC: handle-inbox ( tab message -- )
 
-: filter-participants ( pack alist val color -- pack )
-   '[ , = [ <label> , >>color add-gadget ] [ drop ] if ] assoc-each ;
+: value-labels ( assoc val -- seq )
+    '[ nip , = ] assoc-filter keys [ >lower <=> ] sort [ <label> ] map ;
+
+: add-gadget-color ( pack seq color -- pack )
+    '[ , >>color add-gadget ] each ;
 
 : update-participants ( tab -- )
     [ userlist>> [ clear-gadget ] keep ]
     [ listener>> participants>> ] bi
-    [ +operator+ dark-green filter-participants ]
-    [ +voice+ blue filter-participants ]
-    [ +normal+ black filter-participants ] tri drop ;
+    [ +operator+ value-labels dark-green add-gadget-color ]
+    [ +voice+ value-labels blue add-gadget-color ]
+    [ +normal+ value-labels black add-gadget-color ] tri drop ;
 
 M: participant-changed handle-inbox
     drop update-participants ;
