@@ -5,9 +5,24 @@ compiler.tree.normalization compiler.tree.copy-equiv
 compiler.tree.propagation compiler.tree.cleanup
 compiler.tree.combinators compiler.tree sequences math
 kernel tools.test accessors slots.private quotations.private
-prettyprint classes.tuple.private ;
+prettyprint classes.tuple.private classes classes.tuple ;
 
 \ escape-analysis must-infer
+
+GENERIC: count-unboxed-allocations* ( m node -- n )
+
+: (count-unboxed-allocations) ( m node -- n )
+    out-d>> first escaping-allocation? [ 1+ ] unless ;
+
+M: #call count-unboxed-allocations*
+    dup word>> \ <tuple-boa> =
+    [ (count-unboxed-allocations) ] [ drop ] if ;
+
+M: #push count-unboxed-allocations*
+    dup literal>> class immutable-tuple-class?
+    [ (count-unboxed-allocations) ] [ drop ] if ;
+
+M: node count-unboxed-allocations* drop ;
 
 : count-unboxed-allocations ( quot -- sizes )
     build-tree
@@ -16,14 +31,7 @@ prettyprint classes.tuple.private ;
     propagate
     cleanup
     escape-analysis
-    0 swap [
-        dup #call?
-        [
-            dup word>> \ <tuple-boa> = [
-                out-d>> first escaping-allocation? [ 1+ ] unless
-            ] [ drop ] if
-        ] [ drop ] if
-    ] each-node ;
+    0 swap [ count-unboxed-allocations* ] each-node ;
 
 [ 0 ] [ [ [ + ] curry ] count-unboxed-allocations ] unit-test
 
@@ -126,5 +134,26 @@ TUPLE: cons { car read-only } { cdr read-only } ;
                 4 cons boa
             ] if
         ] if drop
+    ] count-unboxed-allocations
+] unit-test
+
+[ 2 ] [
+    [
+        [ dup cons boa ] [ drop 1 2 cons boa ] if car>>
+    ] count-unboxed-allocations
+] unit-test
+
+[ 2 ] [
+    [
+        3dup
+        [ cons boa ] [ cons boa 3 cons boa ] if
+        [ car>> ] [ cdr>> ] bi
+    ] count-unboxed-allocations
+] unit-test
+
+[ 2 ] [
+    [
+        3dup [ cons boa ] [ cons boa . 1 2 cons boa ] if
+        [ car>> ] [ cdr>> ] bi
     ] count-unboxed-allocations
 ] unit-test
