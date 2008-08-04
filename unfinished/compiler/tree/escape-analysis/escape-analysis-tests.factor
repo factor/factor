@@ -30,6 +30,7 @@ M: node count-unboxed-allocations* drop ;
     compute-copy-equiv
     propagate
     cleanup
+    compute-copy-equiv
     escape-analysis
     0 swap [ count-unboxed-allocations* ] each-node ;
 
@@ -155,5 +156,34 @@ TUPLE: cons { car read-only } { cdr read-only } ;
     [
         3dup [ cons boa ] [ cons boa . 1 2 cons boa ] if
         [ car>> ] [ cdr>> ] bi
+    ] count-unboxed-allocations
+] unit-test
+
+[ 1 ] [
+    [ [ 3 cons boa ] [ "A" throw ] if car>> ]
+    count-unboxed-allocations
+] unit-test
+
+[ 0 ] [
+    [ 10 [ drop ] each-integer ] count-unboxed-allocations
+] unit-test
+
+[ 2 ] [
+    [
+        1 2 cons boa 10 [ 2drop 1 2 cons boa ] each-integer car>>
+    ] count-unboxed-allocations
+] unit-test
+
+[ 0 ] [
+    [
+        1 2 cons boa 10 [ drop 2 cons boa ] each-integer car>>
+    ] count-unboxed-allocations
+] unit-test
+
+: infinite-cons-loop ( a -- b ) 2 cons boa infinite-cons-loop ; inline recursive
+
+[ 0 ] [
+    [
+        1 2 cons boa infinite-cons-loop
     ] count-unboxed-allocations
 ] unit-test
