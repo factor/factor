@@ -3,7 +3,7 @@
 
 USING: accessors kernel threads combinators concurrency.mailboxes
        sequences strings hashtables splitting fry assocs hashtables colors
-       sorting qualified unicode.case math.order
+       sorting qualified unicode.collation math.order
        ui ui.gadgets ui.gadgets.panes ui.gadgets.editors
        ui.gadgets.scrollers ui.commands ui.gadgets.frames ui.gestures
        ui.gadgets.tabs ui.gadgets.grids ui.gadgets.packs ui.gadgets.labels
@@ -76,6 +76,14 @@ M: quit write-irc
     " has left IRC" dark-red write-color
     trailing>> dot-or-parens dark-red write-color ;
 
+M: kick write-irc
+    "* " dark-red write-color
+    [ prefix>> parse-name write ] keep
+    " has kicked " dark-red write-color
+    [ who>> write ] keep
+    " from the channel" dark-red write-color
+    trailing>> dot-or-parens dark-red write-color ;
+
 : full-mode ( message -- mode )
     parameters>> rest " " sjoin ;
 
@@ -126,7 +134,7 @@ M: irc-message write-irc
 GENERIC: handle-inbox ( tab message -- )
 
 : value-labels ( assoc val -- seq )
-    '[ nip , = ] assoc-filter keys [ >lower <=> ] sort [ <label> ] map ;
+    '[ nip , = ] assoc-filter keys sort-strings [ <label> ] map ;
 
 : add-gadget-color ( pack seq color -- pack )
     '[ , >>color add-gadget ] each ;
