@@ -10,12 +10,16 @@ compiler.tree.escape-analysis.allocations ;
 IN: compiler.tree.escape-analysis.recursive
 
 : congruent? ( alloc1 alloc2 -- ? )
-    2dup [ length ] bi@ = [
-        [ [ allocation ] bi@ congruent? ] 2all?
-    ] [ 2drop f ] if ;
+    {
+        { [ 2dup [ f eq? ] either? ] [ eq? ] }
+        { [ 2dup [ t eq? ] either? ] [ eq? ] }
+        { [ 2dup [ length ] bi@ = not ] [ 2drop f ] }
+        [ [ [ allocation ] bi@ congruent? ] 2all? ]
+    } cond ;
 
 : check-fixed-point ( node alloc1 alloc2 -- node )
-    congruent? [ dup label>> f >>fixed-point drop ] unless ; inline
+    [ congruent? ] 2all?
+    [ dup label>> f >>fixed-point drop ] unless ; inline
 
 : node-input-allocations ( node -- allocations )
     in-d>> [ allocation ] map ;
@@ -27,13 +31,18 @@ IN: compiler.tree.escape-analysis.recursive
     [ label>> calls>> [ in-d>> ] map ] [ in-d>> ] bi suffix ;
 
 : analyze-recursive-phi ( #enter-recursive -- )
-    [ ] [ recursive-stacks flip (merge-allocations) ] [ out-d>> ] tri
-    [ [ allocation ] map check-fixed-point drop ] 2keep
-    record-allocations ;
+    [ ] [ recursive-stacks flip ] [ out-d>> ] tri
+    [ [ merge-values ] 2each ]
+    [
+        [ (merge-allocations) ] dip
+        [ [ allocation ] map check-fixed-point drop ]
+        [ record-allocations ]
+        2bi
+    ] 2bi ;
 
 M: #recursive escape-analysis* ( #recursive -- )
     [
-        copies [ clone ] change
+        ! copies [ clone ] change
 
         child>>
         [ first analyze-recursive-phi ]

@@ -10,12 +10,21 @@ compiler.tree.escape-analysis.nodes
 compiler.tree.escape-analysis.allocations ;
 IN: compiler.tree.escape-analysis.simple
 
+M: #introduce escape-analysis*
+    value>> unknown-allocation ;
+
+: record-literal-allocation ( value object -- )
+    dup class immutable-tuple-class? [
+        tuple-slots rest-slice
+        [ <slot-value> [ swap record-literal-allocation ] keep ] map
+        swap record-allocation
+    ] [
+        drop unknown-allocation
+    ] if ;
+
 M: #push escape-analysis*
     #! Delegation.
-    dup literal>> dup class immutable-tuple-class? [
-        tuple-slots length 1- [ <slot-value> ] replicate
-        swap out-d>> first record-allocation
-    ] [ 2drop ] if ;
+    [ out-d>> first ] [ literal>> ] bi record-literal-allocation ;
 
 : record-tuple-allocation ( #call -- )
     #! Delegation.
@@ -23,19 +32,27 @@ M: #push escape-analysis*
     class>> immutable-tuple-class? [
         [ in-d>> but-last ] [ out-d>> first ] bi
         record-allocation
-    ] [ drop ] if ;
+    ] [ out-d>> unknown-allocations ] if ;
 
 : record-slot-call ( #call -- )
     [ out-d>> first ]
     [ dup in-d>> second node-value-info literal>> ]
     [ in-d>> first ] tri
-    over fixnum? [ [ 3 - ] dip record-slot-access ] [ 3drop ] if ;
+    over fixnum? [
+        [ 3 - ] dip record-slot-access
+    ] [
+        2drop unknown-allocation
+    ] if ;
 
 M: #call escape-analysis*
     dup word>> {
         { \ <tuple-boa> [ record-tuple-allocation ] }
         { \ slot [ record-slot-call ] }
-        [ drop in-d>> add-escaping-values ]
+        [
+            drop
+            [ in-d>> add-escaping-values ]
+            [ out-d>> unknown-allocations ] bi
+        ]
     } case ;
 
 M: #return escape-analysis*

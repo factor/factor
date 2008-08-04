@@ -13,16 +13,19 @@ M: #branch escape-analysis*
 
 : (merge-allocations) ( values -- allocation )
     [
-        dup [ allocation ] map dup [ ] all? [
-            dup [ length ] map all-equal? [
-                nip flip
-                [ (merge-allocations) ] [ [ merge-slots ] map ] bi
-                [ record-allocations ] keep
-            ] [ drop add-escaping-values f ] if
-        ] [ drop add-escaping-values f ] if
+        dup [ allocation ] map sift dup empty? [ 2drop f ] [
+            dup [ t eq? not ] all? [
+                dup [ length ] map all-equal? [
+                    nip flip
+                    [ (merge-allocations) ] [ [ merge-slots ] map ] bi
+                    [ record-allocations ] keep
+                ] [ drop add-escaping-values t ] if
+            ] [ drop add-escaping-values t ] if
+        ] if
     ] map ;
 
 : merge-allocations ( in-values out-values -- )
+    [ [ sift ] map ] dip
     [ [ merge-values ] 2each ]
     [ [ (merge-allocations) ] dip record-allocations ]
     2bi ;
