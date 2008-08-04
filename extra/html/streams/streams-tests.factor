@@ -1,6 +1,8 @@
+
 USING: html.streams html.streams.private
-io io.streams.string io.styles kernel
-namespaces tools.test xml.writer sbufs sequences inspector ;
+       io io.streams.string io.styles kernel
+       namespaces tools.test xml.writer sbufs sequences inspector colors ;
+
 IN: html.streams.tests
 
 : make-html-string
@@ -52,7 +54,7 @@ M: funky browser-link-href
 [
     [
         "car"
-        H{ { foreground { 1 0 1 1 } } }
+        H{ { foreground T{ rgba f 1 0 1 1 } } }
         format
     ] make-html-string
 ] unit-test
@@ -60,7 +62,7 @@ M: funky browser-link-href
 [ "<div style='background-color: #ff00ff; white-space: pre; font-family: monospace; '>cdr</div>" ]
 [
     [
-        H{ { page-color { 1 0 1 1 } } }
+        H{ { page-color T{ rgba f 1 0 1 1 } } }
         [ "cdr" write ] with-nesting
     ] make-html-string
 ] unit-test
