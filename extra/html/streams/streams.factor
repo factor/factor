@@ -1,9 +1,11 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: generic assocs help http io io.styles io.files continuations
-io.streams.string kernel math math.order math.parser namespaces
-quotations assocs sequences strings words html.elements
-xml.entities sbufs continuations destructors accessors ;
+
+USING: combinators generic assocs help http io io.styles io.files
+       continuations io.streams.string kernel math math.order math.parser
+       namespaces quotations assocs sequences strings words html.elements
+       xml.entities sbufs continuations destructors accessors arrays ;
+
 IN: html.streams
 
 GENERIC: browser-link-href ( presented -- href )
@@ -47,9 +49,9 @@ TUPLE: html-sub-stream < html-stream style parent ;
         ] [ call ] if*
     ] [ call ] if* ; inline
 
-: hex-color, ( triplet -- )
-    3 head-slice
-    [ 255 * >fixnum >hex 2 CHAR: 0 pad-left % ] each ;
+: hex-color, ( color -- )
+  { [ red>> ] [ green>> ] [ blue>> ] } cleave 3array
+  [ 255 * >fixnum >hex 2 CHAR: 0 pad-left % ] each ;
 
 : fg-css, ( color -- )
     "color: #" % hex-color, "; " % ;
