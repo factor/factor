@@ -8,7 +8,8 @@ compiler.tree.combinators ;
 IN: compiler.tree.copy-equiv
 
 ! Two values are copy-equivalent if they are always identical
-! at run-time ("DS" relation).
+! at run-time ("DS" relation). This is just a weak form of
+! value numbering.
 
 ! Mapping from values to their canonical leader
 SYMBOL: copies
@@ -25,7 +26,8 @@ SYMBOL: copies
         ] if
     ] ;
 
-: resolve-copy ( copy -- val ) copies get compress-path ;
+: resolve-copy ( copy -- val )
+    copies get compress-path [ "Unknown value" throw ] unless* ;
 
 : is-copy-of ( val copy -- ) copies get set-at ;
 
@@ -55,7 +57,7 @@ M: #return-recursive compute-copy-equiv*
     #! An output is a copy of every input if all inputs are
     #! copies of the same original value.
     [
-        swap [ resolve-copy ] map sift
+        swap sift [ resolve-copy ] map
         dup [ all-equal? ] [ empty? not ] bi and
         [ first swap is-copy-of ] [ 2drop ] if
     ] 2each ;

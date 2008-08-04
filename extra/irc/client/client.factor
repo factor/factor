@@ -88,10 +88,11 @@ SYMBOL: current-irc-client
 : irc-stream> ( -- stream ) irc> stream>> ;
 : irc-write ( s -- ) irc-stream> stream-write ;
 : irc-print ( s -- ) irc-stream> [ stream-print ] keep stream-flush ;
+: irc-send ( irc-message -- ) irc> out-messages>> mailbox-put ;
 : listener> ( name -- listener/f ) irc> listeners>> at ;
 
 : maybe-mailbox-get ( mailbox quot: ( irc-message -- ) -- )
-    [ dup mailbox-empty? [ drop yield ] ] dip '[ mailbox-get @ ] if ; inline
+    [ dup mailbox-empty? [ drop 0.1 sleep ] ] dip '[ mailbox-get @ ] if ; inline
 
 GENERIC: to-listener ( message obj -- )
 
@@ -146,24 +147,6 @@ DEFER: me?
 : /JOIN ( channel password -- )
     "JOIN " irc-write
     [ [ " :" ] dip 3append ] when* irc-print ;
-
-: /PART ( channel text -- )
-    [ "PART " irc-write irc-write ] dip
-    " :" irc-write irc-print ;
-
-: /KICK ( channel who -- )
-    [ "KICK " irc-write irc-write ] dip
-    " " irc-write irc-print ;
-
-: /PRIVMSG ( nick line -- )
-    [ "PRIVMSG " irc-write irc-write ] dip
-    " :" irc-write irc-print ;
-
-: /ACTION ( nick line -- )
-    [ 1 , "ACTION " % % 1 , ] "" make /PRIVMSG ;
-
-: /QUIT ( text -- )
-    "QUIT :" irc-write irc-print ;
 
 : /PONG ( text -- )
     "PONG " irc-write irc-print ;
@@ -240,9 +223,13 @@ M: kick handle-incoming-irc ( kick -- )
 M: quit handle-incoming-irc ( quit -- )
     [ dup prefix>> parse-name listeners-with-participant
       [ to-listener ] with each ]
-    [ prefix>> parse-name remove-participant-from-all ]
     [ handle-participant-change ]
+    [ prefix>> parse-name remove-participant-from-all ]
     tri ;
+
+! FIXME: implement this
+! M: mode handle-incoming-irc ( mode -- ) call-next-method ;
+! M: nick handle-incoming-irc ( nick -- ) call-next-method ;
 
 : >nick/mode ( string -- nick mode )
     dup first "+@" member? [ unclip ] [ 0 ] if participant-mode ;

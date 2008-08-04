@@ -8,11 +8,9 @@ IN: compiler.tree.dataflow-analysis
 ! Dataflow analysis
 SYMBOL: work-list
 
-: look-at-value ( values -- )
-    work-list get push-front ;
+: look-at-value ( values -- ) work-list get push-front ;
 
-: look-at-values ( values -- )
-    work-list get '[ , push-front ] each ;
+: look-at-values ( values -- ) work-list get push-all-front ;
 
 : look-at-inputs ( node -- ) in-d>> look-at-values ;
 

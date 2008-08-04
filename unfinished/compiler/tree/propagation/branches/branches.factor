@@ -59,7 +59,7 @@ SYMBOL: infer-children-data
 
 : compute-phi-input-infos ( phi-in -- phi-info )
     infer-children-data get
-    '[ , [ [ value-info ] bind ] 2map ] map ;
+    '[ , [ [ [ value-info ] [ null-info ] if* ] bind ] 2map ] map ;
 
 : annotate-phi-inputs ( #phi -- )
     dup phi-in-d>> compute-phi-input-infos >>phi-info-d
