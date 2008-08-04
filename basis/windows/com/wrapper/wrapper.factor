@@ -1,17 +1,22 @@
-USING: alien alien.c-types windows.com.syntax
+USING: alien alien.c-types windows.com.syntax init
 windows.com.syntax.private windows.com continuations kernel
 namespaces windows.ole32 libc vocabs assocs accessors arrays
 sequences quotations combinators math words compiler.units
-destructors fry math.parser generalizations ;
+destructors fry math.parser generalizations sets ;
 IN: windows.com.wrapper
 
-TUPLE: com-wrapper vtbls disposed ;
+TUPLE: com-wrapper callbacks vtbls disposed ;
 
 <PRIVATE
 
 SYMBOL: +wrapped-objects+
 +wrapped-objects+ get-global
 [ H{ } +wrapped-objects+ set-global ]
+unless
+
+SYMBOL: +live-wrappers+
++live-wrappers+ get-global
+[ V{ } +live-wrappers+ set-global ]
 unless
 
 SYMBOL: +vtbl-counter+
@@ -82,13 +87,12 @@ unless
     [ '[ ,                   [ swap 2array ] curry map ] ] bi bi*
     swap append ;
 
-: compile-alien-callback ( word return parameters abi quot -- alien )
+: compile-alien-callback ( word return parameters abi quot -- word )
     '[ , , , , alien-callback ]
     [ [ (( -- alien )) define-declared ] pick slip ]
-    with-compilation-unit
-    execute ;
+    with-compilation-unit ;
 
-: (byte-array-to-malloced-buffer) ( byte-array -- alien )
+: byte-array>malloc ( byte-array -- alien )
     [ byte-length malloc ] [ over byte-array>memory ] bi ;
 
 : (callback-word) ( function-name interface-name counter -- word )
@@ -99,7 +103,7 @@ unless
     [ dup empty? [ 2drop [ ] ] [ swap 1- '[ , , ndip ] ] if ]
     dip compose ;
 
-: (make-vtbl) ( interface-name quots iunknown-methods n -- vtbl )
+: (make-interface-callbacks) ( interface-name quots iunknown-methods n -- words )
     (thunk) (thunked-quots)
     swap [ find-com-interface-definition family-tree-functions ]
     keep (next-vtbl-counter) '[
@@ -114,12 +118,12 @@ unless
             first2 (finish-thunk)
         ] bi*
         "stdcall" swap compile-alien-callback
-    ] 2map >c-void*-array
-    (byte-array-to-malloced-buffer) ;
+    ] 2map ;
 
-: (make-vtbls) ( implementations -- vtbls )
+: (make-callbacks) ( implementations -- sequence )
     dup [ first ] map (make-iunknown-methods)
-    [ >r >r first2 r> r> swap (make-vtbl) ] curry map-index ;
+    [ >r >r first2 r> r> swap (make-interface-callbacks) ]
+    curry map-index ;
 
 : (malloc-wrapped-object) ( wrapper -- wrapped-object )
     vtbls>> length "void*" heap-size *
@@ -127,13 +131,34 @@ unless
     over <displaced-alien>
     1 0 rot set-ulong-nth ;
 
+: (callbacks>vtbl) ( callbacks -- vtbl )
+    [ execute ] map >c-void*-array byte-array>malloc ;
+: (callbacks>vtbls) ( callbacks -- vtbls )
+    [ (callbacks>vtbl) ] map ;
+
+: (allocate-wrapper) ( wrapper -- )
+    dup callbacks>> (callbacks>vtbls) >>vtbls
+    f >>disposed drop ;
+
+: (init-hook) ( -- )
+    +live-wrappers+ get-global [ (allocate-wrapper) ] each
+    H{ } +wrapped-objects+ set-global ;
+
+[ (init-hook) ] "windows.com.wrapper" add-init-hook
+
 PRIVATE>
 
+: allocate-wrapper ( wrapper -- )
+    [ (allocate-wrapper) ]
+    [ +live-wrappers+ get adjoin ] bi ;
+
 : <com-wrapper> ( implementations -- wrapper )
-    (make-vtbls) f com-wrapper boa ;
+    (make-callbacks) f f com-wrapper boa
+    dup allocate-wrapper ;
 
 M: com-wrapper dispose*
-    vtbls>> [ free ] each ;
+    [ [ free ] each f ] change-vtbls
+    +live-wrappers+ get-global delete ;
 
 : com-wrap ( object wrapper -- wrapped-object )
     [ vtbls>> ] [ (malloc-wrapped-object) ] bi
