@@ -8,8 +8,6 @@ compiler.tree.escape-analysis.nodes
 compiler.tree.escape-analysis.allocations ;
 IN: compiler.tree.escape-analysis.branches
 
-SYMBOL: children-escape-data
-
 M: #branch escape-analysis*
     live-children sift [ (escape-analysis) ] each ;
 
