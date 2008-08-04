@@ -3,7 +3,7 @@
 
 USING: accessors kernel threads combinators concurrency.mailboxes
        sequences strings hashtables splitting fry assocs hashtables colors
-       sorting qualified unicode.case math.order
+       sorting qualified unicode.collation math.order
        ui ui.gadgets ui.gadgets.panes ui.gadgets.editors
        ui.gadgets.scrollers ui.commands ui.gadgets.frames ui.gestures
        ui.gadgets.tabs ui.gadgets.grids ui.gadgets.packs ui.gadgets.labels
@@ -126,7 +126,7 @@ M: irc-message write-irc
 GENERIC: handle-inbox ( tab message -- )
 
 : value-labels ( assoc val -- seq )
-    '[ nip , = ] assoc-filter keys [ >lower <=> ] sort [ <label> ] map ;
+    '[ nip , = ] assoc-filter keys [ string<=> ] sort [ <label> ] map ;
 
 : add-gadget-color ( pack seq color -- pack )
     '[ , >>color add-gadget ] each ;
