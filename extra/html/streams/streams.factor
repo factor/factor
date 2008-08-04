@@ -50,8 +50,8 @@ TUPLE: html-sub-stream < html-stream style parent ;
     ] [ call ] if* ; inline
 
 : hex-color, ( color -- )
-  { [ red>> ] [ green>> ] [ blue>> ] } cleave 3array
-  [ 255 * >fixnum >hex 2 CHAR: 0 pad-left % ] each ;
+    [ red>> ] [ green>> ] [ blue>> ] tri
+    [ 255 * >fixnum >hex 2 CHAR: 0 pad-left % ] tri@ ;
 
 : fg-css, ( color -- )
     "color: #" % hex-color, "; " % ;
