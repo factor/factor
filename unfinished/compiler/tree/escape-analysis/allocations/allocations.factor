@@ -4,18 +4,19 @@ USING: assocs namespaces sequences kernel math combinators sets
 disjoint-sets fry stack-checker.state compiler.tree.copy-equiv ;
 IN: compiler.tree.escape-analysis.allocations
 
-! A map from values to sequences of values
+! A map from values to one of the following:
+! - f -- initial status, assigned to values we have not seen yet;
+!        may potentially become an allocation later
+! - a sequence of values -- potentially unboxed tuple allocations
+! - t -- not allocated locally, can never be unboxed
+
 SYMBOL: allocations
 
-: allocation ( value -- allocation )
-    resolve-copy allocations get at ;
+: (allocation) resolve-copy allocations get ; inline
 
-: record-allocation ( allocation value -- )
-    {
-        { [ dup not ] [ 2drop ] }
-        { [ over not ] [ allocations get delete-at drop ] }
-        [ allocations get set-at ]
-    } cond ;
+: allocation ( value -- allocation ) (allocation) at ;
+
+: record-allocation ( allocation value -- ) (allocation) set-at ;
 
 : record-allocations ( allocations values -- )
     [ record-allocation ] 2each ;
@@ -29,11 +30,8 @@ SYMBOL: +escaping+
     <disjoint-set> +escaping+ over add-atom ;
 
 : init-escaping-values ( -- )
-    copies get <escaping-values>
-    [ '[ drop , add-atom ] assoc-each ]
-    [ '[ , equate ] assoc-each ]
-    [ nip escaping-values set ]
-    2tri ;
+    copies get assoc>disjoint-set +escaping+ over add-atom
+    escaping-values set ;
 
 : <slot-value> ( -- value )
     <value>
