@@ -1,13 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs namespaces sequences kernel math combinators sets
-fry stack-checker.state compiler.tree.copy-equiv
-compiler.tree.escape-analysis.graph ;
+disjoint-sets fry stack-checker.state compiler.tree.copy-equiv ;
 IN: compiler.tree.escape-analysis.allocations
 
-SYMBOL: escaping
-
-! A map from values to sequences of values or 'escaping'
+! A map from values to sequences of values
 SYMBOL: allocations
 
 : allocation ( value -- allocation )
@@ -23,35 +20,56 @@ SYMBOL: allocations
 : record-allocations ( allocations values -- )
     [ record-allocation ] 2each ;
 
-: record-slot-access ( out slot# in -- )
-    over zero? [ 3drop ] [ allocation ?nth swap is-copy-of ] if ;
+! We track escaping values with a disjoint set.
+SYMBOL: escaping-values
 
-! We track available values
-SYMBOL: slot-graph
+SYMBOL: +escaping+
+
+: <escaping-values> ( -- disjoint-set )
+    <disjoint-set> +escaping+ over add-atom ;
+
+: init-escaping-values ( -- )
+    copies get <escaping-values>
+    [ '[ drop , add-atom ] assoc-each ]
+    [ '[ , equate ] assoc-each ]
+    [ nip escaping-values set ]
+    2tri ;
+
+: <slot-value> ( -- value )
+    <value>
+    [ introduce-value ]
+    [ escaping-values get add-atom ]
+    [ ]
+    tri ;
+
+: same-value ( in-value out-value -- )
+    over [
+        [ is-copy-of ] [ escaping-values get equate ] 2bi
+    ] [ 2drop ] if ;
+
+: record-slot-access ( out slot# in -- )
+    over zero? [ 3drop ] [ allocation ?nth swap same-value ] if ;
+
+: merge-values ( in-values out-value -- )
+    escaping-values get '[ , , equate ] each ;
 
 : merge-slots ( values -- value )
     dup [ ] contains? [
-        <value>
-        [ introduce-value ]
-        [ slot-graph get add-edges ]
-        [ ] tri
+        <slot-value> [ merge-values ] keep
     ] [ drop f ] if ;
 
-! A disqualified slot value is not available for unboxing. A
-! tuple may be unboxed if none of its slots have been
-! disqualified.
+: add-escaping-values ( values -- )
+    escaping-values get
+    '[ +escaping+ , equate ] each ;
 
-: disqualify ( slot-value -- )
-    slot-graph get mark-vertex ;
+: escaping-value? ( value -- ? )
+    +escaping+ escaping-values get equiv? ;
 
 SYMBOL: escaping-allocations
 
 : compute-escaping-allocations ( -- )
-    #! Any allocations involving unavailable slots are
-    #! potentially escaping, and cannot be unboxed.
     allocations get
-    slot-graph get marked-components
-    '[ [ , key? ] contains? nip ] assoc-filter
+    [ drop escaping-value? ] assoc-filter
     escaping-allocations set ;
 
 : escaping-allocation? ( value -- ? )
