@@ -125,8 +125,11 @@ M: irc-message write-irc
 
 GENERIC: handle-inbox ( tab message -- )
 
+: lower-<=> ( x y -- <=> )
+    [ >lower ] bi@ <=> ;
+
 : value-labels ( assoc val -- seq )
-    '[ nip , = ] assoc-filter keys [ >lower <=> ] sort [ <label> ] map ;
+    '[ nip , = ] assoc-filter keys [ lower-<=> ] sort [ <label> ] map ;
 
 : add-gadget-color ( pack seq color -- pack )
     '[ , >>color add-gadget ] each ;
