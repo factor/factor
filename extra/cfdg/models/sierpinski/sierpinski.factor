@@ -26,14 +26,12 @@ iterate? [
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: run ( -- )
-[ ] >background
-{ -4 8 -4 8 } viewport set
-0.01 >threshold
-[ top ] >start-shape
-cfdg-window ;
+: init ( -- )
+  [ ]           >background
+  { -4 8 -4 8 } >viewport
+  0.01          >threshold
+  [ top ]       >start-shape ;
+
+: run ( -- ) [ init ] cfdg-window. ;
 
 MAIN: run
-
-
-
