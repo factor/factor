@@ -4,12 +4,16 @@
 ! Simple CSV Parser
 ! Phil Dawes phil@phildawes.net
 
-USING: kernel sequences io namespaces combinators unicode.categories vars ;
+USING: kernel sequences io namespaces combinators unicode.categories ;
 IN: csv
 
-DEFER: quoted-field
+SYMBOL: delimiter
 
-VAR: delimiter
+CHAR: , delimiter set-global
+
+: delimiter> delimiter get ; inline
+    
+DEFER: quoted-field ( -- endchar )
     
 ! trims whitespace from either end of string
 : trim-whitespace ( str -- str )
@@ -44,7 +48,7 @@ VAR: delimiter
 
 : (row) ( -- sep )
   field , 
-  dup delimiter> = [ drop (row) ] when ;
+  dup delimiter get = [ drop (row) ] when ;
 
 : row ( -- eof? array[string] )
   [ (row) ] { } make ;
@@ -55,25 +59,18 @@ VAR: delimiter
 : (csv) ( -- )
   row append-if-row-not-empty
   [ (csv) ] when ;
-
-: init-vars ( -- )
-  delimiter> [ CHAR: , >delimiter ] unless ; inline 
   
 : csv-row ( stream -- row )
-  init-vars
   [ row nip ] with-input-stream ;
 
 : csv ( stream -- rows )
-  init-vars
   [ [ (csv) ] { } make ] with-input-stream ;
 
 : with-delimiter ( char quot -- )
   delimiter swap with-variable ; inline
 
-
-    
 : needs-escaping? ( cell -- ? )
-  [ "\n\"" delimiter> suffix member? ] contains? ; inline ! "
+  [ [ "\n\"" member? ] [ delimiter get = ] bi or ] contains? ; inline ! "
 
 : escape-quotes ( cell -- cell' )
   [ [ dup , CHAR: " = [ CHAR: " , ] when ] each ] "" make ; inline
@@ -85,8 +82,7 @@ VAR: delimiter
   dup needs-escaping? [ escape-quotes enclose-in-quotes ] when ; inline
     
 : write-row ( row -- )
-  [ delimiter> write1 ] [ escape-if-required write ] interleave nl ; inline
+  [ delimiter get write1 ] [ escape-if-required write ] interleave nl ; inline
     
 : write-csv ( rows outstream -- )
-  init-vars
   [ [ write-row ] each ] with-output-stream ;
