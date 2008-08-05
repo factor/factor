@@ -220,13 +220,14 @@ TUPLE: bunny-outlined
         [ normal-texture>> GL_TEXTURE_2D GL_TEXTURE1 bind-texture-unit ]
         [ depth-texture>>  GL_TEXTURE_2D GL_TEXTURE2 bind-texture-unit ]
         [
-            pass2-program>> {
-                { "colormap"   [ 0 glUniform1i ] }
-                { "normalmap"  [ 1 glUniform1i ] }
-                { "depthmap"   [ 2 glUniform1i ] }
-                { "line_color" [ 0.1 0.0 0.1 1.0 glUniform4f ] }
-            } [ { -1.0 -1.0 } { 1.0 1.0 } rect-vertices ]
-            with-gl-program
+            pass2-program>> [
+                {
+                    [ "colormap"   glGetUniformLocation 0 glUniform1i ]
+                    [ "normalmap"  glGetUniformLocation 1 glUniform1i ]
+                    [ "depthmap"   glGetUniformLocation 2 glUniform1i ]
+                    [ "line_color" glGetUniformLocation 0.1 0.0 0.1 1.0 glUniform4f ]
+                } cleave { -1.0 -1.0 } { 1.0 1.0 } rect-vertices
+            ] with-gl-program
         ]
     } cleave ;
 

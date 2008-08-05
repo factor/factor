@@ -1,26 +1,34 @@
 USING: arrays accessors continuations kernel symbols
-combinators.lib sequences namespaces init ;
+combinators.lib sequences namespaces init vocabs ;
 IN: game-input
 
 SYMBOLS: game-input-backend game-input-opened ;
 
 HOOK: (open-game-input)  game-input-backend ( -- )
 HOOK: (close-game-input) game-input-backend ( -- )
+HOOK: (reset-game-input) game-input-backend ( -- )
 
 : game-input-opened? ( -- ? )
     game-input-opened get ;
 
 <PRIVATE
 
+M: f (reset-game-input) ;
+
 : reset-game-input ( -- )
-    game-input-opened off ;
+    game-input-opened off
+    (reset-game-input) ;
+
+: load-game-input-backend ( -- )
+    game-input-backend get
+    [ "game-input.backend" load-vocab drop ] unless ;
 
 [ reset-game-input ] "game-input" add-init-hook
 
 PRIVATE>
 
-
 : open-game-input ( -- )
+    load-game-input-backend
     game-input-opened? [
         (open-game-input) 
         game-input-opened on
