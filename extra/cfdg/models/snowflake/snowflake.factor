@@ -25,12 +25,13 @@ spike
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: run ( -- )
-[ ] >background
-{ -40 80 -40 80 } viewport set
-0.1 threshold set
-[ snowflake ] start-shape set
-cfdg-window ;
+: init ( -- )
+  [ ]               >background
+  { -40 80 -40 80 } >viewport
+  0.1               >threshold
+  [ snowflake ]     >start-shape ;
+
+: run ( -- ) [ init ] cfdg-window. ;
 
 MAIN: run
 

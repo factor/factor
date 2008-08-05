@@ -1,28 +1,84 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs namespaces sequences kernel math
-stack-checker.state compiler.tree.copy-equiv ;
+USING: accessors assocs namespaces sequences kernel math
+combinators sets disjoint-sets fry stack-checker.state
+compiler.tree.copy-equiv ;
 IN: compiler.tree.escape-analysis.allocations
 
-SYMBOL: escaping
+! A map from values to one of the following:
+! - f -- initial status, assigned to values we have not seen yet;
+!        may potentially become an allocation later
+! - a sequence of values -- potentially unboxed tuple allocations
+! - t -- not allocated in this procedure, can never be unboxed
 
-! A map from values to sequences of values or 'escaping'
 SYMBOL: allocations
 
-: allocation ( value -- allocation )
-    resolve-copy allocations get at ;
+TUPLE: slot-access slot# value ;
 
-: record-allocation ( allocation value -- )
-    allocations get set-at ;
+C: <slot-access> slot-access
+
+: (allocation) ( value -- value' allocations )
+    resolve-copy allocations get ; inline
+
+: allocation ( value -- allocation )
+    (allocation) at dup slot-access? [
+        [ slot#>> ] [ value>> allocation ] bi nth
+        allocation
+    ] when ;
+
+: record-allocation ( allocation value -- ) (allocation) set-at ;
+
+: unknown-allocation ( value -- ) t swap record-allocation ;
 
 : record-allocations ( allocations values -- )
     [ record-allocation ] 2each ;
 
-: record-slot-access ( out slot# in -- )
-    over zero? [ 3drop ] [ allocation ?nth swap is-copy-of ] if ;
+: unknown-allocations ( values -- )
+    [ unknown-allocation ] each ;
 
-! A map from values to sequences of values
-SYMBOL: slot-merging
+! We track escaping values with a disjoint set.
+SYMBOL: escaping-values
+
+SYMBOL: +escaping+
+
+: <escaping-values> ( -- disjoint-set )
+    <disjoint-set> +escaping+ over add-atom ;
+
+: init-escaping-values ( -- )
+    copies get assoc>disjoint-set +escaping+ over add-atom
+    escaping-values set ;
+
+: <slot-value> ( -- value )
+    <value>
+    [ introduce-value ]
+    [ escaping-values get add-atom ]
+    [ ]
+    tri ;
+
+: record-slot-access ( out slot# in -- )
+    over zero? [ 3drop ] [
+        <slot-access> swap record-allocation
+    ] if ;
+
+: merge-values ( in-values out-value -- )
+    escaping-values get '[ , , equate ] each ;
 
 : merge-slots ( values -- value )
-    <value> [ introduce-value ] [ slot-merging get set-at ] [ ] tri ;
+    <slot-value> [ merge-values ] keep ;
+
+: add-escaping-values ( values -- )
+    escaping-values get
+    '[ +escaping+ , equate ] each ;
+
+: escaping-value? ( value -- ? )
+    +escaping+ escaping-values get equiv? ;
+
+SYMBOL: escaping-allocations
+
+: compute-escaping-allocations ( -- )
+    allocations get
+    [ drop escaping-value? ] assoc-filter
+    escaping-allocations set ;
+
+: escaping-allocation? ( value -- ? )
+    escaping-allocations get key? ;

@@ -96,12 +96,13 @@ iterate? [
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: run ( -- )
-[ ] >background
-{ -5 25 -15 25 } viewport set
-0.03 threshold set
-[ toc ] start-shape set
-cfdg-window ;
+: init ( -- )
+  [ ]              >background
+  { -5 25 -15 25 } >viewport
+  0.03             >threshold
+  [ toc ]          >start-shape ;
+
+: run ( -- ) [ init ] cfdg-window. ;
 
 MAIN: run
 

@@ -25,11 +25,12 @@ iterate? [
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: run ( -- )
-[ -1 b ] >background
-{ -60 140 -120 140 } viewport set
-0.1 threshold set
-[ anemone-begin ] start-shape set
-cfdg-window ;
+: init ( -- )
+  [ -1 b ]             >background
+  { -60 140 -120 140 } >viewport
+  0.1                  >threshold
+  [ anemone-begin ]    >start-shape ;
+
+: run ( -- ) [ init ] cfdg-window. ;
 
 MAIN: run

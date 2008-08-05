@@ -160,7 +160,7 @@ IN: irc.client.tests
     } cleave
     ] unit-test
 
-! Namelist notification
+! Namelist change notification
 { T{ participant-changed f f f } } [
     { ":ircserver.net 353 factorbot @ #factortest :@factorbot "
       ":ircserver.net 366 factorbot #factortest :End of /NAMES list." } make-client
@@ -170,6 +170,21 @@ IN: irc.client.tests
       [ connect-irc ]
       [ drop 0.1 seconds sleep ]
       [ listeners>> [ "#factortest" ] dip at [ read-message drop ] [ read-message ] bi ]
+      [ terminate-irc ]
+    } cleave
+    ] unit-test
+
+{ T{ participant-changed f "somedude" +part+ } } [
+    { ":somedude!n=user@isp.net QUIT" } make-client
+    { [ "factorbot" set-nick ]
+      [ listeners>>
+        [ "#factortest" [ <irc-channel-listener>
+                          H{ { "somedude" +normal+ } } clone >>participants ] keep
+        ] dip set-at ]
+      [ connect-irc ]
+      [ drop 0.1 seconds sleep ]
+      [ listeners>> [ "#factortest" ] dip at
+        [ read-message drop ] [ read-message drop ] [ read-message ] tri ]
       [ terminate-irc ]
     } cleave
     ] unit-test

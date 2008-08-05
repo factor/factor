@@ -51,12 +51,13 @@ DEFER: line
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: run ( -- )
+: init ( -- )
   [ -1 b ] >background
   { -20 40 -20 40 } viewport set
   [ centre ] >start-shape
-  0.0001 >threshold
-  cfdg-window ;
+  0.0001 >threshold ;
+
+: run ( -- ) [ init ] cfdg-window. ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

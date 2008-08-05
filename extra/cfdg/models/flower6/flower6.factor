@@ -18,12 +18,13 @@ iterate? [
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: run ( -- )
-[ ] >background
-{ -1 2 -1 2 } viewport set
-0.01 threshold set
-[ flower6 ] start-shape set
-cfdg-window ;
+: init ( -- )
+  [ ]           >background
+  { -1 2 -1 2 } >viewport
+  0.01          >threshold
+  [ flower6 ]   >start-shape ;
+
+: run ( -- ) [ init ] cfdg-window. ;
 
 MAIN: run
 

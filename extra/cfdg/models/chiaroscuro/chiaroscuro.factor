@@ -29,11 +29,12 @@ DEFER: white
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: run ( -- )
-[ -0.5 b ] >background
-{ -3 6 -2 6 } viewport set
-0.01 threshold set
-[ chiaroscuro ] start-shape set
-cfdg-window ;
+: init ( -- )
+  [ -0.5 b ]      >background
+  { -3 6 -2 6 }   >viewport
+  0.01            >threshold
+  [ chiaroscuro ] >start-shape ;
+
+: run ( -- ) [ init ] cfdg-window. ;
 
 MAIN: run
