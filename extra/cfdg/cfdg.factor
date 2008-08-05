@@ -130,7 +130,7 @@ VAR: threshold
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: recursive ( quot -- ) iterate? swap when ;
+: recursive ( quot -- ) iterate? swap when ; inline
 
 : multi ( seq -- ) random-weighted* call ;
 
@@ -155,6 +155,28 @@ VAR: start-shape
 
 : set-initial-color ( -- ) T{ hsva f 0 0 0 1 } clone >self ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: dlist
+
+! : build-model-dlist ( -- )
+!   1 glGenLists dlist set
+!   dlist get GL_COMPILE_AND_EXECUTE glNewList
+!   start-shape> call
+!   glEndList ;
+
+: build-model-dlist ( -- )
+  1 glGenLists dlist set
+  dlist get GL_COMPILE_AND_EXECUTE glNewList
+
+  set-initial-color
+
+  self> set-color
+
+  start-shape> call
+      
+  glEndList ;
+
 : display ( -- )
 
   GL_PROJECTION glMatrixMode
@@ -172,15 +194,31 @@ VAR: start-shape
   init-modelview-matrix-stack
   init-color-stack
 
-  set-initial-color
+  dlist get not
+    [ build-model-dlist ]
+    [ dlist get glCallList ]
+  if ;
 
-  self> set-color
-
-  start-shape> call ;
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : cfdg-window* ( -- )
-  [ display ] closed-quot <slate>
-  { 500 500 } over set-slate-pdim
+  C[ display ] <slate>
+    { 500 500 } >>pdim
+    C[ dlist get [ dlist get 1 glDeleteLists ] when ] >>ungraft
   dup "CFDG" open-window ;
 
 : cfdg-window ( -- ) [ cfdg-window* ] with-ui ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: <cfdg-gadget> ( -- slate )
+  C[ display ] <slate>
+    { 500 500 } >>pdim
+    C[ dlist get [ dlist get 1 glDeleteLists ] when ] >>ungraft ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USE: fry
+
+: cfdg-window. ( quot -- )
+  '[ [ @ <cfdg-gadget> "CFDG" open-window ] with-scope ] with-ui ;
