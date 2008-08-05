@@ -4,10 +4,13 @@ USING: kernel effects accessors math math.private math.libm
 math.partial-dispatch math.intervals math.parser math.order
 layouts words sequences sequences.private arrays assocs classes
 classes.algebra combinators generic.math splitting fry locals
-classes.tuple alien.accessors classes.tuple.private
-compiler.tree.propagation.info compiler.tree.propagation.nodes
-compiler.tree.propagation.constraints
-compiler.tree.comparisons ;
+classes.tuple alien.accessors classes.tuple.private slots.private
+compiler.tree.comparisons
+compiler.tree.propagation.info
+compiler.tree.propagation.nodes
+compiler.tree.propagation.slots
+compiler.tree.propagation.simple
+compiler.tree.propagation.constraints ;
 IN: compiler.tree.propagation.known-words
 
 \ fixnum
@@ -75,7 +78,7 @@ most-negative-fixnum most-positive-fixnum [a,b]
 
 : binary-op-class ( info1 info2 -- newclass )
     [ class>> ] bi@
-    2dup [ null class<= ] either? [ 2drop null ] [
+    2dup [ null-class? ] either? [ 2drop null ] [
         [ math-closure ] bi@ math-class-max
     ] if ;
 
@@ -86,13 +89,13 @@ most-negative-fixnum most-positive-fixnum [a,b]
     [ fixnum class<= ] [ fixnum fits? ] bi* and ;
 
 : may-overflow ( class interval -- class' interval' )
-    over null class<= [
+    over null-class? [
         2dup won't-overflow?
         [ [ integer math-class-max ] dip ] unless
     ] unless ;
 
 : may-be-rational ( class interval -- class' interval' )
-    over null class<= [
+    over null-class? [
         [ rational math-class-max ] dip
     ] unless ;
 
@@ -106,7 +109,7 @@ most-negative-fixnum most-positive-fixnum [a,b]
     [ real math-class-min ] dip ;
 
 : float-valued ( class interval -- class' interval' )
-    over null class<= [
+    over null-class? [
         [ drop float ] dip
     ] unless ;
 
@@ -148,12 +151,9 @@ most-negative-fixnum most-positive-fixnum [a,b]
        /\
     ] ;
 
-: comparison-constraints ( in1 in2 out op -- constraint )
-    swap [
-        [ (comparison-constraints) ]
-        [ negate-comparison (comparison-constraints) ]
-        3bi
-    ] dip <conditional> ;
+:: comparison-constraints ( in1 in2 out op -- constraint )
+    in1 in2 op (comparison-constraints) out t-->
+    in1 in2 op negate-comparison (comparison-constraints) out f--> /\ ;
 
 : define-comparison-constraints ( word op -- )
     '[ , comparison-constraints ] +constraints+ set-word-prop ;
@@ -169,14 +169,14 @@ generic-comparison-ops [
 ! Remove redundant comparisons
 : fold-comparison ( info1 info2 word -- info )
     [ [ interval>> ] bi@ ] dip interval-comparison {
-        { incomparable [ object <class-info> ] }
+        { incomparable [ object-info ] }
         { t [ t <literal-info> ] }
         { f [ f <literal-info> ] }
     } case ;
 
 comparison-ops [
-    [
-        dup '[ , fold-comparison ] +outputs+ set-word-prop
+    dup '[
+        [ , fold-comparison ] +outputs+ set-word-prop
     ] each-derived-op
 ] each
 
@@ -186,7 +186,7 @@ generic-comparison-ops [
 ] each
 
 : maybe-or-never ( ? -- info )
-    [ object <class-info> ] [ \ f <class-info> ] if ;
+    [ object-info ] [ f <literal-info> ] if ;
 
 : info-intervals-intersect? ( info1 info2 -- ? )
     [ interval>> ] bi@ intervals-intersect? ;
@@ -201,9 +201,15 @@ generic-comparison-ops [
     [ class>> ] bi@ classes-intersect? ;
 
 \ eq? [
+    over value-info literal>> fixnum? [
+        [ value-info literal>> is-equal-to ] dip t-->
+    ] [ 3drop f ] if
+] +constraints+ set-word-prop
+
+\ eq? [
     [ info-intervals-intersect? ]
     [ info-classes-intersect? ]
-    bi or maybe-or-never
+    2bi or maybe-or-never
 ] +outputs+ set-word-prop
 
 {
@@ -258,3 +264,19 @@ generic-comparison-ops [
 
 ! the output of clone has the same type as the input
 { clone (clone) } [ [ ] +outputs+ set-word-prop ] each
+
+\ slot [
+    dup literal?>>
+    [ literal>> swap value-info-slot ] [ 2drop object-info ] if
+] +outputs+ set-word-prop
+
+\ instance? [
+    [ value-info ] dip over literal>> class? [
+        [ literal>> ] dip predicate-constraints
+    ] [ 2drop f ] if
+] +constraints+ set-word-prop
+
+\ instance? [
+    dup literal>> class?
+    [ literal>> predicate-output-infos ] [ 2drop f ] if
+] +outputs+ set-word-prop

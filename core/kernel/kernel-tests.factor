@@ -50,6 +50,10 @@ IN: kernel.tests
 [ f ] [ 3 f and ] unit-test
 [ 4 ] [ 4 6 or ] unit-test
 [ 6 ] [ f 6 or ] unit-test
+[ f ] [ 1 2 xor ] unit-test
+[ 1 ] [ 1 f xor ] unit-test
+[ 2 ] [ f 2 xor ] unit-test
+[ f ] [ f f xor ] unit-test
 
 [ slip ] must-fail
 [ ] [ :c ] unit-test

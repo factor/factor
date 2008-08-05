@@ -1,0 +1,5 @@
+unportable
+gamepads
+joysticks
+mac
+input

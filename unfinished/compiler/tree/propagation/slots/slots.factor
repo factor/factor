@@ -3,7 +3,7 @@
 USING: fry assocs arrays byte-arrays strings accessors sequences
 kernel slots classes.algebra classes.tuple classes.tuple.private
 words math math.private combinators sequences.private namespaces
-compiler.tree.propagation.info ;
+slots.private classes compiler.tree.propagation.info ;
 IN: compiler.tree.propagation.slots
 
 ! Propagation of immutable slots and array lengths
@@ -13,8 +13,8 @@ IN: compiler.tree.propagation.slots
 
 UNION: fixed-length-sequence array byte-array string ;
 
-: sequence-constructor? ( node -- ? )
-    word>> { <array> <byte-array> <string> } memq? ;
+: sequence-constructor? ( word -- ? )
+    { <array> <byte-array> <string> } memq? ;
 
 : constructor-output-class ( word -- class )
     {
@@ -23,89 +23,62 @@ UNION: fixed-length-sequence array byte-array string ;
         { <string> string }
     } at ;
 
-: propagate-sequence-constructor ( node -- infos )
-    [ word>> constructor-output-class <class-info> ]
+: propagate-sequence-constructor ( #call word -- infos )
     [ in-d>> first <sequence-info> ]
-    bi value-info-intersect 1array ;
+    [ constructor-output-class <class-info> ]
+    bi* value-info-intersect 1array ;
 
-: length-accessor? ( node -- ? )
-    dup in-d>> first fixed-length-sequence value-is?
-    [ word>> \ length eq? ] [ drop f ] if ;
+: tuple-constructor? ( word -- ? )
+    { <tuple-boa> <complex> } memq? ;
 
-: propagate-length ( node -- infos )
-    in-d>> first value-info length>>
-    [ array-capacity <class-info> ] unless* 1array ;
+: read-only-slots ( values class -- slots )
+    #! Delegation.
+    all-slots rest-slice
+    [ read-only>> [ drop f ] unless ] 2map
+    { f f } prepend ;
 
-: tuple-constructor? ( node -- ? )
-    word>> { <tuple-boa> <complex> } memq? ;
+: fold-<tuple-boa> ( values class -- info )
+    [ , f , [ literal>> ] map % ] { } make >tuple
+    <literal-info> ;
 
-: propagate-<tuple-boa> ( node -- info )
+: (propagate-tuple-constructor) ( values class -- info )
+    [ [ value-info ] map ] dip [ read-only-slots ] keep
+    over 2 tail-slice [ dup [ literal?>> ] when ] all? [
+        [ 2 tail-slice ] dip fold-<tuple-boa>
+    ] [
+        <tuple-info>
+    ] if ;
+
+: propagate-<tuple-boa> ( #call -- info )
     #! Delegation
-    in-d>> [ value-info ] map unclip-last
-    literal>> class>> dup immutable-tuple-class? [
-        over [ literal?>> ] all?
-        [ [ , f , [ literal>> ] map % ] { } make >tuple <literal-info> ]
-        [ <tuple-info> ]
-        if
-    ] [ nip <class-info> ] if ;
+    in-d>> unclip-last
+    value-info literal>> class>> (propagate-tuple-constructor) ;
 
-: propagate-<complex> ( node -- info )
+: propagate-<complex> ( #call -- info )
     in-d>> [ value-info ] map complex <tuple-info> ;
 
-: propagate-tuple-constructor ( node -- infos )
-    dup word>> {
+: propagate-tuple-constructor ( #call word -- infos )
+    {
         { \ <tuple-boa> [ propagate-<tuple-boa> ] }
         { \ <complex> [ propagate-<complex> ] }
     } case 1array ;
 
-: relevant-methods ( node -- methods )
-    [ word>> "methods" word-prop ]
-    [ in-d>> first value-info class>> ] bi
-    '[ drop , classes-intersect? ] assoc-filter ;
+: read-only-slot? ( n class -- ? )
+    all-slots [ offset>> = ] with find nip
+    dup [ read-only>> ] when ;
 
-: relevant-slots ( node -- slots )
-    relevant-methods [ nip "reading" word-prop ] { } assoc>map ;
+: literal-info-slot ( slot object -- info/f )
+    2dup class read-only-slot?
+    [ swap slot <literal-info> ] [ 2drop f ] if ;
 
-: no-reader-methods ( input slots -- info )
-    2drop null <class-info> ;
-
-: same-offset ( slots -- slot/f )
-    dup [ dup [ read-only>> ] when ] all? [
-        [ offset>> ] map dup all-equal? [ first ] [ drop f ] if
-    ] [ drop f ] if ;
-
-: (reader-word-outputs) ( reader -- info )
-    null
-    [ [ class>> ] [ object ] if* class-or ] reduce
-    <class-info> ;
+: length-accessor? ( slot info -- ? )
+    [ 1 = ] [ length>> ] bi* and ;
 
 : value-info-slot ( slot info -- info' )
     #! Delegation.
-    [ class>> complex class<= 1 3 ? - ] keep
-    dup literal?>> [
-        literal>> {
-            { [ dup tuple? ] [
-                tuple-slots 1 tail-slice nth <literal-info>
-            ] }
-            { [ dup complex? ] [
-                [ real-part ] [ imaginary-part ] bi
-                2array nth <literal-info>
-            ] }
-        } cond
-    ] [ slots>> ?nth ] if ;
-
-: reader-word-outputs ( node -- infos )
-    [ relevant-slots ] [ in-d>> first ] bi
-    over empty? [ no-reader-methods ] [
-        over same-offset dup
-        [ swap value-info value-info-slot ] [ 2drop f ] if
-        [ ] [ (reader-word-outputs) ] ?if
-    ] if 1array ;
-
-: reader-word-inputs ( node -- )
-    [ in-d>> first ] [
-        relevant-slots keys
-        object [ class>> [ class-and ] when* ] reduce
-        <class-info>
-    ] bi
-    refine-value-info ;
+    {
+        { [ over 0 = ] [ 2drop fixnum <class-info> ] }
+        { [ 2dup length-accessor? ] [ nip length>> ] }
+        { [ dup literal?>> ] [ literal>> literal-info-slot ] }
+        [ [ 1- ] [ slots>> ] bi* ?nth ]
+    } cond [ object-info ] unless* ;

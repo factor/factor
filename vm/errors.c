@@ -1,5 +1,12 @@
 #include "master.h"
 
+void out_of_memory(void)
+{
+	fprintf(stderr,"Out of memory\n\n");
+	dump_generations();
+	exit(1);
+}
+
 void fatal_error(char* msg, CELL tagged)
 {
 	fprintf(stderr,"fatal_error: %s %lx\n",msg,tagged);

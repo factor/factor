@@ -1,6 +1,6 @@
 
 USING: kernel arrays sequences math math.order qualified
-       sequences.lib circular processing ui newfx ;
+       sequences.lib circular processing ui newfx processing.shapes ;
 
 IN: processing.gallery.trails
 

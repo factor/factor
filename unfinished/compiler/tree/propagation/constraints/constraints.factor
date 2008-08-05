@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs math math.intervals kernel accessors
-sequences namespaces disjoint-sets classes classes.algebra
+sequences namespaces classes classes.algebra
 combinators words
 compiler.tree compiler.tree.propagation.info
 compiler.tree.copy-equiv ;
@@ -12,38 +12,42 @@ IN: compiler.tree.propagation.constraints
 ! Maps constraints to constraints ("A implies B")
 SYMBOL: constraints
 
-GENERIC: assume ( constraint -- )
+GENERIC: assume* ( constraint -- )
 GENERIC: satisfied? ( constraint -- ? )
-GENERIC: satisfiable? ( constraint -- ? )
+
+M: f assume* drop ;
+
+! satisfied? is inaccurate. It's just used to prevent infinite
+! loops so its only implemented for true-constraints and
+! false-constraints.
+M: object satisfied? drop f ;
+
+: assume ( constraint -- ) dup satisfied? [ drop ] [ assume* ] if ;
 
 ! Boolean constraints
 TUPLE: true-constraint value ;
 
 : =t ( value -- constriant ) resolve-copy true-constraint boa ;
 
-M: true-constraint assume
-    [ constraints get at [ assume ] when* ]
+M: true-constraint assume*
     [ \ f class-not <class-info> swap value>> refine-value-info ]
+    [ constraints get at [ assume ] when* ]
     bi ;
 
-M: true-constraint satisfied? value>> \ f class-not value-is? ;
-
-M: true-constraint satisfiable? value>> \ f class-not value-is? ;
+M: true-constraint satisfied?
+    value>> value-info class>> true-class? ;
 
 TUPLE: false-constraint value ;
 
 : =f ( value -- constriant ) resolve-copy false-constraint boa ;
 
-M: false-constraint assume
-    [ constraints get at [ assume ] when* ]
+M: false-constraint assume*
     [ \ f <class-info> swap value>> refine-value-info ]
+    [ constraints get at [ assume ] when* ]
     bi ;
 
 M: false-constraint satisfied?
-    value>> value-info class>> \ f class<= ;
-
-M: false-constraint satisfiable?
-    value>> value-info class>> \ f classes-intersect? ;
+    value>> value-info class>> false-class? ;
 
 ! Class constraints
 TUPLE: class-constraint value class ;
@@ -51,7 +55,7 @@ TUPLE: class-constraint value class ;
 : is-instance-of ( value class -- constraint )
     [ resolve-copy ] dip class-constraint boa ;
 
-M: class-constraint assume
+M: class-constraint assume*
     [ class>> <class-info> ] [ value>> ] bi refine-value-info ;
 
 ! Interval constraints
@@ -60,7 +64,7 @@ TUPLE: interval-constraint value interval ;
 : is-in-interval ( value interval -- constraint )
     [ resolve-copy ] dip interval-constraint boa ;
 
-M: interval-constraint assume
+M: interval-constraint assume*
     [ interval>> <interval-info> ] [ value>> ] bi refine-value-info ;
 
 ! Literal constraints
@@ -69,7 +73,7 @@ TUPLE: literal-constraint value literal ;
 : is-equal-to ( value literal -- constraint )
     [ resolve-copy ] dip literal-constraint boa ;
 
-M: literal-constraint assume
+M: literal-constraint assume*
     [ literal>> <literal-info> ] [ value>> ] bi refine-value-info ;
 
 ! Implication constraints
@@ -77,46 +81,29 @@ TUPLE: implication p q ;
 
 C: --> implication
 
-M: implication assume
-    [ q>> ] [ p>> ] bi
-    [ constraints get set-at ]
+: assume-implication ( p q -- )
+    [ constraints get [ swap suffix ] change-at ]
     [ satisfied? [ assume ] [ drop ] if ] 2bi ;
 
-M: implication satisfiable?
-    [ q>> satisfiable? ] [ p>> satisfiable? not ] bi or ;
+M: implication assume*
+    [ q>> ] [ p>> ] bi assume-implication ;
 
-! Conjunction constraints
-TUPLE: conjunction p q ;
+! Equivalence constraints
+TUPLE: equivalence p q ;
 
-C: /\ conjunction
+C: <--> equivalence
 
-M: conjunction assume [ p>> assume ] [ q>> assume ] bi ;
+M: equivalence assume*
+    [ p>> ] [ q>> ] bi
+    [ assume-implication ]
+    [ swap assume-implication ] 2bi ;
 
-M: conjunction satisfiable?
-    [ p>> satisfiable? ] [ q>> satisfiable? ] bi and ;
+! Conjunction constraints -- sequences act as conjunctions
+M: sequence assume* [ assume ] each ;
 
-! Disjunction constraints
-TUPLE: disjunction p q ;
-
-C: \/ disjunction
-
-M: disjunction assume
-    {
-        { [ dup p>> satisfiable? not ] [ q>> assume ] }
-        { [ dup q>> satisfiable? not ] [ p>> assume ] }
-        [ drop ]
-    } cond ;
-
-M: disjunction satisfiable?
-    [ p>> satisfiable? ] [ q>> satisfiable? ] bi or ;
-
-! No-op
-M: f assume drop ;
+: /\ ( p q -- constraint ) 2array ;
 
 ! Utilities
 : t--> ( constraint boolean-value -- constraint' ) =t swap --> ;
 
 : f--> ( constraint boolean-value -- constraint' ) =f swap --> ;
-
-: <conditional> ( true-constr false-constr boolean-value -- constraint )
-    tuck [ t--> ] [ f--> ] 2bi* /\ ;

@@ -6,50 +6,17 @@ accessors combinators stack-checker.state stack-checker.visitor ;
 IN: compiler.tree
 
 ! High-level tree SSA form.
-!
-! Invariants:
-! 1) Each value has exactly one definition. A "definition" means
-! the value appears in the out-d or out-r slot of a node, or the
-! values slot of an #introduce node.
-! 2) Each value appears only once in the inputs of a node, where
-! the inputs are the concatenation of in-d and in-r, or in the
-! case of a #phi node, the sequence of sequences in the phi-in-r
-! and phi-in-d slots.
-! 3) A value is never used in the same node where it is defined.
-TUPLE: node < identity-tuple
-in-d out-d in-r out-r info
-successor children ;
+
+TUPLE: node < identity-tuple info ;
 
 M: node hashcode* drop node hashcode* ;
 
-: node-child ( node -- child ) children>> first ;
+TUPLE: #introduce < node value ;
 
-: last-node ( node -- last )
-    dup successor>> [ last-node ] [ ] ?if ;
+: #introduce ( value -- node )
+    \ #introduce new swap >>value ;
 
-: penultimate-node ( node -- penultimate )
-    dup successor>> dup [
-        dup successor>>
-        [ nip penultimate-node ] [ drop ] if
-    ] [
-        2drop f
-    ] if ;
-
-: node-value-info ( node value -- info )
-    swap info>> at ;
-
-: node-input-infos ( node -- seq )
-    dup in-d>> [ node-value-info ] with map ;
-
-: node-output-infos ( node -- seq )
-    dup out-d>> [ node-value-info ] with map ;
-
-TUPLE: #introduce < node values ;
-
-: #introduce ( values -- node )
-    \ #introduce new swap >>values ;
-
-TUPLE: #call < node word history ;
+TUPLE: #call < node word in-d out-d body method ;
 
 : #call ( inputs outputs word -- node )
     \ #call new
@@ -57,7 +24,7 @@ TUPLE: #call < node word history ;
         swap >>out-d
         swap >>in-d ;
 
-TUPLE: #call-recursive < node label ;
+TUPLE: #call-recursive < node label in-d out-d ;
 
 : #call-recursive ( inputs outputs label -- node )
     \ #call-recursive new
@@ -65,14 +32,14 @@ TUPLE: #call-recursive < node label ;
         swap >>out-d
         swap >>in-d ;
 
-TUPLE: #push < node literal ;
+TUPLE: #push < node literal out-d ;
 
 : #push ( literal value -- node )
     \ #push new
         swap 1array >>out-d
         swap >>literal ;
 
-TUPLE: #shuffle < node mapping ;
+TUPLE: #shuffle < node mapping in-d out-d ;
 
 : #shuffle ( inputs outputs mapping -- node )
     \ #shuffle new
@@ -83,25 +50,27 @@ TUPLE: #shuffle < node mapping ;
 : #drop ( inputs -- node )
     { } { } #shuffle ;
 
-TUPLE: #>r < node ;
+TUPLE: #>r < node in-d out-r ;
 
 : #>r ( inputs outputs -- node )
     \ #>r new
         swap >>out-r
         swap >>in-d ;
 
-TUPLE: #r> < node ;
+TUPLE: #r> < node in-r out-d ;
 
 : #r> ( inputs outputs -- node )
     \ #r> new
         swap >>out-d
         swap >>in-r ;
 
-TUPLE: #terminate < node ;
+TUPLE: #terminate < node in-d ;
 
-: #terminate ( -- node ) \ #terminate new ;
+: #terminate ( stack -- node )
+    \ #terminate new
+        swap >>in-d ;
 
-TUPLE: #branch < node ;
+TUPLE: #branch < node in-d children live-branches ;
 
 : new-branch ( value children class -- node )
     new
@@ -118,10 +87,11 @@ TUPLE: #dispatch < #branch ;
 : #dispatch ( n branches -- node )
     \ #dispatch new-branch ;
 
-TUPLE: #phi < node phi-in-d phi-in-r ;
+TUPLE: #phi < node phi-in-d phi-info-d phi-in-r phi-info-r out-d out-r terminated ;
 
-: #phi ( d-phi-in d-phi-out r-phi-in r-phi-out -- node )
+: #phi ( d-phi-in d-phi-out r-phi-in r-phi-out terminated -- node )
     \ #phi new
+        swap >>terminated
         swap >>out-r
         swap >>phi-in-r
         swap >>out-d
@@ -133,59 +103,62 @@ TUPLE: #declare < node declaration ;
     \ #declare new
         swap >>declaration ;
 
-TUPLE: #return < node label ;
+TUPLE: #return < node in-d ;
 
-: #return ( label stack -- node )
+: #return ( stack -- node )
     \ #return new
-        swap >>in-d
-        swap >>label ;
+        swap >>in-d ;
 
-TUPLE: #recursive < node word label loop? returns calls ;
+TUPLE: #recursive < node in-d word label loop? returns calls child ;
 
-: #recursive ( word label inputs outputs child -- node )
+: #recursive ( word label inputs child -- node )
     \ #recursive new
-        swap 1array >>children
-        swap >>out-d
+        swap >>child
         swap >>in-d
         swap >>label
         swap >>word ;
 
-TUPLE: #copy < node ;
+TUPLE: #enter-recursive < node in-d out-d label ;
+
+: #enter-recursive ( label inputs outputs -- node )
+    \ #enter-recursive new
+        swap >>out-d
+        swap >>in-d
+        swap >>label ;
+
+TUPLE: #return-recursive < node in-d out-d label ;
+
+: #return-recursive ( label inputs outputs -- node )
+    \ #return-recursive new
+        swap >>out-d
+        swap >>in-d
+        swap >>label ;
+
+TUPLE: #copy < node in-d out-d ;
 
 : #copy ( inputs outputs -- node )
     \ #copy new
         swap >>out-d
         swap >>in-d ;
 
-DEFER: #tail?
+: node, ( node -- ) stack-visitor get push ;
 
-PREDICATE: #tail-phi < #phi successor>> #tail? ;
-
-UNION: #tail POSTPONE: f #return #tail-phi #terminate ;
-
-TUPLE: node-list first last ;
-
-: node, ( node -- )
-    stack-visitor get swap
-    over last>>
-    [ [ [ last>> ] dip >>successor drop ] [ >>last drop ] 2bi ]
-    [ [ >>first ] [ >>last ] bi drop ]
-    if ;
-
-M: node-list child-visitor node-list new ;
-M: node-list #introduce, #introduce node, ;
-M: node-list #call, #call node, ;
-M: node-list #call-recursive, #call-recursive node, ;
-M: node-list #push, #push node, ;
-M: node-list #shuffle, #shuffle node, ;
-M: node-list #drop, #drop node, ;
-M: node-list #>r, #>r node, ;
-M: node-list #r>, #r> node, ;
-M: node-list #return, #return node, ;
-M: node-list #terminate, #terminate node, ;
-M: node-list #if, #if node, ;
-M: node-list #dispatch, #dispatch node, ;
-M: node-list #phi, #phi node, ;
-M: node-list #declare, #declare node, ;
-M: node-list #recursive, #recursive node, ;
-M: node-list #copy, #copy node, ;
+M: vector child-visitor V{ } clone ;
+M: vector #introduce, #introduce node, ;
+M: vector #call, #call node, ;
+M: vector #push, #push node, ;
+M: vector #shuffle, #shuffle node, ;
+M: vector #drop, #drop node, ;
+M: vector #>r, #>r node, ;
+M: vector #r>, #r> node, ;
+M: vector #return, #return node, ;
+M: vector #enter-recursive, #enter-recursive node, ;
+M: vector #return-recursive, #return-recursive node, ;
+M: vector #call-recursive, #call-recursive node, ;
+M: vector #terminate, #terminate node, ;
+M: vector #if, #if node, ;
+M: vector #dispatch, #dispatch node, ;
+M: vector #phi, #phi node, ;
+M: vector #declare, #declare node, ;
+M: vector #recursive, #recursive node, ;
+M: vector #copy, #copy node, ;

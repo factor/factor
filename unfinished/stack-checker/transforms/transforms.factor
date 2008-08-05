@@ -4,7 +4,8 @@ USING: fry accessors arrays kernel words sequences generic math
 namespaces quotations assocs combinators classes.tuple
 classes.tuple.private effects summary hashtables classes generic
 sets definitions generic.standard slots.private continuations
-stack-checker.backend stack-checker.state stack-checker.errors ;
+stack-checker.backend stack-checker.state stack-checker.visitor
+stack-checker.errors ;
 IN: stack-checker.transforms
 
 SYMBOL: +transform-quot+
@@ -15,8 +16,9 @@ SYMBOL: +transform-n+
         drop recursive-state get 1array
     ] [
         consume-d
+        [ #drop, ]
         [ [ literal value>> ] map ]
-        [ first literal recursion>> ] bi prefix
+        [ first literal recursion>> ] tri prefix
     ] if
     swap with-datastack ;
 

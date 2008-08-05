@@ -171,7 +171,7 @@ F_SEGMENT *alloc_segment(CELL size)
 
 	if((mem = (char *)VirtualAlloc(NULL, getpagesize() * 2 + size,
 		MEM_COMMIT, PAGE_EXECUTE_READWRITE)) == 0)
-		fatal_error("Out of memory in alloc_segment",0);
+		out_of_memory();
 
 	if (!VirtualProtect(mem, getpagesize(), PAGE_NOACCESS, &ignore))
 		fatal_error("Cannot allocate low guard page", (CELL)mem);

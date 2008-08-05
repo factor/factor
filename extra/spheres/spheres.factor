@@ -194,10 +194,9 @@ M: spheres-gadget pref-dim* ( gadget -- dim )
 : sphere-scene ( gadget -- )
     GL_DEPTH_BUFFER_BIT GL_COLOR_BUFFER_BIT bitor glClear
     [
-        solid-sphere-program>> dup {
-            { "light_position" [ 0.0 0.0 100.0 glUniform3f ] }
-        } [
+        solid-sphere-program>> [
             {
+                [ "light_position" glGetUniformLocation 0.0 0.0 100.0 glUniform3f ]
                 [ {  7.0  0.0  0.0 } 1.0 { 1.0 0.0 0.0 1.0 } (draw-sphere) ]
                 [ { -7.0  0.0  0.0 } 1.0 { 0.0 1.0 0.0 1.0 } (draw-sphere) ]
                 [ {  0.0  0.0  7.0 } 1.0 { 0.0 0.0 1.0 1.0 } (draw-sphere) ]
@@ -207,7 +206,8 @@ M: spheres-gadget pref-dim* ( gadget -- dim )
             } cleave
         ] with-gl-program
     ] [
-        plane-program>> { } [
+        plane-program>> [
+            drop
             GL_QUADS [
                 -1000.0 -30.0  1000.0 glVertex3f
                 -1000.0 -30.0 -1000.0 glVertex3f
@@ -269,10 +269,10 @@ M: spheres-gadget draw-gadget* ( gadget -- )
         [ sphere-scene ]
         [ reflection-texture>> GL_TEXTURE_CUBE_MAP GL_TEXTURE0 bind-texture-unit ]
         [
-            texture-sphere-program>> dup {
-                { "surface_texture" [ 0 glUniform1i ] }
-            } [
-                { 0.0 0.0 0.0 } 4.0 { 1.0 0.0 0.0 1.0 } (draw-sphere)
+            texture-sphere-program>> [
+                [ "surface_texture" glGetUniformLocation 0 glUniform1i ]
+                [ { 0.0 0.0 0.0 } 4.0 { 1.0 0.0 0.0 1.0 } (draw-sphere) ]
+                bi
             ] with-gl-program
         ]
     } cleave ;

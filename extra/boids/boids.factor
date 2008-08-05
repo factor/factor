@@ -220,7 +220,7 @@ cond ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: init-boids ( -- ) 50 random-boids >boids ;
+: init-boids ( -- ) 100 random-boids >boids ;
 
 : init-world-size ( -- ) { 100 100 } >world-size ;
 

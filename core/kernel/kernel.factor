@@ -173,7 +173,7 @@ GENERIC: boa ( ... class -- tuple )
 
 : or ( obj1 obj2 -- ? ) dupd ? ; inline
 
-: xor ( obj1 obj2 -- ? ) dup not swap ? ; inline
+: xor ( obj1 obj2 -- ? ) [ f swap ? ] when* ; inline
 
 : both? ( x y quot -- ? ) bi@ and ; inline
 
@@ -185,6 +185,10 @@ GENERIC: boa ( ... class -- tuple )
 ! Error handling -- defined early so that other files can
 ! throw errors before continuations are loaded
 : throw ( error -- * ) 5 getenv [ die ] or 1 (throw) ;
+
+ERROR: assert got expect ;
+
+: assert= ( a b -- ) 2dup = [ 2drop ] [ assert ] if ;
 
 <PRIVATE
 

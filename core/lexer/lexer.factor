@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences accessors namespaces math words strings
-debugger io vectors arrays math.parser combinators summary
-continuations ;
+io vectors arrays math.parser combinators continuations ;
 IN: lexer
 
 TUPLE: lexer text line line-text line-length column ;
@@ -68,18 +67,6 @@ M: lexer skip-word ( lexer -- )
 
 ERROR: unexpected want got ;
 
-GENERIC: expected>string ( obj -- str )
-
-M: f expected>string drop "end of input" ;
-M: word expected>string name>> ;
-M: string expected>string ;
-
-M: unexpected error.
-    "Expected " write
-    dup unexpected-want expected>string write
-    " but got " write
-    unexpected-got expected>string print ;
-
 PREDICATE: unexpected-eof < unexpected
     unexpected-got not ;
 
@@ -112,18 +99,6 @@ TUPLE: lexer-error line column line-text error ;
     [ column>> 0 or ] tri
     pick length + CHAR: \s <string>
     [ write ] [ print ] [ write "^" print ] tri* ;
-
-M: lexer-error error.
-    [ lexer-dump ] [ error>> error. ] bi ;
-
-M: lexer-error summary
-    error>> summary ;
-
-M: lexer-error compute-restarts
-    error>> compute-restarts ;
-
-M: lexer-error error-help
-    error>> error-help ;
 
 : with-lexer ( lexer quot -- newquot )
     [ lexer set ] dip [ <lexer-error> rethrow ] recover ; inline

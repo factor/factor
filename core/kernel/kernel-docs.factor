@@ -437,7 +437,7 @@ HELP: or
 
 HELP: xor
 { $values { "obj1" "a generalized boolean" } { "obj2" "a generalized boolean" } { "?" "a generalized boolean" } }
-{ $description "Tests if at exactly one object is not " { $link f } "." }
+{ $description "If exactly one input is false, outputs the other input. Otherwise outputs " { $link f } "." }
 { $notes "This word implements boolean exclusive or, so applying it to integers will not yield useful results (all integers have a true value). Bitwise exclusive or is the " { $link bitxor } " word." } ;
 
 HELP: both?
@@ -903,3 +903,8 @@ $nl
     "[ P ] [ Q ] [ ] while T"
 }
 "However, depending on the stack effects of " { $snippet "pred" } " and " { $snippet "quot" } ", the " { $snippet "tail" } " quotation might need to be non-empty in order to balance out the stack effect of branches for stack effect inference." } ;
+
+HELP: assert
+{ $values { "got" "the obtained value" } { "expect" "the expected value" } }
+{ $description "Throws an " { $link assert } " error." }
+{ $error-description "Thrown when a unit test or other assertion fails." } ;

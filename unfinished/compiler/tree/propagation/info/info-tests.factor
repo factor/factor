@@ -1,5 +1,5 @@
 USING: accessors math math.intervals sequences classes.algebra
-math kernel tools.test compiler.tree.propagation.info ;
+math kernel tools.test compiler.tree.propagation.info arrays ;
 IN: compiler.tree.propagation.info.tests
 
 [ f ] [ 0.0 -0.0 eql? ] unit-test
@@ -59,5 +59,14 @@ IN: compiler.tree.propagation.info.tests
 
 [ 3 t ] [
     3 <literal-info>
-    null <class-info> value-info-union >literal<
+    null-info value-info-union >literal<
+] unit-test
+
+[ ] [ { } value-infos-union drop ] unit-test
+
+TUPLE: test-tuple { x read-only } ;
+
+[ t ] [
+    f f 3 <literal-info> 3array test-tuple <tuple-info> dup
+    object-info value-info-intersect =
 ] unit-test

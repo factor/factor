@@ -1,8 +1,8 @@
 
 USING: kernel sequences combinators
        math math.vectors math.functions multi-methods
-       accessors combinators.cleave processing processing.color
-       bubble-chamber.common ;
+       accessors combinators.cleave processing
+       bubble-chamber.common colors ;
 
 IN: bubble-chamber.particle
 
@@ -28,8 +28,8 @@ TUPLE: particle pos vel speed speed-d theta theta-d theta-dd myc mya ;
   0 >>theta-d
   0 >>theta-dd
 
-  0 0 0 1 <rgba> >>myc
-  0 0 0 1 <rgba> >>mya ;
+  0 0 0 1 rgba boa >>myc
+  0 0 0 1 rgba boa >>mya ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

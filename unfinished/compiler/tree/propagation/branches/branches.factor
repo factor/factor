@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry kernel sequences assocs accessors namespaces
-math.intervals arrays classes.algebra locals
+math.intervals arrays classes.algebra combinators
 compiler.tree
 compiler.tree.def-use
+compiler.tree.combinators
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
 compiler.tree.propagation.simple
@@ -19,58 +20,116 @@ M: #if child-constraints
 M: #dispatch child-constraints
     children>> length f <repetition> ;
 
-GENERIC: live-children ( #branch -- children )
+GENERIC: live-branches ( #branch -- indices )
 
-M: #if live-children
-    [ children>> ] [ in-d>> first value-info possible-boolean-values ] bi
-    [ t swap memq? [ first ] [ drop f ] if ]
-    [ f swap memq? [ second ] [ drop f ] if ]
-    2bi 2array ;
+M: #if live-branches
+    in-d>> first value-info class>> {
+        { [ dup null-class? ] [ { f f } ] }
+        { [ dup true-class? ] [ { t f } ] }
+        { [ dup false-class? ] [ { f t } ] }
+        [ { t t } ]
+    } cond nip ;
 
-M: #dispatch live-children
-    [ children>> ] [ in-d>> first value-info interval>> ] bi
-    '[ , interval-contains? [ drop f ] unless ] map-index ;
+M: #dispatch live-branches
+    [ children>> length ] [ in-d>> first value-info interval>> ] bi
+    '[ , interval-contains? ] map ;
 
-: infer-children ( node -- assocs )
+: live-children ( #branch -- children )
+    [ children>> ] [ live-branches>> ] bi select-children ;
+
+SYMBOL: infer-children-data
+
+: copy-value-info ( -- )
+    value-infos [ clone ] change
+    constraints [ clone ] change ;
+
+: no-value-info ( -- )
+    value-infos off
+    constraints off ;
+
+: infer-children ( node -- )
     [ live-children ] [ child-constraints ] bi [
         [
-            over [
-                value-infos [ clone ] change
-                constraints [ clone ] change
-                assume
-                first>> (propagate)
-            ] [
-                2drop
-                value-infos off
-                constraints off
-            ] if
+            over
+            [ copy-value-info assume (propagate) ]
+            [ 2drop no-value-info ]
+            if
         ] H{ } make-assoc
-    ] 2map ;
+    ] 2map infer-children-data set ;
 
-: (merge-value-infos) ( inputs results -- infos )
-    '[ , [ [ value-info ] bind ] 2map value-infos-union ] map ;
+: compute-phi-input-infos ( phi-in -- phi-info )
+    infer-children-data get
+    '[ , [ [ [ value-info ] [ null-info ] if* ] bind ] 2map ] map ;
 
-: merge-value-infos ( results inputs outputs -- )
-    [ swap (merge-value-infos) ] dip set-value-infos ;
+: annotate-phi-inputs ( #phi -- )
+    dup phi-in-d>> compute-phi-input-infos >>phi-info-d
+    dup phi-in-r>> compute-phi-input-infos >>phi-info-r
+    drop ;
 
-: propagate-branch-phi ( results #phi -- )
-    [ [ phi-in-d>> ] [ out-d>> ] bi merge-value-infos ]
-    [ [ phi-in-r>> ] [ out-r>> ] bi merge-value-infos ]
-    2bi ;
+: annotate-phi-outputs ( #phi -- )
+    dup [ out-d>> ] [ out-r>> ] bi append extract-value-info
+    >>info drop ;
 
-:: branch-phi-constraints ( x #phi -- )
-    #phi [ out-d>> ] [ phi-in-d>> ] bi [
-        first2 2dup and [ USE: prettyprint
-            [ [ =t x =t /\ ] [ =t x =f /\ ] bi* \/ swap t--> dup  . assume ]
-            [ [ =f x =t /\ ] [ =f x =f /\ ] bi* \/ swap f--> dup  . assume ]
-            3bi
-        ] [ 3drop ] if
-    ] 2each ;
+: merge-value-infos ( infos outputs -- )
+    [ [ value-infos-union ] map ] dip set-value-infos ;
 
-: merge-children ( results node -- )
-    [ successor>> propagate-branch-phi ]
-    [ [ in-d>> first ] [ successor>> ] bi 2drop ] ! branch-phi-constraints ]
-    bi ;
+SYMBOL: condition-value
+
+M: #phi propagate-before ( #phi -- )
+    {
+        [ annotate-phi-inputs ]
+        [ [ phi-info-d>> ] [ out-d>> ] bi merge-value-infos ]
+        [ [ phi-info-r>> ] [ out-r>> ] bi merge-value-infos ]
+        [ annotate-phi-outputs ]
+    } cleave ;
+
+: branch-phi-constraints ( output values booleans -- )
+     {
+        {
+            { { t } { f } }
+            [
+                drop condition-value get
+                [ [ =t ] [ =t ] bi* <--> ]
+                [ [ =f ] [ =f ] bi* <--> ] 2bi /\ assume
+            ]
+        }
+        {
+            { { f } { t } }
+            [
+                drop condition-value get
+                [ [ =t ] [ =f ] bi* <--> ]
+                [ [ =f ] [ =t ] bi* <--> ] 2bi /\ assume
+            ]
+        }
+        {
+            { { t f } { f } }
+            [ first =t condition-value get =t /\ swap t--> assume ]
+        }
+        {
+            { { f } { t f } }
+            [ second =t condition-value get =f /\ swap t--> assume ]
+        }
+        [ 3drop ]
+    } case ;
+
+M: #phi propagate-after ( #phi -- )
+    condition-value get [
+        [ out-d>> ] [ phi-in-d>> ] [ phi-info-d>> ] tri
+        3array flip [
+            first3 [ possible-boolean-values ] map
+            branch-phi-constraints
+        ] each
+    ] [ drop ] if ;
+
+M: #phi propagate-around ( #phi -- )
+    [ propagate-before ] [ propagate-after ] bi ;
 
 M: #branch propagate-around
-    [ infer-children ] [ merge-children ] [ annotate-node ] tri ;
+    dup live-branches >>live-branches
+    [ infer-children ] [ annotate-node ] bi ;
+
+M: #if propagate-around
+    [ in-d>> first condition-value set ] [ call-next-method ] bi ;
+
+M: #dispatch propagate-around
+    condition-value off call-next-method ;

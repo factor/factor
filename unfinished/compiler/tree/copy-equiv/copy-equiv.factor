@@ -1,20 +1,39 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces disjoint-sets sequences assocs
-kernel accessors fry
-compiler.tree compiler.tree.def-use compiler.tree.combinators ;
+USING: namespaces sequences assocs math kernel accessors fry
+combinators sets locals
+compiler.tree
+compiler.tree.def-use
+compiler.tree.combinators ;
 IN: compiler.tree.copy-equiv
 
-! Disjoint set of copy equivalence
+! Two values are copy-equivalent if they are always identical
+! at run-time ("DS" relation). This is just a weak form of
+! value numbering.
+
+! Mapping from values to their canonical leader
 SYMBOL: copies
 
-: is-copy-of ( val copy -- ) copies get equate ;
+:: compress-path ( source assoc -- destination )
+    [let | destination [ source assoc at ] |
+        source destination = [ source ] [
+            [let | destination' [ destination assoc compress-path ] |
+                destination' destination = [
+                    destination' source assoc set-at
+                ] unless
+                destination'
+            ]
+        ] if
+    ] ;
+
+: resolve-copy ( copy -- val )
+    copies get compress-path [ "Unknown value" throw ] unless* ;
+
+: is-copy-of ( val copy -- ) copies get set-at ;
 
 : are-copies-of ( vals copies -- ) [ is-copy-of ] 2each ;
 
-: resolve-copy ( copy -- val ) copies get representative ;
-
-: introduce-value ( val -- ) copies get add-atom ;
+: introduce-value ( val -- ) copies get conjoin ;
 
 GENERIC: compute-copy-equiv* ( node -- )
 
@@ -31,12 +50,31 @@ M: #r> compute-copy-equiv*
 M: #copy compute-copy-equiv*
     [ in-d>> ] [ out-d>> ] bi are-copies-of ;
 
+M: #return-recursive compute-copy-equiv*
+    [ in-d>> ] [ out-d>> ] bi are-copies-of ;
+
+: compute-phi-equiv ( inputs outputs -- )
+    #! An output is a copy of every input if all inputs are
+    #! copies of the same original value.
+    [
+        swap sift [ resolve-copy ] map
+        dup [ all-equal? ] [ empty? not ] bi and
+        [ first swap is-copy-of ] [ 2drop ] if
+    ] 2each ;
+
+M: #phi compute-copy-equiv*
+    [ [ phi-in-d>> ] [ out-d>> ] bi compute-phi-equiv ]
+    [ [ phi-in-r>> ] [ out-r>> ] bi compute-phi-equiv ] bi ;
+
 M: node compute-copy-equiv* drop ;
 
-: compute-copy-equiv ( node -- node )
-    <disjoint-set> copies set
-    dup [
+: amend-copy-equiv ( node -- )
+    [
         [ node-defs-values [ introduce-value ] each ]
         [ compute-copy-equiv* ]
         bi
     ] each-node ;
+
+: compute-copy-equiv ( node -- node )
+    H{ } clone copies set
+    dup amend-copy-equiv ;

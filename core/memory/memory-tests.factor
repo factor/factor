@@ -23,3 +23,6 @@ TUPLE: testing x y z ;
         ] when*
     ] each
 ] unit-test
+
+! Erg's bug
+2 [ [ [ 3 throw ] instances ] must-fail ] times

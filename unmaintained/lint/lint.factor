@@ -1,8 +1,9 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.accessors arrays assocs combinators.lib io kernel
-macros math namespaces prettyprint quotations sequences
-vectors vocabs words html.elements slots.private tar ;
+USING: accessors alien alien.accessors arrays assocs
+combinators.lib io kernel macros math namespaces prettyprint
+quotations sequences vectors vocabs words html.elements sets
+slots.private combinators.short-circuit ;
 IN: lint
 
 SYMBOL: def-hash
@@ -18,7 +19,7 @@ SYMBOL: def-hash-keys
         2drop
     ] if ;
 
-: more-defs
+: more-defs ( -- )
     {
         { [ swap >r swap r> ] -rot }
         { [ swap swapd ] -rot }
@@ -33,6 +34,7 @@ SYMBOL: def-hash-keys
         { [ 0 = ] zero? }
         { [ pop drop ] pop* }
         { [ [ ] if ] when }
+        { [ f = not ] >boolean }
     } [ first2 swap add-word-def ] each ;
 
 : accessor-words ( -- seq )
@@ -51,33 +53,32 @@ SYMBOL: def-hash-keys
     {
         [ get ] [ t ] [ { } ] [ . ] [ drop f ]
         [ drop ] [ f ] [ first ] [ second ] [ third ] [ fourth ]
-        [ ">" write-html ] [ <unimplemented-typeflag> throw ]
-        [ "/>" write-html ]
+        [ ">" write-html ] [ "/>" write-html ]
     } ;
 
 H{ } clone def-hash set-global
-all-words [ dup word-def add-word-def ] each
+all-words [ dup def>> add-word-def ] each
 more-defs
 
 ! Remove empty word defs
 def-hash get-global [
     drop empty? not
-] assoc-subset
+] assoc-filter
 
 ! Remove constants [ 1 ]
 [
     drop dup length 1 = swap first number? and not
-] assoc-subset
+] assoc-filter
 
 ! Remove set-alien-cell, etc.
 [
-    drop [ accessor-words swap seq-diff ] keep [ length ] bi@ =
-] assoc-subset
+    drop [ accessor-words diff ] keep [ length ] bi@ =
+] assoc-filter
 
 ! Remove trivial defs
 [
     drop trivial-defs member? not
-] assoc-subset
+] assoc-filter
 
 ! Remove n m shift defs
 [
@@ -85,19 +86,19 @@ def-hash get-global [
         dup first2 [ number? ] both?
         swap third \ shift = and not
     ] [ drop t ] if
-] assoc-subset 
+] assoc-filter 
 
 ! Remove [ n slot ]
 [
     drop dup length 2 = [
         first2 \ slot = swap number? and not
     ] [ drop t ] if
-] assoc-subset def-hash set-global
+] assoc-filter def-hash set-global
 
-: find-duplicates
+: find-duplicates ( -- seq )
     def-hash get-global [
         nip length 1 >
-    ] assoc-subset ;
+    ] assoc-filter ;
 
 def-hash get-global keys def-hash-keys set-global
 
@@ -107,18 +108,18 @@ M: object lint ( obj -- seq )
     drop f ;
 
 : subseq/member? ( subseq/member seq -- ? )
-    { [ 2dup start ] [ 2dup member? ] } || 2nip ;
+    { [ start ] [ member? ] } 2|| ;
 
 M: callable lint ( quot -- seq )
     def-hash-keys get [
         swap subseq/member?
-    ] with subset ;
+    ] with filter ;
 
 M: word lint ( word -- seq )
-    word-def dup callable? [ lint ] [ drop f ] if ;
+    def>> dup callable? [ lint ] [ drop f ] if ;
 
 : word-path. ( word -- )
-    [ word-vocabulary ":" ] keep unparse 3append write nl ;
+    [ vocabulary>> ":" ] keep unparse 3append write nl ;
 
 : (lint.) ( pair -- )
     first2 >r word-path. r> [
@@ -135,7 +136,7 @@ M: word lint ( word -- seq )
 
 GENERIC: run-lint ( obj -- obj )
 
-: (trim-self)
+: (trim-self) ( val key -- obj ? )
     def-hash get-global at* [
         dupd remove empty? not
     ] [
@@ -143,13 +144,13 @@ GENERIC: run-lint ( obj -- obj )
     ] if ;
 
 : trim-self ( seq -- newseq )
-    [ [ (trim-self) ] subset ] assoc-map ;
+    [ [ (trim-self) ] filter ] assoc-map ;
 
 : filter-symbols ( alist -- alist )
     [
         nip first dup def-hash get at
         [ first ] bi@ literalize = not
-    ] assoc-subset ;
+    ] assoc-filter ;
 
 M: sequence run-lint ( seq -- seq )
     [
@@ -157,7 +158,7 @@ M: sequence run-lint ( seq -- seq )
         dup lint
     ] { } map>assoc
     trim-self
-    [ second empty? not ] subset
+    [ second empty? not ] filter
     filter-symbols ;
 
 M: word run-lint ( word -- seq )
