@@ -4,7 +4,8 @@ USING: kernel alien.c-types combinators namespaces arrays
        math math.functions math.vectors math.trig
        opengl.gl opengl.glu opengl ui ui.gadgets.slate
        vars colors self self.slots
-       random-weighted colors.hsv cfdg.gl accessors ;
+       random-weighted colors.hsv cfdg.gl accessors
+       ui.gadgets.handler ui.gestures assocs ui.gadgets ;
 
 IN: cfdg
 
@@ -201,20 +202,32 @@ SYMBOL: dlist
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: delete-dlist ( -- ) dlist get [ dlist get 1 glDeleteLists dlist off ] when ;
+
 : cfdg-window* ( -- )
   C[ display ] <slate>
-    { 500 500 } >>pdim
-    C[ dlist get [ dlist get 1 glDeleteLists ] when ] >>ungraft
+    { 500 500 }       >>pdim
+    C[ delete-dlist ] >>ungraft
   dup "CFDG" open-window ;
 
 : cfdg-window ( -- ) [ cfdg-window* ] with-ui ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+SYMBOL: the-slate
+
+: rebuild ( -- ) delete-dlist the-slate get relayout-1 ;
+
 : <cfdg-gadget> ( -- slate )
   C[ display ] <slate>
+    dup the-slate set
     { 500 500 } >>pdim
-    C[ dlist get [ dlist get 1 glDeleteLists ] when ] >>ungraft ;
+    C[ dlist get [ dlist get 1 glDeleteLists ] when ] >>ungraft
+  <handler>
+    H{ } clone
+      T{ key-down f f "ENTER" } C[ drop rebuild ] swap pick set-at
+      T{ button-down }          C[ drop rebuild ] swap pick set-at
+    >>table ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
