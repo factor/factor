@@ -42,6 +42,7 @@ IN: tools.deploy.shaker
     ] when
     strip-dictionary? [
         "compiler.units" init-hooks get delete-at
+        "tools.vocabs" init-hooks get delete-at
     ] when ;
 
 : strip-debugger ( -- )
@@ -88,16 +89,28 @@ IN: tools.deploy.shaker
     ] [
         "Remaining word properties:" print
         [ props>> keys ] gather .
-    ] bi ;
+    ] [
+        H{ } clone '[
+            [ [ _ [ ] cache ] map ] change-props drop
+        ] each
+    ] tri ;
 
 : stripped-word-props ( -- seq )
     [
+        strip-dictionary? deploy-compiler? get and [
+            {
+                "combination"
+                "members"
+                "methods"
+            } %
+        ] when
+
         strip-dictionary? [
             {
+                "alias"
                 "boa-check"
                 "cannot-infer"
                 "coercer"
-                "combination"
                 "compiled-effect"
                 "compiled-generic-uses"
                 "compiled-uses"
@@ -127,12 +140,10 @@ IN: tools.deploy.shaker
                 "local-writer?"
                 "local?"
                 "macro"
-                "members"
                 "memo-quot"
                 "mixin"
                 "method-class"
                 "method-generic"
-                "methods"
                 "modular-arithmetic"
                 "no-compile"
                 "optimizer-hooks"
@@ -145,6 +156,8 @@ IN: tools.deploy.shaker
                 "reader"
                 "reading"
                 "recursive"
+                "register"
+                "register-size"
                 "shuffle"
                 "slot-names"
                 "slots"
@@ -226,9 +239,12 @@ IN: tools.deploy.shaker
             "alarms"
             "tools"
             "io.launcher"
+            "random"
         } strip-vocab-globals %
 
         strip-dictionary? [
+            "libraries" "alien" lookup ,
+
             { } { "cpu" } strip-vocab-globals %
 
             {

@@ -169,8 +169,26 @@ DEFINE_PRIMITIVE(save_image)
 	save_image(unbox_native_string());
 }
 
+void strip_compiled_quotations(void)
+{
+	begin_scan();
+	CELL obj;
+	while((obj = next_object()) != F)
+	{
+		if(type_of(obj) == QUOTATION_TYPE)
+		{
+			F_QUOTATION *quot = untag_object(obj);
+			quot->compiledp = F;
+		}
+	}
+	gc_off = false;
+}
+
 DEFINE_PRIMITIVE(save_image_and_exit)
 {
+	/* This reduces deployed image size */
+	strip_compiled_quotations();
+
 	F_CHAR *path = unbox_native_string();
 
 	REGISTER_C_STRING(path);
