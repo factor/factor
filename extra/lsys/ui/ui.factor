@@ -41,7 +41,7 @@ VAR: model
 
 : display ( -- )
 
-black gl-clear
+black set-clear-color GL_COLOR_BUFFER_BIT glClear
 
 GL_FLAT glShadeModel
 
@@ -57,7 +57,9 @@ camera> do-look-at
 
 GL_FRONT_AND_BACK GL_LINE glPolygonMode
 
-white gl-color
+! white gl-color
+
+white set-color
 
 GL_LINES glBegin { 0 0 0 } gl-vertex { 0 0 1 } gl-vertex glEnd
 
