@@ -1,4 +1,4 @@
-USING: kernel accessors multi-methods locals combinators math arrays
+USING: kernel accessors locals combinators math arrays
 assocs namespaces sequences ;
 IN: persistent-heaps
 ! These are minheaps
@@ -36,13 +36,14 @@ PRIVATE>
 
 GENERIC: sift-down ( value prio left right -- heap )
 
-METHOD: sift-down { empty-heap empty-heap } <branch> ;
-
-METHOD: sift-down { singleton-heap empty-heap }
+: sift-singleton ( value prio left right -- heap )
     3dup drop prio>> <= [ <branch> ] [
         drop -rot [ [ value>> ] [ prio>> ] bi ] 2dip
         <singleton-heap> <persistent-heap> <branch>
     ] if ;
+
+M: empty-heap sift-down
+    over empty-heap? [ <branch> ] [ sift-singleton ] if ;
 
 :: reroot-left ( value prio left right -- heap )
     left value>> left prio>>
@@ -54,7 +55,7 @@ METHOD: sift-down { singleton-heap empty-heap }
     value prio right left>> right right>> sift-down
     <branch> ;
 
-METHOD: sift-down { branch branch }
+M: branch sift-down
     3dup [ prio>> <= ] both-with? [ <branch> ] [
         2dup [ prio>> ] bi@ <= [ reroot-left ] [ reroot-right ] if
     ] if ;
