@@ -536,3 +536,15 @@ M: array iterate first t ;
 [ V{ f } ] [
     [ 10 eq? [ drop 3 ] unless ] final-literals
 ] unit-test
+
+GENERIC: bad-generic ( a -- b )
+M: fixnum bad-generic 1 fixnum+fast ;
+: bad-behavior 4 bad-generic ; inline recursive
+
+[ V{ fixnum } ] [ [ bad-behavior ] final-classes ] unit-test
+
+[ V{ number } ] [
+    [
+        0 10 [ bad-generic dup 123 bitand drop bad-generic 1 + ] times
+    ] final-classes
+] unit-test
