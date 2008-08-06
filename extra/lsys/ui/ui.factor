@@ -57,9 +57,9 @@ camera> do-look-at
 
 GL_FRONT_AND_BACK GL_LINE glPolygonMode
 
-! white gl-color
+white color>raw glColor4d
 
-white set-color
+! white set-color
 
 GL_LINES glBegin { 0 0 0 } gl-vertex { 0 0 1 } gl-vertex glEnd
 
