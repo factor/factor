@@ -34,7 +34,7 @@ M:: full-node (pluck-at) ( key hashcode full-node -- node' )
                 full-node shift>>
                 <full-node>
             ] [
-                hashcode full-node shift>> bitpos bitnot
+                hashcode full-node shift>> bitpos bitnot full-bitmap-mask bitand
                 idx full-node nodes>> remove-nth
                 full-node shift>>
                 <bitmap-node>

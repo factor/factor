@@ -14,7 +14,7 @@ M:: bitmap-node (entry-at) ( key hashcode bitmap-node -- entry )
             bit [ hashcode shift bitpos ]
             bitmap [ bitmap-node bitmap>> ]
             nodes [ bitmap-node nodes>> ] |
-       bitmap bit bitand 0 = [ f ] [
+       bitmap bit bitand 0 eq? [ f ] [
            key hashcode
            bit bitmap index nodes nth-unsafe
            (entry-at)
@@ -27,7 +27,7 @@ M:: bitmap-node (new-at) ( shift value key hashcode bitmap-node -- node' added-l
             bitmap [ bitmap-node bitmap>> ]
             idx [ bit bitmap index ]
             nodes [ bitmap-node nodes>> ] |
-        bitmap bit bitand 0 = [
+        bitmap bit bitand 0 eq? [
             [let | new-leaf [ value key hashcode <leaf-node> ] |
                 bitmap bit bitor
                 new-leaf idx nodes insert-nth
@@ -58,7 +58,7 @@ M:: bitmap-node (pluck-at) ( key hashcode bitmap-node -- node' )
            bitmap [ bitmap-node bitmap>> ]
            nodes [ bitmap-node nodes>> ]
            shift [ bitmap-node shift>> ] |
-           bit bitmap bitand 0 = [ bitmap-node ] [
+           bit bitmap bitand 0 eq? [ bitmap-node ] [
             [let* | idx [ bit bitmap index ]
                     n [ idx nodes nth-unsafe ]
                     n' [ key hashcode n (pluck-at) ] |
@@ -71,8 +71,7 @@ M:: bitmap-node (pluck-at) ( key hashcode bitmap-node -- node' )
                         shift
                         <bitmap-node>
                     ] [
-                        bitmap bit = [ f ] [
-                            nodes length 1 = [ bitmap bit 2array throw ] when
+                        bitmap bit eq? [ f ] [
                             bitmap bit bitnot bitand
                             idx nodes remove-nth
                             shift

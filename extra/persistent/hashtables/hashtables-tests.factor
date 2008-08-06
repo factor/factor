@@ -75,7 +75,7 @@ M: hash-0-b hashcode* 2drop 0 ;
 ] unit-test
 
 : random-string ( -- str )
-    100 random [ CHAR: a CHAR: z [a,b] random ] "" replicate-as ;
+    1000000 random ; ! [ CHAR: a CHAR: z [a,b] random ] "" replicate-as ;
 
 : random-assocs ( -- hash phash )
     [ random-string ] replicate
@@ -89,16 +89,16 @@ M: hash-0-b hashcode* 2drop 0 ;
 : test-persistent-hashtables-1 ( n -- )
     random-assocs ok? ;
 
-! [ t ] [ 10 test-persistent-hashtables-1 ] unit-test
-! [ t ] [ 20 test-persistent-hashtables-1 ] unit-test
-! [ t ] [ 30 test-persistent-hashtables-1 ] unit-test
-! [ t ] [ 50 test-persistent-hashtables-1 ] unit-test
-! [ t ] [ 100 test-persistent-hashtables-1 ] unit-test
-! [ t ] [ 500 test-persistent-hashtables-1 ] unit-test
-! [ t ] [ 1000 test-persistent-hashtables-1 ] unit-test
-! [ t ] [ 5000 test-persistent-hashtables-1 ] unit-test
-! [ t ] [ 10000 test-persistent-hashtables-1 ] unit-test
-! [ t ] [ 50000 test-persistent-hashtables-1 ] unit-test
+[ t ] [ 10 test-persistent-hashtables-1 ] unit-test
+[ t ] [ 20 test-persistent-hashtables-1 ] unit-test
+[ t ] [ 30 test-persistent-hashtables-1 ] unit-test
+[ t ] [ 50 test-persistent-hashtables-1 ] unit-test
+[ t ] [ 100 test-persistent-hashtables-1 ] unit-test
+[ t ] [ 500 test-persistent-hashtables-1 ] unit-test
+[ t ] [ 1000 test-persistent-hashtables-1 ] unit-test
+[ t ] [ 5000 test-persistent-hashtables-1 ] unit-test
+[ t ] [ 10000 test-persistent-hashtables-1 ] unit-test
+[ t ] [ 50000 test-persistent-hashtables-1 ] unit-test
 
 : test-persistent-hashtables-2 ( n -- )
     random-assocs
@@ -107,13 +107,4 @@ M: hash-0-b hashcode* 2drop 0 ;
         2dup ok?
     ] all? 2nip ;
 
-[ t ] [ 10 test-persistent-hashtables-2 ] unit-test
-[ t ] [ 20 test-persistent-hashtables-2 ] unit-test
-[ t ] [ 30 test-persistent-hashtables-2 ] unit-test
-[ t ] [ 50 test-persistent-hashtables-2 ] unit-test
-[ t ] [ 100 test-persistent-hashtables-2 ] unit-test
-[ t ] [ 500 test-persistent-hashtables-2 ] unit-test
-[ t ] [ 1000 test-persistent-hashtables-2 ] unit-test
-[ t ] [ 5000 test-persistent-hashtables-2 ] unit-test
-[ t ] [ 10000 test-persistent-hashtables-2 ] unit-test
-[ t ] [ 50000 test-persistent-hashtables-2 ] unit-test
+[ t ] [ 6000 test-persistent-hashtables-2 ] unit-test
