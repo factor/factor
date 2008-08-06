@@ -5,7 +5,7 @@ USING: kernel alien.c-types combinators namespaces arrays
        opengl.gl opengl.glu opengl ui ui.gadgets.slate
        vars colors self self.slots
        random-weighted colors.hsv cfdg.gl accessors
-       ui.gadgets.handler ui.gestures assocs ui.gadgets ;
+       ui.gadgets.handler ui.gestures assocs ui.gadgets macros ;
 
 IN: cfdg
 
@@ -134,6 +134,25 @@ VAR: threshold
 : recursive ( quot -- ) iterate? swap when ; inline
 
 : multi ( seq -- ) random-weighted* call ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: [rules] ( seq -- quot )
+  [ unclip swap [ [ do ] curry ] map concat 2array ] map
+  [ call-random-weighted ] swap prefix
+  [ when ] swap prefix
+  [ iterate? ] swap append ;
+
+MACRO: rules ( seq -- quot ) [rules] ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: [rule] ( seq -- quot )
+  [ [ do ] swap prefix ] map concat
+  [ when ] swap prefix
+  [ iterate? ] prepend ;
+
+MACRO: rule ( seq -- quot ) [rule] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
