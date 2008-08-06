@@ -67,6 +67,12 @@ SYMBOL: *calling*
 : print-word-timings ( -- )
   *wordtimes* get-global [ swap suffix ] { } assoc>map natural-sort reverse pprint ;
 
+: wordtimer-call ( quot -- )
+  reset-word-timer 
+  [ call ] micro-time >r
+  correct-for-timing-overhead
+  "total time:" write r> pprint nl
+  print-word-timings nl ;
 
 : profile-vocab ( vocabspec quot -- )
   "annotating vocab..." print flush
