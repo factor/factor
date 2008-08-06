@@ -32,7 +32,7 @@ HELP: assoc>disjoint-set
         "4 5 pick equiv? ."
         "1 5 pick equiv? ."
         "drop"
-        "t\nt\nf\n"
+        "t\nt\nf"
     }
 } ;
 

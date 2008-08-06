@@ -1,0 +1,59 @@
+! Based on Clojure's PersistentHashMap by Rich Hickey.
+
+USING: kernel accessors math arrays fry sequences sequences.lib
+locals persistent.sequences
+persistent.hashtables.config
+persistent.hashtables.nodes
+persistent.hashtables.nodes.leaf ;
+IN: persistent.hashtables.nodes.collision
+
+: find-index ( key hashcode collision-node -- n leaf-node )
+    leaves>> -rot '[ , , _ matching-key? ] find ; inline
+
+M:: collision-node (entry-at) ( key hashcode collision-node -- leaf-node )
+    key hashcode collision-node find-index nip ;
+
+M:: collision-node (pluck-at) ( key hashcode collision-node -- leaf-node )
+    hashcode collision-node hashcode>> eq? [
+        [let | idx [ key hashcode collision-node find-index drop ] |
+            idx [
+                idx collision-node leaves>> smash [
+                    collision-node hashcode>>
+                    <collision-node>
+                ] when
+            ] [ collision-node ] if
+        ]
+    ] [ collision-node ] if ;
+
+M:: collision-node (new-at) ( shift value key hashcode collision-node -- node' added-leaf )
+    hashcode collision-node hashcode>> eq? [
+        key hashcode collision-node find-index
+        [let | leaf-node [ ] idx [ ] |
+            idx [
+                value leaf-node value>> = [
+                    collision-node f
+                ] [
+                    hashcode
+                    value key hashcode <leaf-node>
+                    idx
+                    collision-node leaves>>
+                    new-nth
+                    <collision-node>
+                    f
+                ] if
+            ] [
+                [let | new-leaf-node [ value key hashcode <leaf-node> ] |
+                    hashcode
+                    collision-node leaves>>
+                    new-leaf-node
+                    suffix
+                    <collision-node>
+                    new-leaf-node
+                ]
+            ] if
+        ]
+    ] [
+        shift collision-node value key hashcode make-bitmap-node
+    ] if ;
+
+M: collision-node >alist% leaves>> >alist-each% ;
