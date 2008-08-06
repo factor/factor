@@ -1,5 +1,5 @@
-USING: persistent-heaps tools.test ;
-IN: persistent-heaps.tests
+USING: persistent.heaps tools.test ;
+IN: persistent.heaps.tests
 
 : test-input
     { { "hello" 3 } { "goodbye" 2 } { "whatever" 5 }

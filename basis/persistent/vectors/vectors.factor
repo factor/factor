@@ -1,8 +1,9 @@
 ! Based on Clojure's PersistentVector by Rich Hickey.
 
 USING: math accessors kernel sequences.private sequences arrays
-combinators combinators.short-circuit parser prettyprint.backend ;
-IN: persistent-vectors
+combinators combinators.short-circuit parser prettyprint.backend
+persistent.sequences ;
+IN: persistent.vectors
 
 <PRIVATE
 
@@ -11,18 +12,6 @@ TUPLE: node { children array } { level fixnum } ;
 PRIVATE>
 
 ERROR: empty-error pvec ;
-
-GENERIC: ppush ( val seq -- seq' )
-
-M: sequence ppush swap suffix ;
-
-GENERIC: ppop ( seq -- seq' )
-
-M: sequence ppop 1 head* ;
-
-GENERIC: new-nth ( val i seq -- seq' )
-
-M: sequence new-nth clone [ set-nth ] keep ;
 
 TUPLE: persistent-vector
 { count fixnum }

@@ -1,6 +1,7 @@
 IN: persistent-vectors.tests
-USING: accessors tools.test persistent-vectors sequences kernel
-arrays random namespaces vectors math math.order ;
+USING: accessors tools.test persistent.vectors
+persistent.sequences sequences kernel arrays random namespaces
+vectors math math.order ;
 
 \ new-nth must-infer
 \ ppush must-infer

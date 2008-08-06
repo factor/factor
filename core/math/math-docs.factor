@@ -212,7 +212,7 @@ HELP: bit?
 
 HELP: log2
 { $values { "x" "a positive integer" } { "n" integer } }
-{ $description "Outputs the largest integer " { $snippet "n" } " such that " { $snippet "2^n" } " is less than " { $snippet "x" } "." }
+{ $description "Outputs the largest integer " { $snippet "n" } " such that " { $snippet "2^n" } " is less than or equal to " { $snippet "x" } "." }
 { $errors "Throws an error if " { $snippet "x" } " is zero or negative." } ;
 
 HELP: 1+
