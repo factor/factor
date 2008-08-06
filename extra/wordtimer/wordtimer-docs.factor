@@ -34,8 +34,13 @@ HELP: profile-vocab
 { $description "Annotates the words in the vocab with timing code then runs the quotation. Finally resets the words and prints the timings information."
 } ;
 
+HELP: wordtimer-call
+{ $values { "quot" "a quotation to run" } }
+{ $description "Resets the wordtimer hash and runs the quotation. After the quotation has run it prints out the timed words"
+} ;
+
     
 ARTICLE: "wordtimer" "Word Timer"
-"The " { $vocab-link "wordtimer" } " vocabulary measures accumulated execution time for words. If you just want to profile the accumulated time taken by all words in a vocab you can use " { $vocab-link "profile-vocab" } ". If you need more fine grained control then do the following: First annotate individual words with the " { $link add-timer } " word or whole vocabularies with " { $link add-timers } ". Then reset the clock with " { $link reset-word-timer } " and execute your code. Finally you can view the timings with " { $link print-word-timings } ". If you have functions that are quick and called often you may want to " { $link correct-for-timing-overhead } ". To remove all the annotations in the vocab you can use " { $link reset-vocab } ". Alternatively if you just want to time the contents of a vocabulary you can use profile-vocab." ;
+"The " { $vocab-link "wordtimer" } " vocabulary measures accumulated execution time for words. If you just want to profile the accumulated time taken by all words in a vocab you can use " { $vocab-link "profile-vocab" } ". If you need more fine grained control then do the following: First annotate individual words with the " { $link add-timer } " word or whole vocabularies with " { $link add-timers } ". Then use " { $link wordtimer-call } " to invoke a quotation and print out the timings." ;
     
 ABOUT: "wordtimer"

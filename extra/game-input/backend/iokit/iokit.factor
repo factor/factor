@@ -231,6 +231,10 @@ M: iokit-game-input-backend (open-game-input)
         ]
     } cleave ;
 
+M: iokit-game-input-backend (reset-game-input)
+    { +hid-manager+ +keyboard-state+ +controller-states+ }
+    [ f swap set-global ] each ;
+
 M: iokit-game-input-backend (close-game-input)
     +hid-manager+ get-global [
         +hid-manager+ global [ 
@@ -271,5 +275,3 @@ M: iokit-game-input-backend read-keyboard ( -- keyboard-state )
 
 M: iokit-game-input-backend calibrate-controller ( controller -- )
     drop ;
-
-iokit-game-input-backend game-input-backend set-global

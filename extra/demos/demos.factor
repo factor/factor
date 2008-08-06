@@ -10,7 +10,7 @@ IN: demos
 : demo-vocabs ( -- seq ) "demos" tagged [ second ] map concat [ name>> ] map ;
 
 : <run-vocab-button> ( vocab-name -- button )
-  dup '[ drop [ , run ] call-listener ] <bevel-button> ;
+  dup '[ drop [ , run ] call-listener ] <bevel-button> { 0 0 } >>align ;
 
 : <demo-runner> ( -- gadget )
   <pile> 1 >>fill demo-vocabs [ <run-vocab-button> add-gadget ] each ;

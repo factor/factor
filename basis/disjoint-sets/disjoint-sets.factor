@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hints kernel locals math hashtables
-assocs ;
+assocs fry ;
 
 IN: disjoint-sets
 
@@ -36,16 +36,12 @@ TUPLE: disjoint-set
 : representative? ( a disjoint-set -- ? )
     dupd parent = ; inline
 
-PRIVATE>
-
 GENERIC: representative ( a disjoint-set -- p )
 
 M: disjoint-set representative
     2dup representative? [ drop ] [
         [ [ parent ] keep representative dup ] 2keep set-parent
     ] if ;
-
-<PRIVATE
 
 : representatives ( a b disjoint-set -- r r )
     [ representative ] curry bi@ ; inline
@@ -90,3 +86,10 @@ M:: disjoint-set equate ( a b disjoint-set -- )
 M: disjoint-set clone
     [ parents>> ] [ ranks>> ] [ counts>> ] tri [ clone ] tri@
     disjoint-set boa ;
+
+: assoc>disjoint-set ( assoc -- disjoint-set )
+    <disjoint-set>
+    [ '[ drop , add-atom ] assoc-each ]
+    [ '[ , equate ] assoc-each ]
+    [ nip ]
+    2tri ;

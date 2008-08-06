@@ -205,8 +205,11 @@ PRIVATE>
 : nths ( seq indices -- seq' )
     swap [ nth ] curry map ;
 
-: remove-nth ( seq n -- seq' )
-    cut-slice rest-slice append ;
+: remove-nth ( n seq -- seq' )
+    [ swap head-slice ] [ swap 1+ tail-slice ] 2bi append ;
+
+: insert-nth ( elt n seq -- seq' )
+    swap cut-slice [ swap 1array ] dip 3append ;
 
 : if-seq ( seq quot1 quot2 -- )
     [ f like ] 2dip if* ; inline

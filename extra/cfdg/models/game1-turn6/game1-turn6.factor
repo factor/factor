@@ -37,11 +37,12 @@ DEFER: start
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: run ( -- )
-[ 66 hue 0.4 sat 0.5 b ] >background
-{ -5 10 -5 10 } viewport set
-0.001 >threshold
-[ start ] >start-shape
-cfdg-window ;
+: init ( -- )
+  [ 66 hue 0.4 sat 0.5 b ] >background
+  { -5 10 -5 10 }          >viewport
+  0.001                    >threshold
+  [ start ]                >start-shape ;
+
+: run ( -- ) [ init ] cfdg-window. ;
 
 MAIN: run

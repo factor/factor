@@ -1,0 +1,1 @@
+Persistent hashtables with O(1) insertion, removal and lookup
