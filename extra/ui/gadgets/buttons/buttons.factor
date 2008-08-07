@@ -199,14 +199,11 @@ M: radio-control model-changed
 : <radio-button> ( value model label -- gadget )
     <radio-knob> label-on-right radio-button-theme <radio-control> ;
 
-: radio-buttons-theme ( gadget -- )
-    { 5 5 } >>gap drop ;
-
 : <radio-buttons> ( model assoc -- gadget )
   <filled-pile>
     -rot
     [ <radio-button> ] <radio-controls>
-  dup radio-buttons-theme ;
+  { 5 5 } >>gap ;
 
 : <toggle-button> ( value model label -- gadget )
     <radio-control> bevel-button-theme ;
