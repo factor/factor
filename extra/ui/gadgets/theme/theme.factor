@@ -18,41 +18,41 @@ IN: ui.gadgets.theme
 
 : plain-gradient
     T{ gradient f {
-        T{ rgba f 0.94 0.94 0.94 1.0 }
-        T{ rgba f 0.83 0.83 0.83 1.0 }
-        T{ rgba f 0.83 0.83 0.83 1.0 }
-        T{ rgba f 0.62 0.62 0.62 1.0 }
+        T{ gray f 0.94 1.0 }
+        T{ gray f 0.83 1.0 }
+        T{ gray f 0.83 1.0 }
+        T{ gray f 0.62 1.0 }
     } } ;
 
 : rollover-gradient
     T{ gradient f {
-        T{ rgba f 1.0 1.0 1.0 1.0 }
-        T{ rgba f 0.9 0.9 0.9 1.0 }
-        T{ rgba f 0.9 0.9 0.9 1.0 }
-        T{ rgba f 0.75 0.75 0.75 1.0 }
+        T{ gray f 1.0  1.0 }
+        T{ gray f 0.9  1.0 }
+        T{ gray f 0.9  1.0 }
+        T{ gray f 0.75 1.0 }
     } } ;
 
 : pressed-gradient
     T{ gradient f {
-        T{ rgba f 0.75 0.75 0.75 1.0 }
-        T{ rgba f 0.9 0.9 0.9 1.0 }
-        T{ rgba f 0.9 0.9 0.9 1.0 }
-        T{ rgba f 1.0 1.0 1.0 1.0 }
+        T{ gray f 0.75 1.0 }
+        T{ gray f 0.9  1.0 }
+        T{ gray f 0.9  1.0 }
+        T{ gray f 1.0  1.0 }
     } } ;
 
 : selected-gradient
     T{ gradient f {
-        T{ rgba f 0.65 0.65 0.65 1.0 }
-        T{ rgba f 0.8 0.8 0.8 1.0 }
-        T{ rgba f 0.8 0.8 0.8 1.0 }
-        T{ rgba f 1.0 1.0 1.0 1.0 }
+        T{ gray f 0.65 1.0 }
+        T{ gray f 0.8  1.0 }
+        T{ gray f 0.8  1.0 }
+        T{ gray f 1.0  1.0 }
     } } ;
 
 : lowered-gradient
     T{ gradient f {
-        T{ rgba f 0.37 0.37 0.37 1.0 }
-        T{ rgba f 0.43 0.43 0.43 1.0 }
-        T{ rgba f 0.5 0.5 0.5 1.0 }
+        T{ gray f 0.37 1.0 }
+        T{ gray f 0.43 1.0 }
+        T{ gray f 0.5  1.0 }
     } } ;
 
 : sans-serif-font { "sans-serif" plain 12 } ;

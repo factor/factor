@@ -4,8 +4,8 @@ USING: kernel sequences accessors arrays fry math.intervals
 combinators namespaces
 stack-checker.inlining
 compiler.tree
-compiler.tree.copy-equiv
 compiler.tree.combinators
+compiler.tree.propagation.copy
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
 compiler.tree.propagation.simple
@@ -13,8 +13,9 @@ compiler.tree.propagation.branches
 compiler.tree.propagation.constraints ;
 IN: compiler.tree.propagation.recursive
 
-: check-fixed-point ( node infos1 infos2 -- node )
-    sequence= [ dup label>> f >>fixed-point drop ] unless ; inline
+: check-fixed-point ( node infos1 infos2 -- )
+    [ value-info<= ] 2all?
+    [ drop ] [ label>> f >>fixed-point drop ] if ;
 
 : recursive-stacks ( #enter-recursive -- stacks initial )
     [ label>> calls>> [ node-input-infos ] map flip ]
@@ -46,19 +47,21 @@ IN: compiler.tree.propagation.recursive
 
 : propagate-recursive-phi ( #enter-recursive -- )
     [ ] [ recursive-stacks unify-recursive-stacks ] [ ] tri
-    [ node-output-infos check-fixed-point drop ] 2keep
-    out-d>> set-value-infos ;
+    [ node-output-infos check-fixed-point ]
+    [ out-d>> set-value-infos drop ]
+    3bi ;
 
 M: #recursive propagate-around ( #recursive -- )
-    [
-        copies [ clone ] change
+    { 0 } clone [ USE: math
+        dup first 10 = [ "OOPS" throw ] [ dup first 1+ swap set-first ] if
         constraints [ clone ] change
 
         child>>
+        [ first compute-copy-equiv ]
         [ first propagate-recursive-phi ]
         [ (propagate) ]
-        bi
-    ] until-fixed-point ;
+        tri
+    ] curry until-fixed-point ;
 
 : generalize-return-interval ( info -- info' )
     dup [ literal?>> ] [ class>> null-class? ] bi or
@@ -67,11 +70,9 @@ M: #recursive propagate-around ( #recursive -- )
 : generalize-return ( infos -- infos' )
     [ generalize-return-interval ] map ;
 
-M: #call-recursive propagate-before ( #call-label -- )
-    dup [ node-output-infos ] [ label>> return>> node-input-infos ] bi
-    [ check-fixed-point ] keep
-    generalize-return swap out-d>> set-value-infos ;
+: return-infos ( node -- infos )
+    label>> return>> node-input-infos generalize-return ;
 
-M: #return-recursive propagate-before ( #return-recursive -- )
-    dup [ node-input-infos ] [ in-d>> [ value-info ] map ] bi
-    check-fixed-point drop ;
+M: #call-recursive propagate-before ( #call-label -- )
+    [ ] [ return-infos ] [ node-output-infos ] tri
+    [ check-fixed-point ] [ drop swap out-d>> set-value-infos ] 3bi ;

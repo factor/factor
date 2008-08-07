@@ -6,7 +6,6 @@ classes.union sets quotations assocs combinators words
 namespaces
 compiler.tree
 compiler.tree.builder
-compiler.tree.copy-equiv
 compiler.tree.normalization
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes ;
@@ -25,7 +24,7 @@ M: quotation splicing-nodes
     normalize ;
 
 : propagate-body ( #call -- )
-    body>> [ amend-copy-equiv ] [ (propagate) ] bi ;
+    body>> (propagate) ;
 
 ! Dispatch elimination
 : eliminate-dispatch ( #call word/quot/f -- ? )

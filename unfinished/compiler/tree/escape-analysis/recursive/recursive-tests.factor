@@ -1,6 +1,5 @@
 IN: compiler.tree.escape-analysis.recursive.tests
 USING: kernel tools.test namespaces sequences
-compiler.tree.copy-equiv
 compiler.tree.escape-analysis.recursive
 compiler.tree.escape-analysis.allocations ;
 

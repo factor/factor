@@ -1,4 +1,4 @@
-USING: multiline system parser combinators ;
+USING: eval multiline system combinators ;
 IN: game-input.backend
 
 STRING: set-backend-for-macosx

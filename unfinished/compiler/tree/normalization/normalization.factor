@@ -128,6 +128,10 @@ M: #recursive normalize*
     dup dup label>> introductions>>
     eliminate-recursive-introductions ;
 
+M: #enter-recursive normalize*
+    dup [ label>> ] keep >>enter-recursive drop
+    dup [ label>> ] [ out-d>> ] bi >>enter-out drop ;
+
 : unchanged-underneath ( #call-recursive -- n )
     [ out-d>> length ] [ label>> return>> in-d>> length ] bi - ;
 

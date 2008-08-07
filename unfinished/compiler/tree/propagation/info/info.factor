@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs classes classes.algebra kernel
 accessors math math.intervals namespaces sequences words
-combinators arrays compiler.tree.copy-equiv ;
+combinators combinators.short-circuit arrays
+compiler.tree.propagation.copy ;
 IN: compiler.tree.propagation.info
 
 : false-class? ( class -- ? ) \ f class<= ;
@@ -217,6 +218,28 @@ DEFER: (value-info-union)
     dup empty?
     [ drop null-info ]
     [ dup first [ value-info-union ] reduce ] if ;
+
+: literals<= ( info1 info2 -- ? )
+    {
+        { [ dup literal?>> not ] [ 2drop t ] }
+        { [ over literal?>> not ] [ 2drop f ] }
+        [ [ literal>> ] bi@ eql? ]
+    } cond ;
+
+: value-info<= ( info1 info2 -- ? )
+    {
+        { [ dup not ] [ 2drop t ] }
+        { [ over not ] [ 2drop f ] }
+        [
+            {
+                [ [ class>> ] bi@ class<= ]
+                [ [ interval>> ] bi@ interval-subset? ]
+                [ literals<= ]
+                [ [ length>> ] bi@ value-info<= ]
+                [ [ slots>> ] bi@ [ value-info<= ] 2all? ]
+            } 2&&
+        ]
+    } cond ;
 
 ! Current value --> info mapping
 SYMBOL: value-infos

@@ -1,5 +1,5 @@
-IN: compiler.tree.copy-equiv.tests
-USING: compiler.tree.copy-equiv tools.test namespaces kernel
+IN: compiler.tree.propagation.copy.tests
+USING: compiler.tree.propagation.copy tools.test namespaces kernel
 assocs ;
 
 H{ } clone copies set
