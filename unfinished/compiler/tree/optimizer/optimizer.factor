@@ -9,7 +9,6 @@ IN: compiler.tree.optimizer
 
 : optimize-tree ( nodes -- nodes' )
     normalize
-    compute-copy-equiv
     propagate
     cleanup
     compute-def-use

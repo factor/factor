@@ -28,13 +28,8 @@ C: <slot-access> slot-access
 
 : record-allocation ( allocation value -- ) (allocation) set-at ;
 
-: unknown-allocation ( value -- ) t swap record-allocation ;
-
 : record-allocations ( allocations values -- )
     [ record-allocation ] 2each ;
-
-: unknown-allocations ( values -- )
-    [ unknown-allocation ] each ;
 
 ! We track escaping values with a disjoint set.
 SYMBOL: escaping-values
@@ -66,9 +61,20 @@ SYMBOL: +escaping+
 : merge-slots ( values -- value )
     <slot-value> [ merge-values ] keep ;
 
+: add-escaping-value ( value -- )
+    +escaping+ escaping-values get equate ;
+
 : add-escaping-values ( values -- )
     escaping-values get
     '[ +escaping+ , equate ] each ;
+
+: unknown-allocation ( value -- )
+    [ add-escaping-value ]
+    [ t swap record-allocation ]
+    bi ;
+
+: unknown-allocations ( values -- )
+    [ unknown-allocation ] each ;
 
 : escaping-value? ( value -- ? )
     +escaping+ escaping-values get equiv? ;

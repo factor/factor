@@ -3,6 +3,7 @@
 USING: accessors kernel sequences namespaces hashtables
 compiler.tree
 compiler.tree.def-use
+compiler.tree.copy-equiv
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
 compiler.tree.propagation.simple
@@ -13,8 +14,7 @@ compiler.tree.propagation.known-words ;
 IN: compiler.tree.propagation
 
 : propagate ( node -- node )
-    [
-        H{ } clone constraints set
-        H{ } clone value-infos set
-        dup (propagate)
-    ] with-scope ;
+    H{ } clone copies set
+    H{ } clone constraints set
+    H{ } clone value-infos set
+    dup (propagate) ;

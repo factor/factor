@@ -7,6 +7,9 @@ compiler.tree.def-use
 compiler.tree.combinators ;
 IN: compiler.tree.copy-equiv
 
+! This is not really a compiler pass; its invoked as part of
+! propagation.
+
 ! Two values are copy-equivalent if they are always identical
 ! at run-time ("DS" relation). This is just a weak form of
 ! value numbering.
@@ -26,8 +29,7 @@ SYMBOL: copies
         ] if
     ] ;
 
-: resolve-copy ( copy -- val )
-    copies get compress-path [ "Unknown value" throw ] unless* ;
+: resolve-copy ( copy -- val ) copies get compress-path ;
 
 : is-copy-of ( val copy -- ) copies get set-at ;
 
@@ -68,13 +70,7 @@ M: #phi compute-copy-equiv*
 
 M: node compute-copy-equiv* drop ;
 
-: amend-copy-equiv ( node -- )
-    [
-        [ node-defs-values [ introduce-value ] each ]
-        [ compute-copy-equiv* ]
-        bi
-    ] each-node ;
-
-: compute-copy-equiv ( node -- node )
-    H{ } clone copies set
-    dup amend-copy-equiv ;
+: compute-copy-equiv ( node -- )
+    [ node-defs-values [ introduce-value ] each ]
+    [ compute-copy-equiv* ]
+    bi ;

@@ -4,7 +4,6 @@ USING: kernel namespaces search-dequeues assocs fry sequences
 disjoint-sets
 compiler.tree
 compiler.tree.def-use
-compiler.tree.copy-equiv
 compiler.tree.escape-analysis.allocations
 compiler.tree.escape-analysis.recursive
 compiler.tree.escape-analysis.branches
