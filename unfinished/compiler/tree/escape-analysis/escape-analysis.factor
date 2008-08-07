@@ -11,6 +11,8 @@ compiler.tree.escape-analysis.nodes
 compiler.tree.escape-analysis.simple ;
 IN: compiler.tree.escape-analysis
 
+! This pass must run after propagation
+
 : escape-analysis ( node -- node )
     init-escaping-values
     H{ } clone allocations set

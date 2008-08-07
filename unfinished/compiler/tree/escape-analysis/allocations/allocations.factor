@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs namespaces sequences kernel math
-combinators sets disjoint-sets fry stack-checker.state
-compiler.tree.copy-equiv ;
+combinators sets disjoint-sets fry stack-checker.state ;
 IN: compiler.tree.escape-analysis.allocations
 
 ! A map from values to one of the following:
@@ -18,7 +17,7 @@ TUPLE: slot-access slot# value ;
 C: <slot-access> slot-access
 
 : (allocation) ( value -- value' allocations )
-    resolve-copy allocations get ; inline
+    allocations get ; inline
 
 : allocation ( value -- allocation )
     (allocation) at dup slot-access? [
@@ -26,7 +25,8 @@ C: <slot-access> slot-access
         allocation
     ] when ;
 
-: record-allocation ( allocation value -- ) (allocation) set-at ;
+: record-allocation ( allocation value -- )
+    (allocation) set-at ;
 
 : record-allocations ( allocations values -- )
     [ record-allocation ] 2each ;
@@ -40,15 +40,16 @@ SYMBOL: +escaping+
     <disjoint-set> +escaping+ over add-atom ;
 
 : init-escaping-values ( -- )
-    copies get assoc>disjoint-set +escaping+ over add-atom
-    escaping-values set ;
+    <escaping-values> escaping-values set ;
+
+: introduce-value ( values -- )
+    escaping-values get add-atom ;
+
+: introduce-values ( values -- )
+    escaping-values get add-atoms ;
 
 : <slot-value> ( -- value )
-    <value>
-    [ introduce-value ]
-    [ escaping-values get add-atom ]
-    [ ]
-    tri ;
+    <value> dup escaping-values get add-atom ;
 
 : record-slot-access ( out slot# in -- )
     over zero? [ 3drop ] [
@@ -61,8 +62,11 @@ SYMBOL: +escaping+
 : merge-slots ( values -- value )
     <slot-value> [ merge-values ] keep ;
 
+: equate-values ( value1 value2 -- )
+    escaping-values get equate ;
+
 : add-escaping-value ( value -- )
-    +escaping+ escaping-values get equate ;
+    +escaping+ equate-values ;
 
 : add-escaping-values ( values -- )
     escaping-values get
@@ -79,6 +83,20 @@ SYMBOL: +escaping+
 : escaping-value? ( value -- ? )
     +escaping+ escaping-values get equiv? ;
 
+DEFER: copy-value
+
+: copy-allocation ( allocation -- allocation' )
+    {
+        { [ dup not ] [ ] }
+        { [ dup t eq? ] [ ] }
+        [ [ <value> [ introduce-value ] [ copy-value ] [ ] tri ] map ]
+    } cond ;
+
+: copy-value ( from to -- )
+    [ equate-values ]
+    [ [ allocation copy-allocation ] dip record-allocation ]
+    2bi ;
+
 SYMBOL: escaping-allocations
 
 : compute-escaping-allocations ( -- )
@@ -88,3 +106,11 @@ SYMBOL: escaping-allocations
 
 : escaping-allocation? ( value -- ? )
     escaping-allocations get key? ;
+
+: unboxed-allocation ( value -- allocation/f )
+    dup escaping-allocation? [ drop f ] [ allocation ] if ;
+
+: unboxed-slot-access? ( value -- ? )
+    (allocation) at dup slot-access?
+    [ value>> unboxed-allocation >boolean ] [ drop f ] if ;
+

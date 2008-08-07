@@ -1,9 +1,9 @@
 IN: compiler.tree.escape-analysis.tests
 USING: compiler.tree.escape-analysis
 compiler.tree.escape-analysis.allocations compiler.tree.builder
-compiler.tree.normalization compiler.tree.copy-equiv
+compiler.tree.normalization math.functions
 compiler.tree.propagation compiler.tree.cleanup
-compiler.tree.combinators compiler.tree sequences math
+compiler.tree.combinators compiler.tree sequences math math.private
 kernel tools.test accessors slots.private quotations.private
 prettyprint classes.tuple.private classes classes.tuple ;
 
@@ -12,10 +12,10 @@ prettyprint classes.tuple.private classes classes.tuple ;
 GENERIC: count-unboxed-allocations* ( m node -- n )
 
 : (count-unboxed-allocations) ( m node -- n )
-    dup out-d>> first escaping-allocation? [ drop ] [ short. 1+ ] if ;
+    out-d>> first escaping-allocation? [ 1+ ] unless ;
 
 M: #call count-unboxed-allocations*
-    dup word>> \ <tuple-boa> =
+    dup word>> { <tuple-boa> <complex> } memq?
     [ (count-unboxed-allocations) ] [ drop ] if ;
 
 M: #push count-unboxed-allocations*
@@ -281,3 +281,5 @@ C: <ro-box> ro-box
     ] if ; inline recursive
 
 [ 0 ] [ [ bad-tuple-fib-3 i>> ] count-unboxed-allocations ] unit-test
+
+[ 1 ] [ [ <complex> >rect ] count-unboxed-allocations ] unit-test

@@ -5,10 +5,7 @@ combinators sets locals
 compiler.tree
 compiler.tree.def-use
 compiler.tree.combinators ;
-IN: compiler.tree.copy-equiv
-
-! This is not really a compiler pass; its invoked as part of
-! propagation.
+IN: compiler.tree.propagation.copy
 
 ! Two values are copy-equivalent if they are always identical
 ! at run-time ("DS" relation). This is just a weak form of
@@ -39,21 +36,7 @@ SYMBOL: copies
 
 GENERIC: compute-copy-equiv* ( node -- )
 
-M: #shuffle compute-copy-equiv*
-    [ out-d>> dup ] [ mapping>> ] bi
-    '[ , at ] map swap are-copies-of ;
-
-M: #>r compute-copy-equiv*
-    [ in-d>> ] [ out-r>> ] bi are-copies-of ;
-
-M: #r> compute-copy-equiv*
-    [ in-r>> ] [ out-d>> ] bi are-copies-of ;
-
-M: #copy compute-copy-equiv*
-    [ in-d>> ] [ out-d>> ] bi are-copies-of ;
-
-M: #return-recursive compute-copy-equiv*
-    [ in-d>> ] [ out-d>> ] bi are-copies-of ;
+M: #renaming compute-copy-equiv* inputs/outputs are-copies-of ;
 
 : compute-phi-equiv ( inputs outputs -- )
     #! An output is a copy of every input if all inputs are
