@@ -17,12 +17,6 @@ ARTICLE: "persistent.vectors" "Persistent vectors"
 $nl
 "The class of persistent vectors:"
 { $subsection persistent-vector }
-"Persistent vectors support the immutable sequence protocol, namely as " { $link length } " and " { $link nth } ", and so can be used with most sequence words (" { $link "sequences" } ")."
-$nl
-"In addition to standard sequence operations, persistent vectors implement efficient operations specific to them. They run in sub-linear time on persistent vectors, and degrate to linear-time algorithms on ordinary sequences:"
-{ $subsection new-nth }
-{ $subsection ppush }
-{ $subsection ppop }
 "Converting a sequence into a persistent vector:"
 { $subsection >persistent-vector }
 "Persistent vectors have a literal syntax:"
