@@ -1,190 +1,153 @@
 USING: kernel tools.test accessors arrays sequences qualified
-       io.streams.string io.streams.duplex namespaces threads
+       io io.streams.duplex namespaces threads
        calendar irc.client.private irc.client irc.messages.private
        concurrency.mailboxes classes assocs combinators ;
 EXCLUDE: irc.messages => join ;
 RENAME: join irc.messages => join_
 IN: irc.client.tests
 
-! Utilities
-: <test-stream> ( lines -- stream )
-  "\n" join <string-reader> <string-writer> <duplex-stream> ;
+! Streams for testing
+TUPLE: mb-writer lines last-line disposed ;
+TUPLE: mb-reader lines disposed ;
+: <mb-writer> ( -- mb-writer ) V{ } clone V{ } clone f mb-writer boa ;
+: <mb-reader> ( -- mb-reader ) <mailbox> f mb-reader boa ;
+: push-line ( line test-reader-stream -- ) lines>> mailbox-put ;
+: <test-stream> ( -- stream ) <mb-reader> <mb-writer> <duplex-stream> ;
+M: mb-writer stream-write ( line mb-writer -- ) last-line>> push ;
+M: mb-writer stream-flush ( mb-writer -- ) drop ;
+M: mb-reader stream-readln ( mb-reader -- str/f ) lines>> mailbox-get ;
+M: mb-writer stream-nl ( mb-writer -- )
+    [ [ last-line>> concat ] [ lines>> ] bi push ] keep
+    V{ } clone >>last-line drop ;
 
-: make-client ( lines -- irc-client )
-    "someserver" irc-port "factorbot" f <irc-profile> <irc-client>
-    swap [ 2nip <test-stream> f ] curry >>connect ;
+: spawn-client ( lines listeners -- irc-client )
+    "someserver" irc-port "factorbot" f <irc-profile>
+    <irc-client>
+        t >>is-running
+        <test-stream> >>stream
+    dup [ spawn-irc yield ] with-irc-client ;
 
-: set-nick ( irc-client nickname -- )
-    swap profile>> (>>nickname) ;
+! to be used inside with-irc-client quotations
+: %add-named-listener ( listener -- ) [ name>> ] keep set+run-listener ;
+: %join ( channel -- ) <irc-channel-listener> irc> add-listener ;
+: %push-line ( line -- ) irc> stream>> in>> push-line yield yield ;
 
-: with-dummy-client ( irc-client quot -- )
-    [ current-irc-client ] dip with-variable ; inline
+: read-matching-message ( listener quot: ( msg -- ? ) -- irc-message )
+    [ in-messages>> 0.1 seconds ] dip mailbox-get-timeout? ;
 
-{ "" } make-client dup "factorbot" set-nick [
-    { t } [ irc> profile>> nickname>> me? ] unit-test
+: with-irc ( quot: ( -- ) -- )
+    [ spawn-client ] dip [ f %push-line ] compose with-irc-client ; inline
 
-    { "factorbot" } [ irc> profile>> nickname>> ] unit-test
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!                       TESTS
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    { "someuser" } [ "someuser!n=user@some.where" parse-name ] unit-test
+[ { t } [ irc> profile>> nickname>> me? ] unit-test
 
-    { "#factortest" } [ ":someuser!n=user@some.where PRIVMSG #factortest :hi"
-                        parse-irc-line irc-message-origin ] unit-test
+  { "factorbot" } [ irc> profile>> nickname>> ] unit-test
 
-    { "someuser" } [ ":someuser!n=user@some.where PRIVMSG factorbot :hi"
-                     parse-irc-line irc-message-origin ] unit-test
-] with-dummy-client
+  { "someuser" } [ "someuser!n=user@some.where" parse-name ] unit-test
+
+  { "#factortest" } [ ":someuser!n=user@some.where PRIVMSG #factortest :hi"
+                      parse-irc-line irc-message-origin ] unit-test
+
+  { "someuser" } [ ":someuser!n=user@some.where PRIVMSG factorbot :hi"
+                   parse-irc-line irc-message-origin ] unit-test
+] with-irc
 
 ! Test login and nickname set
-{ "factorbot" } [
-    { "NOTICE AUTH :*** Looking up your hostname..."
-      "NOTICE AUTH :*** Checking ident"
-      "NOTICE AUTH :*** Found your hostname"
-      "NOTICE AUTH :*** No identd (auth) response"
-      ":some.where 001 factorbot :Welcome factorbot"
-    } make-client
-    { [ connect-irc ]
-      [ drop 0.1 seconds sleep ]
-      [ profile>> nickname>> ]
-      [ terminate-irc ]
-    } cleave ] unit-test
+[ { "factorbot2" } [
+     ":some.where 001 factorbot2 :Welcome factorbot2" %push-line
+      irc> profile>> nickname>>
+  ] unit-test
+] with-irc
 
-{ join_ "#factortest" } [
-    { ":factorbot!n=factorbo@some.where JOIN :#factortest"
-      ":ircserver.net MODE #factortest +ns"
-      ":ircserver.net 353 factorbot @ #factortest :@factorbot "
-      ":ircserver.net 366 factorbot #factortest :End of /NAMES list."
-      ":ircserver.net 477 factorbot #factortest :[ircserver-info] blah blah"
-    } make-client
-    { [ "factorbot" set-nick ]
-      [ connect-irc ]
-      [ drop 0.1 seconds sleep ]
-      [ join-messages>> 0.1 seconds mailbox-get-timeout ]
-      [ terminate-irc ]
-    } cleave
-    [ class ] [ trailing>> ] bi ] unit-test
+[ { join_ "#factortest" } [
+      { ":factorbot!n=factorbo@some.where JOIN :#factortest"
+        ":ircserver.net 353 factorbot @ #factortest :@factorbot "
+        ":ircserver.net 366 factorbot #factortest :End of /NAMES list."
+        ":ircserver.net 477 factorbot #factortest :[ircserver-info] blah blah"
+      } [ %push-line ] each
+      irc> join-messages>> 0.1 seconds mailbox-get-timeout
+      [ class ] [ trailing>> ] bi
+  ] unit-test
+] with-irc
 
-{ +join+ "somebody" } [
-    { ":somebody!n=somebody@some.where JOIN :#factortest" } make-client
-    { [ "factorbot" set-nick ]
-      [ listeners>>
-        [ "#factortest" [ <irc-channel-listener> ] keep ] dip set-at ]
-      [ connect-irc ]
-      [ listeners>> [ "#factortest" ] dip at
-        [ read-message drop ] [ read-message drop ] [ read-message ] tri ]
-      [ terminate-irc ]
-    } cleave
-    [ action>> ] [ nick>> ] bi
-    ] unit-test
+[ { T{ participant-changed f "somebody" +join+ } } [
+      "#factortest" <irc-channel-listener> [ %add-named-listener ] keep
+      ":somebody!n=somebody@some.where JOIN :#factortest" %push-line
+      [ participant-changed? ] read-matching-message
+  ] unit-test
+] with-irc
 
-{ privmsg "#factortest" "hello" } [
-    { ":somebody!n=somebody@some.where PRIVMSG #factortest :hello" } make-client
-    { [ "factorbot" set-nick ]
-      [ listeners>>
-        [ "#factortest" [ <irc-channel-listener> ] keep ] dip set-at ]
-      [ connect-irc ]
-      [ listeners>> [ "#factortest" ] dip at
-        [ read-message drop ] [ read-message ] bi ]
-      [ terminate-irc ]
-    } cleave
-    [ class ] [ name>> ] [ trailing>> ] tri
-    ] unit-test
+[ { privmsg "#factortest" "hello" } [
+      "#factortest" <irc-channel-listener> [ %add-named-listener ] keep
+      ":somebody!n=somebody@some.where PRIVMSG #factortest :hello" %push-line
+      [ privmsg? ] read-matching-message
+      [ class ] [ name>> ] [ trailing>> ] tri
+  ] unit-test
+] with-irc
 
-{ privmsg "factorbot" "hello" } [
-    { ":somedude!n=user@isp.net PRIVMSG factorbot :hello" } make-client
-    { [ "factorbot" set-nick ]
-      [ listeners>>
-        [ "somedude" [ <irc-nick-listener> ] keep ] dip set-at ]
-      [ connect-irc ]
-      [ listeners>> [ "somedude" ] dip at
-        [ read-message drop ] [ read-message ] bi ]
-      [ terminate-irc ]
-    } cleave
-    [ class ] [ name>> ] [ trailing>> ] tri
-    ] unit-test
+[ { privmsg "factorbot" "hello" } [
+      "somedude" <irc-nick-listener>  [ %add-named-listener ] keep
+      ":somedude!n=user@isp.net PRIVMSG factorbot :hello" %push-line
+      [ privmsg? ] read-matching-message
+      [ class ] [ name>> ] [ trailing>> ] tri
+  ] unit-test
+] with-irc
 
 ! Participants lists tests
-{ H{ { "somedude" +normal+ } } } [
-    { ":somedude!n=user@isp.net JOIN :#factortest" } make-client
-    { [ "factorbot" set-nick ]
-      [ listeners>>
-        [ "#factortest" [ <irc-channel-listener> ] keep ] dip set-at ]
-      [ connect-irc ]
-      [ drop 0.1 seconds sleep ]
-      [ listeners>> [ "#factortest" ] dip at participants>> ]
-      [ terminate-irc ]
-    } cleave
-    ] unit-test
+[ { H{ { "somedude" +normal+ } } } [
+      "#factortest" <irc-channel-listener> [ %add-named-listener ] keep
+      ":somedude!n=user@isp.net JOIN :#factortest" %push-line
+      participants>>
+  ] unit-test
+] with-irc
 
-{ H{ { "somedude2" +normal+ } } } [
-    { ":somedude!n=user@isp.net PART #factortest" } make-client
-    { [ "factorbot" set-nick ]
-      [ listeners>>
-        [ "#factortest" [ <irc-channel-listener>
-                          H{ { "somedude2" +normal+ }
-                             { "somedude" +normal+ } } clone >>participants ] keep
-        ] dip set-at ]
-      [ connect-irc ]
-      [ drop 0.1 seconds sleep ]
-      [ listeners>> [ "#factortest" ] dip at participants>> ]
-      [ terminate-irc ]
-    } cleave
-    ] unit-test
+[ { H{ { "somedude2" +normal+ } } } [
+      "#factortest" <irc-channel-listener>
+          H{ { "somedude2" +normal+ }
+             { "somedude" +normal+ } } clone >>participants
+      [ %add-named-listener ] keep
+      ":somedude!n=user@isp.net PART #factortest" %push-line
+      participants>>
+  ] unit-test
+] with-irc
 
-{ H{ { "somedude2" +normal+ } } } [
-    { ":somedude!n=user@isp.net QUIT" } make-client
-    { [ "factorbot" set-nick ]
-      [ listeners>>
-        [ "#factortest" [ <irc-channel-listener>
-                          H{ { "somedude2" +normal+ }
-                             { "somedude" +normal+ } } clone >>participants ] keep
-        ] dip set-at ]
-      [ connect-irc ]
-      [ drop 0.1 seconds sleep ]
-      [ listeners>> [ "#factortest" ] dip at participants>> ]
-      [ terminate-irc ]
-    } cleave
-    ] unit-test
+[ { H{ { "somedude2" +normal+ } } } [
+      "#factortest" <irc-channel-listener>
+          H{ { "somedude2" +normal+ }
+             { "somedude" +normal+ } } clone >>participants
+      [ %add-named-listener ] keep
+      ":somedude!n=user@isp.net QUIT" %push-line
+      participants>>
+  ] unit-test
+] with-irc
 
-{ H{ { "somedude2" +normal+ } } } [
-    { ":somedude2!n=user2@isp.net KICK #factortest somedude" } make-client
-    { [ "factorbot" set-nick ]
-      [ listeners>>
-        [ "#factortest" [ <irc-channel-listener>
-                          H{ { "somedude2" +normal+ }
-                             { "somedude" +normal+ } } clone >>participants ] keep
-        ] dip set-at ]
-      [ connect-irc ]
-      [ drop 0.1 seconds sleep ]
-      [ listeners>> [ "#factortest" ] dip at participants>> ]
-      [ terminate-irc ]
-    } cleave
-    ] unit-test
+[ { H{ { "somedude2" +normal+ } } } [
+      "#factortest" <irc-channel-listener>
+          H{ { "somedude2" +normal+ }
+             { "somedude" +normal+ } } clone >>participants
+      [ %add-named-listener ] keep
+      ":somedude2!n=user2@isp.net KICK #factortest somedude" %push-line
+      participants>>
+  ] unit-test
+] with-irc
 
 ! Namelist change notification
-{ T{ participant-changed f f f } } [
-    { ":ircserver.net 353 factorbot @ #factortest :@factorbot "
-      ":ircserver.net 366 factorbot #factortest :End of /NAMES list." } make-client
-    { [ "factorbot" set-nick ]
-      [ listeners>>
-        [ "#factortest" [ <irc-channel-listener> ] keep ] dip set-at ]
-      [ connect-irc ]
-      [ drop 0.1 seconds sleep ]
-      [ listeners>> [ "#factortest" ] dip at [ read-message drop ] [ read-message ] bi ]
-      [ terminate-irc ]
-    } cleave
-    ] unit-test
+[ { T{ participant-changed f f f } } [
+      "#factortest" <irc-channel-listener> [ %add-named-listener ] keep
+      ":ircserver.net 353 factorbot @ #factortest :@factorbot " %push-line
+      ":ircserver.net 366 factorbot #factortest :End of /NAMES list." %push-line
+      [ participant-changed? ] read-matching-message
+  ] unit-test
+] with-irc
 
-{ T{ participant-changed f "somedude" +part+ } } [
-    { ":somedude!n=user@isp.net QUIT" } make-client
-    { [ "factorbot" set-nick ]
-      [ listeners>>
-        [ "#factortest" [ <irc-channel-listener>
-                          H{ { "somedude" +normal+ } } clone >>participants ] keep
-        ] dip set-at ]
-      [ connect-irc ]
-      [ drop 0.1 seconds sleep ]
-      [ listeners>> [ "#factortest" ] dip at
-        [ read-message drop ] [ read-message drop ] [ read-message ] tri ]
-      [ terminate-irc ]
-    } cleave
-    ] unit-test
+[ { T{ participant-changed f "somedude" +part+ } } [
+      "#factortest" <irc-channel-listener>
+                    H{ { "somedude" +normal+ } } clone >>participants
+      [ %add-named-listener ] keep
+      ":somedude!n=user@isp.net QUIT" %push-line
+      [ participant-changed? ] read-matching-message
+  ] unit-test
+] with-irc
