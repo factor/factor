@@ -28,7 +28,7 @@ TUPLE: function function color ;
 
 GENERIC: plot-function ( plot object -- plot )
 
-M: quotation plot-function ( plot quotation -- plot )
+M: callable plot-function ( plot quotation -- plot )
   >r dup plot-range r> '[ dup @ 2array ] map line-strip ;
 
 M: function plot-function ( plot function -- plot )
