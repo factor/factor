@@ -100,17 +100,21 @@ M: string to-listener ( message string -- )
     listener> [ +server-listener+ listener> ] unless*
     [ to-listener ] [ drop ] if* ;
 
+M: irc-listener to-listener ( message irc-listener -- )
+    in-messages>> mailbox-put ;
+
 : unregister-listener ( name -- )
     irc> listeners>>
         [ at [ irc-listener-end ] dip to-listener ]
         [ delete-at ]
     2bi ;
 
-M: irc-listener to-listener ( message irc-listener -- )
-    in-messages>> mailbox-put ;
+: (remove-participant) ( nick listener -- )
+    [ participants>> delete-at ]
+    [ [ +part+ <participant-changed> ] dip to-listener ] 2bi ;
 
 : remove-participant ( nick channel -- )
-    listener> [ participants>> delete-at ] [ drop ] if* ;
+    listener> [ (remove-participant) ] [ drop ] if* ;
 
 : listeners-with-participant ( nick -- seq )
     irc> listeners>> values
@@ -118,10 +122,13 @@ M: irc-listener to-listener ( message irc-listener -- )
     with filter ;
 
 : remove-participant-from-all ( nick -- )
-    dup listeners-with-participant [ participants>> delete-at ] with each ;
+    dup listeners-with-participant [ (remove-participant) ] with each ;
 
 : add-participant ( mode nick channel -- )
-    listener> [ participants>> set-at ] [ 2drop ] if* ;
+    listener> [
+        [ participants>> set-at ]
+        [ [ +join+ <participant-changed> ] dip to-listener ] 2bi
+    ] [ 2drop ] if* ;
 
 DEFER: me?
 
@@ -164,25 +171,6 @@ DEFER: me?
 : broadcast-message-to-listeners ( message -- )
     irc> listeners>> values [ to-listener ] with each ;
 
-GENERIC: handle-participant-change ( irc-message -- )
-
-M: join handle-participant-change ( join -- )
-    [ prefix>> parse-name +join+ <participant-changed> ]
-    [ trailing>> ] bi to-listener ;
-
-M: part handle-participant-change ( part -- )
-    [ prefix>> parse-name +part+ <participant-changed> ]
-    [ channel>> ] bi to-listener ;
-
-M: kick handle-participant-change ( kick -- )
-    [ who>> +part+ <participant-changed> ]
-    [ channel>> ] bi to-listener ;
-
-M: quit handle-participant-change ( quit -- )
-    prefix>> parse-name
-    [ +part+ <participant-changed> ] [ listeners-with-participant ] bi
-    [ to-listener ] with each ;
-
 GENERIC: handle-incoming-irc ( irc-message -- )
 
 M: irc-message handle-incoming-irc ( irc-message -- )
@@ -201,31 +189,27 @@ M: privmsg handle-incoming-irc ( privmsg -- )
     dup irc-message-origin to-listener ;
 
 M: join handle-incoming-irc ( join -- )
-    { [ maybe-forward-join ]
-      [ dup trailing>> to-listener ]
-      [ [ drop +normal+ ] [ prefix>> parse-name ] [ trailing>> ] tri add-participant ]
-      [ handle-participant-change ]
-    } cleave ;
+    [ maybe-forward-join ]
+    [ dup trailing>> to-listener ]
+    [ [ drop +normal+ ] [ prefix>> parse-name ] [ trailing>> ] tri add-participant ]
+    tri ;
 
 M: part handle-incoming-irc ( part -- )
     [ dup channel>> to-listener ]
     [ [ prefix>> parse-name ] [ channel>> ] bi remove-participant ]
-    [ handle-participant-change ]
-    tri ;
+    bi ;
 
 M: kick handle-incoming-irc ( kick -- )
-    { [ dup channel>> to-listener ]
-      [ [ who>> ] [ channel>> ] bi remove-participant ]
-      [ handle-participant-change ]
-      [ dup who>> me? [ unregister-listener ] [ drop ] if ]
-    } cleave ;
+    [ dup channel>> to-listener ]
+    [ [ who>> ] [ channel>> ] bi remove-participant ]
+    [ dup who>> me? [ unregister-listener ] [ drop ] if ]
+    tri ;
 
 M: quit handle-incoming-irc ( quit -- )
     [ dup prefix>> parse-name listeners-with-participant
       [ to-listener ] with each ]
-    [ handle-participant-change ]
     [ prefix>> parse-name remove-participant-from-all ]
-    tri ;
+    bi ;
 
 ! FIXME: implement this
 ! M: mode handle-incoming-irc ( mode -- ) call-next-method ;
@@ -367,7 +351,7 @@ M: irc-server-listener (remove-listener) ( irc-server-listener -- )
     in-messages>> [ irc-connected ] dip mailbox-put ;
 
 : with-irc-client ( irc-client quot: ( -- ) -- )
-    [ current-irc-client ] dip with-variable ; inline
+    [ \ current-irc-client ] dip with-variable ; inline
 
 PRIVATE>
 
