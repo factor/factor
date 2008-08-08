@@ -72,6 +72,9 @@ M: #call unbox-tuples*
         [ drop ]
     } case ;
 
+M: #declare unbox-tuples*
+    [ unzip [ flatten-values ] dip zip ] change-declaration ;
+
 M: #copy unbox-tuples*
     [ flatten-values ] change-in-d
     [ flatten-values ] change-out-d ;
@@ -92,9 +95,37 @@ M: #shuffle unbox-tuples*
 M: #terminate unbox-tuples*
     [ flatten-values ] change-in-d ;
 
-! These nodes never participate in unboxing
-M: #return unbox-tuples* ;
+M: #phi unbox-tuples*
+    [ flip [ flatten-values ] map flip ] change-phi-in-d
+    [ flip [ flatten-values ] map flip ] change-phi-in-r
+    [ flatten-values ] change-out-d
+    [ flatten-values ] change-out-r ;
 
-M: #introduce unbox-tuples* ;
+M: #recursive unbox-tuples*
+    [ flatten-values ] change-in-d ;
+
+M: #enter-recursive unbox-tuples*
+    [ flatten-values ] change-in-d
+    [ flatten-values ] change-out-d ;
+
+M: #call-recursive unbox-tuples*
+    [ flatten-values ] change-in-d
+    [ flatten-values ] change-out-d ;
+
+M: #return-recursive unbox-tuples*
+    [ flatten-values ] change-in-d
+    [ flatten-values ] change-out-d ;
+
+! These nodes never participate in unboxing
+: assert-not-unboxed ( values -- )
+    dup array?
+    [ [ unboxed-allocation ] contains? ] [ unboxed-allocation ] if
+    [ "Unboxing wrong value" throw ] when ;
+
+M: #branch unbox-tuples* dup in-d>> assert-not-unboxed ;
+
+M: #return unbox-tuples* dup in-d>> assert-not-unboxed ;
+
+M: #introduce unbox-tuples* dup value>> assert-not-unboxed ;
 
 : unbox-tuples ( nodes -- nodes ) [ unbox-tuples* ] map-nodes ;
