@@ -5,6 +5,7 @@ classes.tuple.private arrays math math.private slots.private
 combinators dequeues search-dequeues namespaces fry classes
 classes.algebra stack-checker.state
 compiler.tree
+compiler.tree.intrinsics
 compiler.tree.propagation.info
 compiler.tree.escape-analysis.nodes
 compiler.tree.escape-analysis.allocations ;
@@ -23,33 +24,24 @@ DEFER: record-literal-allocation
 : make-literal-slots ( seq -- values )
     [ <slot-value> [ swap record-literal-allocation ] keep ] map ;
 
-: record-literal-tuple-allocation ( value object -- )
-    tuple-slots rest-slice
-    make-literal-slots
-    swap record-allocation ;
-
-: record-literal-complex-allocation ( value object -- )
-    [ real-part ] [ imaginary-part ] bi 2array make-literal-slots
-    swap record-allocation ;
+: object-slots ( object -- slots/f )
+    #! Delegation
+    {
+        { [ dup class immutable-tuple-class? ] [ tuple-slots rest-slice ] }
+        { [ dup complex? ] [ [ real-part ] [ imaginary-part ] bi 2array ] }
+        [ drop f ]
+    } cond ;
 
 : record-literal-allocation ( value object -- )
-    {
-        { [ dup class immutable-tuple-class? ] [ record-literal-tuple-allocation ] }
-        { [ dup complex? ] [ record-literal-complex-allocation ] }
-        [ drop unknown-allocation ]
-    } cond ;
+    object-slots dup
+    [ make-literal-slots swap record-allocation ] [ 2drop ] if ;
 
 M: #push escape-analysis*
     #! Delegation.
     [ out-d>> first ] [ literal>> ] bi record-literal-allocation ;
 
 : record-tuple-allocation ( #call -- )
-    #! Delegation.
-    dup dup in-d>> peek node-value-info literal>>
-    class>> immutable-tuple-class? [
-        [ in-d>> but-last ] [ out-d>> first ] bi
-        record-allocation
-    ] [ out-d>> unknown-allocations ] if ;
+    [ in-d>> but-last ] [ out-d>> first ] bi record-allocation ;
 
 : record-complex-allocation ( #call -- )
     [ in-d>> ] [ out-d>> first ] bi record-allocation ;
@@ -68,11 +60,13 @@ M: #push escape-analysis*
 
 : record-slot-call ( #call -- )
     [ out-d>> first ] [ slot-offset ] [ in-d>> first ] tri
-    over [ record-slot-access ] [ 2drop unknown-allocation ] if ;
+    over [
+        [ record-slot-access ] [ copy-slot-value ] 3bi
+    ] [ 2drop unknown-allocation ] if ;
 
 M: #call escape-analysis*
     dup word>> {
-        { \ <tuple-boa> [ record-tuple-allocation ] }
+        { \ <immutable-tuple-boa> [ record-tuple-allocation ] }
         { \ <complex> [ record-complex-allocation ] }
         { \ slot [ record-slot-call ] }
         [
