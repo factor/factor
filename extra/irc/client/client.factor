@@ -41,6 +41,7 @@ SYMBOL: +normal+
 SYMBOL: +join+
 SYMBOL: +part+
 SYMBOL: +mode+
+SYMBOL: +nick+
 
 ! listener objects
 : <irc-listener> ( -- irc-listener ) <mailbox> <mailbox> irc-listener boa ;
@@ -59,7 +60,7 @@ SYMBOL: +mode+
 ! Message objects
 ! ======================================
 
-TUPLE: participant-changed nick action ;
+TUPLE: participant-changed nick action parameter ;
 C: <participant-changed> participant-changed
 
 SINGLETON: irc-listener-end ! send to a listener to stop its execution
@@ -111,7 +112,7 @@ M: irc-listener to-listener ( message irc-listener -- )
 
 : (remove-participant) ( nick listener -- )
     [ participants>> delete-at ]
-    [ [ +part+ <participant-changed> ] dip to-listener ] 2bi ;
+    [ [ +part+ f <participant-changed> ] dip to-listener ] 2bi ;
 
 : remove-participant ( nick channel -- )
     listener> [ (remove-participant) ] [ drop ] if* ;
@@ -124,10 +125,21 @@ M: irc-listener to-listener ( message irc-listener -- )
 : remove-participant-from-all ( nick -- )
     dup listeners-with-participant [ (remove-participant) ] with each ;
 
+: notify-rename ( newnick oldnick listener -- )
+    [ participant-changed new +nick+ >>action
+      [ (>>nick) ] [ (>>parameter) ] [ ] tri ] dip to-listener ;
+
+: rename-participant ( newnick oldnick listener -- )
+    [ participants>> [ delete-at* drop ] [ [ swap ] dip set-at ] bi ]
+    [ notify-rename ] 3bi ;
+
+: rename-participant-in-all ( oldnick newnick -- )
+    swap dup listeners-with-participant [ rename-participant ] with with each ;
+
 : add-participant ( mode nick channel -- )
     listener> [
         [ participants>> set-at ]
-        [ [ +join+ <participant-changed> ] dip to-listener ] 2bi
+        [ [ +join+ f <participant-changed> ] dip to-listener ] 2bi
     ] [ 2drop ] if* ;
 
 DEFER: me?
@@ -211,9 +223,14 @@ M: quit handle-incoming-irc ( quit -- )
     [ prefix>> parse-name remove-participant-from-all ]
     bi ;
 
-! FIXME: implement this
-! M: mode handle-incoming-irc ( mode -- ) call-next-method ;
-! M: nick handle-incoming-irc ( nick -- ) call-next-method ;
+M: mode handle-incoming-irc ( mode -- ) ! FIXME: modify participant list
+    dup channel>> to-listener ;
+
+M: nick handle-incoming-irc ( nick -- )
+    [ dup prefix>> parse-name listeners-with-participant
+      [ to-listener ] with each ]
+    [ [ prefix>> parse-name ] [ trailing>> ] bi rename-participant-in-all ]
+    bi ;
 
 : >nick/mode ( string -- nick mode )
     dup first "+@" member? [ unclip ] [ 0 ] if participant-mode ;
@@ -225,7 +242,7 @@ M: quit handle-incoming-irc ( quit -- )
 M: names-reply handle-incoming-irc ( names-reply -- )
     [ names-reply>participants ] [ channel>> listener> ] bi [
         [ (>>participants) ]
-        [ [ f f <participant-changed> ] dip name>> to-listener ] bi
+        [ [ f f f <participant-changed> ] dip name>> to-listener ] bi
     ] [ drop ] if* ;
 
 M: irc-broadcasted-message handle-incoming-irc ( irc-broadcasted-message -- )

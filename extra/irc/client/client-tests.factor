@@ -30,7 +30,7 @@ M: mb-writer stream-nl ( mb-writer -- )
 ! to be used inside with-irc-client quotations
 : %add-named-listener ( listener -- ) [ name>> ] keep set+run-listener ;
 : %join ( channel -- ) <irc-channel-listener> irc> add-listener ;
-: %push-line ( line -- ) irc> stream>> in>> push-line yield yield ;
+: %push-line ( line -- ) irc> stream>> in>> push-line yield ;
 
 : read-matching-message ( listener quot: ( msg -- ? ) -- irc-message )
     [ in-messages>> 0.1 seconds ] dip mailbox-get-timeout? ;
@@ -96,7 +96,14 @@ M: mb-writer stream-nl ( mb-writer -- )
   ] unit-test
 ] with-irc
 
-! Participants lists tests
+[ { mode } [
+      "#factortest" <irc-channel-listener>  [ %add-named-listener ] keep
+      ":ircserver.net MODE #factortest +ns" %push-line
+      [ mode? ] read-matching-message class
+  ] unit-test
+] with-irc
+
+! Participant lists tests
 [ { H{ { "somedude" +normal+ } } } [
       "#factortest" <irc-channel-listener> [ %add-named-listener ] keep
       ":somedude!n=user@isp.net JOIN :#factortest" %push-line
@@ -134,8 +141,17 @@ M: mb-writer stream-nl ( mb-writer -- )
   ] unit-test
 ] with-irc
 
+[ { H{ { "somedude2" +normal+ } } } [
+      "#factortest" <irc-channel-listener>
+          H{ { "somedude" +normal+ } } clone >>participants
+      [ %add-named-listener ] keep
+      ":somedude!n=user2@isp.net NICK :somedude2" %push-line
+      participants>>
+  ] unit-test
+] with-irc
+
 ! Namelist change notification
-[ { T{ participant-changed f f f } } [
+[ { T{ participant-changed f f f f } } [
       "#factortest" <irc-channel-listener> [ %add-named-listener ] keep
       ":ircserver.net 353 factorbot @ #factortest :@factorbot " %push-line
       ":ircserver.net 366 factorbot #factortest :End of /NAMES list." %push-line
@@ -143,11 +159,20 @@ M: mb-writer stream-nl ( mb-writer -- )
   ] unit-test
 ] with-irc
 
-[ { T{ participant-changed f "somedude" +part+ } } [
+[ { T{ participant-changed f "somedude" +part+ f } } [
       "#factortest" <irc-channel-listener>
-                    H{ { "somedude" +normal+ } } clone >>participants
+          H{ { "somedude" +normal+ } } clone >>participants
       [ %add-named-listener ] keep
       ":somedude!n=user@isp.net QUIT" %push-line
+      [ participant-changed? ] read-matching-message
+  ] unit-test
+] with-irc
+
+[ { T{ participant-changed f "somedude" +nick+ "somedude2" } } [
+      "#factortest" <irc-channel-listener>
+          H{ { "somedude" +normal+ } } clone >>participants
+      [ %add-named-listener ] keep
+      ":somedude!n=user2@isp.net NICK :somedude2" %push-line
       [ participant-changed? ] read-matching-message
   ] unit-test
 ] with-irc
