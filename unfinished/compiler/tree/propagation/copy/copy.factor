@@ -5,7 +5,7 @@ combinators sets locals
 compiler.tree
 compiler.tree.def-use
 compiler.tree.combinators ;
-IN: compiler.tree.copy-equiv
+IN: compiler.tree.propagation.copy
 
 ! Two values are copy-equivalent if they are always identical
 ! at run-time ("DS" relation). This is just a weak form of
@@ -26,8 +26,7 @@ SYMBOL: copies
         ] if
     ] ;
 
-: resolve-copy ( copy -- val )
-    copies get compress-path [ "Unknown value" throw ] unless* ;
+: resolve-copy ( copy -- val ) copies get compress-path ;
 
 : is-copy-of ( val copy -- ) copies get set-at ;
 
@@ -37,21 +36,7 @@ SYMBOL: copies
 
 GENERIC: compute-copy-equiv* ( node -- )
 
-M: #shuffle compute-copy-equiv*
-    [ out-d>> dup ] [ mapping>> ] bi
-    '[ , at ] map swap are-copies-of ;
-
-M: #>r compute-copy-equiv*
-    [ in-d>> ] [ out-r>> ] bi are-copies-of ;
-
-M: #r> compute-copy-equiv*
-    [ in-r>> ] [ out-d>> ] bi are-copies-of ;
-
-M: #copy compute-copy-equiv*
-    [ in-d>> ] [ out-d>> ] bi are-copies-of ;
-
-M: #return-recursive compute-copy-equiv*
-    [ in-d>> ] [ out-d>> ] bi are-copies-of ;
+M: #renaming compute-copy-equiv* inputs/outputs are-copies-of ;
 
 : compute-phi-equiv ( inputs outputs -- )
     #! An output is a copy of every input if all inputs are
@@ -68,13 +53,7 @@ M: #phi compute-copy-equiv*
 
 M: node compute-copy-equiv* drop ;
 
-: amend-copy-equiv ( node -- )
-    [
-        [ node-defs-values [ introduce-value ] each ]
-        [ compute-copy-equiv* ]
-        bi
-    ] each-node ;
-
-: compute-copy-equiv ( node -- node )
-    H{ } clone copies set
-    dup amend-copy-equiv ;
+: compute-copy-equiv ( node -- )
+    [ node-defs-values [ introduce-value ] each ]
+    [ compute-copy-equiv* ]
+    bi ;

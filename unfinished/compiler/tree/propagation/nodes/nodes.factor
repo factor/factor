@@ -3,6 +3,7 @@
 USING: sequences accessors kernel assocs sequences
 compiler.tree
 compiler.tree.def-use
+compiler.tree.propagation.copy
 compiler.tree.propagation.info ;
 IN: compiler.tree.propagation.nodes
 
@@ -15,7 +16,8 @@ GENERIC: propagate-after ( node -- )
 
 GENERIC: propagate-around ( node -- )
 
-: (propagate) ( node -- ) [ propagate-around ] each ;
+: (propagate) ( node -- )
+    [ [ compute-copy-equiv ] [ propagate-around ] bi ] each ;
 
 : extract-value-info ( values -- assoc )
     [ dup value-info ] H{ } map>assoc ;

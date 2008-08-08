@@ -3,8 +3,9 @@
 USING: arrays assocs math math.intervals kernel accessors
 sequences namespaces classes classes.algebra
 combinators words
-compiler.tree compiler.tree.propagation.info
-compiler.tree.copy-equiv ;
+compiler.tree
+compiler.tree.propagation.info
+compiler.tree.propagation.copy ;
 IN: compiler.tree.propagation.constraints
 
 ! A constraint is a statement about a value.

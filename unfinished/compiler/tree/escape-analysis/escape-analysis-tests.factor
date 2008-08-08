@@ -1,9 +1,9 @@
 IN: compiler.tree.escape-analysis.tests
 USING: compiler.tree.escape-analysis
 compiler.tree.escape-analysis.allocations compiler.tree.builder
-compiler.tree.normalization compiler.tree.copy-equiv
+compiler.tree.normalization math.functions
 compiler.tree.propagation compiler.tree.cleanup
-compiler.tree.combinators compiler.tree sequences math
+compiler.tree.combinators compiler.tree sequences math math.private
 kernel tools.test accessors slots.private quotations.private
 prettyprint classes.tuple.private classes classes.tuple ;
 
@@ -15,7 +15,7 @@ GENERIC: count-unboxed-allocations* ( m node -- n )
     out-d>> first escaping-allocation? [ 1+ ] unless ;
 
 M: #call count-unboxed-allocations*
-    dup word>> \ <tuple-boa> =
+    dup word>> { <tuple-boa> <complex> } memq?
     [ (count-unboxed-allocations) ] [ drop ] if ;
 
 M: #push count-unboxed-allocations*
@@ -27,10 +27,8 @@ M: node count-unboxed-allocations* drop ;
 : count-unboxed-allocations ( quot -- sizes )
     build-tree
     normalize
-    compute-copy-equiv
     propagate
     cleanup
-    compute-copy-equiv
     escape-analysis
     0 swap [ count-unboxed-allocations* ] each-node ;
 
@@ -187,3 +185,101 @@ TUPLE: cons { car read-only } { cdr read-only } ;
         1 2 cons boa infinite-cons-loop
     ] count-unboxed-allocations
 ] unit-test
+
+TUPLE: rw-box i ;
+
+C: <rw-box> rw-box
+
+[ 0 ] [ [ <rw-box> i>> ] count-unboxed-allocations ] unit-test
+
+: fake-fib ( m -- n )
+    dup i>> 1 <= [ drop 1 <rw-box> ] when ; inline recursive
+
+[ 0 ] [ [ <rw-box> fake-fib i>> ] count-unboxed-allocations ] unit-test
+
+TUPLE: ro-box { i read-only } ;
+
+C: <ro-box> ro-box
+
+: tuple-fib ( m -- n )
+    dup i>> 1 <= [
+        drop 1 <ro-box>
+    ] [
+        i>> 1- <ro-box>
+        dup tuple-fib
+        swap
+        i>> 1- <ro-box>
+        tuple-fib
+        swap i>> swap i>> + <ro-box>
+    ] if ; inline recursive
+
+[ 5 ] [ [ <ro-box> tuple-fib i>> ] count-unboxed-allocations ] unit-test
+
+[ 3 ] [ [ <ro-box> tuple-fib ] count-unboxed-allocations ] unit-test
+
+: bad-tuple-fib-1 ( m -- n )
+    dup i>> 1 <= [
+        drop 1 <ro-box>
+    ] [
+        i>> 1- <ro-box>
+        dup bad-tuple-fib-1
+        swap
+        i>> 1- <ro-box>
+        bad-tuple-fib-1 dup .
+        swap i>> swap i>> + <ro-box>
+    ] if ; inline recursive
+
+[ 3 ] [ [ <ro-box> bad-tuple-fib-1 i>> ] count-unboxed-allocations ] unit-test
+
+: bad-tuple-fib-2 ( m -- n )
+    dup .
+    dup i>> 1 <= [
+        drop 1 <ro-box>
+    ] [
+        i>> 1- <ro-box>
+        dup bad-tuple-fib-2
+        swap
+        i>> 1- <ro-box>
+        bad-tuple-fib-2
+        swap i>> swap i>> + <ro-box>
+    ] if ; inline recursive
+
+[ 2 ] [ [ <ro-box> bad-tuple-fib-2 i>> ] count-unboxed-allocations ] unit-test
+
+: tuple-fib-2 ( m -- n )
+    dup 1 <= [
+        drop 1 <ro-box>
+    ] [
+        1- dup tuple-fib-2
+        swap
+        1- tuple-fib-2
+        swap i>> swap i>> + <ro-box>
+    ] if ; inline recursive
+
+[ 2 ] [ [ tuple-fib-2 i>> ] count-unboxed-allocations ] unit-test
+
+: tuple-fib-3 ( m -- n )
+    dup 1 <= [
+        drop 1 <ro-box>
+    ] [
+        1- dup tuple-fib-3
+        swap
+        1- tuple-fib-3 dup .
+        swap i>> swap i>> + <ro-box>
+    ] if ; inline recursive
+
+[ 0 ] [ [ tuple-fib-3 i>> ] count-unboxed-allocations ] unit-test
+
+: bad-tuple-fib-3 ( m -- n )
+    dup 1 <= [
+        drop 1 <ro-box>
+    ] [
+        1- dup bad-tuple-fib-3
+        swap
+        1- bad-tuple-fib-3
+        2drop f
+    ] if ; inline recursive
+
+[ 0 ] [ [ bad-tuple-fib-3 i>> ] count-unboxed-allocations ] unit-test
+
+[ 1 ] [ [ <complex> >rect ] count-unboxed-allocations ] unit-test

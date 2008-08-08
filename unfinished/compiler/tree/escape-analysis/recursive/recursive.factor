@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences math combinators accessors namespaces
+fry disjoint-sets
 compiler.tree
-compiler.tree.copy-equiv
 compiler.tree.combinators
 compiler.tree.escape-analysis.nodes
 compiler.tree.escape-analysis.branches
@@ -17,9 +17,10 @@ IN: compiler.tree.escape-analysis.recursive
         [ [ [ allocation ] bi@ congruent? ] 2all? ]
     } cond ;
 
-: check-fixed-point ( node alloc1 alloc2 -- node )
-    [ congruent? ] 2all?
-    [ dup label>> f >>fixed-point drop ] unless ; inline
+: check-fixed-point ( node alloc1 alloc2 -- )
+    [ congruent? ] 2all? [ drop ] [
+        label>> f >>fixed-point drop
+    ] if ;
 
 : node-input-allocations ( node -- allocations )
     in-d>> [ allocation ] map ;
@@ -35,31 +36,26 @@ IN: compiler.tree.escape-analysis.recursive
     [ [ merge-values ] 2each ]
     [
         [ (merge-allocations) ] dip
-        [ [ allocation ] map check-fixed-point drop ]
+        [ [ allocation ] map check-fixed-point ]
         [ record-allocations ]
         2bi
     ] 2bi ;
 
 M: #recursive escape-analysis* ( #recursive -- )
     [
-        ! copies [ clone ] change
-
         child>>
         [ first analyze-recursive-phi ]
         [ (escape-analysis) ]
         bi
     ] until-fixed-point ;
 
-M: #call-recursive escape-analysis* ( #call-label -- )
-    dup
-    [ node-output-allocations ]
-    [ label>> return>> node-input-allocations ] bi
-    [ check-fixed-point ] keep
-    swap out-d>> record-allocations ;
+: return-allocations ( node -- allocations )
+    label>> return>> node-input-allocations ;
 
-! M: #return-recursive escape-analysis* ( #return-recursive -- )
-!     dup dup label>> calls>> dup empty? [ 3drop ] [
-!         [ node-input-allocations ]
-!         [ first node-output-allocations ] bi*
-!         check-fixed-point drop
-!     ] if ;
+M: #call-recursive escape-analysis* ( #call-label -- )
+    [ ] [ return-allocations ] [ node-output-allocations ] tri
+    [ check-fixed-point ] [ drop swap out-d>> record-allocations ] 3bi ;
+
+M: #return-recursive escape-analysis* ( #return-recursive -- )
+    [ in-d>> ] [ label>> calls>> ] bi
+    [ out-d>> escaping-values get '[ , equate ] 2each ] with each ;

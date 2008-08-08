@@ -41,6 +41,13 @@ M: persistent-hash >alist [ root>> >alist% ] { } make ;
 : >persistent-hash ( assoc -- phash )
     T{ persistent-hash } swap [ spin new-at ] assoc-each ;
 
+M: persistent-hash equal?
+    over persistent-hash? [ assoc= ] [ 2drop f ] if ;
+
+M: persistent-hash hashcode* nip assoc-size ;
+
+M: persistent-hash clone ;
+
 : PH{ \ } [ >persistent-hash ] parse-literal ; parsing
 
 M: persistent-hash pprint-delims drop \ PH{ \ } ;

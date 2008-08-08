@@ -1,5 +1,5 @@
 USING: kernel compiler.tree.builder compiler.tree
-compiler.tree.propagation compiler.tree.copy-equiv
+compiler.tree.propagation
 compiler.tree.normalization tools.test math math.order
 accessors sequences arrays kernel.private vectors
 alien.accessors alien.c-types sequences.private
@@ -14,7 +14,6 @@ IN: compiler.tree.propagation.tests
 : final-info ( quot -- seq )
     build-tree
     normalize
-    compute-copy-equiv
     propagate
     peek node-input-infos ;
 
@@ -145,6 +144,8 @@ IN: compiler.tree.propagation.tests
     [ dup string? t xor [ "A" throw ] [ ] if ] final-classes
 ] unit-test
 
+[ f ] [ [ t xor ] final-classes first null-class? ] unit-test
+
 [ t ] [ [ t or ] final-classes first true-class? ] unit-test
 
 [ t ] [ [ t swap or ] final-classes first true-class? ] unit-test
@@ -155,11 +156,19 @@ IN: compiler.tree.propagation.tests
 
 [ t ] [ [ dup not or ] final-classes first true-class? ] unit-test
 
+[ t ] [ [ dup t xor or ] final-classes first true-class? ] unit-test
+
 [ t ] [ [ dup not swap or ] final-classes first true-class? ] unit-test
+
+[ t ] [ [ dup t xor swap or ] final-classes first true-class? ] unit-test
 
 [ t ] [ [ dup not and ] final-classes first false-class? ] unit-test
 
+[ t ] [ [ dup t xor and ] final-classes first false-class? ] unit-test
+
 [ t ] [ [ dup not swap and ] final-classes first false-class? ] unit-test
+
+[ t ] [ [ dup t xor swap and ] final-classes first false-class? ] unit-test
 
 [ t ] [ [ over [ drop f ] when [ "A" throw ] unless ] final-classes first false-class? ] unit-test
 
