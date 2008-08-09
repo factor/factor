@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences sequences.deep combinators fry
 classes.algebra namespaces assocs math math.private
-math.partial-dispatch
+math.partial-dispatch classes.tuple classes.tuple.private
 compiler.tree
+compiler.tree.intrinsics
 compiler.tree.combinators
 compiler.tree.propagation.info
 compiler.tree.propagation.branches ;
@@ -53,11 +54,21 @@ GENERIC: cleanup* ( node -- node/nodes )
 : remove-overflow-check ( #call -- #call )
     [ in-d>> ] [ out-d>> ] [ word>> no-overflow-variant ] tri #call cleanup* ;
 
+: immutable-tuple-boa? ( #call -- ? )
+    dup word>> \ <tuple-boa> eq? [
+        dup in-d>> peek node-value-info
+        literal>> class>> immutable-tuple-class?
+    ] [ drop f ] if ;
+
+: immutable-tuple-boa ( #call -- #call )
+    \ <immutable-tuple-boa> >>word ;
+
 M: #call cleanup*
     {
         { [ dup body>> ] [ cleanup-inlining ] }
         { [ dup cleanup-folding? ] [ cleanup-folding ] }
         { [ dup remove-overflow-check? ] [ remove-overflow-check ] }
+        { [ dup immutable-tuple-boa? ] [ immutable-tuple-boa ] }
         [ ]
     } cond ;
 

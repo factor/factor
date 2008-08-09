@@ -66,6 +66,10 @@ M: disjoint-set add-atom
 
 : add-atoms ( seq disjoint-set -- ) '[ , add-atom ] each ;
 
+GENERIC: disjoint-set-member? ( a disjoint-set -- ? )
+
+M: disjoint-set disjoint-set-member? parents>> key? ;
+
 GENERIC: equiv-set-size ( a disjoint-set -- n )
 
 M: disjoint-set equiv-set-size [ representative ] keep count ;
