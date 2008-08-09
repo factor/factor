@@ -4,7 +4,7 @@ compiler.tree.escape-analysis.recursive
 compiler.tree.escape-analysis.allocations ;
 
 H{ } clone allocations set
-H{ } clone copies set
+<escaping-values> escaping-values set
 
 [ ] [ 8 [ introduce-value ] each ] unit-test
 

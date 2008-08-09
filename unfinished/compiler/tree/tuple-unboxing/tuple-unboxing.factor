@@ -1,56 +1,41 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: namespaces assocs accessors kernel combinators
+classes.algebra sequences sequences.deep slots.private
+classes.tuple.private math math.private arrays
+compiler.tree
+compiler.tree.intrinsics
+compiler.tree.combinators
+compiler.tree.escape-analysis.simple
+compiler.tree.escape-analysis.allocations ;
 IN: compiler.tree.tuple-unboxing
 
 ! This pass must run after escape analysis
 
-! Mapping from values to sequences of values
-SYMBOL: unboxed-tuples
+GENERIC: unbox-tuples* ( node -- node/nodes )
 
-: unboxed-tuple ( value -- unboxed-tuple )
-    unboxed-tuples get at ;
-
-GENERIC: unbox-tuples* ( node -- )
-
-: value-info-slots ( info -- slots )
-    #! Delegation.
-    [ info>> ] [ class>> ] bi {
-        { [ dup tuple class<= ] [ drop 2 tail ] }
-        { [ dup complex class<= ] [ drop ] }
-    } cond ;
-
-: prepare-unboxed-values ( #push -- values )
+: unbox-output? ( node -- values )
     out-d>> first unboxed-allocation ;
 
-: prepare-unboxed-info ( #push -- infos values )
-    dup prepare-unboxed-values dup
-    [ [ node-output-infos first value-info-slots ] dip ]
-    [ 2drop f f ]
-    if ;
+: (expand-#push) ( object value -- nodes )
+    dup unboxed-allocation dup [
+        [ object-slots ] [ drop ] [ ] tri*
+        [ (expand-#push) ] 2map
+    ] [
+        drop #push
+    ] if ;
 
-: expand-#push ( #push infos values -- )
-    [ [ literal>> ] dip #push ] 2map >>body drop ;
+: expand-#push ( #push -- nodes )
+    [ literal>> ] [ out-d>> first ] bi (expand-#push) ;
 
-M: #push unbox-tuples* ( #push -- )
-    dup prepare-unboxed-info dup [ expand-#push ] [ 3drop ] if ;
+M: #push unbox-tuples* ( #push -- nodes )
+    dup unbox-output? [ expand-#push ] when ;
 
-: expand-<tuple-boa> ( #call values -- quot )
-    [ drop in-d>> peek #drop ]
-    [ [ in-d>> but-last ] dip #copy ]
-    2bi 2array ;
+: unbox-<tuple-boa> ( #call -- nodes )
+    dup unbox-output? [ in-d>> 1 tail* #drop ] when ;
 
-: expand-<complex> ( #call values -- quot )
-    [ in-d>> ] dip #copy 1array ;
-
-: expand-constructor ( #call values -- )
-    [ drop ] [ ] [ drop word>> ] 2tri {
-        { <tuple-boa> [ expand-<tuple-boa> ] }
-        { <complex> [ expand-<complex> ] }
-    } case unbox-tuples >>body ;
-
-: unbox-constructor ( #call -- )
-    dup prepare-unboxed-values dup
-    [ expand-constructor ] [ 2drop ] if ;
+: unbox-<complex> ( #call -- nodes )
+    dup unbox-output? [ drop { } ] when ;
 
 : (flatten-values) ( values -- values' )
     [ dup unboxed-allocation [ (flatten-values) ] [ ] ?if ] map ;
@@ -59,51 +44,88 @@ M: #push unbox-tuples* ( #push -- )
     (flatten-values) flatten ;
 
 : flatten-value ( values -- values )
-    1array flatten-values ;
+    [ unboxed-allocation ] [ 1array ] bi or ;
 
-: prepare-slot-access ( #call -- tuple-values slot-values outputs )
+: prepare-slot-access ( #call -- tuple-values outputs slot-values )
     [ in-d>> first flatten-value ]
-    [
-        [ dup in-d>> second node-value-info literal>> ]
-        [ out-d>> first unboxed-allocation ]
-        bi nth flatten-value
-    ]
     [ out-d>> flatten-values ]
-    tri ;
+    [
+        out-d>> first slot-accesses get at
+        [ slot#>> ] [ value>> ] bi allocation nth flatten-value
+    ] tri ;
 
-: slot-access-shuffle ( tuple-values slot-values outputs -- #shuffle )
-    [ nip ] [ zip ] 2bi #shuffle ;
+: slot-access-shuffle ( tuple-values outputs slot-values -- #shuffle )
+    [ drop ] [ zip ] 2bi #shuffle ;
 
-: unbox-slot-access ( #call -- )
-    dup unboxed-slot-access? [
-        dup
+: unbox-slot-access ( #call -- nodes )
+    dup out-d>> first unboxed-slot-access? [
         [ in-d>> second 1array #drop ]
         [ prepare-slot-access slot-access-shuffle ]
-        bi 2array unbox-tuples >>body
-    ] when drop ;
+        bi 2array
+    ] when ;
 
-M: #call unbox-tuples* ( #call -- )
+M: #call unbox-tuples*
     dup word>> {
-        { \ <tuple-boa> [ unbox-<tuple-boa> ] }
+        { \ <immutable-tuple-boa> [ unbox-<tuple-boa> ] }
         { \ <complex> [ unbox-<complex> ] }
         { \ slot [ unbox-slot-access ] }
-        [ 2drop ]
+        [ drop ]
     } case ;
 
-M: #copy ... ;
+M: #declare unbox-tuples*
+    [ unzip [ flatten-values ] dip zip ] change-declaration ;
 
-M: #>r ... ;
+M: #copy unbox-tuples*
+    [ flatten-values ] change-in-d
+    [ flatten-values ] change-out-d ;
 
-M: #r> ... ;
+M: #>r unbox-tuples*
+    [ flatten-values ] change-in-d
+    [ flatten-values ] change-out-r ;
 
-M: #shuffle ... ;
+M: #r> unbox-tuples*
+    [ flatten-values ] change-in-r
+    [ flatten-values ] change-out-d ;
 
-M: #terrible ... ;
+M: #shuffle unbox-tuples*
+    [ flatten-values ] change-in-d
+    [ flatten-values ] change-out-d
+    [ unzip [ flatten-values ] bi@ zip ] change-mapping ;
+
+M: #terminate unbox-tuples*
+    [ flatten-values ] change-in-d ;
+
+M: #phi unbox-tuples*
+    [ flip [ flatten-values ] map flip ] change-phi-in-d
+    [ flip [ flatten-values ] map flip ] change-phi-in-r
+    [ flatten-values ] change-out-d
+    [ flatten-values ] change-out-r ;
+
+M: #recursive unbox-tuples*
+    [ flatten-values ] change-in-d ;
+
+M: #enter-recursive unbox-tuples*
+    [ flatten-values ] change-in-d
+    [ flatten-values ] change-out-d ;
+
+M: #call-recursive unbox-tuples*
+    [ flatten-values ] change-in-d
+    [ flatten-values ] change-out-d ;
+
+M: #return-recursive unbox-tuples*
+    [ flatten-values ] change-in-d
+    [ flatten-values ] change-out-d ;
 
 ! These nodes never participate in unboxing
-M: #return drop ;
+: assert-not-unboxed ( values -- )
+    dup array?
+    [ [ unboxed-allocation ] contains? ] [ unboxed-allocation ] if
+    [ "Unboxing wrong value" throw ] when ;
 
-M: #introduce drop ;
+M: #branch unbox-tuples* dup in-d>> assert-not-unboxed ;
 
-: unbox-tuples ( nodes -- nodes )
-    dup [ unbox-tuples* ] each-node ;
+M: #return unbox-tuples* dup in-d>> assert-not-unboxed ;
+
+M: #introduce unbox-tuples* dup value>> assert-not-unboxed ;
+
+: unbox-tuples ( nodes -- nodes ) [ unbox-tuples* ] map-nodes ;
