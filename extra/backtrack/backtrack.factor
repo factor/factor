@@ -66,3 +66,5 @@ MACRO: amb-execute ( seq -- quot )
         tri* if
     ] with-scope ; inline
 
+: cut-amb ( -- )
+    f failure set ;
