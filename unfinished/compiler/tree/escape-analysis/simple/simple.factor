@@ -33,8 +33,10 @@ DEFER: record-literal-allocation
     } cond ;
 
 : record-literal-allocation ( value object -- )
-    object-slots dup
-    [ make-literal-slots swap record-allocation ] [ 2drop ] if ;
+    object-slots
+    [ make-literal-slots swap record-allocation ]
+    [ unknown-allocation ]
+    if* ;
 
 M: #push escape-analysis*
     #! Delegation.

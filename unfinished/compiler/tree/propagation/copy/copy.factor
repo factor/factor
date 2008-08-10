@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces sequences assocs math kernel accessors fry
 combinators sets locals
+stack-checker.branches
 compiler.tree
 compiler.tree.def-use
 compiler.tree.combinators ;
@@ -42,7 +43,7 @@ M: #renaming compute-copy-equiv* inputs/outputs are-copies-of ;
     #! An output is a copy of every input if all inputs are
     #! copies of the same original value.
     [
-        swap sift [ resolve-copy ] map
+        swap remove-bottom [ resolve-copy ] map
         dup [ all-equal? ] [ empty? not ] bi and
         [ first swap is-copy-of ] [ 2drop ] if
     ] 2each ;

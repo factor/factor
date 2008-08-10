@@ -18,9 +18,7 @@ IN: compiler.tree.escape-analysis.recursive
     } cond ;
 
 : check-fixed-point ( node alloc1 alloc2 -- )
-    [ congruent? ] 2all? [ drop ] [
-        label>> f >>fixed-point drop
-    ] if ;
+    [ congruent? ] 2all? [ drop ] [ label>> f >>fixed-point drop ] if ;
 
 : node-input-allocations ( node -- allocations )
     in-d>> [ allocation ] map ;
@@ -44,13 +42,14 @@ IN: compiler.tree.escape-analysis.recursive
     ] 2bi ;
 
 M: #recursive escape-analysis* ( #recursive -- )
-    [
+    { 0 } clone [ USE: math
+        dup first 10 = [ "OOPS" throw ] [ dup first 1+ swap set-first ] if
         child>>
         [ first out-d>> introduce-values ]
         [ first analyze-recursive-phi ]
         [ (escape-analysis) ]
         tri
-    ] until-fixed-point ;
+    ] curry until-fixed-point ;
 
 M: #enter-recursive escape-analysis* ( #enter-recursive -- )
     #! Handled by #recursive

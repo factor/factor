@@ -105,10 +105,10 @@ SYMBOL: live-branches
 
 M: #branch cleanup*
     {
-        [ live-branches>> live-branches set ]
         [ delete-unreachable-branches ]
         [ cleanup-children ]
         [ fold-only-branch ]
+        [ live-branches>> live-branches set ]
     } cleave ;
 
 : cleanup-phi-in ( phi-in live-branches -- phi-in' )
@@ -122,7 +122,8 @@ M: #phi cleanup*
         [ '[ , cleanup-phi-in ] change-phi-in-r ]
         [ '[ , cleanup-phi-in ] change-phi-info-d ]
         [ '[ , cleanup-phi-in ] change-phi-info-r ]
-    } cleave ;
+    } cleave
+    live-branches off ;
 
 : >copy ( node -- #copy ) [ in-d>> ] [ out-d>> ] bi #copy ;
 
