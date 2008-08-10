@@ -17,18 +17,8 @@ HELP: derivative ( x function -- m )
     }
     { $notes
         "For applied scientists, you may play with the settings "
-        "in the source file to achieve arbitrary accuracy."
+        "in the source file to achieve arbitrary accuracy. "
     }
-} ;
-
-HELP: fast-derivative ( x function -- m )
-{ $values { "x" "a x-position on the function" } { "function" "a differentiable function" } }
-{ $description
-    "Approximates the slope of the tangent line of the provided function "
-    "by using a secant line with very near points. This implementation is "
-    "naive and is only provided because it is used in the much more "
-    "accurate " { $link derivative } " word. Use this word if accuracy "
-    "is of no importance."
 } ;
 
 HELP: derivative-func ( function -- der )
@@ -48,6 +38,5 @@ HELP: derivative-func ( function -- der )
 ARTICLE: "derivatives" "The Derivative Toolkit"
 "A toolkit for computing the derivative of functions."
 { $subsection derivative }
-{ $subsection derivative-func }
-{ $subsection fast-derivative } ;
+{ $subsection derivative-func } ;
 ABOUT: "derivatives"
