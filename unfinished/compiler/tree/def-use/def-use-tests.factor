@@ -1,7 +1,9 @@
 USING: accessors namespaces assocs kernel sequences math
 tools.test words sets combinators.short-circuit
 stack-checker.state compiler.tree compiler.tree.builder
-compiler.tree.def-use arrays kernel.private ;
+compiler.tree.normalization compiler.tree.propagation
+compiler.tree.cleanup compiler.tree.def-use arrays kernel.private
+sorting math.order binary-search compiler.tree.checker ;
 IN: compiler.tree.def-use.tests
 
 \ compute-def-use must-infer
@@ -14,8 +16,16 @@ IN: compiler.tree.def-use.tests
     } 1&&
 ] unit-test
 
-! compute-def-use checks for SSA violations, so we make sure
-! some common patterns are generated correctly.
+: test-def-use ( quot -- )
+    build-tree
+    normalize
+    propagate
+    cleanup
+    compute-def-use
+    check-nodes ;
+
+! compute-def-use checks for SSA violations, so we use that to
+! ensure we generate some common patterns correctly.
 {
     [ [ drop ] each-integer ]
     [ [ 2drop ] curry each-integer ]
@@ -28,6 +38,10 @@ IN: compiler.tree.def-use.tests
     [ [ 1 ] 2 [ + ] curry compose call + ]
     [ [ 1 ] [ call 2 ] curry call + ]
     [ [ 1 ] [ 2 ] compose swap [ 1 ] [ 2 ] if + * ]
+    [ dup slice? [ dup array? [ ] [ ] if ] [ ] if ]
+    [ dup [ drop f ] [ "A" throw ] if ]
+    [ [ <=> ] sort ]
+    [ [ <=> ] with search ]
 } [
-    [ ] swap [ build-tree compute-def-use drop ] curry unit-test
+    [ ] swap [ test-def-use ] curry unit-test
 ] each

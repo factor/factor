@@ -1,7 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry namespaces sequences math accessors kernel arrays
-stack-checker.backend stack-checker.inlining compiler.tree
+stack-checker.backend
+stack-checker.branches
+stack-checker.inlining
+compiler.tree
 compiler.tree.combinators ;
 IN: compiler.tree.normalization
 
@@ -97,7 +100,12 @@ M: #branch eliminate-introductions*
     bi ;
 
 : eliminate-phi-introductions ( introductions seq terminated -- seq' )
-    [ flip ] dip [ [ nip ] [ over length tail append ] if ] 3map flip ;
+    [ flip ] dip [
+        [ nip ] [
+            dup [ +bottom+ eq? ] left-trim
+            [ [ length ] bi@ - tail* ] keep append
+        ] if
+    ] 3map flip ;
 
 M: #phi eliminate-introductions*
     remaining-introductions get swap dup terminated>>

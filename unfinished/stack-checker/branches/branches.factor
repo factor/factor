@@ -9,21 +9,30 @@ IN: stack-checker.branches
 : balanced? ( pairs -- ? )
     [ second ] filter [ first2 length - ] map all-equal? ;
 
-: unify-inputs ( max-d-in d-in meta-d -- new-meta-d )
-    dup [ [ - f <repetition> ] dip append ] [ 3drop f ] if ;
+SYMBOL: +bottom+
 
-: pad-with-f ( seq -- newseq )
-    dup [ length ] map supremum '[ , f pad-left ] map ;
+: unify-inputs ( max-d-in d-in meta-d -- new-meta-d )
+    dup [ [ - +bottom+ <repetition> ] dip append ] [ 3drop f ] if ;
+
+: pad-with-bottom ( seq -- newseq )
+    dup empty? [
+        dup [ length ] map supremum
+        '[ , +bottom+ pad-left ] map
+    ] unless ;
 
 : phi-inputs ( max-d-in pairs -- newseq )
     dup empty? [ nip ] [
         swap '[ , _ first2 unify-inputs ] map
-        pad-with-f
+        pad-with-bottom
         flip
     ] if ;
 
+: remove-bottom ( seq -- seq' )
+    +bottom+ swap remove ;
+
 : unify-values ( values -- phi-out )
-    sift dup empty? [ drop <value> ] [
+    remove-bottom
+    dup empty? [ drop <value> ] [
         [ known ] map dup all-eq?
         [ first make-known ] [ drop <value> ] if
     ] if ;

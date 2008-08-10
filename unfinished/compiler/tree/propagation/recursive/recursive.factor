@@ -39,7 +39,7 @@ IN: compiler.tree.propagation.recursive
 : unify-recursive-stacks ( stacks initial -- infos )
     over empty? [ nip ] [
         [
-            [ sift value-infos-union ] dip
+            [ value-infos-union ] dip
             [ generalize-counter ] keep
             value-info-union
         ] 2map
