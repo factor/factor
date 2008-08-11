@@ -22,7 +22,7 @@ IN: compiler.tree.loop.detection
 
 SYMBOL: loop-heights
 SYMBOL: loop-calls
-SYMBOL: label-stack
+SYMBOL: loop-stack
 SYMBOL: work-list
 
 GENERIC: collect-loop-info* ( tail? node -- )
@@ -34,14 +34,14 @@ GENERIC: collect-loop-info* ( tail? node -- )
     [ tail-calls ] keep [ collect-loop-info* ] 2each ;
 
 : remember-loop-info ( label -- )
-    label-stack get length swap loop-heights get set-at ;
+    loop-stack get length swap loop-heights get set-at ;
 
 M: #recursive collect-loop-info*
     nip
     [
         [
             label>>
-            [ label-stack [ swap suffix ] change ]
+            [ loop-stack [ swap suffix ] change ]
             [ remember-loop-info ]
             [ t >>loop? drop ]
             tri
@@ -50,7 +50,7 @@ M: #recursive collect-loop-info*
     ] with-scope ;
 
 : current-loop-nesting ( label -- labels )
-    label-stack get swap loop-heights get at tail ;
+    loop-stack get swap loop-heights get at tail ;
 
 : disqualify-loop ( label -- )
     work-list get push-front ;
@@ -69,7 +69,7 @@ M: #dispatch collect-loop-info*
 M: node collect-loop-info* 2drop ;
 
 : collect-loop-info ( node -- )
-    { } label-stack set
+    { } loop-stack set
     H{ } clone loop-calls set
     H{ } clone loop-heights set
     <hashed-dlist> work-list set

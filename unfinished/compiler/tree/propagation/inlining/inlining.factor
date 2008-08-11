@@ -18,10 +18,7 @@ M: word splicing-nodes
     [ [ in-d>> ] [ out-d>> ] bi ] dip #call 1array ;
 
 M: quotation splicing-nodes
-    [ [ out-d>> ] [ in-d>> ] bi ] dip
-    build-tree-with
-    rot #copy suffix
-    normalize ;
+    build-sub-tree normalize ;
 
 : propagate-body ( #call -- )
     body>> (propagate) ;
