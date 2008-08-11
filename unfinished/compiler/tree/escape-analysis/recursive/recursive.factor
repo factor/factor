@@ -18,9 +18,7 @@ IN: compiler.tree.escape-analysis.recursive
     } cond ;
 
 : check-fixed-point ( node alloc1 alloc2 -- )
-    [ congruent? ] 2all? [ drop ] [
-        label>> f >>fixed-point drop
-    ] if ;
+    [ congruent? ] 2all? [ drop ] [ label>> f >>fixed-point drop ] if ;
 
 : node-input-allocations ( node -- allocations )
     in-d>> [ allocation ] map ;
@@ -29,10 +27,12 @@ IN: compiler.tree.escape-analysis.recursive
     out-d>> [ allocation ] map ;
 
 : recursive-stacks ( #enter-recursive -- stacks )
-    [ label>> calls>> [ in-d>> ] map ] [ in-d>> ] bi suffix ;
+    [ label>> calls>> [ in-d>> ] map ] [ in-d>> ] bi suffix
+    escaping-values get '[ [ , disjoint-set-member? ] all? ] filter
+    flip ;
 
 : analyze-recursive-phi ( #enter-recursive -- )
-    [ ] [ recursive-stacks flip ] [ out-d>> ] tri
+    [ ] [ recursive-stacks ] [ out-d>> ] tri
     [ [ merge-values ] 2each ]
     [
         [ (merge-allocations) ] dip
@@ -42,12 +42,18 @@ IN: compiler.tree.escape-analysis.recursive
     ] 2bi ;
 
 M: #recursive escape-analysis* ( #recursive -- )
-    [
+    { 0 } clone [ USE: math
+        dup first 10 = [ "OOPS" throw ] [ dup first 1+ swap set-first ] if
         child>>
+        [ first out-d>> introduce-values ]
         [ first analyze-recursive-phi ]
         [ (escape-analysis) ]
-        bi
-    ] until-fixed-point ;
+        tri
+    ] curry until-fixed-point ;
+
+M: #enter-recursive escape-analysis* ( #enter-recursive -- )
+    #! Handled by #recursive
+    drop ;
 
 : return-allocations ( node -- allocations )
     label>> return>> node-input-allocations ;
@@ -57,5 +63,8 @@ M: #call-recursive escape-analysis* ( #call-label -- )
     [ check-fixed-point ] [ drop swap out-d>> record-allocations ] 3bi ;
 
 M: #return-recursive escape-analysis* ( #return-recursive -- )
-    [ in-d>> ] [ label>> calls>> ] bi
-    [ out-d>> escaping-values get '[ , equate ] 2each ] with each ;
+    [ call-next-method ]
+    [
+        [ in-d>> ] [ label>> calls>> ] bi
+        [ out-d>> escaping-values get '[ , equate ] 2each ] with each
+    ] bi ;

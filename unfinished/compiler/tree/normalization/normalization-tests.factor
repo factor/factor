@@ -1,6 +1,6 @@
 IN: compiler.tree.normalization.tests
 USING: compiler.tree.builder compiler.tree.normalization
-compiler.tree sequences accessors tools.test kernel ;
+compiler.tree sequences accessors tools.test kernel math ;
 
 \ count-introductions must-infer
 \ fixup-enter-recursive must-infer
@@ -25,3 +25,5 @@ compiler.tree sequences accessors tools.test kernel ;
     [ recursive-inputs ]
     [ normalize recursive-inputs ] bi
 ] unit-test
+
+[ ] [ [ [ 1 ] [ 2 ] if + * ] build-tree normalize drop ] unit-test

@@ -1,7 +1,7 @@
 USING: namespaces assocs sequences compiler.tree.builder
 compiler.tree.dead-code compiler.tree.def-use compiler.tree
 compiler.tree.combinators tools.test kernel math
-stack-checker.state accessors ;
+stack-checker.state accessors combinators ;
 IN: compiler.tree.dead-code.tests
 
 \ remove-dead-code must-infer
@@ -10,20 +10,27 @@ IN: compiler.tree.dead-code.tests
     build-tree
     compute-def-use
     remove-dead-code
-    compute-def-use
-    0 swap [ dup #push? [ out-d>> length + ] [ drop ] if ] each-node ;
+    0 swap [
+        {
+            { [ dup #push? ] [ out-d>> length + ] }
+            { [ dup #introduce? ] [ drop 1 + ] }
+            [ drop ]
+        } cond
+    ] each-node ;
 
 [ 3 ] [ [ 1 2 3 ] count-live-values ] unit-test
+
+[ 1 ] [ [ drop ] count-live-values ] unit-test
 
 [ 0 ] [ [ 1 drop ] count-live-values ] unit-test
 
 [ 1 ] [ [ 1 2 drop ] count-live-values ] unit-test
 
-[ 2 ] [ [ [ 1 ] [ 2 ] if ] count-live-values ] unit-test
+[ 3 ] [ [ [ 1 ] [ 2 ] if ] count-live-values ] unit-test
 
-[ 0 ] [ [ [ 1 ] [ 2 ] if drop ] count-live-values ] unit-test
+[ 1 ] [ [ [ 1 ] [ 2 ] if drop ] count-live-values ] unit-test
 
-[ 0 ] [ [ [ 1 ] [ dup ] if drop ] count-live-values ] unit-test
+[ 2 ] [ [ [ 1 ] [ dup ] if drop ] count-live-values ] unit-test
 
 [ 2 ] [ [ 1 2 + ] count-live-values ] unit-test
 
@@ -33,9 +40,9 @@ IN: compiler.tree.dead-code.tests
 
 [ 0 ] [ [ 1 2 + 3 + drop ] count-live-values ] unit-test
 
-[ 3 ] [ [ [ 1 ] [ 2 ] if 3 + ] count-live-values ] unit-test
+[ 4 ] [ [ [ 1 ] [ 2 ] if 3 + ] count-live-values ] unit-test
 
-[ 0 ] [ [ [ 1 ] [ 2 ] if 3 + drop ] count-live-values ] unit-test
+[ 1 ] [ [ [ 1 ] [ 2 ] if 3 + drop ] count-live-values ] unit-test
 
 [ 0 ] [ [ [ ] call ] count-live-values ] unit-test
 

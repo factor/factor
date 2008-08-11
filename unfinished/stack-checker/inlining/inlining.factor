@@ -17,15 +17,21 @@ IN: stack-checker.inlining
 : (inline-word) ( word label -- )
     [ [ def>> ] keep ] dip infer-quot-recursive ;
 
-TUPLE: inline-recursive
+TUPLE: inline-recursive < identity-tuple
+id
 word
 enter-out enter-recursive
 return calls
 fixed-point
-introductions ;
+introductions
+loop? ;
+
+M: inline-recursive hashcode* id>> hashcode* ;
 
 : <inline-recursive> ( word -- label )
-    inline-recursive new swap >>word ;
+    inline-recursive new
+        gensym >>id
+        swap >>word ;
 
 : quotation-param? ( obj -- ? )
     dup pair? [ second effect? ] [ drop f ] if ;

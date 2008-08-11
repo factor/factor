@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry kernel sequences assocs accessors namespaces
 math.intervals arrays classes.algebra combinators
+stack-checker.branches
 compiler.tree
 compiler.tree.def-use
 compiler.tree.combinators
@@ -59,7 +60,14 @@ SYMBOL: infer-children-data
 
 : compute-phi-input-infos ( phi-in -- phi-info )
     infer-children-data get
-    '[ , [ [ [ value-info ] [ null-info ] if* ] bind ] 2map ] map ;
+    '[
+        , [
+            [
+                dup +bottom+ eq?
+                [ drop null-info ] [ value-info ] if
+            ] bind
+        ] 2map
+    ] map ;
 
 : annotate-phi-inputs ( #phi -- )
     dup phi-in-d>> compute-phi-input-infos >>phi-info-d
@@ -139,10 +147,10 @@ M: #phi propagate-before ( #phi -- )
 M: #phi propagate-after ( #phi -- )
     condition-value get [
         [ out-d>> ] [ phi-in-d>> ] [ phi-info-d>> ] tri
-        3array flip [
-            first3 [ possible-boolean-values ] map
+        [
+            [ possible-boolean-values ] map
             branch-phi-constraints
-        ] each
+        ] 3each
     ] [ drop ] if ;
 
 M: #phi propagate-around ( #phi -- )
