@@ -23,6 +23,7 @@ MATCH-VARS: ?a ?b ?c ;
 
 : pretty-shuffle ( in out -- word/f )
     2array {
+        { { { } { } } [ ] }
         { { { ?a } { ?a } } [ ] }
         { { { ?a ?b } { ?a ?b } } [ ] }
         { { { ?a ?b ?c } { ?a ?b ?c } } [ ] }
@@ -34,6 +35,8 @@ MATCH-VARS: ?a ?b ?c ;
         { { { ?a ?b ?c } { ?a ?b ?c ?a ?b ?c } } [ 3dup ] }
         { { { ?a ?b } { ?a ?b ?a } } [ over ] }
         { { { ?b ?a } { ?a ?b } } [ swap ] }
+        { { { ?b ?a ?c } { ?a ?b ?c } } [ swapd ] }
+        { { { ?a ?b } { ?a ?a ?b } } [ dupd ] }
         { { { ?a ?b } { ?b ?a ?b } } [ tuck ] }
         { { { ?a ?b ?c } { ?a ?b ?c ?a } } [ pick ] }
         { { { ?a ?b ?c } { ?c ?a ?b } } [ -rot ] }
@@ -88,7 +91,7 @@ M: node node>quot drop ;
 : nodes>quot ( node -- quot )
     [ [ node>quot ] each ] [ ] make ;
 
-: optimized-quot. ( quot -- )
+: optimized. ( quot/word -- )
     dup word? [ specialized-def ] when
     build-tree optimize-tree nodes>quot . ;
 
