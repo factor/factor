@@ -29,6 +29,7 @@ M: integer effect>string number>string ;
 M: pair effect>string first2 [ effect>string ] bi@ ": " swap 3append ;
 
 : stack-picture ( seq -- string )
+    dup integer? [ "object" <repetition> ] when
     [ [ effect>string % CHAR: \s , ] each ] "" make ;
 
 M: effect effect>string ( effect -- string )
