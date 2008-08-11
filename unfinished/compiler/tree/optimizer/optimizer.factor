@@ -9,6 +9,7 @@ compiler.tree.def-use
 compiler.tree.dead-code
 compiler.tree.strength-reduction
 compiler.tree.loop.detection
+compiler.tree.loop.inversion
 compiler.tree.branch-fusion ;
 IN: compiler.tree.optimizer
 
