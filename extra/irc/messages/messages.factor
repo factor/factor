@@ -98,6 +98,11 @@ M: irc-message irc-message>server-line ( irc-message -- string )
 
 PRIVATE>
 
+UNION: sender-in-prefix privmsg join part quit kick mode nick ;
+GENERIC: irc-message-sender ( irc-message -- sender )
+M: sender-in-prefix irc-message-sender ( sender-in-prefix -- sender )
+    prefix>> parse-name ;
+
 : string>irc-message ( string -- object )
     dup split-prefix split-trailing
     [ [ blank? ] trim " " split unclip swap ] dip

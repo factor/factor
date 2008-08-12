@@ -49,10 +49,10 @@ M: mb-writer stream-nl ( mb-writer -- )
   { "someuser" } [ "someuser!n=user@some.where" parse-name ] unit-test
 
   { "#factortest" } [ ":someuser!n=user@some.where PRIVMSG #factortest :hi"
-                      parse-irc-line irc-message-origin ] unit-test
+                      parse-irc-line forward-name ] unit-test
 
   { "someuser" } [ ":someuser!n=user@some.where PRIVMSG factorbot :hi"
-                   parse-irc-line irc-message-origin ] unit-test
+                   parse-irc-line forward-name ] unit-test
 ] with-irc
 
 ! Test login and nickname set
