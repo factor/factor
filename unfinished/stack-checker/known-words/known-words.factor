@@ -179,10 +179,10 @@ SYMBOL: +primitive+
         { [ dup +shuffle+ word-prop ] [ infer-shuffle-word ] }
         { [ dup +special+ word-prop ] [ infer-special ] }
         { [ dup +primitive+ word-prop ] [ infer-primitive ] }
-        { [ dup +cannot-infer+ word-prop ] [ cannot-infer-effect ] }
         { [ dup +transform-quot+ word-prop ] [ apply-transform ] }
-        { [ dup +inferred-effect+ word-prop ] [ cached-infer ] }
         { [ dup "macro" word-prop ] [ apply-macro ] }
+        { [ dup +cannot-infer+ word-prop ] [ cannot-infer-effect ] }
+        { [ dup +inferred-effect+ word-prop ] [ cached-infer ] }
         { [ dup recursive-label ] [ call-recursive-word ] }
         [ dup infer-word apply-word/effect ]
     } cond ;
