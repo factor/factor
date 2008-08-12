@@ -4,7 +4,7 @@ USING: byte-arrays arrays assocs kernel kernel.private libc math
 namespaces parser sequences strings words assocs splitting
 math.parser cpu.architecture alien alien.accessors quotations
 layouts system compiler.units io.files io.encodings.binary
-accessors combinators effects ;
+accessors combinators effects continuations ;
 IN: alien.c-types
 
 DEFER: <int>
@@ -239,14 +239,19 @@ M: long-long-type box-return ( type -- )
     } 2cleave ;
 
 : expand-constants ( c-type -- c-type' )
-    #! We use def>> call instead of execute to get around
-    #! staging violations
     dup array? [
-        unclip >r [ dup word? [ def>> call ] when ] map r> prefix
+        unclip >r [
+            dup word? [
+                def>> { } swap with-datastack first
+            ] when
+        ] map r> prefix
     ] when ;
 
 : malloc-file-contents ( path -- alien len )
     binary file-contents dup malloc-byte-array swap length ;
+
+: if-void ( type true false -- )
+    pick "void" = [ drop nip call ] [ nip call ] if ; inline
 
 [
     <c-type>

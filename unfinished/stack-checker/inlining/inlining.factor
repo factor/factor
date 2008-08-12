@@ -32,7 +32,7 @@ M: inline-recursive hashcode* id>> hashcode* ;
 
 : <inline-recursive> ( word -- label )
     inline-recursive new
-        gensym t "inlined-block" set-word-prop >>id
+        gensym dup t "inlined-block" set-word-prop >>id
         swap >>word ;
 
 : quotation-param? ( obj -- ? )

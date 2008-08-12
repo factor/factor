@@ -10,10 +10,14 @@ sequences sequences.private slots.private strings
 strings.private system threads.private classes.tuple
 classes.tuple.private vectors vectors.private words definitions
 words.private assocs summary compiler.units system.private
-combinators locals.backend stack-checker.state
-stack-checker.backend stack-checker.branches
-stack-checker.errors stack-checker.transforms
-stack-checker.visitor ;
+combinators locals.backend
+stack-checker.state
+stack-checker.backend
+stack-checker.branches
+stack-checker.errors
+stack-checker.transforms
+stack-checker.visitor
+stack-checker.alien ;
 IN: stack-checker.known-words
 
 : infer-primitive ( word -- )
@@ -153,13 +157,15 @@ M: object infer-call*
         { \ get-local [ infer-get-local ] }
         { \ drop-locals [ infer-drop-locals ] }
         { \ do-primitive [ \ do-primitive cannot-infer-effect ] }
+        { \ alien-invoke [ infer-alien-invoke ] }
+        { \ alien-indirect [ infer-alien-indirect ] }
+        { \ alien-callback [ infer-alien-callback ] }
     } case ;
 
 {
-    >r r> declare call curry compose
-    execute if dispatch <tuple-boa>
-    (throw) load-locals get-local drop-locals
-    do-primitive
+    >r r> declare call curry compose execute if dispatch
+    <tuple-boa> (throw) load-locals get-local drop-locals
+    do-primitive alien-invoke alien-indirect alien-callback
 } [ t +special+ set-word-prop ] each
 
 { call execute dispatch load-locals get-local drop-locals }

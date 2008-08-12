@@ -35,6 +35,12 @@ M: #phi backward
     [ [ out-r>> ] [ phi-in-r>> ] bi look-at-corresponding ]
     2bi ;
 
+M: #alien-invoke backward
+    nip [ look-at-inputs ] [ look-at-outputs ] bi ;
+
+M: #alien-indirect backward
+    nip [ look-at-inputs ] [ look-at-outputs ] bi ;
+
 M: node backward 2drop ;
 
 : backward-dfa ( node quot -- assoc ) [ backward ] dfa ; inline
