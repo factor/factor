@@ -23,10 +23,11 @@ SYMBOL: +transform-n+
     inline
 
 : (apply-transform) ( word quot n -- )
-    consume-d dup [ known literal? ] all? [
+    dup ensure-d [ known literal? ] all? [
         dup empty? [
             drop recursive-state get 1array
         ] [
+            consume-d
             [ #drop, ]
             [ [ literal value>> ] map ]
             [ first literal recursion>> ] tri prefix
@@ -123,7 +124,6 @@ SYMBOL: +transform-n+
 
 : bit-member-quot ( seq -- newquot )
     [
-        [ drop ] % ! drop the sequence itself; we don't use it at run time
         bit-member-seq ,
         [
             {
@@ -140,7 +140,7 @@ SYMBOL: +transform-n+
         bit-member-quot
     ] [
         [ literalize [ t ] ] { } map>assoc
-        [ drop f ] suffix [ nip case ] curry
+        [ drop f ] suffix [ case ] curry
     ] if ;
 
 \ member? [

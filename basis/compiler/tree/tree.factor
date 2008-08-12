@@ -143,6 +143,30 @@ TUPLE: #copy < #renaming in-d out-d ;
         swap >>out-d
         swap >>in-d ;
 
+TUPLE: #alien-node < node params ;
+
+: new-alien-node ( params class -- node )
+    new
+        over in-d>> >>in-d
+        over out-d>> >>out-d
+        swap >>params ; inline
+
+TUPLE: #alien-invoke < #alien-node in-d out-d ;
+
+: #alien-invoke ( params -- node )
+    \ #alien-invoke new-alien-node ;
+
+TUPLE: #alien-indirect < #alien-node in-d out-d ;
+
+: #alien-indirect ( params -- node )
+    \ #alien-indirect new-alien-node ;
+
+TUPLE: #alien-callback < #alien-node ;
+
+: #alien-callback ( params -- node )
+    \ #alien-callback new
+        swap >>params ;
+
 : node, ( node -- ) stack-visitor get push ;
 
 GENERIC: inputs/outputs ( #renaming -- inputs outputs )
@@ -177,3 +201,6 @@ M: vector #phi, #phi node, ;
 M: vector #declare, #declare node, ;
 M: vector #recursive, #recursive node, ;
 M: vector #copy, #copy node, ;
+M: vector #alien-invoke, #alien-invoke node, ;
+M: vector #alien-indirect, #alien-indirect node, ;
+M: vector #alien-callback, #alien-callback node, ;

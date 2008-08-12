@@ -22,7 +22,7 @@ MACRO: match-choose ( alist -- )
 MATCH-VARS: ?a ?b ?c ;
 
 : pretty-shuffle ( effect -- word/f )
-    [ in>> ] [ out>> ] bi {
+    [ in>> ] [ out>> ] bi 2array {
         { { { } { } } [ ] }
         { { { ?a } { ?a } } [ ] }
         { { { ?a ?b } { ?a ?b } } [ ] }
