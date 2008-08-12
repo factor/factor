@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser kernel sequences words effects
-inference.transforms combinators assocs definitions quotations
-namespaces memoize ;
+stack-checker.transforms combinators assocs definitions
+quotations namespaces memoize ;
 IN: macros
 
 : real-macro-effect ( word -- effect' )

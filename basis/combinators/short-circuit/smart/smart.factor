@@ -1,5 +1,5 @@
 
-USING: kernel sequences math inference accessors macros
+USING: kernel sequences math stack-checker accessors macros
        combinators.short-circuit ;
 
 IN: combinators.short-circuit.smart

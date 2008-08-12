@@ -4,9 +4,10 @@ USING: accessors alien alien.accessors arrays cpu.x86.assembler
 cpu.x86.allot cpu.x86.architecture cpu.architecture kernel
 kernel.private math math.private namespaces quotations sequences
 words generic byte-arrays hashtables hashtables.private
-generator generator.registers generator.fixup sequences.private
-sbufs sbufs.private vectors vectors.private layouts system
-strings.private slots.private compiler.constants optimizer.allot ;
+compiler.generator compiler.generator.registers
+compiler.generator.fixup sequences.private sbufs sbufs.private
+vectors vectors.private layouts system strings.private
+slots.private compiler.constants ;
 IN: cpu.x86.intrinsics
 
 ! Type checks

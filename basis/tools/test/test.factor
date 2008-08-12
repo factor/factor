@@ -3,7 +3,7 @@
 USING: accessors namespaces arrays prettyprint sequences kernel
 vectors quotations words parser assocs combinators continuations
 debugger io io.styles io.files vocabs vocabs.loader source-files
-compiler.units summary inference effects tools.vocabs ;
+compiler.units summary stack-checker effects tools.vocabs ;
 IN: tools.test
 
 SYMBOL: failures

@@ -4,10 +4,10 @@ USING: accessors alien alien.accessors alien.c-types arrays
 cpu.ppc.assembler cpu.ppc.architecture cpu.ppc.allot
 cpu.architecture kernel kernel.private math math.private
 namespaces sequences words generic quotations byte-arrays
-hashtables hashtables.private generator generator.registers
-generator.fixup sequences.private sbufs vectors system layouts
-math.floats.private classes slots.private combinators
-compiler.constants optimizer.allot ;
+hashtables hashtables.private compiler.generator
+compiler.generator.registers generator.fixup sequences.private
+sbufs vectors system layouts math.floats.private classes
+slots.private combinators compiler.constants ;
 IN: cpu.ppc.intrinsics
 
 : %slot-literal-known-tag

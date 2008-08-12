@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: math kernel slots.private inference.known-words
-inference.backend sequences effects words ;
+USING: math kernel slots.private sequences effects words ;
 IN: locals.backend
 
 : load-locals ( n -- )
@@ -16,29 +15,3 @@ IN: locals.backend
 
 : drop-locals ( n -- )
     dup zero? [ drop ] [ r> drop 1- drop-locals ] if ;
-
-\ load-locals [
-    pop-literal nip
-    [ dup reverse <effect> infer-shuffle ]
-    [ infer->r ]
-    bi
-] "infer" set-word-prop
-
-\ get-local [
-    pop-literal nip
-    [ infer-r> ]
-    [ dup 0 prefix <effect> infer-shuffle ]
-    [ infer->r ]
-    tri
-] "infer" set-word-prop
-
-\ drop-locals [
-    pop-literal nip
-    [ infer-r> ]
-    [ { } <effect> infer-shuffle ] bi
-] "infer" set-word-prop
-
-<<
-{ load-locals get-local drop-locals }
-[ t "no-compile" set-word-prop ] each
->>

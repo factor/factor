@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.strings alien.compiler
-arrays assocs combinators compiler inference.transforms kernel
+USING: alien alien.c-types alien.strings
+arrays assocs combinators compiler kernel
 math namespaces parser prettyprint prettyprint.sections
 quotations sequences strings words cocoa.runtime io macros
 memoize debugger io.encodings.ascii effects ;

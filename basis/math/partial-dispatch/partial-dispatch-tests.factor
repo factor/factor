@@ -1,4 +1,4 @@
-IN: optimizer.math.partial.tests
+IN: math.partial-dispatch.tests
 USING: math.partial-dispatch tools.test math kernel sequences ;
 
 [ t ] [ \ + integer fixnum math-both-known? ] unit-test

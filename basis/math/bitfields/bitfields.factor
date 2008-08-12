@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math sequences words
-namespaces inference.transforms ;
+namespaces stack-checker.transforms ;
 IN: math.bitfields
 
 GENERIC: (bitfield) ( value accum shift -- newaccum )

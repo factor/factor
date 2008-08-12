@@ -1,10 +1,9 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces arrays sequences io inference.backend
-inference.state generator debugger words compiler.units
-continuations vocabs assocs alien.compiler dlists optimizer
-definitions math compiler.errors threads graphs generic
-inference combinators dequeues search-dequeues ;
+USING: kernel namespaces arrays sequences io debugger words
+compiler.units continuations vocabs assocs dlists definitions
+math compiler.errors threads graphs generic combinators dequeues
+search-dequeues ;
 IN: compiler
 
 SYMBOL: +failed+
