@@ -35,7 +35,7 @@ nl
     roll -roll declare not
 
     array? hashtable? vector?
-    tuple? sbuf? node? tombstone?
+    tuple? sbuf? tombstone?
 
     array-nth set-array-nth
 

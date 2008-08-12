@@ -4,7 +4,7 @@ USING: alien.c-types arrays cpu.x86.assembler
 cpu.x86.architecture cpu.x86.intrinsics cpu.x86.allot
 cpu.architecture kernel kernel.private math namespaces sequences
 compiler.generator.registers compiler.generator.fixup
-compiler.generator system layouts alien.compiler combinators
+compiler.generator system layouts combinators
 command-line compiler compiler.units io vocabs.loader accessors
 init ;
 IN: cpu.x86.32

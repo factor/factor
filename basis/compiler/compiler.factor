@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces arrays sequences io debugger words
 compiler.units continuations vocabs assocs dlists definitions
-math compiler.errors threads graphs generic combinators dequeues
-search-dequeues ;
+math threads graphs generic combinators dequeues search-dequeues
+stack-checker stack-checker.state compiler.generator
+compiler.errors compiler.tree.builder compiler.tree.optimizer ;
 IN: compiler
 
 SYMBOL: +failed+
@@ -51,8 +52,8 @@ SYMBOL: +failed+
         {
             [ compile-begins ]
             [
-                [ word-dataflow ] [ compile-failed return ] recover
-                optimize
+                [ build-tree-from-word ] [ compile-failed return ] recover
+                optimize-tree
             ]
             [ dup generate ]
             [ compile-succeeded ]

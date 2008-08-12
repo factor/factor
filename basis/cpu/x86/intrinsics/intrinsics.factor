@@ -289,45 +289,45 @@ IN: cpu.x86.intrinsics
     { +clobber+ { "n" } }
 } define-intrinsic
 
-\ (tuple) [
-    tuple "layout" get size>> 2 + cells [
-        ! Store layout
-        "layout" get "scratch" get load-literal
-        1 object@ "scratch" operand MOV
-        ! Store tagged ptr in reg
-        "tuple" get tuple %store-tagged
-    ] %allot
-] H{
-    { +input+ { { [ ] "layout" } } }
-    { +scratch+ { { f "tuple" } { f "scratch" } } }
-    { +output+ { "tuple" } }
-} define-intrinsic
-
-\ (array) [
-    array "n" get 2 + cells [
-        ! Store length
-        1 object@ "n" operand MOV
-        ! Store tagged ptr in reg
-        "array" get object %store-tagged
-    ] %allot
-] H{
-    { +input+ { { [ ] "n" } } }
-    { +scratch+ { { f "array" } } }
-    { +output+ { "array" } }
-} define-intrinsic
-
-\ (byte-array) [
-    byte-array "n" get 2 cells + [
-        ! Store length
-        1 object@ "n" operand MOV
-        ! Store tagged ptr in reg
-        "array" get object %store-tagged
-    ] %allot
-] H{
-    { +input+ { { [ ] "n" } } }
-    { +scratch+ { { f "array" } } }
-    { +output+ { "array" } }
-} define-intrinsic
+! \ (tuple) [
+!     tuple "layout" get size>> 2 + cells [
+!         ! Store layout
+!         "layout" get "scratch" get load-literal
+!         1 object@ "scratch" operand MOV
+!         ! Store tagged ptr in reg
+!         "tuple" get tuple %store-tagged
+!     ] %allot
+! ] H{
+!     { +input+ { { [ ] "layout" } } }
+!     { +scratch+ { { f "tuple" } { f "scratch" } } }
+!     { +output+ { "tuple" } }
+! } define-intrinsic
+! 
+! \ (array) [
+!     array "n" get 2 + cells [
+!         ! Store length
+!         1 object@ "n" operand MOV
+!         ! Store tagged ptr in reg
+!         "array" get object %store-tagged
+!     ] %allot
+! ] H{
+!     { +input+ { { [ ] "n" } } }
+!     { +scratch+ { { f "array" } } }
+!     { +output+ { "array" } }
+! } define-intrinsic
+! 
+! \ (byte-array) [
+!     byte-array "n" get 2 cells + [
+!         ! Store length
+!         1 object@ "n" operand MOV
+!         ! Store tagged ptr in reg
+!         "array" get object %store-tagged
+!     ] %allot
+! ] H{
+!     { +input+ { { [ ] "n" } } }
+!     { +scratch+ { { f "array" } } }
+!     { +output+ { "array" } }
+! } define-intrinsic
 
 \ <ratio> [
     ratio 3 cells [

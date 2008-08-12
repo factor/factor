@@ -1,10 +1,10 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes classes.private classes.algebra
-combinators cpu.architecture generator.fixup hashtables kernel
-layouts math namespaces quotations sequences system vectors
-words effects alien byte-arrays
-accessors sets math.order ;
+combinators hashtables kernel layouts math namespaces quotations
+sequences system vectors words effects alien byte-arrays
+accessors sets math.order cpu.architecture
+compiler.generator.fixup ;
 IN: compiler.generator.registers
 
 SYMBOL: +input+
