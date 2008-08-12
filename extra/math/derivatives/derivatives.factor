@@ -1,64 +1,123 @@
-! Tools for approximating derivatives
 
-USING: kernel math math.functions locals generalizations float-arrays sequences
-math.constants namespaces math.function-tools math.points math.ranges math.order ;
+USING: kernel continuations combinators sequences math
+      math.order math.ranges accessors float-arrays ;
+
 IN: math.derivatives
 
+TUPLE: state x func h err i j errt fac hh ans a done ;
+
 : largest-float ( -- x ) HEX: 7fefffffffffffff bits>double ; foldable
-: ntab 10 ;         ! max size of tableau (main accuracy setting)
-: con 1.41 ;        ! stepsize is decreased by this per-iteration
-: con2 1.9881 ;     ! con^2
-: initial-h 0.02 ;  ! distance of the 2 points of the first secant line
-: safe 2.0 ;        ! return when current err is SAFE worse than the best
-                    ! \ safe probably should not be changed
-SYMBOL: i
-SYMBOL: j
-SYMBOL: err
-SYMBOL: errt
-SYMBOL: fac
-SYMBOL: h 
-SYMBOL: ans
-SYMBOL: matrix
+: ntab ( -- val ) 8 ;
+: con ( -- val ) 1.6 ;
+: con2 ( -- val ) con con * ;
+: big ( -- val ) largest-float ;
+: safe ( -- val ) 2.0 ;
 
-: (derivative) ( x function -- m )
-        [ [ h get + ] dip eval ]
-        [ [ h get - ] dip eval ]
-    2bi slope ; inline
-: init-matrix ( -- )
-        ntab [ ntab <float-array> ] replicate
-    matrix set ;
-: m-set ( value j i -- ) matrix get nth set-nth ;
-: m-get ( j i -- n ) matrix get nth nth ;
-:: derivative ( x func -- m )
-    init-matrix
-    initial-h h set
-    x func (derivative) 0 0 m-set
-    largest-float err set
-    ntab 1 - [1,b] [| i |
-        h [ con / ] change
-        x func (derivative) 0 i m-set
-        con2 fac set
-        i [1,b] [| j |
-                    j 1 - i m-get fac get * 
-                    j 1 - i 1 - m-get
-                -
-                fac get 1 -
-            / j i m-set
-            fac [ con2 * ] change
-                j i m-get j 1 - i m-get - abs
-                j i m-get j 1 - i 1 - m-get - abs
-            max errt set
-                errt get err get <=
-                [
-                    errt get err set
-                    j i m-get ans set
-                ] [ ]
-            if
-        ] each
-            i i m-get i 1 - dup m-get - abs
-            err get safe *
-        <
-    ] all? drop
-    ans get ; inline
-: derivative-func ( function -- function ) [ derivative ] curry ; inline
+! Yes, this was ported from C code.
+: a[i][i]     ( state -- elt ) [ i>>     ] [ i>>     ] [ a>> ] tri nth nth ;
+: a[j][i]     ( state -- elt ) [ i>>     ] [ j>>     ] [ a>> ] tri nth nth ;
+: a[j-1][i]   ( state -- elt ) [ i>>     ] [ j>> 1 - ] [ a>> ] tri nth nth ;
+: a[j-1][i-1] ( state -- elt ) [ i>> 1 - ] [ j>> 1 - ] [ a>> ] tri nth nth ;
+: a[i-1][i-1] ( state -- elt ) [ i>> 1 - ] [ i>> 1 - ] [ a>> ] tri nth nth ;
 
+: check-h ( state -- state )
+ dup h>> 0 = [ "h must be nonzero in dfridr" throw ] when ;
+: init-a     ( state -- state ) ntab [ ntab <float-array> ] replicate >>a ;
+: init-hh    ( state -- state ) dup h>> >>hh ;
+: init-err   ( state -- state ) big >>err ;
+: update-hh  ( state -- state ) dup hh>> con / >>hh ;
+: reset-fac  ( state -- state ) con2 >>fac ;
+: update-fac ( state -- state ) dup fac>> con2 * >>fac ;
+
+! If error is decreased, save the improved answer
+: error-decreased? ( state -- state ? ) [ ] [ errt>> ] [ err>> ] tri <= ;
+: save-improved-answer ( state -- state )
+ dup err>>   >>errt
+ dup a[j][i] >>ans ;
+
+! If higher order is worse by a significant factor SAFE, then quit early.
+: check-safe ( state -- state )
+ dup
+ [ [ a[i][i] ] [ a[i-1][i-1] ] bi - abs ] [ err>> safe * ] bi >=
+   [ t >>done ]
+ when ;
+: x+hh ( state -- val ) [ x>> ] [ hh>> ] bi + ;
+: x-hh ( state -- val ) [ x>> ] [ hh>> ] bi - ;
+: limit-approx ( state -- val )
+ [
+   [ [ x+hh ] [ func>> ] bi call ]
+   [ [ x-hh ] [ func>> ] bi call ]
+   bi -
+ ]
+ [ hh>> 2.0 * ]
+ bi / ;
+: a[0][0]! ( state -- state )
+ { [ ] [ limit-approx ] [ drop 0 ] [ drop 0 ] [ a>> ] } cleave nth set-nth ;
+: a[0][i]! ( state -- state )
+ { [ ] [ limit-approx ] [ i>> ] [ drop 0 ] [ a>> ] } cleave nth set-nth ;
+: a[j-1][i]*fac ( state -- val ) [ a[j-1][i] ] [ fac>> ] bi * ;
+: new-a[j][i] ( state -- val )
+ [ [ a[j-1][i]*fac ] [ a[j-1][i-1] ] bi - ]
+ [ fac>> 1.0 - ]
+ bi / ;
+: a[j][i]! ( state -- state )
+ { [ ] [ new-a[j][i] ] [ i>> ] [ j>> ] [ a>> ] } cleave nth set-nth ;
+
+: update-errt ( state -- state )
+ dup
+    [ [ a[j][i] ] [ a[j-1][i]   ] bi - abs ]
+    [ [ a[j][i] ] [ a[j-1][i-1] ] bi - abs ]
+ bi max
+ >>errt ;
+
+: not-done? ( state -- state ? ) dup done>> not ;
+
+: derive ( state -- state )
+ init-a
+ check-h
+ init-hh
+ a[0][0]!
+ init-err
+ 1 ntab [a,b)
+  [
+     >>i
+     not-done?
+       [
+         update-hh
+         a[0][i]!
+         reset-fac
+         1 over i>> [a,b]
+           [
+             >>j
+             a[j][i]!
+             update-fac
+             update-errt
+             error-decreased? [ save-improved-answer ] when
+           ]
+         each
+         check-safe
+       ]
+     when
+   ]
+ each ;
+
+: derivative-state ( x func h err -- state )
+    state new
+    swap >>err
+    swap >>h
+    swap >>func
+    swap >>x ;
+
+! For scientists:
+! h should be .001 to .5 -- too small can cause bad convergence,
+! h should be small enough to give the correct sgn(f'(x))
+! err is the max tolerance of gain in error for a single iteration-
+: (derivative) ( x func h err -- ans error )
+ derivative-state
+ derive
+    [ ans>> ]
+    [ errt>> ]
+ bi ;
+
+: derivative ( x func -- m ) 0.01 2.0 (derivative) drop ; 
+: derivative-func ( func -- der ) [ derivative ] curry ;
