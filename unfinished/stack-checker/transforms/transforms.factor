@@ -11,31 +11,45 @@ IN: stack-checker.transforms
 SYMBOL: +transform-quot+
 SYMBOL: +transform-n+
 
-: (apply-transform) ( quot n -- newquot )
-    dup zero? [
-        drop recursive-state get 1array
-    ] [
-        consume-d
-        [ #drop, ]
-        [ [ literal value>> ] map ]
-        [ first literal recursion>> ] tri prefix
-    ] if
-    swap with-datastack ;
+: give-up-transform ( word -- )
+    dup recursive-label
+    [ call-recursive-word ]
+    [ dup infer-word apply-word/effect ]
+    if ;
+
+: ((apply-transform)) ( word quot stack -- )
+    swap with-datastack first2
+    dup [ swap infer-quot drop ] [ 2drop give-up-transform ] if ;
+    inline
+
+: (apply-transform) ( word quot n -- )
+    consume-d dup [ known literal? ] all? [
+        dup empty? [
+            drop recursive-state get 1array
+        ] [
+            [ #drop, ]
+            [ [ literal value>> ] map ]
+            [ first literal recursion>> ] tri prefix
+        ] if
+        ((apply-transform))
+    ] [ 2drop give-up-transform ] if ;
 
 : apply-transform ( word -- )
     [ +inlined+ depends-on ] [
+        [ ]
         [ +transform-quot+ word-prop ]
         [ +transform-n+ word-prop ]
-        bi (apply-transform)
-        first2 swap infer-quot
+        tri
+        (apply-transform)
     ] bi ;
 
 : apply-macro ( word -- )
     [ +inlined+ depends-on ] [
+        [ ]
         [ "macro" word-prop ]
         [ "declared-effect" word-prop in>> length ]
-        bi (apply-transform)
-        first2 swap infer-quot
+        tri
+        (apply-transform)
     ] bi ;
 
 : define-transform ( word quot n -- )
@@ -66,20 +80,80 @@ SYMBOL: +transform-n+
 
 \ spread [ spread>quot ] 1 define-transform
 
+\ (call-next-method) [
+    [ [ +inlined+ depends-on ] bi@ ] [ next-method-quot ] 2bi
+] 2 define-transform
+
+! Constructors
 \ boa [
     dup tuple-class? [
         dup +inlined+ depends-on
         [ "boa-check" word-prop ]
         [ tuple-layout '[ , <tuple-boa> ] ]
         bi append
-    ] [
-        \ boa \ no-method boa time-bomb
-    ] if
+    ] [ drop f ] if
 ] 1 define-transform
 
-\ (call-next-method) [
-    [ [ +inlined+ depends-on ] bi@ ] [ next-method-quot ] 2bi
-] 2 define-transform
+\ new [
+    dup tuple-class? [
+        dup +inlined+ depends-on
+        dup all-slots rest-slice ! delegate slot
+        [ [ initial>> literalize , ] each literalize , \ boa , ] [ ] make
+    ] [ drop f ] if
+] 1 define-transform
+
+! Membership testing
+: bit-member-n 256 ; inline
+
+: bit-member? ( seq -- ? )
+    #! Can we use a fast byte array test here?
+    {
+        { [ dup length 8 < ] [ f ] }
+        { [ dup [ integer? not ] contains? ] [ f ] }
+        { [ dup [ 0 < ] contains? ] [ f ] }
+        { [ dup [ bit-member-n >= ] contains? ] [ f ] }
+        [ t ]
+    } cond nip ;
+
+: bit-member-seq ( seq -- flags )
+    bit-member-n swap [ member? 1 0 ? ] curry B{ } map-as ;
+
+: exact-float? ( f -- ? )
+    dup float? [ dup >integer >float = ] [ drop f ] if ; inline
+
+: bit-member-quot ( seq -- newquot )
+    [
+        [ drop ] % ! drop the sequence itself; we don't use it at run time
+        bit-member-seq ,
+        [
+            {
+                { [ over fixnum? ] [ ?nth 1 eq? ] }
+                { [ over bignum? ] [ ?nth 1 eq? ] }
+                { [ over exact-float? ] [ ?nth 1 eq? ] }
+                [ 2drop f ]
+            } cond
+        ] %
+    ] [ ] make ;
+
+: member-quot ( seq -- newquot )
+    dup bit-member? [
+        bit-member-quot
+    ] [
+        [ literalize [ t ] ] { } map>assoc
+        [ drop f ] suffix [ nip case ] curry
+    ] if ;
+
+\ member? [
+    dup sequence? [ member-quot ] [ drop f ] if
+] 1 define-transform
+
+: memq-quot ( seq -- newquot )
+    [ [ dupd eq? ] curry [ drop t ] ] { } map>assoc
+    [ drop f ] suffix [ nip cond ] curry ;
+
+\ memq? [
+    dup sequence? [ memq-quot ] [ drop f ] if
+] 1 define-transform
 
 ! Deprecated
 \ get-slots [ [ 1quotation ] map [ cleave ] curry ] 1 define-transform

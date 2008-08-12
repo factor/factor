@@ -629,7 +629,7 @@ HELP: 2bi*
     "The following two lines are equivalent:"
     { $code
         "[ p ] [ q ] 2bi*"
-        ">r >r q r> r> q"
+        ">r >r p r> r> q"
     }
 } ;
 
