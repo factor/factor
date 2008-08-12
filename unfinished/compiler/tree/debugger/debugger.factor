@@ -21,8 +21,8 @@ MACRO: match-choose ( alist -- )
 
 MATCH-VARS: ?a ?b ?c ;
 
-: pretty-shuffle ( in out -- word/f )
-    2array {
+: pretty-shuffle ( effect -- word/f )
+    [ in>> ] [ out>> ] bi {
         { { { } { } } [ ] }
         { { { ?a } { ?a } } [ ] }
         { { { ?a ?b } { ?a ?b } } [ ] }
@@ -50,13 +50,9 @@ TUPLE: shuffle effect ;
 
 M: shuffle pprint* effect>> effect>string text ;
 
-: shuffle-inputs/outputs ( node -- in out )
-    [ in-d>> ] [ out-d>> ] [ mapping>> ] tri
-    [ at ] curry map ;
-
 M: #shuffle node>quot
-    shuffle-inputs/outputs 2dup pretty-shuffle dup
-    [ 2nip % ] [ drop <effect> shuffle boa , ] if ;
+    shuffle-effect dup pretty-shuffle
+    [ % ] [ shuffle boa , ] ?if ;
 
 : pushed-literals ( node -- seq )
     dup out-d>> [ node-value-info literal>> literalize ] with map ;

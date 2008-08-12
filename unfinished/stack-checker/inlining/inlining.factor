@@ -28,9 +28,11 @@ loop? ;
 
 M: inline-recursive hashcode* id>> hashcode* ;
 
+: inlined-block? ( word -- ? ) "inlined-block" word-prop ;
+
 : <inline-recursive> ( word -- label )
     inline-recursive new
-        gensym >>id
+        gensym t "inlined-block" set-word-prop >>id
         swap >>word ;
 
 : quotation-param? ( obj -- ? )

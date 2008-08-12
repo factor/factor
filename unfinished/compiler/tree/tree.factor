@@ -153,6 +153,11 @@ M: #r> inputs/outputs [ in-r>> ] [ out-d>> ] bi ;
 M: #copy inputs/outputs [ in-d>> ] [ out-d>> ] bi ;
 M: #return-recursive inputs/outputs [ in-d>> ] [ out-d>> ] bi ;
 
+: shuffle-effect ( #shuffle -- effect )
+    [ in-d>> ] [ out-d>> ] [ mapping>> ] tri
+    [ at ] curry map
+    <effect> ;
+
 M: vector child-visitor V{ } clone ;
 M: vector #introduce, #introduce node, ;
 M: vector #call, #call node, ;
