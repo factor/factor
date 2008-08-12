@@ -60,7 +60,9 @@ SYMBOL: current-label-start
 GENERIC: generate-node ( node -- next )
 
 : generate-nodes ( nodes -- )
-    [ current-node generate-node ] iterate-nodes end-basic-block ;
+    <sequence-cursor>
+    [ current-node generate-node ] iterate-nodes
+    end-basic-block ;
 
 : init-generate-nodes ( -- )
     init-templates
