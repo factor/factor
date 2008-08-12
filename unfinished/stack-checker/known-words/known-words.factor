@@ -165,24 +165,27 @@ M: object infer-call*
 { call execute dispatch load-locals get-local drop-locals }
 [ t "no-compile" set-word-prop ] each
 
+SYMBOL: +primitive+
+
 : non-inline-word ( word -- )
     dup +called+ depends-on
     {
         { [ dup +shuffle+ word-prop ] [ infer-shuffle-word ] }
         { [ dup +special+ word-prop ] [ infer-special ] }
-        { [ dup primitive? ] [ infer-primitive ] }
+        { [ dup +primitive+ word-prop ] [ infer-primitive ] }
         { [ dup +cannot-infer+ word-prop ] [ cannot-infer-effect ] }
-        { [ dup +inferred-effect+ word-prop ] [ cached-infer ] }
         { [ dup +transform-quot+ word-prop ] [ apply-transform ] }
+        { [ dup +inferred-effect+ word-prop ] [ cached-infer ] }
         { [ dup "macro" word-prop ] [ apply-macro ] }
         { [ dup recursive-label ] [ call-recursive-word ] }
         [ dup infer-word apply-word/effect ]
     } cond ;
 
 : define-primitive ( word inputs outputs -- )
+    [ 2drop t +primitive+ set-word-prop ]
     [ drop "input-classes" set-word-prop ]
     [ nip "default-output-classes" set-word-prop ]
-    3bi ;
+    3tri ;
 
 ! Stack effects for all primitives
 \ fixnum< { fixnum fixnum } { object } define-primitive

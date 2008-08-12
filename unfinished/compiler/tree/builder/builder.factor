@@ -22,6 +22,11 @@ IN: compiler.tree.builder
     ] with-tree-builder nip
     unclip-last in-d>> ;
 
+: build-sub-tree ( #call quot -- nodes )
+    [ [ out-d>> ] [ in-d>> ] bi ] dip
+    build-tree-with
+    rot #copy suffix ;
+
 : (make-specializer) ( class picker -- quot )
     swap "predicate" word-prop append ;
 

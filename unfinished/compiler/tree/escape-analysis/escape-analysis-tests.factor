@@ -5,7 +5,8 @@ compiler.tree.normalization math.functions
 compiler.tree.propagation compiler.tree.cleanup
 compiler.tree.combinators compiler.tree sequences math math.private
 kernel tools.test accessors slots.private quotations.private
-prettyprint classes.tuple.private classes classes.tuple ;
+prettyprint classes.tuple.private classes classes.tuple
+compiler.tree.intrinsics ;
 
 \ escape-analysis must-infer
 
@@ -15,7 +16,7 @@ GENERIC: count-unboxed-allocations* ( m node -- n )
     out-d>> first escaping-allocation? [ 1+ ] unless ;
 
 M: #call count-unboxed-allocations*
-    dup word>> { <tuple-boa> <complex> } memq?
+    dup word>> { <immutable-tuple-boa> <complex> } memq?
     [ (count-unboxed-allocations) ] [ drop ] if ;
 
 M: #push count-unboxed-allocations*

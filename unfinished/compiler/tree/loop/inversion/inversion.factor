@@ -1,5 +1,5 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: compiler.tree.elaboration
+IN: compiler.tree.loop.inversion
 
-: elaborate ( nodes -- nodes' ) ;
+: invert-loops ( nodes -- nodes' ) ;

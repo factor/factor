@@ -8,7 +8,8 @@ compiler.tree.tuple-unboxing
 compiler.tree.def-use
 compiler.tree.dead-code
 compiler.tree.strength-reduction
-compiler.tree.loop-detection
+compiler.tree.loop.detection
+compiler.tree.loop.inversion
 compiler.tree.branch-fusion ;
 IN: compiler.tree.optimizer
 
@@ -16,11 +17,11 @@ IN: compiler.tree.optimizer
     normalize
     propagate
     cleanup
+    detect-loops
+    invert-loops
+    fuse-branches
     escape-analysis
     unbox-tuples
     compute-def-use
     remove-dead-code
-    strength-reduce
-    detect-loops
-    fuse-branches
-    elaborate ;
+    strength-reduce ;

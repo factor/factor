@@ -3,6 +3,7 @@
 USING: namespaces assocs accessors kernel combinators
 classes.algebra sequences sequences.deep slots.private
 classes.tuple.private math math.private arrays
+stack-checker.branches
 compiler.tree
 compiler.tree.intrinsics
 compiler.tree.combinators
@@ -43,15 +44,13 @@ M: #push unbox-tuples* ( #push -- nodes )
 : flatten-values ( values -- values' )
     (flatten-values) flatten ;
 
-: flatten-value ( values -- values )
-    [ unboxed-allocation ] [ 1array ] bi or ;
-
 : prepare-slot-access ( #call -- tuple-values outputs slot-values )
-    [ in-d>> first flatten-value ]
+    [ in-d>> flatten-values ]
     [ out-d>> flatten-values ]
     [
         out-d>> first slot-accesses get at
-        [ slot#>> ] [ value>> ] bi allocation nth flatten-value
+        [ slot#>> ] [ value>> ] bi allocation nth
+        1array flatten-values
     ] tri ;
 
 : slot-access-shuffle ( tuple-values outputs slot-values -- #shuffle )
@@ -73,7 +72,8 @@ M: #call unbox-tuples*
     } case ;
 
 M: #declare unbox-tuples*
-    [ unzip [ flatten-values ] dip zip ] change-declaration ;
+    #! We don't look at declarations after propagation anyway.
+    f >>declaration ;
 
 M: #copy unbox-tuples*
     [ flatten-values ] change-in-d
@@ -96,9 +96,9 @@ M: #terminate unbox-tuples*
     [ flatten-values ] change-in-d ;
 
 M: #phi unbox-tuples*
-    [ flip [ flatten-values ] map flip ] change-phi-in-d
-    [ flip [ flatten-values ] map flip ] change-phi-in-r
-    [ flatten-values ] change-out-d
+    [ flip [ flatten-values ] map pad-with-bottom flip ] change-phi-in-d
+    [ flip [ flatten-values ] map pad-with-bottom flip ] change-phi-in-r
+    [ flatten-values ] change-out-d 
     [ flatten-values ] change-out-r ;
 
 M: #recursive unbox-tuples*
