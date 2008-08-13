@@ -7,7 +7,7 @@ GENERIC: key ( cursor -- key )
 GENERIC: value ( cursor -- value )
 GENERIC: next ( cursor -- cursor/f )
 
-TUPLE: sequence-cursor i seq ;
+TUPLE: sequence-cursor { i read-only } { seq read-only } ;
 
 : (sequence-cursor) ( i seq -- cursor/f )
     2dup bounds-check? [ sequence-cursor boa ] [ 2drop f ] if ;
