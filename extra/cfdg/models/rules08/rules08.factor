@@ -17,37 +17,21 @@ DEFER: line
 
 : ligne ( -- )
   {
-    { 1   [ 4.5 y 1.15 0.8 size* -0.3 b line ] do }
+    { 1   [ 4.5 y 1.15 0.8 size* -0.3 b line ] }
     { 0.5 [ ] }
   }
-  call-random-weighted ;
+  rules ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: line ( -- ) [ insct ligne ] recursive ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+: line ( -- ) { [ insct ligne ] } rule ;
 
 : sole ( -- )
-  [
-    {
-      {
-        1 [
-            [ 1 brightness 0.5 saturation ligne ] do
-            [ 140 r 1 hue                 sole  ] do
-          ]
-      }
-      { 0.01 [ ] }
-    }
-    call-random-weighted
-  ]
-  recursive ;
+  {
+    { 1    [ 1 brightness 0.5 saturation ligne ] [ 140 r 1 hue sole ] }
+    { 0.01 [ ] }
+  }
+  rules ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: centre ( -- )
-  [ 1 b 5 s circle ] do
-  [ sole ] do ;
+: centre ( -- ) { [ 1 b 5 s circle ] [ sole ] } rule ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

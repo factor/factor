@@ -10,6 +10,10 @@ tools.test kernel namespaces random math.ranges sequences fry ;
 
 [ f ] [ "X" PH{ { "A" "B" } } at ] unit-test
 
+! We have to define these first so that they're compiled before
+! the below hashtables are parsed...
+<<
+
 TUPLE: hash-0-a ;
 
 M: hash-0-a hashcode* 2drop 0 ;
@@ -17,6 +21,8 @@ M: hash-0-a hashcode* 2drop 0 ;
 TUPLE: hash-0-b ;
 
 M: hash-0-b hashcode* 2drop 0 ;
+
+>>
 
 [ ] [
     PH{ }

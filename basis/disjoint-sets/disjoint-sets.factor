@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hints kernel locals math hashtables
-assocs fry ;
-
+assocs fry sequences ;
 IN: disjoint-sets
 
 TUPLE: disjoint-set
@@ -65,6 +64,12 @@ M: disjoint-set add-atom
     [ 1 -rot counts>> set-at ]
     2tri ;
 
+: add-atoms ( seq disjoint-set -- ) '[ , add-atom ] each ;
+
+GENERIC: disjoint-set-member? ( a disjoint-set -- ? )
+
+M: disjoint-set disjoint-set-member? parents>> key? ;
+
 GENERIC: equiv-set-size ( a disjoint-set -- n )
 
 M: disjoint-set equiv-set-size [ representative ] keep count ;
@@ -81,6 +86,14 @@ M:: disjoint-set equate ( a b disjoint-set -- )
         2dup disjoint-set ranks
         [ swap ] [ over disjoint-set inc-rank ] [ ] branch
         disjoint-set link-sets
+    ] if ;
+
+: equate-all-with ( seq a disjoint-set -- )
+    '[ , , equate ] each ;
+
+: equate-all ( seq disjoint-set -- )
+    over dup empty? [ 2drop ] [
+        [ unclip-slice ] dip equate-all-with
     ] if ;
 
 M: disjoint-set clone

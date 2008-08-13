@@ -9,12 +9,11 @@ compiler.tree
 compiler.tree.combinators
 compiler.tree.cleanup
 compiler.tree.builder
-compiler.tree.copy-equiv
 compiler.tree.normalization
 compiler.tree.propagation ;
 
 : cleaned-up-tree ( quot -- nodes )
-    build-tree normalize compute-copy-equiv propagate cleanup ;
+    build-tree normalize propagate cleanup ;
 
 [ t ] [ [ [ 1 ] [ 2 ] if ] cleaned-up-tree [ #if? ] contains-node? ] unit-test
 

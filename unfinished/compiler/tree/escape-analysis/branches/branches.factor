@@ -9,7 +9,9 @@ compiler.tree.escape-analysis.allocations ;
 IN: compiler.tree.escape-analysis.branches
 
 M: #branch escape-analysis*
-    live-children sift [ (escape-analysis) ] each ;
+    [ in-d>> add-escaping-values ]
+    [ live-children sift [ (escape-analysis) ] each ]
+    bi ;
 
 : (merge-allocations) ( values -- allocation )
     [
@@ -25,7 +27,7 @@ M: #branch escape-analysis*
     ] map ;
 
 : merge-allocations ( in-values out-values -- )
-    [ [ sift ] map ] dip
+    [ [ remove-bottom ] map ] dip
     [ [ merge-values ] 2each ]
     [ [ (merge-allocations) ] dip record-allocations ]
     2bi ;

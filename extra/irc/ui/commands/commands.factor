@@ -6,8 +6,15 @@ USING: accessors kernel irc.client irc.messages irc.ui namespaces ;
 IN: irc.ui.commands
 
 : say ( string -- )
-    [ client get profile>> nickname>> <own-message> print-irc ]
-    [ listener get write-message ] bi ;
+    irc-tab get
+    [ window>> client>> profile>> nickname>> <own-message> print-irc ]
+    [ listener>> write-message ] 2bi ;
+
+: join ( string -- )
+    irc-tab get window>> join-channel ;
+
+: query ( string -- )
+    irc-tab get window>> query-nick ;
 
 : quote ( string -- )
     drop ; ! THIS WILL CHANGE
