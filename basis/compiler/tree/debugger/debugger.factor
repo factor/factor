@@ -7,8 +7,7 @@ combinators io sorting
 compiler.tree
 compiler.tree.builder
 compiler.tree.optimizer
-compiler.tree.combinators
-compiler.tree.propagation.info ;
+compiler.tree.combinators ;
 IN: compiler.tree.debugger
 
 ! A simple tool for turning tree IR into quotations and
@@ -54,10 +53,7 @@ M: #shuffle node>quot
     shuffle-effect dup pretty-shuffle
     [ % ] [ shuffle-node boa , ] ?if ;
 
-: pushed-literals ( node -- seq )
-    dup out-d>> [ node-value-info literal>> literalize ] with map ;
-
-M: #push node>quot pushed-literals % ;
+M: #push node>quot literal>> , ;
 
 M: #call node>quot word>> , ;
 

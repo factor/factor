@@ -35,7 +35,7 @@ SYMBOL: visited
         ] tri
     ] if ;
 
-! M: word redefined H{ } clone visited [ (redefined) ] with-variable ;
+M: word redefined H{ } clone visited [ (redefined) ] with-variable ;
 
 : push-d ( obj -- ) meta-d get push ;
 
