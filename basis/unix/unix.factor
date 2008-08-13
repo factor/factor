@@ -25,6 +25,8 @@ TYPEDEF: uint socklen_t
 
 : NGROUPS_MAX 16 ; inline
 
+: O_NDELAY O_NONBLOCK ; inline
+
 C-STRUCT: group
     { "char*" "gr_name" }
     { "char*" "gr_passwd" }
