@@ -3,6 +3,7 @@
 USING: alien.c-types arrays cpu.x86.assembler
 cpu.x86.architecture cpu.x86.intrinsics cpu.x86.allot
 cpu.architecture kernel kernel.private math namespaces sequences
+stack-checker.known-words
 compiler.generator.registers compiler.generator.fixup
 compiler.generator system layouts combinators
 command-line compiler compiler.units io vocabs.loader accessors
@@ -276,6 +277,8 @@ os windows? [
     { EAX EBX ECX EDX } [ POP ] each
     JE
 ] { } define-if-intrinsic
+
+\ (sse2?) { } { object } define-primitive
 
 >>
 
