@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays generic assocs kernel math namespaces parser
+USING: fry arrays generic assocs kernel math namespaces parser
 sequences words vectors math.intervals effects classes
 accessors combinators stack-checker.state stack-checker.visitor ;
 IN: compiler.tree
@@ -179,8 +179,11 @@ M: #return-recursive inputs/outputs [ in-d>> ] [ out-d>> ] bi ;
 
 : shuffle-effect ( #shuffle -- effect )
     [ in-d>> ] [ out-d>> ] [ mapping>> ] tri
-    [ at ] curry map
+    '[ , at ] map
     <effect> ;
+
+: recursive-phi-in ( #enter-recursive -- seq )
+    [ label>> calls>> [ in-d>> ] map ] [ in-d>> ] bi suffix ;
 
 M: vector child-visitor V{ } clone ;
 M: vector #introduce, #introduce node, ;

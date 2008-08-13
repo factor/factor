@@ -57,7 +57,7 @@ SYMBOL: +escaping+
     <value> dup introduce-value ;
 
 : merge-values ( in-values out-value -- )
-    escaping-values get '[ , , equate ] each ;
+    escaping-values get equate-all-with ;
 
 : merge-slots ( values -- value )
     <slot-value> [ merge-values ] keep ;

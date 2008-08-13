@@ -27,7 +27,7 @@ IN: compiler.tree.escape-analysis.recursive
     out-d>> [ allocation ] map ;
 
 : recursive-stacks ( #enter-recursive -- stacks )
-    [ label>> calls>> [ in-d>> ] map ] [ in-d>> ] bi suffix
+    recursive-phi-in
     escaping-values get '[ [ , disjoint-set-member? ] all? ] filter
     flip ;
 

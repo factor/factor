@@ -28,14 +28,18 @@ DEFER: (tail-call?)
     [ value #phi? ] [ next (tail-call?) ] bi and ;
 
 : (tail-call?) ( cursor -- ? )
-    [ value [ #return? ] [ #terminate? ] bi or ]
-    [ tail-phi? ]
-    bi or ;
+    dup [
+        [ value [ #return? ] [ #terminate? ] bi or ]
+        [ tail-phi? ]
+        bi or
+    ] [ drop t ] if ;
 
 : tail-call? ( -- ? )
     node-stack get [
         next
-        [ (tail-call?) ]
-        [ value #terminate? not ]
-        bi and
+        dup [
+            [ (tail-call?) ]
+            [ value #terminate? not ]
+            bi and
+        ] [ drop t ] if
     ] all? ;

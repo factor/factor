@@ -11,8 +11,6 @@ compiler.tree.escape-analysis.nodes
 compiler.tree.escape-analysis.allocations ;
 IN: compiler.tree.escape-analysis.simple
 
-M: #declare escape-analysis* drop ;
-
 M: #terminate escape-analysis* drop ;
 
 M: #renaming escape-analysis* inputs/outputs [ copy-value ] 2each ;

@@ -72,6 +72,8 @@ M: #call cleanup*
         [ ]
     } cond ;
 
+M: #declare cleanup* drop f ;
+
 GENERIC: delete-node ( node -- )
 
 M: #call-recursive delete-node

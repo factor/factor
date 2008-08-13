@@ -45,7 +45,7 @@ M: #phi check-node
 
 M: #enter-recursive check-node
     [ [ in-d>> ] [ out-d>> ] bi 2array check-lengths ]
-    [ [ label>> calls>> [ in-d>> ] map ] [ in-d>> ] bi suffix check-lengths ]
+    [ recursive-phi-in check-lengths ]
     bi ;
 
 M: #push check-node

@@ -46,13 +46,13 @@ MATCH-VARS: ?a ?b ?c ;
         { _ f }
     } match-choose ;
 
-TUPLE: shuffle effect ;
+TUPLE: shuffle-node effect ;
 
-M: shuffle pprint* effect>> effect>string text ;
-
+M: shuffle-node pprint* effect>> effect>string text ;
+ 
 M: #shuffle node>quot
     shuffle-effect dup pretty-shuffle
-    [ % ] [ shuffle boa , ] ?if ;
+    [ % ] [ shuffle-node boa , ] ?if ;
 
 : pushed-literals ( node -- seq )
     dup out-d>> [ node-value-info literal>> literalize ] with map ;
@@ -78,9 +78,15 @@ M: #if node>quot
 M: #dispatch node>quot
     children>> [ nodes>quot ] map , \ dispatch , ;
 
-M: #>r node>quot in-d>> length \ >r <repetition> % ;
+M: #>r node>quot
+    [ in-d>> length ] [ out-r>> empty? \ drop \ >r ? ] bi
+    <repetition> % ;
 
-M: #r> node>quot out-d>> length \ r> <repetition> % ;
+DEFER: rdrop
+
+M: #r> node>quot
+    [ in-r>> length ] [ out-d>> empty? \ rdrop \ r> ? ] bi
+    <repetition> % ;
 
 M: node node>quot drop ;
 

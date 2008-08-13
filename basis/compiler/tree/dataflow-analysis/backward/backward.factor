@@ -9,37 +9,40 @@ GENERIC: backward ( value node -- )
 M: #copy backward
     #! If the output of a copy is live, then the corresponding
     #! input is live also.
-    [ out-d>> index ] keep in-d>> nth look-at-value ;
+    [ out-d>> ] [ in-d>> ] bi look-at-mapping ;
 
-M: #call backward
-    #! If any of the outputs of a call are live, then all
-    #! inputs and outputs must be live.
-    nip [ look-at-inputs ] [ look-at-outputs ] bi ;
+M: #call backward nip look-at-inputs ;
 
 M: #call-recursive backward
     #! If the output of a copy is live, then the corresponding
     #! inputs to #return nodes are live also.
-    [ out-d>> <reversed> index ] keep label>> returns>>
-    [ <reversed> nth look-at-value ] with each ;
+    [ out-d>> ] [ label>> return>> ] bi look-at-mapping ;
 
-M: #>r backward nip in-d>> first look-at-value ;
+M: #>r backward [ out-r>> ] [ in-d>> ] bi look-at-mapping ;
 
-M: #r> backward nip in-r>> first look-at-value ;
+M: #r> backward [ out-d>> ] [ in-r>> ] bi look-at-mapping ;
 
 M: #shuffle backward mapping>> at look-at-value ;
 
 M: #phi backward
     #! If any of the outputs of a #phi are live, then the
     #! corresponding inputs are live too.
-    [ [ out-d>> ] [ phi-in-d>> ] bi look-at-corresponding ]
-    [ [ out-r>> ] [ phi-in-r>> ] bi look-at-corresponding ]
+    [ [ out-d>> ] [ phi-in-d>> ] bi look-at-phi ]
+    [ [ out-r>> ] [ phi-in-r>> ] bi look-at-phi ]
     2bi ;
 
-M: #alien-invoke backward
-    nip [ look-at-inputs ] [ look-at-outputs ] bi ;
+M: #enter-recursive backward
+    [ out-d>> ] [ recursive-phi-in flip ] bi look-at-phi ;
 
-M: #alien-indirect backward
-    nip [ look-at-inputs ] [ look-at-outputs ] bi ;
+: return-recursive-phi-in ( #return-recursive -- phi-in )
+    [ label>> calls>> [ in-d>> ] map ] [ in-d>> ] bi suffix ;
+
+M: #return-recursive backward
+    [ out-d>> ] [ return-recursive-phi-in flip ] bi look-at-phi ;
+
+M: #alien-invoke backward nip look-at-inputs ;
+
+M: #alien-indirect backward nip look-at-inputs ;
 
 M: node backward 2drop ;
 

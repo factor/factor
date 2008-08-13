@@ -15,9 +15,10 @@ SYMBOL: work-list
 
 : look-at-inputs ( node -- ) in-d>> look-at-values ;
 
-: look-at-outputs ( node -- ) out-d>> look-at-values ;
+: look-at-mapping ( value inputs outputs -- )
+    [ index ] dip over [ nth look-at-value ] [ 2drop ] if ;
 
-: look-at-corresponding ( value inputs outputs -- )
+: look-at-phi ( value inputs outputs -- )
     [ index ] dip over [ nth look-at-values ] [ 2drop ] if ;
 
 : init-dfa ( -- )

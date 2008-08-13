@@ -152,6 +152,7 @@ M: #if generate-node
             %save-dispatch-xt
             %prologue-later
             [ generate-nodes ] with-node-iterator
+            %return
         ] with-generator
     ] keep ;
 
