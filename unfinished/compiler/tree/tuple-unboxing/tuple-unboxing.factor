@@ -128,4 +128,8 @@ M: #return unbox-tuples* dup in-d>> assert-not-unboxed ;
 
 M: #introduce unbox-tuples* dup value>> assert-not-unboxed ;
 
+M: #alien-invoke unbox-tuples* dup in-d>> assert-not-unboxed ;
+
+M: #alien-indirect unbox-tuples* dup in-d>> assert-not-unboxed ;
+
 : unbox-tuples ( nodes -- nodes ) [ unbox-tuples* ] map-nodes ;
