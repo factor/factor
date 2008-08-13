@@ -88,6 +88,14 @@ M:: disjoint-set equate ( a b disjoint-set -- )
         disjoint-set link-sets
     ] if ;
 
+: equate-all-with ( seq a disjoint-set -- )
+    '[ , , equate ] each ;
+
+: equate-all ( seq disjoint-set -- )
+    over dup empty? [ 2drop ] [
+        [ unclip-slice ] dip equate-all-with
+    ] if ;
+
 M: disjoint-set clone
     [ parents>> ] [ ranks>> ] [ counts>> ] tri [ clone ] tri@
     disjoint-set boa ;
