@@ -460,6 +460,9 @@ PRIVATE>
 : last-index-from ( obj i seq -- n )
     rot [ = ] curry find-last-from drop ;
 
+: nths ( seq indices -- seq' )
+    swap [ nth ] curry map ;
+
 : contains? ( seq quot -- ? )
     find drop >boolean ; inline
 
