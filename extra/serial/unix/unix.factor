@@ -5,10 +5,10 @@ io.streams.duplex io.unix.backend system kernel math math.bitfields
 vocabs.loader unix serial serial.unix.termios ;
 IN: serial.unix
 
-{
+<< {
     { [ os linux? ] [ "serial.unix.linux" ] }
     { [ os bsd? ] [ "serial.unix.bsd" ] }
-} cond require
+} cond require >>
 
 FUNCTION: speed_t cfgetispeed ( termios* t ) ;
 FUNCTION: speed_t cfgetospeed ( termios* t ) ;

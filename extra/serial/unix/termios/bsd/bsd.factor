@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences system ;
+USING: alien.syntax kernel sequences system ;
 IN: serial.unix.termios
 
 : NCCS 20 ; inline
