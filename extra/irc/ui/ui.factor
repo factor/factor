@@ -21,7 +21,7 @@ SYMBOL: client
 
 TUPLE: ui-window < tabbed client ;
 
-TUPLE: irc-tab < frame listener client window userlist ;
+TUPLE: irc-tab < frame listener client window ;
 
 : write-color ( str color -- )
     foreground associate format ;
