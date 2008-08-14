@@ -21,6 +21,9 @@ SYMBOL: client
 
 TUPLE: ui-window < tabbed client ;
 
+M: ui-window ungraft*
+    client>> terminate-irc ;
+
 TUPLE: irc-tab < frame listener client window ;
 
 : write-color ( str color -- )
@@ -139,16 +142,6 @@ GENERIC: handle-inbox ( tab message -- )
 : add-gadget-color ( pack seq color -- pack )
     '[ , >>color add-gadget ] each ;
 
-: update-participants ( tab -- )
-    [ userlist>> [ clear-gadget ] keep ]
-    [ listener>> participants>> ] bi
-    [ +operator+ value-labels dark-green add-gadget-color ]
-    [ +voice+ value-labels blue add-gadget-color ]
-    [ +normal+ value-labels black add-gadget-color ] tri drop ;
-
-M: participant-changed handle-inbox
-    drop update-participants ;
-
 M: object handle-inbox
     nip print-irc ;
 
@@ -198,14 +191,20 @@ TUPLE: irc-channel-tab < irc-tab userlist ;
     irc-tab new-irc-tab
     <pile> [ <scroller> @right grid-add ] keep >>userlist ;
 
+: update-participants ( tab -- )
+    [ userlist>> [ clear-gadget ] keep ]
+    [ listener>> participants>> ] bi
+    [ +operator+ value-labels dark-green add-gadget-color ]
+    [ +voice+ value-labels blue add-gadget-color ]
+    [ +normal+ value-labels black add-gadget-color ] tri drop ;
+
+M: participant-changed handle-inbox
+    drop update-participants ;
+
 TUPLE: irc-server-tab < irc-tab ;
 
 : <irc-server-tab> ( listener -- irc-tab )
     f irc-server-tab new-irc-tab ;
-
-M: irc-server-tab ungraft*
-    [ window>> client>> terminate-irc ]
-    [ listener>> ] [ window>> client>> ] tri remove-listener ;
 
 : <irc-nick-tab> ( listener ui-window -- irc-tab )
     irc-tab new-irc-tab ;
