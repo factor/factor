@@ -46,7 +46,7 @@ DEFER: define-lisp-macro
 : rest-lambda ( body vars -- quot )
     "&rest" swap [ remove ] [ index ] 2bi
     [ localize-lambda <lambda> lambda-rewrite call ] dip
-    swap '[ , cut '[ @ , seq>list ] call , call ] ;
+    swap '[ , cut '[ @ , seq>list ] call , call call ] ;
 
 : normal-lambda ( body vars -- quot )
     localize-lambda <lambda> lambda-rewrite [ compose call call ] compose 1quotation ;
