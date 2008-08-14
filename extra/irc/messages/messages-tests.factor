@@ -3,7 +3,9 @@ USING: kernel tools.test accessors arrays qualified
 EXCLUDE: sequences => join ;
 IN: irc.messages.tests
 
-! Parsing tests
+
+{ "someuser" } [ "someuser!n=user@some.where" parse-name ] unit-test
+
 irc-message new
     ":someuser!n=user@some.where PRIVMSG #factortest :hi" >>line
     "someuser!n=user@some.where" >>prefix

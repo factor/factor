@@ -1,12 +1,17 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces sequences assocs io
-prettyprint inference generator optimizer compiler.vops
-compiler.cfg.builder compiler.cfg.simplifier
-compiler.machine.builder compiler.machine.simplifier ;
-IN: compiler.machine.debug
+prettyprint inference generator optimizer
+compiler.vops
+compiler.tree.builder
+compiler.tree.optimizer
+compiler.cfg.builder
+compiler.cfg.simplifier
+compiler.machine.builder
+compiler.machine.simplifier ;
+IN: compiler.machine.debugger
 
-: dataflow>linear ( dataflow word -- linear )
+: tree>linear ( tree word -- linear )
     [
         init-counter
         build-cfg
@@ -20,15 +25,16 @@ IN: compiler.machine.debug
     ] assoc-each ;
 
 : linearized-quot. ( quot -- )
-    dataflow optimize
-    "Anonymous quotation" dataflow>linear
+    build-tree optimize-tree
+    "Anonymous quotation" tree>linear
     linear. ;
 
 : linearized-word. ( word -- )
-    dup word-dataflow nip optimize swap dataflow>linear linear. ;
+    dup build-tree-from-word nip optimize-tree
+    dup word-dataflow nip optimize swap tree>linear linear. ;
 
 : >basic-block ( quot -- basic-block )
-    dataflow optimize
+    build-tree optimize-tree
     [
         init-counter
         "Anonymous quotation" build-cfg

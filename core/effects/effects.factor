@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math namespaces sequences strings words assocs
-combinators accessors arrays ;
+USING: kernel math math.parser namespaces sequences strings
+words assocs combinators accessors arrays ;
 IN: effects
 
 TUPLE: effect in out terminated? ;
@@ -25,10 +25,11 @@ TUPLE: effect in out terminated? ;
 GENERIC: effect>string ( obj -- str )
 M: string effect>string ;
 M: word effect>string name>> ;
-M: integer effect>string drop "object" ;
+M: integer effect>string number>string ;
 M: pair effect>string first2 [ effect>string ] bi@ ": " swap 3append ;
 
 : stack-picture ( seq -- string )
+    dup integer? [ "object" <repetition> ] when
     [ [ effect>string % CHAR: \s , ] each ] "" make ;
 
 M: effect effect>string ( effect -- string )
