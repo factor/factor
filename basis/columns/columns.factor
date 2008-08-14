@@ -15,4 +15,4 @@ M: column length seq>> length ;
 INSTANCE: column virtual-sequence
 
 : <flipped> ( seq -- seq' )
-    dup first length [ <column> ] with map ;
+    dup empty? [ first length [ <column> ] with map ] unless ;

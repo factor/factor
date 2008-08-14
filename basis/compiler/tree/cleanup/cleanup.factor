@@ -113,17 +113,13 @@ M: #branch cleanup*
         [ live-branches>> live-branches set ]
     } cleave ;
 
-: cleanup-phi-in ( phi-in live-branches -- phi-in' )
-    swap dup empty?
-    [ nip ] [ flip swap select-children sift flip ] if ;
-
 M: #phi cleanup*
     #! Remove #phi function inputs which no longer exist.
     live-branches get {
-        [ '[ , cleanup-phi-in ] change-phi-in-d ]
-        [ '[ , cleanup-phi-in ] change-phi-in-r ]
-        [ '[ , cleanup-phi-in ] change-phi-info-d ]
-        [ '[ , cleanup-phi-in ] change-phi-info-r ]
+        [ '[ , select-children sift ] change-phi-in-d ]
+        [ '[ , select-children sift ] change-phi-in-r ]
+        [ '[ , select-children sift ] change-phi-info-d ]
+        [ '[ , select-children sift ] change-phi-info-r ]
     } cleave
     live-branches off ;
 

@@ -17,20 +17,30 @@ SYMBOL: +transform-n+
     [ dup infer-word apply-word/effect ]
     if ;
 
-: ((apply-transform)) ( word quot stack -- )
-    swap with-datastack first2
-    dup [ swap infer-quot drop ] [ 2drop give-up-transform ] if ;
-    inline
+: ((apply-transform)) ( word quot values stack -- )
+    rot with-datastack first2
+    dup [
+        [
+            [ drop ] [
+                [ length meta-d get '[ , pop* ] times ]
+                [ #drop, ]
+                bi
+            ] bi*
+        ] 2dip
+        swap infer-quot
+    ] [
+        3drop give-up-transform
+    ] if ; inline
 
 : (apply-transform) ( word quot n -- )
-    dup ensure-d [ known literal? ] all? [
+    ensure-d dup [ known literal? ] all? [
         dup empty? [
-            drop recursive-state get 1array
+            recursive-state get 1array
         ] [
-            consume-d
-            [ #drop, ]
+            [ ]
             [ [ literal value>> ] map ]
-            [ first literal recursion>> ] tri prefix
+            [ first literal recursion>> ] tri
+            prefix
         ] if
         ((apply-transform))
     ] [ 2drop give-up-transform ] if ;
@@ -149,7 +159,7 @@ SYMBOL: +transform-n+
 
 : memq-quot ( seq -- newquot )
     [ [ dupd eq? ] curry [ drop t ] ] { } map>assoc
-    [ drop f ] suffix [ nip cond ] curry ;
+    [ drop f ] suffix [ cond ] curry ;
 
 \ memq? [
     dup sequence? [ memq-quot ] [ drop f ] if

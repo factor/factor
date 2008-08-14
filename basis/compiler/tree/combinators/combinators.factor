@@ -51,7 +51,8 @@ IN: compiler.tree.combinators
 
 : 3map ( seq1 seq2 seq3 quot -- seq ) (3each) map ; inline
 
-: until-fixed-point ( #recursive quot -- )
+: until-fixed-point ( #recursive quot: ( node -- ) -- )
     over label>> t >>fixed-point drop
     [ with-scope ] 2keep
-    over label>> fixed-point>> [ 2drop ] [ until-fixed-point ] if ; inline
+    over label>> fixed-point>> [ 2drop ] [ until-fixed-point ] if ;
+    inline recursive

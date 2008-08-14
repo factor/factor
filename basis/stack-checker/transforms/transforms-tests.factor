@@ -1,6 +1,6 @@
 IN: stack-checker.transforms.tests
 USING: sequences stack-checker.transforms tools.test math kernel
-quotations inference accessors combinators words arrays
+quotations stack-checker accessors combinators words arrays
 classes classes.tuple ;
 
 : compose-n-quot ( word -- quot' ) <repetition> >quotation ;

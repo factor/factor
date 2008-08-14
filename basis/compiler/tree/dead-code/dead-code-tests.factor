@@ -1,7 +1,7 @@
 USING: namespaces assocs sequences compiler.tree.builder
 compiler.tree.dead-code compiler.tree.def-use compiler.tree
 compiler.tree.combinators compiler.tree.debugger
-compiler.tree.normalization tools.test
+compiler.tree.normalization compiler.tree.checker tools.test
 kernel math stack-checker.state accessors combinators io ;
 IN: compiler.tree.dead-code.tests
 
@@ -13,11 +13,9 @@ IN: compiler.tree.dead-code.tests
     compute-def-use
     remove-dead-code
     0 swap [
-        {
-            { [ dup #push? ] [ out-d>> length + ] }
-            { [ dup #introduce? ] [ drop 1 + ] }
-            [ drop ]
-        } cond
+        dup
+        [ #push? ] [ #introduce? ] bi or
+        [ out-d>> length + ] [ drop ] if
     ] each-node ;
 
 [ 3 ] [ [ 1 2 3 ] count-live-values ] unit-test
@@ -56,10 +54,25 @@ IN: compiler.tree.dead-code.tests
 
 : optimize-quot ( quot -- quot' )
     build-tree normalize compute-def-use remove-dead-code
-    nodes>quot ;
+    dup check-nodes nodes>quot ;
 
 [ [ drop 1 ] ] [ [ >r 1 r> drop ] optimize-quot ] unit-test
 
-[ [ read 1 2 ] ] [ [ read >r 1 2 r> drop ] optimize-quot ] unit-test
+[ [ read drop 1 2 ] ] [ [ read >r 1 2 r> drop ] optimize-quot ] unit-test
 
 [ [ over >r + r> ] ] [ [ [ + ] [ drop ] 2bi ] optimize-quot ] unit-test
+
+[ [ [ ] [ ] if ] ] [ [ [ 1 ] [ 2 ] if drop ] optimize-quot ] unit-test
+
+: flushable-1 ( a b -- c ) 2drop f ; flushable
+: flushable-2 ( a b -- c ) 2drop f ; flushable
+
+[ [ 2nip [ ] [ ] if ] ] [
+    [ [ flushable-1 ] [ flushable-2 ] if drop ] optimize-quot
+] unit-test
+
+: non-flushable-3 ( a b -- c ) 2drop f ;
+
+[ [ [ drop drop ] [ non-flushable-3 drop ] if ] ] [
+    [ [ flushable-1 ] [ non-flushable-3 ] if drop ] optimize-quot
+] unit-test

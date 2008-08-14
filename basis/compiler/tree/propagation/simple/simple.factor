@@ -17,7 +17,7 @@ IN: compiler.tree.propagation.simple
 ! Propagation for straight-line code.
 
 M: #introduce propagate-before
-    value>> object-info swap set-value-info ;
+    out-d>> [ object-info swap set-value-info ] each ;
 
 M: #push propagate-before
     [ literal>> <literal-info> ] [ out-d>> first ] bi

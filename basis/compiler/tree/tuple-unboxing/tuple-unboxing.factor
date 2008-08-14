@@ -96,8 +96,8 @@ M: #terminate unbox-tuples*
     [ flatten-values ] change-in-d ;
 
 M: #phi unbox-tuples*
-    [ flip [ flatten-values ] map pad-with-bottom flip ] change-phi-in-d
-    [ flip [ flatten-values ] map pad-with-bottom flip ] change-phi-in-r
+    [ [ flatten-values ] map pad-with-bottom ] change-phi-in-d
+    [ [ flatten-values ] map pad-with-bottom ] change-phi-in-r
     [ flatten-values ] change-out-d 
     [ flatten-values ] change-out-r ;
 
@@ -126,7 +126,7 @@ M: #branch unbox-tuples* dup in-d>> assert-not-unboxed ;
 
 M: #return unbox-tuples* dup in-d>> assert-not-unboxed ;
 
-M: #introduce unbox-tuples* dup value>> assert-not-unboxed ;
+M: #introduce unbox-tuples* dup out-d>> assert-not-unboxed ;
 
 M: #alien-invoke unbox-tuples* dup in-d>> assert-not-unboxed ;
 

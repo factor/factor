@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry kernel sequences assocs accessors namespaces
-math.intervals arrays classes.algebra combinators
+math.intervals arrays classes.algebra combinators columns
 stack-checker.branches
 compiler.tree
 compiler.tree.def-use
@@ -60,14 +60,14 @@ SYMBOL: infer-children-data
 
 : compute-phi-input-infos ( phi-in -- phi-info )
     infer-children-data get
-    '[
-        , [
-            [
+    [
+        '[
+            , [
                 dup +bottom+ eq?
                 [ drop null-info ] [ value-info ] if
             ] bind
-        ] 2map
-    ] map ;
+        ] map
+    ] 2map ;
 
 : annotate-phi-inputs ( #phi -- )
     dup phi-in-d>> compute-phi-input-infos >>phi-info-d
@@ -86,8 +86,8 @@ SYMBOL: condition-value
 M: #phi propagate-before ( #phi -- )
     {
         [ annotate-phi-inputs ]
-        [ [ phi-info-d>> ] [ out-d>> ] bi merge-value-infos ]
-        [ [ phi-info-r>> ] [ out-r>> ] bi merge-value-infos ]
+        [ [ phi-info-d>> <flipped> ] [ out-d>> ] bi merge-value-infos ]
+        [ [ phi-info-r>> <flipped> ] [ out-r>> ] bi merge-value-infos ]
         [ annotate-phi-outputs ]
     } cleave ;
 
@@ -146,7 +146,9 @@ M: #phi propagate-before ( #phi -- )
 
 M: #phi propagate-after ( #phi -- )
     condition-value get [
-        [ out-d>> ] [ phi-in-d>> ] [ phi-info-d>> ] tri
+        [ out-d>> ]
+        [ phi-in-d>> <flipped> ]
+        [ phi-info-d>> <flipped> ] tri
         [
             [ possible-boolean-values ] map
             branch-phi-constraints

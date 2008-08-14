@@ -21,7 +21,7 @@ MACRO: match-choose ( alist -- )
 MATCH-VARS: ?a ?b ?c ;
 
 : pretty-shuffle ( effect -- word/f )
-    [ in>> ] [ out>> ] bi 2array {
+    [ in>> ] [ out>> ] bi drop-prefix [ >array ] bi@ 2array {
         { { { } { } } [ ] }
         { { { ?a } { ?a } } [ ] }
         { { { ?a ?b } { ?a ?b } } [ ] }
@@ -45,7 +45,7 @@ MATCH-VARS: ?a ?b ?c ;
         { _ f }
     } match-choose ;
 
-TUPLE: shuffle-node effect ;
+TUPLE: shuffle-node { effect effect } ;
 
 M: shuffle-node pprint* effect>> effect>string text ;
  

@@ -41,7 +41,7 @@ M: word redefined H{ } clone visited [ (redefined) ] with-variable ;
 
 : pop-d  ( -- obj )
     meta-d get dup empty? [
-        drop <value> dup #introduce, d-in inc
+        drop <value> dup 1array #introduce, d-in inc
     ] [ pop ] if ;
 
 : peek-d ( -- obj ) pop-d dup push-d ;

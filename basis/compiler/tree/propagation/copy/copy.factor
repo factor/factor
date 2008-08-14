@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces sequences assocs math kernel accessors fry
-combinators sets locals
+combinators sets locals columns
 stack-checker.branches
 compiler.tree
 compiler.tree.def-use
@@ -49,8 +49,8 @@ M: #renaming compute-copy-equiv* inputs/outputs are-copies-of ;
     ] 2each ;
 
 M: #phi compute-copy-equiv*
-    [ [ phi-in-d>> ] [ out-d>> ] bi compute-phi-equiv ]
-    [ [ phi-in-r>> ] [ out-r>> ] bi compute-phi-equiv ] bi ;
+    [ [ phi-in-d>> <flipped> ] [ out-d>> ] bi compute-phi-equiv ]
+    [ [ phi-in-r>> <flipped> ] [ out-r>> ] bi compute-phi-equiv ] bi ;
 
 M: node compute-copy-equiv* drop ;
 

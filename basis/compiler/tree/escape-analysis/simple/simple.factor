@@ -15,7 +15,7 @@ M: #terminate escape-analysis* drop ;
 
 M: #renaming escape-analysis* inputs/outputs [ copy-value ] 2each ;
 
-M: #introduce escape-analysis* value>> unknown-allocation ;
+M: #introduce escape-analysis* out-d>> unknown-allocations ;
 
 DEFER: record-literal-allocation
 

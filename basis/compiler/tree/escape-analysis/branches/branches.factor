@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel namespaces sequences sets fry
+USING: accessors kernel namespaces sequences sets fry columns
 stack-checker.branches
 compiler.tree
 compiler.tree.propagation.branches
@@ -33,6 +33,6 @@ M: #branch escape-analysis*
     2bi ;
 
 M: #phi escape-analysis*
-    [ [ phi-in-d>> ] [ out-d>> ] bi merge-allocations ]
-    [ [ phi-in-r>> ] [ out-r>> ] bi merge-allocations ]
+    [ [ phi-in-d>> <flipped> ] [ out-d>> ] bi merge-allocations ]
+    [ [ phi-in-r>> <flipped> ] [ out-r>> ] bi merge-allocations ]
     bi ;

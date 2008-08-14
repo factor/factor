@@ -47,7 +47,6 @@ M: node node-uses-values in-d>> ;
 
 GENERIC: node-defs-values ( node -- values )
 
-M: #introduce node-defs-values value>> 1array ;
 M: #>r node-defs-values out-r>> ;
 M: #branch node-defs-values drop f ;
 M: #phi node-defs-values [ out-d>> ] [ out-r>> ] bi append ;

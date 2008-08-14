@@ -11,10 +11,9 @@ IN: compiler.tree.normalization
 ! A transform pass done before optimization can begin to
 ! fix up some oddities in the tree output by the stack checker:
 !
-! - We rewrite the code is that #introduce nodes only appear
-! at the beginning of a program, never having #introduce follow
-! any other type of node or appear inside a #branch or
-! #recursive. This simplifies some types of analysis.
+! - We rewrite the code so that all #introduce nodes are
+! replaced with a single one, at the beginning of a program.
+! This simplifies subsequent analysis.
 !
 ! - We collect #return-recursive and #call-recursive nodes and
 ! store them in the #recursive's label slot.
@@ -43,12 +42,15 @@ GENERIC: count-introductions* ( node -- )
         introductions get
     ] with-scope ;
 
-M: #introduce count-introductions* drop introductions inc ;
+: introductions+ ( n -- ) introductions [ + ] change ;
+
+M: #introduce count-introductions*
+    out-d>> length introductions+ ;
 
 M: #branch count-introductions*
     children>>
     [ count-introductions ] map supremum
-    introductions [ + ] change ;
+    introductions+ ;
 
 M: #recursive count-introductions*
     [ label>> ] [ child>> count-introductions ] bi
@@ -83,8 +85,11 @@ GENERIC: eliminate-introductions* ( node -- node' )
 : pop-introduction ( -- value )
     introduction-stack [ unclip-last swap ] change ;
 
+: pop-introductions ( n -- values )
+    introduction-stack [ swap cut* swap ] change ;
+
 M: #introduce eliminate-introductions*
-    pop-introduction swap value>> [ 1array ] bi@ #copy ;
+    out-d>> [ length pop-introductions ] keep #copy ;
 
 SYMBOL: remaining-introductions
 
@@ -100,12 +105,12 @@ M: #branch eliminate-introductions*
     bi ;
 
 : eliminate-phi-introductions ( introductions seq terminated -- seq' )
-    [ flip ] dip [
+    [
         [ nip ] [
             dup [ +bottom+ eq? ] left-trim
             [ [ length ] bi@ - tail* ] keep append
         ] if
-    ] 3map flip ;
+    ] 3map ;
 
 M: #phi eliminate-introductions*
     remaining-introductions get swap dup terminated>>
@@ -120,8 +125,8 @@ M: node eliminate-introductions* ;
 
 : eliminate-toplevel-introductions ( nodes -- nodes' )
     dup count-introductions make-values
-    [ nip [ #introduce ] map ] [ eliminate-introductions ] 2bi
-    append ;
+    [ eliminate-introductions ] [ nip #introduce ] 2bi
+    prefix ;
 
 : eliminate-recursive-introductions ( recursive n -- )
     make-values

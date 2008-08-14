@@ -548,7 +548,7 @@ M: array iterate first t ;
 
 GENERIC: bad-generic ( a -- b )
 M: fixnum bad-generic 1 fixnum+fast ;
-: bad-behavior 4 bad-generic ; inline recursive
+: bad-behavior ( -- b ) 4 bad-generic ; inline recursive
 
 [ V{ fixnum } ] [ [ bad-behavior ] final-classes ] unit-test
 

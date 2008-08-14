@@ -9,7 +9,7 @@ HOOK: child-visitor stack-visitor ( -- visitor )
 
 : nest-visitor ( -- ) child-visitor stack-visitor set ;
 
-HOOK: #introduce, stack-visitor ( value -- )
+HOOK: #introduce, stack-visitor ( values -- )
 HOOK: #call, stack-visitor ( inputs outputs word -- )
 HOOK: #call-recursive, stack-visitor ( inputs outputs word -- )
 HOOK: #push, stack-visitor ( literal value -- )

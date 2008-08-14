@@ -11,10 +11,10 @@ TUPLE: node < identity-tuple info ;
 
 M: node hashcode* drop node hashcode* ;
 
-TUPLE: #introduce < node value ;
+TUPLE: #introduce < node out-d ;
 
-: #introduce ( value -- node )
-    \ #introduce new swap >>value ;
+: #introduce ( out-d -- node )
+    \ #introduce new swap >>out-d ;
 
 TUPLE: #call < node word in-d out-d body method ;
 

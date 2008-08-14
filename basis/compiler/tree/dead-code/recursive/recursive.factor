@@ -7,13 +7,13 @@ compiler.tree.dead-code.simple ;
 IN: compiler.tree.dead-code.recursive
 
 M: #enter-recursive compute-live-values*
-    [ out-d>> ] [ recursive-phi-in flip ] bi look-at-phi ;
+    [ out-d>> ] [ recursive-phi-in ] bi look-at-phi ;
 
 : return-recursive-phi-in ( #return-recursive -- phi-in )
     [ label>> calls>> [ in-d>> ] map ] [ in-d>> ] bi suffix ;
 
 M: #return-recursive compute-live-values*
-    [ out-d>> ] [ return-recursive-phi-in flip ] bi look-at-phi ;
+    [ out-d>> ] [ return-recursive-phi-in ] bi look-at-phi ;
 
 M: #recursive remove-dead-code*
     [ filter-live ] change-in-d ;

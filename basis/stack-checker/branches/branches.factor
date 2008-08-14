@@ -24,7 +24,6 @@ SYMBOL: +bottom+
     dup empty? [ nip ] [
         swap '[ , _ first2 unify-inputs ] map
         pad-with-bottom
-        flip
     ] if ;
 
 : remove-bottom ( seq -- seq' )
@@ -38,7 +37,7 @@ SYMBOL: +bottom+
     ] if ;
 
 : phi-outputs ( phi-in -- stack )
-    [ unify-values ] map ;
+    flip [ unify-values ] map ;
 
 SYMBOL: quotations
 

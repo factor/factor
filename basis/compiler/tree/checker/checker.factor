@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences kernel sets namespaces accessors assocs
-arrays combinators continuations
+arrays combinators continuations columns math
 compiler.tree
 compiler.tree.def-use
 compiler.tree.combinators ;
@@ -17,9 +17,9 @@ ERROR: check-use-error value message ;
 : check-def-use ( -- )
     def-use get [ uses>> check-use ] assoc-each ;
 
-GENERIC: check-node ( node -- )
+GENERIC: check-node* ( node -- )
 
-M: #shuffle check-node
+M: #shuffle check-node*
     [ [ mapping>> values ] [ in-d>> ] bi subset? [ "Bad mapping inputs" throw ] unless ]
     [ [ mapping>> keys ] [ out-d>> ] bi set= [ "Bad mapping outputs" throw ] unless ]
     bi ;
@@ -27,35 +27,46 @@ M: #shuffle check-node
 : check-lengths ( seq -- )
     [ length ] map all-equal? [ "Bad lengths" throw ] unless ;
 
-M: #copy check-node inputs/outputs 2array check-lengths ;
+M: #copy check-node* inputs/outputs 2array check-lengths ;
 
-M: #>r check-node inputs/outputs 2array check-lengths ;
+M: #>r check-node* inputs/outputs 2array check-lengths ;
 
-M: #r> check-node inputs/outputs 2array check-lengths ;
+M: #r> check-node* inputs/outputs 2array check-lengths ;
 
-M: #return-recursive check-node inputs/outputs 2array check-lengths ;
+M: #return-recursive check-node* inputs/outputs 2array check-lengths ;
 
-M: #phi check-node
+M: #phi check-node*
     {
-        [ [ phi-in-d>> ] [ out-d>> ] bi 2array check-lengths ]
-        [ [ phi-in-r>> ] [ out-r>> ] bi 2array check-lengths ]
+        [ [ phi-in-d>> <flipped> ] [ out-d>> ] bi 2array check-lengths ]
+        [ [ phi-in-r>> <flipped> ] [ out-r>> ] bi 2array check-lengths ]
         [ phi-in-d>> check-lengths ]
         [ phi-in-r>> check-lengths ]
     } cleave ;
 
-M: #enter-recursive check-node
+M: #enter-recursive check-node*
     [ [ in-d>> ] [ out-d>> ] bi 2array check-lengths ]
     [ recursive-phi-in check-lengths ]
     bi ;
 
-M: #push check-node
+M: #push check-node*
     out-d>> length 1 = [ "Bad #push" throw ] unless ;
 
-M: node check-node drop ;
+M: node check-node* drop ;
+
+: check-values ( seq -- )
+    [ integer? ] all? [ "Bad values" throw ] unless ;
 
 ERROR: check-node-error node error ;
+
+: check-node ( node -- )
+    [
+        [ node-uses-values check-values ]
+        [ node-defs-values check-values ]
+        [ check-node* ]
+        tri
+    ] [ check-node-error ] recover ;
 
 : check-nodes ( nodes -- )
     compute-def-use
     check-def-use
-    [ [ check-node ] [ check-node-error ] recover ] each-node ;
+    [ check-node ] each-node ;
