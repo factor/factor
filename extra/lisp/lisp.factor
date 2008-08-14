@@ -62,7 +62,7 @@ PRIVATE>
     cdr [ car ] keep [ convert-lambda ] [ car name>> ] bi define-lisp-macro 1quotation ;
 
 : macro-expand ( cons -- quot )
-    uncons [ list>seq >quotation ] [ lookup-macro ] bi* call convert-form ;
+    uncons [ list>seq >quotation ] [ lookup-macro ] bi* call call convert-form ;
     
 : convert-begin ( cons -- quot )    
     cdr [ convert-form ] [ ] lmap-as [ 1 tail* ] [ but-last ] bi
