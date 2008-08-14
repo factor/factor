@@ -7,13 +7,15 @@ USING: alien.syntax ;
 
 : MAXPATHLEN 1024 ; inline
 
-: O_RDONLY  HEX: 0000 ; inline
-: O_WRONLY  HEX: 0001 ; inline
-: O_RDWR    HEX: 0002 ; inline
-: O_CREAT   HEX: 0040 ; inline
-: O_EXCL    HEX: 0080 ; inline
-: O_TRUNC   HEX: 0200 ; inline
-: O_APPEND  HEX: 0400 ; inline
+: O_RDONLY   HEX: 0000 ; inline
+: O_WRONLY   HEX: 0001 ; inline
+: O_RDWR     HEX: 0002 ; inline
+: O_CREAT    HEX: 0040 ; inline
+: O_EXCL     HEX: 0080 ; inline
+: O_NOCTTY   HEX: 0100 ; inline
+: O_TRUNC    HEX: 0200 ; inline
+: O_APPEND   HEX: 0400 ; inline
+: O_NONBLOCK HEX: 0800 ; inline
 
 : SOL_SOCKET 1 ; inline
 
@@ -28,7 +30,6 @@ USING: alien.syntax ;
 : FD_CLOEXEC 1 ; inline
 
 : F_SETFL 4 ; inline
-: O_NONBLOCK HEX: 800 ; inline
 
 C-STRUCT: addrinfo
     { "int" "flags" }
