@@ -66,14 +66,6 @@ IN: lisp.test
     { { 1 2 { 3 { 4 } 5 } } } [
         "(list 1 2 (list 3 (list 4) 5))" lisp-eval cons>seq
     ] unit-test
-
-    { T{ lisp-symbol f "begin" } } [
-        "(defmacro begin (&rest body) (list (cons (quote lambda) (cons (list) body))))" lisp-eval
-    ] unit-test
-    
-    { t } [
-        T{ lisp-symbol f "begin" } lisp-macro?
-    ] unit-test
     
     { 5 } [
         "(begin (+ 1 4))" lisp-eval
@@ -84,7 +76,7 @@ IN: lisp.test
     ] unit-test
     
     { T{ lisp-symbol f "if" } } [
-        "(defmacro if (pred tr fl) (list (list (quote cond) (list pred tr) (list (quote #t) fl))))" lisp-eval
+        "(defmacro if (pred tr fl) (list (quote cond) (list pred tr) (list (quote #t) fl)))" lisp-eval
     ] unit-test
     
     { t } [

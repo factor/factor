@@ -63,6 +63,10 @@ PRIVATE>
 
 : macro-expand ( cons -- quot )
     uncons [ list>seq >quotation ] [ lookup-macro ] bi* call convert-form ;
+    
+: convert-begin ( cons -- quot )    
+    cdr [ convert-form ] [ ] lmap-as [ 1 tail* ] [ but-last ] bi
+    [ [ drop ] compose ] map prepend '[ , [ call ] each ] ;
 
 : form-dispatch ( cons lisp-symbol -- quot )
     name>>
@@ -70,6 +74,7 @@ PRIVATE>
       { "defmacro" [ convert-defmacro ] }
       { "quote" [ convert-quoted ] }
       { "cond" [ convert-cond ] }
+      { "begin" [ convert-begin ] }
      [ drop convert-general-form ]
     } case ;
 
