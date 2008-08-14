@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math.bitfields serial.unix ;
+USING: accessors kernel math.bitfields serial serial.unix ;
 IN: serial.unix
 
 : serial-obj ( -- obj )
