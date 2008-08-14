@@ -13,3 +13,6 @@ M: column virtual@ dup col>> -rot seq>> nth bounds-check ;
 M: column length seq>> length ;
 
 INSTANCE: column virtual-sequence
+
+: <flipped> ( seq -- seq' )
+    dup first length [ <column> ] with map ;
