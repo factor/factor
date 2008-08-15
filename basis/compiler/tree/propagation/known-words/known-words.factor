@@ -263,7 +263,10 @@ generic-comparison-ops [
 ] +outputs+ set-word-prop
 
 ! the output of clone has the same type as the input
-{ clone (clone) } [ [ ] +outputs+ set-word-prop ] each
+{ clone (clone) } [
+    [ clone f >>literal f >>literal? ]
+    +outputs+ set-word-prop
+] each
 
 \ slot [
     dup literal?>>

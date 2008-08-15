@@ -566,3 +566,5 @@ M: integer infinite-loop infinite-loop ;
 [ V{ tuple } ] [ [ tuple-layout <tuple> ] final-classes ] unit-test
 
 [ ] [ [ instance? ] final-classes drop ] unit-test
+
+[ f ] [ [ V{ } clone ] final-info first literal?>> ] unit-test
