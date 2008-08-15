@@ -123,8 +123,11 @@ M: irc-listener-end write-irc
 M: irc-message write-irc
     drop ; ! catch all unimplemented writes, THIS WILL CHANGE    
 
-: time-happened ( irc-message -- timestamp )
-    [ timestamp>> ] [ 2drop now ] recover ;
+GENERIC: time-happened ( message -- timestamp )
+
+M: irc-message time-happened timestamp>> ;
+
+M: object time-happened drop now ;
 
 : print-irc ( irc-message -- )
     [ time-happened timestamp>hms write " " write ]
@@ -188,7 +191,7 @@ M: irc-tab ungraft*
 TUPLE: irc-channel-tab < irc-tab userlist ;
 
 : <irc-channel-tab> ( listener ui-window -- irc-tab )
-    irc-tab new-irc-tab
+    irc-channel-tab new-irc-tab
     <pile> [ <scroller> @right grid-add ] keep >>userlist ;
 
 : update-participants ( tab -- )
