@@ -3,7 +3,7 @@
 USING: concurrency.mailboxes kernel io.sockets io.encodings.8-bit calendar
        accessors destructors namespaces io assocs arrays qualified fry
        continuations threads strings classes combinators splitting hashtables
-       ascii irc.messages irc.messages.private ;
+       ascii irc.messages ;
 RENAME: join sequences => sjoin
 EXCLUDE: sequences => join ;
 IN: irc.client
@@ -67,7 +67,6 @@ SINGLETON: irc-listener-end ! send to a listener to stop its execution
 SINGLETON: irc-end          ! sent when the client isn't running anymore
 SINGLETON: irc-disconnected ! sent when connection is lost
 SINGLETON: irc-connected    ! sent when connection is established
-UNION: irc-broadcasted-message irc-end irc-disconnected irc-connected ;
 
 : terminate-irc ( irc-client -- )
     [ is-running>> ] keep and [
@@ -122,6 +121,9 @@ M: irc-listener to-listener ( message irc-listener -- )
     [ dup irc-channel-listener? [ participants>> key? ] [ 2drop f ] if ]
     with filter ;
 
+: to-listeners-with-participant ( message nickname -- )
+    listeners-with-participant [ to-listener ] with each ;
+
 : remove-participant-from-all ( nick -- )
     dup listeners-with-participant [ (remove-participant) ] with each ;
 
@@ -145,7 +147,7 @@ M: irc-listener to-listener ( message irc-listener -- )
 DEFER: me?
 
 : maybe-forward-join ( join -- )
-    [ prefix>> parse-name me? ] keep and
+    [ irc-message-sender me? ] keep and
     [ irc> join-messages>> mailbox-put ] when* ;
 
 ! ======================================
@@ -177,60 +179,64 @@ DEFER: me?
 : me? ( string -- ? )
     irc> profile>> nickname>> = ;
 
-: irc-message-origin ( irc-message -- name )
-    dup name>> me? [ prefix>> parse-name ] [ name>> ] if ;
+GENERIC: forward-name ( irc-message -- name )
+M: join forward-name ( join -- name ) trailing>> ;
+M: part forward-name ( part -- name ) channel>> ;
+M: kick forward-name ( kick -- name ) channel>> ;
+M: mode forward-name ( mode -- name ) channel>> ;
+M: privmsg forward-name ( privmsg -- name )
+    dup name>> me? [ irc-message-sender ] [ name>> ] if ;
 
-: broadcast-message-to-listeners ( message -- )
-    irc> listeners>> values [ to-listener ] with each ;
+UNION: single-forward join part kick mode privmsg ;
+UNION: multiple-forward nick quit ;
+UNION: broadcast-forward irc-end irc-disconnected irc-connected ;
+GENERIC: forward-message ( irc-message -- )
 
-GENERIC: handle-incoming-irc ( irc-message -- )
-
-M: irc-message handle-incoming-irc ( irc-message -- )
+M: irc-message forward-message ( irc-message -- )
     +server-listener+ listener> [ to-listener ] [ drop ] if* ;
 
-M: logged-in handle-incoming-irc ( logged-in -- )
+M: single-forward forward-message ( forward-single -- )
+    dup forward-name to-listener ;
+
+M: multiple-forward forward-message ( multiple-forward -- )
+    dup irc-message-sender to-listeners-with-participant ;
+
+M: join forward-message ( join -- )
+    [ maybe-forward-join ] [ call-next-method ] bi ;
+    
+M: broadcast-forward forward-message ( irc-broadcasted-message -- )
+    irc> listeners>> values [ to-listener ] with each ;
+
+GENERIC: process-message ( irc-message -- )
+
+M: object process-message ( object -- )
+    drop ;
+    
+M: logged-in process-message ( logged-in -- )
     name>> irc> profile>> (>>nickname) ;
 
-M: ping handle-incoming-irc ( ping -- )
+M: ping process-message ( ping -- )
     trailing>> /PONG ;
 
-M: nick-in-use handle-incoming-irc ( nick-in-use -- )
+M: nick-in-use process-message ( nick-in-use -- )
     name>> "_" append /NICK ;
 
-M: privmsg handle-incoming-irc ( privmsg -- )
-    dup irc-message-origin to-listener ;
+M: join process-message ( join -- )
+    [ drop +normal+ ] [ irc-message-sender ] [ trailing>> ] tri add-participant ;
 
-M: join handle-incoming-irc ( join -- )
-    [ maybe-forward-join ]
-    [ dup trailing>> to-listener ]
-    [ [ drop +normal+ ] [ prefix>> parse-name ] [ trailing>> ] tri add-participant ]
-    tri ;
+M: part process-message ( part -- )
+    [ irc-message-sender ] [ channel>> ] bi remove-participant ;
 
-M: part handle-incoming-irc ( part -- )
-    [ dup channel>> to-listener ]
-    [ [ prefix>> parse-name ] [ channel>> ] bi remove-participant ]
-    bi ;
-
-M: kick handle-incoming-irc ( kick -- )
-    [ dup channel>> to-listener ]
+M: kick process-message ( kick -- )
     [ [ who>> ] [ channel>> ] bi remove-participant ]
     [ dup who>> me? [ unregister-listener ] [ drop ] if ]
-    tri ;
-
-M: quit handle-incoming-irc ( quit -- )
-    [ dup prefix>> parse-name listeners-with-participant
-      [ to-listener ] with each ]
-    [ prefix>> parse-name remove-participant-from-all ]
     bi ;
 
-M: mode handle-incoming-irc ( mode -- ) ! FIXME: modify participant list
-    dup channel>> to-listener ;
+M: quit process-message ( quit -- )
+    irc-message-sender remove-participant-from-all ;
 
-M: nick handle-incoming-irc ( nick -- )
-    [ dup prefix>> parse-name listeners-with-participant
-      [ to-listener ] with each ]
-    [ [ prefix>> parse-name ] [ trailing>> ] bi rename-participant-in-all ]
-    bi ;
+M: nick process-message ( nick -- )
+    [ irc-message-sender ] [ trailing>> ] bi rename-participant-in-all ;
 
 : >nick/mode ( string -- nick mode )
     dup first "+@" member? [ unclip ] [ 0 ] if participant-mode ;
@@ -239,22 +245,20 @@ M: nick handle-incoming-irc ( nick -- )
     trailing>> [ blank? ] trim " " split
     [ >nick/mode 2array ] map >hashtable ;
 
-M: names-reply handle-incoming-irc ( names-reply -- )
+M: names-reply process-message ( names-reply -- )
     [ names-reply>participants ] [ channel>> listener> ] bi [
         [ (>>participants) ]
         [ [ f f f <participant-changed> ] dip name>> to-listener ] bi
     ] [ drop ] if* ;
 
-M: irc-broadcasted-message handle-incoming-irc ( irc-broadcasted-message -- )
-    broadcast-message-to-listeners ;
+: handle-incoming-irc ( irc-message -- )
+    [ forward-message ] [ process-message ] bi ;
 
 ! ======================================
 ! Client message handling
 ! ======================================
 
-GENERIC: handle-outgoing-irc ( obj -- )
-
-M: irc-message handle-outgoing-irc ( irc-message -- )
+: handle-outgoing-irc ( irc-message -- )
     irc-message>client-line irc-print ;
 
 ! ======================================

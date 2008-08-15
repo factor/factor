@@ -83,13 +83,6 @@ M: src-printer print-closing-named-tag ( tag -- )
 SYMBOL: tab-width
 SYMBOL: #indentations
 
-: html-pp ( vector -- )
-    [
-        0 #indentations set
-        2 tab-width set
-        
-    ] with-scope ;
-
 : print-tabs ( -- )
     tab-width get #indentations get * CHAR: \s <repetition> write ; 
 
@@ -125,3 +118,6 @@ M: printer print-tag ( tag -- )
 ! H{ { table-gap { 10 10 } } } [
     ! [ [ [ [ . ] with-cell ] each ] with-row ] each
 ! ] tabular-output
+
+! : html-pp ( vector -- )
+    ! [ 0 #indentations set 2 tab-width set ] with-scope ; 
