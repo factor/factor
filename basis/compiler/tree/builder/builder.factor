@@ -22,10 +22,15 @@ IN: compiler.tree.builder
     ] with-tree-builder nip
     unclip-last in-d>> ;
 
+: ends-with-terminate? ( nodes -- ? )
+    dup empty? [ drop f ] [ peek #terminate? ] if ;
+
 : build-sub-tree ( #call quot -- nodes )
-    [ [ out-d>> ] [ in-d>> ] bi ] dip
-    build-tree-with
-    rot #copy suffix ;
+    [ [ out-d>> ] [ in-d>> ] bi ] dip build-tree-with
+    over ends-with-terminate?
+    [ drop swap [ f swap #push ] map append ]
+    [ rot #copy suffix ]
+    if ;
 
 : (make-specializer) ( class picker -- quot )
     swap "predicate" word-prop append ;
@@ -70,13 +75,31 @@ IN: compiler.tree.builder
         [ drop ]
     } cond ;
 
+: (build-tree-from-word) ( word -- )
+    dup
+    [ "inline" word-prop ]
+    [ "recursive" word-prop ] bi and [
+        1quotation f infer-quot
+    ] [
+        [ specialized-def ]
+        [ dup 2array 1array ] bi infer-quot
+    ] if ;
+
+: check-cannot-infer ( word -- )
+    dup +cannot-infer+ word-prop [ cannot-infer-effect ] [ drop ] if ;
+
+: check-no-compile ( word -- )
+    dup "no-compile" word-prop [ cannot-infer-effect ] [ drop ] if ;
+
 : build-tree-from-word ( word -- effect nodes )
     [
         [
-            dup +cannot-infer+ word-prop [ cannot-infer-effect ] when
-            dup "no-compile" word-prop [ cannot-infer-effect ] when
-            dup specialized-def over dup 2array 1array infer-quot
-            finish-word
+            {
+                [ check-cannot-infer ]
+                [ check-no-compile ]
+                [ (build-tree-from-word) ]
+                [ finish-word ]
+            } cleave
         ] maybe-cannot-infer
     ] with-tree-builder ;
 

@@ -13,14 +13,30 @@ IN: compiler.tree.cleanup
 ! A phase run after propagation to finish the job, so to speak.
 ! Codifies speculative inlining decisions, deletes branches
 ! marked as never taken, and flattens local recursive blocks
-! that do not call themselves.
+! that do not call themselves. Finally, if inlining inserts a
+! #terminate, we delete all nodes after that.
+
+GENERIC: delete-node ( node -- )
+
+M: #call-recursive delete-node
+    dup label>> [ [ eq? not ] with filter ] change-calls drop ;
+
+M: #return-recursive delete-node
+    label>> f >>return drop ;
+
+M: node delete-node drop ;
+
+: delete-nodes ( nodes -- ) [ delete-node ] each-node ;
 
 GENERIC: cleanup* ( node -- node/nodes )
+
+: termination-cleanup ( nodes -- nodes' )
+    dup [ #terminate? ] find drop [ 1+ cut delete-nodes ] when* ;
 
 : cleanup ( nodes -- nodes' )
     #! We don't recurse into children here, instead the methods
     #! do it since the logic is a bit more involved
-    [ cleanup* ] map flatten ;
+    [ cleanup* ] map flatten ; ! termination-cleanup ;
 
 : cleanup-folding? ( #call -- ? )
     node-output-infos dup empty?
@@ -73,18 +89,6 @@ M: #call cleanup*
     } cond ;
 
 M: #declare cleanup* drop f ;
-
-GENERIC: delete-node ( node -- )
-
-M: #call-recursive delete-node
-    dup label>> [ [ eq? not ] with filter ] change-calls drop ;
-
-M: #return-recursive delete-node
-    label>> f >>return drop ;
-
-M: node delete-node drop ;
-
-: delete-nodes ( nodes -- ) [ delete-node ] each-node ;
 
 : delete-unreachable-branches ( #branch -- )
     dup live-branches>> '[

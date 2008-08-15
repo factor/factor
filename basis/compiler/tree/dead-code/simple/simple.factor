@@ -25,11 +25,6 @@ M: #copy compute-live-values*
 
 M: #call compute-live-values* nip look-at-inputs ;
 
-M: #call-recursive compute-live-values*
-    #! If the output of a copy is live, then the corresponding
-    #! inputs to #return nodes are live also.
-    [ out-d>> ] [ label>> return>> ] bi look-at-mapping ;
-
 M: #>r compute-live-values*
     [ out-r>> ] [ in-d>> ] bi look-at-mapping ;
 
@@ -108,3 +103,7 @@ M: #copy remove-dead-code*
     [ in-d>> ] [ out-d>> ] bi
     2dup swap zip #shuffle
     remove-dead-code* ;
+
+M: #terminate remove-dead-code*
+    [ filter-live ] change-in-d
+    [ filter-live ] change-in-r ;

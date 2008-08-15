@@ -81,10 +81,10 @@ M: #return escape-analysis*
 
 M: #alien-invoke escape-analysis*
     [ in-d>> add-escaping-values ]
-    [ out-d>> unknown-allocation ]
+    [ out-d>> unknown-allocations ]
     bi ;
 
 M: #alien-indirect escape-analysis*
     [ in-d>> add-escaping-values ]
-    [ out-d>> unknown-allocation ]
+    [ out-d>> unknown-allocations ]
     bi ;

@@ -66,10 +66,11 @@ TUPLE: #r> < #renaming in-r out-d ;
         swap >>out-d
         swap >>in-r ;
 
-TUPLE: #terminate < node in-d ;
+TUPLE: #terminate < node in-d in-r ;
 
-: #terminate ( stack -- node )
+: #terminate ( in-d in-r -- node )
     \ #terminate new
+        swap >>in-r
         swap >>in-d ;
 
 TUPLE: #branch < node in-d children live-branches ;

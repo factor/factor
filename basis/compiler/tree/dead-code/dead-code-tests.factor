@@ -1,6 +1,8 @@
 USING: namespaces assocs sequences compiler.tree.builder
 compiler.tree.dead-code compiler.tree.def-use compiler.tree
-compiler.tree.combinators compiler.tree.debugger
+compiler.tree.combinators compiler.tree.propagation
+compiler.tree.cleanup compiler.tree.escape-analysis
+compiler.tree.tuple-unboxing compiler.tree.debugger
 compiler.tree.normalization compiler.tree.checker tools.test
 kernel math stack-checker.state accessors combinators io ;
 IN: compiler.tree.dead-code.tests
@@ -10,6 +12,10 @@ IN: compiler.tree.dead-code.tests
 : count-live-values ( quot -- n )
     build-tree
     normalize
+    propagate
+    cleanup
+    escape-analysis
+    unbox-tuples
     compute-def-use
     remove-dead-code
     0 swap [
@@ -32,11 +38,11 @@ IN: compiler.tree.dead-code.tests
 
 [ 2 ] [ [ [ 1 ] [ dup ] if drop ] count-live-values ] unit-test
 
-[ 2 ] [ [ 1 2 + ] count-live-values ] unit-test
+[ 2 ] [ [ 1 + ] count-live-values ] unit-test
 
 [ 0 ] [ [ 1 2 + drop ] count-live-values ] unit-test
 
-[ 3 ] [ [ 1 2 + 3 + ] count-live-values ] unit-test
+[ 3 ] [ [ 1 + 3 + ] count-live-values ] unit-test
 
 [ 0 ] [ [ 1 2 + 3 + drop ] count-live-values ] unit-test
 
@@ -52,9 +58,18 @@ IN: compiler.tree.dead-code.tests
 
 [ 0 ] [ [ [ 1 ] [ 2 ] compose call + drop ] count-live-values ] unit-test
 
+[ 3 ] [ [ 10 [ ] times ] count-live-values ] unit-test
+
 : optimize-quot ( quot -- quot' )
-    build-tree normalize compute-def-use remove-dead-code
-    dup check-nodes nodes>quot ;
+    build-tree
+    normalize
+    propagate
+    cleanup
+    escape-analysis
+    unbox-tuples
+    compute-def-use
+    remove-dead-code
+    "no-check" get [ dup check-nodes ] unless nodes>quot ;
 
 [ [ drop 1 ] ] [ [ >r 1 r> drop ] optimize-quot ] unit-test
 
@@ -76,3 +91,14 @@ IN: compiler.tree.dead-code.tests
 [ [ [ drop drop ] [ non-flushable-3 drop ] if ] ] [
     [ [ flushable-1 ] [ non-flushable-3 ] if drop ] optimize-quot
 ] unit-test
+
+[ [ [ f ] [ f ] if ] ] [ [ [ f ] [ f ] if ] optimize-quot ] unit-test
+
+[ ] [ [ dup [ 3 throw ] [ ] if ] optimize-quot drop ] unit-test
+
+: non-flushable-4 ( a -- b ) drop f ;
+
+: recursive-test-1 ( a b -- )
+    dup 10 < [
+        >r drop 5 non-flushable-4 r> 1 + recursive-test-1
+    ] [ 2drop ] if ; inline recursive

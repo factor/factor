@@ -93,7 +93,8 @@ M: #shuffle unbox-tuples*
     [ unzip [ flatten-values ] bi@ zip ] change-mapping ;
 
 M: #terminate unbox-tuples*
-    [ flatten-values ] change-in-d ;
+    [ flatten-values ] change-in-d
+    [ flatten-values ] change-in-r ;
 
 M: #phi unbox-tuples*
     [ [ flatten-values ] map pad-with-bottom ] change-phi-in-d

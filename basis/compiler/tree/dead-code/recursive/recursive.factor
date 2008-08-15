@@ -15,8 +15,14 @@ M: #enter-recursive compute-live-values*
 M: #return-recursive compute-live-values*
     [ out-d>> ] [ return-recursive-phi-in ] bi look-at-phi ;
 
+M: #call-recursive compute-live-values*
+    #! If the output of a copy is live, then the corresponding
+    #! inputs to #return nodes are live also.
+    [ out-d>> ] [ label>> return>> in-d>> ] bi look-at-mapping ;
+
 M: #recursive remove-dead-code*
-    [ filter-live ] change-in-d ;
+    [ filter-live ] change-in-d
+    [ (remove-dead-code) ] change-child ;
 
 M: #call-recursive remove-dead-code*
     [ filter-live ] change-in-d

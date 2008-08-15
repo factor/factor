@@ -123,7 +123,7 @@ DEFER: (flat-length)
 SYMBOL: history
 
 : remember-inlining ( word -- )
-    history get [ swap suffix ] change ;
+    history [ swap suffix ] change ;
 
 : inline-word ( #call word -- )
     dup history get memq? [

@@ -288,7 +288,7 @@ M: wlet local-rewrite*
     CREATE-METHOD
     [ parse-locals-definition ] with-method-definition ;
 
-: parsed-lambda ( form -- )
+: parsed-lambda ( accum form -- accum )
     in-lambda? get [ parsed ] [ lambda-rewrite over push-all ] if ;
 
 PRIVATE>

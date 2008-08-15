@@ -253,7 +253,7 @@ generic-comparison-ops [
 
 { <tuple> <tuple-boa> } [
     [
-        literal>> dup tuple-layout? [ class>> ] [ drop tuple ] if
+        literal>> dup tuple-layout? [ class>> ] [ drop tuple ] if <class-info>
         [ clear ] dip
     ] +outputs+ set-word-prop
 ] each
@@ -273,10 +273,10 @@ generic-comparison-ops [
 \ instance? [
     [ value-info ] dip over literal>> class? [
         [ literal>> ] dip predicate-constraints
-    ] [ 2drop f ] if
+    ] [ 3drop f ] if
 ] +constraints+ set-word-prop
 
 \ instance? [
     dup literal>> class?
-    [ literal>> predicate-output-infos ] [ 2drop f ] if
+    [ literal>> predicate-output-infos ] [ 2drop object-info ] if
 ] +outputs+ set-word-prop

@@ -21,7 +21,7 @@ MACRO: match-choose ( alist -- )
 MATCH-VARS: ?a ?b ?c ;
 
 : pretty-shuffle ( effect -- word/f )
-    [ in>> ] [ out>> ] bi drop-prefix [ >array ] bi@ 2array {
+    [ in>> ] [ out>> ] bi 2array {
         { { { } { } } [ ] }
         { { { ?a } { ?a } } [ ] }
         { { { ?a ?b } { ?a ?b } } [ ] }
@@ -83,6 +83,12 @@ DEFER: rdrop
 M: #r> node>quot
     [ in-r>> length ] [ out-d>> empty? \ rdrop \ r> ? ] bi
     <repetition> % ;
+
+M: #alien-invoke node>quot params>> , \ #alien-invoke , ;
+
+M: #alien-indirect node>quot params>> , \ #alien-indirect , ;
+
+M: #alien-callback node>quot params>> , \ #alien-callback , ;
 
 M: node node>quot drop ;
 

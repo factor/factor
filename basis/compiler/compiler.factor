@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces arrays sequences io debugger words
+USING: kernel namespaces arrays sequences io debugger words fry
 compiler.units continuations vocabs assocs dlists definitions
 math threads graphs generic combinators dequeues search-dequeues
 stack-checker stack-checker.state compiler.generator
@@ -47,10 +47,10 @@ SYMBOL: +failed+
 
 : (compile) ( word -- )
     USE: prettyprint dup .
-    [
+    '[
         H{ } clone dependencies set
 
-        {
+        , {
             [ compile-begins ]
             [
                 [ build-tree-from-word ] [ compile-failed return ] recover
@@ -59,7 +59,7 @@ SYMBOL: +failed+
             [ dup generate ]
             [ compile-succeeded ]
         } cleave
-    ] curry with-return ;
+    ] with-return ;
 
 : compile-loop ( dequeue -- )
     [ (compile) yield ] slurp-dequeue ;

@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry namespaces assocs kernel sequences words accessors
-definitions math effects classes arrays combinators vectors
-arrays
+definitions math math.order effects classes arrays combinators
+vectors arrays
 stack-checker.state
 stack-checker.visitor
 stack-checker.backend
@@ -115,8 +115,8 @@ SYMBOL: enter-out
 
 : adjust-stack-effect ( effect -- effect' )
     [ in>> ] [ out>> ] bi
-    meta-d get length pick length - object <repetition>
-    '[ , prepend ] bi@
+    meta-d get length pick length - 0 max
+    object <repetition> '[ , prepend ] bi@
     <effect> ;
 
 : call-recursive-inline-word ( word -- )

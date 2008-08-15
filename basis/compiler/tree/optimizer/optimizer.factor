@@ -10,7 +10,8 @@ compiler.tree.dead-code
 compiler.tree.strength-reduction
 compiler.tree.loop.detection
 compiler.tree.loop.inversion
-compiler.tree.branch-fusion ;
+compiler.tree.branch-fusion
+compiler.tree.checker ;
 IN: compiler.tree.optimizer
 
 : optimize-tree ( nodes -- nodes' )
@@ -18,10 +19,12 @@ IN: compiler.tree.optimizer
     propagate
     cleanup
     detect-loops
-    invert-loops
-    fuse-branches
-    escape-analysis
-    unbox-tuples
-    compute-def-use
-    remove-dead-code
-    strength-reduce ;
+    ! invert-loops
+    ! fuse-branches
+    ! escape-analysis
+    ! unbox-tuples
+    ! compute-def-use
+    ! remove-dead-code
+    ! strength-reduce
+    compute-def-use USE: kernel
+    dup check-nodes ;

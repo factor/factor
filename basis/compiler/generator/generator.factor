@@ -92,7 +92,7 @@ M: node generate-node drop iterate-next ;
     %jump-label ;
 
 : generate-call ( label -- next )
-    dup maybe-compile
+    ! dup maybe-compile
     end-basic-block
     dup compiling-loops get at [
         %jump-label f
@@ -107,7 +107,7 @@ M: node generate-node drop iterate-next ;
     ] ?if ;
 
 ! #recursive
-: compile-recursive ( node -- )
+: compile-recursive ( node -- next )
     dup label>> id>> generate-call >r
     [ child>> ] [ label>> word>> ] [ label>> id>> ] tri generate
     r> ;
@@ -115,7 +115,7 @@ M: node generate-node drop iterate-next ;
 : compiling-loop ( word -- )
     <label> dup resolve-label swap compiling-loops get set-at ;
 
-: compile-loop ( node -- )
+: compile-loop ( node -- next )
     end-basic-block
     [ label>> id>> compiling-loop ] [ child>> generate-nodes ] bi
     iterate-next ;
@@ -232,7 +232,7 @@ M: #dispatch generate-node
     ] if ;
 
 M: #call generate-node
-    dup node-input-infos [ class>> ] map set-operand-classes
+    ! dup node-input-infos [ class>> ] map set-operand-classes
     dup find-if-intrinsic [
         do-if-intrinsic
     ] [

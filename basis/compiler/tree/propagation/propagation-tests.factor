@@ -557,3 +557,12 @@ M: fixnum bad-generic 1 fixnum+fast ;
         0 10 [ bad-generic dup 123 bitand drop bad-generic 1 + ] times
     ] final-classes
 ] unit-test
+
+GENERIC: infinite-loop ( a -- b )
+M: integer infinite-loop infinite-loop ;
+
+[ ] [ [ { integer } declare infinite-loop ] final-classes drop ] unit-test
+
+[ V{ tuple } ] [ [ tuple-layout <tuple> ] final-classes ] unit-test
+
+[ ] [ [ instance? ] final-classes drop ] unit-test

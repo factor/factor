@@ -85,7 +85,7 @@ M: wrapper apply-object
 M: object apply-object push-literal ;
 
 : terminate ( -- )
-    terminated? on meta-d get clone #terminate, ;
+    terminated? on meta-d get clone meta-r get clone #terminate, ;
 
 : infer-quot ( quot rstate -- )
     recursive-state get [
