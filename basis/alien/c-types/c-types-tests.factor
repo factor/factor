@@ -2,6 +2,12 @@ IN: alien.c-types.tests
 USING: alien alien.syntax alien.c-types kernel tools.test
 sequences system libc alien.strings io.encodings.utf8 ;
 
+\ expand-constants must-infer
+
+: xyz 123 ;
+
+[ { "blah" 123 } ] [ { "blah" xyz } expand-constants ] unit-test
+
 : foo ( -- n ) "fdafd" f dlsym [ 123 ] unless* ;
 
 [ 123 ] [ foo ] unit-test

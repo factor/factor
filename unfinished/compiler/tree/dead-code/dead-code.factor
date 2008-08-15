@@ -23,6 +23,12 @@ M: #call mark-live-values
     dup word>> "flushable" word-prop
     [ drop ] [ [ look-at-inputs ] [ look-at-outputs ] bi ] if ;
 
+M: #alien-invoke mark-live-values
+    [ look-at-inputs ] [ look-at-outputs ] bi ;
+
+M: #alien-indirect mark-live-values
+    [ look-at-inputs ] [ look-at-outputs ] bi ;
+
 M: #return mark-live-values
     look-at-inputs ;
 

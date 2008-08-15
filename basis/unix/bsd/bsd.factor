@@ -7,13 +7,16 @@ IN: unix
 
 : MAXPATHLEN 1024 ; inline
 
-: O_RDONLY  HEX: 0000 ; inline
-: O_WRONLY  HEX: 0001 ; inline
-: O_RDWR    HEX: 0002 ; inline
-: O_APPEND  HEX: 0008 ; inline
-: O_CREAT   HEX: 0200 ; inline
-: O_TRUNC   HEX: 0400 ; inline
-: O_EXCL    HEX: 0800 ; inline
+: O_RDONLY   HEX: 0000 ; inline
+: O_WRONLY   HEX: 0001 ; inline
+: O_RDWR     HEX: 0002 ; inline
+: O_NONBLOCK HEX: 0004 ; inline
+: O_APPEND   HEX: 0008 ; inline
+: O_CREAT    HEX: 0200 ; inline
+: O_TRUNC    HEX: 0400 ; inline
+: O_EXCL     HEX: 0800 ; inline
+: O_NOCTTY   HEX: 20000 ; inline
+: O_NDELAY O_NONBLOCK ; inline
 
 : SOL_SOCKET HEX: ffff ; inline
 : SO_REUSEADDR HEX: 4 ; inline
@@ -24,7 +27,6 @@ IN: unix
 : F_SETFD 2 ; inline
 : F_SETFL 4 ; inline
 : FD_CLOEXEC 1 ; inline
-: O_NONBLOCK 4 ; inline
 
 C-STRUCT: sockaddr-in
     { "uchar" "len" }

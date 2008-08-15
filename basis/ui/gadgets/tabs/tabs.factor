@@ -48,8 +48,8 @@ DEFER: (del-page)
 : del-page ( name tabbed -- )
     [ names>> index ] 2keep (del-page) ;
 
-: <tabbed> ( assoc -- tabbed )
-  tabbed new-frame
+: new-tabbed ( assoc class -- tabbed )
+    new-frame
     0 <model> >>model
     <pile> 1 >>fill >>toggler
     dup toggler>> @left grid-add
@@ -59,3 +59,4 @@ DEFER: (del-page)
     bi
     dup redo-toggler ;
     
+: <tabbed> ( assoc -- tabbed ) tabbed new-tabbed ;
