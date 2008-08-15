@@ -135,9 +135,9 @@ M: output-port dispose*
     [
         {
             [ handle>> &dispose drop ]
+            [ buffer>> &dispose drop ]
             [ port-flush ]
             [ handle>> shutdown ]
-            [ buffer>> dispose ]
         } cleave
     ] with-destructors ;
 
