@@ -1,4 +1,4 @@
-USING: arrays html.parser.utils hashtables io kernel
+USING: accessors arrays html.parser.utils hashtables io kernel
 namespaces prettyprint quotations
 sequences splitting state-parser strings unicode.categories unicode.case ;
 IN: html.parser
@@ -23,8 +23,10 @@ SYMBOL: tagstack
     ] if ;
 
 : <tag> ( name attributes closing? -- tag )
-    { set-tag-name set-tag-attributes set-tag-closing? }
-    tag construct ;
+    tag new
+        swap >>closing?
+        swap >>attributes
+        swap >>name ;
 
 : make-tag ( str attribs -- tag )
     >r [ closing-tag? ] keep "/" trim1 r> rot <tag> ;
@@ -75,7 +77,7 @@ SYMBOL: tagstack
         read-quote
     ] [
         read-token
-    ] if ;
+    ] if [ blank? ] trim ;
 
 : read-comment ( -- )
     "-->" take-string* make-comment-tag push-tag ;

@@ -60,3 +60,4 @@ DEFER: check-status
 : 24-able ( -- vector ) build-quad dup 24-able? [ drop build-quad ] unless ;
 : set-commands ( -- ) { + - * / rot swap q } commands set ;
 : play-game ( -- ) set-commands 24-able repeat ;
+MAIN: play-game

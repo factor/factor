@@ -46,7 +46,7 @@ GENERIC: irc-command-parameters ( irc-message -- seq )
 M: irc-message irc-command-parameters ( irc-message -- seq ) parameters>> ;
 M: ping        irc-command-parameters ( ping -- seq )    drop { } ;
 M: join        irc-command-parameters ( join -- seq )    drop { } ;
-M: part        irc-command-parameters ( part -- seq )    name>> 1array ;
+M: part        irc-command-parameters ( part -- seq )    channel>> 1array ;
 M: quit        irc-command-parameters ( quit -- seq )    drop { } ;
 M: nick        irc-command-parameters ( nick -- seq )    drop { } ;
 M: privmsg     irc-command-parameters ( privmsg -- seq ) name>> 1array ;
@@ -97,6 +97,11 @@ M: irc-message irc-message>server-line ( irc-message -- string )
     ":" split1 ;
 
 PRIVATE>
+
+UNION: sender-in-prefix privmsg join part quit kick mode nick ;
+GENERIC: irc-message-sender ( irc-message -- sender )
+M: sender-in-prefix irc-message-sender ( sender-in-prefix -- sender )
+    prefix>> parse-name ;
 
 : string>irc-message ( string -- object )
     dup split-prefix split-trailing

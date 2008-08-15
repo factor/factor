@@ -211,8 +211,11 @@ PRIVATE>
 : insert-nth ( elt n seq -- seq' )
     swap cut-slice [ swap 1array ] dip 3append ;
 
-: if-seq ( seq quot1 quot2 -- )
-    [ f like ] 2dip if* ; inline
+: if-seq ( seq quot1 quot2 -- ) [ f like ] 2dip if* ; inline
+ 
+: if-empty ( seq quot1 quot2 -- ) swap if-seq ; inline
 
-: if-empty ( seq quot1 quot2 -- )
-    swap if-seq ; inline
+: when-empty ( seq quot1 -- ) [ ] if-empty ; inline
+
+: unless-empty ( seq quot1 -- ) [ ] swap if-empty ; inline
+
