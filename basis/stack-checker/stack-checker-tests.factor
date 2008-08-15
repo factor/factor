@@ -568,4 +568,10 @@ M: object inference-invalidation-d inference-invalidation-c 2drop ;
     dup 10 < [ 2drop 5 1 + unbalanced-retain-usage ] [ 2drop ] if ;
     inline recursive
 
-[ unbalanced-retain-usage ] [ inference-error? ] must-fail-with
+[ [ unbalanced-retain-usage ] infer ] [ inference-error? ] must-fail-with
+
+DEFER: eee'
+: ddd' ( ? -- ) [ f eee' ] when ; inline recursive
+: eee' ( ? -- ) >r swap [ ] r> ddd' call ; inline recursive
+
+[ [ eee' ] infer ] [ inference-error? ] must-fail-with

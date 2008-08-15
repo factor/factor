@@ -112,14 +112,13 @@ TUPLE: #return < node in-d ;
     \ #return new
         swap >>in-d ;
 
-TUPLE: #recursive < node in-d word label loop? returns calls child ;
+TUPLE: #recursive < node in-d word label loop? child ;
 
-: #recursive ( word label inputs child -- node )
+: #recursive ( label inputs child -- node )
     \ #recursive new
         swap >>child
         swap >>in-d
-        swap >>label
-        swap >>word ;
+        swap >>label ;
 
 TUPLE: #enter-recursive < node in-d out-d label ;
 

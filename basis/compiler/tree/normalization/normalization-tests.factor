@@ -3,8 +3,6 @@ USING: compiler.tree.builder compiler.tree.normalization
 compiler.tree sequences accessors tools.test kernel math ;
 
 \ count-introductions must-infer
-\ fixup-enter-recursive must-infer
-\ eliminate-introductions must-infer
 \ normalize must-infer
 
 [ 3 ] [ [ 3drop 1 2 3 ] build-tree count-introductions ] unit-test
@@ -27,3 +25,19 @@ compiler.tree sequences accessors tools.test kernel math ;
 ] unit-test
 
 [ ] [ [ [ 1 ] [ 2 ] if + * ] build-tree normalize drop ] unit-test
+
+DEFER: bbb
+: aaa ( x -- ) dup [ dup >r bbb r> aaa ] [ drop ] if ; inline recursive
+: bbb ( x -- ) >r drop 0 r> aaa ; inline recursive
+
+[ ] [ [ bbb ] build-tree normalize drop ] unit-test
+
+: ccc ( -- ) ccc drop 1 ; inline recursive
+
+[ ] [ [ ccc ] build-tree normalize drop ] unit-test
+
+DEFER: eee
+: ddd ( -- ) eee ; inline recursive
+: eee ( -- ) swap ddd ; inline recursive
+
+[ ] [ [ eee ] build-tree normalize drop ] unit-test

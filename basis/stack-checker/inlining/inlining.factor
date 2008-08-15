@@ -39,14 +39,19 @@ M: inline-recursive hashcode* id>> hashcode* ;
     dup pair? [ second effect? ] [ drop f ] if ;
 
 : make-copies ( values effect-in -- values' )
-    [ quotation-param? [ copy-value ] [ drop <value> ] if ] 2map ;
+    [ length cut* ] keep
+    [ quotation-param? [ copy-value ] [ drop <value> ] if ] 2map
+    append ;
 
 SYMBOL: enter-in
 SYMBOL: enter-out
 
 : prepare-stack ( word -- )
-    required-stack-effect in>> [ length ensure-d ] keep
-    [ drop enter-in set ] [ make-copies enter-out set ] 2bi ;
+    required-stack-effect in>>
+    [ length ensure-d drop ] [
+        meta-d get clone enter-in set
+        meta-d get swap make-copies enter-out set
+    ] bi ;
 
 : emit-enter-recursive ( label -- )
     enter-out get >>enter-out
@@ -74,7 +79,7 @@ SYMBOL: enter-out
 : recursive-word-inputs ( label -- n )
     entry-stack-height d-in get + ;
 
-: (inline-recursive-word) ( word -- word label in out visitor )
+: (inline-recursive-word) ( word -- label in out visitor )
     dup prepare-stack
     [
         init-inference
@@ -83,7 +88,7 @@ SYMBOL: enter-out
         dup <inline-recursive>
         [ dup emit-enter-recursive (inline-word) ]
         [ end-recursive-word ]
-        [ ]
+        [ nip ]
         2tri
 
         check->r
@@ -97,21 +102,26 @@ SYMBOL: enter-out
     (inline-recursive-word)
     [ consume-d ] [ output-d ] [ ] tri* #recursive, ;
 
-: check-call-height ( word label -- )
-    entry-stack-height current-stack-height >
-    [ diverging-recursion-error inference-error ] [ drop ] if ;
+: check-call-height ( label -- )
+    dup entry-stack-height current-stack-height >
+    [ word>> diverging-recursion-error inference-error ] [ drop ] if ;
+
+: trim-stack ( label seq -- stack )
+    swap word>> required-stack-effect in>> length tail* ;
 
 : call-site-stack ( label -- stack )
-    required-stack-effect in>> length meta-d get swap tail* ;
+    meta-d get trim-stack ;
 
-: check-call-site-stack ( stack label -- )
-    tuck enter-out>>
+: trimmed-enter-out ( label -- stack )
+    dup enter-out>> trim-stack ;
+
+: check-call-site-stack ( label -- )
+    [ ] [ call-site-stack ] [ trimmed-enter-out ] tri
     [ dup known [ [ known ] bi@ = ] [ 2drop t ] if ] 2all?
     [ drop ] [ word>> inconsistent-recursive-call-error inference-error ] if ;
 
-: add-call ( word label -- )
-    [ check-call-height ]
-    [ [ call-site-stack ] dip check-call-site-stack ] 2bi ;
+: check-call ( label -- )
+    [ check-call-height ] [ check-call-site-stack ] bi ;
 
 : adjust-stack-effect ( effect -- effect' )
     [ in>> ] [ out>> ] bi
@@ -122,9 +132,7 @@ SYMBOL: enter-out
 : call-recursive-inline-word ( word -- )
     dup "recursive" word-prop [
         [ required-stack-effect adjust-stack-effect ] [ ] [ recursive-label ] tri
-        [ add-call drop ]
-        [ nip '[ , #call-recursive, ] consume/produce ]
-        3bi
+        [ 2nip check-call ] [ nip '[ , #call-recursive, ] consume/produce ] 3bi
     ] [ undeclared-recursion-error inference-error ] if ;
 
 : inline-word ( word -- )

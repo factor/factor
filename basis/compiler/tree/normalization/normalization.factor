@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry namespaces sequences math accessors kernel arrays
+combinators sequences.deep assocs
 stack-checker.backend
 stack-checker.branches
 stack-checker.inlining
@@ -54,7 +55,8 @@ M: #branch count-introductions*
 
 M: #recursive count-introductions*
     [ label>> ] [ child>> count-introductions ] bi
-    >>introductions drop ;
+    >>introductions
+    drop ;
 
 M: node count-introductions* drop ;
 
@@ -72,15 +74,10 @@ M: #recursive collect-label-info
 
 M: node collect-label-info drop ;
 
-! Eliminate introductions
+! Normalize
+GENERIC: normalize* ( node -- node' )
+
 SYMBOL: introduction-stack
-
-: fixup-enter-recursive ( introductions recursive -- )
-    [ child>> first ] [ in-d>> ] bi >>in-d
-    [ append ] change-out-d
-    drop ;
-
-GENERIC: eliminate-introductions* ( node -- node' )
 
 : pop-introduction ( -- value )
     introduction-stack [ unclip-last swap ] change ;
@@ -88,18 +85,21 @@ GENERIC: eliminate-introductions* ( node -- node' )
 : pop-introductions ( n -- values )
     introduction-stack [ swap cut* swap ] change ;
 
-M: #introduce eliminate-introductions*
+M: #introduce normalize*
     out-d>> [ length pop-introductions ] keep #copy ;
 
 SYMBOL: remaining-introductions
 
-M: #branch eliminate-introductions*
-    dup children>> [
+M: #branch normalize*
+    [
         [
-            [ eliminate-introductions* ] change-each
-            introduction-stack get
-        ] with-scope
-    ] map
+            [
+                [ normalize* ] map flatten
+                introduction-stack get
+                2array
+            ] with-scope
+        ] map unzip swap
+    ] change-children swap
     [ remaining-introductions set ]
     [ [ length ] map infimum introduction-stack [ swap head ] change ]
     bi ;
@@ -112,51 +112,52 @@ M: #branch eliminate-introductions*
         ] if
     ] 3map ;
 
-M: #phi eliminate-introductions*
+M: #phi normalize*
     remaining-introductions get swap dup terminated>>
     '[ , eliminate-phi-introductions ] change-phi-in-d ;
 
-M: node eliminate-introductions* ;
-
-: eliminate-introductions ( nodes introductions -- nodes )
+: (normalize) ( nodes introductions -- nodes )
     introduction-stack [
-        [ eliminate-introductions* ] map
+        [ normalize* ] map flatten
     ] with-variable ;
 
-: eliminate-toplevel-introductions ( nodes -- nodes' )
-    dup count-introductions make-values
-    [ eliminate-introductions ] [ nip #introduce ] 2bi
-    prefix ;
-
-: eliminate-recursive-introductions ( recursive n -- )
-    make-values
-    [ swap fixup-enter-recursive ]
-    [ '[ , eliminate-introductions ] change-child drop ]
+M: #recursive normalize*
+    dup label>> introductions>>
+    [ drop [ child>> first ] [ in-d>> ] bi >>in-d drop ]
+    [ make-values '[ , (normalize) ] change-child ]
     2bi ;
 
-! Normalize
-GENERIC: normalize* ( node -- node' )
-
-M: #recursive normalize*
-    dup dup label>> introductions>>
-    eliminate-recursive-introductions ;
-
 M: #enter-recursive normalize*
+    [ introduction-stack get prepend ] change-out-d
     dup [ label>> ] keep >>enter-recursive drop
     dup [ label>> ] [ out-d>> ] bi >>enter-out drop ;
 
 : unchanged-underneath ( #call-recursive -- n )
     [ out-d>> length ] [ label>> return>> in-d>> length ] bi - ;
 
-M: #call-recursive normalize*
-    dup unchanged-underneath
+: call<return ( #call-recursive n -- nodes )
+    neg dup make-values [
+        [ pop-introductions '[ , prepend ] change-in-d ]
+        [ '[ , prepend ] change-out-d ]
+        bi*
+    ] [ introduction-stack [ prepend ] change ] bi ;
+
+: call>return ( #call-recursive n -- nodes )
     [ [ [ in-d>> ] [ out-d>> ] bi ] [ '[ , head ] ] bi* bi@ #copy ]
     [ '[ , tail ] [ change-in-d ] [ change-out-d ] bi ]
     2bi 2array ;
+
+M: #call-recursive normalize*
+    dup unchanged-underneath {
+        { [ dup 0 < ] [ call<return ] }
+        { [ dup 0 = ] [ drop ] }
+        { [ dup 0 > ] [ call>return ] }
+    } cond ;
 
 M: node normalize* ;
 
 : normalize ( nodes -- nodes' )
     dup [ collect-label-info ] each-node
-    eliminate-toplevel-introductions
-    [ normalize* ] map-nodes ;
+    dup count-introductions make-values
+    [ (normalize) ] [ nip #introduce ] 2bi
+    prefix ;
