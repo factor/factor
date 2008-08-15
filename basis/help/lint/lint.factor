@@ -3,9 +3,9 @@
 USING: accessors sequences parser kernel help help.markup
 help.topics words strings classes tools.vocabs namespaces io
 io.streams.string prettyprint definitions arrays vectors
-combinators splitting debugger hashtables sorting effects vocabs
-vocabs.loader assocs editors continuations classes.predicate
-macros math sets eval ;
+combinators combinators.short-circuit splitting debugger
+hashtables sorting effects vocabs vocabs.loader assocs editors
+continuations classes.predicate macros math sets eval ;
 IN: help.lint
 
 : check-example ( element -- )
@@ -43,15 +43,15 @@ IN: help.lint
 
 : check-values ( word element -- )
     {
-        { [ over "declared-effect" word-prop ] [ 2drop ] }
-        { [ dup contains-funky-elements? not ] [ 2drop ] }
-        { [ over macro? not ] [ 2drop ] }
+        [ drop "declared-effect" word-prop not ]
+        [ nip contains-funky-elements? ]
+        [ drop macro? ]
         [
             [ effect-values >array ]
             [ extract-values >array ]
-            bi* assert=
+            bi* =
         ]
-    } cond ;
+    } 2|| [ "$values don't match stack effect" throw ] unless ;
 
 : check-see-also ( word element -- )
     nip \ $see-also swap elements [
