@@ -15,9 +15,8 @@ M: invalid-baud summary ( invalid-baud -- string )
     " not supported" 3append ;
 
 HOOK: lookup-baud os ( m -- n )
-HOOK: open-serial os ( serial -- serial' )
-M: serial dispose ( serial -- ) stream>> dispose ;
+HOOK: open-serial os ( serial -- stream )
 
 {
-    { [ os unix? ] [ "serial.unix" ] } 
+    { [ os unix? ] [ "io.serial.unix" ] } 
 } cond require

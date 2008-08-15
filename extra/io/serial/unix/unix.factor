@@ -2,12 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types alien.syntax combinators io.ports
 io.streams.duplex io.unix.backend system kernel math math.bitfields
-vocabs.loader unix serial serial.unix.termios ;
+vocabs.loader unix io.serial io.serial.unix.termios ;
 IN: io.serial.unix
 
 << {
-    { [ os linux? ] [ "serial.unix.linux" ] }
-    { [ os bsd? ] [ "serial.unix.bsd" ] }
+    { [ os linux? ] [ "io.serial.unix.linux" ] }
+    { [ os bsd? ] [ "io.serial.unix.bsd" ] }
 } cond require >>
 
 FUNCTION: speed_t cfgetispeed ( termios* t ) ;
@@ -31,9 +31,8 @@ FUNCTION: int cfsetspeed ( termios* t, speed_t s ) ;
 : <file-rw> ( path -- stream ) open-rw fd>duplex-stream ;
 
 M: unix open-serial ( serial -- serial' )
-    dup
     path>> { O_RDWR O_NOCTTY O_NDELAY } flags file-mode open-file
-    fd>duplex-stream >>stream ;
+    fd>duplex-stream ;
 
 : serial-fd ( serial -- fd )
     stream>> in>> handle>> fd>> ;

@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs alien.syntax kernel serial system unix ;
+USING: assocs alien.syntax kernel io.serial system unix ;
 IN: io.serial.unix
 
 : TCSANOW     0 ; inline

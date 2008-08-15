@@ -4,6 +4,6 @@ USING: combinators system vocabs.loader ;
 IN: io.serial.unix.termios
 
 {
-    { [ os linux? ] [ "serial.unix.termios.linux" ] }
-    { [ os bsd? ] [ "serial.unix.termios.bsd" ] }
+    { [ os linux? ] [ "io.serial.unix.termios.linux" ] }
+    { [ os bsd? ] [ "io.serial.unix.termios.bsd" ] }
 } cond require
