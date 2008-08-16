@@ -16,6 +16,7 @@ USING: alien.syntax ;
 : O_TRUNC    HEX: 0200 ; inline
 : O_APPEND   HEX: 0400 ; inline
 : O_NONBLOCK HEX: 0800 ; inline
+: O_NDELAY O_NONBLOCK ; inline
 
 : SOL_SOCKET 1 ; inline
 

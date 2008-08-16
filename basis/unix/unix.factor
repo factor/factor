@@ -25,8 +25,6 @@ TYPEDEF: uint socklen_t
 
 : NGROUPS_MAX 16 ; inline
 
-: O_NDELAY O_NONBLOCK ; inline
-
 C-STRUCT: group
     { "char*" "gr_name" }
     { "char*" "gr_passwd" }
@@ -194,4 +192,3 @@ FUNCTION: ssize_t write ( int fd, void* buf, size_t nbytes ) ;
     { [ os bsd? ] [ "unix.bsd" require ] }
     { [ os solaris? ] [ "unix.solaris" require ] }
 } cond
-

@@ -171,10 +171,11 @@ M: block section-fits? ( section -- ? )
     line-limit? [ drop t ] [ call-next-method ] if ;
 
 : pprint-sections ( block advancer -- )
-    swap sections>> [ line-break? not ] filter
-    unclip pprint-section [
-        dup rot call pprint-section
-    ] with each ; inline
+    [
+        sections>> [ line-break? not ] filter
+        unclip-slice pprint-section
+    ] dip
+    [ [ pprint-section ] bi ] curry each ; inline
 
 M: block short-section ( block -- )
     [ advance ] pprint-sections ;

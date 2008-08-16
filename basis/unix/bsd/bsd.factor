@@ -16,6 +16,7 @@ IN: unix
 : O_TRUNC    HEX: 0400 ; inline
 : O_EXCL     HEX: 0800 ; inline
 : O_NOCTTY   HEX: 20000 ; inline
+: O_NDELAY O_NONBLOCK ; inline
 
 : SOL_SOCKET HEX: ffff ; inline
 : SO_REUSEADDR HEX: 4 ; inline

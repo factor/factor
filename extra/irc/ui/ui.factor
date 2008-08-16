@@ -8,7 +8,7 @@ USING: accessors kernel threads combinators concurrency.mailboxes
        ui.gadgets.scrollers ui.commands ui.gadgets.frames ui.gestures
        ui.gadgets.tabs ui.gadgets.grids ui.gadgets.packs ui.gadgets.labels
        io io.styles namespaces calendar calendar.format models continuations
-       irc.client irc.client.private irc.messages irc.messages.private
+       irc.client irc.client.private irc.messages
        irc.ui.commandparser irc.ui.load ;
 
 RENAME: join sequences => sjoin
@@ -21,7 +21,10 @@ SYMBOL: client
 
 TUPLE: ui-window < tabbed client ;
 
-TUPLE: irc-tab < frame listener client window userlist ;
+M: ui-window ungraft*
+    client>> terminate-irc ;
+
+TUPLE: irc-tab < frame listener client window ;
 
 : write-color ( str color -- )
     foreground associate format ;
@@ -39,7 +42,7 @@ M: ping write-irc
 
 M: privmsg write-irc
     "<" blue write-color
-    [ prefix>> parse-name write ] keep
+    [ irc-message-sender write ] keep
     "> " blue write-color
     trailing>> write ;
 
@@ -61,24 +64,24 @@ M: own-message write-irc
 
 M: join write-irc
     "* " dark-green write-color
-    prefix>> parse-name write
+    irc-message-sender write
     " has entered the channel." dark-green write-color ;
 
 M: part write-irc
     "* " dark-red write-color
-    [ prefix>> parse-name write ] keep
+    [ irc-message-sender write ] keep
     " has left the channel" dark-red write-color
     trailing>> dot-or-parens dark-red write-color ;
 
 M: quit write-irc
     "* " dark-red write-color
-    [ prefix>> parse-name write ] keep
+    [ irc-message-sender write ] keep
     " has left IRC" dark-red write-color
     trailing>> dot-or-parens dark-red write-color ;
 
 M: kick write-irc
     "* " dark-red write-color
-    [ prefix>> parse-name write ] keep
+    [ irc-message-sender write ] keep
     " has kicked " dark-red write-color
     [ who>> write ] keep
     " from the channel" dark-red write-color
@@ -89,7 +92,7 @@ M: kick write-irc
 
 M: mode write-irc
     "* " blue write-color
-    [ prefix>> parse-name write ] keep
+    [ irc-message-sender write ] keep
     " has applied mode " blue write-color
     [ full-mode write ] keep
     " to " blue write-color
@@ -97,7 +100,7 @@ M: mode write-irc
 
 M: nick write-irc
     "* " blue write-color
-    [ prefix>> parse-name write ] keep
+    [ irc-message-sender write ] keep
     " is now known as " blue write-color
     trailing>> write ;
 
@@ -120,8 +123,11 @@ M: irc-listener-end write-irc
 M: irc-message write-irc
     drop ; ! catch all unimplemented writes, THIS WILL CHANGE    
 
-: time-happened ( irc-message -- timestamp )
-    [ timestamp>> ] [ 2drop now ] recover ;
+GENERIC: time-happened ( message -- timestamp )
+
+M: irc-message time-happened timestamp>> ;
+
+M: object time-happened drop now ;
 
 : print-irc ( irc-message -- )
     [ time-happened timestamp>hms write " " write ]
@@ -138,16 +144,6 @@ GENERIC: handle-inbox ( tab message -- )
 
 : add-gadget-color ( pack seq color -- pack )
     '[ , >>color add-gadget ] each ;
-
-: update-participants ( tab -- )
-    [ userlist>> [ clear-gadget ] keep ]
-    [ listener>> participants>> ] bi
-    [ +operator+ value-labels dark-green add-gadget-color ]
-    [ +voice+ value-labels blue add-gadget-color ]
-    [ +normal+ value-labels black add-gadget-color ] tri drop ;
-
-M: participant-changed handle-inbox
-    drop update-participants ;
 
 M: object handle-inbox
     nip print-irc ;
@@ -195,17 +191,23 @@ M: irc-tab ungraft*
 TUPLE: irc-channel-tab < irc-tab userlist ;
 
 : <irc-channel-tab> ( listener ui-window -- irc-tab )
-    irc-tab new-irc-tab
+    irc-channel-tab new-irc-tab
     <pile> [ <scroller> @right grid-add ] keep >>userlist ;
+
+: update-participants ( tab -- )
+    [ userlist>> [ clear-gadget ] keep ]
+    [ listener>> participants>> ] bi
+    [ +operator+ value-labels dark-green add-gadget-color ]
+    [ +voice+ value-labels blue add-gadget-color ]
+    [ +normal+ value-labels black add-gadget-color ] tri drop ;
+
+M: participant-changed handle-inbox
+    drop update-participants ;
 
 TUPLE: irc-server-tab < irc-tab ;
 
 : <irc-server-tab> ( listener -- irc-tab )
     f irc-server-tab new-irc-tab ;
-
-M: irc-server-tab ungraft*
-    [ window>> client>> terminate-irc ]
-    [ listener>> ] [ window>> client>> ] tri remove-listener ;
 
 : <irc-nick-tab> ( listener ui-window -- irc-tab )
     irc-tab new-irc-tab ;

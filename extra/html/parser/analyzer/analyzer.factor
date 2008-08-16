@@ -140,6 +140,12 @@ TUPLE: link attributes clickable ;
 : href-contains? ( str tag -- ? )
     attributes>> "href" swap at* [ subseq? ] [ 2drop f ] if ;
 
+: find-hrefs ( vector -- vector' )
+    find-links
+    [ [
+        [ name>> "a" = ]
+        [ attributes>> "href" swap key? ] bi and ] filter
+    ] map sift [ [ attributes>> "href" swap at ] map ] map concat ;
 
 : find-forms ( vector -- vector' )
     "form" over find-opening-tags-by-name
