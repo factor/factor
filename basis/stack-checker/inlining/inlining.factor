@@ -41,7 +41,7 @@ M: inline-recursive hashcode* id>> hashcode* ;
 : make-copies ( values effect-in -- values' )
     [ length cut* ] keep
     [ quotation-param? [ copy-value ] [ drop <value> ] if ] 2map
-    append ;
+    [ make-values ] dip append ;
 
 SYMBOL: enter-in
 SYMBOL: enter-out
@@ -125,7 +125,7 @@ SYMBOL: enter-out
 
 : adjust-stack-effect ( effect -- effect' )
     [ in>> ] [ out>> ] bi
-    meta-d get length pick length - 0 max
+    meta-d get length pick length [-]
     object <repetition> '[ , prepend ] bi@
     <effect> ;
 

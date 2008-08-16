@@ -5,7 +5,8 @@ accessors sequences arrays kernel.private vectors
 alien.accessors alien.c-types sequences.private
 byte-arrays classes.algebra classes.tuple.private
 math.functions math.private strings layouts
-compiler.tree.propagation.info slots.private words hashtables
+compiler.tree.propagation.info compiler.tree.def-use
+compiler.tree.checker slots.private words hashtables
 classes assocs ;
 IN: compiler.tree.propagation.tests
 
@@ -15,6 +16,8 @@ IN: compiler.tree.propagation.tests
     build-tree
     normalize
     propagate
+    compute-def-use
+    dup check-nodes
     peek node-input-infos ;
 
 : final-classes ( quot -- seq )
