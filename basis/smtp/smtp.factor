@@ -26,6 +26,8 @@ LOG: log-smtp-connection NOTICE ( addrspec -- )
 TUPLE: email
     { from string }
     { to array }
+    { cc array }
+    { bcc array }
     { subject string }
     { body string } ;
 
@@ -154,9 +156,12 @@ ERROR: invalid-header-string string ;
 
 : email>headers ( email -- hashtable )
     [
-        [ from>> "From" set ]
-        [ to>> ", " join "To" set ]
-        [ subject>> "Subject" set ] tri
+        {
+            [ from>> "From" set ]
+            [ to>> ", " join "To" set ]
+            [ cc>> ", " join "Cc" set ]
+            [ subject>> "Subject" set ]
+        } cleave
         now timestamp>rfc822 "Date" set
         message-id "Message-Id" set
     ] { } make-assoc ;
@@ -166,6 +171,8 @@ ERROR: invalid-header-string string ;
         helo get-ok
         dup from>> extract-email mail-from get-ok
         dup to>> [ extract-email rcpt-to get-ok ] each
+        dup cc>> [ extract-email rcpt-to get-ok ] each
+        dup bcc>> [ extract-email rcpt-to get-ok ] each
         data get-ok
         swap write-headers
         crlf
