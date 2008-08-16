@@ -58,19 +58,37 @@ LOG: log-smtp-connection NOTICE ( addrspec -- )
 
 LOG: smtp-response DEBUG
 
+ERROR: smtp-error message ;
+ERROR: smtp-server-busy < smtp-error ;
+ERROR: smtp-syntax-error < smtp-error ;
+ERROR: smtp-command-not-implemented < smtp-error ;
+ERROR: smtp-bad-authentication < smtp-error ;
+ERROR: smtp-mailbox-unavailable < smtp-error ;
+ERROR: smtp-user-not-local < smtp-error ;
+ERROR: smtp-exceeded-storage-allocation < smtp-error ;
+ERROR: smtp-bad-mailbox-name < smtp-error ;
+ERROR: smtp-transaction-failed < smtp-error ;
+
 : check-response ( response -- )
+    dup smtp-response
     {
-        { [ dup "220" head? ] [ smtp-response ] }
-        { [ dup "235" swap subseq? ] [ smtp-response ] }
-        { [ dup "250" head? ] [ smtp-response ] }
-        { [ dup "221" head? ] [ smtp-response ] }
-        { [ dup "bye" head? ] [ smtp-response ] }
-        { [ dup "4" head? ] [ "server busy" throw ] }
-        { [ dup "354" head? ] [ smtp-response ] }
-        { [ dup "50" head? ] [ smtp-response "syntax error" throw ] }
-        { [ dup "53" head? ] [ smtp-response "invalid authentication data" throw ] }
-        { [ dup "55" head? ] [ smtp-response "fatal error" throw ] }
-        [ "unknown error" throw ]
+        { [ dup "bye" head? ] [ drop ] }
+        { [ dup "220" head? ] [ drop ] }
+        { [ dup "235" swap subseq? ] [ drop ] }
+        { [ dup "250" head? ] [ drop ] }
+        { [ dup "221" head? ] [ drop ] }
+        { [ dup "354" head? ] [ drop ] }
+        { [ dup "4" head? ] [ smtp-server-busy ] }
+        { [ dup "500" head? ] [ smtp-syntax-error ] }
+        { [ dup "501" head? ] [ smtp-command-not-implemented ] }
+        { [ dup "50" head? ] [ smtp-syntax-error ] }
+        { [ dup "53" head? ] [ smtp-bad-authentication ] }
+        { [ dup "550" head? ] [ smtp-mailbox-unavailable ] }
+        { [ dup "551" head? ] [ smtp-user-not-local ] }
+        { [ dup "552" head? ] [ smtp-exceeded-storage-allocation ] }
+        { [ dup "553" head? ] [ smtp-bad-mailbox-name ] }
+        { [ dup "554" head? ] [ smtp-transaction-failed ] }
+        [ smtp-error ]
     } cond ;
 
 : multiline? ( response -- boolean )
