@@ -1,10 +1,10 @@
 ! Copyright (C) 2007, 2008 Elie CHAFTARI, Dirk Vleugels,
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces io io.timeouts kernel logging io.sockets
+USING: arrays namespaces io io.timeouts kernel logging io.sockets
 sequences combinators sequences.lib splitting assocs strings
 math.parser random system calendar io.encodings.ascii summary
-calendar.format accessors sets ;
+calendar.format accessors sets hashtables ;
 IN: smtp
 
 SYMBOL: smtp-domain
@@ -132,7 +132,14 @@ ERROR: invalid-header-string string ;
 : write-headers ( assoc -- )
     [ write-header ] assoc-each ;
 
-TUPLE: email from to subject headers body ;
+TUPLE: email
+    { from string }
+    { to array }
+    { subject string }
+    { headers hashtable }
+    { body string } ;
+
+: <email> ( -- email ) email new ;
 
 M: email clone
     call-next-method [ clone ] change-headers ;
@@ -176,10 +183,6 @@ M: email clone
     dup subject>> "Subject" set-header
     now timestamp>rfc822 "Date" set-header
     message-id "Message-Id" set-header ;
-
-: <email> ( -- email )
-    email new
-    H{ } clone >>headers ;
 
 : send-email ( email -- )
     prepare (send) ;
