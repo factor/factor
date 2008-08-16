@@ -31,6 +31,8 @@ IN: combinators.lib
 ! Generalized versions of core combinators
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: quad ( x p q r s -- ) >r >r >r keep r> keep r> keep r> call ; inline
+
 : 4slip ( quot a b c d -- a b c d ) 4 nslip ; inline
 
 : 4keep ( w x y z quot -- w x y z ) 4 nkeep ; inline 
@@ -137,7 +139,7 @@ MACRO: multikeep ( word out-indexes -- ... )
     [ drop ] rot compose attempt-all ; inline
 
 : do-while ( pred body tail -- )
-    >r tuck 2slip r> while ;
+    >r tuck 2slip r> while ; inline
 
 : generate ( generator predicate -- obj )
     [ dup ] swap [ dup [ nip ] unless not ] 3compose
