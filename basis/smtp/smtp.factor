@@ -3,7 +3,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces io io.timeouts kernel logging io.sockets
 sequences combinators sequences.lib splitting assocs strings
-math.parser random system calendar io.encodings.ascii
+math.parser random system calendar io.encodings.ascii summary
 calendar.format accessors sets ;
 IN: smtp
 
@@ -30,10 +30,12 @@ LOG: log-smtp-connection NOTICE ( addrspec -- )
 : helo ( -- )
     esmtp get "EHLO " "HELO " ? host-name append command ;
 
+ERROR: bad-email-address email ;
+
 : validate-address ( string -- string' )
     #! Make sure we send funky stuff to the server by accident.
     dup "\r\n>" intersect empty?
-    [ "Bad e-mail address: " prepend throw ] unless ;
+    [ bad-email-address ] unless ;
 
 : mail-from ( fromaddr -- )
     "MAIL FROM:<" swap validate-address ">" 3append command ;
@@ -44,8 +46,15 @@ LOG: log-smtp-connection NOTICE ( addrspec -- )
 : data ( -- )
     "DATA" command ;
 
+ERROR: message-contains-dot message ;
+
+M: message-contains-dot summary ( obj -- string )
+    drop
+    "Message cannot contain . on a line by itself" ;
+
 : validate-message ( msg -- msg' )
-    "." over member? [ "Message cannot contain . on a line by itself" throw ] when ;
+    "." over member?
+    [ message-contains-dot ] when ;
 
 : send-body ( body -- )
     string-lines
@@ -107,9 +116,11 @@ ERROR: smtp-transaction-failed < smtp-error ;
 
 : get-ok ( -- ) receive-response check-response ;
 
+ERROR: invalid-header-string string ;
+
 : validate-header ( string -- string' )
     dup "\r\n" intersect empty?
-    [ "Invalid header string: " prepend throw ] unless ;
+    [ invalid-header-string ] unless ;
 
 : write-header ( key value -- )
     swap
