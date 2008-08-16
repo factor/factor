@@ -23,6 +23,14 @@ LOG: log-smtp-connection NOTICE ( addrspec -- )
         call
     ] with-client ; inline
 
+TUPLE: email
+    { from string }
+    { to array }
+    { subject string }
+    { body string } ;
+
+: <email> ( -- email ) email new ;
+
 : crlf ( -- ) "\r\n" write ;
 
 : command ( string -- ) write crlf flush ;
@@ -123,42 +131,11 @@ ERROR: invalid-header-string string ;
     [ invalid-header-string ] unless ;
 
 : write-header ( key value -- )
-    swap
-    validate-header write
-    ": " write
-    validate-header write
-    crlf ;
+    [ validate-header write ]
+    [ ": " write validate-header write ] bi* crlf ;
 
 : write-headers ( assoc -- )
     [ write-header ] assoc-each ;
-
-TUPLE: email
-    { from string }
-    { to array }
-    { subject string }
-    { headers hashtable }
-    { body string } ;
-
-: <email> ( -- email ) email new ;
-
-M: email clone
-    call-next-method [ clone ] change-headers ;
-
-: (send) ( email -- )
-    [
-        helo get-ok
-        dup from>> mail-from get-ok
-        dup to>> [ rcpt-to get-ok ] each
-        data get-ok
-        dup headers>> write-headers
-        crlf
-        body>> send-body get-ok
-        quit get-ok
-    ] with-smtp-connection ;
-
-: extract-email ( recepient -- email )
-    #! This could be much smarter.
-    " " last-split1 swap or "<" ?head drop ">" ?tail drop ;
 
 : message-id ( -- string )
     [
@@ -171,21 +148,33 @@ M: email clone
         ">" %
     ] "" make ;
 
-: set-header ( email value key -- email )
-    pick headers>> set-at ;
+: extract-email ( recepient -- email )
+    #! This could be much smarter.
+    " " last-split1 swap or "<" ?head drop ">" ?tail drop ;
 
-: prepare ( email -- email )
-    clone
-    dup from>> "From" set-header
-    [ extract-email ] change-from
-    dup to>> ", " join "To" set-header
-    [ [ extract-email ] map ] change-to
-    dup subject>> "Subject" set-header
-    now timestamp>rfc822 "Date" set-header
-    message-id "Message-Id" set-header ;
+: email>headers ( email -- hashtable )
+    [
+        [ from>> "From" set ]
+        [ to>> ", " join "To" set ]
+        [ subject>> "Subject" set ] tri
+        now timestamp>rfc822 "Date" set
+        message-id "Message-Id" set
+    ] { } make-assoc ;
+
+: (send-email) ( headers email -- )
+    [
+        helo get-ok
+        dup from>> extract-email mail-from get-ok
+        dup to>> [ extract-email rcpt-to get-ok ] each
+        data get-ok
+        swap write-headers
+        crlf
+        body>> send-body get-ok
+        quit get-ok
+    ] with-smtp-connection ;
 
 : send-email ( email -- )
-    prepare (send) ;
+    [ email>headers ] keep (send-email) ;
 
 ! Dirk's old AUTH CRAM-MD5 code. I don't know anything about
 ! CRAM MD5, and the old code didn't work properly either, so here
