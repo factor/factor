@@ -4,7 +4,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel combinators fry namespaces quotations hashtables
 sequences assocs arrays inference effects math math.ranges
-generalizations macros continuations locals ;
+generalizations macros continuations random locals ;
 
 IN: combinators.lib
 
@@ -147,3 +147,5 @@ MACRO: predicates ( seq -- quot/f )
     dup [ 1quotation [ drop ] prepend ] map
     >r [ [ dup ] prepend ] map r> zip [ drop f ] suffix
     [ cond ] curry ;
+
+: %chance ( quot integer -- ) 100 random > swap when ; inline
