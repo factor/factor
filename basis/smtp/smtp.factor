@@ -159,7 +159,7 @@ ERROR: invalid-header-string string ;
         {
             [ from>> "From" set ]
             [ to>> ", " join "To" set ]
-            [ cc>> ", " join "Cc" set ]
+            [ cc>> ", " join [ "Cc" set ] unless-empty ]
             [ subject>> "Subject" set ]
         } cleave
         now timestamp>rfc822 "Date" set
