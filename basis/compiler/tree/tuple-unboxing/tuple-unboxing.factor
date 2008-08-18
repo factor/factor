@@ -58,9 +58,11 @@ M: #push unbox-tuples* ( #push -- nodes )
 
 : unbox-slot-access ( #call -- nodes )
     dup out-d>> first unboxed-slot-access? [
-        [ in-d>> second 1array #drop ]
-        [ prepare-slot-access slot-access-shuffle ]
-        bi 2array
+       !  [ in-d>> second 1array #drop ]
+       ! [
+    prepare-slot-access slot-access-shuffle
+    ! ]
+    !    bi 2array
     ] when ;
 
 M: #call unbox-tuples*
@@ -132,5 +134,7 @@ M: #introduce unbox-tuples* dup out-d>> assert-not-unboxed ;
 M: #alien-invoke unbox-tuples* dup in-d>> assert-not-unboxed ;
 
 M: #alien-indirect unbox-tuples* dup in-d>> assert-not-unboxed ;
+
+M: #alien-callback unbox-tuples* ;
 
 : unbox-tuples ( nodes -- nodes ) [ unbox-tuples* ] map-nodes ;

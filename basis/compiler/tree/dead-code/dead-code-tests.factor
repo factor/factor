@@ -4,7 +4,8 @@ compiler.tree.combinators compiler.tree.propagation
 compiler.tree.cleanup compiler.tree.escape-analysis
 compiler.tree.tuple-unboxing compiler.tree.debugger
 compiler.tree.normalization compiler.tree.checker tools.test
-kernel math stack-checker.state accessors combinators io ;
+kernel math stack-checker.state accessors combinators io
+prettyprint ;
 IN: compiler.tree.dead-code.tests
 
 \ remove-dead-code must-infer
@@ -96,9 +97,4 @@ IN: compiler.tree.dead-code.tests
 
 [ ] [ [ dup [ 3 throw ] [ ] if ] optimize-quot drop ] unit-test
 
-: non-flushable-4 ( a -- b ) drop f ;
-
-: recursive-test-1 ( a b -- )
-    dup 10 < [
-        >r drop 5 non-flushable-4 r> 1 + recursive-test-1
-    ] [ 2drop ] if ; inline recursive
+[ [ [ . ] [ drop ] if ] ] [ [ [ dup . ] [ ] if drop ] optimize-quot ] unit-test

@@ -37,3 +37,12 @@ TUPLE: empty-tuple ;
     [ [ <=> ] sort ]
     [ [ <=> ] with search ]
 } [ [ ] swap [ test-unboxing ] curry unit-test ] each
+
+! A more complicated example
+: impeach-node ( quot: ( node -- ) -- )
+    dup slip impeach-node ; inline recursive
+
+: bleach-node ( quot: ( node -- ) -- )
+    [ bleach-node ] curry [ ] compose impeach-node ; inline recursive
+
+[ ] [ [ [ ] bleach-node ] test-unboxing ] unit-test

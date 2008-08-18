@@ -80,9 +80,9 @@ nl
     malloc calloc free memcpy
 } compile-uncompiled
 
-{
-    build-tree optimize-tree
-} compile-uncompiled
+{ build-tree } compile-uncompiled
+
+{ optimize-tree } compile-uncompiled
 
 vocabs [ words compile-uncompiled "." write flush ] each
 

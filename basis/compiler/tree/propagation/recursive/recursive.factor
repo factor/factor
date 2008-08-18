@@ -52,7 +52,6 @@ IN: compiler.tree.propagation.recursive
     3bi ;
 
 M: #recursive propagate-around ( #recursive -- )
-    "blah" USE: io print
     { 0 } clone [ USE: math
         dup first 10 = [ "OOPS" throw ] [ dup first 1+ swap set-first ] if
         constraints [ clone ] change

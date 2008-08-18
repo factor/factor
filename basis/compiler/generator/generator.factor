@@ -92,7 +92,7 @@ M: node generate-node drop iterate-next ;
     %jump-label ;
 
 : generate-call ( label -- next )
-    dup maybe-compile
+    ! dup maybe-compile
     end-basic-block
     dup compiling-loops get at [
         %jump-label f
@@ -232,7 +232,7 @@ M: #dispatch generate-node
     ] if ;
 
 M: #call generate-node
-    ! dup node-input-infos [ class>> ] map set-operand-classes
+    dup node-input-infos [ class>> ] map set-operand-classes
     dup find-if-intrinsic [
         do-if-intrinsic
     ] [

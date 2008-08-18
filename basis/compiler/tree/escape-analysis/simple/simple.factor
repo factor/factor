@@ -59,10 +59,10 @@ M: #push escape-analysis*
     ] [ 2drop f ] if ;
 
 : record-slot-call ( #call -- )
-    [ out-d>> first ] [ slot-offset ] [ in-d>> first ] tri
-    over [
-        [ record-slot-access ] [ copy-slot-value ] 3bi
-    ] [ 2drop unknown-allocation ] if ;
+    [ out-d>> first ] [ slot-offset ] [ in-d>> first ] tri over
+    [ [ record-slot-access ] [ copy-slot-value ] 3bi ]
+    [ [ unknown-allocation ] [ drop ] [ add-escaping-value ] tri* ]
+    if ;
 
 M: #call escape-analysis*
     dup word>> {
@@ -88,3 +88,5 @@ M: #alien-indirect escape-analysis*
     [ in-d>> add-escaping-values ]
     [ out-d>> unknown-allocations ]
     bi ;
+
+M: #alien-callback escape-analysis* drop ;

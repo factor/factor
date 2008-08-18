@@ -6,7 +6,7 @@ compiler.tree.propagation compiler.tree.cleanup
 compiler.tree.combinators compiler.tree sequences math math.private
 kernel tools.test accessors slots.private quotations.private
 prettyprint classes.tuple.private classes classes.tuple
-compiler.tree.intrinsics ;
+compiler.tree.intrinsics namespaces ;
 
 \ escape-analysis must-infer
 
@@ -295,3 +295,13 @@ C: <ro-box> ro-box
 [ 1 ] [ [ 1 cons boa 2 cons boa car>> ] count-unboxed-allocations ] unit-test
 
 [ 0 ] [ [ 1 cons boa 2 cons boa dup . car>> ] count-unboxed-allocations ] unit-test
+
+[ 0 ] [ [ 1 cons boa "x" get slot ] count-unboxed-allocations ] unit-test
+
+: impeach-node ( quot: ( node -- ) -- )
+    dup slip impeach-node ; inline recursive
+
+: bleach-node ( quot: ( node -- ) -- )
+    [ bleach-node ] curry [ ] compose impeach-node ; inline recursive
+
+[ 2 ] [ [ [ ] bleach-node ] count-unboxed-allocations ] unit-test

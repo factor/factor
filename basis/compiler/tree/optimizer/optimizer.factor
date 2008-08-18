@@ -21,10 +21,10 @@ IN: compiler.tree.optimizer
     detect-loops
     ! invert-loops
     ! fuse-branches
-    ! escape-analysis
-    ! unbox-tuples
-    ! compute-def-use
-    ! remove-dead-code
+    escape-analysis
+    unbox-tuples
+    compute-def-use
+    remove-dead-code
     ! strength-reduce
     compute-def-use USE: kernel
     dup check-nodes ;

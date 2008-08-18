@@ -223,9 +223,6 @@ GENERIC: error-in-thread ( error thread -- )
     dup register-thread
     set-self ;
 
-[ self error-in-thread stop ]
-thread-error-hook set-global
-
 PRIVATE>
 
 [ init-threads ] "threads" add-init-hook
