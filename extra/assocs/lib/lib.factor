@@ -38,8 +38,11 @@ IN: assocs.lib
         swap [ change-at ] 2curry assoc-each
     ] keep ; inline
 
+: ?at ( obj1 assoc -- obj1/obj2 )
+    dupd at* [ nip ] [ drop ] if ;
+
 : if-at ( obj assoc quot1 quot2 -- )
-    [ dupd at* [ not -rot ? ] keep ] 2dip if ; inline
+    [ ?at dup ] 2dip if ; inline
 
 : when-at ( obj assoc quot -- ) [ ] if-at ; inline
 
