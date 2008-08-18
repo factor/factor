@@ -173,7 +173,12 @@ M: reversed length seq>> length ;
 
 INSTANCE: reversed virtual-sequence
 
-: reverse ( seq -- newseq ) [ <reversed> ] [ like ] bi ;
+: reverse ( seq -- newseq )
+    [
+        dup [ length ] keep new-sequence
+        [ 0 swap copy ] keep
+        [ reverse-here ] keep
+    ] keep like ;
 
 ! A slice of another sequence.
 TUPLE: slice
