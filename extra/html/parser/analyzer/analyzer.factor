@@ -56,8 +56,7 @@ TUPLE: link attributes clickable ;
 : trim-text ( vector -- vector' )
     [
         dup name>> text = [
-            [ text>> [ blank? ] trim ] keep
-            [ set-tag-text ] keep
+            [ [ blank? ] trim ] change-text
         ] when
     ] map ;
 
@@ -173,8 +172,7 @@ TUPLE: link attributes clickable ;
     [
         {
             { [ dup name>> "form" = ]
-                [ "form action: " write attributes>> "action" swap at print
-            ] }
+                [ "form action: " write attributes>> "action" swap at print ] }
             { [ dup name>> "input" = ] [ input. ] }
             [ drop ]
         } cond

@@ -697,3 +697,7 @@ DEFER: error-y
     <string-reader> "forget-subclass-test" parse-stream
     drop
 ] unit-test
+
+[ ] [
+    "IN: sequences TUPLE: reversed { seq read-only } ;" eval
+] unit-test
