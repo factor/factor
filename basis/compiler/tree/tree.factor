@@ -183,6 +183,9 @@ M: #return-recursive inputs/outputs [ in-d>> ] [ out-d>> ] bi ;
 : recursive-phi-in ( #enter-recursive -- seq )
     [ label>> calls>> [ in-d>> ] map ] [ in-d>> ] bi suffix ;
 
+: ends-with-terminate? ( nodes -- ? )
+    dup empty? [ drop f ] [ peek #terminate? ] if ;
+
 M: vector child-visitor V{ } clone ;
 M: vector #introduce, #introduce node, ;
 M: vector #call, #call node, ;

@@ -117,11 +117,19 @@ M: #branch cleanup*
         [ live-branches>> live-branches set ]
     } cleave ;
 
+: eliminate-phi ( #phi -- node )
+    dup phi-in-d>> length {
+        { 0 [ drop f ] }
+        { 1 [ [ phi-in-d>> first ] [ out-d>> ] bi #copy ] }
+        [ drop ]
+    } case ;
+
 M: #phi cleanup*
     #! Remove #phi function inputs which no longer exist.
     live-branches get
     [ '[ , select-children sift ] change-phi-in-d ]
     [ '[ , select-children sift ] change-phi-info-d ] bi
+    eliminate-phi
     live-branches off ;
 
 : >copy ( node -- #copy ) [ in-d>> ] [ out-d>> ] bi #copy ;

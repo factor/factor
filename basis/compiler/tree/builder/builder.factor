@@ -22,9 +22,6 @@ IN: compiler.tree.builder
     ] with-tree-builder nip
     unclip-last in-d>> ;
 
-: ends-with-terminate? ( nodes -- ? )
-    dup empty? [ drop f ] [ peek #terminate? ] if ;
-
 : build-sub-tree ( #call quot -- nodes )
     [ [ out-d>> ] [ in-d>> ] bi ] dip build-tree-with
     over ends-with-terminate?

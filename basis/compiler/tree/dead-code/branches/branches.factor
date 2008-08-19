@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: sequences namespaces kernel accessors assocs sets fry
-arrays combinators columns stack-checker.backend compiler.tree
-compiler.tree.combinators compiler.tree.dead-code.liveness
-compiler.tree.dead-code.simple ;
+arrays combinators columns stack-checker.backend
+stack-checker.branches compiler.tree compiler.tree.combinators
+compiler.tree.dead-code.liveness compiler.tree.dead-code.simple
+;
 IN: compiler.tree.dead-code.branches
 
 M: #if mark-live-values* look-at-inputs ;
@@ -26,10 +27,9 @@ M: #branch remove-dead-code*
     bi ;
 
 : remove-phi-inputs ( #phi -- )
-    dup [ out-d>> ] [ phi-in-d>> flip ] bi
-    filter-corresponding
-    flip >>phi-in-d
-    drop ;
+    if-node get children>>
+    [ dup ends-with-terminate? [ drop f ] [ peek out-d>> ] if ] map
+    pad-with-bottom >>phi-in-d drop ;
 
 : live-value-indices ( values -- indices )
     [ length ] keep live-values get
@@ -42,7 +42,10 @@ M: #branch remove-dead-code*
     #shuffle ;
 
 : insert-drops ( nodes values indices -- nodes' )
-    '[ , drop-values suffix ] 2map ;
+    '[
+        over ends-with-terminate?
+        [ drop ] [ , drop-values suffix ] if
+    ] 2map ;
 
 : hoist-drops ( #phi -- )
     if-node get swap
@@ -50,8 +53,7 @@ M: #branch remove-dead-code*
     '[ , , insert-drops ] change-children drop ;
 
 : remove-phi-outputs ( #phi -- )
-    [ filter-live ] change-out-d
-    drop ;
+    [ filter-live ] change-out-d drop ;
 
 M: #phi remove-dead-code*
     {

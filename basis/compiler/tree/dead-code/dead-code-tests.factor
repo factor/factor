@@ -98,3 +98,5 @@ IN: compiler.tree.dead-code.tests
 [ ] [ [ dup [ 3 throw ] [ ] if ] optimize-quot drop ] unit-test
 
 [ [ [ . ] [ drop ] if ] ] [ [ [ dup . ] [ ] if drop ] optimize-quot ] unit-test
+
+[ [ f ] ] [ [ f dup [ ] [ ] if ] optimize-quot ] unit-test
