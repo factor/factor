@@ -96,8 +96,8 @@ PRIVATE>
 
 : integer, ( num radix -- )
     dup 1 <= [ "Invalid radix" throw ] when
-    dup >r /mod >digit , dup 0 >
-    [ r> integer, ] [ r> 2drop ] if ;
+    [ /mod >digit , ] keep over 0 >
+    [ integer, ] [ 2drop ] if ;
 
 PRIVATE>
 

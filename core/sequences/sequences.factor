@@ -33,7 +33,7 @@ M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ;
 : first ( seq -- first ) 0 swap nth ; inline
 : second ( seq -- second ) 1 swap nth ; inline
 : third ( seq -- third ) 2 swap nth ; inline
-: fourth  ( seq -- fourth ) 3 swap nth ; inline
+: fourth ( seq -- fourth ) 3 swap nth ; inline
 
 : set-first ( first seq -- ) 0 swap set-nth ; inline
 : set-second ( second seq -- ) 1 swap set-nth ; inline
@@ -172,13 +172,6 @@ M: reversed virtual@ seq>> [ length swap - 1- ] keep ;
 M: reversed length seq>> length ;
 
 INSTANCE: reversed virtual-sequence
-
-: reverse ( seq -- newseq )
-    [
-        dup [ length ] keep new-sequence
-        [ 0 swap copy ] keep
-        [ reverse-here ] keep
-    ] keep like ;
 
 ! A slice of another sequence.
 TUPLE: slice
@@ -341,11 +334,10 @@ M: immutable-sequence clone-like like ;
     pick >r >r (each) r> call r> finish-find ; inline
 
 : (find-from) ( n seq quot quot' -- i elt )
-    >r >r 2dup bounds-check? [
-        r> r> (find)
-    ] [
-        r> r> 2drop 2drop f f
-    ] if ; inline
+    [ 2dup bounds-check? ] 2dip
+    [ (find) ] 2curry
+    [ 2drop f f ]
+    if ; inline
 
 : (monotonic) ( seq quot -- ? )
     [ 2dup nth-unsafe rot 1+ rot nth-unsafe ]
@@ -609,6 +601,13 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
         tuck - 1- rot exchange-unsafe
     ] each 2drop ;
 
+: reverse ( seq -- newseq )
+    [
+        dup [ length ] keep new-sequence
+        [ 0 swap copy ] keep
+        [ reverse-here ] keep
+    ] keep like ;
+
 : sum-lengths ( seq -- n )
     0 [ length + ] reduce ;
 
@@ -632,8 +631,10 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
     ] keep like ;
 
 : padding ( seq n elt quot -- newseq )
-    >r >r over length [-] dup zero?
-    [ r> r> 3drop ] [ r> <repetition> r> call ] if ; inline
+    [
+        [ over length [-] dup zero? [ drop ] ] dip
+        [ <repetition> ] curry
+    ] dip compose if ; inline
 
 : pad-left ( seq n elt -- padded )
     [ swap dup (append) ] padding ;
@@ -738,9 +739,11 @@ PRIVATE>
     [ left-trim ] [ right-trim ] bi ; inline
 
 : sum ( seq -- n ) 0 [ + ] binary-reduce ;
+
 : product ( seq -- n ) 1 [ * ] binary-reduce ;
 
 : infimum ( seq -- n ) dup first [ min ] reduce ;
+
 : supremum ( seq -- n ) dup first [ max ] reduce ;
 
 : flip ( matrix -- newmatrix )
@@ -752,4 +755,3 @@ PRIVATE>
 : sigma ( seq quot -- n ) [ + ] compose 0 swap reduce ; inline
 
 : count ( seq quot -- n ) [ 1 0 ? ] compose sigma ; inline
-
