@@ -92,7 +92,7 @@ M: node generate-node drop iterate-next ;
     %jump-label ;
 
 : generate-call ( label -- next )
-    dup maybe-compile
+    ! dup maybe-compile
     end-basic-block
     dup compiling-loops get at [
         %jump-label f

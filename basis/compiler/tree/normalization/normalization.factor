@@ -74,6 +74,46 @@ M: #recursive collect-label-info
 
 M: node collect-label-info drop ;
 
+! Rename
+SYMBOL: rename-map
+
+: rename-value ( value -- value' )
+    [ rename-map get at ] keep or ;
+
+: rename-values ( values -- values' )
+    [ rename-value ] map ;
+
+GENERIC: rename-node-values* ( node -- node )
+
+M: #introduce rename-node-values* ;
+
+M: #shuffle rename-node-values*
+    [ rename-values ] change-in-d
+    [ [ rename-value ] assoc-map ] change-mapping ;
+
+M: #push rename-node-values* ;
+
+M: #r> rename-node-values*
+    [ rename-values ] change-in-r ;
+
+M: #terminate rename-node-values*
+    [ rename-values ] change-in-d
+    [ rename-values ] change-in-r ;
+
+M: #phi rename-node-values*
+    [ [ rename-values ] map ] change-phi-in-d ;
+
+M: #declare rename-node-values*
+    [ [ [ rename-value ] dip ] assoc-map ] change-declaration ;
+
+M: #alien-callback rename-node-values* ;
+
+M: node rename-node-values*
+    [ rename-values ] change-in-d ;
+
+: rename-node-values ( nodes -- nodes' )
+    dup [ rename-node-values* drop ] each-node ;
+
 ! Normalize
 GENERIC: normalize* ( node -- node' )
 
@@ -85,8 +125,11 @@ SYMBOL: introduction-stack
 : pop-introductions ( n -- values )
     introduction-stack [ swap cut* swap ] change ;
 
+: add-renamings ( old new -- )
+    rename-map get '[ , set-at ] 2each ;
+
 M: #introduce normalize*
-    out-d>> [ length pop-introductions ] keep #copy ;
+    out-d>> [ length pop-introductions ] keep add-renamings f ;
 
 SYMBOL: remaining-introductions
 
@@ -142,10 +185,10 @@ M: #enter-recursive normalize*
         bi*
     ] [ introduction-stack [ prepend ] change ] bi ;
 
-: call>return ( #call-recursive n -- nodes )
-    [ [ [ in-d>> ] [ out-d>> ] bi ] [ '[ , head ] ] bi* bi@ #copy ]
+: call>return ( #call-recursive n -- #call-recursive )
+    [ [ [ in-d>> ] [ out-d>> ] bi ] [ '[ , head ] ] bi* bi@ add-renamings ]
     [ '[ , tail ] [ change-in-d ] [ change-out-d ] bi ]
-    2bi 2array ;
+    2bi ;
 
 M: #call-recursive normalize*
     dup unchanged-underneath {
@@ -157,7 +200,8 @@ M: #call-recursive normalize*
 M: node normalize* ;
 
 : normalize ( nodes -- nodes' )
+    H{ } clone rename-map set
     dup [ collect-label-info ] each-node
     dup count-introductions make-values
-    [ (normalize) ] [ nip #introduce ] 2bi
-    prefix ;
+    [ (normalize) ] [ nip #introduce ] 2bi prefix
+    rename-node-values ;

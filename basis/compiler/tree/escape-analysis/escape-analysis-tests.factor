@@ -305,3 +305,8 @@ C: <ro-box> ro-box
     [ bleach-node ] curry [ ] compose impeach-node ; inline recursive
 
 [ 2 ] [ [ [ ] bleach-node ] count-unboxed-allocations ] unit-test
+
+[ 0 ] [
+    [ dup -1 over >= [ 0 >= [ "A" throw ] unless ] [ drop ] if ]
+    count-unboxed-allocations
+] unit-test

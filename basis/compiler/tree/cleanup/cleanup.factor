@@ -3,6 +3,7 @@
 USING: kernel accessors sequences sequences.deep combinators fry
 classes.algebra namespaces assocs math math.private
 math.partial-dispatch classes.tuple classes.tuple.private
+stack-checker.branches
 compiler.tree
 compiler.tree.intrinsics
 compiler.tree.combinators
@@ -13,8 +14,7 @@ IN: compiler.tree.cleanup
 ! A phase run after propagation to finish the job, so to speak.
 ! Codifies speculative inlining decisions, deletes branches
 ! marked as never taken, and flattens local recursive blocks
-! that do not call themselves. Finally, if inlining inserts a
-! #terminate, we delete all nodes after that.
+! that do not call themselves.
 
 GENERIC: delete-node ( node -- )
 
@@ -117,10 +117,16 @@ M: #branch cleanup*
         [ live-branches>> live-branches set ]
     } cleave ;
 
+: eliminate-single-phi ( #phi -- node )
+    [ phi-in-d>> first ] [ out-d>> ] bi over [ +bottom+ eq? ] all?
+    [ [ drop ] [ [ f swap #push ] map ] bi* ]
+    [ #copy ]
+    if ;
+
 : eliminate-phi ( #phi -- node )
     dup phi-in-d>> length {
         { 0 [ drop f ] }
-        { 1 [ [ phi-in-d>> first ] [ out-d>> ] bi #copy ] }
+        { 1 [ eliminate-single-phi ] }
         [ drop ]
     } case ;
 

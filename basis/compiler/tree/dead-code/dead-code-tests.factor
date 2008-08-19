@@ -89,7 +89,7 @@ IN: compiler.tree.dead-code.tests
 
 : non-flushable-3 ( a b -- c ) 2drop f ;
 
-[ [ [ drop drop ] [ non-flushable-3 drop ] if ] ] [
+[ [ [ 2drop ] [ non-flushable-3 drop ] if ] ] [
     [ [ flushable-1 ] [ non-flushable-3 ] if drop ] optimize-quot
 ] unit-test
 
@@ -100,3 +100,9 @@ IN: compiler.tree.dead-code.tests
 [ [ [ . ] [ drop ] if ] ] [ [ [ dup . ] [ ] if drop ] optimize-quot ] unit-test
 
 [ [ f ] ] [ [ f dup [ ] [ ] if ] optimize-quot ] unit-test
+
+[ ] [ [ over [ ] [ dup [ "X" throw ] [ "X" throw ] if ] if ] optimize-quot drop ] unit-test
+
+: boo ( a b -- c ) 2drop f ;
+
+[ [ dup 4 eq? [ nip ] [ boo ] if ] ] [ [ dup dup 4 eq? [ drop nip ] [ drop boo ] if ] optimize-quot ] unit-test

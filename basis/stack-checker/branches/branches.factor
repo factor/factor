@@ -64,10 +64,13 @@ SYMBOL: quotations
 : terminated-phi ( seq -- terminated )
     terminated? branch-variable ;
 
+: terminate-branches ( seq -- )
+    [ terminated? swap at ] all? [ terminate ] when ;
+
 : compute-phi-function ( seq -- )
     [ quotation active-variable sift quotations set ]
     [ [ datastack-phi ] [ terminated-phi ] bi #phi, ]
-    [ [ terminated? swap at ] all? terminated? set ]
+    [ terminate-branches ]
     tri ;
 
 : copy-inference ( -- )
