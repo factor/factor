@@ -70,11 +70,6 @@ SYMBOL: meta-r
 : init-known-values ( -- )
     H{ } clone known-values set ;
 
-: copy-inference ( -- )
-    meta-d [ clone ] change
-    meta-r [ clone ] change
-    d-in [ ] change ;
-
 : recursive-label ( word -- label/f )
     recursive-state get at ;
 

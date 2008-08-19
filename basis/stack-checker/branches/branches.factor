@@ -61,10 +61,10 @@ SYMBOL: quotations
     unify-branches
     [ d-in set ] [ ] [ dup >vector meta-d set ] tri* ;
 
-: retainstack-phi ( seq -- phi-in phi-out )
-    [ length 0 <repetition> ] [ meta-r active-variable ] bi
-    unify-branches
-    [ drop ] [ ] [ dup >vector meta-r set ] tri* ;
+! : retainstack-phi ( seq -- phi-in phi-out )
+!     [ length 0 <repetition> ] [ meta-r active-variable ] bi
+!     unify-branches
+!     [ drop ] [ ] [ dup >vector meta-r set ] tri* ;
 
 : terminated-phi ( seq -- terminated )
     terminated? branch-variable ;
@@ -73,18 +73,25 @@ SYMBOL: quotations
     [ quotation active-variable sift quotations set ]
     [
         [ datastack-phi ]
-        [ retainstack-phi ]
+        ! [ retainstack-phi ]
+        [ drop f f ]
         [ terminated-phi ]
         tri #phi,
     ]
     [ [ terminated? swap at ] all? terminated? set ]
     tri ;
 
+: copy-inference ( -- )
+    meta-d [ clone ] change
+    V{ } clone meta-r set
+    d-in [ ] change ;
+
 : infer-branch ( literal -- namespace )
     [
         copy-inference
         nest-visitor
         [ value>> quotation set ] [ infer-literal-quot ] bi
+        check->r
     ] H{ } make-assoc ; inline
 
 : infer-branches ( branches -- input children data )
