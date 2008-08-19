@@ -25,19 +25,19 @@ TUPLE: merge
 
 : dump ( from to seq accum -- )
     #! Optimize common case where to - from = 1, 2, or 3.
-    >r >r 2dup swap - dup 1 =
-    [ 2drop r> nth-unsafe r> push ] [
-        dup 2 = [
-            2drop dup 1+
+    >r >r 2dup swap - r> r> pick 1 = 
+    [ >r >r 2drop r> nth-unsafe r> push ] [
+        pick 2 = [
+            >r >r 2drop dup 1+
             r> [ nth-unsafe ] curry bi@
             r> [ push ] curry bi@
         ] [
-            dup 3 = [
-                2drop dup 1+ dup 1+
+            pick 3 = [
+                >r >r 2drop dup 1+ dup 1+
                 r> [ nth-unsafe ] curry tri@
                 r> [ push ] curry tri@
             ] [
-                drop r> subseq r> push-all
+                >r nip subseq r> push-all
             ] if
         ] if
     ] if ; inline
@@ -120,11 +120,13 @@ TUPLE: merge
     [ [ 1 shift dup 1+ ] dip ] prepose curry each-integer ; inline
 
 : (sort-pairs) ( i1 i2 seq quot accum -- )
-    >r >r 2dup length = [
-        nip nth r> drop r> push
+    [ 2dup length = ] 2dip rot [
+        [ drop nip nth ] dip push
     ] [
-        tuck [ nth-unsafe ] 2bi@ 2dup r> call +gt+ eq?
-        [ swap ] when r> tuck [ push ] 2bi@
+        [
+            [ tuck [ nth-unsafe ] 2bi@ 2dup ] dip call +gt+ eq?
+            [ swap ] when
+        ] dip tuck [ push ] 2bi@
     ] if ; inline
 
 : sort-pairs ( merge quot -- )

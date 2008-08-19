@@ -10,10 +10,14 @@ sequences sequences.private slots.private strings
 strings.private system threads.private classes.tuple
 classes.tuple.private vectors vectors.private words definitions
 words.private assocs summary compiler.units system.private
-combinators locals.backend stack-checker.state
-stack-checker.backend stack-checker.branches
-stack-checker.errors stack-checker.transforms
-stack-checker.visitor ;
+combinators locals.backend
+stack-checker.state
+stack-checker.backend
+stack-checker.branches
+stack-checker.errors
+stack-checker.transforms
+stack-checker.visitor
+stack-checker.alien ;
 IN: stack-checker.known-words
 
 : infer-primitive ( word -- )
@@ -153,36 +157,41 @@ M: object infer-call*
         { \ get-local [ infer-get-local ] }
         { \ drop-locals [ infer-drop-locals ] }
         { \ do-primitive [ \ do-primitive cannot-infer-effect ] }
+        { \ alien-invoke [ infer-alien-invoke ] }
+        { \ alien-indirect [ infer-alien-indirect ] }
+        { \ alien-callback [ infer-alien-callback ] }
     } case ;
 
 {
-    >r r> declare call curry compose
-    execute if dispatch <tuple-boa>
-    (throw) load-locals get-local drop-locals
-    do-primitive
+    >r r> declare call curry compose execute if dispatch
+    <tuple-boa> (throw) load-locals get-local drop-locals
+    do-primitive alien-invoke alien-indirect alien-callback
 } [ t +special+ set-word-prop ] each
 
 { call execute dispatch load-locals get-local drop-locals }
 [ t "no-compile" set-word-prop ] each
+
+SYMBOL: +primitive+
 
 : non-inline-word ( word -- )
     dup +called+ depends-on
     {
         { [ dup +shuffle+ word-prop ] [ infer-shuffle-word ] }
         { [ dup +special+ word-prop ] [ infer-special ] }
-        { [ dup primitive? ] [ infer-primitive ] }
-        { [ dup +cannot-infer+ word-prop ] [ cannot-infer-effect ] }
-        { [ dup +inferred-effect+ word-prop ] [ cached-infer ] }
+        { [ dup +primitive+ word-prop ] [ infer-primitive ] }
         { [ dup +transform-quot+ word-prop ] [ apply-transform ] }
         { [ dup "macro" word-prop ] [ apply-macro ] }
+        { [ dup +cannot-infer+ word-prop ] [ cannot-infer-effect ] }
+        { [ dup +inferred-effect+ word-prop ] [ cached-infer ] }
         { [ dup recursive-label ] [ call-recursive-word ] }
         [ dup infer-word apply-word/effect ]
     } cond ;
 
 : define-primitive ( word inputs outputs -- )
+    [ 2drop t +primitive+ set-word-prop ]
     [ drop "input-classes" set-word-prop ]
     [ nip "default-output-classes" set-word-prop ]
-    3bi ;
+    3tri ;
 
 ! Stack effects for all primitives
 \ fixnum< { fixnum fixnum } { object } define-primitive

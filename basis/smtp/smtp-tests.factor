@@ -3,12 +3,6 @@ smtp.server kernel sequences namespaces logging accessors
 assocs sorting ;
 IN: smtp.tests
 
-[ t ] [
-    <email>
-    dup clone "a" "b" set-header drop
-    headers>> assoc-empty?
-] unit-test
-
 { 0 0 } [ [ ] with-smtp-connection ] must-infer-as
 
 [ "hello\nworld" validate-address ] must-fail
@@ -60,12 +54,13 @@ IN: smtp.tests
             "Ed <dharmatech@factorcode.org>"
         } >>to
         "Doug <erg@factorcode.org>" >>from
-    prepare
-    dup headers>> >alist sort-keys [
-        drop { "Date" "Message-Id" } member? not
-    ] assoc-filter
-    over to>>
-    rot from>>
+    [
+        email>headers sort-keys [
+            drop { "Date" "Message-Id" } member? not
+        ] assoc-filter
+    ]
+    [ to>> [ extract-email ] map ]
+    [ from>> extract-email ] tri
 ] unit-test
 
 [ ] [ [ 4321 mock-smtp-server ] "SMTP server" spawn drop ] unit-test

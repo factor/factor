@@ -13,11 +13,6 @@ IN: math.combinatorics.tests
 [ { 0 1 3 2 } ] [ 1 4 permutation-indices ] unit-test
 [ { 1 2 0 6 3 5 4 } ] [ 859 7 permutation-indices ] unit-test
 
-[ { "b" "d" } ] [ { "a" "b" "c" "d" } { 1 3 } reorder ] unit-test
-[ { "a" "b" "c" "d" } ] [ { "a" "b" "c" "d" } { 0 1 2 3 } reorder ] unit-test
-[ { "d" "c" "b" "a" } ] [ { "a" "b" "c" "d" } { 3 2 1 0 } reorder ] unit-test
-[ { "d" "a" "b" "c" } ] [ { "a" "b" "c" "d" } { 3 0 1 2 } reorder ] unit-test
-
 [ 1 ] [ 0 factorial ] unit-test
 [ 1 ] [ 1 factorial ] unit-test
 [ 3628800 ] [ 10 factorial ] unit-test

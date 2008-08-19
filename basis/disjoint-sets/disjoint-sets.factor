@@ -66,6 +66,10 @@ M: disjoint-set add-atom
 
 : add-atoms ( seq disjoint-set -- ) '[ , add-atom ] each ;
 
+GENERIC: disjoint-set-member? ( a disjoint-set -- ? )
+
+M: disjoint-set disjoint-set-member? parents>> key? ;
+
 GENERIC: equiv-set-size ( a disjoint-set -- n )
 
 M: disjoint-set equiv-set-size [ representative ] keep count ;
@@ -82,6 +86,14 @@ M:: disjoint-set equate ( a b disjoint-set -- )
         2dup disjoint-set ranks
         [ swap ] [ over disjoint-set inc-rank ] [ ] branch
         disjoint-set link-sets
+    ] if ;
+
+: equate-all-with ( seq a disjoint-set -- )
+    '[ , , equate ] each ;
+
+: equate-all ( seq disjoint-set -- )
+    over dup empty? [ 2drop ] [
+        [ unclip-slice ] dip equate-all-with
     ] if ;
 
 M: disjoint-set clone

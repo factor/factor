@@ -4,8 +4,8 @@ USING: kernel sequences accessors arrays fry math.intervals
 combinators namespaces
 stack-checker.inlining
 compiler.tree
-compiler.tree.copy-equiv
 compiler.tree.combinators
+compiler.tree.propagation.copy
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
 compiler.tree.propagation.simple
@@ -39,7 +39,7 @@ IN: compiler.tree.propagation.recursive
 : unify-recursive-stacks ( stacks initial -- infos )
     over empty? [ nip ] [
         [
-            [ sift value-infos-union ] dip
+            [ value-infos-union ] dip
             [ generalize-counter ] keep
             value-info-union
         ] 2map

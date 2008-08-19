@@ -1,29 +1,33 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel assocs sequences sequences.lib fry accessors
-compiler.cfg compiler.vops compiler.vops.builder
-namespaces math inference.dataflow optimizer.allot combinators
-math.order ;
+namespaces math combinators math.order
+compiler.tree
+compiler.tree.combinators
+compiler.tree.propagation.info
+compiler.cfg
+compiler.vops
+compiler.vops.builder ;
 IN: compiler.cfg.builder
 
-! Convert dataflow IR to procedure CFG.
+! Convert tree SSA IR to CFG SSA IR.
+
 ! We construct the graph and set successors first, then we
 ! set predecessors in a separate pass. This simplifies the
 ! logic.
 
 SYMBOL: procedures
 
-SYMBOL: values>vregs
-
 SYMBOL: loop-nesting
 
-GENERIC: convert* ( node -- )
+SYMBOL: values>vregs
 
 GENERIC: convert ( node -- )
 
+M: #introduce convert drop ;
+
 : init-builder ( -- )
-    H{ } clone values>vregs set
-    V{ } clone loop-nesting set ;
+    H{ } clone values>vregs set ;
 
 : end-basic-block ( -- )
     basic-block get [ %b emit ] when ;
@@ -40,15 +44,12 @@ GENERIC: convert ( node -- )
     set-basic-block ;
 
 : convert-nodes ( node -- )
-    dup basic-block get and [
-        [ convert ] [ successor>> convert-nodes ] bi
-    ] [ drop ] if ;
+    [ convert ] each ;
 
 : (build-cfg) ( node word -- )
     init-builder
     begin-basic-block
     basic-block get swap procedures get set-at
-    %prolog emit
     convert-nodes ;
 
 : build-cfg ( node word -- procedures )
@@ -73,10 +74,9 @@ GENERIC: convert ( node -- )
         2bi
     ] if ;
 
-: load-inputs ( node -- )
-    [ in-d>> %data (load-inputs) ]
-    [ in-r>> %retain (load-inputs) ]
-    bi ;
+: load-in-d ( node -- ) in-d>> %data (load-inputs) ;
+
+: load-in-r ( node -- ) in-r>> %retain (load-inputs) ;
 
 : (store-outputs) ( seq stack -- )
     over empty? [ 2drop ] [
@@ -86,40 +86,21 @@ GENERIC: convert ( node -- )
         2bi
     ] if ;
 
-: store-outputs ( node -- )
-    [ out-d>> %data (store-outputs) ]
-    [ out-r>> %retain (store-outputs) ]
-    bi ;
+: store-out-d ( node -- ) out-d>> %data (store-outputs) ;
 
-M: #push convert*
-    out-d>> [
-        [ produce-vreg ] [ value-literal ] bi
-        emit-literal
-    ] each ;
-
-M: #shuffle convert* drop ;
-
-M: #>r convert* drop ;
-
-M: #r> convert* drop ;
-
-M: node convert
-    [ load-inputs ]
-    [ convert* ]
-    [ store-outputs ]
-    tri ;
+: store-out-r ( node -- ) out-r>> %retain (store-outputs) ;
 
 : (emit-call) ( word -- )
     begin-basic-block %call emit begin-basic-block ;
 
 : intrinsic-inputs ( node -- )
-    [ load-inputs ]
+    [ load-in-d ]
     [ in-d>> { #1 #2 #3 #4 } [ [ value>vreg ] dip set ] 2each ]
     bi ;
 
 : intrinsic-outputs ( node -- )
     [ out-d>> { ^1 ^2 ^3 ^4 } [ get output-vreg ] 2each ]
-    [ store-outputs ]
+    [ store-out-d ]
     bi ;
 
 : intrinsic ( node quot -- )
@@ -132,19 +113,17 @@ M: node convert
         tri
     ] with-scope ; inline
 
-USING: kernel.private math.private slots.private
-optimizer.allot ;
+USING: kernel.private math.private slots.private ;
 
 : maybe-emit-fixnum-shift-fast ( node -- node )
-    dup dup in-d>> second node-literal? [
-        dup dup in-d>> second node-literal
+    dup dup in-d>> second node-value-info literal>> dup fixnum? [
         '[ , emit-fixnum-shift-fast ] intrinsic
     ] [
-        dup param>> (emit-call)
+        drop dup word>> (emit-call)
     ] if ;
 
 : emit-call ( node -- )
-    dup param>> {
+    dup word>> {
         { \ tag [ [ emit-tag ] intrinsic ] }
 
         { \ slot [ [ dup emit-slot ] intrinsic ] }
@@ -175,24 +154,43 @@ optimizer.allot ;
         { \ float> [ [ emit-float> ] intrinsic ] }
         { \ float? [ [ emit-float= ] intrinsic ] }
 
-        { \ (tuple) [ dup first-input '[ , emit-(tuple) ] intrinsic ] }
-        { \ (array) [ dup first-input '[ , emit-(array) ] intrinsic ] }
-        { \ (byte-array) [ dup first-input '[ , emit-(byte-array) ] intrinsic ] }
+        ! { \ (tuple) [ dup first-input '[ , emit-(tuple) ] intrinsic ] }
+        ! { \ (array) [ dup first-input '[ , emit-(array) ] intrinsic ] }
+        ! { \ (byte-array) [ dup first-input '[ , emit-(byte-array) ] intrinsic ] }
 
         [ (emit-call) ]
     } case drop ;
 
 M: #call convert emit-call ;
 
-M: #call-label convert
-    dup param>> loop-nesting get at [
-        basic-block get successors>> push
-        end-basic-block
-        basic-block off
-        drop
-    ] [
-        (emit-call)
-    ] if* ;
+: emit-call-loop ( #recursive -- )
+    dup label>> loop-nesting get at basic-block get successors>> push
+    end-basic-block
+    basic-block off
+    drop ;
+
+: emit-call-recursive ( #recursive -- )
+    label>> id>> (emit-call) ;
+
+M: #call-recursive convert
+    dup label>> loop?>>
+    [ emit-call-loop ] [ emit-call-recursive ] if ;
+
+M: #push convert
+    [
+        [ out-d>> first produce-vreg ]
+        [ node-output-infos first literal>> ]
+        bi emit-literal
+    ]
+    [ store-out-d ] bi ;
+
+M: #shuffle convert [ load-in-d ] [ store-out-d ] bi ;
+
+M: #>r convert [ load-in-d ] [ store-out-r ] bi ;
+
+M: #r> convert [ load-in-r ] [ store-out-d ] bi ;
+
+M: #terminate convert drop ;
 
 : integer-conditional ( in1 in2 cc -- )
     [ [ next-vreg dup ] 2dip %icmp emit ] dip %bi emit ; inline
@@ -221,50 +219,38 @@ M: #call-label convert
     [ set-basic-block ]
     bi ;
 
-: phi-inputs ( #if -- vregs-seq )
-    children>>
-    [ last-node ] map
-    [ #values? ] filter
-    [ in-d>> [ value>vreg ] map ] map ;
-
-: phi-outputs ( #if -- vregs )
-    successor>> out-d>> [ produce-vreg ] map ;
-
-: emit-phi ( #if -- )
-    [ phi-outputs ] [ phi-inputs ] bi %phi emit ;
-
 M: #if convert
-    {
-        [ load-inputs ]
-        [ emit-if ]
-        [ convert-if-children ]
-        [ emit-phi ]
-    } cleave ;
+    [ load-in-d ] [ emit-if ] [ convert-if-children ] tri ;
 
-M: #values convert drop ;
+M: #dispatch convert
+    "Unimplemented" throw ;
 
-M: #merge convert drop ;
-
-M: #entry convert drop ;
+M: #phi convert drop ;
 
 M: #declare convert drop ;
 
-M: #terminate convert drop ;
+M: #return convert drop %return emit ;
 
-M: #label convert
-    #! Labels create a new procedure.
-    [ [ param>> ] [ node-child ] bi (build-cfg) ] [ (emit-call) ] bi ;
+: convert-recursive ( #recursive -- )
+    [ [ label>> id>> ] [ child>> ] bi (build-cfg) ]
+    [ (emit-call) ]
+    bi ;
 
-M: #loop convert
-    #! Loops become part of the current CFG.
-    begin-basic-block
-    [ param>> basic-block get 2array loop-nesting get push ]
-    [ node-child convert-nodes ]
-    bi
+: begin-loop ( #recursive -- )
+    label>> basic-block get 2array loop-nesting get push ;
+
+: end-loop ( -- )
     loop-nesting get pop* ;
 
-M: #return convert
-    param>> loop-nesting get key? [
-        %epilog emit
-        %return emit
-    ] unless ;
+: convert-loop ( #recursive -- )
+    begin-basic-block
+    [ begin-loop ]
+    [ child>> convert-nodes ]
+    [ drop end-loop ]
+    tri ;
+
+M: #recursive convert
+    dup label>> loop?>>
+    [ convert-loop ] [ convert-recursive ] if ;
+
+M: #copy convert drop ;

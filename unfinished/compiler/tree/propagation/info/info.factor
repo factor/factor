@@ -3,7 +3,7 @@
 USING: assocs classes classes.algebra kernel
 accessors math math.intervals namespaces sequences words
 combinators combinators.short-circuit arrays
-compiler.tree.copy-equiv ;
+compiler.tree.propagation.copy ;
 IN: compiler.tree.propagation.info
 
 : false-class? ( class -- ? ) \ f class<= ;

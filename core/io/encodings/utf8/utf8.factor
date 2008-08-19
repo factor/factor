@@ -24,7 +24,7 @@ SINGLETON: utf8
 : triple ( stream byte -- stream char )
     BIN: 1111 bitand append-nums append-nums ; inline
 
-: quad ( stream byte -- stream char )
+: quadruple ( stream byte -- stream char )
     BIN: 111 bitand append-nums append-nums append-nums ; inline
 
 : begin-utf8 ( stream byte -- stream char )
@@ -32,7 +32,7 @@ SINGLETON: utf8
         { [ dup -7 shift zero? ] [ ] }
         { [ dup -5 shift BIN: 110 number= ] [ double ] }
         { [ dup -4 shift BIN: 1110 number= ] [ triple ] }
-        { [ dup -3 shift BIN: 11110 number= ] [ quad ] }
+        { [ dup -3 shift BIN: 11110 number= ] [ quadruple ] }
         [ drop replacement-char ]
     } cond ; inline
 

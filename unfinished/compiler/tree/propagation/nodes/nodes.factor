@@ -3,7 +3,7 @@
 USING: sequences accessors kernel assocs sequences
 compiler.tree
 compiler.tree.def-use
-compiler.tree.copy-equiv
+compiler.tree.propagation.copy
 compiler.tree.propagation.info ;
 IN: compiler.tree.propagation.nodes
 

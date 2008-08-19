@@ -3,7 +3,7 @@
 USING: accessors kernel sequences namespaces hashtables
 compiler.tree
 compiler.tree.def-use
-compiler.tree.copy-equiv
+compiler.tree.propagation.copy
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
 compiler.tree.propagation.simple
@@ -12,6 +12,8 @@ compiler.tree.propagation.recursive
 compiler.tree.propagation.constraints
 compiler.tree.propagation.known-words ;
 IN: compiler.tree.propagation
+
+! This pass must run after normalization
 
 : propagate ( node -- node )
     H{ } clone copies set

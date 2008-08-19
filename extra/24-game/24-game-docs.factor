@@ -31,12 +31,12 @@ HELP: 24-able ( -- vector )
     "just using the provided commands and the 4 numbers. The Following are the "
     "provided commands: "
     { $link + } ", " { $link - } ", " { $link * } ", "
-    { $link / } ", and " { $link swap } "."
+    { $link / } ", " { $link swap } ", and " { $link rot } "."
 }
 { $examples
     { $example
         "USE: 24-game"
-        "24-able vector-24-able?"
+        "24-able vector-24-able? ."
         "t"
     }
     { $notes { $link 24-able? } " is used in " { $link 24-able } "." }

@@ -115,3 +115,9 @@ M: #call propagate-before
 M: #call propagate-after
     dup word>> "input-classes" word-prop dup
     [ propagate-input-classes ] [ 2drop ] if ;
+
+M: #alien-invoke propagate-before
+    out-d>> [ object-info swap set-value-info ] each ;
+
+M: #alien-indirect propagate-before
+    out-d>> [ object-info swap set-value-info ] each ;

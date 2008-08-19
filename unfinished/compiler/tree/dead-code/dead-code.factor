@@ -3,14 +3,17 @@
 USING: fry accessors namespaces assocs dequeues search-dequeues
 kernel sequences words sets stack-checker.inlining
 compiler.tree
+compiler.tree.combinators
 compiler.tree.dataflow-analysis
-compiler.tree.dataflow-analysis.backward
-compiler.tree.combinators ;
+compiler.tree.dataflow-analysis.backward ;
 IN: compiler.tree.dead-code
 
 ! Dead code elimination: remove #push and flushable #call whose
 ! outputs are unused using backward DFA.
 GENERIC: mark-live-values ( node -- )
+
+M: #introduce mark-live-values
+    value>> look-at-value ;
 
 M: #if mark-live-values look-at-inputs ;
 
@@ -19,6 +22,12 @@ M: #dispatch mark-live-values look-at-inputs ;
 M: #call mark-live-values
     dup word>> "flushable" word-prop
     [ drop ] [ [ look-at-inputs ] [ look-at-outputs ] bi ] if ;
+
+M: #alien-invoke mark-live-values
+    [ look-at-inputs ] [ look-at-outputs ] bi ;
+
+M: #alien-indirect mark-live-values
+    [ look-at-inputs ] [ look-at-outputs ] bi ;
 
 M: #return mark-live-values
     look-at-inputs ;
@@ -33,9 +42,6 @@ SYMBOL: live-values
     [ mark-live-values ] backward-dfa live-values set ;
 
 GENERIC: remove-dead-values* ( node -- )
-
-M: #introduce remove-dead-values*
-    [ [ live-value? ] filter ] change-values drop ;
 
 M: #>r remove-dead-values*
     dup out-r>> first live-value? [ { } >>out-r ] unless
@@ -56,6 +62,30 @@ M: #push remove-dead-values*
 
 : filter-live ( values -- values' )
     [ live-value? ] filter ;
+
+M: #call remove-dead-values*
+    [ filter-live ] change-in-d
+    [ filter-live ] change-out-d
+    drop ;
+
+M: #recursive remove-dead-values*
+    [ filter-live ] change-in-d
+    drop ;
+
+M: #call-recursive remove-dead-values*
+    [ filter-live ] change-in-d
+    [ filter-live ] change-out-d
+    drop ;
+
+M: #enter-recursive remove-dead-values*
+    [ filter-live ] change-in-d
+    [ filter-live ] change-out-d
+    drop ;
+
+M: #return-recursive remove-dead-values*
+    [ filter-live ] change-in-d
+    [ filter-live ] change-out-d
+    drop ;
 
 M: #shuffle remove-dead-values*
     [ filter-live ] change-in-d
@@ -92,24 +122,19 @@ M: #phi remove-dead-values*
 
 M: node remove-dead-values* drop ;
 
-M: f remove-dead-values* drop ;
+: remove-dead-values ( nodes -- )
+    [ remove-dead-values* ] each-node ;
 
-GENERIC: remove-dead-nodes* ( node -- newnode/t )
+GENERIC: remove-dead-nodes* ( node -- node/f )
 
-: prune-if-empty ( node seq -- successor/t )
-    empty? [ successor>> ] [ drop t ] if ; inline
+: prune-if-empty ( node seq -- node/f )
+    empty? [ drop f ] when ; inline
 
-M: #introduce remove-dead-nodes* dup values>> prune-if-empty ;
-
-: live-call? ( #call -- ? )
-    out-d>> [ live-value? ] contains? ;
+: live-call? ( #call -- ? ) out-d>> [ live-value? ] contains? ;
 
 M: #declare remove-dead-nodes* dup declaration>> prune-if-empty ;
 
-M: #call remove-dead-nodes*
-    dup live-call? [ drop t ] [
-        [ in-d>> #drop ] [ successor>> ] bi >>successor
-    ] if ;
+M: #call remove-dead-nodes* dup live-call? [ in-d>> #drop ] unless ;
 
 M: #shuffle remove-dead-nodes* dup in-d>> prune-if-empty ;
 
@@ -121,25 +146,13 @@ M: #r> remove-dead-nodes* dup in-r>> prune-if-empty ;
 
 M: #copy remove-dead-nodes* dup in-d>> prune-if-empty ;
 
-: (remove-dead-code) ( node -- newnode )
-    [
-        dup remove-dead-values*
-        dup remove-dead-nodes* dup t eq?
-        [ drop ] [ nip (remove-dead-code) ] if
-    ] transform-nodes ;
+M: node remove-dead-nodes* ;
 
-M: #if remove-dead-nodes*
-    [ (remove-dead-code) ] map-children t ;
-
-M: #dispatch remove-dead-nodes*
-    [ (remove-dead-code) ] map-children t ;
-
-M: #recursive remove-dead-nodes*
-    [ (remove-dead-code) ] change-child drop t ;
-
-M: node remove-dead-nodes* drop t ;
-
-M: f remove-dead-nodes* drop t ;
+: remove-dead-nodes ( nodes -- nodes' )
+    [ remove-dead-nodes* ] map-nodes ;
 
 : remove-dead-code ( node -- newnode )
-    [ [ compute-live-values ] [ (remove-dead-code) ] bi ] with-scope ;
+    [ compute-live-values ]
+    [ remove-dead-values ]
+    [ remove-dead-nodes ]
+    tri ;

@@ -4,8 +4,7 @@ namespaces prettyprint quotations sequences splitting
 state-parser strings sequences.lib ;
 IN: html.parser.utils
 
-: string-parse-end? ( -- ? )
-    get-next not ;
+: string-parse-end? ( -- ? ) get-next not ;
 
 : take-string* ( match -- string )
     dup length <circular-string>
@@ -16,17 +15,18 @@ IN: html.parser.utils
     [ ?head drop ] [ ?tail drop ] bi ;
 
 : single-quote ( str -- newstr )
-    >r "'" r> "'" 3append ;
+    "'" swap "'" 3append ;
 
 : double-quote ( str -- newstr )
-    >r "\"" r> "\"" 3append ;
+    "\"" swap "\"" 3append ;
 
 : quote ( str -- newstr )
     CHAR: ' over member?
     [ double-quote ] [ single-quote ] if ;
 
 : quoted? ( str -- ? )
-    [ [ first ] [ peek ] bi [ = ] keep "'\"" member? and ] [ f ] if-seq ;
+    [ f ]
+    [ [ first ] [ peek ] bi [ = ] keep "'\"" member? and ] if-empty ;
 
 : ?quote ( str -- newstr )
     dup quoted? [ quote ] unless ;

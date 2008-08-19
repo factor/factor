@@ -4,7 +4,7 @@ USING: math kernel io sequences io.buffers io.timeouts generic
 byte-vectors system io.encodings math.order io.backend
 continuations debugger classes byte-arrays namespaces splitting
 grouping dlists assocs io.encodings.binary summary accessors
-destructors ;
+destructors combinators ;
 IN: io.ports
 
 SYMBOL: default-buffer-size
@@ -133,10 +133,12 @@ M: output-port stream-flush ( port -- )
 
 M: output-port dispose*
     [
-        [ handle>> &dispose drop ]
-        [ port-flush ]
-        [ handle>> shutdown ]
-        tri
+        {
+            [ handle>> &dispose drop ]
+            [ buffer>> &dispose drop ]
+            [ port-flush ]
+            [ handle>> shutdown ]
+        } cleave
     ] with-destructors ;
 
 M: buffered-port dispose*

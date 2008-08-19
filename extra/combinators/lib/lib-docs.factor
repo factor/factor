@@ -11,3 +11,12 @@ HELP: generate
     "[ 20 random-prime ] [ 4 mod 3 = ] generate ."
     "526367"
 } ;
+
+HELP: %chance
+{ $values { "quot" quotation } { "n" integer } }
+{ $description "Calls the quotation " { $snippet "n" } " percent of the time." }
+{ $unchecked-example
+    "USING: io ;"
+    "[ \"hello, world!  maybe.\" print ] 50 %chance"
+    ""
+} ;

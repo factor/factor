@@ -1,8 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays namespaces assocs sequences kernel generic assocs
-classes vectors accessors combinators sets stack-checker.state
-compiler.tree compiler.tree.combinators ;
+classes vectors accessors combinators sets
+stack-checker.state
+stack-checker.branches
+compiler.tree
+compiler.tree.combinators ;
 IN: compiler.tree.def-use
 
 SYMBOL: def-use
@@ -37,7 +40,8 @@ M: #introduce node-uses-values drop f ;
 M: #push node-uses-values drop f ;
 M: #r> node-uses-values in-r>> ;
 M: #phi node-uses-values
-    [ phi-in-d>> ] [ phi-in-r>> ] bi append concat sift prune ;
+    [ phi-in-d>> ] [ phi-in-r>> ] bi
+    append concat remove-bottom prune ;
 M: #declare node-uses-values declaration>> keys ;
 M: node node-uses-values in-d>> ;
 
@@ -57,14 +61,6 @@ M: node node-defs-values out-d>> ;
     [ dup node-uses-values [ use-value ] with each ]
     [ dup node-defs-values [ def-value ] with each ] bi ;
 
-: check-use ( uses -- )
-    [ empty? [ "No use" throw ] when ]
-    [ all-unique? [ "Uses not all unique" throw ] unless ] bi ;
-
-: check-def-use ( -- )
-    def-use get [ nip uses>> check-use ] assoc-each ;
-
 : compute-def-use ( node -- node )
     H{ } clone def-use set
-    dup [ node-def-use ] each-node
-    check-def-use ;
+    dup [ node-def-use ] each-node ;

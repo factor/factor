@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors namespaces assocs dequeues search-dequeues
-kernel sequences words sets stack-checker.inlining compiler.tree
-compiler.tree.def-use compiler.tree.combinators ;
+kernel sequences words sets
+stack-checker.branches stack-checker.inlining
+compiler.tree compiler.tree.def-use compiler.tree.combinators ;
 IN: compiler.tree.dataflow-analysis
 
 ! Dataflow analysis
@@ -34,5 +35,5 @@ SYMBOL: work-list
 : dfa ( node mark-quot iterate-quot -- assoc )
     init-dfa
     [ each-node ] dip
-    work-list get H{ { f f } } clone
+    work-list get H{ { +bottom+ f } } clone
     [ rot '[ , , iterate-dfa ] slurp-dequeue ] keep ; inline
