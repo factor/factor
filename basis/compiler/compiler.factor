@@ -4,7 +4,7 @@ USING: kernel namespaces arrays sequences io inference.backend
 inference.state generator debugger words compiler.units
 continuations vocabs assocs alien.compiler dlists optimizer
 definitions math compiler.errors threads graphs generic
-inference combinators dequeues search-dequeues ;
+inference combinators deques search-deques ;
 IN: compiler
 
 SYMBOL: +failed+
@@ -60,8 +60,8 @@ SYMBOL: +failed+
         } cleave
     ] curry with-return ;
 
-: compile-loop ( dequeue -- )
-    [ (compile) yield ] slurp-dequeue ;
+: compile-loop ( deque -- )
+    [ (compile) yield ] slurp-deque ;
 
 : decompile ( word -- )
     f 2array 1array t modify-code-heap ;

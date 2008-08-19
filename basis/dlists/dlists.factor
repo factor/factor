@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Mackenzie Straight, Doug Coleman,
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators kernel math sequences accessors dequeues
+USING: combinators kernel math sequences accessors deques
 summary ;
 IN: dlists
 
@@ -11,7 +11,7 @@ TUPLE: dlist front back length ;
     dlist new
         0 >>length ;
 
-M: dlist dequeue-length length>> ;
+M: dlist deque-length length>> ;
 
 <PRIVATE
 
@@ -121,7 +121,7 @@ M: dlist pop-back* ( dlist -- )
 : dlist-contains? ( dlist quot -- ? )
     dlist-find nip ; inline
 
-M: dlist dequeue-member? ( value dlist -- ? )
+M: dlist deque-member? ( value dlist -- ? )
     [ = ] with dlist-contains? ;
 
 M: dlist delete-node ( dlist-node dlist -- )
@@ -145,7 +145,7 @@ M: dlist delete-node ( dlist-node dlist -- )
 : delete-node-if ( dlist quot -- obj/f )
     [ obj>> ] prepose delete-node-if* drop ; inline
 
-M: dlist clear-dequeue ( dlist -- )
+M: dlist clear-deque ( dlist -- )
     f >>front
     f >>back
     0 >>length
@@ -156,4 +156,4 @@ M: dlist clear-dequeue ( dlist -- )
 
 : 1dlist ( obj -- dlist ) <dlist> [ push-front ] keep ;
 
-INSTANCE: dlist dequeue
+INSTANCE: dlist deque

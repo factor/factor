@@ -1,6 +1,6 @@
 USING: help.markup help.syntax kernel kernel.private io
 threads.private continuations dlists init quotations strings
-assocs heaps boxes namespaces dequeues ;
+assocs heaps boxes namespaces deques ;
 IN: threads
 
 ARTICLE: "threads-start/stop" "Starting and stopping threads"
@@ -86,7 +86,7 @@ HELP: run-queue
 { $var-description "Global variable holding the queue of runnable threads. Calls to " { $link yield } " switch to the thread which has been in the queue for the longest period of time."
 $nl
 "By convention, threads are queued with " { $link push-front } 
-" and dequeued with " { $link pop-back } "." } ;
+" and dequed with " { $link pop-back } "." } ;
 
 HELP: resume
 { $values { "thread" thread } }

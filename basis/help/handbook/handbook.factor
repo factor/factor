@@ -128,10 +128,10 @@ ARTICLE: "collections" "Collections"
 { $subsection "alists" }
 { $subsection "enums" }
 { $heading "Double-ended queues" }
-{ $subsection "dequeues" }
+{ $subsection "deques" }
 "Implementations:"
 { $subsection "dlists" }
-{ $subsection "search-dequeues" }
+{ $subsection "search-deques" }
 { $heading "Other collections" }
 { $subsection "boxes" }
 { $subsection "heaps" }

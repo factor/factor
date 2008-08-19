@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: dequeues dlists kernel threads continuations math
+USING: deques dlists kernel threads continuations math
 concurrency.conditions ;
 IN: concurrency.locks
 
@@ -80,7 +80,7 @@ TUPLE: rw-lock readers writers reader# writer ;
 
 : release-write-lock ( lock -- )
     f over set-rw-lock-writer
-    dup rw-lock-readers dequeue-empty?
+    dup rw-lock-readers deque-empty?
     [ notify-writer ] [ rw-lock-readers notify-all ] if ;
 
 : reentrant-read-lock-ok? ( lock -- ? )

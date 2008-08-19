@@ -1,0 +1,4 @@
+boot.x86.32.image 07cd1d5506e508e8054d22f03cd0e63b
+boot.x86.64.image 4e99cd0902df35bbef4d1ad30559d911
+boot.linux-ppc.image 2188d87eb2920b7f34b5c6f2ddf7bd27
+boot.macosx-ppc.image 37e05c8b04df0386032959bdbd9dc9cc

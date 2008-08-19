@@ -1,17 +1,17 @@
-USING: dequeues dlists dlists.private kernel tools.test random
+USING: deques dlists dlists.private kernel tools.test random
 assocs sets sequences namespaces sorting debugger io prettyprint
 math accessors classes ;
 IN: dlists.tests
 
-[ t ] [ <dlist> dequeue-empty? ] unit-test
+[ t ] [ <dlist> deque-empty? ] unit-test
 
 [ T{ dlist f T{ dlist-node f 1 f f } T{ dlist-node f 1 f f } 1 } ]
 [ <dlist> 1 over push-front ] unit-test
 
 ! Make sure empty lists are empty
-[ t ] [ <dlist> dequeue-empty? ] unit-test
-[ f ] [ <dlist> 1 over push-front dequeue-empty? ] unit-test
-[ f ] [ <dlist> 1 over push-back dequeue-empty? ] unit-test
+[ t ] [ <dlist> deque-empty? ] unit-test
+[ f ] [ <dlist> 1 over push-front deque-empty? ] unit-test
+[ f ] [ <dlist> 1 over push-back deque-empty? ] unit-test
 
 [ 1 ] [ <dlist> 1 over push-front pop-front ] unit-test
 [ 1 ] [ <dlist> 1 over push-front pop-back ] unit-test
@@ -50,17 +50,17 @@ IN: dlists.tests
 [ t ] [ <dlist> 1 over push-back [ 1 = ] dlist-contains? ] unit-test
 
 [ 1 ] [ <dlist> 1 over push-back [ 1 = ] delete-node-if ] unit-test
-[ t ] [ <dlist> 1 over push-back dup [ 1 = ] delete-node-if drop dequeue-empty? ] unit-test
-[ t ] [ <dlist> 1 over push-back dup [ 1 = ] delete-node-if drop dequeue-empty? ] unit-test
-[ 0 ] [ <dlist> 1 over push-back dup [ 1 = ] delete-node-if drop dequeue-length ] unit-test
-[ 1 ] [ <dlist> 1 over push-back 2 over push-back dup [ 1 = ] delete-node-if drop dequeue-length ] unit-test
-[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back dup [ 1 = ] delete-node-if drop dequeue-length ] unit-test
-[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back dup [ 2 = ] delete-node-if drop dequeue-length ] unit-test
-[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back dup [ 3 = ] delete-node-if drop dequeue-length ] unit-test
+[ t ] [ <dlist> 1 over push-back dup [ 1 = ] delete-node-if drop deque-empty? ] unit-test
+[ t ] [ <dlist> 1 over push-back dup [ 1 = ] delete-node-if drop deque-empty? ] unit-test
+[ 0 ] [ <dlist> 1 over push-back dup [ 1 = ] delete-node-if drop deque-length ] unit-test
+[ 1 ] [ <dlist> 1 over push-back 2 over push-back dup [ 1 = ] delete-node-if drop deque-length ] unit-test
+[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back dup [ 1 = ] delete-node-if drop deque-length ] unit-test
+[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back dup [ 2 = ] delete-node-if drop deque-length ] unit-test
+[ 2 ] [ <dlist> 1 over push-back 2 over push-back 3 over push-back dup [ 3 = ] delete-node-if drop deque-length ] unit-test
 
-[ 0 ] [ <dlist> dequeue-length ] unit-test
-[ 1 ] [ <dlist> 1 over push-front dequeue-length ] unit-test
-[ 0 ] [ <dlist> 1 over push-front dup pop-front* dequeue-length ] unit-test
+[ 0 ] [ <dlist> deque-length ] unit-test
+[ 1 ] [ <dlist> 1 over push-front deque-length ] unit-test
+[ 0 ] [ <dlist> 1 over push-front dup pop-front* deque-length ] unit-test
 
 [ t ] [ <dlist> 4 over push-back 5 over push-back [ obj>> 4 = ] dlist-find-node drop class dlist-node = ] unit-test
 [ t ] [ <dlist> 4 over push-back 5 over push-back [ obj>> 5 = ] dlist-find-node drop class dlist-node = ] unit-test
@@ -72,8 +72,8 @@ IN: dlists.tests
 [ <dlist> pop-front ] [ empty-dlist? ] must-fail-with
 [ <dlist> pop-back ] [ empty-dlist? ] must-fail-with
 
-[ t ] [ <dlist> 3 over push-front 4 over push-back 3 swap dequeue-member? ] unit-test
+[ t ] [ <dlist> 3 over push-front 4 over push-back 3 swap deque-member? ] unit-test
 
-[ f ] [ <dlist> 3 over push-front 4 over push-back -1 swap dequeue-member? ] unit-test
+[ f ] [ <dlist> 3 over push-front 4 over push-back -1 swap deque-member? ] unit-test
 
-[ f ] [ <dlist> 0 swap dequeue-member? ] unit-test
+[ f ] [ <dlist> 0 swap deque-member? ] unit-test
