@@ -34,10 +34,10 @@ GENERIC: engine>quot ( engine -- quot )
     [ [ nip class<=     ] curry assoc-filter ] 2bi ;
 
 : convert-methods ( assoc class word -- assoc' )
-    over >r >r split-methods dup assoc-empty? [
-        r> r> 3drop
+    over [ split-methods ] 2dip pick assoc-empty? [
+        3drop
     ] [
-        r> execute r> pick set-at
+        [ execute ] dip pick set-at
     ] if ; inline
 
 : (picker) ( n -- quot )
