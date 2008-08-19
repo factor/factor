@@ -90,13 +90,11 @@ TUPLE: #dispatch < #branch ;
 : #dispatch ( n branches -- node )
     \ #dispatch new-branch ;
 
-TUPLE: #phi < node phi-in-d phi-info-d phi-in-r phi-info-r out-d out-r terminated ;
+TUPLE: #phi < node phi-in-d phi-info-d out-d terminated ;
 
-: #phi ( d-phi-in d-phi-out r-phi-in r-phi-out terminated -- node )
+: #phi ( d-phi-in d-phi-out terminated -- node )
     \ #phi new
         swap >>terminated
-        swap >>out-r
-        swap >>phi-in-r
         swap >>out-d
         swap >>phi-in-d ;
 

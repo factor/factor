@@ -16,9 +16,7 @@ M: #dispatch mark-live-values* look-at-inputs ;
 M: #phi compute-live-values*
     #! If any of the outputs of a #phi are live, then the
     #! corresponding inputs are live too.
-    [ [ out-d>> ] [ phi-in-d>> ] bi look-at-phi ]
-    [ [ out-r>> ] [ phi-in-r>> ] bi look-at-phi ]
-    2bi ;
+    [ out-d>> ] [ phi-in-d>> ] bi look-at-phi ;
 
 SYMBOL: if-node
 
@@ -28,45 +26,31 @@ M: #branch remove-dead-code*
     bi ;
 
 : remove-phi-inputs ( #phi -- )
-    dup [ out-d>> ] [ phi-in-d>> flip ] bi filter-corresponding flip >>phi-in-d
-    dup [ out-r>> ] [ phi-in-r>> flip ] bi filter-corresponding flip >>phi-in-r
+    dup [ out-d>> ] [ phi-in-d>> flip ] bi
+    filter-corresponding
+    flip >>phi-in-d
     drop ;
 
 : live-value-indices ( values -- indices )
     [ length ] keep live-values get
     '[ , nth , key? ] filter ; inline
 
-: drop-d-values ( values indices -- node )
+: drop-values ( values indices -- node )
     [ drop filter-live ] [ nths ] 2bi
     [ make-values ] keep
     [ drop ] [ zip ] 2bi
     #shuffle ;
 
-: drop-r-values ( values indices -- nodes ) 2drop f ;
-!     [ dup make-values [ #r> ] keep ] dip
-!     drop-d-values dup out-d>> dup make-values #>r
-!     3array ;
-
-: insert-drops ( nodes d-values r-values d-indices r-indices -- nodes' )
-    '[
-        [ , drop-d-values 1array ]
-        [ , drop-r-values ]
-        bi* 3append
-    ] 3map ;
+: insert-drops ( nodes values indices -- nodes' )
+    '[ , drop-values suffix ] 2map ;
 
 : hoist-drops ( #phi -- )
     if-node get swap
-    {
-        [ phi-in-d>> ]
-        [ phi-in-r>> ]
-        [ out-d>> live-value-indices ]
-        [ out-r>> live-value-indices ]
-    } cleave
-    '[ , , , , insert-drops ] change-children drop ;
+    [ phi-in-d>> ] [ out-d>> live-value-indices ] bi
+    '[ , , insert-drops ] change-children drop ;
 
 : remove-phi-outputs ( #phi -- )
     [ filter-live ] change-out-d
-    [ filter-live ] change-out-r
     drop ;
 
 M: #phi remove-dead-code*

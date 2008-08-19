@@ -39,9 +39,7 @@ GENERIC: node-uses-values ( node -- values )
 M: #introduce node-uses-values drop f ;
 M: #push node-uses-values drop f ;
 M: #r> node-uses-values in-r>> ;
-M: #phi node-uses-values
-    [ phi-in-d>> ] [ phi-in-r>> ] bi
-    append concat remove-bottom prune ;
+M: #phi node-uses-values phi-in-d>> concat remove-bottom prune ;
 M: #declare node-uses-values declaration>> keys ;
 M: #terminate node-uses-values [ in-d>> ] [ in-r>> ] bi append ;
 M: #alien-callback node-uses-values drop f ;
@@ -51,7 +49,6 @@ GENERIC: node-defs-values ( node -- values )
 
 M: #>r node-defs-values out-r>> ;
 M: #branch node-defs-values drop f ;
-M: #phi node-defs-values [ out-d>> ] [ out-r>> ] bi append ;
 M: #declare node-defs-values drop f ;
 M: #return node-defs-values drop f ;
 M: #recursive node-defs-values drop f ;

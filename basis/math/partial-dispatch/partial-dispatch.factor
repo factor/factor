@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel kernel.private math math.private words
-sequences parser namespaces assocs quotations arrays
+sequences parser namespaces assocs quotations arrays locals
 generic generic.math hashtables effects compiler.units ;
 IN: math.partial-dispatch
 
@@ -12,29 +12,26 @@ IN: math.partial-dispatch
 PREDICATE: math-partial < word
     "derived-from" word-prop >boolean ;
 
-: fixnum-integer-op ( a b fix-word big-word -- c )
-    pick tag 0 eq? [
-        drop execute
+:: fixnum-integer-op ( a b fix-word big-word -- c )
+    b tag 0 eq? [
+        a b fix-word execute
     ] [
-        >r drop >r fixnum>bignum r> r> execute
+       a fixnum>bignum b big-word execute
     ] if ; inline
 
-: integer-fixnum-op ( a b fix-word big-word -- c )
-    >r pick tag 0 eq? [
-        r> drop execute
+:: integer-fixnum-op ( a b fix-word big-word -- c )
+    a tag 0 eq? [
+        a b fix-word execute
     ] [
-        drop fixnum>bignum r> execute
+        a b fixnum>bignum big-word execute
     ] if ; inline
 
-: integer-integer-op ( a b fix-word big-word -- c )
-    pick tag 0 eq? [
-        integer-fixnum-op
+:: integer-integer-op ( a b fix-word big-word -- c )
+    b tag 0 eq? [
+        a b fix-word big-word integer-fixnum-op
     ] [
-        >r drop over tag 0 eq? [
-            >r fixnum>bignum r> r> execute
-        ] [
-            r> execute
-        ] if
+        a dup tag 0 eq? [ fixnum>bignum ] when
+        b big-word execute
     ] if ; inline
 
 : integer-op-combinator ( triple -- word )

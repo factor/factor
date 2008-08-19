@@ -36,12 +36,9 @@ M: #r> check-node* inputs/outputs 2array check-lengths ;
 M: #return-recursive check-node* inputs/outputs 2array check-lengths ;
 
 M: #phi check-node*
-    {
-        [ [ phi-in-d>> <flipped> ] [ out-d>> ] bi 2array check-lengths ]
-        [ [ phi-in-r>> <flipped> ] [ out-r>> ] bi 2array check-lengths ]
-        [ phi-in-d>> check-lengths ]
-        [ phi-in-r>> check-lengths ]
-    } cleave ;
+    [ [ phi-in-d>> <flipped> ] [ out-d>> ] bi 2array check-lengths ]
+    [ phi-in-d>> check-lengths ]
+    bi ;
 
 M: #enter-recursive check-node*
     [ [ in-d>> ] [ out-d>> ] bi 2array check-lengths ]

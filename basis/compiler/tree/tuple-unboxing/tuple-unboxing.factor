@@ -100,9 +100,7 @@ M: #terminate unbox-tuples*
 
 M: #phi unbox-tuples*
     [ [ flatten-values ] map pad-with-bottom ] change-phi-in-d
-    [ [ flatten-values ] map pad-with-bottom ] change-phi-in-r
-    [ flatten-values ] change-out-d 
-    [ flatten-values ] change-out-r ;
+    [ flatten-values ] change-out-d ;
 
 M: #recursive unbox-tuples*
     [ flatten-values ] change-in-d ;

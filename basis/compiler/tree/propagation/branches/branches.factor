@@ -70,13 +70,10 @@ SYMBOL: infer-children-data
     ] 2map ;
 
 : annotate-phi-inputs ( #phi -- )
-    dup phi-in-d>> compute-phi-input-infos >>phi-info-d
-    dup phi-in-r>> compute-phi-input-infos >>phi-info-r
-    drop ;
+    dup phi-in-d>> compute-phi-input-infos >>phi-info-d drop ;
 
 : annotate-phi-outputs ( #phi -- )
-    dup [ out-d>> ] [ out-r>> ] bi append extract-value-info
-    >>info drop ;
+    dup out-d>> extract-value-info >>info drop ;
 
 : merge-value-infos ( infos outputs -- )
     [ [ value-infos-union ] map ] dip set-value-infos ;
@@ -84,12 +81,10 @@ SYMBOL: infer-children-data
 SYMBOL: condition-value
 
 M: #phi propagate-before ( #phi -- )
-    {
-        [ annotate-phi-inputs ]
-        [ [ phi-info-d>> <flipped> ] [ out-d>> ] bi merge-value-infos ]
-        [ [ phi-info-r>> <flipped> ] [ out-r>> ] bi merge-value-infos ]
-        [ annotate-phi-outputs ]
-    } cleave ;
+    [ annotate-phi-inputs ]
+    [ [ phi-info-d>> <flipped> ] [ out-d>> ] bi merge-value-infos ]
+    [ annotate-phi-outputs ]
+    tri ;
 
 : branch-phi-constraints ( output values booleans -- )
      {
