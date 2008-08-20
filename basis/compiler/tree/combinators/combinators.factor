@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry kernel accessors sequences sequences.deep arrays
+USING: assocs fry kernel accessors sequences sequences.deep arrays
 stack-checker.inlining namespaces compiler.tree ;
 IN: compiler.tree.combinators
 
@@ -44,6 +44,9 @@ IN: compiler.tree.combinators
 
 : select-children ( seq flags -- seq' )
     [ [ drop f ] unless ] 2map ;
+
+: sift-children ( seq flags -- seq' )
+    zip [ nip ] assoc-filter keys ;
 
 : (3each) [ 3array flip ] dip [ first3 ] prepose ; inline
 

@@ -4,16 +4,18 @@ math.private math generic words quotations alien alien.c-types
 strings sbufs sequences.private slots.private combinators
 definitions system layouts vectors math.partial-dispatch
 math.order math.functions accessors hashtables classes assocs
-io.encodings.utf8 io.encodings.ascii io.encodings fry
+io.encodings.utf8 io.encodings.ascii io.encodings fry slots
+sorting.private
 compiler.tree
 compiler.tree.combinators
 compiler.tree.cleanup
 compiler.tree.builder
 compiler.tree.normalization
-compiler.tree.propagation ;
+compiler.tree.propagation
+compiler.tree.checker ;
 
 : cleaned-up-tree ( quot -- nodes )
-    build-tree normalize propagate cleanup ;
+    build-tree normalize propagate cleanup dup check-nodes ;
 
 [ t ] [ [ [ 1 ] [ 2 ] if ] cleaned-up-tree [ #if? ] contains-node? ] unit-test
 
@@ -429,4 +431,15 @@ cell-bits 32 = [
     [
         { integer } declare [ 0 >= ] map
     ] { >= fixnum>= } inlined?
+] unit-test
+
+[ ] [
+    [
+        4 pick array-capacity?
+        [ set-slot ] [ \ array-capacity 2nip bad-slot-value ] if
+    ] cleaned-up-tree drop
+] unit-test
+
+[ ] [
+    [ { merge } declare accum>> 0 >>length ] cleaned-up-tree drop
 ] unit-test

@@ -124,7 +124,7 @@ M: #branch cleanup*
     if ;
 
 : eliminate-phi ( #phi -- node )
-    dup phi-in-d>> length {
+    live-branches get sift length {
         { 0 [ drop f ] }
         { 1 [ eliminate-single-phi ] }
         [ drop ]
@@ -133,8 +133,9 @@ M: #branch cleanup*
 M: #phi cleanup*
     #! Remove #phi function inputs which no longer exist.
     live-branches get
-    [ '[ , select-children sift ] change-phi-in-d ]
-    [ '[ , select-children sift ] change-phi-info-d ] bi
+    [ '[ , sift-children ] change-phi-in-d ]
+    [ '[ , sift-children ] change-phi-info-d ]
+    [ '[ , sift-children ] change-terminated ] tri
     eliminate-phi
     live-branches off ;
 

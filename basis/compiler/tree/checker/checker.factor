@@ -67,6 +67,7 @@ ERROR: check-node-error node error ;
 
 SYMBOL: datastack
 SYMBOL: retainstack
+SYMBOL: terminated?
 
 GENERIC: check-stack-flow* ( node -- )
 
@@ -120,11 +121,8 @@ M: #r> check-stack-flow* [ check-in-r ] [ check-out-d ] bi ;
 : assert-retainstack-empty ( -- )
     retainstack get empty? [ "Retain stack not empty" throw ] unless ;
 
-: must-consume-all ( -- )
-    assert-datastack-empty assert-retainstack-empty ;
-
 M: #return check-stack-flow*
-    check-in-d must-consume-all ;
+    check-in-d assert-datastack-empty assert-retainstack-empty ;
 
 M: #enter-recursive check-stack-flow*
     check-out-d ;
@@ -144,7 +142,9 @@ M: #call-recursive check-stack-flow*
     [ "Bad terminate retain stack" throw ] unless ;
 
 M: #terminate check-stack-flow*
-    [ check-terminate-in-d ] [ check-terminate-in-r ] bi ;
+    terminated? on
+    [ check-terminate-in-d ]
+    [ check-terminate-in-r ] bi ;
 
 SYMBOL: branch-out
 
@@ -154,7 +154,7 @@ SYMBOL: branch-out
         V{ } clone retainstack set
         (check-stack-flow)
         assert-retainstack-empty
-        datastack get
+        terminated? get f datastack get ?
     ] with-scope ;
 
 M: #branch check-stack-flow*
@@ -176,7 +176,7 @@ M: #branch check-stack-flow*
 
 : set-phi-datastack ( #phi -- )
     phi-in-d>> first length
-    branch-out get [ [ +bottom+ eq? ] all? not ] find nip
+    branch-out get [ ] find nip
     dup [ swap head* >vector ] [ 2drop V{ } clone ] if datastack set ;
 
 M: #phi check-stack-flow*
