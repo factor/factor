@@ -1,26 +1,22 @@
 USING: accessors arrays html.parser.utils hashtables io kernel
 namespaces prettyprint quotations
-sequences splitting state-parser strings unicode.categories unicode.case ;
+sequences splitting state-parser strings unicode.categories unicode.case
+sequences.lib ;
 IN: html.parser
 
-TUPLE: tag name attributes text matched? closing? ;
+TUPLE: tag name attributes text closing? ;
 
-SYMBOL: text
-SYMBOL: dtd
-SYMBOL: comment
-SYMBOL: javascript
+SINGLETON: text
+SINGLETON: dtd
+SINGLETON: comment
 SYMBOL: tagstack
 
 : push-tag ( tag -- )
     tagstack get push ;
 
 : closing-tag? ( string -- ? )
-    dup empty? [
-        drop f
-    ] [
-        dup first CHAR: / =
-        swap peek CHAR: / = or
-    ] if ;
+    [ f ]
+    [ [ first ] [ peek ] bi [ CHAR: / = ] bi@ or ] if-empty ;
 
 : <tag> ( name attributes closing? -- tag )
     tag new
@@ -28,56 +24,55 @@ SYMBOL: tagstack
         swap >>attributes
         swap >>name ;
 
-: make-tag ( str attribs -- tag )
+: make-tag ( string attribs -- tag )
     >r [ closing-tag? ] keep "/" trim1 r> rot <tag> ;
 
-: make-text-tag ( str -- tag )
-    T{ tag f text } clone [ set-tag-text ] keep ;
+: make-text-tag ( string -- tag )
+    tag new
+        text >>name
+        swap >>text ;
 
-: make-comment-tag ( str -- tag )
-    T{ tag f comment } clone [ set-tag-text ] keep ;
+: make-comment-tag ( string -- tag )
+    tag new
+        comment >>name
+        swap >>text ;
 
-: make-dtd-tag ( str -- tag )
-    T{ tag f dtd } clone [ set-tag-text ] keep ;
+: make-dtd-tag ( string -- tag )
+    tag new
+        dtd >>name
+        swap >>text ;
 
-: read-whitespace ( -- str )
+: read-whitespace ( -- string )
     [ get-char blank? not ] take-until ;
 
-: read-whitespace* ( -- )
-    read-whitespace drop ;
+: read-whitespace* ( -- ) read-whitespace drop ;
 
-: read-token ( -- str )
+: read-token ( -- string )
     read-whitespace*
     [ get-char blank? ] take-until ;
 
-: read-single-quote ( -- str )
+: read-single-quote ( -- string )
     [ get-char CHAR: ' = ] take-until ;
 
-: read-double-quote ( -- str )
+: read-double-quote ( -- string )
     [ get-char CHAR: " = ] take-until ;
 
-: read-quote ( -- str )
-    get-char next* CHAR: ' = [
-        read-single-quote
-    ] [
-        read-double-quote
-    ] if next* ;
+: read-quote ( -- string )
+    get-char next* CHAR: ' =
+    [ read-single-quote ] [ read-double-quote ] if next* ;
 
-: read-key ( -- str )
+: read-key ( -- string )
     read-whitespace*
-    [ get-char CHAR: = = get-char blank? or ] take-until ;
+    [ get-char [ CHAR: = = ] [ blank? ] bi or ] take-until ;
 
 : read-= ( -- )
     read-whitespace*
     [ get-char CHAR: = = ] take-until drop next* ;
 
-: read-value ( -- str )
+: read-value ( -- string )
     read-whitespace*
-    get-char quote? [
-        read-quote
-    ] [
-        read-token
-    ] if [ blank? ] trim ;
+    get-char quote? [ read-quote ] [ read-token ] if
+    [ blank? ] trim ;
 
 : read-comment ( -- )
     "-->" take-string* make-comment-tag push-tag ;
@@ -97,14 +92,14 @@ SYMBOL: tagstack
     [ get-char CHAR: > = get-char CHAR: < = or ] take-until
     get-char CHAR: < = [ next* ] unless ;
 
-: read-< ( -- str )
+: read-< ( -- string )
     next* get-char CHAR: ! = [
         read-bang f
     ] [
         read-tag
     ] if ;
 
-: read-until-< ( -- str )
+: read-until-< ( -- string )
     [ get-char CHAR: < = ] take-until ;
 
 : parse-text ( -- )
@@ -131,11 +126,9 @@ SYMBOL: tagstack
     ] string-parse ;
 
 : parse-tag ( -- )
-    read-< dup empty? [
-        drop
-    ] [
+    read-< [
         (parse-tag) make-tag push-tag
-    ] if ;
+    ] unless-empty ;
 
 : (parse-html) ( -- )
     get-next [
@@ -145,13 +138,7 @@ SYMBOL: tagstack
     ] when ;
 
 : tag-parse ( quot -- vector )
-    [
-        V{ } clone tagstack set
-        string-parse
-    ] with-scope ;
+    V{ } clone tagstack [ string-parse ] with-variable ;
 
 : parse-html ( string -- vector )
-    [
-        (parse-html)
-        tagstack get
-    ] tag-parse ;
+    [ (parse-html) tagstack get ] tag-parse ;

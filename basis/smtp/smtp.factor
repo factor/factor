@@ -1,10 +1,10 @@
 ! Copyright (C) 2007, 2008 Elie CHAFTARI, Dirk Vleugels,
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces io io.timeouts kernel logging io.sockets
+USING: arrays namespaces io io.timeouts kernel logging io.sockets
 sequences combinators sequences.lib splitting assocs strings
-math.parser random system calendar io.encodings.ascii
-calendar.format accessors sets ;
+math.parser random system calendar io.encodings.ascii summary
+calendar.format accessors sets hashtables ;
 IN: smtp
 
 SYMBOL: smtp-domain
@@ -23,6 +23,16 @@ LOG: log-smtp-connection NOTICE ( addrspec -- )
         call
     ] with-client ; inline
 
+TUPLE: email
+    { from string }
+    { to array }
+    { cc array }
+    { bcc array }
+    { subject string }
+    { body string } ;
+
+: <email> ( -- email ) email new ;
+
 : crlf ( -- ) "\r\n" write ;
 
 : command ( string -- ) write crlf flush ;
@@ -30,10 +40,12 @@ LOG: log-smtp-connection NOTICE ( addrspec -- )
 : helo ( -- )
     esmtp get "EHLO " "HELO " ? host-name append command ;
 
+ERROR: bad-email-address email ;
+
 : validate-address ( string -- string' )
     #! Make sure we send funky stuff to the server by accident.
     dup "\r\n>" intersect empty?
-    [ "Bad e-mail address: " prepend throw ] unless ;
+    [ bad-email-address ] unless ;
 
 : mail-from ( fromaddr -- )
     "MAIL FROM:<" swap validate-address ">" 3append command ;
@@ -44,8 +56,15 @@ LOG: log-smtp-connection NOTICE ( addrspec -- )
 : data ( -- )
     "DATA" command ;
 
+ERROR: message-contains-dot message ;
+
+M: message-contains-dot summary ( obj -- string )
+    drop
+    "Message cannot contain . on a line by itself" ;
+
 : validate-message ( msg -- msg' )
-    "." over member? [ "Message cannot contain . on a line by itself" throw ] when ;
+    "." over member?
+    [ message-contains-dot ] when ;
 
 : send-body ( body -- )
     string-lines
@@ -58,19 +77,37 @@ LOG: log-smtp-connection NOTICE ( addrspec -- )
 
 LOG: smtp-response DEBUG
 
+ERROR: smtp-error message ;
+ERROR: smtp-server-busy < smtp-error ;
+ERROR: smtp-syntax-error < smtp-error ;
+ERROR: smtp-command-not-implemented < smtp-error ;
+ERROR: smtp-bad-authentication < smtp-error ;
+ERROR: smtp-mailbox-unavailable < smtp-error ;
+ERROR: smtp-user-not-local < smtp-error ;
+ERROR: smtp-exceeded-storage-allocation < smtp-error ;
+ERROR: smtp-bad-mailbox-name < smtp-error ;
+ERROR: smtp-transaction-failed < smtp-error ;
+
 : check-response ( response -- )
+    dup smtp-response
     {
-        { [ dup "220" head? ] [ smtp-response ] }
-        { [ dup "235" swap subseq? ] [ smtp-response ] }
-        { [ dup "250" head? ] [ smtp-response ] }
-        { [ dup "221" head? ] [ smtp-response ] }
-        { [ dup "bye" head? ] [ smtp-response ] }
-        { [ dup "4" head? ] [ "server busy" throw ] }
-        { [ dup "354" head? ] [ smtp-response ] }
-        { [ dup "50" head? ] [ smtp-response "syntax error" throw ] }
-        { [ dup "53" head? ] [ smtp-response "invalid authentication data" throw ] }
-        { [ dup "55" head? ] [ smtp-response "fatal error" throw ] }
-        [ "unknown error" throw ]
+        { [ dup "bye" head? ] [ drop ] }
+        { [ dup "220" head? ] [ drop ] }
+        { [ dup "235" swap subseq? ] [ drop ] }
+        { [ dup "250" head? ] [ drop ] }
+        { [ dup "221" head? ] [ drop ] }
+        { [ dup "354" head? ] [ drop ] }
+        { [ dup "4" head? ] [ smtp-server-busy ] }
+        { [ dup "500" head? ] [ smtp-syntax-error ] }
+        { [ dup "501" head? ] [ smtp-command-not-implemented ] }
+        { [ dup "50" head? ] [ smtp-syntax-error ] }
+        { [ dup "53" head? ] [ smtp-bad-authentication ] }
+        { [ dup "550" head? ] [ smtp-mailbox-unavailable ] }
+        { [ dup "551" head? ] [ smtp-user-not-local ] }
+        { [ dup "552" head? ] [ smtp-exceeded-storage-allocation ] }
+        { [ dup "553" head? ] [ smtp-bad-mailbox-name ] }
+        { [ dup "554" head? ] [ smtp-transaction-failed ] }
+        [ smtp-error ]
     } cond ;
 
 : multiline? ( response -- boolean )
@@ -89,40 +126,18 @@ LOG: smtp-response DEBUG
 
 : get-ok ( -- ) receive-response check-response ;
 
+ERROR: invalid-header-string string ;
+
 : validate-header ( string -- string' )
     dup "\r\n" intersect empty?
-    [ "Invalid header string: " prepend throw ] unless ;
+    [ invalid-header-string ] unless ;
 
 : write-header ( key value -- )
-    swap
-    validate-header write
-    ": " write
-    validate-header write
-    crlf ;
+    [ validate-header write ]
+    [ ": " write validate-header write ] bi* crlf ;
 
 : write-headers ( assoc -- )
     [ write-header ] assoc-each ;
-
-TUPLE: email from to subject headers body ;
-
-M: email clone
-    call-next-method [ clone ] change-headers ;
-
-: (send) ( email -- )
-    [
-        helo get-ok
-        dup from>> mail-from get-ok
-        dup to>> [ rcpt-to get-ok ] each
-        data get-ok
-        dup headers>> write-headers
-        crlf
-        body>> send-body get-ok
-        quit get-ok
-    ] with-smtp-connection ;
-
-: extract-email ( recepient -- email )
-    #! This could be much smarter.
-    " " last-split1 swap or "<" ?head drop ">" ?tail drop ;
 
 : message-id ( -- string )
     [
@@ -135,25 +150,38 @@ M: email clone
         ">" %
     ] "" make ;
 
-: set-header ( email value key -- email )
-    pick headers>> set-at ;
+: extract-email ( recepient -- email )
+    #! This could be much smarter.
+    " " last-split1 swap or "<" ?head drop ">" ?tail drop ;
 
-: prepare ( email -- email )
-    clone
-    dup from>> "From" set-header
-    [ extract-email ] change-from
-    dup to>> ", " join "To" set-header
-    [ [ extract-email ] map ] change-to
-    dup subject>> "Subject" set-header
-    now timestamp>rfc822 "Date" set-header
-    message-id "Message-Id" set-header ;
+: email>headers ( email -- hashtable )
+    [
+        {
+            [ from>> "From" set ]
+            [ to>> ", " join "To" set ]
+            [ cc>> ", " join [ "Cc" set ] unless-empty ]
+            [ subject>> "Subject" set ]
+        } cleave
+        now timestamp>rfc822 "Date" set
+        message-id "Message-Id" set
+    ] { } make-assoc ;
 
-: <email> ( -- email )
-    email new
-    H{ } clone >>headers ;
+: (send-email) ( headers email -- )
+    [
+        helo get-ok
+        dup from>> extract-email mail-from get-ok
+        dup to>> [ extract-email rcpt-to get-ok ] each
+        dup cc>> [ extract-email rcpt-to get-ok ] each
+        dup bcc>> [ extract-email rcpt-to get-ok ] each
+        data get-ok
+        swap write-headers
+        crlf
+        body>> send-body get-ok
+        quit get-ok
+    ] with-smtp-connection ;
 
 : send-email ( email -- )
-    prepare (send) ;
+    [ email>headers ] keep (send-email) ;
 
 ! Dirk's old AUTH CRAM-MD5 code. I don't know anything about
 ! CRAM MD5, and the old code didn't work properly either, so here
