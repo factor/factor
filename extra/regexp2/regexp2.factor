@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel math math.ranges
-sequences regexp2.backend regexp2.utils memoize
+sequences regexp2.backend regexp2.utils memoize sets
 regexp2.parser regexp2.nfa regexp2.dfa regexp2.traversal
 regexp2.transition-tables ;
 IN: regexp2
@@ -30,12 +30,15 @@ IN: regexp2
 
 : match-head ( string regexp -- end ) match length>> 1- ;
 
-MEMO: <regexp> ( string -- regexp )
+: initial-option ( regexp option -- regexp' )
+    over options>> conjoin ;
+
+: <regexp> ( string -- regexp )
     default-regexp construct-regexp ;
 
-MEMO: <iregexp> ( string -- regexp )
+: <iregexp> ( string -- regexp )
     default-regexp
-    t >>case-insensitive
+    case-insensitive initial-option
     construct-regexp ;
 
 : R! CHAR: ! <regexp> ; parsing

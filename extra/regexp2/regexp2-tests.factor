@@ -151,7 +151,7 @@ IN: regexp2-tests
 [ f ] [ "abc" "[\\p{Upper}]{3}" <regexp> matches? ] unit-test
 [ t ] [ "ABC" "[\\p{Upper}]{3}" <regexp> matches? ] unit-test
 
-[ t ] [ "" "\\Q\\E" <regexp> matches? ] unit-test
+[ f ] [ "" "\\Q\\E" <regexp> matches? ] unit-test
 [ f ] [ "a" "\\Q\\E" <regexp> matches? ] unit-test
 [ t ] [ "|*+" "\\Q|*+\\E" <regexp> matches? ] unit-test
 [ f ] [ "abc" "\\Q|*+\\E" <regexp> matches? ] unit-test

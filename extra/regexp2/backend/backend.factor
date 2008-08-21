@@ -7,10 +7,10 @@ TUPLE: regexp
     raw
     { stack vector }
     parse-tree
+    { options hashtable }
     nfa-table
     dfa-table
     minimized-table
-    case-insensitive
     { state integer }
     { new-states vector }
     { visited-states hashtable } ;

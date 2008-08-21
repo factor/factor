@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators io io.streams.string
-kernel math math.parser multi-methods namespaces qualified
+kernel math math.parser multi-methods namespaces qualified sets
 quotations sequences sequences.lib splitting symbols vectors
-dlists math.order combinators.lib unicode.categories
-sequences.lib regexp2.backend regexp2.utils ;
+dlists math.order combinators.lib unicode.categories strings
+sequences.lib regexp2.backend regexp2.utils unicode.case ;
 IN: regexp2.parser
 
 FROM: math.ranges => [a,b] ;
@@ -48,12 +48,26 @@ SINGLETONS: beginning-of-group end-of-group
 beginning-of-character-class end-of-character-class
 left-parenthesis pipe caret dash ;
 
-: <constant> ( obj -- constant ) constant boa ;
+: get-option ( option -- ? ) current-regexp get options>> at ;
+: get-unix-lines ( -- ? ) unix-lines get-option ;
+: get-dotall ( -- ? ) dotall get-option ;
+: get-multiline ( -- ? ) multiline get-option ;
+: get-comments ( -- ? ) comments get-option ;
+: get-case-insensitive ( -- ? ) case-insensitive get-option ;
+: get-unicode-case ( -- ? ) unicode-case get-option ;
+
 : <negation> ( obj -- negation ) negation boa ;
 : <concatenation> ( seq -- concatenation ) >vector concatenation boa ;
 : <alternation> ( seq -- alternation ) >vector alternation boa ;
 : <capture-group> ( obj -- capture-group ) capture-group boa ;
 : <kleene-star> ( obj -- kleene-star ) kleene-star boa ;
+: <constant> ( obj -- constant )
+    dup Letter? get-case-insensitive and [
+        [ ch>lower constant boa ]
+        [ ch>upper constant boa ] bi 2array <alternation>
+    ] [
+        constant boa
+    ] if ;
 
 : first|concatenation ( seq -- first/concatenation )
     dup length 1 = [ first ] [ <concatenation> ] if ;
@@ -95,19 +109,20 @@ ERROR: bad-option ch ;
         { CHAR: x [ comments ] }
         [ bad-option ]
     } case ;
-    
-: option-on ( ch -- ) option \ option-on boa push-stack ;
-: option-off ( ch -- ) option \ option-off boa push-stack ;
-: toggle-option ( ch ? -- ) [ option-on ] [ option-off ] if ;
+
+: option-on ( option -- ) current-regexp get options>> conjoin ;
+: option-off ( option -- ) current-regexp get options>> delete-at ;
+
+: toggle-option ( ch ? -- ) [ option ] dip [ option-on ] [ option-off ] if ;
 : (parse-options) ( string ? -- ) [ toggle-option ] curry each ;
 
 : parse-options ( string -- )
     "-" split1 [ t (parse-options) ] [ f (parse-options) ] bi* ;
 
 DEFER: (parse-regexp)
-: parse-special-group-options ( options -- )
+: parse-special-group ( -- )
     beginning-of-group push-stack
-    parse-options (parse-regexp) pop-stack make-non-capturing-group ;
+    (parse-regexp) pop-stack make-non-capturing-group ;
 
 ERROR: bad-special-group string ;
 
@@ -126,8 +141,13 @@ ERROR: bad-special-group string ;
         { [ dup CHAR: < = peek1 CHAR: ! = and ]
             [ drop read1 drop nested-parse-regexp pop-stack make-negative-lookbehind ] }
         [
-            ":" read-until [ bad-special-group ] unless
-            swap prefix parse-special-group-options
+            ":)" read-until
+            [ swap prefix ] dip
+            {
+                { CHAR: : [ parse-options parse-special-group ] }
+                { CHAR: ) [ parse-options ] }
+                [ drop bad-special-group ]
+            } case
         ]
     } cond ;
 
@@ -312,10 +332,8 @@ DEFER: handle-left-bracket
     beginning-of-character-class push-stack
     parse-character-class-first (parse-character-class) ;
 
-ERROR: empty-regexp ;
 : finish-regexp-parse ( stack -- obj )
     dup length {
-        { 0 [ empty-regexp ] }
         { 1 [ first ] }
         [
             drop { pipe } split
