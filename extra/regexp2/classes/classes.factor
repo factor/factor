@@ -50,3 +50,6 @@ M: hex-digit-class class-member? ( obj class -- ? )
 
 M: java-blank-class class-member? ( obj class -- ? )
     drop java-blank? ;
+
+M: unmatchable-class class-member? ( obj class -- ? )
+    2drop f ;
