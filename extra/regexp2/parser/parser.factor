@@ -31,18 +31,12 @@ SINGLETON: back-anchor INSTANCE: back-anchor node
 TUPLE: option-on option ; INSTANCE: option-on node
 TUPLE: option-off option ; INSTANCE: option-off node
 SINGLETONS: unix-lines dotall multiline comments case-insensitive unicode-case ;
-MIXIN: regexp-option
-INSTANCE: unix-lines regexp-option
-INSTANCE: dotall regexp-option
-INSTANCE: multiline regexp-option
-INSTANCE: comments regexp-option
-INSTANCE: case-insensitive regexp-option
-INSTANCE: unicode-case regexp-option
 
 SINGLETONS: letter-class LETTER-class Letter-class digit-class
 alpha-class non-newline-blank-class
 ascii-class punctuation-class java-printable-class blank-class
-control-character-class hex-digit-class java-blank-class c-identifier-class ;
+control-character-class hex-digit-class java-blank-class c-identifier-class
+unmatchable-class ;
 
 SINGLETONS: beginning-of-group end-of-group
 beginning-of-character-class end-of-character-class
@@ -74,6 +68,17 @@ left-parenthesis pipe caret dash ;
 
 : first|alternation ( seq -- first/alternation )
     dup length 1 = [ first ] [ <alternation> ] if ;
+
+: <character-class-range> ( from to -- obj )
+    2dup [ Letter? ] bi@ or get-case-insensitive and [
+        [ [ ch>lower ] bi@ character-class-range boa ]
+        [ [ ch>upper ] bi@ character-class-range boa ] 2bi
+        2array [ [ from>> ] [ to>> ] bi < ] filter
+        [ unmatchable-class ] [ first|alternation ] if-empty
+    ] [
+        dup [ from>> ] [ to>> ] bi <
+        [ character-class-range boa ] [ 2drop unmatchable-class ] if
+    ] if ;
 
 ERROR: unmatched-parentheses ;
 
@@ -213,10 +218,10 @@ ERROR: expected-posix-class ;
     read1 CHAR: { = [ expected-posix-class ] unless
     "}" read-until [ bad-character-class ] unless
     {
-        { "Lower" [ letter-class ] }
-        { "Upper" [ LETTER-class ] }
-        { "ASCII" [ ascii-class ] }
+        { "Lower" [ get-case-insensitive Letter-class letter-class ? ] }
+        { "Upper" [ get-case-insensitive Letter-class LETTER-class ? ] }
         { "Alpha" [ Letter-class ] }
+        { "ASCII" [ ascii-class ] }
         { "Digit" [ digit-class ] }
         { "Alnum" [ alpha-class ] }
         { "Punct" [ punctuation-class ] }
@@ -270,6 +275,13 @@ ERROR: bad-escaped-literals seq ;
         { CHAR: 0 [ parse-octal <constant> ] }
         { CHAR: c [ parse-control-character ] }
 
+        ! { CHAR: b [ handle-word-boundary ] }
+        ! { CHAR: B [ handle-word-boundary <negation> ] }
+        ! { CHAR: A [ handle-beginning-of-input ] }
+        ! { CHAR: G [ end of previous match ] }
+        ! { CHAR: Z [ handle-end-of-input ] }
+        ! { CHAR: z [ handle-end-of-input ] } ! except for terminator
+
         { CHAR: Q [ parse-escaped-literals ] }
     } case ;
 
@@ -293,7 +305,7 @@ ERROR: bad-escaped-literals seq ;
     handle-dash handle-caret ;
 
 : apply-dash ( -- )
-    stack [ pop3 nip character-class-range boa ] keep push ;
+    stack [ pop3 nip <character-class-range> ] keep push ;
 
 : apply-dash? ( -- ? )
     stack dup length 3 >=
