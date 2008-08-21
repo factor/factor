@@ -78,11 +78,3 @@ TUPLE: dfa-traverser
     dup matches>>
     [ drop f ]
     [ [ start-index>> ] [ peek ] bi* 1 <range> ] if-empty ;
-
-: match ( string regexp -- pair )
-    <dfa-traverser> do-match return-match ;
-
-: matches? ( string regexp -- ? )
-    dupd match [ [ length ] [ range-length 1- ] bi* = ] [ drop f ] if* ;
-
-: match-head ( string regexp -- end ) match length>> 1- ;
