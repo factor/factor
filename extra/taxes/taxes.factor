@@ -1,5 +1,7 @@
-USING: arrays assocs kernel math math.intervals namespaces
-sequences combinators.lib money math.order ;
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors arrays assocs kernel math math.intervals
+namespaces sequences combinators.lib money math.order ;
 IN: taxes
 
 : monthly ( x -- y ) 12 / ;
@@ -14,22 +16,21 @@ C: <w4> w4
 
 : allowance ( -- x ) 3500 ; inline
 
-: calculate-w4-allowances ( w4 -- x )
-    w4-allowances allowance * ;
+: calculate-w4-allowances ( w4 -- x ) allowances>> allowance * ;
 
 ! Withhold: FICA, Medicare, Federal (FICA is social security)
 : fica-tax-rate ( -- x ) DECIMAL: .062 ; inline
 
 ! Base rate -- income over this rate is not taxed
-TUPLE: fica-base-unknown ;
+ERROR: fica-base-unknown ;
 : fica-base-rate ( year -- x )
     H{
         { 2008 102000 }
         { 2007  97500 }
-    } at* [ T{ fica-base-unknown } throw ] unless ;
+    } at* [ fica-base-unknown ] unless ;
 
 : fica-tax ( salary w4 -- x )
-    w4-year fica-base-rate min fica-tax-rate * ;
+    year>> fica-base-rate min fica-tax-rate * ;
 
 ! Employer tax only, not withheld
 : futa-tax-rate ( -- x ) DECIMAL: .062 ; inline
@@ -64,8 +65,7 @@ TUPLE: tax-table single married ;
     0 -rot [ tax-bracket ] each drop ;
 
 : marriage-table ( w4 tax-table -- triples )
-    swap w4-married?
-    [ tax-table-married ] [ tax-table-single ] if ;
+    swap married?>> [ married>> ] [ single>> ] if ;
 
 : federal-tax ( salary w4 tax-table -- n )
     [ adjust-allowances ] 2keep marriage-table tax ;

@@ -37,3 +37,13 @@ IN: assocs.lib
     H{ } clone [
         swap [ change-at ] 2curry assoc-each
     ] keep ; inline
+
+: ?at ( obj assoc -- value/obj ? )
+    dupd at* [ [ nip ] [ drop ] if ] keep ;
+
+: if-at ( obj assoc quot1 quot2 -- )
+    [ ?at ] 2dip if ; inline
+
+: when-at ( obj assoc quot -- ) [ ] if-at ; inline
+
+: unless-at ( obj assoc quot -- ) [ ] swap if-at ; inline

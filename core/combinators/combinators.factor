@@ -117,10 +117,10 @@ ERROR: no-case ;
     ] [ drop f ] if ;
 
 : dispatch-case ( value from to default array -- )
-    >r >r 3dup between? [
-        drop - >fixnum r> drop r> dispatch
+    >r >r 3dup between? r> r> rot [
+        >r 2drop - >fixnum r> dispatch
     ] [
-        2drop r> call r> drop
+        drop 2nip call
     ] if ; inline
 
 : dispatch-case-quot ( default assoc -- quot )

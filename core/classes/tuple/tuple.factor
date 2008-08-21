@@ -104,8 +104,7 @@ ERROR: bad-superclass class ;
     [ tuple-instance? ] 2curry define-predicate ;
 
 : superclass-size ( class -- n )
-    superclasses but-last-slice
-    [ "slots" word-prop length ] sigma ;
+    superclasses but-last [ "slots" word-prop length ] sigma ;
 
 : (instance-check-quot) ( class -- quot )
     [
@@ -203,11 +202,11 @@ ERROR: bad-superclass class ;
 
 M: tuple-class update-class
     {
+        [ define-boa-check ]
         [ define-tuple-layout ]
         [ define-tuple-slots ]
         [ define-tuple-predicate ]
         [ define-tuple-prototype ]
-        [ define-boa-check ]
     } cleave ;
 
 : define-new-tuple-class ( class superclass slots -- )
@@ -280,11 +279,8 @@ M: tuple-class reset-class
         ] with each
     ] [
         [ call-next-method ]
-        [
-            {
-                "layout" "slots" "boa-check" "prototype"
-            } reset-props
-        ] bi
+        [ { "layout" "slots" "boa-check" "prototype" } reset-props ]
+        bi
     ] bi ;
 
 M: tuple-class rank-class drop 0 ;
