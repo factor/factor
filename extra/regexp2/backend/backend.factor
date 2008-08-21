@@ -10,6 +10,7 @@ TUPLE: regexp
     nfa-table
     dfa-table
     minimized-table
+    case-insensitive
     { state integer }
     { new-states vector }
     { visited-states hashtable } ;
