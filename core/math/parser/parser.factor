@@ -147,6 +147,7 @@ M: float >base
         { [ dup fp-nan? ] [ drop "0.0/0.0" ] }
         { [ dup 1.0/0.0 = ] [ drop "1.0/0.0" ] }
         { [ dup -1.0/0.0 = ] [ drop "-1.0/0.0" ] }
+        { [ dup double>bits HEX: 8000000000000000 = ] [ drop "-0.0" ] }
         [ float>string fix-float ]
     } cond ;
 
