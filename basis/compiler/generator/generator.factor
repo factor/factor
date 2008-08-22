@@ -4,7 +4,7 @@ USING: accessors arrays assocs classes combinators
 cpu.architecture effects generic hashtables io kernel
 kernel.private layouts math math.parser namespaces prettyprint
 quotations sequences system threads words vectors sets dequeues
-cursors continuations.private summary alien alien.c-types
+continuations.private summary alien alien.c-types
 alien.structs alien.strings alien.arrays libc compiler.errors
 stack-checker.inlining
 compiler.tree compiler.tree.builder compiler.tree.combinators
@@ -60,7 +60,6 @@ SYMBOL: current-label-start
 GENERIC: generate-node ( node -- next )
 
 : generate-nodes ( nodes -- )
-    <sequence-cursor>
     [ current-node generate-node ] iterate-nodes
     end-basic-block ;
 
@@ -216,20 +215,17 @@ M: #dispatch generate-node
     2array 1array define-if-intrinsics ;
 
 : do-if-intrinsic ( pair -- next )
-    <label> [
-        swap do-template
-        node> next dup >node
-    ] keep generate-if ;
+    <label> [ swap do-template skip-next ] keep generate-if ;
 
 : find-intrinsic ( #call -- pair/f )
     intrinsics find-template ;
 
 : find-if-intrinsic ( #call -- pair/f )
-    node@ next #if? [
-        if-intrinsics find-template
-    ] [
-        drop f
-    ] if ;
+    node@ {
+        { [ dup length 2 < ] [ 2drop f ] }
+        { [ dup second #if? ] [ drop if-intrinsics find-template ] }
+        [ 2drop f ]
+    } cond ;
 
 M: #call generate-node
     dup node-input-infos [ class>> ] map set-operand-classes

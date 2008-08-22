@@ -3,7 +3,7 @@
 USING: kernel accessors sequences sequences.deep combinators fry
 classes.algebra namespaces assocs math math.private
 math.partial-dispatch classes.tuple classes.tuple.private
-stack-checker.branches
+definitions stack-checker.state stack-checker.branches
 compiler.tree
 compiler.tree.intrinsics
 compiler.tree.combinators
@@ -42,14 +42,18 @@ GENERIC: cleanup* ( node -- node/nodes )
 : cleanup-folding ( #call -- nodes )
     #! Replace a #call having a known result with a #drop of its
     #! inputs followed by #push nodes for the outputs.
+    [ word>> +inlined+ depends-on ]
     [
         [ node-output-infos ] [ out-d>> ] bi
         [ [ literal>> ] dip #push ] 2map
     ]
-    [ in-d>> #drop ] bi prefix ;
+    [ in-d>> #drop ]
+    tri prefix ;
 
 : cleanup-inlining ( #call -- nodes )
-    body>> cleanup ;
+    [ dup method>> [ drop ] [ word>> +inlined+ depends-on ] if ]
+    [ body>> cleanup ]
+    bi ;
 
 ! Removing overflow checks
 : no-overflow-variant ( op -- fast-op )

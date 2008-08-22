@@ -5,7 +5,8 @@ compiler.tree.cleanup compiler.tree.escape-analysis
 compiler.tree.tuple-unboxing compiler.tree.debugger
 compiler.tree.normalization compiler.tree.checker tools.test
 kernel math stack-checker.state accessors combinators io
-prettyprint words sequences.deep sequences.private ;
+prettyprint words sequences.deep sequences.private arrays
+classes kernel.private ;
 IN: compiler.tree.dead-code.tests
 
 \ remove-dead-code must-infer
@@ -173,3 +174,11 @@ IN: compiler.tree.dead-code.tests
 [ ] [ [ [ ] curry [ ] swap compose call-recursive-dce-6 ] optimize-quot drop ] unit-test
 
 [ ] [ [ [ ] rot [ . ] curry pick [ roll 2drop call ] [ 2nip call ] if ] optimize-quot drop ] unit-test
+
+[ [ drop ] ] [ [ array? drop ] optimize-quot ] unit-test
+
+[ [ drop ] ] [ [ array instance? drop ] optimize-quot ] unit-test
+
+[ [ drop ] ] [ [ { integer } declare f <array> drop ] optimize-quot ] unit-test
+
+[ [ f <array> drop ] ] [ [ f <array> drop ] optimize-quot ] unit-test

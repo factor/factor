@@ -298,11 +298,9 @@ M: tuple-class (classes-intersect?)
         [ swap classes-intersect? ]
     } cond ;
 
-M: tuple clone
-    (clone) dup delegate clone over set-delegate ;
+M: tuple clone (clone) ;
 
-M: tuple equal?
-    over tuple? [ tuple= ] [ 2drop f ] if ;
+M: tuple equal? over tuple? [ tuple= ] [ 2drop f ] if ;
 
 M: tuple hashcode*
     [

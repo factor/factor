@@ -1,9 +1,9 @@
 IN: compiler.tests
 USING: alien alien.c-types alien.syntax compiler kernel
-namespaces namespaces tools.test sequences inference words
-arrays parser quotations continuations inference.backend effects
-namespaces.private io io.streams.string memory system threads
-tools.test math ;
+namespaces namespaces tools.test sequences stack-checker
+stack-checker.errors words arrays parser quotations
+continuations effects namespaces.private io io.streams.string
+memory system threads tools.test math ;
 
 FUNCTION: void ffi_test_0 ;
 [ ] [ ffi_test_0 ] unit-test

@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces sequences cursors kernel compiler.tree ;
+USING: namespaces sequences kernel compiler.tree ;
 IN: compiler.generator.iterator
 
 SYMBOL: node-stack
@@ -8,15 +8,15 @@ SYMBOL: node-stack
 : >node ( cursor -- ) node-stack get push ;
 : node> ( -- cursor ) node-stack get pop ;
 : node@ ( -- cursor ) node-stack get peek ;
-: current-node ( -- node ) node@ value ;
-
-: iterate-next ( -- cursor ) node@ next ;
+: current-node ( -- node ) node@ first ;
+: iterate-next ( -- cursor ) node@ rest-slice ;
+: skip-next ( -- next ) node> rest-slice [ first ] [ >node ] bi ;
 
 : iterate-nodes ( cursor quot: ( -- ) -- )
-    over [
-        [ swap >node call node> drop ] keep iterate-nodes
-    ] [
+    over empty? [
         2drop
+    ] [
+        [ swap >node call node> drop ] keep iterate-nodes
     ] if ; inline recursive
 
 : with-node-iterator ( quot -- )
@@ -25,21 +25,21 @@ SYMBOL: node-stack
 DEFER: (tail-call?)
 
 : tail-phi? ( cursor -- ? )
-    [ value #phi? ] [ next (tail-call?) ] bi and ;
+    [ first #phi? ] [ rest-slice (tail-call?) ] bi and ;
 
 : (tail-call?) ( cursor -- ? )
-    dup [
-        [ value [ #return? ] [ #terminate? ] bi or ]
+    dup empty? [ drop t ] [
+        [ first [ #return? ] [ #terminate? ] bi or ]
         [ tail-phi? ]
         bi or
-    ] [ drop t ] if ;
+    ] if ;
 
 : tail-call? ( -- ? )
     node-stack get [
-        next
+        rest-slice
         dup [
             [ (tail-call?) ]
-            [ value #terminate? not ]
+            [ first #terminate? not ]
             bi and
         ] [ drop t ] if
     ] all? ;

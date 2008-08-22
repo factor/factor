@@ -109,9 +109,9 @@ M: help-error error.
     vocabs [ dup vocab-docs-path swap ] H{ } map>assoc
     H{ } clone [
         [
-            >r >r dup >link where dup
-            [ first r> at r> push-at ]
-            [ r> r> 2drop 2drop ]
+            [ dup >link where dup ] 2dip
+            [ first r> at r> push-at ] 2curry
+            [ 2drop ]
             if
         ] 2curry each
     ] keep ;

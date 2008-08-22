@@ -4,7 +4,7 @@ IN: concurrency.mailboxes
 USING: dlists dequeues threads sequences continuations
 destructors namespaces random math quotations words kernel
 arrays assocs init system concurrency.conditions accessors
-debugger debugger.threads ;
+debugger debugger.threads locals ;
 
 TUPLE: mailbox threads data disposed ;
 
@@ -23,13 +23,12 @@ M: mailbox dispose* threads>> notify-all ;
 : wait-for-mailbox ( mailbox timeout -- )
     >r threads>> r> "mailbox" wait ;
 
-: block-unless-pred ( mailbox timeout pred: ( message -- ? ) -- )
-    pick check-disposed
-    pick data>> over dlist-contains? [
-        3drop
-    ] [
-        >r 2dup wait-for-mailbox r> block-unless-pred
-    ] if ; inline recursive
+:: block-unless-pred ( mailbox timeout pred: ( message -- ? ) -- )
+    mailbox check-disposed
+    mailbox data>> pred dlist-contains? [
+        mailbox timeout wait-for-mailbox
+        mailbox timeout pred block-unless-pred
+    ] unless ; inline recursive
 
 : block-if-empty ( mailbox timeout -- mailbox )
     over check-disposed

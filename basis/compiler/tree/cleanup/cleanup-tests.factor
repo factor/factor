@@ -433,7 +433,7 @@ cell-bits 32 = [
     ] { >= fixnum>= } inlined?
 ] unit-test
 
-[ ] [
+[ t ] [
     [
         4 pick array-capacity?
         [ set-slot ] [ \ array-capacity 2nip bad-slot-value ] if
@@ -450,4 +450,9 @@ cell-bits 32 = [
         [ dupd dup -1 < [ 0 >= [ ] [ "X" throw ] if ] [ drop ] if ]
         if
     ] cleaned-up-tree drop
+] unit-test
+
+[ t ] [
+    [ [ 2array ] [ 0 3array ] if first ]
+    { nth-unsafe < <= > >= } inlined?
 ] unit-test

@@ -143,10 +143,6 @@ IN: compiler.tree.propagation.tests
     [ dup string? not not >boolean [ ] [ "Oops" throw ] if ] final-classes
 ] unit-test
 
-[ V{ string } ] [
-    [ dup string? t xor [ "A" throw ] [ ] if ] final-classes
-] unit-test
-
 [ f ] [ [ t xor ] final-classes first null-class? ] unit-test
 
 [ t ] [ [ t or ] final-classes first true-class? ] unit-test
@@ -159,19 +155,11 @@ IN: compiler.tree.propagation.tests
 
 [ t ] [ [ dup not or ] final-classes first true-class? ] unit-test
 
-[ t ] [ [ dup t xor or ] final-classes first true-class? ] unit-test
-
 [ t ] [ [ dup not swap or ] final-classes first true-class? ] unit-test
-
-[ t ] [ [ dup t xor swap or ] final-classes first true-class? ] unit-test
 
 [ t ] [ [ dup not and ] final-classes first false-class? ] unit-test
 
-[ t ] [ [ dup t xor and ] final-classes first false-class? ] unit-test
-
 [ t ] [ [ dup not swap and ] final-classes first false-class? ] unit-test
-
-[ t ] [ [ dup t xor swap and ] final-classes first false-class? ] unit-test
 
 [ t ] [ [ over [ drop f ] when [ "A" throw ] unless ] final-classes first false-class? ] unit-test
 
@@ -571,3 +559,15 @@ M: integer infinite-loop infinite-loop ;
 : fold-throw-test ( a -- b ) "A" throw ; foldable
 
 [ ] [ [ 0 fold-throw-test ] final-info drop ] unit-test
+
+! [ V{ string } ] [
+!     [ dup string? t xor [ "A" throw ] [ ] if ] final-classes
+! ] unit-test
+
+! [ t ] [ [ dup t xor or ] final-classes first true-class? ] unit-test
+
+! [ t ] [ [ dup t xor swap or ] final-classes first true-class? ] unit-test
+
+! [ t ] [ [ dup t xor and ] final-classes first false-class? ] unit-test
+
+! [ t ] [ [ dup t xor swap and ] final-classes first false-class? ] unit-test

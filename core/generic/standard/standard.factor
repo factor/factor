@@ -21,26 +21,10 @@ M: generic method-declaration
 M: quotation engine>quot
     assumed get generic get method-declaration prepend ;
 
-: unpickers
-    {
-        [ nip ]
-        [ >r nip r> swap ]
-        [ >r >r nip r> r> -rot ]
-    } ; inline
-
-: unpicker ( -- quot ) \ (dispatch#) get unpickers nth ;
-
 ERROR: no-method object generic ;
 
 : error-method ( word -- quot )
     picker swap [ no-method ] curry append ;
-
-: empty-method ( word -- quot )
-    [
-        picker % [ delegate dup ] %
-        unpicker over suffix ,
-        error-method \ drop prefix , \ if ,
-    ] [ ] make ;
 
 : default-method ( word -- pair )
     "default-method" word-prop
@@ -137,7 +121,7 @@ PREDICATE: simple-generic < standard-generic
 M: standard-generic extra-values drop 0 ;
 
 M: standard-combination make-default-method
-    [ empty-method ] with-standard ;
+    [ error-method ] with-standard ;
 
 M: standard-combination perform-combination
     [ drop ] [ [ single-combination ] with-standard ] 2bi define ;

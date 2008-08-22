@@ -1,13 +1,25 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors words assocs sequences arrays namespaces
-fry locals compiler.tree stack-checker.backend
+fry locals classes.algebra stack-checker.backend
+compiler.tree
+compiler.tree.propagation.info
 compiler.tree.dead-code.liveness ;
 IN: compiler.tree.dead-code.simple
 
+: flushable? ( word -- ? )
+    [ "flushable" word-prop ] [ "predicating" word-prop ] bi or ;
+
+: flushable-call? ( #call -- ? )
+    dup word>> dup flushable? [
+        "input-classes" word-prop dup [
+            [ node-input-infos ] dip
+            [ [ class>> ] dip class<= ] 2all?
+        ] [ 2drop t ] if
+    ] [ 2drop f ] if ;
+
 M: #call mark-live-values*
-    dup word>> "flushable" word-prop
-    [ drop ] [ look-at-inputs ] if ;
+    dup flushable-call? [ drop ] [ look-at-inputs ] if ;
 
 M: #alien-invoke mark-live-values* look-at-inputs ;
 
@@ -80,8 +92,9 @@ M: #push remove-dead-code*
     dup out-d>> first live-value? [ drop f ] unless ;
 
 : dead-flushable-call? ( #call -- ? )
-    [ word>> "flushable" word-prop ]
-    [ out-d>> [ live-value? not ] all? ] bi and ;
+    dup flushable-call? [
+        out-d>> [ live-value? not ] all?
+    ] [ drop f ] if ;
 
 : remove-flushable-call ( #call -- node )
     in-d>> #drop remove-dead-code* ;
