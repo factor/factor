@@ -4,7 +4,8 @@ USING: kernel sequences strings fry namespaces math assocs shuffle debugger io
        vectors arrays math.parser math.order vectors combinators
        classes sets unicode.categories compiler.units parser
        words quotations effects memoize accessors locals effects splitting 
-       combinators.short-circuit combinators.short-circuit.smart ;
+       combinators.short-circuit combinators.short-circuit.smart
+       generalizations ;
 IN: peg
 
 USE: prettyprint
@@ -144,15 +145,15 @@ TUPLE: peg-head rule-id involved-set eval-set ;
 : setup-growth ( h p -- )
   pos set dup involved-set>> clone >>eval-set drop ;
 
-: (grow-lr) ( h p r m -- )
+: (grow-lr) ( h p r: ( -- result ) m -- )
   >r >r [ setup-growth ] 2keep r> r>
   >r dup eval-rule r> swap
   dup pick stop-growth? [
-    4drop drop
+    5 ndrop
   ] [
     over update-m
     (grow-lr)
-  ] if ; inline
+  ] if ; inline recursive
  
 : grow-lr ( h p r m -- ast )
   >r >r [ heads set-at ] 2keep r> r>
