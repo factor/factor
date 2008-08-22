@@ -41,6 +41,11 @@ IN: regexp2
     case-insensitive initial-option
     construct-regexp ;
 
+: <rregexp> ( string -- regexp )
+    default-regexp
+    reversed-regexp initial-option
+    construct-regexp ;
+
 : R! CHAR: ! <regexp> ; parsing
 : R" CHAR: " <regexp> ; parsing
 : R# CHAR: # <regexp> ; parsing

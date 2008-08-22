@@ -30,7 +30,7 @@ SINGLETON: back-anchor INSTANCE: back-anchor node
 
 TUPLE: option-on option ; INSTANCE: option-on node
 TUPLE: option-off option ; INSTANCE: option-off node
-SINGLETONS: unix-lines dotall multiline comments case-insensitive unicode-case ;
+SINGLETONS: unix-lines dotall multiline comments case-insensitive unicode-case reversed-regexp ;
 
 SINGLETONS: letter-class LETTER-class Letter-class digit-class
 alpha-class non-newline-blank-class
@@ -49,9 +49,12 @@ left-parenthesis pipe caret dash ;
 : get-comments ( -- ? ) comments get-option ;
 : get-case-insensitive ( -- ? ) case-insensitive get-option ;
 : get-unicode-case ( -- ? ) unicode-case get-option ;
+: get-reversed-regexp ( -- ? ) reversed-regexp get-option ;
 
 : <negation> ( obj -- negation ) negation boa ;
-: <concatenation> ( seq -- concatenation ) >vector concatenation boa ;
+: <concatenation> ( seq -- concatenation )
+    >vector get-reversed-regexp [ reverse ] when
+    concatenation boa ;
 : <alternation> ( seq -- alternation ) >vector alternation boa ;
 : <capture-group> ( obj -- capture-group ) capture-group boa ;
 : <kleene-star> ( obj -- kleene-star ) kleene-star boa ;
@@ -76,7 +79,7 @@ left-parenthesis pipe caret dash ;
         2array [ [ from>> ] [ to>> ] bi < ] filter
         [ unmatchable-class ] [ first|alternation ] if-empty
     ] [
-        dup [ from>> ] [ to>> ] bi <
+        2dup <
         [ character-class-range boa ] [ 2drop unmatchable-class ] if
     ] if ;
 
@@ -109,6 +112,7 @@ ERROR: bad-option ch ;
         { CHAR: i [ case-insensitive ] }
         { CHAR: d [ unix-lines ] }
         { CHAR: m [ multiline ] }
+        { CHAR: r [ reversed-regexp ] }
         { CHAR: s [ dotall ] }
         { CHAR: u [ unicode-case ] }
         { CHAR: x [ comments ] }
@@ -345,13 +349,8 @@ DEFER: handle-left-bracket
     parse-character-class-first (parse-character-class) ;
 
 : finish-regexp-parse ( stack -- obj )
-    dup length {
-        { 1 [ first ] }
-        [
-            drop { pipe } split
-            [ first|concatenation ] map first|alternation
-        ]
-    } case ;
+    { pipe } split
+    [ first|concatenation ] map first|alternation ;
 
 : handle-right-parenthesis ( -- )
     stack beginning-of-group over last-index cut rest

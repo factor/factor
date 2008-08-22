@@ -1,4 +1,5 @@
-USING: regexp2 tools.test kernel regexp2.parser regexp2.traversal ;
+USING: regexp2 tools.test kernel sequences regexp2.parser
+regexp2.traversal ;
 IN: regexp2-tests
 
 [ f ] [ "b" "a*" <regexp> matches? ] unit-test
@@ -247,6 +248,10 @@ IN: regexp2-tests
 
 [ f ] [ "A" "\\p{Lower}" <regexp> matches? ] unit-test
 [ t ] [ "A" "\\p{Lower}" <iregexp> matches? ] unit-test
+
+[ t ] [ "abc" <reversed> "abc" <rregexp> matches? ] unit-test
+[ t ] [ "abc" <reversed> "a[bB][cC]" <rregexp> matches? ] unit-test
+[ t ] [ "adcbe" "a(?r)(bcd)(?-r)e" <rregexp> matches? ] unit-test
 
 ! Bug in parsing word
 ! [ t ] [ "a" R' a' matches?  ] unit-test
