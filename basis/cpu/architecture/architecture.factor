@@ -163,8 +163,8 @@ PREDICATE: small-slot < integer cells small-enough? ;
 PREDICATE: small-tagged < integer v>operand small-enough? ;
 
 : if-small-struct ( n size true false -- ? )
-    >r >r over not over struct-small-enough? and
-    [ nip r> call r> drop ] [ r> drop r> call ] if ;
+    [ over not over struct-small-enough? and ] 2dip
+    [ [ nip ] prepose ] dip if ;
     inline
 
 : %unbox-struct ( n size -- )

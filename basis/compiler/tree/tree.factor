@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry arrays generic assocs kernel math namespaces parser
 sequences words vectors math.intervals effects classes
-accessors combinators stack-checker.state stack-checker.visitor ;
+accessors combinators stack-checker.state stack-checker.visitor
+stack-checker.inlining ;
 IN: compiler.tree
 
 ! High-level tree SSA form.

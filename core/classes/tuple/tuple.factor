@@ -164,8 +164,8 @@ ERROR: bad-superclass class ;
 
 : update-slot ( old-values n class initial -- value )
     pick [
-        >r >r swap nth dup r> instance?
-        [ r> drop ] [ drop r> ] if
+        >r >r swap nth dup r> instance? r> swap
+        [ drop ] [ nip ] if
     ] [ >r 3drop r> ] if ;
 
 : apply-slot-permutation ( old-values triples -- new-values )

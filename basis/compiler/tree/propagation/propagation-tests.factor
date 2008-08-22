@@ -567,3 +567,7 @@ M: integer infinite-loop infinite-loop ;
 [ ] [ [ instance? ] final-classes drop ] unit-test
 
 [ f ] [ [ V{ } clone ] final-info first literal?>> ] unit-test
+
+: fold-throw-test ( a -- b ) "A" throw ; foldable
+
+[ ] [ [ 0 fold-throw-test ] final-info drop ] unit-test

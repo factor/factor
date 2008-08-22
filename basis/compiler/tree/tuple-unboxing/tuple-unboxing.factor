@@ -103,7 +103,9 @@ M: #phi unbox-tuples*
     [ flatten-values ] change-out-d ;
 
 M: #recursive unbox-tuples*
-    [ flatten-values ] change-in-d ;
+    [ label>> [ flatten-values ] change-enter-out drop ]
+    [ [ flatten-values ] change-in-d ]
+    bi ;
 
 M: #enter-recursive unbox-tuples*
     [ flatten-values ] change-in-d

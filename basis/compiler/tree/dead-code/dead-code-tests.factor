@@ -5,7 +5,7 @@ compiler.tree.cleanup compiler.tree.escape-analysis
 compiler.tree.tuple-unboxing compiler.tree.debugger
 compiler.tree.normalization compiler.tree.checker tools.test
 kernel math stack-checker.state accessors combinators io
-prettyprint ;
+prettyprint words sequences.deep sequences.private ;
 IN: compiler.tree.dead-code.tests
 
 \ remove-dead-code must-infer
@@ -106,3 +106,70 @@ IN: compiler.tree.dead-code.tests
 : boo ( a b -- c ) 2drop f ;
 
 [ [ dup 4 eq? [ nip ] [ boo ] if ] ] [ [ dup dup 4 eq? [ drop nip ] [ drop boo ] if ] optimize-quot ] unit-test
+
+: squish ( quot -- quot' )
+    [
+        {
+            { [ dup word? ] [ dup vocabulary>> [ drop "REC" ] unless ] }
+            { [ dup wrapper? ] [ dup wrapped>> vocabulary>> [ drop "WRAP" ] unless ] }
+            [ ]
+        } cond
+    ] deep-map ;
+
+: call-recursive-dce-1 ( a -- b )
+    [ call-recursive-dce-1 drop ] [ call-recursive-dce-1 ] bi ; inline recursive
+
+[ [ "WRAP" [ dup >r "REC" drop r> "REC" ] label ] ] [
+    [ call-recursive-dce-1 ] optimize-quot squish
+] unit-test
+
+: produce-a-value ( -- a ) f ;
+
+: call-recursive-dce-2 ( a -- b )
+    drop
+    produce-a-value dup . call-recursive-dce-2 ; inline recursive
+
+[ [ "WRAP" [ produce-a-value . "REC" ] label ] ] [
+    [ f call-recursive-dce-2 drop ] optimize-quot squish
+] unit-test
+
+[ [ "WRAP" [ produce-a-value dup . drop "REC" ] label ] ] [
+    [ f call-recursive-dce-2 ] optimize-quot squish
+] unit-test
+
+: call-recursive-dce-3 ( a -- )
+    call-recursive-dce-3 ; inline recursive
+
+[ [ [ drop "WRAP" [ "REC" ] label ] [ . ] if ] ] [
+    [ [ call-recursive-dce-3 ] [ . ] if ] optimize-quot squish
+] unit-test
+
+[ [ drop "WRAP" [ "REC" ] label ] ] [
+    [ call-recursive-dce-3 ] optimize-quot squish
+] unit-test
+
+: call-recursive-dce-4 ( a -- b )
+    call-recursive-dce-4 ; inline recursive
+
+[ [ "WRAP" [ "REC" ] label ] ] [
+    [ call-recursive-dce-4 ] optimize-quot squish
+] unit-test
+
+[ [ drop "WRAP" [ "REC" ] label ] ] [
+    [ call-recursive-dce-4 drop ] optimize-quot squish
+] unit-test
+
+[ ] [ [ f call-recursive-dce-3 swap ] optimize-quot drop ] unit-test
+
+: call-recursive-dce-5 ( -- ) call-recursive-dce-5 ; inline recursive
+
+[ ] [ [ call-recursive-dce-5 swap ] optimize-quot drop ] unit-test
+
+[ ] [ [ [ 0 -rot set-nth-unsafe ] curry (each-integer) ] optimize-quot drop ] unit-test
+
+: call-recursive-dce-6 ( i quot: ( i -- ? ) -- i )
+    dup call [ drop ] [ call-recursive-dce-6 ] if ; inline recursive
+
+[ ] [ [ [ ] curry [ ] swap compose call-recursive-dce-6 ] optimize-quot drop ] unit-test
+
+[ ] [ [ [ ] rot [ . ] curry pick [ roll 2drop call ] [ 2nip call ] if ] optimize-quot drop ] unit-test

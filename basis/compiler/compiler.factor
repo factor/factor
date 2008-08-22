@@ -46,7 +46,6 @@ SYMBOL: +failed+
     ] tri ;
 
 : (compile) ( word -- )
-    USE: prettyprint dup .
     '[
         H{ } clone dependencies set
 

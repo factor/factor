@@ -658,3 +658,9 @@ UNION: immediate fixnum POSTPONE: f ;
 : phantom-r> ( n -- )
     phantom-retainstack get phantom-input
     phantom-datastack get phantom-append ;
+
+: phantom-drop ( n -- )
+    phantom-datastack get phantom-input drop ;
+
+: phantom-rdrop ( n -- )
+    phantom-retainstack get phantom-input drop ;

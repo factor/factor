@@ -4,7 +4,7 @@ USING: alien alien.c-types alien.strings
 arrays assocs combinators compiler kernel
 math namespaces parser prettyprint prettyprint.sections
 quotations sequences strings words cocoa.runtime io macros
-memoize debugger io.encodings.ascii effects ;
+memoize debugger io.encodings.ascii effects compiler.generator ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )

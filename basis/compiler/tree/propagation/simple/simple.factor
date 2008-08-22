@@ -62,10 +62,10 @@ M: #declare propagate-before
     [ in-d>> [ value-info literal?>> ] all? ] [ drop f ] if ;
 
 : fold-call ( #call word -- infos )
-    [ in-d>> [ value-info literal>> ] map ]
-    [ [ execute ] curry ]
-    bi* with-datastack
-    [ <literal-info> ] map ;
+    [ [ out-d>> ] [ in-d>> [ value-info literal>> ] map ] bi ] [ '[ , execute ] ] bi*
+    '[ , , with-datastack [ <literal-info> ] map nip ]
+    [ drop [ object-info ] replicate ]
+    recover ;
 
 : predicate-output-infos ( info class -- info )
     [ class>> ] dip {

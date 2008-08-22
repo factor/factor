@@ -41,11 +41,16 @@ M: #alien-indirect compute-live-values* nip look-at-inputs ;
 : filter-mapping ( assoc -- assoc' )
     live-values get '[ drop , key? ] assoc-filter ;
 
-: filter-corresponding ( new old -- new' )
+: filter-corresponding ( new old -- old' )
+    #! Remove elements from 'old' if the element with the same
+    #! index in 'new' is dead.
     zip filter-mapping values ;
 
 : filter-live ( values -- values' )
     [ live-value? ] filter ;
+
+: drop-dead-values ( in out -- #shuffle )
+    [ make-values dup ] keep zip #shuffle ;
 
 :: drop-dead-outputs ( node -- nodes )
     [let* | old-outputs [ node out-d>> ]

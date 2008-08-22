@@ -443,3 +443,11 @@ cell-bits 32 = [
 [ ] [
     [ { merge } declare accum>> 0 >>length ] cleaned-up-tree drop
 ] unit-test
+
+[ ] [
+    [
+        [ "X" throw ]
+        [ dupd dup -1 < [ 0 >= [ ] [ "X" throw ] if ] [ drop ] if ]
+        if
+    ] cleaned-up-tree drop
+] unit-test

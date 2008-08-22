@@ -31,9 +31,12 @@ M: #shuffle check-node*
 
 M: #copy check-node* inputs/outputs 2array check-lengths ;
 
-M: #>r check-node* inputs/outputs 2array check-lengths ;
+: check->r/r> ( node -- )
+    inputs/outputs dup empty? [ 2drop ] [ 2array check-lengths ] if ;
 
-M: #r> check-node* inputs/outputs 2array check-lengths ;
+M: #>r check-node* check->r/r> ;
+
+M: #r> check-node* check->r/r> ;
 
 M: #return-recursive check-node* inputs/outputs 2array check-lengths ;
 
@@ -43,9 +46,10 @@ M: #phi check-node*
     bi ;
 
 M: #enter-recursive check-node*
+    [ [ label>> enter-out>> ] [ out-d>> ] bi assert= ]
     [ [ in-d>> ] [ out-d>> ] bi 2array check-lengths ]
     [ recursive-phi-in check-lengths ]
-    bi ;
+    tri ;
 
 M: #push check-node*
     out-d>> length 1 = [ "Bad #push" throw ] unless ;
@@ -72,7 +76,7 @@ SYMBOL: terminated?
 GENERIC: check-stack-flow* ( node -- )
 
 : (check-stack-flow) ( nodes -- )
-    [ check-stack-flow* ] each ;
+    [ check-stack-flow* terminated? get not ] all? drop ;
 
 : init-stack-flow ( -- )
     V{ } clone datastack set
@@ -164,31 +168,27 @@ M: #branch check-stack-flow*
 
 : check-phi-in ( #phi -- )
     phi-in-d>> branch-out get [
-        over [ +bottom+ eq? ] all? [
-            2drop
-        ] [
+        dup [
             over length tail* sequence= [
                 "Branch outputs don't match phi inputs"
                 throw
             ] unless
+        ] [
+            2drop
         ] if
     ] 2each ;
 
 : set-phi-datastack ( #phi -- )
     phi-in-d>> first length
-    branch-out get [ ] find nip
-    dup [ swap head* >vector ] [ 2drop V{ } clone ] if datastack set ;
+    branch-out get [ ] find nip swap head* >vector datastack set ;
 
 M: #phi check-stack-flow*
-    [ check-phi-in ] [ set-phi-datastack ] [ check-out-d ] tri ;
+    branch-out get [ ] contains? [
+        [ check-phi-in ] [ set-phi-datastack ] [ check-out-d ] tri
+    ] [ drop terminated? on ] if ;
 
 M: #recursive check-stack-flow*
-    [
-        init-stack-flow
-        child>> (check-stack-flow)
-        datastack get
-    ] with-scope
-    datastack set ;
+    [ check-in-d ] [ child>> (check-stack-flow) ] bi ;
 
 M: #copy check-stack-flow* [ check-in-d ] [ check-out-d ] bi ;
 

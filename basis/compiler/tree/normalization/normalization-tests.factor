@@ -1,6 +1,7 @@
 IN: compiler.tree.normalization.tests
 USING: compiler.tree.builder compiler.tree.normalization
-compiler.tree sequences accessors tools.test kernel math ;
+compiler.tree compiler.tree.checker
+sequences accessors tools.test kernel math ;
 
 \ count-introductions must-infer
 \ normalize must-infer
@@ -24,20 +25,24 @@ compiler.tree sequences accessors tools.test kernel math ;
     [ normalize recursive-inputs ] bi
 ] unit-test
 
-[ ] [ [ [ 1 ] [ 2 ] if + * ] build-tree normalize drop ] unit-test
+[ ] [ [ [ 1 ] [ 2 ] if + * ] build-tree normalize check-nodes ] unit-test
 
 DEFER: bbb
 : aaa ( x -- ) dup [ dup >r bbb r> aaa ] [ drop ] if ; inline recursive
 : bbb ( x -- ) >r drop 0 r> aaa ; inline recursive
 
-[ ] [ [ bbb ] build-tree normalize drop ] unit-test
+[ ] [ [ bbb ] build-tree normalize check-nodes ] unit-test
 
 : ccc ( -- ) ccc drop 1 ; inline recursive
 
-[ ] [ [ ccc ] build-tree normalize drop ] unit-test
+[ ] [ [ ccc ] build-tree normalize check-nodes ] unit-test
 
 DEFER: eee
 : ddd ( -- ) eee ; inline recursive
 : eee ( -- ) swap ddd ; inline recursive
 
-[ ] [ [ eee ] build-tree normalize drop ] unit-test
+[ ] [ [ eee ] build-tree normalize check-nodes ] unit-test
+
+: call-recursive-5 ( -- ) call-recursive-5 ; inline recursive
+
+[ ] [ [ call-recursive-5 swap ] build-tree normalize check-nodes ] unit-test

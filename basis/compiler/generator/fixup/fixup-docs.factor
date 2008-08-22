@@ -1,5 +1,5 @@
 USING: help.syntax help.markup math kernel
-words strings alien ;
+words strings alien compiler.generator ;
 IN: compiler.generator.fixup
 
 HELP: frame-required
@@ -14,3 +14,6 @@ HELP: rel-dlsym
 { $values { "name" string } { "dll" "a " { $link dll } " or " { $link f } } { "class" "a relocation class" } }
 { $description "Records that the most recently assembled instruction contains a reference to the " { $snippet "name" } " symbol from " { $snippet "dll" } ". The correct " { $snippet "class" } " to use depends on instruction formats."
 } ;
+
+HELP: literal-table
+{ $var-description "Holds a vector of literal objects referenced from the currently compiling word. If " { $link compiled-stack-traces? } " is on, " { $link begin-compiling } " ensures that the first entry is the word being compiled." } ;

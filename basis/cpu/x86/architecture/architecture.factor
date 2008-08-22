@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types arrays cpu.x86.assembler
 cpu.x86.assembler.private cpu.architecture kernel kernel.private
-math memory namespaces sequences words generator
+math memory namespaces sequences words compiler.generator
 compiler.generator.registers compiler.generator.fixup system
 layouts combinators compiler.constants math.order ;
 IN: cpu.x86.architecture

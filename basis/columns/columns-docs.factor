@@ -6,7 +6,7 @@ ARTICLE: "columns" "Column sequences"
 { $subsection column }
 { $subsection <column> }
 "A utility word:"
-{ $subsection flipped } ;
+{ $subsection <flipped> } ;
 
 HELP: column
 { $class-description "A virtual sequence which presents a fixed column of a matrix represented as a sequence of rows. New instances can be created by calling " { $link <column> } "." } ;

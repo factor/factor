@@ -92,7 +92,7 @@ M: node generate-node drop iterate-next ;
     %jump-label ;
 
 : generate-call ( label -- next )
-    ! dup maybe-compile
+    dup maybe-compile
     end-basic-block
     dup compiling-loops get at [
         %jump-label f
@@ -255,13 +255,13 @@ M: #shuffle generate-node
     shuffle-effect phantom-shuffle iterate-next ;
 
 M: #>r generate-node
-    in-d>> length
-    phantom->r
+    [ in-d>> length ] [ out-r>> empty? ] bi
+    [ phantom-drop ] [ phantom->r ] if
     iterate-next ;
 
 M: #r> generate-node
-    out-d>> length
-    phantom-r>
+    [ in-r>> length ] [ out-d>> empty? ] bi
+    [ phantom-rdrop ] [ phantom-r> ] if
     iterate-next ;
 
 ! #return
