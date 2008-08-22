@@ -12,8 +12,6 @@ FROM: math.ranges => [a,b] ;
 MIXIN: node
 TUPLE: concatenation seq ; INSTANCE: concatenation node
 TUPLE: alternation seq ; INSTANCE: alternation node
-! !!!!!!!!
-TUPLE: question term ; INSTANCE: question node
 TUPLE: kleene-star term ; INSTANCE: kleene-star node
 
 ! !!!!!!!!
@@ -31,7 +29,7 @@ TUPLE: lookahead term ; INSTANCE: lookahead node
 TUPLE: lookbehind term ; INSTANCE: lookbehind node
 TUPLE: capture-group term ; INSTANCE: capture-group node
 TUPLE: non-capture-group term ; INSTANCE: non-capture-group node
-TUPLE: independent-group term ; INSTANCE: independent-group node
+TUPLE: independent-group term ; INSTANCE: independent-group node ! atomic group
 TUPLE: character-class-range from to ; INSTANCE: character-class-range node
 SINGLETON: epsilon INSTANCE: epsilon node
 SINGLETON: any-char INSTANCE: any-char node
@@ -116,7 +114,6 @@ ERROR: unmatched-parentheses ;
 : make-negative-lookbehind ( string -- )
     <negation> lookbehind boa push-stack ;
 
-DEFER: nested-parse-regexp
 : make-non-capturing-group ( string -- )
     non-capture-group boa push-stack ;
 
@@ -150,6 +147,7 @@ DEFER: (parse-regexp)
 
 ERROR: bad-special-group string ;
 
+DEFER: nested-parse-regexp
 : (parse-special-group) ( -- )
     read1 {
         { [ dup CHAR: : = ]
