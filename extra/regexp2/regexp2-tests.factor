@@ -180,58 +180,18 @@ IN: regexp2-tests
 [ t ] [ "aaaab" "a+ab" <regexp> matches? ] unit-test
 [ f ] [ "aaaxb" "a+ab" <regexp> matches? ] unit-test
 [ t ] [ "aaacb" "a+cb" <regexp> matches? ] unit-test
-[ f ] [ "aaaab" "a++ab" <regexp> matches? ] unit-test
-[ t ] [ "aaacb" "a++cb" <regexp> matches? ] unit-test
 
 [ 3 ] [ "aaacb" "a*" <regexp> match-head ] unit-test
-[ 1 ] [ "aaacb" "a+?" <regexp> match-head ] unit-test
 [ 2 ] [ "aaacb" "aa?" <regexp> match-head ] unit-test
-[ 1 ] [ "aaacb" "aa??" <regexp> match-head ] unit-test
-[ 3 ] [ "aacb" "aa?c" <regexp> match-head ] unit-test
-[ 3 ] [ "aacb" "aa??c" <regexp> match-head ] unit-test
 
-! [ t ] [ "aaa" "AAA" t <regexp> matches? ] unit-test
-! [ f ] [ "aax" "AAA" t <regexp> matches? ] unit-test
-! [ t ] [ "aaa" "A*" t <regexp> matches? ] unit-test
-! [ f ] [ "aaba" "A*" t <regexp> matches? ] unit-test
-! [ t ] [ "b" "[AB]" t <regexp> matches? ] unit-test
-! [ f ] [ "c" "[AB]" t <regexp> matches? ] unit-test
-! [ t ] [ "c" "[A-Z]" t <regexp> matches? ] unit-test
-! [ f ] [ "3" "[A-Z]" t <regexp> matches? ] unit-test
-
-[ ] [
-    "(0[lL]?|[1-9]\\d{0,9}(\\d{0,9}[lL])?|0[xX]\\p{XDigit}{1,8}(\\p{XDigit}{0,8}[lL])?|0[0-7]{1,11}([0-7]{0,11}[lL])?|([0-9]+\\.[0-9]*|\\.[0-9]+)([eE][+-]?[0-9]+)?[fFdD]?|[0-9]+([eE][+-]?[0-9]+[fFdD]?|([eE][+-]?[0-9]+)?[fFdD]))"
-    <regexp> drop
-] unit-test
-
-[ "{Lower}" <regexp> ] [ invalid-range? ] must-fail-with
-
-[ t ] [ "fxxbar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
-[ f ] [ "foobar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
-
-! [ 3 ] [ "foobar" "foo(?=bar)" <regexp> match-head ] unit-test
-! [ f ] [ "foobxr" "foo(?=bar)" <regexp> match-head ] unit-test
-
-! [ f ] [ "foobxr" "foo\\z" <regexp> match-head ] unit-test
-! [ 3 ] [ "foo" "foo\\z" <regexp> match-head ] unit-test
-
-! [ 3 ] [ "foo bar" "foo\\b" <regexp> match-head ] unit-test
-! [ f ] [ "fooxbar" "foo\\b" <regexp> matches? ] unit-test
-! [ t ] [ "foo" "foo\\b" <regexp> matches? ] unit-test
-! [ t ] [ "foo bar" "foo\\b bar" <regexp> matches? ] unit-test
-! [ f ] [ "fooxbar" "foo\\bxbar" <regexp> matches? ] unit-test
-! [ f ] [ "foo" "foo\\bbar" <regexp> matches? ] unit-test
-
-! [ f ] [ "foo bar" "foo\\B" <regexp> matches? ] unit-test
-! [ 3 ] [ "fooxbar" "foo\\B" <regexp> match-head ] unit-test
-! [ t ] [ "foo" "foo\\B" <regexp> matches? ] unit-test
-! [ f ] [ "foo bar" "foo\\B bar" <regexp> matches? ] unit-test
-! [ t ] [ "fooxbar" "foo\\Bxbar" <regexp> matches? ] unit-test
-! [ f ] [ "foo" "foo\\Bbar" <regexp> matches? ] unit-test
-
-[ t ] [ "s@f" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
-[ f ] [ "a" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
-[ t ] [ ".o" "\\.[a-z]" <regexp> matches? ] unit-test
+[ t ] [ "aaa" "AAA" <iregexp> matches? ] unit-test
+[ f ] [ "aax" "AAA" <iregexp> matches? ] unit-test
+[ t ] [ "aaa" "A*" <iregexp> matches? ] unit-test
+[ f ] [ "aaba" "A*" <iregexp> matches? ] unit-test
+[ t ] [ "b" "[AB]" <iregexp> matches? ] unit-test
+[ f ] [ "c" "[AB]" <iregexp> matches? ] unit-test
+[ t ] [ "c" "[A-Z]" <iregexp> matches? ] unit-test
+[ f ] [ "3" "[A-Z]" <iregexp> matches? ] unit-test
 
 [ t ] [ "a" "(?i)a" <regexp> matches? ] unit-test
 [ t ] [ "a" "(?i)a" <regexp> matches? ] unit-test
@@ -252,6 +212,50 @@ IN: regexp2-tests
 [ t ] [ "abc" <reversed> "abc" <rregexp> matches? ] unit-test
 [ t ] [ "abc" <reversed> "a[bB][cC]" <rregexp> matches? ] unit-test
 [ t ] [ "adcbe" "a(?r)(bcd)(?-r)e" <rregexp> matches? ] unit-test
+
+[ t ] [ "s@f" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
+[ f ] [ "a" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
+[ t ] [ ".o" "\\.[a-z]" <regexp> matches? ] unit-test
+
+[ ] [
+    "(0[lL]?|[1-9]\\d{0,9}(\\d{0,9}[lL])?|0[xX]\\p{XDigit}{1,8}(\\p{XDigit}{0,8}[lL])?|0[0-7]{1,11}([0-7]{0,11}[lL])?|([0-9]+\\.[0-9]*|\\.[0-9]+)([eE][+-]?[0-9]+)?[fFdD]?|[0-9]+([eE][+-]?[0-9]+[fFdD]?|([eE][+-]?[0-9]+)?[fFdD]))"
+    <regexp> drop
+] unit-test
+
+
+
+
+[ "{Lower}" <regexp> ] [ invalid-range? ] must-fail-with
+
+[ 1 ] [ "aaacb" "a+?" <regexp> match-head ] unit-test
+[ 1 ] [ "aaacb" "aa??" <regexp> match-head ] unit-test
+[ f ] [ "aaaab" "a++ab" <regexp> matches? ] unit-test
+[ t ] [ "aaacb" "a++cb" <regexp> matches? ] unit-test
+[ 3 ] [ "aacb" "aa?c" <regexp> match-head ] unit-test
+[ 3 ] [ "aacb" "aa??c" <regexp> match-head ] unit-test
+
+[ t ] [ "fxxbar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
+[ f ] [ "foobar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
+
+[ 3 ] [ "foobar" "foo(?=bar)" <regexp> match-head ] unit-test
+[ f ] [ "foobxr" "foo(?=bar)" <regexp> match-head ] unit-test
+
+! [ f ] [ "foobxr" "foo\\z" <regexp> match-head ] unit-test
+! [ 3 ] [ "foo" "foo\\z" <regexp> match-head ] unit-test
+
+! [ 3 ] [ "foo bar" "foo\\b" <regexp> match-head ] unit-test
+! [ f ] [ "fooxbar" "foo\\b" <regexp> matches? ] unit-test
+! [ t ] [ "foo" "foo\\b" <regexp> matches? ] unit-test
+! [ t ] [ "foo bar" "foo\\b bar" <regexp> matches? ] unit-test
+! [ f ] [ "fooxbar" "foo\\bxbar" <regexp> matches? ] unit-test
+! [ f ] [ "foo" "foo\\bbar" <regexp> matches? ] unit-test
+
+! [ f ] [ "foo bar" "foo\\B" <regexp> matches? ] unit-test
+! [ 3 ] [ "fooxbar" "foo\\B" <regexp> match-head ] unit-test
+! [ t ] [ "foo" "foo\\B" <regexp> matches? ] unit-test
+! [ f ] [ "foo bar" "foo\\B bar" <regexp> matches? ] unit-test
+! [ t ] [ "fooxbar" "foo\\Bxbar" <regexp> matches? ] unit-test
+! [ f ] [ "foo" "foo\\Bbar" <regexp> matches? ] unit-test
 
 ! Bug in parsing word
 ! [ t ] [ "a" R' a' matches?  ] unit-test
