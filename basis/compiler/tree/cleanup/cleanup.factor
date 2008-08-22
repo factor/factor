@@ -30,13 +30,10 @@ M: node delete-node drop ;
 
 GENERIC: cleanup* ( node -- node/nodes )
 
-: termination-cleanup ( nodes -- nodes' )
-    dup [ #terminate? ] find drop [ 1+ cut delete-nodes ] when* ;
-
 : cleanup ( nodes -- nodes' )
     #! We don't recurse into children here, instead the methods
     #! do it since the logic is a bit more involved
-    [ cleanup* ] map flatten ; ! termination-cleanup ;
+    [ cleanup* ] map flatten ;
 
 : cleanup-folding? ( #call -- ? )
     node-output-infos dup empty?
@@ -70,21 +67,11 @@ GENERIC: cleanup* ( node -- node/nodes )
 : remove-overflow-check ( #call -- #call )
     [ in-d>> ] [ out-d>> ] [ word>> no-overflow-variant ] tri #call cleanup* ;
 
-: immutable-tuple-boa? ( #call -- ? )
-    dup word>> \ <tuple-boa> eq? [
-        dup in-d>> peek node-value-info
-        literal>> class>> immutable-tuple-class?
-    ] [ drop f ] if ;
-
-: immutable-tuple-boa ( #call -- #call )
-    \ <immutable-tuple-boa> >>word ;
-
 M: #call cleanup*
     {
         { [ dup body>> ] [ cleanup-inlining ] }
         { [ dup cleanup-folding? ] [ cleanup-folding ] }
         { [ dup remove-overflow-check? ] [ remove-overflow-check ] }
-        { [ dup immutable-tuple-boa? ] [ immutable-tuple-boa ] }
         [ ]
     } cond ;
 

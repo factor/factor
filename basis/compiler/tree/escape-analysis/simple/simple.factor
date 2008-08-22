@@ -40,8 +40,15 @@ M: #push escape-analysis*
     #! Delegation.
     [ out-d>> first ] [ literal>> ] bi record-literal-allocation ;
 
+: record-unknown-allocation ( #call -- )
+    [ in-d>> add-escaping-values ]
+    [ out-d>> unknown-allocations ] bi ;
+
 : record-tuple-allocation ( #call -- )
-    [ in-d>> but-last ] [ out-d>> first ] bi record-allocation ;
+    dup immutable-tuple-boa?
+    [ [ in-d>> but-last ] [ out-d>> first ] bi record-allocation ]
+    [ record-unknown-allocation ]
+    if ;
 
 : record-complex-allocation ( #call -- )
     [ in-d>> ] [ out-d>> first ] bi record-allocation ;
@@ -66,14 +73,10 @@ M: #push escape-analysis*
 
 M: #call escape-analysis*
     dup word>> {
-        { \ <immutable-tuple-boa> [ record-tuple-allocation ] }
+        { \ <tuple-boa> [ record-tuple-allocation ] }
         { \ <complex> [ record-complex-allocation ] }
         { \ slot [ record-slot-call ] }
-        [
-            drop
-            [ in-d>> add-escaping-values ]
-            [ out-d>> unknown-allocations ] bi
-        ]
+        [ drop record-unknown-allocation ]
     } case ;
 
 M: #return escape-analysis*

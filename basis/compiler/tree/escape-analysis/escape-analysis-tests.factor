@@ -6,7 +6,8 @@ compiler.tree.propagation compiler.tree.cleanup
 compiler.tree.combinators compiler.tree sequences math math.private
 kernel tools.test accessors slots.private quotations.private
 prettyprint classes.tuple.private classes classes.tuple
-compiler.tree.intrinsics namespaces ;
+compiler.tree.intrinsics namespaces compiler.tree.propagation.info
+stack-checker.errors ;
 
 \ escape-analysis must-infer
 
@@ -16,7 +17,7 @@ GENERIC: count-unboxed-allocations* ( m node -- n )
     out-d>> first escaping-allocation? [ 1+ ] unless ;
 
 M: #call count-unboxed-allocations*
-    dup word>> { <immutable-tuple-boa> <complex> } memq?
+    dup [ immutable-tuple-boa? ] [ word>> \ <complex> eq? ] bi or
     [ (count-unboxed-allocations) ] [ drop ] if ;
 
 M: #push count-unboxed-allocations*
@@ -308,5 +309,10 @@ C: <ro-box> ro-box
 
 [ 0 ] [
     [ dup -1 over >= [ 0 >= [ "A" throw ] unless ] [ drop ] if ]
+    count-unboxed-allocations
+] unit-test
+
+[ 0 ] [
+    [ \ too-many->r boa f f \ inference-error boa ]
     count-unboxed-allocations
 ] unit-test

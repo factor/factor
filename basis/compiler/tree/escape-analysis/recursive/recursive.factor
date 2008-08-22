@@ -42,14 +42,13 @@ IN: compiler.tree.escape-analysis.recursive
     ] 2bi ;
 
 M: #recursive escape-analysis* ( #recursive -- )
-    { 0 } clone [ USE: math
-        dup first 10 = [ "OOPS" throw ] [ dup first 1+ swap set-first ] if
+    [
         child>>
         [ first out-d>> introduce-values ]
         [ first analyze-recursive-phi ]
         [ (escape-analysis) ]
         tri
-    ] curry until-fixed-point ;
+    ] until-fixed-point ;
 
 M: #enter-recursive escape-analysis* ( #enter-recursive -- )
     #! Handled by #recursive

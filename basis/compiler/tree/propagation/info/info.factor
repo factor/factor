@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs classes classes.algebra kernel
-accessors math math.intervals namespaces sequences words
-combinators combinators.short-circuit arrays
-compiler.tree.propagation.copy ;
+USING: assocs classes classes.algebra classes.tuple
+classes.tuple.private kernel accessors math math.intervals
+namespaces sequences words combinators combinators.short-circuit
+arrays compiler.tree.propagation.copy ;
 IN: compiler.tree.propagation.info
 
 : false-class? ( class -- ? ) \ f class<= ;
@@ -276,3 +276,9 @@ SYMBOL: value-infos
 
 : node-output-infos ( node -- seq )
     dup out-d>> [ node-value-info ] with map ;
+
+: immutable-tuple-boa? ( #call -- ? )
+    dup word>> \ <tuple-boa> eq? [
+        dup in-d>> peek node-value-info
+        literal>> class>> immutable-tuple-class?
+    ] [ drop f ] if ;

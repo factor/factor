@@ -26,4 +26,7 @@ IN: compiler.tree.optimizer
     compute-def-use
     remove-dead-code
     ! strength-reduce
+    USE: kernel
+    compute-def-use
+    dup check-nodes
     ;

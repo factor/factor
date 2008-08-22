@@ -7,6 +7,7 @@ stack-checker.branches
 compiler.tree
 compiler.tree.intrinsics
 compiler.tree.combinators
+compiler.tree.propagation.info
 compiler.tree.escape-analysis.simple
 compiler.tree.escape-analysis.allocations ;
 IN: compiler.tree.tuple-unboxing
@@ -58,16 +59,12 @@ M: #push unbox-tuples* ( #push -- nodes )
 
 : unbox-slot-access ( #call -- nodes )
     dup out-d>> first unboxed-slot-access? [
-       !  [ in-d>> second 1array #drop ]
-       ! [
-    prepare-slot-access slot-access-shuffle
-    ! ]
-    !    bi 2array
+        prepare-slot-access slot-access-shuffle
     ] when ;
 
 M: #call unbox-tuples*
     dup word>> {
-        { \ <immutable-tuple-boa> [ unbox-<tuple-boa> ] }
+        { \ <tuple-boa> [ unbox-<tuple-boa> ] }
         { \ <complex> [ unbox-<complex> ] }
         { \ slot [ unbox-slot-access ] }
         [ drop ]

@@ -52,8 +52,7 @@ IN: compiler.tree.propagation.recursive
     3bi ;
 
 M: #recursive propagate-around ( #recursive -- )
-    { 0 } clone [ USE: math
-        dup first 10 = [ "OOPS" throw ] [ dup first 1+ swap set-first ] if
+    [
         constraints [ clone ] change
 
         child>>
@@ -61,7 +60,7 @@ M: #recursive propagate-around ( #recursive -- )
         [ first propagate-recursive-phi ]
         [ (propagate) ]
         tri
-    ] curry until-fixed-point ;
+    ] until-fixed-point ;
 
 : generalize-return-interval ( info -- info' )
     dup [ literal?>> ] [ class>> null-class? ] bi or

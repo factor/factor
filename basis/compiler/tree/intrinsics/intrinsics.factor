@@ -4,8 +4,6 @@ USING: kernel classes.tuple classes.tuple.private math arrays
 byte-arrays words stack-checker.known-words ;
 IN: compiler.tree.intrinsics
 
-: <immutable-tuple-boa> ( ... class -- tuple ) <tuple-boa> ;
-
 : (tuple) ( layout -- tuple )
     "BUG: missing (tuple) intrinsic" throw ;
 
