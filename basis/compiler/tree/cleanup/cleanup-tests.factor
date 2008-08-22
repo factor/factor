@@ -144,7 +144,7 @@ M: object xyz ;
 
 [ f ] [ [ dup 0 < [ neg ] when ] \ - inlined? ] unit-test
 
-[ f ] [
+[ t ] [
     [
         [ no-cond ] 1
         [ 1array dup quotation? [ >quotation ] unless ] times
@@ -433,7 +433,7 @@ cell-bits 32 = [
     ] { >= fixnum>= } inlined?
 ] unit-test
 
-[ t ] [
+[ ] [
     [
         4 pick array-capacity?
         [ set-slot ] [ \ array-capacity 2nip bad-slot-value ] if

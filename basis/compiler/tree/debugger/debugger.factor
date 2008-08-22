@@ -3,7 +3,7 @@
 USING: kernel assocs fry match accessors namespaces effects
 sequences sequences.private quotations generic macros arrays
 prettyprint prettyprint.backend prettyprint.sections math words
-combinators io sorting
+combinators io sorting hints
 compiler.tree
 compiler.tree.builder
 compiler.tree.optimizer

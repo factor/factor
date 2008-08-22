@@ -25,14 +25,13 @@ M: #call-recursive compute-live-values*
     [ out-d>> ] [ label>> return>> in-d>> ] bi look-at-mapping ;
 
 :: drop-dead-inputs ( inputs outputs -- #shuffle )
-    [let* | new-inputs [ inputs make-values ]
-            live-inputs [ outputs inputs filter-corresponding ]
-            new-live-inputs [ outputs new-inputs filter-corresponding ]
-            mapping [ new-live-inputs live-inputs zip ] |
-        inputs filter-live
+    [let* | live-inputs [ inputs filter-live ]
+            new-live-inputs [ outputs inputs filter-corresponding make-values ] |
+        live-inputs
         new-live-inputs
-        mapping
-        #shuffle
+        outputs
+        inputs
+        drop-values
     ] ;
 
 M: #recursive remove-dead-code* ( node -- nodes )
@@ -53,17 +52,20 @@ M: #enter-recursive remove-dead-code*
     [ nip ]
     2bi ;
 
-:: drop-call-recursive-outputs ( node -- #shuffle )
-    [let* | node-out [ node out-d>> ]
-            return-in [ node label>> return>> in-d>> ]
-            node-out-live [ return-in node-out filter-corresponding ]
-            new-node-out-live [ node-out-live make-values ]
-            node-out-dropped [ node-out filter-live ]
-            new-node-out-dropped [ node-out-dropped new-node-out-live filter-corresponding ]
-            mapping [ node-out-dropped new-node-out-dropped zip ] |
-        node new-node-out-live >>out-d drop
-        new-node-out-live node-out-dropped mapping #shuffle
+:: (drop-call-recursive-outputs) ( inputs outputs -- #shuffle )
+    [let* | new-live-outputs [ inputs outputs filter-corresponding make-values ]
+            live-outputs [ outputs filter-live ] |
+        new-live-outputs
+        live-outputs
+        live-outputs
+        new-live-outputs
+        drop-values
     ] ;
+
+: drop-call-recursive-outputs ( node -- #shuffle )
+    dup [ label>> return>> in-d>> ] [ out-d>> ] bi
+    (drop-call-recursive-outputs)
+    [ in-d>> >>out-d drop ] keep ;
 
 M: #call-recursive remove-dead-code*
     [ drop-call-recursive-inputs ]

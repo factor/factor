@@ -35,7 +35,7 @@ M: #branch remove-dead-code*
     [ length ] keep live-values get
     '[ , nth , key? ] filter ; inline
 
-: drop-values ( values indices -- node )
+: drop-indexed-values ( values indices -- node )
     [ drop filter-live ] [ nths ] 2bi
     [ make-values ] keep
     [ drop ] [ zip ] 2bi
@@ -44,7 +44,7 @@ M: #branch remove-dead-code*
 : insert-drops ( nodes values indices -- nodes' )
     '[
         over ends-with-terminate?
-        [ drop ] [ , drop-values suffix ] if
+        [ drop ] [ , drop-indexed-values suffix ] if
     ] 2map ;
 
 : hoist-drops ( #phi -- )

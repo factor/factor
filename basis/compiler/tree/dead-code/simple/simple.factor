@@ -61,19 +61,27 @@ M: #alien-indirect compute-live-values* nip look-at-inputs ;
 : filter-live ( values -- values' )
     [ live-value? ] filter ;
 
-: drop-dead-values ( in out -- #shuffle )
-    [ make-values dup ] keep zip #shuffle ;
+:: drop-values ( inputs outputs mapping-keys mapping-values -- #shuffle )
+    inputs
+    outputs
+    outputs
+    mapping-keys
+    mapping-values
+    filter-corresponding zip #shuffle ; inline
 
-:: drop-dead-outputs ( node -- nodes )
-    [let* | old-outputs [ node out-d>> ]
-            new-outputs [ old-outputs make-values ]
-            old-live-outputs [ old-outputs filter-live ]
-            new-live-outputs [ old-outputs new-outputs filter-corresponding ]
-            mapping [ old-live-outputs new-live-outputs zip ] |
-        node new-outputs >>out-d
-        new-outputs old-live-outputs mapping #shuffle
-        2array
+:: drop-dead-values ( outputs -- #shuffle )
+    [let* | new-outputs [ outputs make-values ]
+            live-outputs [ outputs filter-live ] |
+        new-outputs
+        live-outputs
+        outputs
+        new-outputs
+        drop-values
     ] ;
+
+: drop-dead-outputs ( node -- nodes )
+    dup out-d>> drop-dead-values
+    [ in-d>> >>out-d drop ] [ 2array ] 2bi ;
 
 M: #introduce remove-dead-code* ( #introduce -- nodes )
     drop-dead-outputs ;
