@@ -124,6 +124,7 @@ ERROR: bad-option ch ;
         { CHAR: i [ case-insensitive ] }
         { CHAR: d [ unix-lines ] }
         { CHAR: m [ multiline ] }
+        { CHAR: n [ multiline ] }
         { CHAR: r [ reversed-regexp ] }
         { CHAR: s [ dotall ] }
         { CHAR: u [ unicode-case ] }
