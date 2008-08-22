@@ -19,6 +19,7 @@ IN: regexp2.utils
 : push1 ( obj -- ) input-stream get stream>> push ;
 : peek1 ( -- obj ) input-stream get stream>> [ f ] [ peek ] if-empty ;
 : pop3 ( seq -- obj1 obj2 obj3 ) [ pop ] [ pop ] [ pop ] tri spin ;
+: drop1 ( -- ) read1 drop ;
 
 : stack ( -- obj ) current-regexp get stack>> ;
 : change-whole-stack ( quot -- )

@@ -12,8 +12,18 @@ FROM: math.ranges => [a,b] ;
 MIXIN: node
 TUPLE: concatenation seq ; INSTANCE: concatenation node
 TUPLE: alternation seq ; INSTANCE: alternation node
-TUPLE: kleene-star term ; INSTANCE: kleene-star node
+! !!!!!!!!
 TUPLE: question term ; INSTANCE: question node
+TUPLE: kleene-star term ; INSTANCE: kleene-star node
+
+! !!!!!!!!
+TUPLE: possessive-question term ; INSTANCE: possessive-question node
+TUPLE: possessive-kleene-star term ; INSTANCE: possessive-kleene-star node
+
+! !!!!!!!!
+TUPLE: reluctant-question term ; INSTANCE: reluctant-question node
+TUPLE: reluctant-kleene-star term ; INSTANCE: reluctant-kleene-star node
+
 TUPLE: negation term ; INSTANCE: negation node
 TUPLE: constant char ; INSTANCE: constant node
 TUPLE: range from to ; INSTANCE: range node
@@ -50,6 +60,11 @@ left-parenthesis pipe caret dash ;
 : get-case-insensitive ( -- ? ) case-insensitive get-option ;
 : get-unicode-case ( -- ? ) unicode-case get-option ;
 : get-reversed-regexp ( -- ? ) reversed-regexp get-option ;
+
+: <possessive-kleene-star> ( obj -- kleene ) possessive-kleene-star boa ;
+: <reluctant-kleene-star> ( obj -- kleene ) reluctant-kleene-star boa ;
+: <possessive-question> ( obj -- kleene ) possessive-question boa ;
+: <reluctant-question> ( obj -- kleene ) reluctant-question boa ;
 
 : <negation> ( obj -- negation ) negation boa ;
 : <concatenation> ( seq -- concatenation )
@@ -146,9 +161,9 @@ ERROR: bad-special-group string ;
         { [ dup CHAR: > = ]
             [ drop nested-parse-regexp pop-stack make-independent-group ] }
         { [ dup CHAR: < = peek1 CHAR: = = and ]
-            [ drop read1 drop nested-parse-regexp pop-stack make-positive-lookbehind ] }
+            [ drop drop1 nested-parse-regexp pop-stack make-positive-lookbehind ] }
         { [ dup CHAR: < = peek1 CHAR: ! = and ]
-            [ drop read1 drop nested-parse-regexp pop-stack make-negative-lookbehind ] }
+            [ drop drop1 nested-parse-regexp pop-stack make-negative-lookbehind ] }
         [
             ":)" read-until
             [ swap prefix ] dip
@@ -162,16 +177,27 @@ ERROR: bad-special-group string ;
 
 : handle-left-parenthesis ( -- )
     peek1 CHAR: ? =
-    [ read1 drop (parse-special-group) ]
+    [ drop1 (parse-special-group) ]
     [ nested-parse-regexp ] if ;
 
 : handle-dot ( -- ) any-char push-stack ;
 : handle-pipe ( -- ) pipe push-stack ;
-: handle-star ( -- ) stack pop <kleene-star> push-stack ;
+: (handle-star) ( obj -- kleene-star )
+    peek1 {
+        { CHAR: + [ drop1 <possessive-kleene-star> ] }
+        { CHAR: ? [ drop1 <reluctant-kleene-star> ] }
+        [ drop <kleene-star> ]
+    } case ;
+: handle-star ( -- ) stack pop (handle-star) push-stack ;
 : handle-question ( -- )
-    stack pop epsilon 2array <alternation> push-stack ;
+    stack pop peek1 {
+        { CHAR: + [ drop1 <possessive-question> ] }
+        { CHAR: ? [ drop1 <reluctant-question> ] }
+        [ drop epsilon 2array <alternation> ]
+    } case push-stack ;
 : handle-plus ( -- )
-    stack pop dup <kleene-star> 2array <concatenation> push-stack ;
+    stack pop dup (handle-star)
+    2array <concatenation> push-stack ;
 
 ERROR: unmatched-brace ;
 : parse-repetition ( -- start finish ? )
@@ -247,7 +273,7 @@ ERROR: expected-posix-class ;
 ERROR: bad-escaped-literals seq ;
 : parse-escaped-literals ( -- obj )
     "\\E" read-until [ bad-escaped-literals ] unless
-    read1 drop
+    drop1
     [ epsilon ] [
         [ <constant> ] V{ } map-as
         first|concatenation
