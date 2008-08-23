@@ -10,7 +10,7 @@ sequences sequences.private slots.private strings
 strings.private system threads.private classes.tuple
 classes.tuple.private vectors vectors.private words definitions
 words.private assocs summary compiler.units system.private
-combinators locals.backend
+combinators locals.backend words.private quotations.private
 stack-checker.state
 stack-checker.backend
 stack-checker.branches
@@ -145,9 +145,11 @@ M: object infer-call*
         { \ r> [ 1 infer-r> ] }
         { \ declare [ infer-declare ] }
         { \ call [ pop-d infer-call ] }
+        { \ (call) [ pop-d infer-call ] }
         { \ curry [ infer-curry ] }
         { \ compose [ infer-compose ] }
         { \ execute [ infer-execute ] }
+        { \ (execute) [ infer-execute ] }
         { \ if [ infer-if ] }
         { \ dispatch [ infer-dispatch ] }
         { \ <tuple-boa> [ infer-<tuple-boa> ] }
@@ -163,9 +165,9 @@ M: object infer-call*
     } case ;
 
 {
-    >r r> declare call curry compose execute if dispatch
-    <tuple-boa> (throw) load-locals get-local drop-locals
-    do-primitive alien-invoke alien-indirect alien-callback
+    >r r> declare call (call) curry compose execute (execute) if
+dispatch <tuple-boa> (throw) load-locals get-local drop-locals
+do-primitive alien-invoke alien-indirect alien-callback
 } [ t "special" set-word-prop ] each
 
 { call execute dispatch load-locals get-local drop-locals }
