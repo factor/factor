@@ -49,7 +49,7 @@ DEFER: define-lisp-macro
     swap '[ , cut '[ @ , seq>list ] call , call call ] ;
 
 : normal-lambda ( body vars -- quot )
-    localize-lambda <lambda> lambda-rewrite [ compose call call ] compose 1quotation ;
+    localize-lambda <lambda> lambda-rewrite '[ @ compose call call ] 1quotation ;
 PRIVATE>
 
 : convert-lambda ( cons -- quot )
@@ -62,11 +62,17 @@ PRIVATE>
     cdr [ car ] keep [ convert-lambda ] [ car name>> ] bi define-lisp-macro 1quotation ;
 
 : macro-expand ( cons -- quot )
-    uncons [ list>seq >quotation ] [ lookup-macro ] bi* call call convert-form ;
+    uncons [ list>seq >quotation ] [ lookup-macro ] bi* call call ;
+    
+: (expand-macros) ( cons -- cons )    
+    [ dup list? [ (expand-macros) dup car lisp-macro? [ macro-expand ] when ] when ] lmap ;
+    
+: expand-macros ( cons -- cons )    
+    dup list? [ (expand-macros) dup car lisp-macro? [ macro-expand ] when ] when ;
     
 : convert-begin ( cons -- quot )    
     cdr [ convert-form ] [ ] lmap-as [ 1 tail* ] [ but-last ] bi
-    [ [ drop ] compose ] map prepend '[ , [ call ] each ] ;
+    [ '[ { } , with-datastack drop ] ] map prepend '[ , [ call ] each ] ;
 
 : form-dispatch ( cons lisp-symbol -- quot )
     name>>
@@ -80,7 +86,7 @@ PRIVATE>
 
 : convert-list-form ( cons -- quot )
     dup car
-    { { [ dup lisp-macro?  ] [ drop macro-expand ] }
+    { 
       { [ dup lisp-symbol? ] [ form-dispatch ] }
      [ drop convert-general-form ]
     } cond ;
@@ -94,7 +100,7 @@ PRIVATE>
     } cond ;
 
 : lisp-string>factor ( str -- quot )
-    lisp-expr convert-form ;
+    lisp-expr expand-macros convert-form ;
 
 : lisp-eval ( str -- * )
     lisp-string>factor call ;
