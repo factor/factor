@@ -541,9 +541,9 @@ $nl
     "A simple tuple class:"
     { $code "TUPLE: color red green blue ;" }
     "Declaring slots to be integer-valued:"
-    { $code "TUPLE: color" "{ \"red\" integer }" "{ \"green\" integer }" "{ \"blue\" integer } ;" }
+    { $code "TUPLE: color" "{ red integer }" "{ green integer }" "{ blue integer } ;" }
     "An example mixing short and long slot specifiers:"
-    { $code "TUPLE: person" "{ \"age\" integer initial: 0 }" "{ \"department\" string initial: \"Marketing\" }" "manager ;" }
+    { $code "TUPLE: person" "{ age integer initial: 0 }" "{ department string initial: \"Marketing\" }" "manager ;" }
 } ;
 
 HELP: initial:
