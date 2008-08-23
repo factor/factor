@@ -31,7 +31,7 @@ TUPLE: list < pack index presenter color hook ;
     swap set-list-index ;
 
 : list-presentation-hook ( list -- quot )
-    hook>> [ [ [ list? ] is? ] find-parent ] prepend ;
+    hook>> [ [ list? ] find-parent ] prepend ;
 
 : <list-presentation> ( hook elt presenter -- gadget )
     keep >r >label text-theme r>

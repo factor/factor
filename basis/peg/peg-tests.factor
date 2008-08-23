@@ -11,7 +11,7 @@ IN: peg.tests
 
 { "begin" "end" } [
   "beginend" "begin" token (parse) 
-  { ast>> remaining>> } get-slots
+  [ ast>> ] [ remaining>> ] bi
   >string
 ] unit-test
 

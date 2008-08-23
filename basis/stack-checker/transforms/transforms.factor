@@ -164,8 +164,3 @@ SYMBOL: +transform-n+
 \ memq? [
     dup sequence? [ memq-quot ] [ drop f ] if
 ] 1 define-transform
-
-! Deprecated
-\ get-slots [ [ 1quotation ] map [ cleave ] curry ] 1 define-transform
-
-\ set-slots [ <reversed> [ get-slots ] curry ] 1 define-transform

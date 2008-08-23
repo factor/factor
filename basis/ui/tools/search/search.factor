@@ -29,7 +29,7 @@ M: live-search handle-gesture* ( gadget gesture delegate -- ? )
     ] if ;
 
 : find-live-search ( gadget -- search )
-    [ [ live-search? ] is? ] find-parent ;
+    [ live-search? ] find-parent ;
 
 : find-search-list ( gadget -- list )
     find-live-search live-search-list ;

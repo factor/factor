@@ -320,14 +320,3 @@ M: tuple-class boa
     bi <tuple-boa> ;
 
 M: tuple-class initial-value* new ;
-
-! Deprecated
-M: object get-slots ( obj slots -- ... )
-    [ execute ] with each ;
-
-M: object set-slots ( ... obj slots -- )
-    <reversed> get-slots ;
-
-: delegates ( obj -- seq ) [ delegate ] follow ;
-
-: is? ( obj quot -- ? ) >r delegates r> contains? ; inline

@@ -361,8 +361,3 @@ M: f request-focus-on 2drop ;
 
 : focus-path ( world -- seq )
     [ focus>> ] follow ;
-
-! Deprecated
-
-: construct-gadget ( class -- tuple )
-    >r <gadget> { set-delegate } r> construct ; inline

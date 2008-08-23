@@ -17,7 +17,7 @@ GENERIC: handle-gesture* ( gadget gesture delegate -- ? )
 M: object handle-gesture* default-gesture-handler ;
 
 : handle-gesture ( gesture gadget -- ? )
-    tuck delegates [ >r 2dup r> handle-gesture* ] all? 2nip ;
+    tuck >r 2dup r> handle-gesture* 2nip ;
 
 : send-gesture ( gesture gadget -- ? )
     [ dupd handle-gesture ] each-parent nip ;

@@ -45,7 +45,7 @@ M: labelled-gadget focusable-child* labelled-gadget-content ;
 TUPLE: closable-gadget < frame content ;
 
 : find-closable-gadget ( parent -- child )
-    [ [ closable-gadget? ] is? ] find-parent ;
+    [ closable-gadget? ] find-parent ;
 
 : <closable-gadget> ( gadget title quot -- gadget )
   closable-gadget new-frame

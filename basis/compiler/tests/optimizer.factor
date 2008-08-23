@@ -223,16 +223,6 @@ USE: binary-search.private
 ] unit-test
 
 ! Regression
-TUPLE: silly-tuple a b ;
-
-[ 1 2 { silly-tuple-a silly-tuple-b } ] [
-    T{ silly-tuple f 1 2 }
-    [
-        { silly-tuple-a silly-tuple-b } [ get-slots ] keep
-    ] compile-call
-] unit-test
-
-! Regression
 : empty-compound ;
 
 : node-successor-f-bug ( x -- * )

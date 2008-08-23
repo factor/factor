@@ -533,8 +533,8 @@ $nl
 "Slot specifiers take one of the following three forms:"
 { $list
     { { $snippet "name" } " - a slot which can hold any object, with no attributes" }
-    { { $snippet "{ \"name\" attributes... }" } " - a slot which can hold any object, with optional attributes" }
-    { { $snippet "{ \"name\" class attributes... }" } " - a slot specialized to a specific class, with optional attributes" }
+    { { $snippet "{ name attributes... }" } " - a slot which can hold any object, with optional attributes" }
+    { { $snippet "{ name class attributes... }" } " - a slot specialized to a specific class, with optional attributes" }
 }
 "Slot attributes are lists of slot attribute specifiers followed by values; a slot attribute specifier is one of " { $link initial: } " or " { $link read-only } ". See " { $link "tuple-declarations" } " for details." }
 { $examples

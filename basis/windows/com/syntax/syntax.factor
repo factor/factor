@@ -74,7 +74,7 @@ unless
 
 : (define-word-for-function) ( function interface n -- )
     -rot [ (function-word) swap ] 2keep drop
-    { return>> parameters>> } get-slots
+    [ return>> ] [ parameters>> ] bi
     [ (invocation-quot) ] 2keep
     (stack-effect-from-return-and-parameters)
     define-declared ;
