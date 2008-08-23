@@ -9,15 +9,9 @@ stack-checker.visitor stack-checker.errors ;
 IN: stack-checker.backend
 
 ! Word properties we use
-SYMBOL: +inferred-effect+
-SYMBOL: +cannot-infer+
-SYMBOL: +special+
-SYMBOL: +shuffle+
-SYMBOL: +infer+
-
 SYMBOL: visited
 
-: reset-on-redefine { +inferred-effect+ +cannot-infer+ } ; inline
+: reset-on-redefine { "inferred-effect" "cannot-infer" } ; inline
 
 : (redefined) ( word -- )
     dup visited get key? [ drop ] [
@@ -122,7 +116,7 @@ M: object apply-object push-literal ;
     consume-r dup copy-values [ #r>, ] [ nip output-d ] 2bi ;
 
 : undo-infer ( -- )
-    recorded get [ f +inferred-effect+ set-word-prop ] each ;
+    recorded get [ f "inferred-effect" set-word-prop ] each ;
 
 : consume/produce ( effect quot -- )
     #! quot is ( inputs outputs -- )
@@ -168,11 +162,11 @@ M: object apply-object push-literal ;
     current-effect
     [ check-effect ]
     [ drop recorded get push ]
-    [ +inferred-effect+ set-word-prop ]
+    [ "inferred-effect" set-word-prop ]
     2tri ;
 
 : maybe-cannot-infer ( word quot -- )
-    [ ] [ t +cannot-infer+ set-word-prop ] cleanup ; inline
+    [ ] [ t "cannot-infer" set-word-prop ] cleanup ; inline
 
 : infer-word ( word -- effect )
     [
@@ -197,7 +191,7 @@ M: object apply-object push-literal ;
     dup required-stack-effect apply-word/effect ;
 
 : cached-infer ( word -- )
-    dup +inferred-effect+ word-prop apply-word/effect ;
+    dup "inferred-effect" word-prop apply-word/effect ;
 
 : with-infer ( quot -- effect visitor )
     [

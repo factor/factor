@@ -39,7 +39,7 @@ IN: compiler.tree.builder
     ] if ;
 
 : check-cannot-infer ( word -- )
-    dup +cannot-infer+ word-prop [ cannot-infer-effect ] [ drop ] if ;
+    dup "cannot-infer" word-prop [ cannot-infer-effect ] [ drop ] if ;
 
 : check-no-compile ( word -- )
     dup "no-compile" word-prop [ cannot-infer-effect ] [ drop ] if ;

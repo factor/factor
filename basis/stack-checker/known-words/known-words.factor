@@ -43,7 +43,7 @@ IN: stack-checker.known-words
     { over  (( x y   -- x y x       )) }
     { pick  (( x y z -- x y z x     )) }
     { swap  (( x y   -- y x         )) }
-} [ +shuffle+ set-word-prop ] assoc-each
+} [ "shuffle" set-word-prop ] assoc-each
 
 : infer-shuffle ( shuffle -- )
     [ in>> length consume-d ] keep ! inputs shuffle
@@ -52,7 +52,7 @@ IN: stack-checker.known-words
     #shuffle, ;
 
 : infer-shuffle-word ( word -- )
-    +shuffle+ word-prop infer-shuffle ;
+    "shuffle" word-prop infer-shuffle ;
 
 : infer-declare ( -- )
     pop-literal nip
@@ -166,7 +166,7 @@ M: object infer-call*
     >r r> declare call curry compose execute if dispatch
     <tuple-boa> (throw) load-locals get-local drop-locals
     do-primitive alien-invoke alien-indirect alien-callback
-} [ t +special+ set-word-prop ] each
+} [ t "special" set-word-prop ] each
 
 { call execute dispatch load-locals get-local drop-locals }
 [ t "no-compile" set-word-prop ] each
@@ -176,13 +176,13 @@ SYMBOL: +primitive+
 : non-inline-word ( word -- )
     dup +called+ depends-on
     {
-        { [ dup +shuffle+ word-prop ] [ infer-shuffle-word ] }
-        { [ dup +special+ word-prop ] [ infer-special ] }
+        { [ dup "shuffle" word-prop ] [ infer-shuffle-word ] }
+        { [ dup "special" word-prop ] [ infer-special ] }
         { [ dup +primitive+ word-prop ] [ infer-primitive ] }
         { [ dup +transform-quot+ word-prop ] [ apply-transform ] }
         { [ dup "macro" word-prop ] [ apply-macro ] }
-        { [ dup +cannot-infer+ word-prop ] [ cannot-infer-effect ] }
-        { [ dup +inferred-effect+ word-prop ] [ cached-infer ] }
+        { [ dup "cannot-infer" word-prop ] [ cannot-infer-effect ] }
+        { [ dup "inferred-effect" word-prop ] [ cached-infer ] }
         { [ dup recursive-label ] [ call-recursive-word ] }
         [ dup infer-word apply-word/effect ]
     } cond ;
@@ -598,7 +598,7 @@ SYMBOL: +primitive+
 
 \ (set-os-envs) { array } { } define-primitive
 
-\ do-primitive [ \ do-primitive cannot-infer-effect ] +infer+ set-word-prop
+\ do-primitive [ \ do-primitive cannot-infer-effect ] "infer" set-word-prop
 
 \ dll-valid? { object } { object } define-primitive
 

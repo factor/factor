@@ -81,7 +81,7 @@ SYMBOL: rename-map
     [ rename-map get at ] keep or ;
 
 : rename-values ( values -- values' )
-    [ rename-value ] map ;
+    rename-map get '[ [ , at ] keep or ] map ;
 
 GENERIC: rename-node-values* ( node -- node )
 
@@ -126,6 +126,7 @@ SYMBOL: introduction-stack
     introduction-stack [ swap cut* swap ] change ;
 
 : add-renamings ( old new -- )
+    [ rename-values ] dip
     rename-map get '[ , set-at ] 2each ;
 
 M: #introduce normalize*

@@ -48,18 +48,6 @@ if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-USE: inference.transforms
-
-! : narray ( n -- array ) [ drop ] map reverse ;
-
-: [narray] ( n -- quot ) [ [ drop ] map reverse ] curry ;
-
-: narray ( n -- array ) [narray] call ;
-
-\ narray [ [narray] ] 1 define-transform
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 : new ( class -- object )
 get dup >r class-slots length narray r> swap 2array ;
 

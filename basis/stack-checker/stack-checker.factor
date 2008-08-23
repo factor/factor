@@ -18,10 +18,10 @@ M: callable infer ( quot -- effect )
 
 : forget-errors ( -- )
     all-words [
-        dup subwords [ f +cannot-infer+ set-word-prop ] each
-        f +cannot-infer+ set-word-prop
+        dup subwords [ f "cannot-infer" set-word-prop ] each
+        f "cannot-infer" set-word-prop
     ] each ;
 
 : forget-effects ( -- )
     forget-errors
-    all-words [ f +inferred-effect+ set-word-prop ] each ;
+    all-words [ f "inferred-effect" set-word-prop ] each ;

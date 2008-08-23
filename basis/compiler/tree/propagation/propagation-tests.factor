@@ -560,6 +560,11 @@ M: integer infinite-loop infinite-loop ;
 
 [ ] [ [ 0 fold-throw-test ] final-info drop ] unit-test
 
+: too-deep ( a b -- c )
+    dup [ drop ] [ 2dup too-deep too-deep * ] if ; inline recursive
+
+[ ] [ [ too-deep ] final-info drop ] unit-test
+
 ! [ V{ string } ] [
 !     [ dup string? t xor [ "A" throw ] [ ] if ] final-classes
 ! ] unit-test

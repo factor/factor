@@ -91,10 +91,7 @@ M: ratio big-generic-test "ratio" ;
 M: string big-generic-test "string" ;
 M: shit big-generic-test "shit" ;
 
-TUPLE: delegating ;
-
 [ T{ shit f } "shit" ] [ T{ shit f } big-generic-test ] unit-test
-[ T{ shit f } "shit" ] [ T{ delegating T{ shit f } } big-generic-test ] unit-test
 
 [ t ] [ \ + math-generic? ] unit-test
 

@@ -24,6 +24,11 @@ IN: compiler.tree.def-use.tests
     compute-def-use
     check-nodes ;
 
+: too-deep ( a b -- c )
+    dup [ drop ] [ 2dup too-deep too-deep drop ] if ; inline recursive
+
+[ ] [ [ too-deep ] build-tree normalize compute-def-use check-nodes ] unit-test
+
 ! compute-def-use checks for SSA violations, so we use that to
 ! ensure we generate some common patterns correctly.
 {
