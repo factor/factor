@@ -1,4 +1,4 @@
-USING: help.markup help.syntax math strings words ;
+USING: help.markup help.syntax math strings words kernel ;
 IN: effects
 
 ARTICLE: "effect-declaration" "Stack effect declaration"
@@ -61,7 +61,7 @@ HELP: effect<=
 { $description "Tests if " { $snippet "eff1" } " is substitutable for " { $snippet "eff2" } ". What this means is that both stack effects change the stack height by the same amount, the first takes a smaller or equal number of inputs as the second, and either both or neither one terminate execution by throwing an error." } ;
 
 HELP: effect>string
-{ $values { "effect" effect } { "string" string } }
+{ $values { "obj" object } { "str" string } }
 { $description "Turns a stack effect object into a string mnemonic." }
 { $examples
     { $example "USING: effects io ;" "1 2 <effect> effect>string print" "( object -- object object )" }

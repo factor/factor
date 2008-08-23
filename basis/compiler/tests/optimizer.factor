@@ -2,7 +2,7 @@ USING: accessors arrays compiler.units generic hashtables
 stack-checker kernel kernel.private math prettyprint sequences
 sbufs strings tools.test vectors words sequences.private
 quotations classes classes.algebra classes.tuple.private
-continuations growable namespaces hints
+continuations growable namespaces hints alien.accessors
 compiler.tree.builder compiler.tree.optimizer ;
 IN: optimizer.tests
 
@@ -356,3 +356,10 @@ TUPLE: some-tuple x ;
     [ ] curry some-tuple boa ;
 
 [ T{ some-tuple f [ 3 ] } ] [ 3 allot-regression ] unit-test
+
+[ 1 ] [ B{ 0 0 0 0 } [ 0 alien-signed-4 1+ ] compile-call ] unit-test
+[ 1 ] [ B{ 0 0 0 0 } [ 0 alien-unsigned-4 1+ ] compile-call ] unit-test
+[ 1 ] [ B{ 0 0 0 0 0 0 0 0 } [ 0 alien-signed-8 1+ ] compile-call ] unit-test
+[ 1 ] [ B{ 0 0 0 0 0 0 0 0 } [ 0 alien-unsigned-8 1+ ] compile-call ] unit-test
+[ 1 ] [ B{ 0 0 0 0 0 0 0 0 } [ 0 alien-signed-cell 1+ ] compile-call ] unit-test
+[ 1 ] [ B{ 0 0 0 0 0 0 0 0 } [ 0 alien-unsigned-cell 1+ ] compile-call ] unit-test

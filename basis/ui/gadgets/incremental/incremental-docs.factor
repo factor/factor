@@ -11,8 +11,8 @@ $nl
 "Not every " { $link pack } " can use incremental layout, since incremental layout does not support non-default values for " { $link pack-align } ", " { $link pack-fill } ", and " { $link pack-gap } "." } ;
 
 HELP: <incremental>
-{ $values { "pack" pack } { "incremental" "a new instance of " { $link incremental } } }
-{ $description "Creates a new incremental layout gadget delegating to " { $snippet "pack" } "." } ;
+{ $values { "incremental" "a new instance of " { $link incremental } } }
+{ $description "Creates a new incremental layout gadget." } ;
 
 { <incremental> add-incremental clear-incremental } related-words
 

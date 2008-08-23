@@ -247,7 +247,7 @@ generic-comparison-ops [
             [ string>number 8 * 2^ 1- 0 swap [a,b] ]
         }
     } cond
-    [ fixnum fits? fixnum bignum ? ] keep <class/interval-info>
+    [ fixnum fits? fixnum integer ? ] keep <class/interval-info>
     [ 2nip ] curry +outputs+ set-word-prop
 ] each
 

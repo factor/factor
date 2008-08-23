@@ -68,9 +68,6 @@ HELP: classes
 HELP: update-map
 { $var-description "Assoc mapping each class to a set of classes defined in terms of this class. The " { $link define-class } " word uses this information to update generic words when classes are redefined." } ;
 
-! HELP: implementors-map
-! { $var-description "Assoc mapping each class to a set of generic words defining methods on this class." } ;
-
 HELP: predicate-word
 { $values { "word" "a word" } { "predicate" "a predicate word" } }
 { $description "Suffixes the word's name with \"?\" and creates a word with that name in the same vocabulary as the word itself." } ;
@@ -96,3 +93,7 @@ HELP: define-class
 { $values { "word" word } { "superclass" class } { "members" "a sequence of class words" } { "participants" "a sequence of class words" } { "metaclass" class } }
 { $description "Sets a property indicating this word is a class word, thus making it an instance of " { $link class } ", and registers it with " { $link update-map } "." }
 $low-level-note ;
+
+HELP: implementors
+{ $values { "class/classes" "a class or a sequence of classes" } { "seq" "a sequence of generic words" } }
+{ $description "Finds all generic words in the dictionary implementing methods for the given set of classes." } ;

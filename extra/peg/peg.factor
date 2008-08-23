@@ -349,10 +349,10 @@ TUPLE: token-parser symbol ;
 
 : parse-token ( input string -- result )
   #! Parse the string, returning a parse result
-  dup >r ?head-slice [
-    r> <parse-result> f f add-error
+  [ ?head-slice ] keep swap [
+    <parse-result> f f add-error
   ] [
-    drop pos get "token '" r> append "'" append 1vector add-error f
+    >r drop pos get "token '" r> append "'" append 1vector add-error f
   ] if ;
 
 M: token-parser (compile) ( peg -- quot )
@@ -436,14 +436,14 @@ M: choice-parser (compile) ( peg -- quot )
 
 TUPLE: repeat0-parser p1 ;
 
-: (repeat) ( quot result -- result )
+: (repeat) ( quot: ( -- result ) result -- result )
   over call [
     [ remaining>> swap (>>remaining) ] 2keep 
     ast>> swap [ ast>> push ] keep
     (repeat) 
   ] [
     nip
-  ] if* ; inline
+  ] if* ; inline recursive
 
 M: repeat0-parser (compile) ( peg -- quot )
   p1>> compile-parser 1quotation '[ 

@@ -32,7 +32,7 @@ HELP: grid-child
 { $errors "Throws an error if the indices are out of bounds." } ;
 
 HELP: grid-add
-{ $values { "gadget" gadget } { "grid" grid } { "i" "non-negative integer" } { "j" "non-negative integer" } }
+{ $values { "grid" grid } { "child" gadget } { "i" "non-negative integer" } { "j" "non-negative integer" } }
 { $description "Adds a child gadget at the specified location." }
 { $side-effects "grid" } ;
 

@@ -135,7 +135,7 @@ TUPLE: merge
 
 PRIVATE>
 
-: sort ( seq quot -- seq' )
+: sort ( seq quot -- sortedseq )
     [ <merge> ] dip
     [ sort-pairs ] [ sort-loop ] [ drop accum>> underlying>> ] 2tri ;
     inline

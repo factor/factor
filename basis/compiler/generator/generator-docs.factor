@@ -36,8 +36,8 @@ HELP: begin-compiling
 { $description "Prepares to generate machine code for a word." } ;
 
 HELP: with-generator
-{ $values { "node" "a dataflow node" } { "word" word } { "label" word } { "quot" "a quotation with stack effect " { $snippet "( node -- )" } } }
-{ $description "Generates machine code for " { $snippet "label" } " by applying the quotation to the dataflow node." } ;
+{ $values { "nodes" "a sequence of nodes" } { "word" word } { "label" word } { "quot" "a quotation with stack effect " { $snippet "( node -- )" } } }
+{ $description "Generates machine code for " { $snippet "label" } " by applying the quotation to the sequence of nodes." } ;
 
 HELP: generate-node
 { $values { "node" "a dataflow node" } { "next" "a dataflow node" } }
@@ -45,13 +45,13 @@ HELP: generate-node
 { $notes "This word can only be called from inside the quotation passed to " { $link with-generator } "." } ;
 
 HELP: generate-nodes
-{ $values { "node" "a dataflow node" } } 
+{ $values { "nodes" "a sequence of nodes" } } 
 { $description "Recursively generate machine code for a dataflow graph." }
 { $notes "This word can only be called from inside the quotation passed to " { $link with-generator } "." } ;
 
 HELP: generate
-{ $values { "word" word } { "label" word } { "node" "a dataflow node" } }
-{ $description "Generates machine code for " { $snippet "label" } " from " { $snippet "node" } ". The value of " { $snippet "word" } " is retained for debugging purposes; it is the word which will appear in a call stack trace if this compiled code block throws an error when run." } ;
+{ $values { "word" word } { "label" word } { "nodes" "a sequence of nodes" } }
+{ $description "Generates machine code for " { $snippet "label" } " from " { $snippet "nodes" } ". The value of " { $snippet "word" } " is retained for debugging purposes; it is the word which will appear in a call stack trace if this compiled code block throws an error when run." } ;
 
 HELP: define-intrinsics
 { $values { "word" word } { "intrinsics" "a sequence of " { $snippet "{ quot assoc }" } " pairs" } }

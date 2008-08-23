@@ -110,7 +110,7 @@ M: help-error error.
     H{ } clone [
         [
             [ dup >link where dup ] 2dip
-            [ first r> at r> push-at ] 2curry
+            [ >r >r first r> at r> push-at ] 2curry
             [ 2drop ]
             if
         ] 2curry each
