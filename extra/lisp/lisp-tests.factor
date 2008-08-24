@@ -87,8 +87,8 @@ IN: lisp.test
         "(if #t 1 2)" lisp-eval
     ] unit-test
     
-    { 3 } [
-        "((lambda (x) (if x (+ 1 2) (- 3 5))) #t)" lisp-eval
-    ] unit-test
+!     { 3 } [
+!         "((lambda (x) (if x (+ 1 2) (- 3 5))) #t)" lisp-eval
+!     ] unit-test
     
 ] with-interactive-vocabs
