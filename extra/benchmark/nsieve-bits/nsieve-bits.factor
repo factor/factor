@@ -7,7 +7,7 @@ bit-arrays namespaces io ;
         3drop
     ] [
         f 2over set-nth-unsafe >r over + r> clear-flags
-    ] if ; inline
+    ] if ; inline recursive
 
 : (nsieve-bits) ( count i seq -- count )
     2dup length < [
@@ -17,7 +17,7 @@ bit-arrays namespaces io ;
         ] when >r 1+ r> (nsieve-bits)
     ] [
         2drop
-    ] if ; inline
+    ] if ; inline recursive
 
 : nsieve-bits ( m -- count )
     0 2 rot 1+ <bit-array> dup set-bits (nsieve-bits) ;

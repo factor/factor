@@ -26,7 +26,7 @@ IN: benchmark.mandel
 
 : iter ( c z nb-iter -- x )
     over absq 4.0 >= over zero? or
-    [ 2nip ] [ 1- >r sq dupd + r> iter ] if ; inline
+    [ 2nip ] [ 1- >r sq dupd + r> iter ] if ; inline recursive
 
 SYMBOL: cols
 
