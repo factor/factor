@@ -456,3 +456,8 @@ cell-bits 32 = [
     [ [ 2array ] [ 0 3array ] if first ]
     { nth-unsafe < <= > >= } inlined?
 ] unit-test
+
+[ ] [
+    [ [ >r "A" throw r> ] [ "B" throw ] if ]
+    cleaned-up-tree drop
+] unit-test

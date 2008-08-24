@@ -126,7 +126,9 @@ M: #r> check-stack-flow* [ check-in-r ] [ check-out-d ] bi ;
     retainstack get empty? [ "Retain stack not empty" throw ] unless ;
 
 M: #return check-stack-flow*
-    check-in-d assert-datastack-empty assert-retainstack-empty ;
+    check-in-d
+    assert-datastack-empty
+    terminated? get [ assert-retainstack-empty ] unless ;
 
 M: #enter-recursive check-stack-flow*
     check-out-d ;
@@ -157,7 +159,7 @@ SYMBOL: branch-out
         datastack [ clone ] change
         V{ } clone retainstack set
         (check-stack-flow)
-        assert-retainstack-empty
+        terminated? get [ assert-retainstack-empty ] unless
         terminated? get f datastack get ?
     ] with-scope ;
 

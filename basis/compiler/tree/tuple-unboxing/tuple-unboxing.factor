@@ -134,4 +134,6 @@ M: #alien-indirect unbox-tuples* dup in-d>> assert-not-unboxed ;
 
 M: #alien-callback unbox-tuples* ;
 
-: unbox-tuples ( nodes -- nodes ) [ unbox-tuples* ] map-nodes ;
+: unbox-tuples ( nodes -- nodes )
+    allocations get escaping-allocations get assoc-diff assoc-empty?
+    [ [ unbox-tuples* ] map-nodes ] unless ;
