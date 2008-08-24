@@ -3,7 +3,7 @@ IN: macros
 
 HELP: MACRO:
 { $syntax "MACRO: word ( inputs... -- ) definition... ;" }
-{ $description "Defines a compile-time code transformation. If all inputs to the word are literal, then the macro body is invoked at compile-time to produce a quotation; this quotation is then spliced into the compiled code. If the inputs are not literal, or if the word is invoked from interpreted code, the macro body will execute every time and the result will be passed to " { $link call } "."
+{ $description "Defines a compile-time code transformation. If all inputs to the word are literal and the word calling the macro has a static stack effect, then the macro body is invoked at compile-time to produce a quotation; this quotation is then spliced into the compiled code. If the inputs are not literal, or if the word is invoked from a word which does not have a static stack effect, the macro body will execute every time and the result will be passed to " { $link call } "."
 $nl
 "The stack effect declaration must be present because it tells the compiler how many literal inputs to expect."
 }

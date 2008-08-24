@@ -192,6 +192,11 @@ HELP: inline
     "The non-optimizing quotation compiler ignores inlining declarations."
 } ;
 
+HELP: recursive
+{ $syntax ": foo ... ; recursive" }
+{ $description "Declares the most recently defined word as a recursive word." }
+{ $notes "This declaration is only required for " { $link POSTPONE: inline } " words which call themselves. See " { $link "inference-recursive-combinators" } "." } ;
+
 HELP: foldable
 { $syntax ": foo ... ; foldable" }
 { $description

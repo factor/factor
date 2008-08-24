@@ -1,4 +1,5 @@
-USING: tools.test tools.annotations math parser eval ;
+USING: tools.test tools.annotations math parser eval
+io.streams.string kernel ;
 IN: tools.annotations.tests
 
 : foo ;
@@ -24,3 +25,16 @@ M: integer some-generic 1+ ;
 [ ] [ \ some-generic reset ] unit-test
 
 [ 2 ] [ 3 some-generic ] unit-test
+
+! slava's bug
+GENERIC: another-generic ( a -- b )
+
+M: object another-generic ;
+
+\ another-generic watch
+
+[ ] [ "IN: tools.annotations.tests GENERIC: another-generic ( a -- b )" eval ] unit-test
+
+[ ] [ \ another-generic reset ] unit-test
+
+[ "" ] [ [ 3 another-generic drop ] with-string-writer ] unit-test

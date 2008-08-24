@@ -45,15 +45,21 @@ $nl
 "The call to " { $link if } " takes one value from the stack, a generalized boolean. The first branch " { $snippet "[ + ]" } " has stack effect " { $snippet "( x x -- x )" } " and the second has stack effect " { $snippet "( x -- )" } ". Since both branches decrease the height of the stack by one, we say that the stack effect of the two branches is " { $snippet "( x x -- x )" } ", and together with the boolean popped off the stack by " { $link if } ", this gives a total stack effect of " { $snippet "( x x x -- x )" } "." ;
 
 ARTICLE: "inference-recursive" "Stack effects of recursive words"
-"Recursive words must declare a stack effect. When a recursive call is encountered, the declared stack effect is substituted in. When inference is complete, the inferred stack effect is compared with the declared stack effect."
+"When a recursive call is encountered, the declared stack effect is substituted in. When inference is complete, the inferred stack effect is compared with the declared stack effect."
 $nl
 "Attempting to infer the stack effect of a recursive word which outputs a variable number of objects on the stack will fail. For example, the following will throw an " { $link unbalanced-branches-error } ":"
 { $code ": foo ( seq -- ) dup empty? [ drop ] [ dup pop foo ] if" "[ foo ] infer." }
 "If you declare an incorrect stack effect, inference will fail also. Badly defined recursive words cannot confuse the inferencer." ;
 
-ARTICLE: "inference-limitations" "Inference limitations"
-"Mutually recursive words are supported, but mutually recursive " { $emphasis "inline" } " words are not."
+ARTICLE: "inference-recursive-combinators" "Recursive combinator inference"
+"Most combinators are not explicitly recursive; instead, they are implemented in terms of existing combinators, for example " { $link while } ", " { $link map } ", and the " { $link "compositional-combinators" } "."
 $nl
+"Combinators which are recursive require additional care."
+$nl
+"If a recursive word takes quotation parameters from the stack and calls them, it must be declared " { $link POSTPONE: inline } " (as documented in " { $link "inference-combinators" } ") as well as " { $link POSTPONE: recursive } "."
+$nl
+"Furthermore, the input parameters which are quotations must be annotated in the stack effect. For example,"
+{ $see loop }
 "An inline recursive word cannot pass a quotation through the recursive call. For example, the following will not infer:"
 { $code ": foo ( a b c -- d e f ) [ f foo drop ] when 2dup call ; inline" "[ 1 [ 1+ ] foo ] infer." }
 "However a small change can be made:"
@@ -82,10 +88,10 @@ $nl
 $nl
 "The following articles describe the implementation of the stack effect inference algorithm:"
 { $subsection "inference-simple" }
-{ $subsection "inference-combinators" }
-{ $subsection "inference-branches" }
 { $subsection "inference-recursive" } 
-{ $subsection "inference-limitations" }
+{ $subsection "inference-combinators" }
+{ $subsection "inference-recursive-combinators" }
+{ $subsection "inference-branches" }
 { $subsection "inference-errors" }
 { $subsection "compiler-transforms" }
 { $see-also "effects" } ;

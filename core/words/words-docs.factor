@@ -80,6 +80,7 @@ $nl
 { $subsection POSTPONE: inline }
 { $subsection POSTPONE: foldable }
 { $subsection POSTPONE: flushable }
+{ $subsection POSTPONE: recursive }
 "Stack effect declarations are documented in " { $link "effect-declaration" } "." ;
 
 ARTICLE: "word-definition" "Defining words"

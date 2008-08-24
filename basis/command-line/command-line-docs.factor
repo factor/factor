@@ -52,9 +52,14 @@ ARTICLE: "standard-cli-args" "Command line switches for general usage"
     { { $snippet "-script" } { "Equivalent to " { $snippet "-quiet -run=none" } "." $nl "On Unix systems, Factor can be used for scripting - just create an executable text file whose first line is:" { $code "#! /usr/local/bin/factor -script" } "The space after " { $snippet "#!" } " is necessary because of Factor syntax." } }
 } ;
 
-ARTICLE: "cli" "Command line usage"
+ARTICLE: "rc-files" "Running code on startup"
 "Unless the " { $snippet "-no-user-init" } " command line switch is specified, The startup routine runs the " { $snippet ".factor-rc" } " file in the user's home directory, if it exists. This file can contain initialization and customization for your development environment."
 $nl
+"The " { $snippet ".factor-rc" } " and " { $snippet ".factor-boot-rc" } " files can be run explicitly:"
+{ $subsection run-user-init }
+{ $subsection run-bootstrap-init } ;
+
+ARTICLE: "cli" "Command line usage"
 "Zero or more command line arguments may be passed to the Factor runtime. Command line arguments starting with a dash (" { $snippet "-" } ") is interpreted as switches. All other arguments are taken to be file names to be run by " { $link run-file } "."
 $nl
 "Switches can take one of the following three forms:"
@@ -68,9 +73,6 @@ $nl
 { $subsection "standard-cli-args" }
 "The list of command line arguments can be obtained and inspected directly:"
 { $subsection cli-args }
-"The " { $snippet ".factor-rc" } " and " { $snippet ".factor-boot-rc" } " files can be run explicitly:"
-{ $subsection run-user-init }
-{ $subsection run-bootstrap-init }
 "There is a way to override the default vocabulary to run on startup:"
 { $subsection main-vocab-hook } ;
 
