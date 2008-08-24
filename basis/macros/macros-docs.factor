@@ -17,20 +17,11 @@ $nl
 HELP: macro
 { $class-description "Class of words defined with " { $link POSTPONE: MACRO: } "." } ;
 
-HELP: macro-expand
-{ $values { "..." "inputs to a macro" } { "word" macro } { "quot" quotation } }
-{ $description "Expands a macro. Useful for debugging." }
-{ $examples
-    { $code "USING: math macros combinators.short-circuit ;" "{ [ integer? ] [ 0 > ] [ 13 mod zero? ] } \ 1&& macro-expand ." }
-} ;
-
 ARTICLE: "macros" "Macros"
 "The " { $vocab-link "macros" } " vocabulary implements macros in the Lisp sense; compile-time code transformers and generators. Macros can be used to calculate lookup tables and generate code at compile time, which can improve performance, the level of abstraction and simplify code."
 $nl
 "Defining new macros:"
 { $subsection POSTPONE: MACRO: }
-"Expanding macros for debugging purposes:"
-{ $subsection macro-expand }
 "Macros are really just a very thin layer of syntax sugar over " { $link "compiler-transforms" } "." ;
 
 ABOUT: "macros"

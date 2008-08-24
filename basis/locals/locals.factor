@@ -5,7 +5,7 @@ parser words quotations debugger macros arrays macros splitting
 combinators prettyprint.backend definitions prettyprint
 hashtables prettyprint.sections sets sequences.private effects
 effects.parser generic generic.parser compiler.units accessors
-locals.backend memoize lexer ;
+locals.backend memoize macros.expander lexer ;
 IN: locals
 
 ! Inspired by
@@ -17,17 +17,26 @@ TUPLE: lambda vars body ;
 
 C: <lambda> lambda
 
-TUPLE: let bindings body ;
+TUPLE: binding-form bindings body ;
+
+TUPLE: let < binding-form ;
 
 C: <let> let
 
-TUPLE: let* bindings body ;
+TUPLE: let* < binding-form ;
 
 C: <let*> let*
 
-TUPLE: wlet bindings body ;
+TUPLE: wlet < binding-form ;
 
 C: <wlet> wlet
+
+M: lambda expand-macros clone [ expand-macros ] change-body ;
+
+M: binding-form expand-macros
+    clone
+        [ [ expand-macros ] assoc-map ] change-bindings
+        [ expand-macros ] change-body ;
 
 PREDICATE: local < word "local?" word-prop ;
 
@@ -146,7 +155,8 @@ GENERIC: lambda-rewrite* ( obj -- )
 
 GENERIC: local-rewrite* ( obj -- )
 
-: lambda-rewrite ( quot -- quot' )
+: lambda-rewrite ( form -- form' )
+    expand-macros
     [ local-rewrite* ] [ ] make
     [ [ lambda-rewrite* ] each ] [ ] make ;
 

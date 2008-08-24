@@ -60,8 +60,9 @@ M: mailbox dispose* threads>> notify-all ;
     [ [ mailbox-empty? ] curry ] dip [ ] while ; inline
 
 : mailbox-get-timeout? ( mailbox timeout pred -- obj )
-    3dup block-unless-pred
-    nip >r data>> r> delete-node-if ; inline
+    [ block-unless-pred ]
+    [ nip >r data>> r> delete-node-if ]
+    3bi ; inline
 
 : mailbox-get? ( mailbox pred -- obj )
     f swap mailbox-get-timeout? ; inline

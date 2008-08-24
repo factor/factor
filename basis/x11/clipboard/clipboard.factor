@@ -33,10 +33,10 @@ TUPLE: x-clipboard atom contents ;
     [ XGetWindowProperty drop ] keep snarf-property ;
 
 : selection-from-event ( event window -- string )
-    >r XSelectionEvent-property zero? [
-        r> drop f
+    swap XSelectionEvent-property zero? [
+        drop f
     ] [
-        r> selection-property 1 window-property utf8 decode
+        selection-property 1 window-property utf8 decode
     ] if ;
 
 : own-selection ( prop win -- )

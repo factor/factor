@@ -202,17 +202,17 @@ M: slice length [ to>> ] [ from>> ] bi - ;
 
 : short ( seq n -- seq n' ) over length min ; inline
 
-: head-slice ( seq n -- slice ) (head) <slice> ;
+: head-slice ( seq n -- slice ) (head) <slice> ; inline
 
-: tail-slice ( seq n -- slice ) (tail) <slice> ;
+: tail-slice ( seq n -- slice ) (tail) <slice> ; inline
 
-: rest-slice ( seq -- slice ) 1 tail-slice ;
+: rest-slice ( seq -- slice ) 1 tail-slice ; inline
 
-: head-slice* ( seq n -- slice ) from-end head-slice ;
+: head-slice* ( seq n -- slice ) from-end head-slice ; inline
 
-: tail-slice* ( seq n -- slice ) from-end tail-slice ;
+: tail-slice* ( seq n -- slice ) from-end tail-slice ; inline
 
-: but-last-slice ( seq -- slice ) 1 head-slice* ;
+: but-last-slice ( seq -- slice ) 1 head-slice* ; inline
 
 INSTANCE: slice virtual-sequence
 

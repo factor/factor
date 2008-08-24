@@ -12,10 +12,10 @@ IN: persistent.deques
 TUPLE: cons { car read-only } { cdr read-only } ;
 C: <cons> cons
 
-: each ( list quot -- )
+: each ( list quot: ( elt -- ) -- )
     over
     [ [ >r car>> r> call ] [ >r cdr>> r> ] 2bi each ]
-    [ 2drop ] if ; inline
+    [ 2drop ] if ; inline recursive
 
 : reduce ( list start quot -- end )
     swapd each ; inline

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private accessors math
-math.order combinators ;
+math.order combinators hints arrays ;
 IN: binary-search
 
 <PRIVATE
@@ -35,6 +35,8 @@ PRIVATE>
 
 : natural-search ( obj seq -- i elt )
     [ <=> ] with search ;
+
+HINTS: natural-search array ;
 
 : sorted-index ( obj seq -- i )
     natural-search drop ;

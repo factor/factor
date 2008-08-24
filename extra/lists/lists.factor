@@ -55,19 +55,20 @@ M: object nil? drop f ;
 : (leach) ( list quot -- cdr quot )
     [ [ car ] dip call ] [ [ cdr ] dip ] 2bi ; inline
 
-: leach ( list quot -- )
-    over nil? [ 2drop ] [ (leach) leach ] if ; inline
+: leach ( list quot: ( elt -- ) -- )
+    over nil? [ 2drop ] [ (leach) leach ] if ; inline recursive
 
-: lmap ( list quot -- result )
-    over nil? [ drop ] [ (leach) lmap cons ] if ; inline
+: lmap ( list quot: ( elt -- ) -- result )
+    over nil? [ drop ] [ (leach) lmap cons ] if ; inline recursive
 
-: foldl ( list identity quot -- result ) swapd leach ; inline
+: foldl ( list identity quot: ( obj1 obj2 -- obj ) -- result )
+    swapd leach ; inline
 
-: foldr ( list identity quot -- result )
+: foldr ( list identity quot: ( obj1 obj2 -- obj ) -- result )
     pick nil? [ [ drop ] [ ] [ drop ] tri* ] [
         [ [ cdr ] 2dip foldr ] [ nip [ car ] dip ] 3bi
         call
-    ] if ; inline
+    ] if ; inline recursive
 
 : llength ( list -- n )
     0 [ drop 1+ ] foldl ;
@@ -87,9 +88,10 @@ M: object nil? drop f ;
 : seq>cons ( seq -- cons )
     [ <reversed> ] keep nil [ tuck same? [ seq>cons ] when f cons swap >>cdr ] with reduce ;
     
-: (lmap>array) ( acc cons quot -- newcons )
+: (lmap>array) ( acc cons quot: ( elt -- elt' ) -- newcons )
     over nil? [ 2drop ]
-    [ [ uncons ] dip [ call ] keep swapd [ suffix ] 2dip (lmap>array) ] if ; inline
+    [ [ uncons ] dip [ call ] keep swapd [ suffix ] 2dip (lmap>array) ] if ;
+    inline recursive
     
 : lmap>array ( cons quot -- newcons )
     { } -rot (lmap>array) ; inline
@@ -103,8 +105,8 @@ M: object nil? drop f ;
 : list>seq ( list -- array )    
     [ ] lmap>array ;
     
-: traverse ( list pred quot -- result )
+: traverse ( list pred quot: ( list/elt -- result ) -- result )
     [ 2over call [ tuck [ call ] 2dip ] when
-      pick list? [ traverse ] [ 2drop ] if ] 2curry lmap ;
+      pick list? [ traverse ] [ 2drop ] if ] 2curry lmap ; inline recursive
     
 INSTANCE: cons list
