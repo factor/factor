@@ -8,7 +8,7 @@ IN: compiler.tree
 
 ! High-level tree SSA form.
 
-TUPLE: node < identity-tuple info ;
+TUPLE: node < identity-tuple ;
 
 M: node hashcode* drop node hashcode* ;
 
@@ -17,7 +17,7 @@ TUPLE: #introduce < node out-d ;
 : #introduce ( out-d -- node )
     \ #introduce new swap >>out-d ;
 
-TUPLE: #call < node word in-d out-d body method ;
+TUPLE: #call < node word in-d out-d body method info ;
 
 : #call ( inputs outputs word -- node )
     \ #call new
@@ -25,7 +25,7 @@ TUPLE: #call < node word in-d out-d body method ;
         swap >>out-d
         swap >>in-d ;
 
-TUPLE: #call-recursive < node label in-d out-d ;
+TUPLE: #call-recursive < node label in-d out-d info ;
 
 : #call-recursive ( inputs outputs label -- node )
     \ #call-recursive new
@@ -105,7 +105,7 @@ TUPLE: #declare < node declaration ;
     \ #declare new
         swap >>declaration ;
 
-TUPLE: #return < node in-d ;
+TUPLE: #return < node in-d info ;
 
 : #return ( stack -- node )
     \ #return new
@@ -119,7 +119,7 @@ TUPLE: #recursive < node in-d word label loop? child ;
         swap >>in-d
         swap >>label ;
 
-TUPLE: #enter-recursive < node in-d out-d label ;
+TUPLE: #enter-recursive < node in-d out-d label info ;
 
 : #enter-recursive ( label inputs outputs -- node )
     \ #enter-recursive new
@@ -127,7 +127,7 @@ TUPLE: #enter-recursive < node in-d out-d label ;
         swap >>in-d
         swap >>label ;
 
-TUPLE: #return-recursive < #renaming in-d out-d label ;
+TUPLE: #return-recursive < #renaming in-d out-d label info ;
 
 : #return-recursive ( label inputs outputs -- node )
     \ #return-recursive new

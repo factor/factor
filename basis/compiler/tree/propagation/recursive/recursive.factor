@@ -72,6 +72,15 @@ M: #recursive propagate-around ( #recursive -- )
 : return-infos ( node -- infos )
     label>> return>> node-input-infos generalize-return ;
 
-M: #call-recursive propagate-before ( #call-label -- )
+M: #call-recursive propagate-before ( #call-recursive -- )
     [ ] [ return-infos ] [ node-output-infos ] tri
     [ check-fixed-point ] [ drop swap out-d>> set-value-infos ] 3bi ;
+
+M: #call-recursive annotate-node
+    dup [ in-d>> ] [ out-d>> ] bi append (annotate-node) ;
+
+M: #enter-recursive annotate-node
+    dup out-d>> (annotate-node) ;
+
+M: #return-recursive annotate-node
+    dup in-d>> (annotate-node) ;

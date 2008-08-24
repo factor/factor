@@ -4,7 +4,6 @@ USING: fry kernel sequences assocs accessors namespaces
 math.intervals arrays classes.algebra combinators columns
 stack-checker.branches
 compiler.tree
-compiler.tree.def-use
 compiler.tree.combinators
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
@@ -72,9 +71,6 @@ SYMBOL: infer-children-data
 : annotate-phi-inputs ( #phi -- )
     dup phi-in-d>> compute-phi-input-infos >>phi-info-d drop ;
 
-: annotate-phi-outputs ( #phi -- )
-    dup out-d>> extract-value-info >>info drop ;
-
 : merge-value-infos ( infos outputs -- )
     [ [ value-infos-union ] map ] dip set-value-infos ;
 
@@ -83,8 +79,7 @@ SYMBOL: condition-value
 M: #phi propagate-before ( #phi -- )
     [ annotate-phi-inputs ]
     [ [ phi-info-d>> <flipped> ] [ out-d>> ] bi merge-value-infos ]
-    [ annotate-phi-outputs ]
-    tri ;
+    bi ;
 
 : branch-phi-constraints ( output values booleans -- )
      {

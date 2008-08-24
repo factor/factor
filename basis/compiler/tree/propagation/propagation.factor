@@ -2,7 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences namespaces hashtables
 compiler.tree
-compiler.tree.def-use
 compiler.tree.propagation.copy
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes

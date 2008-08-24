@@ -6,7 +6,6 @@ classes.tuple.private continuations arrays byte-arrays strings
 math math.partial-dispatch math.private slots generic
 generic.standard generic.math
 compiler.tree
-compiler.tree.def-use
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
 compiler.tree.propagation.slots
@@ -109,6 +108,9 @@ M: #call propagate-before
         2bi
     ] if ;
 
+M: #call annotate-node
+    dup [ in-d>> ] [ out-d>> ] bi append (annotate-node) ;
+
 : propagate-input-classes ( node input-classes -- )
     class-infos swap in-d>> refine-value-infos ;
 
@@ -121,3 +123,6 @@ M: #alien-invoke propagate-before
 
 M: #alien-indirect propagate-before
     out-d>> [ object-info swap set-value-info ] each ;
+
+M: #return annotate-node
+    dup in-d>> (annotate-node) ;
