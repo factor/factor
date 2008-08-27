@@ -76,10 +76,6 @@ METHOD: at-mutate { number object  sequence } swapd set-nth ;
 METHOD: as-mutate { object  number sequence }       set-nth ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! assoc
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -181,15 +177,15 @@ METHOD: as-mutate { object object assoc }       set-at ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: 1st ( seq -- obj ) 0 at ;
-: 2nd ( seq -- obj ) 1 at ;
-: 3rd ( seq -- obj ) 2 at ;
-: 4th ( seq -- obj ) 3 at ;
-: 5th ( seq -- obj ) 4 at ;
-: 6th ( seq -- obj ) 5 at ;
-: 7th ( seq -- obj ) 6 at ;
-: 8th ( seq -- obj ) 7 at ;
-: 9th ( seq -- obj ) 8 at ;
+: 1st ( seq -- obj ) 0 swap nth ;
+: 2nd ( seq -- obj ) 1 swap nth ;
+: 3rd ( seq -- obj ) 2 swap nth ;
+: 4th ( seq -- obj ) 3 swap nth ;
+: 5th ( seq -- obj ) 4 swap nth ;
+: 6th ( seq -- obj ) 5 swap nth ;
+: 7th ( seq -- obj ) 6 swap nth ;
+: 8th ( seq -- obj ) 7 swap nth ;
+: 9th ( seq -- obj ) 8 swap nth ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
