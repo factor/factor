@@ -146,12 +146,19 @@ TUPLE: interval { from read-only } { to read-only } ;
     dupd interval-intersect = ;
 
 : interval-contains? ( x int -- ? )
-    >r [a,a] r> interval-subset? ;
+    dup empty-interval eq? [ 2drop f ] [
+        [ from>> first2 [ >= ] [ > ] if ]
+        [ to>>   first2 [ <= ] [ < ] if ]
+        2bi and
+    ] if ;
+
+: interval-zero? ( int -- ? )
+    0 swap interval-contains? ;
 
 : interval* ( i1 i2 -- i3 )
     [ [ [ * ] interval-op ] do-empty-interval ]
-    [ [ 0 swap interval-contains? ] either? ] 2bi
-    [ 0 [a,a] interval-union ] when ;
+    [ [ interval-zero? ] either? ]
+    2bi [ 0 [a,a] interval-union ] when ;
 
 : interval-1+ ( i1 -- i2 ) 1 [a,a] interval+ ;
 
@@ -222,7 +229,7 @@ TUPLE: interval { from read-only } { to read-only } ;
 : interval-division-op ( i1 i2 quot -- i3 )
     {
         { [ 0 pick interval-closure interval-contains? ] [ 3drop [-inf,inf] ] }
-        { [ pick 0 swap interval-contains? ] [ call 0 [a,a] interval-union ] }
+        { [ pick interval-zero? ] [ call 0 [a,a] interval-union ] }
         [ call ]
     } cond ; inline
 
