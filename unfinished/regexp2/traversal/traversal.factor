@@ -65,7 +65,10 @@ TUPLE: dfa-traverser
     { [ match-literal ] [ match-class ] [ match-default ] } 3|| ;
 
 : setup-match ( match -- obj state dfa-table )
-    { current-index>> text>> current-state>> dfa-table>> } get-slots
+    {
+        [ current-index>> ] [ text>> ]
+        [ current-state>> ] [ dfa-table>> ]
+    } cleave
     [ nth ] 2dip ;
 
 : do-match ( dfa-traverser -- dfa-traverser )

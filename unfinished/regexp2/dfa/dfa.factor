@@ -42,7 +42,7 @@ IN: regexp2.dfa
         dupd pop dup pick find-transitions rot
         [
             [ [ find-closure ] 2keep nip dupd add-todo-state ] 3keep
-            >r swapd transition boa r> dfa-table>> add-transition 
+            >r swapd f transition boa r> dfa-table>> add-transition 
         ] curry with each
         new-transitions
     ] if-empty ;

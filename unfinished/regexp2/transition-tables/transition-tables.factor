@@ -14,7 +14,7 @@ IN: regexp2.transition-tables
 : ?insert-at ( value key hash/f -- hash )
     [ H{ } clone ] unless* [ insert-at ] keep ;
 
-TUPLE: transition from to obj ;
+TUPLE: transition from to obj lookahead ;
 TUPLE: literal-transition < transition ;
 TUPLE: class-transition < transition ;
 TUPLE: default-transition < transition ;
@@ -22,9 +22,12 @@ TUPLE: default-transition < transition ;
 TUPLE: literal obj ;
 TUPLE: class obj ;
 TUPLE: default ;
-: <literal-transition> ( from to obj -- transition ) literal-transition boa ;
-: <class-transition> ( from to obj -- transition ) class-transition boa ;
-: <default-transition> ( from to -- transition ) t default-transition boa ;
+: <literal-transition> ( from to obj -- transition )
+    f literal-transition boa ;
+: <class-transition> ( from to obj -- transition )
+    f class-transition boa ;
+: <default-transition> ( from to -- transition )
+    t f default-transition boa ;
 
 TUPLE: transition-table transitions
     literals classes defaults

@@ -10,7 +10,7 @@ IN: regexp2.utils
     ! quot: ( obj -- obj' )
     ! pred: ( obj -- <=> )
     >r >r dup slip r> pick over call r> dupd =
-    [ 3drop ] [ (while-changes) ] if ; inline
+    [ 3drop ] [ (while-changes) ] if ; inline recursive
 
 : while-changes ( obj quot pred -- obj' )
     pick over call (while-changes) ; inline
