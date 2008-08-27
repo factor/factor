@@ -82,7 +82,7 @@ M: node collect-loop-info* 2drop ;
             [ loop-calls get at [ disqualify-loop ] each ]
             bi
         ] [ drop ] if
-    ] slurp-dequeue ;
+    ] slurp-deque ;
 
 : detect-loops ( nodes -- nodes )
     dup collect-loop-info disqualify-loops ;

@@ -41,7 +41,7 @@ M: node compute-live-values* 2drop ;
     ] if ;
 
 : compute-live-values ( -- )
-    work-list get [ iterate-live-values ] slurp-dequeue ;
+    work-list get [ iterate-live-values ] slurp-deque ;
 
 GENERIC: remove-dead-code* ( node -- node' )
 
