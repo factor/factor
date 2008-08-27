@@ -82,7 +82,7 @@ M: bunny-dlist bunny-geom
     bunny-dlist-list glCallList ;
 
 M: bunny-buffers bunny-geom
-    dup { array>> element-array>> } get-slots [
+    dup [ array>> ] [ element-array>> ] bi [
         { GL_VERTEX_ARRAY GL_NORMAL_ARRAY } [
             GL_FLOAT 0 0 buffer-offset glNormalPointer
             [
@@ -99,7 +99,7 @@ M: bunny-dlist dispose
     list>> delete-dlist ;
 
 M: bunny-buffers dispose
-    { array>> element-array>> } get-slots
+    [ array>> ] [ element-array>> ] bi
     delete-gl-buffer delete-gl-buffer ;
 
 : <bunny-geom> ( model -- geom )
