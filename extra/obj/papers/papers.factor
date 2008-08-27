@@ -1,5 +1,5 @@
 
-USING: sets meta.util obj ;
+USING: sets obj.util obj ;
 
 IN: obj.papers
 
