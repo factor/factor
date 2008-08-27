@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: sequences kernel math io calendar calendar.format
-calendar.model arrays models models.filter namespaces ui.gadgets
-ui.gadgets.labels ui.gadgets.theme ui ;
+USING: accessors sequences kernel math io calendar grouping
+calendar.format calendar.model arrays models models.filter
+namespaces ui.gadgets ui.gadgets.labels ui.gadgets.theme ui ;
 IN: lcd
 
 : lcd-digit ( row digit -- str )
@@ -11,7 +11,7 @@ IN: lcd
         " | |  |   _| _| |_| |_  |_    | |_| |_|  *  "
         " |_|  |  |_  _|   |  _| |_|   | |_|   |  *  "
         "                                            "
-    } nth >r 4 * dup 4 + r> subseq ;
+    } nth 4 <groups> nth ;
 
 : lcd-row ( num row -- string )
     [ swap lcd-digit ] curry { } map-as concat ;
@@ -20,9 +20,8 @@ IN: lcd
     4 [ lcd-row ] with map "\n" join ;
 
 : hh:mm:ss ( timestamp -- string )
-    {
-        timestamp-hour timestamp-minute timestamp-second
-    } get-slots >fixnum 3array [ pad-00 ] map ":" join ;
+    [ hour>> ] [ minute>> ] [ second>> >fixnum ] tri
+    3array [ pad-00 ] map ":" join ;
 
 : <time-display> ( timestamp -- gadget )
     [ hh:mm:ss lcd ] <filter> <label-control>

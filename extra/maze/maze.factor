@@ -49,10 +49,9 @@ SYMBOL: visited
     { 0 0 } dup vertex (draw-maze)
     glEnd ;
 
-TUPLE: maze ;
+TUPLE: maze < canvas ;
 
-: <maze> ( -- gadget )
-    <canvas> { set-delegate } maze construct ;
+: <maze> ( -- gadget ) maze new-canvas ;
 
 : n ( gadget -- n ) rect-dim first2 min line-width /i ;
 

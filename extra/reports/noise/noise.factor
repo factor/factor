@@ -1,3 +1,5 @@
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs math kernel shuffle generalizations
 words quotations arrays combinators sequences math.vectors
 io.styles prettyprint vocabs sorting io generic locals.private
@@ -92,11 +94,11 @@ M: word noise badness 1 2array ;
 
 M: wrapper noise wrapped>> noise ;
 
-M: let noise let-body noise ;
+M: let noise body>> noise ;
 
-M: wlet noise wlet-body noise ;
+M: wlet noise body>> noise ;
 
-M: lambda noise lambda-body noise ;
+M: lambda noise body>> noise ;
 
 M: object noise drop { 0 0 } ;
 

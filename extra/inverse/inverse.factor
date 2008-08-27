@@ -226,17 +226,6 @@ DEFER: _
 
 \ new 1 [ ?wrapped empty-inverse ] define-pop-inverse
 
-: writer>reader ( word -- word' )
-    [ "writing" word-prop "slots" word-prop ] keep
-    [ swap slot-spec-writer = ] curry find nip slot-spec-reader ;
-
-: construct-inverse ( class setters -- quot )
-    >r deconstruct-pred r>
-    [ writer>reader ] map [ get-slots ] curry
-    compose ;
-
-\ construct 2 [ >r ?wrapped r> construct-inverse ] define-pop-inverse
-
 ! More useful inverse-based combinators
 
 : recover-fail ( try fail -- )
