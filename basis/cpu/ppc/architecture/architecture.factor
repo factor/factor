@@ -1,10 +1,10 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types cpu.ppc.assembler cpu.architecture generic
 kernel kernel.private math memory namespaces sequences words
-assocs generator generator.registers generator.fixup system
-layouts classes words.private alien combinators
-compiler.constants math.order ;
+assocs compiler.generator compiler.generator.registers
+compiler.generator.fixup system layouts classes words.private
+alien combinators compiler.constants math.order ;
 IN: cpu.ppc.architecture
 
 ! PowerPC register assignments

@@ -23,9 +23,9 @@ TUPLE: lexer text line line-text line-length column ;
     lexer new-lexer ;
 
 : skip ( i seq ? -- n )
-    over >r
+    >r tuck r>
     [ swap CHAR: \s eq? xor ] curry find-from drop
-    [ r> drop ] [ r> length ] if* ;
+    [ ] [ length ] ?if ;
 
 : change-lexer-column ( lexer quot -- )
     swap

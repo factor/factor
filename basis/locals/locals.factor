@@ -1,11 +1,12 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces sequences sequences.private assocs math
-inference.transforms parser words quotations debugger macros
-arrays macros splitting combinators prettyprint.backend
-definitions prettyprint hashtables prettyprint.sections sets
-sequences.private effects effects.parser generic generic.parser
-compiler.units accessors locals.backend memoize lexer ;
+parser words quotations debugger macros arrays macros splitting
+combinators prettyprint.backend definitions prettyprint
+hashtables prettyprint.sections sets sequences.private effects
+effects.parser generic generic.parser compiler.units accessors
+locals.backend memoize macros.expander lexer
+stack-checker.known-words ;
 IN: locals
 
 ! Inspired by
@@ -17,23 +18,34 @@ TUPLE: lambda vars body ;
 
 C: <lambda> lambda
 
-TUPLE: let bindings body ;
+TUPLE: binding-form bindings body ;
+
+TUPLE: let < binding-form ;
 
 C: <let> let
 
-TUPLE: let* bindings body ;
+TUPLE: let* < binding-form ;
 
 C: <let*> let*
 
-TUPLE: wlet bindings body ;
+TUPLE: wlet < binding-form ;
 
 C: <wlet> wlet
+
+M: lambda expand-macros clone [ expand-macros ] change-body ;
+
+M: binding-form expand-macros
+    clone
+        [ [ expand-macros ] assoc-map ] change-bindings
+        [ expand-macros ] change-body ;
 
 PREDICATE: local < word "local?" word-prop ;
 
 : <local> ( name -- word )
     #! Create a local variable identifier
-    f <word> dup t "local?" set-word-prop ;
+    f <word>
+    dup t "local?" set-word-prop
+    dup { } { object } define-primitive ;
 
 PREDICATE: local-word < word "local-word?" word-prop ;
 
@@ -43,15 +55,20 @@ PREDICATE: local-word < word "local-word?" word-prop ;
 PREDICATE: local-reader < word "local-reader?" word-prop ;
 
 : <local-reader> ( name -- word )
-    f <word> dup t "local-reader?" set-word-prop ;
+    f <word>
+    dup t "local-reader?" set-word-prop
+    dup { } { object } define-primitive ;
 
 PREDICATE: local-writer < word "local-writer?" word-prop ;
 
 : <local-writer> ( reader -- word )
-    dup name>> "!" append f <word>
-    [ t "local-writer?" set-word-prop ] keep
-    [ "local-writer" set-word-prop ] 2keep
-    [ swap "local-reader" set-word-prop ] keep ;
+    dup name>> "!" append f <word> {
+        [ nip { object } { } define-primitive ]
+        [ nip t "local-writer?" set-word-prop ]
+        [ swap "local-reader" set-word-prop ]
+        [ "local-writer" set-word-prop ]
+        [ nip ]
+    } 2cleave ;
 
 TUPLE: quote local ;
 
@@ -146,7 +163,8 @@ GENERIC: lambda-rewrite* ( obj -- )
 
 GENERIC: local-rewrite* ( obj -- )
 
-: lambda-rewrite ( quot -- quot' )
+: lambda-rewrite ( form -- form' )
+    expand-macros
     [ local-rewrite* ] [ ] make
     [ [ lambda-rewrite* ] each ] [ ] make ;
 
@@ -288,7 +306,7 @@ M: wlet local-rewrite*
     CREATE-METHOD
     [ parse-locals-definition ] with-method-definition ;
 
-: parsed-lambda ( form -- )
+: parsed-lambda ( accum form -- accum )
     in-lambda? get [ parsed ] [ lambda-rewrite over push-all ] if ;
 
 PRIVATE>

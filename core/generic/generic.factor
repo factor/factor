@@ -170,15 +170,12 @@ M: sequence update-methods ( class seq -- )
     ] with each ;
 
 : define-generic ( word combination -- )
-    over "combination" word-prop over = [
-        2drop
-    ] [
+    over "combination" word-prop over = [ drop ] [
         2dup "combination" set-word-prop
         over "methods" word-prop values forget-all
         over H{ } clone "methods" set-word-prop
         dupd define-default-method
-        make-generic
-    ] if ;
+    ] if make-generic ;
 
 M: generic subwords
     [

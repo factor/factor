@@ -1,9 +1,9 @@
 ! Testing templates machinery without compiling anything
 IN: compiler.tests
-USING: compiler generator generator.registers
-generator.registers.private tools.test namespaces sequences
-words kernel math effects definitions compiler.units accessors
-cpu.architecture ;
+USING: compiler compiler.generator compiler.generator.registers
+compiler.generator.registers.private tools.test namespaces
+sequences words kernel math effects definitions compiler.units
+accessors cpu.architecture ;
 
 : <int-vreg> ( n -- vreg ) int-regs <vreg> ;
 

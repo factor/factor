@@ -24,20 +24,20 @@ $nl
 { find find-from find-last find-last find-last-from search } related-words
 
 HELP: sorted-index
-{ $values { "elt" object } { "seq" "a sorted sequence" } { "i" "an index, or " { $link f } } { "elt" "an element, or " { $link f } } }
+{ $values { "obj" object } { "seq" "a sorted sequence" } { "i" "an index, or " { $link f } } }
 { $description "Outputs the index and value of the element closest to " { $snippet "elt" } " in the sequence. See " { $link search } " for details." }
 { $notes "If the sequence has at least one element, this word always outputs a valid index, because it finds the closest match, not necessarily an exact one. In this respect its behavior differs from " { $link index } "." } ;
 
 { index index-from last-index last-index-from sorted-index } related-words
 
 HELP: sorted-member?
-{ $values { "elt" object } { "seq" "a sorted sequence" } { "?" "a boolean" } }
+{ $values { "obj" object } { "seq" "a sorted sequence" } { "?" "a boolean" } }
 { $description "Tests if the sorted sequence contains " { $snippet "elt" } ". Equality is tested with " { $link = } "." } ;
 
 { member? sorted-member? } related-words
 
 HELP: sorted-memq?
-{ $values { "elt" object } { "seq" "a sorted sequence" } { "?" "a boolean" } }
+{ $values { "obj" object } { "seq" "a sorted sequence" } { "?" "a boolean" } }
 { $description "Tests if the sorted sequence contains " { $snippet "elt" } ". Equality is tested with " { $link eq? } "." } ;
 
 { memq? sorted-memq? } related-words

@@ -1,12 +1,14 @@
-USING: help.markup help.syntax math strings words ;
+USING: help.markup help.syntax math strings words kernel ;
 IN: effects
 
 ARTICLE: "effect-declaration" "Stack effect declaration"
 "Stack effects of words must be declared, with the exception of words which only push literals on the stack."
 $nl
-"Stack effects are declared with the following syntax:"
-{ $code ": sq ( x -- y ) dup * ;" }
-"A stack effect declaration is written in parentheses and lists word inputs and outputs, separated by " { $snippet "--" } ". Stack effect declarations are read in using a parsing word:"
+"A stack effect declaration is written in parentheses and lists word inputs and outputs, separated by " { $snippet "--" } ". Here is an example:"
+{ $synopsis sq }
+"Parameters which are quotations can be declared by suffixing the parameter name with " { $snippet ":" } " and then writing a nested stack effect declaration:"
+{ $synopsis while }
+"Stack effect declarations are read in using a parsing word:"
 { $subsection POSTPONE: ( }
 "Stack elements in a stack effect are ordered so that the top of the stack is on the right side. Each value can be named by a data type or description. The following are some examples of value names:"
 { $table
@@ -24,9 +26,7 @@ $nl
     { { $snippet "dim" } "a screen dimension specified as a two-element array holding width and height values" }
     { { $snippet "*" } "when this symbol appears by itself in the list of outputs, it means the word unconditionally throws an error" }
 }
-"The stack effect inferencer verifies stack effect comments to ensure the correct number of inputs and outputs is listed. Value names are ignored; only their number matters. An error is thrown if a word's declared stack effect does not match its inferred stack effect."
-$nl
-"Recursive words must declare a stack effect in order to compile. This includes all generic words, due to how delegation is implemented." ;
+"The stack effect inferencer verifies stack effect comments to ensure the correct number of inputs and outputs is listed. Value names are ignored; only their number matters. An error is thrown if a word's declared stack effect does not match its inferred stack effect. See " { $link "inference" } "." ;
 
 ARTICLE: "effects" "Stack effects"
 "A " { $emphasis "stack effect declaration" } ", for example " { $snippet "( x y -- z )" } " denotes that an operation takes two inputs, with " { $snippet "y" } " at the top of the stack, and returns one output."
@@ -61,7 +61,7 @@ HELP: effect<=
 { $description "Tests if " { $snippet "eff1" } " is substitutable for " { $snippet "eff2" } ". What this means is that both stack effects change the stack height by the same amount, the first takes a smaller or equal number of inputs as the second, and either both or neither one terminate execution by throwing an error." } ;
 
 HELP: effect>string
-{ $values { "effect" effect } { "string" string } }
+{ $values { "obj" object } { "str" string } }
 { $description "Turns a stack effect object into a string mnemonic." }
 { $examples
     { $example "USING: effects io ;" "1 2 <effect> effect>string print" "( object -- object object )" }

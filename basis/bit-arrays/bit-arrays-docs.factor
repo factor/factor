@@ -60,11 +60,11 @@ HELP: set-bits
 { $side-effects "bit-array" } ;
 
 HELP: integer>bit-array
-{ $values { "integer" integer } { "bit-array" bit-array } }
+{ $values { "n" integer } { "bit-array" bit-array } }
 { $description "Outputs a freshly-allocated bit array whose elements correspond to the bits in the binary representation of the given unsigned integer value." }
 { $notes "The bits of the integer are stored in the resulting bit array in order of ascending significance, least significant bit first. This word will fail if passed a negative integer. If you want the two's-complement binary representation of a negative number, use " { $link bitnot } " to get the complement of the number first. This word works with fixnums or bignums of any size; it is not limited by fixnum size or machine word size." } ;
 
 HELP: bit-array>integer
-{ $values { "bit-array" bit-array } { "integer" integer } }
+{ $values { "bit-array" bit-array } { "n" integer } }
 { $description "Outputs the unsigned integer whose binary representation corresponds to the contents of the given bit array." }
 { $notes "The bits of the integer are taken from the bit array in order of ascending significance, least significant bit first. This word is able to return fixnums or bignums of any size; it is not limited by fixnum size or machine word size." } ;

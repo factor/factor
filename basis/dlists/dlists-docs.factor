@@ -1,16 +1,16 @@
 USING: help.markup help.syntax kernel quotations
-dequeues ;
+deques ;
 IN: dlists
 
 ARTICLE: "dlists" "Double-linked lists"
-"A double-linked list is the canonical implementation of a " { $link dequeue } "."
+"A double-linked list is the canonical implementation of a " { $link deque } "."
 $nl
 "Double-linked lists form a class:"
 { $subsection dlist }
 { $subsection dlist? }
 "Constructing a double-linked list:"
 { $subsection <dlist> }
-"Double-linked lists support all the operations of the dequeue protocol (" { $link "dequeues" } ") as well as the following."
+"Double-linked lists support all the operations of the deque protocol (" { $link "deques" } ") as well as the following."
 $nl
 "Iterating over elements:"
 { $subsection dlist-each }

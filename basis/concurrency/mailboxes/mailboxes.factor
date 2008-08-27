@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2008 Chris Double, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: concurrency.mailboxes
-USING: dlists dequeues threads sequences continuations
+USING: dlists deques threads sequences continuations
 destructors namespaces random math quotations words kernel
 arrays assocs init system concurrency.conditions accessors
-debugger debugger.threads ;
+debugger debugger.threads locals ;
 
 TUPLE: mailbox threads data disposed ;
 
@@ -14,7 +14,7 @@ M: mailbox dispose* threads>> notify-all ;
     <dlist> <dlist> f mailbox boa ;
 
 : mailbox-empty? ( mailbox -- bool )
-    data>> dequeue-empty? ;
+    data>> deque-empty? ;
 
 : mailbox-put ( obj mailbox -- )
     [ data>> push-front ]
@@ -23,13 +23,12 @@ M: mailbox dispose* threads>> notify-all ;
 : wait-for-mailbox ( mailbox timeout -- )
     >r threads>> r> "mailbox" wait ;
 
-: block-unless-pred ( mailbox timeout pred: ( message -- ? ) -- )
-    pick check-disposed
-    pick data>> over dlist-contains? [
-        3drop
-    ] [
-        >r 2dup wait-for-mailbox r> block-unless-pred
-    ] if ; inline recursive
+:: block-unless-pred ( mailbox timeout pred: ( message -- ? ) -- )
+    mailbox check-disposed
+    mailbox data>> pred dlist-contains? [
+        mailbox timeout wait-for-mailbox
+        mailbox timeout pred block-unless-pred
+    ] unless ; inline recursive
 
 : block-if-empty ( mailbox timeout -- mailbox )
     over check-disposed
@@ -61,8 +60,9 @@ M: mailbox dispose* threads>> notify-all ;
     [ [ mailbox-empty? ] curry ] dip [ ] while ; inline
 
 : mailbox-get-timeout? ( mailbox timeout pred -- obj )
-    3dup block-unless-pred
-    nip >r data>> r> delete-node-if ; inline
+    [ block-unless-pred ]
+    [ nip >r data>> r> delete-node-if ]
+    3bi ; inline
 
 : mailbox-get? ( mailbox pred -- obj )
     f swap mailbox-get-timeout? ; inline

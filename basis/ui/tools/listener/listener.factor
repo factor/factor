@@ -188,9 +188,9 @@ listener-gadget "toolbar" f {
     { T{ key-down f f "F1" } listener-help }
 } define-command-map
 
-M: listener-gadget handle-gesture* ( gadget gesture delegate -- ? )
-    3dup drop swap find-workspace workspace-page handle-gesture
-    [ default-gesture-handler ] [ 3drop f ] if ;
+M: listener-gadget handle-gesture ( gesture gadget -- ? )
+    2dup find-workspace workspace-page handle-gesture
+    [ call-next-method ] [ 2drop f ] if ;
 
 M: listener-gadget graft*
     [ call-next-method ] [ restart-listener ] bi ;

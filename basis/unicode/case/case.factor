@@ -1,6 +1,6 @@
-USING: kernel unicode.data sequences sequences.next namespaces
+USING: unicode.data sequences sequences.next namespaces
 unicode.normalize math unicode.categories combinators
-assocs strings splitting ;
+assocs strings splitting kernel ;
 IN: unicode.case
 
 : at-default ( key assoc -- value/key ) over >r at r> or ;
@@ -70,15 +70,23 @@ SYMBOL: locale ! Just casing locale, or overall?
 : final-sigma ( string -- string )
     HEX: 3A3 over member? [ sigma-map ] when ;
 
+! : map-case ( string string-quot char-quot -- case )
+!     [
+!         rot [
+!             -rot [
+!                 rot dup special-casing at
+!                 [ -rot drop call % ]
+!                 [ -rot nip call , ] ?if
+!             ] 2keep
+!         ] each 2drop
+!     ] "" make ; inline
+
 : map-case ( string string-quot char-quot -- case )
     [
-        rot [
-            -rot [
-                rot dup special-casing at
-                [ -rot drop call % ]
-                [ -rot nip call , ] ?if
-            ] 2keep
-        ] each 2drop
+        [
+            [ dup special-casing at ] 2dip
+            [ [ % ] compose ] [ [ , ] compose ] bi* ?if
+        ] 2curry each
     ] "" make ; inline
 
 : >lower ( string -- lower )

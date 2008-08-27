@@ -3,10 +3,11 @@
 USING: accessors compiler cpu.architecture vocabs.loader system
 sequences namespaces parser kernel kernel.private classes
 classes.private arrays hashtables vectors classes.tuple sbufs
-inference.dataflow hashtables.private sequences.private math
-classes.tuple.private growable namespaces.private assocs words
-generator command-line vocabs io io.encodings.string
-prettyprint libc compiler.units math.order ;
+hashtables.private sequences.private math classes.tuple.private
+growable namespaces.private assocs words command-line vocabs io
+io.encodings.string prettyprint libc splitting math.parser
+compiler.units math.order compiler.tree.builder
+compiler.tree.optimizer ;
 IN: bootstrap.compiler
 
 ! Don't bring this in when deploying, since it will store a
@@ -35,7 +36,7 @@ nl
     roll -roll declare not
 
     array? hashtable? vector?
-    tuple? sbuf? node? tombstone?
+    tuple? sbuf? tombstone?
 
     array-nth set-array-nth
 
@@ -71,14 +72,26 @@ nl
 "." write flush
 
 {
-    . lines
+    memq? split harvest sift cut cut-slice start index clone
+    set-at reverse push-all class number>string string>number
 } compile-uncompiled
 
 "." write flush
 
 {
-    malloc calloc free memcpy
+    lines prefix suffix unclip new-assoc update
+    word-prop set-word-prop 1array 2array 3array ?nth
 } compile-uncompiled
+
+"." write flush
+
+{
+    . malloc calloc free memcpy
+} compile-uncompiled
+
+{ build-tree } compile-uncompiled
+
+{ optimize-tree } compile-uncompiled
 
 vocabs [ words compile-uncompiled "." write flush ] each
 

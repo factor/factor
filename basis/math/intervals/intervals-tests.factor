@@ -123,6 +123,8 @@ IN: math.intervals.tests
 
 [ empty-interval ] [ -1 1 (a,b) empty-interval interval/ ] unit-test
 
+[ t ] [ 0 0 331 [a,b) -1775 -953 (a,b) interval/ interval-contains? ] unit-test
+
 [ t ] [ -1 1 (a,b) -1 1 (a,b) interval/ [-inf,inf] = ] unit-test
 
 [ t ] [ -1 1 (a,b) 0 1 (a,b) interval/ [-inf,inf] = ] unit-test

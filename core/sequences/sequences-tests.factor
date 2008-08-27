@@ -246,3 +246,8 @@ unit-test
 
 [ 50 ] [ 100 [ even? ] count ] unit-test
 [ 50 ] [ 100 [ odd?  ] count ] unit-test
+
+[ { "b" "d" } ] [ { "a" "b" "c" "d" } { 1 3 } nths ] unit-test
+[ { "a" "b" "c" "d" } ] [ { "a" "b" "c" "d" } { 0 1 2 3 } nths ] unit-test
+[ { "d" "c" "b" "a" } ] [ { "a" "b" "c" "d" } { 3 2 1 0 } nths ] unit-test
+[ { "d" "a" "b" "c" } ] [ { "a" "b" "c" "d" } { 3 0 1 2 } nths ] unit-test

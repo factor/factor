@@ -37,11 +37,9 @@ $nl
 { $subsection r> }
 "The top of the data stack is ``hidden'' between " { $link >r } " and " { $link r> } ":"
 { $example "1 2 3 >r .s r>" "1\n2" }
-"Words must not leave objects on the retain stack, nor expect values to be there on entry. The retain stack is for local storage within a word only, and occurrences of " { $link >r } " and " { $link r> } " must be balanced inside a single quotation. One exception is the following trick involving " { $link if } "; values may be pushed on the retain stack before the condition value is computed, as long as both branches of the " { $link if } " pop the values off the retain stack before returning:"
-{ $code
-    ": foo ( m ? n -- m+n/n )"
-    "    >r [ r> + ] [ drop r> ] if ; ! This is OK"
-} ;
+"Usages of " { $link >r } " and " { $link r> } " must be balanced within a single quotation; quotations are not permitted to pop retain stack elements they did not push, or leave elements on the retain stack after returning."
+$nl
+"The " { $link "inference" } " tool checks retain stack usage. The " { $link "slip-keep-combinators" } " combinators abstract out common retain stack usage patterns." ;
 
 ARTICLE: "cleave-shuffle-equivalence" "Expressing shuffle words with cleave combinators"
 "Cleave combinators are defined in terms of shuffle words, and mappings from certain shuffle idioms to cleave combinators are discussed in the documentation for " { $link bi } ", " { $link 2bi } ", " { $link 3bi } ", " { $link tri } ", " { $link 2tri } " and " { $link 3tri } "."
@@ -160,14 +158,14 @@ $nl
 { $subsection both? }
 { $subsection either? } ;
 
-ARTICLE: "slip-keep-combinators" "The slip and keep combinators"
+ARTICLE: "slip-keep-combinators" "The dip, slip and keep combinators"
+"The dip combinators invoke the quotation at the top of the stack, hiding the values underneath:"
+{ $subsection dip }
+{ $subsection 2dip }
 "The slip combinators invoke a quotation further down on the stack. They are most useful for implementing other combinators:"
 { $subsection slip }
 { $subsection 2slip }
 { $subsection 3slip }
-"The dip combinators invoke the quotation at the top of the stack, hiding the values underneath:"
-{ $subsection dip }
-{ $subsection 2dip }
 "The keep combinators invoke a quotation which takes a number of values off the stack, and then they restore those values:"
 { $subsection keep }
 { $subsection 2keep }

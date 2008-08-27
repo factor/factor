@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files io words alien kernel math.parser alien.syntax
 io.launcher system assocs arrays sequences namespaces qualified
-system math generator.fixup io.encodings.ascii accessors
-generic tr ;
+system math compiler.generator.fixup io.encodings.ascii
+accessors generic tr ;
 IN: tools.disassembler
 
 : in-file ( -- path ) "gdb-in.txt" temp-file ;

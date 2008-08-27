@@ -258,14 +258,16 @@ M: string ($instance)
 : $notes ( element -- )
     "Notes" $heading print-element ;
 
-: ($see) ( word -- )
+: ($see) ( word quot -- )
     [
         snippet-style get [
-            code-style get [ see ] with-nesting
+            code-style get swap with-nesting
         ] with-style
-    ] ($block) ;
+    ] ($block) ; inline
 
-: $see ( element -- ) first ($see) ;
+: $see ( element -- ) first [ see ] ($see) ;
+
+: $synopsis ( element -- ) first [ synopsis write ] ($see) ;
 
 : $definition ( element -- )
     "Definition" $heading $see ;

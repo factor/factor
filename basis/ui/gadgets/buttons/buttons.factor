@@ -52,7 +52,7 @@ TUPLE: button-paint plain rollover pressed selected ;
 C: <button-paint> button-paint
 
 : find-button ( gadget -- button )
-    [ [ button? ] is? ] find-parent ;
+    [ button? ] find-parent ;
 
 : button-paint ( button paint -- button paint )
     over find-button {

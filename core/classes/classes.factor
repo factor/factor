@@ -182,4 +182,4 @@ M: class forget* ( class -- )
 
 GENERIC: class ( object -- class )
 
-GENERIC: instance? ( object class -- ? )
+GENERIC: instance? ( object class -- ? ) flushable

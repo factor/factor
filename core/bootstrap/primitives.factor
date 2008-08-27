@@ -72,7 +72,6 @@ bootstrapping? on
     "classes.predicate"
     "compiler.units"
     "continuations.private"
-    "generator"
     "growable"
     "hashtables"
     "hashtables.private"

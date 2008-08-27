@@ -10,7 +10,7 @@ IN: ui.gadgets.scrollers
 TUPLE: scroller < frame viewport x y follows ;
 
 : find-scroller ( gadget -- scroller/f )
-    [ [ scroller? ] is? ] find-parent ;
+    [ scroller? ] find-parent ;
 
 : scroll-up-page ( scroller -- ) y>> -1 swap slide-by-page ;
 

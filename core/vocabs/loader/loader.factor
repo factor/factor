@@ -34,10 +34,11 @@ SYMBOL: root-cache
 
 H{ } clone root-cache set-global
 
+: (find-vocab-root) ( name -- path/f )
+    vocab-roots get swap [ vocab-dir? ] curry find nip ;
+
 : find-vocab-root ( vocab -- path/f )
-    vocab-name root-cache get [
-        vocab-roots get swap [ vocab-dir? ] curry find nip
-    ] cache ;
+    vocab-name dup root-cache get at [ ] [ (find-vocab-root) ] ?if ;
 
 : vocab-append-path ( vocab path -- newpath )
     swap find-vocab-root dup [ prepend-path ] [ 2drop f ] if ;

@@ -10,7 +10,7 @@ $nl
 "A button can be selected, which is distinct from being pressed. This state is held in the " { $link button-selected? } " slot, and is used by the " { $link <toggle-buttons> } " word to construct a row of buttons for choosing among several alternatives." } ;
 
 HELP: <button>
-{ $values { "gadget" gadget } { "quot" "a quotation with stack effect " { $snippet "( button -- )" } } { "button" "a new " { $link button } } }
+{ $values { "label" gadget } { "quot" "a quotation with stack effect " { $snippet "( button -- )" } } { "button" "a new " { $link button } } }
 { $description "Creates a new " { $link button } " which calls the quotation when clicked. The given gadget becomes the button's only child." } ;
 
 HELP: <roll-button>
