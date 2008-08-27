@@ -30,10 +30,10 @@ GENERIC: nfa-node ( node -- )
             stack [ regexp stack>> ]
             table [ regexp nfa-table>> ] |
         negated? [
-            s0 f obj class boa table add-transition
+            s0 f obj class make-transition table add-transition
             s0 s1 <default-transition> table add-transition
         ] [
-            s0 s1 obj class boa table add-transition
+            s0 s1 obj class make-transition table add-transition
         ] if
         s0 s1 2array stack push
         t s1 table final-states>> set-at ] ;
