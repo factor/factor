@@ -1,4 +1,5 @@
-USING: regexp2 tools.test kernel regexp2.traversal ;
+USING: regexp2 tools.test kernel sequences regexp2.parser
+regexp2.traversal ;
 IN: regexp2-tests
 
 [ f ] [ "b" "a*" <regexp> matches? ] unit-test
@@ -151,7 +152,7 @@ IN: regexp2-tests
 [ f ] [ "abc" "[\\p{Upper}]{3}" <regexp> matches? ] unit-test
 [ t ] [ "ABC" "[\\p{Upper}]{3}" <regexp> matches? ] unit-test
 
-[ t ] [ "" "\\Q\\E" <regexp> matches? ] unit-test
+[ f ] [ "" "\\Q\\E" <regexp> matches? ] unit-test
 [ f ] [ "a" "\\Q\\E" <regexp> matches? ] unit-test
 [ t ] [ "|*+" "\\Q|*+\\E" <regexp> matches? ] unit-test
 [ f ] [ "abc" "\\Q|*+\\E" <regexp> matches? ] unit-test
@@ -203,6 +204,8 @@ IN: regexp2-tests
     <regexp> drop
 ] unit-test
 
+[ "{Lower}" <regexp> ] [ invalid-range? ] must-fail-with
+
 [ t ] [ "fxxbar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
 [ f ] [ "foobar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
 
@@ -226,9 +229,29 @@ IN: regexp2-tests
 ! [ t ] [ "fooxbar" "foo\\Bxbar" <regexp> matches? ] unit-test
 ! [ f ] [ "foo" "foo\\Bbar" <regexp> matches? ] unit-test
 
-! [ t ] [ "s@f" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
-! [ f ] [ "a" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
-! [ t ] [ ".o" "\\.[a-z]" <regexp> matches? ] unit-test
+[ t ] [ "s@f" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
+[ f ] [ "a" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
+[ t ] [ ".o" "\\.[a-z]" <regexp> matches? ] unit-test
+
+[ t ] [ "a" "(?i)a" <regexp> matches? ] unit-test
+[ t ] [ "a" "(?i)a" <regexp> matches? ] unit-test
+[ t ] [ "A" "(?i)a" <regexp> matches? ] unit-test
+[ t ] [ "A" "(?i)a" <regexp> matches? ] unit-test
+
+[ t ] [ "a" "(?-i)a" <iregexp> matches? ] unit-test
+[ t ] [ "a" "(?-i)a" <iregexp> matches? ] unit-test
+[ f ] [ "A" "(?-i)a" <iregexp> matches? ] unit-test
+[ f ] [ "A" "(?-i)a" <iregexp> matches? ] unit-test
+
+[ f ] [ "A" "[a-z]" <regexp> matches? ] unit-test
+[ t ] [ "A" "[a-z]" <iregexp> matches? ] unit-test
+
+[ f ] [ "A" "\\p{Lower}" <regexp> matches? ] unit-test
+[ t ] [ "A" "\\p{Lower}" <iregexp> matches? ] unit-test
+
+[ t ] [ "abc" <reversed> "abc" <rregexp> matches? ] unit-test
+[ t ] [ "abc" <reversed> "a[bB][cC]" <rregexp> matches? ] unit-test
+[ t ] [ "adcbe" "a(?r)(bcd)(?-r)e" <rregexp> matches? ] unit-test
 
 ! Bug in parsing word
 ! [ t ] [ "a" R' a' matches?  ] unit-test

@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators io io.streams.string
-kernel math math.parser multi-methods namespaces qualified
+kernel math math.parser multi-methods namespaces qualified sets
 quotations sequences sequences.lib splitting symbols vectors
-dlists math.order combinators.lib unicode.categories
-sequences.lib regexp2.backend regexp2.utils ;
+dlists math.order combinators.lib unicode.categories strings
+sequences.lib regexp2.backend regexp2.utils unicode.case ;
 IN: regexp2.parser
 
 FROM: math.ranges => [a,b] ;
@@ -30,36 +30,58 @@ SINGLETON: back-anchor INSTANCE: back-anchor node
 
 TUPLE: option-on option ; INSTANCE: option-on node
 TUPLE: option-off option ; INSTANCE: option-off node
-SINGLETONS: unix-lines dotall multiline comments case-insensitive unicode-case ;
-MIXIN: regexp-option
-INSTANCE: unix-lines regexp-option
-INSTANCE: dotall regexp-option
-INSTANCE: multiline regexp-option
-INSTANCE: comments regexp-option
-INSTANCE: case-insensitive regexp-option
-INSTANCE: unicode-case regexp-option
+SINGLETONS: unix-lines dotall multiline comments case-insensitive unicode-case reversed-regexp ;
 
 SINGLETONS: letter-class LETTER-class Letter-class digit-class
 alpha-class non-newline-blank-class
 ascii-class punctuation-class java-printable-class blank-class
-control-character-class hex-digit-class java-blank-class c-identifier-class ;
+control-character-class hex-digit-class java-blank-class c-identifier-class
+unmatchable-class ;
 
 SINGLETONS: beginning-of-group end-of-group
 beginning-of-character-class end-of-character-class
 left-parenthesis pipe caret dash ;
 
-: <constant> ( obj -- constant ) constant boa ;
+: get-option ( option -- ? ) current-regexp get options>> at ;
+: get-unix-lines ( -- ? ) unix-lines get-option ;
+: get-dotall ( -- ? ) dotall get-option ;
+: get-multiline ( -- ? ) multiline get-option ;
+: get-comments ( -- ? ) comments get-option ;
+: get-case-insensitive ( -- ? ) case-insensitive get-option ;
+: get-unicode-case ( -- ? ) unicode-case get-option ;
+: get-reversed-regexp ( -- ? ) reversed-regexp get-option ;
+
 : <negation> ( obj -- negation ) negation boa ;
-: <concatenation> ( seq -- concatenation ) >vector concatenation boa ;
+: <concatenation> ( seq -- concatenation )
+    >vector get-reversed-regexp [ reverse ] when
+    concatenation boa ;
 : <alternation> ( seq -- alternation ) >vector alternation boa ;
 : <capture-group> ( obj -- capture-group ) capture-group boa ;
 : <kleene-star> ( obj -- kleene-star ) kleene-star boa ;
+: <constant> ( obj -- constant )
+    dup Letter? get-case-insensitive and [
+        [ ch>lower constant boa ]
+        [ ch>upper constant boa ] bi 2array <alternation>
+    ] [
+        constant boa
+    ] if ;
 
 : first|concatenation ( seq -- first/concatenation )
     dup length 1 = [ first ] [ <concatenation> ] if ;
 
 : first|alternation ( seq -- first/alternation )
     dup length 1 = [ first ] [ <alternation> ] if ;
+
+: <character-class-range> ( from to -- obj )
+    2dup [ Letter? ] bi@ or get-case-insensitive and [
+        [ [ ch>lower ] bi@ character-class-range boa ]
+        [ [ ch>upper ] bi@ character-class-range boa ] 2bi
+        2array [ [ from>> ] [ to>> ] bi < ] filter
+        [ unmatchable-class ] [ first|alternation ] if-empty
+    ] [
+        2dup <
+        [ character-class-range boa ] [ 2drop unmatchable-class ] if
+    ] if ;
 
 ERROR: unmatched-parentheses ;
 
@@ -90,24 +112,26 @@ ERROR: bad-option ch ;
         { CHAR: i [ case-insensitive ] }
         { CHAR: d [ unix-lines ] }
         { CHAR: m [ multiline ] }
+        { CHAR: r [ reversed-regexp ] }
         { CHAR: s [ dotall ] }
         { CHAR: u [ unicode-case ] }
         { CHAR: x [ comments ] }
         [ bad-option ]
     } case ;
-    
-: option-on ( ch -- ) option \ option-on boa push-stack ;
-: option-off ( ch -- ) option \ option-off boa push-stack ;
-: toggle-option ( ch ? -- ) [ option-on ] [ option-off ] if ;
+
+: option-on ( option -- ) current-regexp get options>> conjoin ;
+: option-off ( option -- ) current-regexp get options>> delete-at ;
+
+: toggle-option ( ch ? -- ) [ option ] dip [ option-on ] [ option-off ] if ;
 : (parse-options) ( string ? -- ) [ toggle-option ] curry each ;
 
 : parse-options ( string -- )
     "-" split1 [ t (parse-options) ] [ f (parse-options) ] bi* ;
 
 DEFER: (parse-regexp)
-: parse-special-group-options ( options -- )
+: parse-special-group ( -- )
     beginning-of-group push-stack
-    parse-options (parse-regexp) pop-stack make-non-capturing-group ;
+    (parse-regexp) pop-stack make-non-capturing-group ;
 
 ERROR: bad-special-group string ;
 
@@ -126,8 +150,13 @@ ERROR: bad-special-group string ;
         { [ dup CHAR: < = peek1 CHAR: ! = and ]
             [ drop read1 drop nested-parse-regexp pop-stack make-negative-lookbehind ] }
         [
-            ":" read-until [ bad-special-group ] unless
-            swap prefix parse-special-group-options
+            ":)" read-until
+            [ swap prefix ] dip
+            {
+                { CHAR: : [ parse-options parse-special-group ] }
+                { CHAR: ) [ parse-options ] }
+                [ drop bad-special-group ]
+            } case
         ]
     } cond ;
 
@@ -193,10 +222,10 @@ ERROR: expected-posix-class ;
     read1 CHAR: { = [ expected-posix-class ] unless
     "}" read-until [ bad-character-class ] unless
     {
-        { "Lower" [ letter-class ] }
-        { "Upper" [ LETTER-class ] }
-        { "ASCII" [ ascii-class ] }
+        { "Lower" [ get-case-insensitive Letter-class letter-class ? ] }
+        { "Upper" [ get-case-insensitive Letter-class LETTER-class ? ] }
         { "Alpha" [ Letter-class ] }
+        { "ASCII" [ ascii-class ] }
         { "Digit" [ digit-class ] }
         { "Alnum" [ alpha-class ] }
         { "Punct" [ punctuation-class ] }
@@ -250,6 +279,13 @@ ERROR: bad-escaped-literals seq ;
         { CHAR: 0 [ parse-octal <constant> ] }
         { CHAR: c [ parse-control-character ] }
 
+        ! { CHAR: b [ handle-word-boundary ] }
+        ! { CHAR: B [ handle-word-boundary <negation> ] }
+        ! { CHAR: A [ handle-beginning-of-input ] }
+        ! { CHAR: G [ end of previous match ] }
+        ! { CHAR: Z [ handle-end-of-input ] }
+        ! { CHAR: z [ handle-end-of-input ] } ! except for terminator
+
         { CHAR: Q [ parse-escaped-literals ] }
     } case ;
 
@@ -273,7 +309,7 @@ ERROR: bad-escaped-literals seq ;
     handle-dash handle-caret ;
 
 : apply-dash ( -- )
-    stack [ pop3 nip character-class-range boa ] keep push ;
+    stack [ pop3 nip <character-class-range> ] keep push ;
 
 : apply-dash? ( -- ? )
     stack dup length 3 >=
@@ -312,16 +348,9 @@ DEFER: handle-left-bracket
     beginning-of-character-class push-stack
     parse-character-class-first (parse-character-class) ;
 
-ERROR: empty-regexp ;
 : finish-regexp-parse ( stack -- obj )
-    dup length {
-        { 0 [ empty-regexp ] }
-        { 1 [ first ] }
-        [
-            drop { pipe } split
-            [ first|concatenation ] map first|alternation
-        ]
-    } case ;
+    { pipe } split
+    [ first|concatenation ] map first|alternation ;
 
 : handle-right-parenthesis ( -- )
     stack beginning-of-group over last-index cut rest
