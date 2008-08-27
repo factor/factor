@@ -155,7 +155,7 @@ DEFER: nested-parse-regexp
             [ drop nested-parse-regexp pop-stack make-non-capturing-group ] }
         { [ dup CHAR: = = ]
             [ drop nested-parse-regexp pop-stack make-positive-lookahead ] }
-        { [ dup CHAR: = = ]
+        { [ dup CHAR: ! = ]
             [ drop nested-parse-regexp pop-stack make-negative-lookahead ] }
         { [ dup CHAR: > = ]
             [ drop nested-parse-regexp pop-stack make-independent-group ] }
