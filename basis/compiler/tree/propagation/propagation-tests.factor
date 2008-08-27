@@ -565,6 +565,12 @@ M: integer infinite-loop infinite-loop ;
 
 [ ] [ [ too-deep ] final-info drop ] unit-test
 
+[ ] [ [ reversed boa slice boa nth-unsafe * ] final-info drop ] unit-test
+
+MIXIN: empty-mixin
+
+[ ] [ [ { empty-mixin } declare empty-mixin? ] final-info drop ] unit-test
+
 ! [ V{ string } ] [
 !     [ dup string? t xor [ "A" throw ] [ ] if ] final-classes
 ! ] unit-test
