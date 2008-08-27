@@ -5,7 +5,8 @@ parser words quotations debugger macros arrays macros splitting
 combinators prettyprint.backend definitions prettyprint
 hashtables prettyprint.sections sets sequences.private effects
 effects.parser generic generic.parser compiler.units accessors
-locals.backend memoize macros.expander lexer ;
+locals.backend memoize macros.expander lexer
+stack-checker.known-words ;
 IN: locals
 
 ! Inspired by
@@ -42,7 +43,9 @@ PREDICATE: local < word "local?" word-prop ;
 
 : <local> ( name -- word )
     #! Create a local variable identifier
-    f <word> dup t "local?" set-word-prop ;
+    f <word>
+    dup t "local?" set-word-prop
+    dup { } { object } define-primitive ;
 
 PREDICATE: local-word < word "local-word?" word-prop ;
 
@@ -52,15 +55,20 @@ PREDICATE: local-word < word "local-word?" word-prop ;
 PREDICATE: local-reader < word "local-reader?" word-prop ;
 
 : <local-reader> ( name -- word )
-    f <word> dup t "local-reader?" set-word-prop ;
+    f <word>
+    dup t "local-reader?" set-word-prop
+    dup { } { object } define-primitive ;
 
 PREDICATE: local-writer < word "local-writer?" word-prop ;
 
 : <local-writer> ( reader -- word )
-    dup name>> "!" append f <word>
-    [ t "local-writer?" set-word-prop ] keep
-    [ "local-writer" set-word-prop ] 2keep
-    [ swap "local-reader" set-word-prop ] keep ;
+    dup name>> "!" append f <word> {
+        [ nip { object } { } define-primitive ]
+        [ nip t "local-writer?" set-word-prop ]
+        [ swap "local-reader" set-word-prop ]
+        [ "local-writer" set-word-prop ]
+        [ nip ]
+    } 2cleave ;
 
 TUPLE: quote local ;
 
