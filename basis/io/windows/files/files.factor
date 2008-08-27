@@ -123,7 +123,7 @@ SYMBOLS: +read-only+ +hidden+ +system+
 +not-content-indexed+ +encrypted+ ;
 
 : win32-file-attribute ( n attr symbol -- n )
-    >r dupd mask? [ r> , ] [ r> drop ] if ;
+    >r dupd mask? r> swap [ , ] [ drop ] if ;
 
 : win32-file-attributes ( n -- seq )
     [
