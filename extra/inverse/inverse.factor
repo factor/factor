@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel words summary slots quotations
-sequences assocs math arrays inference effects generalizations
+sequences assocs math arrays stack-checker effects generalizations
 continuations debugger classes.tuple namespaces vectors
 bit-arrays byte-arrays strings sbufs math.functions macros
 sequences.private combinators mirrors

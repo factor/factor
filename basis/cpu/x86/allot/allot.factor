@@ -1,9 +1,9 @@
-! Copyright (C) 2006, 2007 Slava Pestov.
+! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel cpu.architecture cpu.x86.assembler
-cpu.x86.architecture kernel.private namespaces math
-sequences generic arrays generator generator.fixup
-generator.registers system layouts alien ;
+cpu.x86.architecture kernel.private namespaces math sequences
+generic arrays compiler.generator compiler.generator.fixup
+compiler.generator.registers system layouts alien ;
 IN: cpu.x86.allot
 
 : allot-reg ( -- reg )

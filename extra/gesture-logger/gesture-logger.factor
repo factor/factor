@@ -1,8 +1,8 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io kernel prettyprint ui ui.gadgets ui.gadgets.panes
-ui.gadgets.scrollers ui.gadgets.theme ui.gestures colors
-accessors ;
+USING: accessors io kernel prettyprint ui ui.gadgets
+ui.gadgets.panes ui.gadgets.scrollers ui.gadgets.theme
+ui.gestures colors ;
 IN: gesture-logger
 
 TUPLE: gesture-logger < gadget stream ;
@@ -14,9 +14,8 @@ TUPLE: gesture-logger < gadget stream ;
     black solid-interior ;
 
 M: gesture-logger handle-gesture*
-    drop
-    dup T{ button-down } = [ over request-focus ] when
-    swap gesture-logger-stream [ . ] with-output-stream*
+    over T{ button-down } = [ dup request-focus ] when
+    stream>> [ . ] with-output-stream*
     t ;
 
 M: gesture-logger user-input*

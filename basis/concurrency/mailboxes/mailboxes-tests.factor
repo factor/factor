@@ -3,6 +3,8 @@ USING: concurrency.mailboxes concurrency.count-downs vectors
 sequences threads tools.test math kernel strings namespaces
 continuations calendar destructors ;
 
+{ 1 1 } [ [ integer? ] mailbox-get? ] must-infer-as
+
 [ V{ 1 2 3 } ] [
     0 <vector>
     <mailbox>

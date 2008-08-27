@@ -1,4 +1,4 @@
-USING: help.markup help.syntax kernel classes io io.styles ;
+USING: help.markup help.syntax kernel classes io io.styles mirrors ;
 IN: inspector
 
 ARTICLE: "inspector" "The inspector"
@@ -41,15 +41,8 @@ $nl
 { $examples { $code "global describe" } } ;
 
 HELP: describe*
-{ $values { "obj" object } { "flags" "an assoc" } }
-{ $description "Print a tabular overview of the object."
-$nl
-"The assoc can contain any of the following keys:"
-{ $list
-    { { $link +number-rows+ } " - if set to a true value, every row of output will begin with a row number." }
-    { { $link +editable+ } " - if set to a true value, keys and values will be editable in place, if the output stream supports it." }
-    { { $link +sequence+ } " - if set to a true value, keys will not be printed, only values." }
-} }
+{ $values { "obj" object } { "mirror" mirror } { "keys" "a sequence of objects" } }
+{ $description "Print a tabular overview of the object." }
 { $notes "This word is a factor of " { $link describe } " and " { $link inspect } "." } ;
 
 HELP: inspector-stack

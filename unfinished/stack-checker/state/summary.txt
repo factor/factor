@@ -1,1 +1,0 @@
-Variables for holding stack effect inference state

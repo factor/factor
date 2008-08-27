@@ -122,7 +122,7 @@ $nl
 } } ;
 
 HELP: define-typecheck
-{ $values { "class" class } { "generic" "a generic word" } { "quot" quotation } }
+{ $values { "class" class } { "generic" "a generic word" } { "quot" quotation } { "props" "an assoc of word properties" } }
 { $description
     "Defines a generic word with the " { $link standard-combination } " using dispatch position 0, and having one method on " { $snippet "class" } "."
     $nl
@@ -136,18 +136,18 @@ HELP: define-typecheck
 { $notes "This word is used internally to wrap unsafe low-level code in a type-checking stub." } ;
 
 HELP: define-reader
-{ $values { "class" class } { "name" string } { "slot" integer } }
-{ $description "Defines a reader word to read a slot from instances of " { $snippet "class" } "." }
+{ $values { "class" class } { "slot-spec" slot-spec } }
+{ $description "Defines a reader word to read a slot specified by " { $snippet "slot-spec" } "." }
 $low-level-note ;
 
 HELP: define-writer
-{ $values { "class" class } { "name" string } { "slot" integer } }
-{ $description "Defines a generic word " { $snippet "writer" } " to write a new value to a slot in instances of " { $snippet "class" } "." }
+{ $values { "class" class } { "slot-spec" slot-spec } }
+{ $description "Defines a generic word " { $snippet "writer" } " to write a new value to a slot specified by " { $snippet "slot-spec" } "." }
 $low-level-note ;
 
 HELP: define-slot-methods
-{ $values { "class" class } { "name" string } { "slot" integer } }
-{ $description "Defines a reader, writer, setter and changer for a slot in instances of " { $snippet "class" } "." }
+{ $values { "class" class } { "slot-spec" slot-spec } }
+{ $description "Defines a reader, writer, setter and changer for a slot specified by " { $snippet "slot-spec" } "." }
 $low-level-note ;
 
 HELP: define-accessors

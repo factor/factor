@@ -13,5 +13,5 @@ unit-test
     [ \ see-test see ] with-string-writer =
 ] unit-test
 
-[ ] [ "USING: macros inference kernel ; IN: hanging-macro MACRO: c ( quot -- ) infer drop [ ] ; : a ( -- ) [ a ] c ;" eval ] unit-test
+[ ] [ "USING: macros stack-checker kernel ; IN: hanging-macro MACRO: c ( quot -- ) infer drop [ ] ; : a ( -- ) [ a ] c ;" eval ] unit-test
 

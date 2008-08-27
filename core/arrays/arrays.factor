@@ -23,12 +23,12 @@ M: array equal?
 
 INSTANCE: array sequence
 
-: 1array ( x -- array ) 1 swap <array> ; flushable
+: 1array ( x -- array ) 1 swap <array> ; inline
 
-: 2array ( x y -- array ) { } 2sequence ; flushable
+: 2array ( x y -- array ) { } 2sequence ; inline
 
-: 3array ( x y z -- array ) { } 3sequence ; flushable
+: 3array ( x y z -- array ) { } 3sequence ; inline
 
-: 4array ( w x y z -- array ) { } 4sequence ; flushable
+: 4array ( w x y z -- array ) { } 4sequence ; inline
 
 PREDICATE: pair < array length 2 number= ;

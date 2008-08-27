@@ -6,18 +6,16 @@ HELP: set-gestures
 { $values { "class" "a class word" } { "hash" hashtable } }
 { $description "Sets the gestures a gadget class responds to. The hashtable maps gestures to quotations with stack effect " { $snippet "( gadget -- )" } "." } ;
 
-HELP: handle-gesture*
-{ $values { "gadget" "the receiver of the gesture" } { "gesture" "a gesture" } { "delegate" "an object" } { "?" "a boolean" } }
-{ $contract "Handles a gesture sent to a gadget. As the delegation chain is traversed, this generic word is called with every delegate of the gadget at the top of the stack, however the front-most delegate remains fixed as the " { $snippet "gadget" } " parameter."
+HELP: handle-gesture
+{ $values { "gesture" "a gesture" } { "gadget" "the receiver of the gesture" } { "?" "a boolean" } }
+{ $contract "Handles a gesture sent to a gadget."
 $nl
-"Outputs " { $link f } " if the gesture was handled, and " { $link t } " if the gesture should be passed on to the gadget's delegate." }
+"Outputs " { $link f } " if the gesture was handled, and " { $link t } " if the gesture should be passed on to the gadget's parent."
+$nl
+"The default implementation looks at the " { $snippet "\"gestures\"" } " word property of each superclass of the gadget's class." }
 { $notes "Methods should be defined on this word if you desire to handle an arbitrary set of gestures. To define handlers for a fixed set, it is easier to use " { $link set-gestures } "." } ;
 
-HELP: handle-gesture
-{ $values { "gesture" "a gesture" } { "gadget" gadget } { "?" "a boolean" } }
-{ $description "Calls " { $link handle-gesture* } " on every delegate of " { $snippet "gadget" } ". Outputs " { $link f } " if some delegate handled the gesture, else outputs " { $link t } "." } ;
-
-{ send-gesture handle-gesture handle-gesture* set-gestures } related-words
+{ send-gesture handle-gesture set-gestures } related-words
 
 HELP: send-gesture
 { $values { "gesture" "a gesture" } { "gadget" gadget } { "?" "a boolean" } }
@@ -203,7 +201,7 @@ $nl
 "There are two ways to define gesture handling logic. The simplest way is to associate a fixed set of gestures with a class:"
 { $subsection set-gestures }
 "Another way is to define a generic word on a class which handles all gestures sent to gadgets of that class:"
-{ $subsection handle-gesture* }
+{ $subsection handle-gesture }
 "Sometimes a gesture needs to be presented to the user:"
 { $subsection gesture>string }
 "Keyboard input:"

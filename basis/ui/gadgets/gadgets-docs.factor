@@ -130,13 +130,13 @@ HELP: clear-gadget
 { $side-effects "gadget" } ;
 
 HELP: add-gadget
-{ $values { "gadget" gadget } { "parent" gadget } }
+{ $values { "parent" gadget } { "child" gadget } }
 { $description "Adds a child gadget to a parent. If the gadget is contained in another gadget, " { $link unparent } " is called on the gadget first. The parent will be relayout." }
 { $notes "Adding a gadget to a parent may result in " { $link graft* } " being called on the children, if the parent is visible on the screen." }
 { $side-effects "parent" } ;
 
 HELP: add-gadgets
-{ $values { "seq" "a sequence of gadgets" } { "parent" gadget } }
+{ $values { "parent" gadget } { "children" "a sequence of gadgets" } }
 { $description "Adds a sequence of gadgets to a parent. The parent will be relayout." }
 { $notes "This may result in " { $link graft* } " being called on the children, if the parent is visible on the screen." }
 { $side-effects "parent" } ;

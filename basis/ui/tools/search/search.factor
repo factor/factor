@@ -20,8 +20,8 @@ TUPLE: live-search < track field list ;
     search-value object-operations
     [ operation-gesture = ] with find nip ;
 
-M: live-search handle-gesture* ( gadget gesture delegate -- ? )
-    drop over search-gesture dup [
+M: live-search handle-gesture ( gesture live-search -- ? )
+    tuck search-gesture dup [
         over find-workspace hide-popup
         >r search-value r> invoke-command f
     ] [
@@ -29,7 +29,7 @@ M: live-search handle-gesture* ( gadget gesture delegate -- ? )
     ] if ;
 
 : find-live-search ( gadget -- search )
-    [ [ live-search? ] is? ] find-parent ;
+    [ live-search? ] find-parent ;
 
 : find-search-list ( gadget -- list )
     find-live-search live-search-list ;

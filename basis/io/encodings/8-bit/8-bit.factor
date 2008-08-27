@@ -53,14 +53,14 @@ SYMBOL: 8-bit-encodings
 TUPLE: 8-bit decode encode ;
 
 : encode-8-bit ( char stream assoc -- )
-    swap >r at*
-    [ r> stream-write1 ] [ r> drop encode-error ] if ; inline
+    swapd at*
+    [ swap stream-write1 ] [ nip encode-error ] if ; inline
 
 M: 8-bit encode-char encode>> encode-8-bit ;
 
 : decode-8-bit ( stream array -- char/f )
-    >r stream-read1 dup
-    [ r> nth [ replacement-char ] unless* ] [ r> 2drop f ] if ; inline
+    swap stream-read1 dup
+    [ swap nth [ replacement-char ] unless* ] [ 2drop f ] if ; inline
 
 M: 8-bit decode-char decode>> decode-8-bit ;
 

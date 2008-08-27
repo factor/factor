@@ -8,16 +8,12 @@ IN: ui.gestures
 
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;
 
-GENERIC: handle-gesture* ( gadget gesture delegate -- ? )
+GENERIC: handle-gesture ( gesture gadget -- ? )
 
-: default-gesture-handler ( gadget gesture delegate -- ? )
-    class superclasses [ "gestures" word-prop ] map assoc-stack dup
-    [ call f ] [ 2drop t ] if ;
-
-M: object handle-gesture* default-gesture-handler ;
-
-: handle-gesture ( gesture gadget -- ? )
-    tuck delegates [ >r 2dup r> handle-gesture* ] all? 2nip ;
+M: object handle-gesture
+    tuck class superclasses
+    [ "gestures" word-prop ] map
+    assoc-stack dup [ call f ] [ 2drop t ] if ;
 
 : send-gesture ( gesture gadget -- ? )
     [ dupd handle-gesture ] each-parent nip ;

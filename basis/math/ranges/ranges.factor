@@ -10,7 +10,7 @@ TUPLE: range
 : <range> ( a b step -- range )
     >r over - r>
     [ / 1+ 0 max >integer ] keep
-    range boa ;
+    range boa ; inline
 
 M: range length ( seq -- n )
     length>> ;
@@ -26,19 +26,19 @@ INSTANCE: range immutable-sequence
 
 : ,b) dup neg rot + swap ; inline
 
-: [a,b] ( a b -- range ) twiddle <range> ; foldable
+: [a,b] ( a b -- range ) twiddle <range> ; inline
 
-: (a,b] ( a b -- range ) twiddle (a, <range> ; foldable
+: (a,b] ( a b -- range ) twiddle (a, <range> ; inline
 
-: [a,b) ( a b -- range ) twiddle ,b) <range> ; foldable
+: [a,b) ( a b -- range ) twiddle ,b) <range> ; inline
 
-: (a,b) ( a b -- range ) twiddle (a, ,b) <range> ; foldable
+: (a,b) ( a b -- range ) twiddle (a, ,b) <range> ; inline
 
-: [0,b] ( b -- range ) 0 swap [a,b] ; foldable
+: [0,b] ( b -- range ) 0 swap [a,b] ; inline
 
-: [1,b] ( b -- range ) 1 swap [a,b] ; foldable
+: [1,b] ( b -- range ) 1 swap [a,b] ; inline
 
-: [0,b) ( b -- range ) 0 swap [a,b) ; foldable
+: [0,b) ( b -- range ) 0 swap [a,b) ; inline
 
 : range-increasing? ( range -- ? )
     step>> 0 > ;

@@ -47,16 +47,16 @@ M: float-array byte-length length "double" heap-size * ;
 INSTANCE: float-array sequence
 
 : 1float-array ( x -- array )
-    1 <float-array> [ set-first ] keep ; flushable
+    1 <float-array> [ set-first ] keep ; inline
 
 : 2float-array ( x y -- array )
-    T{ float-array } 2sequence ; flushable
+    T{ float-array } 2sequence ; inline
 
 : 3float-array ( x y z -- array )
-    T{ float-array } 3sequence ; flushable
+    T{ float-array } 3sequence ; inline
 
 : 4float-array ( w x y z -- array )
-    T{ float-array } 4sequence ; flushable
+    T{ float-array } 4sequence ; inline
 
 : F{ ( parsed -- parsed )
     \ } [ >float-array ] parse-literal ; parsing

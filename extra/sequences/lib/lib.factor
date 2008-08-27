@@ -202,9 +202,6 @@ PRIVATE>
 : ?nth* ( n seq -- elt/f ? )
     2dup bounds-check? [ nth-unsafe t ] [ 2drop f f ] if ; flushable
 
-: nths ( seq indices -- seq' )
-    swap [ nth ] curry map ;
-
 : remove-nth ( n seq -- seq' )
     [ swap head-slice ] [ swap 1+ tail-slice ] 2bi append ;
 

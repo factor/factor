@@ -212,7 +212,7 @@ M: freetype-renderer draw-string ( font string loc -- )
     char-widths [ scan-sums ] [ 2 v/n ] bi v+ ;
 
 M: freetype-renderer x>offset ( x open-font string -- n )
-    dup >r run-char-widths [ <= ] with find drop
-    [ r> drop ] [ r> length ] if* ;
+    [ run-char-widths [ <= ] with find drop ] keep swap
+    [ ] [ length ] ?if ;
 
 T{ freetype-renderer } font-renderer set-global

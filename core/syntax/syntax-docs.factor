@@ -192,6 +192,11 @@ HELP: inline
     "The non-optimizing quotation compiler ignores inlining declarations."
 } ;
 
+HELP: recursive
+{ $syntax ": foo ... ; recursive" }
+{ $description "Declares the most recently defined word as a recursive word." }
+{ $notes "This declaration is only required for " { $link POSTPONE: inline } " words which call themselves. See " { $link "inference-recursive-combinators" } "." } ;
+
 HELP: foldable
 { $syntax ": foo ... ; foldable" }
 { $description
@@ -533,17 +538,17 @@ $nl
 "Slot specifiers take one of the following three forms:"
 { $list
     { { $snippet "name" } " - a slot which can hold any object, with no attributes" }
-    { { $snippet "{ \"name\" attributes... }" } " - a slot which can hold any object, with optional attributes" }
-    { { $snippet "{ \"name\" class attributes... }" } " - a slot specialized to a specific class, with optional attributes" }
+    { { $snippet "{ name attributes... }" } " - a slot which can hold any object, with optional attributes" }
+    { { $snippet "{ name class attributes... }" } " - a slot specialized to a specific class, with optional attributes" }
 }
 "Slot attributes are lists of slot attribute specifiers followed by values; a slot attribute specifier is one of " { $link initial: } " or " { $link read-only } ". See " { $link "tuple-declarations" } " for details." }
 { $examples
     "A simple tuple class:"
     { $code "TUPLE: color red green blue ;" }
     "Declaring slots to be integer-valued:"
-    { $code "TUPLE: color" "{ \"red\" integer }" "{ \"green\" integer }" "{ \"blue\" integer } ;" }
+    { $code "TUPLE: color" "{ red integer }" "{ green integer }" "{ blue integer } ;" }
     "An example mixing short and long slot specifiers:"
-    { $code "TUPLE: person" "{ \"age\" integer initial: 0 }" "{ \"department\" string initial: \"Marketing\" }" "manager ;" }
+    { $code "TUPLE: person" "{ age integer initial: 0 }" "{ department string initial: \"Marketing\" }" "manager ;" }
 } ;
 
 HELP: initial:

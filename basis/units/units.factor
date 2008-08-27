@@ -1,6 +1,6 @@
-USING: arrays io kernel math namespaces splitting prettyprint
-sequences sorting vectors words inverse summary shuffle
-math.functions sets ;
+USING: accessors arrays io kernel math namespaces splitting
+prettyprint sequences sorting vectors words inverse summary
+shuffle math.functions sets ;
 IN: units
 
 TUPLE: dimensioned value top bot ;
@@ -28,8 +28,7 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
     dimensioned boa ;
 
 : >dimensioned< ( d -- n top bot )
-    { dimensioned-value dimensioned-top dimensioned-bot }
-    get-slots ;
+    [ value>> ] [ top>> ] [ bot>> ] tri ;
 
 \ <dimensioned> [ >dimensioned< ] define-inverse
 

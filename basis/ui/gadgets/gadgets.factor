@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hashtables kernel models math namespaces
        sequences quotations math.vectors combinators sorting
-       binary-search vectors dlists dequeues models threads
+       binary-search vectors dlists deques models threads
        concurrency.flags math.order math.geometry.rect ;
 
 IN: ui.gadgets
@@ -361,8 +361,3 @@ M: f request-focus-on 2drop ;
 
 : focus-path ( world -- seq )
     [ focus>> ] follow ;
-
-! Deprecated
-
-: construct-gadget ( class -- tuple )
-    >r <gadget> { set-delegate } r> construct ; inline

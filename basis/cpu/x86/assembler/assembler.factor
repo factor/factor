@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays generator.fixup io.binary kernel
+USING: arrays compiler.generator.fixup io.binary kernel
 combinators kernel.private math namespaces sequences
 words system layouts math.order accessors
 cpu.x86.assembler.syntax ;

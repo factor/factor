@@ -4,7 +4,7 @@ USING: alien.syntax cocoa cocoa.nibs cocoa.application
 cocoa.classes cocoa.dialogs cocoa.pasteboard cocoa.subclassing
 core-foundation help.topics kernel memory namespaces parser
 system ui ui.tools.browser ui.tools.listener ui.tools.workspace
-ui.cocoa eval ;
+ui.cocoa eval locals ;
 IN: ui.cocoa.tools
 
 : finder-run-files ( alien -- )
@@ -52,10 +52,10 @@ CLASS: {
     NSApp FactorApplicationDelegate install-delegate ;
 
 ! Service support; evaluate Factor code from other apps
-: do-service ( pboard error quot -- )
-    pick >r >r
-    ?pasteboard-string dup [ r> call ] [ r> 2drop f ] if
-    dup [ r> set-pasteboard-string ] [ r> 2drop ] if ;
+:: do-service ( pboard error quot -- )
+    pboard error ?pasteboard-string
+    dup [ quot call ] when
+    [ pboard set-pasteboard-string ] when* ;
 
 CLASS: {
     { +superclass+ "NSObject" }
