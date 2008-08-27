@@ -1,13 +1,13 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: dequeues threads kernel arrays sequences alarms ;
+USING: deques threads kernel arrays sequences alarms ;
 IN: concurrency.conditions
 
-: notify-1 ( dequeue -- )
-    dup dequeue-empty? [ drop ] [ pop-back resume-now ] if ;
+: notify-1 ( deque -- )
+    dup deque-empty? [ drop ] [ pop-back resume-now ] if ;
 
-: notify-all ( dequeue -- )
-    [ resume-now ] slurp-dequeue ;
+: notify-all ( deque -- )
+    [ resume-now ] slurp-deque ;
 
 : queue-timeout ( queue timeout -- alarm )
     #! Add an alarm which removes the current thread from the

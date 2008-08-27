@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences classes.tuple
 classes.tuple.private arrays math math.private slots.private
-combinators dequeues search-dequeues namespaces fry classes
+combinators deques search-deques namespaces fry classes
 classes.algebra stack-checker.state
 compiler.tree
 compiler.tree.intrinsics

@@ -1,10 +1,10 @@
-IN: search-dequeues.tests
-USING: search-dequeues tools.test namespaces
-kernel sequences words dequeues vocabs ;
+IN: search-deques.tests
+USING: search-deques tools.test namespaces
+kernel sequences words deques vocabs ;
 
 <hashed-dlist> "h" set
 
-[ t ] [ "h" get dequeue-empty? ] unit-test
+[ t ] [ "h" get deque-empty? ] unit-test
 
 [ ] [ 3 "h" get push-front* "1" set ] unit-test
 [ ] [ 1 "h" get push-front ] unit-test
@@ -15,21 +15,21 @@ kernel sequences words dequeues vocabs ;
 [ t ] [ "1" get "2" get eq? ] unit-test
 [ t ] [ "2" get "3" get eq? ] unit-test
 
-[ 3 ] [ "h" get dequeue-length ] unit-test
-[ t ] [ 7 "h" get dequeue-member? ] unit-test
+[ 3 ] [ "h" get deque-length ] unit-test
+[ t ] [ 7 "h" get deque-member? ] unit-test
 
 [ 3 ] [ "1" get node-value ] unit-test
 [ ] [ "1" get "h" get delete-node ] unit-test
 
-[ 2 ] [ "h" get dequeue-length ] unit-test
+[ 2 ] [ "h" get deque-length ] unit-test
 [ 1 ] [ "h" get pop-back ] unit-test
 [ 7 ] [ "h" get pop-back ] unit-test
 
-[ f ] [ 7 "h" get dequeue-member? ] unit-test
+[ f ] [ 7 "h" get deque-member? ] unit-test
 
 [ ] [
     <hashed-dlist>
     [ all-words swap [ push-front ] curry each ]
-    [ [ drop ] slurp-dequeue ]
+    [ [ drop ] slurp-deque ]
     bi
 ] unit-test

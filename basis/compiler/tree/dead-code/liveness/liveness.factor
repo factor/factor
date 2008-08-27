@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: fry accessors namespaces assocs dequeues search-dequeues
+USING: fry accessors namespaces assocs deques search-deques
 kernel sequences sequences.deep words sets stack-checker.branches
 compiler.tree compiler.tree.def-use compiler.tree.combinators ;
 IN: compiler.tree.dead-code.liveness

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences namespaces assocs accessors fry
-compiler.tree dequeues search-dequeues ;
+compiler.tree deques search-deques ;
 IN: compiler.tree.loop.detection
 
 ! A loop is a #recursive which only tail calls itself, and those

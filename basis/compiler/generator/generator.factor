@@ -3,7 +3,7 @@
 USING: accessors arrays assocs classes combinators
 cpu.architecture effects generic hashtables io kernel
 kernel.private layouts math math.parser namespaces prettyprint
-quotations sequences system threads words vectors sets dequeues
+quotations sequences system threads words vectors sets deques
 continuations.private summary alien alien.c-types
 alien.structs alien.strings alien.arrays libc compiler.errors
 stack-checker.inlining

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces arrays sequences io debugger words fry
 compiler.units continuations vocabs assocs dlists definitions
-math threads graphs generic combinators dequeues search-dequeues
+math threads graphs generic combinators deques search-deques
 stack-checker stack-checker.state compiler.generator
 compiler.errors compiler.tree.builder compiler.tree.optimizer ;
 IN: compiler
@@ -60,8 +60,8 @@ SYMBOL: +failed+
         } cleave
     ] with-return ;
 
-: compile-loop ( dequeue -- )
-    [ (compile) yield ] slurp-dequeue ;
+: compile-loop ( deque -- )
+    [ (compile) yield ] slurp-deque ;
 
 : decompile ( word -- )
     f 2array 1array t modify-code-heap ;

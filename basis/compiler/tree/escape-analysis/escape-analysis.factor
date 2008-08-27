@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces search-dequeues assocs fry sequences
-disjoint-sets
+USING: kernel namespaces assocs fry sequences
 compiler.tree
 compiler.tree.escape-analysis.allocations
 compiler.tree.escape-analysis.recursive
