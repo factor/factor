@@ -8,7 +8,7 @@ SYMBOL: errored
 SYMBOL: before
 SYMBOL: after
 SYMBOL: quot
-TUPLE: random-tester-error ;
+ERROR: random-tester-error ;
 
 : setup-test ( #data #code -- data... quot )
     #! Variable stack effect
@@ -35,7 +35,7 @@ TUPLE: random-tester-error ;
             "--" print
             [ . ] each
             quot get .
-            random-tester-error construct-empty throw
+            random-tester-error
         ] if
     ] unless clear ;
 

@@ -1,5 +1,7 @@
-USING: kernel namespaces sequences sorting vocabs ;
-USING: arrays assocs generic hashtables  math math.intervals math.parser math.functions refs shuffle vectors words ;
+USING: kernel namespaces sequences sets sorting vocabs ;
+USING: arrays assocs generic hashtables 
+math math.intervals math.parser math.order math.functions
+refs shuffle vectors words ;
 IN: random-tester.safe-words
 
 : ?-words
@@ -16,7 +18,11 @@ IN: random-tester.safe-words
         array? integer? complex? value-ref? ref? key-ref?
         interval? number?
         wrapper? tuple?
-        [-1,1]? between? bignum? both? either? eq? equal? even? fixnum? float? fp-nan? hashtable? interval-contains? interval-subset? interval? key-ref? key? number? odd? pair? power-of-2? ratio? rational? real? subassoc? zero? assoc? curry? vector? callstack? ! clear 3.14 [ <vector> assoc? ] compile-1
+        [-1,1]? between? bignum? both? either? eq? equal? even? fixnum?
+        float? fp-nan? hashtable? interval-contains? interval-subset?
+        interval? key-ref? key? number? odd? pair? power-of-2?
+        ratio? rational? real? zero? assoc? curry? vector? callstack?
+
         2^ not
         ! arrays
         resize-array <array>
@@ -64,6 +70,9 @@ IN: random-tester.safe-words
         retainstack callstack
         datastack
         callstack>array
+
+        curry 2curry 3curry compose 3compose
+        (assoc-each)
     } ;
 
 : exit-words
@@ -83,28 +92,31 @@ IN: random-tester.safe-words
     ] { } make ;
 
 : safe-words ( -- array )
-    bad-words {
-        "alists" "arrays" "assocs" ! "bit-arrays" "byte-arrays"
+    {
+        ! "accessors"
+        "alists" "arrays" "assocs" "bit-arrays" "byte-arrays"
         ! "classes" "combinators" "compiler" "continuations"
         ! "core-foundation" "definitions" "documents"
         ! "float-arrays" "generic" "graphs" "growable"
         "hashtables"  ! io.*
-        "kernel" "math" 
+        "kernel" "math"
         "math.bitfields" "math.complex" "math.constants" "math.floats"
         "math.functions" "math.integers" "math.intervals" "math.libm"
-        "math.parser" "math.ratios" "math.vectors"
-        ! "namespaces" "quotations" "sbufs"
+        "math.parser" "math.order" "math.ratios" "math.vectors"
+        ! "namespaces"
+        "quotations" "sbufs"
         ! "queues" "strings" "sequences"
+        "sets"
         "vectors"
         ! "words"
-    } [ words ] map concat seq-diff natural-sort ;
+    } [ words ] map concat bad-words diff natural-sort ;
     
 safe-words \ safe-words set-global
 
 ! foo dup (clone) = .
 ! foo dup clone = .
 ! f [ byte-array>bignum assoc-clone-like ] compile-1
-! 2 3.14 [ construct-empty number= ] compile-1
+! 2 3.14 [ number= ] compile-1
 ! 3.14 [ <vector> assoc? ] compile-1
 ! -3 [ ] 2 [ byte-array>bignum denominator ] compile-1
-
+! : foo ( x -- y ) euler bitand ; { foo } compile 20 foo
