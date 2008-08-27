@@ -168,7 +168,7 @@ M: key-caps-gadget graft*
 M: key-caps-gadget ungraft*
     alarm>> [ cancel-alarm ] when* ;
 
-M: key-caps-gadget handle-gesture*
+M: key-caps-gadget handle-gesture
     drop [ key-down? ] [ key-up? ] bi or not ;
 
 : key-caps ( -- )

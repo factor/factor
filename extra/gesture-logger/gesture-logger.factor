@@ -13,7 +13,7 @@ TUPLE: gesture-logger < gadget stream ;
     { 100 100 } >>dim
     black solid-interior ;
 
-M: gesture-logger handle-gesture*
+M: gesture-logger handle-gesture
     over T{ button-down } = [ dup request-focus ] when
     stream>> [ . ] with-output-stream*
     t ;
