@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: xml.errors xml.data xml.utilities xml.char-classes sets
 xml.entities kernel state-parser kernel namespaces strings math
-math.parser sequences assocs arrays splitting combinators unicode.case ;
+math.parser sequences assocs arrays splitting combinators unicode.case
+accessors ;
 IN: xml.tokenize
 
 ! XML namespace processing: ns = namespace
@@ -14,8 +15,8 @@ SYMBOL: ns-stack
     ! this should check to make sure URIs are valid
     [
         [
-            swap dup name-space "xmlns" =
-            [ name-tag set ]
+            swap dup space>> "xmlns" =
+            [ main>> set ]
             [
                 T{ name f "" "xmlns" f } names-match?
                 [ "" set ] [ drop ] if
@@ -24,8 +25,8 @@ SYMBOL: ns-stack
     ] { } make-assoc f like ;
 
 : add-ns ( name -- )
-    dup name-space dup ns-stack get assoc-stack
-    [ nip ] [ <nonexist-ns> throw ] if* swap set-name-url ;
+    dup space>> dup ns-stack get assoc-stack
+    [ nip ] [ <nonexist-ns> throw ] if* >>url drop ;
 
 : push-ns ( hash -- )
     ns-stack get push ;

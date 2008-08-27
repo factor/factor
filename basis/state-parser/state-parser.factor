@@ -94,7 +94,7 @@ SYMBOL: prolog-data
         [ call ] keep swap [ drop ] [
             next skip-until
         ] if
-    ] [ drop ] if ; inline
+    ] [ drop ] if ; inline recursive
 
 : take-until ( quot -- string )
     #! Take the substring of a string starting at spot

@@ -38,19 +38,19 @@ M: directive process
     add-child ;
 
 M: contained process
-    [ contained-name ] keep contained-attrs 
+    [ name>> ] [ attrs>> ] bi
     <contained-tag> add-child ;
 
 M: opener process push-xml ;
 
 : check-closer ( name opener -- name opener )
     dup [ <unopened> throw ] unless
-    2dup opener-name =
-    [ opener-name swap <mismatched> throw ] unless ;
+    2dup name>> =
+    [ name>> swap <mismatched> throw ] unless ;
 
 M: closer process
-    closer-name pop-xml first2
-    >r check-closer opener-attrs r>
+    name>> pop-xml first2
+    >r check-closer attrs>> r>
     <tag> add-child ;
 
 : init-xml-stack ( -- )
@@ -102,10 +102,10 @@ TUPLE: pull-xml scope ;
         init-parser reset-prolog init-ns-stack
         text-now? on
     ] H{ } make-assoc
-    { set-pull-xml-scope } pull-xml construct ;
+    pull-xml boa ;
 
 : pull-event ( pull -- xml-event/f )
-    pull-xml-scope [
+    scope>> [
         text-now? get [ parse-text f ] [
             get-char [ make-tag t ] [ f f ] if
         ] if text-now? set
