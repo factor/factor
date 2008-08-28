@@ -14,7 +14,7 @@ GENERIC: where ( specs obj -- )
 
 : query-make ( class quot -- )
     >r sql-props r>
-    [ 0 sql-counter rot with-variable ] { "" { } { } } nmake
+    [ 0 sql-counter rot with-variable ] curry { "" { } { } } nmake
     <simple-statement> maybe-make-retryable ; inline
 
 M: db begin-transaction ( -- ) "BEGIN" sql-command ;

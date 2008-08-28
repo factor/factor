@@ -1,10 +1,10 @@
-USING: sequences assocs kernel quotations namespaces xml.data
-xml.utilities combinators macros parser lexer words ;
+USING: accessors sequences assocs kernel quotations namespaces
+xml.data xml.utilities combinators macros parser lexer words ;
 IN: xmode.utilities
 
 : implies >r not r> or ; inline
 
-: child-tags ( tag -- seq ) tag-children [ tag? ] filter ;
+: child-tags ( tag -- seq ) children>> [ tag? ] filter ;
 
 : map-find ( seq quot -- result elt )
     f -rot
@@ -53,5 +53,5 @@ SYMBOL: tag-handler-word
 
 : TAGS>
     tag-handler-word get
-    tag-handlers get >alist [ >r dup name-tag r> case ] curry
+    tag-handlers get >alist [ >r dup main>> r> case ] curry
     define ; parsing

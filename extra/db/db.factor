@@ -96,12 +96,12 @@ M: object execute-statement* ( statement type -- )
 : sql-row-typed ( result-set -- seq )
     dup #columns [ row-column-typed ] with map ;
 
-: query-each ( statement quot -- )
+: query-each ( statement quot: ( statement -- ) -- )
     over more-rows? [
         [ call ] 2keep over advance-row query-each
     ] [
         2drop
-    ] if ; inline
+    ] if ; inline recursive
 
 : query-map ( statement quot -- seq )
     accumulator >r query-each r> { } like ; inline
