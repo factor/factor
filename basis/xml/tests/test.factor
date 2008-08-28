@@ -3,7 +3,7 @@
 IN: xml.tests
 USING: kernel xml tools.test io namespaces sequences xml.errors xml.entities
     parser strings xml.data io.files xml.writer xml.utilities state-parser 
-    continuations assocs sequences.deep ;
+    continuations assocs sequences.deep accessors ;
 
 ! This is insufficient
 \ read-xml must-infer
@@ -11,22 +11,22 @@ USING: kernel xml tools.test io namespaces sequences xml.errors xml.entities
 SYMBOL: xml-file
 [ ] [ "resource:basis/xml/tests/test.xml"
     [ file>xml ] with-html-entities xml-file set ] unit-test
-[ "1.0" ] [ xml-file get xml-prolog prolog-version ] unit-test
-[ f ] [ xml-file get xml-prolog prolog-standalone ] unit-test
-[ "a" ] [ xml-file get name-space ] unit-test
-[ "http://www.hello.com" ] [ xml-file get name-url ] unit-test
+[ "1.0" ] [ xml-file get prolog>> version>> ] unit-test
+[ f ] [ xml-file get prolog>> standalone>> ] unit-test
+[ "a" ] [ xml-file get space>> ] unit-test
+[ "http://www.hello.com" ] [ xml-file get url>> ] unit-test
 [ "that" ] [
     xml-file get T{ name f "" "this" "http://d.de" } swap at
 ] unit-test
-[ t ] [ xml-file get tag-children second contained-tag? ] unit-test
+[ t ] [ xml-file get children>> second contained-tag? ] unit-test
 [ "<a></b>" string>xml ] [ xml-parse-error? ] must-fail-with
 [ T{ comment f "This is where the fun begins!" } ] [
     xml-file get xml-before [ comment? ] find nip
 ] unit-test
 [ "xsl stylesheet=\"that-one.xsl\"" ] [
-    xml-file get xml-after [ instruction? ] find nip instruction-text
+    xml-file get after>> [ instruction? ] find nip text>>
 ] unit-test
-[ V{ "fa&g" } ] [ xml-file get "x" get-id tag-children ] unit-test
+[ V{ "fa&g" } ] [ xml-file get "x" get-id children>> ] unit-test
 [ "that" ] [ xml-file get "this" swap at ] unit-test
 [ "<?xml version=\"1.0\" encoding=\"UTF-8\"?><a b=\"c\"/>" ]
     [ "<a b='c'/>" string>xml xml>string ] unit-test
