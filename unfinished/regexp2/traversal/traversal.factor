@@ -3,25 +3,31 @@
 USING: accessors assocs combinators combinators.lib kernel
 math math.ranges quotations sequences regexp2.parser
 regexp2.classes combinators.short-circuit assocs.lib
-sequences.lib ;
+sequences.lib regexp2.utils ;
 IN: regexp2.traversal
 
 TUPLE: dfa-traverser
     dfa-table
+    traversal-flags
+    capture-groups
+    { capture-group-index integer }
+    { lookahead-counter integer }
     last-state current-state
     text
     start-index current-index
     matches ;
 
 : <dfa-traverser> ( text regexp -- match )
-    dfa-table>>
+    [ dfa-table>> ] [ traversal-flags>> ] bi
     dfa-traverser new
+        swap >>traversal-flags
         swap [ start-state>> >>current-state ] keep
         >>dfa-table
         swap >>text
         0 >>start-index
         0 >>current-index
-        V{ } clone >>matches ;
+        V{ } clone >>matches
+        V{ } clone >>capture-groups ;
 
 : final-state? ( dfa-traverser -- ? )
     [ current-state>> ] [ dfa-table>> final-states>> ] bi
@@ -48,9 +54,6 @@ TUPLE: dfa-traverser
 
 : match-literal ( transition from-state table -- to-state/f )
     transitions>> [ at ] [ 2drop f ] if-at ;
-
-: assoc-with ( param assoc quot -- assoc curry )
-    swapd [ [ -rot ] dip call ] 2curry ; inline
 
 : match-class ( transition from-state table -- to-state/f )
     transitions>> at* [

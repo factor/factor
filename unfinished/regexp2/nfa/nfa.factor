@@ -3,13 +3,19 @@
 USING: accessors arrays assocs grouping kernel regexp2.backend
 locals math namespaces regexp2.parser sequences state-tables fry
 quotations math.order math.ranges vectors unicode.categories
-regexp2.utils regexp2.transition-tables words sequences.lib ;
+regexp2.utils regexp2.transition-tables words sequences.lib sets ;
 IN: regexp2.nfa
 
 SYMBOL: negation-mode
 : negated? ( -- ? ) negation-mode get 0 or odd? ; 
 
 SINGLETON: eps
+
+MIXIN: traversal-flag
+SINGLETON: lookahead-on INSTANCE: lookahead-on traversal-flag
+SINGLETON: lookahead-off INSTANCE: lookahead-off traversal-flag
+SINGLETON: capture-group-on INSTANCE: capture-group-on traversal-flag
+SINGLETON: capture-group-off INSTANCE: capture-group-off traversal-flag
 
 : next-state ( regexp -- state )
     [ state>> ] [ [ 1+ ] change-state drop ] bi ;
@@ -37,6 +43,10 @@ GENERIC: nfa-node ( node -- )
         ] if
         s0 s1 2array stack push
         t s1 table final-states>> set-at ] ;
+
+: add-traversal-flag ( flag -- )
+    stack peek second
+    current-regexp get traversal-flags>> push-at ;
 
 :: concatenate-nodes ( -- )
     [let* | regexp [ current-regexp get ]
@@ -115,6 +125,14 @@ M: negation nfa-node ( node -- )
     negation-mode inc
     term>> nfa-node 
     negation-mode dec ;
+
+M: lookahead nfa-node ( node -- )
+    eps literal-transition add-simple-entry
+    lookahead-on add-traversal-flag
+    term>> nfa-node
+    eps literal-transition add-simple-entry
+    lookahead-off add-traversal-flag
+    2 [ concatenate-nodes ] times ;
 
 : construct-nfa ( regexp -- )
     [

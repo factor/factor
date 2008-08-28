@@ -12,6 +12,7 @@ IN: regexp2
         <transition-table> >>nfa-table
         <transition-table> >>dfa-table
         <transition-table> >>minimized-table
+        H{ } clone >>traversal-flags
         reset-regexp ;
 
 : construct-regexp ( regexp -- regexp' )
@@ -26,7 +27,8 @@ IN: regexp2
     <dfa-traverser> do-match return-match ;
 
 : matches? ( string regexp -- ? )
-    dupd match [ [ length ] [ range-length 1- ] bi* = ] [ drop f ] if* ;
+    dupd match
+    [ [ length ] [ range-length 1- ] bi* = ] [ drop f ] if* ;
 
 : match-head ( string regexp -- end ) match length>> 1- ;
 
