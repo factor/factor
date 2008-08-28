@@ -1,6 +1,7 @@
 
-USING: kernel words namespaces arrays sequences prettyprint help.topics bake
-       obj obj.print ;
+USING: kernel words namespaces arrays sequences prettyprint
+       help.topics help.markup bake combinators.cleave
+       obj obj.misc obj.print ;
 
 IN: obj.view
 
@@ -25,7 +26,13 @@ M: obj-type article-content ( type -- content )
 
 M: ptr article-title ( ptr -- title ) [ title -> ] [ unparse ] bi or ;
 
-M: ptr article-content ( ptr -- content ) get { $obj , } bake ;
+M: ptr article-content ( ptr -- content )
+   {
+     [ get     { $obj , } bake ]
+     [ drop { $heading "Related\n" } ]
+     [ related { $seq , } bake ]
+   }
+   1arr ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

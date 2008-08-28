@@ -68,9 +68,10 @@ M: float-array >pprint-sequence ;
 USING: hints math.vectors arrays ;
 
 HINTS: vneg { float-array } { array } ;
-HINTS: v*n { float-array object } { array object } ;
-HINTS: v/n { float-array object } { array object } ;
-HINTS: n/v { object float-array } { object array } ;
+HINTS: v*n { float-array float } { array object } ;
+HINTS: n*v { float float-array } { array object } ;
+HINTS: v/n { float-array float } { array object } ;
+HINTS: n/v { float float-array } { object array } ;
 HINTS: v+ { float-array float-array } { array array } ;
 HINTS: v- { float-array float-array } { array array } ;
 HINTS: v* { float-array float-array } { array array } ;

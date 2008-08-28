@@ -33,7 +33,7 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
 \ <dimensioned> [ >dimensioned< ] define-inverse
 
 : dimensions ( dimensioned -- top bot )
-    { dimensioned-top dimensioned-bot } get-slots ;
+    [ top>> ] [ bot>> ] bi ;
 
 : check-dimensions ( d d -- )
     [ dimensions 2array ] bi@ =
