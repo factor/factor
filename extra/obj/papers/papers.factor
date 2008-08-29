@@ -1,28 +1,38 @@
 
-USING: sets obj.util obj ;
+USING: sets obj obj.util obj.view ;
 
 IN: obj.papers
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYM: title    properties adjoin
-SYM: abstract properties adjoin
-SYM: authors  properties adjoin
-SYM: file     properties adjoin
-SYM: date     properties adjoin
+SYM: title        properties adjoin
+SYM: abstract     properties adjoin
+SYM: authors      properties adjoin
+SYM: file         properties adjoin
+SYM: date         properties adjoin
+SYM: participants properties adjoin
+SYM: description  properties adjoin
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SYM: paper  types adjoin
 SYM: person types adjoin
+SYM: event  types adjoin
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-SYM: bay-wei-chang   { type person } define-object
-SYM: craig-chambers  { type person } define-object
-SYM: david-ungar     { type person } define-object
-SYM: randall-b-smith { type person } define-object
-SYM: urs-holzle      { type person } define-object
+SYM: bay-wei-chang       { type person } define-object
+SYM: craig-chambers      { type person } define-object
+SYM: david-ungar         { type person } define-object
+SYM: frank-g-halasz      { type person } define-object
+SYM: gerald-jay-sussman  { type person } define-object
+SYM: guy-lewis-steele-jr { type person } define-object
+SYM: randall-b-smith     { type person } define-object
+SYM: randall-h-trigg     { type person } define-object
+SYM: robert-adams        { type person } define-object
+SYM: russell-noftsker    { type person } define-object
+SYM: thomas-p-moran      { type person } define-object
+SYM: urs-holzle          { type person } define-object
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -69,5 +79,52 @@ SYM: organizing-programs-without-classes
     abstract "All organizational functions carried out by classes can be accomplished in a simple and natural way by object inheritance in classless languages, with no need for special mechanisms. A single model--dividing types into prototypes and traits--supports sharing of behavior and extending or replacing representations. A natural extension, dynamic object inheritance, can model behavioral modes. Object inheritance can also be used to provide structured name spaces for well-known objects. Classless languages can even express 'class-based' encapsulation. These stylized uses of object inheritance become instantly recognizable idioms, and extend the repertory of organizing principles to cover a wider range of programs."
     authors { david-ungar craig-chambers bay-wei-chang urs-holzle }
     date 1991
+  }
+define-object
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYM: scheme-an-interpreter-for-extended-lambda-calculus
+  {
+    type paper
+    title "Scheme: An Interpreter for Extended Lambda Calculus"
+    abstract "Inspired by ACTORS [Greif and Hewitt] [Smith and Hewitt], we have implemented an interpreter for a LISP-like language, SCHEME, based on the lambda calculus [Church], but extended for side effects, multiprocessing, and process synchronization. The purpose of this implementation is tutorial. We wish to: (1) alleviate the confusion caused by Micro-PLANNER, CONNIVER, etc. by clarifying the embedding of non-recursive control structures in a recursive host language like LISP. (2) explain how to use these control structures, independent of such issues as pattern matching and data base manipulation. (3) have a simple concrete experimental domain for certain issues of programming semantics and style."
+    authors { gerald-jay-sussman guy-lewis-steele-jr }
+    date 1975
+  }
+define-object
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYM: symbolics-is-founded
+  {
+    type         event
+    participants { russell-noftsker robert-adams }
+    date         1980
+  }
+define-object
+
+SYM: symbolics-funding-from-gi
+  {
+    type        event
+    description "Symbolics receives $500,000 from General Instruments"
+    date        1982
+  }
+define-object
+
+SYM: symbolics-files-for-bankruptcy
+  {
+    type event
+    date "1993-01-28"
+  }
+define-object
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYM: notecards-in-a-nutshell
+  {
+    type paper
+    authors { frank-g-halasz thomas-p-moran randall-h-trigg }
+    date 1987
   }
 define-object
