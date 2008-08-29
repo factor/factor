@@ -40,8 +40,8 @@ M: no-inverse summary
 
 : constant-word? ( word -- ? )
     stack-effect
-    [ effect-out length 1 = ] keep
-    effect-in length 0 = and ;
+    [ out>> length 1 = ] keep
+    in>> length 0 = and ;
 
 : assure-constant ( constant -- quot )
     dup word? [ "Badly formed math inverse" throw ] when 1quotation ;
@@ -65,7 +65,7 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
 
 : enough? ( stack word -- ? )
     dup deferred? [ 2drop f ] [
-        [ >r length r> 1quotation infer effect-in >= ]
+        [ >r length r> 1quotation infer in>> >= ]
         [ 3drop f ] recover
     ] if ;
 
@@ -235,11 +235,11 @@ DEFER: _
     ] recover ; inline
 
 : true-out ( quot effect -- quot' )
-    effect-out [ ndrop ] curry
+    out>> [ ndrop ] curry
     [ t ] 3compose ;
 
 : false-recover ( effect -- quot )
-    effect-in [ ndrop f ] curry [ recover-fail ] curry ;
+    in>> [ ndrop f ] curry [ recover-fail ] curry ;
 
 : [matches?] ( quot -- undoes?-quot )
     [undo] dup infer [ true-out ] keep false-recover curry ;

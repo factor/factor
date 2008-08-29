@@ -1,6 +1,6 @@
 USING: smtp tools.test io.streams.string io.sockets threads
 smtp.server kernel sequences namespaces logging accessors
-assocs sorting ;
+assocs sorting smtp.private ;
 IN: smtp.tests
 
 { 0 0 } [ [ ] with-smtp-connection ] must-infer-as

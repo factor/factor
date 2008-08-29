@@ -3,17 +3,31 @@
 USING: accessors arrays assocs combinators.lib io kernel
 math math.order namespaces regexp2.backend sequences
 sequences.lib unicode.categories math.ranges fry
-combinators.short-circuit ;
+combinators.short-circuit vectors ;
 IN: regexp2.utils
 
 : (while-changes) ( obj quot pred pred-ret -- obj )
     ! quot: ( obj -- obj' )
     ! pred: ( obj -- <=> )
     >r >r dup slip r> pick over call r> dupd =
-    [ 3drop ] [ (while-changes) ] if ; inline
+    [ 3drop ] [ (while-changes) ] if ; inline recursive
 
 : while-changes ( obj quot pred -- obj' )
     pick over call (while-changes) ; inline
+
+: assoc-with ( param assoc quot -- assoc curry )
+    swapd [ [ -rot ] dip call ] 2curry ; inline
+
+: insert-at ( value key hash -- )
+    2dup at* [
+        2nip push
+    ] [
+        drop
+        [ dup vector? [ 1vector ] unless ] 2dip set-at
+    ] if ;
+
+: ?insert-at ( value key hash/f -- hash )
+    [ H{ } clone ] unless* [ insert-at ] keep ;
 
 : last-state ( regexp -- range ) stack>> peek first2 [a,b] ;
 : push1 ( obj -- ) input-stream get stream>> push ;

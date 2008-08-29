@@ -1,19 +1,31 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-
 USING: arrays kernel math math.functions namespaces sequences
 strings system vocabs.loader calendar.backend threads
 accessors combinators locals classes.tuple math.order
-memoize ;
+memoize summary combinators.short-circuit ;
 IN: calendar
 
-TUPLE: timestamp year month day hour minute second gmt-offset ;
-
-C: <timestamp> timestamp
-
-TUPLE: duration year month day hour minute second ;
+TUPLE: duration
+    { year real }
+    { month real }
+    { day real }
+    { hour real }
+    { minute real }
+    { second real } ;
 
 C: <duration> duration
+
+TUPLE: timestamp
+    { year integer }
+    { month integer }
+    { day integer }
+    { hour integer }
+    { minute integer }
+    { second real }
+    { gmt-offset duration } ;
+
+C: <timestamp> timestamp
 
 : gmt-offset-duration ( -- duration )
     0 0 0 gmt-offset <duration> ;
@@ -21,32 +33,58 @@ C: <duration> duration
 : <date> ( year month day -- timestamp )
     0 0 0 gmt-offset-duration <timestamp> ;
 
-: month-names
+ERROR: not-a-month n ;
+M: not-a-month summary
+    drop "Months are indexed starting at 1" ;
+
+<PRIVATE
+: check-month ( n -- n )
+    dup zero? [ not-a-month ] when ;
+PRIVATE>
+
+: month-names ( -- array )
     {
-        "Not a month" "January" "February" "March" "April" "May" "June"
+        "January" "February" "March" "April" "May" "June"
         "July" "August" "September" "October" "November" "December"
     } ;
 
-: month-abbreviations
+: month-name ( n -- string )
+    check-month 1- month-names nth ;
+
+: month-abbreviations ( -- array )
     {
-        "Not a month"
-        "Jan" "Feb" "Mar" "Apr" "May" "Jun" "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"
+        "Jan" "Feb" "Mar" "Apr" "May" "Jun"
+        "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"
     } ;
 
-: day-names
+: month-abbreviation ( n -- array )
+    check-month 1- month-abbreviations nth ;
+
+: day-names ( -- array )
     {
         "Sunday" "Monday" "Tuesday" "Wednesday" "Thursday" "Friday" "Saturday"
     } ;
 
-: day-abbreviations2 { "Su" "Mo" "Tu" "We" "Th" "Fr" "Sa" } ;
-: day-abbreviations3 { "Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat" } ;
+: day-name ( n -- string ) day-names nth ;
 
-: average-month 30+5/12 ; inline
-: months-per-year 12 ; inline
-: days-per-year 3652425/10000 ; inline
-: hours-per-year 876582/100 ; inline
-: minutes-per-year 5259492/10 ; inline
-: seconds-per-year 31556952 ; inline
+: day-abbreviations2 ( -- array )
+    { "Su" "Mo" "Tu" "We" "Th" "Fr" "Sa" } ;
+
+: day-abbreviation2 ( n -- string )
+    day-abbreviations2 nth ;
+
+: day-abbreviations3 ( -- array )
+    { "Sun" "Mon" "Tue" "Wed" "Thu" "Fri" "Sat" } ;
+
+: day-abbreviation3 ( n -- string )
+    day-abbreviations3 nth ;
+
+: average-month ( -- ratio ) 30+5/12 ; inline
+: months-per-year ( -- integer ) 12 ; inline
+: days-per-year ( -- ratio ) 3652425/10000 ; inline
+: hours-per-year ( -- ratio ) 876582/100 ; inline
+: minutes-per-year ( -- ratio ) 5259492/10 ; inline
+: seconds-per-year ( -- integer ) 31556952 ; inline
 
 :: julian-day-number ( year month day -- n )
     #! Returns a composite date number
@@ -113,10 +151,12 @@ GENERIC: +second ( timestamp x -- timestamp )
     [ floor >integer ] keep over - ;
 
 : adjust-leap-year ( timestamp -- timestamp )
-    dup day>> 29 = over month>> 2 = pick leap-year? not and and
+    dup
+    { [ day>> 29 = ] [ month>> 2 = ] [ leap-year? not ] } 1&&
     [ 3 >>month 1 >>day ] when ;
 
-: unless-zero >r dup zero? [ drop ] r> if ; inline
+: unless-zero ( n quot -- )
+    [ dup zero? [ drop ] ] dip if ; inline
 
 M: integer +year ( timestamp n -- timestamp )
     [ [ + ] curry change-year adjust-leap-year ] unless-zero ;

@@ -26,7 +26,7 @@ TUPLE: document < model locs ;
 : remove-loc ( loc document -- ) locs>> delete ;
 
 : update-locs ( loc document -- )
-    document-locs [ set-model ] with each ;
+    locs>> [ set-model ] with each ;
 
 : doc-line ( n document -- string ) model-value nth ;
 
@@ -132,7 +132,7 @@ TUPLE: document < model locs ;
 
 : set-doc-string ( string document -- )
     >r string-lines V{ } like r> [ set-model ] keep
-    dup doc-end swap update-locs ;
+    [ doc-end ] [ update-locs ] bi ;
 
 : clear-doc ( document -- )
     "" swap set-doc-string ;

@@ -1,5 +1,5 @@
 USING: help.markup help.syntax io kernel math quotations
-opengl.gl assocs vocabs.loader sequences ;
+opengl.gl assocs vocabs.loader sequences accessors ;
 IN: opengl
 
 HELP: gl-color
@@ -91,17 +91,17 @@ HELP: do-attribs
 HELP: sprite
 { $class-description "A sprite is an OpenGL texture together with a display list which renders a textured quad. Sprites are used to draw text in the UI. Sprites have the following slots:"
     { $list
-        { { $link sprite-dlist } " - an OpenGL display list ID" }
-        { { $link sprite-texture } " - an OpenGL texture ID" }
-        { { $link sprite-loc } " - top-left corner of the sprite" }
-        { { $link sprite-dim } " - dimensions of the sprite" }
-        { { $link sprite-dim2 } " - dimensions of the sprite, rounded up to the nearest powers of two" }
+        { { $link dlist>> } " - an OpenGL display list ID" }
+        { { $link texture>> } " - an OpenGL texture ID" }
+        { { $link loc>> } " - top-left corner of the sprite" }
+        { { $link dim>> } " - dimensions of the sprite" }
+        { { $link dim2>> } " - dimensions of the sprite, rounded up to the nearest powers of two" }
     }
 } ;
 
 HELP: gray-texture
 { $values { "sprite" sprite } { "pixmap" "an alien or byte array" } { "id" "an OpenGL texture ID" } }
-{ $description "Creates a new OpenGL texture from a 1 byte per pixel image whose dimensions are equal to " { $link sprite-dim2 } "." } ;
+{ $description "Creates a new OpenGL texture from a 1 byte per pixel image whose dimensions are equal to " { $snippet "dim2" } "." } ;
 
 HELP: gen-dlist
 { $values { "id" integer } }
