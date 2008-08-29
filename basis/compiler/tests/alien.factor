@@ -3,7 +3,7 @@ USING: alien alien.c-types alien.syntax compiler kernel
 namespaces namespaces tools.test sequences stack-checker
 stack-checker.errors words arrays parser quotations
 continuations effects namespaces.private io io.streams.string
-memory system threads tools.test math ;
+memory system threads tools.test math accessors ;
 
 FUNCTION: void ffi_test_0 ;
 [ ] [ ffi_test_0 ] unit-test
@@ -288,7 +288,7 @@ FUNCTION: ulonglong ffi_test_38 ( ulonglong x, ulonglong y ) ;
 
 : callback-1 ( -- callback ) "void" { } "cdecl" [ ] alien-callback ;
 
-[ 0 1 ] [ [ callback-1 ] infer dup effect-in swap effect-out ] unit-test
+[ 0 1 ] [ [ callback-1 ] infer [ in>> ] [ out>> ] bi ] unit-test
 
 [ t ] [ callback-1 alien? ] unit-test
 
