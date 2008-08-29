@@ -51,9 +51,11 @@ GENERIC: cleanup* ( node -- node/nodes )
     tri prefix ;
 
 : cleanup-inlining ( #call -- nodes )
-    [ dup method>> [ drop ] [ word>> +inlined+ depends-on ] if ]
-    [ body>> cleanup ]
-    bi ;
+    [
+        dup method>>
+        [ method>> dup word? [ +called+ depends-on ] [ drop ] if ]
+        [ word>> +inlined+ depends-on ] if
+    ] [ body>> cleanup ] bi ;
 
 ! Removing overflow checks
 : no-overflow-variant ( op -- fast-op )
