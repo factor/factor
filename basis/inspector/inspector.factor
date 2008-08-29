@@ -72,7 +72,7 @@ M: tuple error. describe ;
     namestack namestack. ;
 
 : :vars ( -- )
-    error-continuation get continuation-name namestack. ;
+    error-continuation get name>> namestack. ;
 
 SYMBOL: inspector-hook
 

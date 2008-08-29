@@ -324,7 +324,7 @@ TUPLE: pathname string ;
 
 C: <pathname> pathname
 
-M: pathname <=> [ pathname-string ] compare ;
+M: pathname <=> [ string>> ] compare ;
 
 ! Home directory
 HOOK: home os ( -- dir )

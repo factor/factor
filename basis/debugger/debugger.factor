@@ -44,7 +44,7 @@ M: string error. print ;
 : restart. ( restart n -- )
     [
         1+ dup 3 <= [ ":" % # "    " % ] [ # " :res  " % ] if
-        restart-name %
+        name>> %
     ] "" make print ;
 
 : restarts. ( -- )

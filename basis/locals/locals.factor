@@ -75,7 +75,7 @@ TUPLE: quote local ;
 C: <quote> quote
 
 : local-index ( obj args -- n )
-    [ dup quote? [ quote-local ] when eq? ] with find drop ;
+    [ dup quote? [ local>> ] when eq? ] with find drop ;
 
 : read-local-quot ( obj args -- quot )
     local-index 1+ [ get-local ] curry ;
@@ -87,7 +87,7 @@ C: <quote> quote
 : localize ( obj args -- quot )
     {
         { [ over local? ]        [ read-local-quot ] }
-        { [ over quote? ]        [ >r quote-local r> read-local-quot ] }
+        { [ over quote? ]        [ >r local>> r> read-local-quot ] }
         { [ over local-word? ]   [ read-local-quot [ call ] append ] }
         { [ over local-reader? ] [ read-local-quot [ local-value ] append ] }
         { [ over local-writer? ] [ localize-writer ] }
