@@ -16,10 +16,13 @@ M: mirror at*
     [ nip object>> ] [ object-slots slot-named ] 2bi
     dup [ offset>> slot t ] [ 2drop f f ] if ;
 
+ERROR: no-such-slot slot ;
+ERROR: read-only-slot slot ;
+
 : check-set-slot ( val slot -- val offset )
     {
-        { [ dup not ] [ "No such slot" throw ] }
-        { [ dup read-only>> ] [ "Read only slot" throw ] }
+        { [ dup not ] [ no-such-slot ] }
+        { [ dup read-only>> ] [ read-only-slot ] }
         { [ 2dup class>> instance? not ] [ class>> bad-slot-value ] }
         [ offset>> ]
     } cond ; inline
