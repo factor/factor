@@ -30,7 +30,7 @@ TUPLE: lexer text line line-text line-length column ;
 : change-lexer-column ( lexer quot -- )
     swap
     [ [ column>> ] [ line-text>> ] bi rot call ] keep
-    swap >>column drop ; inline
+    (>>column) ; inline
 
 GENERIC: skip-blank ( lexer -- )
 
