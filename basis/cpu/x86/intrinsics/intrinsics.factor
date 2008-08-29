@@ -404,10 +404,8 @@ IN: cpu.x86.intrinsics
 
 : %alien-integer-set ( quot reg -- )
     small-reg PUSH
-    "offset" get "value" get = [
-        "value" operand %untag-fixnum
-    ] unless
     small-reg "value" operand MOV
+    small-reg %untag-fixnum
     swap %alien-accessor
     small-reg POP ; inline
 
