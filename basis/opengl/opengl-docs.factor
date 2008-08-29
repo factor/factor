@@ -91,11 +91,11 @@ HELP: do-attribs
 HELP: sprite
 { $class-description "A sprite is an OpenGL texture together with a display list which renders a textured quad. Sprites are used to draw text in the UI. Sprites have the following slots:"
     { $list
-        { { $link dlist>> } " - an OpenGL display list ID" }
-        { { $link texture>> } " - an OpenGL texture ID" }
-        { { $link loc>> } " - top-left corner of the sprite" }
-        { { $link dim>> } " - dimensions of the sprite" }
-        { { $link dim2>> } " - dimensions of the sprite, rounded up to the nearest powers of two" }
+        { { $snippet "dlist" } " - an OpenGL display list ID" }
+        { { $snippet "texture" } " - an OpenGL texture ID" }
+        { { $snippet "loc" } " - top-left corner of the sprite" }
+        { { $snippet "dim" } " - dimensions of the sprite" }
+        { { $snippet "dim2" } " - dimensions of the sprite, rounded up to the nearest powers of two" }
     }
 } ;
 
