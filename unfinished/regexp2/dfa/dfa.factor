@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators fry kernel locals
 math math.order regexp2.nfa regexp2.transition-tables sequences
-sets sorting vectors regexp2.utils sequences.lib ;
+sets sorting vectors regexp2.utils sequences.lib combinators.lib
+sequences.deep ;
 USING: io prettyprint threads ;
 IN: regexp2.dfa
 
@@ -66,5 +67,13 @@ IN: regexp2.dfa
     [ >>start-state drop ] keep
     1vector >>new-states drop ;
 
+: set-traversal-flags ( regexp -- )
+    [ dfa-table>> transitions>> keys ]
+    [ nfa-traversal-flags>> ]
+    bi 2drop ;
+
 : construct-dfa ( regexp -- )
-    [ set-initial-state ] [ new-transitions ] [ set-final-states ] tri ;
+    [ set-initial-state ]
+    [ new-transitions ]
+    [ set-final-states ] tri ;
+    ! [ set-traversal-flags ] quad ;

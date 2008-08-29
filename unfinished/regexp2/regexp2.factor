@@ -12,7 +12,8 @@ IN: regexp2
         <transition-table> >>nfa-table
         <transition-table> >>dfa-table
         <transition-table> >>minimized-table
-        H{ } clone >>traversal-flags
+        H{ } clone >>nfa-traversal-flags
+        H{ } clone >>dfa-traversal-flags
         reset-regexp ;
 
 : construct-regexp ( regexp -- regexp' )

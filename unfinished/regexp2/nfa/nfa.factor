@@ -46,7 +46,7 @@ GENERIC: nfa-node ( node -- )
 
 : add-traversal-flag ( flag -- )
     stack peek second
-    current-regexp get traversal-flags>> push-at ;
+    current-regexp get nfa-traversal-flags>> push-at ;
 
 :: concatenate-nodes ( -- )
     [let* | regexp [ current-regexp get ]
