@@ -1,14 +1,14 @@
 USING: hints kernel math ;
 IN: math.bitfields.lib
 
-: clear-bit ( x n -- y ) 2^ bitnot bitand ; foldable
-: set-bit ( x n -- y ) 2^ bitor ; foldable
-: bit-clear? ( x n -- ? ) 2^ bitand zero? ; foldable
-: unmask ( x n -- ? ) bitnot bitand ; foldable
-: unmask? ( x n -- ? ) unmask 0 > ; foldable
-: mask ( x n -- ? ) bitand ; foldable
-: mask? ( x n -- ? ) mask 0 > ; foldable
-: wrap ( m n -- m' ) 1- bitand ; foldable
+: clear-bit ( x n -- y ) 2^ bitnot bitand ; inline
+: set-bit ( x n -- y ) 2^ bitor ; inline
+: bit-clear? ( x n -- ? ) 2^ bitand zero? ; inline
+: unmask ( x n -- ? ) bitnot bitand ; inline
+: unmask? ( x n -- ? ) unmask 0 > ; inline
+: mask ( x n -- ? ) bitand ; inline
+: mask? ( x n -- ? ) mask 0 > ; inline
+: wrap ( m n -- m' ) 1- bitand ; inline
 : bits ( m n -- m' ) 2^ wrap ; inline
 : mask-bit ( m n -- m' ) 1- 2^ mask ; inline
 
