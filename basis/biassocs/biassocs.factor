@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel assocs accessors ;
+USING: kernel assocs accessors summary ;
 IN: biassocs
 
 TUPLE: biassoc from to ;
@@ -23,8 +23,13 @@ M: biassoc value-at* to>> at* ;
 M: biassoc set-at
     [ from>> set-at ] [ swapd to>> once-at ] 3bi ;
 
+ERROR: no-biassoc-deletion ;
+
+M: no-biassoc-deletion summary
+    drop "biassocs do not support deletion" ;
+
 M: biassoc delete-at
-    "biassocs do not support deletion" throw ;
+    no-biassoc-deletion ;
 
 M: biassoc >alist
     from>> >alist ;
