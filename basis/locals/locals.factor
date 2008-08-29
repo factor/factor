@@ -418,7 +418,7 @@ M: lambda-memoized reset-word
 : method-stack-effect ( method -- effect )
     dup "lambda" word-prop vars>>
     swap "method-generic" word-prop stack-effect
-    dup [ effect-out ] when
+    dup [ out>> ] when
     <effect> ;
 
 M: lambda-method synopsis*
