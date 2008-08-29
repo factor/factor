@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences sequences.deep combinators fry
 classes.algebra namespaces assocs words math math.private
-math.partial-dispatch classes classes.tuple classes.tuple.private
-definitions stack-checker.state stack-checker.branches
-compiler.tree
+math.partial-dispatch math.intervals classes classes.tuple
+classes.tuple.private layouts definitions stack-checker.state
+stack-checker.branches compiler.tree
 compiler.tree.intrinsics
 compiler.tree.combinators
 compiler.tree.propagation.info
@@ -64,9 +64,19 @@ GENERIC: cleanup* ( node -- node/nodes )
         { fixnum-shift fixnum-shift-fast }
     } at ;
 
+: (remove-overflow-check?) ( #call -- ? )
+    node-output-infos first class>> fixnum class<= ;
+
+: small-shift? ( #call -- ? )
+    node-input-infos second interval>>
+    0 cell-bits tag-bits get - [a,b] interval-subset? ;
+
 : remove-overflow-check? ( #call -- ? )
-    dup word>> no-overflow-variant
-    [ node-output-infos first class>> fixnum class<= ] [ drop f ] if ;
+    {
+        { [ dup word>> \ fixnum-shift eq? ] [ [ (remove-overflow-check?) ] [ small-shift? ] bi and ] }
+        { [ dup word>> no-overflow-variant ] [ (remove-overflow-check?) ] }
+        [ drop f ]
+    } cond ;
 
 : remove-overflow-check ( #call -- #call )
     [ in-d>> ] [ out-d>> ] [ word>> no-overflow-variant ] tri #call cleanup* ;
