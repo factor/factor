@@ -648,7 +648,7 @@ UNION: immediate fixnum POSTPONE: f ;
     phantom-datastack get stack>> push ;
 
 : phantom-shuffle ( shuffle -- )
-    [ effect-in length phantom-datastack get phantom-input ] keep
+    [ in>> length phantom-datastack get phantom-input ] keep
     shuffle* phantom-datastack get phantom-append ;
 
 : phantom->r ( n -- )
