@@ -2,7 +2,7 @@
 ! Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences arrays assocs sequences.private
-growable accessors math.order ;
+growable accessors math.order summary ;
 IN: heaps
 
 GENERIC: heap-push* ( value key heap -- entry )
@@ -161,10 +161,13 @@ M: heap heap-push* ( value key heap -- entry )
 M: heap heap-peek ( heap -- value key )
     data-first >entry< ;
 
+ERROR: bad-heap-delete ;
+
+M: bad-heap-delete summary 
+    drop "Invalid entry passed to heap-delete" ;
+    
 : entry>index ( entry heap -- n )
-    over entry-heap eq? [
-        "Invalid entry passed to heap-delete" throw
-    ] unless
+    over entry-heap eq? [ bad-heap-delete ] unless
     entry-index ;
 
 M: heap heap-delete ( entry heap -- )
