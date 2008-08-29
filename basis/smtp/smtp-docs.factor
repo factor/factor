@@ -23,7 +23,8 @@ HELP: send-email
 { $description "Sends an " { $link email } " object to an STMP server stored in the " { $link smtp-server } " variable.  The required slots are " { $snippet "from" } " and " { $snippet "to" } "." }
 
 { $examples
-    { $example "<email>"
+    { $unchecked-example "USING: accessors smtp ;"
+    "<email>"
     "    \"groucho@marx.bros\" >>from"
     "    { \"chico@marx.bros\" \"harpo@marx.bros\" } >>to"
     "    { \"gummo@marx.bros\" } >>cc"
