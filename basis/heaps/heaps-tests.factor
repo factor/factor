@@ -58,7 +58,7 @@ IN: heaps.tests
     dup length random dup pick nth >r swap delete-nth r> ;
 
 : sort-entries ( entries -- entries' )
-    [ [ entry-key ] compare ] sort ;
+    [ [ key>> ] compare ] sort ;
 
 : delete-test ( n -- ? )
     [
@@ -67,7 +67,7 @@ IN: heaps.tests
         dup data>> clone swap
     ] keep 3 /i [ 2dup >r delete-random r> heap-delete ] times
     data>>
-    [ [ entry-key ] map ] bi@
+    [ [ key>> ] map ] bi@
     [ natural-sort ] bi@ ;
 
 11 [
