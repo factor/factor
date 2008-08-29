@@ -17,12 +17,12 @@ HELP: gmt-offset-duration
 { $description "Returns a " { $link duration } " object with the GMT offset returned by " { $link gmt-offset } "." } ;
 
 HELP: <date>
-{ $values { "year" real } { "month" real } { "day" real } }
+{ $values { "year" integer } { "month" integer } { "day" integer } { "timestamp" timestamp } }
 { $description "Returns a timestamp object representing the start of the specified day in your current timezone." }
 { $examples
-    { $example "USE: calendar"
+    { $example "USING: calendar prettyprint ;"
                "12 25 2010 <date> ."
-                "T{ timestamp f 12 25 2010 0 0 0 T{ duration f 0 0 0 -5 0 0 }"
+                "T{ timestamp f 12 25 2010 0 0 0 T{ duration f 0 0 0 -5 0 0 } }"
     }
 } ;
 
