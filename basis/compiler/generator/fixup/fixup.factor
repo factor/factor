@@ -15,7 +15,7 @@ TUPLE: frame-required n ;
 
 : stack-frame-size ( code -- n )
     no-stack-frame [
-        dup frame-required? [ frame-required-n max ] [ drop ] if
+        dup frame-required? [ n>> max ] [ drop ] if
     ] reduce ;
 
 GENERIC: fixup* ( frame-size obj -- frame-size )
