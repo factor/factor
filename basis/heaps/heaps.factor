@@ -61,7 +61,7 @@ M: heap heap-size ( heap -- n )
     >r right r> data-nth ; inline
 
 : data-set-nth ( entry n heap -- )
-    >r [ swap set-entry-index ] 2keep r>
+    >r [ >>index drop ] 2keep r>
     data>> set-nth-unsafe ;
 
 : data-push ( entry heap -- n )
@@ -87,7 +87,7 @@ M: heap heap-size ( heap -- n )
 
 GENERIC: heap-compare ( pair1 pair2 heap -- ? )
 
-: (heap-compare) drop [ entry-key ] compare ; inline
+: (heap-compare) drop [ key>> ] compare ; inline
 
 M: min-heap heap-compare (heap-compare) +gt+ eq? ;
 
@@ -167,8 +167,8 @@ M: bad-heap-delete summary
     drop "Invalid entry passed to heap-delete" ;
     
 : entry>index ( entry heap -- n )
-    over entry-heap eq? [ bad-heap-delete ] unless
-    entry-index ;
+    over heap>> eq? [ bad-heap-delete ] unless
+    index>> ;
 
 M: heap heap-delete ( entry heap -- )
     [ entry>index ] keep
