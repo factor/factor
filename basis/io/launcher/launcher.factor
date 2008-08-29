@@ -53,7 +53,7 @@ SYMBOL: +realtime-priority+
     dup handle>> swap status>> or ;
 
 : process-running? ( process -- ? )
-    process-handle >boolean ;
+    handle>> >boolean ;
 
 ! Non-blocking process exit notification facility
 SYMBOL: processes
@@ -80,7 +80,7 @@ SYMBOL: wait-flag
     V{ } clone swap processes get set-at
     wait-flag get-global raise-flag ;
 
-M: process hashcode* process-handle hashcode* ;
+M: process hashcode* handle>> hashcode* ;
 
 : pass-environment? ( process -- ? )
     dup environment>> assoc-empty? not
@@ -99,9 +99,14 @@ M: process hashcode* process-handle hashcode* ;
 
 GENERIC: >process ( obj -- process )
 
+ERROR: process-already-started ;
+
+M: process-already-started summary
+    drop "Process has already been started once" ;
+
 M: process >process
     dup process-started? [
-        "Process has already been started once" throw
+        process-already-started
     ] when
     clone ;
 
@@ -111,6 +116,8 @@ HOOK: current-process-handle io-backend ( -- handle )
 
 HOOK: run-process* io-backend ( process -- handle )
 
+ERROR: process-was-killed ;
+
 : wait-for-process ( process -- status )
     [
         dup handle>>
@@ -119,7 +126,7 @@ HOOK: run-process* io-backend ( process -- handle )
             "process" suspend drop
         ] when
         dup killed>>
-        [ "Process was killed" throw ] [ status>> ] if
+        [ process-was-killed ] [ status>> ] if
     ] with-timeout ;
 
 : run-detached ( desc -- process )
@@ -150,7 +157,7 @@ HOOK: kill-process* io-backend ( handle -- )
 
 M: process timeout timeout>> ;
 
-M: process set-timeout set-process-timeout ;
+M: process set-timeout swap >>timeout drop ;
 
 M: process cancel-operation kill-process ;
 
@@ -222,10 +229,12 @@ GENERIC: underlying-handle ( stream -- handle )
 
 M: port underlying-handle handle>> ;
 
+ERROR: invalid-duplex-stream ;
+
 M: duplex-stream underlying-handle
     [ in>> underlying-handle ]
     [ out>> underlying-handle ] bi
-    [ = [ "Invalid duplex stream" throw ] when ] keep ;
+    [ = [ invalid-duplex-stream ] when ] keep ;
 
 M: encoder underlying-handle
     stream>> underlying-handle ;

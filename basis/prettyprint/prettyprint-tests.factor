@@ -2,7 +2,8 @@ USING: arrays definitions io.streams.string io.streams.duplex
 kernel math namespaces parser prettyprint prettyprint.config
 prettyprint.sections sequences tools.test vectors words
 effects splitting generic.standard prettyprint.private
-continuations generic compiler.units tools.walker eval ;
+continuations generic compiler.units tools.walker eval
+accessors ;
 IN: prettyprint.tests
 
 [ "4" ] [ 4 unparse ] unit-test
@@ -296,7 +297,7 @@ M: class-see-layout class-see-layout ;
     [ \ class-see-layout see-methods ] with-string-writer "\n" split
 ] unit-test
 
-[ ] [ \ effect-in synopsis drop ] unit-test
+[ ] [ \ in>> synopsis drop ] unit-test
 
 ! Regression
 [ t ] [
