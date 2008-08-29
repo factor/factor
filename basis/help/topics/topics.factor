@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.x
-USING: accessors arrays definitions generic assocs
+USING: arrays definitions generic assocs
 io kernel namespaces prettyprint prettyprint.sections
 sequences words summary classes strings vocabs ;
 IN: help.topics
@@ -16,12 +16,12 @@ M: link >link ;
 M: vocab-spec >link ;
 M: object >link link boa ;
 
-PREDICATE: word-link < link name>> word? ;
+PREDICATE: word-link < link link-name word? ;
 
 M: link summary
     [
         "Link: " %
-        name>> dup word? [ summary ] [ unparse ] if %
+        link-name dup word? [ summary ] [ unparse ] if %
     ] "" make ;
 
 ! Help articles
@@ -44,7 +44,9 @@ TUPLE: article title content loc ;
 
 M: article article-name article-title ;
 
-ERROR: no-article name ;
+TUPLE: no-article name ;
+
+: no-article ( name -- * ) \ no-article boa throw ;
 
 M: no-article summary
     drop "Help article does not exist" ;
@@ -58,11 +60,11 @@ M: object article-content article article-content ;
 M: object article-parent article-xref get at ;
 M: object set-article-parent article-xref get set-at ;
 
-M: link article-name name>> article-name ;
-M: link article-title name>> article-title ;
-M: link article-content name>> article-content ;
-M: link article-parent name>> article-parent ;
-M: link set-article-parent name>> set-article-parent ;
+M: link article-name link-name article-name ;
+M: link article-title link-name article-title ;
+M: link article-content link-name article-content ;
+M: link article-parent link-name article-parent ;
+M: link set-article-parent link-name set-article-parent ;
 
 ! Special case: f help
 M: f article-name drop \ f article-name ;
