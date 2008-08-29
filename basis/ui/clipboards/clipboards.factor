@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel ui.gadgets ui.gestures namespaces ;
+USING: kernel accessors ui.gadgets ui.gestures namespaces ;
 IN: ui.clipboards
 
 ! Two text transfer buffers
@@ -14,7 +14,7 @@ M: object paste-clipboard
 
 GENERIC: copy-clipboard ( string gadget clipboard -- )
 
-M: object copy-clipboard nip set-clipboard-contents ;
+M: object copy-clipboard nip (>>contents) ;
 
 SYMBOL: clipboard
 SYMBOL: selection
