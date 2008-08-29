@@ -1,4 +1,5 @@
 USING: kernel tools.test base64 strings ;
+IN: base64.tests
 
 [ "abcdefghijklmnopqrstuvwxyz" ] [ "abcdefghijklmnopqrstuvwxyz" >base64 base64> >string
 ] unit-test
