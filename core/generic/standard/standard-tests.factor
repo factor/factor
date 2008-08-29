@@ -317,3 +317,14 @@ M: xref-tuple-2 xref-test (xref-test) ;
 [ t ] [
     \ + \ nth effective-method nip dup \ nth "default-method" word-prop eq? and
 ] unit-test
+
+GENERIC: wide-predicate-bug ( obj -- n )
+
+PREDICATE: b-predicate < object { { } } member? ;
+
+M: b-predicate wide-predicate-bug drop 0 ;
+
+M: array wide-predicate-bug drop 1 ;
+
+[ 0 ] [ { } wide-predicate-bug ] unit-test
+[ 1 ] [ { 1 } wide-predicate-bug ] unit-test

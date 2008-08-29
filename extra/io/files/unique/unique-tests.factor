@@ -1,3 +1,5 @@
+USING: io.encodings.ascii sequences strings io io.files accessors
+tools.test kernel io.files.unique ;
 IN: io.files.unique.tests
 
 [ 123 ] [

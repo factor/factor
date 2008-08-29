@@ -120,7 +120,7 @@ IN: compiler.tree.dead-code.tests
 : call-recursive-dce-1 ( a -- b )
     [ call-recursive-dce-1 drop ] [ call-recursive-dce-1 ] bi ; inline recursive
 
-[ [ "WRAP" [ dup >r "REC" drop r> "REC" ] label ] ] [
+[ [ drop "WRAP" [ "REC" drop "REC" ] label ] ] [
     [ call-recursive-dce-1 ] optimize-quot squish
 ] unit-test
 
@@ -134,7 +134,7 @@ IN: compiler.tree.dead-code.tests
     [ f call-recursive-dce-2 drop ] optimize-quot squish
 ] unit-test
 
-[ [ "WRAP" [ produce-a-value dup . drop "REC" ] label ] ] [
+[ [ "WRAP" [ produce-a-value . "REC" ] label ] ] [
     [ f call-recursive-dce-2 ] optimize-quot squish
 ] unit-test
 
@@ -152,7 +152,7 @@ IN: compiler.tree.dead-code.tests
 : call-recursive-dce-4 ( a -- b )
     call-recursive-dce-4 ; inline recursive
 
-[ [ "WRAP" [ "REC" ] label ] ] [
+[ [ drop "WRAP" [ "REC" ] label ] ] [
     [ call-recursive-dce-4 ] optimize-quot squish
 ] unit-test
 

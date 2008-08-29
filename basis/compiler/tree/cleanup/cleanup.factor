@@ -69,7 +69,7 @@ GENERIC: cleanup* ( node -- node/nodes )
 
 : small-shift? ( #call -- ? )
     node-input-infos second interval>>
-    0 cell-bits tag-bits get - [a,b] interval-subset? ;
+    cell-bits tag-bits get - [ neg ] keep [a,b] interval-subset? ;
 
 : remove-overflow-check? ( #call -- ? )
     {
