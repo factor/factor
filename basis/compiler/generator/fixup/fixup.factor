@@ -29,7 +29,7 @@ TUPLE: label offset ;
 : <label> ( -- label ) label new ;
 
 M: label fixup*
-    compiled-offset swap set-label-offset ;
+    compiled-offset >>offset drop ;
 
 : define-label ( name -- ) <label> swap set ;
 
@@ -138,7 +138,7 @@ SYMBOL: literal-table
 
 : resolve-labels ( labels -- labels' )
     [
-        first3 label-offset
+        first3 offset>>
         [ "Unresolved label" throw ] unless*
         3array
     ] map concat ;
