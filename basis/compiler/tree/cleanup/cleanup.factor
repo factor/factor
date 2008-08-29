@@ -102,8 +102,11 @@ M: #declare cleanup* drop f ;
 : fold-only-branch ( #branch -- node/nodes )
     #! If only one branch is live we don't need to branch at
     #! all; just drop the condition value.
-    dup live-children sift dup length 1 =
-    [ first swap in-d>> #drop prefix ] [ drop ] if ;
+    dup live-children sift dup length {
+        { 0 [ 2drop f ] }
+        { 1 [ first swap in-d>> #drop prefix ] }
+        [ 2drop ]
+    } case ;
 
 SYMBOL: live-branches
 
@@ -118,15 +121,18 @@ M: #branch cleanup*
         [ live-branches>> live-branches set ]
     } cleave ;
 
+: output-fs ( values -- nodes )
+    [ f swap #push ] map ;
+
 : eliminate-single-phi ( #phi -- node )
     [ phi-in-d>> first ] [ out-d>> ] bi over [ +bottom+ eq? ] all?
-    [ [ drop ] [ [ f swap #push ] map ] bi* ]
+    [ [ drop ] [ output-fs ] bi* ]
     [ #copy ]
     if ;
 
 : eliminate-phi ( #phi -- node )
     live-branches get sift length {
-        { 0 [ drop f ] }
+        { 0 [ out-d>> output-fs ] }
         { 1 [ eliminate-single-phi ] }
         [ drop ]
     } case ;
