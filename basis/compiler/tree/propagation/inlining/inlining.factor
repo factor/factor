@@ -125,21 +125,20 @@ SYMBOL: history
 : remember-inlining ( word -- )
     history [ swap suffix ] change ;
 
-: inline-word ( #call word -- )
+: inline-word ( #call word -- ? )
     dup history get memq? [
-        2drop
+        2drop f
     ] [
         [
             dup remember-inlining
             dupd def>> splicing-nodes >>body
             propagate-body
         ] with-scope
+        t
     ] if ;
 
 : inline-method-body ( #call word -- ? )
-    2dup should-inline? [ inline-word t ] [ 2drop f ] if ;
+    2dup should-inline? [ inline-word ] [ 2drop f ] if ;
 
 : always-inline-word? ( word -- ? )
     { curry compose } memq? ;
-
-: always-inline-word ( #call word -- ? ) inline-word t ;

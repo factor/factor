@@ -7,7 +7,7 @@ compiler.tree.combinators compiler.tree sequences math math.private
 kernel tools.test accessors slots.private quotations.private
 prettyprint classes.tuple.private classes classes.tuple
 compiler.tree.intrinsics namespaces compiler.tree.propagation.info
-stack-checker.errors ;
+stack-checker.errors kernel.private ;
 
 \ escape-analysis must-infer
 
@@ -315,4 +315,8 @@ C: <ro-box> ro-box
 [ 0 ] [
     [ \ too-many->r boa f f \ inference-error boa ]
     count-unboxed-allocations
+] unit-test
+
+[ 0 ] [
+    [ { null } declare [ 1 ] [ 2 ] if ] count-unboxed-allocations
 ] unit-test

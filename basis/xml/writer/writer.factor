@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: hashtables kernel math namespaces sequences strings
-assocs combinators io io.streams.string
+assocs combinators io io.streams.string accessors
 xml.data wrap xml.entities unicode.categories ;
 IN: xml.writer
 
@@ -38,9 +38,9 @@ SYMBOL: indenter
     ] when ;
 
 : print-name ( name -- )
-    dup name-space f like
+    dup space>> f like
     [ write CHAR: : write1 ] when*
-    name-tag write ;
+    main>> write ;
 
 : print-attrs ( assoc -- )
     [
@@ -59,7 +59,7 @@ M: string write-item
 
 : write-tag ( tag -- )
     ?indent CHAR: < write1
-    dup print-name tag-attrs print-attrs ;
+    dup print-name attrs>> print-attrs ;
 
 : write-start-tag ( tag -- )
     write-tag ">" write ;
@@ -68,7 +68,7 @@ M: contained-tag write-item
     write-tag "/>" write ;
 
 : write-children ( tag -- )
-    indent tag-children ?filter-children
+    indent children>> ?filter-children
     [ write-item ] each unindent ;
 
 : write-end-tag ( tag -- )
@@ -85,18 +85,18 @@ M: open-tag write-item
     r> xml-pprint? set ;
 
 M: comment write-item
-    "<!--" write comment-text write "-->" write ;
+    "<!--" write text>> write "-->" write ;
 
 M: directive write-item
-    "<!" write directive-text write CHAR: > write1 ;
+    "<!" write text>> write CHAR: > write1 ;
 
 M: instruction write-item
-    "<?" write instruction-text write "?>" write ;
+    "<?" write text>> write "?>" write ;
 
 : write-prolog ( xml -- )
-    "<?xml version=\"" write dup prolog-version write
-    "\" encoding=\"" write dup prolog-encoding write
-    prolog-standalone [ "\" standalone=\"yes" write ] when
+    "<?xml version=\"" write dup version>> write
+    "\" encoding=\"" write dup encoding>> write
+    standalone>> [ "\" standalone=\"yes" write ] when
     "\"?>" write ;
 
 : write-chunk ( seq -- )
@@ -104,10 +104,10 @@ M: instruction write-item
 
 : write-xml ( xml -- )
     {
-        [ xml-prolog write-prolog ]
-        [ xml-before write-chunk ]
-        [ write-item ]
-        [ xml-after write-chunk ]
+        [ prolog>> write-prolog ]
+        [ before>> write-chunk ]
+        [ body>> write-item ]
+        [ after>> write-chunk ]
     } cleave ;
 
 : print-xml ( xml -- )

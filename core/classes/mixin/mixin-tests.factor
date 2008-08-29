@@ -105,3 +105,7 @@ TUPLE: flat-mx-2-1 ; INSTANCE: flat-mx-2-1 flat-mx-2
 [ ] [ "IN: classes.mixin.tests MIXIN: blah" <string-reader> "mixin-reset-test" parse-stream drop ] unit-test
 
 [ t ] [ "blah" "classes.mixin.tests" lookup mixin-class? ] unit-test
+
+MIXIN: empty-mixin
+
+[ f ] [ "hi" empty-mixin? ] unit-test

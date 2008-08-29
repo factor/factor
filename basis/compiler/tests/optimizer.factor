@@ -3,7 +3,7 @@ stack-checker kernel kernel.private math prettyprint sequences
 sbufs strings tools.test vectors words sequences.private
 quotations classes classes.algebra classes.tuple.private
 continuations growable namespaces hints alien.accessors
-compiler.tree.builder compiler.tree.optimizer ;
+compiler.tree.builder compiler.tree.optimizer sequences.deep ;
 IN: optimizer.tests
 
 GENERIC: xyz ( obj -- obj )
@@ -353,3 +353,12 @@ TUPLE: some-tuple x ;
 [ 1 ] [ B{ 0 0 0 0 0 0 0 0 } [ 0 alien-unsigned-8 1+ ] compile-call ] unit-test
 [ 1 ] [ B{ 0 0 0 0 0 0 0 0 } [ 0 alien-signed-cell 1+ ] compile-call ] unit-test
 [ 1 ] [ B{ 0 0 0 0 0 0 0 0 } [ 0 alien-unsigned-cell 1+ ] compile-call ] unit-test
+
+: deep-find-test ( seq -- ? ) [ 5 = ] deep-find ;
+
+[ 5 ] [ { 1 2 { 3 { 4 5 } } } deep-find-test ] unit-test
+[ f ] [ { 1 2 { 3 { 4 } } } deep-find-test ] unit-test
+
+[ B{ 0 1 2 3 4 5 6 7 } ] [ [ 8 [ ] B{ } map-as ] compile-call ] unit-test
+
+[ 0 ] [ 1234 [ { fixnum } declare -64 shift ] compile-call ] unit-test

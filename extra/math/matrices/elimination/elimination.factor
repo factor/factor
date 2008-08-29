@@ -31,10 +31,10 @@ SYMBOL: matrix
     >r over r> nth dup zero? [
         3drop 0
     ] [
-        >r nth dup zero? [
-            r> 2drop 0
+        >r nth dup zero? r> swap [
+            2drop 0
         ] [
-            r> swap / neg
+            swap / neg
         ] if
     ] if ;
 

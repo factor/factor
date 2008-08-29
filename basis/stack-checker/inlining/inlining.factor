@@ -67,8 +67,10 @@ SYMBOL: enter-out
     [ entry-stack-height current-stack-height swap - ]
     bi*
     = [ 2drop ] [
-        word>> current-stack-height
-        unbalanced-recursion-error inference-error
+        terminated? get [ 2drop ] [
+            word>> current-stack-height
+            unbalanced-recursion-error inference-error
+        ] if
     ] if ;
 
 : end-recursive-word ( word label -- )
@@ -79,7 +81,7 @@ SYMBOL: enter-out
 : recursive-word-inputs ( label -- n )
     entry-stack-height d-in get + ;
 
-: (inline-recursive-word) ( word -- label in out visitor )
+: (inline-recursive-word) ( word -- label in out visitor terminated? )
     dup prepare-stack
     [
         init-inference
@@ -96,11 +98,13 @@ SYMBOL: enter-out
         dup recursive-word-inputs
         meta-d get
         stack-visitor get
+        terminated? get
     ] with-scope ;
 
 : inline-recursive-word ( word -- )
     (inline-recursive-word)
-    [ consume-d ] [ output-d ] [ ] tri* #recursive, ;
+    [ [ consume-d ] [ output-d ] [ ] tri* #recursive, ] dip
+    [ terminate ] when ;
 
 : check-call-height ( label -- )
     dup entry-stack-height current-stack-height >

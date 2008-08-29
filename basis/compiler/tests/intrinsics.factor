@@ -450,3 +450,14 @@ cell 8 = [
 [ 8 ] [
     1 [ 3 fixnum-shift-fast ] compile-call
 ] unit-test
+
+TUPLE: alien-accessor-regression { b byte-array } { i fixnum } ;
+
+[ B{ 0 1 } ] [
+    B{ 0 0 } 1 alien-accessor-regression boa
+    dup [
+        { alien-accessor-regression } declare
+        [ i>> ] [ b>> ] bi over set-alien-unsigned-1
+    ] compile-call
+    b>>
+] unit-test

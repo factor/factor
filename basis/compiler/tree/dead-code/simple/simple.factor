@@ -1,7 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors words assocs sequences arrays namespaces
-fry locals classes.algebra stack-checker.backend
+fry locals definitions classes.algebra
+stack-checker.state
+stack-checker.backend
 compiler.tree
 compiler.tree.propagation.info
 compiler.tree.dead-code.liveness ;
@@ -80,11 +82,10 @@ M: #alien-indirect compute-live-values* nip look-at-inputs ;
     ] ;
 
 : drop-dead-outputs ( node -- nodes )
-    dup out-d>> drop-dead-values
-    [ in-d>> >>out-d drop ] [ 2array ] 2bi ;
+    dup out-d>> drop-dead-values tuck in-d>> >>out-d drop ;
 
 M: #introduce remove-dead-code* ( #introduce -- nodes )
-    drop-dead-outputs ;
+    dup drop-dead-outputs 2array ;
 
 M: #>r remove-dead-code*
     [ filter-live ] change-out-r
@@ -105,7 +106,9 @@ M: #push remove-dead-code*
     ] [ drop f ] if ;
 
 : remove-flushable-call ( #call -- node )
-    in-d>> #drop remove-dead-code* ;
+    [ word>> +inlined+ depends-on ]
+    [ in-d>> #drop remove-dead-code* ]
+    bi ;
 
 : some-outputs-dead? ( #call -- ? )
     out-d>> [ live-value? not ] contains? ;
@@ -115,7 +118,7 @@ M: #call remove-dead-code*
         remove-flushable-call
     ] [
         dup some-outputs-dead? [
-            drop-dead-outputs
+            dup drop-dead-outputs 2array
         ] when
     ] if ;
 

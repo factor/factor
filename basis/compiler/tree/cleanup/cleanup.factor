@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences sequences.deep combinators fry
-classes.algebra namespaces assocs math math.private
-math.partial-dispatch classes.tuple classes.tuple.private
-definitions stack-checker.state stack-checker.branches
-compiler.tree
+classes.algebra namespaces assocs words math math.private
+math.partial-dispatch math.intervals classes classes.tuple
+classes.tuple.private layouts definitions stack-checker.state
+stack-checker.branches compiler.tree
 compiler.tree.intrinsics
 compiler.tree.combinators
 compiler.tree.propagation.info
@@ -64,9 +64,19 @@ GENERIC: cleanup* ( node -- node/nodes )
         { fixnum-shift fixnum-shift-fast }
     } at ;
 
+: (remove-overflow-check?) ( #call -- ? )
+    node-output-infos first class>> fixnum class<= ;
+
+: small-shift? ( #call -- ? )
+    node-input-infos second interval>>
+    cell-bits tag-bits get - [ neg ] keep [a,b] interval-subset? ;
+
 : remove-overflow-check? ( #call -- ? )
-    dup word>> no-overflow-variant
-    [ node-output-infos first class>> fixnum class<= ] [ drop f ] if ;
+    {
+        { [ dup word>> \ fixnum-shift eq? ] [ [ (remove-overflow-check?) ] [ small-shift? ] bi and ] }
+        { [ dup word>> no-overflow-variant ] [ (remove-overflow-check?) ] }
+        [ drop f ]
+    } cond ;
 
 : remove-overflow-check ( #call -- #call )
     [ in-d>> ] [ out-d>> ] [ word>> no-overflow-variant ] tri #call cleanup* ;
@@ -92,8 +102,11 @@ M: #declare cleanup* drop f ;
 : fold-only-branch ( #branch -- node/nodes )
     #! If only one branch is live we don't need to branch at
     #! all; just drop the condition value.
-    dup live-children sift dup length 1 =
-    [ first swap in-d>> #drop prefix ] [ drop ] if ;
+    dup live-children sift dup length {
+        { 0 [ 2drop f ] }
+        { 1 [ first swap in-d>> #drop prefix ] }
+        [ 2drop ]
+    } case ;
 
 SYMBOL: live-branches
 
@@ -108,15 +121,18 @@ M: #branch cleanup*
         [ live-branches>> live-branches set ]
     } cleave ;
 
+: output-fs ( values -- nodes )
+    [ f swap #push ] map ;
+
 : eliminate-single-phi ( #phi -- node )
     [ phi-in-d>> first ] [ out-d>> ] bi over [ +bottom+ eq? ] all?
-    [ [ drop ] [ [ f swap #push ] map ] bi* ]
+    [ [ drop ] [ output-fs ] bi* ]
     [ #copy ]
     if ;
 
 : eliminate-phi ( #phi -- node )
     live-branches get sift length {
-        { 0 [ drop f ] }
+        { 0 [ out-d>> output-fs ] }
         { 1 [ eliminate-single-phi ] }
         [ drop ]
     } case ;

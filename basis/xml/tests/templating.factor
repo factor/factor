@@ -1,5 +1,5 @@
 USING: kernel xml sequences assocs tools.test io arrays namespaces
-    xml.data xml.utilities xml.writer generic sequences.deep ;
+accessors xml.data xml.utilities xml.writer generic sequences.deep ;
 IN: xml.tests
 
 : sub-tag
@@ -11,7 +11,7 @@ GENERIC: (r-ref) ( xml -- )
 M: tag (r-ref)
     sub-tag over at* [
         ref-table get at
-        swap set-tag-children
+        >>children drop
     ] [ 2drop ] if ;
 M: object (r-ref) drop ;
 
@@ -34,7 +34,7 @@ M: object (r-ref) drop ;
     [
         H{
             { "foo" { "foo" } }
-            { "bar" { "blah" T{ tag T{ name f "" "a" "" } V{ } f } } }
+            { "bar" { "blah" T{ tag f T{ name f "" "a" "" } f f } } }
             { "baz" f }
         } ref-table set
         sample-doc string>xml dup template xml>string

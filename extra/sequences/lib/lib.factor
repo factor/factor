@@ -193,7 +193,7 @@ USE: continuations
     [
         iterate-step roll
         [ 3nip ] [ iterate-next (attempt-each-integer) ] if*
-    ] [ 3drop f ] if-iterate? ; inline
+    ] [ 3drop f ] if-iterate? ; inline recursive
 PRIVATE>
 
 : attempt-each ( seq quot -- result )

@@ -66,14 +66,11 @@ delegate
 chars
 ;
 
-: construct-rule ( class -- rule )
-    >r rule new r> construct-delegate ; inline
+TUPLE: seq-rule < rule ;
 
-TUPLE: seq-rule ;
+TUPLE: span-rule < rule ;
 
-TUPLE: span-rule ;
-
-TUPLE: eol-span-rule ;
+TUPLE: eol-span-rule < rule ;
 
 : init-span ( rule -- )
     dup rule-delegate [ drop ] [
@@ -85,16 +82,15 @@ TUPLE: eol-span-rule ;
     dup init-span
     t swap set-rule-no-line-break? ;
 
-TUPLE: mark-following-rule ;
+TUPLE: mark-following-rule < rule ;
 
-TUPLE: mark-previous-rule ;
+TUPLE: mark-previous-rule < rule ;
 
-TUPLE: escape-rule ;
+TUPLE: escape-rule < rule ;
 
 : <escape-rule> ( string -- rule )
     f <string-matcher> f f f <matcher>
-    escape-rule construct-rule
-    [ set-rule-start ] keep ;
+    escape-rule new swap >>start ;
 
 GENERIC: text-hash-char ( text -- ch )
 

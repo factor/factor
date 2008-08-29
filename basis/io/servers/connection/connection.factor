@@ -87,7 +87,7 @@ M: threaded-server handle-client* handler>> call ;
         [ [ accept-connection ] with-semaphore ]
         [ accept-connection ]
         if*
-    ] [ accept-loop ] bi ; inline
+    ] [ accept-loop ] bi ; inline recursive
 
 : started-accept-loop ( server -- )
     threaded-server get

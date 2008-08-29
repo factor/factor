@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2006 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel xml arrays math generic http.client combinators
-    hashtables namespaces io base64 sequences strings calendar
-    xml.data xml.writer xml.utilities assocs math.parser debugger
-    calendar.format math.order ;
+USING: accessors kernel xml arrays math generic http.client
+combinators hashtables namespaces io base64 sequences strings
+calendar xml.data xml.writer xml.utilities assocs math.parser
+debugger calendar.format math.order ;
 IN: xml-rpc
 
 ! * Sending RPC requests
@@ -17,7 +17,7 @@ M: integer item>xml
     [ "Integers must fit in 32 bits" throw ] unless
     number>string "i4" build-tag ;
 
-PREDICATE: boolean < object { t f } member? ;
+UNION: boolean t POSTPONE: f ;
 
 M: boolean item>xml
     "1" "0" ? "boolean" build-tag ;
@@ -147,10 +147,10 @@ TAG: array xml>item
     xml>item [ "faultCode" get "faultString" get ] bind ;
 
 : receive-rpc ( xml -- rpc )
-    dup name-tag dup "methodCall" =
+    dup main>> dup "methodCall" =
     [ drop parse-method <rpc-method> ] [
         "methodResponse" = [
-            dup first-child-tag name-tag "fault" =
+            dup first-child-tag main>> "fault" =
             [ parse-fault <rpc-fault> ]
             [ parse-rpc-response <rpc-response> ] if
         ] [ "Bad main tag name" server-error ] if

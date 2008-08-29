@@ -27,7 +27,7 @@ IN: xml.generator
 
 ! Word-based XML literal syntax
 : parsed-name ( accum -- accum )
-    scan ":" split1 [ f <name> ] [ <name-tag> ] if* parsed ;
+    scan ":" split1 [ f <name> ] [ <simple-name> ] if* parsed ;
 
 : run-combinator ( accum quot1 quot2 -- accum )
     >r [ ] like parsed r> [ parsed ] each ;

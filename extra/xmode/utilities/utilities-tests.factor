@@ -1,7 +1,7 @@
 IN: xmode.utilities.tests
-USING: xmode.utilities tools.test xml xml.data kernel strings
-vectors sequences io.files prettyprint assocs unicode.case ;
-
+USING: accessors xmode.utilities tools.test xml xml.data kernel
+strings vectors sequences io.files prettyprint assocs
+unicode.case ;
 [ "hi" 3 ] [
     { 1 2 3 4 5 6 7 8 } [ H{ { 3 "hi" } } at ] map-find
 ] unit-test
@@ -35,7 +35,7 @@ TAGS>
         { { "type" >upper set-company-type } }
         init-from-tag dup
     ] keep
-    tag-children [ tag? ] filter
+    children>> [ tag? ] filter
     [ parse-employee-tag ] with each ;
 
 [

@@ -331,7 +331,7 @@ SYMBOL: +primitive+
 \ bignum-bitnot { bignum } { bignum } define-primitive
 \ bignum-bitnot make-foldable
 
-\ bignum-shift { bignum bignum } { bignum } define-primitive
+\ bignum-shift { bignum fixnum } { bignum } define-primitive
 \ bignum-shift make-foldable
 
 \ bignum< { bignum bignum } { object } define-primitive

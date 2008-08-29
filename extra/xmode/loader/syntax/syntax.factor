@@ -1,4 +1,4 @@
-USING: xmode.tokens xmode.rules xmode.keyword-map xml.data
+USING: accessors xmode.tokens xmode.rules xmode.keyword-map xml.data
 xml.utilities xml assocs kernel combinators sequences
 math.parser namespaces parser lexer xmode.utilities regexp io.files ;
 IN: xmode.loader.syntax
@@ -7,7 +7,7 @@ SYMBOL: ignore-case?
 
 ! Rule tag parsing utilities
 : (parse-rule-tag) ( rule-set tag specs class -- )
-    construct-rule swap init-from-tag swap add-rule ; inline
+    new swap init-from-tag swap add-rule ; inline
 
 : RULE:
     scan scan-word
@@ -98,4 +98,4 @@ TAGS>
 : init-eol-span-tag ( -- ) [ drop init-eol-span ] , ;
 
 : parse-keyword-tag ( tag keyword-map -- )
-    >r dup name-tag string>token swap children>string r> set-at ;
+    >r dup main>> string>token swap children>string r> set-at ;
