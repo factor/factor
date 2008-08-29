@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors sequences sequences.deep combinators fry
-classes.algebra namespaces assocs math math.private
-math.partial-dispatch classes.tuple classes.tuple.private
+classes.algebra namespaces assocs words math math.private
+math.partial-dispatch classes classes.tuple classes.tuple.private
 definitions stack-checker.state stack-checker.branches
 compiler.tree
 compiler.tree.intrinsics

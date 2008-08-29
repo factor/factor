@@ -575,3 +575,8 @@ DEFER: eee'
 : eee' ( ? -- ) >r swap [ ] r> ddd' call ; inline recursive
 
 [ [ eee' ] infer ] [ inference-error? ] must-fail-with
+
+: bogus-error ( x -- )
+    dup "A" throw [ bogus-error ] [ drop ] if ; inline recursive
+
+[ bogus-error ] must-infer

@@ -182,3 +182,8 @@ IN: compiler.tree.dead-code.tests
 [ [ drop ] ] [ [ { integer } declare f <array> drop ] optimize-quot ] unit-test
 
 [ [ f <array> drop ] ] [ [ f <array> drop ] optimize-quot ] unit-test
+
+: call-recursive-dce-7 ( obj -- elt ? )
+    dup 5 = [ t ] [ dup [ call-recursive-dce-7 ] [ drop f f ] if ] if ; inline recursive
+
+[ ] [ [ call-recursive-dce-7 ] optimize-quot drop ] unit-test

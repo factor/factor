@@ -270,6 +270,9 @@ M: tuple-class define-tuple-class
         tri* define-declared
     ] 3tri ;
 
+M: tuple-class update-generic
+    over new-class? [ 2drop ] [ call-next-method ] if ;
+
 M: tuple-class reset-class
     [
         dup "slots" word-prop [

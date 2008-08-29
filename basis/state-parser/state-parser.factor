@@ -88,8 +88,7 @@ SYMBOL: prolog-data
 : next* ( -- )
     get-char [ (next) record ] when ;
 
-: skip-until ( quot -- )
-    #! quot: ( -- ? )
+: skip-until ( quot: ( -- ? ) -- )
     get-char [
         [ call ] keep swap [ drop ] [
             next skip-until
