@@ -31,7 +31,7 @@ M: word reset
 
 : word-inputs ( word -- seq )
     stack-effect [
-        >r datastack r> effect-in length tail*
+        >r datastack r> in>> length tail*
     ] [
         datastack
     ] if* ;
@@ -44,7 +44,7 @@ M: word reset
 : leaving ( str -- )
     "/-- Leaving: " write dup .
     stack-effect [
-        >r datastack r> effect-out length tail* stack.
+        >r datastack r> out>> length tail* stack.
     ] [
         .s
     ] if* "\\--" print flush ;
