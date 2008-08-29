@@ -24,7 +24,7 @@ t parser-notes set-global
 
 : note. ( str -- )
     parser-notes? [
-        file get [ path>> write ] when*
+        file get [ path>> write ":" write ] when* 
         lexer get line>> number>string write ": " write
         "Note: " write dup print
     ] when drop ;

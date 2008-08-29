@@ -33,11 +33,9 @@ TUPLE: CreateProcess-args
     CreateProcess-args >tuple< CreateProcess win32-error=0/f ;
 
 : count-trailing-backslashes ( str n -- str n )
-    >r "\\" ?tail [
-        r> 1+ count-trailing-backslashes
-    ] [
-        r>
-    ] if ;
+    >r "\\" ?tail r> swap [
+        1+ count-trailing-backslashes
+    ] when ;
 
 : fix-trailing-backslashes ( str -- str' )
     0 count-trailing-backslashes

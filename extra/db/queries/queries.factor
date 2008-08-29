@@ -14,7 +14,7 @@ GENERIC: where ( specs obj -- )
 
 : query-make ( class quot -- )
     >r sql-props r>
-    [ 0 sql-counter rot with-variable ] { "" { } { } } nmake
+    [ 0 sql-counter rot with-variable ] curry { "" { } { } } nmake
     <simple-statement> maybe-make-retryable ; inline
 
 M: db begin-transaction ( -- ) "BEGIN" sql-command ;
@@ -177,24 +177,6 @@ M: db <count-statement> ( tuple class groups -- statement )
         swap >>group
     [ [ "select count(*) from " 0% 0% where-clause ] query-make ]
     dip make-query ;
-
-: where-clause* ( tuple specs -- )
-    dupd filter-slots [
-        drop
-    ] [
-        \ where 0,
-        [ 2dup slot-name>> swap get-slot-named where ] map 2array 0,
-        drop
-    ] if-empty ;
-
-: delete-tuple* ( tuple -- sql )
-    dup
-    [
-        delete 0, from 0, dup class db-table 0,
-        dup class db-columns where-clause*
-    ] { { } { } { } } nmake
-    >r >r parse-sql 4drop r> r>
-    <simple-statement> maybe-make-retryable do-select ;
 
 : create-index ( index-name table-name columns -- )
     [

@@ -76,10 +76,12 @@ TUPLE: interval { from read-only } { to read-only } ;
     [ from>> ] [ to>> ] bi ;
 
 : points>interval ( seq -- interval )
-    dup [ first fp-nan? ] contains? [ drop [-inf,inf] ] [
+    dup [ first fp-nan? ] contains?
+    [ drop [-inf,inf] ] [
         dup first
-        [ [ endpoint-min ] reduce ] 2keep
-        [ endpoint-max ] reduce <interval>
+        [ [ endpoint-min ] reduce ]
+        [ [ endpoint-max ] reduce ]
+        2bi <interval>
     ] if ;
 
 : (interval-op) ( p1 p2 quot -- p3 )
@@ -107,19 +109,6 @@ TUPLE: interval { from read-only } { to read-only } ;
 
 : interval- ( i1 i2 -- i3 )
     [ [ - ] interval-op ] do-empty-interval ;
-
-: interval* ( i1 i2 -- i3 )
-    [ [ * ] interval-op ] do-empty-interval ;
-
-: interval-1+ ( i1 -- i2 ) 1 [a,a] interval+ ;
-
-: interval-1- ( i1 -- i2 ) -1 [a,a] interval+ ;
-
-: interval-neg ( i1 -- i2 ) -1 [a,a] interval* ;
-
-: interval-bitnot ( i1 -- i2 ) interval-neg interval-1- ;
-
-: interval-sq ( i1 -- i2 ) dup interval* ;
 
 : interval-intersect ( i1 i2 -- i3 )
     {
@@ -157,7 +146,29 @@ TUPLE: interval { from read-only } { to read-only } ;
     dupd interval-intersect = ;
 
 : interval-contains? ( x int -- ? )
-    >r [a,a] r> interval-subset? ;
+    dup empty-interval eq? [ 2drop f ] [
+        [ from>> first2 [ >= ] [ > ] if ]
+        [ to>>   first2 [ <= ] [ < ] if ]
+        2bi and
+    ] if ;
+
+: interval-zero? ( int -- ? )
+    0 swap interval-contains? ;
+
+: interval* ( i1 i2 -- i3 )
+    [ [ [ * ] interval-op ] do-empty-interval ]
+    [ [ interval-zero? ] either? ]
+    2bi [ 0 [a,a] interval-union ] when ;
+
+: interval-1+ ( i1 -- i2 ) 1 [a,a] interval+ ;
+
+: interval-1- ( i1 -- i2 ) -1 [a,a] interval+ ;
+
+: interval-neg ( i1 -- i2 ) -1 [a,a] interval* ;
+
+: interval-bitnot ( i1 -- i2 ) interval-neg interval-1- ;
+
+: interval-sq ( i1 -- i2 ) dup interval* ;
 
 : interval-singleton? ( int -- ? )
     dup empty-interval eq? [
@@ -216,8 +227,11 @@ TUPLE: interval { from read-only } { to read-only } ;
     ] unless ;
 
 : interval-division-op ( i1 i2 quot -- i3 )
-    >r 0 over interval-closure interval-contains?
-    [ 2drop [-inf,inf] ] r> if ; inline
+    {
+        { [ 0 pick interval-closure interval-contains? ] [ 3drop [-inf,inf] ] }
+        { [ pick interval-zero? ] [ call 0 [a,a] interval-union ] }
+        [ call ]
+    } cond ; inline
 
 : interval/ ( i1 i2 -- i3 )
     [ [ [ / ] interval-op ] interval-division-op ] do-empty-interval ;

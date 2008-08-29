@@ -76,8 +76,8 @@ TUPLE: entry title url description date ;
         [ "link" tag-named "href" swap at >url >>url ]
         [
             { "content" "summary" } any-tag-named
-            dup tag-children [ string? not ] contains?
-            [ tag-children [ write-chunk ] with-string-writer ]
+            dup children>> [ string? not ] contains?
+            [ children>> [ write-chunk ] with-string-writer ]
             [ children>string ] if >>description
         ]
         [
@@ -96,7 +96,7 @@ TUPLE: entry title url description date ;
     tri ;
 
 : xml>feed ( xml -- feed )
-    dup name-tag {
+    dup main>> {
         { "RDF" [ rss1.0 ] }
         { "rss" [ rss2.0 ] }
         { "feed" [ atom1.0 ] }

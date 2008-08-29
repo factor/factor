@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel words summary slots quotations
-sequences assocs math arrays inference effects generalizations
+sequences assocs math arrays stack-checker effects generalizations
 continuations debugger classes.tuple namespaces vectors
 bit-arrays byte-arrays strings sbufs math.functions macros
 sequences.private combinators mirrors
@@ -225,17 +225,6 @@ DEFER: _
     compose ;
 
 \ new 1 [ ?wrapped empty-inverse ] define-pop-inverse
-
-: writer>reader ( word -- word' )
-    [ "writing" word-prop "slots" word-prop ] keep
-    [ swap slot-spec-writer = ] curry find nip slot-spec-reader ;
-
-: construct-inverse ( class setters -- quot )
-    >r deconstruct-pred r>
-    [ writer>reader ] map [ get-slots ] curry
-    compose ;
-
-\ construct 2 [ >r ?wrapped r> construct-inverse ] define-pop-inverse
 
 ! More useful inverse-based combinators
 

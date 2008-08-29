@@ -2,7 +2,7 @@ IN: generic.standard.tests
 USING: tools.test math math.functions math.constants
 generic.standard strings sequences arrays kernel accessors
 words float-arrays byte-arrays bit-arrays parser namespaces
-quotations inference vectors growable hashtables sbufs
+quotations stack-checker vectors growable hashtables sbufs
 prettyprint byte-vectors bit-vectors float-vectors definitions
 generic sets graphs assocs ;
 

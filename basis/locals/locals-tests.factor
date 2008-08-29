@@ -1,6 +1,7 @@
 USING: locals math sequences tools.test hashtables words kernel
 namespaces arrays strings prettyprint io.streams.string parser
-accessors generic eval ;
+accessors generic eval combinators combinators.short-circuit
+combinators.short-circuit.smart ;
 IN: locals.tests
 
 :: foo ( a b -- a a ) a a ;
@@ -276,3 +277,42 @@ M:: sequence method-with-locals ( a -- y ) a reverse ;
     [ \ sequence \ method-with-locals method see ] with-string-writer
     method-definition =
 ] unit-test
+
+:: cond-test ( a b -- c )
+    {
+        { [ a b < ] [ 3 ] }
+        { [ a b = ] [ 4 ] }
+        { [ a b > ] [ 5 ] }
+    } cond ;
+
+[ 3 ] [ 1 2 cond-test ] unit-test
+[ 4 ] [ 2 2 cond-test ] unit-test
+[ 5 ] [ 3 2 cond-test ] unit-test
+
+:: 0&&-test ( a -- ? )
+    { [ a integer? ] [ a even? ] [ a 10 > ] } 0&& ;
+
+[ f ] [ 1.5 0&&-test ] unit-test
+[ f ] [ 3 0&&-test ] unit-test
+[ f ] [ 8 0&&-test ] unit-test
+[ t ] [ 12 0&&-test ] unit-test
+
+:: &&-test ( a -- ? )
+    { [ a integer? ] [ a even? ] [ a 10 > ] } && ;
+
+[ f ] [ 1.5 &&-test ] unit-test
+[ f ] [ 3 &&-test ] unit-test
+[ f ] [ 8 &&-test ] unit-test
+[ t ] [ 12 &&-test ] unit-test
+
+:: wlet-&&-test ( a -- ? )
+    [wlet | is-integer? [ a integer? ]
+            is-even? [ a even? ]
+            >10? [ a 10 > ] |
+        { [ is-integer? ] [ is-even? ] [ >10? ] } &&
+    ] ;
+
+! [ f ] [ 1.5 wlet-&&-test ] unit-test
+! [ f ] [ 3 wlet-&&-test ] unit-test
+! [ f ] [ 8 wlet-&&-test ] unit-test
+! [ t ] [ 12 wlet-&&-test ] unit-test

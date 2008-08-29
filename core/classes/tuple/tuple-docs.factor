@@ -425,28 +425,6 @@ HELP: new
     }
 } ;
 
-HELP: construct
-{ $values { "..." "slot values" } { "slots" "a sequence of setter words" } { "class" tuple-class } { "tuple" tuple } }
-{ $description "Creates a new instance of " { $snippet "class" } ", storing consecutive stack values into the slots of the new tuple using setter words in " { $snippet "slots" } ". The top-most stack element is stored in the right-most slot." }
-{ $examples
-    "We can define a class:"
-    { $code "TUPLE: color red green blue alpha ;" }
-    "Together with two constructors:"
-    { $code
-        ": <rgb> ( r g b -- color )"
-        "    { set-color-red set-color-green set-color-blue }"
-        "    color construct ;"
-        ""
-        ": <rgba> ( r g b a -- color )"
-        "    { set-color-red set-color-green set-color-blue set-color-alpha }"
-        "    color construct ;"
-    }
-    "The last definition is actually equivalent to the following:"
-    { $code ": <rgba> ( r g b a -- color ) rgba boa ;" }
-    "Which can be abbreviated further:"
-    { $code "C: <rgba> color" }
-} ;
-
 HELP: boa
 { $values { "..." "slot values" } { "class" tuple-class } { "tuple" tuple } }
 { $description "Creates a new instance of " { $snippet "class" } " and fill in the slots from the stack, with the top-most stack element being stored in the right-most slot." }

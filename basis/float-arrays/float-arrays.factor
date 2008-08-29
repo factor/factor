@@ -47,16 +47,16 @@ M: float-array byte-length length "double" heap-size * ;
 INSTANCE: float-array sequence
 
 : 1float-array ( x -- array )
-    1 <float-array> [ set-first ] keep ; flushable
+    1 <float-array> [ set-first ] keep ; inline
 
 : 2float-array ( x y -- array )
-    T{ float-array } 2sequence ; flushable
+    T{ float-array } 2sequence ; inline
 
 : 3float-array ( x y z -- array )
-    T{ float-array } 3sequence ; flushable
+    T{ float-array } 3sequence ; inline
 
 : 4float-array ( w x y z -- array )
-    T{ float-array } 4sequence ; flushable
+    T{ float-array } 4sequence ; inline
 
 : F{ ( parsed -- parsed )
     \ } [ >float-array ] parse-literal ; parsing
@@ -68,9 +68,10 @@ M: float-array >pprint-sequence ;
 USING: hints math.vectors arrays ;
 
 HINTS: vneg { float-array } { array } ;
-HINTS: v*n { float-array object } { array object } ;
-HINTS: v/n { float-array object } { array object } ;
-HINTS: n/v { object float-array } { object array } ;
+HINTS: v*n { float-array float } { array object } ;
+HINTS: n*v { float float-array } { array object } ;
+HINTS: v/n { float-array float } { array object } ;
+HINTS: n/v { float float-array } { object array } ;
 HINTS: v+ { float-array float-array } { array array } ;
 HINTS: v- { float-array float-array } { array array } ;
 HINTS: v* { float-array float-array } { array array } ;

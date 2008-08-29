@@ -19,12 +19,9 @@ SYMBOL: restarts
 
 : c> ( -- continuation ) catchstack* pop ;
 
-: dummy ( -- obj )
-    #! Optimizing compiler assumes stack won't be messed with
-    #! in-transit. To ensure that a value is actually reified
-    #! on the stack, we put it in a non-inline word together
-    #! with a declaration.
-    f { object } declare ;
+! We have to defeat some optimizations to make continuations work
+: dummy-1 ( -- obj ) f ;
+: dummy-2 ( obj -- obj ) dup drop ;
 
 : init-catchstack ( -- ) V{ } clone 1 setenv ;
 
@@ -68,7 +65,7 @@ C: <continuation> continuation
     #! ( value f r:capture r:restore )
     #! Execution begins right after the call to 'continuation'.
     #! The 'restore' branch is taken.
-    >r >r dummy continuation r> r> ?if ; inline
+    >r >r dummy-1 continuation r> r> [ dummy-2 ] prepose ?if ; inline
 
 : callcc0 ( quot -- ) [ drop ] ifcc ; inline
 

@@ -69,8 +69,7 @@ M: bit-array resize
 
 M: bit-array byte-length length 7 + -3 shift ;
 
-: ?{ ( parsed -- parsed )
-    \ } [ >bit-array ] parse-literal ; parsing
+: ?{ \ } [ >bit-array ] parse-literal ; parsing
 
 :: integer>bit-array ( n -- bit-array ) 
     n zero? [ 0 <bit-array> ] [
@@ -84,7 +83,7 @@ M: bit-array byte-length length 7 + -3 shift ;
         ]
     ] if ;
 
-: bit-array>integer ( bit-array -- int )
+: bit-array>integer ( bit-array -- n )
     0 swap underlying>> [ length ] keep [
         uchar-nth swap 8 shift bitor
     ] curry each ;

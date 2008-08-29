@@ -194,9 +194,9 @@ METHOD: n*M.M+n*M-in-place { number double-complex-blas-matrix double-complex-bl
 syntax:M: blas-matrix-base clone
     [ 
         [
-            { data>> ld>> cols>> element-type } get-slots
-            heap-size * * memory>byte-array
-        ] [ { ld>> rows>> cols>> transpose>> } get-slots ] bi
+            { [ data>> ] [ ld>> ] [ cols>> ] [ element-type heap-size ] } cleave
+            * * memory>byte-array
+        ] [ { [ ld>> ] [ rows>> ] [ cols>> ] [ transpose>> ] } cleave ] bi
     ] keep (blas-matrix-like) ;
 
 ! XXX try rounding stride to next 128 bit bound for better vectorizin'
@@ -296,7 +296,7 @@ syntax:M: blas-matrix-rowcol-sequence nth-unsafe
     recip swap n*M ; inline
 
 : Mtranspose ( matrix -- matrix^T )
-    [ { data>> ld>> rows>> cols>> transpose>> } get-slots not ] keep (blas-matrix-like) ;
+    [ { [ data>> ] [ ld>> ] [ rows>> ] [ cols>> ] [ transpose>> not ] } cleave ] keep (blas-matrix-like) ;
 
 syntax:M: blas-matrix-base equal?
     {

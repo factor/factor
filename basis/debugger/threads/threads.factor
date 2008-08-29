@@ -20,3 +20,6 @@ M: thread error-in-thread ( error thread -- )
             error-thread get-global error-in-thread. print-error flush
         ] bind
     ] if ;
+
+[ self error-in-thread stop ]
+thread-error-hook set-global

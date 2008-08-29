@@ -101,15 +101,27 @@ $nl
 ARTICLE: "locals-limitations" "Limitations of locals"
 "The first limitation is that the " { $link >r } " and " { $link r> } " words may not be used together with locals. Instead, use the " { $link dip } " combinator."
 $nl
-"Another limitation is that closure conversion does not descend into arrays, hashtables or other types of literals. For example, the following does not work:"
+"Another limitation concerns combinators implemented as macros. Locals can only be used with such combinators if the input array immediately precedes the combinator call. For example, the following will work:"
 { $code
-    ":: bad-cond-usage ( a -- ... )"
+    ":: good-cond-usage ( a -- ... )"
     "    {"
     "        { [ a 0 < ] [ ... ] }"
     "        { [ a 0 > ] [ ... ] }"
     "        { [ a 0 = ] [ ... ] }"
     "    } cond ;"
-} ;
+}
+"But not the following:"
+{ $code
+    ": my-cond ( alist -- ) cond ; inline"
+    ""
+    ":: bad-cond-usage ( a -- ... )"
+    "    {"
+    "        { [ a 0 < ] [ ... ] }"
+    "        { [ a 0 > ] [ ... ] }"
+    "        { [ a 0 = ] [ ... ] }"
+    "    } my-cond ;"
+}
+"The reason is that locals are rewritten into stack code at parse time, whereas macro expansion is performed later during compile time. To circumvent this problem, the " { $vocab-link "macros.expander" } " vocabulary is used to rewrite simple macro usages prior to local transformation, however "{ $vocab-link "macros.expander" } " does not deal with more complicated cases where the literal inputs to the macro do not immediately precede the macro call in the source." ;
 
 ARTICLE: "locals" "Local variables and lexical closures"
 "The " { $vocab-link "locals" } " vocabulary implements lexical scope with full closures, both downward and upward. Mutable bindings are supported, including assignment to bindings in outer scope."

@@ -164,8 +164,8 @@ ERROR: bad-superclass class ;
 
 : update-slot ( old-values n class initial -- value )
     pick [
-        >r >r swap nth dup r> instance?
-        [ r> drop ] [ drop r> ] if
+        >r >r swap nth dup r> instance? r> swap
+        [ drop ] [ nip ] if
     ] [ >r 3drop r> ] if ;
 
 : apply-slot-permutation ( old-values triples -- new-values )
@@ -270,6 +270,9 @@ M: tuple-class define-tuple-class
         tri* define-declared
     ] 3tri ;
 
+M: tuple-class update-generic
+    over new-class? [ 2drop ] [ call-next-method ] if ;
+
 M: tuple-class reset-class
     [
         dup "slots" word-prop [
@@ -298,11 +301,9 @@ M: tuple-class (classes-intersect?)
         [ swap classes-intersect? ]
     } cond ;
 
-M: tuple clone
-    (clone) dup delegate clone over set-delegate ;
+M: tuple clone (clone) ;
 
-M: tuple equal?
-    over tuple? [ tuple= ] [ 2drop f ] if ;
+M: tuple equal? over tuple? [ tuple= ] [ 2drop f ] if ;
 
 M: tuple hashcode*
     [
@@ -322,14 +323,3 @@ M: tuple-class boa
     bi <tuple-boa> ;
 
 M: tuple-class initial-value* new ;
-
-! Deprecated
-M: object get-slots ( obj slots -- ... )
-    [ execute ] with each ;
-
-M: object set-slots ( ... obj slots -- )
-    <reversed> get-slots ;
-
-: delegates ( obj -- seq ) [ delegate ] follow ;
-
-: is? ( obj quot -- ? ) >r delegates r> contains? ; inline

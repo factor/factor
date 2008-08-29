@@ -3,12 +3,12 @@
 USING: continuations definitions ui.tools.browser
 ui.tools.interactor ui.tools.listener ui.tools.profiler
 ui.tools.search ui.tools.traceback ui.tools.workspace generic
-help.topics inference summary inspector io.files io.styles kernel
-namespaces parser prettyprint quotations tools.annotations
-editors tools.profiler tools.test tools.time tools.walker
-ui.commands ui.gadgets.editors ui.gestures ui.operations
-ui.tools.deploy vocabs vocabs.loader words sequences
-tools.vocabs classes compiler.units accessors ;
+help.topics stack-checker summary inspector io.files io.styles
+kernel namespaces parser prettyprint quotations
+tools.annotations editors tools.profiler tools.test tools.time
+tools.walker ui.commands ui.gadgets.editors ui.gestures
+ui.operations ui.tools.deploy vocabs vocabs.loader words
+sequences tools.vocabs classes compiler.units accessors ;
 IN: ui.tools.operations
 
 V{ } clone operations set-global

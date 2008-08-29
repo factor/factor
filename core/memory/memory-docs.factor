@@ -7,7 +7,10 @@ ARTICLE: "images" "Images"
 { $subsection save-image }
 { $subsection save-image-and-exit }
 "To start Factor with a custom image, use the " { $snippet "-i=" { $emphasis "image" } } " command line switch; see " { $link "runtime-cli-args" } "."
-{ $see-also "tools.memory" } ;
+$nl
+"New images can be created from scratch:"
+{ $subsection "bootstrap.image" }
+{ $see-also "tools.memory" "tools.deploy" } ;
 
 ABOUT: "images"
 

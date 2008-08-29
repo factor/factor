@@ -2,12 +2,12 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 USING: kernel threads vectors arrays sequences
-namespaces tools.test continuations dequeues strings math words
+namespaces tools.test continuations deques strings math words
 match quotations concurrency.messaging concurrency.mailboxes
 concurrency.count-downs accessors ;
 IN: concurrency.messaging.tests
 
-[ ] [ my-mailbox mailbox-data clear-dequeue ] unit-test
+[ ] [ my-mailbox mailbox-data clear-deque ] unit-test
 
 [ "received" ] [ 
     [

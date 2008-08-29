@@ -26,8 +26,8 @@ SYMBOL: key-value
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-M: processing-gadget handle-gesture* ( gadget gesture delegate -- ? )
-   rot drop swap         ! delegate gesture
+M: processing-gadget handle-gesture ( gesture gadget -- ? )
+   swap
    {
      {
        [ dup key-down? ]

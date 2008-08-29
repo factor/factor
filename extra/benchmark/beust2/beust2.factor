@@ -5,7 +5,7 @@ IN: benchmark.beust2
 
 ! http://crazybob.org/BeustSequence.java.html
 
-:: (count-numbers) ( remaining first value used max listener -- ? )
+:: (count-numbers) ( remaining first value used max listener: ( -- ) -- ? )
     10 first - [| i |
         [let* | digit [ i first + ]
                 mask [ digit 2^ ]
@@ -26,7 +26,7 @@ IN: benchmark.beust2
                 ] if
             ] [ f ] if
         ]
-    ] contains? ; inline
+    ] contains? ; inline recursive
 
 :: count-numbers ( max listener -- )
     10 [ 1+ 1 1 0 max listener (count-numbers) ] contains? drop ;

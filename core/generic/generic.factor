@@ -62,7 +62,9 @@ TUPLE: check-method class generic ;
     [ nip [ classes-intersect? ] [ class<= ] 2bi or ] curry assoc-filter
     values ;
 
-: update-generic ( class generic -- )
+GENERIC# update-generic 1 ( class generic -- )
+
+M: class update-generic
     affected-methods [ +called+ changed-definition ] each ;
 
 : with-methods ( class generic quot -- )
@@ -170,15 +172,12 @@ M: sequence update-methods ( class seq -- )
     ] with each ;
 
 : define-generic ( word combination -- )
-    over "combination" word-prop over = [
-        2drop
-    ] [
+    over "combination" word-prop over = [ drop ] [
         2dup "combination" set-word-prop
         over "methods" word-prop values forget-all
         over H{ } clone "methods" set-word-prop
         dupd define-default-method
-        make-generic
-    ] if ;
+    ] if make-generic ;
 
 M: generic subwords
     [

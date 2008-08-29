@@ -193,7 +193,7 @@ USE: continuations
     [
         iterate-step roll
         [ 3nip ] [ iterate-next (attempt-each-integer) ] if*
-    ] [ 3drop f ] if-iterate? ; inline
+    ] [ 3drop f ] if-iterate? ; inline recursive
 PRIVATE>
 
 : attempt-each ( seq quot -- result )
@@ -201,9 +201,6 @@ PRIVATE>
 
 : ?nth* ( n seq -- elt/f ? )
     2dup bounds-check? [ nth-unsafe t ] [ 2drop f f ] if ; flushable
-
-: nths ( seq indices -- seq' )
-    swap [ nth ] curry map ;
 
 : remove-nth ( n seq -- seq' )
     [ swap head-slice ] [ swap 1+ tail-slice ] 2bi append ;

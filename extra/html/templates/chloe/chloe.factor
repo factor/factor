@@ -28,6 +28,7 @@ DEFER: process-template
     [ drop name-url chloe-ns = not ] assoc-filter ;
 
 : chloe-tag? ( tag -- ? )
+    dup xml? [ body>> ] when
     {
         { [ dup tag? not ] [ f ] }
         { [ dup url>> chloe-ns = not ] [ f ] }
@@ -112,12 +113,12 @@ CHLOE-TUPLE: checkbox
 CHLOE-TUPLE: code
 
 : process-chloe-tag ( tag -- )
-    dup name-tag dup tags get at
+    dup main>> dup tags get at
     [ call ] [ "Unknown chloe tag: " prepend throw ] ?if ;
 
 : process-tag ( tag -- )
     {
-        [ name-tag >lower tag-stack get push ]
+        [ main>> >lower tag-stack get push ]
         [ write-start-tag ]
         [ process-tag-children ]
         [ write-end-tag ]
@@ -125,7 +126,7 @@ CHLOE-TUPLE: code
     } cleave ;
 
 : expand-attrs ( tag -- tag )
-    dup [ tag? ] is? [
+    dup [ tag? ] [ xml? ] bi or [
         clone [
             [ "@" ?head [ value present ] when ] assoc-map
         ] change-attrs
@@ -134,8 +135,8 @@ CHLOE-TUPLE: code
 : process-template ( xml -- )
     expand-attrs
     {
-        { [ dup [ chloe-tag? ] is? ] [ process-chloe-tag ] }
-        { [ dup [ tag? ] is? ] [ process-tag ] }
+        { [ dup chloe-tag? ] [ process-chloe-tag ] }
+        { [ dup [ tag? ] [ xml? ] bi or ] [ process-tag ] }
         { [ t ] [ write-item ] }
     } cond ;
 

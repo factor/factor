@@ -92,7 +92,7 @@ M:: disjoint-set equate ( a b disjoint-set -- )
     '[ , , equate ] each ;
 
 : equate-all ( seq disjoint-set -- )
-    over dup empty? [ 2drop ] [
+    over empty? [ 2drop ] [
         [ unclip-slice ] dip equate-all-with
     ] if ;
 

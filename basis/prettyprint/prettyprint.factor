@@ -58,11 +58,7 @@ IN: prettyprint
 
 : pprint ( obj -- ) [ pprint* ] with-pprint ;
 
-: . ( obj -- )
-    H{
-       { length-limit 1000 }
-       { nesting-limit 10 }
-    } clone [ pprint ] bind nl ;
+: . ( obj -- ) pprint nl ;
 
 : pprint-use ( obj -- ) [ pprint* ] with-use ;
 
@@ -128,7 +124,7 @@ PRIVATE>
 : callstack. ( callstack -- )
     callstack>array 2 <groups> [
         remove-breakpoints
-        2 nesting-limit [ . ] with-variable
+        3 nesting-limit [ . ] with-variable
     ] assoc-each ;
 
 : .c ( -- ) callstack callstack. ;

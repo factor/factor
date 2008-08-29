@@ -1,7 +1,7 @@
-IN: compiler.tests
 USING: accessors compiler compiler.units tools.test math parser
 kernel sequences sequences.private classes.mixin generic
 definitions arrays words assocs eval ;
+IN: compiler.tests
 
 GENERIC: method-redefine-test ( a -- b )
 
@@ -30,15 +30,6 @@ M: integer method-redefine-test 3 + ;
 [ f ] [ \ there compiled>> ] unit-test
 [ ] [ "IN: compiler.tests : hey ( -- ) ;" eval ] unit-test
 [ t ] [ \ there compiled>> ] unit-test
-
-! Just changing the stack effect didn't mark a word for recompilation
-DEFER: change-effect
-
-[ ] [ "IN: compiler.tests GENERIC: change-effect ( a -- b )" eval ] unit-test
-{ 1 1 } [ change-effect ] must-infer-as
-
-[ ] [ "IN: compiler.tests GENERIC: change-effect ( a -- )" eval ] unit-test
-{ 1 0 } [ change-effect ] must-infer-as
 
 : good ( -- ) ;
 : bad ( -- ) good ;

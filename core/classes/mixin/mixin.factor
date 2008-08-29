@@ -20,7 +20,9 @@ M: mixin-class rank-class drop 3 ;
     dup mixin-class? [
         drop
     ] [
-        { } redefine-mixin-class
+        [ { } redefine-mixin-class ]
+        [ update-classes ]
+        bi
     ] if ;
 
 TUPLE: check-mixin-class mixin ;

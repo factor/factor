@@ -86,7 +86,7 @@ HELP: unexpected-eof
 { $description "Throws an " { $link unexpected } " error indicating the parser was looking for an occurrence of " { $snippet "word" } " but encountered end of file." } ;
 
 HELP: with-lexer
-{ $values { "lexer" lexer } { "quot" quotation } }
+{ $values { "lexer" lexer } { "quot" quotation } { "newquot" quotation } }
 { $description "Calls the quotation with the " { $link lexer } " variable set to the given lexer. The quotation can make use of words such as " { $link scan } ". Any errors thrown by the quotation are wrapped in " { $link lexer-error } " instances." } ;
 
 HELP: lexer-factory

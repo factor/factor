@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser kernel sequences words effects
-inference.transforms combinators assocs definitions quotations
-namespaces memoize ;
+stack-checker.transforms combinators assocs definitions
+quotations namespaces memoize ;
 IN: macros
 
 : real-macro-effect ( word -- effect' )
@@ -25,8 +25,6 @@ M: macro definition "macro" word-prop ;
 
 M: macro reset-word
     [ call-next-method ] [ f "macro" set-word-prop ] bi ;
-
-: macro-expand ( ... word -- quot ) "macro" word-prop call ;
 
 : n*quot ( n seq -- seq' ) <repetition> concat >quotation ;
 

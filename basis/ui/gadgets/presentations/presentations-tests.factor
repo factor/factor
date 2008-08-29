@@ -4,7 +4,7 @@ prettyprint ui.gadgets.buttons io io.streams.string kernel
 classes.tuple ;
 
 [ t ] [
-    "Hi" \ + <presentation> [ gadget? ] is?
+    "Hi" \ + <presentation> gadget?
 ] unit-test
 
 [ "+" ] [

@@ -206,17 +206,3 @@ GENERIC: delegate ( obj -- delegate )
 M: tuple delegate 2 slot ;
 
 M: object delegate drop f ;
-
-GENERIC: set-delegate ( delegate tuple -- )
-
-M: tuple set-delegate 2 set-slot ;
-
-GENERIC# get-slots 1 ( tuple slots -- ... )
-
-GENERIC# set-slots 1 ( ... tuple slots -- )
-
-: construct ( ... slots class -- tuple )
-    new [ swap set-slots ] keep ; inline
-
-: construct-delegate ( delegate class -- tuple )
-    >r { set-delegate } r> construct ; inline

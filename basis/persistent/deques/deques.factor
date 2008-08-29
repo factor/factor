@@ -1,4 +1,4 @@
-! Copyright (C) 2008 Daniel Ehrenberg
+! Copyback (C) 2008 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors math qualified ;
 QUALIFIED: sequences
@@ -12,10 +12,10 @@ IN: persistent.deques
 TUPLE: cons { car read-only } { cdr read-only } ;
 C: <cons> cons
 
-: each ( list quot -- )
+: each ( list quot: ( elt -- ) -- )
     over
     [ [ >r car>> r> call ] [ >r cdr>> r> ] 2bi each ]
-    [ 2drop ] if ; inline
+    [ 2drop ] if ; inline recursive
 
 : reduce ( list start quot -- end )
     swapd each ; inline
@@ -33,44 +33,55 @@ C: <cons> cons
     dup length 2/ cut [ reverse ] bi@ ;
 PRIVATE>
 
-TUPLE: deque { lhs read-only } { rhs read-only } ;
+TUPLE: deque { front read-only } { back read-only } ;
 : <deque> ( -- deque ) T{ deque } ;
 
+<PRIVATE
+: flip ( deque -- newdeque )
+    [ back>> ] [ front>> ] bi deque boa ;
+
+: flipped ( deque quot -- newdeque )
+    >r flip r> call flip ;
+PRIVATE>
+
 : deque-empty? ( deque -- ? )
-    [ lhs>> ] [ rhs>> ] bi or not ;
-
-: push-left ( deque item -- newdeque )
-    swap [ lhs>> <cons> ] [ rhs>> ] bi deque boa ;
-
-: push-right ( deque item -- newdeque )
-    swap [ rhs>> <cons> ] [ lhs>> ] bi swap deque boa ;
+    [ front>> ] [ back>> ] bi or not ;
 
 <PRIVATE
-: (pop-left) ( deque -- item newdeque )
-    [ lhs>> car>> ] [ [ lhs>> cdr>> ] [ rhs>> ] bi deque boa ] bi ;
-
-: transfer-left ( deque -- item newdeque )
-    rhs>> [ split-reverse deque boa (pop-left) ]
-    [ "Popping from an empty deque" throw ] if* ;
+: push ( item deque -- newdeque )
+    [ front>> <cons> ] [ back>> ] bi deque boa ; inline
 PRIVATE>
 
-: pop-left ( deque -- item newdeque )
-    dup lhs>> [ (pop-left) ] [ transfer-left ] if ;
+: push-front ( deque item -- newdeque )
+    swap push ;
+
+: push-back ( deque item -- newdeque )
+    swap [ push ] flipped ;
 
 <PRIVATE
-: (pop-right) ( deque -- item newdeque )
-    [ rhs>> car>> ] [ [ lhs>> ] [ rhs>> cdr>> ] bi deque boa ] bi ;
+: remove ( deque -- item newdeque )
+    [ front>> car>> ] [ [ front>> cdr>> ] [ back>> ] bi deque boa ] bi ; inline
 
-: transfer-right ( deque -- newdeque item )
-    lhs>> [ split-reverse deque boa (pop-left) ]
-    [ "Popping from an empty deque" throw ] if* ;
+: transfer ( deque -- item newdeque )
+    back>> [ split-reverse deque boa remove ]
+    [ "Popping from an empty deque" throw ] if* ; inline
+
+: pop ( deque -- item newdeque )
+    dup front>> [ remove ] [ transfer ] if ; inline
 PRIVATE>
 
-: pop-right ( deque -- item newdeque )
-    dup rhs>> [ (pop-right) ] [ transfer-right ] if ;
+: pop-front ( deque -- item newdeque )
+    pop ;
+
+: pop-back ( deque -- item newdeque )
+    [ pop ] flipped ;
+
+: peek-front ( deque -- item ) pop-front drop ;
+
+: peek-back ( deque -- item ) pop-back drop ;
 
 : sequence>deque ( sequence -- deque )
-    <deque> [ push-right ] sequences:reduce ;
+    <deque> [ push-back ] sequences:reduce ;
 
 : deque>sequence ( deque -- sequence )
-    [ dup deque-empty? not ] [ pop-left swap ] [ ] sequences:produce nip ;
+    [ dup deque-empty? not ] [ pop-front swap ] [ ] sequences:produce nip ;

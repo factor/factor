@@ -128,10 +128,10 @@ ARTICLE: "collections" "Collections"
 { $subsection "alists" }
 { $subsection "enums" }
 { $heading "Double-ended queues" }
-{ $subsection "dequeues" }
+{ $subsection "deques" }
 "Implementations:"
 { $subsection "dlists" }
-{ $subsection "search-dequeues" }
+{ $subsection "search-deques" }
 { $heading "Other collections" }
 { $subsection "boxes" }
 { $subsection "heaps" }
@@ -248,6 +248,7 @@ ARTICLE: "handbook-environment-reference" "Environment reference"
 { $subsection "prettyprint" }
 { $subsection "tools" }
 { $subsection "cli" }
+{ $subsection "rc-files" }
 { $subsection "help" }
 { $subsection "inference" }
 { $subsection "compiler" }
@@ -255,7 +256,8 @@ ARTICLE: "handbook-environment-reference" "Environment reference"
 { $subsection "images" }
 { $subsection "alien" }
 { $subsection "init" }
-{ $subsection "layouts" } ;
+{ $subsection "layouts" }
+{ $see-also "program-org" } ;
 
 ARTICLE: "handbook-library-reference" "Library reference"
 "This index only includes articles from loaded vocabularies. To explore more vocabularies, see " { $link "vocab-index" } "."
