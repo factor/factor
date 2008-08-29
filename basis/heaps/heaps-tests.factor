@@ -48,7 +48,7 @@ IN: heaps.tests
 : test-entry-indices ( n -- ? )
     random-alist
     <min-heap> [ heap-push-all ] keep
-    data>> dup length swap [ entry-index ] map sequence= ;
+    data>> dup length swap [ index>> ] map sequence= ;
 
 14 [
     [ t ] swap [ 2^ test-entry-indices ] curry unit-test

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: threads kernel prettyprint prettyprint.config
 io io.styles sequences assocs namespaces sorting boxes
-heaps.private system math math.parser math.order ;
+heaps.private system math math.parser math.order accessors ;
 IN: tools.threads
 
 : thread. ( thread -- )
@@ -14,7 +14,7 @@ IN: tools.threads
     ] with-cell
     [
         thread-sleep-entry [
-            entry-key millis [-] number>string write
+            key>> millis [-] number>string write
             " ms" write
         ] when*
     ] with-cell ;
