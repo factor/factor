@@ -127,17 +127,17 @@ TUPLE: pull-xml scope ;
 : call-under ( quot object -- quot )
     swap dup slip ; inline
 
-: sax-loop ( quot -- ) ! quot: xml-elem --
+: sax-loop ( quot: ( xml-elem -- ) -- )
     parse-text call-under
     get-char [ make-tag call-under sax-loop ]
-    [ drop ] if ; inline
+    [ drop ] if ; inline recursive
 
-: sax ( stream quot -- ) ! quot: xml-elem --
+: sax ( stream quot: ( xml-elem -- ) -- )
     swap [
         reset-prolog init-ns-stack
         prolog-data get call-under
         sax-loop
-    ] state-parse ; inline
+    ] state-parse ; inline recursive
 
 : (read-xml) ( -- )
     [ process ] sax-loop ; inline
