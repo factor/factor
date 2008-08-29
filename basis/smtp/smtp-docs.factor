@@ -41,6 +41,4 @@ ARTICLE: "smtp" "SMTP Client Library"
 "Set the " { $snippet "from" } " slot to a " { $link string } "." $nl
 "Set the recipient fields, " { $snippet "to" } ", " { $snippet "cc" } ", and " { $snippet "bcc" } ", to arrays of strings."
 "Set the " { $snippet "subject" } " to a " { $link string } "." $nl
-"Set the " { $snippet "body" } " to a " { $link string } "." $nl
-
-;
+"Set the " { $snippet "body" } " to a " { $link string } "." $nl ;
