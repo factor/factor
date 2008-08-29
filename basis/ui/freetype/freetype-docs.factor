@@ -16,12 +16,35 @@ HELP: init-freetype
 { $notes "Do not call this word if you are using the UI." } ;
 
 HELP: font
-{ $class-description "A font which has been loaded by FreeType. Font instances have the following slots:"
-    { $list
-        { { $link font-ascent } ", " { $link font-descent } ", " { $link font-height } " - metrics." }
-        { { $link font-handle } " - alien pointer to an " { $snippet "FT_Face" } "." }
-        { { $link font-widths } " - sequence of character widths. Use " { $link char-width } " and " { $link string-width } " to compute string widths instead of reading this sequence directly." }
-    }
+
+{ $class-description
+
+"A font which has been loaded by FreeType. Font instances have the following slots:"
+
+{
+  $list
+  {
+    { $snippet "ascent"  } ", "
+    { $snippet "descent" } ", "
+    { $snippet "height"  } " - metrics."
+  }
+
+  {
+    { $snippet "handle" }
+    " - alien pointer to an "
+    { $snippet "FT_Face" } "."
+  }
+
+  {
+    { $snippet "widths" }
+    " - sequence of character widths. Use "
+    { $snippet "width" }
+    " and "
+    { $snippet "width" }
+    " to compute string widths instead of reading this sequence directly."
+  }
+}
+
 } ;
 
 HELP: close-freetype

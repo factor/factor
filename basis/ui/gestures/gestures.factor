@@ -157,15 +157,15 @@ SYMBOL: drag-timer
 
 : focus-child ( child gadget ? -- )
     [
-        dup gadget-focus [
+        dup focus>> [
             dup send-lose-focus
             f swap t focus-child
         ] when*
-        dupd set-gadget-focus [
+        dupd (>>focus) [
             send-gain-focus
         ] when*
     ] [
-        set-gadget-focus
+        (>>focus)
     ] if ;
 
 : modifier ( mod modifiers -- seq )
@@ -244,7 +244,7 @@ SYMBOL: drag-timer
     drop ;
 
 : world-focus ( world -- gadget )
-    dup gadget-focus [ world-focus ] [ ] ?if ;
+    dup focus>> [ world-focus ] [ ] ?if ;
 
 : send-action ( world gesture -- )
     swap world-focus send-gesture drop ;

@@ -30,7 +30,7 @@ TUPLE: pack < gadget
     nip ;
 
 : pack-layout ( pack sizes -- )
-    round-dims over gadget-children
+    round-dims over children>>
     >r dupd packed-dims r> 2dup [ (>>dim) ] 2each
     >r packed-locs r> [ set-rect-loc ] 2each ;
 
@@ -49,14 +49,14 @@ TUPLE: pack < gadget
 
 : pack-pref-dim ( gadget sizes -- dim )
     over pack-gap over gap-dims >r max-dim r>
-    rot gadget-orientation set-axis ;
+    rot orientation>> set-axis ;
 
 M: pack pref-dim*
-    dup gadget-children pref-dims pack-pref-dim ;
+    dup children>> pref-dims pack-pref-dim ;
 
 M: pack layout*
-    dup gadget-children pref-dims pack-layout ;
+    dup children>> pref-dims pack-layout ;
 
 M: pack children-on ( rect gadget -- seq )
-    dup gadget-orientation swap gadget-children
+    dup orientation>> swap children>>
     [ fast-children-on ] keep <slice> ;

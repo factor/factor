@@ -29,11 +29,11 @@ M: labelled-gadget focusable-child* labelled-gadget-content ;
     gray close-box <polygon-gadget> swap <bevel-button> ;
 
 : title-theme ( gadget -- )
-    { 1 0 } over set-gadget-orientation
+    { 1 0 } over (>>orientation)
     T{ gradient f {
         T{ rgba f 0.65 0.65 1.0 1.0 }
         T{ rgba f 0.65 0.45 1.0 1.0 }
-    } } swap set-gadget-interior ;
+    } } swap (>>interior) ;
 
 : <title-label> ( text -- label ) <label> dup title-theme ;
 

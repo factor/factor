@@ -29,7 +29,7 @@ TUPLE: slider < frame elevator thumb saved line ;
     dup slider-page over slider-max 1 max / 1 min
     over elevator-length * min-thumb-dim max
     over slider-elevator rect-dim
-    rot gadget-orientation v. min ;
+    rot orientation>> v. min ;
 
 : slider-scale ( slider -- n )
     #! A scaling factor such that if x is a slider co-ordinate,
@@ -49,7 +49,7 @@ TUPLE: thumb < gadget ;
     find-slider dup slider-value swap set-slider-saved ;
 
 : do-drag ( thumb -- )
-    find-slider drag-loc over gadget-orientation v.
+    find-slider drag-loc over orientation>> v.
     over screen>slider swap [ slider-saved + ] keep
     gadget-model set-range-value ;
 
@@ -75,7 +75,7 @@ thumb H{
 
 : compute-direction ( elevator -- -1/1 )
     dup find-slider swap hand-click-rel
-    over gadget-orientation v.
+    over orientation>> v.
     over screen>slider
     swap slider-value - sgn ;
 
@@ -97,7 +97,7 @@ elevator H{
     lowered-gradient >>interior ;
 
 : (layout-thumb) ( slider n -- n thumb )
-    over gadget-orientation n*v swap slider-thumb ;
+    over orientation>> n*v swap slider-thumb ;
 
 : thumb-loc ( slider -- loc )
     dup slider-value swap slider>screen ;
@@ -109,7 +109,7 @@ elevator H{
 : layout-thumb-dim ( slider -- )
     dup dup thumb-dim (layout-thumb) >r
     >r dup rect-dim r>
-    rot gadget-orientation set-axis [ ceiling ] map
+    rot orientation>> set-axis [ ceiling ] map
     r> (>>dim) ;
 
 : layout-thumb ( slider -- )
@@ -124,7 +124,7 @@ M: elevator layout*
 : <slide-button> ( vector polygon amount -- button )
     >r gray swap <polygon-gadget> r>
     [ swap find-slider slide-by-line ] curry <repeat-button>
-    [ set-gadget-orientation ] keep ;
+    [ (>>orientation) ] keep ;
 
 : elevator, ( gadget orientation -- gadget )
   tuck <elevator> >>elevator
@@ -157,5 +157,5 @@ M: elevator layout*
 
 M: slider pref-dim*
     dup call-next-method
-    swap gadget-orientation [ 40 v*n ] keep
+    swap orientation>> [ 40 v*n ] keep
     set-axis ;

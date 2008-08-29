@@ -119,9 +119,9 @@ M: checkmark-paint draw-interior
     black <solid>
     black <checkmark-paint>
     <button-paint>
-    over set-gadget-interior
+    over (>>interior)
     black <solid>
-    swap set-gadget-boundary ;
+    swap (>>boundary) ;
 
 : <checkmark> ( -- gadget )
     <gadget>
@@ -165,9 +165,9 @@ M: radio-paint draw-boundary
     black <radio-paint>
     black <radio-paint>
     <button-paint>
-    over set-gadget-interior
+    over (>>interior)
     black <radio-paint>
-    swap set-gadget-boundary ;
+    swap (>>boundary) ;
 
 : <radio-knob> ( -- gadget )
     <gadget>

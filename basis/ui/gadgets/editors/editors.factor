@@ -121,7 +121,7 @@ M: editor ungraft*
     line-height 0 swap 2array ;
 
 : scroll>caret ( editor -- )
-    dup gadget-graft-state second [
+    dup graft-state>> second [
         dup caret-loc over caret-dim { 1 0 } v+ <rect>
         over scroll>rect
     ] when drop ;
