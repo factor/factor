@@ -4,7 +4,7 @@ USING: byte-arrays arrays assocs kernel kernel.private libc math
 namespaces parser sequences strings words assocs splitting
 math.parser cpu.architecture alien alien.accessors quotations
 layouts system compiler.units io.files io.encodings.binary
-accessors combinators effects continuations summary ;
+accessors combinators effects continuations ;
 IN: alien.c-types
 
 DEFER: <int>
@@ -62,19 +62,17 @@ M: string c-type ( name -- type )
         ] ?if
     ] if ;
 
-ERROR: no-boxer ;
-M: no-boxer summary drop "No boxer" ;
 : c-type-box ( n type -- )
-    [ reg-class>> ]
-    [ boxer>> [ no-boxer ] unless* ] bi %box ;
+    dup c-type-reg-class
+    swap c-type-boxer [ "No boxer" throw ] unless*
+    %box ;
 
-ERROR: no-unboxer ;
-M: no-unboxer summary drop "No unboxer" ;
 : c-type-unbox ( n ctype -- )
-    [ reg-class>> ]
-    [ unboxer>> [ no-unboxer ] unless* ] bi %unbox ;
+    dup c-type-reg-class
+    swap c-type-unboxer [ "No unboxer" throw ] unless*
+    %unbox ;
 
-M: string c-type-align c-type align>> ;
+M: string c-type-align c-type c-type-align ;
 
 M: string c-type-stack-align? c-type c-type-stack-align? ;
 
@@ -109,33 +107,27 @@ GENERIC: heap-size ( type -- size ) foldable
 
 M: string heap-size c-type heap-size ;
 
-M: c-type heap-size size>> ;
+M: c-type heap-size c-type-size ;
 
 GENERIC: stack-size ( type -- size ) foldable
 
 M: string stack-size c-type stack-size ;
 
-M: c-type stack-size size>> ;
+M: c-type stack-size c-type-size ;
 
 GENERIC: byte-length ( seq -- n ) flushable
 
 M: byte-array byte-length length ;
 
-ERROR: c-struct-reader ;
-
-M: c-struct-reader summary
-    drop "Cannot read struct fields with type" ;
-
 : c-getter ( name -- quot )
-    c-type c-type-getter [ c-struct-reader ] unless* ;
-
-ERROR: c-struct-writer ;
-
-M: c-struct-writer summary
-    drop "Cannot write struct fields with type" ;
+    c-type c-type-getter [
+        [ "Cannot read struct fields with type" throw ]
+    ] unless* ;
 
 : c-setter ( name -- quot )
-    c-type c-type-setter [ c-struct-writer ] unless* ;
+    c-type c-type-setter [
+        [ "Cannot write struct fields with type" throw ]
+    ] unless* ;
 
 : <c-array> ( n type -- array )
     heap-size * <byte-array> ; inline
@@ -186,13 +178,13 @@ TUPLE: long-long-type < c-type ;
     long-long-type new-c-type ;
 
 M: long-long-type unbox-parameter ( n type -- )
-    unboxer>> %unbox-long-long ;
+    c-type-unboxer %unbox-long-long ;
 
 M: long-long-type unbox-return ( type -- )
     f swap unbox-parameter ;
 
 M: long-long-type box-parameter ( n type -- )
-    boxer>> %box-long-long ;
+    c-type-boxer %box-long-long ;
 
 M: long-long-type box-return ( type -- )
     f swap box-parameter ;

@@ -44,7 +44,7 @@ M: string-type heap-size
     drop "void*" heap-size ;
 
 M: string-type c-type-align
-    drop "void*" align>> ;
+    drop "void*" c-type-align ;
 
 M: string-type c-type-stack-align?
     drop "void*" c-type-stack-align? ;
@@ -68,10 +68,10 @@ M: string-type c-type-reg-class
     drop int-regs ;
 
 M: string-type c-type-boxer
-    drop "void*" boxer>> ;
+    drop "void*" c-type-boxer ;
 
 M: string-type c-type-unboxer
-    drop "void*" unboxer>> ;
+    drop "void*" c-type-unboxer ;
 
 M: string-type c-type-boxer-quot
     second [ alien>string ] curry [ ] like ;
