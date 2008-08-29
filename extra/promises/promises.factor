@@ -5,7 +5,7 @@
 ! Updated by Chris Double, September 2006
 
 USING: arrays kernel sequences math vectors arrays namespaces
-quotations parser effects stack-checker words ;
+quotations parser effects stack-checker words accessors ;
 IN: promises
 
 TUPLE: promise quot forced? value ;
@@ -23,14 +23,14 @@ TUPLE: promise quot forced? value ;
     #! Force the given promise leaving the value of calling the
     #! promises quotation on the stack. Re-forcing the promise
     #! will return the same value and not recall the quotation.
-    dup promise-forced? [
-        dup promise-quot call over set-promise-value
-        t over set-promise-forced?
+    dup forced?>> [
+        dup quot>> call >>value
+        t >>forced?
     ] unless
-    promise-value ;
+    value>> ;
 
 : stack-effect-in ( quot word -- n )
-  stack-effect [ ] [ infer ] ?if effect-in length ;
+  stack-effect [ ] [ infer ] ?if in>> length ;
 
 : make-lazy-quot ( word quot -- quot )
   [
