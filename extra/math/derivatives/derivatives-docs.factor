@@ -10,7 +10,7 @@ HELP: derivative ( x function -- m )
 }
 { $examples
     { $example
-        "USING: math.derivatives prettyprint ;"
+        "USING: math math.derivatives prettyprint ;"
         "[ sq ] 4 derivative ."
         "8"
     }
@@ -50,7 +50,7 @@ HELP: (derivative) ( x function h err -- m )
 }
 { $examples
     { $example
-        "USING: math.derivatives prettyprint ;"
+        "USING: math math.derivatives prettyprint ;"
         "[ sq ] 4 derivative ."
         "8"
     }
@@ -68,7 +68,7 @@ HELP: derivative-func ( function -- der )
 }
 { $examples
     { $example
-        "USING: math.derivatives prettyprint ;"
+        "USING: math.derivatives math.trig prettyprint ;"
         "60 deg>rad [ sin ] derivative-func call ."
         "0.5000000000000173"
     }
