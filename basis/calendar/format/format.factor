@@ -244,13 +244,13 @@ ERROR: invalid-timestamp-format ;
     [ (ymdhms>timestamp) ] with-string-reader ;
 
 : (hms>timestamp) ( -- timestamp )
-    f f f read-hms instant <timestamp> ;
+    0 0 0 read-hms instant <timestamp> ;
 
 : hms>timestamp ( str -- timestamp )
     [ (hms>timestamp) ] with-string-reader ;
 
 : (ymd>timestamp) ( -- timestamp )
-    read-ymd f f f instant <timestamp> ;
+    read-ymd 0 0 0 instant <timestamp> ;
 
 : ymd>timestamp ( str -- timestamp )
     [ (ymd>timestamp) ] with-string-reader ;
