@@ -20,10 +20,10 @@ value connections dependencies ref locked? ;
 M: model hashcode* drop model hashcode* ;
 
 : add-dependency ( dep model -- )
-    model-dependencies push ;
+    dependencies>> push ;
 
 : remove-dependency ( dep model -- )
-    model-dependencies delete ;
+    dependencies>> delete ;
 
 DEFER: add-connection
 
@@ -32,14 +32,14 @@ GENERIC: model-activated ( model -- )
 M: model model-activated drop ;
 
 : ref-model ( model -- n )
-    dup model-ref 1+ dup rot set-model-ref ;
+    [ 1+ ] change-ref ref>> ;
 
 : unref-model ( model -- n )
-    dup model-ref 1- dup rot set-model-ref ;
+    [ 1- ] change-ref ref>> ;
 
 : activate-model ( model -- )
     dup ref-model 1 = [
-        dup model-dependencies
+        dup dependencies>>
         [ dup activate-model dupd add-connection ] each
         model-activated
     ] [
@@ -50,7 +50,7 @@ DEFER: remove-connection
 
 : deactivate-model ( model -- )
     dup unref-model zero? [
-        dup model-dependencies
+        dup dependencies>>
         [ dup deactivate-model remove-connection ] with each
     ] [
         drop
@@ -59,46 +59,45 @@ DEFER: remove-connection
 GENERIC: model-changed ( model observer -- )
 
 : add-connection ( observer model -- )
-    dup model-connections empty? [ dup activate-model ] when
-    model-connections push ;
+    dup connections>> empty? [ dup activate-model ] when
+    connections>> push ;
 
 : remove-connection ( observer model -- )
-    [ model-connections delete ] keep
-    dup model-connections empty? [ dup deactivate-model ] when
+    [ connections>> delete ] keep
+    dup connections>> empty? [ dup deactivate-model ] when
     drop ;
 
 : with-locked-model ( model quot -- )
     swap
-    t over set-model-locked?
+    t >>locked?
     slip
-    f swap set-model-locked? ; inline
+    f >>locked? drop ; inline
 
 GENERIC: update-model ( model -- )
 
 M: model update-model drop ;
 
 : notify-connections ( model -- )
-    dup model-connections [ model-changed ] with each ;
+    dup connections>> [ model-changed ] with each ;
 
 : set-model ( value model -- )
-    dup model-locked? [
+    dup locked?>> [
         2drop
     ] [
         dup [
-            [ set-model-value ] keep
-            [ update-model ] keep
-            notify-connections
+            swap >>value
+            [ update-model ] [ notify-connections ] bi
         ] with-locked-model
     ] if ;
 
 : ((change-model)) ( model quot -- newvalue model )
-    over >r >r model-value r> call r> ; inline
+    over >r >r value>> r> call r> ; inline
 
 : change-model ( model quot -- )
     ((change-model)) set-model ; inline
 
 : (change-model) ( model quot -- )
-    ((change-model)) set-model-value ; inline
+    ((change-model)) (>>value) ; inline
 
 GENERIC: range-value ( model -- value )
 GENERIC: range-page-value ( model -- value )

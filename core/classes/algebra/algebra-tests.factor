@@ -4,7 +4,7 @@ tools.test vectors words quotations classes classes.algebra
 classes.private classes.union classes.mixin classes.predicate
 vectors definitions source-files compiler.units growable
 random stack-checker effects kernel.private sbufs math.order
-classes.tuple ;
+classes.tuple accessors ;
 IN: classes.algebra.tests
 
 \ class< must-infer
@@ -204,7 +204,7 @@ UNION: z1 b1 c1 ;
 10 [
     [ ] [
         20 [ random-op ] [ ] replicate-as
-        [ infer effect-in [ random-class ] times ] keep
+        [ infer in>> [ random-class ] times ] keep
         call
         drop
     ] unit-test
@@ -238,7 +238,7 @@ UNION: z1 b1 c1 ;
 20 [
     [ t ] [
         20 [ random-boolean-op ] [ ] replicate-as dup .
-        [ infer effect-in [ random-boolean ] replicate dup . ] keep
+        [ infer in>> [ random-boolean ] replicate dup . ] keep
         
         [ >r [ ] each r> call ] 2keep
         

@@ -1,7 +1,8 @@
 ! Copyright (C) 2007 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel hashtables sequences arrays words namespaces
-parser math assocs effects definitions quotations ;
+parser math assocs effects definitions quotations summary
+accessors ;
 IN: memoize
 
 : packer ( n -- quot )
@@ -11,10 +12,10 @@ IN: memoize
     { [ drop ] [ ] [ first2 ] [ first3 ] [ first4 ] } nth ;
 
 : #in ( word -- n )
-    stack-effect effect-in length ;
+    stack-effect in>> length ;
 
 : #out ( word -- n )
-    stack-effect effect-out length ;
+    stack-effect out>> length ;
 
 : pack/unpack ( quot word -- newquot )
     [ dup #in unpacker % swap % #out packer % ] [ ] make ;
@@ -28,10 +29,13 @@ IN: memoize
         #out unpacker %
     ] [ ] make ;
 
+ERROR: too-many-arguments ;
+
+M: too-many-arguments summary
+    drop "There must be no more than 4 input and 4 output arguments" ;
+
 : check-memoized ( word -- )
-    dup #in 4 > swap #out 4 > or [
-        "There must be no more than 4 input and 4 output arguments" throw
-    ] when ;
+    dup #in 4 > swap #out 4 > or [ too-many-arguments ] when ;
 
 : define-memoized ( word quot -- )
     over check-memoized

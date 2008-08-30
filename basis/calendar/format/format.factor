@@ -26,11 +26,11 @@ IN: calendar.format
 
 : DD ( time -- ) day>> write-00 ;
 
-: DAY ( time -- ) day-of-week day-abbreviations3 nth write ;
+: DAY ( time -- ) day-of-week day-abbreviation3 write ;
 
 : MM ( time -- ) month>> write-00 ;
 
-: MONTH ( time -- ) month>> month-abbreviations nth write ;
+: MONTH ( time -- ) month>> month-abbreviation write ;
 
 : YYYY ( time -- ) year>> write-0000 ;
 
@@ -57,7 +57,7 @@ GENERIC: month. ( obj -- )
 
 M: array month. ( pair -- )
     first2
-    [ month-names nth write bl number>string print ]
+    [ month-name write bl number>string print ]
     [ 1 zeller-congruence ]
     [ (days-in-month) day-abbreviations2 " " join print ] 2tri
     over "   " <repetition> concat write
@@ -191,7 +191,7 @@ ERROR: invalid-timestamp-format ;
         "," read-token day-abbreviations3 member? check-timestamp drop
         read1 CHAR: \s assert=
         read-sp checked-number >>day
-        read-sp month-abbreviations index check-timestamp >>month
+        read-sp month-abbreviations index 1+ check-timestamp >>month
         read-sp checked-number >>year
         ":" read-token checked-number >>hour
         ":" read-token checked-number >>minute
@@ -206,7 +206,7 @@ ERROR: invalid-timestamp-format ;
         "," read-token day-abbreviations3 member? check-timestamp drop
         read1 CHAR: \s assert=
         "-" read-token checked-number >>day
-        "-" read-token month-abbreviations index check-timestamp >>month
+        "-" read-token month-abbreviations index 1+ check-timestamp >>month
         read-sp checked-number >>year
         ":" read-token checked-number >>hour
         ":" read-token checked-number >>minute
@@ -219,7 +219,7 @@ ERROR: invalid-timestamp-format ;
 : (cookie-string>timestamp-2) ( -- timestamp )
     timestamp new
         read-sp day-abbreviations3 member? check-timestamp drop
-        read-sp month-abbreviations index check-timestamp >>month
+        read-sp month-abbreviations index 1+ check-timestamp >>month
         read-sp checked-number >>day
         ":" read-token checked-number >>hour
         ":" read-token checked-number >>minute

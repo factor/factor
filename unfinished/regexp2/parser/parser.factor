@@ -151,11 +151,13 @@ ERROR: bad-special-group string ;
 DEFER: nested-parse-regexp
 : (parse-special-group) ( -- )
     read1 {
+        { [ dup CHAR: # = ]
+            [ drop nested-parse-regexp pop-stack drop ] }
         { [ dup CHAR: : = ]
             [ drop nested-parse-regexp pop-stack make-non-capturing-group ] }
         { [ dup CHAR: = = ]
             [ drop nested-parse-regexp pop-stack make-positive-lookahead ] }
-        { [ dup CHAR: = = ]
+        { [ dup CHAR: ! = ]
             [ drop nested-parse-regexp pop-stack make-negative-lookahead ] }
         { [ dup CHAR: > = ]
             [ drop nested-parse-regexp pop-stack make-independent-group ] }
@@ -385,25 +387,25 @@ DEFER: handle-left-bracket
 : nested-parse-regexp ( -- )
     beginning-of-group push-stack (parse-regexp) ;
 
-: ((parse-regexp)) ( token -- )
+: ((parse-regexp)) ( token -- ? )
     {
-        { CHAR: . [ handle-dot ] }
-        { CHAR: ( [ handle-left-parenthesis ] }
-        { CHAR: ) [ handle-right-parenthesis ] }
-        { CHAR: | [ handle-pipe ] }
-        { CHAR: ? [ handle-question ] }
-        { CHAR: * [ handle-star ] }
-        { CHAR: + [ handle-plus ] }
-        { CHAR: { [ handle-left-brace ] }
-        { CHAR: [ [ handle-left-bracket ] }
-        { CHAR: ^ [ handle-front-anchor ] }
-        { CHAR: $ [ handle-back-anchor ] }
-        { CHAR: \ [ handle-escape ] }
-        [ <constant> push-stack ]
+        { CHAR: . [ handle-dot t ] }
+        { CHAR: ( [ handle-left-parenthesis t ] }
+        { CHAR: ) [ handle-right-parenthesis f ] }
+        { CHAR: | [ handle-pipe t ] }
+        { CHAR: ? [ handle-question t ] }
+        { CHAR: * [ handle-star t ] }
+        { CHAR: + [ handle-plus t ] }
+        { CHAR: { [ handle-left-brace t ] }
+        { CHAR: [ [ handle-left-bracket t ] }
+        { CHAR: ^ [ handle-front-anchor t ] }
+        { CHAR: $ [ handle-back-anchor t ] }
+        { CHAR: \ [ handle-escape t ] }
+        [ <constant> push-stack t ]
     } case ;
 
 : (parse-regexp) ( -- )
-    read1 [ ((parse-regexp)) (parse-regexp) ] when* ;
+    read1 [ ((parse-regexp)) [ (parse-regexp) ] when ] when* ;
 
 : parse-regexp ( regexp -- )
     dup current-regexp [

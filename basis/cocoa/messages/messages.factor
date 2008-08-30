@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types alien.strings
+USING: accessors alien alien.c-types alien.strings
 arrays assocs combinators compiler kernel
 math namespaces parser prettyprint prettyprint.sections
 quotations sequences strings words cocoa.runtime io macros
@@ -46,11 +46,11 @@ TUPLE: selector name object ;
 MEMO: <selector> ( name -- sel ) f \ selector boa ;
 
 : selector ( selector -- alien )
-    dup selector-object expired? [
-        dup selector-name sel_registerName
-        dup rot set-selector-object
+    dup object>> expired? [
+        dup name>> sel_registerName
+        [ >>object drop ] keep
     ] [
-        selector-object
+        object>>
     ] if ;
 
 SYMBOL: objc-methods

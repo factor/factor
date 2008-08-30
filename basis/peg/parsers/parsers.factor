@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences strings namespaces math assocs shuffle 
-     vectors arrays math.parser 
+     vectors arrays math.parser accessors
      unicode.categories sequences.deep peg peg.private 
      peg.search math.ranges words ;
 IN: peg.parsers
@@ -11,7 +11,7 @@ TUPLE: just-parser p1 ;
 : just-pattern
   [
     execute dup [
-      dup parse-result-remaining empty? [ drop f ] unless
+      dup remaining>> empty? [ drop f ] unless
     ] when
   ] ;
 

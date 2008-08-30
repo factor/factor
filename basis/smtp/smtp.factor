@@ -1,5 +1,5 @@
 ! Copyright (C) 2007, 2008 Elie CHAFTARI, Dirk Vleugels,
-! Slava Pestov.
+! Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays namespaces io io.timeouts kernel logging io.sockets
 sequences combinators sequences.lib splitting assocs strings
@@ -9,7 +9,7 @@ IN: smtp
 
 SYMBOL: smtp-domain
 SYMBOL: smtp-server     "localhost" "smtp" <inet> smtp-server set-global
-SYMBOL: read-timeout    1 minutes read-timeout set-global
+SYMBOL: smtp-read-timeout    1 minutes smtp-read-timeout set-global
 SYMBOL: esmtp           t esmtp set-global
 
 LOG: log-smtp-connection NOTICE ( addrspec -- )
@@ -19,7 +19,7 @@ LOG: log-smtp-connection NOTICE ( addrspec -- )
     dup log-smtp-connection
     ascii [
         smtp-domain [ host-name or ] change
-        read-timeout get timeouts
+        smtp-read-timeout get timeouts
         call
     ] with-client ; inline
 
@@ -33,6 +33,7 @@ TUPLE: email
 
 : <email> ( -- email ) email new ;
 
+<PRIVATE
 : crlf ( -- ) "\r\n" write ;
 
 : command ( string -- ) write crlf flush ;
@@ -151,7 +152,7 @@ ERROR: invalid-header-string string ;
     ] "" make ;
 
 : extract-email ( recepient -- email )
-    #! This could be much smarter.
+    ! This could be much smarter.
     " " last-split1 swap or "<" ?head drop ">" ?tail drop ;
 
 : email>headers ( email -- hashtable )
@@ -179,6 +180,7 @@ ERROR: invalid-header-string string ;
         body>> send-body get-ok
         quit get-ok
     ] with-smtp-connection ;
+PRIVATE>
 
 : send-email ( email -- )
     [ email>headers ] keep (send-email) ;
@@ -200,5 +202,3 @@ ERROR: invalid-header-string string ;
 ! : cram-md5-auth ( key login  -- )
 !     "AUTH CRAM-MD5\r\n" get-ok 
 !     (cram-md5-auth) "\r\n" append get-ok ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

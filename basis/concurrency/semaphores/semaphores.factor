@@ -1,29 +1,34 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: dlists kernel threads math concurrency.conditions
-continuations ;
+continuations accessors summary ;
 IN: concurrency.semaphores
 
 TUPLE: semaphore count threads ;
 
+ERROR: negative-count-semaphore ;
+
+M: negative-count-semaphore summary
+    drop "Cannot have semaphore with negative count" ;
+
 : <semaphore> ( n -- semaphore )
-    dup 0 < [ "Cannot have semaphore with negative count" throw ] when
+    dup 0 < [ negative-count-semaphore ] when
     <dlist> semaphore boa ;
 
 : wait-to-acquire ( semaphore timeout -- )
-    >r semaphore-threads r> "semaphore" wait ;
+    [ threads>> ] dip "semaphore" wait ;
 
 : acquire-timeout ( semaphore timeout -- )
-    over semaphore-count zero?
+    over count>> zero?
     [ dupd wait-to-acquire ] [ drop ] if
-    dup semaphore-count 1- swap set-semaphore-count ;
+    [ 1- ] change-count drop ;
 
 : acquire ( semaphore -- )
     f acquire-timeout ;
 
 : release ( semaphore -- )
-    dup semaphore-count 1+ over set-semaphore-count
-    semaphore-threads notify-1 ;
+    [ 1+ ] change-count
+    threads>> notify-1 ;
 
 : with-semaphore-timeout ( semaphore timeout quot -- )
     pick rot acquire-timeout swap

@@ -102,12 +102,12 @@ TUPLE: cached loc vreg ;
 
 C: <cached> cached
 
-M: cached set-operand-class cached-vreg set-operand-class ;
-M: cached operand-class* cached-vreg operand-class* ;
+M: cached set-operand-class vreg>> set-operand-class ;
+M: cached operand-class* vreg>> operand-class* ;
 M: cached move-spec drop cached ;
-M: cached live-vregs* cached-vreg live-vregs* ;
+M: cached live-vregs* vreg>> live-vregs* ;
 M: cached live-loc? cached-loc live-loc? ;
-M: cached (lazy-load) >r cached-vreg r> (lazy-load) ;
+M: cached (lazy-load) >r vreg>> r> (lazy-load) ;
 M: cached lazy-store
     2dup cached-loc live-loc?
     [ "live-locs" get at %move ] [ 2drop ] if ;
@@ -169,7 +169,7 @@ INSTANCE: unboxed-c-ptr value
 ! A constant value
 TUPLE: constant value ;
 C: <constant> constant
-M: constant operand-class* constant-value class ;
+M: constant operand-class* value>> class ;
 M: constant move-spec class ;
 
 INSTANCE: constant value
@@ -204,7 +204,7 @@ INSTANCE: constant value
         { { f unboxed-c-ptr } [ %move-bug ] }
         { { f unboxed-byte-array } [ %move-bug ] }
 
-        { { f constant } [ constant-value swap load-literal ] }
+        { { f constant } [ value>> swap load-literal ] }
 
         { { f float } [ %box-float ] }
         { { f unboxed-alien } [ %box-alien ] }
@@ -420,7 +420,7 @@ M: loc lazy-store
     #! with the area of the data stack above the stack pointer
     find-tmp-loc slow-shuffle-mapping [
         [
-            swap dup cached? [ cached-vreg ] when %move
+            swap dup cached? [ vreg>> ] when %move
         ] assoc-each
     ] keep >hashtable do-shuffle ;
 
@@ -480,7 +480,7 @@ M: loc lazy-store
 : substitute-vreg? ( old new -- ? )
     #! We don't substitute locs for float or alien vregs,
     #! since in those cases the boxing overhead might kill us.
-    cached-vreg tagged? >r loc? r> and ;
+    vreg>> tagged? >r loc? r> and ;
 
 : substitute-vregs ( values vregs -- )
     [ vreg-substitution ] 2map
@@ -488,7 +488,7 @@ M: loc lazy-store
     [ >r stack>> r> substitute-here ] curry each-phantom ;
 
 : set-operand ( value var -- )
-    >r dup constant? [ constant-value ] when r> set ;
+    >r dup constant? [ value>> ] when r> set ;
 
 : lazy-load ( values template -- )
     #! Set operand vars here.
@@ -506,7 +506,7 @@ M: loc lazy-store
 
 : clash? ( seq -- ? )
     phantoms [ stack>> ] bi@ append [
-        dup cached? [ cached-vreg ] when swap member?
+        dup cached? [ vreg>> ] when swap member?
     ] with contains? ;
 
 : outputs-clash? ( -- ? )
@@ -516,7 +516,7 @@ M: loc lazy-store
 
 : count-input-vregs ( phantom spec -- )
     phantom&spec [
-        >r dup cached? [ cached-vreg ] when r> first allocation
+        >r dup cached? [ vreg>> ] when r> first allocation
     ] 2map count-vregs ;
 
 : count-scratch-regs ( spec -- )
@@ -557,7 +557,7 @@ M: loc lazy-store
     #! the value is always good.
     dup quotation? [
         over constant?
-        [ >r constant-value r> call ] [ 2drop f ] if
+        [ >r value>> r> call ] [ 2drop f ] if
     ] [
         2drop t
     ] if ;
@@ -648,7 +648,7 @@ UNION: immediate fixnum POSTPONE: f ;
     phantom-datastack get stack>> push ;
 
 : phantom-shuffle ( shuffle -- )
-    [ effect-in length phantom-datastack get phantom-input ] keep
+    [ in>> length phantom-datastack get phantom-input ] keep
     shuffle* phantom-datastack get phantom-append ;
 
 : phantom->r ( n -- )
