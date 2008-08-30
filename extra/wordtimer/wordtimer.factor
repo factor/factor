@@ -40,10 +40,10 @@ SYMBOL: *calling*
 : add-timer ( word -- )
   dup [ (add-timer) ] annotate ;
 
-: add-timers ( vocabspec -- )
+: add-timers ( vocab -- )
   words [ add-timer ] each ;
 
-: reset-vocab ( vocabspec -- )
+: reset-vocab ( vocab -- )
   words [ reset ] each ;
 
 : dummy-word ( -- ) ;
@@ -74,7 +74,7 @@ SYMBOL: *calling*
   "total time:" write r> pprint nl
   print-word-timings nl ;
 
-: profile-vocab ( vocabspec quot -- )
+: profile-vocab ( vocab quot -- )
   "annotating vocab..." print flush
   over [ reset-vocab ] [ add-timers ] bi
   reset-word-timer
