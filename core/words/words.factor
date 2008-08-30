@@ -121,15 +121,22 @@ compiled-crossref global [ H{ } assoc-like ] change-at
 : compiled-usage ( word -- assoc )
     compiled-crossref get at ;
 
+: (compiled-usages) ( word dependency -- assoc )
+    #! If the word is not flushable anymore, we have to recompile
+    #! all words which flushable away a call (presumably when the
+    #! word was still flushable). If the word is flushable, we
+    #! don't have to recompile words that folded this away.
+    [ drop compiled-usage ]
+    [
+        swap "flushable" word-prop +inlined+ +flushed+ ?
+        weakest-dependency
+    ] 2bi
+    [ dependency>= nip ] curry assoc-filter ;
+
 : compiled-usages ( assoc -- seq )
     clone [
         dup [
-            [
-                [ compiled-usage ] dip
-                +inlined+ eq? [
-                    [ nip +inlined+ eq? ] assoc-filter
-                ] when
-            ] dip swap update
+            [ (compiled-usages) ] dip swap update
         ] curry assoc-each
     ] keep keys ;
 

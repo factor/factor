@@ -186,7 +186,7 @@ M: sequence assoc-clone-like
     >r >alist r> clone-like ;
 
 M: sequence assoc-like
-    over sequence? [ like ] [ assoc-clone-like ] if ;
+    >r >alist r> like ;
 
 M: sequence >alist ;
 

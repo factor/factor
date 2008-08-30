@@ -88,9 +88,8 @@ SYMBOL: meta-r
 SYMBOL: dependencies
 
 : depends-on ( word how -- )
-    swap dependencies get dup [
-        2dup at +inlined+ eq? [ 3drop ] [ set-at ] if
-    ] [ 3drop ] if ;
+    [ strongest-dependency ] curry
+    dependencies get dup [ swap change-at ] [ 3drop ] if ;
 
 ! Words we've inferred the stack effect of, for rollback
 SYMBOL: recorded

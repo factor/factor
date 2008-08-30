@@ -94,6 +94,7 @@ SYMBOL: update-tuples-hook
     [
         H{ } clone changed-definitions set
         H{ } clone outdated-tuples set
+        H{ } clone new-classes set
         [ finish-compilation-unit ] [ ] cleanup
     ] with-scope ; inline
 

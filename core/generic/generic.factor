@@ -62,9 +62,7 @@ TUPLE: check-method class generic ;
     [ nip [ classes-intersect? ] [ class<= ] 2bi or ] curry assoc-filter
     values ;
 
-GENERIC# update-generic 1 ( class generic -- )
-
-M: class update-generic
+: update-generic ( class generic -- )
     affected-methods [ +called+ changed-definition ] each ;
 
 : with-methods ( class generic quot -- )
