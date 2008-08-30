@@ -11,7 +11,7 @@ GENERIC: send ( message thread -- )
 
 : mailbox-of ( thread -- mailbox )
     dup mailbox>> [ ] [
-        <mailbox> swap >>mailbox
+        <mailbox> [ >>mailbox drop ] keep
     ] ?if ;
 
 M: thread send ( message thread -- )
