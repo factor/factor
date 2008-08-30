@@ -130,7 +130,7 @@ M: help-error error.
 
 : run-help-lint ( prefix -- alist )
     [
-        all-vocabs-seq [ name>> ] map "all-vocabs" set
+        all-vocabs-seq [ vocab-name ] map "all-vocabs" set
         articles get keys "group-articles" set
         child-vocabs
         [ dup check-vocab ] { } map>assoc
