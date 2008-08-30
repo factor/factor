@@ -46,7 +46,7 @@ M: traceback-gadget pref-dim* drop { 550 600 } ;
     <namestack-display> { 400 400 } <limited-scroller> ;
 
 : variables ( traceback -- )
-    gadget-model <variables-gadget>
+    model>> <variables-gadget>
     "Dynamic variables" open-status-window ;
 
 : traceback-window ( continuation -- )

@@ -5,7 +5,7 @@ IN: ui.gadgets.buttons
 HELP: button
 { $class-description "A button is a " { $link gadget } " which responds to mouse clicks by invoking a quotation."
 $nl
-"A button's appearance can vary depending on the state of the mouse button if the " { $link gadget-interior } " or " { $link gadget-boundary } " slots are set to instances of " { $link button-paint } "."
+"A button's appearance can vary depending on the state of the mouse button if the " { $snippet "interior" } " or " { $snippet "boundary" } " slots are set to instances of " { $link button-paint } "."
 $nl
 "A button can be selected, which is distinct from being pressed. This state is held in the " { $link button-selected? } " slot, and is used by the " { $link <toggle-buttons> } " word to construct a row of buttons for choosing among several alternatives." } ;
 

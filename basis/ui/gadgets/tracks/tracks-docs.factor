@@ -11,7 +11,7 @@ ARTICLE: "ui-track-layout" "Track layouts"
 { $subsection track-add } ;
 
 HELP: track
-{ $class-description "A track is like a " { $link pack } " except each child is resized to a fixed multiple of the track's dimension in the direction of " { $link gadget-orientation } ". Tracks are created by calling " { $link <track> } "." } ;
+{ $class-description "A track is like a " { $link pack } " except each child is resized to a fixed multiple of the track's dimension in the direction of " { $snippet "orientation" } ". Tracks are created by calling " { $link <track> } "." } ;
 
 HELP: <track>
 { $values { "orientation" "an orientation specifier" } { "track" "a new " { $link track } } }

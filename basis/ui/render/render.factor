@@ -63,7 +63,7 @@ DEFER: draw-gadget
         dup dup interior>> draw-interior
         dup draw-gadget*
         dup visible-children [ draw-gadget ] each
-        dup gadget-boundary draw-boundary
+        dup boundary>> draw-boundary
     ] with-scope ;
 
 : >absolute ( rect -- rect )

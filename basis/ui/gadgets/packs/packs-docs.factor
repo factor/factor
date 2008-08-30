@@ -15,7 +15,7 @@ ARTICLE: "ui-pack-layout" "Pack layouts"
 { $subsection pack-layout } ;
 
 HELP: pack
-{ $class-description "A gadget which lays out its children along a single axis stored in the " { $link gadget-orientation } " slot. Can be constructed with one of the following words:"
+{ $class-description "A gadget which lays out its children along a single axis stored in the " { $snippet "orientation" } " slot. Can be constructed with one of the following words:"
 { $list
     { $link <pack> }
     { $link <pile> }
@@ -31,7 +31,7 @@ HELP: pack
 
 HELP: pack-layout
 { $values { "pack" "a new " { $link pack } } { "sizes" "a sequence of pairs of integers" } }
-{ $description "Lays out the pack's children along the " { $link gadget-orientation } " of the pack, with each gadget receiving its size from the corresponding index of the " { $snippet "sizes" } " sequence." }
+{ $description "Lays out the pack's children along the " { $snippet "orientation" } " of the pack, with each gadget receiving its size from the corresponding index of the " { $snippet "sizes" } " sequence." }
 { $notes
     "This word is useful if you are writing your own layout gadget which inherits from " { $link pack } ". This allows you to reuse layout logic while computing gadget sizes using a custom procedure."
 } ;

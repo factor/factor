@@ -29,7 +29,7 @@ M: gadget tool-scroller drop f ;
   book>> children>> [ class eq? ] with find ;
 
 : show-tool ( class workspace -- tool )
-    [ find-tool swap ] keep workspace-book gadget-model
+    [ find-tool swap ] keep workspace-book model>>
     set-model ;
 
 : select-tool ( workspace class -- ) swap show-tool drop ;

@@ -57,7 +57,7 @@ TUPLE: deploy-gadget < pack vocab settings ;
             advanced-settings
 
             deploy-settings-theme
-            namespace <mapping> over set-gadget-model
+            namespace <mapping> over (>>model)
         ]
     bind ;
 

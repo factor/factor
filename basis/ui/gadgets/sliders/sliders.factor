@@ -20,10 +20,10 @@ TUPLE: slider < frame elevator thumb saved line ;
 
 : min-thumb-dim 15 ;
 
-: slider-value ( gadget -- n ) gadget-model range-value >fixnum ;
-: slider-page  ( gadget -- n ) gadget-model range-page-value    ;
-: slider-max   ( gadget -- n ) gadget-model range-max-value     ;
-: slider-max*  ( gadget -- n ) gadget-model range-max-value*    ;
+: slider-value ( gadget -- n ) model>> range-value >fixnum ;
+: slider-page  ( gadget -- n ) model>> range-page-value    ;
+: slider-max   ( gadget -- n ) model>> range-max-value     ;
+: slider-max*  ( gadget -- n ) model>> range-max-value*    ;
 
 : thumb-dim ( slider -- h )
     dup slider-page over slider-max 1 max / 1 min
@@ -51,7 +51,7 @@ TUPLE: thumb < gadget ;
 : do-drag ( thumb -- )
     find-slider drag-loc over orientation>> v.
     over screen>slider swap [ slider-saved + ] keep
-    gadget-model set-range-value ;
+    model>> set-range-value ;
 
 thumb H{
     { T{ button-down } [ begin-drag ] }
@@ -69,9 +69,9 @@ thumb H{
         t >>root?
     thumb-theme ;
 
-: slide-by ( amount slider -- ) gadget-model move-by ;
+: slide-by ( amount slider -- ) model>> move-by ;
 
-: slide-by-page ( amount slider -- ) gadget-model move-by-page ;
+: slide-by-page ( amount slider -- ) model>> move-by-page ;
 
 : compute-direction ( elevator -- -1/1 )
     dup find-slider swap hand-click-rel

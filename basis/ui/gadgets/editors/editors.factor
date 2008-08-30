@@ -38,12 +38,12 @@ focused? ;
 : activate-editor-model ( editor model -- )
     2dup add-connection
     dup activate-model
-    swap gadget-model add-loc ;
+    swap model>> add-loc ;
 
 : deactivate-editor-model ( editor model -- )
     2dup remove-connection
     dup deactivate-model
-    swap gadget-model remove-loc ;
+    swap model>> remove-loc ;
 
 M: editor graft*
     dup
@@ -60,11 +60,11 @@ M: editor ungraft*
 : editor-mark* ( editor -- loc ) editor-mark model-value ;
 
 : set-caret ( loc editor -- )
-    [ gadget-model validate-loc ] keep
+    [ model>> validate-loc ] keep
     editor-caret set-model ;
 
 : change-caret ( editor quot -- )
-    over >r >r dup editor-caret* swap gadget-model r> call r>
+    over >r >r dup editor-caret* swap model>> r> call r>
     set-caret ; inline
 
 : mark>caret ( editor -- )
@@ -81,7 +81,7 @@ M: editor ungraft*
     editor-font* "" string-height ;
 
 : y>line ( y editor -- line# )
-    [ line-height / >fixnum ] keep gadget-model validate-line ;
+    [ line-height / >fixnum ] keep model>> validate-line ;
 
 : point>loc ( point editor -- loc )
     [
@@ -157,7 +157,7 @@ M: editor ungraft*
         swap
         dup first-visible-line \ first-visible-line set
         dup last-visible-line \ last-visible-line set
-        dup gadget-model document set
+        dup model>> document set
         editor set
         call
     ] with-scope ; inline
@@ -227,19 +227,19 @@ M: editor gadget-selection?
     selection-start/end = not ;
 
 M: editor gadget-selection
-    [ selection-start/end ] keep gadget-model doc-range ;
+    [ selection-start/end ] keep model>> doc-range ;
 
 : remove-selection ( editor -- )
-    [ selection-start/end ] keep gadget-model remove-doc-range ;
+    [ selection-start/end ] keep model>> remove-doc-range ;
 
 M: editor user-input*
-    [ selection-start/end ] keep gadget-model set-doc-range t ;
+    [ selection-start/end ] keep model>> set-doc-range t ;
 
 : editor-string ( editor -- string )
-    gadget-model doc-string ;
+    model>> doc-string ;
 
 : set-editor-string ( string editor -- )
-    gadget-model set-doc-string ;
+    model>> set-doc-string ;
 
 M: editor gadget-text* editor-string % ;
 
@@ -257,12 +257,12 @@ M: editor gadget-text* editor-string % ;
 
 : drag-selection-caret ( loc editor element -- loc )
     >r [ drag-direction? ] 2keep
-    gadget-model
+    model>>
     r> prev/next-elt ? ;
 
 : drag-selection-mark ( loc editor element -- loc )
     >r [ drag-direction? not ] 2keep
-    nip dup editor-mark* swap gadget-model
+    nip dup editor-mark* swap model>>
     r> prev/next-elt ? ;
 
 : drag-caret&mark ( editor -- caret mark )
@@ -282,8 +282,8 @@ M: editor gadget-text* editor-string % ;
     over gadget-selection? [
         drop nip remove-selection
     ] [
-        over >r >r dup editor-caret* swap gadget-model
-        r> call r> gadget-model remove-doc-range
+        over >r >r dup editor-caret* swap model>>
+        r> call r> model>> remove-doc-range
     ] if ; inline
 
 : editor-delete ( editor elt -- )
@@ -309,7 +309,7 @@ M: editor gadget-text* editor-string % ;
 
 : select-elt ( editor elt -- )
     over >r
-    >r dup editor-caret* swap gadget-model r> prev/next-elt
+    >r dup editor-caret* swap model>> r> prev/next-elt
     r> editor-select ;
 
 : start-of-document ( editor -- ) T{ doc-elt } editor-prev ;
