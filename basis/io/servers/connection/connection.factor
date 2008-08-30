@@ -41,7 +41,7 @@ ready ;
 
 SYMBOL: remote-address
 
-GENERIC: handle-client* ( server -- )
+GENERIC: handle-client* ( threaded-server -- )
 
 <PRIVATE
 
@@ -75,13 +75,13 @@ M: threaded-server handle-client* handler>> call ;
 : thread-name ( server-name addrspec -- string )
     unparse " connection from " swap 3append ;
 
-: accept-connection ( server -- )
+: accept-connection ( threaded-server -- )
     [ accept ] [ addr>> ] bi
     [ '[ , , , handle-client ] ]
     [ drop threaded-server get name>> swap thread-name ] 2bi
     spawn drop ;
 
-: accept-loop ( server -- )
+: accept-loop ( threaded-server -- )
     [
         threaded-server get semaphore>>
         [ [ accept-connection ] with-semaphore ]
@@ -89,7 +89,7 @@ M: threaded-server handle-client* handler>> call ;
         if*
     ] [ accept-loop ] bi ; inline recursive
 
-: started-accept-loop ( server -- )
+: started-accept-loop ( threaded-server -- )
     threaded-server get
     [ sockets>> push ] [ ready>> raise-flag ] bi ;
 

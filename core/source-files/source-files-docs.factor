@@ -30,10 +30,10 @@ HELP: source-file
 { $description "Outputs the source file associated to a path name, creating the source file first if it doesn't exist. Source files are retained in the " { $link source-files } " variable." }
 { $class-description "Instances retain information about loaded source files, and have the following slots:"
     { $list
-        { { $link source-file-path } " - a pathname string." }
-        { { $link source-file-checksum } " - the CRC32 checksum of the source file's contents at the time it was most recently loaded." }
-        { { $link source-file-uses } " - an assoc whose keys are words referenced from this source file's top level form." }
-        { { $link source-file-definitions } " - a pair of assocs, containing definitions and classes defined in this source file, respectively" }
+        { { $snippet "path" } " - a pathname string." }
+        { { $snippet "checksum" } " - the CRC32 checksum of the source file's contents at the time it was most recently loaded." }
+        { { $snippet "uses" } " - an assoc whose keys are words referenced from this source file's top level form." }
+        { { $snippet "definitions" } " - a pair of assocs, containing definitions and classes defined in this source file, respectively" }
     }
 } ;
 
@@ -78,4 +78,4 @@ HELP: rollback-source-file
 { $description "Records information to the source file after an incomplete parse which ended with an error." } ;
 
 HELP: file
-{ $var-description "Stores the " { $link source-file } " being parsed. The " { $link source-file-path } " of this object comes from the input parameter to " { $link with-source-file } "." } ;
+{ $var-description "Stores the " { $link source-file } " being parsed. The " { $snippet "path" } " of this object comes from the input parameter to " { $link with-source-file } "." } ;

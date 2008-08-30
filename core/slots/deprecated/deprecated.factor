@@ -6,15 +6,15 @@ classes slots.private combinators slots ;
 IN: slots.deprecated
 
 : reader-effect ( class spec -- effect )
-    >r ?word-name 1array r> slot-spec-name 1array <effect> ;
+    >r ?word-name 1array r> name>> 1array <effect> ;
 
 PREDICATE: slot-reader < word "reading" word-prop >boolean ;
 
 : set-reader-props ( class spec -- )
     2dup reader-effect
-    over slot-spec-reader
+    over reader>>
     swap "declared-effect" set-word-prop
-    slot-spec-reader swap "reading" set-word-prop ;
+    reader>> swap "reading" set-word-prop ;
 
 : define-slot-word ( class word quot -- )
     [
@@ -23,9 +23,9 @@ PREDICATE: slot-reader < word "reading" word-prop >boolean ;
     ] dip define ;
 
 : define-reader ( class spec -- )
-    dup slot-spec-reader [
+    dup reader>> [
         [ set-reader-props ] 2keep
-        dup slot-spec-reader
+        dup reader>>
         swap reader-quot
         define-slot-word
     ] [
@@ -33,20 +33,20 @@ PREDICATE: slot-reader < word "reading" word-prop >boolean ;
     ] if ;
 
 : writer-effect ( class spec -- effect )
-    slot-spec-name swap ?word-name 2array 0 <effect> ;
+    name>> swap ?word-name 2array 0 <effect> ;
 
 PREDICATE: slot-writer < word "writing" word-prop >boolean ;
 
 : set-writer-props ( class spec -- )
     2dup writer-effect
-    over slot-spec-writer
+    over writer>>
     swap "declared-effect" set-word-prop
-    slot-spec-writer swap "writing" set-word-prop ;
+    writer>> swap "writing" set-word-prop ;
 
 : define-writer ( class spec -- )
-    dup slot-spec-writer [
+    dup writer>> [
         [ set-writer-props ] 2keep
-        dup slot-spec-writer
+        dup writer>>
         swap writer-quot
         define-slot-word
     ] [

@@ -77,13 +77,14 @@ M: grid pref-dim*
 M: grid layout* dup compute-grid grid-layout ;
 
 M: grid children-on ( rect gadget -- seq )
-    dup gadget-children empty? [
-        2drop f
-    ] [
+    dup children>> empty?
+      [ 2drop f ]
+      [
         { 0 1 } swap grid>>
         [ 0 <column> fast-children-on ] keep
         <slice> concat
-    ] if ;
+      ]
+    if ;
 
 M: grid gadget-text*
     grid>>

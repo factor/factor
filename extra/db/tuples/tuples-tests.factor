@@ -84,8 +84,8 @@ SYMBOL: person4
             10
             3.14
             T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
-            T{ timestamp f 2008 11 22 f f f T{ duration f 0 0 0 0 0 0 } }
-            T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
+            T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
+            T{ timestamp f 0 0 0 12 34 56 T{ duration f 0 0 0 0 0 0 } }
             B{ 115 116 111 114 101 105 110 97 98 108 111 98 }
         }
     ] [ T{ person f 3 } select-tuple ] unit-test
@@ -100,8 +100,8 @@ SYMBOL: person4
             10
             3.14
             T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
-            T{ timestamp f 2008 11 22 f f f T{ duration f 0 0 0 0 0 0 } }
-            T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
+            T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
+            T{ timestamp f 0 0 0 12 34 56 T{ duration f 0 0 0 0 0 0 } }
             f
             H{ { 1 2 } { 3 4 } { 5 "lol" } }
             URL" http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search"
@@ -129,12 +129,12 @@ SYMBOL: person4
     "teddy" 10 3.14
         T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
         T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
-        T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
+        T{ timestamp f 0 0 0 12 34 56 T{ duration f 0 0 0 0 0 0 } }
         B{ 115 116 111 114 101 105 110 97 98 108 111 98 } f f <person> person3 set
     "eddie" 10 3.14
         T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
         T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
-        T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
+        T{ timestamp f 0 0 0 12 34 56 T{ duration f 0 0 0 0 0 0 } }
         f H{ { 1 2 } { 3 4 } { 5 "lol" } } URL" http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search"  <person> person4 set ;
 
 : user-assigned-person-schema ( -- )
@@ -156,13 +156,13 @@ SYMBOL: person4
     3 "teddy" 10 3.14
         T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
         T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
-        T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
+        T{ timestamp f 0 0 0 12 34 56 T{ duration f 0 0 0 0 0 0 } }
         B{ 115 116 111 114 101 105 110 97 98 108 111 98 }
         f f <user-assigned-person> person3 set
     4 "eddie" 10 3.14
         T{ timestamp f 2008 3 5 16 24 11 T{ duration f 0 0 0 0 0 0 } }
         T{ timestamp f 2008 11 22 0 0 0 T{ duration f 0 0 0 0 0 0 } }
-        T{ timestamp f f f f 12 34 56 T{ duration f 0 0 0 0 0 0 } }
+        T{ timestamp f 0 0 0 12 34 56 T{ duration f 0 0 0 0 0 0 } }
         f H{ { 1 2 } { 3 4 } { 5 "lol" } } URL" http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search" <user-assigned-person> person4 set ;
 
 TUPLE: paste n summary author channel mode contents timestamp annotations ;

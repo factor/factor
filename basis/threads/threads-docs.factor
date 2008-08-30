@@ -38,7 +38,7 @@ ARTICLE: "thread-state" "Thread-local state and variables"
 { $subsection tchange }
 "Each thread has its own independent set of thread-local variables and newly-spawned threads begin with an empty set."
 $nl
-"Global hashtable of all threads, keyed by " { $link thread-id } ":"
+"Global hashtable of all threads, keyed by " { $snippet "id" } ":"
 { $subsection threads }
 "Threads have an identity independent of continuations. If a continuation is refied in one thread and then resumed in another thread, the code running in that continuation will observe a change in the value output by " { $link self } "." ;
 
@@ -63,10 +63,10 @@ ABOUT: "threads"
 HELP: thread
 { $class-description "A thread. The slots are as follows:"
     { $list
-        { { $link thread-id } " - a unique identifier assigned to each thread." }
-        { { $link thread-name } " - the name passed to " { $link spawn } "." }
-        { { $link thread-quot } " - the initial quotation passed to " { $link spawn } "." }
-        { { $link thread-continuation } " - a " { $link box } "; if the thread is ready to run, the box holds the continuation, otherwise it is empty." }
+        { { $snippet "id" } " - a unique identifier assigned to each thread." }
+        { { $snippet "name" } " - the name passed to " { $link spawn } "." }
+        { { $snippet "quot" } " - the initial quotation passed to " { $link spawn } "." }
+        { { $snippet "continuation" } " - a " { $link box } "; if the thread is ready to run, the box holds the continuation, otherwise it is empty." }
     }
 } ;
 

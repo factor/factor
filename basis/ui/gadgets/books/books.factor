@@ -5,7 +5,7 @@ IN: ui.gadgets.books
 
 TUPLE: book < gadget ;
 
-: hide-all ( book -- ) gadget-children [ hide-gadget ] each ;
+: hide-all ( book -- ) children>> [ hide-gadget ] each ;
 
 : current-page ( book -- gadget ) [ control-value ] keep nth-gadget ;
 

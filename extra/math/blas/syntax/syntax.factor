@@ -2,22 +2,22 @@ USING: kernel math.blas.matrices math.blas.vectors parser
 arrays prettyprint.backend sequences ;
 IN: math.blas.syntax
 
-: svector{ ( accum -- accum )
+: svector{
     \ } [ >float-blas-vector ] parse-literal ; parsing
-: dvector{ ( accum -- accum )
+: dvector{
     \ } [ >double-blas-vector ] parse-literal ; parsing
-: cvector{ ( accum -- accum )
+: cvector{
     \ } [ >float-complex-blas-vector ] parse-literal ; parsing
-: zvector{ ( accum -- accum )
+: zvector{
     \ } [ >double-complex-blas-vector ] parse-literal ; parsing
 
-: smatrix{ ( accum -- accum )
+: smatrix{
     \ } [ >float-blas-matrix ] parse-literal ; parsing
-: dmatrix{ ( accum -- accum )
+: dmatrix{
     \ } [ >double-blas-matrix ] parse-literal ; parsing
-: cmatrix{ ( accum -- accum )
+: cmatrix{
     \ } [ >float-complex-blas-matrix ] parse-literal ; parsing
-: zmatrix{ ( accum -- accum )
+: zmatrix{
     \ } [ >double-complex-blas-matrix ] parse-literal ; parsing
 
 M: float-blas-vector pprint-delims drop \ svector{ \ } ;

@@ -38,7 +38,7 @@ HELP: pheap>alist
 { $description "Creates an association list whose keys are the entries in the heap and whose values are the associated priorities. It is in sorted order by priority. This does not modify the heap." } ;
 
 HELP: pheap>values
-{ $values { "heap" "a persistent heap" } { "values" array } }
+{ $values { "heap" "a persistent heap" } { "seq" array } }
 { $description "Creates an an array of all of the values in the heap, in sorted order by priority. This does not modify the heap." } ;
 
 ARTICLE: "persistent-heaps" "Persistent heaps"

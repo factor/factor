@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays ui.gadgets ui.gadgets.labels ui.render kernel math
+USING: accessors arrays ui.gadgets ui.gadgets.labels ui.render kernel math
 namespaces sequences math.order math.geometry.rect ;
 IN: ui.gadgets.paragraphs
 
@@ -17,7 +17,7 @@ TUPLE: paragraph < gadget margin ;
 
 : <paragraph> ( margin -- gadget )
     paragraph new-gadget
-    { 1 0 } over set-gadget-orientation
+    { 1 0 } over (>>orientation)
     [ set-paragraph-margin ] keep ;
 
 SYMBOL: x SYMBOL: max-x

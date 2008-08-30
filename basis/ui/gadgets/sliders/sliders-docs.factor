@@ -56,6 +56,6 @@ ARTICLE: "ui.gadgets.sliders" "Slider gadgets"
 { $subsection slide-by }
 { $subsection slide-by-line }
 { $subsection slide-by-page }
-"Since sliders are controls the value can be get and set by calling " { $link gadget-model } "." ;
+"Since sliders are controls the value can be get and set by via the " { $snippet "model" } " slot. " ;
 
 ABOUT: "ui.gadgets.sliders"

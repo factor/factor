@@ -62,7 +62,7 @@ ARTICLE: "network-streams" "Networking"
 ABOUT: "network-streams"
 
 HELP: local
-{ $class-description "Local address specifier for Unix domain sockets on Unix systems. The " { $link local-path } " slot holds the path name of the socket. New instances are created by calling " { $link <local> } "." }
+{ $class-description "Local address specifier for Unix domain sockets on Unix systems. The " { $snippet "path" } " slot holds the path name of the socket. New instances are created by calling " { $link <local> } "." }
 { $examples
     { $code "\"/tmp/.X11-unix/0\" <local>" }
 } ;

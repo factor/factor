@@ -83,7 +83,7 @@ TUPLE: pane-stream pane ;
 C: <pane-stream> pane-stream
 
 : smash-line ( current -- gadget )
-    dup gadget-children {
+    dup children>> {
         { [ dup empty? ] [ 2drop "" <label> ] }
         { [ dup length 1 = ] [ nip first ] }
         [ drop ]
@@ -121,7 +121,7 @@ M: style-stream write-gadget
     output-stream get print-gadget ;
 
 : ?nl ( stream -- )
-    dup pane-stream-pane pane-current gadget-children empty?
+    dup pane-stream-pane pane-current children>> empty?
     [ dup stream-nl ] unless drop ;
 
 : with-pane ( pane quot -- )
@@ -258,7 +258,7 @@ M: pane-stream make-block-stream
     table-gap [ over set-grid-gap ] apply-style ;
 
 : apply-table-border-style ( style grid -- style grid )
-    table-border [ <grid-lines> over set-gadget-boundary ]
+    table-border [ <grid-lines> over (>>boundary) ]
     apply-style ;
 
 : styled-grid ( style grid -- grid )
@@ -336,7 +336,7 @@ M: pack sloppy-pick-up* ( loc gadget -- n )
    [ orientation>> ] [ children>> ] bi (fast-children-on) ;
 
 M: gadget sloppy-pick-up*
-    gadget-children [ inside? ] with find-last drop ;
+    children>> [ inside? ] with find-last drop ;
 
 M: f sloppy-pick-up*
     2drop f ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel assocs namespaces splitting sequences
-strings math.parser lexer ;
+strings math.parser lexer accessors ;
 IN: strings.parser
 
 ERROR: bad-escape ;
@@ -46,7 +46,7 @@ name>char-hook global [
     dup [ "\"\\" member? ] find dup [
         >r cut-slice >r % r> rest-slice r>
         dup CHAR: " = [
-            drop slice-from
+            drop from>>
         ] [
             drop next-escape >r , r> (parse-string)
         ] if

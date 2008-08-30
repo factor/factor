@@ -53,7 +53,7 @@ M: list model-changed
     bound-index ;
 
 : selected-rect ( list -- rect )
-    dup list-index swap gadget-children ?nth ;
+    dup list-index swap children>> ?nth ;
 
 M: list draw-gadget*
     origin get [
@@ -98,7 +98,7 @@ M: list focusable-child* drop t ;
     ] if ;
 
 : select-gadget ( gadget list -- )
-    swap over gadget-children index
+    swap over children>> index
     [ swap select-index ] [ drop ] if* ;
 
 : clamp-loc ( point max -- point )

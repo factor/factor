@@ -23,8 +23,8 @@ M: f world-status ;
 : hide-status ( gadget -- ) f swap show-status ;
 
 : (request-focus) ( child world ? -- )
-    pick gadget-parent pick eq? [
-        >r >r dup gadget-parent dup r> r>
+    pick parent>> pick eq? [
+        >r >r dup parent>> dup r> r>
         [ (request-focus) ] keep
     ] unless focus-child ;
 
@@ -51,7 +51,7 @@ M: world layout*
 
 M: world focusable-child* gadget-child ;
 
-M: world children-on nip gadget-children ;
+M: world children-on nip children>> ;
 
 : (draw-world) ( world -- )
     dup world-handle [

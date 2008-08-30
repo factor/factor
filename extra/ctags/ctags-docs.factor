@@ -23,7 +23,7 @@ HELP: ctags ( path -- )
 } ;
 
 HELP: ctags-write ( seq path -- )
-{ $values { "alist" "an association list" }
+{ $values { "seq" sequence }
           { "path" "a pathname string" } }
 { $description "Stores a " { $snippet "alist" } " in " { $snippet "path" } ". " { $snippet "alist" } " must be an association list with ctags format: key must be a valid word and value a sequence whose first element is a resource name and second element is a line number" }
 { $examples
