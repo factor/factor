@@ -10,8 +10,8 @@ IN: concurrency.messaging
 GENERIC: send ( message thread -- )
 
 : mailbox-of ( thread -- mailbox )
-    dup thread-mailbox [ ] [
-        <mailbox> dup rot set-thread-mailbox
+    dup mailbox>> [ ] [
+        <mailbox> swap >>mailbox
     ] ?if ;
 
 M: thread send ( message thread -- )
