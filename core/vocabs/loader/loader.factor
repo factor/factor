@@ -3,7 +3,7 @@
 USING: namespaces sequences io.files kernel assocs words vocabs
 definitions parser continuations io hashtables sorting
 source-files arrays combinators strings system math.parser
-compiler.errors splitting init ;
+compiler.errors splitting init accessors ;
 IN: vocabs.loader
 
 SYMBOL: vocab-roots
@@ -51,28 +51,19 @@ H{ } clone root-cache set-global
 
 SYMBOL: load-help?
 
-: source-was-loaded ( vocab -- ) t swap set-vocab-source-loaded? ;
+: load-source ( vocab -- vocab )
+    f >>source-loaded?
+    [ vocab-source-path [ parse-file ] [ [ ] ] if* ] keep
+    t >>source-loaded?
+    [ [ % ] [ call ] if-bootstrapping ] dip ;
 
-: source-wasn't-loaded ( vocab -- ) f swap set-vocab-source-loaded? ;
 
-: load-source ( vocab -- )
-    [ source-wasn't-loaded ]
-    [ vocab-source-path [ parse-file ] [ [ ] ] if* ]
-    [ source-was-loaded ]
-    tri
-    [ % ] [ call ] if-bootstrapping ;
-
-: docs-were-loaded ( vocab -- ) t swap set-vocab-docs-loaded? ;
-
-: docs-weren't-loaded ( vocab -- ) f swap set-vocab-docs-loaded? ;
-
-: load-docs ( vocab -- )
+: load-docs ( vocab -- vocab )
     load-help? get [
-        [ docs-weren't-loaded ]
-        [ vocab-docs-path [ ?run-file ] when* ]
-        [ docs-were-loaded ]
-        tri
-    ] [ drop ] if ;
+        f >>docs-loaded?
+        [ vocab-docs-path [ ?run-file ] when* ] keep
+        t >>docs-loaded?
+    ] when ;
 
 : reload ( name -- )
     [
@@ -100,8 +91,8 @@ GENERIC: (load-vocab) ( name -- )
 
 M: vocab (load-vocab)
     [
-        dup vocab-source-loaded? [ dup load-source ] unless
-        dup vocab-docs-loaded? [ dup load-docs ] unless
+        dup vocab-source-loaded? [ load-source ] unless
+        dup vocab-docs-loaded? [ load-docs ] unless
         drop
     ] [ [ swap add-to-blacklist ] keep rethrow ] recover ;
 
