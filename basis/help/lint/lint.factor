@@ -117,7 +117,7 @@ M: help-error error.
     ] keep ;
 
 : check-about ( vocab -- )
-    [ vocab-help [ article drop ] when* ] check-something ;
+    [ help>> [ article drop ] when* ] check-something ;
 
 : check-vocab ( vocab -- seq )
     "Checking " write dup write "..." print
@@ -130,7 +130,7 @@ M: help-error error.
 
 : run-help-lint ( prefix -- alist )
     [
-        all-vocabs-seq [ vocab-name ] map "all-vocabs" set
+        all-vocabs-seq [ name>> ] map "all-vocabs" set
         articles get keys "group-articles" set
         child-vocabs
         [ dup check-vocab ] { } map>assoc
