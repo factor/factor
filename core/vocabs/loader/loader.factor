@@ -67,7 +67,7 @@ SYMBOL: load-help?
 
 : reload ( name -- )
     [
-        dup vocab [ dup load-source load-docs ] [ no-vocab ] ?if
+        dup vocab [ load-source load-docs drop ] [ no-vocab ] ?if
     ] with-compiler-errors ;
 
 : require ( vocab -- )
