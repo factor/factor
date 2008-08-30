@@ -1,4 +1,5 @@
 USING: vocabs.loader sequences ;
+IN: bootstrap.tools
 
 {
     "inspector"

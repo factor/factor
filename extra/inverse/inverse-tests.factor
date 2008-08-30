@@ -62,10 +62,10 @@ C: <nil> nil
 [ "Malformed list" ] [ [ f list-sum ] [ ] recover ] unit-test
 
 : empty-cons ( -- cons ) cons new ;
-: cons* ( cdr car -- cons ) { set-cons-cdr set-cons-car } cons construct ;
+: cons* ( cdr car -- cons ) cons boa ;
 
 [ ] [ T{ cons f f f } [ empty-cons ] undo ] unit-test
-[ 1 2 ] [ 2 1 <cons> [ cons* ] undo ] unit-test
+[ 1 2 ] [ 1 2 <cons> [ cons* ] undo ] unit-test
 
 [ t ] [ pi [ pi ] matches? ] unit-test
 [ 0.0 ] [ 0.0 pi + [ pi + ] undo ] unit-test

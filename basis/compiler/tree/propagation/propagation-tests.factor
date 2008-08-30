@@ -571,6 +571,8 @@ MIXIN: empty-mixin
 
 [ ] [ [ { empty-mixin } declare empty-mixin? ] final-info drop ] unit-test
 
+[ V{ fixnum } ] [ [ [ bignum-shift drop ] keep ] final-classes ] unit-test
+
 ! [ V{ string } ] [
 !     [ dup string? t xor [ "A" throw ] [ ] if ] final-classes
 ! ] unit-test

@@ -1,4 +1,4 @@
-USING: kernel ;
+USING: accessors kernel ;
 IN: xmode.marker.context
 
 ! Based on org.gjt.sp.jedit.syntax.TokenMarker.LineContext
@@ -11,10 +11,9 @@ end
 
 : <line-context> ( ruleset parent -- line-context )
     over [ "no context" throw ] unless
-    { set-line-context-in-rule-set set-line-context-parent }
-    line-context construct ;
+    line-context new
+        swap >>parent
+        swap >>in-rule-set ;
 
 M: line-context clone
-    (clone)
-    dup line-context-parent clone
-    over set-line-context-parent ;
+    call-next-method [ clone ] change-parent ;

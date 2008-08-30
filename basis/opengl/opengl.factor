@@ -180,9 +180,9 @@ TUPLE: sprite loc dim dim2 dlist texture ;
 : <sprite> ( loc dim dim2 -- sprite )
     f f sprite boa ;
 
-: sprite-size2 ( sprite -- w h ) sprite-dim2 first2 ;
+: sprite-size2 ( sprite -- w h ) dim2>> first2 ;
 
-: sprite-width ( sprite -- w ) sprite-dim first ;
+: sprite-width ( sprite -- w ) dim>> first ;
 
 : gray-texture ( sprite pixmap -- id )
     gen-texture [
@@ -223,10 +223,10 @@ PRIVATE>
     dup top-left dup top-right dup bottom-right bottom-left ;
 
 : draw-sprite ( sprite -- )
-    dup sprite-loc gl-translate
-    GL_TEXTURE_2D over sprite-texture glBindTexture
+    dup loc>> gl-translate
+    GL_TEXTURE_2D over texture>> glBindTexture
     init-texture
-    GL_QUADS [ sprite-dim2 four-sides ] do-state
+    GL_QUADS [ dim2>> four-sides ] do-state
     GL_TEXTURE_2D 0 glBindTexture ;
 
 : rect-vertices ( lower-left upper-right -- )
@@ -243,14 +243,14 @@ PRIVATE>
     ] do-matrix ;
 
 : init-sprite ( texture sprite -- )
-    [ set-sprite-texture ] keep
-    [ make-sprite-dlist ] keep set-sprite-dlist ;
+    swap >>texture
+    dup make-sprite-dlist >>dlist drop ;
 
 : delete-dlist ( id -- ) 1 glDeleteLists ;
 
 : free-sprite ( sprite -- )
-    dup sprite-dlist delete-dlist
-    sprite-texture delete-texture ;
+    [ dlist>> delete-dlist ]
+    [ texture>> delete-texture ] bi ;
 
 : free-sprites ( sprites -- )
     [ nip [ free-sprite ] when* ] assoc-each ;

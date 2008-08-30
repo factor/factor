@@ -48,7 +48,7 @@ IN: heaps.tests
 : test-entry-indices ( n -- ? )
     random-alist
     <min-heap> [ heap-push-all ] keep
-    data>> dup length swap [ entry-index ] map sequence= ;
+    data>> dup length swap [ index>> ] map sequence= ;
 
 14 [
     [ t ] swap [ 2^ test-entry-indices ] curry unit-test
@@ -58,7 +58,7 @@ IN: heaps.tests
     dup length random dup pick nth >r swap delete-nth r> ;
 
 : sort-entries ( entries -- entries' )
-    [ [ entry-key ] compare ] sort ;
+    [ [ key>> ] compare ] sort ;
 
 : delete-test ( n -- ? )
     [
@@ -67,7 +67,7 @@ IN: heaps.tests
         dup data>> clone swap
     ] keep 3 /i [ 2dup >r delete-random r> heap-delete ] times
     data>>
-    [ [ entry-key ] map ] bi@
+    [ [ key>> ] map ] bi@
     [ natural-sort ] bi@ ;
 
 11 [

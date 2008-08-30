@@ -76,16 +76,16 @@ HELP: add-edge*
     { "from" "The index of a vertex" }
     { "to" "The index of another vertex" }
     { "graph" "A graph" } }
-{ $description "Adds a one-way edge to the graph, between from and to."
+{ $description "Adds a one-way edge to the graph, between " { $snippet "from" } " and " { $snippet "to" } "."
   $nl 
   "If you want to add a two-way edge, use " { $link add-edge } " instead." } ;
 
 HELP: add-edge
 { $values
-    { "m" "The index of a vertex" }
-    { "n" "The index of another vertex" }
+    { "u" "The index of a vertex" }
+    { "v" "The index of another vertex" }
     { "graph" "A graph" } }
-{ $description "Adds a two-way edge to the graph, between m and n."
+{ $description "Adds a two-way edge to the graph, between " { $snippet "u" } " and " { $snippet "v" } "."
   $nl
   "If you want to add a one-way edge, use " { $link add-edge* } " instead." } ;
 

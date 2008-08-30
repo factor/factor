@@ -29,8 +29,8 @@ TUPLE: lexer text line line-text line-length column ;
 
 : change-lexer-column ( lexer quot -- )
     swap
-    [ dup lexer-column swap lexer-line-text rot call ] keep
-    set-lexer-column ; inline
+    [ [ column>> ] [ line-text>> ] bi rot call ] keep
+    (>>column) ; inline
 
 GENERIC: skip-blank ( lexer -- )
 
@@ -45,16 +45,18 @@ M: lexer skip-word ( lexer -- )
     ] change-lexer-column ;
 
 : still-parsing? ( lexer -- ? )
-    dup lexer-line swap lexer-text length <= ;
+    [ line>> ] [ text>> ] bi length <= ;
 
 : still-parsing-line? ( lexer -- ? )
-    dup lexer-column swap lexer-line-length < ;
+    [ column>> ] [ line-length>> ] bi < ;
 
 : (parse-token) ( lexer -- str )
-    [ lexer-column ] keep
-    [ skip-word ] keep
-    [ lexer-column ] keep
-    lexer-line-text subseq ;
+    {
+        [ column>> ]
+        [ skip-word ]
+        [ column>> ]
+        [ line-text>> ]
+    } cleave subseq ;
 
 :  parse-token ( lexer -- str/f )
     dup still-parsing? [
@@ -68,7 +70,7 @@ M: lexer skip-word ( lexer -- )
 ERROR: unexpected want got ;
 
 PREDICATE: unexpected-eof < unexpected
-    unexpected-got not ;
+    got>> not ;
 
 : unexpected-eof ( word -- * ) f unexpected ;
 

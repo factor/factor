@@ -4,14 +4,14 @@
 ! Concurrency library for Factor, based on Erlang/Termite style
 ! concurrency.
 USING: kernel threads concurrency.mailboxes continuations
-namespaces assocs random ;
+namespaces assocs random accessors ;
 IN: concurrency.messaging
 
 GENERIC: send ( message thread -- )
 
 : mailbox-of ( thread -- mailbox )
-    dup thread-mailbox [ ] [
-        <mailbox> dup rot set-thread-mailbox
+    dup mailbox>> [ ] [
+        <mailbox> [ >>mailbox drop ] keep
     ] ?if ;
 
 M: thread send ( message thread -- )
@@ -45,11 +45,11 @@ TUPLE: synchronous data sender tag ;
 TUPLE: reply data tag ;
 
 : <reply> ( data synchronous -- reply )
-    synchronous-tag \ reply boa ;
+    tag>> \ reply boa ;
 
 : synchronous-reply? ( response synchronous -- ? )
     over reply?
-    [ >r reply-tag r> synchronous-tag = ]
+    [ >r tag>> r> tag>> = ]
     [ 2drop f ] if ;
 
 : send-synchronous ( message thread -- reply )
@@ -58,15 +58,15 @@ TUPLE: reply data tag ;
     ] [
         >r <synchronous> dup r> send
         [ synchronous-reply? ] curry receive-if
-        reply-data
+        data>>
     ] if ;
 
 : reply-synchronous ( message synchronous -- )
-    [ <reply> ] keep synchronous-sender send ;
+    [ <reply> ] keep sender>> send ;
 
 : handle-synchronous ( quot -- )
     receive [
-        synchronous-data swap call
+        data>> swap call
     ] keep reply-synchronous ; inline
 
 <PRIVATE

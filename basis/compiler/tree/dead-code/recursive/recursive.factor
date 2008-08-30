@@ -13,11 +13,8 @@ M: #enter-recursive compute-live-values*
     #! corresponding inputs to the #call-recursive are live also.
     [ out-d>> ] [ recursive-phi-in ] bi look-at-phi ;
 
-: return-recursive-phi-in ( #return-recursive -- phi-in )
-    [ label>> calls>> [ in-d>> ] map ] [ in-d>> ] bi suffix ;
-
 M: #return-recursive compute-live-values*
-    [ out-d>> ] [ return-recursive-phi-in ] bi look-at-phi ;
+    [ out-d>> ] [ in-d>> ] bi look-at-mapping ;
 
 M: #call-recursive compute-live-values*
     #! If the output of a #call-recursive is live, then the
@@ -33,15 +30,6 @@ M: #call-recursive compute-live-values*
         inputs
         drop-values
     ] ;
-
-M: #recursive remove-dead-code* ( node -- nodes )
-    dup [ in-d>> ] [ label>> enter-out>> ] bi drop-dead-inputs
-    {
-        [ [ dup label>> enter-recursive>> ] [ out-d>> ] bi* '[ , >>in-d drop ] bi@ ]
-        [ drop [ (remove-dead-code) ] change-child drop ]
-        [ drop label>> [ filter-live ] change-enter-out drop ]
-        [ swap 2array ]
-    } 2cleave ;
 
 M: #enter-recursive remove-dead-code*
     [ filter-live ] change-out-d ;
@@ -73,9 +61,30 @@ M: #call-recursive remove-dead-code*
     [ drop-call-recursive-outputs ]
     tri 3array ;
 
-M: #return-recursive remove-dead-code* ( node -- nodes )
-    dup [ in-d>> ] [ out-d>> ] bi drop-dead-inputs
-    [ drop [ filter-live ] change-out-d drop ]
-    [ out-d>> >>in-d drop ]
-    [ swap 2array ]
-    2tri ;
+:: drop-recursive-inputs ( node -- shuffle )
+    [let* | shuffle [ node [ in-d>> ] [ label>> enter-out>> ] bi drop-dead-inputs ]
+            new-outputs [ shuffle out-d>> ] |
+        node new-outputs
+        [ [ label>> enter-recursive>> ] dip >>in-d drop ] [ >>in-d drop ] 2bi
+        shuffle
+    ] ;
+
+:: drop-recursive-outputs ( node -- shuffle )
+    [let* | return [ node label>> return>> ]
+            new-inputs [ return in-d>> filter-live ]
+            new-outputs [ return [ in-d>> ] [ out-d>> ] bi filter-corresponding ] |
+        return
+        [ new-inputs >>in-d new-outputs >>out-d drop ]
+        [ drop-dead-outputs ]
+        bi
+    ] ;
+
+M:: #recursive remove-dead-code* ( node -- nodes )
+    [let* | drop-inputs [ node drop-recursive-inputs ]
+            drop-outputs [ node drop-recursive-outputs ] |
+         node [ (remove-dead-code) ] change-child drop
+         node label>> [ filter-live ] change-enter-out drop
+         drop-inputs node drop-outputs 3array
+    ] ;
+
+M: #return-recursive remove-dead-code* ;

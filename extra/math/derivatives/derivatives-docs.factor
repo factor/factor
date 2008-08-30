@@ -1,8 +1,8 @@
-USING: help.markup help.syntax math.functions ;
+USING: help.markup help.syntax math math.functions ;
 IN: math.derivatives
 
 HELP: derivative ( x function -- m )
-{ $values { "x" "a position on the function" } { "function" "a differentiable function" } }
+{ $values { "x" "a position on the function" } { "function" "a differentiable function" } { "m" number } }
 { $description
     "Approximates the slope of the tangent line by using Ridders' "
     "method of computing derivatives, from the chapter \"Accurate computation "
@@ -10,8 +10,8 @@ HELP: derivative ( x function -- m )
 }
 { $examples
     { $example
-        "USING: math.derivatives prettyprint ;"
-        "[ sq ] 4 derivative ."
+        "USING: math math.derivatives prettyprint ;"
+        "4 [ sq ] derivative >integer ."
         "8"
     }
     { $notes
@@ -20,10 +20,10 @@ HELP: derivative ( x function -- m )
     }
 } ;
 
-HELP: (derivative) ( x function h err -- m )
+HELP: (derivative)
 { $values
     { "x" "a position on the function" }
-    { "function" "a differentiable function" }
+    { "func" "a differentiable function" }
     {
         "h" "distance between the points of the first secant line used for "
         "approximation of the tangent. This distance will be divided "
@@ -41,6 +41,8 @@ HELP: (derivative) ( x function h err -- m )
         "when the error multiplies by 2. See " { $link check-safe } " for "
         "the enforcing code."
     }
+    {   "ans" number }
+    {   "error" number }
 }
 { $description
     "Approximates the slope of the tangent line by using Ridders' "
@@ -50,8 +52,8 @@ HELP: (derivative) ( x function h err -- m )
 }
 { $examples
     { $example
-        "USING: math.derivatives prettyprint ;"
-        "[ sq ] 4 derivative ."
+        "USING: math math.derivatives prettyprint ;"
+        "4 [ sq ] derivative >integer ."
         "8"
     }
     { $notes
@@ -60,7 +62,7 @@ HELP: (derivative) ( x function h err -- m )
     }
 } ;
 
-HELP: derivative-func ( function -- der )
+HELP: derivative-func
 { $values { "func" "a differentiable function" } { "der" "the derivative" } }
 { $description
     "Provides the derivative of the function. The implementation simply "
@@ -68,7 +70,7 @@ HELP: derivative-func ( function -- der )
 }
 { $examples
     { $example
-        "USING: math.derivatives prettyprint ;"
+        "USING: kernel math.derivatives math.functions math.trig prettyprint ;"
         "60 deg>rad [ sin ] derivative-func call ."
         "0.5000000000000173"
     }

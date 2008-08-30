@@ -23,7 +23,7 @@ tags global [ H{ } clone or ] change-at
 
 MEMO: chloe-name ( string -- name )
     name new
-        swap >>tag
+        swap >>main
         chloe-ns >>url ;
 
 : required-attr ( tag name -- value )
@@ -45,7 +45,7 @@ MEMO: chloe-name ( string -- name )
 : attrs>slots ( tag tuple -- )
     [ attrs>> ] [ <mirror> ] bi*
     '[
-        swap tag>> dup "name" =
+        swap main>> dup "name" =
         [ 2drop ] [ , set-at ] if
     ] assoc-each ;
 

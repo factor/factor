@@ -88,13 +88,12 @@ SYMBOL: prolog-data
 : next* ( -- )
     get-char [ (next) record ] when ;
 
-: skip-until ( quot -- )
-    #! quot: ( -- ? )
+: skip-until ( quot: ( -- ? ) -- )
     get-char [
         [ call ] keep swap [ drop ] [
             next skip-until
         ] if
-    ] [ drop ] if ; inline
+    ] [ drop ] if ; inline recursive
 
 : take-until ( quot -- string )
     #! Take the substring of a string starting at spot

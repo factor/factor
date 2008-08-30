@@ -2,14 +2,14 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: parser kernel sequences words effects
 stack-checker.transforms combinators assocs definitions
-quotations namespaces memoize ;
+quotations namespaces memoize accessors ;
 IN: macros
 
 : real-macro-effect ( word -- effect' )
-    "declared-effect" word-prop effect-in 1 <effect> ;
+    "declared-effect" word-prop in>> 1 <effect> ;
 
 : define-macro ( word definition -- )
-    over "declared-effect" word-prop effect-in length >r
+    over "declared-effect" word-prop in>> length >r
     2dup "macro" set-word-prop
     2dup over real-macro-effect memoize-quot [ call ] append define
     r> define-transform ;

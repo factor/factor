@@ -124,13 +124,11 @@ $nl
 
     { { { $snippet "\"inferred-effect\"" } } { $link "inference" } }
 
-    { { $snippet "\"specializer\"" } { $link "specializers" } }
+    { { $snippet "\"specializer\"" } { $link "hints" } }
     
     { { { $snippet "\"intrinsics\"" } ", " { $snippet "\"if-intrinsics\"" } } { $link "generator" } }
 
     { { $snippet "\"predicating\"" } " Set on class predicates, stores the corresponding class word" }
-    
-    { { { $snippet "\"constructing\"" } ", " { $snippet "\"constructor-quot\"" } } { $link "tuple-constructors" } }
 }
 "Properties which are defined for classes only:"
 { $table
@@ -163,12 +161,12 @@ ARTICLE: "words" "Words"
 $nl
 "Word introspection facilities and implementation details are found in the " { $vocab-link "words" } " vocabulary."
 $nl
-"A word consists of several parts:"
-{ $list
-    "a word name,"
-    "a vocabulary name,"
-    "a definition quotation, called when the word when executed,"
-    "a set of word properties, including documentation and other meta-data."
+"Word objects contain several slots:"
+{ $table
+    { { $snippet "name" } "a word name" }
+    { { $snippet "vocabulary" } "a word vocabulary name" }
+    { { $snippet "def" } "a definition quotation" }
+    { { $snippet "props" } "an assoc of word properties, including documentation and other meta-data" }
 }
 "Words are instances of a class."
 { $subsection word }

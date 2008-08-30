@@ -23,16 +23,16 @@ M: tuple error-help class ;
 M: string error. print ;
 
 : :s ( -- )
-    error-continuation get continuation-data stack. ;
+    error-continuation get data>> stack. ;
 
 : :r ( -- )
-    error-continuation get continuation-retain stack. ;
+    error-continuation get retain>> stack. ;
 
 : :c ( -- )
-    error-continuation get continuation-call callstack. ;
+    error-continuation get call>> callstack. ;
 
 : :get ( variable -- value )
-    error-continuation get continuation-name assoc-stack ;
+    error-continuation get name>> assoc-stack ;
 
 : :res ( n -- * )
     1- restarts get-global nth f restarts set-global restart ;
@@ -44,7 +44,7 @@ M: string error. print ;
 : restart. ( restart n -- )
     [
         1+ dup 3 <= [ ":" % # "    " % ] [ # " :res  " % ] if
-        restart-name %
+        name>> %
     ] "" make print ;
 
 : restarts. ( -- )

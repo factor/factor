@@ -15,11 +15,11 @@ checksum
 uses definitions ;
 
 : record-checksum ( lines source-file -- )
-    >r crc32 checksum-lines r> set-source-file-checksum ;
+    [ crc32 checksum-lines ] dip (>>checksum) ;
 
 : (xref-source) ( source-file -- pathname uses )
-    dup source-file-path <pathname>
-    swap source-file-uses [ crossref? ] filter ;
+    [ path>> <pathname> ]
+    [ uses>> [ crossref? ] filter ] bi ;
 
 : xref-source ( source-file -- )
     (xref-source) crossref get add-vertex ;
@@ -31,20 +31,22 @@ uses definitions ;
     source-files get [ nip xref-source ] assoc-each ;
 
 : record-form ( quot source-file -- )
-    dup unxref-source
-    swap quot-uses keys over set-source-file-uses
+    tuck unxref-source
+    quot-uses keys >>uses
     xref-source ;
 
 : record-definitions ( file -- )
-    new-definitions get swap set-source-file-definitions ;
+    new-definitions get >>definitions drop ;
 
 : <source-file> ( path -- source-file )
     \ source-file new
         swap >>path
         <definitions> >>definitions ;
 
+ERROR: invalid-source-file-path path ;
+
 : source-file ( path -- source-file )
-    dup string? [ "Invalid source file path" throw ] unless
+    dup string? [ invalid-source-file-path ] unless
     source-files get [ <source-file> ] cache ;
 
 : reset-checksums ( -- )
@@ -70,8 +72,9 @@ M: pathname forget*
     pathname-string forget-source ;
 
 : rollback-source-file ( file -- )
-    dup source-file-definitions new-definitions get [ assoc-union ] 2map
-    swap set-source-file-definitions ;
+    [
+        new-definitions get [ assoc-union ] 2map
+    ] change-definitions drop ;
 
 SYMBOL: file
 
@@ -87,7 +90,7 @@ TUPLE: source-file-error file error ;
     [
         swap source-file
         dup file set
-        source-file-definitions old-definitions set
+        definitions>> old-definitions set
         [
             file get rollback-source-file
             <source-file-error> rethrow

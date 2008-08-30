@@ -1,6 +1,6 @@
 USING: unicode.data sequences sequences.next namespaces
 unicode.normalize math unicode.categories combinators
-assocs strings splitting kernel ;
+assocs strings splitting kernel accessors ;
 IN: unicode.case
 
 : at-default ( key assoc -- value/key ) over >r at r> or ;
@@ -91,17 +91,17 @@ SYMBOL: locale ! Just casing locale, or overall?
 
 : >lower ( string -- lower )
     i-dot? [ turk>lower ] when
-    final-sigma [ code-point-lower ] [ ch>lower ] map-case ;
+    final-sigma [ lower>> ] [ ch>lower ] map-case ;
 
 : >upper ( string -- upper )
     i-dot? [ turk>upper ] when
-    [ code-point-upper ] [ ch>upper ] map-case ;
+    [ upper>> ] [ ch>upper ] map-case ;
 
 : >title ( string -- title )
     final-sigma
     CHAR: \s swap
     [ tuck word-boundary swapd
-        [ code-point-title ] [ code-point-lower ] if ]
+        [ title>> ] [ lower>> ] if ]
     [ tuck word-boundary swapd 
         [ ch>title ] [ ch>lower ] if ]
     map-case nip ;

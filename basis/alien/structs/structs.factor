@@ -11,17 +11,17 @@ IN: alien.structs
 : struct-offsets ( specs -- size )
     0 [
         [ class>> align-offset ] keep
-        [ set-slot-spec-offset ] 2keep
+        [ (>>offset) ] 2keep
         class>> heap-size +
     ] reduce ;
 
 : define-struct-slot-word ( spec word quot -- )
-    rot slot-spec-offset prefix define-inline ;
+    rot offset>> prefix define-inline ;
 
 : define-getter ( type spec -- )
     [ set-reader-props ] keep
     [ ]
-    [ slot-spec-reader ]
+    [ reader>> ]
     [
         class>>
         [ c-getter ] [ c-type c-type-boxer-quot ] bi append
@@ -31,7 +31,7 @@ IN: alien.structs
 : define-setter ( type spec -- )
     [ set-writer-props ] keep
     [ ]
-    [ slot-spec-writer ]
+    [ writer>> ]
     [ class>> c-setter ] tri
     define-struct-slot-word ;
 

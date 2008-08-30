@@ -84,5 +84,5 @@ DEFER: quoted-field ( -- endchar )
 : write-row ( row -- )
   [ delimiter get write1 ] [ escape-if-required write ] interleave nl ; inline
     
-: write-csv ( rows outstream -- )
+: write-csv ( rows stream -- )
   [ [ write-row ] each ] with-output-stream ;

@@ -15,7 +15,7 @@ TUPLE: frame-required n ;
 
 : stack-frame-size ( code -- n )
     no-stack-frame [
-        dup frame-required? [ frame-required-n max ] [ drop ] if
+        dup frame-required? [ n>> max ] [ drop ] if
     ] reduce ;
 
 GENERIC: fixup* ( frame-size obj -- frame-size )
@@ -29,7 +29,7 @@ TUPLE: label offset ;
 : <label> ( -- label ) label new ;
 
 M: label fixup*
-    compiled-offset swap set-label-offset ;
+    compiled-offset >>offset drop ;
 
 : define-label ( name -- ) <label> swap set ;
 
@@ -138,7 +138,7 @@ SYMBOL: literal-table
 
 : resolve-labels ( labels -- labels' )
     [
-        first3 label-offset
+        first3 offset>>
         [ "Unresolved label" throw ] unless*
         3array
     ] map concat ;

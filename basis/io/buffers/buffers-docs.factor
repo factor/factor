@@ -35,8 +35,8 @@ HELP: buffer
 $nl
 "Buffers have two internal pointers:"
 { $list
-    { { $link buffer-fill } " - the fill pointer, a write index where new data is added" }
-    { { $link buffer-pos } " - the position, a read index where data is consumed" }
+    { { $snippet "fill" } " - the fill pointer, a write index where new data is added" }
+    { { $snippet "pos" } " - the position, a read index where data is consumed" }
 } } ;
 
 HELP: <buffer>

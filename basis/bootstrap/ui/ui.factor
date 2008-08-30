@@ -1,5 +1,6 @@
 USING: alien namespaces system combinators kernel sequences
 vocabs vocabs.loader ;
+IN: bootstrap.ui
 
 "bootstrap.compiler" vocab [
     "ui-backend" get [

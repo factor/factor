@@ -53,7 +53,7 @@ TUPLE: library path abi dll ;
     over dup [ dlopen ] when \ library boa ;
 
 : load-library ( name -- dll )
-    library dup [ library-dll ] when ;
+    library dup [ dll>> ] when ;
 
 : add-library ( name path abi -- )
     <library> swap libraries get set-at ;

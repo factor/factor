@@ -1,6 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.order sequences ;
+USING: kernel math math.order sequences
+combinators.short-circuit ;
 IN: ascii
 
 : blank? ( ch -- ? ) " \t\n\r" member? ; inline
@@ -20,7 +21,7 @@ IN: ascii
     dup printable? [ "\"\\" member? not ] [ drop f ] if ; inline
 
 : Letter? ( ch -- ? )
-    dup letter? [ drop t ] [ LETTER? ] if ; inline
+    [ [ letter? ] [ LETTER? ] ] 1|| ;
 
 : alpha? ( ch -- ? )
-    dup Letter? [ drop t ] [ digit? ] if ; inline
+    [ [ Letter? ] [ digit? ] ] 1|| ;

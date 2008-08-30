@@ -58,8 +58,7 @@ INSTANCE: float-array sequence
 : 4float-array ( w x y z -- array )
     T{ float-array } 4sequence ; inline
 
-: F{ ( parsed -- parsed )
-    \ } [ >float-array ] parse-literal ; parsing
+: F{ \ } [ >float-array ] parse-literal ; parsing
 
 M: float-array pprint-delims drop \ F{ \ } ;
 

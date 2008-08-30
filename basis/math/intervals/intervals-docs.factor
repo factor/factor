@@ -88,7 +88,7 @@ ABOUT: "math-intervals"
 HELP: interval
 { $class-description "An interval represents a set of real numbers between two endpoints; the endpoints can either be included or excluded from the interval."
 $nl
-"The " { $link interval-from } " and " { $link interval-to } " slots store endpoints, represented as arrays of the shape " { $snippet "{ number included? }" } "."
+"The " { $snippet "from" } " and " { $snippet "to" } " slots store endpoints, represented as arrays of the shape " { $snippet "{ number included? }" } "."
 $nl
 "Intervals are created by calling " { $link [a,b] } ", " { $link (a,b) } ", " { $link [a,b) } ", " { $link (a,b] } " or " { $link [a,a] } "." } ;
 

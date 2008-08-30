@@ -11,6 +11,8 @@ TUPLE: regexp
     nfa-table
     dfa-table
     minimized-table
+    { nfa-traversal-flags hashtable }
+    { dfa-traversal-flags hashtable }
     { state integer }
     { new-states vector }
     { visited-states hashtable } ;

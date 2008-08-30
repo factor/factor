@@ -1,5 +1,5 @@
 USING: sequences namespaces unicode.data kernel math arrays
-locals sorting.insertion ;
+locals sorting.insertion accessors ;
 IN: unicode.normalize
 
 ! Conjoining Jamo behavior
@@ -43,7 +43,7 @@ IN: unicode.normalize
 : reorder-next ( string i -- new-i done? )
     over [ non-starter? ] find-from drop [
         reorder-slice
-        >r dup [ combining-class ] insertion-sort slice-to r>
+        >r dup [ combining-class ] insertion-sort to>> r>
     ] [ length t ] if* ;
 
 : reorder-loop ( string start -- )

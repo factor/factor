@@ -24,7 +24,7 @@ t parser-notes set-global
 
 : note. ( str -- )
     parser-notes? [
-        file get [ path>> write ] when*
+        file get [ path>> write ":" write ] when* 
         lexer get line>> number>string write ": " write
         "Note: " write dup print
     ] when drop ;
@@ -216,7 +216,7 @@ SYMBOL: interactive-vocabs
 : filter-moved ( assoc1 assoc2 -- seq )
     swap assoc-diff [
         drop where dup [ first ] when
-        file get source-file-path =
+        file get path>> =
     ] assoc-filter keys ;
 
 : removed-definitions ( -- assoc1 assoc2 )

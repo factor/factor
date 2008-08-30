@@ -222,6 +222,8 @@ IN: regexp2-tests
     <regexp> drop
 ] unit-test
 
+! Comment
+[ t ] [ "ac" "a(?#boo)c" <regexp> matches? ] unit-test
 
 
 

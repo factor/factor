@@ -1,11 +1,15 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays calendar combinators generic init kernel math
-namespaces sequences heaps boxes threads debugger quotations
-assocs math.order ;
+USING: accessors arrays calendar combinators generic init
+kernel math namespaces sequences heaps boxes threads debugger
+quotations assocs math.order ;
 IN: alarms
 
-TUPLE: alarm quot time interval entry ;
+TUPLE: alarm
+    { quot callable initial: [ ] }
+    { time timestamp }
+    interval
+    { entry box } ;
 
 <PRIVATE
 
@@ -15,31 +19,28 @@ SYMBOL: alarm-thread
 : notify-alarm-thread ( -- )
     alarm-thread get-global interrupt ;
 
-: check-alarm
-    dup duration? over not or [ "Not a duration" throw ] unless
-    over timestamp? [ "Not a timestamp" throw ] unless
-    pick callable? [ "Not a quotation" throw ] unless ; inline
+ERROR: bad-alarm-frequency frequency ;
+: check-alarm ( frequency/f -- frequency/f )
+    dup [ duration? ] [ not ] bi or [ bad-alarm-frequency ] unless ;
 
 : <alarm> ( quot time frequency -- alarm )
     check-alarm <box> alarm boa ;
 
 : register-alarm ( alarm -- )
-    dup dup alarm-time alarms get-global heap-push*
-    swap alarm-entry >box
+    dup dup time>> alarms get-global heap-push*
+    swap entry>> >box
     notify-alarm-thread ;
 
 : alarm-expired? ( alarm now -- ? )
-    >r alarm-time r> before=? ;
+    [ time>> ] dip before=? ;
 
 : reschedule-alarm ( alarm -- )
-    dup alarm-time over alarm-interval time+
-    over set-alarm-time
-    register-alarm ;
+    dup [ swap interval>> time+ ] change-time register-alarm ;
 
 : call-alarm ( alarm -- )
-    dup alarm-entry box> drop
-    dup alarm-quot "Alarm execution" spawn drop
-    dup alarm-interval [ reschedule-alarm ] [ drop ] if ;
+    [ entry>> box> drop ]
+    [ quot>> "Alarm execution" spawn drop ]
+    [ dup interval>> [ reschedule-alarm ] [ drop ] if ] tri ;
 
 : (trigger-alarms) ( alarms now -- )
     over heap-empty? [
@@ -57,7 +58,7 @@ SYMBOL: alarm-thread
 
 : next-alarm ( alarms -- timestamp/f )
     dup heap-empty?
-    [ drop f ] [ heap-peek drop alarm-time ] if ;
+    [ drop f ] [ heap-peek drop time>> ] if ;
 
 : alarm-thread-loop ( -- )
     alarms get-global
@@ -66,7 +67,7 @@ SYMBOL: alarm-thread
 
 : cancel-alarms ( alarms -- )
     [
-        heap-pop-all [ nip alarm-entry box> drop ] assoc-each
+        heap-pop-all [ nip entry>> box> drop ] assoc-each
     ] when* ;
 
 : init-alarms ( -- )
@@ -88,4 +89,4 @@ PRIVATE>
     [ hence ] keep add-alarm ;
 
 : cancel-alarm ( alarm -- )
-    alarm-entry [ alarms get-global heap-delete ] if-box? ;
+    entry>> [ alarms get-global heap-delete ] if-box? ;

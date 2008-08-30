@@ -10,13 +10,13 @@ IN: xml.utilities
 TUPLE: process-missing process tag ;
 M: process-missing error.
     "Tag <" write
-    dup process-missing-tag print-name
+    dup tag>> print-name
     "> not implemented on process process " write
-    process-missing-process name>> print ;
+    name>> print ;
 
 : run-process ( tag word -- )
     2dup "xtable" word-prop
-    >r dup name-tag r> at* [ 2nip call ] [
+    >r dup main>> r> at* [ 2nip call ] [
         drop \ process-missing boa throw
     ] if ;
 
@@ -48,17 +48,18 @@ M: process-missing error.
     standard-prolog { } rot { } <xml> ;
 
 : children>string ( tag -- string )
-    tag-children {
+    children>> {
         { [ dup empty? ] [ drop "" ] }
-        { [ dup [ string? not ] contains? ] [ "XML tag unexpectedly contains non-text children" throw ] }
+        { [ dup [ string? not ] contains? ]
+          [ "XML tag unexpectedly contains non-text children" throw ] }
         [ concat ]
     } cond ;
 
 : children-tags ( tag -- sequence )
-    tag-children [ tag? ] filter ;
+    children>> [ tag? ] filter ;
 
 : first-child-tag ( tag -- tag )
-    tag-children [ tag? ] find nip ;
+    children>> [ tag? ] find nip ;
 
 ! * Accessing part of an XML document
 ! for tag- words, a start means that it searches all children
@@ -91,7 +92,7 @@ M: process-missing error.
     assure-name [ tag-with-attr? ] 2curry find nip ;
 
 : tags-with-attr ( tag attr-value attr-name -- tags-seq )
-    tags@ [ tag-with-attr? ] 2curry filter tag-children ;
+    tags@ [ tag-with-attr? ] 2curry filter children>> ;
 
 : deep-tag-with-attr ( tag attr-value attr-name -- matching-tag )
     assure-name [ tag-with-attr? ] 2curry deep-find ;
@@ -109,8 +110,8 @@ M: process-missing error.
     names-match? [ "Unexpected XML tag found" throw ] unless ;
 
 : insert-children ( children tag -- )
-    dup tag-children [ push-all ]
-    [ >r V{ } like r> set-tag-children ] if ;
+    dup children>> [ push-all ]
+    [ swap V{ } like >>children drop ] if ;
 
 : insert-child ( child tag -- )
     >r 1vector r> insert-children ;

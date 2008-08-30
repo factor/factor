@@ -1,8 +1,6 @@
-
-! USING: kernel quotations namespaces sequences assocs.lib ;
-
 USING: kernel namespaces namespaces.private quotations sequences
-       assocs.lib math.parser math generalizations locals mirrors ;
+       assocs.lib math.parser math generalizations locals mirrors
+       macros ;
 
 IN: namespaces.lib
 
@@ -42,22 +40,20 @@ SYMBOL: building-seq
 : 4% ( seq -- ) 4 n% ;
 : 4# ( num -- ) 4 n# ;
 
-MACRO:: nmake ( quot exemplars -- )
-    [let | n [ exemplars length ] |
-        [
-            [
-                exemplars
-                [ 0 swap new-resizable ] map
-                building-seq set
+MACRO: finish-nmake ( exemplars -- )
+    length [ firstn ] curry ;
 
-                quot call
+:: nmake ( quot exemplars -- )
+    [
+        exemplars
+        [ 0 swap new-resizable ] map
+        building-seq set
 
-                building-seq get
-                exemplars [ like ] 2map
-                n firstn
-            ] with-scope
-        ]
-    ] ;
+        quot call
+
+        building-seq get
+        exemplars [ [ like ] 2map ] [ finish-nmake ] bi
+    ] with-scope ; inline
 
 : make-object ( quot class -- object )
     new [ <mirror> swap bind ] keep ; inline

@@ -110,7 +110,7 @@ TUPLE: peg-head rule-id involved-set eval-set ;
 : input-from ( input -- n )
   #! Return the index from the original string that the
   #! input slice is based on.
-  dup slice? [ slice-from ] [ drop 0 ] if ;
+  dup slice? [ from>> ] [ drop 0 ] if ;
 
 : process-rule-result ( p result -- result )
   [
