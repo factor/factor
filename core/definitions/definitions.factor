@@ -35,6 +35,15 @@ SYMBOL: changed-definitions
     swap changed-definitions get
     [ set-at ] [ no-compilation-unit ] if* ;
 
+SYMBOL: new-classes
+
+: new-class ( word -- )
+    dup new-classes get
+    [ set-at ] [ no-compilation-unit ] if* ;
+
+: new-class? ( word -- ? )
+    new-classes get key? ;
+
 GENERIC: where ( defspec -- loc )
 
 M: object where drop f ;
