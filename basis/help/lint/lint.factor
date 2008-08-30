@@ -117,7 +117,7 @@ M: help-error error.
     ] keep ;
 
 : check-about ( vocab -- )
-    [ help>> [ article drop ] when* ] check-something ;
+    [ vocab-help [ article drop ] when* ] check-something ;
 
 : check-vocab ( vocab -- seq )
     "Checking " write dup write "..." print

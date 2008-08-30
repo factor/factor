@@ -175,7 +175,7 @@ M: vocab summary
     [
         dup vocab-summary %
         " (" %
-        vocab-words assoc-size #
+        words>> assoc-size #
         " words)" %
     ] "" make ;
 
