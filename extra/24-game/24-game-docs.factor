@@ -35,8 +35,8 @@ HELP: 24-able ( -- vector )
 }
 { $examples
     { $example
-        "USE: 24-game"
-        "24-able vector-24-able? ."
+        "USING: 24-game prettyprint ;"
+        "24-able 24-able? ."
         "t"
     }
     { $notes { $link 24-able? } " is used in " { $link 24-able } "." }
@@ -54,7 +54,7 @@ HELP: 24-able? ( quad -- t/f )
 
 HELP: build-quad ( -- array )
 { $values
-    { "vector" "an array of 4 numbers" }
+    { "array" "an array of 4 numbers" }
 }
 { $description "Builds an array of 4 random numbers." } ;
 ARTICLE: "24-game" "The Game of 24"
