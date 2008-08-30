@@ -9,22 +9,22 @@ definitions ;
 SYMBOL: a
 SYMBOL: b
 
-[ ] [ a +called+ depends-on ] unit-test
+[ ] [ a called-dependency depends-on ] unit-test
 
-[ H{ { a +called+ } } ] [
-    [ a +called+ depends-on ] computing-dependencies
+[ H{ { a called-dependency } } ] [
+    [ a called-dependency depends-on ] computing-dependencies
 ] unit-test
 
-[ H{ { a +called+ } { b +inlined+ } } ] [
+[ H{ { a called-dependency } { b inlined-dependency } } ] [
     [
-        a +called+ depends-on b +inlined+ depends-on
+        a called-dependency depends-on b inlined-dependency depends-on
     ] computing-dependencies
 ] unit-test
 
-[ H{ { a +inlined+ } { b +inlined+ } } ] [
+[ H{ { a inlined-dependency } { b inlined-dependency } } ] [
     [
-        a +inlined+ depends-on
-        a +called+ depends-on
-        b +inlined+ depends-on
+        a inlined-dependency depends-on
+        a called-dependency depends-on
+        b inlined-dependency depends-on
     ] computing-dependencies
 ] unit-test

@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel continuations assocs namespaces
-sequences words vocabs definitions hashtables init sets ;
+sequences words vocabs definitions hashtables init sets
+math.order classes.algebra ;
 IN: compiler.units
 
 SYMBOL: old-definitions
@@ -71,6 +72,46 @@ GENERIC: definitions-changed ( assoc obj -- )
 
 SYMBOL: outdated-tuples
 SYMBOL: update-tuples-hook
+
+: strongest-dependency ( how1 how2 -- how )
+    [ called-dependency or ] bi@
+    2dup [ method-dependency? ] both?
+    [ [ class>> ] bi@ class-or <method-dependency> ] [ max ] if ;
+
+: weakest-dependency ( how1 how2 -- how )
+    [ inlined-dependency or ] bi@
+    2dup [ method-dependency? ] both?
+    [ [ class>> ] bi@ class-and <method-dependency> ] [ min ] if ;
+
+: relevant-dependency? ( how to -- ? )
+    #! Note that an intersection check alone is not enough,
+    #! since we're also interested in empty mixins.
+    2dup [ method-dependency? ] both? [
+        [ class>> ] bi@
+        [ classes-intersect? ] [ class<= ] 2bi or
+    ] [ after=? ] if ;
+
+: compiled-usage ( word -- assoc )
+    compiled-crossref get at ;
+
+: (compiled-usages) ( word dependency -- assoc )
+    #! If the word is not flushable anymore, we have to recompile
+    #! all words which flushable away a call (presumably when the
+    #! word was still flushable). If the word is flushable, we
+    #! don't have to recompile words that folded this away.
+    [ drop compiled-usage ]
+    [
+        swap "flushable" word-prop inlined-dependency flushed-dependency ?
+        weakest-dependency
+    ] 2bi
+    [ relevant-dependency? nip ] curry assoc-filter ;
+
+: compiled-usages ( assoc -- seq )
+    clone [
+        dup [
+            [ (compiled-usages) ] dip swap update
+        ] curry assoc-each
+    ] keep keys ;
 
 : call-recompile-hook ( -- )
     changed-definitions get [ drop word? ] assoc-filter

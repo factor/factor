@@ -46,7 +46,7 @@ SYMBOL: +transform-n+
     ] [ 2drop give-up-transform ] if ;
 
 : apply-transform ( word -- )
-    [ +inlined+ depends-on ] [
+    [ inlined-dependency depends-on ] [
         [ ]
         [ +transform-quot+ word-prop ]
         [ +transform-n+ word-prop ]
@@ -55,7 +55,7 @@ SYMBOL: +transform-n+
     ] bi ;
 
 : apply-macro ( word -- )
-    [ +inlined+ depends-on ] [
+    [ inlined-dependency depends-on ] [
         [ ]
         [ "macro" word-prop ]
         [ "declared-effect" word-prop in>> length ]
@@ -92,13 +92,13 @@ SYMBOL: +transform-n+
 \ spread [ spread>quot ] 1 define-transform
 
 \ (call-next-method) [
-    [ [ +inlined+ depends-on ] bi@ ] [ next-method-quot ] 2bi
+    [ [ inlined-dependency depends-on ] bi@ ] [ next-method-quot ] 2bi
 ] 2 define-transform
 
 ! Constructors
 \ boa [
     dup tuple-class? [
-        dup +inlined+ depends-on
+        dup inlined-dependency depends-on
         [ "boa-check" word-prop ]
         [ tuple-layout '[ , <tuple-boa> ] ]
         bi append
@@ -107,7 +107,7 @@ SYMBOL: +transform-n+
 
 \ new [
     dup tuple-class? [
-        dup +inlined+ depends-on
+        dup inlined-dependency depends-on
         dup all-slots rest-slice ! delegate slot
         [ [ initial>> literalize , ] each literalize , \ boa , ] [ ] make
     ] [ drop f ] if

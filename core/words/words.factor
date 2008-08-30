@@ -118,28 +118,6 @@ compiled-crossref global [ H{ } assoc-like ] change-at
     dup compiled-unxref
     compiled-crossref get delete-at ;
 
-: compiled-usage ( word -- assoc )
-    compiled-crossref get at ;
-
-: (compiled-usages) ( word dependency -- assoc )
-    #! If the word is not flushable anymore, we have to recompile
-    #! all words which flushable away a call (presumably when the
-    #! word was still flushable). If the word is flushable, we
-    #! don't have to recompile words that folded this away.
-    [ drop compiled-usage ]
-    [
-        swap "flushable" word-prop +inlined+ +flushed+ ?
-        weakest-dependency
-    ] 2bi
-    [ dependency>= nip ] curry assoc-filter ;
-
-: compiled-usages ( assoc -- seq )
-    clone [
-        dup [
-            [ (compiled-usages) ] dip swap update
-        ] curry assoc-each
-    ] keep keys ;
-
 GENERIC: redefined ( word -- )
 
 M: object redefined drop ;
@@ -149,7 +127,7 @@ M: object redefined drop ;
     over unxref
     over redefined
     >>def
-    dup +inlined+ changed-definition
+    dup inlined-dependency changed-definition
     dup crossref? [ dup xref ] when drop ;
 
 : set-stack-effect ( effect word -- )
@@ -159,7 +137,7 @@ M: object redefined drop ;
         [
             drop
             dup primitive? [ drop ] [
-                [ redefined ] [ +inlined+ changed-definition ] bi
+                [ redefined ] [ inlined-dependency changed-definition ] bi
             ] if
         ] 2bi
     ] if ;

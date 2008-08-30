@@ -55,7 +55,7 @@ IN: hints
 
 : HINTS:
     scan-word
-    [ +inlined+ changed-definition ]
+    [ inlined-dependency changed-definition ]
     [ parse-definition "specializer" set-word-prop ] bi ;
     parsing
 

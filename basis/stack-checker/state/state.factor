@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs namespaces sequences kernel definitions math
-effects accessors words stack-checker.errors ;
+effects accessors words stack-checker.errors
+compiler.units ;
 IN: stack-checker.state
 
 : <value> ( -- value ) \ <value> counter ;

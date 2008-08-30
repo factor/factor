@@ -17,7 +17,7 @@ TUPLE: #introduce < node out-d ;
 : #introduce ( out-d -- node )
     \ #introduce new swap >>out-d ;
 
-TUPLE: #call < node word in-d out-d body method info ;
+TUPLE: #call < node word in-d out-d body method class info ;
 
 : #call ( inputs outputs word -- node )
     \ #call new

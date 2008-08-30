@@ -227,7 +227,7 @@ M: tuple-class update-class
         2drop
         [
             [ update-tuples-after ]
-            [ +inlined+ changed-definition ]
+            [ inlined-dependency changed-definition ]
             [ redefined ]
             tri
         ] each-subclass

@@ -39,6 +39,11 @@ TUPLE: check-mixin-class mixin ;
     [ [ members swap bootstrap-word ] dip call ] [ drop ] 2bi
     swap redefine-mixin-class ; inline
 
+: update-classes/new ( mixin -- )
+    class-usages
+    [ [ update-class ] each ]
+    [ implementors [ make-generic ] each ] bi ;
+
 : add-mixin-instance ( class mixin -- )
     #! Note: we call update-classes on the new member, not the
     #! mixin. This ensures that we only have to update the
@@ -48,9 +53,12 @@ TUPLE: check-mixin-class mixin ;
     #! updated by transitivity; the mixins usages appear in
     #! class-usages of the member, now that it's been added.
     [ 2drop ] [
-        [ [ suffix ] change-mixin-class ]
-        [ drop update-classes ]
-        2bi
+        [ [ suffix ] change-mixin-class ] 2keep
+        tuck [ new-class? ] either? [
+            update-classes/new
+        ] [
+            update-classes
+        ] if
     ] if-mixin-member? ;
 
 : remove-mixin-instance ( class mixin -- )

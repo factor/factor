@@ -186,6 +186,13 @@ M: anonymous-complement (classes-intersect?)
         [ [ rank-class ] bi@ < ]
     } cond ;
 
+: class<=> ( first second -- ? )
+    {
+        { [ 2dup class<= not ] [ 2drop +gt+ ] }
+        { [ 2dup swap class<= not ] [ 2drop +lt+ ] }
+        [ [ rank-class ] bi@ <=> ]
+    } cond ;
+
 : class= ( first second -- ? )
     [ class<= ] [ swap class<= ] 2bi and ;
 

@@ -119,7 +119,7 @@ M: sequence implementors [ implementors ] gather ;
 
 : (define-class) ( word props -- )
     >r
-    dup class? [ implementors-map+ ] unless
+    dup class? [ dup implementors-map+ ] unless
     dup reset-class
     dup deferred? [ dup define-symbol ] when
     dup props>>

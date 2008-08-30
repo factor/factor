@@ -176,7 +176,7 @@ do-primitive alien-invoke alien-indirect alien-callback
 SYMBOL: +primitive+
 
 : non-inline-word ( word -- )
-    dup +called+ depends-on
+    dup called-dependency depends-on
     {
         { [ dup "shuffle" word-prop ] [ infer-shuffle-word ] }
         { [ dup "special" word-prop ] [ infer-special ] }

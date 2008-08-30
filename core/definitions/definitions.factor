@@ -5,24 +5,31 @@ USING: kernel sequences namespaces assocs graphs math math.order ;
 
 ERROR: no-compilation-unit definition ;
 
+SINGLETON: inlined-dependency
+SINGLETON: flushed-dependency
+SINGLETON: called-dependency
+
+TUPLE: method-dependency class ;
+C: <method-dependency> method-dependency
+
+UNION: dependency
+inlined-dependency
+flushed-dependency
+called-dependency
+method-dependency ;
+
+M: dependency <=>
+    [
+        dup method-dependency? [ drop method-dependency ] when
+        {
+            called-dependency
+            method-dependency
+            flushed-dependency
+            inlined-dependency
+        } index
+    ] bi@ <=> ;
+
 SYMBOL: changed-definitions
-
-SYMBOL: +inlined+
-SYMBOL: +flushed+
-SYMBOL: +called+
-
-: dependency<=> ( how1 how2 -- <=> )
-    [ { f +called+ +flushed+ +inlined+ } index ] bi@ <=> ;
-
-: dependency>= ( how1 how2 -- ? ) dependency<=> +lt+ eq? not ;
-
-: strongest-dependency ( how1 how2 -- how )
-    [ dependency>= ] most ;
-
-: dependency<= ( how1 how2 -- ? ) dependency<=> +gt+ eq? not ;
-
-: weakest-dependency ( how1 how2 -- how )
-    [ dependency<= ] most ;
 
 : changed-definition ( defspec how -- )
     swap changed-definitions get

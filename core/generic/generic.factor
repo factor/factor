@@ -63,7 +63,8 @@ TUPLE: check-method class generic ;
     values ;
 
 : update-generic ( class generic -- )
-    affected-methods [ +called+ changed-definition ] each ;
+    [ affected-methods ] [ drop <method-dependency> ] 2bi
+    [ changed-definition ] curry each ;
 
 : with-methods ( class generic quot -- )
     [ drop update-generic ]
