@@ -55,9 +55,9 @@ M: editor ungraft*
     dup caret>> deactivate-editor-model
     dup mark>> deactivate-editor-model ;
 
-: editor-caret* ( editor -- loc ) caret>> model-value ;
+: editor-caret* ( editor -- loc ) caret>> value>> ;
 
-: editor-mark* ( editor -- loc ) mark>> model-value ;
+: editor-mark* ( editor -- loc ) mark>> value>> ;
 
 : set-caret ( loc editor -- )
     [ model>> validate-loc ] keep
@@ -501,7 +501,7 @@ TUPLE: field < wrapper field-model editor ;
         swap >>field-model ;
 
 M: field graft*
-    [ [ field-model>> model-value ] [ editor>> ] bi set-editor-string ]
+    [ [ field-model>> value>> ] [ editor>> ] bi set-editor-string ]
     [ dup editor>> model>> add-connection ]
     bi ;
 
