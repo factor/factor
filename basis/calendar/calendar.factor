@@ -57,7 +57,7 @@ PRIVATE>
         "Jul" "Aug" "Sep" "Oct" "Nov" "Dec"
     } ;
 
-: month-abbreviation ( n -- array )
+: month-abbreviation ( n -- string )
     check-month 1- month-abbreviations nth ;
 
 : day-names ( -- array )
@@ -377,23 +377,24 @@ M: timestamp days-in-year ( timestamp -- n ) year>> days-in-year ;
 : friday ( timestamp -- timestamp ) 5 day-this-week ;
 : saturday ( timestamp -- timestamp ) 6 day-this-week ;
 
-: beginning-of-day ( timestamp -- new-timestamp )
-    clone
-    0 >>hour
-    0 >>minute
-    0 >>second ; inline
+: midnight ( timestamp -- new-timestamp )
+    clone 0 >>hour 0 >>minute 0 >>second ; inline
+
+: noon ( timestamp -- new-timestamp )
+    midnight 12 >>hour ; inline
 
 : beginning-of-month ( timestamp -- new-timestamp )
-    beginning-of-day 1 >>day ;
+    midnight 1 >>day ;
 
 : beginning-of-week ( timestamp -- new-timestamp )
-    beginning-of-day sunday ;
+    midnight sunday ;
 
 : beginning-of-year ( timestamp -- new-timestamp )
     beginning-of-month 1 >>month ;
 
 : time-since-midnight ( timestamp -- duration )
-    dup beginning-of-day time- ;
+    dup midnight time- ;
+
 
 M: timestamp sleep-until timestamp>millis sleep-until ;
 
