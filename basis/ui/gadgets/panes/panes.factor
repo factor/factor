@@ -173,7 +173,7 @@ M: pane-stream make-span-stream
     >r pick at r> when* ; inline
 
 : apply-foreground-style ( style gadget -- style gadget )
-    foreground [ over set-label-color ] apply-style ;
+    foreground [ over (>>color) ] apply-style ;
 
 : apply-background-style ( style gadget -- style gadget )
     background [ solid-interior ] apply-style ;
@@ -184,7 +184,7 @@ M: pane-stream make-span-stream
     font-size swap at 12 or 3array ;
 
 : apply-font-style ( style gadget -- style gadget )
-    over specified-font over set-label-font ;
+    over specified-font over (>>font) ;
 
 : apply-presentation-style ( style gadget -- style gadget )
     presented [ <presentation> ] apply-style ;
@@ -255,7 +255,7 @@ M: pane-stream make-block-stream
 
 ! Tables
 : apply-table-gap-style ( style grid -- style grid )
-    table-gap [ over set-grid-gap ] apply-style ;
+    table-gap [ over (>>gap) ] apply-style ;
 
 : apply-table-border-style ( style grid -- style grid )
     table-border [ <grid-lines> over (>>boundary) ]
@@ -263,7 +263,7 @@ M: pane-stream make-block-stream
 
 : styled-grid ( style grid -- grid )
     <grid>
-    f over set-grid-fill?
+    f over (>>fill?)
     apply-table-gap-style
     apply-table-border-style
     nip ;

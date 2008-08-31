@@ -24,20 +24,20 @@ TUPLE: incremental < pack cursor ;
 
 M: incremental pref-dim*
     dup layout-state>> [
-        dup call-next-method over set-incremental-cursor
-    ] when incremental-cursor ;
+        dup call-next-method over (>>cursor)
+    ] when cursor>> ;
 
 : next-cursor ( gadget incremental -- cursor )
     [
-        swap rect-dim swap incremental-cursor
+        swap rect-dim swap cursor>>
         2dup v+ >r vmax r>
     ] keep orientation>> set-axis ;
 
 : update-cursor ( gadget incremental -- )
-    [ next-cursor ] keep set-incremental-cursor ;
+    [ next-cursor ] keep (>>cursor) ;
 
 : incremental-loc ( gadget incremental -- )
-    dup incremental-cursor swap orientation>> v*
+    dup cursor>> swap orientation>> v*
     swap set-rect-loc ;
 
 : prefer-incremental ( gadget -- )
@@ -57,5 +57,5 @@ M: incremental pref-dim*
     not-in-layout
     dup (clear-gadget)
     dup forget-pref-dim
-    { 0 0 } over set-incremental-cursor
+    { 0 0 } over (>>cursor)
     parent>> [ relayout ] when* ;
