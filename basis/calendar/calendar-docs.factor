@@ -156,7 +156,6 @@ HELP: hours
 HELP: minutes
 { $values { "x" number } { "duration" duration } }
 { $description } ;
-{ minute minutes } related-words
 
 HELP: seconds
 { $values { "x" number } { "duration" duration } }
