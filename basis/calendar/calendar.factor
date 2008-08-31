@@ -3,7 +3,7 @@
 USING: arrays kernel math math.functions namespaces sequences
 strings system vocabs.loader calendar.backend threads
 accessors combinators locals classes.tuple math.order
-memoize summary combinators.short-circuit alias ;
+memoize summary combinators.short-circuit ;
 IN: calendar
 
 TUPLE: duration
