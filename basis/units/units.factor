@@ -39,7 +39,7 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
     [ dimensions 2array ] bi@ =
     [ dimensions-not-equal ] unless ;
 
-: 2values ( dim dim -- val val ) [ dimensioned-value ] bi@ ;
+: 2values ( dim dim -- val val ) [ value>> ] bi@ ;
 
 : <dimension-op ( dim dim -- top bot val val )
     2dup check-dimensions dup dimensions 2swap 2values ;
@@ -56,8 +56,8 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
 
 : d* ( d d -- d )
     [ dup number? [ scalar ] when ] bi@
-    [ [ dimensioned-top ] bi@ append ] 2keep
-    [ [ dimensioned-bot ] bi@ append ] 2keep
+    [ [ top>> ] bi@ append ] 2keep
+    [ [ bot>> ] bi@ append ] 2keep
     2values * dimension-op> ;
 
 : d-neg ( d -- d ) -1 d* ;
