@@ -508,10 +508,10 @@ M: ebnf-non-terminal (transform) ( ast -- parser )
 
 : check-parse-result ( result -- result )
   dup [
-    dup parse-result-remaining [ blank? ] trim empty? [
+    dup remaining>> [ blank? ] trim empty? [
       [ 
         "Unable to fully parse EBNF. Left to parse was: " %
-        parse-result-remaining % 
+        remaining>> % 
       ] "" make throw
     ] unless
   ] [

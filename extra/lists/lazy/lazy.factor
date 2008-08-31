@@ -24,7 +24,7 @@ TUPLE: lazy-cons car cdr ;
 : lazy-cons ( car cdr -- promise )
     [ promise ] bi@ \ lazy-cons boa
     T{ promise f f t f } clone
-    [ set-promise-value ] keep ;
+        swap >>value ;
 
 M: lazy-cons car ( lazy-cons -- car )
     car>> force ;

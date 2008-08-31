@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel parser-combinators namespaces sequences promises strings 
        assocs math math.parser math.vectors math.functions math.order
-       lists hashtables ascii ;
+       lists hashtables ascii accessors ;
 IN: json.reader
 
 ! Grammar for JSON from RFC 4627
@@ -169,11 +169,12 @@ LAZY: 'value' ( -- parser )
     'array' ,
     'number' ,
   ] [<|>] spaced ;
+ERROR: could-not-parse-json ;
 
 : json> ( string -- object )
   #! Parse a json formatted string to a factor object
   'value' parse dup nil? [ 
-    "Could not parse json" throw
+      could-not-parse-json
   ] [ 
-    car parse-result-parsed 
+    car parsed>> 
   ] if ;

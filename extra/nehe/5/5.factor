@@ -1,5 +1,5 @@
 USING: arrays kernel math opengl opengl.gl opengl.glu ui
-ui.gadgets ui.render threads ;
+ui.gadgets ui.render threads accessors ;
 IN: nehe.5
 
 TUPLE: nehe5-gadget < gadget rtri rquad thread quit? ;
@@ -9,8 +9,8 @@ TUPLE: nehe5-gadget < gadget rtri rquad thread quit? ;
 
 : <nehe5-gadget> (  -- gadget )
   nehe5-gadget new-gadget
-  0.0 over set-nehe5-gadget-rtri
-  0.0 over set-nehe5-gadget-rquad ;
+    0.0 >>rtri
+    0.0 >>rquad ;
 
 M: nehe5-gadget pref-dim* ( gadget -- dim )
   drop width height 2array ;
@@ -103,11 +103,11 @@ M: nehe5-gadget draw-gadget* ( gadget -- )
     1.0 -1.0 1.0 glVertex3f
     1.0 -1.0 -1.0 glVertex3f
   ] do-state 
-  dup nehe5-gadget-rtri 0.2 + over set-nehe5-gadget-rtri
-  dup nehe5-gadget-rquad 0.15 - swap set-nehe5-gadget-rquad ;
+  [ 0.2 + ] change-rtri
+  [ 0.15 - ] change-rquad drop ;
 
 : nehe5-update-thread ( gadget -- )  
-  dup nehe5-gadget-quit? [
+  dup quit?>> [
     drop
   ] [
     redraw-interval sleep 
@@ -116,11 +116,11 @@ M: nehe5-gadget draw-gadget* ( gadget -- )
   ] if ;
 
 M: nehe5-gadget graft* ( gadget -- )
- [ f swap set-nehe5-gadget-quit? ] keep
- [ nehe5-update-thread ] in-thread drop ;
+  f >>quit?
+  [ nehe5-update-thread ] in-thread drop ;
 
 M: nehe5-gadget ungraft* ( gadget -- )
- t swap set-nehe5-gadget-quit? ;
+  t >>quit? drop ;
 
 
 : run5 ( -- )
