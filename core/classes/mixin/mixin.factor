@@ -101,4 +101,4 @@ M: mixin-instance definition drop f ;
 
 M: mixin-instance forget*
     [ class>> ] [ mixin>> ] bi
-    mixin-class? [ remove-mixin-instance ] [ 2drop ] if ;
+    dup mixin-class? [ remove-mixin-instance ] [ 2drop ] if ;
