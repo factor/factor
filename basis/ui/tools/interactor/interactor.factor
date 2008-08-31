@@ -36,8 +36,7 @@ output history flag mailbox thread waiting help ;
         assoc-stack
     ] if ;
 
-: <help-model> ( interactor -- model )
-    editor-caret 1/3 seconds <delay> ;
+: <help-model> ( interactor -- model ) caret>> 1/3 seconds <delay> ;
 
 : <interactor> ( output -- gadget )
     interactor new-editor
