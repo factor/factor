@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: lists lists.lazy promises kernel sequences strings math
 arrays splitting quotations combinators namespaces
-unicode.case unicode.categories sequences.deep ;
+unicode.case unicode.categories sequences.deep accessors ;
 IN: parser-combinators
 
 ! Parser combinator protocol
@@ -13,11 +13,13 @@ M: promise parse ( input parser -- list )
 
 TUPLE: parse-result parsed unparsed ;
 
+ERROR: cannot-parse input ;
+
 : parse-1 ( input parser -- result )
     dupd parse dup nil? [
-        "Cannot parse " rot append throw
+        rot cannot-parse
     ] [
-        nip car parse-result-parsed
+        nip car parsed>>
     ] if ;
 
 C: <parse-result> parse-result
@@ -26,12 +28,12 @@ C: <parse-result> parse-result
     <parse-result> 1list ;
 
 : parse-result-parsed-slice ( parse-result -- slice )
-    dup parse-result-parsed empty? [
-        parse-result-unparsed 0 0 rot <slice>
+    dup parsed>> empty? [
+        unparsed>> 0 0 rot <slice>
     ] [
-        dup parse-result-unparsed
-        dup slice-from [ rot parse-result-parsed length - ] keep
-        rot slice-seq <slice>
+        dup unparsed>>
+        dup from>> [ rot parsed>> length - ] keep
+        rot seq>> <slice>
     ] if ;
 
 : string= ( str1 str2 ignore-case -- ? )
@@ -132,7 +134,7 @@ TUPLE: and-parser parsers ;
 
 : <&> ( parser1 parser2 -- parser )
     over and-parser? [
-        >r and-parser-parsers r> suffix
+        >r parsers>> r> suffix
     ] [
         2array
     ] if and-parser boa ;
@@ -142,11 +144,11 @@ TUPLE: and-parser parsers ;
 
 : and-parser-parse ( list p1  -- list )
     swap [
-        dup parse-result-unparsed rot parse
+        dup unparsed>> rot parse
         [
-            >r parse-result-parsed r>
-            [ parse-result-parsed 2array ] keep
-            parse-result-unparsed <parse-result>
+            >r parsed>> r>
+            [ parsed>> 2array ] keep
+            unparsed>> <parse-result>
         ] lazy-map-with
     ] lazy-map-with lconcat ;
 

@@ -353,11 +353,11 @@ M: quotation fjsc-parse ( object -- ast )
   ] with-string-writer ;
 
 : fjsc-compile* ( string -- string )
-  'statement' parse parse-result-ast fjsc-compile ;
+  'statement' parse ast>> fjsc-compile ;
 
 : fc* ( string -- string )
   [
-  'statement' parse parse-result-ast values>> do-expressions
+  'statement' parse ast>> values>> do-expressions
   ] { } make [ write ] each ;
 
 
