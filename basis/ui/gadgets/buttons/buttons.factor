@@ -25,14 +25,13 @@ TUPLE: button < border pressed? selected? quot ;
     dup mouse-clicked?
     over button-rollover? and
     buttons-down? and
-    over set-button-pressed?
+    over (>>pressed?)
     relayout-1 ;
 
 : if-clicked ( button quot -- )
     >r dup button-update dup button-rollover? r> [ drop ] if ;
 
-: button-clicked ( button -- )
-    dup button-quot if-clicked ;
+: button-clicked ( button -- ) dup quot>> if-clicked ;
 
 button H{
     { T{ button-up } [ button-clicked ] }
@@ -106,7 +105,7 @@ TUPLE: checkmark-paint color ;
 C: <checkmark-paint> checkmark-paint
 
 M: checkmark-paint draw-interior
-    checkmark-paint-color set-color
+    color>> set-color
     origin get [
         rect-dim
         { 0 0 } over gl-line
@@ -145,18 +144,18 @@ TUPLE: checkbox < button ;
         swap >>model ;
 
 M: checkbox model-changed
-    swap model-value over set-button-selected? relayout-1 ;
+    swap model-value over (>>selected?) relayout-1 ;
 
 TUPLE: radio-paint color ;
 
 C: <radio-paint> radio-paint
 
 M: radio-paint draw-interior
-    radio-paint-color set-color
+    color>> set-color
     origin get { 4 4 } v+ swap rect-dim { 8 8 } v- 12 gl-fill-circle ;
 
 M: radio-paint draw-boundary
-    radio-paint-color set-color
+    color>> set-color
     origin get { 1 1 } v+ swap rect-dim { 2 2 } v- 12 gl-circle ;
 
 : radio-knob-theme ( gadget -- )
@@ -184,8 +183,8 @@ TUPLE: radio-control < button value ;
 
 M: radio-control model-changed
     swap model-value
-    over radio-control-value =
-    over set-button-selected?
+    over value>> =
+    over (>>selected?)
     relayout-1 ;
 
 : <radio-controls> ( parent model assoc quot -- parent )
