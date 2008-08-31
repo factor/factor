@@ -27,8 +27,8 @@ TUPLE: list < pack index presenter color hook ;
     control-value length 1- min 0 max ;
 
 : bound-index ( list -- )
-    dup list-index over calc-bounded-index
-    swap set-list-index ;
+    dup index>> over calc-bounded-index
+    swap (>>index) ;
 
 : list-presentation-hook ( list -- quot )
     hook>> [ [ list? ] find-parent ] prepend ;
@@ -53,18 +53,18 @@ M: list model-changed
     bound-index ;
 
 : selected-rect ( list -- rect )
-    dup list-index swap children>> ?nth ;
+    dup index>> swap children>> ?nth ;
 
 M: list draw-gadget*
     origin get [
-        dup list-color set-color
+        dup color>> set-color
         selected-rect [ rect-extent gl-fill-rect ] when*
     ] with-translation ;
 
 M: list focusable-child* drop t ;
 
 : list-value ( list -- object )
-    dup list-index swap control-value ?nth ;
+    dup index>> swap control-value ?nth ;
 
 : scroll>selected ( list -- )
     #! We change the rectangle's width to zero to avoid
@@ -79,22 +79,22 @@ M: list focusable-child* drop t ;
         2drop
     ] [
         [ control-value length rem ] keep
-        [ set-list-index ] keep
+        [ (>>index) ] keep
         [ relayout-1 ] keep
         scroll>selected
     ] if ;
 
 : select-previous ( list -- )
-    dup list-index 1- swap select-index ;
+    dup index>> 1- swap select-index ;
 
 : select-next ( list -- )
-    dup list-index 1+ swap select-index ;
+    dup index>> 1+ swap select-index ;
 
 : invoke-value-action ( list -- )
     dup list-empty? [
-        dup list-hook call
+        dup hook>> call
     ] [
-        dup list-index swap nth-gadget invoke-secondary
+        dup index>> swap nth-gadget invoke-secondary
     ] if ;
 
 : select-gadget ( gadget list -- )

@@ -16,7 +16,7 @@ TUPLE: labelled-gadget < track content ;
     swap >>content
     dup content>> 1 track-add ;
 
-M: labelled-gadget focusable-child* labelled-gadget-content ;
+M: labelled-gadget focusable-child* content>> ;
 
 : <labelled-scroller> ( gadget title -- gadget )
     >r <scroller> r> <labelled-gadget> ;
@@ -53,4 +53,4 @@ TUPLE: closable-gadget < frame content ;
     swap >>content
     dup content>> @center grid-add ;
     
-M: closable-gadget focusable-child* closable-gadget-content ;
+M: closable-gadget focusable-child* content>> ;

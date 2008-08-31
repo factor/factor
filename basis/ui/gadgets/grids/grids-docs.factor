@@ -14,9 +14,9 @@ ARTICLE: "ui-grid-layout" "Grid layouts"
 HELP: grid
 { $class-description "A grid gadget lays out its children so that all gadgets in a column have equal width and all gadgets in a row have equal height."
 $nl
-"The " { $link grid-gap } " slot stores a pair of integers, the horizontal and vertical gap between children, respectively."
+"The " { $snippet "gap" } " slot stores a pair of integers, the horizontal and vertical gap between children, respectively."
 $nl
-"The " { $link grid-fill? } " slot stores a boolean, indicating if grid cells should assume their preferred size, or if they should fill the dimensions of the cell. The default is " { $link t } "."
+"The " { $snippet "fill?" } " slot stores a boolean, indicating if grid cells should assume their preferred size, or if they should fill the dimensions of the cell. The default is " { $link t } "."
 $nl
 "Grids are created by calling " { $link <grid> } " and children are managed with " { $link grid-add } " and " { $link grid-remove } "."
 $nl
