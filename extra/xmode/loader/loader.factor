@@ -45,7 +45,7 @@ RULE: MARK_PREVIOUS mark-previous-rule
 TAG: KEYWORDS ( rule-set tag -- key value )
     ignore-case? get <keyword-map>
     swap child-tags [ over parse-keyword-tag ] each
-    swap set-rule-set-keywords ;
+    swap (>>keywords) ;
 
 TAGS>
 
@@ -72,7 +72,7 @@ TAGS>
     ] keep ;
 
 : merge-rule-set-props ( props rule-set -- )
-    [ rule-set-props assoc-union ] keep set-rule-set-props ;
+    [ assoc-union ] change-props drop ;
 
 ! Top-level entry points
 : parse-mode-tag ( tag -- rule-sets )

@@ -52,11 +52,11 @@ SYMBOL: rule-sets
     dup -roll at* [ nip ] [ drop no-such-rule-set ] if ;
 
 : resolve-delegate ( rule -- )
-    dup rule-delegate dup string?
-    [ get-rule-set nip swap set-rule-delegate ] [ 2drop ] if ;
+    dup delegate>> dup string?
+    [ get-rule-set nip swap (>>delegate) ] [ 2drop ] if ;
 
 : each-rule ( rule-set quot -- )
-    >r rule-set-rules values concat r> each ; inline
+    >r rules>> values concat r> each ; inline
 
 : resolve-delegates ( ruleset -- )
     [ resolve-delegate ] each-rule ;
