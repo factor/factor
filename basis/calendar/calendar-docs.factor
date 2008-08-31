@@ -136,27 +136,22 @@ HELP: instant
 HELP: years
 { $values { "x" number } { "duration" duration } }
 { $description } ;
-{ year years } related-words
 
 HELP: months
 { $values { "x" number } { "duration" duration } }
 { $description } ;
-{ month months } related-words
 
 HELP: days
 { $values { "x" number } { "duration" duration } }
 { $description } ;
-{ day days } related-words
 
 HELP: weeks
 { $values { "x" number } { "duration" duration } }
 { $description } ;
-{ week weeks } related-words
 
 HELP: hours
 { $values { "x" number } { "duration" duration } }
 { $description } ;
-{ hour hours } related-words
 
 HELP: minutes
 { $values { "x" number } { "duration" duration } }
@@ -166,12 +161,10 @@ HELP: minutes
 HELP: seconds
 { $values { "x" number } { "duration" duration } }
 { $description } ;
-{ second seconds } related-words
 
 HELP: milliseconds
 { $values { "x" number } { "duration" duration } }
 { $description } ;
-{ millisecond milliseconds } related-words
 
 HELP: leap-year?
 { $values { "obj" object } { "?" "a boolean" } }

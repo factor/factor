@@ -125,14 +125,6 @@ MEMO: instant ( -- duration ) 0 0 0 0 0 0 <duration> ;
 : minutes ( x -- duration ) instant clone swap >>minute ;
 : seconds ( x -- duration ) instant clone swap >>second ;
 : milliseconds ( x -- duration ) 1000 / seconds ;
-ALIAS: year years
-ALIAS: month months
-ALIAS: day days
-ALIAS: week weeks
-ALIAS: hour hours
-ALIAS: minute minutes
-ALIAS: second seconds
-ALIAS: millisecond milliseconds
 
 GENERIC: leap-year? ( obj -- ? )
 
