@@ -1,5 +1,5 @@
 IN: alien.structs
-USING: alien.c-types strings help.markup help.syntax
+USING: accessors alien.c-types strings help.markup help.syntax
 alien.syntax sequences io arrays slots.deprecated
 kernel words slots assocs namespaces accessors ;
 
@@ -67,7 +67,7 @@ M: word slot-specs "slots" word-prop ;
     first dup "writing" word-prop [ slot-specs ] keep
     $spec-writer ;
 
-M: string slot-specs c-type struct-type-fields ;
+M: string slot-specs c-type fields>> ;
 
 M: array ($instance) first ($instance) " array" write ;
 

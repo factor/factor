@@ -56,7 +56,7 @@ ERROR: invalid-source-file-path path ;
         ] [ 2drop ] if
     ] assoc-each ;
 
-M: pathname where pathname-string 1 2array ;
+M: pathname where string>> 1 2array ;
 
 : forget-source ( path -- )
     [
@@ -69,7 +69,7 @@ M: pathname where pathname-string 1 2array ;
     bi ;
 
 M: pathname forget*
-    pathname-string forget-source ;
+    string>> forget-source ;
 
 : rollback-source-file ( file -- )
     [

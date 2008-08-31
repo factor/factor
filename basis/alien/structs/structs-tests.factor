@@ -7,7 +7,7 @@ C-STRUCT: bar
     { { "int" 8 } "y" } ;
 
 [ 36 ] [ "bar" heap-size ] unit-test
-[ t ] [ \ <displaced-alien> "bar" c-type c-type-getter memq? ] unit-test
+[ t ] [ \ <displaced-alien> "bar" c-type-getter memq? ] unit-test
 
 C-STRUCT: align-test
     { "int" "x" }

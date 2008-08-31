@@ -178,7 +178,7 @@ M: condition compute-restarts
     [ error>> compute-restarts ]
     [
         [ restarts>> ]
-        [ condition-continuation [ <restart> ] curry ] bi
+        [ continuation>> [ <restart> ] curry ] bi
         { } assoc>map
     ] bi append ;
 

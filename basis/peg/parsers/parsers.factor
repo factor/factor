@@ -17,7 +17,7 @@ TUPLE: just-parser p1 ;
 
 
 M: just-parser (compile) ( parser -- quot )
-  just-parser-p1 compile-parser just-pattern curry ;
+  p1>> compile-parser just-pattern curry ;
 
 : just ( parser -- parser )
   just-parser boa wrap-peg ;

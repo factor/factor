@@ -16,43 +16,77 @@ source-loaded? docs-loaded? ;
         swap >>name
         H{ } clone >>words ;
 
+GENERIC: vocab-name ( vocab-spec -- name )
+
 GENERIC: vocab ( vocab-spec -- vocab )
 
 M: vocab vocab ;
 
 M: object vocab ( name -- vocab ) vocab-name dictionary get at ;
 
+M: vocab vocab-name name>> ;
+
 M: string vocab-name ;
+
+GENERIC: vocab-words ( vocab-spec -- words )
+
+M: vocab vocab-words words>> ;
 
 M: object vocab-words vocab vocab-words ;
 
+M: f vocab-words ;
+
+GENERIC: vocab-help ( vocab-spec -- help )
+
+M: vocab vocab-help help>> ;
+
 M: object vocab-help vocab vocab-help ;
 
+M: f vocab-help ;
+
+GENERIC: vocab-main ( vocab-spec -- main )
+
+M: vocab vocab-main main>> ;
+
 M: object vocab-main vocab vocab-main ;
+
+M: f vocab-main ;
+
+GENERIC: vocab-source-loaded? ( vocab-spec -- ? )
+
+M: vocab vocab-source-loaded? source-loaded?>> ;
 
 M: object vocab-source-loaded?
     vocab vocab-source-loaded? ;
 
+M: f vocab-source-loaded? ;
+
+GENERIC: set-vocab-source-loaded? ( ? vocab-spec -- )
+
+M: vocab set-vocab-source-loaded? (>>source-loaded?) ;
+
 M: object set-vocab-source-loaded?
     vocab set-vocab-source-loaded? ;
+
+M: f set-vocab-source-loaded? 2drop ;
+
+GENERIC: vocab-docs-loaded? ( vocab-spec -- ? )
+
+M: vocab vocab-docs-loaded? docs-loaded?>> ;
 
 M: object vocab-docs-loaded?
     vocab vocab-docs-loaded? ;
 
+M: f vocab-docs-loaded? ;
+
+GENERIC: set-vocab-docs-loaded? ( ? vocab-spec -- )
+
+M: vocab set-vocab-docs-loaded? (>>docs-loaded?) ;
+
 M: object set-vocab-docs-loaded?
     vocab set-vocab-docs-loaded? ;
 
-M: f vocab-words ;
-
-M: f vocab-source-loaded? ;
-
-M: f set-vocab-source-loaded? 2drop ;
-
-M: f vocab-docs-loaded? ;
-
 M: f set-vocab-docs-loaded? 2drop ;
-
-M: f vocab-help ;
 
 : create-vocab ( name -- vocab )
     dictionary get [ <vocab> ] cache ;
@@ -90,10 +124,9 @@ TUPLE: vocab-link name ;
 : <vocab-link> ( name -- vocab-link )
     vocab-link boa ;
 
-M: vocab-link hashcode*
-    vocab-link-name hashcode* ;
+M: vocab-link hashcode* name>> hashcode* ;
 
-M: vocab-link vocab-name vocab-link-name ;
+M: vocab-link vocab-name name>> ;
 
 UNION: vocab-spec vocab vocab-link ;
 

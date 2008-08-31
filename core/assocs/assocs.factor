@@ -210,7 +210,7 @@ M: enum at*
 
 M: enum set-at seq>> set-nth ;
 
-M: enum delete-at enum-seq delete-nth ;
+M: enum delete-at seq>> delete-nth ;
 
 M: enum >alist ( enum -- alist )
     seq>> [ length ] keep zip ;

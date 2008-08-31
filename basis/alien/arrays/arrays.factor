@@ -10,7 +10,7 @@ M: array c-type ;
 
 M: array heap-size unclip heap-size [ * ] reduce ;
 
-M: array c-type-align first c-type c-type-align ;
+M: array c-type-align first c-type-align ;
 
 M: array c-type-stack-align? drop f ;
 

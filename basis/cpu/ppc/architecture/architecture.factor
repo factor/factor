@@ -1,10 +1,11 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types cpu.ppc.assembler cpu.architecture generic
-kernel kernel.private math memory namespaces sequences words
-assocs compiler.generator compiler.generator.registers
-compiler.generator.fixup system layouts classes words.private
-alien combinators compiler.constants math.order ;
+USING: accessors alien.c-types cpu.ppc.assembler
+cpu.architecture generic kernel kernel.private math memory
+namespaces sequences words assocs compiler.generator
+compiler.generator.registers compiler.generator.fixup system
+layouts classes words.private alien combinators
+compiler.constants math.order ;
 IN: cpu.ppc.architecture
 
 ! PowerPC register assignments
@@ -65,8 +66,8 @@ M: float-regs vregs drop { 0 1 2 3 4 5 6 7 8 9 10 11 12 13 } ;
 
 GENERIC: loc>operand ( loc -- reg n )
 
-M: ds-loc loc>operand ds-loc-n cells neg ds-reg swap ;
-M: rs-loc loc>operand rs-loc-n cells neg rs-reg swap ;
+M: ds-loc loc>operand n>> cells neg ds-reg swap ;
+M: rs-loc loc>operand n>> cells neg rs-reg swap ;
 
 M: immediate load-literal
     [ v>operand ] bi@ LOAD ;
