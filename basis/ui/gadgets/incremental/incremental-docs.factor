@@ -8,7 +8,7 @@ $nl
 $nl
 "Children are managed with the " { $link add-incremental } " and " { $link clear-incremental } " words."
 $nl
-"Not every " { $link pack } " can use incremental layout, since incremental layout does not support non-default values for " { $link pack-align } ", " { $link pack-fill } ", and " { $link pack-gap } "." } ;
+"Not every " { $link pack } " can use incremental layout, since incremental layout does not support non-default values for " { $snippet "align" } ", " { $snippet "fill" } ", and " { $snippet "gap" } "." } ;
 
 HELP: <incremental>
 { $values { "incremental" "a new instance of " { $link incremental } } }

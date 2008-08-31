@@ -203,7 +203,7 @@ M: freetype-renderer string-height ( open-font string -- h )
     ] do-enabled ;
 
 : font-sprites ( font world -- open-font sprites )
-    world-fonts [ open-font H{ } clone 2array ] cache first2 ;
+    fonts>> [ open-font H{ } clone 2array ] cache first2 ;
 
 M: freetype-renderer draw-string ( font string loc -- )
     >r >r world get font-sprites r> r> (draw-string) ;

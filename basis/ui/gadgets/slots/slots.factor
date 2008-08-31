@@ -16,8 +16,8 @@ TUPLE: edit-slot ;
 TUPLE: slot-editor < track ref text ;
 
 : revert ( slot-editor -- )
-    dup slot-editor-ref get-ref unparse-use
-    swap slot-editor-text set-editor-string ;
+    dup ref>> get-ref unparse-use
+    swap text>> set-editor-string ;
 
 \ revert H{
     { +description+ "Revert any uncomitted changes." }
@@ -32,21 +32,21 @@ M: value-ref finish-editing
     drop T{ update-slot } swap send-gesture drop ;
 
 : slot-editor-value ( slot-editor -- object )
-    slot-editor-text control-value parse-fresh ;
+    text>> control-value parse-fresh ;
 
 : commit ( slot-editor -- )
-    dup slot-editor-text control-value parse-fresh first
-    over slot-editor-ref set-ref
-    dup slot-editor-ref finish-editing ;
+    dup text>> control-value parse-fresh first
+    over ref>> set-ref
+    dup ref>> finish-editing ;
 
 \ commit H{
     { +description+ "Parse the object being edited, and store the result back into the edited slot." }
 } define-command
 
 : com-eval ( slot-editor -- )
-    [ slot-editor-text editor-string eval ] keep
-    [ slot-editor-ref set-ref ] keep
-    dup slot-editor-ref finish-editing ;
+    [ text>> editor-string eval ] keep
+    [ ref>> set-ref ] keep
+    dup ref>> finish-editing ;
 
 \ com-eval H{
     { +listener+ t }
@@ -54,7 +54,7 @@ M: value-ref finish-editing
 } define-command
 
 : delete ( slot-editor -- )
-    dup slot-editor-ref delete-ref
+    dup ref>> delete-ref
     T{ update-object } swap send-gesture drop ;
 
 \ delete H{

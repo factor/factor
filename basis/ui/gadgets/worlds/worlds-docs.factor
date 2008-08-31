@@ -11,7 +11,7 @@ HELP: hand-world
 HELP: set-title
 { $values { "string" string } { "world" world } }
 { $description "Sets the title bar of the native window containing the world." }
-{ $notes "This word should not be called directly by user code. Instead, change the " { $link world-title } " model; see " { $link "models" } "." } ;
+{ $notes "This word should not be called directly by user code. Instead, change the " { $snippet "title" } " slot model; see " { $link "models" } "." } ;
 
 HELP: select-gl-context
 { $values { "handle" "a backend-specific handle" } }

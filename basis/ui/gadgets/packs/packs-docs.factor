@@ -23,9 +23,9 @@ HELP: pack
 }
 "Packs have the following slots:"
 { $list
-    { { $link pack-align } " a rational number between 0 and 1, the alignment of gadgets along the axis perpendicular to the pack's orientation" }
-    { { $link pack-fill } " a rational number between 0 and 1, where 0 gives each gadget its preferred size and 1 fills the dimension perpendicular to the pack's orientation" }
-    { { $link pack-gap } " a pair of integers, the horizontal and vertical gap between children" }
+    { { $snippet "align" } " a rational number between 0 and 1, the alignment of gadgets along the axis perpendicular to the pack's orientation" }
+    { { $snippet "fill" } " a rational number between 0 and 1, where 0 gives each gadget its preferred size and 1 fills the dimension perpendicular to the pack's orientation" }
+    { { $snippet "gap" } " a pair of integers, the horizontal and vertical gap between children" }
 }
 "Custom gadgets can inherit from the " { $link pack } " class and implement their own " { $link pref-dim* } " and " { $link layout* } " methods, reusing pack layout logic by calling " { $link pack-pref-dim } " and " { $link pack-layout } "." } ;
 

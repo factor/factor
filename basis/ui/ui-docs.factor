@@ -172,7 +172,7 @@ $nl
 ARTICLE: "ui-backend-windows" "UI backend window management"
 "The high-level " { $link open-window } " word eventually calls a low-level word which you must implement:"
 { $subsection open-world-window }
-"This word should create a native window, store some kind of handle in the " { $link world-handle } " slot, then call two words:"
+"This word should create a native window, store some kind of handle in the " { $snippet "handle" } " slot, then call two words:"
 { $subsection register-window }
 "The following words must also be implemented:"
 { $subsection set-title }

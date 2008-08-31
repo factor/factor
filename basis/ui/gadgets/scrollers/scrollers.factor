@@ -22,8 +22,8 @@ TUPLE: scroller < frame viewport x y follows ;
 
 : do-mouse-scroll ( scroller -- )
     scroll-direction get-global first2
-    pick scroller-y slide-by-line
-    swap scroller-x slide-by-line ;
+    pick y>> slide-by-line
+    swap x>> slide-by-line ;
 
 scroller H{
     { T{ mouse-scroll } [ do-mouse-scroll ] }
@@ -48,8 +48,8 @@ scroller H{
 
 : scroll ( value scroller -- )
     [
-        dup scroller-viewport rect-dim { 0 0 }
-        rot scroller-viewport viewport-dim 4array flip
+        dup viewport>> rect-dim { 0 0 }
+        rot viewport>> viewport-dim 4array flip
     ] keep
     2dup control-value = [ 2drop ] [ set-control-value ] if ;
 
@@ -61,9 +61,9 @@ scroller H{
         scroller-value vneg offset-rect
         viewport-gap offset-rect
     ] keep
-    [ scroller-viewport rect-min ] keep
+    [ viewport>> rect-min ] keep
     [
-        scroller-viewport 2rect-extent
+        viewport>> 2rect-extent
         >r >r v- { 0 0 } vmin r> r> v- { 0 0 } vmax v+
     ] keep dup scroller-value rot v+ swap scroll ;
 
@@ -72,7 +72,7 @@ scroller H{
 
 : find-scroller* ( gadget -- scroller )
     dup find-scroller dup [
-        2dup scroller-viewport gadget-child
+        2dup viewport>> gadget-child
         swap child? [ nip ] [ 2drop f ] if
     ] [
         2drop f
@@ -81,7 +81,7 @@ scroller H{
 : scroll>rect ( rect gadget -- )
     dup find-scroller* dup [
         [ relative-scroll-rect ] keep
-        [ set-scroller-follows ] keep
+        [ (>>follows) ] keep
         relayout
     ] [
         3drop
@@ -94,18 +94,18 @@ scroller H{
 
 : scroll>gadget ( gadget -- )
     dup find-scroller* dup [
-        [ set-scroller-follows ] keep
+        [ (>>follows) ] keep
         relayout
     ] [
         2drop
     ] if ;
 
 : (scroll>bottom) ( scroller -- )
-    dup scroller-viewport viewport-dim { 0 1 } v* swap scroll ;
+    dup viewport>> viewport-dim { 0 1 } v* swap scroll ;
 
 : scroll>bottom ( gadget -- )
     find-scroller [
-        t over set-scroller-follows relayout-1
+        t over (>>follows) relayout-1
     ] when* ;
 
 : scroll>top ( gadget -- )
@@ -123,15 +123,15 @@ M: f update-scroller drop dup scroller-value swap scroll ;
 
 M: scroller layout*
     dup call-next-method
-    dup scroller-follows
+    dup follows>>
     [ update-scroller ] 2keep
-    swap set-scroller-follows ;
+    swap (>>follows) ;
 
 M: scroller focusable-child*
-    scroller-viewport ;
+    viewport>> ;
 
 M: scroller model-changed
-    nip f swap set-scroller-follows ;
+    nip f swap (>>follows) ;
 
 TUPLE: limited-scroller < scroller fixed-dim ;
 

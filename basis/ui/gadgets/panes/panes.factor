@@ -37,8 +37,8 @@ M: pane gadget-selection ( pane -- string/f ) selected-children gadget-text ;
 
 : pane-clear ( pane -- )
   clear-selection
-  [ pane-output clear-incremental ]
-  [ pane-current clear-gadget ]
+  [ output>> clear-incremental ]
+  [ current>> clear-gadget ]
   bi ;
 
 : new-pane ( class -- pane )
@@ -68,7 +68,7 @@ M: node draw-selection ( loc node -- )
 
 M: pane draw-gadget*
     dup gadget-selection? [
-        dup pane-selection-color set-color
+        dup selection-color>> set-color
         origin get over rect-loc v- swap selected-children
         [ draw-selection ] with each
     ] [
@@ -76,7 +76,7 @@ M: pane draw-gadget*
     ] if ;
 
 : scroll-pane ( pane -- )
-    dup pane-scrolls? [ scroll>bottom ] [ drop ] if ;
+    dup scrolls?>> [ scroll>bottom ] [ drop ] if ;
 
 TUPLE: pane-stream pane ;
 
@@ -89,21 +89,21 @@ C: <pane-stream> pane-stream
         [ drop ]
     } cond ;
 
-: smash-pane ( pane -- gadget ) pane-output smash-line ;
+: smash-pane ( pane -- gadget ) output>> smash-line ;
 
 : pane-nl ( pane -- pane )
-    dup pane-current dup unparent smash-line
-    over pane-output add-incremental
+    dup current>> dup unparent smash-line
+    over output>> add-incremental
     prepare-line ;
 
 : pane-write ( pane seq -- )
     [ pane-nl ]
-    [ over pane-current stream-write ]
+    [ over current>> stream-write ]
     interleave drop ;
 
 : pane-format ( style pane seq -- )
     [ pane-nl ]
-    [ 2over pane-current stream-format ]
+    [ 2over current>> stream-format ]
     interleave 2drop ;
 
 GENERIC: write-gadget ( gadget stream -- )
@@ -121,7 +121,7 @@ M: style-stream write-gadget
     output-stream get print-gadget ;
 
 : ?nl ( stream -- )
-    dup pane-stream-pane pane-current children>> empty?
+    dup pane>> current>> children>> empty?
     [ dup stream-nl ] unless drop ;
 
 : with-pane ( pane quot -- )
@@ -132,8 +132,7 @@ M: style-stream write-gadget
 : make-pane ( quot -- gadget )
     <pane> [ swap with-pane ] keep smash-pane ; inline
 
-: <scrolling-pane> ( -- pane )
-    <pane> t over set-pane-scrolls? ;
+: <scrolling-pane> ( -- pane ) <pane> t over (>>scrolls?) ;
 
 TUPLE: pane-control < pane quot ;
 
@@ -146,13 +145,13 @@ M: pane-control model-changed ( model pane-control -- )
         swap >>model ;
 
 : do-pane-stream ( pane-stream quot -- )
-    >r pane-stream-pane r> keep scroll-pane ; inline
+    >r pane>> r> keep scroll-pane ; inline
 
 M: pane-stream stream-nl
     [ pane-nl drop ] do-pane-stream ;
 
 M: pane-stream stream-write1
-    [ pane-current stream-write1 ] do-pane-stream ;
+    [ current>> stream-write1 ] do-pane-stream ;
 
 M: pane-stream stream-write
     [ swap string-lines pane-write ] do-pane-stream ;
@@ -277,7 +276,7 @@ M: pane-stream make-cell-stream
 
 M: pane-stream stream-write-table
     >r
-    swap [ [ pane-stream-pane smash-pane ] map ] map
+    swap [ [ pane>> smash-pane ] map ] map
     styled-grid
     r> print-gadget ;
 
@@ -353,11 +352,10 @@ M: f sloppy-pick-up*
 : move-caret ( pane -- pane )
   dup hand-rel
   over sloppy-pick-up
-  over set-pane-caret
+  over (>>caret)
   dup relayout-1 ;
 
-: begin-selection ( pane -- )
-    move-caret f swap set-pane-mark ;
+: begin-selection ( pane -- ) move-caret f swap (>>mark) ;
 
 : extend-selection ( pane -- )
     hand-moved? [
@@ -371,7 +369,7 @@ M: f sloppy-pick-up*
                 caret>mark
             ] when
         ] if
-        dup dup pane-caret gadget-at-path scroll>gadget
+        dup dup caret>> gadget-at-path scroll>gadget
     ] when drop ;
 
 : end-selection ( pane -- )
@@ -383,7 +381,7 @@ M: f sloppy-pick-up*
     ] if ;
 
 : select-to-caret ( pane -- )
-    dup pane-mark [ caret>mark ] unless
+    dup mark>> [ caret>mark ] unless
     move-caret
     dup request-focus
     com-copy-selection ;

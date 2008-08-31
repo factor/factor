@@ -30,7 +30,7 @@ HELP: slide-by-page
 
 HELP: slide-by-line
 { $values { "amount" "an integer" } { "slider" slider } }
-{ $description "Adds the amount multiplied by " { $link slider-line } " to the slider's current position." } ;
+{ $description "Adds the amount multiplied by the " { $snippet "line" } " slot to the slider's current position." } ;
 
 HELP: <slider>
 { $values { "range" range } { "orientation" "an orientation specifier" } { "slider" "a new " { $link slider } } }
