@@ -5,6 +5,6 @@ IN: benchmark.empty-loop-1
     [ drop ] each-integer ;
 
 : empty-loop-main ( -- )
-    5000000 empty-loop-1 ;
+    50000000 empty-loop-1 ;
 
 MAIN: empty-loop-main
