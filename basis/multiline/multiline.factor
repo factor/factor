@@ -5,7 +5,7 @@ accessors ;
 IN: multiline
 
 : next-line-text ( -- str )
-    lexer get dup next-line text>> ;
+    lexer get dup next-line line-text>> ;
 
 : (parse-here) ( -- )
     next-line-text [
@@ -23,7 +23,7 @@ IN: multiline
     parse-here 1quotation define-inline ; parsing
 
 : (parse-multiline-string) ( start-index end-text -- end-index )
-    lexer get text>> [
+    lexer get line-text>> [
         2dup start
         [ rot dupd >r >r swap subseq % r> r> length + ] [
             rot tail % "\n" % 0
