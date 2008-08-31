@@ -3,7 +3,7 @@
 ! Adapted from mysql.h and mysql.c
 ! Tested with MySQL version - 5.0.24a
 USING: kernel alien io prettyprint sequences
-namespaces arrays math db.mysql.ffi system ;
+namespaces arrays math db.mysql.ffi system accessors ;
 IN: db.mysql.lib
 
 SYMBOL: my-conn
