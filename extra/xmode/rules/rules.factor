@@ -30,10 +30,10 @@ finalized?
         V{ } clone >>imports ;
 
 MEMO: standard-rule-set ( id -- ruleset )
-    <rule-set> [ set-rule-set-default ] keep ;
+    <rule-set> swap >>default ;
 
 : import-rule-set ( import ruleset -- )
-    rule-set-imports push ;
+    imports>> push ;
 
 : inverted-index ( hashes key index -- )
     [ swapd push-at ] 2curry each ;
@@ -44,8 +44,9 @@ MEMO: standard-rule-set ( id -- ruleset )
     ] when* ;
 
 : rule-set-no-word-sep* ( ruleset -- str )
-    dup rule-set-no-word-sep
-    swap rule-set-keywords dup [ keyword-map-no-word-sep* ] when
+    [ no-word-sep>> ]
+    [ keywords>> ] bi
+    dup [ keyword-map-no-word-sep* ] when
     "_" 3append ;
 
 ! Match restrictions
@@ -101,18 +102,17 @@ M: string-matcher text-hash-char string-matcher-string first ;
 M: regexp text-hash-char drop f ;
 
 : rule-chars* ( rule -- string )
-    dup rule-chars
-    swap rule-start matcher-text
+    [ chars>> ] [ start>> ] bi text>>
     text-hash-char [ suffix ] when* ;
 
 : add-rule ( rule ruleset -- )
     >r dup rule-chars* >upper swap
-    r> rule-set-rules inverted-index ;
+    r> rules>> inverted-index ;
 
 : add-escape-rule ( string ruleset -- )
     over [
-        >r <escape-rule> r>
-        2dup set-rule-set-escape-rule
+        [ <escape-rule> ] dip
+        2dup (>>escape-rule)
         add-rule
     ] [
         2drop
