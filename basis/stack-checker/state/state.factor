@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs namespaces sequences kernel definitions math
-effects accessors words stack-checker.errors ;
+effects accessors words fry classes.algebra stack-checker.errors
+compiler.units ;
 IN: stack-checker.state
 
 : <value> ( -- value ) \ <value> counter ;
@@ -88,9 +89,15 @@ SYMBOL: meta-r
 SYMBOL: dependencies
 
 : depends-on ( word how -- )
-    swap dependencies get dup [
-        2dup at +inlined+ eq? [ 3drop ] [ set-at ] if
-    ] [ 3drop ] if ;
+    dependencies get dup
+    [ swap '[ , strongest-dependency ] change-at ] [ 3drop ] if ;
+
+! Generic words that the current quotation depends on
+SYMBOL: generic-dependencies
+
+: depends-on-generic ( generic class -- )
+    generic-dependencies get dup
+    [ swap '[ null or , class-or ] change-at ] [ 3drop ] if ;
 
 ! Words we've inferred the stack effect of, for rollback
 SYMBOL: recorded

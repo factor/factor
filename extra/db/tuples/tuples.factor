@@ -127,12 +127,12 @@ M: retryable execute-statement* ( statement type -- )
 
 : insert-db-assigned-statement ( tuple -- )
     dup class
-    db get db-insert-statements [ <insert-db-assigned-statement> ] cache
+    db get insert-statements>> [ <insert-db-assigned-statement> ] cache
     [ bind-tuple ] 2keep insert-tuple* ;
 
 : insert-user-assigned-statement ( tuple -- )
     dup class
-    db get db-insert-statements [ <insert-user-assigned-statement> ] cache
+    db get insert-statements>> [ <insert-user-assigned-statement> ] cache
     [ bind-tuple ] keep execute-statement ;
 
 : insert-tuple ( tuple -- )
@@ -141,7 +141,7 @@ M: retryable execute-statement* ( statement type -- )
 
 : update-tuple ( tuple -- )
     dup class
-    db get db-update-statements [ <update-tuple-statement> ] cache
+    db get update-statements>> [ <update-tuple-statement> ] cache
     [ bind-tuple ] keep execute-statement ;
 
 : delete-tuples ( tuple -- )

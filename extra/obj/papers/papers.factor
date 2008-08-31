@@ -13,15 +13,26 @@ SYM: date         properties adjoin
 SYM: participants properties adjoin
 SYM: description  properties adjoin
 
+SYM: chapter      properties adjoin
+SYM: section      properties adjoin
+SYM: paragraph    properties adjoin
+SYM: content      properties adjoin
+
+SYM: subjects     properties adjoin
+SYM: source       properties adjoin
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SYM: paper  types adjoin
 SYM: person types adjoin
 SYM: event  types adjoin
 
+SYM: excerpt types adjoin
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SYM: bay-wei-chang       { type person } define-object
+SYM: chuck-moore         { type person } define-object
 SYM: craig-chambers      { type person } define-object
 SYM: david-ungar         { type person } define-object
 SYM: frank-g-halasz      { type person } define-object
@@ -121,6 +132,27 @@ define-object
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+SYM: the-evolution-of-forth
+  {
+    type paper
+    title "The Evolution of Forth"
+    authors { chuck-moore "elizabeth-d-rather" "donald-r-colburn" }
+    abstract
+    "Forth is unique among programming languages in that its development and proliferation has been a grass-roots effort unsupported by any major corporate or academic sponsors. Originally conceived and developed by a single individual, its later development has progressed under two significant influences: professional programmers who developed tools to solve application problems and then commercialized them, and the interests of hobbyists concerned with free distribution of Forth. These influences have produced a language markedly different from traditional programming languages."
+    date 1993
+  }
+define-object
+
+SYM: first-complete-stand-alone-forth
+  {
+    type event
+    participants { chuck-moore }
+    date 1971
+  }
+define-object
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 SYM: notecards-in-a-nutshell
   {
     type paper
@@ -128,3 +160,19 @@ SYM: notecards-in-a-nutshell
     date 1987
   }
 define-object
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYM: the-evolution-of-forth-excerpt-2-1-1
+  {
+    type excerpt
+    source the-evolution-of-forth
+    chapter 2
+    section 1
+    paragraph 1
+    content
+    "Moore developed the first complete, stand-alone implementation of Forth in 1971 for the 11-meter radio telescope operated by the National Radio Astronomy Observatory (NRAO) at Kitt Peak, Arizona. This system ran on two early minicomputers (a 16 KB DDP-116 and a 32 KB H316) joined by a serial link. Both a multiprogrammed system and a multiprocessor system (in that both computers shared responsibility for controlling the telescope and its scientific instruments), it was responsible for pointing and tracking the telescope, collecting data and recording it on magnetic tape, and supporting an interactive graphics terminal on which an astronomer could analyze previously recorded data. The multiprogrammed nature of the system allowed all these functions to be performed concurrently, without timing conflicts or other interference."
+    subjects { chuck-moore first-complete-stand-alone-forth }
+  }
+define-object
+

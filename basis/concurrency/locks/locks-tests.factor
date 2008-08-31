@@ -1,7 +1,7 @@
 IN: concurrency.locks.tests
 USING: tools.test concurrency.locks concurrency.count-downs
 concurrency.messaging concurrency.mailboxes locals kernel
-threads sequences calendar ;
+threads sequences calendar accessors ;
 
 :: lock-test-0 ( -- )
     [let | v [ V{ } clone ]
@@ -174,7 +174,7 @@ threads sequences calendar ;
     ] ;
 
 [ lock-timeout-test ] [
-    linked-error-thread thread-name "Lock timeout-er" =
+    thread>> name>> "Lock timeout-er" =
 ] must-fail-with
 
 :: read/write-test ( -- )

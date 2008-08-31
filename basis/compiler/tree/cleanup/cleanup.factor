@@ -42,7 +42,7 @@ GENERIC: cleanup* ( node -- node/nodes )
 : cleanup-folding ( #call -- nodes )
     #! Replace a #call having a known result with a #drop of its
     #! inputs followed by #push nodes for the outputs.
-    [ word>> +inlined+ depends-on ]
+    [ word>> inlined-dependency depends-on ]
     [
         [ node-output-infos ] [ out-d>> ] bi
         [ [ literal>> ] dip #push ] 2map
@@ -50,11 +50,16 @@ GENERIC: cleanup* ( node -- node/nodes )
     [ in-d>> #drop ]
     tri prefix ;
 
+: add-method-dependency ( #call -- )
+    dup method>> word? [
+        [ word>> ] [ class>> ] bi depends-on-generic
+    ] [ drop ] if ;
+
 : cleanup-inlining ( #call -- nodes )
     [
         dup method>>
-        [ method>> dup word? [ +called+ depends-on ] [ drop ] if ]
-        [ word>> +inlined+ depends-on ] if
+        [ add-method-dependency ]
+        [ word>> inlined-dependency depends-on ] if
     ] [ body>> cleanup ] bi ;
 
 ! Removing overflow checks

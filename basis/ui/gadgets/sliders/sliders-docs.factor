@@ -30,7 +30,7 @@ HELP: slide-by-page
 
 HELP: slide-by-line
 { $values { "amount" "an integer" } { "slider" slider } }
-{ $description "Adds the amount multiplied by " { $link slider-line } " to the slider's current position." } ;
+{ $description "Adds the amount multiplied by the " { $snippet "line" } " slot to the slider's current position." } ;
 
 HELP: <slider>
 { $values { "range" range } { "orientation" "an orientation specifier" } { "slider" "a new " { $link slider } } }
@@ -56,6 +56,6 @@ ARTICLE: "ui.gadgets.sliders" "Slider gadgets"
 { $subsection slide-by }
 { $subsection slide-by-line }
 { $subsection slide-by-page }
-"Since sliders are controls the value can be get and set by calling " { $link gadget-model } "." ;
+"Since sliders are controls the value can be get and set by via the " { $snippet "model" } " slot. " ;
 
 ABOUT: "ui.gadgets.sliders"

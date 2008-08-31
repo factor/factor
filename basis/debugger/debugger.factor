@@ -207,7 +207,7 @@ M: no-case summary
 
 M: slice-error error.
     "Cannot create slice because " write
-    slice-error-reason print ;
+    reason>> print ;
 
 M: bounds-error summary drop "Sequence index out of bounds" ;
 
@@ -232,14 +232,14 @@ M: immutable summary drop "Sequence is immutable" ;
 
 M: redefine-error error.
     "Re-definition of " write
-    redefine-error-def . ;
+    def>> . ;
 
 M: undefined summary
     drop "Calling a deferred word before it has been defined" ;
 
 M: no-compilation-unit error.
     "Attempting to define " write
-    no-compilation-unit-definition pprint
+    definition>> pprint
     " outside of a compilation unit" print ;
 
 M: no-vocab summary
@@ -299,9 +299,9 @@ M: string expected>string ;
 
 M: unexpected error.
     "Expected " write
-    dup unexpected-want expected>string write
+    dup want>> expected>string write
     " but got " write
-    unexpected-got expected>string print ;
+    got>> expected>string print ;
 
 M: lexer-error error.
     [ lexer-dump ] [ error>> error. ] bi ;

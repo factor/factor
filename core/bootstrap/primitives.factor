@@ -35,6 +35,7 @@ H{ } clone sub-primitives set
 H{ } clone dictionary set
 H{ } clone new-classes set
 H{ } clone changed-definitions set
+H{ } clone changed-generics set
 H{ } clone forgotten-definitions set
 H{ } clone root-cache set
 H{ } clone source-files set

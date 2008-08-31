@@ -259,9 +259,9 @@ M: x86.32 %cleanup ( alien-node -- )
 M: x86.32 %unwind ( n -- ) %epilogue-later RET ;
 
 os windows? [
-    cell "longlong" c-type set-c-type-align
-    cell "ulonglong" c-type set-c-type-align
-    4 "double" c-type set-c-type-align
+    cell "longlong" c-type (>>align)
+    cell "ulonglong" c-type (>>align)
+    4 "double" c-type (>>align)
 ] unless
 
 : (sse2?) ( -- ? ) "Intrinsic" throw ;

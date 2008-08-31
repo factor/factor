@@ -1,10 +1,22 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel ui.gadgets ui.gestures namespaces ;
+
+USING: kernel accessors ui.gadgets ui.gestures namespaces ;
+
 IN: ui.clipboards
 
 ! Two text transfer buffers
+
 TUPLE: clipboard contents ;
+
+GENERIC: clipboard-contents ( clipboard -- string )
+
+GENERIC: set-clipboard-contents ( string clipboard -- )
+
+M: clipboard clipboard-contents contents>> ;
+
+M: clipboard set-clipboard-contents (>>contents) ;
+
 : <clipboard> ( -- clipboard ) "" clipboard boa ;
 
 GENERIC: paste-clipboard ( gadget clipboard -- )
@@ -20,11 +32,10 @@ SYMBOL: clipboard
 SYMBOL: selection
 
 : gadget-copy ( gadget clipboard -- )
-    over gadget-selection? [
-        >r [ gadget-selection ] keep r> copy-clipboard
-    ] [
-        2drop
-    ] if ;
+    over gadget-selection?
+        [ >r [ gadget-selection ] keep r> copy-clipboard ]
+        [ 2drop ]
+    if ;
 
 : com-copy ( gadget -- ) clipboard get gadget-copy ;
 

@@ -33,7 +33,7 @@ ascent descent height handle widths ;
 
 M: font hashcode* drop font hashcode* ;
 
-: close-font ( font -- ) font-handle FT_Done_Face ;
+: close-font ( font -- ) handle>> FT_Done_Face ;
 
 : close-freetype ( -- )
     global [
@@ -111,11 +111,11 @@ M: freetype-renderer open-font ( font -- open-font )
     freetype drop open-fonts get [ <font> ] cache ;
 
 : load-glyph ( font char -- glyph )
-    >r font-handle dup r> 0 FT_Load_Char
+    >r handle>> dup r> 0 FT_Load_Char
     freetype-error face-glyph ;
 
 : char-width ( open-font char -- w )
-    over font-widths [
+    over widths>> [
         dupd load-glyph glyph-hori-advance ft-ceil
     ] cache nip ;
 
@@ -123,7 +123,7 @@ M: freetype-renderer string-width ( open-font string -- w )
     0 -rot [ char-width + ] with each ;
 
 M: freetype-renderer string-height ( open-font string -- h )
-    drop font-height ;
+    drop height>> ;
 
 : glyph-size ( glyph -- dim )
     dup glyph-hori-advance ft-ceil
@@ -166,7 +166,7 @@ M: freetype-renderer string-height ( open-font string -- h )
 
 : glyph-texture-loc ( glyph font -- loc )
     over glyph-hori-bearing-x ft-floor -rot
-    font-ascent swap glyph-hori-bearing-y - ft-floor 2array ;
+    ascent>> swap glyph-hori-bearing-y - ft-floor 2array ;
 
 : glyph-texture-size ( glyph -- dim )
     [ glyph-bitmap-width next-power-of-2 ]
@@ -203,7 +203,7 @@ M: freetype-renderer string-height ( open-font string -- h )
     ] do-enabled ;
 
 : font-sprites ( font world -- open-font sprites )
-    world-fonts [ open-font H{ } clone 2array ] cache first2 ;
+    fonts>> [ open-font H{ } clone 2array ] cache first2 ;
 
 M: freetype-renderer draw-string ( font string loc -- )
     >r >r world get font-sprites r> r> (draw-string) ;

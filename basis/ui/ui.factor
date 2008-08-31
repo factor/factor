@@ -51,31 +51,31 @@ SYMBOL: stop-after-last-window?
     T{ gain-focus } swap each-gesture ;
 
 : focus-world ( world -- )
-    t over set-world-focused?
+    t over (>>focused?)
     dup raised-window
     focus-path f focus-gestures ;
 
 : unfocus-world ( world -- )
-    f over set-world-focused?
+    f over (>>focused?)
     focus-path f swap focus-gestures ;
 
 M: world graft*
     dup (open-window)
-    dup world-title over set-title
+    dup title>> over set-title
     request-focus ;
 
 : reset-world ( world -- )
     #! This is used when a window is being closed, but also
     #! when restoring saved worlds on image startup.
-    dup world-fonts clear-assoc
+    dup fonts>> clear-assoc
     dup unfocus-world
-    f swap set-world-handle ;
+    f swap (>>handle) ;
 
 M: world ungraft*
     dup free-fonts
     dup hand-clicked close-global
     dup hand-gadget close-global
-    dup world-handle (close-window)
+    dup handle>> (close-window)
     reset-world ;
 
 : find-window ( quot -- world )
@@ -90,21 +90,21 @@ SYMBOL: ui-hook
     V{ } clone windows set-global ;
 
 : restore-gadget-later ( gadget -- )
-    dup gadget-graft-state {
+    dup graft-state>> {
         { { f f } [ ] }
         { { f t } [ ] }
         { { t t } [
-            { f f } over set-gadget-graft-state
+            { f f } over (>>graft-state)
         ] }
         { { t f } [
             dup unqueue-graft
-            { f f } over set-gadget-graft-state
+            { f f } over (>>graft-state)
         ] }
     } case graft-later ;
 
 : restore-gadget ( gadget -- )
     dup restore-gadget-later
-    gadget-children [ restore-gadget ] each ;
+    children>> [ restore-gadget ] each ;
 
 : restore-world ( world -- )
     dup reset-world restore-gadget ;
@@ -133,9 +133,9 @@ SYMBOL: ui-hook
     [ dup update-hand draw-world ] each ;
 
 : notify ( gadget -- )
-    dup gadget-graft-state
+    dup graft-state>>
     dup first { f f } { t t } ?
-    pick set-gadget-graft-state {
+    pick (>>graft-state) {
         { { f t } [ dup activate-control graft* ] }
         { { t f } [ dup deactivate-control ungraft* ] }
     } case ;

@@ -63,12 +63,7 @@ HELP: set-model
 { $values { "value" object } { "model" model } }
 { $description "Changes the value of a model and calls " { $link model-changed } " on all observers registered with " { $link add-connection } "." } ;
 
-{ set-model set-model-value change-model (change-model) } related-words
-
-HELP: set-model-value ( value model -- )
-{ $values { "value" object } { "model" model } }
-{ $description "Changes the value of a model without notifying any observers registered with " { $link add-connection } "." }
-{ $notes "There are very few reasons for user code to call this word. Instead, call " { $link set-model } ", which notifies observers." } ;
+{ set-model change-model (change-model) } related-words
 
 HELP: change-model
 { $values { "model" model } { "quot" "a quotation with stack effect " { $snippet "( obj -- newobj )" } } }

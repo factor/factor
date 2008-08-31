@@ -42,12 +42,17 @@ SYMBOL: +failed+
     [ compiled-unxref ]
     [
         dup crossref?
-        [ dependencies get compiled-xref ] [ drop ] if
+        [
+            dependencies get
+            generic-dependencies get
+            compiled-xref
+        ] [ drop ] if
     ] tri ;
 
 : (compile) ( word -- )
     '[
         H{ } clone dependencies set
+        H{ } clone generic-dependencies set
 
         , {
             [ compile-begins ]

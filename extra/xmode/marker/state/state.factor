@@ -1,4 +1,4 @@
-USING: xmode.marker.context xmode.rules symbols
+USING: xmode.marker.context xmode.rules symbols accessors
 xmode.tokens namespaces kernel sequences assocs math ;
 IN: xmode.marker.state
 
@@ -9,13 +9,13 @@ SYMBOLS: line last-offset position context
  escaped?  process-escape?  delegate-end-escaped? ;
 
 : current-rule ( -- rule )
-    context get line-context-in-rule ;
+    context get in-rule>> ;
 
 : current-rule-set ( -- rule )
-    context get line-context-in-rule-set ;
+    context get in-rule-set>> ;
 
 : current-keywords ( -- keyword-map )
-    current-rule-set rule-set-keywords ;
+    current-rule-set keywords>> ;
 
 : token, ( from to id -- )
     2over = [ 3drop ] [ >r line get subseq r> <token> , ] if ;
@@ -32,9 +32,8 @@ SYMBOLS: line last-offset position context
     context [ <line-context> ] change ;
 
 : pop-context ( -- )
-    context get line-context-parent
-    dup context set
-    f swap set-line-context-in-rule ;
+    context get parent>>
+    f >>in-rule context set ;
 
 : init-token-marker ( main prev-context line -- )
     line set

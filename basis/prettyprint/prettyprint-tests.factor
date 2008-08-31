@@ -195,11 +195,11 @@ DEFER: parse-error-file
 
 : string-layout
     {
-        "USING: debugger io kernel lexer ;"
+        "USING: accessors debugger io kernel ;"
         "IN: prettyprint.tests"
         ": string-layout-test ( error -- )"
-        "    \"Expected \" write dup unexpected-want expected>string write"
-        "    \" but got \" write unexpected-got expected>string print ;"
+        "    \"Expected \" write dup want>> expected>string write"
+        "    \" but got \" write got>> expected>string print ;"
     } ;
 
 

@@ -779,19 +779,19 @@ HELP: collapse-slice
 
 HELP: <flat-slice>
 { $values { "seq" sequence } { "slice" slice } }
-{ $description "Outputs a slice with the same elements as " { $snippet "seq" } ", and " { $link slice-from } " equal to 0 and " { $link slice-to } " equal to the length of " { $snippet "seq" } "." }
+{ $description "Outputs a slice with the same elements as " { $snippet "seq" } ", and " { $snippet "from" } " equal to 0 and " { $snippet "to" } " equal to the length of " { $snippet "seq" } "." }
 { $notes "Some words create slices then proceed to read the " { $snippet "to" } " and " { $snippet "from" } " slots of the slice. To behave predictably when they are themselves given a slice as input, they apply this word first to get a canonical slice." } ;
 
 HELP: <slice>
 { $values { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "seq" sequence } { "slice" slice } }
 { $description "Outputs a new virtual sequence sharing storage with the subrange of elements in " { $snippet "seq" } " with indices starting from and including " { $snippet "m" } ", and up to but not including " { $snippet "n" } "." }
 { $errors "Throws an error if " { $snippet "m" } " or " { $snippet "n" } " is out of bounds." }
-{ $notes "Taking the slice of a slice outputs a slice of the underlying sequence of the original slice. Keep this in mind when writing code which depends on the values of " { $link slice-from } " and " { $link slice-to } " being equal to the inputs to this word. The " { $link <flat-slice> } " word might be helpful in such situations." } ;
+{ $notes "Taking the slice of a slice outputs a slice of the underlying sequence of the original slice. Keep this in mind when writing code which depends on the values of " { $snippet "from" } " and " { $snippet "to" } " being equal to the inputs to this word. The " { $link <flat-slice> } " word might be helpful in such situations." } ;
 
 { <slice> subseq } related-words
 
 HELP: repetition
-{ $class-description "A virtual sequence consisting of " { $link repetition-elt } " repeated " { $link repetition-len } " times. Repetitions are created by calling " { $link <repetition> } "." } ;
+{ $class-description "A virtual sequence consisting of " { $snippet "elt" } " repeated " { $snippet "len" } " times. Repetitions are created by calling " { $link <repetition> } "." } ;
 
 HELP: <repetition> ( len elt -- repetition )
 { $values { "len" "a non-negative integer" } { "elt" object } { "repetition" repetition } }

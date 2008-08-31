@@ -36,8 +36,7 @@ output history flag mailbox thread waiting help ;
         assoc-stack
     ] if ;
 
-: <help-model> ( interactor -- model )
-    editor-caret 1/3 seconds <delay> ;
+: <help-model> ( interactor -- model ) caret>> 1/3 seconds <delay> ;
 
 : <interactor> ( output -- gadget )
     interactor new-editor
@@ -54,7 +53,7 @@ M: interactor ungraft*
 
 : word-at-loc ( loc interactor -- word )
     over [
-        [ gadget-model T{ one-word-elt } elt-string ] keep
+        [ model>> T{ one-word-elt } elt-string ] keep
         interactor-use assoc-stack
     ] [
         2drop f
@@ -82,7 +81,7 @@ M: interactor model-changed
 : interactor-continue ( obj interactor -- )
     mailbox>> mailbox-put ;
 
-: clear-input ( interactor -- ) gadget-model clear-doc ;
+: clear-input ( interactor -- ) model>> clear-doc ;
 
 : interactor-finish ( interactor -- )
     #! The spawn is a kludge to make it infer. Stupid.

@@ -115,10 +115,10 @@ M: object short-section? section-fits? ;
 
 : pprint-section ( section -- )
     dup short-section? [
-        dup section-style [ short-section ] with-style
+        dup style>> [ short-section ] with-style
     ] [
         [ <long-section ]
-        [ dup section-style [ long-section ] with-style ]
+        [ dup style>> [ long-section ] with-style ]
         [ long-section> ]
         tri
     ] if ;
@@ -205,7 +205,7 @@ TUPLE: text < section string ;
         swap >>style
         swap >>string ;
 
-M: text short-section text-string write ;
+M: text short-section string>> write ;
 
 M: text long-section short-section ;
 
@@ -291,17 +291,13 @@ SYMBOL: next
 
 : split-groups ( ? -- ) [ t , ] when ;
 
-M: f section-start-group? drop t ;
-
-M: f section-end-group? drop f ;
-
 : split-before ( section -- )
-    [ section-start-group? prev get section-end-group? and ]
+    [ start-group?>> prev get [ end-group?>> ] [ t ] if* and ]
     [ flow? prev get flow? not and ]
     bi or split-groups ;
 
 : split-after ( section -- )
-    section-end-group? split-groups ;
+    [ end-group?>> ] [ f ] if* split-groups ;
 
 : group-flow ( seq -- newseq )
     [

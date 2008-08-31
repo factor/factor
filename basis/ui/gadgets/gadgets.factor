@@ -150,7 +150,7 @@ DEFER: relayout
 : invalidate* ( gadget -- )
     \ invalidate* over (>>layout-state)
     dup forget-pref-dim
-    dup gadget-root?
+    dup root?>>
     [ layout-later ] [ parent>> [ relayout ] when* ] if ;
 
 : relayout ( gadget -- )

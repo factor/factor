@@ -6,14 +6,14 @@ heaps.private system math math.parser math.order accessors ;
 IN: tools.threads
 
 : thread. ( thread -- )
-    dup thread-id pprint-cell
-    dup thread-name over [ write-object ] with-cell
-    dup thread-state [
+    dup id>> pprint-cell
+    dup name>> over [ write-object ] with-cell
+    dup state>> [
         [ dup self eq? "running" "yield" ? ] unless*
         write
     ] with-cell
     [
-        thread-sleep-entry [
+        sleep-entry>> [
             key>> millis [-] number>string write
             " ms" write
         ] when*

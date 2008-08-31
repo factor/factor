@@ -140,7 +140,7 @@ SYMBOL: enter-out
     ] [ undeclared-recursion-error inference-error ] if ;
 
 : inline-word ( word -- )
-    [ +inlined+ depends-on ]
+    [ inlined-dependency depends-on ]
     [
         {
             { [ dup inline-recursive-label ] [ call-recursive-inline-word ] }

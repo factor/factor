@@ -5,7 +5,7 @@ namespaces sequences db.sqlite.ffi db combinators
 continuations db.types calendar.format serialize
 io.streams.byte-array byte-arrays io.encodings.binary
 io.backend db.errors present urls io.encodings.utf8
-io.encodings.string ;
+io.encodings.string accessors ;
 IN: db.sqlite.lib
 
 ERROR: sqlite-error < db-error n string ;
@@ -16,7 +16,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
 
 : sqlite-statement-error ( -- * )
     SQLITE_ERROR
-    db get db-handle sqlite3_errmsg sqlite-sql-error ;
+    db get handle>> sqlite3_errmsg sqlite-sql-error ;
 
 : sqlite-check-result ( n -- )
     {

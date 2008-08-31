@@ -1,13 +1,13 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces sequences kernel math arrays io ui.gadgets
+USING: accessors namespaces sequences kernel math arrays io ui.gadgets
 generic combinators ;
 IN: ui.traverse
 
 TUPLE: node value children ;
 
 : traverse-step ( path gadget -- path' gadget' )
-    >r unclip r> gadget-children ?nth ;
+    >r unclip r> children>> ?nth ;
 
 : make-node ( quot -- ) { } make node boa , ; inline
 
@@ -19,7 +19,7 @@ TUPLE: node value children ;
             nip ,
         ] [
             [
-                2dup gadget-children swap first head-slice %
+                2dup children>> swap first head-slice %
                 tuck traverse-step traverse-to-path
             ] make-node
         ] if
@@ -34,7 +34,7 @@ TUPLE: node value children ;
         ] [
             [
                 2dup traverse-step traverse-from-path
-                tuck gadget-children swap first 1+ tail-slice %
+                tuck children>> swap first 1+ tail-slice %
             ] make-node
         ] if
     ] if ;
@@ -43,7 +43,7 @@ TUPLE: node value children ;
     traverse-step traverse-from-path ;
 
 : (traverse-middle) ( frompath topath gadget -- )
-    >r >r first 1+ r> first r> gadget-children <slice> % ;
+    >r >r first 1+ r> first r> children>> <slice> % ;
 
 : traverse-post ( topath gadget -- )
     traverse-step traverse-to-path ;

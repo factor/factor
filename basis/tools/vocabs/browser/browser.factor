@@ -181,12 +181,12 @@ M: vocab-spec article-parent drop "vocab-index" ;
 M: vocab-tag >link ;
 
 M: vocab-tag article-title
-    vocab-tag-name "Vocabularies tagged ``" swap "''" 3append ;
+    name>> "Vocabularies tagged ``" swap "''" 3append ;
 
-M: vocab-tag article-name vocab-tag-name ;
+M: vocab-tag article-name name>> ;
 
 M: vocab-tag article-content
-    \ $tagged-vocabs swap vocab-tag-name 2array ;
+    \ $tagged-vocabs swap name>> 2array ;
 
 M: vocab-tag article-parent drop "vocab-index" ;
 
@@ -195,12 +195,12 @@ M: vocab-tag summary article-title ;
 M: vocab-author >link ;
 
 M: vocab-author article-title
-    vocab-author-name "Vocabularies by " prepend ;
+    name>> "Vocabularies by " prepend ;
 
-M: vocab-author article-name vocab-author-name ;
+M: vocab-author article-name name>> ;
 
 M: vocab-author article-content
-    \ $authored-vocabs swap vocab-author-name 2array ;
+    \ $authored-vocabs swap name>> 2array ;
 
 M: vocab-author article-parent drop "vocab-index" ;
 

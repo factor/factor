@@ -130,9 +130,9 @@ M: encoder stream-write1
 M: encoder stream-write
     >encoder< decoder-write ;
 
-M: encoder dispose encoder-stream dispose ;
+M: encoder dispose stream>> dispose ;
 
-M: encoder stream-flush encoder-stream stream-flush ;
+M: encoder stream-flush stream>> stream-flush ;
 
 INSTANCE: encoder plain-writer
 PRIVATE>

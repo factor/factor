@@ -22,8 +22,8 @@ DEFER: start-walker-thread
 
 : get-walker-thread ( -- status continuation thread )
     walker-thread tget [
-        [ thread-variables walker-status swap at ]
-        [ thread-variables walker-continuation swap at ]
+        [ variables>> walker-status swap at ]
+        [ variables>> walker-continuation swap at ]
         [ ] tri
     ] [
         f <model>
@@ -43,7 +43,7 @@ DEFER: start-walker-thread
     } cond ;
 
 : break ( -- )
-    continuation callstack over set-continuation-call
+    continuation callstack >>call
     show-walker send-synchronous
     after-break ;
 
@@ -163,7 +163,7 @@ SYMBOL: +stopped+
     ] change-frame ;
 
 : status ( -- symbol )
-    walker-status tget model-value ;
+    walker-status tget value>> ;
 
 : set-status ( symbol -- )
     walker-status tget set-model ;
@@ -248,7 +248,7 @@ SYMBOL: +stopped+
 : associate-thread ( walker -- )
     walker-thread tset
     [ f walker-thread tget send-synchronous drop ]
-    self set-thread-exit-handler ;
+    self (>>exit-handler) ;
 
 : start-walker-thread ( status continuation -- thread' )
     self [
@@ -258,7 +258,7 @@ SYMBOL: +stopped+
         V{ } clone walker-history tset
         walker-loop
     ] 3curry
-    "Walker on " self thread-name append spawn
+    "Walker on " self name>> append spawn
     [ associate-thread ] keep ;
 
 ! For convenience

@@ -14,9 +14,9 @@ TUPLE: label < gadget text font color ;
 
 : set-label-string ( string label -- )
     CHAR: \n pick memq? [
-        >r string-lines r> set-label-text
+        >r string-lines r> (>>text)
     ] [
-        set-label-text
+        (>>text)
     ] if ; inline
 
 : label-theme ( gadget -- gadget )

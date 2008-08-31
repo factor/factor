@@ -83,7 +83,7 @@ ARTICLE: "ui-glossary" "UI glossary"
 ARTICLE: "building-ui" "Building user interfaces"
 "A gadget is a graphical element which responds to user input. Gadgets are implemented as tuples which (directly or indirectly) inherit from " { $link gadget } ", which in turn inherits from " { $link rect } "."
 { $subsection gadget }
-"Gadgets are arranged in a hierarchy, and all visible gadgets except for instances of " { $link world } " are contained in a parent gadget, stored in the " { $link gadget-parent } " slot."
+"Gadgets are arranged in a hierarchy, and all visible gadgets except for instances of " { $link world } " are contained in a parent gadget, stored in the " { $snippet "parent" } " slot."
 { $subsection "ui-geometry" }
 { $subsection "ui-layouts" }
 { $subsection "gadgets" }
@@ -119,8 +119,10 @@ ARTICLE: "ui-geometry" "Gadget geometry"
 { $subsection offset-rect }
 { $subsection rect-intersect }
 { $subsection intersects? }
-"A gadget's bounding box is always relative to its parent:"
-{ $subsection gadget-parent }
+
+! "A gadget's bounding box is always relative to its parent. "
+! { $subsection gadget-parent }
+
 "Word for converting from a child gadget's co-ordinate system to a parent's:"
 { $subsection relative-loc }
 { $subsection screen-loc }
@@ -170,7 +172,7 @@ $nl
 ARTICLE: "ui-backend-windows" "UI backend window management"
 "The high-level " { $link open-window } " word eventually calls a low-level word which you must implement:"
 { $subsection open-world-window }
-"This word should create a native window, store some kind of handle in the " { $link world-handle } " slot, then call two words:"
+"This word should create a native window, store some kind of handle in the " { $snippet "handle" } " slot, then call two words:"
 { $subsection register-window }
 "The following words must also be implemented:"
 { $subsection set-title }
@@ -211,8 +213,8 @@ $nl
 { $subsection unparent }
 { $subsection add-gadgets }
 { $subsection clear-gadget }
-"Working with gadget children:"
-{ $subsection gadget-children }
+"The children of a gadget are available via the "
+{ $snippet "children" } " slot. " "Working with gadget children:"
 { $subsection gadget-child }
 { $subsection nth-gadget }
 { $subsection each-child }

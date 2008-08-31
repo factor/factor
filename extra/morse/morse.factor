@@ -116,7 +116,7 @@ LAZY: 'morse-words' ( -- parser )
 PRIVATE>
 
 : morse> ( str -- str )
-    'morse-words' parse car parse-result-parsed [
+    'morse-words' parse car parsed>> [
         [ 
             >string morse>ch
         ] map >string

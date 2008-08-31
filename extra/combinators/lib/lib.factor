@@ -150,4 +150,4 @@ MACRO: predicates ( seq -- quot/f )
     >r [ [ dup ] prepend ] map r> zip [ drop f ] suffix
     [ cond ] curry ;
 
-: %chance ( quot integer -- ) 100 random > swap when ; inline
+: %chance ( quot n -- ) 100 random > swap when ; inline

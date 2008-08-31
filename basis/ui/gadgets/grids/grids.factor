@@ -48,7 +48,7 @@ grid
     dupd add-gaps dim-sum v+ ;
 
 M: grid pref-dim*
-    dup grid-gap swap compute-grid >r over r>
+    dup gap>> swap compute-grid >r over r>
     gap-sum >r gap-sum r> (pair-up) ;
 
 : do-grid ( dims grid quot -- )
@@ -57,7 +57,7 @@ M: grid pref-dim*
     drop ; inline
 
 : grid-positions ( grid dims -- locs )
-    >r grid-gap dup r> add-gaps swap [ v+ ] accumulate nip ;
+    >r gap>> dup r> add-gaps swap [ v+ ] accumulate nip ;
 
 : position-grid ( grid horiz vert -- )
     pick >r
@@ -65,7 +65,7 @@ M: grid pref-dim*
     pair-up r> [ set-rect-loc ] do-grid ;
 
 : resize-grid ( grid horiz vert -- )
-    pick grid-fill? [
+    pick fill?>> [
         pair-up swap [ (>>dim) ] do-grid
     ] [
         2drop grid>> [ [ prefer ] each ] each
@@ -77,13 +77,14 @@ M: grid pref-dim*
 M: grid layout* dup compute-grid grid-layout ;
 
 M: grid children-on ( rect gadget -- seq )
-    dup gadget-children empty? [
-        2drop f
-    ] [
+    dup children>> empty?
+      [ 2drop f ]
+      [
         { 0 1 } swap grid>>
         [ 0 <column> fast-children-on ] keep
         <slice> concat
-    ] if ;
+      ]
+    if ;
 
 M: grid gadget-text*
     grid>>

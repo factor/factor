@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: deques dlists kernel threads continuations math
-concurrency.conditions ;
+concurrency.conditions combinators.short-circuit accessors ;
 IN: concurrency.locks
 
 ! Simple critical sections
@@ -16,13 +16,13 @@ TUPLE: lock threads owner reentrant? ;
 <PRIVATE
 
 : acquire-lock ( lock timeout -- )
-    over lock-owner
-    [ 2dup >r lock-threads r> "lock" wait ] when drop
-    self swap set-lock-owner ;
+    over owner>>
+    [ 2dup >r threads>> r> "lock" wait ] when drop
+    self >>owner drop ;
 
 : release-lock ( lock -- )
-    f over set-lock-owner
-    lock-threads notify-1 ;
+    f >>owner
+    threads>> notify-1 ;
 
 : do-lock ( lock timeout quot acquire release -- )
     >r >r pick rot r> call ! use up  timeout acquire
@@ -34,8 +34,8 @@ TUPLE: lock threads owner reentrant? ;
 PRIVATE>
 
 : with-lock-timeout ( lock timeout quot -- )
-    pick lock-reentrant? [
-        pick lock-owner self eq? [
+    pick reentrant?>> [
+        pick owner>> self eq? [
             2nip call
         ] [
             (with-lock)
@@ -56,44 +56,43 @@ TUPLE: rw-lock readers writers reader# writer ;
 <PRIVATE
 
 : add-reader ( lock -- )
-    dup rw-lock-reader# 1+ swap set-rw-lock-reader# ;
+    [ 1+ ] change-reader# drop ;
 
 : acquire-read-lock ( lock timeout -- )
-    over rw-lock-writer
-    [ 2dup >r rw-lock-readers r> "read lock" wait ] when drop
+    over writer>>
+    [ 2dup >r readers>> r> "read lock" wait ] when drop
     add-reader ;
 
 : notify-writer ( lock -- )
-    rw-lock-writers notify-1 ;
+    writers>> notify-1 ;
 
 : remove-reader ( lock -- )
-    dup rw-lock-reader# 1- swap set-rw-lock-reader# ;
+    [ 1- ] change-reader# drop ;
 
 : release-read-lock ( lock -- )
     dup remove-reader
-    dup rw-lock-reader# zero? [ notify-writer ] [ drop ] if ;
+    dup reader#>> zero? [ notify-writer ] [ drop ] if ;
 
 : acquire-write-lock ( lock timeout -- )
-    over rw-lock-writer pick rw-lock-reader# 0 > or
-    [ 2dup >r rw-lock-writers r> "write lock" wait ] when drop
-    self swap set-rw-lock-writer ;
+    over writer>> pick reader#>> 0 > or
+    [ 2dup >r writers>> r> "write lock" wait ] when drop
+    self >>writer drop ;
 
 : release-write-lock ( lock -- )
-    f over set-rw-lock-writer
-    dup rw-lock-readers deque-empty?
-    [ notify-writer ] [ rw-lock-readers notify-all ] if ;
+    f >>writer
+    dup readers>> deque-empty?
+    [ notify-writer ] [ readers>> notify-all ] if ;
 
 : reentrant-read-lock-ok? ( lock -- ? )
     #! If we already have a write lock, then we can grab a read
     #! lock too.
-    rw-lock-writer self eq? ;
+    writer>> self eq? ;
 
 : reentrant-write-lock-ok? ( lock -- ? )
     #! The only case where we have a writer and > 1 reader is
     #! write -> read re-entrancy, and in this case we prohibit
     #! a further write -> read -> write re-entrancy.
-    dup rw-lock-writer self eq?
-    swap rw-lock-reader# zero? and ;
+    { [ writer>> self eq? ] [ reader#>> zero? ] } 1&& ;
 
 PRIVATE>
 

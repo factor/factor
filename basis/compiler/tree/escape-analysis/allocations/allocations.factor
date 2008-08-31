@@ -103,6 +103,9 @@ DEFER: copy-value
     [ [ allocation copy-allocation ] dip record-allocation ]
     2bi ;
 
+: copy-values ( from to -- )
+    [ copy-value ] 2each ;
+
 : copy-slot-value ( out slot# in -- )
     allocation {
         { [ dup not ] [ 3drop ] }

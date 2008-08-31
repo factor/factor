@@ -2,7 +2,7 @@ USING: arrays combinators kernel lists math math.parser
 namespaces parser lexer parser-combinators parser-combinators.simple
 promises quotations sequences combinators.lib strings math.order
 assocs prettyprint.backend memoize unicode.case unicode.categories
-combinators.short-circuit ;
+combinators.short-circuit accessors ;
 USE: io
 IN: regexp
 
@@ -270,14 +270,14 @@ TUPLE: regexp source parser ignore-case? ;
     ] keep regexp boa ;
 
 : do-ignore-case ( string regexp -- string regexp )
-    dup regexp-ignore-case? [ >r >upper r> ] when ;
+    dup ignore-case?>> [ >r >upper r> ] when ;
 
 : matches? ( string regexp -- ? )
-    do-ignore-case regexp-parser just parse nil? not ;
+    do-ignore-case parser>> just parse nil? not ;
 
 : match-head ( string regexp -- end )
-    do-ignore-case regexp-parser parse dup nil?
-    [ drop f ] [ car parse-result-unparsed slice-from ] if ;
+    do-ignore-case parser>> parse dup nil?
+    [ drop f ] [ car unparsed>> from>> ] if ;
 
 ! Literal syntax for regexps
 : parse-options ( string -- ? )

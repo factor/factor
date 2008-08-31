@@ -1,5 +1,5 @@
 USING: sorting sequences kernel math math.order random
-tools.test vectors sets ;
+tools.test vectors sets vocabs ;
 IN: sorting.tests
 
 [ { } ] [ { } natural-sort ] unit-test
@@ -24,3 +24,5 @@ unit-test
 
 [ { { 1 "a" } { 1 "b" } { 1 "c" } { 1 "e" } { 2 "d" } } ]
 [ { { 1 "a" } { 1 "b" } { 1 "c" } { 2 "d" } { 1 "e" } } sort-keys ] unit-test
+
+[ ] [ all-words natural-sort drop ] unit-test

@@ -31,7 +31,7 @@ HELP: user-input*
 HELP: children-on
 { $values { "rect/point" "a " { $link rect } " or a pair of integers" } { "gadget" gadget } { "seq" "a sequence of gadgets" } }
 { $contract "Outputs a sequence of gadgets which potentially intersect a rectangle or contain a point in the co-ordinate system of the gadget." }
-{ $notes "This does not have to be an accurate intersection test, and simply returning " { $link gadget-children } " is a valid implementation. However, an accurate intersection test reduces the amount of work done when drawing this gadget if it is partially clipped and not all children are visible." } ;
+{ $notes "This does not have to be an accurate intersection test, and simply returning " { $snippet "children" } " is a valid implementation. However, an accurate intersection test reduces the amount of work done when drawing this gadget if it is partially clipped and not all children are visible." } ;
 
 HELP: pick-up
 { $values { "point" "a pair of integers" } { "gadget" gadget } { "child/f" "a " { $link gadget } " or " { $link f } } }
@@ -57,7 +57,7 @@ HELP: gadget-selection
 
 HELP: relayout
 { $values { "gadget" gadget } }
-{ $description "Relayout and redraw a gadget before the next iteration of the event loop. Unlike " { $link relayout-1 } ", this relayouts all parents up to a gadget having " { $link gadget-root? } " set, so this word should be used when the gadget's dimensions have potentially changed." } ;
+{ $description "Relayout and redraw a gadget before the next iteration of the event loop. Unlike " { $link relayout-1 } ", this relayouts all parents up to a gadget having " { $snippet "root?" } " set, so this word should be used when the gadget's dimensions have potentially changed." } ;
 
 HELP: relayout-1
 { $values { "gadget" gadget } }
@@ -170,7 +170,7 @@ HELP: focusable-child
 { $values { "gadget" gadget } { "child" gadget } }
 { $description "Outputs the child of the gadget which would prefer to receive keyboard focus." } ;
 
-{ control-value set-control-value gadget-model } related-words
+{ control-value set-control-value } related-words
 
 HELP: control-value
 { $values { "control" gadget } { "value" object } }
@@ -181,10 +181,9 @@ HELP: set-control-value
 { $description "Sets the value of the control's model." } ;
 
 ARTICLE: "ui-control-impl" "Implementing controls"
-"A " { $emphasis "control" } " is a gadget which is linked to an underlying " { $link model } " by having its " { $link gadget-model } " slot set to a " { $link model } " instance."
+"A " { $emphasis "control" } " is a gadget which is linked to an underlying " { $link model } " by having its " { $snippet "model" } " slot set to a " { $link model } " instance."
 $nl
 "Some utility words useful in control implementations:"
-{ $subsection gadget-model }
 { $subsection control-value }
 { $subsection set-control-value }
 { $see-also "models" } ;

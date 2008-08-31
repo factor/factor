@@ -8,29 +8,6 @@ sets generic.standard.engines.tuple stack-checker.state
 stack-checker.visitor stack-checker.errors ;
 IN: stack-checker.backend
 
-! Word properties we use
-SYMBOL: visited
-
-: reset-on-redefine { "inferred-effect" "cannot-infer" } ; inline
-
-: (redefined) ( word -- )
-    dup visited get key? [ drop ] [
-        [ reset-on-redefine reset-props ]
-        [ visited get conjoin ]
-        [
-            crossref get at keys
-            [ word? ] filter
-            [
-                [ reset-on-redefine [ word-prop ] with contains? ]
-                [ inline? ]
-                bi or
-            ] filter
-            [ (redefined) ] each
-        ] tri
-    ] if ;
-
-M: word redefined H{ } clone visited [ (redefined) ] with-variable ;
-
 : push-d ( obj -- ) meta-d get push ;
 
 : pop-d  ( -- obj )
@@ -72,7 +49,7 @@ GENERIC: apply-object ( obj -- )
 
 M: wrapper apply-object
     wrapped>>
-    [ dup word? [ +called+ depends-on ] [ drop ] if ]
+    [ dup word? [ called-dependency depends-on ] [ drop ] if ]
     [ push-literal ]
     bi ;
 
@@ -175,6 +152,7 @@ M: object apply-object push-literal ;
             init-known-values
             stack-visitor off
             dependencies off
+            generic-dependencies off
             [ [ def>> ] [ ] [ ] tri infer-quot-recursive end-infer ]
             [ finish-word current-effect ]
             bi

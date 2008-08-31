@@ -4,7 +4,7 @@ USING: kernel io io.styles io.files io.encodings.utf8
 vocabs.loader vocabs sequences namespaces math.parser arrays
 hashtables assocs memoize summary sorting splitting combinators
 source-files debugger continuations compiler.errors init
-checksums checksums.crc32 sets ;
+checksums checksums.crc32 sets accessors ;
 IN: tools.vocabs
 
 : vocab-tests-file ( vocab -- path )
@@ -61,10 +61,10 @@ SYMBOL: failures
 
 : source-modified? ( path -- ? )
     dup source-files get at [
-        dup source-file-path
+        dup path>>
         dup exists? [
             utf8 file-lines crc32 checksum-lines
-            swap source-file-checksum = not
+            swap checksum>> = not
         ] [
             2drop f
         ] if
@@ -175,7 +175,7 @@ M: vocab summary
     [
         dup vocab-summary %
         " (" %
-        vocab-words assoc-size #
+        words>> assoc-size #
         " words)" %
     ] "" make ;
 

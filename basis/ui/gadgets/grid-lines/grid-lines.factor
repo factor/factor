@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math namespaces opengl opengl.gl sequences
+USING: kernel accessors math namespaces opengl opengl.gl sequences
 math.vectors ui.gadgets ui.gadgets.grids ui.render math.geometry.rect ;
 IN: ui.gadgets.grid-lines
 
@@ -10,7 +10,7 @@ C: <grid-lines> grid-lines
 
 SYMBOL: grid-dim
 
-: half-gap grid get grid-gap [ 2/ ] map ; inline
+: half-gap grid get gap>> [ 2/ ] map ; inline
 
 : grid-line-from/to ( orientation point -- from to )
     half-gap v-
@@ -25,7 +25,7 @@ SYMBOL: grid-dim
 M: grid-lines draw-boundary
     origin get [
         -0.5 -0.5 0.0 glTranslated
-        grid-lines-color set-color [
+        color>> set-color [
             dup grid set
             dup rect-dim half-gap v- grid-dim set
             compute-grid

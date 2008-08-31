@@ -143,7 +143,7 @@ HOOK: bind# db ( spec obj -- )
 
 : offset-of-slot ( str obj -- n )
     class superclasses [ "slots" word-prop ] map concat
-    slot-named slot-spec-offset ;
+    slot-named offset>> ;
 
 : get-slot-named ( name obj -- value )
     tuck offset-of-slot slot ;

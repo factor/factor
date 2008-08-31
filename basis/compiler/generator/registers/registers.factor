@@ -69,23 +69,21 @@ TUPLE: ds-loc n class ;
 
 : <ds-loc> ( n -- loc ) f ds-loc boa ;
 
-M: ds-loc minimal-ds-loc* ds-loc-n min ;
-M: ds-loc operand-class* ds-loc-class ;
-M: ds-loc set-operand-class set-ds-loc-class ;
+M: ds-loc minimal-ds-loc* n>> min ;
 M: ds-loc live-loc?
-    over ds-loc? [ [ ds-loc-n ] bi@ = not ] [ 2drop t ] if ;
+    over ds-loc? [ [ n>> ] bi@ = not ] [ 2drop t ] if ;
 
 ! A retain stack location.
 TUPLE: rs-loc n class ;
 
 : <rs-loc> ( n -- loc ) f rs-loc boa ;
-M: rs-loc operand-class* rs-loc-class ;
-M: rs-loc set-operand-class set-rs-loc-class ;
 M: rs-loc live-loc?
-    over rs-loc? [ [ rs-loc-n ] bi@ = not ] [ 2drop t ] if ;
+    over rs-loc? [ [ n>> ] bi@ = not ] [ 2drop t ] if ;
 
 UNION: loc ds-loc rs-loc ;
 
+M: loc operand-class* class>> ;
+M: loc set-operand-class (>>class) ;
 M: loc move-spec drop loc ;
 
 INSTANCE: loc value
@@ -106,12 +104,12 @@ M: cached set-operand-class vreg>> set-operand-class ;
 M: cached operand-class* vreg>> operand-class* ;
 M: cached move-spec drop cached ;
 M: cached live-vregs* vreg>> live-vregs* ;
-M: cached live-loc? cached-loc live-loc? ;
+M: cached live-loc? loc>> live-loc? ;
 M: cached (lazy-load) >r vreg>> r> (lazy-load) ;
 M: cached lazy-store
-    2dup cached-loc live-loc?
+    2dup loc>> live-loc?
     [ "live-locs" get at %move ] [ 2drop ] if ;
-M: cached minimal-ds-loc* cached-loc minimal-ds-loc* ;
+M: cached minimal-ds-loc* loc>> minimal-ds-loc* ;
 
 INSTANCE: cached value
 
@@ -121,48 +119,48 @@ TUPLE: tagged vreg class ;
 : <tagged> ( vreg -- tagged )
     f tagged boa ;
 
-M: tagged v>operand tagged-vreg v>operand ;
-M: tagged set-operand-class set-tagged-class ;
-M: tagged operand-class* tagged-class ;
+M: tagged v>operand vreg>> v>operand ;
+M: tagged set-operand-class (>>class) ;
+M: tagged operand-class* class>> ;
 M: tagged move-spec drop f ;
-M: tagged live-vregs* tagged-vreg , ;
+M: tagged live-vregs* vreg>> , ;
 
 INSTANCE: tagged value
 
 ! Unboxed alien pointers
 TUPLE: unboxed-alien vreg ;
 C: <unboxed-alien> unboxed-alien
-M: unboxed-alien v>operand unboxed-alien-vreg v>operand ;
+M: unboxed-alien v>operand vreg>> v>operand ;
 M: unboxed-alien operand-class* drop simple-alien ;
 M: unboxed-alien move-spec class ;
-M: unboxed-alien live-vregs* unboxed-alien-vreg , ;
+M: unboxed-alien live-vregs* vreg>> , ;
 
 INSTANCE: unboxed-alien value
 
 TUPLE: unboxed-byte-array vreg ;
 C: <unboxed-byte-array> unboxed-byte-array
-M: unboxed-byte-array v>operand unboxed-byte-array-vreg v>operand ;
+M: unboxed-byte-array v>operand vreg>> v>operand ;
 M: unboxed-byte-array operand-class* drop c-ptr ;
 M: unboxed-byte-array move-spec class ;
-M: unboxed-byte-array live-vregs* unboxed-byte-array-vreg , ;
+M: unboxed-byte-array live-vregs* vreg>> , ;
 
 INSTANCE: unboxed-byte-array value
 
 TUPLE: unboxed-f vreg ;
 C: <unboxed-f> unboxed-f
-M: unboxed-f v>operand unboxed-f-vreg v>operand ;
+M: unboxed-f v>operand vreg>> v>operand ;
 M: unboxed-f operand-class* drop \ f ;
 M: unboxed-f move-spec class ;
-M: unboxed-f live-vregs* unboxed-f-vreg , ;
+M: unboxed-f live-vregs* vreg>> , ;
 
 INSTANCE: unboxed-f value
 
 TUPLE: unboxed-c-ptr vreg ;
 C: <unboxed-c-ptr> unboxed-c-ptr
-M: unboxed-c-ptr v>operand unboxed-c-ptr-vreg v>operand ;
+M: unboxed-c-ptr v>operand vreg>> v>operand ;
 M: unboxed-c-ptr operand-class* drop c-ptr ;
 M: unboxed-c-ptr move-spec class ;
-M: unboxed-c-ptr live-vregs* unboxed-c-ptr-vreg , ;
+M: unboxed-c-ptr live-vregs* vreg>> , ;
 
 INSTANCE: unboxed-c-ptr value
 

@@ -20,16 +20,16 @@ TUPLE: slider < frame elevator thumb saved line ;
 
 : min-thumb-dim 15 ;
 
-: slider-value ( gadget -- n ) gadget-model range-value >fixnum ;
-: slider-page  ( gadget -- n ) gadget-model range-page-value    ;
-: slider-max   ( gadget -- n ) gadget-model range-max-value     ;
-: slider-max*  ( gadget -- n ) gadget-model range-max-value*    ;
+: slider-value ( gadget -- n ) model>> range-value >fixnum ;
+: slider-page  ( gadget -- n ) model>> range-page-value    ;
+: slider-max   ( gadget -- n ) model>> range-max-value     ;
+: slider-max*  ( gadget -- n ) model>> range-max-value*    ;
 
 : thumb-dim ( slider -- h )
     dup slider-page over slider-max 1 max / 1 min
     over elevator-length * min-thumb-dim max
-    over slider-elevator rect-dim
-    rot gadget-orientation v. min ;
+    over elevator>> rect-dim
+    rot orientation>> v. min ;
 
 : slider-scale ( slider -- n )
     #! A scaling factor such that if x is a slider co-ordinate,
@@ -41,17 +41,17 @@ TUPLE: slider < frame elevator thumb saved line ;
 : slider>screen ( m scale -- n ) slider-scale * ;
 : screen>slider ( m scale -- n ) slider-scale / ;
 
-M: slider model-changed nip slider-elevator relayout-1 ;
+M: slider model-changed nip elevator>> relayout-1 ;
 
 TUPLE: thumb < gadget ;
 
 : begin-drag ( thumb -- )
-    find-slider dup slider-value swap set-slider-saved ;
+    find-slider dup slider-value swap (>>saved) ;
 
 : do-drag ( thumb -- )
-    find-slider drag-loc over gadget-orientation v.
-    over screen>slider swap [ slider-saved + ] keep
-    gadget-model set-range-value ;
+    find-slider drag-loc over orientation>> v.
+    over screen>slider swap [ saved>> + ] keep
+    model>> set-range-value ;
 
 thumb H{
     { T{ button-down } [ begin-drag ] }
@@ -69,21 +69,21 @@ thumb H{
         t >>root?
     thumb-theme ;
 
-: slide-by ( amount slider -- ) gadget-model move-by ;
+: slide-by ( amount slider -- ) model>> move-by ;
 
-: slide-by-page ( amount slider -- ) gadget-model move-by-page ;
+: slide-by-page ( amount slider -- ) model>> move-by-page ;
 
 : compute-direction ( elevator -- -1/1 )
     dup find-slider swap hand-click-rel
-    over gadget-orientation v.
+    over orientation>> v.
     over screen>slider
     swap slider-value - sgn ;
 
 : elevator-hold ( elevator -- )
-    dup elevator-direction swap find-slider slide-by-page ;
+    dup direction>> swap find-slider slide-by-page ;
 
 : elevator-click ( elevator -- )
-    dup compute-direction over set-elevator-direction
+    dup compute-direction over (>>direction)
     elevator-hold ;
 
 elevator H{
@@ -97,7 +97,7 @@ elevator H{
     lowered-gradient >>interior ;
 
 : (layout-thumb) ( slider n -- n thumb )
-    over gadget-orientation n*v swap slider-thumb ;
+    over orientation>> n*v swap thumb>> ;
 
 : thumb-loc ( slider -- loc )
     dup slider-value swap slider>screen ;
@@ -109,7 +109,7 @@ elevator H{
 : layout-thumb-dim ( slider -- )
     dup dup thumb-dim (layout-thumb) >r
     >r dup rect-dim r>
-    rot gadget-orientation set-axis [ ceiling ] map
+    rot orientation>> set-axis [ ceiling ] map
     r> (>>dim) ;
 
 : layout-thumb ( slider -- )
@@ -118,13 +118,12 @@ elevator H{
 M: elevator layout*
     find-slider layout-thumb ;
 
-: slide-by-line ( amount slider -- )
-    [ slider-line * ] keep slide-by ;
+: slide-by-line ( amount slider -- ) [ line>> * ] keep slide-by ;
 
 : <slide-button> ( vector polygon amount -- button )
     >r gray swap <polygon-gadget> r>
     [ swap find-slider slide-by-line ] curry <repeat-button>
-    [ set-gadget-orientation ] keep ;
+    [ (>>orientation) ] keep ;
 
 : elevator, ( gadget orientation -- gadget )
   tuck <elevator> >>elevator
@@ -157,5 +156,5 @@ M: elevator layout*
 
 M: slider pref-dim*
     dup call-next-method
-    swap gadget-orientation [ 40 v*n ] keep
+    swap orientation>> [ 40 v*n ] keep
     set-axis ;

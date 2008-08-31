@@ -1,6 +1,6 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: definitions help help.topics help.syntax
+USING: accessors definitions help help.topics help.syntax
 prettyprint.backend prettyprint words kernel effects ;
 IN: help.definitions
 
@@ -8,30 +8,30 @@ IN: help.definitions
 
 M: link definer drop \ ARTICLE: \ ; ;
 
-M: link where link-name article article-loc ;
+M: link where name>> article loc>> ;
 
-M: link set-where link-name article set-article-loc ;
+M: link set-where name>> article (>>loc) ;
 
-M: link forget* link-name remove-article ;
+M: link forget* name>> remove-article ;
 
 M: link definition article-content ;
 
 M: link synopsis*
     dup definer.
-    dup link-name pprint*
+    dup name>> pprint*
     article-title pprint* ;
 
 M: word-link definer drop \ HELP: \ ; ;
 
-M: word-link where link-name "help-loc" word-prop ;
+M: word-link where name>> "help-loc" word-prop ;
 
-M: word-link set-where link-name swap "help-loc" set-word-prop ;
+M: word-link set-where name>> swap "help-loc" set-word-prop ;
 
-M: word-link definition link-name "help" word-prop ;
+M: word-link definition name>> "help" word-prop ;
 
 M: word-link synopsis*
     dup definer.
-    link-name dup pprint-word
+    name>> dup pprint-word
     stack-effect. ;
 
-M: word-link forget* link-name remove-word-help ;
+M: word-link forget* name>> remove-word-help ;

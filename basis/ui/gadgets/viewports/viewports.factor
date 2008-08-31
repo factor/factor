@@ -31,7 +31,7 @@ M: viewport focusable-child*
 M: viewport pref-dim* viewport-dim ;
 
 : scroller-value ( scroller -- loc )
-    gadget-model range-value [ >fixnum ] map ;
+    model>> range-value [ >fixnum ] map ;
 
 M: viewport model-changed
     nip
@@ -41,8 +41,7 @@ M: viewport model-changed
     swap gadget-child set-rect-loc ;
 
 : visible-dim ( gadget -- dim )
-    dup gadget-parent viewport? [
-        gadget-parent rect-dim viewport-gap 2 v*n v-
-    ] [
-        rect-dim
-    ] if ;
+    dup parent>> viewport?
+      [ parent>> rect-dim viewport-gap 2 v*n v- ]
+      [ rect-dim ]
+    if ;

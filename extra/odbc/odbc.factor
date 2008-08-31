@@ -213,7 +213,7 @@ C: <column> column
   ] if ;
 
 : dereference-type-pointer ( byte-array column -- object )
-  column-type {
+  type>> {
     { SQL-CHAR [ ascii alien>string ] }
     { SQL-VARCHAR [ ascii alien>string ] }
     { SQL-LONGVARCHAR [ ascii alien>string ] }
@@ -235,7 +235,7 @@ TUPLE: field value column ;
 C: <field> field
 
 : odbc-get-field ( statement column -- field )
-  dup column? [ dupd odbc-describe-column ] unless dup >r column-number
+  dup column? [ dupd odbc-describe-column ] unless dup >r number>>
   SQL-C-DEFAULT
   8192 CHAR: \space <string> ascii string>alien dup >r
   8192
@@ -244,15 +244,15 @@ C: <field> field
   ] [
     r> drop r> [
       "SQLGetData Failed for Column: " %
-      dup column-name %
-      " of type: " % dup column-type name>> %
+      dup name>> %
+      " of type: " % dup type>> name>> %
     ] "" make swap <field>
   ] if ;
 
 : odbc-get-row-fields ( statement -- seq )
   [
     dup odbc-number-of-columns [
-      1+ odbc-get-field field-value ,
+      1+ odbc-get-field value>> ,
     ] with each
   ] { } make ;
 

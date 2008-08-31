@@ -34,6 +34,6 @@ SYMBOL: foo
 ] unit-test
 
 [ { "testfile" 2 } ]
-[ { "test" 1 } articles get at article-loc ] unit-test
+[ { "test" 1 } articles get at loc>> ] unit-test
 
 [ ] [ { "test" 1 } remove-article ] unit-test

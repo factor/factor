@@ -13,7 +13,7 @@ IN: compiler.tree.escape-analysis.simple
 
 M: #terminate escape-analysis* drop ;
 
-M: #renaming escape-analysis* inputs/outputs [ copy-value ] 2each ;
+M: #renaming escape-analysis* inputs/outputs copy-values ;
 
 M: #introduce escape-analysis* out-d>> unknown-allocations ;
 

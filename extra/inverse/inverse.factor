@@ -208,7 +208,7 @@ DEFER: _
 
 : slot-readers ( class -- quot )
     all-slots rest ! tail gets rid of delegate
-    [ slot-spec-reader 1quotation [ keep ] curry ] map concat
+    [ reader>> 1quotation [ keep ] curry ] map concat
     [ ] like [ drop ] compose ;
 
 : ?wrapped ( object -- wrapped )

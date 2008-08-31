@@ -42,24 +42,26 @@ IN: compiler.tree.escape-analysis.recursive
     ] 2bi ;
 
 M: #recursive escape-analysis* ( #recursive -- )
+    [ label>> return>> in-d>> introduce-values ]
     [
-        child>>
-        [ first out-d>> introduce-values ]
-        [ first analyze-recursive-phi ]
-        [ (escape-analysis) ]
-        tri
-    ] until-fixed-point ;
+        [
+            child>>
+            [ first out-d>> introduce-values ]
+            [ first analyze-recursive-phi ]
+            [ (escape-analysis) ]
+            tri
+        ] until-fixed-point
+    ] bi ;
 
 M: #enter-recursive escape-analysis* ( #enter-recursive -- )
     #! Handled by #recursive
     drop ;
 
-: return-allocations ( node -- allocations )
-    label>> return>> node-input-allocations ;
-
 M: #call-recursive escape-analysis* ( #call-label -- )
-    [ ] [ return-allocations ] [ node-output-allocations ] tri
-    [ check-fixed-point ] [ drop swap out-d>> record-allocations ] 3bi ;
+    [ ] [ label>> return>> ] [ node-output-allocations ] tri
+    [ [ node-input-allocations ] dip check-fixed-point ]
+    [ drop swap [ in-d>> ] [ out-d>> ] bi* copy-values ]
+    3bi ;
 
 M: #return-recursive escape-analysis* ( #return-recursive -- )
     [ call-next-method ]

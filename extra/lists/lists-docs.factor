@@ -1,6 +1,6 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax ;
+USING: kernel help.markup help.syntax ;
 
 IN: lists
 
@@ -23,7 +23,7 @@ HELP: nil
 { $description "Returns a symbol representing the empty list" } ;
 
 HELP: nil? 
-{ $values { "cons" "a cons object" } { "?" "a boolean" } }
+{ $values { "object" object } { "?" "a boolean" } }
 { $description "Return true if the cons object is the nil cons." } ;
 
 HELP: list? ( object -- ? )

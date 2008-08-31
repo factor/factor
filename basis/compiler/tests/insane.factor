@@ -1,4 +1,5 @@
 IN: compiler.tests
-USING: words kernel stack-checker alien.strings tools.test ;
+USING: words kernel stack-checker alien.strings tools.test
+compiler.units ;
 
-[ ] [ \ if redefined [ string>alien ] infer. ] unit-test
+[ ] [ [ \ if redefined ] with-compilation-unit [ string>alien ] infer. ] unit-test

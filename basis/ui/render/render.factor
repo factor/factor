@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays hashtables io kernel math namespaces opengl
+USING: accessors alien arrays hashtables io kernel math namespaces opengl
 opengl.gl opengl.glu sequences strings io.styles vectors
 combinators math.vectors ui.gadgets colors
 math.order math.geometry.rect ;
@@ -60,10 +60,10 @@ DEFER: draw-gadget
 : (draw-gadget) ( gadget -- )
     [
         dup translate
-        dup dup gadget-interior draw-interior
+        dup dup interior>> draw-interior
         dup draw-gadget*
         dup visible-children [ draw-gadget ] each
-        dup gadget-boundary draw-boundary
+        dup boundary>> draw-boundary
     ] with-scope ;
 
 : >absolute ( rect -- rect )
@@ -79,8 +79,8 @@ DEFER: draw-gadget
 
 : draw-gadget ( gadget -- )
     {
-        { [ dup gadget-visible? not ] [ drop ] }
-        { [ dup gadget-clipped? not ] [ (draw-gadget) ] }
+        { [ dup visible?>> not ] [ drop ] }
+        { [ dup clipped?>> not ] [ (draw-gadget) ] }
         [ [ (draw-gadget) ] with-clipping ]
     } cond ;
 
@@ -108,7 +108,7 @@ C: <gradient> gradient
 
 M: gradient draw-interior
     origin get [
-        over gadget-orientation
+        over orientation>>
         swap gradient-colors
         rot rect-dim
         gl-gradient
@@ -139,7 +139,7 @@ M: polygon draw-interior
 : <polygon-gadget> ( color points -- gadget )
     dup max-dim
     >r <polygon> <gadget> r> over set-rect-dim
-    [ set-gadget-interior ] keep ;
+    [ (>>interior) ] keep ;
 
 ! Font rendering
 SYMBOL: font-renderer

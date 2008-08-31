@@ -216,7 +216,7 @@ SYMBOL: interactive-vocabs
 : filter-moved ( assoc1 assoc2 -- seq )
     swap assoc-diff [
         drop where dup [ first ] when
-        file get source-file-path =
+        file get path>> =
     ] assoc-filter keys ;
 
 : removed-definitions ( -- assoc1 assoc2 )

@@ -1,13 +1,13 @@
 IN: alien.structs
-USING: alien.c-types strings help.markup help.syntax
+USING: accessors alien.c-types strings help.markup help.syntax
 alien.syntax sequences io arrays slots.deprecated
-kernel words slots assocs namespaces ;
+kernel words slots assocs namespaces accessors ;
 
 ! Deprecated code
 : ($spec-reader-values) ( slot-spec class -- element )
     dup ?word-name swap 2array
-    over slot-spec-name
-    rot slot-spec-class 2array 2array
+    over name>>
+    rot class>> 2array 2array
     [ { $instance } swap suffix ] assoc-map ;
 
 : $spec-reader-values ( slot-spec class -- )
@@ -16,14 +16,14 @@ kernel words slots assocs namespaces ;
 : $spec-reader-description ( slot-spec class -- )
     [
         "Outputs the value stored in the " ,
-        { $snippet } rot slot-spec-name suffix ,
+        { $snippet } rot name>> suffix ,
         " slot of " ,
         { $instance } swap suffix ,
         " instance." ,
     ] { } make $description ;
 
 : slot-of-reader ( reader specs -- spec/f )
-    [ slot-spec-reader eq? ] with find nip ;
+    [ reader>> eq? ] with find nip ;
 
 : $spec-reader ( reader slot-specs class -- )
     >r slot-of-reader r>
@@ -46,14 +46,14 @@ M: word slot-specs "slots" word-prop ;
 : $spec-writer-description ( slot-spec class -- )
     [
         "Stores a new value to the " ,
-        { $snippet } rot slot-spec-name suffix ,
+        { $snippet } rot name>> suffix ,
         " slot of " ,
         { $instance } swap suffix ,
         " instance." ,
     ] { } make $description ;
 
 : slot-of-writer ( writer specs -- spec/f )
-    [ slot-spec-writer eq? ] with find nip ;
+    [ writer>> eq? ] with find nip ;
 
 : $spec-writer ( writer slot-specs class -- )
     >r slot-of-writer r>
@@ -67,7 +67,7 @@ M: word slot-specs "slots" word-prop ;
     first dup "writing" word-prop [ slot-specs ] keep
     $spec-writer ;
 
-M: string slot-specs c-type struct-type-fields ;
+M: string slot-specs c-type fields>> ;
 
 M: array ($instance) first ($instance) " array" write ;
 

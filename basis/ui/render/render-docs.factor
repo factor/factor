@@ -31,17 +31,17 @@ HELP: draw-gadget*
 
 HELP: draw-interior
 { $values { "interior" object } { "gadget" gadget } } 
-{ $contract "Draws the interior of a gadget by making OpenGL calls. The " { $link gadget-interior } " slot may be set to objects implementing this generic word." } ;
+{ $contract "Draws the interior of a gadget by making OpenGL calls. The " { $snippet "interior" } " slot may be set to objects implementing this generic word." } ;
 
 HELP: draw-boundary
 { $values { "boundary" object } { "gadget" gadget } } 
-{ $contract "Draws the boundary of a gadget by making OpenGL calls. The " { $link gadget-boundary } " slot may be set to objects implementing this generic word." } ;
+{ $contract "Draws the boundary of a gadget by making OpenGL calls. The " { $snippet "boundary" } " slot may be set to objects implementing this generic word." } ;
 
 HELP: solid
 { $class-description "A class implementing the " { $link draw-boundary } " and " { $link draw-interior } " generic words to draw a solid outline or a solid fill, respectively. The " { $link solid-color } " slot stores a color specifier." } ;
 
 HELP: gradient
-{ $class-description "A class implementing the " { $link draw-interior } " generic word to draw a smoothly shaded transition between colors. The " { $link gradient-colors } " slot stores a sequence of color specifiers and the gradient is drawn in the direction given by the " { $link gadget-orientation } " slot of the gadget." } ;
+{ $class-description "A class implementing the " { $link draw-interior } " generic word to draw a smoothly shaded transition between colors. The " { $link gradient-colors } " slot stores a sequence of color specifiers and the gradient is drawn in the direction given by the " { $snippet "orientation" } " slot of the gadget." } ;
 
 HELP: polygon
 { $class-description "A class implementing the " { $link draw-boundary } " and " { $link draw-interior } " generic words to draw a solid outline or a solid filled polygon, respectively. Instances of " { $link polygon } " have two slots:"
@@ -94,17 +94,17 @@ ARTICLE: "gadgets-polygons" "Polygon gadgets"
 ARTICLE: "ui-paint" "Customizing gadget appearance"
 "The UI carries out the following steps when drawing a gadget:"
 { $list
-    { "The " { $link draw-interior } " generic word is called on the value of the " { $link gadget-interior } " slot." }
+    { "The " { $link draw-interior } " generic word is called on the value of the " { $snippet "interior" } " slot." }
     { "The " { $link draw-gadget* } " generic word is called on the gadget." }
     { "The gadget's visible children are drawn, determined by calling " { $link visible-children } " on the gadget." }
-    { "The " { $link draw-boundary } " generic word is called on the value of the " { $link gadget-boundary } " slot." }
+    { "The " { $link draw-boundary } " generic word is called on the value of the " { $snippet "boundary" } " slot." }
 }
 "Now, each one of these steps will be covered in detail."
 { $subsection "ui-pen-protocol" }
 { $subsection "ui-paint-custom" } ;
 
 ARTICLE: "ui-pen-protocol" "UI pen protocol"
-"The " { $link gadget-interior } " and " { $link gadget-boundary } " slots of a gadget facilitate easy factoring and sharing of drawing logic. Objects stored in these slots must implement the pen protocol:"
+"The " { $snippet "interior" } " and " { $snippet "boundary" } " slots of a gadget facilitate easy factoring and sharing of drawing logic. Objects stored in these slots must implement the pen protocol:"
 { $subsection draw-interior }
 { $subsection draw-boundary }
 "The default value of these slots is the " { $link f } " singleton, which implements the above protocol by doing nothing."
@@ -139,7 +139,7 @@ $nl
 $nl
 "OpenGL state must not be altered as a result of drawing a gadget, so any flags which were enabled should be disabled, and vice versa."
 $nl
-"Gadgets must not draw outside of their bounding box, however clipping is not enforced by default, for performance reasons. This can be changed by setting the " { $link gadget-clipped? } " slot to " { $link t } " in the gadget's constructor."
+"Gadgets must not draw outside of their bounding box, however clipping is not enforced by default, for performance reasons. This can be changed by setting the " { $snippet "clipped?" } " slot to " { $link t } " in the gadget's constructor."
 $nl
 "Saving the " { $link GL_MODELVIEW } " matrix and enabling/disabling flags can be done in a clean way using the combinators documented in the following section."
 { $subsection "gl-utilities" }
