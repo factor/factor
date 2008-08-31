@@ -28,10 +28,10 @@ TUPLE: document < model locs ;
 : update-locs ( loc document -- )
     locs>> [ set-model ] with each ;
 
-: doc-line ( n document -- string ) model-value nth ;
+: doc-line ( n document -- string ) value>> nth ;
 
 : doc-lines ( from to document -- slice )
-    >r 1+ r> model-value <slice> ;
+    >r 1+ r> value>> <slice> ;
 
 : start-on-line ( document from line# -- n1 )
     >r dup first r> = [ nip second ] [ 2drop 0 ] if ;
@@ -99,7 +99,7 @@ TUPLE: document < model locs ;
     >r >r >r "" r> r> r> set-doc-range ;
 
 : last-line# ( document -- line )
-    model-value length 1- ;
+    value>> length 1- ;
 
 : validate-line ( line document -- line )
     last-line# min 0 max ;
@@ -117,7 +117,7 @@ TUPLE: document < model locs ;
     [ last-line# ] keep line-end ;
 
 : validate-loc ( loc document -- newloc )
-    over first over model-value length >= [
+    over first over value>> length >= [
         nip doc-end
     ] [
         over first 0 < [
@@ -128,7 +128,7 @@ TUPLE: document < model locs ;
     ] if ;
 
 : doc-string ( document -- str )
-    model-value "\n" join ;
+    value>> "\n" join ;
 
 : set-doc-string ( string document -- )
     >r string-lines V{ } like r> [ set-model ] keep

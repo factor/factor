@@ -144,7 +144,7 @@ M: ftp-list service-command ( stream obj -- )
     150 "Opening BINARY mode data connection for "
     rot   
     [ file-name ] [
-        " " swap  file-info file-info-size number>string
+        " " swap  file-info size>> number>string
         "(" " bytes)." swapd 3append append
     ] bi 3append server-response ;
 

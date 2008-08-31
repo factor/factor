@@ -163,7 +163,7 @@ SYMBOL: +stopped+
     ] change-frame ;
 
 : status ( -- symbol )
-    walker-status tget model-value ;
+    walker-status tget value>> ;
 
 : set-status ( symbol -- )
     walker-status tget set-model ;

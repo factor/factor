@@ -27,5 +27,5 @@ IN: tools.walker.debug
 
         p ?promise
         variables>> walker-continuation swap at
-        model-value data>>
+        value>> data>>
     ] ;

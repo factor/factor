@@ -141,7 +141,7 @@ M: retryable execute-statement* ( statement type -- )
 
 : update-tuple ( tuple -- )
     dup class
-    db get db-update-statements [ <update-tuple-statement> ] cache
+    db get update-statements>> [ <update-tuple-statement> ] cache
     [ bind-tuple ] keep execute-statement ;
 
 : delete-tuples ( tuple -- )
