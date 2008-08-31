@@ -101,45 +101,79 @@ SYMBOL: compiled-crossref
 
 compiled-crossref global [ H{ } assoc-like ] change-at
 
-: compiled-xref ( word dependencies -- )
-    [ drop crossref? ] assoc-filter
-    [ "compiled-uses" set-word-prop ]
-    [ compiled-crossref get add-vertex* ]
-    2bi ;
+SYMBOL: compiled-generic-crossref
+
+compiled-generic-crossref global [ H{ } assoc-like ] change-at
+
+: (compiled-xref) ( word dependencies word-prop variable -- )
+    [ [ set-word-prop ] curry ]
+    [ [ get add-vertex* ] curry ]
+    bi* 2bi ;
+
+: compiled-xref ( word dependencies generic-dependencies -- )
+    [ [ drop crossref? ] assoc-filter ] bi@
+    [ over ] dip
+    [ "compiled-uses" compiled-crossref (compiled-xref) ]
+    [ "compiled-generic-uses" compiled-generic-crossref (compiled-xref) ]
+    2bi* ;
+
+: (compiled-unxref) ( word word-prop variable -- )
+    [ [ [ dupd word-prop ] dip get remove-vertex* ] 2curry ]
+    [ drop [ f swap set-word-prop ] curry ]
+    2bi bi ;
 
 : compiled-unxref ( word -- )
-    [
-        dup "compiled-uses" word-prop
-        compiled-crossref get remove-vertex*
-    ]
-    [ f "compiled-uses" set-word-prop ] bi ;
+    [ "compiled-uses" compiled-crossref (compiled-unxref) ]
+    [ "compiled-generic-uses" compiled-generic-crossref (compiled-unxref) ]
+    bi ;
 
 : delete-compiled-xref ( word -- )
-    dup compiled-unxref
-    compiled-crossref get delete-at ;
+    [ compiled-unxref ]
+    [ compiled-crossref get delete-at ]
+    [ compiled-generic-crossref get delete-at ]
+    tri ;
 
-GENERIC: redefined ( word -- )
+GENERIC: inline? ( word -- ? )
 
-M: object redefined drop ;
+M: word inline? "inline" word-prop ;
+
+SYMBOL: visited
+
+: reset-on-redefine { "inferred-effect" "cannot-infer" } ; inline
+
+: (redefined) ( word -- )
+    dup visited get key? [ drop ] [
+        [ reset-on-redefine reset-props ]
+        [ visited get conjoin ]
+        [
+            crossref get at keys
+            [ word? ] filter
+            [
+                [ reset-on-redefine [ word-prop ] with contains? ]
+                [ inline? ]
+                bi or
+            ] filter
+            [ (redefined) ] each
+        ] tri
+    ] if ;
+
+: redefined ( word -- )
+    [ H{ } clone visited [ (redefined) ] with-variable ]
+    [ changed-definition ]
+    bi ;
 
 : define ( word def -- )
     [ ] like
     over unxref
     over redefined
     >>def
-    dup inlined-dependency changed-definition
     dup crossref? [ dup xref ] when drop ;
 
 : set-stack-effect ( effect word -- )
     2dup "declared-effect" word-prop = [ 2drop ] [
         swap
         [ "declared-effect" set-word-prop ]
-        [
-            drop
-            dup primitive? [ drop ] [
-                [ redefined ] [ inlined-dependency changed-definition ] bi
-            ] if
-        ] 2bi
+        [ drop dup primitive? [ dup redefined ] unless drop ] 2bi
     ] if ;
 
 : define-declared ( word def effect -- )
@@ -210,10 +244,6 @@ ERROR: bad-create name vocab ;
 
 : constructor-word ( name vocab -- word )
     >r "<" swap ">" 3append r> create ;
-
-GENERIC: inline? ( word -- ? )
-
-M: word inline? "inline" word-prop ;
 
 PREDICATE: parsing-word < word "parsing" word-prop ;
 

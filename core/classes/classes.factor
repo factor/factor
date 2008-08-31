@@ -122,6 +122,7 @@ M: sequence implementors [ implementors ] gather ;
     dup class? [ dup [ implementors-map+ ] [ new-class ] bi ] unless
     dup reset-class
     dup deferred? [ dup define-symbol ] when
+    dup redefined
     dup props>>
     r> assoc-union >>props
     dup predicate-word

@@ -53,21 +53,12 @@ GENERIC: next-method-quot* ( class generic combination -- quot )
 TUPLE: check-method class generic ;
 
 : check-method ( class generic -- class generic )
-    over class? over generic? and [
+    2dup [ class? ] [ generic? ] bi* and [
         \ check-method boa throw
     ] unless ; inline
 
-: affected-methods ( class generic -- seq )
-    "methods" word-prop swap
-    [ nip [ classes-intersect? ] [ class<= ] 2bi or ] curry assoc-filter
-    values ;
-
-: update-generic ( class generic -- )
-    [ affected-methods ] [ drop <method-dependency> ] 2bi
-    [ changed-definition ] curry each ;
-
 : with-methods ( class generic quot -- )
-    [ drop update-generic ]
+    [ drop changed-generic ]
     [ [ "methods" word-prop ] dip call ]
     [ drop make-generic drop ]
     3tri ; inline
@@ -167,7 +158,7 @@ M: method-body smart-usage
 
 M: sequence update-methods ( class seq -- )
     implementors [
-        [ update-generic ] [ make-generic drop ] 2bi
+        [ changed-generic ] [ make-generic drop ] 2bi
     ] with each ;
 
 : define-generic ( word combination -- )

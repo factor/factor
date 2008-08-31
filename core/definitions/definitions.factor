@@ -9,21 +9,15 @@ SINGLETON: inlined-dependency
 SINGLETON: flushed-dependency
 SINGLETON: called-dependency
 
-TUPLE: method-dependency class ;
-C: <method-dependency> method-dependency
-
 UNION: dependency
 inlined-dependency
 flushed-dependency
-called-dependency
-method-dependency ;
+called-dependency ;
 
 M: dependency <=>
     [
-        dup method-dependency? [ drop method-dependency ] when
         {
             called-dependency
-            method-dependency
             flushed-dependency
             inlined-dependency
         } index
@@ -31,8 +25,14 @@ M: dependency <=>
 
 SYMBOL: changed-definitions
 
-: changed-definition ( defspec how -- )
-    swap changed-definitions get
+: changed-definition ( defspec -- )
+    inlined-dependency swap changed-definitions get
+    [ set-at ] [ no-compilation-unit ] if* ;
+
+SYMBOL: changed-generics
+
+: changed-generic ( class generic -- )
+    changed-generics get
     [ set-at ] [ no-compilation-unit ] if* ;
 
 SYMBOL: new-classes

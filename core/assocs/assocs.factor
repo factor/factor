@@ -110,6 +110,9 @@ M: assoc assoc-clone-like ( assoc exemplar -- newassoc )
     2dup [ assoc-size ] bi@ + pick new-assoc
     [ rot update ] keep [ swap update ] keep ;
 
+: assoc-combine ( seq -- union )
+    H{ } clone [ dupd update ] reduce ;
+
 : assoc-diff ( assoc1 assoc2 -- diff )
     [ nip key? not ] curry assoc-filter ;
 

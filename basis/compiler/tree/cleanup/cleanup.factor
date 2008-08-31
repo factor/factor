@@ -52,7 +52,7 @@ GENERIC: cleanup* ( node -- node/nodes )
 
 : add-method-dependency ( #call -- )
     dup method>> word? [
-        [ method>> ] [ class>> <method-dependency> ] bi depends-on
+        [ word>> ] [ class>> ] bi depends-on-generic
     ] [ drop ] if ;
 
 : cleanup-inlining ( #call -- nodes )

@@ -29,7 +29,7 @@ IN: compiler.tests
 ] unit-test
 
 [
-    "my-tuple" "compiler.tests.redefine9" lookup
+    "my-tuple" "compiler.tests.redefine9" lookup boa
     "my-generic" "compiler.tests.redefine9" lookup
     execute
 ] [ no-math-method? ] must-fail-with

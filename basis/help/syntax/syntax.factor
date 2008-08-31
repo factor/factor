@@ -18,5 +18,5 @@ IN: help.syntax
 : ABOUT:
     scan-object
     in get vocab
-    dup +inlined+ changed-definition
+    dup changed-definition
     set-vocab-help ; parsing
