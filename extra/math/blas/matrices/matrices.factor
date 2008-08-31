@@ -153,41 +153,45 @@ PRIVATE>
     [ (flatten-complex-sequence) >c-double-array ] (>matrix)
     <double-complex-blas-matrix> ;
 
-GENERIC: n*M.V+n*V-in-place ( alpha A x beta y -- y=alpha*A.x+b*y )
-GENERIC: n*V(*)V+M-in-place ( alpha x y A -- A=alpha*x(*)y+A )
-GENERIC: n*V(*)Vconj+M-in-place ( alpha x y A -- A=alpha*x(*)yconj+A )
-GENERIC: n*M.M+n*M-in-place ( alpha A B beta C -- C=alpha*A.B+beta*C )
+GENERIC: n*M.V+n*V! ( alpha A x beta y -- y=alpha*A.x+b*y )
+GENERIC: n*V(*)V+M! ( alpha x y A -- A=alpha*x(*)y+A )
+GENERIC: n*V(*)Vconj+M! ( alpha x y A -- A=alpha*x(*)yconj+A )
+GENERIC: n*M.M+n*M! ( alpha A B beta C -- C=alpha*A.B+beta*C )
 
-METHOD: n*M.V+n*V-in-place { real float-blas-matrix float-blas-vector real float-blas-vector }
+METHOD: n*M.V+n*V! { real float-blas-matrix float-blas-vector real float-blas-vector }
     [ ] (prepare-gemv) [ cblas_sgemv ] dip ;
-METHOD: n*M.V+n*V-in-place { real double-blas-matrix double-blas-vector real double-blas-vector }
+METHOD: n*M.V+n*V! { real double-blas-matrix double-blas-vector real double-blas-vector }
     [ ] (prepare-gemv) [ cblas_dgemv ] dip ;
-METHOD: n*M.V+n*V-in-place { number float-complex-blas-matrix float-complex-blas-vector number float-complex-blas-vector }
+METHOD: n*M.V+n*V! { number float-complex-blas-matrix float-complex-blas-vector number float-complex-blas-vector }
     [ (>c-complex) ] (prepare-gemv) [ cblas_cgemv ] dip ;
-METHOD: n*M.V+n*V-in-place { number double-complex-blas-matrix double-complex-blas-vector number double-complex-blas-vector }
+METHOD: n*M.V+n*V! { number double-complex-blas-matrix double-complex-blas-vector number double-complex-blas-vector }
     [ (>z-complex) ] (prepare-gemv) [ cblas_zgemv ] dip ;
 
-METHOD: n*V(*)V+M-in-place { real float-blas-vector float-blas-vector float-blas-matrix }
+METHOD: n*V(*)V+M! { real float-blas-vector float-blas-vector float-blas-matrix }
     [ ] (prepare-ger) [ cblas_sger ] dip ;
-METHOD: n*V(*)V+M-in-place { real double-blas-vector double-blas-vector double-blas-matrix }
+METHOD: n*V(*)V+M! { real double-blas-vector double-blas-vector double-blas-matrix }
     [ ] (prepare-ger) [ cblas_dger ] dip ;
-METHOD: n*V(*)V+M-in-place { number float-complex-blas-vector float-complex-blas-vector float-complex-blas-matrix }
+METHOD: n*V(*)V+M! { number float-complex-blas-vector float-complex-blas-vector float-complex-blas-matrix }
     [ (>c-complex) ] (prepare-ger) [ cblas_cgeru ] dip ;
-METHOD: n*V(*)V+M-in-place { number double-complex-blas-vector double-complex-blas-vector double-complex-blas-matrix }
+METHOD: n*V(*)V+M! { number double-complex-blas-vector double-complex-blas-vector double-complex-blas-matrix }
     [ (>z-complex) ] (prepare-ger) [ cblas_zgeru ] dip ;
 
-METHOD: n*V(*)Vconj+M-in-place { number float-complex-blas-vector float-complex-blas-vector float-complex-blas-matrix }
+METHOD: n*V(*)Vconj+M! { real float-blas-vector float-blas-vector float-blas-matrix }
+    [ ] (prepare-ger) [ cblas_sger ] dip ;
+METHOD: n*V(*)Vconj+M! { real double-blas-vector double-blas-vector double-blas-matrix }
+    [ ] (prepare-ger) [ cblas_dger ] dip ;
+METHOD: n*V(*)Vconj+M! { number float-complex-blas-vector float-complex-blas-vector float-complex-blas-matrix }
     [ (>c-complex) ] (prepare-ger) [ cblas_cgerc ] dip ;
-METHOD: n*V(*)Vconj+M-in-place { number double-complex-blas-vector double-complex-blas-vector double-complex-blas-matrix }
+METHOD: n*V(*)Vconj+M! { number double-complex-blas-vector double-complex-blas-vector double-complex-blas-matrix }
     [ (>z-complex) ] (prepare-ger) [ cblas_zgerc ] dip ;
 
-METHOD: n*M.M+n*M-in-place { real float-blas-matrix float-blas-matrix real float-blas-matrix }
+METHOD: n*M.M+n*M! { real float-blas-matrix float-blas-matrix real float-blas-matrix }
     [ ] (prepare-gemm) [ cblas_sgemm ] dip ;
-METHOD: n*M.M+n*M-in-place { real double-blas-matrix double-blas-matrix real double-blas-matrix }
+METHOD: n*M.M+n*M! { real double-blas-matrix double-blas-matrix real double-blas-matrix }
     [ ] (prepare-gemm) [ cblas_dgemm ] dip ;
-METHOD: n*M.M+n*M-in-place { number float-complex-blas-matrix float-complex-blas-matrix number float-complex-blas-matrix }
+METHOD: n*M.M+n*M! { number float-complex-blas-matrix float-complex-blas-matrix number float-complex-blas-matrix }
     [ (>c-complex) ] (prepare-gemm) [ cblas_cgemm ] dip ;
-METHOD: n*M.M+n*M-in-place { number double-complex-blas-matrix double-complex-blas-matrix number double-complex-blas-matrix }
+METHOD: n*M.M+n*M! { number double-complex-blas-matrix double-complex-blas-matrix number double-complex-blas-matrix }
     [ (>z-complex) ] (prepare-gemm) [ cblas_zgemm ] dip ;
 
 ! XXX should do a dense clone
@@ -206,36 +210,36 @@ syntax:M: blas-matrix-base clone
     [ f swap (blas-matrix-like) ] 3tri ;
 
 : n*M.V+n*V ( alpha A x beta y -- alpha*A.x+b*y )
-    clone n*M.V+n*V-in-place ;
+    clone n*M.V+n*V! ;
 : n*V(*)V+M ( alpha x y A -- alpha*x(*)y+A )
-    clone n*V(*)V+M-in-place ;
+    clone n*V(*)V+M! ;
 : n*V(*)Vconj+M ( alpha x y A -- alpha*x(*)yconj+A )
-    clone n*V(*)Vconj+M-in-place ;
+    clone n*V(*)Vconj+M! ;
 : n*M.M+n*M ( alpha A B beta C -- alpha*A.B+beta*C )
-    clone n*M.M+n*M-in-place ;
+    clone n*M.M+n*M! ;
 
 : n*M.V ( alpha A x -- alpha*A.x )
     1.0 2over [ Mheight ] dip <empty-vector>
-    n*M.V+n*V-in-place ; inline
+    n*M.V+n*V! ; inline
 
 : M.V ( A x -- A.x )
     1.0 -rot n*M.V ; inline
 
-: n*V(*)V ( n x y -- n*x(*)y )
+: n*V(*)V ( alpha x y -- alpha*x(*)y )
     2dup [ length>> ] bi@ pick <empty-matrix>
-    n*V(*)V+M-in-place ;
-: n*V(*)Vconj ( n x y -- n*x(*)yconj )
+    n*V(*)V+M! ;
+: n*V(*)Vconj ( alpha x y -- alpha*x(*)yconj )
     2dup [ length>> ] bi@ pick <empty-matrix>
-    n*V(*)Vconj+M-in-place ;
+    n*V(*)Vconj+M! ;
 
 : V(*) ( x y -- x(*)y )
     1.0 -rot n*V(*)V ; inline
 : V(*)conj ( x y -- x(*)yconj )
     1.0 -rot n*V(*)Vconj ; inline
 
-: n*M.M ( n A B -- n*A.B )
+: n*M.M ( alpha A B -- alpha*A.B )
     2dup [ Mheight ] [ Mwidth ] bi* pick <empty-matrix> 
-    1.0 swap n*M.M+n*M-in-place ;
+    1.0 swap n*M.M+n*M! ;
 
 : M. ( A B -- A.B )
     1.0 -rot n*M.M ; inline
@@ -247,7 +251,7 @@ syntax:M: blas-matrix-base clone
     height
     width ;
 
-: Msub ( matrix row col height width -- submatrix )
+: Msub ( matrix row col height width -- sub )
     5 npick dup transpose>>
     [ nip [ [ swap ] 2dip swap ] when (Msub) ] 2keep
     swap (blas-matrix-like) ;
@@ -281,14 +285,14 @@ syntax:M: blas-matrix-rowcol-sequence nth-unsafe
 
 : Mrows ( A -- rows )
     dup transpose>> [ (Mcols) ] [ (Mrows) ] if ;
-: Mcols ( A -- rows )
+: Mcols ( A -- cols )
     dup transpose>> [ (Mrows) ] [ (Mcols) ] if ;
 
-: n*M-in-place ( n A -- A=n*A )
-    [ (Mcols) [ n*V-in-place drop ] with each ] keep ;
+: n*M! ( n A -- A=n*A )
+    [ (Mcols) [ n*V! drop ] with each ] keep ;
 
 : n*M ( n A -- n*A )
-    clone n*M-in-place ; inline
+    clone n*M! ; inline
 
 : M*n ( A n -- A*n )
     swap n*M ; inline
