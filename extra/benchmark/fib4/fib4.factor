@@ -1,7 +1,7 @@
 USING: accessors math kernel debugger ;
 IN: benchmark.fib4
 
-TUPLE: box i ;
+TUPLE: box { i read-only } ;
 
 C: <box> box
 
@@ -15,8 +15,8 @@ C: <box> box
         i>> 1- <box>
         tuple-fib
         swap i>> swap i>> + <box>
-    ] if ;
+    ] if ; inline recursive
 
-: fib-main ( -- ) T{ box f 34 } tuple-fib T{ box f 9227465 } assert= ;
+: fib-main ( -- ) T{ box f 34 } tuple-fib i>> 9227465 assert= ;
 
 MAIN: fib-main

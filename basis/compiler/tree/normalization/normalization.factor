@@ -204,5 +204,6 @@ M: node normalize* ;
     H{ } clone rename-map set
     dup [ collect-label-info ] each-node
     dup count-introductions make-values
-    [ (normalize) ] [ nip #introduce ] 2bi prefix
+    [ (normalize) ] [ nip ] 2bi
+    dup empty? [ drop ] [ #introduce prefix ] if
     rename-node-values ;
