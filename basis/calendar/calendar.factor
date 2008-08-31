@@ -3,7 +3,7 @@
 USING: arrays kernel math math.functions namespaces sequences
 strings system vocabs.loader calendar.backend threads
 accessors combinators locals classes.tuple math.order
-memoize summary combinators.short-circuit ;
+memoize summary combinators.short-circuit alias ;
 IN: calendar
 
 TUPLE: duration
@@ -116,15 +116,23 @@ PRIVATE>
 : >time< ( timestamp -- hour minute second )
     [ hour>> ] [ minute>> ] [ second>> ] tri ;
 
-MEMO: instant ( -- dt ) 0 0 0 0 0 0 <duration> ;
-: years ( n -- dt ) instant clone swap >>year ;
-: months ( n -- dt ) instant clone swap >>month ;
-: days ( n -- dt ) instant clone swap >>day ;
-: weeks ( n -- dt ) 7 * days ;
-: hours ( n -- dt ) instant clone swap >>hour ;
-: minutes ( n -- dt ) instant clone swap >>minute ;
-: seconds ( n -- dt ) instant clone swap >>second ;
-: milliseconds ( n -- dt ) 1000 / seconds ;
+MEMO: instant ( -- duration ) 0 0 0 0 0 0 <duration> ;
+: years ( x -- duration ) instant clone swap >>year ;
+: months ( x -- duration ) instant clone swap >>month ;
+: days ( x -- duration ) instant clone swap >>day ;
+: weeks ( x -- duration ) 7 * days ;
+: hours ( x -- duration ) instant clone swap >>hour ;
+: minutes ( x -- duration ) instant clone swap >>minute ;
+: seconds ( x -- duration ) instant clone swap >>second ;
+: milliseconds ( x -- duration ) 1000 / seconds ;
+ALIAS: year years
+ALIAS: month months
+ALIAS: day days
+ALIAS: week weeks
+ALIAS: hour hours
+ALIAS: minute minutes
+ALIAS: second seconds
+ALIAS: millisecond milliseconds
 
 GENERIC: leap-year? ( obj -- ? )
 
@@ -218,7 +226,7 @@ M: number +second ( timestamp n -- timestamp )
 
 PRIVATE>
 
-GENERIC# time+ 1 ( time dt -- time )
+GENERIC# time+ 1 ( time1 time2 -- time3 )
 
 M: timestamp time+
     >r clone r> (time+) drop ;
@@ -236,8 +244,8 @@ M: duration time+
         2drop <duration>
     ] if ;
 
-: dt>years ( dt -- x )
-    #! Uses average month/year length since dt loses calendar
+: dt>years ( duration -- x )
+    #! Uses average month/year length since duration loses calendar
     #! data
     0 swap
     {
@@ -251,12 +259,12 @@ M: duration time+
 
 M: duration <=> [ dt>years ] compare ;
 
-: dt>months ( dt -- x ) dt>years months-per-year * ;
-: dt>days ( dt -- x ) dt>years days-per-year * ;
-: dt>hours ( dt -- x ) dt>years hours-per-year * ;
-: dt>minutes ( dt -- x ) dt>years minutes-per-year * ;
-: dt>seconds ( dt -- x ) dt>years seconds-per-year * ;
-: dt>milliseconds ( dt -- x ) dt>seconds 1000 * ;
+: dt>months ( duration -- x ) dt>years months-per-year * ;
+: dt>days ( duration -- x ) dt>years days-per-year * ;
+: dt>hours ( duration -- x ) dt>years hours-per-year * ;
+: dt>minutes ( duration -- x ) dt>years minutes-per-year * ;
+: dt>seconds ( duration -- x ) dt>years seconds-per-year * ;
+: dt>milliseconds ( duration -- x ) dt>seconds 1000 * ;
 
 GENERIC: time- ( time1 time2 -- time )
 
@@ -296,7 +304,7 @@ M: timestamp time-
         } 2cleave <duration>
     ] if ;
 
-: before ( dt -- -dt )
+: before ( duration -- -duration )
     -1 time* ;
 
 M: duration time-
@@ -324,8 +332,8 @@ MEMO: unix-1970 ( -- timestamp )
 
 : now ( -- timestamp ) gmt >local-time ;
 
-: hence ( dt -- timestamp ) now swap time+ ;
-: ago ( dt -- timestamp ) now swap time- ;
+: hence ( duration -- timestamp ) now swap time+ ;
+: ago ( duration -- timestamp ) now swap time- ;
 
 : day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 } ; inline
 

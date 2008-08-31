@@ -8,7 +8,7 @@ HELP: duration
 { $description "A duration is a period of time years, months, days, hours, minutes, and seconds.  All duration slots can store " { $link real } " numbers." } ;
 
 HELP: timestamp
-{ $description "A timestamp is a date and a time with a timezone offset.  Timestamp slots must store integers except for " { $snippet "seconds" } ", which stores reals, and " { $snippet "gmt-offset" } ", which stores a " { $link duration } "." } ;
+{ $description "A timestamp is a date and a time with a timezone offset.  Timestamp slots must store integers except for " { $snippet "seconds" } ", which stores reals, and " { $snippet "gmt-offset" } ", which stores a " { $link duration } ". Compare two timestamps with the " { $link <=> } " word." } ;
 
 { timestamp duration } related-words
 
@@ -128,3 +128,76 @@ HELP: >time<
 } ;
 
 { >date< >time< } related-words
+
+HELP: instant
+{ $values { "duration" duration } }
+{ $description "Pushes a " { $snippet "duration" } " of zero seconds." } ;
+
+HELP: years
+{ $values { "x" number } { "duration" duration } }
+{ $description } ;
+{ year years } related-words
+
+HELP: months
+{ $values { "x" number } { "duration" duration } }
+{ $description } ;
+{ month months } related-words
+
+HELP: days
+{ $values { "x" number } { "duration" duration } }
+{ $description } ;
+{ day days } related-words
+
+HELP: weeks
+{ $values { "x" number } { "duration" duration } }
+{ $description } ;
+{ week weeks } related-words
+
+HELP: hours
+{ $values { "x" number } { "duration" duration } }
+{ $description } ;
+{ hour hours } related-words
+
+HELP: minutes
+{ $values { "x" number } { "duration" duration } }
+{ $description } ;
+{ minute minutes } related-words
+
+HELP: seconds
+{ $values { "x" number } { "duration" duration } }
+{ $description } ;
+{ second seconds } related-words
+
+HELP: milliseconds
+{ $values { "x" number } { "duration" duration } }
+{ $description } ;
+{ millisecond milliseconds } related-words
+
+HELP: leap-year?
+{ $values { "obj" object } { "?" "a boolean" } }
+{ $description "Returns " { $link t } " if the object represents a leap year." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "2008 leap-year? ."
+               "t"
+    }
+    { $example "USING: calendar prettyprint ;"
+               "2010 1 1 <date> leap-year? ."
+               "f"
+    }
+} ;
+
+HELP: time+
+{ $values { "time1" "timestamp or duration" } { "time2" "timestamp or duration" } { "time3" "timestamp or duration" } }
+{ $description "Adds two durations to produce a duration or adds a timestamp and a duration to produce a timestamp. The calculation takes timezones into account." }
+{ $examples
+    { $example "USING: calendar math.order prettyprint ;"
+               "10 months 2 months time+ 1 year <=> ."
+               "+eq+"
+    }
+    { $example "USING: calendar math.order prettyprint ;"
+               "2010 1 1 <date> 3 days time+ days>> ."
+               "4"
+    }
+} ;
+
