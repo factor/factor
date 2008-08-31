@@ -174,7 +174,7 @@ threads sequences calendar accessors ;
     ] ;
 
 [ lock-timeout-test ] [
-    linked-error-thread name>> "Lock timeout-er" =
+    thread>> name>> "Lock timeout-er" =
 ] must-fail-with
 
 :: read/write-test ( -- )
