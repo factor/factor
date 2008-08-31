@@ -11,6 +11,7 @@ compiler.tree.strength-reduction
 compiler.tree.loop.detection
 compiler.tree.loop.inversion
 compiler.tree.branch-fusion
+compiler.tree.finalization
 compiler.tree.checker ;
 IN: compiler.tree.optimizer
 
@@ -25,6 +26,7 @@ IN: compiler.tree.optimizer
     unbox-tuples
     compute-def-use
     remove-dead-code
+    finalize
     ! strength-reduce
     ! USE: kernel
     ! compute-def-use
