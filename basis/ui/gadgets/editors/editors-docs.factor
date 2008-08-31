@@ -7,32 +7,34 @@ HELP: editor
 $nl
 "Editors have the following slots:"
 { $list
-    { { $link editor-font } " - a font specifier." }
-    { { $link editor-color } " - text color specifier." }
-    { { $link editor-caret-color } " - caret color specifier." }
-    { { $link editor-selection-color } " - selection background color specifier." }
-    { { $link editor-caret } " - a model storing a line/column pair." }
-    { { $link editor-mark } " - a model storing a line/column pair. If there is no selection, the mark is equal to the caret, otherwise the mark is located at the opposite end of the selection from the caret." }
-    { { $link editor-focused? } " - a boolean." }
+    { { $snippet "font" } " - a font specifier." }
+    { { $snippet "color" } " - text color specifier." }
+    { { $snippet "caret-color" } " - caret color specifier." }
+    { { $snippet "selection-color" } " - selection background color specifier." }
+    { { $snippet "caret" } " - a model storing a line/column pair." }
+    { { $snippet "mark" } " - a model storing a line/column pair. If there is no selection, the mark is equal to the caret, otherwise the mark is located at the opposite end of the selection from the caret." }
+    { { $snippet "focused?" } " - a boolean." }
 } } ;
 
 HELP: <editor>
 { $values { "editor" "a new " { $link editor } } }
 { $description "Creates a new " { $link editor } " with an empty document." } ;
 
-HELP: editor-caret ( editor -- caret )
-{ $values { "editor" editor } { "caret" model } }
-{ $description "Outputs a " { $link model } " holding the current caret location." } ;
+! 'editor-caret' is now an old accessor, but it's documented as a word here. Maybe move this description somewhere else.
 
-{ editor-caret editor-caret* editor-mark editor-mark* } related-words
+! HELP: editor-caret ( editor -- caret )
+! { $values { "editor" editor } { "caret" model } }
+! { $description "Outputs a " { $link model } " holding the current caret location." } ;
+
+{ editor-caret* editor-mark* } related-words
 
 HELP: editor-caret*
 { $values { "editor" editor } { "loc" "a pair of integers" } }
 { $description "Outputs the current caret location as a line/column number pair." } ;
 
-HELP: editor-mark ( editor -- mark )
-{ $values { "editor" editor } { "mark" model } }
-{ $description "Outputs a " { $link model } " holding the current mark location." } ;
+! HELP: editor-mark ( editor -- mark )
+! { $values { "editor" editor } { "mark" model } }
+! { $description "Outputs a " { $link model } " holding the current mark location." } ;
 
 HELP: editor-mark*
 { $values { "editor" editor } { "loc" "a pair of integers" } }
@@ -74,9 +76,7 @@ HELP: set-editor-string
 
 ARTICLE: "gadgets-editors-selection" "The caret and mark"
 "If there is no selection, the caret and the mark are at the same location; otherwise the mark delimits the end-point of the selection opposite the caret."
-{ $subsection editor-caret }
 { $subsection editor-caret* }
-{ $subsection editor-mark }
 { $subsection editor-mark* }
 { $subsection change-caret }
 { $subsection change-caret&mark }
