@@ -17,7 +17,7 @@ IN: ui.tools.traceback
     t "Data stack" <labelled-pane> ;
 
 : <retainstack-display> ( model -- gadget )
-    [ [ return>> stack. ] when* ]
+    [ [ retain>> stack. ] when* ]
     t "Retain stack" <labelled-pane> ;
 
 TUPLE: traceback-gadget < track ;
