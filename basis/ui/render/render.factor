@@ -138,7 +138,7 @@ M: polygon draw-interior
 
 : <polygon-gadget> ( color points -- gadget )
     dup max-dim
-    >r <polygon> <gadget> r> over set-rect-dim
+    >r <polygon> <gadget> r> >>dim
     [ (>>interior) ] keep ;
 
 ! Font rendering
