@@ -84,10 +84,12 @@ ERROR: mutually-recursive-rulesets ruleset ;
 : finalize-rule-set ( ruleset -- )
     dup finalized?>> {
         { f [
-            1 >>finalized?
-            [ resolve-imports ]
-            [ resolve-delegates ] bi
-            t >>finalized? drop
+            {
+                [ 1 >>finalized? drop ]
+                [ resolve-imports ]
+                [ resolve-delegates ]
+                [ t >>finalized? drop ]
+            } cleave
         ] }
         { t [ drop ] }
         { 1 [ mutually-recursive-rulesets ] }
