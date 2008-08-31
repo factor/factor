@@ -90,7 +90,7 @@ M: sqlite-statement bind-tuple ( tuple statement -- )
     ] keep bind-statement ;
 
 : last-insert-id ( -- id )
-    db get db-handle sqlite3_last_insert_rowid
+    db get handle>> sqlite3_last_insert_rowid
     dup zero? [ "last-id failed" throw ] when ;
 
 M: sqlite-db insert-tuple* ( tuple statement -- )

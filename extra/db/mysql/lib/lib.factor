@@ -34,7 +34,7 @@ TUPLE: mysql-result-set ;
 ! =========================================================
 
 : (mysql-query) ( mysql-connection query -- ret )
-    >r mysql-db-handle r> mysql_query ;
+    >r db-handle>> r> mysql_query ;
 
 ! : (mysql-result) ( mysql-connection -- ret )
     ! [ mysql-db-handle mysql_use_result ] keep 
