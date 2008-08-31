@@ -49,41 +49,41 @@ SYMBOL: ignore-case?
     swap position-attrs <matcher> ;
 
 : shared-tag-attrs ( -- )
-    { "TYPE" string>token set-rule-body-token } , ; inline
+    { "TYPE" string>token (>>body-token) } , ; inline
 
 : delegate-attr ( -- )
-    { "DELEGATE" f set-rule-delegate } , ;
+    { "DELEGATE" f (>>delegate) } , ;
 
 : regexp-attr ( -- )
-    { "HASH_CHAR" f set-rule-chars } , ;
+    { "HASH_CHAR" f (>>chars) } , ;
 
 : match-type-attr ( -- )
-    { "MATCH_TYPE" string>match-type set-rule-match-token } , ;
+    { "MATCH_TYPE" string>match-type (>>match-token) } , ;
 
 : span-attrs ( -- )
-    { "NO_LINE_BREAK" string>boolean set-rule-no-line-break? } ,
-    { "NO_WORD_BREAK" string>boolean set-rule-no-word-break? } ,
-    { "NO_ESCAPE" string>boolean set-rule-no-escape? } , ;
+    { "NO_LINE_BREAK" string>boolean (>>no-line-break?) } ,
+    { "NO_WORD_BREAK" string>boolean (>>no-word-break?) } ,
+    { "NO_ESCAPE" string>boolean (>>no-escape?) } , ;
 
 : literal-start ( -- )
-    [ parse-literal-matcher swap set-rule-start ] , ;
+    [ parse-literal-matcher >>start drop ] , ;
 
 : regexp-start ( -- )
-    [ parse-regexp-matcher swap set-rule-start ] , ;
+    [ parse-regexp-matcher >>start drop ] , ;
 
 : literal-end ( -- )
-    [ parse-literal-matcher swap set-rule-end ] , ;
+    [ parse-literal-matcher >>end drop ] , ;
 
 ! SPAN's children
 <TAGS: parse-begin/end-tag ( rule tag -- )
 
 TAG: BEGIN
     ! XXX
-    parse-literal-matcher swap set-rule-start ;
+    parse-literal-matcher >>start drop ;
 
 TAG: END
     ! XXX
-    parse-literal-matcher swap set-rule-end ;
+    parse-literal-matcher >>end drop ;
 
 TAGS>
 

@@ -1,6 +1,6 @@
 USING: xmode.loader xmode.utilities xmode.rules namespaces
 strings splitting assocs sequences kernel io.files xml memoize
-words globs combinators io.encodings.utf8 sorting ;
+words globs combinators io.encodings.utf8 sorting accessors ;
 IN: xmode.catalog
 
 TUPLE: mode file file-name-glob first-line-glob ;
@@ -10,9 +10,9 @@ TUPLE: mode file file-name-glob first-line-glob ;
 TAG: MODE
     "NAME" over at >r
     mode new {
-        { "FILE" f set-mode-file }
-        { "FILE_NAME_GLOB" f set-mode-file-name-glob }
-        { "FIRST_LINE_GLOB" f set-mode-first-line-glob }
+        { "FILE" f (>>file) }
+        { "FILE_NAME_GLOB" f (>>file-name-glob) }
+        { "FIRST_LINE_GLOB" f (>>first-line-glob) }
     } init-from-tag r>
     rot set-at ;
 
@@ -35,7 +35,7 @@ MEMO: mode-names ( -- modes )
 
 MEMO: (load-mode) ( name -- rule-sets )
     modes at [
-        mode-file
+        file>>
         "resource:extra/xmode/modes/" prepend
         utf8 <file-reader> parse-mode
     ] [
@@ -52,11 +52,11 @@ SYMBOL: rule-sets
     dup -roll at* [ nip ] [ drop no-such-rule-set ] if ;
 
 : resolve-delegate ( rule -- )
-    dup rule-delegate dup string?
-    [ get-rule-set nip swap set-rule-delegate ] [ 2drop ] if ;
+    dup delegate>> dup string?
+    [ get-rule-set nip swap (>>delegate) ] [ 2drop ] if ;
 
 : each-rule ( rule-set quot -- )
-    >r rule-set-rules values concat r> each ; inline
+    >r rules>> values concat r> each ; inline
 
 : resolve-delegates ( ruleset -- )
     [ resolve-delegate ] each-rule ;
@@ -65,14 +65,14 @@ SYMBOL: rule-sets
     over [ dupd update ] [ nip clone ] if ;
 
 : import-keywords ( parent child -- )
-    over >r [ rule-set-keywords ] bi@ ?update
-    r> set-rule-set-keywords ;
+    over >r [ keywords>> ] bi@ ?update
+    r> (>>keywords) ;
 
 : import-rules ( parent child -- )
     swap [ add-rule ] curry each-rule ;
 
 : resolve-imports ( ruleset -- )
-    dup rule-set-imports [
+    dup imports>> [
         get-rule-set swap rule-sets [
             dup resolve-delegates
             2dup import-keywords
@@ -80,16 +80,19 @@ SYMBOL: rule-sets
         ] with-variable
     ] with each ;
 
+ERROR: mutually-recursive-rulesets ruleset ;
 : finalize-rule-set ( ruleset -- )
-    dup rule-set-finalized? {
+    dup finalized?>> {
         { f [
-            1 over set-rule-set-finalized?
-            dup resolve-imports
-            dup resolve-delegates
-            t swap set-rule-set-finalized?
+            {
+                [ 1 >>finalized? drop ]
+                [ resolve-imports ]
+                [ resolve-delegates ]
+                [ t >>finalized? drop ]
+            } cleave
         ] }
         { t [ drop ] }
-        { 1 [ "Mutually recursive rule sets" throw ] }
+        { 1 [ mutually-recursive-rulesets ] }
     } case ;
 
 : finalize-mode ( rulesets -- )
@@ -107,8 +110,8 @@ SYMBOL: rule-sets
     dup [ glob-matches? ] [ 2drop f ] if ;
 
 : suitable-mode? ( file-name first-line mode -- ? )
-    tuck mode-first-line-glob ?glob-matches
-    [ 2drop t ] [ mode-file-name-glob ?glob-matches ] if ;
+    tuck first-line-glob>> ?glob-matches
+    [ 2drop t ] [ file-name-glob>> ?glob-matches ] if ;
 
 : find-mode ( file-name first-line -- mode )
     modes

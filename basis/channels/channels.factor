@@ -3,7 +3,7 @@
 !
 ! Channels - based on ideas from newsqueak
 USING: kernel sequences sequences.lib threads continuations
-random math ;
+random math accessors ;
 IN: channels
 
 TUPLE: channel receivers senders ;
@@ -17,14 +17,14 @@ GENERIC: from ( channel -- value )
 <PRIVATE
 
 : wait ( channel -- )
-    [ channel-senders push ] curry
+    [ senders>> push ] curry
     "channel send" suspend drop ;
 
 : (to) ( value receivers -- )
     delete-random resume-with yield ;
 
 : notify ( continuation channel -- channel )
-    [ channel-receivers push ] keep ;
+    [ receivers>> push ] keep ;
 
 : (from) ( senders -- )
     delete-random resume ;
@@ -32,11 +32,11 @@ GENERIC: from ( channel -- value )
 PRIVATE>
 
 M: channel to ( value channel -- )
-    dup channel-receivers
+    dup receivers>>
     dup empty? [ drop dup wait to ] [ nip (to) ] if ;
 
 M: channel from ( channel -- value )
     [
-        notify channel-senders
+        notify senders>>
         dup empty? [ drop ] [ (from) ] if
     ] curry "channel receive" suspend ;

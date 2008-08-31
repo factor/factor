@@ -14,7 +14,7 @@ TUPLE: company employees type ;
 
 : <company> V{ } clone f company boa ;
 
-: add-employee company-employees push ;
+: add-employee employees>> push ;
 
 <TAGS: parse-employee-tag
 
@@ -22,7 +22,7 @@ TUPLE: employee name description ;
 
 TAG: employee
     employee new
-    { { "name" f set-employee-name } { f set-employee-description } }
+    { { "name" f (>>name) } { f (>>description) } }
     init-from-tag swap add-employee ;
 
 TAGS>
@@ -32,7 +32,7 @@ TAGS>
 : parse-company-tag
     [
         <company>
-        { { "type" >upper set-company-type } }
+        { { "type" >upper (>>type) } }
         init-from-tag dup
     ] keep
     children>> [ tag? ] filter
