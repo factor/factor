@@ -52,17 +52,17 @@ H{ } clone root-cache set-global
 SYMBOL: load-help?
 
 : load-source ( vocab -- vocab )
-    f >>source-loaded?
+    f over set-vocab-source-loaded?
     [ vocab-source-path [ parse-file ] [ [ ] ] if* ] keep
-    t >>source-loaded?
+    t over set-vocab-source-loaded?
     [ [ % ] [ call ] if-bootstrapping ] dip ;
 
 
 : load-docs ( vocab -- vocab )
     load-help? get [
-        f >>docs-loaded?
+        f over set-vocab-docs-loaded?
         [ vocab-docs-path [ ?run-file ] when* ] keep
-        t >>docs-loaded?
+        t over set-vocab-docs-loaded?
     ] when ;
 
 : reload ( name -- )

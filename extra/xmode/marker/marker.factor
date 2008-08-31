@@ -3,7 +3,7 @@ USING: kernel namespaces xmode.rules xmode.tokens
 xmode.marker.state xmode.marker.context xmode.utilities
 xmode.catalog sequences math assocs combinators combinators.lib
 strings regexp splitting parser-combinators ascii unicode.case
-combinators.short-circuit ;
+combinators.short-circuit accessors ;
 
 ! Based on org.gjt.sp.jedit.syntax.TokenMarker
 
@@ -12,11 +12,11 @@ combinators.short-circuit ;
 
 : keyword-number? ( keyword -- ? )
     {
-        [ current-rule-set rule-set-highlight-digits? ]
+        [ current-rule-set highlight-digits?>> ]
         [ dup [ digit? ] contains? ]
         [
             dup [ digit? ] all? [
-                current-rule-set rule-set-digit-re
+                current-rule-set digit-re>>
                 dup [ dupd matches? ] [ drop f ] if
             ] unless*
         ]
@@ -26,10 +26,10 @@ combinators.short-circuit ;
     keyword-number? DIGIT and ;
 
 : mark-keyword ( keyword -- id )
-    current-rule-set rule-set-keywords at ;
+    current-rule-set keywords>> at ;
 
 : add-remaining-token ( -- )
-    current-rule-set rule-set-default prev-token, ;
+    current-rule-set default>> prev-token, ;
 
 : mark-token ( -- )
     current-keyword
@@ -48,9 +48,9 @@ M: rule match-position drop position get ;
 : can-match-here? ( matcher rule -- ? )
     match-position {
         [ over ]
-        [ over matcher-at-line-start?     over zero?                implies ]
-        [ over matcher-at-whitespace-end? over whitespace-end get = implies ]
-        [ over matcher-at-word-start?     over last-offset get =    implies ]
+        [ over at-line-start?>>     over zero?                implies ]
+        [ over at-whitespace-end?>> over whitespace-end get = implies ]
+        [ over at-word-start?>>     over last-offset get =    implies ]
     } 0&& 2nip ;
 
 : rest-of-line ( -- str )
@@ -72,19 +72,19 @@ M: regexp text-matches?
     >r >string r> match-head ;
 
 : rule-start-matches? ( rule -- match-count/f )
-    dup rule-start tuck swap can-match-here? [
-        rest-of-line swap matcher-text text-matches?
+    dup start>> tuck swap can-match-here? [
+        rest-of-line swap text>> text-matches?
     ] [
         drop f
     ] if ;
 
 : rule-end-matches? ( rule -- match-count/f )
     dup mark-following-rule? [
-        dup rule-start swap can-match-here? 0 and
+        dup start>> swap can-match-here? 0 and
     ] [
-        dup rule-end tuck swap can-match-here? [
+        dup end>> tuck swap can-match-here? [
             rest-of-line
-            swap matcher-text context get line-context-end or
+            swap text>> context get end>> or
             text-matches?
         ] [
             drop f
@@ -94,10 +94,10 @@ M: regexp text-matches?
 DEFER: get-rules
 
 : get-always-rules ( vector/f ruleset -- vector/f )
-    f swap rule-set-rules at ?push-all ;
+    f swap rules>> at ?push-all ;
 
 : get-char-rules ( vector/f char ruleset -- vector/f )
-    >r ch>upper r> rule-set-rules at ?push-all ;
+    >r ch>upper r> rules>> at ?push-all ;
 
 : get-rules ( char ruleset -- seq )
     f -rot [ get-char-rules ] keep get-always-rules ;
@@ -108,13 +108,13 @@ GENERIC: handle-rule-end ( match-count rule -- )
 
 : find-escape-rule ( -- rule )
     context get dup
-    line-context-in-rule-set rule-set-escape-rule [ ] [
-        line-context-parent line-context-in-rule-set
-        dup [ rule-set-escape-rule ] when
+    in-rule-set>> escape-rule>> [ ] [
+        parent>> in-rule-set>>
+        dup [ escape-rule>> ] when
     ] ?if ;
 
 : check-escape-rule ( rule -- ? )
-    rule-no-escape? [ f ] [
+    no-escape?>> [ f ] [
         find-escape-rule dup [
             dup rule-start-matches? dup [
                 swap handle-rule-start
@@ -138,9 +138,9 @@ GENERIC: handle-rule-end ( match-count rule -- )
     ] when* ;
 
 : rule-match-token* ( rule -- id )
-    dup rule-match-token {
-        { f [ dup rule-body-token ] }
-        { t [ current-rule-set rule-set-default ] }
+    dup match-token>> {
+        { f [ dup body-token>> ] }
+        { t [ current-rule-set default>> ] }
         [ ]
     } case nip ;
 
@@ -156,8 +156,8 @@ M: seq-rule handle-rule-start
     ?end-rule
     mark-token
     add-remaining-token
-    tuck rule-body-token next-token,
-    rule-delegate [ push-context ] when* ;
+    tuck body-token>> next-token,
+    delegate>> [ push-context ] when* ;
 
 UNION: abstract-span-rule span-rule eol-span-rule ;
 
@@ -167,8 +167,8 @@ M: abstract-span-rule handle-rule-start
     add-remaining-token
     tuck rule-match-token* next-token,
     ! ... end subst ...
-    dup context get set-line-context-in-rule
-    rule-delegate push-context ;
+    dup context get (>>in-rule)
+    delegate>> push-context ;
 
 M: span-rule handle-rule-end
     2drop ;
@@ -197,15 +197,16 @@ M: mark-previous-rule handle-rule-start
     ] when ;
 
 : check-end-delegate ( -- ? )
-    context get line-context-parent [
-        line-context-in-rule [
+    context get parent>> [
+        in-rule>> [
             dup rule-end-matches? dup [
                 [
                     swap handle-rule-end
                     ?end-rule
                     mark-token
                     add-remaining-token
-                ] keep context get line-context-parent line-context-in-rule rule-match-token* next-token,
+                ] keep context get parent>> in-rule>>
+                rule-match-token* next-token,
                 pop-context
                 seen-whitespace-end? on t
             ] [ drop check-escape-rule ] if
@@ -213,9 +214,9 @@ M: mark-previous-rule handle-rule-start
     ] [ f ] if* ;
 
 : handle-no-word-break ( -- )
-    context get line-context-parent [
-        line-context-in-rule [
-            dup rule-no-word-break? [
+    context get parent>> [
+        in-rule>> [
+            dup no-word-break?>> [
                 rule-match-token* prev-token,
                 pop-context
             ] [ drop ] if
@@ -231,11 +232,11 @@ M: mark-previous-rule handle-rule-start
 : (check-word-break) ( -- )
     check-rule
     
-    1 current-rule-set rule-set-default next-token, ;
+    1 current-rule-set default>> next-token, ;
 
 : rule-set-empty? ( ruleset -- ? )
-    dup rule-set-rules assoc-empty?
-    swap rule-set-keywords assoc-empty? and ;
+    [ rules>> ] [ keywords>> ] bi
+    [ assoc-empty? ] bi@ and ;
 
 : check-word-break ( -- ? )
     current-char dup blank? [
@@ -285,9 +286,9 @@ M: mark-previous-rule handle-rule-start
     check-rule ;
 
 : unwind-no-line-break ( -- )
-    context get line-context-parent [
-        line-context-in-rule [
-            rule-no-line-break? [
+    context get parent>> [
+        in-rule>> [
+            no-line-break?>> [
                 pop-context
                 unwind-no-line-break
             ] when

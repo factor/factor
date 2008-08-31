@@ -3,7 +3,7 @@
 
 USING: arrays asn1.ldap assocs byte-arrays combinators
 continuations io io.binary io.streams.string kernel math
-math.parser namespaces pack strings sequences ;
+math.parser namespaces pack strings sequences accessors ;
 
 IN: asn1
 
@@ -48,16 +48,12 @@ SYMBOL: elements
 
 TUPLE: element syntax id tag tagclass encoding contentlength newobj objtype ;
 
-: <element> ( -- element ) element new ;
-
-: set-id ( -- boolean )
-    read1 dup elements get set-element-id ;
 
 : get-id ( -- id )
-    elements get element-id ;
+    elements get id>> ;
 
 : (set-tag) ( -- )
-    elements get element-id 31 bitand
+    elements get id>> 31 bitand
     dup elements get set-element-tag
     31 < [
         [ "unsupported tag encoding: #{" % 
@@ -81,14 +77,14 @@ TUPLE: element syntax id tag tagclass encoding contentlength newobj objtype ;
     ] unless elements get set-element-contentlength ;
 
 : set-newobj ( -- )
-    elements get element-contentlength read
+    elements get contentlength>> read
     elements get set-element-newobj ;
 
 : set-objtype ( syntax -- )
     builtin-syntax 2array [
-        elements get element-tagclass swap at
-        elements get element-encoding swap at
-        elements get element-tag
+        elements get tagclass>> swap at
+        elements get encoding>> swap at
+        elements get tag>>
         swap at [ 
             elements get set-element-objtype
         ] when*
@@ -99,7 +95,7 @@ DEFER: read-ber
 SYMBOL: end
 
 : (read-array) ( -- )
-    elements get element-id [
+    elements get id>> [
         elements get element-syntax read-ber
         dup end = [ drop ] [ , (read-array) ] if
     ] when ;
@@ -115,9 +111,13 @@ SYMBOL: end
         { "array" [ "" or [ read-array ] with-string-reader ] }
     } case ;
 
+: set-id ( -- boolean )
+    read1 dup elements get set-element-id ;
+
 : read-ber ( syntax -- object )
-    <element> elements set
-    elements get set-element-syntax
+    element new
+        swap >>syntax
+    elements set
     set-id [
         (set-tag)
         set-tagclass
