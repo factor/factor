@@ -7,7 +7,7 @@ HELP: button
 $nl
 "A button's appearance can vary depending on the state of the mouse button if the " { $snippet "interior" } " or " { $snippet "boundary" } " slots are set to instances of " { $link button-paint } "."
 $nl
-"A button can be selected, which is distinct from being pressed. This state is held in the " { $link button-selected? } " slot, and is used by the " { $link <toggle-buttons> } " word to construct a row of buttons for choosing among several alternatives." } ;
+"A button can be selected, which is distinct from being pressed. This state is held in the " { $snippet "selected?" } " slot, and is used by the " { $link <toggle-buttons> } " word to construct a row of buttons for choosing among several alternatives." } ;
 
 HELP: <button>
 { $values { "label" gadget } { "quot" "a quotation with stack effect " { $snippet "( button -- )" } } { "button" "a new " { $link button } } }
@@ -28,10 +28,10 @@ HELP: <repeat-button>
 HELP: button-paint
 { $class-description "A class implementing the " { $link draw-boundary } " and " { $link draw-interior } " gneeric words by delegating to an object in one of four slots which depend on the state of the button being drawn:"
     { $list
-        { { $link button-paint-plain } " - the button is inactive" }
-        { { $link button-paint-rollover } " - the button is under the mouse" }
-        { { $link button-paint-pressed } " - the button is under the mouse and a mouse button is held down" }
-        { { $link button-paint-selected } " - the button is selected (see " { $link <toggle-buttons> }  }
+        { { $snippet "plain"    } " - the button is inactive" }
+        { { $snippet "rollover" } " - the button is under the mouse" }
+        { { $snippet "pressed"  } " - the button is under the mouse and a mouse button is held down" }
+        { { $snippet "selected" } " - the button is selected (see " { $link <toggle-buttons> }  }
     }
 "The " { $link <roll-button> } " and " { $link <bevel-button> } " words create " { $link button } " instances with specific " { $link button-paint } "." } ;
 
