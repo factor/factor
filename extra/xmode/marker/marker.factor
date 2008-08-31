@@ -72,7 +72,7 @@ M: regexp text-matches?
     >r >string r> match-head ;
 
 : rule-start-matches? ( rule -- match-count/f )
-    dup rule-start tuck swap can-match-here? [
+    dup start>> tuck swap can-match-here? [
         rest-of-line swap text>> text-matches?
     ] [
         drop f
@@ -114,7 +114,7 @@ GENERIC: handle-rule-end ( match-count rule -- )
     ] ?if ;
 
 : check-escape-rule ( rule -- ? )
-    rule-no-escape? [ f ] [
+    no-escape?>> [ f ] [
         find-escape-rule dup [
             dup rule-start-matches? dup [
                 swap handle-rule-start
@@ -139,7 +139,7 @@ GENERIC: handle-rule-end ( match-count rule -- )
 
 : rule-match-token* ( rule -- id )
     dup match-token>> {
-        { f [ dup rule-body-token ] }
+        { f [ dup body-token>> ] }
         { t [ current-rule-set default>> ] }
         [ ]
     } case nip ;
@@ -216,7 +216,7 @@ M: mark-previous-rule handle-rule-start
 : handle-no-word-break ( -- )
     context get parent>> [
         in-rule>> [
-            dup rule-no-word-break? [
+            dup no-word-break?>> [
                 rule-match-token* prev-token,
                 pop-context
             ] [ drop ] if

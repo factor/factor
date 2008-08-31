@@ -74,14 +74,14 @@ TUPLE: span-rule < rule ;
 TUPLE: eol-span-rule < rule ;
 
 : init-span ( rule -- )
-    dup rule-delegate [ drop ] [
-        dup rule-body-token standard-rule-set
-        swap set-rule-delegate
+    dup delegate>> [ drop ] [
+        dup body-token>> standard-rule-set
+        swap (>>delegate)
     ] if ;
 
 : init-eol-span ( rule -- )
     dup init-span
-    t swap set-rule-no-line-break? ;
+    t >>no-line-break? drop ;
 
 TUPLE: mark-following-rule < rule ;
 

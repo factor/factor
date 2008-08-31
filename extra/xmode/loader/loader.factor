@@ -77,7 +77,7 @@ TAGS>
 ! Top-level entry points
 : parse-mode-tag ( tag -- rule-sets )
     dup "RULES" tags-named [
-        parse-rules-tag dup rule-set-name swap
+        parse-rules-tag dup name>> swap
     ] H{ } map>assoc
     swap "PROPS" tag-named [
         parse-props-tag over values

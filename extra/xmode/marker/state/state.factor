@@ -15,7 +15,7 @@ SYMBOLS: line last-offset position context
     context get in-rule-set>> ;
 
 : current-keywords ( -- keyword-map )
-    current-rule-set rule-set-keywords ;
+    current-rule-set keywords>> ;
 
 : token, ( from to id -- )
     2over = [ 3drop ] [ >r line get subseq r> <token> , ] if ;
