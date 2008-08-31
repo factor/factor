@@ -11,7 +11,7 @@ USING: accessors arrays ui ui.commands ui.gestures ui.gadgets
 IN: ui.tools.debugger
 
 : <restart-list> ( restarts restart-hook -- gadget )
-    [ restart-name ] rot <model> <list> ;
+    [ name>> ] rot <model> <list> ;
 
 TUPLE: debugger < track restarts ;
 

@@ -39,17 +39,17 @@ M: browser-gadget ungraft*
 
 : showing-definition? ( defspec assoc -- ? )
     [ key? ] 2keep
-    [ >r dup word-link? [ link-name ] when r> key? ] 2keep
+    [ >r dup word-link? [ name>> ] when r> key? ] 2keep
     >r dup vocab-link? [ vocab ] when r> key?
     or or ;
 
 M: browser-gadget definitions-changed ( assoc browser -- )
     history>>
-    dup model-value rot showing-definition?
+    dup value>> rot showing-definition?
     [ notify-connections ] [ drop ] if ;
 
 : help-action ( browser-gadget -- link )
-    history>> model-value >link ;
+    history>> value>> >link ;
 
 : com-follow ( link -- ) browser-gadget call-tool ;
 

@@ -9,15 +9,15 @@ USING: accessors continuations kernel models namespaces
 IN: ui.tools.traceback
 
 : <callstack-display> ( model -- gadget )
-    [ [ continuation-call callstack. ] when* ]
+    [ [ call>> callstack. ] when* ]
     t "Call stack" <labelled-pane> ;
 
 : <datastack-display> ( model -- gadget )
-    [ [ continuation-data stack. ] when* ]
+    [ [ data>> stack. ] when* ]
     t "Data stack" <labelled-pane> ;
 
 : <retainstack-display> ( model -- gadget )
-    [ [ continuation-retain stack. ] when* ]
+    [ [ return>> stack. ] when* ]
     t "Retain stack" <labelled-pane> ;
 
 TUPLE: traceback-gadget < track ;
@@ -39,7 +39,7 @@ M: traceback-gadget pref-dim* drop { 550 600 } ;
     dup <toolbar> f track-add ;
 
 : <namestack-display> ( model -- gadget )
-    [ [ continuation-name namestack. ] when* ]
+    [ [ name>> namestack. ] when* ]
     <pane-control> ;
 
 : <variables-gadget> ( model -- gadget )
