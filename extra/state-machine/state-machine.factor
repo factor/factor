@@ -1,5 +1,6 @@
-USING: kernel parser lexer strings math namespaces sequences words io
-arrays quotations debugger kernel.private sequences.private ;
+USING: kernel parser lexer strings math namespaces
+sequences words io arrays quotations debugger accessors
+sequences.private ;
 IN: state-machine
 
 : STATES:
@@ -20,9 +21,9 @@ M: missing-state error.
     ! quot is ( state string -- output-string )
     [ missing-state ] <array> dup
     [
-        [ >r dup dup state-data swap state-place r> ] %
+        [ >r dup [ data>> ] [ place>> ] bi r> ] %
         [ swapd bounds-check dispatch ] curry ,
-        [ each pick set-state-place swap set-state-data ] %
+        [ each pick (>>place) swap (>>date) ] %
     ] [ ] make [ over make ] curry ;
 
 : define-machine ( word state-class -- )
