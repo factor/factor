@@ -1,11 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math strings help.markup help.syntax
-calendar.backend ;
+calendar.backend math.order ;
 IN: calendar
 
 HELP: duration
-{ $description "A duration is a period of time years, months, days, hours, minutes, and seconds.  All duration slots can store " { $link real } " numbers." } ;
+{ $description "A duration is a period of time years, months, days, hours, minutes, and seconds.  All duration slots can store " { $link real } " numbers. Compare two timestamps with the " { $link <=> } " word." } ;
 
 HELP: timestamp
 { $description "A timestamp is a date and a time with a timezone offset.  Timestamp slots must store integers except for " { $snippet "seconds" } ", which stores reals, and " { $snippet "gmt-offset" } ", which stores a " { $link duration } ". Compare two timestamps with the " { $link <=> } " word." } ;
@@ -195,8 +195,8 @@ HELP: time+
                "10 months 2 months time+ 1 year <=> ."
                "+eq+"
     }
-    { $example "USING: calendar math.order prettyprint ;"
-               "2010 1 1 <date> 3 days time+ days>> ."
+    { $example "USING: accessors calendar math.order prettyprint ;"
+               "2010 1 1 <date> 3 days time+ day>> ."
                "4"
     }
 } ;
