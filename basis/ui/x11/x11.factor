@@ -69,7 +69,7 @@ M: world configure-event
 
 : key-down-event>gesture ( event world -- string gesture )
     dupd
-    world-handle x11-handle-xic lookup-string
+    handle>> x11-handle-xic lookup-string
     >r swap event-modifiers r> key-code <key-down> ;
 
 M: world key-down-event
@@ -116,14 +116,14 @@ M: world motion-event
 
 M: world focus-in-event
     nip
-    dup world-handle x11-handle-xic XSetICFocus focus-world ;
+    dup handle>> x11-handle-xic XSetICFocus focus-world ;
 
 M: world focus-out-event
     nip
-    dup world-handle x11-handle-xic XUnsetICFocus unfocus-world ;
+    dup handle>> x11-handle-xic XUnsetICFocus unfocus-world ;
 
 M: world selection-notify-event
-    [ world-handle x11-handle-window selection-from-event ] keep
+    [ handle>> x11-handle-window selection-from-event ] keep
     world-focus user-input ;
 
 : supported-type? ( atom -- ? )
@@ -173,7 +173,7 @@ M: world client-event
     dup window-loc>> over rect-dim glx-window
     over "Factor" create-xic <x11-handle>
     2dup x11-handle-window register-window
-    swap set-world-handle ;
+    swap (>>handle) ;
 
 : wait-event ( -- event )
     QueuedAfterFlush events-queued 0 > [
@@ -189,14 +189,14 @@ M: x11-ui-backend do-events
 
 : x-clipboard@ ( gadget clipboard -- prop win )
     x-clipboard-atom swap
-    find-world world-handle x11-handle-window ;
+    find-world handle>> x11-handle-window ;
 
 M: x-clipboard copy-clipboard
     [ x-clipboard@ own-selection ] keep
     set-x-clipboard-contents ;
 
 M: x-clipboard paste-clipboard
-    >r find-world world-handle x11-handle-window
+    >r find-world handle>> x11-handle-window
     r> x-clipboard-atom convert-selection ;
 
 : init-clipboard ( -- )
@@ -212,11 +212,11 @@ M: x-clipboard paste-clipboard
     r> utf8 encode dup length XChangeProperty drop ;
 
 M: x11-ui-backend set-title ( string world -- )
-    world-handle x11-handle-window swap dpy get -rot
+    handle>> x11-handle-window swap dpy get -rot
     3dup set-title-old set-title-new ;
     
 M: x11-ui-backend set-fullscreen* ( ? world -- )
-    world-handle x11-handle-window "XClientMessageEvent" <c-object>
+    handle>> x11-handle-window "XClientMessageEvent" <c-object>
     tuck set-XClientMessageEvent-window
     swap _NET_WM_STATE_ADD _NET_WM_STATE_REMOVE ?
     over set-XClientMessageEvent-data0
@@ -230,10 +230,10 @@ M: x11-ui-backend set-fullscreen* ( ? world -- )
 
 M: x11-ui-backend (open-window) ( world -- )
     dup gadget-window
-    world-handle x11-handle-window dup set-closable map-window ;
+    handle>> x11-handle-window dup set-closable map-window ;
 
 M: x11-ui-backend raise-window* ( world -- )
-    world-handle [
+    handle>> [
         dpy get swap x11-handle-window XRaiseWindow drop
     ] when* ;
 

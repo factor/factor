@@ -44,7 +44,7 @@ IN: ui.tools
     dup <toolbar>        f   track-add ;
 
 : resize-workspace ( workspace -- )
-    dup track-sizes over control-value zero? [
+    dup sizes>> over control-value zero? [
         1/5 1 pick set-nth
         4/5 2 rot set-nth
     ] [

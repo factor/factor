@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays ui.commands ui.gadgets ui.gadgets.buttons
+USING: accessors arrays ui.commands ui.gadgets ui.gadgets.buttons
 ui.gadgets.worlds ui.gestures generic hashtables kernel math
 models namespaces opengl sequences math.vectors
 ui.gadgets.theme ui.gadgets.packs ui.gadgets.borders colors
@@ -20,14 +20,14 @@ TUPLE: menu-glass < gadget ;
 M: menu-glass layout* gadget-child prefer ;
 
 : hide-glass ( world -- )
-    dup world-glass [ unparent ] when*
-    f swap set-world-glass ;
+    dup glass>> [ unparent ] when*
+    f swap (>>glass) ;
 
 : show-glass ( gadget world -- )
     over hand-clicked set-global
     [ hide-glass ] keep
     [ swap add-gadget drop ] 2keep
-    set-world-glass ;
+    (>>glass) ;
 
 : show-menu ( gadget owner -- )
     find-world [ <menu-glass> ] keep show-glass ;

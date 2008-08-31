@@ -28,7 +28,7 @@ TUPLE: slider < frame elevator thumb saved line ;
 : thumb-dim ( slider -- h )
     dup slider-page over slider-max 1 max / 1 min
     over elevator-length * min-thumb-dim max
-    over slider-elevator rect-dim
+    over elevator>> rect-dim
     rot orientation>> v. min ;
 
 : slider-scale ( slider -- n )
@@ -41,16 +41,16 @@ TUPLE: slider < frame elevator thumb saved line ;
 : slider>screen ( m scale -- n ) slider-scale * ;
 : screen>slider ( m scale -- n ) slider-scale / ;
 
-M: slider model-changed nip slider-elevator relayout-1 ;
+M: slider model-changed nip elevator>> relayout-1 ;
 
 TUPLE: thumb < gadget ;
 
 : begin-drag ( thumb -- )
-    find-slider dup slider-value swap set-slider-saved ;
+    find-slider dup slider-value swap (>>saved) ;
 
 : do-drag ( thumb -- )
     find-slider drag-loc over orientation>> v.
-    over screen>slider swap [ slider-saved + ] keep
+    over screen>slider swap [ saved>> + ] keep
     model>> set-range-value ;
 
 thumb H{
@@ -80,10 +80,10 @@ thumb H{
     swap slider-value - sgn ;
 
 : elevator-hold ( elevator -- )
-    dup elevator-direction swap find-slider slide-by-page ;
+    dup direction>> swap find-slider slide-by-page ;
 
 : elevator-click ( elevator -- )
-    dup compute-direction over set-elevator-direction
+    dup compute-direction over (>>direction)
     elevator-hold ;
 
 elevator H{
@@ -97,7 +97,7 @@ elevator H{
     lowered-gradient >>interior ;
 
 : (layout-thumb) ( slider n -- n thumb )
-    over orientation>> n*v swap slider-thumb ;
+    over orientation>> n*v swap thumb>> ;
 
 : thumb-loc ( slider -- loc )
     dup slider-value swap slider>screen ;
@@ -118,8 +118,7 @@ elevator H{
 M: elevator layout*
     find-slider layout-thumb ;
 
-: slide-by-line ( amount slider -- )
-    [ slider-line * ] keep slide-by ;
+: slide-by-line ( amount slider -- ) [ line>> * ] keep slide-by ;
 
 : <slide-button> ( vector polygon amount -- button )
     >r gray swap <polygon-gadget> r>

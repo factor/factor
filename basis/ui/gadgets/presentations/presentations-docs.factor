@@ -10,23 +10,23 @@ $nl
 $nl
 "Presentations have two slots:"
 { $list
-    { { $link presentation-object } " - the object being presented." }
-    { { $link presentation-hook } " - a quotation with stack effect " { $snippet "( presentation -- )" } ". The default value is " { $snippet "[ drop ]" } "." }
+    { { $snippet "object" } " - the object being presented." }
+    { { $snippet "hook" } " - a quotation with stack effect " { $snippet "( presentation -- )" } ". The default value is " { $snippet "[ drop ]" } "." }
 } } ;
 
 HELP: invoke-presentation
 { $values { "presentation" presentation } { "command" "a command" } }
-{ $description "Calls the " { $link presentation-hook } " and then invokes the command on the " { $link presentation-object } "." } ;
+{ $description "Calls the " { $snippet "hook" } " and then invokes the command on the " { $snippet "object" } "." } ;
 
 { invoke-presentation invoke-primary invoke-secondary } related-words
 
 HELP: invoke-primary
 { $values { "presentation" presentation } } 
-{ $description "Invokes the " { $link primary-operation } " associated to the " { $link presentation-object } ". This word is executed when the presentation is clicked with the left mouse button." } ;
+{ $description "Invokes the " { $link primary-operation } " associated to the " { $snippet "object" } ". This word is executed when the presentation is clicked with the left mouse button." } ;
 
 HELP: invoke-secondary
 { $values { "presentation" presentation } } 
-{ $description "Invokes the " { $link secondary-operation } " associated to the " { $link presentation-object } ". This word is executed when a list receives a " { $snippet "RET" } " key press." } ;
+{ $description "Invokes the " { $link secondary-operation } " associated to the " { $snippet "object" } ". This word is executed when a list receives a " { $snippet "RET" } " key press." } ;
 
 HELP: <presentation>
 { $values { "label" "a label" } { "object" object } { "button" "a new " { $link button } } }
@@ -41,7 +41,7 @@ HELP: <presentation>
 
 HELP: show-mouse-help
 { $values { "presentation" presentation } }
-{ $description "Displays a " { $link summary } " of the " { $link presentation-object } "in the status bar of the " { $link world } " containing this presentation. This word is executed when the mouse enters the presentation." } ;
+{ $description "Displays a " { $link summary } " of the " { $snippet "object" } "in the status bar of the " { $link world } " containing this presentation. This word is executed when the mouse enters the presentation." } ;
 
 ARTICLE: "ui.gadgets.presentations" "Presentation gadgets"
 "Outliner gadgets are usually not constructed directly, and instead are written to " { $link "ui.gadgets.panes" } " with formatted stream output words (" { $link "presentations" } ")."

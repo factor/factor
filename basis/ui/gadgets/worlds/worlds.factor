@@ -30,7 +30,7 @@ M: f world-status ;
 
 M: world request-focus-on ( child gadget -- )
     2dup eq?
-    [ 2drop ] [ dup world-focused? (request-focus) ] if ;
+    [ 2drop ] [ dup focused?>> (request-focus) ] if ;
 
 : <world> ( gadget title status -- world )
     { 0 1 } world new-track
@@ -45,7 +45,7 @@ M: world request-focus-on ( child gadget -- )
 
 M: world layout*
     dup call-next-method
-    dup world-glass [
+    dup glass>> [
         >r dup rect-dim r> (>>dim)
     ] when* drop ;
 
@@ -54,15 +54,15 @@ M: world focusable-child* gadget-child ;
 M: world children-on nip children>> ;
 
 : (draw-world) ( world -- )
-    dup world-handle [
+    dup handle>> [
         [ dup init-gl ] keep draw-gadget
     ] with-gl-context ;
 
 : draw-world? ( world -- ? )
     #! We don't draw deactivated worlds, or those with 0 size.
     #! On Windows, the latter case results in GL errors.
-    dup world-active?
-    over world-handle
+    dup active?>>
+    over handle>>
     rot rect-dim [ 0 > ] all? and and ;
 
 TUPLE: world-error error world ;
@@ -83,7 +83,7 @@ SYMBOL: ui-error-hook
                 (draw-world)
             ] [
                 over <world-error> ui-error
-                f swap set-world-active?
+                f swap (>>active?)
             ] recover
         ] with-variable
     ] [

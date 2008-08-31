@@ -18,7 +18,7 @@ TUPLE: paragraph < gadget margin ;
 : <paragraph> ( margin -- gadget )
     paragraph new-gadget
     { 1 0 } over (>>orientation)
-    [ set-paragraph-margin ] keep ;
+    [ (>>margin) ] keep ;
 
 SYMBOL: x SYMBOL: max-x
 
@@ -56,7 +56,7 @@ SYMBOL: margin
 : wrap-dim ( -- dim ) max-x get max-y get 2array ;
 
 : init-wrap ( paragraph -- )
-    paragraph-margin margin set
+    margin>> margin set
     { x max-x y max-y line-height } zero-vars ;
 
 : do-wrap ( paragraph quot -- dim )

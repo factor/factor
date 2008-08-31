@@ -11,19 +11,19 @@ IN: ui.gadgets.presentations
 TUPLE: presentation < button object hook ;
 
 : invoke-presentation ( presentation command -- )
-    over dup presentation-hook call
-    >r presentation-object r> invoke-command ;
+    over dup hook>> call
+    >r object>> r> invoke-command ;
 
 : invoke-primary ( presentation -- )
-    dup presentation-object primary-operation
+    dup object>> primary-operation
     invoke-presentation ;
 
 : invoke-secondary ( presentation -- )
-    dup presentation-object secondary-operation
+    dup object>> secondary-operation
     invoke-presentation ;
 
 : show-mouse-help ( presentation -- )
-    dup presentation-object over show-summary button-update ;
+    dup object>> over show-summary button-update ;
 
 : <presentation> ( label object -- button )
     swap [ invoke-primary ] presentation new-button
@@ -36,8 +36,8 @@ M: presentation ungraft*
     call-next-method ;
 
 : <operations-menu> ( presentation -- menu )
-    dup dup presentation-hook curry
-    swap presentation-object
+    dup dup hook>> curry
+    swap object>>
     dup object-operations <commands-menu> ;
 
 : operations-menu ( presentation -- )
