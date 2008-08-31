@@ -115,10 +115,10 @@ M: object short-section? section-fits? ;
 
 : pprint-section ( section -- )
     dup short-section? [
-        dup section-style [ short-section ] with-style
+        dup style>> [ short-section ] with-style
     ] [
         [ <long-section ]
-        [ dup section-style [ long-section ] with-style ]
+        [ dup style>> [ long-section ] with-style ]
         [ long-section> ]
         tri
     ] if ;

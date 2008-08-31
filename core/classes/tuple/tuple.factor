@@ -227,9 +227,8 @@ M: tuple-class update-class
         2drop
         [
             [ update-tuples-after ]
-            [ +inlined+ changed-definition ]
             [ redefined ]
-            tri
+            bi
         ] each-subclass
     ]
     [ define-new-tuple-class ]
@@ -269,9 +268,6 @@ M: tuple-class define-tuple-class
         [ thrower-effect ]
         tri* define-declared
     ] 3tri ;
-
-M: tuple-class update-generic
-    over new-class? [ 2drop ] [ call-next-method ] if ;
 
 M: tuple-class reset-class
     [

@@ -7,7 +7,7 @@ match quotations concurrency.messaging concurrency.mailboxes
 concurrency.count-downs accessors ;
 IN: concurrency.messaging.tests
 
-[ ] [ my-mailbox mailbox-data clear-deque ] unit-test
+[ ] [ my-mailbox data>> clear-deque ] unit-test
 
 [ "received" ] [ 
     [

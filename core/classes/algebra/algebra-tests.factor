@@ -310,3 +310,8 @@ SINGLETON: sb
 SINGLETON: sc
 
 [ sa ] [ sa { sa sb sc } min-class ] unit-test
+
+[ +lt+ ] [ integer sequence class<=> ] unit-test
+[ +lt+ ] [ sequence object class<=> ] unit-test
+[ +gt+ ] [ object sequence class<=> ] unit-test
+[ +eq+ ] [ integer integer class<=> ] unit-test

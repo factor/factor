@@ -5,6 +5,8 @@ math.partial-dispatch math.intervals math.parser math.order
 layouts words sequences sequences.private arrays assocs classes
 classes.algebra combinators generic.math splitting fry locals
 classes.tuple alien.accessors classes.tuple.private slots.private
+definitions
+stack-checker.state
 compiler.tree.comparisons
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
@@ -280,6 +282,14 @@ generic-comparison-ops [
 ] +constraints+ set-word-prop
 
 \ instance? [
+    ! We need to force the caller word to recompile when the class
+    ! is redefined, since now we're making assumptions but the
+    ! class definition itself.
     dup literal>> class?
-    [ literal>> predicate-output-infos ] [ 2drop object-info ] if
+    [
+        literal>>
+        [ inlined-dependency depends-on ]
+        [ predicate-output-infos ]
+        bi
+    ] [ 2drop object-info ] if
 ] +outputs+ set-word-prop

@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors kernel sequences sequences.private assocs words
 namespaces classes.algebra combinators classes classes.tuple
-classes.tuple.private continuations arrays byte-arrays strings
-math math.partial-dispatch math.private slots generic
+classes.tuple.private continuations arrays
+math math.partial-dispatch math.private slots generic definitions
 generic.standard generic.math
+stack-checker.state
 compiler.tree
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
@@ -32,7 +33,14 @@ M: #push propagate-before
     [ set-value-info ] 2each ;
 
 M: #declare propagate-before
-    declaration>> [ <class-info> swap refine-value-info ] assoc-each ;
+    #! We need to force the caller word to recompile when the
+    #! classes mentioned in the declaration are redefined, since
+    #! now we're making assumptions but their definitions.
+    declaration>> [
+        [ inlined-dependency depends-on ]
+        [ <class-info> swap refine-value-info ]
+        bi
+    ] assoc-each ;
 
 : predicate-constraints ( value class boolean-value -- constraint )
     [ [ is-instance-of ] dip t--> ]
@@ -74,7 +82,11 @@ M: #declare propagate-before
     } cond 2nip ;
 
 : propagate-predicate ( #call word -- infos )
-    [ in-d>> first value-info ] [ "predicating" word-prop ] bi*
+    #! We need to force the caller word to recompile when the class
+    #! is redefined, since now we're making assumptions but the
+    #! class definition itself.
+    [ in-d>> first value-info ]
+    [ "predicating" word-prop dup inlined-dependency depends-on ] bi*
     predicate-output-infos 1array ;
 
 : default-output-value-infos ( #call word -- infos )

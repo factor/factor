@@ -1,17 +1,38 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 IN: definitions
-USING: kernel sequences namespaces assocs graphs ;
+USING: kernel sequences namespaces assocs graphs math math.order ;
 
 ERROR: no-compilation-unit definition ;
 
+SINGLETON: inlined-dependency
+SINGLETON: flushed-dependency
+SINGLETON: called-dependency
+
+UNION: dependency
+inlined-dependency
+flushed-dependency
+called-dependency ;
+
+M: dependency <=>
+    [
+        {
+            called-dependency
+            flushed-dependency
+            inlined-dependency
+        } index
+    ] bi@ <=> ;
+
 SYMBOL: changed-definitions
 
-SYMBOL: +inlined+
-SYMBOL: +called+
+: changed-definition ( defspec -- )
+    inlined-dependency swap changed-definitions get
+    [ set-at ] [ no-compilation-unit ] if* ;
 
-: changed-definition ( defspec how -- )
-    swap changed-definitions get
+SYMBOL: changed-generics
+
+: changed-generic ( class generic -- )
+    changed-generics get
     [ set-at ] [ no-compilation-unit ] if* ;
 
 SYMBOL: new-classes

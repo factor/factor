@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel continuations assocs namespaces
-sequences words vocabs definitions hashtables init sets ;
+USING: accessors arrays kernel continuations assocs namespaces
+sequences words vocabs definitions hashtables init sets
+math.order classes classes.algebra ;
 IN: compiler.units
 
 SYMBOL: old-definitions
@@ -72,9 +73,51 @@ GENERIC: definitions-changed ( assoc obj -- )
 SYMBOL: outdated-tuples
 SYMBOL: update-tuples-hook
 
+: strongest-dependency ( how1 how2 -- how )
+    [ called-dependency or ] bi@ max ;
+
+: weakest-dependency ( how1 how2 -- how )
+    [ inlined-dependency or ] bi@ min ;
+
+: compiled-usage ( word -- assoc )
+    compiled-crossref get at ;
+
+: (compiled-usages) ( word -- assoc )
+    #! If the word is not flushable anymore, we have to recompile
+    #! all words which flushable away a call (presumably when the
+    #! word was still flushable). If the word is flushable, we
+    #! don't have to recompile words that folded this away.
+    [ compiled-usage ]
+    [ "flushable" word-prop inlined-dependency flushed-dependency ? ] bi
+    [ after=? nip ] curry assoc-filter ;
+
+: compiled-usages ( assoc -- assocs )
+    [ drop word? ] assoc-filter
+    [ [ drop (compiled-usages) ] { } assoc>map ] keep suffix ;
+
+: compiled-generic-usage ( word -- assoc )
+    compiled-generic-crossref get at ;
+
+: (compiled-generic-usages) ( generic class -- assoc )
+    dup class? [
+        [ compiled-generic-usage ] dip
+        [ [ classes-intersect? ] [ null class<= ] bi or nip ]
+        curry assoc-filter
+    ] [ 2drop f ] if ;
+
+: compiled-generic-usages ( assoc -- assocs )
+    [ (compiled-generic-usages) ] { } assoc>map ;
+
+: words-only ( assoc -- assoc' )
+    [ drop word? ] assoc-filter ;
+
+: to-recompile ( -- seq )
+    changed-definitions get compiled-usages
+    changed-generics get compiled-generic-usages
+    append assoc-combine keys ;
+
 : call-recompile-hook ( -- )
-    changed-definitions get [ drop word? ] assoc-filter
-    compiled-usages recompile-hook get call ;
+    to-recompile recompile-hook get call ;
 
 : call-update-tuples-hook ( -- )
     update-tuples-hook get call ;
@@ -93,13 +136,16 @@ SYMBOL: update-tuples-hook
 : with-nested-compilation-unit ( quot -- )
     [
         H{ } clone changed-definitions set
+        H{ } clone changed-generics set
         H{ } clone outdated-tuples set
+        H{ } clone new-classes set
         [ finish-compilation-unit ] [ ] cleanup
     ] with-scope ; inline
 
 : with-compilation-unit ( quot -- )
     [
         H{ } clone changed-definitions set
+        H{ } clone changed-generics set
         H{ } clone forgotten-definitions set
         H{ } clone outdated-tuples set
         H{ } clone new-classes set

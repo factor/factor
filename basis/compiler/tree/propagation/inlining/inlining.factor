@@ -24,18 +24,19 @@ M: quotation splicing-nodes
     body>> (propagate) ;
 
 ! Dispatch elimination
-: eliminate-dispatch ( #call word/quot/f -- ? )
-    [
+: eliminate-dispatch ( #call class/f word/f -- ? )
+    dup [
+        [ >>class ] dip
         over method>> over = [ drop ] [
             2dup splicing-nodes
             [ >>method ] [ >>body ] bi*
         ] if
         propagate-body t
-    ] [ f >>method f >>body drop f ] if* ;
+    ] [ 2drop f >>method f >>body f >>class drop f ] if ;
 
-: inlining-standard-method ( #call word -- method/f )
+: inlining-standard-method ( #call word -- class/f method/f )
     [ in-d>> <reversed> ] [ [ dispatch# ] keep ] bi*
-    [ swap nth value-info class>> ] dip
+    [ swap nth value-info class>> dup ] dip
     specific-method ;
 
 : inline-standard-method ( #call word -- ? )
@@ -51,15 +52,17 @@ M: quotation splicing-nodes
         object
     } [ class<= ] with find nip ;
 
-: inlining-math-method ( #call word -- quot/f )
+: inlining-math-method ( #call word -- class/f quot/f )
     swap in-d>>
     first2 [ value-info class>> normalize-math-class ] bi@
-    3dup math-both-known? [ math-method* ] [ 3drop f ] if ;
+    3dup math-both-known?
+    [ math-method* ] [ 3drop f ] if
+    number swap ;
 
 : inline-math-method ( #call word -- ? )
     dupd inlining-math-method eliminate-dispatch ;
 
-: inlining-math-partial ( #call word -- quot/f )
+: inlining-math-partial ( #call word -- class/f quot/f )
     [ "derived-from" word-prop first inlining-math-method ]
     [ nip 1quotation ] 2bi
     [ = not ] [ drop ] 2bi and ;

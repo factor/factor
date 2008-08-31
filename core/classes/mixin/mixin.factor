@@ -63,8 +63,10 @@ TUPLE: check-mixin-class mixin ;
 
 : remove-mixin-instance ( class mixin -- )
     [
-        [ [ swap remove ] change-mixin-class ] keep
-        update-classes
+        [ class-usages update-methods ]
+        [ [ swap remove ] change-mixin-class ]
+        [ nip update-classes ]
+        2tri
     ] [ 2drop ] if-mixin-member? ;
 
 M: mixin-class class-forgotten remove-mixin-instance ;
