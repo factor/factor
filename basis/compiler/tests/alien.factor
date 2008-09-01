@@ -84,6 +84,13 @@ FUNCTION: tiny ffi_test_17 int x ;
 
 [ 3 ] [ "ffi_test_1" f dlsym indirect-test-1 ] unit-test
 
+: indirect-test-1' ( ptr -- )
+    "int" { } "cdecl" alien-indirect drop ;
+
+{ 1 0 } [ indirect-test-1' ] must-infer-as
+
+[ ] [ "ffi_test_1" f dlsym indirect-test-1' ] unit-test
+
 [ -1 indirect-test-1 ] must-fail
 
 : indirect-test-2 ( x y ptr -- result )
