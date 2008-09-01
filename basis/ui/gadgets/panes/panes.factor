@@ -60,10 +60,10 @@ M: gadget draw-selection ( loc gadget -- )
     swap offset-rect [ rect-extent gl-fill-rect ] if-fits ;
 
 M: node draw-selection ( loc node -- )
-    2dup node-value swap offset-rect [
+    2dup value>> swap offset-rect [
         drop 2dup
-        [ node-value rect-loc v+ ] keep
-        node-children [ draw-selection ] with each
+        [ value>> rect-loc v+ ] keep
+        children>> [ draw-selection ] with each
     ] if-fits 2drop ;
 
 M: pane draw-gadget*
