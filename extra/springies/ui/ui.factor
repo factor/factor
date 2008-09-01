@@ -10,7 +10,7 @@ IN: springies.ui
 : draw-node ( node -- ) pos>> { -5 -5 } v+ dup { 10 10 } v+ gl-rect ;
 
 : draw-spring ( spring -- )
-  [ spring-node-a pos>> ] [ spring-node-b pos>> ] bi gl-line ;
+  [ node-a>> pos>> ] [ node-b>> pos>> ] bi gl-line ;
 
 : draw-nodes ( -- ) nodes> [ draw-node ] each ;
 

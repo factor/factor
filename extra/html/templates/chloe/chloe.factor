@@ -22,10 +22,10 @@ C: <chloe> chloe
 DEFER: process-template
 
 : chloe-attrs-only ( assoc -- assoc' )
-    [ drop name-url chloe-ns = ] assoc-filter ;
+    [ drop url>> chloe-ns = ] assoc-filter ;
 
 : non-chloe-attrs-only ( assoc -- assoc' )
-    [ drop name-url chloe-ns = not ] assoc-filter ;
+    [ drop url>> chloe-ns = not ] assoc-filter ;
 
 : chloe-tag? ( tag -- ? )
     dup xml? [ body>> ] when
@@ -148,10 +148,10 @@ CHLOE-TUPLE: code
             process-template
         ] [
             {
-                [ xml-prolog write-prolog ]
-                [ xml-before write-chunk  ]
+                [ prolog>> write-prolog ]
+                [ before>> write-chunk  ]
                 [ process-template        ]
-                [ xml-after write-chunk   ]
+                [ after>> write-chunk   ]
             } cleave
         ] if
     ] with-scope ;
