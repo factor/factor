@@ -24,10 +24,10 @@ TUPLE: pasteboard handle ;
 C: <pasteboard> pasteboard
 
 M: pasteboard clipboard-contents
-    pasteboard-handle pasteboard-string ;
+    handle>> pasteboard-string ;
 
 M: pasteboard set-clipboard-contents
-    pasteboard-handle set-pasteboard-string ;
+    handle>> set-pasteboard-string ;
 
 : init-clipboard ( -- )
     NSPasteboard -> generalPasteboard <pasteboard>
@@ -47,26 +47,26 @@ M: pasteboard set-clipboard-contents
     ] keep set-world-handle ;
 
 M: cocoa-ui-backend set-title ( string world -- )
-    world-handle handle-window swap <NSString> -> setTitle: ;
+    world-handle window>> swap <NSString> -> setTitle: ;
 
 : enter-fullscreen ( world -- )
-    world-handle handle-view
+    world-handle view>>
     NSScreen -> mainScreen
     f -> enterFullScreenMode:withOptions:
     drop ;
 
 : exit-fullscreen ( world -- )
-    world-handle handle-view f -> exitFullScreenModeWithOptions: ;
+    world-handle view>> f -> exitFullScreenModeWithOptions: ;
 
 M: cocoa-ui-backend set-fullscreen* ( ? world -- )
     swap [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
 M: cocoa-ui-backend fullscreen* ( world -- ? )
-    world-handle handle-view -> isInFullScreenMode zero? not ;
+    world-handle view>> -> isInFullScreenMode zero? not ;
 
 : auto-position ( world -- )
     dup window-loc>> { 0 0 } = [
-        world-handle handle-window -> center
+        world-handle window>> -> center
     ] [
         drop
     ] if ;
@@ -74,29 +74,29 @@ M: cocoa-ui-backend fullscreen* ( world -- ? )
 M: cocoa-ui-backend (open-window) ( world -- )
     dup gadget-window
     dup auto-position
-    world-handle handle-window f -> makeKeyAndOrderFront: ;
+    world-handle window>> f -> makeKeyAndOrderFront: ;
 
 M: cocoa-ui-backend (close-window) ( handle -- )
-    handle-window -> release ;
+    window>> -> release ;
 
 M: cocoa-ui-backend close-window ( gadget -- )
     find-world [
         world-handle [
-            handle-window f -> performClose:
+            window>> f -> performClose:
         ] when*
     ] when* ;
 
 M: cocoa-ui-backend raise-window* ( world -- )
     world-handle [
-        handle-window dup f -> orderFront: -> makeKeyWindow
+        window>> dup f -> orderFront: -> makeKeyWindow
         NSApp 1 -> activateIgnoringOtherApps:
     ] when* ;
 
 M: cocoa-ui-backend select-gl-context ( handle -- )
-    handle-view -> openGLContext -> makeCurrentContext ;
+    view>> -> openGLContext -> makeCurrentContext ;
 
 M: cocoa-ui-backend flush-gl-context ( handle -- )
-    handle-view -> openGLContext -> flushBuffer ;
+    view>> -> openGLContext -> flushBuffer ;
 
 M: cocoa-ui-backend beep ( -- )
     NSBeep ;
