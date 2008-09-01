@@ -81,11 +81,19 @@ M: #alien-indirect compute-live-values* nip look-at-inputs ;
         drop-values
     ] ;
 
-: drop-dead-outputs ( node -- nodes )
+: drop-dead-outputs ( node -- #shuffle )
     dup out-d>> drop-dead-values tuck in-d>> >>out-d drop ;
 
+: some-outputs-dead? ( #call -- ? )
+    out-d>> [ live-value? not ] contains? ;
+
+: maybe-drop-dead-outputs ( node -- nodes )
+    dup some-outputs-dead? [
+        dup drop-dead-outputs 2array
+    ] when ;
+
 M: #introduce remove-dead-code* ( #introduce -- nodes )
-    dup drop-dead-outputs 2array ;
+    maybe-drop-dead-outputs ;
 
 M: #>r remove-dead-code*
     [ filter-live ] change-out-r
@@ -110,17 +118,9 @@ M: #push remove-dead-code*
     [ in-d>> #drop remove-dead-code* ]
     bi ;
 
-: some-outputs-dead? ( #call -- ? )
-    out-d>> [ live-value? not ] contains? ;
-
 M: #call remove-dead-code*
-    dup dead-flushable-call? [
-        remove-flushable-call
-    ] [
-        dup some-outputs-dead? [
-            dup drop-dead-outputs 2array
-        ] when
-    ] if ;
+    dup dead-flushable-call?
+    [ remove-flushable-call ] [ maybe-drop-dead-outputs ] if ;
 
 M: #shuffle remove-dead-code*
     [ filter-live ] change-in-d
@@ -136,3 +136,9 @@ M: #copy remove-dead-code*
 M: #terminate remove-dead-code*
     [ filter-live ] change-in-d
     [ filter-live ] change-in-r ;
+
+M: #alien-invoke remove-dead-code*
+    maybe-drop-dead-outputs ;
+
+M: #alien-indirect remove-dead-code*
+    maybe-drop-dead-outputs ;

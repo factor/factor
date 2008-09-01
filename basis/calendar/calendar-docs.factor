@@ -184,7 +184,7 @@ HELP: time+
 { $description "Adds two durations to produce a duration or adds a timestamp and a duration to produce a timestamp. The calculation takes timezones into account." }
 { $examples
     { $example "USING: calendar math.order prettyprint ;"
-               "10 months 2 months time+ 1 year <=> ."
+               "10 months 2 months time+ 1 years <=> ."
                "+eq+"
     }
     { $example "USING: accessors calendar math.order prettyprint ;"
@@ -193,3 +193,109 @@ HELP: time+
     }
 } ;
 
+HELP: dt>years
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in years." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "6 months dt>years ."
+               "1/2"
+    }
+} ;
+
+HELP: dt>months
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in months." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "30 days dt>months ."
+               "16000/16233"
+    }
+} ;
+
+HELP: dt>days
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in days." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "6 hours dt>days ."
+               "1/4"
+    }
+} ;
+
+HELP: dt>hours
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in hours." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "3/4 days dt>hours ."
+               "18"
+    }
+} ;
+HELP: dt>minutes
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in minutes." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "6 hours dt>minutes ."
+               "360"
+    }
+} ;
+HELP: dt>seconds
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in seconds." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "6 minutes dt>seconds ."
+               "360"
+    }
+} ;
+
+HELP: dt>milliseconds
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in milliseconds." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "6 seconds dt>milliseconds ."
+               "6000"
+    }
+} ;
+
+{ dt>years dt>months dt>days dt>hours dt>minutes dt>seconds dt>milliseconds } related-words
+
+
+HELP: time-
+{ $values { "time1" "timestamp or duration" } { "time2" "timestamp or duration" } { "time3" "timestamp or duration" } }
+{ $description "Subtracts two durations to produce a duration or subtracts a duration from a timestamp to produce a timestamp. The calculation takes timezones into account." }
+{ $examples
+    { $example "USING: calendar math.order prettyprint ;"
+               "10 months 2 months time- 8 months <=> ."
+               "+eq+"
+    }
+    { $example "USING: accessors calendar math.order prettyprint ;"
+               "2010 1 1 <date> 3 days time- day>> ."
+               "29"
+    }
+} ;
+
+{ time+ time- } related-words
+
+HELP: convert-timezone
+{ $values { "timestamp" timestamp } { "duration" duration } { "timestamp" timestamp } }
+{ $description "Converts the " { $snippet "timestamp" } "'s " { $snippet "gmt-offset" } " to the GMT offset represented by the " { $snippet "duration" } "." }
+{ $examples
+    { $example "USING: accessors calendar prettyprint ;"
+               "gmt noon instant -5 >>hour convert-timezone gmt-offset>> hour>> ."
+               "-5"
+    }
+} ;
+
+HELP: >local-time
+{ $values { "timestamp" timestamp } { "timestamp" timestamp } }
+{ $description "Converts the " { $snippet "timestamp" } " to the timezone of your computer." }
+{ $examples
+    { $example "USING: accessors calendar kernel prettyprint ;"
+               "now gmt >local-time [ gmt-offset>> ] bi@ = ."
+               "t"
+    }
+} ;

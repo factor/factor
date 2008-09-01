@@ -54,7 +54,7 @@ IN: ui.tools
 
 M: workspace model-changed
     nip
-    dup workspace-listener listener-gadget-output scroll>bottom
+    dup listener>> output>> scroll>bottom
     dup resize-workspace
     request-focus ;
 

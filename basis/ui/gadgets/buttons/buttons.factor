@@ -67,9 +67,12 @@ M: button-paint draw-interior
 M: button-paint draw-boundary
     button-paint draw-boundary ;
 
+: align-left ( button -- button )
+    { 0 1/2 } >>align ; inline
+
 : roll-button-theme ( button -- button )
     f black <solid> dup f <button-paint> >>boundary
-    { 0 1/2 } >>align ; inline
+    align-left ; inline
 
 : <roll-button> ( label quot -- button )
     <button> roll-button-theme ;
@@ -141,7 +144,8 @@ TUPLE: checkbox < button ;
     <checkmark> label-on-right checkbox-theme
     [ model>> toggle-model ]
     checkbox new-button
-        swap >>model ;
+        swap >>model
+        align-left ;
 
 M: checkbox model-changed
     swap model-value over (>>selected?) relayout-1 ;
@@ -179,7 +183,8 @@ TUPLE: radio-control < button value ;
     [ [ value>> ] keep set-control-value ]
     radio-control new-button
         swap >>model
-        swap >>value ; inline
+        swap >>value
+        align-left ; inline
 
 M: radio-control model-changed
     swap model-value

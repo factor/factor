@@ -76,7 +76,7 @@ M: interactor model-changed
     ] with-output-stream* ;
 
 : add-interactor-history ( str interactor -- )
-    over empty? [ 2drop ] [ interactor-history adjoin ] if ;
+    over empty? [ 2drop ] [ history>> adjoin ] if ;
 
 : interactor-continue ( obj interactor -- )
     mailbox>> mailbox-put ;
