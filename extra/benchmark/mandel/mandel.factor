@@ -1,69 +1,45 @@
-USING: arrays io kernel math math.order namespaces sequences
-       byte-arrays byte-vectors math.functions math.parser io.files
-       colors.hsv io.encodings.binary ;
-
+USING: arrays io kernel math math.functions math.order
+math.parser sequences locals byte-arrays byte-vectors io.files
+io.encodings.binary benchmark.mandel.params
+benchmark.mandel.colors ;
 IN: benchmark.mandel
 
-: max-color 360   ; inline
-: zoom-fact 0.8   ; inline
-: width     640   ; inline
-: height    480   ; inline
-: nb-iter   40    ; inline
-: center    -0.65 ; inline
-
-: scale 255 * >fixnum ; inline
-
-: scale-rgb ( r g b -- n ) [ scale ] tri@ 3array ;
-
-: sat 0.85 ; inline
-: val 0.85 ; inline
-
-: <color-map> ( nb-cols -- map )
-    dup [
-        360 * swap 1+ / sat val
-        3array hsv>rgb first3 scale-rgb
-    ] with map ;
-
 : iter ( c z nb-iter -- x )
-    over absq 4.0 >= over zero? or
-    [ 2nip ] [ 1- >r sq dupd + r> iter ] if ; inline recursive
-
-SYMBOL: cols
+    dup 0 <= [ 2nip ] [
+        over absq 4.0 >= [ 2nip ] [
+            >r sq dupd + r> 1- iter
+        ] if
+    ] if ; inline recursive
 
 : x-inc width  200000 zoom-fact * / ; inline
 : y-inc height 150000 zoom-fact * / ; inline
 
 : c ( i j -- c )
-    >r
-    x-inc * center real-part x-inc width 2 / * - + >float
-    r>
-    y-inc * center imaginary-part y-inc height 2 / * - + >float
+    [ x-inc * center real-part x-inc width 2 / * - + >float ]
+    [ y-inc * center imaginary-part y-inc height 2 / * - + >float ] bi*
     rect> ; inline
 
-: render ( -- )
+:: render ( accum -- )
     height [
         width swap [
-            c 0 nb-iter iter dup zero? [
-                drop "\0\0\0"
-            ] [
-                cols get [ length mod ] keep nth
-            ] if %
+            c C{ 0.0 0.0 } nb-iter iter dup zero?
+            [ drop B{ 0 0 0 } ] [ color-map [ length mod ] keep nth ] if
+            accum push-all
         ] curry each
-    ] each ;
+    ] each ; inline
 
-: ppm-header ( w h -- )
-    "P6\n" % swap # " " % # "\n255\n" % ;
+:: ppm-header ( accum -- )
+    "P6\n" accum push-all
+    width number>string accum push-all
+    " " accum push-all
+    height number>string accum push-all
+    "\n255\n" accum push-all ; inline
 
-: buf-size ( -- n ) width height * 3 * 100 + ;
+: buf-size ( -- n ) width height * 3 * 100 + ; inline
 
 : mandel ( -- data )
-    [
-        buf-size <byte-vector> building set
-        width height ppm-header
-        nb-iter max-color min <color-map> cols set
-        render
-        building get >byte-array
-    ] with-scope ;
+    buf-size <byte-vector>
+    [ ppm-header ] [ render ] [ B{ } like ] tri ;
 
 : mandel-main ( -- )
     mandel "mandel.ppm" temp-file binary set-file-contents ;
