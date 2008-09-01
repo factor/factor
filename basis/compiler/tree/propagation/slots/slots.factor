@@ -31,12 +31,6 @@ UNION: fixed-length-sequence array byte-array string ;
 : tuple-constructor? ( word -- ? )
     { <tuple-boa> <complex> } memq? ;
 
-: read-only-slots ( values class -- slots )
-    #! Delegation.
-    all-slots rest-slice
-    [ read-only>> [ drop f ] unless ] 2map
-    { f f } prepend ;
-
 : fold-<tuple-boa> ( values class -- info )
     [ , f , [ literal>> ] map % ] { } make >tuple
     <literal-info> ;

@@ -411,6 +411,14 @@ TUPLE: mixed-mutable-immutable { x integer } { y sequence read-only } ;
     ] final-classes
 ] unit-test
 
+[ V{ integer array } ] [
+    [
+        [ 2drop T{ mixed-mutable-immutable f 3 { } } ]
+        [ { array } declare mixed-mutable-immutable boa ] if
+        [ x>> ] [ y>> ] bi
+    ] final-classes
+] unit-test
+
 ! Recursive propagation
 : recursive-test-1 ( a -- b ) recursive-test-1 ; inline recursive
 
@@ -572,6 +580,14 @@ MIXIN: empty-mixin
 [ ] [ [ { empty-mixin } declare empty-mixin? ] final-info drop ] unit-test
 
 [ V{ fixnum } ] [ [ [ bignum-shift drop ] keep ] final-classes ] unit-test
+
+[ V{ float } ] [
+    [
+        [ { float float } declare <complex> ]
+        [ 2drop C{ 0.0 0.0 } ]
+        if real-part
+    ] final-classes
+] unit-test
 
 ! [ V{ string } ] [
 !     [ dup string? t xor [ "A" throw ] [ ] if ] final-classes
