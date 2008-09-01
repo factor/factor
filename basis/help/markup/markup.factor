@@ -143,13 +143,13 @@ M: f print-element drop ;
     link-style get [ write-object ] with-style ;
 
 : ($link) ( article -- )
-    [ dup article-name swap >link write-link ] ($span) ;
+    [ [ article-name ] [ >link ] bi write-link ] ($span) ;
 
 : $link ( element -- )
     first ($link) ;
 
 : ($long-link) ( object -- )
-    dup article-title swap >link write-link ;
+    [ article-title ] [ >link ] bi write-link ;
 
 : ($subsection) ( element quot -- )
     [

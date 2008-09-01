@@ -20,7 +20,7 @@ $nl
 
 HELP: <compose>
 { $values { "models" "a sequence of models" } { "compose" "a new " { $link compose } } }
-{ $description "Creates a new instance of " { $link compose } ". The value of the new compose model is obtained by mapping " { $link model-value } " over the given sequence of models." }
+{ $description "Creates a new instance of " { $link compose } ". The value of the new compose model is obtained by mapping the " { $snippet "value" } " slot accessor over the given sequence of models." }
 { $examples "See the example in the documentation for " { $link compose } "." } ;
 
 ARTICLE: "models-compose" "Composed models"
