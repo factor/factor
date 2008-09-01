@@ -69,7 +69,7 @@ M: world configure-event
 
 : key-down-event>gesture ( event world -- string gesture )
     dupd
-    handle>> x11-handle-xic lookup-string
+    handle>> xic>> lookup-string
     >r swap event-modifiers r> key-code <key-down> ;
 
 M: world key-down-event
@@ -116,14 +116,14 @@ M: world motion-event
 
 M: world focus-in-event
     nip
-    dup handle>> x11-handle-xic XSetICFocus focus-world ;
+    dup handle>> xic>> XSetICFocus focus-world ;
 
 M: world focus-out-event
     nip
-    dup handle>> x11-handle-xic XUnsetICFocus unfocus-world ;
+    dup handle>> xic>> XUnsetICFocus unfocus-world ;
 
 M: world selection-notify-event
-    [ handle>> x11-handle-window selection-from-event ] keep
+    [ handle>> window>> selection-from-event ] keep
     world-focus user-input ;
 
 : supported-type? ( atom -- ? )
@@ -161,9 +161,9 @@ M: world selection-request-event
     } cond ;
 
 M: x11-ui-backend (close-window) ( handle -- )
-    dup x11-handle-xic XDestroyIC
-    dup x11-handle-glx destroy-glx
-    x11-handle-window dup unregister-window
+    dup xic>> XDestroyIC
+    dup glx>> destroy-glx
+    window>> dup unregister-window
     destroy-window ;
 
 M: world client-event
@@ -172,7 +172,7 @@ M: world client-event
 : gadget-window ( world -- )
     dup window-loc>> over rect-dim glx-window
     over "Factor" create-xic <x11-handle>
-    2dup x11-handle-window register-window
+    2dup window>> register-window
     swap (>>handle) ;
 
 : wait-event ( -- event )
@@ -189,14 +189,14 @@ M: x11-ui-backend do-events
 
 : x-clipboard@ ( gadget clipboard -- prop win )
     x-clipboard-atom swap
-    find-world handle>> x11-handle-window ;
+    find-world handle>> window>> ;
 
 M: x-clipboard copy-clipboard
     [ x-clipboard@ own-selection ] keep
     set-x-clipboard-contents ;
 
 M: x-clipboard paste-clipboard
-    >r find-world handle>> x11-handle-window
+    >r find-world handle>> window>>
     r> x-clipboard-atom convert-selection ;
 
 : init-clipboard ( -- )
@@ -212,11 +212,11 @@ M: x-clipboard paste-clipboard
     r> utf8 encode dup length XChangeProperty drop ;
 
 M: x11-ui-backend set-title ( string world -- )
-    handle>> x11-handle-window swap dpy get -rot
+    handle>> window>> swap dpy get -rot
     3dup set-title-old set-title-new ;
     
 M: x11-ui-backend set-fullscreen* ( ? world -- )
-    handle>> x11-handle-window "XClientMessageEvent" <c-object>
+    handle>> window>> "XClientMessageEvent" <c-object>
     tuck set-XClientMessageEvent-window
     swap _NET_WM_STATE_ADD _NET_WM_STATE_REMOVE ?
     over set-XClientMessageEvent-data0
@@ -230,20 +230,20 @@ M: x11-ui-backend set-fullscreen* ( ? world -- )
 
 M: x11-ui-backend (open-window) ( world -- )
     dup gadget-window
-    handle>> x11-handle-window dup set-closable map-window ;
+    handle>> window>> dup set-closable map-window ;
 
 M: x11-ui-backend raise-window* ( world -- )
     handle>> [
-        dpy get swap x11-handle-window XRaiseWindow drop
+        dpy get swap window>> XRaiseWindow drop
     ] when* ;
 
 M: x11-ui-backend select-gl-context ( handle -- )
     dpy get swap
-    dup x11-handle-window swap x11-handle-glx glXMakeCurrent
+    dup window>> swap glx>> glXMakeCurrent
     [ "Failed to set current GLX context" throw ] unless ;
 
 M: x11-ui-backend flush-gl-context ( handle -- )
-    dpy get swap x11-handle-window glXSwapBuffers ;
+    dpy get swap window>> glXSwapBuffers ;
 
 M: x11-ui-backend ui ( -- )
     [

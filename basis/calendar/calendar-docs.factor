@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math strings help.markup help.syntax
-calendar.backend math.order ;
+math.order ;
 IN: calendar
 
 HELP: duration
@@ -278,8 +278,6 @@ HELP: time-
     }
 } ;
 
-{ time+ time- } related-words
-
 HELP: convert-timezone
 { $values { "timestamp" timestamp } { "duration" duration } { "timestamp" timestamp } }
 { $description "Converts the " { $snippet "timestamp" } "'s " { $snippet "gmt-offset" } " to the GMT offset represented by the " { $snippet "duration" } "." }
@@ -299,3 +297,197 @@ HELP: >local-time
                "t"
     }
 } ;
+
+HELP: >gmt
+{ $values { "timestamp" timestamp } { "timestamp" timestamp } }
+{ $description "Converts the " { $snippet "timestamp" } " to the GMT timezone." }
+{ $examples
+    { $example "USING: accessors calendar kernel prettyprint ;"
+               "now >gmt gmt-offset>> hour>> ."
+               "0"
+    }
+} ;
+
+HELP: time*
+{ $values { "obj1" object } { "obj2" object } { "obj3" object } }
+{ $description "Multiplies each time slot of a timestamp or duration by a number and make a new duration from the result.  Used in the implementation of " { $link before } "." } ;
+{ time+ time- time* } related-words
+
+HELP: before
+{ $values { "duration" duration } { "-duration" duration } }
+{ $description "Negates a duration." }
+{ $examples
+    { $example "USING: accessors calendar prettyprint ;"
+               "3 hours before now noon time+ hour>> ."
+               "9"
+    }
+} ;
+
+HELP: <zero>
+{ $values { "timestamp" timestamp } }
+{ $description "Outputs a zero timestamp that consists of zeros for every slot.  Used to see if timestamps are valid." } ;
+
+HELP: valid-timestamp?
+{ $values { "timestamp" timestamp } { "?" "a boolean" } }
+{ $description "Tests if a timestamp is valid or not." } ;
+
+HELP: unix-1970
+{ $values { "timestamp" timestamp } }
+{ $description "Outputs the beginning of UNIX time, or midnight, January 1, 1970." } ;
+
+HELP: millis>timestamp
+{ $values { "x" number } { "timestamp" timestamp } }
+{ $description "Converts a number of milliseconds into a timestamp value in GMT time." }
+{ $examples
+    { $example "USING: accessors calendar prettyprint ;"
+               "1000 millis>timestamp year>> ."
+               "1970"
+    }
+} ;
+
+HELP: gmt
+{ $values { "timestamp" timestamp } }
+{ $description "Outputs the time right now, but in the GMT timezone." } ;
+
+{ gmt now } related-words
+
+HELP: now
+{ $values { "timestamp" timestamp } }
+{ $description "Outputs the time right now in your computer's timezone." }
+{ $examples
+    { $unchecked-example "USING: calendar prettyprint ;"
+        "now ."
+         "T{ timestamp f 2008 9 1 16 38 24+801/1000 T{ duration f 0 0 0 -5 0 0 } }"
+    }
+} ;
+
+HELP: hence
+{ $values { "duration" duration } { "timestamp" timestamp } }
+{ $description "Computes a time in the future that is the " { $snippet "duration" } " added to the result of " { $link now } "." }
+{ $examples
+    { $unchecked-example
+       "USING: calendar prettyprint ;"
+       "10 hours hence ."
+       "T{ timestamp f 2008 9 2 2 47 45+943/1000 T{ duration f 0 0 0 -5 0 0 } }"
+    }
+} ;
+
+HELP: ago
+{ $values { "duration" duration } { "timestamp" timestamp } }
+{ $description "Computes a time in the past that is the " { $snippet "duration" } " subtracted from the result of " { $link now } "." }
+{ $examples
+    { $unchecked-example
+       "USING: calendar prettyprint ;"
+       "3 weeks ago ."
+       "T{ timestamp f 2008 8 11 16 49 52+99/500 T{ duration f 0 0 0 -5 0 0 } }"
+    }
+} ;
+
+HELP: zeller-congruence
+{ $values { "year" integer } { "month" integer } { "day" integer } { "n" integer } }
+{ $description "An implementation of an algorithm that computes the day of the week given a date. Days are indexed starting from Sunday, which is index 0." }
+{ $notes "User code should use the " { $link day-of-week } " word, which takes a " { $snippet "timestamp" } " instead of integers." } ;
+
+HELP: days-in-year
+{ $values { "obj" "a timestamp or an integer" } { "n" integer } } 
+{ $description "Calculates the number of days in a given year." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "2004 days-in-year ."
+               "366"
+    }
+} ;
+
+HELP: days-in-month
+{ $values { "timestamp" timestamp } { "n" integer } }
+{ $description "Calculates the number of days in a given month." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "2008 8 24 <date> days-in-month ."
+               "31"
+    }
+} ;
+
+HELP: day-of-week
+{ $values { "timestamp" timestamp } { "n" integer } }
+{ $description "Calculates the index of the day of the week. Sunday will result in an index of 0." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "now sunday day-of-week ."
+               "0"
+    }
+} ;
+
+HELP: day-of-year
+{ $values { "timestamp" timestamp } { "n" integer } }
+{ $description "Calculates the day of the year, resulting in a number from 1 to 366 (leap years)." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "2008 1 4 <date> day-of-year ."
+               "4"
+    }
+} ;
+
+HELP: day-this-week
+{ $values { "timestamp" timestamp } { "n" integer } { "timestamp" timestamp } } 
+{ $description "Implementation word to calculate the day of the week relative to the timestamp. Sunday is the first day of the week, so the resulting " { $snippet "timestamp" } " will be Sunday or after, and before Saturday." }
+{ $examples
+    { $example "USING: calendar kernel prettyprint ;"
+               "now 0 day-this-week now sunday = ."
+               "t"
+    }
+} ;
+
+HELP: sunday
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Returns the Sunday from the current week, which starts on a Sunday." } ;
+
+HELP: monday
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Returns the Monday from the current week, which starts on a Sunday." } ;
+
+HELP: tuesday
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Returns the Tuesday from the current week, which starts on a Sunday." } ;
+
+HELP: wednesday
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Returns the Wednesday from the current week, which starts on a Sunday." } ;
+
+HELP: thursday
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Returns the Thursday from the current week, which starts on a Sunday." } ;
+
+HELP: friday
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Returns the Friday from the current week, which starts on a Sunday." } ;
+
+HELP: saturday
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Returns the Saturday from the current week, which starts on a Sunday." } ;
+
+{ sunday monday tuesday wednesday thursday friday saturday } related-words
+
+HELP: midnight
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Returns a timestamp that represents today at midnight, or the beginning of the day." } ;
+
+HELP: noon
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Returns a timestamp that represents today at noon, or the middle of the day." } ;
+
+HELP: beginning-of-month
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Outputs a timestamp with the day set to one." } ;
+
+HELP: beginning-of-week
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Outputs a timestamp where the day of the week is Sunday." } ;
+
+HELP: beginning-of-year
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Outputs a timestamp with the month and day set to one, or January 1 of the input timestamp." } ;
+
+HELP: time-since-midnight
+{ $values { "timestamp" timestamp } { "duration" duration } }
+{ $description "Calculates a " { $snippet "duration" } " that represents the elapsed time since midnight of the input " { $snippet "timestamp" } "." } ;

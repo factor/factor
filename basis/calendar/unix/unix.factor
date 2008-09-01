@@ -1,5 +1,5 @@
-USING: alien alien.c-types arrays calendar.backend
-kernel structs math unix.time namespaces system ;
+USING: alien alien.c-types arrays calendar kernel structs
+math unix.time namespaces system ;
 IN: calendar.unix
 
 : get-time ( -- alien )

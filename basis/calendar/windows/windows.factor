@@ -1,5 +1,5 @@
-USING: calendar.backend namespaces alien.c-types system
-windows windows.kernel32 kernel math combinators ;
+USING: calendar namespaces alien.c-types system windows
+windows.kernel32 kernel math combinators ;
 IN: calendar.windows
 
 M: windows gmt-offset ( -- hours minutes seconds )

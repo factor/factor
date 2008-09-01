@@ -1,10 +1,12 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math math.functions namespaces sequences
-strings system vocabs.loader calendar.backend threads
-accessors combinators locals classes.tuple math.order
-memoize summary combinators.short-circuit ;
+strings system vocabs.loader threads accessors combinators
+locals classes.tuple math.order summary
+combinators.short-circuit ;
 IN: calendar
+
+HOOK: gmt-offset os ( -- hours minutes seconds )
 
 TUPLE: duration
     { year real }
@@ -304,17 +306,17 @@ M: timestamp time-
 M: duration time-
     before time+ ;
 
-MEMO: <zero> ( -- timestamp )
-0 0 0 0 0 0 instant <timestamp> ;
+: <zero> ( -- timestamp )
+    0 0 0 0 0 0 instant <timestamp> ;
 
 : valid-timestamp? ( timestamp -- ? )
     clone instant >>gmt-offset
     dup <zero> time- <zero> time+ = ;
 
-MEMO: unix-1970 ( -- timestamp )
+: unix-1970 ( -- timestamp )
     1970 1 1 0 0 0 instant <timestamp> ;
 
-: millis>timestamp ( n -- timestamp )
+: millis>timestamp ( x -- timestamp )
     >r unix-1970 r> milliseconds time+ ;
 
 : timestamp>millis ( timestamp -- n )
@@ -368,13 +370,13 @@ M: timestamp days-in-year ( timestamp -- n ) year>> days-in-year ;
 : day-this-week ( timestamp n -- timestamp )
     day-offset days time+ ;
 
-: sunday ( timestamp -- timestamp ) 0 day-this-week ;
-: monday ( timestamp -- timestamp ) 1 day-this-week ;
-: tuesday ( timestamp -- timestamp ) 2 day-this-week ;
-: wednesday ( timestamp -- timestamp ) 3 day-this-week ;
-: thursday ( timestamp -- timestamp ) 4 day-this-week ;
-: friday ( timestamp -- timestamp ) 5 day-this-week ;
-: saturday ( timestamp -- timestamp ) 6 day-this-week ;
+: sunday ( timestamp -- new-timestamp ) 0 day-this-week ;
+: monday ( timestamp -- new-timestamp ) 1 day-this-week ;
+: tuesday ( timestamp -- new-timestamp ) 2 day-this-week ;
+: wednesday ( timestamp -- new-timestamp ) 3 day-this-week ;
+: thursday ( timestamp -- new-timestamp ) 4 day-this-week ;
+: friday ( timestamp -- new-timestamp ) 5 day-this-week ;
+: saturday ( timestamp -- new-timestamp ) 6 day-this-week ;
 
 : midnight ( timestamp -- new-timestamp )
     clone 0 >>hour 0 >>minute 0 >>second ; inline
