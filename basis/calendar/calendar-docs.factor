@@ -250,6 +250,7 @@ HELP: dt>seconds
                "360"
     }
 } ;
+
 HELP: dt>milliseconds
 { $values { "duration" duration } { "x" number } }
 { $description "Calculates the length of a duration in milliseconds." }
@@ -257,5 +258,44 @@ HELP: dt>milliseconds
     { $example "USING: calendar prettyprint ;"
                "6 seconds dt>milliseconds ."
                "6000"
+    }
+} ;
+
+{ dt>years dt>months dt>days dt>hours dt>minutes dt>seconds dt>milliseconds } related-words
+
+
+HELP: time-
+{ $values { "time1" "timestamp or duration" } { "time2" "timestamp or duration" } { "time3" "timestamp or duration" } }
+{ $description "Subtracts two durations to produce a duration or subtracts a duration from a timestamp to produce a timestamp. The calculation takes timezones into account." }
+{ $examples
+    { $example "USING: calendar math.order prettyprint ;"
+               "10 months 2 months time- 8 months <=> ."
+               "+eq+"
+    }
+    { $example "USING: accessors calendar math.order prettyprint ;"
+               "2010 1 1 <date> 3 days time- day>> ."
+               "29"
+    }
+} ;
+
+{ time+ time- } related-words
+
+HELP: convert-timezone
+{ $values { "timestamp" timestamp } { "duration" duration } { "timestamp" timestamp } }
+{ $description "Converts the " { $snippet "timestamp" } "'s " { $snippet "gmt-offset" } " to the GMT offset represented by the " { $snippet "duration" } "." }
+{ $examples
+    { $example "USING: accessors calendar prettyprint ;"
+               "gmt noon instant -5 >>hour convert-timezone gmt-offset>> hour>> ."
+               "-5"
+    }
+} ;
+
+HELP: >local-time
+{ $values { "timestamp" timestamp } { "timestamp" timestamp } }
+{ $description "Converts the " { $snippet "timestamp" } " to the timezone of your computer." }
+{ $examples
+    { $example "USING: accessors calendar kernel prettyprint ;"
+               "now gmt >local-time [ gmt-offset>> ] bi@ = ."
+               "t"
     }
 } ;
