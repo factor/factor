@@ -1,10 +1,12 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math math.functions namespaces sequences
-strings system vocabs.loader calendar.backend threads
-accessors combinators locals classes.tuple math.order
-summary combinators.short-circuit ;
+strings system vocabs.loader threads accessors combinators
+locals classes.tuple math.order summary
+combinators.short-circuit ;
 IN: calendar
+
+HOOK: gmt-offset os ( -- hours minutes seconds )
 
 TUPLE: duration
     { year real }
@@ -305,7 +307,7 @@ M: duration time-
     before time+ ;
 
 : <zero> ( -- timestamp )
-0 0 0 0 0 0 instant <timestamp> ;
+    0 0 0 0 0 0 instant <timestamp> ;
 
 : valid-timestamp? ( timestamp -- ? )
     clone instant >>gmt-offset
