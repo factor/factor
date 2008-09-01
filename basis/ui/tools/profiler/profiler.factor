@@ -14,7 +14,7 @@ TUPLE: profiler-gadget < track pane ;
     dup pane>> <scroller> 1 track-add ;
     
 : with-profiler-pane ( gadget quot -- )
-    >r profiler-gadget-pane r> with-pane ;
+    >r pane>> r> with-pane ;
 
 : com-full-profile ( gadget -- )
     [ profile. ] with-profiler-pane ;

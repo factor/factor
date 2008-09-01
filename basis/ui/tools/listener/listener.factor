@@ -110,7 +110,7 @@ M: engine-word word-completion-string
     ] [ 2drop ] if ;
 
 : insert-word ( word -- )
-    get-workspace workspace-listener input>>
+    get-workspace listener>> input>>
     [ >r word-completion-string r> user-input ]
     [ interactor-use use-if-necessary ]
     2bi ;
@@ -131,10 +131,10 @@ TUPLE: stack-display < track ;
     1 track-add ;
 
 M: stack-display tool-scroller
-    find-workspace workspace-listener tool-scroller ;
+    find-workspace listener>> tool-scroller ;
 
 : ui-listener-hook ( listener -- )
-    >r datastack r> listener-gadget-stack set-model ;
+    >r datastack r> stack>> set-model ;
 
 : ui-error-hook ( error listener -- )
     find-workspace debugger-popup ;
@@ -168,7 +168,7 @@ M: stack-display tool-scroller
     } cleave ;
 
 : init-listener ( listener -- )
-    f <model> swap set-listener-gadget-stack ;
+    f <model> swap (>>stack) ;
 
 : <listener-gadget> ( -- gadget )
   { 0 1 } listener-gadget new-track

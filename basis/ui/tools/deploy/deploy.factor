@@ -65,13 +65,13 @@ TUPLE: deploy-gadget < pack vocab settings ;
     [ deploy-gadget? ] find-parent ;
 
 : find-deploy-vocab ( gadget -- vocab )
-    find-deploy-gadget deploy-gadget-vocab ;
+    find-deploy-gadget vocab>> ;
 
 : find-deploy-config ( gadget -- config )
     find-deploy-vocab deploy-config ;
 
 : find-deploy-settings ( gadget -- settings )
-    find-deploy-gadget deploy-gadget-settings ;
+    find-deploy-gadget settings>> ;
 
 : com-revert ( gadget -- )
     dup find-deploy-config
