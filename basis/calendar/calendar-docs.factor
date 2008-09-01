@@ -278,8 +278,6 @@ HELP: time-
     }
 } ;
 
-{ time+ time- } related-words
-
 HELP: convert-timezone
 { $values { "timestamp" timestamp } { "duration" duration } { "timestamp" timestamp } }
 { $description "Converts the " { $snippet "timestamp" } "'s " { $snippet "gmt-offset" } " to the GMT offset represented by the " { $snippet "duration" } "." }
@@ -297,5 +295,30 @@ HELP: >local-time
     { $example "USING: accessors calendar kernel prettyprint ;"
                "now gmt >local-time [ gmt-offset>> ] bi@ = ."
                "t"
+    }
+} ;
+
+HELP: >gmt
+{ $values { "timestamp" timestamp } { "timestamp" timestamp } }
+{ $description "Converts the " { $snippet "timestamp" } " to the GMT timezone." }
+{ $examples
+    { $example "USING: accessors calendar kernel prettyprint ;"
+               "now >gmt gmt-offset>> hour>> ."
+               "0"
+    }
+} ;
+
+HELP: time*
+{ $values { "obj1" object } { "obj2" object } { "obj3" object } }
+{ $description "Multiplies each time slot of a timestamp or duration by a number and make a new duration from the result.  Used in the implementation of " { $link before } "." } ;
+{ time+ time- time* } related-words
+
+HELP: before
+{ $values { "duration" duration } { "-duration" duration } }
+{ $description "Negates a duration." }
+{ $examples
+    { $example "USING: accessors calendar prettyprint ;"
+               "3 hours before now noon time+ hour>> ."
+               "9"
     }
 } ;

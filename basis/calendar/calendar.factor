@@ -3,7 +3,7 @@
 USING: arrays kernel math math.functions namespaces sequences
 strings system vocabs.loader calendar.backend threads
 accessors combinators locals classes.tuple math.order
-memoize summary combinators.short-circuit ;
+summary combinators.short-circuit ;
 IN: calendar
 
 TUPLE: duration
@@ -304,14 +304,14 @@ M: timestamp time-
 M: duration time-
     before time+ ;
 
-MEMO: <zero> ( -- timestamp )
+: <zero> ( -- timestamp )
 0 0 0 0 0 0 instant <timestamp> ;
 
 : valid-timestamp? ( timestamp -- ? )
     clone instant >>gmt-offset
     dup <zero> time- <zero> time+ = ;
 
-MEMO: unix-1970 ( -- timestamp )
+: unix-1970 ( -- timestamp )
     1970 1 1 0 0 0 instant <timestamp> ;
 
 : millis>timestamp ( n -- timestamp )
