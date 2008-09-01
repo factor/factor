@@ -60,6 +60,8 @@ PRIVATE>
 : month-abbreviation ( n -- string )
     check-month 1- month-abbreviations nth ;
 
+: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 } ; inline
+
 : day-names ( -- array )
     {
         "Sunday" "Monday" "Tuesday" "Wednesday" "Thursday" "Friday" "Saturday"
@@ -116,7 +118,7 @@ PRIVATE>
 : >time< ( timestamp -- hour minute second )
     [ hour>> ] [ minute>> ] [ second>> ] tri ;
 
-MEMO: instant ( -- duration ) 0 0 0 0 0 0 <duration> ;
+: instant ( -- duration ) 0 0 0 0 0 0 <duration> ;
 : years ( x -- duration ) instant clone swap >>year ;
 : months ( x -- duration ) instant clone swap >>month ;
 : days ( x -- duration ) instant clone swap >>day ;
@@ -258,7 +260,7 @@ M: duration <=> [ dt>years ] compare ;
 : dt>seconds ( duration -- x ) dt>years seconds-per-year * ;
 : dt>milliseconds ( duration -- x ) dt>seconds 1000 * ;
 
-GENERIC: time- ( time1 time2 -- time )
+GENERIC: time- ( time1 time2 -- time3 )
 
 : convert-timezone ( timestamp duration -- timestamp )
     over gmt-offset>> over = [ drop ] [
@@ -323,11 +325,8 @@ MEMO: unix-1970 ( -- timestamp )
     unix-1970 millis milliseconds time+ ;
 
 : now ( -- timestamp ) gmt >local-time ;
-
 : hence ( duration -- timestamp ) now swap time+ ;
 : ago ( duration -- timestamp ) now swap time- ;
-
-: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 } ; inline
 
 : zeller-congruence ( year month day -- n )
     #! Zeller Congruence
@@ -394,7 +393,6 @@ M: timestamp days-in-year ( timestamp -- n ) year>> days-in-year ;
 
 : time-since-midnight ( timestamp -- duration )
     dup midnight time- ;
-
 
 M: timestamp sleep-until timestamp>millis sleep-until ;
 

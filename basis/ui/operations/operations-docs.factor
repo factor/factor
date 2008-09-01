@@ -22,11 +22,11 @@ HELP: operation
 $nl
 "Operations have the following slots:"
 { $list
-    { { $link operation-predicate } " - a quotation with stack effect " { $snippet "( obj -- ? )" } }
-    { { $link operation-command } " - a " { $link word } }
-    { { $link operation-translator } " - a quotation with stack effect " { $snippet "( obj -- newobj )" } ", or " { $link f } }
-    { { $link operation-hook } " - a quotation with stack effect " { $snippet "( obj -- newobj )" } ", or " { $link f } }
-    { { $link operation-listener? } " - a boolean" }
+    { { $snippet "predicate" } " - a quotation with stack effect " { $snippet "( obj -- ? )" } }
+    { { $snippet "command" } " - a " { $link word } }
+    { { $snippet "translator" } " - a quotation with stack effect " { $snippet "( obj -- newobj )" } ", or " { $link f } }
+    { { $snippet "hook" } " - a quotation with stack effect " { $snippet "( obj -- newobj )" } ", or " { $link f } }
+    { { $snippet "listener?" } " - a boolean" }
 } } ;
 
 HELP: operation-gesture
@@ -38,7 +38,7 @@ HELP: operations
 
 HELP: object-operations
 { $values { "obj" object } { "operations" "a sequence of " { $link operation } " instances" } }
-{ $description "Outputs a sequence of operations applicable to the given object, by testing each defined operation's " { $link operation-predicate } " quotation in turn." } ;
+{ $description "Outputs a sequence of operations applicable to the given object, by testing each defined operation's " { $snippet "predicate" } " quotation in turn." } ;
 
 HELP: primary-operation
 { $values { "obj" object } { "operation" "an " { $link operation  } " or " { $link f } } }
