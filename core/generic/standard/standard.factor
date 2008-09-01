@@ -26,10 +26,6 @@ ERROR: no-method object generic ;
 : error-method ( word -- quot )
     picker swap [ no-method ] curry append ;
 
-: default-method ( word -- pair )
-    "default-method" word-prop
-    object bootstrap-word swap 2array ;
-
 : push-method ( method specializer atomic assoc -- )
     [
         [ H{ } clone <predicate-dispatch-engine> ] unless*
