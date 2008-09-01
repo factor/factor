@@ -29,7 +29,7 @@ TUPLE: debugger < track restarts ;
         -rot <restart-list> >>restarts
         dup restarts>> rot <debugger-display> <scroller> 1 track-add ;
 
-M: debugger focusable-child* debugger-restarts ;
+M: debugger focusable-child* restarts>> ;
 
 : debugger-window ( error -- )
     #! No restarts for the debugger window

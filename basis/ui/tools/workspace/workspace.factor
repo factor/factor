@@ -29,7 +29,7 @@ M: gadget tool-scroller drop f ;
   book>> children>> [ class eq? ] with find ;
 
 : show-tool ( class workspace -- tool )
-    [ find-tool swap ] keep workspace-book model>>
+    [ find-tool swap ] keep book>> model>>
     set-model ;
 
 : select-tool ( workspace class -- ) swap show-tool drop ;
@@ -81,10 +81,10 @@ SYMBOL: workspace-dim
 M: workspace pref-dim* drop workspace-dim get ;
 
 M: workspace focusable-child*
-    dup workspace-popup [ ] [ workspace-listener ] ?if ;
+    dup popup>> [ ] [ listener>> ] ?if ;
 
 : workspace-page ( workspace -- gadget )
-    workspace-book current-page ;
+    book>> current-page ;
 
 M: workspace tool-scroller ( workspace -- scroller )
     workspace-page tool-scroller ;

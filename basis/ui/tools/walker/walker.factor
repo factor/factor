@@ -84,7 +84,7 @@ walker-gadget "toolbar" f {
 : walker-for-thread? ( thread gadget -- ? )
     {
         { [ dup walker-gadget? not ] [ 2drop f ] }
-        { [ dup walker-gadget-closing? ] [ 2drop f ] }
+        { [ dup closing?>> ] [ 2drop f ] }
         [ thread>> eq? ]
     } cond ;
 
