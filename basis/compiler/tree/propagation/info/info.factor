@@ -12,8 +12,6 @@ IN: compiler.tree.propagation.info
 
 : null-class? ( class -- ? ) null class<= ;
 
-SYMBOL: +interval+
-
 GENERIC: eql? ( obj1 obj2 -- ? )
 M: object eql? eq? ;
 M: fixnum eql? eq? ;
@@ -40,7 +38,7 @@ slots ;
 
 : class-interval ( class -- interval )
     dup real class<=
-    [ +interval+ word-prop [-inf,inf] or ] [ drop f ] if ;
+    [ "interval" word-prop [-inf,inf] or ] [ drop f ] if ;
 
 : interval>literal ( class interval -- literal literal? )
     #! If interval has zero length and the class is sufficiently
@@ -84,7 +82,7 @@ slots ;
     init-value-info ; foldable
 
 : <class-info> ( class -- info )
-    dup word? [ dup +interval+ word-prop ] [ f ] if [-inf,inf] or
+    dup word? [ dup "interval" word-prop ] [ f ] if [-inf,inf] or
     <class/interval-info> ; foldable
 
 : <interval-info> ( interval -- info )

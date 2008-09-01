@@ -6,9 +6,6 @@ compiler.tree.propagation.copy
 compiler.tree.propagation.info ;
 IN: compiler.tree.propagation.nodes
 
-SYMBOL: +constraints+
-SYMBOL: +outputs+
-
 GENERIC: propagate-before ( node -- )
 
 GENERIC: propagate-after ( node -- )

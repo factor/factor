@@ -173,15 +173,13 @@ do-primitive alien-invoke alien-indirect alien-callback
 { call execute dispatch load-locals get-local drop-locals }
 [ t "no-compile" set-word-prop ] each
 
-SYMBOL: +primitive+
-
 : non-inline-word ( word -- )
     dup called-dependency depends-on
     {
         { [ dup "shuffle" word-prop ] [ infer-shuffle-word ] }
         { [ dup "special" word-prop ] [ infer-special ] }
-        { [ dup +primitive+ word-prop ] [ infer-primitive ] }
-        { [ dup +transform-quot+ word-prop ] [ apply-transform ] }
+        { [ dup "primitive" word-prop ] [ infer-primitive ] }
+        { [ dup "transform-quot" word-prop ] [ apply-transform ] }
         { [ dup "macro" word-prop ] [ apply-macro ] }
         { [ dup "cannot-infer" word-prop ] [ cannot-infer-effect ] }
         { [ dup "inferred-effect" word-prop ] [ cached-infer ] }
@@ -190,7 +188,7 @@ SYMBOL: +primitive+
     } cond ;
 
 : define-primitive ( word inputs outputs -- )
-    [ 2drop t +primitive+ set-word-prop ]
+    [ 2drop t "primitive" set-word-prop ]
     [ drop "input-classes" set-word-prop ]
     [ nip "default-output-classes" set-word-prop ]
     3tri ;
@@ -599,8 +597,6 @@ SYMBOL: +primitive+
 \ unset-os-env { string } { } define-primitive
 
 \ (set-os-envs) { array } { } define-primitive
-
-\ do-primitive [ \ do-primitive cannot-infer-effect ] "infer" set-word-prop
 
 \ dll-valid? { object } { object } define-primitive
 
