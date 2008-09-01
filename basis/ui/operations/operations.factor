@@ -19,34 +19,34 @@ TUPLE: operation predicate command translator hook listener? ;
         swap >>predicate ;
 
 PREDICATE: listener-operation < operation
-    dup operation-command listener-command?
-    swap operation-listener? or ;
+    dup command>> listener-command?
+    swap listener?>> or ;
 
 M: operation command-name
-    operation-command command-name ;
+    command>> command-name ;
 
 M: operation command-description
-    operation-command command-description ;
+    command>> command-description ;
 
-M: operation command-word operation-command command-word ;
+M: operation command-word command>> command-word ;
 
 : operation-gesture ( operation -- gesture )
-    operation-command +keyboard+ word-prop ;
+    command>> +keyboard+ word-prop ;
 
 SYMBOL: operations
 
 : object-operations ( obj -- operations )
-    operations get [ operation-predicate call ] with filter ;
+    operations get [ predicate>> call ] with filter ;
 
 : find-operation ( obj quot -- command )
     >r object-operations r> find-last nip ; inline
 
 : primary-operation ( obj -- operation )
-    [ operation-command +primary+ word-prop ] find-operation ;
+    [ command>> +primary+ word-prop ] find-operation ;
 
 : secondary-operation ( obj -- operation )
     dup
-    [ operation-command +secondary+ word-prop ] find-operation
+    [ command>> +secondary+ word-prop ] find-operation
     [ ] [ primary-operation ] ?if ;
 
 : default-flags ( -- assoc )
@@ -59,9 +59,9 @@ SYMBOL: operations
 
 : modify-operation ( hook translator operation -- operation )
     clone
-    tuck set-operation-translator
-    tuck set-operation-hook
-    t over set-operation-listener? ;
+    tuck (>>translator)
+    tuck (>>hook)
+    t over (>>listener?) ;
 
 : modify-operations ( operations hook translator -- operations )
     rot [ >r 2dup r> modify-operation ] map 2nip ;
@@ -76,9 +76,9 @@ SYMBOL: operations
 : operation-quot ( target command -- quot )
     [
         swap literalize ,
-        dup operation-translator %
-        operation-command ,
+        dup translator>> %
+        command>> ,
     ] [ ] make ;
 
 M: operation invoke-command ( target command -- )
-    [ operation-hook call ] keep operation-quot call ;
+    [ hook>> call ] keep operation-quot call ;
