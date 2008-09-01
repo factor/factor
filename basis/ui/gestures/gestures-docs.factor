@@ -30,13 +30,13 @@ HELP: motion
 { $examples { $code "T{ motion }" } } ;
 
 HELP: drag
-{ $class-description "Mouse drag gesture. The " { $link drag-# } " slot is either set to a mouse button number, or " { $link f } " indicating no specific button is expected." } ;
+{ $class-description "Mouse drag gesture. The " { $snippet "#" } " slot is either set to a mouse button number, or " { $link f } " indicating no specific button is expected." } ;
 
 HELP: button-up
 { $class-description "Mouse button up gesture. Instances have two slots:"
     { $list
-        { { $link button-up-mods } " - a sequence of modifiers; see " { $link "keyboard-gestures" } }
-        { { $link button-up-# } " - a mouse button number, or " { $link f } " indicating no specific button is expected" }
+        { { $snippet "mods" } " - a sequence of modifiers; see " { $link "keyboard-gestures" } }
+        { { $snippet "#" } " - a mouse button number, or " { $link f } " indicating no specific button is expected" }
     }
 }
 { $examples { $code "T{ button-up f f 1 }" "T{ button-up }" } } ;
@@ -44,8 +44,8 @@ HELP: button-up
 HELP: button-down
 { $class-description "Mouse button down gesture. Instances have two slots:"
     { $list
-        { { $link button-down-mods } " - a sequence of modifiers; see " { $link "keyboard-gestures" } }
-        { { $link button-down-# } " - a mouse button number, or " { $link f } " indicating no specific button is expected" }
+        { { $snippet "mods" } " - a sequence of modifiers; see " { $link "keyboard-gestures" } }
+        { { $snippet "#" } " - a mouse button number, or " { $link f } " indicating no specific button is expected" }
     }
 }
 { $examples { $code "T{ button-down f f 1 }" "T{ button-down }" } } ;
@@ -109,8 +109,8 @@ HELP: S+
 HELP: key-down
 { $class-description "Key down gesture. Instances have two slots:"
     { $list
-        { { $link key-down-mods } " - a sequence of modifiers; see " { $link "keyboard-gestures" } }
-    { { $link key-down-sym } " - a string denoting the key pressed; see " { $link "keyboard-gestures" } }
+        { { $snippet "mods" } " - a sequence of modifiers; see " { $link "keyboard-gestures" } }
+    { { $snippet "sym" } " - a string denoting the key pressed; see " { $link "keyboard-gestures" } }
     }
 }
 { $examples { $code "T{ key-down f { C+ } \"a\" }" "T{ key-down f f \"TAB\" }" } } ;
@@ -118,8 +118,8 @@ HELP: key-down
 HELP: key-up
 { $class-description "Key up gesture. Instances have two slots:"
     { $list
-        { { $link key-up-mods } " - a sequence of modifiers; see " { $link "keyboard-gestures" } }
-    { { $link key-up-sym } " - a string denoting the key pressed; see " { $link "keyboard-gestures" } }
+        { { $snippet "mods" } " - a sequence of modifiers; see " { $link "keyboard-gestures" } }
+    { { $snippet "sym" } " - a string denoting the key pressed; see " { $link "keyboard-gestures" } }
     }
 }
 { $examples { $code "T{ key-up f { C+ } \"a\" }" "T{ key-up f f \"TAB\" }" } } ;
