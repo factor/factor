@@ -395,7 +395,6 @@ M: timestamp days-in-year ( timestamp -- n ) year>> days-in-year ;
 : time-since-midnight ( timestamp -- duration )
     dup midnight time- ;
 
-
 M: timestamp sleep-until timestamp>millis sleep-until ;
 
 M: duration sleep hence sleep-until ;

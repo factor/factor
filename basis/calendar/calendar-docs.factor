@@ -184,7 +184,7 @@ HELP: time+
 { $description "Adds two durations to produce a duration or adds a timestamp and a duration to produce a timestamp. The calculation takes timezones into account." }
 { $examples
     { $example "USING: calendar math.order prettyprint ;"
-               "10 months 2 months time+ 1 year <=> ."
+               "10 months 2 months time+ 1 years <=> ."
                "+eq+"
     }
     { $example "USING: accessors calendar math.order prettyprint ;"
@@ -193,3 +193,69 @@ HELP: time+
     }
 } ;
 
+HELP: dt>years
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in years." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "6 months dt>years ."
+               "1/2"
+    }
+} ;
+
+HELP: dt>months
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in months." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "30 days dt>months ."
+               "16000/16233"
+    }
+} ;
+
+HELP: dt>days
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in days." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "6 hours dt>days ."
+               "1/4"
+    }
+} ;
+
+HELP: dt>hours
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in hours." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "3/4 days dt>hours ."
+               "18"
+    }
+} ;
+HELP: dt>minutes
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in minutes." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "6 hours dt>minutes ."
+               "360"
+    }
+} ;
+HELP: dt>seconds
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in seconds." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "6 minutes dt>seconds ."
+               "360"
+    }
+} ;
+HELP: dt>milliseconds
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in milliseconds." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "6 seconds dt>milliseconds ."
+               "6000"
+    }
+} ;
