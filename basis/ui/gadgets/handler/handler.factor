@@ -8,4 +8,4 @@ TUPLE: handler < wrapper table ;
 : <handler> ( child -- handler ) handler new-wrapper ;
 
 M: handler handle-gesture ( gesture gadget -- ? )
-   over table>> at dup [ call f ] [ 2drop t ] if ;
+   tuck table>> at dup [ call f ] [ 2drop t ] if ;
