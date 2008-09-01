@@ -514,8 +514,8 @@ IN: cpu.ppc.intrinsics
 ! Alien intrinsics
 : %alien-accessor ( quot -- )
     "offset" operand dup %untag-fixnum
-    "offset" operand dup "alien" operand ADD
-    "value" operand "offset" operand 0 roll call ; inline
+    "scratch" operand "offset" operand "alien" operand ADD
+    "value" operand "scratch" operand 0 roll call ; inline
 
 : alien-integer-get-template
     H{
@@ -539,6 +539,7 @@ IN: cpu.ppc.intrinsics
             { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
+        { +scratch+ { "scratch" } }
         { +clobber+ { "value" "offset" } }
     } ;
 
