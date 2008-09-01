@@ -16,7 +16,7 @@ IN: help.topics.tests
 
 SYMBOL: foo
 
-[ ] [ { "test" "a" } "Test A" { { $subsection foo } } <article> add-article ] unit-test
+[ ] [ "Test A" { { $subsection foo } } <article> { "test" "a" } add-article ] unit-test
 
 ! Test article location recording
 
