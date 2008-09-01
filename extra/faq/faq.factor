@@ -18,15 +18,15 @@ C: <q/a> q/a
 : li>q/a ( li -- q/a )
     [ "br" tag-named*? not ] filter
     [ "strong" tag-named*? ] find-after
-    >r tag-children r> <q/a> ;
+    >r children>> r> <q/a> ;
 
 : q/a>li ( q/a -- li )
     [ question>> "strong" build-tag* f "br" build-tag* 2array ] keep
     answer>> append "li" build-tag* ;
 
 : xml>q/a ( xml -- q/a )
-    [ "question" tag-named tag-children ] keep
-    "answer" tag-named tag-children <q/a> ;
+    [ "question" tag-named children>> ] keep
+    "answer" tag-named children>> <q/a> ;
 
 : q/a>xml ( q/a -- xml )
     [ question>> "question" build-tag* ] keep
@@ -39,7 +39,7 @@ C: <question-list> question-list
 
 : xml>question-list ( list -- question-list )
     [ "title" swap at ] keep
-    tag-children [ tag? ] filter [ xml>q/a ] map
+    children>> [ tag? ] filter [ xml>q/a ] map
     <question-list> ;
 
 : question-list>xml ( question-list -- list )
