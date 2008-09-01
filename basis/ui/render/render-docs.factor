@@ -38,16 +38,16 @@ HELP: draw-boundary
 { $contract "Draws the boundary of a gadget by making OpenGL calls. The " { $snippet "boundary" } " slot may be set to objects implementing this generic word." } ;
 
 HELP: solid
-{ $class-description "A class implementing the " { $link draw-boundary } " and " { $link draw-interior } " generic words to draw a solid outline or a solid fill, respectively. The " { $link solid-color } " slot stores a color specifier." } ;
+{ $class-description "A class implementing the " { $link draw-boundary } " and " { $link draw-interior } " generic words to draw a solid outline or a solid fill, respectively. The " { $snippet "color" } " slot stores a color specifier." } ;
 
 HELP: gradient
-{ $class-description "A class implementing the " { $link draw-interior } " generic word to draw a smoothly shaded transition between colors. The " { $link gradient-colors } " slot stores a sequence of color specifiers and the gradient is drawn in the direction given by the " { $snippet "orientation" } " slot of the gadget." } ;
+{ $class-description "A class implementing the " { $link draw-interior } " generic word to draw a smoothly shaded transition between colors. The " { $snippet "colors" } " slot stores a sequence of color specifiers and the gradient is drawn in the direction given by the " { $snippet "orientation" } " slot of the gadget." } ;
 
 HELP: polygon
 { $class-description "A class implementing the " { $link draw-boundary } " and " { $link draw-interior } " generic words to draw a solid outline or a solid filled polygon, respectively. Instances of " { $link polygon } " have two slots:"
     { $list
-        { { $link polygon-color } " - a color specifier" }
-        { { $link polygon-points } " - a sequence of points" }
+        { { $snippet "color" } " - a color specifier" }
+        { { $snippet "points" } " - a sequence of points" }
     }
 } ;
 

@@ -95,7 +95,7 @@ C: <solid> solid
 
 ! Solid pen
 : (solid) ( gadget paint -- loc dim )
-    solid-color set-color rect-dim >r origin get dup r> v+ ;
+    color>> set-color rect-dim >r origin get dup r> v+ ;
 
 M: solid draw-interior (solid) gl-fill-rect ;
 
@@ -109,7 +109,7 @@ C: <gradient> gradient
 M: gradient draw-interior
     origin get [
         over orientation>>
-        swap gradient-colors
+        swap colors>>
         rot rect-dim
         gl-gradient
     ] with-translation ;
@@ -121,7 +121,7 @@ C: <polygon> polygon
 
 : draw-polygon ( polygon quot -- )
     origin get [
-        >r dup polygon-color set-color polygon-points r> call
+        >r dup color>> set-color points>> r> call
     ] with-translation ; inline
 
 M: polygon draw-boundary
