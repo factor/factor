@@ -8,9 +8,6 @@ stack-checker.backend stack-checker.state stack-checker.visitor
 stack-checker.errors ;
 IN: stack-checker.transforms
 
-SYMBOL: +transform-quot+
-SYMBOL: +transform-n+
-
 : give-up-transform ( word -- )
     dup recursive-label
     [ call-recursive-word ]
@@ -48,8 +45,8 @@ SYMBOL: +transform-n+
 : apply-transform ( word -- )
     [ inlined-dependency depends-on ] [
         [ ]
-        [ +transform-quot+ word-prop ]
-        [ +transform-n+ word-prop ]
+        [ "transform-quot" word-prop ]
+        [ "transform-n" word-prop ]
         tri
         (apply-transform)
     ] bi ;
@@ -64,8 +61,8 @@ SYMBOL: +transform-n+
     ] bi ;
 
 : define-transform ( word quot n -- )
-    [ drop +transform-quot+ set-word-prop ]
-    [ nip +transform-n+ set-word-prop ]
+    [ drop "transform-quot" set-word-prop ]
+    [ nip "transform-n" set-word-prop ]
     3bi ;
 
 ! Combinators

@@ -37,6 +37,7 @@ ERROR: no-c-type name ;
         dup string? [ (c-type) ] when
     ] when ;
 
+! C type protocol
 GENERIC: c-type ( name -- type ) foldable
 
 : resolve-pointer-type ( name -- name )
@@ -62,6 +63,60 @@ M: string c-type ( name -- type )
         ] ?if
     ] if ;
 
+GENERIC: c-type-boxer ( name -- boxer )
+
+M: c-type c-type-boxer boxer>> ;
+
+M: string c-type-boxer c-type c-type-boxer ;
+
+GENERIC: c-type-boxer-quot ( name -- quot )
+
+M: c-type c-type-boxer-quot boxer-quot>> ;
+
+M: string c-type-boxer-quot c-type c-type-boxer-quot ;
+
+GENERIC: c-type-unboxer ( name -- boxer )
+
+M: c-type c-type-unboxer unboxer>> ;
+
+M: string c-type-unboxer c-type c-type-unboxer ;
+
+GENERIC: c-type-unboxer-quot ( name -- quot )
+
+M: c-type c-type-unboxer-quot unboxer-quot>> ;
+
+M: string c-type-unboxer-quot c-type c-type-unboxer-quot ;
+
+GENERIC: c-type-reg-class ( name -- reg-class )
+
+M: c-type c-type-reg-class reg-class>> ;
+
+M: string c-type-reg-class c-type c-type-reg-class ;
+
+GENERIC: c-type-getter ( name -- quot )
+
+M: c-type c-type-getter getter>> ;
+
+M: string c-type-getter c-type c-type-getter ;
+
+GENERIC: c-type-setter ( name -- quot )
+
+M: c-type c-type-setter setter>> ;
+
+M: string c-type-setter c-type c-type-setter ;
+
+GENERIC: c-type-align ( name -- n )
+
+M: c-type c-type-align align>> ;
+
+M: string c-type-align c-type c-type-align ;
+
+GENERIC: c-type-stack-align? ( name -- ? )
+
+M: c-type c-type-stack-align? stack-align?>> ;
+
+M: string c-type-stack-align? c-type c-type-stack-align? ;
+
 : c-type-box ( n type -- )
     dup c-type-reg-class
     swap c-type-boxer [ "No boxer" throw ] unless*
@@ -71,10 +126,6 @@ M: string c-type ( name -- type )
     dup c-type-reg-class
     swap c-type-unboxer [ "No unboxer" throw ] unless*
     %unbox ;
-
-M: string c-type-align c-type c-type-align ;
-
-M: string c-type-stack-align? c-type c-type-stack-align? ;
 
 GENERIC: box-parameter ( n ctype -- )
 
@@ -107,25 +158,25 @@ GENERIC: heap-size ( type -- size ) foldable
 
 M: string heap-size c-type heap-size ;
 
-M: c-type heap-size c-type-size ;
+M: c-type heap-size size>> ;
 
 GENERIC: stack-size ( type -- size ) foldable
 
 M: string stack-size c-type stack-size ;
 
-M: c-type stack-size c-type-size ;
+M: c-type stack-size size>> ;
 
 GENERIC: byte-length ( seq -- n ) flushable
 
 M: byte-array byte-length length ;
 
 : c-getter ( name -- quot )
-    c-type c-type-getter [
+    c-type-getter [
         [ "Cannot read struct fields with type" throw ]
     ] unless* ;
 
 : c-setter ( name -- quot )
-    c-type c-type-setter [
+    c-type-setter [
         [ "Cannot write struct fields with type" throw ]
     ] unless* ;
 

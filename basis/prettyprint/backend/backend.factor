@@ -105,7 +105,7 @@ M: sbuf pprint*
     dup "SBUF\" " "\"" pprint-string ;
 
 M: pathname pprint*
-    dup pathname-string "P\" " "\"" pprint-string ;
+    dup string>> "P\" " "\"" pprint-string ;
 
 ! Sequences
 : nesting-limit? ( -- ? )

@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel cpu.ppc.architecture cpu.ppc.assembler
 kernel.private namespaces math sequences generic arrays
-generator generator.registers generator.fixup system layouts
+compiler.generator compiler.generator.registers
+compiler.generator.fixup system layouts
 cpu.architecture alien ;
 IN: cpu.ppc.allot
 

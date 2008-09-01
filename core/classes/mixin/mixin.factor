@@ -78,8 +78,8 @@ TUPLE: mixin-instance loc class mixin ;
 M: mixin-instance equal?
     {
         { [ over mixin-instance? not ] [ f ] }
-        { [ 2dup [ mixin-instance-class ] bi@ = not ] [ f ] }
-        { [ 2dup [ mixin-instance-mixin ] bi@ = not ] [ f ] }
+        { [ 2dup [ class>> ] bi@ = not ] [ f ] }
+        { [ 2dup [ mixin>> ] bi@ = not ] [ f ] }
         [ t ]
     } cond 2nip ;
 
@@ -91,15 +91,14 @@ M: mixin-instance hashcode*
         swap >>mixin
         swap >>class ;
 
-M: mixin-instance where mixin-instance-loc ;
+M: mixin-instance where loc>> ;
 
-M: mixin-instance set-where set-mixin-instance-loc ;
+M: mixin-instance set-where (>>loc) ;
 
 M: mixin-instance definer drop \ INSTANCE: f ;
 
 M: mixin-instance definition drop f ;
 
 M: mixin-instance forget*
-    dup mixin-instance-class
-    swap mixin-instance-mixin dup mixin-class?
-    [ remove-mixin-instance ] [ 2drop ] if ;
+    [ class>> ] [ mixin>> ] bi
+    dup mixin-class? [ remove-mixin-instance ] [ 2drop ] if ;

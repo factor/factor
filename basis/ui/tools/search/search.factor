@@ -118,7 +118,7 @@ M: live-search pref-dim* drop { 400 200 } ;
 
 : <source-file-search> ( string files -- gadget )
     source-file-candidates
-    f [ pathname-string ] <live-search> ;
+    f [ string>> ] <live-search> ;
 
 : all-source-files ( -- seq )
     source-files get keys natural-sort ;
@@ -146,7 +146,7 @@ M: live-search pref-dim* drop { 400 200 } ;
 
 : <history-search> ( string seq -- gadget )
     history-candidates
-    f [ input-string ] <live-search> ;
+    f [ string>> ] <live-search> ;
 
 : listener-history ( listener -- seq )
     listener-gadget-input interactor-history <reversed> ;

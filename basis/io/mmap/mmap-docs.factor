@@ -5,8 +5,8 @@ IN: io.mmap
 HELP: mapped-file
 { $class-description "The class of memory-mapped files, opened by " { $link <mapped-file> } " and closed by " { $link close-mapped-file } ". The following two slots are of interest to users:"
     { $list
-        { { $link mapped-file-length } " - the length of the mapped file area, in bytes" }
-        { { $link mapped-file-address } " - an " { $link alien } " pointing at the file's memory area" }
+        { { $snippet "length" } " - the length of the mapped file area, in bytes" }
+        { { $snippet "address" } " - an " { $link alien } " pointing at the file's memory area" }
     }
 } ;
 
@@ -33,8 +33,7 @@ ARTICLE: "io.mmap" "Memory-mapped files"
 $nl
 "A utility combinator which wraps the above:"
 { $subsection with-mapped-file }
-"Memory mapped files implement the " { $link "sequence-protocol" } " and present themselves as a sequence of bytes. The underlying memory area can also be accessed directly:"
-{ $subsection mapped-file-address }
+"Memory mapped files implement the " { $link "sequence-protocol" } " and present themselves as a sequence of bytes. The underlying memory area can also be accessed directly with the " { $snippet "address" } " slot." $nl
 "Data can be read and written from the memory area using alien words. See " { $link "reading-writing-memory" } "." ;
 
 ABOUT: "io.mmap"

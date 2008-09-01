@@ -21,6 +21,10 @@ IN: cocoa.views
 : NSOpenGLPFASampleBuffers 55 ;
 : NSOpenGLPFASamples 56 ;
 : NSOpenGLPFAAuxDepthStencil 57 ;
+: NSOpenGLPFAColorFloat  58 ;
+: NSOpenGLPFAMultisample 59 ;
+: NSOpenGLPFASupersample 60 ;
+: NSOpenGLPFASampleAlpha 61 ;
 : NSOpenGLPFARendererID 70 ;
 : NSOpenGLPFASingleRenderer 71 ;
 : NSOpenGLPFANoRecovery 72 ;
@@ -34,25 +38,36 @@ IN: cocoa.views
 : NSOpenGLPFACompliant 83 ;
 : NSOpenGLPFAScreenMask 84 ;
 : NSOpenGLPFAPixelBuffer 90 ;
+: NSOpenGLPFAAllowOfflineRenderers 96 ;
 : NSOpenGLPFAVirtualScreenCount 128 ;
+
+: kCGLRendererGenericFloatID HEX: 00020400 ;
 
 <PRIVATE
 
 SYMBOL: +software-renderer+
+SYMBOL: +multisample+
 
 PRIVATE>
 
 : with-software-renderer ( quot -- )
-    t +software-renderer+ set
-    [ f +software-renderer+ set ]
-    [ ] cleanup ; inline
+    t +software-renderer+ pick with-variable ; inline
+: with-multisample ( quot -- )
+    t +multisample+ pick with-variable ; inline
 
 : <PixelFormat> ( -- pixelfmt )
     NSOpenGLPixelFormat -> alloc [
         NSOpenGLPFAWindow ,
         NSOpenGLPFADoubleBuffer ,
         NSOpenGLPFADepthSize , 16 ,
-        +software-renderer+ get [ NSOpenGLPFARobust , ] when
+        +software-renderer+ get [
+            NSOpenGLPFARendererID , kCGLRendererGenericFloatID ,
+        ] when
+        +multisample+ get [
+            NSOpenGLPFASupersample ,
+            NSOpenGLPFASampleBuffers , 1 ,
+            NSOpenGLPFASamples , 8 ,
+        ] when
         0 ,
     ] { } make >c-int-array
     -> initWithAttributes:

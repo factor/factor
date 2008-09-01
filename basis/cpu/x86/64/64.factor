@@ -174,10 +174,10 @@ USE: cpu.x86.intrinsics
 
 ! The ABI for passing structs by value is pretty messed up
 << "void*" c-type clone "__stack_value" define-primitive-type
-stack-params "__stack_value" c-type set-c-type-reg-class >>
+stack-params "__stack_value" c-type (>>reg-class) >>
 
 : struct-types&offset ( struct-type -- pairs )
-    struct-type-fields [
+    fields>> [
         [ class>> ] [ offset>> ] bi 2array
     ] map ;
 

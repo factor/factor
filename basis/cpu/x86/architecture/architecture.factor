@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types arrays cpu.x86.assembler
+USING: accessors alien alien.c-types arrays cpu.x86.assembler
 cpu.x86.assembler.private cpu.architecture kernel kernel.private
 math memory namespaces sequences words compiler.generator
 compiler.generator.registers compiler.generator.fixup system
@@ -16,8 +16,8 @@ HOOK: stack-save-reg cpu ( -- reg )
 
 : reg-stack ( n reg -- op ) swap cells neg [+] ;
 
-M: ds-loc v>operand ds-loc-n ds-reg reg-stack ;
-M: rs-loc v>operand rs-loc-n rs-reg reg-stack ;
+M: ds-loc v>operand n>> ds-reg reg-stack ;
+M: rs-loc v>operand n>> rs-reg reg-stack ;
 
 M: int-regs %save-param-reg drop >r stack@ r> MOV ;
 M: int-regs %load-param-reg drop swap stack@ MOV ;

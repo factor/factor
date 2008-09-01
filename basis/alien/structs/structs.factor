@@ -6,7 +6,7 @@ slots.deprecated alien.c-types cpu.architecture ;
 IN: alien.structs
 
 : align-offset ( offset type -- offset )
-    c-type c-type-align align ;
+    c-type-align align ;
 
 : struct-offsets ( specs -- size )
     0 [
@@ -24,7 +24,7 @@ IN: alien.structs
     [ reader>> ]
     [
         class>>
-        [ c-getter ] [ c-type c-type-boxer-quot ] bi append
+        [ c-getter ] [ c-type-boxer-quot ] bi append
     ] tri
     define-struct-slot-word ;
 
@@ -44,9 +44,9 @@ IN: alien.structs
 
 TUPLE: struct-type size align fields ;
 
-M: struct-type heap-size struct-type-size ;
+M: struct-type heap-size size>> ;
 
-M: struct-type c-type-align struct-type-align ;
+M: struct-type c-type-align align>> ;
 
 M: struct-type c-type-stack-align? drop f ;
 

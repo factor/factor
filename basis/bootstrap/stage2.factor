@@ -1,11 +1,11 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors init command-line namespaces words debugger io
+USING: accessors init namespaces words io
 kernel.private math memory continuations kernel io.files
 io.backend system parser vocabs sequences prettyprint
 vocabs.loader combinators splitting source-files strings
 definitions assocs compiler.errors compiler.units
-math.parser generic sets ;
+math.parser generic sets debugger command-line ;
 IN: bootstrap.stage2
 
 SYMBOL: bootstrap-time

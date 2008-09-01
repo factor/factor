@@ -1,6 +1,6 @@
-USING: definitions help help.topics help.crossref help.markup
-help.syntax kernel sequences tools.test words parser namespaces
-assocs source-files eval ;
+USING: accessors definitions help help.topics help.crossref
+help.markup help.syntax kernel sequences tools.test words parser
+namespaces assocs source-files eval ;
 IN: help.topics.tests
 
 \ article-name must-infer
@@ -34,6 +34,6 @@ SYMBOL: foo
 ] unit-test
 
 [ { "testfile" 2 } ]
-[ { "test" 1 } articles get at article-loc ] unit-test
+[ { "test" 1 } articles get at loc>> ] unit-test
 
 [ ] [ { "test" 1 } remove-article ] unit-test

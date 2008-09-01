@@ -21,8 +21,8 @@ C: <double-blas-vector> double-blas-vector
 C: <float-complex-blas-vector> float-complex-blas-vector
 C: <double-complex-blas-vector> double-complex-blas-vector
 
-GENERIC: n*V+V-in-place ( alpha x y -- y=alpha*x+y )
-GENERIC: n*V-in-place   ( alpha x -- x=alpha*x )
+GENERIC: n*V+V! ( alpha x y -- y=alpha*x+y )
+GENERIC: n*V!   ( alpha x -- x=alpha*x )
 
 GENERIC: V. ( x y -- x.y )
 GENERIC: V.conj ( x y -- xconj.y )
@@ -202,30 +202,30 @@ METHOD: Vswap { float-complex-blas-vector float-complex-blas-vector }
 METHOD: Vswap { double-complex-blas-vector double-complex-blas-vector }
     (prepare-swap) [ cblas_zswap ] 2dip ;
 
-METHOD: n*V+V-in-place { real float-blas-vector float-blas-vector }
+METHOD: n*V+V! { real float-blas-vector float-blas-vector }
     (prepare-axpy) [ cblas_saxpy ] dip ;
-METHOD: n*V+V-in-place { real double-blas-vector double-blas-vector }
+METHOD: n*V+V! { real double-blas-vector double-blas-vector }
     (prepare-axpy) [ cblas_daxpy ] dip ;
-METHOD: n*V+V-in-place { number float-complex-blas-vector float-complex-blas-vector }
+METHOD: n*V+V! { number float-complex-blas-vector float-complex-blas-vector }
     [ (>c-complex) ] 2dip
     (prepare-axpy) [ cblas_caxpy ] dip ;
-METHOD: n*V+V-in-place { number double-complex-blas-vector double-complex-blas-vector }
+METHOD: n*V+V! { number double-complex-blas-vector double-complex-blas-vector }
     [ (>z-complex) ] 2dip
     (prepare-axpy) [ cblas_zaxpy ] dip ;
 
-METHOD: n*V-in-place { real float-blas-vector }
+METHOD: n*V! { real float-blas-vector }
     (prepare-scal) [ cblas_sscal ] dip ;
-METHOD: n*V-in-place { real double-blas-vector }
+METHOD: n*V! { real double-blas-vector }
     (prepare-scal) [ cblas_dscal ] dip ;
-METHOD: n*V-in-place { number float-complex-blas-vector }
+METHOD: n*V! { number float-complex-blas-vector }
     [ (>c-complex) ] dip
     (prepare-scal) [ cblas_cscal ] dip ;
-METHOD: n*V-in-place { number double-complex-blas-vector }
+METHOD: n*V! { number double-complex-blas-vector }
     [ (>z-complex) ] dip
     (prepare-scal) [ cblas_zscal ] dip ;
 
-: n*V+V ( alpha x y -- alpha*x+y ) clone n*V+V-in-place ; inline
-: n*V ( alpha x -- alpha*x ) clone n*V-in-place ; inline
+: n*V+V ( alpha x y -- alpha*x+y ) clone n*V+V! ; inline
+: n*V ( alpha x -- alpha*x ) clone n*V! ; inline
 
 : V+ ( x y -- x+y )
     1.0 -rot n*V+V ; inline
@@ -251,6 +251,10 @@ METHOD: V. { double-complex-blas-vector double-complex-blas-vector }
     (prepare-dot)
     "CBLAS_Z" <c-object> [ cblas_zdotu_sub ] keep (z-complex>) ;
 
+METHOD: V.conj { float-blas-vector float-blas-vector }
+    (prepare-dot) cblas_sdot ;
+METHOD: V.conj { double-blas-vector double-blas-vector }
+    (prepare-dot) cblas_ddot ;
 METHOD: V.conj { float-complex-blas-vector float-complex-blas-vector }
     (prepare-dot)
     "CBLAS_C" <c-object> [ cblas_cdotc_sub ] keep (c-complex>) ;
@@ -288,7 +292,7 @@ METHOD: Viamax { double-complex-blas-vector }
 : Vamax ( x -- max )
     [ Viamax ] keep nth ; inline
 
-: Vsub ( v start length -- vsub )
+: Vsub ( v start length -- sub )
     rot [
         [
             nip [ inc>> ] [ element-type heap-size ] [ data>> ] tri

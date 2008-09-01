@@ -14,7 +14,7 @@ TUPLE: history < model back forward ;
         reset-history ;
 
 : (add-history) ( history to -- )
-    swap model-value dup [ swap push ] [ 2drop ] if ;
+    swap value>> dup [ swap push ] [ 2drop ] if ;
 
 : go-back/forward ( history to from -- )
     dup empty?
@@ -22,11 +22,11 @@ TUPLE: history < model back forward ;
     [ >r dupd (add-history) r> pop swap set-model ] if ;
 
 : go-back ( history -- )
-    dup history-forward over history-back go-back/forward ;
+    dup [ forward>> ] [ back>> ] bi go-back/forward ;
 
 : go-forward ( history -- )
-    dup history-back over history-forward go-back/forward ;
+    dup [ back>> ] [ forward>> ] bi go-back/forward ;
 
 : add-history ( history -- )
-    dup history-forward delete-all
-    dup history-back (add-history) ;
+    dup forward>> delete-all
+    dup back>> (add-history) ;

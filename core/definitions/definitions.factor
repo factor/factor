@@ -5,23 +5,9 @@ USING: kernel sequences namespaces assocs graphs math math.order ;
 
 ERROR: no-compilation-unit definition ;
 
-SINGLETON: inlined-dependency
-SINGLETON: flushed-dependency
-SINGLETON: called-dependency
-
-UNION: dependency
-inlined-dependency
-flushed-dependency
-called-dependency ;
-
-M: dependency <=>
-    [
-        {
-            called-dependency
-            flushed-dependency
-            inlined-dependency
-        } index
-    ] bi@ <=> ;
+SYMBOL: inlined-dependency
+SYMBOL: flushed-dependency
+SYMBOL: called-dependency
 
 SYMBOL: changed-definitions
 

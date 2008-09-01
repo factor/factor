@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel continuations assocs namespaces
 sequences words vocabs definitions hashtables init sets
-math.order classes classes.algebra ;
+math math.order classes classes.algebra ;
 IN: compiler.units
 
 SYMBOL: old-definitions
@@ -73,11 +73,20 @@ GENERIC: definitions-changed ( assoc obj -- )
 SYMBOL: outdated-tuples
 SYMBOL: update-tuples-hook
 
+: dependency>= ( how1 how2 -- ? )
+    [
+        {
+            called-dependency
+            flushed-dependency
+            inlined-dependency
+        } index
+    ] bi@ >= ;
+
 : strongest-dependency ( how1 how2 -- how )
-    [ called-dependency or ] bi@ max ;
+    [ called-dependency or ] bi@ [ dependency>= ] most ;
 
 : weakest-dependency ( how1 how2 -- how )
-    [ inlined-dependency or ] bi@ min ;
+    [ inlined-dependency or ] bi@ [ dependency>= not ] most ;
 
 : compiled-usage ( word -- assoc )
     compiled-crossref get at ;
@@ -89,7 +98,7 @@ SYMBOL: update-tuples-hook
     #! don't have to recompile words that folded this away.
     [ compiled-usage ]
     [ "flushable" word-prop inlined-dependency flushed-dependency ? ] bi
-    [ after=? nip ] curry assoc-filter ;
+    [ dependency>= nip ] curry assoc-filter ;
 
 : compiled-usages ( assoc -- assocs )
     [ drop word? ] assoc-filter

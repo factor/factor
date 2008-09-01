@@ -172,7 +172,7 @@ M: hook-generic synopsis*
         [ definer. ]
         [ seeing-word ]
         [ pprint-word ]
-        [ "combination" word-prop hook-combination-var pprint* ]
+        [ "combination" word-prop var>> pprint* ]
         [ stack-effect. ]
     } cleave ;
 

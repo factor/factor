@@ -41,7 +41,7 @@ M: incremental pref-dim*
     swap set-rect-loc ;
 
 : prefer-incremental ( gadget -- )
-    dup forget-pref-dim dup pref-dim swap set-rect-dim ;
+    dup forget-pref-dim dup pref-dim >>dim drop ;
 
 : add-incremental ( gadget incremental -- )
     not-in-layout

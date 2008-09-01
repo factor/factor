@@ -5,6 +5,6 @@ IN: benchmark.empty-loop-0
     dup 0 fixnum< [ drop ] [ 1 fixnum-fast empty-loop-0 ] if ;
 
 : empty-loop-main ( -- )
-    5000000 empty-loop-0 ;
+    50000000 empty-loop-0 ;
 
 MAIN: empty-loop-main

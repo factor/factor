@@ -6,7 +6,7 @@
 
 USING: alien alien.c-types alien.strings combinators kernel math
 namespaces oracle.liboci prettyprint sequences
-io.encodings.ascii ;
+io.encodings.ascii accessors ;
 
 IN: oracle
 
@@ -102,9 +102,9 @@ C: <connection> connection
 
 : oci-log-on ( -- )
     env get err get svc get 
-    con get connection-username dup length swap ascii malloc-string swap 
-    con get connection-password dup length swap ascii malloc-string swap
-    con get connection-db dup length swap ascii malloc-string swap
+    con get username>> dup length swap ascii malloc-string swap 
+    con get password>> dup length swap ascii malloc-string swap
+    con get db>> dup length swap ascii malloc-string swap
     OCILogon check-result ;
 
 ! =========================================================
@@ -112,18 +112,18 @@ C: <connection> connection
 ! =========================================================
 
 : attach-to-server ( -- )
-    srv get err get con get connection-db dup length OCI_DEFAULT
+    srv get err get con get db>> dup length OCI_DEFAULT
     OCIServerAttach check-result ;
 
 : set-service-attribute ( -- )
     svc get OCI_HTYPE_SVCCTX srv get 0 OCI_ATTR_SERVER err get OCIAttrSet check-result ;
 
 : set-username-attribute ( -- )
-    ses get OCI_HTYPE_SESSION con get connection-username dup length swap ascii malloc-string swap 
+    ses get OCI_HTYPE_SESSION con get username>> dup length swap ascii malloc-string swap 
     OCI_ATTR_USERNAME err get OCIAttrSet check-result ;
 
 : set-password-attribute ( -- )
-    ses get OCI_HTYPE_SESSION con get connection-password dup length swap ascii malloc-string swap 
+    ses get OCI_HTYPE_SESSION con get password>> dup length swap ascii malloc-string swap 
     OCI_ATTR_PASSWORD err get OCIAttrSet check-result ;
 
 : set-attributes ( -- )

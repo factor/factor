@@ -6,7 +6,7 @@ IN: models.delay
 TUPLE: delay < model model timeout alarm ;
 
 : update-delay-model ( delay -- )
-    [ delay-model model-value ] keep set-model ;
+    [ model>> value>> ] keep set-model ;
 
 : <delay> ( model timeout -- delay )
     f delay new-model
@@ -15,7 +15,7 @@ TUPLE: delay < model model timeout alarm ;
         [ add-dependency ] keep ;
 
 : cancel-delay ( delay -- )
-    delay-alarm [ cancel-alarm ] when* ;
+    alarm>> [ cancel-alarm ] when* ;
 
 : start-delay ( delay -- )
     dup

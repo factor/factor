@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays byte-arrays byte-vectors
+USING: accessors alien arrays byte-arrays byte-vectors
 definitions generic hashtables kernel math namespaces parser
 lexer sequences strings strings.parser sbufs vectors
 words quotations io assocs splitting classes.tuple
@@ -193,7 +193,7 @@ IN: bootstrap.syntax
         "))" parse-effect parsed
     ] define-syntax
 
-    "MAIN:" [ scan-word in get vocab set-vocab-main ] define-syntax
+    "MAIN:" [ scan-word in get vocab (>>main) ] define-syntax
 
     "<<" [
         [

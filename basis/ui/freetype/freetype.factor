@@ -184,7 +184,7 @@ M: freetype-renderer string-height ( open-font string -- h )
 : draw-char ( open-font sprites char loc -- )
     GL_MODELVIEW [
         0 0 glTranslated
-        char-sprite sprite-dlist glCallList
+        char-sprite dlist>> glCallList
     ] do-matrix ;
 
 : char-widths ( open-font string -- widths )

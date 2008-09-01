@@ -34,6 +34,8 @@ SYMBOL: article-xref
 article-xref global [ H{ } assoc-like ] change-at
 
 GENERIC: article-name ( topic -- string )
+GENERIC: article-title ( topic -- string )
+GENERIC: article-content ( topic -- content )
 GENERIC: article-parent ( topic -- parent )
 GENERIC: set-article-parent ( parent topic -- )
 
@@ -42,7 +44,9 @@ TUPLE: article title content loc ;
 : <article> ( title content -- article )
     f \ article boa ;
 
-M: article article-name article-title ;
+M: article article-name title>> ;
+M: article article-title title>> ;
+M: article article-content content>> ;
 
 ERROR: no-article name ;
 

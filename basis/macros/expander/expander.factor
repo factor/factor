@@ -32,8 +32,8 @@ M: wrapper expand-macros* wrapped>> literal ;
     stack get pop >quotation end (expand-macros) ;
 
 : expand-macro? ( word -- quot ? )
-    dup [ "macro" word-prop ] [ +transform-quot+ word-prop ] bi or dup [
-        swap [ stack-effect in>> length ] [ +transform-n+ word-prop ] bi or
+    dup [ "macro" word-prop ] [ "transform-quot" word-prop ] bi or dup [
+        swap [ stack-effect in>> length ] [ "transform-n" word-prop ] bi or
         stack get length <=
     ] [ 2drop f f ] if ;
 

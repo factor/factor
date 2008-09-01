@@ -54,7 +54,7 @@ TUPLE: element syntax id tag tagclass encoding contentlength newobj objtype ;
 
 : (set-tag) ( -- )
     elements get id>> 31 bitand
-    dup elements get set-element-tag
+    dup elements get (>>tag)
     31 < [
         [ "unsupported tag encoding: #{" % 
           get-id # "}" %
@@ -63,22 +63,22 @@ TUPLE: element syntax id tag tagclass encoding contentlength newobj objtype ;
 
 : set-tagclass ( -- )
     get-id -6 shift tag-classes nth
-    elements get set-element-tagclass ;
+    elements get (>>tagclass) ;
 
 : set-encoding ( -- )
     get-id HEX: 20 bitand
     zero? "primitive" "constructed" ?
-    elements get set-element-encoding ;
+    elements get (>>encoding) ;
 
 : set-content-length ( -- )
     read1
     dup 127 <= [ 
         127 bitand read be>
-    ] unless elements get set-element-contentlength ;
+    ] unless elements get (>>contentlength) ;
 
 : set-newobj ( -- )
     elements get contentlength>> read
-    elements get set-element-newobj ;
+    elements get (>>newobj) ;
 
 : set-objtype ( syntax -- )
     builtin-syntax 2array [
@@ -86,7 +86,7 @@ TUPLE: element syntax id tag tagclass encoding contentlength newobj objtype ;
         elements get encoding>> swap at
         elements get tag>>
         swap at [ 
-            elements get set-element-objtype
+            elements get (>>objtype)
         ] when*
     ] each ;
 
@@ -96,15 +96,15 @@ SYMBOL: end
 
 : (read-array) ( -- )
     elements get id>> [
-        elements get element-syntax read-ber
+        elements get syntax>> read-ber
         dup end = [ drop ] [ , (read-array) ] if
     ] when ;
 
 : read-array ( -- array ) [ (read-array) ] { } make ;
 
 : set-case ( -- object )
-    elements get element-newobj
-    elements get element-objtype {
+    elements get newobj>>
+    elements get objtype>> {
         { "boolean" [ "\0" = not ] }
         { "string" [ "" or ] }
         { "integer" [ be> ] }
@@ -112,7 +112,7 @@ SYMBOL: end
     } case ;
 
 : set-id ( -- boolean )
-    read1 dup elements get set-element-id ;
+    read1 dup elements get (>>id) ;
 
 : read-ber ( syntax -- object )
     element new
@@ -124,7 +124,7 @@ SYMBOL: end
         set-encoding
         set-content-length
         set-newobj
-        elements get element-syntax set-objtype
+        elements get syntax>> set-objtype
         set-case
     ] [ end ] if ;
 
@@ -181,7 +181,7 @@ TUPLE: tag value ;
     ] with-scope ; inline
 
 : set-tag ( value -- )
-    tagnum get set-tag-value ;
+    tagnum get (>>value) ;
 
 M: string >ber ( str -- byte-array )
     tagnum get tag-value 1array "C" pack-native swap dup
