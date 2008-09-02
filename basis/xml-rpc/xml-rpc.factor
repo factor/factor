@@ -48,7 +48,7 @@ TUPLE: base64 string ;
 C: <base64> base64
 
 M: base64 item>xml
-    base64-string >base64 "base64" build-tag ;
+    string>> >base64 "base64" build-tag ;
 
 : params ( seq -- xml )
     [ item>xml "value" build-tag "param" build-tag ] map
