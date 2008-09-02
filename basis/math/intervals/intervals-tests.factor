@@ -60,11 +60,11 @@ IN: math.intervals.tests
 ] unit-test
 
 [ t ] [
-    1 2 [a,b] -0.5 0.5 [a,b] interval* -1 1 [a,b] =
+    1 2 [a,b] -0.5 0.5 [a,b] interval* -1.0 1.0 [a,b] =
 ] unit-test
 
 [ t ] [
-    1 2 [a,b] -0.5 0.5 (a,b] interval* -1 1 (a,b] =
+    1 2 [a,b] -0.5 0.5 (a,b] interval* -1.0 1.0 (a,b] =
 ] unit-test
 
 [ t ] [
@@ -131,7 +131,7 @@ IN: math.intervals.tests
 
 "math.ratios.private" vocab [
     [ t ] [
-        -1 1 (a,b) 0.5 1 (a,b) interval/ -2 2 (a,b) =
+        -1 1 (a,b) 0.5 1 (a,b) interval/ -2.0 2.0 (a,b) =
     ] unit-test
 ] when
 

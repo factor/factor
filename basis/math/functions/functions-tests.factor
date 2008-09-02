@@ -12,10 +12,11 @@ IN: math.functions.tests
 [ 0.25 ] [ 2.0 -2.0 fpow ] unit-test
 
 [ 4.0 ] [ 16 sqrt ] unit-test
-[ C{ 0 4.0 } ] [ -16 sqrt ] unit-test
+[ 2.0 ] [ 4.0 0.5 ^ ] unit-test
+[ C{ 0.0 4.0 } ] [ -16 sqrt ] unit-test
 
-[ 4.0 ] [ 2 2 ^ ] unit-test
-[ 0.25 ] [ 2 -2 ^ ] unit-test
+[ 4 ] [ 2 2 ^ ] unit-test
+[ 1/4 ] [ 2 -2 ^ ] unit-test
 [ t ] [ 2 0.5 ^ 2 ^ 2 2.00001 between? ] unit-test
 [ t ] [ e pi i* ^ real-part -1.0 = ] unit-test
 [ t ] [ e pi i* ^ imaginary-part -0.00001 0.00001 between? ] unit-test
@@ -26,6 +27,8 @@ IN: math.functions.tests
 [ 1.0/0.0 ] [ 0 -2.0 ^ ] unit-test
 [ 0 ] [ 0 3.0 ^ ] unit-test
 [ 0 ] [ 0 3 ^ ] unit-test
+
+[ 0.0 ] [ 1 log ] unit-test
 
 [ 1.0 ] [ 0 cosh ] unit-test
 [ 0.0 ] [ 1 acosh ] unit-test

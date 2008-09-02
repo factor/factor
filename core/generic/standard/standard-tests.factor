@@ -81,7 +81,7 @@ M: parallelogram perimiter
 M: circle perimiter 2 * pi * ;
 
 [ 14 ] [ 4 3 <rectangle> perimiter ] unit-test
-[ 30 ] [ 10 4 3 <parallelogram> perimiter ] unit-test
+[ 30.0 ] [ 10 4 3 <parallelogram> perimiter ] unit-test
 
 GENERIC: big-mix-test ( obj -- obj' )
 

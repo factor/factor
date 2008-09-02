@@ -251,13 +251,15 @@ ARTICLE: "conditionals" "Conditionals and logic"
 { $see-also "booleans" "bitwise-arithmetic" both? either? } ;
 
 ARTICLE: "equality" "Equality"
-"There are two distinct notions of ``sameness'' when it comes to objects. You can test if two references point to the same object (" { $emphasis "identity comparison" } "), or you can test if two objects are equal in a domain-specific sense, usually by being instances of the same class, and having equal slot values (" { $emphasis "value comparison" } "). Both notions of equality are equality relations in the mathematical sense."
+"There are two distinct notions of ``sameness'' when it comes to objects."
 $nl
-"Identity comparison:"
+"You can test if two references point to the same object (" { $emphasis "identity comparison" } "). This is rarely used; it is mostly useful with large, mutable objects where the object identity matters but the value is transient:"
 { $subsection eq? }
-"Value comparison:"
+"You can test if two objects are equal in a domain-specific sense, usually by being instances of the same class, and having equal slot values (" { $emphasis "value comparison" } "):"
 { $subsection = }
-"Custom value comparison methods:"
+"A third form of equality is provided by " { $link number= } ". It compares numeric value while disregarding types."
+$nl
+"Custom value comparison methods for use with " { $link = } " can be defined on a generic word:"
 { $subsection equal? }
 "Utility class:"
 { $subsection identity-tuple }
@@ -367,6 +369,13 @@ HELP: =
 { $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }
 { $description
     "Tests if two objects are equal. If " { $snippet "obj1" } " and " { $snippet "obj2" } " point to the same object, outputs " { $link t } ". Otherwise, calls the " { $link equal? } " generic word."
+}
+{ $examples
+    { $example "USING: kernel prettyprint ;" "5 5 = ." "t" }
+    { $example "USING: kernel prettyprint ;" "5 005 = ." "t" }
+    { $example "USING: kernel prettyprint ;" "5 5.0 = ." "f" }
+    { $example "USING: arrays kernel prettyprint ;" "{ \"a\" \"b\" } \"a\" \"b\" 2array = ." "t" }
+    { $example "USING: arrays kernel prettyprint ;" "{ \"a\" \"b\" } [ \"a\" \"b\" ] = ." "f" }
 } ;
 
 HELP: equal?
@@ -381,8 +390,13 @@ HELP: equal?
         { { $snippet "a = b" } " implies " { $snippet "b = a" } }
         { { $snippet "a = b" } " and " { $snippet "b = c" } " implies " { $snippet "a = c" } }
     }
-    $nl
     "If a class defines a custom equality comparison test, it should also define a compatible method for the " { $link hashcode* } " generic word."
+}
+{ $examples
+    "An example demonstrating why this word should only be used to define methods on, and never called directly:"
+    { $example "USING: kernel prettyprint ;" "5 5 equal? ." "f" }
+    "Using " { $link = } " gives the expected behavior:"
+    { $example "USING: kernel prettyprint ;" "5 5 = ." "t" }
 } ;
 
 HELP: identity-tuple

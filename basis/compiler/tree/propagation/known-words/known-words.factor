@@ -211,7 +211,7 @@ generic-comparison-ops [
 \ eq? [
     [ info-intervals-intersect? ]
     [ info-classes-intersect? ]
-    2bi or maybe-or-never
+    2bi and maybe-or-never
 ] "outputs" set-word-prop
 
 {

@@ -81,8 +81,8 @@ unit-test
 [ -1/2 ] [ 1/2 1- ] unit-test
 [ 3/2 ] [ 1/2 1+ ] unit-test
 
-[ 1 ] [ 0.5 1/2 + ] unit-test
-[ 1 ] [ 1/2 0.5 + ] unit-test
+[ 1.0 ] [ 0.5 1/2 + ] unit-test
+[ 1.0 ] [ 1/2 0.5 + ] unit-test
 
 [ 1/268435456 ] [ -1 -268435456 >fixnum / ] unit-test
 [ 268435456 ] [ -268435456 >fixnum -1 / ] unit-test

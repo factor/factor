@@ -701,3 +701,11 @@ DEFER: error-y
 [ ] [
     "IN: sequences TUPLE: reversed { seq read-only } ;" eval
 ] unit-test
+
+TUPLE: bogus-hashcode-1 x ;
+
+TUPLE: bogus-hashcode-2 x ;
+
+M: bogus-hashcode-1 hashcode* 2drop 0 >bignum ;
+
+[ ] [ T{ bogus-hashcode-2 T{ bogus-hashcode-1 } } hashcode drop ] unit-test
