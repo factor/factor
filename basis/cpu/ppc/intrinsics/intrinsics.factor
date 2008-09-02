@@ -539,7 +539,7 @@ IN: cpu.ppc.intrinsics
             { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { "scratch" } }
+        { +scratch+ { { f "scratch" } } }
         { +clobber+ { "value" "offset" } }
     } ;
 
