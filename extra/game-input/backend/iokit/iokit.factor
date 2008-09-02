@@ -1,9 +1,10 @@
 USING: cocoa cocoa.plists core-foundation iokit iokit.hid
 kernel cocoa.enumeration destructors math.parser cocoa.application 
-sequences locals combinators.short-circuit game-input threads
+sequences locals combinators.short-circuit threads
 symbols namespaces assocs vectors arrays combinators
 core-foundation.run-loop accessors sequences.private
-alien.c-types math ;
+alien.c-types math parser ;
+<< "game-input" (use+) >>
 IN: game-input.backend.iokit
 
 SINGLETON: iokit-game-input-backend
