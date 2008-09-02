@@ -58,7 +58,7 @@ IN: calendar.format.tests
         26
         0
         37
-        42.12345
+        42+2469/20000
         T{ duration f 0 0 0 -5 0 0 }
     }
 ] [ "2008-05-26T00:37:42.12345-05:00" rfc3339>timestamp ] unit-test
