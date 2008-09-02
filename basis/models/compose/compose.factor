@@ -18,12 +18,12 @@ TUPLE: compose < model ;
 
 M: compose model-changed
     nip
-    [ [ model-value ] composed-value ] keep set-model ;
+    [ [ value>> ] composed-value ] keep set-model ;
 
 M: compose model-activated dup model-changed ;
 
 M: compose update-model
-    dup model-value swap [ set-model ] set-composed-value ;
+    dup value>> swap [ set-model ] set-composed-value ;
 
 M: compose range-value
     [ range-value ] composed-value ;
