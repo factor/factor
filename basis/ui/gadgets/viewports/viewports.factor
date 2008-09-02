@@ -38,7 +38,7 @@ M: viewport model-changed
     dup relayout-1
     dup scroller-value
     vneg viewport-gap v+
-    swap gadget-child set-rect-loc ;
+    swap gadget-child (>>loc) ;
 
 : visible-dim ( gadget -- dim )
     dup parent>> viewport?
