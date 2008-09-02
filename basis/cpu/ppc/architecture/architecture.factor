@@ -18,13 +18,13 @@ IN: cpu.ppc.architecture
 : ds-reg 14 ; inline
 : rs-reg 15 ; inline
 
-: reserved-area-size
+: reserved-area-size ( -- n )
     os {
         { linux [ 2 ] }
         { macosx [ 6 ] }
     } case cells ; foldable
 
-: lr-save
+: lr-save ( -- n )
     os {
         { linux [ 1 ] }
         { macosx [ 2 ] }
@@ -32,12 +32,12 @@ IN: cpu.ppc.architecture
 
 : param@ ( n -- x ) reserved-area-size + ; inline
 
-: param-save-size 8 cells ; foldable
+: param-save-size ( -- n ) 8 cells ; foldable
 
 : local@ ( n -- x )
     reserved-area-size param-save-size + + ; inline
 
-: factor-area-size 2 cells ;
+: factor-area-size ( -- n ) 2 cells ; foldable
 
 : next-save ( n -- i ) cell - ;
 
@@ -96,9 +96,9 @@ M: ppc %epilogue ( n -- )
     1 1 rot ADDI
     0 MTLR ;
 
-: (%call) 11 MTLR BLRL ;
+: (%call) ( -- ) 11 MTLR BLRL ;
 
-: (%jump) 11 MTCTR BCTR ;
+: (%jump) ( -- ) 11 MTCTR BCTR ;
 
 : %load-dlsym ( symbol dll register -- )
     0 swap LOAD32 rc-absolute-ppc-2/2 rel-dlsym ;
@@ -218,7 +218,7 @@ M: ppc %box-long-long ( n func -- )
         4 1 rot cell + local@ LWZ
     ] when* r> f %alien-invoke ;
 
-: temp@ stack-frame* factor-area-size - swap - ;
+: temp@ ( m -- n ) stack-frame* factor-area-size - swap - ;
 
 : struct-return@ ( size n -- n ) [ local@ ] [ temp@ ] ?if ;
 
