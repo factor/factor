@@ -41,9 +41,9 @@ SYMBOL: person4
     
     [ ] [ person1 get insert-tuple ] unit-test
 
-    [ 1 ] [ person1 get person-the-id ] unit-test
+    [ 1 ] [ person1 get the-id>> ] unit-test
 
-    [ ] [ 200 person1 get set-person-the-number ] unit-test
+    [ ] [ person1 get 200 >>the-number drop ] unit-test
 
     [ ] [ person1 get update-tuple ] unit-test
 
