@@ -41,7 +41,7 @@ Bar [
     -> release
 ] compile-call
 
-[ 1 ] [ "x" get NSRect-x ] unit-test
-[ 2 ] [ "x" get NSRect-y ] unit-test
-[ 101 ] [ "x" get NSRect-w ] unit-test
-[ 102 ] [ "x" get NSRect-h ] unit-test
+[ 1.0 ] [ "x" get NSRect-x ] unit-test
+[ 2.0 ] [ "x" get NSRect-y ] unit-test
+[ 101.0 ] [ "x" get NSRect-w ] unit-test
+[ 102.0 ] [ "x" get NSRect-h ] unit-test
