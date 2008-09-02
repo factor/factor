@@ -19,3 +19,11 @@ M: byte-array resize
     resize-byte-array ;
 
 INSTANCE: byte-array sequence
+
+: 1byte-array ( x -- array ) 1 <byte-array> [ set-first ] keep ; inline
+
+: 2byte-array ( x y -- array ) B{ } 2sequence ; inline
+
+: 3byte-array ( x y z -- array ) B{ } 3sequence ; inline
+
+: 4byte-array ( w x y z -- array ) B{ } 4sequence ; inline

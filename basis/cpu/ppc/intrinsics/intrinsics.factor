@@ -11,17 +11,17 @@ math.floats.private classes slots.private combinators
 compiler.constants ;
 IN: cpu.ppc.intrinsics
 
-: %slot-literal-known-tag
+: %slot-literal-known-tag ( -- out value offset )
     "val" operand
     "obj" operand
     "n" get cells
     "obj" get operand-tag - ;
 
-: %slot-literal-any-tag
+: %slot-literal-any-tag ( -- out value offset )
     "obj" operand "scratch1" operand %untag
     "val" operand "scratch1" operand "n" get cells ;
 
-: %slot-any
+: %slot-any ( -- out value offset )
     "obj" operand "scratch1" operand %untag
     "offset" operand "n" operand 1 SRAWI
     "scratch1" operand "val" operand "offset" operand ;
@@ -188,7 +188,7 @@ IN: cpu.ppc.intrinsics
     }
 } define-intrinsics
 
-: generate-fixnum-mod
+: generate-fixnum-mod ( -- )
     #! PowerPC doesn't have a MOD instruction; so we compute
     #! x-(x/y)*y. Puts the result in "s" operand.
     "s" operand "r" operand "y" operand MULLW
@@ -259,7 +259,7 @@ IN: cpu.ppc.intrinsics
 \ fixnum+ \ ADD \ ADDO. overflow-template
 \ fixnum- \ SUBF \ SUBFO. overflow-template
 
-: generate-fixnum/i
+: generate-fixnum/i ( -- )
     #! This VOP is funny. If there is an overflow, it falls
     #! through to the end, and the result is in "x" operand.
     #! Otherwise it jumps to the "no-overflow" label and the
@@ -514,8 +514,8 @@ IN: cpu.ppc.intrinsics
 ! Alien intrinsics
 : %alien-accessor ( quot -- )
     "offset" operand dup %untag-fixnum
-    "offset" operand dup "alien" operand ADD
-    "value" operand "offset" operand 0 roll call ; inline
+    "scratch" operand "offset" operand "alien" operand ADD
+    "value" operand "scratch" operand 0 roll call ; inline
 
 : alien-integer-get-template
     H{
@@ -539,6 +539,7 @@ IN: cpu.ppc.intrinsics
             { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
+        { +scratch+ { "scratch" } }
         { +clobber+ { "value" "offset" } }
     } ;
 

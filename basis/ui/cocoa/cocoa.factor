@@ -44,29 +44,29 @@ M: pasteboard set-clipboard-contents
         dup install-window-delegate
         over -> release
         <handle>
-    ] keep set-world-handle ;
+    ] keep (>>handle) ;
 
 M: cocoa-ui-backend set-title ( string world -- )
-    world-handle window>> swap <NSString> -> setTitle: ;
+    handle>> window>> swap <NSString> -> setTitle: ;
 
 : enter-fullscreen ( world -- )
-    world-handle view>>
+    handle>> view>>
     NSScreen -> mainScreen
     f -> enterFullScreenMode:withOptions:
     drop ;
 
 : exit-fullscreen ( world -- )
-    world-handle view>> f -> exitFullScreenModeWithOptions: ;
+    handle>> view>> f -> exitFullScreenModeWithOptions: ;
 
 M: cocoa-ui-backend set-fullscreen* ( ? world -- )
     swap [ enter-fullscreen ] [ exit-fullscreen ] if ;
 
 M: cocoa-ui-backend fullscreen* ( world -- ? )
-    world-handle view>> -> isInFullScreenMode zero? not ;
+    handle>> view>> -> isInFullScreenMode zero? not ;
 
 : auto-position ( world -- )
     dup window-loc>> { 0 0 } = [
-        world-handle window>> -> center
+        handle>> window>> -> center
     ] [
         drop
     ] if ;
@@ -74,20 +74,20 @@ M: cocoa-ui-backend fullscreen* ( world -- ? )
 M: cocoa-ui-backend (open-window) ( world -- )
     dup gadget-window
     dup auto-position
-    world-handle window>> f -> makeKeyAndOrderFront: ;
+    handle>> window>> f -> makeKeyAndOrderFront: ;
 
 M: cocoa-ui-backend (close-window) ( handle -- )
     window>> -> release ;
 
 M: cocoa-ui-backend close-window ( gadget -- )
     find-world [
-        world-handle [
+        handle>> [
             window>> f -> performClose:
         ] when*
     ] when* ;
 
 M: cocoa-ui-backend raise-window* ( world -- )
-    world-handle [
+    handle>> [
         window>> dup f -> orderFront: -> makeKeyWindow
         NSApp 1 -> activateIgnoringOtherApps:
     ] when* ;
