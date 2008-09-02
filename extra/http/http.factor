@@ -106,7 +106,7 @@ TUPLE: cookie name value version comment path domain expires max-age http-only s
         [
             {
                 { [ dup timestamp? ] [ timestamp>cookie-string ] }
-                { [ dup duration? ] [ dt>seconds number>string ] }
+                { [ dup duration? ] [ duration>seconds number>string ] }
                 { [ dup real? ] [ number>string ] }
                 [ ]
             } cond

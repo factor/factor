@@ -11,7 +11,7 @@ SYMBOL: sleep-period
 ! : my-progress ( -- progress ) millis 
 : progress ( -- progress ) millis last-loop get - reset-progress ;
 : progress-peek ( -- progress ) millis last-loop get - ;
-: set-end ( duration -- end-time ) dt>milliseconds millis + ;
+: set-end ( duration -- end-time ) duration>milliseconds millis + ;
 : loop ( quot end -- ) dup millis > [ [ dup call ] dip loop ] [ 2drop ] if ; inline
 : animate ( quot duration -- ) reset-progress set-end loop ; inline
 : sample ( revs quot -- avg ) reset-progress dupd times progress swap / ; inline
