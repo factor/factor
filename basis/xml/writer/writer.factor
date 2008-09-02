@@ -110,6 +110,9 @@ M: instruction write-item
         [ after>> write-chunk ]
     } cleave ;
 
+M: xml write-item
+    body>> write-item ;
+
 : print-xml ( xml -- )
     write-xml nl ;
 
