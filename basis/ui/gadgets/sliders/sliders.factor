@@ -104,7 +104,7 @@ elevator H{
 
 : layout-thumb-loc ( slider -- )
     dup thumb-loc (layout-thumb)
-    >r [ floor ] map r> set-rect-loc ;
+    >r [ floor ] map r> (>>loc) ;
 
 : layout-thumb-dim ( slider -- )
     dup dup thumb-dim (layout-thumb) >r
