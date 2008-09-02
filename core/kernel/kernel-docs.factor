@@ -920,3 +920,7 @@ HELP: assert
 { $values { "got" "the obtained value" } { "expect" "the expected value" } }
 { $description "Throws an " { $link assert } " error." }
 { $error-description "Thrown when a unit test or other assertion fails." } ;
+
+HELP: assert=
+{ $values { "a" object } { "b" object } }
+{ $description "Throws an " { $link assert } " error if " { $snippet "a" } " does not equal " { $snippet "b" } "." } ;
