@@ -148,7 +148,7 @@ TUPLE: checkbox < button ;
         align-left ;
 
 M: checkbox model-changed
-    swap model-value over (>>selected?) relayout-1 ;
+    swap value>> over (>>selected?) relayout-1 ;
 
 TUPLE: radio-paint color ;
 
@@ -187,7 +187,7 @@ TUPLE: radio-control < button value ;
         align-left ; inline
 
 M: radio-control model-changed
-    swap model-value
+    swap value>>
     over value>> =
     over (>>selected?)
     relayout-1 ;
