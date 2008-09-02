@@ -149,7 +149,7 @@ M: world selection-notify-event
     >r 8 PropModeReplace r>
     [
         XSelectionRequestEvent-selection
-        clipboard-for-atom x-clipboard-contents
+        clipboard-for-atom contents>>
     ] keep encode-clipboard dup length XChangeProperty drop ;
 
 M: world selection-request-event
@@ -188,16 +188,16 @@ M: x11-ui-backend do-events
     [ [ 2dup handle-event ] assert-depth ] when 2drop ;
 
 : x-clipboard@ ( gadget clipboard -- prop win )
-    x-clipboard-atom swap
+    atom>> swap
     find-world handle>> window>> ;
 
 M: x-clipboard copy-clipboard
     [ x-clipboard@ own-selection ] keep
-    set-x-clipboard-contents ;
+    (>>clipboard-contents) ;
 
 M: x-clipboard paste-clipboard
     >r find-world handle>> window>>
-    r> x-clipboard-atom convert-selection ;
+    r> atom>> convert-selection ;
 
 : init-clipboard ( -- )
     XA_PRIMARY <x-clipboard> selection set-global
