@@ -66,7 +66,7 @@ HELP: number=
 { $notes "This word differs from " { $link = } " in that it disregards differences in type when comparing numbers." }
 { $examples
     { $example "USING: math prettyprint ;" "3.0 3 number= ." "t" }
-    { $example "USING: math prettyprint ;" "3.0 3 = ." "f" }
+    { $example "USING: kernel math prettyprint ;" "3.0 3 = ." "f" }
 } ;
 
 HELP: <
@@ -294,7 +294,7 @@ HELP: times
 { $description "Calls the quotation " { $snippet "n" } " times." }
 { $notes "If you need to pass the current index to the quotation, use " { $link each } "." }
 { $examples
-    { $example "USING: io math ;" "3 [ \"Hi\" print ] times" "Hi\nHi\nHi\n" }
+    { $example "USING: io math ;" "3 [ \"Hi\" print ] times" "Hi\nHi\nHi" }
 } ;
 
 HELP: fp-nan?
@@ -304,14 +304,14 @@ HELP: fp-nan?
 HELP: real-part
 { $values { "z" number } { "x" real } }
 { $description "Outputs the real part of a complex number. This acts as the identity on real numbers." }
-{ $examples { $example "C{ 1 2 } real-part ." "1" } } ;
+{ $examples { $example "USING: math prettyprint ; C{ 1 2 } real-part ." "1" } } ;
 
 HELP: imaginary-part
 { $values { "z" number } { "y" real } }
 { $description "Outputs the imaginary part of a complex number. This outputs zero for real numbers." }
 { $examples
-    { $example "C{ 1 2 } imaginary-part ." "2" }
-    { $example "3 imaginary-part ." "0" }
+    { $example "USING: math prettyprint ; C{ 1 2 } imaginary-part ." "2" }
+    { $example "USING: math prettyprint ; 3 imaginary-part ." "0" }
 } ;
 
 HELP: real
