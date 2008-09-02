@@ -5,9 +5,14 @@ IN: math.complex.tests
 [ 1 C{ 0 1 } rect> ] must-fail
 [ C{ 0 1 } 1 rect> ] must-fail
 
-[ f ] [ C{ 5 12.5 } 5  = ] unit-test
-[ t ] [ C{ 1.0 2.0 } C{ 1 2 }  = ] unit-test
-[ f ] [ C{ 1.0 2.3 } C{ 1 2 }  = ] unit-test
+[ f ] [ C{ 5 12.5 } 5 = ] unit-test
+[ f ] [ C{ 5 12.5 } 5 number= ] unit-test
+
+[ f ] [ C{ 1.0 2.0 } C{ 1 2 } = ] unit-test
+[ t ] [ C{ 1.0 2.0 } C{ 1 2 } number= ] unit-test
+
+[ f ] [ C{ 1.0 2.3 } C{ 1 2 } = ] unit-test
+[ f ] [ C{ 1.0 2.3 } C{ 1 2 } number= ] unit-test
 
 [ C{ 2 5 } ] [ 2 5  rect> ] unit-test
 [ 2 5 ] [ C{ 2 5 }  >rect ] unit-test
@@ -30,7 +35,7 @@ IN: math.complex.tests
 
 [ C{ 0 1 } ] [ C{ 0 1 } 1  * ] unit-test
 [ C{ 0 1 } ] [ 1 C{ 0 1 }  * ] unit-test
-[ C{ 0 1.0 } ] [ 1.0 C{ 0 1 }  * ] unit-test
+[ C{ 0.0 1.0 } ] [ 1.0 C{ 0 1 }  * ] unit-test
 [ -1 ] [ C{ 0 1 } C{ 0 1 }  * ] unit-test
 [ C{ 0 1 } ] [ 1 C{ 0 1 }  * ] unit-test
 [ C{ 0 1 } ] [ C{ 0 1 } 1  * ] unit-test
@@ -45,18 +50,18 @@ IN: math.complex.tests
 
 [ C{ -3 4 } ] [ C{ 3 -4 }  neg ] unit-test
 
-[ 5 ] [ C{ 3 4 } abs ] unit-test
-[ 5 ] [ -5.0 abs ] unit-test
+[ 5.0 ] [ C{ 3 4 } abs ] unit-test
+[ 5.0 ] [ -5.0 abs ] unit-test
 
 ! Make sure arguments are sane
-[ 0 ] [ 0 arg ] unit-test
-[ 0 ] [ 1 arg ] unit-test
+[ 0.0 ] [ 0 arg ] unit-test
+[ 0.0 ] [ 1 arg ] unit-test
 [ t ] [ -1 arg 3.14 3.15 between? ] unit-test
 [ t ] [ C{ 0 1 } arg 1.57 1.58 between? ] unit-test
 [ t ] [ C{ 0 -1 } arg -1.58 -1.57 between? ] unit-test
 
-[ 1 0 ] [ 1 >polar ] unit-test
-[ 1 ] [ -1 >polar drop ] unit-test
+[ 1.0 0.0 ] [ 1 >polar ] unit-test
+[ 1.0 ] [ -1 >polar drop ] unit-test
 [ t ] [ -1 >polar nip 3.14 3.15 between? ] unit-test
 
 ! I broke something

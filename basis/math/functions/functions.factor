@@ -7,7 +7,7 @@ IN: math.functions
 <PRIVATE
 
 : (rect>) ( x y -- z )
-    dup zero? [ drop ] [ <complex> ] if ; inline
+    dup 0 = [ drop ] [ <complex> ] if ; inline
 
 PRIVATE>
 
@@ -24,29 +24,57 @@ M: real sqrt
     >float dup 0.0 < [ neg fsqrt 0.0 swap rect> ] [ fsqrt ] if ;
 
 : each-bit ( n quot: ( ? -- ) -- )
-    over 0 number= pick -1 number= or [
+    over 0 = pick -1 = or [
         2drop
     ] [
         2dup >r >r >r odd? r> call r> 2/ r> each-bit
     ] if ; inline recursive
-
-GENERIC: (^) ( x y -- z ) foldable
 
 : ^n ( z w -- z^w )
     1 swap [
         [ dupd * ] when >r sq r>
     ] each-bit nip ; inline
 
-M: integer (^)
-    dup 0 < [ neg ^n recip ] [ ^n ] if ;
+: integer^ ( x y -- z )
+    dup 0 > [ ^n ] [ neg ^n recip ] if ; inline
+
+: >rect ( z -- x y )
+    [ real-part ] [ imaginary-part ] bi ; inline
+
+: >float-rect ( z -- x y )
+    >rect [ >float ] bi@ ; inline
+
+: >polar ( z -- abs arg )
+    >float-rect [ [ sq ] bi@ + fsqrt ] [ swap fatan2 ] 2bi ;
+    inline
+
+: cis ( arg -- z ) dup fcos swap fsin rect> ; inline
+
+: polar> ( abs arg -- z ) cis * ; inline
+
+: ^mag ( w abs arg -- magnitude )
+    >r >r >float-rect swap r> swap fpow r> rot * fexp /f ;
+    inline
+
+: ^theta ( w abs arg -- theta )
+    >r >r >float-rect r> flog * swap r> * + ; inline
+
+: ^complex ( x y -- z )
+    swap >polar [ ^mag ] [ ^theta ] 3bi polar> ; inline
+
+: real^? ( x y -- ? )
+    2dup [ real? ] both? [ drop 0 >= ] [ 2drop f ] if ; inline
+
+: 0^ ( x -- z )
+    dup zero? [ drop 0./0. ] [ 0 < 1./0. 0 ? ] if ; inline
 
 : ^ ( x y -- z )
-    over zero? [
-        dup zero?
-        [ 2drop 0.0 0.0 / ] [ 0 < [ drop 1.0 0.0 / ] when ] if
-    ] [
-        (^)
-    ] if ; inline
+    {
+        { [ over zero? ] [ nip 0^ ] }
+        { [ dup integer? ] [ integer^ ] }
+        { [ 2dup real^? ] [ fpow ] }
+        [ ^complex ]
+    } cond ;
 
 : (^mod) ( n x y -- z )
     1 swap [
@@ -98,32 +126,9 @@ M: real absq sq ;
         [ ~abs ]
     } cond ;
 
-: >rect ( z -- x y ) dup real-part swap imaginary-part ; inline
-
 : conjugate ( z -- z* ) >rect neg rect> ; inline
 
-: >float-rect ( z -- x y )
-    >rect swap >float swap >float ; inline
-
 : arg ( z -- arg ) >float-rect swap fatan2 ; inline
-
-: >polar ( z -- abs arg )
-    >float-rect [ [ sq ] bi@ + fsqrt ] 2keep swap fatan2 ;
-    inline
-
-: cis ( arg -- z ) dup fcos swap fsin rect> ; inline
-
-: polar> ( abs arg -- z ) cis * ; inline
-
-: ^mag ( w abs arg -- magnitude )
-    >r >r >float-rect swap r> swap fpow r> rot * fexp /f ;
-    inline
-
-: ^theta ( w abs arg -- theta )
-    >r >r >float-rect r> flog * swap r> * + ; inline
-
-M: number (^)
-    swap >polar 3dup ^theta >r ^mag r> polar> ;
 
 : [-1,1]? ( x -- ? )
     dup complex? [ drop f ] [ abs 1 <= ] if ; inline
@@ -131,9 +136,17 @@ M: number (^)
 : >=1? ( x -- ? )
     dup complex? [ drop f ] [ 1 >= ] if ; inline
 
-: exp ( x -- y ) >rect swap fexp swap polar> ; inline
+GENERIC: exp ( x -- y )
 
-: log ( x -- y ) >polar swap flog swap rect> ; inline
+M: real exp fexp ;
+
+M: complex exp >rect swap fexp swap polar> ;
+
+GENERIC: log ( x -- y )
+
+M: real log dup 0.0 >= [ flog ] [ 0.0 rect> log ] if ;
+
+M: complex log >polar swap flog swap rect> ;
 
 : cos ( x -- y )
     dup complex? [

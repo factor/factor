@@ -69,7 +69,7 @@ unit-test
 [ f ] [ [ { 2 } { } { } ] all-equal? ] unit-test
 [ t ] [ [ ] all-equal? ] unit-test
 [ t ] [ [ 1234 ] all-equal? ] unit-test
-[ t ] [ [ 1.0 1 1 ] all-equal? ] unit-test
+[ f ] [ [ 1.0 1 1 ] all-equal? ] unit-test
 [ t ] [ { 1 2 3 4 } [ < ] monotonic? ] unit-test
 [ f ] [ { 1 2 3 4 } [ > ] monotonic? ] unit-test
 [ [ 2 3 4 ] ] [ [ 1 2 3 ] 1 [ + ] curry map ] unit-test
@@ -251,3 +251,9 @@ unit-test
 [ { "a" "b" "c" "d" } ] [ { "a" "b" "c" "d" } { 0 1 2 3 } nths ] unit-test
 [ { "d" "c" "b" "a" } ] [ { "a" "b" "c" "d" } { 3 2 1 0 } nths ] unit-test
 [ { "d" "a" "b" "c" } ] [ { "a" "b" "c" "d" } { 3 0 1 2 } nths ] unit-test
+
+TUPLE: bogus-hashcode ;
+
+M: bogus-hashcode hashcode* 2drop 0 >bignum ;
+
+[ 0 ] [ { T{ bogus-hashcode } } hashcode ] unit-test

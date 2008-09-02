@@ -589,6 +589,10 @@ MIXIN: empty-mixin
     ] final-classes
 ] unit-test
 
+[ V{ POSTPONE: f } ] [
+    [ { float } declare 0 eq? ] final-classes
+] unit-test
+
 ! [ V{ string } ] [
 !     [ dup string? t xor [ "A" throw ] [ ] if ] final-classes
 ! ] unit-test
