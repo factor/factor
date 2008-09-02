@@ -1,8 +1,6 @@
-
 USING: accessors ui.gadgets ui.gadgets.labels namespaces sequences kernel
 math arrays tools.test io ui.gadgets.panes ui.traverse
 definitions compiler.units ;
-
 IN: ui.traverse.tests
 
 M: array children>> ;
@@ -10,7 +8,7 @@ M: array children>> ;
 GENERIC: (flatten-tree) ( node -- )
 
 M: node (flatten-tree)
-    node-children [ (flatten-tree) ] each ;
+    children>> [ (flatten-tree) ] each ;
 
 M: object (flatten-tree) , ;
 
@@ -64,4 +62,4 @@ M: object (flatten-tree) , ;
     { 0 1 } { 2 0 1 } { { "a" "b" "c" "d" } { "e" "f" "g" } { { "h" "i" } "j" } } gadgets-in-range
 ] unit-test
 
-[ { array gadget-children } forget ] with-compilation-unit
+[ { array children>> } forget ] with-compilation-unit

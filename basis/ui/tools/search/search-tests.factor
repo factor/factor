@@ -1,6 +1,6 @@
 USING: assocs ui.tools.search help.topics io.files io.styles
 kernel namespaces sequences source-files threads
-tools.test ui.gadgets ui.gestures vocabs
+tools.test ui.gadgets ui.gestures vocabs accessors
 vocabs.loader words tools.test.ui debugger ;
 IN: ui.tools.search.tests
 
@@ -15,7 +15,7 @@ IN: ui.tools.search.tests
 : update-live-search ( search -- seq )
     dup [
         300 sleep
-        live-search-list control-value
+        list>> control-value
     ] with-grafted-gadget ;
 
 : test-live-search ( gadget quot -- ? )
@@ -29,7 +29,7 @@ IN: ui.tools.search.tests
 [ t ] [
     "" all-words t <definition-search>
     dup [
-        { "set-word-prop" } over live-search-field set-control-value
+        { "set-word-prop" } over field>> set-control-value
         300 sleep
         search-value \ set-word-prop eq?
     ] with-grafted-gadget
