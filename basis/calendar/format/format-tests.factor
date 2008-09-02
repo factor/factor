@@ -3,23 +3,23 @@ io.streams.string accessors io math.order ;
 IN: calendar.format.tests
 
 [ 0 ] [
-    "Z" [ read1 read-rfc3339-gmt-offset ] with-string-reader dt>hours
+    "Z" [ read1 read-rfc3339-gmt-offset ] with-string-reader duration>hours
 ] unit-test
 
 [ 1 ] [
-    "+01" [ read1 read-rfc3339-gmt-offset ] with-string-reader dt>hours
+    "+01" [ read1 read-rfc3339-gmt-offset ] with-string-reader duration>hours
 ] unit-test
 
 [ -1 ] [
-    "-01" [ read1 read-rfc3339-gmt-offset ] with-string-reader dt>hours
+    "-01" [ read1 read-rfc3339-gmt-offset ] with-string-reader duration>hours
 ] unit-test
 
 [ -1-1/2 ] [
-    "-01:30" [ read1 read-rfc3339-gmt-offset ] with-string-reader dt>hours
+    "-01:30" [ read1 read-rfc3339-gmt-offset ] with-string-reader duration>hours
 ] unit-test
 
 [ 1+1/2 ] [
-    "+01:30" [ read1 read-rfc3339-gmt-offset ] with-string-reader dt>hours
+    "+01:30" [ read1 read-rfc3339-gmt-offset ] with-string-reader duration>hours
 ] unit-test
 
 [ ] [ now timestamp>rfc3339 drop ] unit-test
