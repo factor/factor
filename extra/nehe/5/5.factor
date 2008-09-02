@@ -65,7 +65,7 @@ M: nehe5-gadget draw-gadget* ( gadget -- )
   glLoadIdentity
 
   1.5 0.0 -7.0 glTranslatef
-  dup nehe5-gadget-rquad 1.0 0.0 0.0 glRotatef
+  dup rquad>> 1.0 0.0 0.0 glRotatef
   GL_QUADS [
     0.0 1.0 0.0 glColor3f
     1.0 1.0 -1.0 glVertex3f
