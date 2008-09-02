@@ -61,7 +61,7 @@ M: interactor ungraft*
 
 M: interactor model-changed
     2dup help>> eq? [
-        swap model-value over word-at-loc swap show-summary
+        swap value>> over word-at-loc swap show-summary
     ] [
         call-next-method
     ] if ;
