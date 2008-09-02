@@ -346,10 +346,8 @@ GENERIC: days-in-year ( obj -- n )
 M: integer days-in-year ( year -- n ) leap-year? 366 365 ? ;
 M: timestamp days-in-year ( timestamp -- n ) year>> days-in-year ;
 
-<PRIVATE
 : (days-in-month) ( year month -- n )
     dup 2 = [ drop leap-year? 29 28 ? ] [ nip day-counts nth ] if ;
-PRIVATE>
 
 : days-in-month ( timestamp -- n )
     >date< drop (days-in-month) ;
