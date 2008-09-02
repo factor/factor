@@ -28,7 +28,7 @@ TUPLE: dummy-destructor obj ;
 C: <dummy-destructor> dummy-destructor
 
 M: dummy-destructor dispose ( obj -- )
-    dummy-destructor-obj t swap set-dummy-obj-destroyed? ;
+    obj>> t >>destroyed? drop ;
 
 : destroy-always
     <dummy-destructor> &dispose drop ;
@@ -39,13 +39,13 @@ M: dummy-destructor dispose ( obj -- )
 [ t ] [
     [
         <dummy-obj> dup destroy-always
-    ] with-destructors dummy-obj-destroyed? 
+    ] with-destructors destroyed?>>
 ] unit-test
 
 [ f ] [
     [
         <dummy-obj> dup destroy-later
-    ] with-destructors dummy-obj-destroyed? 
+    ] with-destructors destroyed?>>
 ] unit-test
 
 [ t ] [
@@ -54,7 +54,7 @@ M: dummy-destructor dispose ( obj -- )
             dup destroy-always
             "foo" throw
         ] with-destructors
-    ] ignore-errors dummy-obj-destroyed? 
+    ] ignore-errors destroyed?>>
 ] unit-test
 
 [ t ] [
@@ -63,6 +63,6 @@ M: dummy-destructor dispose ( obj -- )
             dup destroy-later
             "foo" throw
         ] with-destructors
-    ] ignore-errors dummy-obj-destroyed? 
+    ] ignore-errors destroyed?>>
 ] unit-test
 
