@@ -139,11 +139,7 @@ TUPLE: bunny-outlined
 
 : <bunny-outlined> ( gadget -- draw )
     outlining-supported? [
-        pass1-program pass2-program {
-            (>>gadget)
-            (>>pass1-program)
-            (>>pass2-program)
-        } bunny-outlined construct
+        pass1-program pass2-program f f f f f bunny-outlined boa
     ] [ drop f ] if ;
 
 : (framebuffer-texture) ( dim iformat xformat -- texture )

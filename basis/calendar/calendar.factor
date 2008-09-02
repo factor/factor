@@ -278,12 +278,10 @@ GENERIC: time- ( time1 time2 -- time3 )
 M: timestamp <=> ( ts1 ts2 -- n )
     [ >gmt tuple-slots ] compare ;
 
-<PRIVATE
 : (time-) ( timestamp timestamp -- n )
     [ >gmt ] bi@
     [ [ >date< julian-day-number ] bi@ - 86400 * ] 2keep
     [ >time< >r >r 3600 * r> 60 * r> + + ] bi@ - + ;
-PRIVATE>
 
 M: timestamp time-
     #! Exact calendar-time difference

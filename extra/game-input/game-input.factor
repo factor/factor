@@ -28,7 +28,6 @@ M: f (reset-game-input) ;
 PRIVATE>
 
 : open-game-input ( -- )
-    load-game-input-backend
     game-input-opened? [
         (open-game-input) 
         game-input-opened on
@@ -76,3 +75,6 @@ M: keyboard-state clone
     call-next-method dup keys>> clone >>keys ;
 
 HOOK: read-keyboard game-input-backend ( -- keyboard-state )
+
+load-game-input-backend
+

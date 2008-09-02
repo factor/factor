@@ -46,19 +46,19 @@ HELP: vocab
 { $class-description "Instances represent vocabularies." } ;
 
 HELP: vocab-name
-{ $values { "vocab" "a vocabulary specifier" } { "name" string } }
+{ $values { "vocab-spec" "a vocabulary specifier" } { "name" string } }
 { $description "Outputs the name of a vocabulary." } ;
 
 HELP: vocab-words
-{ $values { "vocab" "a vocabulary specifier" } { "words" "an assoc mapping strings to words" } }
+{ $values { "vocab-spec" "a vocabulary specifier" } { "words" "an assoc mapping strings to words" } }
 { $description "Outputs the words defined in a vocabulary." } ;
 
 HELP: vocab-source-loaded?
-{ $values { "vocab" "a vocabulary specifier" } { "source-loaded?" "a boolean" } }
+{ $values { "vocab-spec" "a vocabulary specifier" } { "?" "a boolean" } }
 { $description "Outputs if the source for this vocubulary has been loaded." } ;
 
 HELP: vocab-docs-loaded?
-{ $values { "vocab" "a vocabulary specifier" } { "docs-loaded?" "a boolean" } }
+{ $values { "vocab-spec" "a vocabulary specifier" } { "?" "a boolean" } }
 { $description "Outputs if the documentation for this vocubulary has been loaded." } ;
 
 HELP: words

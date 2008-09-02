@@ -4,7 +4,7 @@
 ! Remote Channels
 USING: kernel init namespaces assocs arrays random
 sequences channels match concurrency.messaging
-concurrency.distributed threads ;
+concurrency.distributed threads accessors ;
 IN: channels.remote
 
 <PRIVATE
@@ -52,13 +52,13 @@ TUPLE: remote-channel node id ;
 C: <remote-channel> remote-channel 
 
 M: remote-channel to ( value remote-channel -- )
-    [ [ \ to , remote-channel-id , , ] { } make ] keep
-    remote-channel-node "remote-channels" <remote-process> 
+    [ [ \ to , id>> , , ] { } make ] keep
+    node>> "remote-channels" <remote-process> 
     send-synchronous no-channel = [ no-channel throw ] when ;
 
 M: remote-channel from ( remote-channel -- value )
-    [ [ \ from , remote-channel-id , ] { } make ] keep
-    remote-channel-node "remote-channels" <remote-process> 
+    [ [ \ from , id>> , ] { } make ] keep
+    node>> "remote-channels" <remote-process> 
     send-synchronous dup no-channel = [ no-channel throw ] when* ;
 
 [

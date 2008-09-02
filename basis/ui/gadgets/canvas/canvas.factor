@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: ui.backend ui.gadgets ui.gadgets.theme ui.gadgets.lib
 ui.gadgets.worlds ui.render opengl opengl.gl kernel namespaces
-classes.tuple colors ;
+classes.tuple colors accessors ;
 IN: ui.gadgets.canvas
 
 TUPLE: canvas < gadget dlist ;
@@ -11,16 +11,16 @@ TUPLE: canvas < gadget dlist ;
     new-gadget black solid-interior ; inline
 
 : delete-canvas-dlist ( canvas -- )
-    dup find-gl-context
-    dup canvas-dlist [ delete-dlist ] when*
-    f swap set-canvas-dlist ;
+    [ find-gl-context ]
+    [ dlist>> [ delete-dlist ] when* ]
+    [ f >>dlist drop ] tri ;
 
 : make-canvas-dlist ( canvas quot -- dlist )
-    over >r GL_COMPILE swap make-dlist dup r>
-    set-canvas-dlist ;
+    [ GL_COMPILE ] dip make-dlist
+    [ >>dlist drop ] keep ;
 
 : cache-canvas-dlist ( canvas quot -- dlist )
-    over canvas-dlist dup
+    over dlist>> dup
     [ 2nip ] [ drop make-canvas-dlist ] if ; inline
 
 : draw-canvas ( canvas quot -- )

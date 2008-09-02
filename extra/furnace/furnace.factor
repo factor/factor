@@ -203,6 +203,6 @@ CHLOE: button
     {
         [ [ attrs>> chloe-attrs-only ] dip add-tag-attrs ]
         [ [ attrs>> non-chloe-attrs-only ] dip "button" tag-named add-tag-attrs ]
-        [ [ children>string 1array ] dip "button" tag-named set-tag-children ]
+        [ [ children>string 1array ] dip "button" tag-named (>>children) ]
         [ nip ]
     } 2cleave process-chloe-tag ;
