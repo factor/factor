@@ -12,7 +12,6 @@ $nl
 $nl
 "Type hints are declared with a parsing word:"
 { $subsection POSTPONE: HINTS: }
-$nl
 "The specialized version of a word which will be compiled by the compiler can be inspected:"
 { $subsection specialized-def } ;
 
