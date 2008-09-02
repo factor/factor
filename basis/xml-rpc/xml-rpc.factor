@@ -80,11 +80,11 @@ C: <rpc-fault> rpc-fault
 
 GENERIC: send-rpc ( rpc -- xml )
 M: rpc-method send-rpc
-    [ rpc-method-name ] keep rpc-method-params method-call ;
+    [ name>> ] [ params>> ] bi method-call ;
 M: rpc-response send-rpc
-    rpc-response-params return-params ;
+    params>> return-params ;
 M: rpc-fault send-rpc
-    [ rpc-fault-code ] keep rpc-fault-string return-fault ;
+    [ code>> ] [ string>> ] bi return-fault ;
 
 ! * Recieving RPC requests
 ! this needs to have much better error checking
@@ -96,8 +96,8 @@ TUPLE: server-error tag message ;
 
 M: server-error error.
     "Error in XML supplied to server" print
-    "Description: " write dup server-error-message print
-    "Tag: " write server-error-tag xml>string print ;
+    "Description: " write dup message>> print
+    "Tag: " write tag>> xml>string print ;
 
 PROCESS: xml>item ( tag -- object )
 
@@ -139,8 +139,8 @@ TAG: array xml>item
     first-child-tag params>array ;
 
 : parse-method ( xml -- string array )
-    children-tags dup first children>string
-    swap second params>array ;
+    children-tags first2
+    [ children>string ] [ params>array ] bi* ;
 
 : parse-fault ( xml -- fault-code fault-string )
     first-child-tag first-child-tag first-child-tag
