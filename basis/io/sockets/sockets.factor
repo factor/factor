@@ -72,8 +72,8 @@ M: inet4 sockaddr-type drop "sockaddr-in" c-type ;
 M: inet4 make-sockaddr ( inet -- sockaddr )
     "sockaddr-in" <c-object>
     AF_INET over set-sockaddr-in-family
-    over inet4-port htons over set-sockaddr-in-port
-    over inet4-host
+    over port>> htons over set-sockaddr-in-port
+    over host>>
     "0.0.0.0" or
     rot inet-pton *uint over set-sockaddr-in-addr ;
 
@@ -134,8 +134,8 @@ M: inet6 sockaddr-type drop "sockaddr-in6" c-type ;
 M: inet6 make-sockaddr ( inet -- sockaddr )
     "sockaddr-in6" <c-object>
     AF_INET6 over set-sockaddr-in6-family
-    over inet6-port htons over set-sockaddr-in6-port
-    over inet6-host "::" or
+    over port>> htons over set-sockaddr-in6-port
+    over host>> "::" or
     rot inet-pton over set-sockaddr-in6-addr ;
 
 M: inet6 parse-sockaddr
