@@ -430,16 +430,6 @@ HELP: day-of-year
     }
 } ;
 
-HELP: day-this-week
-{ $values { "timestamp" timestamp } { "n" integer } { "timestamp" timestamp } } 
-{ $description "Implementation word to calculate the day of the week relative to the timestamp. Sunday is the first day of the week, so the resulting " { $snippet "timestamp" } " will be Sunday or after, and before Saturday." }
-{ $examples
-    { $example "USING: calendar kernel prettyprint ;"
-               "now 0 day-this-week now sunday = ."
-               "t"
-    }
-} ;
-
 HELP: sunday
 { $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
 { $description "Returns the Sunday from the current week, which starts on a Sunday." } ;
@@ -501,18 +491,32 @@ ARTICLE: "calendar" "Calendar"
 "Durations represent spans of time:"
 { $subsection "using-durations" }
 "Arithmetic on timestamps and durations:"
-{ $subsection time+ }
-{ $subsection time- }
-{ $subsection time* }
+{ $subsection "timestamp-arithmetic" }
 "Getting the current timestamp:"
 { $subsection now }
 { $subsection gmt }
 "Converting between timestamps:"
 { $subsection >local-time }
 { $subsection >gmt }
+"Converting between timezones:"
+{ $subsection convert-timezone }
 "Timestamps relative to each other:"
 { $subsection "relative-timestamps" }
+"Operations on units of time:"
+{ $subsection "years" }
+{ $subsection "months" }
+{ $subsection "days" }
+"Meta-data about the calendar:"
+{ $subsection "calendar-facts" }
 ;
+
+ARTICLE: "timestamp-arithmetic" "Timestamp arithmetic"
+"Adding timestamps and durations, or durations and durations:"
+{ $subsection time+ }
+"Subtracting:"
+{ $subsection time- }
+"Element-wise multiplication:"
+{ $subsection time* } ;
 
 ARTICLE: "using-durations" "Using durations"
 "Creating a duration object:"
@@ -524,6 +528,7 @@ ARTICLE: "using-durations" "Using durations"
 { $subsection minutes }
 { $subsection seconds }
 { $subsection milliseconds }
+{ $subsection instant }
 "Converting a duration to a number:"
 { $subsection duration>years }
 { $subsection duration>months }
@@ -534,9 +539,11 @@ ARTICLE: "using-durations" "Using durations"
 { $subsection duration>milliseconds } ;
 
 ARTICLE: "relative-timestamps" "Relative timestamps"
-"Getting a relative timestamp:"
+"In the future:"
 { $subsection hence }
+"In the past:"
 { $subsection ago }
+"Invert a duration:"
 { $subsection before }
 "Days of the week relative to " { $link now } ":"
 { $subsection sunday }
@@ -546,6 +553,54 @@ ARTICLE: "relative-timestamps" "Relative timestamps"
 { $subsection thursday }
 { $subsection friday }
 { $subsection saturday }
+"New timestamps relative to calendar events:"
+{ $subsection beginning-of-year }
+{ $subsection beginning-of-month }
+{ $subsection beginning-of-week }
+{ $subsection midnight }
+{ $subsection noon }
+;
+
+ARTICLE: "days" "Day operations"
+"Naming days:"
+{ $subsection day-abbreviation2 }
+{ $subsection day-abbreviations2 }
+{ $subsection day-abbreviation3 }
+{ $subsection day-abbreviations3 }
+{ $subsection day-name }
+{ $subsection day-names }
+"Calculating a Julian day number:"
+{ $subsection julian-day-number }
+"Calculate a timestamp:"
+{ $subsection julian-day-number>date }
+;
+
+ARTICLE: "calendar-facts" "Calendar facts"
+"Calendar facts:"
+{ $subsection average-month }
+{ $subsection months-per-year }
+{ $subsection days-per-year }
+{ $subsection hours-per-year }
+{ $subsection minutes-per-year }
+{ $subsection seconds-per-year }
+{ $subsection days-in-month }
+{ $subsection day-of-year }
+{ $subsection day-of-week }
+;
+
+ARTICLE: "years" "Year operations"
+"Leap year predicate:"
+{ $subsection leap-year? }
+"Find the number of days in a year:"
+{ $subsection days-in-year }
+;
+
+ARTICLE: "months" "Month operations"
+"Naming months:"
+{ $subsection month-name }
+{ $subsection month-names }
+{ $subsection month-abbreviation }
+{ $subsection month-abbreviations }
 ;
 
 ABOUT: "calendar"

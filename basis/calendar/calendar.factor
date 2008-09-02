@@ -278,10 +278,12 @@ GENERIC: time- ( time1 time2 -- time3 )
 M: timestamp <=> ( ts1 ts2 -- n )
     [ >gmt tuple-slots ] compare ;
 
+<PRIVATE
 : (time-) ( timestamp timestamp -- n )
     [ >gmt ] bi@
     [ [ >date< julian-day-number ] bi@ - 86400 * ] 2keep
     [ >time< >r >r 3600 * r> 60 * r> + + ] bi@ - + ;
+PRIVATE>
 
 M: timestamp time-
     #! Exact calendar-time difference
@@ -344,8 +346,10 @@ GENERIC: days-in-year ( obj -- n )
 M: integer days-in-year ( year -- n ) leap-year? 366 365 ? ;
 M: timestamp days-in-year ( timestamp -- n ) year>> days-in-year ;
 
+<PRIVATE
 : (days-in-month) ( year month -- n )
     dup 2 = [ drop leap-year? 29 28 ? ] [ nip day-counts nth ] if ;
+PRIVATE>
 
 : days-in-month ( timestamp -- n )
     >date< drop (days-in-month) ;
@@ -364,11 +368,13 @@ M: timestamp days-in-year ( timestamp -- n ) year>> days-in-year ;
 : day-of-year ( timestamp -- n )
     >date< (day-of-year) ;
 
+<PRIVATE
 : day-offset ( timestamp m -- timestamp n )
     over day-of-week - ; inline
 
 : day-this-week ( timestamp n -- timestamp )
     day-offset days time+ ;
+PRIVATE>
 
 : sunday ( timestamp -- new-timestamp ) 0 day-this-week ;
 : monday ( timestamp -- new-timestamp ) 1 day-this-week ;
