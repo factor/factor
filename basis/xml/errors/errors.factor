@@ -171,7 +171,7 @@ M: bad-directive summary ( obj -- str )
     [
         dup call-next-method write
         "Misplaced directive:" print
-        bad-directive-dir write-item nl
+        dir>> write-item nl
     ] with-string-writer ;
 
 UNION: xml-parse-error multitags notags extra-attrs nonexist-ns
