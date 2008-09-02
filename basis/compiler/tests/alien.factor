@@ -109,7 +109,7 @@ unit-test
 << "f-stdcall" f "stdcall" add-library >>
 
 [ f ] [ "f-stdcall" load-library ] unit-test
-[ "stdcall" ] [ "f-stdcall" library library-abi ] unit-test
+[ "stdcall" ] [ "f-stdcall" library abi>> ] unit-test
 
 : ffi_test_18 ( w x y z -- int )
     "int" "f-stdcall" "ffi_test_18" { "int" "int" "int" "int" }
