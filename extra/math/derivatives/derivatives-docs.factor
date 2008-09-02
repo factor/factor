@@ -71,8 +71,8 @@ HELP: derivative-func
 { $examples
     { $example
         "USING: kernel math.derivatives math.functions math.trig prettyprint ;"
-        "60 deg>rad [ sin ] derivative-func call ."
-        "0.5000000000000173"
+        "60 deg>rad [ sin ] derivative-func call 0.5 .001 ~ ."
+        "t"
     }
     { $notes
         "Without a heavy algebraic system, derivatives must be "
