@@ -193,7 +193,7 @@ M: x11-ui-backend do-events
 
 M: x-clipboard copy-clipboard
     [ x-clipboard@ own-selection ] keep
-    (>>clipboard-contents) ;
+    (>>contents) ;
 
 M: x-clipboard paste-clipboard
     >r find-world handle>> window>>
