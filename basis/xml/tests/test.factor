@@ -21,7 +21,7 @@ SYMBOL: xml-file
 [ t ] [ xml-file get children>> second contained-tag? ] unit-test
 [ "<a></b>" string>xml ] [ xml-parse-error? ] must-fail-with
 [ T{ comment f "This is where the fun begins!" } ] [
-    xml-file get xml-before [ comment? ] find nip
+    xml-file get before>> [ comment? ] find nip
 ] unit-test
 [ "xsl stylesheet=\"that-one.xsl\"" ] [
     xml-file get after>> [ instruction? ] find nip text>>
