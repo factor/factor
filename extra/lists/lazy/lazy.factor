@@ -356,7 +356,7 @@ M: lazy-io car ( lazy-io -- car )
         nip
     ] [
         drop dup stream>> over quot>> call
-        swap dupd set-lazy-io-car
+        >>car
     ] if ;
 
 M: lazy-io cdr ( lazy-io -- cdr )
