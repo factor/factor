@@ -62,7 +62,7 @@ C: <rollover> rollover
 
 M: rollover length n>> ;
 
-M: rollover nth-unsafe rollover-seq [ length mod ] keep nth-unsafe ;
+M: rollover nth-unsafe seq>> [ length mod ] keep nth-unsafe ;
 
 INSTANCE: rollover immutable-sequence
 
