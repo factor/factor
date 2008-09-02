@@ -15,7 +15,7 @@ GENERIC# whoa 1 ( s t -- w )
 PROTOCOL: baz foo { bar 0 } { whoa 1 } ;
 
 : hello-test ( hello/goodbye -- array )
-    [ hello? ] [ hello-this ] [ hello-that ] tri 3array ;
+    [ hello? ] [ this>> ] [ that>> ] tri 3array ;
 
 CONSULT: baz goodbye these>> ;
 M: hello foo this>> ;
@@ -34,8 +34,8 @@ M: hello bing hello-test ;
 [ 3 ] [ 1 0 <hello> 2 whoa ] unit-test
 [ 3 ] [ 1 0 <hello> f <goodbye> 2 whoa ] unit-test
 
-[ ] [ 3 [ "USE: delegate IN: delegate.tests CONSULT: baz goodbye goodbye-these ;" eval ] times ] unit-test
-[ H{ { goodbye [ goodbye-these ] } } ] [ baz protocol-consult ] unit-test
+[ ] [ 3 [ "USING: accessors delegate ; IN: delegate.tests CONSULT: baz goodbye these>> ;" eval ] times ] unit-test
+[ H{ { goodbye [ these>> ] } } ] [ baz protocol-consult ] unit-test
 [ H{ } ] [ bee protocol-consult ] unit-test
 
 [ "USING: delegate ;\nIN: delegate.tests\nPROTOCOL: baz foo bar { whoa 1 } ;\n" ] [ [ baz see ] with-string-writer ] unit-test
