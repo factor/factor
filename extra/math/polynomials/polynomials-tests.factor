@@ -22,7 +22,7 @@ USING: kernel math math.polynomials tools.test ;
 [ V{ 1 0 1 } V{ 0 0 0 } ] [ { 1 1 1 1 } { 1 1 } p/mod ] unit-test
 [ V{ 1 0 1 } V{ 0 0 0 } ] [ { 1 1 1 1 } { 1 1 0 0 0 0 0 0 } p/mod ] unit-test
 [ V{ 1 0 1 } V{ 0 0 0 } ] [ { 1 1 1 1 0 0 0 0 } { 1 1 0 0 } p/mod ] unit-test
-[ V{ 5.0 } V{ 0.0 } ] [ { 10.0 } { 2.0 } p/mod ] unit-test
+[ V{ 5.0 } V{ 0 } ] [ { 10.0 } { 2.0 } p/mod ] unit-test
 [ V{ 15/16 } V{ 0 } ] [ { 3/4 } { 4/5 } p/mod ] unit-test
 [ t ] [ { 0 1 } { 0 1 0 } p= ] unit-test
 [ f ] [ { 0 0 1 } { 0 1 0 } p= ] unit-test
