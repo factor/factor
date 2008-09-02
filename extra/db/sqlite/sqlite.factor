@@ -52,12 +52,12 @@ M: sqlite-result-set dispose ( result-set -- )
     handle>> [ sqlite3_reset drop ] [ sqlite3_clear_bindings drop ] bi ;
 
 M: sqlite-statement low-level-bind ( statement -- )
-    [ statement-bind-params ] [ statement-handle ] bi
+    [ bind-params>> ] [ handle>> ] bi
     [ swap [ key>> ] [ value>> ] [ type>> ] tri sqlite-bind-type ] curry each ;
 
 M: sqlite-statement bind-statement* ( statement -- )
     sqlite-maybe-prepare
-    dup statement-bound? [ dup reset-bindings ] when
+    dup bound?>> [ dup reset-bindings ] when
     low-level-bind ;
 
 GENERIC: sqlite-bind-conversion ( tuple obj -- array )
