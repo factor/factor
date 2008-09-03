@@ -6,7 +6,7 @@ classes.algebra slots.private combinators accessors words
 sequences.private assocs alien ;
 IN: slots
 
-TUPLE: slot-spec name offset class initial read-only reader writer ;
+TUPLE: slot-spec name offset class initial read-only ;
 
 PREDICATE: reader < word "reader" word-prop ;
 
