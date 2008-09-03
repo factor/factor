@@ -7,9 +7,9 @@ IN: quotations
 
 <PRIVATE
 
-: uncurry dup 3 slot swap 4 slot ; inline
+: uncurry dup 2 slot swap 3 slot ; inline
 
-: uncompose dup 3 slot swap 4 slot ; inline
+: uncompose dup 2 slot swap 3 slot ; inline
 
 PRIVATE>
 

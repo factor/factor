@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel classes.tuple classes.tuple.private math arrays 
 byte-arrays words stack-checker.known-words ;
-IN: compiler.tree.intrinsics
+IN: compiler.intrinsics
 
 : (tuple) ( layout -- tuple )
     "BUG: missing (tuple) intrinsic" throw ;

@@ -358,7 +358,7 @@ M: byte-array '
 
 ! Tuples
 : (emit-tuple) ( tuple -- pointer )
-    [ tuple>array rest-slice ]
+    [ tuple-slots ]
     [ class transfer-word tuple-layout ] bi prefix [ ' ] map
     tuple type-number dup [ emit-seq ] emit-object ;
 
@@ -384,9 +384,9 @@ M: tuple-layout '
     ] cache-object ;
 
 M: tombstone '
-    delegate
-    "((tombstone))" "((empty))" ? "hashtables.private" lookup
-    def>> first [ emit-tuple ] cache-object ;
+    state>> "((tombstone))" "((empty))" ?
+    "hashtables.private" lookup def>> first
+    [ emit-tuple ] cache-object ;
 
 ! Arrays
 M: array '

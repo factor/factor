@@ -199,10 +199,3 @@ ERROR: assert got expect ;
 : do-primitive ( number -- ) "Improper primitive call" throw ;
 
 PRIVATE>
-
-! Deprecated
-GENERIC: delegate ( obj -- delegate )
-
-M: tuple delegate 2 slot ;
-
-M: object delegate drop f ;

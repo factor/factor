@@ -83,7 +83,7 @@ IN: bootstrap.syntax
     "B{" [ \ } [ >byte-array ] parse-literal ] define-syntax
     "BV{" [ \ } [ >byte-vector ] parse-literal ] define-syntax
     "H{" [ \ } [ >hashtable ] parse-literal ] define-syntax
-    "T{" [ \ } [ >tuple ] parse-literal ] define-syntax
+    "T{" [ \ } [ literal>tuple ] parse-literal ] define-syntax
     "W{" [ \ } [ first <wrapper> ] parse-literal ] define-syntax
 
     "POSTPONE:" [ scan-word parsed ] define-syntax

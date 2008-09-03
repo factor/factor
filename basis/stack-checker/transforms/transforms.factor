@@ -105,8 +105,11 @@ IN: stack-checker.transforms
 \ new [
     dup tuple-class? [
         dup inlined-dependency depends-on
-        dup all-slots rest-slice ! delegate slot
-        [ [ initial>> literalize , ] each literalize , \ boa , ] [ ] make
+        [
+            [ all-slots [ initial>> literalize , ] each ]
+            [ literalize , ] bi
+            \ boa ,
+        ] [ ] make
     ] [ drop f ] if
 ] 1 define-transform
 

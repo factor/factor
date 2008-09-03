@@ -32,19 +32,18 @@ UNION: fixed-length-sequence array byte-array string ;
     { <tuple-boa> <complex> } memq? ;
 
 : fold-<tuple-boa> ( values class -- info )
-    [ , f , [ literal>> ] map % ] { } make >tuple
+    [ [ literal>> ] map ] dip prefix >tuple
     <literal-info> ;
 
 : (propagate-tuple-constructor) ( values class -- info )
     [ [ value-info ] map ] dip [ read-only-slots ] keep
-    over 2 tail-slice [ dup [ literal?>> ] when ] all? [
-        [ 2 tail-slice ] dip fold-<tuple-boa>
+    over rest-slice [ dup [ literal?>> ] when ] all? [
+        [ rest-slice ] dip fold-<tuple-boa>
     ] [
         <tuple-info>
     ] if ;
 
 : propagate-<tuple-boa> ( #call -- info )
-    #! Delegation
     in-d>> unclip-last
     value-info literal>> class>> (propagate-tuple-constructor) ;
 
@@ -69,7 +68,6 @@ UNION: fixed-length-sequence array byte-array string ;
     [ 1 = ] [ length>> ] bi* and ;
 
 : value-info-slot ( slot info -- info' )
-    #! Delegation.
     {
         { [ over 0 = ] [ 2drop fixnum <class-info> ] }
         { [ 2dup length-accessor? ] [ nip length>> ] }

@@ -4,11 +4,15 @@ USING: accessors alien alien.accessors alien.c-types arrays
 cpu.ppc.assembler cpu.ppc.architecture cpu.ppc.allot
 cpu.architecture kernel kernel.private math math.private
 namespaces sequences words generic quotations byte-arrays
-hashtables hashtables.private compiler.generator
-compiler.generator.registers compiler.generator.fixup
+hashtables hashtables.private
 sequences.private sbufs vectors system layouts
-math.floats.private classes slots.private combinators
-compiler.constants ;
+math.floats.private classes slots.private
+combinators
+compiler.constants
+compiler.intrinsics
+compiler.generator
+compiler.generator.fixup
+compiler.generator.registers ;
 IN: cpu.ppc.intrinsics
 
 : %slot-literal-known-tag ( -- out value offset )
@@ -437,44 +441,44 @@ IN: cpu.ppc.intrinsics
     { +clobber+ { "n" } }
 } define-intrinsic
 
-! \ (tuple) [
-!     tuple "layout" get size>> 2 + cells %allot
-!     ! Store layout
-!     "layout" get 12 load-indirect
-!     12 11 cell STW
-!     ! Store tagged ptr in reg
-!     "tuple" get tuple %store-tagged
-! ] H{
-!     { +input+ { { [ ] "layout" } } }
-!     { +scratch+ { { f "tuple" } } }
-!     { +output+ { "tuple" } }
-! } define-intrinsic
-! 
-! \ (array) [
-!     array "n" get 2 + cells %allot
-!     ! Store length
-!     "n" operand 12 LI
-!     12 11 cell STW
-!     ! Store tagged ptr in reg
-!     "array" get object %store-tagged
-! ] H{
-!     { +input+ { { [ ] "n" } } }
-!     { +scratch+ { { f "array" } } }
-!     { +output+ { "array" } }
-! } define-intrinsic
-! 
-! \ (byte-array) [
-!     byte-array "n" get 2 cells + %allot
-!     ! Store length
-!     "n" operand 12 LI
-!     12 11 cell STW
-!     ! Store tagged ptr in reg
-!     "array" get object %store-tagged
-! ] H{
-!     { +input+ { { [ ] "n" } } }
-!     { +scratch+ { { f "array" } } }
-!     { +output+ { "array" } }
-! } define-intrinsic
+\ (tuple) [
+    tuple "layout" get size>> 2 + cells %allot
+    ! Store layout
+    "layout" get 12 load-indirect
+    12 11 cell STW
+    ! Store tagged ptr in reg
+    "tuple" get tuple %store-tagged
+] H{
+    { +input+ { { [ ] "layout" } } }
+    { +scratch+ { { f "tuple" } } }
+    { +output+ { "tuple" } }
+} define-intrinsic
+
+\ (array) [
+    array "n" get 2 + cells %allot
+    ! Store length
+    "n" operand 12 LI
+    12 11 cell STW
+    ! Store tagged ptr in reg
+    "array" get object %store-tagged
+] H{
+    { +input+ { { [ ] "n" } } }
+    { +scratch+ { { f "array" } } }
+    { +output+ { "array" } }
+} define-intrinsic
+
+\ (byte-array) [
+    byte-array "n" get 2 cells + %allot
+    ! Store length
+    "n" operand 12 LI
+    12 11 cell STW
+    ! Store tagged ptr in reg
+    "array" get object %store-tagged
+] H{
+    { +input+ { { [ ] "n" } } }
+    { +scratch+ { { f "array" } } }
+    { +output+ { "array" } }
+} define-intrinsic
 
 \ <ratio> [
     ratio 3 cells %allot
@@ -523,7 +527,7 @@ IN: cpu.ppc.intrinsics
             { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { { f "value" } } }
+        { +scratch+ { { f "value" } { f "scratch" } } }
         { +output+ { "value" } }
         { +clobber+ { "offset" } }
     } ;
@@ -580,7 +584,7 @@ define-alien-integer-intrinsics
         { unboxed-c-ptr "alien" c-ptr }
         { f "offset" fixnum }
     } }
-    { +scratch+ { { unboxed-alien "value" } } }
+    { +scratch+ { { unboxed-alien "value" } { f "scratch" } } }
     { +output+ { "value" } }
     { +clobber+ { "offset" } }
 } define-intrinsic
@@ -593,6 +597,7 @@ define-alien-integer-intrinsics
         { unboxed-c-ptr "alien" c-ptr }
         { f "offset" fixnum }
     } }
+    { +scratch+ { { f "scratch" } } }
     { +clobber+ { "offset" } }
 } define-intrinsic
 
@@ -602,7 +607,7 @@ define-alien-integer-intrinsics
             { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { { float "value" } } }
+        { +scratch+ { { float "value" } { f "scratch" } } }
         { +output+ { "value" } }
         { +clobber+ { "offset" } }
     } ;
@@ -614,6 +619,7 @@ define-alien-integer-intrinsics
             { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
+        { +scratch+ { { f "scratch" } } }
         { +clobber+ { "offset" } }
     } ;
 
