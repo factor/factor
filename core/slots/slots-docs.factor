@@ -131,7 +131,7 @@ HELP: define-typecheck
         "GENERIC: generic"
         "M: class generic quot ;"
     }
-    "It checks if the top of the stack is an instance of " { $snippet "class" } ", and if so, executes the quotation. Delegation is respected."
+    "It checks if the top of the stack is an instance of " { $snippet "class" } ", and if so, executes the quotation."
 }
 { $notes "This word is used internally to wrap unsafe low-level code in a type-checking stub." } ;
 
