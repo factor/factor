@@ -14,7 +14,7 @@ C: <tree-node> tree-node
         [ >r 2 *     r> bottom-up-tree ] 2tri
     ] [
         drop f f
-    ] if <tree-node> ;
+    ] if <tree-node> ; inline recursive
 
 GENERIC: item-check ( node -- n )
 
@@ -28,7 +28,7 @@ M: f item-check drop 0 ;
 : stretch-tree ( max-depth -- )
     1 + 0 over bottom-up-tree item-check
     [ "stretch tree of depth " write pprint ]
-    [ "\t check: " write . ] bi* ;
+    [ "\t check: " write . ] bi* ; inline
 
 :: long-lived-tree ( max-depth -- )
     0 max-depth bottom-up-tree
@@ -46,10 +46,10 @@ M: f item-check drop 0 ;
     ] each
 
     "long lived tree of depth " write max-depth pprint
-    "\t check: " write item-check . ;
+    "\t check: " write item-check . ; inline
 
 : binary-trees ( n -- )
-    min-depth 2 + max [ stretch-tree ] [ long-lived-tree ] bi ;
+    min-depth 2 + max [ stretch-tree ] [ long-lived-tree ] bi ; inline
 
 : binary-trees-main ( -- )
     16 binary-trees ;
