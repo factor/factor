@@ -46,13 +46,13 @@ C: <point> point
 
 [ ] [ "p" get 300 ">>z" "accessors" lookup execute drop ] unit-test
 
-[ 4 ] [ "p" get tuple-size ] unit-test
+[ 3 ] [ "p" get tuple-size ] unit-test
 
 [ 300 ] [ "p" get "z>>" "accessors" lookup execute ] unit-test
 
 [ ] [ "IN: classes.tuple.tests TUPLE: point z y ;" eval ] unit-test
 
-[ 3 ] [ "p" get tuple-size ] unit-test
+[ 2 ] [ "p" get tuple-size ] unit-test
 
 [ "p" get x>> ] must-fail
 [ 200 ] [ "p" get y>> ] unit-test
@@ -425,7 +425,7 @@ C: <constructor-update-2> constructor-update-2
 
 { 5 1 } [ <constructor-update-2> ] must-infer-as
 
-[ { f 1 2 3 4 5 } ] [ 1 2 3 4 5 <constructor-update-2> tuple-slots ] unit-test
+[ { 1 2 3 4 5 } ] [ 1 2 3 4 5 <constructor-update-2> tuple-slots ] unit-test
 
 ! Redefinition problem
 TUPLE: redefinition-problem ;
@@ -478,7 +478,7 @@ USE: vocabs
 ] unit-test
 
 [ "USE: words T{ word }" eval ]
-[ error>> T{ no-method f word slots>tuple } = ]
+[ error>> T{ no-method f word new } = ]
 must-fail-with
 
 ! Accessors not being forgotten...
@@ -592,10 +592,10 @@ GENERIC: break-me ( obj -- )
 TUPLE: declared-types { n fixnum } { m string } ;
 
 [ T{ declared-types f 0 "hi" } ]
-[ { declared-types f 0 "hi" } >tuple ]
+[ { declared-types 0 "hi" } >tuple ]
 unit-test
 
-[ { declared-types f "hi" 0 } >tuple ]
+[ { declared-types "hi" 0 } >tuple ]
 [ T{ bad-slot-value f "hi" fixnum } = ]
 must-fail-with
 
@@ -708,4 +708,4 @@ TUPLE: bogus-hashcode-2 x ;
 
 M: bogus-hashcode-1 hashcode* 2drop 0 >bignum ;
 
-[ ] [ T{ bogus-hashcode-2 T{ bogus-hashcode-1 } } hashcode drop ] unit-test
+[ ] [ T{ bogus-hashcode-2 f T{ bogus-hashcode-1 } } hashcode drop ] unit-test

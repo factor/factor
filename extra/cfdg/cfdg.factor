@@ -5,8 +5,9 @@ USING: kernel alien.c-types combinators namespaces arrays
        opengl.gl opengl.glu opengl ui ui.gadgets.slate
        vars colors self self.slots
        random-weighted colors.hsv cfdg.gl accessors
-       ui.gadgets.handler ui.gestures assocs ui.gadgets macros ;
-
+       ui.gadgets.handler ui.gestures assocs ui.gadgets macros
+       qualified ;
+QUALIFIED: syntax
 IN: cfdg
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -158,7 +159,7 @@ MACRO: rule ( seq -- quot ) [rule] ;
 
 VAR: background
 
-: set-initial-background ( -- ) T{ hsva f 0 0 1 1 } clone >self ;
+: set-initial-background ( -- ) T{ hsva syntax:f 0 0 1 1 } clone >self ;
 
 : set-background ( -- )
   set-initial-background
@@ -173,7 +174,7 @@ VAR: viewport ! { left width bottom height }
 
 VAR: start-shape
 
-: set-initial-color ( -- ) T{ hsva f 0 0 0 1 } clone >self ;
+: set-initial-color ( -- ) T{ hsva syntax:f 0 0 0 1 } clone >self ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -244,8 +245,8 @@ SYMBOL: the-slate
     C[ dlist get [ dlist get 1 glDeleteLists ] when ] >>ungraft
   <handler>
     H{ } clone
-      T{ key-down f f "ENTER" } C[ drop rebuild ] swap pick set-at
-      T{ button-down }          C[ drop rebuild ] swap pick set-at
+      T{ key-down syntax:f syntax:f "ENTER" } C[ drop rebuild ] swap pick set-at
+      T{ button-down } C[ drop rebuild ] swap pick set-at
     >>table ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

@@ -21,7 +21,7 @@ load-help? off
         ! using the host image's hashing algorithms. We don't
         ! use each-object here since the catch stack isn't yet
         ! set up.
-        begin-scan USE: accessors USE: kernel.private
+        begin-scan
         [ hashtable? ] pusher [ (each-object) ] dip
         end-scan
         [ rehash ] each

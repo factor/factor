@@ -67,7 +67,7 @@ MEMO: builtin-predicate-expansion ( word -- nodes )
 
 MEMO: (tuple-boa-expansion) ( n -- quot )
     [
-       [ 2 + ] map <reversed>
+        [ 2 + ] map <reversed>
         [ '[ [ , set-slot ] keep ] % ] each
     ] [ ] make ;
 

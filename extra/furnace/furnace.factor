@@ -199,7 +199,7 @@ STRING: button-tag-markup
     attrs>> swap update ;
 
 CHLOE: button
-    button-tag-markup string>xml delegate
+    button-tag-markup string>xml body>>
     {
         [ [ attrs>> chloe-attrs-only ] dip add-tag-attrs ]
         [ [ attrs>> non-chloe-attrs-only ] dip "button" tag-named add-tag-attrs ]

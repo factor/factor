@@ -6,9 +6,9 @@ TUPLE: foo bar baz ;
 
 C: <foo> foo
 
-[ 3 ] [ 1 2 <foo> <mirror> assoc-size ] unit-test
+[ 2 ] [ 1 2 <foo> <mirror> assoc-size ] unit-test
 
-[ { "delegate" "bar" "baz" } ] [ 1 2 <foo> <mirror> keys ] unit-test
+[ { "bar" "baz" } ] [ 1 2 <foo> <mirror> keys ] unit-test
 
 [ 1 t ] [ "bar" 1 2 <foo> <mirror> at* ] unit-test
 
