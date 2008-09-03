@@ -21,8 +21,7 @@ ERROR: not-a-tuple object ;
     superclasses [ "slots" word-prop ] map concat ;
 
 PREDICATE: immutable-tuple-class < tuple-class ( class -- ? )
-    #! Delegation
-    all-slots rest-slice [ read-only>> ] all? ;
+    all-slots [ read-only>> ] all? ;
 
 <PRIVATE
 
@@ -126,7 +125,7 @@ ERROR: bad-superclass class ;
     } cond ;
 
 : boa-check-quot ( class -- quot )
-    all-slots 1 tail [ class>> instance-check-quot ] map spread>quot ;
+    all-slots [ class>> instance-check-quot ] map spread>quot ;
 
 : define-boa-check ( class -- )
     dup boa-check-quot "boa-check" set-word-prop ;

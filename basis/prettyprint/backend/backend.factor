@@ -163,9 +163,11 @@ M: byte-vector >pprint-sequence ;
 M: curry >pprint-sequence ;
 M: compose >pprint-sequence ;
 M: hashtable >pprint-sequence >alist ;
-M: tuple >pprint-sequence tuple>array ;
 M: wrapper >pprint-sequence wrapped>> 1array ;
 M: callstack >pprint-sequence callstack>array ;
+
+M: tuple >pprint-sequence
+    [ class f 2array ] [ tuple-slots ] bi append ;
 
 GENERIC: pprint-narrow? ( obj -- ? )
 

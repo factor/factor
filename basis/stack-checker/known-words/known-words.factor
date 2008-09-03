@@ -108,7 +108,7 @@ M: object infer-call*
 
 : infer-<tuple-boa> ( -- )
     \ <tuple-boa>
-    peek-d literal value>> size>> { tuple } <effect>
+    peek-d literal value>> size>> 1+ { tuple } <effect>
     apply-word/effect ;
 
 : infer-(throw) ( -- )

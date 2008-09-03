@@ -345,11 +345,8 @@ DEFINE_PRIMITIVE(tuple_boa)
 	F_TUPLE *tuple = allot_tuple(layout);
 	UNREGISTER_UNTAGGED(layout);
 
-	/* set delegate slot */
-	put(AREF(tuple,0),F);
-
 	F_FIXNUM i;
-	for(i = size - 1; i >= 1; i--)
+	for(i = size - 1; i >= 0; i--)
 		put(AREF(tuple,i),dpop());
 
 	dpush(tag_tuple(tuple));

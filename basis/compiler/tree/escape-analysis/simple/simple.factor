@@ -23,9 +23,8 @@ DEFER: record-literal-allocation
     [ <slot-value> [ swap record-literal-allocation ] keep ] map ;
 
 : object-slots ( object -- slots/f )
-    #! Delegation
     {
-        { [ dup class immutable-tuple-class? ] [ tuple-slots rest-slice ] }
+        { [ dup class immutable-tuple-class? ] [ tuple-slots ] }
         { [ dup complex? ] [ [ real-part ] [ imaginary-part ] bi 2array ] }
         [ drop f ]
     } cond ;
@@ -37,7 +36,6 @@ DEFER: record-literal-allocation
     if* ;
 
 M: #push escape-analysis*
-    #! Delegation.
     [ out-d>> first ] [ literal>> ] bi record-literal-allocation ;
 
 : record-unknown-allocation ( #call -- )
@@ -59,7 +57,7 @@ M: #push escape-analysis*
     [ second node-value-info literal>> ] 2bi
     dup fixnum? [
         {
-            { [ over tuple class<= ] [ 3 - ] }
+            { [ over tuple class<= ] [ 2 - ] }
             { [ over complex class<= ] [ 1 - ] }
             [ drop f ]
         } cond nip
