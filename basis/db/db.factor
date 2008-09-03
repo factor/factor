@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes continuations destructors kernel math
 namespaces sequences sequences.lib classes.tuple words strings
-tools.walker accessors combinators.lib ;
+tools.walker accessors combinators.lib combinators ;
 IN: db
 
 TUPLE: db
@@ -15,24 +15,25 @@ TUPLE: db
     new
         H{ } clone >>insert-statements
         H{ } clone >>update-statements
-        H{ } clone >>delete-statements ;
+        H{ } clone >>delete-statements ; inline
 
-GENERIC: make-db* ( seq class -- db )
+GENERIC: make-db* ( seq db -- db )
 
-: make-db ( seq class -- db )
-    new-db make-db* ;
+: make-db ( seq class -- db ) new-db make-db* ;
 
 GENERIC: db-open ( db -- db )
 HOOK: db-close db ( handle -- )
 
 : dispose-statements ( assoc -- ) values dispose-each ;
 
-: dispose-db ( db -- ) 
+: db-dispose ( db -- ) 
     dup db [
-        dup insert-statements>> dispose-statements
-        dup update-statements>> dispose-statements
-        dup delete-statements>> dispose-statements
-        handle>> db-close
+        {
+            [ insert-statements>> dispose-statements ]
+            [ update-statements>> dispose-statements ]
+            [ delete-statements>> dispose-statements ]
+            [ handle>> db-close ]
+        } cleave
     ] with-variable ;
 
 TUPLE: statement handle sql in-params out-params bind-params bound? type retries ;
@@ -47,8 +48,8 @@ TUPLE: result-set sql in-params out-params handle n max ;
         swap >>in-params
         swap >>sql ;
 
-HOOK: <simple-statement> db ( str in out -- statement )
-HOOK: <prepared-statement> db ( str in out -- statement )
+HOOK: <simple-statement> db ( string in out -- statement )
+HOOK: <prepared-statement> db ( string in out -- statement )
 GENERIC: prepare-statement ( statement -- )
 GENERIC: bind-statement* ( statement -- )
 GENERIC: low-level-bind ( statement -- )

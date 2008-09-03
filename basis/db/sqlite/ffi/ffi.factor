@@ -118,9 +118,6 @@ FUNCTION: int sqlite3_bind_blob ( sqlite3_stmt* pStmt, int index, void* ptr, int
 FUNCTION: int sqlite3_bind_double ( sqlite3_stmt* pStmt, int index, double x ) ;
 FUNCTION: int sqlite3_bind_int ( sqlite3_stmt* pStmt, int index, int n ) ;
 FUNCTION: int sqlite3_bind_int64 ( sqlite3_stmt* pStmt, int index, sqlite3_int64 n ) ;
-: sqlite3-bind-uint64 ( pStmt index in64 -- int )
-    "int" "sqlite" "sqlite3_bind_int64"
-    { "sqlite3_stmt*" "int" "sqlite3_uint64" } alien-invoke ;
 FUNCTION: int sqlite3_bind_null ( sqlite3_stmt* pStmt, int n ) ;
 FUNCTION: int sqlite3_bind_text ( sqlite3_stmt* pStmt, int index, char* text, int len, int destructor ) ;
 FUNCTION: int sqlite3_bind_parameter_index ( sqlite3_stmt* pStmt, char* name ) ;
@@ -131,9 +128,6 @@ FUNCTION: int sqlite3_column_bytes ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: char* sqlite3_column_decltype ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: int sqlite3_column_int ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: sqlite3_int64 sqlite3_column_int64 ( sqlite3_stmt* pStmt, int col ) ;
-: sqlite3-column-uint64 ( pStmt col -- uint64 )
-    "sqlite3_uint64" "sqlite" "sqlite3_column_int64"
-    { "sqlite3_stmt*" "int" } alien-invoke ;
 FUNCTION: double sqlite3_column_double ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: char* sqlite3_column_name ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: char* sqlite3_column_text ( sqlite3_stmt* pStmt, int col ) ;

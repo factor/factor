@@ -6,6 +6,5 @@ IN: db.errors
 ERROR: db-error ;
 ERROR: sql-error ;
 
-
 ERROR: table-exists ;
 ERROR: bad-schema ;

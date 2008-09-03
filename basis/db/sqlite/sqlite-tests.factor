@@ -57,8 +57,7 @@ IN: db.sqlite.tests
     ] with-db
 ] unit-test
 
-[
-] [
+[ ] [
     test.db [
         [
             "insert into person(name, country) values('Jose', 'Mexico')"
