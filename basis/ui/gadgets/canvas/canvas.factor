@@ -16,8 +16,8 @@ TUPLE: canvas < gadget dlist ;
     [ f >>dlist drop ] tri ;
 
 : make-canvas-dlist ( canvas quot -- dlist )
-    [ GL_COMPILE ] dip make-dlist
-    [ >>dlist drop ] keep ;
+    [ drop ] [ GL_COMPILE swap make-dlist ] 2bi
+    [ >>dlist drop ] keep ; inline
 
 : cache-canvas-dlist ( canvas quot -- dlist )
     over dlist>> dup
