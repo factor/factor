@@ -43,8 +43,8 @@ SYMBOL: +failed+
     [
         dup crossref?
         [
-            dependencies get
-            generic-dependencies get
+            dependencies get >alist
+            generic-dependencies get >alist
             compiled-xref
         ] [ drop ] if
     ] tri ;
