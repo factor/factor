@@ -5,29 +5,6 @@ quotations ;
 
 IN: lisp.test
 
-: define-lisp-builtins (  --  )    
-   init-env
-    
-    f "#f" lisp-define
-    t "#t" lisp-define
-    
-    "+" "math" "+" define-primitive
-    "-" "math" "-" define-primitive
-    "<" "math" "<" define-primitive
-    ">" "math" ">" define-primitive
-    
-    "cons" "lists" "cons" define-primitive
-    "car" "lists" "car" define-primitive
-    "cdr" "lists" "cdr" define-primitive
-    "append" "lists" "lappend" define-primitive
-    "nil" "lists" "nil" define-primitive
-    "nil?" "lists" "nil?" define-primitive
-    
-    "define" "lisp" "defun" define-primitive
-    
-    "(lambda (&rest xs) xs)" lisp-string>factor "list" lisp-define
-   ;     
-    
 [
     define-lisp-builtins
     
@@ -73,10 +50,6 @@ IN: lisp.test
     
     { 5 } [
         "(begin (+ 5 6) (+ 1 4))" lisp-eval
-    ] unit-test
-    
-    { T{ lisp-symbol f "if" } } [
-        "(defmacro if (pred tr fl) (list (quote cond) (list pred tr) (list (quote #t) fl)))" lisp-eval
     ] unit-test
     
     { t } [

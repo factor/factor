@@ -59,18 +59,20 @@ PRIVATE>
     cadr 1quotation ;
 
 : convert-defmacro ( cons -- quot )
-    cdr [ car ] keep [ convert-lambda ] [ car name>> ] bi define-lisp-macro 1quotation ;
+    cdr [ convert-lambda ] [ car name>> ] bi define-lisp-macro [ ] ;
 
 : macro-expand ( cons -- quot )
     uncons [ list>seq >quotation ] [ lookup-macro ] bi* call call ;
-    
-: (expand-macros) ( cons -- cons )    
+
+<PRIVATE
+: (expand-macros) ( cons -- cons )
     [ dup list? [ (expand-macros) dup car lisp-macro? [ macro-expand ] when ] when ] lmap ;
-    
-: expand-macros ( cons -- cons )    
+PRIVATE>
+
+: expand-macros ( cons -- cons )
     dup list? [ (expand-macros) dup car lisp-macro? [ macro-expand ] when ] when ;
-    
-: convert-begin ( cons -- quot )    
+
+: convert-begin ( cons -- quot )
     cdr [ convert-form ] [ ] lmap-as [ 1 tail* ] [ but-last ] bi
     [ '[ { } , with-datastack drop ] ] map prepend '[ , [ call ] each ] ;
 
@@ -86,7 +88,7 @@ PRIVATE>
 
 : convert-list-form ( cons -- quot )
     dup car
-    { 
+    {
       { [ dup lisp-symbol? ] [ form-dispatch ] }
      [ drop convert-general-form ]
     } cond ;
@@ -147,3 +149,27 @@ M: no-such-var summary drop "No such variable" ;
 
 : lisp-macro? ( car -- ? )
     dup lisp-symbol? [ name>> macro-env get key? ] [ drop f ] if ;
+
+: define-lisp-builtins (  --  )
+   init-env
+
+   f "#f" lisp-define
+   t "#t" lisp-define
+
+   "+" "math" "+" define-primitive
+   "-" "math" "-" define-primitive
+   "<" "math" "<" define-primitive
+   ">" "math" ">" define-primitive
+
+   "cons" "lists" "cons" define-primitive
+   "car" "lists" "car" define-primitive
+   "cdr" "lists" "cdr" define-primitive
+   "append" "lists" "lappend" define-primitive
+   "nil" "lists" "nil" define-primitive
+   "nil?" "lists" "nil?" define-primitive
+
+   "define" "lisp" "defun" define-primitive
+
+   "(lambda (&rest xs) xs)" lisp-string>factor "list" lisp-define
+   "(defmacro if (pred tr fl) (list (quote cond) (list pred tr) (list (quote #t) fl)))" lisp-eval
+   ;
