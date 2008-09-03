@@ -527,7 +527,7 @@ IN: cpu.ppc.intrinsics
             { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { { f "value" } } }
+        { +scratch+ { { f "value" } { f "scratch" } } }
         { +output+ { "value" } }
         { +clobber+ { "offset" } }
     } ;
@@ -584,7 +584,7 @@ define-alien-integer-intrinsics
         { unboxed-c-ptr "alien" c-ptr }
         { f "offset" fixnum }
     } }
-    { +scratch+ { { unboxed-alien "value" } } }
+    { +scratch+ { { unboxed-alien "value" } { f "scratch" } } }
     { +output+ { "value" } }
     { +clobber+ { "offset" } }
 } define-intrinsic
@@ -597,6 +597,7 @@ define-alien-integer-intrinsics
         { unboxed-c-ptr "alien" c-ptr }
         { f "offset" fixnum }
     } }
+    { +scratch+ { { f "scratch" } } }
     { +clobber+ { "offset" } }
 } define-intrinsic
 
@@ -606,7 +607,7 @@ define-alien-integer-intrinsics
             { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { { float "value" } } }
+        { +scratch+ { { float "value" } { f "scratch" } } }
         { +output+ { "value" } }
         { +clobber+ { "offset" } }
     } ;
@@ -618,6 +619,7 @@ define-alien-integer-intrinsics
             { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
+        { +scratch+ { { f "scratch" } } }
         { +clobber+ { "offset" } }
     } ;
 
