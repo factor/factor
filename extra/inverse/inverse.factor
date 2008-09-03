@@ -207,7 +207,7 @@ DEFER: _
     "predicate" word-prop [ dupd call assure ] curry ;
 
 : slot-readers ( class -- quot )
-    all-slots rest ! tail gets rid of delegate
+    all-slots
     [ name>> reader-word 1quotation [ keep ] curry ] map concat
     [ ] like [ drop ] compose ;
 
