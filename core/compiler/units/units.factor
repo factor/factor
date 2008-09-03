@@ -110,8 +110,7 @@ SYMBOL: update-tuples-hook
 : (compiled-generic-usages) ( generic class -- assoc )
     dup class? [
         [ compiled-generic-usage ] dip
-        [ [ classes-intersect? ] [ null class<= ] bi or nip ]
-        curry assoc-filter
+        [ classes-intersect? nip ] curry assoc-filter
     ] [ 2drop f ] if ;
 
 : compiled-generic-usages ( assoc -- assocs )
