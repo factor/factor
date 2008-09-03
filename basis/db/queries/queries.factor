@@ -43,13 +43,6 @@ M: random-id-generator eval-generator ( singleton -- obj )
 : interval-comparison ( ? str -- str )
     "from" = " >" " <" ? swap [ "= " append ] when ;
 
-: fp-infinity? ( float -- ? )
-    dup float? [
-        double>bits -52 shift 11 2^ 1- [ bitand ] keep =
-    ] [
-        drop f
-    ] if ;
-
 : (infinite-interval?) ( interval -- ?1 ?2 )
     [ from>> ] [ to>> ] bi
     [ first fp-infinity? ] bi@ ;

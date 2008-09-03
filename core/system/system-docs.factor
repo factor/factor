@@ -14,8 +14,7 @@ ARTICLE: "system" "System interface"
 "Getting the current time:"
 { $subsection millis }
 "Exiting the Factor VM:"
-{ $subsection exit }
-{ $see-also "io.files" "io.mmap" "io.monitors" "network-streams" "io.launcher" } ;
+{ $subsection exit } ;
 
 ARTICLE: "environment-variables" "Environment variables"
 "Reading environment variables:"
