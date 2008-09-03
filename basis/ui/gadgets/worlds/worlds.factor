@@ -13,12 +13,10 @@ title status
 fonts handle
 window-loc ;
 
-: find-world ( gadget -- world ) [ world? ] find-parent ;
-
-M: f world-status ;
+: find-world ( gadget -- world/f ) [ world? ] find-parent ;
 
 : show-status ( string/f gadget -- )
-    find-world world-status [ set-model ] [ drop ] if* ;
+    find-world dup [ status>> set-model ] [ 2drop ] if ;
 
 : hide-status ( gadget -- ) f swap show-status ;
 

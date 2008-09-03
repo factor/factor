@@ -5,10 +5,10 @@ math.order ;
 IN: calendar
 
 HELP: duration
-{ $description "A duration is a period of time years, months, days, hours, minutes, and seconds.  All duration slots can store " { $link real } " numbers. Compare two timestamps with the " { $link <=> } " word." } ;
+{ $description "A duration is a period of time years, months, days, hours, minutes, and seconds.  All duration slots can store " { $link real } " numbers. Compare two durations with the " { $link <=> } " word." } ;
 
 HELP: timestamp
-{ $description "A timestamp is a date and a time with a timezone offset.  Timestamp slots must store integers except for " { $snippet "seconds" } ", which stores reals, and " { $snippet "gmt-offset" } ", which stores a " { $link duration } ". Compare two timestamps with the " { $link <=> } " word." } ;
+{ $description "A timestamp is a date and a time with a timezone offset.  Timestamp slots must store integers except for " { $snippet "seconds" } ", which stores reals, and " { $snippet "gmt-offset" } ", which stores a " { $link duration } ". Compare two duarionts with the " { $link <=> } " word." } ;
 
 { timestamp duration } related-words
 
@@ -135,35 +135,37 @@ HELP: instant
 
 HELP: years
 { $values { "x" number } { "duration" duration } }
-{ $description } ;
+{ $description "Creates a duration object with the specified number of years." } ;
 
 HELP: months
 { $values { "x" number } { "duration" duration } }
-{ $description } ;
+{ $description "Creates a duration object with the specified number of months." } ;
 
 HELP: days
 { $values { "x" number } { "duration" duration } }
-{ $description } ;
+{ $description "Creates a duration object with the specified number of days." } ;
 
 HELP: weeks
 { $values { "x" number } { "duration" duration } }
-{ $description } ;
+{ $description "Creates a duration object with the specified number of weeks." } ;
 
 HELP: hours
 { $values { "x" number } { "duration" duration } }
-{ $description } ;
+{ $description "Creates a duration object with the specified number of hours." } ;
 
 HELP: minutes
 { $values { "x" number } { "duration" duration } }
-{ $description } ;
+{ $description "Creates a duration object with the specified number of minutes." } ;
 
 HELP: seconds
 { $values { "x" number } { "duration" duration } }
-{ $description } ;
+{ $description "Creates a duration object with the specified number of seconds." } ;
 
 HELP: milliseconds
 { $values { "x" number } { "duration" duration } }
-{ $description } ;
+{ $description "Creates a duration object with the specified number of milliseconds." } ;
+
+{ years months days hours minutes seconds milliseconds } related-words
 
 HELP: leap-year?
 { $values { "obj" object } { "?" "a boolean" } }
@@ -193,75 +195,75 @@ HELP: time+
     }
 } ;
 
-HELP: dt>years
+HELP: duration>years
 { $values { "duration" duration } { "x" number } }
 { $description "Calculates the length of a duration in years." }
 { $examples
     { $example "USING: calendar prettyprint ;"
-               "6 months dt>years ."
+               "6 months duration>years ."
                "1/2"
     }
 } ;
 
-HELP: dt>months
+HELP: duration>months
 { $values { "duration" duration } { "x" number } }
 { $description "Calculates the length of a duration in months." }
 { $examples
     { $example "USING: calendar prettyprint ;"
-               "30 days dt>months ."
+               "30 days duration>months ."
                "16000/16233"
     }
 } ;
 
-HELP: dt>days
+HELP: duration>days
 { $values { "duration" duration } { "x" number } }
 { $description "Calculates the length of a duration in days." }
 { $examples
     { $example "USING: calendar prettyprint ;"
-               "6 hours dt>days ."
+               "6 hours duration>days ."
                "1/4"
     }
 } ;
 
-HELP: dt>hours
+HELP: duration>hours
 { $values { "duration" duration } { "x" number } }
 { $description "Calculates the length of a duration in hours." }
 { $examples
     { $example "USING: calendar prettyprint ;"
-               "3/4 days dt>hours ."
+               "3/4 days duration>hours ."
                "18"
     }
 } ;
-HELP: dt>minutes
+HELP: duration>minutes
 { $values { "duration" duration } { "x" number } }
 { $description "Calculates the length of a duration in minutes." }
 { $examples
     { $example "USING: calendar prettyprint ;"
-               "6 hours dt>minutes ."
+               "6 hours duration>minutes ."
                "360"
     }
 } ;
-HELP: dt>seconds
+HELP: duration>seconds
 { $values { "duration" duration } { "x" number } }
 { $description "Calculates the length of a duration in seconds." }
 { $examples
     { $example "USING: calendar prettyprint ;"
-               "6 minutes dt>seconds ."
+               "6 minutes duration>seconds ."
                "360"
     }
 } ;
 
-HELP: dt>milliseconds
+HELP: duration>milliseconds
 { $values { "duration" duration } { "x" number } }
 { $description "Calculates the length of a duration in milliseconds." }
 { $examples
     { $example "USING: calendar prettyprint ;"
-               "6 seconds dt>milliseconds ."
+               "6 seconds duration>milliseconds ."
                "6000"
     }
 } ;
 
-{ dt>years dt>months dt>days dt>hours dt>minutes dt>seconds dt>milliseconds } related-words
+{ duration>years duration>months duration>days duration>hours duration>minutes duration>seconds duration>milliseconds } related-words
 
 
 HELP: time-
@@ -428,16 +430,6 @@ HELP: day-of-year
     }
 } ;
 
-HELP: day-this-week
-{ $values { "timestamp" timestamp } { "n" integer } { "timestamp" timestamp } } 
-{ $description "Implementation word to calculate the day of the week relative to the timestamp. Sunday is the first day of the week, so the resulting " { $snippet "timestamp" } " will be Sunday or after, and before Saturday." }
-{ $examples
-    { $example "USING: calendar kernel prettyprint ;"
-               "now 0 day-this-week now sunday = ."
-               "t"
-    }
-} ;
-
 HELP: sunday
 { $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
 { $description "Returns the Sunday from the current week, which starts on a Sunday." } ;
@@ -491,3 +483,124 @@ HELP: beginning-of-year
 HELP: time-since-midnight
 { $values { "timestamp" timestamp } { "duration" duration } }
 { $description "Calculates a " { $snippet "duration" } " that represents the elapsed time since midnight of the input " { $snippet "timestamp" } "." } ;
+
+ARTICLE: "calendar" "Calendar"
+"The two data types used throughout the calendar library:"
+{ $subsection timestamp }
+{ $subsection duration }
+"Durations represent spans of time:"
+{ $subsection "using-durations" }
+"Arithmetic on timestamps and durations:"
+{ $subsection "timestamp-arithmetic" }
+"Getting the current timestamp:"
+{ $subsection now }
+{ $subsection gmt }
+"Converting between timestamps:"
+{ $subsection >local-time }
+{ $subsection >gmt }
+"Converting between timezones:"
+{ $subsection convert-timezone }
+"Timestamps relative to each other:"
+{ $subsection "relative-timestamps" }
+"Operations on units of time:"
+{ $subsection "years" }
+{ $subsection "months" }
+{ $subsection "days" }
+"Meta-data about the calendar:"
+{ $subsection "calendar-facts" }
+;
+
+ARTICLE: "timestamp-arithmetic" "Timestamp arithmetic"
+"Adding timestamps and durations, or durations and durations:"
+{ $subsection time+ }
+"Subtracting:"
+{ $subsection time- }
+"Element-wise multiplication:"
+{ $subsection time* } ;
+
+ARTICLE: "using-durations" "Using durations"
+"Creating a duration object:"
+{ $subsection years }
+{ $subsection months }
+{ $subsection weeks }
+{ $subsection days }
+{ $subsection hours }
+{ $subsection minutes }
+{ $subsection seconds }
+{ $subsection milliseconds }
+{ $subsection instant }
+"Converting a duration to a number:"
+{ $subsection duration>years }
+{ $subsection duration>months }
+{ $subsection duration>days }
+{ $subsection duration>hours }
+{ $subsection duration>minutes }
+{ $subsection duration>seconds }
+{ $subsection duration>milliseconds } ;
+
+ARTICLE: "relative-timestamps" "Relative timestamps"
+"In the future:"
+{ $subsection hence }
+"In the past:"
+{ $subsection ago }
+"Invert a duration:"
+{ $subsection before }
+"Days of the week relative to " { $link now } ":"
+{ $subsection sunday }
+{ $subsection monday }
+{ $subsection tuesday }
+{ $subsection wednesday }
+{ $subsection thursday }
+{ $subsection friday }
+{ $subsection saturday }
+"New timestamps relative to calendar events:"
+{ $subsection beginning-of-year }
+{ $subsection beginning-of-month }
+{ $subsection beginning-of-week }
+{ $subsection midnight }
+{ $subsection noon }
+;
+
+ARTICLE: "days" "Day operations"
+"Naming days:"
+{ $subsection day-abbreviation2 }
+{ $subsection day-abbreviations2 }
+{ $subsection day-abbreviation3 }
+{ $subsection day-abbreviations3 }
+{ $subsection day-name }
+{ $subsection day-names }
+"Calculating a Julian day number:"
+{ $subsection julian-day-number }
+"Calculate a timestamp:"
+{ $subsection julian-day-number>date }
+;
+
+ARTICLE: "calendar-facts" "Calendar facts"
+"Calendar facts:"
+{ $subsection average-month }
+{ $subsection months-per-year }
+{ $subsection days-per-year }
+{ $subsection hours-per-year }
+{ $subsection minutes-per-year }
+{ $subsection seconds-per-year }
+{ $subsection days-in-month }
+{ $subsection day-of-year }
+{ $subsection day-of-week }
+;
+
+ARTICLE: "years" "Year operations"
+"Leap year predicate:"
+{ $subsection leap-year? }
+"Find the number of days in a year:"
+{ $subsection days-in-year }
+;
+
+ARTICLE: "months" "Month operations"
+"Naming months:"
+{ $subsection month-name }
+{ $subsection month-names }
+{ $subsection month-abbreviation }
+{ $subsection month-abbreviations }
+;
+
+ABOUT: "calendar"

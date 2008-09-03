@@ -210,10 +210,10 @@ USE: binary-search.private
 
 : old-binsearch ( elt quot seq -- elt quot i )
     dup length 1 <= [
-        slice-from
+        from>>
     ] [
         [ midpoint swap call ] 3keep roll dup zero?
-        [ drop dup slice-from swap midpoint@ + ]
+        [ drop dup from>> swap midpoint@ + ]
         [ dup midpoint@ cut-slice old-binsearch ] if
     ] if ; inline
 

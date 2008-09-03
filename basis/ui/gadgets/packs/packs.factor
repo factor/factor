@@ -32,7 +32,7 @@ TUPLE: pack < gadget
 : pack-layout ( pack sizes -- )
     round-dims over children>>
     >r dupd packed-dims r> 2dup [ (>>dim) ] 2each
-    >r packed-locs r> [ set-rect-loc ] 2each ;
+    >r packed-locs r> [ (>>loc) ] 2each ;
 
 : <pack> ( orientation -- pack )
     pack new-gadget

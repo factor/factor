@@ -26,7 +26,7 @@ IN: lcd
 : <time-display> ( timestamp -- gadget )
     [ hh:mm:ss lcd ] <filter> <label-control>
     "99:99:99" lcd over set-label-string
-    monospace-font over set-label-font ;
+    monospace-font >>font ;
 
 : time-window ( -- )
     [ time get <time-display> "Time" open-window ] with-ui ;

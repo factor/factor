@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.private assocs arrays
 delegate.protocols delegate vectors accessors multiline
-macros words quotations combinators ;
+macros words quotations combinators slots ;
 IN: xml.data
 
 TUPLE: name space main url ;
@@ -89,7 +89,7 @@ TUPLE: tag name attrs children ;
     tag boa ;
 
 ! For convenience, tags follow the assoc protocol too (for attrs)
-CONSULT: assoc-protocol tag tag-attrs ;
+CONSULT: assoc-protocol tag attrs>> ;
 INSTANCE: tag assoc
 
 ! They also follow the sequence protocol (for children)
@@ -100,14 +100,14 @@ CONSULT: name tag name>> ;
 
 M: tag like
     over tag? [ drop ] [
-        [ name>> ] keep tag-attrs
+        [ name>> ] keep attrs>>
         rot dup [ V{ } like ] when <tag>
     ] if ;
 
 MACRO: clone-slots ( class -- tuple )
     [
         "slots" word-prop
-        [ reader>> 1quotation [ clone ] compose ] map
+        [ name>> reader-word 1quotation [ clone ] compose ] map
         [ cleave ] curry
     ] [ [ boa ] curry ] bi compose ;
 

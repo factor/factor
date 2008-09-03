@@ -1,10 +1,10 @@
 USING: ui.gadgets ui.gadgets.grids tools.test kernel arrays
-namespaces math.geometry.rect ;
+namespaces math.geometry.rect accessors ;
 IN: ui.gadgets.grids.tests
 
 [ { 0 0 } ] [ { } <grid> pref-dim ] unit-test
 
-: 100x100 <gadget> { 100 100 } over set-rect-dim ;
+: 100x100 <gadget> { 100 100 } >>dim ;
 
 [ { 100 100 } ] [
     100x100
@@ -38,7 +38,7 @@ IN: ui.gadgets.grids.tests
     100x100 dup "a" set
     100x100 dup "b" set
     2array 1array <grid>
-    { 10 10 } over set-grid-gap
+    { 10 10 } >>gap
     dup prefer
     dup layout
     rect-dim

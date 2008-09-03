@@ -1,11 +1,11 @@
-IN: ui.gadgets.panes.tests
 USING: alien ui.gadgets.panes ui.gadgets namespaces
 kernel sequences io io.styles io.streams.string tools.test
 prettyprint definitions help help.syntax help.markup
 help.stylesheet splitting tools.test.ui models math summary
-inspector ;
+inspector accessors ;
+IN: ui.gadgets.panes.tests
 
-: #children "pane" get gadget-children length ;
+: #children "pane" get children>> length ;
 
 [ ] [ <pane> "pane" set ] unit-test
 

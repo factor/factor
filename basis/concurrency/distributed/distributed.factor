@@ -37,7 +37,7 @@ M: remote-process send ( message thread -- )
     send-remote-message ;
 
 M: thread (serialize) ( obj -- )
-    thread-id local-node get-global <remote-process>
+    id>> local-node get-global <remote-process>
     (serialize) ;
 
 : stop-node ( node -- )

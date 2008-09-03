@@ -5,9 +5,9 @@ continuations math.parser math arrays sets math.order ;
 IN: opengl.capabilities
 
 : (require-gl) ( thing require-quot make-error-quot -- )
-    >r dupd call
-    [ r> 2drop ]
-    [ r> " " make throw ]
+    -rot dupd call
+    [ 2drop ]
+    [ swap " " make throw ]
     if ; inline
 
 : gl-extensions ( -- seq )

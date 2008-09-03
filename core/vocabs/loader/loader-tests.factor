@@ -55,7 +55,7 @@ IN: vocabs.loader.tests
     
     [ t ] [
         "resource:core/vocabs/loader/test/a/a.factor"
-        source-file source-file-definitions dup USE: prettyprint .
+        source-file definitions>> dup USE: prettyprint .
         "v-l-t-a-hello" "vocabs.loader.test.a" lookup dup .
         swap first key?
     ] unit-test

@@ -390,7 +390,7 @@ HELP: P"
 { $syntax "P\" pathname\"" }
 { $values { "pathname" "a pathname string" } }
 { $description "Reads from the input string until the next occurrence of " { $link POSTPONE: " } ", creates a new " { $link pathname } ", and appends it to the parse tree." }
-{ $examples { $example "USING: io io.files ;" "P\" foo.txt\" pathname-string print" "foo.txt" } } ;
+{ $examples { $example "USING: accessors io io.files ;" "P\" foo.txt\" string>> print" "foo.txt" } } ;
 
 HELP: (
 { $syntax "( inputs -- outputs )" }

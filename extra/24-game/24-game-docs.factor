@@ -35,8 +35,8 @@ HELP: 24-able ( -- vector )
 }
 { $examples
     { $example
-        "USING: 24-game prettyprint ;"
-        "24-able 24-able? ."
+        "USING: 24-game kernel sequences prettyprint ;"
+        "24-able length 4 = ."
         "t"
     }
     { $notes { $link 24-able? } " is used in " { $link 24-able } "." }

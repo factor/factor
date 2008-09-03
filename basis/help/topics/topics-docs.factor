@@ -1,5 +1,6 @@
-USING: help.markup help.syntax help.topics help.crossref help io
-io.styles hashtables ;
+USING: help.markup help.syntax help.crossref help io io.styles
+hashtables strings ;
+IN: help.topics
 
 HELP: articles
 { $var-description "Hashtable mapping article names to " { $link article } " instances." } ;
@@ -14,11 +15,11 @@ HELP: article
 { $description "Outputs a named " { $link article } " object." } ;
 
 HELP: article-title
-{ $values { "article" "an article name or a word" } { "title" "a string" } }
+{ $values { "topic" "an article name or a word" } { "string" string } }
 { $description "Outputs the title of a specific help article." } ;
 
 HELP: article-content
-{ $values { "article" "an article name or a word" } { "content" "a markup element" } }
+{ $values { "topic" "an article name or a word" } { "content" "a markup element" } }
 { $description "Outputs the content of a specific help article." } ;
 
 HELP: all-articles

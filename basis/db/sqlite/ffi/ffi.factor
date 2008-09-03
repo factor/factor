@@ -118,6 +118,7 @@ FUNCTION: int sqlite3_bind_blob ( sqlite3_stmt* pStmt, int index, void* ptr, int
 FUNCTION: int sqlite3_bind_double ( sqlite3_stmt* pStmt, int index, double x ) ;
 FUNCTION: int sqlite3_bind_int ( sqlite3_stmt* pStmt, int index, int n ) ;
 FUNCTION: int sqlite3_bind_int64 ( sqlite3_stmt* pStmt, int index, sqlite3_int64 n ) ;
+! Bind the same function as above, but for unsigned 64bit integers
 : sqlite3-bind-uint64 ( pStmt index in64 -- int )
     "int" "sqlite" "sqlite3_bind_int64"
     { "sqlite3_stmt*" "int" "sqlite3_uint64" } alien-invoke ;
@@ -131,6 +132,7 @@ FUNCTION: int sqlite3_column_bytes ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: char* sqlite3_column_decltype ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: int sqlite3_column_int ( sqlite3_stmt* pStmt, int col ) ;
 FUNCTION: sqlite3_int64 sqlite3_column_int64 ( sqlite3_stmt* pStmt, int col ) ;
+! Bind the same function as above, but for unsigned 64bit integers
 : sqlite3-column-uint64 ( pStmt col -- uint64 )
     "sqlite3_uint64" "sqlite" "sqlite3_column_int64"
     { "sqlite3_stmt*" "int" } alien-invoke ;

@@ -240,7 +240,7 @@ M: duration time+
         2drop <duration>
     ] if ;
 
-: dt>years ( duration -- x )
+: duration>years ( duration -- x )
     #! Uses average month/year length since duration loses calendar
     #! data
     0 swap
@@ -253,14 +253,14 @@ M: duration time+
         [ second>> seconds-per-year / + ]
     } cleave ;
 
-M: duration <=> [ dt>years ] compare ;
+M: duration <=> [ duration>years ] compare ;
 
-: dt>months ( duration -- x ) dt>years months-per-year * ;
-: dt>days ( duration -- x ) dt>years days-per-year * ;
-: dt>hours ( duration -- x ) dt>years hours-per-year * ;
-: dt>minutes ( duration -- x ) dt>years minutes-per-year * ;
-: dt>seconds ( duration -- x ) dt>years seconds-per-year * ;
-: dt>milliseconds ( duration -- x ) dt>seconds 1000 * ;
+: duration>months ( duration -- x ) duration>years months-per-year * ;
+: duration>days ( duration -- x ) duration>years days-per-year * ;
+: duration>hours ( duration -- x ) duration>years hours-per-year * ;
+: duration>minutes ( duration -- x ) duration>years minutes-per-year * ;
+: duration>seconds ( duration -- x ) duration>years seconds-per-year * ;
+: duration>milliseconds ( duration -- x ) duration>seconds 1000 * ;
 
 GENERIC: time- ( time1 time2 -- time3 )
 
@@ -364,11 +364,13 @@ M: timestamp days-in-year ( timestamp -- n ) year>> days-in-year ;
 : day-of-year ( timestamp -- n )
     >date< (day-of-year) ;
 
+<PRIVATE
 : day-offset ( timestamp m -- timestamp n )
     over day-of-week - ; inline
 
 : day-this-week ( timestamp n -- timestamp )
     day-offset days time+ ;
+PRIVATE>
 
 : sunday ( timestamp -- new-timestamp ) 0 day-this-week ;
 : monday ( timestamp -- new-timestamp ) 1 day-this-week ;

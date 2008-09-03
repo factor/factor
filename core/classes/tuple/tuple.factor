@@ -3,8 +3,8 @@
 USING: arrays definitions hashtables kernel kernel.private math
 namespaces sequences sequences.private strings vectors words
 quotations memory combinators generic classes classes.algebra
-classes.builtin classes.private slots.deprecated slots.private
-slots compiler.units math.private accessors assocs effects ;
+classes.builtin classes.private slots.private slots
+compiler.units math.private accessors assocs effects ;
 IN: classes.tuple
 
 PREDICATE: tuple-class < class
@@ -139,13 +139,11 @@ ERROR: bad-superclass class ;
     dup tuple-prototype "prototype" set-word-prop ;
 
 : finalize-tuple-slots ( class slots -- slots )
-    over superclass-size 2 + finalize-slots deprecated-slots ;
+    swap superclass-size 2 + finalize-slots ;
 
 : define-tuple-slots ( class -- )
     dup dup "slots" word-prop finalize-tuple-slots
-    [ define-accessors ] ! new
-    [ define-slots ] ! old
-    2bi ;
+    define-accessors ;
 
 : make-tuple-layout ( class -- layout )
     [ ]

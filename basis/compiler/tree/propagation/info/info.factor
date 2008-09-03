@@ -59,10 +59,38 @@ slots ;
 
 : <value-info> ( -- info ) \ value-info new ;
 
+: read-only-slots ( values class -- slots )
+    #! Delegation.
+    all-slots rest-slice
+    [ read-only>> [ drop f ] unless ] 2map
+    { f f } prepend ;
+
+DEFER: <literal-info>
+
+: init-literal-info ( info -- info )
+    #! Delegation.
+    dup literal>> class >>class
+    dup literal>> dup real? [ [a,a] >>interval ] [
+        [ [-inf,inf] >>interval ] dip
+        {
+            { [ dup complex? ] [
+                [ real-part <literal-info> ]
+                [ imaginary-part <literal-info> ] bi
+                2array >>slots
+            ] }
+            { [ dup tuple? ] [
+                [
+                    tuple-slots rest-slice
+                    [ <literal-info> ] map
+                ] [ class ] bi read-only-slots >>slots
+            ] }
+            [ drop ]
+        } cond
+    ] if ; inline
+
 : init-value-info ( info -- info )
     dup literal?>> [
-        dup literal>> class >>class
-        dup literal>> dup real? [ [a,a] ] [ drop [-inf,inf] ] if >>interval
+        init-literal-info
     ] [
         dup [ class>> null-class? ] [ interval>> empty-interval eq? ] bi or [
             null >>class
@@ -73,7 +101,7 @@ slots ;
             dup [ class>> ] [ interval>> ] bi interval>literal
             [ >>literal ] [ >>literal? ] bi*
         ] if
-    ] if ;
+    ] if ; inline
 
 : <class/interval-info> ( class interval -- info )
     <value-info>

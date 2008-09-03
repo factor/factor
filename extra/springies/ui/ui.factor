@@ -10,7 +10,7 @@ IN: springies.ui
 : draw-node ( node -- ) pos>> { -5 -5 } v+ dup { 10 10 } v+ gl-rect ;
 
 : draw-spring ( spring -- )
-  [ spring-node-a pos>> ] [ spring-node-b pos>> ] bi gl-line ;
+  [ node-a>> pos>> ] [ node-b>> pos>> ] bi gl-line ;
 
 : draw-nodes ( -- ) nodes> [ draw-node ] each ;
 
@@ -52,13 +52,11 @@ DEFER: maybe-loop
 
 : springies-window* ( -- )
 
-  C[ display ] <slate> >slate
-    { 800 600 }                                      slate> set-slate-pdim
-    C[ { 500 500 } >world-size loop on [ run ] in-thread ]
-      slate> set-slate-graft
-    C[ loop off ]                                    slate> set-slate-ungraft
-
-  slate> "Springies" open-window ;
+  C[ display ] <slate>
+    { 800 600 } >>pdim
+    C[ { 500 500 } >world-size loop on [ run ] in-thread ] >>graft
+    C[ loop off ] >>ungraft
+  [ >slate ] [ "Springies" open-window ] bi ;
 
 : springies-window ( -- ) [ [ springies-window* ] with-scope ] with-ui ;
 

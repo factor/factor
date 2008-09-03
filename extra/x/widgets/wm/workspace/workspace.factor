@@ -1,5 +1,6 @@
 
-USING: kernel namespaces namespaces.lib math sequences vars mortar slot-accessors x ;
+USING: kernel namespaces namespaces.lib math sequences vars mortar
+accessors slot-accessors x ;
 
 IN: x.widgets.wm.workspace
 
@@ -23,9 +24,9 @@ dpy get $default-root <- children [ <- mapped? ] filter ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : switch-to-workspace ( n -- )
-mapped-windows current-workspace> workspaces> nth set-workspace-windows
+mapped-windows current-workspace> workspaces> nth (>>windows)
 mapped-windows [ <- unmap drop ] each
-dup workspaces> nth workspace-windows [ <- map drop ] each
+dup workspaces> nth windows>> [ <- map drop ] each
 current-workspace set* ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

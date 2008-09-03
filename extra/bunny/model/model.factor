@@ -79,7 +79,7 @@ GENERIC: bunny-geom ( geom -- )
 GENERIC: draw-bunny ( geom draw -- )
 
 M: bunny-dlist bunny-geom
-    bunny-dlist-list glCallList ;
+    list>> glCallList ;
 
 M: bunny-buffers bunny-geom
     dup [ array>> ] [ element-array>> ] bi [

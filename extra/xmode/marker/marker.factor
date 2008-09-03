@@ -63,10 +63,8 @@ M: f text-matches?
 
 M: string-matcher text-matches?
     [
-        dup string-matcher-string
-        swap string-matcher-ignore-case?
-        string-head?
-    ] keep string-matcher-string length and ;
+        [ string>> ] [ ignore-case?>> ] bi string-head?
+    ] keep string>> length and ;
 
 M: regexp text-matches?
     >r >string r> match-head ;
@@ -177,17 +175,17 @@ M: mark-following-rule handle-rule-start
     ?end-rule
     mark-token add-remaining-token
     tuck rule-match-token* next-token,
-    f context get set-line-context-end
-    context get set-line-context-in-rule ;
+    f context get (>>end)
+    context get (>>in-rule) ;
 
 M: mark-following-rule handle-rule-end
     nip rule-match-token* prev-token,
-    f context get set-line-context-in-rule ;
+    f context get (>>in-rule) ;
 
 M: mark-previous-rule handle-rule-start
     ?end-rule
     mark-token
-    dup rule-body-token prev-token,
+    dup body-token>> prev-token,
     rule-match-token* next-token, ;
 
 : do-escaped ( -- )

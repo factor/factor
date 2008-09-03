@@ -32,7 +32,7 @@ M: processing-gadget handle-gesture ( gesture gadget -- ? )
      {
        [ dup key-down? ]
        [
-         key-down-sym key-value set
+         sym>> key-value set
          key-pressed-value on
          key-down>> dup [ call ] [ drop ] if
          t
@@ -49,7 +49,7 @@ M: processing-gadget handle-gesture ( gesture gadget -- ? )
      {
        [ dup button-down? ]
        [
-         button-down-# button-value set
+         #>> button-value set
          mouse-pressed-value on
          button-down>> dup [ call ] [ drop ] if
          t

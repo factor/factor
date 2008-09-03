@@ -37,8 +37,8 @@ M: incremental pref-dim*
     [ next-cursor ] keep (>>cursor) ;
 
 : incremental-loc ( gadget incremental -- )
-    dup cursor>> swap orientation>> v*
-    swap set-rect-loc ;
+    [ cursor>> ] [ orientation>> ] bi v*
+    >>loc drop ;
 
 : prefer-incremental ( gadget -- )
     dup forget-pref-dim dup pref-dim >>dim drop ;

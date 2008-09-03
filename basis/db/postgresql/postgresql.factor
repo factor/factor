@@ -16,7 +16,7 @@ TUPLE: postgresql-statement < statement ;
 
 TUPLE: postgresql-result-set < result-set ;
 
-M: postgresql-db make-db* ( seq tuple -- db )
+M: postgresql-db make-db* ( seq db -- db )
     >r first4 r>
         swap >>db
         swap >>pass

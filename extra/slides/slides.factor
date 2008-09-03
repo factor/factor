@@ -61,7 +61,7 @@ IN: slides
 
 : page-theme ( gadget -- )
     T{ gradient f { T{ rgba f 0.8 0.8 1.0 1.0 } T{ rgba f 0.8 1.0 1.0 1.0 } } }
-    swap set-gadget-interior ;
+    >>interior drop ;
 
 : <page> ( list -- gadget )
     [
@@ -82,8 +82,8 @@ TUPLE: slides < book ;
     [ <page> ] map 0 <model> slides new-book ;
 
 : change-page ( book n -- )
-    over control-value + over gadget-children length rem
-    swap gadget-model set-model ;
+    over control-value + over children>> length rem
+    swap model>> set-model ;
 
 : next-page ( book -- ) 1 change-page ;
 

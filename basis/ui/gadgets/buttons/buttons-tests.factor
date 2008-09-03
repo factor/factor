@@ -1,6 +1,7 @@
-IN: ui.gadgets.buttons.tests
 USING: ui.commands ui.gadgets.buttons ui.gadgets.labels
-ui.gadgets tools.test namespaces sequences kernel models ;
+ui.gadgets tools.test namespaces sequences kernel models
+accessors ;
+IN: ui.gadgets.buttons.tests
 
 TUPLE: foo-gadget ;
 
@@ -15,7 +16,7 @@ TUPLE: foo-gadget ;
 
 T{ foo-gadget } <toolbar> "t" set
 
-[ 2 ] [ "t" get gadget-children length ] unit-test
+[ 2 ] [ "t" get children>> length ] unit-test
 [ "Foo A" ] [ "t" get gadget-child gadget-child label-string ] unit-test
 
 [ ] [
@@ -34,7 +35,7 @@ T{ foo-gadget } <toolbar> "t" set
 \ <checkbox> must-infer
 
 [ 0 ] [
-    "religion" get gadget-child radio-control-value
+    "religion" get gadget-child value>>
 ] unit-test
 
 [ 2 ] [

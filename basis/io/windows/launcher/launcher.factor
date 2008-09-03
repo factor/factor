@@ -151,13 +151,13 @@ M: windows kill-process* ( handle -- )
     swap win32-error=0/f ;
 
 : process-exited ( process -- )
-    dup process-handle exit-code
-    over process-handle dispose-process
+    dup handle>> exit-code
+    over handle>> dispose-process
     notify-exit ;
 
 M: windows wait-for-processes ( -- ? )
     processes get keys dup
-    [ process-handle PROCESS_INFORMATION-hProcess ] map
+    [ handle>> PROCESS_INFORMATION-hProcess ] map
     dup length swap >c-void*-array 0 0
     WaitForMultipleObjects
     dup HEX: ffffffff = [ win32-error ] when

@@ -3,7 +3,6 @@ io.streams.string namespaces classes effects source-files
 assocs sequences strings io.files definitions continuations
 sorting classes.tuple compiler.units debugger vocabs
 vocabs.loader accessors eval combinators ;
-
 IN: parser.tests
 
 [
@@ -63,7 +62,7 @@ IN: parser.tests
     : baz ( a b -- * ) 2array throw ;
 
     [ t ]
-    [ \ baz "declared-effect" word-prop effect-terminated? ]
+    [ \ baz "declared-effect" word-prop terminated?>> ]
     unit-test
 
     [ ] [ "IN: parser.tests USE: math : effect-parsing-test ( a b -- d ) - ;" eval ] unit-test
@@ -121,7 +120,7 @@ IN: parser.tests
         "IN: parser.tests : smudge-me ;" <string-reader> "foo"
         parse-stream drop
 
-        "foo" source-file source-file-definitions first assoc-size
+        "foo" source-file definitions>> first assoc-size
     ] unit-test
 
     [ t ] [ "smudge-me" "parser.tests" lookup >boolean ] unit-test
@@ -138,21 +137,21 @@ IN: parser.tests
         "IN: parser.tests USING: math strings ; GENERIC: smudge-me M: integer smudge-me ; M: string smudge-me ;" <string-reader> "foo"
         parse-stream drop
 
-        "foo" source-file source-file-definitions first assoc-size
+        "foo" source-file definitions>> first assoc-size
     ] unit-test
 
     [ 1 ] [
         "IN: parser.tests USING: arrays ; M: array smudge-me ;" <string-reader> "bar"
         parse-stream drop
 
-        "bar" source-file source-file-definitions first assoc-size
+        "bar" source-file definitions>> first assoc-size
     ] unit-test
 
     [ 2 ] [
         "IN: parser.tests USING: math strings ; GENERIC: smudge-me M: integer smudge-me ;" <string-reader> "foo"
         parse-stream drop
 
-        "foo" source-file source-file-definitions first assoc-size
+        "foo" source-file definitions>> first assoc-size
     ] unit-test
     
     [ t ] [
@@ -401,7 +400,7 @@ IN: parser.tests
 ] times
 
 [ "resource:core/parser/test/assert-depth.factor" run-file ]
-[ relative-overflow-stack { 1 2 3 } sequence= ]
+[ stack>> { 1 2 3 } sequence= ]
 must-fail-with
 
 2 [

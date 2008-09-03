@@ -8,7 +8,7 @@ classes.singleton accessors quotations random ;
 IN: db.types
 
 HOOK: persistent-table db ( -- hash )
-HOOK: compound db ( str obj -- hash )
+HOOK: compound db ( string obj -- hash )
 
 TUPLE: sql-spec class slot-name column-name type primary-key modifiers ;
 
@@ -78,7 +78,7 @@ FACTOR-BLOB NULL URL ;
         swap >>class
     dup normalize-spec ;
 
-: number>string* ( n/str -- str )
+: number>string* ( n/string -- string )
     dup number? [ number>string ] when ;
 
 : remove-db-assigned-id ( specs -- obj )
@@ -97,7 +97,7 @@ FACTOR-BLOB NULL URL ;
 
 ERROR: unknown-modifier ;
 
-: lookup-modifier ( obj -- str )
+: lookup-modifier ( obj -- string )
     {
         { [ dup array? ] [ unclip lookup-modifier swap compound ] }
         [ persistent-table at* [ unknown-modifier ] unless third ]
@@ -105,43 +105,43 @@ ERROR: unknown-modifier ;
 
 ERROR: no-sql-type ;
 
-: (lookup-type) ( obj -- str )
+: (lookup-type) ( obj -- string )
     persistent-table at* [ no-sql-type ] unless ;
 
-: lookup-type ( obj -- str )
+: lookup-type ( obj -- string )
     dup array? [
         unclip (lookup-type) first nip
     ] [
         (lookup-type) first
     ] if ;
 
-: lookup-create-type ( obj -- str )
+: lookup-create-type ( obj -- string )
     dup array? [
         unclip (lookup-type) second swap compound
     ] [
         (lookup-type) second
     ] if ;
 
-: single-quote ( str -- newstr )
+: single-quote ( string -- new-string )
     "'" swap "'" 3append ;
 
-: double-quote ( str -- newstr )
+: double-quote ( string -- new-string )
     "\"" swap "\"" 3append ;
 
-: paren ( str -- newstr )
+: paren ( string -- new-string )
     "(" swap ")" 3append ;
 
-: join-space ( str1 str2 -- newstr )
+: join-space ( string1 string2 -- new-string )
     " " swap 3append ;
 
-: modifiers ( spec -- str )
+: modifiers ( spec -- string )
     modifiers>> [ lookup-modifier ] map " " join
     dup empty? [ " " prepend ] unless ;
 
 HOOK: bind% db ( spec -- )
 HOOK: bind# db ( spec obj -- )
 
-: offset-of-slot ( str obj -- n )
+: offset-of-slot ( string obj -- n )
     class superclasses [ "slots" word-prop ] map concat
     slot-named offset>> ;
 

@@ -7,6 +7,9 @@ IN: math.geometry.rect
 
 TUPLE: rect loc dim ;
 
+GENERIC: rect-loc ( obj -- loc )
+GENERIC: rect-dim ( obj -- dim )
+
 : init-rect ( rect -- rect ) { 0 0 } clone >>loc { 0 0 } clone >>dim ;
 
 : <rect> ( loc dim -- rect ) rect boa ;
@@ -16,6 +19,10 @@ TUPLE: rect loc dim ;
 M: array rect-loc ;
 
 M: array rect-dim drop { 0 0 } ;
+
+M: rect rect-loc loc>> ;
+
+M: rect rect-dim dim>> ;
 
 : rect-bounds ( rect -- loc dim ) dup rect-loc swap rect-dim ;
 

@@ -39,10 +39,10 @@ profiler-gadget "toolbar" f {
 GENERIC: profiler-presentation ( obj -- quot )
 
 M: usage-profile profiler-presentation
-    usage-profile-word [ usage-profile. ] curry ;
+    word>> [ usage-profile. ] curry ;
 
 M: vocab-profile profiler-presentation
-    vocab-profile-vocab [ vocab-profile. ] curry ;
+    vocab>> [ vocab-profile. ] curry ;
 
 M: f profiler-presentation
     drop [ vocabs-profile. ] ;

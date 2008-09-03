@@ -15,7 +15,7 @@ C: <foo> foo
 [ f f ] [ "hi" 1 2 <foo> <mirror> at* ] unit-test
 
 [ 3 ] [
-    3 "baz" 1 2 <foo> [ <mirror> set-at ] keep foo-baz
+    3 "baz" 1 2 <foo> [ <mirror> set-at ] keep baz>>
 ] unit-test
 
 [ 3 "hi" 1 2 <foo> <mirror> set-at ] must-fail

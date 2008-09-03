@@ -323,8 +323,8 @@ TUPLE: regexp source parser ignore-case? ;
 
 M: regexp pprint*
     [
-        dup regexp-source
+        dup source>>
         dup find-regexp-syntax swap % swap % %
-        dup regexp-ignore-case? [ "i" % ] when
+        dup ignore-case?>> [ "i" % ] when
     ] "" make
     swap present-text ;

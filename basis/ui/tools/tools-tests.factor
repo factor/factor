@@ -14,7 +14,7 @@ IN: ui.tools.tests
 [ ] [ "w" get com-scroll-up ] unit-test
 [ ] [ "w" get com-scroll-down ] unit-test
 [ t ] [
-    "w" get workspace-book gadget-children
+    "w" get book>> children>>
     [ tool-scroller ] map sift [ scroller? ] all?
 ] unit-test
 [ ] [ "w" get hide-popup ] unit-test
@@ -35,8 +35,8 @@ IN: ui.tools.tests
 
     [ ] [ notify-queued ] unit-test
 
-    [ ] [ "w" get workspace-popup closable-gadget-content
-    live-search-list gadget-child "p" set ] unit-test
+    [ ] [ "w" get popup>> content>>
+    list>> gadget-child "p" set ] unit-test
 
     [ t ] [ "p" get presentation? ] unit-test
 
@@ -47,7 +47,7 @@ IN: ui.tools.tests
     [ t ] [ "c" get button? ] unit-test
 
     [ ] [
-        "w" get workspace-listener listener-gadget-input
+        "w" get listener>> input>>
         3 handle-parse-error
     ] unit-test
 

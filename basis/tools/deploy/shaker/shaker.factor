@@ -246,7 +246,7 @@ IN: tools.deploy.shaker
                 word
             } %
 
-            { } { "optimizer.math.partial" } strip-vocab-globals %
+            { } { "math.partial-dispatch" } strip-vocab-globals %
         ] when
 
         strip-prettyprint? [

@@ -43,7 +43,7 @@ M: label gadget-text* label-string % ;
 TUPLE: label-control < label ;
 
 M: label-control model-changed
-    swap model-value over set-label-string relayout ;
+    swap value>> over set-label-string relayout ;
 
 : <label-control> ( model -- gadget )
     "" label-control new-label

@@ -53,7 +53,7 @@ M: mismatched summary ( obj -- str )
 TUPLE: unclosed < parsing-error tags ;
 : <unclosed> ( -- unclosed )
     unclosed parsing-error
-        xml-stack get rest-slice [ first opener-name ] map >>tags ;
+        xml-stack get rest-slice [ first name>> ] map >>tags ;
 M: unclosed summary ( obj -- str )
     [
         dup call-next-method write
@@ -171,7 +171,7 @@ M: bad-directive summary ( obj -- str )
     [
         dup call-next-method write
         "Misplaced directive:" print
-        bad-directive-dir write-item nl
+        dir>> write-item nl
     ] with-string-writer ;
 
 UNION: xml-parse-error multitags notags extra-attrs nonexist-ns

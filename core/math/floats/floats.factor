@@ -10,11 +10,14 @@ M: float >fixnum float>fixnum ;
 M: float >bignum float>bignum ;
 M: float >float ;
 
+M: float hashcode* nip float>bits ;
+M: float equal? over float? [ float= ] [ 2drop f ] if ;
+M: float number= float= ;
+
 M: float < float< ;
 M: float <= float<= ;
 M: float > float> ;
 M: float >= float>= ;
-M: float number= float= ;
 
 M: float + float+ ;
 M: float - float- ;

@@ -62,7 +62,7 @@ M: grid pref-dim*
 : position-grid ( grid horiz vert -- )
     pick >r
     >r over r> grid-positions >r grid-positions r>
-    pair-up r> [ set-rect-loc ] do-grid ;
+    pair-up r> [ (>>loc) ] do-grid ;
 
 : resize-grid ( grid horiz vert -- )
     pick fill?>> [

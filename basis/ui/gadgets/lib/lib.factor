@@ -1,6 +1,8 @@
 
-USING: ui.backend ui.gadgets.worlds ;
+USING: accessors kernel ui.backend ui.gadgets.worlds ;
 
 IN: ui.gadgets.lib
 
-: find-gl-context ( gadget -- ) find-world world-handle select-gl-context ;
+ERROR: no-world-found ;
+: find-gl-context ( gadget -- )
+    find-world dup [ handle>> select-gl-context ] [ no-world-found ] if ;

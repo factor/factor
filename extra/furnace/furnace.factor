@@ -176,7 +176,7 @@ CHLOE: a
                     [ link-attrs ]
                     [ "method" optional-attr "post" or =method ]
                     [ "action" required-attr resolve-base-path =action ]
-                    [ tag-attrs non-chloe-attrs-only print-attrs ]
+                    [ attrs>> non-chloe-attrs-only print-attrs ]
                 } cleave
             form>
         ]
@@ -196,13 +196,13 @@ STRING: button-tag-markup
 ;
 
 : add-tag-attrs ( attrs tag -- )
-    tag-attrs swap update ;
+    attrs>> swap update ;
 
 CHLOE: button
     button-tag-markup string>xml delegate
     {
-        [ [ tag-attrs chloe-attrs-only ] dip add-tag-attrs ]
-        [ [ tag-attrs non-chloe-attrs-only ] dip "button" tag-named add-tag-attrs ]
-        [ [ children>string 1array ] dip "button" tag-named set-tag-children ]
+        [ [ attrs>> chloe-attrs-only ] dip add-tag-attrs ]
+        [ [ attrs>> non-chloe-attrs-only ] dip "button" tag-named add-tag-attrs ]
+        [ [ children>string 1array ] dip "button" tag-named (>>children) ]
         [ nip ]
     } 2cleave process-chloe-tag ;

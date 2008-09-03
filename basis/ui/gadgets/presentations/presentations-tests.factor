@@ -1,7 +1,7 @@
-IN: ui.gadgets.presentations.tests
 USING: math ui.gadgets.presentations ui.gadgets tools.test
 prettyprint ui.gadgets.buttons io io.streams.string kernel
-classes.tuple ;
+classes.tuple accessors ;
+IN: ui.gadgets.presentations.tests
 
 [ t ] [
     "Hi" \ + <presentation> gadget?
@@ -9,6 +9,6 @@ classes.tuple ;
 
 [ "+" ] [
     [
-        \ + f \ pprint <command-button> dup button-quot call
+        \ + f \ pprint <command-button> dup quot>> call
     ] with-string-writer
 ] unit-test
