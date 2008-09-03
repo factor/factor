@@ -13,7 +13,7 @@ USE: db.sqlite
 
 [ "pool-test.db" temp-file delete-file ] ignore-errors
 
-[ ] [ "pool-test.db" sqlite-db <db-pool> "pool" set ] unit-test
+[ ] [ "pool-test.db" temp-file sqlite-db <db-pool> "pool" set ] unit-test
 
 [ ] [ "pool" get expired>> t >>expired drop ] unit-test
 
