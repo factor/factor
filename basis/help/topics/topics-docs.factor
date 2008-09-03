@@ -1,5 +1,5 @@
 USING: help.markup help.syntax help.crossref help io io.styles
-hashtables ;
+hashtables strings ;
 IN: help.topics
 
 HELP: articles
@@ -15,7 +15,7 @@ HELP: article
 { $description "Outputs a named " { $link article } " object." } ;
 
 HELP: article-title
-{ $values { "topic" "an article name or a word" } { "title" "a string" } }
+{ $values { "topic" "an article name or a word" } { "string" string } }
 { $description "Outputs the title of a specific help article." } ;
 
 HELP: article-content
