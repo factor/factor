@@ -301,6 +301,16 @@ HELP: fp-nan?
 { $values { "x" real } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " is an IEEE Not-a-Number value. While " { $snippet "x" } " can be any real number, this word will only ever yield true if " { $snippet "x" } " is a " { $link float } "." } ;
 
+HELP: fp-infinity?
+{ $values { "x" real } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "x" } " is an IEEE Infinity value. While " { $snippet "x" } " can be any real number, this word will only ever yield true if " { $snippet "x" } " is a " { $link float } "." }
+{ $examples
+    { $example "USING: math prettyprint ;" "1/0. fp-infinity? ." "t" }
+    { $example "USING: io kernel math ;" "-1/0. [ fp-infinity? ] [ 0 < ] bi [ \"negative infinity\" print ] when" "negative infinity" }
+} ;
+
+{ fp-nan? fp-infinity? } related-words
+
 HELP: real-part
 { $values { "z" number } { "x" real } }
 { $description "Outputs the real part of a complex number. This acts as the identity on real numbers." }
