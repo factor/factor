@@ -20,18 +20,6 @@ IN: vocab-browser
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: pprint-class ( class -- )
-  [
-    \ TUPLE: pprint-word dup pprint-word
-    dup superclass tuple eq?
-    [ "<" text dup superclass pprint-word ] unless
-    <block "slots" word-prop [ pprint-slot ] each
-    block> pprint-;
-  ]
-  with-pprint nl ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 : word-effect-as-string ( word -- string )
   stack-effect dup
     [ effect>string ]
@@ -71,7 +59,10 @@ IN: vocab-browser
     [ drop ]
     [
       "Predicate Classes" $heading nl
-      [ pprint-class ] each
+      ! [ pprint-class ] each
+      [ { [ ] [ superclass ] } 1arr ] map
+      { "CLASS" "SUPERCLASS" } prefix
+      print-table
     ]
   if
 
