@@ -281,18 +281,12 @@ bi
 "tuple" "kernel" create
 [ { } define-builtin ]
 [ define-tuple-layout ]
-[
-    { "delegate" } make-slots
-    [ drop ] [ finalize-tuple-slots ] 2bi
-    [ "slots" set-word-prop ]
-    [ define-accessors ]
-    2bi
-] tri
+bi
 
 ! Create special tombstone values
 "tombstone" "hashtables.private" create
 tuple
-{ } define-tuple-class
+{ "state" } define-tuple-class
 
 "((empty))" "hashtables.private" create
 "tombstone" "hashtables.private" lookup f

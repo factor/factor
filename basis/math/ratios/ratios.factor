@@ -30,6 +30,14 @@ M: integer /
         2dup gcd nip tuck /i >r /i r> fraction>
     ] if ;
 
+M: ratio hashcode*
+    nip >fraction [ hashcode ] bi@ bitxor ;
+
+M: ratio equal?
+    over ratio? [
+        2>fraction = [ = ] [ 2drop f ] if
+    ] [ 2drop f ] if ;
+
 M: ratio number=
     2>fraction number= [ number= ] [ 2drop f ] if ;
 

@@ -1,6 +1,6 @@
-IN: models.mapping.tests
 USING: arrays generic kernel math models namespaces sequences assocs
-tools.test models.mapping ;
+tools.test models.mapping accessors ;
+IN: models.mapping.tests
 
 ! Test mapping
 [ ] [
@@ -14,7 +14,7 @@ tools.test models.mapping ;
 [ ] [ "m" get activate-model ] unit-test
 
 [ H{ { "one" 1 } { "two" 2 } } ] [
-    "m" get model-value
+    "m" get value>>
 ] unit-test
 
 [ ] [
@@ -23,12 +23,12 @@ tools.test models.mapping ;
 ] unit-test
 
 [ H{ { "one" 3 } { "two" 4 } } ] [
-    "m" get model-value
+    "m" get value>>
 ] unit-test
 
 [ H{ { "one" 5 } { "two" 4 } } ] [
-    5 "one" "m" get mapping-assoc at set-model
-    "m" get model-value
+    5 "one" "m" get assoc>> at set-model
+    "m" get value>>
 ] unit-test
 
 [ ] [ "m" get deactivate-model ] unit-test

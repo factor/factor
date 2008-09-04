@@ -7,6 +7,7 @@ classes.algebra combinators generic.math splitting fry locals
 classes.tuple alien.accessors classes.tuple.private slots.private
 definitions
 stack-checker.state
+compiler.intrinsics
 compiler.tree.comparisons
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
@@ -17,11 +18,11 @@ IN: compiler.tree.propagation.known-words
 
 \ fixnum
 most-negative-fixnum most-positive-fixnum [a,b]
-+interval+ set-word-prop
+"interval" set-word-prop
 
 \ array-capacity
 0 max-array-capacity [a,b]
-+interval+ set-word-prop
+"interval" set-word-prop
 
 { + - * / }
 [ { number number } "input-classes" set-word-prop ] each
@@ -66,17 +67,17 @@ most-negative-fixnum most-positive-fixnum [a,b]
     over interval>> [ [ clone ] dip change-interval ] [ 2drop ] if ; inline
 
 { bitnot fixnum-bitnot bignum-bitnot } [
-    [ [ interval-bitnot ] ?change-interval ] +outputs+ set-word-prop
+    [ [ interval-bitnot ] ?change-interval ] "outputs" set-word-prop
 ] each
 
-\ abs [ [ interval-abs ] ?change-interval ] +outputs+ set-word-prop
+\ abs [ [ interval-abs ] ?change-interval ] "outputs" set-word-prop
 
 : math-closure ( class -- newclass )
     { fixnum bignum integer rational float real number object }
     [ class<= ] with find nip ;
 
 : fits? ( interval class -- ? )
-    +interval+ word-prop interval-subset? ;
+    "interval" word-prop interval-subset? ;
 
 : binary-op-class ( info1 info2 -- newclass )
     [ class>> ] bi@
@@ -120,7 +121,7 @@ most-negative-fixnum most-positive-fixnum [a,b]
         [ binary-op-class ] [ , binary-op-interval ] 2bi
         @
         <class/interval-info>
-    ] +outputs+ set-word-prop ;
+    ] "outputs" set-word-prop ;
 
 \ + [ [ interval+ ] [ may-overflow number-valued ] binary-op ] each-derived-op
 \ + [ [ interval+ ] [ number-valued ] binary-op ] each-fast-derived-op
@@ -158,7 +159,7 @@ most-negative-fixnum most-positive-fixnum [a,b]
     in1 in2 op negate-comparison (comparison-constraints) out f--> /\ ;
 
 : define-comparison-constraints ( word op -- )
-    '[ , comparison-constraints ] +constraints+ set-word-prop ;
+    '[ , comparison-constraints ] "constraints" set-word-prop ;
 
 comparison-ops
 [ dup '[ , define-comparison-constraints ] each-derived-op ] each
@@ -178,13 +179,13 @@ generic-comparison-ops [
 
 comparison-ops [
     dup '[
-        [ , fold-comparison ] +outputs+ set-word-prop
+        [ , fold-comparison ] "outputs" set-word-prop
     ] each-derived-op
 ] each
 
 generic-comparison-ops [
     dup specific-comparison
-    '[ , fold-comparison ] +outputs+ set-word-prop
+    '[ , fold-comparison ] "outputs" set-word-prop
 ] each
 
 : maybe-or-never ( ? -- info )
@@ -196,7 +197,7 @@ generic-comparison-ops [
 { number= bignum= float= } [
     [
         info-intervals-intersect? maybe-or-never
-    ] +outputs+ set-word-prop
+    ] "outputs" set-word-prop
 ] each
 
 : info-classes-intersect? ( info1 info2 -- ? )
@@ -206,13 +207,13 @@ generic-comparison-ops [
     over value-info literal>> fixnum? [
         [ value-info literal>> is-equal-to ] dip t-->
     ] [ 3drop f ] if
-] +constraints+ set-word-prop
+] "constraints" set-word-prop
 
 \ eq? [
     [ info-intervals-intersect? ]
     [ info-classes-intersect? ]
-    2bi or maybe-or-never
-] +outputs+ set-word-prop
+    2bi and maybe-or-never
+] "outputs" set-word-prop
 
 {
     { >fixnum fixnum }
@@ -226,7 +227,7 @@ generic-comparison-ops [
             interval-intersect
         ] 2bi
         <class/interval-info>
-    ] +outputs+ set-word-prop
+    ] "outputs" set-word-prop
 ] assoc-each
 
 {
@@ -250,36 +251,36 @@ generic-comparison-ops [
         }
     } cond
     [ fixnum fits? fixnum integer ? ] keep <class/interval-info>
-    [ 2nip ] curry +outputs+ set-word-prop
+    [ 2nip ] curry "outputs" set-word-prop
 ] each
 
-{ <tuple> <tuple-boa> } [
+{ <tuple> <tuple-boa> (tuple) } [
     [
         literal>> dup tuple-layout? [ class>> ] [ drop tuple ] if <class-info>
         [ clear ] dip
-    ] +outputs+ set-word-prop
+    ] "outputs" set-word-prop
 ] each
 
 \ new [
     literal>> dup tuple-class? [ drop tuple ] unless <class-info>
-] +outputs+ set-word-prop
+] "outputs" set-word-prop
 
 ! the output of clone has the same type as the input
 { clone (clone) } [
     [ clone f >>literal f >>literal? ]
-    +outputs+ set-word-prop
+    "outputs" set-word-prop
 ] each
 
 \ slot [
     dup literal?>>
     [ literal>> swap value-info-slot ] [ 2drop object-info ] if
-] +outputs+ set-word-prop
+] "outputs" set-word-prop
 
 \ instance? [
     [ value-info ] dip over literal>> class? [
         [ literal>> ] dip predicate-constraints
     ] [ 3drop f ] if
-] +constraints+ set-word-prop
+] "constraints" set-word-prop
 
 \ instance? [
     ! We need to force the caller word to recompile when the class
@@ -292,4 +293,4 @@ generic-comparison-ops [
         [ predicate-output-infos ]
         bi
     ] [ 2drop object-info ] if
-] +outputs+ set-word-prop
+] "outputs" set-word-prop

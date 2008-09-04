@@ -1,8 +1,6 @@
-
-USING: html.streams html.streams.private
-       io io.streams.string io.styles kernel
-       namespaces tools.test xml.writer sbufs sequences inspector colors ;
-
+USING: html.streams html.streams.private accessors io
+io.streams.string io.styles kernel namespaces tools.test
+xml.writer sbufs sequences inspector colors ;
 IN: html.streams.tests
 
 : make-html-string
@@ -33,7 +31,7 @@ IN: html.streams.tests
 TUPLE: funky town ;
 
 M: funky browser-link-href
-    "http://www.funky-town.com/" swap funky-town append ;
+    "http://www.funky-town.com/" swap town>> append ;
 
 [ "<a href='http://www.funky-town.com/austin'>&lt;</a>" ] [
     [

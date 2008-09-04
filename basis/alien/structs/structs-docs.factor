@@ -1,75 +1,7 @@
-IN: alien.structs
 USING: accessors alien.c-types strings help.markup help.syntax
-alien.syntax sequences io arrays slots.deprecated
-kernel words slots assocs namespaces accessors ;
-
-! Deprecated code
-: ($spec-reader-values) ( slot-spec class -- element )
-    dup ?word-name swap 2array
-    over name>>
-    rot class>> 2array 2array
-    [ { $instance } swap suffix ] assoc-map ;
-
-: $spec-reader-values ( slot-spec class -- )
-    ($spec-reader-values) $values ;
-
-: $spec-reader-description ( slot-spec class -- )
-    [
-        "Outputs the value stored in the " ,
-        { $snippet } rot name>> suffix ,
-        " slot of " ,
-        { $instance } swap suffix ,
-        " instance." ,
-    ] { } make $description ;
-
-: slot-of-reader ( reader specs -- spec/f )
-    [ reader>> eq? ] with find nip ;
-
-: $spec-reader ( reader slot-specs class -- )
-    >r slot-of-reader r>
-    over [
-        2dup $spec-reader-values
-        2dup $spec-reader-description
-    ] when 2drop ;
-
-GENERIC: slot-specs ( help-type -- specs )
-
-M: word slot-specs "slots" word-prop ;
-
-: $slot-reader ( reader -- )
-    first dup "reading" word-prop [ slot-specs ] keep
-    $spec-reader ;
-
-: $spec-writer-values ( slot-spec class -- )
-    ($spec-reader-values) reverse $values ;
-
-: $spec-writer-description ( slot-spec class -- )
-    [
-        "Stores a new value to the " ,
-        { $snippet } rot name>> suffix ,
-        " slot of " ,
-        { $instance } swap suffix ,
-        " instance." ,
-    ] { } make $description ;
-
-: slot-of-writer ( writer specs -- spec/f )
-    [ writer>> eq? ] with find nip ;
-
-: $spec-writer ( writer slot-specs class -- )
-    >r slot-of-writer r>
-    over [
-        2dup $spec-writer-values
-        2dup $spec-writer-description
-        dup ?word-name 1array $side-effects
-    ] when 2drop ;
-
-: $slot-writer ( reader -- )
-    first dup "writing" word-prop [ slot-specs ] keep
-    $spec-writer ;
-
-M: string slot-specs c-type fields>> ;
-
-M: array ($instance) first ($instance) " array" write ;
+alien.syntax sequences io arrays kernel words assocs namespaces
+accessors ;
+IN: alien.structs
 
 ARTICLE: "c-structs" "C structure types"
 "A " { $snippet "struct" } " in C is essentially a block of memory with the value of each structure field stored at a fixed offset from the start of the block. The C library interface provides some utilities to define words which read and write structure fields given a base address."

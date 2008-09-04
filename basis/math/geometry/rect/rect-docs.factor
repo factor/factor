@@ -17,11 +17,6 @@ HELP: <rect> ( loc dim -- rect )
 
 { <zero-rect> <rect> <extent-rect> } related-words
 
-HELP: set-rect-dim ( dim rect -- )
-{ $values { "dim" "a pair of integers" } { "rect" rect } }
-{ $description "Modifies the dimensions of a rectangle." }
-{ $side-effects "rect" } ;
-
 HELP: rect-bounds
 { $values { "rect" rect } { "loc" "a pair of integers" } { "dim" "a pair of integers" } }
 { $description "Outputs the location and dimensions of a rectangle." } ;

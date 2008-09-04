@@ -97,7 +97,7 @@ GENERIC: text-hash-char ( text -- ch )
 
 M: f text-hash-char ;
 
-M: string-matcher text-hash-char string-matcher-string first ;
+M: string-matcher text-hash-char string>> first ;
 
 M: regexp text-hash-char drop f ;
 

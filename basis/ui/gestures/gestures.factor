@@ -226,14 +226,14 @@ SYMBOL: drag-timer
 : send-button-down ( gesture loc world -- )
     move-hand
     start-drag-timer
-    dup button-down-#
+    dup #>>
     dup update-click# hand-buttons get-global push
     update-clicked
     button-gesture ;
 
 : send-button-up ( gesture loc world -- )
     move-hand
-    dup button-up-# hand-buttons get-global delete
+    dup #>> hand-buttons get-global delete
     stop-drag-timer
     button-gesture ;
 
@@ -261,21 +261,21 @@ GENERIC: gesture>string ( gesture -- string/f )
     [ name>> ] map concat >string ;
 
 M: key-down gesture>string
-    dup key-down-mods modifiers>string
-    swap key-down-sym append ;
+    dup mods>> modifiers>string
+    swap sym>> append ;
 
 M: button-up gesture>string
     [
-        dup button-up-mods modifiers>string %
+        dup mods>> modifiers>string %
         "Click Button" %
-        button-up-# [ " " % # ] when*
+        #>> [ " " % # ] when*
     ] "" make ;
 
 M: button-down gesture>string
     [
-        dup button-down-mods modifiers>string %
+        dup mods>> modifiers>string %
         "Press Button" %
-        button-down-# [ " " % # ] when*
+        #>> [ " " % # ] when*
     ] "" make ;
 
 M: left-action gesture>string drop "Swipe left" ;

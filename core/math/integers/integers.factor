@@ -1,4 +1,4 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! Copyright (C) 2008, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel kernel.private sequences
@@ -12,6 +12,8 @@ M: fixnum >fixnum ;
 M: fixnum >bignum fixnum>bignum ;
 M: fixnum >integer ;
 
+M: fixnum hashcode* nip ;
+M: fixnum equal? over bignum? [ >bignum bignum= ] [ 2drop f ] if ;
 M: fixnum number= eq? ;
 
 M: fixnum < fixnum< ;
@@ -47,7 +49,15 @@ M: fixnum (log2) 0 swap (fixnum-log2) ;
 M: bignum >fixnum bignum>fixnum ;
 M: bignum >bignum ;
 
+M: bignum hashcode* nip >fixnum ;
+
+M: bignum equal?
+    over bignum? [ bignum= ] [
+        swap dup fixnum? [ >bignum bignum= ] [ 2drop f ] if
+    ] if ;
+
 M: bignum number= bignum= ;
+
 M: bignum < bignum< ;
 M: bignum <= bignum<= ;
 M: bignum > bignum> ;

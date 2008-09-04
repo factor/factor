@@ -8,8 +8,19 @@ IN: obj.print
 
 : write-wrapped ( string -- ) H{ { wrap-margin 500 } } [ write ] with-nesting ;
 
+! : print-elt ( val -- )
+!   {
+!     { [ string? ] [ write-wrapped ] }
+!     { [ array?  ] [ [ . ] each    ] }
+!     { [ drop t  ] [ . ] }
+!   }
+!   1cond ;
+
+USING: accessors vocabs help.markup ;
+
 : print-elt ( val -- )
   {
+    { [ vocab?  ] [ [ name>> ] [ ] bi write-object ] }
     { [ string? ] [ write-wrapped ] }
     { [ array?  ] [ [ . ] each    ] }
     { [ drop t  ] [ . ] }

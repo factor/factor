@@ -41,7 +41,7 @@ M: walker-gadget focusable-child*
 : walker-state-string ( status thread -- string )
     [
         "Thread: " %
-        dup thread-name %
+        dup name>> %
         " (" %
         swap {
             { +stopped+ "Stopped" }
@@ -84,7 +84,7 @@ walker-gadget "toolbar" f {
 : walker-for-thread? ( thread gadget -- ? )
     {
         { [ dup walker-gadget? not ] [ 2drop f ] }
-        { [ dup walker-gadget-closing? ] [ 2drop f ] }
+        { [ dup closing?>> ] [ 2drop f ] }
         [ thread>> eq? ]
     } cond ;
 
@@ -92,7 +92,7 @@ walker-gadget "toolbar" f {
     [ swap walker-for-thread? ] curry find-window ;
 
 : walker-window ( status continuation thread -- )
-    [ <walker-gadget> ] [ thread-name ] bi open-status-window ;
+    [ <walker-gadget> ] [ name>> ] bi open-status-window ;
 
 [
     dup find-walker-window dup

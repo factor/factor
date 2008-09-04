@@ -148,7 +148,7 @@ M: fixnum potential-hang dup [ potential-hang ] when ;
 
 TUPLE: funny-cons car cdr ;
 GENERIC: iterate ( obj -- )
-M: funny-cons iterate funny-cons-cdr iterate ;
+M: funny-cons iterate cdr>> iterate ;
 M: f iterate drop ;
 M: real iterate drop ;
 

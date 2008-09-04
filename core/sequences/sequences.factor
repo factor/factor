@@ -499,15 +499,13 @@ M: sequence <=>
     [ mismatch not ] [ 2drop f ] if ; inline
 
 : sequence-hashcode-step ( oldhash newpart -- newhash )
-    swap [
+    >fixnum swap [
         dup -2 fixnum-shift-fast swap 5 fixnum-shift-fast
         fixnum+fast fixnum+fast
     ] keep fixnum-bitxor ; inline
 
 : sequence-hashcode ( n seq -- x )
-    0 -rot [
-        hashcode* >fixnum sequence-hashcode-step
-    ] with each ; inline
+    0 -rot [ hashcode* sequence-hashcode-step ] with each ; inline
 
 M: reversed equal? over reversed? [ sequence= ] [ 2drop f ] if ;
 

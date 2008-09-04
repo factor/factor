@@ -50,7 +50,7 @@ M: gadget model-changed 2drop ;
     dup model>> dup [ 2dup remove-connection ] when 2drop ;
 
 : control-value ( control -- value )
-    model>> model-value ;
+    model>> value>> ;
 
 : set-control-value ( value control -- )
     model>> set-model ;

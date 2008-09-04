@@ -13,7 +13,7 @@ concurrency.promises io.encodings.ascii io threads calendar ;
 ] unit-test
 
 [ t ] [
-    T{ inet4 "1.2.3.4" 1234 } T{ inet4 "1.2.3.5" 1235 }
+    T{ inet4 f "1.2.3.4" 1234 } T{ inet4 f "1.2.3.5" 1235 }
     [ log-connection ] 2keep
     [ remote-address get = ] [ local-address get = ] bi*
     and

@@ -26,7 +26,9 @@ $nl
 { $subsection < }
 { $subsection <= }
 { $subsection > }
-{ $subsection >= } ;
+{ $subsection >= }
+"Numbers can be compared for equality using " { $link = } ", or a less precise test which disregards types:"
+{ $subsection number= } ;
 
 ARTICLE: "modular-arithmetic" "Modular arithmetic"
 { $subsection mod }
@@ -60,8 +62,12 @@ ABOUT: "arithmetic"
 
 HELP: number=
 { $values { "x" number } { "y" number } { "?" "a boolean" } }
-{ $description "Tests if two numbers have the same numerical value. If either input is not a number, outputs " { $link f } "." }
-{ $notes "Do not call this word directly. Calling " { $link = } " has the same effect and is more concise." } ;
+{ $description "Tests if two numbers have the same numeric value." }
+{ $notes "This word differs from " { $link = } " in that it disregards differences in type when comparing numbers." }
+{ $examples
+    { $example "USING: math prettyprint ;" "3.0 3 number= ." "t" }
+    { $example "USING: kernel math prettyprint ;" "3.0 3 = ." "f" }
+} ;
 
 HELP: <
 { $values { "x" real } { "y" real } { "?" "a boolean" } }
@@ -286,19 +292,37 @@ HELP: zero?
 HELP: times
 { $values { "n" integer } { "quot" quotation } }
 { $description "Calls the quotation " { $snippet "n" } " times." }
-{ $notes "If you need to pass the current index to the quotation, use " { $link each } "." } ;
+{ $notes "If you need to pass the current index to the quotation, use " { $link each } "." }
+{ $examples
+    { $example "USING: io math ;" "3 [ \"Hi\" print ] times" "Hi\nHi\nHi" }
+} ;
 
 HELP: fp-nan?
 { $values { "x" real } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " is an IEEE Not-a-Number value. While " { $snippet "x" } " can be any real number, this word will only ever yield true if " { $snippet "x" } " is a " { $link float } "." } ;
 
+HELP: fp-infinity?
+{ $values { "x" real } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "x" } " is an IEEE Infinity value. While " { $snippet "x" } " can be any real number, this word will only ever yield true if " { $snippet "x" } " is a " { $link float } "." }
+{ $examples
+    { $example "USING: math prettyprint ;" "1/0. fp-infinity? ." "t" }
+    { $example "USING: io kernel math ;" "-1/0. [ fp-infinity? ] [ 0 < ] bi [ \"negative infinity\" print ] when" "negative infinity" }
+} ;
+
+{ fp-nan? fp-infinity? } related-words
+
 HELP: real-part
 { $values { "z" number } { "x" real } }
-{ $description "Outputs the real part of a complex number. This acts as the identity on real numbers." } ;
+{ $description "Outputs the real part of a complex number. This acts as the identity on real numbers." }
+{ $examples { $example "USING: math prettyprint ; C{ 1 2 } real-part ." "1" } } ;
 
 HELP: imaginary-part
 { $values { "z" number } { "y" real } }
-{ $description "Outputs the imaginary part of a complex number. This outputs zero for real numbers." } ;
+{ $description "Outputs the imaginary part of a complex number. This outputs zero for real numbers." }
+{ $examples
+    { $example "USING: math prettyprint ; C{ 1 2 } imaginary-part ." "2" }
+    { $example "USING: math prettyprint ; 3 imaginary-part ." "0" }
+} ;
 
 HELP: real
 { $class-description "The class of real numbers, which is a disjoint union of rationals and floats." } ;

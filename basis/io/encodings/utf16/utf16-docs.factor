@@ -1,7 +1,7 @@
 USING: help.markup help.syntax io.encodings strings ;
 IN: io.encodings.utf16
 
-ARTICLE: "io.encodings.utf16" "UTF-16"
+ARTICLE: "io.encodings.utf16" "UTF-16 encoding"
 "The UTF-16 encoding is a variable-width encoding. Unicode code points are encoded as 2 or 4 byte sequences. There are three encoding descriptor classes for working with UTF-16, depending on endianness or the presence of a BOM:"
 { $subsection utf16 }
 { $subsection utf16le }

@@ -1,4 +1,4 @@
-! Copyright (C) 2003, 2007 Slava Pestov.
+! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math.private ;
 IN: math
@@ -82,18 +82,26 @@ UNION: real rational float ;
 
 UNION: number real complex ;
 
-M: number equal? number= ;
-
-M: real hashcode* nip >fixnum ;
-
 GENERIC: fp-nan? ( x -- ? )
 
 M: object fp-nan?
     drop f ;
 
 M: float fp-nan?
-    double>bits -51 shift BIN: 111111111111 [ bitand ] keep
-    number= ;
+    double>bits -51 shift HEX: fff [ bitand ] keep = ;
+
+GENERIC: fp-infinity? ( x -- ? )
+
+M: object fp-infinity?
+    drop f ;
+
+M: float fp-infinity? ( float -- ? )
+    double>bits
+    dup -52 shift HEX: 7ff [ bitand ] keep = [
+        HEX: fffffffffffff bitand 0 =
+    ] [
+        drop f
+    ] if ;
 
 : (next-power-of-2) ( i n -- n )
     2dup >= [

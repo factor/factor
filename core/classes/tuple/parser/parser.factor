@@ -58,3 +58,10 @@ ERROR: invalid-slot-name name ;
     } case
     dup check-duplicate-slots
     3dup check-slot-shadowing ;
+
+: literal>tuple ( seq -- tuple )
+    {
+        { [ dup length 1 = ] [ first new ] }
+        { [ dup second not ] [ [ 2 tail ] [ first ] bi slots>tuple ] }
+        [ "Not implemented" throw ]
+    } cond ;

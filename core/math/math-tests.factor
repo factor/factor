@@ -9,3 +9,10 @@ IN: math.tests
 [ [ 0 1 2 3 4 ] ] [ [ 5 [ , ] each-integer ] [ ] make ] unit-test
 [ [ ] ] [ [ -1 [ , ] each-integer ] [ ] make ] unit-test
 
+[ f ] [ 1/0. fp-nan? ] unit-test
+[ f ] [ -1/0. fp-nan? ] unit-test
+[ t ] [ -0/0. fp-nan? ] unit-test
+
+[ t ] [ 1/0. fp-infinity? ] unit-test
+[ t ] [ -1/0. fp-infinity? ] unit-test
+[ f ] [ -0/0. fp-infinity? ] unit-test

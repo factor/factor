@@ -50,7 +50,7 @@ HELP: load-vocab
 { $error-description "Thrown by " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " when a given vocabulary does not exist. Vocabularies must be created by " { $link POSTPONE: IN: } " before being used." } ;
 
 HELP: vocab-main
-{ $values { "vocab" "a vocabulary specifier" } { "main" word } }
+{ $values { "vocab-spec" "a vocabulary specifier" } { "main" word } }
 { $description "Outputs the main entry point for a vocabulary. The entry point can be executed with " { $link run } " and set with " { $link POSTPONE: MAIN: } "." } ;
 
 HELP: vocab-roots

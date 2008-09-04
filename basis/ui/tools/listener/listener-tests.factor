@@ -30,7 +30,7 @@ IN: ui.tools.listener.tests
     ] unit-test
     
     [ t ] [
-        "i" get gadget-model doc-end
+        "i" get model>> doc-end
         "i" get editor-caret* =
     ] unit-test
 

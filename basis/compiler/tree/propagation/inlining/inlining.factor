@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel arrays sequences math math.order
-math.partial-dispatch generic generic.standard classes.algebra
-classes.union sets quotations assocs combinators words
-namespaces
+math.partial-dispatch generic generic.standard generic.math
+classes.algebra classes.union sets quotations assocs combinators
+words namespaces
 compiler.tree
 compiler.tree.builder
 compiler.tree.normalization
@@ -145,3 +145,13 @@ SYMBOL: history
 
 : always-inline-word? ( word -- ? )
     { curry compose } memq? ;
+
+: do-inlining ( #call word -- ? )
+    {
+        { [ dup always-inline-word? ] [ inline-word ] }
+        { [ dup standard-generic? ] [ inline-standard-method ] }
+        { [ dup math-generic? ] [ inline-math-method ] }
+        { [ dup math-partial? ] [ inline-math-partial ] }
+        { [ dup method-body? ] [ inline-method-body ] }
+        [ 2drop f ]
+    } cond ;

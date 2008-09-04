@@ -4,24 +4,28 @@ USING: accessors alien alien.accessors alien.c-types arrays
 cpu.ppc.assembler cpu.ppc.architecture cpu.ppc.allot
 cpu.architecture kernel kernel.private math math.private
 namespaces sequences words generic quotations byte-arrays
-hashtables hashtables.private compiler.generator
-compiler.generator.registers compiler.generator.fixup
+hashtables hashtables.private
 sequences.private sbufs vectors system layouts
-math.floats.private classes slots.private combinators
-compiler.constants ;
+math.floats.private classes slots.private
+combinators
+compiler.constants
+compiler.intrinsics
+compiler.generator
+compiler.generator.fixup
+compiler.generator.registers ;
 IN: cpu.ppc.intrinsics
 
-: %slot-literal-known-tag
+: %slot-literal-known-tag ( -- out value offset )
     "val" operand
     "obj" operand
     "n" get cells
     "obj" get operand-tag - ;
 
-: %slot-literal-any-tag
+: %slot-literal-any-tag ( -- out value offset )
     "obj" operand "scratch1" operand %untag
     "val" operand "scratch1" operand "n" get cells ;
 
-: %slot-any
+: %slot-any ( -- out value offset )
     "obj" operand "scratch1" operand %untag
     "offset" operand "n" operand 1 SRAWI
     "scratch1" operand "val" operand "offset" operand ;
@@ -188,7 +192,7 @@ IN: cpu.ppc.intrinsics
     }
 } define-intrinsics
 
-: generate-fixnum-mod
+: generate-fixnum-mod ( -- )
     #! PowerPC doesn't have a MOD instruction; so we compute
     #! x-(x/y)*y. Puts the result in "s" operand.
     "s" operand "r" operand "y" operand MULLW
@@ -259,7 +263,7 @@ IN: cpu.ppc.intrinsics
 \ fixnum+ \ ADD \ ADDO. overflow-template
 \ fixnum- \ SUBF \ SUBFO. overflow-template
 
-: generate-fixnum/i
+: generate-fixnum/i ( -- )
     #! This VOP is funny. If there is an overflow, it falls
     #! through to the end, and the result is in "x" operand.
     #! Otherwise it jumps to the "no-overflow" label and the
@@ -437,44 +441,44 @@ IN: cpu.ppc.intrinsics
     { +clobber+ { "n" } }
 } define-intrinsic
 
-! \ (tuple) [
-!     tuple "layout" get size>> 2 + cells %allot
-!     ! Store layout
-!     "layout" get 12 load-indirect
-!     12 11 cell STW
-!     ! Store tagged ptr in reg
-!     "tuple" get tuple %store-tagged
-! ] H{
-!     { +input+ { { [ ] "layout" } } }
-!     { +scratch+ { { f "tuple" } } }
-!     { +output+ { "tuple" } }
-! } define-intrinsic
-! 
-! \ (array) [
-!     array "n" get 2 + cells %allot
-!     ! Store length
-!     "n" operand 12 LI
-!     12 11 cell STW
-!     ! Store tagged ptr in reg
-!     "array" get object %store-tagged
-! ] H{
-!     { +input+ { { [ ] "n" } } }
-!     { +scratch+ { { f "array" } } }
-!     { +output+ { "array" } }
-! } define-intrinsic
-! 
-! \ (byte-array) [
-!     byte-array "n" get 2 cells + %allot
-!     ! Store length
-!     "n" operand 12 LI
-!     12 11 cell STW
-!     ! Store tagged ptr in reg
-!     "array" get object %store-tagged
-! ] H{
-!     { +input+ { { [ ] "n" } } }
-!     { +scratch+ { { f "array" } } }
-!     { +output+ { "array" } }
-! } define-intrinsic
+\ (tuple) [
+    tuple "layout" get size>> 2 + cells %allot
+    ! Store layout
+    "layout" get 12 load-indirect
+    12 11 cell STW
+    ! Store tagged ptr in reg
+    "tuple" get tuple %store-tagged
+] H{
+    { +input+ { { [ ] "layout" } } }
+    { +scratch+ { { f "tuple" } } }
+    { +output+ { "tuple" } }
+} define-intrinsic
+
+\ (array) [
+    array "n" get 2 + cells %allot
+    ! Store length
+    "n" operand 12 LI
+    12 11 cell STW
+    ! Store tagged ptr in reg
+    "array" get object %store-tagged
+] H{
+    { +input+ { { [ ] "n" } } }
+    { +scratch+ { { f "array" } } }
+    { +output+ { "array" } }
+} define-intrinsic
+
+\ (byte-array) [
+    byte-array "n" get 2 cells + %allot
+    ! Store length
+    "n" operand 12 LI
+    12 11 cell STW
+    ! Store tagged ptr in reg
+    "array" get object %store-tagged
+] H{
+    { +input+ { { [ ] "n" } } }
+    { +scratch+ { { f "array" } } }
+    { +output+ { "array" } }
+} define-intrinsic
 
 \ <ratio> [
     ratio 3 cells %allot
@@ -514,8 +518,8 @@ IN: cpu.ppc.intrinsics
 ! Alien intrinsics
 : %alien-accessor ( quot -- )
     "offset" operand dup %untag-fixnum
-    "offset" operand dup "alien" operand ADD
-    "value" operand "offset" operand 0 roll call ; inline
+    "scratch" operand "offset" operand "alien" operand ADD
+    "value" operand "scratch" operand 0 roll call ; inline
 
 : alien-integer-get-template
     H{
@@ -523,7 +527,7 @@ IN: cpu.ppc.intrinsics
             { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { { f "value" } } }
+        { +scratch+ { { f "value" } { f "scratch" } } }
         { +output+ { "value" } }
         { +clobber+ { "offset" } }
     } ;
@@ -539,6 +543,7 @@ IN: cpu.ppc.intrinsics
             { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
+        { +scratch+ { { f "scratch" } } }
         { +clobber+ { "value" "offset" } }
     } ;
 
@@ -579,7 +584,7 @@ define-alien-integer-intrinsics
         { unboxed-c-ptr "alien" c-ptr }
         { f "offset" fixnum }
     } }
-    { +scratch+ { { unboxed-alien "value" } } }
+    { +scratch+ { { unboxed-alien "value" } { f "scratch" } } }
     { +output+ { "value" } }
     { +clobber+ { "offset" } }
 } define-intrinsic
@@ -592,6 +597,7 @@ define-alien-integer-intrinsics
         { unboxed-c-ptr "alien" c-ptr }
         { f "offset" fixnum }
     } }
+    { +scratch+ { { f "scratch" } } }
     { +clobber+ { "offset" } }
 } define-intrinsic
 
@@ -601,7 +607,7 @@ define-alien-integer-intrinsics
             { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { { float "value" } } }
+        { +scratch+ { { float "value" } { f "scratch" } } }
         { +output+ { "value" } }
         { +clobber+ { "offset" } }
     } ;
@@ -613,6 +619,7 @@ define-alien-integer-intrinsics
             { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
+        { +scratch+ { { f "scratch" } } }
         { +clobber+ { "offset" } }
     } ;
 

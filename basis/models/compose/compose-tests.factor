@@ -1,6 +1,6 @@
-IN: models.compose.tests
 USING: arrays generic kernel math models namespaces sequences assocs
-tools.test models.compose ;
+tools.test models.compose accessors ;
+IN: models.compose.tests
 
 ! Test compose
 [ ] [
@@ -11,14 +11,14 @@ tools.test models.compose ;
 
 [ ] [ "c" get activate-model ] unit-test
 
-[ { 1 2 } ] [ "c" get model-value ] unit-test
+[ { 1 2 } ] [ "c" get value>> ] unit-test
 
 [ ] [ 3 "b" get set-model ] unit-test
 
-[ { 1 3 } ] [ "c" get model-value ] unit-test
+[ { 1 3 } ] [ "c" get value>> ] unit-test
 
 [ ] [ { 4 5 } "c" get set-model ] unit-test
 
-[ { 4 5 } ] [ "c" get model-value ] unit-test
+[ { 4 5 } ] [ "c" get value>> ] unit-test
 
 [ ] [ "c" get deactivate-model ] unit-test

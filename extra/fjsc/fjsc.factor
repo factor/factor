@@ -336,7 +336,7 @@ M: wrapper (parse-factor-quotation) ( object -- ast )
 GENERIC: fjsc-parse ( object -- ast )
 
 M: string fjsc-parse ( object -- ast )
-  'expression' parse parse-result-ast ;
+  'expression' parse ast>> ;
 
 M: quotation fjsc-parse ( object -- ast )
   [

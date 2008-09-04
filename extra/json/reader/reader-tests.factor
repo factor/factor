@@ -11,9 +11,9 @@ IN: json.reader.tests
 { 102.0 } [ "102.0" json> ] unit-test
 { 102.5 } [ "102.5" json> ] unit-test
 { 102.5 } [ "102.50" json> ] unit-test
-{ -10250 } [ "-102.5e2" json> ] unit-test
-{ -10250 } [ "-102.5E+2" json> ] unit-test
-{ 10.25 } [ "1025e-2" json> ] unit-test
+{ -10250.0 } [ "-102.5e2" json> ] unit-test
+{ -10250.0 } [ "-102.5E+2" json> ] unit-test
+{ 10+1/4 } [ "1025e-2" json> ] unit-test
 { 0.125 } [ "0.125" json> ] unit-test
 { -0.125 } [ "-0.125" json> ] unit-test
 

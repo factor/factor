@@ -40,7 +40,13 @@ PREDICATE: obj-list < word \ objects = ;
 
 M: obj-list article-title ( objects -- title ) drop "Objects" ;
 
+! M: obj-list article-content ( objects -- title )
+!    execute
+!    [ [ type -> ] [ ] bi 2array ] map
+!    { $tab , } bake ;
+
 M: obj-list article-content ( objects -- title )
-   execute
+   drop
+   objects
    [ [ type -> ] [ ] bi 2array ] map
    { $tab , } bake ;

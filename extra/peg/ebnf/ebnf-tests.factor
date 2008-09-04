@@ -105,11 +105,11 @@ IN: peg.ebnf.tests
 ] unit-test
 
 { "foo" } [
-  "foo" 'non-terminal' parse ebnf-non-terminal-symbol
+  "foo" 'non-terminal' parse symbol>>
 ] unit-test
 
 { "foo" } [
-  "foo]" 'non-terminal' parse ebnf-non-terminal-symbol
+  "foo]" 'non-terminal' parse symbol>>
 ] unit-test
 
 { V{ "a" "b" } } [

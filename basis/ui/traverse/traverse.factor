@@ -77,7 +77,7 @@ DEFER: (gadget-subtree)
     [ (gadget-subtree) ] { } make ;
 
 M: node gadget-text*
-    dup node-children swap node-value gadget-seq-text ;
+    dup children>> swap value>> gadget-seq-text ;
 
 : gadget-text-range ( frompath topath gadget -- str )
     gadget-subtree gadget-text ;

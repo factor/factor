@@ -12,8 +12,6 @@ IN: compiler.tree.propagation.info
 
 : null-class? ( class -- ? ) null class<= ;
 
-SYMBOL: +interval+
-
 GENERIC: eql? ( obj1 obj2 -- ? )
 M: object eql? eq? ;
 M: fixnum eql? eq? ;
@@ -40,7 +38,7 @@ slots ;
 
 : class-interval ( class -- interval )
     dup real class<=
-    [ +interval+ word-prop [-inf,inf] or ] [ drop f ] if ;
+    [ "interval" word-prop [-inf,inf] or ] [ drop f ] if ;
 
 : interval>literal ( class interval -- literal literal? )
     #! If interval has zero length and the class is sufficiently
@@ -61,10 +59,34 @@ slots ;
 
 : <value-info> ( -- info ) \ value-info new ;
 
+: read-only-slots ( values class -- slots )
+    all-slots
+    [ read-only>> [ drop f ] unless ] 2map
+    f prefix ;
+
+DEFER: <literal-info>
+
+: init-literal-info ( info -- info )
+    dup literal>> class >>class
+    dup literal>> dup real? [ [a,a] >>interval ] [
+        [ [-inf,inf] >>interval ] dip
+        {
+            { [ dup complex? ] [
+                [ real-part <literal-info> ]
+                [ imaginary-part <literal-info> ] bi
+                2array >>slots
+            ] }
+            { [ dup tuple? ] [
+                [ tuple-slots [ <literal-info> ] map ] [ class ] bi
+                read-only-slots >>slots
+            ] }
+            [ drop ]
+        } cond
+    ] if ; inline
+
 : init-value-info ( info -- info )
     dup literal?>> [
-        dup literal>> class >>class
-        dup literal>> dup real? [ [a,a] ] [ drop [-inf,inf] ] if >>interval
+        init-literal-info
     ] [
         dup [ class>> null-class? ] [ interval>> empty-interval eq? ] bi or [
             null >>class
@@ -75,7 +97,7 @@ slots ;
             dup [ class>> ] [ interval>> ] bi interval>literal
             [ >>literal ] [ >>literal? ] bi*
         ] if
-    ] if ;
+    ] if ; inline
 
 : <class/interval-info> ( class interval -- info )
     <value-info>
@@ -84,7 +106,7 @@ slots ;
     init-value-info ; foldable
 
 : <class-info> ( class -- info )
-    dup word? [ dup +interval+ word-prop ] [ f ] if [-inf,inf] or
+    dup word? [ dup "interval" word-prop ] [ f ] if [-inf,inf] or
     <class/interval-info> ; foldable
 
 : <interval-info> ( interval -- info )

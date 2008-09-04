@@ -10,14 +10,17 @@ IN: debugger.threads
         dup id>> #
         " (" % dup name>> %
         ", " % dup quot>> unparse-short % ")" %
-    ] "" make swap write-object ":" print nl ;
+    ] "" make swap write-object ":" print ;
 
 M: thread error-in-thread ( error thread -- )
     initial-thread get-global eq? [
         die drop
     ] [
         global [
-            error-thread get-global error-in-thread. print-error flush
+            error-thread get-global error-in-thread. nl
+            print-error nl
+            :c
+            flush
         ] bind
     ] if ;
 

@@ -208,7 +208,7 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
     hWnd window-focus send-gesture drop ;
 
 :: set-window-active ( hwnd uMsg wParam lParam ? -- n )
-    ? hwnd window set-world-active?
+    ? hwnd window (>>active?)
     hwnd uMsg wParam lParam DefWindowProc ;
 
 : handle-wm-syscommand ( hWnd uMsg wParam lParam -- n )
@@ -221,14 +221,14 @@ SYMBOLS: msg-obj class-name-ptr mouse-captured ;
     } cond ;
 
 : cleanup-window ( handle -- )
-    dup win-title [ free ] when*
-    dup win-hRC wglDeleteContext win32-error=0/f
-    dup win-hWnd swap win-hDC ReleaseDC win32-error=0/f ;
+    dup title>> [ free ] when*
+    dup hRC>> wglDeleteContext win32-error=0/f
+    dup hWnd>> swap hDC>> ReleaseDC win32-error=0/f ;
 
 M: windows-ui-backend (close-window)
-    dup win-hWnd unregister-window
+    dup hWnd>> unregister-window
     dup cleanup-window
-    win-hWnd DestroyWindow win32-error=0/f ;
+    hWnd>> DestroyWindow win32-error=0/f ;
 
 : handle-wm-close ( hWnd uMsg wParam lParam -- )
     3drop window ungraft ;
@@ -472,28 +472,28 @@ M: windows-ui-backend do-events
 M: windows-ui-backend (open-window) ( world -- )
     [ create-window dup setup-gl ] keep
     [ f <win> ] keep
-    [ swap win-hWnd register-window ] 2keep
-    dupd set-world-handle
-    win-hWnd show-window ;
+    [ swap hWnd>> register-window ] 2keep
+    dupd (>>handle)
+    hWnd>> show-window ;
 
 M: windows-ui-backend select-gl-context ( handle -- )
-    [ win-hDC ] keep win-hRC wglMakeCurrent win32-error=0/f ;
+    [ hDC>> ] keep hRC>> wglMakeCurrent win32-error=0/f ;
 
 M: windows-ui-backend flush-gl-context ( handle -- )
-    win-hDC SwapBuffers win32-error=0/f ;
+    hDC>> SwapBuffers win32-error=0/f ;
 
 ! Move window to front
 M: windows-ui-backend raise-window* ( world -- )
-    world-handle [
-        win-hWnd SetFocus drop
+    handle>> [
+        hWnd>> SetFocus drop
     ] when* ;
 
 M: windows-ui-backend set-title ( string world -- )
-    world-handle
-    dup win-title [ free ] when*
+    handle>>
+    dup title>> [ free ] when*
     >r utf16n malloc-string r>
-    2dup set-win-title
-    win-hWnd WM_SETTEXT 0 roll alien-address SendMessage drop ;
+    2dup (>>title)
+    hWnd>> WM_SETTEXT 0 roll alien-address SendMessage drop ;
 
 M: windows-ui-backend ui
     [

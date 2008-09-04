@@ -1,6 +1,6 @@
-IN: ui.gadgets.worlds.tests
 USING: ui.gadgets ui.gadgets.packs ui.gadgets.worlds tools.test
-namespaces models kernel ;
+namespaces models kernel accessors ;
+IN: ui.gadgets.worlds.tests
 
 ! Test focus behavior
 <gadget> "g1" set
@@ -14,7 +14,7 @@ namespaces models kernel ;
 
 [ ] [ "g1" get request-focus ] unit-test
 
-[ t ] [ "w" get gadget-focus "g1" get eq? ] unit-test
+[ t ] [ "w" get focus>> "g1" get eq? ] unit-test
 
 <gadget> "g1" set
 <gadget> "g2" set
@@ -26,9 +26,9 @@ namespaces models kernel ;
 
 [ ] [ "g1" get request-focus ] unit-test
 
-[ t ] [ "w" get gadget-focus "g2" get eq? ] unit-test
-[ t ] [ "g2" get gadget-focus "g1" get eq? ] unit-test
-[ f ] [ "g1" get gadget-focus ] unit-test
+[ t ] [ "w" get focus>> "g2" get eq? ] unit-test
+[ t ] [ "g2" get focus>> "g1" get eq? ] unit-test
+[ f ] [ "g1" get focus>> ] unit-test
 
 <gadget> "g1" set
 <gadget> "g2" set
@@ -42,7 +42,7 @@ namespaces models kernel ;
 
 [ ] [ "g1" get request-focus ] unit-test
 [ ] [ "g2" get unparent ] unit-test
-[ t ] [ "g3" get gadget-focus "g1" get eq? ] unit-test
+[ t ] [ "g3" get focus>> "g1" get eq? ] unit-test
 
 [ t ] [ <gadget> dup <test-world> focusable-child eq? ] unit-test
 
@@ -63,6 +63,6 @@ M: focus-test focusable-child* gadget-child ;
 
 [ ] [ "f" get <test-world> request-focus ] unit-test
 
-[ t ] [ "f" get gadget-focus "f" get gadget-child eq? ] unit-test
+[ t ] [ "f" get focus>> "f" get gadget-child eq? ] unit-test
 
 [ t ] [ "f" get gadget-child focusing? ] unit-test

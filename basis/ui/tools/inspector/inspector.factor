@@ -47,4 +47,4 @@ inspector-gadget "multi-touch" f {
 } define-command-map
 
 M: inspector-gadget tool-scroller
-    inspector-gadget-pane find-scroller ;
+    pane>> find-scroller ;

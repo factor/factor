@@ -33,8 +33,8 @@ IN: calendar.tests
 
 [ t ] [ 2006 10 10 0 0 0 instant <timestamp> 10 minutes time+
         2006 10 10 0 10 0 instant <timestamp> = ] unit-test
-[ t ] [ 2006 10 10 0 0 0 instant <timestamp> 10.5 minutes time+
-        2006 10 10 0 10 30 instant <timestamp> = ] unit-test
+[ +eq+ ] [ 2006 10 10 0 0 0 instant <timestamp> 10.5 minutes time+
+        2006 10 10 0 10 30 instant <timestamp> <=> ] unit-test
 [ t ] [ 2006 10 10 0 0 0 instant <timestamp> 3/4 minutes time+
         2006 10 10 0 0 45 instant <timestamp> = ] unit-test
 [ t ] [ 2006 10 10 0 0 0 instant <timestamp> -3/4 minutes time+

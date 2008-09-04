@@ -4,7 +4,7 @@ sequences tools.test namespaces byte-arrays strings accessors
 destructors ;
 
 : buffer-set ( string buffer -- )
-    over >byte-array over buffer-ptr byte-array>memory
+    over >byte-array over ptr>> byte-array>memory
     >r length r> buffer-reset ;
 
 : string>buffer ( string -- buffer )
