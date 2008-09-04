@@ -13,6 +13,7 @@ SYMBOL: using
 ERROR: not-a-vocab-root string ;
 ERROR: vocab-name-contains-separator path ;
 ERROR: vocab-name-contains-dot path ;
+ERROR: no-vocab vocab ;
 
 : root? ( string -- ? )
     vocab-roots get member?  ;
@@ -183,10 +184,15 @@ PRIVATE>
 
 : with-scaffold ( quot -- )
     [ H{ } clone using ] dip with-variable ; inline
+
+: check-vocab ( vocab -- vocab )
+    dup find-vocab-root [ no-vocab ] unless ;
 PRIVATE>
+
 
 : scaffold-help ( vocab-root string -- )
     [
+        check-vocab
         prepare-scaffold
         [ "-docs.factor" scaffold-path ] dip
         swap [ set-scaffold-help-file ] [ 2drop ] if
