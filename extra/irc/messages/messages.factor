@@ -126,5 +126,5 @@ M: sender-in-prefix irc-message-sender ( sender-in-prefix -- sender )
         [ drop unhandled ]
     } case
     [ [ tuple-slots ] [ parameters>> ] bi append ] dip
-    [ all-slots over [ length ] bi@ min head >quotation ] keep
+    [ all-slots over [ length ] bi@ min head ] keep
     prefix >tuple ;
