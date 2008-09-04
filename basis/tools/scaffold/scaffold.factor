@@ -146,16 +146,14 @@ ERROR: no-vocab vocab ;
 
 : help-header. ( word -- )
     "HELP: " write name>> print ;
-PRIVATE>
 
-: help. ( word -- )
+: (help.) ( word -- )
     [ help-header. ] [ $values. ] [ $description. ] tri ;
 
-<PRIVATE
 : help-file-string ( str1 -- str2 )
     [
         [ "IN: " write print nl ]
-        [ words natural-sort [ help. nl ] each ]
+        [ words natural-sort [ (help.) nl ] each ]
         [ "ARTICLE: " write unparse dup write bl print ";" print nl ]
         [ "ABOUT: " write unparse print ] quad
     ] with-string-writer ;
@@ -189,6 +187,15 @@ PRIVATE>
     dup find-vocab-root [ no-vocab ] unless ;
 PRIVATE>
 
+: link-vocab ( vocab -- )
+    check-vocab
+    "Edit documentation: " write
+    [ find-vocab-root ] keep
+    [ append-path ] keep "-docs.factor" append append-path
+    <pathname> . ;
+
+: help. ( word -- )
+    [ (help.) ] [ nl vocabulary>> link-vocab ] bi ;
 
 : scaffold-help ( vocab-root string -- )
     [
@@ -199,9 +206,10 @@ PRIVATE>
     ] with-scaffold ;
 
 : scaffold-undocumented ( string -- )
-    words
+    dup words
     [ [ "help" word-prop ] [ predicate? ] bi or not ] filter
-    natural-sort [ help. nl ] each ;
+    natural-sort [ (help.) nl ] each
+    link-vocab ;
 
 : scaffold-vocab ( vocab-root string -- )
     prepare-scaffold
