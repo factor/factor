@@ -3,7 +3,7 @@ IN: benchmark.typecheck3
 
 TUPLE: hello n ;
 
-: hello-n* ( obj -- val ) dup tag 2 eq? [ 3 slot ] [ 3 throw ] if ;
+: hello-n* ( obj -- val ) dup tag 2 eq? [ 2 slot ] [ 3 throw ] if ;
 
 : foo ( obj -- obj n ) 0 100000000 [ over hello-n* + ] times ;
 

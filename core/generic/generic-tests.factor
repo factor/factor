@@ -2,7 +2,7 @@ USING: accessors alien arrays definitions generic generic.standard
 generic.math assocs hashtables io kernel math namespaces parser
 prettyprint sequences strings tools.test vectors words
 quotations classes classes.algebra classes.tuple continuations
-layouts classes.union sorting compiler.units eval ;
+layouts classes.union sorting compiler.units eval multiline ;
 IN: generic.tests
 
 GENERIC: foobar ( x -- y )
@@ -135,7 +135,7 @@ M: f tag-and-f 4 ;
 [ 3.4 3 ] [ 3.4 tag-and-f ] unit-test
 
 ! Issues with forget
-GENERIC: generic-forget-test-1
+GENERIC: generic-forget-test-1 ( a b -- c )
 
 M: integer generic-forget-test-1 / ;
 
@@ -187,7 +187,7 @@ M: f generic-forget-test-3 ;
 
 : a-word ;
 
-GENERIC: a-generic
+GENERIC: a-generic ( a -- b )
 
 M: integer a-generic a-word ;
 
@@ -198,3 +198,27 @@ M: integer a-generic a-word ;
 [ ] [ "IN: generic.tests : a-generic ;" eval ] unit-test
 
 [ f ] [ "m" get \ a-word usage memq? ] unit-test
+
+! erg's regression
+[ ] [
+    <"
+    IN: compiler.tests
+
+    GENERIC: jeah ( a -- b )
+    TUPLE: boii ;
+    M: boii jeah ;
+    GENERIC: jeah* ( a -- b )
+    M: boii jeah* jeah ;
+    "> eval
+
+    <"
+    IN: compiler.tests
+    FORGET: boii
+    "> eval
+    
+    <"
+    IN: compiler.tests
+    TUPLE: boii ;
+    M: boii jeah ;
+    "> eval
+] unit-test

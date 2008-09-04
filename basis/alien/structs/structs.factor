@@ -1,42 +1,9 @@
-! Copyright (C) 2004, 2007 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays generic hashtables kernel kernel.private
-math namespaces parser sequences strings words libc slots
-slots.deprecated alien.c-types cpu.architecture ;
+math namespaces parser sequences strings words libc
+alien.c-types alien.structs.fields cpu.architecture ;
 IN: alien.structs
-
-: align-offset ( offset type -- offset )
-    c-type-align align ;
-
-: struct-offsets ( specs -- size )
-    0 [
-        [ class>> align-offset ] keep
-        [ (>>offset) ] 2keep
-        class>> heap-size +
-    ] reduce ;
-
-: define-struct-slot-word ( spec word quot -- )
-    rot offset>> prefix define-inline ;
-
-: define-getter ( type spec -- )
-    [ set-reader-props ] keep
-    [ ]
-    [ reader>> ]
-    [
-        class>>
-        [ c-getter ] [ c-type-boxer-quot ] bi append
-    ] tri
-    define-struct-slot-word ;
-
-: define-setter ( type spec -- )
-    [ set-writer-props ] keep
-    [ ]
-    [ writer>> ]
-    [ class>> c-setter ] tri
-    define-struct-slot-word ;
-
-: define-field ( type spec -- )
-    2dup define-getter define-setter ;
 
 : if-value-structs? ( ctype true false -- )
     value-structs?
@@ -76,17 +43,8 @@ M: struct-type stack-size
     struct-type boa
     -rot define-c-type ;
 
-: make-field ( struct-name vocab type field-name -- spec )
-    <slot-spec>
-        0 >>offset
-        swap >>name
-        swap expand-constants >>class
-        3dup name>> swap reader-word >>reader
-        3dup name>> swap writer-word >>writer
-    2nip ;
-
 : define-struct-early ( name vocab fields -- fields )
-    -rot [ rot first2 make-field ] 2curry map ;
+    -rot [ rot first2 <field-spec> ] 2curry map ;
 
 : compute-struct-align ( types -- n )
     [ c-type-align ] map supremum ;
@@ -94,7 +52,7 @@ M: struct-type stack-size
 : define-struct ( name vocab fields -- )
     pick >r
     [ struct-offsets ] keep
-    [ [ class>> ] map compute-struct-align ] keep
+    [ [ type>> ] map compute-struct-align ] keep
     [ (define-struct) ] keep
     r> [ swap define-field ] curry each ;
 

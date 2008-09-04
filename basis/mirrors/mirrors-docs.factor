@@ -30,7 +30,7 @@ HELP: <mirror> ( object -- mirror )
         "TUPLE: circle center radius ;"
         "C: <circle> circle"
         "{ 100 50 } 15 <circle> <mirror> >alist ."
-        "{ { \"delegate\" f } { \"center\" { 100 50 } } { \"radius\" 15 } }"
+        "{ { \"center\" { 100 50 } } { \"radius\" 15 } }"
     }
 } ;
 
