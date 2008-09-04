@@ -95,7 +95,7 @@ DEFER: (http-request)
 SYMBOL: redirects
 
 : redirect-url ( request url -- request )
-    '[ , >url ensure-port derive-url ensure-port ] change-url ;
+    '[ , >url derive-url ensure-port ] change-url ;
 
 : do-redirect ( response data -- response data )
     over code>> 300 399 between? [

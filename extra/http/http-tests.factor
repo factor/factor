@@ -225,6 +225,28 @@ test-db [
     "http://localhost:1237/quit" http-get nip
 ] unit-test
 
+! HTTP client redirect bug
+[ ] [
+    [
+        <dispatcher>
+            add-quit-action
+            <action> [ "quit" <temporary-redirect> ] >>display
+            "redirect" add-responder
+        main-responder set
+
+        test-httpd
+    ] with-scope
+] unit-test
+
+[ "Goodbye" ] [
+    "http://localhost:1237/redirect" http-get nip
+] unit-test
+
+
+[ ] [
+    [ "http://localhost:1237/quit" http-get 2drop ] ignore-errors
+] unit-test
+
 ! Dispatcher bugs
 [ ] [
     [
