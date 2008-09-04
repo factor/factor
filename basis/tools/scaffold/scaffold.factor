@@ -178,12 +178,22 @@ ERROR: vocab-name-contains-dot path ;
 : prepare-scaffold ( vocab-root string -- string path )
     check-scaffold [ vocab>scaffold-path ] keep ;
 
+: with-scaffold ( quot -- )
+    [ H{ } clone using ] dip with-variable ; inline
+
 : scaffold-help ( vocab-root string -- )
-    H{ } clone using [
+    [
         prepare-scaffold
         [ "-docs.factor" scaffold-path ] dip
         swap [ set-scaffold-help-file ] [ 2drop ] if
-    ] with-variable ;
+    ] with-scaffold ;
+
+: scaffold-undocumented ( string -- )
+    [
+        words
+        [ "help" word-prop not ] filter
+        natural-sort [ help. nl ] each
+    ] with-scaffold ;
 
 : scaffold-vocab ( vocab-root string -- )
     prepare-scaffold
