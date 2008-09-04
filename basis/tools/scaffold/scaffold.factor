@@ -142,7 +142,7 @@ ERROR: no-vocab vocab ;
 
 : $description. ( word -- )
     drop
-    "{ $description } ;" print ;
+    "{ $description \"\" } ;" print ;
 
 : help-header. ( word -- )
     "HELP: " write name>> print ;
