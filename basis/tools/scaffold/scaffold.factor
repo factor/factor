@@ -150,10 +150,18 @@ ERROR: no-vocab vocab ;
 : (help.) ( word -- )
     [ help-header. ] [ $values. ] [ $description. ] tri ;
 
+: interesting-words ( vocab -- array )
+    words
+    [ [ "help" word-prop ] [ predicate? ] bi or not ] filter
+    natural-sort ;
+
+: interesting-words. ( vocab -- )
+    interesting-words [ (help.) nl ] each ;
+
 : help-file-string ( str1 -- str2 )
     [
         [ "IN: " write print nl ]
-        [ words natural-sort [ (help.) nl ] each ]
+        [ interesting-words. ]
         [ "ARTICLE: " write unparse dup write bl print ";" print nl ]
         [ "ABOUT: " write unparse print ] quad
     ] with-string-writer ;
@@ -206,10 +214,7 @@ PRIVATE>
     ] with-scaffold ;
 
 : scaffold-undocumented ( string -- )
-    dup words
-    [ [ "help" word-prop ] [ predicate? ] bi or not ] filter
-    natural-sort [ (help.) nl ] each
-    link-vocab ;
+    [ interesting-words. ] [ link-vocab ] bi ;
 
 : scaffold-vocab ( vocab-root string -- )
     prepare-scaffold
