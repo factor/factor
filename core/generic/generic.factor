@@ -130,7 +130,7 @@ M: method-spec definition
     first2 method definition ;
 
 M: method-spec forget*
-    first2 method forget* ;
+    first2 method [ forgotten-definition ] [ forget* ] bi ;
 
 M: method-spec smart-usage
     second smart-usage ;
