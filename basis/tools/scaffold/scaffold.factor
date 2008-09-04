@@ -4,19 +4,20 @@ USING: assocs io.files hashtables kernel namespaces sequences
 vocabs.loader io combinators io.encodings.utf8 calendar accessors
 math.parser io.streams.string ui.tools.operations quotations
 strings arrays prettyprint words vocabs sorting sets cords
-sequences.lib combinators.lib ;
+classes sequences.lib combinators.lib ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
 SYMBOL: using
 
 ERROR: not-a-vocab-root string ;
+ERROR: vocab-name-contains-separator path ;
+ERROR: vocab-name-contains-dot path ;
 
 : root? ( string -- ? )
     vocab-roots get member?  ;
 
-ERROR: vocab-name-contains-separator path ;
-ERROR: vocab-name-contains-dot path ;
+<PRIVATE
 : check-vocab-name ( string -- string )
     dup dup [ CHAR: . = ] trim [ length ] bi@ =
     [ vocab-name-contains-dot ] unless
@@ -109,7 +110,7 @@ ERROR: vocab-name-contains-dot path ;
     } at* ;
 
 : add-using ( object -- )
-    vocabulary>> using get conjoin ;
+    vocabulary>> using get [ conjoin ] [ drop ] if* ;
 
 : ($values.) ( array -- )
     [
@@ -144,10 +145,12 @@ ERROR: vocab-name-contains-dot path ;
 
 : help-header. ( word -- )
     "HELP: " write name>> print ;
+PRIVATE>
 
 : help. ( word -- )
     [ help-header. ] [ $values. ] [ $description. ] tri ;
 
+<PRIVATE
 : help-file-string ( str1 -- str2 )
     [
         [ "IN: " write print nl ]
@@ -180,6 +183,7 @@ ERROR: vocab-name-contains-dot path ;
 
 : with-scaffold ( quot -- )
     [ H{ } clone using ] dip with-variable ; inline
+PRIVATE>
 
 : scaffold-help ( vocab-root string -- )
     [
@@ -189,11 +193,9 @@ ERROR: vocab-name-contains-dot path ;
     ] with-scaffold ;
 
 : scaffold-undocumented ( string -- )
-    [
-        words
-        [ "help" word-prop not ] filter
-        natural-sort [ help. nl ] each
-    ] with-scaffold ;
+    words
+    [ [ "help" word-prop ] [ predicate? ] bi or not ] filter
+    natural-sort [ help. nl ] each ;
 
 : scaffold-vocab ( vocab-root string -- )
     prepare-scaffold
