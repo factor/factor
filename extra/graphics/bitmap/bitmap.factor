@@ -20,7 +20,7 @@ TUPLE: bitmap magic size reserved offset header-length width
         { 32 [ "32bit" throw ] }
         { 24 [ ] }
         { 16 [ "16bit" throw ] }
-        { 8 [ ] }
+        { 8 [ "8bit" throw ] }
         { 4 [ "4bit" throw ] }
         { 2 [ "2bit" throw ] }
         { 1 [ "1bit" throw ] }
@@ -110,7 +110,6 @@ M: bitmap draw-image ( bitmap -- )
         bit-count>> {
             ! { 32 [ GL_BGRA GL_UNSIGNED_INT_8_8_8_8 ] } ! broken
             { 24 [ GL_BGR GL_UNSIGNED_BYTE ] }
-            { 8 [ GL_LUMINANCE GL_UNSIGNED_BYTE ] }
         } case
     ] keep array>> glDrawPixels ;
 
