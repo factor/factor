@@ -15,10 +15,10 @@ ERROR: vocab-name-contains-separator path ;
 ERROR: vocab-name-contains-dot path ;
 ERROR: no-vocab vocab ;
 
+<PRIVATE
 : root? ( string -- ? )
     vocab-roots get member?  ;
 
-<PRIVATE
 : check-vocab-name ( string -- string )
     dup dup [ CHAR: . = ] trim [ length ] bi@ =
     [ vocab-name-contains-dot ] unless
