@@ -117,7 +117,7 @@ ERROR: vocab-name-contains-dot path ;
         dup array? [ first ] when
         dup lookup-type [
             [ unparse write bl ]
-            [ dup string? [ unparse write ] [ [ pprint ] [ add-using ] bi ] if ] bi*
+            [ [ pprint ] [ dup string? [ drop ] [ add-using ] if ] bi ] bi*
         ] [
             drop unparse write bl null pprint
             null add-using
