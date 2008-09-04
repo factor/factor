@@ -57,7 +57,6 @@ SYMBOL: load-help?
     t over set-vocab-source-loaded?
     [ [ % ] [ call ] if-bootstrapping ] dip ;
 
-
 : load-docs ( vocab -- vocab )
     load-help? get [
         f over set-vocab-docs-loaded?
