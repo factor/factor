@@ -254,6 +254,40 @@ M: load-this-vocab pprint* ( obj -- )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+M: vocab-author pprint* ( vocab-author -- ) [ name>> ] [ ] bi write-object ;
+
+: $vocab-authors ( seq -- )
+  drop all-authors [ vocab-author boa ] map print-seq ;
+
+ARTICLE: "vocab-authors" "Vocabulary Authors" { $vocab-authors } ;
+
+: vocabs-by-author ( author -- vocab-names )
+  authored values concat [ name>> ] map ;
+
+: $vocabs-by-author ( seq -- )
+  first name>> vocabs-by-author print-these-vocabs ;
+
+M: vocab-author article-content ( vocab-author -- content )
+   { $vocabs-by-author } swap suffix ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+M: vocab-tag pprint* ( vocab-tag -- ) [ name>> ] [ ] bi write-object ;
+
+: print-vocab-tags ( -- ) all-tags [ vocab-tag boa ] map print-seq ;
+
+: $vocab-tags ( seq -- ) drop print-vocab-tags ;
+
+ARTICLE: "vocab-tags" "Vocabulary Tags" { $vocab-tags } ;
+
+: $vocabs-with-tag ( seq -- )
+  first tagged values concat [ name>> ] map print-these-vocabs ;
+
+M: vocab-tag article-content ( vocab-tag -- content )
+   name>> { $vocabs-with-tag } swap suffix ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 ARTICLE: "vocab-index-all"      "All Vocabularies"      { $all-vocabs    } ;
 ARTICLE: "vocab-index-loaded"   "Loaded Vocabularies"   { $loaded-vocabs } ;
 ARTICLE: "vocab-index-unloaded" "Unloaded Vocabularies" { $loaded-vocabs } ;
@@ -268,4 +302,9 @@ ARTICLE: "vocab-indices" "Vocabulary Indices"
   { $subsection "vocab-index-extra"    }
   { $subsection "vocab-index-all"      }
   { $subsection "vocab-index-loaded"   }
-  { $subsection "vocab-index-unloaded" } ;
+  { $subsection "vocab-index-unloaded" }
+  { $subsection "vocab-authors"        }
+  { $subsection "vocab-tags"           } ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
