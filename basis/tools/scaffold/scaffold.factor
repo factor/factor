@@ -3,8 +3,8 @@
 USING: assocs io.files hashtables kernel namespaces sequences
 vocabs.loader io combinators io.encodings.utf8 calendar accessors
 math.parser io.streams.string ui.tools.operations quotations
-strings arrays prettyprint words vocabs sorting combinators.lib
-sets cords ;
+strings arrays prettyprint words vocabs sorting sets cords
+sequences.lib combinators.lib ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -12,19 +12,19 @@ SYMBOL: using
 
 ERROR: not-a-vocab-root string ;
 
-: root? ( str -- ? )
+: root? ( string -- ? )
     vocab-roots get member?  ;
 
 ERROR: vocab-name-contains-separator path ;
 ERROR: vocab-name-contains-dot path ;
-: check-vocab-name ( str -- str )
+: check-vocab-name ( string -- string )
     dup dup [ CHAR: . = ] trim [ length ] bi@ =
     [ vocab-name-contains-dot ] unless
     ".." over subseq? [ vocab-name-contains-dot ] when
     dup [ path-separator? ] contains?
     [ vocab-name-contains-separator ] when ;
 
-: check-root ( str -- str )
+: check-root ( string -- string )
     check-vocab-name
     dup "resource:" head? [ "resource:" prepend ] unless
     dup root? [ not-a-vocab-root ] unless ;
@@ -41,7 +41,7 @@ ERROR: vocab-name-contains-dot path ;
 : scaffolding ( path -- )
     "Creating scaffolding for " write <pathname> . ;
 
-: scaffold-path ( path suffix -- path ? )
+: scaffold-path ( path string -- path ? )
     dupd [ file-name ] dip append append-path
     dup exists? [ dup not-scaffolding f ] [ dup scaffolding t ] if ;
 
@@ -50,7 +50,7 @@ ERROR: vocab-name-contains-dot path ;
     developer-name get [ "Your name" ] unless* bl write "." print
     "! See http://factorcode.org/license.txt for BSD license." print ;
 
-: main-file-string ( vocab -- str )
+: main-file-string ( vocab -- string )
     [
         scaffold-copyright
         "USING: ;" print
@@ -64,7 +64,7 @@ ERROR: vocab-name-contains-dot path ;
     [ ".factor" scaffold-path ] dip
     swap [ set-scaffold-main-file ] [ 2drop ] if ;
 
-: tests-file-string ( vocab -- str )
+: tests-file-string ( vocab -- string )
     [
         scaffold-copyright
         "USING: tools.test " write dup write " ;" print
@@ -88,22 +88,24 @@ ERROR: vocab-name-contains-dot path ;
 
 : lookup-type ( string -- object/string ? )
     H{
-        { "obj" object }
-        { "obj1" object }
-        { "obj2" object }
-        { "obj3" object }
-        { "obj4" object }
-        { "quot" quotation }
-        { "quot1" quotation }
-        { "quot2" quotation }
-        { "quot3" quotation }
+        { "object" object } { "obj" object }
+        { "obj1" object } { "obj2" object }
+        { "obj3" object } { "obj4" object }
+        { "quot" quotation } { "quot1" quotation }
+        { "quot2" quotation } { "quot3" quotation }
+        { "string" string } { "string1" string }
+        { "string2" string } { "string3" string }
         { "str" string }
-        { "str1" string }
-        { "str2" string }
-        { "str3" string }
+        { "str1" string } { "str2" string } { "str3" string }
+        { "hash" hashtable }
         { "hashtable" hashtable }
         { "?" "a boolean" }
         { "ch" "a character" }
+        { "word" word }
+        { "array" array }
+        { "path" "a pathname string" }
+        { "vocab" "a vocabulary specifier" }
+        { "vocab-root" "a vocabulary root string" }
     } at* ;
 
 : add-using ( object -- )
@@ -117,17 +119,23 @@ ERROR: vocab-name-contains-dot path ;
             [ unparse write bl ]
             [ dup string? [ unparse write ] [ [ pprint ] [ add-using ] bi ] if ] bi*
         ] [
-            drop unparse write
+            drop unparse write bl null pprint
+            null add-using
         ] if
         " }" write
     ] each ;
 
 : $values. ( word -- )
     "declared-effect" word-prop [
-        "{ $values" print
         [ in>> ] [ out>> ] bi
-        [ "    " write ($values.) nl ] bi@
-        "}" write nl
+        2dup [ empty? ] bi@ and [
+            2drop
+        ] [
+            "{ $values" print
+            [ "    " write ($values.) ]
+            [ [ nl "    " write ($values.) ] unless-empty ] bi*
+            " }" write nl
+        ] if
     ] when* ;
 
 : $description. ( word -- )
@@ -160,24 +168,24 @@ ERROR: vocab-name-contains-dot path ;
         scaffold-copyright help-file-string write-using write
     ] with-output-stream ;
 
-: check-scaffold ( vocab-root str -- vocab-root str )
+: check-scaffold ( vocab-root string -- vocab-root string )
     [ check-root ] [ check-vocab-name ] bi* ;
 
-: vocab>scaffold-path ( vocab-root str -- path )
+: vocab>scaffold-path ( vocab-root string -- path )
     path-separator first CHAR: . associate substitute
     append-path ;
 
-: prepare-scaffold ( vocab-root str -- str path )
+: prepare-scaffold ( vocab-root string -- string path )
     check-scaffold [ vocab>scaffold-path ] keep ;
 
-: scaffold-help ( vocab-root str -- )
+: scaffold-help ( vocab-root string -- )
     H{ } clone using [
         prepare-scaffold
         [ "-docs.factor" scaffold-path ] dip
         swap [ set-scaffold-help-file ] [ 2drop ] if
     ] with-variable ;
 
-: scaffold-vocab ( vocab-root str -- )
+: scaffold-vocab ( vocab-root string -- )
     prepare-scaffold
     {
         [ drop scaffold-directory ]
