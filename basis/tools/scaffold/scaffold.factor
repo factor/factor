@@ -192,4 +192,5 @@ ERROR: vocab-name-contains-dot path ;
         [ scaffold-main ]
         [ scaffold-tests ]
         [ drop scaffold-authors ]
+        [ nip require ]
     } 2cleave ;
