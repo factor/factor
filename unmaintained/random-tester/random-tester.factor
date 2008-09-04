@@ -1,7 +1,8 @@
 USING: compiler continuations io kernel math namespaces
 prettyprint quotations random sequences vectors
 compiler.units ;
-USING: random-tester.databank random-tester.safe-words ;
+USING: random-tester.databank random-tester.safe-words
+random-tester.random ;
 IN: random-tester
 
 SYMBOL: errored
@@ -13,6 +14,8 @@ ERROR: random-tester-error ;
 : setup-test ( #data #code -- data... quot )
     #! Variable stack effect
     >r [ databank random ] times r>
+    ! 200 300 random-cond ;
+    ! random-if ;
     [ drop \ safe-words get random ] map >quotation ;
 
 : test-compiler ! ( data... quot -- ... )

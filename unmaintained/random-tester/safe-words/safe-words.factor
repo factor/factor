@@ -6,8 +6,6 @@ IN: random-tester.safe-words
 
 : ?-words
     {
-        delegate
-
         /f
 
         bits>float bits>double

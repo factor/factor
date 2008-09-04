@@ -1,6 +1,7 @@
 USING: kernel math sequences namespaces hashtables words
-arrays parser compiler syntax io prettyprint optimizer
-random math.constants math.functions layouts random-tester.utils ;
+arrays parser compiler syntax io prettyprint random
+math.constants math.functions layouts random-tester.utils
+random-tester.safe-words quotations fry combinators ;
 IN: random-tester
 
 ! Tweak me
@@ -72,3 +73,14 @@ IN: random-tester
 : random-complex ( -- C )
     random-number random-number rect> ;
 
+: random-quot ( n -- quot )
+    [ \ safe-words get random ] replicate >quotation ;
+
+: random-if ( n -- quot )
+    [ random-quot ] [ random-quot ] bi
+    '[ , , if ] ;
+
+: random-cond ( m n -- quot )
+    [ '[ , [ random-quot ] [ random-quot ] bi 2array ] replicate ] 
+    [ random-quot ] bi suffix 
+    '[ , cond ] ; 
