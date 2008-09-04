@@ -89,8 +89,11 @@ SYMBOL: meta-r
 SYMBOL: dependencies
 
 : depends-on ( word how -- )
-    dependencies get dup
-    [ swap '[ , strongest-dependency ] change-at ] [ 3drop ] if ;
+    over primitive? [ 2drop ] [
+        dependencies get dup [
+            swap '[ , strongest-dependency ] change-at
+        ] [ 3drop ] if
+    ] if ;
 
 ! Generic words that the current quotation depends on
 SYMBOL: generic-dependencies

@@ -62,10 +62,13 @@ TUPLE: check-mixin-class mixin ;
     ] if-mixin-member? ;
 
 : remove-mixin-instance ( class mixin -- )
+    #! The order of the three clauses is important here. The last
+    #! one must come after the other two so that the entries it
+    #! adds to changed-generics are not overwritten.
     [
-        [ class-usages update-methods ]
         [ [ swap remove ] change-mixin-class ]
         [ nip update-classes ]
+        [ class-usages update-methods ]
         2tri
     ] [ 2drop ] if-mixin-member? ;
 

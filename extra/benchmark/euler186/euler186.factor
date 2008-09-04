@@ -1,4 +1,7 @@
 IN: benchmark.euler186
-USE: project-euler.186
+USING: kernel project-euler.186 ;
 
-MAIN: euler186
+: euler186-benchmark ( -- )
+    euler186 2325629 assert= ;
+
+MAIN: euler186-benchmark
