@@ -74,7 +74,15 @@ IN: vocab-browser
       [ pprint-class ] each
     ]
   if
-  
+
+  dup vocab words [ class? not ] filter [ symbol? ] filter natural-sort
+  dup empty?
+    [ drop ]
+    [
+      "Symbols" $heading nl
+      print-seq
+    ]
+  if
 
   dup vocab words [ generic? ] filter natural-sort
   dup empty?
@@ -92,6 +100,7 @@ IN: vocab-browser
     [ builtin-class?   not ] filter
     [ tuple-class?     not ] filter
     [ generic?         not ] filter
+    [ symbol?          not ] filter
     [ word?                ] filter
     natural-sort
     [ [ ] [ word-effect-as-string ] bi 2array ] map
