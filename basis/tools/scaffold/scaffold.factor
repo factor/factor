@@ -3,10 +3,12 @@
 USING: assocs io.files hashtables kernel namespaces sequences
 vocabs.loader io combinators io.encodings.utf8 calendar accessors
 math.parser io.streams.string ui.tools.operations quotations
-strings arrays prettyprint words vocabs sorting combinators.lib ;
+strings arrays prettyprint words vocabs sorting combinators.lib
+sets cords ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
+SYMBOL: using
 
 ERROR: not-a-vocab-root string ;
 
@@ -18,9 +20,7 @@ ERROR: vocab-name-contains-dot path ;
 : check-vocab-name ( str -- str )
     dup dup [ CHAR: . = ] trim [ length ] bi@ =
     [ vocab-name-contains-dot ] unless
-
     ".." over subseq? [ vocab-name-contains-dot ] when
-
     dup [ path-separator? ] contains?
     [ vocab-name-contains-separator ] when ;
 
@@ -106,13 +106,16 @@ ERROR: vocab-name-contains-dot path ;
         { "ch" "a character" }
     } at* ;
 
+: add-using ( object -- )
+    vocabulary>> using get conjoin ;
+
 : ($values.) ( array -- )
     [
         " { " write
         dup array? [ first ] when
         dup lookup-type [
             [ unparse write bl ]
-            [ dup string? [ unparse write ] [ pprint ] if ] bi*
+            [ dup string? [ unparse write ] [ [ pprint ] [ add-using ] bi ] if ] bi*
         ] [
             drop unparse write
         ] if
@@ -139,18 +142,23 @@ ERROR: vocab-name-contains-dot path ;
 
 : help-file-string ( str1 -- str2 )
     [
-        scaffold-copyright
-        [
-            "USING: help.markup help.syntax ;" print
-            "IN: " write print nl
-        ]
+        [ "IN: " write print nl ]
         [ words natural-sort [ help. nl ] each ]
         [ "ARTICLE: " write unparse dup write bl print ";" print nl ]
         [ "ABOUT: " write unparse print ] quad
     ] with-string-writer ;
 
+: write-using ( -- )
+    "USING:" write
+    using get keys
+    { "help.markup" "help.syntax" } cord-append natural-sort 
+    [ bl write ] each
+    " ;" print ;
+
 : set-scaffold-help-file ( path vocab -- )
-    help-file-string swap utf8 set-file-contents ;
+    swap utf8 <file-writer> [
+        scaffold-copyright help-file-string write-using write
+    ] with-output-stream ;
 
 : check-scaffold ( vocab-root str -- vocab-root str )
     [ check-root ] [ check-vocab-name ] bi* ;
@@ -163,9 +171,11 @@ ERROR: vocab-name-contains-dot path ;
     check-scaffold [ vocab>scaffold-path ] keep ;
 
 : scaffold-help ( vocab-root str -- )
-    prepare-scaffold
-    [ "-docs.factor" scaffold-path ] dip
-    swap [ set-scaffold-help-file ] [ 2drop ] if ;
+    H{ } clone using [
+        prepare-scaffold
+        [ "-docs.factor" scaffold-path ] dip
+        swap [ set-scaffold-help-file ] [ 2drop ] if
+    ] with-variable ;
 
 : scaffold-vocab ( vocab-root str -- )
     prepare-scaffold
