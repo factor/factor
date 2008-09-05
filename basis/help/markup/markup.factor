@@ -3,7 +3,7 @@
 USING: accessors arrays definitions generic io kernel assocs
 hashtables namespaces parser prettyprint sequences strings
 io.styles vectors words math sorting splitting classes slots
-vocabs help.stylesheet help.topics vocabs.loader ;
+vocabs help.stylesheet help.topics vocabs.loader alias ;
 IN: help.markup
 
 ! Simple markup language.
@@ -60,6 +60,9 @@ M: f print-element drop ;
 
 : $snippet ( children -- )
     [ snippet-style get print-element* ] ($span) ;
+
+! for help-lint
+ALIAS: $slot $snippet
 
 : $emphasis ( children -- )
     [ emphasis-style get print-element* ] ($span) ;
