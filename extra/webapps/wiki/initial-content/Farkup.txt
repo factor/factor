@@ -16,9 +16,13 @@ Images can be embedded in the text:
 
 [[image:http://factorcode.org/graphics/logo.png]]
 
+Lists:
+
 - a list
 - with three
 - items
+
+Tables:
 
 |a table|with|four|columns|
 |and|two|rows|...|

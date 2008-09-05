@@ -4,19 +4,21 @@ USING: assocs io.files hashtables kernel namespaces sequences
 vocabs.loader io combinators io.encodings.utf8 calendar accessors
 math.parser io.streams.string ui.tools.operations quotations
 strings arrays prettyprint words vocabs sorting sets cords
-sequences.lib combinators.lib ;
+classes sequences.lib combinators.lib ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
 SYMBOL: using
 
 ERROR: not-a-vocab-root string ;
+ERROR: vocab-name-contains-separator path ;
+ERROR: vocab-name-contains-dot path ;
+ERROR: no-vocab vocab ;
 
+<PRIVATE
 : root? ( string -- ? )
     vocab-roots get member?  ;
 
-ERROR: vocab-name-contains-separator path ;
-ERROR: vocab-name-contains-dot path ;
 : check-vocab-name ( string -- string )
     dup dup [ CHAR: . = ] trim [ length ] bi@ =
     [ vocab-name-contains-dot ] unless
@@ -109,7 +111,7 @@ ERROR: vocab-name-contains-dot path ;
     } at* ;
 
 : add-using ( object -- )
-    vocabulary>> using get conjoin ;
+    vocabulary>> using get [ conjoin ] [ drop ] if* ;
 
 : ($values.) ( array -- )
     [
@@ -140,18 +142,26 @@ ERROR: vocab-name-contains-dot path ;
 
 : $description. ( word -- )
     drop
-    "{ $description } ;" print ;
+    "{ $description \"\" } ;" print ;
 
 : help-header. ( word -- )
     "HELP: " write name>> print ;
 
-: help. ( word -- )
+: (help.) ( word -- )
     [ help-header. ] [ $values. ] [ $description. ] tri ;
+
+: interesting-words ( vocab -- array )
+    words
+    [ [ "help" word-prop ] [ predicate? ] bi or not ] filter
+    natural-sort ;
+
+: interesting-words. ( vocab -- )
+    interesting-words [ (help.) nl ] each ;
 
 : help-file-string ( str1 -- str2 )
     [
         [ "IN: " write print nl ]
-        [ words natural-sort [ help. nl ] each ]
+        [ interesting-words. ]
         [ "ARTICLE: " write unparse dup write bl print ";" print nl ]
         [ "ABOUT: " write unparse print ] quad
     ] with-string-writer ;
@@ -178,12 +188,33 @@ ERROR: vocab-name-contains-dot path ;
 : prepare-scaffold ( vocab-root string -- string path )
     check-scaffold [ vocab>scaffold-path ] keep ;
 
+: with-scaffold ( quot -- )
+    [ H{ } clone using ] dip with-variable ; inline
+
+: check-vocab ( vocab -- vocab )
+    dup find-vocab-root [ no-vocab ] unless ;
+PRIVATE>
+
+: link-vocab ( vocab -- )
+    check-vocab
+    "Edit documentation: " write
+    [ find-vocab-root ] keep
+    [ append-path ] keep "-docs.factor" append append-path
+    <pathname> . ;
+
+: help. ( word -- )
+    [ (help.) ] [ nl vocabulary>> link-vocab ] bi ;
+
 : scaffold-help ( vocab-root string -- )
-    H{ } clone using [
+    [
+        check-vocab
         prepare-scaffold
         [ "-docs.factor" scaffold-path ] dip
         swap [ set-scaffold-help-file ] [ 2drop ] if
-    ] with-variable ;
+    ] with-scaffold ;
+
+: scaffold-undocumented ( string -- )
+    [ interesting-words. ] [ link-vocab ] bi ;
 
 : scaffold-vocab ( vocab-root string -- )
     prepare-scaffold
@@ -192,4 +223,5 @@ ERROR: vocab-name-contains-dot path ;
         [ scaffold-main ]
         [ scaffold-tests ]
         [ drop scaffold-authors ]
+        [ nip require ]
     } 2cleave ;

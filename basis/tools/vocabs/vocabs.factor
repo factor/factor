@@ -190,7 +190,7 @@ M: vocab-link summary vocab-summary ;
     vocab-dir "tags.txt" append-path ;
 
 : vocab-tags ( vocab -- tags )
-    dup vocab-tags-path vocab-file-contents ;
+    dup vocab-tags-path vocab-file-contents harvest ;
 
 : set-vocab-tags ( tags vocab -- )
     dup vocab-tags-path set-vocab-file-contents ;
@@ -202,7 +202,7 @@ M: vocab-link summary vocab-summary ;
     vocab-dir "authors.txt" append-path ;
 
 : vocab-authors ( vocab -- authors )
-    dup vocab-authors-path vocab-file-contents ;
+    dup vocab-authors-path vocab-file-contents harvest ;
 
 : set-vocab-authors ( authors vocab -- )
     dup vocab-authors-path set-vocab-file-contents ;
