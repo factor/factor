@@ -13,7 +13,7 @@ CFLAGS = -Wall
 ifdef DEBUG
 	CFLAGS += -g
 else
-	CFLAGS += -O3 -fno-forward-propagate $(SITE_CFLAGS)
+	CFLAGS += -O3 $(SITE_CFLAGS)
 endif
 
 ifdef CONFIG
