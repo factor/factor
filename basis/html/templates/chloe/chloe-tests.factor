@@ -26,7 +26,7 @@ IN: html.templates.chloe.tests
     "?>" split1 nip ; inline
 
 : test-template ( name -- template )
-    "resource:extra/html/templates/chloe/test/"
+    "resource:basis/html/templates/chloe/test/"
     prepend <chloe> ;
 
 [ "Hello world" ] [

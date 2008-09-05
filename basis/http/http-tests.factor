@@ -202,7 +202,7 @@ test-db [
         <dispatcher>
             add-quit-action
             <dispatcher>
-                "resource:extra/http/test" <static> >>default
+                "resource:basis/http/test" <static> >>default
             "nested" add-responder
             <action>
                 [ URL" redirect-loop" <temporary-redirect> ] >>display
@@ -214,7 +214,7 @@ test-db [
 ] unit-test
 
 [ t ] [
-    "resource:extra/http/test/foo.html" ascii file-contents
+    "resource:basis/http/test/foo.html" ascii file-contents
     "http://localhost:1237/nested/foo.html" http-get nip =
 ] unit-test
 

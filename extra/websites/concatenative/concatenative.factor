@@ -76,8 +76,8 @@ SYMBOL: dh-file
     init-factor-db ;
 
 : init-testing ( -- )
-    "resource:extra/openssl/test/dh1024.pem" dh-file set-global
-    "resource:extra/openssl/test/server.pem" key-file set-global
+    "resource:basis/openssl/test/dh1024.pem" dh-file set-global
+    "resource:basis/openssl/test/server.pem" key-file set-global
     "password" key-password set-global
     common-configuration ;
 

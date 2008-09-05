@@ -20,7 +20,7 @@ IN: xmode.code2html
 
 : default-stylesheet ( -- )
     <style>
-        "resource:extra/xmode/code2html/stylesheet.css"
+        "resource:basis/xmode/code2html/stylesheet.css"
         utf8 file-contents escape-string write
     </style> ;
 
