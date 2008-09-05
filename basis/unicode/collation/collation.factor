@@ -136,7 +136,7 @@ PRIVATE>
 : insensitive= ( str1 str2 levels-removed -- ? )
     [
         swap collation-key swap
-        [ [ 0 = not ] right-trim but-last ] times
+        [ [ 0 = not ] trim-right but-last ] times
     ] curry bi@ = ;
 PRIVATE>
 

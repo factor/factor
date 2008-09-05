@@ -113,7 +113,7 @@ SYMBOL: redirects
 PRIVATE>
 
 : read-chunk-size ( -- n )
-    read-crlf ";" split1 drop [ blank? ] right-trim
+    read-crlf ";" split1 drop [ blank? ] trim-right
     hex> [ "Bad chunk size" throw ] unless* ;
 
 : read-chunks ( -- )

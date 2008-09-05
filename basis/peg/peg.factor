@@ -513,18 +513,11 @@ TUPLE: action-parser p1 quot ;
 M: action-parser (compile) ( peg -- quot )
   [ p1>> compile-parser 1quotation ] [ quot>> ] bi '[ @ , check-action ] ;
 
-: left-trim-slice ( string -- string )
-  #! Return a new string without any leading whitespace
-  #! from the original string.
-  dup empty? [
-    dup first blank? [ rest-slice left-trim-slice ] when
-  ] unless ;
-
 TUPLE: sp-parser p1 ;
 
 M: sp-parser (compile) ( peg -- quot )
   p1>> compile-parser 1quotation '[ 
-    input-slice left-trim-slice input-from pos set @ 
+    input-slice trim-left-slice input-from pos set @ 
   ] ;
 
 TUPLE: delay-parser quot ;
