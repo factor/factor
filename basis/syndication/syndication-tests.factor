@@ -25,7 +25,7 @@ IN: syndication.tests
             f
         }
     }
-} ] [ "resource:extra/syndication/test/rss1.xml" load-news-file ] unit-test
+} ] [ "resource:basis/syndication/test/rss1.xml" load-news-file ] unit-test
 [ T{
     feed
     f
@@ -42,4 +42,4 @@ IN: syndication.tests
             T{ timestamp f 2003 12 13 8 29 29 T{ duration f 0 0 0 -4 0 0 } }
         }
     }
-} ] [ "resource:extra/syndication/test/atom.xml" load-news-file ] unit-test
+} ] [ "resource:basis/syndication/test/atom.xml" load-news-file ] unit-test

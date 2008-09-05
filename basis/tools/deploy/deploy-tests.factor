@@ -79,7 +79,7 @@ M: quit-responder call-responder*
     [
         <dispatcher>
             add-quot-responder
-            "resource:extra/http/test" <static> >>default
+            "resource:basis/http/test" <static> >>default
         main-responder set
 
         test-httpd
