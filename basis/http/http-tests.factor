@@ -202,7 +202,7 @@ test-db [
         <dispatcher>
             add-quit-action
             <dispatcher>
-                "resource:extra/http/test" <static> >>default
+                "resource:basis/http/test" <static> >>default
             "nested" add-responder
             <action>
                 [ URL" redirect-loop" <temporary-redirect> ] >>display
@@ -214,7 +214,7 @@ test-db [
 ] unit-test
 
 [ t ] [
-    "resource:extra/http/test/foo.html" ascii file-contents
+    "resource:basis/http/test/foo.html" ascii file-contents
     "http://localhost:1237/nested/foo.html" http-get nip =
 ] unit-test
 
@@ -223,6 +223,28 @@ test-db [
 
 [ "Goodbye" ] [
     "http://localhost:1237/quit" http-get nip
+] unit-test
+
+! HTTP client redirect bug
+[ ] [
+    [
+        <dispatcher>
+            add-quit-action
+            <action> [ "quit" <temporary-redirect> ] >>display
+            "redirect" add-responder
+        main-responder set
+
+        test-httpd
+    ] with-scope
+] unit-test
+
+[ "Goodbye" ] [
+    "http://localhost:1237/redirect" http-get nip
+] unit-test
+
+
+[ ] [
+    [ "http://localhost:1237/quit" http-get 2drop ] ignore-errors
 ] unit-test
 
 ! Dispatcher bugs

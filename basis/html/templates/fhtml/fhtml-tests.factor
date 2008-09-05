@@ -4,7 +4,7 @@ tools.test sequences parser ;
 IN: html.templates.fhtml.tests
 
 : test-template ( path -- ? )
-    "resource:extra/html/templates/fhtml/test/"
+    "resource:basis/html/templates/fhtml/test/"
     prepend
     [
         ".fhtml" append <fhtml> [ call-template ] with-string-writer

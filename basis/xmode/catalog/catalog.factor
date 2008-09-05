@@ -24,7 +24,7 @@ TAGS>
     ] keep ;
 
 MEMO: modes ( -- modes )
-    "resource:extra/xmode/modes/catalog"
+    "resource:basis/xmode/modes/catalog"
     file>xml parse-modes-tag ;
 
 MEMO: mode-names ( -- modes )
@@ -36,7 +36,7 @@ MEMO: mode-names ( -- modes )
 MEMO: (load-mode) ( name -- rule-sets )
     modes at [
         file>>
-        "resource:extra/xmode/modes/" prepend
+        "resource:basis/xmode/modes/" prepend
         utf8 <file-reader> parse-mode
     ] [
         "text" (load-mode)

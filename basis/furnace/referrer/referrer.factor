@@ -1,6 +1,7 @@
-USING: accessors kernel
-http.server http.server.filters http.server.responses
-furnace ;
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors kernel http.server http.server.filters
+http.server.responses furnace ;
 IN: furnace.referrer
 
 TUPLE: referrer-check < filter-responder quot ;
