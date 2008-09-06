@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien io io.files kernel math math.bitfields system unix
+USING: alien io io.files kernel math math.bitwise system unix
 io.unix.backend io.ports io.mmap destructors locals accessors ;
 IN: io.unix.mmap
 

@@ -175,11 +175,11 @@ M: or-parser parse ( input parser1 -- list )
     parsers>> 0 swap seq>list
     [ parse ] lazy-map-with lconcat ;
 
-: left-trim-slice ( string -- string )
+: trim-left-slice ( string -- string )
     #! Return a new string without any leading whitespace
     #! from the original string.
     dup empty? [
-        dup first blank? [ rest-slice left-trim-slice ] when
+        dup first blank? [ rest-slice trim-left-slice ] when
     ] unless ;
 
 TUPLE: sp-parser p1 ;
@@ -191,7 +191,7 @@ C: sp sp-parser ( p1 -- parser )
 M: sp-parser parse ( input parser -- list )
     #! Skip all leading whitespace from the input then call
     #! the parser on the remaining input.
-    >r left-trim-slice r> p1>> parse ;
+    >r trim-left-slice r> p1>> parse ;
 
 TUPLE: just-parser p1 ;
 

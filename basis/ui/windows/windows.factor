@@ -8,7 +8,7 @@ sequences strings vectors words windows.kernel32 windows.gdi32
 windows.user32 windows.opengl32 windows.messages windows.types
 windows.nt windows threads libc combinators continuations
 command-line shuffle opengl ui.render unicode.case ascii
-math.bitfields locals symbols accessors math.geometry.rect ;
+math.bitwise locals symbols accessors math.geometry.rect ;
 IN: ui.windows
 
 SINGLETON: windows-ui-backend

@@ -4,6 +4,7 @@ USING: namespaces parser lexer kernel sequences words quotations math
 accessors ;
 IN: multiline
 
+<PRIVATE
 : next-line-text ( -- str )
     lexer get dup next-line line-text>> ;
 
@@ -13,6 +14,7 @@ IN: multiline
         [ drop lexer get next-line ]
         [ % "\n" % (parse-here) ] if
     ] [ ";" unexpected-eof ] if* ;
+PRIVATE>
 
 : parse-here ( -- str )
     [ (parse-here) ] "" make but-last
@@ -22,6 +24,7 @@ IN: multiline
     CREATE-WORD
     parse-here 1quotation define-inline ; parsing
 
+<PRIVATE
 : (parse-multiline-string) ( start-index end-text -- end-index )
     lexer get line-text>> [
         2dup start
@@ -30,6 +33,7 @@ IN: multiline
             lexer get next-line swap (parse-multiline-string)
         ] if*
     ] [ nip unexpected-eof ] if* ;
+PRIVATE>
 
 : parse-multiline-string ( end-text -- str )
     [

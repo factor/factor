@@ -22,6 +22,12 @@ window-loc ;
 
 : hide-status ( gadget -- ) f swap show-status ;
 
+ERROR: no-world-found ;
+
+: find-gl-context ( gadget -- )
+    find-world dup
+    [ handle>> select-gl-context ] [ no-world-found ] if ;
+
 : (request-focus) ( child world ? -- )
     pick parent>> pick eq? [
         >r >r dup parent>> dup r> r>

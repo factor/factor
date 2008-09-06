@@ -1,6 +1,6 @@
 USING: alien alien.c-types alien.syntax arrays continuations
 destructors generic io.mmap io.ports io.windows io.windows.files
-kernel libc math math.bitfields namespaces quotations sequences windows
+kernel libc math math.bitwise namespaces quotations sequences windows
 windows.advapi32 windows.kernel32 io.backend system accessors
 io.windows.privileges ;
 IN: io.windows.nt.privileges

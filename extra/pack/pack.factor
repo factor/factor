@@ -1,7 +1,7 @@
 USING: alien alien.c-types arrays assocs byte-arrays io
 io.binary io.streams.string kernel math math.parser namespaces
 parser prettyprint quotations sequences strings vectors words
-macros math.functions math.bitfields.lib ;
+macros math.functions math.bitwise ;
 IN: pack
 
 SYMBOL: big-endian
@@ -84,7 +84,7 @@ M: string b, ( n string -- ) heap-size b, ;
     "\0" read-until [ drop f ] unless ;
 
 : read-c-string* ( n -- str/f )
-    read [ zero? ] right-trim dup empty? [ drop f ] when ;
+    read [ zero? ] trim-right dup empty? [ drop f ] when ;
 
 : (read-128-ber) ( n -- n )
     read1

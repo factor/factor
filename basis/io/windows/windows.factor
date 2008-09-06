@@ -5,7 +5,7 @@ io.buffers io.files io.ports io.sockets io.binary
 io.sockets io.timeouts windows.errors strings
 kernel math namespaces sequences windows windows.kernel32
 windows.shell32 windows.types windows.winsock splitting
-continuations math.bitfields system accessors ;
+continuations math.bitwise system accessors ;
 IN: io.windows
 
 : set-inherit ( handle ? -- )

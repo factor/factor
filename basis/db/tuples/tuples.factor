@@ -3,7 +3,7 @@
 USING: arrays assocs classes db kernel namespaces
 classes.tuple words sequences slots math accessors
 math.parser io prettyprint db.types continuations
-destructors mirrors sequences.lib combinators.lib ;
+destructors mirrors ;
 IN: db.tuples
 
 : define-persistent ( class table columns -- )
@@ -71,13 +71,14 @@ SINGLETON: retryable
     ] 2map >>bind-params ;
 
 M: retryable execute-statement* ( statement type -- )
-    drop [
+    drop [ retries>> ] [
         [
+            nip
             [ query-results dispose t ]
             [ ]
             [ regenerate-params bind-statement* f ] cleanup
         ] curry
-    ] [ retries>> ] bi retry drop ;
+    ] bi attempt-all drop ;
 
 : resulting-tuple ( class row out-params -- tuple )
     rot class new [
@@ -159,7 +160,8 @@ M: retryable execute-statement* ( statement type -- )
     dup dup class <select-by-slots-statement> do-select ;
 
 : select-tuple ( tuple -- tuple/f )
-    dup dup class \ query new 1 >>limit <query> do-select ?first ;
+    dup dup class \ query new 1 >>limit <query> do-select
+    [ f ] [ first ] if-empty ;
 
 : do-count ( exemplar-tuple statement -- tuples )
     [

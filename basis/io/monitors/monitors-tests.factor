@@ -54,7 +54,7 @@ os { winnt linux macosx } member? [
                     "m" get next-change drop
                     dup print flush
                     dup parent-directory
-                    [ right-trim-separators "xyz" tail? ] either? not
+                    [ trim-right-separators "xyz" tail? ] either? not
                 ] loop
 
                 "c1" get count-down
@@ -63,7 +63,7 @@ os { winnt linux macosx } member? [
                     "m" get next-change drop
                     dup print flush
                     dup parent-directory
-                    [ right-trim-separators "yxy" tail? ] either? not
+                    [ trim-right-separators "yxy" tail? ] either? not
                 ] loop
 
                 "c2" get count-down

@@ -47,7 +47,7 @@ IN: stack-checker.known-words
 
 : infer-shuffle ( shuffle -- )
     [ in>> length consume-d ] keep ! inputs shuffle
-    [ drop ] [ shuffle* dup copy-values dup output-d ] 2bi ! inputs outputs copies
+    [ drop ] [ shuffle dup copy-values dup output-d ] 2bi ! inputs outputs copies
     [ nip ] [ swap zip ] 2bi ! inputs copies mapping
     #shuffle, ;
 

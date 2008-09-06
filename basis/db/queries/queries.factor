@@ -1,9 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math namespaces sequences random
-strings math.parser math.intervals combinators
-math.bitfields.lib namespaces.lib db db.tuples db.types
-sequences.lib db.sql classes words shuffle arrays ;
+USING: accessors kernel math namespaces sequences random strings
+math.parser math.intervals combinators math.bitwise nmake db
+db.tuples db.types db.sql classes words shuffle arrays ;
 IN: db.queries
 
 GENERIC: where ( specs obj -- )
@@ -142,8 +141,8 @@ M: db <select-by-slots-statement> ( tuple class -- statement )
 : make-query ( tuple query -- tuple' )
     dupd
     {
-        [ group>> [ do-group ] [ drop ] if-seq ]
-        [ order>> [ do-order ] [ drop ] if-seq ]
+        [ group>> [ drop ] [ do-group ] if-empty ]
+        [ order>> [ drop ] [ do-order ] if-empty ]
         [ limit>> [ do-limit ] [ drop ] if* ]
         [ offset>> [ do-offset ] [ drop ] if* ]
     } 2cleave ;

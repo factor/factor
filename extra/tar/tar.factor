@@ -135,7 +135,7 @@ M: unknown-typeflag summary ( obj -- str )
 : typeflag-L ( header -- )
     drop ;
     ! <string-writer> [ read-data-blocks ] keep
-    ! >string [ zero? ] right-trim filename set
+    ! >string [ zero? ] trim-right filename set
     ! filename get tar-prepend-path make-directories ;
 
 ! Multi volume continuation entry

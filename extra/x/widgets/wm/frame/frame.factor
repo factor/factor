@@ -4,7 +4,7 @@ USING: kernel io combinators namespaces quotations arrays sequences
        x11.xlib x11.constants
        mortar mortar.sugar slot-accessors
        geom.rect
-       math.bitfields
+       math.bitwise
        x x.gc x.widgets
        x.widgets.button
        x.widgets.wm.child

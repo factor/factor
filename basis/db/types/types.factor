@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs db kernel math math.parser
-sequences continuations sequences.deep sequences.lib
+sequences continuations sequences.deep
 words namespaces slots slots.private classes mirrors
 classes.tuple combinators calendar.format symbols
 classes.singleton accessors quotations random ;

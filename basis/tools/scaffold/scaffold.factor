@@ -3,8 +3,8 @@
 USING: assocs io.files hashtables kernel namespaces sequences
 vocabs.loader io combinators io.encodings.utf8 calendar accessors
 math.parser io.streams.string ui.tools.operations quotations
-strings arrays prettyprint words vocabs sorting sets cords
-classes sequences.lib combinators.lib ;
+strings arrays prettyprint words vocabs sorting sets
+classes math alien ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -95,6 +95,7 @@ ERROR: no-vocab vocab ;
         { "obj3" object } { "obj4" object }
         { "quot" quotation } { "quot1" quotation }
         { "quot2" quotation } { "quot3" quotation }
+        { "quot'" quotation }
         { "string" string } { "string1" string }
         { "string2" string } { "string3" string }
         { "str" string }
@@ -105,9 +106,20 @@ ERROR: no-vocab vocab ;
         { "ch" "a character" }
         { "word" word }
         { "array" array }
+        { "duration" duration }
         { "path" "a pathname string" }
         { "vocab" "a vocabulary specifier" }
         { "vocab-root" "a vocabulary root string" }
+        { "c-ptr" c-ptr }
+        { "seq" sequence } { "seq1" sequence } { "seq2" sequence }
+        { "seq3" sequence } { "seq4" sequence }
+        { "seq1'" sequence } { "seq2'" sequence }
+        { "newseq" sequence } 
+        { "assoc" assoc } { "assoc1" assoc } { "assoc2" assoc }
+        { "assoc3" assoc } { "newassoc" assoc }
+        { "alist" "an array of key/value pairs" }
+        { "keys" sequence } { "values" sequence }
+        { "class" class }
     } at* ;
 
 : add-using ( object -- )
@@ -160,16 +172,18 @@ ERROR: no-vocab vocab ;
 
 : help-file-string ( str1 -- str2 )
     [
-        [ "IN: " write print nl ]
-        [ interesting-words. ]
-        [ "ARTICLE: " write unparse dup write bl print ";" print nl ]
-        [ "ABOUT: " write unparse print ] quad
+        {
+            [ "IN: " write print nl ]
+            [ interesting-words. ]
+            [ "ARTICLE: " write unparse dup write bl print ";" print nl ]
+            [ "ABOUT: " write unparse print ]
+        } cleave
     ] with-string-writer ;
 
 : write-using ( -- )
     "USING:" write
     using get keys
-    { "help.markup" "help.syntax" } cord-append natural-sort 
+    { "help.markup" "help.syntax" } append natural-sort 
     [ bl write ] each
     " ;" print ;
 
@@ -225,3 +239,20 @@ PRIVATE>
         [ drop scaffold-authors ]
         [ nip require ]
     } 2cleave ;
+
+SYMBOL: examples-flag
+
+: example ( -- )
+    {
+        "{ $example \"\" \"USING: prettyprint ;\""
+        "           \"\""
+        "           \"\""
+        "}"
+    } [ examples-flag get [ "    " write ] when print ] each ;
+
+: examples ( n -- )
+    t \ examples-flag [
+        "{ $examples " print
+        [ example ] times
+        "}" print
+    ] with-variable ;

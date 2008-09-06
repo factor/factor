@@ -49,5 +49,5 @@ IN: syntax
 : C{ \ } [ first2 rect> ] parse-literal ; parsing
 
 M: complex pprint-delims drop \ C{ \ } ;
-
 M: complex >pprint-sequence >rect 2array ;
+M: complex pprint* pprint-object ;

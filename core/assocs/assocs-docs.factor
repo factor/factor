@@ -1,7 +1,7 @@
-! Copyright (C) 2007 Daniel Ehrenberg and Slava Pestov
+! Copyright (C) 2007 Daniel Ehrenberg, Slava Pestov, and Doug Coleman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax kernel sequences
-sequences.private namespaces math ;
+sequences.private namespaces math quotations ;
 IN: assocs
 
 ARTICLE: "alists" "Association lists"
@@ -81,6 +81,7 @@ ARTICLE: "assocs-sets" "Set-theoretic operations on assocs"
 { $subsection remove-all }
 { $subsection substitute }
 { $subsection substitute-here }
+{ $subsection extract-keys }
 { $see-also key? assoc-contains? assoc-all? "sets" } ;
 
 ARTICLE: "assocs-mutation" "Storing keys and values in assocs"
@@ -89,7 +90,18 @@ ARTICLE: "assocs-mutation" "Storing keys and values in assocs"
 { $subsection rename-at }
 { $subsection change-at }
 { $subsection at+ }
-{ $see-also set-at delete-at clear-assoc } ;
+{ $see-also set-at delete-at clear-assoc push-at } ;
+
+ARTICLE: "assocs-conversions" "Associative mapping conversions"
+"Converting to other assocs:"
+{ $subsection assoc-clone-like }
+"Combining a sequence of assocs into a single assoc:"
+{ $subsection assoc-combine }
+"Creating an assoc from key/value sequences:"
+{ $subsection zip }
+"Creating key/value sequences from an assoc:"
+{ $subsection unzip }
+;
 
 ARTICLE: "assocs-combinators" "Associative mapping combinators"
 "The following combinators can be used on any associative mapping."
@@ -104,10 +116,14 @@ $nl
 { $subsection assoc-filter }
 { $subsection assoc-contains? }
 { $subsection assoc-all? }
-"Three additional combinators:"
+"Additional combinators:"
 { $subsection cache }
 { $subsection map>assoc }
-{ $subsection assoc>map } ;
+{ $subsection assoc>map }
+{ $subsection assoc-map-as }
+{ $subsection search-alist }
+"Utility word:"
+{ $subsection assoc-pusher } ;
 
 ARTICLE: "assocs" "Associative mapping operations"
 "An " { $emphasis "associative mapping" } ", abbreviated " { $emphasis "assoc" } ", is a collection of key/value pairs which provides efficient lookup and storage indexed by key."
@@ -121,7 +137,8 @@ $nl
 { $subsection "assocs-values" }
 { $subsection "assocs-mutation" }
 { $subsection "assocs-combinators" }
-{ $subsection "assocs-sets" } ;
+{ $subsection "assocs-sets" }
+{ $subsection "assocs-conversions" } ;
 
 ABOUT: "assocs"
 
@@ -203,6 +220,8 @@ HELP: assoc-map
         "H{ { \"bananas\" 3 } { \"apples\" 39 } { \"pears\" 15 } }"
     }
 } ;
+
+{ assoc-map assoc-map-as } related-words
 
 HELP: assoc-push-if
 { $values { "accum" "a resizable mutable sequence" } { "quot" "a quotation with stack effect " { $snippet "( key value -- ? )" } } { "key" object } { "value" object } }
@@ -334,3 +353,96 @@ HELP: >alist
 { $values { "assoc" assoc } { "newassoc" "an array of key/value pairs" } }
 { $contract "Converts an associative structure into an association list." }
 { $notes "The " { $link assoc } " mixin has a default implementation for this generic word which constructs the association list by iterating over the assoc with " { $link assoc-find } "." } ;
+
+HELP: assoc-clone-like
+{ $values
+     { "assoc" assoc } { "exemplar" assoc }
+     { "newassoc" assoc } }
+{ $description "Outputs a newly-allocated assoc with the same elements as " { $snippet "assoc" } "." }
+{ $examples { $example "USING: prettyprint assocs hashtables ;" "H{ { 1 2 } { 3 4 } } { } assoc-clone-like ." "{ { 1 2 } { 3 4 } }" } } ;
+
+HELP: assoc-combine
+{ $values
+     { "seq" "a sequence of assocs" }
+     { "union" assoc } }
+{ $description "Takes the union of all of the " { $snippet "assocs" } " in " { $snippet "seq" } "." }
+{ $examples { $example "USING: prettyprint assocs ;" "{ H{ { 1 2 } } H{ { 3 4 } } } assoc-combine ." "H{ { 1 2 } { 3 4 } }" } } ;
+
+HELP: assoc-map-as
+{ $values
+     { "assoc" assoc } { "quot" quotation } { "exemplar" assoc }
+     { "newassoc" assoc } }
+{ $description "Applies the quotation to each entry in the input assoc and collects the results in a new assoc of the stame type as the exemplar." }
+{ $examples { $example "USING: prettyprint assocs hashtables math ;" " H{ { 1 2 } { 3 4 } } [ sq ] { } assoc-map-as ." "{ { 1 4 } { 3 16 } }" } } ;
+
+HELP: assoc-pusher
+{ $values
+     { "quot" "a predicate quotation" }
+     { "quot'" quotation } { "accum" assoc } }
+{ $description "Creates a new " { $snippet "assoc" } " to accumulate the key/value pairs which return true for a predicate.  Returns a new quotation which accepts a pair of object to be tested and stored in the accumulator if the test yields true. The accumulator is left on the stack for convenience." }
+{ $example "! Find only the pairs that sum to 5:" "USING: prettyprint assocs math kernel ;"
+           "{ { 1 2 } { 2 3 } { 3 4 } } [ + 5 = ] assoc-pusher [ assoc-each ] dip ."
+           "V{ { 2 3 } }"
+}
+{ $notes "Used to implement the " { $link assoc-filter } " word." } ;
+
+
+HELP: extract-keys
+{ $values
+     { "seq" sequence } { "assoc" assoc }
+     { "subassoc" assoc } }
+{ $description "Outputs an new " { $snippet "assoc" } " with key/value pairs whose keys match the elements in the input " { $snippet "seq" } "." }
+{ $examples
+    { $example "USING: prettyprint assocs ;"
+               "{ 1 3 } { { 1 10 } { 2 20 } { 3 30 } } extract-keys ."
+               "{ { 1 10 } { 3 30 } }"
+    }
+} ;
+
+HELP: push-at
+{ $values
+     { "value" object } { "key" object } { "assoc" assoc } }
+{ $description "Pushes the " { $snippet "value" } " onto a " { $snippet "vector" } " stored at the " { $snippet "key" } " in the " { $snippet "assoc" } ". If the " { $snippet "key" } " does not yet exist, creates a new " { $snippet "vector" } " at that " { $snippet "key" } " and pushes the " { $snippet "value" } "." }
+{ $examples { $example  "USING: prettyprint assocs kernel ;"
+"H{ { \"cats\" V{ \"Mittens\" } } } \"Mew\" \"cats\" pick push-at ."
+"H{ { \"cats\" V{ \"Mittens\" \"Mew\" } } }"
+} } ;
+
+HELP: search-alist
+{ $values
+     { "key" object } { "alist" "an array of key/value pairs" }
+     { "pair/f" "a key/value pair" } { "i/f" integer } }
+{ $description "Performs an in-order traversal of a " { $snippet "alist" } " and stops when the key is matched or the end of the " { $snippet "alist" } " has been reached. If there is no match, both outputs are " { $link f } "." }
+{ $examples { $example "USING: prettyprint assocs kernel ;"
+                        "3 { { 1 2 } { 3 4 } } search-alist [ . ] bi@"
+                       "{ 3 4 }\n1"
+            } { $example "USING: prettyprint assocs kernel ;"
+                       "6 { { 1 2 } { 3 4 } } search-alist [ . ] bi@"
+                       "f\nf"
+            }
+} ;
+
+HELP: unzip
+{ $values
+     { "assoc" assoc }
+     { "keys" sequence } { "values" sequence } }
+{ $description "Outputs an array of keys and an array of values of the input " { $snippet "assoc" } "." }
+{ $examples 
+    { $example "USING: prettyprint assocs kernel ;"
+               "{ { 1 4 } { 2 5 } { 3 6 } } unzip [ . ] bi@"
+               "{ 1 2 3 }\n{ 4 5 6 }" 
+    }
+} ;
+
+HELP: zip
+{ $values
+     { "keys" sequence } { "values" sequence }
+     { "alist" "an array of key/value pairs" } }
+{ $description "Combines two sequences pairwise into a single sequence of key/value pairs." }
+{ $examples 
+    { $example "" "USING: prettyprint assocs ;"
+               "{ 1 2 3 } { 4 5 6 } zip ."
+               "{ { 1 4 } { 2 5 } { 3 6 } }"
+    }
+} ;
+{ unzip zip } related-words

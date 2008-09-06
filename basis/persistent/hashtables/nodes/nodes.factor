@@ -1,6 +1,6 @@
 ! Based on Clojure's PersistentHashMap by Rich Hickey.
 
-USING: math arrays kernel sequences sequences.lib
+USING: math arrays kernel sequences
 accessors locals persistent.hashtables.config ;
 IN: persistent.hashtables.nodes
 

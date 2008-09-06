@@ -34,5 +34,5 @@ INSTANCE: float-vector growable
 : FV{ \ } [ >float-vector ] parse-literal ; parsing
 
 M: float-vector >pprint-sequence ;
-
 M: float-vector pprint-delims drop \ FV{ \ } ;
+M: float-vector pprint* pprint-object ;

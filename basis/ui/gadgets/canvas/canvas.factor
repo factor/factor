@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ui.backend ui.gadgets ui.gadgets.theme ui.gadgets.lib
+USING: ui.backend ui.gadgets ui.gadgets.theme
 ui.gadgets.worlds ui.render opengl opengl.gl kernel namespaces
 classes.tuple colors accessors ;
 IN: ui.gadgets.canvas

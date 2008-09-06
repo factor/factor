@@ -9,14 +9,30 @@ HELP: <"
 { $syntax "<\" text \">" }
 { $description "This forms a multiline string literal ending in \">. Unlike the " { $link POSTPONE: STRING: } " form, you can end it in the middle of a line. This construct is non-nesting. In the example above, the string would be parsed as \"text\"." } ;
 
-{ POSTPONE: <" POSTPONE: STRING: } related-words
+HELP: /*
+{ $syntax "/* comment */" }
+{ $description "Provides C-like comments that can span multiple lines. One caveat is that " { $snippet "/*" } " and " { $snippet "*/" } " are still tokens and must not abut the comment text itself." }
+{ $example "USING: multiline ;"
+           "/* I think that I shall never see"
+           "   A poem lovely as a tree. */"
+           ""
+} ;
 
-HELP: parse-here
-{ $values { "str" "a string" } }
-{ $description "Parses a multiline string literal, as used by " { $link POSTPONE: STRING: } "." } ;
+{ POSTPONE: <" POSTPONE: STRING: } related-words
 
 HELP: parse-multiline-string
 { $values { "end-text" "a string delineating the end" } { "str" "the parsed string" } }
-{ $description "Parses a multiline string literal, as used by " { $link POSTPONE: <" } ". The end-text is the delimiter for the end." } ;
+{ $description "Parses the input stream until the " { $snippet "end-text" } " is reached and returns the parsed text as a string." }
+{ $notes "Used to implement " { $link POSTPONE: /* } " and " { $link POSTPONE: <" } "." } ;
 
-{ parse-here parse-multiline-string } related-words
+ARTICLE: "multiline" "Multiline"
+"Multiline strings:"
+{ $subsection POSTPONE: STRING: }
+{ $subsection POSTPONE: <" }
+"Multiline comments:"
+{ $subsection POSTPONE: /* }
+"Writing new multiline parsing words:"
+{ $subsection parse-multiline-string }
+;
+
+ABOUT: "multiline"
