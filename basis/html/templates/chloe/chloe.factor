@@ -3,7 +3,7 @@
 USING: accessors kernel sequences combinators kernel namespaces
 classes.tuple assocs splitting words arrays memoize
 io io.files io.encodings.utf8 io.streams.string
-unicode.case tuple-syntax mirrors fry math urls present
+unicode.case mirrors fry math urls present
 multiline xml xml.data xml.writer xml.utilities
 html.forms
 html.elements

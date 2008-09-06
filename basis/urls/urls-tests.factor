@@ -1,7 +1,6 @@
 IN: urls.tests
 USING: urls urls.private tools.test
-tuple-syntax arrays kernel assocs
-present accessors ;
+arrays kernel assocs present accessors ;
 
 [ "hello%20world" ] [ "hello world" url-encode ] unit-test
 [ "hello world" ] [ "hello%20world" url-decode ] unit-test
@@ -30,78 +29,78 @@ present accessors ;
 : urls
     {
         {
-            TUPLE{ url
-                protocol: "http"
-                host: "www.apple.com"
-                port: 1234
-                path: "/a/path"
-                query: H{ { "a" "b" } }
-                anchor: "foo"
+            T{ url
+                { protocol "http" }
+                { host "www.apple.com" }
+                { port 1234 }
+                { path "/a/path" }
+                { query H{ { "a" "b" } } }
+                { anchor "foo" }
             }
             "http://www.apple.com:1234/a/path?a=b#foo"
         }
         {
-            TUPLE{ url
-                protocol: "http"
-                host: "www.apple.com"
-                path: "/a/path"
-                query: H{ { "a" "b" } }
-                anchor: "foo"
+            T{ url
+                { protocol "http" }
+                { host "www.apple.com" }
+                { path "/a/path" }
+                { query H{ { "a" "b" } } }
+                { anchor "foo" }
             }
             "http://www.apple.com/a/path?a=b#foo"
         }
         {
-            TUPLE{ url
-                protocol: "http"
-                host: "www.apple.com"
-                port: 1234
-                path: "/another/fine/path"
-                anchor: "foo"
+            T{ url
+                { protocol "http" }
+                { host "www.apple.com" }
+                { port 1234 }
+                { path "/another/fine/path" }
+                { anchor "foo" }
             }
             "http://www.apple.com:1234/another/fine/path#foo"
         }
         {
-            TUPLE{ url
-                path: "/a/relative/path"
-                anchor: "foo"
+            T{ url
+                { path "/a/relative/path" }
+                { anchor "foo" }
             }
             "/a/relative/path#foo"
         }
         {
-            TUPLE{ url
-                path: "/a/relative/path"
+            T{ url
+                { path "/a/relative/path" }
             }
             "/a/relative/path"
         }
         {
-            TUPLE{ url
-                path: "a/relative/path"
+            T{ url
+                { path "a/relative/path" }
             }
             "a/relative/path"
         }
         {
-            TUPLE{ url
-                path: "bar"
-                query: H{ { "a" "b" } }
+            T{ url
+                { path "bar" }
+                { query H{ { "a" "b" } } }
             }
             "bar?a=b"
         }
         {
-            TUPLE{ url
-                protocol: "ftp"
-                host: "ftp.kernel.org"
-                username: "slava"
-                path: "/"
+            T{ url
+                { protocol "ftp" }
+                { host "ftp.kernel.org" }
+                { username "slava" }
+                { path "/" }
             }
             "ftp://slava@ftp.kernel.org/"
         }
         {
-            TUPLE{ url
-                protocol: "ftp"
-                host: "ftp.kernel.org"
-                username: "slava"
-                password: "secret"
-                path: "/"
+            T{ url
+                { protocol "ftp" }
+                { host "ftp.kernel.org" }
+                { username "slava" }
+                { password "secret" }
+                { path "/" }
             }
             "ftp://slava:secret@ftp.kernel.org/"
         }
@@ -128,94 +127,94 @@ urls [
 [ "/xxx/bar" ] [ "/xxx/baz" "bar" url-append-path ] unit-test
 
 [
-    TUPLE{ url
-        protocol: "http"
-        host: "www.apple.com"
-        port: 1234
-        path: "/a/path"
+    T{ url
+        { protocol "http" }
+        { host "www.apple.com" }
+        { port 1234 }
+        { path "/a/path" }
     }
 ] [
-    TUPLE{ url
-        protocol: "http"
-        host: "www.apple.com"
-        port: 1234
-        path: "/foo"
+    T{ url
+        { protocol "http" }
+        { host "www.apple.com" }
+        { port 1234 }
+        { path "/foo" }
     }
 
-    TUPLE{ url
-        path: "/a/path"
+    T{ url
+        { path "/a/path" }
     }
 
     derive-url
 ] unit-test
 
 [
-    TUPLE{ url
-        protocol: "http"
-        host: "www.apple.com"
-        port: 1234
-        path: "/a/path/relative/path"
-        query: H{ { "a" "b" } }
-        anchor: "foo"
+    T{ url
+        { protocol "http" }
+        { host "www.apple.com" }
+        { port 1234 }
+        { path "/a/path/relative/path" }
+        { query H{ { "a" "b" } } }
+        { anchor "foo" }
     }
 ] [
-    TUPLE{ url
-        protocol: "http"
-        host: "www.apple.com"
-        port: 1234
-        path: "/a/path/"
+    T{ url
+        { protocol "http" }
+        { host "www.apple.com" }
+        { port 1234 }
+        { path "/a/path/" }
     }
 
-    TUPLE{ url
-        path: "relative/path"
-        query: H{ { "a" "b" } }
-        anchor: "foo"
+    T{ url
+        { path "relative/path" }
+        { query H{ { "a" "b" } } }
+        { anchor "foo" }
     }
 
     derive-url
 ] unit-test
 
 [
-    TUPLE{ url
-        protocol: "http"
-        host: "www.apple.com"
-        port: 1234
-        path: "/a/path/relative/path"
-        query: H{ { "a" "b" } }
-        anchor: "foo"
+    T{ url
+        { protocol "http" }
+        { host "www.apple.com" }
+        { port 1234 }
+        { path "/a/path/relative/path" }
+        { query H{ { "a" "b" } } }
+        { anchor "foo" }
     }
 ] [
-    TUPLE{ url
-        protocol: "http"
-        host: "www.apple.com"
-        port: 1234
-        path: "/a/path/"
+    T{ url
+        { protocol "http" }
+        { host "www.apple.com" }
+        { port 1234 }
+        { path "/a/path/" }
     }
 
-    TUPLE{ url
-        path: "relative/path"
-        query: H{ { "a" "b" } }
-        anchor: "foo"
+    T{ url
+        { path "relative/path" }
+        { query H{ { "a" "b" } } }
+        { anchor "foo" }
     }
 
     derive-url
 ] unit-test
 
 [
-    TUPLE{ url
-        protocol: "http"
-        host: "www.apple.com"
-        path: "/xxx/baz"
+    T{ url
+        { protocol "http" }
+        { host "www.apple.com" }
+        { path "/xxx/baz" }
     }
 ] [
-    TUPLE{ url
-        protocol: "http"
-        host: "www.apple.com"
-        path: "/xxx/bar"
+    T{ url
+        { protocol "http" }
+        { host "www.apple.com" }
+        { path "/xxx/bar" }
     }
 
-    TUPLE{ url
-        path: "baz"
+    T{ url
+        { path "baz" }
     }
 
     derive-url
