@@ -426,6 +426,15 @@ PRIVATE>
 : filter ( seq quot -- subseq )
     over >r pusher >r each r> r> like ; inline
 
+: push-either ( elt quot accum1 accum2 -- )
+    >r >r keep swap r> r> ? push ; inline
+
+: 2pusher ( quot -- quot accum1 accum2 )
+    V{ } clone V{ } clone [ [ push-either ] 3curry ] 2keep ; inline
+
+: partition ( seq quot -- trueseq falseseq )
+    over >r 2pusher >r >r each r> r> r> tuck [ like ] 2bi@ ; inline
+
 : monotonic? ( seq quot -- ? )
     >r dup length 1- swap r> (monotonic) all? ; inline
 
