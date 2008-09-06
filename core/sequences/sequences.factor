@@ -763,7 +763,7 @@ PRIVATE>
     over [ trim-right-slice ] dip like ; inline
 
 : trim-slice ( seq quot -- slice )
-    [ trim-left-slice ] [ trim-right-slice ] bi ;
+    [ trim-left-slice ] [ trim-right-slice ] bi ; inline
 
 : trim ( seq quot -- newseq )
     over [ trim-slice ] dip like ; inline

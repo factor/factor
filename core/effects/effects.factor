@@ -67,6 +67,3 @@ M: effect clone
 
 : shuffle* ( stack shuffle -- newstack )
     [ [ load-shuffle ] keep shuffled-values ] with-scope ;
-
-: shuffle ( stack shuffle -- newstack )
-    [ split-shuffle ] keep shuffle* append ;
