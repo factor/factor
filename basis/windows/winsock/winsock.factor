@@ -2,7 +2,7 @@
 
 USING: alien alien.c-types alien.strings alien.syntax arrays
 byte-arrays kernel math sequences windows.types windows.kernel32
-windows.errors structs windows math.bitfields alias ;
+windows.errors structs windows math.bitwise alias ;
 IN: windows.winsock
 
 USE: libc

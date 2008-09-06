@@ -19,7 +19,7 @@ M: gesture-logger handle-gesture
     t ;
 
 M: gesture-logger user-input*
-    gesture-logger-stream [
+    stream>> [
         "User input: " write print
     ] with-output-stream* t ;
 

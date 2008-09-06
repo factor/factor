@@ -1,13 +1,12 @@
-IN: models.tests
 USING: arrays generic kernel math models models.compose
-namespaces sequences assocs
-tools.test ;
+namespaces sequences assocs accessors tools.test ;
+IN: models.tests
 
 TUPLE: model-tester hit? ;
 
 : <model-tester> model-tester new ;
 
-M: model-tester model-changed nip t swap set-model-tester-hit? ;
+M: model-tester model-changed nip t >>hit? drop ;
 
 [ T{ model-tester f t } ]
 [
@@ -20,7 +19,7 @@ M: model-tester model-changed nip t swap set-model-tester-hit? ;
 "model-a" get "model-b" get 2array <compose> "model-c" set
 
 "model-c" get activate-model
-[ { 3 4 } ] [ "model-c" get model-value  ] unit-test
+[ { 3 4 } ] [ "model-c" get value>>  ] unit-test
 "model-c" get deactivate-model
 
 T{ model-tester f f } "tester" set
@@ -30,5 +29,5 @@ T{ model-tester f f } "tester" set
     "tester" get "model-c" get add-connection
     6 "model-a" get set-model
     "tester" get
-    "model-c" get model-value
+    "model-c" get value>>
 ] unit-test

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types libc destructors locals
 kernel math assocs namespaces continuations sequences hashtables
-sorting arrays combinators math.bitfields strings system
+sorting arrays combinators math.bitwise strings system
 accessors threads splitting
 io.backend io.windows io.windows.nt.backend io.windows.nt.files
 io.monitors io.ports io.buffers io.files io.timeouts io

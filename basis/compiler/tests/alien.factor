@@ -84,6 +84,13 @@ FUNCTION: tiny ffi_test_17 int x ;
 
 [ 3 ] [ "ffi_test_1" f dlsym indirect-test-1 ] unit-test
 
+: indirect-test-1' ( ptr -- )
+    "int" { } "cdecl" alien-indirect drop ;
+
+{ 1 0 } [ indirect-test-1' ] must-infer-as
+
+[ ] [ "ffi_test_1" f dlsym indirect-test-1' ] unit-test
+
 [ -1 indirect-test-1 ] must-fail
 
 : indirect-test-2 ( x y ptr -- result )
@@ -102,7 +109,7 @@ unit-test
 << "f-stdcall" f "stdcall" add-library >>
 
 [ f ] [ "f-stdcall" load-library ] unit-test
-[ "stdcall" ] [ "f-stdcall" library library-abi ] unit-test
+[ "stdcall" ] [ "f-stdcall" library abi>> ] unit-test
 
 : ffi_test_18 ( w x y z -- int )
     "int" "f-stdcall" "ffi_test_18" { "int" "int" "int" "int" }

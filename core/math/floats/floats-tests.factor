@@ -5,10 +5,17 @@ IN: math.floats.tests
 [ t ] [ 3.1415 number? ] unit-test
 [ f ] [ 12 float? ] unit-test
 
-[ t ] [ 1 1.0 = ] unit-test
-[ t ] [ 1 >bignum 1.0 = ] unit-test
-[ t ] [ 1.0 1 = ] unit-test
-[ t ] [ 1.0 1 >bignum = ] unit-test
+[ f ] [ 1 1.0 = ] unit-test
+[ t ] [ 1 1.0 number= ] unit-test
+
+[ f ] [ 1 >bignum 1.0 = ] unit-test
+[ t ] [ 1 >bignum 1.0 number= ] unit-test
+
+[ f ] [ 1.0 1 = ] unit-test
+[ t ] [ 1.0 1 number= ] unit-test
+
+[ f ] [ 1.0 1 >bignum = ] unit-test
+[ t ] [ 1.0 1 >bignum number= ] unit-test
 
 [ f ] [ 1 1.3 = ] unit-test
 [ f ] [ 1 >bignum 1.3 = ] unit-test
@@ -45,13 +52,10 @@ unit-test
 [ 2.0 ] [ 1.0 1+ ] unit-test
 [ 0.0 ] [ 1.0 1- ] unit-test
 
-! [ t ] [ -0.0 -0.0 = ] unit-test
-! [ f ] [ 0.0 -0.0 = ] unit-test
-
 [ t ] [ 0.0 zero? ] unit-test
 [ t ] [ -0.0 zero? ] unit-test
 
-! [ t ] [ 0.0/0.0 0.0/0.0 = ] unit-test
+! [ f ] [ 0.0/0.0 0.0/0.0 number= ] unit-test
 
 [ 0 ] [ 1/0. >bignum ] unit-test
 

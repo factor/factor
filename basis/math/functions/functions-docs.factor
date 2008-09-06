@@ -106,7 +106,7 @@ HELP: (rect>)
 
 HELP: rect>
 { $values { "x" real } { "y" real } { "z" number } }
-{ $description "Creates a complex number from real and imaginary components." } ;
+{ $description "Creates a complex number from real and imaginary components. If " { $snippet "z" } " is an integer zero, this will simply output " { $snippet "x" } "." } ;
 
 HELP: >rect
 { $values { "z" number } { "x" real } { "y" real } }

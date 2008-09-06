@@ -1,10 +1,10 @@
 IN: compiler.tests
 USING: compiler tools.test namespaces sequences
 kernel.private kernel math continuations continuations.private
-words splitting grouping sorting ;
+words splitting grouping sorting accessors ;
 
 : symbolic-stack-trace ( -- newseq )
-    error-continuation get continuation-call callstack>array
+    error-continuation get call>> callstack>array
     2 group flip first ;
 
 : foo ( -- * ) 3 throw 7 ;

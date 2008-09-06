@@ -1,6 +1,6 @@
-USING: definitions help help.topics help.crossref help.markup
-help.syntax kernel sequences tools.test words parser namespaces
-assocs source-files eval ;
+USING: accessors definitions help help.topics help.crossref
+help.markup help.syntax kernel sequences tools.test words parser
+namespaces assocs source-files eval ;
 IN: help.topics.tests
 
 \ article-name must-infer
@@ -16,7 +16,7 @@ IN: help.topics.tests
 
 SYMBOL: foo
 
-[ ] [ { "test" "a" } "Test A" { { $subsection foo } } <article> add-article ] unit-test
+[ ] [ "Test A" { { $subsection foo } } <article> { "test" "a" } add-article ] unit-test
 
 ! Test article location recording
 

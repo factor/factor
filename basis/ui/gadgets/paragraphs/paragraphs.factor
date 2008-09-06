@@ -69,4 +69,4 @@ M: paragraph pref-dim*
     [ 2drop ] do-wrap ;
 
 M: paragraph layout*
-    [ swap dup prefer set-rect-loc ] do-wrap drop ;
+    [ swap dup prefer (>>loc) ] do-wrap drop ;

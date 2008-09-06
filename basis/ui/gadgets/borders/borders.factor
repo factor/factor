@@ -41,7 +41,7 @@ M: border pref-dim*
 
 M: border layout*
     dup border-child-rect swap gadget-child
-    over loc>> over set-rect-loc
+    over loc>> >>loc
     swap dim>> swap (>>dim) ;
 
 M: border focusable-child*

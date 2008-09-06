@@ -229,10 +229,6 @@ M: float detect-float ;
     \ detect-float inlined?
 ] unit-test
 
-[ t ] [
-    [ 3 + = ] \ equal? inlined?
-] unit-test
-
 [ f ] [
     [ { fixnum fixnum } declare 7 bitand neg shift ]
     \ fixnum-shift-fast inlined?

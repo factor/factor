@@ -10,7 +10,7 @@ IN: color-picker
 ! Simple example demonstrating the use of models.
 
 : <color-slider> ( model -- gadget )
-    <x-slider> 1 over set-slider-line ;
+    <x-slider> 1 >>line ;
 
 TUPLE: color-preview < gadget ;
 
@@ -20,7 +20,7 @@ TUPLE: color-preview < gadget ;
       { 100 100 } >>dim ;
 
 M: color-preview model-changed
-    swap model-value over set-gadget-interior relayout-1 ;
+    swap value>> >>interior relayout-1 ;
 
 : <color-model> ( model -- model )
     [ [ 256 /f ] map 1 suffix first4 rgba boa <solid> ] <filter> ;

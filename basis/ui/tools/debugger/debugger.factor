@@ -11,7 +11,7 @@ USING: accessors arrays ui ui.commands ui.gestures ui.gadgets
 IN: ui.tools.debugger
 
 : <restart-list> ( restarts restart-hook -- gadget )
-    [ restart-name ] rot <model> <list> ;
+    [ name>> ] rot <model> <list> ;
 
 TUPLE: debugger < track restarts ;
 
@@ -29,7 +29,7 @@ TUPLE: debugger < track restarts ;
         -rot <restart-list> >>restarts
         dup restarts>> rot <debugger-display> <scroller> 1 track-add ;
 
-M: debugger focusable-child* debugger-restarts ;
+M: debugger focusable-child* restarts>> ;
 
 : debugger-window ( error -- )
     #! No restarts for the debugger window

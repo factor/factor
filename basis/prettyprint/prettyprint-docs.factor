@@ -26,7 +26,8 @@ ARTICLE: "prettyprint-variables" "Prettyprint control variables"
 { $subsection nesting-limit }
 { $subsection length-limit }
 { $subsection line-limit }
-{ $subsection string-limit }
+{ $subsection string-limit? }
+{ $subsection boa-tuples? }
 "Note that the " { $link short. } " and " { $link pprint-short } " variables override some of these variables."
 {
     $warning "Treat the global variables as essentially being constants. Only ever rebind them in a nested scope."
@@ -86,7 +87,7 @@ $nl
 { $subsection "prettyprint-section-protocol" } ;
 
 ARTICLE: "prettyprint-literal" "Literal prettyprinting protocol"
-"Unless a more specialized method exists for the input class, the " { $link pprint* } " word outputs an object in a standard format, ultimately calling two generic words:"
+"Most custom data types have a literal syntax which resembles a sequence. An easy way to define such a syntax is to add a method to the " { $link pprint* } " generic word which calls " { $link pprint-object } ", and then to provide methods on two other generic words:"
 { $subsection pprint-delims }
 { $subsection >pprint-sequence }
 "For example, consider the following data type, together with a parsing word for creating literals:"
@@ -104,10 +105,11 @@ ARTICLE: "prettyprint-literal" "Literal prettyprinting protocol"
 { $code "RECT[ 100 * 200 ]" }
 "Without further effort, the literal does not print in the same way:"
 { $unchecked-example "RECT[ 100 * 200 ] ." "T{ rect f 100 200 }" }
-"However, we can define two methods easily enough:"
+"However, we can define three methods easily enough:"
 { $code
     "M: rect pprint-delims drop \\ RECT[ \\ ] ;"
     "M: rect >pprint-sequence dup rect-w \\ * rot rect-h 3array ;"
+    "M: rect pprint* pprint-object ;"
 }
 "Now, it will be printed in a custom way:"
 { $unchecked-example "RECT[ 100 * 200 ] ." "RECT[ 100 * 200 ]" } ;

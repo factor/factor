@@ -6,7 +6,7 @@ windows.types math windows.kernel32
 namespaces io.launcher kernel sequences windows.errors
 splitting system threads init strings combinators
 io.backend accessors concurrency.flags io.files assocs
-io.files.private windows destructors classes.tuple.lib ;
+io.files.private windows destructors ;
 IN: io.windows.launcher
 
 TUPLE: CreateProcess-args
@@ -30,7 +30,19 @@ TUPLE: CreateProcess-args
     0 >>dwCreateFlags ;
 
 : call-CreateProcess ( CreateProcess-args -- )
-    CreateProcess-args >tuple< CreateProcess win32-error=0/f ;
+    {
+        [ lpApplicationName>> ]
+        [ lpCommandLine>> ]
+        [ lpProcessAttributes>> ]
+        [ lpThreadAttributes>> ]
+        [ bInheritHandles>> ]
+        [ dwCreateFlags>> ]
+        [ lpEnvironment>> ]
+        [ lpCurrentDirectory>> ]
+        [ lpStartupInfo>> ]
+        [ lpProcessInformation>> ]
+    } cleave
+    CreateProcess win32-error=0/f ;
 
 : count-trailing-backslashes ( str n -- str n )
     >r "\\" ?tail r> swap [
@@ -139,13 +151,13 @@ M: windows kill-process* ( handle -- )
     swap win32-error=0/f ;
 
 : process-exited ( process -- )
-    dup process-handle exit-code
-    over process-handle dispose-process
+    dup handle>> exit-code
+    over handle>> dispose-process
     notify-exit ;
 
 M: windows wait-for-processes ( -- ? )
     processes get keys dup
-    [ process-handle PROCESS_INFORMATION-hProcess ] map
+    [ handle>> PROCESS_INFORMATION-hProcess ] map
     dup length swap >c-void*-array 0 0
     WaitForMultipleObjects
     dup HEX: ffffffff = [ win32-error ] when

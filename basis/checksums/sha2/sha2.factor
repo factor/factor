@@ -1,6 +1,8 @@
-USING: crypto.common kernel splitting grouping
-math sequences namespaces io.binary symbols
-math.bitfields.lib checksums ;
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
+USING: kernel splitting grouping math sequences namespaces
+io.binary symbols math.bitwise checksums checksums.common
+sbufs strings ;
 IN: checksums.sha2
 
 <PRIVATE
@@ -81,6 +83,8 @@ SYMBOLS: vars M K H S0 S1 process-M word-size block-size ;
     [ -11 bitroll-32 ] keep
     -25 bitroll-32 bitxor bitxor ; inline
 
+: slice3 ( n seq -- a b c ) >r dup 3 + r> <slice> first3 ; inline
+
 : T1 ( W n -- T1 )
     [ swap nth ] keep
     K get nth +
@@ -111,6 +115,15 @@ SYMBOLS: vars M K H S0 S1 process-M word-size block-size ;
 
 : seq>byte-array ( n seq -- string )
     [ swap [ >be % ] curry each ] B{ } make ;
+
+: preprocess-plaintext ( string big-endian? -- padded-string )
+    #! pad 0x80 then 00 til 8 bytes left, then 64bit length in bits
+    >r >sbuf r> over [
+        HEX: 80 ,
+        dup length HEX: 3f bitand
+        calculate-pad-length 0 <string> %
+        length 3 shift 8 rot [ >be ] [ >le ] if %
+    ] "" make over push-all ;
 
 : byte-array>sha2 ( byte-array -- string )
     t preprocess-plaintext

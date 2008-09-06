@@ -28,8 +28,10 @@ $nl
 $nl
 "Classes themselves form a class:"
 { $subsection class? }
-"You can ask an object for its class:"
+"You can ask an object for its class or superclass:"
 { $subsection class }
+{ $subsection superclass }
+{ $subsection superclasses }
 "Testing if an object is an instance of a class:"
 { $subsection instance? }
 "Class predicates can be used to test instances directly:"
@@ -79,7 +81,27 @@ $low-level-note ;
 
 HELP: superclass
 { $values { "class" class } { "super" class } }
-{ $description "Outputs the superclass of a class. All instances of this class are also instances of the superclass." } ;
+{ $description "Outputs the superclass of a class. All instances of this class are also instances of the superclass." }
+{ $examples 
+    { $example "USING: classes prettyprint ;"
+               "t superclass ."
+               "word"
+    }
+} ;
+
+HELP: superclasses
+{ $values
+     { "class" class }
+     { "supers" sequence } }
+{ $description "Outputs a sequence of superclasses of a class along with the class itself." }
+{ $examples 
+    { $example "USING: classes prettyprint ;"
+               "t superclasses ."
+               "{ word t }"
+    }
+} ;
+
+{ superclass superclasses } related-words
 
 HELP: members
 { $values { "class" class } { "seq" "a sequence of union members, or " { $link f } } }
@@ -97,3 +119,9 @@ $low-level-note ;
 HELP: implementors
 { $values { "class/classes" "a class or a sequence of classes" } { "seq" "a sequence of generic words" } }
 { $description "Finds all generic words in the dictionary implementing methods for the given set of classes." } ;
+
+HELP: instance?
+{ $values
+     { "object" object } { "class" class }
+     { "?" "a boolean" } }
+{ $description "Tests whether the input object is a member of the class." } ;

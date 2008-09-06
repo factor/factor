@@ -31,7 +31,7 @@ M: nehe4-gadget draw-gadget* ( gadget -- )
   GL_COLOR_BUFFER_BIT GL_DEPTH_BUFFER_BIT bitor glClear
   glLoadIdentity
   -1.5 0.0 -6.0 glTranslatef
-  dup nehe4-gadget-rtri 0.0 1.0 0.0 glRotatef
+  dup rtri>> 0.0 1.0 0.0 glRotatef
 
   GL_TRIANGLES [
     1.0 0.0 0.0 glColor3f
@@ -45,7 +45,7 @@ M: nehe4-gadget draw-gadget* ( gadget -- )
   glLoadIdentity
 
   1.5 0.0 -6.0 glTranslatef
-  dup nehe4-gadget-rquad 1.0 0.0 0.0 glRotatef
+  dup rquad>> 1.0 0.0 0.0 glRotatef
   0.5 0.5 1.0 glColor3f
   GL_QUADS [
     -1.0 1.0 0.0 glVertex3f

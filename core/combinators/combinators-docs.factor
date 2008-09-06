@@ -16,6 +16,10 @@ $nl
 { $subsection while }
 "Generalization of " { $link bi } " and " { $link tri } ":"
 { $subsection cleave }
+"Generalization of " { $link 2bi } " and " { $link 2tri } ":"
+{ $subsection 2cleave }
+"Generalization of " { $link 3bi } " and " { $link 3tri }  ":"
+{ $subsection 3cleave }
 "Generalization of " { $link bi* } " and " { $link tri* } ":"
 { $subsection spread }
 "Two combinators which abstract out nested chains of " { $link if } ":"
@@ -49,6 +53,16 @@ HELP: cleave
         "[ p ] keep [ q ] keep [ r ] keep s"
     }
 } ;
+
+HELP: 2cleave
+{ $values { "x" object } { "y" object }
+          { "seq" "a sequence of quotations with stack effect " { $snippet "( x y -- ... )" } } }
+{ $description "Applies each quotation to the two objects in turn." } ;
+
+HELP: 3cleave
+{ $values { "x" object } { "y" object } { "z" object }
+          { "seq" "a sequence of quotations with stack effect " { $snippet "( x y z -- ... )" } } }
+{ $description "Applies each quotation to the three objects in turn." } ;
 
 { bi tri cleave } related-words
 

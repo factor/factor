@@ -284,10 +284,31 @@ HELP: C{
 
 HELP: T{
 { $syntax "T{ class slots... }" }
-{ $values { "class" "a tuple class word" } { "slots" "list of objects" } }
-{ $description "Marks the beginning of a literal tuple. Literal tuples are terminated by " { $link POSTPONE: } } "."
+{ $values { "class" "a tuple class word" } { "slots" "slot values" } }
+{ $description "Marks the beginning of a literal tuple."
 $nl
-"The class word must always be specified. If an insufficient number of values is given after the class word, the remaining slots of the tuple are set to " { $link f } ". If too many values are given, they are ignored." } ;
+"Three literal syntax forms are recognized:"
+{ $list
+    { "empty tuple form: if no slot values are specified, then the literal tuple will have all slots set to their initial values (see " { $link "slot-initial-values" } ")." }
+    { "BOA-form: if the first element of " { $snippet "slots" } " is " { $snippet "f" } ", then the remaining elements are slot values corresponding to slots in the order in which they are defined in the " { $link POSTPONE: TUPLE: } " form." }
+    { "assoc-form: otherwise, " { $snippet "slots" } " is interpreted as a sequence of " { $snippet "{ slot-name value }" } " pairs. The " { $snippet "slot-name" } " should not be quoted." }
+}
+"BOA form is more concise, whereas assoc form is more readable for larger tuples with many slots, or if only a few slots are to be specified."
+$nl
+"With BOA form, specifying an insufficient number of values is given after the class word, the remaining slots of the tuple are set to their initial values (see " { $link "slot-initial-values" } "). If too many values are given, an error will be raised." }
+{ $examples
+"An empty tuple; since vectors have their own literal syntax, the above is equivalent to " { $snippet "V{ }" } ""
+{ $code "T{ vector }" }
+"A BOA-form tuple:"
+{ $code
+    "USE: colors"
+    "T{ rgba f 1.0 0.0 0.5 }"
+}
+"An assoc-form tuple equal to the above:"
+{ $code
+    "USE: colors"
+    "T{ rgba { red 1.0 } { green 0.0 } { blue 0.5 } }"
+} } ;
 
 HELP: W{
 { $syntax "W{ object }" }
@@ -390,7 +411,7 @@ HELP: P"
 { $syntax "P\" pathname\"" }
 { $values { "pathname" "a pathname string" } }
 { $description "Reads from the input string until the next occurrence of " { $link POSTPONE: " } ", creates a new " { $link pathname } ", and appends it to the parse tree." }
-{ $examples { $example "USING: io io.files ;" "P\" foo.txt\" pathname-string print" "foo.txt" } } ;
+{ $examples { $example "USING: accessors io io.files ;" "P\" foo.txt\" string>> print" "foo.txt" } } ;
 
 HELP: (
 { $syntax "( inputs -- outputs )" }

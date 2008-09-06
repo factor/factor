@@ -3,6 +3,9 @@ sequences.private strings sbufs tools.test vectors
 generic vocabs.loader ;
 IN: sequences.tests
 
+[ "empty" ] [ { } [ "empty" ] [ "not empty" ] if-empty ] unit-test
+[ { 1 } "not empty" ] [ { 1 } [ "empty" ] [ "not empty" ] if-empty ] unit-test
+
 [ V{ 1 2 3 4 } ] [ 1 5 dup <slice> >vector ] unit-test
 [ 3 ] [ 1 4 dup <slice> length ] unit-test
 [ 2 ] [ 1 3 { 1 2 3 4 } <slice> length ] unit-test
@@ -69,7 +72,7 @@ unit-test
 [ f ] [ [ { 2 } { } { } ] all-equal? ] unit-test
 [ t ] [ [ ] all-equal? ] unit-test
 [ t ] [ [ 1234 ] all-equal? ] unit-test
-[ t ] [ [ 1.0 1 1 ] all-equal? ] unit-test
+[ f ] [ [ 1.0 1 1 ] all-equal? ] unit-test
 [ t ] [ { 1 2 3 4 } [ < ] monotonic? ] unit-test
 [ f ] [ { 1 2 3 4 } [ > ] monotonic? ] unit-test
 [ [ 2 3 4 ] ] [ [ 1 2 3 ] 1 [ + ] curry map ] unit-test
@@ -234,13 +237,13 @@ unit-test
 
 [ -1./0. 0 delete-nth ] must-fail
 [ "" ] [ "" [ CHAR: \s = ] trim ] unit-test
-[ "" ] [ "" [ CHAR: \s = ] left-trim ] unit-test
-[ "" ] [ "" [ CHAR: \s = ] right-trim ] unit-test
-[ "" ] [ "  " [ CHAR: \s = ] left-trim ] unit-test
-[ "" ] [ "  " [ CHAR: \s = ] right-trim ] unit-test
+[ "" ] [ "" [ CHAR: \s = ] trim-left ] unit-test
+[ "" ] [ "" [ CHAR: \s = ] trim-right ] unit-test
+[ "" ] [ "  " [ CHAR: \s = ] trim-left ] unit-test
+[ "" ] [ "  " [ CHAR: \s = ] trim-right ] unit-test
 [ "asdf" ] [ " asdf " [ CHAR: \s = ] trim ] unit-test
-[ "asdf " ] [ " asdf " [ CHAR: \s = ] left-trim ] unit-test
-[ " asdf" ] [ " asdf " [ CHAR: \s = ] right-trim ] unit-test
+[ "asdf " ] [ " asdf " [ CHAR: \s = ] trim-left ] unit-test
+[ " asdf" ] [ " asdf " [ CHAR: \s = ] trim-right ] unit-test
 
 [ 328350 ] [ 100 [ sq ] sigma ] unit-test
 
@@ -251,3 +254,15 @@ unit-test
 [ { "a" "b" "c" "d" } ] [ { "a" "b" "c" "d" } { 0 1 2 3 } nths ] unit-test
 [ { "d" "c" "b" "a" } ] [ { "a" "b" "c" "d" } { 3 2 1 0 } nths ] unit-test
 [ { "d" "a" "b" "c" } ] [ { "a" "b" "c" "d" } { 3 0 1 2 } nths ] unit-test
+
+TUPLE: bogus-hashcode ;
+
+M: bogus-hashcode hashcode* 2drop 0 >bignum ;
+
+[ 0 ] [ { T{ bogus-hashcode } } hashcode ] unit-test
+
+[ { 2 4 6 } { 1 3 5 7 } ] [ { 1 2 3 4 5 6 7 } [ even? ] partition ] unit-test
+
+[ { 1 3 7 } ] [ 2 { 1 3 5 7 } remove-nth ] unit-test
+
+[ { 1 3 "X" 5 7 } ] [ "X" 2 { 1 3 5 7 } insert-nth ] unit-test

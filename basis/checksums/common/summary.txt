@@ -1,0 +1,1 @@
+Some code shared by MD5, SHA1 and SHA2 implementations

@@ -47,11 +47,11 @@ HOOK: (file-appender) io-backend ( path -- stream )
 
 : path-separator ( -- string ) os windows? "\\" "/" ? ;
 
-: right-trim-separators ( str -- newstr )
-    [ path-separator? ] right-trim ;
+: trim-right-separators ( str -- newstr )
+    [ path-separator? ] trim-right ;
 
-: left-trim-separators ( str -- newstr )
-    [ path-separator? ] left-trim ;
+: trim-left-separators ( str -- newstr )
+    [ path-separator? ] trim-left ;
 
 : last-path-separator ( path -- n ? )
     [ length 1- ] keep [ path-separator? ] find-last-from ;
@@ -65,7 +65,7 @@ ERROR: no-parent-directory path ;
 
 : parent-directory ( path -- parent )
     dup root-directory? [
-        right-trim-separators
+        trim-right-separators
         dup last-path-separator [
             1+ cut
         ] [
@@ -92,7 +92,7 @@ ERROR: no-parent-directory path ;
 : append-path-empty ( path1 path2 -- path' )
     {
         { [ dup head.? ] [
-            rest left-trim-separators append-path-empty
+            rest trim-left-separators append-path-empty
         ] }
         { [ dup head..? ] [ drop no-parent-directory ] }
         [ nip ]
@@ -121,19 +121,19 @@ PRIVATE>
     {
         { [ over empty? ] [ append-path-empty ] }
         { [ dup empty? ] [ drop ] }
-        { [ over right-trim-separators "." = ] [ nip ] }
+        { [ over trim-right-separators "." = ] [ nip ] }
         { [ dup absolute-path? ] [ nip ] }
-        { [ dup head.? ] [ rest left-trim-separators append-path ] }
+        { [ dup head.? ] [ rest trim-left-separators append-path ] }
         { [ dup head..? ] [
-            2 tail left-trim-separators
+            2 tail trim-left-separators
             >r parent-directory r> append-path
         ] }
         { [ over absolute-path? over first path-separator? and ] [
             >r 2 head r> append
         ] }
         [
-            >r right-trim-separators "/" r>
-            left-trim-separators 3append
+            >r trim-right-separators "/" r>
+            trim-left-separators 3append
         ]
     } cond ;
 
@@ -142,7 +142,7 @@ PRIVATE>
 
 : file-name ( path -- string )
     dup root-directory? [
-        right-trim-separators
+        trim-right-separators
         dup last-path-separator [ 1+ tail ] [
             drop "resource:" ?head [ file-name ] when
         ] if
@@ -200,7 +200,7 @@ SYMBOL: current-directory
 
 : (normalize-path) ( path -- path' )
     "resource:" ?head [
-        left-trim-separators resource-path
+        trim-left-separators resource-path
         (normalize-path)
     ] [
         current-directory get prepend-path
@@ -219,7 +219,7 @@ M: object normalize-path ( path -- path' )
 HOOK: make-directory io-backend ( path -- )
 
 : make-directories ( path -- )
-    normalize-path right-trim-separators {
+    normalize-path trim-right-separators {
         { [ dup "." = ] [ ] }
         { [ dup root-directory? ] [ ] }
         { [ dup empty? ] [ ] }

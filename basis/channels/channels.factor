@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! Channels - based on ideas from newsqueak
-USING: kernel sequences sequences.lib threads continuations
-random math accessors ;
+USING: kernel sequences threads continuations
+random math accessors random ;
 IN: channels
 
 TUPLE: channel receivers senders ;

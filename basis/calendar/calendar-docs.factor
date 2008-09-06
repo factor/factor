@@ -1,14 +1,14 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math strings help.markup help.syntax
-calendar.backend math.order ;
+math.order ;
 IN: calendar
 
 HELP: duration
-{ $description "A duration is a period of time years, months, days, hours, minutes, and seconds.  All duration slots can store " { $link real } " numbers. Compare two timestamps with the " { $link <=> } " word." } ;
+{ $description "A duration is a period of time years, months, days, hours, minutes, and seconds.  All duration slots can store " { $link real } " numbers. Compare two durations with the " { $link <=> } " word." } ;
 
 HELP: timestamp
-{ $description "A timestamp is a date and a time with a timezone offset.  Timestamp slots must store integers except for " { $snippet "seconds" } ", which stores reals, and " { $snippet "gmt-offset" } ", which stores a " { $link duration } ". Compare two timestamps with the " { $link <=> } " word." } ;
+{ $description "A timestamp is a date and a time with a timezone offset.  Timestamp slots must store integers except for " { $snippet "seconds" } ", which stores reals, and " { $snippet "gmt-offset" } ", which stores a " { $link duration } ". Compare two duarionts with the " { $link <=> } " word." } ;
 
 { timestamp duration } related-words
 
@@ -21,8 +21,8 @@ HELP: <date>
 { $description "Returns a timestamp object representing the start of the specified day in your current timezone." }
 { $examples
     { $example "USING: calendar prettyprint ;"
-               "12 25 2010 <date> ."
-                "T{ timestamp f 12 25 2010 0 0 0 T{ duration f 0 0 0 -5 0 0 } }"
+               "2010 12 25 <date> ."
+               "T{ timestamp\n    { year 2010 }\n    { month 12 }\n    { day 25 }\n    { gmt-offset T{ duration { hour -5 } } }\n}"
     }
 } ;
 
@@ -135,43 +135,37 @@ HELP: instant
 
 HELP: years
 { $values { "x" number } { "duration" duration } }
-{ $description } ;
-{ year years } related-words
+{ $description "Creates a duration object with the specified number of years." } ;
 
 HELP: months
 { $values { "x" number } { "duration" duration } }
-{ $description } ;
-{ month months } related-words
+{ $description "Creates a duration object with the specified number of months." } ;
 
 HELP: days
 { $values { "x" number } { "duration" duration } }
-{ $description } ;
-{ day days } related-words
+{ $description "Creates a duration object with the specified number of days." } ;
 
 HELP: weeks
 { $values { "x" number } { "duration" duration } }
-{ $description } ;
-{ week weeks } related-words
+{ $description "Creates a duration object with the specified number of weeks." } ;
 
 HELP: hours
 { $values { "x" number } { "duration" duration } }
-{ $description } ;
-{ hour hours } related-words
+{ $description "Creates a duration object with the specified number of hours." } ;
 
 HELP: minutes
 { $values { "x" number } { "duration" duration } }
-{ $description } ;
-{ minute minutes } related-words
+{ $description "Creates a duration object with the specified number of minutes." } ;
 
 HELP: seconds
 { $values { "x" number } { "duration" duration } }
-{ $description } ;
-{ second seconds } related-words
+{ $description "Creates a duration object with the specified number of seconds." } ;
 
 HELP: milliseconds
 { $values { "x" number } { "duration" duration } }
-{ $description } ;
-{ millisecond milliseconds } related-words
+{ $description "Creates a duration object with the specified number of milliseconds." } ;
+
+{ years months days hours minutes seconds milliseconds } related-words
 
 HELP: leap-year?
 { $values { "obj" object } { "?" "a boolean" } }
@@ -192,7 +186,7 @@ HELP: time+
 { $description "Adds two durations to produce a duration or adds a timestamp and a duration to produce a timestamp. The calculation takes timezones into account." }
 { $examples
     { $example "USING: calendar math.order prettyprint ;"
-               "10 months 2 months time+ 1 year <=> ."
+               "10 months 2 months time+ 1 years <=> ."
                "+eq+"
     }
     { $example "USING: accessors calendar math.order prettyprint ;"
@@ -201,3 +195,412 @@ HELP: time+
     }
 } ;
 
+HELP: duration>years
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in years." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "6 months duration>years ."
+               "1/2"
+    }
+} ;
+
+HELP: duration>months
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in months." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "30 days duration>months ."
+               "16000/16233"
+    }
+} ;
+
+HELP: duration>days
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in days." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "6 hours duration>days ."
+               "1/4"
+    }
+} ;
+
+HELP: duration>hours
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in hours." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "3/4 days duration>hours ."
+               "18"
+    }
+} ;
+HELP: duration>minutes
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in minutes." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "6 hours duration>minutes ."
+               "360"
+    }
+} ;
+HELP: duration>seconds
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in seconds." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "6 minutes duration>seconds ."
+               "360"
+    }
+} ;
+
+HELP: duration>milliseconds
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in milliseconds." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "6 seconds duration>milliseconds ."
+               "6000"
+    }
+} ;
+
+{ duration>years duration>months duration>days duration>hours duration>minutes duration>seconds duration>milliseconds } related-words
+
+
+HELP: time-
+{ $values { "time1" "timestamp or duration" } { "time2" "timestamp or duration" } { "time3" "timestamp or duration" } }
+{ $description "Subtracts two durations to produce a duration or subtracts a duration from a timestamp to produce a timestamp. The calculation takes timezones into account." }
+{ $examples
+    { $example "USING: calendar math.order prettyprint ;"
+               "10 months 2 months time- 8 months <=> ."
+               "+eq+"
+    }
+    { $example "USING: accessors calendar math.order prettyprint ;"
+               "2010 1 1 <date> 3 days time- day>> ."
+               "29"
+    }
+} ;
+
+HELP: convert-timezone
+{ $values { "timestamp" timestamp } { "duration" duration } { "timestamp" timestamp } }
+{ $description "Converts the " { $snippet "timestamp" } "'s " { $snippet "gmt-offset" } " to the GMT offset represented by the " { $snippet "duration" } "." }
+{ $examples
+    { $example "USING: accessors calendar prettyprint ;"
+               "gmt noon instant -5 >>hour convert-timezone gmt-offset>> hour>> ."
+               "-5"
+    }
+} ;
+
+HELP: >local-time
+{ $values { "timestamp" timestamp } { "timestamp" timestamp } }
+{ $description "Converts the " { $snippet "timestamp" } " to the timezone of your computer." }
+{ $examples
+    { $example "USING: accessors calendar kernel prettyprint ;"
+               "now gmt >local-time [ gmt-offset>> ] bi@ = ."
+               "t"
+    }
+} ;
+
+HELP: >gmt
+{ $values { "timestamp" timestamp } { "timestamp" timestamp } }
+{ $description "Converts the " { $snippet "timestamp" } " to the GMT timezone." }
+{ $examples
+    { $example "USING: accessors calendar kernel prettyprint ;"
+               "now >gmt gmt-offset>> hour>> ."
+               "0"
+    }
+} ;
+
+HELP: time*
+{ $values { "obj1" object } { "obj2" object } { "obj3" object } }
+{ $description "Multiplies each time slot of a timestamp or duration by a number and make a new duration from the result.  Used in the implementation of " { $link before } "." } ;
+{ time+ time- time* } related-words
+
+HELP: before
+{ $values { "duration" duration } { "-duration" duration } }
+{ $description "Negates a duration." }
+{ $examples
+    { $example "USING: accessors calendar prettyprint ;"
+               "3 hours before now noon time+ hour>> ."
+               "9"
+    }
+} ;
+
+HELP: <zero>
+{ $values { "timestamp" timestamp } }
+{ $description "Outputs a zero timestamp that consists of zeros for every slot.  Used to see if timestamps are valid." } ;
+
+HELP: valid-timestamp?
+{ $values { "timestamp" timestamp } { "?" "a boolean" } }
+{ $description "Tests if a timestamp is valid or not." } ;
+
+HELP: unix-1970
+{ $values { "timestamp" timestamp } }
+{ $description "Outputs the beginning of UNIX time, or midnight, January 1, 1970." } ;
+
+HELP: millis>timestamp
+{ $values { "x" number } { "timestamp" timestamp } }
+{ $description "Converts a number of milliseconds into a timestamp value in GMT time." }
+{ $examples
+    { $example "USING: accessors calendar prettyprint ;"
+               "1000 millis>timestamp year>> ."
+               "1970"
+    }
+} ;
+
+HELP: gmt
+{ $values { "timestamp" timestamp } }
+{ $description "Outputs the time right now, but in the GMT timezone." } ;
+
+{ gmt now } related-words
+
+HELP: now
+{ $values { "timestamp" timestamp } }
+{ $description "Outputs the time right now in your computer's timezone." }
+{ $examples
+    { $unchecked-example "USING: calendar prettyprint ;"
+        "now ."
+         "T{ timestamp f 2008 9 1 16 38 24+801/1000 T{ duration f 0 0 0 -5 0 0 } }"
+    }
+} ;
+
+HELP: hence
+{ $values { "duration" duration } { "timestamp" timestamp } }
+{ $description "Computes a time in the future that is the " { $snippet "duration" } " added to the result of " { $link now } "." }
+{ $examples
+    { $unchecked-example
+       "USING: calendar prettyprint ;"
+       "10 hours hence ."
+       "T{ timestamp f 2008 9 2 2 47 45+943/1000 T{ duration f 0 0 0 -5 0 0 } }"
+    }
+} ;
+
+HELP: ago
+{ $values { "duration" duration } { "timestamp" timestamp } }
+{ $description "Computes a time in the past that is the " { $snippet "duration" } " subtracted from the result of " { $link now } "." }
+{ $examples
+    { $unchecked-example
+       "USING: calendar prettyprint ;"
+       "3 weeks ago ."
+       "T{ timestamp f 2008 8 11 16 49 52+99/500 T{ duration f 0 0 0 -5 0 0 } }"
+    }
+} ;
+
+HELP: zeller-congruence
+{ $values { "year" integer } { "month" integer } { "day" integer } { "n" integer } }
+{ $description "An implementation of an algorithm that computes the day of the week given a date. Days are indexed starting from Sunday, which is index 0." }
+{ $notes "User code should use the " { $link day-of-week } " word, which takes a " { $snippet "timestamp" } " instead of integers." } ;
+
+HELP: days-in-year
+{ $values { "obj" "a timestamp or an integer" } { "n" integer } } 
+{ $description "Calculates the number of days in a given year." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "2004 days-in-year ."
+               "366"
+    }
+} ;
+
+HELP: days-in-month
+{ $values { "timestamp" timestamp } { "n" integer } }
+{ $description "Calculates the number of days in a given month." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "2008 8 24 <date> days-in-month ."
+               "31"
+    }
+} ;
+
+HELP: day-of-week
+{ $values { "timestamp" timestamp } { "n" integer } }
+{ $description "Calculates the index of the day of the week. Sunday will result in an index of 0." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "now sunday day-of-week ."
+               "0"
+    }
+} ;
+
+HELP: day-of-year
+{ $values { "timestamp" timestamp } { "n" integer } }
+{ $description "Calculates the day of the year, resulting in a number from 1 to 366 (leap years)." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "2008 1 4 <date> day-of-year ."
+               "4"
+    }
+} ;
+
+HELP: sunday
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Returns the Sunday from the current week, which starts on a Sunday." } ;
+
+HELP: monday
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Returns the Monday from the current week, which starts on a Sunday." } ;
+
+HELP: tuesday
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Returns the Tuesday from the current week, which starts on a Sunday." } ;
+
+HELP: wednesday
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Returns the Wednesday from the current week, which starts on a Sunday." } ;
+
+HELP: thursday
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Returns the Thursday from the current week, which starts on a Sunday." } ;
+
+HELP: friday
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Returns the Friday from the current week, which starts on a Sunday." } ;
+
+HELP: saturday
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Returns the Saturday from the current week, which starts on a Sunday." } ;
+
+{ sunday monday tuesday wednesday thursday friday saturday } related-words
+
+HELP: midnight
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Returns a timestamp that represents today at midnight, or the beginning of the day." } ;
+
+HELP: noon
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Returns a timestamp that represents today at noon, or the middle of the day." } ;
+
+HELP: beginning-of-month
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Outputs a timestamp with the day set to one." } ;
+
+HELP: beginning-of-week
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Outputs a timestamp where the day of the week is Sunday." } ;
+
+HELP: beginning-of-year
+{ $values { "timestamp" timestamp } { "new-timestamp" timestamp } }
+{ $description "Outputs a timestamp with the month and day set to one, or January 1 of the input timestamp." } ;
+
+HELP: time-since-midnight
+{ $values { "timestamp" timestamp } { "duration" duration } }
+{ $description "Calculates a " { $snippet "duration" } " that represents the elapsed time since midnight of the input " { $snippet "timestamp" } "." } ;
+
+ARTICLE: "calendar" "Calendar"
+"The two data types used throughout the calendar library:"
+{ $subsection timestamp }
+{ $subsection duration }
+"Durations represent spans of time:"
+{ $subsection "using-durations" }
+"Arithmetic on timestamps and durations:"
+{ $subsection "timestamp-arithmetic" }
+"Getting the current timestamp:"
+{ $subsection now }
+{ $subsection gmt }
+"Converting between timestamps:"
+{ $subsection >local-time }
+{ $subsection >gmt }
+"Converting between timezones:"
+{ $subsection convert-timezone }
+"Timestamps relative to each other:"
+{ $subsection "relative-timestamps" }
+"Operations on units of time:"
+{ $subsection "years" }
+{ $subsection "months" }
+{ $subsection "days" }
+"Meta-data about the calendar:"
+{ $subsection "calendar-facts" }
+;
+
+ARTICLE: "timestamp-arithmetic" "Timestamp arithmetic"
+"Adding timestamps and durations, or durations and durations:"
+{ $subsection time+ }
+"Subtracting:"
+{ $subsection time- }
+"Element-wise multiplication:"
+{ $subsection time* } ;
+
+ARTICLE: "using-durations" "Using durations"
+"Creating a duration object:"
+{ $subsection years }
+{ $subsection months }
+{ $subsection weeks }
+{ $subsection days }
+{ $subsection hours }
+{ $subsection minutes }
+{ $subsection seconds }
+{ $subsection milliseconds }
+{ $subsection instant }
+"Converting a duration to a number:"
+{ $subsection duration>years }
+{ $subsection duration>months }
+{ $subsection duration>days }
+{ $subsection duration>hours }
+{ $subsection duration>minutes }
+{ $subsection duration>seconds }
+{ $subsection duration>milliseconds } ;
+
+ARTICLE: "relative-timestamps" "Relative timestamps"
+"In the future:"
+{ $subsection hence }
+"In the past:"
+{ $subsection ago }
+"Invert a duration:"
+{ $subsection before }
+"Days of the week relative to " { $link now } ":"
+{ $subsection sunday }
+{ $subsection monday }
+{ $subsection tuesday }
+{ $subsection wednesday }
+{ $subsection thursday }
+{ $subsection friday }
+{ $subsection saturday }
+"New timestamps relative to calendar events:"
+{ $subsection beginning-of-year }
+{ $subsection beginning-of-month }
+{ $subsection beginning-of-week }
+{ $subsection midnight }
+{ $subsection noon }
+;
+
+ARTICLE: "days" "Day operations"
+"Naming days:"
+{ $subsection day-abbreviation2 }
+{ $subsection day-abbreviations2 }
+{ $subsection day-abbreviation3 }
+{ $subsection day-abbreviations3 }
+{ $subsection day-name }
+{ $subsection day-names }
+"Calculating a Julian day number:"
+{ $subsection julian-day-number }
+"Calculate a timestamp:"
+{ $subsection julian-day-number>date }
+;
+
+ARTICLE: "calendar-facts" "Calendar facts"
+"Calendar facts:"
+{ $subsection average-month }
+{ $subsection months-per-year }
+{ $subsection days-per-year }
+{ $subsection hours-per-year }
+{ $subsection minutes-per-year }
+{ $subsection seconds-per-year }
+{ $subsection days-in-month }
+{ $subsection day-of-year }
+{ $subsection day-of-week }
+;
+
+ARTICLE: "years" "Year operations"
+"Leap year predicate:"
+{ $subsection leap-year? }
+"Find the number of days in a year:"
+{ $subsection days-in-year }
+;
+
+ARTICLE: "months" "Month operations"
+"Naming months:"
+{ $subsection month-name }
+{ $subsection month-names }
+{ $subsection month-abbreviation }
+{ $subsection month-abbreviations }
+;
+
+ABOUT: "calendar"

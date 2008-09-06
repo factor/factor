@@ -85,8 +85,11 @@ IN: tools.deploy.shaker
     [
         strip-dictionary? [
             {
+                "cannot-infer"
                 "coercer"
+                "combination"
                 "compiled-effect"
+                "compiled-generic-uses"
                 "compiled-uses"
                 "constraints"
                 "declared-effect"
@@ -94,38 +97,51 @@ IN: tools.deploy.shaker
                 "default-method"
                 "default-output-classes"
                 "derived-from"
-                "identities"
+                "engines"
                 "if-intrinsics"
                 "infer"
                 "inferred-effect"
+                "inline"
+                "inlined-block"
                 "input-classes"
                 "interval"
                 "intrinsics"
+                "lambda"
                 "loc"
+                "local-reader"
+                "local-reader?"
+                "local-writer"
+                "local-writer?"
+                "local?"
+                "macro"
                 "members"
-                "methods"
+                "memo-quot"
                 "method-class"
                 "method-generic"
-                "combination"
-                "cannot-infer"
+                "methods"
                 "no-compile"
                 "optimizer-hooks"
-                "output-classes"
+                "outputs"
                 "participants"
                 "predicate"
                 "predicate-definition"
                 "predicating"
-                "tuple-dispatch-generic"
-                "slots"
+                "reader"
+                "reading"
+                "recursive"
+                "shuffle"
                 "slot-names"
+                "slots"
+                "special"
                 "specializer"
                 "step-into"
                 "step-into?"
-                "superclass"
-                "reading"
-                "writing"
+                "transform-n"
+                "transform-quot"
+                "tuple-dispatch-generic"
                 "type"
-                "engines"
+                "writer"
+                "writing"
             } %
         ] when
         
@@ -211,6 +227,7 @@ IN: tools.deploy.shaker
                 classes:update-map
                 command-line:main-vocab-hook
                 compiled-crossref
+                compiled-generic-crossref
                 compiler.units:recompile-hook
                 compiler.units:update-tuples-hook
                 definitions:crossref
@@ -229,13 +246,14 @@ IN: tools.deploy.shaker
                 word
             } %
 
-            { } { "optimizer.math.partial" } strip-vocab-globals %
+            { } { "math.partial-dispatch" } strip-vocab-globals %
         ] when
 
         strip-prettyprint? [
             {
                 prettyprint.config:margin
-                prettyprint.config:string-limit
+                prettyprint.config:string-limit?
+                prettyprint.config:boa-tuples?
                 prettyprint.config:tab-size
             } %
         ] when

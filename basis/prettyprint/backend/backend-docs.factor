@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io kernel prettyprint
+USING: help.markup help.syntax io kernel
 prettyprint.config prettyprint.sections words strings ;
 IN: prettyprint.backend
 
@@ -24,7 +24,7 @@ HELP: unparse-ch
 
 HELP: do-string-limit
 { $values { "str" string } { "trimmed" "a possibly trimmed string" } }
-{ $description "If " { $link string-limit } " is on, trims the string such that it does not exceed the margin, appending \"...\" if trimming took place." } ;
+{ $description "If " { $link string-limit? } " is on, trims the string such that it does not exceed the margin, appending \"...\" if trimming took place." } ;
 
 HELP: pprint-string
 { $values { "obj" object } { "str" string } { "prefix" string } { "suffix" string } }

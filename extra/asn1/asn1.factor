@@ -184,7 +184,7 @@ TUPLE: tag value ;
     tagnum get (>>value) ;
 
 M: string >ber ( str -- byte-array )
-    tagnum get tag-value 1array "C" pack-native swap dup
+    tagnum get value>> 1array "C" pack-native swap dup
     length >ber-length-encoding swapd append swap
     >byte-array append ;
 

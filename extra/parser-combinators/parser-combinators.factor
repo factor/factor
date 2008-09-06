@@ -59,7 +59,7 @@ C: <token-parser> token-parser
 : case-insensitive-token ( string -- parser ) t <token-parser> ;
 
 M: token-parser parse ( input parser -- list )
-    dup token-parser-string swap token-parser-ignore-case?
+    [ string>> ] [ ignore-case?>> ] bi
     >r tuck r> ?string-head
     [ <parse-results> ] [ 2drop nil ] if ;
 
@@ -76,7 +76,7 @@ M: satisfy-parser parse ( input parser -- list )
     over empty? [
         2drop nil
     ] [
-        satisfy-parser-quot >r unclip-slice dup r> call
+        quot>> >r unclip-slice dup r> call
         [ swap <parse-results> ] [ 2drop nil ] if
     ] if ;
 
@@ -101,7 +101,7 @@ C: succeed succeed-parser ( result -- parser )
 M: succeed-parser parse ( input parser -- list )
     #! A parser that always returns 'result' as a
     #! successful parse with no input consumed.
-    succeed-parser-result swap <parse-results> ;
+    result>> swap <parse-results> ;
 
 TUPLE: fail-parser ;
 
@@ -118,7 +118,7 @@ TUPLE: ensure-parser test ;
     ensure-parser boa ;
 
 M: ensure-parser parse ( input parser -- list )
-    2dup ensure-parser-test parse nil?
+    2dup test>> parse nil?
     [ 2drop nil ] [ drop t swap <parse-results> ] if ;
 
 TUPLE: ensure-not-parser test ;
@@ -127,7 +127,7 @@ TUPLE: ensure-not-parser test ;
     ensure-not-parser boa ;
 
 M: ensure-not-parser parse ( input parser -- list )
-    2dup ensure-not-parser-test parse nil?
+    2dup test>> parse nil?
     [ drop t swap <parse-results> ] [ 2drop nil ] if ;
 
 TUPLE: and-parser parsers ;
@@ -157,7 +157,7 @@ M: and-parser parse ( input parser -- list )
     #! two parsers. First parser1 is applied to the
     #! input then parser2 is applied to the rest of
     #! the input strings from the first parser.
-    and-parser-parsers unclip swapd parse
+    parsers>> unclip swapd parse
     [ [ and-parser-parse ] reduce ] 2curry promise ;
 
 TUPLE: or-parser parsers ;
@@ -172,14 +172,14 @@ M: or-parser parse ( input parser1 -- list )
     #! Return the combined list resulting from the parses
     #! of parser1 and parser2 being applied to the same
     #! input. This implements the choice parsing operator.
-    or-parser-parsers 0 swap seq>list
+    parsers>> 0 swap seq>list
     [ parse ] lazy-map-with lconcat ;
 
-: left-trim-slice ( string -- string )
+: trim-left-slice ( string -- string )
     #! Return a new string without any leading whitespace
     #! from the original string.
     dup empty? [
-        dup first blank? [ rest-slice left-trim-slice ] when
+        dup first blank? [ rest-slice trim-left-slice ] when
     ] unless ;
 
 TUPLE: sp-parser p1 ;
@@ -191,7 +191,7 @@ C: sp sp-parser ( p1 -- parser )
 M: sp-parser parse ( input parser -- list )
     #! Skip all leading whitespace from the input then call
     #! the parser on the remaining input.
-    >r left-trim-slice r> sp-parser-p1 parse ;
+    >r trim-left-slice r> p1>> parse ;
 
 TUPLE: just-parser p1 ;
 
@@ -202,7 +202,7 @@ M: just-parser parse ( input parser -- result )
     #! from the results anything where the remaining
     #! input to be parsed is not empty. So ensures a
     #! fully parsed input string.
-    just-parser-p1 parse [ parse-result-unparsed empty? ] lfilter ;
+    p1>> parse [ unparsed>> empty? ] lfilter ;
 
 TUPLE: apply-parser p1 quot ;
 
@@ -214,10 +214,10 @@ M: apply-parser parse ( input parser -- result )
     #! The result of that quotation then becomes the new parse result.
     #! This allows modification of parse tree results (like
     #! converting strings to integers, etc).
-    [ apply-parser-p1 ] keep apply-parser-quot
+    [ p1>> ] [ quot>> ] bi
     -rot parse [
-        [ parse-result-parsed swap call ] keep
-        parse-result-unparsed <parse-result>
+        [ parsed>> swap call ] keep
+        unparsed>> <parse-result>
     ] lazy-map-with ;
 
 TUPLE: some-parser p1 ;
@@ -229,7 +229,7 @@ M: some-parser parse ( input parser -- result )
     #! the parse is complete (the remaining input is empty),
     #! picks the first solution and only returns the parse
     #! tree since the remaining input is empty.
-    some-parser-p1 just parse-1 ;
+    p1>> just parse-1 ;
 
 : <& ( parser1 parser2 -- parser )
     #! Same as <&> except discard the results of the second parser.
@@ -272,7 +272,7 @@ LAZY: only-first ( parser -- parser )
 M: only-first-parser parse ( input parser -- list )
     #! Transform a parser into a parser that only yields
     #! the first possibility.
-    only-first-parser-p1 parse 1 swap ltake ;
+    p1>> parse 1 swap ltake ;
 
 LAZY: <!*> ( parser -- parser )
     #! Like <*> but only return one possible result

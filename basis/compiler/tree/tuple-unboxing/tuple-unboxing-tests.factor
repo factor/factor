@@ -30,7 +30,7 @@ TUPLE: empty-tuple ;
     [ dup cons boa 10 [ nip dup cons boa ] each-integer car>> ]
     [ 2 cons boa { [ ] [ ] } dispatch ]
     [ dup [ drop f ] [ "A" throw ] if ]
-    [ [ ] [ ] curry curry dup 3 slot swap 4 slot dup 3 slot swap 4 slot drop ]
+    [ [ ] [ ] curry curry dup 2 slot swap 3 slot dup 2 slot swap 3 slot drop ]
     [ [ ] [ ] curry curry call ]
     [ <complex> <complex> dup 1 slot drop 2 slot drop ]
     [ 1 cons boa over [ "A" throw ] when car>> ]

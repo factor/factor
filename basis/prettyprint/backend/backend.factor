@@ -80,7 +80,7 @@ M: f pprint* drop \ f pprint-word ;
     dup ch>ascii-escape [ "\\" % ] [ ] ?if , ;
 
 : do-string-limit ( str -- trimmed )
-    string-limit get [
+    string-limit? get [
         dup length margin get > [
             margin get 3 - head "..." append
         ] when
@@ -129,6 +129,30 @@ M: pathname pprint*
         ] if
     ] if ; inline
 
+: tuple>assoc ( tuple -- assoc )
+    [ class all-slots ] [ tuple-slots ] bi zip
+    [ [ initial>> ] dip = not ] assoc-filter
+    [ [ name>> ] dip ] assoc-map ;
+
+: pprint-slot-value ( name value -- )
+    <flow \ { pprint-word
+    [ text ] [ f <inset pprint* block> ] bi*
+    \ } pprint-word block> ;
+
+M: tuple pprint*
+    boa-tuples? get [ call-next-method ] [
+        [
+            <flow
+            \ T{ pprint-word
+            dup class pprint-word
+            t <inset
+            tuple>assoc [ pprint-slot-value ] assoc-each
+            block>
+            \ } pprint-word
+            block>
+        ] check-recursion
+    ] if ;
+
 : do-length-limit ( seq -- trimmed n/f )
     length-limit get dup [
         over length over [-]
@@ -163,9 +187,11 @@ M: byte-vector >pprint-sequence ;
 M: curry >pprint-sequence ;
 M: compose >pprint-sequence ;
 M: hashtable >pprint-sequence >alist ;
-M: tuple >pprint-sequence tuple>array ;
 M: wrapper >pprint-sequence wrapped>> 1array ;
 M: callstack >pprint-sequence callstack>array ;
+
+M: tuple >pprint-sequence
+    [ class f 2array ] [ tuple-slots ] bi append ;
 
 GENERIC: pprint-narrow? ( obj -- ? )
 
@@ -186,6 +212,8 @@ M: tuple pprint-narrow? drop t ;
     ] check-recursion ;
 
 M: object pprint* pprint-object ;
+M: vector pprint* pprint-object ;
+M: hashtable pprint* pprint-object ;
 
 M: curry pprint*
     dup quot>> callable? [ pprint-object ] [

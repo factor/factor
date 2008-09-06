@@ -61,8 +61,8 @@ INSTANCE: float-array sequence
 : F{ \ } [ >float-array ] parse-literal ; parsing
 
 M: float-array pprint-delims drop \ F{ \ } ;
-
 M: float-array >pprint-sequence ;
+M: float-array pprint* pprint-object ;
 
 USING: hints math.vectors arrays ;
 

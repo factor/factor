@@ -46,7 +46,7 @@ HELP: <world>
 { $description "Creates a new " { $link world } " delegating to the given gadget." } ;
 
 HELP: find-world
-{ $values { "gadget" gadget } { "world" "a " { $link world } " or " { $link f } } }
+{ $values { "gadget" gadget } { "world/f" "a " { $link world } " or " { $link f } } }
 { $description "Finds the " { $link world } " containing the gadget, or outputs " { $link f } " if the gadget is not grafted." } ;
 
 HELP: draw-world

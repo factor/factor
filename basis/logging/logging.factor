@@ -46,7 +46,7 @@ SYMBOL: log-service
     dup array? [ dup length 1 = [ first ] when ] when
     dup string? [
         [
-            string-limit off
+            string-limit? off
             1 line-limit set
             3 nesting-limit set
             0 margin set

@@ -49,7 +49,7 @@ SYMBOL: ns-stack
 ! Parsing names
 
 : version=1.0? ( -- ? )
-    prolog-data get prolog-version "1.0" = ;
+    prolog-data get version>> "1.0" = ;
 
 ! version=1.0? is calculated once and passed around for efficiency
 
@@ -69,7 +69,7 @@ SYMBOL: ns-stack
 
 : (parse-entity) ( string -- )
     dup entities at [ , ] [ 
-        prolog-data get prolog-standalone
+        prolog-data get standalone>>
         [ <no-entity> throw ] [
             dup extra-entities get at
             [ , ] [ <no-entity> throw ] ?if

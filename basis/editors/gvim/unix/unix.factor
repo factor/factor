@@ -1,4 +1,4 @@
-USING: io.unix.backend kernel namespaces editors.gvim.backend
+USING: io.unix.backend kernel namespaces editors.gvim
 system ;
 IN: editors.gvim.unix
 

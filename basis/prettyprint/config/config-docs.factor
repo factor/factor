@@ -1,4 +1,4 @@
-USING: help.markup help.syntax io kernel prettyprint
+USING: help.markup help.syntax io kernel
 prettyprint.sections words ;
 IN: prettyprint.config
 
@@ -19,5 +19,9 @@ HELP: length-limit
 HELP: line-limit
 { $var-description "The maximum number of lines output by the prettyprinter before output is truncated with \"...\". The default is " { $link f } ", denoting unlimited line count." } ;
 
-HELP: string-limit
+HELP: string-limit?
 { $var-description "Toggles whether printed strings are truncated to the margin." } ;
+
+HELP: boa-tuples?
+{ $var-description "Toggles whether tuples print in BOA-form or assoc-form." }
+{ $notes "See " { $link POSTPONE: T{ } " for a description of both literal tuple forms." } ;

@@ -14,7 +14,7 @@ TUPLE: menu-glass < gadget ;
 
 : <menu-glass> ( menu world -- glass )
     menu-glass new-gadget
-    >r over menu-loc over set-rect-loc r>
+    >r over menu-loc >>loc r>
     [ swap add-gadget drop ] keep ;
 
 M: menu-glass layout* gadget-child prefer ;

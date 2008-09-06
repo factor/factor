@@ -22,7 +22,7 @@ SYMBOLS:
 : (offsetof) ( field struct -- offset )
     [ (field-spec-of) offset>> ] [ drop 0 ] if* ;
 : (sizeof) ( field struct -- size )
-    [ (field-spec-of) class>> "[" split1 drop heap-size ] [ drop 1 ] if* ;
+    [ (field-spec-of) type>> "[" split1 drop heap-size ] [ drop 1 ] if* ;
 
 : (flag) ( thing -- integer )
     {

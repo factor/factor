@@ -14,7 +14,7 @@ IN: ui.tools.search
 TUPLE: live-search < track field list ;
 
 : search-value ( live-search -- value )
-    live-search-list list-value ;
+    list>> list-value ;
 
 : search-gesture ( gesture live-search -- operation/f )
     search-value object-operations
@@ -32,7 +32,7 @@ M: live-search handle-gesture ( gesture live-search -- ? )
     [ live-search? ] find-parent ;
 
 : find-search-list ( gadget -- list )
-    find-live-search live-search-list ;
+    find-live-search list>> ;
 
 TUPLE: search-field < editor ;
 
@@ -70,12 +70,12 @@ search-field H{
     over field>> set-editor-string
   dup field>> end-of-document ;
 
-M: live-search focusable-child* live-search-field ;
+M: live-search focusable-child* field>> ;
 
 M: live-search pref-dim* drop { 400 200 } ;
 
 : current-word ( workspace -- string )
-    workspace-listener listener-gadget-input selected-word ;
+    listener>> input>> selected-word ;
 
 : definition-candidates ( words -- candidates )
     [ dup synopsis >lower ] { } map>assoc sort-values ;
@@ -118,7 +118,7 @@ M: live-search pref-dim* drop { 400 200 } ;
 
 : <source-file-search> ( string files -- gadget )
     source-file-candidates
-    f [ pathname-string ] <live-search> ;
+    f [ string>> ] <live-search> ;
 
 : all-source-files ( -- seq )
     source-files get keys natural-sort ;
@@ -146,13 +146,13 @@ M: live-search pref-dim* drop { 400 200 } ;
 
 : <history-search> ( string seq -- gadget )
     history-candidates
-    f [ input-string ] <live-search> ;
+    f [ string>> ] <live-search> ;
 
 : listener-history ( listener -- seq )
-    listener-gadget-input interactor-history <reversed> ;
+    input>> history>> <reversed> ;
 
 : com-history ( workspace -- )
-    "" over workspace-listener listener-history <history-search>
+    "" over listener>> listener-history <history-search>
     "History search" show-titled-popup ;
 
 workspace "toolbar" f {

@@ -14,6 +14,7 @@ ARTICLE: "span-elements" "Span elements"
 { $subsection $link }
 { $subsection $vocab-link }
 { $subsection $snippet }
+{ $subsection $slot }
 { $subsection $url } ;
 
 ARTICLE: "block-elements" "Block elements"
@@ -212,6 +213,18 @@ HELP: $code
     { $markup-example { $code "2 2 + ." } }
 } ;
 
+HELP: $nl
+{ $values { "children" "unused parameter" } }
+{ $description "Prints a paragraph break. The parameter is unused." } ;
+
+HELP: $snippet
+{ $values { "children" "markup elements" } }
+{ $description "Prints a key word or otherwise notable snippet of text, such as a type or a word input parameter. To document slot names, use " { $link $slot } "." } ;
+
+HELP: $slot
+{ $values { "children" "markup elements" } }
+{ $description "Prints a tuple slot name in the same way as a snippet. The help tool can check that there exists an accessor with this name." } ;
+
 HELP: $vocabulary
 { $values { "element" "a markup element of the form " { $snippet "{ word }" } } }
 { $description "Prints a word's vocabulary. This markup element is automatically output by the help system, so help descriptions of parsing words should not call it." } ;
@@ -399,5 +412,5 @@ HELP: ABOUT:
 { $description "Defines the main documentation article for the current vocabulary." } ;
 
 HELP: vocab-help
-{ $values { "vocab" "a vocabulary specifier" } { "help" "a help article" } }
+{ $values { "vocab-spec" "a vocabulary specifier" } { "help" "a help article" } }
 { $description "Outputs the main help article for a vocabulary. The main help article can be set with " { $link POSTPONE: ABOUT:  } "." } ;

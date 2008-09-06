@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io io.streams.string kernel math namespaces sequences
 strings circular prettyprint debugger ascii sbufs fry summary
-accessors sequences.lib ;
+accessors ;
 IN: state-parser
 
 ! * Basic underlying words
@@ -120,7 +120,7 @@ M: not-enough-characters summary ( obj -- str )
 
 : take ( n -- string )
     [ 1- ] [ <sbuf> ] bi [
-        '[ drop get-char [ next , push f ] [ t ] if* ] attempt-each drop
+        '[ drop get-char [ next , push f ] [ t ] if* ] contains? drop
     ] keep get-char [ over push ] when* >string ;
 
 : pass-blank ( -- )

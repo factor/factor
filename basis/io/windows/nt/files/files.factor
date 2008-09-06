@@ -22,7 +22,7 @@ M: winnt root-directory? ( path -- ? )
     {
         { [ dup empty? ] [ f ] }
         { [ dup [ path-separator? ] all? ] [ t ] }
-        { [ dup right-trim-separators { [ length 2 = ] [ second CHAR: : = ] } 1&& ] [ t ] }
+        { [ dup trim-right-separators { [ length 2 = ] [ second CHAR: : = ] } 1&& ] [ t ] }
         [ f ]
     } cond nip ;
 

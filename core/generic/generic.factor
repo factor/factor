@@ -105,6 +105,10 @@ M: method-body crossref?
         drop [ <method> dup ] 2keep reveal-method
     ] if ;
 
+PREDICATE: default-method < word "default" word-prop ;
+
+M: default-method irrelevant? drop t ;
+
 : <default-method> ( generic combination -- method )
     [ drop object bootstrap-word swap <method> ] [ make-default-method ] 2bi
     [ define ] [ drop t "default" set-word-prop ] [ drop ] 2tri ;
@@ -126,7 +130,7 @@ M: method-spec definition
     first2 method definition ;
 
 M: method-spec forget*
-    first2 method forget* ;
+    first2 method [ forgotten-definition ] [ forget* ] bi ;
 
 M: method-spec smart-usage
     second smart-usage ;
@@ -137,7 +141,7 @@ M: method-body definer
 M: method-body forget*
     dup "forgotten" word-prop [ drop ] [
         [
-            dup "default" word-prop [ drop ] [
+            dup default-method? [ drop ] [
                 [
                     [ "method-class" word-prop ]
                     [ "method-generic" word-prop ] bi

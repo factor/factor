@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ascii assocs hashtables io.encodings.ascii io.files kernel math
     math.parser namespaces sequences sequences.lib sequences.private sorting
-    splitting grouping strings sets ;
+    splitting grouping strings sets accessors ;
 IN: project-euler.059
 
 ! http://projecteuler.net/index.php?section=problems&id=59
@@ -53,16 +53,16 @@ IN: project-euler.059
 
 : source-059 ( -- seq )
     "resource:extra/project-euler/059/cipher1.txt"
-    ascii file-contents [ blank? ] right-trim "," split
+    ascii file-contents [ blank? ] trim-right "," split
     [ string>number ] map ;
 
 TUPLE: rollover seq n ;
 
 C: <rollover> rollover
 
-M: rollover length rollover-n ;
+M: rollover length n>> ;
 
-M: rollover nth-unsafe rollover-seq [ length mod ] keep nth-unsafe ;
+M: rollover nth-unsafe seq>> [ length mod ] keep nth-unsafe ;
 
 INSTANCE: rollover immutable-sequence
 

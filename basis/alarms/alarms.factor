@@ -82,10 +82,10 @@ PRIVATE>
 : add-alarm ( quot time frequency -- alarm )
     <alarm> [ register-alarm ] keep ;
 
-: later ( quot dt -- alarm )
+: later ( quot duration -- alarm )
     hence f add-alarm ;
 
-: every ( quot dt -- alarm )
+: every ( quot duration -- alarm )
     [ hence ] keep add-alarm ;
 
 : cancel-alarm ( alarm -- )

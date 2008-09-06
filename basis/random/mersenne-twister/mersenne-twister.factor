@@ -3,7 +3,7 @@
 ! mersenne twister based on 
 ! http://www.math.sci.hiroshima-u.ac.jp/~m-mat/MT/MT2002/CODES/mt19937ar.c
 USING: arrays kernel math namespaces sequences system init
-accessors math.ranges random circular math.bitfields.lib
+accessors math.ranges random circular math.bitwise
 combinators ;
 IN: random.mersenne-twister
 

@@ -1,7 +1,9 @@
-USING: arrays combinators crypto.common kernel io
-io.encodings.binary io.files io.streams.byte-array math.vectors
-strings sequences namespaces math parser sequences vectors
-io.binary hashtables symbols math.bitfields.lib checksums ;
+! Copyright (C) 2006, 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
+USING: arrays combinators kernel io io.encodings.binary io.files
+io.streams.byte-array math.vectors strings sequences namespaces
+math parser sequences assocs grouping vectors io.binary hashtables
+symbols math.bitwise checksums checksums.common ;
 IN: checksums.sha1
 
 ! Implemented according to RFC 3174.
@@ -44,6 +46,9 @@ SYMBOLS: h0 h1 h2 h3 h4 A B C D E w K ;
         { 2 [ 2dup bitand >r pick bitand >r bitand r> r> bitor bitor ] }
         { 3 [ bitxor bitxor ] }
     } case ;
+
+: nth-int-be ( string n -- int )
+    4 * dup 4 + rot <slice> be> ; inline
 
 : make-w ( str -- )
     #! compute w, steps a-b of RFC 3174, section 6.1
@@ -113,8 +118,16 @@ INSTANCE: sha1 checksum
 M: sha1 checksum-stream ( stream -- sha1 )
     drop [ initialize-sha1 stream>sha1 get-sha1 ] with-input-stream ;
 
+: seq>2seq ( seq -- seq1 seq2 )
+    #! { abcdefgh } -> { aceg } { bdfh }
+    2 group flip dup empty? [ drop { } { } ] [ first2 ] if ;
+
+: 2seq>seq ( seq1 seq2 -- seq )
+    #! { aceg } { bdfh } -> { abcdefgh }
+    [ zip concat ] keep like ;
+
 : sha1-interleave ( string -- seq )
-    [ zero? ] left-trim
+    [ zero? ] trim-left
     dup length odd? [ rest ] when
     seq>2seq [ sha1 checksum-bytes ] bi@
     2seq>seq ;

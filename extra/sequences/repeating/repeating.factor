@@ -11,7 +11,7 @@ TUPLE: repeating circular len ;
 : repeated ( seq length -- new-seq )
     dupd <repeating> swap like ;
 
-M: repeating length repeating-len ;
+M: repeating length len>> ;
 M: repeating set-length (>>len) ;
 
 M: repeating virtual@ ( n seq -- n' seq' ) circular>> ;

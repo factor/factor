@@ -1,10 +1,12 @@
 ! Copyright (C) 2007 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math math.functions namespaces sequences
-strings system vocabs.loader calendar.backend threads
-accessors combinators locals classes.tuple math.order
-memoize summary combinators.short-circuit alias ;
+strings system vocabs.loader threads accessors combinators
+locals classes.tuple math.order summary
+combinators.short-circuit ;
 IN: calendar
+
+HOOK: gmt-offset os ( -- hours minutes seconds )
 
 TUPLE: duration
     { year real }
@@ -59,6 +61,8 @@ PRIVATE>
 
 : month-abbreviation ( n -- string )
     check-month 1- month-abbreviations nth ;
+
+: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 } ; inline
 
 : day-names ( -- array )
     {
@@ -116,7 +120,7 @@ PRIVATE>
 : >time< ( timestamp -- hour minute second )
     [ hour>> ] [ minute>> ] [ second>> ] tri ;
 
-MEMO: instant ( -- duration ) 0 0 0 0 0 0 <duration> ;
+: instant ( -- duration ) 0 0 0 0 0 0 <duration> ;
 : years ( x -- duration ) instant clone swap >>year ;
 : months ( x -- duration ) instant clone swap >>month ;
 : days ( x -- duration ) instant clone swap >>day ;
@@ -125,14 +129,6 @@ MEMO: instant ( -- duration ) 0 0 0 0 0 0 <duration> ;
 : minutes ( x -- duration ) instant clone swap >>minute ;
 : seconds ( x -- duration ) instant clone swap >>second ;
 : milliseconds ( x -- duration ) 1000 / seconds ;
-ALIAS: year years
-ALIAS: month months
-ALIAS: day days
-ALIAS: week weeks
-ALIAS: hour hours
-ALIAS: minute minutes
-ALIAS: second seconds
-ALIAS: millisecond milliseconds
 
 GENERIC: leap-year? ( obj -- ? )
 
@@ -244,7 +240,7 @@ M: duration time+
         2drop <duration>
     ] if ;
 
-: dt>years ( duration -- x )
+: duration>years ( duration -- x )
     #! Uses average month/year length since duration loses calendar
     #! data
     0 swap
@@ -257,16 +253,16 @@ M: duration time+
         [ second>> seconds-per-year / + ]
     } cleave ;
 
-M: duration <=> [ dt>years ] compare ;
+M: duration <=> [ duration>years ] compare ;
 
-: dt>months ( duration -- x ) dt>years months-per-year * ;
-: dt>days ( duration -- x ) dt>years days-per-year * ;
-: dt>hours ( duration -- x ) dt>years hours-per-year * ;
-: dt>minutes ( duration -- x ) dt>years minutes-per-year * ;
-: dt>seconds ( duration -- x ) dt>years seconds-per-year * ;
-: dt>milliseconds ( duration -- x ) dt>seconds 1000 * ;
+: duration>months ( duration -- x ) duration>years months-per-year * ;
+: duration>days ( duration -- x ) duration>years days-per-year * ;
+: duration>hours ( duration -- x ) duration>years hours-per-year * ;
+: duration>minutes ( duration -- x ) duration>years minutes-per-year * ;
+: duration>seconds ( duration -- x ) duration>years seconds-per-year * ;
+: duration>milliseconds ( duration -- x ) duration>seconds 1000 * ;
 
-GENERIC: time- ( time1 time2 -- time )
+GENERIC: time- ( time1 time2 -- time3 )
 
 : convert-timezone ( timestamp duration -- timestamp )
     over gmt-offset>> over = [ drop ] [
@@ -310,17 +306,17 @@ M: timestamp time-
 M: duration time-
     before time+ ;
 
-MEMO: <zero> ( -- timestamp )
-0 0 0 0 0 0 instant <timestamp> ;
+: <zero> ( -- timestamp )
+    0 0 0 0 0 0 instant <timestamp> ;
 
 : valid-timestamp? ( timestamp -- ? )
     clone instant >>gmt-offset
     dup <zero> time- <zero> time+ = ;
 
-MEMO: unix-1970 ( -- timestamp )
+: unix-1970 ( -- timestamp )
     1970 1 1 0 0 0 instant <timestamp> ;
 
-: millis>timestamp ( n -- timestamp )
+: millis>timestamp ( x -- timestamp )
     >r unix-1970 r> milliseconds time+ ;
 
 : timestamp>millis ( timestamp -- n )
@@ -331,11 +327,8 @@ MEMO: unix-1970 ( -- timestamp )
     unix-1970 millis milliseconds time+ ;
 
 : now ( -- timestamp ) gmt >local-time ;
-
 : hence ( duration -- timestamp ) now swap time+ ;
 : ago ( duration -- timestamp ) now swap time- ;
-
-: day-counts { 0 31 28 31 30 31 30 31 31 30 31 30 31 } ; inline
 
 : zeller-congruence ( year month day -- n )
     #! Zeller Congruence
@@ -371,19 +364,21 @@ M: timestamp days-in-year ( timestamp -- n ) year>> days-in-year ;
 : day-of-year ( timestamp -- n )
     >date< (day-of-year) ;
 
+<PRIVATE
 : day-offset ( timestamp m -- timestamp n )
     over day-of-week - ; inline
 
 : day-this-week ( timestamp n -- timestamp )
     day-offset days time+ ;
+PRIVATE>
 
-: sunday ( timestamp -- timestamp ) 0 day-this-week ;
-: monday ( timestamp -- timestamp ) 1 day-this-week ;
-: tuesday ( timestamp -- timestamp ) 2 day-this-week ;
-: wednesday ( timestamp -- timestamp ) 3 day-this-week ;
-: thursday ( timestamp -- timestamp ) 4 day-this-week ;
-: friday ( timestamp -- timestamp ) 5 day-this-week ;
-: saturday ( timestamp -- timestamp ) 6 day-this-week ;
+: sunday ( timestamp -- new-timestamp ) 0 day-this-week ;
+: monday ( timestamp -- new-timestamp ) 1 day-this-week ;
+: tuesday ( timestamp -- new-timestamp ) 2 day-this-week ;
+: wednesday ( timestamp -- new-timestamp ) 3 day-this-week ;
+: thursday ( timestamp -- new-timestamp ) 4 day-this-week ;
+: friday ( timestamp -- new-timestamp ) 5 day-this-week ;
+: saturday ( timestamp -- new-timestamp ) 6 day-this-week ;
 
 : midnight ( timestamp -- new-timestamp )
     clone 0 >>hour 0 >>minute 0 >>second ; inline
@@ -402,7 +397,6 @@ M: timestamp days-in-year ( timestamp -- n ) year>> days-in-year ;
 
 : time-since-midnight ( timestamp -- duration )
     dup midnight time- ;
-
 
 M: timestamp sleep-until timestamp>millis sleep-until ;
 

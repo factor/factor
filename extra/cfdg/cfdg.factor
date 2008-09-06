@@ -5,8 +5,9 @@ USING: kernel alien.c-types combinators namespaces arrays
        opengl.gl opengl.glu opengl ui ui.gadgets.slate
        vars colors self self.slots
        random-weighted colors.hsv cfdg.gl accessors
-       ui.gadgets.handler ui.gestures assocs ui.gadgets macros ;
-
+       ui.gadgets.handler ui.gestures assocs ui.gadgets macros
+       qualified ;
+QUALIFIED: syntax
 IN: cfdg
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -245,7 +246,7 @@ SYMBOL: the-slate
   <handler>
     H{ } clone
       T{ key-down f f "ENTER" } C[ drop rebuild ] swap pick set-at
-      T{ button-down }          C[ drop rebuild ] swap pick set-at
+      T{ button-down } C[ drop rebuild ] swap pick set-at
     >>table ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

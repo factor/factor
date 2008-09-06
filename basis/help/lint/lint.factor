@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors sequences parser kernel help help.markup
+USING: fry accessors sequences parser kernel help help.markup
 help.topics words strings classes tools.vocabs namespaces io
 io.streams.string prettyprint definitions arrays vectors
 combinators combinators.short-circuit splitting debugger
@@ -39,7 +39,7 @@ IN: help.lint
         $predicate
         $class-description
         $error-description
-    } swap [ elements f like ] curry contains? ;
+    } swap '[ , elements empty? not ] contains? ;
 
 : check-values ( word element -- )
     {
@@ -108,12 +108,10 @@ M: help-error error.
     articles get keys
     vocabs [ dup vocab-docs-path swap ] H{ } map>assoc
     H{ } clone [
-        [
-            [ dup >link where dup ] 2dip
-            [ >r >r first r> at r> push-at ] 2curry
-            [ 2drop ]
-            if
-        ] 2curry each
+        '[
+            dup >link where dup
+            [ first , at , push-at ] [ 2drop ] if
+        ] each
     ] keep ;
 
 : check-about ( vocab -- )

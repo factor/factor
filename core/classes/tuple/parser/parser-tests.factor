@@ -91,4 +91,8 @@ must-fail-with
     ] with-compilation-unit
 ] unit-test
 
+TUPLE: syntax-test bar baz ;
 
+[ T{ syntax-test } ] [ T{ syntax-test } ] unit-test
+[ T{ syntax-test f { 2 3 } { 4 { 5 } } } ]
+[ T{ syntax-test { bar { 2 3 } } { baz { 4 { 5 } } } } ] unit-test

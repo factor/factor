@@ -17,6 +17,14 @@ M: complex absq >rect [ sq ] bi@ + ;
     [ [ real-part ] bi@ ] 2keep
     [ imaginary-part ] bi@ ; inline
 
+M: complex hashcode*
+    nip >rect [ hashcode ] bi@ bitxor ;
+
+M: complex equal?
+    over complex? [
+        2>rect = [ = ] [ 2drop f ] if
+    ] [ 2drop f ] if ;
+
 M: complex number=
     2>rect number= [ number= ] [ 2drop f ] if ;
 
@@ -36,12 +44,10 @@ M: complex abs absq >float fsqrt ;
 
 M: complex sqrt >polar swap fsqrt swap 2.0 / polar> ;
 
-M: complex hashcode* nip >rect >fixnum swap >fixnum bitxor ;
-
 IN: syntax
 
 : C{ \ } [ first2 rect> ] parse-literal ; parsing
 
 M: complex pprint-delims drop \ C{ \ } ;
-
 M: complex >pprint-sequence >rect 2array ;
+M: complex pprint* pprint-object ;

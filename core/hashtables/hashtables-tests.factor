@@ -28,7 +28,6 @@ unit-test
 
 [ t ] [ 12 hashcode 12 hashcode = ] unit-test
 [ t ] [ 12 >bignum hashcode 12 hashcode = ] unit-test
-[ t ] [ 12.0 hashcode 12 >bignum hashcode = ] unit-test
 
 ! Test various odd keys to see if they work.
 

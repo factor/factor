@@ -34,5 +34,5 @@ INSTANCE: bit-vector growable
 : ?V{ \ } [ >bit-vector ] parse-literal ; parsing
 
 M: bit-vector >pprint-sequence ;
-
 M: bit-vector pprint-delims drop \ ?V{ \ } ;
+M: bit-vector pprint* pprint-object ;

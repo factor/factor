@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types assocs combinators destructors
-kernel math math.bitfields math.parser sequences summary system
+kernel math math.bitwise math.parser sequences summary system
 vocabs.loader ;
 IN: io.serial
 

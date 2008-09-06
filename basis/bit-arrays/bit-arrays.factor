@@ -91,5 +91,5 @@ M: bit-array byte-length length 7 + -3 shift ;
 INSTANCE: bit-array sequence
 
 M: bit-array pprint-delims drop \ ?{ \ } ;
-
 M: bit-array >pprint-sequence ;
+M: bit-array pprint* pprint-object ;

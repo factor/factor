@@ -12,7 +12,7 @@
 ! and note the section.
 
 USING: kernel arrays alien alien.c-types alien.strings
-alien.syntax math math.bitfields words sequences namespaces
+alien.syntax math math.bitwise words sequences namespaces
 continuations io.encodings.ascii ;
 IN: x11.xlib
 

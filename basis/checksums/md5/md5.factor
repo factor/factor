@@ -1,10 +1,13 @@
-! See http://www.faqs.org/rfcs/rfc1321.html
-
+! Copyright (C) 2006, 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel io io.binary io.files io.streams.byte-array math
 math.functions math.parser namespaces splitting grouping strings
-sequences crypto.common byte-arrays locals sequences.private
-io.encodings.binary symbols math.bitfields.lib checksums ;
+sequences byte-arrays locals sequences.private
+io.encodings.binary symbols math.bitwise checksums
+checksums.common ;
 IN: checksums.md5
+
+! See http://www.faqs.org/rfcs/rfc1321.html
 
 <PRIVATE
 

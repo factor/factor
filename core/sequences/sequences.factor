@@ -28,6 +28,14 @@ M: sequence lengthen 2dup length > [ set-length ] [ 2drop ] if ;
 M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ;
 
 : empty? ( seq -- ? ) length zero? ; inline
+
+: if-empty ( seq quot1 quot2 -- )
+    [ dup empty? ] [ [ drop ] prepose ] [ ] tri* if ; inline
+
+: when-empty ( seq quot1 -- ) [ ] if-empty ; inline
+
+: unless-empty ( seq quot1 -- ) [ ] swap if-empty ; inline
+
 : delete-all ( seq -- ) 0 swap set-length ;
 
 : first ( seq -- first ) 0 swap nth ; inline
@@ -418,6 +426,15 @@ PRIVATE>
 : filter ( seq quot -- subseq )
     over >r pusher >r each r> r> like ; inline
 
+: push-either ( elt quot accum1 accum2 -- )
+    >r >r keep swap r> r> ? push ; inline
+
+: 2pusher ( quot -- quot accum1 accum2 )
+    V{ } clone V{ } clone [ [ push-either ] 3curry ] 2keep ; inline
+
+: partition ( seq quot -- trueseq falseseq )
+    over >r 2pusher >r >r each r> r> r> tuck [ like ] 2bi@ ; inline
+
 : monotonic? ( seq quot -- ? )
     >r dup length 1- swap r> (monotonic) all? ; inline
 
@@ -499,15 +516,13 @@ M: sequence <=>
     [ mismatch not ] [ 2drop f ] if ; inline
 
 : sequence-hashcode-step ( oldhash newpart -- newhash )
-    swap [
+    >fixnum swap [
         dup -2 fixnum-shift-fast swap 5 fixnum-shift-fast
         fixnum+fast fixnum+fast
     ] keep fixnum-bitxor ; inline
 
 : sequence-hashcode ( n seq -- x )
-    0 -rot [
-        hashcode* >fixnum sequence-hashcode-step
-    ] with each ; inline
+    0 -rot [ hashcode* sequence-hashcode-step ] with each ; inline
 
 M: reversed equal? over reversed? [ sequence= ] [ 2drop f ] if ;
 
@@ -583,6 +598,9 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 : replace-slice ( new from to seq -- )
     [ >r >r dup pick length + r> - over r> open-slice ] keep
     copy ;
+
+: remove-nth ( n seq -- seq' )
+    [ swap head-slice ] [ swap 1+ tail-slice ] 2bi append ;
 
 : pop ( seq -- elt )
     [ length 1- ] [ [ nth ] [ shorten ] 2bi ] bi ;
@@ -661,6 +679,9 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 : cut-slice ( seq n -- before after )
     [ head-slice ] [ tail-slice ] 2bi ;
 
+: insert-nth ( elt n seq -- seq' )
+    swap cut-slice [ swap suffix ] dip append ;
+
 : midpoint@ ( seq -- n ) length 2/ ; inline
 
 : halves ( seq -- first second )
@@ -727,16 +748,25 @@ PRIVATE>
     dup slice? [ { } like ] when 0 over length rot <slice> ;
     inline
 
-: left-trim ( seq quot -- newseq )
+: trim-left-slice ( seq quot -- slice )
     over >r [ not ] compose find drop r> swap
-    [ tail ] [ dup length tail ] if* ; inline
+    [ tail-slice ] [ dup length tail-slice ] if* ; inline
+    
+: trim-left ( seq quot -- newseq )
+    over [ trim-left-slice ] dip like ; inline
 
-: right-trim ( seq quot -- newseq )
+: trim-right-slice ( seq quot -- slice )
     over >r [ not ] compose find-last drop r> swap
-    [ 1+ head ] [ 0 head ] if* ; inline
+    [ 1+ head-slice ] [ 0 head-slice ] if* ; inline
+
+: trim-right ( seq quot -- newseq )
+    over [ trim-right-slice ] dip like ; inline
+
+: trim-slice ( seq quot -- slice )
+    [ trim-left-slice ] [ trim-right-slice ] bi ; inline
 
 : trim ( seq quot -- newseq )
-    [ left-trim ] [ right-trim ] bi ; inline
+    over [ trim-slice ] dip like ; inline
 
 : sum ( seq -- n ) 0 [ + ] binary-reduce ;
 

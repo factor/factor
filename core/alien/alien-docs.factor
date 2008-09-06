@@ -10,12 +10,30 @@ HELP: alien
 HELP: dll
 { $class-description "The class of native library handles. See " { $link "syntax-aliens" } " for syntax and " { $link "dll.private" } " for general information." } ;
 
+HELP: dll-valid? ( dll -- ? )
+{ $values { "dll" dll } { "?" "a boolean" } }
+{ $description "Returns true if the library exists and is loaded." } ;
+
 HELP: expired?
-{ $values { "c-ptr" "an alien, byte array, or " { $link f } } { "?" "a boolean" } }
+{ $values { "c-ptr" c-ptr } { "?" "a boolean" } }
 { $description "Tests if the alien is a relic from an earlier session. A byte array is never considered to have expired, whereas passing " { $link f } " always yields true." } ;
 
+HELP: <bad-alien>
+{ $values  { "alien" c-ptr } }
+{ $description "Constructs an invalid alien pointer that has expired." } ;
+
+HELP: <library>
+{ $values
+     { "path" "a pathname string" } { "abi" "the ABI used by the library, either " { $snippet "cdecl" } " or " { $snippet "stdcall" } }
+     { "library" library } }
+{ $description "Opens a C library using the path and ABI parameters and outputs a library tuple." }
+{ $notes "User code should use " { $link add-library } " so that the opened library is added to a global hashtable, " { $link libraries } "." } ;
+
+HELP: libraries
+{ $description "A global hashtable that keeps a list of open libraries. Use the " { $link add-library } " word to construct a library and add it with a single call." } ;
+
 HELP: <displaced-alien> ( displacement c-ptr -- alien )
-{ $values { "displacement" "an integer" } { "c-ptr" "an alien, byte array, or " { $link f } } { "alien" "a new alien" } }
+{ $values { "displacement" "an integer" } { "c-ptr" c-ptr } { "alien" "a new alien" } }
 { $description "Creates a new alien address object, wrapping a raw memory address. The alien points to a location in memory which is offset by " { $snippet "displacement" } " from the address of " { $snippet "c-ptr" } "." }
 { $notes "Passing a value of " { $link f } " for " { $snippet "c-ptr" } " creates an alien with an absolute address; this is how " { $link <alien> } " is implemented."
 $nl
@@ -24,7 +42,7 @@ $nl
 { <alien> <displaced-alien> alien-address } related-words
 
 HELP: alien-address ( c-ptr -- addr )
-{ $values { "c-ptr" "an alien or " { $link f } } { "addr" "a non-negative integer" } }
+{ $values { "c-ptr" c-ptr } { "addr" "a non-negative integer" } }
 { $description "Outputs the address of an alien." }
 { $notes "Taking the address of a " { $link byte-array } " is explicitly prohibited since byte arrays can be moved by the garbage collector between the time the address is taken, and when it is accessed. If you need to pass pointers to C functions which will persist across alien calls, you must allocate unmanaged memory instead. See " { $link "malloc" } "." } ;
 
@@ -124,7 +142,7 @@ HELP: alien-callback-error
 } ;
 
 HELP: alien-callback
-{ $values { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } { "quot" "a quotation" } { "alien" c-ptr } }
+{ $values { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } { "quot" "a quotation" } { "alien" alien } }
 { $description
     "Defines a callback from C to Factor which accepts the given set of parameters from the C caller, pushes them on the data stack, calls the quotation, and passes a return value back to the C caller. A return type of " { $snippet "\"void\"" } " indicates that no value is to be returned."
     $nl
@@ -228,7 +246,8 @@ $nl
 "Usually one never has to deal with DLL handles directly; the C library interface creates them as required. However if direct access to these operating system facilities is required, the following primitives can be used:"
 { $subsection dlopen }
 { $subsection dlsym }
-{ $subsection dlclose } ;
+{ $subsection dlclose }
+{ $subsection dll-valid? } ;
 
 ARTICLE: "embedding-api" "Factor embedding API"
 "The Factor embedding API is defined in " { $snippet "vm/master.h" } "."

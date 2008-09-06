@@ -164,7 +164,7 @@ M: assoc value-at* swap [ = nip ] curry assoc-find nip ;
 : unzip ( assoc -- keys values )
     dup assoc-empty? [ drop { } { } ] [ >alist flip first2 ] if ;
 
-: search-alist ( key alist -- pair i )
+: search-alist ( key alist -- pair/f i/f )
     [ first = ] with find swap ; inline
 
 M: sequence at*

@@ -21,8 +21,8 @@ IN: io.windows.nt.files.tests
 [ t ] [ "\\\\" root-directory? ] unit-test
 [ t ] [ "/" root-directory? ] unit-test
 [ t ] [ "//" root-directory? ] unit-test
-[ t ] [ "c:\\" right-trim-separators root-directory? ] unit-test
-[ t ] [ "Z:\\" right-trim-separators root-directory? ] unit-test
+[ t ] [ "c:\\" trim-right-separators root-directory? ] unit-test
+[ t ] [ "Z:\\" trim-right-separators root-directory? ] unit-test
 [ f ] [ "c:\\foo" root-directory? ] unit-test
 [ f ] [ "." root-directory? ] unit-test
 [ f ] [ ".." root-directory? ] unit-test

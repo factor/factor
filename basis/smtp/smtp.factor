@@ -1,8 +1,8 @@
 ! Copyright (C) 2007, 2008 Elie CHAFTARI, Dirk Vleugels,
 ! Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays namespaces io io.timeouts kernel logging io.sockets
-sequences combinators sequences.lib splitting assocs strings
+USING: arrays namespaces io io.timeouts kernel logging
+io.sockets sequences combinators splitting assocs strings
 math.parser random system calendar io.encodings.ascii summary
 calendar.format accessors sets hashtables ;
 IN: smtp
@@ -112,7 +112,7 @@ ERROR: smtp-transaction-failed < smtp-error ;
     } cond ;
 
 : multiline? ( response -- boolean )
-    ?fourth CHAR: - = ;
+    3 swap ?nth CHAR: - = ;
 
 : process-multiline ( multiline -- response )
     >r readln r> 2dup " " append head? [
@@ -184,21 +184,3 @@ PRIVATE>
 
 : send-email ( email -- )
     [ email>headers ] keep (send-email) ;
-
-! Dirk's old AUTH CRAM-MD5 code. I don't know anything about
-! CRAM MD5, and the old code didn't work properly either, so here
-! it is in case anyone wants to fix it later.
-!
-! check-response used to have this clause:
-! { [ dup "334" head? ] [ " " split 1 swap nth base64> challenge set ] }
-!
-! and the rest of the code was as follows:
-! : (cram-md5-auth) ( -- response )
-!     swap challenge get 
-!     string>md5-hmac hex-string 
-!     " " prepend append 
-!     >base64 ;
-! 
-! : cram-md5-auth ( key login  -- )
-!     "AUTH CRAM-MD5\r\n" get-ok 
-!     (cram-md5-auth) "\r\n" append get-ok ;

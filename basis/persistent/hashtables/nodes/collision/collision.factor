@@ -1,6 +1,6 @@
 ! Based on Clojure's PersistentHashMap by Rich Hickey.
 
-USING: kernel accessors math arrays fry sequences sequences.lib
+USING: kernel accessors math arrays fry sequences
 locals persistent.sequences
 persistent.hashtables.config
 persistent.hashtables.nodes

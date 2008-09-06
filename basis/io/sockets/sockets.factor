@@ -72,22 +72,14 @@ M: inet4 sockaddr-type drop "sockaddr-in" c-type ;
 M: inet4 make-sockaddr ( inet -- sockaddr )
     "sockaddr-in" <c-object>
     AF_INET over set-sockaddr-in-family
-    over inet4-port htons over set-sockaddr-in-port
-    over inet4-host
+    over port>> htons over set-sockaddr-in-port
+    over host>>
     "0.0.0.0" or
     rot inet-pton *uint over set-sockaddr-in-addr ;
 
-<PRIVATE
-
-SYMBOL: port-override
-
-: (port) ( port -- port' ) port-override get swap or ;
-
-PRIVATE>
-
 M: inet4 parse-sockaddr
     >r dup sockaddr-in-addr <uint> r> inet-ntop
-    swap sockaddr-in-port ntohs (port) <inet4> ;
+    swap sockaddr-in-port ntohs <inet4> ;
 
 TUPLE: inet6 host port ;
 
@@ -134,13 +126,13 @@ M: inet6 sockaddr-type drop "sockaddr-in6" c-type ;
 M: inet6 make-sockaddr ( inet -- sockaddr )
     "sockaddr-in6" <c-object>
     AF_INET6 over set-sockaddr-in6-family
-    over inet6-port htons over set-sockaddr-in6-port
-    over inet6-host "::" or
+    over port>> htons over set-sockaddr-in6-port
+    over host>> "::" or
     rot inet-pton over set-sockaddr-in6-addr ;
 
 M: inet6 parse-sockaddr
     >r dup sockaddr-in6-addr r> inet-ntop
-    swap sockaddr-in6-port ntohs (port) <inet6> ;
+    swap sockaddr-in6-port ntohs <inet6> ;
 
 : addrspec-of-family ( af -- addrspec )
     {
@@ -259,17 +251,6 @@ HOOK: (send) io-backend ( packet addrspec datagram -- )
     [ addrinfo>addrspec ] map
     sift ;
 
-: prepare-resolve-host ( addrspec -- host' serv' flags )
-    #! If the port is a number, we resolve for 'http' then
-    #! change it later. This is a workaround for a FreeBSD
-    #! getaddrinfo() limitation -- on Windows, Linux and Mac,
-    #! we can convert a number to a string and pass that as the
-    #! service name, but on FreeBSD this gives us an unknown
-    #! service error.
-    [ host>> ]
-    [ port>> dup integer? [ port-override set "http" ] when ] bi
-    over 0 AI_PASSIVE ? ;
-
 HOOK: addrinfo-error io-backend ( n -- )
 
 GENERIC: resolve-host ( addrspec -- seq )
@@ -278,17 +259,24 @@ TUPLE: inet host port ;
 
 C: <inet> inet
 
+: resolve-passive-host ( -- addrspecs )
+    { T{ inet6 f "::" f } T{ inet4 f "0.0.0.0" f } } [ clone ] map ;
+
+: prepare-addrinfo ( -- addrinfo )
+    "addrinfo" <c-object>
+    PF_UNSPEC over set-addrinfo-family
+    IPPROTO_TCP over set-addrinfo-protocol ;
+
+: fill-in-ports ( addrspecs port -- addrspecs )
+    [ >>port ] curry map ;
+
 M: inet resolve-host
-    [
-        prepare-resolve-host
-        "addrinfo" <c-object>
-        [ set-addrinfo-flags ] keep
-        PF_UNSPEC over set-addrinfo-family
-        IPPROTO_TCP over set-addrinfo-protocol
-        f <void*> [ getaddrinfo addrinfo-error ] keep *void*
-        [ parse-addrinfo-list ] keep
-        freeaddrinfo
-    ] with-scope ;
+    [ port>> ] [ host>> ] bi [
+        f prepare-addrinfo f <void*>
+        [ getaddrinfo addrinfo-error ] keep *void*
+        [ parse-addrinfo-list ] keep freeaddrinfo
+    ] [ resolve-passive-host ] if*
+    swap fill-in-ports ;
 
 M: f resolve-host drop { } ;
 

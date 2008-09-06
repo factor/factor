@@ -1,7 +1,7 @@
 USING: alien arrays generic generic.math help.markup help.syntax
 kernel math memory strings sbufs vectors io io.files classes
-help generic.standard continuations system debugger.private
-io.files.private listener ;
+help generic.standard continuations system io.files.private
+listener ;
 IN: debugger
 
 ARTICLE: "debugger" "The debugger"
@@ -22,8 +22,6 @@ ARTICLE: "debugger" "The debugger"
 { $subsection :2 }
 { $subsection :3 }
 { $subsection :res }
-"Assertions:"
-{ $subsection "errors-assert" }
 "You can read more about error handling in " { $link "errors" } "." ;
 
 ABOUT: "debugger"

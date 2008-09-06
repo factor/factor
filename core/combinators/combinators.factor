@@ -13,14 +13,14 @@ IN: combinators
     [ [ keep ] curry ] map concat [ drop ] append [ ] like ;
 
 ! 2cleave
-: 2cleave ( x seq -- )
+: 2cleave ( x y seq -- )
     [ 2keep ] each 2drop ;
 
 : 2cleave>quot ( seq -- quot )
     [ [ 2keep ] curry ] map concat [ 2drop ] append [ ] like ;
 
 ! 3cleave
-: 3cleave ( x seq -- )
+: 3cleave ( x y z seq -- )
     [ 3keep ] each 3drop ;
 
 : 3cleave>quot ( seq -- quot )
