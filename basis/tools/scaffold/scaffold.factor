@@ -4,7 +4,7 @@ USING: assocs io.files hashtables kernel namespaces sequences
 vocabs.loader io combinators io.encodings.utf8 calendar accessors
 math.parser io.streams.string ui.tools.operations quotations
 strings arrays prettyprint words vocabs sorting sets
-classes ;
+classes alien ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -95,6 +95,7 @@ ERROR: no-vocab vocab ;
         { "obj3" object } { "obj4" object }
         { "quot" quotation } { "quot1" quotation }
         { "quot2" quotation } { "quot3" quotation }
+        { "quot'" quotation }
         { "string" string } { "string1" string }
         { "string2" string } { "string3" string }
         { "str" string }
@@ -105,9 +106,20 @@ ERROR: no-vocab vocab ;
         { "ch" "a character" }
         { "word" word }
         { "array" array }
+        { "duration" duration }
         { "path" "a pathname string" }
         { "vocab" "a vocabulary specifier" }
         { "vocab-root" "a vocabulary root string" }
+        { "c-ptr" c-ptr }
+        { "seq" sequence } { "seq1" sequence } { "seq2" sequence }
+        { "seq3" sequence } { "seq4" sequence }
+        { "seq1'" sequence } { "seq2'" sequence }
+        { "newseq" sequence } 
+        { "assoc" assoc } { "assoc1" assoc } { "assoc2" assoc }
+        { "assoc3" assoc } { "newassoc" assoc }
+        { "alist" "an array of key/value pairs" }
+        { "keys" sequence } { "values" sequence }
+        { "class" class }
     } at* ;
 
 : add-using ( object -- )
@@ -227,3 +239,20 @@ PRIVATE>
         [ drop scaffold-authors ]
         [ nip require ]
     } 2cleave ;
+
+SYMBOL: examples-flag
+
+: example ( -- )
+    {
+        "{ $example \"\" \"USING: prettyprint ;\""
+        "           \"\""
+        "           \"\""
+        "}"
+    } [ examples-flag get [ "    " write ] when print ] each ;
+
+: examples ( n -- )
+    t \ examples-flag [
+        "{ $examples " print
+        [ example ] times
+        "}" print
+    ] with-variable ;

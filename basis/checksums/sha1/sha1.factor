@@ -127,7 +127,7 @@ M: sha1 checksum-stream ( stream -- sha1 )
     [ zip concat ] keep like ;
 
 : sha1-interleave ( string -- seq )
-    [ zero? ] left-trim
+    [ zero? ] trim-left
     dup length odd? [ rest ] when
     seq>2seq [ sha1 checksum-bytes ] bi@
     2seq>seq ;

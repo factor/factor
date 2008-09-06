@@ -237,13 +237,13 @@ unit-test
 
 [ -1./0. 0 delete-nth ] must-fail
 [ "" ] [ "" [ CHAR: \s = ] trim ] unit-test
-[ "" ] [ "" [ CHAR: \s = ] left-trim ] unit-test
-[ "" ] [ "" [ CHAR: \s = ] right-trim ] unit-test
-[ "" ] [ "  " [ CHAR: \s = ] left-trim ] unit-test
-[ "" ] [ "  " [ CHAR: \s = ] right-trim ] unit-test
+[ "" ] [ "" [ CHAR: \s = ] trim-left ] unit-test
+[ "" ] [ "" [ CHAR: \s = ] trim-right ] unit-test
+[ "" ] [ "  " [ CHAR: \s = ] trim-left ] unit-test
+[ "" ] [ "  " [ CHAR: \s = ] trim-right ] unit-test
 [ "asdf" ] [ " asdf " [ CHAR: \s = ] trim ] unit-test
-[ "asdf " ] [ " asdf " [ CHAR: \s = ] left-trim ] unit-test
-[ " asdf" ] [ " asdf " [ CHAR: \s = ] right-trim ] unit-test
+[ "asdf " ] [ " asdf " [ CHAR: \s = ] trim-left ] unit-test
+[ " asdf" ] [ " asdf " [ CHAR: \s = ] trim-right ] unit-test
 
 [ 328350 ] [ 100 [ sq ] sigma ] unit-test
 

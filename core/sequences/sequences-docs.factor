@@ -178,6 +178,16 @@ ARTICLE: "sequences-search" "Searching sequences"
 { $subsection find-last }
 { $subsection find-last-from } ;
 
+ARTICLE: "sequences-trimming" "Trimming sequences"
+"Trimming words:"
+{ $subsection trim }
+{ $subsection trim-left }
+{ $subsection trim-right }
+"Potentially more efficient trim:"
+{ $subsection trim-slice }
+{ $subsection trim-left-slice }
+{ $subsection trim-right-slice } ;
+
 ARTICLE: "sequences-destructive" "Destructive operations"
 "These words modify their input, instead of creating a new sequence."
 $nl
@@ -245,6 +255,7 @@ $nl
 { $subsection "sequences-sorting" }
 { $subsection "binary-search" }
 { $subsection "sets" }
+{ $subsection "sequences-trimming" }
 "For inner loops:"
 { $subsection "sequences-unsafe" } ;
 
@@ -731,7 +742,7 @@ HELP: reverse-here
 
 HELP: padding
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "elt" object } { "quot" "a quotation with stack effect " { $snippet "( seq1 seq2 -- newseq )" } } { "newseq" "a new sequence" } }
-{ $description "Outputs a new string sequence of " { $snippet "elt" } " repeated, that when appended to " { $snippet "seq" } ", yields a sequence of length " { $snippet "n" } ". If the length of { " { $snippet "seq" } " is greater than " { $snippet "n" } ", this word outputs an empty sequence." } ;
+{ $description "Outputs a new string sequence of " { $snippet "elt" } " repeated, that when appended to " { $snippet "seq" } ", yields a sequence of length " { $snippet "n" } ". If the length of " { $snippet "seq" } " is greater than " { $snippet "n" } ", this word outputs an empty sequence." } ;
 
 HELP: pad-left
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "elt" object } { "padded" "a new sequence" } }
@@ -1004,3 +1015,45 @@ HELP: count
     "50"
 } ;
 
+HELP: pusher
+{ $values
+     { "quot" "a predicate quotation" }
+     { "quot" quotation } { "accum" vector } }
+{ $description "Creates a new vector to accumulate the values which return true for a predicate.  Returns a new quotation which accepts an object to be tested and stored in the accumulator if the test yields true. The accumulator is left on the stack for convenience." }
+{ $example "! Find all the even numbers:" "USING: prettyprint sequences math kernel ;"
+           "10 [ even? ] pusher [ each ] dip ."
+           "V{ 0 2 4 6 8 }"
+}
+{ $notes "Used to implement the " { $link filter } " word." } ;
+
+HELP: trim-left
+{ $values
+     { "seq" sequence } { "quot" quotation }
+     { "newseq" sequence } }
+{ $description "Removes elements starting from the left side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a new sequence." }
+{ $example "" "USING: prettyprint math sequences ;"
+           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-left ."
+           "{ 1 2 3 0 0 }"
+} ;
+
+HELP: trim-right
+{ $values
+     { "seq" sequence } { "quot" quotation }
+     { "newseq" sequence } }
+{ $description "Removes elements starting from the right side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a new sequence." }
+{ $example "" "USING: prettyprint math sequences ;"
+           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-right ."
+           "{ 0 0 1 2 3 }"
+} ;
+
+HELP: trim
+{ $values
+     { "seq" sequence } { "quot" quotation }
+     { "newseq" sequence } }
+{ $description "Removes elements starting from the left and right sides of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a new sequence." }
+{ $example "" "USING: prettyprint math sequences ;"
+           "{ 0 0 1 2 3 0 0 } [ zero? ] trim ."
+           "{ 1 2 3 }"
+} ;
+
+{ trim-left trim-right trim } related-words

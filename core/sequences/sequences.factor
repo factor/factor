@@ -748,16 +748,25 @@ PRIVATE>
     dup slice? [ { } like ] when 0 over length rot <slice> ;
     inline
 
-: left-trim ( seq quot -- newseq )
+: trim-left-slice ( seq quot -- slice )
     over >r [ not ] compose find drop r> swap
-    [ tail ] [ dup length tail ] if* ; inline
+    [ tail-slice ] [ dup length tail-slice ] if* ; inline
+    
+: trim-left ( seq quot -- newseq )
+    over [ trim-left-slice ] dip like ; inline
 
-: right-trim ( seq quot -- newseq )
+: trim-right-slice ( seq quot -- slice )
     over >r [ not ] compose find-last drop r> swap
-    [ 1+ head ] [ 0 head ] if* ; inline
+    [ 1+ head-slice ] [ 0 head-slice ] if* ; inline
+
+: trim-right ( seq quot -- newseq )
+    over [ trim-right-slice ] dip like ; inline
+
+: trim-slice ( seq quot -- slice )
+    [ trim-left-slice ] [ trim-right-slice ] bi ;
 
 : trim ( seq quot -- newseq )
-    [ left-trim ] [ right-trim ] bi ; inline
+    over [ trim-slice ] dip like ; inline
 
 : sum ( seq -- n ) 0 [ + ] binary-reduce ;
 

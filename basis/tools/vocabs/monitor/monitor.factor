@@ -9,8 +9,8 @@ IN: tools.vocabs.monitor
 TR: convert-separators "/\\" ".." ;
 
 : vocab-dir>vocab-name ( path -- vocab )
-    left-trim-separators
-    right-trim-separators
+    trim-left-separators
+    trim-right-separators
     convert-separators ;
 
 : path>vocab-name ( path -- vocab )
