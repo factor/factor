@@ -252,7 +252,8 @@ IN: tools.deploy.shaker
         strip-prettyprint? [
             {
                 prettyprint.config:margin
-                prettyprint.config:string-limit
+                prettyprint.config:string-limit?
+                prettyprint.config:boa-tuples?
                 prettyprint.config:tab-size
             } %
         ] when

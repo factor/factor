@@ -51,5 +51,5 @@ M: persistent-hash clone ;
 : PH{ \ } [ >persistent-hash ] parse-literal ; parsing
 
 M: persistent-hash pprint-delims drop \ PH{ \ } ;
-
 M: persistent-hash >pprint-sequence >alist ;
+M: persistent-hash pprint* pprint-object ;

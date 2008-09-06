@@ -71,7 +71,8 @@ IN: prettyprint
        { line-limit 1 }
        { length-limit 15 }
        { nesting-limit 2 }
-       { string-limit t }
+       { string-limit? t }
+       { boa-tuples? t }
     } clone [ pprint ] bind ;
 
 : unparse-short ( obj -- str )
