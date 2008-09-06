@@ -18,7 +18,7 @@ TUPLE: kick < irc-message channel who ;
 TUPLE: roomlist < irc-message channel names ;
 TUPLE: nick-in-use < irc-message asterisk name ;
 TUPLE: notice < irc-message type ;
-TUPLE: mode < irc-message channel mode ;
+TUPLE: mode < irc-message channel mode nickname parameter ;
 TUPLE: names-reply < irc-message who channel ;
 TUPLE: unhandled < irc-message ;
 
@@ -27,6 +27,9 @@ TUPLE: unhandled < irc-message ;
     [ [ (>>trailing) ] [ (>>parameters) ] [ (>>command) ] tri ] keep ;
 
 <PRIVATE
+
+: channel? ( string -- ? )
+    first "#&" member? ;
 
 GENERIC: command-string>> ( irc-message -- string )
 
@@ -65,10 +68,18 @@ M: privmsg (>>command-parameters) ( params privmsg -- ) >r first r> (>>name) ;
 M: notice  (>>command-parameters) ( params notice -- )  >r first r> (>>type) ;
 M: kick    (>>command-parameters) ( params kick -- )
     >r first2 r> [ (>>who) ] [ (>>channel) ] bi ;
-M: mode    (>>command-parameters) ( params mode -- )
-    >r first2 r> [ (>>mode) ] [ (>>channel) ] bi ; ! FIXME
 M: names-reply (>>command-parameters) ( params names-reply -- )
     [ >r first r> (>>who) ] [ >r third r> (>>channel) ] 2bi ;
+M: mode    (>>command-parameters) ( params mode -- )
+    over first channel? [
+        over length 3 = [
+            >r first3 r> [ (>>parameter) ] [ (>>mode) ] [ (>>channel) ] tri
+        ] [
+            >r first2 r>                   [ (>>mode) ] [ (>>channel) ] bi
+        ] if
+    ] [
+        >r first2 r> [ (>>mode) ] [ (>>nickname) ] bi
+    ] if ;
 
 PRIVATE>
 
@@ -110,7 +121,7 @@ M: irc-message irc-message>server-line ( irc-message -- string )
 : split-trailing ( string -- string string/f )
     ":" split1 ;
 
-: copy-contents ( origin dest -- )
+: copy-message-in ( origin dest -- )
     { [ >r parameters>> r> [ (>>command-parameters) ] [ (>>parameters) ] 2bi ]
       [ >r line>>       r> (>>line) ]
       [ >r prefix>>     r> (>>prefix) ]
@@ -134,18 +145,17 @@ M: sender-in-prefix irc-message-sender ( sender-in-prefix -- sender )
 : parse-irc-line ( string -- message )
     string>irc-message
     dup command>> {
-        { "PING" [ ping new ] }
-        { "NOTICE" [ notice new ] }
-        { "001" [ logged-in new ] }
-        { "433" [ nick-in-use new ] }
-        { "353" [ names-reply new ] }
-        { "JOIN" [ join new ] }
-        { "PART" [ part new ] }
-        { "NICK" [ nick new ] }
-        { "PRIVMSG" [ privmsg new ] }
-        { "QUIT" [ quit new ] }
-        { "MODE" [ mode new ] }
-        { "KICK" [ kick new ] }
-        [ drop unhandled new ]
-    } case
-    [ copy-contents ] keep ;
+        { "PING"    [ ping ] }
+        { "NOTICE"  [ notice ] }
+        { "001"     [ logged-in ] }
+        { "433"     [ nick-in-use ] }
+        { "353"     [ names-reply ] }
+        { "JOIN"    [ join ] }
+        { "PART"    [ part ] }
+        { "NICK"    [ nick ] }
+        { "PRIVMSG" [ privmsg ] }
+        { "QUIT"    [ quit ] }
+        { "MODE"    [ mode ] }
+        { "KICK"    [ kick ] }
+        [ drop unhandled ]
+    } case new [ copy-message-in ] keep ;

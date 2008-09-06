@@ -6,54 +6,70 @@ IN: irc.messages.tests
 
 { "someuser" } [ "someuser!n=user@some.where" parse-name ] unit-test
 
-irc-message new
-    ":someuser!n=user@some.where PRIVMSG #factortest :hi" >>line
-    "someuser!n=user@some.where" >>prefix
-                       "PRIVMSG" >>command
-               { "#factortest" } >>parameters
-                            "hi" >>trailing
-1array
+{ T{ irc-message
+     { line ":someuser!n=user@some.where PRIVMSG #factortest :hi" }
+     { prefix "someuser!n=user@some.where" }
+     { command  "PRIVMSG" }
+     { parameters { "#factortest" } }
+     { trailing "hi" } } }
 [ ":someuser!n=user@some.where PRIVMSG #factortest :hi"
   string>irc-message f >>timestamp ] unit-test
 
-privmsg new
-    ":someuser!n=user@some.where PRIVMSG #factortest :hi" >>line
-    "someuser!n=user@some.where" >>prefix
-                       "PRIVMSG" >>command
-               { "#factortest" } >>parameters
-                            "hi" >>trailing
-                   "#factortest" >>name
-1array
+{ T{ privmsg
+     { line ":someuser!n=user@some.where PRIVMSG #factortest :hi" }
+     { prefix  "someuser!n=user@some.where" }
+     { command "PRIVMSG" }
+     { parameters { "#factortest" } }
+     { trailing "hi" }
+     { name "#factortest" } } }
 [ ":someuser!n=user@some.where PRIVMSG #factortest :hi"
   parse-irc-line f >>timestamp ] unit-test
 
-join new
-    ":someuser!n=user@some.where JOIN :#factortest" >>line
-    "someuser!n=user@some.where" >>prefix
-                          "JOIN" >>command
-                             { } >>parameters
-                   "#factortest" >>trailing
-1array
+{ T{ join
+     { line ":someuser!n=user@some.where JOIN :#factortest" }
+     { prefix "someuser!n=user@some.where" }
+     { command "JOIN" }
+     { parameters { } }
+     { trailing "#factortest" } } }
 [ ":someuser!n=user@some.where JOIN :#factortest"
   parse-irc-line f >>timestamp ] unit-test
 
-mode new
-    ":ircserver.net MODE #factortest +ns" >>line
-                          "ircserver.net" >>prefix
-                                   "MODE" >>command
-                  { "#factortest" "+ns" } >>parameters
-                            "#factortest" >>channel
-                                    "+ns" >>mode
-1array
+{ T{ mode
+     { line ":ircserver.net MODE #factortest +ns" }
+     { prefix "ircserver.net" }
+     { command "MODE" }
+     { parameters { "#factortest" "+ns" } }
+     { channel "#factortest" }
+     { mode "+ns" } } }
 [ ":ircserver.net MODE #factortest +ns"
   parse-irc-line f >>timestamp ] unit-test
 
-nick new
-    ":someuser!n=user@some.where NICK :someuser2" >>line
-                     "someuser!n=user@some.where" >>prefix
-                                           "NICK" >>command
-                                              { } >>parameters
-                                      "someuser2" >>trailing
-1array
+{ T{ mode
+     { line ":ircserver.net MODE #factortest +o someuser" }
+     { prefix "ircserver.net" }
+     { command "MODE" }
+     { parameters { "#factortest" "+o" "someuser" } }
+     { channel "#factortest" }
+     { mode "+o" }
+     { parameter "someuser" } } }
+[ ":ircserver.net MODE #factortest +o someuser"
+  parse-irc-line f >>timestamp ] unit-test
+
+{ T{ mode
+     { line ":ircserver.net MODE someuser +i" }
+     { prefix "ircserver.net" }
+     { command "MODE" }
+     { parameters { "someuser" "+i" } }
+     { nickname "someuser" }
+     { mode "+i" } } }
+[ ":ircserver.net MODE someuser +i"
+  parse-irc-line f >>timestamp ] unit-test
+
+{ T{ nick
+     { line ":someuser!n=user@some.where NICK :someuser2" }
+     { prefix "someuser!n=user@some.where" }
+     { command "NICK" }
+     { parameters  { } }
+     { trailing "someuser2" } } }
 [ ":someuser!n=user@some.where NICK :someuser2"
   parse-irc-line f >>timestamp ] unit-test
