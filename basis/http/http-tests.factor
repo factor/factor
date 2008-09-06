@@ -25,7 +25,7 @@ blah
 
 [
     T{ request
-        { url T{ url path: "/bar" } }
+        { url T{ url { path "/bar" } } }
         { method "POST" }
         { version "1.1" }
         { header H{ { "some-header" "1; 2" } { "content-length" "4" } { "content-type" "application/octet-stream" } } }
