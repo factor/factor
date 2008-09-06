@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel combinators math namespaces
-assocs assocs.lib sequences splitting sorting sets debugger
+assocs sequences splitting sorting sets debugger
 strings vectors hashtables quotations arrays byte-arrays
 math.parser calendar calendar.format present
 
@@ -27,9 +27,12 @@ IN: http
 : (read-header) ( -- alist )
     [ read-crlf dup f like ] [ parse-header-line ] [ drop ] produce ;
 
+: collect-headers ( assoc -- assoc' )
+    H{ } clone [ '[ , push-at ] assoc-each ] keep ;
+
 : process-header ( alist -- assoc )
     f swap [ [ swap or dup ] dip swap ] assoc-map nip
-    [ ?push ] histogram [ "; " join ] assoc-map
+    collect-headers [ "; " join ] assoc-map
     >hashtable ;
 
 : read-header ( -- assoc )

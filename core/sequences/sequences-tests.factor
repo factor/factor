@@ -3,6 +3,9 @@ sequences.private strings sbufs tools.test vectors
 generic vocabs.loader ;
 IN: sequences.tests
 
+[ "empty" ] [ { } [ "empty" ] [ "not empty" ] if-empty ] unit-test
+[ { 1 } "not empty" ] [ { 1 } [ "empty" ] [ "not empty" ] if-empty ] unit-test
+
 [ V{ 1 2 3 4 } ] [ 1 5 dup <slice> >vector ] unit-test
 [ 3 ] [ 1 4 dup <slice> length ] unit-test
 [ 2 ] [ 1 3 { 1 2 3 4 } <slice> length ] unit-test

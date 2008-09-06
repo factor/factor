@@ -28,6 +28,14 @@ M: sequence lengthen 2dup length > [ set-length ] [ 2drop ] if ;
 M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ;
 
 : empty? ( seq -- ? ) length zero? ; inline
+
+: if-empty ( seq quot1 quot2 -- )
+    [ dup empty? ] [ [ drop ] prepose ] [ ] tri* if ; inline
+
+: when-empty ( seq quot1 -- ) [ ] if-empty ; inline
+
+: unless-empty ( seq quot1 -- ) [ ] swap if-empty ; inline
+
 : delete-all ( seq -- ) 0 swap set-length ;
 
 : first ( seq -- first ) 0 swap nth ; inline
@@ -582,6 +590,9 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
     [ >r >r dup pick length + r> - over r> open-slice ] keep
     copy ;
 
+: remove-nth ( n seq -- seq' )
+    [ swap head-slice ] [ swap 1+ tail-slice ] 2bi append ;
+
 : pop ( seq -- elt )
     [ length 1- ] [ [ nth ] [ shorten ] 2bi ] bi ;
 
@@ -658,6 +669,9 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 
 : cut-slice ( seq n -- before after )
     [ head-slice ] [ tail-slice ] 2bi ;
+
+: insert-nth ( elt n seq -- seq' )
+    swap cut-slice [ swap suffix ] dip append ;
 
 : midpoint@ ( seq -- n ) length 2/ ; inline
 

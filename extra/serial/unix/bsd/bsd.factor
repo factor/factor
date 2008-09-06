@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax kernel math.bitfields sequences system serial ;
+USING: alien.syntax kernel math.bitwise sequences system serial ;
 IN: serial.unix
 
 M: bsd lookup-baud ( m -- n )

@@ -3,8 +3,8 @@
 USING: io.files kernel tools.test db db.tuples classes
 db.types continuations namespaces math math.ranges
 prettyprint calendar sequences db.sqlite math.intervals
-db.postgresql accessors random math.bitfields.lib
-math.ranges strings sequences.lib urls fry ;
+db.postgresql accessors random math.bitwise
+math.ranges strings urls fry ;
 IN: db.tuples.tests
 
 TUPLE: person the-id the-name the-number the-real

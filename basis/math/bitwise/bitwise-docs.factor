@@ -1,5 +1,5 @@
 USING: help.markup help.syntax math ;
-IN: math.bitfields
+IN: math.bitwise
 
 ARTICLE: "math-bitfields" "Constructing bit fields"
 "Some applications, such as binary communication protocols and assemblers, need to construct integers from elaborate bit field specifications. Hand-coding this using " { $link shift } " and " { $link bitor } " results in repetitive code. A higher-level facility exists to factor out this repetition:"
@@ -34,4 +34,17 @@ HELP: bitfield
         "        0"
         "    } ;"
     }
+} ;
+
+HELP: bits 
+{ $values { "m" integer } { "n" integer } { "m'" integer } }
+{ $description "Keep only n bits from the integer m." }
+{ $example "USING: math.bitwise prettyprint ;" "HEX: 123abcdef 16 bits .h" "cdef" } ;
+
+HELP: bitroll
+{ $values { "x" "an integer (input)" } { "s" "an integer (shift)" } { "w" "an integer (wrap)" } { "y" integer } }
+{ $description "Roll n by s bits to the left, wrapping around after w bits." }
+{ $examples
+    { $example "USING: math.bitwise prettyprint ;" "1 -1 32 bitroll .b" "10000000000000000000000000000000" }
+    { $example "USING: math.bitwise prettyprint ;" "HEX: ffff0000 8 32 bitroll .h" "ff0000ff" }
 } ;

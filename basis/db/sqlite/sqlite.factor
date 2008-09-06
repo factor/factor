@@ -1,13 +1,11 @@
 ! Copyright (C) 2005, 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien arrays assocs classes compiler db
-hashtables io.files kernel math math.parser namespaces
-prettyprint sequences strings classes.tuple alien.c-types
-continuations db.sqlite.lib db.sqlite.ffi db.tuples
-words combinators.lib db.types combinators math.intervals
-io namespaces.lib accessors vectors math.ranges random
-math.bitfields.lib db.queries destructors ;
-USE: tools.walker
+USING: alien arrays assocs classes compiler db hashtables
+io.files kernel math math.parser namespaces prettyprint
+sequences strings classes.tuple alien.c-types continuations
+db.sqlite.lib db.sqlite.ffi db.tuples words db.types combinators
+math.intervals io nmake accessors vectors math.ranges random
+math.bitwise db.queries destructors ;
 IN: db.sqlite
 
 TUPLE: sqlite-db < db path ;

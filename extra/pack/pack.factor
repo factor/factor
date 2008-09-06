@@ -1,7 +1,7 @@
 USING: alien alien.c-types arrays assocs byte-arrays io
 io.binary io.streams.string kernel math math.parser namespaces
 parser prettyprint quotations sequences strings vectors words
-macros math.functions math.bitfields.lib ;
+macros math.functions math.bitwise ;
 IN: pack
 
 SYMBOL: big-endian

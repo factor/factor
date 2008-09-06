@@ -4,8 +4,7 @@ USING: alien.c-types io.binary io.backend io.files io.buffers
 io.windows kernel math splitting
 windows windows.kernel32 windows.time calendar combinators
 math.functions sequences namespaces words symbols system
-io.ports destructors accessors
-math.bitfields math.bitfields.lib ;
+io.ports destructors accessors math.bitwise ;
 IN: io.windows.files
 
 : open-file ( path access-mode create-mode flags -- handle )

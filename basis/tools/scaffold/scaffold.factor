@@ -3,8 +3,8 @@
 USING: assocs io.files hashtables kernel namespaces sequences
 vocabs.loader io combinators io.encodings.utf8 calendar accessors
 math.parser io.streams.string ui.tools.operations quotations
-strings arrays prettyprint words vocabs sorting sets cords
-classes sequences.lib combinators.lib ;
+strings arrays prettyprint words vocabs sorting sets
+classes ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -160,16 +160,18 @@ ERROR: no-vocab vocab ;
 
 : help-file-string ( str1 -- str2 )
     [
-        [ "IN: " write print nl ]
-        [ interesting-words. ]
-        [ "ARTICLE: " write unparse dup write bl print ";" print nl ]
-        [ "ABOUT: " write unparse print ] quad
+        {
+            [ "IN: " write print nl ]
+            [ interesting-words. ]
+            [ "ARTICLE: " write unparse dup write bl print ";" print nl ]
+            [ "ABOUT: " write unparse print ]
+        } cleave
     ] with-string-writer ;
 
 : write-using ( -- )
     "USING:" write
     using get keys
-    { "help.markup" "help.syntax" } cord-append natural-sort 
+    { "help.markup" "help.syntax" } append natural-sort 
     [ bl write ] each
     " ;" print ;
 

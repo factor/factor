@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2006 Eduardo Cavazos and Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.c-types hashtables kernel math math.vectors math.bitfields
-namespaces sequences x11.xlib x11.constants x11.glx ;
+USING: alien alien.c-types hashtables kernel math math.vectors
+math.bitwise namespaces sequences x11.xlib x11.constants x11.glx ;
 IN: x11.windows
 
 : create-window-mask ( -- n )

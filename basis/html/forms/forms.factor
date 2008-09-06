@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors strings namespaces assocs hashtables
-mirrors math fry sequences sequences.lib words continuations ;
+mirrors math fry sequences words continuations ;
 IN: html.forms
 
 TUPLE: form errors values validation-failed ;

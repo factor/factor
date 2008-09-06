@@ -43,6 +43,9 @@ M: f random-32* ( obj -- * ) no-random-number-generator ;
         ] keep nth
     ] if ;
 
+: delete-random ( seq -- elt )
+    [ length random ] keep [ nth ] 2keep delete-nth ;
+
 : random-bits ( n -- r ) 2^ random ;
 
 : with-random ( tuple quot -- )

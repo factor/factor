@@ -88,9 +88,6 @@ IN: sequences.lib
 : monotonic-split ( seq quot -- newseq )
     over empty? [ 2drop { } ] [ (monotonic-split) ] if ;
 
-: delete-random ( seq -- value )
-    [ length random ] keep [ nth ] 2keep delete-nth ;
-
 ERROR: element-not-found ;
 : split-around ( seq quot -- before elem after )
     dupd find over [ element-not-found ] unless
@@ -201,12 +198,6 @@ PRIVATE>
 
 : ?nth* ( n seq -- elt/f ? )
     2dup bounds-check? [ nth-unsafe t ] [ 2drop f f ] if ; flushable
-
-: remove-nth ( n seq -- seq' )
-    [ swap head-slice ] [ swap 1+ tail-slice ] 2bi append ;
-
-: insert-nth ( elt n seq -- seq' )
-    swap cut-slice [ swap 1array ] dip 3append ;
 
 : if-seq ( seq quot1 quot2 -- ) [ f like ] 2dip if* ; inline
  

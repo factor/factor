@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types kernel math math.bitfields namespaces
+USING: alien.c-types kernel math math.bitwise namespaces
 locals accessors combinators threads vectors hashtables
 sequences assocs continuations sets
 unix unix.time unix.kqueue unix.process

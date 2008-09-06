@@ -43,9 +43,6 @@ IN: sequences.lib.tests
 [ { { 1 1 1 1 } { 2 2 } { 3 } { 4 } { 5 } { 6 6 6 } } ]
 [ { 1 1 1 1 2 2 3 4 5 6 6 6 } [ = ] monotonic-split [ >array ] map ] unit-test
 
-[ 2 ] [ V{ 10 20 30 } [ delete-random drop ] keep length ] unit-test
-[ V{ } [ delete-random drop ] keep length ] must-fail
-
 [ { 1 9 25 } ] [ { 1 3 5 6 } [ sq ] [ even? ] map-until ] unit-test
 [ { 2 4 } ] [ { 2 4 1 3 } [ even? ] take-while ] unit-test
 
@@ -69,6 +66,3 @@ IN: sequences.lib.tests
 
 [ "empty" ] [ { } [ "not empty" ] [ "empty" ] if-seq ] unit-test
 [ { 1 } "not empty" ] [ { 1 } [ "not empty" ] [ "empty" ] if-seq ] unit-test
-
-[ "empty" ] [ { } [ "empty" ] [ "not empty" ] if-empty ] unit-test
-[ { 1 } "not empty" ] [ { 1 } [ "empty" ] [ "not empty" ] if-empty ] unit-test

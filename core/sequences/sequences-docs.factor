@@ -315,6 +315,15 @@ HELP: empty?
 { $values { "seq" sequence } { "?" "a boolean" } }
 { $description "Tests if the sequence has zero length." } ;
 
+HELP: if-empty
+{ $values { "seq" sequence } { "quot1" quotation } { "quot2" quotation } }
+{ $description "Makes an implicit check if the sequence is empty. An empty sequence is dropped and " { $snippet "quot1" } " is called. Otherwise, if the sequence has any elements, " { $snippet "quot2" } " is called on it." }
+{ $example
+    "USING: kernel prettyprint sequences sequences.lib ;"
+    "{ 1 2 3 } [ \"empty sequence\" ] [ sum ] if-empty ."
+    "6"
+} ;
+
 HELP: delete-all
 { $values { "seq" "a resizable sequence" } }
 { $description "Resizes the sequence to zero length, removing all elements. Not all sequences are resizable." }
