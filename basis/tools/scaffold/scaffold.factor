@@ -4,7 +4,7 @@ USING: assocs io.files hashtables kernel namespaces sequences
 vocabs.loader io combinators io.encodings.utf8 calendar accessors
 math.parser io.streams.string ui.tools.operations quotations
 strings arrays prettyprint words vocabs sorting sets
-classes alien ;
+classes math alien ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
