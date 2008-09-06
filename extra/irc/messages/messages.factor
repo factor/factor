@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel fry splitting ascii calendar accessors combinators qualified
-       arrays classes.tuple math.order quotations ;
+       arrays classes.tuple math.order inverse ;
 RENAME: join sequences => sjoin
 EXCLUDE: sequences => join ;
 IN: irc.messages
@@ -59,6 +59,9 @@ M: kick command-parameters>> ( kick -- seq )
 M: mode command-parameters>> ( mode -- seq )
     [ name>> ] [ channel>> ] [ mode>> ] tri 3array ;
 
+: (>>channel|nickname) ( string mode -- )
+    over channel? [ (>>channel) ] [ (>>nickname) ] if ;
+
 GENERIC: (>>command-parameters) ( params irc-message -- )
 
 M: irc-message (>>command-parameters) ( params irc-message -- ) 2drop ;
@@ -71,15 +74,9 @@ M: kick    (>>command-parameters) ( params kick -- )
 M: names-reply (>>command-parameters) ( params names-reply -- )
     [ >r first r> (>>who) ] [ >r third r> (>>channel) ] 2bi ;
 M: mode    (>>command-parameters) ( params mode -- )
-    over first channel? [
-        over length 3 = [
-            >r first3 r> [ (>>parameter) ] [ (>>mode) ] [ (>>channel) ] tri
-        ] [
-            >r first2 r>                   [ (>>mode) ] [ (>>channel) ] bi
-        ] if
-    ] [
-        >r first2 r> [ (>>mode) ] [ (>>nickname) ] bi
-    ] if ;
+    { { [ >r 2array r> ] [ [ (>>mode) ] [ (>>channel|nickname) ] bi ] }
+      { [ >r 3array r> ] [ [ (>>parameter) ] [ (>>mode) ] [ (>>channel) ] tri ] }
+    } switch ;
 
 PRIVATE>
 
