@@ -142,7 +142,7 @@ HELP: alien-callback-error
 } ;
 
 HELP: alien-callback
-{ $values { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } { "quot" "a quotation" } { "c-ptr" c-ptr } }
+{ $values { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } { "quot" "a quotation" } { "alien" alien } }
 { $description
     "Defines a callback from C to Factor which accepts the given set of parameters from the C caller, pushes them on the data stack, calls the quotation, and passes a return value back to the C caller. A return type of " { $snippet "\"void\"" } " indicates that no value is to be returned."
     $nl

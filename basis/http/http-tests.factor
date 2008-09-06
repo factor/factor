@@ -63,7 +63,7 @@ Host: www.sex.com
 
 [
     T{ request
-        { url T{ url host: "www.sex.com" path: "/bar" } }
+        { url T{ url { host "www.sex.com" } { path "/bar" } } }
         { method "HEAD" }
         { version "1.1" }
         { header H{ { "host" "www.sex.com" } } }

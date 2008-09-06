@@ -421,7 +421,7 @@ HELP: new
         "IN: scratchpad"
         "TUPLE: employee number name department ;"
         "employee new ."
-        "T{ employee f f f f }"
+        "T{ employee }"
     }
 } ;
 
