@@ -189,12 +189,3 @@ PRIVATE>
 
 : ?nth* ( n seq -- elt/f ? )
     2dup bounds-check? [ nth-unsafe t ] [ 2drop f f ] if ; flushable
-
-: if-seq ( seq quot1 quot2 -- ) [ f like ] 2dip if* ; inline
- 
-: if-empty ( seq quot1 quot2 -- ) swap if-seq ; inline
-
-: when-empty ( seq quot1 -- ) [ ] if-empty ; inline
-
-: unless-empty ( seq quot1 -- ) [ ] swap if-empty ; inline
-

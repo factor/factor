@@ -22,7 +22,7 @@ ERROR: not-a-decimal x ;
 : parse-decimal ( str -- ratio )
     "." split1
     >r dup "-" head? [ drop t "0" ] [ f swap ] if r>
-    [ dup empty? [ drop "0" ] when ] bi@
+    [ [ "0" ] when-empty ] bi@
     dup length
     >r [ dup string>number [ nip ] [ not-a-decimal ] if* ] bi@ r>
     10 swap ^ / + swap [ neg ] when ;

@@ -115,8 +115,7 @@ DEFER: (d)
 : x.dy ( x y -- vec ) (d) wedge -1 alt*n ;
 
 : (d) ( product -- value )
-    dup empty?
-    [ drop H{ } ] [ unclip swap [ x.dy ] 2keep dx.y alt+ ] if ;
+    [ H{ } ] [ unclip swap [ x.dy ] 2keep dx.y alt+ ] if-empty ;
 
 : linear-op ( vec quot -- vec )
         [
@@ -211,7 +210,7 @@ DEFER: (d)
 : m'.m ( matrix -- matrix' ) dup flip swap m. ;
 
 : empty-matrix? ( matrix -- ? )
-    dup empty? [ drop t ] [ first empty? ] if ;
+    [ t ] [ first empty? ] if-empty ;
 
 : ?m+ ( m1 m2 -- m3 )
     over empty-matrix? [

@@ -34,9 +34,8 @@ M: no-inverse summary
     drop "The word cannot be used in pattern matching" ;
 
 : next ( revquot -- revquot* first )
-    dup empty?
     [ "Badly formed math inverse" throw ]
-    [ unclip-slice ] if ;
+    [ unclip-slice ] if-empty ;
 
 : constant-word? ( word -- ? )
     stack-effect
@@ -116,8 +115,7 @@ M: pop-inverse inverse
     "pop-inverse" word-prop compose call ;
 
 : (undo) ( revquot -- )
-    dup empty? [ drop ]
-    [ unclip-slice inverse % (undo) ] if ;
+    [ unclip-slice inverse % (undo) ] unless-empty ;
 
 : [undo] ( quot -- undo )
     flatten fold reverse [ (undo) ] [ ] make ;

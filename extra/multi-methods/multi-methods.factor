@@ -112,10 +112,10 @@ SYMBOL: total
     dup length <reversed>
     [ picker 2array ] 2map
     [ drop object eq? not ] assoc-filter
-    dup empty? [ drop [ t ] ] [
+    [ [ t ] ] [
         [ (multi-predicate) ] { } assoc>map
         unclip [ swap [ f ] \ if 3array append [ ] like ] reduce
-    ] if ;
+    ] if-empty ;
 
 : argument-count ( methods -- n )
     keys 0 [ length max ] reduce ;

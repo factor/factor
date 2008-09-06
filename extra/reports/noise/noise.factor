@@ -155,11 +155,11 @@ M: lambda-word word-noise-factor
 : vocab-noise-factor ( vocab -- factor )
     words flatten-generics
     [ word-noise-factor dup 20 < [ drop 0 ] when ] map
-    dup empty? [ drop 0 ] [
+    [ 0 ] [
         [ [ sum ] [ length 5 max ] bi /i ]
         [ supremum ]
         bi +
-    ] if ;
+    ] if-empty ;
 
 : noisy-vocabs ( -- alist )
     vocabs [ dup vocab-noise-factor ] { } map>assoc
