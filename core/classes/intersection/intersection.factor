@@ -8,14 +8,14 @@ PREDICATE: intersection-class < class
     "metaclass" word-prop intersection-class eq? ;
 
 : intersection-predicate-quot ( members -- quot )
-    dup empty? [
-        drop [ drop t ]
+    [
+        [ drop t ]
     ] [
         unclip "predicate" word-prop swap [
             "predicate" word-prop [ dup ] swap [ not ] 3append
             [ drop f ]
         ] { } map>assoc alist>quot
-    ] if ;
+    ] if-empty ;
 
 : define-intersection-predicate ( class -- )
     dup participants intersection-predicate-quot define-predicate ;

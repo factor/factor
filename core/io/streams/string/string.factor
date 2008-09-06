@@ -18,7 +18,7 @@ M: growable stream-flush drop ;
     <string-writer> swap [ output-stream get ] compose with-output-stream*
     >string ; inline
 
-M: growable stream-read1 dup empty? [ drop f ] [ pop ] if ;
+M: growable stream-read1 [ f ] [ pop ] if-empty ;
 
 : harden-as ( seq growble-exemplar -- newseq )
     underlying>> like ;
@@ -39,13 +39,13 @@ M: growable stream-read-until
     ] if ;
 
 M: growable stream-read
-    dup empty? [
-        2drop f
+    [
+        drop f
     ] [
         [ length swap - 0 max ] keep
         [ swap growable-read-until ] 2keep
         set-length
-    ] if ;
+    ] if-empty ;
 
 M: growable stream-read-partial
     stream-read ;
