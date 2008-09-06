@@ -1,8 +1,8 @@
 USING: http http.server http.client tools.test multiline
-tuple-syntax io.streams.string io.encodings.utf8
-io.encodings.8-bit io.encodings.binary io.encodings.string
-kernel arrays splitting sequences assocs io.sockets db db.sqlite
-continuations urls hashtables accessors ;
+io.streams.string io.encodings.utf8 io.encodings.8-bit
+io.encodings.binary io.encodings.string kernel arrays splitting
+sequences assocs io.sockets db db.sqlite continuations urls
+hashtables accessors ;
 IN: http.tests
 
 [ "text/plain" latin1 ] [ "text/plain" parse-content-type ] unit-test
@@ -24,13 +24,13 @@ blah
 ;
 
 [
-    TUPLE{ request
-        url: TUPLE{ url path: "/bar" }
-        method: "POST"
-        version: "1.1"
-        header: H{ { "some-header" "1; 2" } { "content-length" "4" } { "content-type" "application/octet-stream" } }
-        post-data: TUPLE{ post-data content: "blah" raw: "blah" content-type: "application/octet-stream" }
-        cookies: V{ }
+    T{ request
+        { url T{ url path: "/bar" } }
+        { method "POST" }
+        { version "1.1" }
+        { header H{ { "some-header" "1; 2" } { "content-length" "4" } { "content-type" "application/octet-stream" } } }
+        { post-data T{ post-data { content "blah" } { raw "blah" } { content-type "application/octet-stream" } } }
+        { cookies V{ } }
     }
 ] [
     read-request-test-1 lf>crlf [
@@ -62,12 +62,12 @@ Host: www.sex.com
 ;
 
 [
-    TUPLE{ request
-        url: TUPLE{ url host: "www.sex.com" path: "/bar" }
-        method: "HEAD"
-        version: "1.1"
-        header: H{ { "host" "www.sex.com" } }
-        cookies: V{ }
+    T{ request
+        { url T{ url host: "www.sex.com" path: "/bar" } }
+        { method "HEAD" }
+        { version "1.1" }
+        { header H{ { "host" "www.sex.com" } } }
+        { cookies V{ } }
     }
 ] [
     read-request-test-2 lf>crlf [
@@ -103,14 +103,14 @@ blah
 ;
 
 [
-    TUPLE{ response
-        version: "1.1"
-        code: 404
-        message: "not found"
-        header: H{ { "content-type" "text/html; charset=UTF-8" } }
-        cookies: { }
-        content-type: "text/html"
-        content-charset: utf8
+    T{ response
+        { version "1.1" }
+        { code 404 }
+        { message "not found" }
+        { header H{ { "content-type" "text/html; charset=UTF-8" } } }
+        { cookies { } }
+        { content-type "text/html" }
+        { content-charset utf8 }
     }
 ] [
     read-response-test-1 lf>crlf

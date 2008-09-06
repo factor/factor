@@ -48,13 +48,13 @@ PREDICATE: immutable-tuple-class < tuple-class ( class -- ? )
         ] 2each
     ] if-bootstrapping ; inline
 
+PRIVATE>
+
 : initial-values ( class -- slots )
     all-slots [ initial>> ] map ;
 
 : pad-slots ( slots class -- slots' class )
     [ initial-values over length tail append ] keep ; inline
-
-PRIVATE>
 
 : tuple>array ( tuple -- array )
     prepare-tuple>array
