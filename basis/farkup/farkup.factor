@@ -155,32 +155,35 @@ stand-alone
         </pre>
     ] with-string-writer write ;
 
-GENERIC: write-farkup ( obj -- )
+GENERIC: (write-farkup) ( farkup -- )
 : <foo.> ( string -- ) <foo> write ;
 : </foo.> ( string -- ) </foo> write ;
 : in-tag. ( obj quot string -- ) [ <foo.> call ] keep </foo.> ; inline
-M: heading1 write-farkup ( obj -- ) [ obj>> write-farkup ] "h1" in-tag. ;
-M: heading2 write-farkup ( obj -- ) [ obj>> write-farkup ] "h2" in-tag. ;
-M: heading3 write-farkup ( obj -- ) [ obj>> write-farkup ] "h3" in-tag. ;
-M: heading4 write-farkup ( obj -- ) [ obj>> write-farkup ] "h4" in-tag. ;
-M: strong write-farkup ( obj -- ) [ obj>> write-farkup ] "strong" in-tag. ;
-M: emphasis write-farkup ( obj -- ) [ obj>> write-farkup ] "em" in-tag. ;
-M: superscript write-farkup ( obj -- ) [ obj>> write-farkup ] "sup" in-tag. ;
-M: subscript write-farkup ( obj -- ) [ obj>> write-farkup ] "sub" in-tag. ;
-M: inline-code write-farkup ( obj -- ) [ obj>> write-farkup ] "code" in-tag. ;
-M: list-item write-farkup ( obj -- ) [ obj>> write-farkup ] "li" in-tag. ;
-M: list write-farkup ( obj -- ) [ obj>> write-farkup ] "ul" in-tag. ;
-M: paragraph write-farkup ( obj -- ) [ obj>> write-farkup ] "p" in-tag. ;
-M: link write-farkup ( obj -- ) [ href>> ] [ text>> ] bi write-link ;
-M: image write-farkup ( obj -- ) [ href>> ] [ text>> ] bi write-image-link ;
-M: code write-farkup ( obj -- ) [ string>> ] [ mode>> ] bi render-code ;
-M: table-row write-farkup ( obj -- )
-    obj>> [ [ [ write-farkup ] "td" in-tag. ] each ] "tr" in-tag. ;
-M: table write-farkup ( obj -- ) [ obj>> write-farkup ] "table" in-tag. ;
-M: fixnum write-farkup ( obj -- ) write1 ;
-M: string write-farkup ( obj -- ) write ;
-M: vector write-farkup ( obj -- ) [ write-farkup ] each ;
-M: f write-farkup ( obj -- ) drop ;
+M: heading1 (write-farkup) ( obj -- ) [ obj>> (write-farkup) ] "h1" in-tag. ;
+M: heading2 (write-farkup) ( obj -- ) [ obj>> (write-farkup) ] "h2" in-tag. ;
+M: heading3 (write-farkup) ( obj -- ) [ obj>> (write-farkup) ] "h3" in-tag. ;
+M: heading4 (write-farkup) ( obj -- ) [ obj>> (write-farkup) ] "h4" in-tag. ;
+M: strong (write-farkup) ( obj -- ) [ obj>> (write-farkup) ] "strong" in-tag. ;
+M: emphasis (write-farkup) ( obj -- ) [ obj>> (write-farkup) ] "em" in-tag. ;
+M: superscript (write-farkup) ( obj -- ) [ obj>> (write-farkup) ] "sup" in-tag. ;
+M: subscript (write-farkup) ( obj -- ) [ obj>> (write-farkup) ] "sub" in-tag. ;
+M: inline-code (write-farkup) ( obj -- ) [ obj>> (write-farkup) ] "code" in-tag. ;
+M: list-item (write-farkup) ( obj -- ) [ obj>> (write-farkup) ] "li" in-tag. ;
+M: list (write-farkup) ( obj -- ) [ obj>> (write-farkup) ] "ul" in-tag. ;
+M: paragraph (write-farkup) ( obj -- ) [ obj>> (write-farkup) ] "p" in-tag. ;
+M: link (write-farkup) ( obj -- ) [ href>> ] [ text>> ] bi write-link ;
+M: image (write-farkup) ( obj -- ) [ href>> ] [ text>> ] bi write-image-link ;
+M: code (write-farkup) ( obj -- ) [ string>> ] [ mode>> ] bi render-code ;
+M: table-row (write-farkup) ( obj -- )
+    obj>> [ [ [ (write-farkup) ] "td" in-tag. ] each ] "tr" in-tag. ;
+M: table (write-farkup) ( obj -- ) [ obj>> (write-farkup) ] "table" in-tag. ;
+M: fixnum (write-farkup) ( obj -- ) write1 ;
+M: string (write-farkup) ( obj -- ) write ;
+M: vector (write-farkup) ( obj -- ) [ (write-farkup) ] each ;
+M: f (write-farkup) ( obj -- ) drop ;
+
+: write-farkup ( string -- )
+    farkup (write-farkup) ;
 
 : convert-farkup ( string -- string' )
-    farkup [ write-farkup ] with-string-writer ;
+    farkup [ (write-farkup) ] with-string-writer ;
