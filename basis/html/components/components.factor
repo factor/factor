@@ -156,7 +156,7 @@ M: farkup render*
     [
         [ no-follow>> [ string>boolean link-no-follow? set ] when* ]
         [ disable-images>> [ string>boolean disable-images? set ] when* ] bi
-        drop string-lines "\n" join convert-farkup write
+        drop string-lines "\n" join write-farkup
     ] with-scope ;
 
 ! Inspector component
