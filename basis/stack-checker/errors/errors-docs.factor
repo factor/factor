@@ -45,11 +45,6 @@ HELP: too-many-r>
     }
 } ;
 
-HELP: cannot-infer-effect
-{ $values { "word" word } }
-{ $description "Throws a " { $link cannot-infer-effect } " error." }
-{ $error-description "Thrown when inference encounters a call to a word which is already known not to have a static stack effect, due to a prior inference attempt failing." } ;
-
 HELP: missing-effect
 { $error-description "Thrown when inference encounters a word lacking a stack effect declaration. Stack effects of words must be declared, with the exception of words which only push literals on the stack." }
 { $examples
@@ -108,7 +103,6 @@ ARTICLE: "inference-errors" "Inference warnings and errors"
 { $subsection inference-error }
 "Inference warnings:"
 { $subsection literal-expected }
-{ $subsection cannot-infer-effect }
 "Inference errors:"
 { $subsection recursive-quotation-error }
 { $subsection unbalanced-branches-error }

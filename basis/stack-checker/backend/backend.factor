@@ -144,8 +144,11 @@ M: object apply-object push-literal ;
     [ "inferred-effect" set-word-prop ]
     2tri ;
 
+: cannot-infer-effect ( word -- * )
+    "cannot-infer" word-prop throw ;
+
 : maybe-cannot-infer ( word quot -- )
-    [ ] [ t "cannot-infer" set-word-prop ] cleanup ; inline
+    [ [ "cannot-infer" set-word-prop ] keep throw ] recover ; inline
 
 : infer-word ( word -- effect )
     [

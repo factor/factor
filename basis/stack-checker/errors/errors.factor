@@ -57,14 +57,6 @@ M: too-many-r> summary
     drop
     "Quotation pops retain stack elements which it did not push" ;
 
-TUPLE: cannot-infer-effect word ;
-
-: cannot-infer-effect ( word -- * )
-    \ cannot-infer-effect inference-warning ;
-
-M: cannot-infer-effect error.
-    "Unable to infer stack effect of " write word>> . ;
-
 TUPLE: missing-effect word ;
 
 M: missing-effect error.
