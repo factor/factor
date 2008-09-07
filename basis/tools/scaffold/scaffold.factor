@@ -175,7 +175,11 @@ ERROR: no-vocab vocab ;
         {
             [ "IN: " write print nl ]
             [ interesting-words. ]
-            [ "ARTICLE: " write unparse dup write bl print ";" print nl ]
+            [
+                [ "ARTICLE: " write unparse dup write bl print ]
+                [ "{ $vocab-link " write pprint " }" print ] bi
+                ";" print nl
+            ]
             [ "ABOUT: " write unparse print ]
         } cleave
     ] with-string-writer ;
