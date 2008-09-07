@@ -28,6 +28,12 @@ TUPLE: link href text ;
 TUPLE: image href text ;
 TUPLE: code mode string ;
 
+: absolute-url? ( string -- ? )
+    { "http://" "https://" "ftp://" } [ head? ] with contains? ;
+
+: simple-link-title ( string -- string' )
+    dup absolute-url? [ "/" last-split1 swap or ] unless ;
+
 EBNF: farkup
 nl               = ("\r\n" | "\r" | "\n") => [[ drop "\n" ]]
 2nl              = nl nl
@@ -67,7 +73,7 @@ image-link       = "[[image:" (!("|") .)+  "|" (!("]]").)+ "]]"
                     => [[ second >string f image boa ]]
 
 simple-link      = "[[" (!("|]" | "]]") .)+ "]]"
-    => [[ second >string dup link boa ]]
+    => [[ second >string dup simple-link-title link boa ]]
 
 labelled-link    = "[[" (!("|") .)+ "|" (!("]]").)+ "]]"
     => [[ [ second >string ] [ fourth >string ] bi link boa ]]
@@ -119,31 +125,26 @@ stand-alone
         { [ dup empty? ] [ drop invalid-url ] }
         { [ dup [ 127 > ] contains? ] [ drop invalid-url ] }
         { [ dup first "/\\" member? ] [ drop invalid-url ] }
-        { [ CHAR: : over member? ] [
-            dup { "http://" "https://" "ftp://" } [ head? ] with contains?
-            [ drop invalid-url ] unless
-        ] }
+        { [ CHAR: : over member? ] [ dup absolute-url? [ drop invalid-url ] unless ] }
         [ relative-link-prefix get prepend ]
     } cond ;
 
 : escape-link ( href text -- href-esc text-esc )
     >r check-url escape-quoted-string r> escape-string ;
 
-: write-link ( text href -- )
+: write-link ( href text -- )
     escape-link
-    "<a" write
-    " href=\"" write write "\"" write
-    link-no-follow? get [ " nofollow=\"true\"" write ] when
-    ">" write write "</a>" write ;
+    [ <a =href link-no-follow? get [ "true" =nofollow ] when a> ]
+    [ write </a> ]
+    bi* ;
 
 : write-image-link ( href text -- )
     disable-images? get [
-        2drop "<strong>Images are not allowed</strong>" write
+        2drop
+        <strong> "Images are not allowed" write </strong>
     ] [
         escape-link
-        >r "<img src=\"" write write "\"" write r>
-        [ " alt=\"" write write "\"" write ] unless-empty
-        "/>" write
+        [ <img =src ] [ [ =alt ] unless-empty img/> ] bi*
     ] if ;
 
 : render-code ( string mode -- string' )
@@ -170,7 +171,7 @@ M: inline-code write-farkup ( obj -- ) [ obj>> write-farkup ] "code" in-tag. ;
 M: list-item write-farkup ( obj -- ) [ obj>> write-farkup ] "li" in-tag. ;
 M: list write-farkup ( obj -- ) [ obj>> write-farkup ] "ul" in-tag. ;
 M: paragraph write-farkup ( obj -- ) [ obj>> write-farkup ] "p" in-tag. ;
-M: link write-farkup ( obj -- ) [ text>> ] [ href>> ] bi write-link ;
+M: link write-farkup ( obj -- ) [ href>> ] [ text>> ] bi write-link ;
 M: image write-farkup ( obj -- ) [ href>> ] [ text>> ] bi write-image-link ;
 M: code write-farkup ( obj -- ) [ string>> ] [ mode>> ] bi render-code ;
 M: table-row write-farkup ( obj -- )
