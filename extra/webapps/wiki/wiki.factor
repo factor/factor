@@ -89,6 +89,9 @@ M: revision feed-entry-url id>> revision-url ;
     <article> select-tuple
     dup [ revision>> <revision> select-tuple ] when ;
 
+: init-relative-link-prefix ( -- )
+    URL" $wiki/view/" adjust-url present relative-link-prefix set ;
+
 : <view-article-action> ( -- action )
     <action>
 
@@ -96,6 +99,7 @@ M: revision feed-entry-url id>> revision-url ;
 
         [
             validate-title
+            init-relative-link-prefix
         ] >>init
 
         [
@@ -118,7 +122,7 @@ M: revision feed-entry-url id>> revision-url ;
             validate-integer-id
             "id" value <revision>
             select-tuple from-object
-            URL" $wiki/view/" adjust-url present relative-link-prefix set
+            init-relative-link-prefix
         ] >>init
 
         { wiki "view" } >>template
@@ -370,11 +374,13 @@ M: revision feed-entry-url id>> revision-url ;
 : init-wiki ( -- )
     "resource:extra/webapps/wiki/initial-content" directory* keys
     [
-        [ ascii file-contents ] [ file-name "." split1 drop ] bi
-        f <revision>
-            swap >>title
-            swap >>content
-            "slava" >>author
-            now >>date
-        add-revision
+        dup file-name ".txt" ?tail [
+            swap ascii file-contents
+            f <revision>
+                swap >>content
+                swap >>title
+                "slava" >>author
+                now >>date
+            add-revision
+        ] [ 2drop ] if
     ] each ;
