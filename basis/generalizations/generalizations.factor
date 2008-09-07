@@ -5,9 +5,12 @@ USING: kernel sequences sequences.private namespaces math
 math.ranges combinators macros quotations fry arrays ;
 IN: generalizations
 
-MACRO: narray ( n -- quot )
-    [ <reversed> ] [ '[ , f <array> ] ] bi
+MACRO: nsequence ( n seq -- quot )
+    [ drop <reversed> ] [ '[ , , new-sequence ] ] 2bi
     [ '[ @ [ , swap set-nth-unsafe ] keep ] ] reduce ;
+
+MACRO: narray ( n -- quot )
+    '[ , { } nsequence ] ;
 
 MACRO: firstn ( n -- )
     dup zero? [ drop [ drop ] ] [

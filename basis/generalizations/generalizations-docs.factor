@@ -2,12 +2,24 @@ USING: help.syntax help.markup kernel sequences quotations
 math arrays ;
 IN: generalizations
 
+HELP: nsequence
+{ $values { "n" integer } { "seq" "an exemplar" } }
+{ $description "A generalization of " { $link 2sequence } ", "
+{ $link 3sequence } ", and " { $link 4sequence } " "
+"that constructs a sequence from the top " { $snippet "n" } " elements of the stack."
+}
+{ $examples
+    { $example "CHAR: f CHAR: i CHAR: s CHAR: h 4 \"\" nsequence ." "\"fish\"" }
+} ;
+
 HELP: narray
 { $values { "n" integer } }
 { $description "A generalization of " { $link 1array } ", "
 { $link 2array } ", " { $link 3array } " and " { $link 4array } " "
 "that constructs an array from the top " { $snippet "n" } " elements of the stack."
 } ;
+
+{ nsequence narray } related-words
 
 HELP: firstn
 { $values { "n" integer } }
@@ -127,11 +139,15 @@ HELP: nkeep
 { $see-also keep nslip } ;
 
 ARTICLE: "generalizations" "Generalized shuffle words and combinators"
-"A number of stack shuffling words and combinators for use in "
+"The " { $vocab-link "generalizations" } " vocabulary defines a number of stack shuffling words and combinators for use in "
 "macros where the arity of the input quotations depends on an "
 "input parameter."
+$nl
+"Generalized sequence operations:"
 { $subsection narray }
+{ $subsection nsequence }
 { $subsection firstn }
+"Generated stack shuffle operations:"
 { $subsection ndup }
 { $subsection npick }
 { $subsection nrot }
@@ -139,6 +155,7 @@ ARTICLE: "generalizations" "Generalized shuffle words and combinators"
 { $subsection nnip }
 { $subsection ndrop }
 { $subsection nrev }
+"Generalized combinators:"
 { $subsection ndip }
 { $subsection nslip }
 { $subsection nkeep }
