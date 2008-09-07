@@ -34,7 +34,7 @@ CAN HAS STDIO?
 VISIBLE "HAI WORLD!"
 KTHXBYE}]
 
-There is syntax highlighting various languages, too:
+There is syntax highlighting for various languages, too:
 
 [factor{PEG: parse-request-line ( string -- triple )
     #! Triple is { method url version }
