@@ -102,7 +102,12 @@ list = ((list-item nl)+ list-item? | list-item)
 code       =  '[' (!('{' | nl | '[').)+ '{' (!("}]").)+ "}]"
     => [[ [ second >string ] [ fourth >string ] bi code boa ]]
 
-stand-alone      = (code | heading | list | table | paragraph | nl)*
+simple-code
+           = "[{" (!("}]").)+ "}]"
+    => [[ second f swap code boa ]]
+
+stand-alone
+           = (code | simple-code | heading | list | table | paragraph | nl)*
 ;EBNF
 
 
@@ -137,7 +142,7 @@ stand-alone      = (code | heading | list | table | paragraph | nl)*
     ] [
         escape-link
         >r "<img src=\"" write write "\"" write r>
-        dup empty? [ drop ] [ " alt=\"" write write "\"" write ] if
+        [ " alt=\"" write write "\"" write ] unless-empty
         "/>" write
     ] if ;
 
