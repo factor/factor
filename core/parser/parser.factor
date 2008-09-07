@@ -182,6 +182,7 @@ SYMBOL: interactive-vocabs
     "sequences"
     "slicing"
     "sorting"
+    "stack-checker"
     "strings"
     "syntax"
     "tools.annotations"
