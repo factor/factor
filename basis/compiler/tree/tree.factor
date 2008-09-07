@@ -185,7 +185,7 @@ M: #return-recursive inputs/outputs [ in-d>> ] [ out-d>> ] bi ;
     [ label>> calls>> [ in-d>> ] map ] [ in-d>> ] bi suffix ;
 
 : ends-with-terminate? ( nodes -- ? )
-    dup empty? [ drop f ] [ peek #terminate? ] if ;
+    [ f ] [ peek #terminate? ] if-empty ;
 
 M: vector child-visitor V{ } clone ;
 M: vector #introduce, #introduce node, ;

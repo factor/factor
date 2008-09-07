@@ -32,7 +32,7 @@ M: #shuffle check-node*
 M: #copy check-node* inputs/outputs 2array check-lengths ;
 
 : check->r/r> ( node -- )
-    inputs/outputs dup empty? [ 2drop ] [ 2array check-lengths ] if ;
+    inputs/outputs [ drop ] [ 2array check-lengths ] if-empty ;
 
 M: #>r check-node* check->r/r> ;
 

@@ -112,8 +112,7 @@ SYMBOL: exit-continuation
 
 ! Chloe tags
 : parse-query-attr ( string -- assoc )
-    dup empty?
-    [ drop f ] [ "," split [ dup value ] H{ } map>assoc ] if ;
+    [ f ] [ "," split [ dup value ] H{ } map>assoc ] if-empty ;
 
 : a-url-path ( tag -- string )
     [ "href" required-attr ]

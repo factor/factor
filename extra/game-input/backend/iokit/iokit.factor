@@ -58,7 +58,7 @@ SINGLETON: iokit-game-input-backend
     buttons-matching-hash device-elements-matching length ;
 
 : ?axis ( device hash -- axis/f )
-    device-elements-matching dup empty? [ drop f ] [ first ] if ;
+    device-elements-matching [ f ] [ first ] if-empty ;
 
 : ?x-axis ( device -- ? )
     x-axis-matching-hash ?axis ;

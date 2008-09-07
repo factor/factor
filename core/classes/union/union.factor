@@ -8,14 +8,14 @@ PREDICATE: union-class < class
     "metaclass" word-prop union-class eq? ;
 
 : union-predicate-quot ( members -- quot )
-    dup empty? [
-        drop [ drop f ]
+    [
+        [ drop f ]
     ] [
         unclip "predicate" word-prop swap [
             "predicate" word-prop [ dup ] prepend
             [ drop t ]
         ] { } map>assoc alist>quot
-    ] if ;
+    ] if-empty ;
 
 : define-union-predicate ( class -- )
     dup members union-predicate-quot define-predicate ;

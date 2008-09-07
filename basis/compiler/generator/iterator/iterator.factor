@@ -28,18 +28,18 @@ DEFER: (tail-call?)
     [ first #phi? ] [ rest-slice (tail-call?) ] bi and ;
 
 : (tail-call?) ( cursor -- ? )
-    dup empty? [ drop t ] [
+    [ t ] [
         [ first [ #return? ] [ #terminate? ] bi or ]
         [ tail-phi? ]
         bi or
-    ] if ;
+    ] if-empty ;
 
 : tail-call? ( -- ? )
     node-stack get [
         rest-slice
-        dup empty? [ drop t ] [
+        [ t ] [
             [ (tail-call?) ]
             [ first #terminate? not ]
             bi and
-        ] if
+        ] if-empty
     ] all? ;

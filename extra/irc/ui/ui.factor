@@ -32,8 +32,8 @@ TUPLE: irc-tab < frame listener client window ;
 : dark-green T{ rgba f 0.0 0.5 0.0 1 } ;
 
 : dot-or-parens ( string -- string )
-    dup empty? [ drop "." ]
-    [ "(" prepend ")" append ] if ;
+    [ "." ]
+    [ "(" prepend ")" append ] if-empty ;
 
 GENERIC: write-irc ( irc-message -- )
 

@@ -8,7 +8,7 @@ IN: irc.ui.commandparser
 "irc.ui.commands" require
 
 : command ( string string -- string command )
-    dup empty? [ drop "say" ] when
+    [ "say" ] when-empty
     dup "irc.ui.commands" lookup
     [ nip ]
     [ " " append prepend "quote" "irc.ui.commands" lookup ] if* ;

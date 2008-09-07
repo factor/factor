@@ -136,7 +136,7 @@ ERROR: no-sql-type ;
 
 : modifiers ( spec -- string )
     modifiers>> [ lookup-modifier ] map " " join
-    dup empty? [ " " prepend ] unless ;
+    [ "" ] [ " " prepend ] if-empty ;
 
 HOOK: bind% db ( spec -- )
 HOOK: bind# db ( spec obj -- )

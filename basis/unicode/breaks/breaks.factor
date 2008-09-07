@@ -80,10 +80,10 @@ VALUE: grapheme-table
     nip swap length or 1+ ;
 
 : (>graphemes) ( str -- )
-    dup empty? [ drop ] [
+    [
         dup first-grapheme cut-slice
         swap , (>graphemes)
-    ] if ;
+    ] unless-empty ;
 
 : >graphemes ( str -- graphemes )
     [ (>graphemes) ] { } make ;

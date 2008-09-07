@@ -48,14 +48,12 @@ M: string error. print ;
     ] "" make print ;
 
 : restarts. ( -- )
-    restarts get dup empty? [
-        drop
-    ] [
+    restarts get [
         nl
         "The following restarts are available:" print
         nl
         [ restart. ] each-index
-    ] if ;
+    ] unless-empty ;
 
 : print-error ( error -- )
     [ error. flush ] curry

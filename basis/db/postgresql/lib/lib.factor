@@ -87,11 +87,11 @@ M: postgresql-result-null summary ( obj -- str )
             { URL [ dup [ present ] when default-param-value ] }
             [ drop default-param-value ]
         } case 2array
-    ] 2map flip dup empty? [
-        drop f f
+    ] 2map flip [
+        f f
     ] [
         first2 [ >c-void*-array ] [ >c-uint-array ] bi*
-    ] if ;
+    ] if-empty ;
 
 : param-formats ( statement -- seq )
     in-params>> [ type>> type>param-format ] map >c-uint-array ;

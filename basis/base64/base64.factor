@@ -36,7 +36,7 @@ PRIVATE>
     #! pad string with = when not enough bits
     dup length dup 3 mod - cut
     [ 3 <groups> [ encode3 ] map concat ]
-    [ dup empty? [ drop "" ] [ >base64-rem ] if ]
+    [ [ "" ] [ >base64-rem ] if-empty ]
     bi* append ;
 
 : base64> ( base64 -- str )

@@ -164,7 +164,7 @@ SYMBOL: ns-stack
         T{ name f "" "encoding" f }
         T{ name f "" "standalone" f }
     } diff
-    dup empty? [ drop ] [ <extra-attrs> throw ] if ; 
+    [ <extra-attrs> throw ] unless-empty ; 
 
 : good-version ( version -- version )
     dup { "1.0" "1.1" } member? [ <bad-version> throw ] unless ;

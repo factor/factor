@@ -44,11 +44,11 @@ M: builtin-class (classes-intersect?)
 
 M: anonymous-intersection (flatten-class)
     participants>> [ flatten-builtin-class ] map
-    dup empty? [
-        drop builtins get sift [ (flatten-class) ] each
+    [
+        builtins get sift [ (flatten-class) ] each
     ] [
         unclip [ assoc-intersect ] reduce [ swap set ] assoc-each
-    ] if ;
+    ] if-empty ;
 
 M: anonymous-complement (flatten-class)
     drop builtins get sift [ (flatten-class) ] each ;

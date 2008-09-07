@@ -73,7 +73,7 @@ SYMBOL: deploy-image
 : deploy-config ( vocab -- assoc )
     dup default-config swap
     dup deploy-config-path vocab-file-contents
-    parse-fresh dup empty? [ drop ] [ first assoc-union ] if ;
+    parse-fresh [ first assoc-union ] unless-empty ;
 
 : set-deploy-config ( assoc vocab -- )
     >r unparse-use string-lines r>

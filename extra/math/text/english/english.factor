@@ -57,11 +57,9 @@ SYMBOL: and-needed?
 
 : text-with-scale ( index seq -- str )
     dupd nth 3digits>text swap
-    scale-numbers dup empty? [
-        drop
-    ] [
+    scale-numbers [
         " " swap 3append
-    ] if ;
+    ] unless-empty ;
 
 : append-with-conjunction ( str1 str2 -- newstr )
     over length zero? [

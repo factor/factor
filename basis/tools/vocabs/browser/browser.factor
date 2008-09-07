@@ -36,14 +36,14 @@ IN: tools.vocabs.browser
 
 : vocabs. ( assoc -- )
     [
-        dup empty? [
-            2drop
+        [
+            drop
         ] [
             swap root-heading.
             standard-table-style [
                 vocab-headings. [ vocab. ] each
             ] ($grid)
-        ] if
+        ] if-empty
     ] assoc-each ;
 
 : describe-summary ( vocab -- )
@@ -98,10 +98,10 @@ C: <vocab-author> vocab-author
     ] when* ;
 
 : describe-words ( vocab -- )
-    words dup empty? [
+    words [
         "Words" $heading
-        dup natural-sort $links
-    ] unless drop ;
+        natural-sort $links
+    ] unless-empty ;
 
 : vocab-xref ( vocab quot -- vocabs )
     >r dup vocab-name swap words [ generic? not ] filter r> map
@@ -113,16 +113,16 @@ C: <vocab-author> vocab-author
 : vocab-usage ( vocab -- vocabs ) [ usage ] vocab-xref ;
 
 : describe-uses ( vocab -- )
-    vocab-uses dup empty? [
+    vocab-uses [
         "Uses" $heading
-        dup $vocab-links
-    ] unless drop ;
+        $vocab-links
+    ] unless-empty ;
 
 : describe-usage ( vocab -- )
-    vocab-usage dup empty? [
+    vocab-usage [
         "Used by" $heading
-        dup $vocab-links
-    ] unless drop ;
+        $vocab-links
+    ] unless-empty ;
 
 : $describe-vocab ( element -- )
     first

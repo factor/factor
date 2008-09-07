@@ -72,11 +72,9 @@ M: listener-operation invoke-command ( target command -- )
     evaluate-input ;
 
 : listener-run-files ( seq -- )
-    dup empty? [
-        drop
-    ] [
+    [
         [ [ run-file ] each ] curry call-listener
-    ] if ;
+    ] unless-empty ;
 
 : com-end ( listener -- )
     input>> interactor-eof ;

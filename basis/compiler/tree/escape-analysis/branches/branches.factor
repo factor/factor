@@ -15,7 +15,7 @@ M: #branch escape-analysis*
 
 : (merge-allocations) ( values -- allocation )
     [
-        dup [ allocation ] map sift dup empty? [ 2drop f ] [
+        dup [ allocation ] map sift [ drop f ] [
             dup [ t eq? not ] all? [
                 dup [ length ] map all-equal? [
                     nip flip
@@ -23,7 +23,7 @@ M: #branch escape-analysis*
                     [ record-allocations ] keep
                 ] [ drop add-escaping-values t ] if
             ] [ drop add-escaping-values t ] if
-        ] if
+        ] if-empty
     ] map ;
 
 : merge-allocations ( in-values out-values -- )

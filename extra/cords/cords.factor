@@ -27,7 +27,7 @@ M: multi-cord virtual@
     [ first - ] [ second ] bi ;
 
 M: multi-cord virtual-seq
-    seqs>> dup empty? [ drop f ] [ first second ] if ;
+    seqs>> [ f ] [ first second ] if-empty ;
 
 : <cord> ( seqs -- cord )
     dup length 2 = [
