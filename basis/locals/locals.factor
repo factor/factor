@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces sequences sequences.private assocs math
-       vectors strings generalizations 
+       vectors strings classes.tuple generalizations 
        parser words quotations debugger macros arrays macros splitting
        combinators prettyprint.backend definitions prettyprint
        hashtables prettyprint.sections sets sequences.private effects
@@ -205,15 +205,19 @@ M: object local-rewrite* , ;
 ! Broil is used to support locals in literals
 
 DEFER: [broil]
+DEFER: [broil-hashtable]
+DEFER: [broil-tuple]
 
 : broil-element ( obj -- quot )
   {
-    { [ dup number?   ] [            1quotation ] }
-    { [ dup string?   ] [            1quotation ] }
-    { [ dup sequence? ] [ [broil]               ] }
-    { [ dup local?    ] [            1quotation ] }
-    { [ dup word?     ] [ literalize 1quotation ] }
-    { [ t             ] [            1quotation ] }
+    { [ dup number?    ] [            1quotation ] }
+    { [ dup string?    ] [            1quotation ] }
+    { [ dup sequence?  ] [ [broil]               ] }
+    { [ dup hashtable? ] [ [broil-hashtable]     ] }
+    { [ dup tuple?     ] [ [broil-tuple]         ] }
+    { [ dup local?     ] [            1quotation ] }
+    { [ dup word?      ] [ literalize 1quotation ] }
+    { [ t              ] [            1quotation ] }
   }
   cond ;
 
@@ -226,11 +230,33 @@ DEFER: [broil]
   
 MACRO: broil ( seq -- quot ) [broil] ;
 
+: [broil-hashtable] ( hashtable -- quot )
+  >alist
+  [ [ broil-element ] map concat >quotation ]
+  [ length ]
+  [        ]
+  tri
+  [ nsequence >hashtable ] curry curry compose ;
+
+MACRO: broil-hashtable ( hashtable -- quot ) [broil-hashtable] ;
+
+: [broil-tuple] ( tuple -- quot )
+  tuple>array
+  [ [ broil-element ] map concat >quotation ]
+  [ length ]
+  [        ]
+  tri
+  [ nsequence >tuple ] curry curry compose ;
+
+MACRO: broil-tuple ( tuple -- quot ) [broil-tuple] ;
+
 ! Engage broil on arrays and vectors. Can't do it on 'sequence'
 ! because that will pick up strings and integers. What do do...
 
-M: array  local-rewrite* ( array  -- ) [broil] % ;
-M: vector local-rewrite* ( vector -- ) [broil] % ;
+M: array     local-rewrite* ( array      -- ) [broil]           % ;
+M: vector    local-rewrite* ( vector     -- ) [broil]           % ;
+M: tuple     local-rewrite* ( tuple      -- ) [broil-tuple]     % ;
+M: hashtable local-rewrite* ( hashtable  -- ) [broil-hashtable] % ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
