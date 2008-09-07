@@ -98,8 +98,8 @@ C: <quote> quote
 UNION: special local quote local-word local-reader local-writer ;
 
 : load-locals-quot ( args -- quot )
-    dup empty? [
-        drop [ ]
+    [
+        [ ]
     ] [
         dup [ local-reader? ] contains? [
             <reversed> [
@@ -108,14 +108,10 @@ UNION: special local quote local-word local-reader local-writer ;
         ] [
             length [ load-locals ] curry >quotation
         ] if
-    ] if ;
+    ] if-empty ;
 
 : drop-locals-quot ( args -- quot )
-    dup empty? [
-        drop [ ]
-    ] [
-        length [ drop-locals ] curry
-    ] if ;
+    [ [ ] ] [ length [ drop-locals ] curry ] if-empty ;
 
 : point-free-body ( quot args -- newquot )
     >r but-last-slice r> [ localize ] curry map concat ;

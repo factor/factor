@@ -50,14 +50,14 @@ SYMBOL: +editable+
 
 : describe* ( obj mirror keys -- )
     rot summary.
-    dup empty? [
-        2drop
+    [
+        drop
     ] [
         dup enum? [ +sequence+ on ] when
         standard-table-style [
             swap [ -rot describe-row ] curry each-index
         ] tabular-output
-    ] if ;
+    ] if-empty ;
 
 : describe ( obj -- )
     dup make-mirror dup sorted-keys describe* ;

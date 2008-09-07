@@ -136,15 +136,14 @@ M: help-error error.
     ] with-scope ;
 
 : typos. ( assoc -- )
-    dup empty? [
-        drop
+    [
         "==== ALL CHECKS PASSED" print
     ] [
         [
             swap vocab-heading.
             [ error. nl ] each
         ] assoc-each
-    ] if ;
+    ] if-empty ;
 
 : help-lint ( prefix -- ) run-help-lint typos. ;
 

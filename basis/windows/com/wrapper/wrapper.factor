@@ -100,7 +100,7 @@ unless
     "windows.com.wrapper.callbacks" create ;
 
 : (finish-thunk) ( param-count thunk quot -- thunked-quot )
-    [ dup empty? [ 2drop [ ] ] [ swap 1- '[ , , ndip ] ] if ]
+    [ [ drop [ ] ] [ swap 1- '[ , , ndip ] ] if-empty ]
     dip compose ;
 
 : (make-interface-callbacks) ( interface-name quots iunknown-methods n -- words )

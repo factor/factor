@@ -23,11 +23,11 @@ SYMBOL: rest
 
 : render-validation-messages ( -- )
     form get errors>>
-    dup empty? [ drop ] [
+    [
         <ul "errors" =class ul>
             [ <li> escape-string write </li> ] each
         </ul>
-    ] if ;
+    ] unless-empty ;
 
 CHLOE: validation-messages drop render-validation-messages ;
 
@@ -47,11 +47,11 @@ TUPLE: action rest authorize init display validate submit ;
     2tri ;
 
 : set-nested-form ( form name -- )
-    dup empty? [
-        drop merge-forms
+    [
+        merge-forms
     ] [
         unclip [ set-nested-form ] nest-form
-    ] if ;
+    ] if-empty ;
 
 : restore-validation-errors ( -- )
     form cget [

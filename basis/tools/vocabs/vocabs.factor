@@ -165,11 +165,11 @@ MEMO: vocab-file-contents ( vocab name -- seq )
 
 : vocab-summary ( vocab -- summary )
     dup dup vocab-summary-path vocab-file-contents
-    dup empty? [
-        drop vocab-name " vocabulary" append
+    [
+        vocab-name " vocabulary" append
     ] [
         nip first
-    ] if ;
+    ] if-empty ;
 
 M: vocab summary
     [
@@ -212,11 +212,9 @@ M: vocab-link summary vocab-summary ;
 
 : (all-child-vocabs) ( root name -- vocabs )
     [ vocab-dir append-path subdirs ] keep
-    dup empty? [
-        drop
-    ] [
+    [
         swap [ "." swap 3append ] with map
-    ] if ;
+    ] unless-empty ;
 
 : vocabs-in-dir ( root name -- )
     dupd (all-child-vocabs) [

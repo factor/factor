@@ -34,14 +34,12 @@ M: f random-32* ( obj -- * ) no-random-number-generator ;
     ] keep head ;
 
 : random ( seq -- elt )
-    dup empty? [
-        drop f
-    ] [
+    [ f ] [
         [
             length dup log2 7 + 8 /i
             random-bytes byte-array>bignum swap mod
         ] keep nth
-    ] if ;
+    ] if-empty ;
 
 : delete-random ( seq -- elt )
     [ length random ] keep [ nth ] 2keep delete-nth ;

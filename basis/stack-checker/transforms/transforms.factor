@@ -69,15 +69,15 @@ IN: stack-checker.transforms
 \ cond [ cond>quot ] 1 define-transform
 
 \ case [
-    dup empty? [
-        drop [ no-case ]
+    [
+        [ no-case ]
     ] [
         dup peek quotation? [
             dup peek swap but-last
         ] [
             [ no-case ] swap
         ] if case>quot
-    ] if
+    ] if-empty
 ] 1 define-transform
 
 \ cleave [ cleave>quot ] 1 define-transform

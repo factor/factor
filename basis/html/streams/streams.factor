@@ -88,11 +88,11 @@ TUPLE: html-sub-stream < html-stream style parent ;
     ] make-css ;
 
 : span-tag ( style quot -- )
-    over span-css-style dup empty? [
-        drop call
+    over span-css-style [
+        call
     ] [
         <span =style span> call </span>
-    ] if ; inline
+    ] if-empty ; inline
 
 : format-html-span ( string style stream -- )
     stream>> [
@@ -121,11 +121,11 @@ M: html-span-stream dispose
     ] make-css ;
 
 : div-tag ( style quot -- )
-    swap div-css-style dup empty? [
-        drop call
+    swap div-css-style [
+        call
     ] [
         <div =style div> call </div>
-    ] if ; inline
+    ] if-empty ; inline
 
 : format-html-div ( string style stream -- )
     stream>> [

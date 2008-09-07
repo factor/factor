@@ -197,7 +197,7 @@ SYMBOL: +stopped+
 : step-back-msg ( continuation -- continuation' )
     walker-history tget
     [ pop* ]
-    [ dup empty? [ drop ] [ nip pop ] if ] bi ;
+    [ [ nip pop ] unless-empty ] bi ;
 
 : walker-suspended ( continuation -- continuation' )
     +suspended+ set-status

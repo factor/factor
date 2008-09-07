@@ -31,10 +31,10 @@ SYMBOL: +bottom+
 
 : unify-values ( values -- phi-out )
     remove-bottom
-    dup empty? [ drop <value> ] [
+    [ <value> ] [
         [ known ] map dup all-eq?
         [ first make-known ] [ drop <value> ] if
-    ] if ;
+    ] if-empty ;
 
 : phi-outputs ( phi-in -- stack )
     flip [ unify-values ] map ;
@@ -42,12 +42,12 @@ SYMBOL: +bottom+
 SYMBOL: quotations
 
 : unify-branches ( ins stacks -- in phi-in phi-out )
-    zip dup empty? [ drop 0 { } { } ] [
+    zip [ 0 { } { } ] [
         [ keys supremum ] [ ] [ balanced? ] tri
         [ dupd phi-inputs dup phi-outputs ]
         [ quotations get unbalanced-branches-error ]
         if
-    ] if ;
+    ] if-empty ;
 
 : branch-variable ( seq symbol -- seq )
     '[ , _ at ] map ;

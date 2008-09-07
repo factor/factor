@@ -18,14 +18,14 @@ SYMBOL: insomniac-recipients
     ] "" make ;
 
 : (email-log-report) ( service word-names -- )
-    dupd ?analyze-log dup empty? [ 2drop ] [
+    dupd ?analyze-log [ drop ] [
         <email>
             swap >>body
             insomniac-recipients get >>to
             insomniac-sender get >>from
             swap email-subject >>subject
         send-email
-    ] if ;
+    ] if-empty ;
 
 \ (email-log-report) NOTICE add-error-logging
 

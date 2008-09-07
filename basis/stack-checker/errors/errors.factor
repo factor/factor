@@ -26,8 +26,8 @@ M: inference-error error-help error>> error-help ;
 
 M: inference-error error.
     [
-        rstate>> dup empty?
-        [ drop ] [ "Nesting:" print stack. ] if
+        rstate>>
+        [ "Nesting:" print stack. ] unless-empty
     ] [ error>> error. ] bi ;
 
 TUPLE: literal-expected ;

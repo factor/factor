@@ -15,7 +15,7 @@ IN: help.markup
 ! Element types are words whose name begins with $.
 
 PREDICATE: simple-element < array
-    dup empty? [ drop t ] [ first word? not ] if ;
+    [ t ] [ first word? not ] if-empty ;
 
 SYMBOL: last-element
 SYMBOL: span
@@ -201,8 +201,8 @@ ALIAS: $slot $snippet
     dup [ "related" set-word-prop ] curry each ;
 
 : $related ( element -- )
-    first dup "related" word-prop remove dup empty?
-    [ drop ] [ $see-also ] if ;
+    first dup "related" word-prop remove
+    [ $see-also ] unless-empty ;
 
 : ($grid) ( style quot -- )
     [

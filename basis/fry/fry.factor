@@ -14,13 +14,13 @@ DEFER: shallow-fry
 
 : ((shallow-fry)) ( accum quot adder -- result )
     >r shallow-fry r>
-    append swap dup empty? [ drop ] [
+    append swap [
         [ prepose ] curry append
-    ] if ; inline
+    ] unless-empty ; inline
 
 : (shallow-fry) ( accum quot -- result )
-    dup empty? [
-        drop 1quotation
+    [
+        1quotation
     ] [
         unclip {
             { \ , [ [ curry ] ((shallow-fry)) ] }
@@ -31,7 +31,7 @@ DEFER: shallow-fry
 
             [ swap >r suffix r> (shallow-fry) ]
         } case
-    ] if ;
+    ] if-empty ;
 
 : shallow-fry ( quot -- quot' ) [ ] swap (shallow-fry) ;
 
