@@ -39,7 +39,7 @@ IN: irc.messages.tests
      { prefix "ircserver.net" }
      { command "MODE" }
      { parameters { "#factortest" "+ns" } }
-     { channel "#factortest" }
+     { name "#factortest" }
      { mode "+ns" } } }
 [ ":ircserver.net MODE #factortest +ns"
   parse-irc-line f >>timestamp ] unit-test
@@ -49,20 +49,10 @@ IN: irc.messages.tests
      { prefix "ircserver.net" }
      { command "MODE" }
      { parameters { "#factortest" "+o" "someuser" } }
-     { channel "#factortest" }
+     { name "#factortest" }
      { mode "+o" }
      { parameter "someuser" } } }
 [ ":ircserver.net MODE #factortest +o someuser"
-  parse-irc-line f >>timestamp ] unit-test
-
-{ T{ mode
-     { line ":ircserver.net MODE someuser +i" }
-     { prefix "ircserver.net" }
-     { command "MODE" }
-     { parameters { "someuser" "+i" } }
-     { nickname "someuser" }
-     { mode "+i" } } }
-[ ":ircserver.net MODE someuser +i"
   parse-irc-line f >>timestamp ] unit-test
 
 { T{ nick

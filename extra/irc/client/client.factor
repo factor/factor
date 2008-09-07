@@ -183,7 +183,7 @@ GENERIC: forward-name ( irc-message -- name )
 M: join forward-name ( join -- name ) trailing>> ;
 M: part forward-name ( part -- name ) channel>> ;
 M: kick forward-name ( kick -- name ) channel>> ;
-M: mode forward-name ( mode -- name ) channel>> ;
+M: mode forward-name ( mode -- name ) name>> ;
 M: privmsg forward-name ( privmsg -- name )
     dup name>> me? [ irc-message-sender ] [ name>> ] if ;
 

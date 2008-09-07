@@ -18,7 +18,7 @@ TUPLE: kick < irc-message channel who ;
 TUPLE: roomlist < irc-message channel names ;
 TUPLE: nick-in-use < irc-message asterisk name ;
 TUPLE: notice < irc-message type ;
-TUPLE: mode < irc-message channel mode nickname parameter ;
+TUPLE: mode < irc-message name mode parameter ;
 TUPLE: names-reply < irc-message who channel ;
 TUPLE: unhandled < irc-message ;
 
@@ -27,9 +27,6 @@ TUPLE: unhandled < irc-message ;
     [ [ (>>trailing) ] [ (>>parameters) ] [ (>>command) ] tri ] keep ;
 
 <PRIVATE
-
-: channel? ( string -- ? )
-    first "#&" member? ;
 
 GENERIC: command-string>> ( irc-message -- string )
 
@@ -59,9 +56,6 @@ M: kick command-parameters>> ( kick -- seq )
 M: mode command-parameters>> ( mode -- seq )
     [ name>> ] [ channel>> ] [ mode>> ] tri 3array ;
 
-: (>>channel|nickname) ( string mode -- )
-    over channel? [ (>>channel) ] [ (>>nickname) ] if ;
-
 GENERIC: (>>command-parameters) ( params irc-message -- )
 
 M: irc-message (>>command-parameters) ( params irc-message -- ) 2drop ;
@@ -74,8 +68,8 @@ M: kick    (>>command-parameters) ( params kick -- )
 M: names-reply (>>command-parameters) ( params names-reply -- )
     [ >r first r> (>>who) ] [ >r third r> (>>channel) ] 2bi ;
 M: mode    (>>command-parameters) ( params mode -- )
-    { { [ >r 2array r> ] [ [ (>>mode) ] [ (>>channel|nickname) ] bi ] }
-      { [ >r 3array r> ] [ [ (>>parameter) ] [ (>>mode) ] [ (>>channel) ] tri ] }
+    { { [ >r 2array r> ] [ [ (>>mode) ] [ (>>name) ] bi ] }
+      { [ >r 3array r> ] [ [ (>>parameter) ] [ (>>mode) ] [ (>>name) ] tri ] }
     } switch ;
 
 PRIVATE>
