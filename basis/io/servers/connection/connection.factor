@@ -73,7 +73,7 @@ M: threaded-server handle-client* handler>> call ;
     ] with-stream ;
 
 : thread-name ( server-name addrspec -- string )
-    unparse " connection from " swap 3append ;
+    unparse-short " connection from " swap 3append ;
 
 : accept-connection ( threaded-server -- )
     [ accept ] [ addr>> ] bi
