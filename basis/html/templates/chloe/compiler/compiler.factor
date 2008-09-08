@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs namespaces kernel sequences accessors combinators
-strings splitting io io.streams.string xml.writer xml.data
-xml.entities html.forms html.templates.chloe.syntax ;
+strings splitting io io.streams.string present xml.writer
+xml.data xml.entities html.forms html.templates.chloe.syntax ;
 IN: html.templates.chloe.compiler
 
 : chloe-attrs-only ( assoc -- assoc' )
@@ -42,10 +42,10 @@ DEFER: compile-element
     reset-buffer [ , ] [ % ] bi* ;
 
 : expand-attr ( value -- )
-    [ value write ] [code-with] ;
+    [ value present write ] [code-with] ;
 
 : compile-attr ( value -- )
-    reset-buffer "@" ?head [ , \ value ] when , ;
+    reset-buffer "@" ?head [ , [ value present ] % ] [ , ] if ;
 
 : compile-attrs ( assoc -- )
     [
@@ -103,18 +103,22 @@ DEFER: compile-element
 : compile-chunk ( seq -- )
     [ compile-element ] each ;
 
-: process-children ( tag quot -- )
+: compile-quot ( quot -- )
     reset-buffer
     [
-        [
-            SBUF" " string-buffer set
-            compile-children
-            reset-buffer
-        ] [ ] make ,
-    ] [ % ] bi* ;
+        SBUF" " string-buffer set
+        call
+        reset-buffer
+    ] [ ] make , ; inline
+
+: process-children ( tag quot -- )
+    [ [ compile-children ] compile-quot ] [ % ] bi* ; inline
 
 : compile-children>string ( tag -- )
      [ with-string-writer ] process-children ;
+
+: compile-with-scope ( quot -- )
+    compile-quot [ with-scope ] [code] ; inline
 
 : compile-template ( xml -- quot )
     [

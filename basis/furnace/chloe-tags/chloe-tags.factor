@@ -65,7 +65,10 @@ CHLOE: write-atom drop [ write-atom-feeds ] [code] ;
 : a-end-tag ( tag -- )
     drop [ </a> ] [code] ;
 
-CHLOE: a [ a-start-tag ] [ compile-children ] [ a-end-tag ] tri ;
+CHLOE: a
+    [
+        [ a-start-tag ] [ compile-children ] [ a-end-tag ] tri
+    ] compile-with-scope ;
 
 : compile-hidden-form-fields ( for -- )
     '[
@@ -95,12 +98,14 @@ CHLOE: a [ a-start-tag ] [ compile-children ] [ a-end-tag ] tri ;
     drop [ </form> ] [code] ;
 
 CHLOE: form
-    {
-        [ compile-link-attrs ]
-        [ form-start-tag ]
-        [ compile-children ]
-        [ form-end-tag ]
-    } cleave ;
+    [
+        {
+            [ compile-link-attrs ]
+            [ form-start-tag ]
+            [ compile-children ]
+            [ form-end-tag ]
+        } cleave
+    ] compile-with-scope ;
 
 STRING: button-tag-markup
 <t:form class="inline" xmlns:t="http://factorcode.org/chloe/1.0">

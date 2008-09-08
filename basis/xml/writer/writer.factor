@@ -38,7 +38,7 @@ SYMBOL: indenter
     ] when ;
 
 : name>string ( name -- string )
-    [ main>> ] [ space>> ] bi [ ":" swap 3append ] unless-empty ;
+    [ main>> ] [ space>> ] bi [ ":" rot 3append ] unless-empty ;
 
 : print-name ( name -- )
     name>string write ;

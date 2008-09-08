@@ -88,13 +88,21 @@ CHLOE-TUPLE: choice
 CHLOE-TUPLE: checkbox
 CHLOE-TUPLE: code
 
-MEMO: template-quot ( chloe -- quot )
-    path>> ".xml" append utf8 <file-reader> read-xml
-    compile-template ;
+: read-template ( chloe -- xml )
+    path>> ".xml" append utf8 <file-reader> read-xml ;
 
-: reset-templates ( -- ) \ template-quot reset-memoized ;
+MEMO: template-quot ( chloe -- quot )
+    read-template compile-template ;
+
+MEMO: nested-template-quot ( chloe -- quot )
+    read-template compile-nested-template ;
+
+: reset-templates ( -- )
+    { template-quot nested-template-quot } [ reset-memoized ] each ;
 
 M: chloe call-template*
-    template-quot call ;
+    nested-template? get
+    [ nested-template-quot ] [ template-quot ] if
+    assert-depth ;
 
 INSTANCE: chloe template
