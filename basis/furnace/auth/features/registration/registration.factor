@@ -36,7 +36,8 @@ IN: furnace.auth.features.registration
 
             URL" $realm" <redirect>
         ] >>submit
-    <auth-boilerplate> ;
+    <auth-boilerplate>
+    <secure-realm-only> ;
 
 : allow-registration ( login -- login )
     <register-action> "register" add-responder ;

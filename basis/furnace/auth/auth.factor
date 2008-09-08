@@ -134,22 +134,21 @@ TUPLE: protected < filter-responder description capabilities ;
         swap >>responder ;
 
 : have-capabilities? ( capabilities -- ? )
-    logged-in-user get {
-        { [ dup not ] [ 2drop f ] }
-        { [ dup deleted>> 1 = ] [ 2drop f ] }
-        [ capabilities>> subset? ]
-    } cond ;
+    realm get secure>> secure-connection? not and [ drop f ] [
+        logged-in-user get {
+            { [ dup not ] [ 2drop f ] }
+            { [ dup deleted>> 1 = ] [ 2drop f ] }
+            [ capabilities>> subset? ]
+        } cond
+    ] if ;
 
 M: protected call-responder* ( path responder -- response )
-    '[
-        , ,
-        dup protected set
-        dup capabilities>> have-capabilities?
-        [ call-next-method ] [
-            [ drop ] [ [ description>> ] [ capabilities>> ] bi ] bi*
-            realm get login-required*
-        ] if
-    ] if-secure-realm ;
+    dup protected set
+    dup capabilities>> have-capabilities?
+    [ call-next-method ] [
+        [ drop ] [ [ description>> ] [ capabilities>> ] bi ] bi*
+        realm get login-required*
+    ] if ;
 
 : <auth-boilerplate> ( responder -- responder' )
     <boilerplate> { realm "boilerplate" } >>template ;
