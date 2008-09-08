@@ -13,9 +13,13 @@ FUNCTION: bool sel_isMapped ( SEL aSelector ) ;
 
 FUNCTION: SEL sel_registerName ( char* str ) ;
 
+TYPEDEF: void* Class
+TYPEDEF: void* Method
+TYPEDEF: void* Protocol
+
 C-STRUCT: objc-super
     { "id" "receiver" }
-    { "void*" "class" } ;
+    { "Class" "class" } ;
 
 : CLS_CLASS        HEX: 1   ;
 : CLS_META         HEX: 2   ;
@@ -27,61 +31,47 @@ C-STRUCT: objc-super
 : CLS_NEED_BIND    HEX: 80  ;
 : CLS_METHOD_ARRAY HEX: 100 ;
 
-C-STRUCT: objc-class
-    { "void*" "isa" }
-    { "void*" "super-class" }
-    { "char*" "name" }
-    { "long" "version" }
-    { "long" "info" }
-    { "long" "instance-size" }
-    { "void*" "ivars" }
-    { "void*" "methodLists" }
-    { "void*" "cache" }
-    { "void*" "protocols" } ;
-
-C-STRUCT: objc-object
-    { "objc-class*" "isa" } ;
-
 FUNCTION: int objc_getClassList ( void* buffer, int bufferLen ) ;
 
-FUNCTION: objc-class* objc_getClass ( char* class ) ;
+FUNCTION: Class objc_getClass ( char* class ) ;
 
-FUNCTION: objc-class* objc_getMetaClass ( char* class ) ;
+FUNCTION: Class objc_getMetaClass ( char* class ) ;
 
-FUNCTION: objc-class* objc_getProtocol ( char* class ) ;
+FUNCTION: Protocol objc_getProtocol ( char* class ) ;
 
-FUNCTION: void objc_addClass ( objc-class* class ) ;
+FUNCTION: Class objc_allocateClassPair ( Class superclass, char* name, size_t extraBytes ) ;
+FUNCTION: Class objc_registerClassPair ( Class cls ) ;
 
-FUNCTION: id class_createInstance ( objc-class* class, uint additionalByteCount ) ;
+FUNCTION: id class_createInstance ( Class class, uint additionalByteCount ) ;
 
-FUNCTION: id class_createInstanceFromZone ( objc-class* class, uint additionalByteCount, void* zone ) ;
+FUNCTION: id class_createInstanceFromZone ( Class class, uint additionalByteCount, void* zone ) ;
 
-C-STRUCT: objc-method
-    { "SEL" "name" }
-    { "char*" "types" }
-    { "void*" "imp" } ;
+FUNCTION: Method class_getInstanceMethod ( Class class, SEL selector ) ;
 
-FUNCTION: objc-method* class_getInstanceMethod ( objc-class* class, SEL selector ) ;
+FUNCTION: Method class_getClassMethod ( Class class, SEL selector ) ;
 
-FUNCTION: objc-method* class_getClassMethod ( objc-class* class, SEL selector ) ;
+FUNCTION: Method* class_copyMethodList ( Class class, uint* outCount ) ;
 
-C-STRUCT: objc-method-list
-    { "void*" "obsolete" }
-    { "int" "count" } ;
+FUNCTION: Class class_getSuperclass ( Class cls ) ;
 
-FUNCTION: objc-method-list* class_nextMethodList ( objc-class* class, void** iterator ) ;
+FUNCTION: char class_addMethod ( Class class, SEL name, void* imp, void* types ) ;
 
-FUNCTION: void class_addMethods ( objc-class* class, objc-method-list* methodList ) ;
+FUNCTION: char class_addProtocol ( Class class, Protocol protocol ) ;
 
-FUNCTION: void class_removeMethods ( objc-class* class, objc-method-list* methodList ) ;
+FUNCTION: uint method_getNumberOfArguments ( Method method ) ;
 
-FUNCTION: uint method_getNumberOfArguments ( objc-method* method ) ;
+FUNCTION: uint method_getSizeOfArguments ( Method method ) ;
 
-FUNCTION: uint method_getSizeOfArguments ( objc-method* method ) ;
+FUNCTION: uint method_getArgumentInfo ( Method method, int argIndex, char** type, int* offset ) ;
 
-FUNCTION: uint method_getArgumentInfo ( objc-method* method, int argIndex, char** type, int* offset ) ;
+FUNCTION: void* method_copyReturnType ( Method method ) ;
 
-C-STRUCT: objc-protocol-list
-    { "void*" "next" }
-    { "int" "count" }
-    { "objc-class*" "class" } ;
+FUNCTION: void* method_copyArgumentType ( Method method, uint index ) ;
+
+FUNCTION: void* method_getTypeEncoding ( Method method ) ;
+
+FUNCTION: SEL method_getName ( Method method ) ;
+
+FUNCTION: void* method_setImplementation ( Method method, void* imp ) ; 
+
+FUNCTION: Class object_getClass ( id object ) ;
