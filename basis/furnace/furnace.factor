@@ -1,30 +1,14 @@
-! Copyright (C) 2003, 2008 Slava Pestov.
+! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel combinators assocs
-continuations namespaces sequences splitting words
-vocabs.loader classes strings
-fry urls multiline present
-xml
-xml.data
-xml.entities
-xml.writer
-html.components
-html.elements
-html.forms
-html.templates
-html.templates.chloe
-html.templates.chloe.syntax
-http
-http.server
-http.server.redirection
-http.server.responses
-qualified ;
-QUALIFIED-WITH: assocs a
-EXCLUDE: xml.utilities => children>string ;
+USING: namespaces assocs sequences kernel classes splitting
+vocabs.loader accessors strings combinators arrays
+continuations present fry
+urls html.elements
+http http.server http.server.redirection ;
 IN: furnace
 
 : nested-responders ( -- seq )
-    responder-nesting get a:values ;
+    responder-nesting get values ;
 
 : each-responder ( quot -- )
    nested-responders swap each ; inline
@@ -63,9 +47,24 @@ M: url adjust-url
 
 M: string adjust-url ;
 
+GENERIC: link-attr ( tag responder -- )
+
+M: object link-attr 2drop ;
+
 GENERIC: modify-form ( responder -- )
 
 M: object modify-form drop ;
+
+: hidden-form-field ( value name -- )
+    over [
+        <input
+            "hidden" =type
+            =name
+            present =value
+        input/>
+    ] [ 2drop ] if ;
+
+: nested-forms-key "__n" ;
 
 : request-params ( request -- assoc )
     dup method>> {
@@ -110,98 +109,4 @@ SYMBOL: exit-continuation
 : with-exit-continuation ( quot -- )
     '[ exit-continuation set @ ] callcc1 exit-continuation off ;
 
-! Chloe tags
-: parse-query-attr ( string -- assoc )
-    [ f ] [ "," split [ dup value ] H{ } map>assoc ] if-empty ;
-
-: a-url-path ( tag -- string )
-    [ "href" required-attr ]
-    [ "rest" optional-attr dup [ value ] when ] bi
-    [ [ "/" ?tail drop "/" ] dip present 3append ] when* ;
-
-: a-url ( tag -- url )
-    dup "value" optional-attr
-    [ value ] [
-        <url>
-            swap
-            [ a-url-path >>path ]
-            [ "query" optional-attr parse-query-attr >>query ]
-            bi
-        adjust-url relative-to-request
-    ] ?if ;
-
-CHLOE: atom [ children>string ] [ a-url ] bi add-atom-feed ;
-
-CHLOE: write-atom drop write-atom-feeds ;
-
-GENERIC: link-attr ( tag responder -- )
-
-M: object link-attr 2drop ;
-
-: link-attrs ( tag -- )
-    #! Side-effects current namespace.
-    '[ , _ link-attr ] each-responder ;
-
-: a-start-tag ( tag -- )
-    [ <a [ link-attrs ] [ a-url =href ] bi a> ] with-scope ;
-
-CHLOE: a
-    [ a-start-tag ]
-    [ process-tag-children ]
-    [ drop </a> ]
-    tri ;
-
-: hidden-form-field ( value name -- )
-    over [
-        <input
-            "hidden" =type
-            =name
-            present =value
-        input/>
-    ] [ 2drop ] if ;
-
-: nested-forms-key "__n" ;
-
-: form-magic ( tag -- )
-    [ modify-form ] each-responder
-    nested-forms get " " join f like nested-forms-key hidden-form-field
-    "for" optional-attr [ "," split [ hidden render ] each ] when* ;
-
-: form-start-tag ( tag -- )
-    [
-        [
-            <form
-                {
-                    [ link-attrs ]
-                    [ "method" optional-attr "post" or =method ]
-                    [ "action" required-attr resolve-base-path =action ]
-                    [ attrs>> non-chloe-attrs-only print-attrs ]
-                } cleave
-            form>
-        ]
-        [ form-magic ] bi
-    ] with-scope ;
-
-CHLOE: form
-    [ form-start-tag ]
-    [ process-tag-children ]
-    [ drop </form> ]
-    tri ;
-
-STRING: button-tag-markup
-<t:form class="inline" xmlns:t="http://factorcode.org/chloe/1.0">
-    <button type="submit"></button>
-</t:form>
-;
-
-: add-tag-attrs ( attrs tag -- )
-    attrs>> swap update ;
-
-CHLOE: button
-    button-tag-markup string>xml body>>
-    {
-        [ [ attrs>> chloe-attrs-only ] dip add-tag-attrs ]
-        [ [ attrs>> non-chloe-attrs-only ] dip "button" tag-named add-tag-attrs ]
-        [ [ children>string 1array ] dip "button" tag-named (>>children) ]
-        [ nip ]
-    } 2cleave process-chloe-tag ;
+"furnace.chloe-tags" require

@@ -1,7 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: farkup kernel peg peg.ebnf tools.test ;
+USING: farkup kernel peg peg.ebnf tools.test namespaces ;
 IN: farkup.tests
+
+[ "Baz" ] [ "Foo/Bar/Baz" simple-link-title ] unit-test
+[ "Baz" ] [ "Baz" simple-link-title ] unit-test
 
 [ ] [
     "abcd-*strong*\nasdifj\nweouh23ouh23"
@@ -81,10 +84,15 @@ IN: farkup.tests
 [ "<pre><span class='KEYWORD3'>int</span> <span class='FUNCTION'>main</span><span class='OPERATOR'>(</span><span class='OPERATOR'>)</span>\n</pre>" ]
 [ "[c{int main()}]" convert-farkup ] unit-test
 
-[ "<p><img src=\"lol.jpg\"/></p>" ] [ "[[image:lol.jpg]]" convert-farkup ] unit-test
-[ "<p><img src=\"lol.jpg\" alt=\"teh lol\"/></p>" ] [ "[[image:lol.jpg|teh lol]]" convert-farkup ] unit-test
-[ "<p><a href=\"lol.com\">lol.com</a></p>" ] [ "[[lol.com]]" convert-farkup ] unit-test
-[ "<p><a href=\"lol.com\">haha</a></p>" ] [ "[[lol.com|haha]]" convert-farkup ] unit-test
+[ "<p><img src='lol.jpg'/></p>" ] [ "[[image:lol.jpg]]" convert-farkup ] unit-test
+[ "<p><img src='lol.jpg' alt='teh lol'/></p>" ] [ "[[image:lol.jpg|teh lol]]" convert-farkup ] unit-test
+[ "<p><a href='http://lol.com'>http://lol.com</a></p>" ] [ "[[http://lol.com]]" convert-farkup ] unit-test
+[ "<p><a href='http://lol.com'>haha</a></p>" ] [ "[[http://lol.com|haha]]" convert-farkup ] unit-test
+[ "<p><a href='Foo/Bar'>Bar</a></p>" ] [ "[[Foo/Bar]]" convert-farkup ] unit-test
+
+"/wiki/view/" relative-link-prefix [
+    [ "<p><a href='/wiki/view/Foo/Bar'>Bar</a></p>" ] [ "[[Foo/Bar]]" convert-farkup ] unit-test
+] with-variable
 
 [ ] [ "[{}]" convert-farkup drop ] unit-test
 

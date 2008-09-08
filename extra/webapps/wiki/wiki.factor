@@ -3,7 +3,7 @@
 USING: accessors kernel hashtables calendar random assocs
 namespaces splitting sequences sorting math.order present
 io.files io.encodings.ascii
-syndication
+syndication farkup
 html.components html.forms
 http.server
 http.server.dispatchers
@@ -47,7 +47,7 @@ article "ARTICLES" {
 
 : <article> ( title -- article ) article new swap >>title ;
 
-TUPLE: revision id title author date content description ;
+TUPLE: revision id title author date content html description ;
 
 revision "REVISIONS" {
     { "id" "ID" INTEGER +db-assigned-id+ }
@@ -55,6 +55,7 @@ revision "REVISIONS" {
     { "author" "AUTHOR" { VARCHAR 256 } +not-null+ } ! uid
     { "date" "DATE" TIMESTAMP +not-null+ }
     { "content" "CONTENT" TEXT +not-null+ }
+    { "html" "HTML" TEXT +not-null+ } ! Farkup converted to HTML
     { "description" "DESCRIPTION" TEXT }
 } define-persistent
 
@@ -70,6 +71,9 @@ M: revision feed-entry-url id>> revision-url ;
 
 : <revision> ( id -- revision )
     revision new swap >>id ;
+
+: compute-html ( revision -- )
+    dup content>> convert-farkup >>html drop ;
 
 : validate-title ( -- )
     { { "title" [ v-one-line ] } } validate-params ;
@@ -89,6 +93,9 @@ M: revision feed-entry-url id>> revision-url ;
     <article> select-tuple
     dup [ revision>> <revision> select-tuple ] when ;
 
+: init-relative-link-prefix ( -- )
+    URL" $wiki/view/" adjust-url present relative-link-prefix set ;
+
 : <view-article-action> ( -- action )
     <action>
 
@@ -96,6 +103,7 @@ M: revision feed-entry-url id>> revision-url ;
 
         [
             validate-title
+            init-relative-link-prefix
         ] >>init
 
         [
@@ -118,7 +126,7 @@ M: revision feed-entry-url id>> revision-url ;
             validate-integer-id
             "id" value <revision>
             select-tuple from-object
-            URL" $wiki/view/" adjust-url present relative-link-prefix set
+            init-relative-link-prefix
         ] >>init
 
         { wiki "view" } >>template
@@ -140,11 +148,13 @@ M: revision feed-entry-url id>> revision-url ;
     [ title>> ] [ id>> ] bi article boa insert-tuple ;
 
 : add-revision ( revision -- )
+    [ compute-html ]
     [ insert-tuple ]
     [
         dup title>> <article> select-tuple
         [ amend-article ] [ add-article ] if*
-    ] bi ;
+    ]
+    tri ;
 
 : <edit-article-action> ( -- action )
     <page-action>
@@ -370,11 +380,13 @@ M: revision feed-entry-url id>> revision-url ;
 : init-wiki ( -- )
     "resource:extra/webapps/wiki/initial-content" directory* keys
     [
-        [ ascii file-contents ] [ file-name "." split1 drop ] bi
-        f <revision>
-            swap >>title
-            swap >>content
-            "slava" >>author
-            now >>date
-        add-revision
+        dup file-name ".txt" ?tail [
+            swap ascii file-contents
+            f <revision>
+                swap >>content
+                swap >>title
+                "slava" >>author
+                now >>date
+            add-revision
+        ] [ 2drop ] if
     ] each ;
