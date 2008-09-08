@@ -137,7 +137,7 @@ M: f <CFNumber>
     dup <CFBundle> [
         CFBundleLoadExecutable drop
     ] [
-        "Cannot load bundled named " prepend throw
+        "Cannot load bundle named " prepend throw
     ] ?if ;
 
 TUPLE: CFRelease-destructor alien disposed ;
