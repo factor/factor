@@ -31,6 +31,7 @@ DEFER: sql%
     ] each ;
 
 USE: multiline
+/*
 HOOK: sql-create db ( object -- )
 M: db sql-create ( object -- )
     drop
@@ -128,7 +129,6 @@ GENERIC: sql-max db ( object -- )
 M: db sql-max ( object -- )
     "max" sql-function, ;
 
-/*
 : sql-array% ( array -- )
     unclip
     {
