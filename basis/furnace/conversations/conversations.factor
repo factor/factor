@@ -130,7 +130,8 @@ M: conversations call-responder*
             over post-data>> >>post-data
             over url>> >>url
     ] change
-    url>> path>> split-path
+    [ url>> url set ]
+    [ url>> path>> split-path ] bi
     conversations get responder>> call-responder ;
 
 \ end-aside-post DEBUG add-input-logging
