@@ -1,7 +1,6 @@
-! Copyright (c) 2008 Eric Mertens
+! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs kernel math math.ranges sequences ;
-
 IN: project-euler.164
 
 ! http://projecteuler.net/index.php?section=problems&id=164
@@ -11,6 +10,7 @@ IN: project-euler.164
 
 ! How many 20 digit numbers n (without any leading zero) exist such
 ! that no three consecutive digits of n have a sum greater than 9?
+
 
 ! SOLUTION
 ! --------
@@ -29,5 +29,10 @@ IN: project-euler.164
 
 PRIVATE>
 
-: euler164 ( -- n )
+: euler164 ( -- answer )
     init-table 19 [ next-table ] times values sum ;
+
+! [ euler164 ] 100 ave-time
+! 8 ms run time - 100 trials
+
+MAIN: euler164

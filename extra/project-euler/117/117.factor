@@ -1,7 +1,6 @@
-! Copyright (c) 2008 Eric Mertens
+! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.order splitting sequences ;
-
+USING: kernel math math.order sequences splitting ;
 IN: project-euler.117
 
 ! http://projecteuler.net/index.php?section=problems&id=117
@@ -14,7 +13,8 @@ IN: project-euler.117
 ! units, and blue tiles measuring four units, it is possible to tile a
 ! row measuring five units in length in exactly fifteen different ways.
 
-!  How many ways can a row measuring fifty units in length be tiled?
+! How many ways can a row measuring fifty units in length be tiled?
+
 
 ! SOLUTION
 ! --------
@@ -33,10 +33,15 @@ IN: project-euler.117
 : next ( seq -- )
     [ 4 short tail* sum ] keep push ;
 
-PRIVATE>
-
 : (euler117) ( n -- m )
     V{ 1 } clone tuck [ next ] curry times peek ;
 
-: euler117 ( -- m )
+PRIVATE>
+
+: euler117 ( -- answer )
     50 (euler117) ;
+
+! [ euler117 ] 100 ave-time
+! 0 ms run time - 100 trials
+
+MAIN: euler117

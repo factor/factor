@@ -182,6 +182,7 @@ $nl
 ARTICLE: "cookbook-io" "Input and output cookbook"
 "Ask the user for their age, and print it back:"
 { $code
+    "USING: io math.parser ;"
     ": ask-age ( -- ) \"How old are you?\" print ;"
     ": read-age ( -- n ) readln string>number ;"
     ": print-age ( n -- )"
@@ -193,22 +194,26 @@ ARTICLE: "cookbook-io" "Input and output cookbook"
 }
 "Print the lines of a file in sorted order:"
 { $code
-    "utf8 \"lines.txt\" file-lines natural-sort [ print ] each"
+    "USING: io io.encodings.utf8 io.files sequences sorting ;"
+    "\"lines.txt\" utf8 file-lines natural-sort [ print ] each"
 }
 "Read 1024 bytes from a file:"
 { $code
+    "USING: io io.encodings.binary io.files ;"
     "\"data.bin\" binary [ 1024 read ] with-file-reader"
 }
 "Convert a file of 4-byte cells from little to big endian or vice versa, by directly mapping it into memory and operating on it with sequence words:"
 { $code
+    "USING: accessors grouping io.files io.mmap kernel sequences ;"
     "\"mydata.dat\" dup file-info size>> ["
     "    4 <sliced-groups> [ reverse-here ] change-each"
     "] with-mapped-file"
 }
 "Send some bytes to a remote host:"
 { $code
-    "\"myhost\" 1033 <inet>"
-    "[ { 12 17 102 } >string write ] with-client"
+    "USING: io io.encodings.ascii io.sockets strings ;"
+    "\"myhost\" 1033 <inet> ascii"
+    "[ B{ 12 17 102 } write ] with-client"
 }
 { $references
     { }
@@ -244,7 +249,7 @@ ARTICLE: "cookbook-application" "Application cookbook"
 }
 "See " { $link POSTPONE: MAIN: } " for details. The " { $link run } " word loads a vocabulary if necessary, and calls its main entry point; try the following, it's fun:"
 { $code "\"tetris\" run" }
-"On Mac OS X and Windows, stand-alone applications can also be deployed; these are genuine, 100% native code double-clickable executables:"
+"Factor can deploy stand-alone executables; they do not have any external dependencies and consist entirely of compiled native machine code:"
 { $code "\"tetris\" deploy-tool" }
 { $references
     { }

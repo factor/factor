@@ -1,8 +1,7 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.lib kernel math math.functions math.ranges namespaces
-    project-euler.common sequences sequences.lib
-    combinators.short-circuit ;
+USING: combinators.lib combinators.short-circuit kernel math math.functions
+    math.ranges namespaces project-euler.common sequences sequences.lib ;
 IN: project-euler.021
 
 ! http://projecteuler.net/index.php?section=problems&id=21
