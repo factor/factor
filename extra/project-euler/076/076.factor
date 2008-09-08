@@ -1,7 +1,7 @@
-! Copyright (c) 2008 Eric Mertens
+! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs combinators kernel math sequences
-math.order math.ranges locals ;
+USING: arrays assocs combinators kernel locals math math.order math.ranges
+    sequences ;
 IN: project-euler.076
 
 ! http://projecteuler.net/index.php?section=problems&id=76
@@ -11,6 +11,7 @@ IN: project-euler.076
 
 ! How many different ways can one hundred be written as a
 ! sum of at least two positive integers?
+
 
 ! SOLUTION
 ! --------
@@ -43,12 +44,17 @@ IN: project-euler.076
 :: each-subproblem ( n quot -- )
     n [1,b] [ dup [1,b] quot with each ] each ; inline
 
-PRIVATE>
-
 : (euler076) ( n -- m )
     dup init
     [ [ ways ] curry each-subproblem ]
     [ [ dup 2array ] dip at 1- ] 2bi ;
 
-: euler076 ( -- m )
+PRIVATE>
+
+: euler076 ( -- answer )
     100 (euler076) ;
+
+! [ euler076 ] 100 ave-time
+! 704 ms run time - 100 trials
+
+MAIN: euler076

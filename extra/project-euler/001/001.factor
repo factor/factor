@@ -19,8 +19,17 @@ IN: project-euler.001
 
 ! Inclusion-exclusion principle
 
+<PRIVATE
+
+: sum-divisible-by ( target n -- m )
+    [ /i dup 1+ * ] keep * 2 /i ;
+
+PRIVATE>
+
 : euler001 ( -- answer )
-    0 999 3 <range> sum 0 999 5 <range> sum + 0 999 15 <range> sum - ;
+    999 3 sum-divisible-by
+    999 5 sum-divisible-by +
+    999 15 sum-divisible-by - ;
 
 ! [ euler001 ] 100 ave-time
 ! 0 ms run / 0 ms GC ave time - 100 trials
@@ -30,9 +39,16 @@ IN: project-euler.001
 ! -------------------
 
 : euler001a ( -- answer )
-    1000 [ dup 5 mod swap 3 mod [ zero? ] either? ] filter sum ;
+    0 999 3 <range> sum 0 999 5 <range> sum + 0 999 15 <range> sum - ;
 
 ! [ euler001a ] 100 ave-time
+! 0 ms run / 0 ms GC ave time - 100 trials
+
+
+: euler001b ( -- answer )
+    1000 [ dup 5 mod swap 3 mod [ zero? ] either? ] filter sum ;
+
+! [ euler001b ] 100 ave-time
 ! 0 ms run / 0 ms GC ave time - 100 trials
 
 MAIN: euler001

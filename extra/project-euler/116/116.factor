@@ -1,7 +1,6 @@
-! Copyright (c) 2008 Eric Mertens
+! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.ranges sequences sequences.lib ;
-
 IN: project-euler.116
 
 ! http://projecteuler.net/index.php?section=problems&id=116
@@ -23,6 +22,7 @@ IN: project-euler.116
 ! How many different ways can the black tiles in a row measuring fifty units in
 ! length be replaced if colours cannot be mixed and at least one coloured tile
 ! must be used?
+
 
 ! SOLUTION
 ! --------
@@ -46,10 +46,15 @@ IN: project-euler.116
 : ways ( length colortile -- permutations )
     V{ 1 } clone [ [ next ] 2curry times ] keep peek 1- ;
 
-PRIVATE>
-
 : (euler116) ( length -- permutations )
     3 [1,b] [ ways ] with sigma ;
 
-: euler116 ( -- permutations )
+PRIVATE>
+
+: euler116 ( -- answer )
     50 (euler116) ;
+
+! [ euler116 ] 100 ave-time
+! 0 ms run time - 100 trials
+
+MAIN: euler116

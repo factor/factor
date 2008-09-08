@@ -1,8 +1,32 @@
-! Copyright (c) 2008 Eric Mertens
+! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.order sequences sequences.private
-locals hints ;
+USING: hints kernel locals math math.order sequences sequences.private ;
 IN: project-euler.150
+
+! http://projecteuler.net/index.php?section=problems&id=150
+
+! DESCRIPTION
+! -----------
+
+! In a triangular array of positive and negative integers, we wish to find a
+! sub-triangle such that the sum of the numbers it contains is the smallest
+! possible.
+
+! In the example below, it can be easily verified that the marked triangle
+! satisfies this condition having a sum of -42.
+
+! We wish to make such a triangular array with one thousand rows, so we
+! generate 500500 pseudo-random numbers sk in the range +/-2^19, using a type of
+! random number generator (known as a Linear Congruential Generator) as
+! follows:
+
+! ...
+
+! Find the smallest possible sub-triangle sum.
+
+
+! SOLUTION
+! --------
 
 <PRIVATE
 
@@ -20,16 +44,13 @@ IN: project-euler.150
 : map-infimum ( seq quot -- min )
     [ min ] compose 0 swap reduce ; inline
 
-
 ! triangle generator functions
 
 : next ( t -- new-t s )
     615949 * 797807 + 20 2^ rem dup 19 2^ - ; inline
 
 : sums-triangle ( -- seq )
-    0 1000 [ 1+ [ next ] replicate partial-sums ] map nip ; 
-
-PRIVATE>
+    0 1000 [ 1+ [ next ] replicate partial-sums ] map nip ;
 
 :: (euler150) ( m -- n )
     [let | table [ sums-triangle ] |
@@ -46,5 +67,12 @@ PRIVATE>
 
 HINTS: (euler150) fixnum ;
 
-: euler150 ( -- n )
+PRIVATE>
+
+: euler150 ( -- answer )
     1000 (euler150) ;
+
+! [ euler150 ] 10 ave-time
+! 32858 ms run time - 10 trials
+
+MAIN: euler150
