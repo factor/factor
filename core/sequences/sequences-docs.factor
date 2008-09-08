@@ -338,7 +338,7 @@ HELP: if-empty
 HELP: when-empty
 { $values
      { "seq" sequence } { "quot" "the first quotation of an " { $link if-empty } } }
-{ $description "Makes an implicit check if the sequence is empty. An empty sequence is dropped and the " { $snippet "quot1" } " is called." }
+{ $description "Makes an implicit check if the sequence is empty. An empty sequence is dropped and the " { $snippet "quot" } " is called." }
 { $examples "This word is equivalent to " { $link if-empty } " with an empty second quotation:"
     { $example
     "USING: sequences prettyprint ;"
@@ -355,7 +355,7 @@ HELP: when-empty
 HELP: unless-empty
 { $values
      { "seq" sequence } { "quot" "the second quotation of an " { $link if-empty } } }
-{ $description "Makes an implicit check if the sequence is empty. An empty sequence is dropped. Otherwise, the " { $snippet "quot2" } " is called on the sequence." }
+{ $description "Makes an implicit check if the sequence is empty. An empty sequence is dropped. Otherwise, the " { $snippet "quot" } " is called on the sequence." }
 { $examples "This word is equivalent to " { $link if-empty } " with an empty first quotation:"
     { $example
     "USING: sequences prettyprint ;"

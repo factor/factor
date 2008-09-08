@@ -119,7 +119,7 @@ ERROR: no-vocab vocab ;
         { "assoc3" assoc } { "newassoc" assoc }
         { "alist" "an array of key/value pairs" }
         { "keys" sequence } { "values" sequence }
-        { "class" class }
+        { "class" class } { "tuple" tuple }
     } at* ;
 
 : add-using ( object -- )
