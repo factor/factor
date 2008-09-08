@@ -249,7 +249,7 @@ ARTICLE: "cookbook-application" "Application cookbook"
 }
 "See " { $link POSTPONE: MAIN: } " for details. The " { $link run } " word loads a vocabulary if necessary, and calls its main entry point; try the following, it's fun:"
 { $code "\"tetris\" run" }
-"On Mac OS X and Windows, stand-alone applications can also be deployed; these are genuine, 100% native code double-clickable executables:"
+"Factor can deploy stand-alone executables; they do not have any external dependencies and consist entirely of compiled native machine code:"
 { $code "\"tetris\" deploy-tool" }
 { $references
     { }
