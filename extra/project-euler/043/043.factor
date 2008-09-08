@@ -1,8 +1,8 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.lib hashtables kernel math math.combinatorics math.parser
-    math.ranges project-euler.common sequences sequences.lib sorting
-    sets combinators.short-circuit ;
+USING: combinators.lib combinators.short-circuit hashtables kernel math
+    math.combinatorics math.parser math.ranges project-euler.common sequences
+    sequences.lib sorting sets ;
 IN: project-euler.043
 
 ! http://projecteuler.net/index.php?section=problems&id=43
