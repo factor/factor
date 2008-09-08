@@ -50,9 +50,8 @@ PRIVATE>
     [ amb-integer ] [ nth ] bi ;
 
 : amb ( seq -- elt )
-    dup empty?
-    [ drop fail f ]
-    [ unsafe-amb ] if ; inline
+    [ fail f ]
+    [ unsafe-amb ] if-empty ; inline
 
 MACRO: amb-execute ( seq -- quot )
     [ length 1 - ] [ <enum> [ 1quotation ] assoc-map ] bi

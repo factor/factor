@@ -4,22 +4,7 @@ namespaces xml html.components html.forms
 splitting unicode.categories furnace accessors ;
 IN: html.templates.chloe.tests
 
-[ f ] [ f parse-query-attr ] unit-test
-
-[ f ] [ "" parse-query-attr ] unit-test
-
-[ H{ { "a" "b" } } ] [
-    begin-form
-    "b" "a" set-value
-    "a" parse-query-attr
-] unit-test
-
-[ H{ { "a" "b" } { "c" "d" } } ] [
-    begin-form
-    "b" "a" set-value
-    "d" "c" set-value
-    "a,c" parse-query-attr
-] unit-test
+reset-templates
 
 : run-template
     with-string-writer [ "\r\n\t" member? not ] filter

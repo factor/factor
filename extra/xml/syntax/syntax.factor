@@ -21,10 +21,10 @@ IN: xml.syntax
 DEFER: >>
 
 : attributes-parsed ( accum quot -- accum )
-    dup empty? [ drop f parsed ] [
+    [ f parsed ] [
         >r \ >r parsed r> parsed
         [ H{ } make-assoc r> swap ] [ parsed ] each
-    ] if ;
+    ] if-empty ;
 
 : <<
     parsed-name [

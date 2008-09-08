@@ -67,7 +67,7 @@ M: object ((client)) ( addrspec -- fd )
 M: object (server) ( addrspec -- handle )
     [
         SOCK_STREAM server-socket-fd
-        dup handle-fd 10 listen io-error
+        dup handle-fd 128 listen io-error
     ] with-destructors ;
 
 : do-accept ( server addrspec -- fd sockaddr )

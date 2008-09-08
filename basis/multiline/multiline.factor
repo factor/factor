@@ -37,9 +37,8 @@ PRIVATE>
 
 : parse-multiline-string ( end-text -- str )
     [
-        lexer get column>> swap (parse-multiline-string)
-        lexer get (>>column)
-    ] "" make rest but-last ;
+        lexer get [ swap (parse-multiline-string) ] change-column drop
+    ] "" make rest-slice but-last ;
 
 : <"
     "\">" parse-multiline-string parsed ; parsing

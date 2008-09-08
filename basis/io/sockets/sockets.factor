@@ -95,11 +95,11 @@ M: invalid-inet6 summary drop "Invalid IPv6 address" ;
 <PRIVATE
 
 : parse-inet6 ( string -- seq )
-    dup empty? [ drop f ] [
+    [ f ] [
         ":" split [
             hex> [ "Component not a number" throw ] unless*
         ] B{ } map-as
-    ] if ;
+    ] if-empty ;
 
 : pad-inet6 ( string1 string2 -- seq )
     2dup [ length ] bi@ + 8 swap -

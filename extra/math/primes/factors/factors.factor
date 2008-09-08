@@ -10,11 +10,11 @@ IN: math.primes.factors
 
 : (count) ( n d -- n' )
     [ (factor) ] { } make
-    dup empty? [ drop ] [ [ first ] keep length 2array , ] if ;
+    [ [ first ] keep length 2array , ] unless-empty ;
 
 : (unique) ( n d -- n' )
     [ (factor) ] { } make
-    dup empty? [ drop ] [ first , ] if ;
+    [ first , ] unless-empty ;
 
 : (factors) ( quot list n -- )
     dup 1 > [ swap uncons swap >r pick call r> swap (factors) ] [ 3drop ] if ;

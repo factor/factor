@@ -103,11 +103,9 @@ SYMBOL: tagstack
     [ get-char CHAR: < = ] take-until ;
 
 : parse-text ( -- )
-    read-until-< dup empty? [
-        drop
-    ] [
+    read-until-< [
         make-text-tag push-tag
-    ] if ;
+    ] unless-empty ;
 
 : (parse-attributes) ( -- )
     read-whitespace*

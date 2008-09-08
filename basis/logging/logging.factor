@@ -46,6 +46,7 @@ SYMBOL: log-service
     dup array? [ dup length 1 = [ first ] when ] when
     dup string? [
         [
+            boa-tuples? on
             string-limit? off
             1 line-limit set
             3 nesting-limit set

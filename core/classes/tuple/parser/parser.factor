@@ -26,7 +26,7 @@ ERROR: duplicate-slot-names names ;
 
 : check-duplicate-slots ( slots -- )
     slot-names duplicates
-    dup empty? [ drop ] [ duplicate-slot-names ] if ;
+    [ duplicate-slot-names ] unless-empty ;
 
 ERROR: invalid-slot-name name ;
 

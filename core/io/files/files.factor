@@ -59,7 +59,7 @@ HOOK: (file-appender) io-backend ( path -- stream )
 HOOK: root-directory? io-backend ( path -- ? )
 
 M: object root-directory? ( path -- ? )
-    dup empty? [ drop f ] [ [ path-separator? ] all? ] if ;
+    [ f ] [ [ path-separator? ] all? ] if-empty ;
 
 ERROR: no-parent-directory path ;
 
@@ -80,7 +80,7 @@ ERROR: no-parent-directory path ;
 
 : head-path-separator? ( path1 ? -- ?' )
     [
-        dup empty? [ drop t ] [ first path-separator? ] if
+        [ t ] [ first path-separator? ] if-empty
     ] [
         drop f
     ] if ;

@@ -13,10 +13,10 @@ IN: hints
     dup length <reversed>
     [ (picker) 2array ] 2map
     [ drop object eq? not ] assoc-filter
-    dup empty? [ drop [ t ] ] [
+    [ [ t ] ] [
         [ (make-specializer) ] { } assoc>map
         unclip [ swap [ f ] \ if 3array append [ ] like ] reduce
-    ] if ;
+    ] if-empty ;
 
 : specializer-cases ( quot word -- default alist )
     dup [ array? ] all? [ 1array ] unless [

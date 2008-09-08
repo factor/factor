@@ -33,10 +33,10 @@ PRIVATE>
 
 M: channel to ( value channel -- )
     dup receivers>>
-    dup empty? [ drop dup wait to ] [ nip (to) ] if ;
+    [ dup wait to ] [ nip (to) ] if-empty ;
 
 M: channel from ( channel -- value )
     [
         notify senders>>
-        dup empty? [ drop ] [ (from) ] if
+        [ (from) ] unless-empty
     ] curry "channel receive" suspend ;

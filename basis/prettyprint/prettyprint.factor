@@ -38,13 +38,13 @@ IN: prettyprint
     [ write-in nl ] when* ;
 
 : use. ( seq -- )
-    dup empty? [ drop ] [
+    [
         natural-sort [
             \ USING: pprint-word
             [ pprint-vocab ] each
             \ ; pprint-word
         ] with-pprint nl
-    ] if ;
+    ] unless-empty ;
 
 : vocabs. ( in use -- )
     dupd remove [ { "syntax" "scratchpad" } member? not ] filter
@@ -98,7 +98,7 @@ SYMBOL: ->
 "word-style" set-word-prop
 
 : remove-step-into ( word -- )
-    building get dup empty? [ drop ] [ nip pop wrapped>> ] if , ;
+    building get [ nip pop wrapped>> ] unless-empty , ;
 
 : (remove-breakpoints) ( quot -- newquot )
     [

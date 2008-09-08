@@ -11,9 +11,9 @@ IN: stack-checker.backend
 : push-d ( obj -- ) meta-d get push ;
 
 : pop-d  ( -- obj )
-    meta-d get dup empty? [
-        drop <value> dup 1array #introduce, d-in inc
-    ] [ pop ] if ;
+    meta-d get [
+        <value> dup 1array #introduce, d-in inc
+    ] [ pop ] if-empty ;
 
 : peek-d ( -- obj ) pop-d dup push-d ;
 
@@ -40,7 +40,9 @@ IN: stack-checker.backend
 : output-r ( seq -- ) meta-r get push-all ;
 
 : pop-literal ( -- rstate obj )
-    pop-d [ 1array #drop, ] [ literal [ recursion>> ] [ value>> ] bi ] bi ;
+    pop-d
+    [ 1array #drop, ]
+    [ literal [ recursion>> ] [ value>> ] bi ] bi ;
 
 GENERIC: apply-object ( obj -- )
 
@@ -142,8 +144,11 @@ M: object apply-object push-literal ;
     [ "inferred-effect" set-word-prop ]
     2tri ;
 
+: cannot-infer-effect ( word -- * )
+    "cannot-infer" word-prop throw ;
+
 : maybe-cannot-infer ( word quot -- )
-    [ ] [ t "cannot-infer" set-word-prop ] cleanup ; inline
+    [ [ "cannot-infer" set-word-prop ] keep throw ] recover ; inline
 
 : infer-word ( word -- effect )
     [

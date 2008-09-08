@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel peg peg.ebnf peg.expr math.parser sequences arrays strings
+USING: kernel peg peg.ebnf math.parser sequences arrays strings
 combinators.lib math fry accessors lists combinators.short-circuit ;
 
 IN: lisp.parser

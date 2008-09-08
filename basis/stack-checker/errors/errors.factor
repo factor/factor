@@ -26,8 +26,8 @@ M: inference-error error-help error>> error-help ;
 
 M: inference-error error.
     [
-        rstate>> dup empty?
-        [ drop ] [ "Nesting:" print stack. ] if
+        rstate>>
+        [ "Nesting:" print stack. ] unless-empty
     ] [ error>> error. ] bi ;
 
 TUPLE: literal-expected ;
@@ -56,14 +56,6 @@ TUPLE: too-many-r> ;
 M: too-many-r> summary
     drop
     "Quotation pops retain stack elements which it did not push" ;
-
-TUPLE: cannot-infer-effect word ;
-
-: cannot-infer-effect ( word -- * )
-    \ cannot-infer-effect inference-warning ;
-
-M: cannot-infer-effect error.
-    "Unable to infer stack effect of " write word>> . ;
 
 TUPLE: missing-effect word ;
 

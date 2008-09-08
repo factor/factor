@@ -108,7 +108,7 @@ SYMBOL: double-click-timeout
 
 : drag-gesture ( -- )
     hand-buttons get-global
-    dup empty? [ drop ] [ first <drag> button-gesture ] if ;
+    [ first <drag> button-gesture ] unless-empty ;
 
 SYMBOL: drag-timer
 
@@ -170,7 +170,7 @@ SYMBOL: drag-timer
 
 : modifier ( mod modifiers -- seq )
     [ second swap bitand 0 > ] with filter
-    0 <column> prune dup empty? [ drop f ] [ >array ] if ;
+    0 <column> prune [ f ] [ >array ] if-empty ;
 
 : drag-loc ( -- loc )
     hand-loc get-global hand-click-loc get-global v- ;

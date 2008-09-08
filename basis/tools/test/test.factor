@@ -67,8 +67,7 @@ SYMBOL: this-test
 : test-failures. ( assoc -- )
     [
         nl
-        dup empty? [
-            drop
+        [
             "==== ALL TESTS PASSED" print
         ] [
             "==== FAILING TESTS:" print
@@ -76,16 +75,16 @@ SYMBOL: this-test
                 swap vocab-heading.
                 [ failure. nl ] each
             ] assoc-each
-        ] if
+        ] if-empty
     ] [
         "==== NOTHING TO TEST" print
     ] if* ;
 
 : run-tests ( prefix -- failures )
-    child-vocabs dup empty? [ drop f ] [
+    child-vocabs [ f ] [
         [ dup run-test ] { } map>assoc
         [ second empty? not ] filter
-    ] if ;
+    ] if-empty ;
 
 : test ( prefix -- )
     run-tests test-failures. ;

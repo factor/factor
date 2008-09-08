@@ -142,6 +142,7 @@ SYMBOL: html
     "ol" "li" "form" "a" "p" "html" "head" "body" "title"
     "b" "i" "ul" "table" "tbody" "tr" "td" "th" "pre" "textarea"
     "script" "div" "span" "select" "option" "style" "input"
+    "strong"
 ] [ define-closed-html-word ] each
 
 ! Define some open HTML tags
@@ -160,6 +161,8 @@ SYMBOL: html
     "src" "language" "colspan" "onchange" "rel"
     "width" "selected" "onsubmit" "xmlns" "lang" "xml:lang"
     "media" "title" "multiple" "checked"
+    "summary" "cellspacing" "align" "scope" "abbr"
+    "nofollow" "alt"
 ] [ define-attribute-word ] each
 
 >>

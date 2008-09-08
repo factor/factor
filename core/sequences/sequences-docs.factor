@@ -335,6 +335,42 @@ HELP: if-empty
     "6"
 } ;
 
+HELP: when-empty
+{ $values
+     { "seq" sequence } { "quot" "the first quotation of an " { $link if-empty } } }
+{ $description "Makes an implicit check if the sequence is empty. An empty sequence is dropped and the " { $snippet "quot1" } " is called." }
+{ $examples "This word is equivalent to " { $link if-empty } " with an empty second quotation:"
+    { $example
+    "USING: sequences prettyprint ;"
+    "{ } [ { 4 5 6 } ] [ ] if-empty ."
+    "{ 4 5 6 }"
+    }
+    { $example
+    "USING: sequences prettyprint ;"
+    "{ } [ { 4 5 6 } ] when-empty ."
+    "{ 4 5 6 }"
+    }
+} ;
+
+HELP: unless-empty
+{ $values
+     { "seq" sequence } { "quot" "the second quotation of an " { $link if-empty } } }
+{ $description "Makes an implicit check if the sequence is empty. An empty sequence is dropped. Otherwise, the " { $snippet "quot2" } " is called on the sequence." }
+{ $examples "This word is equivalent to " { $link if-empty } " with an empty first quotation:"
+    { $example
+    "USING: sequences prettyprint ;"
+    "{ 4 5 6 } [ ] [ sum ] if-empty ."
+    "15"
+    }
+    { $example
+    "USING: sequences prettyprint ;"
+    "{ 4 5 6 } [ sum ] unless-empty ."
+    "15"
+    }
+} ;
+
+{ if-empty when-empty unless-empty } related-words
+
 HELP: delete-all
 { $values { "seq" "a resizable sequence" } }
 { $description "Resizes the sequence to zero length, removing all elements. Not all sequences are resizable." }

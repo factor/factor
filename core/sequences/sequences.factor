@@ -32,9 +32,9 @@ M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ;
 : if-empty ( seq quot1 quot2 -- )
     [ dup empty? ] [ [ drop ] prepose ] [ ] tri* if ; inline
 
-: when-empty ( seq quot1 -- ) [ ] if-empty ; inline
+: when-empty ( seq quot -- ) [ ] if-empty ; inline
 
-: unless-empty ( seq quot1 -- ) [ ] swap if-empty ; inline
+: unless-empty ( seq quot -- ) [ ] swap if-empty ; inline
 
 : delete-all ( seq -- ) 0 swap set-length ;
 
@@ -91,7 +91,7 @@ M: sequence set-nth-unsafe set-nth ;
 ! The f object supports the sequence protocol trivially
 M: f length drop 0 ;
 M: f nth-unsafe nip ;
-M: f like drop dup empty? [ drop f ] when ;
+M: f like drop [ f ] when-empty ;
 
 INSTANCE: f immutable-sequence
 
@@ -630,14 +630,14 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
     0 [ length + ] reduce ;
 
 : concat ( seq -- newseq )
-    dup empty? [
-        drop { }
+    [
+        { }
     ] [
         [ sum-lengths ] keep
         [ first new-resizable ] keep
         [ [ over push-all ] each ] keep
         first like
-    ] if ;
+    ] if-empty ;
 
 : joined-length ( seq glue -- n )
     >r dup sum-lengths swap length 1 [-] r> length * + ;

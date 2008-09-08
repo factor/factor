@@ -42,8 +42,8 @@ IN: furnace.auth.features.edit-profile
         [
             logged-in-user get
 
-            "new-password" value dup empty?
-            [ drop ] [ >>encoded-password ] if
+            "new-password" value
+            [ >>encoded-password ] unless-empty
 
             "realname" value >>realname
             "email" value >>email

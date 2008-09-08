@@ -3,14 +3,14 @@
 USING: lcs html.elements kernel qualified ;
 FROM: accessors => item>> ;
 FROM: io => write ;
-FROM: sequences => each empty? ;
+FROM: sequences => each if-empty ;
 FROM: xml.entities => escape-string ;
 IN: lcs.diff2html
 
 GENERIC: diff-line ( obj -- )
 
 : write-item ( item -- )
-    item>> dup empty? [ drop "&nbsp;" ] [ escape-string ] if write ;
+    item>> [ "&nbsp;" ] [ escape-string ] if-empty write ;
 
 M: retain diff-line
     <tr>

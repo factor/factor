@@ -1,12 +1,14 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces sequences sequences.private assocs math
-parser words quotations debugger macros arrays macros splitting
-combinators prettyprint.backend definitions prettyprint
-hashtables prettyprint.sections sets sequences.private effects
-effects.parser generic generic.parser compiler.units accessors
-locals.backend memoize macros.expander lexer
-stack-checker.known-words ;
+       vectors strings classes.tuple generalizations 
+       parser words quotations debugger macros arrays macros splitting
+       combinators prettyprint.backend definitions prettyprint
+       hashtables prettyprint.sections sets sequences.private effects
+       effects.parser generic generic.parser compiler.units accessors
+       locals.backend memoize macros.expander lexer
+       stack-checker.known-words ;
+
 IN: locals
 
 ! Inspired by
@@ -98,8 +100,8 @@ C: <quote> quote
 UNION: special local quote local-word local-reader local-writer ;
 
 : load-locals-quot ( args -- quot )
-    dup empty? [
-        drop [ ]
+    [
+        [ ]
     ] [
         dup [ local-reader? ] contains? [
             <reversed> [
@@ -108,14 +110,10 @@ UNION: special local quote local-word local-reader local-writer ;
         ] [
             length [ load-locals ] curry >quotation
         ] if
-    ] if ;
+    ] if-empty ;
 
 : drop-locals-quot ( args -- quot )
-    dup empty? [
-        drop [ ]
-    ] [
-        length [ drop-locals ] curry
-    ] if ;
+    [ [ ] ] [ length [ drop-locals ] curry ] if-empty ;
 
 : point-free-body ( quot args -- newquot )
     >r but-last-slice r> [ localize ] curry map concat ;
@@ -201,6 +199,66 @@ M: block lambda-rewrite*
 M: object lambda-rewrite* , ;
 
 M: object local-rewrite* , ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! Broil is used to support locals in literals
+
+DEFER: [broil]
+DEFER: [broil-hashtable]
+DEFER: [broil-tuple]
+
+: broil-element ( obj -- quot )
+  {
+    { [ dup number?    ] [            1quotation ] }
+    { [ dup string?    ] [            1quotation ] }
+    { [ dup sequence?  ] [ [broil]               ] }
+    { [ dup hashtable? ] [ [broil-hashtable]     ] }
+    { [ dup tuple?     ] [ [broil-tuple]         ] }
+    { [ dup local?     ] [            1quotation ] }
+    { [ dup word?      ] [ literalize 1quotation ] }
+    { [ t              ] [            1quotation ] }
+  }
+  cond ;
+
+: [broil] ( seq -- quot )
+  [ [ broil-element ] map concat >quotation ]
+  [ length ]
+  [        ]
+  tri
+  [ nsequence ] curry curry compose ;
+  
+MACRO: broil ( seq -- quot ) [broil] ;
+
+: [broil-hashtable] ( hashtable -- quot )
+  >alist
+  [ [ broil-element ] map concat >quotation ]
+  [ length ]
+  [        ]
+  tri
+  [ nsequence >hashtable ] curry curry compose ;
+
+MACRO: broil-hashtable ( hashtable -- quot ) [broil-hashtable] ;
+
+: [broil-tuple] ( tuple -- quot )
+  tuple>array
+  [ [ broil-element ] map concat >quotation ]
+  [ length ]
+  [        ]
+  tri
+  [ nsequence >tuple ] curry curry compose ;
+
+MACRO: broil-tuple ( tuple -- quot ) [broil-tuple] ;
+
+! Engage broil on arrays and vectors. Can't do it on 'sequence'
+! because that will pick up strings and integers. What do do...
+
+M: array     local-rewrite* ( array      -- ) [broil]           % ;
+M: vector    local-rewrite* ( vector     -- ) [broil]           % ;
+M: tuple     local-rewrite* ( tuple      -- ) [broil-tuple]     % ;
+M: hashtable local-rewrite* ( hashtable  -- ) [broil-hashtable] % ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : make-local ( name -- word )
     "!" ?tail [

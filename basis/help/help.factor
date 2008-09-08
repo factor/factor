@@ -72,15 +72,13 @@ M: word article-parent "help-parent" word-prop ;
 M: word set-article-parent swap "help-parent" set-word-prop ;
 
 : $doc-path ( article -- )
-    help-path dup empty? [
-        drop
-    ] [
+    help-path [
         [
             help-path-style get [
                 "Parent topics: " write $links
             ] with-style
         ] ($block)
-    ] if ;
+    ] unless-empty ;
 
 : $title ( topic -- )
     title-style get [
@@ -112,8 +110,7 @@ M: word set-article-parent swap "help-parent" set-word-prop ;
     sort-articles [ \ $subsection swap 2array ] map print-element ;
 
 : $index ( element -- )
-    first call dup empty?
-    [ drop ] [ ($index) ] if ;
+    first call [ ($index) ] unless-empty ;
 
 : $about ( element -- )
     first vocab-help [ 1array $subsection ] when* ;

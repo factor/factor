@@ -15,7 +15,7 @@ IN: math.polynomials
 : 2pad-right ( p p n -- p p ) 0 [ pad-right swap ] 2keep pad-right swap ;
 : pextend ( p p -- p p ) 2dup [ length ] bi@ max 2pad-right ;
 : pextend-left ( p p -- p p ) 2dup [ length ] bi@ max 2pad-left ;
-: unempty ( seq -- seq ) dup empty? [ drop { 0 } ] when ;
+: unempty ( seq -- seq ) [ { 0 } ] when-empty ;
 : 2unempty ( seq seq -- seq seq ) [ unempty ] bi@ ;
 
 PRIVATE>

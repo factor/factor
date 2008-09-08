@@ -120,7 +120,7 @@ M: sha1 checksum-stream ( stream -- sha1 )
 
 : seq>2seq ( seq -- seq1 seq2 )
     #! { abcdefgh } -> { aceg } { bdfh }
-    2 group flip dup empty? [ drop { } { } ] [ first2 ] if ;
+    2 group flip [ { } { } ] [ first2 ] if-empty ;
 
 : 2seq>seq ( seq1 seq2 -- seq )
     #! { aceg } { bdfh } -> { abcdefgh }
