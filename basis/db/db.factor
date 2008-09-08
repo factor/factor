@@ -105,10 +105,10 @@ M: object execute-statement* ( statement type -- )
     ] if ; inline recursive
 
 : query-map ( statement quot -- seq )
-    accumulator >r query-each r> { } like ; inline
+    accumulator [ query-each ] dip { } like ; inline
 
 : with-db ( seq class quot -- )
-    >r make-db db-open db r>
+    [ make-db db-open db ] dip
     [ db get swap [ drop ] prepose with-disposal ] curry with-variable ;
     inline
 
