@@ -52,11 +52,13 @@ HELP: construct-statement
 { $description "Makes a new statement object from the given parameters." } ;
 
 HELP: <simple-statement>
-{ $values { "string" string } { "in" sequence } { "out" sequence } }
+{ $values { "string" string } { "in" sequence } { "out" sequence }
+    { "statement" statement } }
 { $description "Makes a new simple statement object from the given parameters." } ;
 
 HELP: <prepared-statement>
-{ $values { "string" string } { "in" sequence } { "out" sequence } }
+{ $values { "string" string } { "in" sequence } { "out" sequence }
+    { "statement" statement } }
 { $description "Makes a new prepared statement object from the given parameters." } ;
 
 HELP: prepare-statement
@@ -76,7 +78,9 @@ HELP: bind-tuple
 { $description "" } ;
 
 HELP: query-results
-{ $values { "query" object } { "statement" statement } }
+{ $values { "query" object }
+    { "result-set" result-set }
+}
 { $description "" } ;
 
 HELP: #rows
@@ -88,11 +92,14 @@ HELP: #columns
 { $description "Returns the number of columns in a result set." } ;
 
 HELP: row-column
-{ $values { "result-set" result-set } { "column" integer } }
+{ $values { "result-set" result-set } { "column" integer }
+    { "obj" object }
+}
 { $description "" } ;
 
 HELP: row-column-typed
-{ $values { "result-set" result-set } { "column" integer } }
+{ $values { "result-set" result-set } { "column" integer }
+    { "sql" "sql" } }
 { $description "" } ;
 
 HELP: advance-row
@@ -100,7 +107,7 @@ HELP: advance-row
 ;
 
 HELP: more-rows?
-{ $values { "result-set" result-set } { "column" integer } }
+{ $values { "result-set" result-set } { "?" "a boolean" } }
 ;
 
 HELP: execute-statement*
