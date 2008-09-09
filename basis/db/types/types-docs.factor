@@ -133,12 +133,6 @@ HELP: db-assigned-id-spec?
      { "?" "a boolean" } }
 { $description "" } ;
 
-HELP: double-quote
-{ $values
-     { "string" string }
-     { "new-string" null } }
-{ $description "" } ;
-
 HELP: find-primary-key
 { $values
      { "specs" null }
@@ -264,12 +258,6 @@ HELP: remove-relations
 HELP: set-slot-named
 { $values
      { "value" null } { "name" null } { "obj" object } }
-{ $description "" } ;
-
-HELP: single-quote
-{ $values
-     { "string" string }
-     { "new-string" null } }
 { $description "" } ;
 
 HELP: spec>tuple

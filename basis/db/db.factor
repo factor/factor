@@ -116,19 +116,6 @@ M: object execute-statement* ( statement type -- )
 : default-query ( query -- result-set )
     query-results [ [ sql-row ] query-map ] with-disposal ;
 
-SYMBOL: in-transaction
-HOOK: begin-transaction db ( -- )
-HOOK: commit-transaction db ( -- )
-HOOK: rollback-transaction db ( -- )
-
-: in-transaction? ( -- ? ) in-transaction get ;
-
-: with-transaction ( quot -- )
-    t in-transaction [
-        begin-transaction
-        [ ] [ rollback-transaction ] cleanup commit-transaction
-    ] with-variable ;
-
 : sql-query ( sql -- rows )
     f f <simple-statement> [ default-query ] with-disposal ;
 
@@ -140,3 +127,20 @@ HOOK: rollback-transaction db ( -- )
             [ sql-command ] each
         ! ] with-transaction
     ] if ;
+
+SYMBOL: in-transaction
+HOOK: begin-transaction db ( -- )
+HOOK: commit-transaction db ( -- )
+HOOK: rollback-transaction db ( -- )
+
+M: db begin-transaction ( -- ) "BEGIN" sql-command ;
+M: db commit-transaction ( -- ) "COMMIT" sql-command ;
+M: db rollback-transaction ( -- ) "ROLLBACK" sql-command ;
+
+: in-transaction? ( -- ? ) in-transaction get ;
+
+: with-transaction ( quot -- )
+    t in-transaction [
+        begin-transaction
+        [ ] [ rollback-transaction ] cleanup commit-transaction
+    ] with-variable ;
