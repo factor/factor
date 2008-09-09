@@ -50,10 +50,10 @@ HOOK: insert-tuple* db ( tuple statement -- )
 
 GENERIC: eval-generator ( singleton -- obj )
 
-: resulting-tuple ( class row out-params -- tuple )
+: resulting-tuple ( exemplar-tuple row out-params -- tuple )
     rot class new [
         [
-            >r slot-name>> r> set-slot-named
+            [ slot-name>> ] dip set-slot-named
         ] curry 2each
     ] keep ;
 
@@ -65,7 +65,7 @@ GENERIC: eval-generator ( singleton -- obj )
 : query-modify-tuple ( tuple statement -- )
     [ query-results [ sql-row-typed ] with-disposal ] keep
     out-params>> rot [
-        >r slot-name>> r> set-slot-named
+        [ slot-name>> ] dip set-slot-named
     ] curry 2each ;
 
 : with-disposals ( seq quot -- )
@@ -121,7 +121,7 @@ GENERIC: eval-generator ( singleton -- obj )
     [ [ bind-tuple ] [ query-tuples ] 2bi ] with-disposal ;
 
 : query ( tuple query -- tuples )
-    >r dup dup class r> <query> do-select ;
+    [ dup dup class ] dip <query> do-select ;
 
 : select-tuples ( tuple -- tuples )
     dup dup class <select-by-slots-statement> do-select ;

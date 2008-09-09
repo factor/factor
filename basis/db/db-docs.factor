@@ -150,8 +150,9 @@ ARTICLE: "db-custom-database-combinators" "Custom database combinators"
 
 "Make a " { $snippet "with-" } " word to open, close, and use your database."
 { $code <"
+USING: db.sqlite db io.files ;
 : with-my-database ( quot -- )
-    { "my-database.db" temp-file } 
+    { "my-database.db" temp-file } sqlite-db rot with-db ;
 "> }
 
 
