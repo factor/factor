@@ -4,6 +4,7 @@ USING: accessors kernel sequences assocs io.files io.sockets
 io.sockets.secure io.servers.connection
 namespaces db db.tuples db.sqlite smtp urls
 logging.insomniac
+html.templates.chloe
 http.server
 http.server.dispatchers
 http.server.redirection
@@ -68,6 +69,7 @@ SYMBOL: key-file
 SYMBOL: dh-file
 
 : common-configuration ( -- )
+    reset-templates
     "concatenative.org" 25 <inet> smtp-server set-global
     "noreply@concatenative.org" lost-password-from set-global
     "website@concatenative.org" insomniac-sender set-global

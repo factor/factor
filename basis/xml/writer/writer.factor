@@ -37,10 +37,11 @@ SYMBOL: indenter
         [ [ empty? ] [ string? ] bi and not ] filter
     ] when ;
 
+: name>string ( name -- string )
+    [ main>> ] [ space>> ] bi [ ":" rot 3append ] unless-empty ;
+
 : print-name ( name -- )
-    dup space>> f like
-    [ write CHAR: : write1 ] when*
-    main>> write ;
+    name>string write ;
 
 : print-attrs ( assoc -- )
     [

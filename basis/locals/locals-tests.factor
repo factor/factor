@@ -316,3 +316,17 @@ M:: sequence method-with-locals ( a -- y ) a reverse ;
 ! [ f ] [ 3 wlet-&&-test ] unit-test
 ! [ f ] [ 8 wlet-&&-test ] unit-test
 ! [ t ] [ 12 wlet-&&-test ] unit-test
+
+[ { 10       } ] [ 10       [| a     | { a     } ] call ] unit-test
+[ { 10 20    } ] [ 10 20    [| a b   | { a b   } ] call ] unit-test
+[ { 10 20 30 } ] [ 10 20 30 [| a b c | { a b c } ] call ] unit-test
+
+[ { 10 20 30 } ] [ [let | a [ 10 ] b [ 20 ] c [ 30 ] | { a b c } ] ] unit-test
+
+[ V{ 10 20 30 } ] [ 10 20 30 [| a b c | V{ a b c } ] call ] unit-test
+
+[ H{ { 10 "a" } { 20 "b" } { 30 "c" } } ]
+[ 10 20 30 [| a b c | H{ { a "a" } { b "b" } { c "c" } } ] call ] unit-test
+
+[ T{ slice f 0 3 "abc" } ]
+[ 0 3 "abc" [| from to seq | T{ slice f from to seq } ] call ] unit-test
