@@ -274,4 +274,9 @@ unsigned long long ffi_test_38(unsigned long long x, unsigned long long y)
 	return x * y;
 }
 
-
+int ffi_test_39(long a, long b, struct test_struct_13 s)
+{
+	printf("ffi_test_39(%ld,%ld,%f,%f,%f,%f,%f,%f)\n",a,b,s.x1,s.x2,s.x3,s.x4,s.x5,s.x6);
+	if(a != b) abort();
+	return s.x1 + s.x2 + s.x3 + s.x4 + s.x5 + s.x6;
+}
