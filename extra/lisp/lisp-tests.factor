@@ -64,4 +64,24 @@ IN: lisp.test
         "((lambda (x) (if x (+ 1 2) (- 3 5))) #t)" lisp-eval
     ] unit-test
     
+    { { 5 4 3 } } [
+        "((lambda (x &rest xs) (cons x xs)) 5 4 3)" lisp-eval cons>seq
+    ] unit-test
+    
+    { { 5 } } [
+        "((lambda (x &rest xs) (cons x xs)) 5)" lisp-eval cons>seq
+    ] unit-test
+    
+    { { 1 2 3 4 } } [
+        "((lambda (&rest xs) xs) 1 2 3 4)" lisp-eval cons>seq
+    ] unit-test
+    
+!     { 10 } [
+!         <LISP (begin (+ 1 2) (+ 9 1)) LISP>
+!     ] unit-test
+    
+!     { 4 } [
+!         <LISP ((lambda (x y) (if x (+ 1 y) (+ 2 y))) #t 3) LISP>
+!     ] unit-test
+    
 ] with-interactive-vocabs
