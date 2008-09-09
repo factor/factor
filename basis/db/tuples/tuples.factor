@@ -49,41 +49,11 @@ HOOK: <count-statement> db ( tuple class groups -- n )
 HOOK: insert-tuple* db ( tuple statement -- )
 
 GENERIC: eval-generator ( singleton -- obj )
-SINGLETON: retryable
 
-: make-retryable ( obj -- obj' )
-    dup sequence? [
-        [ make-retryable ] map
-    ] [
-        retryable >>type
-        10 >>retries
-    ] if ;
-
-: regenerate-params ( statement -- statement )
-    dup
-    [ bind-params>> ] [ in-params>> ] bi
-    [
-        dup generator-bind? [
-            generator-singleton>> eval-generator >>value
-        ] [
-            drop
-        ] if
-    ] 2map >>bind-params ;
-
-M: retryable execute-statement* ( statement type -- )
-    drop [ retries>> ] [
-        [
-            nip
-            [ query-results dispose t ]
-            [ ]
-            [ regenerate-params bind-statement* f ] cleanup
-        ] curry
-    ] bi attempt-all drop ;
-
-: resulting-tuple ( class row out-params -- tuple )
+: resulting-tuple ( exemplar-tuple row out-params -- tuple )
     rot class new [
         [
-            >r slot-name>> r> set-slot-named
+            [ slot-name>> ] dip set-slot-named
         ] curry 2each
     ] keep ;
 
@@ -95,11 +65,8 @@ M: retryable execute-statement* ( statement type -- )
 : query-modify-tuple ( tuple statement -- )
     [ query-results [ sql-row-typed ] with-disposal ] keep
     out-params>> rot [
-        >r slot-name>> r> set-slot-named
+        [ slot-name>> ] dip set-slot-named
     ] curry 2each ;
-
-: sql-props ( class -- columns table )
-    [ db-columns ] [ db-table ] bi ;
 
 : with-disposals ( seq quot -- )
     over sequence? [
@@ -154,7 +121,7 @@ M: retryable execute-statement* ( statement type -- )
     [ [ bind-tuple ] [ query-tuples ] 2bi ] with-disposal ;
 
 : query ( tuple query -- tuples )
-    >r dup dup class r> <query> do-select ;
+    [ dup dup class ] dip <query> do-select ;
 
 : select-tuples ( tuple -- tuples )
     dup dup class <select-by-slots-statement> do-select ;

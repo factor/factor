@@ -21,7 +21,7 @@ tags global [ H{ } clone or ] change-at
 
 : chloe-ns "http://factorcode.org/chloe/1.0" ; inline
 
-MEMO: chloe-name ( string -- name )
+: chloe-name ( string -- name )
     name new
         swap >>main
         chloe-ns >>url ;
@@ -32,30 +32,3 @@ MEMO: chloe-name ( string -- name )
 
 : optional-attr ( tag name -- value )
     chloe-name swap at ;
-
-: singleton-component-tag ( tag class -- )
-    [ "name" required-attr ] dip render ;
-
-: CHLOE-SINGLETON:
-    scan-word
-    [ name>> ] [ '[ , singleton-component-tag ] ] bi
-    define-chloe-tag ;
-    parsing
-
-: attrs>slots ( tag tuple -- )
-    [ attrs>> ] [ <mirror> ] bi*
-    '[
-        swap main>> dup "name" =
-        [ 2drop ] [ , set-at ] if
-    ] assoc-each ;
-
-: tuple-component-tag ( tag class -- )
-    [ drop "name" required-attr ]
-    [ new [ attrs>slots ] keep ]
-    2bi render ;
-
-: CHLOE-TUPLE:
-    scan-word
-    [ name>> ] [ '[ , tuple-component-tag ] ] bi
-    define-chloe-tag ;
-    parsing

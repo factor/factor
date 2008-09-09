@@ -67,15 +67,17 @@ inline-code   = "%" (!("%" | nl).)+ "%"
 
 escaped-char  = "\" .                => [[ second ]]
 
-image-link       = "[[image:" (!("|") .)+  "|" (!("]]").)+ "]]"
+link-content     = (!("|"|"]").)+
+
+image-link       = "[[image:" link-content  "|" link-content "]]"
                     => [[ [ second >string ] [ fourth >string ] bi image boa ]]
-                  | "[[image:" (!("]").)+ "]]"
+                  | "[[image:" link-content "]]"
                     => [[ second >string f image boa ]]
 
-simple-link      = "[[" (!("|]" | "]]") .)+ "]]"
+simple-link      = "[[" link-content "]]"
     => [[ second >string dup simple-link-title link boa ]]
 
-labelled-link    = "[[" (!("|") .)+ "|" (!("]]").)+ "]]"
+labelled-link    = "[[" link-content "|" link-content "]]"
     => [[ [ second >string ] [ fourth >string ] bi link boa ]]
 
 link             = image-link | labelled-link | simple-link

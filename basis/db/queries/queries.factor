@@ -2,14 +2,48 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math namespaces sequences random strings
 math.parser math.intervals combinators math.bitwise nmake db
-db.tuples db.types db.sql classes words shuffle arrays ;
+db.tuples db.types db.sql classes words shuffle arrays destructors
+continuations ;
 IN: db.queries
 
 GENERIC: where ( specs obj -- )
 
+SINGLETON: retryable
+: make-retryable ( obj -- obj' )
+    dup sequence? [
+        [ make-retryable ] map
+    ] [
+        retryable >>type
+        10 >>retries
+    ] if ;
+
 : maybe-make-retryable ( statement -- statement )
     dup in-params>> [ generator-bind? ] contains?
     [ make-retryable ] when ;
+
+: regenerate-params ( statement -- statement )
+    dup 
+    [ bind-params>> ] [ in-params>> ] bi
+    [
+        dup generator-bind? [
+            generator-singleton>> eval-generator >>value
+        ] [
+            drop
+        ] if
+    ] 2map >>bind-params ;
+    
+M: retryable execute-statement* ( statement type -- )
+    drop [ retries>> ] [
+        [
+            nip
+            [ query-results dispose t ]
+            [ ] 
+            [ regenerate-params bind-statement* f ] cleanup
+        ] curry
+    ] bi attempt-all drop ;
+
+: sql-props ( class -- columns table )
+    [ db-columns ] [ db-table ] bi ;
 
 : query-make ( class quot -- )
     >r sql-props r>

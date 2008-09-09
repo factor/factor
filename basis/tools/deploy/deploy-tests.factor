@@ -26,7 +26,7 @@ namespaces continuations layouts accessors ;
 
 [ t ] [ 1300000 small-enough? ] unit-test
 
-[ "staging.threads-math-compiler-ui-strip.image" ] [
+[ "staging.math-compiler-threads-ui-strip.image" ] [
     "hello-ui" deploy-config
     [ bootstrap-profile staging-image-name file-name ] bind
 ] unit-test
@@ -39,9 +39,9 @@ namespaces continuations layouts accessors ;
 ! 
 ! [ t ] [ 1500000 small-enough? ] unit-test
 ! 
-! [ ] [ "bunny" shake-and-bake ] unit-test
-! 
-! [ t ] [ 2500000 small-enough? ] unit-test
+[ ] [ "bunny" shake-and-bake ] unit-test
+
+[ t ] [ 2500000 small-enough? ] unit-test
 
 {
     "tools.deploy.test.1"

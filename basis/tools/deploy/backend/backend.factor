@@ -42,9 +42,9 @@ IN: tools.deploy.backend
 
 : bootstrap-profile ( -- profile )
     {
-        { "threads"  deploy-threads?  }
         { "math"     deploy-math?     }
         { "compiler" deploy-compiler? }
+        { "threads"  deploy-threads?  }
         { "ui"       deploy-ui?       }
         { "random"   deploy-random?   }
     } [ nip get ] assoc-filter keys

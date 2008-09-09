@@ -191,7 +191,8 @@ M: wrapper >pprint-sequence wrapped>> 1array ;
 M: callstack >pprint-sequence callstack>array ;
 
 M: tuple >pprint-sequence
-    [ class f 2array ] [ tuple-slots ] bi append ;
+    [ class ] [ tuple-slots ] bi
+    [ 1array ] [ [ f 2array ] dip append ] if-empty ;
 
 GENERIC: pprint-narrow? ( obj -- ? )
 

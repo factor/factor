@@ -41,7 +41,7 @@
 							</t:a>
 						</h2>
 		
-						<t:farkup t:name="content" />
+						<t:html t:name="html" />
 					</t:bind>
 				</td>
 			</t:if>
@@ -52,7 +52,7 @@
 				<td>
 					<t:bind t:name="footer">
 						<small>
-							<t:farkup t:name="content" />
+							<t:html t:name="html" />
 						</small>
 					</t:bind>
 				</td>

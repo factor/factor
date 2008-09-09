@@ -1,12 +1,12 @@
-! Copyright (c) 2008 Eric Mertens
+! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences sequences.lib math math.functions math.ranges locals ;
 IN: project-euler.190
 
-! PROBLEM
-! -------
-
 ! http://projecteuler.net/index.php?section=problems&id=190
+
+! DESCRIPTION
+! -----------
 
 ! Let Sm = (x1, x2, ... , xm) be the m-tuple of positive real numbers
 ! with x1 + x2 + ... + xm = m for which Pm = x1 * x22 * ... * xmm is
@@ -16,6 +16,7 @@ IN: project-euler.190
 ! part function).
 
 ! Find Σ[Pm] for 2 ≤ m ≤ 15.
+
 
 ! SOLUTION
 ! --------
@@ -44,5 +45,10 @@ PRIVATE>
 :: P_m ( m -- P_m )
     m [1,b] [| i | 2 i * m 1+ / i ^ ] PI ;
 
-: euler190 ( -- n )
+: euler190 ( -- answer )
     2 15 [a,b] [ P_m truncate ] sigma ;
+
+! [ euler150 ] 100 ave-time
+! 7 ms run time - 100 trials
+
+MAIN: euler190
