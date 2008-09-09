@@ -139,12 +139,6 @@ HELP: find-primary-key
      { "obj" object } }
 { $description "" } ;
 
-HELP: find-random-generator
-{ $values
-     { "seq" sequence }
-     { "obj" object } }
-{ $description "" } ;
-
 HELP: generator-bind
 { $description "" } ;
 
@@ -267,18 +261,6 @@ HELP: spec>tuple
 { $description "" } ;
 
 HELP: sql-spec
-{ $description "" } ;
-
-HELP: tuple>filled-slots
-{ $values
-     { "tuple" null }
-     { "alist" "an array of key/value pairs" } }
-{ $description "" } ;
-
-HELP: tuple>params
-{ $values
-     { "specs" null } { "tuple" null }
-     { "obj" object } }
 { $description "" } ;
 
 HELP: unknown-modifier
