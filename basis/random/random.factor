@@ -39,7 +39,7 @@ M: f random-32* ( obj -- * ) no-random-number-generator ;
             length [
                 log2 8 + 8 /i
                 random-bytes byte-array>bignum
-            ] keep wrap
+            ] keep mod
         ] keep nth
     ] if-empty ;
 
