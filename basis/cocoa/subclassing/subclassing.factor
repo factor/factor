@@ -51,17 +51,17 @@ IN: cocoa.subclassing
 ! : verify-method-type ( class sel imp types -- class sel imp types )
 !     4 ndup nip (verify-method-type) ;
 
-: (redefine-objc-method) ( class method -- )
-    init-method ! verify-method-type
-    drop
-    [ class_getInstanceMethod ] dip method_setImplementation drop ;
-    
-: redefine-objc-methods ( imeth name -- )
-    dup class-exists? [
-        objc_getClass swap [ (redefine-objc-method) ] with each
-    ] [
-        2drop
-    ] if ;
+! : (redefine-objc-method) ( class method -- )
+!     init-method ! verify-method-type
+!     drop
+!     [ class_getInstanceMethod ] dip method_setImplementation drop ;
+!     
+! : redefine-objc-methods ( imeth name -- )
+!     dup class-exists? [
+!         objc_getClass swap [ (redefine-objc-method) ] with each
+!     ] [
+!         2drop
+!     ] if ;
 
 SYMBOL: +name+
 SYMBOL: +protocols+
@@ -71,7 +71,7 @@ SYMBOL: +superclass+
     clone [
         prepare-methods
         +name+ get "cocoa.classes" create drop
-        +name+ get 2dup redefine-objc-methods swap [
+        +name+ get swap [
             +protocols+ get , +superclass+ get , +name+ get , ,
             \ (define-objc-class) ,
         ] [ ] make import-objc-class
