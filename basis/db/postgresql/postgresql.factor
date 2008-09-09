@@ -80,7 +80,7 @@ M: postgresql-statement query-results ( query -- result-set )
     ] [
         dup do-postgresql-statement
     ] if*
-    postgresql-result-set construct-result-set
+    postgresql-result-set new-result-set
     dup init-result-set ;
 
 M: postgresql-result-set advance-row ( result-set -- )
@@ -109,7 +109,7 @@ M: postgresql-statement prepare-statement ( statement -- )
     >>handle drop ;
 
 M: postgresql-db <simple-statement> ( sql in out -- statement )
-    postgresql-statement construct-statement ;
+    postgresql-statement new-statement ;
 
 M: postgresql-db <prepared-statement> ( sql in out -- statement )
     <simple-statement> dup prepare-statement ;

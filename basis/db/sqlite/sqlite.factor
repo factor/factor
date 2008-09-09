@@ -27,7 +27,7 @@ M: sqlite-db <simple-statement> ( str in out -- obj )
     <prepared-statement> ;
 
 M: sqlite-db <prepared-statement> ( str in out -- obj )
-    sqlite-statement construct-statement ;
+    sqlite-statement new-statement ;
 
 : sqlite-maybe-prepare ( statement -- statement )
     dup handle>> [
@@ -41,9 +41,6 @@ M: sqlite-statement dispose ( statement -- )
 
 M: sqlite-result-set dispose ( result-set -- )
     f >>handle drop ;
-
-: reset-statement ( statement -- )
-    sqlite-maybe-prepare handle>> sqlite-reset ;
 
 : reset-bindings ( statement -- )
     sqlite-maybe-prepare
@@ -112,7 +109,7 @@ M: sqlite-result-set more-rows? ( result-set -- ? )
 
 M: sqlite-statement query-results ( query -- result-set )
     sqlite-maybe-prepare
-    dup handle>> sqlite-result-set construct-result-set
+    dup handle>> sqlite-result-set new-result-set
     dup advance-row ;
 
 M: sqlite-db create-sql-statement ( class -- statement )

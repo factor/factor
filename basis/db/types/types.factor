@@ -30,15 +30,6 @@ UNION: +primary-key+ +db-assigned-id+ +user-assigned-id+ +random-id+ ;
 SYMBOLS: +autoincrement+ +serial+ +unique+ +default+ +null+ +not-null+
 +foreign-id+ +has-many+ ;
 
-: find-random-generator ( seq -- obj )
-    [
-        {
-            random-generator
-            system-random-generator
-            secure-random-generator
-        } member?
-    ] find nip [ system-random-generator ] unless* ;
-
 : primary-key? ( spec -- ? )
     primary-key>> +primary-key+? ;
 
@@ -122,12 +113,6 @@ ERROR: no-sql-type ;
         (lookup-type) second
     ] if ;
 
-: single-quote ( string -- new-string )
-    "'" swap "'" 3append ;
-
-: double-quote ( string -- new-string )
-    "\"" swap "\"" 3append ;
-
 : paren ( string -- new-string )
     "(" swap ")" 3append ;
 
@@ -150,12 +135,3 @@ HOOK: bind# db ( spec obj -- )
 
 : set-slot-named ( value name obj -- )
     tuck offset-of-slot set-slot ;
-
-: tuple>filled-slots ( tuple -- alist )
-    <mirror> [ nip ] assoc-filter ;
-
-: tuple>params ( specs tuple -- obj )
-    [
-        >r [ type>> ] [ slot-name>> ] bi r>
-        get-slot-named swap
-    ] curry { } map>assoc ;

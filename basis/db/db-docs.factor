@@ -47,7 +47,7 @@ HELP: prepared-statement
 HELP: result-set
 { $description } ;
 
-HELP: construct-statement
+HELP: new-statement
 { $values { "sql" string } { "in" sequence } { "out" sequence } { "class" class } { "statement" statement } }
 { $description "Makes a new statement object from the given parameters." } ;
 

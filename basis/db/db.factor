@@ -17,9 +17,9 @@ TUPLE: db
         H{ } clone >>update-statements
         H{ } clone >>delete-statements ; inline
 
-GENERIC: make-db* ( seq db -- db )
+GENERIC: make-db* ( object db -- db )
 
-: make-db ( seq class -- db ) new-db make-db* ;
+: make-db ( object class -- db ) new-db make-db* ;
 
 GENERIC: db-open ( db -- db )
 HOOK: db-close db ( handle -- )
@@ -36,13 +36,33 @@ HOOK: db-close db ( handle -- )
         } cleave
     ] with-variable ;
 
+TUPLE: result-set sql in-params out-params handle n max ;
+
+GENERIC: query-results ( query -- result-set )
+GENERIC: #rows ( result-set -- n )
+GENERIC: #columns ( result-set -- n )
+GENERIC# row-column 1 ( result-set column -- obj )
+GENERIC# row-column-typed 1 ( result-set column -- sql )
+GENERIC: advance-row ( result-set -- )
+GENERIC: more-rows? ( result-set -- ? )
+
+: init-result-set ( result-set -- )
+    dup #rows >>max
+    0 >>n drop ;
+
+: new-result-set ( query handle class -- result-set )
+    new
+        swap >>handle
+        >r [ sql>> ] [ in-params>> ] [ out-params>> ] tri r>
+        swap >>out-params
+        swap >>in-params
+        swap >>sql ;
+
 TUPLE: statement handle sql in-params out-params bind-params bound? type retries ;
 TUPLE: simple-statement < statement ;
 TUPLE: prepared-statement < statement ;
 
-TUPLE: result-set sql in-params out-params handle n max ;
-
-: construct-statement ( sql in out class -- statement )
+: new-statement ( sql in out class -- statement )
     new
         swap >>out-params
         swap >>in-params
@@ -54,13 +74,6 @@ GENERIC: prepare-statement ( statement -- )
 GENERIC: bind-statement* ( statement -- )
 GENERIC: low-level-bind ( statement -- )
 GENERIC: bind-tuple ( tuple statement -- )
-GENERIC: query-results ( query -- result-set )
-GENERIC: #rows ( result-set -- n )
-GENERIC: #columns ( result-set -- n )
-GENERIC# row-column 1 ( result-set column -- obj )
-GENERIC# row-column-typed 1 ( result-set column -- sql )
-GENERIC: advance-row ( result-set -- )
-GENERIC: more-rows? ( result-set -- ? )
 
 GENERIC: execute-statement* ( statement type -- )
 
@@ -78,18 +91,6 @@ M: object execute-statement* ( statement type -- )
     swap >>bind-params
     [ bind-statement* ] keep
     t >>bound? drop ;
-
-: init-result-set ( result-set -- )
-    dup #rows >>max
-    0 >>n drop ;
-
-: construct-result-set ( query handle class -- result-set )
-    new
-        swap >>handle
-        >r [ sql>> ] [ in-params>> ] [ out-params>> ] tri r>
-        swap >>out-params
-        swap >>in-params
-        swap >>sql ;
 
 : sql-row ( result-set -- seq )
     dup #columns [ row-column ] with map ;
@@ -114,12 +115,6 @@ M: object execute-statement* ( statement type -- )
 
 : default-query ( query -- result-set )
     query-results [ [ sql-row ] query-map ] with-disposal ;
-
-: do-bound-query ( obj query -- rows )
-    [ bind-statement ] keep default-query ;
-
-: do-bound-command ( obj query -- )
-    [ bind-statement ] keep execute-statement ;
 
 SYMBOL: in-transaction
 HOOK: begin-transaction db ( -- )
