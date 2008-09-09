@@ -36,4 +36,6 @@ atom         = number
               | string
 s-expression = LPAREN (list-item)* RPAREN                => [[ second seq>cons ]]
 list-item    = _ ( atom | s-expression ) _               => [[ second ]]
+quoted       = squote list-item                          => [[ second nil cons "quote" <lisp-symbol> swap cons ]]
+expr         = list-item | quoted
 ;EBNF
