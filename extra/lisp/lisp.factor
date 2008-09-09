@@ -3,7 +3,7 @@
 USING: kernel peg sequences arrays strings combinators.lib
 namespaces combinators math locals locals.private locals.backend accessors
 vectors syntax lisp.parser assocs parser sequences.lib words
-quotations fry lists summary combinators.short-circuit continuations ;
+quotations fry lists summary combinators.short-circuit continuations multiline ;
 IN: lisp
 
 DEFER: convert-form
@@ -46,7 +46,7 @@ DEFER: define-lisp-macro
 : rest-lambda ( body vars -- quot )
     "&rest" swap [ remove ] [ index ] 2bi
     [ localize-lambda <lambda> lambda-rewrite call ] dip
-    swap '[ , cut '[ @ , seq>list ] call , call call ] ;
+    swap '[ , cut '[ @ , seq>list ] call , call call ] 1quotation ;
 
 : normal-lambda ( body vars -- quot )
     localize-lambda <lambda> lambda-rewrite '[ @ compose call call ] 1quotation ;
@@ -121,9 +121,9 @@ M: no-such-var summary drop "No such variable" ;
 
 : lisp-define ( quot name -- )
     lisp-env get set-at ;
-
-: defun ( name quot -- name )
-    over name>> lisp-define ;
+    
+: define-lisp-var ( lisp-symbol body --  )
+    swap name>> lisp-define ;
 
 : lisp-get ( name -- word )
     lisp-env get at ;
@@ -135,8 +135,7 @@ M: no-such-var summary drop "No such variable" ;
     dup lisp-symbol? [ name>> lisp-env get key? ] [ drop f ] if ;
 
 : funcall ( quot sym -- * )
-    [ 1array [ call ] with-datastack >quotation ] dip
-    dup lisp-symbol? [ lookup-var ] when curry call ; inline
+    [ 1array [ call ] with-datastack >quotation ] dip curry call ; inline
 
 : define-primitive ( name vocab word -- )
     swap lookup 1quotation '[ , compose call ] swap lisp-define ;
@@ -150,7 +149,7 @@ M: no-such-var summary drop "No such variable" ;
 : lisp-macro? ( car -- ? )
     dup lisp-symbol? [ name>> macro-env get key? ] [ drop f ] if ;
 
-: define-lisp-builtins (  --  )
+: define-lisp-builtins ( -- )
    init-env
 
    f "#f" lisp-define
@@ -168,8 +167,17 @@ M: no-such-var summary drop "No such variable" ;
    "nil" "lists" "nil" define-primitive
    "nil?" "lists" "nil?" define-primitive
 
-   "define" "lisp" "defun" define-primitive
-
-   "(lambda (&rest xs) xs)" lisp-string>factor "list" lisp-define
+   "set" "lisp" "define-lisp-var" define-primitive
+    
+   "(lambda (&rest xs) xs)" lisp-string>factor first "list" lisp-define
+   "(defmacro setq (var val) (list (quote set) (list (quote quote) var) val))" lisp-eval
+    
+   <" (defmacro defun (name vars &rest body)
+        (list (quote setq) name (list (quote lambda) vars body))) "> lisp-eval
+    
    "(defmacro if (pred tr fl) (list (quote cond) (list pred tr) (list (quote #t) fl)))" lisp-eval
    ;
+
+: <LISP 
+    "LISP>" parse-multiline-string define-lisp-builtins
+    lisp-string>factor parsed \ call parsed ; parsing
