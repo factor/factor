@@ -43,16 +43,17 @@ IN: cocoa.subclassing
 : types= ( a b -- ? )
     [ ascii alien>string ] bi@ = ;
 
-: (verify-method-type) ( class sel types -- )
-    [ class_getInstanceMethod method_getTypeEncoding ]
-    dip types=
-    [ "Objective-C method types cannot be changed once defined" throw ]
-    unless ;
-: verify-method-type ( class sel imp types -- class sel imp types )
-    4 ndup nip (verify-method-type) ;
+! : (verify-method-type) ( class sel types -- )
+!     [ class_getInstanceMethod method_getTypeEncoding ]
+!     dip types=
+!     [ "Objective-C method types cannot be changed once defined" throw ]
+!     unless ;
+! : verify-method-type ( class sel imp types -- class sel imp types )
+!     4 ndup nip (verify-method-type) ;
 
 : (redefine-objc-method) ( class method -- )
-    init-method verify-method-type drop
+    init-method ! verify-method-type
+    drop
     [ class_getInstanceMethod ] dip method_setImplementation drop ;
     
 : redefine-objc-methods ( imeth name -- )

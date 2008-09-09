@@ -102,15 +102,6 @@ MACRO: (send) ( selector super? -- quot )
 : objc-meta-class ( string -- class )
     \ objc_getMetaClass (objc-class) ;
 
-USE: prettyprint
-: (.) ( foo bar -- foo )
-    . dup . ;
-
-: method-arg-type ( method i -- type )
-    method_copyArgumentType
-    [ ascii alien>string parse-objc-type ] keep
-    (free) ;
-
 SYMBOL: objc>alien-types
 
 H{
@@ -163,6 +154,11 @@ H{
     } cond ;
 
 : parse-objc-type ( string -- ctype ) 0 swap (parse-objc-type) ;
+
+: method-arg-type ( method i -- type )
+    method_copyArgumentType
+    [ ascii alien>string parse-objc-type ] keep
+    (free) ;
 
 : method-arg-types ( method -- args )
     dup method_getNumberOfArguments
