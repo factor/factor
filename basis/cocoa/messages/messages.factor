@@ -107,7 +107,9 @@ USE: prettyprint
     . dup . ;
 
 : method-arg-type ( method i -- type )
-    method_copyArgumentType [ ascii alien>string ] keep (free) ;
+    method_copyArgumentType
+    [ ascii alien>string parse-objc-type ] keep
+    (free) ;
 
 SYMBOL: objc>alien-types
 
@@ -164,10 +166,12 @@ H{
 
 : method-arg-types ( method -- args )
     dup method_getNumberOfArguments
-    [ method-arg-type parse-objc-type ] with map ;
+    [ method-arg-type ] with map ;
 
 : method-return-type ( method -- ctype )
-    method_copyReturnType [ ascii alien>string ] keep (free) ;
+    method_copyReturnType
+    [ ascii alien>string parse-objc-type ] keep
+    (free) ;
 
 : register-objc-method ( method -- )
     dup method-return-type over method-arg-types 2array

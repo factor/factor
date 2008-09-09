@@ -57,7 +57,7 @@ IN: cocoa.subclassing
     
 : redefine-objc-methods ( imeth name -- )
     dup class-exists? [
-        objc_getClass swap [ (redefine-objc-method) ] with map
+        objc_getClass swap [ (redefine-objc-method) ] with each
     ] [
         2drop
     ] if ;
