@@ -40,7 +40,7 @@ FUNCTION: Class objc_getMetaClass ( char* class ) ;
 FUNCTION: Protocol objc_getProtocol ( char* class ) ;
 
 FUNCTION: Class objc_allocateClassPair ( Class superclass, char* name, size_t extraBytes ) ;
-FUNCTION: Class objc_registerClassPair ( Class cls ) ;
+FUNCTION: void objc_registerClassPair ( Class cls ) ;
 
 FUNCTION: id class_createInstance ( Class class, uint additionalByteCount ) ;
 
