@@ -82,9 +82,9 @@ HELP: count-tuples
 
 HELP: query
 { $values
-     { "tuple" null } { "query" null }
-     { "tuples" null } }
-{ $description "" } ;
+     { "tuple" tuple } { "query" query }
+     { "tuples" "a sequence of tuples" } }
+{ $description "Allows for queries with group by, order by, limit, and offset clauses.  " } ;
 
 { select-tuple select-tuples count-tuples query } related-words
 
