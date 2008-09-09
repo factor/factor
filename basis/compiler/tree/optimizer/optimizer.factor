@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: compiler.tree.normalization
+USING: kernel namespaces
+compiler.tree.normalization
 compiler.tree.propagation
 compiler.tree.cleanup
 compiler.tree.escape-analysis
@@ -9,26 +10,24 @@ compiler.tree.def-use
 compiler.tree.dead-code
 compiler.tree.strength-reduction
 compiler.tree.loop.detection
-compiler.tree.loop.inversion
-compiler.tree.branch-fusion
 compiler.tree.finalization
 compiler.tree.checker ;
 IN: compiler.tree.optimizer
+
+SYMBOL: check-optimizer?
 
 : optimize-tree ( nodes -- nodes' )
     normalize
     propagate
     cleanup
     detect-loops
-    ! invert-loops
-    ! fuse-branches
     escape-analysis
     unbox-tuples
     compute-def-use
     remove-dead-code
-    finalize
     ! strength-reduce
-    ! USE: kernel
-    ! compute-def-use
-    ! dup check-nodes
-    ;
+    check-optimizer? get [
+        compute-def-use
+        dup check-nodes
+    ] when
+    finalize ;
