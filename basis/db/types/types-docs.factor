@@ -133,21 +133,9 @@ HELP: db-assigned-id-spec?
      { "?" "a boolean" } }
 { $description "" } ;
 
-HELP: double-quote
-{ $values
-     { "string" string }
-     { "new-string" null } }
-{ $description "" } ;
-
 HELP: find-primary-key
 { $values
      { "specs" null }
-     { "obj" object } }
-{ $description "" } ;
-
-HELP: find-random-generator
-{ $values
-     { "seq" sequence }
      { "obj" object } }
 { $description "" } ;
 
@@ -266,12 +254,6 @@ HELP: set-slot-named
      { "value" null } { "name" null } { "obj" object } }
 { $description "" } ;
 
-HELP: single-quote
-{ $values
-     { "string" string }
-     { "new-string" null } }
-{ $description "" } ;
-
 HELP: spec>tuple
 { $values
      { "class" class } { "spec" null }
@@ -279,18 +261,6 @@ HELP: spec>tuple
 { $description "" } ;
 
 HELP: sql-spec
-{ $description "" } ;
-
-HELP: tuple>filled-slots
-{ $values
-     { "tuple" null }
-     { "alist" "an array of key/value pairs" } }
-{ $description "" } ;
-
-HELP: tuple>params
-{ $values
-     { "specs" null } { "tuple" null }
-     { "obj" object } }
 { $description "" } ;
 
 HELP: unknown-modifier

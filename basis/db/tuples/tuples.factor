@@ -15,13 +15,13 @@ IN: db.tuples
 
 ERROR: not-persistent class ;
 
-: db-table ( class -- obj )
+: db-table ( class -- object )
     dup "db-table" word-prop [ ] [ not-persistent ] ?if ;
 
-: db-columns ( class -- obj )
+: db-columns ( class -- object )
     superclasses [ "db-columns" word-prop ] map concat ;
 
-: db-relations ( class -- obj )
+: db-relations ( class -- object )
     "db-relations" word-prop ;
 
 : set-primary-key ( key tuple -- )
@@ -34,13 +34,13 @@ SYMBOL: sql-counter
     sql-counter [ inc ] [ get ] bi number>string ;
 
 ! returns a sequence of prepared-statements
-HOOK: create-sql-statement db ( class -- obj )
-HOOK: drop-sql-statement db ( class -- obj )
+HOOK: create-sql-statement db ( class -- object )
+HOOK: drop-sql-statement db ( class -- object )
 
-HOOK: <insert-db-assigned-statement> db ( class -- obj )
-HOOK: <insert-user-assigned-statement> db ( class -- obj )
-HOOK: <update-tuple-statement> db ( class -- obj )
-HOOK: <delete-tuples-statement> db ( tuple class -- obj )
+HOOK: <insert-db-assigned-statement> db ( class -- object )
+HOOK: <insert-user-assigned-statement> db ( class -- object )
+HOOK: <update-tuple-statement> db ( class -- object )
+HOOK: <delete-tuples-statement> db ( tuple class -- object )
 HOOK: <select-by-slots-statement> db ( tuple class -- tuple )
 TUPLE: query group order offset limit ;
 HOOK: <query> db ( tuple class query -- statement' )
@@ -48,7 +48,7 @@ HOOK: <count-statement> db ( tuple class groups -- n )
 
 HOOK: insert-tuple* db ( tuple statement -- )
 
-GENERIC: eval-generator ( singleton -- obj )
+GENERIC: eval-generator ( singleton -- object )
 
 : resulting-tuple ( exemplar-tuple row out-params -- tuple )
     rot class new [
@@ -68,7 +68,7 @@ GENERIC: eval-generator ( singleton -- obj )
         [ slot-name>> ] dip set-slot-named
     ] curry 2each ;
 
-: with-disposals ( seq quot -- )
+: with-disposals ( object quotation -- )
     over sequence? [
         [ with-disposal ] curry each
     ] [

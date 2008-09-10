@@ -741,7 +741,7 @@ PRIVATE>
 : unclip-slice ( seq -- rest first )
     [ rest-slice ] [ first ] bi ; inline
 
-: unclip-last-slice ( seq -- butfirst last )
+: unclip-last-slice ( seq -- butlast last )
     [ but-last-slice ] [ peek ] bi ; inline
 
 : <flat-slice> ( seq -- slice )

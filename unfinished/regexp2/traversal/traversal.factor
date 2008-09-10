@@ -18,7 +18,7 @@ TUPLE: dfa-traverser
     matches ;
 
 : <dfa-traverser> ( text regexp -- match )
-    [ dfa-table>> ] [ traversal-flags>> ] bi
+    [ dfa-table>> ] [ dfa-traversal-flags>> ] bi
     dfa-traverser new
         swap >>traversal-flags
         swap [ start-state>> >>current-state ] keep

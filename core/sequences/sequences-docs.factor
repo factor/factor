@@ -81,6 +81,7 @@ ARTICLE: "sequences-reshape" "Reshaping sequences"
 
 ARTICLE: "sequences-appending" "Appending sequences"
 { $subsection append }
+{ $subsection prepend }
 { $subsection 3append }
 { $subsection concat }
 { $subsection join }
@@ -100,6 +101,7 @@ ARTICLE: "sequences-slices" "Subsequences and slices"
 { $subsection but-last }
 "Taking a sequence apart into a head and a tail:"
 { $subsection unclip }
+{ $subsection unclip-last }
 { $subsection cut }
 { $subsection cut* }
 "A " { $emphasis "slice" } " is a virtual sequence which presents as view of a subsequence of an underlying sequence:"
@@ -124,6 +126,8 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
 { $subsection each }
 { $subsection reduce }
 { $subsection interleave }
+{ $subsection replicate }
+{ $subsection replicate-as }
 "Mapping:"
 { $subsection map }
 { $subsection map-as }
@@ -871,12 +875,43 @@ HELP: push-all
 HELP: append
 { $values { "seq1" sequence } { "seq2" sequence } { "newseq" sequence } }
 { $description "Outputs a new sequence of the same type as " { $snippet "seq1" } " consisting of the elements of " { $snippet "seq1" } " followed by " { $snippet "seq2" } "." }
-{ $errors "Throws an error if " { $snippet "seq2" } " contains elements not permitted in sequences of the same class as " { $snippet "seq1" } "." } ;
+{ $errors "Throws an error if " { $snippet "seq2" } " contains elements not permitted in sequences of the same class as " { $snippet "seq1" } "." }
+{ $examples 
+    { $example "USING: prettyprint sequences ;"
+        "{ 1 2 } B{ 3 4 } append ."
+        "{ 1 2 3 4 }"
+    }
+    { $example "USING: prettyprint sequences strings ;"
+        "\"go\" \"ing\" append ."
+        "\"going\""
+    }
+} ;
+
+HELP: prepend
+{ $values { "seq1" sequence } { "seq2" sequence } { "newseq" sequence } }
+{ $description "Outputs a new sequence of the same type as " { $snippet "seq2" } " consisting of the elements of " { $snippet "seq2" } " followed by " { $snippet "seq1" } "." }
+{ $errors "Throws an error if " { $snippet "seq1" } " contains elements not permitted in sequences of the same class as " { $snippet "seq2" } "." }
+{ $examples 
+    { $example "USING: prettyprint sequences ;"
+        "{ 1 2 } B{ 3 4 } prepend ."
+        "B{ 3 4 1 2 }"
+    }
+    { $example "USING: prettyprint sequences strings ;"
+        "\"go\" \"car\" prepend ."
+        "\"cargo\""
+    }
+} ;
 
 HELP: 3append
 { $values { "seq1" sequence } { "seq2" sequence } { "seq3" sequence } { "newseq" sequence } }
 { $description "Outputs a new sequence consisting of the elements of " { $snippet "seq1" } ", " { $snippet "seq2" } " and " { $snippet "seq3" } " in turn." }
-{ $errors "Throws an error if " { $snippet "seq2" } " or " { $snippet "seq3" } " contain elements not permitted in sequences of the same class as " { $snippet "seq1" } "." } ;
+{ $errors "Throws an error if " { $snippet "seq2" } " or " { $snippet "seq3" } " contain elements not permitted in sequences of the same class as " { $snippet "seq1" } "." }
+{ $examples
+    { $example "USING: prettyprint sequences ;"
+        "\"a\" \"b\" \"c\" 3append ."
+        "\"abc\""
+    }
+} ;
 
 HELP: subseq
 { $values { "from" "a non-negative integer" } { "to" "a non-negative integer" } { "seq" sequence } { "subseq" "a new sequence" } }
@@ -1004,6 +1039,17 @@ HELP: unclip-slice
 { $values { "seq" sequence } { "rest" slice } { "first" object } }
 { $description "Outputs a tail sequence and the first element of " { $snippet "seq" } "; the tail sequence consists of all elements of " { $snippet "seq" } " but the first. Unlike " { $link unclip } ", this word does not make a copy of the input sequence, and runs in constant time." } ;
 
+HELP: unclip-last
+{ $values { "seq" sequence } { "butlast" sequence } { "last" object } }
+{ $description "Outputs a head sequence and the last element of " { $snippet "seq" } "; the head sequence consists of all elements of " { $snippet "seq" } " but the last." }
+{ $examples
+    { $example "USING: prettyprint sequences ;" "{ 1 2 3 } unclip-last prefix ." "{ 3 1 2 }" }
+} ;
+
+HELP: unclip-last-slice
+{ $values { "seq" sequence } { "butlast" slice } { "last" object } }
+{ $description "Outputs a head sequence and the last element of " { $snippet "seq" } "; the head sequence consists of all elements of " { $snippet "seq" } " but the last Unlike " { $link unclip-last } ", this word does not make a copy of the input sequence, and runs in constant time." } ;
+
 HELP: sum
 { $values { "seq" "a sequence of numbers" } { "n" "a number" } }
 { $description "Outputs the sum of all elements of " { $snippet "seq" } ". Outputs zero given an empty sequence." } ;
@@ -1072,6 +1118,16 @@ HELP: trim-left
            "{ 1 2 3 0 0 }"
 } ;
 
+HELP: trim-left-slice
+{ $values
+     { "seq" sequence } { "quot" quotation }
+     { "slice" slice } }
+{ $description "Removes elements starting from the left side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a slice" }
+{ $example "" "USING: prettyprint math sequences ;"
+           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-left-slice ."
+           "T{ slice { from 2 } { to 7 } { seq { 0 0 1 2 3 0 0 } } }"
+} ;
+
 HELP: trim-right
 { $values
      { "seq" sequence } { "quot" quotation }
@@ -1080,6 +1136,16 @@ HELP: trim-right
 { $example "" "USING: prettyprint math sequences ;"
            "{ 0 0 1 2 3 0 0 } [ zero? ] trim-right ."
            "{ 0 0 1 2 3 }"
+} ;
+
+HELP: trim-right-slice
+{ $values
+     { "seq" sequence } { "quot" quotation }
+     { "slice" slice } }
+{ $description "Removes elements starting from the right side of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a slice." }
+{ $example "" "USING: prettyprint math sequences ;"
+           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-right-slice ."
+           "T{ slice { from 0 } { to 5 } { seq { 0 0 1 2 3 0 0 } } }"
 } ;
 
 HELP: trim
@@ -1092,4 +1158,123 @@ HELP: trim
            "{ 1 2 3 }"
 } ;
 
-{ trim-left trim-right trim } related-words
+HELP: trim-slice
+{ $values
+     { "seq" sequence } { "quot" quotation }
+     { "slice" slice } }
+{ $description "Removes elements starting from the left and right sides of a sequence if they match a predicate. Once an element does not match, the test stops and the rest of the sequence is left on the stack as a slice." }
+{ $example "" "USING: prettyprint math sequences ;"
+           "{ 0 0 1 2 3 0 0 } [ zero? ] trim-slice ."
+           "T{ slice { from 2 } { to 5 } { seq { 0 0 1 2 3 0 0 } } }"
+} ;
+
+{ trim trim-slice trim-left trim-left-slice trim-right trim-right-slice } related-words
+
+HELP: sift
+{ $values
+     { "seq" sequence }
+     { "newseq" sequence } }
+ { $description "Outputs a new sequence with all instance of " { $link f  } " removed." }
+ { $examples 
+    { $example "USING: prettyprint sequences ;"
+        "{ \"a\" 3 { } f } sift ."
+        "{ \"a\" 3 { } }"
+    }
+} ;
+
+HELP: harvest
+{ $values
+     { "seq" sequence }
+     { "newseq" sequence } }
+{ $description "Outputs a new sequence with all empty sequences removed." }
+{ $examples 
+    { $example "USING: prettyprint sequences ;"
+               "{ { } { 2 3 } { 5 } { } } harvest ."
+               "{ { 2 3 } { 5 } }"
+    }
+} ;
+
+{ filter sift harvest } related-words
+
+HELP: set-first
+{ $values
+     { "first" object } { "seq" sequence } }
+{ $description "Sets the first element of a sequence." }
+{ $examples 
+    { $example "USING: prettyprint kernel sequences ;"
+        "{ 1 2 3 4  } 5 over set-first ."
+        "{ 5 2 3 4 }"
+    }
+} ;
+
+HELP: set-second
+{ $values
+     { "second" object } { "seq" sequence } }
+{ $description "Sets the second element of a sequence." }
+{ $examples 
+    { $example "USING: prettyprint kernel sequences ;"
+        "{ 1 2 3 4  } 5 over set-second ."
+        "{ 1 5 3 4 }"
+    }
+} ;
+
+HELP: set-third
+{ $values
+     { "third" object } { "seq" sequence } }
+{ $description "Sets the third element of a sequence." }
+{ $examples 
+    { $example "USING: prettyprint kernel sequences ;"
+        "{ 1 2 3 4  } 5 over set-third ."
+        "{ 1 2 5 4 }"
+    }
+} ;
+
+HELP: set-fourth
+{ $values
+     { "fourth" object } { "seq" sequence } }
+{ $description "Sets the fourth element of a sequence." }
+{ $examples 
+    { $example "USING: prettyprint kernel sequences ;"
+        "{ 1 2 3 4  } 5 over set-fourth ."
+        "{ 1 2 3 5 }"
+    }
+} ;
+
+{ set-first set-second set-third set-fourth } related-words
+
+HELP: replicate
+{ $values
+     { "seq" sequence } { "quot" quotation }
+     { "newseq" sequence } }
+{ $description "Calls the quotation for every element of the sequence in order. However, the element is not passed to the quotation -- it is dropped, and the quotation produces an element of its own that is collected into a sequence of the same class as the input sequence." }
+{ $examples 
+    { $unchecked-example "USING: prettyprint kernel sequences ;"
+        "5 [ 100 random ] replicate ."
+        "{ 52 10 45 81 30 }"
+    }
+} ;
+
+HELP: replicate-as
+{ $values
+     { "seq" sequence } { "quot" quotation } { "exemplar" sequence }
+     { "newseq" sequence } }
+{ $description "Calls the quotation for every element of the sequence in order. However, the element is not passed to the quotation -- it is dropped, and the quotation produces an element of its own that is collected into a sequence of the same class as the exemplar sequence." }
+{ $examples 
+    { $unchecked-example "USING: prettyprint kernel sequences ;"
+        "5 [ 100 random ] B{ } replicate-as ."
+        "B{ 44 8 2 33 18 }"
+    }
+} ;
+{ replicate replicate-as } related-words
+
+HELP: partition
+{ $values
+     { "seq" sequence } { "quot" quotation }
+     { "trueseq" sequence } { "falseseq" sequence } }
+     { $description "Calls a predicate quotation on each element of the input sequence.  If the test yields true, the element is added to " { $snippet "trueseq" } "; if false, it's added to " { $snippet "falseseq" } "." }
+{ $examples 
+    { $example "USING: prettyprint kernel math sequences ;"
+        "{ 1 2 3 4 5 } [ even? ] partition [ . ] bi@"
+        "{ 2 4 }\n{ 1 3 5 }"
+    }
+} ;
