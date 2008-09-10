@@ -36,9 +36,9 @@ M: f random-32* ( obj -- * ) no-random-number-generator ;
 : random ( seq -- elt )
     [ f ] [
         [
-            length dup log2 7 + 8 /i 1+ random-bytes
-            [ length 3 shift 2^ ] [ byte-array>bignum ] bi
-            swap / * >integer
+            length dup log2 7 + 8 /i 1+
+            [ random-bytes byte-array>bignum ]
+            [ 3 shift 2^ ] bi / * >integer
         ] keep nth
     ] if-empty ;
 
