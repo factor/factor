@@ -74,7 +74,7 @@ INSTANCE: immutable-sequence sequence
 : set-array-nth ( elt n array -- )
     swap 2 fixnum+fast set-slot ; inline
 
-: dispatch ( n array -- ) array-nth (call) ;
+: dispatch ( n array -- ) array-nth call ;
 
 GENERIC: resize ( n seq -- newseq ) flushable
 

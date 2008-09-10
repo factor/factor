@@ -1,6 +1,7 @@
 USING: arrays byte-arrays kernel kernel.private math memory
 namespaces sequences tools.test math.private quotations
-continuations prettyprint io.streams.string debugger assocs ;
+continuations prettyprint io.streams.string debugger assocs
+sequences.private ;
 IN: kernel.tests
 
 [ 0 ] [ f size ] unit-test
@@ -118,7 +119,8 @@ IN: kernel.tests
 
 [ total-failure-1 ] must-fail
 
-! From combinators.lib
 [ 1 1 2 2 3 3 ] [ 1 2 3 [ dup ] tri@ ] unit-test
 [ 1 4 9 ] [ 1 2 3 [ sq ] tri@ ] unit-test
 [ [ sq ] tri@ ] must-infer
+
+[ 4 ] [ 1 { [ 1 ] [ 2 ] } dispatch sq ] unit-test
