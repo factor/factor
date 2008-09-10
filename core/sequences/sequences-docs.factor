@@ -101,6 +101,7 @@ ARTICLE: "sequences-slices" "Subsequences and slices"
 { $subsection but-last }
 "Taking a sequence apart into a head and a tail:"
 { $subsection unclip }
+{ $subsection unclip-last }
 { $subsection cut }
 { $subsection cut* }
 "A " { $emphasis "slice" } " is a virtual sequence which presents as view of a subsequence of an underlying sequence:"
@@ -1037,6 +1038,17 @@ HELP: unclip
 HELP: unclip-slice
 { $values { "seq" sequence } { "rest" slice } { "first" object } }
 { $description "Outputs a tail sequence and the first element of " { $snippet "seq" } "; the tail sequence consists of all elements of " { $snippet "seq" } " but the first. Unlike " { $link unclip } ", this word does not make a copy of the input sequence, and runs in constant time." } ;
+
+HELP: unclip-last
+{ $values { "seq" sequence } { "butlast" sequence } { "last" object } }
+{ $description "Outputs a head sequence and the last element of " { $snippet "seq" } "; the head sequence consists of all elements of " { $snippet "seq" } " but the last." }
+{ $examples
+    { $example "USING: prettyprint sequences ;" "{ 1 2 3 } unclip-last prefix ." "{ 3 1 2 }" }
+} ;
+
+HELP: unclip-last-slice
+{ $values { "seq" sequence } { "butlast" slice } { "last" object } }
+{ $description "Outputs a head sequence and the last element of " { $snippet "seq" } "; the head sequence consists of all elements of " { $snippet "seq" } " but the last Unlike " { $link unclip-last } ", this word does not make a copy of the input sequence, and runs in constant time." } ;
 
 HELP: sum
 { $values { "seq" "a sequence of numbers" } { "n" "a number" } }
