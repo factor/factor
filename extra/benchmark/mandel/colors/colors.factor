@@ -16,4 +16,4 @@ IN: benchmark.mandel.colors
     ] with map ;
 
 : color-map ( -- map )
-    nb-iter max-color min <color-map> ; foldable
+    max-iterations max-color min <color-map> ; foldable
