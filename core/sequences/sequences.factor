@@ -739,10 +739,10 @@ PRIVATE>
     [ but-last ] [ peek ] bi ;
 
 : unclip-slice ( seq -- rest first )
-    [ rest-slice ] [ first ] bi ;
+    [ rest-slice ] [ first ] bi ; inline
 
 : unclip-last-slice ( seq -- butfirst last )
-    [ but-last-slice ] [ peek ] bi ;
+    [ but-last-slice ] [ peek ] bi ; inline
 
 : <flat-slice> ( seq -- slice )
     dup slice? [ { } like ] when 0 over length rot <slice> ;
