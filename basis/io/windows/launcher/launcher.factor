@@ -3,7 +3,7 @@
 USING: alien alien.c-types arrays continuations io
 io.windows io.windows.nt.pipes libc io.ports
 windows.types math windows.kernel32
-namespaces io.launcher kernel sequences windows.errors
+namespaces make io.launcher kernel sequences windows.errors
 splitting system threads init strings combinators
 io.backend accessors concurrency.flags io.files assocs
 io.files.private windows destructors ;
