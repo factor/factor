@@ -1,5 +1,5 @@
 IN: assocs.tests
-USING: kernel math namespaces tools.test vectors sequences
+USING: kernel math namespaces make tools.test vectors sequences
 sequences.private hashtables io prettyprint assocs
 continuations float-arrays ;
 
