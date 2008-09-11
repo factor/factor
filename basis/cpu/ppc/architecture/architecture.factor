@@ -5,7 +5,7 @@ cpu.architecture generic kernel kernel.private math memory
 namespaces sequences words assocs compiler.generator
 compiler.generator.registers compiler.generator.fixup system
 layouts classes words.private alien combinators
-compiler.constants math.order ;
+compiler.constants math.order make ;
 IN: cpu.ppc.architecture
 
 ! PowerPC register assignments

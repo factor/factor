@@ -11,14 +11,12 @@ IN: blum-blum-shub.tests
 [ 70576473 ] [
     T{ blum-blum-shub f 590695557939 811977232793 } clone [
         32 random-bits
-        little-endian? [ <uint> reverse *uint ] unless
     ] with-random
 ] unit-test
 
 [ 5570804936418322777 ] [
     T{ blum-blum-shub f 590695557939 811977232793 } clone [
         64 random-bits
-        little-endian? [ <ulonglong> 4 group [ reverse ] map concat *ulonglong ] unless
     ] with-random
 ] unit-test
 
