@@ -1,12 +1,13 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math sequences io.binary splitting grouping ;
+USING: kernel math sequences io.binary splitting grouping
+accessors ;
 IN: base64
 
 <PRIVATE
 
-: count-end ( seq quot -- count )
-    >r [ length ] keep r> find-last drop dup [ - 1- ] [ 2drop 0 ] if ; inline
+: count-end ( seq quot -- n )
+    trim-right-slice [ seq>> length ] [ to>> ] bi - ; inline
 
 : ch>base64 ( ch -- ch )
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/" nth ;
@@ -21,13 +22,16 @@ IN: base64
     } nth ;
 
 : encode3 ( seq -- seq )
-    be> 4 <reversed> [ -6 * shift HEX: 3f bitand ch>base64 ] with B{ } map-as ;
+    be> 4 <reversed> [
+        -6 * shift HEX: 3f bitand ch>base64
+    ] with B{ } map-as ;
 
 : decode4 ( str -- str )
     0 [ base64>ch swap 6 shift bitor ] reduce 3 >be ;
 
 : >base64-rem ( str -- str )
-    [ 3 0 pad-right encode3 ] [ length 1+ ] bi head 4 CHAR: = pad-right ;
+    [ 3 0 pad-right encode3 ] [ length 1+ ] bi
+    head-slice 4 CHAR: = pad-right ;
 
 PRIVATE>
 
@@ -42,5 +46,5 @@ PRIVATE>
 : base64> ( base64 -- str )
     #! input length must be a multiple of 4
     [ 4 <groups> [ decode4 ] map concat ]
-    [ [ CHAR: = = not ] count-end ]
+    [ [ CHAR: = = ] count-end ]
     bi head* ;
