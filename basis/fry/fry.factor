@@ -21,7 +21,6 @@ DEFER: shallow-fry
 : (shallow-fry) ( accum quot -- result )
     [ 1quotation ] [
         unclip {
-            { \ , [ "Oops!!" throw ] }
             { \ _ [ [ curry ] ((shallow-fry)) ] }
             { \ @ [ [ compose ] ((shallow-fry)) ] }
             [ swap >r suffix r> (shallow-fry) ]
@@ -30,12 +29,12 @@ DEFER: shallow-fry
 
 : shallow-fry ( quot -- quot' ) [ ] swap (shallow-fry) ;
 
-PREDICATE: fry-specifier < word { _ @ , } memq? ;
+PREDICATE: fry-specifier < word { _ @ } memq? ;
 
 GENERIC: count-inputs ( quot -- n )
 
 M: callable count-inputs [ count-inputs ] sigma ;
-M: fry-specifier count-inputs \ , eq? [ "Oops!!" throw ] when 1 ;
+M: fry-specifier count-inputs drop 1 ;
 M: object count-inputs drop 0 ;
 
 PRIVATE>
