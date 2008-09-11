@@ -108,12 +108,12 @@ H{
     { "c" "char" }
     { "i" "int" }
     { "s" "short" }
-    { "l" "long" }
+    { "l" "int" }
     { "q" "longlong" }
     { "C" "uchar" }
     { "I" "uint" }
     { "S" "ushort" }
-    { "L" "ulong" }
+    { "L" "uint" }
     { "Q" "ulonglong" }
     { "f" "float" }
     { "d" "double" }
@@ -133,14 +133,14 @@ objc>alien-types get [ swap ] assoc-map
 "ptrdiff_t" heap-size {
     { 4 [ H{
         { "NSPoint" "{_NSPoint=ff}" }
-        { "NSRect" "{_NSRect=ffff}" }
+        { "NSRect" "{_NSRect={_NSPoint=ff}{_NSSize=ff}}" }
         { "NSSize" "{_NSSize=ff}" }
         { "NSRange" "{_NSRange=II}" }
     } ] }
     { 8 [ H{
-        { "NSPoint" "{_NSPoint=dd}" }
-        { "NSRect" "{_NSRect=dddd}" }
-        { "NSSize" "{_NSSize=dd}" }
+        { "NSPoint" "{CGPoint=dd}" }
+        { "NSRect" "{CGRect={CGPoint=dd}{CGSize=dd}}" }
+        { "NSSize" "{CGSize=dd}" }
         { "NSRange" "{_NSRange=QQ}" }
     } ] }
 } case

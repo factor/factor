@@ -128,8 +128,8 @@ CLASS: {
 }
 
 ! Rendering
-{ "drawRect:" "void" { "id" "SEL" "id" "NSRect" }
-    [ 3drop window relayout-1 ]
+{ "drawRect:" "void" { "id" "SEL" "NSRect" }
+    [ 2drop window relayout-1 ]
 }
 
 ! Events

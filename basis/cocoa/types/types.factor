@@ -10,25 +10,6 @@ TYPEDEF: ulong NSUInteger
     { 8 [ "double" ] }
 } case "CGFloat" typedef >>
 
-C-STRUCT: NSRect
-    { "CGFloat" "x" }
-    { "CGFloat" "y" }
-    { "CGFloat" "w" }
-    { "CGFloat" "h" } ;
-
-TYPEDEF: NSRect _NSRect
-TYPEDEF: NSRect CGRect
-
-: <NSRect> ( x y w h -- rect )
-    "NSRect" <c-object>
-    [ set-NSRect-h ] keep
-    [ set-NSRect-w ] keep
-    [ set-NSRect-y ] keep
-    [ set-NSRect-x ] keep ;
-
-: NSRect-x-y ( alien -- origin-x origin-y )
-    [ NSRect-x ] keep NSRect-y ;
-
 C-STRUCT: NSPoint
     { "CGFloat" "x" }
     { "CGFloat" "y" } ;
@@ -52,6 +33,41 @@ TYPEDEF: NSPoint CGPoint
     "NSSize" <c-object>
     [ set-NSSize-h ] keep
     [ set-NSSize-w ] keep ;
+
+C-STRUCT: NSRect
+    { "NSPoint" "origin" }
+    { "NSSize"  "size"   } ;
+
+TYPEDEF: NSRect _NSRect
+TYPEDEF: NSRect CGRect
+
+: NSRect-x ( NSRect -- x )
+    NSRect-origin NSPoint-x ; inline
+: NSRect-y ( NSRect -- y )
+    NSRect-origin NSPoint-y ; inline
+: NSRect-w ( NSRect -- w )
+    NSRect-size NSSize-w ; inline
+: NSRect-h ( NSRect -- h )
+    NSRect-size NSSize-h ; inline
+
+: set-NSRect-x ( x NSRect -- )
+    NSRect-origin set-NSPoint-x ; inline
+: set-NSRect-y ( y NSRect -- )
+    NSRect-origin set-NSPoint-y ; inline
+: set-NSRect-w ( w NSRect -- )
+    NSRect-size set-NSSize-w ; inline
+: set-NSRect-h ( h NSRect -- )
+    NSRect-size set-NSSize-h ; inline
+
+: <NSRect> ( x y w h -- rect )
+    "NSRect" <c-object>
+    [ set-NSRect-h ] keep
+    [ set-NSRect-w ] keep
+    [ set-NSRect-y ] keep
+    [ set-NSRect-x ] keep ;
+
+: NSRect-x-y ( alien -- origin-x origin-y )
+    [ NSRect-x ] keep NSRect-y ;
 
 C-STRUCT: NSRange
     { "NSUInteger" "location" }
