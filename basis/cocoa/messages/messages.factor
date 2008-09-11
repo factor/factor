@@ -108,22 +108,34 @@ H{
     { "c" "char" }
     { "i" "int" }
     { "s" "short" }
-    { "l" "int" }
-    { "q" "longlong" }
     { "C" "uchar" }
     { "I" "uint" }
     { "S" "ushort" }
-    { "L" "uint" }
-    { "Q" "ulonglong" }
     { "f" "float" }
     { "d" "double" }
     { "B" "bool" }
     { "v" "void" }
     { "*" "char*" }
+    { "?" "unknown_type" }
     { "@" "id" }
     { "#" "id" }
     { ":" "SEL" }
-} objc>alien-types set-global
+}
+"ptrdiff_t" heap-size {
+    { 4 [ H{
+        { "l" "long" }
+        { "q" "longlong" }
+        { "L" "ulong" }
+        { "Q" "ulonglong" }
+    } ] }
+    { 8 [ H{
+        { "l" "long32" }
+        { "q" "long" }
+        { "L" "ulong32" }
+        { "Q" "ulong" }
+    } ] }
+} case
+assoc-union objc>alien-types set-global
 
 ! The transpose of the above map
 SYMBOL: alien>objc-types

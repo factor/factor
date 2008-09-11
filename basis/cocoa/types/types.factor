@@ -27,7 +27,7 @@ C-STRUCT: NSSize
     { "CGFloat" "h" } ;
 
 TYPEDEF: NSSize _NSSize
-TYPEDEF: NSPoint CGPoint
+TYPEDEF: NSSize CGSize
 
 : <NSSize> ( w h -- size )
     "NSSize" <c-object>
@@ -74,6 +74,11 @@ C-STRUCT: NSRange
     { "NSUInteger" "length" } ;
 
 TYPEDEF: NSRange _NSRange
+
+! The "lL" type encodings refer to 32-bit values even in 64-bit mode
+TYPEDEF: int long32
+TYPEDEF: uint long32
+TYPEDEF: void* unknown_type
 
 : <NSRange> ( length location -- size )
     "NSRange" <c-object>
