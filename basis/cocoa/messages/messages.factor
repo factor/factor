@@ -4,7 +4,8 @@ USING: accessors alien alien.c-types alien.strings
 arrays assocs combinators compiler kernel
 math namespaces parser prettyprint prettyprint.sections
 quotations sequences strings words cocoa.runtime io macros
-memoize debugger io.encodings.ascii effects compiler.generator ;
+memoize debugger io.encodings.ascii effects compiler.generator
+libc libc.private ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )
@@ -36,7 +37,7 @@ super-message-senders global [ H{ } assoc-like ] change-at
 
 : <super> ( receiver -- super )
     "objc-super" <c-object> [
-        >r dup objc-object-isa objc-class-super-class r>
+        >r dup object_getClass class_getSuperclass r>
         set-objc-super-class
     ] keep
     [ set-objc-super-receiver ] keep ;
@@ -101,11 +102,6 @@ MACRO: (send) ( selector super? -- quot )
 : objc-meta-class ( string -- class )
     \ objc_getMetaClass (objc-class) ;
 
-: method-arg-type ( method i -- type )
-    f <void*> 0 <int> over
-    >r method_getArgumentInfo drop
-    r> *void* ascii alien>string ;
-
 SYMBOL: objc>alien-types
 
 H{
@@ -134,12 +130,21 @@ SYMBOL: alien>objc-types
 
 objc>alien-types get [ swap ] assoc-map
 ! A hack...
-H{
-    { "NSPoint" "{_NSPoint=ff}" }
-    { "NSRect" "{_NSRect=ffff}" }
-    { "NSSize" "{_NSSize=ff}" }
-    { "NSRange" "{_NSRange=II}" }
-} assoc-union alien>objc-types set-global
+"ptrdiff_t" heap-size {
+    { 4 [ H{
+        { "NSPoint" "{_NSPoint=ff}" }
+        { "NSRect" "{_NSRect=ffff}" }
+        { "NSSize" "{_NSSize=ff}" }
+        { "NSRange" "{_NSRange=II}" }
+    } ] }
+    { 8 [ H{
+        { "NSPoint" "{_NSPoint=dd}" }
+        { "NSRect" "{_NSRect=dddd}" }
+        { "NSSize" "{_NSSize=dd}" }
+        { "NSRange" "{_NSRange=QQ}" }
+    } ] }
+} case
+assoc-union alien>objc-types set-global
 
 : objc-struct-type ( i string -- ctype )
     2dup CHAR: = -rot index-from swap subseq
@@ -159,34 +164,32 @@ H{
 
 : parse-objc-type ( string -- ctype ) 0 swap (parse-objc-type) ;
 
+: method-arg-type ( method i -- type )
+    method_copyArgumentType
+    [ ascii alien>string parse-objc-type ] keep
+    (free) ;
+
 : method-arg-types ( method -- args )
     dup method_getNumberOfArguments
-    [ method-arg-type parse-objc-type ] with map ;
+    [ method-arg-type ] with map ;
 
 : method-return-type ( method -- ctype )
-    #! Undocumented hack! Apple does not support this feature!
-    objc-method-types parse-objc-type ;
+    method_copyReturnType
+    [ ascii alien>string parse-objc-type ] keep
+    (free) ;
 
 : register-objc-method ( method -- )
     dup method-return-type over method-arg-types 2array
     dup cache-stubs
-    swap objc-method-name sel_getName
+    swap method_getName sel_getName
     objc-methods get set-at ;
 
-: method-list@ ( ptr -- ptr )
-    "objc-method-list" heap-size swap <displaced-alien> ;
-
-: (register-objc-methods) ( objc-class iterator -- )
-    2dup class_nextMethodList [
-        dup objc-method-list-count swap method-list@ [
-            objc-method-nth register-objc-method
-        ] curry each (register-objc-methods)
-    ] [
-        2drop
-    ] if* ;
+: (register-objc-methods) ( methods count -- methods )
+    over [ void*-nth register-objc-method ] curry each ;
 
 : register-objc-methods ( class -- )
-    f <void*> (register-objc-methods) ;
+    0 <uint> [ class_copyMethodList ] keep *uint 
+    (register-objc-methods) (free) ;
 
 : class-exists? ( string -- class ) objc_getClass >boolean ;
 
@@ -209,4 +212,4 @@ H{
     ] curry try ;
 
 : root-class ( class -- root )
-    dup objc-class-super-class [ root-class ] [ ] ?if ;
+    dup class_getSuperclass [ root-class ] [ ] ?if ;

@@ -30,8 +30,6 @@ DEFER: sql%
         [ third 1, \ ? 0, ] tri
     ] each ;
 
-USE: multiline
-/*
 HOOK: sql-create db ( object -- )
 M: db sql-create ( object -- )
     drop
@@ -97,35 +95,35 @@ M: db sql-limit ( object -- )
 ! M: db sql-subselectselect ( object -- )
     ! "(select" sql% sql% ")" sql% ;
 
-GENERIC: sql-table db ( object -- )
+HOOK: sql-table db ( object -- )
 M: db sql-table ( object -- )
     sql% ;
 
-GENERIC: sql-set db ( object -- )
+HOOK: sql-set db ( object -- )
 M: db sql-set ( object -- )
     "set" "," sql-interleave ;
 
-GENERIC: sql-values db ( object -- )
+HOOK: sql-values db ( object -- )
 M: db sql-values ( object -- )
     "values(" sql% "," (sql-interleave) ")" sql% ;
 
-GENERIC: sql-count db ( object -- )
+HOOK: sql-count db ( object -- )
 M: db sql-count ( object -- )
     "count" sql-function, ;
 
-GENERIC: sql-sum db ( object -- )
+HOOK: sql-sum db ( object -- )
 M: db sql-sum ( object -- )
     "sum" sql-function, ;
 
-GENERIC: sql-avg db ( object -- )
+HOOK: sql-avg db ( object -- )
 M: db sql-avg ( object -- )
     "avg" sql-function, ;
 
-GENERIC: sql-min db ( object -- )
+HOOK: sql-min db ( object -- )
 M: db sql-min ( object -- )
     "min" sql-function, ;
 
-GENERIC: sql-max db ( object -- )
+HOOK: sql-max db ( object -- )
 M: db sql-max ( object -- )
     "max" sql-function, ;
 
@@ -156,9 +154,7 @@ M: db sql-max ( object -- )
         { \ max [ sql-max ] }
         [ sql% [ sql% ] each ]
     } case ;
-*/
 
-: sql-array% ( array -- ) drop ;
 ERROR: no-sql-match ;
 : sql% ( obj -- )
     {

@@ -5,29 +5,6 @@ quotations ;
 
 IN: lisp.test
 
-: define-lisp-builtins (  --  )    
-   init-env
-    
-    f "#f" lisp-define
-    t "#t" lisp-define
-    
-    "+" "math" "+" define-primitive
-    "-" "math" "-" define-primitive
-    "<" "math" "<" define-primitive
-    ">" "math" ">" define-primitive
-    
-    "cons" "lists" "cons" define-primitive
-    "car" "lists" "car" define-primitive
-    "cdr" "lists" "cdr" define-primitive
-    "append" "lists" "lappend" define-primitive
-    "nil" "lists" "nil" define-primitive
-    "nil?" "lists" "nil?" define-primitive
-    
-    "define" "lisp" "defun" define-primitive
-    
-    "(lambda (&rest xs) xs)" lisp-string>factor "list" lisp-define
-   ;     
-    
 [
     define-lisp-builtins
     
@@ -75,10 +52,6 @@ IN: lisp.test
         "(begin (+ 5 6) (+ 1 4))" lisp-eval
     ] unit-test
     
-    { T{ lisp-symbol f "if" } } [
-        "(defmacro if (pred tr fl) (list (quote cond) (list pred tr) (list (quote #t) fl)))" lisp-eval
-    ] unit-test
-    
     { t } [
         T{ lisp-symbol f "if" } lisp-macro?
     ] unit-test
@@ -87,8 +60,28 @@ IN: lisp.test
         "(if #t 1 2)" lisp-eval
     ] unit-test
     
-!     { 3 } [
-!         "((lambda (x) (if x (+ 1 2) (- 3 5))) #t)" lisp-eval
-!     ] unit-test
+    { 3 } [
+        "((lambda (x) (if x (+ 1 2) (- 3 5))) #t)" lisp-eval
+    ] unit-test
+    
+    { { 5 4 3 } } [
+        "((lambda (x &rest xs) (cons x xs)) 5 4 3)" lisp-eval cons>seq
+    ] unit-test
+    
+    { { 5 } } [
+        "((lambda (x &rest xs) (cons x xs)) 5)" lisp-eval cons>seq
+    ] unit-test
+    
+    { { 1 2 3 4 } } [
+        "((lambda (&rest xs) xs) 1 2 3 4)" lisp-eval cons>seq
+    ] unit-test
+    
+    { 10 } [
+        <LISP (begin (+ 1 2) (+ 9 1)) LISP>
+    ] unit-test
+    
+    { 4 } [
+        <LISP ((lambda (x y) (if x (+ 1 y) (+ 2 y))) #t 3) LISP>
+    ] unit-test
     
 ] with-interactive-vocabs

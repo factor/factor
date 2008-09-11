@@ -50,10 +50,6 @@ M: retryable execute-statement* ( statement type -- )
     [ 0 sql-counter rot with-variable ] curry { "" { } { } } nmake
     <simple-statement> maybe-make-retryable ; inline
 
-M: db begin-transaction ( -- ) "BEGIN" sql-command ;
-M: db commit-transaction ( -- ) "COMMIT" sql-command ;
-M: db rollback-transaction ( -- ) "ROLLBACK" sql-command ;
-
 : where-primary-key% ( specs -- )
     " where " 0%
     find-primary-key dup column-name>> 0% " = " 0% bind% ;
@@ -70,7 +66,7 @@ M: db <update-tuple-statement> ( class -- statement )
 M: random-id-generator eval-generator ( singleton -- obj )
     drop
     system-random-generator get [
-        63 [ 2^ random ] keep 1 - set-bit
+        63 [ random-bits ] keep 1- set-bit
     ] with-random ;
 
 : interval-comparison ( ? str -- str )
@@ -154,22 +150,22 @@ M: db <select-by-slots-statement> ( tuple class -- statement )
 
 : do-group ( tuple groups -- )
     [
-        ", " join " group by " prepend append
+        ", " join " group by " swap 3append
     ] curry change-sql drop ;
 
 : do-order ( tuple order -- )
     [
-        ", " join " order by " prepend append
+        ", " join " order by " swap 3append
     ] curry change-sql drop ;
 
 : do-offset ( tuple n -- )
     [
-        number>string " offset " prepend append
+        number>string " offset " swap 3append
     ] curry change-sql drop ;
 
 : do-limit ( tuple n -- )
     [
-        number>string " limit " prepend append
+        number>string " limit " swap 3append
     ] curry change-sql drop ;
 
 : make-query ( tuple query -- tuple' )

@@ -150,6 +150,8 @@ HOOK: %alien-indirect cpu ( -- )
 
 M: stack-params param-reg drop ;
 
+M: stack-params param-regs drop f ;
+
 GENERIC: v>operand ( obj -- operand )
 
 M: integer v>operand tag-fixnum ;

@@ -27,7 +27,13 @@ HELP: random
 
 HELP: random-bytes
 { $values { "n" "an integer" } { "byte-array" "a random integer" } }
-{ $description "Outputs an integer with n bytes worth of bits." } ;
+{ $description "Outputs an integer with n bytes worth of bits." }
+{ $examples 
+    { $unchecked-example "USING: prettyprint random ;"
+               "5 random-bytes ."
+               "B{ 135 50 185 119 240 }"
+    }
+} ;
 
 HELP: random-bits
 { $values { "n" "an integer" } { "r" "a random integer" } }

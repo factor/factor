@@ -279,7 +279,7 @@ FUNCTION: double ffi_test_35 test-struct-11 x int y ;
 
 C-STRUCT: test-struct-12 { "int" "a" } { "double" "x" } ;
 
-: make-struct-12
+: make-struct-12 ( x -- alien )
     "test-struct-12" <c-object>
     [ set-test-struct-12-x ] keep ;
 
@@ -380,3 +380,24 @@ FUNCTION: int ffi_test_37 ( void* func ) ;
 [ 1 ] [ callback-9 ffi_test_37 ] unit-test
 
 [ 7 ] [ callback-9 ffi_test_37 ] unit-test
+
+C-STRUCT: test_struct_13
+{ "float" "x1" }
+{ "float" "x2" }
+{ "float" "x3" }
+{ "float" "x4" }
+{ "float" "x5" }
+{ "float" "x6" } ;
+
+: make-test-struct-13 ( -- alien )
+    "test_struct_13" <c-object>
+        1.0 over set-test_struct_13-x1
+        2.0 over set-test_struct_13-x2
+        3.0 over set-test_struct_13-x3
+        4.0 over set-test_struct_13-x4
+        5.0 over set-test_struct_13-x5
+        6.0 over set-test_struct_13-x6 ;
+
+FUNCTION: int ffi_test_39 ( long a, long b, test_struct_13 s ) ;
+
+[ 21 ] [ 12347 12347 make-test-struct-13 ffi_test_39 ] unit-test

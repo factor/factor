@@ -20,8 +20,7 @@ HELP: <email>
 
 HELP: send-email
 { $values { "email" email } }
-{ $description "Sends an " { $link email } " object to an STMP server stored in the " { $link smtp-server } " variable.  The required slots are " { $snippet "from" } " and " { $snippet "to" } "." }
-
+{ $description "Sends an " { $link email } " object to an STMP server stored in the " { $link smtp-server } " variable.  The required slots are " { $slot "from" } " and " { $slot "to" } "." }
 { $examples
     { $unchecked-example "USING: accessors smtp ;"
     "<email>"
@@ -37,9 +36,5 @@ HELP: send-email
 } ;
 
 ARTICLE: "smtp" "SMTP Client Library"
-"Start by creating a new email object:"
-{ $subsection <email> }
-"Set the " { $snippet "from" } " slot to a " { $link string } "." $nl
-"Set the recipient fields, " { $snippet "to" } ", " { $snippet "cc" } ", and " { $snippet "bcc" } ", to arrays of strings."
-"Set the " { $snippet "subject" } " to a " { $link string } "." $nl
-"Set the " { $snippet "body" } " to a " { $link string } "." $nl ;
+"Sending an email:"
+{ $subsection send-email } ;

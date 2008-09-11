@@ -128,7 +128,6 @@ CLASS: {
 }
 
 ! Rendering
-! Rendering
 { "drawRect:" "void" { "id" "SEL" "id" "NSRect" }
     [ 3drop window relayout-1 ]
 }

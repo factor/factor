@@ -40,15 +40,15 @@ M: postgresql-db dispose ( db -- )
 M: postgresql-statement bind-statement* ( statement -- )
     drop ;
 
-GENERIC: postgresql-bind-conversion ( tuple obj -- low-level-binding )
+GENERIC: postgresql-bind-conversion ( tuple object -- low-level-binding )
 
-M: sql-spec postgresql-bind-conversion ( tuple spec -- obj )
+M: sql-spec postgresql-bind-conversion ( tuple spec -- object )
     slot-name>> swap get-slot-named <low-level-binding> ;
 
-M: literal-bind postgresql-bind-conversion ( tuple literal-bind -- obj )
+M: literal-bind postgresql-bind-conversion ( tuple literal-bind -- object )
     nip value>> <low-level-binding> ;
 
-M: generator-bind postgresql-bind-conversion ( tuple generate-bind -- obj )
+M: generator-bind postgresql-bind-conversion ( tuple generate-bind -- object )
     dup generator-singleton>> eval-generator
     [ swap slot-name>> rot set-slot-named ] [ <low-level-binding> ] bi ;
 
@@ -66,10 +66,10 @@ M: postgresql-result-set #columns ( result-set -- n )
 : result-handle-n ( result-set -- handle n )
     [ handle>> ] [ n>> ] bi ;
 
-M: postgresql-result-set row-column ( result-set column -- obj )
+M: postgresql-result-set row-column ( result-set column -- object )
     >r result-handle-n r> pq-get-string ;
 
-M: postgresql-result-set row-column-typed ( result-set column -- obj )
+M: postgresql-result-set row-column-typed ( result-set column -- object )
     dup pick out-params>> nth type>>
     >r >r result-handle-n r> r> postgresql-column-typed ;
 
@@ -80,7 +80,7 @@ M: postgresql-statement query-results ( query -- result-set )
     ] [
         dup do-postgresql-statement
     ] if*
-    postgresql-result-set construct-result-set
+    postgresql-result-set new-result-set
     dup init-result-set ;
 
 M: postgresql-result-set advance-row ( result-set -- )
@@ -109,7 +109,7 @@ M: postgresql-statement prepare-statement ( statement -- )
     >>handle drop ;
 
 M: postgresql-db <simple-statement> ( sql in out -- statement )
-    postgresql-statement construct-statement ;
+    postgresql-statement new-statement ;
 
 M: postgresql-db <prepared-statement> ( sql in out -- statement )
     <simple-statement> dup prepare-statement ;
@@ -121,7 +121,7 @@ M: postgresql-db <prepared-statement> ( sql in out -- statement )
 M: postgresql-db bind% ( spec -- )
     bind-name% 1, ;
 
-M: postgresql-db bind# ( spec obj -- )
+M: postgresql-db bind# ( spec object -- )
     >r bind-name% f swap type>> r> <literal-bind> 1, ;
 
 : create-table-sql ( class -- statement )
@@ -251,7 +251,8 @@ M: postgresql-db persistent-table ( -- hashtable )
         { random-generator { f f f } }
     } ;
 
-M: postgresql-db compound ( str obj -- str' )
+ERROR: no-compound-found string object ;
+M: postgresql-db compound ( string object -- string' )
     over {
         { "default" [ first number>string join-space ] }
         { "varchar" [ first number>string paren append ] }
@@ -260,5 +261,5 @@ M: postgresql-db compound ( str obj -- str' )
                 swap [ slot-name>> = ] with find nip
                 column-name>> paren append
             ] }
-        [ "no compound found" 3array throw ]
+        [ drop no-compound-found ]
     } case ;

@@ -29,7 +29,7 @@ IN: regexp2
 
 : matches? ( string regexp -- ? )
     dupd match
-    [ [ length ] [ range-length 1- ] bi* = ] [ drop f ] if* ;
+    [ [ length ] [ length>> 1- ] bi* = ] [ drop f ] if* ;
 
 : match-head ( string regexp -- end ) match length>> 1- ;
 

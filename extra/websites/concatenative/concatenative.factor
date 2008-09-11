@@ -84,6 +84,8 @@ SYMBOL: dh-file
     common-configuration ;
 
 : init-production ( -- )
+    f dh-file set-global
+    f key-password set-global
     "/home/slava/cert/host.pem" key-file set-global
     common-configuration ;
 

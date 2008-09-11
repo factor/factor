@@ -1,4 +1,5 @@
-USING: random sequences tools.test kernel ;
+USING: random sequences tools.test kernel math math.functions
+sets ;
 IN: random.tests
 
 [ 4 ] [ 4 random-bytes length ] unit-test
@@ -9,3 +10,8 @@ IN: random.tests
 
 [ 2 ] [ V{ 10 20 30 } [ delete-random drop ] keep length ] unit-test
 [ V{ } [ delete-random drop ] keep length ] must-fail
+
+[ t ] [ 10000 [ 0 [ drop 187 random + ] reduce ] keep / 2 * 187 10 ~ ] unit-test
+[ t ] [ 10000 [ 0 [ drop 400 random + ] reduce ] keep / 2 * 400 10 ~ ] unit-test
+
+[ t ] [ 1000 [ 400 random ] replicate prune length 256 > ] unit-test

@@ -67,3 +67,7 @@ DLLEXPORT void ffi_test_36_point_5(void);
 DLLEXPORT int ffi_test_37(int (*f)(int, int, int));
 
 DLLEXPORT unsigned long long ffi_test_38(unsigned long long x, unsigned long long y);
+
+struct test_struct_13 { float x1, x2, x3, x4, x5, x6; };
+
+DLLEXPORT int ffi_test_39(long a, long b, struct test_struct_13 s);

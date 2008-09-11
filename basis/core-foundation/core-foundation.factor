@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax kernel
-math sequences io.encodings.utf16 destructors accessors ;
+math sequences io.encodings.utf16 destructors accessors combinators ;
 IN: core-foundation
 
 TYPEDEF: void* CFAllocatorRef
@@ -17,10 +17,10 @@ TYPEDEF: void* CFURLRef
 TYPEDEF: void* CFUUIDRef
 TYPEDEF: void* CFTypeRef
 TYPEDEF: bool Boolean
-TYPEDEF: int CFIndex
+TYPEDEF: long CFIndex
 TYPEDEF: int SInt32
 TYPEDEF: uint UInt32
-TYPEDEF: uint CFTypeID
+TYPEDEF: ulong CFTypeID
 TYPEDEF: double CFTimeInterval
 TYPEDEF: double CFAbsoluteTime
 
@@ -137,7 +137,7 @@ M: f <CFNumber>
     dup <CFBundle> [
         CFBundleLoadExecutable drop
     ] [
-        "Cannot load bundled named " prepend throw
+        "Cannot load bundle named " prepend throw
     ] ?if ;
 
 TUPLE: CFRelease-destructor alien disposed ;

@@ -74,7 +74,7 @@ INSTANCE: immutable-sequence sequence
 : set-array-nth ( elt n array -- )
     swap 2 fixnum+fast set-slot ; inline
 
-: dispatch ( n array -- ) array-nth (call) ;
+: dispatch ( n array -- ) array-nth call ;
 
 GENERIC: resize ( n seq -- newseq ) flushable
 
@@ -739,10 +739,10 @@ PRIVATE>
     [ but-last ] [ peek ] bi ;
 
 : unclip-slice ( seq -- rest first )
-    [ rest-slice ] [ first ] bi ;
+    [ rest-slice ] [ first ] bi ; inline
 
-: unclip-last-slice ( seq -- butfirst last )
-    [ but-last-slice ] [ peek ] bi ;
+: unclip-last-slice ( seq -- butlast last )
+    [ but-last-slice ] [ peek ] bi ; inline
 
 : <flat-slice> ( seq -- slice )
     dup slice? [ { } like ] when 0 over length rot <slice> ;

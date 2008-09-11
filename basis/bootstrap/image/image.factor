@@ -280,7 +280,7 @@ M: f '
         [
             [
                 {
-                    [ hashcode , ]
+                    [ hashcode <fake-bignum> , ]
                     [ name>> , ]
                     [ vocabulary>> , ]
                     [ def>> , ]

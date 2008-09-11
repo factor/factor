@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel math namespaces sequences
 io.backend io.binary combinators system vocabs.loader
-summary ;
+summary math.bitwise ;
 IN: random
 
 SYMBOL: system-random-generator
@@ -29,15 +29,16 @@ M: f random-32* ( obj -- * ) no-random-number-generator ;
 
 : random-bytes ( n -- byte-array )
     [
-        dup 4 rem zero? [ 1+ ] unless
+        dup 3 mask zero? [ 1+ ] unless
         random-generator get random-bytes*
     ] keep head ;
 
 : random ( seq -- elt )
     [ f ] [
         [
-            length dup log2 7 + 8 /i
-            random-bytes byte-array>bignum swap mod
+            length dup log2 7 + 8 /i 1+
+            [ random-bytes byte-array>bignum ]
+            [ 3 shift 2^ ] bi / * >integer
         ] keep nth
     ] if-empty ;
 

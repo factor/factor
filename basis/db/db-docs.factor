@@ -12,11 +12,11 @@ HELP: new-db
 { $description "Creates a new database object from a given class." } ;
 
 HELP: make-db*
-{ $values { "seq" sequence } { "db" object } { "db" object } }
+{ $values { "object" object } { "db" object } { "db" object } }
 { $description "Takes a sequence of parameters specific to each database and a class name of the database, and constructs a new database object." } ;
 
 HELP: make-db
-{ $values { "seq" sequence } { "class" class } { "db" db } }
+{ $values { "object" object } { "class" class } { "db" db } }
 { $description "Takes a sequence of parameters specific to each database and a class name of the database, and constructs a new database object." } ;
 
 HELP: db-open
@@ -47,16 +47,18 @@ HELP: prepared-statement
 HELP: result-set
 { $description } ;
 
-HELP: construct-statement
+HELP: new-statement
 { $values { "sql" string } { "in" sequence } { "out" sequence } { "class" class } { "statement" statement } }
 { $description "Makes a new statement object from the given parameters." } ;
 
 HELP: <simple-statement>
-{ $values { "string" string } { "in" sequence } { "out" sequence } }
+{ $values { "string" string } { "in" sequence } { "out" sequence }
+    { "statement" statement } }
 { $description "Makes a new simple statement object from the given parameters." } ;
 
 HELP: <prepared-statement>
-{ $values { "string" string } { "in" sequence } { "out" sequence } }
+{ $values { "string" string } { "in" sequence } { "out" sequence }
+    { "statement" statement } }
 { $description "Makes a new prepared statement object from the given parameters." } ;
 
 HELP: prepare-statement
@@ -76,7 +78,9 @@ HELP: bind-tuple
 { $description "" } ;
 
 HELP: query-results
-{ $values { "query" object } { "statement" statement } }
+{ $values { "query" object }
+    { "result-set" result-set }
+}
 { $description "" } ;
 
 HELP: #rows
@@ -88,11 +92,14 @@ HELP: #columns
 { $description "Returns the number of columns in a result set." } ;
 
 HELP: row-column
-{ $values { "result-set" result-set } { "column" integer } }
+{ $values { "result-set" result-set } { "column" integer }
+    { "obj" object }
+}
 { $description "" } ;
 
 HELP: row-column-typed
-{ $values { "result-set" result-set } { "column" integer } }
+{ $values { "result-set" result-set } { "column" integer }
+    { "sql" "sql" } }
 { $description "" } ;
 
 HELP: advance-row
@@ -100,7 +107,7 @@ HELP: advance-row
 ;
 
 HELP: more-rows?
-{ $values { "result-set" result-set } { "column" integer } }
+{ $values { "result-set" result-set } { "?" "a boolean" } }
 ;
 
 HELP: execute-statement*
@@ -143,8 +150,9 @@ ARTICLE: "db-custom-database-combinators" "Custom database combinators"
 
 "Make a " { $snippet "with-" } " word to open, close, and use your database."
 { $code <"
+USING: db.sqlite db io.files ;
 : with-my-database ( quot -- )
-    { "my-database.db" temp-file } 
+    { "my-database.db" temp-file } sqlite-db rot with-db ;
 "> }
 
 
