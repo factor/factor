@@ -14,7 +14,7 @@ IN: furnace.alloy
     '[
         <conversations>
         <sessions>
-        , , <db-persistence>
+        _ _ <db-persistence>
         <check-form-submissions>
     ] call ;
 
@@ -26,5 +26,5 @@ IN: furnace.alloy
 
 : start-expiring ( db params -- )
     '[
-        , , [ state-classes [ expire-state ] each ] with-db
+        _ _ [ state-classes [ expire-state ] each ] with-db
     ] 5 minutes every drop ;

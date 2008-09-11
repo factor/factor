@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Joe Groff.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces sequences splitting opengl.gl
+USING: kernel namespaces make sequences splitting opengl.gl
 continuations math.parser math arrays sets math.order ;
 IN: opengl.capabilities
 

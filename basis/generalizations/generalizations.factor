@@ -6,24 +6,24 @@ math.ranges combinators macros quotations fry arrays ;
 IN: generalizations
 
 MACRO: nsequence ( n seq -- quot )
-    [ drop <reversed> ] [ '[ , , new-sequence ] ] 2bi
-    [ '[ @ [ , swap set-nth-unsafe ] keep ] ] reduce ;
+    [ drop <reversed> ] [ '[ _ _ new-sequence ] ] 2bi
+    [ '[ @ [ _ swap set-nth-unsafe ] keep ] ] reduce ;
 
 MACRO: narray ( n -- quot )
-    '[ , { } nsequence ] ;
+    '[ _ { } nsequence ] ;
 
 MACRO: firstn ( n -- )
     dup zero? [ drop [ drop ] ] [
-        [ [ '[ [ , ] dip nth-unsafe ] ] map ]
-        [ 1- '[ [ , ] dip bounds-check 2drop ] ]
-        bi prefix '[ , cleave ]
+        [ [ '[ [ _ ] dip nth-unsafe ] ] map ]
+        [ 1- '[ [ _ ] dip bounds-check 2drop ] ]
+        bi prefix '[ _ cleave ]
     ] if ;
 
 MACRO: npick ( n -- )
     1- dup saver [ dup ] rot [ r> swap ] n*quot 3append ;
 
 MACRO: ndup ( n -- )
-    dup '[ , npick ] n*quot ;
+    dup '[ _ npick ] n*quot ;
 
 MACRO: nrot ( n -- )
     1- dup saver swap [ r> swap ] n*quot append ;
@@ -41,7 +41,7 @@ MACRO: ntuck ( n -- )
     2 + [ dupd -nrot ] curry ;
 
 MACRO: nrev ( n -- quot )
-    1 [a,b] [ ] [ '[ @ , -nrot ] ] reduce ;
+    1 [a,b] [ ] [ '[ @ _ -nrot ] ] reduce ;
 
 MACRO: ndip ( quot n -- )
     dup saver -rot restorer 3append ;
@@ -51,7 +51,7 @@ MACRO: nslip ( n -- )
 
 MACRO: nkeep ( n -- )
     [ ] [ 1+ ] [ ] tri
-    '[ [ , ndup ] dip , -nrot , nslip ] ;
+    '[ [ _ ndup ] dip _ -nrot _ nslip ] ;
 
 MACRO: ncurry ( n -- )
     [ curry ] n*quot ;
@@ -61,5 +61,5 @@ MACRO: nwith ( n -- )
 
 MACRO: napply ( n -- )
     2 [a,b]
-    [ [ 1- ] keep '[ , ntuck , nslip ] ]
+    [ [ 1- ] keep '[ _ ntuck _ nslip ] ]
     map concat >quotation [ call ] append ;

@@ -1,6 +1,7 @@
 ! Copyright (C) 2006, 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces kernel xml.data xml.utilities assocs sequences ;
+USING: namespaces make kernel xml.data xml.utilities assocs
+sequences ;
 IN: xml.generator
 
 : comment, ( string -- ) <comment> , ;

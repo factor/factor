@@ -12,7 +12,7 @@ TUPLE: sparse-graph alist ;
 
 : >sparse-graph ( graph -- sparse-graph )
     [ vertices ] keep
-    '[ dup , adjlist 2array ] map >hashtable sparse-graph boa ;
+    '[ dup _ adjlist 2array ] map >hashtable sparse-graph boa ;
 
 INSTANCE: sparse-graph graph
 

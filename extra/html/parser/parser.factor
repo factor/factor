@@ -1,6 +1,6 @@
 USING: accessors arrays html.parser.utils hashtables io kernel
-namespaces prettyprint quotations
-sequences splitting state-parser strings unicode.categories unicode.case
+namespaces make prettyprint quotations sequences splitting
+state-parser strings unicode.categories unicode.case
 sequences.lib ;
 IN: html.parser
 

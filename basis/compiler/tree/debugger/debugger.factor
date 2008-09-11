@@ -16,7 +16,7 @@ IN: compiler.tree.debugger
 GENERIC: node>quot ( node -- )
 
 MACRO: match-choose ( alist -- )
-    [ '[ , ] ] assoc-map '[ , match-cond ] ;
+    [ [ ] curry ] assoc-map [ match-cond ] curry ;
 
 MATCH-VARS: ?a ?b ?c ;
 

@@ -14,7 +14,7 @@ DEFER: (del-page)
 
 :: add-toggle ( model n name toggler -- )
   <frame>
-    n name toggler parent>> '[ , , , (del-page) ] "X" swap <bevel-button>
+    n name toggler parent>> '[ _ _ _ (del-page) ] "X" swap <bevel-button>
       @right grid-add
     n model name <toggle-button> @center grid-add
   toggler swap add-gadget drop ;
@@ -23,7 +23,7 @@ DEFER: (del-page)
      [ names>> ] [ model>> ] [ toggler>> ] tri
      [ clear-gadget ] keep
      [ [ length ] keep ] 2dip
-     '[ [ , ] 2dip , add-toggle ] 2each ;
+     '[ [ _ ] 2dip _ add-toggle ] 2each ;
 
 : refresh-book ( tabbed -- )
     model>> [ ] change-model ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel ascii combinators combinators.short-circuit
-sequences splitting fry namespaces assocs arrays strings
+sequences splitting fry namespaces make assocs arrays strings
 io.sockets io.sockets.secure io.encodings.string
 io.encodings.utf8 math math.parser accessors parser
 strings.parser lexer prettyprint.backend hashtables present ;
@@ -105,7 +105,7 @@ TUPLE: url protocol username password host port path query anchor ;
     swap query>> at ;
 
 : set-query-param ( url value key -- url )
-    '[ [ , , ] dip ?set-at ] change-query ;
+    '[ [ _ _ ] dip ?set-at ] change-query ;
 
 : parse-host ( string -- host port )
     ":" split1 [ url-decode ] [
@@ -220,7 +220,7 @@ PRIVATE>
     } case ;
 
 : ensure-port ( url -- url' )
-    dup protocol>> '[ , protocol-port or ] change-port ;
+    dup protocol>> '[ _ protocol-port or ] change-port ;
 
 ! Literal syntax
 : URL" lexer get skip-blank parse-string >url parsed ; parsing

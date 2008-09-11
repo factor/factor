@@ -21,16 +21,16 @@ DEFER: define-lisp-macro
 
 : convert-cond ( cons -- quot )
     cdr [ 2car [ convert-form ] bi@ 2array ]
-    { } lmap-as '[ , cond ] ;
+    { } lmap-as '[ _ cond ] ;
 
 : convert-general-form ( cons -- quot )
-    uncons [ convert-body ] [ convert-form ] bi* '[ , @ funcall ] ;
+    uncons [ convert-body ] [ convert-form ] bi* '[ _ @ funcall ] ;
 
 ! words for convert-lambda
 <PRIVATE
 : localize-body ( assoc body -- newbody )
     {
-      { [ dup list? ] [ [ lisp-symbol? ] rot '[ [ name>> , at ] [ ] bi or ] traverse ] }
+      { [ dup list? ] [ [ lisp-symbol? ] rot '[ [ name>> _ at ] [ ] bi or ] traverse ] }
       { [ dup lisp-symbol? ] [ name>> swap at ] }
      [ nip ]
     } cond ;
@@ -46,7 +46,7 @@ DEFER: define-lisp-macro
 : rest-lambda ( body vars -- quot )
     "&rest" swap [ remove ] [ index ] 2bi
     [ localize-lambda <lambda> lambda-rewrite call ] dip
-    swap '[ , cut '[ @ , seq>list ] call , call call ] 1quotation ;
+    swap '[ _ cut '[ @ _ seq>list ] call _ call call ] 1quotation ;
 
 : normal-lambda ( body vars -- quot )
     localize-lambda <lambda> lambda-rewrite '[ @ compose call call ] 1quotation ;
@@ -74,7 +74,7 @@ PRIVATE>
 
 : convert-begin ( cons -- quot )
     cdr [ convert-form ] [ ] lmap-as [ 1 tail* ] [ but-last ] bi
-    [ '[ { } , with-datastack drop ] ] map prepend '[ , [ call ] each ] ;
+    [ '[ { } _ with-datastack drop ] ] map prepend '[ _ [ call ] each ] ;
 
 : form-dispatch ( cons lisp-symbol -- quot )
     name>>
@@ -97,7 +97,7 @@ PRIVATE>
     {
       { [ dup cons? ] [ convert-list-form ] }
       { [ dup lisp-var? ] [ lookup-var 1quotation ] }
-      { [ dup lisp-symbol? ] [ '[ , lookup-var ] ] }
+      { [ dup lisp-symbol? ] [ '[ _ lookup-var ] ] }
      [ 1quotation ]
     } cond ;
 
@@ -138,7 +138,7 @@ M: no-such-var summary drop "No such variable" ;
     [ 1array [ call ] with-datastack >quotation ] dip curry call ; inline
 
 : define-primitive ( name vocab word -- )
-    swap lookup 1quotation '[ , compose call ] swap lisp-define ;
+    swap lookup 1quotation '[ _ compose call ] swap lisp-define ;
 
 : lookup-macro ( lisp-symbol -- lambda )
     name>> macro-env get at ;

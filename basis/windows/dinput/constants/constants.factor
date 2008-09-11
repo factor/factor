@@ -78,7 +78,7 @@ SYMBOLS:
 
 : (malloc-guid-symbol) ( symbol guid -- )
     global swap '[ [
-        , execute [ byte-length malloc ] [ over byte-array>memory ] bi
+        _ execute [ byte-length malloc ] [ over byte-array>memory ] bi
     ] unless* ] change-at ;
 
 : define-guid-constants ( -- )

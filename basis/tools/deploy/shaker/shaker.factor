@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors qualified io.streams.c init fry namespaces
+USING: accessors qualified io.streams.c init fry namespaces make
 assocs kernel parser lexer strings.parser tools.deploy.config
 vocabs sequences words words.private memory kernel.private
 continuations io prettyprint vocabs.loader debugger system
@@ -76,7 +76,7 @@ IN: tools.deploy.shaker
     [
         [
             props>> swap
-            '[ drop , member? not ] assoc-filter sift-assoc
+            '[ drop _ member? not ] assoc-filter sift-assoc
             dup assoc-empty? [ drop f ] [ >alist >vector ] if
         ] keep (>>props)
     ] with each ;
@@ -283,7 +283,7 @@ IN: tools.deploy.shaker
     strip-globals? [
         "Stripping globals" show
         global swap
-        '[ drop , member? not ] assoc-filter
+        '[ drop _ member? not ] assoc-filter
         [ drop string? not ] assoc-filter ! strip CLI args
         sift-assoc
         dup keys unparse show

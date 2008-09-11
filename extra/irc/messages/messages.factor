@@ -77,7 +77,7 @@ M: irc-message irc-message>server-line ( irc-message -- string )
 ! ======================================
 
 : split-at-first ( seq separators -- before after )
-    dupd '[ , member? ] find
+    dupd '[ _ member? ] find
         [ cut 1 tail ]
         [ swap ]
     if ;
@@ -127,4 +127,4 @@ M: sender-in-prefix irc-message-sender ( sender-in-prefix -- sender )
     } case
     [ [ tuple-slots ] [ parameters>> ] bi append ] dip
     [ all-slots over [ length ] bi@ min head >quotation ] keep
-    '[ @ , boa ] call ;
+    '[ @ _ boa ] call ;

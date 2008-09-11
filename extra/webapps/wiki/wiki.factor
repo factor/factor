@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel hashtables calendar random assocs
-namespaces splitting sequences sorting math.order present
+namespaces make splitting sequences sorting math.order present
 io.files io.encodings.ascii
 syndication farkup
 html.components html.forms

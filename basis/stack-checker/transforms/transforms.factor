@@ -19,7 +19,7 @@ IN: stack-checker.transforms
     dup [
         [
             [ drop ] [
-                [ length meta-d get '[ , pop* ] times ]
+                [ length meta-d get '[ _ pop* ] times ]
                 [ #drop, ]
                 bi
             ] bi*
@@ -97,7 +97,7 @@ IN: stack-checker.transforms
     dup tuple-class? [
         dup inlined-dependency depends-on
         [ "boa-check" word-prop ]
-        [ tuple-layout '[ , <tuple-boa> ] ]
+        [ tuple-layout '[ _ <tuple-boa> ] ]
         bi append
     ] [ drop f ] if
 ] 1 define-transform

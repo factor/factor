@@ -9,7 +9,7 @@ IN: ui.gadgets.tracks
 TUPLE: track < pack sizes ;
 
 : normalized-sizes ( track -- seq )
-  sizes>> dup sift sum '[ dup [ , / ] when ] map ;
+  sizes>> dup sift sum '[ dup [ _ / ] when ] map ;
 
 : init-track ( track -- track )
   init-gadget

@@ -125,7 +125,7 @@ TUPLE: joystick-demo-gadget < pack axis raxis controller buttons alarm ;
     [ (update-axes) ] [ kill-update-axes ] if* ;
 
 M: joystick-demo-gadget graft*
-    dup '[ , update-axes ] FREQUENCY every >>alarm
+    dup '[ _ update-axes ] FREQUENCY every >>alarm
     drop ;
 
 M: joystick-demo-gadget ungraft*

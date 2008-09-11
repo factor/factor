@@ -6,12 +6,12 @@ IN: compiler.tree.combinators
 
 : each-node ( nodes quot: ( node -- ) -- )
     dup dup '[
-        , [
+        _ [
             dup #branch? [
-                children>> [ , each-node ] each
+                children>> [ _ each-node ] each
             ] [
                 dup #recursive? [
-                    child>> , each-node
+                    child>> _ each-node
                 ] [ drop ] if
             ] if
         ] bi
@@ -21,22 +21,22 @@ IN: compiler.tree.combinators
     dup dup '[
         @
         dup #branch? [
-            [ [ , map-nodes ] map ] change-children
+            [ [ _ map-nodes ] map ] change-children
         ] [
             dup #recursive? [
-                [ , map-nodes ] change-child
+                [ _ map-nodes ] change-child
             ] when
         ] if
     ] map flatten ; inline recursive
 
 : contains-node? ( nodes quot: ( node -- ? ) -- ? )
     dup dup '[
-        , keep swap [ drop t ] [
+        _ keep swap [ drop t ] [
             dup #branch? [
-                children>> [ , contains-node? ] contains?
+                children>> [ _ contains-node? ] contains?
             ] [
                 dup #recursive? [
-                    child>> , contains-node?
+                    child>> _ contains-node?
                 ] [ drop f ] if
             ] if
         ] if

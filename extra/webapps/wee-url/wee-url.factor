@@ -26,7 +26,7 @@ short-url "SHORT_URLS" {
     1 6 [a,b] random [ letter-bank random ] "" replicate-as ;
 
 : insert-short-url ( short-url -- short-url )
-    '[ , dup random-url >>short insert-tuple ] 10 retry ;
+    '[ _ dup random-url >>short insert-tuple ] 10 retry ;
 
 : shorten ( url -- short )
     short-url new swap >>url dup select-tuple

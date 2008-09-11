@@ -1,11 +1,10 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-
-USING: combinators generic assocs help http io io.styles io.files
-       continuations io.streams.string kernel math math.order math.parser
-       namespaces quotations assocs sequences strings words html.elements
-       xml.entities sbufs continuations destructors accessors arrays ;
-
+USING: combinators generic assocs help http io io.styles
+io.files continuations io.streams.string kernel math math.order
+math.parser namespaces make quotations assocs sequences strings
+words html.elements xml.entities sbufs continuations destructors
+accessors arrays ;
 IN: html.streams
 
 GENERIC: browser-link-href ( presented -- href )

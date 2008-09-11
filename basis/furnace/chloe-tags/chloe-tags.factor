@@ -56,7 +56,7 @@ CHLOE: write-atom drop [ write-atom-feeds ] [code] ;
 
 : compile-link-attrs ( tag -- )
     #! Side-effects current namespace.
-    attrs>> '[ [ [ , ] dip link-attr ] each-responder ] [code] ;
+    attrs>> '[ [ [ _ ] dip link-attr ] each-responder ] [code] ;
 
 : a-start-tag ( tag -- )
     [ compile-link-attrs ] [ compile-a-url ] bi
@@ -72,7 +72,7 @@ CHLOE: a
 
 : compile-hidden-form-fields ( for -- )
     '[
-        , [ "," split [ hidden render ] each ] when*
+        _ [ "," split [ hidden render ] each ] when*
         nested-forms get " " join f like nested-forms-key hidden-form-field
         [ modify-form ] each-responder
     ] [code] ;

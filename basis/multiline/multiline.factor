@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces parser lexer kernel sequences words quotations math
-accessors ;
+USING: namespaces make parser lexer kernel sequences words
+quotations math accessors ;
 IN: multiline
 
 <PRIVATE

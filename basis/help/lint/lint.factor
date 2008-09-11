@@ -39,7 +39,7 @@ IN: help.lint
         $predicate
         $class-description
         $error-description
-    } swap '[ , elements empty? not ] contains? ;
+    } swap '[ _ elements empty? not ] contains? ;
 
 : check-values ( word element -- )
     {
@@ -110,7 +110,7 @@ M: help-error error.
     H{ } clone [
         '[
             dup >link where dup
-            [ first , at , push-at ] [ 2drop ] if
+            [ first _ at _ push-at ] [ 2drop ] if
         ] each
     ] keep ;
 

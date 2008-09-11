@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel combinators math namespaces
+USING: accessors kernel combinators math namespaces make
 assocs sequences splitting sorting sets debugger
 strings vectors hashtables quotations arrays byte-arrays
 math.parser calendar calendar.format present
@@ -28,7 +28,7 @@ IN: http
     [ read-crlf dup f like ] [ parse-header-line ] [ drop ] produce ;
 
 : collect-headers ( assoc -- assoc' )
-    H{ } clone [ '[ , push-at ] assoc-each ] keep ;
+    H{ } clone [ '[ _ push-at ] assoc-each ] keep ;
 
 : process-header ( alist -- assoc )
     f swap [ [ swap or dup ] dip swap ] assoc-map nip
@@ -196,7 +196,7 @@ M: response clone
         [ clone ] change-cookies ;
 
 : get-cookie ( request/response name -- cookie/f )
-    [ cookies>> ] dip '[ [ , ] dip name>> = ] find nip ;
+    [ cookies>> ] dip '[ [ _ ] dip name>> = ] find nip ;
 
 : delete-cookie ( request/response name -- )
     over cookies>> [ get-cookie ] dip delete ;

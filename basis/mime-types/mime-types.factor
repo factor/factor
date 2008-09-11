@@ -17,7 +17,7 @@ MEMO: mime-db ( -- seq )
 
 MEMO: mime-types ( -- assoc )
     [
-        mime-db [ unclip '[ [ , ] dip set ] each ] each
+        mime-db [ unclip '[ [ _ ] dip set ] each ] each
     ] H{ } make-assoc
     nonstandard-mime-types assoc-union ;
 

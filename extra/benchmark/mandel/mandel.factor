@@ -1,8 +1,8 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays io kernel math math.functions math.order
-math.parser sequences byte-arrays byte-vectors io.files
-io.encodings.binary fry namespaces benchmark.mandel.params
+USING: arrays io kernel namespaces math math.functions
+math.order math.parser sequences byte-arrays byte-vectors
+io.files io.encodings.binary fry make benchmark.mandel.params
 benchmark.mandel.colors ;
 IN: benchmark.mandel
 
@@ -19,13 +19,13 @@ IN: benchmark.mandel
 
 : pixel ( c -- iterations )
     [ C{ 0.0 0.0 } max-iterations ] dip
-    '[ sq , + ] [ absq 4.0 >= ] count-iterations ; inline
+    '[ sq _ + ] [ absq 4.0 >= ] count-iterations ; inline
 
 : color ( iterations -- color )
     [ color-map [ length mod ] keep nth ] [ B{ 0 0 0 } ] if* ; inline
 
 : render ( -- )
-    height [ width swap '[ , c pixel color % ] each ] each ; inline
+    height [ width swap '[ _ c pixel color % ] each ] each ; inline
 
 : ppm-header ( -- )
     "P6\n" % width # " " % height # "\n255\n" % ; inline

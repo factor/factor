@@ -1,6 +1,6 @@
 USING: accessors values kernel sequences assocs io.files
 io.encodings ascii math.ranges io splitting math.parser 
-namespaces byte-arrays locals math sets io.encodings.ascii
+namespaces make byte-arrays locals math sets io.encodings.ascii
 words compiler.units arrays interval-maps unicode.data ;
 IN: unicode.script
 

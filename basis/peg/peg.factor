@@ -356,7 +356,7 @@ TUPLE: token-parser symbol ;
   ] if ;
 
 M: token-parser (compile) ( peg -- quot )
-  symbol>> '[ input-slice , parse-token ] ;
+  symbol>> '[ input-slice _ parse-token ] ;
    
 TUPLE: satisfy-parser quot ;
 
@@ -373,7 +373,7 @@ TUPLE: satisfy-parser quot ;
 
 
 M: satisfy-parser (compile) ( peg -- quot )
-  quot>> '[ input-slice , parse-satisfy ] ;
+  quot>> '[ input-slice _ parse-satisfy ] ;
 
 TUPLE: range-parser min max ;
 
@@ -389,7 +389,7 @@ TUPLE: range-parser min max ;
   ] if ;
 
 M: range-parser (compile) ( peg -- quot )
-  [ min>> ] [ max>> ] bi '[ input-slice , , parse-range ] ;
+  [ min>> ] [ max>> ] bi '[ input-slice _ _ parse-range ] ;
 
 TUPLE: seq-parser parsers ;
 
@@ -447,7 +447,7 @@ TUPLE: repeat0-parser p1 ;
 
 M: repeat0-parser (compile) ( peg -- quot )
   p1>> compile-parser 1quotation '[ 
-    input-slice V{ } clone <parse-result> , swap (repeat) 
+    input-slice V{ } clone <parse-result> _ swap (repeat) 
   ] ; 
 
 TUPLE: repeat1-parser p1 ;
@@ -461,7 +461,7 @@ TUPLE: repeat1-parser p1 ;
 
 M: repeat1-parser (compile) ( peg -- quot )
   p1>> compile-parser 1quotation '[ 
-    input-slice V{ } clone <parse-result> , swap (repeat) repeat1-empty-check  
+    input-slice V{ } clone <parse-result> _ swap (repeat) repeat1-empty-check  
   ] ; 
 
 TUPLE: optional-parser p1 ;
@@ -483,7 +483,7 @@ TUPLE: semantic-parser p1 quot ;
 
 M: semantic-parser (compile) ( peg -- quot )
   [ p1>> compile-parser 1quotation ] [ quot>> ] bi  
-  '[ @ , check-semantic ] ;
+  '[ @ _ check-semantic ] ;
 
 TUPLE: ensure-parser p1 ;
 
@@ -511,7 +511,7 @@ TUPLE: action-parser p1 quot ;
   ] if ; inline
 
 M: action-parser (compile) ( peg -- quot )
-  [ p1>> compile-parser 1quotation ] [ quot>> ] bi '[ @ , check-action ] ;
+  [ p1>> compile-parser 1quotation ] [ quot>> ] bi '[ @ _ check-action ] ;
 
 TUPLE: sp-parser p1 ;
 

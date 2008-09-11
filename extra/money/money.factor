@@ -1,5 +1,5 @@
 USING: io kernel math math.functions math.parser parser lexer
-namespaces sequences splitting grouping combinators
+namespaces make sequences splitting grouping combinators
 continuations sequences.lib ;
 IN: money
 

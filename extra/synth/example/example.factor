@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel namespaces openal sequences synth synth.buffers ;
+USING: accessors arrays kernel namespaces make openal sequences
+synth synth.buffers ;
 IN: synth.example
 
 : play-sine-wave ( freq seconds sample-freq -- )

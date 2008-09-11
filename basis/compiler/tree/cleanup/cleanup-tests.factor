@@ -36,7 +36,7 @@ compiler.tree.checker ;
 : inlined? ( quot seq/word -- ? )
     [ cleaned-up-tree ] dip
     dup word? [ 1array ] when
-    '[ dup #call? [ word>> , member? ] [ drop f ] if ]
+    '[ dup #call? [ word>> _ member? ] [ drop f ] if ]
     contains-node? not ;
 
 [ f ] [

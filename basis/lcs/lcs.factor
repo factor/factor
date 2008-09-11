@@ -1,5 +1,6 @@
 USING: sequences kernel math locals math.order math.ranges
-accessors arrays namespaces combinators combinators.short-circuit ;
+accessors arrays namespaces make combinators
+combinators.short-circuit ;
 IN: lcs
 
 <PRIVATE
