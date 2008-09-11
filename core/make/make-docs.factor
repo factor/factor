@@ -2,7 +2,7 @@ IN: make
 USING: help.markup help.syntax quotations sequences math.parser
 kernel ;
 
-ARTICLE: "namespaces-make" "Constructing sequences"
+ARTICLE: "namespaces-make" "Making sequences with variables"
 "The " { $vocab-link "make" } " vocabulary implements a facility for constructing sequences by holding an accumulator sequence in a variable. Storing the accumulator sequence in a variable rather than the stack may allow code to be written with less stack manipulation."
 { $subsection make }
 { $subsection , }
