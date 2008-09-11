@@ -329,7 +329,7 @@ CLASS: {
     [ 3drop 0 0 0 0 <NSRect> ]
 }
 
-{ "conversationIdentifier" "long" { "id" "SEL" }
+{ "conversationIdentifier" "NSInteger" { "id" "SEL" }
     [ drop alien-address ]
 }
 

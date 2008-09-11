@@ -144,16 +144,22 @@ objc>alien-types get [ swap ] assoc-map
 ! A hack...
 "ptrdiff_t" heap-size {
     { 4 [ H{
-        { "NSPoint" "{_NSPoint=ff}" }
-        { "NSRect" "{_NSRect={_NSPoint=ff}{_NSSize=ff}}" }
-        { "NSSize" "{_NSSize=ff}" }
-        { "NSRange" "{_NSRange=II}" }
+        { "NSPoint"    "{_NSPoint=ff}" }
+        { "NSRect"     "{_NSRect={_NSPoint=ff}{_NSSize=ff}}" }
+        { "NSSize"     "{_NSSize=ff}" }
+        { "NSRange"    "{_NSRange=II}" }
+        { "NSInteger"  "i" }
+        { "NSUInteger" "I" }
+        { "CGFloat"    "f" }
     } ] }
     { 8 [ H{
-        { "NSPoint" "{CGPoint=dd}" }
-        { "NSRect" "{CGRect={CGPoint=dd}{CGSize=dd}}" }
-        { "NSSize" "{CGSize=dd}" }
-        { "NSRange" "{_NSRange=QQ}" }
+        { "NSPoint"    "{CGPoint=dd}" }
+        { "NSRect"     "{CGRect={CGPoint=dd}{CGSize=dd}}" }
+        { "NSSize"     "{CGSize=dd}" }
+        { "NSRange"    "{_NSRange=QQ}" }
+        { "NSInteger"  "q" }
+        { "NSUInteger" "Q" }
+        { "CGFloat"    "d" }
     } ] }
 } case
 assoc-union alien>objc-types set-global
