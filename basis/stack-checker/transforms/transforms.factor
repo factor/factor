@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors arrays kernel words sequences generic math
-namespaces quotations assocs combinators classes.tuple
+namespaces make quotations assocs combinators classes.tuple
 classes.tuple.private effects summary hashtables classes generic
 sets definitions generic.standard slots.private continuations
 stack-checker.backend stack-checker.state stack-checker.visitor

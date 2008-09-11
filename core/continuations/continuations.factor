@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays vectors kernel kernel.private sequences
-namespaces math splitting sorting quotations assocs
+namespaces make math splitting sorting quotations assocs
 combinators accessors ;
 IN: continuations
 

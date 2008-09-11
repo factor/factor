@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel kernel.private math math.private words
-sequences parser namespaces assocs quotations arrays locals
+sequences parser namespaces make assocs quotations arrays locals
 generic generic.math hashtables effects compiler.units ;
 IN: math.partial-dispatch
 

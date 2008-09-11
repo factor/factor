@@ -457,3 +457,24 @@ cell-bits 32 = [
     [ [ >r "A" throw r> ] [ "B" throw ] if ]
     cleaned-up-tree drop
 ] unit-test
+
+! Regression from benchmark.nsieve
+: chicken-fingers ( i seq -- )
+    2dup < [
+        2drop
+    ] [
+        chicken-fingers
+    ] if ; inline recursive
+
+: buffalo-wings ( i seq -- )
+    2dup < [
+        2dup chicken-fingers
+        >r 1+ r> buffalo-wings
+    ] [
+        2drop
+    ] if ; inline recursive
+
+[ t ] [
+    [ 2 swap >fixnum buffalo-wings ]
+    { <-integer-fixnum +-integer-fixnum } inlined?
+] unit-test

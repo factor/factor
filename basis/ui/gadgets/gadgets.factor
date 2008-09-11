@@ -1,10 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays hashtables kernel models math namespaces
-       sequences quotations math.vectors combinators sorting
-       binary-search vectors dlists deques models threads
-       concurrency.flags math.order math.geometry.rect ;
-
+make sequences quotations math.vectors combinators sorting
+binary-search vectors dlists deques models threads
+concurrency.flags math.order math.geometry.rect ;
 IN: ui.gadgets
 
 SYMBOL: ui-notify-flag

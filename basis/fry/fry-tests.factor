@@ -19,29 +19,25 @@ sequences ;
 [ [ + ] [ - ] '[ 1 2 @ 3 4 @ ] ] unit-test
 
 [ 1/2 ] [
-    1 '[ , _ / ] 2 swap call
+    1 '[ [ , ] dip / ] 2 swap call
 ] unit-test
 
 [ { { 1 "a" "A" } { 1 "b" "B" } { 1 "c" "C" } } ] [
-    1 '[ , _ _ 3array ]
+    1 '[ [ , ] 2dip 3array ]
     { "a" "b" "c" } { "A" "B" "C" } rot 2map
 ] unit-test
 
 [ { { 1 "a" } { 1 "b" } { 1 "c" } } ] [
-    '[ 1 _ 2array ]
+    '[ [ 1 ] dip 2array ]
     { "a" "b" "c" } swap map
-] unit-test
-
-[ 1 2 ] [
-    1 2 '[ _ , ] call
 ] unit-test
 
 [ { { 1 "a" 2 } { 1 "b" 2 } { 1 "c" 2 } } ] [
-    1 2 '[ , _ , 3array ]
+    1 2 '[ [ , ] dip , 3array ]
     { "a" "b" "c" } swap map
 ] unit-test
 
-: funny-dip '[ @ _ ] call ; inline
+: funny-dip '[ [ @ ] dip ] call ; inline
 
 [ "hi" 3 ] [ "h" "i" 3 [ append ] funny-dip ] unit-test
 

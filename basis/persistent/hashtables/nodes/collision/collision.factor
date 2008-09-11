@@ -8,7 +8,7 @@ persistent.hashtables.nodes.leaf ;
 IN: persistent.hashtables.nodes.collision
 
 : find-index ( key hashcode collision-node -- n leaf-node )
-    leaves>> -rot '[ , , _ matching-key? ] find ; inline
+    leaves>> -rot '[ [ , , ] dip matching-key? ] find ; inline
 
 M:: collision-node (entry-at) ( key hashcode collision-node -- leaf-node )
     key hashcode collision-node find-index nip ;

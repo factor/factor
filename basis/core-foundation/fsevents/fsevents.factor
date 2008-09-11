@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax kernel
-math sequences namespaces assocs init accessors continuations
-combinators core-foundation core-foundation.run-loop
-io.encodings.utf8 destructors ;
+math sequences namespaces make assocs init accessors
+continuations combinators core-foundation
+core-foundation.run-loop io.encodings.utf8 destructors ;
 IN: core-foundation.fsevents
 
 ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !

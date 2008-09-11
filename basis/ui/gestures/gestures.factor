@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs kernel math models namespaces
-sequences words strings system hashtables math.parser
-math.vectors classes.tuple classes ui.gadgets boxes
-calendar alarms symbols combinators sets columns ;
+make sequences words strings system hashtables math.parser
+math.vectors classes.tuple classes ui.gadgets boxes calendar
+alarms symbols combinators sets columns ;
 IN: ui.gestures
 
 : set-gestures ( class hash -- ) "gestures" set-word-prop ;

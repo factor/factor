@@ -1,13 +1,14 @@
 ! Copyright (C) 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences combinators parser splitting math
-quotations arrays namespaces qualified ;
-QUALIFIED: namespaces
+quotations arrays make qualified words ;
+QUALIFIED: make
 IN: fry
 
 : , ( -- * ) "Only valid inside a fry" throw ;
 : @ ( -- * ) "Only valid inside a fry" throw ;
-: _ ( -- * ) "Only valid inside a fry" throw ;
+
+<PRIVATE
 
 DEFER: (shallow-fry)
 DEFER: shallow-fry
@@ -19,15 +20,13 @@ DEFER: shallow-fry
     ] unless-empty ; inline
 
 : (shallow-fry) ( accum quot -- result )
-    [
-        1quotation
-    ] [
+    [ 1quotation ] [
         unclip {
             { \ , [ [ curry ] ((shallow-fry)) ] }
             { \ @ [ [ compose ] ((shallow-fry)) ] }
 
             ! to avoid confusion, remove if fry goes core
-            { \ namespaces:, [ [ curry ] ((shallow-fry)) ] }
+            { \ make:, [ [ curry ] ((shallow-fry)) ] }
 
             [ swap >r suffix r> (shallow-fry) ]
         } case
@@ -35,32 +34,23 @@ DEFER: shallow-fry
 
 : shallow-fry ( quot -- quot' ) [ ] swap (shallow-fry) ;
 
-: deep-fry ( quot -- quot )
-    { _ } last-split1 dup [
-      shallow-fry [ >r ] rot
-      deep-fry    [ [ dip ] curry r> compose ] 4array concat
-    ] [
-        drop shallow-fry
-    ] if ;
+PREDICATE: fry-specifier < word { , make:, @ } memq? ;
 
-: fry-specifier? ( obj -- ? ) { , namespaces:, @ } member? ;
+GENERIC: count-inputs ( quot -- n )
 
-: count-inputs ( quot -- n )
-    [
-        {
-            { [ dup callable?      ] [ count-inputs ] }
-            { [ dup fry-specifier? ] [ drop 1       ] }
-                                     [ drop 0       ]
-        } cond
-    ] map sum ;
-    
+M: callable count-inputs [ count-inputs ] sigma ;
+M: fry-specifier count-inputs drop 1 ;
+M: object count-inputs drop 0 ;
+
+PRIVATE>
+
 : fry ( quot -- quot' )
     [
         [
             dup callable? [
                 [ count-inputs \ , <repetition> % ] [ fry % ] bi
-            ] [ namespaces:, ] if
+            ] [ make:, ] if
         ] each
-    ] [ ] make deep-fry ;
+    ] [ ] make shallow-fry ;
 
 : '[ \ ] parse-until fry over push-all ; parsing

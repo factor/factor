@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov, Jorge Acereda Macia.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files io words alien kernel math.parser alien.syntax
-io.launcher system assocs arrays sequences namespaces qualified
-system math compiler.generator.fixup io.encodings.ascii
-accessors generic tr ;
+io.launcher system assocs arrays sequences namespaces make
+qualified system math compiler.generator.fixup
+io.encodings.ascii accessors generic tr ;
 IN: tools.disassembler
 
 : in-file ( -- path ) "gdb-in.txt" temp-file ;

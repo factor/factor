@@ -14,8 +14,8 @@ MACRO: narray ( n -- quot )
 
 MACRO: firstn ( n -- )
     dup zero? [ drop [ drop ] ] [
-        [ [ '[ , _ nth-unsafe ] ] map ]
-        [ 1- '[ , _ bounds-check 2drop ] ]
+        [ [ '[ [ , ] dip nth-unsafe ] ] map ]
+        [ 1- '[ [ , ] dip bounds-check 2drop ] ]
         bi prefix '[ , cleave ]
     ] if ;
 

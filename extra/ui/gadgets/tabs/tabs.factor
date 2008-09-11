@@ -23,7 +23,7 @@ DEFER: (del-page)
      [ names>> ] [ model>> ] [ toggler>> ] tri
      [ clear-gadget ] keep
      [ [ length ] keep ] 2dip
-    '[ , _ _ , add-toggle ] 2each ;
+     '[ [ , ] 2dip , add-toggle ] 2each ;
 
 : refresh-book ( tabbed -- )
     model>> [ ] change-model ;

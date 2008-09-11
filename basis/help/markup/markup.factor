@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions generic io kernel assocs
-hashtables namespaces parser prettyprint sequences strings
+hashtables namespaces make parser prettyprint sequences strings
 io.styles vectors words math sorting splitting classes slots
 vocabs help.stylesheet help.topics vocabs.loader alias ;
 IN: help.markup

@@ -18,4 +18,4 @@ LOG: received-datagram NOTICE
 PRIVATE>
 
 : with-datagrams ( seq service quot -- )
-    '[ [ , _ spawn-datagrams ] parallel-each ] with-logging ; inline
+    '[ [ [ , ] dip spawn-datagrams ] parallel-each ] with-logging ; inline

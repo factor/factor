@@ -56,7 +56,7 @@ CHLOE: write-atom drop [ write-atom-feeds ] [code] ;
 
 : compile-link-attrs ( tag -- )
     #! Side-effects current namespace.
-    attrs>> '[ [ , _ link-attr ] each-responder ] [code] ;
+    attrs>> '[ [ [ , ] dip link-attr ] each-responder ] [code] ;
 
 : a-start-tag ( tag -- )
     [ compile-link-attrs ] [ compile-a-url ] bi

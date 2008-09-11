@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel assocs fry match accessors namespaces effects
+USING: kernel assocs fry match accessors namespaces make effects
 sequences sequences.private quotations generic macros arrays
 prettyprint prettyprint.backend prettyprint.sections math words
 combinators io sorting hints

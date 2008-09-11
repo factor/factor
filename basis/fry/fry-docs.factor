@@ -7,9 +7,6 @@ HELP: ,
 HELP: @
 { $description "Fry specifier. Splices a quotation into the fried quotation." } ;
 
-HELP: _
-{ $description "Fry specifier. Shifts all fry specifiers to the left down by one stack position." } ;
-
 HELP: fry
 { $values { "quot" quotation } { "quot'" quotation } }
 { $description "Outputs a quotation that when called, fries " { $snippet "quot" } " by taking values from the stack and substituting them in." }
@@ -52,25 +49,11 @@ $nl
     "{ 8 13 14 27 } [ even? ] 5 [ dup ] swap [ ? ] curry 3compose map"
     "{ 8 13 14 27 } [ even? dup 5 ? ] map"
 }
-"Occurrences of " { $link _ } " have the effect of enclosing all code to their left in a quotation passed to " { $link dip } ". The following four lines are equivalent:"
-{ $code 
-    "{ 10 20 30 } 1 '[ , _ / ] map"
-    "{ 10 20 30 } 1 [ [ ] curry dip / ] curry map"
-    "{ 10 20 30 } 1 [ swap / ] curry map"
-    "{ 10 20 30 } [ 1 swap / ] map"
-}
-"For any quotation body " { $snippet "X" } ", the following two are equivalent:"
-{ $code
-    "[ [ X ] dip ]"
-    "'[ X _ ]"
-}
 "Here are some built-in combinators rewritten in terms of fried quotations:"
 { $table
     { { $link literalize } { $snippet ": literalize '[ , ] ;" } }
     { { $link slip } { $snippet ": slip '[ @ , ] call ;" } }
-    { { $link dip } { $snippet ": dip '[ @ _ ] call ;" } }
     { { $link curry } { $snippet ": curry '[ , @ ] ;" } }
-    { { $link with } { $snippet ": with swapd '[ , _ @ ] ;" } }
     { { $link compose } { $snippet ": compose '[ @ @ ] ;" } }
     { { $link bi@ } { $snippet ": bi@ tuck '[ , @ , @ ] call ;" } }
 } ;
@@ -85,11 +68,6 @@ ARTICLE: "fry.philosophy" "Fried quotation philosophy"
 { $code
     "'[ 3 , + 4 , / ]"
     "[let | a [ ] b [ ] | [ 3 a + 4 b / ] ]"
-}
-"The " { $link _ } " fry specifier has no direct analogue in " { $vocab-link "locals" } ", however closure conversion together with the " { $link dip } " combinator achieve the same effect:"
-{ $code
-    "'[ , 2 + , * _ / ]"
-    "[let | a [ ] b [ ] | [ [ a 2 + b * ] dip / ] ]"
 } ;
 
 ARTICLE: "fry.limitations" "Fried quotation limitations"
@@ -103,7 +81,6 @@ $nl
 "Fried quotations contain zero or more " { $emphasis "fry specifiers" } ":"
 { $subsection , }
 { $subsection @ }
-{ $subsection _ }
 "When a fried quotation is being evaluated, values are consumed from the stack and spliced into the quotation from right to left."
 { $subsection "fry.examples" }
 { $subsection "fry.philosophy" }

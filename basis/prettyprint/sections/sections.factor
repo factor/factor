@@ -1,7 +1,7 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays generic hashtables io kernel math assocs
-namespaces sequences strings io.styles vectors words
+namespaces make sequences strings io.styles vectors words
 prettyprint.config splitting classes continuations
 io.streams.nested accessors sets ;
 IN: prettyprint.sections

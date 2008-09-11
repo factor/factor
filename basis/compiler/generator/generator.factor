@@ -1,15 +1,15 @@
- ! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators
 cpu.architecture effects generic hashtables io kernel
-kernel.private layouts math math.parser namespaces prettyprint
-quotations sequences system threads words vectors sets deques
-continuations.private summary alien alien.c-types
+kernel.private layouts math math.parser namespaces make
+prettyprint quotations sequences system threads words vectors
+sets deques continuations.private summary alien alien.c-types
 alien.structs alien.strings alien.arrays libc compiler.errors
-stack-checker.inlining
-compiler.tree compiler.tree.builder compiler.tree.combinators
-compiler.tree.propagation.info compiler.generator.fixup
-compiler.generator.registers compiler.generator.iterator ;
+stack-checker.inlining compiler.tree compiler.tree.builder
+compiler.tree.combinators compiler.tree.propagation.info
+compiler.generator.fixup compiler.generator.registers
+compiler.generator.iterator ;
 IN: compiler.generator
 
 SYMBOL: compile-queue

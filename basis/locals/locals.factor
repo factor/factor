@@ -1,14 +1,13 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces sequences sequences.private assocs math
-       vectors strings classes.tuple generalizations 
-       parser words quotations debugger macros arrays macros splitting
-       combinators prettyprint.backend definitions prettyprint
-       hashtables prettyprint.sections sets sequences.private effects
-       effects.parser generic generic.parser compiler.units accessors
-       locals.backend memoize macros.expander lexer
-       stack-checker.known-words ;
-
+USING: kernel namespaces make sequences sequences.private assocs
+math vectors strings classes.tuple generalizations parser words
+quotations debugger macros arrays macros splitting combinators
+prettyprint.backend definitions prettyprint hashtables
+prettyprint.sections sets sequences.private effects
+effects.parser generic generic.parser compiler.units accessors
+locals.backend memoize macros.expander lexer
+stack-checker.known-words ;
 IN: locals
 
 ! Inspired by

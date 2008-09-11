@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays io kernel math models namespaces
+USING: accessors arrays io kernel math models namespaces make
 sequences strings splitting combinators unicode.categories
 math.order ;
 IN: documents

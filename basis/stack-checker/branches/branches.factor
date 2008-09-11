@@ -22,7 +22,7 @@ SYMBOL: +bottom+
 
 : phi-inputs ( max-d-in pairs -- newseq )
     dup empty? [ nip ] [
-        swap '[ , _ first2 unify-inputs ] map
+        swap '[ [ , ] dip first2 unify-inputs ] map
         pad-with-bottom
     ] if ;
 
@@ -50,7 +50,7 @@ SYMBOL: quotations
     ] if-empty ;
 
 : branch-variable ( seq symbol -- seq )
-    '[ , _ at ] map ;
+    '[ [ , ] dip at ] map ;
 
 : active-variable ( seq symbol -- seq )
     [ [ terminated? over at [ drop f ] when ] map ] dip

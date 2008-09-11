@@ -103,4 +103,4 @@ C: <validation-error> validation-error
     swap set-value ;
 
 : validate-values ( assoc validators -- assoc' )
-    swap '[ dup , at _ validate-value ] assoc-each ;
+    swap '[ [ dup , at ] dip validate-value ] assoc-each ;

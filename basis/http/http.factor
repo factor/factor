@@ -196,7 +196,7 @@ M: response clone
         [ clone ] change-cookies ;
 
 : get-cookie ( request/response name -- cookie/f )
-    [ cookies>> ] dip '[ , _ name>> = ] find nip ;
+    [ cookies>> ] dip '[ [ , ] dip name>> = ] find nip ;
 
 : delete-cookie ( request/response name -- )
     over cookies>> [ get-cookie ] dip delete ;

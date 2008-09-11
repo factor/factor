@@ -1,9 +1,9 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes classes.private classes.algebra
-combinators hashtables kernel layouts math namespaces quotations
-sequences system vectors words effects alien byte-arrays
-accessors sets math.order cpu.architecture
+combinators hashtables kernel layouts math namespaces make
+quotations sequences system vectors words effects alien
+byte-arrays accessors sets math.order cpu.architecture
 compiler.generator.fixup ;
 IN: compiler.generator.registers
 

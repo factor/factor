@@ -51,7 +51,7 @@ M: identity monad-of drop identity-monad ;
 M: identity-monad return drop identity boa ;
 M: identity-monad fail   "Fail" throw ;
 
-M: identity >>= value>> '[ , _ call ] ;
+M: identity >>= value>> '[ , swap call ] ;
 
 : run-identity ( identity -- value ) value>> ;
 
@@ -73,7 +73,7 @@ M: maybe-monad return drop just ;
 M: maybe-monad fail   2drop nothing ;
 
 M: nothing >>= '[ drop , ] ;
-M: just    >>= value>> '[ , _ call ] ;
+M: just    >>= value>> '[ , swap call ] ;
 
 : if-maybe ( maybe just-quot nothing-quot -- )
     pick nothing? [ 2nip call ] [ drop [ value>> ] dip call ] if ; inline
@@ -97,7 +97,7 @@ M: either-monad return  drop right ;
 M: either-monad fail    drop left ;
 
 M: left  >>= '[ drop , ] ;
-M: right >>= value>> '[ , _ call ] ;
+M: right >>= value>> '[ , swap call ] ;
 
 : if-either ( value left-quot right-quot -- )
     [ [ value>> ] [ left? ] bi ] 2dip if ; inline
@@ -112,7 +112,7 @@ M: array-monad fail   2drop { } ;
 
 M: array monad-of drop array-monad ;
 
-M: array >>= '[ , _ map concat ] ;
+M: array >>= '[ , swap map concat ] ;
 
 ! List
 SINGLETON: list-monad
@@ -124,7 +124,7 @@ M: list-monad fail   2drop nil ;
 
 M: list monad-of drop list-monad ;
 
-M: list >>= '[ , _ lazy-map lconcat ] ;
+M: list >>= '[ , swap lazy-map lconcat ] ;
 
 ! State
 SINGLETON: state-monad
@@ -142,7 +142,7 @@ M: state-monad fail   "Fail" throw ;
 
 : mcall ( state -- ) quot>> call ;
 
-M: state >>= '[ , _ '[ , mcall first2 @ mcall ] state ] ;
+M: state >>= '[ , swap '[ , mcall first2 @ mcall ] state ] ;
 
 : get-st ( -- state ) [ dup 2array ] state ;
 : put-st ( value -- state ) '[ drop , f 2array ] state ;
@@ -164,7 +164,7 @@ M: reader monad-of drop reader-monad ;
 M: reader-monad return drop '[ drop , ] reader ;
 M: reader-monad fail   "Fail" throw ;
 
-M: reader >>= '[ , _ '[ dup , mcall @ mcall ] reader ] ;
+M: reader >>= '[ , swap '[ dup , mcall @ mcall ] reader ] ;
 
 : run-reader ( reader env -- ) swap mcall ;
 
@@ -185,7 +185,7 @@ M: writer-monad fail   "Fail" throw ;
 
 : run-writer ( writer -- value log ) [ value>> ] [ log>> ] bi ;
 
-M: writer >>= '[ , run-writer _ '[ @ run-writer ] dip append writer ] ;
+M: writer >>= '[ [ , run-writer ] dip '[ @ run-writer ] dip append writer ] ;
 
 : pass ( writer -- writer' ) run-writer [ first2 ] dip swap call writer ;
 : listen ( writer -- writer' ) run-writer [ 2array ] keep writer ;

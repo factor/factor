@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions kernel sequences strings
-math assocs words generic namespaces assocs quotations splitting
-ui.gestures unicode.case unicode.categories tr ;
+math assocs words generic namespaces make assocs quotations
+splitting ui.gestures unicode.case unicode.categories tr ;
 IN: ui.commands
 
 SYMBOL: +nullary+
