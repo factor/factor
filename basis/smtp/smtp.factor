@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Elie CHAFTARI, Dirk Vleugels,
 ! Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays namespaces io io.timeouts kernel logging
+USING: arrays namespaces make io io.timeouts kernel logging
 io.sockets sequences combinators splitting assocs strings
 math.parser random system calendar io.encodings.ascii summary
 calendar.format accessors sets hashtables ;

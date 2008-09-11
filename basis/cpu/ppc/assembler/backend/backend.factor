@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: compiler.generator.fixup kernel namespaces sequences
+USING: compiler.generator.fixup kernel namespaces make sequences
 words math math.bitwise io.binary parser lexer ;
 IN: cpu.ppc.assembler.backend
 

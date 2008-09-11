@@ -1,5 +1,5 @@
 USING: tools.test quotations math kernel sequences
-assocs namespaces compiler.units ;
+assocs namespaces make compiler.units ;
 IN: compiler.tests
 
 [ 3 ] [ 5 [ [ 2 - ] curry call ] compile-call ] unit-test

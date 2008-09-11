@@ -1,11 +1,10 @@
 ! Copyright (C) 2007 Slava Pestov, Chris Double, Doug Coleman,
 !                    Eduardo Cavazos, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.lib kernel sequences math namespaces assocs 
-random sequences.private shuffle math.functions
-arrays math.parser math.private sorting strings ascii macros
-assocs.lib quotations hashtables math.order locals
-generalizations ;
+USING: combinators.lib kernel sequences math namespaces make
+assocs random sequences.private shuffle math.functions arrays
+math.parser math.private sorting strings ascii macros assocs.lib
+quotations hashtables math.order locals generalizations ;
 IN: sequences.lib
 
 : each-withn ( seq quot n -- ) nwith each ; inline

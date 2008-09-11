@@ -1,6 +1,6 @@
 ! Copyright (C) 2005 Chris Double, 2007 Clemens Hofreither.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel hashtables namespaces continuations quotations
+USING: kernel hashtables namespaces make continuations quotations
 accessors ;
 IN: coroutines
 

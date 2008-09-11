@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math namespaces sequences random strings
-math.parser math.intervals combinators math.bitwise nmake db
-db.tuples db.types db.sql classes words shuffle arrays destructors
-continuations ;
+USING: accessors kernel math namespaces make sequences random
+strings math.parser math.intervals combinators math.bitwise
+nmake db db.tuples db.types db.sql classes words shuffle arrays
+destructors continuations ;
 IN: db.queries
 
 GENERIC: where ( specs obj -- )

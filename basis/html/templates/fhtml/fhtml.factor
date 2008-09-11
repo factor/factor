@@ -74,6 +74,6 @@ TUPLE: fhtml path ;
 C: <fhtml> fhtml
 
 M: fhtml call-template* ( filename -- )
-    '[ , path>> utf8 file-contents eval-template ] assert-depth ;
+    '[ _ path>> utf8 file-contents eval-template ] assert-depth ;
 
 INSTANCE: fhtml template

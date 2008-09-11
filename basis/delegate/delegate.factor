@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors parser generic kernel classes classes.tuple
 words slots assocs sequences arrays vectors definitions
-prettyprint math hashtables sets macros namespaces ;
+prettyprint math hashtables sets macros namespaces make ;
 IN: delegate
 
 : protocol-words ( protocol -- words )

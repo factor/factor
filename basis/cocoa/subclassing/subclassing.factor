@@ -4,7 +4,7 @@ USING: alien alien.c-types alien.strings arrays assocs
 combinators compiler hashtables kernel libc math namespaces
 parser sequences words cocoa.messages cocoa.runtime
 compiler.units io.encodings.ascii generalizations
-continuations ;
+continuations make ;
 IN: cocoa.subclassing
 
 : init-method ( method -- sel imp types )

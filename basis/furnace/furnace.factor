@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces assocs sequences kernel classes splitting
+USING: namespaces make assocs sequences kernel classes splitting
 vocabs.loader accessors strings combinators arrays
 continuations present fry
 urls html.elements

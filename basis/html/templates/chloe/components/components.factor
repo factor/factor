@@ -14,13 +14,13 @@ IN: html.templates.chloe.components
 
 : CHLOE-SINGLETON:
     scan-word
-    [ name>> ] [ '[ , singleton-component-tag ] ] bi
+    [ name>> ] [ '[ _ singleton-component-tag ] ] bi
     define-chloe-tag ;
     parsing
 
 : compile-component-attrs ( tag class -- )
     [ attrs>> [ drop main>> "name" = not ] assoc-filter ] dip
-    [ all-slots swap '[ name>> , at compile-attr ] each ]
+    [ all-slots swap '[ name>> _ at compile-attr ] each ]
     [ [ boa ] [code-with] ]
     bi ;
 
@@ -30,6 +30,6 @@ IN: html.templates.chloe.components
 
 : CHLOE-TUPLE:
     scan-word
-    [ name>> ] [ '[ , tuple-component-tag ] ] bi
+    [ name>> ] [ '[ _ tuple-component-tag ] ] bi
     define-chloe-tag ;
     parsing

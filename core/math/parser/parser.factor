@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math.private namespaces sequences strings arrays
-combinators splitting math assocs ;
+USING: kernel math.private namespaces make sequences strings
+arrays combinators splitting math assocs ;
 IN: math.parser
 
 : digit> ( ch -- n )

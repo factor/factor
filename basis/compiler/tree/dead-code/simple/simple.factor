@@ -53,7 +53,7 @@ M: #alien-invoke compute-live-values* nip look-at-inputs ;
 M: #alien-indirect compute-live-values* nip look-at-inputs ;
 
 : filter-mapping ( assoc -- assoc' )
-    live-values get '[ drop , key? ] assoc-filter ;
+    live-values get '[ drop _ key? ] assoc-filter ;
 
 : filter-corresponding ( new old -- old' )
     #! Remove elements from 'old' if the element with the same

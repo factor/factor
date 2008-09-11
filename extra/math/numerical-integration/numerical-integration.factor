@@ -1,4 +1,4 @@
-USING: arrays kernel sequences namespaces math math.ranges
+USING: arrays kernel sequences namespaces make math math.ranges
 math.vectors vectors ;
 IN: math.numerical-integration
 

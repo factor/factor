@@ -12,7 +12,7 @@ C-STRUCT: com-interface
 MACRO: com-invoke ( n return parameters -- )
     dup length -roll
     '[
-        , npick com-interface-vtbl , swap void*-nth , ,
+        _ npick com-interface-vtbl _ swap void*-nth _ _
         "stdcall" alien-indirect
     ] ;
 

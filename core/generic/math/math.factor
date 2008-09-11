@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays generic hashtables kernel kernel.private
-math namespaces sequences words quotations layouts combinators
+USING: arrays generic hashtables kernel kernel.private math
+namespaces make sequences words quotations layouts combinators
 sequences.private classes classes.builtin classes.algebra
 definitions math.order ;
 IN: generic.math

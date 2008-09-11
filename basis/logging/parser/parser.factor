@@ -1,8 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors peg peg.parsers memoize kernel sequences
-logging arrays words strings vectors io io.files io.encodings.utf8
-namespaces combinators logging.server calendar calendar.format ;
+logging arrays words strings vectors io io.files
+io.encodings.utf8 namespaces make combinators logging.server
+calendar calendar.format ;
 IN: logging.parser
 
 TUPLE: log-entry date level word-name message ;

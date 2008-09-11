@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays alien.c-types alien.structs
-sequences math kernel namespaces libc cpu.architecture ;
+sequences math kernel namespaces make libc cpu.architecture ;
 IN: alien.arrays
 
 UNION: value-type array struct-type ;

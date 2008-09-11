@@ -1,12 +1,12 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces continuations.private kernel.private init
+USING: namespaces make continuations.private kernel.private init
 assocs kernel vocabs words sequences memory io system arrays
 continuations math definitions mirrors splitting parser classes
 summary layouts vocabs.loader prettyprint.config prettyprint
-debugger io.streams.c io.files io.backend
-quotations io.launcher words.private tools.deploy.config
-bootstrap.image io.encodings.utf8 destructors accessors ;
+debugger io.streams.c io.files io.backend quotations io.launcher
+words.private tools.deploy.config bootstrap.image
+io.encodings.utf8 destructors accessors ;
 IN: tools.deploy.backend
 
 : copy-vm ( executable bundle-name extension -- vm )

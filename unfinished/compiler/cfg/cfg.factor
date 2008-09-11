@@ -3,16 +3,19 @@
 USING: kernel accessors namespaces assocs sequences sets fry ;
 IN: compiler.cfg
 
-! The id is a globally unique id used for fast hashcode* and
-! equal? on basic blocks. The number is assigned by
-! linearization.
+TUPLE: procedure entry word label ;
+
+C: <procedure> procedure
+
+! - "id" is a globally unique id used for hashcode*.
+! - "number" is assigned by linearization.
 TUPLE: basic-block < identity-tuple
 id
 number
+label
 instructions
 successors
-predecessors
-stack-frame ;
+predecessors ;
 
 SYMBOL: next-block-id
 
@@ -34,14 +37,11 @@ SYMBOL: visited-blocks
 
 : (each-block) ( basic-block quot -- )
     '[
-        ,
+        _
         [ call ]
-        [ [ successors>> ] dip '[ , (each-block) ] each ]
+        [ [ successors>> ] dip '[ _ (each-block) ] each ]
         2bi
     ] visit-block ; inline
 
 : each-block ( basic-block quot -- )
     H{ } clone visited-blocks [ (each-block) ] with-variable ; inline
-
-: copy-at ( from to assoc -- )
-    3dup nip at* [ -rot set-at drop ] [ 2drop 2drop ] if ; inline

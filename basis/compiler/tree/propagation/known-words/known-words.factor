@@ -118,7 +118,7 @@ most-negative-fixnum most-positive-fixnum [a,b]
 
 : binary-op ( word interval-quot post-proc-quot -- )
     '[
-        [ binary-op-class ] [ , binary-op-interval ] 2bi
+        [ binary-op-class ] [ _ binary-op-interval ] 2bi
         @
         <class/interval-info>
     ] "outputs" set-word-prop ;
@@ -159,14 +159,14 @@ most-negative-fixnum most-positive-fixnum [a,b]
     in1 in2 op negate-comparison (comparison-constraints) out f--> /\ ;
 
 : define-comparison-constraints ( word op -- )
-    '[ , comparison-constraints ] "constraints" set-word-prop ;
+    '[ _ comparison-constraints ] "constraints" set-word-prop ;
 
 comparison-ops
-[ dup '[ , define-comparison-constraints ] each-derived-op ] each
+[ dup '[ _ define-comparison-constraints ] each-derived-op ] each
 
 generic-comparison-ops [
     dup specific-comparison
-    '[ , , define-comparison-constraints ] each-derived-op
+    '[ _ _ define-comparison-constraints ] each-derived-op
 ] each
 
 ! Remove redundant comparisons
@@ -179,13 +179,13 @@ generic-comparison-ops [
 
 comparison-ops [
     dup '[
-        [ , fold-comparison ] "outputs" set-word-prop
+        [ _ fold-comparison ] "outputs" set-word-prop
     ] each-derived-op
 ] each
 
 generic-comparison-ops [
     dup specific-comparison
-    '[ , fold-comparison ] "outputs" set-word-prop
+    '[ _ fold-comparison ] "outputs" set-word-prop
 ] each
 
 : maybe-or-never ( ? -- info )
@@ -221,7 +221,7 @@ generic-comparison-ops [
     { >float float }
 } [
     '[
-        ,
+        _
         [ nip ] [
             [ interval>> ] [ class-interval ] bi*
             interval-intersect

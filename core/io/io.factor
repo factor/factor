@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: hashtables generic kernel math namespaces sequences
+USING: hashtables generic kernel math namespaces make sequences
 continuations destructors assocs ;
 IN: io
 

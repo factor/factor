@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel io.streams.string io strings splitting sequences math 
-       math.parser assocs classes words namespaces prettyprint
-       hashtables mirrors tr ;
+USING: kernel io.streams.string io strings splitting sequences
+math math.parser assocs classes words namespaces make
+prettyprint hashtables mirrors tr ;
 IN: json.writer
 
 #! Writes the object out to a stream in JSON format

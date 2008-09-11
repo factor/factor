@@ -81,7 +81,7 @@ SYMBOL: rename-map
     [ rename-map get at ] keep or ;
 
 : rename-values ( values -- values' )
-    rename-map get '[ [ , at ] keep or ] map ;
+    rename-map get '[ [ _ at ] keep or ] map ;
 
 GENERIC: rename-node-values* ( node -- node )
 
@@ -127,7 +127,7 @@ SYMBOL: introduction-stack
 
 : add-renamings ( old new -- )
     [ rename-values ] dip
-    rename-map get '[ , set-at ] 2each ;
+    rename-map get '[ _ set-at ] 2each ;
 
 M: #introduce normalize*
     out-d>> [ length pop-introductions ] keep add-renamings f ;
@@ -158,7 +158,7 @@ M: #branch normalize*
 
 M: #phi normalize*
     remaining-introductions get swap dup terminated>>
-    '[ , eliminate-phi-introductions ] change-phi-in-d ;
+    '[ _ eliminate-phi-introductions ] change-phi-in-d ;
 
 : (normalize) ( nodes introductions -- nodes )
     introduction-stack [
@@ -168,7 +168,7 @@ M: #phi normalize*
 M: #recursive normalize*
     dup label>> introductions>>
     [ drop [ child>> first ] [ in-d>> ] bi >>in-d drop ]
-    [ make-values '[ , (normalize) ] change-child ]
+    [ make-values '[ _ (normalize) ] change-child ]
     2bi ;
 
 M: #enter-recursive normalize*
@@ -181,14 +181,14 @@ M: #enter-recursive normalize*
 
 : call<return ( #call-recursive n -- nodes )
     neg dup make-values [
-        [ pop-introductions '[ , prepend ] change-in-d ]
-        [ '[ , prepend ] change-out-d ]
+        [ pop-introductions '[ _ prepend ] change-in-d ]
+        [ '[ _ prepend ] change-out-d ]
         bi*
     ] [ introduction-stack [ prepend ] change ] bi ;
 
 : call>return ( #call-recursive n -- #call-recursive )
-    [ [ [ in-d>> ] [ out-d>> ] bi ] [ '[ , head ] ] bi* bi@ add-renamings ]
-    [ '[ , tail ] [ change-in-d ] [ change-out-d ] bi ]
+    [ [ [ in-d>> ] [ out-d>> ] bi ] [ '[ _ head ] ] bi* bi@ add-renamings ]
+    [ '[ _ tail ] [ change-in-d ] [ change-out-d ] bi ]
     2bi ;
 
 M: #call-recursive normalize*

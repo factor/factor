@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.bitwise strings io.binary namespaces
-grouping ;
+make grouping ;
 IN: checksums.common
 
 SYMBOL: bytes-read

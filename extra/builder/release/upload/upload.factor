@@ -1,5 +1,5 @@
 
-USING: kernel namespaces sequences arrays io io.files
+USING: kernel namespaces make sequences arrays io io.files
        builder.util
        builder.common
        builder.release.archive ;

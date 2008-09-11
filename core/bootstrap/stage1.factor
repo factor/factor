@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays debugger generic hashtables io assocs
-kernel.private kernel math memory namespaces parser
+kernel.private kernel math memory namespaces make parser
 prettyprint sequences vectors words system splitting
 init io.files bootstrap.image bootstrap.image.private vocabs
 vocabs.loader system debugger continuations ;

@@ -108,6 +108,7 @@ USE: io.buffers
 ARTICLE: "collections" "Collections" 
 { $heading "Sequences" }
 { $subsection "sequences" }
+{ $subsection "namespaces-make" }
 "Fixed-length sequences:"
 { $subsection "arrays" }
 { $subsection "quotations" }

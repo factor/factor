@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces project-euler.common sequences
+USING: kernel namespaces make project-euler.common sequences
 splitting grouping ;
 IN: project-euler.011
 

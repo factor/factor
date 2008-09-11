@@ -1,4 +1,4 @@
-USING: kernel math namespaces tools.test ;
+USING: kernel math namespaces make tools.test ;
 IN: math.tests
 
 [ ] [ 5 [ ] times ] unit-test

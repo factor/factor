@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: lexer parser splitting kernel quotations namespaces
+USING: lexer parser splitting kernel quotations namespaces make
 sequences assocs sequences.lib xml.generator xml.utilities
 xml.data ;
 IN: xml.syntax

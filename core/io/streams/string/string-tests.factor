@@ -1,4 +1,5 @@
-USING: io.streams.string io kernel arrays namespaces tools.test ;
+USING: io.streams.string io kernel arrays namespaces make
+tools.test ;
 IN: io.streams.string.tests
 
 [ "line 1" CHAR: l ]

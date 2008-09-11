@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: checksums checksums.openssl splitting assocs
-kernel io.files bootstrap.image sequences io namespaces
+kernel io.files bootstrap.image sequences io namespaces make
 io.launcher math io.encodings.ascii ;
 IN: bootstrap.image.upload
 
