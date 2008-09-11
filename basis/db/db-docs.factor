@@ -12,11 +12,11 @@ HELP: new-db
 { $description "Creates a new database object from a given class." } ;
 
 HELP: make-db*
-{ $values { "seq" sequence } { "db" object } { "db" object } }
+{ $values { "object" object } { "db" object } { "db" object } }
 { $description "Takes a sequence of parameters specific to each database and a class name of the database, and constructs a new database object." } ;
 
 HELP: make-db
-{ $values { "seq" sequence } { "class" class } { "db" db } }
+{ $values { "object" object } { "class" class } { "db" db } }
 { $description "Takes a sequence of parameters specific to each database and a class name of the database, and constructs a new database object." } ;
 
 HELP: db-open
