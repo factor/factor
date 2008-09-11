@@ -30,6 +30,8 @@ IN: compiler.cfg.builder
     building off
     basic-block off ;
 
+: stop-iterating ( -- next ) end-basic-block f ;
+
 USE: qualified
 FROM: compiler.generator.registers => +input+   ;
 FROM: compiler.generator.registers => +output+  ;
@@ -49,7 +51,7 @@ SYMBOL: current-label-start
 
 : add-procedure ( -- )
     basic-block get current-word get current-label get
-    <procedure> procedures get push ;
+    <cfg> procedures get push ;
 
 : begin-procedure ( word label -- )
     end-basic-block
@@ -100,17 +102,17 @@ GENERIC: emit-node ( node -- next )
 : if-intrinsics ( #call -- quot )
     word>> "if-intrinsics" word-prop ;
 
-: local-recursive-call ( basic-block -- )
+: local-recursive-call ( basic-block -- next )
     %branch
     basic-block get successors>> push
-    end-basic-block ;
+    stop-iterating ;
 
 : emit-call ( word -- next )
     finalize-phantoms
     {
         { [ tail-call? not ] [ 0 %frame-required %call iterate-next ] }
-        { [ dup loops get key? ] [ loops get at local-recursive-call f ] }
-        [ %epilogue %jump f ]
+        { [ dup loops get key? ] [ loops get at local-recursive-call ] }
+        [ %epilogue %jump stop-iterating ]
     } cond ;
 
 ! #recursive
@@ -265,7 +267,7 @@ M: #return-recursive emit-node
     [ %epilogue %return ] unless f ;
 
 ! #terminate
-M: #terminate emit-node drop end-basic-block f ;
+M: #terminate emit-node drop stop-iterating ;
 
 ! FFI
 M: #alien-invoke emit-node

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs accessors sequences math
 math.order sorting compiler.instructions compiler.registers ;
-IN: compiler.machine.linear-scan.live-intervals
+IN: compiler.cfg.linear-scan.live-intervals
 
 TUPLE: live-interval < identity-tuple vreg start end ;
 

@@ -1,12 +1,10 @@
 IN: compiler.cfg.builder.tests
-USING: compiler.cfg.builder tools.test kernel sequences
+USING: tools.test kernel sequences
+words sequences.private fry prettyprint alien
 math.private compiler.tree.builder compiler.tree.optimizer
-words sequences.private fry prettyprint alien ;
+compiler.cfg.builder compiler.cfg.debugger  ;
 
 ! Just ensure that various CFGs build correctly.
-: test-cfg ( quot -- result )
-    build-tree optimize-tree gensym gensym build-cfg ;
-
 {
     [ ]
     [ dup ]
@@ -28,10 +26,6 @@ words sequences.private fry prettyprint alien ;
     '[ _ test-cfg drop ] [ ] swap unit-test
 ] each
 
-: test-word-cfg ( word -- result )
-    [ build-tree-from-word nip optimize-tree ] keep dup
-    build-cfg ;
-
 : test-1 ( -- ) test-1 ;
 : test-2 ( -- ) 3 . test-2 ;
 : test-3 ( a -- b ) dup [ test-3 ] when ;
@@ -41,5 +35,5 @@ words sequences.private fry prettyprint alien ;
     test-2
     test-3
 } [
-    '[ _ test-word-cfg drop ] [ ] swap unit-test
+    '[ _ test-cfg drop ] [ ] swap unit-test
 ] each

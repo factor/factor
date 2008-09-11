@@ -2,9 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces sequences math math.order kernel assocs
 accessors vectors fry
-compiler.machine.linear-scan.live-intervals
+compiler.cfg.linear-scan.live-intervals
 compiler.backend ;
-IN: compiler.machine.linear-scan.allocation
+IN: compiler.cfg.linear-scan.allocation
 
 ! Mapping from vregs to machine registers
 SYMBOL: register-allocation

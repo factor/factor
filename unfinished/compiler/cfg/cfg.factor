@@ -3,45 +3,25 @@
 USING: kernel accessors namespaces assocs sequences sets fry ;
 IN: compiler.cfg
 
-TUPLE: procedure entry word label ;
+TUPLE: cfg entry word label ;
 
-C: <procedure> procedure
+C: <cfg> cfg
 
-! - "id" is a globally unique id used for hashcode*.
-! - "number" is assigned by linearization.
+! - "number" and "visited" is used by linearization.
 TUPLE: basic-block < identity-tuple
-id
+visited
 number
 label
 instructions
 successors
 predecessors ;
 
-SYMBOL: next-block-id
-
 : <basic-block> ( -- basic-block )
     basic-block new
-        next-block-id counter >>id
         V{ } clone >>instructions
         V{ } clone >>successors
         V{ } clone >>predecessors ;
 
-M: basic-block hashcode* id>> nip ;
+TUPLE: mr instructions word label ;
 
-! Utilities
-SYMBOL: visited-blocks
-
-: visit-block ( basic-block quot -- )
-    over visited-blocks get 2dup key?
-    [ 2drop 2drop ] [ conjoin call ] if ; inline
-
-: (each-block) ( basic-block quot -- )
-    '[
-        _
-        [ call ]
-        [ [ successors>> ] dip '[ _ (each-block) ] each ]
-        2bi
-    ] visit-block ; inline
-
-: each-block ( basic-block quot -- )
-    H{ } clone visited-blocks [ (each-block) ] with-variable ; inline
+C: <mr> mr

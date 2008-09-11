@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs accessors arrays kernel sequences
-compiler.instructions.syntax ;
+USING: assocs accessors arrays kernel sequences namespaces
+math compiler.instructions.syntax ;
 IN: compiler.instructions
 
 ! Virtual CPU instructions, used by CFG and machine IRs
@@ -17,9 +17,6 @@ INSN: %inc-r n ;
 INSN: %load-literal obj vreg ;
 
 ! Calling convention
-INSN: %prologue ;
-INSN: %epilogue ;
-INSN: %frame-required n ;
 INSN: %return ;
 
 ! Subroutine calls
@@ -30,15 +27,6 @@ INSN: %intrinsic quot vregs ;
 ! Jump tables
 INSN: %dispatch-label label ;
 INSN: %dispatch ;
-
-! Unconditional branch to successor (CFG only)
-INSN: %branch ;
-
-! Conditional branches (CFG only)
-INSN: %branch-f < %cond-branch ;
-INSN: %branch-t < %cond-branch ;
-INSN: %if-intrinsic quot vregs ;
-INSN: %boolean-intrinsic quot vregs out ;
 
 ! Boxing and unboxing
 INSN: %copy < %unary ;
@@ -64,9 +52,45 @@ M: insn uses-vregs drop f ;
 M: %peek uses-vregs vreg>> 1array ;
 M: %replace uses-vregs vreg>> 1array ;
 M: %load-literal uses-vregs vreg>> 1array ;
-M: %cond-branch uses-vregs vreg>> 1array ;
 M: %unary uses-vregs [ dst>> ] [ src>> ] bi 2array ;
 M: %intrinsic uses-vregs vregs>> values ;
+
+! Instructions used by CFG IR only.
+INSN: %prologue ;
+INSN: %epilogue ;
+INSN: %frame-required n ;
+
+INSN: %branch ;
+INSN: %branch-f < %cond-branch ;
+INSN: %branch-t < %cond-branch ;
+INSN: %if-intrinsic quot vregs ;
+INSN: %boolean-intrinsic quot vregs out ;
+
+M: %cond-branch uses-vregs vreg>> 1array ;
 M: %if-intrinsic uses-vregs vregs>> values ;
 M: %boolean-intrinsic uses-vregs
     [ vregs>> values ] [ out>> ] bi suffix ;
+
+! Instructions used by machine IR only.
+INSN: _prologue n ;
+INSN: _epilogue n ;
+
+TUPLE: label id ;
+
+INSN: _label label ;
+
+: <label> ( -- label ) \ <label> counter label boa ;
+: define-label ( name -- ) <label> swap set ;
+
+: resolve-label ( label/name -- )
+    dup label? [ get ] unless _label ;
+
+TUPLE: _cond-branch vreg label ;
+
+INSN: _branch label ;
+INSN: _branch-f < _cond-branch ;
+INSN: _branch-t < _cond-branch ;
+INSN: _if-intrinsic label quot vregs ;
+
+M: _cond-branch uses-vregs vreg>> 1array ;
+M: _if-intrinsic uses-vregs vregs>> values ;
