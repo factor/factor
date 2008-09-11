@@ -19,7 +19,7 @@ HELP: building
 HELP: make
 { $values { "quot" quotation } { "exemplar" sequence } { "seq" "a new sequence" } }
 { $description "Calls the quotation in a new " { $emphasis "dynamic scope" } ". The quotation and any words it calls can execute the " { $link , } " and " { $link % } " words to accumulate elements. When the quotation returns, all accumulated elements are collected into a sequence with the same type as " { $snippet "exemplar" } "." }
-{ $examples { $example "USING: namespaces prettyprint ;" "[ 1 , 2 , 3 , ] { } make ." "{ 1 2 3 }" } } ;
+{ $examples { $example "USING: make prettyprint ;" "[ 1 , 2 , 3 , ] { } make ." "{ 1 2 3 }" } } ;
 
 HELP: ,
 { $values { "elt" object } }

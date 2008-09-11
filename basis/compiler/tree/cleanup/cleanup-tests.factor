@@ -478,3 +478,22 @@ cell-bits 32 = [
     [ 2 swap >fixnum buffalo-wings ]
     { <-integer-fixnum +-integer-fixnum } inlined?
 ] unit-test
+
+! A reduction
+: buffalo-sauce f ;
+
+: steak ( -- )
+    buffalo-sauce [ steak ] when ; inline recursive
+
+: ribs ( i seq -- )
+    2dup < [
+        steak
+        >r 1+ r> ribs
+    ] [
+        2drop
+    ] if ; inline recursive
+
+[ t ] [
+    [ 2 swap >fixnum ribs ]
+    { <-integer-fixnum +-integer-fixnum } inlined?
+] unit-test
