@@ -59,17 +59,18 @@ M: mode command-parameters>> ( mode -- seq )
 GENERIC: (>>command-parameters) ( params irc-message -- )
 
 M: irc-message (>>command-parameters) ( params irc-message -- ) 2drop ;
-M: logged-in (>>command-parameters) ( params part -- )  >r first r> (>>name) ;
-M: part    (>>command-parameters) ( params part -- )    >r first r> (>>channel) ;
-M: privmsg (>>command-parameters) ( params privmsg -- ) >r first r> (>>name) ;
-M: notice  (>>command-parameters) ( params notice -- )  >r first r> (>>type) ;
+M: logged-in (>>command-parameters) ( params part -- )  [ first ] dip (>>name) ;
+M: privmsg (>>command-parameters) ( params privmsg -- ) [ first ] dip (>>name) ;
+M: notice  (>>command-parameters) ( params notice -- )  [ first ] dip (>>type) ;
+M: part    (>>command-parameters) ( params part -- )
+    [ first ] dip (>>channel) ;
 M: kick    (>>command-parameters) ( params kick -- )
-    >r first2 r> [ (>>who) ] [ (>>channel) ] bi ;
+    [ first2 ] dip [ (>>who) ] [ (>>channel) ] bi ;
 M: names-reply (>>command-parameters) ( params names-reply -- )
-    [ >r first r> (>>who) ] [ >r third r> (>>channel) ] 2bi ;
+    [ [ first ] dip (>>who) ] [ [ third ] dip (>>channel) ] 2bi ;
 M: mode    (>>command-parameters) ( params mode -- )
-    { { [ >r 2array r> ] [ [ (>>mode) ] [ (>>name) ] bi ] }
-      { [ >r 3array r> ] [ [ (>>parameter) ] [ (>>mode) ] [ (>>name) ] tri ] }
+    { { [ [ 2array ] dip ] [ [ (>>mode) ] [ (>>name) ] bi ] }
+      { [ [ 3array ] dip ] [ [ (>>parameter) ] [ (>>mode) ] [ (>>name) ] tri ] }
     } switch ;
 
 PRIVATE>
@@ -113,12 +114,12 @@ M: irc-message irc-message>server-line ( irc-message -- string )
     ":" split1 ;
 
 : copy-message-in ( origin dest -- )
-    { [ >r parameters>> r> [ (>>command-parameters) ] [ (>>parameters) ] 2bi ]
-      [ >r line>>       r> (>>line) ]
-      [ >r prefix>>     r> (>>prefix) ]
-      [ >r command>>    r> (>>command) ]
-      [ >r trailing>>   r> (>>trailing) ]
-      [ >r timestamp>>  r> (>>timestamp) ]
+    { [ [ parameters>> ] dip [ (>>command-parameters) ] [ (>>parameters) ] 2bi ]
+      [ [ line>>       ] dip (>>line) ]
+      [ [ prefix>>     ] dip (>>prefix) ]
+      [ [ command>>    ] dip (>>command) ]
+      [ [ trailing>>   ] dip (>>trailing) ]
+      [ [ timestamp>>  ] dip (>>timestamp) ]
     } 2cleave ;
 
 PRIVATE>
