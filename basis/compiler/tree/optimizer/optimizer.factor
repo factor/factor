@@ -7,6 +7,7 @@ compiler.tree.propagation
 compiler.tree.cleanup
 compiler.tree.escape-analysis
 compiler.tree.tuple-unboxing
+compiler.tree.identities
 compiler.tree.def-use
 compiler.tree.dead-code
 compiler.tree.strength-reduction
@@ -23,6 +24,7 @@ SYMBOL: check-optimizer?
     cleanup
     escape-analysis
     unbox-tuples
+    apply-identities
     compute-def-use
     remove-dead-code
     ! strength-reduce

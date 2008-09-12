@@ -6,6 +6,7 @@ compiler.tree.propagation.copy
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
 compiler.tree.propagation.simple
+compiler.tree.propagation.inlining
 compiler.tree.propagation.branches
 compiler.tree.propagation.recursive
 compiler.tree.propagation.constraints
@@ -18,4 +19,5 @@ IN: compiler.tree.propagation
     H{ } clone copies set
     H{ } clone constraints set
     H{ } clone value-infos set
+    dup count-nodes
     dup (propagate) ;
