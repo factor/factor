@@ -32,7 +32,7 @@ M: #if live-branches
 
 M: #dispatch live-branches
     [ children>> length ] [ in-d>> first value-info interval>> ] bi
-    '[ , interval-contains? ] map ;
+    '[ _ interval-contains? ] map ;
 
 : live-children ( #branch -- children )
     [ children>> ] [ live-branches>> ] bi select-children ;
@@ -61,7 +61,7 @@ SYMBOL: infer-children-data
     infer-children-data get
     [
         '[
-            , [
+            _ [
                 dup +bottom+ eq?
                 [ drop null-info ] [ value-info ] if
             ] bind

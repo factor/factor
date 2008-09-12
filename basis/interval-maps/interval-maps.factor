@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel sequences arrays accessors grouping math.order
-sorting binary-search math assocs locals namespaces ;
+sorting binary-search math assocs locals namespaces make ;
 IN: interval-maps
 
 TUPLE: interval-map array ;

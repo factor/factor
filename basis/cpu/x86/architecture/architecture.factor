@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types arrays cpu.x86.assembler
 cpu.x86.assembler.private cpu.architecture kernel kernel.private
-math memory namespaces sequences words compiler.generator
+math memory namespaces make sequences words compiler.generator
 compiler.generator.registers compiler.generator.fixup system
 layouts combinators compiler.constants math.order ;
 IN: cpu.x86.architecture
@@ -140,13 +140,6 @@ M: x86 small-enough? ( n -- ? )
 : %tag-fixnum ( reg -- ) tag-bits get SHL ;
 
 : temp@ ( n -- op ) stack-reg \ stack-frame get rot - [+] ;
-
-: struct-return@ ( size n -- n )
-    [
-        stack-frame* cell + +
-    ] [
-        \ stack-frame get swap -
-    ] ?if ;
 
 HOOK: %unbox-struct-1 cpu ( -- )
 

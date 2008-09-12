@@ -1,4 +1,5 @@
-USING: accessors arrays bank calendar kernel math math.functions namespaces tools.test tools.walker ;
+USING: accessors arrays bank calendar kernel math math.functions
+namespaces make tools.test tools.walker ;
 IN: bank.tests
 
 SYMBOL: my-account

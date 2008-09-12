@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel assocs fry match accessors namespaces effects
+USING: kernel assocs fry match accessors namespaces make effects
 sequences sequences.private quotations generic macros arrays
 prettyprint prettyprint.backend prettyprint.sections math words
 combinators io sorting hints
@@ -16,7 +16,7 @@ IN: compiler.tree.debugger
 GENERIC: node>quot ( node -- )
 
 MACRO: match-choose ( alist -- )
-    [ '[ , ] ] assoc-map '[ , match-cond ] ;
+    [ [ ] curry ] assoc-map [ match-cond ] curry ;
 
 MATCH-VARS: ?a ?b ?c ;
 

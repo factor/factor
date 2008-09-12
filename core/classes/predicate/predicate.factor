@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes classes.algebra kernel namespaces words sequences
-quotations arrays kernel.private assocs combinators ;
+USING: classes classes.algebra kernel namespaces make words
+sequences quotations arrays kernel.private assocs combinators ;
 IN: classes.predicate
 
 PREDICATE: predicate-class < class

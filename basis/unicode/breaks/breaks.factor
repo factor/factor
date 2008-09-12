@@ -1,7 +1,8 @@
-USING: combinators.short-circuit unicode.categories kernel math combinators splitting
-sequences math.parser io.files io assocs arrays namespaces
-math.ranges unicode.normalize values io.encodings.ascii
-unicode.syntax unicode.data compiler.units alien.syntax sets ;
+USING: combinators.short-circuit unicode.categories kernel math
+combinators splitting sequences math.parser io.files io assocs
+arrays namespaces make math.ranges unicode.normalize values
+io.encodings.ascii unicode.syntax unicode.data compiler.units
+alien.syntax sets ;
 IN: unicode.breaks
 
 C-ENUM: Any L V T Extend Control CR LF graphemes ;

@@ -60,7 +60,7 @@ TUPLE: action rest authorize init display validate submit ;
 
 : handle-get ( action -- response )
     '[
-        , dup display>> [
+        _ dup display>> [
             {
                 [ init>> call ]
                 [ authorize>> call ]
@@ -90,7 +90,7 @@ TUPLE: action rest authorize init display validate submit ;
 
 : handle-post ( action -- response )
     '[
-        , dup submit>> [
+        _ dup submit>> [
             [ validate>> call ]
             [ authorize>> call ]
             [ submit>> call ]
@@ -133,4 +133,4 @@ TUPLE: page-action < action template ;
 
 : <page-action> ( -- page )
     page-action new-action
-        dup '[ , template>> <chloe-content> ] >>display ;
+        dup '[ _ template>> <chloe-content> ] >>display ;

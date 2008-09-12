@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
 !
-USING: kernel tools.test strings namespaces arrays sequences 
+USING: kernel tools.test strings namespaces make arrays sequences 
        peg peg.private accessors words math accessors ;
 IN: peg.tests
 

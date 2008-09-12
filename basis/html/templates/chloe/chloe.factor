@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences combinators kernel fry
-namespaces classes.tuple assocs splitting words arrays memoize
-io io.files io.encodings.utf8 io.streams.string unicode.case
-mirrors math urls present multiline quotations xml xml.data
+namespaces make classes.tuple assocs splitting words arrays
+memoize io io.files io.encodings.utf8 io.streams.string
+unicode.case mirrors math urls present multiline quotations xml
+xml.data
 html.forms
 html.elements
 html.components

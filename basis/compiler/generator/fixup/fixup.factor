@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays byte-arrays generic assocs hashtables io.binary
-kernel kernel.private math namespaces sequences words
+kernel kernel.private math namespaces make sequences words
 quotations strings alien.accessors alien.strings layouts system
 combinators math.bitwise words.private cpu.architecture
 math.order accessors growable ;

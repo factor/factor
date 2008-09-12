@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types arrays kernel math namespaces cocoa
+USING: alien.c-types arrays kernel math namespaces make cocoa
 cocoa.messages cocoa.classes cocoa.types sequences
 continuations ;
 IN: cocoa.views

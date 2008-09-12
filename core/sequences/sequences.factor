@@ -74,7 +74,7 @@ INSTANCE: immutable-sequence sequence
 : set-array-nth ( elt n array -- )
     swap 2 fixnum+fast set-slot ; inline
 
-: dispatch ( n array -- ) array-nth (call) ;
+: dispatch ( n array -- ) array-nth call ;
 
 GENERIC: resize ( n seq -- newseq ) flushable
 
@@ -236,6 +236,10 @@ INSTANCE: repetition immutable-sequence
 
 <PRIVATE
 
+: check-length ( n -- n )
+    #! Ricing.
+    dup integer? [ "length not an integer" throw ] unless ; inline
+
 : ((copy)) ( dst i src j n -- dst i src j n )
     dup -roll [
         + swap nth-unsafe -roll [
@@ -248,8 +252,9 @@ INSTANCE: repetition immutable-sequence
     inline recursive
 
 : prepare-subseq ( from to seq -- dst i src j n )
+    #! The check-length call forces partial dispatch
     [ >r swap - r> new-sequence dup 0 ] 3keep
-    -rot drop roll length ; inline
+    -rot drop roll length check-length ; inline
 
 : check-copy ( src n dst -- )
     over 0 < [ bounds-error ] when
@@ -273,7 +278,8 @@ PRIVATE>
 : but-last ( seq -- headseq ) 1 head* ;
 
 : copy ( src i dst -- )
-    pick length >r 3dup check-copy spin 0 r>
+    #! The check-length call forces partial dispatch
+    pick length check-length >r 3dup check-copy spin 0 r>
     (copy) drop ; inline
 
 M: sequence clone-like
@@ -739,10 +745,10 @@ PRIVATE>
     [ but-last ] [ peek ] bi ;
 
 : unclip-slice ( seq -- rest first )
-    [ rest-slice ] [ first ] bi ;
+    [ rest-slice ] [ first ] bi ; inline
 
 : unclip-last-slice ( seq -- butlast last )
-    [ but-last-slice ] [ peek ] bi ;
+    [ but-last-slice ] [ peek ] bi ; inline
 
 : <flat-slice> ( seq -- slice )
     dup slice? [ { } like ] when 0 over length rot <slice> ;

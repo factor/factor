@@ -1,4 +1,6 @@
-USING: classes.private generic.standard.engines namespaces
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: classes.private generic.standard.engines namespaces make
 arrays assocs sequences.private quotations kernel.private
 math slots.private math.private kernel accessors words
 layouts ;

@@ -192,7 +192,6 @@ HELP: raise-window
 ARTICLE: "ui-layouts" "Gadget hierarchy and layouts"
 "A layout gadget is a gadget whose sole purpose is to contain other gadgets. Layout gadgets position and resize children according to a certain policy, taking the preferred size of the children into account. Gadget hierarchies are constructed by building up nested layouts."
 { $subsection "ui-layout-basics" }
-{ $subsection "ui-layout-combinators" }
 "Common layout gadgets:"
 { $subsection "ui-pack-layout" }
 { $subsection "ui-track-layout" }
@@ -229,12 +228,6 @@ $nl
 "Gadgets implement a generic word to inform their parents of their preferred size:"
 { $subsection pref-dim* }
 "To get a gadget's preferred size, do not call the above word, instead use " { $link pref-dim  } ",  which caches the result." ;
-
-ARTICLE: "ui-layout-combinators" "Creating layouts using combinators"
-"The " { $link make } " combinator provides a convenient way of constructing sequences by keeping the intermediate sequence off the stack until construction is done. The " { $link , } " and " { $link % } " words operate on this implicit sequence, reducing stack noise."
-$nl
-"Similar tools exist for constructing complex gadget hierarchies. Different words are used for different types of gadgets; see " { $link "ui-pack-layout" } ", " { $link "ui-track-layout" } " and " { $link "ui-frame-layout" } " for specifics. This section documents their common factors."
-;
 
 ARTICLE: "ui-null-layout" "Manual layouts"
 "When automatic layout is not appropriate, gadgets can be added to a parent with no layout policy, and then positioned and sized manually by setting the " { $snippet "loc" } " field." ;

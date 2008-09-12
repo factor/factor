@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces sequences vectors assocs accessors ;
+USING: kernel namespaces make sequences vectors assocs accessors ;
 IN: state-tables
 
 TUPLE: table rows columns start-state final-states ;

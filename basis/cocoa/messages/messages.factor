@@ -1,11 +1,10 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.strings
-arrays assocs combinators compiler kernel
-math namespaces parser prettyprint prettyprint.sections
-quotations sequences strings words cocoa.runtime io macros
-memoize debugger io.encodings.ascii effects compiler.generator
-libc libc.private ;
+USING: accessors alien alien.c-types alien.strings arrays assocs
+combinators compiler kernel math namespaces make parser
+prettyprint prettyprint.sections quotations sequences strings
+words cocoa.runtime io macros memoize debugger
+io.encodings.ascii effects compiler.generator libc libc.private ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )

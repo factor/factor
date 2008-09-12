@@ -3,7 +3,7 @@
 !
 ! based on glx.h from xfree86, and some of glxtokens.h
 USING: alien alien.c-types alien.syntax alien.syntax.private x11.xlib
-namespaces kernel sequences parser words ;
+namespaces make kernel sequences parser words ;
 IN: x11.glx
 
 LIBRARY: glx

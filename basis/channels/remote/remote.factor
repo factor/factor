@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 !
 ! Remote Channels
-USING: kernel init namespaces assocs arrays random
+USING: kernel init namespaces make assocs arrays random
 sequences channels match concurrency.messaging
 concurrency.distributed threads accessors ;
 IN: channels.remote

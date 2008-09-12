@@ -6,10 +6,19 @@ classes.algebra classes.union sets quotations assocs combinators
 words namespaces
 compiler.tree
 compiler.tree.builder
+compiler.tree.recursive
+compiler.tree.combinators
 compiler.tree.normalization
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes ;
 IN: compiler.tree.propagation.inlining
+
+! We count nodes up-front; if there are relatively few nodes,
+! we are more eager to inline
+SYMBOL: node-count
+
+: count-nodes ( nodes -- )
+    0 swap [ drop 1+ ] each-node node-count set ;
 
 ! Splicing nodes
 GENERIC: splicing-nodes ( #call word/quot/f -- nodes )
@@ -18,7 +27,7 @@ M: word splicing-nodes
     [ [ in-d>> ] [ out-d>> ] bi ] dip #call 1array ;
 
 M: quotation splicing-nodes
-    build-sub-tree normalize ;
+    build-sub-tree analyze-recursive normalize ;
 
 : propagate-body ( #call -- )
     body>> (propagate) ;
@@ -113,12 +122,13 @@ DEFER: (flat-length)
     [ classes-known? 2 0 ? ]
     [
         {
+            [ drop node-count get 45 swap [-] 8 /i ]
             [ flat-length 24 swap [-] 4 /i ]
             [ "default" word-prop -4 0 ? ]
             [ "specializer" word-prop 1 0 ? ]
             [ method-body? 1 0 ? ]
         } cleave
-    ] bi* + + + + ;
+    ] bi* + + + + + ;
 
 : should-inline? ( #call word -- ? )
     inlining-rank 5 >= ;

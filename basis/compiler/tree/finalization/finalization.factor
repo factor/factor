@@ -1,12 +1,13 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel arrays accessors sequences sequences.private words
-fry namespaces math math.order memoize classes.builtin
+fry namespaces make math math.order memoize classes.builtin
 classes.tuple.private slots.private combinators layouts
 byte-arrays alien.accessors
 compiler.intrinsics
 compiler.tree
 compiler.tree.builder
+compiler.tree.recursive
 compiler.tree.normalization
 compiler.tree.propagation
 compiler.tree.propagation.info
@@ -39,6 +40,7 @@ M: #shuffle finalize*
 : splice-quot ( quot -- nodes )
     [
         build-tree
+        analyze-recursive 
         normalize
         propagate
         cleanup
@@ -68,7 +70,7 @@ MEMO: builtin-predicate-expansion ( word -- nodes )
 MEMO: (tuple-boa-expansion) ( n -- quot )
     [
         [ 2 + ] map <reversed>
-        [ '[ [ , set-slot ] keep ] % ] each
+        [ '[ [ _ set-slot ] keep ] % ] each
     ] [ ] make ;
 
 : tuple-boa-expansion ( layout -- quot )

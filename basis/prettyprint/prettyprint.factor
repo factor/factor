@@ -1,15 +1,13 @@
 ! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-
-USING: arrays generic generic.standard assocs io kernel
-math namespaces sequences strings io.styles io.streams.string
+USING: arrays generic generic.standard assocs io kernel math
+namespaces make sequences strings io.styles io.streams.string
 vectors words prettyprint.backend prettyprint.sections
 prettyprint.config sorting splitting grouping math.parser vocabs
 definitions effects classes.builtin classes.tuple io.files
 classes continuations hashtables classes.mixin classes.union
 classes.intersection classes.predicate classes.singleton
 combinators quotations sets accessors colors ;
-
 IN: prettyprint
 
 : make-pprint ( obj quot -- block in use )

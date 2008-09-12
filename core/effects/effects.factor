@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.parser namespaces sequences strings
+USING: kernel math math.parser namespaces make sequences strings
 words assocs combinators accessors arrays ;
 IN: effects
 

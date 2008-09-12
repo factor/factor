@@ -1,6 +1,6 @@
 ! Copyright (C) 2006 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel parser-combinators namespaces sequences promises strings 
+USING: kernel parser-combinators namespaces make sequences promises strings 
        assocs math math.parser math.vectors math.functions math.order
        lists hashtables ascii accessors ;
 IN: json.reader

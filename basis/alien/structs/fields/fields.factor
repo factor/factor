@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel kernel.private math namespaces
-sequences strings words effects combinators alien.c-types ;
+make sequences strings words effects combinators alien.c-types ;
 IN: alien.structs.fields
 
 TUPLE: field-spec name offset type reader writer ;

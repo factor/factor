@@ -13,7 +13,7 @@ TUPLE: blum-blum-shub x n ;
     [ [ random-prime ] curry [ 4 mod 3 = ] generate ] dup bi ;
 
 : next-bbs-bit ( bbs -- bit )
-    [ [ x>> 2 ] [ n>> ] bi ^mod dup ] keep (>>x) 1 bitand ;
+    dup [ x>> 2 ] [ n>> ] bi ^mod [ >>x drop ] [ 1 bitand ] bi ;
 
 PRIVATE>
 

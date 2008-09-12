@@ -1,11 +1,11 @@
 ! Copyright (C) 2007 Chris Double.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel compiler.units words arrays strings math.parser sequences 
-       quotations vectors namespaces math assocs continuations peg
-       peg.parsers unicode.categories multiline 
-       splitting accessors effects sequences.deep peg.search
-       combinators.short-circuit lexer io.streams.string
-       stack-checker io prettyprint combinators parser ;
+USING: kernel compiler.units words arrays strings math.parser
+sequences quotations vectors namespaces make math assocs
+continuations peg peg.parsers unicode.categories multiline
+splitting accessors effects sequences.deep peg.search
+combinators.short-circuit lexer io.streams.string stack-checker
+io prettyprint combinators parser ;
 IN: peg.ebnf
 
 : rule ( name word -- parser )

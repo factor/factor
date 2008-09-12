@@ -1,4 +1,4 @@
-USING: unicode.data sequences sequences.next namespaces
+USING: unicode.data sequences sequences.next namespaces make
 unicode.normalize math unicode.categories combinators
 assocs strings splitting kernel accessors ;
 IN: unicode.case

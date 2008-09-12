@@ -44,7 +44,7 @@ TUPLE: feed-action < action title url entries ;
     feed-action new-action
         dup '[
             feed new
-                ,
+                _
                 [ title>> call >>title ]
                 [ url>> call adjust-url relative-to-request >>url ]
                 [ entries>> call process-entries >>entries ]

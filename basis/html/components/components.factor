@@ -88,7 +88,7 @@ TUPLE: choice size multiple choices ;
     </option> ;
 
 : render-options ( options selected -- )
-    '[ dup , member? render-option ] each ;
+    '[ dup _ member? render-option ] each ;
 
 M: choice render*
     <select

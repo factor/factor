@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays definitions kernel ui.commands
-ui.gestures sequences strings math words generic namespaces
+ui.gestures sequences strings math words generic namespaces make
 hashtables help.markup quotations assocs ;
 IN: ui.operations
 

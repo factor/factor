@@ -13,7 +13,7 @@ M: counter-app init-session* drop 0 count sset ;
 : <counter-action> ( quot -- action )
     <action>
         swap '[
-            count , schange
+            count _ schange
             URL" $counter-app" <redirect>
         ] >>submit ;
 

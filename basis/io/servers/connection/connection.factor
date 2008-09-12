@@ -67,7 +67,7 @@ M: threaded-server handle-client* handler>> call ;
 
 : handle-client ( client remote local -- )
     '[
-        , , log-connection
+        _ _ log-connection
         threaded-server get
         [ timeout>> timeouts ] [ handle-client* ] bi
     ] with-stream ;
@@ -77,7 +77,7 @@ M: threaded-server handle-client* handler>> call ;
 
 : accept-connection ( threaded-server -- )
     [ accept ] [ addr>> ] bi
-    [ '[ , , , handle-client ] ]
+    [ '[ _ _ _ handle-client ] ]
     [ drop threaded-server get name>> swap thread-name ] 2bi
     spawn drop ;
 

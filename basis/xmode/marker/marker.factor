@@ -1,5 +1,7 @@
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 IN: xmode.marker
-USING: kernel namespaces xmode.rules xmode.tokens
+USING: kernel namespaces make xmode.rules xmode.tokens
 xmode.marker.state xmode.marker.context xmode.utilities
 xmode.catalog sequences math assocs combinators
 strings regexp splitting parser-combinators ascii unicode.case

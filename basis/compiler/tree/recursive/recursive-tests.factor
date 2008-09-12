@@ -1,5 +1,5 @@
-IN: compiler.tree.loop.detection.tests
-USING: compiler.tree.loop.detection tools.test
+IN: compiler.tree.recursive.tests
+USING: compiler.tree.recursive tools.test
 kernel combinators.short-circuit math sequences accessors
 compiler.tree
 compiler.tree.builder
@@ -10,7 +10,7 @@ compiler.tree.combinators ;
 [ { f t t t } ] [ t { f f t t } (tail-calls) ] unit-test
 [ { f f f t } ] [ t { f f t f } (tail-calls) ] unit-test
 
-\ detect-loops must-infer
+\ analyze-recursive must-infer
 
 : label-is-loop? ( nodes word -- ? )
     [
@@ -38,22 +38,22 @@ compiler.tree.combinators ;
     dup [ 1+ loop-test-1 ] [ drop ] if ; inline recursive
                           
 [ t ] [
-    [ loop-test-1 ] build-tree detect-loops
+    [ loop-test-1 ] build-tree analyze-recursive
     \ loop-test-1 label-is-loop?
 ] unit-test
 
 [ t ] [
-    [ loop-test-1 1 2 3 ] build-tree detect-loops
+    [ loop-test-1 1 2 3 ] build-tree analyze-recursive
     \ loop-test-1 label-is-loop?
 ] unit-test
 
 [ t ] [
-    [ [ loop-test-1 ] each ] build-tree detect-loops
+    [ [ loop-test-1 ] each ] build-tree analyze-recursive
     \ loop-test-1 label-is-loop?
 ] unit-test
 
 [ t ] [
-    [ [ loop-test-1 ] each ] build-tree detect-loops
+    [ [ loop-test-1 ] each ] build-tree analyze-recursive
     \ (each-integer) label-is-loop?
 ] unit-test
 
@@ -61,7 +61,7 @@ compiler.tree.combinators ;
     dup [ 1+ loop-test-2 1- ] [ drop ] if ; inline recursive
 
 [ t ] [
-    [ loop-test-2 ] build-tree detect-loops
+    [ loop-test-2 ] build-tree analyze-recursive
     \ loop-test-2 label-is-not-loop?
 ] unit-test
 
@@ -69,7 +69,7 @@ compiler.tree.combinators ;
     dup [ [ loop-test-3 ] each ] [ drop ] if ; inline recursive
 
 [ t ] [
-    [ loop-test-3 ] build-tree detect-loops
+    [ loop-test-3 ] build-tree analyze-recursive
     \ loop-test-3 label-is-not-loop?
 ] unit-test
 
@@ -81,7 +81,7 @@ compiler.tree.combinators ;
     ] if ; inline recursive
 
 [ f ] [
-    [ [ [ ] map ] map ] build-tree detect-loops
+    [ [ [ ] map ] map ] build-tree analyze-recursive
     [
         dup #recursive? [ label>> loop?>> not ] [ drop f ] if
     ] contains-node?
@@ -98,22 +98,22 @@ DEFER: a
     blah [ b ] [ a ] if ; inline recursive
 
 [ t ] [
-    [ a ] build-tree detect-loops
+    [ a ] build-tree analyze-recursive
     \ a label-is-loop?
 ] unit-test
 
 [ t ] [
-    [ a ] build-tree detect-loops
+    [ a ] build-tree analyze-recursive
     \ b label-is-loop?
 ] unit-test
 
 [ t ] [
-    [ b ] build-tree detect-loops
+    [ b ] build-tree analyze-recursive
     \ a label-is-loop?
 ] unit-test
 
 [ t ] [
-    [ a ] build-tree detect-loops
+    [ a ] build-tree analyze-recursive
     \ b label-is-loop?
 ] unit-test
 
@@ -126,12 +126,12 @@ DEFER: a'
     blah [ b' ] [ a' ] if ; inline recursive
 
 [ f ] [
-    [ a' ] build-tree detect-loops
+    [ a' ] build-tree analyze-recursive
     \ a' label-is-loop?
 ] unit-test
 
 [ f ] [
-    [ b' ] build-tree detect-loops
+    [ b' ] build-tree analyze-recursive
     \ b' label-is-loop?
 ] unit-test
 
@@ -140,11 +140,11 @@ DEFER: a'
 ! sound.
 
 [ t ] [
-    [ b' ] build-tree detect-loops
+    [ b' ] build-tree analyze-recursive
     \ a' label-is-loop?
 ] unit-test
 
 [ f ] [
-    [ a' ] build-tree detect-loops
+    [ a' ] build-tree analyze-recursive
     \ b' label-is-loop?
 ] unit-test

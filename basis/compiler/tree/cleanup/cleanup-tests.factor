@@ -10,12 +10,13 @@ compiler.tree
 compiler.tree.combinators
 compiler.tree.cleanup
 compiler.tree.builder
+compiler.tree.recursive
 compiler.tree.normalization
 compiler.tree.propagation
 compiler.tree.checker ;
 
 : cleaned-up-tree ( quot -- nodes )
-    build-tree normalize propagate cleanup dup check-nodes ;
+    build-tree analyze-recursive normalize propagate cleanup dup check-nodes ;
 
 [ t ] [ [ [ 1 ] [ 2 ] if ] cleaned-up-tree [ #if? ] contains-node? ] unit-test
 
@@ -36,7 +37,7 @@ compiler.tree.checker ;
 : inlined? ( quot seq/word -- ? )
     [ cleaned-up-tree ] dip
     dup word? [ 1array ] when
-    '[ dup #call? [ word>> , member? ] [ drop f ] if ]
+    '[ dup #call? [ word>> _ member? ] [ drop f ] if ]
     contains-node? not ;
 
 [ f ] [
@@ -456,4 +457,44 @@ cell-bits 32 = [
 [ ] [
     [ [ >r "A" throw r> ] [ "B" throw ] if ]
     cleaned-up-tree drop
+] unit-test
+
+! Regression from benchmark.nsieve
+: chicken-fingers ( i seq -- )
+    2dup < [
+        2drop
+    ] [
+        chicken-fingers
+    ] if ; inline recursive
+
+: buffalo-wings ( i seq -- )
+    2dup < [
+        2dup chicken-fingers
+        >r 1+ r> buffalo-wings
+    ] [
+        2drop
+    ] if ; inline recursive
+
+[ t ] [
+    [ 2 swap >fixnum buffalo-wings ]
+    { <-integer-fixnum +-integer-fixnum } inlined?
+] unit-test
+
+! A reduction
+: buffalo-sauce f ;
+
+: steak ( -- )
+    buffalo-sauce [ steak ] when ; inline recursive
+
+: ribs ( i seq -- )
+    2dup < [
+        steak
+        >r 1+ r> ribs
+    ] [
+        2drop
+    ] if ; inline recursive
+
+[ t ] [
+    [ 2 swap >fixnum ribs ]
+    { <-integer-fixnum +-integer-fixnum } inlined?
 ] unit-test

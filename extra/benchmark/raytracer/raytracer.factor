@@ -3,7 +3,7 @@
 
 USING: arrays accessors float-arrays io io.files
 io.encodings.binary kernel math math.functions math.vectors
-math.parser namespaces sequences sequences.private words ;
+math.parser make sequences sequences.private words ;
 IN: benchmark.raytracer
 
 ! parameters

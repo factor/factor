@@ -3,9 +3,10 @@
 USING: accessors alien.c-types arrays cpu.x86.assembler
 cpu.x86.architecture cpu.x86.intrinsics cpu.x86.sse2
 cpu.x86.allot cpu.architecture kernel kernel.private math
-namespaces sequences compiler.generator compiler.generator.registers
-compiler.generator.fixup system layouts alien alien.accessors
-alien.structs slots splitting assocs ;
+namespaces make sequences compiler.generator
+compiler.generator.registers compiler.generator.fixup system
+layouts alien alien.accessors alien.structs slots splitting
+assocs ;
 IN: cpu.x86.64
 
 M: x86.64 ds-reg R14 ;
@@ -114,6 +115,9 @@ M: x86.64 %box-small-struct ( size -- )
     RSI RDX MOV
     RDX swap MOV
     "box_small_struct" f %alien-invoke ;
+
+: struct-return@ ( size n -- n )
+    [ ] [ \ stack-frame get swap - ] ?if ;
 
 M: x86.64 %box-large-struct ( n size -- )
     ! Struct size is parameter 2

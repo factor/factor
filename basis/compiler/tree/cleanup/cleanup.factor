@@ -101,7 +101,7 @@ M: #declare cleanup* drop f ;
 
 : delete-unreachable-branches ( #branch -- )
     dup live-branches>> '[
-        ,
+        _
         [ [ [ drop ] [ delete-nodes ] if ] 2each ]
         [ select-children ]
         2bi
@@ -148,9 +148,9 @@ M: #branch cleanup*
 M: #phi cleanup*
     #! Remove #phi function inputs which no longer exist.
     live-branches get
-    [ '[ , sift-children ] change-phi-in-d ]
-    [ '[ , sift-children ] change-phi-info-d ]
-    [ '[ , sift-children ] change-terminated ] tri
+    [ '[ _ sift-children ] change-phi-in-d ]
+    [ '[ _ sift-children ] change-phi-info-d ]
+    [ '[ _ sift-children ] change-terminated ] tri
     eliminate-phi
     live-branches off ;
 

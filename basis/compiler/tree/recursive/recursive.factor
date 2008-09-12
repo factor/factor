@@ -1,14 +1,27 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences namespaces assocs accessors fry
-compiler.tree deques search-deques ;
-IN: compiler.tree.loop.detection
+USING: kernel assocs namespaces accessors sequences deques
+search-deques compiler.tree compiler.tree.combinators ;
+IN: compiler.tree.recursive
+
+! Collect label info
+GENERIC: collect-label-info ( node -- )
+
+M: #return-recursive collect-label-info
+    dup label>> (>>return) ;
+
+M: #call-recursive collect-label-info
+    dup label>> calls>> push ;
+
+M: #recursive collect-label-info
+    label>> V{ } clone >>calls drop ;
+
+M: node collect-label-info drop ;
 
 ! A loop is a #recursive which only tail calls itself, and those
 ! calls are nested inside other loops only. We optimistically
 ! assume all #recursive nodes are loops, disqualifying them as
 ! we see evidence to the contrary.
-
 : (tail-calls) ( tail? seq -- seq' )
     reverse [ swap [ and ] keep ] map nip reverse ;
 
@@ -84,5 +97,6 @@ M: node collect-loop-info* 2drop ;
         ] [ drop ] if
     ] slurp-deque ;
 
-: detect-loops ( nodes -- nodes )
+: analyze-recursive ( nodes -- nodes )
+    dup [ collect-label-info ] each-node
     dup collect-loop-info disqualify-loops ;

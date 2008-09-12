@@ -130,13 +130,13 @@ SYMBOL: enter-out
 : adjust-stack-effect ( effect -- effect' )
     [ in>> ] [ out>> ] bi
     meta-d get length pick length [-]
-    object <repetition> '[ , prepend ] bi@
+    object <repetition> '[ _ prepend ] bi@
     <effect> ;
 
 : call-recursive-inline-word ( word -- )
     dup "recursive" word-prop [
         [ required-stack-effect adjust-stack-effect ] [ ] [ recursive-label ] tri
-        [ 2nip check-call ] [ nip '[ , #call-recursive, ] consume/produce ] 3bi
+        [ 2nip check-call ] [ nip '[ _ #call-recursive, ] consume/produce ] 3bi
     ] [ undeclared-recursion-error inference-error ] if ;
 
 : inline-word ( word -- )

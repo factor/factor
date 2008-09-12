@@ -73,7 +73,7 @@ TUPLE: file-responder root hook special allow-listings ;
 
 : list-directory ( directory -- response )
     file-responder get allow-listings>> [
-        '[ , directory. ] "text/html" <content>
+        '[ _ directory. ] "text/html" <content>
     ] [
         drop <403>
     ] if ;
