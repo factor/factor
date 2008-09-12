@@ -77,7 +77,7 @@ TYPEDEF: NSRange _NSRange
 
 ! The "lL" type encodings refer to 32-bit values even in 64-bit mode
 TYPEDEF: int long32
-TYPEDEF: uint long32
+TYPEDEF: uint ulong32
 TYPEDEF: void* unknown_type
 
 : <NSRange> ( length location -- size )
