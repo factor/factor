@@ -231,6 +231,32 @@ generic-comparison-ops [
 ] assoc-each
 
 {
+    mod-integer-integer
+    mod-integer-fixnum
+    mod-fixnum-integer
+    fixnum-mod
+    rem
+} [
+    [
+        in-d>> second value-info >literal<
+        [ power-of-2? [ 1- bitand ] f ? ] when
+    ] "custom-inlining" set-word-prop
+] each
+
+{
+    bitand-integer-integer
+    bitand-integer-fixnum
+    bitand-fixnum-integer
+} [
+    [
+        in-d>> second value-info >literal< [
+            0 most-positive-fixnum between?
+            [ [ >fixnum ] bi@ fixnum-bitand ] f ?
+        ] when
+    ] "custom-inlining" set-word-prop
+] each
+
+{
     alien-signed-1
     alien-unsigned-1
     alien-signed-2

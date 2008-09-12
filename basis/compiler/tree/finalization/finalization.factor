@@ -6,27 +6,20 @@ classes.tuple.private slots.private combinators layouts
 byte-arrays alien.accessors
 compiler.intrinsics
 compiler.tree
-compiler.tree.builder
-compiler.tree.recursive
-compiler.tree.normalization
-compiler.tree.propagation
+compiler.tree.combinators
 compiler.tree.propagation.info
-compiler.tree.cleanup
-compiler.tree.def-use
-compiler.tree.dead-code
-compiler.tree.combinators ;
+compiler.tree.late-optimizations ;
 IN: compiler.tree.finalization
+
+! This is a late-stage optimization.
+! See the comment in compiler.tree.late-optimizations.
 
 ! This pass runs after propagation, so that it can expand
 ! built-in type predicates and memory allocation; these cannot
 ! be expanded before propagation since we need to see 'fixnum?'
 ! instead of 'tag 0 eq?' and so on, for semantic reasoning.
 ! We also delete empty stack shuffles and copies to facilitate
-! tail call optimization in the code generator. After this pass
-! runs, stack flow information is no longer accurate, since we
-! punt in 'splice-quot' and don't update everything that we
-! should; this simplifies the code, improves performance, and we
-! don't need the stack flow information after this pass anyway.
+! tail call optimization in the code generator.
 
 GENERIC: finalize* ( node -- nodes )
 
@@ -36,18 +29,6 @@ M: #shuffle finalize*
     dup shuffle-effect
     [ in>> ] [ out>> ] bi sequence=
     [ drop f ] when ;
-
-: splice-quot ( quot -- nodes )
-    [
-        build-tree
-        analyze-recursive 
-        normalize
-        propagate
-        cleanup
-        compute-def-use
-        remove-dead-code
-        but-last
-    ] with-scope ;
 
 : builtin-predicate? ( #call -- ? )
     word>> "predicating" word-prop builtin-class? ;
