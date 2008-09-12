@@ -27,7 +27,7 @@ HELP: nonstandard-mime-types
      { "assoc" assoc } }
 { $description "A list of Factor-specific MIME types that are added to the MIME database loaded from disk." } ;
 
-ARTICLE: "mime-types" "mime-types"
+ARTICLE: "mime-types" "MIME types"
 "The " { $vocab-link "mime-types" } " vocabulary loads a file of MIME types and provides a word to look up the MIME type based on a file extension." $nl
 "Looking up a MIME type:"
 { $subsection mime-type } ;
