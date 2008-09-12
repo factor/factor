@@ -23,7 +23,7 @@ HELP: every
 { $description "Creates and registers an alarm which calls the quotation repeatedly, using " { $snippet "dt" } " as the frequency." } ;
 
 ARTICLE: "alarms" "Alarms"
-"Alarms provide a lightweight way to schedule one-time and recurring tasks without spawning a new thread."
+"The " { $vocab-link "alarms" } " vocabulary provides a lightweight way to schedule one-time and recurring tasks without spawning a new thread."
 { $subsection alarm }
 { $subsection add-alarm }
 { $subsection later }
