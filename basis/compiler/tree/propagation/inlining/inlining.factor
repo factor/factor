@@ -19,7 +19,7 @@ M: word splicing-nodes
     [ [ in-d>> ] [ out-d>> ] bi ] dip #call 1array ;
 
 M: quotation splicing-nodes
-    build-sub-tree normalize analyze-recursive ;
+    build-sub-tree analyze-recursive normalize ;
 
 : propagate-body ( #call -- )
     body>> (propagate) ;
