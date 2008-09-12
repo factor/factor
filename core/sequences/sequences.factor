@@ -480,6 +480,11 @@ PRIVATE>
 : last-index-from ( obj i seq -- n )
     rot [ = ] curry find-last-from drop ;
 
+: indices ( obj seq -- indices )
+    V{ } clone spin
+    [ rot = [ over push ] [ drop ] if ]
+    curry each-index ;
+
 : nths ( seq indices -- seq' )
     swap [ nth ] curry map ;
 
@@ -746,6 +751,17 @@ PRIVATE>
 
 : unclip-slice ( seq -- rest first )
     [ rest-slice ] [ first ] bi ; inline
+
+: 2unclip-slice ( seq1 seq2 -- seq1' seq2' elt1 elt2 )
+    [ unclip-slice ] bi@ swapd ; inline
+
+: map-reduce ( seq map-quot reduce-quot -- result )
+    [ [ unclip-slice ] dip [ call ] keep ] dip
+    compose reduce ; inline
+
+: 2map-reduce ( seq1 seq2 map-quot reduce-quot -- result )
+    [ [ 2unclip-slice ] dip [ call ] keep ] dip
+    compose 2reduce ; inline
 
 : unclip-last-slice ( seq -- butlast last )
     [ but-last-slice ] [ peek ] bi ; inline
