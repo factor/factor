@@ -265,4 +265,6 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 
 [ { 1 3 7 } ] [ 2 { 1 3 5 7 } remove-nth ] unit-test
 
-[ { 1 3 "X" 5 7 } ] [ "X" 2 { 1 3 5 7 } insert-nth ] unit-test
+[ { 1 3 "X" 5 7 } ] [ "X" 2 { 1 3 5 7 } insert-nth ] 
+
+[ V{ 0 2 } ] [ "a" { "a" "b" "a" } indices ] unit-test
