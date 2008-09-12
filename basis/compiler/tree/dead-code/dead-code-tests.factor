@@ -3,16 +3,17 @@ compiler.tree.dead-code compiler.tree.def-use compiler.tree
 compiler.tree.combinators compiler.tree.propagation
 compiler.tree.cleanup compiler.tree.escape-analysis
 compiler.tree.tuple-unboxing compiler.tree.debugger
-compiler.tree.normalization compiler.tree.checker tools.test
-kernel math stack-checker.state accessors combinators io
-prettyprint words sequences.deep sequences.private arrays
-classes kernel.private ;
+compiler.tree.recursive compiler.tree.normalization
+compiler.tree.checker tools.test kernel math stack-checker.state
+accessors combinators io prettyprint words sequences.deep
+sequences.private arrays classes kernel.private ;
 IN: compiler.tree.dead-code.tests
 
 \ remove-dead-code must-infer
 
 : count-live-values ( quot -- n )
     build-tree
+    analyze-recursive
     normalize
     propagate
     cleanup
@@ -64,6 +65,7 @@ IN: compiler.tree.dead-code.tests
 
 : optimize-quot ( quot -- quot' )
     build-tree
+    analyze-recursive
     normalize
     propagate
     cleanup

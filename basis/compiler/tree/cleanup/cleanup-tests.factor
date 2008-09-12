@@ -10,12 +10,13 @@ compiler.tree
 compiler.tree.combinators
 compiler.tree.cleanup
 compiler.tree.builder
+compiler.tree.recursive
 compiler.tree.normalization
 compiler.tree.propagation
 compiler.tree.checker ;
 
 : cleaned-up-tree ( quot -- nodes )
-    build-tree normalize propagate cleanup dup check-nodes ;
+    build-tree analyze-recursive normalize propagate cleanup dup check-nodes ;
 
 [ t ] [ [ [ 1 ] [ 2 ] if ] cleaned-up-tree [ #if? ] contains-node? ] unit-test
 

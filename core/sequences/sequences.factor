@@ -236,6 +236,10 @@ INSTANCE: repetition immutable-sequence
 
 <PRIVATE
 
+: check-length ( n -- n )
+    #! Ricing.
+    dup integer? [ "length not an integer" throw ] unless ; inline
+
 : ((copy)) ( dst i src j n -- dst i src j n )
     dup -roll [
         + swap nth-unsafe -roll [
@@ -248,8 +252,9 @@ INSTANCE: repetition immutable-sequence
     inline recursive
 
 : prepare-subseq ( from to seq -- dst i src j n )
+    #! The check-length call forces partial dispatch
     [ >r swap - r> new-sequence dup 0 ] 3keep
-    -rot drop roll length ; inline
+    -rot drop roll length check-length ; inline
 
 : check-copy ( src n dst -- )
     over 0 < [ bounds-error ] when
@@ -273,7 +278,8 @@ PRIVATE>
 : but-last ( seq -- headseq ) 1 head* ;
 
 : copy ( src i dst -- )
-    pick length >r 3dup check-copy spin 0 r>
+    #! The check-length call forces partial dispatch
+    pick length check-length >r 3dup check-copy spin 0 r>
     (copy) drop ; inline
 
 M: sequence clone-like

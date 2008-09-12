@@ -91,7 +91,7 @@ IN: hints
 
 \ >string { sbuf } "specializer" set-word-prop
 
-\ >array { { string } { vector } } "specializer" set-word-prop
+\ >array { { vector } } "specializer" set-word-prop
 
 \ >vector { { array } { vector } } "specializer" set-word-prop
 
@@ -101,7 +101,7 @@ IN: hints
 
 \ memq? { array } "specializer" set-word-prop
 
-\ member? { fixnum string } "specializer" set-word-prop
+\ member? { array } "specializer" set-word-prop
 
 \ assoc-stack { vector } "specializer" set-word-prop
 

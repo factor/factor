@@ -7,6 +7,7 @@ byte-arrays alien.accessors
 compiler.intrinsics
 compiler.tree
 compiler.tree.builder
+compiler.tree.recursive
 compiler.tree.normalization
 compiler.tree.propagation
 compiler.tree.propagation.info
@@ -39,6 +40,7 @@ M: #shuffle finalize*
 : splice-quot ( quot -- nodes )
     [
         build-tree
+        analyze-recursive 
         normalize
         propagate
         cleanup

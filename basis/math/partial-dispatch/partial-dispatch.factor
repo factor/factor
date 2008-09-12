@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel kernel.private math math.private words
 sequences parser namespaces make assocs quotations arrays locals
-generic generic.math hashtables effects compiler.units ;
+generic generic.math hashtables effects compiler.units
+classes.algebra ;
 IN: math.partial-dispatch
 
 ! Partial dispatch.
@@ -96,18 +97,27 @@ SYMBOL: fast-math-ops
     [ drop math-class-max swap specific-method >boolean ] if ;
 
 : (derived-ops) ( word assoc -- words )
-    swap [ rot first eq? nip ] curry assoc-filter values ;
+    swap [ rot first eq? nip ] curry assoc-filter ;
 
 : derived-ops ( word -- words )
-    [ 1array ]
-    [ math-ops get (derived-ops) ]
-    bi append ;
+    [ 1array ] [ math-ops get (derived-ops) values ] bi append ;
 
 : fast-derived-ops ( word -- words )
-    fast-math-ops get (derived-ops) ;
+    fast-math-ops get (derived-ops) values ;
 
 : all-derived-ops ( word -- words )
     [ derived-ops ] [ fast-derived-ops ] bi append ;
+
+: integer-derived-ops ( word -- words )
+    [ math-ops get (derived-ops) ] [ fast-math-ops get (derived-ops) ] bi
+    [
+            [
+            drop
+            [ second integer class<= ]
+            [ third integer class<= ]
+            bi and
+        ] assoc-filter values
+    ] bi@ append ;
 
 : each-derived-op ( word quot -- )
     >r derived-ops r> each ; inline
