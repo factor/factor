@@ -10,7 +10,7 @@ IN: smtp
 SYMBOL: smtp-domain
 SYMBOL: smtp-server     "localhost" "smtp" <inet> smtp-server set-global
 SYMBOL: smtp-read-timeout    1 minutes smtp-read-timeout set-global
-SYMBOL: esmtp           t esmtp set-global
+SYMBOL: esmtp?           t esmtp? set-global
 
 LOG: log-smtp-connection NOTICE ( addrspec -- )
 
@@ -39,7 +39,7 @@ TUPLE: email
 : command ( string -- ) write crlf flush ;
 
 : helo ( -- )
-    esmtp get "EHLO " "HELO " ? host-name append command ;
+    esmtp? get "EHLO " "HELO " ? host-name append command ;
 
 ERROR: bad-email-address email ;
 

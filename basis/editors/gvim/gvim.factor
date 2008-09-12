@@ -1,6 +1,6 @@
 USING: io.backend io.files kernel math math.parser
 namespaces sequences system combinators
-editors.vim vocabs.loader ;
+editors.vim vocabs.loader make ;
 IN: editors.gvim
 
 SINGLETON: gvim

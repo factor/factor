@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel sequences math math.functions hints
 math.order ;
@@ -19,8 +19,8 @@ IN: math.vectors
 : vmax ( u v -- w ) [ max ] 2map ;
 : vmin ( u v -- w ) [ min ] 2map ;
 
-: v. ( u v -- x ) 0 [ * + ] 2reduce ;
-: norm-sq ( v -- x ) 0 [ absq + ] reduce ;
+: v. ( u v -- x ) [ * ] [ + ] 2map-reduce ;
+: norm-sq ( v -- x ) [ absq ] [ + ] map-reduce ;
 : norm ( v -- x ) norm-sq sqrt ;
 : normalize ( u -- v ) dup norm v/n ;
 

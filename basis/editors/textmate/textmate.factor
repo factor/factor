@@ -1,5 +1,5 @@
 USING: definitions io.launcher kernel math math.parser parser
-namespaces prettyprint editors ;
+namespaces prettyprint editors make ;
 
 IN: editors.textmate
 
