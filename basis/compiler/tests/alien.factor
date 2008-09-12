@@ -3,7 +3,7 @@ USING: alien alien.c-types alien.syntax compiler kernel
 namespaces namespaces tools.test sequences stack-checker
 stack-checker.errors words arrays parser quotations
 continuations effects namespaces.private io io.streams.string
-memory system threads tools.test math accessors ;
+memory system threads tools.test math accessors combinators ;
 
 FUNCTION: void ffi_test_0 ;
 [ ] [ ffi_test_0 ] unit-test
@@ -401,3 +401,41 @@ C-STRUCT: test_struct_13
 FUNCTION: int ffi_test_39 ( long a, long b, test_struct_13 s ) ;
 
 [ 21 ] [ 12347 12347 make-test-struct-13 ffi_test_39 ] unit-test
+
+! Joe Groff found this problem
+C-STRUCT: double-rect
+{ "double" "a" }
+{ "double" "b" }
+{ "double" "c" }
+{ "double" "d" } ;
+
+: <double-rect> ( a b c d -- foo )
+    "double-rect" <c-object>
+    {
+        [ set-double-rect-d ]
+        [ set-double-rect-c ]
+        [ set-double-rect-b ]
+        [ set-double-rect-a ]
+        [ ]
+    } cleave ;
+
+: >double-rect< ( foo -- a b c d )
+    {
+        [ double-rect-a ]
+        [ double-rect-b ]
+        [ double-rect-c ]
+        [ double-rect-d ]
+    } cleave ;
+
+: double-rect-callback ( -- alien )
+    "void" { "void*" "void*" "double-rect" } "cdecl"
+    [ "example" set-global 2drop ] alien-callback ;
+
+: double-rect-test ( arg -- arg' )
+    f f rot
+    double-rect-callback
+    "void" { "void*" "void*" "double-rect" } "cdecl" alien-indirect
+    "example" get-global ;
+
+[ 1.0 2.0 3.0 4.0 ]
+[ 1.0 2.0 3.0 4.0 <double-rect> double-rect-test >double-rect< ] unit-test
