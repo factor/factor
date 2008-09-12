@@ -141,13 +141,6 @@ M: x86 small-enough? ( n -- ? )
 
 : temp@ ( n -- op ) stack-reg \ stack-frame get rot - [+] ;
 
-: struct-return@ ( size n -- n )
-    [
-        stack-frame* cell + +
-    ] [
-        \ stack-frame get swap -
-    ] ?if ;
-
 HOOK: %unbox-struct-1 cpu ( -- )
 
 HOOK: %unbox-struct-2 cpu ( -- )

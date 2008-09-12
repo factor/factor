@@ -173,6 +173,9 @@ M: x86.32 %box-long-long ( n func -- )
         [ (%box-long-long) ] [ f %alien-invoke ] bi*
     ] with-aligned-stack ;
 
+: struct-return@ ( size n -- n )
+    [ stack-frame* cell + + ] [ \ stack-frame get swap - ] ?if ;
+
 M: x86.32 %box-large-struct ( n size -- )
     ! Compute destination address
     [ swap struct-return@ ] keep

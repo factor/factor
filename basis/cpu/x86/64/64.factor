@@ -116,6 +116,9 @@ M: x86.64 %box-small-struct ( size -- )
     RDX swap MOV
     "box_small_struct" f %alien-invoke ;
 
+: struct-return@ ( size n -- n )
+    [ ] [ \ stack-frame get swap - ] ?if ;
+
 M: x86.64 %box-large-struct ( n size -- )
     ! Struct size is parameter 2
     RSI over MOV
