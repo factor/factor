@@ -1,5 +1,5 @@
 USING: editors io.files io.launcher kernel math.parser
-namespaces sequences windows.shell32 ;
+namespaces sequences windows.shell32 wne ;
 IN: editors.ultraedit
 
 : ultraedit-path ( -- path )

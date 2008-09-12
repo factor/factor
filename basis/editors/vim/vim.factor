@@ -1,5 +1,6 @@
 USING: definitions io io.launcher kernel math math.parser
-namespaces parser prettyprint sequences editors accessors ;
+namespaces parser prettyprint sequences editors accessors
+make ;
 IN: editors.vim
 
 SYMBOL: vim-path
