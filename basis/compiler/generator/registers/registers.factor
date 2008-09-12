@@ -50,12 +50,20 @@ C: <vreg> vreg ( n reg-class -- vreg )
 
 M: vreg v>operand [ n>> ] [ reg-class>> ] bi vregs nth ;
 M: vreg live-vregs* , ;
-M: vreg move-spec reg-class>> move-spec ;
+
+M: vreg move-spec
+    reg-class>> {
+        { [ dup int-regs? ] [ f ] }
+        { [ dup float-regs? ] [ float ] }
+    } cond nip ;
+
+M: vreg operand-class*
+    reg-class>> {
+        { [ dup int-regs? ] [ f ] }
+        { [ dup float-regs? ] [ float ] }
+    } cond nip ;
 
 INSTANCE: vreg value
-
-M: float-regs move-spec drop float ;
-M: float-regs operand-class* drop float ;
 
 ! Temporary register for stack shuffling
 SINGLETON: temp-reg
