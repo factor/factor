@@ -480,6 +480,11 @@ PRIVATE>
 : last-index-from ( obj i seq -- n )
     rot [ = ] curry find-last-from drop ;
 
+: indices ( obj seq -- indices )
+    V{ } clone spin
+    [ rot = [ over push ] [ drop ] if ]
+    curry each-index ;
+
 : nths ( seq indices -- seq' )
     swap [ nth ] curry map ;
 
