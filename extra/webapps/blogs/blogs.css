@@ -1,0 +1,15 @@
+.post-form {
+	border: 2px solid #666;
+	padding: 10px;
+	background: #eee;
+}
+
+.post-title {
+	background-color:#f5f5ff;
+	padding: 3px;
+}
+
+.post-footer {
+	text-align: right;
+	font-size:90%;
+}

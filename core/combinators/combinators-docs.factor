@@ -16,6 +16,10 @@ $nl
 { $subsection while }
 "Generalization of " { $link bi } " and " { $link tri } ":"
 { $subsection cleave }
+"Generalization of " { $link 2bi } " and " { $link 2tri } ":"
+{ $subsection 2cleave }
+"Generalization of " { $link 3bi } " and " { $link 3tri }  ":"
+{ $subsection 3cleave }
 "Generalization of " { $link bi* } " and " { $link tri* } ":"
 { $subsection spread }
 "Two combinators which abstract out nested chains of " { $link if } ":"
@@ -25,10 +29,16 @@ $nl
 $nl
 "A combinator which can help with implementing methods on " { $link hashcode* } ":"
 { $subsection recursive-hashcode }
-"An oddball combinator:"
-{ $subsection with-datastack }
+{ $subsection "assertions" }
 { $subsection "combinators-quot" }
 { $see-also "quotations" "dataflow" } ;
+
+ARTICLE: "assertions" "Assertions"
+"Some words to make assertions easier to enforce:"
+{ $subsection assert }
+{ $subsection assert= }
+"Runtime stack depth checking:"
+{ $subsection assert-depth } ;
 
 ABOUT: "combinators"
 
@@ -43,6 +53,16 @@ HELP: cleave
         "[ p ] keep [ q ] keep [ r ] keep s"
     }
 } ;
+
+HELP: 2cleave
+{ $values { "x" object } { "y" object }
+          { "seq" "a sequence of quotations with stack effect " { $snippet "( x y -- ... )" } } }
+{ $description "Applies each quotation to the two objects in turn." } ;
+
+HELP: 3cleave
+{ $values { "x" object } { "y" object } { "z" object }
+          { "seq" "a sequence of quotations with stack effect " { $snippet "( x y z -- ... )" } } }
+{ $description "Applies each quotation to the three objects in turn." } ;
 
 { bi tri cleave } related-words
 
@@ -116,13 +136,6 @@ HELP: no-case
 { $description "Throws a " { $link no-case } " error." }
 { $error-description "Thrown by " { $link case } " if the object at the top of the stack does not match any case, and no default case is given." } ;
 
-HELP: with-datastack
-{ $values { "stack" sequence } { "quot" quotation } { "newstack" sequence } }
-{ $description "Executes the quotation with the given data stack contents, and outputs the new data stack after the word returns. The input sequence is not modified. Does not affect the data stack in surrounding code, other than consuming the two inputs and pushing the output." }
-{ $examples
-    { $example "USING: combinators math prettyprint ;" "{ 3 7 } [ + ] with-datastack ." "{ 10 }" }
-} ;
-
 HELP: recursive-hashcode
 { $values { "n" integer } { "obj" object } { "quot" "a quotation with stack effect " { $snippet "( n obj -- code )" } } { "code" integer } }
 { $description "A combinator used to implement methods for the " { $link hashcode* } " generic word. If " { $snippet "n" } " is less than or equal to zero, outputs 0, otherwise calls the quotation." } ;
@@ -146,7 +159,7 @@ $nl
 } } ;
 
 HELP: distribute-buckets
-{ $values { "assoc" "an alist" } { "initial" object } { "quot" "a quotation with stack effect " { $snippet "( obj -- assoc )" } } { "buckets" "a new array" } }
+{ $values { "alist" "an alist" } { "initial" object } { "quot" "a quotation with stack effect " { $snippet "( obj -- assoc )" } } { "buckets" "a new array" } }
 { $description "Sorts the entries of " { $snippet "assoc" } " into buckets, using the quotation to yield a set of keys for each entry. The hashcode of each key is computed, and the entry is placed in all corresponding buckets. Each bucket is initially cloned from " { $snippet "initial" } "; this should either be an empty vector or a one-element vector containing a pair." }
 { $notes "This word is used in the implemention of " { $link hash-case-quot } " and " { $link standard-combination } "." } ;
 
@@ -154,3 +167,7 @@ HELP: dispatch ( n array -- )
 { $values { "n" "a fixnum" } { "array" "an array of quotations" } }
 { $description "Calls the " { $snippet "n" } "th quotation in the array." }
 { $warning "This word is in the " { $vocab-link "kernel.private" } " vocabulary because it is an implementation detail used by the generic word system to accelerate method dispatch. It does not perform type or bounds checks, and user code should not need to call it directly." } ;
+
+HELP: assert-depth
+{ $values { "quot" "a quotation" } }
+{ $description "Runs a quotation. Throws an error if the total number of elements on the stack is not the same before and after the quotation runs." } ;

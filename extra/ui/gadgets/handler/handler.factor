@@ -1,11 +1,11 @@
 
-USING: kernel assocs ui.gestures ;
+USING: kernel assocs ui.gestures ui.gadgets.wrappers accessors ;
 
 IN: ui.gadgets.handler
 
-TUPLE: handler table ;
+TUPLE: handler < wrapper table ;
 
-C: <handler> handler
+: <handler> ( child -- handler ) handler new-wrapper ;
 
-M: handler handle-gesture* ( gadget gesture delegate -- ? )
-handler-table at dup [ call f ] [ 2drop t ] if ;
+M: handler handle-gesture ( gesture gadget -- ? )
+   tuck table>> at dup [ call f ] [ 2drop t ] if ;

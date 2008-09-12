@@ -1,7 +1,7 @@
 ! From http://www.ffconsultancy.com/ocaml/maze/index.html
 USING: sequences namespaces math math.vectors opengl opengl.gl
 arrays kernel random ui ui.gadgets ui.gadgets.canvas ui.render
-math.order ;
+math.order math.geometry.rect ;
 IN: maze
 
 : line-width 8 ;
@@ -49,10 +49,9 @@ SYMBOL: visited
     { 0 0 } dup vertex (draw-maze)
     glEnd ;
 
-TUPLE: maze ;
+TUPLE: maze < canvas ;
 
-: <maze> ( -- gadget )
-    <canvas> { set-delegate } maze construct ;
+: <maze> ( -- gadget ) maze new-canvas ;
 
 : n ( gadget -- n ) rect-dim first2 min line-width /i ;
 

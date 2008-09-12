@@ -6,7 +6,7 @@ USING: kernel words namespaces classes parser continuations
        combinators sequences splitting quotations arrays strings tools.time
        sequences.deep accessors assocs.lib
        io.encodings.utf8
-       combinators.cleave bake calendar calendar.format ;
+       combinators.cleave calendar calendar.format eval ;
 
 IN: builder.util
 
@@ -40,14 +40,6 @@ DEFER: to-strings
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : host-name* ( -- name ) host-name "." split first ;
-
-! : datestamp ( -- string )
-!   now `{ ,[ dup timestamp-year   ]
-!          ,[ dup timestamp-month  ]
-!          ,[ dup timestamp-day    ]
-!          ,[ dup timestamp-hour   ]
-!          ,[     timestamp-minute ] }
-!   [ pad-00 ] map "-" join ;
 
 : datestamp ( -- string )
   now

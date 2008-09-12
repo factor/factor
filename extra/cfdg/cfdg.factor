@@ -3,40 +3,18 @@ USING: kernel alien.c-types combinators namespaces arrays
        sequences sequences.lib namespaces.lib splitting
        math math.functions math.vectors math.trig
        opengl.gl opengl.glu opengl ui ui.gadgets.slate
-       vars
-       random-weighted colors.hsv cfdg.gl ;
-
+       vars colors self self.slots
+       random-weighted colors.hsv cfdg.gl accessors
+       ui.gadgets.handler ui.gestures assocs ui.gadgets macros
+       qualified ;
+QUALIFIED: syntax
 IN: cfdg
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! hsba { hue saturation brightness alpha }
+SELF-SLOTS: hsva
 
-: <hsba> 4array ;
-
-VAR: color
-
-! ( -- val )
-
-: hue>>        0 color> nth ;
-: saturation>> 1 color> nth ;
-: brightness>> 2 color> nth ;
-: alpha>>      3 color> nth ;
-
-! ( val -- )
-
-: >>hue        0 color> set-nth ;
-: >>saturation 1 color> set-nth ;
-: >>brightness 2 color> set-nth ;
-: >>alpha      3 color> set-nth ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: hsva>rgba ( hsva -- rgba ) [ 3 head hsv>rgb ] [ peek ] bi suffix ;
-
-: gl-set-hsba ( hsva -- ) hsva>rgba gl-color ;
-
-: gl-clear-hsba ( hsva -- ) hsva>rgba gl-clear ;
+: clear-color ( color -- ) set-clear-color GL_COLOR_BUFFER_BIT glClear ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -50,18 +28,18 @@ VAR: color
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: hue ( num -- ) hue>> + 360 mod >>hue ;
+: hue ( num -- ) hue-> + 360 mod ->hue ;
 
-: saturation ( num -- ) saturation>> swap adjust >>saturation ;
-: brightness ( num -- ) brightness>> swap adjust >>brightness ;
-: alpha      ( num -- ) alpha>>      swap adjust >>alpha ;
+: saturation ( num -- ) saturation-> swap adjust ->saturation ;
+: brightness ( num -- ) value->      swap adjust ->value ;
+: alpha      ( num -- ) alpha->      swap adjust ->alpha ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: h   hue ;
-: sat saturation ;
-: b   brightness ;
-: a   alpha ;
+: h   ( num -- ) hue ;
+: sat ( num -- ) saturation ;
+: b   ( num -- ) brightness ;
+: a   ( num -- ) alpha ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -69,9 +47,9 @@ VAR: color-stack
 
 : init-color-stack ( -- ) V{ } clone >color-stack ;
 
-: push-color ( -- ) color> color-stack> push   color> clone >color ;
+: push-color ( -- ) self> color-stack> push   self> clone >self ;
 
-: pop-color ( -- ) color-stack> pop dup >color gl-set-hsba ;
+: pop-color ( -- ) color-stack> pop dup >self set-color ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -102,11 +80,11 @@ VAR: threshold
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : circle ( -- )
-  color> gl-set-hsba
+  self> set-color
   gluNewQuadric dup 0 0.5 20 10 gluDisk gluDeleteQuadric ;
 
 : triangle ( -- )
-  color> gl-set-hsba
+  self> set-color
   GL_POLYGON glBegin
     0    0.577 glVertex2d
     0.5 -0.289 glVertex2d
@@ -114,7 +92,7 @@ VAR: threshold
   glEnd ;
 
 : square ( -- )
-  color> gl-set-hsba
+  self> set-color
   GL_POLYGON glBegin
     -0.5  0.5 glVertex2d
      0.5  0.5 glVertex2d
@@ -138,10 +116,10 @@ VAR: threshold
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: s  size ;
-: s* size* ;
-: r  rotate ;
-: f  flip ;
+: s  ( scale -- ) size ;
+: s* ( scale-x scale-y -- ) size* ;
+: r  ( angle -- ) rotate ;
+: f  ( angle -- ) flip ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -154,20 +132,39 @@ VAR: threshold
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: recursive ( quot -- ) iterate? swap when ;
+: recursive ( quot -- ) iterate? swap when ; inline
 
 : multi ( seq -- ) random-weighted* call ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+: [rules] ( seq -- quot )
+  [ unclip swap [ [ do ] curry ] map concat 2array ] map
+  [ call-random-weighted ] swap prefix
+  [ when ] swap prefix
+  [ iterate? ] swap append ;
+
+MACRO: rules ( seq -- quot ) [rules] ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: [rule] ( seq -- quot )
+  [ [ do ] swap prefix ] map concat
+  [ when ] swap prefix
+  [ iterate? ] prepend ;
+
+MACRO: rule ( seq -- quot ) [rule] ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 VAR: background
 
-: set-initial-background ( -- ) { 0 0 1 1 } clone >color ;
+: set-initial-background ( -- ) T{ hsva f 0 0 1 1 } clone >self ;
 
 : set-background ( -- )
   set-initial-background
   background> call
-  color> gl-clear-hsba ;
+  self> clear-color ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -177,7 +174,29 @@ VAR: viewport ! { left width bottom height }
 
 VAR: start-shape
 
-: set-initial-color ( -- ) { 0 0 0 1 } clone >color ;
+: set-initial-color ( -- ) T{ hsva f 0 0 0 1 } clone >self ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: dlist
+
+! : build-model-dlist ( -- )
+!   1 glGenLists dlist set
+!   dlist get GL_COMPILE_AND_EXECUTE glNewList
+!   start-shape> call
+!   glEndList ;
+
+: build-model-dlist ( -- )
+  1 glGenLists dlist set
+  dlist get GL_COMPILE_AND_EXECUTE glNewList
+
+  set-initial-color
+
+  self> set-color
+
+  start-shape> call
+      
+  glEndList ;
 
 : display ( -- )
 
@@ -196,15 +215,43 @@ VAR: start-shape
   init-modelview-matrix-stack
   init-color-stack
 
-  set-initial-color
+  dlist get not
+    [ build-model-dlist ]
+    [ dlist get glCallList ]
+  if ;
 
-  color> gl-set-hsba
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-  start-shape> call ;
+: delete-dlist ( -- ) dlist get [ dlist get 1 glDeleteLists dlist off ] when ;
 
 : cfdg-window* ( -- )
-  [ display ] closed-quot <slate>
-  { 500 500 } over set-slate-dim
+  C[ display ] <slate>
+    { 500 500 }       >>pdim
+    C[ delete-dlist ] >>ungraft
   dup "CFDG" open-window ;
 
 : cfdg-window ( -- ) [ cfdg-window* ] with-ui ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+SYMBOL: the-slate
+
+: rebuild ( -- ) delete-dlist the-slate get relayout-1 ;
+
+: <cfdg-gadget> ( -- slate )
+  C[ display ] <slate>
+    dup the-slate set
+    { 500 500 } >>pdim
+    C[ dlist get [ dlist get 1 glDeleteLists ] when ] >>ungraft
+  <handler>
+    H{ } clone
+      T{ key-down f f "ENTER" } C[ drop rebuild ] swap pick set-at
+      T{ button-down } C[ drop rebuild ] swap pick set-at
+    >>table ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USE: fry
+
+: cfdg-window. ( quot -- )
+  '[ [ @ <cfdg-gadget> "CFDG" open-window ] with-scope ] with-ui ;

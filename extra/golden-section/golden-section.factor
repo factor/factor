@@ -1,64 +1,54 @@
-USING: kernel namespaces math math.constants math.functions arrays sequences
-    opengl opengl.gl opengl.glu ui ui.render ui.gadgets ui.gadgets.theme
-    ui.gadgets.slate colors ;
+
+USING: kernel namespaces math math.constants math.functions math.order
+       arrays sequences
+       opengl opengl.gl opengl.glu ui ui.render ui.gadgets ui.gadgets.theme
+       ui.gadgets.cartesian colors accessors combinators.cleave
+       processing.shapes ;
+
 IN: golden-section
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-! To run:
-! "golden-section" run
+! omega(i) = 2*pi*i*(phi-1)
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! x(i) = 0.5*i*cos(omega(i))
+! y(i) = 0.5*i*sin(omega(i))
 
-: disk ( quadric radius center -- )
-    glPushMatrix
-    gl-translate
-    dup 0 glScalef
-    0 1 10 10 gluDisk
-    glPopMatrix ;
+! radius(i) = 10*sin((pi*i)/720)
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : omega ( i -- omega ) phi 1- * 2 * pi * ;
 
-: x ( i -- x ) dup omega cos * 0.5 * ;
+: x ( i -- x ) [ omega cos ] [ 0.5 * ] bi * ;
+: y ( i -- y ) [ omega sin ] [ 0.5 * ] bi * ;
 
-: y ( i -- y ) dup omega sin * 0.5 * ;
-
-: center ( i -- point ) dup x swap y 2array ;
+: center ( i -- point ) { x y } 1arr ;
 
 : radius ( i -- radius ) pi * 720 / sin 10 * ;
 
-: color ( i -- color ) 360.0 / dup 0.25 1 4array ;
+: color ( i -- i ) dup 360.0 / dup 0.25 1 rgba boa >fill-color ;
 
-: rim ( quadric i -- )
-    black gl-color dup radius 1.5 * swap center disk ;
+: line-width ( i -- i ) dup radius 0.5 * 1 max glLineWidth ;
 
-: inner ( quadric i -- )
-    dup color gl-color dup radius swap center disk ;
+: draw ( i -- ) [ center ] [ radius 1.5 * 2 * ] bi circle ;
 
-: dot ( quadric i -- ) 2dup rim inner ;
+: dot ( i -- ) color line-width draw ;
 
-: golden-section ( quadric -- ) 720 [ dot ] with each ;
+: golden-section ( -- ) 720 [ dot ] each ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: with-quadric ( quot -- )
-    gluNewQuadric [ swap call ] keep gluDeleteQuadric ; inline
-
-: display ( -- )
-    GL_PROJECTION glMatrixMode
-    glLoadIdentity
-    -400 400 -400 400 -1 1 glOrtho
-    GL_MODELVIEW glMatrixMode
-    glLoadIdentity
-    [ golden-section ] with-quadric ;
+: <golden-section> ( -- gadget )
+  <cartesian>
+    {  600 600 }       >>pdim
+    { -400 400 }       x-range
+    { -400 400 }       y-range
+    [ golden-section ] >>action ;
 
 : golden-section-window ( -- )
-    [
-        [ display ] <slate>
-        { 600 600 } over set-slate-dim
-        "Golden Section" open-window
-    ] with-ui ;
+  [ <golden-section> "Golden Section" open-window ] with-ui ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 MAIN: golden-section-window

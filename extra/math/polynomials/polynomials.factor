@@ -15,14 +15,14 @@ IN: math.polynomials
 : 2pad-right ( p p n -- p p ) 0 [ pad-right swap ] 2keep pad-right swap ;
 : pextend ( p p -- p p ) 2dup [ length ] bi@ max 2pad-right ;
 : pextend-left ( p p -- p p ) 2dup [ length ] bi@ max 2pad-left ;
-: unempty ( seq -- seq ) dup empty? [ drop { 0 } ] when ;
+: unempty ( seq -- seq ) [ { 0 } ] when-empty ;
 : 2unempty ( seq seq -- seq seq ) [ unempty ] bi@ ;
 
 PRIVATE>
 : p= ( p p -- ? ) pextend = ;
 
 : ptrim ( p -- p )
-    dup length 1 = [ [ zero? ] right-trim ] unless ;
+    dup length 1 = [ [ zero? ] trim-right ] unless ;
 
 : 2ptrim ( p p -- p p ) [ ptrim ] bi@ ;
 : p+ ( p p -- p ) pextend v+ ;
@@ -54,7 +54,7 @@ PRIVATE>
     #! divide the last two numbers in the sequences
     [ peek ] bi@ / ;
 
-: (p/mod)
+: (p/mod) ( p p -- p p )
     2dup /-last
     2dup , n*p swapd
     p- >vector

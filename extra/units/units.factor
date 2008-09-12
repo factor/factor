@@ -1,6 +1,6 @@
-USING: arrays io kernel math namespaces splitting prettyprint
-sequences sorting vectors words inverse inspector shuffle
-math.functions sets ;
+USING: accessors arrays io kernel math namespaces splitting
+prettyprint sequences sorting vectors words inverse summary
+shuffle math.functions sets ;
 IN: units
 
 TUPLE: dimensioned value top bot ;
@@ -19,8 +19,8 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
     [ remove-one ] curry bi@ ;
 
 : symbolic-reduce ( seq seq -- seq seq )
-    2dup intersect dup empty?
-    [ drop ] [ first 2remove-one symbolic-reduce ] if ;
+    2dup intersect
+    [ first 2remove-one symbolic-reduce ] unless-empty ;
 
 : <dimensioned> ( n top bot -- obj )
     symbolic-reduce
@@ -28,24 +28,23 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
     dimensioned boa ;
 
 : >dimensioned< ( d -- n top bot )
-    { dimensioned-value dimensioned-top dimensioned-bot }
-    get-slots ;
+    [ value>> ] [ top>> ] [ bot>> ] tri ;
 
 \ <dimensioned> [ >dimensioned< ] define-inverse
 
 : dimensions ( dimensioned -- top bot )
-    { dimensioned-top dimensioned-bot } get-slots ;
+    [ top>> ] [ bot>> ] bi ;
 
 : check-dimensions ( d d -- )
     [ dimensions 2array ] bi@ =
     [ dimensions-not-equal ] unless ;
 
-: 2values [ dimensioned-value ] bi@ ;
+: 2values ( dim dim -- val val ) [ value>> ] bi@ ;
 
-: <dimension-op
+: <dimension-op ( dim dim -- top bot val val )
     2dup check-dimensions dup dimensions 2swap 2values ;
 
-: dimension-op>
+: dimension-op> ( top bot val -- dim )
     -rot <dimensioned> ;
 
 : d+ ( d d -- d ) <dimension-op + dimension-op> ;
@@ -57,8 +56,8 @@ M: dimensions-not-equal summary drop "Dimensions do not match" ;
 
 : d* ( d d -- d )
     [ dup number? [ scalar ] when ] bi@
-    [ [ dimensioned-top ] bi@ append ] 2keep
-    [ [ dimensioned-bot ] bi@ append ] 2keep
+    [ [ top>> ] bi@ append ] 2keep
+    [ [ bot>> ] bi@ append ] 2keep
     2values * dimension-op> ;
 
 : d-neg ( d -- d ) -1 d* ;

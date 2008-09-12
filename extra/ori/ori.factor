@@ -1,7 +1,7 @@
 
-USING: kernel namespaces
+USING: kernel namespaces accessors
        math math.constants math.functions math.matrices math.vectors
-       sequences splitting self math.trig ;
+       sequences splitting grouping self math.trig ;
 
 IN: ori
 
@@ -11,13 +11,13 @@ C: <ori> ori
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: ori> ( -- val ) self> ori-val ;
+: ori> ( -- val ) self> val>> ;
 
-: >ori ( val -- ) self> set-ori-val ;
+: >ori ( val -- ) self> (>>val) ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: make-matrix ( quot width -- matrix ) >r { } make r> group ;
+: make-matrix ( quot width -- matrix ) >r { } make r> group ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

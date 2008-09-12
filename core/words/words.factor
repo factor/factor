@@ -1,9 +1,9 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays definitions graphs assocs kernel kernel.private
-slots.private math namespaces sequences strings vectors sbufs
-quotations assocs hashtables sorting words.private vocabs
-math.order sets ;
+USING: accessors arrays definitions graphs assocs kernel
+kernel.private slots.private math namespaces sequences strings
+vectors sbufs quotations assocs hashtables sorting words.private
+vocabs math.order sets ;
 IN: words
 
 : word ( -- word ) \ word get-global ;
@@ -15,37 +15,38 @@ GENERIC: execute ( word -- )
 M: word execute (execute) ;
 
 M: word <=>
-    [ dup word-name swap word-vocabulary 2array ] compare ;
+    [ [ name>> ] [ vocabulary>> ] bi 2array ] compare ;
 
 M: word definer drop \ : \ ; ;
 
-M: word definition word-def ;
+M: word definition def>> ;
 
 ERROR: undefined ;
 
 PREDICATE: deferred < word ( obj -- ? )
-    word-def [ undefined ] = ;
+    def>> [ undefined ] = ;
 M: deferred definer drop \ DEFER: f ;
 M: deferred definition drop f ;
 
 PREDICATE: symbol < word ( obj -- ? )
-    dup <wrapper> 1array swap word-def sequence= ;
+    [ def>> ] [ [ ] curry ] bi sequence= ;
 M: symbol definer drop \ SYMBOL: f ;
 M: symbol definition drop f ;
 
 PREDICATE: primitive < word ( obj -- ? )
-    word-def [ do-primitive ] tail? ;
+    [ def>> [ do-primitive ] tail? ]
+    [ sub-primitive>> >boolean ]
+    bi or ;
 M: primitive definer drop \ PRIMITIVE: f ;
 M: primitive definition drop f ;
 
-: word-prop ( word name -- value ) swap word-props at ;
+: word-prop ( word name -- value ) swap props>> at ;
 
-: remove-word-prop ( word name -- )
-    swap word-props delete-at ;
+: remove-word-prop ( word name -- ) swap props>> delete-at ;
 
 : set-word-prop ( word value name -- )
     over
-    [ pick word-props ?set-at swap set-word-props ]
+    [ pick props>> ?set-at >>props drop ]
     [ nip remove-word-prop ] if ;
 
 : reset-props ( word seq -- ) [ remove-word-prop ] with each ;
@@ -53,7 +54,7 @@ M: primitive definition drop f ;
 : lookup ( name vocab -- word ) vocab-words at ;
 
 : target-word ( word -- target )
-    dup word-name swap word-vocabulary lookup ;
+    [ name>> ] [ vocabulary>> ] bi lookup ;
 
 SYMBOL: bootstrapping?
 
@@ -69,7 +70,7 @@ M: word crossref?
     dup "forgotten" word-prop [
         drop f
     ] [
-        word-vocabulary >boolean
+        vocabulary>> >boolean
     ] if ;
 
 GENERIC: compiled-crossref? ( word -- ? )
@@ -80,8 +81,7 @@ GENERIC# (quot-uses) 1 ( obj assoc -- )
 
 M: object (quot-uses) 2drop ;
 
-M: word (quot-uses)
-    >r dup crossref? [ dup r> set-at ] [ r> 2drop ] if ;
+M: word (quot-uses) over crossref? [ conjoin ] [ 2drop ] if ;
 
 : seq-uses ( seq assoc -- ) [ (quot-uses) ] curry each ;
 
@@ -89,72 +89,92 @@ M: array (quot-uses) seq-uses ;
 
 M: callable (quot-uses) seq-uses ;
 
-M: wrapper (quot-uses) >r wrapped r> (quot-uses) ;
+M: wrapper (quot-uses) >r wrapped>> r> (quot-uses) ;
 
 : quot-uses ( quot -- assoc )
     global [ H{ } clone [ (quot-uses) ] keep ] bind ;
 
 M: word uses ( word -- seq )
-    word-def quot-uses keys ;
+    def>> quot-uses keys ;
 
 SYMBOL: compiled-crossref
 
 compiled-crossref global [ H{ } assoc-like ] change-at
 
-: compiled-xref ( word dependencies -- )
-    [ drop compiled-crossref? ] assoc-filter
-    2dup "compiled-uses" set-word-prop
-    compiled-crossref get add-vertex* ;
+SYMBOL: compiled-generic-crossref
+
+compiled-generic-crossref global [ H{ } assoc-like ] change-at
+
+: (compiled-xref) ( word dependencies word-prop variable -- )
+    [ [ set-word-prop ] curry ]
+    [ [ get add-vertex* ] curry ]
+    bi* 2bi ;
+
+: compiled-xref ( word dependencies generic-dependencies -- )
+    [ [ drop crossref? ] assoc-filter ] bi@
+    [ over ] dip
+    [ "compiled-uses" compiled-crossref (compiled-xref) ]
+    [ "compiled-generic-uses" compiled-generic-crossref (compiled-xref) ]
+    2bi* ;
+
+: (compiled-unxref) ( word word-prop variable -- )
+    [ [ [ dupd word-prop ] dip get remove-vertex* ] 2curry ]
+    [ drop [ f swap set-word-prop ] curry ]
+    2bi bi ;
 
 : compiled-unxref ( word -- )
-    dup "compiled-uses" word-prop
-    compiled-crossref get remove-vertex* ;
+    [ "compiled-uses" compiled-crossref (compiled-unxref) ]
+    [ "compiled-generic-uses" compiled-generic-crossref (compiled-unxref) ]
+    bi ;
 
 : delete-compiled-xref ( word -- )
-    dup compiled-unxref
-    compiled-crossref get delete-at ;
+    [ compiled-unxref ]
+    [ compiled-crossref get delete-at ]
+    [ compiled-generic-crossref get delete-at ]
+    tri ;
 
-SYMBOL: +inlined+
-SYMBOL: +called+
+GENERIC: inline? ( word -- ? )
 
-: compiled-usage ( word -- assoc )
-    compiled-crossref get at ;
-
-: compiled-usages ( words -- seq )
-    [ unique dup ] keep [
-        compiled-usage [ nip +inlined+ eq? ] assoc-filter update
-    ] with each keys ;
-
-<PRIVATE
+M: word inline? "inline" word-prop ;
 
 SYMBOL: visited
 
-: reset-on-redefine { "inferred-effect" "no-effect" } ; inline
+: reset-on-redefine { "inferred-effect" "cannot-infer" } ; inline
 
 : (redefined) ( word -- )
     dup visited get key? [ drop ] [
         [ reset-on-redefine reset-props ]
-        [ dup visited get set-at ]
+        [ visited get conjoin ]
         [
             crossref get at keys
             [ word? ] filter
-            [ reset-on-redefine [ word-prop ] with contains? ] filter
+            [
+                [ reset-on-redefine [ word-prop ] with contains? ]
+                [ inline? ]
+                bi or
+            ] filter
             [ (redefined) ] each
         ] tri
     ] if ;
 
-PRIVATE>
-
 : redefined ( word -- )
-    H{ } clone visited [ (redefined) ] with-variable ;
+    [ H{ } clone visited [ (redefined) ] with-variable ]
+    [ changed-definition ]
+    bi ;
 
 : define ( word def -- )
     [ ] like
     over unxref
     over redefined
-    over set-word-def
-    dup changed-definition
+    >>def
     dup crossref? [ dup xref ] when drop ;
+
+: set-stack-effect ( effect word -- )
+    2dup "declared-effect" word-prop = [ 2drop ] [
+        swap
+        [ "declared-effect" set-word-prop ]
+        [ drop dup primitive? [ dup redefined ] unless drop ] 2bi
+    ] if ;
 
 : define-declared ( word def effect -- )
     pick swap "declared-effect" set-word-prop
@@ -162,6 +182,9 @@ PRIVATE>
 
 : make-inline ( word -- )
     t "inline" set-word-prop ;
+
+: make-recursive ( word -- )
+    t "recursive" set-word-prop ;
 
 : make-flushable ( word -- )
     t "flushable" set-word-prop ;
@@ -180,9 +203,10 @@ GENERIC: reset-word ( word -- )
 M: word reset-word
     {
         "unannotated-def"
-        "parsing" "inline" "foldable" "flushable"
+        "parsing" "inline" "recursive" "foldable" "flushable"
         "predicating"
         "reading" "writing"
+        "reader" "writer"
         "constructing"
         "declared-effect" "constructor-quot" "delimiter"
     } reset-props ;
@@ -192,9 +216,10 @@ GENERIC: subwords ( word -- seq )
 M: word subwords drop f ;
 
 : reset-generic ( word -- )
-    dup subwords forget-all
-    dup reset-word
-    { "methods" "combination" "default-method" } reset-props ;
+    [ subwords forget-all ]
+    [ reset-word ]
+    [ { "methods" "combination" "default-method" } reset-props ]
+    tri ;
 
 : gensym ( -- word )
     "( gensym )" f <word> ;
@@ -203,7 +228,7 @@ M: word subwords drop f ;
     gensym dup rot define ;
 
 : reveal ( word -- )
-    dup word-name over word-vocabulary dup vocab-words
+    dup [ name>> ] [ vocabulary>> ] bi dup vocab-words
     [ ] [ no-vocab ] ?if
     set-at ;
 
@@ -220,8 +245,7 @@ ERROR: bad-create name vocab ;
 : constructor-word ( name vocab -- word )
     >r "<" swap ">" 3append r> create ;
 
-: parsing? ( obj -- ? )
-    dup word? [ "parsing" word-prop ] [ drop f ] if ;
+PREDICATE: parsing-word < word "parsing" word-prop ;
 
 : delimiter? ( obj -- ? )
     dup word? [ "delimiter" word-prop ] [ drop f ] if ;
@@ -232,18 +256,18 @@ M: word where "loc" word-prop ;
 M: word set-where swap "loc" set-word-prop ;
 
 M: word forget*
-    dup "forgotten" word-prop [
-        dup delete-xref
-        dup delete-compiled-xref
-        dup word-name over word-vocabulary vocab-words delete-at
-        dup t "forgotten" set-word-prop
-    ] unless drop ;
+    dup "forgotten" word-prop [ drop ] [
+        [ delete-xref ]
+        [ [ name>> ] [ vocabulary>> vocab-words ] bi delete-at ]
+        [ t "forgotten" set-word-prop ]
+        tri
+    ] if ;
 
 M: word hashcode*
     nip 1 slot { fixnum } declare ;
 
 M: word literalize <wrapper> ;
 
-: ?word-name dup word? [ word-name ] when ;
+: ?word-name ( word -- name ) dup word? [ name>> ] when ;
 
 : xref-words ( -- ) all-words [ xref ] each ;

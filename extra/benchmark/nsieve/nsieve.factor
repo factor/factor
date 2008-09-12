@@ -7,7 +7,7 @@ arrays namespaces io ;
         3drop
     ] [
         f 2over set-nth-unsafe >r over + r> clear-flags
-    ] if ; inline
+    ] if ; inline recursive
 
 : (nsieve) ( count i seq -- count )
     2dup length < [
@@ -17,7 +17,7 @@ arrays namespaces io ;
         ] when >r 1+ r> (nsieve)
     ] [
         2drop
-    ] if ; inline
+    ] if ; inline recursive
 
 : nsieve ( m -- count )
     0 2 rot 1+ t <array> (nsieve) ;
@@ -30,6 +30,6 @@ arrays namespaces io ;
     dup 1 - 2^ 10000 * nsieve.
     2 - 2^ 10000 * nsieve. ;
 
-: nsieve-main* 9 nsieve-main ;
+: nsieve-main* ( -- ) 9 nsieve-main ;
 
 MAIN: nsieve-main*

@@ -11,7 +11,7 @@ HELP: 'digit'
     "the input string. The numeric value of the digit "
     " consumed is the result of the parse." }
 { $examples
-{ $example "USING: lazy-lists parser-combinators parser-combinators.simple prettyprint ;" "\"123\" 'digit' parse-1 ." "1" } } ;
+{ $example "USING: lists.lazy parser-combinators parser-combinators.simple prettyprint ;" "\"123\" 'digit' parse-1 ." "1" } } ;
 
 HELP: 'integer'
 { $values 
@@ -21,7 +21,7 @@ HELP: 'integer'
     "the input string. The numeric value of the integer "
     " consumed is the result of the parse." }
 { $examples
-{ $example "USING: lazy-lists parser-combinators parser-combinators.simple prettyprint ;" "\"123\" 'integer' parse-1 ." "123" } } ;
+{ $example "USING: lists.lazy parser-combinators parser-combinators.simple prettyprint ;" "\"123\" 'integer' parse-1 ." "123" } } ;
 HELP: 'string'
 { $values 
   { "parser" "a parser object" } }
@@ -30,7 +30,7 @@ HELP: 'string'
     "quotations from the input string. The string value "
     " consumed is the result of the parse." }
 { $examples
-{ $example "USING: lazy-lists parser-combinators parser-combinators.simple prettyprint ;" "\"\\\"foo\\\"\" 'string' parse-1 ." "\"foo\"" } } ;
+{ $example "USING: lists.lazy parser-combinators parser-combinators.simple prettyprint ;" "\"\\\"foo\\\"\" 'string' parse-1 ." "\"foo\"" } } ;
 
 HELP: 'bold'
 { $values 
@@ -62,6 +62,6 @@ HELP: comma-list
     "'element' should be a parser that can parse the elements. The "
     "result of the parser is a sequence of the parsed elements." }
 { $examples
-{ $example "USING: lazy-lists parser-combinators parser-combinators.simple prettyprint ;" "\"1,2,3,4\" 'integer' comma-list parse-1 ." "{ 1 2 3 4 }" } } ;
+{ $example "USING: lists.lazy parser-combinators parser-combinators.simple prettyprint ;" "\"1,2,3,4\" 'integer' comma-list parse-1 ." "{ 1 2 3 4 }" } } ;
 
 { $see-also 'digit' 'integer' 'string' 'bold' 'italic' comma-list } related-words

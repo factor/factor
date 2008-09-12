@@ -1,102 +1,183 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel peg sequences arrays strings combinators.lib
-namespaces combinators math bake locals locals.private accessors
-vectors syntax lisp.parser assocs parser sequences.lib words quotations
-fry ;
+namespaces combinators math locals locals.private locals.backend accessors
+vectors syntax lisp.parser assocs parser sequences.lib words
+quotations fry lists summary combinators.short-circuit continuations multiline ;
 IN: lisp
 
 DEFER: convert-form
 DEFER: funcall
 DEFER: lookup-var
+DEFER: lookup-macro
+DEFER: lisp-macro?
+DEFER: lisp-var?
+DEFER: define-lisp-macro
 
 ! Functions to convert s-exps to quotations
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-: convert-body ( s-exp -- quot )
-    [ ] [ convert-form compose ] reduce ; inline
-  
-: convert-if ( s-exp -- quot )
-    rest first3 [ convert-form ] tri@ '[ @ , , if ] ;
-    
-: convert-begin ( s-exp -- quot )  
-    rest [ convert-form ] [ ] map-as '[ , [ funcall ] each ] ;
-    
-: convert-cond ( s-exp -- quot )  
-    rest [ body>> first2 [ convert-form ] bi@ [ '[ @ funcall ] ] dip 2array ]
-    { } map-as '[ , cond ]  ;
-    
-: convert-general-form ( s-exp -- quot )
-    unclip convert-form swap convert-body swap '[ , @ funcall ] ;
+: convert-body ( cons -- quot )
+    [ ] [ convert-form compose ] foldl ; inline
 
-! words for convert-lambda  
-<PRIVATE  
-: localize-body ( assoc body -- assoc newbody )  
-    [ dup lisp-symbol? [ over dupd [ name>> ] dip at swap or ]
-                     [ dup s-exp? [ body>> localize-body <s-exp> ] when ] if
-                   ] map ;
-    
-: localize-lambda ( body vars -- newbody newvars )
-    make-locals dup push-locals swap
-    [ swap localize-body <s-exp> convert-form swap pop-locals ] dip swap ;
-                   
-: split-lambda ( s-exp -- body vars )                   
-    first3 -rot nip [ body>> ] bi@ [ name>> ] map ; inline
-    
-: rest-lambda ( body vars -- quot )  
-    "&rest" swap [ index ] [ remove ] 2bi
-    localize-lambda <lambda>
-    '[ , cut '[ @ , ] , compose ] ;
-    
-: normal-lambda ( body vars -- quot )
-    localize-lambda <lambda> '[ , compose ] ;
-PRIVATE>
-    
-: convert-lambda ( s-exp -- quot )  
-    split-lambda "&rest" over member? [ rest-lambda ] [ normal-lambda ] if ;
-    
-: convert-quoted ( s-exp -- quot )  
-    second 1quotation ;
-    
-: convert-list-form ( s-exp -- quot )  
-    dup first dup lisp-symbol?
-    [ name>>
-      { { "lambda" [ convert-lambda ] }
-        { "quote" [ convert-quoted ] }
-        { "if" [ convert-if ] }
-        { "begin" [ convert-begin ] }
-        { "cond" [ convert-cond ] }
-       [ drop convert-general-form ]
-      } case ]
-    [ drop convert-general-form ] if ;
-    
-: convert-form ( lisp-form -- quot )
-    { { [ dup s-exp? ] [ body>> convert-list-form ] }
-    { [ dup lisp-symbol? ] [ '[ , lookup-var ] ] }
-    [ 1quotation ]
+: convert-cond ( cons -- quot )
+    cdr [ 2car [ convert-form ] bi@ 2array ]
+    { } lmap-as '[ , cond ] ;
+
+: convert-general-form ( cons -- quot )
+    uncons [ convert-body ] [ convert-form ] bi* '[ , @ funcall ] ;
+
+! words for convert-lambda
+<PRIVATE
+: localize-body ( assoc body -- newbody )
+    {
+      { [ dup list? ] [ [ lisp-symbol? ] rot '[ [ name>> , at ] [ ] bi or ] traverse ] }
+      { [ dup lisp-symbol? ] [ name>> swap at ] }
+     [ nip ]
     } cond ;
-    
+
+: localize-lambda ( body vars -- newvars newbody )
+    swap [ make-locals dup push-locals ] dip
+    dupd [ localize-body convert-form ] with lmap>array
+    >quotation swap pop-locals ;
+
+: split-lambda ( cons -- body-cons vars-seq )
+    cdr uncons [ name>> ] lmap>array ; inline
+
+: rest-lambda ( body vars -- quot )
+    "&rest" swap [ remove ] [ index ] 2bi
+    [ localize-lambda <lambda> lambda-rewrite call ] dip
+    swap '[ , cut '[ @ , seq>list ] call , call call ] 1quotation ;
+
+: normal-lambda ( body vars -- quot )
+    localize-lambda <lambda> lambda-rewrite '[ @ compose call call ] 1quotation ;
+PRIVATE>
+
+: convert-lambda ( cons -- quot )
+    split-lambda "&rest" over member? [ rest-lambda ] [ normal-lambda ] if ;
+
+: convert-quoted ( cons -- quot )
+    cadr 1quotation ;
+
+: convert-defmacro ( cons -- quot )
+    cdr [ convert-lambda ] [ car name>> ] bi define-lisp-macro [ ] ;
+
+: macro-expand ( cons -- quot )
+    uncons [ list>seq >quotation ] [ lookup-macro ] bi* call call ;
+
+<PRIVATE
+: (expand-macros) ( cons -- cons )
+    [ dup list? [ (expand-macros) dup car lisp-macro? [ macro-expand ] when ] when ] lmap ;
+PRIVATE>
+
+: expand-macros ( cons -- cons )
+    dup list? [ (expand-macros) dup car lisp-macro? [ macro-expand ] when ] when ;
+
+: convert-begin ( cons -- quot )
+    cdr [ convert-form ] [ ] lmap-as [ 1 tail* ] [ but-last ] bi
+    [ '[ { } , with-datastack drop ] ] map prepend '[ , [ call ] each ] ;
+
+: form-dispatch ( cons lisp-symbol -- quot )
+    name>>
+    { { "lambda" [ convert-lambda ] }
+      { "defmacro" [ convert-defmacro ] }
+      { "quote" [ convert-quoted ] }
+      { "cond" [ convert-cond ] }
+      { "begin" [ convert-begin ] }
+     [ drop convert-general-form ]
+    } case ;
+
+: convert-list-form ( cons -- quot )
+    dup car
+    {
+      { [ dup lisp-symbol? ] [ form-dispatch ] }
+     [ drop convert-general-form ]
+    } cond ;
+
+: convert-form ( lisp-form -- quot )
+    {
+      { [ dup cons? ] [ convert-list-form ] }
+      { [ dup lisp-var? ] [ lookup-var 1quotation ] }
+      { [ dup lisp-symbol? ] [ '[ , lookup-var ] ] }
+     [ 1quotation ]
+    } cond ;
+
 : lisp-string>factor ( str -- quot )
-    lisp-expr parse-result-ast convert-form lambda-rewrite call ;
-    
+    lisp-expr expand-macros convert-form ;
+
+: lisp-eval ( str -- * )
+    lisp-string>factor call ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 SYMBOL: lisp-env
-ERROR: no-such-var var ;
+SYMBOL: macro-env
+
+ERROR: no-such-var variable-name ;
+M: no-such-var summary drop "No such variable" ;
 
 : init-env ( -- )
-    H{ } clone lisp-env set ;
+    H{ } clone lisp-env set
+    H{ } clone macro-env set ;
 
-: lisp-define ( name quot -- )
-    swap lisp-env get set-at ;
+: lisp-define ( quot name -- )
+    lisp-env get set-at ;
     
+: define-lisp-var ( lisp-symbol body --  )
+    swap name>> lisp-define ;
+
 : lisp-get ( name -- word )
-    dup lisp-env get at [ ] [ no-such-var throw ] ?if ;
-    
+    lisp-env get at ;
+
 : lookup-var ( lisp-symbol -- quot )
-    name>> lisp-get ;
-    
+    [ name>> ] [ lisp-var? ] bi [ lisp-get ] [ no-such-var ] if ;
+
+: lisp-var? ( lisp-symbol -- ? )
+    dup lisp-symbol? [ name>> lisp-env get key? ] [ drop f ] if ;
+
 : funcall ( quot sym -- * )
-    dup lisp-symbol?  [ lookup-var ] when call ; inline
+    [ 1array [ call ] with-datastack >quotation ] dip curry call ; inline
+
+: define-primitive ( name vocab word -- )
+    swap lookup 1quotation '[ , compose call ] swap lisp-define ;
+
+: lookup-macro ( lisp-symbol -- lambda )
+    name>> macro-env get at ;
+
+: define-lisp-macro ( quot name -- )
+    macro-env get set-at ;
+
+: lisp-macro? ( car -- ? )
+    dup lisp-symbol? [ name>> macro-env get key? ] [ drop f ] if ;
+
+: define-lisp-builtins ( -- )
+   init-env
+
+   f "#f" lisp-define
+   t "#t" lisp-define
+
+   "+" "math" "+" define-primitive
+   "-" "math" "-" define-primitive
+   "<" "math" "<" define-primitive
+   ">" "math" ">" define-primitive
+
+   "cons" "lists" "cons" define-primitive
+   "car" "lists" "car" define-primitive
+   "cdr" "lists" "cdr" define-primitive
+   "append" "lists" "lappend" define-primitive
+   "nil" "lists" "nil" define-primitive
+   "nil?" "lists" "nil?" define-primitive
+
+   "set" "lisp" "define-lisp-var" define-primitive
     
-: define-primitve ( name vocab word -- )  
-    swap lookup 1quotation '[ , compose call ] lisp-define ;
+   "(lambda (&rest xs) xs)" lisp-string>factor first "list" lisp-define
+   "(defmacro setq (var val) (list (quote set) (list (quote quote) var) val))" lisp-eval
+    
+   <" (defmacro defun (name vars &rest body)
+        (list (quote setq) name (list (quote lambda) vars body))) "> lisp-eval
+    
+   "(defmacro if (pred tr fl) (list (quote cond) (list pred tr) (list (quote #t) fl)))" lisp-eval
+   ;
+
+: <LISP 
+    "LISP>" parse-multiline-string define-lisp-builtins
+    lisp-string>factor parsed \ call parsed ; parsing

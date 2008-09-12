@@ -10,32 +10,21 @@ IN: generic.standard
 
 GENERIC: dispatch# ( word -- n )
 
-M: word dispatch# "combination" word-prop dispatch# ;
+M: generic dispatch#
+    "combination" word-prop dispatch# ;
 
-: unpickers
-    {
-        [ nip ]
-        [ >r nip r> swap ]
-        [ >r >r nip r> r> -rot ]
-    } ; inline
+GENERIC: method-declaration ( class generic -- quot )
 
-: unpicker ( -- quot ) \ (dispatch#) get unpickers nth ;
+M: generic method-declaration
+    "combination" word-prop method-declaration ;
+
+M: quotation engine>quot
+    assumed get generic get method-declaration prepend ;
 
 ERROR: no-method object generic ;
 
 : error-method ( word -- quot )
     picker swap [ no-method ] curry append ;
-
-: empty-method ( word -- quot )
-    [
-        picker % [ delegate dup ] %
-        unpicker over suffix ,
-        error-method \ drop prefix , \ if ,
-    ] [ ] make ;
-
-: default-method ( word -- pair )
-    "default-method" word-prop
-    object bootstrap-word swap 2array ;
 
 : push-method ( method specializer atomic assoc -- )
     [
@@ -81,14 +70,8 @@ ERROR: no-method object generic ;
                 "methods" word-prop
                 [ generic get mangle-method ] assoc-map
                 [ find-default default set ]
-                [
-                    generic get "inline" word-prop [
-                        <predicate-dispatch-engine>
-                    ] [
-                        <big-dispatch-engine>
-                    ] if
-                ] bi
-                engine>quot
+                [ <big-dispatch-engine> ]
+                bi engine>quot
             ]
         } cleave
     ] with-scope ;
@@ -99,11 +82,11 @@ ERROR: no-next-method class generic ;
 
 : single-next-method-quot ( class generic -- quot )
     [
-        [ drop [ instance? ] curry % ]
+        [ drop "predicate" word-prop % ]
         [
             2dup next-method
             [ 2nip 1quotation ]
-            [ [ no-next-method ] 2curry ] if* ,
+            [ [ no-next-method ] 2curry [ ] like ] if* ,
         ]
         [ [ inconsistent-next-method ] 2curry , ]
         2tri
@@ -111,7 +94,9 @@ ERROR: no-next-method class generic ;
     ] [ ] make ;
 
 : single-effective-method ( obj word -- method )
-    [ order [ instance? ] with find-last nip ] keep method ;
+    [ [ order [ instance? ] with find-last nip ] keep method ]
+    [ "default-method" word-prop ]
+    bi or ;
 
 TUPLE: standard-combination # ;
 
@@ -132,12 +117,15 @@ PREDICATE: simple-generic < standard-generic
 M: standard-generic extra-values drop 0 ;
 
 M: standard-combination make-default-method
-    [ empty-method ] with-standard ;
+    [ error-method ] with-standard ;
 
 M: standard-combination perform-combination
     [ drop ] [ [ single-combination ] with-standard ] 2bi define ;
 
 M: standard-combination dispatch# #>> ;
+
+M: standard-combination method-declaration
+    dispatch# object <array> swap prefix [ declare ] curry [ ] like ;
 
 M: standard-combination next-method-quot*
     [
@@ -160,6 +148,8 @@ PREDICATE: hook-generic < generic
     ] with-variable ; inline
 
 M: hook-combination dispatch# drop 0 ;
+
+M: hook-combination method-declaration 2drop [ ] ;
 
 M: hook-generic extra-values drop 1 ;
 

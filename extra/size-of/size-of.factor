@@ -12,15 +12,15 @@ IN: size-of
 VAR: headers
 
 : include-headers ( -- seq )
-  headers> [ { "#include <" , ">" } bake to-string ] map ;
+  headers> [ `{ "#include <" , ">" } to-string ] map ;
 
 : size-of-c-program ( type -- lines )
-  {
+  `{
     "#include <stdio.h>"
     include-headers
     { "main() { printf( \"%i\" , sizeof( " , " ) ) ; }" }
   }
-  bake to-strings ;
+  to-strings ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

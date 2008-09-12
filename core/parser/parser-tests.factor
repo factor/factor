@@ -2,8 +2,7 @@ USING: arrays math parser tools.test kernel generic words
 io.streams.string namespaces classes effects source-files
 assocs sequences strings io.files definitions continuations
 sorting classes.tuple compiler.units debugger vocabs
-vocabs.loader accessors ;
-
+vocabs.loader accessors eval combinators ;
 IN: parser.tests
 
 [
@@ -63,7 +62,7 @@ IN: parser.tests
     : baz ( a b -- * ) 2array throw ;
 
     [ t ]
-    [ \ baz "declared-effect" word-prop effect-terminated? ]
+    [ \ baz "declared-effect" word-prop terminated?>> ]
     unit-test
 
     [ ] [ "IN: parser.tests USE: math : effect-parsing-test ( a b -- d ) - ;" eval ] unit-test
@@ -121,7 +120,7 @@ IN: parser.tests
         "IN: parser.tests : smudge-me ;" <string-reader> "foo"
         parse-stream drop
 
-        "foo" source-file source-file-definitions first assoc-size
+        "foo" source-file definitions>> first assoc-size
     ] unit-test
 
     [ t ] [ "smudge-me" "parser.tests" lookup >boolean ] unit-test
@@ -138,21 +137,21 @@ IN: parser.tests
         "IN: parser.tests USING: math strings ; GENERIC: smudge-me M: integer smudge-me ; M: string smudge-me ;" <string-reader> "foo"
         parse-stream drop
 
-        "foo" source-file source-file-definitions first assoc-size
+        "foo" source-file definitions>> first assoc-size
     ] unit-test
 
     [ 1 ] [
         "IN: parser.tests USING: arrays ; M: array smudge-me ;" <string-reader> "bar"
         parse-stream drop
 
-        "bar" source-file source-file-definitions first assoc-size
+        "bar" source-file definitions>> first assoc-size
     ] unit-test
 
     [ 2 ] [
         "IN: parser.tests USING: math strings ; GENERIC: smudge-me M: integer smudge-me ;" <string-reader> "foo"
         parse-stream drop
 
-        "foo" source-file source-file-definitions first assoc-size
+        "foo" source-file definitions>> first assoc-size
     ] unit-test
     
     [ t ] [
@@ -198,7 +197,7 @@ IN: parser.tests
     [
         "IN: parser.tests : x ; : y 3 throw ; this is an error"
         <string-reader> "a" parse-stream
-    ] [ parse-error? ] must-fail-with
+    ] [ source-file-error? ] must-fail-with
 
     [ t ] [
         "y" "parser.tests" lookup >boolean
@@ -298,12 +297,12 @@ IN: parser.tests
     [
         "IN: parser.tests TUPLE: another-pred-test ; GENERIC: another-pred-test?"
         <string-reader> "removing-the-predicate" parse-stream
-    ] [ error>> error>> redefine-error? ] must-fail-with
+    ] [ error>> error>> error>> redefine-error? ] must-fail-with
 
     [
         "IN: parser.tests TUPLE: class-redef-test ; TUPLE: class-redef-test ;"
         <string-reader> "redefining-a-class-1" parse-stream
-    ] [ error>> error>> redefine-error? ] must-fail-with
+    ] [ error>> error>> error>> redefine-error? ] must-fail-with
 
     [ ] [
         "IN: parser.tests TUPLE: class-redef-test ; SYMBOL: class-redef-test"
@@ -313,7 +312,7 @@ IN: parser.tests
     [
         "IN: parser.tests TUPLE: class-redef-test ; SYMBOL: class-redef-test : class-redef-test ;"
         <string-reader> "redefining-a-class-3" parse-stream drop
-    ] [ error>> error>> redefine-error? ] must-fail-with
+    ] [ error>> error>> error>> redefine-error? ] must-fail-with
 
     [ ] [
         "IN: parser.tests TUPLE: class-fwd-test ;"
@@ -323,7 +322,7 @@ IN: parser.tests
     [
         "IN: parser.tests \\ class-fwd-test"
         <string-reader> "redefining-a-class-3" parse-stream drop
-    ] [ error>> error>> no-word-error? ] must-fail-with
+    ] [ error>> error>> error>> no-word-error? ] must-fail-with
 
     [ ] [
         "IN: parser.tests TUPLE: class-fwd-test ; SYMBOL: class-fwd-test"
@@ -333,12 +332,12 @@ IN: parser.tests
     [
         "IN: parser.tests \\ class-fwd-test"
         <string-reader> "redefining-a-class-3" parse-stream drop
-    ] [ error>> error>> no-word-error? ] must-fail-with
+    ] [ error>> error>> error>> no-word-error? ] must-fail-with
 
     [
         "IN: parser.tests : foo ; TUPLE: foo ;"
         <string-reader> "redefining-a-class-4" parse-stream drop
-    ] [ error>> error>> redefine-error? ] must-fail-with
+    ] [ error>> error>> error>> redefine-error? ] must-fail-with
 
     [ ] [
         "IN: parser.tests : foo ( x y -- z ) 1 2 ; : bar ( a -- b ) ;" eval
@@ -401,7 +400,7 @@ IN: parser.tests
 ] times
 
 [ "resource:core/parser/test/assert-depth.factor" run-file ]
-[ relative-overflow-stack { 1 2 3 } sequence= ]
+[ stack>> { 1 2 3 } sequence= ]
 must-fail-with
 
 2 [
@@ -420,8 +419,6 @@ must-fail-with
         <string-reader> "d-f-s-test" parse-stream drop
     ] unit-test
 ] times
-
-[ ] [ "parser" reload ] unit-test
 
 [ ] [
     [ "this-better-not-exist" forget-vocab ] with-compilation-unit
@@ -487,3 +484,9 @@ must-fail-with
 [ t ] [ "staging-problem-test-2" "parser.tests" lookup >boolean ] unit-test
 
 [ "DEFER: blah" eval ] [ error>> no-current-vocab? ] must-fail-with
+
+[
+    "IN: parser.tests : blah ; parsing FORGET: blah" eval
+] [
+    error>> staging-violation?
+] must-fail-with

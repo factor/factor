@@ -1,4 +1,4 @@
-USING: arrays kernel kernel.private math namespaces
+USING: accessors arrays kernel kernel.private math namespaces
 sequences sequences.private strings tools.test vectors
 continuations random growable classes ;
 IN: vectors.tests
@@ -26,7 +26,7 @@ IN: vectors.tests
 [ V{ 1 2 } ] [ [ 1 2 ] >vector ] unit-test
 
 [ t ] [
-    100 [ drop 100 random ] map >vector
+    100 [ 100 random ] V{ } replicate-as
     dup >array >vector =
 ] unit-test
 
@@ -70,14 +70,14 @@ IN: vectors.tests
 [ "funky" ] [ "funny-stack" get pop ] unit-test
 
 [ t ] [
-    V{ 1 2 3 4 } dup underlying length
-    >r clone underlying length r>
+    V{ 1 2 3 4 } dup underlying>> length
+    >r clone underlying>> length r>
     =
 ] unit-test
 
 [ f ] [
     V{ 1 2 3 4 } dup clone
-    [ underlying ] bi@ eq?
+    [ underlying>> ] bi@ eq?
 ] unit-test
 
 [ 0 ] [

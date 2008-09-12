@@ -1,0 +1,27 @@
+USING: help.markup help.syntax io kernel
+prettyprint.sections words ;
+IN: prettyprint.config
+
+ABOUT: "prettyprint-variables"
+
+HELP: tab-size
+{ $var-description "Prettyprinter tab size. Indent nesting is always a multiple of the tab size." } ;
+
+HELP: margin
+{ $var-description "The maximum line length, in characters. Lines longer than the margin are wrapped." } ;
+
+HELP: nesting-limit
+{ $var-description "The maximum nesting level. Structures that nest further than this will simply print as a pound sign (#). The default is " { $link f } ", denoting unlimited nesting depth." } ;
+
+HELP: length-limit
+{ $var-description "The maximum printed sequence length. Sequences longer than this are truncated, and \"...\" is output in place of remaining elements. The default is " { $link f } ", denoting unlimited sequence length." } ;
+
+HELP: line-limit
+{ $var-description "The maximum number of lines output by the prettyprinter before output is truncated with \"...\". The default is " { $link f } ", denoting unlimited line count." } ;
+
+HELP: string-limit?
+{ $var-description "Toggles whether printed strings are truncated to the margin." } ;
+
+HELP: boa-tuples?
+{ $var-description "Toggles whether tuples print in BOA-form or assoc-form." }
+{ $notes "See " { $link POSTPONE: T{ } " for a description of both literal tuple forms." } ;

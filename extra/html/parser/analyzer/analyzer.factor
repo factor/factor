@@ -1,12 +1,12 @@
 USING: assocs html.parser kernel math sequences strings ascii
-arrays shuffle unicode.case namespaces splitting http
-sequences.lib accessors io combinators http.client urls ;
+arrays generalizations shuffle unicode.case namespaces splitting
+http sequences.lib accessors io combinators http.client urls ;
 IN: html.parser.analyzer
 
 TUPLE: link attributes clickable ;
 
 : scrape-html ( url -- vector )
-    http-get parse-html ;
+    http-get nip parse-html ;
 
 : (find-relative)
     [ >r + dup r> ?nth* [ 2drop f f ] unless ] [ 2drop f ] if ; inline
@@ -56,8 +56,7 @@ TUPLE: link attributes clickable ;
 : trim-text ( vector -- vector' )
     [
         dup name>> text = [
-            [ text>> [ blank? ] trim ] keep
-            [ set-tag-text ] keep
+            [ [ blank? ] trim ] change-text
         ] when
     ] map ;
 
@@ -140,6 +139,12 @@ TUPLE: link attributes clickable ;
 : href-contains? ( str tag -- ? )
     attributes>> "href" swap at* [ subseq? ] [ 2drop f ] if ;
 
+: find-hrefs ( vector -- vector' )
+    find-links
+    [ [
+        [ name>> "a" = ]
+        [ attributes>> "href" swap key? ] bi and ] filter
+    ] map sift [ [ attributes>> "href" swap at ] map ] map concat ;
 
 : find-forms ( vector -- vector' )
     "form" over find-opening-tags-by-name
@@ -167,8 +172,7 @@ TUPLE: link attributes clickable ;
     [
         {
             { [ dup name>> "form" = ]
-                [ "form action: " write attributes>> "action" swap at print
-            ] }
+                [ "form action: " write attributes>> "action" swap at print ] }
             { [ dup name>> "input" = ] [ input. ] }
             [ drop ]
         } cond

@@ -145,7 +145,7 @@ HELP: check-method
 { $error-description "Thrown if " { $link POSTPONE: M: } " or " { $link create-method } " is given an invalid class or generic word." } ;
 
 HELP: with-methods
-{ $values { "generic" generic } { "quot" "a quotation with stack effect " { $snippet "( methods -- )" } } }
+{ $values { "class" class } { "generic" generic } { "quot" "a quotation with stack effect " { $snippet "( methods -- )" } } }
 { $description "Applies a quotation to the generic word's methods hashtable, and regenerates the generic word's definition when the quotation returns." }
 $low-level-note ;
 
@@ -153,10 +153,6 @@ HELP: create-method
 { $values { "class" class } { "generic" generic } { "method" method-body } }
 { $description "Creates a method or returns an existing one. This is the runtime equivalent of " { $link POSTPONE: M: } "." }
 { $notes "To define a method, pass the output value to " { $link define } "." } ;
-
-HELP: implementors
-{ $values { "class" class } { "seq" "a sequence of generic words" } }
-{ $description "Finds all generic words in the dictionary implementing methods for this class." } ;
 
 HELP: forget-methods
 { $values { "class" class } }

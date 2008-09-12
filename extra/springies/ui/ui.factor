@@ -1,16 +1,16 @@
 
 USING: kernel namespaces threads sequences math math.vectors
        opengl.gl opengl colors ui ui.gadgets ui.gadgets.slate
-       bake rewrite-closures vars springies ;
+       fry rewrite-closures vars springies accessors math.geometry.rect ;
 
 IN: springies.ui
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: draw-node ( node -- ) node-pos { -5 -5 } v+ dup { 10 10 } v+ gl-rect ;
+: draw-node ( node -- ) pos>> { -5 -5 } v+ dup { 10 10 } v+ gl-rect ;
 
 : draw-spring ( spring -- )
-  [ spring-node-a node-pos ] [ spring-node-b node-pos ] bi gl-line ;
+  [ node-a>> pos>> ] [ node-b>> pos>> ] bi gl-line ;
 
 : draw-nodes ( -- ) nodes> [ draw-node ] each ;
 
@@ -23,7 +23,9 @@ IN: springies.ui
   GL_MODELVIEW glMatrixMode
   glLoadIdentity ;
 
-: display ( -- ) set-projection black gl-color draw-nodes draw-springs ;
+! : display ( -- ) set-projection black gl-color draw-nodes draw-springs ;
+
+: display ( -- ) set-projection black set-color draw-nodes draw-springs ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -50,17 +52,14 @@ DEFER: maybe-loop
 
 : springies-window* ( -- )
 
-  C[ display ] <slate> >slate
-    { 800 600 }                                      slate> set-slate-dim
-    C[ { 500 500 } >world-size loop on [ run ] in-thread ]
-      slate> set-slate-graft
-    C[ loop off ]                                    slate> set-slate-ungraft
-
-  slate> "Springies" open-window ;
+  C[ display ] <slate>
+    { 800 600 } >>pdim
+    C[ { 500 500 } >world-size loop on [ run ] in-thread ] >>graft
+    C[ loop off ] >>ungraft
+  [ >slate ] [ "Springies" open-window ] bi ;
 
 : springies-window ( -- ) [ [ springies-window* ] with-scope ] with-ui ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: go* ( quot -- )
-  [ [ [ springies-window* 1000 sleep % ] with-scope ] with-ui ] bake call ;
+: go* ( quot -- ) '[ [ springies-window* 1000 sleep @ ] with-scope ] with-ui ;

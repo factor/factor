@@ -1,7 +1,7 @@
 USING: byte-arrays arrays help.syntax help.markup
 alien.syntax compiler definitions math libc
-debugger parser io io.backend system bit-arrays float-arrays
-alien.accessors ;
+debugger parser io io.backend system
+alien.accessors eval ;
 IN: alien
 
 HELP: alien
@@ -10,14 +10,30 @@ HELP: alien
 HELP: dll
 { $class-description "The class of native library handles. See " { $link "syntax-aliens" } " for syntax and " { $link "dll.private" } " for general information." } ;
 
-HELP: expired? ( c-ptr -- ? )
-{ $values { "c-ptr" "an alien, byte array, or " { $link f } } { "?" "a boolean" } }
-{ $description "Tests if the alien is a relic from an earlier session. When an image is loaded, any alien objects which persisted in the image are marked as being expired."
-$nl
-"A byte array is never considered to be expired, whereas passing " { $link f } " always yields true." } ;
+HELP: dll-valid? ( dll -- ? )
+{ $values { "dll" dll } { "?" "a boolean" } }
+{ $description "Returns true if the library exists and is loaded." } ;
+
+HELP: expired?
+{ $values { "c-ptr" c-ptr } { "?" "a boolean" } }
+{ $description "Tests if the alien is a relic from an earlier session. A byte array is never considered to have expired, whereas passing " { $link f } " always yields true." } ;
+
+HELP: <bad-alien>
+{ $values  { "alien" c-ptr } }
+{ $description "Constructs an invalid alien pointer that has expired." } ;
+
+HELP: <library>
+{ $values
+     { "path" "a pathname string" } { "abi" "the ABI used by the library, either " { $snippet "cdecl" } " or " { $snippet "stdcall" } }
+     { "library" library } }
+{ $description "Opens a C library using the path and ABI parameters and outputs a library tuple." }
+{ $notes "User code should use " { $link add-library } " so that the opened library is added to a global hashtable, " { $link libraries } "." } ;
+
+HELP: libraries
+{ $description "A global hashtable that keeps a list of open libraries. Use the " { $link add-library } " word to construct a library and add it with a single call." } ;
 
 HELP: <displaced-alien> ( displacement c-ptr -- alien )
-{ $values { "displacement" "an integer" } { "c-ptr" "an alien, byte array, or " { $link f } } { "alien" "a new alien" } }
+{ $values { "displacement" "an integer" } { "c-ptr" c-ptr } { "alien" "a new alien" } }
 { $description "Creates a new alien address object, wrapping a raw memory address. The alien points to a location in memory which is offset by " { $snippet "displacement" } " from the address of " { $snippet "c-ptr" } "." }
 { $notes "Passing a value of " { $link f } " for " { $snippet "c-ptr" } " creates an alien with an absolute address; this is how " { $link <alien> } " is implemented."
 $nl
@@ -26,7 +42,7 @@ $nl
 { <alien> <displaced-alien> alien-address } related-words
 
 HELP: alien-address ( c-ptr -- addr )
-{ $values { "c-ptr" "an alien or " { $link f } } { "addr" "a non-negative integer" } }
+{ $values { "c-ptr" c-ptr } { "addr" "a non-negative integer" } }
 { $description "Outputs the address of an alien." }
 { $notes "Taking the address of a " { $link byte-array } " is explicitly prohibited since byte arrays can be moved by the garbage collector between the time the address is taken, and when it is accessed. If you need to pass pointers to C functions which will persist across alien calls, you must allocate unmanaged memory instead. See " { $link "malloc" } "." } ;
 
@@ -126,7 +142,7 @@ HELP: alien-callback-error
 } ;
 
 HELP: alien-callback
-{ $values { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } { "quot" "a quotation" } { "alien" c-ptr } }
+{ $values { "return" "a C return type" } { "parameters" "a sequence of C parameter types" } { "abi" "one of " { $snippet "\"cdecl\"" } " or " { $snippet "\"stdcall\"" } } { "quot" "a quotation" } { "alien" alien } }
 { $description
     "Defines a callback from C to Factor which accepts the given set of parameters from the C caller, pushes them on the data stack, calls the quotation, and passes a return value back to the C caller. A return type of " { $snippet "\"void\"" } " indicates that no value is to be returned."
     $nl
@@ -146,15 +162,25 @@ HELP: alien-callback
 
 { alien-invoke alien-indirect alien-callback } related-words
 
+ARTICLE: "alien-expiry" "Alien expiry"
+"When an image is loaded, any alien objects which persisted from the previous session are marked as having expired. This is because the C pointers they contain are almost certainly no longer valid."
+$nl
+"For this reason, the " { $link POSTPONE: ALIEN: } " word should not be used in source files, since loading the source file then saving the image will result in the literal becoming expired. Use " { $link <alien> } " instead, and ensure the word calling " { $link <alien> } " is not declared " { $link POSTPONE: flushable } "."
+{ $subsection expired? } ;
+
 ARTICLE: "aliens" "Alien addresses"
 "Instances of the " { $link alien } " class represent pointers to C data outside the Factor heap:"
 { $subsection <alien> }
 { $subsection <displaced-alien> }
 { $subsection alien-address }
-{ $subsection expired? }
 "Anywhere that a " { $link alien } " instance is accepted, the " { $link f } " singleton may be passed in to denote a null pointer."
 $nl
-"Usually alien objects do not have to created and dereferenced directly; instead declaring C function parameters and return values as having a pointer type such as " { $snippet "void*" } " takes care of the details. See " { $link "c-types-specs" } "." ;
+"Usually alien objects do not have to created and dereferenced directly; instead declaring C function parameters and return values as having a pointer type such as " { $snippet "void*" } " takes care of the details."
+{ $subsection "syntax-aliens" }
+{ $subsection "alien-expiry" }
+"When higher-level abstractions won't do:"
+{ $subsection "reading-writing-memory" }
+{ $see-also "c-data" "c-types-specs" } ;
 
 ARTICLE: "reading-writing-memory" "Reading and writing memory directly"
 "Numerical values can be read from memory addresses and converted to Factor objects using the various typed memory accessor words:"
@@ -220,7 +246,8 @@ $nl
 "Usually one never has to deal with DLL handles directly; the C library interface creates them as required. However if direct access to these operating system facilities is required, the following primitives can be used:"
 { $subsection dlopen }
 { $subsection dlsym }
-{ $subsection dlclose } ;
+{ $subsection dlclose }
+{ $subsection dll-valid? } ;
 
 ARTICLE: "embedding-api" "Factor embedding API"
 "The Factor embedding API is defined in " { $snippet "vm/master.h" } "."
@@ -293,6 +320,7 @@ $nl
 "C library interface words are found in the " { $vocab-link "alien" } " vocabulary."
 { $warning "C does not perform runtime type checking, automatic memory management or array bounds checks. Incorrect usage of C library functions can lead to crashes, data corruption, and security exploits." }
 { $subsection "loading-libs" }
+{ $subsection "aliens" }
 { $subsection "alien-invoke" }
 { $subsection "alien-callback" }
 { $subsection "c-data" }

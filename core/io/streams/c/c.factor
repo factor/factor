@@ -58,7 +58,7 @@ M: object init-io ;
 
 : stdin-handle 11 getenv ;
 : stdout-handle 12 getenv ;
-: stderr-handle 38 getenv ;
+: stderr-handle 61 getenv ;
 
 M: object (init-stdio)
     stdin-handle <c-reader>

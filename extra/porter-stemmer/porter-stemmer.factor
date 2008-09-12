@@ -163,11 +163,11 @@ USING: kernel math parser sequences combinators splitting ;
     } cond ;
 
 : -ion ( str -- newstr )
-    dup empty? [
-        drop "ion"
+    [
+        "ion"
     ] [
         dup "st" last-is? [ "ion" append ] unless
-    ] if ;
+    ] if-empty ;
 
 : step4 ( str -- newstr )
     dup {

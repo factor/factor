@@ -1,6 +1,6 @@
 
-USING: kernel io parser words namespaces quotations arrays assocs sequences
-       splitting math shuffle ;
+USING: kernel io parser lexer words namespaces quotations arrays assocs sequences
+       splitting grouping math generalizations ;
 
 IN: mortar
 
@@ -45,18 +45,6 @@ if ;
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : is? ( object class -- ? ) swap object-class class-name = ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-USE: inference.transforms
-
-! : narray ( n -- array ) [ drop ] map reverse ;
-
-: [narray] ( n -- quot ) [ [ drop ] map reverse ] curry ;
-
-: narray ( n -- array ) [narray] call ;
-
-\ narray [ [narray] ] 1 define-transform
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

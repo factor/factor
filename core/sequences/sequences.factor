@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private slots.private math math.private
-math.order ;
+USING: accessors kernel kernel.private slots.private math
+math.private math.order ;
 IN: sequences
 
 MIXIN: sequence
@@ -21,16 +21,27 @@ GENERIC: clone-like ( seq exemplar -- newseq ) flushable
 M: sequence like drop ;
 
 GENERIC: lengthen ( n seq -- )
+GENERIC: shorten ( n seq -- )
 
 M: sequence lengthen 2dup length > [ set-length ] [ 2drop ] if ;
 
+M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ;
+
 : empty? ( seq -- ? ) length zero? ; inline
+
+: if-empty ( seq quot1 quot2 -- )
+    [ dup empty? ] [ [ drop ] prepose ] [ ] tri* if ; inline
+
+: when-empty ( seq quot -- ) [ ] if-empty ; inline
+
+: unless-empty ( seq quot -- ) [ ] swap if-empty ; inline
+
 : delete-all ( seq -- ) 0 swap set-length ;
 
 : first ( seq -- first ) 0 swap nth ; inline
 : second ( seq -- second ) 1 swap nth ; inline
 : third ( seq -- third ) 2 swap nth ; inline
-: fourth  ( seq -- fourth ) 3 swap nth ; inline
+: fourth ( seq -- fourth ) 3 swap nth ; inline
 
 : set-first ( first seq -- ) 0 swap set-nth ; inline
 : set-second ( second seq -- ) 1 swap set-nth ; inline
@@ -57,16 +68,6 @@ INSTANCE: immutable-sequence sequence
 
 <PRIVATE
 
-: max-array-capacity ( -- n )
-    #! A bit of a pain; can't call cell-bits here
-    7 getenv 8 * 5 - 2^ 1- ; foldable
-
-PREDICATE: array-capacity < fixnum
-    0 max-array-capacity between? ;
-
-: array-capacity ( array -- n )
-    1 slot { array-capacity } declare ; inline
-
 : array-nth ( n array -- elt )
     swap 2 fixnum+fast slot ; inline
 
@@ -90,7 +91,7 @@ M: sequence set-nth-unsafe set-nth ;
 ! The f object supports the sequence protocol trivially
 M: f length drop 0 ;
 M: f nth-unsafe nip ;
-M: f like drop dup empty? [ drop f ] when ;
+M: f like drop [ f ] when-empty ;
 
 INSTANCE: f immutable-sequence
 
@@ -168,25 +169,26 @@ M: virtual-sequence new-sequence virtual-seq new-sequence ;
 INSTANCE: virtual-sequence sequence
 
 ! A reversal of an underlying sequence.
-TUPLE: reversed seq ;
+TUPLE: reversed { seq read-only } ;
 
 C: <reversed> reversed
 
-M: reversed virtual-seq reversed-seq ;
+M: reversed virtual-seq seq>> ;
 
-M: reversed virtual@ reversed-seq [ length swap - 1- ] keep ;
+M: reversed virtual@ seq>> [ length swap - 1- ] keep ;
 
-M: reversed length reversed-seq length ;
+M: reversed length seq>> length ;
 
 INSTANCE: reversed virtual-sequence
 
-: reverse ( seq -- newseq ) [ <reversed> ] [ like ] bi ;
-
 ! A slice of another sequence.
-TUPLE: slice from to seq ;
+TUPLE: slice
+{ from read-only }
+{ to read-only }
+{ seq read-only } ;
 
 : collapse-slice ( m n slice -- m' n' seq )
-    dup slice-from swap slice-seq >r tuck + >r + r> r> ; inline
+    [ from>> ] [ seq>> ] bi >r tuck + >r + r> r> ; inline
 
 ERROR: slice-error reason ;
 
@@ -200,33 +202,35 @@ ERROR: slice-error reason ;
     check-slice
     slice boa ; inline
 
-M: slice virtual-seq slice-seq ;
+M: slice virtual-seq seq>> ;
 
-M: slice virtual@ [ slice-from + ] [ slice-seq ] bi ;
+M: slice virtual@ [ from>> + ] [ seq>> ] bi ;
 
-M: slice length dup slice-to swap slice-from - ;
+M: slice length [ to>> ] [ from>> ] bi - ;
 
-: head-slice ( seq n -- slice ) (head) <slice> ;
+: short ( seq n -- seq n' ) over length min ; inline
 
-: tail-slice ( seq n -- slice ) (tail) <slice> ;
+: head-slice ( seq n -- slice ) (head) <slice> ; inline
 
-: rest-slice ( seq -- slice ) 1 tail-slice ;
+: tail-slice ( seq n -- slice ) (tail) <slice> ; inline
 
-: head-slice* ( seq n -- slice ) from-end head-slice ;
+: rest-slice ( seq -- slice ) 1 tail-slice ; inline
 
-: tail-slice* ( seq n -- slice ) from-end tail-slice ;
+: head-slice* ( seq n -- slice ) from-end head-slice ; inline
 
-: but-last-slice ( seq -- slice ) 1 head-slice* ;
+: tail-slice* ( seq n -- slice ) from-end tail-slice ; inline
+
+: but-last-slice ( seq -- slice ) 1 head-slice* ; inline
 
 INSTANCE: slice virtual-sequence
 
 ! One element repeated many times
-TUPLE: repetition len elt ;
+TUPLE: repetition { len read-only } { elt read-only } ;
 
 C: <repetition> repetition
 
-M: repetition length repetition-len ;
-M: repetition nth-unsafe nip repetition-elt ;
+M: repetition length len>> ;
+M: repetition nth-unsafe nip elt>> ;
 
 INSTANCE: repetition immutable-sequence
 
@@ -240,7 +244,8 @@ INSTANCE: repetition immutable-sequence
     ] 3keep ; inline
 
 : (copy) ( dst i src j n -- dst )
-    dup 0 <= [ 2drop 2drop ] [ 1- ((copy)) (copy) ] if ; inline
+    dup 0 <= [ 2drop 2drop ] [ 1- ((copy)) (copy) ] if ;
+    inline recursive
 
 : prepare-subseq ( from to seq -- dst i src j n )
     [ >r swap - r> new-sequence dup 0 ] 3keep
@@ -327,6 +332,9 @@ M: immutable-sequence clone-like like ;
     >r [ min-length ] 2keep r>
     [ >r 2nth-unsafe r> call ] 3curry ; inline
 
+: 2map-into ( seq1 seq2 quot into -- newseq )
+    >r (2each) r> collect ; inline
+
 : finish-find ( i seq -- i elt )
     over [ dupd nth-unsafe ] [ drop f ] if ; inline
 
@@ -334,11 +342,10 @@ M: immutable-sequence clone-like like ;
     pick >r >r (each) r> call r> finish-find ; inline
 
 : (find-from) ( n seq quot quot' -- i elt )
-    >r >r 2dup bounds-check? [
-        r> r> (find)
-    ] [
-        r> r> 2drop 2drop f f
-    ] if ; inline
+    [ 2dup bounds-check? ] 2dip
+    [ (find) ] 2curry
+    [ 2drop f f ]
+    if ; inline
 
 : (monotonic) ( seq quot -- ? )
     [ 2dup nth-unsafe rot 1+ rot nth-unsafe ]
@@ -361,6 +368,12 @@ PRIVATE>
 : map ( seq quot -- newseq )
     over map-as ; inline
 
+: replicate ( seq quot -- newseq )
+    [ drop ] prepose map ; inline
+
+: replicate-as ( seq quot exemplar -- newseq )
+    >r [ drop ] prepose r> map-as ; inline
+
 : change-each ( seq quot -- )
     over map-into ; inline
 
@@ -376,9 +389,15 @@ PRIVATE>
 : 2reduce ( seq1 seq2 identity quot -- result )
     >r -rot r> 2each ; inline
 
+: 2map-as ( seq1 seq2 quot exemplar -- newseq )
+    >r 2over min-length r>
+    [ [ 2map-into ] keep ] new-like ; inline
+
 : 2map ( seq1 seq2 quot -- newseq )
-    pick >r (2each) over r>
-    [ [ collect ] keep ] new-like ; inline
+    pick 2map-as ; inline
+
+: 2change-each ( seq1 seq2 quot -- newseq )
+    pick 2map-into ; inline
 
 : 2all? ( seq1 seq2 quot -- ? )
     (2each) all-integers? ; inline
@@ -407,19 +426,41 @@ PRIVATE>
 : filter ( seq quot -- subseq )
     over >r pusher >r each r> r> like ; inline
 
+: push-either ( elt quot accum1 accum2 -- )
+    >r >r keep swap r> r> ? push ; inline
+
+: 2pusher ( quot -- quot accum1 accum2 )
+    V{ } clone V{ } clone [ [ push-either ] 3curry ] 2keep ; inline
+
+: partition ( seq quot -- trueseq falseseq )
+    over >r 2pusher >r >r each r> r> r> tuck [ like ] 2bi@ ; inline
+
 : monotonic? ( seq quot -- ? )
     >r dup length 1- swap r> (monotonic) all? ; inline
 
 : interleave ( seq between quot -- )
     [ (interleave) ] 2curry >r dup length swap r> 2each ; inline
 
-: unfold ( pred quot tail -- seq )
-    V{ } clone [
-        swap >r [ push ] curry compose r> while
-    ] keep { } like ; inline
+: accumulator ( quot -- quot' vec )
+    V{ } clone [ [ push ] curry compose ] keep ; inline
+
+: produce ( pred quot tail -- seq )
+    swap accumulator >r swap while r> { } like ; inline
 
 : follow ( obj quot -- seq )
-    >r [ dup ] r> [ keep ] curry [ ] unfold nip ; inline
+    >r [ dup ] r> [ keep ] curry [ ] produce nip ; inline
+
+: prepare-index ( seq quot -- seq n quot )
+    >r dup length r> ; inline
+
+: each-index ( seq quot -- )
+    prepare-index 2each ; inline
+
+: map-index ( seq quot -- )
+    prepare-index 2map ; inline
+
+: reduce-index ( seq identity quot -- )
+    swapd each-index ; inline
 
 : index ( obj seq -- n )
     [ = ] with find drop ;
@@ -432,6 +473,9 @@ PRIVATE>
 
 : last-index-from ( obj i seq -- n )
     rot [ = ] curry find-last-from drop ;
+
+: nths ( seq indices -- seq' )
+    swap [ nth ] curry map ;
 
 : contains? ( seq quot -- ? )
     find drop >boolean ; inline
@@ -472,15 +516,13 @@ M: sequence <=>
     [ mismatch not ] [ 2drop f ] if ; inline
 
 : sequence-hashcode-step ( oldhash newpart -- newhash )
-    swap [
+    >fixnum swap [
         dup -2 fixnum-shift-fast swap 5 fixnum-shift-fast
         fixnum+fast fixnum+fast
     ] keep fixnum-bitxor ; inline
 
 : sequence-hashcode ( n seq -- x )
-    0 -rot [
-        hashcode* >fixnum sequence-hashcode-step
-    ] with each ; inline
+    0 -rot [ hashcode* sequence-hashcode-step ] with each ; inline
 
 M: reversed equal? over reversed? [ sequence= ] [ 2drop f ] if ;
 
@@ -513,7 +555,7 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 
 : peek ( seq -- elt ) [ length 1- ] [ nth ] bi ;
 
-: pop* ( seq -- ) [ length 1- ] [ set-length ] bi ;
+: pop* ( seq -- ) [ length 1- ] [ shorten ] bi ;
 
 : move-backward ( shift from to seq -- )
     2over number= [
@@ -557,8 +599,11 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
     [ >r >r dup pick length + r> - over r> open-slice ] keep
     copy ;
 
+: remove-nth ( n seq -- seq' )
+    [ swap head-slice ] [ swap 1+ tail-slice ] 2bi append ;
+
 : pop ( seq -- elt )
-    [ length 1- ] [ [ nth ] [ set-length ] 2bi ] bi ;
+    [ length 1- ] [ [ nth ] [ shorten ] 2bi ] bi ;
 
 : all-equal? ( seq -- ? ) [ = ] monotonic? ;
 
@@ -574,18 +619,25 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
         tuck - 1- rot exchange-unsafe
     ] each 2drop ;
 
+: reverse ( seq -- newseq )
+    [
+        dup [ length ] keep new-sequence
+        [ 0 swap copy ] keep
+        [ reverse-here ] keep
+    ] keep like ;
+
 : sum-lengths ( seq -- n )
     0 [ length + ] reduce ;
 
 : concat ( seq -- newseq )
-    dup empty? [
-        drop { }
+    [
+        { }
     ] [
         [ sum-lengths ] keep
         [ first new-resizable ] keep
         [ [ over push-all ] each ] keep
         first like
-    ] if ;
+    ] if-empty ;
 
 : joined-length ( seq glue -- n )
     >r dup sum-lengths swap length 1 [-] r> length * + ;
@@ -597,8 +649,10 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
     ] keep like ;
 
 : padding ( seq n elt quot -- newseq )
-    >r >r over length [-] dup zero?
-    [ r> r> 3drop ] [ r> <repetition> r> call ] if ; inline
+    [
+        [ over length [-] dup zero? [ drop ] ] dip
+        [ <repetition> ] curry
+    ] dip compose if ; inline
 
 : pad-left ( seq n elt -- padded )
     [ swap dup (append) ] padding ;
@@ -625,12 +679,15 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 : cut-slice ( seq n -- before after )
     [ head-slice ] [ tail-slice ] 2bi ;
 
+: insert-nth ( elt n seq -- seq' )
+    swap cut-slice [ swap suffix ] dip append ;
+
 : midpoint@ ( seq -- n ) length 2/ ; inline
 
 : halves ( seq -- first second )
     dup midpoint@ cut-slice ;
 
-: binary-reduce ( seq start quot -- value )
+: binary-reduce ( seq start quot: ( elt1 elt2 -- newelt ) -- value )
     #! We can't use case here since combinators depends on
     #! sequences
     pick length dup 0 3 between? [
@@ -645,7 +702,7 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
         >r >r halves r> r>
         [ [ binary-reduce ] 2curry bi@ ] keep
         call
-    ] if ; inline
+    ] if ; inline recursive
 
 : cut ( seq n -- before after )
     [ head ] [ tail ] 2bi ;
@@ -684,28 +741,39 @@ PRIVATE>
 : unclip-slice ( seq -- rest first )
     [ rest-slice ] [ first ] bi ;
 
-: unclip-last-slice ( seq -- butfirst last )
+: unclip-last-slice ( seq -- butlast last )
     [ but-last-slice ] [ peek ] bi ;
 
 : <flat-slice> ( seq -- slice )
     dup slice? [ { } like ] when 0 over length rot <slice> ;
     inline
 
-: left-trim ( seq quot -- newseq )
+: trim-left-slice ( seq quot -- slice )
     over >r [ not ] compose find drop r> swap
-    [ tail ] [ dup length tail ] if* ; inline
+    [ tail-slice ] [ dup length tail-slice ] if* ; inline
+    
+: trim-left ( seq quot -- newseq )
+    over [ trim-left-slice ] dip like ; inline
 
-: right-trim ( seq quot -- newseq )
+: trim-right-slice ( seq quot -- slice )
     over >r [ not ] compose find-last drop r> swap
-    [ 1+ head ] [ 0 head ] if* ; inline
+    [ 1+ head-slice ] [ 0 head-slice ] if* ; inline
+
+: trim-right ( seq quot -- newseq )
+    over [ trim-right-slice ] dip like ; inline
+
+: trim-slice ( seq quot -- slice )
+    [ trim-left-slice ] [ trim-right-slice ] bi ; inline
 
 : trim ( seq quot -- newseq )
-    [ left-trim ] [ right-trim ] bi ; inline
+    over [ trim-slice ] dip like ; inline
 
 : sum ( seq -- n ) 0 [ + ] binary-reduce ;
+
 : product ( seq -- n ) 1 [ * ] binary-reduce ;
 
 : infimum ( seq -- n ) dup first [ min ] reduce ;
+
 : supremum ( seq -- n ) dup first [ max ] reduce ;
 
 : flip ( matrix -- newmatrix )
@@ -713,3 +781,7 @@ PRIVATE>
         dup [ length ] map infimum
         swap [ [ nth-unsafe ] with { } map-as ] curry { } map-as
     ] unless ;
+
+: sigma ( seq quot -- n ) [ + ] compose 0 swap reduce ; inline
+
+: count ( seq quot -- n ) [ 1 0 ? ] compose sigma ; inline

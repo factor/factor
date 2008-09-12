@@ -3,40 +3,39 @@
 !                          Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel combinators fry namespaces quotations hashtables
-sequences assocs arrays inference effects math math.ranges
-arrays.lib shuffle macros continuations locals ;
+sequences assocs arrays stack-checker effects math math.ranges
+generalizations macros continuations random locals accessors ;
 
 IN: combinators.lib
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Currying cleave combinators
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: bi, ( obj quot quot -- quot' quot' )
+    [ [ curry ] curry ] bi@ bi ; inline
+: tri, ( obj quot quot quot -- quot' quot' quot' )
+    [ [ curry ] curry ] tri@ tri ; inline
+
+: bi*, ( obj obj quot quot -- quot' quot' )
+    [ [ curry ] curry ] bi@ bi* ; inline
+: tri*, ( obj obj obj quot quot quot -- quot' quot' quot' )
+    [ [ curry ] curry ] tri@ tri* ; inline
+
+: bi@, ( obj obj quot -- quot' quot' )
+    [ curry ] curry bi@ ; inline
+: tri@, ( obj obj obj quot -- quot' quot' quot' )
+    [ curry ] curry tri@ ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! Generalized versions of core combinators
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-MACRO: ndip ( quot n -- ) dup saver -rot restorer 3append ;
-
-MACRO: nslip ( n -- ) dup saver [ call ] rot restorer 3append ;
+: quad ( x p q r s -- ) >r >r >r keep r> keep r> keep r> call ; inline
 
 : 4slip ( quot a b c d -- a b c d ) 4 nslip ; inline
 
-MACRO: nkeep ( n -- )
-  [ ] [ 1+ ] [ ] tri
-  '[ [ , ndup ] dip , -nrot , nslip ] ;
-
 : 4keep ( w x y z quot -- w x y z ) 4 nkeep ; inline 
-
-MACRO: ncurry ( n -- ) [ curry ] n*quot ;
-
-MACRO:: nwith ( quot n -- )
-  [let | n' [ n 1+ ] |
-    [ n' -nrot [ n' nrot quot call ] n ncurry ] ] ;
-
-MACRO: napply ( n -- )
-  2 [a,b]
-  [ [ 1- ] [ ] bi
-    '[ , ntuck , nslip ] ]
-  map concat >quotation [ call ] append ;
-
-: 3apply ( obj obj obj quot -- ) 3 napply ; inline
 
 : 2with ( param1 param2 obj quot -- obj curry )
     with with ; inline
@@ -60,44 +59,11 @@ MACRO: napply ( n -- )
     with* assoc-map ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! short circuiting words
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: short-circuit ( quots quot default -- quot )
-  1quotation -rot { } map>assoc <reversed> alist>quot ;
-
-MACRO: && ( quots -- ? )
-    [ [ not ] append [ f ] ] t short-circuit ;
-
-MACRO: <-&& ( quots -- )
-    [ [ dup ] prepend [ not ] append [ f ] ] t short-circuit
-    [ nip ] append ;
-
-MACRO: <--&& ( quots -- )
-    [ [ 2dup ] prepend [ not ] append [ f ] ] t short-circuit
-    [ 2nip ] append ;
-
-! or
-
-MACRO: || ( quots -- ? ) [ [ t ] ] f short-circuit ;
-
-MACRO: 0|| ( quots -- ? ) [ [ t ] ] f short-circuit ;
-
-MACRO: 1|| ( quots -- ? )
-  [ [ dup ] prepend [ t ] ] f short-circuit [ nip ] append ;
-
-MACRO: 2|| ( quots -- ? )
-  [ [ 2dup ] prepend [ t ] ] f short-circuit [ 2nip ] append ;
-
-MACRO: 3|| ( quots -- ? )
-  [ [ 3dup ] prepend [ t ] ] f short-circuit [ 3nip ] append ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! ifte
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 MACRO: preserving ( predicate -- quot )
-    dup infer effect-in
+    dup infer in>>
     dup 1+
     '[ , , nkeep , nrot ] ;
 
@@ -173,7 +139,7 @@ MACRO: multikeep ( word out-indexes -- ... )
     [ drop ] rot compose attempt-all ; inline
 
 : do-while ( pred body tail -- )
-    >r tuck 2slip r> while ;
+    >r tuck 2slip r> while ; inline
 
 : generate ( generator predicate -- obj )
     [ dup ] swap [ dup [ nip ] unless not ] 3compose
@@ -183,3 +149,5 @@ MACRO: predicates ( seq -- quot/f )
     dup [ 1quotation [ drop ] prepend ] map
     >r [ [ dup ] prepend ] map r> zip [ drop f ] suffix
     [ cond ] curry ;
+
+: %chance ( quot n -- ) 100 random > swap when ; inline

@@ -1,5 +1,6 @@
 USING: kernel math tools.test namespaces random
-random.blum-blum-shub alien.c-types sequences splitting ;
+random.blum-blum-shub alien.c-types sequences splitting
+grouping ;
 IN: blum-blum-shub.tests
 
 [ 887708070 ] [
@@ -7,14 +8,14 @@ IN: blum-blum-shub.tests
 ] unit-test
 
 
-[ 887708070 ] [
+[ 70576473 ] [
     T{ blum-blum-shub f 590695557939 811977232793 } clone [
         32 random-bits
         little-endian? [ <uint> reverse *uint ] unless
     ] with-random
 ] unit-test
 
-[ 5726770047455156646 ] [
+[ 5570804936418322777 ] [
     T{ blum-blum-shub f 590695557939 811977232793 } clone [
         64 random-bits
         little-endian? [ <ulonglong> 4 group [ reverse ] map concat *ulonglong ] unless

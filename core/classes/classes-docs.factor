@@ -1,5 +1,5 @@
 USING: help.markup help.syntax kernel kernel.private
-namespaces sequences words arrays layouts help effects math
+namespaces sequences words arrays layouts effects math
 layouts classes.private classes.union classes.mixin
 classes.predicate quotations ;
 IN: classes
@@ -28,10 +28,14 @@ $nl
 $nl
 "Classes themselves form a class:"
 { $subsection class? }
-"You can ask an object for its class:"
+"You can ask an object for its class or superclass:"
 { $subsection class }
+{ $subsection superclass }
+{ $subsection superclasses }
 "Testing if an object is an instance of a class:"
 { $subsection instance? }
+"Class predicates can be used to test instances directly:"
+{ $subsection "class-predicates" }
 "There is a universal class which all objects are an instance of, and an empty class with no instances:"
 { $subsection object }
 { $subsection null }
@@ -63,12 +67,8 @@ HELP: classes
 { $values { "seq" "a sequence of class words" } }
 { $description "Finds all class words in the dictionary." } ;
 
-HELP: tuple-class
-{ $class-description "The class of tuple class words." }
-{ $examples { $example "USING: classes prettyprint ;" "IN: scratchpad" "TUPLE: name title first last ;" "name tuple-class? ." "t" } } ;
-
 HELP: update-map
-{ $var-description "Hashtable mapping each class to a set of classes defined in terms of this class. The " { $link define-class } " word uses this information to update generic words when classes are redefined." } ;
+{ $var-description "Assoc mapping each class to a set of classes defined in terms of this class. The " { $link define-class } " word uses this information to update generic words when classes are redefined." } ;
 
 HELP: predicate-word
 { $values { "word" "a word" } { "predicate" "a predicate word" } }
@@ -81,7 +81,27 @@ $low-level-note ;
 
 HELP: superclass
 { $values { "class" class } { "super" class } }
-{ $description "Outputs the superclass of a class. All instances of this class are also instances of the superclass." } ;
+{ $description "Outputs the superclass of a class. All instances of this class are also instances of the superclass." }
+{ $examples 
+    { $example "USING: classes prettyprint ;"
+               "t superclass ."
+               "word"
+    }
+} ;
+
+HELP: superclasses
+{ $values
+     { "class" class }
+     { "supers" sequence } }
+{ $description "Outputs a sequence of superclasses of a class along with the class itself." }
+{ $examples 
+    { $example "USING: classes prettyprint ;"
+               "t superclasses ."
+               "{ word t }"
+    }
+} ;
+
+{ superclass superclasses } related-words
 
 HELP: members
 { $values { "class" class } { "seq" "a sequence of union members, or " { $link f } } }
@@ -95,3 +115,13 @@ HELP: define-class
 { $values { "word" word } { "superclass" class } { "members" "a sequence of class words" } { "participants" "a sequence of class words" } { "metaclass" class } }
 { $description "Sets a property indicating this word is a class word, thus making it an instance of " { $link class } ", and registers it with " { $link update-map } "." }
 $low-level-note ;
+
+HELP: implementors
+{ $values { "class/classes" "a class or a sequence of classes" } { "seq" "a sequence of generic words" } }
+{ $description "Finds all generic words in the dictionary implementing methods for the given set of classes." } ;
+
+HELP: instance?
+{ $values
+     { "object" object } { "class" class }
+     { "?" "a boolean" } }
+{ $description "Tests whether the input object is a member of the class." } ;

@@ -7,9 +7,12 @@ ARTICLE: "images" "Images"
 { $subsection save-image }
 { $subsection save-image-and-exit }
 "To start Factor with a custom image, use the " { $snippet "-i=" { $emphasis "image" } } " command line switch; see " { $link "runtime-cli-args" } "."
-{ $see-also "tools.memory" } ;
+$nl
+"New images can be created from scratch:"
+{ $subsection "bootstrap.image" }
+{ $see-also "tools.memory" "tools.deploy" } ;
 
-ABOUT: "image"
+ABOUT: "images"
 
 HELP: begin-scan ( -- )
 { $description "Moves all objects to tenured space, disables the garbage collector, and resets the heap scan pointer to point at the first object in the heap. The " { $link next-object } " word can then be called to advance the heap scan pointer and return successive objects."

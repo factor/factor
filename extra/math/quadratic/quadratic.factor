@@ -3,13 +3,13 @@
 USING: kernel math math.functions ;
 IN: math.quadratic
 
-: monic ( c b a -- c' b' ) tuck / >r / r> ;
+: monic ( c b a -- c' b' ) tuck [ / ] 2bi@ ;
 
 : discriminant ( c b -- b d ) tuck sq 4 / swap - sqrt ;
 
-: critical ( b d -- -b/2 d ) >r -2 / r> ;
+: critical ( b d -- -b/2 d ) [ -2 / ] dip ;
 
-: +- ( x y -- x+y x-y ) [ + ] 2keep - ;
+: +- ( x y -- x+y x-y ) [ + ] [ - ] 2bi ;
 
 : quadratic ( c b a -- alpha beta )
     #! Solve a quadratic equation ax^2 + bx + c = 0
@@ -17,4 +17,4 @@ IN: math.quadratic
 
 : qeval ( x c b a -- y )
     #! Evaluate ax^2 + bx + c
-    >r pick * r> roll sq * + + ;
+    [ pick * ] dip roll sq * + + ;

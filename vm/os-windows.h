@@ -47,5 +47,3 @@ long getpagesize (void);
 
 s64 current_millis(void);
 
-INLINE void reset_stdio(void) {}
-

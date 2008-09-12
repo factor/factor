@@ -35,8 +35,8 @@ IN: project-euler.079
     ] { } make ;
 
 : find-source ( seq -- elt )
-    [ keys ] [ values ] bi diff prune
-    dup empty? [ "Topological sort failed" throw ] [ first ] if ;
+    unzip diff prune
+    [ "Topological sort failed" throw ] [ first ] if-empty ;
 
 : remove-source ( seq elt -- seq )
     [ swap member? not ] curry filter ;
@@ -45,7 +45,7 @@ IN: project-euler.079
     dup length 1 > [
         dup find-source dup , remove-source (topological-sort)
     ] [
-        dup empty? [ drop ] [ first [ , ] each ] if
+        [ first [ , ] each ] unless-empty
     ] if ;
 
 PRIVATE>

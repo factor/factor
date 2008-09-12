@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math sequences vectors classes classes.algebra
 combinators arrays words assocs parser namespaces definitions
-prettyprint prettyprint.backend quotations arrays.lib
+prettyprint prettyprint.backend quotations generalizations
 debugger io compiler.units kernel.private effects accessors
 hashtables sorting shuffle math.order sets ;
 IN: multi-methods
@@ -80,7 +80,7 @@ SYMBOL: total
 : topological-sort ( seq quot -- newseq )
     >r >vector [ dup empty? not ] r>
     [ dupd maximal-element >r over delete-nth r> ] curry
-    [ ] unfold nip ; inline
+    [ ] produce nip ; inline
 
 : classes< ( seq1 seq2 -- lt/eq/gt )
     [
@@ -112,10 +112,10 @@ SYMBOL: total
     dup length <reversed>
     [ picker 2array ] 2map
     [ drop object eq? not ] assoc-filter
-    dup empty? [ drop [ t ] ] [
+    [ [ t ] ] [
         [ (multi-predicate) ] { } assoc>map
         unclip [ swap [ f ] \ if 3array append [ ] like ] reduce
-    ] if ;
+    ] if-empty ;
 
 : argument-count ( methods -- n )
     keys 0 [ length max ] reduce ;
@@ -154,10 +154,10 @@ M: method-body stack-effect
     "multi-method-generic" word-prop stack-effect ;
 
 M: method-body crossref?
-    drop t ;
+    "forgotten" word-prop not ;
 
 : method-word-name ( specializer generic -- string )
-    [ word-name % "-" % unparse % ] "" make ;
+    [ name>> % "-" % unparse % ] "" make ;
 
 : method-word-props ( specializer generic -- assoc )
     [
@@ -168,7 +168,7 @@ M: method-body crossref?
 : <method> ( specializer generic -- word )
     [ method-word-props ] 2keep
     method-word-name f <word>
-    [ set-word-props ] keep ;
+    swap >>props ;
 
 : with-methods ( word quot -- )
     over >r >r "multi-methods" word-prop
@@ -187,7 +187,8 @@ M: method-body crossref?
         drop [ <method> dup ] 2keep reveal-method
     ] if ;
 
-: niceify-method [ dup \ f eq? [ drop f ] when ] map ;
+: niceify-method ( seq -- seq )
+    [ dup \ f eq? [ drop f ] when ] map ;
 
 M: no-method error.
     "Type check error" print
@@ -229,10 +230,10 @@ M: no-method error.
 : create-method-in ( specializer generic -- method )
     create-method dup save-location f set-word ;
 
-: CREATE-METHOD
+: CREATE-METHOD ( -- method )
     scan-word scan-object swap create-method-in ;
 
-: (METHOD:) CREATE-METHOD parse-definition ;
+: (METHOD:) ( -- method def ) CREATE-METHOD parse-definition ;
 
 : METHOD: (METHOD:) define ; parsing
 

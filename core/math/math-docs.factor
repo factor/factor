@@ -26,7 +26,9 @@ $nl
 { $subsection < }
 { $subsection <= }
 { $subsection > }
-{ $subsection >= } ;
+{ $subsection >= }
+"Numbers can be compared for equality using " { $link = } ", or a less precise test which disregards types:"
+{ $subsection number= } ;
 
 ARTICLE: "modular-arithmetic" "Modular arithmetic"
 { $subsection mod }
@@ -60,8 +62,12 @@ ABOUT: "arithmetic"
 
 HELP: number=
 { $values { "x" number } { "y" number } { "?" "a boolean" } }
-{ $description "Tests if two numbers have the same numerical value. If either input is not a number, outputs " { $link f } "." }
-{ $notes "Do not call this word directly. Calling " { $link = } " has the same effect and is more concise." } ;
+{ $description "Tests if two numbers have the same numeric value." }
+{ $notes "This word differs from " { $link = } " in that it disregards differences in type when comparing numbers." }
+{ $examples
+    { $example "USING: math prettyprint ;" "3.0 3 number= ." "t" }
+    { $example "USING: kernel math prettyprint ;" "3.0 3 = ." "f" }
+} ;
 
 HELP: <
 { $values { "x" real } { "y" real } { "?" "a boolean" } }
@@ -130,38 +136,27 @@ HELP: /
 { $see-also "division-by-zero" } ;
 
 HELP: /i
-{ $values { "x" real } { "y" real } { "z" real } }
+{ $values { "x" real } { "y" real } { "z" integer } }
 { $description
     "Divides " { $snippet "x" } " by " { $snippet "y" } ", truncating the result to an integer."
-    { $list
-        "Integer division of fixnums may overflow and yield a bignum."
-        "Integer division of bignums always yields a bignum."
-        "Integer division of floats always yields a float."
-        "Integer division of ratios and complex numbers proceeds using the relevant mathematical rules."
-    }
 }
 { $see-also "division-by-zero" } ;
 
 HELP: /f
-{ $values { "x" real } { "y" real } { "z" real } }
+{ $values { "x" real } { "y" real } { "z" float } }
 { $description
     "Divides " { $snippet "x" } " by " { $snippet "y" } ", representing the result as a floating point number."
-    { $list 
-        "Integer division of fixnums may overflow and yield a bignum."
-        "Integer division of bignums always yields a bignum."            
-        "Integer division of floats always yields a float."
-        "Integer division of ratios and complex numbers proceeds using the relevant mathematical rules."
-    }
 }
 { $see-also "division-by-zero" } ;
 
 HELP: mod
-{ $values { "x" integer } { "y" integer } { "z" integer } }
+{ $values { "x" rational } { "y" rational } { "z" rational } }
 { $description
     "Computes the remainder of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder being negative if " { $snippet "x" } " is negative."
     { $list 
         "Modulus of fixnums always yields a fixnum."
-        "Modulus of bignums always yields a bignum."            
+        "Modulus of bignums always yields a bignum."    
+        { "Modulus of rationals always yields a rational. In this case, the remainder is computed using the formula " { $snippet "x - (x mod y) * y" } "." }
     }
 }
 { $see-also "division-by-zero" rem } ;
@@ -223,7 +218,7 @@ HELP: bit?
 
 HELP: log2
 { $values { "x" "a positive integer" } { "n" integer } }
-{ $description "Outputs the largest integer " { $snippet "n" } " such that " { $snippet "2^n" } " is less than " { $snippet "x" } "." }
+{ $description "Outputs the largest integer " { $snippet "n" } " such that " { $snippet "2^n" } " is less than or equal to " { $snippet "x" } "." }
 { $errors "Throws an error if " { $snippet "x" } " is zero or negative." } ;
 
 HELP: 1+
@@ -254,12 +249,13 @@ HELP: recip
 { $errors "Throws an error if " { $snippet "x" } " is the integer 0." } ;
 
 HELP: rem
-{ $values { "x" integer } { "y" integer } { "z" integer } }
+{ $values { "x" rational } { "y" rational } { "z" rational } }
 { $description
     "Computes the remainder of dividing " { $snippet "x" } " by " { $snippet "y" } ", with the remainder always positive."
     { $list 
-        "Modulus of fixnums always yields a fixnum."
-        "Modulus of bignums always yields a bignum."            
+        "Given fixnums, always yields a fixnum."
+        "Given bignums, always yields a bignum."
+        "Given rationals, always yields a rational."    
     }
 }
 { $see-also "division-by-zero" mod } ;
@@ -296,19 +292,37 @@ HELP: zero?
 HELP: times
 { $values { "n" integer } { "quot" quotation } }
 { $description "Calls the quotation " { $snippet "n" } " times." }
-{ $notes "If you need to pass the current index to the quotation, use " { $link each } "." } ;
+{ $notes "If you need to pass the current index to the quotation, use " { $link each } "." }
+{ $examples
+    { $example "USING: io math ;" "3 [ \"Hi\" print ] times" "Hi\nHi\nHi" }
+} ;
 
 HELP: fp-nan?
 { $values { "x" real } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "x" } " is an IEEE Not-a-Number value. While " { $snippet "x" } " can be any real number, this word will only ever yield true if " { $snippet "x" } " is a " { $link float } "." } ;
 
-HELP: real-part ( z -- x )
-{ $values { "z" number } { "x" real } }
-{ $description "Outputs the real part of a complex number. This acts as the identity on real numbers." } ;
+HELP: fp-infinity?
+{ $values { "x" real } { "?" "a boolean" } }
+{ $description "Tests if " { $snippet "x" } " is an IEEE Infinity value. While " { $snippet "x" } " can be any real number, this word will only ever yield true if " { $snippet "x" } " is a " { $link float } "." }
+{ $examples
+    { $example "USING: math prettyprint ;" "1/0. fp-infinity? ." "t" }
+    { $example "USING: io kernel math ;" "-1/0. [ fp-infinity? ] [ 0 < ] bi [ \"negative infinity\" print ] when" "negative infinity" }
+} ;
 
-HELP: imaginary-part ( z -- y )
+{ fp-nan? fp-infinity? } related-words
+
+HELP: real-part
+{ $values { "z" number } { "x" real } }
+{ $description "Outputs the real part of a complex number. This acts as the identity on real numbers." }
+{ $examples { $example "USING: math prettyprint ; C{ 1 2 } real-part ." "1" } } ;
+
+HELP: imaginary-part
 { $values { "z" number } { "y" real } }
-{ $description "Outputs the imaginary part of a complex number. This outputs zero for real numbers." } ;
+{ $description "Outputs the imaginary part of a complex number. This outputs zero for real numbers." }
+{ $examples
+    { $example "USING: math prettyprint ; C{ 1 2 } imaginary-part ." "2" }
+    { $example "USING: math prettyprint ; 3 imaginary-part ." "0" }
+} ;
 
 HELP: real
 { $class-description "The class of real numbers, which is a disjoint union of rationals and floats." } ;

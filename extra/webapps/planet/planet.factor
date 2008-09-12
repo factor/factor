@@ -3,22 +3,27 @@
 USING: kernel accessors sequences sorting math math.order
 calendar alarms logging concurrency.combinators namespaces
 sequences.lib db.types db.tuples db fry locals hashtables
+syndication urls xml.writer validators
+html.forms
 html.components
-rss urls xml.writer
-validators
 http.server
 http.server.dispatchers
 furnace
 furnace.actions
+furnace.redirection
 furnace.boilerplate
 furnace.auth.login
 furnace.auth
-furnace.rss ;
+furnace.syndication ;
 IN: webapps.planet
 
-TUPLE: planet-factor < dispatcher ;
+TUPLE: planet < dispatcher ;
 
-TUPLE: planet-factor-admin < dispatcher ;
+SYMBOL: can-administer-planet?
+
+can-administer-planet? define-capability
+
+TUPLE: planet-admin < dispatcher ;
 
 TUPLE: blog id name www-url feed-url ;
 
@@ -30,25 +35,20 @@ blog "BLOGS"
 {
     { "id" "ID" INTEGER +db-assigned-id+ }
     { "name" "NAME" { VARCHAR 256 } +not-null+ }
-    { "www-url" "WWWURL" { VARCHAR 256 } +not-null+ }
-    { "feed-url" "FEEDURL" { VARCHAR 256 } +not-null+ }
+    { "www-url" "WWWURL" URL +not-null+ }
+    { "feed-url" "FEEDURL" URL +not-null+ }
 } define-persistent
 
-! TUPLE: posting < entry id ;
-TUPLE: posting id title link description pub-date ;
+TUPLE: posting < entry id ;
 
 posting "POSTINGS"
 {
     { "id" "ID" INTEGER +db-assigned-id+ }
     { "title" "TITLE" { VARCHAR 256 } +not-null+ }
-    { "link" "LINK" { VARCHAR 256 } +not-null+ }
+    { "url" "LINK" URL +not-null+ }
     { "description" "DESCRIPTION" TEXT +not-null+ }
-    { "pub-date" "DATE" TIMESTAMP +not-null+ }
+    { "date" "DATE" TIMESTAMP +not-null+ }
 } define-persistent
-
-: init-blog-table blog ensure-table ;
-
-: init-postings-table posting ensure-table ;
 
 : <blog> ( id -- todo )
     blog new
@@ -60,12 +60,12 @@ posting "POSTINGS"
 
 : postings ( -- seq )
     posting new select-tuples
-    [ [ pub-date>> ] compare invert-comparison ] sort ;
+    [ [ date>> ] compare invert-comparison ] sort ;
 
 : <edit-blogroll-action> ( -- action )
     <page-action>
         [ blogroll "blogroll" set-value ] >>init
-        { planet-factor "admin" } >>template ;
+        { planet "admin" } >>template ;
 
 : <planet-action> ( -- action )
     <page-action>
@@ -74,23 +74,20 @@ posting "POSTINGS"
             postings "postings" set-value
         ] >>init
 
-        { planet-factor "planet" } >>template ;
-
-: planet-feed ( -- feed )
-    feed new
-        "Planet Factor" >>title
-        "http://planet.factorcode.org" >>link
-        postings >>entries ;
+        { planet "planet" } >>template ;
 
 : <planet-feed-action> ( -- action )
-    <feed-action> [ planet-feed ] >>feed ;
+    <feed-action>
+        [ "Planet Factor" ] >>title
+        [ URL" $planet" ] >>url
+        [ postings ] >>entries ;
 
 :: <posting> ( entry name -- entry' )
     posting new
         name ": " entry title>> 3append >>title
-        entry link>> >>link
+        entry url>> >>url
         entry description>> >>description
-        entry pub-date>> >>pub-date ;
+        entry date>> >>date ;
 
 : fetch-feed ( url -- feed )
     download-feed entries>> ;
@@ -102,7 +99,7 @@ posting "POSTINGS"
     [ '[ , <posting> ] map ] 2map concat ;
 
 : sort-entries ( entries -- entries' )
-    [ [ pub-date>> ] compare invert-comparison ] sort ;
+    [ [ date>> ] compare invert-comparison ] sort ;
 
 : update-cached-postings ( -- )
     blogroll fetch-blogroll sort-entries 8 short head [
@@ -114,7 +111,7 @@ posting "POSTINGS"
     <action>
         [
             update-cached-postings
-            URL" $planet-factor/admin" <redirect>
+            URL" $planet/admin" <redirect>
         ] >>submit ;
 
 : <delete-blog-action> ( -- action )
@@ -123,7 +120,7 @@ posting "POSTINGS"
 
         [
             "id" value <blog> delete-tuples
-            URL" $planet-factor/admin" <redirect>
+            URL" $planet/admin" <redirect>
         ] >>submit ;
 
 : validate-blog ( -- )
@@ -134,11 +131,12 @@ posting "POSTINGS"
     } validate-params ;
 
 : deposit-blog-slots ( blog -- )
-    { "name" "www-url" "feed-url" } deposit-slots ;
+    { "name" "www-url" "feed-url" } to-object ;
 
 : <new-blog-action> ( -- action )
     <page-action>
-        { planet-factor "new-blog" } >>template
+
+        { planet "new-blog" } >>template
 
         [ validate-blog ] >>validate
 
@@ -148,21 +146,22 @@ posting "POSTINGS"
             [ insert-tuple ]
             [
                 <url>
-                    "$planet-factor/admin/edit-blog" >>path
+                    "$planet/admin/edit-blog" >>path
                     swap id>> "id" set-query-param
                 <redirect>
             ]
             tri
         ] >>submit ;
-    
+
 : <edit-blog-action> ( -- action )
     <page-action>
+
         [
             validate-integer-id
             "id" value <blog> select-tuple from-object
         ] >>init
 
-        { planet-factor "edit-blog" } >>template
+        { planet "edit-blog" } >>template
 
         [
             validate-integer-id
@@ -175,32 +174,31 @@ posting "POSTINGS"
             [ update-tuple ]
             [
                 <url>
-                    "$planet-factor/admin" >>path
+                    "$planet/admin" >>path
                     swap id>> "id" set-query-param
                 <redirect>
             ]
             tri
         ] >>submit ;
 
-: <planet-factor-admin> ( -- responder )
-    planet-factor-admin new-dispatcher
+: <planet-admin> ( -- responder )
+    planet-admin new-dispatcher
         <edit-blogroll-action> "blogroll" add-main-responder
         <update-action> "update" add-responder
         <new-blog-action> "new-blog" add-responder
         <edit-blog-action> "edit-blog" add-responder
-        <delete-blog-action> "delete-blog" add-responder ;
+        <delete-blog-action> "delete-blog" add-responder
+    <protected>
+        "administer Planet Factor" >>description
+        { can-administer-planet? } >>capabilities ;
 
-SYMBOL: can-administer-planet-factor?
-
-can-administer-planet-factor? define-capability
-
-: <planet-factor> ( -- responder )
-    planet-factor new-dispatcher
+: <planet> ( -- responder )
+    planet new-dispatcher
         <planet-action> "list" add-main-responder
-        <feed-action> "feed.xml" add-responder
-        <planet-factor-admin> { can-administer-planet-factor? } <protected> "admin" add-responder
+        <planet-feed-action> "feed.xml" add-responder
+        <planet-admin> "admin" add-responder
     <boilerplate>
-        { planet-factor "planet-common" } >>template ;
+        { planet "planet-common" } >>template ;
 
 : start-update-task ( db params -- )
     '[ , , [ update-cached-postings ] with-db ] 10 minutes every drop ;

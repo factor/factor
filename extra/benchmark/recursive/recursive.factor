@@ -3,14 +3,14 @@ IN: benchmark.recursive
 
 : fib ( m -- n )
     dup 2 < [ drop 1 ] [ [ 1 - fib ] [ 2 - fib ] bi + ] if ;
-    inline
+    inline recursive
 
 : ack ( m n -- x )
     {
         { [ over zero? ] [ nip 1+ ] }
         { [ dup zero? ] [ drop 1- 1 ack ] }
         [ [ drop 1- ] [ 1- ack ] 2bi ack ]
-    } cond ; inline
+    } cond ; inline recursive
 
 : tak ( x y z -- t )
     2over <= [
@@ -21,7 +21,7 @@ IN: benchmark.recursive
         [      1- -rot tak ]
         3tri
         tak
-    ] if ; inline
+    ] if ; inline recursive
 
 : recursive ( n -- )
     [ 3 swap ack . flush ]
@@ -32,6 +32,6 @@ IN: benchmark.recursive
 
 HINTS: recursive fixnum ;
 
-: recursive-main 11 recursive ;
+: recursive-main ( -- ) 11 recursive ;
 
 MAIN: recursive-main

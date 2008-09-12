@@ -2,7 +2,8 @@
 USING: kernel parser words continuations namespaces debugger
        sequences combinators splitting prettyprint
        system io io.files io.launcher io.encodings.utf8 io.pipes sequences.deep
-       accessors multi-methods newfx shell.parser ;
+       accessors multi-methods newfx shell.parser
+       combinators.short-circuit eval ;
 
 IN: shell
 
@@ -49,7 +50,6 @@ DEFER: expansion
 METHOD: expand { back-quoted-expr }
   expr>>
   expr
-  ast>>
   command>>
   expansion
   utf8 <process-stream>
@@ -121,7 +121,7 @@ DEFER: shell
     { [ dup f = ]      [ drop ] }
     { [ dup "exit" = ] [ drop ] }
     { [ dup "" = ]     [ drop shell ] }
-    { [ dup expr ]     [ expr ast>> chant shell ] }
+    { [ dup expr ]     [ expr chant shell ] }
     { [ t ]            [ drop "ix: ignoring input" print shell ] }
   }
     cond ;

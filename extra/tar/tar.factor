@@ -1,6 +1,6 @@
 USING: combinators io io.files io.streams.string kernel math
 math.parser continuations namespaces pack prettyprint sequences
-strings system hexdump io.encodings.binary inspector accessors
+strings system hexdump io.encodings.binary summary accessors
 io.backend symbols byte-arrays ;
 IN: tar
 
@@ -135,7 +135,7 @@ M: unknown-typeflag summary ( obj -- str )
 : typeflag-L ( header -- )
     drop ;
     ! <string-writer> [ read-data-blocks ] keep
-    ! >string [ zero? ] right-trim filename set
+    ! >string [ zero? ] trim-right filename set
     ! filename get tar-prepend-path make-directories ;
 
 ! Multi volume continuation entry

@@ -1,27 +1,35 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays sequences sequences.private
+USING: accessors arrays sequences sequences.private
 kernel kernel.private math assocs quotations.private
 slots.private ;
 IN: quotations
 
+<PRIVATE
+
+: uncurry dup 2 slot swap 3 slot ; inline
+
+: uncompose dup 2 slot swap 3 slot ; inline
+
+PRIVATE>
+
 M: quotation call (call) ;
 
-M: curry call dup 3 slot swap 4 slot call ;
+M: curry call uncurry call ;
 
-M: compose call dup 3 slot swap 4 slot slip call ;
+M: compose call uncompose slip call ;
 
 M: wrapper equal?
-    over wrapper? [ [ wrapped ] bi@ = ] [ 2drop f ] if ;
+    over wrapper? [ [ wrapped>> ] bi@ = ] [ 2drop f ] if ;
 
 UNION: callable quotation curry compose ;
 
 M: callable equal?
     over callable? [ sequence= ] [ 2drop f ] if ;
 
-M: quotation length quotation-array length ;
+M: quotation length array>> length ;
 
-M: quotation nth-unsafe quotation-array nth-unsafe ;
+M: quotation nth-unsafe array>> nth-unsafe ;
 
 : >quotation ( seq -- quot )
     >array array>quotation ; inline
@@ -38,26 +46,23 @@ M: object literalize ;
 
 M: wrapper literalize <wrapper> ;
 
-M: curry length curry-quot length 1+ ;
+M: curry length quot>> length 1+ ;
 
 M: curry nth
-    over zero? [
-        nip curry-obj literalize
-    ] [
-        >r 1- r> curry-quot nth
-    ] if ;
+    over zero? [ nip obj>> literalize ] [ >r 1- r> quot>> nth ] if ;
 
 INSTANCE: curry immutable-sequence
 
 M: compose length
-    [ compose-first length ]
-    [ compose-second length ] bi + ;
+    [ first>> length ] [ second>> length ] bi + ;
 
-M: compose nth
-    2dup compose-first length < [
-        compose-first
+M: compose virtual-seq first>> ;
+
+M: compose virtual@
+    2dup first>> length < [
+        first>>
     ] [
-        [ compose-first length - ] [ compose-second ] bi
-    ] if nth ;
+        [ first>> length - ] [ second>> ] bi
+    ] if ;
 
-INSTANCE: compose immutable-sequence
+INSTANCE: compose virtual-sequence

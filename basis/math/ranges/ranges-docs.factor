@@ -1,0 +1,27 @@
+USING: help.syntax help.markup arrays sequences ;
+
+IN: math.ranges
+
+ARTICLE: "ranges" "Ranges"
+"A " { $emphasis "range" } " is a virtual sequence with real number elements "
+"ranging from " { $emphasis "a" } " to " { $emphasis "b" } " by " { $emphasis "step" } "."
+$nl
+"The class of ranges:"
+{ $subsection range }
+"Creating ranges with integer end-points. The standard mathematical convention is used, where " { $snippet "(" } " or " { $snippet ")" } " denotes that the end-point itself " { $emphasis "is not" } " part of the range; " { $snippet "[" } " or " { $snippet "]" } " denotes that the end-point " { $emphasis "is" } " part of the range:"
+{ $subsection [a,b] }
+{ $subsection (a,b] }
+{ $subsection [a,b) }
+{ $subsection (a,b) }
+{ $subsection [0,b] }
+{ $subsection [1,b] }
+{ $subsection [0,b) }
+"Creating general ranges:"
+{ $subsection <range> }
+"Ranges are most frequently used with sequence combinators as a means of iterating over integers. For example,"
+{ $code
+    "3 10 [a,b] [ sqrt ] map"
+}
+"A range can be converted into a concrete sequence using a word such as " { $link >array } ". In most cases this is unnecessary since ranges implement the sequence protocol already. It is necessary if a mutable sequence is needed, for use with words such as " { $link set-nth } " or " { $link change-each } "." ;
+  
+ABOUT: "ranges"

@@ -1,6 +1,6 @@
 
 USING: kernel arrays sequences random math accessors multi-methods
-       processing
+       processing processing.shapes
        bubble-chamber.common
        bubble-chamber.particle ;
 

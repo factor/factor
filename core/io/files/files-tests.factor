@@ -1,10 +1,13 @@
 IN: io.files.tests
 USING: tools.test io.files io.files.private io threads kernel
-continuations io.encodings.ascii io.files.unique sequences
-strings accessors io.encodings.utf8 math destructors ;
+continuations io.encodings.ascii sequences
+strings accessors io.encodings.utf8 math destructors
+namespaces ;
 
 \ exists? must-infer
 \ (exists?) must-infer
+\ file-info must-infer
+\ link-info must-infer
 
 [ ] [ "blahblah" temp-file dup exists? [ delete-directory ] [ drop ] if ] unit-test
 [ ] [ "blahblah" temp-file make-directory ] unit-test
@@ -123,6 +126,8 @@ strings accessors io.encodings.utf8 math destructors ;
 
 [ f ] [ "test-blah" temp-file exists? ] unit-test
 
+USE: debugger.threads
+
 [ ] [ "test-quux.txt" temp-file ascii [ [ yield "Hi" write ] "Test" spawn drop ] with-file-writer ] unit-test
 
 [ ] [ "test-quux.txt" temp-file delete-file ] unit-test
@@ -130,6 +135,7 @@ strings accessors io.encodings.utf8 math destructors ;
 [ ] [ "test-quux.txt" temp-file ascii [ [ yield "Hi" write ] "Test" spawn drop ] with-file-writer ] unit-test
 
 [ ] [ "test-quux.txt" "quux-test.txt" [ temp-file ] bi@ move-file ] unit-test
+
 [ t ] [ "quux-test.txt" temp-file exists? ] unit-test
 
 [ ] [ "quux-test.txt" temp-file delete-file ] unit-test
@@ -218,18 +224,6 @@ strings accessors io.encodings.utf8 math destructors ;
 
 [ ] [ "append-test" temp-file ascii <file-appender> dispose ] unit-test
 
-
-
-[ 123 ] [
-    "core" ".test" [
-        [
-            ascii [
-                123 CHAR: a <repetition> >string write
-            ] with-file-writer
-        ] keep file-info size>>
-    ] with-unique-file
-] unit-test
-
 [ "/usr/lib" ] [ "/usr" "lib" append-path ] unit-test
 [ "/usr/lib" ] [ "/usr/" "lib" append-path ] unit-test
 [ "/usr/lib" ] [ "/usr" "./lib" append-path ] unit-test
@@ -274,3 +268,12 @@ strings accessors io.encodings.utf8 math destructors ;
 
 [ "touch-twice-test" temp-file delete-file ] ignore-errors
 [ ] [ 2 [ "touch-twice-test" temp-file touch-file ] times ] unit-test
+
+! aum's bug
+[
+    "." current-directory set
+    ".." "resource-path" set
+    [ "../core/bootstrap/stage2.factor" ]
+    [ "resource:core/bootstrap/stage2.factor" (normalize-path) ]
+    unit-test
+] with-scope

@@ -166,8 +166,6 @@ void mach_initialize (void)
 {
 	mach_port_t self;
 	exception_mask_t mask;
-	pthread_attr_t attr;
-	pthread_t thread;
 
 	self = mach_task_self ();
 
@@ -186,13 +184,7 @@ void mach_initialize (void)
 	mask = EXC_MASK_BAD_ACCESS | EXC_MASK_ARITHMETIC;
 
 	/* Create the thread listening on the exception port.  */
-	if (pthread_attr_init (&attr) != 0)
-		fatal_error("pthread_attr_init() failed",0);
-	if (pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_DETACHED) != 0)
-		fatal_error("pthread_attr_setdetachstate() failed",0);
-	if (pthread_create (&thread, &attr, mach_exception_thread, NULL) != 0)
-		fatal_error("pthread_create() failed",0);
-	pthread_attr_destroy (&attr);
+	start_thread(mach_exception_thread);
 
 	/* Replace the exception port info for these exceptions with our own.
 	Note that we replace the exception port for the entire task, not only

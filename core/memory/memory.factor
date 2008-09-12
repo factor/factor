@@ -1,18 +1,22 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: kernel continuations sequences vectors arrays system math ;
 IN: memory
-USING: arrays kernel sequences vectors system hashtables
-kernel.private sbufs growable assocs namespaces quotations
-math strings combinators ;
 
-: (each-object) ( quot -- )
-    next-object dup
-    [ swap [ call ] keep (each-object) ] [ 2drop ] if ; inline
+: (each-object) ( quot: ( obj -- ) -- )
+    [ next-object dup ] swap [ drop ] while ; inline
 
 : each-object ( quot -- )
-    begin-scan (each-object) end-scan ; inline
+    begin-scan [ (each-object) ] [ end-scan ] [ ] cleanup ; inline
+
+: count-instances ( quot -- n )
+    0 swap [ 1 0 ? + ] compose each-object ; inline
 
 : instances ( quot -- seq )
-    pusher >r each-object r> >array ; inline
+    #! To ensure we don't need to grow the vector while scanning
+    #! the heap, we do two scans, the first one just counts the
+    #! number of objects that satisfy the predicate.
+    [ count-instances 100 + <vector> ] keep swap
+    [ [ push-if ] 2curry each-object ] keep >array ; inline
 
 : save ( -- ) image save-image ;

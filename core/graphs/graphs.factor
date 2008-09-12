@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs kernel namespaces sequences ;
+USING: assocs kernel namespaces sequences sets ;
 IN: graphs
 
 SYMBOL: graph
@@ -37,14 +37,14 @@ SYMBOL: graph
 
 SYMBOL: previous
 
-: (closure) ( obj quot -- )
+: (closure) ( obj quot: ( elt -- assoc ) -- )
     over previous get key? [
         2drop
     ] [
-        over dup previous get set-at
+        over previous get conjoin
         dup slip
         [ nip (closure) ] curry assoc-each
-    ] if ; inline
+    ] if ; inline recursive
 
 : closure ( obj quot -- assoc )
     H{ } clone [

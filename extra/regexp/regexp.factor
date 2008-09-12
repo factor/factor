@@ -1,7 +1,8 @@
-USING: arrays combinators kernel lazy-lists math math.parser
-namespaces parser parser-combinators parser-combinators.simple
+USING: arrays combinators kernel lists math math.parser
+namespaces parser lexer parser-combinators parser-combinators.simple
 promises quotations sequences combinators.lib strings math.order
-assocs prettyprint.backend memoize unicode.case unicode.categories ;
+assocs prettyprint.backend memoize unicode.case unicode.categories
+combinators.short-circuit accessors ;
 USE: io
 IN: regexp
 
@@ -20,12 +21,9 @@ SYMBOL: ignore-case?
     [ [ between? ] ]
     if 2curry ;
 
-: or-predicates ( quots -- quot )
-    [ \ dup prefix ] map [ [ t ] ] f short-circuit \ nip suffix ;
+: <@literal ( parser obj -- action ) [ nip ] curry <@ ;
 
-: <@literal [ nip ] curry <@ ;
-
-: <@delay [ curry ] curry <@ ;
+: <@delay ( parser quot -- action ) [ curry ] curry <@ ;
 
 PRIVATE>
 
@@ -135,10 +133,10 @@ PRIVATE>
     'posix-character-class' <|>
     'simple-escape' <|> &> ;
 
-: 'any-char'
+: 'any-char' ( -- parser )
     "." token [ drop t ] <@literal ;
 
-: 'char'
+: 'char' ( -- parser )
     'any-char' 'escape' 'ordinary-char' <|> <|> [ satisfy ] <@ ;
 
 DEFER: 'regexp'
@@ -179,7 +177,7 @@ C: <group-result> group-result
 : 'positive-character-class' ( -- parser )
     "]" token [ CHAR: ] = ] <@literal 'character-class-term' <*> <&:>
     'character-class-term' <+> <|>
-    [ or-predicates ] <@ ;
+    [ [ 1|| ] curry ] <@ ;
 
 : 'negative-character-class' ( -- parser )
     "^" token 'positive-character-class' &>
@@ -272,14 +270,14 @@ TUPLE: regexp source parser ignore-case? ;
     ] keep regexp boa ;
 
 : do-ignore-case ( string regexp -- string regexp )
-    dup regexp-ignore-case? [ >r >upper r> ] when ;
+    dup ignore-case?>> [ >r >upper r> ] when ;
 
 : matches? ( string regexp -- ? )
-    do-ignore-case regexp-parser just parse nil? not ;
+    do-ignore-case parser>> just parse nil? not ;
 
 : match-head ( string regexp -- end )
-    do-ignore-case regexp-parser parse dup nil?
-    [ drop f ] [ car parse-result-unparsed slice-from ] if ;
+    do-ignore-case parser>> parse dup nil?
+    [ drop f ] [ car unparsed>> from>> ] if ;
 
 ! Literal syntax for regexps
 : parse-options ( string -- ? )
@@ -325,8 +323,8 @@ TUPLE: regexp source parser ignore-case? ;
 
 M: regexp pprint*
     [
-        dup regexp-source
+        dup source>>
         dup find-regexp-syntax swap % swap % %
-        dup regexp-ignore-case? [ "i" % ] when
+        dup ignore-case?>> [ "i" % ] when
     ] "" make
     swap present-text ;

@@ -1,0 +1,161 @@
+! Copyright (C) 2006, 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: fry accessors sequences parser kernel help help.markup
+help.topics words strings classes tools.vocabs namespaces io
+io.streams.string prettyprint definitions arrays vectors
+combinators combinators.short-circuit splitting debugger
+hashtables sorting effects vocabs vocabs.loader assocs editors
+continuations classes.predicate macros math sets eval ;
+IN: help.lint
+
+: check-example ( element -- )
+    rest [
+        but-last "\n" join 1vector
+        [
+            use [ clone ] change
+            [ eval>string ] with-datastack
+        ] with-scope peek "\n" ?tail drop
+    ] keep
+    peek assert= ;
+
+: check-examples ( word element -- )
+    nip \ $example swap elements [ check-example ] each ;
+
+: extract-values ( element -- seq )
+    \ $values swap elements dup empty? [
+        first rest [ first ] map prune natural-sort
+    ] unless ;
+
+: effect-values ( word -- seq )
+    stack-effect
+    [ in>> ] [ out>> ] bi append
+    [ dup pair? [ first ] when effect>string ] map
+    prune natural-sort ;
+
+: contains-funky-elements? ( element -- ? )
+    {
+        $shuffle
+        $values-x/y
+        $predicate
+        $class-description
+        $error-description
+    } swap '[ , elements empty? not ] contains? ;
+
+: check-values ( word element -- )
+    {
+        [ drop "declared-effect" word-prop not ]
+        [ nip contains-funky-elements? ]
+        [ drop macro? ]
+        [
+            [ effect-values >array ]
+            [ extract-values >array ]
+            bi* =
+        ]
+    } 2|| [ "$values don't match stack effect" throw ] unless ;
+
+: check-see-also ( word element -- )
+    nip \ $see-also swap elements [
+        rest dup prune [ length ] bi@ assert=
+    ] each ;
+
+: vocab-exists? ( name -- ? )
+    dup vocab swap "all-vocabs" get member? or ;
+
+: check-modules ( word element -- )
+    nip \ $vocab-link swap elements [
+        second
+        vocab-exists? [ "Missing vocabulary" throw ] unless
+    ] each ;
+
+: check-rendering ( word element -- )
+    [ help ] with-string-writer drop ;
+
+: all-word-help ( words -- seq )
+    [ word-help ] filter ;
+
+TUPLE: help-error topic error ;
+
+C: <help-error> help-error
+
+M: help-error error.
+    "In " write dup topic>> pprint nl
+    error>> error. ;
+
+: check-something ( obj quot -- )
+    flush [ <help-error> , ] recover ; inline
+
+: check-word ( word -- )
+    dup word-help [
+        [
+            dup word-help [
+                2dup check-examples
+                2dup check-values
+                2dup check-see-also
+                2dup check-modules
+                2dup drop check-rendering
+            ] assert-depth 2drop
+        ] check-something
+    ] [ drop ] if ;
+
+: check-words ( words -- ) [ check-word ] each ;
+
+: check-article ( article -- )
+    [
+        [ dup check-rendering ] assert-depth drop
+    ] check-something ;
+
+: group-articles ( -- assoc )
+    articles get keys
+    vocabs [ dup vocab-docs-path swap ] H{ } map>assoc
+    H{ } clone [
+        '[
+            dup >link where dup
+            [ first , at , push-at ] [ 2drop ] if
+        ] each
+    ] keep ;
+
+: check-about ( vocab -- )
+    [ vocab-help [ article drop ] when* ] check-something ;
+
+: check-vocab ( vocab -- seq )
+    "Checking " write dup write "..." print
+    [
+        [ check-about ]
+        [ words [ check-word ] each ]
+        [ "vocab-articles" get at [ check-article ] each ]
+        tri
+    ] { } make ;
+
+: run-help-lint ( prefix -- alist )
+    [
+        all-vocabs-seq [ vocab-name ] map "all-vocabs" set
+        group-articles "vocab-articles" set
+        child-vocabs
+        [ dup check-vocab ] { } map>assoc
+        [ nip empty? not ] assoc-filter
+    ] with-scope ;
+
+: typos. ( assoc -- )
+    [
+        "==== ALL CHECKS PASSED" print
+    ] [
+        [
+            swap vocab-heading.
+            [ error. nl ] each
+        ] assoc-each
+    ] if-empty ;
+
+: help-lint ( prefix -- ) run-help-lint typos. ;
+
+: help-lint-all ( -- ) "" help-lint ;
+
+: unlinked-words ( words -- seq )
+    all-word-help [ article-parent not ] filter ;
+
+: linked-undocumented-words ( -- seq )
+    all-words
+    [ word-help not ] filter
+    [ article-parent ] filter
+    [ "predicating" word-prop not ] filter ;
+
+MAIN: help-lint

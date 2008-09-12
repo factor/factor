@@ -1,12 +1,15 @@
 USING: tools.deploy.config ;
-V{
-    { deploy-ui? t }
-    { deploy-io 1 }
+H{
     { deploy-reflection 1 }
-    { deploy-compiler? t }
     { deploy-math? t }
-    { deploy-word-props? f }
-    { deploy-c-types? f }
-    { "stop-after-last-window?" t }
+    { deploy-ui? t }
     { deploy-name "Maze" }
+    { deploy-compiler? t }
+    { deploy-threads? t }
+    { deploy-word-defs? f }
+    { deploy-c-types? f }
+    { deploy-io 1 }
+    { "stop-after-last-window?" t }
+    { deploy-random? t }
+    { deploy-word-props? f }
 }

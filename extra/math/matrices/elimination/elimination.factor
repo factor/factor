@@ -11,7 +11,7 @@ SYMBOL: matrix
 
 : nth-row ( row# -- seq ) matrix get nth ;
 
-: change-row ( row# quot -- | quot: seq -- seq )
+: change-row ( row# quot: ( seq -- seq ) -- )
     matrix get swap change-nth ; inline
 
 : exchange-rows ( row# row# -- ) matrix get exchange ;
@@ -31,10 +31,10 @@ SYMBOL: matrix
     >r over r> nth dup zero? [
         3drop 0
     ] [
-        >r nth dup zero? [
-            r> 2drop 0
+        >r nth dup zero? r> swap [
+            2drop 0
         ] [
-            r> swap / neg
+            swap / neg
         ] if
     ] if ;
 
@@ -69,7 +69,8 @@ SYMBOL: matrix
 : echelon ( matrix -- matrix' )
     [ 0 0 (echelon) ] with-matrix ;
 
-: nonzero-rows [ [ zero? ] all? not ] filter ;
+: nonzero-rows ( matrix -- matrix' )
+    [ [ zero? ] all? not ] filter ;
 
 : null/rank ( matrix -- null rank )
     echelon dup length swap nonzero-rows length [ - ] keep ;

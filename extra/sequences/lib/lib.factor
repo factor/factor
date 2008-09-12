@@ -2,9 +2,10 @@
 !                    Eduardo Cavazos, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.lib kernel sequences math namespaces assocs 
-random sequences.private shuffle math.functions mirrors
+random sequences.private shuffle math.functions
 arrays math.parser math.private sorting strings ascii macros
-assocs.lib quotations hashtables math.order locals ;
+assocs.lib quotations hashtables math.order locals
+generalizations ;
 IN: sequences.lib
 
 : each-withn ( seq quot n -- ) nwith each ; inline
@@ -19,26 +20,6 @@ IN: sequences.lib
 
 : map-with2 ( obj obj list quot -- newseq ) 2 map-withn ; inline
 
-MACRO: firstn ( n -- )
-    [ [ swap nth ] curry [ keep ] curry ] map
-    concat >quotation
-    [ drop ] compose ;
-
-: prepare-index ( seq quot -- seq n quot )
-    >r dup length r> ; inline
-
-: each-index ( seq quot -- )
-    #! quot: ( elt index -- )
-    prepare-index 2each ; inline
-
-: map-index ( seq quot -- )
-    #! quot: ( elt index -- obj )
-    prepare-index 2map ; inline
-
-: reduce-index ( seq identity quot -- )
-    #! quot: ( prev elt index -- next )
-    swapd each-index ; inline
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : each-percent ( seq quot -- )
@@ -48,14 +29,6 @@ MACRO: firstn ( n -- )
   [ 1+ ] prepose
   r> compose
   2each ;                       inline
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: sigma ( seq quot -- n )
-    [ + ] compose 0 swap reduce ; inline
-
-: count ( seq quot -- n )
-    [ 1 0 ? ] compose sigma ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -102,21 +75,22 @@ MACRO: firstn ( n -- )
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: ,, building get peek push ;
-: v, V{ } clone , ;
-: ,v building get dup peek empty? [ dup pop* ] when drop ;
+: ,, ( obj -- ) building get peek push ;
+: v, ( -- ) V{ } clone , ;
+: ,v ( -- ) building get dup peek empty? [ dup pop* ] when drop ;
 
-: monotonic-split ( seq quot -- newseq )
+: (monotonic-split) ( seq quot -- newseq )
     [
         >r dup unclip suffix r>
         v, [ pick ,, call [ v, ] unless ] curry 2each ,v
     ] { } make ;
 
-: delete-random ( seq -- value )
-    [ length random ] keep [ nth ] 2keep delete-nth ;
+: monotonic-split ( seq quot -- newseq )
+    over empty? [ 2drop { } ] [ (monotonic-split) ] if ;
 
+ERROR: element-not-found ;
 : split-around ( seq quot -- before elem after )
-    dupd find over [ "Element not found" throw ] unless
+    dupd find over [ element-not-found ] unless
     >r cut rest r> swap ; inline
 
 : (map-until) ( quot pred -- quot )
@@ -130,10 +104,6 @@ MACRO: firstn ( n -- )
     [ not ] compose
     [ find drop [ head-slice ] when* ] curry
     [ dup ] prepose keep like ;
-
-: replicate ( seq quot -- newseq )
-    #! quot: ( -- obj )
-    [ drop ] prepose map ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -164,15 +134,6 @@ PRIVATE>
 
 : power-set ( seq -- subsets )
     2 over length exact-number-strings swap [ switches ] curry map ;
-
-: push-either ( elt quot accum1 accum2 -- )
-    >r >r keep swap r> r> ? push ; inline
-
-: 2pusher ( quot -- quot accum1 accum2 )
-    V{ } clone V{ } clone [ [ push-either ] 3curry ] 2keep ; inline
-
-: partition ( seq quot -- trueseq falseseq )
-    over >r 2pusher >r >r each r> r> r> drop ; inline
 
 : cut-find ( seq pred -- before after )
     dupd find drop dup [ cut ] when ;
@@ -205,9 +166,6 @@ USE: continuations
     >r >r 0 max r> r>
     [ length tuck min >r min r> ] keep subseq ;
 
-: accumulator ( quot -- quot vec )
-    V{ } clone [ [ push ] curry compose ] keep ; inline
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! List the positions of obj in seq
@@ -223,7 +181,7 @@ USE: continuations
     [
         iterate-step roll
         [ 3nip ] [ iterate-next (attempt-each-integer) ] if*
-    ] [ 3drop f ] if-iterate? ; inline
+    ] [ 3drop f ] if-iterate? ; inline recursive
 PRIVATE>
 
 : attempt-each ( seq quot -- result )
@@ -231,35 +189,3 @@ PRIVATE>
 
 : ?nth* ( n seq -- elt/f ? )
     2dup bounds-check? [ nth-unsafe t ] [ 2drop f f ] if ; flushable
-
-: nths ( seq indices -- seq' )
-    swap [ nth ] curry map ;
-
-: replace ( str oldseq newseq -- str' )
-    zip >hashtable substitute ;
-
-: remove-nth ( seq n -- seq' )
-    cut-slice rest-slice append ;
-
-: short ( seq n -- seq n' )
-    over length min ; inline
-
-<PRIVATE
-:: insert ( seq quot n -- )
-    n zero? [
-        n n 1- [ seq nth quot call ] bi@ >= [
-            n n 1- seq exchange
-            seq quot n 1- insert
-        ] unless
-    ] unless ; inline
-PRIVATE>
-
-: insertion-sort ( seq quot -- )
-    ! quot is a transformation on elements
-    over length [ insert ] 2with each ; inline
-
-: if-seq ( seq quot1 quot2 -- )
-    [ f like ] 2dip if* ; inline
-
-: if-empty ( seq quot1 quot2 -- )
-    swap if-seq ; inline

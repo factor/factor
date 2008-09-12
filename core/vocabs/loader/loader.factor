@@ -1,16 +1,16 @@
 ! Copyright (C) 2007, 2008 Eduardo Cavazos, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces sequences io.files kernel assocs words vocabs
-definitions parser continuations inspector debugger io io.styles
-hashtables sorting prettyprint source-files
-arrays combinators strings system math.parser compiler.errors
-splitting init ;
+definitions parser continuations io hashtables sorting
+source-files arrays combinators strings system math.parser
+compiler.errors splitting init accessors ;
 IN: vocabs.loader
 
 SYMBOL: vocab-roots
 
 V{
     "resource:core"
+    "resource:basis"
     "resource:extra"
     "resource:work"
 } clone vocab-roots set-global
@@ -34,10 +34,11 @@ SYMBOL: root-cache
 
 H{ } clone root-cache set-global
 
+: (find-vocab-root) ( name -- path/f )
+    vocab-roots get swap [ vocab-dir? ] curry find nip ;
+
 : find-vocab-root ( vocab -- path/f )
-    vocab-name root-cache get [
-        vocab-roots get swap [ vocab-dir? ] curry find nip
-    ] cache ;
+    vocab-name dup root-cache get at [ ] [ (find-vocab-root) ] ?if ;
 
 : vocab-append-path ( vocab path -- newpath )
     swap find-vocab-root dup [ prepend-path ] [ 2drop f ] if ;
@@ -50,29 +51,22 @@ H{ } clone root-cache set-global
 
 SYMBOL: load-help?
 
-: source-was-loaded t swap set-vocab-source-loaded? ;
+: load-source ( vocab -- vocab )
+    f over set-vocab-source-loaded?
+    [ vocab-source-path [ parse-file ] [ [ ] ] if* ] keep
+    t over set-vocab-source-loaded?
+    [ [ % ] [ call ] if-bootstrapping ] dip ;
 
-: source-wasn't-loaded f swap set-vocab-source-loaded? ;
-
-: load-source ( vocab -- )
-    [ source-wasn't-loaded ] keep
-    [ vocab-source-path [ bootstrap-file ] when* ] keep
-    source-was-loaded ;
-
-: docs-were-loaded t swap set-vocab-docs-loaded? ;
-
-: docs-weren't-loaded f swap set-vocab-docs-loaded? ;
-
-: load-docs ( vocab -- )
+: load-docs ( vocab -- vocab )
     load-help? get [
-        [ docs-weren't-loaded ] keep
+        f over set-vocab-docs-loaded?
         [ vocab-docs-path [ ?run-file ] when* ] keep
-        docs-were-loaded
-    ] [ drop ] if ;
+        t over set-vocab-docs-loaded?
+    ] when ;
 
 : reload ( name -- )
     [
-        dup vocab [ dup load-source load-docs ] [ no-vocab ] ?if
+        dup vocab [ load-source load-docs drop ] [ no-vocab ] ?if
     ] with-compiler-errors ;
 
 : require ( vocab -- )
@@ -96,8 +90,8 @@ GENERIC: (load-vocab) ( name -- )
 
 M: vocab (load-vocab)
     [
-        dup vocab-source-loaded? [ dup load-source ] unless
-        dup vocab-docs-loaded? [ dup load-docs ] unless
+        dup vocab-source-loaded? [ load-source ] unless
+        dup vocab-docs-loaded? [ load-docs ] unless
         drop
     ] [ [ swap add-to-blacklist ] keep rethrow ] recover ;
 

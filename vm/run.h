@@ -1,4 +1,4 @@
-#define USER_ENV 64
+#define USER_ENV 70
 
 typedef enum {
 	NAMESTACK_ENV,            /* used by library only */
@@ -47,20 +47,23 @@ typedef enum {
 	JIT_EPILOG,
 	JIT_RETURN,
 	JIT_PROFILING,
+	JIT_PUSH_IMMEDIATE,
 
-	STACK_TRACES_ENV    = 36,
+	JIT_DECLARE_WORD    = 42,
 
-	UNDEFINED_ENV       = 37, /* default quotation for undefined words */
+	STACK_TRACES_ENV    = 59,
 
-	STDERR_ENV          = 38, /* stderr FILE* handle */
+	UNDEFINED_ENV       = 60, /* default quotation for undefined words */
 
-	STAGE2_ENV          = 39, /* have we bootstrapped? */
+	STDERR_ENV          = 61, /* stderr FILE* handle */
 
-	CURRENT_THREAD_ENV  = 40,
+	STAGE2_ENV          = 62, /* have we bootstrapped? */
 
-	THREADS_ENV         = 41,
-	RUN_QUEUE_ENV       = 42,
-	SLEEP_QUEUE_ENV     = 43,
+	CURRENT_THREAD_ENV  = 63,
+
+	THREADS_ENV         = 64,
+	RUN_QUEUE_ENV       = 65,
+	SLEEP_QUEUE_ENV     = 66,
 } F_ENVTYPE;
 
 #define FIRST_SAVE_ENV BOOT_ENV
@@ -222,28 +225,9 @@ DLLEXPORT void save_stacks(void);
 DLLEXPORT void nest_stacks(void);
 DLLEXPORT void unnest_stacks(void);
 void init_stacks(CELL ds_size, CELL rs_size);
-DECLARE_PRIMITIVE(drop);
-DECLARE_PRIMITIVE(2drop);
-DECLARE_PRIMITIVE(3drop);
-DECLARE_PRIMITIVE(dup);
-DECLARE_PRIMITIVE(2dup);
-DECLARE_PRIMITIVE(3dup);
-DECLARE_PRIMITIVE(rot);
-DECLARE_PRIMITIVE(_rot);
-DECLARE_PRIMITIVE(dupd);
-DECLARE_PRIMITIVE(swapd);
-DECLARE_PRIMITIVE(nip);
-DECLARE_PRIMITIVE(2nip);
-DECLARE_PRIMITIVE(tuck);
-DECLARE_PRIMITIVE(over);
-DECLARE_PRIMITIVE(pick);
-DECLARE_PRIMITIVE(swap);
-DECLARE_PRIMITIVE(to_r);
-DECLARE_PRIMITIVE(from_r);
+
 DECLARE_PRIMITIVE(datastack);
 DECLARE_PRIMITIVE(retainstack);
-DECLARE_PRIMITIVE(execute);
-DECLARE_PRIMITIVE(call);
 DECLARE_PRIMITIVE(getenv);
 DECLARE_PRIMITIVE(setenv);
 DECLARE_PRIMITIVE(exit);
@@ -252,11 +236,8 @@ DECLARE_PRIMITIVE(os_envs);
 DECLARE_PRIMITIVE(set_os_env);
 DECLARE_PRIMITIVE(unset_os_env);
 DECLARE_PRIMITIVE(set_os_envs);
-DECLARE_PRIMITIVE(eq);
 DECLARE_PRIMITIVE(millis);
 DECLARE_PRIMITIVE(sleep);
-DECLARE_PRIMITIVE(tag);
-DECLARE_PRIMITIVE(slot);
 DECLARE_PRIMITIVE(set_slot);
 
 bool stage2;

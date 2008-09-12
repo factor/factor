@@ -2,8 +2,9 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces assocs sorting sequences kernel accessors
 hashtables sequences.lib db.types db.tuples db combinators
-calendar calendar.format math.parser rss urls xml.writer
+calendar calendar.format math.parser syndication urls xml.writer
 xmode.catalog validators
+html.forms
 html.components
 html.templates.chloe
 http.server
@@ -11,13 +12,18 @@ http.server.dispatchers
 http.server.redirection
 furnace
 furnace.actions
+furnace.redirection
 furnace.auth
 furnace.auth.login
 furnace.boilerplate
-furnace.rss ;
+furnace.syndication ;
 IN: webapps.pastebin
 
 TUPLE: pastebin < dispatcher ;
+
+SYMBOL: can-delete-pastes?
+
+can-delete-pastes? define-capability
 
 ! ! !
 ! DOMAIN MODEL
@@ -34,6 +40,14 @@ entity f
     { "date" "DATE" DATETIME +not-null+ }
     { "contents" "CONTENTS" TEXT +not-null+ }
 } define-persistent
+
+GENERIC: entity-url ( entity -- url )
+
+M: entity feed-entry-title summary>> ;
+
+M: entity feed-entry-date date>> ;
+
+M: entity feed-entry-url entity-url ;
 
 TUPLE: paste < entity annotations ;
 
@@ -58,39 +72,31 @@ annotation "ANNOTATIONS"
         swap >>id
         swap >>parent ;
 
-: fetch-annotations ( paste -- paste )
-    dup annotations>> [
-        dup id>> f <annotation> select-tuples >>annotations
-    ] unless ;
-
 : paste ( id -- paste )
-    <paste> select-tuple fetch-annotations ;
+    [ <paste> select-tuple ]
+    [ f <annotation> select-tuples ]
+    bi >>annotations ;
 
 ! ! !
 ! LINKS, ETC
 ! ! !
 
-: pastebin-link ( -- url )
+: pastebin-url ( -- url )
     URL" $pastebin/list" ;
 
-GENERIC: entity-link ( entity -- url )
+: paste-url ( id -- url )
+    "$pastebin/paste" >url swap "id" set-query-param ;
 
-: paste-link ( id -- url )
-    <url>
-        "$pastebin/paste" >>path
-        swap "id" set-query-param ;
+M: paste entity-url
+    id>> paste-url ;
 
-M: paste entity-link
-    id>> paste-link ;
-
-: annotation-link ( parent id -- url )
-    <url>
-        "$pastebin/paste" >>path
+: annotation-url ( parent id -- url )
+    "$pastebin/paste" >url
         swap number>string >>anchor
         swap "id" set-query-param ;
 
-M: annotation entity-link
-    [ parent>> ] [ id>> ] bi annotation-link ;
+M: annotation entity-url
+    [ parent>> ] [ id>> ] bi annotation-url ;
 
 ! ! !
 ! PASTE LIST
@@ -101,24 +107,11 @@ M: annotation entity-link
         [ pastes "pastes" set-value ] >>init
         { pastebin "pastebin" } >>template ;
 
-: pastebin-feed-entries ( seq -- entries )
-    <reversed> 20 short head [
-        entry new
-            swap
-            [ summary>> >>title ]
-            [ date>> >>pub-date ]
-            [ entity-link adjust-url relative-to-request >>link ]
-            tri
-    ] map ;
-
-: pastebin-feed ( -- feed )
-    feed new
-        "Factor Pastebin" >>title
-        pastebin-link >>link
-        pastes pastebin-feed-entries >>entries ;
-
 : <pastebin-feed-action> ( -- action )
-    <feed-action> [ pastebin-feed ] >>feed ;
+    <feed-action>
+        [ pastebin-url ] >>url
+        [ "Factor Pastebin" ] >>title
+        [ pastes <reversed> ] >>entries ;
 
 ! ! !
 ! PASTES
@@ -132,29 +125,20 @@ M: annotation entity-link
 
             "id" value
             "new-annotation" [
-                "id" set-value
+                "parent" set-value
                 mode-names "modes" set-value
                 "factor" "mode" set-value
-            ] nest-values
+            ] nest-form
         ] >>init
 
         { pastebin "paste" } >>template ;
 
-: paste-feed-entries ( paste -- entries )
-    fetch-annotations annotations>> pastebin-feed-entries ;
-
-: paste-feed ( paste -- feed )
-    feed new
-        swap
-        [ "Paste " swap id>> number>string append >>title ]
-        [ entity-link adjust-url relative-to-request >>link ]
-        [ paste-feed-entries >>entries ]
-        tri ;
-
 : <paste-feed-action> ( -- action )
     <feed-action>
         [ validate-integer-id ] >>init
-        [ "id" value paste paste-feed ] >>feed ;
+        [ "id" value paste-url ] >>url
+        [ "Paste " "id" value number>string append ] >>title
+        [ "id" value f <annotation> select-tuples ] >>entries ;
 
 : validate-entity ( -- )
     {
@@ -167,7 +151,7 @@ M: annotation entity-link
 
 : deposit-entity-slots ( tuple -- )
     now >>date
-    { "summary" "author" "mode" "contents" } deposit-slots ;
+    { "summary" "author" "mode" "contents" } to-object ;
 
 : <new-paste-action> ( -- action )
     <page-action>
@@ -178,27 +162,35 @@ M: annotation entity-link
 
         { pastebin "new-paste" } >>template
 
-        [ mode-names "modes" set-value ] >>validate
+        [
+            mode-names "modes" set-value
+            validate-entity
+        ] >>validate
 
         [
-            validate-entity
-
             f <paste>
             [ deposit-entity-slots ]
             [ insert-tuple ]
-            [ id>> paste-link <redirect> ]
+            [ id>> paste-url <redirect> ]
             tri
         ] >>submit ;
 
 : <delete-paste-action> ( -- action )
     <action>
+
         [ validate-integer-id ] >>validate
 
         [
-            "id" value <paste> delete-tuples
-            "id" value f <annotation> delete-tuples
+            [
+                "id" value <paste> delete-tuples
+                "id" value f <annotation> delete-tuples
+            ] with-transaction
             URL" $pastebin/list" <redirect>
-        ] >>submit ;
+        ] >>submit
+
+        <protected>
+            "delete pastes" >>description
+            { can-delete-pastes? } >>capabilities ;
 
 ! ! !
 ! ANNOTATIONS
@@ -207,37 +199,34 @@ M: annotation entity-link
 : <new-annotation-action> ( -- action )
     <action>
         [
-            { { "id" [ v-integer ] } } validate-params
-            "id" value paste-link <redirect>
-        ] >>display
-
-        [
-            { { "id" [ v-integer ] } } validate-params
+            mode-names "modes" set-value
+            { { "parent" [ v-integer ] } } validate-params
             validate-entity
         ] >>validate
 
         [
-            "id" value f <annotation>
+            "parent" value f <annotation>
             [ deposit-entity-slots ]
             [ insert-tuple ]
-            [ entity-link <redirect> ]
+            [ entity-url <redirect> ]
             tri
         ] >>submit ;
 
 : <delete-annotation-action> ( -- action )
     <action>
+
         [ { { "id" [ v-number ] } } validate-params ] >>validate
 
         [
             f "id" value <annotation> select-tuple
             [ delete-tuples ]
-            [ parent>> paste-link <redirect> ]
+            [ parent>> paste-url <redirect> ]
             bi
-        ] >>submit ;
+        ] >>submit
 
-SYMBOL: can-delete-pastes?
-
-can-delete-pastes? define-capability
+    <protected>
+        "delete annotations" >>description
+        { can-delete-pastes? } >>capabilities ;
 
 : <pastebin> ( -- responder )
     pastebin new-dispatcher
@@ -246,12 +235,8 @@ can-delete-pastes? define-capability
         <paste-action> "paste" add-responder
         <paste-feed-action> "paste.atom" add-responder
         <new-paste-action> "new-paste" add-responder
-        <delete-paste-action> { can-delete-pastes? } <protected> "delete-paste" add-responder
+        <delete-paste-action> "delete-paste" add-responder
         <new-annotation-action> "new-annotation" add-responder
-        <delete-annotation-action> { can-delete-pastes? } <protected> "delete-annotation" add-responder
+        <delete-annotation-action> "delete-annotation" add-responder
     <boilerplate>
         { pastebin "pastebin-common" } >>template ;
-
-: init-pastes-table \ paste ensure-table ;
-
-: init-annotations-table annotation ensure-table ;

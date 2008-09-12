@@ -16,6 +16,12 @@ IN: sets
     [ ] [ length <hashtable> ] [ length <vector> ] tri
     [ [ (prune) ] 2curry each ] keep ;
 
+: duplicates ( seq -- newseq )
+    H{ } clone [ [ key? ] [ conjoin ] 2bi ] curry filter ;
+
+: gather ( seq quot -- newseq )
+    map concat prune ; inline
+
 : unique ( seq -- assoc )
     [ dup ] H{ } map>assoc ;
 

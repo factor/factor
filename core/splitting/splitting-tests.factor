@@ -1,10 +1,6 @@
 USING: splitting tools.test kernel sequences arrays ;
 IN: splitting.tests
 
-[ { 1 2 3 } 0 group ] must-fail
-
-[ { "hell" "o wo" "rld" } ] [ "hello world" 4 group ] unit-test
-
 [ "hello" "world ." ] [ "hello world ." " " split1 ] unit-test
 [ "hello" "world-+." ] [ "hello-+world-+." "-+" split1 ] unit-test
 [ "goodbye" f ] [ "goodbye" " " split1 ] unit-test
@@ -56,9 +52,3 @@ unit-test
 [ { "hello" "hi" } ] [ "hello\nhi" string-lines ] unit-test
 [ { "hello" "hi" } ] [ "hello\rhi" string-lines ] unit-test
 [ { "hello" "hi" } ] [ "hello\r\nhi" string-lines ] unit-test
-
-[ { V{ "a" "b" } V{ f f } } ] [
-    V{ "a" "b" } clone 2 <groups>
-    2 over set-length
-    >array
-] unit-test

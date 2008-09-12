@@ -29,6 +29,12 @@
 (defvar factor-mode-syntax-table nil
   "Syntax table used while in Factor mode.")
 
+(defcustom factor-display-compilation-output t
+  "Display the REPL buffer before compiling files."
+  :type '(choice (const :tag "Enable" t) (const :tag "Disable" nil))
+  :group 'factor)
+
+
 (if factor-mode-syntax-table
     ()
   (let ((i 0))
@@ -94,6 +100,10 @@
     "SYMBOLS:"
 ))
 
+(defun factor-indent-line ()
+  "Indent current line as Factor code"
+  (indent-line-to (+ (current-indentation) 4)))
+
 (defun factor-mode ()
   "A mode for editing programs written in the Factor programming language."
   (interactive)
@@ -107,6 +117,8 @@
   (setq font-lock-defaults
 	'(factor-font-lock-keywords nil nil nil nil))
   (set-syntax-table factor-mode-syntax-table)
+  (make-local-variable 'indent-line-function)
+  (setq indent-line-function 'factor-indent-line)
   (run-hooks 'factor-mode-hook))
 
 (add-to-list 'auto-mode-alist '("\\.factor\\'" . factor-mode))
@@ -133,8 +145,19 @@
 
 (defun factor-run-file ()
   (interactive)
+  (when (and (buffer-modified-p)
+			 (y-or-n-p (format "Save file %s? " (buffer-file-name))))
+	(save-buffer))
+  (when factor-display-compilation-output
+	(factor-display-output-buffer))
   (comint-send-string "*factor*" (format "\"%s\"" (buffer-file-name)))
   (comint-send-string "*factor*" " run-file\n"))
+
+(defun factor-display-output-buffer ()
+  (with-current-buffer "*factor*"
+	(goto-char (point-max))
+	(unless (get-buffer-window (current-buffer) t)
+	  (display-buffer (current-buffer) t))))
 
 ;; (defun factor-send-region (start end)
 ;;   (interactive "r")

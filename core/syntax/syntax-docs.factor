@@ -138,14 +138,6 @@ ARTICLE: "syntax-quots" "Quotation syntax"
 { $subsection POSTPONE: ] }
 "Quotations are documented in " { $link "quotations" } "." ;
 
-ARTICLE: "syntax-bit-arrays" "Bit array syntax"
-{ $subsection POSTPONE: ?{ }
-"Bit arrays are documented in " { $link "bit-arrays" } "." ;
-
-ARTICLE: "syntax-float-arrays" "Float array syntax"
-{ $subsection POSTPONE: F{ }
-"Float arrays are documented in " { $link "float-arrays" } "." ;
-
 ARTICLE: "syntax-byte-arrays" "Byte array syntax"
 { $subsection POSTPONE: B{ }
 "Byte arrays are documented in " { $link "byte-arrays" } "." ;
@@ -165,9 +157,7 @@ $nl
 { $subsection "syntax-quots" }
 { $subsection "syntax-arrays" }
 { $subsection "syntax-strings" }
-{ $subsection "syntax-bit-arrays" }
 { $subsection "syntax-byte-arrays" }
-{ $subsection "syntax-float-arrays" }
 { $subsection "syntax-vectors" }
 { $subsection "syntax-sbufs" }
 { $subsection "syntax-hashtables" }
@@ -201,6 +191,11 @@ HELP: inline
     $nl
     "The non-optimizing quotation compiler ignores inlining declarations."
 } ;
+
+HELP: recursive
+{ $syntax ": foo ... ; recursive" }
+{ $description "Declares the most recently defined word as a recursive word." }
+{ $notes "This declaration is only required for " { $link POSTPONE: inline } " words which call themselves. See " { $link "inference-recursive-combinators" } "." } ;
 
 HELP: foldable
 { $syntax ": foo ... ; foldable" }
@@ -276,18 +271,6 @@ HELP: B{
 { $description "Marks the beginning of a literal byte array. Literal byte arrays are terminated by " { $link POSTPONE: } } "." } 
 { $examples { $code "B{ 1 2 3 }" } } ;
 
-HELP: ?{
-{ $syntax "?{ elements... }" }
-{ $values { "elements" "a list of booleans" } }
-{ $description "Marks the beginning of a literal bit array. Literal bit arrays are terminated by " { $link POSTPONE: } } "." } 
-{ $examples { $code "?{ t f t }" } } ;
-
-HELP: F{
-{ $syntax "F{ elements... }" }
-{ $values { "elements" "a list of real numbers" } }
-{ $description "Marks the beginning of a literal float array. Literal float arrays are terminated by " { $link POSTPONE: } } "." } 
-{ $examples { $code "F{ 1.0 2.0 3.0 }" } } ;
-
 HELP: H{
 { $syntax "H{ { key value }... }" }
 { $values { "key" "an object" } { "value" "an object" } }
@@ -301,10 +284,31 @@ HELP: C{
 
 HELP: T{
 { $syntax "T{ class slots... }" }
-{ $values { "class" "a tuple class word" } { "slots" "list of objects" } }
-{ $description "Marks the beginning of a literal tuple. Literal tuples are terminated by " { $link POSTPONE: } } "."
+{ $values { "class" "a tuple class word" } { "slots" "slot values" } }
+{ $description "Marks the beginning of a literal tuple."
 $nl
-"The class word must always be specified. If an insufficient number of values is given after the class word, the remaining slots of the tuple are set to " { $link f } ". If too many values are given, they are ignored." } ;
+"Three literal syntax forms are recognized:"
+{ $list
+    { "empty tuple form: if no slot values are specified, then the literal tuple will have all slots set to their initial values (see " { $link "slot-initial-values" } ")." }
+    { "BOA-form: if the first element of " { $snippet "slots" } " is " { $snippet "f" } ", then the remaining elements are slot values corresponding to slots in the order in which they are defined in the " { $link POSTPONE: TUPLE: } " form." }
+    { "assoc-form: otherwise, " { $snippet "slots" } " is interpreted as a sequence of " { $snippet "{ slot-name value }" } " pairs. The " { $snippet "slot-name" } " should not be quoted." }
+}
+"BOA form is more concise, whereas assoc form is more readable for larger tuples with many slots, or if only a few slots are to be specified."
+$nl
+"With BOA form, specifying an insufficient number of values is given after the class word, the remaining slots of the tuple are set to their initial values (see " { $link "slot-initial-values" } "). If too many values are given, an error will be raised." }
+{ $examples
+"An empty tuple; since vectors have their own literal syntax, the above is equivalent to " { $snippet "V{ }" } ""
+{ $code "T{ vector }" }
+"A BOA-form tuple:"
+{ $code
+    "USE: colors"
+    "T{ rgba f 1.0 0.0 0.5 }"
+}
+"An assoc-form tuple equal to the above:"
+{ $code
+    "USE: colors"
+    "T{ rgba { red 1.0 } { green 0.0 } { blue 0.5 } }"
+} } ;
 
 HELP: W{
 { $syntax "W{ object }" }
@@ -319,9 +323,9 @@ HELP: POSTPONE:
 { $notes "This word is used inside parsing words to delegate further action to another parsing word, and to refer to parsing words literally from literal arrays and such." } ;
 
 HELP: :
-{ $syntax ": word definition... ;" }
+{ $syntax ": word ( stack -- effect ) definition... ;" }
 { $values { "word" "a new word to define" } { "definition" "a word definition" } }
-{ $description "Defines a word in the current vocabulary." }
+{ $description "Defines a word with the given stack effect in the current vocabulary. The stack effect is optional for words which only push literals on the stack." }
 { $examples { $code ": ask-name ( -- name )\n    \"What is your name? \" write readln ;\n: greet ( name -- )\n    \"Greetings, \" write print ;\n: friend ( -- )\n    ask-name greet ;" } } ;
 
 { POSTPONE: : POSTPONE: ; define } related-words
@@ -346,7 +350,7 @@ HELP: \
 { $syntax "\\ word" }
 { $values { "word" "a word" } }
 { $description "Reads the next word from the input and appends a wrapper holding the word to the parse tree. When the evaluator encounters a wrapper, it pushes the wrapped word literally on the data stack." }
-{ $examples "The following two lines are equivalent:" { $code "0 \\ <vector> execute\n0 <vector>" } } ;
+{ $examples "The following two lines are equivalent:" { $code "0 \\ <vector> execute\n0 <vector>" } "If " { $snippet "foo" } " is a symbol, the following two lines are equivalent:" { $code "foo" "\\ foo" } } ;
 
 HELP: DEFER:
 { $syntax "DEFER: word" }
@@ -407,13 +411,27 @@ HELP: P"
 { $syntax "P\" pathname\"" }
 { $values { "pathname" "a pathname string" } }
 { $description "Reads from the input string until the next occurrence of " { $link POSTPONE: " } ", creates a new " { $link pathname } ", and appends it to the parse tree." }
-{ $examples { $example "USING: io io.files ;" "P\" foo.txt\" pathname-string print" "foo.txt" } } ;
+{ $examples { $example "USING: accessors io io.files ;" "P\" foo.txt\" string>> print" "foo.txt" } } ;
 
 HELP: (
 { $syntax "( inputs -- outputs )" }
 { $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
 { $description "Declares the stack effect of the most recently defined word, storing a new " { $link effect } " instance in the " { $snippet "\"declared-effect\"" } " word property." }
-{ $notes "Recursive words must have a declared stack effect to compile. See " { $link "effect-declaration" } " for details." } ;
+{ $notes "All words except those only pushing literals on the stack must have a stack effect declaration. See " { $link "effect-declaration" } " for details." } ;
+
+HELP: ((
+{ $syntax "(( inputs -- outputs ))" }
+{ $values { "inputs" "a list of tokens" } { "outputs" "a list of tokens" } }
+{ $description "Literal stack effect syntax." }
+{ $notes "Useful for meta-programming with " { $link define-declared } "." }
+{ $examples
+    { $code
+        "SYMBOL: my-dynamic-word"
+        "USING: math random words ;"
+        "3 { [ + ] [ - ] [ * ] [ / ] } random curry"
+        "(( x -- y )) define-declared"
+    }
+} ;
 
 HELP: !
 { $syntax "! comment..." }
@@ -526,12 +544,50 @@ HELP: PREDICATE:
         "it satisfies the predicate"
     }
     "Each predicate must be defined as a subclass of some other class. This ensures that predicates inheriting from disjoint classes do not need to be exhaustively tested during method dispatch."
+}
+{ $examples
+    { $code "USING: math ;" "PREDICATE: positive < integer 0 > ;" }
 } ;
 
 HELP: TUPLE:
 { $syntax "TUPLE: class slots... ;" "TUPLE: class < superclass slots ... ;" }
-{ $values { "class" "a new tuple class to define" } { "slots" "a list of slot names" } }
-{ $description "Defines a new tuple class. The superclass is optional; if left unspecified, it defaults to " { $link tuple } "." } ;
+{ $values { "class" "a new tuple class to define" } { "slots" "a list of slot specifiers" } }
+{ $description "Defines a new tuple class."
+$nl
+"The superclass is optional; if left unspecified, it defaults to " { $link tuple } "."
+$nl
+"Slot specifiers take one of the following three forms:"
+{ $list
+    { { $snippet "name" } " - a slot which can hold any object, with no attributes" }
+    { { $snippet "{ name attributes... }" } " - a slot which can hold any object, with optional attributes" }
+    { { $snippet "{ name class attributes... }" } " - a slot specialized to a specific class, with optional attributes" }
+}
+"Slot attributes are lists of slot attribute specifiers followed by values; a slot attribute specifier is one of " { $link initial: } " or " { $link read-only } ". See " { $link "tuple-declarations" } " for details." }
+{ $examples
+    "A simple tuple class:"
+    { $code "TUPLE: color red green blue ;" }
+    "Declaring slots to be integer-valued:"
+    { $code "TUPLE: color" "{ red integer }" "{ green integer }" "{ blue integer } ;" }
+    "An example mixing short and long slot specifiers:"
+    { $code "TUPLE: person" "{ age integer initial: 0 }" "{ department string initial: \"Marketing\" }" "manager ;" }
+} ;
+
+HELP: initial:
+{ $syntax "TUPLE: ... { \"slot\" initial: value } ... ;" }
+{ $values { "slot" "a slot name" } { "value" "any literal" } }
+{ $description "Specifies an initial value for a tuple slot." } ;
+
+HELP: read-only
+{ $syntax "TUPLE: ... { \"slot\" read-only } ... ;" }
+{ $values { "slot" "a slot name" } }
+{ $description "Defines a tuple slot to be read-only. If a tuple has read-only slots, instances of the tuple should only be created by calling " { $link boa } ", instead of " { $link new } ". Using " { $link boa } " is the only way to set the value of a read-only slot." } ;
+
+{ initial: read-only } related-words
+
+HELP: SLOT:
+{ $syntax "SLOT: name" }
+{ $values { "name" "a slot name" } }
+{ $description "Defines a protocol slot; that is, defines the accessor words for a slot named " { $snippet "slot" } " without associating it with any specific tuple." } ;
 
 HELP: ERROR:
 { $syntax "ERROR: class slots... ;" }

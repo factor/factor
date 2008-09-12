@@ -6,9 +6,9 @@ IN: benchmark.sockets
 
 SYMBOL: counter
 
-: number-of-requests 1 ;
+: number-of-requests 1000 ;
 
-: server-addr "127.0.0.1" 7777 <inet4> ;
+: server-addr ( -- addr ) "127.0.0.1" 7777 <inet4> ;
 
 : server-loop ( server -- )
     dup accept drop [
@@ -31,12 +31,14 @@ SYMBOL: counter
     ] ignore-errors ;
 
 : simple-client ( -- )
-    server-addr ascii [
-        CHAR: b write1 flush
-        number-of-requests
-        [ CHAR: a dup write1 flush read1 assert= ] times
-        counter get count-down
-    ] with-client ;
+    [
+        server-addr ascii [
+            CHAR: b write1 flush
+            number-of-requests
+            [ CHAR: a dup write1 flush read1 assert= ] times
+        ] with-client
+    ] try
+    counter get count-down ;
 
 : stop-server ( -- )
     server-addr ascii [
@@ -52,8 +54,13 @@ SYMBOL: counter
         counter get await
         stop-server
         yield yield
-    ] time ;
+    ] benchmark . flush ;
 
-: socket-benchmarks ;
+: socket-benchmarks ( -- )
+    1 clients
+    10 clients
+    20 clients
+    40 clients
+    100 clients ;
 
 MAIN: socket-benchmarks

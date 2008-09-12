@@ -1,13 +1,13 @@
 
-USING: kernel alien.c-types combinators sequences splitting
+USING: kernel alien.c-types combinators sequences splitting grouping
        opengl.gl ui.gadgets ui.render
-       math math.vectors accessors ;
+       math math.vectors accessors math.geometry.rect ;
 
 IN: ui.gadgets.frame-buffer
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: frame-buffer action dim last-dim graft ungraft pixels ;
+TUPLE: frame-buffer < gadget action pdim last-dim graft ungraft pixels ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -18,12 +18,14 @@ TUPLE: frame-buffer action dim last-dim graft ungraft pixels ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: <frame-buffer> ( -- frame-buffer )
-  frame-buffer construct-gadget
+: new-frame-buffer ( class -- gadget )
+  new-gadget
     [ ]         >>action
-    { 100 100 } >>dim
+    { 100 100 } >>pdim
     [ ]         >>graft
     [ ]         >>ungraft ;
+
+: <frame-buffer> ( -- frame-buffer ) frame-buffer new-frame-buffer ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -44,7 +46,7 @@ TUPLE: frame-buffer action dim last-dim graft ungraft pixels ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-M: frame-buffer pref-dim* dim>> ;
+M: frame-buffer pref-dim* pdim>> ;
 M: frame-buffer graft*    graft>>   call ;
 M: frame-buffer ungraft*  ungraft>> call ;
 

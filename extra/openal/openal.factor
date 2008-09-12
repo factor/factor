@@ -245,7 +245,7 @@ SYMBOL: init
     f init set-global
   ] unless ;
 
-: <uint-array> "ALuint" <c-array> ;
+: <uint-array> ( n -- byte-array ) "ALuint" <c-array> ;
 
 : gen-sources ( size -- seq )
   dup <uint-array> 2dup alGenSources swap c-uint-array> ;

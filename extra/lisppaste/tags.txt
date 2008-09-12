@@ -1,3 +1,2 @@
-demos
 web
 network

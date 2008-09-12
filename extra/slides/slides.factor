@@ -1,7 +1,9 @@
+! Copyright (C) 2007, 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: arrays hashtables help.markup help.stylesheet io
 io.styles kernel math models namespaces sequences ui ui.gadgets
 ui.gadgets.books ui.gadgets.panes ui.gestures ui.render
-parser ;
+parser accessors colors ;
 IN: slides
 
 : stylesheet
@@ -21,14 +23,14 @@ IN: slides
             H{
                 { font "monospace" }
                 { font-size 36 }
-                { page-color { 0.4 0.4 0.4 0.3 } }
+                { page-color T{ rgba f 0.4 0.4 0.4 0.3 } }
             }
         }
         { snippet-style
             H{
                 { font "monospace" }
                 { font-size 36 }
-                { foreground { 0.1 0.1 0.4 1 } }
+                { foreground T{ rgba f 0.1 0.1 0.4 1 } }
             }
         }
         { table-content-style
@@ -46,16 +48,20 @@ IN: slides
 : $divider ( -- )
     [
         <gadget>
-        T{ gradient f { { 0.25 0.25 0.25 1.0 } { 1.0 1.0 1.0 0.0 } } }
-        over set-gadget-interior
-        { 800 10 } over set-gadget-dim
-        { 1 0 } over set-gadget-orientation
+        T{ gradient f
+           {
+             T{ rgba f 0.25 0.25 0.25 1.0 }
+             T{ rgba f 1.0 1.0 1.0 0.0 }
+           }
+         } >>interior
+        { 800 10 } >>dim
+        { 1 0 } >>orientation
         gadget.
     ] ($block) ;
 
-: page-theme
-    T{ gradient f { { 0.8 0.8 1.0 1.0 } { 0.8 1.0 1.0 1.0 } } }
-    swap set-gadget-interior ;
+: page-theme ( gadget -- )
+    T{ gradient f { T{ rgba f 0.8 0.8 1.0 1.0 } T{ rgba f 0.8 1.0 1.0 1.0 } } }
+    >>interior drop ;
 
 : <page> ( list -- gadget )
     [
@@ -70,16 +76,14 @@ IN: slides
     $divider
     $list ;
 
-TUPLE: slides ;
+TUPLE: slides < book ;
 
 : <slides> ( slides -- gadget )
-    [ <page> ] map 0 <model> <book>
-    slides construct-gadget
-    [ set-gadget-delegate ] keep ;
+    [ <page> ] map 0 <model> slides new-book ;
 
 : change-page ( book n -- )
-    over control-value + over gadget-children length rem
-    swap gadget-model set-model ;
+    over control-value + over children>> length rem
+    swap model>> set-model ;
 
 : next-page ( book -- ) 1 change-page ;
 
@@ -103,5 +107,3 @@ TUPLE: slides ;
 
 : slides-window ( slides -- )
     [ <slides> "Slides" open-window ] with-ui ;
-
-MAIN: slides-window

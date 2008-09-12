@@ -28,7 +28,6 @@ unit-test
 
 [ t ] [ 12 hashcode 12 hashcode = ] unit-test
 [ t ] [ 12 >bignum hashcode 12 hashcode = ] unit-test
-[ t ] [ 12.0 hashcode 12 >bignum hashcode = ] unit-test
 
 ! Test various odd keys to see if they work.
 
@@ -164,3 +163,16 @@ H{ } "x" set
 [ { "one" "two" 3 } ] [
     { 1 2 3 } H{ { 1 "one" } { 2 "two" } } substitute
 ] unit-test
+
+! We want this to work
+[ ] [ hashtable new "h" set ] unit-test
+
+[ 0 ] [ "h" get assoc-size ] unit-test
+
+[ f f ] [ "goo" "h" get at* ] unit-test
+
+[ ] [ 1 2 "h" get set-at ] unit-test
+
+[ 1 ] [ "h" get assoc-size ] unit-test
+
+[ 1 ] [ 2 "h" get at ] unit-test

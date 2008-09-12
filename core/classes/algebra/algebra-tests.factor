@@ -3,7 +3,8 @@ kernel math namespaces parser prettyprint sequences strings
 tools.test vectors words quotations classes classes.algebra
 classes.private classes.union classes.mixin classes.predicate
 vectors definitions source-files compiler.units growable
-random inference effects kernel.private sbufs math.order ;
+random stack-checker effects kernel.private sbufs math.order
+classes.tuple accessors ;
 IN: classes.algebra.tests
 
 \ class< must-infer
@@ -12,11 +13,9 @@ IN: classes.algebra.tests
 \ flatten-class must-infer
 \ flatten-builtin-class must-infer
 
-: class= [ class<= ] [ swap class<= ] 2bi and ;
+: class-and* ( cls1 cls2 cls3 -- ? ) >r class-and r> class= ;
 
-: class-and* >r class-and r> class= ;
-
-: class-or* >r class-or r> class= ;
+: class-or* ( cls1 cls2 cls3 -- ? ) >r class-or r> class= ;
 
 [ t ] [ object  object  object class-and* ] unit-test
 [ t ] [ fixnum  object  fixnum class-and* ] unit-test
@@ -193,9 +192,9 @@ UNION: z1 b1 c1 ;
 [ f ] [ null { number fixnum null } min-class ] unit-test
 
 ! Test for hangs?
-: random-class classes random ;
+: random-class ( -- class ) classes random ;
 
-: random-op
+: random-op ( -- word )
     {
         class-and
         class-or
@@ -204,20 +203,20 @@ UNION: z1 b1 c1 ;
 
 10 [
     [ ] [
-        20 [ drop random-op ] map >quotation
-        [ infer effect-in [ random-class ] times ] keep
+        20 [ random-op ] [ ] replicate-as
+        [ infer in>> [ random-class ] times ] keep
         call
         drop
     ] unit-test
 ] times
 
-: random-boolean
+: random-boolean ( -- ? )
     { t f } random ;
 
-: boolean>class
+: boolean>class ( ? -- class )
     object null ? ;
 
-: random-boolean-op
+: random-boolean-op ( -- word )
     {
         and
         or
@@ -225,9 +224,10 @@ UNION: z1 b1 c1 ;
         xor
     } random ;
 
-: class-xor [ class-or ] 2keep class-and class-not class-and ;
+: class-xor ( cls1 cls2 -- cls3 )
+    [ class-or ] 2keep class-and class-not class-and ;
 
-: boolean-op>class-op
+: boolean-op>class-op ( word -- word' )
     {
         { and class-and }
         { or class-or }
@@ -237,8 +237,8 @@ UNION: z1 b1 c1 ;
 
 20 [
     [ t ] [
-        20 [ drop random-boolean-op ] [ ] map-as dup .
-        [ infer effect-in [ drop random-boolean ] map dup . ] keep
+        20 [ random-boolean-op ] [ ] replicate-as dup .
+        [ infer in>> [ random-boolean ] replicate dup . ] keep
         
         [ >r [ ] each r> call ] 2keep
         
@@ -286,6 +286,8 @@ INTERSECTION: generic-class generic class ;
     generic-class flatten-class
 ] unit-test
 
+[ \ + flatten-class ] must-fail
+
 INTERSECTION: empty-intersection ;
 
 [ t ] [ object empty-intersection class<= ] unit-test
@@ -302,3 +304,14 @@ INTERSECTION: empty-intersection ;
 [ t ] [ object \ f class-not \ f class-or class<= ] unit-test
 
 [ ] [ object flatten-builtin-class drop ] unit-test
+
+SINGLETON: sa
+SINGLETON: sb
+SINGLETON: sc
+
+[ sa ] [ sa { sa sb sc } min-class ] unit-test
+
+[ +lt+ ] [ integer sequence class<=> ] unit-test
+[ +lt+ ] [ sequence object class<=> ] unit-test
+[ +gt+ ] [ object sequence class<=> ] unit-test
+[ +eq+ ] [ integer integer class<=> ] unit-test

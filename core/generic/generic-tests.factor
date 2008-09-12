@@ -1,8 +1,8 @@
-USING: alien arrays definitions generic generic.standard
+USING: accessors alien arrays definitions generic generic.standard
 generic.math assocs hashtables io kernel math namespaces parser
 prettyprint sequences strings tools.test vectors words
-quotations classes classes.algebra continuations layouts
-classes.union sorting compiler.units ;
+quotations classes classes.algebra classes.tuple continuations
+layouts classes.union sorting compiler.units eval multiline ;
 IN: generic.tests
 
 GENERIC: foobar ( x -- y )
@@ -91,10 +91,7 @@ M: ratio big-generic-test "ratio" ;
 M: string big-generic-test "string" ;
 M: shit big-generic-test "shit" ;
 
-TUPLE: delegating ;
-
 [ T{ shit f } "shit" ] [ T{ shit f } big-generic-test ] unit-test
-[ T{ shit f } "shit" ] [ T{ delegating T{ shit f } } big-generic-test ] unit-test
 
 [ t ] [ \ + math-generic? ] unit-test
 
@@ -138,13 +135,13 @@ M: f tag-and-f 4 ;
 [ 3.4 3 ] [ 3.4 tag-and-f ] unit-test
 
 ! Issues with forget
-GENERIC: generic-forget-test-1
+GENERIC: generic-forget-test-1 ( a b -- c )
 
 M: integer generic-forget-test-1 / ;
 
 [ t ] [
     \ / usage [ word? ] filter
-    [ word-name "generic-forget-test-1/integer" = ] contains?
+    [ name>> "integer=>generic-forget-test-1" = ] contains?
 ] unit-test
 
 [ ] [
@@ -153,16 +150,16 @@ M: integer generic-forget-test-1 / ;
 
 [ f ] [
     \ / usage [ word? ] filter
-    [ word-name "generic-forget-test-1/integer" = ] contains?
+    [ name>> "integer=>generic-forget-test-1" = ] contains?
 ] unit-test
 
-GENERIC: generic-forget-test-2
+GENERIC: generic-forget-test-2 ( a b -- c )
 
 M: sequence generic-forget-test-2 = ;
 
 [ t ] [
     \ = usage [ word? ] filter
-    [ word-name "generic-forget-test-2/sequence" = ] contains?
+    [ name>> "sequence=>generic-forget-test-2" = ] contains?
 ] unit-test
 
 [ ] [
@@ -171,10 +168,10 @@ M: sequence generic-forget-test-2 = ;
 
 [ f ] [
     \ = usage [ word? ] filter
-    [ word-name "generic-forget-test-2/sequence" = ] contains?
+    [ name>> "sequence=>generic-forget-test-2" = ] contains?
 ] unit-test
 
-GENERIC: generic-forget-test-3
+GENERIC: generic-forget-test-3 ( a -- b )
 
 M: f generic-forget-test-3 ;
 
@@ -190,7 +187,7 @@ M: f generic-forget-test-3 ;
 
 : a-word ;
 
-GENERIC: a-generic
+GENERIC: a-generic ( a -- b )
 
 M: integer a-generic a-word ;
 
@@ -201,3 +198,27 @@ M: integer a-generic a-word ;
 [ ] [ "IN: generic.tests : a-generic ;" eval ] unit-test
 
 [ f ] [ "m" get \ a-word usage memq? ] unit-test
+
+! erg's regression
+[ ] [
+    <"
+    IN: compiler.tests
+
+    GENERIC: jeah ( a -- b )
+    TUPLE: boii ;
+    M: boii jeah ;
+    GENERIC: jeah* ( a -- b )
+    M: boii jeah* jeah ;
+    "> eval
+
+    <"
+    IN: compiler.tests
+    FORGET: boii
+    "> eval
+    
+    <"
+    IN: compiler.tests
+    TUPLE: boii ;
+    M: boii jeah ;
+    "> eval
+] unit-test

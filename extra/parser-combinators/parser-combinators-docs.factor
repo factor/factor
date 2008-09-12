@@ -23,4 +23,4 @@ HELP: any-char-parser
     "from the input string. The value consumed is the "
     "result of the parse." }
 { $examples
-{ $example "USING: lazy-lists parser-combinators prettyprint ;" "\"foo\" any-char-parser parse-1 ." "102" } } ;
+{ $example "USING: lists.lazy parser-combinators prettyprint ;" "\"foo\" any-char-parser parse-1 ." "102" } } ;

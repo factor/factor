@@ -43,7 +43,7 @@ DEFER: base>
 SYMBOL: radix
 SYMBOL: negative?
 
-: sign negative? get "-" "+" ? ;
+: sign ( -- str ) negative? get "-" "+" ? ;
 
 : with-radix ( radix quot -- )
     radix swap with-variable ; inline
@@ -55,8 +55,9 @@ SYMBOL: negative?
     dup [ (base>) ] [ drop 0 swap ] if ;
 
 : string>ratio ( str -- a/b )
+    "-" ?head dup negative? set swap
     "/" split1 (base>) >r whole-part r>
-    3dup and and [ / + ] [ 3drop f ] if ;
+    3dup and and [ / + swap [ neg ] when ] [ 2drop 2drop f ] if ;
 
 : valid-digits? ( seq -- ? )
     {
@@ -66,20 +67,23 @@ SYMBOL: negative?
     } cond ;
 
 : string>integer ( str -- n/f )
+    "-" ?head swap
     string>digits dup valid-digits?
-    [ radix get digits>integer ] [ drop f ] if ;
+    [ radix get digits>integer swap [ neg ] when ] [ 2drop f ] if ;
 
 PRIVATE>
 
 : base> ( str radix -- n/f )
     [
-        "-" ?head dup negative? set >r
-        {
-            { [ CHAR: / over member? ] [ string>ratio ] }
-            { [ CHAR: . over member? ] [ string>float ] }
-            [ string>integer ]
-        } cond
-        r> [ dup [ neg ] when ] when
+        CHAR: / over member? [
+            string>ratio
+        ] [
+            CHAR: . over member? [
+                string>float
+            ] [
+                string>integer
+            ] if
+        ] if
     ] with-radix ;
 
 : string>number ( str -- n/f ) 10 base> ;
@@ -92,8 +96,8 @@ PRIVATE>
 
 : integer, ( num radix -- )
     dup 1 <= [ "Invalid radix" throw ] when
-    dup >r /mod >digit , dup 0 >
-    [ r> integer, ] [ r> 2drop ] if ;
+    [ /mod >digit , ] keep over 0 >
+    [ integer, ] [ 2drop ] if ;
 
 PRIVATE>
 
@@ -143,6 +147,7 @@ M: float >base
         { [ dup fp-nan? ] [ drop "0.0/0.0" ] }
         { [ dup 1.0/0.0 = ] [ drop "1.0/0.0" ] }
         { [ dup -1.0/0.0 = ] [ drop "-1.0/0.0" ] }
+        { [ dup double>bits HEX: 8000000000000000 = ] [ drop "-0.0" ] }
         [ float>string fix-float ]
     } cond ;
 

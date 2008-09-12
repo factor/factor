@@ -1,11 +1,11 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays byte-arrays generic hashtables
-hashtables.private io kernel math namespaces parser sequences
-strings vectors words quotations assocs layouts classes
-classes.builtin classes.tuple classes.tuple.private
+hashtables.private io kernel math math.order namespaces parser
+sequences strings vectors words quotations assocs layouts
+classes classes.builtin classes.tuple classes.tuple.private
 kernel.private vocabs vocabs.loader source-files definitions
-slots.deprecated classes.union classes.intersection
+slots classes.union classes.intersection classes.predicate
 compiler.units bootstrap.image.private io.files accessors
 combinators ;
 IN: bootstrap.primitives
@@ -14,9 +14,11 @@ IN: bootstrap.primitives
 
 crossref off
 
+H{ } clone sub-primitives set
+
 "resource:core/bootstrap/syntax.factor" parse-file
 
-"resource:core/cpu/" architecture get {
+"resource:basis/cpu/" architecture get {
     { "x86.32" "x86/32" }
     { "x86.64" "x86/64" }
     { "linux-ppc" "ppc/linux" }
@@ -31,11 +33,14 @@ crossref off
 ! Bring up a bare cross-compiling vocabulary.
 "syntax" vocab vocab-words bootstrap-syntax set
 H{ } clone dictionary set
+H{ } clone new-classes set
 H{ } clone changed-definitions set
+H{ } clone changed-generics set
 H{ } clone forgotten-definitions set
 H{ } clone root-cache set
 H{ } clone source-files set
 H{ } clone update-map set
+H{ } clone implementors-map set
 init-caches
 
 ! Vocabulary for slot accessors
@@ -60,16 +65,14 @@ bootstrapping? on
     "alien"
     "alien.accessors"
     "arrays"
-    "bit-arrays"
     "byte-arrays"
     "byte-vectors"
     "classes.private"
     "classes.tuple"
     "classes.tuple.private"
+    "classes.predicate"
     "compiler.units"
     "continuations.private"
-    "float-arrays"
-    "generator"
     "growable"
     "hashtables"
     "hashtables.private"
@@ -103,24 +106,8 @@ bootstrapping? on
 } [ create-vocab drop ] each
 
 ! Builtin classes
-: lo-tag-eq-quot ( n -- quot )
-    [ \ tag , , \ eq? , ] [ ] make ;
-
-: hi-tag-eq-quot ( n -- quot )
-    [
-        [ dup tag ] % \ hi-tag tag-number , \ eq? ,
-        [ [ hi-tag ] % , \ eq? , ] [ ] make ,
-        [ drop f ] ,
-        \ if ,
-    ] [ ] make ;
-
-: builtin-predicate-quot ( class -- quot )
-    "type" word-prop
-    dup tag-mask get <
-    [ lo-tag-eq-quot ] [ hi-tag-eq-quot ] if ;
-
 : define-builtin-predicate ( class -- )
-    dup builtin-predicate-quot define-predicate ;
+    dup class>type [ builtin-instance? ] curry define-predicate ;
 
 : lookup-type-number ( word -- n )
     global [ target-word ] bind type-number ;
@@ -131,9 +118,12 @@ bootstrapping? on
     [ f f f builtin-class define-class ]
     tri ;
 
-: define-builtin-slots ( symbol slotspec -- )
-    [ drop ] [ 1 simple-slots ] 2bi
-    [ "slots" set-word-prop ] [ define-slots ] 2bi ;
+: prepare-slots ( slots -- slots' )
+    [ [ dup pair? [ first2 create ] when ] map ] map ;
+
+: define-builtin-slots ( class slots -- )
+    prepare-slots make-slots 1 finalize-slots
+    [ "slots" set-word-prop ] [ define-accessors ] 2bi ;
 
 : define-builtin ( symbol slotspec -- )
     >r [ define-builtin-predicate ] keep
@@ -148,16 +138,54 @@ bootstrapping? on
 "f" "syntax" lookup register-builtin
 "array" "arrays" create register-builtin
 "wrapper" "kernel" create register-builtin
-"float-array" "float-arrays" create register-builtin
 "callstack" "kernel" create register-builtin
 "string" "strings" create register-builtin
-"bit-array" "bit-arrays" create register-builtin
 "quotation" "quotations" create register-builtin
 "dll" "alien" create register-builtin
 "alien" "alien" create register-builtin
 "word" "words" create register-builtin
 "byte-array" "byte-arrays" create register-builtin
 "tuple-layout" "classes.tuple.private" create register-builtin
+
+! For predicate classes
+"predicate-instance?" "classes.predicate" create drop
+
+! We need this before defining c-ptr below
+"f" "syntax" lookup { } define-builtin
+
+"f" "syntax" create [ not ] "predicate" set-word-prop
+"f?" "syntax" vocab-words delete-at
+
+! Some unions
+"integer" "math" create
+"fixnum" "math" lookup
+"bignum" "math" lookup
+2array
+define-union-class
+
+"rational" "math" create
+"integer" "math" lookup
+"ratio" "math" lookup
+2array
+define-union-class
+
+"real" "math" create
+"rational" "math" lookup
+"float" "math" lookup
+2array
+define-union-class
+
+"c-ptr" "alien" create [
+    "alien" "alien" lookup ,
+    "f" "syntax" lookup ,
+    "byte-array" "byte-arrays" lookup ,
+] { } make define-union-class
+
+! A predicate class used for declarations
+"array-capacity" "sequences.private" create
+"fixnum" "math" lookup
+0 bootstrap-max-array-capacity <fake-bignum> [ between? ] 2curry
+define-predicate-class
 
 ! Catch-all class for providing a default method.
 "object" "kernel" create
@@ -186,213 +214,79 @@ bi
 "bignum" "math" create ">bignum" "math" create 1quotation "coercer" set-word-prop
 
 "ratio" "math" create {
-    {
-        { "integer" "math" }
-        "numerator"
-        { "numerator" "math" }
-        f
-    }
-    {
-        { "integer" "math" }
-        "denominator"
-        { "denominator" "math" }
-        f
-    }
+    { "numerator" { "integer" "math" } read-only }
+    { "denominator" { "integer" "math" } read-only }
 } define-builtin
 
 "float" "math" create { } define-builtin
 "float" "math" create ">float" "math" create 1quotation "coercer" set-word-prop
 
 "complex" "math" create {
-    {
-        { "real" "math" }
-        "real-part"
-        { "real-part" "math" }
-        f
-    }
-    {
-        { "real" "math" }
-        "imaginary-part"
-        { "imaginary-part" "math" }
-        f
-    }
+    { "real" { "real" "math" } read-only }
+    { "imaginary" { "real" "math" } read-only }
 } define-builtin
 
-"f" "syntax" lookup { } define-builtin
-
-"array" "arrays" create { } define-builtin
+"array" "arrays" create {
+    { "length" { "array-capacity" "sequences.private" } read-only }
+} define-builtin
 
 "wrapper" "kernel" create {
-    {
-        { "object" "kernel" }
-        "wrapped"
-        { "wrapped" "kernel" }
-        f
-    }
+    { "wrapped" read-only }
 } define-builtin
 
 "string" "strings" create {
-    {
-        { "array-capacity" "sequences.private" }
-        "length"
-        { "length" "sequences" }
-        f
-    } {
-        { "object" "kernel" }
-        "aux"
-        { "string-aux" "strings.private" }
-        { "set-string-aux" "strings.private" }
-    }
+    { "length" { "array-capacity" "sequences.private" } read-only }
+    "aux"
 } define-builtin
 
 "quotation" "quotations" create {
-    {
-        { "object" "kernel" }
-        "array"
-        { "quotation-array" "quotations.private" }
-        f
-    }
-    {
-        { "object" "kernel" }
-        "compiled?"
-        { "quotation-compiled?" "quotations" }
-        f
-    }
+    { "array" { "array" "arrays" } read-only }
+    { "compiled" read-only }
 } define-builtin
 
 "dll" "alien" create {
-    {
-        { "byte-array" "byte-arrays" }
-        "path"
-        { "(dll-path)" "alien" }
-        f
-    }
-}
-define-builtin
-
-"alien" "alien" create {
-    {
-        { "c-ptr" "alien" }
-        "alien"
-        { "underlying-alien" "alien" }
-        f
-    } {
-        { "object" "kernel" }
-        "expired?"
-        { "expired?" "alien" }
-        f
-    }
-}
-define-builtin
-
-"word" "words" create {
-    f
-    {
-        { "object" "kernel" }
-        "name"
-        { "word-name" "words" }
-        { "set-word-name" "words" }
-    }
-    {
-        { "object" "kernel" }
-        "vocabulary"
-        { "word-vocabulary" "words" }
-        { "set-word-vocabulary" "words" }
-    }
-    {
-        { "quotation" "quotations" }
-        "def"
-        { "word-def" "words" }
-        { "set-word-def" "words.private" }
-    }
-    {
-        { "object" "kernel" }
-        "props"
-        { "word-props" "words" }
-        { "set-word-props" "words" }
-    }
-    {
-        { "object" "kernel" }
-        "compiled?"
-        { "compiled?" "words" }
-        f
-    }
-    {
-        { "fixnum" "math" }
-        "counter"
-        { "profile-counter" "tools.profiler.private" }
-        { "set-profile-counter" "tools.profiler.private" }
-    }
+    { "path" { "byte-array" "byte-arrays" } read-only }
 } define-builtin
 
-"byte-array" "byte-arrays" create { } define-builtin
+"alien" "alien" create {
+    { "underlying" { "c-ptr" "alien" } read-only }
+    "expired"
+} define-builtin
 
-"bit-array" "bit-arrays" create { } define-builtin
+"word" "words" create {
+    { "hashcode" { "fixnum" "math" } }
+    "name"
+    "vocabulary"
+    { "def" { "quotation" "quotations" } initial: [ ] }
+    "props"
+    { "compiled" read-only }
+    { "counter" { "fixnum" "math" } }
+    { "sub-primitive" read-only }
+} define-builtin
 
-"float-array" "float-arrays" create { } define-builtin
+"byte-array" "byte-arrays" create {
+    { "length" { "array-capacity" "sequences.private" } read-only }
+} define-builtin
 
 "callstack" "kernel" create { } define-builtin
 
 "tuple-layout" "classes.tuple.private" create {
-    {
-        { "fixnum" "math" }
-        "hashcode"
-        { "layout-hashcode" "classes.tuple.private" }
-        f
-    }
-    {
-        { "word" "words" }
-        "class"
-        { "layout-class" "classes.tuple.private" }
-        f
-    }
-    {
-        { "fixnum" "math" }
-        "size"
-        { "layout-size" "classes.tuple.private" }
-        f
-    }
-    {
-        { "array" "arrays" }
-        "superclasses"
-        { "layout-superclasses" "classes.tuple.private" }
-        f
-    }
-    {
-        { "fixnum" "math" }
-        "echelon"
-        { "layout-echelon" "classes.tuple.private" }
-        f
-    }
+    { "hashcode" { "fixnum" "math" } read-only }
+    { "class" { "word" "words" } initial: t read-only }
+    { "size" { "fixnum" "math" } read-only }
+    { "superclasses" { "array" "arrays" } initial: { } read-only }
+    { "echelon" { "fixnum" "math" } read-only }
 } define-builtin
 
-"tuple" "kernel" create {
-    [ { } define-builtin ]
-    [ { "delegate" } "slot-names" set-word-prop ]
-    [ define-tuple-layout ]
-    [
-        {
-            {
-                { "object" "kernel" }
-                "delegate"
-                { "delegate" "kernel" }
-                { "set-delegate" "kernel" }
-            }
-        }
-        [ drop ] [ generate-tuple-slots ] 2bi
-        [ "slots" set-word-prop ]
-        [ define-slots ]
-        2bi
-    ]
-} cleave
-
-"f" "syntax" create [ not ] "predicate" set-word-prop
-"f?" "syntax" vocab-words delete-at
+"tuple" "kernel" create
+[ { } define-builtin ]
+[ define-tuple-layout ]
+bi
 
 ! Create special tombstone values
 "tombstone" "hashtables.private" create
 tuple
-{ } define-tuple-class
+{ "state" } define-tuple-class
 
 "((empty))" "hashtables.private" create
 "tombstone" "hashtables.private" lookup f
@@ -403,116 +297,80 @@ tuple
 2array >tuple 1quotation define-inline
 
 ! Some tuple classes
-"hashtable" "hashtables" create
-tuple
-{
-    {
-        { "array-capacity" "sequences.private" }
-        "count"
-        { "hash-count" "hashtables.private" }
-        { "set-hash-count" "hashtables.private" }
-    } {
-        { "array-capacity" "sequences.private" }
-        "deleted"
-        { "hash-deleted" "hashtables.private" }
-        { "set-hash-deleted" "hashtables.private" }
-    } {
-        { "array" "arrays" }
-        "array"
-        { "hash-array" "hashtables.private" }
-        { "set-hash-array" "hashtables.private" }
-    }
-} define-tuple-class
-
-"sbuf" "sbufs" create
-tuple
-{
-    {
-        { "string" "strings" }
-        "underlying"
-        { "underlying" "growable" }
-        { "set-underlying" "growable" }
-    } {
-        { "array-capacity" "sequences.private" }
-        "length"
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    }
-} define-tuple-class
-
-"vector" "vectors" create
-tuple
-{
-    {
-        { "array" "arrays" }
-        "underlying"
-        { "underlying" "growable" }
-        { "set-underlying" "growable" }
-    } {
-        { "array-capacity" "sequences.private" }
-        "fill"
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    }
-} define-tuple-class
-
-"byte-vector" "byte-vectors" create
-tuple
-{
-    {
-        { "byte-array" "byte-arrays" }
-        "underlying"
-        { "underlying" "growable" }
-        { "set-underlying" "growable" }
-    } {
-        { "array-capacity" "sequences.private" }
-        "fill"
-        { "length" "sequences" }
-        { "set-fill" "growable" }
-    }
-} define-tuple-class
-
 "curry" "kernel" create
 tuple
 {
-    {
-        { "object" "kernel" }
-        "obj"
-        { "curry-obj" "kernel" }
-        f
-    } {
-        { "object" "kernel" }
-        "quot"
-        { "curry-quot" "kernel" }
-        f
-    }
-} define-tuple-class
+    { "obj" read-only }
+    { "quot" read-only }
+} prepare-slots define-tuple-class
 
 "curry" "kernel" lookup
-[ f "inline" set-word-prop ]
-[ ]
-[ tuple-layout [ <tuple-boa> ] curry ] tri define
+{
+    [ f "inline" set-word-prop ]
+    [ make-flushable ]
+    [ ]
+    [ tuple-layout [ <tuple-boa> ] curry ]
+} cleave
+(( obj quot -- curry )) define-declared
 
 "compose" "kernel" create
 tuple
 {
-    {
-        { "object" "kernel" }
-        "first"
-        { "compose-first" "kernel" }
-        f
-    } {
-        { "object" "kernel" }
-        "second"
-        { "compose-second" "kernel" }
-        f
-    }
-} define-tuple-class
+    { "first" read-only }
+    { "second" read-only }
+} prepare-slots define-tuple-class
 
 "compose" "kernel" lookup
-[ f "inline" set-word-prop ]
-[ ]
-[ tuple-layout [ <tuple-boa> ] curry ] tri define
+{
+    [ f "inline" set-word-prop ]
+    [ make-flushable ]
+    [ ]
+    [ tuple-layout [ <tuple-boa> ] curry ]
+} cleave
+(( quot1 quot2 -- compose )) define-declared
+
+! Sub-primitive words
+: make-sub-primitive ( word vocab -- )
+    create
+    dup reset-word
+    dup 1quotation define ;
+
+{
+    { "(execute)" "words.private" }
+    { "(call)" "kernel.private" }
+    { "fixnum+fast" "math.private" }
+    { "fixnum-fast" "math.private" }
+    { "fixnum*fast" "math.private" }
+    { "fixnum-bitand" "math.private" }
+    { "fixnum-bitor" "math.private" }
+    { "fixnum-bitxor" "math.private" }
+    { "fixnum-bitnot" "math.private" }
+    { "fixnum<" "math.private" }
+    { "fixnum<=" "math.private" }
+    { "fixnum>" "math.private" }
+    { "fixnum>=" "math.private" }
+    { "drop" "kernel" }
+    { "2drop" "kernel" }
+    { "3drop" "kernel" }
+    { "dup" "kernel" }
+    { "2dup" "kernel" }
+    { "3dup" "kernel" }
+    { "rot" "kernel" }
+    { "-rot" "kernel" }
+    { "dupd" "kernel" }
+    { "swapd" "kernel" }
+    { "nip" "kernel" }
+    { "2nip" "kernel" }
+    { "tuck" "kernel" }
+    { "over" "kernel" }
+    { "pick" "kernel" }
+    { "swap" "kernel" }
+    { ">r" "kernel" }
+    { "r>" "kernel" }
+    { "eq?" "kernel" }
+    { "tag" "kernel.private" }
+    { "slot" "slots.private" }
+} [ make-sub-primitive ] assoc-each
 
 ! Primitive words
 : make-primitive ( word vocab n -- )
@@ -520,8 +378,6 @@ tuple
     [ do-primitive ] curry [ ] like define ;
 
 {
-    { "(execute)" "words.private" }
-    { "(call)" "kernel.private" }
     { "bignum>fixnum" "math.private" }
     { "float>fixnum" "math.private" }
     { "fixnum>bignum" "math.private" }
@@ -537,24 +393,13 @@ tuple
     { "bits>double" "math" }
     { "<complex>" "math.private" }
     { "fixnum+" "math.private" }
-    { "fixnum+fast" "math.private" }
     { "fixnum-" "math.private" }
-    { "fixnum-fast" "math.private" }
     { "fixnum*" "math.private" }
-    { "fixnum*fast" "math.private" }
     { "fixnum/i" "math.private" }
     { "fixnum-mod" "math.private" }
     { "fixnum/mod" "math.private" }
-    { "fixnum-bitand" "math.private" }
-    { "fixnum-bitor" "math.private" }
-    { "fixnum-bitxor" "math.private" }
-    { "fixnum-bitnot" "math.private" }
     { "fixnum-shift" "math.private" }
     { "fixnum-shift-fast" "math.private" }
-    { "fixnum<" "math.private" }
-    { "fixnum<=" "math.private" }
-    { "fixnum>" "math.private" }
-    { "fixnum>=" "math.private" }
     { "bignum=" "math.private" }
     { "bignum+" "math.private" }
     { "bignum-" "math.private" }
@@ -586,25 +431,6 @@ tuple
     { "float>=" "math.private" }
     { "<word>" "words" }
     { "word-xt" "words" }
-    { "drop" "kernel" }
-    { "2drop" "kernel" }
-    { "3drop" "kernel" }
-    { "dup" "kernel" }
-    { "2dup" "kernel" }
-    { "3dup" "kernel" }
-    { "rot" "kernel" }
-    { "-rot" "kernel" }
-    { "dupd" "kernel" }
-    { "swapd" "kernel" }
-    { "nip" "kernel" }
-    { "2nip" "kernel" }
-    { "tuck" "kernel" }
-    { "over" "kernel" }
-    { "pick" "kernel" }
-    { "swap" "kernel" }
-    { ">r" "kernel" }
-    { "r>" "kernel" }
-    { "eq?" "kernel" }
     { "getenv" "kernel.private" }
     { "setenv" "kernel.private" }
     { "(exists?)" "io.files.private" }
@@ -624,13 +450,11 @@ tuple
     { "code-room" "memory" }
     { "os-env" "system" }
     { "millis" "system" }
-    { "tag" "kernel.private" }
     { "modify-code-heap" "compiler.units" }
     { "dlopen" "alien" }
     { "dlsym" "alien" }
     { "dlclose" "alien" }
     { "<byte-array>" "byte-arrays" }
-    { "<bit-array>" "bit-arrays" }
     { "<displaced-alien>" "alien" }
     { "alien-signed-cell" "alien.accessors" }
     { "set-alien-signed-cell" "alien.accessors" }
@@ -660,7 +484,6 @@ tuple
     { "set-alien-cell" "alien.accessors" }
     { "(throw)" "kernel.private" }
     { "alien-address" "alien" }
-    { "slot" "slots.private" }
     { "set-slot" "slots.private" }
     { "string-nth" "strings.private" }
     { "set-string-nth" "strings.private" }
@@ -689,7 +512,6 @@ tuple
     { "profiling" "tools.profiler.private" }
     { "become" "kernel.private" }
     { "(sleep)" "threads.private" }
-    { "<float-array>" "float-arrays" }
     { "<tuple-boa>" "classes.tuple.private" }
     { "callstack>array" "kernel" }
     { "innermost-frame-quot" "kernel.private" }
@@ -701,13 +523,11 @@ tuple
     { "unset-os-env" "system" }
     { "(set-os-envs)" "system.private" }
     { "resize-byte-array" "byte-arrays" }
-    { "resize-bit-array" "bit-arrays" }
-    { "resize-float-array" "float-arrays" }
     { "dll-valid?" "alien" }
     { "unimplemented" "kernel.private" }
     { "gc-reset" "memory" }
 }
-dup length [ >r first2 r> make-primitive ] 2each
+[ >r first2 r> make-primitive ] each-index
 
 ! Bump build number
 "build" "kernel" create build 1+ 1quotation define

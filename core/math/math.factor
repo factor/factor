@@ -1,12 +1,18 @@
-! Copyright (C) 2003, 2007 Slava Pestov.
+! Copyright (C) 2003, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math.private ;
 IN: math
 
-GENERIC: >fixnum ( x -- y ) foldable
-GENERIC: >bignum ( x -- y ) foldable
-GENERIC: >integer ( x -- y ) foldable
+GENERIC: >fixnum ( x -- n ) foldable
+GENERIC: >bignum ( x -- n ) foldable
+GENERIC: >integer ( x -- n ) foldable
 GENERIC: >float ( x -- y ) foldable
+
+GENERIC: numerator ( a/b -- a )
+GENERIC: denominator ( a/b -- b )
+
+GENERIC: real-part ( z -- x )
+GENERIC: imaginary-part ( z -- y )
 
 MATH: number= ( x y -- ? ) foldable
 
@@ -60,7 +66,7 @@ PRIVATE>
 
 : ?1+ [ 1+ ] [ 0 ] if* ; inline
 
-: rem ( x y -- z ) tuck mod over + swap mod ; foldable
+: rem ( x y -- z ) abs tuck mod over + swap mod ; foldable
 
 : 2^ ( n -- 2^n ) 1 swap shift ; inline
 
@@ -76,18 +82,26 @@ UNION: real rational float ;
 
 UNION: number real complex ;
 
-M: number equal? number= ;
-
-M: real hashcode* nip >fixnum ;
-
 GENERIC: fp-nan? ( x -- ? )
 
 M: object fp-nan?
     drop f ;
 
 M: float fp-nan?
-    double>bits -51 shift BIN: 111111111111 [ bitand ] keep
-    number= ;
+    double>bits -51 shift HEX: fff [ bitand ] keep = ;
+
+GENERIC: fp-infinity? ( x -- ? )
+
+M: object fp-infinity?
+    drop f ;
+
+M: float fp-infinity? ( float -- ? )
+    double>bits
+    dup -52 shift HEX: 7ff [ bitand ] keep = [
+        HEX: fffffffffffff bitand 0 =
+    ] [
+        drop f
+    ] if ;
 
 : (next-power-of-2) ( i n -- n )
     2dup >= [
@@ -118,21 +132,21 @@ M: float fp-nan?
 
 PRIVATE>
 
-: (each-integer) ( i n quot -- )
+: (each-integer) ( i n quot: ( i -- ) -- )
     [ iterate-step iterate-next (each-integer) ]
-    [ 3drop ] if-iterate? ; inline
+    [ 3drop ] if-iterate? ; inline recursive
 
-: (find-integer) ( i n quot -- i )
+: (find-integer) ( i n quot: ( i -- ? ) -- i )
     [
         iterate-step roll
         [ 2drop ] [ iterate-next (find-integer) ] if
-    ] [ 3drop f ] if-iterate? ; inline
+    ] [ 3drop f ] if-iterate? ; inline recursive
 
-: (all-integers?) ( i n quot -- ? )
+: (all-integers?) ( i n quot: ( i -- ? ) -- ? )
     [
         iterate-step roll
         [ iterate-next (all-integers?) ] [ 3drop f ] if
-    ] [ 3drop t ] if-iterate? ; inline
+    ] [ 3drop t ] if-iterate? ; inline recursive
 
 : each-integer ( n quot -- )
     iterate-prep (each-integer) ; inline
@@ -146,7 +160,7 @@ PRIVATE>
 : all-integers? ( n quot -- ? )
     iterate-prep (all-integers?) ; inline
 
-: find-last-integer ( n quot -- i )
+: find-last-integer ( n quot: ( i -- ? ) -- i )
     over 0 < [
         2drop f
     ] [
@@ -155,4 +169,4 @@ PRIVATE>
         ] [
             >r 1- r> find-last-integer
         ] if
-    ] if ; inline
+    ] if ; inline recursive

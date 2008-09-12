@@ -1,122 +1,116 @@
 
-USING: kernel namespaces opengl ui.render ui.gadgets ;
+USING: kernel namespaces opengl ui.render ui.gadgets accessors ;
 
 IN: ui.gadgets.slate
 
-TUPLE: slate action dim graft ungraft
-       button-down
-       button-up
-       key-down
-       key-up ;
+TUPLE: slate < gadget action pdim graft ungraft ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: init-slate ( slate -- slate )
+  init-gadget
+  [ ]         >>action
+  { 200 200 } >>pdim
+  [ ]         >>graft
+  [ ]         >>ungraft ;
 
 : <slate> ( action -- slate )
-  slate construct-gadget
-  tuck set-slate-action
-  { 100 100 } over set-slate-dim
-  [ ] over set-slate-graft
-  [ ] over set-slate-ungraft ;
+  slate new
+    init-slate
+    swap >>action ;
 
-M: slate pref-dim* ( slate -- dim ) slate-dim ;
+M: slate pref-dim* ( slate -- dim ) pdim>> ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USING: combinators arrays sequences math math.geometry
+       opengl.gl ui.gadgets.worlds ;
+
+: screen-y* ( gadget -- loc )
+  {
+    [ find-world height ]
+    [ screen-loc second ]
+    [ height ]
+  }
+  cleave
+  + - ;
+
+: screen-loc* ( gadget -- loc )
+  {
+    [ screen-loc first ]
+    [ screen-y* ]
+  }
+  cleave
+  2array ;
+
+: setup-viewport ( gadget -- gadget )
+  dup
+  {
+    [ screen-loc* ]
+    [ dim>>       ]
+  }
+  cleave
+  gl-viewport ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: default-coordinate-system ( gadget -- gadget )
+  dup
+  {
+    [ drop 0 ]
+    [ width 1 - ]
+    [ height 1 - ]
+    [ drop 0 ]
+  }
+  cleave
+  -1 1
+  glOrtho ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+M: slate graft*   ( slate -- ) graft>>   call ;
+M: slate ungraft* ( slate -- ) ungraft>> call ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+GENERIC: establish-coordinate-system ( gadget -- gadget )
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+M: slate establish-coordinate-system ( slate -- slate )
+   default-coordinate-system ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+GENERIC: draw-slate ( slate -- slate )
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+M: slate draw-slate ( slate -- slate ) dup action>> call ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 M: slate draw-gadget* ( slate -- )
-   origin get swap slate-action with-translation ;
 
-M: slate graft* ( slate -- ) slate-graft call ;
+   GL_PROJECTION glMatrixMode glPushMatrix glLoadIdentity
 
-M: slate ungraft* ( slate -- ) slate-ungraft call ;
+   establish-coordinate-system
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+   GL_MODELVIEW glMatrixMode glPushMatrix glLoadIdentity 
 
-SYMBOL: key-pressed-value
+   setup-viewport
 
-: key-pressed? ( -- ? ) key-pressed-value get ;
+   draw-slate
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+   GL_PROJECTION glMatrixMode glPopMatrix glLoadIdentity
+   GL_MODELVIEW  glMatrixMode glPopMatrix glLoadIdentity
 
-SYMBOL: mouse-pressed-value
-
-: mouse-pressed? ( -- ? ) mouse-pressed-value get ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-SYMBOL: key-value
-
-: key ( -- key ) key-value get ;
+   dup
+   find-world
+   ! The world coordinate system is a little wacky:
+   dup { [ drop 0 ] [ width ] [ height ] [ drop 0 ] } cleave -1 1 glOrtho
+   setup-viewport
+   drop
+   drop ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-SYMBOL: button-value
-
-: button ( -- val ) button-value get ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-USING: combinators ui.gestures accessors ;
-
-! M: slate handle-gesture* ( gadget gesture delegate -- ? )
-!    drop nip
-!    {
-!      {
-!        [ dup key-down? ]
-!        [
-       
-!          key-down-sym key-value set
-!          key-pressed-value on
-!          t
-!        ]
-!      }
-!      { [ dup key-up?   ] [ drop key-pressed-value off t ] }
-!      {
-!        [ dup button-down? ]
-!        [
-!          button-down-# mouse-button-value set
-!          mouse-pressed-value on
-!          t
-!        ]
-!      }
-!      { [ dup button-up? ] [ drop mouse-pressed-value off t ] }
-!      { [ t             ] [ drop                       t ] }
-!    }
-!    cond ;
-
-M: slate handle-gesture* ( gadget gesture delegate -- ? )
-   rot drop swap         ! delegate gesture
-   {
-     {
-       [ dup key-down? ]
-       [
-         key-down-sym key-value set
-         key-pressed-value on
-         key-down>> dup [ call ] [ drop ] if
-         t
-       ]
-     }
-     {
-       [ dup key-up?   ]
-       [
-         key-pressed-value off
-         drop
-         key-up>> dup [ call ] [ drop ] if
-         t
-       ] }
-     {
-       [ dup button-down? ]
-       [
-         button-down-# button-value set
-         mouse-pressed-value on
-         button-down>> dup [ call ] [ drop ] if
-         t
-       ]
-     }
-     {
-       [ dup button-up? ]
-       [
-         mouse-pressed-value off
-         drop
-         button-up>> dup [ call ] [ drop ] if
-         t
-       ]
-     }
-     { [ t ] [ 2drop t ] }
-   }
-   cond ;

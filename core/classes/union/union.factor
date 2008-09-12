@@ -1,33 +1,37 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: words sequences kernel assocs combinators classes
-namespaces arrays math quotations ;
+classes.algebra namespaces arrays math quotations ;
 IN: classes.union
 
 PREDICATE: union-class < class
     "metaclass" word-prop union-class eq? ;
 
 : union-predicate-quot ( members -- quot )
-    dup empty? [
-        drop [ drop f ]
+    [
+        [ drop f ]
     ] [
         unclip "predicate" word-prop swap [
             "predicate" word-prop [ dup ] prepend
             [ drop t ]
         ] { } map>assoc alist>quot
-    ] if ;
+    ] if-empty ;
 
 : define-union-predicate ( class -- )
     dup members union-predicate-quot define-predicate ;
 
 M: union-class update-class define-union-predicate ;
 
-: define-union-class ( class members -- )
-    [ f swap f union-class define-class ]
-    [ drop update-classes ]
-    2bi ;
+: (define-union-class) ( class members -- )
+    f swap f union-class define-class ;
 
-M: union-class reset-class
-    { "class" "metaclass" "members" } reset-props ;
+: define-union-class ( class members -- )
+    [ (define-union-class) ] [ drop update-classes ] 2bi ;
 
 M: union-class rank-class drop 2 ;
+
+M: union-class instance?
+    "members" word-prop [ instance? ] with contains? ;
+
+M: union-class (flatten-class)
+    members <anonymous-union> (flatten-class) ;

@@ -1,0 +1,3 @@
+Congratulations, you are now running your very own Wiki.
+
+You can now click *Edit* below and begin editing the content of the [[Front Page]]. More information at [[Wiki Help]].

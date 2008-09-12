@@ -3,6 +3,8 @@ sequences tools.test words namespaces layouts classes
 classes.builtin arrays quotations ;
 IN: memory.tests
 
+[ [ ] instances ] must-infer
+
 ! Code GC wasn't kicking in when needed
 : leak-step 800000 f <array> 1quotation call drop ;
 
@@ -23,3 +25,6 @@ TUPLE: testing x y z ;
         ] when*
     ] each
 ] unit-test
+
+! Erg's bug
+2 [ [ [ 3 throw ] instances ] must-fail ] times

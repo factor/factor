@@ -19,14 +19,11 @@ SYMBOL: restarts
 
 : c> ( -- continuation ) catchstack* pop ;
 
-: dummy ( -- obj )
-    #! Optimizing compiler assumes stack won't be messed with
-    #! in-transit. To ensure that a value is actually reified
-    #! on the stack, we put it in a non-inline word together
-    #! with a declaration.
-    f { object } declare ;
+! We have to defeat some optimizations to make continuations work
+: dummy-1 ( -- obj ) f ;
+: dummy-2 ( obj -- obj ) dup drop ;
 
-: init-catchstack V{ } clone 1 setenv ;
+: init-catchstack ( -- ) V{ } clone 1 setenv ;
 
 PRIVATE>
 
@@ -68,7 +65,7 @@ C: <continuation> continuation
     #! ( value f r:capture r:restore )
     #! Execution begins right after the call to 'continuation'.
     #! The 'restore' branch is taken.
-    >r >r dummy continuation r> r> ?if ; inline
+    >r >r dummy-1 continuation r> r> [ dummy-2 ] prepose ?if ; inline
 
 : callcc0 ( quot -- ) [ drop ] ifcc ; inline
 
@@ -108,6 +105,14 @@ SYMBOL: return-continuation
 
 : return ( -- )
     return-continuation get continue ;
+
+: with-datastack ( stack quot -- newstack )
+    [
+        [
+            [ [ { } like set-datastack ] dip call datastack ] dip
+            continue-with
+        ] 3 (throw)
+    ] callcc1 2nip ;
 
 GENERIC: compute-restarts ( error -- seq )
 
@@ -173,6 +178,23 @@ M: condition compute-restarts
     [ error>> compute-restarts ]
     [
         [ restarts>> ]
-        [ condition-continuation [ <restart> ] curry ] bi
+        [ continuation>> [ <restart> ] curry ] bi
         { } assoc>map
     ] bi append ;
+
+<PRIVATE
+
+: init-error-handler ( -- )
+    V{ } clone set-catchstack
+    ! VM calls on error
+    [
+        ! 63 = self
+        63 getenv error-thread set-global
+        continuation error-continuation set-global
+        rethrow
+    ] 5 setenv
+    ! VM adds this to kernel errors, so that user-space
+    ! can identify them
+    "kernel-error" 6 setenv ;
+
+PRIVATE>

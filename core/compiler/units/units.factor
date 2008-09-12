@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel continuations assocs namespaces sequences words
-vocabs definitions hashtables init sets ;
+USING: accessors arrays kernel continuations assocs namespaces
+sequences words vocabs definitions hashtables init sets
+math math.order classes classes.algebra ;
 IN: compiler.units
 
 SYMBOL: old-definitions
@@ -54,7 +55,7 @@ GENERIC: definitions-changed ( assoc obj -- )
 
 : changed-vocabs ( assoc -- vocabs )
     [ drop word? ] assoc-filter
-    [ drop word-vocabulary dup [ vocab ] when dup ] assoc-map ;
+    [ drop vocabulary>> dup [ vocab ] when dup ] assoc-map ;
 
 : updated-definitions ( -- assoc )
     H{ } clone
@@ -66,37 +67,96 @@ GENERIC: definitions-changed ( assoc obj -- )
 
 : compile ( words -- )
     recompile-hook get call
-    dup [ drop compiled-crossref? ] assoc-contains?
+    dup [ drop crossref? ] assoc-contains?
     modify-code-heap ;
 
 SYMBOL: outdated-tuples
 SYMBOL: update-tuples-hook
 
+: dependency>= ( how1 how2 -- ? )
+    [
+        {
+            called-dependency
+            flushed-dependency
+            inlined-dependency
+        } index
+    ] bi@ >= ;
+
+: strongest-dependency ( how1 how2 -- how )
+    [ called-dependency or ] bi@ [ dependency>= ] most ;
+
+: weakest-dependency ( how1 how2 -- how )
+    [ inlined-dependency or ] bi@ [ dependency>= not ] most ;
+
+: compiled-usage ( word -- assoc )
+    compiled-crossref get at ;
+
+: (compiled-usages) ( word -- assoc )
+    #! If the word is not flushable anymore, we have to recompile
+    #! all words which flushable away a call (presumably when the
+    #! word was still flushable). If the word is flushable, we
+    #! don't have to recompile words that folded this away.
+    [ compiled-usage ]
+    [ "flushable" word-prop inlined-dependency flushed-dependency ? ] bi
+    [ dependency>= nip ] curry assoc-filter ;
+
+: compiled-usages ( assoc -- assocs )
+    [ drop word? ] assoc-filter
+    [ [ drop (compiled-usages) ] { } assoc>map ] keep suffix ;
+
+: compiled-generic-usage ( word -- assoc )
+    compiled-generic-crossref get at ;
+
+: (compiled-generic-usages) ( generic class -- assoc )
+    dup class? [
+        [ compiled-generic-usage ] dip
+        [ classes-intersect? nip ] curry assoc-filter
+    ] [ 2drop f ] if ;
+
+: compiled-generic-usages ( assoc -- assocs )
+    [ (compiled-generic-usages) ] { } assoc>map ;
+
+: words-only ( assoc -- assoc' )
+    [ drop word? ] assoc-filter ;
+
+: to-recompile ( -- seq )
+    changed-definitions get compiled-usages
+    changed-generics get compiled-generic-usages
+    append assoc-combine keys ;
+
 : call-recompile-hook ( -- )
-    changed-definitions get keys [ word? ] filter
-    compiled-usages recompile-hook get call ;
+    to-recompile recompile-hook get call ;
 
 : call-update-tuples-hook ( -- )
     update-tuples-hook get call ;
 
+: unxref-forgotten-definitions ( -- )
+    forgotten-definitions get
+    keys [ word? ] filter
+    [ delete-compiled-xref ] each ;
+
 : finish-compilation-unit ( -- )
     call-recompile-hook
     call-update-tuples-hook
-    dup [ drop compiled-crossref? ] assoc-contains? modify-code-heap
-     ;
+    unxref-forgotten-definitions
+    dup [ drop crossref? ] assoc-contains? modify-code-heap ;
 
 : with-nested-compilation-unit ( quot -- )
     [
         H{ } clone changed-definitions set
+        H{ } clone changed-generics set
         H{ } clone outdated-tuples set
+        H{ } clone new-classes set
         [ finish-compilation-unit ] [ ] cleanup
     ] with-scope ; inline
 
 : with-compilation-unit ( quot -- )
     [
         H{ } clone changed-definitions set
+        H{ } clone changed-generics set
         H{ } clone forgotten-definitions set
         H{ } clone outdated-tuples set
+        H{ } clone new-classes set
         <definitions> new-definitions set
         <definitions> old-definitions set
         [

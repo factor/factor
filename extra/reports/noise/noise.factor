@@ -1,7 +1,9 @@
-USING: assocs math kernel shuffle combinators.lib
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors assocs math kernel shuffle generalizations
 words quotations arrays combinators sequences math.vectors
 io.styles prettyprint vocabs sorting io generic locals.private
-math.statistics math.order ;
+math.statistics math.order combinators.lib ;
 IN: reports.noise
 
 : badness ( word -- n )
@@ -20,7 +22,6 @@ IN: reports.noise
         { 2swap 3 }
         { 2with 2 }
         { 2with* 3 }
-        { 3apply 1/2 }
         { 3curry 2 }
         { 3drop 1 }
         { 3dup 2 }
@@ -85,19 +86,19 @@ IN: reports.noise
         { spread 2 }
     } at 0 or ;
 
-: vsum { 0 0 } [ v+ ] reduce ;
+: vsum ( pairs -- pair ) { 0 0 } [ v+ ] reduce ;
 
 GENERIC: noise ( obj -- pair )
 
 M: word noise badness 1 2array ;
 
-M: wrapper noise wrapped noise ;
+M: wrapper noise wrapped>> noise ;
 
-M: let noise let-body noise ;
+M: let noise body>> noise ;
 
-M: wlet noise wlet-body noise ;
+M: wlet noise body>> noise ;
 
-M: lambda noise lambda-body noise ;
+M: lambda noise body>> noise ;
 
 M: object noise drop { 0 0 } ;
 
@@ -105,7 +106,7 @@ M: quotation noise [ noise ] map vsum { 1/4 1/2 } v+ ;
 
 M: array noise [ noise ] map vsum ;
 
-: noise-factor / 100 * >integer ;
+: noise-factor ( x y -- z ) / 100 * >integer ;
 
 : quot-noise-factor ( quot -- n )
     #! For very short words, noise doesn't count so much
@@ -129,7 +130,7 @@ M: array noise [ noise ] map vsum ;
 GENERIC: word-noise-factor ( word -- factor )
 
 M: word word-noise-factor
-    word-def quot-noise-factor ;
+    def>> quot-noise-factor ;
 
 M: lambda-word word-noise-factor
     "lambda" word-prop quot-noise-factor ;
@@ -154,11 +155,11 @@ M: lambda-word word-noise-factor
 : vocab-noise-factor ( vocab -- factor )
     words flatten-generics
     [ word-noise-factor dup 20 < [ drop 0 ] when ] map
-    dup empty? [ drop 0 ] [
+    [ 0 ] [
         [ [ sum ] [ length 5 max ] bi /i ]
         [ supremum ]
         bi +
-    ] if ;
+    ] if-empty ;
 
 : noisy-vocabs ( -- alist )
     vocabs [ dup vocab-noise-factor ] { } map>assoc

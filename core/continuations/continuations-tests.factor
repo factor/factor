@@ -1,6 +1,6 @@
 USING: kernel math namespaces io tools.test sequences vectors
 continuations debugger parser memory arrays words
-kernel.private accessors ;
+kernel.private accessors eval ;
 IN: continuations.tests
 
 : (callcc1-test)
@@ -66,7 +66,7 @@ IN: continuations.tests
 
 [ 1 3 2 ] [ bar ] unit-test
 
-[ t ] [ \ bar word-def "c" get innermost-frame-quot = ] unit-test
+[ t ] [ \ bar def>> "c" get innermost-frame-quot = ] unit-test
 
 [ 1 ] [ "c" get innermost-frame-scan ] unit-test
 
@@ -104,3 +104,7 @@ SYMBOL: error-counter
 [ ] [ [ return ] with-return ] unit-test
 
 [ { } [ ] attempt-all ] [ attempt-all-error? ] must-fail-with
+
+[ { 4 } ] [ { 2 2 } [ + ] with-datastack ] unit-test
+
+\ with-datastack must-infer

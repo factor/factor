@@ -1,19 +1,22 @@
 
-USING: kernel namespaces
+USING: combinators.short-circuit kernel namespaces
        math
        math.constants
        math.functions
        math.order
        math.vectors
        math.trig
+       math.physics.pos
+       math.physics.vel
        combinators arrays sequences random vars
-       combinators.lib ;
+       combinators.lib
+       accessors ;
 
 IN: boids
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: boid pos vel ;
+TUPLE: boid < vel ;
 
 C: <boid> boid
 
@@ -70,10 +73,6 @@ VAR: separation-radius
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: distance ( boid boid -- n ) [ boid-pos ] [ boid-pos ] bi* v- norm ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 : constrain ( n a b -- n ) rot min max ;
 
 : angle-between ( vec vec -- angle )
@@ -81,10 +80,10 @@ VAR: separation-radius
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: relative-position ( self other -- v ) swap [ boid-pos ] bi@ v- ;
+: relative-position ( self other -- v ) swap [ pos>> ] bi@ v- ;
 
 : relative-angle ( self other -- angle )
-over boid-vel -rot relative-position angle-between ;
+over vel>> -rot relative-position angle-between ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -92,9 +91,9 @@ over boid-vel -rot relative-position angle-between ;
 
 : vaverage ( seq-of-vectors -- seq ) [ vsum ] [ length ] bi v/n ;
 
-: average-position ( boids -- pos ) [ boid-pos ] map vaverage ;
+: average-position ( boids -- pos ) [ pos>> ] map vaverage ;
 
-: average-velocity ( boids -- vel ) [ boid-vel ] map vaverage ;
+: average-velocity ( boids -- vel ) [ vel>> ] map vaverage ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -114,7 +113,7 @@ over boid-vel -rot relative-position angle-between ;
   { [ cohesion-radius> in-range? ]
     [ cohesion-view-angle> in-view? ]
     [ eq? not ] }
-  <--&& ;
+  2&& ;
 
 : cohesion-neighborhood ( self -- boids )
   boids> [ within-cohesion-neighborhood? ] with filter ;
@@ -123,7 +122,7 @@ over boid-vel -rot relative-position angle-between ;
   dup cohesion-neighborhood
   dup empty?
   [ 2drop { 0 0 } ]
-  [ average-position swap boid-pos v- normalize* cohesion-weight> v*n ]
+  [ average-position swap pos>> v- normalize* cohesion-weight> v*n ]
   if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -134,7 +133,7 @@ over boid-vel -rot relative-position angle-between ;
   { [ separation-radius> in-range? ]
     [ separation-view-angle> in-view? ]
     [ eq? not ] }
-  <--&& ;
+  2&& ;
 
 : separation-neighborhood ( self -- boids )
   boids> [ within-separation-neighborhood? ] with filter ;
@@ -143,7 +142,7 @@ over boid-vel -rot relative-position angle-between ;
   dup separation-neighborhood
   dup empty?
   [ 2drop { 0 0 } ]
-  [ average-position swap boid-pos swap v- normalize* separation-weight> v*n ]
+  [ average-position swap pos>> swap v- normalize* separation-weight> v*n ]
   if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -154,7 +153,7 @@ over boid-vel -rot relative-position angle-between ;
   { [ alignment-radius> in-range? ]
     [ alignment-view-angle> in-view? ]
     [ eq? not ] }
-  <--&& ;
+  2&& ;
 
 : alignment-neighborhood ( self -- boids )
 boids> [ within-alignment-neighborhood? ] with filter ;
@@ -206,10 +205,10 @@ cond ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: new-pos ( boid -- pos ) [ boid-pos ] [ boid-vel time-slice> v*n ] bi v+ ;
+: new-pos ( boid -- pos ) [ pos>> ] [ vel>> time-slice> v*n ] bi v+ ;
 
 : new-vel ( boid -- vel )
-  [ boid-vel ] [ acceleration time-slice> v*n ] bi v+ normalize* ;
+  [ vel>> ] [ acceleration time-slice> v*n ] bi v+ normalize* ;
 
 : wrap-pos ( pos -- pos ) { [ wrap-x ] [ wrap-y ] } parallel-call ;
 
@@ -221,7 +220,7 @@ cond ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: init-boids ( -- ) 50 random-boids >boids ;
+: init-boids ( -- ) 100 random-boids >boids ;
 
 : init-world-size ( -- ) { 100 100 } >world-size ;
 

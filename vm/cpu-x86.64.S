@@ -2,7 +2,6 @@
 
 #define ARG0 %rdi
 #define ARG1 %rsi
-#define XT_REG %rcx
 #define STACK_REG %rsp
 #define DS_REG %r14
 #define RETURN_REG %rax
@@ -22,9 +21,6 @@
 	pop %rbx
 
 #define QUOT_XT_OFFSET 21
-#define PROFILING_OFFSET 53
-#define WORD_DEF_OFFSET 29
-#define WORD_XT_OFFSET 61
 
 /* We pass a function pointer to memcpy to work around a Mac OS X
 ABI limitation which would otherwise require us to do a bizzaro PC-relative

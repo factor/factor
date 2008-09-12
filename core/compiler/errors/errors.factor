@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces assocs prettyprint io sequences
-sorting continuations debugger math math.parser ;
+USING: kernel namespaces assocs io sequences
+sorting continuations math math.parser ;
 IN: compiler.errors
 
 SYMBOL: +error+
@@ -12,17 +12,13 @@ GENERIC: compiler-error-type ( error -- ? )
 
 M: object compiler-error-type drop +error+ ;
 
+GENERIC# compiler-error. 1 ( error word -- )
+
 <PRIVATE
 
 SYMBOL: compiler-errors
 
 SYMBOL: with-compiler-errors?
-
-: compiler-error. ( error word -- )
-    nl
-    "While compiling " write pprint ": " print
-    nl
-    print-error ;
 
 : errors-of-type ( type -- assoc )
     compiler-errors get-global
@@ -53,17 +49,17 @@ SYMBOL: with-compiler-errors?
 
 PRIVATE>
 
+: :errors ( -- ) +error+ compiler-errors. ;
+
+: :warnings ( -- ) +warning+ compiler-errors. ;
+
+: :linkage ( -- ) +linkage+ compiler-errors. ;
+
 : compiler-error ( error word -- )
     with-compiler-errors? get [
         compiler-errors get pick
         [ set-at ] [ delete-at drop ] if
     ] [ 2drop ] if ;
-
-: :errors +error+ compiler-errors. ;
-
-: :warnings +warning+ compiler-errors. ;
-
-: :linkage +linkage+ compiler-errors. ;
 
 : with-compiler-errors ( quot -- )
     with-compiler-errors? get "quiet" get or [ call ] [

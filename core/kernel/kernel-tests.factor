@@ -50,6 +50,10 @@ IN: kernel.tests
 [ f ] [ 3 f and ] unit-test
 [ 4 ] [ 4 6 or ] unit-test
 [ 6 ] [ f 6 or ] unit-test
+[ f ] [ 1 2 xor ] unit-test
+[ 1 ] [ 1 f xor ] unit-test
+[ 2 ] [ f 2 xor ] unit-test
+[ f ] [ f f xor ] unit-test
 
 [ slip ] must-fail
 [ ] [ :c ] unit-test
@@ -114,6 +118,7 @@ IN: kernel.tests
 
 [ total-failure-1 ] must-fail
 
-: total-failure-2 [ ] (call) unimplemented ;
-
-[ total-failure-2 ] must-fail
+! From combinators.lib
+[ 1 1 2 2 3 3 ] [ 1 2 3 [ dup ] tri@ ] unit-test
+[ 1 4 9 ] [ 1 2 3 [ sq ] tri@ ] unit-test
+[ [ sq ] tri@ ] must-infer

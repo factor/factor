@@ -1,8 +1,11 @@
-USING: kernel words inspector slots quotations sequences assocs
-math arrays inference effects shuffle continuations debugger
-classes.tuple namespaces vectors bit-arrays byte-arrays strings
-sbufs math.functions macros sequences.private combinators
-mirrors combinators.lib ;
+! Copyright (C) 2007, 2008 Daniel Ehrenberg.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors kernel words summary slots quotations
+sequences assocs math arrays stack-checker effects generalizations
+continuations debugger classes.tuple namespaces vectors
+bit-arrays byte-arrays strings sbufs math.functions macros
+sequences.private combinators mirrors
+combinators.short-circuit ;
 IN: inverse
 
 TUPLE: fail ;
@@ -31,14 +34,13 @@ M: no-inverse summary
     drop "The word cannot be used in pattern matching" ;
 
 : next ( revquot -- revquot* first )
-    dup empty?
     [ "Badly formed math inverse" throw ]
-    [ unclip-slice ] if ;
+    [ unclip-slice ] if-empty ;
 
 : constant-word? ( word -- ? )
     stack-effect
-    [ effect-out length 1 = ] keep
-    effect-in length 0 = and ;
+    [ out>> length 1 = ] keep
+    in>> length 0 = and ;
 
 : assure-constant ( constant -- quot )
     dup word? [ "Badly formed math inverse" throw ] when 1quotation ;
@@ -62,7 +64,7 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
 
 : enough? ( stack word -- ? )
     dup deferred? [ 2drop f ] [
-        [ >r length r> 1quotation infer effect-in >= ]
+        [ >r length r> 1quotation infer in>> >= ]
         [ 3drop f ] recover
     ] if ;
 
@@ -77,10 +79,10 @@ UNION: explicit-inverse normal-inverse math-inverse pop-inverse ;
     { [ word? ] [ primitive? not ] [
         { "inverse" "math-inverse" "pop-inverse" }
         [ word-prop ] with contains? not
-    ] } <-&& ; 
+    ] } 1&& ; 
 
 : (flatten) ( quot -- )
-    [ dup flattenable? [ word-def (flatten) ] [ , ] if ] each ;
+    [ dup flattenable? [ def>> (flatten) ] [ , ] if ] each ;
 
  : retain-stack-overflow? ( error -- ? )
     { "kernel-error" 14 f f } = ;
@@ -113,8 +115,7 @@ M: pop-inverse inverse
     "pop-inverse" word-prop compose call ;
 
 : (undo) ( revquot -- )
-    dup empty? [ drop ]
-    [ unclip-slice inverse % (undo) ] if ;
+    [ unclip-slice inverse % (undo) ] unless-empty ;
 
 : [undo] ( quot -- undo )
     flatten fold reverse [ (undo) ] [ ] make ;
@@ -204,12 +205,12 @@ DEFER: _
     "predicate" word-prop [ dupd call assure ] curry ;
 
 : slot-readers ( class -- quot )
-    all-slots rest ! tail gets rid of delegate
-    [ slot-spec-reader 1quotation [ keep ] curry ] map concat
+    all-slots
+    [ name>> reader-word 1quotation [ keep ] curry ] map concat
     [ ] like [ drop ] compose ;
 
 : ?wrapped ( object -- wrapped )
-    dup wrapper? [ wrapped ] when ;
+    dup wrapper? [ wrapped>> ] when ;
 
 : boa-inverse ( class -- quot )
     [ deconstruct-pred ] keep slot-readers compose ;
@@ -223,17 +224,6 @@ DEFER: _
 
 \ new 1 [ ?wrapped empty-inverse ] define-pop-inverse
 
-: writer>reader ( word -- word' )
-    [ "writing" word-prop "slots" word-prop ] keep
-    [ swap slot-spec-writer = ] curry find nip slot-spec-reader ;
-
-: construct-inverse ( class setters -- quot )
-    >r deconstruct-pred r>
-    [ writer>reader ] map [ get-slots ] curry
-    compose ;
-
-\ construct 2 [ >r ?wrapped r> construct-inverse ] define-pop-inverse
-
 ! More useful inverse-based combinators
 
 : recover-fail ( try fail -- )
@@ -243,11 +233,11 @@ DEFER: _
     ] recover ; inline
 
 : true-out ( quot effect -- quot' )
-    effect-out [ ndrop ] curry
+    out>> [ ndrop ] curry
     [ t ] 3compose ;
 
 : false-recover ( effect -- quot )
-    effect-in [ ndrop f ] curry [ recover-fail ] curry ;
+    in>> [ ndrop f ] curry [ recover-fail ] curry ;
 
 : [matches?] ( quot -- undoes?-quot )
     [undo] dup infer [ true-out ] keep false-recover curry ;

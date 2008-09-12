@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Samuel Tardieu.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel lazy-lists math math.primes namespaces sequences ;
+USING: arrays kernel lists math math.primes namespaces sequences ;
 IN: math.primes.factors
 
 <PRIVATE
@@ -10,14 +10,14 @@ IN: math.primes.factors
 
 : (count) ( n d -- n' )
     [ (factor) ] { } make
-    dup empty? [ drop ] [ [ first ] keep length 2array , ] if ;
+    [ [ first ] keep length 2array , ] unless-empty ;
 
 : (unique) ( n d -- n' )
     [ (factor) ] { } make
-    dup empty? [ drop ] [ first , ] if ;
+    [ first , ] unless-empty ;
 
 : (factors) ( quot list n -- )
-    dup 1 > [ swap uncons >r pick call r> swap (factors) ] [ 3drop ] if ;
+    dup 1 > [ swap uncons swap >r pick call r> swap (factors) ] [ 3drop ] if ;
 
 : (decompose) ( n quot -- seq )
     [ lprimes rot (factors) ] { } make ;

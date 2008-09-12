@@ -35,8 +35,6 @@ void update_word_xt(F_WORD *word)
 	/* If we just enabled the profiler, reset call count */
 	if(profiling_p)
 	{
-		word->counter = tag_fixnum(0);
-
 		if(!word->profiling)
 		{
 			REGISTER_UNTAGGED(word);
@@ -71,6 +69,8 @@ void set_profiling(bool profiling)
 	for(i = 0; i < length; i++)
 	{
 		F_WORD *word = untag_word(array_nth(untag_array(words),i));
+		if(profiling)
+			word->counter = tag_fixnum(0);
 		update_word_xt(word);
 	}
 

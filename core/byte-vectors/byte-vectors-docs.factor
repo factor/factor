@@ -30,11 +30,6 @@ HELP: >byte-vector
 { $description "Outputs a freshly-allocated byte vector with the same elements as a given sequence." }
 { $errors "Throws an error if the sequence contains elements other than integers." } ;
 
-HELP: byte-array>vector
-{ $values { "byte-array" "an array" } { "length" "a non-negative integer" } { "byte-vector" byte-vector } }
-{ $description "Creates a new byte vector using the array for underlying storage with the specified initial length." }
-{ $warning "This word is in the " { $vocab-link "byte-vectors.private" } " vocabulary because it does not perform type or bounds checks. User code should call " { $link >byte-vector } " instead." } ;
-
 HELP: BV{
 { $syntax "BV{ elements... }" }
 { $values { "elements" "a list of bytes" } }

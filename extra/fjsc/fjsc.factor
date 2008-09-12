@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Chris Double. All Rights Reserved.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel peg strings promises sequences math math.parser
-       namespaces words quotations arrays hashtables io
-       io.streams.string assocs memoize ascii peg.parsers ;
+USING: accessors kernel peg strings sequences math
+math.parser namespaces words quotations arrays hashtables io
+io.streams.string assocs ascii peg.parsers accessors ;
 IN: fjsc
 
 TUPLE: ast-number value ;
@@ -20,28 +20,13 @@ TUPLE: ast-using names ;
 TUPLE: ast-in name ;
 TUPLE: ast-hashtable elements ;
 
-C: <ast-number> ast-number
-C: <ast-identifier> ast-identifier
-C: <ast-string> ast-string
-C: <ast-quotation> ast-quotation
-C: <ast-array> ast-array
-C: <ast-define> ast-define
-C: <ast-expression> ast-expression
-C: <ast-word> ast-word
-C: <ast-comment> ast-comment
-C: <ast-stack-effect> ast-stack-effect
-C: <ast-use> ast-use
-C: <ast-using> ast-using
-C: <ast-in> ast-in
-C: <ast-hashtable> ast-hashtable
-
 : identifier-middle? ( ch -- bool )
   [ blank? not ] keep
   [ "}];\"" member? not ] keep
   digit? not
   and and ;
 
-MEMO: 'identifier-ends' ( -- parser )
+: 'identifier-ends' ( -- parser )
   [
     [ blank? not ] keep
     [ CHAR: " = not ] keep
@@ -52,22 +37,22 @@ MEMO: 'identifier-ends' ( -- parser )
     and and and and and
   ] satisfy repeat0 ;
 
-MEMO: 'identifier-middle' ( -- parser )
+: 'identifier-middle' ( -- parser )
   [ identifier-middle? ] satisfy repeat1 ;
 
-MEMO: 'identifier' ( -- parser )
+: 'identifier' ( -- parser )
   [
     'identifier-ends' ,
     'identifier-middle' ,
     'identifier-ends' ,
-  ] { } make seq [
-    concat >string f <ast-identifier>
+  ] seq* [
+    concat >string f ast-identifier boa
   ] action ;
 
 
 DEFER: 'expression'
 
-MEMO: 'effect-name' ( -- parser )
+: 'effect-name' ( -- parser )
   [
     [ blank? not ] keep
     [ CHAR: ) = not ] keep
@@ -75,98 +60,98 @@ MEMO: 'effect-name' ( -- parser )
     and and
   ] satisfy repeat1 [ >string ] action ;
 
-MEMO: 'stack-effect' ( -- parser )
+: 'stack-effect' ( -- parser )
   [
     "(" token hide ,
     'effect-name' sp repeat0 ,
     "--" token sp hide ,
     'effect-name' sp repeat0 ,
     ")" token sp hide ,
-  ] { } make seq [
-    first2 <ast-stack-effect>
+  ] seq* [
+    first2 ast-stack-effect boa
   ] action ;
 
-MEMO: 'define' ( -- parser )
+: 'define' ( -- parser )
   [
     ":" token sp hide ,
-    'identifier' sp [ ast-identifier-value ] action ,
+    'identifier' sp [ value>> ] action ,
     'stack-effect' sp optional ,
     'expression' ,
     ";" token sp hide ,
-  ] { } make seq [ first3 <ast-define> ] action ;
+  ] seq* [ first3 ast-define boa ] action ;
 
-MEMO: 'quotation' ( -- parser )
+: 'quotation' ( -- parser )
   [
     "[" token sp hide ,
-    'expression' [ ast-expression-values ] action ,
+    'expression' [ values>> ] action ,
     "]" token sp hide ,
-  ] { } make seq [ first <ast-quotation> ] action ;
+  ] seq* [ first ast-quotation boa ] action ;
 
-MEMO: 'array' ( -- parser )
+: 'array' ( -- parser )
   [
     "{" token sp hide ,
-    'expression' [ ast-expression-values ] action ,
+    'expression' [ values>> ] action ,
     "}" token sp hide ,
-  ] { } make seq [ first <ast-array> ] action ;
+  ] seq* [ first ast-array boa ] action ;
 
-MEMO: 'word' ( -- parser )
+: 'word' ( -- parser )
   [
     "\\" token sp hide ,
     'identifier' sp ,
-  ] { } make seq [ first ast-identifier-value f <ast-word> ] action ;
+  ] seq* [ first value>> f ast-word boa ] action ;
 
-MEMO: 'atom' ( -- parser )
+: 'atom' ( -- parser )
   [
     'identifier' ,
-    'integer' [ <ast-number> ] action ,
-    'string' [ <ast-string> ] action ,
-  ] { } make choice ;
+    'integer' [ ast-number boa ] action ,
+    'string' [ ast-string boa ] action ,
+  ] choice* ;
 
-MEMO: 'comment' ( -- parser )
+: 'comment' ( -- parser )
   [
     [
       "#!" token sp ,
       "!" token sp ,
-    ] { } make choice hide ,
+    ] choice* hide ,
     [
       dup CHAR: \n = swap CHAR: \r = or not
     ] satisfy repeat0 ,
-  ] { } make seq [ drop <ast-comment> ] action ;
+  ] seq* [ drop ast-comment boa ] action ;
 
-MEMO: 'USE:' ( -- parser )
+: 'USE:' ( -- parser )
   [
     "USE:" token sp hide ,
     'identifier' sp ,
-  ] { } make seq [ first ast-identifier-value <ast-use> ] action ;
+  ] seq* [ first value>> ast-use boa ] action ;
 
-MEMO: 'IN:' ( -- parser )
+: 'IN:' ( -- parser )
   [
     "IN:" token sp hide ,
     'identifier' sp ,
-  ] { } make seq [ first ast-identifier-value <ast-in> ] action ;
+  ] seq* [ first value>> ast-in boa ] action ;
 
-MEMO: 'USING:' ( -- parser )
+: 'USING:' ( -- parser )
   [
     "USING:" token sp hide ,
-    'identifier' sp [ ast-identifier-value ] action repeat1 ,
+    'identifier' sp [ value>> ] action repeat1 ,
     ";" token sp hide ,
-  ] { } make seq [ first <ast-using> ] action ;
+  ] seq* [ first ast-using boa ] action ;
 
-MEMO: 'hashtable' ( -- parser )
+: 'hashtable' ( -- parser )
   [
     "H{" token sp hide ,
-    'expression' [ ast-expression-values ] action ,
+    'expression' [ values>> ] action ,
     "}" token sp hide ,
-  ] { } make seq [ first <ast-hashtable> ] action ;
+  ] seq* [ first ast-hashtable boa ] action ;
 
-MEMO: 'parsing-word' ( -- parser )
+: 'parsing-word' ( -- parser )
   [
     'USE:' ,
     'USING:' ,
     'IN:' ,
-  ] { } make choice ;
+  ] choice* ;
 
-MEMO: 'expression' ( -- parser )
+: 'expression' ( -- parser )
   [
     [
       'comment' ,
@@ -177,17 +162,17 @@ MEMO: 'expression' ( -- parser )
       'hashtable' sp ,
       'word' sp ,
       'atom' sp ,
-    ] { } make choice repeat0 [ <ast-expression> ] action
+    ] choice* repeat0 [ ast-expression boa ] action
   ] delay ;
 
-MEMO: 'statement' ( -- parser )
+: 'statement' ( -- parser )
   'expression' ;
 
 GENERIC: (compile) ( ast -- )
 GENERIC: (literal) ( ast -- )
 
 M: ast-number (literal)
-  ast-number-value number>string , ;
+  value>> number>string , ;
 
 M: ast-number (compile)
   "factor.push_data(" ,
@@ -196,7 +181,7 @@ M: ast-number (compile)
 
 M: ast-string (literal)
   "\"" ,
-  ast-string-value ,
+  value>> ,
   "\"" , ;
 
 M: ast-string (compile)
@@ -205,14 +190,14 @@ M: ast-string (compile)
   "," , ;
 
 M: ast-identifier (literal)
-  dup ast-identifier-vocab [
+  dup vocab>> [
    "factor.get_word(\"" ,
-   dup ast-identifier-vocab ,
+   dup vocab>> ,
    "\",\"" ,
-   ast-identifier-value ,
+   value>> ,
    "\")" ,
   ] [
-   "factor.find_word(\"" , ast-identifier-value , "\")" ,
+   "factor.find_word(\"" , value>> , "\")" ,
   ] if ;
 
 M: ast-identifier (compile)
@@ -220,9 +205,9 @@ M: ast-identifier (compile)
 
 M: ast-define (compile)
   "factor.define_word(\"" ,
-  dup ast-define-name ,
+  dup name>> ,
   "\",\"source\"," ,
-  ast-define-expression (compile)
+  expression>> (compile)
   "," , ;
 
 : do-expressions ( seq -- )
@@ -242,17 +227,17 @@ M: ast-define (compile)
 
 M: ast-quotation (literal)
   "factor.make_quotation(\"source\"," ,
-  ast-quotation-values do-expressions
+  values>> do-expressions
   ")" , ;
 
 M: ast-quotation (compile)
   "factor.push_data(factor.make_quotation(\"source\"," ,
-  ast-quotation-values do-expressions
+  values>> do-expressions
   ")," , ;
 
 M: ast-array (literal)
   "[" ,
-  ast-array-elements [ "," , ] [ (literal) ] interleave
+  elements>> [ "," , ] [ (literal) ] interleave
   "]" , ;
 
 M: ast-array (compile)
@@ -260,7 +245,7 @@ M: ast-array (compile)
 
 M: ast-hashtable (literal)
   "new Hashtable().fromAlist([" ,
-  ast-hashtable-elements [ "," , ] [ (literal) ] interleave
+  elements>> [ "," , ] [ (literal) ] interleave
   "])" , ;
 
 M: ast-hashtable (compile)
@@ -268,22 +253,22 @@ M: ast-hashtable (compile)
 
 
 M: ast-expression (literal)
-  ast-expression-values [
+  values>> [
     (literal)
   ] each ;
 
 M: ast-expression (compile)
-  ast-expression-values do-expressions ;
+  values>> do-expressions ;
 
 M: ast-word (literal)
-  dup ast-word-vocab [
+  dup vocab>> [
    "factor.get_word(\"" ,
-   dup ast-word-vocab ,
+   dup vocab>> ,
    "\",\"" ,
-   ast-word-value ,
+   value>> ,
    "\")" ,
   ] [
-   "factor.find_word(\"" , ast-word-value , "\")" ,
+   "factor.find_word(\"" , value>> , "\")" ,
   ] if ;
 
 M: ast-word (compile)
@@ -299,17 +284,17 @@ M: ast-stack-effect (compile)
 
 M: ast-use (compile)
   "factor.use(\"" ,
-  ast-use-name ,
+  name>> ,
   "\"," , ;
 
 M: ast-in (compile)
   "factor.set_in(\"" ,
-  ast-in-name ,
+  name>> ,
   "\"," , ;
 
 M: ast-using (compile)
   "factor.using([" ,
-  ast-using-names [
+  names>> [
     "," ,
   ] [
     "\"" , , "\"" ,
@@ -319,44 +304,44 @@ M: ast-using (compile)
 GENERIC: (parse-factor-quotation) ( object -- ast )
 
 M: number (parse-factor-quotation) ( object -- ast )
-  <ast-number> ;
+  ast-number boa ;
 
 M: symbol (parse-factor-quotation) ( object -- ast )
-  dup >string swap word-vocabulary <ast-identifier> ;
+  dup >string swap vocabulary>> ast-identifier boa ;
 
 M: word (parse-factor-quotation) ( object -- ast )
-  dup word-name swap word-vocabulary <ast-identifier> ;
+  dup name>> swap vocabulary>> ast-identifier boa ;
 
 M: string (parse-factor-quotation) ( object -- ast )
-  <ast-string> ;
+  ast-string boa ;
 
 M: quotation (parse-factor-quotation) ( object -- ast )
   [
     [ (parse-factor-quotation) , ] each
-  ] { } make <ast-quotation> ;
+  ] { } make ast-quotation boa ;
 
 M: array (parse-factor-quotation) ( object -- ast )
   [
     [ (parse-factor-quotation) , ] each
-  ] { } make <ast-array> ;
+  ] { } make ast-array boa ;
 
 M: hashtable (parse-factor-quotation) ( object -- ast )
   >alist [
     [ (parse-factor-quotation) , ] each
-  ] { } make <ast-hashtable> ;
+  ] { } make ast-hashtable boa ;
 
 M: wrapper (parse-factor-quotation) ( object -- ast )
-  wrapped dup word-name swap word-vocabulary <ast-word> ;
+  wrapped>> dup name>> swap vocabulary>> ast-word boa ;
 
 GENERIC: fjsc-parse ( object -- ast )
 
 M: string fjsc-parse ( object -- ast )
-  'expression' parse parse-result-ast ;
+  'expression' parse ast>> ;
 
 M: quotation fjsc-parse ( object -- ast )
   [
     [ (parse-factor-quotation) , ] each
-  ] { } make <ast-expression> ;
+  ] { } make ast-expression boa ;
 
 : fjsc-compile ( ast -- string )
   [
@@ -368,11 +353,11 @@ M: quotation fjsc-parse ( object -- ast )
   ] with-string-writer ;
 
 : fjsc-compile* ( string -- string )
-  'statement' parse parse-result-ast fjsc-compile ;
+  'statement' parse ast>> fjsc-compile ;
 
 : fc* ( string -- string )
   [
-  'statement' parse parse-result-ast ast-expression-values do-expressions
+  'statement' parse ast>> values>> do-expressions
   ] { } make [ write ] each ;
 
 

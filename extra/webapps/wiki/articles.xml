@@ -7,7 +7,7 @@
 	<ul>
 		<t:bind-each t:name="articles">
 			<li>
-				<t:a t:href="view" t:query="title"><t:label t:name="title"/></t:a>
+				<t:a t:href="$wiki/view" t:rest="title"><t:label t:name="title"/></t:a>
 			</li>
 		</t:bind-each>
 	</ul>

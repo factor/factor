@@ -6,7 +6,6 @@ USING: kernel namespaces math quotations arrays hashtables sequences threads
        ui
        ui.gestures
        ui.gadgets
-       ui.gadgets.handler
        ui.gadgets.slate
        ui.gadgets.labels
        ui.gadgets.buttons
@@ -14,8 +13,10 @@ USING: kernel namespaces math quotations arrays hashtables sequences threads
        ui.gadgets.packs
        ui.gadgets.grids
        ui.gadgets.theme
+       ui.gadgets.handler
+       accessors
        namespaces.lib assocs.lib vars
-       rewrite-closures automata ;
+       rewrite-closures automata math.geometry.rect newfx ;
 
 IN: automata.ui
 
@@ -29,7 +30,7 @@ IN: automata.ui
 
 : draw-bitmap ( bitmap -- ) GL_POINTS glBegin (draw-bitmap) glEnd ;
 
-: display ( -- ) black gl-color bitmap> draw-bitmap ;
+: display ( -- ) black set-color bitmap> draw-bitmap ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -57,29 +58,40 @@ slate> relayout-1 ;
 
 DEFER: automata-window
 
-: automata-window* ( -- ) init-rule set-interesting <frame>
+: automata-window* ( -- )
+  init-rule
+  set-interesting
 
-{
-[ "1 - Center"      [ start-center    ] view-button ]
-[ "2 - Random"      [ start-random    ] view-button ]
-[ "3 - Continue"    [ run-rule        ] view-button ]
-[ "5 - Random Rule" [ random-rule     ] view-button ]
-[ "n - New"         [ automata-window ] view-button ]
-} make*
-[ [ gadget, ] curry ] map concat ! Hack
-make-shelf over @top grid-add
+  <frame>
 
-[ display ] closed-quot <slate> { 400 400 } over set-slate-dim dup >slate
-over @center grid-add
+    <shelf>
 
-{
-{ T{ key-down f f "1" } [ [ start-center    ] view-action ] }
-{ T{ key-down f f "2" } [ [ start-random    ] view-action ] }
-{ T{ key-down f f "3" } [ [ run-rule        ] view-action ] }
-{ T{ key-down f f "5" } [ [ random-rule     ] view-action ] }
-{ T{ key-down f f "n" } [ [ automata-window ] view-action ] }
-} [ make* ] map >hashtable <handler> tuck set-gadget-delegate
-"Automata" open-window ;
+      "1 - Center"      [ start-center    ] view-button add-gadget
+      "2 - Random"      [ start-random    ] view-button add-gadget
+      "3 - Continue"    [ run-rule        ] view-button add-gadget
+      "5 - Random Rule" [ random-rule     ] view-button add-gadget
+      "n - New"         [ automata-window ] view-button add-gadget
+
+    @top grid-add
+
+    C[ display ] <slate>
+      { 400 400 } >>pdim
+    dup >slate
+
+    @center grid-add
+
+  <handler>
+
+  H{ }
+    T{ key-down f f "1" } [ start-center    ] view-action is
+    T{ key-down f f "2" } [ start-random    ] view-action is
+    T{ key-down f f "3" } [ run-rule        ] view-action is
+    T{ key-down f f "5" } [ random-rule     ] view-action is
+    T{ key-down f f "n" } [ automata-window ] view-action is
+
+  >>table
+
+  "Automata" open-window ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

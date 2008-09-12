@@ -1,11 +1,12 @@
 
-USING: kernel sequences assocs qualified circular ;
+USING: kernel sequences assocs qualified circular sets fry sequences.lib ;
 
 USING: math multi-methods ;
 
 QUALIFIED: sequences
 QUALIFIED: assocs
 QUALIFIED: circular
+QUALIFIED: sets
 
 IN: newfx
 
@@ -73,10 +74,6 @@ METHOD: mutate-as { sequence object  number }      rot set-nth ;
 
 METHOD: at-mutate { number object  sequence } swapd set-nth ;
 METHOD: as-mutate { object  number sequence }       set-nth ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! assoc
@@ -158,6 +155,11 @@ METHOD: as-mutate { object object assoc }       set-at ;
 : prefix-on ( elt seq -- seq ) swap prefix ;
 : suffix-on ( elt seq -- seq ) swap suffix ;
 
+: suffix!      ( seq elt -- seq ) over sequences:push ;
+: suffix-on!   ( elt seq -- seq ) tuck sequences:push ;
+: suffixed!    ( seq elt --     ) swap sequences:push ;
+: suffixed-on! ( elt seq --     )      sequences:push ;
+
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : subseq ( seq from to -- subseq ) rot sequences:subseq ;
@@ -175,18 +177,72 @@ METHOD: as-mutate { object object assoc }       set-at ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: 1st 0 at ;
-: 2nd 1 at ;
-: 3rd 2 at ;
-: 4th 3 at ;
-: 5th 4 at ;
-: 6th 5 at ;
-: 7th 6 at ;
-: 8th 7 at ;
-: 9th 8 at ;
+: 1st ( seq -- obj ) 0 swap nth ;
+: 2nd ( seq -- obj ) 1 swap nth ;
+: 3rd ( seq -- obj ) 2 swap nth ;
+: 4th ( seq -- obj ) 3 swap nth ;
+: 5th ( seq -- obj ) 4 swap nth ;
+: 6th ( seq -- obj ) 5 swap nth ;
+: 7th ( seq -- obj ) 6 swap nth ;
+: 8th ( seq -- obj ) 7 swap nth ;
+: 9th ( seq -- obj ) 8 swap nth ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ! A note about the 'mutate' qualifier. Other words also technically mutate
 ! their primary object. However, the 'mutate' qualifier is supposed to
 ! indicate that this is the main objective of the word, as a side effect.
+
+: adjoin      ( seq elt -- seq ) over sets:adjoin ;
+: adjoin-on   ( elt seq -- seq ) tuck sets:adjoin ;
+: adjoined    ( set elt --     ) swap sets:adjoin ;
+: adjoined-on ( elt set --     )      sets:adjoin ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: start ( seq subseq -- i ) swap sequences:start ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: pluck         ( seq i   -- seq ) cut-slice rest-slice append ;
+: pluck-from    ( i   seq -- seq ) swap pluck ;
+: pluck!        ( seq i   -- seq ) over delete-nth ;
+: pluck-from!   ( i   seq -- seq ) tuck delete-nth ;
+: plucked!      ( seq i   --     ) swap delete-nth ;
+: plucked-from! ( i   seq --     )      delete-nth ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: snip          ( seq a b -- seq ) >r over r> [ head ] [ tail ] 2bi* append ;
+: snip-this     ( a b seq -- seq ) -rot snip ;
+: snip!         ( seq a b -- seq )      pick delete-slice ;
+: snip-this!    ( a b seq -- seq ) -rot pick delete-slice ;
+: snipped!      ( seq a b --     )       rot delete-slice ;
+: snipped-from! ( a b seq --     )           delete-slice ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: invert-index ( seq i -- seq i ) >r dup length 1 - r> - ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: append!      ( a b -- ab )      over sequences:push-all ;
+: append-to!   ( b a -- ab ) swap over sequences:push-all ;
+: appended!    ( a b --    ) swap      sequences:push-all ;
+: appended-to! ( b a --    )           sequences:push-all ;
+
+: prepend!   ( a b -- ba  ) over append 0 pick copy ;
+: prepended! ( a b --     ) over append 0 rot  copy ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: insert ( seq i obj -- seq ) >r cut r> prefix append ;
+
+: splice ( seq i seq -- seq ) >r cut r> prepend append ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: purge ( seq quot -- seq ) [ not ] compose filter ;
+
+: purge! ( seq quot -- seq )
+  dupd '[ swap @ [ pluck! ] [ drop ] if ] each-index ;

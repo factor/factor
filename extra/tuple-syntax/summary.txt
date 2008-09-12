@@ -1,1 +1,0 @@
-Tuple literals with named slots

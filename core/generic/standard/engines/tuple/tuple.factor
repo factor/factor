@@ -4,7 +4,7 @@ USING: kernel classes.tuple.private hashtables assocs sorting
 accessors combinators sequences slots.private math.parser words
 effects namespaces generic generic.standard.engines
 classes.algebra math math.private kernel.private
-quotations arrays ;
+quotations arrays definitions ;
 IN: generic.standard.engines.tuple
 
 TUPLE: echelon-dispatch-engine n methods ;
@@ -18,7 +18,7 @@ C: <trivial-tuple-dispatch-engine> trivial-tuple-dispatch-engine
 TUPLE: tuple-dispatch-engine echelons ;
 
 : push-echelon ( class method assoc -- )
-    >r swap dup "layout" word-prop layout-echelon r>
+    >r swap dup "layout" word-prop echelon>> r>
     [ ?set-at ] change-at ;
 
 : echelon-sort ( assoc -- assoc' )
@@ -44,7 +44,7 @@ M: trivial-tuple-dispatch-engine engine>quot
     >alist V{ } clone [ hashcode 1array ] distribute-buckets
     [ <trivial-tuple-dispatch-engine> ] map ;
 
-: word-hashcode% [ 1 slot ] % ;
+: word-hashcode% ( -- ) [ 1 slot ] % ;
 
 : class-hash-dispatch-quot ( methods -- quot )
     [
@@ -54,7 +54,7 @@ M: trivial-tuple-dispatch-engine engine>quot
     ] [ ] make ;
 
 : engine-word-name ( -- string )
-    generic get word-name "/tuple-dispatch-engine" append ;
+    generic get name>> "/tuple-dispatch-engine" append ;
 
 PREDICATE: engine-word < word
     "tuple-dispatch-generic" word-prop generic? ;
@@ -64,8 +64,12 @@ M: engine-word stack-effect
     [ extra-values ] [ stack-effect ] bi
     dup [ clone [ length + ] change-in ] [ 2drop f ] if ;
 
-M: engine-word compiled-crossref?
-    drop t ;
+M: engine-word inline?
+    "tuple-dispatch-generic" word-prop inline? ;
+
+M: engine-word crossref? "forgotten" word-prop not ;
+
+M: engine-word irrelevant? drop t ;
 
 : remember-engine ( word -- )
     generic get "engines" word-prop push ;
@@ -77,17 +81,19 @@ M: engine-word compiled-crossref?
 : define-engine-word ( quot -- word )
     >r <engine-word> dup r> define ;
 
-: array-nth% 2 + , [ slot { word } declare ] % ;
+: array-nth% ( n -- ) 2 + , [ slot { word } declare ] % ;
 
-: tuple-layout-superclasses ( obj -- array )
-    { tuple } declare
-    1 slot { tuple-layout } declare
-    4 slot { array } declare ; inline
+: tuple-layout-superclasses% ( -- )
+    [
+        { tuple } declare
+        1 slot { tuple-layout } declare
+        4 slot { array } declare
+    ] % ; inline
 
 : tuple-dispatch-engine-body ( engine -- quot )
     [
         picker %
-        [ tuple-layout-superclasses ] %
+        tuple-layout-superclasses%
         [ n>> array-nth% ]
         [
             methods>> [
@@ -105,7 +111,7 @@ M: echelon-dispatch-engine engine>quot
     ] [
         [
             picker %
-            [ tuple-layout-superclasses ] %
+            tuple-layout-superclasses%
             [ n>> array-nth% ]
             [
                 methods>> [
@@ -119,18 +125,24 @@ M: echelon-dispatch-engine engine>quot
 
 : >=-case-quot ( alist -- quot )
     default get [ drop ] prepend swap
-    [ >r [ dupd fixnum>= ] curry r> \ drop prefix ] assoc-map
+    [
+        [ [ dup ] swap [ fixnum>= ] curry compose ]
+        [ [ drop ] prepose ]
+        bi* [ ] like
+    ] assoc-map
     alist>quot ;
 
-: tuple-layout-echelon ( obj -- array )
-    { tuple } declare
-    1 slot { tuple-layout } declare
-    5 slot ; inline
+: tuple-layout-echelon% ( -- )
+    [
+        { tuple } declare
+        1 slot { tuple-layout } declare
+        5 slot
+    ] % ; inline
 
 M: tuple-dispatch-engine engine>quot
     [
         picker %
-        [ tuple-layout-echelon ] %
+        tuple-layout-echelon%
         [
             tuple assumed set
             echelons>> dup empty? [

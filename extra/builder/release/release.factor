@@ -1,7 +1,7 @@
 
 USING: kernel debugger system namespaces sequences splitting combinators
        io io.files io.launcher prettyprint bootstrap.image
-       bake combinators.cleave
+       combinators.cleave
        builder.util
        builder.common
        builder.release.branch

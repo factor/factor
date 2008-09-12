@@ -32,7 +32,7 @@ C: <foo> foo
 : f>c ( *fahrenheit -- *celsius )
     32 - 1.8 / ;
 
-[ { 212 32 } ] [ { 100 0 } [ [ f>c ] map ] undo ] unit-test
+[ { 212.0 32.0 } ] [ { 100 0 } [ [ f>c ] map ] undo ] unit-test
 [ { t t f } ] [ { t f 1 } [ [ >boolean ] matches? ] map ] unit-test
 [ { t f } ] [ { { 1 2 3 } 4 } [ [ >array ] matches? ] map ] unit-test
 [ 9 9 ] [ 3 [ 1/2 ^ ] undo 3 [ sqrt ] undo ] unit-test
@@ -62,10 +62,10 @@ C: <nil> nil
 [ "Malformed list" ] [ [ f list-sum ] [ ] recover ] unit-test
 
 : empty-cons ( -- cons ) cons new ;
-: cons* ( cdr car -- cons ) { set-cons-cdr set-cons-car } cons construct ;
+: cons* ( cdr car -- cons ) cons boa ;
 
 [ ] [ T{ cons f f f } [ empty-cons ] undo ] unit-test
-[ 1 2 ] [ 2 1 <cons> [ cons* ] undo ] unit-test
+[ 1 2 ] [ 1 2 <cons> [ cons* ] undo ] unit-test
 
 [ t ] [ pi [ pi ] matches? ] unit-test
 [ 0.0 ] [ 0.0 pi + [ pi + ] undo ] unit-test

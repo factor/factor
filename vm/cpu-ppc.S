@@ -103,20 +103,6 @@ DEF(void,c_to_factor,(CELL quot)):
         EPILOGUE
         blr
 
-/* We must pass the XT to the quotation in r11. */
-DEF(void,primitive_call,(void)):
-        lwz r3,0(r14)      /* load quotation from data stack */
-        subi r14,r14,4     /* pop quotation from data stack */
-        JUMP_QUOT
-
-/* We must preserve r4 here in case we're calling a primitive */
-DEF(void,primitive_execute,(void)):
-        lwz r3,0(r14)      /* load word from data stack */
-        lwz r11,29(r3)     /* load word-xt slot */
-        mtctr r11          /* prepare to call XT */
-        subi r14,r14,4     /* pop word from data stack */
-        bctr               /* go */
-
 /* We pass a function pointer to memcpy in r6 to work around a Mac OS X ABI
 limitation which would otherwise require us to do a bizzaro PC-relative
 trampoline to retrieve the function address */

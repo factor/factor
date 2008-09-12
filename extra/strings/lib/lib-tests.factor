@@ -5,4 +5,4 @@ IN: temporary
 [ "ABCDEFGHIJKLMNOPQRSTUVWXYZ" ] [ upper-alpha-chars "" like ] unit-test
 [ "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" ] [ alpha-chars "" like ] unit-test
 [ "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" ] [ alphanumeric-chars "" like ] unit-test
-[ t ] [ 100 [ drop random-alphanumeric-char ] map alphanumeric-chars [ member? ] curry all? ] unit-test
+[ t ] [ 100 [ random-alphanumeric-char ] replicate alphanumeric-chars [ member? ] curry all? ] unit-test

@@ -1,13 +1,13 @@
 ! Copyright (C) 2006, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs hashtables assocs io kernel math
+USING: accessors arrays assocs hashtables assocs io kernel math
 math.vectors math.matrices math.matrices.elimination namespaces
 parser prettyprint sequences words combinators math.parser
 splitting sorting shuffle symbols sets math.order ;
 IN: koszul
 
 ! Utilities
-: -1^ odd? -1 1 ? ;
+: -1^ ( m -- n ) odd? -1 1 ? ;
 
 : >alt ( obj -- vec )
     {
@@ -18,7 +18,7 @@ IN: koszul
         [ 1array >alt ]
     } cond ;
 
-: canonicalize
+: canonicalize ( assoc -- assoc' )
     [ nip zero? not ] assoc-filter ;
 
 SYMBOL: terms
@@ -41,7 +41,7 @@ SYMBOL: terms
         nip number>string
     ] [
         num-alt.
-        swap [ word-name ] map "." join
+        swap [ name>> ] map "." join
         append
     ] if ;
 
@@ -115,8 +115,7 @@ DEFER: (d)
 : x.dy ( x y -- vec ) (d) wedge -1 alt*n ;
 
 : (d) ( product -- value )
-    dup empty?
-    [ drop H{ } ] [ unclip swap [ x.dy ] 2keep dx.y alt+ ] if ;
+    [ H{ } ] [ unclip swap [ x.dy ] 2keep dx.y alt+ ] if-empty ;
 
 : linear-op ( vec quot -- vec )
         [
@@ -142,7 +141,7 @@ DEFER: (d)
 
 ! Computing a basis
 : graded ( seq -- seq )
-    dup 0 [ length max ] reduce 1+ [ drop V{ } clone ] map
+    dup 0 [ length max ] reduce 1+ [ V{ } clone ] replicate
     [ dup length pick nth push ] reduce ;
 
 : nth-basis-elt ( generators n -- elt )
@@ -184,7 +183,7 @@ DEFER: (d)
     [ length ] keep [ (graded-ker/im-d) ] curry map ;
 
 : graded-betti ( generators -- seq )
-    basis graded graded-ker/im-d flip first2 but-last 0 prefix v- ;
+    basis graded graded-ker/im-d unzip but-last 0 prefix v- ;
 
 ! Bi-graded for two-step complexes
 : (bigraded-ker/im-d) ( u-deg z-deg bigraded-basis -- null/rank )
@@ -207,11 +206,11 @@ DEFER: (d)
     [ v- ] 2map ;
 
 ! Laplacian
-: m.m' dup flip m. ;
-: m'.m dup flip swap m. ;
+: m.m' ( matrix -- matrix' ) dup flip m. ;
+: m'.m ( matrix -- matrix' ) dup flip swap m. ;
 
 : empty-matrix? ( matrix -- ? )
-    dup empty? [ drop t ] [ first empty? ] if ;
+    [ t ] [ first empty? ] if-empty ;
 
 : ?m+ ( m1 m2 -- m3 )
     over empty-matrix? [
@@ -257,17 +256,18 @@ DEFER: (d)
     [ laplacian-kernel ] graded-laplacian ;
 
 : graded-basis. ( seq -- )
-    dup length [
+    [
         "=== Degree " write pprint
         ": dimension " write dup length .
         [ alt. ] each
-    ] 2each ;
+    ] each-index ;
 
 : bigraded-triple ( u-deg z-deg bigraded-basis -- triple )
     #! d: C(u,z) ---> C(u+2,z-1)
-    [ >r >r 2 - r> 1 + r> ?nth ?nth ] 3keep
-    [ ?nth ?nth ] 3keep
-    >r >r 2 + r> 1 - r> ?nth ?nth
+    [ [ 2 - ] [ 1 + ] [ ] tri* ?nth ?nth ] 
+    [ ?nth ?nth ] 
+    [ [ 2 + ] [ 1 - ] [ ] tri* ?nth ?nth ]
+    3tri
     3array ;
 
 : bigraded-triples ( grid -- triples )
@@ -288,11 +288,11 @@ DEFER: (d)
     [ laplacian-kernel ] bigraded-laplacian ;
 
 : bigraded-basis. ( seq -- )
-    dup length [
+    [
         "=== U-degree " write .
-        dup length [
+        [
             "  === Z-degree " write pprint
             ": dimension " write dup length .
             [ "  " write alt. ] each
-        ] 2each
-    ] 2each ;
+        ] each-index
+    ] each-index ;

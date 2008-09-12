@@ -11,10 +11,7 @@ $nl
 "Parsing words add definitions to the current vocabulary. When a source file is being parsed, the current vocabulary is initially set to " { $vocab-link "scratchpad" } ". The current vocabulary may be changed with the " { $link POSTPONE: IN: } " parsing word (see " { $link "vocabulary-search" } ")."
 { $subsection create }
 { $subsection create-in }
-{ $subsection lookup }
-"Words can output their name and vocabulary:"
-{ $subsection word-name }
-{ $subsection word-vocabulary } ;
+{ $subsection lookup } ;
 
 ARTICLE: "uninterned-words" "Uninterned words"
 "A word that is not a member of any vocabulary is said to be " { $emphasis "uninterned" } "."
@@ -83,6 +80,7 @@ $nl
 { $subsection POSTPONE: inline }
 { $subsection POSTPONE: foldable }
 { $subsection POSTPONE: flushable }
+{ $subsection POSTPONE: recursive }
 "Stack effect declarations are documented in " { $link "effect-declaration" } "." ;
 
 ARTICLE: "word-definition" "Defining words"
@@ -103,8 +101,6 @@ ARTICLE: "word-props" "Word properties"
 "Each word has a hashtable of properties."
 { $subsection word-prop }
 { $subsection set-word-prop }
-{ $subsection word-props }
-{ $subsection set-word-props }
 "The stack effect of the above two words is designed so that it is most convenient when " { $snippet "name" } " is a literal pushed on the stack right before executing this word."
 $nl
 "The following are some of the properties used by the library:"
@@ -128,13 +124,11 @@ $nl
 
     { { { $snippet "\"inferred-effect\"" } } { $link "inference" } }
 
-    { { $snippet "\"specializer\"" } { $link "specializers" } }
+    { { $snippet "\"specializer\"" } { $link "hints" } }
     
     { { { $snippet "\"intrinsics\"" } ", " { $snippet "\"if-intrinsics\"" } } { $link "generator" } }
 
     { { $snippet "\"predicating\"" } " Set on class predicates, stores the corresponding class word" }
-    
-    { { { $snippet "\"constructing\"" } ", " { $snippet "\"constructor-quot\"" } } { $link "tuple-constructors" } }
 }
 "Properties which are defined for classes only:"
 { $table
@@ -144,8 +138,6 @@ $nl
     { { $snippet "\"coercer\"" } { "A quotation for converting the top of the stack to an instance of this class" } }
     
     { { $snippet "\"constructor\"" } { $link "tuple-constructors" } }
-    
-    { { $snippet "\"slot-names\"" } { $link "tuples" } }
     
     { { $snippet "\"type\"" } { $link "builtin-classes" } }
     
@@ -159,9 +151,8 @@ $nl
 } ;
 
 ARTICLE: "word.private" "Word implementation details"
-"Primitive definition accessors:"
-{ $subsection word-def }
-{ $subsection set-word-def }
+"The " { $snippet "def" } " slot of a word holds a " { $link quotation } " instance that is called when the word is executed."
+$nl
 "An " { $emphasis "XT" } " (execution token) is the machine code address of a word:"
 { $subsection word-xt } ;
 
@@ -170,12 +161,12 @@ ARTICLE: "words" "Words"
 $nl
 "Word introspection facilities and implementation details are found in the " { $vocab-link "words" } " vocabulary."
 $nl
-"A word consists of several parts:"
-{ $list
-    "a word name,"
-    "a vocabulary name,"
-    "a definition quotation, called when the word when executed,"
-    "a set of word properties, including documentation and other meta-data."
+"Word objects contain several slots:"
+{ $table
+    { { $snippet "name" } "a word name" }
+    { { $snippet "vocabulary" } "a word vocabulary name" }
+    { { $snippet "def" } "a definition quotation" }
+    { { $snippet "props" } "an assoc of word properties, including documentation and other meta-data" }
 }
 "Words are instances of a class."
 { $subsection word }
@@ -189,36 +180,12 @@ $nl
 
 ABOUT: "words"
 
-HELP: compiled? ( word -- ? )
-{ $values { "word" word } { "?" "a boolean" } }
-{ $description "Tests if a word has been compiled." } ;
-
 HELP: execute ( word -- )
 { $values { "word" word } }
 { $description "Executes a word." }
 { $examples
     { $example "USING: kernel io words ;" "IN: scratchpad" ": twice dup execute execute ;\n: hello \"Hello\" print ;\n\\ hello twice" "Hello\nHello" }
 } ;
-
-HELP: word-props ( word -- props )
-{ $values { "word" word } { "props" "an assoc" } }
-{ $description "Outputs a word's property table." } ;
-
-HELP: set-word-props ( props word -- )
-{ $values { "props" "an assoc" } { "word" word } }
-{ $description "Sets a word's property table." }
-{ $notes "The given assoc must not be a literal, since it will be mutated by future calls to " { $link set-word-prop } "." }
-{ $side-effects "word" } ;
-
-HELP: word-def ( word -- obj )
-{ $values { "word" word } { "obj" object } }
-{ $description "Outputs a word's primitive definition." } ;
-
-HELP: set-word-def ( obj word -- )
-{ $values { "obj" object } { "word" word } }
-{ $description "Sets a word's primitive definition." }
-$low-level-note
-{ $side-effects "word" } ;
 
 HELP: deferred
 { $class-description "The class of deferred words created by " { $link POSTPONE: DEFER: } "." } ;
@@ -334,7 +301,7 @@ HELP: bootstrap-word
 { $values { "word" word } { "target" word } }
 { $description "Looks up a word with the same name and vocabulary as the given word, performing a transformation to handle parsing words in the target dictionary. Used during bootstrap to transfer host words to the target dictionary." } ;
 
-HELP: parsing?
+HELP: parsing-word? ( obj -- ? )
 { $values { "obj" object } { "?" "a boolean" } }
 { $description "Tests if an object is a parsing word declared by " { $link POSTPONE: parsing } "." }
 { $notes "Outputs " { $link f } " if the object is not a word." } ;

@@ -1,11 +1,11 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private math math.private sequences
-sequences.private ;
+USING: accessors kernel kernel.private math math.private
+sequences sequences.private ;
 IN: arrays
 
 M: array clone (clone) ;
-M: array length array-capacity ;
+M: array length length>> ;
 M: array nth-unsafe >r >fixnum r> array-nth ;
 M: array set-nth-unsafe >r >fixnum r> set-array-nth ;
 M: array resize resize-array ;
@@ -23,12 +23,12 @@ M: array equal?
 
 INSTANCE: array sequence
 
-: 1array ( x -- array ) 1 swap <array> ; flushable
+: 1array ( x -- array ) 1 swap <array> ; inline
 
-: 2array ( x y -- array ) { } 2sequence ; flushable
+: 2array ( x y -- array ) { } 2sequence ; inline
 
-: 3array ( x y z -- array ) { } 3sequence ; flushable
+: 3array ( x y z -- array ) { } 3sequence ; inline
 
-: 4array ( w x y z -- array ) { } 4sequence ; flushable
+: 4array ( w x y z -- array ) { } 4sequence ; inline
 
 PREDICATE: pair < array length 2 number= ;

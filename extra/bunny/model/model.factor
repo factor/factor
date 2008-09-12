@@ -1,9 +1,7 @@
-USING: alien alien.c-types arrays sequences math math.vectors
-math.matrices math.parser io io.files kernel opengl opengl.gl
-opengl.glu io.encodings.ascii opengl.capabilities shuffle
-http.client vectors splitting tools.time system combinators
-float-arrays continuations destructors namespaces sequences.lib
-accessors ;
+USING: accessors alien.c-types arrays combinators destructors http.client
+io io.encodings.ascii io.files kernel math math.matrices math.parser
+math.vectors opengl opengl.capabilities opengl.gl sequences sequences.lib
+splitting vectors words ;
 IN: bunny.model
 
 : numbers ( str -- seq )
@@ -38,9 +36,9 @@ IN: bunny.model
     ascii [ parse-model ] with-file-reader
     [ normals ] 2keep 3array ;
 
-: model-path "bun_zipper.ply" temp-file ;
+: model-path ( -- path ) "bun_zipper.ply" temp-file ;
 
-: model-url "http://factorcode.org/bun_zipper.ply" ;
+: model-url ( -- url ) "http://factorcode.org/bun_zipper.ply" ;
 
 : maybe-download ( -- path )
     model-path dup exists? [
@@ -66,7 +64,7 @@ TUPLE: bunny-buffers array element-array nv ni ;
     {
         [
             [ first concat ] [ second concat ] bi
-            append >float-array
+            append >c-float-array
             GL_ARRAY_BUFFER swap GL_STATIC_DRAW <gl-buffer>
         ]
         [
@@ -81,15 +79,15 @@ GENERIC: bunny-geom ( geom -- )
 GENERIC: draw-bunny ( geom draw -- )
 
 M: bunny-dlist bunny-geom
-    bunny-dlist-list glCallList ;
+    list>> glCallList ;
 
 M: bunny-buffers bunny-geom
-    dup { array>> element-array>> } get-slots [
+    dup [ array>> ] [ element-array>> ] bi [
         { GL_VERTEX_ARRAY GL_NORMAL_ARRAY } [
-            GL_DOUBLE 0 0 buffer-offset glNormalPointer
+            GL_FLOAT 0 0 buffer-offset glNormalPointer
             [
-                nv>> "double" heap-size * buffer-offset
-                3 GL_DOUBLE 0 roll glVertexPointer
+                nv>> "float" heap-size * buffer-offset
+                3 GL_FLOAT 0 roll glVertexPointer
             ] [
                 ni>>
                 GL_TRIANGLES swap GL_UNSIGNED_INT 0 buffer-offset glDrawElements
@@ -101,7 +99,7 @@ M: bunny-dlist dispose
     list>> delete-dlist ;
 
 M: bunny-buffers dispose
-    { array>> element-array>> } get-slots
+    [ array>> ] [ element-array>> ] bi
     delete-gl-buffer delete-gl-buffer ;
 
 : <bunny-geom> ( model -- geom )

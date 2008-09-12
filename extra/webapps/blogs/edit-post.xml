@@ -1,0 +1,29 @@
+<?xml version='1.0' ?>
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+	<t:title>Edit: <t:label t:name="title" /></t:title>
+
+	<div class="post-form">
+		<t:form t:action="$blogs/edit-post" t:for="id">
+
+			<p>Title: <t:field t:name="title" t:size="60" /></p>
+			<p><t:textarea t:name="content" t:rows="30" t:cols="80" /></p>
+			<input type="SUBMIT" value="Done" />
+		</t:form>
+	</div>
+
+	<div class="posting-footer">
+		Post by
+		<t:a t:href="$blogs/by" t:rest="author">
+			<t:label t:name="author" />
+		</t:a>
+		on
+		<t:label t:name="date" />
+		|
+		<t:a t:href="$blogs/post" t:rest="id">View Post</t:a>
+		|
+		<t:button t:action="$blogs/delete-post" t:for="id,author" class="link-button link">Delete Post</t:button>
+	</div>
+
+</t:chloe>

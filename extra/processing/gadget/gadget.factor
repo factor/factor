@@ -1,25 +1,14 @@
 
 USING: kernel namespaces combinators
-       ui.gestures qualified accessors ui.gadgets.frame-buffer ;
+       ui.gestures accessors ui.gadgets.frame-buffer ;
 
 IN: processing.gadget
 
-QUALIFIED: ui.gadgets
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-TUPLE: processing-gadget button-down button-up key-down key-up ;
+TUPLE: processing-gadget < frame-buffer button-down button-up key-down key-up ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: set-gadget-delegate ( tuple gadget -- tuple )
-  over ui.gadgets:set-gadget-delegate ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: <processing-gadget> ( -- gadget )
-  processing-gadget new
-    <frame-buffer> set-gadget-delegate ;
+: <processing-gadget> ( -- gadget ) processing-gadget new-frame-buffer ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -37,13 +26,13 @@ SYMBOL: key-value
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-M: processing-gadget handle-gesture* ( gadget gesture delegate -- ? )
-   rot drop swap         ! delegate gesture
+M: processing-gadget handle-gesture ( gesture gadget -- ? )
+   swap
    {
      {
        [ dup key-down? ]
        [
-         key-down-sym key-value set
+         sym>> key-value set
          key-pressed-value on
          key-down>> dup [ call ] [ drop ] if
          t
@@ -60,7 +49,7 @@ M: processing-gadget handle-gesture* ( gadget gesture delegate -- ? )
      {
        [ dup button-down? ]
        [
-         button-down-# button-value set
+         #>> button-value set
          mouse-pressed-value on
          button-down>> dup [ call ] [ drop ] if
          t

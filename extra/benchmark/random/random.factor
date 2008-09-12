@@ -1,7 +1,8 @@
 USING: io.files io.encodings.ascii random math.parser io math ;
 IN: benchmark.random
 
-: random-numbers-path "random-numbers.txt" temp-file ;
+: random-numbers-path ( -- path )
+    "random-numbers.txt" temp-file ;
 
 : write-random-numbers ( n -- )
     random-numbers-path ascii [

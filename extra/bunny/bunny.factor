@@ -1,34 +1,25 @@
-USING: alien alien.c-types arrays sequences math math.vectors
-math.matrices math.parser io io.files kernel opengl opengl.gl
-opengl.glu shuffle http.client vectors namespaces ui.gadgets
-ui.gadgets.canvas ui.render ui splitting combinators tools.time
-system combinators.lib float-arrays continuations
-opengl.demo-support multiline ui.gestures bunny.fixed-pipeline
-bunny.cel-shaded bunny.outlined bunny.model accessors destructors ;
+USING: accessors arrays bunny.cel-shaded bunny.fixed-pipeline
+bunny.model bunny.outlined destructors kernel math opengl.demo-support
+opengl.gl sequences ui ui.gadgets ui.gestures ui.render words ;
 IN: bunny
 
-TUPLE: bunny-gadget model geom draw-seq draw-n ;
+TUPLE: bunny-gadget < demo-gadget model-triangles geom draw-seq draw-n ;
 
 : <bunny-gadget> ( -- bunny-gadget )
-    0.0 0.0 0.375 <demo-gadget>
-    maybe-download read-model {
-        set-delegate
-        (>>model)
-    } bunny-gadget construct ;
+    0.0 0.0 0.375 bunny-gadget new-demo-gadget
+    maybe-download read-model >>model-triangles ;
 
 : bunny-gadget-draw ( gadget -- draw )
-    { draw-n>> draw-seq>> }
-    get-slots nth ;
+    [ draw-n>> ] [ draw-seq>> ] bi nth ;
 
 : bunny-gadget-next-draw ( gadget -- )
-    dup { draw-seq>> draw-n>> }
-    get-slots
+    dup [ draw-seq>> ] [ draw-n>> ] bi
     1+ swap length mod
     >>draw-n relayout-1 ;
 
 M: bunny-gadget graft* ( gadget -- )
     GL_DEPTH_TEST glEnable
-    dup model>> <bunny-geom> >>geom
+    dup model-triangles>> <bunny-geom> >>geom
     dup
     [ <bunny-fixed-pipeline> ]
     [ <bunny-cel-shaded> ]
@@ -42,13 +33,14 @@ M: bunny-gadget ungraft* ( gadget -- )
     [ draw-seq>> [ [ dispose ] when* ] each ] bi ;
 
 M: bunny-gadget draw-gadget* ( gadget -- )
-    0.15 0.15 0.15 1.0 glClearColor
-    GL_DEPTH_BUFFER_BIT GL_COLOR_BUFFER_BIT bitor glClear
-    dup demo-gadget-set-matrices
-    GL_MODELVIEW glMatrixMode
-    0.02 -0.105 0.0 glTranslatef
-    { geom>> bunny-gadget-draw } get-slots
-    draw-bunny ;
+    dup draw-seq>> empty? [ drop ] [
+        0.15 0.15 0.15 1.0 glClearColor
+        GL_DEPTH_BUFFER_BIT GL_COLOR_BUFFER_BIT bitor glClear
+        dup demo-gadget-set-matrices
+        GL_MODELVIEW glMatrixMode
+        0.02 -0.105 0.0 glTranslatef
+        [ geom>> ] [ bunny-gadget-draw ] bi draw-bunny
+    ] if ;
 
 M: bunny-gadget pref-dim* ( gadget -- dim )
     drop { 640 480 } ;

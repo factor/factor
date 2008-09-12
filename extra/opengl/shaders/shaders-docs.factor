@@ -95,18 +95,7 @@ HELP: delete-gl-program
 { $description "Deletes the program object, invalidating it and releasing any resources allocated for it by the OpenGL implementation. Any attached " { $link gl-shader } "s are also deleted.\n\nIf the shader objects should be preserved, they should each be detached using " { $link detach-gl-program-shader } ". The program object can then be destroyed alone using " { $link delete-gl-program-only } "." } ;
 
 HELP: with-gl-program
-{ $values { "program" "A " { $link gl-program } " object" } { "uniforms" "An " { $link assoc } " between uniform parameter names and quotations with effect " { $snippet "( uniform-location -- )" } } { "quot" "A quotation" } }
-{ $description "Enables " { $snippet "program" } " for all OpenGL calls made in the dynamic extent of " { $snippet "quot" } ". The fixed-function pipeline is restored at the end of " { $snippet "quot" } ". Before calling " { $snippet "quot" } ", calls " { $link glGetUniformLocation } " on each key of " { $snippet "uniforms" } " to get the address of the uniform parameter, which is then placed on top of the stack as the associated quotation is called.\n\nExample:" }
-{ $code <"
-! From bunny.cel-shaded
-: (draw-cel-shaded-bunny) ( geom program -- )
-    {
-        { "light_direction" [ 1.0 -1.0 1.0 glUniform3f ] }
-        { "color"           [ 0.6 0.5 0.5 1.0 glUniform4f ] }
-        { "ambient"         [ 0.2 0.2 0.2 0.2 glUniform4f ] }
-        { "diffuse"         [ 0.8 0.8 0.8 0.8 glUniform4f ] }
-        { "shininess"       [ 100.0 glUniform1f ] }
-    } [ bunny-geom ] with-gl-program ;
-"> } ;
+{ $values { "program" "A " { $link gl-program } " object" } { "quot" "A quotation with stack effect " { $snippet "( program -- )" } } }
+{ $description "Enables " { $snippet "program" } " for all OpenGL calls made in the dynamic extent of " { $snippet "quot" } ". " { $snippet "program" } " is left on the top of the stack when " { $snippet "quot" } " is called. The fixed-function pipeline is restored at the end of " { $snippet "quot" } "." } ;
 
 ABOUT: "gl-utilities"

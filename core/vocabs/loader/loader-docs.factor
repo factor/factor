@@ -1,12 +1,29 @@
 USING: vocabs help.markup help.syntax words strings io ;
 IN: vocabs.loader
 
+ARTICLE: "vocabs.roots" "Vocabulary roots"
+"The vocabulary loader searches for it in one of the root directories:"
+{ $subsection vocab-roots }
+"The default set of roots includes the following directories in the Factor source directory:"
+{ $list
+    { { $snippet "core" } " - essential system vocabularies such as " { $vocab-link "parser" } " and " { $vocab-link "sequences" } ". The vocabularies in this root constitute the boot image; see " { $link "bootstrap.image" } "." }
+    { { $snippet "basis" } " - useful libraries and tools, such as " { $vocab-link "compiler" } ", " { $vocab-link "ui" } ", " { $vocab-link "calendar" } ", and so on." }
+    { { $snippet "extra" } " - additional contributed libraries." }
+    { { $snippet "work" } " - a root for vocabularies which are not intended to be contributed back to Factor." }
+}
+"Your own vocabularies should go into " { $snippet "extra" } " or " { $snippet "work" } ", depending on whether or not you intend to contribute them back to the Factor project. If you wish to work on vocabularies outside of the Factor source directory, create a " { $snippet "~/.factor-rc" } " file like the following,"
+{ $code
+    "USING: namespaces sequences vocabs.loader ;"
+    "\"/home/jane/sources/\" vocab-roots get push"
+}
+"See " { $link "rc-files" } " for details." ;
+
 ARTICLE: "vocabs.loader" "Vocabulary loader"
 "The vocabulary loader is defined in the " { $vocab-link "vocabs.loader" } " vocabulary."
 $nl
-"Vocabulary names map directly to source files. When a vocabulary which has not been loaded is accessed, the vocabulary loader searches for it in one of the root directories:"
-{ $subsection vocab-roots }
-"A vocabulary named " { $snippet "foo.bar" } " must be defined in a " { $snippet "bar" } " directory nested inside a " { $snippet "foo" } " directory at the vocabulary root. Any level of vocabulary nesting is permitted."
+"Vocabularies are searched for in vocabulary roots."
+{ $subsection "vocabs.roots" }
+"Vocabulary names map directly to source files. A vocabulary named " { $snippet "foo.bar" } " must be defined in a " { $snippet "bar" } " directory nested inside a " { $snippet "foo" } " directory of a vocabulary root. Any level of vocabulary nesting is permitted."
 $nl
 "The vocabulary directory - " { $snippet "bar" } " in our example - can contain the following files; the first is required while the rest are optional:"
 { $list
@@ -33,7 +50,7 @@ HELP: load-vocab
 { $error-description "Thrown by " { $link POSTPONE: USE: } " and " { $link POSTPONE: USING: } " when a given vocabulary does not exist. Vocabularies must be created by " { $link POSTPONE: IN: } " before being used." } ;
 
 HELP: vocab-main
-{ $values { "vocab" "a vocabulary specifier" } { "main" word } }
+{ $values { "vocab-spec" "a vocabulary specifier" } { "main" word } }
 { $description "Outputs the main entry point for a vocabulary. The entry point can be executed with " { $link run } " and set with " { $link POSTPONE: MAIN: } "." } ;
 
 HELP: vocab-roots

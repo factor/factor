@@ -7,30 +7,16 @@ ARTICLE: "growable" "Resizable sequence implementation"
 $nl
 "There is a resizable sequence mixin:"
 { $subsection growable }
-"This mixin implements the sequence protocol in terms of a growable protocol:"
-{ $subsection underlying }
-{ $subsection set-underlying }
-{ $subsection set-fill }
+"This mixin implements the sequence protocol by assuming the object has two specific slots:"
+{ $list
+    { { $snippet "length" } " - the fill pointer (number of occupied elements in the underlying storage)" }
+    { { $snippet "underlying" } " - the underlying storage" }
+}
 "The underlying sequence must implement a generic word:"
 { $subsection resize }
-{ $link "vectors" } " and " { $link "sbufs" } " are implemented using the resizable sequence facility." ;
+{ $link "vectors" } ", " { $link "byte-vectors" } " and " { $link "sbufs" } " are implemented using the resizable sequence facility." ;
 
 ABOUT: "growable"
-
-HELP: set-fill
-{ $values { "n" "a new fill pointer" } { "seq" growable } }
-{ $contract "Sets the fill pointer (number of occupied elements in the underlying storage) of a resizable sequence." }
-{ $side-effects "seq" }
-{ $warning "This word is not safe. Changing the fill pointer to a negative value, or a value higher than the underlying sequence length can lead to memory corruption. User code should use " { $link set-length } " instead." } ;
-
-HELP: underlying
-{ $values { "seq" growable } { "underlying" "the underlying sequence" } }
-{ $contract "Outputs the underlying storage of a resizable sequence." } ;
-
-HELP: set-underlying
-{ $values { "underlying" sequence } { "seq" growable } }
-{ $contract "Modifies the underlying storage of a resizable sequence." }
-{ $warning "This word is not safe. Setting an underlying sequence shorter than the fill pointer can lead to memory corruption." } ;
 
 HELP: capacity
 { $values { "seq" "a vector or string buffer" } { "n" "the capacity of the sequence" } }

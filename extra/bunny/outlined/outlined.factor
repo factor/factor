@@ -139,11 +139,7 @@ TUPLE: bunny-outlined
 
 : <bunny-outlined> ( gadget -- draw )
     outlining-supported? [
-        pass1-program pass2-program {
-            (>>gadget)
-            (>>pass1-program)
-            (>>pass2-program)
-        } bunny-outlined construct
+        pass1-program pass2-program f f f f f bunny-outlined boa
     ] [ drop f ] if ;
 
 : (framebuffer-texture) ( dim iformat xformat -- texture )
@@ -181,10 +177,9 @@ TUPLE: bunny-outlined
     ] [ drop ] if ;
 
 : remake-framebuffer-if-needed ( draw -- )
-    dup [ gadget>> dim>> ] [ framebuffer-dim>> ] bi
-    over =
-    [ 2drop ] [
-        [ dup dispose-framebuffer dup ] dip {
+    dup [ gadget>> dim>> ] [ framebuffer-dim>> ] bi =
+    [ drop ] [
+        [ dispose-framebuffer ] [ dup ] [ gadget>> dim>> ] tri {
             [
                 GL_RGBA16F_ARB GL_RGBA (framebuffer-texture)
                 [ >>color-texture drop ] keep
@@ -196,7 +191,8 @@ TUPLE: bunny-outlined
                 [ >>depth-texture drop ] keep
             ]
         } 2cleave
-        (make-framebuffer) >>framebuffer drop
+        [ (make-framebuffer) >>framebuffer ] [ >>framebuffer-dim ] bi
+        drop
     ] if ;
 
 : clear-framebuffer ( -- )
@@ -220,13 +216,14 @@ TUPLE: bunny-outlined
         [ normal-texture>> GL_TEXTURE_2D GL_TEXTURE1 bind-texture-unit ]
         [ depth-texture>>  GL_TEXTURE_2D GL_TEXTURE2 bind-texture-unit ]
         [
-            pass2-program>> {
-                { "colormap"   [ 0 glUniform1i ] }
-                { "normalmap"  [ 1 glUniform1i ] }
-                { "depthmap"   [ 2 glUniform1i ] }
-                { "line_color" [ 0.1 0.0 0.1 1.0 glUniform4f ] }
-            } [ { -1.0 -1.0 } { 1.0 1.0 } rect-vertices ]
-            with-gl-program
+            pass2-program>> [
+                {
+                    [ "colormap"   glGetUniformLocation 0 glUniform1i ]
+                    [ "normalmap"  glGetUniformLocation 1 glUniform1i ]
+                    [ "depthmap"   glGetUniformLocation 2 glUniform1i ]
+                    [ "line_color" glGetUniformLocation 0.1 0.0 0.1 1.0 glUniform4f ]
+                } cleave { -1.0 -1.0 } { 1.0 1.0 } rect-vertices
+            ] with-gl-program
         ]
     } cleave ;
 

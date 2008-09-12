@@ -7,11 +7,11 @@ SYMBOL: +lt+
 SYMBOL: +eq+
 SYMBOL: +gt+
 
-: invert-comparison ( symbol -- new-symbol )
+: invert-comparison ( <=> -- <=>' )
     #! Can't use case, index or nth here
     dup +lt+ eq? [ drop +gt+ ] [ +eq+ eq? +eq+ +lt+ ? ] if ;
 
-GENERIC: <=> ( obj1 obj2 -- symbol )
+GENERIC: <=> ( obj1 obj2 -- <=> )
 
 M: real <=> 2dup < [ 2drop +lt+ ] [ number= +eq+ +gt+ ? ] if ;
 
@@ -38,4 +38,4 @@ M: real after=? ( obj1 obj2 -- ? ) >= ;
 
 : [-] ( x y -- z ) - 0 max ; inline
 
-: compare ( obj1 obj2 quot -- symbol ) bi@ <=> ; inline
+: compare ( obj1 obj2 quot -- <=> ) bi@ <=> ; inline

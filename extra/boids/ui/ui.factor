@@ -1,6 +1,7 @@
 
-USING: kernel namespaces
+USING: combinators.short-circuit kernel namespaces
        math
+       math.trig
        math.functions
        math.vectors
        math.parser
@@ -19,7 +20,10 @@ USING: kernel namespaces
        ui.gadgets.packs
        ui.gadgets.grids
        ui.gestures
-       assocs.lib vars rewrite-closures boids ;
+       assocs.lib vars rewrite-closures boids accessors
+       math.geometry.rect
+       newfx
+       processing.shapes ;
 
 IN: boids.ui
 
@@ -27,17 +31,21 @@ IN: boids.ui
 ! draw-boid
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: point-a ( boid -- a ) boid-pos ;
-
-: point-b ( boid -- b ) [ boid-pos ] [ boid-vel normalize* 20 v*n ] bi v+ ;
-
-: boid-points ( boid -- point-a point-b ) [ point-a ] [ point-b ] bi ;
-
-: draw-boid ( boid -- ) boid-points gl-line ;
+: draw-boid ( boid -- )
+  glPushMatrix
+    dup pos>> gl-translate-2d
+        vel>> first2 rect> arg rad>deg 0 0 1 glRotated
+    { { 0 5 } { 0 -5 } { 20 0 } } triangle
+    fill-mode
+  glPopMatrix ;
 
 : draw-boids ( -- ) boids> [ draw-boid ] each ;
 
-: display ( -- ) black gl-color draw-boids ;
+: boid-color ( -- color ) T{ rgba f 1.0 0 0 0.3 } ;
+
+: display ( -- )
+  boid-color >fill-color
+  draw-boids ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -98,67 +106,70 @@ VARS: population-label cohesion-label alignment-label separation-label ;
 : boids-window* ( -- )
   init-variables init-world-size init-boids loop on
 
-  C[ display ] <slate> >slate
-    t                      slate> set-gadget-clipped?
-    { 600 400 }            slate> set-slate-dim
-    C[ [ run ] in-thread ] slate> set-slate-graft
-    C[ loop off ]          slate> set-slate-ungraft
-
-  "" <label> dup reverse-video-theme >population-label update-population-label
-
-  "" <label> dup reverse-video-theme >cohesion-label   update-cohesion-label
-  "" <label> dup reverse-video-theme >alignment-label  update-alignment-label
-  "" <label> dup reverse-video-theme >separation-label update-separation-label
+  "" <label> reverse-video-theme >population-label update-population-label
+  "" <label> reverse-video-theme >cohesion-label   update-cohesion-label
+  "" <label> reverse-video-theme >alignment-label  update-alignment-label
+  "" <label> reverse-video-theme >separation-label update-separation-label
 
   <frame>
 
-  {
-    [ "ESC - Pause" [ drop toggle-loop ] button* ]
+    <shelf>
 
-    [ "1 - Randomize" [ drop randomize ] button* ]
+       1 >>fill
 
-    [ <pile> 1 over set-pack-fill
-      population-label> over add-gadget
-      "3 - Add 10" [ drop add-10-boids ] button* over add-gadget
-      "2 - Sub 10" [ drop sub-10-boids ] button* over add-gadget ]
+      "ESC - Pause" [ drop toggle-loop ] button* add-gadget
+    
+      "1 - Randomize" [ drop randomize ] button* add-gadget
+    
+      <pile> 1 >>fill
+        population-label> add-gadget
+        "3 - Add 10" [ drop add-10-boids ] button* add-gadget
+        "2 - Sub 10" [ drop sub-10-boids ] button* add-gadget
+      add-gadget
+    
+      <pile> 1 >>fill
+        cohesion-label> add-gadget
+        "q - +0.1" [ drop inc-cohesion-weight ] button* add-gadget
+        "a - -0.1" [ drop dec-cohesion-weight ] button* add-gadget
+      add-gadget
 
-    [ <pile> 1 over set-pack-fill
-      cohesion-label> over add-gadget
-      "q - +0.1" [ drop inc-cohesion-weight ] button* over add-gadget
-      "a - -0.1" [ drop dec-cohesion-weight ] button* over add-gadget ]
+      <pile> 1 >>fill
+        alignment-label> add-gadget
+        "w - +0.1" [ drop inc-alignment-weight ] button* add-gadget
+        "s - -0.1" [ drop dec-alignment-weight ] button* add-gadget
+      add-gadget
 
-    [ <pile> 1 over set-pack-fill
-      alignment-label> over add-gadget
-      "w - +0.1" [ drop inc-alignment-weight ] button* over add-gadget
-      "s - -0.1" [ drop dec-alignment-weight ] button* over add-gadget ]
+      <pile> 1 >>fill
+        separation-label> add-gadget
+        "e - +0.1" [ drop inc-separation-weight ] button* add-gadget
+        "d - -0.1" [ drop dec-separation-weight ] button* add-gadget
+      add-gadget
 
-    [ <pile> 1 over set-pack-fill
-      separation-label> over add-gadget
-      "e - +0.1" [ drop inc-separation-weight ] button* over add-gadget
-      "d - -0.1" [ drop dec-separation-weight ] button* over add-gadget ]
+    @top grid-add
 
-  } [ call ] map [ [ gadget, ] each ] make-shelf
-    1 over set-pack-fill
-    over @top grid-add
+    C[ display ] <slate>
+      dup                    >slate
+      t                      >>clipped?
+      { 600 400 }            >>pdim
+      C[ [ run ] in-thread ] >>graft
+      C[ loop off ]          >>ungraft
+    @center grid-add
 
-  slate> over @center grid-add
+  <handler> 
+    H{ } clone
+      T{ key-down f f "1"   } C[ drop randomize             ] is
+      T{ key-down f f "2"   } C[ drop sub-10-boids          ] is
+      T{ key-down f f "3"   } C[ drop add-10-boids          ] is
+      T{ key-down f f "q"   } C[ drop inc-cohesion-weight   ] is
+      T{ key-down f f "a"   } C[ drop dec-cohesion-weight   ] is
+      T{ key-down f f "w"   } C[ drop inc-alignment-weight  ] is
+      T{ key-down f f "s"   } C[ drop dec-alignment-weight  ] is
+      T{ key-down f f "e"   } C[ drop inc-separation-weight ] is
+      T{ key-down f f "d"   } C[ drop dec-separation-weight ] is
+      T{ key-down f f "ESC" } C[ drop toggle-loop           ] is
+    >>table
 
-  H{ } clone
-    T{ key-down f f "1" } C[ drop randomize    ] put-at
-    T{ key-down f f "2" } C[ drop sub-10-boids ] put-at
-    T{ key-down f f "3" } C[ drop add-10-boids ] put-at
-
-    T{ key-down f f "q" } C[ drop inc-cohesion-weight ] put-at
-    T{ key-down f f "a" } C[ drop dec-cohesion-weight ] put-at
-
-    T{ key-down f f "w" } C[ drop inc-alignment-weight ] put-at
-    T{ key-down f f "s" } C[ drop dec-alignment-weight ] put-at
-
-    T{ key-down f f "e" } C[ drop inc-separation-weight ] put-at
-    T{ key-down f f "d" } C[ drop dec-separation-weight ] put-at
-
-    T{ key-down f f "ESC" } C[ drop toggle-loop ] put-at
-  <handler> tuck set-gadget-delegate "Boids" open-window ;
+  "Boids" open-window ;
 
 : boids-window ( -- ) [ [ boids-window* ] with-scope ] with-ui ;
 

@@ -219,12 +219,6 @@ CELL unaligned_object_size(CELL pointer)
 	case BYTE_ARRAY_TYPE:
 		return byte_array_size(
 			byte_array_capacity((F_BYTE_ARRAY*)pointer));
-	case BIT_ARRAY_TYPE:
-		return bit_array_size(
-			bit_array_capacity((F_BIT_ARRAY*)pointer));
-	case FLOAT_ARRAY_TYPE:
-		return float_array_size(
-			float_array_capacity((F_FLOAT_ARRAY*)pointer));
 	case STRING_TYPE:
 		return string_size(string_capacity((F_STRING*)pointer));
 	case TUPLE_TYPE:
@@ -600,8 +594,6 @@ CELL binary_payload_start(CELL pointer)
 	/* these objects do not refer to other objects at all */
 	case FLOAT_TYPE:
 	case BYTE_ARRAY_TYPE:
-	case BIT_ARRAY_TYPE:
-	case FLOAT_ARRAY_TYPE:
 	case BIGNUM_TYPE:
 	case CALLSTACK_TYPE:
 		return 0;

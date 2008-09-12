@@ -1,12 +1,7 @@
 USING: arrays assocs kernel vectors sequences namespaces
-random math.parser math fry ;
+       random math.parser math fry ;
+
 IN: assocs.lib
-
-: ref-at ( table key -- value ) swap at ;
-
-: put-at* ( table key value -- ) swap rot set-at ;
-
-: put-at ( table key value -- table ) swap pick set-at ;
 
 : set-assoc-stack ( value key seq -- )
     dupd [ key? ] with find-last nip set-at ;
@@ -16,9 +11,6 @@ IN: assocs.lib
 
 : replace-at ( assoc value key -- assoc )
     >r >r dup r> 1vector r> rot set-at ;
-
-: insert-at ( value key assoc -- )
-    [ ?push ] change-at ;
 
 : peek-at* ( assoc key -- obj ? )
     swap at* dup [ >r peek r> ] when ;
@@ -32,7 +24,7 @@ IN: assocs.lib
 : multi-assoc-each ( assoc quot -- )
     [ with each ] curry assoc-each ; inline
 
-: insert ( value variable -- ) namespace insert-at ;
+: insert ( value variable -- ) namespace push-at ;
 
 : generate-key ( assoc -- str )
     >r 32 random-bits >hex r>
@@ -44,4 +36,14 @@ IN: assocs.lib
 : histogram ( assoc quot -- assoc' )
     H{ } clone [
         swap [ change-at ] 2curry assoc-each
-    ] keep ;
+    ] keep ; inline
+
+: ?at ( obj assoc -- value/obj ? )
+    dupd at* [ [ nip ] [ drop ] if ] keep ;
+
+: if-at ( obj assoc quot1 quot2 -- )
+    [ ?at ] 2dip if ; inline
+
+: when-at ( obj assoc quot -- ) [ ] if-at ; inline
+
+: unless-at ( obj assoc quot -- ) [ ] swap if-at ; inline

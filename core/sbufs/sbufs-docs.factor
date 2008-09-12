@@ -1,4 +1,4 @@
-USING: strings arrays byte-arrays bit-arrays help.markup
+USING: strings arrays byte-arrays help.markup
 help.syntax kernel vectors ;
 IN: sbufs
 

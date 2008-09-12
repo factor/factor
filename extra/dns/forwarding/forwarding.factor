@@ -1,5 +1,5 @@
 
-USING: kernel
+USING: combinators.short-circuit kernel
        combinators
        vectors
        sequences
@@ -36,10 +36,6 @@ IN: dns.forwarding
   upstream-server not
     [ resolv-conf-server set-upstream-server ]
   when ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: 1&& <-&& ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

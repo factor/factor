@@ -23,16 +23,20 @@ ABOUT: "integers"
 HELP: fixnum
 { $class-description "The class of fixnums, which are fixed-width integers small enough to fit in a machine cell. Because they are not heap-allocated, fixnums do not have object identity. Equality of tagged pointer bit patterns is actually " { $emphasis "value" } " equality for fixnums." } ;
 
-HELP: >fixnum ( x -- n )
+HELP: >fixnum
 { $values { "x" real } { "n" fixnum } }
 { $description "Converts a real number to a fixnum, with a possible loss of precision and overflow." } ;
 
 HELP: bignum
 { $class-description "The class of bignums, which are heap-allocated arbitrary-precision integers." } ;
 
-HELP: >bignum ( x -- n )
+HELP: >bignum
 { $values { "x" real } { "n" bignum } }
 { $description "Converts a real number to a bignum, with a possible loss of precision." } ;
+
+HELP: >integer
+{ $values { "x" real } { "n" bignum } }
+{ $description "Converts a real number to an integer, with a possible loss of precision." } ;
 
 HELP: integer
 { $class-description "The class of integers, which is a disjoint union of fixnums and bignums." } ;

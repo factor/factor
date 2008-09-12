@@ -28,20 +28,20 @@ DEFER: if
 : if ( ? true false -- ) ? call ;
 
 ! Single branch
-: unless ( cond false -- )
+: unless ( ? false -- )
     swap [ drop ] [ call ] if ; inline
 
-: when ( cond true -- )
+: when ( ? true -- )
     swap [ call ] [ drop ] if ; inline
 
 ! Anaphoric
-: if* ( cond true false -- )
+: if* ( ? true false -- )
     pick [ drop call ] [ 2nip call ] if ; inline
 
-: when* ( cond true -- )
+: when* ( ? true -- )
     over [ call ] [ 2drop ] if ; inline
 
-: unless* ( cond false -- )
+: unless* ( ? false -- )
     over [ drop ] [ nip call ] if ; inline
 
 ! Default
@@ -64,15 +64,14 @@ DEFER: if
 
 : 2keep ( x y quot -- x y ) 2over 2slip ; inline
 
-: 3keep ( x y z quot -- x y z )
-    >r 3dup r> -roll 3slip ; inline
+: 3keep ( x y z quot -- x y z ) >r 3dup r> -roll 3slip ; inline
 
 ! Cleavers
 : bi ( x p q -- )
     >r keep r> call ; inline
 
 : tri ( x p q r -- )
-    >r pick >r bi r> r> call ; inline
+    >r >r keep r> keep r> call ; inline
 
 ! Double cleavers
 : 2bi ( x y p q -- )
@@ -93,7 +92,7 @@ DEFER: if
     >r dip r> call ; inline
 
 : tri* ( x y z p q r -- )
-    >r rot >r bi* r> r> call ; inline
+    >r >r 2dip r> dip r> call ; inline
 
 ! Double spreaders
 : 2bi* ( w x y z p q -- )
@@ -110,10 +109,13 @@ DEFER: if
 : 2bi@ ( w x y z quot -- )
     dup 2bi* ; inline
 
-: while ( pred body tail -- )
+: loop ( pred: ( -- ? ) -- )
+    dup slip swap [ loop ] [ drop ] if ; inline recursive
+
+: while ( pred: ( -- ? ) body: ( -- ) tail: ( -- ) -- )
     >r >r dup slip r> r> roll
     [ >r tuck 2slip r> while ]
-    [ 2nip call ] if ; inline
+    [ 2nip call ] if ; inline recursive
 
 ! Object protocol
 GENERIC: hashcode* ( depth obj -- code )
@@ -142,11 +144,9 @@ M: object clone ;
 M: callstack clone (clone) ;
 
 ! Tuple construction
-: new ( class -- tuple )
-    tuple-layout <tuple> ;
+GENERIC: new ( class -- tuple )
 
-: boa ( ... class -- tuple )
-    tuple-layout <tuple-boa> ;
+GENERIC: boa ( ... class -- tuple )
 
 ! Quotation building
 : 2curry ( obj1 obj2 quot -- curry )
@@ -165,15 +165,15 @@ M: callstack clone (clone) ;
     compose compose ; inline
 
 ! Booleans
-: not ( obj -- ? ) f eq? ; inline
-
-: >boolean ( obj -- ? ) t f ? ; inline
+: not ( obj -- ? ) f t ? ; inline
 
 : and ( obj1 obj2 -- ? ) over ? ; inline
 
+: >boolean ( obj -- ? ) t f ? ; inline
+
 : or ( obj1 obj2 -- ? ) dupd ? ; inline
 
-: xor ( obj1 obj2 -- ? ) dup not swap ? ; inline
+: xor ( obj1 obj2 -- ? ) [ f swap ? ] when* ; inline
 
 : both? ( x y quot -- ? ) bi@ and ; inline
 
@@ -186,6 +186,10 @@ M: callstack clone (clone) ;
 ! throw errors before continuations are loaded
 : throw ( error -- * ) 5 getenv [ die ] or 1 (throw) ;
 
+ERROR: assert got expect ;
+
+: assert= ( a b -- ) 2dup = [ 2drop ] [ assert ] if ;
+
 <PRIVATE
 
 : hi-tag ( obj -- n ) 0 slot ; inline
@@ -195,16 +199,3 @@ M: callstack clone (clone) ;
 : do-primitive ( number -- ) "Improper primitive call" throw ;
 
 PRIVATE>
-
-! Deprecated
-M: object delegate drop f ;
-
-GENERIC# get-slots 1 ( tuple slots -- ... )
-
-GENERIC# set-slots 1 ( ... tuple slots -- )
-
-: construct ( ... slots class -- tuple )
-    new [ swap set-slots ] keep ; inline
-
-: construct-delegate ( delegate class -- tuple )
-    >r { set-delegate } r> construct ; inline

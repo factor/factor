@@ -1,7 +1,7 @@
 USING: arrays generic assocs kernel math namespaces
 sequences tools.test words definitions parser quotations
 vocabs continuations classes.tuple compiler.units
-io.streams.string accessors ;
+io.streams.string accessors eval ;
 IN: words.tests
 
 [ 4 ] [
@@ -37,7 +37,7 @@ DEFER: plist-test
 ] with-scope
 
 [ "test-scope" ] [
-    "test-scope" "scratchpad" lookup word-name
+    "test-scope" "scratchpad" lookup name>> 
 ] unit-test
 
 [ t ] [ vocabs array? ] unit-test
@@ -120,7 +120,7 @@ DEFER: x
 [ f ] [ "no-loc-2" "words.tests" lookup where ] unit-test
 
 [ ] [ "IN: words.tests : test-last ( -- ) ;" eval ] unit-test
-[ "test-last" ] [ word word-name ] unit-test
+[ "test-last" ] [ word name>> ] unit-test
 
 ! regression
 SYMBOL: quot-uses-a
@@ -183,3 +183,16 @@ SYMBOL: quot-uses-b
 [ t ] [ "decl-forget-test" "words.tests" lookup "flushable" word-prop ] unit-test
 [ ] [ "IN: words.tests : decl-forget-test ;" eval ] unit-test
 [ f ] [ "decl-forget-test" "words.tests" lookup "flushable" word-prop ] unit-test
+
+[ { } ]
+[
+    all-words [
+        "compiled-uses" word-prop
+        keys [ "forgotten" word-prop ] contains?
+    ] filter
+] unit-test
+
+[ { } ] [
+    crossref get keys
+    [ word? ] filter [ "forgotten" word-prop ] filter
+] unit-test

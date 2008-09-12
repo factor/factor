@@ -1,4 +1,4 @@
-USING: arrays byte-arrays bit-arrays help.markup
+USING: arrays byte-arrays help.markup
 help.syntax kernel sbufs strings quotations sequences.private
 vectors.private combinators ;
 IN: vectors
@@ -29,11 +29,6 @@ HELP: <vector>
 HELP: >vector
 { $values { "seq" "a sequence" } { "vector" vector } }
 { $description "Outputs a freshly-allocated vector with the same elements as a given sequence." } ;
-
-HELP: array>vector
-{ $values { "array" "an array" } { "length" "a non-negative integer" } { "vector" vector } }
-{ $description "Creates a new vector using the array for underlying storage with the specified initial length." }
-{ $warning "This word is in the " { $vocab-link "vectors.private" } " vocabulary because it does not perform type or bounds checks. User code should call " { $link >vector } " instead." } ;
 
 HELP: 1vector
 { $values { "x" object } { "vector" vector } }
