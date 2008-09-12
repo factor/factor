@@ -1,5 +1,6 @@
 USING: editors hardware-info.windows io.files io.launcher
-kernel math.parser namespaces sequences windows.shell32 ;
+kernel math.parser namespaces sequences windows.shell32
+make ;
 IN: editors.emeditor
 
 : emeditor-path ( -- path )
