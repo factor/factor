@@ -416,7 +416,7 @@ make_boot_image() {
 
 install_build_system_apt() {
     ensure_program_installed yes
-    yes | sudo apt-get install sudo libc6-dev libfreetype6-dev libx11-dev xorg-dev glutg3-dev wget git-core git-doc rlwrap gcc make
+    sudo apt-get --yes install sudo libc6-dev libfreetype6-dev libx11-dev xorg-dev glutg3-dev wget git-core git-doc rlwrap gcc make
     check_ret sudo
 }
 
