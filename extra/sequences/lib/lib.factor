@@ -31,9 +31,6 @@ IN: sequences.lib
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: map-reduce ( seq map-quot reduce-quot -- result )
-    >r [ unclip ] dip [ call ] keep r> compose reduce ; inline
-
 : reduce* ( seq quot -- result ) [ ] swap map-reduce ; inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
