@@ -1,13 +1,14 @@
 IN: compiler.tree.escape-analysis.tests
 USING: compiler.tree.escape-analysis
 compiler.tree.escape-analysis.allocations compiler.tree.builder
-compiler.tree.normalization math.functions
-compiler.tree.propagation compiler.tree.cleanup
-compiler.tree.combinators compiler.tree sequences math math.private
-kernel tools.test accessors slots.private quotations.private
-prettyprint classes.tuple.private classes classes.tuple
-compiler.intrinsics namespaces compiler.tree.propagation.info
-stack-checker.errors kernel.private ;
+compiler.tree.recursive compiler.tree.normalization
+math.functions compiler.tree.propagation compiler.tree.cleanup
+compiler.tree.combinators compiler.tree sequences math
+math.private kernel tools.test accessors slots.private
+quotations.private prettyprint classes.tuple.private classes
+classes.tuple compiler.intrinsics namespaces
+compiler.tree.propagation.info stack-checker.errors
+kernel.private ;
 
 \ escape-analysis must-infer
 
@@ -28,6 +29,7 @@ M: node count-unboxed-allocations* drop ;
 
 : count-unboxed-allocations ( quot -- sizes )
     build-tree
+    analyze-recursive
     normalize
     propagate
     cleanup

@@ -1,5 +1,8 @@
 IN: compiler.tree.normalization.tests
-USING: compiler.tree.builder compiler.tree.normalization
+USING: compiler.tree.builder compiler.tree.recursive
+compiler.tree.normalization
+compiler.tree.normalization.introductions
+compiler.tree.normalization.renaming
 compiler.tree compiler.tree.checker
 sequences accessors tools.test kernel math ;
 
@@ -22,27 +25,30 @@ sequences accessors tools.test kernel math ;
 [ 0 2 ] [
     [ foo ] build-tree
     [ recursive-inputs ]
-    [ normalize recursive-inputs ] bi
+    [ analyze-recursive normalize recursive-inputs ] bi
 ] unit-test
 
-[ ] [ [ [ 1 ] [ 2 ] if + * ] build-tree normalize check-nodes ] unit-test
+: test-normalization ( quot -- )
+    build-tree analyze-recursive normalize check-nodes ;
+
+[ ] [ [ [ 1 ] [ 2 ] if + * ] test-normalization ] unit-test
 
 DEFER: bbb
 : aaa ( x -- ) dup [ dup >r bbb r> aaa ] [ drop ] if ; inline recursive
 : bbb ( x -- ) >r drop 0 r> aaa ; inline recursive
 
-[ ] [ [ bbb ] build-tree normalize check-nodes ] unit-test
+[ ] [ [ bbb ] test-normalization ] unit-test
 
 : ccc ( -- ) ccc drop 1 ; inline recursive
 
-[ ] [ [ ccc ] build-tree normalize check-nodes ] unit-test
+[ ] [ [ ccc ] test-normalization ] unit-test
 
 DEFER: eee
 : ddd ( -- ) eee ; inline recursive
 : eee ( -- ) swap ddd ; inline recursive
 
-[ ] [ [ eee ] build-tree normalize check-nodes ] unit-test
+[ ] [ [ eee ] test-normalization ] unit-test
 
 : call-recursive-5 ( -- ) call-recursive-5 ; inline recursive
 
-[ ] [ [ call-recursive-5 swap ] build-tree normalize check-nodes ] unit-test
+[ ] [ [ call-recursive-5 swap ] test-normalization ] unit-test

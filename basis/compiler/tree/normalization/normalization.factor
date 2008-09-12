@@ -6,7 +6,9 @@ stack-checker.backend
 stack-checker.branches
 stack-checker.inlining
 compiler.tree
-compiler.tree.combinators ;
+compiler.tree.combinators
+compiler.tree.normalization.introductions
+compiler.tree.normalization.renaming ;
 IN: compiler.tree.normalization
 
 ! A transform pass done before optimization can begin to
@@ -15,9 +17,6 @@ IN: compiler.tree.normalization
 ! - We rewrite the code so that all #introduce nodes are
 ! replaced with a single one, at the beginning of a program.
 ! This simplifies subsequent analysis.
-!
-! - We collect #return-recursive and #call-recursive nodes and
-! store them in the #recursive's label slot.
 !
 ! - We normalize #call-recursive as follows. The stack checker
 ! says that the inputs of a #call-recursive are the entire stack
@@ -28,93 +27,6 @@ IN: compiler.tree.normalization
 ! #call-recursive into a #copy of the unchanged values and a
 ! #call-recursive with trimmed inputs and outputs.
 
-! Collect introductions
-SYMBOL: introductions
-
-GENERIC: count-introductions* ( node -- )
-
-: count-introductions ( nodes -- n )
-    #! Note: we use each, not each-node, since the #branch
-    #! method recurses into children directly and we don't
-    #! recurse into #recursive at all.
-    [
-        0 introductions set
-        [ count-introductions* ] each
-        introductions get
-    ] with-scope ;
-
-: introductions+ ( n -- ) introductions [ + ] change ;
-
-M: #introduce count-introductions*
-    out-d>> length introductions+ ;
-
-M: #branch count-introductions*
-    children>>
-    [ count-introductions ] map supremum
-    introductions+ ;
-
-M: #recursive count-introductions*
-    [ label>> ] [ child>> count-introductions ] bi
-    >>introductions
-    drop ;
-
-M: node count-introductions* drop ;
-
-! Collect label info
-GENERIC: collect-label-info ( node -- )
-
-M: #return-recursive collect-label-info
-    dup label>> (>>return) ;
-
-M: #call-recursive collect-label-info
-    dup label>> calls>> push ;
-
-M: #recursive collect-label-info
-    label>> V{ } clone >>calls drop ;
-
-M: node collect-label-info drop ;
-
-! Rename
-SYMBOL: rename-map
-
-: rename-value ( value -- value' )
-    [ rename-map get at ] keep or ;
-
-: rename-values ( values -- values' )
-    rename-map get '[ [ _ at ] keep or ] map ;
-
-GENERIC: rename-node-values* ( node -- node )
-
-M: #introduce rename-node-values* ;
-
-M: #shuffle rename-node-values*
-    [ rename-values ] change-in-d
-    [ [ rename-value ] assoc-map ] change-mapping ;
-
-M: #push rename-node-values* ;
-
-M: #r> rename-node-values*
-    [ rename-values ] change-in-r ;
-
-M: #terminate rename-node-values*
-    [ rename-values ] change-in-d
-    [ rename-values ] change-in-r ;
-
-M: #phi rename-node-values*
-    [ [ rename-values ] map ] change-phi-in-d ;
-
-M: #declare rename-node-values*
-    [ [ [ rename-value ] dip ] assoc-map ] change-declaration ;
-
-M: #alien-callback rename-node-values* ;
-
-M: node rename-node-values*
-    [ rename-values ] change-in-d ;
-
-: rename-node-values ( nodes -- nodes' )
-    dup [ rename-node-values* drop ] each-node ;
-
-! Normalize
 GENERIC: normalize* ( node -- node' )
 
 SYMBOL: introduction-stack
@@ -124,10 +36,6 @@ SYMBOL: introduction-stack
 
 : pop-introductions ( n -- values )
     introduction-stack [ swap cut* swap ] change ;
-
-: add-renamings ( old new -- )
-    [ rename-values ] dip
-    rename-map get '[ _ set-at ] 2each ;
 
 M: #introduce normalize*
     out-d>> [ length pop-introductions ] keep add-renamings f ;
@@ -201,9 +109,8 @@ M: #call-recursive normalize*
 M: node normalize* ;
 
 : normalize ( nodes -- nodes' )
-    H{ } clone rename-map set
-    dup [ collect-label-info ] each-node
     dup count-introductions make-values
+    H{ } clone rename-map set
     [ (normalize) ] [ nip ] 2bi
     [ #introduce prefix ] unless-empty
     rename-node-values ;

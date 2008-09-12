@@ -1,5 +1,5 @@
 USING: kernel compiler.tree.builder compiler.tree
-compiler.tree.propagation
+compiler.tree.propagation compiler.tree.recursive
 compiler.tree.normalization tools.test math math.order
 accessors sequences arrays kernel.private vectors
 alien.accessors alien.c-types sequences.private
@@ -14,6 +14,7 @@ IN: compiler.tree.propagation.tests
 
 : final-info ( quot -- seq )
     build-tree
+    analyze-recursive
     normalize
     propagate
     compute-def-use

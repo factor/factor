@@ -6,6 +6,7 @@ classes.algebra classes.union sets quotations assocs combinators
 words namespaces
 compiler.tree
 compiler.tree.builder
+compiler.tree.recursive
 compiler.tree.normalization
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes ;
@@ -18,7 +19,7 @@ M: word splicing-nodes
     [ [ in-d>> ] [ out-d>> ] bi ] dip #call 1array ;
 
 M: quotation splicing-nodes
-    build-sub-tree normalize ;
+    build-sub-tree normalize analyze-recursive ;
 
 : propagate-body ( #call -- )
     body>> (propagate) ;
