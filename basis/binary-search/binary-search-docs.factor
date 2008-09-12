@@ -1,17 +1,6 @@
 IN: binary-search
 USING: help.markup help.syntax sequences kernel math.order ;
 
-ARTICLE: "binary-search" "Binary search"
-"The " { $emphasis "binary search" } " algorithm allows elements to be located in sorted sequence in " { $snippet "O(log n)" } " time."
-{ $subsection search }
-"Variants of sequence words optimized for sorted sequences:"
-{ $subsection sorted-index }
-{ $subsection sorted-member? }
-{ $subsection sorted-memq? }
-{ $see-also "order-specifiers" "sequences-sorting" } ;
-
-ABOUT: "binary-search"
-
 HELP: search
 { $values { "seq" "a sorted sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- <=> )" } } { "i" "an index, or " { $link f } } { "elt" "an element, or " { $link f } } }
 { $description "Performs a binary search on a sequence, calling the quotation to decide whether to end the search (" { $link +eq+ } "), search lower (" { $link +lt+ } ") or search higher (" { $link +gt+ } ")."
@@ -41,3 +30,14 @@ HELP: sorted-memq?
 { $description "Tests if the sorted sequence contains " { $snippet "elt" } ". Equality is tested with " { $link eq? } "." } ;
 
 { memq? sorted-memq? } related-words
+
+ARTICLE: "binary-search" "Binary search"
+"The " { $emphasis "binary search" } " algorithm allows elements to be located in sorted sequence in " { $snippet "O(log n)" } " time."
+{ $subsection search }
+"Variants of sequence words optimized for sorted sequences:"
+{ $subsection sorted-index }
+{ $subsection sorted-member? }
+{ $subsection sorted-memq? }
+{ $see-also "order-specifiers" "sequences-sorting" } ;
+
+ABOUT: "binary-search"
