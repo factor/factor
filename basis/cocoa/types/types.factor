@@ -46,6 +46,7 @@ C-STRUCT: NSSize
     { "CGFloat" "h" } ;
 
 TYPEDEF: NSSize _NSSize
+TYPEDEF: NSSize CGSize
 TYPEDEF: NSPoint CGPoint
 
 : <NSSize> ( w h -- size )
