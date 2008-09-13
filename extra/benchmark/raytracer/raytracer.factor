@@ -3,7 +3,7 @@
 
 USING: arrays accessors float-arrays io io.files
 io.encodings.binary kernel math math.functions math.vectors
-math.parser make sequences sequences.private words ;
+math.parser make sequences sequences.private words hints ;
 IN: benchmark.raytracer
 
 ! parameters
@@ -38,34 +38,40 @@ TUPLE: sphere { center float-array read-only } { radius float read-only } ;
 C: <sphere> sphere
 
 : sphere-v ( sphere ray -- v )
-    swap center>> swap orig>> v- ; inline
+    [ center>> ] [ orig>> ] bi* v- ; inline
 
-: sphere-b ( ray v -- b ) swap dir>> v. ; inline
+: sphere-b ( v ray -- b )
+    dir>> v. ; inline
 
-: sphere-disc ( sphere v b -- d )
-    sq swap norm-sq - swap radius>> sq + ; inline
+: sphere-d ( sphere b v -- d )
+    [ radius>> sq ] [ sq ] [ norm-sq ] tri* - + ; inline
 
-: -+ ( x y -- x-y x+y ) [ - ] 2keep + ; inline
+: -+ ( x y -- x-y x+y )
+    [ - ] [ + ] 2bi ; inline
 
-: sphere-b/d ( b d -- t )
+: sphere-t ( b d -- t )
     -+ dup 0.0 <
     [ 2drop 1.0/0.0 ] [ [ [ 0.0 > ] keep ] dip ? ] if ; inline
 
-: ray-sphere ( sphere ray -- t )
-    2dup sphere-v tuck sphere-b [ sphere-disc ] keep
-    over 0.0 < [ 2drop 1.0/0.0 ] [ swap sqrt sphere-b/d ] if ;
-    inline
+: sphere-b&v ( sphere ray -- b v )
+    [ sphere-v ] [ nip ] 2bi
+    [ sphere-b ] [ drop ] 2bi ; inline
 
-: sphere-n ( ray sphere l -- n )
-    pick dir>> n*v swap center>> v- swap orig>> v+ ;
-    inline
+: ray-sphere ( sphere ray -- t )
+    [ drop ] [ sphere-b&v ] 2bi
+    [ drop ] [ sphere-d ] 3bi
+    dup 0.0 < [ 3drop 1/0. ] [ sqrt sphere-t nip ] if ; inline
 
 : if-ray-sphere ( hit ray sphere quot -- hit )
     #! quot: hit ray sphere l -- hit
     [
-        pick lambda>> [ 2dup swap ray-sphere dup ] dip >=
-        [ 3drop ]
-    ] dip if ; inline
+        [ ] [ swap ray-sphere nip ] [ 2drop lambda>> ] 3tri
+        [ drop ] [ < ] 2bi
+    ] dip [ 3drop ] if ; inline
+
+: sphere-n ( ray sphere l -- n )
+    [ [ orig>> ] [ dir>> ] bi ] [ center>> ] [ ] tri*
+    swap [ v*n ] dip v- v+ ; inline
 
 M: sphere intersect-scene ( hit ray sphere -- hit )
     [ [ sphere-n normalize ] keep <hit> nip ] if-ray-sphere ;
@@ -79,21 +85,17 @@ TUPLE: group < sphere { objs array read-only } ;
     swap [ { } make ] dip <group> ; inline
 
 M: group intersect-scene ( hit ray group -- hit )
-    [
-        drop
-        objs>> [ [ tuck ] dip intersect-scene swap ] each
-        drop
-    ] if-ray-sphere ;
+    [ drop objs>> [ intersect-scene ] with each ] if-ray-sphere ;
 
-: initial-hit T{ hit f F{ 0.0 0.0 0.0 } 1.0/0.0 } ; inline
+: initial-hit T{ hit f F{ 0.0 0.0 0.0 } 1/0. } ; inline
 
 : initial-intersect ( ray scene -- hit )
-    initial-hit -rot intersect-scene ; inline
+    [ initial-hit ] 2dip intersect-scene ; inline
 
 : ray-o ( ray hit -- o )
-    over dir>> over lambda>> v*n
-    swap normal>> delta v*n v+
-    swap orig>> v+ ; inline
+    [ [ orig>> ] [ normal>> delta v*n ] bi* ]
+    [ [ dir>> ] [ lambda>> ] bi* v*n ]
+    2bi v+ v+ ; inline
 
 : sray-intersect ( ray scene hit -- ray )
     swap [ ray-o light vneg <ray> ] dip initial-intersect ; inline
@@ -101,10 +103,10 @@ M: group intersect-scene ( hit ray group -- hit )
 : ray-g ( hit -- g ) normal>> light v. ; inline
 
 : cast-ray ( ray scene -- g )
-    2dup initial-intersect dup lambda>> 1.0/0.0 = [
+    2dup initial-intersect dup lambda>> 1/0. = [
         3drop 0.0
     ] [
-        [ sray-intersect lambda>> 1.0/0.0 = ] keep swap
+        [ sray-intersect lambda>> 1/0. = ] keep swap
         [ ray-g neg ] [ drop 0.0 ] if
     ] if ; inline
 
