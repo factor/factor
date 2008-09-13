@@ -3,7 +3,7 @@
 USING: accessors alien alien.c-types alien.strings arrays assocs
 combinators compiler kernel math namespaces make parser
 prettyprint prettyprint.sections quotations sequences strings
-words cocoa.runtime io macros memoize debugger
+words cocoa.runtime io macros memoize debugger fry
 io.encodings.ascii effects compiler.generator libc libc.private ;
 IN: cocoa.messages
 
@@ -201,12 +201,23 @@ assoc-union alien>objc-types set-global
     swap method_getName sel_getName
     objc-methods get set-at ;
 
-: (register-objc-methods) ( methods count -- methods )
-    over [ void*-nth register-objc-method ] curry each ;
+: each-method-in-class ( class quot -- )
+    [ 0 <uint> [ class_copyMethodList ] keep *uint over ] dip
+    '[ _ void*-nth @ ] each (free) ; inline
 
 : register-objc-methods ( class -- )
-    0 <uint> [ class_copyMethodList ] keep *uint 
-    (register-objc-methods) (free) ;
+    [ register-objc-method ] each-method-in-class ;
+
+: method. ( method -- )
+    {
+        [ method_getName sel_getName ]
+        [ method-return-type ]
+        [ method-arg-types ]
+        [ method_getImplementation ]
+    } cleave 4array . ;
+
+: methods. ( class -- )
+    [ method. ] each-method-in-class ;
 
 : class-exists? ( string -- class ) objc_getClass >boolean ;
 
