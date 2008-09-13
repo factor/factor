@@ -14,6 +14,13 @@ IN: regexp2-tests
 [ t ] [ "c" "a|b|c" <regexp> matches? ] unit-test
 [ f ] [ "c" "d|e|f" <regexp> matches? ] unit-test
 
+[ t ] [ "b" "|b" <regexp> matches? ] unit-test
+[ t ] [ "b" "b|" <regexp> matches? ] unit-test
+[ t ] [ "" "b|" <regexp> matches? ] unit-test
+[ t ] [ "" "b|" <regexp> matches? ] unit-test
+[ f ] [ "" "|" <regexp> matches? ] unit-test
+[ f ] [ "" "|||||||" <regexp> matches? ] unit-test
+
 [ f ] [ "aa" "a|b|c" <regexp> matches? ] unit-test
 [ f ] [ "bb" "a|b|c" <regexp> matches? ] unit-test
 [ f ] [ "cc" "a|b|c" <regexp> matches? ] unit-test
