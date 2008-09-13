@@ -39,8 +39,6 @@ GENERIC: store-return-reg ( stack@ reg-class -- )
 HOOK: temp-reg-1 cpu ( -- reg )
 HOOK: temp-reg-2 cpu ( -- reg )
 
-HOOK: address-operand cpu ( address -- operand )
-
 HOOK: fixnum>slot@ cpu ( op -- )
 
 HOOK: prepare-division cpu ( -- )
