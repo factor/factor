@@ -42,11 +42,11 @@ IN: hints
 
 : specialized-def ( word -- quot )
     dup def>> swap {
-        { [ dup standard-method? ] [ specialize-method ] }
         {
             [ dup "specializer" word-prop ]
             [ "specializer" word-prop specialize-quot ]
         }
+        { [ dup standard-method? ] [ specialize-method ] }
         [ drop ]
     } cond ;
 
@@ -54,7 +54,8 @@ IN: hints
     dup [ array? ] all? [ first ] when length ;
 
 : HINTS:
-    scan-word
+    scan-object
+    dup method-spec? [ first2 method ] when
     [ redefined ]
     [ parse-definition "specializer" set-word-prop ] bi ;
     parsing
