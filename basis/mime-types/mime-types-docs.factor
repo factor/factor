@@ -11,7 +11,7 @@ HELP: mime-db
 
 HELP: mime-type
 { $values
-    { "path" "a pathname string" }
+    { "filename" "a filename" }
     { "mime-type" "a MIME type string" } }
 { $description "Outputs the MIME type associtated with a path by parsing the path's file extension and looking it up in the table returned by " { $link mime-types } "." } ;
 
