@@ -10,7 +10,7 @@ compiler.tree.tuple-unboxing
 compiler.tree.identities
 compiler.tree.def-use
 compiler.tree.dead-code
-compiler.tree.strength-reduction
+compiler.tree.modular-arithmetic
 compiler.tree.finalization
 compiler.tree.checker ;
 IN: compiler.tree.optimizer
@@ -27,9 +27,10 @@ SYMBOL: check-optimizer?
     apply-identities
     compute-def-use
     remove-dead-code
-    ! strength-reduce
     check-optimizer? get [
         compute-def-use
         dup check-nodes
     ] when
+    compute-def-use
+    optimize-modular-arithmetic
     finalize ;

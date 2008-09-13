@@ -41,7 +41,7 @@ IN: benchmark.spectral-norm
     ] times ; inline
 
 : spectral-norm ( n -- norm )
-    u/v [ v. ] keep norm-sq /f sqrt ;
+    u/v [ v. ] [ norm-sq ] bi /f sqrt ;
 
 HINTS: spectral-norm fixnum ;
 

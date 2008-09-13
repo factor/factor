@@ -550,7 +550,7 @@ HELP: 2bi
 
 HELP: 3bi
 { $values { "x" object } { "y" object } { "z" object } { "p" "a quotation with stack effect " { $snippet "( x y z -- ... )" } } { "q" "a quotation with stack effect " { $snippet "( x y z -- ... )" } } }
-{ $description "Applies " { $snippet "p" } " to the two input values, then applies " { $snippet "q" } " to the two input values." }
+{ $description "Applies " { $snippet "p" } " to the three input values, then applies " { $snippet "q" } " to the three input values." }
 { $examples
     "If " { $snippet "[ p ]" } " and " { $snippet "[ q ]" } " have stack effect " { $snippet "( x y z -- )" } ", then the following two lines are equivalent:"
     { $code

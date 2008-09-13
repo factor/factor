@@ -10,9 +10,6 @@ IN: sequences.lib.tests
 { { 16 17 18 19 20 } } [ 1 2 3 4 { 6 7 8 9 10 } [ + + + + ] 4 map-withn ] unit-test
 [ { 910 911 912 } ] [ 10 900 3 [ + + ] map-with2 ] unit-test
 
-[ 4 ] [ { 1 2 } [ sq ] [ * ] map-reduce ] unit-test
-[ 36 ] [ { 2 3 } [ sq ] [ * ] map-reduce ] unit-test
-
 [ 10 ] [ { 1 2 3 4 } [ + ] reduce* ] unit-test
 [ 24 ] [ { 1 2 3 4 } [ * ] reduce* ] unit-test
 
