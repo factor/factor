@@ -15,7 +15,7 @@ IN: regexp2.dfa
     eps swap find-delta ;
 
 : find-epsilon-closure ( states regexp -- new-states )
-    '[ dup , (find-epsilon-closure) union ] [ length ] while-changes
+    '[ dup _ (find-epsilon-closure) union ] [ length ] while-changes
     natural-sort ;
 
 : find-closure ( states transition regexp -- new-states )

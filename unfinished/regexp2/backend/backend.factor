@@ -21,7 +21,6 @@ TUPLE: regexp
     0 >>state
     V{ } clone >>stack
     V{ } clone >>new-states
-    H{ } clone >>options
     H{ } clone >>visited-states ;
 
 SYMBOL: current-regexp
