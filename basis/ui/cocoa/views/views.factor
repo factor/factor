@@ -133,7 +133,7 @@ CLASS: {
 }
 
 ! Events
-{ "acceptsFirstMouse:" "bool" { "id" "SEL" "id" }
+{ "acceptsFirstMouse:" "char" { "id" "SEL" "id" }
     [ 3drop 1 ]
 }
 
@@ -251,7 +251,7 @@ CLASS: {
 
 ! "rotateWithEvent:" "void" { "id" "SEL" "id" }}
 
-{ "acceptsFirstResponder" "bool" { "id" "SEL" }
+{ "acceptsFirstResponder" "char" { "id" "SEL" }
     [ 2drop 1 ]
 }
 
@@ -264,26 +264,26 @@ CLASS: {
     ]
 }
 
-{ "writeSelectionToPasteboard:types:" "bool" { "id" "SEL" "id" "id" }
+{ "writeSelectionToPasteboard:types:" "char" { "id" "SEL" "id" "id" }
     [
         CF>string-array NSStringPboardType swap member? [
             >r drop window-focus gadget-selection dup [
-                r> set-pasteboard-string t
+                r> set-pasteboard-string 1
             ] [
-                r> 2drop f
+                r> 2drop 0
             ] if
         ] [
-            3drop f
+            3drop 0
         ] if
     ]
 }
 
-{ "readSelectionFromPasteboard:" "bool" { "id" "SEL" "id" }
+{ "readSelectionFromPasteboard:" "char" { "id" "SEL" "id" }
     [
         pasteboard-string dup [
-            >r drop window-focus r> swap user-input t
+            >r drop window-focus r> swap user-input 1
         ] [
-            3drop f
+            3drop 0
         ] if
     ]
 }
@@ -293,7 +293,7 @@ CLASS: {
     [ [ nip send-user-input ] ui-try ]
 }
 
-{ "hasMarkedText" "bool" { "id" "SEL" }
+{ "hasMarkedText" "char" { "id" "SEL" }
     [ 2drop 0 ]
 }
 
@@ -321,7 +321,7 @@ CLASS: {
     [ 3drop f ]
 }
 
-{ "characterIndexForPoint:" "uint" { "id" "SEL" "NSPoint" }
+{ "characterIndexForPoint:" "NSUInteger" { "id" "SEL" "NSPoint" }
     [ 3drop 0 ]
 }
 
@@ -394,9 +394,9 @@ CLASS: {
     ]
 }
 
-{ "windowShouldClose:" "bool" { "id" "SEL" "id" }
+{ "windowShouldClose:" "char" { "id" "SEL" "id" }
     [
-        3drop t
+        3drop 1
     ]
 }
 

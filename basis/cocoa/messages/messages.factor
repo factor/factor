@@ -117,7 +117,7 @@ H{
     { "*" "char*" }
     { "?" "unknown_type" }
     { "@" "id" }
-    { "#" "id" }
+    { "#" "Class" }
     { ":" "SEL" }
 }
 "ptrdiff_t" heap-size {
