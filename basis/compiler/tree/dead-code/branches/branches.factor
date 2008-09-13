@@ -36,7 +36,7 @@ M: #branch remove-dead-code*
     '[ _ nth _ key? ] filter ; inline
 
 : drop-indexed-values ( values indices -- node )
-    [ drop filter-live ] [ nths ] 2bi
+    [ drop filter-live ] [ swap nths ] 2bi
     [ make-values ] keep
     [ drop ] [ zip ] 2bi
     #shuffle ;

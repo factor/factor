@@ -1,13 +1,21 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel assocs fry match accessors namespaces make effects
+USING: kernel assocs match fry accessors namespaces make effects
 sequences sequences.private quotations generic macros arrays
 prettyprint prettyprint.backend prettyprint.sections math words
-combinators io sorting hints
+combinators io sorting hints qualified
 compiler.tree
+compiler.tree.recursive
+compiler.tree.normalization
+compiler.tree.cleanup
+compiler.tree.propagation
+compiler.tree.propagation.info
+compiler.tree.def-use
 compiler.tree.builder
 compiler.tree.optimizer
-compiler.tree.combinators ;
+compiler.tree.combinators
+compiler.tree.checker ;
+RENAME: _ match => __
 IN: compiler.tree.debugger
 
 ! A simple tool for turning tree IR into quotations and
@@ -42,7 +50,7 @@ MATCH-VARS: ?a ?b ?c ;
         { { { ?a ?b ?c } { ?b ?c ?a } } [ rot ] }
         { { { ?a ?b } { ?b } } [ nip ] }
         { { { ?a ?b ?c } { ?c } } [ 2nip ] }
-        { _ f }
+        { __ f }
     } match-choose ;
 
 TUPLE: shuffle-node { effect effect } ;
@@ -146,3 +154,32 @@ SYMBOL: node-count
 
 : optimizer-report. ( word -- )
     make-report report. ;
+
+! More utilities
+
+: final-info ( quot -- seq )
+    build-tree
+    analyze-recursive
+    normalize
+    propagate
+    compute-def-use
+    dup check-nodes
+    peek node-input-infos ;
+
+: final-classes ( quot -- seq )
+    final-info [ class>> ] map ;
+
+: final-literals ( quot -- seq )
+    final-info [ literal>> ] map ;
+
+: cleaned-up-tree ( quot -- nodes )
+    [
+        check-optimizer? on
+        build-tree optimize-tree 
+    ] with-scope ;
+
+: inlined? ( quot seq/word -- ? )
+    [ cleaned-up-tree ] dip
+    dup word? [ 1array ] when
+    '[ dup #call? [ word>> _ member? ] [ drop f ] if ]
+    contains-node? not ;

@@ -13,10 +13,8 @@ compiler.tree.builder
 compiler.tree.recursive
 compiler.tree.normalization
 compiler.tree.propagation
-compiler.tree.checker ;
-
-: cleaned-up-tree ( quot -- nodes )
-    build-tree analyze-recursive normalize propagate cleanup dup check-nodes ;
+compiler.tree.checker
+compiler.tree.debugger ;
 
 [ t ] [ [ [ 1 ] [ 2 ] if ] cleaned-up-tree [ #if? ] contains-node? ] unit-test
 
@@ -33,12 +31,6 @@ compiler.tree.checker ;
 [ f ] [ [ f recursive-test ] cleaned-up-tree [ #recursive? ] contains-node? ] unit-test
 
 [ t ] [ [ t recursive-test ] cleaned-up-tree [ #recursive? ] contains-node? ] unit-test
-
-: inlined? ( quot seq/word -- ? )
-    [ cleaned-up-tree ] dip
-    dup word? [ 1array ] when
-    '[ dup #call? [ word>> _ member? ] [ drop f ] if ]
-    contains-node? not ;
 
 [ f ] [
     [ { integer } declare >fixnum ]
@@ -497,4 +489,8 @@ cell-bits 32 = [
 [ t ] [
     [ 2 swap >fixnum ribs ]
     { <-integer-fixnum +-integer-fixnum } inlined?
+] unit-test
+
+[ t ] [
+    [ hashtable new ] \ new inlined?
 ] unit-test
