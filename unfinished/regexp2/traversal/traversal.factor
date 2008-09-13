@@ -45,7 +45,9 @@ TUPLE: dfa-traverser
     ] when text-finished? ;
 
 : increment-state ( dfa-traverser state -- dfa-traverser )
-    >r [ 1+ ] change-current-index dup current-state>> >>last-state r>
+    [
+        [ 1+ ] change-current-index dup current-state>> >>last-state
+    ] dip
     first >>current-state ;
 
 : match-failed ( dfa-traverser -- dfa-traverser )

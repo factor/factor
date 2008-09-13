@@ -291,6 +291,8 @@ ERROR: bad-escaped-literals seq ;
         { CHAR: f [ HEX: c <constant> ] }
         { CHAR: a [ HEX: 7 <constant> ] }
         { CHAR: e [ HEX: 1b <constant> ] }
+        { CHAR: $ [ CHAR: $ <constant> ] }
+        { CHAR: ^ [ CHAR: ^ <constant> ] }
 
         { CHAR: d [ digit-class ] }
         { CHAR: D [ digit-class <negation> ] }
