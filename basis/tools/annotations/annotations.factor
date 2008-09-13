@@ -55,11 +55,12 @@ M: word reset
     dup [ (watch) ] annotate ;
 
 : (watch-vars) ( quot word vars -- newquot )
-    [
-        "--- Entering: " write swap .
-        "--- Variable values:" print
-        [ dup get ] H{ } map>assoc describe
-    ] 2curry prepose ;
+    rot
+   '[
+        "--- Entering: "       write _ .
+        "--- Variable values:" print _ [ dup get ] H{ } map>assoc describe
+        @
+    ] ;
 
 : watch-vars ( word vars -- )
     dupd [ (watch-vars) ] 2curry annotate ;
