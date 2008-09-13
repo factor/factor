@@ -3,7 +3,7 @@
 USING: accessors kernel arrays sequences math math.order
 math.partial-dispatch generic generic.standard generic.math
 classes.algebra classes.union sets quotations assocs combinators
-words namespaces
+words namespaces continuations
 compiler.tree
 compiler.tree.builder
 compiler.tree.recursive
@@ -33,7 +33,7 @@ M: quotation splicing-nodes
     body>> (propagate) ;
 
 ! Dispatch elimination
-: eliminate-dispatch ( #call class/f word/f -- ? )
+: eliminate-dispatch ( #call class/f word/quot/f -- ? )
     dup [
         [ >>class ] dip
         over method>> over = [ drop ] [
@@ -156,12 +156,19 @@ SYMBOL: history
 : always-inline-word? ( word -- ? )
     { curry compose } memq? ;
 
+: custom-inlining? ( word -- ? )
+    "custom-inlining" word-prop ;
+
+: inline-custom ( #call word -- ? )
+    [ dup 1array ] [ "custom-inlining" word-prop ] bi* with-datastack
+    first object swap eliminate-dispatch ;
+
 : do-inlining ( #call word -- ? )
     {
+        { [ dup custom-inlining? ] [ inline-custom ] }
         { [ dup always-inline-word? ] [ inline-word ] }
         { [ dup standard-generic? ] [ inline-standard-method ] }
         { [ dup math-generic? ] [ inline-math-method ] }
-        { [ dup math-partial? ] [ inline-math-partial ] }
         { [ dup method-body? ] [ inline-method-body ] }
         [ 2drop f ]
     } cond ;

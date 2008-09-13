@@ -250,11 +250,11 @@ unit-test
 [ 50 ] [ 100 [ even? ] count ] unit-test
 [ 50 ] [ 100 [ odd?  ] count ] unit-test
 
-[ { "b" "d" } ] [ { "a" "b" "c" "d" } { 1 3 } nths ] unit-test
-[ { "a" "b" "c" "d" } ] [ { "a" "b" "c" "d" } { 0 1 2 3 } nths ] unit-test
-[ { "d" "c" "b" "a" } ] [ { "a" "b" "c" "d" } { 3 2 1 0 } nths ] unit-test
-[ { "d" "a" "b" "c" } ] [ { "a" "b" "c" "d" } { 3 0 1 2 } nths ] unit-test
-
+[ { "b" "d" } ] [ { 1 3 } { "a" "b" "c" "d" } nths ] unit-test
+[ { "a" "b" "c" "d" } ] [ { 0 1 2 3 } { "a" "b" "c" "d" } nths ] unit-test
+[ { "d" "c" "b" "a" } ] [ { 3 2 1 0 } { "a" "b" "c" "d" } nths ] unit-test
+[ { "d" "a" "b" "c" } ] [ { 3 0 1 2 } { "a" "b" "c" "d" } nths ] unit-test
+                          
 TUPLE: bogus-hashcode ;
 
 M: bogus-hashcode hashcode* 2drop 0 >bignum ;
@@ -265,6 +265,6 @@ M: bogus-hashcode hashcode* 2drop 0 >bignum ;
 
 [ { 1 3 7 } ] [ 2 { 1 3 5 7 } remove-nth ] unit-test
 
-[ { 1 3 "X" 5 7 } ] [ "X" 2 { 1 3 5 7 } insert-nth ] 
+[ { 1 3 "X" 5 7 } ] [ "X" 2 { 1 3 5 7 } insert-nth ] unit-test
 
 [ V{ 0 2 } ] [ "a" { "a" "b" "a" } indices ] unit-test

@@ -64,14 +64,6 @@ GENERIC: cleanup* ( node -- node/nodes )
     ] [ body>> cleanup ] bi ;
 
 ! Removing overflow checks
-: no-overflow-variant ( op -- fast-op )
-    H{
-        { fixnum+ fixnum+fast }
-        { fixnum- fixnum-fast }
-        { fixnum* fixnum*fast }
-        { fixnum-shift fixnum-shift-fast }
-    } at ;
-
 : (remove-overflow-check?) ( #call -- ? )
     node-output-infos first class>> fixnum class<= ;
 

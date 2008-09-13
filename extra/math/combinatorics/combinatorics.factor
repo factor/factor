@@ -39,7 +39,7 @@ PRIVATE>
     twiddle [ nPk ] keep factorial / ;
 
 : permutation ( n seq -- seq )
-    tuck permutation-indices nths ;
+    tuck permutation-indices swap nths ;
 
 : all-permutations ( seq -- seq )
     [

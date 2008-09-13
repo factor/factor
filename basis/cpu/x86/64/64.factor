@@ -33,13 +33,6 @@ M: float-regs vregs
 M: float-regs param-regs
     drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 
-M: x86.64 address-operand ( address -- operand )
-    #! On AMD64, we have to load 64-bit addresses into a
-    #! scratch register first. The usage of R11 here is a hack.
-    #! This word can only be called right before a subroutine
-    #! call, where all vregs have been flushed anyway.
-    temp-reg v>operand [ swap MOV ] keep ;
-
 M: x86.64 fixnum>slot@ drop ;
 
 M: x86.64 prepare-division CQO ;
@@ -49,8 +42,8 @@ M: x86.64 load-indirect ( literal reg -- )
 
 M: stack-params %load-param-reg
     drop
-    >r temp-reg v>operand swap stack@ MOV
-    r> stack@ temp-reg v>operand MOV ;
+    >r R11 swap stack@ MOV
+    r> stack@ R11 MOV ;
 
 M: stack-params %save-param-reg
     >r stack-frame* + cell + swap r> %load-param-reg ;
@@ -138,7 +131,9 @@ M: x86.64 %alien-global
     [ 0 MOV rc-absolute-cell rel-dlsym ] [ dup [] MOV ] bi ;
 
 M: x86.64 %alien-invoke
-    0 address-operand >r rc-absolute-cell rel-dlsym r> CALL ;
+    R11 0 MOV
+    rc-absolute-cell rel-dlsym
+    R11 CALL ;
 
 M: x86.64 %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke

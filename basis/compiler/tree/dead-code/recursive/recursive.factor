@@ -84,7 +84,7 @@ M:: #recursive remove-dead-code* ( node -- nodes )
             drop-outputs [ node drop-recursive-outputs ] |
          node [ (remove-dead-code) ] change-child drop
          node label>> [ filter-live ] change-enter-out drop
-         drop-inputs node drop-outputs 3array
+         { drop-inputs node drop-outputs }
     ] ;
 
 M: #return-recursive remove-dead-code* ;

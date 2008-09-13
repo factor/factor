@@ -20,9 +20,24 @@ HELP: specialized-def
 { $description "Outputs the definition of a word after it has been split into specialized branches. This is the definition which will actually be compiled by the compiler." } ;
 
 HELP: HINTS:
-{ $values { "word" word } { "hints..." "a list of sequences of classes" } }
-{ $description "Defines specialization hints for each words. Each sequence of classes in the list will cause a specialized version of the word to be compiled." }
+{ $values { "defspec" "a definition specifier" } { "hints..." "a list of sequences of classes" } }
+{ $description "Defines specialization hints for a word or a method."
+$nl
+"Each sequence of classes in the list will cause a specialized version of the word to be compiled." }
 { $examples "The " { $link append } " word has a specializer for the very common case where two strings or two arrays are appended:"
-{ $code "HINTS: append { string string } { array array } ;" } } ;
+{ $code "HINTS: append { string string } { array array } ;" }
+"Specializers can also be defined on methods:"
+{ $code
+    "GENERIC: count-occurrences ( elt obj -- n )"
+    ""
+    "M: sequence count-occurrences [ = ] with count ;"
+    ""
+    "M: assoc count-occurrences"
+    "    swap [ = nip ] curry assoc-filter assoc-size ;"
+    ""
+    "HINTS: { sequence count-occurrences } { object array } ;"
+    "HINTS: { assoc count-occurrences } { object hashtable } ;"
+}
+} ;
 
 ABOUT: "hints"
