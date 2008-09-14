@@ -31,3 +31,7 @@ IN: regexp2.parser
 [ ] [ "[a-c]" test-regexp ] unit-test
 [ ] [ "[^a-c]" test-regexp ] unit-test
 [ "[^]" test-regexp ] must-fail
+
+[ ] [ "|b" test-regexp ] unit-test
+[ ] [ "b|" test-regexp ] unit-test
+[ ] [ "||" test-regexp ] unit-test

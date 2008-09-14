@@ -38,7 +38,7 @@ HELP: quotable?
 { $description "Tests for characters which may appear in a Factor string literal without escaping." } ;
 
 ARTICLE: "ascii" "ASCII character classes"
-"Traditional ASCII character classes:"
+"The " { $vocab-link "ascii" } " vocabulary implements traditional ASCII character classes:"
 { $subsection blank? }
 { $subsection letter? }
 { $subsection LETTER? }

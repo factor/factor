@@ -330,3 +330,5 @@ M:: sequence method-with-locals ( a -- y ) a reverse ;
 
 [ T{ slice f 0 3 "abc" } ]
 [ 0 3 "abc" [| from to seq | T{ slice f from to seq } ] call ] unit-test
+
+{ 3 1 } [| from to seq | T{ slice f from to seq } ] must-infer-as

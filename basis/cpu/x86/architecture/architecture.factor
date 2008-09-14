@@ -39,8 +39,6 @@ GENERIC: store-return-reg ( stack@ reg-class -- )
 HOOK: temp-reg-1 cpu ( -- reg )
 HOOK: temp-reg-2 cpu ( -- reg )
 
-HOOK: address-operand cpu ( address -- operand )
-
 HOOK: fixnum>slot@ cpu ( op -- )
 
 HOOK: prepare-division cpu ( -- )
@@ -140,21 +138,6 @@ M: x86 small-enough? ( n -- ? )
 : %tag-fixnum ( reg -- ) tag-bits get SHL ;
 
 : temp@ ( n -- op ) stack-reg \ stack-frame get rot - [+] ;
-
-HOOK: %unbox-struct-1 cpu ( -- )
-
-HOOK: %unbox-struct-2 cpu ( -- )
-
-M: x86 %unbox-small-struct ( size -- )
-    #! Alien must be in EAX.
-    cell align cell /i {
-        { 1 [ %unbox-struct-1 ] }
-        { 2 [ %unbox-struct-2 ] }
-    } case ;
-
-M: x86 struct-small-enough? ( size -- ? )
-    { 1 2 4 8 } member?
-    os { linux netbsd solaris } member? not and ;
 
 M: x86 %return ( -- ) 0 %unwind ;
 

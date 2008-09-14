@@ -6,26 +6,12 @@ alien.accessors alien.c-types sequences.private
 byte-arrays classes.algebra classes.tuple.private
 math.functions math.private strings layouts
 compiler.tree.propagation.info compiler.tree.def-use
-compiler.tree.checker slots.private words hashtables
-classes assocs ;
+compiler.tree.debugger compiler.tree.checker
+slots.private words hashtables classes assocs locals
+float-arrays ;
 IN: compiler.tree.propagation.tests
 
 \ propagate must-infer
-
-: final-info ( quot -- seq )
-    build-tree
-    analyze-recursive
-    normalize
-    propagate
-    compute-def-use
-    dup check-nodes
-    peek node-input-infos ;
-
-: final-classes ( quot -- seq )
-    final-info [ class>> ] map ;
-
-: final-literals ( quot -- seq )
-    final-info [ literal>> ] map ;
 
 [ V{ } ] [ [ ] final-classes ] unit-test
 
@@ -593,6 +579,16 @@ MIXIN: empty-mixin
 [ V{ POSTPONE: f } ] [
     [ { float } declare 0 eq? ] final-classes
 ] unit-test
+
+[ V{ integer } ] [
+    [ { integer fixnum } declare mod ] final-classes
+] unit-test
+
+[ V{ integer } ] [
+    [ { fixnum integer } declare bitand ] final-classes
+] unit-test
+
+[ V{ float-array } ] [ [| | F{ } ] final-classes ] unit-test
 
 ! [ V{ string } ] [
 !     [ dup string? t xor [ "A" throw ] [ ] if ] final-classes

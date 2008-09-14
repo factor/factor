@@ -71,3 +71,19 @@ DLLEXPORT unsigned long long ffi_test_38(unsigned long long x, unsigned long lon
 struct test_struct_13 { float x1, x2, x3, x4, x5, x6; };
 
 DLLEXPORT int ffi_test_39(long a, long b, struct test_struct_13 s);
+
+struct test_struct_14 { double x1, x2; };
+
+DLLEXPORT struct test_struct_14 ffi_test_40(double x1, double x2);
+
+DLLEXPORT struct test_struct_12 ffi_test_41(int a, double x);
+
+struct test_struct_15 { float x, y; };
+
+DLLEXPORT struct test_struct_15 ffi_test_42(float x, float y);
+
+struct test_struct_16 { float x; int a; };
+
+DLLEXPORT struct test_struct_16 ffi_test_43(float x, int a);
+
+DLLEXPORT struct test_struct_14 ffi_test_44();

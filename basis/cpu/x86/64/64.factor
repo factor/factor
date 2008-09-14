@@ -1,4 +1,4 @@
-! Copyright (C) 2005, 2007 Slava Pestov.
+! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien.c-types arrays cpu.x86.assembler
 cpu.x86.architecture cpu.x86.intrinsics cpu.x86.sse2
@@ -6,7 +6,7 @@ cpu.x86.allot cpu.architecture kernel kernel.private math
 namespaces make sequences compiler.generator
 compiler.generator.registers compiler.generator.fixup system
 layouts alien alien.accessors alien.structs slots splitting
-assocs ;
+assocs combinators ;
 IN: cpu.x86.64
 
 M: x86.64 ds-reg R14 ;
@@ -33,13 +33,6 @@ M: float-regs vregs
 M: float-regs param-regs
     drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 
-M: x86.64 address-operand ( address -- operand )
-    #! On AMD64, we have to load 64-bit addresses into a
-    #! scratch register first. The usage of R11 here is a hack.
-    #! This word can only be called right before a subroutine
-    #! call, where all vregs have been flushed anyway.
-    temp-reg v>operand [ swap MOV ] keep ;
-
 M: x86.64 fixnum>slot@ drop ;
 
 M: x86.64 prepare-division CQO ;
@@ -49,11 +42,49 @@ M: x86.64 load-indirect ( literal reg -- )
 
 M: stack-params %load-param-reg
     drop
-    >r temp-reg v>operand swap stack@ MOV
-    r> stack@ temp-reg v>operand MOV ;
+    >r R11 swap stack@ MOV
+    r> stack@ R11 MOV ;
 
 M: stack-params %save-param-reg
     >r stack-frame* + cell + swap r> %load-param-reg ;
+
+: with-return-regs ( quot -- )
+    [
+        V{ RDX RAX } clone int-regs set
+        V{ XMM1 XMM0 } clone float-regs set
+        call
+    ] with-scope ; inline
+
+! The ABI for passing structs by value is pretty messed up
+<< "void*" c-type clone "__stack_value" define-primitive-type
+stack-params "__stack_value" c-type (>>reg-class) >>
+
+: struct-types&offset ( struct-type -- pairs )
+    fields>> [
+        [ type>> ] [ offset>> ] bi 2array
+    ] map ;
+
+: split-struct ( pairs -- seq )
+    [
+        [ 8 mod zero? [ t , ] when , ] assoc-each
+    ] { } make { t } split harvest ;
+
+: flatten-small-struct ( c-type -- seq )
+    struct-types&offset split-struct [
+        [ c-type c-type-reg-class ] map
+        int-regs swap member? "void*" "double" ? c-type
+    ] map ;
+
+: flatten-large-struct ( c-type -- seq )
+    heap-size cell align
+    cell /i "__stack_value" c-type <repetition> ;
+
+M: struct-type flatten-value-type ( type -- seq )
+    dup heap-size 16 > [
+        flatten-large-struct
+    ] [
+        flatten-small-struct
+    ] if ;
 
 M: x86.64 %prepare-unbox ( -- )
     ! First parameter is top of stack
@@ -69,22 +100,26 @@ M: x86.64 %unbox ( n reg-class func -- )
 M: x86.64 %unbox-long-long ( n func -- )
     int-regs swap %unbox ;
 
-M: x86.64 %unbox-struct-1 ( -- )
-    #! Alien must be in RDI.
-    "alien_offset" f %alien-invoke
-    ! Load first cell
-    RAX RAX [] MOV ;
+: %unbox-struct-field ( c-type i -- )
+    ! Alien must be in RDI.
+    RDI swap cells [+] swap reg-class>> {
+        { int-regs [ int-regs get pop swap MOV ] }
+        { double-float-regs [ float-regs get pop swap MOVSD ] }
+    } case ;
 
-M: x86.64 %unbox-struct-2 ( -- )
-    #! Alien must be in RDI.
+M: x86.64 %unbox-small-struct ( c-type -- )
+    ! Alien must be in RDI.
     "alien_offset" f %alien-invoke
-    ! Load second cell
-    RDX RAX cell [+] MOV
-    ! Load first cell
-    RAX RAX [] MOV ;
+    ! Move alien_offset() return value to RDI so that we don't
+    ! clobber it.
+    RDI RAX MOV
+    [
+        flatten-small-struct [ %unbox-struct-field ] each-index
+    ] with-return-regs ;
 
-M: x86.64 %unbox-large-struct ( n size -- )
+M: x86.64 %unbox-large-struct ( n c-type -- )
     ! Source is in RDI
+    heap-size
     ! Load destination address
     RSI RSP roll [+] LEA
     ! Load structure size
@@ -107,20 +142,33 @@ M: x86.64 %box ( n reg-class func -- )
 M: x86.64 %box-long-long ( n func -- )
     int-regs swap %box ;
 
-M: x86.64 struct-small-enough? ( size -- ? ) 2 cells <= ;
+M: x86.64 struct-small-enough? ( size -- ? )
+    heap-size 2 cells <= ;
 
-M: x86.64 %box-small-struct ( size -- )
-    #! Box a <= 16-byte struct returned in RAX:RDX.
-    RDI RAX MOV
-    RSI RDX MOV
-    RDX swap MOV
-    "box_small_struct" f %alien-invoke ;
+: box-struct-field@ ( i -- operand ) RSP swap 1+ cells [+] ;
+
+: %box-struct-field ( c-type i -- )
+    box-struct-field@ swap reg-class>> {
+        { int-regs [ int-regs get pop MOV ] }
+        { double-float-regs [ float-regs get pop MOVSD ] }
+    } case ;
+
+M: x86.64 %box-small-struct ( c-type -- )
+    #! Box a <= 16-byte struct.
+    [
+        [ flatten-small-struct [ %box-struct-field ] each-index ]
+        [ RDX swap heap-size MOV ] bi
+        RDI 0 box-struct-field@ MOV
+        RSI 1 box-struct-field@ MOV
+        "box_small_struct" f %alien-invoke
+    ] with-return-regs ;
 
 : struct-return@ ( size n -- n )
     [ ] [ \ stack-frame get swap - ] ?if ;
 
-M: x86.64 %box-large-struct ( n size -- )
+M: x86.64 %box-large-struct ( n c-type -- )
     ! Struct size is parameter 2
+    heap-size
     RSI over MOV
     ! Compute destination address
     swap struct-return@ RDI RSP rot [+] LEA
@@ -138,7 +186,9 @@ M: x86.64 %alien-global
     [ 0 MOV rc-absolute-cell rel-dlsym ] [ dup [] MOV ] bi ;
 
 M: x86.64 %alien-invoke
-    0 address-operand >r rc-absolute-cell rel-dlsym r> CALL ;
+    R11 0 MOV
+    rc-absolute-cell rel-dlsym
+    R11 CALL ;
 
 M: x86.64 %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke
@@ -175,32 +225,3 @@ USE: cpu.x86.intrinsics
 
 \ alien-signed-4 small-reg-32 define-signed-getter
 \ set-alien-signed-4 small-reg-32 define-setter
-
-! The ABI for passing structs by value is pretty messed up
-<< "void*" c-type clone "__stack_value" define-primitive-type
-stack-params "__stack_value" c-type (>>reg-class) >>
-
-: struct-types&offset ( struct-type -- pairs )
-    fields>> [
-        [ type>> ] [ offset>> ] bi 2array
-    ] map ;
-
-: split-struct ( pairs -- seq )
-    [
-        [ 8 mod zero? [ t , ] when , ] assoc-each
-    ] { } make { t } split harvest ;
-
-: flatten-large-struct ( type -- )
-    heap-size cell align
-    cell /i "__stack_value" c-type <repetition> % ;
-
-M: struct-type flatten-value-type ( type -- seq )
-    dup heap-size 16 > [
-        flatten-large-struct
-    ] [
-        struct-types&offset split-struct [
-            [ c-type c-type-reg-class ] map
-            int-regs swap member?
-            "void*" "double" ? c-type ,
-        ] each
-    ] if ;

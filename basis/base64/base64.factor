@@ -43,7 +43,7 @@ PRIVATE>
     [ [ "" ] [ >base64-rem ] if-empty ]
     bi* append ;
 
-: base64> ( base64 -- str )
+: base64> ( base64 -- seq )
     #! input length must be a multiple of 4
     [ 4 <groups> [ decode4 ] map concat ]
     [ [ CHAR: = = ] count-end ]

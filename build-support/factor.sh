@@ -159,6 +159,7 @@ check_factor_exists() {
 }
 
 find_os() {
+	if [[ -n $OS ]] ; then return; fi
     $ECHO "Finding OS..."
     uname_s=`uname -s`
     check_ret uname
@@ -178,6 +179,7 @@ find_os() {
 }
 
 find_architecture() {
+	if [[ -n $ARCH ]] ; then return; fi
     $ECHO "Finding ARCH..."
     uname_m=`uname -m`
     check_ret uname
@@ -197,7 +199,7 @@ write_test_program() {
     echo "int main(){printf(\"%d\", 8*sizeof(void*)); return 0; }" >> $C_WORD.c
 }
 
-find_word_size() {
+c_find_word_size() {
     $ECHO "Finding WORD..."
     C_WORD=factor-word-size
     write_test_program
@@ -205,6 +207,29 @@ find_word_size() {
     WORD=$(./$C_WORD)
     check_ret $C_WORD
     rm -f $C_WORD*
+}
+
+intel_macosx_word_size() {
+	ensure_program_installed sysctl
+	$ECHO -n "Testing if your Intel Mac supports 64bit binaries..."
+	sysctl machdep.cpu.extfeatures | grep EM64T >/dev/null
+    if [[ $? -eq 0 ]] ; then
+		WORD=32
+		$ECHO "yes!"
+		$ECHO "Defaulting to 32bit for now though..."
+    else
+		WORD=32
+		$ECHO "no."
+    fi
+}
+
+find_word_size() {
+	if [[ -n $WORD ]] ; then return; fi
+    if [[ $OS -eq "macosx" && $ARCH -eq "x86" ]] ; then
+		intel_macosx_word_size
+	else
+		c_find_word_size
+	fi
 }
 
 set_factor_binary() {
@@ -230,15 +255,18 @@ echo_build_info() {
     $ECHO MAKE=$MAKE
 }
 
-set_build_info() {
+check_os_arch_word() {
     if ! [[ -n $OS && -n $ARCH && -n $WORD ]] ; then
         $ECHO "OS: $OS"
         $ECHO "ARCH: $ARCH"
         $ECHO "WORD: $WORD"
-        $ECHO "OS, ARCH, or WORD is empty.  Please report this"
+        $ECHO "OS, ARCH, or WORD is empty.  Please report this."
         exit 5
     fi
+}
 
+set_build_info() {
+	check_os_arch_word
     MAKE_TARGET=$OS-$ARCH-$WORD
     MAKE_IMAGE_TARGET=$ARCH.$WORD
     BOOT_IMAGE=boot.$ARCH.$WORD.image
@@ -252,6 +280,23 @@ set_build_info() {
         MAKE_TARGET=$OS-$ARCH
         BOOT_IMAGE=boot.linux-ppc.image
     fi
+}
+
+parse_build_info() {
+	ensure_program_installed cut
+	$ECHO "Parsing make target from command line: $1"
+	OS=`echo $1 | cut -d '-' -f 1`
+	ARCH=`echo $1 | cut -d '-' -f 2`
+	WORD=`echo $1 | cut -d '-' -f 3`
+	
+    if [[ $OS == linux && $ARCH == ppc ]] ; then WORD=32; fi
+    if [[ $OS == linux && $ARCH == arm ]] ; then WORD=32; fi
+    if [[ $OS == macosx && $ARCH == ppc ]] ; then WORD=32; fi
+    if [[ $OS == wince && $ARCH == arm ]] ; then WORD=32; fi
+	
+	$ECHO "OS=$OS"
+	$ECHO "ARCH=$ARCH"
+	$ECHO "WORD=$WORD"
 }
 
 find_build_info() {
@@ -415,7 +460,6 @@ make_boot_image() {
 }
 
 install_build_system_apt() {
-    ensure_program_installed yes
     sudo apt-get --yes install sudo libc6-dev libfreetype6-dev libx11-dev xorg-dev glutg3-dev wget git-core git-doc rlwrap gcc make
     check_ret sudo
 }
@@ -434,10 +478,18 @@ install_build_system_port() {
 }
 
 usage() {
-    echo "usage: $0 install|install-x11|install-macosx|self-update|quick-update|update|bootstrap|dlls|net-bootstrap|make-target"
+    echo "usage: $0 install|install-x11|install-macosx|self-update|quick-update|update|bootstrap|dlls|net-bootstrap|make-target|report [optional-target]"
     echo "If you are behind a firewall, invoke as:"
     echo "env GIT_PROTOCOL=http $0 <command>"
+	echo ""
+	echo "Example for overriding the default target:"
+	echo "	$0 update macosx-x86-32"
 }
+
+# -n is nonzero length, -z is zero length
+if [[ -n "$2" ]] ; then
+	parse_build_info $2
+fi
 
 case "$1" in
     install) install ;;
@@ -447,6 +499,7 @@ case "$1" in
     quick-update) update; refresh_image ;;
     update) update; update_bootstrap ;;
     bootstrap) get_config_info; bootstrap ;;
+	report) find_build_info ;;
     dlls) get_config_info; maybe_download_dlls;;
     net-bootstrap) get_config_info; update_boot_images; bootstrap ;;
 	make-target) ECHO=false; find_build_info; echo $MAKE_TARGET ;;

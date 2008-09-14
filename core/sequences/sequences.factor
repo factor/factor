@@ -51,7 +51,7 @@ M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ;
 : push ( elt seq -- ) [ length ] [ set-nth ] bi ;
 
 : bounds-check? ( n seq -- ? )
-    length 1- 0 swap between? ; inline
+    dupd length < [ 0 >= ] [ drop f ] if ; inline
 
 ERROR: bounds-error index seq ;
 
@@ -480,8 +480,13 @@ PRIVATE>
 : last-index-from ( obj i seq -- n )
     rot [ = ] curry find-last-from drop ;
 
-: nths ( seq indices -- seq' )
-    swap [ nth ] curry map ;
+: indices ( obj seq -- indices )
+    V{ } clone spin
+    [ rot = [ over push ] [ drop ] if ]
+    curry each-index ;
+
+: nths ( indices seq -- seq' )
+    [ nth ] curry map ;
 
 : contains? ( seq quot -- ? )
     find drop >boolean ; inline
