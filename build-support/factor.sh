@@ -159,6 +159,7 @@ check_factor_exists() {
 }
 
 find_os() {
+	if [[ -n $OS ]] ; then return; fi
     $ECHO "Finding OS..."
     uname_s=`uname -s`
     check_ret uname
@@ -178,6 +179,7 @@ find_os() {
 }
 
 find_architecture() {
+	if [[ -n $ARCH ]] ; then return; fi
     $ECHO "Finding ARCH..."
     uname_m=`uname -m`
     check_ret uname
@@ -207,7 +209,7 @@ c_find_word_size() {
     rm -f $C_WORD*
 }
 
-macosx_supports_64bit() {
+intel_macosx_word_size() {
 	ensure_program_installed sysctl
 	$ECHO -n "Testing if your Intel Mac supports 64bit binaries..."
 	sysctl machdep.cpu.extfeatures | grep EM64T >/dev/null
@@ -222,8 +224,9 @@ macosx_supports_64bit() {
 }
 
 find_word_size() {
+	if [[ -n $WORD ]] ; then return; fi
     if [[ $OS -eq "macosx" && $ARCH -eq "x86" ]] ; then
-		macosx_supports_64bit
+		intel_macosx_word_size
 	else
 		c_find_word_size
 	fi
@@ -252,15 +255,18 @@ echo_build_info() {
     $ECHO MAKE=$MAKE
 }
 
-set_build_info() {
+check_os_arch_word() {
     if ! [[ -n $OS && -n $ARCH && -n $WORD ]] ; then
         $ECHO "OS: $OS"
         $ECHO "ARCH: $ARCH"
         $ECHO "WORD: $WORD"
-        $ECHO "OS, ARCH, or WORD is empty.  Please report this"
+        $ECHO "OS, ARCH, or WORD is empty.  Please report this."
         exit 5
     fi
+}
 
+set_build_info() {
+	check_os_arch_word
     MAKE_TARGET=$OS-$ARCH-$WORD
     MAKE_IMAGE_TARGET=$ARCH.$WORD
     BOOT_IMAGE=boot.$ARCH.$WORD.image
@@ -274,6 +280,31 @@ set_build_info() {
         MAKE_TARGET=$OS-$ARCH
         BOOT_IMAGE=boot.linux-ppc.image
     fi
+}
+
+parse_build_info() {
+	ensure_program_installed cut
+	$ECHO "Parsing make target from command line: $1"
+	OS=`echo $1 | cut -d '-' -f 1`
+	ARCH=`echo $1 | cut -d '-' -f 2`
+	WORD=`echo $1 | cut -d '-' -f 3`
+	
+    if [[ $OS == linux && $ARCH == ppc ]] ; then
+		WORD=32
+	fi
+    if [[ $OS == linux && $ARCH == arm ]] ; then
+		WORD=32
+	fi
+    if [[ $OS == macosx && $ARCH == ppc ]] ; then
+		WORD=32
+	fi
+    if [[ $OS == wince && $ARCH == arm ]] ; then
+		WORD=32
+	fi
+	
+	$ECHO "OS=$OS"
+	$ECHO "ARCH=$ARCH"
+	$ECHO "WORD=$WORD"
 }
 
 find_build_info() {
@@ -455,10 +486,18 @@ install_build_system_port() {
 }
 
 usage() {
-    echo "usage: $0 install|install-x11|install-macosx|self-update|quick-update|update|bootstrap|dlls|net-bootstrap|make-target"
+    echo "usage: $0 install|install-x11|install-macosx|self-update|quick-update|update|bootstrap|dlls|net-bootstrap|make-target|report [optional-target]"
     echo "If you are behind a firewall, invoke as:"
     echo "env GIT_PROTOCOL=http $0 <command>"
+	echo ""
+	echo "Example for overriding the default target:"
+	echo "	$0 update macosx-x86-32"
 }
+
+# -n is nonzero length, -z is zero length
+if [[ -n "$2" ]] ; then
+	parse_build_info $2
+fi
 
 case "$1" in
     install) install ;;
