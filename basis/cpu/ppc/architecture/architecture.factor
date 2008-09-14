@@ -198,9 +198,9 @@ M: ppc %unbox-long-long ( n func -- )
 M: ppc %unbox-large-struct ( n c-type -- )
     ! Value must be in r3
     ! Compute destination address
-    4 1 roll heap-size local@ ADDI
+    4 1 roll local@ ADDI
     ! Load struct size
-    5 LI
+    heap-size 5 LI
     ! Call the function
     "to_value_struct" f %alien-invoke ;
 
