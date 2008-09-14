@@ -289,18 +289,10 @@ parse_build_info() {
 	ARCH=`echo $1 | cut -d '-' -f 2`
 	WORD=`echo $1 | cut -d '-' -f 3`
 	
-    if [[ $OS == linux && $ARCH == ppc ]] ; then
-		WORD=32
-	fi
-    if [[ $OS == linux && $ARCH == arm ]] ; then
-		WORD=32
-	fi
-    if [[ $OS == macosx && $ARCH == ppc ]] ; then
-		WORD=32
-	fi
-    if [[ $OS == wince && $ARCH == arm ]] ; then
-		WORD=32
-	fi
+    if [[ $OS == linux && $ARCH == ppc ]] ; then WORD=32; fi
+    if [[ $OS == linux && $ARCH == arm ]] ; then WORD=32; fi
+    if [[ $OS == macosx && $ARCH == ppc ]] ; then WORD=32; fi
+    if [[ $OS == wince && $ARCH == arm ]] ; then WORD=32; fi
 	
 	$ECHO "OS=$OS"
 	$ECHO "ARCH=$ARCH"
