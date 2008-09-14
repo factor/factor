@@ -67,7 +67,7 @@ left-parenthesis pipe caret dash ;
 : <negation> ( obj -- negation ) negation boa ;
 : <concatenation> ( seq -- concatenation )
     >vector get-reversed-regexp [ reverse ] when
-    concatenation boa ;
+    [ epsilon ] [ concatenation boa ] if-empty ;
 : <alternation> ( seq -- alternation ) >vector alternation boa ;
 : <capture-group> ( obj -- capture-group ) capture-group boa ;
 : <kleene-star> ( obj -- kleene-star ) kleene-star boa ;
