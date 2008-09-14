@@ -197,7 +197,7 @@ write_test_program() {
     echo "int main(){printf(\"%d\", 8*sizeof(void*)); return 0; }" >> $C_WORD.c
 }
 
-find_word_size() {
+c_find_word_size() {
     $ECHO "Finding WORD..."
     C_WORD=factor-word-size
     write_test_program
@@ -205,6 +205,28 @@ find_word_size() {
     WORD=$(./$C_WORD)
     check_ret $C_WORD
     rm -f $C_WORD*
+}
+
+macosx_supports_64bit() {
+	ensure_program_installed sysctl
+	$ECHO -n "Testing if your Intel Mac supports 64bit binaries..."
+	sysctl machdep.cpu.extfeatures | grep EM64T >/dev/null
+    if [[ $? -eq 0 ]] ; then
+		WORD=32
+		$ECHO "yes!"
+		$ECHO "Defaulting to 32bit for now though..."
+    else
+		WORD=32
+		$ECHO "no."
+    fi
+}
+
+find_word_size() {
+    if [[ $OS -eq "macosx" && $ARCH -eq "x86" ]] ; then
+		macosx_supports_64bit
+	else
+		c_find_word_size
+	fi
 }
 
 set_factor_binary() {
@@ -415,8 +437,7 @@ make_boot_image() {
 }
 
 install_build_system_apt() {
-    ensure_program_installed yes
-    yes | sudo apt-get install sudo libc6-dev libfreetype6-dev libx11-dev xorg-dev glutg3-dev wget git-core git-doc rlwrap gcc make
+    sudo apt-get --yes install sudo libc6-dev libfreetype6-dev libx11-dev xorg-dev glutg3-dev wget git-core git-doc rlwrap gcc make
     check_ret sudo
 }
 
@@ -447,6 +468,7 @@ case "$1" in
     quick-update) update; refresh_image ;;
     update) update; update_bootstrap ;;
     bootstrap) get_config_info; bootstrap ;;
+	report) find_build_info ;;
     dlls) get_config_info; maybe_download_dlls;;
     net-bootstrap) get_config_info; update_boot_images; bootstrap ;;
 	make-target) ECHO=false; find_build_info; echo $MAKE_TARGET ;;
