@@ -54,19 +54,19 @@ SYMBOL: load-help?
 : load-source ( vocab -- vocab )
     f over set-vocab-source-loaded?
     [ vocab-source-path [ parse-file ] [ [ ] ] if* ] keep
-    t over set-vocab-source-loaded?
-    [ [ % ] [ call ] if-bootstrapping ] dip ;
+    t swap set-vocab-source-loaded?
+    [ % ] [ call ] if-bootstrapping ;
 
 : load-docs ( vocab -- vocab )
     load-help? get [
         f over set-vocab-docs-loaded?
         [ vocab-docs-path [ ?run-file ] when* ] keep
-        t over set-vocab-docs-loaded?
-    ] when ;
+        t swap set-vocab-docs-loaded?
+    ] [ drop ] if ;
 
 : reload ( name -- )
     [
-        dup vocab [ load-source load-docs drop ] [ no-vocab ] ?if
+        dup vocab [ [ load-source ] [ load-docs ] bi ] [ no-vocab ] ?if
     ] with-compiler-errors ;
 
 : require ( vocab -- )
@@ -90,8 +90,8 @@ GENERIC: (load-vocab) ( name -- )
 
 M: vocab (load-vocab)
     [
-        dup vocab-source-loaded? [ load-source ] unless
-        dup vocab-docs-loaded? [ load-docs ] unless
+        dup vocab-source-loaded? [ dup load-source ] unless
+        dup vocab-docs-loaded? [ dup load-docs ] unless
         drop
     ] [ [ swap add-to-blacklist ] keep rethrow ] recover ;
 
