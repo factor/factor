@@ -8,7 +8,7 @@ calendar.format accessors sets hashtables ;
 IN: smtp
 
 SYMBOL: smtp-domain
-SYMBOL: smtp-server     "localhost" "smtp" <inet> smtp-server set-global
+SYMBOL: smtp-server     "localhost" 25 <inet> smtp-server set-global
 SYMBOL: smtp-read-timeout    1 minutes smtp-read-timeout set-global
 SYMBOL: esmtp?           t esmtp? set-global
 
