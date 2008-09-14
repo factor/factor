@@ -195,10 +195,10 @@ M: ppc %unbox-long-long ( n func -- )
         4 1 rot cell + local@ STW
     ] when* ;
 
-M: ppc %unbox-large-struct ( n size -- )
+M: ppc %unbox-large-struct ( n c-type -- )
     ! Value must be in r3
     ! Compute destination address
-    4 1 roll local@ ADDI
+    4 1 roll heap-size local@ ADDI
     ! Load struct size
     5 LI
     ! Call the function
@@ -227,8 +227,9 @@ M: ppc %prepare-box-struct ( size -- )
     3 1 rot f struct-return@ ADDI
     3 1 0 local@ STW ;
 
-M: ppc %box-large-struct ( n size -- )
+M: ppc %box-large-struct ( n c-type -- )
     #! If n = f, then we're boxing a returned struct
+    heap-size
     [ swap struct-return@ ] keep
     ! Compute destination address
     3 1 roll ADDI

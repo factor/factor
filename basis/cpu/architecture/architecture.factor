@@ -95,7 +95,7 @@ HOOK: %box-float cpu ( dst src -- )
 HOOK: small-enough? cpu ( n -- ? )
 
 ! Is this structure small enough to be returned in registers?
-HOOK: struct-small-enough? cpu ( size -- ? )
+HOOK: struct-small-enough? cpu ( heap-size -- ? )
 
 ! Do we pass explode value structs?
 HOOK: value-structs? cpu ( -- ? )
@@ -109,9 +109,9 @@ HOOK: %unbox cpu ( n reg-class func -- )
 
 HOOK: %unbox-long-long cpu ( n func -- )
 
-HOOK: %unbox-small-struct cpu ( size -- )
+HOOK: %unbox-small-struct cpu ( c-type -- )
 
-HOOK: %unbox-large-struct cpu ( n size -- )
+HOOK: %unbox-large-struct cpu ( n c-type -- )
 
 HOOK: %box cpu ( n reg-class func -- )
 
@@ -119,9 +119,9 @@ HOOK: %box-long-long cpu ( n func -- )
 
 HOOK: %prepare-box-struct cpu ( size -- )
 
-HOOK: %box-small-struct cpu ( size -- )
+HOOK: %box-small-struct cpu ( c-type -- )
 
-HOOK: %box-large-struct cpu ( n size -- )
+HOOK: %box-large-struct cpu ( n c-type -- )
 
 GENERIC: %save-param-reg ( stack reg reg-class -- )
 
@@ -169,14 +169,14 @@ PREDICATE: small-tagged < integer v>operand small-enough? ;
     [ [ nip ] prepose ] dip if ;
     inline
 
-: %unbox-struct ( n size -- )
+: %unbox-struct ( n c-type -- )
     [
         %unbox-small-struct
     ] [
         %unbox-large-struct
     ] if-small-struct ;
 
-: %box-struct ( n size -- )
+: %box-struct ( n c-type -- )
     [
         %box-small-struct
     ] [
