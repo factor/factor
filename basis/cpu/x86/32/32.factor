@@ -62,10 +62,6 @@ M: float-regs store-return-reg load/store-float-return FSTP ;
 : with-aligned-stack ( n quot -- )
     swap dup align-sub slip align-add ; inline
 
-! On x86, we can always use an address as an operand
-! directly.
-M: x86.32 address-operand ;
-
 M: x86.32 fixnum>slot@ 1 SHR ;
 
 M: x86.32 prepare-division CDQ ;
