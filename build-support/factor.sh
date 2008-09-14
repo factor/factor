@@ -102,7 +102,7 @@ set_make() {
         *) MAKE='make';;
     esac
     if ! [[ $MAKE -eq 'gmake' ]] ; then
-    	ensure_program_installed gmake
+        ensure_program_installed gmake
     fi
 }
 
@@ -159,7 +159,7 @@ check_factor_exists() {
 }
 
 find_os() {
-	if [[ -n $OS ]] ; then return; fi
+    if [[ -n $OS ]] ; then return; fi
     $ECHO "Finding OS..."
     uname_s=`uname -s`
     check_ret uname
@@ -179,7 +179,7 @@ find_os() {
 }
 
 find_architecture() {
-	if [[ -n $ARCH ]] ; then return; fi
+    if [[ -n $ARCH ]] ; then return; fi
     $ECHO "Finding ARCH..."
     uname_m=`uname -m`
     check_ret uname
@@ -210,26 +210,26 @@ c_find_word_size() {
 }
 
 intel_macosx_word_size() {
-	ensure_program_installed sysctl
-	$ECHO -n "Testing if your Intel Mac supports 64bit binaries..."
-	sysctl machdep.cpu.extfeatures | grep EM64T >/dev/null
+    ensure_program_installed sysctl
+    $ECHO -n "Testing if your Intel Mac supports 64bit binaries..."
+    sysctl machdep.cpu.extfeatures | grep EM64T >/dev/null
     if [[ $? -eq 0 ]] ; then
-		WORD=32
-		$ECHO "yes!"
-		$ECHO "Defaulting to 32bit for now though..."
+        WORD=32
+        $ECHO "yes!"
+        $ECHO "Defaulting to 32bit for now though..."
     else
-		WORD=32
-		$ECHO "no."
+        WORD=32
+        $ECHO "no."
     fi
 }
 
 find_word_size() {
-	if [[ -n $WORD ]] ; then return; fi
-    if [[ $OS -eq "macosx" && $ARCH -eq "x86" ]] ; then
-		intel_macosx_word_size
-	else
-		c_find_word_size
-	fi
+    if [[ -n $WORD ]] ; then return; fi
+    if [[ $OS == macosx && $ARCH == x86 ]] ; then
+        intel_macosx_word_size
+    else
+        c_find_word_size
+    fi
 }
 
 set_factor_binary() {
@@ -266,7 +266,7 @@ check_os_arch_word() {
 }
 
 set_build_info() {
-	check_os_arch_word
+    check_os_arch_word
     MAKE_TARGET=$OS-$ARCH-$WORD
     MAKE_IMAGE_TARGET=$ARCH.$WORD
     BOOT_IMAGE=boot.$ARCH.$WORD.image
@@ -283,20 +283,20 @@ set_build_info() {
 }
 
 parse_build_info() {
-	ensure_program_installed cut
-	$ECHO "Parsing make target from command line: $1"
-	OS=`echo $1 | cut -d '-' -f 1`
-	ARCH=`echo $1 | cut -d '-' -f 2`
-	WORD=`echo $1 | cut -d '-' -f 3`
-	
+    ensure_program_installed cut
+    $ECHO "Parsing make target from command line: $1"
+    OS=`echo $1 | cut -d '-' -f 1`
+    ARCH=`echo $1 | cut -d '-' -f 2`
+    WORD=`echo $1 | cut -d '-' -f 3`
+    
     if [[ $OS == linux && $ARCH == ppc ]] ; then WORD=32; fi
     if [[ $OS == linux && $ARCH == arm ]] ; then WORD=32; fi
     if [[ $OS == macosx && $ARCH == ppc ]] ; then WORD=32; fi
     if [[ $OS == wince && $ARCH == arm ]] ; then WORD=32; fi
-	
-	$ECHO "OS=$OS"
-	$ECHO "ARCH=$ARCH"
-	$ECHO "WORD=$WORD"
+    
+    $ECHO "OS=$OS"
+    $ECHO "ARCH=$ARCH"
+    $ECHO "WORD=$WORD"
 }
 
 find_build_info() {
@@ -305,9 +305,9 @@ find_build_info() {
     find_word_size
     set_factor_binary
     set_build_info
-	set_downloader
-	set_gcc
-	set_make
+    set_downloader
+    set_gcc
+    set_make
     echo_build_info
 }
 
@@ -467,13 +467,13 @@ install_build_system_apt() {
 install_build_system_port() {
     test_program_installed git
     if [[ $? -ne 1 ]] ; then
-    	ensure_program_installed yes
-		echo "git not found."
-		echo "This script requires either git-core or port."
-		echo "If it fails, install git-core or port and try again."
-    	ensure_program_installed port
-		echo "Installing git-core with port...this will take awhile."
-    	yes | sudo port install git-core
+        ensure_program_installed yes
+        echo "git not found."
+        echo "This script requires either git-core or port."
+        echo "If it fails, install git-core or port and try again."
+        ensure_program_installed port
+        echo "Installing git-core with port...this will take awhile."
+        yes | sudo port install git-core
     fi
 }
 
@@ -481,14 +481,14 @@ usage() {
     echo "usage: $0 install|install-x11|install-macosx|self-update|quick-update|update|bootstrap|dlls|net-bootstrap|make-target|report [optional-target]"
     echo "If you are behind a firewall, invoke as:"
     echo "env GIT_PROTOCOL=http $0 <command>"
-	echo ""
-	echo "Example for overriding the default target:"
-	echo "	$0 update macosx-x86-32"
+    echo ""
+    echo "Example for overriding the default target:"
+    echo "    $0 update macosx-x86-32"
 }
 
 # -n is nonzero length, -z is zero length
 if [[ -n "$2" ]] ; then
-	parse_build_info $2
+    parse_build_info $2
 fi
 
 case "$1" in
@@ -499,9 +499,9 @@ case "$1" in
     quick-update) update; refresh_image ;;
     update) update; update_bootstrap ;;
     bootstrap) get_config_info; bootstrap ;;
-	report) find_build_info ;;
+    report) find_build_info ;;
     dlls) get_config_info; maybe_download_dlls;;
     net-bootstrap) get_config_info; update_boot_images; bootstrap ;;
-	make-target) ECHO=false; find_build_info; echo $MAKE_TARGET ;;
+    make-target) ECHO=false; find_build_info; echo $MAKE_TARGET ;;
     *) usage ;;
 esac
