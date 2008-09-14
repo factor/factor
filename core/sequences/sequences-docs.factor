@@ -65,7 +65,8 @@ ARTICLE: "sequences-add-remove" "Adding and removing sequence elements"
 { $subsection prefix }
 { $subsection suffix }
 "Removing elements:"
-{ $subsection remove } ;
+{ $subsection remove }
+{ $subsection remove-nth } ;
 
 ARTICLE: "sequences-reshape" "Reshaping sequences"
 "A " { $emphasis "repetition" } " is a virtual sequence consisting of a single element repeated multiple times:"
@@ -124,6 +125,7 @@ ARTICLE: "sequences-slices" "Subsequences and slices"
 ARTICLE: "sequences-combinators" "Sequence combinators"
 "Iteration:"
 { $subsection each }
+{ $subsection each-index }
 { $subsection reduce }
 { $subsection interleave }
 { $subsection replicate }
@@ -131,6 +133,7 @@ ARTICLE: "sequences-combinators" "Sequence combinators"
 "Mapping:"
 { $subsection map }
 { $subsection map-as }
+{ $subsection map-index }
 { $subsection accumulate }
 { $subsection produce }
 "Filtering:"
@@ -532,6 +535,24 @@ HELP: map-as
     { $example "USING: prettyprint strings sequences ;" "\"Hello\" [ 1string ] { } map-as ." "{ \"H\" \"e\" \"l\" \"l\" \"o\" }" }
     "Note that " { $link map } " could not be used here, because it would create another string to hold results, and one-element strings cannot themselves be elements of strings."
 } ;
+
+HELP: each-index
+{ $values
+     { "seq" sequence } { "quot" quotation } }
+{ $description "Calls the quotation with the element of the sequence and its index on the stack, with the index on the top of the stack." }
+{ $examples { $example "USING: sequences prettyprint math ;"
+"{ 10 20 30 } [ + . ] each-index"
+"10\n21\n32"
+} } ;
+
+HELP: map-index
+{ $values
+     { "seq" sequence } { "quot" quotation } }
+{ $description "Calls the quotation with the element of the sequence and its index on the stack, with the index on the top of the stack. Collects the outputs of the quotation and outputs them in a sequence of the same type as the input sequence." }
+{ $examples { $example "USING: sequences prettyprint math ;"
+"{ 10 20 30 } [ + ] map-index ."
+"{ 10 21 32 }"
+} } ;
 
 HELP: change-nth
 { $values { "i" "a non-negative integer" } { "seq" "a mutable sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- newelt )" } } }
