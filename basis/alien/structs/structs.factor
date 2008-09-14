@@ -18,20 +18,16 @@ M: struct-type c-type-align align>> ;
 M: struct-type c-type-stack-align? drop f ;
 
 M: struct-type unbox-parameter
-    [ heap-size %unbox-struct ]
-    [ unbox-parameter ]
-    if-value-structs? ;
+    [ %unbox-struct ] [ unbox-parameter ] if-value-structs? ;
 
 M: struct-type unbox-return
-    f swap heap-size %unbox-struct ;
+    f swap %unbox-struct ;
 
 M: struct-type box-parameter
-    [ heap-size %box-struct ]
-    [ box-parameter ]
-    if-value-structs? ;
+    [ %box-struct ] [ box-parameter ] if-value-structs? ;
 
 M: struct-type box-return
-    f swap heap-size %box-struct ;
+    f swap %box-struct ;
 
 M: struct-type stack-size
     [ heap-size ] [ stack-size ] if-value-structs? ;

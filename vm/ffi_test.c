@@ -280,3 +280,48 @@ int ffi_test_39(long a, long b, struct test_struct_13 s)
 	if(a != b) abort();
 	return s.x1 + s.x2 + s.x3 + s.x4 + s.x5 + s.x6;
 }
+
+struct test_struct_14 ffi_test_40(double x1, double x2)
+{
+	struct test_struct_14 retval;
+	retval.x1 = x1;
+	retval.x2 = x2;
+	printf("ffi_test_40(%f,%f)\n",x1,x2);
+	return retval;
+}
+
+struct test_struct_12 ffi_test_41(int a, double x)
+{
+	struct test_struct_12 retval;
+	retval.a = a;
+	retval.x = x;
+	printf("ffi_test_41(%d,%f)\n",a,x);
+	return retval;
+}
+
+struct test_struct_15 ffi_test_42(float x, float y)
+{
+	struct test_struct_15 retval;
+	retval.x = x;
+	retval.y = y;
+	printf("ffi_test_42(%f,%f)\n",x,y);
+	return retval;
+}
+
+struct test_struct_16 ffi_test_43(float x, int a)
+{
+	struct test_struct_16 retval;
+	retval.x = x;
+	retval.a = a;
+	printf("ffi_test_43(%f,%d)\n",x,a);
+	return retval;
+}
+
+struct test_struct_14 ffi_test_44(void)
+{
+	struct test_struct_14 retval;
+	retval.x1 = 1.0;
+	retval.x2 = 2.0;
+	//printf("ffi_test_44()\n");
+	return retval;
+}
