@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: namespaces accessors kernel assocs arrays io.sockets threads
-fry urls smtp validators html.forms present
+USING: namespaces make accessors kernel assocs arrays io.sockets
+threads fry urls smtp validators html.forms present
 http http.server.responses http.server.redirection
 http.server.dispatchers
 furnace furnace.actions furnace.auth furnace.auth.providers
@@ -43,7 +43,7 @@ SYMBOL: lost-password-from
         ] "" make >>body ;
 
 : send-password-email ( user -- )
-    '[ , password-email send-email ]
+    '[ _ password-email send-email ]
     "E-mail send thread" spawn drop ;
 
 : <recover-action-1> ( -- action )

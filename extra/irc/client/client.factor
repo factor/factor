@@ -334,7 +334,7 @@ DEFER: (connect-irc)
 
 : set+run-listener ( name irc-listener -- )
     over irc> listeners>> set-at
-    '[ , listener-loop ] "listener" spawn-irc-loop ;
+    '[ _ listener-loop ] "listener" spawn-irc-loop ;
 
 GENERIC: (add-listener) ( irc-listener -- )
 
@@ -342,7 +342,7 @@ M: irc-channel-listener (add-listener) ( irc-channel-listener -- )
     [ [ name>> ] [ password>> ] bi /JOIN ]
     [ [ [ drop irc> join-messages>> ]
         [ timeout>> ]
-        [ name>> '[ trailing>> , = ] ]
+        [ name>> '[ trailing>> _ = ] ]
         tri mailbox-get-timeout? trailing>> ] keep set+run-listener
     ] bi ;
 
@@ -382,10 +382,10 @@ PRIVATE>
       spawn-irc ] with-irc-client ;
 
 : add-listener ( irc-listener irc-client -- )
-    swap '[ , (add-listener) ] with-irc-client ;
+    swap '[ _ (add-listener) ] with-irc-client ;
 
 : remove-listener ( irc-listener irc-client -- )
-    swap '[ , (remove-listener) ] with-irc-client ;
+    swap '[ _ (remove-listener) ] with-irc-client ;
 
 : write-message ( message irc-listener -- ) out-messages>> mailbox-put ;
 : read-message ( irc-listener -- message ) in-messages>> mailbox-get ;

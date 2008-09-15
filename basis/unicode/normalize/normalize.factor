@@ -1,4 +1,4 @@
-USING: sequences namespaces unicode.data kernel math arrays
+USING: sequences namespaces make unicode.data kernel math arrays
 locals sorting.insertion accessors ;
 IN: unicode.normalize
 

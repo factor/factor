@@ -1,5 +1,5 @@
 USING: help.markup help.syntax math math.private prettyprint
-namespaces strings ;
+namespaces make strings ;
 IN: math.parser
 
 ARTICLE: "number-strings" "Converting between numbers and strings"

@@ -1,6 +1,9 @@
-USING: accessors xmode.tokens xmode.rules xmode.keyword-map xml.data
-xml.utilities xml assocs kernel combinators sequences
-math.parser namespaces parser lexer xmode.utilities regexp io.files ;
+! Copyright (C) 2007, 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors xmode.tokens xmode.rules xmode.keyword-map
+xml.data xml.utilities xml assocs kernel combinators sequences
+math.parser namespaces make parser lexer xmode.utilities regexp
+io.files ;
 IN: xmode.loader.syntax
 
 SYMBOL: ignore-case?

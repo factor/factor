@@ -14,7 +14,7 @@ GENERIC: random-32* ( tuple -- r )
 GENERIC: random-bytes* ( n tuple -- byte-array )
 
 M: object random-bytes* ( n tuple -- byte-array )
-    swap [ drop random-32* ] with map >c-uint-array ;
+    [ random-32* ] curry replicate [ 4 >le ] map concat ;
 
 M: object random-32* ( tuple -- r ) 4 random-bytes* le> ;
 

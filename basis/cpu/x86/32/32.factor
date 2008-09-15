@@ -28,6 +28,10 @@ M: x86.32 %alien-global 0 [] MOV rc-absolute-cell rel-dlsym ;
 
 M: x86.32 %alien-invoke (CALL) rel-dlsym ;
 
+M: x86.32 struct-small-enough? ( size -- ? )
+    heap-size { 1 2 4 8 } member?
+    os { linux netbsd solaris } member? not and ;
+
 ! On x86, parameters are never passed in registers.
 M: int-regs return-reg drop EAX ;
 M: int-regs param-regs drop { } ;
@@ -62,10 +66,6 @@ M: float-regs store-return-reg load/store-float-return FSTP ;
 : with-aligned-stack ( n quot -- )
     swap dup align-sub slip align-add ; inline
 
-! On x86, we can always use an address as an operand
-! directly.
-M: x86.32 address-operand ;
-
 M: x86.32 fixnum>slot@ 1 SHR ;
 
 M: x86.32 prepare-division CDQ ;
@@ -76,62 +76,6 @@ M: x86.32 load-indirect
 M: object %load-param-reg 3drop ;
 
 M: object %save-param-reg 3drop ;
-
-M: x86.32 %prepare-unbox ( -- )
-    #! Move top of data stack to EAX.
-    EAX ESI [] MOV
-    ESI 4 SUB ;
-
-: (%unbox) ( func -- )
-    4 [
-        ! Push parameter
-        EAX PUSH
-        ! Call the unboxer
-        f %alien-invoke
-    ] with-aligned-stack ;
-
-M: x86.32 %unbox ( n reg-class func -- )
-    #! The value being unboxed must already be in EAX.
-    #! If n is f, we're unboxing a return value about to be
-    #! returned by the callback. Otherwise, we're unboxing
-    #! a parameter to a C function about to be called.
-    (%unbox)
-    ! Store the return value on the C stack
-    over [ store-return-reg ] [ 2drop ] if ;
-
-M: x86.32 %unbox-long-long ( n func -- )
-    (%unbox)
-    ! Store the return value on the C stack
-    [
-        dup stack@ EAX MOV
-        cell + stack@ EDX MOV
-    ] when* ;
-
-M: x86.32 %unbox-struct-2
-    #! Alien must be in EAX.
-    4 [
-        EAX PUSH
-        "alien_offset" f %alien-invoke
-        ! Load second cell
-        EDX EAX 4 [+] MOV
-        ! Load first cell
-        EAX EAX [] MOV
-    ] with-aligned-stack ;
-
-M: x86.32 %unbox-large-struct ( n size -- )
-    #! Alien must be in EAX.
-    ! Compute destination address
-    ECX ESP roll [+] LEA
-    12 [
-        ! Push struct size
-        PUSH
-        ! Push destination address
-        ECX PUSH
-        ! Push source address
-        EAX PUSH
-        ! Copy the struct to the stack
-        "to_value_struct" f %alien-invoke
-    ] with-aligned-stack ;
 
 : box@ ( n reg-class -- stack@ )
     #! Used for callbacks; we want to box the values given to
@@ -173,8 +117,12 @@ M: x86.32 %box-long-long ( n func -- )
         [ (%box-long-long) ] [ f %alien-invoke ] bi*
     ] with-aligned-stack ;
 
-M: x86.32 %box-large-struct ( n size -- )
+: struct-return@ ( size n -- n )
+    [ stack-frame* cell + + ] [ \ stack-frame get swap - ] ?if ;
+
+M: x86.32 %box-large-struct ( n c-type -- )
     ! Compute destination address
+    heap-size
     [ swap struct-return@ ] keep
     ECX ESP roll [+] LEA
     8 [
@@ -192,7 +140,46 @@ M: x86.32 %prepare-box-struct ( size -- )
     ! Store it as the first parameter
     ESP [] EAX MOV ;
 
-M: x86.32 %unbox-struct-1
+M: x86.32 %box-small-struct ( c-type -- )
+    #! Box a <= 8-byte struct returned in EAX:EDX. OS X only.
+    12 [
+        heap-size PUSH
+        EDX PUSH
+        EAX PUSH
+        "box_small_struct" f %alien-invoke
+    ] with-aligned-stack ;
+
+M: x86.32 %prepare-unbox ( -- )
+    #! Move top of data stack to EAX.
+    EAX ESI [] MOV
+    ESI 4 SUB ;
+
+: (%unbox) ( func -- )
+    4 [
+        ! Push parameter
+        EAX PUSH
+        ! Call the unboxer
+        f %alien-invoke
+    ] with-aligned-stack ;
+
+M: x86.32 %unbox ( n reg-class func -- )
+    #! The value being unboxed must already be in EAX.
+    #! If n is f, we're unboxing a return value about to be
+    #! returned by the callback. Otherwise, we're unboxing
+    #! a parameter to a C function about to be called.
+    (%unbox)
+    ! Store the return value on the C stack
+    over [ store-return-reg ] [ 2drop ] if ;
+
+M: x86.32 %unbox-long-long ( n func -- )
+    (%unbox)
+    ! Store the return value on the C stack
+    [
+        dup stack@ EAX MOV
+        cell + stack@ EDX MOV
+    ] when* ;
+
+: %unbox-struct-1 ( -- )
     #! Alien must be in EAX.
     4 [
         EAX PUSH
@@ -201,13 +188,38 @@ M: x86.32 %unbox-struct-1
         EAX EAX [] MOV
     ] with-aligned-stack ;
 
-M: x86.32 %box-small-struct ( size -- )
-    #! Box a <= 8-byte struct returned in EAX:DX. OS X only.
-    12 [
-        PUSH
-        EDX PUSH
+: %unbox-struct-2 ( -- )
+    #! Alien must be in EAX.
+    4 [
         EAX PUSH
-        "box_small_struct" f %alien-invoke
+        "alien_offset" f %alien-invoke
+        ! Load second cell
+        EDX EAX 4 [+] MOV
+        ! Load first cell
+        EAX EAX [] MOV
+    ] with-aligned-stack ;
+
+M: x86 %unbox-small-struct ( size -- )
+    #! Alien must be in EAX.
+    heap-size cell align cell /i {
+        { 1 [ %unbox-struct-1 ] }
+        { 2 [ %unbox-struct-2 ] }
+    } case ;
+
+M: x86.32 %unbox-large-struct ( n c-type -- )
+    #! Alien must be in EAX.
+    heap-size
+    ! Compute destination address
+    ECX ESP roll [+] LEA
+    12 [
+        ! Push struct size
+        PUSH
+        ! Push destination address
+        ECX PUSH
+        ! Push source address
+        EAX PUSH
+        ! Copy the struct to the stack
+        "to_value_struct" f %alien-invoke
     ] with-aligned-stack ;
 
 M: x86.32 %prepare-alien-indirect ( -- )

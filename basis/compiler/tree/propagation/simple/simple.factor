@@ -68,8 +68,8 @@ M: #declare propagate-before
     [ in-d>> [ value-info literal?>> ] all? ] [ drop f ] if ;
 
 : (fold-call) ( #call word -- info )
-    [ [ out-d>> ] [ in-d>> [ value-info literal>> ] map ] bi ] [ '[ , execute ] ] bi*
-    '[ , , with-datastack [ <literal-info> ] map nip ]
+    [ [ out-d>> ] [ in-d>> [ value-info literal>> ] map ] bi ] [ '[ _ execute ] ] bi*
+    '[ _ _ with-datastack [ <literal-info> ] map nip ]
     [ drop [ object-info ] replicate ]
     recover ;
 

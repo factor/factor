@@ -1,14 +1,13 @@
 ! Copyright (C) 2007, 2008 Slava Pestov, Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces sequences sequences.private assocs math
-       vectors strings classes.tuple generalizations 
-       parser words quotations debugger macros arrays macros splitting
-       combinators prettyprint.backend definitions prettyprint
-       hashtables prettyprint.sections sets sequences.private effects
-       effects.parser generic generic.parser compiler.units accessors
-       locals.backend memoize macros.expander lexer
-       stack-checker.known-words ;
-
+USING: kernel namespaces make sequences sequences.private assocs
+math vectors strings classes.tuple generalizations parser words
+quotations debugger macros arrays macros splitting combinators
+prettyprint.backend definitions prettyprint hashtables
+prettyprint.sections sets sequences.private effects
+effects.parser generic generic.parser compiler.units accessors
+locals.backend memoize macros.expander lexer classes
+stack-checker.known-words ;
 IN: locals
 
 ! Inspired by
@@ -196,69 +195,40 @@ M: block lambda-rewrite*
         swap point-free ,
     ] keep length \ curry <repetition> % ;
 
+GENERIC: rewrite-element ( obj -- )
+
+: rewrite-elements ( seq -- )
+    [ rewrite-element ] each ;
+
+: rewrite-sequence ( seq -- )
+    [ rewrite-elements ] [ length , ] [ , ] tri \ nsequence , ;
+
+M: array rewrite-element rewrite-sequence ;
+
+M: vector rewrite-element rewrite-sequence ;
+
+M: hashtable rewrite-element >alist rewrite-sequence \ >hashtable , ;
+
+M: tuple rewrite-element
+    [ tuple-slots rewrite-elements ] [ class , ] bi \ boa , ;
+
+M: local rewrite-element , ;
+
+M: word rewrite-element literalize , ;
+
+M: object rewrite-element , ;
+
+M: array local-rewrite* rewrite-element ;
+
+M: vector local-rewrite* rewrite-element ;
+
+M: tuple local-rewrite* rewrite-element ;
+
+M: hashtable local-rewrite* rewrite-element ;
+
 M: object lambda-rewrite* , ;
 
 M: object local-rewrite* , ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! Broil is used to support locals in literals
-
-DEFER: [broil]
-DEFER: [broil-hashtable]
-DEFER: [broil-tuple]
-
-: broil-element ( obj -- quot )
-  {
-    { [ dup number?    ] [            1quotation ] }
-    { [ dup string?    ] [            1quotation ] }
-    { [ dup sequence?  ] [ [broil]               ] }
-    { [ dup hashtable? ] [ [broil-hashtable]     ] }
-    { [ dup tuple?     ] [ [broil-tuple]         ] }
-    { [ dup local?     ] [            1quotation ] }
-    { [ dup word?      ] [ literalize 1quotation ] }
-    { [ t              ] [            1quotation ] }
-  }
-  cond ;
-
-: [broil] ( seq -- quot )
-  [ [ broil-element ] map concat >quotation ]
-  [ length ]
-  [        ]
-  tri
-  [ nsequence ] curry curry compose ;
-  
-MACRO: broil ( seq -- quot ) [broil] ;
-
-: [broil-hashtable] ( hashtable -- quot )
-  >alist
-  [ [ broil-element ] map concat >quotation ]
-  [ length ]
-  [        ]
-  tri
-  [ nsequence >hashtable ] curry curry compose ;
-
-MACRO: broil-hashtable ( hashtable -- quot ) [broil-hashtable] ;
-
-: [broil-tuple] ( tuple -- quot )
-  tuple>array
-  [ [ broil-element ] map concat >quotation ]
-  [ length ]
-  [        ]
-  tri
-  [ nsequence >tuple ] curry curry compose ;
-
-MACRO: broil-tuple ( tuple -- quot ) [broil-tuple] ;
-
-! Engage broil on arrays and vectors. Can't do it on 'sequence'
-! because that will pick up strings and integers. What do do...
-
-M: array     local-rewrite* ( array      -- ) [broil]           % ;
-M: vector    local-rewrite* ( vector     -- ) [broil]           % ;
-M: tuple     local-rewrite* ( tuple      -- ) [broil-tuple]     % ;
-M: hashtable local-rewrite* ( hashtable  -- ) [broil-hashtable] % ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 : make-local ( name -- word )
     "!" ?tail [

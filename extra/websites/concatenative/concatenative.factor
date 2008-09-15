@@ -74,20 +74,24 @@ SYMBOL: dh-file
     "noreply@concatenative.org" lost-password-from set-global
     "website@concatenative.org" insomniac-sender set-global
     "slava@factorcode.org" insomniac-recipients set-global
-    <factor-website> main-responder set-global
     init-factor-db ;
 
 : init-testing ( -- )
     "resource:basis/openssl/test/dh1024.pem" dh-file set-global
     "resource:basis/openssl/test/server.pem" key-file set-global
     "password" key-password set-global
-    common-configuration ;
+    common-configuration
+    <factor-website> main-responder set-global ;
+
+: no-www-prefix ( -- responder )
+    "http://concatenative.org" <permanent-redirect> <trivial-responder> ;
 
 : init-production ( -- )
-    f dh-file set-global
-    f key-password set-global
-    "/home/slava/cert/host.pem" key-file set-global
-    common-configuration ;
+    common-configuration
+    <vhost-dispatcher>
+        <factor-website> "concatenative.org" add-responder
+        no-www-prefix "www.concatenative.org" add-responder
+    main-responder set-global ;
 
 : <factor-secure-config> ( -- config )
     <secure-config>

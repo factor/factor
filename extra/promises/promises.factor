@@ -5,7 +5,7 @@
 ! Updated by Chris Double, September 2006
 
 USING: arrays kernel sequences math vectors arrays namespaces
-quotations parser effects stack-checker words accessors ;
+make quotations parser effects stack-checker words accessors ;
 IN: promises
 
 TUPLE: promise quot forced? value ;

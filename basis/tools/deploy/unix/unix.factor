@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io io.files io.backend kernel namespaces sequences
+USING: io io.files io.backend kernel namespaces make sequences
 system tools.deploy.backend tools.deploy.config assocs
 hashtables prettyprint ;
 IN: tools.deploy.unix

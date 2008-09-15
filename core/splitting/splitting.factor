@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math namespaces strings arrays vectors sequences
+USING: kernel math make strings arrays vectors sequences
 sets math.order accessors ;
 IN: splitting
 

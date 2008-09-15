@@ -4,7 +4,8 @@
 ! Simple CSV Parser
 ! Phil Dawes phil@phildawes.net
 
-USING: kernel sequences io namespaces combinators unicode.categories ;
+USING: kernel sequences io namespaces make
+combinators unicode.categories ;
 IN: csv
 
 SYMBOL: delimiter

@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays byte-arrays kernel kernel.private math namespaces
-sequences strings words effects generic generic.standard classes
-classes.algebra slots.private combinators accessors words
-sequences.private assocs alien ;
+make sequences strings words effects generic generic.standard
+classes classes.algebra slots.private combinators accessors
+words sequences.private assocs alien ;
 IN: slots
 
 TUPLE: slot-spec name offset class initial read-only ;

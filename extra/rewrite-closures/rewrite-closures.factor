@@ -1,5 +1,6 @@
 
-USING: kernel parser math quotations namespaces sequences macros fry ;
+USING: kernel parser math quotations namespaces sequences macros
+bake bake.fry ;
 
 IN: rewrite-closures
 

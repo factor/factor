@@ -178,7 +178,7 @@ M: #return-recursive inputs/outputs [ in-d>> ] [ out-d>> ] bi ;
 
 : shuffle-effect ( #shuffle -- effect )
     [ in-d>> ] [ out-d>> ] [ mapping>> ] tri
-    '[ , at ] map
+    '[ _ at ] map
     <effect> ;
 
 : recursive-phi-in ( #enter-recursive -- seq )

@@ -17,12 +17,12 @@ SYMBOL: +bottom+
 : pad-with-bottom ( seq -- newseq )
     dup empty? [
         dup [ length ] map supremum
-        '[ , +bottom+ pad-left ] map
+        '[ _ +bottom+ pad-left ] map
     ] unless ;
 
 : phi-inputs ( max-d-in pairs -- newseq )
     dup empty? [ nip ] [
-        swap '[ , _ first2 unify-inputs ] map
+        swap '[ [ _ ] dip first2 unify-inputs ] map
         pad-with-bottom
     ] if ;
 
@@ -50,7 +50,7 @@ SYMBOL: quotations
     ] if-empty ;
 
 : branch-variable ( seq symbol -- seq )
-    '[ , _ at ] map ;
+    '[ [ _ ] dip at ] map ;
 
 : active-variable ( seq symbol -- seq )
     [ [ terminated? over at [ drop f ] when ] map ] dip

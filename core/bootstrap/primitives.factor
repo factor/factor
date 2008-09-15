@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien arrays byte-arrays generic hashtables
-hashtables.private io kernel math math.order namespaces parser
-sequences strings vectors words quotations assocs layouts
+hashtables.private io kernel math math.order namespaces make
+parser sequences strings vectors words quotations assocs layouts
 classes classes.builtin classes.tuple classes.tuple.private
 kernel.private vocabs vocabs.loader source-files definitions
 slots classes.union classes.intersection classes.predicate

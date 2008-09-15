@@ -1,4 +1,5 @@
-USING: io io.streams.string kernel namespaces pack strings tools.test ;
+USING: io io.streams.string kernel namespaces make
+pack strings tools.test ;
 
 [ B{ 1 0 2 0 0 3 0 0 0 4 0 0 0 0 0 0 0 5 } ] [
     { 1 2 3 4 5 }

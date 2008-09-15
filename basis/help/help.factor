@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays io io.styles kernel namespaces parser
-prettyprint sequences words assocs definitions generic
+USING: accessors arrays io io.styles kernel namespaces make
+parser prettyprint sequences words assocs definitions generic
 quotations effects slots continuations classes.tuple debugger
 combinators vocabs help.stylesheet help.topics help.crossref
 help.markup sorting classes vocabs.loader ;

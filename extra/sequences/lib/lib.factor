@@ -1,11 +1,10 @@
 ! Copyright (C) 2007 Slava Pestov, Chris Double, Doug Coleman,
 !                    Eduardo Cavazos, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.lib kernel sequences math namespaces assocs 
-random sequences.private shuffle math.functions
-arrays math.parser math.private sorting strings ascii macros
-assocs.lib quotations hashtables math.order locals
-generalizations ;
+USING: combinators.lib kernel sequences math namespaces make
+assocs random sequences.private shuffle math.functions arrays
+math.parser math.private sorting strings ascii macros assocs.lib
+quotations hashtables math.order locals generalizations ;
 IN: sequences.lib
 
 : each-withn ( seq quot n -- ) nwith each ; inline
@@ -31,9 +30,6 @@ IN: sequences.lib
   2each ;                       inline
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: map-reduce ( seq map-quot reduce-quot -- result )
-    >r [ unclip ] dip [ call ] keep r> compose reduce ; inline
 
 : reduce* ( seq quot -- result ) [ ] swap map-reduce ; inline
 
@@ -135,23 +131,6 @@ PRIVATE>
 : power-set ( seq -- subsets )
     2 over length exact-number-strings swap [ switches ] curry map ;
 
-: cut-find ( seq pred -- before after )
-    dupd find drop dup [ cut ] when ;
-
-: cut3 ( seq pred -- first mid last )
-    [ cut-find ] keep [ not ] compose cut-find ;
-
-: (cut-all) ( seq pred quot -- )
-    [ >r cut3 r> dip >r >r , r> [ , ] when* r> ] 2keep
-    pick [ (cut-all) ] [ 3drop ] if ;
-
-: cut-all ( seq pred quot -- first mid last )
-    [ (cut-all) ] { } make ;
-
-: human-sort ( seq -- newseq )
-    [ dup [ digit? ] [ string>number ] cut-all ] { } map>assoc
-    sort-values keys ;
-
 : ?first ( seq -- first/f ) 0 swap ?nth ; inline
 : ?second ( seq -- second/f ) 1 swap ?nth ; inline
 : ?third ( seq -- third/f ) 2 swap ?nth ; inline
@@ -167,14 +146,6 @@ USE: continuations
     [ length tuck min >r min r> ] keep subseq ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-! List the positions of obj in seq
-
-: indices ( seq obj -- seq )
-  >r dup length swap r>
-  [ = [ ] [ drop f ] if ] curry
-  2map
-  sift ;
 
 <PRIVATE
 : (attempt-each-integer) ( i n quot -- result )

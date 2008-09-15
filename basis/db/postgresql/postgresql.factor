@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs alien alien.syntax continuations io
-kernel math math.parser namespaces prettyprint quotations
+kernel math math.parser namespaces make prettyprint quotations
 sequences debugger db db.postgresql.lib db.postgresql.ffi
 db.tuples db.types tools.annotations math.ranges
 combinators classes locals words tools.walker

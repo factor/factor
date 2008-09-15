@@ -70,7 +70,8 @@ M: #recursive propagate-around ( #recursive -- )
     [ generalize-return-interval ] map ;
 
 : return-infos ( node -- infos )
-    label>> return>> node-input-infos generalize-return ;
+    label>> [ return>> node-input-infos ] [ loop?>> ] bi
+    [ generalize-return ] unless ;
 
 M: #call-recursive propagate-before ( #call-recursive -- )
     [ ] [ return-infos ] [ node-output-infos ] tri

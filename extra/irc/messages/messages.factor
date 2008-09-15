@@ -94,7 +94,7 @@ M: irc-message irc-message>server-line ( irc-message -- string )
 ! ======================================
 
 : split-at-first ( seq separators -- before after )
-    dupd '[ , member? ] find
+    dupd '[ _ member? ] find
         [ cut 1 tail ]
         [ swap ]
     if ;

@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel math math.parser namespaces
+USING: accessors assocs kernel math math.parser namespaces make
 sequences io io.sockets io.streams.string io.files io.timeouts
 strings splitting calendar continuations accessors vectors
 math.order hashtables byte-arrays prettyprint
@@ -95,7 +95,7 @@ DEFER: (http-request)
 SYMBOL: redirects
 
 : redirect-url ( request url -- request )
-    '[ , >url derive-url ensure-port ] change-url ;
+    '[ _ >url derive-url ensure-port ] change-url ;
 
 : do-redirect ( response data -- response data )
     over code>> 300 399 between? [
@@ -169,7 +169,7 @@ M: download-failed error.
 : download-to ( url file -- )
     #! Downloads the contents of a URL to a file.
     swap http-get
-    [ content-charset>> ] [ '[ , write ] ] bi*
+    [ content-charset>> ] [ '[ _ write ] ] bi*
     with-file-writer ;
 
 : download ( url -- )

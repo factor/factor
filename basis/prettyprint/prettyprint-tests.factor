@@ -3,7 +3,7 @@ kernel math namespaces parser prettyprint prettyprint.config
 prettyprint.sections sequences tools.test vectors words
 effects splitting generic.standard prettyprint.private
 continuations generic compiler.units tools.walker eval
-accessors ;
+accessors make ;
 IN: prettyprint.tests
 
 [ "4" ] [ 4 unparse ] unit-test
@@ -181,7 +181,7 @@ DEFER: parse-error-file
 
 : another-soft-break-test
     {
-        "USING: namespaces sequences ;"
+        "USING: make sequences ;"
         "IN: prettyprint.tests"
         ": another-soft-break-layout ( node -- quot )"
         "    parse-error-file"

@@ -1,7 +1,7 @@
 USING: io.files io.sockets io kernel threads
 namespaces tools.test continuations strings byte-arrays
 sequences prettyprint system io.encodings.binary io.encodings.ascii
-io.streams.duplex destructors ;
+io.streams.duplex destructors make ;
 IN: io.unix.tests
 
 ! Unix domain stream sockets

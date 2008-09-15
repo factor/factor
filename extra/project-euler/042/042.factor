@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ascii io.files kernel math math.functions namespaces
+USING: ascii io.files kernel math math.functions namespaces make
     project-euler.common sequences sequences.lib splitting io.encodings.ascii ;
 IN: project-euler.042
 

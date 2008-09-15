@@ -21,7 +21,7 @@ MACRO: ncleave ( seq n -- quot ) [ncleave] ;
 ! Cleave into array
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: [narr] ( seq n -- quot ) over length '[ , , ncleave , narray ] ;
+: [narr] ( seq n -- quot ) over length '[ _ _ ncleave _ narray ] ;
 
 MACRO: narr ( seq n -- array ) [narr] ;
 
@@ -34,11 +34,11 @@ MACRO: 3arr ( seq -- array ) 3 [narr] ;
 
 MACRO: <arr> ( seq -- )
   [ >quots ] [ length ] bi
- '[ , cleave , narray ] ;
+ '[ _ cleave _ narray ] ;
 
 MACRO: <2arr> ( seq -- )
   [ >quots ] [ length ] bi
- '[ , 2cleave , narray ] ;
+ '[ _ 2cleave _ narray ] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -58,7 +58,7 @@ MACRO: <2arr> ( seq -- )
 
 MACRO: <arr*> ( seq -- )
   [ >quots ] [ length ] bi
- '[ , spread , narray ] ;
+ '[ _ spread _ narray ] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

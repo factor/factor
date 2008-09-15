@@ -1,7 +1,7 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations io kernel math math.functions math.parser math.statistics
-    namespaces tools.time ;
+    namespaces make tools.time ;
 IN: project-euler.ave-time
 
 : collect-benchmarks ( quot n -- seq )

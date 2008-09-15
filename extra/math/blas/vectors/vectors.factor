@@ -62,7 +62,7 @@ METHOD: (blas-vector-like) { object object object double-complex-blas-vector }
     1 ;
 
 MACRO: (do-copy) ( copy make-vector -- )
-    '[ over 6 npick , 2dip 1 @ ] ;
+    '[ over 6 npick _ 2dip 1 @ ] ;
 
 : (prepare-swap) ( v1 v2 -- length v1-data v1-inc v2-data v2-inc v1 v2 )
     [
@@ -105,7 +105,7 @@ MACRO: (do-copy) ( copy make-vector -- )
 MACRO: (complex-nth) ( nth-quot -- )
     '[ 
         [ 2 * dup 1+ ] dip
-        , curry bi@ rect>
+        _ curry bi@ rect>
     ] ;
 
 : (c-complex-nth) ( n alien -- complex )
@@ -120,7 +120,7 @@ MACRO: (set-complex-nth) ( set-nth-quot -- )
             [ 2 * dup 1+ ] bi*
             swapd
         ] dip
-        , curry 2bi@ 
+        _ curry 2bi@ 
     ] ;
 
 : (set-c-complex-nth) ( complex n alien -- )

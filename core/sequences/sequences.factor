@@ -51,7 +51,7 @@ M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ;
 : push ( elt seq -- ) [ length ] [ set-nth ] bi ;
 
 : bounds-check? ( n seq -- ? )
-    length 1- 0 swap between? ; inline
+    dupd length < [ 0 >= ] [ drop f ] if ; inline
 
 ERROR: bounds-error index seq ;
 
@@ -236,6 +236,10 @@ INSTANCE: repetition immutable-sequence
 
 <PRIVATE
 
+: check-length ( n -- n )
+    #! Ricing.
+    dup integer? [ "length not an integer" throw ] unless ; inline
+
 : ((copy)) ( dst i src j n -- dst i src j n )
     dup -roll [
         + swap nth-unsafe -roll [
@@ -248,8 +252,9 @@ INSTANCE: repetition immutable-sequence
     inline recursive
 
 : prepare-subseq ( from to seq -- dst i src j n )
+    #! The check-length call forces partial dispatch
     [ >r swap - r> new-sequence dup 0 ] 3keep
-    -rot drop roll length ; inline
+    -rot drop roll length check-length ; inline
 
 : check-copy ( src n dst -- )
     over 0 < [ bounds-error ] when
@@ -273,7 +278,8 @@ PRIVATE>
 : but-last ( seq -- headseq ) 1 head* ;
 
 : copy ( src i dst -- )
-    pick length >r 3dup check-copy spin 0 r>
+    #! The check-length call forces partial dispatch
+    pick length check-length >r 3dup check-copy spin 0 r>
     (copy) drop ; inline
 
 M: sequence clone-like
@@ -474,8 +480,13 @@ PRIVATE>
 : last-index-from ( obj i seq -- n )
     rot [ = ] curry find-last-from drop ;
 
-: nths ( seq indices -- seq' )
-    swap [ nth ] curry map ;
+: indices ( obj seq -- indices )
+    V{ } clone spin
+    [ rot = [ over push ] [ drop ] if ]
+    curry each-index ;
+
+: nths ( indices seq -- seq' )
+    [ nth ] curry map ;
 
 : contains? ( seq quot -- ? )
     find drop >boolean ; inline
@@ -740,6 +751,17 @@ PRIVATE>
 
 : unclip-slice ( seq -- rest first )
     [ rest-slice ] [ first ] bi ; inline
+
+: 2unclip-slice ( seq1 seq2 -- seq1' seq2' elt1 elt2 )
+    [ unclip-slice ] bi@ swapd ; inline
+
+: map-reduce ( seq map-quot reduce-quot -- result )
+    [ [ unclip-slice ] dip [ call ] keep ] dip
+    compose reduce ; inline
+
+: 2map-reduce ( seq1 seq2 map-quot reduce-quot -- result )
+    [ [ 2unclip-slice ] dip [ call ] keep ] dip
+    compose 2reduce ; inline
 
 : unclip-last-slice ( seq -- butlast last )
     [ but-last-slice ] [ peek ] bi ; inline

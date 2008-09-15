@@ -282,8 +282,8 @@ HELP: each-bit
 { $values { "n" integer } { "quot" "a quotation with stack effect " { $snippet "( ? -- )" } } }
 { $description "Applies the quotation to each bit of the integer, starting from the least significant bit, and stopping at the last bit from which point on all bits are either clear (if the integer is positive) or all bits are set (if the integer is negataive)." }
 { $examples
-    { $example "USING: math.functions namespaces prettyprint ;" "[ BIN: 1101 [ , ] each-bit ] { } make ." "{ t f t t }" }
-    { $example "USING: math.functions namespaces prettyprint ;" "[ -3 [ , ] each-bit ] { } make ." "{ t f }" }
+    { $example "USING: math.functions make prettyprint ;" "[ BIN: 1101 [ , ] each-bit ] { } make ." "{ t f t t }" }
+    { $example "USING: math.functions make prettyprint ;" "[ -3 [ , ] each-bit ] { } make ." "{ t f }" }
 } ;
 
 HELP: ~

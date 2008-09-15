@@ -4,7 +4,7 @@ USING: threads kernel namespaces continuations combinators
 sequences math namespaces.private continuations.private
 concurrency.messaging quotations kernel.private words
 sequences.private assocs models models.filter arrays accessors
-generic generic.standard definitions ;
+generic generic.standard definitions make ;
 IN: tools.walker
 
 SYMBOL: show-walker-hook ! ( status continuation thread -- )

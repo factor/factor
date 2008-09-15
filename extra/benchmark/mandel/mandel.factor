@@ -1,9 +1,8 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays io kernel math math.functions math.order
-math.parser sequences byte-arrays byte-vectors io.files
-io.encodings.binary fry namespaces benchmark.mandel.params
-benchmark.mandel.colors ;
+USING: io kernel math math.functions sequences prettyprint
+io.files io.encodings io.encodings.ascii io.encodings.binary fry
+benchmark.mandel.params benchmark.mandel.colors ;
 IN: benchmark.mandel
 
 : x-inc width  200000 zoom-fact * / ; inline
@@ -19,24 +18,20 @@ IN: benchmark.mandel
 
 : pixel ( c -- iterations )
     [ C{ 0.0 0.0 } max-iterations ] dip
-    '[ sq , + ] [ absq 4.0 >= ] count-iterations ; inline
+    '[ sq _ + ] [ absq 4.0 >= ] count-iterations ; inline
 
 : color ( iterations -- color )
     [ color-map [ length mod ] keep nth ] [ B{ 0 0 0 } ] if* ; inline
 
 : render ( -- )
-    height [ width swap '[ , c pixel color % ] each ] each ; inline
+    height [ width swap '[ _ c pixel color write ] each ] each ; inline
 
 : ppm-header ( -- )
-    "P6\n" % width # " " % height # "\n255\n" % ; inline
-
-: buf-size ( -- n ) width height * 3 * 100 + ; inline
-
-: mandel ( -- data )
-    buf-size <byte-vector>
-    [ building [ ppm-header render ] with-variable ] [ B{ } like ] bi ;
+    ascii encode-output
+    "P6\n" write width pprint " " write height pprint "\n255\n" write
+    binary encode-output ; inline
 
 : mandel-main ( -- )
-    mandel "mandel.ppm" temp-file binary set-file-contents ;
+    "mandel.ppm" temp-file binary [ ppm-header render ] with-file-writer ;
 
 MAIN: mandel-main

@@ -64,14 +64,6 @@ GENERIC: cleanup* ( node -- node/nodes )
     ] [ body>> cleanup ] bi ;
 
 ! Removing overflow checks
-: no-overflow-variant ( op -- fast-op )
-    H{
-        { fixnum+ fixnum+fast }
-        { fixnum- fixnum-fast }
-        { fixnum* fixnum*fast }
-        { fixnum-shift fixnum-shift-fast }
-    } at ;
-
 : (remove-overflow-check?) ( #call -- ? )
     node-output-infos first class>> fixnum class<= ;
 
@@ -101,7 +93,7 @@ M: #declare cleanup* drop f ;
 
 : delete-unreachable-branches ( #branch -- )
     dup live-branches>> '[
-        ,
+        _
         [ [ [ drop ] [ delete-nodes ] if ] 2each ]
         [ select-children ]
         2bi
@@ -148,9 +140,9 @@ M: #branch cleanup*
 M: #phi cleanup*
     #! Remove #phi function inputs which no longer exist.
     live-branches get
-    [ '[ , sift-children ] change-phi-in-d ]
-    [ '[ , sift-children ] change-phi-info-d ]
-    [ '[ , sift-children ] change-terminated ] tri
+    [ '[ _ sift-children ] change-phi-in-d ]
+    [ '[ _ sift-children ] change-phi-info-d ]
+    [ '[ _ sift-children ] change-terminated ] tri
     eliminate-phi
     live-branches off ;
 

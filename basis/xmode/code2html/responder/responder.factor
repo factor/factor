@@ -9,8 +9,8 @@ IN: xmode.code2html.responder
     [
         drop
         dup '[
-            , utf8 [
-                , file-name input-stream get htmlize-stream
+            _ utf8 [
+                _ file-name input-stream get htmlize-stream
             ] with-file-reader
         ] "text/html" <content>
     ] <file-responder> ;

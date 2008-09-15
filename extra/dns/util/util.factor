@@ -1,5 +1,5 @@
 
-USING: kernel sequences sorting math math.order macros fry ;
+USING: kernel sequences sorting math math.order macros bake bake.fry ;
 
 IN: dns.util
 

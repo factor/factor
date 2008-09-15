@@ -1,13 +1,6 @@
 USING: help.markup help.syntax sequences ;
 IN: columns
 
-ARTICLE: "columns" "Column sequences"
-"A " { $emphasis "column" } " presents a column of a matrix represented as a sequence of rows:"
-{ $subsection column }
-{ $subsection <column> }
-"A utility word:"
-{ $subsection <flipped> } ;
-
 HELP: column
 { $class-description "A virtual sequence which presents a fixed column of a matrix represented as a sequence of rows. New instances can be created by calling " { $link <column> } "." } ;
 
@@ -29,5 +22,12 @@ HELP: <flipped>
 { $values { "seq" sequence } { "seq'" sequence } }
 { $description "Outputs a new virtual sequence which presents the transpose of " { $snippet "seq" } "." }
 { $notes "This is the virtual sequence equivalent of " { $link flip } "." } ;
+
+ARTICLE: "columns" "Column sequences"
+"A " { $emphasis "column" } " presents a column of a matrix represented as a sequence of rows:"
+{ $subsection column }
+{ $subsection <column> }
+"A utility word:"
+{ $subsection <flipped> } ;
 
 ABOUT: "columns"

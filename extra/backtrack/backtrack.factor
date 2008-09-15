@@ -20,9 +20,9 @@ M: amb-failure summary drop "Backtracking failure" ;
     [ fail ] unless ;
 
 MACRO: checkpoint ( quot -- quot' )
-    '[ failure get ,
-       '[ '[ failure set , continue ] callcc0
-          , failure set @ ] callcc0 ] ;
+    '[ failure get _
+       '[ '[ failure set _ continue ] callcc0
+          _ failure set @ ] callcc0 ] ;
 
 : number-from ( from -- from+n )
     [ 1 + number-from ] checkpoint ;
@@ -42,7 +42,7 @@ MACRO: unsafe-amb ( seq -- quot )
     dup length 1 =
     [ first 1quotation ]
     [ [ first ] [ rest ] bi
-      '[ , [ drop , unsafe-amb ] checkpoint ] ] if ;
+      '[ _ [ drop _ unsafe-amb ] checkpoint ] ] if ;
 
 PRIVATE> 
 
@@ -55,7 +55,7 @@ PRIVATE>
 
 MACRO: amb-execute ( seq -- quot )
     [ length 1 - ] [ <enum> [ 1quotation ] assoc-map ] bi
-    '[ , 0 unsafe-number-from-to nip , case ] ;
+    '[ _ 0 unsafe-number-from-to nip _ case ] ;
 
 : if-amb ( true false -- )
     [

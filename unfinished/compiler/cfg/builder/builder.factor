@@ -1,256 +1,297 @@
-! Copyright (C) 2008 Slava Pestov.
+ ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel assocs sequences sequences.lib fry accessors
-namespaces math combinators math.order
+USING: accessors arrays assocs combinators hashtables kernel
+math fry namespaces make sequences words stack-checker.inlining
 compiler.tree
+compiler.tree.builder
 compiler.tree.combinators
 compiler.tree.propagation.info
 compiler.cfg
-compiler.vops
-compiler.vops.builder ;
+compiler.cfg.stacks
+compiler.cfg.templates
+compiler.cfg.iterator
+compiler.cfg.instructions
+compiler.cfg.registers
+compiler.alien ;
 IN: compiler.cfg.builder
 
-! Convert tree SSA IR to CFG SSA IR.
-
-! We construct the graph and set successors first, then we
-! set predecessors in a separate pass. This simplifies the
-! logic.
-
-SYMBOL: procedures
-
-SYMBOL: loop-nesting
-
-SYMBOL: values>vregs
-
-GENERIC: convert ( node -- )
-
-M: #introduce convert drop ;
-
-: init-builder ( -- )
-    H{ } clone values>vregs set ;
-
-: end-basic-block ( -- )
-    basic-block get [ %b emit ] when ;
+! Convert tree SSA IR to CFG (not quite SSA yet) IR.
 
 : set-basic-block ( basic-block -- )
     [ basic-block set ] [ instructions>> building set ] bi ;
 
 : begin-basic-block ( -- )
-    <basic-block> basic-block get
-    [
-        end-basic-block
+    <basic-block> basic-block get [
         dupd successors>> push
     ] when*
     set-basic-block ;
 
-: convert-nodes ( node -- )
-    [ convert ] each ;
+: end-basic-block ( -- )
+    building off
+    basic-block off ;
 
-: (build-cfg) ( node word -- )
-    init-builder
+: stop-iterating ( -- next ) end-basic-block f ;
+
+USE: qualified
+FROM: compiler.generator.registers => +input+   ;
+FROM: compiler.generator.registers => +output+  ;
+FROM: compiler.generator.registers => +scratch+ ;
+FROM: compiler.generator.registers => +clobber+ ;
+
+SYMBOL: procedures
+
+SYMBOL: current-word
+
+SYMBOL: current-label
+
+SYMBOL: loops
+
+! Basic block after prologue, makes recursion faster
+SYMBOL: current-label-start
+
+: add-procedure ( -- )
+    basic-block get current-word get current-label get
+    <cfg> procedures get push ;
+
+: begin-procedure ( word label -- )
+    end-basic-block
     begin-basic-block
-    basic-block get swap procedures get set-at
-    convert-nodes ;
+    H{ } clone loops set
+    current-label set
+    current-word set
+    add-procedure ;
 
-: build-cfg ( node word -- procedures )
-    H{ } clone [
-        procedures [ (build-cfg) ] with-variable
+: with-cfg-builder ( nodes word label quot -- )
+    '[ begin-procedure @ ] with-scope ; inline
+
+GENERIC: emit-node ( node -- next )
+
+: check-basic-block ( node -- node' )
+    basic-block get [ drop f ] unless ; inline
+
+: emit-nodes ( nodes -- )
+    [ current-node emit-node check-basic-block ] iterate-nodes
+    finalize-phantoms ;
+
+: remember-loop ( label -- )
+    basic-block get swap loops get set-at ;
+
+: begin-word ( -- )
+    #! We store the basic block after the prologue as a loop
+    #! labelled by the current word, so that self-recursive
+    #! calls can skip an epilogue/prologue.
+    init-phantoms
+    %prologue
+    %branch
+    begin-basic-block
+    current-label get remember-loop ;
+
+: (build-cfg) ( nodes word label -- )
+    [
+        begin-word
+        [ emit-nodes ] with-node-iterator
+    ] with-cfg-builder ;
+
+: build-cfg ( nodes word label -- procedures )
+    V{ } clone [
+        procedures [
+            (build-cfg)
+        ] with-variable
     ] keep ;
 
-: value>vreg ( value -- vreg )
-    values>vregs get at ;
+: if-intrinsics ( #call -- quot )
+    word>> "if-intrinsics" word-prop ;
 
-: output-vreg ( value vreg -- )
-    swap values>vregs get set-at ;
+: local-recursive-call ( basic-block -- next )
+    %branch
+    basic-block get successors>> push
+    stop-iterating ;
 
-: produce-vreg ( value -- vreg )
-    next-vreg [ output-vreg ] keep ;
+: emit-call ( word -- next )
+    finalize-phantoms
+    {
+        { [ tail-call? not ] [ 0 %frame-required %call iterate-next ] }
+        { [ dup loops get key? ] [ loops get at local-recursive-call ] }
+        [ %epilogue %jump stop-iterating ]
+    } cond ;
 
-: (load-inputs) ( seq stack -- )
-    over empty? [ 2drop ] [
-        [ <reversed> ] dip
-        [ '[ produce-vreg _ , %peek emit ] each-index ]
-        [ [ length neg ] dip %height emit ]
-        2bi
-    ] if ;
+! #recursive
+: compile-recursive ( node -- next )
+    [ label>> id>> emit-call ]
+    [ [ child>> ] [ label>> word>> ] [ label>> id>> ] tri (build-cfg) ] bi ;
 
-: load-in-d ( node -- ) in-d>> %data (load-inputs) ;
-
-: load-in-r ( node -- ) in-r>> %retain (load-inputs) ;
-
-: (store-outputs) ( seq stack -- )
-    over empty? [ 2drop ] [
-        [ <reversed> ] dip
-        [ [ length ] dip %height emit ]
-        [ '[ value>vreg _ , %replace emit ] each-index ]
-        2bi
-    ] if ;
-
-: store-out-d ( node -- ) out-d>> %data (store-outputs) ;
-
-: store-out-r ( node -- ) out-r>> %retain (store-outputs) ;
-
-: (emit-call) ( word -- )
-    begin-basic-block %call emit begin-basic-block ;
-
-: intrinsic-inputs ( node -- )
-    [ load-in-d ]
-    [ in-d>> { #1 #2 #3 #4 } [ [ value>vreg ] dip set ] 2each ]
-    bi ;
-
-: intrinsic-outputs ( node -- )
-    [ out-d>> { ^1 ^2 ^3 ^4 } [ get output-vreg ] 2each ]
-    [ store-out-d ]
-    bi ;
-
-: intrinsic ( node quot -- )
-    [
-        init-intrinsic
-
-        [ intrinsic-inputs ]
-        swap
-        [ intrinsic-outputs ]
-        tri
-    ] with-scope ; inline
-
-USING: kernel.private math.private slots.private ;
-
-: maybe-emit-fixnum-shift-fast ( node -- node )
-    dup dup in-d>> second node-value-info literal>> dup fixnum? [
-        '[ , emit-fixnum-shift-fast ] intrinsic
-    ] [
-        drop dup word>> (emit-call)
-    ] if ;
-
-: emit-call ( node -- )
-    dup word>> {
-        { \ tag [ [ emit-tag ] intrinsic ] }
-
-        { \ slot [ [ dup emit-slot ] intrinsic ] }
-        { \ set-slot [ [ dup emit-set-slot ] intrinsic ] }
-
-        { \ fixnum-bitnot [ [ emit-fixnum-bitnot ] intrinsic ] }
-        { \ fixnum+fast [ [ emit-fixnum+fast ] intrinsic ] }
-        { \ fixnum-fast [ [ emit-fixnum-fast ] intrinsic ] }
-        { \ fixnum-bitand [ [ emit-fixnum-bitand ] intrinsic ] }
-        { \ fixnum-bitor [ [ emit-fixnum-bitor ] intrinsic ] }
-        { \ fixnum-bitxor [ [ emit-fixnum-bitxor ] intrinsic ] }
-        { \ fixnum*fast [ [ emit-fixnum*fast ] intrinsic ] }
-        { \ fixnum<= [ [ emit-fixnum<= ] intrinsic ] }
-        { \ fixnum>= [ [ emit-fixnum>= ] intrinsic ] }
-        { \ fixnum< [ [ emit-fixnum< ] intrinsic ] }
-        { \ fixnum> [ [ emit-fixnum> ] intrinsic ] }
-        { \ eq? [ [ emit-eq? ] intrinsic ] }
-
-        { \ fixnum-shift-fast [ maybe-emit-fixnum-shift-fast ] }
-
-        { \ float+ [ [ emit-float+ ] intrinsic ] }
-        { \ float- [ [ emit-float- ] intrinsic ] }
-        { \ float* [ [ emit-float* ] intrinsic ] }
-        { \ float/f [ [ emit-float/f ] intrinsic ] }
-        { \ float<= [ [ emit-float<= ] intrinsic ] }
-        { \ float>= [ [ emit-float>= ] intrinsic ] }
-        { \ float< [ [ emit-float< ] intrinsic ] }
-        { \ float> [ [ emit-float> ] intrinsic ] }
-        { \ float? [ [ emit-float= ] intrinsic ] }
-
-        ! { \ (tuple) [ dup first-input '[ , emit-(tuple) ] intrinsic ] }
-        ! { \ (array) [ dup first-input '[ , emit-(array) ] intrinsic ] }
-        ! { \ (byte-array) [ dup first-input '[ , emit-(byte-array) ] intrinsic ] }
-
-        [ (emit-call) ]
-    } case drop ;
-
-M: #call convert emit-call ;
-
-: emit-call-loop ( #recursive -- )
-    dup label>> loop-nesting get at basic-block get successors>> push
-    end-basic-block
-    basic-block off
-    drop ;
-
-: emit-call-recursive ( #recursive -- )
-    label>> id>> (emit-call) ;
-
-M: #call-recursive convert
-    dup label>> loop?>>
-    [ emit-call-loop ] [ emit-call-recursive ] if ;
-
-M: #push convert
-    [
-        [ out-d>> first produce-vreg ]
-        [ node-output-infos first literal>> ]
-        bi emit-literal
-    ]
-    [ store-out-d ] bi ;
-
-M: #shuffle convert [ load-in-d ] [ store-out-d ] bi ;
-
-M: #>r convert [ load-in-d ] [ store-out-r ] bi ;
-
-M: #r> convert [ load-in-r ] [ store-out-d ] bi ;
-
-M: #terminate convert drop ;
-
-: integer-conditional ( in1 in2 cc -- )
-    [ [ next-vreg dup ] 2dip %icmp emit ] dip %bi emit ; inline
-
-: float-conditional ( in1 in2 branch -- )
-    [ next-vreg [ %fcmp emit ] keep ] dip emit ; inline
-
-: emit-if ( #if -- )
-    in-d>> first value>vreg
-    next-vreg dup f emit-literal
-    cc/= integer-conditional ;
-
-: convert-nested ( node -- last-bb )
-    [
-        <basic-block>
-        [ set-basic-block ] keep
-        [ convert-nodes end-basic-block ] dip
-        basic-block get
-    ] with-scope
-    [ basic-block get successors>> push ] dip ;
-
-: convert-if-children ( #if -- )
-    children>> [ convert-nested ] map sift
-    <basic-block>
-    [ '[ , _ successors>> push ] each ]
-    [ set-basic-block ]
-    bi ;
-
-M: #if convert
-    [ load-in-d ] [ emit-if ] [ convert-if-children ] tri ;
-
-M: #dispatch convert
-    "Unimplemented" throw ;
-
-M: #phi convert drop ;
-
-M: #declare convert drop ;
-
-M: #return convert drop %return emit ;
-
-: convert-recursive ( #recursive -- )
-    [ [ label>> id>> ] [ child>> ] bi (build-cfg) ]
-    [ (emit-call) ]
-    bi ;
-
-: begin-loop ( #recursive -- )
-    label>> basic-block get 2array loop-nesting get push ;
-
-: end-loop ( -- )
-    loop-nesting get pop* ;
-
-: convert-loop ( #recursive -- )
+: compile-loop ( node -- next )
+    finalize-phantoms
     begin-basic-block
-    [ begin-loop ]
-    [ child>> convert-nodes ]
-    [ drop end-loop ]
-    tri ;
+    [ label>> id>> remember-loop ] [ child>> emit-nodes ] bi
+    iterate-next ;
 
-M: #recursive convert
-    dup label>> loop?>>
-    [ convert-loop ] [ convert-recursive ] if ;
+M: #recursive emit-node
+    dup label>> loop?>> [ compile-loop ] [ compile-recursive ] if ;
 
-M: #copy convert drop ;
+! #if
+: emit-branch ( nodes -- final-bb )
+    [
+        begin-basic-block copy-phantoms
+        emit-nodes
+        basic-block get dup [ %branch ] when
+    ] with-scope ;
+
+: emit-if ( node -- next )
+    children>> [ emit-branch ] map
+    end-basic-block
+    begin-basic-block
+    basic-block get '[ [ _ swap successors>> push ] when* ] each
+    init-phantoms
+    iterate-next ;
+
+M: #if emit-node
+    { { f "flag" } } lazy-load first %branch-t
+    emit-if ;
+
+! #dispatch
+: dispatch-branch ( nodes word -- label )
+    gensym [
+        [
+            copy-phantoms
+            %prologue
+            [ emit-nodes ] with-node-iterator
+            %epilogue
+            %return
+        ] with-cfg-builder
+    ] keep ;
+
+: dispatch-branches ( node -- )
+    children>> [
+        current-word get dispatch-branch
+        %dispatch-label
+    ] each ;
+
+: emit-dispatch ( node -- )
+    %dispatch dispatch-branches init-phantoms ;
+
+M: #dispatch emit-node
+    #! The order here is important, dispatch-branches must
+    #! run after %dispatch, so that each branch gets the
+    #! correct register state
+    tail-call? [
+        emit-dispatch iterate-next
+    ] [
+        current-word get gensym [
+            [
+                begin-word
+                emit-dispatch
+            ] with-cfg-builder
+        ] keep emit-call
+    ] if ;
+
+! #call
+: define-intrinsics ( word intrinsics -- )
+    "intrinsics" set-word-prop ;
+
+: define-intrinsic ( word quot assoc -- )
+    2array 1array define-intrinsics ;
+
+: define-if-intrinsics ( word intrinsics -- )
+    [ +input+ associate ] assoc-map
+    "if-intrinsics" set-word-prop ;
+
+: define-if-intrinsic ( word quot inputs -- )
+    2array 1array define-if-intrinsics ;
+
+: find-intrinsic ( #call -- pair/f )
+    word>> "intrinsics" word-prop find-template ;
+
+: find-boolean-intrinsic ( #call -- pair/f )
+    word>> "if-intrinsics" word-prop find-template ;
+
+: find-if-intrinsic ( #call -- pair/f )
+    node@ {
+        { [ dup length 2 < ] [ 2drop f ] }
+        { [ dup second #if? ] [ drop find-boolean-intrinsic ] }
+        [ 2drop f ]
+    } cond ;
+
+: do-if-intrinsic ( pair -- next )
+    [ %if-intrinsic ] apply-template skip-next emit-if ;
+
+: do-boolean-intrinsic ( pair -- next )
+    [
+        f alloc-vreg [ %boolean-intrinsic ] keep phantom-push
+    ] apply-template iterate-next ;
+
+: do-intrinsic ( pair -- next )
+    [ %intrinsic ] apply-template iterate-next ;
+
+: setup-operand-classes ( #call -- )
+    node-input-infos [ class>> ] map set-operand-classes ;
+
+M: #call emit-node
+    dup setup-operand-classes
+    dup find-if-intrinsic [ do-if-intrinsic ] [
+        dup find-boolean-intrinsic [ do-boolean-intrinsic ] [
+            dup find-intrinsic [ do-intrinsic ] [
+                word>> emit-call
+            ] ?if
+        ] ?if
+    ] ?if ;
+
+! #call-recursive
+M: #call-recursive emit-node label>> id>> emit-call ;
+
+! #push
+M: #push emit-node
+    literal>> <constant> phantom-push iterate-next ;
+
+! #shuffle
+M: #shuffle emit-node
+    shuffle-effect phantom-shuffle iterate-next ;
+
+M: #>r emit-node
+    [ in-d>> length ] [ out-r>> empty? ] bi
+    [ phantom-drop ] [ phantom->r ] if
+    iterate-next ;
+
+M: #r> emit-node
+    [ in-r>> length ] [ out-d>> empty? ] bi
+    [ phantom-rdrop ] [ phantom-r> ] if
+    iterate-next ;
+
+! #return
+M: #return emit-node
+    drop finalize-phantoms %epilogue %return f ;
+
+M: #return-recursive emit-node
+    finalize-phantoms
+    label>> id>> loops get key?
+    [ %epilogue %return ] unless f ;
+
+! #terminate
+M: #terminate emit-node drop stop-iterating ;
+
+! FFI
+M: #alien-invoke emit-node
+    params>>
+    [ alien-invoke-frame %frame-required ]
+    [ %alien-invoke iterate-next ]
+    bi ;
+
+M: #alien-indirect emit-node
+    params>>
+    [ alien-invoke-frame %frame-required ]
+    [ %alien-indirect iterate-next ]
+    bi ;
+
+M: #alien-callback emit-node
+    params>> dup xt>> dup
+    [ init-phantoms %alien-callback ] with-cfg-builder
+    iterate-next ;
+
+! No-op nodes
+M: #introduce emit-node drop iterate-next ;
+
+M: #copy emit-node drop iterate-next ;
+
+M: #enter-recursive emit-node drop iterate-next ;
+
+M: #phi emit-node drop iterate-next ;

@@ -1,5 +1,5 @@
 USING: sequences math mirrors splitting grouping
-kernel namespaces assocs alien.syntax columns
+kernel make assocs alien.syntax columns
 float-arrays bit-arrays ;
 IN: benchmark.dispatch3
 
