@@ -56,7 +56,7 @@ M: %branch linearize-insn
     dup successors>> first2 swap label>> ; inline
 
 : boolean-conditional ( basic-block insn -- basic-block successor vreg label2 )
-    [ conditional ] [ dst>> ] bi* swap ; inline
+    [ conditional ] [ src>> ] bi* swap ; inline
 
 M: %branch-f linearize-insn
     boolean-conditional _branch-f emit-branch ;
@@ -73,10 +73,10 @@ M: %boolean-intrinsic linearize-insn
         "false" define-label
         "end" define-label
         "false" get over [ quot>> ] [ vregs>> ] bi _if-intrinsic
-        dup out>> t %load-literal
+        dup dst>> t %load-literal
         "end" get _branch
         "false" resolve-label
-        dup out>> f %load-literal
+        dup dst>> f %load-literal
         "end" resolve-label
     ] with-scope
     2drop ;

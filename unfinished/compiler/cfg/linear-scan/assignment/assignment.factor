@@ -5,7 +5,7 @@ fry make
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.linear-scan.live-intervals ;
-IN: compiler.cfg.linear-scan.rewriting
+IN: compiler.cfg.linear-scan.assignment
 
 ! A vector of live intervals. There is linear searching involved
 ! but since we never have too many machine registers (around 30
@@ -55,45 +55,24 @@ SYMBOL: unhandled-intervals
         ] [ 2drop ] if
     ] if ;
 
-GENERIC: rewrite-instruction ( insn -- )
+: (assign-registers) ( insn -- )
+    dup
+    [ defs-vregs ] [ uses-vregs ] bi append
+    active-intervals get swap '[ vreg>> _ member? ] filter
+    [ [ vreg>> ] [ reg>> ] bi ] { } map>assoc
+    >>regs drop ;
 
-M: %cond-branch rewrite-instruction
-    [ lookup-register ] change-vreg
-    drop ;
+: init-assignment ( live-intervals -- )
+    V{ } clone active-intervals set
+    <min-heap> unhandled-intervals set
+    init-unhandled ;
 
-M: %unary rewrite-instruction
-    [ lookup-register ] change-dst
-    [ lookup-register ] change-src
-    drop ;
-
-M: %peek rewrite-instruction
-    [ lookup-register ] change-vreg
-    drop ;
-
-M: %replace rewrite-instruction
-    [ lookup-register ] change-vreg
-    drop ;
-
-M: %load-literal rewrite-instruction
-    [ lookup-register ] change-vreg
-    drop ;
-
-: lookup-registers ( assoc -- assoc' )
-    [ dup vreg? [ lookup-register ] when ] assoc-map ;
-
-M: %intrinsic rewrite-instruction
-    [ lookup-registers ] change-vregs
-    drop ;
-
-M: _if-intrinsic rewrite-instruction
-    [ lookup-registers ] change-vregs
-    drop ;
-
-: rewrite-instructions ( insns -- insns' )
+: assign-registers ( insns live-intervals -- insns' )
     [
+        init-assignment
         [
             [ activate-new-intervals ]
-            [ drop [ rewrite-instruction ] [ , ] bi ]
+            [ drop [ (assign-registers) ] [ , ] bi ]
             [ expire-old-intervals ]
             tri
         ] each-index

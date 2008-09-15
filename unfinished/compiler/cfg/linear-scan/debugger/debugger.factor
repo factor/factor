@@ -19,5 +19,5 @@ IN: compiler.cfg.linear-scan.debugger
     ] [ 1array ] if ;
 
 : check-linear-scan ( live-intervals machine-registers -- )
-    [ [ clone ] map dup ] dip allocate-registers
+    [ [ clone ] map ] dip allocate-registers
     [ split-children ] map concat check-assigned ;

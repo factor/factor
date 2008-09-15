@@ -1,14 +1,14 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors arrays kernel sequences namespaces
-math compiler.cfg.instructions.syntax ;
+math compiler.cfg.registers compiler.cfg.instructions.syntax ;
 IN: compiler.cfg.instructions
 
 ! Virtual CPU instructions, used by CFG and machine IRs
 
-INSN: %cond-branch src ;
-INSN: %unary dst src ;
-INSN: %nullary dst ;
+TUPLE: %cond-branch < insn src ;
+TUPLE: %unary < insn dst src ;
+TUPLE: %nullary < insn dst ;
 
 ! Stack operations
 INSN: %load-literal < %nullary obj ;
@@ -50,12 +50,12 @@ INSN: %alien-callback params ;
 GENERIC: defs-vregs ( insn -- seq )
 GENERIC: uses-vregs ( insn -- seq )
 
-M: %nullary defs-vregs dst>> 1array ;
-M: %unary defs-vregs dst>> 1array ;
+M: %nullary defs-vregs dst>> >vreg 1array ;
+M: %unary defs-vregs dst>> >vreg 1array ;
 M: insn defs-vregs drop f ;
 
-M: %replace uses-vregs src>> 1array ;
-M: %unary uses-vregs src>> 1array ;
+M: %replace uses-vregs src>> >vreg 1array ;
+M: %unary uses-vregs src>> >vreg 1array ;
 M: insn uses-vregs drop f ;
 
 ! M: %intrinsic uses-vregs vregs>> values ;
@@ -75,7 +75,7 @@ M: %cond-branch uses-vregs src>> 1array ;
 
 ! M: %if-intrinsic uses-vregs vregs>> values ;
 
-M: %boolean-intrinsic defs-vregs out>> 1array ;
+M: %boolean-intrinsic defs-vregs dst>> 1array ;
 
 ! M: %boolean-intrinsic uses-vregs
 !     [ vregs>> values ] [ out>> ] bi suffix ;
@@ -94,14 +94,14 @@ INSN: _label label ;
 : resolve-label ( label/name -- )
     dup label? [ get ] unless _label ;
 
-TUPLE: _cond-branch src label ;
+TUPLE: _cond-branch < insn src label ;
 
 INSN: _branch label ;
 INSN: _branch-f < _cond-branch ;
 INSN: _branch-t < _cond-branch ;
 INSN: _if-intrinsic label quot vregs ;
 
-M: _cond-branch uses-vregs src>> 1array ;
+M: _cond-branch uses-vregs src>> >vreg 1array ;
 ! M: _if-intrinsic uses-vregs vregs>> values ;
 
 INSN: _spill src n ;

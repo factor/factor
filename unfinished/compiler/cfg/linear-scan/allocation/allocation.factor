@@ -140,7 +140,7 @@ SYMBOL: spill-counter
 : init-allocator ( registers -- )
     V{ } clone active-intervals set
     <min-heap> unhandled-intervals set
-    [ >vector ] assoc-map free-registers set
+    [ reverse >vector ] assoc-map free-registers set
     0 spill-counter set
     -1 progress set ;
 
@@ -150,10 +150,10 @@ SYMBOL: spill-counter
 : (allocate-registers) ( -- )
     unhandled-intervals get [ handle-interval ] slurp-heap ;
 
-: allocate-registers ( live-intervals machine-registers -- )
+: allocate-registers ( live-intervals machine-registers -- live-intervals )
     #! This modifies the input live-intervals.
     [
         init-allocator
-        init-unhandled
+        dup init-unhandled
         (allocate-registers)
     ] with-scope ;
