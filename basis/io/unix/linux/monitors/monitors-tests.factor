@@ -10,6 +10,7 @@ threads calendar prettyprint destructors io.timeouts ;
     
     ! Non-recursive
     [ ] [ "monitor-test-self" temp-file f <monitor> "m" set ] unit-test
+    [ ] [ 3 seconds "m" get set-timeout ] unit-test
 
     [ ] [ "monitor-test-self" temp-file touch-file ] unit-test
 
@@ -22,6 +23,7 @@ threads calendar prettyprint destructors io.timeouts ;
     
     ! Recursive
     [ ] [ "monitor-test-self" temp-file t <monitor> "m" set ] unit-test
+    [ ] [ 3 seconds "m" get set-timeout ] unit-test
 
     [ ] [ "monitor-test-self" temp-file touch-file ] unit-test
 
