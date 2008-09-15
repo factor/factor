@@ -190,3 +190,8 @@ M: heap heap-pop ( heap -- value key )
     [ dup heap-empty? not ]
     [ dup heap-pop swap 2array ]
     [ ] produce nip ;
+
+: slurp-heap ( heap quot: ( elt -- ) -- )
+    over heap-empty? [ 2drop ] [
+        [ [ heap-pop drop ] dip call ] [ slurp-heap ] 2bi
+    ] if ; inline recursive
