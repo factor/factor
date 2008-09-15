@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors arrays kernel sequences namespaces
-math compiler.instructions.syntax ;
-IN: compiler.instructions
+math compiler.cfg.instructions.syntax ;
+IN: compiler.cfg.instructions
 
 ! Virtual CPU instructions, used by CFG and machine IRs
 
@@ -46,14 +46,22 @@ INSN: %alien-invoke params ;
 INSN: %alien-indirect params ;
 INSN: %alien-callback params ;
 
+GENERIC: defs-vregs ( insn -- seq )
 GENERIC: uses-vregs ( insn -- seq )
 
+M: insn defs-vregs drop f ;
 M: insn uses-vregs drop f ;
-M: %peek uses-vregs vreg>> 1array ;
+
+M: %peek defs-vregs vreg>> 1array ;
+
 M: %replace uses-vregs vreg>> 1array ;
-M: %load-literal uses-vregs vreg>> 1array ;
-M: %unary uses-vregs [ dst>> ] [ src>> ] bi 2array ;
-M: %intrinsic uses-vregs vregs>> values ;
+
+M: %load-literal defs-vregs vreg>> 1array ;
+
+M: %unary defs-vregs dst>> 1array ;
+M: %unary uses-vregs src>> 1array ;
+
+! M: %intrinsic uses-vregs vregs>> values ;
 
 ! Instructions used by CFG IR only.
 INSN: %prologue ;
@@ -67,9 +75,13 @@ INSN: %if-intrinsic quot vregs ;
 INSN: %boolean-intrinsic quot vregs out ;
 
 M: %cond-branch uses-vregs vreg>> 1array ;
-M: %if-intrinsic uses-vregs vregs>> values ;
-M: %boolean-intrinsic uses-vregs
-    [ vregs>> values ] [ out>> ] bi suffix ;
+
+! M: %if-intrinsic uses-vregs vregs>> values ;
+
+M: %boolean-intrinsic defs-vregs out>> 1array ;
+
+! M: %boolean-intrinsic uses-vregs
+!     [ vregs>> values ] [ out>> ] bi suffix ;
 
 ! Instructions used by machine IR only.
 INSN: _prologue n ;
@@ -93,4 +105,4 @@ INSN: _branch-t < _cond-branch ;
 INSN: _if-intrinsic label quot vregs ;
 
 M: _cond-branch uses-vregs vreg>> 1array ;
-M: _if-intrinsic uses-vregs vregs>> values ;
+! M: _if-intrinsic uses-vregs vregs>> values ;

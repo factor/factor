@@ -10,9 +10,9 @@ compiler.cfg
 compiler.cfg.stacks
 compiler.cfg.templates
 compiler.cfg.iterator
-compiler.alien
-compiler.instructions
-compiler.registers ;
+compiler.cfg.instructions
+compiler.cfg.registers
+compiler.alien ;
 IN: compiler.cfg.builder
 
 ! Convert tree SSA IR to CFG (not quite SSA yet) IR.

@@ -3,8 +3,8 @@
 USING: arrays assocs classes classes.private classes.algebra
 combinators hashtables kernel layouts math fry namespaces
 quotations sequences system vectors words effects alien
-byte-arrays accessors sets math.order compiler.instructions
-compiler.registers ;
+byte-arrays accessors sets math.order compiler.cfg.instructions
+compiler.cfg.registers ;
 IN: compiler.cfg.stacks
 
 ! Converting stack operations into register operations, while

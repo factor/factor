@@ -1,8 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math accessors sequences namespaces make
-combinators compiler.cfg compiler.cfg.rpo compiler.instructions
-compiler.instructions.syntax ;
+combinators
+compiler.cfg
+compiler.cfg.rpo
+compiler.cfg.instructions
+compiler.cfg.instructions.syntax ;
 IN: compiler.cfg.linearization
 
 ! Convert CFG IR to machine IR.

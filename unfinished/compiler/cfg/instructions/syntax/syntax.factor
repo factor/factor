@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes.tuple classes.tuple.parser kernel words
 make parser ;
-IN: compiler.instructions.syntax
+IN: compiler.cfg.instructions.syntax
 
 TUPLE: insn ;
 

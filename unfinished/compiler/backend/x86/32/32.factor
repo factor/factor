@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: system cpu.x86.assembler compiler.registers compiler.backend ;
+USING: system cpu.x86.assembler compiler.cfg.registers
+compiler.backend ;
 IN: compiler.backend.x86.32
 
 M: x86.32 machine-registers
