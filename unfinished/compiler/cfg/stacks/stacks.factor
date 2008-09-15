@@ -127,7 +127,7 @@ M: constant move-spec class ;
         { { f unboxed-c-ptr } [ %move-bug ] }
         { { f unboxed-byte-array } [ %move-bug ] }
 
-        { { f constant } [ value>> swap %load-literal ] }
+        { { f constant } [ value>> %load-literal ] }
 
         { { f float } [ %box-float ] }
         { { f unboxed-alien } [ %box-alien ] }

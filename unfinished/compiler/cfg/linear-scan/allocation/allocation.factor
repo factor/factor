@@ -6,15 +6,6 @@ compiler.cfg.linear-scan.live-intervals
 compiler.backend ;
 IN: compiler.cfg.linear-scan.allocation
 
-! Vector of live intervals we have already processed
-SYMBOL: retired-intervals
-
-: retire-interval ( live-interval -- )
-    retired-intervals get push ;
-
-: retire-intervals ( live-intervals -- )
-    retired-intervals get push-all ;
-
 ! Mapping from register classes to sequences of machine registers
 SYMBOL: free-registers
 
@@ -37,7 +28,7 @@ SYMBOL: active-intervals
     active-intervals get
     swap '[ end>> _ < ] partition
     active-intervals set
-    [ [ retire-interval ] [ deallocate-register ] bi ] each ;
+    [ deallocate-register ] each ;
 
 : expire-old-uses ( n -- )
     active-intervals get
@@ -112,9 +103,7 @@ SYMBOL: spill-counter
 
 : reuse-register ( new existing -- )
     reg>> >>reg
-    dup uses>> empty? [
-        [ retire-interval ] [ deallocate-register ] bi
-    ] [ add-active ] if ;
+    dup uses>> empty? [ deallocate-register ] [ add-active ] if ;
 
 : spill-existing ( new existing -- )
     #! Our new interval will be used before the active interval
@@ -123,12 +112,7 @@ SYMBOL: spill-counter
     #! of the existing interval again.
     [ reuse-register ]
     [ delete-active ]
-    [
-        split-and-spill
-        [ retire-interval ]
-        [ add-unhandled ]
-        bi*
-    ] tri ;
+    [ split-and-spill [ drop ] [ add-unhandled ] bi* ] tri ;
 
 : spill-new ( new existing -- )
     #! Our new interval will be used after the active interval
@@ -153,13 +137,7 @@ SYMBOL: spill-counter
     ] if-empty ;
 
 ! Main loop
-: slurp-heap ( heap quot: ( elt -- ) -- )
-    over heap-empty? [ 2drop ] [
-        [ [ heap-pop drop ] dip call ] [ slurp-heap ] 2bi
-    ] if ; inline recursive
-
 : init-allocator ( registers -- )
-    V{ } clone retired-intervals set
     V{ } clone active-intervals set
     <min-heap> unhandled-intervals set
     [ >vector ] assoc-map free-registers set
@@ -172,17 +150,10 @@ SYMBOL: spill-counter
 : (allocate-registers) ( -- )
     unhandled-intervals get [ handle-interval ] slurp-heap ;
 
-: finish-allocator ( -- live-intervals )
-    #! After register allocation is done, we retire all
-    #! live intervals which are still active.
-    active-intervals get retire-intervals
-    retired-intervals get ;
-
-: allocate-registers ( live-intervals machine-registers -- live-intervals' )
-    #! This destroys the input live-intervals.
+: allocate-registers ( live-intervals machine-registers -- )
+    #! This modifies the input live-intervals.
     [
         init-allocator
         init-unhandled
         (allocate-registers)
-        finish-allocator
     ] with-scope ;

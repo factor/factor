@@ -37,13 +37,11 @@ SYMBOL: live-intervals
     [ [ defs-vregs ] 2dip '[ _ swap >vreg _ new-live-interval ] each ]
     3bi ;
 
-: finalize-live-intervals ( assoc -- seq' )
+: finalize-live-intervals ( -- )
     #! Reverse uses lists so that we can pop values off.
-    values dup [ uses>> reverse-here ] each ;
+    live-intervals get [ nip uses>> reverse-here ] assoc-each ;
 
-: compute-live-intervals ( instructions -- live-intervals )
-    H{ } clone [
-        live-intervals [
-            [ compute-live-intervals* ] each-index
-        ] with-variable
-    ] keep finalize-live-intervals ;
+: compute-live-intervals ( instructions -- )
+    H{ } clone live-intervals set
+    [ compute-live-intervals* ] each-index
+    finalize-live-intervals ;
