@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors namespaces math kernel ;
-IN: compiler.registers
+IN: compiler.cfg.registers
 
 ! Virtual CPU registers, used by CFG and machine IRs
 
