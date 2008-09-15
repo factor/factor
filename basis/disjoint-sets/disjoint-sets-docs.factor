@@ -37,7 +37,7 @@ HELP: assoc>disjoint-set
 } ;
 
 ARTICLE: "disjoint-sets" "Disjoint sets"
-"The " { $emphasis "disjoint set" } " data structure, also known as " { $emphasis "union-find" } " (after the two main operations which it supports) represents a set of elements partitioned into disjoint equivalence classes, or alternatively, an equivalence relation on a set."
+"The " { $vocab-link "disjoint-sets" } " vocabulary implements the " { $emphasis "disjoint set" } " data structure (also known as " { $emphasis "union-find" } ", after the two main operations which it supports) that represents a set of elements partitioned into disjoint equivalence classes, or alternatively, an equivalence relation on a set."
 $nl
 "The two main supported operations are equating two elements, which joins their equivalence classes, and checking if two elements belong to the same equivalence class. Both operations have the time complexity of the inverse Ackermann function, which for all intents and purposes is constant time."
 $nl

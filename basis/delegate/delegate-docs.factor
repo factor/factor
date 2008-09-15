@@ -45,5 +45,4 @@ $nl
 { $subsection define-consult }
 "The " { $vocab-link "delegate.protocols" } " vocabulary defines formal protocols for the various informal protocols used in the Factor core, such as " { $link "sequence-protocol" } ", " { $link "assocs-protocol" } " or " { $link "stream-protocol" } ;
 
-IN: delegate
 ABOUT: { "delegate" "intro" }
