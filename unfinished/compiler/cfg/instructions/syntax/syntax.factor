@@ -1,15 +1,15 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes.tuple classes.tuple.parser kernel words
-make parser ;
-IN: compiler.instructions.syntax
+make fry sequences parser ;
+IN: compiler.cfg.instructions.syntax
 
 TUPLE: insn ;
 
 : INSN:
-    parse-tuple-definition
+    parse-tuple-definition "regs" suffix
     [ dup tuple eq? [ drop insn ] when ] dip
     [ define-tuple-class ]
     [ 2drop save-location ]
-    [ 2drop dup [ boa , ] curry define-inline ]
+    [ 2drop dup '[ f _ boa , ] define-inline ]
     3tri ; parsing

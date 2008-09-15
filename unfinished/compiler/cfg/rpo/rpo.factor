@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors namespaces make math sequences
-compiler.instructions ;
+compiler.cfg.instructions ;
 IN: compiler.cfg.rpo
 
 : post-order-traversal ( basic-block -- )
