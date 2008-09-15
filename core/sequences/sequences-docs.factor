@@ -695,6 +695,16 @@ HELP: remove
 { $values { "obj" object } { "seq" sequence } { "newseq" "a new sequence" } }
 { $description "Outputs a new sequence containing all elements of the input sequence except those equal to the given element." } ;
 
+HELP: remove-nth
+{ $values
+     { "n" integer } { "seq" sequence }
+     { "seq'" sequence } }
+{ $description "Creates a new sequence without the element at index " { $snippet "n" } "." }
+{ $examples "Notice that the original sequence is left intact:" { $example "USING: sequences prettyprint kernel ;"
+    "{ 1 2 3 } 1 over remove-nth . ."
+    "{ 1 3 }\n{ 1 2 3 }"
+} } ;
+
 HELP: move
 { $values { "from" "an index in " { $snippet "seq" } } { "to" "an index in " { $snippet "seq" } } { "seq" "a mutable sequence" } }
 { $description "Sets the element with index " { $snippet "m" } " to the element with index " { $snippet "n" } "." }
