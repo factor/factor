@@ -175,6 +175,7 @@ find_os() {
         *FreeBSD*) OS=freebsd;;
         *OpenBSD*) OS=openbsd;;
         *DragonFly*) OS=dragonflybsd;;
+	SunOS) OS=solaris;;
     esac
 }
 
@@ -186,6 +187,7 @@ find_architecture() {
     case $uname_m in
        i386) ARCH=x86;;
        i686) ARCH=x86;;
+       i86pc) ARCH=x86;;
        amd64) ARCH=x86;;
        ppc64) ARCH=ppc;;
        *86) ARCH=x86;;
