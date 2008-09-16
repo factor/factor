@@ -261,6 +261,7 @@ check_os_arch_word() {
         $ECHO "ARCH: $ARCH"
         $ECHO "WORD: $WORD"
         $ECHO "OS, ARCH, or WORD is empty.  Please report this."
+	echo $MAKE_TARGET
         exit 5
     fi
 }
@@ -485,6 +486,8 @@ usage() {
     echo "Example for overriding the default target:"
     echo "    $0 update macosx-x86-32"
 }
+
+MAKE_TARGET=unknown
 
 # -n is nonzero length, -z is zero length
 if [[ -n "$2" ]] ; then
