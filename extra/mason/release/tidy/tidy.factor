@@ -27,7 +27,7 @@ IN: mason.release.tidy
 
 : remove-factor-app ( -- )
     target-os get "macosx" =
-    [ [ "Factor.app" delete-tree ] unless ;
+    [ "Factor.app" delete-tree ] unless ;
 
 : tidy ( -- )
     "factor" [ remove-factor-app remove-common-files ] with-directory ;
