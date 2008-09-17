@@ -1,4 +1,5 @@
-USING: help.markup help.syntax libc kernel continuations io ;
+USING: help.markup help.syntax libc kernel continuations io
+sequences ;
 IN: destructors
 
 HELP: dispose
@@ -44,6 +45,11 @@ HELP: &dispose
 HELP: |dispose
 { $values { "disposable" "a disposable object" } }
 { $description "Marks the object for disposal in the event of an error at the end of the current " { $link with-destructors } " scope." } ;
+
+HELP: dispose-each
+{ $values
+     { "seq" sequence } }
+{ $description "Attempts to dispose of each element of a sequence and collects all of the errors into a sequence. If any errors are thrown during disposal, the last error is rethrown after all objects have been disposed." } ;
 
 ARTICLE: "destructors-anti-patterns" "Resource disposal anti-patterns"
 "Words which create objects corresponding to external resources should always be used with " { $link with-disposal } ". The following code is wrong:"

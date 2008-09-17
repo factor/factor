@@ -684,3 +684,7 @@ HELP: call-next-method
 { POSTPONE: call-next-method (call-next-method) next-method } related-words
 
 { POSTPONE: << POSTPONE: >> } related-words
+
+HELP: B
+{ $syntax "B" }
+{ $description "Inserts a breakpoint at parse-time. Useful for debugging." } ;
