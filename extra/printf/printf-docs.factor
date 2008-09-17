@@ -6,19 +6,34 @@ IN: printf
 HELP: printf
 { $values { "format-string" string } }
 { $description 
-    "Writes the arguments formatted according to the format string." 
+    "Writes the arguments formatted according to the format string.\n" 
     { $table
         { "%%"    "Single %" "" }
-        { "%Wd"   "Integer W digits wide (e.g., \"1234\")"  "fixnum" }
-        { "%W.De" "Scientific notation" "fixnum, float" }
-        { "%W.DE" "Scientific notation" "fixnum, float" }
-        { "%W.Df" "Fixed format" "fixnum, float" }
-        { "%Wx"   "Hexadecimal" "hex" }
-        { "%WX"   "Hexadecimal uppercase" "hex" }
-        { "%W.Ds" "String format" "string" }
-        { "%W.DS" "String format uppercase" "string" }
+        { "%Pd"   "Integer format"  "fixnum" }
+        { "%P.De" "Scientific notation" "fixnum, float" }
+        { "%P.DE" "Scientific notation" "fixnum, float" }
+        { "%P.Df" "Fixed format" "fixnum, float" }
+        { "%Px"   "Hexadecimal" "hex" }
+        { "%PX"   "Hexadecimal uppercase" "hex" }
+        { "%P.Ds" "String format" "string" }
+        { "%P.DS" "String format uppercase" "string" }
         { "%c"    "Character format" "char" } 
         { "%C"    "Character format uppercase" "char" } 
+    }
+    "\n"
+    "Padding ('P') is used to specify the minimum width of the result string, the padding character, and the alignment.  By default, the padding character defaults to a space and the alignment defaults to right-aligned. For example:\n"
+    { $list
+        "\"%5s\" formats a string padding with spaces up to 5 characters wide."
+        "\"%08d\" formats an integer padding with zeros up to 3 characters wide."
+        "\"%'#5f\" formats a float padding with '#' up to 3 characters wide."
+        "\"%-10d\" formats an integer to 10 characters wide and left-aligns." 
+    }
+    "\n"
+    "Digits ('D') is used to specify the maximum digits in the result string. For example:\n"
+    { $list 
+        "\"%.3s\" formats a string to truncate at 3 characters (from the left)."
+        "\"%.10f\" formats a float to pad-right with zeros up to 10 digits beyond the decimal point."
+        "\"%.5E\" formats a float into scientific notation with zeros up to 5 digits beyond the decimal point, but before the exponent."
     }
 } 
 { $examples 
@@ -38,6 +53,10 @@ HELP: printf
         "USING: printf ;"
         "{ 1234567890 } \"%.5e\" printf"
         "1.23456e+09" }
+    { $example
+        "USING: printf ;"
+        "{ 12 } \"%'#4d\" printf"
+        "##12" }
 } ;
 
 HELP: sprintf
