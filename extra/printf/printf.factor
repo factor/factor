@@ -1,135 +1,116 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: ascii io io.encodings.ascii io.files present kernel strings 
-math math.parser unicode.case sequences combinators 
-accessors namespaces prettyprint vectors ;
+USING: io io.encodings.ascii io.files 
+kernel sequences strings vectors math math.parser macros
+fry peg.ebnf unicode.case arrays prettyprint quotations ;
 
-IN: printf 
-
-! FIXME: Handle invalid formats properly.
-! FIXME: Handle incomplete formats properly.
-! FIXME: Deal only with CHAR rather than converting to { CHAR } ?
-! FIXME: Understand intermediate allocations that are happening...
-
-TUPLE: state type pad align width decimals neg loop ;
-
-SYMBOL: current
-
-SYMBOL: args
+IN: printf
 
 <PRIVATE
 
-: start-% ( -- )
-    state new 
-      CHAR: s >>type
-      CHAR: \s >>pad
-      CHAR: r >>align
-      0 >>width
-      -1 >>decimals
-      f >>neg
-      CHAR: % >>loop
-    current set ;
+: compose-all ( seq -- quot )
+    [ ] [ compose ] reduce ;
 
-: stop-% ( -- ) 
-    current off ;
+: write-all ( seq -- quot )
+    [ [ write ] append ] map ;
 
-: render ( s -- s )  
-    >vector
+: append-all ( seq -- string )
+    SBUF" " [ dip swap append ] reduce ;
 
-    current get decimals>> 0 >= current get type>> CHAR: f = and
-      [ CHAR: . swap dup rot swap index current get decimals>> + 1 + dup rot swap
-        CHAR: 0 pad-right swap 0 swap rot <slice> ] when
+: apply-format ( params quot -- params string )
+    [ dup pop ] dip call ; 
 
-    current get align>> CHAR: l = 
+: fix-neg ( string -- string )
+    dup CHAR: 0 swap index 0 = 
+      [ dup CHAR: - swap index dup 
+        [ swap remove-nth "-" prepend ] 
+        [ drop ] if ] when ;
 
-        [ current get neg>> [ { CHAR: - } prepend ] when 
-          current get width>> CHAR: \s pad-right ]
+: >digits ( string -- digits ) 
+    dup length 0 > [ >string string>number ] [ drop 0 ] if ;
 
-        [ current get pad>> CHAR: \s = 
-            [ current get neg>> [ { CHAR: - } prepend ] when 
-              current get width>> current get pad>> pad-left ] 
-            [ current get width>> current get neg>> [ 1 - ] when
-              current get pad>> pad-left
-              current get neg>> [ { CHAR: - } prepend ] when ] if
-        ] if 
+: zero-pad ( string digits -- string ) 
+    swap dup
+    CHAR: . swap index rot + 1+
+    dup rot swap
+    CHAR: 0 pad-right 
+    swap head-slice ;
 
-    current get decimals>> 0 >= current get type>> CHAR: f = not and
-      [ current get align>> CHAR: l =
-          [ current get decimals>> CHAR: \s pad-right ]
-          [ current get decimals>> current get pad>> pad-left ] if
-        current get decimals>> head-slice ] when
-    >string ;
-
-: loop-% ( c -- s ) 
-    current get swap
-    {
-      { CHAR: % [ drop stop-% "%" ] }
-      { CHAR: ' [ CHAR: ' >>loop drop "" ] }
-      { CHAR: . [ CHAR: . >>loop 0 >>decimals drop "" ] }
-      { CHAR: - [ CHAR: l >>align drop "" ] }
-      { CHAR: 0 [ dup width>> 0 = [ CHAR: 0 >>pad ] when 
-                  [ 10 * 0 + ] change-width drop "" ] } 
-      { CHAR: 1 [ [ 10 * 1 + ] change-width drop "" ] } 
-      { CHAR: 2 [ [ 10 * 2 + ] change-width drop "" ] } 
-      { CHAR: 3 [ [ 10 * 3 + ] change-width drop "" ] } 
-      { CHAR: 4 [ [ 10 * 4 + ] change-width drop "" ] } 
-      { CHAR: 5 [ [ 10 * 5 + ] change-width drop "" ] } 
-      { CHAR: 6 [ [ 10 * 6 + ] change-width drop "" ] } 
-      { CHAR: 7 [ [ 10 * 7 + ] change-width drop "" ] } 
-      { CHAR: 8 [ [ 10 * 8 + ] change-width drop "" ] } 
-      { CHAR: 9 [ [ 10 * 9 + ] change-width drop "" ] } 
-      { CHAR: d [ CHAR: d >>type drop
-                  args get pop >fixnum 
-                  dup 0 < [ current get t >>neg drop ] when 
-                  abs present render stop-% ] }
-      { CHAR: f [ CHAR: f >>type drop
-                  args get pop >float 
-                  dup 0 < [ current get t >>neg drop ] when 
-                  abs present render stop-% ] }
-      { CHAR: s [ CHAR: s >>type drop 
-                  args get pop present render stop-% ] }
-      { CHAR: c [ CHAR: c >>type 1 >>width drop 
-                  1 args get pop <string> stop-% ] }
-      { CHAR: x [ CHAR: x >>type drop 
-                  args get pop >hex present render stop-% ] }
-      { CHAR: X [ CHAR: X >>type drop 
-                  args get pop >hex present >upper render stop-% ] }
-      [ drop drop stop-% "" ]
-    } case ;
-
-: loop-. ( c -- s )
-    dup digit? current get swap
-      [ swap CHAR: 0 - swap [ 10 * + ] change-decimals drop "" ] 
-      [ CHAR: % >>loop drop loop-% ] if ;
-
-: loop-' ( c -- s ) 
-    current get swap >>pad CHAR: % >>loop drop "" ;
-
-: loop- ( c -- s )
-    dup CHAR: % = [ drop start-% "" ] [ 1 swap <string> ] if ;
-
-: loop ( c -- s ) 
-   current get 
-     [ current get loop>> 
-       { 
-         { CHAR: % [ loop-% ] }
-         { CHAR: ' [ loop-' ] }
-         { CHAR: . [ loop-. ] }
-         [ drop stop-% loop- ]              ! FIXME: RAISE ERROR
-       } case ] 
-     [ loop- ] if ;
+: >exponential ( n -- base exp ) 
+    0 
+    [ swap dup [ 10.0 > ] keep 1.0 < or ] 
+    [ dup 10.0 > 
+      [ 10.0 / [ 1+ ] dip swap ] 
+      [ 10.0 * [ 1- ] dip swap ] if
+    ] [ swap ] while 
+    [ number>string ] dip 
+    dup abs number>string 2 CHAR: 0 pad-left
+    [ 0 < [ "-" ] [ "+" ] if ] dip append
+    "e" prepend ; 
 
 PRIVATE>
 
-: sprintf ( fmt args -- str ) 
-    [ >vector reverse args set
-      V{ } swap [ loop append ] each >string ] with-scope ;
+EBNF: parse-format-string
 
-: printf ( fmt args -- ) 
-    sprintf print ;
+plain-text = (!("%").)+          => [[ >string 1quotation ]]
 
-: fprintf ( path fmt args -- ) 
-    rot ascii [ sprintf write flush ] with-file-appender ;
+percents  =  "%"                 => [[ '[ "%" ] ]]
+
+pad-zero  = "0"                  => [[ CHAR: 0 ]] 
+pad-char  = "'" (.)              => [[ second ]] 
+pad-char_ = (pad-zero|pad-char)? => [[ CHAR: \s or 1quotation ]]
+pad-align = ("-")?               => [[ [ [ pad-right ] ] [ [ pad-left ] ] if ]] 
+pad-width = ([0-9])*             => [[ >digits 1quotation ]]
+pad       = (pad-align) (pad-char_) (pad-width) => [[ reverse compose-all ]]
+
+width     = "." ([0-9])*         => [[ second >digits '[ _ head-slice ] ]]
+width_    = (width)?             => [[ [ ] or ]] 
+
+digits    = "." ([0-9])*         => [[ second >digits '[ _ zero-pad ] ]]
+digits_   = (digits)?            => [[ [ ] or ]]
+
+fmt-c     = "c"                  => [[ [ 1string ] ]]
+fmt-C     = "C"                  => [[ [ 1string >upper ] ]]
+chars     = (fmt-c|fmt-C)        => [[ '[ _ apply-format ] ]]
+
+fmt-s     = "s"                  => [[ [ ] ]]
+fmt-S     = "S"                  => [[ [ >upper ] ]]
+strings   = (pad) (width_) (fmt-s|fmt-S) => [[ reverse compose-all '[ _ apply-format ] ]]
+
+fmt-d     = "d"                  => [[ [ >fixnum number>string ] ]]
+decimals  = fmt-d
+
+fmt-e     = "e"                  => [[ [ >exponential ] ]]
+fmt-E     = "E"                  => [[ [ >exponential >upper ] ]]
+exps      = (digits_) (fmt-e|fmt-E) => [[ reverse [ swap ] join [ swap append ] append ]] 
+
+fmt-f     = "f"                  => [[ [ >float number>string ] ]] 
+floats    = (digits_) (fmt-f)    => [[ reverse compose-all ]]
+
+fmt-x     = "x"                  => [[ [ >hex ] ]]
+fmt-X     = "X"                  => [[ [ >hex >upper ] ]]
+hex       = fmt-x | fmt-X
+
+numbers   = (pad) (decimals|floats|hex|exps) => [[ reverse compose-all [ fix-neg ] append '[ _ apply-format ] ]]
+
+formats   = "%" (chars|strings|numbers|percents) => [[ second ]]
+
+text      = (formats|plain-text)*
+
+;EBNF
+
+MACRO: printf ( format-string -- )
+    parse-format-string 
+      '[ reverse >vector _ write-all compose-all call drop ] ;
+
+MACRO: sprintf ( format-string -- )
+    parse-format-string 
+      '[ reverse >vector _ append-all >string swap drop ] ;
+
+MACRO: fprintf ( format-string -- )
+    parse-format-string 
+      '[ reverse >vector _ write-all compose-all rot ascii [ call ] with-file-appender drop ] ; 
+
 
 
