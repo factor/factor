@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces make math math.parser sequences accessors
 kernel kernel.private layouts assocs words summary arrays
-threads continuations.private libc combinators
-alien alien.c-types alien.structs alien.strings
+combinators classes.algebra alien alien.c-types alien.structs
+alien.strings sets threads libc continuations.private
 compiler.errors
 compiler.alien
 compiler.backend
@@ -14,6 +14,16 @@ compiler.cfg.registers ;
 IN: compiler.codegen
 
 GENERIC: generate-insn ( insn -- )
+
+GENERIC: v>operand ( obj -- operand )
+
+SYMBOL: registers
+
+M: constant v>operand
+    value>> [ tag-fixnum ] [ \ f tag-number ] if* ;
+
+M: value v>operand
+    >vreg [ registers get at ] [ "Bad value" throw ] if* ;
 
 : generate-insns ( insns -- code )
     [
@@ -66,11 +76,14 @@ M: _prologue generate-insn
 M: _epilogue generate-insn
     n>> %epilogue ;
 
-M: ##load-literal generate-insn [ obj>> ] [ dst>> ] bi load-literal ;
+M: ##load-literal generate-insn
+    [ obj>> ] [ dst>> v>operand ] bi load-literal ;
 
-M: ##peek generate-insn [ dst>> ] [ loc>> ] bi %peek ;
+M: ##peek generate-insn
+    [ dst>> v>operand ] [ loc>> ] bi %peek ;
 
-M: ##replace generate-insn [ src>> ] [ loc>> ] bi %replace ;
+M: ##replace generate-insn
+    [ src>> ] [ loc>> ] bi %replace ;
 
 M: ##inc-d generate-insn n>> %inc-d ;
 
@@ -82,8 +95,31 @@ M: ##call generate-insn word>> [ add-call ] [ %call ] bi ;
 
 M: ##jump generate-insn word>> [ add-call ] [ %jump-label ] bi ;
 
+SYMBOL: operands
+
+: init-intrinsic ( insn -- )
+    [ defs-vregs>> ] [ uses-vregs>> ] bi append operands set ;
+
 M: ##intrinsic generate-insn
     [ init-intrinsic ] [ quot>> call ] bi ;
+
+: (operand) ( name -- operand )
+    operands get at* [ "Bad operand name" throw ] unless ;
+
+: operand ( name -- operand )
+    (operand) v>operand ;
+
+: operand-class ( var -- class )
+    (operand) value-class ;
+
+: operand-tag ( operand -- tag/f )
+    operand-class dup [ class-tag ] when ;
+
+: operand-immediate? ( operand -- ? )
+    operand-class immediate class<= ;
+
+: unique-operands ( operands quot -- )
+    >r [ operand ] map prune r> each ; inline
 
 M: _if-intrinsic generate-insn
     [ init-intrinsic ]
@@ -93,32 +129,48 @@ M: _branch generate-insn
     label>> lookup-label %jump-label ;
 
 M: _branch-f generate-insn
-    [ src>> ] [ label>> lookup-label ] bi %jump-f ;
+    [ src>> v>operand ] [ label>> lookup-label ] bi %jump-f ;
 
 M: _branch-t generate-insn
-    [ src>> ] [ label>> lookup-label ] bi %jump-t ;
+    [ src>> v>operand ] [ label>> lookup-label ] bi %jump-t ;
 
 M: ##dispatch-label generate-insn label>> %dispatch-label ;
 
 M: ##dispatch generate-insn drop %dispatch ;
 
-M: ##copy generate-insn %copy ;
+: dst/src ( insn -- dst src )
+    [ dst>> v>operand ] [ src>> v>operand ] bi ;
 
-M: ##copy-float generate-insn %copy-float ;
+M: ##copy generate-insn dst/src %copy ;
 
-M: ##unbox-float generate-insn [ dst>> ] [ src>> ] bi %unbox-float ;
+M: ##copy-float generate-insn dst/src %copy-float ;
 
-M: ##unbox-f generate-insn [ dst>> ] [ src>> ] bi %unbox-f ;
+M: ##unbox-float generate-insn dst/src %unbox-float ;
 
-M: ##unbox-alien generate-insn [ dst>> ] [ src>> ] bi %unbox-alien ;
+M: ##unbox-f generate-insn dst/src %unbox-f ;
 
-M: ##unbox-byte-array generate-insn [ dst>> ] [ src>> ] bi %unbox-byte-array ;
+M: ##unbox-alien generate-insn dst/src %unbox-alien ;
 
-M: ##unbox-any-c-ptr generate-insn [ dst>> ] [ src>> ] bi %unbox-any-c-ptr ;
+M: ##unbox-byte-array generate-insn dst/src %unbox-byte-array ;
 
-M: ##box-float generate-insn [ dst>> ] [ src>> ] bi %box-float ;
+M: ##unbox-any-c-ptr generate-insn dst/src %unbox-any-c-ptr ;
 
-M: ##box-alien generate-insn [ dst>> ] [ src>> ] bi %box-alien ;
+M: ##box-float generate-insn dst/src %box-float ;
+
+M: ##box-alien generate-insn dst/src %box-alien ;
+
+M: ##allot generate-insn
+    {
+        [ dst>> v>operand ]
+        [ size>> ]
+        [ type>> ]
+        [ tag>> ]
+        [ temp>> v>operand ]
+    } cleave
+    %allot ;
+
+M: ##write-barrier generate-insn
+    [ src>> v>operand ] [ temp>> v>operand ] bi %write-barrier ;
 
 M: ##gc generate-insn drop %gc ;
 

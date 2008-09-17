@@ -1,7 +1,10 @@
  ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators hashtables kernel
-math fry namespaces make sequences words stack-checker.inlining
+math fry namespaces make sequences words byte-arrays
+locals layouts
+stack-checker.inlining
+compiler.intrinsics
 compiler.tree
 compiler.tree.builder
 compiler.tree.combinators
@@ -142,8 +145,7 @@ M: #recursive emit-node
     children>> [ emit-nodes ] emit-branches ;
 
 M: #if emit-node
-    { { f "flag" } } lazy-load first ##branch-t
-    emit-if iterate-next ;
+    phantom-pop ##branch-t emit-if iterate-next ;
 
 ! #dispatch
 : dispatch-branch ( nodes word -- label )
@@ -167,7 +169,9 @@ M: #if emit-node
     ] each ;
 
 : emit-dispatch ( node -- )
-    ##epilogue ##dispatch dispatch-branches init-phantoms ;
+    phantom-pop int-regs next-vreg
+    [ finalize-contents finalize-heights ##epilogue ] 2dip ##dispatch
+    dispatch-branches init-phantoms ;
 
 M: #dispatch emit-node
     tail-call? [
@@ -225,12 +229,45 @@ M: #dispatch emit-node
 : setup-value-classes ( #call -- )
     node-input-infos [ class>> ] map set-value-classes ;
 
+{
+    (tuple) (array) (byte-array)
+    (complex) (ratio) (wrapper)
+    (write-barrier)
+} [ t "intrinsic" set-word-prop ] each
+
+: allot-size ( #call -- n )
+    1 phantom-datastack get phantom-input first value>> ;
+
+:: emit-allot ( size type tag -- )
+    int-regs next-vreg
+    dup fresh-object
+    dup size type tag int-regs next-vreg ##allot
+    type tagged boa phantom-push ;
+
+: emit-write-barrier ( -- )
+    phantom-pop dup >vreg fresh-object? [ drop ] [
+        int-regs next-vreg ##write-barrier
+    ] if ;
+
+: emit-intrinsic ( word -- next )
+    {
+        { \ (tuple) [ allot-size 2 cells + tuple tuple emit-allot ] }
+        { \ (array) [ allot-size 2 cells + array object emit-allot ] }
+        { \ (byte-array) [ allot-size cells 2 + byte-array object emit-allot ] }
+        { \ (complex) [ 3 cells complex complex emit-allot ] }
+        { \ (ratio) [ 3 cells ratio ratio emit-allot ] }
+        { \ (wrapper) [ 2 cells wrapper object emit-allot ] }
+        { \ (write-barrier) [ emit-write-barrier ] }
+    } case
+    iterate-next ;
+
 M: #call emit-node
     dup setup-value-classes
     dup find-if-intrinsic [ do-if-intrinsic ] [
         dup find-boolean-intrinsic [ do-boolean-intrinsic ] [
             dup find-intrinsic [ do-intrinsic ] [
-                word>> emit-call
+                word>> dup "intrinsic" word-prop
+                [ emit-intrinsic ] [ emit-call ] if
             ] ?if
         ] ?if
     ] ?if ;

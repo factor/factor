@@ -27,7 +27,7 @@ INSN: ##intrinsic quot defs-vregs uses-vregs ;
 
 ! Jump tables
 INSN: ##dispatch-label label ;
-INSN: ##dispatch ;
+INSN: ##dispatch src temp ;
 
 ! Boxing and unboxing
 INSN: ##copy < ##unary ;
@@ -37,9 +37,12 @@ INSN: ##unbox-f < ##unary ;
 INSN: ##unbox-alien < ##unary ;
 INSN: ##unbox-byte-array < ##unary ;
 INSN: ##unbox-any-c-ptr < ##unary ;
-INSN: ##box-float < ##unary ;
-INSN: ##box-alien < ##unary ;
+INSN: ##box-float < ##unary temp ;
+INSN: ##box-alien < ##unary temp ;
 
+! Memory allocation
+INSN: ##allot < ##nullary size type tag temp ;
+INSN: ##write-barrier src temp ;
 INSN: ##gc ;
 
 ! FFI
@@ -52,10 +55,21 @@ GENERIC: uses-vregs ( insn -- seq )
 
 M: ##nullary defs-vregs dst>> >vreg 1array ;
 M: ##unary defs-vregs dst>> >vreg 1array ;
+M: ##write-barrier defs-vregs temp>> >vreg 1array ;
+
+: allot-defs-vregs ( insn -- seq )
+    [ dst>> >vreg ] [ temp>> >vreg ] bi 2array ;
+
+M: ##box-float defs-vregs allot-defs-vregs ;
+M: ##box-alien defs-vregs allot-defs-vregs ;
+M: ##allot defs-vregs allot-defs-vregs ;
+M: ##dispatch defs-vregs temp>> >vreg 1array ;
 M: insn defs-vregs drop f ;
 
 M: ##replace uses-vregs src>> >vreg 1array ;
 M: ##unary uses-vregs src>> >vreg 1array ;
+M: ##write-barrier uses-vregs src>> >vreg 1array ;
+M: ##dispatch uses-vregs src>> >vreg 1array ;
 M: insn uses-vregs drop f ;
 
 : intrinsic-vregs ( assoc -- seq' )

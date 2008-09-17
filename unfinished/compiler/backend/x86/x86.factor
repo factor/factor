@@ -4,19 +4,11 @@ USING: accessors arrays byte-arrays alien.accessors
 compiler.backend kernel kernel.private math memory namespaces
 make sequences words system layouts combinators math.order
 math.private alien alien.c-types slots.private cpu.x86
-cpu.x86.private compiler.backend compiler.codegen.fixup
+cpu.x86.private locals compiler.backend compiler.codegen.fixup
 compiler.constants compiler.intrinsics compiler.cfg.builder
 compiler.cfg.registers compiler.cfg.stacks
-compiler.cfg.templates ;
+compiler.cfg.templates compiler.codegen ;
 IN: compiler.backend.x86
-
-M: word MOV 0 rot (MOV-I) rc-absolute-cell rel-word ;
-M: word JMP (JMP) rel-word ;
-M: label JMP (JMP) label-fixup ;
-M: word CALL (CALL) rel-word ;
-M: label CALL (CALL) label-fixup ;
-M: word JUMPcc (JUMPcc) rel-word ;
-M: label JUMPcc (JUMPcc) label-fixup ;
 
 HOOK: ds-reg cpu ( -- reg )
 HOOK: rs-reg cpu ( -- reg )
@@ -27,8 +19,10 @@ HOOK: stack-save-reg cpu ( -- reg )
 
 : reg-stack ( n reg -- op ) swap cells neg [+] ;
 
-M: ds-loc v>operand n>> ds-reg reg-stack ;
-M: rs-loc v>operand n>> rs-reg reg-stack ;
+GENERIC: loc>operand ( loc -- operand )
+
+M: ds-loc loc>operand n>> ds-reg reg-stack ;
+M: rs-loc loc>operand n>> rs-reg reg-stack ;
 
 M: int-regs %save-param-reg drop >r stack@ r> MOV ;
 M: int-regs %load-param-reg drop swap stack@ MOV ;
@@ -54,10 +48,10 @@ HOOK: fixnum>slot@ cpu ( op -- )
 HOOK: prepare-division cpu ( -- )
 
 M: f load-literal
-    v>operand \ f tag-number MOV drop ;
+    \ f tag-number MOV drop ;
 
 M: fixnum load-literal
-    v>operand swap tag-fixnum MOV ;
+    swap tag-fixnum MOV ;
 
 M: x86 stack-frame ( n -- i )
     3 cells + 16 align cell - ;
@@ -99,16 +93,16 @@ M: x86 %jump-t ( label vreg -- ) \ f tag-number CMP JNE ;
 : align-code ( n -- )
     0 <repetition> % ;
 
-M: x86 %dispatch ( -- )
+M:: x86 %dispatch ( src temp -- )
     ! Load jump table base. We use a temporary register
     ! since on AMD64 we have to load a 64-bit immediate. On
     ! x86, this is redundant.
     ! Untag and multiply to get a jump table offset
-    temp-reg-1 fixnum>slot@
+    src fixnum>slot@
     ! Add jump table base
-    temp-reg-2 HEX: ffffffff MOV rc-absolute-cell rel-here
-    temp-reg-1 temp-reg-2 ADD
-    temp-reg-1 HEX: 7f [+] JMP
+    temp HEX: ffffffff MOV rc-absolute-cell rel-here
+    src temp ADD
+    src HEX: 7f [+] JMP
     ! Fix up the displacement above
     code-alignment dup bootstrap-cell 8 = 15 9 ? +
     building get dup pop* push
@@ -117,9 +111,9 @@ M: x86 %dispatch ( -- )
 M: x86 %dispatch-label ( word -- )
     0 cell, rc-absolute-cell rel-word ;
 
-M: x86 %peek [ v>operand ] bi@ MOV ;
+M: x86 %peek loc>operand MOV ;
 
-M: x86 %replace swap %peek ;
+M: x86 %replace loc>operand swap MOV ;
 
 : (%inc) ( n reg -- ) swap cells dup 0 > [ ADD ] [ neg SUB ] if ;
 
@@ -146,13 +140,13 @@ M: x86 %return ( -- ) 0 %unwind ;
 
 ! Alien intrinsics
 M: x86 %unbox-byte-array ( dst src -- )
-    [ v>operand ] bi@ byte-array-offset [+] LEA ;
+    byte-array-offset [+] LEA ;
 
 M: x86 %unbox-alien ( dst src -- )
-    [ v>operand ] bi@ alien-offset [+] MOV ;
+    alien-offset [+] MOV ;
 
 M: x86 %unbox-f ( dst src -- )
-    drop v>operand 0 MOV ;
+    drop 0 MOV ;
 
 M: x86 %unbox-any-c-ptr ( dst src -- )
     { "is-byte-array" "end" "start" } [ define-label ] each
@@ -161,7 +155,7 @@ M: x86 %unbox-any-c-ptr ( dst src -- )
     ds-reg 0 MOV
     ! Object is stored in ds-reg
     rs-reg PUSH
-    rs-reg swap v>operand MOV
+    rs-reg swap MOV
     ! We come back here with displaced aliens
     "start" resolve-label
     ! Is the object f?
@@ -182,34 +176,45 @@ M: x86 %unbox-any-c-ptr ( dst src -- )
     ds-reg byte-array-offset ADD
     "end" resolve-label
     ! Done, store address in destination register
-    v>operand ds-reg MOV
+    ds-reg MOV
     ! Restore rs-reg
     rs-reg POP
     ! Restore ds-reg
     ds-reg POP ;
 
-: allot-reg ( -- reg )
-    #! We temporarily use the datastack register, since it won't
-    #! be accessed inside the quotation given to %allot in any
-    #! case.
-    ds-reg ;
+M:: x86 %write-barrier ( src temp -- )
+    #! Mark the card pointed to by vreg.
+    ! Mark the card
+    src card-bits SHR
+    "cards_offset" f temp %alien-global
+    temp temp [+] card-mark <byte> MOV
 
-: (object@) ( n -- operand ) allot-reg swap [+] ;
-
-: object@ ( n -- operand ) cells (object@) ;
+    ! Mark the card deck
+    temp deck-bits card-bits - SHR
+    "decks_offset" f temp %alien-global
+    temp temp [+] card-mark <byte> MOV ;
 
 : load-zone-ptr ( reg -- )
     #! Load pointer to start of zone array
     0 MOV "nursery" f rc-absolute-cell rel-dlsym ;
 
-: load-allot-ptr ( -- )
-    allot-reg load-zone-ptr
-    allot-reg PUSH
-    allot-reg dup cell [+] MOV ;
+: load-allot-ptr ( temp -- )
+    [ load-zone-ptr ] [ PUSH ] [ dup cell [+] MOV ] tri ;
 
-: inc-allot-ptr ( n -- )
-    allot-reg POP
-    allot-reg cell [+] swap 8 align ADD ;
+: inc-allot-ptr ( n temp -- )
+    [ POP ] [ cell [+] swap 8 align ADD ] bi ;
+
+: store-header ( temp type -- )
+    [ 0 [+] ] [ type-number tag-fixnum ] bi* MOV ;
+
+: store-tagged ( dst temp tag -- )
+    dupd tag-number OR MOV ;
+
+M:: x86 %allot ( dst size type tag temp -- )
+    temp load-allot-ptr
+    temp type store-header
+    temp size inc-allot-ptr
+    dst temp store-tagged ;
 
 M: x86 %gc ( -- )
     "end" define-label
@@ -223,73 +228,53 @@ M: x86 %gc ( -- )
     "minor_gc" f %alien-invoke
     "end" resolve-label ;
 
-: store-header ( header -- )
-    0 object@ swap type-number tag-fixnum MOV ;
+: bignum@ ( reg n -- op ) cells bignum tag-number - [+] ;
 
-: %allot ( header size quot -- )
-    allot-reg PUSH
-    swap >r >r
-    load-allot-ptr
-    store-header
-    r> call
-    r> inc-allot-ptr
-    allot-reg POP ; inline
-
-: fresh-object drop ;
-
-: %store-tagged ( reg tag -- )
-    >r dup fresh-object v>operand r>
-    allot-reg swap tag-number OR
-    allot-reg MOV ;
-
-: %allot-bignum-signed-1 ( outreg inreg -- )
+:: %allot-bignum-signed-1 ( dst src temp -- )
     #! on entry, inreg is a signed 32-bit quantity
     #! exits with tagged ptr to bignum in outreg
     #! 1 cell header, 1 cell length, 1 cell sign, + digits
     #! length is the # of digits + sign
     [
-        { "end" "nonzero" "positive" "store" }
-        [ define-label ] each
-        dup v>operand 0 CMP ! is it zero?
+        { "end" "nonzero" "positive" "store" } [ define-label ] each
+        src 0 CMP ! is it zero?
         "nonzero" get JNE
-        0 >bignum pick v>operand load-indirect ! this is our result
+        ! Use cached zero value
+        0 >bignum dst load-indirect
         "end" get JMP
         "nonzero" resolve-label
-        bignum 4 cells [
-            ! Write length
-            1 object@ 2 v>operand MOV
-            ! Test sign
-            dup v>operand 0 CMP
-            "positive" get JGE
-            2 object@ 1 MOV ! negative sign
-            dup v>operand NEG
-            "store" get JMP
-            "positive" resolve-label
-            2 object@ 0 MOV ! positive sign
-            "store" resolve-label
-            3 object@ swap v>operand MOV
-            ! Store tagged ptr in reg
-            bignum %store-tagged
-        ] %allot
+        ! Allocate a bignum
+        dst 4 cells bignum bignum temp %allot
+        ! Write length
+        dst 1 bignum@ 2 MOV
+        ! Test sign
+        src 0 CMP
+        "positive" get JGE
+        dst 2 bignum@ 1 MOV ! negative sign
+        src NEG
+        "store" get JMP
+        "positive" resolve-label
+        dst 2 bignum@ 0 MOV ! positive sign
+        "store" resolve-label
+        dst 3 bignum@ src MOV
         "end" resolve-label
     ] with-scope ;
 
-M: x86 %box-alien ( dst src -- )
+: alien@ ( reg n -- op ) cells object tag-number - [+] ;
+
+M:: x86 %box-alien ( dst src temp -- )
     [
         { "end" "f" } [ define-label ] each
-        dup v>operand 0 CMP
+        src 0 CMP
         "f" get JE
-        alien 4 cells [
-            1 object@ \ f tag-number MOV
-            2 object@ \ f tag-number MOV
-            ! Store src in alien-offset slot
-            3 object@ swap v>operand MOV
-            ! Store tagged ptr in dst
-            dup object %store-tagged
-        ] %allot
+        dst 4 cells alien object temp %allot
+        dst 1 alien@ \ f tag-number MOV
+        dst 2 alien@ \ f tag-number MOV
+        ! Store src in alien-offset slot
+        dst 3 alien@ src MOV
         "end" get JMP
         "f" resolve-label
-        f [ v>operand ] bi@ MOV
+        \ f tag-number MOV
         "end" resolve-label
     ] with-scope ;
 
@@ -321,7 +306,7 @@ M: x86 %box-alien ( dst src -- )
     ! Slot number is literal and the tag is known
     {
         [ "val" operand %slot-literal-known-tag MOV ] T{ template
-            { input { { f "obj" known-tag } { [ small-slot? ] "n" } } }
+            { input { { f "obj" known-tag } { small-slot "n" } } }
             { scratch { { f "val" } } }
             { output { "val" } }
         }
@@ -329,7 +314,7 @@ M: x86 %box-alien ( dst src -- )
     ! Slot number is literal
     {
         [ "obj" operand %slot-literal-any-tag MOV ] T{ template
-            { input { { f "obj" } { [ small-slot? ] "n" } } }
+            { input { { f "obj" } { small-slot "n" } } }
             { output { "obj" } }
         }
     }
@@ -343,40 +328,26 @@ M: x86 %box-alien ( dst src -- )
     }
 } define-intrinsics
 
-: generate-write-barrier ( -- )
-    #! Mark the card pointed to by vreg.
-    "val" operand-immediate? "obj" fresh-object? or [
-        ! Mark the card
-        "obj" operand card-bits SHR
-        "cards_offset" f "scratch" operand %alien-global
-        "scratch" operand "obj" operand [+] card-mark <byte> MOV
-
-        ! Mark the card deck
-        "obj" operand deck-bits card-bits - SHR
-        "decks_offset" f "scratch" operand %alien-global
-        "scratch" operand "obj" operand [+] card-mark <byte> MOV
-    ] unless ;
-
-\ set-slot {
+\ (set-slot) {
     ! Slot number is literal and the tag is known
     {
-        [ %slot-literal-known-tag "val" operand MOV generate-write-barrier ] T{ template
-            { input { { f "val" } { f "obj" known-tag } { [ small-slot? ] "n" } } }
+        [ %slot-literal-known-tag "val" operand MOV ] T{ template
+            { input { { f "val" } { f "obj" known-tag } { small-slot "n" } } }
             { scratch { { f "scratch" } } }
             { clobber { "obj" } }
         }
     }
     ! Slot number is literal
     {
-        [ %slot-literal-any-tag "val" operand MOV generate-write-barrier ] T{ template
-            { input { { f "val" } { f "obj" } { [ small-slot? ] "n" } } }
+        [ %slot-literal-any-tag "val" operand MOV ] T{ template
+            { input { { f "val" } { f "obj" } { small-slot "n" } } }
             { scratch { { f "scratch" } } }
             { clobber { "obj" } }
         }
     }
     ! Slot number in a register
     {
-        [ %slot-any "val" operand MOV generate-write-barrier ] T{ template
+        [ %slot-any "val" operand MOV ] T{ template
             { input { { f "val" } { f "obj" } { f "n" } } }
             { scratch { { f "scratch" } } }
             { clobber { "obj" "n" } }
@@ -400,7 +371,7 @@ M: x86 %box-alien ( dst src -- )
 
 : fixnum-value-op ( op -- pair )
     T{ template
-        { input { { f "x" } { [ small-tagged? ] "y" } } }
+        { input { { f "x" } { small-tagged "y" } } }
         { output { "x" } }
     } fixnum-op ;
 
@@ -476,7 +447,7 @@ M: x86 %box-alien ( dst src -- )
     ! There was an overflow. Recompute the original operand.
     { "y" "x" } %untag-fixnums
     "x" operand "y" operand rot execute
-    "z" get "x" get %allot-bignum-signed-1
+    "z" operand "x" operand "y" operand %allot-bignum-signed-1
     "end" resolve-label ; inline
 
 : overflow-template ( word insn -- )
@@ -516,9 +487,10 @@ M: x86 %box-alien ( dst src -- )
 
 \ fixnum>bignum [
     "x" operand %untag-fixnum
-    "x" get dup %allot-bignum-signed-1
+    "x" operand dup "scratch" operand %allot-bignum-signed-1
 ] T{ template
     { input { { f "x" } } }
+    { scratch { { f "scratch" } } }
     { output { "x" } }
     { gc t }
 } define-intrinsic
@@ -531,7 +503,7 @@ M: x86 %box-alien ( dst src -- )
     "y" operand "x" operand cell [+] MOV
      ! if the length is 1, its just the sign and nothing else,
      ! so output 0
-    "y" operand 1 v>operand CMP
+    "y" operand 1 tag-fixnum CMP
     "nonzero" get JNE
     "y" operand 0 MOV
     "end" get JMP
@@ -575,90 +547,6 @@ M: x86 %box-alien ( dst src -- )
     { input { { f "val" } { f "n" } } }
     { scratch { { f "x" } } }
     { clobber { "n" } }
-} define-intrinsic
-
-\ (tuple) [
-    tuple "layout" get size>> 2 + cells [
-        ! Store layout
-        "layout" get "scratch" operand load-indirect
-        1 object@ "scratch" operand MOV
-        ! Store tagged ptr in reg
-        "tuple" get tuple %store-tagged
-    ] %allot
-] T{ template
-    { input { { [ ] "layout" } } }
-    { scratch { { f "tuple" } { f "scratch" } } }
-    { output { "tuple" } }
-    { gc t }
-} define-intrinsic
-
-\ (array) [
-    array "n" get 2 + cells [
-        ! Store length
-        1 object@ "n" operand MOV
-        ! Store tagged ptr in reg
-        "array" get object %store-tagged
-    ] %allot
-] T{ template
-    { input { { [ ] "n" } } }
-    { scratch { { f "array" } } }
-    { output { "array" } }
-    { gc t }
-} define-intrinsic
-
-\ (byte-array) [
-    byte-array "n" get 2 cells + [
-        ! Store length
-        1 object@ "n" operand MOV
-        ! Store tagged ptr in reg
-        "array" get object %store-tagged
-    ] %allot
-] T{ template
-    { input { { [ ] "n" } } }
-    { scratch { { f "array" } } }
-    { output { "array" } }
-    { gc t }
-} define-intrinsic
-
-\ <ratio> [
-    ratio 3 cells [
-        1 object@ "numerator" operand MOV
-        2 object@ "denominator" operand MOV
-        ! Store tagged ptr in reg
-        "ratio" get ratio %store-tagged
-    ] %allot
-] T{ template
-    { input { { f "numerator" } { f "denominator" } } }
-    { scratch { { f "ratio" } } }
-    { output { "ratio" } }
-    { gc t }
-} define-intrinsic
-
-\ <complex> [
-    complex 3 cells [
-        1 object@ "real" operand MOV
-        2 object@ "imaginary" operand MOV
-        ! Store tagged ptr in reg
-        "complex" get complex %store-tagged
-    ] %allot
-] T{ template
-    { input { { f "real" } { f "imaginary" } } }
-    { scratch { { f "complex" } } }
-    { output { "complex" } }
-    { gc t }
-} define-intrinsic
-
-\ <wrapper> [
-    wrapper 2 cells [
-        1 object@ "obj" operand MOV
-        ! Store tagged ptr in reg
-        "wrapper" get object %store-tagged
-    ] %allot
-] T{ template
-    { input { { f "obj" } } }
-    { scratch { { f "wrapper" } } }
-    { output { "wrapper" } }
-    { gc t }
 } define-intrinsic
 
 ! Alien intrinsics
