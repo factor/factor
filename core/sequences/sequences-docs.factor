@@ -40,6 +40,18 @@ $nl
 "Throws an error if the sequence cannot hold elements of the given type." }
 { $side-effects "seq" } ;
 
+HELP: nths
+{ $values
+     { "indices" null } { "seq" sequence }
+     { "seq'" sequence } }
+{ $description "Ouptuts a sequence of elements from the input sequence indexed by the indices." }
+{ $examples 
+    { $example "USING: prettyprint sequences ;"
+               "{ 0 2 } { \"a\" \"b\" \"c\" } nths ."
+               "{ \"a\" \"c\" }"
+    }
+} ;
+
 HELP: immutable
 { $values { "seq" sequence } }
 { $description "Throws an " { $link immutable } " error." }
@@ -248,6 +260,15 @@ HELP: reduce
 { $examples
     { $example "USING: math prettyprint sequences ;" "{ 1 5 3 } 0 [ + ] reduce ." "9" }
 } ;
+
+HELP: reduce-index
+{ $values
+     { "seq" sequence } { "identity" object } { "quot" quotation } }
+{ $description "Combines successive elements of the sequence and their indices using a binary operation, and outputs the final result. On the first iteration, the two inputs to the quotation are " { $snippet "identity" } ", the first element of the sequence, and its index, 0. On successive iterations, the first input is the result of the previous iteration, the second input is the corresponding element of the sequence, and the third is its index." }
+{ $examples { $example "USING: sequences prettyprint math ;"
+    "{ 10 50 90 } 0 [ + + ] reduce-index ."
+    "153"
+} } ;
 
 HELP: accumulate
 { $values { "identity" object } { "seq" sequence } { "quot" "a quotation with stack effect " { $snippet "( prev elt -- next )" } } { "final" "the final result" } { "newseq" "a new sequence" } }
