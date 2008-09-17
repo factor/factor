@@ -1,6 +1,7 @@
 USING: assocs html.parser kernel math sequences strings ascii
-arrays generalizations shuffle unicode.case namespaces splitting
-http sequences.lib accessors io combinators http.client urls ;
+arrays generalizations shuffle unicode.case namespaces make
+splitting http sequences.lib accessors io combinators
+http.client urls ;
 IN: html.parser.analyzer
 
 TUPLE: link attributes clickable ;

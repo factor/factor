@@ -1,12 +1,12 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit accessors combinators io io.encodings.8-bit
-io.encodings io.encodings.binary io.encodings.utf8 io.files
-io.sockets kernel math.parser namespaces sequences
-ftp io.unix.launcher.parser unicode.case splitting assocs
-classes io.servers.connection destructors calendar io.timeouts
-io.streams.duplex threads continuations math
-concurrency.promises byte-arrays ;
+USING: combinators.short-circuit accessors combinators io
+io.encodings.8-bit io.encodings io.encodings.binary
+io.encodings.utf8 io.files io.sockets kernel math.parser
+namespaces make sequences ftp io.unix.launcher.parser
+unicode.case splitting assocs classes io.servers.connection
+destructors calendar io.timeouts io.streams.duplex threads
+continuations math concurrency.promises byte-arrays ;
 IN: ftp.server
 
 SYMBOL: client

@@ -14,6 +14,13 @@ IN: regexp2-tests
 [ t ] [ "c" "a|b|c" <regexp> matches? ] unit-test
 [ f ] [ "c" "d|e|f" <regexp> matches? ] unit-test
 
+[ t ] [ "b" "|b" <regexp> matches? ] unit-test
+[ t ] [ "b" "b|" <regexp> matches? ] unit-test
+[ t ] [ "" "b|" <regexp> matches? ] unit-test
+[ t ] [ "" "b|" <regexp> matches? ] unit-test
+[ f ] [ "" "|" <regexp> matches? ] unit-test
+[ f ] [ "" "|||||||" <regexp> matches? ] unit-test
+
 [ f ] [ "aa" "a|b|c" <regexp> matches? ] unit-test
 [ f ] [ "bb" "a|b|c" <regexp> matches? ] unit-test
 [ f ] [ "cc" "a|b|c" <regexp> matches? ] unit-test
@@ -221,6 +228,8 @@ IN: regexp2-tests
     "(0[lL]?|[1-9]\\d{0,9}(\\d{0,9}[lL])?|0[xX]\\p{XDigit}{1,8}(\\p{XDigit}{0,8}[lL])?|0[0-7]{1,11}([0-7]{0,11}[lL])?|([0-9]+\\.[0-9]*|\\.[0-9]+)([eE][+-]?[0-9]+)?[fFdD]?|[0-9]+([eE][+-]?[0-9]+[fFdD]?|([eE][+-]?[0-9]+)?[fFdD]))"
     <regexp> drop
 ] unit-test
+
+[ ] [ "(\\$[\\p{XDigit}]|[\\p{Digit}])" <regexp> drop ] unit-test
 
 ! Comment
 [ t ] [ "ac" "a(?#boo)c" <regexp> matches? ] unit-test

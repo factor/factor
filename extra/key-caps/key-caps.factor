@@ -162,7 +162,7 @@ M: key-caps-gadget pref-dim* drop KEYBOARD-SIZE ;
     relayout-1 ;
 
 M: key-caps-gadget graft*
-    dup '[ , update-key-caps-state ] FREQUENCY every >>alarm
+    dup '[ _ update-key-caps-state ] FREQUENCY every >>alarm
     drop ;
 
 M: key-caps-gadget ungraft*

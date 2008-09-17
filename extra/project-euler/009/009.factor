@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.functions namespaces sequences sorting ;
+USING: kernel math math.functions namespaces make sequences sorting ;
 IN: project-euler.009
 
 ! http://projecteuler.net/index.php?section=problems&id=9

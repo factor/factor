@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: fry accessors sequences parser kernel help help.markup
-help.topics words strings classes tools.vocabs namespaces io
-io.streams.string prettyprint definitions arrays vectors
+help.topics words strings classes tools.vocabs namespaces make
+io io.streams.string prettyprint definitions arrays vectors
 combinators combinators.short-circuit splitting debugger
 hashtables sorting effects vocabs vocabs.loader assocs editors
 continuations classes.predicate macros math sets eval ;
@@ -39,7 +39,7 @@ IN: help.lint
         $predicate
         $class-description
         $error-description
-    } swap '[ , elements empty? not ] contains? ;
+    } swap '[ _ elements empty? not ] contains? ;
 
 : check-values ( word element -- )
     {
@@ -110,7 +110,7 @@ M: help-error error.
     H{ } clone [
         '[
             dup >link where dup
-            [ first , at , push-at ] [ 2drop ] if
+            [ first _ at _ push-at ] [ 2drop ] if
         ] each
     ] keep ;
 

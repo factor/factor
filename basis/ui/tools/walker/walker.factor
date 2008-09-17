@@ -4,7 +4,7 @@ USING: accessors kernel concurrency.messaging inspector
 ui.tools.listener ui.tools.traceback ui.gadgets.buttons
 ui.gadgets.status-bar ui.gadgets.tracks ui.commands ui.gadgets
 models models.filter ui.tools.workspace ui.gestures
-ui.gadgets.labels ui threads namespaces tools.walker assocs
+ui.gadgets.labels ui threads namespaces make tools.walker assocs
 combinators ;
 IN: ui.tools.walker
 

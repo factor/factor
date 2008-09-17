@@ -3,7 +3,7 @@ IN: compiler.tests
 USING: compiler compiler.generator compiler.generator.registers
 compiler.generator.registers.private tools.test namespaces
 sequences words kernel math effects definitions compiler.units
-accessors cpu.architecture ;
+accessors cpu.architecture make ;
 
 : <int-vreg> ( n -- vreg ) int-regs <vreg> ;
 

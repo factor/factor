@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel words summary slots quotations
 sequences assocs math arrays stack-checker effects generalizations
-continuations debugger classes.tuple namespaces vectors
+continuations debugger classes.tuple namespaces make vectors
 bit-arrays byte-arrays strings sbufs math.functions macros
 sequences.private combinators mirrors
 combinators.short-circuit ;

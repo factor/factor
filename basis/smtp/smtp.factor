@@ -1,16 +1,16 @@
 ! Copyright (C) 2007, 2008 Elie CHAFTARI, Dirk Vleugels,
 ! Slava Pestov, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays namespaces io io.timeouts kernel logging
+USING: arrays namespaces make io io.timeouts kernel logging
 io.sockets sequences combinators splitting assocs strings
 math.parser random system calendar io.encodings.ascii summary
 calendar.format accessors sets hashtables ;
 IN: smtp
 
 SYMBOL: smtp-domain
-SYMBOL: smtp-server     "localhost" "smtp" <inet> smtp-server set-global
+SYMBOL: smtp-server     "localhost" 25 <inet> smtp-server set-global
 SYMBOL: smtp-read-timeout    1 minutes smtp-read-timeout set-global
-SYMBOL: esmtp           t esmtp set-global
+SYMBOL: esmtp?           t esmtp? set-global
 
 LOG: log-smtp-connection NOTICE ( addrspec -- )
 
@@ -39,7 +39,7 @@ TUPLE: email
 : command ( string -- ) write crlf flush ;
 
 : helo ( -- )
-    esmtp get "EHLO " "HELO " ? host-name append command ;
+    esmtp? get "EHLO " "HELO " ? host-name append command ;
 
 ERROR: bad-email-address email ;
 

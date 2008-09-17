@@ -91,7 +91,7 @@ SYMBOL: dependencies
 : depends-on ( word how -- )
     over primitive? [ 2drop ] [
         dependencies get dup [
-            swap '[ , strongest-dependency ] change-at
+            swap '[ _ strongest-dependency ] change-at
         ] [ 3drop ] if
     ] if ;
 
@@ -100,7 +100,7 @@ SYMBOL: generic-dependencies
 
 : depends-on-generic ( generic class -- )
     generic-dependencies get dup
-    [ swap '[ null or , class-or ] change-at ] [ 3drop ] if ;
+    [ swap '[ null or _ class-or ] change-at ] [ 3drop ] if ;
 
 ! Words we've inferred the stack effect of, for rollback
 SYMBOL: recorded

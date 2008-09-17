@@ -11,9 +11,11 @@ TUPLE: circular seq start ;
 : <circular> ( seq -- circular )
     0 circular boa ;
 
+<PRIVATE
 : circular-wrap ( n circular -- n circular )
     [ start>> + ] keep
     [ seq>> length rem ] keep ; inline
+PRIVATE>
 
 M: circular length seq>> length ;
 
@@ -37,11 +39,13 @@ TUPLE: growing-circular < circular length ;
 
 M: growing-circular length length>> ;
 
+<PRIVATE
 : full? ( circular -- ? )
     [ length ] [ seq>> length ] bi = ;
 
 : set-peek ( elt seq -- )
     [ length 1- ] keep set-nth ;
+PRIVATE>
 
 : push-growing-circular ( elt circular -- )
     dup full? [ push-circular ]

@@ -4,7 +4,7 @@
 ! Concurrency library for Factor, based on Erlang/Termite style
 ! concurrency.
 USING: kernel threads concurrency.mailboxes continuations
-namespaces assocs random accessors ;
+namespaces assocs random accessors summary ;
 IN: concurrency.messaging
 
 GENERIC: send ( message thread -- )
@@ -52,9 +52,14 @@ TUPLE: reply data tag ;
     [ >r tag>> r> tag>> = ]
     [ 2drop f ] if ;
 
+ERROR: cannot-send-synchronous-to-self message thread ;
+
+M: cannot-send-synchronous-to-self summary
+    drop "Cannot synchronous send to myself" ;
+
 : send-synchronous ( message thread -- reply )
     dup self eq? [
-        "Cannot synchronous send to myself" throw
+        cannot-send-synchronous-to-self
     ] [
         >r <synchronous> dup r> send
         [ synchronous-reply? ] curry receive-if

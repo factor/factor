@@ -2,7 +2,7 @@
 !                          Doug Coleman, Eduardo Cavazos,
 !                          Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel combinators fry namespaces quotations hashtables
+USING: kernel combinators fry namespaces make quotations hashtables
 sequences assocs arrays stack-checker effects math math.ranges
 generalizations macros continuations random locals accessors ;
 
@@ -65,10 +65,10 @@ IN: combinators.lib
 MACRO: preserving ( predicate -- quot )
     dup infer in>>
     dup 1+
-    '[ , , nkeep , nrot ] ;
+    '[ _ _ nkeep _ nrot ] ;
 
 MACRO: ifte ( quot quot quot -- )
-    '[ , preserving , , if ] ;
+    '[ _ preserving _ _ if ] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! switch

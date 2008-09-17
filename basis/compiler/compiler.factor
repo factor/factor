@@ -54,7 +54,7 @@ SYMBOL: +failed+
         H{ } clone dependencies set
         H{ } clone generic-dependencies set
 
-        , {
+        _ {
             [ compile-begins ]
             [
                 [ build-tree-from-word ] [ compile-failed return ] recover

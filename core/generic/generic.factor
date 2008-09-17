@@ -1,6 +1,6 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors words kernel sequences namespaces assocs
+USING: accessors words kernel sequences namespaces make assocs
 hashtables definitions kernel.private classes classes.private
 classes.algebra quotations arrays vocabs effects combinators
 sets ;

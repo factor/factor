@@ -15,7 +15,7 @@ IN: cocoa.enumeration
     object state stackbuf count -> countByEnumeratingWithState:objects:count:
     dup zero? [ drop ] [
         state NSFastEnumerationState-itemsPtr [ stackbuf ] unless*
-        '[ , void*-nth quot call ] each
+        '[ _ void*-nth quot call ] each
         object quot state stackbuf count (NSFastEnumeration-each)
     ] if ; inline recursive
 
@@ -24,7 +24,7 @@ IN: cocoa.enumeration
 
 : NSFastEnumeration-map ( object quot -- vector )
     NS-EACH-BUFFER-SIZE <vector>
-    [ '[ @ , push ] NSFastEnumeration-each ] keep ; inline
+    [ '[ @ _ push ] NSFastEnumeration-each ] keep ; inline
 
 : NSFastEnumeration>vector ( object -- vector )
     [ ] NSFastEnumeration-map ;

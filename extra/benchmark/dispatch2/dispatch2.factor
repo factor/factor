@@ -1,4 +1,4 @@
-USING: namespaces math sequences splitting grouping
+USING: make math sequences splitting grouping
 kernel columns float-arrays bit-arrays ;
 IN: benchmark.dispatch2
 

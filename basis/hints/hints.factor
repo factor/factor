@@ -21,7 +21,7 @@ IN: hints
 : specializer-cases ( quot word -- default alist )
     dup [ array? ] all? [ 1array ] unless [
         [ make-specializer ] keep
-        '[ , declare ] pick append
+        '[ _ declare ] pick append
     ] { } map>assoc ;
 
 : method-declaration ( method -- quot )
@@ -30,7 +30,7 @@ IN: hints
     bi prefix ;
 
 : specialize-method ( quot method -- quot' )
-    method-declaration '[ , declare ] prepend ;
+    method-declaration '[ _ declare ] prepend ;
 
 : specialize-quot ( quot specializer -- quot' )
     specializer-cases alist>quot ;
@@ -42,11 +42,11 @@ IN: hints
 
 : specialized-def ( word -- quot )
     dup def>> swap {
-        { [ dup standard-method? ] [ specialize-method ] }
         {
             [ dup "specializer" word-prop ]
             [ "specializer" word-prop specialize-quot ]
         }
+        { [ dup standard-method? ] [ specialize-method ] }
         [ drop ]
     } cond ;
 
@@ -54,7 +54,8 @@ IN: hints
     dup [ array? ] all? [ first ] when length ;
 
 : HINTS:
-    scan-word
+    scan-object
+    dup method-spec? [ first2 method ] when
     [ redefined ]
     [ parse-definition "specializer" set-word-prop ] bi ;
     parsing
@@ -91,7 +92,7 @@ IN: hints
 
 \ >string { sbuf } "specializer" set-word-prop
 
-\ >array { { string } { vector } } "specializer" set-word-prop
+\ >array { { vector } } "specializer" set-word-prop
 
 \ >vector { { array } { vector } } "specializer" set-word-prop
 
@@ -101,7 +102,7 @@ IN: hints
 
 \ memq? { array } "specializer" set-word-prop
 
-\ member? { fixnum string } "specializer" set-word-prop
+\ member? { array } "specializer" set-word-prop
 
 \ assoc-stack { vector } "specializer" set-word-prop
 

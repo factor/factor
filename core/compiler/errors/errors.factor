@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces assocs io sequences
+USING: kernel namespaces make assocs io sequences
 sorting continuations math math.parser ;
 IN: compiler.errors
 

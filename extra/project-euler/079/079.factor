@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs hashtables io.files kernel math math.parser namespaces
-io.encodings.ascii sequences sets ;
+USING: assocs hashtables io.files kernel math math.parser
+namespaces make io.encodings.ascii sequences sets ;
 IN: project-euler.079
 
 ! http://projecteuler.net/index.php?section=problems&id=79

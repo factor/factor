@@ -69,7 +69,7 @@ DEFER: byte-bit-count
 \ byte-bit-count
 256 [
     0 swap [ [ 1+ ] when ] each-bit
-] B{ } map-as '[ HEX: ff bitand , nth-unsafe ] define-inline
+] B{ } map-as '[ HEX: ff bitand _ nth-unsafe ] define-inline
 
 >>
 

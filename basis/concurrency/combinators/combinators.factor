@@ -4,8 +4,10 @@ USING: concurrency.futures concurrency.count-downs sequences
 kernel ;
 IN: concurrency.combinators
 
+<PRIVATE
 : (parallel-each) ( n quot -- )
     >r <count-down> r> keep await ; inline
+PRIVATE>
 
 : parallel-each ( seq quot -- )
     over length [
@@ -20,7 +22,9 @@ IN: concurrency.combinators
 : parallel-filter ( seq quot -- newseq )
     over >r pusher >r each r> r> like ; inline
 
+<PRIVATE
 : future-values dup [ ?future ] change-each ; inline
+PRIVATE>
 
 : parallel-map ( seq quot -- newseq )
     [ curry future ] curry map future-values ;

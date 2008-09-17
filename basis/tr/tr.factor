@@ -7,7 +7,7 @@ IN: tr
 <PRIVATE
 
 : compute-tr ( quot from to -- mapping )
-    zip [ 256 ] 2dip '[ [ @ , at ] keep or ] B{ } map-as ; inline
+    zip [ 256 ] 2dip '[ [ @ _ at ] keep or ] B{ } map-as ; inline
 
 : tr-hints ( word -- )
     { { byte-array } { string } } "specializer" set-word-prop ;
@@ -16,13 +16,13 @@ IN: tr
     create-in dup tr-hints ;
 
 : tr-quot ( mapping -- quot )
-    '[ [ dup 0 255 between? [ , nth-unsafe ] when ] map ] ;
+    '[ [ dup 0 255 between? [ _ nth-unsafe ] when ] map ] ;
 
 : define-tr ( word mapping -- )
     tr-quot (( seq -- translated )) define-declared ;
 
 : fast-tr-quot ( mapping -- quot )
-    '[ [ , nth-unsafe ] change-each ] ;
+    '[ [ _ nth-unsafe ] change-each ] ;
 
 : define-fast-tr ( word mapping -- )
     fast-tr-quot (( seq -- )) define-declared ;

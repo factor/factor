@@ -2,64 +2,6 @@ USING: help.markup help.syntax kernel sequences quotations
 math.private ;
 IN: math
 
-ARTICLE: "division-by-zero" "Division by zero"
-"Floating point division never raises an error if the denominator is zero. This means that if at least one of the two inputs to " { $link / } ", " { $link /f } " or " { $link mod } " is a float, the result will be a floating point infinity or not a number value."
-$nl
-"The behavior of integer division is hardware specific. On x86 processors, " { $link /i } " and " { $link mod } " raise an error if both inputs are integers and the denominator is zero. On PowerPC, integer division by zero yields a result of zero."
-$nl
-"On the other hand, the " { $link / } " word, when given integer arguments, implements a much more expensive division algorithm which always yields an exact rational answer, and this word always tests for division by zero explicitly." ;
-
-ARTICLE: "number-protocol" "Number protocol"
-"Math operations obey certain numerical upgrade rules. If one of the inputs is a bignum and the other is a fixnum, the latter is first coerced to a bignum; if one of the inputs is a float, the other is coerced to a float."
-$nl
-"Two examples where you should note the types of the inputs and outputs:"
-{ $example "3 >fixnum 6 >bignum * class ." "bignum" }
-{ $example "1/2 2.0 + ." "4.5" }
-"The following usual operations are supported by all numbers."
-{ $subsection + }
-{ $subsection - }
-{ $subsection * }
-{ $subsection / }
-"Non-commutative operations take operands from the stack in the natural order; " { $snippet "6 2 /" } " divides 6 by 2."
-{ $subsection "division-by-zero" }
-"Real numbers (but not complex numbers) can be ordered:"
-{ $subsection < }
-{ $subsection <= }
-{ $subsection > }
-{ $subsection >= }
-"Numbers can be compared for equality using " { $link = } ", or a less precise test which disregards types:"
-{ $subsection number= } ;
-
-ARTICLE: "modular-arithmetic" "Modular arithmetic"
-{ $subsection mod }
-{ $subsection rem }
-{ $subsection /mod }
-{ $subsection /i }
-{ $see-also "integer-functions" } ;
-
-ARTICLE: "bitwise-arithmetic" "Bitwise arithmetic"
-"There are two ways of looking at an integer -- as an abstract mathematical entity, or as a string of bits. The latter representation motivates " { $emphasis "bitwise operations" } "."
-{ $subsection bitand }
-{ $subsection bitor }
-{ $subsection bitxor }
-{ $subsection bitnot }
-{ $subsection shift }
-{ $subsection 2/ }
-{ $subsection 2^ }
-{ $subsection bit? }
-{ $see-also "conditionals" } ;
-
-ARTICLE: "arithmetic" "Arithmetic"
-"Factor attempts to preserve natural mathematical semantics for numbers. Multiplying two large integers never results in overflow, and dividing two integers yields an exact ratio. Floating point numbers are also supported, along with complex numbers."
-$nl
-"Math words are in the " { $vocab-link "math" } " vocabulary. Implementation details are in the " { $vocab-link "math.private" } " vocabulary."
-{ $subsection "number-protocol" }
-{ $subsection "modular-arithmetic" }
-{ $subsection "bitwise-arithmetic" }
-{ $see-also "integers" "rationals" "floats" "complex-numbers" } ;
-
-ABOUT: "arithmetic"
-
 HELP: number=
 { $values { "x" number } { "y" number } { "?" "a boolean" } }
 { $description "Tests if two numbers have the same numeric value." }
@@ -235,6 +177,9 @@ HELP: 1-
     { $code "1-" "1 -" }
 } ;
 
+HELP: ?1+
+{ $description "If the input is not " { $link f } ", adds one. Otherwise, outputs a " { $snippet "0" } "." } ;
+
 HELP: sq
 { $values { "x" number } { "y" number } }
 { $description "Multiplies a number by itself." } ;
@@ -357,3 +302,62 @@ HELP: find-last-integer
 { $values { "n" integer } { "quot" "a quotation with stack effect " { $snippet "( i -- ? )" } } { "i" "an integer or " { $link f } } }
 { $description "Applies the quotation to each integer from " { $snippet "n" } " down to 0, inclusive. Iteration stops when the quotation outputs a true value or 0 is reached. If the quotation yields a true value for some integer, the word outputs that integer. Otherwise, the word outputs " { $link f } "." }
 { $notes "This word is used to implement " { $link find-last } "." } ;
+
+ARTICLE: "division-by-zero" "Division by zero"
+"Floating point division never raises an error if the denominator is zero. This means that if at least one of the two inputs to " { $link / } ", " { $link /f } " or " { $link mod } " is a float, the result will be a floating point infinity or not a number value."
+$nl
+"The behavior of integer division is hardware specific. On x86 processors, " { $link /i } " and " { $link mod } " raise an error if both inputs are integers and the denominator is zero. On PowerPC, integer division by zero yields a result of zero."
+$nl
+"On the other hand, the " { $link / } " word, when given integer arguments, implements a much more expensive division algorithm which always yields an exact rational answer, and this word always tests for division by zero explicitly." ;
+
+ARTICLE: "number-protocol" "Number protocol"
+"Math operations obey certain numerical upgrade rules. If one of the inputs is a bignum and the other is a fixnum, the latter is first coerced to a bignum; if one of the inputs is a float, the other is coerced to a float."
+$nl
+"Two examples where you should note the types of the inputs and outputs:"
+{ $example "3 >fixnum 6 >bignum * class ." "bignum" }
+{ $example "1/2 2.0 + ." "4.5" }
+"The following usual operations are supported by all numbers."
+{ $subsection + }
+{ $subsection - }
+{ $subsection * }
+{ $subsection / }
+"Non-commutative operations take operands from the stack in the natural order; " { $snippet "6 2 /" } " divides 6 by 2."
+{ $subsection "division-by-zero" }
+"Real numbers (but not complex numbers) can be ordered:"
+{ $subsection < }
+{ $subsection <= }
+{ $subsection > }
+{ $subsection >= }
+"Numbers can be compared for equality using " { $link = } ", or a less precise test which disregards types:"
+{ $subsection number= } ;
+
+ARTICLE: "modular-arithmetic" "Modular arithmetic"
+{ $subsection mod }
+{ $subsection rem }
+{ $subsection /mod }
+{ $subsection /i }
+{ $see-also "integer-functions" } ;
+
+ARTICLE: "bitwise-arithmetic" "Bitwise arithmetic"
+"There are two ways of looking at an integer -- as an abstract mathematical entity, or as a string of bits. The latter representation motivates " { $emphasis "bitwise operations" } "."
+{ $subsection bitand }
+{ $subsection bitor }
+{ $subsection bitxor }
+{ $subsection bitnot }
+{ $subsection shift }
+{ $subsection 2/ }
+{ $subsection 2^ }
+{ $subsection bit? }
+{ $see-also "conditionals" } ;
+
+ARTICLE: "arithmetic" "Arithmetic"
+"Factor attempts to preserve natural mathematical semantics for numbers. Multiplying two large integers never results in overflow, and dividing two integers yields an exact ratio. Floating point numbers are also supported, along with complex numbers."
+$nl
+"Math words are in the " { $vocab-link "math" } " vocabulary. Implementation details are in the " { $vocab-link "math.private" } " vocabulary."
+{ $subsection "number-protocol" }
+{ $subsection "modular-arithmetic" }
+{ $subsection "bitwise-arithmetic" }
+{ $see-also "integers" "rationals" "floats" "complex-numbers" } ;
+
+ABOUT: "arithmetic"
+

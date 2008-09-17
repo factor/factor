@@ -70,7 +70,7 @@ M: object apply-object push-literal ;
     2array recursive-state get swap prefix infer-quot ;
 
 : time-bomb ( error -- )
-    '[ , throw ] recursive-state get infer-quot ;
+    '[ _ throw ] recursive-state get infer-quot ;
 
 : bad-call ( -- )
     "call must be given a callable" time-bomb ;
@@ -165,7 +165,7 @@ M: object apply-object push-literal ;
     ] maybe-cannot-infer ;
 
 : apply-word/effect ( word effect -- )
-    swap '[ , #call, ] consume/produce ;
+    swap '[ _ #call, ] consume/produce ;
 
 : required-stack-effect ( word -- effect )
     dup stack-effect [ ] [ \ missing-effect inference-error ] ?if ;

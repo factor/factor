@@ -4,11 +4,17 @@ USING: accessors kernel quotations help.syntax help.markup
 io.sockets strings calendar ;
 IN: smtp
 
+HELP: smtp-domain
+{ $description "The name of the machine that is sending the email.  This variable will be filled in by the " { $link host-name } " word if not set by the user." } ;
+
 HELP: smtp-server
 { $description "Holds an " { $link inet } " object with the address of an SMTP server." } ;
 
 HELP: smtp-read-timeout
 { $description "Holds an " { $link duration } " object that specifies how long to wait for a response from the SMTP server." } ;
+
+HELP: esmtp?
+{ $description "Set true by default, determines whether the SMTP client is using the Extended SMTP protocol." } ;
 
 HELP: with-smtp-connection
 { $values { "quot" quotation } }
@@ -36,5 +42,10 @@ HELP: send-email
 } ;
 
 ARTICLE: "smtp" "SMTP Client Library"
+"Configuring SMTP:"
+{ $subsection smtp-server }
+{ $subsection smtp-read-timeout }
+{ $subsection smtp-domain }
+{ $subsection esmtp? }
 "Sending an email:"
 { $subsection send-email } ;

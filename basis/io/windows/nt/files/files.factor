@@ -4,7 +4,7 @@ io.windows.nt.backend windows windows.kernel32
 kernel libc math threads system
 alien.c-types alien.arrays alien.strings sequences combinators
 combinators.short-circuit ascii splitting alien strings
-assocs namespaces io.files.private accessors tr ;
+assocs namespaces make io.files.private accessors tr ;
 IN: io.windows.nt.files
 
 M: winnt cwd

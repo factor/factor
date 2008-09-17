@@ -1,7 +1,7 @@
 ! Copyright (c) 2007, 2008 Slava Pestov, Doug Coleman, Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel math math.order math.ranges mirrors
-namespaces sequences sequences.lib sorting ;
+namespaces make sequences sequences.lib sorting ;
 IN: math.combinatorics
 
 <PRIVATE
@@ -39,7 +39,7 @@ PRIVATE>
     twiddle [ nPk ] keep factorial / ;
 
 : permutation ( n seq -- seq )
-    tuck permutation-indices nths ;
+    tuck permutation-indices swap nths ;
 
 : all-permutations ( seq -- seq )
     [

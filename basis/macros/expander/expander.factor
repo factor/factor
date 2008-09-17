@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences namespaces quotations accessors words
-continuations vectors effects math stack-checker.transforms ;
+USING: kernel sequences namespaces make quotations accessors
+words continuations vectors effects math
+stack-checker.transforms ;
 IN: macros.expander
 
 GENERIC: expand-macros ( quot -- quot' )

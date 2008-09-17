@@ -4,289 +4,6 @@ kernel.private vectors combinators quotations strings words
 assocs arrays math.order ;
 IN: kernel
 
-ARTICLE: "shuffle-words" "Shuffle words"
-"Shuffle words rearrange items at the top of the data stack. They control the flow of data between words that perform actions."
-$nl
-"The " { $link "cleave-combinators" } " and " { $link "spread-combinators" } " are closely related to shuffle words and should be used instead where possible because they can result in clearer code; also, see the advice in " { $link "cookbook-philosophy" } "."
-$nl
-"Removing stack elements:"
-{ $subsection drop }
-{ $subsection 2drop }
-{ $subsection 3drop }
-{ $subsection nip }
-{ $subsection 2nip }
-"Duplicating stack elements:"
-{ $subsection dup }
-{ $subsection 2dup }
-{ $subsection 3dup }
-{ $subsection dupd }
-{ $subsection over }
-{ $subsection 2over }
-{ $subsection pick }
-{ $subsection tuck }
-"Permuting stack elements:"
-{ $subsection swap }
-{ $subsection swapd }
-{ $subsection rot }
-{ $subsection -rot }
-{ $subsection spin }
-{ $subsection roll }
-{ $subsection -roll }
-"Sometimes an additional storage area is needed to hold objects. The " { $emphasis "retain stack" } " is an auxilliary stack for this purpose. Objects can be moved between the data and retain stacks using the following two words:"
-{ $subsection >r }
-{ $subsection r> }
-"The top of the data stack is ``hidden'' between " { $link >r } " and " { $link r> } ":"
-{ $example "1 2 3 >r .s r>" "1\n2" }
-"Usages of " { $link >r } " and " { $link r> } " must be balanced within a single quotation; quotations are not permitted to pop retain stack elements they did not push, or leave elements on the retain stack after returning."
-$nl
-"The " { $link "inference" } " tool checks retain stack usage. The " { $link "slip-keep-combinators" } " combinators abstract out common retain stack usage patterns." ;
-
-ARTICLE: "cleave-shuffle-equivalence" "Expressing shuffle words with cleave combinators"
-"Cleave combinators are defined in terms of shuffle words, and mappings from certain shuffle idioms to cleave combinators are discussed in the documentation for " { $link bi } ", " { $link 2bi } ", " { $link 3bi } ", " { $link tri } ", " { $link 2tri } " and " { $link 3tri } "."
-$nl
-"Certain shuffle words can also be expressed in terms of the cleave combinators. Internalizing such identities can help with understanding and writing code using cleave combinators:"
-{ $code
-    ": keep  [ ] bi ;"
-    ": 2keep [ ] 2bi ;"
-    ": 3keep [ ] 3bi ;"
-    ""
-    ": dup   [ ] [ ] bi ;"
-    ": 2dup  [ ] [ ] 2bi ;"
-    ": 3dup  [ ] [ ] 3bi ;"
-    ""
-    ": tuck  [ nip ] [ ] 2bi ;"
-    ": swap  [ nip ] [ drop ] 2bi ;"
-    ""
-    ": over  [ ] [ drop ] 2bi ;"
-    ": pick  [ ] [ 2drop ] 3bi ;"
-    ": 2over [ ] [ drop ] 3bi ;"
-} ;
-
-ARTICLE: "cleave-combinators" "Cleave combinators"
-"The cleave combinators apply multiple quotations to a single value."
-$nl
-"Two quotations:"
-{ $subsection bi }
-{ $subsection 2bi }
-{ $subsection 3bi }
-"Three quotations:"
-{ $subsection tri }
-{ $subsection 2tri }
-{ $subsection 3tri }
-"Technically, the cleave combinators are redundant because they can be simulated using shuffle words and other combinators, and in addition, they do not reduce token counts by much, if at all. However, they can make code more readable by expressing intention and exploiting any inherent symmetry. For example, a piece of code which performs three operations on the top of the stack can be written in one of two ways:"
-{ $code
-    "! First alternative; uses keep"
-    "[ 1 + ] keep"
-    "[ 1 - ] keep"
-    "2 *"
-    "! Second alternative: uses tri"
-    "[ 1 + ]"
-    "[ 1 - ]"
-    "[ 2 * ] tri"
-}
-"The latter is more aesthetically pleasing than the former."
-$nl
-"A generalization of the above combinators to any number of quotations can be found in " { $link "combinators" } "."
-{ $subsection "cleave-shuffle-equivalence" } ;
-
-ARTICLE: "spread-shuffle-equivalence" "Expressing shuffle words with spread combinators"
-"Spread combinators are defined in terms of shuffle words, and mappings from certain shuffle idioms to spread combinators are discussed in the documentation for " { $link bi* } ", " { $link 2bi* } ", and " { $link tri* } "."
-$nl
-"Certain shuffle words can also be expressed in terms of the spread combinators. Internalizing such identities can help with understanding and writing code using spread combinators:"
-{ $code
-    ": dip   [ ] bi* ;"
-    ": 2dip  [ ] [ ] tri* ;"
-    ""
-    ": slip  [ call ] [ ] bi* ;"
-    ": 2slip [ call ] [ ] [ ] tri* ;"
-    ""
-    ": nip   [ drop ] [ ] bi* ;"
-    ": 2nip  [ drop ] [ drop ] [ ] tri* ;"
-    ""
-    ": rot"
-    "    [ [ drop ] [      ] [ drop ] tri* ]"
-    "    [ [ drop ] [ drop ] [      ] tri* ]"
-    "    [ [      ] [ drop ] [ drop ] tri* ]"
-    "    3tri ;"
-    ""
-    ": -rot"
-    "    [ [ drop ] [ drop ] [      ] tri* ]"
-    "    [ [      ] [ drop ] [ drop ] tri* ]"
-    "    [ [ drop ] [      ] [ drop ] tri* ]"
-    "    3tri ;"
-    ""
-    ": spin"
-    "    [ [ drop ] [ drop ] [      ] tri* ]"
-    "    [ [ drop ] [      ] [ drop ] tri* ]"
-    "    [ [      ] [ drop ] [ drop ] tri* ]"
-    "    3tri ;"
-} ;
-
-ARTICLE: "spread-combinators" "Spread combinators"
-"The spread combinators apply multiple quotations to multiple values. The " { $snippet "*" } " suffix signifies spreading."
-$nl
-"Two quotations:"
-{ $subsection bi* }
-{ $subsection 2bi* }
-"Three quotations:"
-{ $subsection tri* }
-"Technically, the spread combinators are redundant because they can be simulated using shuffle words and other combinators, and in addition, they do not reduce token counts by much, if at all. However, they can make code more readable by expressing intention and exploiting any inherent symmetry. For example, a piece of code which performs three operations on three related values can be written in one of two ways:"
-{ $code
-    "! First alternative; uses retain stack explicitly"
-    ">r >r 1 +"
-    "r> 1 -"
-    "r> 2 *"
-    "! Second alternative: uses tri*"
-    "[ 1 + ]"
-    "[ 1 - ]"
-    "[ 2 * ] tri*"
-}
-
-$nl
-"A generalization of the above combinators to any number of quotations can be found in " { $link "combinators" } "."
-{ $subsection "spread-shuffle-equivalence" } ;
-
-ARTICLE: "apply-combinators" "Apply combinators"
-"The apply combinators apply a single quotation to multiple values. The " { $snippet "@" } " suffix signifies application."
-$nl
-"Two quotations:"
-{ $subsection bi@ }
-{ $subsection 2bi@ }
-"Three quotations:"
-{ $subsection tri@ }
-"A pair of utility words built from " { $link bi@ } ":"
-{ $subsection both? }
-{ $subsection either? } ;
-
-ARTICLE: "slip-keep-combinators" "The dip, slip and keep combinators"
-"The dip combinators invoke the quotation at the top of the stack, hiding the values underneath:"
-{ $subsection dip }
-{ $subsection 2dip }
-"The slip combinators invoke a quotation further down on the stack. They are most useful for implementing other combinators:"
-{ $subsection slip }
-{ $subsection 2slip }
-{ $subsection 3slip }
-"The keep combinators invoke a quotation which takes a number of values off the stack, and then they restore those values:"
-{ $subsection keep }
-{ $subsection 2keep }
-{ $subsection 3keep } ;
-
-ARTICLE: "compositional-combinators" "Compositional combinators"
-"Quotations can be composed using efficient quotation-specific operations:"
-{ $subsection curry }
-{ $subsection 2curry }
-{ $subsection 3curry }
-{ $subsection with }
-{ $subsection compose }
-{ $subsection 3compose }
-{ $subsection prepose }
-"Quotations also implement the sequence protocol, and can be manipulated with sequence words; see " { $link "quotations" } "." ;
-
-ARTICLE: "implementing-combinators" "Implementing combinators"
-"The following pair of words invoke words and quotations reflectively:"
-{ $subsection call }
-{ $subsection execute }
-"These words are used to implement combinators. Note that combinator definitions must be followed by the " { $link POSTPONE: inline } " declaration in order to compile in the optimizing compiler; for example:"
-{ $code
-    ": keep ( x quot -- x )"
-    "    over >r call r> ; inline"
-}
-"Word inlining is documented in " { $link "declarations" } "." ;
-
-ARTICLE: "booleans" "Booleans"
-"In Factor, any object that is not " { $link f } " has a true value, and " { $link f } " has a false value. The " { $link t } " object is the canonical true value."
-{ $subsection f }
-{ $subsection t }
-"The " { $link f } " object is the unique instance of the " { $link f } " class; the two are distinct objects. The latter is also a parsing word which adds the " { $link f } " object to the parse tree at parse time. To refer to the class itself you must use " { $link POSTPONE: POSTPONE: } " or " { $link POSTPONE: \ } " to prevent the parsing word from executing."
-$nl
-"Here is the " { $link f } " object:"
-{ $example "f ." "f" }
-"Here is the " { $link f } " class:"
-{ $example "\\ f ." "POSTPONE: f" }
-"They are not equal:"
-{ $example "f \\ f = ." "f" }
-"Here is an array containing the " { $link f } " object:"
-{ $example "{ f } ." "{ f }" }
-"Here is an array containing the " { $link f } " class:"
-{ $example "{ POSTPONE: f } ." "{ POSTPONE: f }" }
-"The " { $link f } " object is an instance of the " { $link f } " class:"
-{ $example "f class ." "POSTPONE: f" }
-"The " { $link f } " class is an instance of " { $link word } ":"
-{ $example "\\ f class ." "word" }
-"On the other hand, " { $link t } " is just a word, and there is no class which it is a unique instance of."
-{ $example "t \\ t eq? ." "t" }
-"Many words which search collections confuse the case of no element being present with an element being found equal to " { $link f } ". If this distinction is imporant, there is usually an alternative word which can be used; for example, compare " { $link at } " with " { $link at* } "." ;
-
-ARTICLE: "conditionals-boolean-equivalence" "Expressing conditionals with boolean logic"
-"Certain simple conditional forms can be expressed in a simpler manner using boolean logic."
-$nl
-"The following two lines are equivalent:"
-{ $code "[ drop f ] unless" "swap and" }
-"The following two lines are equivalent:"
-{ $code "[ ] [ ] ?if" "swap or" }
-"The following two lines are equivalent, where " { $snippet "L" } " is a literal:"
-{ $code "[ L ] unless*" "L or" } ;
-
-ARTICLE: "conditionals" "Conditionals and logic"
-"The basic conditionals:"
-{ $subsection if }
-{ $subsection when }
-{ $subsection unless }
-"Forms abstracting a common stack shuffle pattern:"
-{ $subsection if* }
-{ $subsection when* }
-{ $subsection unless* }
-"Another form abstracting a common stack shuffle pattern:"
-{ $subsection ?if }
-"Sometimes instead of branching, you just need to pick one of two values:"
-{ $subsection ? }
-"There are some logical operations on booleans:"
-{ $subsection >boolean }
-{ $subsection not }
-{ $subsection and }
-{ $subsection or }
-{ $subsection xor }
-{ $subsection "conditionals-boolean-equivalence" }
-"See " { $link "combinators" } " for forms which abstract away common patterns involving multiple nested branches."
-{ $see-also "booleans" "bitwise-arithmetic" both? either? } ;
-
-ARTICLE: "equality" "Equality"
-"There are two distinct notions of ``sameness'' when it comes to objects."
-$nl
-"You can test if two references point to the same object (" { $emphasis "identity comparison" } "). This is rarely used; it is mostly useful with large, mutable objects where the object identity matters but the value is transient:"
-{ $subsection eq? }
-"You can test if two objects are equal in a domain-specific sense, usually by being instances of the same class, and having equal slot values (" { $emphasis "value comparison" } "):"
-{ $subsection = }
-"A third form of equality is provided by " { $link number= } ". It compares numeric value while disregarding types."
-$nl
-"Custom value comparison methods for use with " { $link = } " can be defined on a generic word:"
-{ $subsection equal? }
-"Utility class:"
-{ $subsection identity-tuple }
-"An object can be cloned; the clone has distinct identity but equal value:"
-{ $subsection clone } ;
-
-ARTICLE: "dataflow" "Data and control flow"
-{ $subsection "evaluator" }
-{ $subsection "words" }
-{ $subsection "effects" }
-{ $subsection "booleans" }
-{ $subsection "shuffle-words" }
-"A central concept in Factor is that of a " { $emphasis "combinator" } ", which is a word taking code as input."
-{ $subsection "cleave-combinators" }
-{ $subsection "spread-combinators" }
-{ $subsection "apply-combinators" }
-{ $subsection "slip-keep-combinators" }
-{ $subsection "conditionals" }
-{ $subsection "compositional-combinators" }
-{ $subsection "combinators" }
-"Advanced topics:"
-{ $subsection "implementing-combinators" }
-{ $subsection "errors" }
-{ $subsection "continuations" } ;
-
-ABOUT: "dataflow"
-
 HELP: eq? ( obj1 obj2 -- ? )
 { $values { "obj1" object } { "obj2" object } { "?" "a boolean" } }
 { $description "Tests if two references point at the same object." } ;
@@ -550,7 +267,7 @@ HELP: 2bi
 
 HELP: 3bi
 { $values { "x" object } { "y" object } { "z" object } { "p" "a quotation with stack effect " { $snippet "( x y z -- ... )" } } { "q" "a quotation with stack effect " { $snippet "( x y z -- ... )" } } }
-{ $description "Applies " { $snippet "p" } " to the two input values, then applies " { $snippet "q" } " to the two input values." }
+{ $description "Applies " { $snippet "p" } " to the three input values, then applies " { $snippet "q" } " to the three input values." }
 { $examples
     "If " { $snippet "[ p ]" } " and " { $snippet "[ q ]" } " have stack effect " { $snippet "( x y z -- )" } ", then the following two lines are equivalent:"
     { $code
@@ -916,6 +633,20 @@ $nl
 }
 "However, depending on the stack effects of " { $snippet "pred" } " and " { $snippet "quot" } ", the " { $snippet "tail" } " quotation might need to be non-empty in order to balance out the stack effect of branches for stack effect inference." } ;
 
+HELP: loop
+{ $values
+     { "pred" quotation } }
+{ $description "Calls the quotation repeatedly until the output is true." }
+{ $examples "Loop until we hit a zero:"
+    { $unchecked-example "USING: kernel random math io ; "
+    " [ \"hi\" write bl 10 random zero? not ] loop"
+    "hi hi hi" }
+    "A fun loop:"
+    { $example "USING: kernel prettyprint math ; "
+    "3 [ dup . 7 + 11 mod dup 3 = not ] loop"
+    "3\n10\n6\n2\n9\n5\n1\n8\n4\n0\n7" }
+} ;
+
 HELP: assert
 { $values { "got" "the obtained value" } { "expect" "the expected value" } }
 { $description "Throws an " { $link assert } " error." }
@@ -924,3 +655,288 @@ HELP: assert
 HELP: assert=
 { $values { "a" object } { "b" object } }
 { $description "Throws an " { $link assert } " error if " { $snippet "a" } " does not equal " { $snippet "b" } "." } ;
+
+
+ARTICLE: "shuffle-words" "Shuffle words"
+"Shuffle words rearrange items at the top of the data stack. They control the flow of data between words that perform actions."
+$nl
+"The " { $link "cleave-combinators" } " and " { $link "spread-combinators" } " are closely related to shuffle words and should be used instead where possible because they can result in clearer code; also, see the advice in " { $link "cookbook-philosophy" } "."
+$nl
+"Removing stack elements:"
+{ $subsection drop }
+{ $subsection 2drop }
+{ $subsection 3drop }
+{ $subsection nip }
+{ $subsection 2nip }
+"Duplicating stack elements:"
+{ $subsection dup }
+{ $subsection 2dup }
+{ $subsection 3dup }
+{ $subsection dupd }
+{ $subsection over }
+{ $subsection 2over }
+{ $subsection pick }
+{ $subsection tuck }
+"Permuting stack elements:"
+{ $subsection swap }
+{ $subsection swapd }
+{ $subsection rot }
+{ $subsection -rot }
+{ $subsection spin }
+{ $subsection roll }
+{ $subsection -roll }
+"Sometimes an additional storage area is needed to hold objects. The " { $emphasis "retain stack" } " is an auxilliary stack for this purpose. Objects can be moved between the data and retain stacks using the following two words:"
+{ $subsection >r }
+{ $subsection r> }
+"The top of the data stack is ``hidden'' between " { $link >r } " and " { $link r> } ":"
+{ $example "1 2 3 >r .s r>" "1\n2" }
+"Usages of " { $link >r } " and " { $link r> } " must be balanced within a single quotation; quotations are not permitted to pop retain stack elements they did not push, or leave elements on the retain stack after returning."
+$nl
+"The " { $link "inference" } " tool checks retain stack usage. The " { $link "slip-keep-combinators" } " combinators abstract out common retain stack usage patterns." ;
+
+ARTICLE: "cleave-shuffle-equivalence" "Expressing shuffle words with cleave combinators"
+"Cleave combinators are defined in terms of shuffle words, and mappings from certain shuffle idioms to cleave combinators are discussed in the documentation for " { $link bi } ", " { $link 2bi } ", " { $link 3bi } ", " { $link tri } ", " { $link 2tri } " and " { $link 3tri } "."
+$nl
+"Certain shuffle words can also be expressed in terms of the cleave combinators. Internalizing such identities can help with understanding and writing code using cleave combinators:"
+{ $code
+    ": keep  [ ] bi ;"
+    ": 2keep [ ] 2bi ;"
+    ": 3keep [ ] 3bi ;"
+    ""
+    ": dup   [ ] [ ] bi ;"
+    ": 2dup  [ ] [ ] 2bi ;"
+    ": 3dup  [ ] [ ] 3bi ;"
+    ""
+    ": tuck  [ nip ] [ ] 2bi ;"
+    ": swap  [ nip ] [ drop ] 2bi ;"
+    ""
+    ": over  [ ] [ drop ] 2bi ;"
+    ": pick  [ ] [ 2drop ] 3bi ;"
+    ": 2over [ ] [ drop ] 3bi ;"
+} ;
+
+ARTICLE: "cleave-combinators" "Cleave combinators"
+"The cleave combinators apply multiple quotations to a single value."
+$nl
+"Two quotations:"
+{ $subsection bi }
+{ $subsection 2bi }
+{ $subsection 3bi }
+"Three quotations:"
+{ $subsection tri }
+{ $subsection 2tri }
+{ $subsection 3tri }
+"Technically, the cleave combinators are redundant because they can be simulated using shuffle words and other combinators, and in addition, they do not reduce token counts by much, if at all. However, they can make code more readable by expressing intention and exploiting any inherent symmetry. For example, a piece of code which performs three operations on the top of the stack can be written in one of two ways:"
+{ $code
+    "! First alternative; uses keep"
+    "[ 1 + ] keep"
+    "[ 1 - ] keep"
+    "2 *"
+    "! Second alternative: uses tri"
+    "[ 1 + ]"
+    "[ 1 - ]"
+    "[ 2 * ] tri"
+}
+"The latter is more aesthetically pleasing than the former."
+$nl
+"A generalization of the above combinators to any number of quotations can be found in " { $link "combinators" } "."
+{ $subsection "cleave-shuffle-equivalence" } ;
+
+ARTICLE: "spread-shuffle-equivalence" "Expressing shuffle words with spread combinators"
+"Spread combinators are defined in terms of shuffle words, and mappings from certain shuffle idioms to spread combinators are discussed in the documentation for " { $link bi* } ", " { $link 2bi* } ", and " { $link tri* } "."
+$nl
+"Certain shuffle words can also be expressed in terms of the spread combinators. Internalizing such identities can help with understanding and writing code using spread combinators:"
+{ $code
+    ": dip   [ ] bi* ;"
+    ": 2dip  [ ] [ ] tri* ;"
+    ""
+    ": slip  [ call ] [ ] bi* ;"
+    ": 2slip [ call ] [ ] [ ] tri* ;"
+    ""
+    ": nip   [ drop ] [ ] bi* ;"
+    ": 2nip  [ drop ] [ drop ] [ ] tri* ;"
+    ""
+    ": rot"
+    "    [ [ drop ] [      ] [ drop ] tri* ]"
+    "    [ [ drop ] [ drop ] [      ] tri* ]"
+    "    [ [      ] [ drop ] [ drop ] tri* ]"
+    "    3tri ;"
+    ""
+    ": -rot"
+    "    [ [ drop ] [ drop ] [      ] tri* ]"
+    "    [ [      ] [ drop ] [ drop ] tri* ]"
+    "    [ [ drop ] [      ] [ drop ] tri* ]"
+    "    3tri ;"
+    ""
+    ": spin"
+    "    [ [ drop ] [ drop ] [      ] tri* ]"
+    "    [ [ drop ] [      ] [ drop ] tri* ]"
+    "    [ [      ] [ drop ] [ drop ] tri* ]"
+    "    3tri ;"
+} ;
+
+ARTICLE: "spread-combinators" "Spread combinators"
+"The spread combinators apply multiple quotations to multiple values. The " { $snippet "*" } " suffix signifies spreading."
+$nl
+"Two quotations:"
+{ $subsection bi* }
+{ $subsection 2bi* }
+"Three quotations:"
+{ $subsection tri* }
+"Technically, the spread combinators are redundant because they can be simulated using shuffle words and other combinators, and in addition, they do not reduce token counts by much, if at all. However, they can make code more readable by expressing intention and exploiting any inherent symmetry. For example, a piece of code which performs three operations on three related values can be written in one of two ways:"
+{ $code
+    "! First alternative; uses retain stack explicitly"
+    ">r >r 1 +"
+    "r> 1 -"
+    "r> 2 *"
+    "! Second alternative: uses tri*"
+    "[ 1 + ]"
+    "[ 1 - ]"
+    "[ 2 * ] tri*"
+}
+
+$nl
+"A generalization of the above combinators to any number of quotations can be found in " { $link "combinators" } "."
+{ $subsection "spread-shuffle-equivalence" } ;
+
+ARTICLE: "apply-combinators" "Apply combinators"
+"The apply combinators apply a single quotation to multiple values. The " { $snippet "@" } " suffix signifies application."
+$nl
+"Two quotations:"
+{ $subsection bi@ }
+{ $subsection 2bi@ }
+"Three quotations:"
+{ $subsection tri@ }
+"A pair of utility words built from " { $link bi@ } ":"
+{ $subsection both? }
+{ $subsection either? } ;
+
+ARTICLE: "slip-keep-combinators" "The dip, slip and keep combinators"
+"The dip combinators invoke the quotation at the top of the stack, hiding the values underneath:"
+{ $subsection dip }
+{ $subsection 2dip }
+"The slip combinators invoke a quotation further down on the stack. They are most useful for implementing other combinators:"
+{ $subsection slip }
+{ $subsection 2slip }
+{ $subsection 3slip }
+"The keep combinators invoke a quotation which takes a number of values off the stack, and then they restore those values:"
+{ $subsection keep }
+{ $subsection 2keep }
+{ $subsection 3keep } ;
+
+ARTICLE: "compositional-combinators" "Compositional combinators"
+"Quotations can be composed using efficient quotation-specific operations:"
+{ $subsection curry }
+{ $subsection 2curry }
+{ $subsection 3curry }
+{ $subsection with }
+{ $subsection compose }
+{ $subsection 3compose }
+{ $subsection prepose }
+"Quotations also implement the sequence protocol, and can be manipulated with sequence words; see " { $link "quotations" } "." ;
+
+ARTICLE: "implementing-combinators" "Implementing combinators"
+"The following pair of words invoke words and quotations reflectively:"
+{ $subsection call }
+{ $subsection execute }
+"These words are used to implement combinators. Note that combinator definitions must be followed by the " { $link POSTPONE: inline } " declaration in order to compile in the optimizing compiler; for example:"
+{ $code
+    ": keep ( x quot -- x )"
+    "    over >r call r> ; inline"
+}
+"Word inlining is documented in " { $link "declarations" } "." ;
+
+ARTICLE: "booleans" "Booleans"
+"In Factor, any object that is not " { $link f } " has a true value, and " { $link f } " has a false value. The " { $link t } " object is the canonical true value."
+{ $subsection f }
+{ $subsection t }
+"The " { $link f } " object is the unique instance of the " { $link f } " class; the two are distinct objects. The latter is also a parsing word which adds the " { $link f } " object to the parse tree at parse time. To refer to the class itself you must use " { $link POSTPONE: POSTPONE: } " or " { $link POSTPONE: \ } " to prevent the parsing word from executing."
+$nl
+"Here is the " { $link f } " object:"
+{ $example "f ." "f" }
+"Here is the " { $link f } " class:"
+{ $example "\\ f ." "POSTPONE: f" }
+"They are not equal:"
+{ $example "f \\ f = ." "f" }
+"Here is an array containing the " { $link f } " object:"
+{ $example "{ f } ." "{ f }" }
+"Here is an array containing the " { $link f } " class:"
+{ $example "{ POSTPONE: f } ." "{ POSTPONE: f }" }
+"The " { $link f } " object is an instance of the " { $link f } " class:"
+{ $example "f class ." "POSTPONE: f" }
+"The " { $link f } " class is an instance of " { $link word } ":"
+{ $example "\\ f class ." "word" }
+"On the other hand, " { $link t } " is just a word, and there is no class which it is a unique instance of."
+{ $example "t \\ t eq? ." "t" }
+"Many words which search collections confuse the case of no element being present with an element being found equal to " { $link f } ". If this distinction is imporant, there is usually an alternative word which can be used; for example, compare " { $link at } " with " { $link at* } "." ;
+
+ARTICLE: "conditionals-boolean-equivalence" "Expressing conditionals with boolean logic"
+"Certain simple conditional forms can be expressed in a simpler manner using boolean logic."
+$nl
+"The following two lines are equivalent:"
+{ $code "[ drop f ] unless" "swap and" }
+"The following two lines are equivalent:"
+{ $code "[ ] [ ] ?if" "swap or" }
+"The following two lines are equivalent, where " { $snippet "L" } " is a literal:"
+{ $code "[ L ] unless*" "L or" } ;
+
+ARTICLE: "conditionals" "Conditionals and logic"
+"The basic conditionals:"
+{ $subsection if }
+{ $subsection when }
+{ $subsection unless }
+"Forms abstracting a common stack shuffle pattern:"
+{ $subsection if* }
+{ $subsection when* }
+{ $subsection unless* }
+"Another form abstracting a common stack shuffle pattern:"
+{ $subsection ?if }
+"Sometimes instead of branching, you just need to pick one of two values:"
+{ $subsection ? }
+"There are some logical operations on booleans:"
+{ $subsection >boolean }
+{ $subsection not }
+{ $subsection and }
+{ $subsection or }
+{ $subsection xor }
+{ $subsection "conditionals-boolean-equivalence" }
+"See " { $link "combinators" } " for forms which abstract away common patterns involving multiple nested branches."
+{ $see-also "booleans" "bitwise-arithmetic" both? either? } ;
+
+ARTICLE: "equality" "Equality"
+"There are two distinct notions of ``sameness'' when it comes to objects."
+$nl
+"You can test if two references point to the same object (" { $emphasis "identity comparison" } "). This is rarely used; it is mostly useful with large, mutable objects where the object identity matters but the value is transient:"
+{ $subsection eq? }
+"You can test if two objects are equal in a domain-specific sense, usually by being instances of the same class, and having equal slot values (" { $emphasis "value comparison" } "):"
+{ $subsection = }
+"A third form of equality is provided by " { $link number= } ". It compares numeric value while disregarding types."
+$nl
+"Custom value comparison methods for use with " { $link = } " can be defined on a generic word:"
+{ $subsection equal? }
+"Utility class:"
+{ $subsection identity-tuple }
+"An object can be cloned; the clone has distinct identity but equal value:"
+{ $subsection clone } ;
+
+ARTICLE: "dataflow" "Data and control flow"
+{ $subsection "evaluator" }
+{ $subsection "words" }
+{ $subsection "effects" }
+{ $subsection "booleans" }
+{ $subsection "shuffle-words" }
+"A central concept in Factor is that of a " { $emphasis "combinator" } ", which is a word taking code as input."
+{ $subsection "cleave-combinators" }
+{ $subsection "spread-combinators" }
+{ $subsection "apply-combinators" }
+{ $subsection "slip-keep-combinators" }
+{ $subsection "conditionals" }
+{ $subsection "compositional-combinators" }
+{ $subsection "combinators" }
+"Advanced topics:"
+{ $subsection "implementing-combinators" }
+{ $subsection "errors" }
+{ $subsection "continuations" } ;
+
+ABOUT: "dataflow"
+

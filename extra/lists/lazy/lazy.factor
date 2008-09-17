@@ -5,7 +5,7 @@
 ! Updated by Chris Double, September 2006
 ! Updated by James Cash, June 2008
 !
-USING: kernel sequences math vectors arrays namespaces
+USING: kernel sequences math vectors arrays namespaces make
 quotations promises combinators io lists accessors ;
 IN: lists.lazy
 

@@ -1,5 +1,5 @@
 
-USING: kernel namespaces accessors
+USING: kernel namespaces make accessors
        math math.constants math.functions math.matrices math.vectors
        sequences splitting grouping self math.trig ;
 

@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays combinators kernel io io.encodings.binary io.files
 io.streams.byte-array math.vectors strings sequences namespaces
-math parser sequences assocs grouping vectors io.binary hashtables
-symbols math.bitwise checksums checksums.common ;
+make math parser sequences assocs grouping vectors io.binary
+hashtables symbols math.bitwise checksums checksums.common ;
 IN: checksums.sha1
 
 ! Implemented according to RFC 3174.

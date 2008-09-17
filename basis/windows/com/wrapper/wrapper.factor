@@ -48,7 +48,7 @@ unless
     (query-interface-cases) 
     '[
         swap 16 memory>byte-array
-        , case
+        _ case
         [
             "void*" heap-size * rot <displaced-alien> com-add-ref
             0 rot set-void*-nth S_OK
@@ -57,14 +57,14 @@ unless
 
 : (make-add-ref) ( interfaces -- quot )
     length "void*" heap-size * '[
-        , swap <displaced-alien>
+        _ swap <displaced-alien>
         0 over ulong-nth
         1+ [ 0 rot set-ulong-nth ] keep
     ] ;
 
 : (make-release) ( interfaces -- quot )
     length "void*" heap-size * '[
-        , over <displaced-alien>
+        _ over <displaced-alien>
         0 over ulong-nth
         1- [ 0 rot set-ulong-nth ] keep
         dup zero? [ swap (free-wrapped-object) ] [ nip ] if
@@ -79,16 +79,16 @@ unless
 : (thunk) ( n -- quot )
     dup 0 =
     [ drop [ ] ]
-    [ "void*" heap-size neg * '[ , swap <displaced-alien> ] ]
+    [ "void*" heap-size neg * '[ _ swap <displaced-alien> ] ]
     if ;
 
 : (thunked-quots) ( quots iunknown-methods thunk -- {thunk,quot}s )
-    [ '[ , '[ @ com-unwrap ] [ swap 2array ] curry map ] ]
-    [ '[ ,                   [ swap 2array ] curry map ] ] bi bi*
+    [ '[ _ '[ @ com-unwrap ] [ swap 2array ] curry map ] ]
+    [ '[ _                   [ swap 2array ] curry map ] ] bi bi*
     swap append ;
 
 : compile-alien-callback ( word return parameters abi quot -- word )
-    '[ , , , , alien-callback ]
+    '[ _ _ _ _ alien-callback ]
     [ [ (( -- alien )) define-declared ] pick slip ]
     with-compilation-unit ;
 
@@ -100,7 +100,7 @@ unless
     "windows.com.wrapper.callbacks" create ;
 
 : (finish-thunk) ( param-count thunk quot -- thunked-quot )
-    [ [ drop [ ] ] [ swap 1- '[ , , ndip ] ] if-empty ]
+    [ [ drop [ ] ] [ swap 1- '[ _ _ ndip ] ] if-empty ]
     dip compose ;
 
 : (make-interface-callbacks) ( interface-name quots iunknown-methods n -- words )
@@ -108,7 +108,7 @@ unless
     swap [ find-com-interface-definition family-tree-functions ]
     keep (next-vtbl-counter) '[
         swap [
-            [ name>> , , (callback-word) ]
+            [ name>> _ _ (callback-word) ]
             [ return>> ] [
                 parameters>>
                 [ [ first ] map ]

@@ -50,7 +50,7 @@ IN: http.server.cgi
     200 >>code
     "CGI output follows" >>message
     swap '[
-        , output-stream get swap <cgi-process> <process-stream> [
+        _ output-stream get swap <cgi-process> <process-stream> [
             post-request? [ request get post-data>> raw>> write flush ] when
             input-stream get swap (stream-copy)
         ] with-stream

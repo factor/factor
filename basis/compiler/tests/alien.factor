@@ -3,7 +3,7 @@ USING: alien alien.c-types alien.syntax compiler kernel
 namespaces namespaces tools.test sequences stack-checker
 stack-checker.errors words arrays parser quotations
 continuations effects namespaces.private io io.streams.string
-memory system threads tools.test math accessors ;
+memory system threads tools.test math accessors combinators ;
 
 FUNCTION: void ffi_test_0 ;
 [ ] [ ffi_test_0 ] unit-test
@@ -401,3 +401,147 @@ C-STRUCT: test_struct_13
 FUNCTION: int ffi_test_39 ( long a, long b, test_struct_13 s ) ;
 
 [ 21 ] [ 12347 12347 make-test-struct-13 ffi_test_39 ] unit-test
+
+! Joe Groff found this problem
+C-STRUCT: double-rect
+{ "double" "a" }
+{ "double" "b" }
+{ "double" "c" }
+{ "double" "d" } ;
+
+: <double-rect> ( a b c d -- foo )
+    "double-rect" <c-object>
+    {
+        [ set-double-rect-d ]
+        [ set-double-rect-c ]
+        [ set-double-rect-b ]
+        [ set-double-rect-a ]
+        [ ]
+    } cleave ;
+
+: >double-rect< ( foo -- a b c d )
+    {
+        [ double-rect-a ]
+        [ double-rect-b ]
+        [ double-rect-c ]
+        [ double-rect-d ]
+    } cleave ;
+
+: double-rect-callback ( -- alien )
+    "void" { "void*" "void*" "double-rect" } "cdecl"
+    [ "example" set-global 2drop ] alien-callback ;
+
+: double-rect-test ( arg -- arg' )
+    f f rot
+    double-rect-callback
+    "void" { "void*" "void*" "double-rect" } "cdecl" alien-indirect
+    "example" get-global ;
+
+[ 1.0 2.0 3.0 4.0 ]
+[ 1.0 2.0 3.0 4.0 <double-rect> double-rect-test >double-rect< ] unit-test
+
+C-STRUCT: test_struct_14
+{ "double" "x1" }
+{ "double" "x2" } ;
+
+FUNCTION: test_struct_14 ffi_test_40 ( double x1, double x2 ) ;
+
+[ 1.0 2.0 ] [
+    1.0 2.0 ffi_test_40
+    [ test_struct_14-x1 ] [ test_struct_14-x2 ] bi
+] unit-test
+
+: callback-10 ( -- callback )
+    "test_struct_14" { "double" "double" } "cdecl"
+    [
+        "test_struct_14" <c-object>
+        [ set-test_struct_14-x2 ] keep
+        [ set-test_struct_14-x1 ] keep
+    ] alien-callback ;
+
+: callback-10-test ( x1 x2 callback -- result )
+    "test_struct_14" { "double" "double" } "cdecl" alien-indirect ;
+
+[ 1.0 2.0 ] [
+    1.0 2.0 callback-10 callback-10-test
+    [ test_struct_14-x1 ] [ test_struct_14-x2 ] bi
+] unit-test
+
+FUNCTION: test-struct-12 ffi_test_41 ( int a, double x ) ;
+
+[ 1 2.0 ] [
+    1 2.0 ffi_test_41
+    [ test-struct-12-a ] [ test-struct-12-x ] bi
+] unit-test
+
+: callback-11 ( -- callback )
+    "test-struct-12" { "int" "double" } "cdecl"
+    [
+        "test-struct-12" <c-object>
+        [ set-test-struct-12-x ] keep
+        [ set-test-struct-12-a ] keep
+    ] alien-callback ;
+
+: callback-11-test ( x1 x2 callback -- result )
+    "test-struct-12" { "int" "double" } "cdecl" alien-indirect ;
+
+[ 1 2.0 ] [
+    1 2.0 callback-11 callback-11-test
+    [ test-struct-12-a ] [ test-struct-12-x ] bi
+] unit-test
+
+C-STRUCT: test_struct_15
+{ "float" "x" }
+{ "float" "y" } ;
+
+FUNCTION: test_struct_15 ffi_test_42 ( float x, float y ) ;
+
+[ 1.0 2.0 ] [ 1.0 2.0 ffi_test_42 [ test_struct_15-x ] [ test_struct_15-y ] bi ] unit-test
+
+: callback-12 ( -- callback )
+    "test_struct_15" { "float" "float" } "cdecl"
+    [
+        "test_struct_15" <c-object>
+        [ set-test_struct_15-y ] keep
+        [ set-test_struct_15-x ] keep
+    ] alien-callback ;
+
+: callback-12-test ( x1 x2 callback -- result )
+    "test_struct_15" { "float" "float" } "cdecl" alien-indirect ;
+
+[ 1.0 2.0 ] [
+    1.0 2.0 callback-12 callback-12-test
+    [ test_struct_15-x ] [ test_struct_15-y ] bi
+] unit-test
+
+C-STRUCT: test_struct_16
+{ "float" "x" }
+{ "int" "a" } ;
+
+FUNCTION: test_struct_16 ffi_test_43 ( float x, int a ) ;
+
+[ 1.0 2 ] [ 1.0 2 ffi_test_43 [ test_struct_16-x ] [ test_struct_16-a ] bi ] unit-test
+
+: callback-13 ( -- callback )
+    "test_struct_16" { "float" "int" } "cdecl"
+    [
+        "test_struct_16" <c-object>
+        [ set-test_struct_16-a ] keep
+        [ set-test_struct_16-x ] keep
+    ] alien-callback ;
+
+: callback-13-test ( x1 x2 callback -- result )
+    "test_struct_16" { "float" "int" } "cdecl" alien-indirect ;
+
+[ 1.0 2 ] [
+    1.0 2 callback-13 callback-13-test
+    [ test_struct_16-x ] [ test_struct_16-a ] bi
+] unit-test
+
+FUNCTION: test_struct_14 ffi_test_44 ( ) ; inline
+
+[ 1.0 2.0 ] [ ffi_test_44 [ test_struct_14-x1 ] [ test_struct_14-x2 ] bi ] unit-test
+
+: stack-frame-bustage ( -- a b ) ffi_test_44 gc 3 ;
+
+[ ] [ stack-frame-bustage 2drop ] unit-test

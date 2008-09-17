@@ -1,5 +1,5 @@
 
-USING: kernel alien.c-types combinators namespaces arrays
+USING: kernel alien.c-types combinators namespaces make arrays
        sequences sequences.lib namespaces.lib splitting
        math math.functions math.vectors math.trig
        opengl.gl opengl.glu opengl ui ui.gadgets.slate

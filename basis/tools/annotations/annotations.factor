@@ -3,7 +3,7 @@
 USING: accessors kernel words parser io summary quotations
 sequences prettyprint continuations effects definitions
 compiler.units namespaces assocs tools.walker generic
-inspector ;
+inspector fry ;
 IN: tools.annotations
 
 GENERIC: reset ( word -- )
@@ -49,20 +49,18 @@ M: word reset
         .s
     ] if* "\\--" print flush ;
 
-: (watch) ( word def -- def )
-    over [ entering ] curry
-    rot [ leaving ] curry
-    swapd 3append ;
+: (watch) ( word def -- def ) over '[ _ entering @ _ leaving ] ;
 
 : watch ( word -- )
     dup [ (watch) ] annotate ;
 
 : (watch-vars) ( quot word vars -- newquot )
-    [
-        "--- Entering: " write swap .
-        "--- Variable values:" print
-        [ dup get ] H{ } map>assoc describe
-    ] 2curry prepose ;
+    rot
+   '[
+        "--- Entering: "       write _ .
+        "--- Variable values:" print _ [ dup get ] H{ } map>assoc describe
+        @
+    ] ;
 
 : watch-vars ( word vars -- )
     dupd [ (watch-vars) ] 2curry annotate ;

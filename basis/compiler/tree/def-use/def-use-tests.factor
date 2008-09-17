@@ -1,9 +1,10 @@
 USING: accessors namespaces assocs kernel sequences math
 tools.test words sets combinators.short-circuit
 stack-checker.state compiler.tree compiler.tree.builder
-compiler.tree.normalization compiler.tree.propagation
-compiler.tree.cleanup compiler.tree.def-use arrays kernel.private
-sorting math.order binary-search compiler.tree.checker ;
+compiler.tree.recursive compiler.tree.normalization
+compiler.tree.propagation compiler.tree.cleanup
+compiler.tree.def-use arrays kernel.private sorting math.order
+binary-search compiler.tree.checker ;
 IN: compiler.tree.def-use.tests
 
 \ compute-def-use must-infer
@@ -18,6 +19,7 @@ IN: compiler.tree.def-use.tests
 
 : test-def-use ( quot -- )
     build-tree
+    analyze-recursive
     normalize
     propagate
     cleanup
@@ -27,7 +29,14 @@ IN: compiler.tree.def-use.tests
 : too-deep ( a b -- c )
     dup [ drop ] [ 2dup too-deep too-deep drop ] if ; inline recursive
 
-[ ] [ [ too-deep ] build-tree normalize compute-def-use check-nodes ] unit-test
+[ ] [
+    [ too-deep ]
+    build-tree
+    analyze-recursive
+    normalize
+    compute-def-use
+    check-nodes
+] unit-test
 
 ! compute-def-use checks for SSA violations, so we use that to
 ! ensure we generate some common patterns correctly.

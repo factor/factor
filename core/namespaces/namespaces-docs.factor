@@ -22,13 +22,6 @@ ARTICLE: "namespaces-global" "Global variables"
 { $subsection get-global }
 { $subsection set-global } ;
 
-ARTICLE: "namespaces-make" "Constructing sequences"
-"There is a lexicon of words for constructing sequences without passing the partial sequence being built on the stack. This reduces stack noise."
-{ $subsection make }
-{ $subsection , }
-{ $subsection % }
-{ $subsection # } ;
-
 ARTICLE: "namespaces.private" "Namespace implementation details"
 "The namestack holds namespaces."
 { $subsection namestack }
@@ -50,8 +43,6 @@ $nl
 { $subsection "namespaces-change" }
 { $subsection "namespaces-combinators" }
 { $subsection "namespaces-global" }
-"A useful facility for constructing sequences by holding an accumulator sequence in a variable:"
-{ $subsection "namespaces-make" }
 "Implementation details your code probably does not care about:"
 { $subsection "namespaces.private" }
 "An alternative to dynamic scope is lexical scope. Lexically-scoped values and closures are implemented in the " { $vocab-link "locals" } " vocabulary." ;
@@ -161,22 +152,6 @@ HELP: >n
 
 HELP: ndrop
 { $description "Pops a namespace from the name stack." } ;
-
-HELP: building
-{ $var-description "Temporary mutable growable sequence holding elements accumulated so far by " { $link make } "." } ;
-
-HELP: make
-{ $values { "quot" quotation } { "exemplar" "a sequence" } { "seq" "a new sequence" } }
-{ $description "Calls the quotation in a new " { $emphasis "dynamic scope" } ". The quotation and any words it calls can execute the " { $link , } " and " { $link % } " words to accumulate elements. When the quotation returns, all accumulated elements are collected into a sequence with the same type as " { $snippet "exemplar" } "." }
-{ $examples { $example "USING: namespaces prettyprint ;" "[ 1 , 2 , 3 , ] { } make ." "{ 1 2 3 }" } } ;
-
-HELP: ,
-{ $values { "elt" object } }
-{ $description "Adds an element to the end of the sequence being constructed by " { $link make } "." } ;
-
-HELP: %
-{ $values { "seq" "a sequence" } }
-{ $description "Appends a sequence to the end of the sequence being constructed by " { $link make } "." } ;
 
 HELP: init-namespaces
 { $description "Resets the name stack to its initial state, holding a single copy of the global namespace." }

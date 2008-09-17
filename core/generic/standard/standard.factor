@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs kernel kernel.private slots.private math
-namespaces sequences vectors words quotations definitions
+namespaces make sequences vectors words quotations definitions
 hashtables layouts combinators sequences.private generic
 classes classes.algebra classes.private generic.standard.engines
 generic.standard.engines.tag generic.standard.engines.predicate
