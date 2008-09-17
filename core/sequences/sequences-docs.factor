@@ -3,271 +3,6 @@ sequences.private vectors strings kernel math.order layouts
 quotations ;
 IN: sequences
 
-ARTICLE: "sequences-unsafe" "Unsafe sequence operations"
-"The " { $link nth-unsafe } " and " { $link set-nth-unsafe } " sequence protocol bypasses bounds checks for increased performance."
-$nl
-"These words assume the sequence index given is within bounds; if it is not, memory corruption can occur. Great care must be exercised when using these words. First, make sure the code in question is actually a bottleneck; next, try improving the algorithm first. If all else fails, then the unsafe sequence words can be used."
-$nl
-"There is a very important invariant these word must preserve: if at some point in time, the length of a sequence was " { $snippet "n" } ", then any future lookups of elements with indices below " { $snippet "n" } " must not crash the VM, even if the sequence length is now less than " { $snippet "n" } ". For example, vectors preserve this invariant by never shrinking the underlying storage, only growing it as necessary."
-$nl
-"The justification for this is that the VM should not crash if a resizable sequence is resized during the execution of an iteration combinator."
-$nl
-"Indeed, iteration combinators are the primary use-case for these words; if the iteration index is already guarded by a loop test which ensures it is within bounds, then additional bounds checks are redundant. For example, see the implementation of " { $link each } "." ;
-
-ARTICLE: "sequence-protocol" "Sequence protocol"
-"All sequences must be instances of a mixin class:"
-{ $subsection sequence }
-{ $subsection sequence? }
-"All sequences must know their length:"
-{ $subsection length }
-"At least one of the following two generic words must have a method for accessing elements; the " { $link sequence } " mixin has default definitions which are mutually recursive:"
-{ $subsection nth }
-{ $subsection nth-unsafe }
-"At least one of the following two generic words must have a method for storing elements; the " { $link sequence } " mixin has default definitions which are mutually recursive:"
-{ $subsection set-nth }
-{ $subsection set-nth-unsafe }
-"Note that even if the sequence is immutable, at least one of the generic words must be specialized, otherwise calling them will result in an infinite recursion. There is a standard word which throws an error indicating a sequence is immutable:"
-{ $subsection immutable }
-"The following two generic words are optional, as not all sequences are resizable:"
-{ $subsection set-length }
-{ $subsection lengthen }
-"An optional generic word for creating sequences of the same class as a given sequence:"
-{ $subsection like }
-"Optional generic words for optimization purposes:"
-{ $subsection new-sequence }
-{ $subsection new-resizable }
-{ $see-also "sequences-unsafe" } ;
-
-ARTICLE: "sequences-integers" "Integer sequences and counted loops"
-"Integers support the sequence protocol in a trivial fashion; a non-negative integer presents its non-negative predecessors as elements. For example, the integer 3, when viewed as a sequence, contains the elements 0, 1, and 2. This is very useful for performing counted loops."
-$nl
-"For example, the " { $link each } " combinator, given an integer, simply calls a quotation that number of times, pushing a counter on each iteration that ranges from 0 up to that integer:"
-{ $example "3 [ . ] each" "0\n1\n2" }
-"A common idiom is to iterate over a sequence, while also maintaining a loop counter. This can be done using " { $link each-index } ", " { $link map-index } " and " { $link reduce-index } "."
-$nl
-"Combinators that produce new sequences, such as " { $link map } ", will output an array if the input is an integer." ;
-
-ARTICLE: "sequences-access" "Accessing sequence elements"
-{ $subsection ?nth }
-"Concise way of extracting one of the first four elements:"
-{ $subsection first }
-{ $subsection second }
-{ $subsection third }
-{ $subsection fourth }
-"Unpacking sequences:"
-{ $subsection first2 }
-{ $subsection first3 }
-{ $subsection first4 }
-{ $see-also nth peek } ;
-
-ARTICLE: "sequences-add-remove" "Adding and removing sequence elements"
-"Adding elements:"
-{ $subsection prefix }
-{ $subsection suffix }
-"Removing elements:"
-{ $subsection remove }
-{ $subsection remove-nth } ;
-
-ARTICLE: "sequences-reshape" "Reshaping sequences"
-"A " { $emphasis "repetition" } " is a virtual sequence consisting of a single element repeated multiple times:"
-{ $subsection repetition }
-{ $subsection <repetition> }
-"Reversing a sequence:"
-{ $subsection reverse }
-"A " { $emphasis "reversal" } " presents a reversed view of an underlying sequence:"
-{ $subsection reversed }
-{ $subsection <reversed> }
-"Transposing a matrix:"
-{ $subsection flip } ;
-
-ARTICLE: "sequences-appending" "Appending sequences"
-{ $subsection append }
-{ $subsection prepend }
-{ $subsection 3append }
-{ $subsection concat }
-{ $subsection join }
-"A pair of words useful for aligning strings:"
-{ $subsection pad-left }
-{ $subsection pad-right } ;
-
-ARTICLE: "sequences-slices" "Subsequences and slices"
-"Extracting a subsequence:"
-{ $subsection subseq }
-{ $subsection head }
-{ $subsection tail }
-{ $subsection head* }
-{ $subsection tail* }
-"Removing the first or last element:"
-{ $subsection rest }
-{ $subsection but-last }
-"Taking a sequence apart into a head and a tail:"
-{ $subsection unclip }
-{ $subsection unclip-last }
-{ $subsection cut }
-{ $subsection cut* }
-"A " { $emphasis "slice" } " is a virtual sequence which presents as view of a subsequence of an underlying sequence:"
-{ $subsection slice }
-{ $subsection slice? }
-"Creating slices:"
-{ $subsection <slice> }
-{ $subsection head-slice }
-{ $subsection tail-slice }
-{ $subsection but-last-slice }
-{ $subsection rest-slice }
-{ $subsection head-slice* }
-{ $subsection tail-slice* }
-"Taking a sequence apart into a head and a tail:"
-{ $subsection unclip-slice }
-{ $subsection cut-slice }
-"A utility for words which use slices as iterators:"
-{ $subsection <flat-slice> } ;
-
-ARTICLE: "sequences-combinators" "Sequence combinators"
-"Iteration:"
-{ $subsection each }
-{ $subsection each-index }
-{ $subsection reduce }
-{ $subsection interleave }
-{ $subsection replicate }
-{ $subsection replicate-as }
-"Mapping:"
-{ $subsection map }
-{ $subsection map-as }
-{ $subsection map-index }
-{ $subsection accumulate }
-{ $subsection produce }
-"Filtering:"
-{ $subsection push-if }
-{ $subsection filter }
-"Testing if a sequence contains elements satisfying a predicate:"
-{ $subsection contains? }
-{ $subsection all? }
-"Testing how elements are related:"
-{ $subsection monotonic? }
-{ $subsection "sequence-2combinators" } ;
-
-ARTICLE: "sequence-2combinators" "Pair-wise sequence combinators"
-"There is a set of combinators which traverse two sequences pairwise. If one sequence is shorter than the other, than only the prefix having the length of the minimum of the two is examined."
-{ $subsection 2each }
-{ $subsection 2reduce }
-{ $subsection 2map }
-{ $subsection 2map-as }
-{ $subsection 2all? } ;
-
-ARTICLE: "sequences-tests" "Testing sequences"
-"Testing for an empty sequence:"
-{ $subsection empty? }
-"Testing indices:"
-{ $subsection bounds-check? }
-"Testing if a sequence contains an object:"
-{ $subsection member? }
-{ $subsection memq? }
-"Testing if a sequence contains a subsequence:"
-{ $subsection head? }
-{ $subsection tail? }
-{ $subsection subseq? }
-"Testing how elements are related:"
-{ $subsection all-eq? }
-{ $subsection all-equal? } ;
-
-ARTICLE: "sequences-search" "Searching sequences"
-"Finding the index of an element:"
-{ $subsection index }
-{ $subsection index-from }
-{ $subsection last-index }
-{ $subsection last-index-from }
-"Finding the start of a subsequence:"
-{ $subsection start }
-{ $subsection start* }
-"Finding the index of an element satisfying a predicate:"
-{ $subsection find }
-{ $subsection find-from }
-{ $subsection find-last }
-{ $subsection find-last-from } ;
-
-ARTICLE: "sequences-trimming" "Trimming sequences"
-"Trimming words:"
-{ $subsection trim }
-{ $subsection trim-left }
-{ $subsection trim-right }
-"Potentially more efficient trim:"
-{ $subsection trim-slice }
-{ $subsection trim-left-slice }
-{ $subsection trim-right-slice } ;
-
-ARTICLE: "sequences-destructive" "Destructive operations"
-"These words modify their input, instead of creating a new sequence."
-$nl
-"In-place variant of " { $link reverse } ":"
-{ $subsection reverse-here }
-"In-place variant of " { $link append } ":"
-{ $subsection push-all }
-"In-place variant of " { $link remove } ":"
-{ $subsection delete }
-"In-place variant of " { $link map } ":"
-{ $subsection change-each }
-"Changing elements:"
-{ $subsection change-nth }
-{ $subsection cache-nth }
-"Deleting elements:"
-{ $subsection delete-nth }
-{ $subsection delete-slice }
-{ $subsection delete-all }
-"Other destructive words:"
-{ $subsection move }
-{ $subsection exchange }
-{ $subsection copy }
-{ $subsection replace-slice }
-{ $see-also set-nth push pop "sequences-stacks" } ;
-
-ARTICLE: "sequences-stacks" "Treating sequences as stacks"
-"The classical stack operations, modifying a sequence in place:"
-{ $subsection peek }
-{ $subsection push }
-{ $subsection pop }
-{ $subsection pop* }
-{ $see-also empty? } ;
-
-ARTICLE: "sequences-comparing" "Comparing sequences"
-"Element equality testing:"
-{ $subsection sequence= }
-{ $subsection mismatch }
-{ $subsection drop-prefix }
-"The " { $link <=> } " generic word performs lexicographic comparison when applied to sequences." ;
-
-ARTICLE: "sequences-f" "The f object as a sequence"
-"The " { $link f } " object supports the sequence protocol in a trivial way. It responds with a length of zero and throws an out of bounds error when an attempt is made to access elements." ;
-
-ARTICLE: "sequences" "Sequence operations"
-"A " { $emphasis "sequence" } " is a finite, linearly-ordered collection of elements. Words for working with sequences are in the " { $vocab-link "sequences" } " vocabulary."
-$nl
-"Sequences implement a protocol:"
-{ $subsection "sequence-protocol" }
-{ $subsection "sequences-f" }
-{ $subsection "sequences-integers" }
-"Sequence utility words can operate on any object whose class implements the sequence protocol. Most implementations are backed by storage. Some implementations obtain their elements from an underlying sequence, or compute them on the fly. These are known as " { $emphasis "virtual sequences" } "."
-{ $subsection "sequences-access" }
-{ $subsection "sequences-combinators" }
-{ $subsection "sequences-add-remove" }
-{ $subsection "sequences-appending" }
-{ $subsection "sequences-slices" }
-{ $subsection "sequences-reshape" }
-{ $subsection "sequences-tests" }
-{ $subsection "sequences-search" }
-{ $subsection "sequences-comparing" }
-{ $subsection "sequences-split" }
-{ $subsection "grouping" }
-{ $subsection "sequences-destructive" }
-{ $subsection "sequences-stacks" }
-{ $subsection "sequences-sorting" }
-{ $subsection "binary-search" }
-{ $subsection "sets" }
-{ $subsection "sequences-trimming" }
-"For inner loops:"
-{ $subsection "sequences-unsafe" } ;
-
-ABOUT: "sequences"
-
 HELP: sequence
 { $class-description "A mixin class whose instances are sequences. Custom implementations of the sequence protocol should be declared as instances of this mixin for all sequence functionality to work correctly:"
     { $code "INSTANCE: my-sequence sequence" }
@@ -1309,3 +1044,291 @@ HELP: partition
         "{ 2 4 }\n{ 1 3 5 }"
     }
 } ;
+
+HELP: virtual-seq
+{ $values
+     { "seq" sequence }
+     { "seq'" sequence } }
+{ $description "Part of the virtual sequence protocol, this word is used to return an underlying array from which to look up a value at an index given by " { $link virtual@ } "." } ;
+
+HELP: virtual@
+{ $values
+     { "n" integer } { "seq" sequence }
+     { "n'" integer } { "seq'" sequence } }
+{ $description "Part of the sequence protocol, this word translates the input index " { $snippet "n" } " into an index into the underlying storage returned by " { $link virtual-seq } "." } ;
+
+ARTICLE: "sequences-unsafe" "Unsafe sequence operations"
+"The " { $link nth-unsafe } " and " { $link set-nth-unsafe } " sequence protocol bypasses bounds checks for increased performance."
+$nl
+"These words assume the sequence index given is within bounds; if it is not, memory corruption can occur. Great care must be exercised when using these words. First, make sure the code in question is actually a bottleneck; next, try improving the algorithm first. If all else fails, then the unsafe sequence words can be used."
+$nl
+"There is a very important invariant these word must preserve: if at some point in time, the length of a sequence was " { $snippet "n" } ", then any future lookups of elements with indices below " { $snippet "n" } " must not crash the VM, even if the sequence length is now less than " { $snippet "n" } ". For example, vectors preserve this invariant by never shrinking the underlying storage, only growing it as necessary."
+$nl
+"The justification for this is that the VM should not crash if a resizable sequence is resized during the execution of an iteration combinator."
+$nl
+"Indeed, iteration combinators are the primary use-case for these words; if the iteration index is already guarded by a loop test which ensures it is within bounds, then additional bounds checks are redundant. For example, see the implementation of " { $link each } "." ;
+
+ARTICLE: "sequence-protocol" "Sequence protocol"
+"All sequences must be instances of a mixin class:"
+{ $subsection sequence }
+{ $subsection sequence? }
+"All sequences must know their length:"
+{ $subsection length }
+"At least one of the following two generic words must have a method for accessing elements; the " { $link sequence } " mixin has default definitions which are mutually recursive:"
+{ $subsection nth }
+{ $subsection nth-unsafe }
+"At least one of the following two generic words must have a method for storing elements; the " { $link sequence } " mixin has default definitions which are mutually recursive:"
+{ $subsection set-nth }
+{ $subsection set-nth-unsafe }
+"Note that even if the sequence is immutable, at least one of the generic words must be specialized, otherwise calling them will result in an infinite recursion. There is a standard word which throws an error indicating a sequence is immutable:"
+{ $subsection immutable }
+"The following two generic words are optional, as not all sequences are resizable:"
+{ $subsection set-length }
+{ $subsection lengthen }
+"An optional generic word for creating sequences of the same class as a given sequence:"
+{ $subsection like }
+"Optional generic words for optimization purposes:"
+{ $subsection new-sequence }
+{ $subsection new-resizable }
+{ $see-also "sequences-unsafe" } ;
+
+ARTICLE: "sequences-virtual-protocol" "Virtual sequence protocol"
+"Virtual sequences must know their length:"
+{ $subsection length }
+"The underlying sequence to look up a value in:"
+{ $subsection virtual-seq }
+"The index of the value in the underlying sequence:"
+{ $subsection virtual@ } ;
+
+ARTICLE: "virtual-sequences" "Virtual sequences"
+"Virtual sequences allow different ways of accessing a sequence without having to create a new sequence or a new data structure altogether. To do this, they translate the virtual index into a normal index into an underlying sequence using the " { $link "sequences-virtual-protocol" } "." ;
+
+ARTICLE: "sequences-integers" "Integer sequences and counted loops"
+"Integers support the sequence protocol in a trivial fashion; a non-negative integer presents its non-negative predecessors as elements. For example, the integer 3, when viewed as a sequence, contains the elements 0, 1, and 2. This is very useful for performing counted loops."
+$nl
+"For example, the " { $link each } " combinator, given an integer, simply calls a quotation that number of times, pushing a counter on each iteration that ranges from 0 up to that integer:"
+{ $example "3 [ . ] each" "0\n1\n2" }
+"A common idiom is to iterate over a sequence, while also maintaining a loop counter. This can be done using " { $link each-index } ", " { $link map-index } " and " { $link reduce-index } "."
+$nl
+"Combinators that produce new sequences, such as " { $link map } ", will output an array if the input is an integer." ;
+
+ARTICLE: "sequences-access" "Accessing sequence elements"
+{ $subsection ?nth }
+"Concise way of extracting one of the first four elements:"
+{ $subsection first }
+{ $subsection second }
+{ $subsection third }
+{ $subsection fourth }
+"Unpacking sequences:"
+{ $subsection first2 }
+{ $subsection first3 }
+{ $subsection first4 }
+{ $see-also nth peek } ;
+
+ARTICLE: "sequences-add-remove" "Adding and removing sequence elements"
+"Adding elements:"
+{ $subsection prefix }
+{ $subsection suffix }
+"Removing elements:"
+{ $subsection remove }
+{ $subsection remove-nth } ;
+
+ARTICLE: "sequences-reshape" "Reshaping sequences"
+"A " { $emphasis "repetition" } " is a virtual sequence consisting of a single element repeated multiple times:"
+{ $subsection repetition }
+{ $subsection <repetition> }
+"Reversing a sequence:"
+{ $subsection reverse }
+"A " { $emphasis "reversal" } " presents a reversed view of an underlying sequence:"
+{ $subsection reversed }
+{ $subsection <reversed> }
+"Transposing a matrix:"
+{ $subsection flip } ;
+
+ARTICLE: "sequences-appending" "Appending sequences"
+{ $subsection append }
+{ $subsection prepend }
+{ $subsection 3append }
+{ $subsection concat }
+{ $subsection join }
+"A pair of words useful for aligning strings:"
+{ $subsection pad-left }
+{ $subsection pad-right } ;
+
+ARTICLE: "sequences-slices" "Subsequences and slices"
+"Extracting a subsequence:"
+{ $subsection subseq }
+{ $subsection head }
+{ $subsection tail }
+{ $subsection head* }
+{ $subsection tail* }
+"Removing the first or last element:"
+{ $subsection rest }
+{ $subsection but-last }
+"Taking a sequence apart into a head and a tail:"
+{ $subsection unclip }
+{ $subsection unclip-last }
+{ $subsection cut }
+{ $subsection cut* }
+"A " { $emphasis "slice" } " is a virtual sequence which presents as view of a subsequence of an underlying sequence:"
+{ $subsection slice }
+{ $subsection slice? }
+"Creating slices:"
+{ $subsection <slice> }
+{ $subsection head-slice }
+{ $subsection tail-slice }
+{ $subsection but-last-slice }
+{ $subsection rest-slice }
+{ $subsection head-slice* }
+{ $subsection tail-slice* }
+"Taking a sequence apart into a head and a tail:"
+{ $subsection unclip-slice }
+{ $subsection cut-slice }
+"A utility for words which use slices as iterators:"
+{ $subsection <flat-slice> } ;
+
+ARTICLE: "sequences-combinators" "Sequence combinators"
+"Iteration:"
+{ $subsection each }
+{ $subsection each-index }
+{ $subsection reduce }
+{ $subsection interleave }
+{ $subsection replicate }
+{ $subsection replicate-as }
+"Mapping:"
+{ $subsection map }
+{ $subsection map-as }
+{ $subsection map-index }
+{ $subsection accumulate }
+{ $subsection produce }
+"Filtering:"
+{ $subsection push-if }
+{ $subsection filter }
+"Testing if a sequence contains elements satisfying a predicate:"
+{ $subsection contains? }
+{ $subsection all? }
+"Testing how elements are related:"
+{ $subsection monotonic? }
+{ $subsection "sequence-2combinators" } ;
+
+ARTICLE: "sequence-2combinators" "Pair-wise sequence combinators"
+"There is a set of combinators which traverse two sequences pairwise. If one sequence is shorter than the other, than only the prefix having the length of the minimum of the two is examined."
+{ $subsection 2each }
+{ $subsection 2reduce }
+{ $subsection 2map }
+{ $subsection 2map-as }
+{ $subsection 2all? } ;
+
+ARTICLE: "sequences-tests" "Testing sequences"
+"Testing for an empty sequence:"
+{ $subsection empty? }
+"Testing indices:"
+{ $subsection bounds-check? }
+"Testing if a sequence contains an object:"
+{ $subsection member? }
+{ $subsection memq? }
+"Testing if a sequence contains a subsequence:"
+{ $subsection head? }
+{ $subsection tail? }
+{ $subsection subseq? }
+"Testing how elements are related:"
+{ $subsection all-eq? }
+{ $subsection all-equal? } ;
+
+ARTICLE: "sequences-search" "Searching sequences"
+"Finding the index of an element:"
+{ $subsection index }
+{ $subsection index-from }
+{ $subsection last-index }
+{ $subsection last-index-from }
+"Finding the start of a subsequence:"
+{ $subsection start }
+{ $subsection start* }
+"Finding the index of an element satisfying a predicate:"
+{ $subsection find }
+{ $subsection find-from }
+{ $subsection find-last }
+{ $subsection find-last-from } ;
+
+ARTICLE: "sequences-trimming" "Trimming sequences"
+"Trimming words:"
+{ $subsection trim }
+{ $subsection trim-left }
+{ $subsection trim-right }
+"Potentially more efficient trim:"
+{ $subsection trim-slice }
+{ $subsection trim-left-slice }
+{ $subsection trim-right-slice } ;
+
+ARTICLE: "sequences-destructive" "Destructive operations"
+"These words modify their input, instead of creating a new sequence."
+$nl
+"In-place variant of " { $link reverse } ":"
+{ $subsection reverse-here }
+"In-place variant of " { $link append } ":"
+{ $subsection push-all }
+"In-place variant of " { $link remove } ":"
+{ $subsection delete }
+"In-place variant of " { $link map } ":"
+{ $subsection change-each }
+"Changing elements:"
+{ $subsection change-nth }
+{ $subsection cache-nth }
+"Deleting elements:"
+{ $subsection delete-nth }
+{ $subsection delete-slice }
+{ $subsection delete-all }
+"Other destructive words:"
+{ $subsection move }
+{ $subsection exchange }
+{ $subsection copy }
+{ $subsection replace-slice }
+{ $see-also set-nth push pop "sequences-stacks" } ;
+
+ARTICLE: "sequences-stacks" "Treating sequences as stacks"
+"The classical stack operations, modifying a sequence in place:"
+{ $subsection peek }
+{ $subsection push }
+{ $subsection pop }
+{ $subsection pop* }
+{ $see-also empty? } ;
+
+ARTICLE: "sequences-comparing" "Comparing sequences"
+"Element equality testing:"
+{ $subsection sequence= }
+{ $subsection mismatch }
+{ $subsection drop-prefix }
+"The " { $link <=> } " generic word performs lexicographic comparison when applied to sequences." ;
+
+ARTICLE: "sequences-f" "The f object as a sequence"
+"The " { $link f } " object supports the sequence protocol in a trivial way. It responds with a length of zero and throws an out of bounds error when an attempt is made to access elements." ;
+
+ARTICLE: "sequences" "Sequence operations"
+"A " { $emphasis "sequence" } " is a finite, linearly-ordered collection of elements. Words for working with sequences are in the " { $vocab-link "sequences" } " vocabulary."
+$nl
+"Sequences implement a protocol:"
+{ $subsection "sequence-protocol" }
+{ $subsection "sequences-f" }
+{ $subsection "sequences-integers" }
+"Sequence utility words can operate on any object whose class implements the sequence protocol. Most implementations are backed by storage. Some implementations obtain their elements from an underlying sequence, or compute them on the fly. These are known as " { $link "virtual-sequences" } "."
+{ $subsection "sequences-access" }
+{ $subsection "sequences-combinators" }
+{ $subsection "sequences-add-remove" }
+{ $subsection "sequences-appending" }
+{ $subsection "sequences-slices" }
+{ $subsection "sequences-reshape" }
+{ $subsection "sequences-tests" }
+{ $subsection "sequences-search" }
+{ $subsection "sequences-comparing" }
+{ $subsection "sequences-split" }
+{ $subsection "grouping" }
+{ $subsection "sequences-destructive" }
+{ $subsection "sequences-stacks" }
+{ $subsection "sequences-sorting" }
+{ $subsection "binary-search" }
+{ $subsection "sets" }
+{ $subsection "sequences-trimming" }
+"For inner loops:"
+{ $subsection "sequences-unsafe" } ;
+
+ABOUT: "sequences"
