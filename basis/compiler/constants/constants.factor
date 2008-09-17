@@ -23,3 +23,30 @@ IN: compiler.constants
 : word-code-offset ( -- n ) 10 bootstrap-cells object tag-number - ;
 : array-start-offset ( -- n ) 2 bootstrap-cells object tag-number - ;
 : compiled-header-size ( -- n ) 4 bootstrap-cells ;
+
+! Relocation classes
+: rc-absolute-cell    0 ;
+: rc-absolute         1 ;
+: rc-relative         2 ;
+: rc-absolute-ppc-2/2 3 ;
+: rc-relative-ppc-2   4 ;
+: rc-relative-ppc-3   5 ;
+: rc-relative-arm-3   6 ;
+: rc-indirect-arm     7 ;
+: rc-indirect-arm-pc  8 ;
+
+! Relocation types
+: rt-primitive 0 ;
+: rt-dlsym     1 ;
+: rt-literal   2 ;
+: rt-dispatch  3 ;
+: rt-xt        4 ;
+: rt-here      5 ;
+: rt-label     6 ;
+: rt-immediate 7 ;
+
+: rc-absolute? ( n -- ? )
+    [ rc-absolute-ppc-2/2 = ]
+    [ rc-absolute-cell = ]
+    [ rc-absolute = ]
+    tri or or ;

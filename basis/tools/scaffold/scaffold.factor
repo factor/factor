@@ -157,7 +157,7 @@ ERROR: no-vocab vocab ;
     "{ $description \"\" } ;" print ;
 
 : help-header. ( word -- )
-    "HELP: " write name>> print ;
+    "HELP: " write . ;
 
 : (help.) ( word -- )
     [ help-header. ] [ $values. ] [ $description. ] tri ;

@@ -175,7 +175,7 @@ find_os() {
         *FreeBSD*) OS=freebsd;;
         *OpenBSD*) OS=openbsd;;
         *DragonFly*) OS=dragonflybsd;;
-	SunOS) OS=solaris;;
+    	SunOS) OS=solaris;;
     esac
 }
 
@@ -263,7 +263,8 @@ check_os_arch_word() {
         $ECHO "ARCH: $ARCH"
         $ECHO "WORD: $WORD"
         $ECHO "OS, ARCH, or WORD is empty.  Please report this."
-	echo $MAKE_TARGET
+
+    	echo $MAKE_TARGET
         exit 5
     fi
 }

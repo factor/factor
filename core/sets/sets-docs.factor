@@ -1,4 +1,4 @@
-USING: kernel help.markup help.syntax sequences ;
+USING: kernel help.markup help.syntax sequences quotations ;
 IN: sets
 
 ARTICLE: "sets" "Set-theoretic operations on sequences"
@@ -111,3 +111,9 @@ HELP: subset?
 HELP: set=
 { $values { "seq1" sequence } { "seq2" sequence } { "?" "a boolean" } }
 { $description "Tests if both sequences contain the same elements, disregrading order and duplicates." } ;
+
+HELP: gather
+{ $values
+     { "seq" sequence } { "quot" quotation }
+     { "newseq" sequence } }
+{ $description "Maps a quotation onto a sequence, concatenates the results of the mapping, and removes duplicates." } ;

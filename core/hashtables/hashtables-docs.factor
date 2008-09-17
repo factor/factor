@@ -111,6 +111,12 @@ HELP: associate
 { $values { "value" "a value" } { "key" "a key" } { "hash" "a new " { $link hashtable } } }
 { $description "Create a new hashtable holding one key/value pair." } ;
 
+HELP: ?set-at
+{ $values
+     { "value" object } { "key" object } { "assoc/f" "an assoc or " { $link f } }
+     { "assoc" assoc } }
+{ $description "If the third input is an assoc, stores the key/value pair into that assoc, or else creates a new hashtable with the key/value pair as its only entry." } ;
+
 HELP: >hashtable
 { $values { "assoc" "an assoc" } { "hashtable" "a hashtable" } }
 { $description "Constructs a hashtable from any assoc." } ;
