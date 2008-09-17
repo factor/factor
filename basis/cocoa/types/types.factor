@@ -1,13 +1,20 @@
 ! Copyright (C) 2006, 2007 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types alien.syntax kernel ;
+USING: alien.c-types alien.syntax combinators kernel ;
 IN: cocoa.types
 
+TYPEDEF: long NSInteger
+TYPEDEF: ulong NSUInteger
+<< "ptrdiff_t" heap-size {
+    { 4 [ "float" ] }
+    { 8 [ "double" ] }
+} case "CGFloat" typedef >>
+
 C-STRUCT: NSRect
-    { "float" "x" }
-    { "float" "y" }
-    { "float" "w" }
-    { "float" "h" } ;
+    { "CGFloat" "x" }
+    { "CGFloat" "y" }
+    { "CGFloat" "w" }
+    { "CGFloat" "h" } ;
 
 TYPEDEF: NSRect _NSRect
 TYPEDEF: NSRect CGRect
@@ -23,8 +30,8 @@ TYPEDEF: NSRect CGRect
     [ NSRect-x ] keep NSRect-y ;
 
 C-STRUCT: NSPoint
-    { "float" "x" }
-    { "float" "y" } ;
+    { "CGFloat" "x" }
+    { "CGFloat" "y" } ;
 
 TYPEDEF: NSPoint _NSPoint
 TYPEDEF: NSPoint CGPoint
@@ -35,10 +42,11 @@ TYPEDEF: NSPoint CGPoint
     [ set-NSPoint-x ] keep ;
 
 C-STRUCT: NSSize
-    { "float" "w" }
-    { "float" "h" } ;
+    { "CGFloat" "w" }
+    { "CGFloat" "h" } ;
 
 TYPEDEF: NSSize _NSSize
+TYPEDEF: NSSize CGSize
 TYPEDEF: NSPoint CGPoint
 
 : <NSSize> ( w h -- size )
@@ -47,8 +55,8 @@ TYPEDEF: NSPoint CGPoint
     [ set-NSSize-w ] keep ;
 
 C-STRUCT: NSRange
-    { "uint" "location" }
-    { "uint" "length" } ;
+    { "NSUInteger" "location" }
+    { "NSUInteger" "length" } ;
 
 TYPEDEF: NSRange _NSRange
 
@@ -58,12 +66,12 @@ TYPEDEF: NSRange _NSRange
     [ set-NSRange-location ] keep ;
 
 C-STRUCT: CGAffineTransform
-    { "float" "a" }
-    { "float" "b" }
-    { "float" "c" }
-    { "float" "d" }
-    { "float" "tx" }
-    { "float" "ty" } ;
+    { "CGFloat" "a" }
+    { "CGFloat" "b" }
+    { "CGFloat" "c" }
+    { "CGFloat" "d" }
+    { "CGFloat" "tx" }
+    { "CGFloat" "ty" } ;
 
 C-STRUCT: NSFastEnumerationState
     { "ulong" "state" }

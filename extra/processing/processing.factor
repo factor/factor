@@ -8,7 +8,7 @@ USING: kernel namespaces threads combinators sequences arrays
        combinators
        combinators.lib
        combinators.cleave
-       rewrite-closures fry accessors newfx
+       rewrite-closures bake bake.fry accessors newfx
        processing.gadget math.geometry.rect
        processing.shapes
        colors ;

@@ -100,7 +100,7 @@ SYMBOL: prolog-data
     #! from code until the quotation given is true and
     #! advance spot to after the substring.
     10 <sbuf> [
-        '[ @ [ t ] [ get-char , push f ] if ] skip-until
+        '[ @ [ t ] [ get-char _ push f ] if ] skip-until
     ] keep >string ; inline
 
 : take-rest ( -- string )
@@ -120,7 +120,7 @@ M: not-enough-characters summary ( obj -- str )
 
 : take ( n -- string )
     [ 1- ] [ <sbuf> ] bi [
-        '[ drop get-char [ next , push f ] [ t ] if* ] contains? drop
+        '[ drop get-char [ next _ push f ] [ t ] if* ] contains? drop
     ] keep get-char [ over push ] when* >string ;
 
 : pass-blank ( -- )

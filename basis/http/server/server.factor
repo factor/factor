@@ -158,7 +158,7 @@ main-responder global [ <404> <trivial-responder> or ] change-at
 
 : <500> ( error -- response )
     500 "Internal server error" <trivial-response>
-    swap development? get [ '[ , http-error. ] >>body ] [ drop ] if ;
+    swap development? get [ '[ _ http-error. ] >>body ] [ drop ] if ;
 
 : do-response ( response -- )
     [ request get swap write-full-response ]
@@ -198,7 +198,7 @@ LOG: httpd-header NOTICE
     [
         local-address get
         [ secure? "https" "http" ? >>protocol ]
-        [ port>> '[ , or ] change-port ]
+        [ port>> '[ _ or ] change-port ]
         bi
     ] change-url drop ;
 
@@ -207,7 +207,7 @@ LOG: httpd-header NOTICE
 
 : do-request ( request -- response )
     '[
-        ,
+        _
         {
             [ init-request ]
             [ prepare-request ]

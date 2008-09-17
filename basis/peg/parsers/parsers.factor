@@ -1,9 +1,8 @@
 ! Copyright (C) 2007, 2008 Chris Double, Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences strings namespaces math assocs shuffle 
-     vectors arrays math.parser accessors
-     unicode.categories sequences.deep peg peg.private 
-     peg.search math.ranges words ;
+USING: kernel sequences strings namespaces make math assocs
+shuffle vectors arrays math.parser accessors unicode.categories
+sequences.deep peg peg.private peg.search math.ranges words ;
 IN: peg.parsers
 
 TUPLE: just-parser p1 ;

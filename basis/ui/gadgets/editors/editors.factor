@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays documents io kernel math models
-namespaces opengl opengl.gl sequences strings io.styles
+namespaces make opengl opengl.gl sequences strings io.styles
 math.vectors sorting colors combinators assocs math.order
 ui.clipboards ui.commands ui.gadgets ui.gadgets.borders
 ui.gadgets.buttons ui.gadgets.labels ui.gadgets.scrollers

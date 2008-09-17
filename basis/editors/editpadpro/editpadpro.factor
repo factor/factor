@@ -1,6 +1,6 @@
 USING: definitions kernel parser words sequences math.parser
 namespaces editors io.launcher windows.shell32 io.files
-io.paths strings unicode.case ;
+io.paths strings unicode.case make ;
 IN: editors.editpadpro
 
 : editpadpro-path

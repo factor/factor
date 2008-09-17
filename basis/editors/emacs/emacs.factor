@@ -1,5 +1,5 @@
 USING: definitions io.launcher kernel parser words sequences math
-math.parser namespaces editors ;
+math.parser namespaces editors make ;
 IN: editors.emacs
 
 : emacsclient ( file line -- )

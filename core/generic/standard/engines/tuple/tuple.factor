@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel classes.tuple.private hashtables assocs sorting
 accessors combinators sequences slots.private math.parser words
-effects namespaces generic generic.standard.engines
+effects namespaces make generic generic.standard.engines
 classes.algebra math math.private kernel.private
 quotations arrays definitions ;
 IN: generic.standard.engines.tuple

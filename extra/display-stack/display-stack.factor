@@ -1,6 +1,6 @@
 
 USING: kernel namespaces sequences math
-       listener io prettyprint sequences.lib fry ;
+       listener io prettyprint sequences.lib bake bake.fry ;
 
 IN: display-stack
 

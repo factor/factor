@@ -109,8 +109,8 @@ M: conversations call-responder*
 : restore-conversation ( seq -- )
     conversation get dup [
         namespace>>
-        [ '[ , key? ] filter ]
-        [ '[ [ , at ] keep set ] each ]
+        [ '[ _ key? ] filter ]
+        [ '[ [ _ at ] keep set ] each ]
         bi
     ] [ 2drop ] if ;
 

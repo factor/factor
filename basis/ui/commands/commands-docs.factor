@@ -1,5 +1,5 @@
 USING: accessors ui.gestures help.markup help.syntax strings kernel
-hashtables quotations words classes sequences namespaces
+hashtables quotations words classes sequences namespaces make
 arrays assocs ;
 IN: ui.commands
 

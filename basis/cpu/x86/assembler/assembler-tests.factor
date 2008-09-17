@@ -1,4 +1,4 @@
-USING: cpu.x86.assembler kernel tools.test namespaces ;
+USING: cpu.x86.assembler kernel tools.test namespaces make ;
 IN: cpu.x86.assembler.tests
 
 [ { HEX: 49 HEX: 89 HEX: 04 HEX: 24 } ] [ [ R12 [] RAX MOV ] { } make ] unit-test

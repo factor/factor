@@ -201,10 +201,10 @@ TUPLE: annotation n paste-id summary author mode contents ;
 ! ] with-db
 
 : test-sqlite ( quot -- )
-    [ ] swap '[ "tuples-test.db" temp-file sqlite-db , with-db ] unit-test ;
+    [ ] swap '[ "tuples-test.db" temp-file sqlite-db _ with-db ] unit-test ;
 
 : test-postgresql ( quot -- )
-    [ ] swap '[ { "localhost" "postgres" "foob" "factor-test" } postgresql-db , with-db ] unit-test ;
+    [ ] swap '[ { "localhost" "postgres" "foob" "factor-test" } postgresql-db _ with-db ] unit-test ;
 
 : test-repeated-insert
     [ ] [ person ensure-table ] unit-test

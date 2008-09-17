@@ -4,8 +4,8 @@
 ! Emacs Etags generator
 ! Alfredo Beaumont <alfredo.beaumont@gmail.com>
 USING: kernel sequences sorting assocs words prettyprint ctags
-io.encodings.ascii io.files math math.parser namespaces strings locals
-shuffle io.backend arrays ;
+io.encodings.ascii io.files math math.parser namespaces make
+strings shuffle io.backend arrays ;
 IN: ctags.etags
 
 : etag-at ( key hash -- vector )

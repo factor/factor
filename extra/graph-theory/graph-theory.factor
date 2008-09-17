@@ -35,10 +35,10 @@ M: graph num-vertices
     vertices length ;
 
 M: graph num-edges
-   [ vertices ] [ '[ , adjlist length ] map sum ] bi ;
+   [ vertices ] [ '[ _ adjlist length ] map sum ] bi ;
 
 M: graph adjlist
-    [ vertices ] [ swapd '[ , swap , adj? ] filter ] bi ;
+    [ vertices ] [ swapd '[ _ swap _ adj? ] filter ] bi ;
 
 M: graph adj?
     swapd adjlist index >boolean ;
@@ -50,11 +50,11 @@ M: graph delete-edge
     [ delete-edge* ] [ swapd delete-edge* ] 3bi ;
 
 : add-blank-vertices ( seq graph -- )
-    '[ , add-blank-vertex ] each ;
+    '[ _ add-blank-vertex ] each ;
 
 : delete-vertex ( index graph -- )
     [ adjlist ]
-    [ '[ , , 3dup adj? [ delete-edge* ] [ 3drop ] if ] each ]
+    [ '[ _ _ 3dup adj? [ delete-edge* ] [ 3drop ] if ] each ]
     [ delete-blank-vertex ] 2tri ;
 
 <PRIVATE
@@ -67,22 +67,22 @@ M: graph delete-edge
     { [ 2drop visited? get t -rot set-at ] 
       [ drop call ]
       [ [ graph get adjlist ] 2dip
-        '[ dup visited? get at [ drop ] [ , , (depth-first) ] if ] each ]
+        '[ dup visited? get at [ drop ] [ _ _ (depth-first) ] if ] each ]
       [ nip call ] } 3cleave ; inline
 
 PRIVATE>
 
 : depth-first ( v graph pre post -- ?list ? )
-    '[ , , (depth-first) visited? get ] swap search-wrap ; inline
+    '[ _ _ (depth-first) visited? get ] swap search-wrap ; inline
 
 : full-depth-first ( graph pre post tail -- ? )
     '[ [ visited? get [ nip not ] assoc-find ] 
-       [ drop , , (depth-first) @ ] 
+       [ drop _ _ (depth-first) @ ] 
        [ 2drop ] while ] swap search-wrap ; inline
 
 : dag? ( graph -- ? )
     V{ } clone swap [ 2dup swap push dupd
-                     '[ , swap graph get adj? not ] all? 
+                     '[ _ swap graph get adj? not ] all? 
                       [ end-search ] unless ]
                     [ drop dup pop* ] [ ] full-depth-first nip ;
 

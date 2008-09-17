@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel hashtables calendar random assocs
-namespaces splitting sequences sorting math.order present
+namespaces make splitting sequences sorting math.order present
 io.files io.encodings.ascii
 syndication farkup
 html.components html.forms
@@ -93,18 +93,12 @@ M: revision feed-entry-url id>> revision-url ;
     <article> select-tuple
     dup [ revision>> <revision> select-tuple ] when ;
 
-: init-relative-link-prefix ( -- )
-    URL" $wiki/view/" adjust-url present relative-link-prefix set ;
-
 : <view-article-action> ( -- action )
     <action>
 
         "title" >>rest
 
-        [
-            validate-title
-            init-relative-link-prefix
-        ] >>init
+        [ validate-title ] >>init
 
         [
             "title" value dup latest-revision [
@@ -126,7 +120,6 @@ M: revision feed-entry-url id>> revision-url ;
             validate-integer-id
             "id" value <revision>
             select-tuple from-object
-            init-relative-link-prefix
         ] >>init
 
         { wiki "view" } >>template

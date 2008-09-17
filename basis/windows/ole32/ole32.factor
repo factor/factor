@@ -1,6 +1,7 @@
 USING: alien alien.syntax alien.c-types alien.strings math
 kernel sequences windows windows.types debugger io accessors
-math.order namespaces math.parser windows.kernel32 combinators ;
+math.order namespaces make math.parser windows.kernel32
+combinators ;
 IN: windows.ole32
 
 LIBRARY: ole32

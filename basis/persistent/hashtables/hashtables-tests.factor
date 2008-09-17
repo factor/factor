@@ -85,7 +85,7 @@ M: hash-0-b hashcode* 2drop 0 ;
 
 : random-assocs ( -- hash phash )
     [ random-string ] replicate
-    [ H{ } clone [ '[ swap , set-at ] each-index ] keep ]
+    [ H{ } clone [ '[ swap _ set-at ] each-index ] keep ]
     [ PH{ } clone swap [ spin new-at ] each-index ]
     bi ;
 

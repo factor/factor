@@ -1,6 +1,6 @@
 IN: benchmark.nsieve
 USING: math math.parser sequences sequences.private kernel
-arrays namespaces io ;
+arrays make io ;
 
 : clear-flags ( step i seq -- )
     2dup length >= [

@@ -1,6 +1,6 @@
 ! Copyright (C) 2003, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: hashtables generic kernel math namespaces sequences
+USING: hashtables generic kernel math namespaces make sequences
 continuations destructors assocs ;
 IN: io
 
@@ -8,7 +8,7 @@ GENERIC: stream-readln ( stream -- str/f )
 GENERIC: stream-read1 ( stream -- ch/f )
 GENERIC: stream-read ( n stream -- str/f )
 GENERIC: stream-read-until ( seps stream -- str/f sep/f )
-GENERIC: stream-read-partial ( max stream -- str/f )
+GENERIC: stream-read-partial ( n stream -- str/f )
 GENERIC: stream-write1 ( ch stream -- )
 GENERIC: stream-write ( str stream -- )
 GENERIC: stream-flush ( stream -- )

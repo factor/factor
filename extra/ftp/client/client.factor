@@ -154,7 +154,7 @@ GENERIC: ftp-download ( path obj -- )
 
 : with-ftp-client ( ftp-client quot -- )
     dupd '[
-        , [ ftp-login ] [ @ ] bi
+        _ [ ftp-login ] [ @ ] bi
         ftp-quit drop
     ] >r ftp-connect r> with-stream ; inline
 

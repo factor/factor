@@ -64,7 +64,7 @@ M: disjoint-set add-atom
     [ 1 -rot counts>> set-at ]
     2tri ;
 
-: add-atoms ( seq disjoint-set -- ) '[ , add-atom ] each ;
+: add-atoms ( seq disjoint-set -- ) '[ _ add-atom ] each ;
 
 GENERIC: disjoint-set-member? ( a disjoint-set -- ? )
 
@@ -89,7 +89,7 @@ M:: disjoint-set equate ( a b disjoint-set -- )
     ] if ;
 
 : equate-all-with ( seq a disjoint-set -- )
-    '[ , , equate ] each ;
+    '[ _ _ equate ] each ;
 
 : equate-all ( seq disjoint-set -- )
     over empty? [ 2drop ] [
@@ -102,7 +102,7 @@ M: disjoint-set clone
 
 : assoc>disjoint-set ( assoc -- disjoint-set )
     <disjoint-set>
-    [ '[ drop , add-atom ] assoc-each ]
-    [ '[ , equate ] assoc-each ]
+    [ '[ drop _ add-atom ] assoc-each ]
+    [ '[ _ equate ] assoc-each ]
     [ nip ]
     2tri ;

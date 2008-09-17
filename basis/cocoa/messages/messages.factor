@@ -1,11 +1,10 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types alien.strings
-arrays assocs combinators compiler kernel
-math namespaces parser prettyprint prettyprint.sections
-quotations sequences strings words cocoa.runtime io macros
-memoize debugger io.encodings.ascii effects compiler.generator
-libc libc.private ;
+USING: accessors alien alien.c-types alien.strings arrays assocs
+combinators compiler kernel math namespaces make parser
+prettyprint prettyprint.sections quotations sequences strings
+words cocoa.runtime io macros memoize debugger
+io.encodings.ascii effects compiler.generator libc libc.private ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )
@@ -130,12 +129,21 @@ SYMBOL: alien>objc-types
 
 objc>alien-types get [ swap ] assoc-map
 ! A hack...
-H{
-    { "NSPoint" "{_NSPoint=ff}" }
-    { "NSRect" "{_NSRect=ffff}" }
-    { "NSSize" "{_NSSize=ff}" }
-    { "NSRange" "{_NSRange=II}" }
-} assoc-union alien>objc-types set-global
+"ptrdiff_t" heap-size {
+    { 4 [ H{
+        { "NSPoint" "{_NSPoint=ff}" }
+        { "NSRect" "{_NSRect=ffff}" }
+        { "NSSize" "{_NSSize=ff}" }
+        { "NSRange" "{_NSRange=II}" }
+    } ] }
+    { 8 [ H{
+        { "NSPoint" "{_NSPoint=dd}" }
+        { "NSRect" "{_NSRect=dddd}" }
+        { "NSSize" "{_NSSize=dd}" }
+        { "NSRange" "{_NSRange=QQ}" }
+    } ] }
+} case
+assoc-union alien>objc-types set-global
 
 : objc-struct-type ( i string -- ctype )
     2dup CHAR: = -rot index-from swap subseq

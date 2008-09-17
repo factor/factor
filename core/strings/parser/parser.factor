@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel assocs namespaces splitting sequences
+USING: kernel assocs namespaces make splitting sequences
 strings math.parser lexer accessors ;
 IN: strings.parser
 

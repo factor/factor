@@ -1,15 +1,15 @@
- ! Copyright (C) 2004, 2008 Slava Pestov.
+! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes combinators
 cpu.architecture effects generic hashtables io kernel
-kernel.private layouts math math.parser namespaces prettyprint
-quotations sequences system threads words vectors sets deques
-continuations.private summary alien alien.c-types
+kernel.private layouts math math.parser namespaces make
+prettyprint quotations sequences system threads words vectors
+sets deques continuations.private summary alien alien.c-types
 alien.structs alien.strings alien.arrays libc compiler.errors
-stack-checker.inlining
-compiler.tree compiler.tree.builder compiler.tree.combinators
-compiler.tree.propagation.info compiler.generator.fixup
-compiler.generator.registers compiler.generator.iterator ;
+stack-checker.inlining compiler.tree compiler.tree.builder
+compiler.tree.combinators compiler.tree.propagation.info
+compiler.generator.fixup compiler.generator.registers
+compiler.generator.iterator ;
 IN: compiler.generator
 
 SYMBOL: compile-queue
@@ -271,9 +271,7 @@ M: #return-recursive generate-node
 
 ! #alien-invoke
 : large-struct? ( ctype -- ? )
-    dup c-struct? [
-        heap-size struct-small-enough? not
-    ] [ drop f ] if ;
+    dup c-struct? [ struct-small-enough? not ] [ drop f ] if ;
 
 : alien-parameters ( params -- seq )
     dup parameters>>
@@ -304,10 +302,10 @@ M: #return-recursive generate-node
     alien-parameters parameter-sizes drop ;
 
 : alien-invoke-frame ( params -- n )
-    #! One cell is temporary storage, temp@
-    dup return>> return-size
-    swap alien-stack-frame +
-    cell + ;
+    #! Two cells for temporary storage, temp@ and on x86.64,
+    #! small struct return value unpacking
+    [ return>> return-size ] [ alien-stack-frame ] bi
+    + 2 cells + ;
 
 : set-stack-frame ( n -- )
     dup [ frame-required ] when* \ stack-frame set ;
@@ -361,17 +359,17 @@ M: float-regs inc-reg-class
     [ spill-param ] [ fastcall-param ] if
     [ param-reg ] keep ;
 
-: (flatten-int-type) ( size -- )
-    cell /i "void*" c-type <repetition> % ;
+: (flatten-int-type) ( size -- types )
+    cell /i "void*" c-type <repetition> ;
 
-GENERIC: flatten-value-type ( type -- )
+GENERIC: flatten-value-type ( type -- types )
 
-M: object flatten-value-type , ;
+M: object flatten-value-type 1array ;
 
-M: struct-type flatten-value-type ( type -- )
+M: struct-type flatten-value-type ( type -- types )
     stack-size cell align (flatten-int-type) ;
 
-M: long-long-type flatten-value-type ( type -- )
+M: long-long-type flatten-value-type ( type -- types )
     stack-size cell align (flatten-int-type) ;
 
 : flatten-value-types ( params -- params )
@@ -379,9 +377,9 @@ M: long-long-type flatten-value-type ( type -- )
     [
         0 [
             c-type
-            [ parameter-align (flatten-int-type) ] keep
+            [ parameter-align (flatten-int-type) % ] keep
             [ stack-size cell align + ] keep
-            flatten-value-type
+            flatten-value-type %
         ] reduce drop
     ] { } make ;
 

@@ -65,7 +65,7 @@ M: nehe4-gadget draw-gadget* ( gadget -- )
 
 M: nehe4-gadget graft* ( gadget -- )
   f >>quit?
-  [ nehe4-update-thread ] in-thread drop ;
+  [ nehe4-update-thread ] curry in-thread ;
 
 M: nehe4-gadget ungraft* ( gadget -- )
   t >>quit? drop ;

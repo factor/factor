@@ -1,6 +1,6 @@
 ! Copyright (C) 2007 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel hashtables sequences arrays words namespaces
+USING: kernel hashtables sequences arrays words namespaces make
 parser math assocs effects definitions quotations summary
 accessors ;
 IN: memoize

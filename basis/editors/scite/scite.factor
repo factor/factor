@@ -9,7 +9,7 @@
 ! if not on the path.
 !
 USING: io.files io.launcher kernel namespaces math
-math.parser editors sequences windows.shell32 ;
+math.parser editors sequences windows.shell32 make ;
 IN: editors.scite
 
 : scite-path ( -- path )

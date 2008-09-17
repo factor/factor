@@ -67,7 +67,7 @@ left-parenthesis pipe caret dash ;
 : <negation> ( obj -- negation ) negation boa ;
 : <concatenation> ( seq -- concatenation )
     >vector get-reversed-regexp [ reverse ] when
-    concatenation boa ;
+    [ epsilon ] [ concatenation boa ] if-empty ;
 : <alternation> ( seq -- alternation ) >vector alternation boa ;
 : <capture-group> ( obj -- capture-group ) capture-group boa ;
 : <kleene-star> ( obj -- kleene-star ) kleene-star boa ;
@@ -291,6 +291,8 @@ ERROR: bad-escaped-literals seq ;
         { CHAR: f [ HEX: c <constant> ] }
         { CHAR: a [ HEX: 7 <constant> ] }
         { CHAR: e [ HEX: 1b <constant> ] }
+        { CHAR: $ [ CHAR: $ <constant> ] }
+        { CHAR: ^ [ CHAR: ^ <constant> ] }
 
         { CHAR: d [ digit-class ] }
         { CHAR: D [ digit-class <negation> ] }

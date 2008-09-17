@@ -11,7 +11,7 @@ IN: combinators.short-circuit
      [ '[ drop N ndup @ dup not ] [ drop N ndrop f ] 2array ]
    map
    [ t ] [ N nnip ] 2array suffix
-   '[ f , cond ] ;
+   '[ f _ cond ] ;
 
 MACRO: 0&& ( quots -- quot ) 0 n&&-rewrite ;
 MACRO: 1&& ( quots -- quot ) 1 n&&-rewrite ;
@@ -25,7 +25,7 @@ MACRO: 3&& ( quots -- quot ) 3 n&&-rewrite ;
      [ '[ drop N ndup @ dup ] [ N nnip ] 2array ]
    map
    [ drop N ndrop t ] [ f ] 2array suffix
-   '[ f , cond ] ;
+   '[ f _ cond ] ;
 
 MACRO: 0|| ( quots -- quot ) 0 n||-rewrite ;
 MACRO: 1|| ( quots -- quot ) 1 n||-rewrite ;

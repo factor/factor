@@ -1,6 +1,43 @@
 USING: help.markup help.syntax parser vocabs.loader strings ;
 IN: command-line
 
+HELP: run-bootstrap-init
+{ $description "Runs the " { $snippet ".factor-boot-rc" } " file in the user's home directory unless the " { $snippet "-no-user-init" } " command line switch was given." } ;
+
+HELP: run-user-init
+{ $description "Runs the " { $snippet ".factor-rc" } " file in the user's home directory unless the " { $snippet "-no-user-init" } " command line switch was given." } ;
+
+HELP: cli-param
+{ $values { "param" string } }
+{ $description "Process a command-line switch."
+$nl
+"If the parameter contains " { $snippet "=" } ", the global variable named by the string before the equals sign is set to the string after the equals sign."
+$nl
+"If the parameter begins with " { $snippet "no-" } ", sets the global variable named by the parameter with the prefix removed to " { $link f } "."
+$nl
+"Otherwise, sets the global variable named by the parameter to " { $link t } "." } ;
+
+HELP: cli-args
+{ $values { "args" "a sequence of strings" } }
+{ $description "Outputs the command line parameters which were passed to the Factor VM on startup." } ;
+
+HELP: main-vocab-hook
+{ $var-description "Global variable holding a quotation which outputs a vocabulary name. UI backends set this so that the UI can automatically start if the prerequisites are met (for example, " { $snippet "$DISPLAY" } " being set on X11)." } ;
+
+HELP: main-vocab
+{ $values { "vocab" string } }
+{ $description "Outputs the name of the vocabulary which is to be run on startup using the " { $link run } " word. The " { $snippet "-run" } " command line switch overrides this setting." } ;
+
+HELP: default-cli-args
+{ $description "Sets global variables corresponding to default command line arguments." } ;
+
+HELP: ignore-cli-args?
+{ $values { "?" "a boolean" } }
+{ $description "On Mac OS X, source files to run are supplied by the Cocoa API, so to avoid running them twice the startup code has to call this word." } ;
+
+HELP: parse-command-line
+{ $description "Called on startup to process command line arguments. This sets global variables with " { $link cli-param } ", runs source files, and evaluates the string given by the " { $snippet "-e" } " switch, if there is one." } ;
+
 ARTICLE: "runtime-cli-args" "Command line switches for the VM"
 "A handful of command line switches are processed by the VM and not the library. They control low-level features."
 { $table
@@ -77,40 +114,3 @@ $nl
 { $subsection main-vocab-hook } ;
 
 ABOUT: "cli"
-
-HELP: run-bootstrap-init
-{ $description "Runs the " { $snippet ".factor-boot-rc" } " file in the user's home directory unless the " { $snippet "-no-user-init" } " command line switch was given." } ;
-
-HELP: run-user-init
-{ $description "Runs the " { $snippet ".factor-rc" } " file in the user's home directory unless the " { $snippet "-no-user-init" } " command line switch was given." } ;
-
-HELP: cli-param
-{ $values { "param" string } }
-{ $description "Process a command-line switch."
-$nl
-"If the parameter contains " { $snippet "=" } ", the global variable named by the string before the equals sign is set to the string after the equals sign."
-$nl
-"If the parameter begins with " { $snippet "no-" } ", sets the global variable named by the parameter with the prefix removed to " { $link f } "."
-$nl
-"Otherwise, sets the global variable named by the parameter to " { $link t } "." } ;
-
-HELP: cli-args
-{ $values { "args" "a sequence of strings" } }
-{ $description "Outputs the command line parameters which were passed to the Factor VM on startup." } ;
-
-HELP: main-vocab-hook
-{ $var-description "Global variable holding a quotation which outputs a vocabulary name. UI backends set this so that the UI can automatically start if the prerequisites are met (for example, " { $snippet "$DISPLAY" } " being set on X11)." } ;
-
-HELP: main-vocab
-{ $values { "vocab" string } }
-{ $description "Outputs the name of the vocabulary which is to be run on startup using the " { $link run } " word. The " { $snippet "-run" } " command line switch overrides this setting." } ;
-
-HELP: default-cli-args
-{ $description "Sets global variables corresponding to default command line arguments." } ;
-
-HELP: ignore-cli-args?
-{ $values { "?" "a boolean" } }
-{ $description "On Mac OS X, source files to run are supplied by the Cocoa API, so to avoid running them twice the startup code has to call this word." } ;
-
-HELP: parse-command-line
-{ $description "Called on startup to process command line arguments. This sets global variables with " { $link cli-param } ", runs source files, and evaluates the string given by the " { $snippet "-e" } " switch, if there is one." } ;

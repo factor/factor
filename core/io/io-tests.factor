@@ -1,5 +1,5 @@
 USING: arrays io io.files kernel math parser strings system
-tools.test words namespaces io.encodings.8-bit
+tools.test words namespaces make io.encodings.8-bit
 io.encodings.binary sequences ;
 IN: io.tests
 

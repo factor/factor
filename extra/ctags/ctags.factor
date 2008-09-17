@@ -6,7 +6,7 @@
 
 USING: arrays kernel sequences io io.files io.backend
 io.encodings.ascii math.parser vocabs definitions
-namespaces words sorting ;
+namespaces make words sorting ;
 IN: ctags
 
 : ctag-word ( ctag -- word )

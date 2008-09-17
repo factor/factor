@@ -1,6 +1,6 @@
-USING: unicode.data kernel math sequences parser lexer bit-arrays
-namespaces sequences.private arrays quotations assocs
-classes.predicate math.order eval ;
+USING: unicode.data kernel math sequences parser lexer
+bit-arrays namespaces make sequences.private arrays quotations
+assocs classes.predicate math.order eval ;
 IN: unicode.syntax
 
 ! Character classes (categories)

@@ -1,6 +1,6 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel kernel.private namespaces io io.encodings
+USING: kernel kernel.private namespaces make io io.encodings
 sequences math generic threads.private classes io.backend
 io.files continuations destructors byte-arrays accessors ;
 IN: io.streams.c

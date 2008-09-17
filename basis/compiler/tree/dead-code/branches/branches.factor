@@ -33,10 +33,10 @@ M: #branch remove-dead-code*
 
 : live-value-indices ( values -- indices )
     [ length ] keep live-values get
-    '[ , nth , key? ] filter ; inline
+    '[ _ nth _ key? ] filter ; inline
 
 : drop-indexed-values ( values indices -- node )
-    [ drop filter-live ] [ nths ] 2bi
+    [ drop filter-live ] [ swap nths ] 2bi
     [ make-values ] keep
     [ drop ] [ zip ] 2bi
     #shuffle ;
@@ -44,13 +44,13 @@ M: #branch remove-dead-code*
 : insert-drops ( nodes values indices -- nodes' )
     '[
         over ends-with-terminate?
-        [ drop ] [ , drop-indexed-values suffix ] if
+        [ drop ] [ _ drop-indexed-values suffix ] if
     ] 2map ;
 
 : hoist-drops ( #phi -- )
     if-node get swap
     [ phi-in-d>> ] [ out-d>> live-value-indices ] bi
-    '[ , , insert-drops ] change-children drop ;
+    '[ _ _ insert-drops ] change-children drop ;
 
 : remove-phi-outputs ( #phi -- )
     [ filter-live ] change-out-d drop ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors namespaces sequences kernel math arrays io ui.gadgets
-generic combinators ;
+USING: accessors namespaces make sequences kernel math arrays io
+ui.gadgets generic combinators ;
 IN: ui.traverse
 
 TUPLE: node value children ;

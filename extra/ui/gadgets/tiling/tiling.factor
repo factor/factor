@@ -1,7 +1,7 @@
 
 USING: kernel sequences math math.order
        ui.gadgets ui.gadgets.tracks ui.gestures
-       fry accessors ;
+       bake.fry accessors ;
 
 IN: ui.gadgets.tiling
 
@@ -93,7 +93,7 @@ TUPLE: tiling < track gadgets tiles first focused ;
 
 : exchanged! ( seq a b -- )
                    [ 0 max ] bi@
-  pick length 1 - '[ , min ] bi@
+  pick length 1 - '[ _ min ] bi@
   rot exchange ;
 
 : move-prev ( tiling -- tiling )

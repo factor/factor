@@ -11,14 +11,18 @@ TUPLE: count-down n promise ;
 : count-down-check ( count-down -- )
     dup n>> zero? [ t swap promise>> fulfill ] [ drop ] if ;
 
+ERROR: invalid-count-down-count count ;
+
 : <count-down> ( n -- count-down )
-    dup 0 < [ "Invalid count for count down" throw ] when
+    dup 0 < [ invalid-count-down-count ] when
     <promise> \ count-down boa
     dup count-down-check ;
 
+ERROR: count-down-already-done ;
+
 : count-down ( count-down -- )
     dup n>> dup zero?
-    [ "Count down already done" throw ]
+    [ count-down-already-done ]
     [ 1- >>n count-down-check ] if ;
 
 : await-timeout ( count-down timeout -- )

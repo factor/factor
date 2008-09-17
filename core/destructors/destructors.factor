@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Doug Coleman, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors continuations kernel namespaces
+USING: accessors continuations kernel namespaces make
 sequences vectors ;
 IN: destructors
 

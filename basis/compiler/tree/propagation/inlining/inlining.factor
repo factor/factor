@@ -3,13 +3,22 @@
 USING: accessors kernel arrays sequences math math.order
 math.partial-dispatch generic generic.standard generic.math
 classes.algebra classes.union sets quotations assocs combinators
-words namespaces
+words namespaces continuations
 compiler.tree
 compiler.tree.builder
+compiler.tree.recursive
+compiler.tree.combinators
 compiler.tree.normalization
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes ;
 IN: compiler.tree.propagation.inlining
+
+! We count nodes up-front; if there are relatively few nodes,
+! we are more eager to inline
+SYMBOL: node-count
+
+: count-nodes ( nodes -- )
+    0 swap [ drop 1+ ] each-node node-count set ;
 
 ! Splicing nodes
 GENERIC: splicing-nodes ( #call word/quot/f -- nodes )
@@ -18,13 +27,13 @@ M: word splicing-nodes
     [ [ in-d>> ] [ out-d>> ] bi ] dip #call 1array ;
 
 M: quotation splicing-nodes
-    build-sub-tree normalize ;
+    build-sub-tree analyze-recursive normalize ;
 
 : propagate-body ( #call -- )
     body>> (propagate) ;
 
 ! Dispatch elimination
-: eliminate-dispatch ( #call class/f word/f -- ? )
+: eliminate-dispatch ( #call class/f word/quot/f -- ? )
     dup [
         [ >>class ] dip
         over method>> over = [ drop ] [
@@ -113,12 +122,13 @@ DEFER: (flat-length)
     [ classes-known? 2 0 ? ]
     [
         {
+            [ drop node-count get 45 swap [-] 8 /i ]
             [ flat-length 24 swap [-] 4 /i ]
             [ "default" word-prop -4 0 ? ]
             [ "specializer" word-prop 1 0 ? ]
             [ method-body? 1 0 ? ]
         } cleave
-    ] bi* + + + + ;
+    ] bi* + + + + + ;
 
 : should-inline? ( #call word -- ? )
     inlining-rank 5 >= ;
@@ -146,12 +156,19 @@ SYMBOL: history
 : always-inline-word? ( word -- ? )
     { curry compose } memq? ;
 
+: custom-inlining? ( word -- ? )
+    "custom-inlining" word-prop ;
+
+: inline-custom ( #call word -- ? )
+    [ dup 1array ] [ "custom-inlining" word-prop ] bi* with-datastack
+    first object swap eliminate-dispatch ;
+
 : do-inlining ( #call word -- ? )
     {
+        { [ dup custom-inlining? ] [ inline-custom ] }
         { [ dup always-inline-word? ] [ inline-word ] }
         { [ dup standard-generic? ] [ inline-standard-method ] }
         { [ dup math-generic? ] [ inline-math-method ] }
-        { [ dup math-partial? ] [ inline-math-partial ] }
         { [ dup method-body? ] [ inline-method-body ] }
         [ 2drop f ]
     } cond ;
