@@ -1,127 +1,6 @@
 USING: help.markup help.syntax quotations hashtables kernel
-classes strings continuations destructors ;
+classes strings continuations destructors math ;
 IN: io
-
-ARTICLE: "stream-protocol" "Stream protocol"
-"The stream protocol consists of a large number of generic words, many of which are optional."
-$nl
-"Stream protocol words are rarely called directly, since code which only works with one stream at a time should be written use " { $link "stdio" } " instead, wrapping I/O operations such as " { $link read } " and " { $link write } " in " { $link with-input-stream } " and " { $link with-output-stream } "."
-$nl
-"All streams must implement the " { $link dispose } " word in addition to the stream protocol."
-$nl
-"Three words are required for input streams:"
-{ $subsection stream-read1 }
-{ $subsection stream-read }
-{ $subsection stream-read-until }
-{ $subsection stream-readln }
-"Seven words are required for output streams:"
-{ $subsection stream-flush }
-{ $subsection stream-write1 }
-{ $subsection stream-write }
-{ $subsection stream-format }
-{ $subsection stream-nl }
-{ $subsection make-span-stream }
-{ $subsection make-block-stream }
-{ $subsection make-cell-stream }
-{ $subsection stream-write-table }
-{ $see-also "io.timeouts" } ;
-
-ARTICLE: "stdio" "Default input and output streams"
-"Most I/O code only operates on one stream at a time. The " { $link input-stream } " and " { $link output-stream } " variables are implicit parameters used by many I/O words. Using this idiom improves code in three ways:"
-{ $list
-    { "Code becomes simpler because there is no need to keep a stream around on the stack." }
-    { "Code becomes more robust because " { $link with-input-stream } " and " { $link with-output-stream } " automatically close the streams if there is an error." }
-    { "Code becomes more reusable because it can be written to not worry about which stream is being used, and instead the caller can use " { $link with-input-stream } " or " { $link with-output-stream } " to specify the source or destination for I/O operations." }
-}
-"For example, here is a program which reads the first line of a file, converts it to an integer, then reads that many characters, and splits them into groups of 16:"
-{ $code
-    "USING: continuations kernel io io.files math.parser splitting ;"
-    "\"data.txt\" utf8 <file-reader>"
-    "dup stream-readln number>string over stream-read 16 group"
-    "swap dispose"
-}
-"This code has two problems: it has some unnecessary stack shuffling, and if either " { $link stream-readln } " or " { $link stream-read } " throws an I/O error, the stream is not closed because " { $link dispose } " is never reached. So we can add a call to " { $link with-disposal } " to ensure the stream is always closed:"
-{ $code
-    "USING: continuations kernel io io.files math.parser splitting ;"
-    "\"data.txt\" utf8 <file-reader> ["
-    "    dup stream-readln number>string over stream-read"
-    "    16 group"
-    "] with-disposal"
-}
-"This code is robust however it is more complex than it needs to be since. This is where the default stream words come in; using them, the above can be rewritten as follows:"
-{ $code
-    "USING: continuations kernel io io.files math.parser splitting ;"
-    "\"data.txt\" utf8 <file-reader> ["
-    "    readln number>string read 16 group"
-    "] with-input-stream"
-}
-"An even better implementation that takes advantage of a utility word:"
-{ $code
-    "USING: continuations kernel io io.files math.parser splitting ;"
-    "\"data.txt\" utf8 ["
-    "    readln number>string read 16 group"
-    "] with-file-reader"
-}
-"The default input stream is stored in a dynamically-scoped variable:"
-{ $subsection input-stream }
-"Unless rebound in a child namespace, this variable will be set to a console stream for reading input from the user."
-$nl
-"Words reading from the default input stream:"
-{ $subsection read1 }
-{ $subsection read }
-{ $subsection read-until }
-{ $subsection readln }
-"A pair of combinators for rebinding the " { $link input-stream } " variable:"
-{ $subsection with-input-stream }
-{ $subsection with-input-stream* }
-"The default output stream is stored in a dynamically-scoped variable:"
-{ $subsection output-stream }
-"Unless rebound in a child namespace, this variable will be set to a console stream for showing output to the user."
-$nl
-"Words writing to the default input stream:"
-{ $subsection flush }
-{ $subsection write1 }
-{ $subsection write }
-{ $subsection print }
-{ $subsection nl }
-{ $subsection bl }
-"Formatted output:"
-{ $subsection format }
-{ $subsection with-style }
-{ $subsection with-nesting }
-"Tabular output:"
-{ $subsection tabular-output }
-{ $subsection with-row }
-{ $subsection with-cell }
-{ $subsection write-cell }
-"A pair of combinators for rebinding the " { $link output-stream } " variable:"
-{ $subsection with-output-stream }
-{ $subsection with-output-stream* }
-"A pair of combinators for rebinding both default streams at once:"
-{ $subsection with-streams }
-{ $subsection with-streams* } ;
-
-ARTICLE: "stream-utils" "Stream utilities"
-"There are a few useful stream-related words which are not generic, but merely built up from the stream protocol."
-$nl
-"First, a simple composition of " { $link stream-write } " and " { $link stream-nl } ":"
-{ $subsection stream-print }
-"Sluring an entire stream into memory all at once:"
-{ $subsection lines }
-{ $subsection contents }
-"Copying the contents of one stream to another:"
-{ $subsection stream-copy } ;
-
-ARTICLE: "streams" "Streams"
-"Input and output centers on the concept of a " { $emphasis "stream" } ", which is a source or sink of characters. Streams also support formatted output, which may be used to present styled text in a manner independent of output medium."
-$nl
-"A stream can either be passed around on the stack or bound to a dynamic variable and used as an implicit " { $emphasis "default stream" } "."
-{ $subsection "stream-protocol" }
-{ $subsection "stdio" }
-{ $subsection "stream-utils" }
-{ $see-also "io.streams.string" "io.streams.plain" "io.streams.duplex" } ;
-
-ABOUT: "streams"
 
 HELP: stream-readln
 { $values { "stream" "an input stream" } { "str/f" "a string or " { $link f } } }
@@ -146,6 +25,12 @@ HELP: stream-read-until
 { $contract "Reads characters from the stream, until the first occurrence of a separator character, or stream exhaustion. In the former case, the separator character is pushed on the stack, and is not part of the output string. In the latter case, the entire stream contents are output, along with " { $link f } "." }
 { $notes "Most code only works on one stream at a time and should instead use " { $link read-until } "; see " { $link "stdio" } "." }
 $io-error ;
+
+HELP: stream-read-partial
+{ $values
+     { "n" integer } { "stream" "an input stream" }
+     { "str/f" "a string or " { $link f } } }
+{ $description "Reads at most " { $snippet "n" } " characters from a stream and returns up to that many characters without blocking. If no characters are available, blocks until some are and returns them." } ;
 
 HELP: stream-write1
 { $values { "ch" "a character" } { "stream" "an output stream" } }
@@ -248,6 +133,12 @@ HELP: read-until
 { $values { "seps" string } { "str/f" "a string or " { $link f } } { "sep/f" "a character or " { $link f } } }
 { $contract "Reads characters from " { $link input-stream } ". until the first occurrence of a separator character, or stream exhaustion. In the former case, the separator character is pushed on the stack, and is not part of the output string. In the latter case, the entire stream contents are output, along with " { $link f } "." }
 $io-error ;
+
+HELP: read-partial
+{ $values
+     { "n" null }
+     { "str/f" null } }
+{ $description "Reads at most " { $snippet "n" } " characters from " { $link input-stream } " and returns up to that many characters without blocking. If no characters are available, blocks until some are and returns them." } ;
 
 HELP: write1
 { $values { "ch" "a character" } }
@@ -363,3 +254,126 @@ HELP: contents
 { $values { "stream" "an input stream" } { "str" string } }
 { $description "Reads the entire contents of a stream into a string." }
 $io-error ;
+
+ARTICLE: "stream-protocol" "Stream protocol"
+"The stream protocol consists of a large number of generic words, many of which are optional."
+$nl
+"Stream protocol words are rarely called directly, since code which only works with one stream at a time should be written use " { $link "stdio" } " instead, wrapping I/O operations such as " { $link read } " and " { $link write } " in " { $link with-input-stream } " and " { $link with-output-stream } "."
+$nl
+"All streams must implement the " { $link dispose } " word in addition to the stream protocol."
+$nl
+"These words are required for input streams:"
+{ $subsection stream-read1 }
+{ $subsection stream-read }
+{ $subsection stream-read-until }
+{ $subsection stream-readln }
+{ $subsection stream-read-partial }
+"These words are required for output streams:"
+{ $subsection stream-flush }
+{ $subsection stream-write1 }
+{ $subsection stream-write }
+{ $subsection stream-format }
+{ $subsection stream-nl }
+{ $subsection make-span-stream }
+{ $subsection make-block-stream }
+{ $subsection make-cell-stream }
+{ $subsection stream-write-table }
+{ $see-also "io.timeouts" } ;
+
+ARTICLE: "stdio" "Default input and output streams"
+"Most I/O code only operates on one stream at a time. The " { $link input-stream } " and " { $link output-stream } " variables are implicit parameters used by many I/O words. Using this idiom improves code in three ways:"
+{ $list
+    { "Code becomes simpler because there is no need to keep a stream around on the stack." }
+    { "Code becomes more robust because " { $link with-input-stream } " and " { $link with-output-stream } " automatically close the streams if there is an error." }
+    { "Code becomes more reusable because it can be written to not worry about which stream is being used, and instead the caller can use " { $link with-input-stream } " or " { $link with-output-stream } " to specify the source or destination for I/O operations." }
+}
+"For example, here is a program which reads the first line of a file, converts it to an integer, then reads that many characters, and splits them into groups of 16:"
+{ $code
+    "USING: continuations kernel io io.files math.parser splitting ;"
+    "\"data.txt\" utf8 <file-reader>"
+    "dup stream-readln number>string over stream-read 16 group"
+    "swap dispose"
+}
+"This code has two problems: it has some unnecessary stack shuffling, and if either " { $link stream-readln } " or " { $link stream-read } " throws an I/O error, the stream is not closed because " { $link dispose } " is never reached. So we can add a call to " { $link with-disposal } " to ensure the stream is always closed:"
+{ $code
+    "USING: continuations kernel io io.files math.parser splitting ;"
+    "\"data.txt\" utf8 <file-reader> ["
+    "    dup stream-readln number>string over stream-read"
+    "    16 group"
+    "] with-disposal"
+}
+"This code is robust however it is more complex than it needs to be since. This is where the default stream words come in; using them, the above can be rewritten as follows:"
+{ $code
+    "USING: continuations kernel io io.files math.parser splitting ;"
+    "\"data.txt\" utf8 <file-reader> ["
+    "    readln number>string read 16 group"
+    "] with-input-stream"
+}
+"An even better implementation that takes advantage of a utility word:"
+{ $code
+    "USING: continuations kernel io io.files math.parser splitting ;"
+    "\"data.txt\" utf8 ["
+    "    readln number>string read 16 group"
+    "] with-file-reader"
+}
+"The default input stream is stored in a dynamically-scoped variable:"
+{ $subsection input-stream }
+"Unless rebound in a child namespace, this variable will be set to a console stream for reading input from the user."
+$nl
+"Words reading from the default input stream:"
+{ $subsection read1 }
+{ $subsection read }
+{ $subsection read-until }
+{ $subsection readln }
+{ $subsection read-partial }
+"A pair of combinators for rebinding the " { $link input-stream } " variable:"
+{ $subsection with-input-stream }
+{ $subsection with-input-stream* }
+"The default output stream is stored in a dynamically-scoped variable:"
+{ $subsection output-stream }
+"Unless rebound in a child namespace, this variable will be set to a console stream for showing output to the user."
+$nl
+"Words writing to the default input stream:"
+{ $subsection flush }
+{ $subsection write1 }
+{ $subsection write }
+{ $subsection print }
+{ $subsection nl }
+{ $subsection bl }
+"Formatted output:"
+{ $subsection format }
+{ $subsection with-style }
+{ $subsection with-nesting }
+"Tabular output:"
+{ $subsection tabular-output }
+{ $subsection with-row }
+{ $subsection with-cell }
+{ $subsection write-cell }
+"A pair of combinators for rebinding the " { $link output-stream } " variable:"
+{ $subsection with-output-stream }
+{ $subsection with-output-stream* }
+"A pair of combinators for rebinding both default streams at once:"
+{ $subsection with-streams }
+{ $subsection with-streams* } ;
+
+ARTICLE: "stream-utils" "Stream utilities"
+"There are a few useful stream-related words which are not generic, but merely built up from the stream protocol."
+$nl
+"First, a simple composition of " { $link stream-write } " and " { $link stream-nl } ":"
+{ $subsection stream-print }
+"Sluring an entire stream into memory all at once:"
+{ $subsection lines }
+{ $subsection contents }
+"Copying the contents of one stream to another:"
+{ $subsection stream-copy } ;
+
+ARTICLE: "streams" "Streams"
+"Input and output centers on the concept of a " { $emphasis "stream" } ", which is a source or sink of characters. Streams also support formatted output, which may be used to present styled text in a manner independent of output medium."
+$nl
+"A stream can either be passed around on the stack or bound to a dynamic variable and used as an implicit " { $emphasis "default stream" } "."
+{ $subsection "stream-protocol" }
+{ $subsection "stdio" }
+{ $subsection "stream-utils" }
+{ $see-also "io.streams.string" "io.streams.plain" "io.streams.duplex" } ;
+
+ABOUT: "streams"
