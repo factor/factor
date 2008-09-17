@@ -12,7 +12,7 @@ IN: compiler.cfg.linearization
 SYMBOL: frame-size
 
 : compute-frame-size ( rpo -- )
-    [ instructions>> [ %frame-required? ] filter ] map concat
+    [ instructions>> [ ##frame-required? ] filter ] map concat
     [ f ] [ [ n>> ] map supremum ] if-empty
     frame-size set ;
 
@@ -23,12 +23,12 @@ GENERIC: linearize-insn ( basic-block insn -- )
 
 M: insn linearize-insn , drop ;
 
-M: %frame-required linearize-insn 2drop ;
+M: ##frame-required linearize-insn 2drop ;
 
-M: %prologue linearize-insn
+M: ##prologue linearize-insn
     2drop frame-size get [ _prologue ] when* ;
 
-M: %epilogue linearize-insn
+M: ##epilogue linearize-insn
     2drop frame-size get [ _epilogue ] when* ;
 
 : useless-branch? ( basic-block successor -- ? )
@@ -39,50 +39,40 @@ M: %epilogue linearize-insn
 : branch-to-return? ( successor -- ? )
     #! A branch to a block containing just a return is cloned.
     instructions>> dup length 2 = [
-        [ first %epilogue? ] [ second %return? ] bi and
+        [ first ##epilogue? ] [ second ##return? ] bi and
     ] [ drop f ] if ;
 
 : emit-branch ( basic-block successor -- )
     {
         { [ 2dup useless-branch? ] [ 2drop ] }
         { [ dup branch-to-return? ] [ nip linearize-insns ] }
-        [ nip label>> _branch ]
+        [ nip number>> _branch ]
     } cond ;
 
-M: %branch linearize-insn
+M: ##branch linearize-insn
     drop dup successors>> first emit-branch ;
 
 : conditional ( basic-block -- basic-block successor1 label2 )
-    dup successors>> first2 swap label>> ; inline
+    dup successors>> first2 swap number>> ; inline
 
 : boolean-conditional ( basic-block insn -- basic-block successor vreg label2 )
     [ conditional ] [ src>> ] bi* swap ; inline
 
-M: %branch-f linearize-insn
+M: ##branch-f linearize-insn
     boolean-conditional _branch-f emit-branch ;
 
-M: %branch-t linearize-insn
+M: ##branch-t linearize-insn
     boolean-conditional _branch-t emit-branch ;
 
-M: %if-intrinsic linearize-insn
-    [ conditional ] [ [ quot>> ] [ vregs>> ] bi ] bi*
+: >intrinsic< ( insn -- quot defs uses )
+    [ quot>> ] [ defs-vregs>> ] [ uses-vregs>> ] tri ;
+
+M: ##if-intrinsic linearize-insn
+    [ conditional ] [ >intrinsic< ] bi*
     _if-intrinsic emit-branch ;
 
-M: %boolean-intrinsic linearize-insn
-    [
-        "false" define-label
-        "end" define-label
-        "false" get over [ quot>> ] [ vregs>> ] bi _if-intrinsic
-        dup dst>> t %load-literal
-        "end" get _branch
-        "false" resolve-label
-        dup dst>> f %load-literal
-        "end" resolve-label
-    ] with-scope
-    2drop ;
-
 : linearize-basic-block ( bb -- )
-    [ label>> _label ] [ linearize-insns ] bi ;
+    [ number>> _label ] [ linearize-insns ] bi ;
 
 : linearize-basic-blocks ( rpo -- insns )
     [ [ linearize-basic-block ] each ] { } make ;
