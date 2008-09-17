@@ -175,6 +175,7 @@ find_os() {
         *FreeBSD*) OS=freebsd;;
         *OpenBSD*) OS=openbsd;;
         *DragonFly*) OS=dragonflybsd;;
+	SunOS) OS=solaris;;
     esac
 }
 
@@ -186,6 +187,7 @@ find_architecture() {
     case $uname_m in
        i386) ARCH=x86;;
        i686) ARCH=x86;;
+       i86pc) ARCH=x86;;
        amd64) ARCH=x86;;
        ppc64) ARCH=ppc;;
        *86) ARCH=x86;;
@@ -261,6 +263,7 @@ check_os_arch_word() {
         $ECHO "ARCH: $ARCH"
         $ECHO "WORD: $WORD"
         $ECHO "OS, ARCH, or WORD is empty.  Please report this."
+	echo $MAKE_TARGET
         exit 5
     fi
 }
@@ -485,6 +488,8 @@ usage() {
     echo "Example for overriding the default target:"
     echo "    $0 update macosx-x86-32"
 }
+
+MAKE_TARGET=unknown
 
 # -n is nonzero length, -z is zero length
 if [[ -n "$2" ]] ; then
