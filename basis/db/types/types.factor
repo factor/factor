@@ -117,6 +117,12 @@ ERROR: no-sql-type ;
     modifiers>> [ lookup-modifier ] map " " join
     [ "" ] [ " " prepend ] if-empty ;
 
+: join-space ( string1 string2 -- new-string )
+    " " swap 3append ;
+
+: paren ( string -- new-string )
+    "(" swap ")" 3append ;
+
 HOOK: bind% db ( spec -- )
 HOOK: bind# db ( spec obj -- )
 
