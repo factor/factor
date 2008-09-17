@@ -141,7 +141,7 @@ PRIVATE>
         do-redirect
     ] with-variable ;
 
-: success? ( code -- ? ) 200 = ;
+: success? ( code -- ? ) 200 299 between? ;
 
 ERROR: download-failed response body ;
 
@@ -183,3 +183,9 @@ M: download-failed error.
 
 : http-post ( post-data url -- response data )
     <post-request> http-request ;
+
+: <put-request> ( data url -- request )
+    <post-request> "PUT" >>method ;
+
+: http-put ( data url -- response data )
+    <put-request> http-request ;
