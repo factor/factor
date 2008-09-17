@@ -9,11 +9,10 @@ IN: compiler.cfg.debugger
 GENERIC: test-cfg ( quot -- cfgs )
 
 M: callable test-cfg
-    build-tree optimize-tree gensym gensym build-cfg ;
+    build-tree optimize-tree gensym build-cfg ;
 
 M: word test-cfg
-    [ build-tree-from-word nip optimize-tree ] keep dup
-    build-cfg ;
+    [ build-tree-from-word nip optimize-tree ] keep build-cfg ;
 
 : test-mr ( quot -- mrs ) test-cfg [ build-mr ] map ;
 

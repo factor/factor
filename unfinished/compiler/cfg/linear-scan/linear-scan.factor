@@ -8,8 +8,19 @@ compiler.cfg.linear-scan.allocation
 compiler.cfg.linear-scan.assignment ;
 IN: compiler.cfg.linear-scan
 
-! See http://www.cs.ucla.edu/~palsberg/course/cs132/linearscan.pdf
+! References:
+
+! Linear Scan Register Allocation
+! by Massimiliano Poletto and Vivek Sarkar
+! http://www.cs.ucla.edu/~palsberg/course/cs132/linearscan.pdf
+
+! Linear Scan Register Allocation for the Java HotSpot Client Compiler
+! by Christian Wimmer
 ! and http://www.ssw.uni-linz.ac.at/Research/Papers/Wimmer04Master/
+
+! Quality and Speed in Linear-scan Register Allocation
+! by Omri Traub, Glenn Holloway, Michael D. Smith
+! http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.34.8435
 
 : linear-scan ( mr -- mr' )
     [

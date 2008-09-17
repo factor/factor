@@ -1,16 +1,128 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: compiler.backend.alien
+USING: namespaces make math math.parser sequences accessors
+kernel kernel.private layouts assocs words summary arrays
+threads continuations.private libc combinators
+alien alien.c-types alien.structs alien.strings
+compiler.errors
+compiler.alien
+compiler.backend
+compiler.codegen.fixup
+compiler.cfg
+compiler.cfg.instructions
+compiler.cfg.registers ;
+IN: compiler.codegen
+
+GENERIC: generate-insn ( insn -- )
+
+: generate-insns ( insns -- code )
+    [
+        [
+            dup regs>> registers set
+            generate-insn
+        ] each
+    ] { } make fixup ;
+
+TUPLE: asm label code calls ;
+
+SYMBOL: calls
+
+: add-call ( word -- )
+    #! Compile this word later.
+    calls get push ;
+
+SYMBOL: compiling-word
+
+: compiled-stack-traces? ( -- ? ) 59 getenv ;
+
+! Mapping _label IDs to label instances
+SYMBOL: labels
+
+: init-generator ( word -- )
+    H{ } clone labels set
+    V{ } clone literal-table set
+    V{ } clone calls set
+    compiling-word set
+    compiled-stack-traces? compiling-word get f ? add-literal drop ;
+
+: generate ( mr -- asm )
+    [
+        [ label>> ]
+        [ word>> init-generator ]
+        [ instructions>> generate-insns ] tri
+        calls get
+        asm boa
+    ] with-scope ;
+
+: lookup-label ( id -- label )
+    labels get [ drop <label> ] cache ;
+
+M: _label generate-insn
+    id>> lookup-label , ;
+
+M: _prologue generate-insn
+    n>> %prologue ;
+
+M: _epilogue generate-insn
+    n>> %epilogue ;
+
+M: ##load-literal generate-insn [ obj>> ] [ dst>> ] bi load-literal ;
+
+M: ##peek generate-insn [ dst>> ] [ loc>> ] bi %peek ;
+
+M: ##replace generate-insn [ src>> ] [ loc>> ] bi %replace ;
+
+M: ##inc-d generate-insn n>> %inc-d ;
+
+M: ##inc-r generate-insn n>> %inc-r ;
+
+M: ##return generate-insn drop %return ;
+
+M: ##call generate-insn word>> [ add-call ] [ %call ] bi ;
+
+M: ##jump generate-insn word>> [ add-call ] [ %jump-label ] bi ;
+
+M: ##intrinsic generate-insn
+    [ init-intrinsic ] [ quot>> call ] bi ;
+
+M: _if-intrinsic generate-insn
+    [ init-intrinsic ]
+    [ [ label>> lookup-label ] [ quot>> ] bi call ] bi ;
+
+M: _branch generate-insn
+    label>> lookup-label %jump-label ;
+
+M: _branch-f generate-insn
+    [ src>> ] [ label>> lookup-label ] bi %jump-f ;
+
+M: _branch-t generate-insn
+    [ src>> ] [ label>> lookup-label ] bi %jump-t ;
+
+M: ##dispatch-label generate-insn label>> %dispatch-label ;
+
+M: ##dispatch generate-insn drop %dispatch ;
+
+M: ##copy generate-insn %copy ;
+
+M: ##copy-float generate-insn %copy-float ;
+
+M: ##unbox-float generate-insn [ dst>> ] [ src>> ] bi %unbox-float ;
+
+M: ##unbox-f generate-insn [ dst>> ] [ src>> ] bi %unbox-f ;
+
+M: ##unbox-alien generate-insn [ dst>> ] [ src>> ] bi %unbox-alien ;
+
+M: ##unbox-byte-array generate-insn [ dst>> ] [ src>> ] bi %unbox-byte-array ;
+
+M: ##unbox-any-c-ptr generate-insn [ dst>> ] [ src>> ] bi %unbox-any-c-ptr ;
+
+M: ##box-float generate-insn [ dst>> ] [ src>> ] bi %box-float ;
+
+M: ##box-alien generate-insn [ dst>> ] [ src>> ] bi %box-alien ;
+
+M: ##gc generate-insn drop %gc ;
 
 ! #alien-invoke
-: set-stack-frame ( n -- )
-    dup [ frame-required ] when* \ stack-frame set ;
-
-: with-stack-frame ( n quot -- )
-    swap set-stack-frame
-    call
-    f set-stack-frame ; inline
-
 GENERIC: reg-size ( register-class -- n )
 
 M: int-regs reg-size drop cell ;
@@ -55,17 +167,17 @@ M: object reg-class-full?
     [ spill-param ] [ fastcall-param ] if
     [ param-reg ] keep ;
 
-: (flatten-int-type) ( size -- )
-    cell /i "void*" c-type <repetition> % ;
+: (flatten-int-type) ( size -- seq )
+    cell /i "void*" c-type <repetition> ;
 
-GENERIC: flatten-value-type ( type -- )
+GENERIC: flatten-value-type ( type -- types )
 
-M: object flatten-value-type , ;
+M: object flatten-value-type 1array ;
 
-M: struct-type flatten-value-type ( type -- )
+M: struct-type flatten-value-type ( type -- types )
     stack-size cell align (flatten-int-type) ;
 
-M: long-long-type flatten-value-type ( type -- )
+M: long-long-type flatten-value-type ( type -- types )
     stack-size cell align (flatten-int-type) ;
 
 : flatten-value-types ( params -- params )
@@ -73,9 +185,9 @@ M: long-long-type flatten-value-type ( type -- )
     [
         0 [
             c-type
-            [ parameter-align (flatten-int-type) ] keep
+            [ parameter-align (flatten-int-type) % ] keep
             [ stack-size cell align + ] keep
-            flatten-value-type
+            flatten-value-type %
         ] reduce drop
     ] { } make ;
 
@@ -170,39 +282,36 @@ M: no-such-symbol compiler-error-type
     swap library>> library dup [ dll>> ] when
     2dup check-dlsym ;
 
-M: #alien-invoke generate-node
+M: ##alien-invoke generate-insn
     params>>
-    dup alien-invoke-frame [
-        end-basic-block
-        %prepare-alien-invoke
-        dup objects>registers
-        %prepare-var-args
-        dup alien-invoke-dlsym %alien-invoke
-        dup %cleanup
-        box-return*
-        iterate-next
-    ] with-stack-frame ;
+    ! Save registers for GC
+    %prepare-alien-invoke
+    ! Unbox parameters
+    dup objects>registers
+    %prepare-var-args
+    ! Call function
+    dup alien-invoke-dlsym %alien-invoke
+    ! Box return value
+    dup %cleanup
+    box-return* ;
 
-! #alien-indirect
-M: #alien-indirect generate-node
+! ##alien-indirect
+M: ##alien-indirect generate-insn
     params>>
-    dup alien-invoke-frame [
-        ! Flush registers
-        end-basic-block
-        ! Save registers for GC
-        %prepare-alien-invoke
-        ! Save alien at top of stack to temporary storage
-        %prepare-alien-indirect
-        dup objects>registers
-        %prepare-var-args
-        ! Call alien in temporary storage
-        %alien-indirect
-        dup %cleanup
-        box-return*
-        iterate-next
-    ] with-stack-frame ;
+    ! Save registers for GC
+    %prepare-alien-invoke
+    ! Save alien at top of stack to temporary storage
+    %prepare-alien-indirect
+    ! Unbox parameters
+    dup objects>registers
+    %prepare-var-args
+    ! Call alien in temporary storage
+    %alien-indirect
+    ! Box return value
+    dup %cleanup
+    box-return* ;
 
-! #alien-callback
+! ##alien-callback
 : box-parameters ( params -- )
     alien-parameters [ box-parameter ] each-parameter ;
 
@@ -264,18 +373,9 @@ TUPLE: callback-context ;
     [ %unnest-stacks ] [ %callback-value ] if-void
     callback-unwind %unwind ;
 
-: generate-callback ( params -- )
-    dup xt>> dup [
-        init-templates
-        %prologue
-        dup alien-stack-frame [
-            [ registers>objects ]
-            [ wrap-callback-quot %alien-callback ]
-            [ %callback-return ]
-            tri
-        ] with-stack-frame
-    ] with-cfg-builder ;
-
-M: #alien-callback generate-node
-    end-basic-block
-    params>> generate-callback iterate-next ;
+M: ##alien-callback generate-insn
+    params>>
+    [ registers>objects ]
+    [ wrap-callback-quot %alien-callback ]
+    [ %callback-return ]
+    tri ;

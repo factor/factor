@@ -7,7 +7,6 @@ IN: compiler.cfg.rpo
 : post-order-traversal ( basic-block -- )
     dup visited>> [ drop ] [
         t >>visited
-        <label> >>label
         [ successors>> [ post-order-traversal ] each ] [ , ] bi
     ] if ;
 

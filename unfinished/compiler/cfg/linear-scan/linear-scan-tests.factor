@@ -3,6 +3,7 @@ USING: tools.test random sorting sequences sets hashtables assocs
 kernel fry arrays splitting namespaces math accessors vectors
 math.order
 compiler.cfg.registers
+compiler.cfg.linear-scan
 compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.debugger ;
 
@@ -98,3 +99,7 @@ SYMBOL: max-uses
 [ ] [ 10 4 2 60 random-test ] unit-test
 [ ] [ 10 20 2 400 random-test ] unit-test
 [ ] [ 10 20 4 300 random-test ] unit-test
+
+USING: math.private compiler.cfg.debugger ;
+
+[ ] [ [ float+ float>fixnum 3 fixnum*fast ] test-mr first linear-scan drop ] unit-test
