@@ -3,76 +3,20 @@
 USING: arrays byte-arrays generic assocs hashtables io.binary
 kernel kernel.private math namespaces make sequences words
 quotations strings alien.accessors alien.strings layouts system
-combinators math.bitwise words.private cpu.architecture
-math.order accessors growable ;
-IN: compiler.cfg.fixup
+combinators math.bitwise words.private math.order accessors
+growable compiler.constants compiler.backend ;
+IN: compiler.codegen.fixup
 
-: no-stack-frame -1 ; inline
-
-TUPLE: frame-required n ;
-
-: frame-required ( n -- ) \ frame-required boa , ;
-
-: stack-frame-size ( code -- n )
-    no-stack-frame [
-        dup frame-required? [ n>> max ] [ drop ] if
-    ] reduce ;
-
-GENERIC: fixup* ( frame-size obj -- frame-size )
+GENERIC: fixup* ( obj -- )
 
 : code-format 22 getenv ;
 
 : compiled-offset ( -- n ) building get length code-format * ;
 
-TUPLE: label offset ;
-
-: <label> ( -- label ) label new ;
-
-M: label fixup*
-    compiled-offset >>offset drop ;
-
-: define-label ( name -- ) <label> swap set ;
-
-: resolve-label ( label/name -- ) dup label? [ get ] unless , ;
-
-: if-stack-frame ( frame-size quot -- )
-    swap dup no-stack-frame =
-    [ 2drop ] [ stack-frame swap call ] if ; inline
-
-M: word fixup*
-    {
-        { \ %prologue-later [ dup [ %prologue ] if-stack-frame ] }
-        { \ %epilogue-later [ dup [ %epilogue ] if-stack-frame ] }
-    } case ;
-
 SYMBOL: relocation-table
 SYMBOL: label-table
 
-! Relocation classes
-: rc-absolute-cell     0 ;
-: rc-absolute          1 ;
-: rc-relative          2 ;
-: rc-absolute-ppc-2/2  3 ;
-: rc-relative-ppc-2    4 ;
-: rc-relative-ppc-3    5 ;
-: rc-relative-arm-3    6 ;
-: rc-indirect-arm      7 ;
-: rc-indirect-arm-pc   8 ;
-
-: rc-absolute? ( n -- ? )
-    dup rc-absolute-cell =
-    over rc-absolute =
-    rot rc-absolute-ppc-2/2 = or or ;
-
-! Relocation types
-: rt-primitive 0 ;
-: rt-dlsym     1 ;
-: rt-literal   2 ;
-: rt-dispatch  3 ;
-: rt-xt        4 ;
-: rt-here      5 ;
-: rt-label     6 ;
-: rt-immediate 7 ;
+M: label fixup* compiled-offset >>offset drop ;
 
 TUPLE: label-fixup label class ;
 
@@ -81,7 +25,7 @@ TUPLE: label-fixup label class ;
 M: label-fixup fixup*
     dup class>> rc-absolute?
     [ "Absolute labels not supported" throw ] when
-    dup label>> swap class>> compiled-offset 4 - rot
+    [ label>> ] [ class>> ] bi compiled-offset 4 - rot
     3array label-table get push ;
 
 TUPLE: rel-fixup arg class type ;
@@ -96,8 +40,6 @@ M: rel-fixup fixup*
     [ [ arg>> ] [ class>> ] [ type>> ] tri { 0 8 16 } bitfield ]
     [ class>> rc-absolute-cell = cell 4 ? compiled-offset swap - ] bi
     [ relocation-table get push-4 ] bi@ ;
-
-M: frame-required fixup* drop ;
 
 M: integer fixup* , ;
 
@@ -143,12 +85,11 @@ SYMBOL: literal-table
         3array
     ] map concat ;
 
-: fixup ( code -- literals relocation labels code )
+: fixup ( fixup-directives -- code )
     [
         init-fixup
-        dup stack-frame-size swap [ fixup* ] each drop
-
+        [ fixup* ] each
         literal-table get >array
         relocation-table get >byte-array
         label-table get resolve-labels
-    ] { } make ;
+    ] { } make 4array ;

@@ -5,16 +5,7 @@ quotations combinators classes.algebra compiler.cfg.instructions
 compiler.cfg.registers compiler.cfg.stacks ;
 IN: compiler.cfg.templates
 
-USE: qualified
-FROM: compiler.generator.registers => +input+   ;
-FROM: compiler.generator.registers => +output+  ;
-FROM: compiler.generator.registers => +scratch+ ;
-FROM: compiler.generator.registers => +clobber+ ;
-
-: template-input +input+ swap at ; inline
-: template-output +output+ swap at ; inline
-: template-scratch +scratch+ swap at ; inline
-: template-clobber +clobber+ swap at ; inline
+TUPLE: template input output scratch clobber gc ;
 
 : phantom&spec ( phantom specs -- phantom' specs' )
     >r stack>> r>
@@ -28,7 +19,7 @@ FROM: compiler.generator.registers => +clobber+ ;
     [ stack>> [ >vreg ] map sift ] each-phantom append ;
 
 : clobbered ( template -- seq )
-    [ template-output ] [ template-clobber ] bi append ;
+    [ output>> ] [ clobber>> ] bi append ;
 
 : clobbered? ( value name -- ? )
     \ clobbered get member? [
@@ -49,25 +40,25 @@ FROM: compiler.generator.registers => +clobber+ ;
     [
         live-vregs \ live-vregs set
         dup clobbered \ clobbered set
-        template-input [ values ] [ lazy-load ] bi zip
+        input>> [ values ] [ lazy-load ] bi zip
     ] with-scope ;
 
 : alloc-scratch ( template -- assoc )
-    template-scratch [ swap alloc-vreg ] assoc-map ;
+    scratch>> [ swap alloc-vreg ] assoc-map ;
 
-: do-template-inputs ( template -- inputs )
+: do-template-inputs ( template -- defs uses )
     #! Load input values into registers and allocates scratch
     #! registers.
-    [ load-inputs ] [ alloc-scratch ] bi assoc-union ;
+    [ alloc-scratch ] [ load-inputs ] bi ;
 
-: do-template-outputs ( template inputs -- )
-    [ template-output ] dip '[ _ at ] map
+: do-template-outputs ( template defs uses -- )
+    [ output>> ] 2dip assoc-union '[ _ at ] map
     phantom-datastack get phantom-append ;
 
 : apply-template ( pair quot -- vregs )
     [
         first2 dup do-template-inputs
-        [ do-template-outputs ] keep
+        [ do-template-outputs ] 2keep
     ] dip call ; inline
 
 : value-matches? ( value spec -- ? )
@@ -92,10 +83,10 @@ FROM: compiler.generator.registers => +clobber+ ;
 
 : spec-matches? ( value spec -- ? )
     2dup first value-matches?
-    >r >r operand-class 2 r> ?nth class-matches? r> and ;
+    >r >r value-class 2 r> ?nth class-matches? r> and ;
 
 : template-matches? ( template -- ? )
-    template-input phantom-datastack get swap
+    input>> phantom-datastack get swap
     [ spec-matches? ] phantom&spec-agree? ;
 
 : find-template ( templates -- pair/f )
