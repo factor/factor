@@ -115,6 +115,7 @@ ERROR: no-vocab vocab ;
         { "seq3" sequence } { "seq4" sequence }
         { "seq1'" sequence } { "seq2'" sequence }
         { "newseq" sequence } 
+        { "seq'" sequence } 
         { "assoc" assoc } { "assoc1" assoc } { "assoc2" assoc }
         { "assoc3" assoc } { "newassoc" assoc }
         { "alist" "an array of key/value pairs" }
