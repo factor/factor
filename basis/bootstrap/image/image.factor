@@ -26,7 +26,6 @@ IN: bootstrap.image
         "x86.32"
         "x86.64"
         "linux-ppc" "macosx-ppc"
-        ! "arm"
     } ;
 
 <PRIVATE
