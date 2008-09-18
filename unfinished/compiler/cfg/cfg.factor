@@ -19,6 +19,10 @@ successors ;
         V{ } clone >>instructions
         V{ } clone >>successors ;
 
-TUPLE: mr instructions word label ;
+TUPLE: mr instructions word label frame-size spill-counts ;
 
-C: <mr> mr
+: <mr> ( instructions word label -- mr )
+    mr new
+        swap >>label
+        swap >>word
+        swap >>instructions ;

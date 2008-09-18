@@ -71,10 +71,10 @@ M: _label generate-insn
     id>> lookup-label , ;
 
 M: _prologue generate-insn
-    n>> %prologue ;
+    drop %prologue ;
 
 M: _epilogue generate-insn
-    n>> %epilogue ;
+    drop %epilogue ;
 
 M: ##load-literal generate-insn
     [ obj>> ] [ dst>> v>operand ] bi load-literal ;
