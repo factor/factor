@@ -39,23 +39,23 @@ HELP: printf
 { $examples 
     { $example
         "USING: printf ;"
-        "{ 123 } \"%05d\" printf"
+        "123 \"%05d\" printf"
         "00123" }
     { $example
         "USING: printf ;"
-        "{ HEX: ff } \"04X\" printf"
+        "HEX: ff \"04X\" printf"
         "00FF" }
     { $example
         "USING: printf ;"
-        "{ 1.23456789 } \"%.3f\" printf"
+        "1.23456789 \"%.3f\" printf"
         "1.234" }
     { $example 
         "USING: printf ;"
-        "{ 1234567890 } \"%.5e\" printf"
+        "1234567890 \"%.5e\" printf"
         "1.23456e+09" }
     { $example
         "USING: printf ;"
-        "{ 12 } \"%'#4d\" printf"
+        "12 \"%'#4d\" printf"
         "##12" }
 } ;
 

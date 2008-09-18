@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license
 
 USING: io io.encodings.ascii io.files io.streams.string
-kernel sequences splitting strings vectors math math.parser macros
-fry peg.ebnf unicode.case arrays prettyprint quotations ;
+kernel sequences splitting strings math math.parser macros
+fry peg.ebnf unicode.case arrays quotations vectors ;
 
 IN: printf
 
@@ -11,12 +11,6 @@ IN: printf
 
 : compose-all ( seq -- quot )
     [ ] [ compose ] reduce ;
-
-: write-all ( seq -- quot )
-    [ [ write ] append ] map ;
-
-: apply-format ( params quot -- params string )
-    [ dup pop ] dip call ; inline
 
 : fix-neg ( string -- string )
     dup CHAR: 0 swap index 0 = 
@@ -47,61 +41,55 @@ IN: printf
 
 EBNF: parse-format-string
 
-plain-text = (!("%").)+          => [[ >string 1quotation ]]
+zero      = "0"                  => [[ CHAR: 0 ]]
+char      = "'" (.)              => [[ second ]]
 
-percents  =  "%"                 => [[ '[ "%" ] ]]
-
-pad-zero  = "0"                  => [[ CHAR: 0 ]] 
-pad-char  = "'" (.)              => [[ second ]] 
-pad-char_ = (pad-zero|pad-char)? => [[ CHAR: \s or 1quotation ]]
+pad-char  = (zero|char)?         => [[ CHAR: \s or 1quotation ]]
 pad-align = ("-")?               => [[ [ [ pad-right ] ] [ [ pad-left ] ] if ]] 
 pad-width = ([0-9])*             => [[ >digits 1quotation ]]
-pad       = pad-align pad-char_ pad-width => [[ reverse compose-all ]]
+pad       = pad-align pad-char pad-width => [[ reverse compose-all [ first ] keep swap 0 = [ drop [ ] ] when ]]
 
-width     = "." ([0-9])*         => [[ second >digits '[ _ max-width ] ]]
-width_    = (width)?             => [[ [ ] or ]] 
+width_    = "." ([0-9])*         => [[ second >digits '[ _ max-width ] ]]
+width     = (width_)?            => [[ [ ] or ]] 
 
-digits    = "." ([0-9])*         => [[ second >digits '[ _ max-digits ] ]]
-digits_   = (digits)?            => [[ [ ] or ]]
+digits_   = "." ([0-9])*         => [[ second >digits '[ _ max-digits ] ]]
+digits    = (digits_)?           => [[ [ ] or ]]
 
+fmt-%     = "%"                  => [[ [ "%" ] ]] 
 fmt-c     = "c"                  => [[ [ 1string ] ]]
 fmt-C     = "C"                  => [[ [ 1string >upper ] ]]
-chars     = (fmt-c | fmt-C)      => [[ '[ _ apply-format ] ]]
-
 fmt-s     = "s"                  => [[ [ ] ]]
 fmt-S     = "S"                  => [[ [ >upper ] ]]
-strings   = pad width_ (fmt-s | fmt-S) => [[ reverse compose-all '[ _ apply-format ] ]]
-
 fmt-d     = "d"                  => [[ [ >fixnum number>string ] ]]
-decimals  = fmt-d
-
 fmt-e     = "e"                  => [[ [ >exponential ] ]]
 fmt-E     = "E"                  => [[ [ >exponential >upper ] ]]
-exps      = digits_ (fmt-e | fmt-E) => [[ reverse [ swap ] join [ swap append ] append ]] 
-
 fmt-f     = "f"                  => [[ [ >float number>string ] ]] 
-floats    = digits_ fmt-f        => [[ reverse compose-all ]]
-
 fmt-x     = "x"                  => [[ [ >hex ] ]]
 fmt-X     = "X"                  => [[ [ >hex >upper ] ]]
+unknown   = (.)*                 => [[ "Unknown directive" throw ]]
+
+chars     = fmt-c | fmt-C
+strings   = pad width (fmt-s|fmt-S) => [[ reverse compose-all ]]
+decimals  = fmt-d
+exps      = digits (fmt-e|fmt-E) => [[ reverse [ swap ] join [ swap append ] append ]] 
+floats    = digits fmt-f         => [[ reverse compose-all ]]
 hex       = fmt-x | fmt-X
+numbers   = pad (decimals|floats|hex|exps) => [[ reverse compose-all [ fix-neg ] append ]]
 
-numbers   = (pad) (decimals|floats|hex|exps) => [[ reverse compose-all [ fix-neg ] append '[ _ apply-format ] ]]
+formats   = "%" (chars|strings|numbers|fmt-%|unknown) => [[ second '[ _ dip ] ]]
 
-formats   = "%" (chars|strings|numbers|percents) => [[ second ]]
+plain-text = (!("%").)+           => [[ >string '[ _ swap ] ]]
 
-text      = (formats|plain-text)* => [[ write-all compose-all ]]
+text      = (formats|plain-text)* => [[ reverse [ [ dup [ push ] dip ] append ] map ]]
 
 ;EBNF
 
 PRIVATE>
 
 MACRO: printf ( format-string -- )
-    parse-format-string '[ reverse >vector @ drop ] ;
+    parse-format-string [ length ] keep compose-all '[ _ <vector> @ reverse [ write ] each ] ;
 
-: sprintf ( params format-string -- result )
+: sprintf ( format-string -- )
     [ printf ] with-string-writer ;
 
-: fprintf ( filename params format-string -- )
-    rot ascii [ printf ] with-file-appender ;
 
