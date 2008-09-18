@@ -1,10 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs combinators.lib io kernel
-math math.order namespaces regexp2.backend sequences
-sequences.lib unicode.categories math.ranges fry
-combinators.short-circuit vectors ;
-IN: regexp2.utils
+USING: accessors arrays assocs io kernel math math.order
+namespaces regexp.backend sequences unicode.categories
+math.ranges fry combinators.short-circuit vectors ;
+IN: regexp.utils
 
 : (while-changes) ( obj quot pred pred-ret -- obj )
     ! quot: ( obj -- obj' )

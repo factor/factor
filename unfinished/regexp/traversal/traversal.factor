@@ -1,10 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs combinators combinators.lib kernel
-math math.ranges quotations sequences regexp2.parser
-regexp2.classes combinators.short-circuit assocs.lib
-sequences.lib regexp2.utils ;
-IN: regexp2.traversal
+USING: accessors assocs combinators kernel math math.ranges
+quotations sequences regexp.parser regexp.classes
+combinators.short-circuit regexp.utils ;
+IN: regexp.traversal
 
 TUPLE: dfa-traverser
     dfa-table
@@ -54,7 +53,7 @@ TUPLE: dfa-traverser
     V{ } clone >>matches ;
 
 : match-literal ( transition from-state table -- to-state/f )
-    transitions>> [ at ] [ 2drop f ] if-at ;
+    transitions>> at* [ at ] [ 2drop f ] if ;
 
 : match-class ( transition from-state table -- to-state/f )
     transitions>> at* [
@@ -62,8 +61,8 @@ TUPLE: dfa-traverser
     ] [ drop ] if ;
 
 : match-default ( transition from-state table -- to-state/f )
-    [ nip ] dip transitions>>
-    [ t swap [ drop f ] unless-at ] [ drop f ] if-at ;
+    [ nip ] dip transitions>> at*
+    [ t swap at* [ ] [ drop f ] if ] [ drop f ] if ;
 
 : match-transition ( obj from-state dfa -- to-state/f )
     { [ match-literal ] [ match-class ] [ match-default ] } 3|| ;
