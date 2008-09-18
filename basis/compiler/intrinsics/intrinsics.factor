@@ -4,20 +4,42 @@ USING: kernel classes.tuple classes.tuple.private math arrays
 byte-arrays words stack-checker.known-words ;
 IN: compiler.intrinsics
 
-: (tuple) ( layout -- tuple )
-    "BUG: missing (tuple) intrinsic" throw ;
+ERROR: missing-intrinsic ;
+
+: (tuple) ( n -- tuple ) missing-intrinsic ;
 
 \ (tuple) { tuple-layout } { tuple } define-primitive
 \ (tuple) make-flushable
 
-: (array) ( n -- array )
-    "BUG: missing (array) intrinsic" throw ;
+: (array) ( n -- array ) missing-intrinsic ;
 
 \ (array) { integer } { array } define-primitive
 \ (array) make-flushable
 
-: (byte-array) ( n -- byte-array )
-    "BUG: missing (byte-array) intrinsic" throw ;
+: (byte-array) ( n -- byte-array ) missing-intrinsic ;
 
 \ (byte-array) { integer } { byte-array } define-primitive
 \ (byte-array) make-flushable
+
+: (ratio) ( -- ratio ) missing-intrinsic ;
+
+\ (ratio) { } { ratio } define-primitive
+\ (ratio) make-flushable
+
+: (complex) ( -- complex ) missing-intrinsic ;
+
+\ (complex) { } { complex } define-primitive
+\ (complex) make-flushable
+
+: (wrapper) ( -- wrapper ) missing-intrinsic ;
+
+\ (wrapper) { } { wrapper } define-primitive
+\ (wrapper) make-flushable
+
+: (set-slot) ( val obj n -- ) missing-intrinsic ;
+
+\ (set-slot) { object object fixnum } { } define-primitive
+
+: (write-barrier) ( obj -- ) missing-intrinsic ;
+
+\ (write-barrier) { object } { } define-primitive

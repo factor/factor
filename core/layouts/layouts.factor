@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces math words kernel assocs classes
 math.order kernel.private ;
@@ -74,3 +74,5 @@ M: bignum >integer
 M: real >integer
     dup most-negative-fixnum most-positive-fixnum between?
     [ >fixnum ] [ >bignum ] if ;
+
+UNION: immediate fixnum POSTPONE: f ;
