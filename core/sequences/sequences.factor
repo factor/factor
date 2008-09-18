@@ -289,6 +289,8 @@ M: immutable-sequence clone-like like ;
 
 : push-all ( src dest -- ) [ length ] [ copy ] bi ;
 
+<PRIVATE
+
 : ((append)) ( seq1 seq2 accum -- accum )
     [ >r over length r> copy ]
     [ 0 swap copy ] 
@@ -303,6 +305,8 @@ M: immutable-sequence clone-like like ;
         [ >r pick length pick length + r> copy ]
         [ ((append)) ] bi
     ] new-like ; inline
+
+PRIVATE>
 
 : append ( seq1 seq2 -- newseq ) over (append) ;
 
@@ -402,7 +406,7 @@ PRIVATE>
 : 2map ( seq1 seq2 quot -- newseq )
     pick 2map-as ; inline
 
-: 2change-each ( seq1 seq2 quot -- newseq )
+: 2change-each ( seq1 seq2 quot -- )
     pick 2map-into ; inline
 
 : 2all? ( seq1 seq2 quot -- ? )
@@ -543,12 +547,16 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
     2over number=
     [ 3drop ] [ [ nth swap ] [ set-nth ] bi ] if ; inline
 
+<PRIVATE
+
 : (delete) ( elt store scan seq -- elt store scan seq )
     2dup length < [
         3dup move
         [ nth pick = ] 2keep rot
         [ >r >r 1+ r> r> ] unless >r 1+ r> (delete)
     ] when ;
+
+PRIVATE>
 
 : delete ( elt seq -- ) 0 0 rot (delete) nip set-length drop ;
 
@@ -567,6 +575,8 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 : peek ( seq -- elt ) [ length 1- ] [ nth ] bi ;
 
 : pop* ( seq -- ) [ length 1- ] [ shorten ] bi ;
+
+<PRIVATE
 
 : move-backward ( shift from to seq -- )
     2over number= [
@@ -590,6 +600,8 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
     ] [
         >r >r over - r> r> move-backward
     ] if ;
+
+PRIVATE>
 
 : open-slice ( shift from seq -- )
     pick zero? [
@@ -650,8 +662,12 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
         first like
     ] if-empty ;
 
+<PRIVATE
+
 : joined-length ( seq glue -- n )
     >r dup sum-lengths swap length 1 [-] r> length * + ;
+
+PRIVATE>
 
 : join ( seq glue -- newseq )
     [
@@ -671,7 +687,7 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 : pad-right ( seq n elt -- padded )
     [ append ] padding ;
 
-: shorter? ( seq1 seq2 -- ? ) >r length r> length < ;
+: shorter? ( seq1 seq2 -- ? ) [ length ] bi@ < ;
 
 : head? ( seq begin -- ? )
     2dup shorter? [
@@ -687,7 +703,7 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
         tuck length tail-slice* sequence=
     ] if ;
 
-: cut-slice ( seq n -- before after )
+: cut-slice ( seq n -- before-slice after-slice )
     [ head-slice ] [ tail-slice ] 2bi ;
 
 : insert-nth ( elt n seq -- seq' )
@@ -695,7 +711,7 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 
 : midpoint@ ( seq -- n ) length 2/ ; inline
 
-: halves ( seq -- first second )
+: halves ( seq -- first-slice second-slice )
     dup midpoint@ cut-slice ;
 
 : binary-reduce ( seq start quot: ( elt1 elt2 -- newelt ) -- value )
@@ -749,10 +765,10 @@ PRIVATE>
 : unclip-last ( seq -- butlast last )
     [ but-last ] [ peek ] bi ;
 
-: unclip-slice ( seq -- rest first )
+: unclip-slice ( seq -- rest-slice first )
     [ rest-slice ] [ first ] bi ; inline
 
-: 2unclip-slice ( seq1 seq2 -- seq1' seq2' elt1 elt2 )
+: 2unclip-slice ( seq1 seq2 -- rest-slice1 rest-slice2 first1 first2 )
     [ unclip-slice ] bi@ swapd ; inline
 
 : map-reduce ( seq map-quot reduce-quot -- result )
@@ -763,7 +779,7 @@ PRIVATE>
     [ [ 2unclip-slice ] dip [ call ] keep ] dip
     compose 2reduce ; inline
 
-: unclip-last-slice ( seq -- butlast last )
+: unclip-last-slice ( seq -- butlast-slice last )
     [ but-last-slice ] [ peek ] bi ; inline
 
 : <flat-slice> ( seq -- slice )

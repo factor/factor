@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces sequences math math.order kernel assocs
 accessors vectors fry heaps
+compiler.cfg.registers
 compiler.cfg.linear-scan.live-intervals
 compiler.backend ;
 IN: compiler.cfg.linear-scan.allocation
@@ -68,10 +69,10 @@ SYMBOL: progress
     [ peek >>reg drop ] [ pop >>reg add-active ] if ;
 
 ! Spilling
-SYMBOL: spill-counter
+SYMBOL: spill-counts
 
-: next-spill-location ( -- n )
-    spill-counter [ dup 1+ ] change ;
+: next-spill-location ( reg-class -- n )
+    spill-counts get [ dup 1+ ] change-at ;
 
 : interval-to-spill ( -- live-interval )
     #! We spill the interval with the most distant use location.
@@ -141,7 +142,7 @@ SYMBOL: spill-counter
     V{ } clone active-intervals set
     <min-heap> unhandled-intervals set
     [ reverse >vector ] assoc-map free-registers set
-    0 spill-counter set
+    H{ { int-regs 0 } { double-float-regs 0 } } clone spill-counts set
     -1 progress set ;
 
 : handle-interval ( live-interval -- )
@@ -152,8 +153,6 @@ SYMBOL: spill-counter
 
 : allocate-registers ( live-intervals machine-registers -- live-intervals )
     #! This modifies the input live-intervals.
-    [
-        init-allocator
-        dup init-unhandled
-        (allocate-registers)
-    ] with-scope ;
+    init-allocator
+    dup init-unhandled
+    (allocate-registers) ;
