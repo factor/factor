@@ -7,6 +7,16 @@ USING: kernel printf tools.test ;
 
 [ t ] [ "10" 10 "%d" sprintf = ] unit-test
 
+[ t ] [ "+10" 10 "%+d" sprintf = ] unit-test
+
+[ t ] [ "-10" -10 "%d" sprintf = ] unit-test
+
+[ t ] [ "  -10" -10 "%5d" sprintf = ] unit-test
+
+[ t ] [ "-0010" -10 "%05d" sprintf = ] unit-test
+
+[ t ] [ "+0010" 10 "%+05d" sprintf = ] unit-test
+
 [ t ] [ "123.456" 123.456 "%f" sprintf = ] unit-test
 
 [ t ] [ "123.10" 123.1 "%01.2f" sprintf = ] unit-test
@@ -17,6 +27,8 @@ USING: kernel printf tools.test ;
 
 [ t ] [ "1.234e+08" 123400000 "%e" sprintf = ] unit-test
 
+[ t ] [ "-1.234e+08" -123400000 "%e" sprintf = ] unit-test
+
 [ t ] [ "1.234567e+08" 123456700 "%e" sprintf = ] unit-test
 
 [ t ] [ "3.625e+08" 362525200 "%.3e" sprintf = ] unit-test
@@ -24,6 +36,18 @@ USING: kernel printf tools.test ;
 [ t ] [ "2.5e-03" 0.0025 "%e" sprintf = ] unit-test
 
 [ t ] [ "2.5E-03" 0.0025 "%E" sprintf = ] unit-test
+
+[ t ] [ "   1.0E+01" 10 "%10.1E" sprintf = ] unit-test
+
+[ t ] [ "  -1.0E+01" -10 "%10.1E" sprintf = ] unit-test
+
+[ t ] [ "  -1.0E+01" -10 "%+10.1E" sprintf = ] unit-test
+
+[ t ] [ "  +1.0E+01" 10 "%+10.1E" sprintf = ] unit-test
+
+[ t ] [ "-001.0E+01" -10 "%+010.1E" sprintf = ] unit-test
+
+[ t ] [ "+001.0E+01" 10 "%+010.1E" sprintf = ] unit-test
 
 [ t ] [ "ff" HEX: ff "%x" sprintf = ] unit-test
 

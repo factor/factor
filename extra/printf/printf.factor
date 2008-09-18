@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: io io.encodings.ascii io.files io.streams.string
+USING: io io.encodings.ascii io.files io.streams.string combinators
 kernel sequences splitting strings math math.parser macros
-fry peg.ebnf unicode.case arrays quotations vectors ;
+fry peg.ebnf ascii unicode.case arrays quotations vectors ;
 
 IN: printf
 
@@ -12,11 +12,17 @@ IN: printf
 : compose-all ( seq -- quot )
     [ ] [ compose ] reduce ;
 
-: fix-neg ( string -- string )
+: fix-sign ( string -- string )
     dup CHAR: 0 swap index 0 = 
-      [ dup CHAR: - swap index dup 
-        [ swap remove-nth "-" prepend ] 
-        [ drop ] if ] when ;
+      [ dup 0 swap [ [ CHAR: 0 = not ] keep digit? and ] find-from
+         [ dup 1- rot dup [ nth ] dip swap
+            {
+               { CHAR: - [ [ 1- ] dip remove-nth "-" prepend ] }
+               { CHAR: + [ [ 1- ] dip remove-nth "+" prepend ] }
+               [ drop swap drop ] 
+            } case 
+         ] [ drop ] if
+      ] when ;
 
 : >digits ( string -- digits ) 
     [ 0 ] [ string>number ] if-empty ;
@@ -28,16 +34,18 @@ IN: printf
     [ dup length ] dip [ > ] keep swap [ head-slice >string ] [ drop ] if ;
 
 : >exponential ( n -- base exp ) 
+    [ 0 < ] keep abs
     0 
-    [ swap dup [ 10.0 > ] keep 1.0 < or ] 
-    [ dup 10.0 > 
+    [ swap dup [ 10.0 >= ] keep 1.0 < or ] 
+    [ dup 10.0 >= 
       [ 10.0 / [ 1+ ] dip swap ] 
       [ 10.0 * [ 1- ] dip swap ] if
     ] [ swap ] while 
     [ number>string ] dip 
     dup abs number>string 2 CHAR: 0 pad-left
     [ 0 < [ "-" ] [ "+" ] if ] dip append
-    "e" prepend ; 
+    "e" prepend 
+    rot [ [ "-" prepend ] dip ] when ; 
 
 EBNF: parse-format-string
 
@@ -48,6 +56,8 @@ pad-char  = (zero|char)?         => [[ CHAR: \s or 1quotation ]]
 pad-align = ("-")?               => [[ [ [ pad-right ] ] [ [ pad-left ] ] if ]] 
 pad-width = ([0-9])*             => [[ >digits 1quotation ]]
 pad       = pad-align pad-char pad-width => [[ reverse compose-all [ first ] keep swap 0 = [ drop [ ] ] when ]]
+
+sign      = ("+")?               => [[ [ [ dup CHAR: - swap index not [ "+" prepend ] when ] ] [ [ ] ] if ]]
 
 width_    = "." ([0-9])*         => [[ second >digits '[ _ max-width ] ]]
 width     = (width_)?            => [[ [ ] or ]] 
@@ -74,7 +84,7 @@ decimals  = fmt-d
 exps      = digits (fmt-e|fmt-E) => [[ reverse [ swap ] join [ swap append ] append ]] 
 floats    = digits fmt-f         => [[ reverse compose-all ]]
 hex       = fmt-x | fmt-X
-numbers   = pad (decimals|floats|hex|exps) => [[ reverse compose-all [ fix-neg ] append ]]
+numbers   = sign pad (decimals|floats|hex|exps) => [[ reverse first3 swap 3append [ fix-sign ] append ]]
 
 formats   = "%" (chars|strings|numbers|fmt-%|unknown) => [[ second '[ _ dip ] ]]
 
