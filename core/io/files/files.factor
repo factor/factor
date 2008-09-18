@@ -192,11 +192,15 @@ PRIVATE>
 
 SYMBOL: current-directory
 
-[ cwd current-directory set-global ] "io.files" add-init-hook
+[
+    cwd current-directory set-global
+    image parent-directory "./" ?head
+    [ cwd prepend-path ] when
+    "resource-path" set
+] "io.files" add-init-hook
 
 : resource-path ( path -- newpath )
-    "resource-path" get [ image parent-directory ] unless*
-    prepend-path ;
+    "resource-path" get prepend-path ;
 
 : (normalize-path) ( path -- path' )
     "resource:" ?head [
