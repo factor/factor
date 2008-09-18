@@ -145,9 +145,12 @@ M: process-failed error.
     "Launch descriptor:" print nl
     process>> . ;
 
-: try-process ( desc -- )
-    run-process dup wait-for-process dup zero?
+: wait-for-success ( process -- )
+    dup wait-for-process dup zero?
     [ 2drop ] [ process-failed ] if ;
+
+: try-process ( desc -- )
+    run-process wait-for-success ;
 
 HOOK: kill-process* io-backend ( handle -- )
 
@@ -167,7 +170,7 @@ M: object run-pipeline-element
     3bi
     wait-for-process ;
 
-: <process-reader*> ( process encoding -- process stream )
+: <process-reader*> ( desc encoding -- stream process )
     [
         >r (pipe) {
             [ |dispose drop ]
@@ -178,13 +181,18 @@ M: object run-pipeline-element
             ]
             [ out>> dispose ]
             [ in>> <input-port> ]
-        } cleave r> <decoder>
+        } cleave r> <decoder> swap
     ] with-destructors ;
 
 : <process-reader> ( desc encoding -- stream )
-    <process-reader*> nip ; inline
+    <process-reader*> drop ; inline
 
-: <process-writer*> ( process encoding -- process stream )
+: with-process-reader ( desc encoding quot -- )
+    [ <process-reader*> ] dip
+    swap [ with-input-stream ] dip
+    wait-for-success ; inline
+
+: <process-writer*> ( desc encoding -- stream process )
     [
         >r (pipe) {
             [ |dispose drop ]
@@ -195,13 +203,18 @@ M: object run-pipeline-element
             ]
             [ in>> dispose ]
             [ out>> <output-port> ]
-        } cleave r> <encoder>
+        } cleave r> <encoder> swap
     ] with-destructors ;
 
 : <process-writer> ( desc encoding -- stream )
-    <process-writer*> nip ; inline
+    <process-writer*> drop ; inline
 
-: <process-stream*> ( process encoding -- process stream )
+: with-process-writer ( desc encoding quot -- )
+    [ <process-writer*> ] dip
+    swap [ with-output-stream ] dip
+    wait-for-success ; inline
+
+: <process-stream*> ( desc encoding -- stream process )
     [
         >r (pipe) (pipe) {
             [ [ |dispose drop ] bi@ ]
@@ -213,11 +226,16 @@ M: object run-pipeline-element
             ]
             [ [ out>> dispose ] [ in>> dispose ] bi* ]
             [ [ in>> <input-port> ] [ out>> <output-port> ] bi* ]
-        } 2cleave r> <encoder-duplex>
+        } 2cleave r> <encoder-duplex> swap
     ] with-destructors ;
 
 : <process-stream> ( desc encoding -- stream )
-    <process-stream*> nip ; inline
+    <process-stream*> drop ; inline
+
+: with-process-stream ( desc encoding quot -- )
+    [ <process-stream*> ] dip
+    swap [ with-stream ] dip
+    wait-for-success ; inline
 
 : notify-exit ( process status -- )
     >>status

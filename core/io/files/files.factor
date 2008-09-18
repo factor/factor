@@ -194,7 +194,7 @@ SYMBOL: current-directory
 
 [
     cwd current-directory set-global
-    image parent-directory cwd prepend-path "resource-path" set
+    image parent-directory cwd prepend-path "resource-path" set-global
 ] "io.files" add-init-hook
 
 : resource-path ( path -- newpath )
