@@ -4,8 +4,12 @@ IN: io.windows.nt.files.tests
 
 [ f ] [ "\\foo" absolute-path? ] unit-test
 [ t ] [ "\\\\?\\c:\\foo" absolute-path? ] unit-test
+[ t ] [ "\\\\?\\c:\\" absolute-path? ] unit-test
+[ t ] [ "\\\\?\\c:" absolute-path? ] unit-test
 [ t ] [ "c:\\foo" absolute-path? ] unit-test
 [ t ] [ "c:" absolute-path? ] unit-test
+[ t ] [ "c:\\" absolute-path? ] unit-test
+[ f ] [ "/cygdrive/c/builds" absolute-path? ] unit-test
 
 [ "c:\\foo\\" ] [ "c:\\foo\\bar" parent-directory ] unit-test
 [ "c:\\" ] [ "c:\\foo\\" parent-directory ] unit-test
@@ -26,6 +30,9 @@ IN: io.windows.nt.files.tests
 [ f ] [ "c:\\foo" root-directory? ] unit-test
 [ f ] [ "." root-directory? ] unit-test
 [ f ] [ ".." root-directory? ] unit-test
+[ t ] [ "\\\\?\\c:\\" root-directory? ] unit-test
+[ t ] [ "\\\\?\\c:" root-directory? ] unit-test
+[ f ] [ "\\\\?\\c:\\bar" root-directory? ] unit-test
 
 [ "\\foo\\bar" ] [ "/foo/bar" normalize-path ":" split1 nip ] unit-test
 
