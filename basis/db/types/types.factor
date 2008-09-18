@@ -113,15 +113,15 @@ ERROR: no-sql-type ;
         (lookup-type) second
     ] if ;
 
-: paren ( string -- new-string )
-    "(" swap ")" 3append ;
+: modifiers ( spec -- string )
+    modifiers>> [ lookup-modifier ] map " " join
+    [ "" ] [ " " prepend ] if-empty ;
 
 : join-space ( string1 string2 -- new-string )
     " " swap 3append ;
 
-: modifiers ( spec -- string )
-    modifiers>> [ lookup-modifier ] map " " join
-    [ "" ] [ " " prepend ] if-empty ;
+: paren ( string -- new-string )
+    "(" swap ")" 3append ;
 
 HOOK: bind% db ( spec -- )
 HOOK: bind# db ( spec obj -- )

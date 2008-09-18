@@ -28,6 +28,7 @@ SYMBOL: live-intervals
     at [ (>>end) ] [ uses>> push ] 2bi ;
 
 : new-live-interval ( n vreg live-intervals -- )
+    2dup key? [ "Multiple defs" throw ] when
     [ [ <live-interval> ] keep ] dip set-at ;
 
 : compute-live-intervals* ( insn n -- )
