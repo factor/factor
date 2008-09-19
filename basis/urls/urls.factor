@@ -14,7 +14,7 @@ IN: urls
         [ letter? ]
         [ LETTER? ]
         [ digit? ]
-        [ "/_-." member? ]
+        [ "/_-.:" member? ]
     } 1|| ; foldable
 
 <PRIVATE
@@ -25,7 +25,7 @@ IN: urls
 
 PRIVATE>
 
-: url-encode ( str -- str )
+: url-encode ( str -- encoded )
     [
         [ dup url-quotable? [ , ] [ push-utf8 ] if ] each
     ] "" make ;
@@ -58,7 +58,7 @@ PRIVATE>
 
 PRIVATE>
 
-: url-decode ( str -- str )
+: url-decode ( str -- decoded )
     [ 0 swap url-decode-iter ] "" make utf8 decode ;
 
 <PRIVATE

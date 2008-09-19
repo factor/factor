@@ -43,6 +43,10 @@ TUPLE: dfa-traverser
         dup save-final-state
     ] when text-finished? ;
 
+: print-flags ( dfa-traverser -- dfa-traverser )
+    dup [ current-state>> ] [ traversal-flags>> ] bi
+    ;
+
 : increment-state ( dfa-traverser state -- dfa-traverser )
     [
         [ 1+ ] change-current-index dup current-state>> >>last-state

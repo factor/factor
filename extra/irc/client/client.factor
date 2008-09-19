@@ -91,8 +91,6 @@ SYMBOL: current-irc-client
 : irc-send ( irc-message -- ) irc> out-messages>> mailbox-put ;
 : listener> ( name -- listener/f ) irc> listeners>> at ;
 
-: maybe-mailbox-get ( mailbox quot: ( irc-message -- ) -- )
-    [ dup mailbox-empty? [ drop 0.1 sleep ] ] dip '[ mailbox-get @ ] if ; inline
 
 GENERIC: to-listener ( message obj -- )
 
@@ -294,14 +292,14 @@ DEFER: (connect-irc)
     [ (reader-loop) ] [ handle-disconnect ] recover t ;
 
 : writer-loop ( -- ? )
-    irc> out-messages>> [ handle-outgoing-irc ] maybe-mailbox-get t ;
+    irc> out-messages>> mailbox-get handle-outgoing-irc t ;
 
 ! ======================================
 ! Processing loops
 ! ======================================
 
 : in-multiplexer-loop ( -- ? )
-    irc> in-messages>> [ handle-incoming-irc ] maybe-mailbox-get t ;
+    irc> in-messages>> mailbox-get handle-incoming-irc t ;
 
 : strings>privmsg ( name string -- privmsg )
     privmsg new [ (>>trailing) ] keep [ (>>name) ] keep ;
@@ -314,9 +312,10 @@ DEFER: (connect-irc)
 
 : listener-loop ( name -- ? )
     dup listener> [
-        out-messages>> [ maybe-annotate-with-name
-                         irc> out-messages>> mailbox-put ] with
-        maybe-mailbox-get t
+        out-messages>> mailbox-get
+        maybe-annotate-with-name
+        irc> out-messages>> mailbox-put
+        t
     ] [ drop f ] if* ;
 
 : spawn-irc-loop ( quot: ( -- ? ) name -- )
