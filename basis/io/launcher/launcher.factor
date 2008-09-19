@@ -101,8 +101,10 @@ GENERIC: >process ( obj -- process )
 
 ERROR: process-already-started process ;
 
-M: process-already-started summary
-    drop "Process has already been started once" ;
+M: process-already-started error.
+    "Process has already been started" print nl
+    "Launch descriptor:" print nl
+    process>> . ;
 
 M: process >process
     dup process-started? [
@@ -117,6 +119,13 @@ HOOK: current-process-handle io-backend ( -- handle )
 HOOK: run-process* io-backend ( process -- handle )
 
 ERROR: process-was-killed process ;
+
+M: process-was-killed error.
+    "Process was killed as a result of a call to" print
+    "kill-process, or a timeout" print
+    nl
+    "Launch descriptor:" print nl
+    process>> . ;
 
 : wait-for-process ( process -- status )
     [
