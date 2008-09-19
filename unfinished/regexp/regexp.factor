@@ -33,7 +33,19 @@ IN: regexp
     dupd match
     [ [ length ] [ length>> 1- ] bi* = ] [ drop f ] if* ;
 
-: match-head ( string regexp -- end ) match length>> 1- ;
+: match-head ( string regexp -- end/f ) match [ length>> 1- ] [ f ] if* ;
+
+: match-at ( string m regexp -- n/f finished? )
+    [
+        2dup swap length > [ 2drop f f ] [ tail-slice t ] if
+    ] dip swap [ match-head f ] [ 2drop f t ] if ;
+
+: match-range ( string m regexp -- a/f b/f )
+    3dup match-at over [
+        drop nip rot drop dupd +
+    ] [
+        [ 3drop drop f f ] [ drop [ 1+ ] dip match-range ] if
+    ] if ;
 
 : initial-option ( regexp option -- regexp' )
     over options>> conjoin ;
