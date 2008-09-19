@@ -1356,16 +1356,18 @@ ARTICLE: "sequences-slices" "Subsequences and slices"
 "A " { $emphasis "slice" } " is a virtual sequence which presents as view of a subsequence of an underlying sequence:"
 { $subsection slice }
 { $subsection slice? }
-"Creating slices:"
+"Extracting a slice:"
 { $subsection <slice> }
 { $subsection head-slice }
 { $subsection tail-slice }
-{ $subsection but-last-slice }
-{ $subsection rest-slice }
 { $subsection head-slice* }
 { $subsection tail-slice* }
+"Removing the first or last element:"
+{ $subsection rest-slice }
+{ $subsection but-last-slice }
 "Taking a sequence apart into a head and a tail:"
 { $subsection unclip-slice }
+{ $subsection unclip-last-slice }
 { $subsection cut-slice }
 "A utility for words which use slices as iterators:"
 { $subsection <flat-slice> } ;
