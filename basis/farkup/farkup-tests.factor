@@ -11,13 +11,11 @@ link-no-follow? off
 [ "Baz" ] [ "Baz" simple-link-title ] unit-test
 
 [ ] [
-    "abcd-*strong*\nasdifj\nweouh23ouh23"
-    "paragraph" \ farkup rule parse drop
+    "abcd-*strong*\nasdifj\nweouh23ouh23" parse-farkup drop
 ] unit-test
 
 [ ] [
-    "abcd-*strong*\nasdifj\nweouh23ouh23\n"
-    "paragraph" \ farkup rule parse drop
+    "abcd-*strong*\nasdifj\nweouh23ouh23\n" parse-farkup drop
 ] unit-test
 
 [ "<p>a-b</p>" ] [ "a-b" convert-farkup ] unit-test
