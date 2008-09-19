@@ -99,7 +99,7 @@ M: process hashcode* handle>> hashcode* ;
 
 GENERIC: >process ( obj -- process )
 
-ERROR: process-already-started ;
+ERROR: process-already-started process ;
 
 M: process-already-started summary
     drop "Process has already been started once" ;
@@ -116,7 +116,7 @@ HOOK: current-process-handle io-backend ( -- handle )
 
 HOOK: run-process* io-backend ( process -- handle )
 
-ERROR: process-was-killed ;
+ERROR: process-was-killed process ;
 
 : wait-for-process ( process -- status )
     [
