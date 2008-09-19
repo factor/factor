@@ -1,6 +1,6 @@
-USING: regexp2 tools.test kernel sequences regexp2.parser
-regexp2.traversal ;
-IN: regexp2-tests
+USING: regexp tools.test kernel sequences regexp.parser
+regexp.traversal eval ;
+IN: regexp-tests
 
 [ f ] [ "b" "a*" <regexp> matches? ] unit-test
 [ t ] [ "" "a*" <regexp> matches? ] unit-test
@@ -224,6 +224,9 @@ IN: regexp2-tests
 [ f ] [ "a" "[a-z.-]@[a-z]" <regexp> matches? ] unit-test
 [ t ] [ ".o" "\\.[a-z]" <regexp> matches? ] unit-test
 
+[ t ] [ "abc*" "[^\\*]*\\*" <regexp> matches? ] unit-test
+[ t ] [ "bca" "[^a]*a" <regexp> matches? ] unit-test
+
 [ ] [
     "(0[lL]?|[1-9]\\d{0,9}(\\d{0,9}[lL])?|0[xX]\\p{XDigit}{1,8}(\\p{XDigit}{0,8}[lL])?|0[0-7]{1,11}([0-7]{0,11}[lL])?|([0-9]+\\.[0-9]*|\\.[0-9]+)([eE][+-]?[0-9]+)?[fFdD]?|[0-9]+([eE][+-]?[0-9]+[fFdD]?|([eE][+-]?[0-9]+)?[fFdD]))"
     <regexp> drop
@@ -236,20 +239,20 @@ IN: regexp2-tests
 
 
 
-[ "{Lower}" <regexp> ] [ invalid-range? ] must-fail-with
+! [ "{Lower}" <regexp> ] [ invalid-range? ] must-fail-with
 
-[ 1 ] [ "aaacb" "a+?" <regexp> match-head ] unit-test
-[ 1 ] [ "aaacb" "aa??" <regexp> match-head ] unit-test
-[ f ] [ "aaaab" "a++ab" <regexp> matches? ] unit-test
-[ t ] [ "aaacb" "a++cb" <regexp> matches? ] unit-test
-[ 3 ] [ "aacb" "aa?c" <regexp> match-head ] unit-test
-[ 3 ] [ "aacb" "aa??c" <regexp> match-head ] unit-test
+! [ 1 ] [ "aaacb" "a+?" <regexp> match-head ] unit-test
+! [ 1 ] [ "aaacb" "aa??" <regexp> match-head ] unit-test
+! [ f ] [ "aaaab" "a++ab" <regexp> matches? ] unit-test
+! [ t ] [ "aaacb" "a++cb" <regexp> matches? ] unit-test
+! [ 3 ] [ "aacb" "aa?c" <regexp> match-head ] unit-test
+! [ 3 ] [ "aacb" "aa??c" <regexp> match-head ] unit-test
 
-[ t ] [ "fxxbar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
-[ f ] [ "foobar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
+! [ t ] [ "fxxbar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
+! [ f ] [ "foobar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
 
-[ 3 ] [ "foobar" "foo(?=bar)" <regexp> match-head ] unit-test
-[ f ] [ "foobxr" "foo(?=bar)" <regexp> match-head ] unit-test
+! [ 3 ] [ "foobar" "foo(?=bar)" <regexp> match-head ] unit-test
+! [ f ] [ "foobxr" "foo(?=bar)" <regexp> match-head ] unit-test
 
 ! [ f ] [ "foobxr" "foo\\z" <regexp> match-head ] unit-test
 ! [ 3 ] [ "foo" "foo\\z" <regexp> match-head ] unit-test
@@ -267,6 +270,12 @@ IN: regexp2-tests
 ! [ f ] [ "foo bar" "foo\\B bar" <regexp> matches? ] unit-test
 ! [ t ] [ "fooxbar" "foo\\Bxbar" <regexp> matches? ] unit-test
 ! [ f ] [ "foo" "foo\\Bbar" <regexp> matches? ] unit-test
+
+[ ] [ "USING: regexp kernel ; R' -{3}[+]{1,6}(?:!!)?\\s' drop" eval ] unit-test
+
+[ ] [ "USING: regexp kernel ; R' (ftp|http|https)://(\\w+:?\\w*@)?(\\S+)(:[0-9]+)?(/|/([\\w#!:.?+=&%@!\\-/]))?' drop" eval ] unit-test
+
+[ ] [ "USING: regexp kernel ; R' \\*[^\s*][^*]*\\*' drop" eval ] unit-test
 
 ! Bug in parsing word
 ! [ t ] [ "a" R' a' matches?  ] unit-test

@@ -3,18 +3,12 @@
 USING: arrays assocs classes classes.private classes.algebra
 combinators hashtables kernel layouts math fry namespaces
 quotations sequences system vectors words effects alien
-byte-arrays accessors sets math.order compiler.cfg.instructions
-compiler.cfg.registers ;
+byte-arrays accessors sets math.order compiler.backend
+compiler.cfg.instructions compiler.cfg.registers ;
 IN: compiler.cfg.stacks
 
 ! Converting stack operations into register operations, while
 ! doing a bit of optimization along the way.
-
-USE: qualified
-FROM: compiler.generator.registers => +input+   ;
-FROM: compiler.generator.registers => +output+  ;
-FROM: compiler.generator.registers => +scratch+ ;
-FROM: compiler.generator.registers => +clobber+ ;
 SYMBOL: known-tag
 
 ! Value protocol
@@ -100,6 +94,14 @@ M: constant move-spec class ;
         swap >>class
     %move ;
 
+! Operands holding pointers to freshly-allocated objects which
+! are guaranteed to be in the nursery
+SYMBOL: fresh-objects
+
+: fresh-object ( vreg/t -- ) fresh-objects get push ;
+
+: fresh-object? ( vreg -- ? ) fresh-objects get memq? ;
+
 : %move ( dst src -- )
     2dup [ move-spec ] bi@ 2array {
         { { f f } [ ##copy ] }
@@ -114,8 +116,8 @@ M: constant move-spec class ;
 
         { { f constant } [ value>> ##load-literal ] }
 
-        { { f float } [ ##box-float ] }
-        { { f unboxed-alien } [ ##box-alien ] }
+        { { f float } [ int-regs next-vreg ##box-float t fresh-object ] }
+        { { f unboxed-alien } [ int-regs next-vreg ##box-alien t fresh-object ] }
         { { f loc } [ ##peek ] }
 
         { { float f } [ ##unbox-float ] }
@@ -223,10 +225,6 @@ M: phantom-retainstack finalize-height
 : live-locs ( -- seq )
     [ (live-locs) ] each-phantom append prune ;
 
-! Operands holding pointers to freshly-allocated objects which
-! are guaranteed to be in the nursery
-SYMBOL: fresh-objects
-
 : reg-spec>class ( spec -- class )
     float eq? double-float-regs int-regs ? ;
 
@@ -255,7 +253,7 @@ SYMBOL: fresh-objects
 
 M: value (lazy-load)
     {
-        { [ dup quotation? ] [ drop ] }
+        { [ dup { small-slot small-tagged } memq? ] [ drop ] }
         { [ 2dup compatible? ] [ drop ] }
         [ (eager-load) ]
     } cond ;
@@ -280,23 +278,11 @@ M: loc lazy-store
         dup loc? over cached? or [ 2drop ] [ %move ] if
     ] each-loc ;
 
-: reset-phantom ( phantom -- )
-    #! Kill register assignments but preserve constants and
-    #! class information.
-    dup phantom-locs*
-    over stack>> [
-        dup constant? [ nip ] [
-            value-class over set-value-class
-        ] if
-    ] 2map
-    over stack>> delete-all
-    swap stack>> push-all ;
-
-: reset-phantoms ( -- )
-    [ reset-phantom ] each-phantom ;
+: clear-phantoms ( -- )
+    [ stack>> delete-all ] each-phantom ;
 
 : finalize-contents ( -- )
-    finalize-locs finalize-vregs reset-phantoms ;
+    finalize-locs finalize-vregs clear-phantoms ;
 
 ! Loading stacks to vregs
 : vreg-substitution ( value vreg -- pair )
@@ -312,26 +298,22 @@ M: loc lazy-store
     [ substitute-vreg? ] assoc-filter >hashtable
     '[ stack>> _ substitute-here ] each-phantom ;
 
-: clear-phantoms ( -- )
-    [ stack>> delete-all ] each-phantom ;
-
 : set-value-classes ( classes -- )
     phantom-datastack get
     over length over add-locs
-    stack>> [ set-value-class ] 2reverse-each ;
+    stack>> [
+        [ value-class class-and ] keep set-value-class
+    ] 2reverse-each ;
 
 : finalize-phantoms ( -- )
     #! Commit all deferred stacking shuffling, and ensure the
     #! in-memory data and retain stacks are up to date with
     #! respect to the compiler's current picture.
     finalize-contents
-    clear-phantoms
     finalize-heights
-    fresh-objects get [ empty? [ ##gc ] unless ] [ delete-all ] bi ;
-
-: fresh-object ( obj -- ) fresh-objects get push ;
-
-: fresh-object? ( obj -- ? ) fresh-objects get memq? ;
+    fresh-objects get [
+        empty? [ 0 ##frame-required ##gc ] unless
+    ] [ delete-all ] bi ;
 
 : init-phantoms ( -- )
     V{ } clone fresh-objects set
@@ -364,3 +346,7 @@ M: loc lazy-store
 
 : phantom-rdrop ( n -- )
     phantom-retainstack get phantom-input drop ;
+
+: phantom-pop ( -- vreg )
+    1 phantom-datastack get phantom-input dup first f (lazy-load)
+    [ 1array substitute-vregs ] keep ;

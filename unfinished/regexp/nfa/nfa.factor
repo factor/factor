@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs grouping kernel regexp2.backend
-locals math namespaces regexp2.parser sequences state-tables fry
+USING: accessors arrays assocs grouping kernel regexp.backend
+locals math namespaces regexp.parser sequences state-tables fry
 quotations math.order math.ranges vectors unicode.categories
-regexp2.utils regexp2.transition-tables words sequences.lib sets ;
-IN: regexp2.nfa
+regexp.utils regexp.transition-tables words sets ;
+IN: regexp.nfa
 
 SYMBOL: negation-mode
 : negated? ( -- ? ) negation-mode get 0 or odd? ; 
@@ -120,6 +120,15 @@ M: character-class-range nfa-node ( node -- )
 
 M: capture-group nfa-node ( node -- )
     term>> nfa-node ;
+
+! xyzzy
+M: non-capture-group nfa-node ( node -- )
+    term>> nfa-node ;
+
+M: reluctant-kleene-star nfa-node ( node -- )
+    term>> <kleene-star> nfa-node ;
+
+!
 
 M: negation nfa-node ( node -- )
     negation-mode inc

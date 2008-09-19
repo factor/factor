@@ -2,27 +2,24 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.accessors arrays generic kernel system
 kernel.private math math.private memory namespaces sequences
-words math.floats.private layouts quotations cpu.x86
-compiler.cfg.templates compiler.cfg.builder compiler.cfg.registers
-compiler.constants compiler.backend compiler.backend.x86 ;
+words math.floats.private layouts quotations locals cpu.x86
+compiler.codegen compiler.cfg.templates compiler.cfg.builder
+compiler.cfg.registers compiler.constants compiler.backend
+compiler.backend.x86 ;
 IN: compiler.backend.x86.sse2
 
-M: x86 %box-float ( dst src -- )
+M:: x86 %box-float ( dst src temp -- )
     #! Only called by pentium4 backend, uses SSE2 instruction
-    #! dest is a loc or a vreg
-    float 16 [
-        8 (object@) swap v>operand MOVSD
-        float %store-tagged
-    ] %allot ;
+    dst 16 float float temp %allot
+    dst 8 float tag-number - [+] src MOVSD ;
 
 M: x86 %unbox-float ( dst src -- )
-    [ v>operand ] bi@ float-offset [+] MOVSD ;
+    float-offset [+] MOVSD ;
 
 : define-float-op ( word op -- )
     [ "x" operand "y" operand ] swap suffix T{ template
         { input { { float "x" } { float "y" } } }
         { output { "x" } }
-        { gc t }
     } define-intrinsic ;
 
 {
@@ -65,7 +62,6 @@ M: x86 %unbox-float ( dst src -- )
     { scratch { { float "out" } } }
     { output { "out" } }
     { clobber { "in" } }
-    { gc t }
 } define-intrinsic
 
 : alien-float-get-template

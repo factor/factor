@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs arrays generic kernel kernel.private
 math memory namespaces make sequences layouts system hashtables
-classes alien byte-arrays combinators words sets classes.algebra
-compiler.cfg.registers compiler.cfg.instructions ;
+classes alien byte-arrays combinators words ;
 IN: compiler.backend
 
 ! Labels
@@ -30,7 +29,7 @@ GENERIC: param-reg ( n register-class -- reg )
 M: object param-reg param-regs nth ;
 
 ! Load a literal (immediate or indirect)
-GENERIC# load-literal 1 ( obj vreg -- )
+GENERIC# load-literal 1 ( obj reg -- )
 
 HOOK: load-indirect cpu ( obj reg -- )
 
@@ -52,10 +51,10 @@ HOOK: %call cpu ( word -- )
 HOOK: %jump-label cpu ( label -- )
 
 ! Test if vreg is 'f' or not
-HOOK: %jump-f cpu ( label vreg -- )
+HOOK: %jump-f cpu ( label reg -- )
 
 ! Test if vreg is 't' or not
-HOOK: %jump-t cpu ( label vreg -- )
+HOOK: %jump-t cpu ( label reg -- )
 
 HOOK: %dispatch cpu ( -- )
 
@@ -71,10 +70,10 @@ HOOK: %inc-d cpu ( n -- )
 HOOK: %inc-r cpu ( n -- )
 
 ! Load stack into vreg
-HOOK: %peek cpu ( vreg loc -- )
+HOOK: %peek cpu ( reg loc -- )
 
 ! Store vreg to stack
-HOOK: %replace cpu ( vreg loc -- )
+HOOK: %replace cpu ( reg loc -- )
 
 ! Copy values between vregs
 HOOK: %copy cpu ( dst src -- )
@@ -148,21 +147,11 @@ M: stack-params param-reg drop ;
 
 M: stack-params param-regs drop f ;
 
-GENERIC: v>operand ( obj -- operand )
-
-SYMBOL: registers
-
-M: constant v>operand
-    value>> [ tag-fixnum ] [ \ f tag-number ] if* ;
-
-M: value v>operand
-    >vreg [ registers get at ] [ "Bad value" throw ] if* ;
-
-M: object load-literal v>operand load-indirect ;
+M: object load-literal load-indirect ;
 
 PREDICATE: small-slot < integer cells small-enough? ;
 
-PREDICATE: small-tagged < integer v>operand small-enough? ;
+PREDICATE: small-tagged < integer tag-fixnum small-enough? ;
 
 : if-small-struct ( n size true false -- ? )
     [ over not over struct-small-enough? and ] 2dip
@@ -194,30 +183,10 @@ HOOK: %unbox-any-c-ptr cpu ( dst src -- )
 
 HOOK: %box-alien cpu ( dst src -- )
 
+! Allocation
+HOOK: %allot cpu ( dst size type tag temp -- )
+
+HOOK: %write-barrier cpu ( src temp -- )
+
 ! GC check
 HOOK: %gc cpu ( -- )
-
-SYMBOL: operands
-
-: init-intrinsic ( insn -- )
-    [ defs-vregs>> ] [ uses-vregs>> ] bi append operands set ;
-
-: (operand) ( name -- operand )
-    operands get at* [ "Bad operand name" throw ] unless ;
-
-: operand ( name -- operand )
-    (operand) v>operand ;
-
-: operand-class ( var -- class )
-    (operand) value-class ;
-
-: operand-tag ( operand -- tag/f )
-    operand-class dup [ class-tag ] when ;
-
-UNION: immediate fixnum POSTPONE: f ;
-
-: operand-immediate? ( operand -- ? )
-    operand-class immediate class<= ;
-
-: unique-operands ( operands quot -- )
-    >r [ operand ] map prune r> each ; inline

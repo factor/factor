@@ -9,27 +9,12 @@ compiler.cfg.instructions.syntax ;
 IN: compiler.cfg.linearization
 
 ! Convert CFG IR to machine IR.
-SYMBOL: frame-size
-
-: compute-frame-size ( rpo -- )
-    [ instructions>> [ ##frame-required? ] filter ] map concat
-    [ f ] [ [ n>> ] map supremum ] if-empty
-    frame-size set ;
-
 GENERIC: linearize-insn ( basic-block insn -- )
 
 : linearize-insns ( basic-block -- )
     dup instructions>> [ linearize-insn ] with each ; inline
 
 M: insn linearize-insn , drop ;
-
-M: ##frame-required linearize-insn 2drop ;
-
-M: ##prologue linearize-insn
-    2drop frame-size get [ _prologue ] when* ;
-
-M: ##epilogue linearize-insn
-    2drop frame-size get [ _epilogue ] when* ;
 
 : useless-branch? ( basic-block successor -- ? )
     #! If our successor immediately follows us in RPO, then we
@@ -78,9 +63,6 @@ M: ##if-intrinsic linearize-insn
     [ [ linearize-basic-block ] each ] { } make ;
 
 : build-mr ( cfg -- mr )
-    [
-        entry>> reverse-post-order [
-            [ compute-frame-size ]
-            [ linearize-basic-blocks ] bi
-        ] with-scope
-    ] [ word>> ] [ label>> ] tri <mr> ;
+    [ entry>> reverse-post-order linearize-basic-blocks ]
+    [ word>> ] [ label>> ]
+    tri <mr> ;

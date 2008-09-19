@@ -28,6 +28,7 @@ SYMBOL: live-intervals
     at [ (>>end) ] [ uses>> push ] 2bi ;
 
 : new-live-interval ( n vreg live-intervals -- )
+    2dup key? [ "Multiple defs" throw ] when
     [ [ <live-interval> ] keep ] dip set-at ;
 
 : compute-live-intervals* ( insn n -- )
@@ -42,7 +43,6 @@ SYMBOL: live-intervals
 
 : compute-live-intervals ( instructions -- live-intervals )
     H{ } clone [
-        live-intervals [
-            [ compute-live-intervals* ] each-index
-        ] with-variable
+        live-intervals set
+        [ compute-live-intervals* ] each-index
     ] keep finalize-live-intervals ;

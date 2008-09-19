@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors sequences kernel fry namespaces
-quotations combinators classes.algebra compiler.cfg.instructions
-compiler.cfg.registers compiler.cfg.stacks ;
+quotations combinators classes.algebra compiler.backend
+compiler.cfg.instructions compiler.cfg.registers compiler.cfg.stacks ;
 IN: compiler.cfg.templates
 
 TUPLE: template input output scratch clobber gc ;
@@ -57,7 +57,9 @@ TUPLE: template input output scratch clobber gc ;
 
 : apply-template ( pair quot -- vregs )
     [
-        first2 dup do-template-inputs
+        first2
+        dup gc>> [ t fresh-object ] when
+        dup do-template-inputs
         [ do-template-outputs ] 2keep
     ] dip call ; inline
 
@@ -67,12 +69,11 @@ TUPLE: template input output scratch clobber gc ;
     #! to the fixnum. Otherwise, the values don't match. If the
     #! spec is not a quotation, its a reg-class, in which case
     #! the value is always good.
-    dup quotation? [
-        over constant?
-        [ >r value>> r> 2drop f ] [ 2drop f ] if
-    ] [
-        2drop t
-    ] if ;
+    {
+        { [ dup small-slot eq? ] [ drop dup constant? [ value>> small-slot? ] [ drop f ] if ] }
+        { [ dup small-tagged eq? ] [ drop dup constant? [ value>> small-tagged? ] [ drop f ] if ] }
+        [ 2drop t ]
+    } cond ;
 
 : class-matches? ( actual expected -- ? )
     {

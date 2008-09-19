@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel strings help.markup help.syntax regexp2.backend ;
-IN: regexp2
+USING: kernel strings help.markup help.syntax regexp.backend ;
+IN: regexp
 
 HELP: <regexp>
 { $values { "string" string } { "regexp" regexp } }

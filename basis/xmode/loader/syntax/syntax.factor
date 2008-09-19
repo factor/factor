@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors xmode.tokens xmode.rules xmode.keyword-map
 xml.data xml.utilities xml assocs kernel combinators sequences
-math.parser namespaces make parser lexer xmode.utilities regexp
-io.files ;
+math.parser namespaces make parser lexer xmode.utilities
+parser-combinators.regexp io.files ;
 IN: xmode.loader.syntax
 
 SYMBOL: ignore-case?

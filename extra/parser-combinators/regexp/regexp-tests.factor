@@ -1,5 +1,5 @@
-USING: regexp tools.test kernel ;
-IN: regexp-tests
+USING: parser-combinators.regexp tools.test kernel ;
+IN: parser-combinators.regexp.tests
 
 [ f ] [ "b" "a*" f <regexp> matches? ] unit-test
 [ t ] [ "" "a*" f <regexp> matches? ] unit-test

@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs fry hashtables kernel sequences
-vectors regexp2.utils ;
-IN: regexp2.transition-tables
+vectors regexp.utils ;
+IN: regexp.transition-tables
 
 TUPLE: transition from to obj ;
 TUPLE: literal-transition < transition ;

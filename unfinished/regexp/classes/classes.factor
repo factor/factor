@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math math.order symbols regexp2.parser
-words regexp2.utils unicode.categories combinators.short-circuit ;
-IN: regexp2.classes
+USING: accessors kernel math math.order symbols regexp.parser
+words regexp.utils unicode.categories combinators.short-circuit ;
+IN: regexp.classes
 
 GENERIC: class-member? ( obj class -- ? )
 
