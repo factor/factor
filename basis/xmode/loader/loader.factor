@@ -1,7 +1,7 @@
 USING: xmode.loader.syntax xmode.tokens xmode.rules
 xmode.keyword-map xml.data xml.utilities xml assocs kernel
 combinators sequences math.parser namespaces parser
-xmode.utilities regexp io.files accessors ;
+xmode.utilities parser-combinators.regexp io.files accessors ;
 IN: xmode.loader
 
 ! Based on org.gjt.sp.jedit.XModeHandler

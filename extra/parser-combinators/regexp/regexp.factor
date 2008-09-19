@@ -3,7 +3,7 @@ namespaces parser lexer parser-combinators parser-combinators.simple
 promises quotations sequences combinators.lib strings math.order
 assocs prettyprint.backend memoize unicode.case unicode.categories
 combinators.short-circuit accessors make io ;
-IN: regexp
+IN: parser-combinators.regexp
 
 <PRIVATE
 

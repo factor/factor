@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators io io.streams.string
 kernel math math.parser multi-methods namespaces qualified sets
-quotations sequences sequences.lib splitting symbols vectors
-dlists math.order combinators.lib unicode.categories strings
-sequences.lib regexp2.backend regexp2.utils unicode.case ;
-IN: regexp2.parser
+quotations sequences splitting symbols vectors math.order
+unicode.categories strings regexp.backend regexp.utils
+unicode.case ;
+IN: regexp.parser
 
 FROM: math.ranges => [a,b] ;
 
@@ -280,11 +280,26 @@ ERROR: bad-escaped-literals seq ;
         first|concatenation
     ] if-empty ;
 
+ERROR: unrecognized-escape char ;
+
 : parse-escaped ( -- obj )
     read1
     {
         { CHAR: \ [ CHAR: \ <constant> ] }
+        { CHAR: - [ CHAR: - <constant> ] }
+        { CHAR: { [ CHAR: { <constant> ] }
+        { CHAR: } [ CHAR: } <constant> ] }
+        { CHAR: [ [ CHAR: [ <constant> ] }
+        { CHAR: ] [ CHAR: ] <constant> ] }
+        { CHAR: ( [ CHAR: ( <constant> ] }
+        { CHAR: ) [ CHAR: ) <constant> ] }
+        { CHAR: @ [ CHAR: @ <constant> ] }
+        { CHAR: * [ CHAR: * <constant> ] }
+        { CHAR: + [ CHAR: + <constant> ] }
+        { CHAR: ? [ CHAR: ? <constant> ] }
         { CHAR: . [ CHAR: . <constant> ] }
+! xyzzy
+        { CHAR: : [ CHAR: : <constant> ] }
         { CHAR: t [ CHAR: \t <constant> ] }
         { CHAR: n [ CHAR: \n <constant> ] }
         { CHAR: r [ CHAR: \r <constant> ] }
@@ -314,8 +329,19 @@ ERROR: bad-escaped-literals seq ;
         ! { CHAR: G [ end of previous match ] }
         ! { CHAR: Z [ handle-end-of-input ] }
         ! { CHAR: z [ handle-end-of-input ] } ! except for terminator
+! xyzzy
+        { CHAR: 1 [ CHAR: 1 <constant> ] }
+        { CHAR: 2 [ CHAR: 2 <constant> ] }
+        { CHAR: 3 [ CHAR: 3 <constant> ] }
+        { CHAR: 4 [ CHAR: 4 <constant> ] }
+        { CHAR: 5 [ CHAR: 5 <constant> ] }
+        { CHAR: 6 [ CHAR: 6 <constant> ] }
+        { CHAR: 7 [ CHAR: 7 <constant> ] }
+        { CHAR: 8 [ CHAR: 8 <constant> ] }
+        { CHAR: 9 [ CHAR: 9 <constant> ] }
 
         { CHAR: Q [ parse-escaped-literals ] }
+        [ unrecognized-escape ]
     } case ;
 
 : handle-escape ( -- ) parse-escaped push-stack ;

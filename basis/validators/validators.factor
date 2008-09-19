@@ -1,8 +1,9 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel continuations sequences math namespaces make sets
-math.parser math.ranges assocs regexp unicode.categories arrays
-hashtables words classes quotations xmode.catalog ;
+math.parser math.ranges assocs parser-combinators.regexp
+unicode.categories arrays hashtables words classes quotations
+xmode.catalog ;
 IN: validators
 
 : v-default ( str def -- str )

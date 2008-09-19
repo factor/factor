@@ -1,15 +1,14 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators fry kernel locals
-math math.order regexp2.nfa regexp2.transition-tables sequences
-sets sorting vectors regexp2.utils sequences.lib combinators.lib
-sequences.deep ;
+math math.order regexp.nfa regexp.transition-tables sequences
+sets sorting vectors regexp.utils sequences.deep ;
 USING: io prettyprint threads ;
-IN: regexp2.dfa
+IN: regexp.dfa
 
 : find-delta ( states transition regexp -- new-states )
     nfa-table>> transitions>>
-    rot [ swap at at ] with with map sift concat prune ;
+    rot [ swap at at ] with with gather sift ;
 
 : (find-epsilon-closure) ( states regexp -- new-states )
     eps swap find-delta ;
@@ -26,7 +25,9 @@ IN: regexp2.dfa
 
 : find-transitions ( seq1 regexp -- seq2 )
     nfa-table>> transitions>>
-    [ at keys ] curry map concat eps swap remove ;
+    [ at keys ] curry map concat
+    eps swap remove ;
+    ! dup t member? [ t swap remove t suffix ] when ;
 
 : add-todo-state ( state regexp -- )
     2dup visited-states>> key? [

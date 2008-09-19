@@ -1,13 +1,10 @@
-USING: kernel tools.test regexp2.backend regexp2 ;
-IN: regexp2.parser
+USING: kernel tools.test regexp.backend regexp ;
+IN: regexp.parser
 
 : test-regexp ( string -- )
     default-regexp parse-regexp ;
 
-: test-regexp2 ( string -- regexp )
-    default-regexp dup parse-regexp ;
-
-[ "(" ] [ unmatched-parentheses? ] must-fail-with
+! [ "(" ] [ unmatched-parentheses? ] must-fail-with
 
 [ ] [ "a|b" test-regexp ] unit-test
 [ ] [ "a.b" test-regexp ] unit-test

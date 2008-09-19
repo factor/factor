@@ -1,9 +1,10 @@
 ! Copyright (C) 2004, 2008 Slava Pestov, Daniel Ehrenberg.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: io.backend io.files.private io hashtables kernel math
-memory namespaces sequences strings assocs arrays definitions
-system combinators splitting sbufs continuations destructors
-io.encodings io.encodings.binary init accessors math.order ;
+USING: io.backend io.files.private io hashtables kernel
+kernel.private math memory namespaces sequences strings assocs
+arrays definitions system combinators splitting sbufs
+continuations destructors io.encodings io.encodings.binary init
+accessors math.order ;
 IN: io.files
 
 HOOK: (file-reader) io-backend ( path -- stream )
@@ -194,7 +195,9 @@ SYMBOL: current-directory
 
 [
     cwd current-directory set-global
-    image parent-directory cwd prepend-path "resource-path" set
+    13 getenv cwd prepend-path \ image set-global
+    14 getenv cwd prepend-path \ vm set-global
+    image parent-directory "resource-path" set-global
 ] "io.files" add-init-hook
 
 : resource-path ( path -- newpath )

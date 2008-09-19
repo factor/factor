@@ -1,11 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors combinators kernel math math.ranges
-sequences regexp2.backend regexp2.utils memoize sets
-regexp2.parser regexp2.nfa regexp2.dfa regexp2.traversal
-regexp2.transition-tables assocs prettyprint.backend
-make ;
-IN: regexp2
+sequences regexp.backend regexp.utils memoize sets
+regexp.parser regexp.nfa regexp.dfa regexp.traversal
+regexp.transition-tables assocs prettyprint.backend
+make lexer namespaces parser ;
+IN: regexp
 
 : default-regexp ( string -- regexp )
     regexp new
@@ -51,17 +51,26 @@ IN: regexp2
     reversed-regexp initial-option
     construct-regexp ;
 
-: R! CHAR: ! <regexp> ; parsing
-: R" CHAR: " <regexp> ; parsing
-: R# CHAR: # <regexp> ; parsing
-: R' CHAR: ' <regexp> ; parsing
-: R( CHAR: ) <regexp> ; parsing
-: R/ CHAR: / <regexp> ; parsing
-: R@ CHAR: @ <regexp> ; parsing
-: R[ CHAR: ] <regexp> ; parsing
-: R` CHAR: ` <regexp> ; parsing
-: R{ CHAR: } <regexp> ; parsing
-: R| CHAR: | <regexp> ; parsing
+
+: parsing-regexp ( accum end -- accum )
+    lexer get dup skip-blank
+    [ [ index-from dup 1+ swap ] 2keep swapd subseq swap ] change-lexer-column
+    lexer get dup still-parsing-line?
+    [ (parse-token) ] [ drop f ] if
+    "i" = [ <iregexp> ] [ <regexp> ] if parsed ;
+
+: R! CHAR: ! parsing-regexp ; parsing
+: R" CHAR: " parsing-regexp ; parsing
+: R# CHAR: # parsing-regexp ; parsing
+: R' CHAR: ' parsing-regexp ; parsing
+: R( CHAR: ) parsing-regexp ; parsing
+: R/ CHAR: / parsing-regexp ; parsing
+: R@ CHAR: @ parsing-regexp ; parsing
+: R[ CHAR: ] parsing-regexp ; parsing
+: R` CHAR: ` parsing-regexp ; parsing
+: R{ CHAR: } parsing-regexp ; parsing
+: R| CHAR: | parsing-regexp ; parsing
+
 
 : find-regexp-syntax ( string -- prefix suffix )
     {
@@ -81,6 +90,8 @@ IN: regexp2
 : option? ( option regexp -- ? )
     options>> key? ;
 
+USE: multiline
+/*
 M: regexp pprint*
     [
         [
@@ -89,3 +100,4 @@ M: regexp pprint*
             case-insensitive swap option? [ "i" % ] when
         ] "" make
     ] keep present-text ;
+*/

@@ -1,30 +1,50 @@
-USING: cocoa cocoa.messages cocoa.application cocoa.nibs
-assocs namespaces kernel words compiler.units sequences
-ui ui.cocoa ;
+! Copyright (C) 2007, 2008 Slava Pestov
+! See http://factorcode.org/license.txt for BSD license.
+USING: cocoa cocoa.messages cocoa.application cocoa.nibs assocs
+namespaces kernel kernel.private words compiler.units sequences
+ui ui.cocoa init ;
+IN: tools.deploy.shaker.cocoa
+
+: pool ( obj -- obj' ) \ pool get [ ] cache ;
+
+: pool-array ( obj -- obj' ) [ pool ] map pool ;
+
+: pool-keys ( assoc -- assoc' ) [ [ pool-array ] dip ] assoc-map ;
+
+: pool-values ( assoc -- assoc' ) [ pool-array ] assoc-map ;
+
+IN: cocoa.application
+
+: objc-error ( error -- ) die ;
+
+[ [ die ] 19 setenv ] "cocoa.application" add-init-hook
 
 "stop-after-last-window?" get
-global [
-    stop-after-last-window? set
 
-    [ "MiniFactor.nib" load-nib ] cocoa-init-hook set-global
+H{ } clone \ pool [
+    global [
+        stop-after-last-window? set
 
-    ! Only keeps those methods that we actually call
-    sent-messages get super-sent-messages get assoc-union
-    objc-methods [ assoc-intersect ] change
+        [ "MiniFactor.nib" load-nib ] cocoa-init-hook set-global
 
-    sent-messages get
-    super-sent-messages get
-    [ keys [ objc-methods get at dup ] H{ } map>assoc ] bi@
-    super-message-senders [ assoc-intersect ] change
-    message-senders [ assoc-intersect ] change
+        ! Only keeps those methods that we actually call
+        sent-messages get super-sent-messages get assoc-union
+        objc-methods [ assoc-intersect pool-values ] change
 
-    sent-messages off
-    super-sent-messages off
+        sent-messages get
+        super-sent-messages get
+        [ keys [ objc-methods get at dup ] H{ } map>assoc ] bi@
+        super-message-senders [ assoc-intersect pool-keys ] change
+        message-senders [ assoc-intersect pool-keys ] change
 
-    alien>objc-types off
-    objc>alien-types off
+        sent-messages off
+        super-sent-messages off
 
-    ! We need this for strip-stack-traces to work fully
-    { message-senders super-message-senders }
-    [ get values compile ] each
-] bind
+        alien>objc-types off
+        objc>alien-types off
+
+        ! We need this for strip-stack-traces to work fully
+        { message-senders super-message-senders }
+        [ get values compile ] each
+    ] bind
+] with-variable
