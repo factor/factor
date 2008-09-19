@@ -147,7 +147,7 @@ SYMBOLS: +read-only+ +hidden+ +system+
     FILE_ATTRIBUTE_DIRECTORY mask? +directory+ +regular-file+ ? ;
 
 : WIN32_FIND_DATA>file-info ( WIN32_FIND_DATA -- file-info )
-    [ file-info new ] dip
+    [ \ file-info new ] dip
     {
         [ WIN32_FIND_DATA-dwFileAttributes win32-file-type >>type ]
         [
@@ -168,7 +168,7 @@ SYMBOLS: +read-only+ +hidden+ +system+
     ] keep ;
 
 : BY_HANDLE_FILE_INFORMATION>file-info ( HANDLE_FILE_INFORMATION -- file-info )
-    [ file-info new ] dip
+    [ \ file-info new ] dip
     {
         [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes win32-file-type >>type ]
         [
