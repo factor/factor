@@ -1,9 +1,10 @@
 ! Copyright (C) 2008 Bruno Deferrari
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel fry splitting ascii calendar accessors combinators qualified
-       arrays classes.tuple math.order inverse ;
+       arrays classes.tuple math.order ;
 RENAME: join sequences => sjoin
 EXCLUDE: sequences => join ;
+EXCLUDE: inverse => _ ;
 IN: irc.messages
 
 TUPLE: irc-message line prefix command parameters trailing timestamp ;
@@ -69,8 +70,8 @@ M: kick    (>>command-parameters) ( params kick -- )
 M: names-reply (>>command-parameters) ( params names-reply -- )
     [ [ first ] dip (>>who) ] [ [ third ] dip (>>channel) ] 2bi ;
 M: mode    (>>command-parameters) ( params mode -- )
-    { { [ [ 2array ] dip ] [ [ (>>mode) ] [ (>>name) ] bi ] }
-      { [ [ 3array ] dip ] [ [ (>>parameter) ] [ (>>mode) ] [ (>>name) ] tri ] }
+    { { [ >r 2array r> ] [ [ (>>mode) ] [ (>>name) ] bi ] }
+      { [ >r 3array r> ] [ [ (>>parameter) ] [ (>>mode) ] [ (>>name) ] tri ] }
     } switch ;
 
 PRIVATE>
@@ -94,10 +95,7 @@ M: irc-message irc-message>server-line ( irc-message -- string )
 ! ======================================
 
 : split-at-first ( seq separators -- before after )
-    dupd '[ _ member? ] find
-        [ cut 1 tail ]
-        [ swap ]
-    if ;
+    dupd '[ _ member? ] find [ cut 1 tail ] [ swap ] if ;
 
 : remove-heading-: ( seq -- seq ) dup ":" head? [ 1 tail ] when ;
 
