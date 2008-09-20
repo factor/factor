@@ -27,7 +27,6 @@ IN: regexp.dfa
     nfa-table>> transitions>>
     [ at keys ] curry map concat
     eps swap remove ;
-    ! dup t member? [ t swap remove t suffix ] when ;
 
 : add-todo-state ( state regexp -- )
     2dup visited-states>> key? [

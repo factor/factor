@@ -14,7 +14,8 @@ html.elements
 html.components
 html.components
 html.templates.chloe
-html.templates.chloe.syntax ;
+html.templates.chloe.syntax
+html.templates.chloe.compiler ;
 IN: furnace.actions
 
 SYMBOL: params
@@ -29,7 +30,8 @@ SYMBOL: rest
         </ul>
     ] unless-empty ;
 
-CHLOE: validation-messages drop render-validation-messages ;
+CHLOE: validation-messages
+    drop [ render-validation-messages ] [code] ;
 
 TUPLE: action rest authorize init display validate submit ;
 

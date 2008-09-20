@@ -48,8 +48,6 @@ IN: html.elements
 !
 ! <input "text" =type "name" =name "20" =size input/>
 
-: elements-vocab ( -- vocab-name ) "html.elements" ;
-
 SYMBOL: html
 
 : write-html ( str -- )
@@ -59,6 +57,8 @@ SYMBOL: html
     write-html "\n" write-html ;
 
 <<
+
+: elements-vocab ( -- vocab-name ) "html.elements" ;
 
 : html-word ( name def effect -- )
     #! Define 'word creating' word to allow
