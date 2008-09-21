@@ -56,7 +56,7 @@ ARTICLE: "printf" "Formatted printing"
     { "%+PX"   "Hexadecimal uppercase" "hex" }
 }
 "\n"
-"A plus sign ('+') is used to optionally specify that the number should be formatted with a '+' preceeding it if positive."
+"A plus sign ('+') is used to optionally specify that the number should be formatted with a '+' preceeding it if positive.\n"
 "\n"
 "Padding ('P') is used to optionally specify the minimum width of the result string, the padding character, and the alignment.  By default, the padding character defaults to a space and the alignment defaults to right-aligned. For example:\n"
 { $list
