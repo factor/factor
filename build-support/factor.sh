@@ -216,9 +216,8 @@ intel_macosx_word_size() {
     $ECHO -n "Testing if your Intel Mac supports 64bit binaries..."
     sysctl machdep.cpu.extfeatures | grep EM64T >/dev/null
     if [[ $? -eq 0 ]] ; then
-        WORD=32
+        WORD=64
         $ECHO "yes!"
-        $ECHO "Defaulting to 32bit for now though..."
     else
         WORD=32
         $ECHO "no."

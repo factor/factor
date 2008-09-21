@@ -69,7 +69,6 @@ SYMBOL: key-file
 SYMBOL: dh-file
 
 : common-configuration ( -- )
-    reset-templates
     "concatenative.org" 25 <inet> smtp-server set-global
     "noreply@concatenative.org" lost-password-from set-global
     "website@concatenative.org" insomniac-sender set-global
