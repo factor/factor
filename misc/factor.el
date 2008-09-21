@@ -228,8 +228,16 @@
 (define-key factor-mode-map [tab]      'indent-for-tab-command)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; factor-indent-line
+;; indentation
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defconst factor-word-starting-keywords
+  '("" ":" "TUPLE" "MACRO" "MACRO:" "M"))
+
+(defmacro factor-word-start-re (keywords)
+  `(format
+    "^\\(%s\\): "
+    (mapconcat 'identity ,keywords "\\|")))
 
 (defun factor-calculate-indentation ()
   "Calculate Factor indentation for line at point."
@@ -242,27 +250,28 @@
         (save-excursion
           (while not-indented
             ;; Check that we are inside open brackets
-            (if (> (factor-brackets-depth) 0)
-                (progn
-                  (let ((cur-depth (factor-brackets-depth)))
-                    (forward-line -1)
-                    (setq cur-indent (+ (current-indentation)
-                                        (* default-tab-width
-                                           (- cur-depth (factor-brackets-depth)))))
-                    (setq not-indented nil)))
-              (forward-line -1)
+            (save-excursion
+              (let ((cur-depth (factor-brackets-depth)))
+                (forward-line -1)
+                (setq cur-indent (+ (current-indentation)
+                                    (* default-tab-width
+                                       (- cur-depth (factor-brackets-depth)))))
+                (setq not-indented nil)))
+            (forward-line -1)
               ;; Check that we are after the end of previous word
               (if (looking-at ".*;[ \t]*$")
                   (progn
                     (setq cur-indent (- (current-indentation) default-tab-width))
                     (setq not-indented nil))
                 ;; Check that we are after the start of word
-                (if (looking-at "^\\(\\|:\\): ")
+                (if (looking-at (factor-word-start-re factor-word-starting-keywords))
+;                (if (looking-at "^[A-Z:]*: ")
                     (progn
+                      (message "inword")
                       (setq cur-indent (+ (current-indentation) default-tab-width))
                       (setq not-indented nil))
                   (if (bobp)
-                      (setq not-indented nil)))))))))
+                      (setq not-indented nil))))))))
     cur-indent))
 
 (defun factor-brackets-depth ()
