@@ -5,6 +5,8 @@ USING: kernel printf tools.test ;
 
 [ "%s" printf ] must-infer 
 
+[ "%s" sprintf ] must-infer
+
 [ t ] [ "10" 10 "%d" sprintf = ] unit-test
 
 [ t ] [ "+10" 10 "%+d" sprintf = ] unit-test

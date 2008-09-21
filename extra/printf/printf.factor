@@ -98,7 +98,7 @@ PRIVATE>
 MACRO: printf ( format-string -- )
     parse-format-string [ length ] keep compose-all '[ _ <vector> @ reverse [ write ] each ] ;
 
-: sprintf ( format-string -- )
-    [ printf ] with-string-writer ;
+: sprintf ( format-string -- result )
+    [ printf ] with-string-writer ; inline
 
 

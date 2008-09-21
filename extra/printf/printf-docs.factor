@@ -6,7 +6,7 @@ IN: printf
 HELP: printf
 { $values { "format-string" string } }
 { $description 
-    "Writes the arguments formatted according to the format string.\n" 
+    "Writes the arguments (specified on the stack) formatted according to the format string.\n" 
     { $table
         { "%%"    "Single %" "" }
         { "%P.Ds" "String format" "string" }
@@ -45,7 +45,7 @@ HELP: printf
         "00123" }
     { $example
         "USING: printf ;"
-        "HEX: ff \"04X\" printf"
+        "HEX: ff \"%04X\" printf"
         "00FF" }
     { $example
         "USING: printf ;"
@@ -66,7 +66,7 @@ HELP: printf
 } ;
 
 HELP: sprintf
-{ $values { "params" sequence } { "format-string" string } { "result" string } }
-{ $description "Returns the arguments formatted according to the format string as a result string." } 
+{ $values { "format-string" string } { "result" string } }
+{ $description "Returns the arguments (specified on the stack) formatted according to the format string as a result string." } 
 { $see-also printf } ;
 
