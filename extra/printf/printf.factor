@@ -31,11 +31,10 @@ IN: printf
     [ "." split1 ] dip [ CHAR: 0 pad-right ] [ head-slice ] bi "." swap 3append ;
 
 : max-width ( string length -- string ) 
-    [ dup length ] dip [ > ] keep swap [ head-slice >string ] [ drop ] if ;
+    short head ;
 
 : >exponential ( n -- base exp ) 
-    [ 0 < ] keep abs
-    0 
+    [ 0 < ] keep abs 0 
     [ swap dup [ 10.0 >= ] keep 1.0 < or ] 
     [ dup 10.0 >= 
       [ 10.0 / [ 1+ ] dip swap ] 
@@ -43,7 +42,7 @@ IN: printf
     ] [ swap ] while 
     [ number>string ] dip 
     dup abs number>string 2 CHAR: 0 pad-left
-    [ 0 < [ "-" ] [ "+" ] if ] dip append
+    [ 0 < "-" "+" ? ] dip append
     "e" prepend 
     rot [ [ "-" prepend ] dip ] when ; 
 
@@ -53,11 +52,11 @@ zero      = "0"                  => [[ CHAR: 0 ]]
 char      = "'" (.)              => [[ second ]]
 
 pad-char  = (zero|char)?         => [[ CHAR: \s or 1quotation ]]
-pad-align = ("-")?               => [[ [ [ pad-right ] ] [ [ pad-left ] ] if ]] 
+pad-align = ("-")?               => [[ [ pad-right ] [ pad-left ] ? ]] 
 pad-width = ([0-9])*             => [[ >digits 1quotation ]]
 pad       = pad-align pad-char pad-width => [[ reverse compose-all [ first ] keep swap 0 = [ drop [ ] ] when ]]
 
-sign      = ("+")?               => [[ [ [ dup CHAR: - swap index not [ "+" prepend ] when ] ] [ [ ] ] if ]]
+sign      = ("+")?               => [[ [ dup CHAR: - swap index not [ "+" prepend ] when ] [ ] ? ]]
 
 width_    = "." ([0-9])*         => [[ second >digits '[ _ max-width ] ]]
 width     = (width_)?            => [[ [ ] or ]] 
