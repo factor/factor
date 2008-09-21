@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences combinators kernel fry
-namespaces make classes.tuple assocs splitting words arrays
-memoize io io.files io.encodings.utf8 io.streams.string
-unicode.case mirrors math urls present multiline quotations xml
+namespaces make classes.tuple assocs splitting words arrays io
+io.files io.encodings.utf8 io.streams.string unicode.case
+mirrors math urls present multiline quotations xml logging
 xml.data
 html.forms
 html.elements
@@ -89,21 +89,40 @@ CHLOE-TUPLE: choice
 CHLOE-TUPLE: checkbox
 CHLOE-TUPLE: code
 
-: read-template ( chloe -- xml )
-    path>> ".xml" append utf8 <file-reader> read-xml ;
+SYMBOL: template-cache
 
-MEMO: template-quot ( chloe -- quot )
-    read-template compile-template ;
+H{ } template-cache set-global
 
-MEMO: nested-template-quot ( chloe -- quot )
-    read-template compile-nested-template ;
+TUPLE: cached-template path last-modified quot ;
 
-: reset-templates ( -- )
-    { template-quot nested-template-quot } [ reset-memoized ] each ;
+: load-template ( chloe -- cached-template )
+    path>> ".xml" append
+    [ ]
+    [ file-info modified>> ]
+    [ utf8 <file-reader> read-xml compile-template ] tri
+    \ cached-template boa ;
+
+\ load-template DEBUG add-input-logging
+
+: cached-template ( chloe -- cached-template/f )
+    template-cache get at* [
+        [
+            [ path>> file-info modified>> ]
+            [ last-modified>> ]
+            bi =
+        ] keep and
+    ] when ;
+
+: template-quot ( chloe -- quot )
+    dup cached-template [ ] [
+        [ load-template dup ] keep
+        template-cache get set-at
+    ] ?if quot>> ;
+
+: reset-cache ( -- )
+    template-cache get clear-assoc ;
 
 M: chloe call-template*
-    nested-template? get
-    [ nested-template-quot ] [ template-quot ] if
-    assert-depth ;
+    template-quot assert-depth ;
 
 INSTANCE: chloe template

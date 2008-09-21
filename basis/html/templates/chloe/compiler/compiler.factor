@@ -3,7 +3,7 @@
 USING: assocs namespaces make kernel sequences accessors
 combinators strings splitting io io.streams.string present
 xml.writer xml.data xml.entities html.forms
-html.templates.chloe.syntax ;
+html.templates html.templates.chloe.syntax ;
 IN: html.templates.chloe.compiler
 
 : chloe-attrs-only ( assoc -- assoc' )
@@ -98,9 +98,6 @@ DEFER: compile-element
         reset-buffer
     ] [ ] make ; inline
 
-: compile-nested-template ( xml -- quot )
-    [ compile-element ] with-compiler ;
-
 : compile-chunk ( seq -- )
     [ compile-element ] each ;
 
@@ -121,12 +118,25 @@ DEFER: compile-element
 : compile-with-scope ( quot -- )
     compile-quot [ with-scope ] [code] ; inline
 
+: if-not-nested ( quot -- )
+    nested-template? get swap unless ; inline
+
+: compile-prologue ( xml -- )
+    [
+        [ before>> compile-chunk ]
+        [ prolog>> [ write-prolog ] [code-with] ]
+        bi
+    ] compile-quot
+    [ if-not-nested ] [code] ;
+
+: compile-epilogue ( xml -- )
+    [ after>> compile-chunk ] compile-quot
+    [ if-not-nested ] [code] ;
+
 : compile-template ( xml -- quot )
     [
-        {
-            [ prolog>> [ write-prolog ] [code-with] ]
-            [ before>> compile-chunk ]
-            [ compile-element ]
-            [ after>> compile-chunk ]
-        } cleave
+        [ compile-prologue ]
+        [ compile-element ]
+        [ compile-epilogue ]
+        tri
     ] with-compiler ;

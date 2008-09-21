@@ -4,8 +4,6 @@ namespaces xml html.components html.forms
 splitting unicode.categories furnace accessors ;
 IN: html.templates.chloe.tests
 
-reset-templates
-
 : run-template
     with-string-writer [ "\r\n\t" member? not ] filter
     "?>" split1 nip ; inline
