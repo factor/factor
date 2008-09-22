@@ -132,14 +132,9 @@ ERROR: bad-option ch ;
 : parse-options ( string -- )
     "-" split1 [ t (parse-options) ] [ f (parse-options) ] bi* ;
 
-DEFER: (parse-regexp)
-: parse-special-group ( -- )
-    ;
-    ! beginning-of-group push-stack
-    ! (parse-regexp) pop-stack make-non-capturing-group ;
-
 ERROR: bad-special-group string ;
 
+DEFER: (parse-regexp)
 : nested-parse-regexp ( token ? -- )
     [ push-stack (parse-regexp) pop-stack ] dip
     [ <negation> ] when pop-stack boa push-stack ;
@@ -165,7 +160,7 @@ ERROR: bad-special-group string ;
             ":)" read-until
             [ swap prefix ] dip
             {
-                { CHAR: : [ parse-options (parse-special-group) ] }
+                { CHAR: : [ parse-options non-capture-group f nested-parse-regexp ] }
                 { CHAR: ) [ parse-options ] }
                 [ drop bad-special-group ]
             } case
