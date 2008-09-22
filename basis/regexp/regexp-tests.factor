@@ -251,8 +251,8 @@ IN: regexp-tests
 ! [ t ] [ "fxxbar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
 ! [ f ] [ "foobar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
 
-! [ 3 ] [ "foobar" "foo(?=bar)" <regexp> match-head ] unit-test
-! [ f ] [ "foobxr" "foo(?=bar)" <regexp> match-head ] unit-test
+[ 3 ] [ "foobar" "foo(?=bar)" <regexp> match-head ] unit-test
+[ f ] [ "foobxr" "foo(?=bar)" <regexp> match-head ] unit-test
 
 ! [ f ] [ "foobxr" "foo\\z" <regexp> match-head ] unit-test
 ! [ 3 ] [ "foo" "foo\\z" <regexp> match-head ] unit-test

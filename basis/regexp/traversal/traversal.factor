@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators kernel math math.ranges
-quotations sequences regexp.parser regexp.classes
-combinators.short-circuit regexp.utils ;
+quotations sequences regexp.parser regexp.classes fry
+combinators.short-circuit regexp.utils prettyprint regexp.nfa ;
 IN: regexp.traversal
 
 TUPLE: dfa-traverser
@@ -10,7 +10,7 @@ TUPLE: dfa-traverser
     traversal-flags
     capture-groups
     { capture-group-index integer }
-    { lookahead-counter integer }
+    lookahead-counters
     last-state current-state
     text
     start-index current-index
@@ -26,7 +26,8 @@ TUPLE: dfa-traverser
         0 >>start-index
         0 >>current-index
         V{ } clone >>matches
-        V{ } clone >>capture-groups ;
+        V{ } clone >>capture-groups
+        V{ } clone >>lookahead-counters ;
 
 : final-state? ( dfa-traverser -- ? )
     [ current-state>> ] [ dfa-table>> final-states>> ] bi
@@ -43,9 +44,21 @@ TUPLE: dfa-traverser
         dup save-final-state
     ] when text-finished? ;
 
-: print-flags ( dfa-traverser -- dfa-traverser )
+GENERIC: flag-action ( dfa-traverser flag -- )
+
+M: lookahead-on flag-action ( dfa-traverser flag -- )
+    drop
+    lookahead-counters>> 0 swap push ;
+
+M: lookahead-off flag-action ( dfa-traverser flag -- )
+    drop
+    dup lookahead-counters>> pop
+    '[ _ - ] change-current-index drop ;
+
+: process-flags ( dfa-traverser -- )
+    [ [ 1+ ] map ] change-lookahead-counters
     dup [ current-state>> ] [ traversal-flags>> ] bi
-    ;
+    at [ dup . flag-action ] with each ;
 
 : increment-state ( dfa-traverser state -- dfa-traverser )
     [
@@ -79,6 +92,7 @@ TUPLE: dfa-traverser
     [ nth ] 2dip ;
 
 : do-match ( dfa-traverser -- dfa-traverser )
+    dup process-flags
     dup match-done? [
         dup setup-match match-transition
         [ increment-state do-match ] when*
