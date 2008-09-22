@@ -150,6 +150,7 @@ TUPLE: farkup no-follow disable-images parsed ;
     {
         { "true" [ t ] }
         { "false" [ f ] }
+        { f [ f ] }
     } case ;
 
 M: farkup render*
