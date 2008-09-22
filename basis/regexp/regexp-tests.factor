@@ -306,3 +306,19 @@ IN: regexp-tests
 
 ! "a(?<!b)" <regexp> "baz" over first-match
 ! "a(?<!b)" <regexp> "caz" over first-match
+
+! "a(?=bcdefg)bcd" <regexp> "abcdefg" over first-match
+! "a(?#bcdefg)bcd" <regexp> "abcdefg" over first-match
+! "a(?:bcdefg)" <regexp> "abcdefg" over first-match
+
+[ { 0 1 } ] [ "ac" "a(?!b)" <regexp> first-match ] unit-test
+[ f ] [ "ab" "a(?!b)" <regexp> first-match ] unit-test
+
+! "a(?<=b)" <regexp> "caba" over first-match
+
+[ { 0 1 } ] [ "ab" "a(?=b)(?=b)" <regexp> first-match ] unit-test
+[ { 1 2 } ] [ "ba" "a(?<=b)(?<=b)" <regexp> first-match ] unit-test
+
+
+[ { 1 2 } ] [ "cab" "a(?=b)(?<=c)" <regexp> first-match ] unit-test
+
