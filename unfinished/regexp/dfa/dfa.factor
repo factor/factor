@@ -68,12 +68,16 @@ IN: regexp.dfa
     1vector >>new-states drop ;
 
 : set-traversal-flags ( regexp -- )
-    [ dfa-table>> transitions>> keys ]
+    dup
     [ nfa-traversal-flags>> ]
-    bi 2drop ;
+    [ dfa-table>> transitions>> keys ] bi
+    [ tuck [ swap at ] with map concat ] with H{ } map>assoc
+    >>dfa-traversal-flags drop ;
 
 : construct-dfa ( regexp -- )
-    [ set-initial-state ]
-    [ new-transitions ]
-    [ set-final-states ] tri ;
-    ! [ set-traversal-flags ] quad ;
+    {
+        [ set-initial-state ]
+        [ new-transitions ]
+        [ set-final-states ]
+        [ set-traversal-flags ]
+    } cleave ;
