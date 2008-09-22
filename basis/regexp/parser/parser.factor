@@ -230,8 +230,18 @@ ERROR: invalid-range a b ;
         [ [ nip at-most-n ] [ at-least-n ] if* ] if
     ] [ drop 0 max exactly-n ] if ;
 
+SINGLETON: beginning-of-input
+SINGLETON: end-of-input
+
+! : beginning-of-input ( -- obj ) 
 : handle-front-anchor ( -- ) front-anchor push-stack ;
-: handle-back-anchor ( -- ) back-anchor push-stack ;
+: end-of-line ( -- obj )
+    end-of-input
+    CHAR: \r <constant>
+    CHAR: \n <constant>
+    2dup 2array <concatenation> 4array <alternation> lookahead boa ;
+
+: handle-back-anchor ( -- ) end-of-line push-stack ;
 
 ERROR: bad-character-class obj ;
 ERROR: expected-posix-class ;
@@ -277,6 +287,8 @@ ERROR: unrecognized-escape char ;
     read1
     {
         { CHAR: \ [ CHAR: \ <constant> ] }
+        { CHAR: ^ [ CHAR: ^ <constant> ] }
+        { CHAR: $ [ CHAR: $ <constant> ] }
         { CHAR: - [ CHAR: - <constant> ] }
         { CHAR: { [ CHAR: { <constant> ] }
         { CHAR: } [ CHAR: } <constant> ] }
@@ -289,7 +301,6 @@ ERROR: unrecognized-escape char ;
         { CHAR: + [ CHAR: + <constant> ] }
         { CHAR: ? [ CHAR: ? <constant> ] }
         { CHAR: . [ CHAR: . <constant> ] }
-! xyzzy
         { CHAR: : [ CHAR: : <constant> ] }
         { CHAR: t [ CHAR: \t <constant> ] }
         { CHAR: n [ CHAR: \n <constant> ] }
@@ -297,8 +308,6 @@ ERROR: unrecognized-escape char ;
         { CHAR: f [ HEX: c <constant> ] }
         { CHAR: a [ HEX: 7 <constant> ] }
         { CHAR: e [ HEX: 1b <constant> ] }
-        { CHAR: $ [ CHAR: $ <constant> ] }
-        { CHAR: ^ [ CHAR: ^ <constant> ] }
 
         { CHAR: d [ digit-class ] }
         { CHAR: D [ digit-class <negation> ] }
@@ -320,16 +329,16 @@ ERROR: unrecognized-escape char ;
         ! { CHAR: G [ end of previous match ] }
         ! { CHAR: Z [ handle-end-of-input ] }
         ! { CHAR: z [ handle-end-of-input ] } ! except for terminator
-! xyzzy
-        { CHAR: 1 [ CHAR: 1 <constant> ] }
-        { CHAR: 2 [ CHAR: 2 <constant> ] }
-        { CHAR: 3 [ CHAR: 3 <constant> ] }
-        { CHAR: 4 [ CHAR: 4 <constant> ] }
-        { CHAR: 5 [ CHAR: 5 <constant> ] }
-        { CHAR: 6 [ CHAR: 6 <constant> ] }
-        { CHAR: 7 [ CHAR: 7 <constant> ] }
-        { CHAR: 8 [ CHAR: 8 <constant> ] }
-        { CHAR: 9 [ CHAR: 9 <constant> ] }
+
+        ! { CHAR: 1 [ CHAR: 1 <constant> ] }
+        ! { CHAR: 2 [ CHAR: 2 <constant> ] }
+        ! { CHAR: 3 [ CHAR: 3 <constant> ] }
+        ! { CHAR: 4 [ CHAR: 4 <constant> ] }
+        ! { CHAR: 5 [ CHAR: 5 <constant> ] }
+        ! { CHAR: 6 [ CHAR: 6 <constant> ] }
+        ! { CHAR: 7 [ CHAR: 7 <constant> ] }
+        ! { CHAR: 8 [ CHAR: 8 <constant> ] }
+        ! { CHAR: 9 [ CHAR: 9 <constant> ] }
 
         { CHAR: Q [ parse-escaped-literals ] }
         [ unrecognized-escape ]
@@ -406,6 +415,10 @@ DEFER: handle-left-bracket
 
 : parse-regexp-token ( token -- ? )
     {
+! todo: only match these at beginning/end of regexp
+        { CHAR: ^ [ handle-front-anchor t ] }
+        { CHAR: $ [ handle-back-anchor t ] }
+
         { CHAR: . [ handle-dot t ] }
         { CHAR: ( [ handle-left-parenthesis t ] }
         { CHAR: ) [ handle-right-parenthesis f ] }
@@ -415,8 +428,6 @@ DEFER: handle-left-bracket
         { CHAR: + [ handle-plus t ] }
         { CHAR: { [ handle-left-brace t ] }
         { CHAR: [ [ handle-left-bracket t ] }
-        { CHAR: ^ [ handle-front-anchor t ] }
-        { CHAR: $ [ handle-back-anchor t ] }
         { CHAR: \ [ handle-escape t ] }
         [ <constant> push-stack t ]
     } case ;

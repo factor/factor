@@ -14,6 +14,8 @@ SINGLETON: eps
 MIXIN: traversal-flag
 SINGLETON: lookahead-on INSTANCE: lookahead-on traversal-flag
 SINGLETON: lookahead-off INSTANCE: lookahead-off traversal-flag
+SINGLETON: lookbehind-on INSTANCE: lookbehind-on traversal-flag
+SINGLETON: lookbehind-off INSTANCE: lookbehind-off traversal-flag
 SINGLETON: capture-group-on INSTANCE: capture-group-on traversal-flag
 SINGLETON: capture-group-off INSTANCE: capture-group-off traversal-flag
 
@@ -141,6 +143,14 @@ M: lookahead nfa-node ( node -- )
     term>> nfa-node
     eps literal-transition add-simple-entry
     lookahead-off add-traversal-flag
+    2 [ concatenate-nodes ] times ;
+
+M: lookbehind nfa-node ( node -- )
+    eps literal-transition add-simple-entry
+    lookbehind-on add-traversal-flag
+    term>> nfa-node
+    eps literal-transition add-simple-entry
+    lookbehind-off add-traversal-flag
     2 [ concatenate-nodes ] times ;
 
 : construct-nfa ( regexp -- )

@@ -128,6 +128,8 @@ IN: regexp
 : option? ( option regexp -- ? )
     options>> key? ;
 
+USE: multiline
+/*
 M: regexp pprint*
     [
         [
@@ -136,3 +138,4 @@ M: regexp pprint*
             case-insensitive swap option? [ "i" % ] when
         ] "" make
     ] keep present-text ;
+*/

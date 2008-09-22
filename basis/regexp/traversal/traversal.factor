@@ -8,9 +8,11 @@ IN: regexp.traversal
 TUPLE: dfa-traverser
     dfa-table
     traversal-flags
+    traverse-forward
     capture-groups
     { capture-group-index integer }
     lookahead-counters
+    lookbehind-counters
     last-state current-state
     text
     start-index current-index
@@ -23,10 +25,12 @@ TUPLE: dfa-traverser
         swap [ start-state>> >>current-state ] keep
         >>dfa-table
         swap >>text
+        t >>traverse-forward
         0 >>start-index
         0 >>current-index
         V{ } clone >>matches
         V{ } clone >>capture-groups
+        V{ } clone >>lookbehind-counters
         V{ } clone >>lookahead-counters ;
 
 : final-state? ( dfa-traverser -- ? )
@@ -52,8 +56,19 @@ M: lookahead-on flag-action ( dfa-traverser flag -- )
 
 M: lookahead-off flag-action ( dfa-traverser flag -- )
     drop
-    dup lookahead-counters>> pop
-    '[ _ - ] change-current-index drop ;
+    dup lookahead-counters>>
+    [ drop ] [ pop '[ _ - ] change-current-index drop ] if-empty ;
+
+M: lookbehind-on flag-action ( dfa-traverser flag -- )
+    drop
+    f >>traverse-forward
+    lookbehind-counters>> 0 swap push ;
+
+M: lookbehind-off flag-action ( dfa-traverser flag -- )
+    drop
+    t >>traverse-forward
+    dup lookbehind-counters>>
+    [ drop ] [ pop '[ _ + ] change-current-index drop ] if-empty ;
 
 : process-flags ( dfa-traverser -- )
     [ [ 1+ ] map ] change-lookahead-counters
@@ -62,7 +77,10 @@ M: lookahead-off flag-action ( dfa-traverser flag -- )
 
 : increment-state ( dfa-traverser state -- dfa-traverser )
     [
-        [ 1+ ] change-current-index dup current-state>> >>last-state
+        dup traverse-forward>>
+        [ [ 1+ ] change-current-index ]
+        [ [ 1- ] change-current-index ] if
+        dup current-state>> >>last-state
     ] dip
     first >>current-state ;
 

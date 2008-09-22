@@ -285,3 +285,17 @@ IN: regexp-tests
 ! 2. (A)
 ! 3. (B(C))
 ! 4. (C) 
+
+! clear "a(?=b*)" <regexp> "ab" over match
+! clear "a(?=b*c)" <regexp> "abbbbbc" over match
+! clear "a(?=b*)" <regexp> "ab" over match
+
+! clear "^a" <regexp> "a" over match
+! clear "^a" <regexp> "\na" over match
+! clear "^a" <regexp> "\r\na" over match
+! clear "^a" <regexp> "\ra" over match
+
+! clear "a$" <regexp> "a" over match
+! clear "a$" <regexp> "a\n" over match
+! clear "a$" <regexp> "a\r" over match
+! clear "a$" <regexp> "a\r\n" over match
