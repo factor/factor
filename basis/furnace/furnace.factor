@@ -92,7 +92,7 @@ M: object modify-form drop ;
 : referrer ( -- referrer )
     #! Typo is intentional, its in the HTTP spec!
     "referer" request get header>> at
-    >url [ remap-port ] change-port ;
+    >url ensure-port [ remap-port ] change-port ;
 
 : user-agent ( -- user-agent )
     "user-agent" request get header>> at "" or ;
