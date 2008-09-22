@@ -212,15 +212,13 @@ PRIVATE>
     [ [ host>> ] [ port>> ] bi <inet> ] [ protocol>> ] bi
     secure-protocol? [ <secure> ] when ;
 
-ERROR: no-protocol-found protocol ;
-
 : protocol-port ( protocol -- port )
     {
         { "http" [ 80 ] }
         { "https" [ 443 ] }
         { "feed" [ 80 ] }
         { "ftp" [ 21 ] }
-        [ no-protocol-found ]
+        [ drop f ]
     } case ;
 
 : ensure-port ( url -- url' )
