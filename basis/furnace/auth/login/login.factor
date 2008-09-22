@@ -104,6 +104,9 @@ M: login-realm login-required* ( description capabilities login -- response )
         URL" $realm/login" <continue-conversation>
     ] if ;
 
+M: login-realm user-registered ( user realm -- )
+    drop successful-login ;
+
 : <login-realm> ( responder name -- auth )
     login-realm new-realm
         <login-action> "login" add-responder
