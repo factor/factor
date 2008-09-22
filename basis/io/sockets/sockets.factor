@@ -5,8 +5,8 @@ USING: generic kernel io.backend namespaces continuations
 sequences arrays io.encodings io.ports io.streams.duplex
 io.encodings.ascii alien.strings io.binary accessors destructors
 classes debugger byte-arrays system combinators parser
-alien.c-types math.parser splitting grouping
-math assocs summary system vocabs.loader combinators ;
+alien.c-types math.parser splitting grouping math assocs summary
+system vocabs.loader combinators present ;
 IN: io.sockets
 
 << {
@@ -40,7 +40,14 @@ TUPLE: local path ;
 : <local> ( path -- addrspec )
     normalize-path local boa ;
 
-TUPLE: inet4 host port ;
+M: local present path>> "Unix domain socket: " prepend ;
+
+TUPLE: abstract-inet host port ;
+
+M: abstract-inet present
+    [ host>> ":" ] [ port>> number>string ] bi 3append ;
+
+TUPLE: inet4 < abstract-inet ;
 
 C: <inet4> inet4
 
@@ -81,7 +88,7 @@ M: inet4 parse-sockaddr
     >r dup sockaddr-in-addr <uint> r> inet-ntop
     swap sockaddr-in-port ntohs <inet4> ;
 
-TUPLE: inet6 host port ;
+TUPLE: inet6 < abstract-inet ;
 
 C: <inet6> inet6
 
@@ -255,7 +262,7 @@ HOOK: addrinfo-error io-backend ( n -- )
 
 GENERIC: resolve-host ( addrspec -- seq )
 
-TUPLE: inet host port ;
+TUPLE: inet < abstract-inet ;
 
 C: <inet> inet
 

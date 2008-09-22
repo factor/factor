@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel symbols namespaces continuations
 destructors io.sockets sequences summary calendar delegate
-system vocabs.loader combinators ;
+system vocabs.loader combinators present ;
 IN: io.sockets.secure
 
 SYMBOL: secure-socket-timeout
@@ -42,6 +42,8 @@ HOOK: <secure-context> secure-socket-backend ( config -- context )
 TUPLE: secure addrspec ;
 
 C: <secure> secure
+
+M: secure present addrspec>> present " (secure)" append ;
 
 CONSULT: inet secure addrspec>> ;
 
