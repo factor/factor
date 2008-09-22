@@ -189,7 +189,7 @@ LOG: httpd-header NOTICE
     "/" split harvest ;
 
 : init-request ( request -- )
-    [ request set ] [ url>> [ remap-port ] change-port url set ] bi
+    [ request set ] [ url>> url set ] bi
     V{ } clone responder-nesting set ;
 
 : dispatch-request ( request -- response )
@@ -199,19 +199,20 @@ LOG: httpd-header NOTICE
     [
         local-address get
         [ secure? "https" "http" ? >>protocol ]
-        [ port>> '[ _ or ] change-port ]
+        [ port>> remap-port '[ _ or ] change-port ]
         bi
     ] change-url drop ;
 
 : valid-request? ( request -- ? )
-    url>> port>> local-address get port>> = ;
+    url>> port>> remap-port
+    local-address get port>> remap-port = ;
 
 : do-request ( request -- response )
     '[
         _
         {
-            [ init-request ]
             [ prepare-request ]
+            [ init-request ]
             [ log-request ]
             [ dup valid-request? [ dispatch-request ] [ drop <400> ] if ]
         } cleave
