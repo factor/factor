@@ -344,8 +344,8 @@ M: revision feed-entry-url id>> revision-url ;
         [ "author" value user-edits-url ] >>url
         [ list-user-edits ] >>entries ;
 
-: init-sidebar ( -- )
-    "Sidebar" latest-revision [ "sidebar" [ from-object ] nest-form ] when*
+: init-sidebars ( -- )
+    "Contents" latest-revision [ "contents" [ from-object ] nest-form ] when*
     "Footer" latest-revision [ "footer" [ from-object ] nest-form ] when* ;
 
 : <wiki> ( -- dispatcher )
@@ -367,7 +367,7 @@ M: revision feed-entry-url id>> revision-url ;
         <list-changes-feed-action> "changes.atom" add-responder
         <delete-action> "delete" add-responder
     <boilerplate>
-        [ init-sidebar ] >>init
+        [ init-sidebars ] >>init
         { wiki "wiki-common" } >>template ;
 
 : init-wiki ( -- )
