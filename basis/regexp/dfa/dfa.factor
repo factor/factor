@@ -25,7 +25,7 @@ IN: regexp.dfa
 
 : find-transitions ( seq1 regexp -- seq2 )
     nfa-table>> transitions>>
-    [ at keys ] curry map concat
+    [ at keys ] curry gather
     eps swap remove ;
 
 : add-todo-state ( state regexp -- )

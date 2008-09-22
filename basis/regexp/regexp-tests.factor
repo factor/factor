@@ -299,3 +299,10 @@ IN: regexp-tests
 ! clear "a$" <regexp> "a\n" over match
 ! clear "a$" <regexp> "a\r" over match
 ! clear "a$" <regexp> "a\r\n" over match
+
+! "(az)(?<=b)" <regexp> "baz" over first-match
+! "a(?<=b*)" <regexp> "cbaz" over first-match
+! "a(?<=b)" <regexp> "baz" over first-match
+
+! "a(?<!b)" <regexp> "baz" over first-match
+! "a(?<!b)" <regexp> "caz" over first-match

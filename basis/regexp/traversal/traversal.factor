@@ -38,7 +38,11 @@ TUPLE: dfa-traverser
     key? ;
 
 : text-finished? ( dfa-traverser -- ? )
-    [ current-index>> ] [ text>> length ] bi >= ;
+    {
+        [ current-state>> empty? ]
+        [ [ current-index>> ] [ text>> length ] bi >= ]
+        ! [ current-index>> 0 < ]
+    } 1|| ;
 
 : save-final-state ( dfa-straverser -- )
     [ current-index>> ] [ matches>> ] bi push ;
@@ -62,24 +66,26 @@ M: lookahead-off flag-action ( dfa-traverser flag -- )
 M: lookbehind-on flag-action ( dfa-traverser flag -- )
     drop
     f >>traverse-forward
+    [ 2 - ] change-current-index
     lookbehind-counters>> 0 swap push ;
 
 M: lookbehind-off flag-action ( dfa-traverser flag -- )
     drop
     t >>traverse-forward
     dup lookbehind-counters>>
-    [ drop ] [ pop '[ _ + ] change-current-index drop ] if-empty ;
+    [ drop ] [ pop '[ _ + 2 + ] change-current-index drop ] if-empty ;
 
 : process-flags ( dfa-traverser -- )
     [ [ 1+ ] map ] change-lookahead-counters
+    [ [ 1+ ] map ] change-lookbehind-counters
+    ! dup current-state>> .
     dup [ current-state>> ] [ traversal-flags>> ] bi
     at [ dup . flag-action ] with each ;
 
 : increment-state ( dfa-traverser state -- dfa-traverser )
     [
         dup traverse-forward>>
-        [ [ 1+ ] change-current-index ]
-        [ [ 1- ] change-current-index ] if
+        [ 1+ ] [ 1- ] ? change-current-index
         dup current-state>> >>last-state
     ] dip
     first >>current-state ;
