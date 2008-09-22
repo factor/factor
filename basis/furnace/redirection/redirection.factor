@@ -1,9 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors combinators namespaces fry
-io.servers.connection urls http http.server
-http.server.redirection http.server.responses
-http.server.filters furnace ;
+USING: kernel accessors combinators namespaces fry urls http
+http.server http.server.redirection http.server.responses
+http.server.remapping http.server.filters furnace ;
 IN: furnace.redirection
 
 : <redirect> ( url -- response )
@@ -16,7 +15,7 @@ IN: furnace.redirection
 : >secure-url ( url -- url' )
     clone
         "https" >>protocol
-        secure-port >>port ;
+        secure-http-port >>port ;
 
 : <secure-redirect> ( url -- response )
     >secure-url <redirect> ;

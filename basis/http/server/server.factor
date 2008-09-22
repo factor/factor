@@ -18,6 +18,7 @@ fry logging logging.insomniac calendar urls
 http
 http.parsers
 http.server.responses
+http.server.remapping
 html.templates
 html.elements
 html.streams ;
@@ -188,7 +189,7 @@ LOG: httpd-header NOTICE
     "/" split harvest ;
 
 : init-request ( request -- )
-    [ request set ] [ url>> url set ] bi
+    [ request set ] [ url>> [ remap-port ] change-port url set ] bi
     V{ } clone responder-nesting set ;
 
 : dispatch-request ( request -- response )
