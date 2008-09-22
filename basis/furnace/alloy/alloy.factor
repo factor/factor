@@ -3,6 +3,7 @@
 USING: kernel sequences db.tuples alarms calendar db fry
 furnace.db
 furnace.cache
+furnace.asides
 furnace.referrer
 furnace.sessions
 furnace.conversations
@@ -12,17 +13,17 @@ IN: furnace.alloy
 
 : <alloy> ( responder db params -- responder' )
     '[
+        <asides>
         <conversations>
         <sessions>
         _ _ <db-persistence>
         <check-form-submissions>
     ] call ;
 
-: state-classes { session conversation permit } ; inline
+: state-classes { session aside conversation permit user } ; inline
 
 : init-furnace-tables ( -- )
-    state-classes ensure-tables
-    user ensure-table ;
+    state-classes ensure-tables ;
 
 : start-expiring ( db params -- )
     '[

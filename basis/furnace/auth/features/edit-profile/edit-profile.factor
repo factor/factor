@@ -3,8 +3,8 @@
 USING: kernel accessors namespaces sequences assocs
 validators urls html.forms http.server.dispatchers
 furnace.auth
-furnace.actions
-furnace.conversations ;
+furnace.asides
+furnace.actions ;
 IN: furnace.auth.features.edit-profile
 
 : <edit-profile-action> ( -- action )

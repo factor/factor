@@ -37,6 +37,10 @@ GENERIC: modify-query ( query responder -- query' )
 
 M: object modify-query drop ;
 
+GENERIC: modify-redirect-query ( query responder -- query' )
+
+M: object modify-redirect-query drop ;
+
 GENERIC: adjust-url ( url -- url' )
 
 M: url adjust-url
@@ -46,6 +50,14 @@ M: url adjust-url
     relative-to-request ;
 
 M: string adjust-url ;
+
+GENERIC: adjust-redirect-url ( url -- url' )
+
+M: url adjust-redirect-url
+    adjust-url
+    [ [ modify-redirect-query ] each-responder ] change-query ;
+
+M: string adjust-redirect-url ;
 
 GENERIC: link-attr ( tag responder -- )
 

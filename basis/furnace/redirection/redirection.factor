@@ -7,7 +7,7 @@ http.server.filters furnace ;
 IN: furnace.redirection
 
 : <redirect> ( url -- response )
-    adjust-url request get method>> {
+    adjust-redirect-url request get method>> {
         { "GET" [ <temporary-redirect> ] }
         { "HEAD" [ <temporary-redirect> ] }
         { "POST" [ <permanent-redirect> ] }

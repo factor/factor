@@ -107,3 +107,7 @@ M: sessions call-responder* ( path responder -- response )
     sessions set
     request-session [ begin-session ] unless*
     existing-session put-session-cookie ;
+
+: check-session ( state/f -- state/f )
+    dup [ dup session>> session get id>> = [ drop f ] unless ] when ;
+

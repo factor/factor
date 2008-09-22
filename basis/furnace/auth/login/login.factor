@@ -5,6 +5,7 @@ calendar validators urls logging html.forms
 http http.server http.server.dispatchers
 furnace
 furnace.auth
+furnace.asides
 furnace.actions
 furnace.sessions
 furnace.utilities
@@ -93,9 +94,15 @@ SYMBOL: capabilities
         [ logout ] >>submit ;
 
 M: login-realm login-required* ( description capabilities login -- response )
-    begin-aside
-    [ description cset ] [ capabilities cset ] [ drop ] tri*
-    URL" $realm/login" >secure-url <redirect> ;
+    begin-conversation
+    [ description cset ] [ capabilities cset ] [ secure>> ] tri*
+    [
+        url get >secure-url begin-aside
+        URL" $realm/login" >secure-url <continue-conversation>
+    ] [
+        url get begin-aside
+        URL" $realm/login" <continue-conversation>
+    ] if ;
 
 : <login-realm> ( responder name -- auth )
     login-realm new-realm
