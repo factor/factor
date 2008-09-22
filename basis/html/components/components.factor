@@ -144,7 +144,7 @@ M: code render*
     [ string-lines ] [ drop ] [ mode>> value ] tri* htmlize-lines ;
 
 ! Farkup component
-TUPLE: farkup no-follow disable-images ;
+TUPLE: farkup no-follow disable-images parsed ;
 
 : string>boolean ( string -- boolean )
     {
@@ -154,9 +154,11 @@ TUPLE: farkup no-follow disable-images ;
 
 M: farkup render*
     [
+        nip
         [ no-follow>> [ string>boolean link-no-follow? set ] when* ]
-        [ disable-images>> [ string>boolean disable-images? set ] when* ] bi
-        drop string-lines "\n" join write-farkup
+        [ disable-images>> [ string>boolean disable-images? set ] when* ]
+        [ parsed>> string>boolean [ (write-farkup) ] [ write-farkup ] if ]
+        tri
     ] with-scope ;
 
 ! Inspector component

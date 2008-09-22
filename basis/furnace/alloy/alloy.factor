@@ -20,10 +20,11 @@ IN: furnace.alloy
         <check-form-submissions>
     ] call ;
 
-: state-classes { session aside conversation permit user } ; inline
+: state-classes { session aside conversation permit } ; inline
 
 : init-furnace-tables ( -- )
-    state-classes ensure-tables ;
+    state-classes ensure-tables
+    user ensure-table ;
 
 : start-expiring ( db params -- )
     '[
