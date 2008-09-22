@@ -20,7 +20,7 @@ M: mb-writer stream-nl ( mb-writer -- )
     [ [ last-line>> concat ] [ lines>> ] bi push ] keep
     V{ } clone >>last-line drop ;
 
-: spawn-client ( lines listeners -- irc-client )
+: spawn-client ( -- irc-client )
     "someserver" irc-port "factorbot" f <irc-profile>
     <irc-client>
         t >>is-running

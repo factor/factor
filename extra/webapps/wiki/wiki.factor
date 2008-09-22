@@ -47,7 +47,7 @@ article "ARTICLES" {
 
 : <article> ( title -- article ) article new swap >>title ;
 
-TUPLE: revision id title author date content html description ;
+TUPLE: revision id title author date content parsed description ;
 
 revision "REVISIONS" {
     { "id" "ID" INTEGER +db-assigned-id+ }
@@ -55,7 +55,7 @@ revision "REVISIONS" {
     { "author" "AUTHOR" { VARCHAR 256 } +not-null+ } ! uid
     { "date" "DATE" TIMESTAMP +not-null+ }
     { "content" "CONTENT" TEXT +not-null+ }
-    { "html" "HTML" TEXT +not-null+ } ! Farkup converted to HTML
+    { "parsed" "PARSED" FACTOR-BLOB +not-null+ } ! Farkup AST
     { "description" "DESCRIPTION" TEXT }
 } define-persistent
 
@@ -73,7 +73,7 @@ M: revision feed-entry-url id>> revision-url ;
     revision new swap >>id ;
 
 : compute-html ( revision -- )
-    dup content>> convert-farkup >>html drop ;
+    dup content>> parse-farkup >>parsed drop ;
 
 : validate-title ( -- )
     { { "title" [ v-one-line ] } } validate-params ;
@@ -344,9 +344,12 @@ M: revision feed-entry-url id>> revision-url ;
         [ "author" value user-edits-url ] >>url
         [ list-user-edits ] >>entries ;
 
-: init-sidebar ( -- )
-    "Sidebar" latest-revision [ "sidebar" [ from-object ] nest-form ] when*
+: init-sidebars ( -- )
+    "Contents" latest-revision [ "contents" [ from-object ] nest-form ] when*
     "Footer" latest-revision [ "footer" [ from-object ] nest-form ] when* ;
+
+: init-relative-link-prefix ( -- )
+    URL" $wiki/view/" adjust-url present relative-link-prefix set ;
 
 : <wiki> ( -- dispatcher )
     wiki new-dispatcher
@@ -367,7 +370,7 @@ M: revision feed-entry-url id>> revision-url ;
         <list-changes-feed-action> "changes.atom" add-responder
         <delete-action> "delete" add-responder
     <boilerplate>
-        [ init-sidebar ] >>init
+        [ init-sidebars init-relative-link-prefix ] >>init
         { wiki "wiki-common" } >>template ;
 
 : init-wiki ( -- )

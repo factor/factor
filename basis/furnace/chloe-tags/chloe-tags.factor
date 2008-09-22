@@ -37,7 +37,7 @@ IN: furnace.chloe-tags
         <url>
             swap parse-query-attr >>query
             -rot a-url-path >>path
-        adjust-url relative-to-request
+        adjust-url
     ] if ;
 
 : compile-a-url ( tag -- )
