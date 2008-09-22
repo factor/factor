@@ -1,10 +1,10 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators io io.streams.string
-kernel math math.parser multi-methods namespaces qualified sets
+kernel math math.parser namespaces qualified sets
 quotations sequences splitting symbols vectors math.order
 unicode.categories strings regexp.backend regexp.utils
-unicode.case ;
+unicode.case words ;
 IN: regexp.parser
 
 FROM: math.ranges => [a,b] ;
@@ -25,11 +25,21 @@ TUPLE: reluctant-kleene-star term ; INSTANCE: reluctant-kleene-star node
 TUPLE: negation term ; INSTANCE: negation node
 TUPLE: constant char ; INSTANCE: constant node
 TUPLE: range from to ; INSTANCE: range node
+
+MIXIN: parentheses-group
 TUPLE: lookahead term ; INSTANCE: lookahead node
+INSTANCE: lookahead parentheses-group
 TUPLE: lookbehind term ; INSTANCE: lookbehind node
+INSTANCE: lookbehind parentheses-group
 TUPLE: capture-group term ; INSTANCE: capture-group node
+INSTANCE: capture-group parentheses-group
 TUPLE: non-capture-group term ; INSTANCE: non-capture-group node
+INSTANCE: non-capture-group parentheses-group
 TUPLE: independent-group term ; INSTANCE: independent-group node ! atomic group
+INSTANCE: independent-group parentheses-group
+TUPLE: comment-group term ; INSTANCE: comment-group node
+INSTANCE: comment-group parentheses-group
+
 TUPLE: character-class-range from to ; INSTANCE: character-class-range node
 SINGLETON: epsilon INSTANCE: epsilon node
 SINGLETON: any-char INSTANCE: any-char node
@@ -98,25 +108,6 @@ left-parenthesis pipe caret dash ;
 
 ERROR: unmatched-parentheses ;
 
-: make-positive-lookahead ( string -- )
-    lookahead boa push-stack ;
-
-: make-negative-lookahead ( string -- )
-    <negation> lookahead boa push-stack ;
-
-: make-independent-group ( string -- )
-    #! no backtracking
-    independent-group boa push-stack ;
-
-: make-positive-lookbehind ( string -- )
-    lookbehind boa push-stack ;
-
-: make-negative-lookbehind ( string -- )
-    <negation> lookbehind boa push-stack ;
-
-: make-non-capturing-group ( string -- )
-    non-capture-group boa push-stack ;
-
 ERROR: bad-option ch ;
 
 : option ( ch -- singleton )
@@ -143,33 +134,38 @@ ERROR: bad-option ch ;
 
 DEFER: (parse-regexp)
 : parse-special-group ( -- )
-    beginning-of-group push-stack
-    (parse-regexp) pop-stack make-non-capturing-group ;
+    ;
+    ! beginning-of-group push-stack
+    ! (parse-regexp) pop-stack make-non-capturing-group ;
 
 ERROR: bad-special-group string ;
 
-DEFER: nested-parse-regexp
+: nested-parse-regexp ( token ? -- )
+    [ push-stack (parse-regexp) pop-stack ] dip
+    [ <negation> ] when pop-stack boa push-stack ;
+
+! non-capturing groups
 : (parse-special-group) ( -- )
     read1 {
-        { [ dup CHAR: # = ]
-            [ drop nested-parse-regexp pop-stack drop ] }
+        { [ dup CHAR: # = ] ! comment
+            [ drop comment-group f nested-parse-regexp pop-stack drop ] }
         { [ dup CHAR: : = ]
-            [ drop nested-parse-regexp pop-stack make-non-capturing-group ] }
+            [ drop non-capture-group f nested-parse-regexp ] }
         { [ dup CHAR: = = ]
-            [ drop nested-parse-regexp pop-stack make-positive-lookahead ] }
+            [ drop lookahead f nested-parse-regexp ] }
         { [ dup CHAR: ! = ]
-            [ drop nested-parse-regexp pop-stack make-negative-lookahead ] }
+            [ drop lookahead t nested-parse-regexp ] }
         { [ dup CHAR: > = ]
-            [ drop nested-parse-regexp pop-stack make-independent-group ] }
+            [ drop non-capture-group f nested-parse-regexp ] }
         { [ dup CHAR: < = peek1 CHAR: = = and ]
-            [ drop drop1 nested-parse-regexp pop-stack make-positive-lookbehind ] }
+            [ drop drop1 lookbehind f nested-parse-regexp ] }
         { [ dup CHAR: < = peek1 CHAR: ! = and ]
-            [ drop drop1 nested-parse-regexp pop-stack make-negative-lookbehind ] }
+            [ drop drop1 lookbehind t nested-parse-regexp ] }
         [
             ":)" read-until
             [ swap prefix ] dip
             {
-                { CHAR: : [ parse-options parse-special-group ] }
+                { CHAR: : [ parse-options (parse-special-group) ] }
                 { CHAR: ) [ parse-options ] }
                 [ drop bad-special-group ]
             } case
@@ -179,7 +175,7 @@ DEFER: nested-parse-regexp
 : handle-left-parenthesis ( -- )
     peek1 CHAR: ? =
     [ drop1 (parse-special-group) ]
-    [ nested-parse-regexp ] if ;
+    [ capture-group f nested-parse-regexp ] if ;
 
 : handle-dot ( -- ) any-char push-stack ;
 : handle-pipe ( -- ) pipe push-stack ;
@@ -408,14 +404,12 @@ DEFER: handle-left-bracket
     [ first|concatenation ] map first|alternation ;
 
 : handle-right-parenthesis ( -- )
-    stack beginning-of-group over last-index cut rest
-    [ current-regexp get swap >>stack drop ]
-    [ finish-regexp-parse <capture-group> push-stack ] bi* ;
+    stack dup [ parentheses-group "members" word-prop member? ] find-last -rot cut rest
+    [ [ push ] keep current-regexp get (>>stack) ]
+    [ finish-regexp-parse push-stack ] bi* ;
 
-: nested-parse-regexp ( -- )
-    beginning-of-group push-stack (parse-regexp) ;
 
-: ((parse-regexp)) ( token -- ? )
+: parse-regexp-token ( token -- ? )
     {
         { CHAR: . [ handle-dot t ] }
         { CHAR: ( [ handle-left-parenthesis t ] }
@@ -433,7 +427,7 @@ DEFER: handle-left-bracket
     } case ;
 
 : (parse-regexp) ( -- )
-    read1 [ ((parse-regexp)) [ (parse-regexp) ] when ] when* ;
+    read1 [ parse-regexp-token [ (parse-regexp) ] when ] when* ;
 
 : parse-regexp ( regexp -- )
     dup current-regexp [
