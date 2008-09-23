@@ -103,7 +103,7 @@ table            =  ((table-row nl => [[ first ]] )+ table-row? | table-row)
 text = (!(nl | code | heading | inline-delimiter | table ).)+
     => [[ >string ]]
 
-paragraph-item = (table | text | inline-tag | inline-delimiter)+
+paragraph-item = (table | list | text | inline-tag | inline-delimiter)+
 paragraph = ((paragraph-item nl => [[ first ]])+ nl+ => [[ first ]]
              | (paragraph-item nl)+ paragraph-item?
              | paragraph-item)

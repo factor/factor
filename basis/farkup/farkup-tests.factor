@@ -128,3 +128,7 @@ link-no-follow? off
 [ "<p><a href='C%2b%2b'>C++</a></p>" ] [ "[[C++]]" convert-farkup ] unit-test
 
 [ "<p>&lt;foo&gt;</p>" ] [ "<foo>" convert-farkup ] unit-test
+
+[ "<p>asdf\n<ul><li>lol</li>\n<li>haha</li></ul></p>" ] [ "asdf\n-lol\n-haha" convert-farkup ] unit-test
+
+[ "<p>asdf</p><ul><li>lol</li>\n<li>haha</li></ul>" ] [ "asdf\n\n-lol\n-haha" convert-farkup ] unit-test
