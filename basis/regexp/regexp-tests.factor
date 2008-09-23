@@ -318,7 +318,17 @@ IN: regexp-tests
 
 [ { 0 1 } ] [ "ab" "a(?=b)(?=b)" <regexp> first-match ] unit-test
 [ { 1 2 } ] [ "ba" "a(?<=b)(?<=b)" <regexp> first-match ] unit-test
-
-
 [ { 1 2 } ] [ "cab" "a(?=b)(?<=c)" <regexp> first-match ] unit-test
+
+! capture group 1: "aaaa"  2: ""
+! "aaaa" "(a*)(a*)" <regexp> match*
+! "aaaa" "(a*)(a+)" <regexp> match*
+
+[ { 0 2 } ] [ "ab" "(a|ab)(bc)?" <regexp> first-match ] unit-test
+[ { 0 3 } ] [ "abc" "(a|ab)(bc)?" <regexp> first-match ] unit-test
+
+[ { 0 2 } ] [ "ab" "(ab|a)(bc)?" <regexp> first-match ] unit-test
+[ { 0 3 } ] [ "abc" "(ab|a)(bc)?" <regexp> first-match ] unit-test
+
+[ { 23 24 } ] [ "aaaaaaaaaaaaaaaaaaaaaaab" "((a*)*b)*b" <regexp> first-match ] unit-test
 

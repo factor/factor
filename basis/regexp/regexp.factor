@@ -28,6 +28,9 @@ IN: regexp
 : match ( string regexp -- pair )
     <dfa-traverser> do-match return-match ;
 
+: match* ( string regexp -- pair )
+    <dfa-traverser> do-match [ return-match ] [ captured-groups>> ] bi ;
+
 : matches? ( string regexp -- ? )
     dupd match
     [ [ length ] [ length>> 1- ] bi* = ] [ drop f ] if* ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs combinators kernel math math.ranges
-quotations sequences regexp.parser regexp.classes fry
+quotations sequences regexp.parser regexp.classes fry arrays
 combinators.short-circuit regexp.utils prettyprint regexp.nfa ;
 IN: regexp.traversal
 
@@ -9,10 +9,11 @@ TUPLE: dfa-traverser
     dfa-table
     traversal-flags
     traverse-forward
-    capture-groups
-    { capture-group-index integer }
     lookahead-counters
     lookbehind-counters
+    capture-counters
+    captured-groups
+    capture-group-index
     last-state current-state
     text
     start-index current-index
@@ -28,10 +29,12 @@ TUPLE: dfa-traverser
         t >>traverse-forward
         0 >>start-index
         0 >>current-index
+        0 >>capture-group-index
         V{ } clone >>matches
-        V{ } clone >>capture-groups
+        V{ } clone >>capture-counters
         V{ } clone >>lookbehind-counters
-        V{ } clone >>lookahead-counters ;
+        V{ } clone >>lookahead-counters
+        H{ } clone >>captured-groups ;
 
 : final-state? ( dfa-traverser -- ? )
     [ current-state>> ] [ dfa-table>> final-states>> ] bi
@@ -75,9 +78,28 @@ M: lookbehind-off flag-action ( dfa-traverser flag -- )
     dup lookbehind-counters>>
     [ drop ] [ pop '[ _ + 2 + ] change-current-index drop ] if-empty ;
 
+M: capture-group-on flag-action ( dfa-traverser flag -- )
+    drop
+    [ current-index>> 0 2array ]
+    [ capture-counters>> ] bi push ;
+
+M: capture-group-off flag-action ( dfa-traverser flag -- )
+    drop
+    dup capture-counters>> empty? [
+        drop
+    ] [
+        {
+            [ capture-counters>> pop first2 dupd + ]
+            [ text>> <slice> ]
+            [ [ 1+ ] change-capture-group-index capture-group-index>> ]
+            [ captured-groups>> set-at ]
+        } cleave
+    ] if ;
+
 : process-flags ( dfa-traverser -- )
     [ [ 1+ ] map ] change-lookahead-counters
     [ [ 1+ ] map ] change-lookbehind-counters
+    [ [ first2 1+ 2array ] map ] change-capture-counters
     ! dup current-state>> .
     dup [ current-state>> ] [ traversal-flags>> ] bi
     at [ dup . flag-action ] with each ;

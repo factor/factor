@@ -121,7 +121,12 @@ M: character-class-range nfa-node ( node -- )
     class-transition add-simple-entry ;
 
 M: capture-group nfa-node ( node -- )
-    term>> nfa-node ;
+    eps literal-transition add-simple-entry
+    capture-group-on add-traversal-flag
+    term>> nfa-node
+    eps literal-transition add-simple-entry
+    capture-group-off add-traversal-flag
+    2 [ concatenate-nodes ] times ;
 
 ! xyzzy
 M: non-capture-group nfa-node ( node -- )
