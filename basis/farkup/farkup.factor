@@ -20,8 +20,10 @@ TUPLE: superscript child ;
 TUPLE: subscript child ;
 TUPLE: inline-code child ;
 TUPLE: paragraph child ;
-TUPLE: list-item child ;
-TUPLE: list child ;
+TUPLE: unordered-list-item child ;
+TUPLE: unordered-list child ;
+TUPLE: ordered-list-item child ;
+TUPLE: ordered-list child ;
 TUPLE: table child ;
 TUPLE: table-row child ;
 TUPLE: link href text ;
@@ -108,10 +110,19 @@ paragraph = ((paragraph-item nl => [[ first ]])+ nl+ => [[ first ]]
              | paragraph-item)
     => [[ paragraph boa ]]
 
-list-item      = '-' (cell | inline-tag)*
-    => [[ second list-item boa ]]
-list = ((list-item nl)+ list-item? | list-item)
-    => [[ list boa ]]
+list-item     = (cell | inline-tag)*
+
+ordered-list-item      = '#' list-item
+    => [[ second ordered-list-item boa ]]
+ordered-list = ((ordered-list-item nl)+ ordered-list-item? | ordered-list-item)
+    => [[ ordered-list boa ]]
+
+unordered-list-item    = '-' list-item
+    => [[ second unordered-list-item boa ]]
+unordered-list = ((unordered-list-item nl)+ unordered-list-item? | unordered-list-item)
+    => [[ unordered-list boa ]]
+
+list = ordered-list | unordered-list
 
 code       =  '[' (!('{' | nl | '[').)+ '{' (!("}]").)+ "}]"
     => [[ [ second >string ] [ fourth >string ] bi code boa ]]
@@ -176,8 +187,10 @@ M: emphasis (write-farkup) [ child>> (write-farkup) ] "em" in-tag. ;
 M: superscript (write-farkup) [ child>> (write-farkup) ] "sup" in-tag. ;
 M: subscript (write-farkup) [ child>> (write-farkup) ] "sub" in-tag. ;
 M: inline-code (write-farkup) [ child>> (write-farkup) ] "code" in-tag. ;
-M: list-item (write-farkup) [ child>> (write-farkup) ] "li" in-tag. ;
-M: list (write-farkup) [ child>> (write-farkup) ] "ul" in-tag. ;
+M: unordered-list-item (write-farkup) [ child>> (write-farkup) ] "li" in-tag. ;
+M: unordered-list (write-farkup) [ child>> (write-farkup) ] "ul" in-tag. ;
+M: ordered-list-item (write-farkup) [ child>> (write-farkup) ] "li" in-tag. ;
+M: ordered-list (write-farkup) [ child>> (write-farkup) ] "ol" in-tag. ;
 M: paragraph (write-farkup) [ child>> (write-farkup) ] "p" in-tag. ;
 M: link (write-farkup) [ href>> ] [ text>> ] bi write-link ;
 M: image (write-farkup) [ href>> ] [ text>> ] bi write-image-link ;

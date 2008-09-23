@@ -35,6 +35,14 @@ link-no-follow? off
 
 [ "<ul><li>foo</li>\n</ul><p>bar\n</p>" ] [ "-foo\nbar\n" convert-farkup ] unit-test
 
+[ "<ol><li>a-b</li></ol>" ] [ "#a-b" convert-farkup ] unit-test
+[ "<ol><li>foo</li></ol>" ] [ "#foo" convert-farkup ] unit-test
+[ "<ol><li>foo</li>\n</ol>" ] [ "#foo\n" convert-farkup ] unit-test
+[ "<ol><li>foo</li>\n<li>bar</li></ol>" ] [ "#foo\n#bar" convert-farkup ] unit-test
+[ "<ol><li>foo</li>\n<li>bar</li>\n</ol>" ] [ "#foo\n#bar\n" convert-farkup ] unit-test
+
+[ "<ol><li>foo</li>\n</ol><p>bar\n</p>" ] [ "#foo\nbar\n" convert-farkup ] unit-test
+
 
 [ "\n\n" ] [ "\n\n" convert-farkup ] unit-test
 [ "\n\n" ] [ "\r\n\r\n" convert-farkup ] unit-test
