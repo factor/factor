@@ -1,0 +1,1 @@
+An abstraction for enforcing a mutual-exclusion invariant
