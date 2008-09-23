@@ -43,7 +43,7 @@ HELP: push-growing-circular
      { "elt" object } { "circular" circular } }
 { $description "Pushes an element onto a " { $link growing-circular } " object." } ;
 
-ARTICLE: "circular" "circular"
+ARTICLE: "circular" "Circular sequences"
 "The " { $vocab-link "circular" } " vocabulary implements the " { $link "sequence-protocol" } " to allow an arbitrary start index and wrap-around indexing." $nl
 "Creating a new circular object:"
 { $subsection <circular> }

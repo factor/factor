@@ -37,7 +37,11 @@ CHLOE: style
     ] ?if ;
 
 CHLOE: write-style
-    drop [ <style> write-style </style> ] [code] ;
+    drop [
+        <style "text/css" =type style>
+            write-style
+        </style>
+    ] [code] ;
 
 CHLOE: even
     [ "index" value even? swap when ] process-children ;
