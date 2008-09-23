@@ -168,7 +168,7 @@ M: db <select-by-slots-statement> ( tuple class -- statement )
         number>string " limit " swap 3append
     ] curry change-sql drop ;
 
-: make-query ( tuple query -- tuple' )
+: make-query* ( tuple query -- tuple' )
     dupd
     {
         [ group>> [ drop ] [ do-group ] if-empty ]
@@ -177,8 +177,8 @@ M: db <select-by-slots-statement> ( tuple class -- statement )
         [ offset>> [ do-offset ] [ drop ] if* ]
     } 2cleave ;
 
-M: db <query> ( tuple class query -- tuple )
-    [ <select-by-slots-statement> ] dip make-query ;
+M: db make-query ( tuple class query -- tuple )
+    [ <select-by-slots-statement> ] dip make-query* ;
 
 ! select ID, NAME, SCORE from EXAM limit 1 offset 3
 
@@ -198,7 +198,7 @@ M: db <count-statement> ( tuple class groups -- statement )
     \ query new
         swap >>group
     [ [ "select count(*) from " 0% 0% where-clause ] query-make ]
-    dip make-query ;
+    dip make-query* ;
 
 : create-index ( index-name table-name columns -- )
     [
