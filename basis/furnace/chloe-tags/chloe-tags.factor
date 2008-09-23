@@ -72,9 +72,11 @@ CHLOE: a
 
 : compile-hidden-form-fields ( for -- )
     '[
-        _ [ "," split [ hidden render ] each ] when*
-        nested-forms get " " join f like nested-forms-key hidden-form-field
-        [ modify-form ] each-responder
+        <div "display: none;" =style div>
+            _ [ "," split [ hidden render ] each ] when*
+            nested-forms get " " join f like nested-forms-key hidden-form-field
+            [ modify-form ] each-responder
+        </div>
     ] [code] ;
 
 : compile-form-attrs ( method action attrs -- )
