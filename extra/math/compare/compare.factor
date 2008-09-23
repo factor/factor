@@ -1,3 +1,6 @@
+! Copyright (C) 2008 John Benediktsson
+! See http://factorcode.org/license.txt for BSD license
+
 USING: math math.order kernel ;
 
 IN: math.compare 

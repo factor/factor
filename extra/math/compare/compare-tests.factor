@@ -1,3 +1,6 @@
+! Copyright (C) 2008 John Benediktsson
+! See http://factorcode.org/license.txt for BSD license
+
 USING: kernel math math.functions math.compare tools.test ;
 
 IN: math.compare.tests
