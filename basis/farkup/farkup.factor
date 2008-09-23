@@ -28,6 +28,7 @@ TUPLE: table-row child ;
 TUPLE: link href text ;
 TUPLE: image href text ;
 TUPLE: code mode string ;
+TUPLE: line ;
 
 : absolute-url? ( string -- ? )
     { "http://" "https://" "ftp://" } [ head? ] with contains? ;
@@ -123,6 +124,9 @@ unordered-list = ((unordered-list-item nl)+ unordered-list-item? | unordered-lis
 
 list = ordered-list | unordered-list
 
+line = '___'
+    => [[ drop line new ]]
+
 code       =  '[' (!('{' | nl | '[').)+ '{' (!("}]").)+ "}]"
     => [[ [ second >string ] [ fourth >string ] bi code boa ]]
 
@@ -131,7 +135,7 @@ simple-code
     => [[ second f swap code boa ]]
 
 stand-alone
-           = (code | simple-code | heading | list | table | paragraph | nl)*
+           = (line | code | simple-code | heading | list | table | paragraph | nl)*
 ;EBNF
 
 
@@ -193,6 +197,7 @@ M: paragraph (write-farkup) [ child>> (write-farkup) ] "p" in-tag. ;
 M: link (write-farkup) [ href>> ] [ text>> ] bi write-link ;
 M: image (write-farkup) [ href>> ] [ text>> ] bi write-image-link ;
 M: code (write-farkup) [ string>> ] [ mode>> ] bi render-code ;
+M: line (write-farkup) drop <hr/> ;
 M: table-row (write-farkup) ( obj -- )
     child>> [ [ [ (write-farkup) ] "td" in-tag. ] each ] "tr" in-tag. ;
 M: table (write-farkup) [ child>> (write-farkup) ] "table" in-tag. ;
