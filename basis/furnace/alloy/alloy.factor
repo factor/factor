@@ -11,20 +11,23 @@ furnace.auth.providers
 furnace.auth.login.permits ;
 IN: furnace.alloy
 
-: <alloy> ( responder db params -- responder' )
-    '[
-        <asides>
-        <conversations>
-        <sessions>
-        _ _ <db-persistence>
-        <check-form-submissions>
-    ] call ;
-
 : state-classes { session aside conversation permit } ; inline
 
 : init-furnace-tables ( -- )
     state-classes ensure-tables
     user ensure-table ;
+
+: <alloy> ( responder db params -- responder' )
+    [ [ init-furnace-tables ] with-db ]
+    [
+        [
+            <asides>
+            <conversations>
+            <sessions>
+        ] 2dip
+        <db-persistence>
+        <check-form-submissions>
+    ] 2bi ;
 
 : start-expiring ( db params -- )
     '[

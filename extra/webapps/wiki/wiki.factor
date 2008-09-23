@@ -19,7 +19,7 @@ db.types db.tuples lcs farkup urls ;
 IN: webapps.wiki
 
 : wiki-url ( rest path -- url )
-    [ "$wiki/" % % "/" % % ] "" make
+    [ "$wiki/" % % "/" % present % ] "" make
     <url> swap >>path ;
 
 : view-url ( title -- url ) "view" wiki-url ;
