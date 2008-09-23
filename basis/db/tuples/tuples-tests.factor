@@ -236,6 +236,17 @@ TUPLE: exam id name score ;
     exam boa ;
 
 : test-intervals ( -- )
+    [
+        exam "EXAM"
+        {
+            { "idd" "ID" +db-assigned-id+ }
+            { "named" "NAME" TEXT }
+            { "score" "SCORE" INTEGER }
+        } define-persistent
+    ] [
+        seq>> { "idd" "named" } =
+    ] must-fail-with
+
     exam "EXAM"
     {
         { "id" "ID" +db-assigned-id+ }
@@ -507,9 +518,8 @@ string-encoding-test "STRING_ENCODING_TEST" {
     ! [ ] [ T{ exam f f "Kenny" 60 } insert-tuple ] unit-test
     ! [ ] [ T{ exam f f "Cartman" 41 } insert-tuple ] unit-test
     [ ] [ 10 [ random-exam insert-tuple ] times ] unit-test
-    [ ] [ ] unit-test
+    ! [ ] [ T{ exam { name "Kenny" } } >query  ] unit-test
     ! [ ] [ query ] unit-test
-
     ;
 
 : test-db ( -- )

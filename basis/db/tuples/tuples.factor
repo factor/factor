@@ -3,7 +3,7 @@
 USING: arrays assocs classes db kernel namespaces
 classes.tuple words sequences slots math accessors
 math.parser io prettyprint db.types continuations
-destructors mirrors ;
+destructors mirrors sets ;
 IN: db.tuples
 
 TUPLE: query tuple group order offset limit ;
@@ -30,8 +30,17 @@ HOOK: make-query db ( tuple class query -- statement )
 
 HOOK: insert-tuple* db ( tuple statement -- )
 
+ERROR: no-slots-named class seq ;
+: check-columns ( class columns -- )
+    tuck
+    [ [ first ] map ]
+    [ "slots" word-prop [ name>> ] map ] bi* diff
+    [ drop ] [ no-slots-named ] if-empty ;
+
 : define-persistent ( class table columns -- )
-    >r dupd "db-table" set-word-prop dup r>
+    pick dupd
+    check-columns
+    [ dupd "db-table" set-word-prop dup ] dip
     [ relation? ] partition swapd
     dupd [ spec>tuple ] with map
     "db-columns" set-word-prop
