@@ -64,7 +64,7 @@ HELP: n||-rewrite
      { "quot" quotation } }
 { $description "A macro that reqrites the code to pass " { $snippet "N" } " parameters from the stack to each OR quotation." } ;
 
-ARTICLE: "combinators.short-circuit" "combinators.short-circuit"
+ARTICLE: "combinators.short-circuit" "Short-circuit combinators"
 "The " { $vocab-link "combinators.short-circuit" } " vocabulary stops a computation early once a condition is met." $nl
 "AND combinators:"
 { $subsection 0&& }

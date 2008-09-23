@@ -123,8 +123,8 @@ DEFER: compile-element
 
 : compile-prologue ( xml -- )
     [
-        [ before>> compile-chunk ]
         [ prolog>> [ write-prolog ] [code-with] ]
+        [ before>> compile-chunk ]
         bi
     ] compile-quot
     [ if-not-nested ] [code] ;
