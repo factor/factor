@@ -16,11 +16,17 @@ Images can be embedded in the text:
 
 [[image:http://factorcode.org/graphics/logo.png]]
 
-Lists:
+Unordered lists:
 
 - a list
 - with three
 - items
+
+Ordered lists:
+
+# a list
+# with three
+# numbered items
 
 Tables:
 
