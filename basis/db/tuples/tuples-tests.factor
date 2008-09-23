@@ -499,3 +499,18 @@ string-encoding-test "STRING_ENCODING_TEST" {
 \ ensure-table must-infer
 \ create-table must-infer
 \ drop-table must-infer
+
+: test-queries ( -- )
+    [ ] [ exam ensure-table ] unit-test
+    ! [ ] [ T{ exam f f "Kyle" 100 } insert-tuple ] unit-test
+    ! [ ] [ T{ exam f f "Stan" 80 } insert-tuple ] unit-test
+    ! [ ] [ T{ exam f f "Kenny" 60 } insert-tuple ] unit-test
+    ! [ ] [ T{ exam f f "Cartman" 41 } insert-tuple ] unit-test
+    [ ] [ 10 [ random-exam insert-tuple ] times ] unit-test
+    [ ] [ ] unit-test
+    ! [ ] [ query ] unit-test
+
+    ;
+
+: test-db ( -- )
+    "tuples-test.db" temp-file sqlite-db make-db db-open db set ;
