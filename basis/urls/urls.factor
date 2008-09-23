@@ -148,13 +148,6 @@ M: string >url
     ]
     [ url-decode >>anchor ] bi* ;
 
-<PRIVATE
-
-: unparse-username-password ( url -- )
-    dup username>> dup [
-        % password>> [ ":" % % ] when* "@" %
-    ] [ 2drop ] if ;
-
 : protocol-port ( protocol -- port )
     {
         { "http" [ 80 ] }
@@ -165,6 +158,11 @@ M: string >url
     } case ;
 
 <PRIVATE
+
+: unparse-username-password ( url -- )
+    dup username>> dup [
+        % password>> [ ":" % % ] when* "@" %
+    ] [ 2drop ] if ;
 
 : url-port ( url -- port/f )
     [ port>> ] [ port>> ] [ protocol>> protocol-port ] tri =
