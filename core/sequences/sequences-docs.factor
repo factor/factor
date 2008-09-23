@@ -1258,6 +1258,8 @@ ARTICLE: "sequence-protocol" "Sequence protocol"
 "At least one of the following two generic words must have a method for accessing elements; the " { $link sequence } " mixin has default definitions which are mutually recursive:"
 { $subsection nth }
 { $subsection nth-unsafe }
+"Note that sequences are always indexed starting from zero."
+$nl
 "At least one of the following two generic words must have a method for storing elements; the " { $link sequence } " mixin has default definitions which are mutually recursive:"
 { $subsection set-nth }
 { $subsection set-nth-unsafe }
@@ -1283,8 +1285,7 @@ ARTICLE: "virtual-sequences-protocol" "Virtual sequence protocol"
 
 ARTICLE: "virtual-sequences" "Virtual sequences"
 "Virtual sequences allow different ways of accessing a sequence without having to create a new sequence or a new data structure altogether. To do this, they translate the virtual index into a normal index into an underlying sequence using the " { $link "virtual-sequences-protocol" } "."
-$nl
-"One current limitation of the virtual sequence protocol is that sequences must be indexed starting at zero." ;
+{ $subsection "virtual-sequences-protocol" } ;
 
 ARTICLE: "sequences-integers" "Integer sequences and counted loops"
 "Integers support the sequence protocol in a trivial fashion; a non-negative integer presents its non-negative predecessors as elements. For example, the integer 3, when viewed as a sequence, contains the elements 0, 1, and 2. This is very useful for performing counted loops."
