@@ -111,7 +111,7 @@ CHLOE: form
 
 STRING: button-tag-markup
 <t:form class="inline" xmlns:t="http://factorcode.org/chloe/1.0">
-    <button type="submit"></button>
+    <div><button type="submit"></button></div>
 </t:form>
 ;
 
@@ -122,7 +122,7 @@ CHLOE: button
     button-tag-markup string>xml body>>
     {
         [ [ attrs>> chloe-attrs-only ] dip add-tag-attrs ]
-        [ [ attrs>> non-chloe-attrs-only ] dip "button" tag-named add-tag-attrs ]
-        [ [ children>> ] dip "button" tag-named (>>children) ]
+        [ [ attrs>> non-chloe-attrs-only ] dip "button" deep-tag-named add-tag-attrs ]
+        [ [ children>> ] dip "button" deep-tag-named (>>children) ]
         [ nip ]
     } 2cleave compile-chloe-tag ;
