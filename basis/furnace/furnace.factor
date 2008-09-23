@@ -4,7 +4,7 @@ USING: namespaces make assocs sequences kernel classes splitting
 vocabs.loader accessors strings combinators arrays
 continuations present fry
 urls html.elements
-http http.server http.server.redirection ;
+http http.server http.server.redirection http.server.remapping ;
 IN: furnace
 
 : nested-responders ( -- seq )
@@ -89,16 +89,19 @@ M: object modify-form drop ;
         ] }
     } case ;
 
-: referrer ( -- referrer )
+: referrer ( -- referrer/f )
     #! Typo is intentional, its in the HTTP spec!
-    "referer" request get header>> at >url ;
+    "referer" request get header>> at
+    dup [ >url ensure-port [ remap-port ] change-port ] when ;
 
 : user-agent ( -- user-agent )
     "user-agent" request get header>> at "" or ;
 
 : same-host? ( url -- ? )
-    url get
-    [ [ protocol>> ] [ host>> ] [ port>> ] tri 3array ] bi@ = ;
+    dup [
+        url get
+        [ [ protocol>> ] [ host>> ] [ port>> ] tri 3array ] bi@ =
+    ] when ;
 
 : cookie-client-state ( key request -- value/f )
     swap get-cookie dup [ value>> ] when ;
