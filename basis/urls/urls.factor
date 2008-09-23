@@ -155,13 +155,30 @@ M: string >url
         % password>> [ ":" % % ] when* "@" %
     ] [ 2drop ] if ;
 
+: protocol-port ( protocol -- port )
+    {
+        { "http" [ 80 ] }
+        { "https" [ 443 ] }
+        { "feed" [ 80 ] }
+        { "ftp" [ 21 ] }
+        [ drop f ]
+    } case ;
+
+<PRIVATE
+
+: url-port ( url -- port/f )
+    [ port>> ] [ port>> ] [ protocol>> protocol-port ] tri =
+    [ drop f ] when ;
+
+PRIVATE>
+
 : unparse-host-part ( url protocol -- )
     %
     "://" %
     {
         [ unparse-username-password ]
         [ host>> url-encode % ]
-        [ port>> [ ":" % # ] when* ]
+        [ url-port [ ":" % # ] when* ]
         [ path>> "/" head? [ "/" % ] unless ]
     } cleave ;
 
@@ -211,15 +228,6 @@ PRIVATE>
 : url-addr ( url -- addr )
     [ [ host>> ] [ port>> ] bi <inet> ] [ protocol>> ] bi
     secure-protocol? [ <secure> ] when ;
-
-: protocol-port ( protocol -- port )
-    {
-        { "http" [ 80 ] }
-        { "https" [ 443 ] }
-        { "feed" [ 80 ] }
-        { "ftp" [ 21 ] }
-        [ drop f ]
-    } case ;
 
 : ensure-port ( url -- url' )
     dup protocol>> '[ _ protocol-port or ] change-port ;

@@ -99,8 +99,12 @@ M: object modify-form drop ;
 
 : same-host? ( url -- ? )
     dup [
-        url get
-        [ [ protocol>> ] [ host>> ] [ port>> ] tri 3array ] bi@ =
+        url get [
+            [ protocol>> ]
+            [ host>> ]
+            [ port>> remap-port ]
+            tri 3array
+        ] bi@ =
     ] when ;
 
 : cookie-client-state ( key request -- value/f )

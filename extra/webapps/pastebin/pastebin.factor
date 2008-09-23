@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces assocs sorting sequences kernel accessors
 hashtables sequences.lib db.types db.tuples db combinators
-calendar calendar.format math.parser syndication urls xml.writer
-xmode.catalog validators
+calendar calendar.format math.parser math.order syndication urls
+xml.writer xmode.catalog validators
 html.forms
 html.components
 html.templates.chloe
@@ -58,7 +58,9 @@ TUPLE: paste < entity annotations ;
         swap >>id ;
 
 : pastes ( -- pastes )
-    f <paste> select-tuples ;
+    f <paste> select-tuples
+    [ [ date>> ] compare ] sort
+    reverse ;
 
 TUPLE: annotation < entity parent ;
 
@@ -111,7 +113,7 @@ M: annotation entity-url
     <feed-action>
         [ pastebin-url ] >>url
         [ "Factor Pastebin" ] >>title
-        [ pastes <reversed> ] >>entries ;
+        [ pastes ] >>entries ;
 
 ! ! !
 ! PASTES

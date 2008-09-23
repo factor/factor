@@ -225,3 +225,5 @@ urls [
 ] unit-test
 
 [ "foo#3" ] [ URL" foo" clone 3 >>anchor present ] unit-test
+
+[ "http://www.foo.com/" ] [ "http://www.foo.com:80" >url present ] unit-test
