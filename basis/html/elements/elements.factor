@@ -149,6 +149,7 @@ SYMBOL: html
 [
     "input"
     "br"
+    "hr"
     "link"
     "img"
 ] [ define-open-html-word ] each
