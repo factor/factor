@@ -9,7 +9,7 @@ xmode.code2html lcs.diff2html farkup
 html.elements html.streams html.forms ;
 IN: html.components
 
-GENERIC: render* ( value name render -- )
+GENERIC: render* ( value name renderer -- )
 
 : render ( name renderer -- )
     prepare-value
@@ -145,6 +145,9 @@ M: code render*
 
 ! Farkup component
 TUPLE: farkup no-follow disable-images parsed ;
+
+: <farkup> ( -- farkup )
+    farkup new ;
 
 : string>boolean ( string -- boolean )
     {

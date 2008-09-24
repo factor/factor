@@ -46,6 +46,6 @@ ARTICLE: "ascii" "ASCII character classes"
 { $subsection printable? }
 { $subsection control? }
 { $subsection quotable? }
-"Modern applications should use Unicode 5.0 instead (" { $vocab-link "unicode" } ")." ;
+"Modern applications should use Unicode 5.0 instead (" { $vocab-link "unicode.categories" } ")." ;
 
 ABOUT: "ascii"

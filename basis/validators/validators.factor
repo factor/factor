@@ -6,13 +6,13 @@ unicode.categories arrays hashtables words classes quotations
 xmode.catalog ;
 IN: validators
 
-: v-default ( str def -- str )
+: v-default ( str def -- str/def )
     over empty? spin ? ;
 
 : v-required ( str -- str )
     dup empty? [ "required" throw ] when ;
 
-: v-optional ( str quot -- str )
+: v-optional ( str quot -- result )
     over empty? [ 2drop f ] [ call ] if ; inline
 
 : v-min-length ( str n -- str )
@@ -91,7 +91,7 @@ IN: validators
         "not a valid syntax mode" throw 
     ] unless ;
 
-: luhn? ( n -- ? )
+: luhn? ( str -- ? )
     string>digits <reversed>
     [ odd? [ 2 * 10 /mod + ] when ] map-index
     sum 10 mod 0 = ;

@@ -42,6 +42,6 @@ HELP: wordtimer-call
 
     
 ARTICLE: "wordtimer" "Word Timer"
-"The " { $vocab-link "wordtimer" } " vocabulary measures accumulated execution time for words. If you just want to profile the accumulated time taken by all words in a vocab you can use " { $vocab-link "profile-vocab" } ". If you need more fine grained control then do the following: First annotate individual words with the " { $link add-timer } " word or whole vocabularies with " { $link add-timers } ". Then use " { $link wordtimer-call } " to invoke a quotation and print out the timings." ;
+"The " { $vocab-link "wordtimer" } " vocabulary measures accumulated execution time for words. If you just want to profile the accumulated time taken by all words in a vocab you can use " { $link profile-vocab } ". If you need more fine grained control then do the following: First annotate individual words with the " { $link add-timer } " word or whole vocabularies with " { $link add-timers } ". Then use " { $link wordtimer-call } " to invoke a quotation and print out the timings." ;
     
 ABOUT: "wordtimer"
