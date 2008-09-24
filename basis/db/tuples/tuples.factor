@@ -34,7 +34,7 @@ ERROR: no-slots-named class seq ;
 : check-columns ( class columns -- )
     tuck
     [ [ first ] map ]
-    [ "slots" word-prop [ name>> ] map ] bi* diff
+    [ all-slots [ name>> ] map ] bi* diff
     [ drop ] [ no-slots-named ] if-empty ;
 
 : define-persistent ( class table columns -- )
