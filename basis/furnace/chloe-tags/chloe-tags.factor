@@ -111,7 +111,7 @@ CHLOE: form
 
 STRING: button-tag-markup
 <t:form class="inline" xmlns:t="http://factorcode.org/chloe/1.0">
-    <div><button type="submit"></button></div>
+    <div style="display: inline;"><button type="submit"></button></div>
 </t:form>
 ;
 
