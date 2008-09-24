@@ -67,7 +67,7 @@ SYMBOL: next-template
 
 M: f call-template* drop call-next-template ;
 
-: with-boilerplate ( body template -- )
+: with-boilerplate ( child master -- )
     [
         title [ <box> or ] change
         style [ SBUF" " clone or ] change
