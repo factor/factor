@@ -146,6 +146,9 @@ M: code render*
 ! Farkup component
 TUPLE: farkup no-follow disable-images parsed ;
 
+: <farkup> ( -- farkup )
+    farkup new ;
+
 : string>boolean ( string -- boolean )
     {
         { "true" [ t ] }
