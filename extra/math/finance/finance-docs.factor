@@ -9,6 +9,34 @@ HELP: enumerate
 { $values { "seq" "a sequence" } { "newseq" "a sequence" } }
 { $description "Returns a new sequence where each element is an array of { value, index }" } ;
 
+HELP: distribute
+{ $values { "amount" "a number of amount" } { "n" "a number of buckets" } { "seq" "a sequence" } } 
+{ $description
+    "Distribute 'amount' in 'n' buckets, as equally as possible.  Returns a list of 'n' elements that sum to 'amount'.\n"
+} 
+{ $examples
+    { $example
+        "USING: math.finance"
+        "3 1 distribute"
+        "{ 3 }" }
+    { $example
+        "USING: math.finance"
+        "3 3 distribute"
+        "{ 1 1 1 }" }
+    { $example
+        "USING: math.finance"
+        "5 3 distribute"
+        "{ 2 1 2 }" }
+    { $example
+        "USING: math.finance"
+        "3 5 distribute"
+        "{ 1 0 1 0 1 }" }
+    { $example
+        "USING: math.finance"
+        "1000 7 distribute"
+        "{ 143 143 143 142 143 143 143 }" }
+} ;
+
 HELP: sma
 { $values { "seq" "a sequence" } { "n" "number of periods" } { "newseq" "a sequence" } }
 { $description "Returns the Simple Moving Average with the specified periodicity." } ;

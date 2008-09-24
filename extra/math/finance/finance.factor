@@ -1,12 +1,19 @@
 ! Copyright (C) 2008 John Benediktsson
 ! See http://factorcode.org/license.txt for BSD license
 
-USING: arrays assocs fry kernel grouping math math.statistics math.vectors sequences ;
+USING: arrays assocs kernel grouping sequences shuffle
+math math.functions math.statistics math.vectors ;
 
 IN: math.finance
 
 : enumerate ( seq -- newseq )
     <enum> >alist ;
+
+: distribute ( amount n -- seq ) 
+    [ / ] keep 0 <array> [ 0 0 ] dip 
+    [ + [ [ dup ] dip + ] dip  
+      [ dup round ] dip 2dup -
+      [ drop ] dip ] map 3nip ;
 
 <PRIVATE
 
@@ -22,7 +29,7 @@ IN: math.finance
 PRIVATE>
 
 : ema ( seq n -- newseq )
-    a swap first-rest swap '[ [ dup ] 2dip swap rot weighted ] accumulate 2nip ;
+    a swap first-rest swap [ [ dup ] 2dip swap rot weighted ] accumulate 2nip ;
 
 : sma ( seq n -- newseq )
     clump [ mean ] map ;
@@ -33,5 +40,4 @@ PRIVATE>
 : momentum ( seq n -- newseq )
     2dup tail-slice -rot swap [ length ] keep
     [ - neg ] dip swap head-slice v- ;
-
 
