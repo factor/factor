@@ -18,6 +18,7 @@ HELP: with-html-stream
 { $description "Calls the quotation in a new dynamic scope with " { $link output-stream } " rebound to an " { $link html-stream } " wrapping the current " { $link output-stream } "." }
 { $examples
     { $example
+        "USING: io io.styles html.streams ;"
         "[ \"Hello\" { { font-style bold } } format nl ] with-html-stream"
         "<span style='font-style: normal; font-weight: bold; '>Hello</span><br/>"
     }

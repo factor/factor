@@ -28,7 +28,6 @@ HELP: set-title
 { $description "Sets the title of the current page. This is usually called by child templates, and a master template calls " { $link write-title } "." } ;
 
 HELP: write-title
-{ $values { "string" string } }
 { $description "Writes the title of the current page, previously set by " { $link set-title } ". This is usually called by a master template after rendering a child template." } ;
 
 HELP: add-style
