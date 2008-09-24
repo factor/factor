@@ -42,9 +42,9 @@ M: mb-writer stream-nl ( mb-writer -- )
 !                       TESTS
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-[ { t } [ irc> profile>> nickname>> me? ] unit-test
+[ { t } [ irc> nick>> me? ] unit-test
 
-  { "factorbot" } [ irc> profile>> nickname>> ] unit-test
+  { "factorbot" } [ irc> nick>> ] unit-test
 
   { "someuser" } [ "someuser!n=user@some.where" parse-name ] unit-test
 
@@ -58,7 +58,7 @@ M: mb-writer stream-nl ( mb-writer -- )
 ! Test login and nickname set
 [ { "factorbot2" } [
      ":some.where 001 factorbot2 :Welcome factorbot2" %push-line
-      irc> profile>> nickname>>
+      irc> nick>>
   ] unit-test
 ] with-irc
 

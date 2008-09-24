@@ -18,9 +18,9 @@ TUPLE: irc-profile server port nickname password ;
 C: <irc-profile> irc-profile
 
 TUPLE: irc-client profile stream in-messages out-messages join-messages
-       listeners is-running connect reconnect-time ;
+       listeners is-running nick connect reconnect-time ;
 : <irc-client> ( profile -- irc-client )
-    f <mailbox> <mailbox> <mailbox> H{ } clone f
+    [ f <mailbox> <mailbox> <mailbox> H{ } clone f ] keep nickname>>
     [ <inet> latin1 <client> ] 15 seconds irc-client boa ;
 
 TUPLE: irc-listener in-messages out-messages ;
@@ -78,7 +78,9 @@ PRIVATE>
 
 : terminate-irc ( irc-client -- )
     [ is-running>> ] keep and [
-        [ end-loops ] [ [ f ] dip (>>is-running) ] bi
+        [ end-loops ]
+        [ [ f ] dip (>>is-running) ]
+        bi
     ] when* ;
 
 <PRIVATE
@@ -96,7 +98,7 @@ SYMBOL: current-irc-client
 : irc-send ( irc-message -- ) irc> out-messages>> mailbox-put ;
 : listener> ( name -- listener/f ) irc> listeners>> at ;
 : channel-mode? ( mode -- ? ) name>> first "#&" member? ;
-: me? ( string -- ? ) irc> profile>> nickname>> = ;
+: me? ( string -- ? ) irc> nick>> = ;
 
 GENERIC: to-listener ( message obj -- )
 
@@ -122,7 +124,7 @@ M: irc-listener to-listener ( message irc-listener -- )
 
 : listeners-with-participant ( nick -- seq )
     irc> listeners>> values
-    [ dup irc-channel-listener? [ participants>> key? ] [ 2drop f ] if ]
+    [ [ irc-channel-listener? ] keep and [ participants>> key? ] when* ]
     with filter ;
 
 : to-listeners-with-participant ( message nickname -- )
@@ -218,7 +220,7 @@ M: object process-message ( object -- )
     drop ;
     
 M: logged-in process-message ( logged-in -- )
-    name>> irc> profile>> (>>nickname) ;
+    name>> irc> (>>nick) ;
 
 M: ping process-message ( ping -- )
     trailing>> /PONG ;
@@ -285,7 +287,7 @@ DEFER: (connect-irc)
     irc>
         [ [ irc-disconnected ] dip in-messages>> mailbox-put ]
         [ dup reconnect-time>> sleep (connect-irc) ]
-        [ profile>> nickname>> /LOGIN ]
+        [ nick>> /LOGIN ]
     tri ;
 
 ! FIXME: do something with the exception, store somewhere to help debugging
@@ -391,7 +393,7 @@ PRIVATE>
 
 : connect-irc ( irc-client -- )
     [ irc>
-      [ (connect-irc) ] [ profile>> nickname>> /LOGIN ] bi
+      [ (connect-irc) ] [ nick>> /LOGIN ] bi
       spawn-irc ] with-irc-client ;
 
 : add-listener ( irc-listener irc-client -- )
