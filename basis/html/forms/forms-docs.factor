@@ -73,6 +73,7 @@ HELP: with-each-value
 { $notes "This word is used to implement the " { $snippet "t:each" } " tag of the " { $vocab-link "html.templates.chloe" } " templating system. It can also be called directly from " { $vocab-link "html.templates.fhtml" } " templates." } ;
 
 HELP: with-each-object
+{ $values { "name" string } { "quot" quotation } }
 { $description "Calls the quotation with each element of the value named " { $snippet "name" } "; the value must be a sequence. The quotation is called in a new dynamic scope where the object's slots become named values, as if " { $link from-object } " was called." }
 { $notes "This word is used to implement the " { $snippet "t:bind-each" } " tag of the " { $vocab-link "html.templates.chloe" } " templating system. It can also be called directly from " { $vocab-link "html.templates.fhtml" } " templates." } ;
 

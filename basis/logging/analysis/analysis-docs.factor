@@ -20,7 +20,7 @@ HELP: analyze-log
 { $description "Analyzes a log file and prints a formatted report. The " { $snippet "word-names" } " parameter is documented in " { $link analyze-entries } "." } ;
 
 ARTICLE: "logging.analysis" "Log analysis"
-"The " { $vocab-link "logging.analysis" } " vocabulary builds on the " { $vocab-link "logging.parser" } " vocabulary. It parses log files and produces formatted summary reports. It is used by the " { $vocab-link "logger.insomniac" } " vocabulary to e-mail daily reports."
+"The " { $vocab-link "logging.analysis" } " vocabulary builds on the " { $vocab-link "logging.parser" } " vocabulary. It parses log files and produces formatted summary reports. It is used by the " { $vocab-link "logging.insomniac" } " vocabulary to e-mail daily reports."
 $nl
 "Print log file summary:"
 { $subsection analyze-log }

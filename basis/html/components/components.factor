@@ -9,7 +9,7 @@ xmode.code2html lcs.diff2html farkup
 html.elements html.streams html.forms ;
 IN: html.components
 
-GENERIC: render* ( value name render -- )
+GENERIC: render* ( value name renderer -- )
 
 : render ( name renderer -- )
     prepare-value

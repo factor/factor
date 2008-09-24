@@ -39,7 +39,7 @@ HELP: sprintf
 { $see-also printf } ;
 
 ARTICLE: "printf" "Formatted printing"
-"The " { $vocab-link "printf" } " and " { $vocab-link "sprintf" } " words are used for formatted printing.\n"
+"The " { $link printf } " and " { $link sprintf } " words are used for formatted printing.\n"
 "\n"
 "Several format specifications exist for handling arguments of different types, and specifying attributes for the result string, including such things as maximum width, padding, and decimals.\n"
 { $table
