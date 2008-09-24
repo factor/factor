@@ -1,10 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors combinators kernel math math.ranges
-sequences regexp.backend regexp.utils memoize sets
-regexp.parser regexp.nfa regexp.dfa regexp.traversal
-regexp.transition-tables assocs prettyprint.backend
-make lexer namespaces parser ;
+USING: accessors combinators kernel math math.ranges sequences
+sets assocs prettyprint.backend make lexer namespaces parser
+arrays fry regexp.backend regexp.utils regexp.parser regexp.nfa
+regexp.dfa regexp.traversal regexp.transition-tables ;
 IN: regexp
 
 : default-regexp ( string -- regexp )
@@ -29,6 +28,9 @@ IN: regexp
 : match ( string regexp -- pair )
     <dfa-traverser> do-match return-match ;
 
+: match* ( string regexp -- pair )
+    <dfa-traverser> do-match [ return-match ] [ captured-groups>> ] bi ;
+
 : matches? ( string regexp -- ? )
     dupd match
     [ [ length ] [ length>> 1- ] bi* = ] [ drop f ] if* ;
@@ -46,6 +48,33 @@ IN: regexp
     ] [
         [ 3drop drop f f ] [ drop [ 1+ ] dip match-range ] if
     ] if ;
+
+: first-match ( string regexp -- pair/f )
+    0 swap match-range dup [ 2array ] [ 2drop f ] if ;
+
+: re-cut ( string regexp -- end/f start )
+    dupd first-match
+    [ [ second tail-slice ] [ first head ] 2bi ]
+    [ "" like f swap ]
+    if* ;
+
+: re-split ( string regexp -- seq )
+    [ dup ] swap '[ _ re-cut ] [ ] produce nip ;
+
+: re-replace ( string regexp replacement -- result )
+    [ re-split ] dip join ;
+
+: next-match ( string regexp -- end/f match/f )
+    dupd first-match dup
+    [ [ second tail-slice ] keep ]
+    [ 2drop f f ]
+    if ;
+
+: all-matches ( string regexp -- seq )
+    [ dup ] swap '[ _ next-match ] [ ] produce nip ;
+
+: count-matches ( string regexp -- n )
+    all-matches length 1- ;
 
 : initial-option ( regexp option -- regexp' )
     over options>> conjoin ;

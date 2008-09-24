@@ -251,8 +251,8 @@ IN: regexp-tests
 ! [ t ] [ "fxxbar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
 ! [ f ] [ "foobar" "(?!foo).{3}bar" <regexp> matches? ] unit-test
 
-! [ 3 ] [ "foobar" "foo(?=bar)" <regexp> match-head ] unit-test
-! [ f ] [ "foobxr" "foo(?=bar)" <regexp> match-head ] unit-test
+[ 3 ] [ "foobar" "foo(?=bar)" <regexp> match-head ] unit-test
+[ f ] [ "foobxr" "foo(?=bar)" <regexp> match-head ] unit-test
 
 ! [ f ] [ "foobxr" "foo\\z" <regexp> match-head ] unit-test
 ! [ 3 ] [ "foo" "foo\\z" <regexp> match-head ] unit-test
@@ -285,3 +285,50 @@ IN: regexp-tests
 ! 2. (A)
 ! 3. (B(C))
 ! 4. (C) 
+
+! clear "a(?=b*)" <regexp> "ab" over match
+! clear "a(?=b*c)" <regexp> "abbbbbc" over match
+! clear "a(?=b*)" <regexp> "ab" over match
+
+! clear "^a" <regexp> "a" over match
+! clear "^a" <regexp> "\na" over match
+! clear "^a" <regexp> "\r\na" over match
+! clear "^a" <regexp> "\ra" over match
+
+! clear "a$" <regexp> "a" over match
+! clear "a$" <regexp> "a\n" over match
+! clear "a$" <regexp> "a\r" over match
+! clear "a$" <regexp> "a\r\n" over match
+
+! "(az)(?<=b)" <regexp> "baz" over first-match
+! "a(?<=b*)" <regexp> "cbaz" over first-match
+! "a(?<=b)" <regexp> "baz" over first-match
+
+! "a(?<!b)" <regexp> "baz" over first-match
+! "a(?<!b)" <regexp> "caz" over first-match
+
+! "a(?=bcdefg)bcd" <regexp> "abcdefg" over first-match
+! "a(?#bcdefg)bcd" <regexp> "abcdefg" over first-match
+! "a(?:bcdefg)" <regexp> "abcdefg" over first-match
+
+[ { 0 1 } ] [ "ac" "a(?!b)" <regexp> first-match ] unit-test
+[ f ] [ "ab" "a(?!b)" <regexp> first-match ] unit-test
+
+! "a(?<=b)" <regexp> "caba" over first-match
+
+[ { 0 1 } ] [ "ab" "a(?=b)(?=b)" <regexp> first-match ] unit-test
+[ { 1 2 } ] [ "ba" "a(?<=b)(?<=b)" <regexp> first-match ] unit-test
+[ { 1 2 } ] [ "cab" "a(?=b)(?<=c)" <regexp> first-match ] unit-test
+
+! capture group 1: "aaaa"  2: ""
+! "aaaa" "(a*)(a*)" <regexp> match*
+! "aaaa" "(a*)(a+)" <regexp> match*
+
+[ { 0 2 } ] [ "ab" "(a|ab)(bc)?" <regexp> first-match ] unit-test
+[ { 0 3 } ] [ "abc" "(a|ab)(bc)?" <regexp> first-match ] unit-test
+
+[ { 0 2 } ] [ "ab" "(ab|a)(bc)?" <regexp> first-match ] unit-test
+[ { 0 3 } ] [ "abc" "(ab|a)(bc)?" <regexp> first-match ] unit-test
+
+[ { 23 24 } ] [ "aaaaaaaaaaaaaaaaaaaaaaab" "((a*)*b)*b" <regexp> first-match ] unit-test
+

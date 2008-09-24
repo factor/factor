@@ -35,6 +35,14 @@ link-no-follow? off
 
 [ "<ul><li>foo</li>\n</ul><p>bar\n</p>" ] [ "-foo\nbar\n" convert-farkup ] unit-test
 
+[ "<ol><li>a-b</li></ol>" ] [ "#a-b" convert-farkup ] unit-test
+[ "<ol><li>foo</li></ol>" ] [ "#foo" convert-farkup ] unit-test
+[ "<ol><li>foo</li>\n</ol>" ] [ "#foo\n" convert-farkup ] unit-test
+[ "<ol><li>foo</li>\n<li>bar</li></ol>" ] [ "#foo\n#bar" convert-farkup ] unit-test
+[ "<ol><li>foo</li>\n<li>bar</li>\n</ol>" ] [ "#foo\n#bar\n" convert-farkup ] unit-test
+
+[ "<ol><li>foo</li>\n</ol><p>bar\n</p>" ] [ "#foo\nbar\n" convert-farkup ] unit-test
+
 
 [ "\n\n" ] [ "\n\n" convert-farkup ] unit-test
 [ "\n\n" ] [ "\r\n\r\n" convert-farkup ] unit-test
@@ -120,3 +128,10 @@ link-no-follow? off
 [ "<p><a href='C%2b%2b'>C++</a></p>" ] [ "[[C++]]" convert-farkup ] unit-test
 
 [ "<p>&lt;foo&gt;</p>" ] [ "<foo>" convert-farkup ] unit-test
+
+[ "<p>asdf\n<ul><li>lol</li>\n<li>haha</li></ul></p>" ] [ "asdf\n-lol\n-haha" convert-farkup ] unit-test
+
+[ "<p>asdf</p><ul><li>lol</li>\n<li>haha</li></ul>" ] [ "asdf\n\n-lol\n-haha" convert-farkup ] unit-test
+
+[ "<hr/>" ] [ "___" convert-farkup ] unit-test
+[ "<hr/>\n" ] [ "___\n" convert-farkup ] unit-test

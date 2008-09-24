@@ -86,7 +86,7 @@ TUPLE: action rest authorize init display validate submit ;
         begin-conversation
         nested-forms-key param " " split harvest nested-forms cset
         form get form cset
-        <redirect>
+        <continue-conversation>
     ] [ <400> ] if*
     exit-with ;
 

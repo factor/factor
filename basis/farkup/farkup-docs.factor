@@ -30,7 +30,8 @@ ARTICLE: "farkup-ast" "Farkup syntax tree nodes"
 { $subsection inline-code }
 { $subsection paragraph }
 { $subsection list-item }
-{ $subsection list }
+{ $subsection unordered-list }
+{ $subsection ordered-list }
 { $subsection table }
 { $subsection table-row }
 { $subsection link }

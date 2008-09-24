@@ -25,7 +25,7 @@ TUPLE: html-stream stream last-div ;
 : a-div ( stream -- straem )
     t >>last-div ; inline
 
-: <html-stream> ( stream -- stream )
+: <html-stream> ( stream -- html-stream )
     f html-stream boa ;
 
 <PRIVATE
