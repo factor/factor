@@ -201,9 +201,13 @@ ERROR: invalid-timestamp-format ;
 : rfc822>timestamp ( str -- timestamp )
     [ (rfc822>timestamp) ] with-string-reader ;
 
+: check-day-name ( str -- )
+    [ day-abbreviations3 member? ] [ day-names member? ] bi or
+    check-timestamp drop ;
+
 : (cookie-string>timestamp-1) ( -- timestamp )
     timestamp new
-        "," read-token day-abbreviations3 member? check-timestamp drop
+        "," read-token check-day-name
         read1 CHAR: \s assert=
         "-" read-token checked-number >>day
         "-" read-token month-abbreviations index 1+ check-timestamp >>month
@@ -218,7 +222,7 @@ ERROR: invalid-timestamp-format ;
 
 : (cookie-string>timestamp-2) ( -- timestamp )
     timestamp new
-        read-sp day-abbreviations3 member? check-timestamp drop
+        read-sp check-day-name
         read-sp month-abbreviations index 1+ check-timestamp >>month
         read-sp checked-number >>day
         ":" read-token checked-number >>hour

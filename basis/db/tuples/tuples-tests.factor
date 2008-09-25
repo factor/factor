@@ -4,7 +4,7 @@ USING: io.files kernel tools.test db db.tuples classes
 db.types continuations namespaces math math.ranges
 prettyprint calendar sequences db.sqlite math.intervals
 db.postgresql accessors random math.bitwise
-math.ranges strings urls fry ;
+math.ranges strings urls fry db.tuples.private ;
 IN: db.tuples.tests
 
 TUPLE: person the-id the-name the-number the-real
@@ -357,7 +357,7 @@ TUPLE: exam id name score ;
         T{ exam } select-tuples
     ] unit-test
 
-    [ 4 ] [ T{ exam } f count-tuples ] unit-test ;
+    [ 4 ] [ T{ exam } count-tuples ] unit-test ;
 
 TUPLE: bignum-test id m n o ;
 : <bignum-test> ( m n o -- obj )
@@ -518,6 +518,7 @@ string-encoding-test "STRING_ENCODING_TEST" {
     ! [ ] [ T{ exam f f "Kenny" 60 } insert-tuple ] unit-test
     ! [ ] [ T{ exam f f "Cartman" 41 } insert-tuple ] unit-test
     [ ] [ 10 [ random-exam insert-tuple ] times ] unit-test
+    [ 5 ] [ <query> T{ exam { score T{ interval { from { 0 t } } { to { 100 t } } } } } >>tuple 5 >>limit select-tuples length ] unit-test
     ! [ ] [ T{ exam { name "Kenny" } } >query  ] unit-test
     ! [ ] [ query ] unit-test
     ;

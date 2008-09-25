@@ -2,19 +2,19 @@ IN: urls.tests
 USING: urls urls.private tools.test
 arrays kernel assocs present accessors ;
 
-[ "hello%20world" ] [ "hello world" url-encode ] unit-test
+[ "hello+world" ] [ "hello world" url-encode ] unit-test
 [ "hello world" ] [ "hello%20world" url-decode ] unit-test
 [ "~hello world" ] [ "%7ehello+world" url-decode ] unit-test
 [ f ] [ "%XX%XX%XX" url-decode ] unit-test
 [ f ] [ "%XX%XX%X" url-decode ] unit-test
 
-[ "hello world"   ] [ "hello+world"    url-decode ] unit-test
-[ "hello world"   ] [ "hello%20world"  url-decode ] unit-test
-[ " ! "           ] [ "%20%21%20"      url-decode ] unit-test
-[ "hello world"   ] [ "hello world%"   url-decode ] unit-test
-[ "hello world"   ] [ "hello world%x"  url-decode ] unit-test
-[ "hello%20world" ] [ "hello world"    url-encode ] unit-test
-[ "%20%21%20"     ] [ " ! "            url-encode ] unit-test
+[ "hello world" ] [ "hello+world"   url-decode ] unit-test
+[ "hello world" ] [ "hello%20world" url-decode ] unit-test
+[ " ! "         ] [ "%20%21%20"     url-decode ] unit-test
+[ "hello world" ] [ "hello world%"  url-decode ] unit-test
+[ "hello world" ] [ "hello world%x" url-decode ] unit-test
+[ "hello+world" ] [ "hello world"   url-encode ] unit-test
+[ "+%21+"       ] [ " ! "           url-encode ] unit-test
 
 [ "\u001234hi\u002045" ] [ "\u001234hi\u002045" url-encode url-decode ] unit-test
 

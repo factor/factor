@@ -28,6 +28,10 @@ Ordered lists:
 # with three
 # numbered items
 
+Horizontal lines:
+
+___
+
 Tables:
 
 |a table|with|four|columns|

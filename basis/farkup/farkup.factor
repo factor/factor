@@ -38,7 +38,7 @@ TUPLE: line ;
 
 EBNF: parse-farkup
 nl               = ("\r\n" | "\r" | "\n") => [[ drop "\n" ]]
-2nl              = nl nl
+whitespace       = " " | "\t" | nl
 
 heading1      = "=" (!("=" | nl).)+ "="
     => [[ second >string heading1 boa ]]
@@ -51,6 +51,10 @@ heading3      = "===" (!("=" | nl).)+ "==="
 
 heading4      = "====" (!("=" | nl).)+ "===="
     => [[ second >string heading4 boa ]]
+
+heading          = heading4 | heading3 | heading2 | heading1
+
+
 
 strong        = "*" (!("*" | nl).)+ "*"
     => [[ second >string strong boa ]]
@@ -67,8 +71,6 @@ subscript     = "~" (!("~" | nl).)+ "~"
 inline-code   = "%" (!("%" | nl).)+ "%"
     => [[ second >string inline-code boa ]]
 
-escaped-char  = "\" .                => [[ second 1string ]]
-
 link-content     = (!("|"|"]").)+
 
 image-link       = "[[image:" link-content  "|" link-content "]]"
@@ -84,10 +86,12 @@ labelled-link    = "[[" link-content "|" link-content "]]"
 
 link             = image-link | labelled-link | simple-link
 
-heading          = heading4 | heading3 | heading2 | heading1
+escaped-char  = "\" .                => [[ second 1string ]]
 
 inline-tag       = strong | emphasis | superscript | subscript | inline-code
                    | link | escaped-char
+
+
 
 inline-delimiter = '*' | '_' | '^' | '~' | '%' | '\' | '['
 
@@ -104,11 +108,12 @@ table            =  ((table-row nl => [[ first ]] )+ table-row? | table-row)
 text = (!(nl | code | heading | inline-delimiter | table ).)+
     => [[ >string ]]
 
-paragraph-item = (table | list | text | inline-tag | inline-delimiter)+
+paragraph-item = (table | nl list | nl line | code | text | inline-tag | inline-delimiter)+
 paragraph = ((paragraph-item nl => [[ first ]])+ nl+ => [[ first ]]
              | (paragraph-item nl)+ paragraph-item?
              | paragraph-item)
     => [[ paragraph boa ]]
+
 
 list-item     = (cell | inline-tag)*
 
@@ -124,18 +129,23 @@ unordered-list = ((unordered-list-item nl)+ unordered-list-item? | unordered-lis
 
 list = ordered-list | unordered-list
 
+
 line = '___'
     => [[ drop line new ]]
 
-code       =  '[' (!('{' | nl | '[').)+ '{' (!("}]").)+ "}]"
+
+named-code       =  '[' (!('{' | whitespace | '[').)+ '{' (!("}]").)+ "}]"
     => [[ [ second >string ] [ fourth >string ] bi code boa ]]
 
 simple-code
            = "[{" (!("}]").)+ "}]"
     => [[ second f swap code boa ]]
 
+code = named-code | simple-code
+
+
 stand-alone
-           = (line | code | simple-code | heading | list | table | paragraph | nl)*
+           = (line | code | heading | list | table | paragraph | nl)*
 ;EBNF
 
 

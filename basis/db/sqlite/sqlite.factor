@@ -5,7 +5,7 @@ io.files kernel math math.parser namespaces prettyprint
 sequences strings classes.tuple alien.c-types continuations
 db.sqlite.lib db.sqlite.ffi db.tuples words db.types combinators
 math.intervals io nmake accessors vectors math.ranges random
-math.bitwise db.queries destructors ;
+math.bitwise db.queries destructors db.tuples.private ;
 IN: db.sqlite
 
 TUPLE: sqlite-db < db path ;
