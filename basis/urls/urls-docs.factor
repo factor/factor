@@ -17,9 +17,9 @@ HELP: >url
 { $examples
     "If we convert a string to a URL and print it out again, it will print similarly to the input string, except some normalization may have occurred:"
     { $example
-        "USING: accessors io urls ;"
+        "USING: accessors prettyprint urls ;"
         "\"http://www.apple.com\" >url ."
-        "URL\" www.apple.com/\""
+        "URL\" http://www.apple.com/\""
     }
     "We can examine the URL object:"
     { $example
@@ -27,9 +27,9 @@ HELP: >url
         "\"http://www.apple.com\" >url host>> print"
         "www.apple.com"
     }
-    "A relative URL does not have a protocol or host component:"
+    "A relative URL does not have a protocol, host or port:"
     { $example
-        "USING: accessors io urls ;"
+        "USING: accessors prettyprint urls ;"
         "\"file.txt\" >url protocol>> ."
         "f"
     }
@@ -47,13 +47,12 @@ HELP: URL"
 } ;
 
 HELP: assoc>query
-{ $values
-     { "hash" hashtable }
-     { "str" string } }
+{ $values { "assoc" assoc } { "str" string } }
 { $description "Converts an assoc of query parameters into a query string, performing URL encoding." }
 { $notes "This word is used to implement the " { $link present } " method on URLs; it is also used by the HTTP client to encode POST requests." }
 { $examples
     { $example
+        "USING: io urls ;"
         "{ { \"from\" \"Lead\" } { \"to\" \"Gold, please\" } }"
         "assoc>query print"
         "from=Lead&to=Gold%2c+please"
@@ -134,7 +133,7 @@ HELP: query-param
         "USING: io urls ;"
         "URL\" http://food.com/calories?item=French+Fries\""
         "\"item\" query-param print"
-        "\"French Fries\""
+        "French Fries"
     }
 } ;
 
@@ -219,8 +218,8 @@ ARTICLE: "url-utilities" "URL implementation utilities"
 { $subsection secure-protocol? }
 { $subsection url-append-path } ;
 
-ARTICLE: "urls" "URLs"
-"The " { $vocab-link "urls" } " implements a URL data type. The benefit of using a data type to prepresent URLs rather than a string is that the parsing, printing and escaping logic is encapsulated and reused, rather than re-implemented in a potentially buggy manner every time."
+ARTICLE: "urls" "URL objects"
+"The " { $vocab-link "urls" } " vocabulary implements a URL data type. The benefit of using a data type to prepresent URLs rather than a string is that the parsing, printing and escaping logic is encapsulated and reused, rather than re-implemented in a potentially buggy manner every time."
 $nl
 "URL objects are used heavily by the " { $vocab-link "http" } " and " { $vocab-link "furnace" } " vocabularies, and are also useful on their own."
 $nl

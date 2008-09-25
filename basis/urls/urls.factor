@@ -104,8 +104,15 @@ TUPLE: url protocol username password host port path query anchor ;
 : query-param ( url key -- value )
     swap query>> at ;
 
+: delete-query-param ( url key -- url )
+    over query>> delete-at ;
+
 : set-query-param ( url value key -- url )
-    '[ [ _ _ ] dip ?set-at ] change-query ;
+    over [
+        '[ [ _ _ ] dip ?set-at ] change-query
+    ] [
+        nip delete-query-param
+    ] if ;
 
 : parse-host ( string -- host port )
     ":" split1 [ url-decode ] [

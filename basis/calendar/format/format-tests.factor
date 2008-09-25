@@ -62,3 +62,15 @@ IN: calendar.format.tests
         T{ duration f 0 0 0 -5 0 0 }
     }
 ] [ "2008-05-26T00:37:42.12345-05:00" rfc3339>timestamp ] unit-test
+
+[
+    T{ timestamp
+        { year 2008 }
+        { month 10 }
+        { day 2 }
+        { hour 23 }
+        { minute 59 }
+        { second 59 }
+        { gmt-offset T{ duration f 0 0 0 0 0 0 } }
+    }
+] [ "Thursday, 02-Oct-2008 23:59:59 GMT" cookie-string>timestamp ] unit-test
