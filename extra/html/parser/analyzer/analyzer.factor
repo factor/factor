@@ -1,3 +1,5 @@
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: assocs html.parser kernel math sequences strings ascii
 arrays generalizations shuffle unicode.case namespaces make
 splitting http accessors io combinators http.client urls
@@ -16,7 +18,6 @@ TUPLE: link attributes clickable ;
     [ <enum> >alist ] 2dip -rot
     '[ _ [ second @ ] find-from rot drop swap 1+ ]
     [ f 0 ] 2dip times drop first2 ; inline
-
 
 : find-first-name ( str vector -- i/f tag/f )
     [ >lower ] dip [ name>> = ] with find ; inline
