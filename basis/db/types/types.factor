@@ -126,11 +126,11 @@ ERROR: no-sql-type ;
 HOOK: bind% db ( spec -- )
 HOOK: bind# db ( spec obj -- )
 
-: offset-of-slot ( string obj -- n )
+: offset-of-slot ( string tuple -- n )
     class superclasses [ "slots" word-prop ] map concat
     slot-named offset>> ;
 
-: get-slot-named ( name obj -- value )
+: get-slot-named ( name tuple -- value )
     tuck offset-of-slot slot ;
 
 : set-slot-named ( value name obj -- )

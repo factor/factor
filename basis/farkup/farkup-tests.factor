@@ -141,3 +141,12 @@ link-no-follow? off
  
 [ "<p><a href='Factor'>Factor</a>-rific!</p>" ]
 [ "[[Factor]]-rific!" convert-farkup ] unit-test
+
+[ "<p>[ factor { 1 2 3 }]</p>" ]
+[ "[ factor { 1 2 3 }]" convert-farkup ] unit-test
+
+[ "<p>paragraph\n<hr/></p>" ]
+[ "paragraph\n___" convert-farkup ] unit-test
+
+[ "<p>paragraph\n a ___ b</p>" ]
+[ "paragraph\n a ___ b" convert-farkup ] unit-test

@@ -518,6 +518,7 @@ string-encoding-test "STRING_ENCODING_TEST" {
     ! [ ] [ T{ exam f f "Kenny" 60 } insert-tuple ] unit-test
     ! [ ] [ T{ exam f f "Cartman" 41 } insert-tuple ] unit-test
     [ ] [ 10 [ random-exam insert-tuple ] times ] unit-test
+    [ 5 ] [ <query> T{ exam { score T{ interval { from { 0 t } } { to { 100 t } } } } } >>tuple 5 >>limit select-tuples length ] unit-test
     ! [ ] [ T{ exam { name "Kenny" } } >query  ] unit-test
     ! [ ] [ query ] unit-test
     ;

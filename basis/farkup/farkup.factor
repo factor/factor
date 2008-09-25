@@ -38,6 +38,7 @@ TUPLE: line ;
 
 EBNF: parse-farkup
 nl               = ("\r\n" | "\r" | "\n") => [[ drop "\n" ]]
+whitespace       = " " | "\t" | nl
 
 heading1      = "=" (!("=" | nl).)+ "="
     => [[ second >string heading1 boa ]]
@@ -107,7 +108,7 @@ table            =  ((table-row nl => [[ first ]] )+ table-row? | table-row)
 text = (!(nl | code | heading | inline-delimiter | table ).)+
     => [[ >string ]]
 
-paragraph-item = (table | nl list | code | text | inline-tag | inline-delimiter)+
+paragraph-item = (table | nl list | nl line | code | text | inline-tag | inline-delimiter)+
 paragraph = ((paragraph-item nl => [[ first ]])+ nl+ => [[ first ]]
              | (paragraph-item nl)+ paragraph-item?
              | paragraph-item)
@@ -133,7 +134,7 @@ line = '___'
     => [[ drop line new ]]
 
 
-named-code       =  '[' (!('{' | nl | '[').)+ '{' (!("}]").)+ "}]"
+named-code       =  '[' (!('{' | whitespace | '[').)+ '{' (!("}]").)+ "}]"
     => [[ [ second >string ] [ fourth >string ] bi code boa ]]
 
 simple-code

@@ -3,7 +3,7 @@
 USING: arrays assocs classes db kernel namespaces
 classes.tuple words sequences slots math accessors
 math.parser io prettyprint db.types continuations
-destructors mirrors sets ;
+destructors mirrors sets db.types ;
 IN: db.tuples
 
 <PRIVATE
