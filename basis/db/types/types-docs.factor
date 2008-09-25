@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes hashtables help.markup help.syntax io.streams.string kernel sequences strings db.tuples math ;
+USING: classes hashtables help.markup help.syntax io.streams.string
+kernel sequences strings math ;
 IN: db.types
 
 HELP: +autoincrement+
@@ -133,7 +134,7 @@ HELP: find-primary-key
 { $values
      { "specs" "an array of sql-specs" }
      { "obj" object } }
-{ $description "Returns the row from the sql-specs array that was defined by " { $link define-persistent } "." }
+{ $description "Returns the row from the sql-specs array." }
 { $notes "This is a low-level word." } ;
 
 HELP: generator-bind
