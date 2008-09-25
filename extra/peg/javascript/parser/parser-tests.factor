@@ -40,8 +40,7 @@ function foldl(f, initial, seq) {
    for(var i=0; i< seq.length; ++i)
      initial = f(initial, seq[i]);
    return initial;
-}
-"> main \ javascript rule (parse) remaining>> length zero?
+}"> main \ javascript rule (parse) remaining>> length zero?
 ] unit-test
 
 { t } [ 
@@ -51,7 +50,6 @@ ParseState.prototype.from = function(index) {
     r.cache = this.cache;
     r.length = this.length - index;
     return r;
-}
-"> main \ javascript rule (parse) remaining>> length zero?
+}"> main \ javascript rule (parse) remaining>> length zero?
 ] unit-test
 
