@@ -18,3 +18,8 @@ HELP: each-withn
 "passed to the quotation given to each-withn for each element in the sequence."
 } 
 { $see-also map-withn } ;
+
+HELP: randomize
+{ $values { "seq" sequence } { "seq'" sequence } }
+{ $description "Shuffle the elements in the sequence randomly, returning the new sequence." } ;
+
