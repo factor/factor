@@ -10,4 +10,7 @@ bar
 [ "foo\nbar\n" ] [ test-it ] unit-test
 [ "foo\nbar\n" ] [ <" foo
 bar
- "> ] unit-test
+"> ] unit-test
+
+[ "hello\nworld" ] [ <" hello
+world"> ] unit-test
