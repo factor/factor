@@ -89,15 +89,17 @@ HELP: count-tuples
 { $values
      { "query/tuple" tuple }
      { "n" integer } }
-{ $description "" } ;
+{ $description "Returns the number of items that would be returned if the query were a select query. Counting the tuples with this word is more efficient than calling " { $link length } " on the result of " { $link select-tuples } "." } ;
 
-{ select-tuple select-tuples count-tuples query } related-words
+{ select-tuple select-tuples count-tuples } related-words
 
 
 
 ARTICLE: "db-tuples" "High-level tuple/database integration"
 "Start with a tutorial:"
 { $subsection "db-tuples-tutorial" }
+"Database types supported:"
+{ $subsection "db.types" }
 "Useful words:"
 { $subsection "db-tuples-words" }
 "For porting db.tuples to other databases:"
@@ -125,8 +127,7 @@ ARTICLE: "db-tuples-words" "High-level tuple/database words"
 { $subsection select-tuples }
 { $subsection count-tuples } ;
 
-
-ARTICLE: "db-tuples-protocol" "High-level tuple/database protocol"
+ARTICLE: "db-tuples-protocol" "Tuple database protocol"
 ;
 
 ARTICLE: "db-tuples-tutorial" "Tuple database tutorial"
