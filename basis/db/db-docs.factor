@@ -118,13 +118,16 @@ HELP: execute-statement
 { $values { "statement" statement } }
 { $description } ;
 
-ARTICLE: "db" "Low-level database library"
+ARTICLE: "db" "Database library"
 { $subsection "db-custom-database-combinators" }
 { $subsection "db-protocol" }
 { $subsection "db-lowlevel-tutorial" }
 "Higher-level database:"
 { $vocab-subsection "Database types" "db.types" }
 { $vocab-subsection "High-level tuple/database integration" "db.tuples" }
+! { $subsection "db-tuples" }
+! { $subsection "db-tuples-protocol" }
+! { $subsection "db-tuples-tutorial" }
 "Supported database backends:"
 { $vocab-subsection "SQLite" "db.sqlite" }
 { $vocab-subsection "PostgreSQL" "db.postgresql" }
@@ -143,7 +146,6 @@ ARTICLE: "db-lowlevel-tutorial" "Low-level database tutorial"
 ARTICLE: "db-porting-the-library" "Porting the database library"
 "This section is not yet written."
 ;
-
 
 ARTICLE: "db-custom-database-combinators" "Custom database combinators"
 "Every database library requires some effort on the programmer's part to initialize and open a database.  SQLite uses files on your harddisk, so a simple pathname is all the setup required. With PostgreSQL, you log in to a networked server as a user on a specfic port." $nl

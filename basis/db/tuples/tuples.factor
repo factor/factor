@@ -6,6 +6,7 @@ math.parser io prettyprint db.types continuations
 destructors mirrors sets ;
 IN: db.tuples
 
+<PRIVATE
 ! returns a sequence of prepared-statements
 HOOK: create-sql-statement db ( class -- object )
 HOOK: drop-sql-statement db ( class -- object )
@@ -19,22 +20,6 @@ HOOK: <count-statement> db ( query -- statement )
 HOOK: query>statement db ( query -- statement )
 
 HOOK: insert-tuple* db ( tuple statement -- )
-
-ERROR: no-slots-named class seq ;
-: check-columns ( class columns -- )
-    tuck
-    [ [ first ] map ]
-    [ all-slots [ name>> ] map ] bi* diff
-    [ drop ] [ no-slots-named ] if-empty ;
-
-: define-persistent ( class table columns -- )
-    pick dupd
-    check-columns
-    [ dupd "db-table" set-word-prop dup ] dip
-    [ relation? ] partition swapd
-    dupd [ spec>tuple ] with map
-    "db-columns" set-word-prop
-    "db-relations" set-word-prop ;
 
 ERROR: not-persistent class ;
 
@@ -60,9 +45,7 @@ GENERIC: eval-generator ( singleton -- object )
 
 : resulting-tuple ( exemplar-tuple row out-params -- tuple )
     rot class new [
-        [
-            [ slot-name>> ] dip set-slot-named
-        ] curry 2each
+        [ [ slot-name>> ] dip set-slot-named ] curry 2each
     ] keep ;
 
 : query-tuples ( exemplar-tuple statement -- seq )
@@ -98,8 +81,25 @@ GENERIC: eval-generator ( singleton -- object )
 
 : do-count ( exemplar-tuple statement -- tuples )
     [ [ bind-tuple ] [ nip default-query ] 2bi ] with-disposal ;
+PRIVATE>
+
 
 ! High level
+ERROR: no-slots-named class seq ;
+: check-columns ( class columns -- )
+    tuck
+    [ [ first ] map ]
+    [ all-slots [ name>> ] map ] bi* diff
+    [ drop ] [ no-slots-named ] if-empty ;
+
+: define-persistent ( class table columns -- )
+    pick dupd
+    check-columns
+    [ dupd "db-table" set-word-prop dup ] dip
+    [ relation? ] partition swapd
+    dupd [ spec>tuple ] with map
+    "db-columns" set-word-prop
+    "db-relations" set-word-prop ;
 
 TUPLE: query tuple group order offset limit ;
 
@@ -110,7 +110,6 @@ GENERIC: >query ( object -- query )
 M: query >query clone ;
 
 M: tuple >query <query> swap >>tuple ;
-
 
 : create-table ( class -- )
     create-sql-statement [ execute-statement ] with-disposals ;

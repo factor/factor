@@ -11,7 +11,18 @@ HELP: define-persistent
 { $list
     { "a slot name from the " { $snippet "tuple class" } }
     { "the name of a database column that maps to the slot" }        { "a database type (see " { $link "db.types" } ")" }
-} } ;
+} "Throws an error if the slot name (column one from each row) is not a slot in the tuple or its superclases." }
+{ $examples
+    { $unchecked-example "USING: db.tuples db.types ;"
+        "TUPLE: boat id year name ;"
+        "boat \"BOAT\" {"
+        "    { \"id\" \"ID\" +db-assigned-id+ }"
+        "    { \"year\" \"YEAR\" INTEGER }"
+        "    { \"name\" \"NAME\" TEXT }"
+        "} define-persistent"
+        ""
+    }
+} ;
 
 HELP: create-table
 { $values
@@ -64,29 +75,25 @@ HELP: delete-tuples
 
 HELP: select-tuple
 { $values
-     { "tuple" tuple }
+     { "query/tuple" tuple }
      { "tuple/f" "a tuple or f" } }
 { $description "A SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". Returns a single tuple from the database if it matches the query constructed from the exemplar tuple." } ;
 
 HELP: select-tuples
 { $values
-     { "tuple" tuple }
+     { "query/tuple" tuple }
      { "tuples" "an array of tuples" } }
 { $description "A SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". Returns a multiple tuples from the database that match the query constructed from the exemplar tuple." } ;
 
 HELP: count-tuples
 { $values
-     { "tuple" tuple } { "groups" "an array of slots to group by" }
+     { "query/tuple" tuple }
      { "n" integer } }
 { $description "" } ;
 
-HELP: query
-{ $values
-     { "tuple" tuple } { "query" query }
-     { "tuples" "a sequence of tuples" } }
-{ $description "Allows for queries with group by, order by, limit, and offset clauses.  " } ;
-
 { select-tuple select-tuples count-tuples query } related-words
+
+
 
 ARTICLE: "db-tuples" "High-level tuple/database integration"
 "Start with a tutorial:"
@@ -115,9 +122,7 @@ ARTICLE: "db-tuples-words" "High-level tuple/database words"
 "Querying tuples:"
 { $subsection select-tuple }
 { $subsection select-tuples }
-{ $subsection count-tuples }
-"Advanced querying of tuples:"
-{ $subsection query } ;
+{ $subsection count-tuples } ;
 
 
 ARTICLE: "db-tuples-protocol" "High-level tuple/database protocol"
