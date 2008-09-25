@@ -9,12 +9,6 @@ IN: math.finance
 : enumerate ( seq -- newseq )
     <enum> >alist ;
 
-: distribute ( amount n -- seq ) 
-    [ / ] keep 0 <array> [ 0 0 ] dip 
-    [ + [ [ dup ] dip + ] dip  
-      [ dup round ] dip 2dup -
-      [ drop ] dip ] map 3nip ;
-
 <PRIVATE
 
 : weighted ( x y a -- z ) 
