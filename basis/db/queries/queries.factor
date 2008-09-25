@@ -3,7 +3,7 @@
 USING: accessors kernel math namespaces make sequences random
 strings math.parser math.intervals combinators math.bitwise
 nmake db db.tuples db.types db.sql classes words shuffle arrays
-destructors continuations ;
+destructors continuations db.tuples.private ;
 IN: db.queries
 
 GENERIC: where ( specs obj -- )

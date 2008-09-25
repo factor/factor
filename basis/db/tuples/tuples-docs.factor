@@ -100,7 +100,8 @@ ARTICLE: "db-tuples" "High-level tuple/database integration"
 { $subsection "db-tuples-tutorial" }
 "Useful words:"
 { $subsection "db-tuples-words" }
-
+"For porting db.tuples to other databases:"
+{ $subsection "db-tuples-protocol" }
 ;
 
 ARTICLE: "db-tuples-words" "High-level tuple/database words"
