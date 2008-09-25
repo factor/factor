@@ -4,7 +4,7 @@ USING: assocs io.files hashtables kernel namespaces sequences
 vocabs.loader io combinators io.encodings.utf8 calendar accessors
 math.parser io.streams.string ui.tools.operations quotations
 strings arrays prettyprint words vocabs sorting sets
-classes math alien ;
+classes math alien urls splitting ascii ;
 IN: tools.scaffold
 
 SYMBOL: developer-name
@@ -89,17 +89,12 @@ ERROR: no-vocab vocab ;
     ] if ;
 
 : lookup-type ( string -- object/string ? )
+    "new" ?head drop [ [ CHAR: ' = ] [ digit? ] bi or ] trim-right
     H{
         { "object" object } { "obj" object }
-        { "obj1" object } { "obj2" object }
-        { "obj3" object } { "obj4" object }
-        { "quot" quotation } { "quot1" quotation }
-        { "quot2" quotation } { "quot3" quotation }
-        { "quot'" quotation }
-        { "string" string } { "string1" string }
-        { "string2" string } { "string3" string }
+        { "quot" quotation }
+        { "string" string }
         { "str" string }
-        { "str1" string } { "str2" string } { "str3" string }
         { "hash" hashtable }
         { "hashtable" hashtable }
         { "?" "a boolean" }
@@ -111,16 +106,12 @@ ERROR: no-vocab vocab ;
         { "vocab" "a vocabulary specifier" }
         { "vocab-root" "a vocabulary root string" }
         { "c-ptr" c-ptr }
-        { "seq" sequence } { "seq1" sequence } { "seq2" sequence }
-        { "seq3" sequence } { "seq4" sequence }
-        { "seq1'" sequence } { "seq2'" sequence }
-        { "newseq" sequence } 
-        { "seq'" sequence } 
-        { "assoc" assoc } { "assoc1" assoc } { "assoc2" assoc }
-        { "assoc3" assoc } { "newassoc" assoc }
+        { "seq" sequence }
+        { "assoc" assoc }
         { "alist" "an array of key/value pairs" }
         { "keys" sequence } { "values" sequence }
         { "class" class } { "tuple" tuple }
+        { "url" url }
     } at* ;
 
 : add-using ( object -- )
@@ -158,7 +149,7 @@ ERROR: no-vocab vocab ;
     "{ $description \"\" } ;" print ;
 
 : help-header. ( word -- )
-    "HELP: " write . ;
+    "HELP: " write name>> print ;
 
 : (help.) ( word -- )
     [ help-header. ] [ $values. ] [ $description. ] tri ;
@@ -171,7 +162,7 @@ ERROR: no-vocab vocab ;
 : interesting-words. ( vocab -- )
     interesting-words [ (help.) nl ] each ;
 
-: help-file-string ( str1 -- str2 )
+: help-file-string ( vocab -- str2 )
     [
         {
             [ "IN: " write print nl ]
@@ -185,16 +176,18 @@ ERROR: no-vocab vocab ;
         } cleave
     ] with-string-writer ;
 
-: write-using ( -- )
+: write-using ( vocab -- )
     "USING:" write
     using get keys
-    { "help.markup" "help.syntax" } append natural-sort 
+    { "help.markup" "help.syntax" } append natural-sort remove
     [ bl write ] each
     " ;" print ;
 
 : set-scaffold-help-file ( path vocab -- )
     swap utf8 <file-writer> [
-        scaffold-copyright help-file-string write-using write
+        scaffold-copyright
+        [ help-file-string ] [ write-using ] bi
+        write
     ] with-output-stream ;
 
 : check-scaffold ( vocab-root string -- vocab-root string )
