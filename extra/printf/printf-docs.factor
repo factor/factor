@@ -39,7 +39,9 @@ HELP: sprintf
 { $see-also printf } ;
 
 ARTICLE: "printf" "Formatted printing"
-"The " { $link printf } " and " { $link sprintf } " words are used for formatted printing.\n"
+"The " { $vocab-link "printf" } " vocabulary is used for formatted printing.\n"
+{ $subsection printf }
+{ $subsection sprintf }
 "\n"
 "Several format specifications exist for handling arguments of different types, and specifying attributes for the result string, including such things as maximum width, padding, and decimals.\n"
 { $table
@@ -72,3 +74,7 @@ ARTICLE: "printf" "Formatted printing"
     "\"%.10f\" formats a float to pad-right with zeros up to 10 digits beyond the decimal point."
     "\"%.5E\" formats a float into scientific notation with zeros up to 5 digits beyond the decimal point, but before the exponent."
 } ;
+
+ABOUT: "printf"
+
+

@@ -160,3 +160,11 @@ PRIVATE>
 
 : ?nth* ( n seq -- elt/f ? )
     2dup bounds-check? [ nth-unsafe t ] [ 2drop f f ] if ; flushable
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+USE: math.ranges
+USE: random 
+: randomize ( seq -- seq' )
+    dup length 1 swap [a,b) <reversed> [ dup random pick exchange ] each ;
+
