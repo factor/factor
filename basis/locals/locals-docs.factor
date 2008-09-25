@@ -31,7 +31,7 @@ HELP: [let
 } ;
 
 HELP: [let*
-{ $syntax "[let* | binding1 [ value1... ]\n       binding2 [ value2... ]\n       ... |\n    body... ]" }
+{ $syntax "[let* | binding1 [ value1... ]\n        binding2 [ value2... ]\n        ... |\n    body... ]" }
 { $description "Introduces a set of lexical bindings and evaluates the body. The values are evaluated sequentially, and may refer to previous bindings from the same " { $link POSTPONE: [let* } " form; for Lisp programmers, this means that " { $link POSTPONE: [let* } " is equivalent to the Lisp " { $snippet "let*" } ", not " { $snippet "let" } "." }
 { $examples
     { $example
