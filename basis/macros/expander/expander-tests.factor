@@ -1,6 +1,6 @@
 IN: macros.expander.tests
 USING: macros.expander tools.test math combinators.short-circuit
-kernel ;
+kernel combinators ;
 
 [ t ] [ 20 [ { [ integer? ] [ even? ] [ 10 > ] } 1&& ] expand-macros call ] unit-test
 
