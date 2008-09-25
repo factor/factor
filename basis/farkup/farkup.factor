@@ -38,6 +38,7 @@ TUPLE: line ;
 
 EBNF: parse-farkup
 nl               = ("\r\n" | "\r" | "\n") => [[ drop "\n" ]]
+whitespace       = " " | "\t" | nl
 
 heading1      = "=" (!("=" | nl).)+ "="
     => [[ second >string heading1 boa ]]
@@ -133,7 +134,7 @@ line = '___'
     => [[ drop line new ]]
 
 
-named-code       =  '[' (!('{' | nl | '[').)+ '{' (!("}]").)+ "}]"
+named-code       =  '[' (!('{' | whitespace | '[').)+ '{' (!("}]").)+ "}]"
     => [[ [ second >string ] [ fourth >string ] bi code boa ]]
 
 simple-code
