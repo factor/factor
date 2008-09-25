@@ -8,8 +8,6 @@ strings.parser lexer prettyprint.backend hashtables present ;
 IN: urls
 
 : url-quotable? ( ch -- ? )
-    #! In a URL, can this character be used without
-    #! URL-encoding?
     {
         [ letter? ]
         [ LETTER? ]
@@ -20,8 +18,10 @@ IN: urls
 <PRIVATE
 
 : push-utf8 ( ch -- )
-    1string utf8 encode
-    [ CHAR: % , >hex 2 CHAR: 0 pad-left % ] each ;
+    dup CHAR: \s = [ drop "+" % ] [
+        1string utf8 encode
+        [ CHAR: % , >hex 2 CHAR: 0 pad-left % ] each
+    ] if ;
 
 PRIVATE>
 
@@ -86,7 +86,7 @@ PRIVATE>
         ] keep
     ] when ;
 
-: assoc>query ( hash -- str )
+: assoc>query ( assoc -- str )
     [
         dup array? [ [ present ] map ] [ present 1array ] if
     ] assoc-map
@@ -152,7 +152,6 @@ M: string >url
     {
         { "http" [ 80 ] }
         { "https" [ 443 ] }
-        { "feed" [ 80 ] }
         { "ftp" [ 21 ] }
         [ drop f ]
     } case ;
@@ -168,8 +167,6 @@ M: string >url
     [ port>> ] [ port>> ] [ protocol>> protocol-port ] tri =
     [ drop f ] when ;
 
-PRIVATE>
-
 : unparse-host-part ( url protocol -- )
     %
     "://" %
@@ -179,6 +176,8 @@ PRIVATE>
         [ url-port [ ":" % # ] when* ]
         [ path>> "/" head? [ "/" % ] unless ]
     } cleave ;
+
+PRIVATE>
 
 M: url present
     [
@@ -224,10 +223,15 @@ PRIVATE>
     "https" = ;
 
 : url-addr ( url -- addr )
-    [ [ host>> ] [ port>> ] bi <inet> ] [ protocol>> ] bi
+    [
+        [ host>> ]
+        [ port>> ]
+        [ protocol>> protocol-port ]
+        tri or <inet>
+    ] [ protocol>> ] bi
     secure-protocol? [ <secure> ] when ;
 
-: ensure-port ( url -- url' )
+: ensure-port ( url -- url )
     dup protocol>> '[ _ protocol-port or ] change-port ;
 
 ! Literal syntax
