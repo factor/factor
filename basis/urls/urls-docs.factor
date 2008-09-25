@@ -90,7 +90,7 @@ HELP: derive-url
     }
     { $example
         "USING: prettyprint urls ;"
-        "URL\" http://www.truecasey.com/drinks/kamboocha\""
+        "URL\" http://www.truecasey.com/drinks/kombucha\""
         "URL\" master-cleanser\" derive-url ."
         "URL\" http://www.truecasey.com/drinks/master-cleanser\""
     }
