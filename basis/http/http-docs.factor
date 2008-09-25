@@ -137,7 +137,7 @@ ARTICLE: "http.post-data" "HTTP post data"
 { $subsection post-data }
 { $subsection <post-data> } ;
 
-ARTICLE: "http" "HTTP protocol implementation"
+ARTICLE: "http" "HTTP protocol objects"
 "The " { $vocab-link "http" } " vocabulary contains data types shared by " { $vocab-link "http.client" } " and " { $vocab-link "http.server" } "."
 $nl
 "The HTTP client sends an HTTP request to the server and receives an HTTP response back. The HTTP server receives HTTP requests from clients and sends HTTP responses back."
@@ -155,6 +155,7 @@ $nl
 { $subsection <raw-response> }
 "Both requests and responses support some common functionality:"
 { $subsection "http.headers" }
-{ $subsection "http.cookies" } ;
+{ $subsection "http.cookies" }
+{ $see-also "urls" } ;
 
 ABOUT: "http"

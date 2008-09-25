@@ -218,8 +218,8 @@ ARTICLE: "url-utilities" "URL implementation utilities"
 { $subsection secure-protocol? }
 { $subsection url-append-path } ;
 
-ARTICLE: "urls" "URLs"
-"The " { $vocab-link "urls" } " implements a URL data type. The benefit of using a data type to prepresent URLs rather than a string is that the parsing, printing and escaping logic is encapsulated and reused, rather than re-implemented in a potentially buggy manner every time."
+ARTICLE: "urls" "URL objects"
+"The " { $vocab-link "urls" } " vocabulary implements a URL data type. The benefit of using a data type to prepresent URLs rather than a string is that the parsing, printing and escaping logic is encapsulated and reused, rather than re-implemented in a potentially buggy manner every time."
 $nl
 "URL objects are used heavily by the " { $vocab-link "http" } " and " { $vocab-link "furnace" } " vocabularies, and are also useful on their own."
 $nl

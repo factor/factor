@@ -33,7 +33,7 @@ IN: http.client
         [ content-type>> "content-type" pick set-at ]
         bi
     ] when*
-    over cookies>> f like [ unparse-cookie "cookie" pick set-at ] when*
+    over cookies>> [ unparse-cookie "cookie" pick set-at ] unless-empty
     write-header ;
 
 GENERIC: >post-data ( object -- post-data )
