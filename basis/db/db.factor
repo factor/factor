@@ -80,11 +80,14 @@ GENERIC: execute-statement* ( statement type -- )
 M: object execute-statement* ( statement type -- )
     drop query-results dispose ;
 
+: execute-one-statement ( statement -- )
+    dup type>> execute-statement* ;
+
 : execute-statement ( statement -- )
     dup sequence? [
-        [ execute-statement ] each
+        [ execute-one-statement ] each
     ] [
-        dup type>> execute-statement*
+        execute-one-statement
     ] if ;
 
 : bind-statement ( obj statement -- )

@@ -116,7 +116,7 @@ HELP: execute-statement*
 
 HELP: execute-statement
 { $values { "statement" statement } }
-{ $description } ;
+{ $description "" } ;
 
 ARTICLE: "db" "Database library"
 { $subsection "db-custom-database-combinators" }
