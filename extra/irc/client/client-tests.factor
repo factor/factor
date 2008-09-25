@@ -28,9 +28,11 @@ M: mb-writer stream-nl ( mb-writer -- )
     dup [ spawn-irc yield ] with-irc-client ;
 
 ! to be used inside with-irc-client quotations
-: %add-named-listener ( listener -- ) [ name>> ] keep set+run-listener ;
-: %join ( channel -- ) <irc-channel-listener> irc> add-listener ;
+: %add-named-listener ( listener -- ) irc> add-listener ;
 : %push-line ( line -- ) irc> stream>> in>> push-line yield ;
+: %join ( channel -- )
+    <irc-channel-listener>
+    [ irc> add-listener ] [ join-irc-channel ] bi ;
 
 : read-matching-message ( listener quot: ( msg -- ? ) -- irc-message )
     [ in-messages>> 0.1 seconds ] dip mailbox-get-timeout? ;
@@ -62,13 +64,28 @@ M: mb-writer stream-nl ( mb-writer -- )
   ] unit-test
 ] with-irc
 
+! Test connect
+{ V{ "NICK factorbot" "USER factorbot hostname servername :irc.factor" } } [
+   "someserver" irc-port "factorbot" f <irc-profile> <irc-client>
+    [ 2drop <test-stream> t ] >>connect
+    [ connect-irc ] keep stream>> out>> lines>>
+] unit-test
+
+! Test join
+[ { "JOIN #factortest" } [
+      "#factortest" %join
+      irc> stream>> out>> lines>> pop
+  ] unit-test
+] with-irc
+
 [ { join_ "#factortest" } [
+      "#factortest" <irc-channel-listener> [ %add-named-listener ] keep
       { ":factorbot!n=factorbo@some.where JOIN :#factortest"
         ":ircserver.net 353 factorbot @ #factortest :@factorbot "
         ":ircserver.net 366 factorbot #factortest :End of /NAMES list."
         ":ircserver.net 477 factorbot #factortest :[ircserver-info] blah blah"
       } [ %push-line ] each
-      irc> join-messages>> 0.1 seconds mailbox-get-timeout
+      in-messages>> 0.1 seconds mailbox-get-timeout
       [ class ] [ trailing>> ] bi
   ] unit-test
 ] with-irc
@@ -89,8 +106,8 @@ M: mb-writer stream-nl ( mb-writer -- )
 ] with-irc
 
 [ { privmsg "factorbot" "hello" } [
-      "somedude" <irc-nick-listener>  [ %add-named-listener ] keep
-      ":somedude!n=user@isp.net PRIVMSG factorbot :hello" %push-line
+      "ircuser" <irc-nick-listener>  [ %add-named-listener ] keep
+      ":ircuser!n=user@isp.net PRIVMSG factorbot :hello" %push-line
       [ privmsg? ] read-matching-message
       [ class ] [ name>> ] [ trailing>> ] tri
   ] unit-test
@@ -104,48 +121,48 @@ M: mb-writer stream-nl ( mb-writer -- )
 ] with-irc
 
 ! Participant lists tests
-[ { H{ { "somedude" +normal+ } } } [
+[ { H{ { "ircuser" +normal+ } } } [
       "#factortest" <irc-channel-listener> [ %add-named-listener ] keep
-      ":somedude!n=user@isp.net JOIN :#factortest" %push-line
+      ":ircuser!n=user@isp.net JOIN :#factortest" %push-line
       participants>>
   ] unit-test
 ] with-irc
 
-[ { H{ { "somedude2" +normal+ } } } [
+[ { H{ { "ircuser2" +normal+ } } } [
       "#factortest" <irc-channel-listener>
-          H{ { "somedude2" +normal+ }
-             { "somedude" +normal+ } } clone >>participants
+          H{ { "ircuser2" +normal+ }
+             { "ircuser" +normal+ } } clone >>participants
       [ %add-named-listener ] keep
-      ":somedude!n=user@isp.net PART #factortest" %push-line
+      ":ircuser!n=user@isp.net PART #factortest" %push-line
       participants>>
   ] unit-test
 ] with-irc
 
-[ { H{ { "somedude2" +normal+ } } } [
+[ { H{ { "ircuser2" +normal+ } } } [
       "#factortest" <irc-channel-listener>
-          H{ { "somedude2" +normal+ }
-             { "somedude" +normal+ } } clone >>participants
+          H{ { "ircuser2" +normal+ }
+             { "ircuser" +normal+ } } clone >>participants
       [ %add-named-listener ] keep
-      ":somedude!n=user@isp.net QUIT" %push-line
+      ":ircuser!n=user@isp.net QUIT" %push-line
       participants>>
   ] unit-test
 ] with-irc
 
-[ { H{ { "somedude2" +normal+ } } } [
+[ { H{ { "ircuser2" +normal+ } } } [
       "#factortest" <irc-channel-listener>
-          H{ { "somedude2" +normal+ }
-             { "somedude" +normal+ } } clone >>participants
+          H{ { "ircuser2" +normal+ }
+             { "ircuser" +normal+ } } clone >>participants
       [ %add-named-listener ] keep
-      ":somedude2!n=user2@isp.net KICK #factortest somedude" %push-line
+      ":ircuser2!n=user2@isp.net KICK #factortest ircuser" %push-line
       participants>>
   ] unit-test
 ] with-irc
 
-[ { H{ { "somedude2" +normal+ } } } [
+[ { H{ { "ircuser2" +normal+ } } } [
       "#factortest" <irc-channel-listener>
-          H{ { "somedude" +normal+ } } clone >>participants
+          H{ { "ircuser" +normal+ } } clone >>participants
       [ %add-named-listener ] keep
-      ":somedude!n=user2@isp.net NICK :somedude2" %push-line
+      ":ircuser!n=user2@isp.net NICK :ircuser2" %push-line
       participants>>
   ] unit-test
 ] with-irc
@@ -159,20 +176,20 @@ M: mb-writer stream-nl ( mb-writer -- )
   ] unit-test
 ] with-irc
 
-[ { T{ participant-changed f "somedude" +part+ f } } [
+[ { T{ participant-changed f "ircuser" +part+ f } } [
       "#factortest" <irc-channel-listener>
-          H{ { "somedude" +normal+ } } clone >>participants
+          H{ { "ircuser" +normal+ } } clone >>participants
       [ %add-named-listener ] keep
-      ":somedude!n=user@isp.net QUIT" %push-line
+      ":ircuser!n=user@isp.net QUIT" %push-line
       [ participant-changed? ] read-matching-message
   ] unit-test
 ] with-irc
 
-[ { T{ participant-changed f "somedude" +nick+ "somedude2" } } [
+[ { T{ participant-changed f "ircuser" +nick+ "ircuser2" } } [
       "#factortest" <irc-channel-listener>
-          H{ { "somedude" +normal+ } } clone >>participants
+          H{ { "ircuser" +normal+ } } clone >>participants
       [ %add-named-listener ] keep
-      ":somedude!n=user2@isp.net NICK :somedude2" %push-line
+      ":ircuser!n=user2@isp.net NICK :ircuser2" %push-line
       [ participant-changed? ] read-matching-message
   ] unit-test
 ] with-irc

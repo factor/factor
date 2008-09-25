@@ -182,11 +182,16 @@ irc-editor "general" f {
     <irc-pane> [ <scroller> @center grid-add ] keep
     <irc-editor> <scroller> @bottom grid-add ;
 
+GENERIC: init-listener ( listener -- )
+M: object init-listener drop ;
+M: irc-channel-listener init-listener join-irc-channel ;
+
 M: irc-tab graft*
-    [ listener>> ] [ window>> client>> ] bi add-listener ;
+    [ listener>> dup ] [ window>> client>> ] bi add-listener
+    init-listener ;
 
 M: irc-tab ungraft*
-    [ listener>> ] [ window>> client>> ] bi remove-listener ;
+    listener>> remove-listener ;
 
 TUPLE: irc-channel-tab < irc-tab userlist ;
 
@@ -239,8 +244,9 @@ M: irc-tab pref-dim*
       [ connect-irc ] } cleave ;
 
 : server-open ( server port nick password channels -- )
-    [ <irc-profile> ui-connect [ irc-window ] keep ] dip
-    [ over join-channel ] each drop ;
+    [ <irc-profile> ui-connect [ irc-window ] keep ] dip 2drop ;
+! FIXME: should join channels only after we have been logged in
+!    [ over join-channel ] each drop ;
 
 : main-run ( -- ) run-ircui ;
 
