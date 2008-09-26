@@ -85,7 +85,7 @@ HELP: MEMO::
 { POSTPONE: MEMO: POSTPONE: MEMO:: } related-words
 
 ARTICLE: "locals-mutable" "Mutable locals"
-"In the list of bindings supplied to " { $link POSTPONE: :: } ", " { $link POSTPONE: [let } " or " { $link POSTPONE: [| } ", a mutable binding may be introduced by suffixing its named with " { $snippet "!" } ". Mutable bindings are read by giving their name as usual; the suffix is not part of the binding's name. To write to a mutable binding, use the binding's with the " { $snippet "!" } " suffix."
+"In the list of bindings supplied to " { $link POSTPONE: :: } ", " { $link POSTPONE: [let } ", " { $link POSTPONE: [let* } " or " { $link POSTPONE: [| } ", a mutable binding may be introduced by suffixing its named with " { $snippet "!" } ". Mutable bindings are read by giving their name as usual; the suffix is not part of the binding's name. To write to a mutable binding, use the binding's with the " { $snippet "!" } " suffix."
 $nl
 "Here is a example word which outputs a pair of quotations which increment and decrement an internal counter, and then return the new value. The quotations are closed over the counter and each invocation of the word yields new quotations with their unique internal counter:"
 { $code
