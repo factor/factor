@@ -4,7 +4,8 @@ USING: kernel ascii combinators combinators.short-circuit
 sequences splitting fry namespaces make assocs arrays strings
 io.sockets io.sockets.secure io.encodings.string
 io.encodings.utf8 math math.parser accessors parser
-strings.parser lexer prettyprint.backend hashtables present ;
+strings.parser lexer prettyprint.backend hashtables present
+peg.ebnf ;
 IN: urls
 
 : url-quotable? ( ch -- ? )
@@ -122,38 +123,57 @@ TUPLE: url protocol username password host port path query anchor ;
         ] when
     ] bi* ;
 
-<PRIVATE
-
-: parse-host-part ( url protocol rest -- url string' )
-    [ >>protocol ] [
-        "//" ?head [ "Invalid URL" throw ] unless
-        "@" split1 [
-            [
-                ":" split1 [ >>username ] [ >>password ] bi*
-            ] dip
-        ] when*
-        "/" split1 [
-            parse-host [ >>host ] [ >>port ] bi*
-        ] [ "/" prepend ] bi*
-    ] bi* ;
-
-PRIVATE>
-
 GENERIC: >url ( obj -- url )
 
 M: f >url drop <url> ;
 
 M: url >url ;
 
+<PRIVATE
+
+EBNF: parse-url
+
+protocol = [a-z]+                   => [[ url-decode ]]
+username = [^/:@#?]+                => [[ url-decode ]]
+password = [^/:@#?]+                => [[ url-decode ]]
+pathname = [^#?]+                   => [[ url-decode ]]
+query    = [^#]+                    => [[ query>assoc ]]
+anchor   = .+                       => [[ url-decode ]]
+
+hostname = [^/#?]+                  => [[ url-decode ]]
+
+hostname-spec = hostname ("/"|!(.)) => [[ first ]]
+
+auth     = (username (":" password  => [[ second ]])? "@"
+                                    => [[ first2 2array ]])?
+
+url      = ((protocol "://")        => [[ first ]] auth hostname)?
+           (pathname)?
+           ("?" query               => [[ second ]])?
+           ("#" anchor              => [[ second ]])?
+
+;EBNF
+
+PRIVATE>
+
 M: string >url
-    <url> swap
-    ":" split1 [ parse-host-part ] when*
-    "#" split1 [
-        "?" split1
-        [ url-decode >>path ]
-        [ [ query>assoc >>query ] when* ] bi*
-    ]
-    [ url-decode >>anchor ] bi* ;
+    parse-url {
+        [
+            first [
+                [ first ] ! protocol
+                [
+                    second
+                    [ first [ first2 ] [ f f ] if* ] ! username, password
+                    [ second parse-host ] ! host, port
+                    bi
+                ] bi
+            ] [ f f f f f ] if*
+        ]
+        [ second ] ! pathname
+        [ third ] ! query
+        [ fourth ] ! anchor
+    } cleave url boa
+    dup host>> [ [ "/" or ] change-path ] when ;
 
 : protocol-port ( protocol -- port )
     {
