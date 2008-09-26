@@ -173,4 +173,3 @@ USE: random
 : enumerate ( seq -- seq' )
     <enum> >alist ;
 
-
