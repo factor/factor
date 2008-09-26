@@ -166,5 +166,5 @@ PRIVATE>
 USE: math.ranges
 USE: random 
 : randomize ( seq -- seq' )
-    dup length 1 swap [a,b) <reversed> [ dup random pick exchange ] each ;
+    dup length 1 (a,b] [ dup random pick exchange ] each ;
 
