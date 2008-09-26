@@ -168,3 +168,9 @@ USE: random
 : randomize ( seq -- seq' )
     dup length 1 (a,b] [ dup random pick exchange ] each ;
 
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: enumerate ( seq -- seq' )
+    <enum> >alist ;
+
+

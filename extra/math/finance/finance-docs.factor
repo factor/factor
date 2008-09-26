@@ -5,10 +5,6 @@ USING: help.markup help.syntax ;
 
 IN: math.finance
 
-HELP: enumerate
-{ $values { "seq" "a sequence" } { "newseq" "a sequence" } }
-{ $description "Returns a new sequence where each element is an array of { value, index }" } ;
-
 HELP: sma
 { $values { "seq" "a sequence" } { "n" "number of periods" } { "newseq" "a sequence" } }
 { $description "Returns the Simple Moving Average with the specified periodicity." } ;

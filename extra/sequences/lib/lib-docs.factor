@@ -23,3 +23,7 @@ HELP: randomize
 { $values { "seq" sequence } { "seq'" sequence } }
 { $description "Shuffle the elements in the sequence randomly, returning the new sequence." } ;
 
+HELP: enumerate
+{ $values { "seq" sequence } { "seq'" sequence } }
+{ $description "Returns a new sequence where each element is an array of { index, value }" } ;
+

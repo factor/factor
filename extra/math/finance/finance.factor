@@ -6,9 +6,6 @@ math math.functions math.statistics math.vectors ;
 
 IN: math.finance
 
-: enumerate ( seq -- newseq )
-    <enum> >alist ;
-
 <PRIVATE
 
 : weighted ( x y a -- z ) 
@@ -17,13 +14,10 @@ IN: math.finance
 : a ( n -- a ) 
     1 + 2 swap / ;
 
-: first-rest ( seq -- first rest )
-    [ first ] keep 1 tail-slice ;
-
 PRIVATE>
 
 : ema ( seq n -- newseq )
-    a swap first-rest swap [ [ dup ] 2dip swap rot weighted ] accumulate 2nip ;
+    a swap unclip [ [ dup ] 2dip swap rot weighted ] accumulate 2nip ;
 
 : sma ( seq n -- newseq )
     clump [ mean ] map ;
