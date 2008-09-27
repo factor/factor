@@ -255,3 +255,11 @@ M: http-server handle-client*
 
 : http-insomniac ( -- )
     "http.server" { "httpd-hit" } schedule-insomniac ;
+
+USE: vocabs.loader
+
+"http.server.filters" require
+"http.server.dispatchers" require
+"http.server.redirection" require
+"http.server.static" require
+"http.server.cgi" require
