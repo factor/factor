@@ -12,7 +12,6 @@ http.server.responses
 http.server.redirection ;
 IN: http.server.static
 
-! special maps mime types to quots with effect ( path -- )
 TUPLE: file-responder root hook special allow-listings ;
 
 : modified-since? ( filename -- ? )

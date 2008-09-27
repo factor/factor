@@ -1,7 +1,9 @@
 IN: html.templates.fhtml
 USING: help.markup help.syntax ;
 
-HELP: <fhtml> ;
+HELP: <fhtml> ( path -- fhtml )
+{ $values { "path" "a pathname string" } { "fhtml" fhtml } }
+{ $description "Creates an FHTML template descriptor." } ;
 
 ARTICLE: "html.templates.fhtml" "FHTML templates"
 "The " { $vocab-link "html.templates.fhtml" } " vocabulary implements a templating engine which mixes markup with Factor code."

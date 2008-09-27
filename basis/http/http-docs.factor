@@ -137,22 +137,27 @@ ARTICLE: "http.post-data" "HTTP post data"
 { $subsection post-data }
 { $subsection <post-data> } ;
 
-ARTICLE: "http" "HTTP protocol objects"
-"The " { $vocab-link "http" } " vocabulary contains data types shared by " { $vocab-link "http.client" } " and " { $vocab-link "http.server" } "."
-$nl
-"The HTTP client sends an HTTP request to the server and receives an HTTP response back. The HTTP server receives HTTP requests from clients and sends HTTP responses back."
-$nl
+ARTICLE: "http.requests" "HTTP requests"
 "HTTP requests:"
 { $subsection request }
 { $subsection <request> }
 "Requests can contain form submissions:"
-{ $subsection "http.post-data" }
+{ $subsection "http.post-data" } ;
+
+ARTICLE: "http.responses" "HTTP responses"
 "HTTP responses:"
 { $subsection response }
 { $subsection <response> }
 "Raw responses only contain a status line, with no header. They are used by webapps which need full control over the HTTP response, for example " { $vocab-link "http.server.cgi" } ":"
 { $subsection raw-response }
-{ $subsection <raw-response> }
+{ $subsection <raw-response> } ;
+
+ARTICLE: "http" "HTTP protocol objects"
+"The " { $vocab-link "http" } " vocabulary contains data types shared by " { $vocab-link "http.client" } " and " { $vocab-link "http.server" } "."
+$nl
+"The HTTP client sends an HTTP request to the server and receives an HTTP response back. The HTTP server receives HTTP requests from clients and sends HTTP responses back."
+{ $subsection "http.requests" }
+{ $subsection "http.responses" }
 "Both requests and responses support some common functionality:"
 { $subsection "http.headers" }
 { $subsection "http.cookies" }
