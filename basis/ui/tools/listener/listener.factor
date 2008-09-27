@@ -30,8 +30,8 @@ TUPLE: listener-gadget < track input output stack ;
     f track-add ;
 
 : welcome. ( -- )
-   "If this is your first time with Factor, please read the " print
-   "handbook" ($link) "." print nl ;
+    "If this is your first time with Factor, please read the " print
+    "handbook" ($link) "." print nl ;
 
 M: listener-gadget focusable-child*
     input>> ;

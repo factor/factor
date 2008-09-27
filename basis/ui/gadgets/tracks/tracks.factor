@@ -44,11 +44,11 @@ M: track layout* ( track -- ) dup track-layout pack-layout ;
     [ >fixnum ] map ;
 
 M: track pref-dim* ( gadget -- dim )
-   [ track-pref-dims-1                           ]
-   [ [ alloted-dim ] [ track-pref-dims-2 ] bi v+ ]
-   [ orientation>>                               ]
-   tri
-   set-axis ;
+    [ track-pref-dims-1 ]
+    [ [ alloted-dim ] [ track-pref-dims-2 ] bi v+ ]
+    [ orientation>> ]
+    tri
+    set-axis ;
 
 : track-add ( track gadget constraint -- track )
     pick sizes>> push add-gadget ;

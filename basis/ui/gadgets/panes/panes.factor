@@ -115,7 +115,7 @@ C: <pane-stream> pane-stream
 GENERIC: write-gadget ( gadget stream -- )
 
 M: pane-stream write-gadget ( gadget pane-stream -- )
-   pane>> current>> swap add-gadget drop ;
+    pane>> current>> swap add-gadget drop ;
 
 M: style-stream write-gadget
     stream>> write-gadget ;
@@ -143,7 +143,7 @@ M: style-stream write-gadget
 TUPLE: pane-control < pane quot ;
 
 M: pane-control model-changed ( model pane-control -- )
-   [ value>> ] [ dup quot>> ] bi* with-pane ;
+    [ value>> ] [ dup quot>> ] bi* with-pane ;
 
 : <pane-control> ( model quot -- pane )
     pane-control new-pane
@@ -338,7 +338,7 @@ M: paragraph stream-format
 GENERIC: sloppy-pick-up* ( loc gadget -- n )
 
 M: pack sloppy-pick-up* ( loc gadget -- n )
-   [ orientation>> ] [ children>> ] bi (fast-children-on) ;
+    [ orientation>> ] [ children>> ] bi (fast-children-on) ;
 
 M: gadget sloppy-pick-up*
     children>> [ inside? ] with find-last drop ;
