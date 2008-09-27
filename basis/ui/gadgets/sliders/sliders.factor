@@ -46,7 +46,7 @@ M: slider model-changed nip elevator>> relayout-1 ;
 TUPLE: thumb < gadget ;
 
 : begin-drag ( thumb -- )
-    find-slider dup slider-value swap (>>saved) ;
+    find-slider dup slider-value >>saved drop ;
 
 : do-drag ( thumb -- )
     find-slider drag-loc over orientation>> v.

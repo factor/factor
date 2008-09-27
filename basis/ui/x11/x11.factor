@@ -173,7 +173,7 @@ M: world client-event
     dup window-loc>> over rect-dim glx-window
     over "Factor" create-xic <x11-handle>
     2dup window>> register-window
-    swap (>>handle) ;
+    >>handle drop ;
 
 : wait-event ( -- event )
     QueuedAfterFlush events-queued 0 > [

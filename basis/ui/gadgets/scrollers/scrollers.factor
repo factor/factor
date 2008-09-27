@@ -122,14 +122,14 @@ M: f update-scroller drop dup scroller-value swap scroll ;
 M: scroller layout*
     dup call-next-method
     dup follows>>
-    [ update-scroller ] 2keep
-    swap (>>follows) ;
+    2dup update-scroller
+    >>follows drop ;
 
 M: scroller focusable-child*
     viewport>> ;
 
 M: scroller model-changed
-    nip f swap (>>follows) ;
+    nip f >>follows drop ;
 
 TUPLE: limited-scroller < scroller fixed-dim ;
 

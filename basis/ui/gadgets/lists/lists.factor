@@ -27,8 +27,7 @@ TUPLE: list < pack index presenter color hook ;
     control-value length 1- min 0 max ;
 
 : bound-index ( list -- )
-    dup index>> over calc-bounded-index
-    swap (>>index) ;
+    dup index>> over calc-bounded-index >>index drop ;
 
 : list-presentation-hook ( list -- quot )
     hook>> [ [ list? ] find-parent ] prepend ;

@@ -69,7 +69,7 @@ M: world graft*
     #! when restoring saved worlds on image startup.
     dup fonts>> clear-assoc
     dup unfocus-world
-    f swap (>>handle) ;
+    f >>handle drop ;
 
 M: world ungraft*
     dup free-fonts

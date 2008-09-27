@@ -165,7 +165,7 @@ M: stack-display tool-scroller
     } cleave ;
 
 : init-listener ( listener -- )
-    f <model> swap (>>stack) ;
+    f <model> >>stack drop ;
 
 : <listener-gadget> ( -- gadget )
     { 0 1 } listener-gadget new-track

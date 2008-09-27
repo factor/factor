@@ -132,9 +132,9 @@ M: array gadget-text*
 : gadget-text ( gadget -- string ) [ gadget-text* ] "" make ;
 
 : invalidate ( gadget -- )
-    \ invalidate swap (>>layout-state) ;
+    \ invalidate >>layout-state drop ;
 
-: forget-pref-dim ( gadget -- ) f swap (>>pref-dim) ;
+: forget-pref-dim ( gadget -- ) f >>pref-dim drop ;
 
 : layout-queue ( -- queue ) \ layout-queue get ;
 
@@ -160,9 +160,9 @@ DEFER: relayout
     dup layout-state>>
     [ drop ] [ dup invalidate layout-later ] if ;
 
-: show-gadget ( gadget -- ) t swap (>>visible?) ;
-
-: hide-gadget ( gadget -- ) f swap (>>visible?) ;
+: show-gadget ( gadget -- ) t >>visible? drop ;
+                              
+: hide-gadget ( gadget -- ) f >>visible? drop ;
 
 DEFER: in-layout?
 
@@ -194,9 +194,9 @@ GENERIC: layout* ( gadget -- )
 
 M: gadget layout* drop ;
 
-: prefer ( gadget -- ) dup pref-dim swap (>>dim) ;
+: prefer ( gadget -- ) dup pref-dim >>dim drop ;
 
-: validate ( gadget -- ) f swap (>>layout-state) ;
+: validate ( gadget -- ) f >>layout-state drop ;
 
 : layout ( gadget -- )
     dup layout-state>> [
@@ -255,11 +255,10 @@ M: gadget ungraft* drop ;
 : (unparent) ( gadget -- )
     dup ungraft
     dup forget-pref-dim
-    f swap (>>parent) ;
+    f >>parent drop ;
 
 : unfocus-gadget ( child gadget -- )
-    tuck focus>> eq?
-    [ f swap (>>focus) ] [ drop ] if ;
+    tuck focus>> eq? [ f >>focus ] when drop ;
 
 SYMBOL: in-layout?
 
