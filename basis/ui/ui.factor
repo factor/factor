@@ -51,12 +51,12 @@ SYMBOL: stop-after-last-window?
     T{ gain-focus } swap each-gesture ;
 
 : focus-world ( world -- )
-    t over (>>focused?)
+    t >>focused?
     dup raised-window
     focus-path f focus-gestures ;
 
 : unfocus-world ( world -- )
-    f over (>>focused?)
+    f >>focused?
     focus-path f swap focus-gestures ;
 
 M: world graft*
@@ -93,13 +93,8 @@ SYMBOL: ui-hook
     dup graft-state>> {
         { { f f } [ ] }
         { { f t } [ ] }
-        { { t t } [
-            { f f } over (>>graft-state)
-        ] }
-        { { t f } [
-            dup unqueue-graft
-            { f f } over (>>graft-state)
-        ] }
+        { { t t } [ { f f } >>graft-state ] }
+        { { t f } [ dup unqueue-graft { f f } >>graft-state ] }
     } case graft-later ;
 
 : restore-gadget ( gadget -- )
@@ -172,7 +167,7 @@ SYMBOL: ui-thread
     "UI update" spawn drop ;
 
 : open-world-window ( world -- )
-    dup pref-dim over (>>dim) dup relayout graft ;
+    dup pref-dim >>dim dup relayout graft ;
 
 : open-window ( gadget title -- )
     f <world> open-world-window ;

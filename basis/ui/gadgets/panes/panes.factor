@@ -1,45 +1,51 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ui.gadgets ui.gadgets.borders ui.gadgets.buttons
-       ui.gadgets.labels ui.gadgets.scrollers
-       ui.gadgets.paragraphs ui.gadgets.incremental ui.gadgets.packs
-       ui.gadgets.theme ui.clipboards ui.gestures ui.traverse ui.render
-       hashtables io kernel namespaces sequences io.styles strings
-       quotations math opengl combinators math.vectors
-       sorting splitting io.streams.nested assocs
-       ui.gadgets.presentations ui.gadgets.slots ui.gadgets.grids
-       ui.gadgets.grid-lines classes.tuple models continuations
-       destructors accessors math.geometry.rect ;
+ui.gadgets.labels ui.gadgets.scrollers ui.gadgets.paragraphs
+ui.gadgets.incremental ui.gadgets.packs ui.gadgets.theme
+ui.clipboards ui.gestures ui.traverse ui.render hashtables io
+kernel namespaces sequences io.styles strings quotations math
+opengl combinators math.vectors sorting splitting
+io.streams.nested assocs ui.gadgets.presentations
+ui.gadgets.slots ui.gadgets.grids ui.gadgets.grid-lines
+classes.tuple models continuations destructors accessors
+math.geometry.rect ;
 
 IN: ui.gadgets.panes
 
 TUPLE: pane < pack
-       output current prototype scrolls?
-       selection-color caret mark selecting? ;
+output current prototype scrolls?
+selection-color caret mark selecting? ;
 
-: clear-selection ( pane -- pane ) f >>caret f >>mark ;
+: clear-selection ( pane -- pane )
+    f >>caret f >>mark ;
 
-: add-output  ( pane current -- pane ) [ >>output  ] [ add-gadget ] bi ;
-: add-current ( pane current -- pane ) [ >>current ] [ add-gadget ] bi ;
+: add-output  ( pane current -- pane )
+    [ >>output  ] [ add-gadget ] bi ;
+
+: add-current ( pane current -- pane )
+    [ >>current ] [ add-gadget ] bi ;
 
 : prepare-line ( pane -- pane )
-  clear-selection
-  dup prototype>> clone add-current ;
+    clear-selection
+    dup prototype>> clone add-current ;
 
-: pane-caret&mark ( pane -- caret mark ) [ caret>> ] [ mark>> ] bi ;
+: pane-caret&mark ( pane -- caret mark )
+    [ caret>> ] [ mark>> ] bi ;
 
 : selected-children ( pane -- seq )
     [ pane-caret&mark sort-pair ] keep gadget-subtree ;
 
 M: pane gadget-selection? pane-caret&mark and ;
 
-M: pane gadget-selection ( pane -- string/f ) selected-children gadget-text ;
+M: pane gadget-selection ( pane -- string/f )
+    selected-children gadget-text ;
 
 : pane-clear ( pane -- )
-  clear-selection
-  [ output>> clear-incremental ]
-  [ current>> clear-gadget ]
-  bi ;
+    clear-selection
+    [ output>> clear-incremental ]
+    [ current>> clear-gadget ]
+    bi ;
 
 : new-pane ( class -- pane )
     new-gadget
@@ -132,7 +138,7 @@ M: style-stream write-gadget
 : make-pane ( quot -- gadget )
     <pane> [ swap with-pane ] keep smash-pane ; inline
 
-: <scrolling-pane> ( -- pane ) <pane> t over (>>scrolls?) ;
+: <scrolling-pane> ( -- pane ) <pane> t >>scrolls? ;
 
 TUPLE: pane-control < pane quot ;
 
@@ -172,7 +178,7 @@ M: pane-stream make-span-stream
     >r pick at r> when* ; inline
 
 : apply-foreground-style ( style gadget -- style gadget )
-    foreground [ over (>>color) ] apply-style ;
+    foreground [ >>color ] apply-style ;
 
 : apply-background-style ( style gadget -- style gadget )
     background [ solid-interior ] apply-style ;
@@ -183,7 +189,7 @@ M: pane-stream make-span-stream
     font-size swap at 12 or 3array ;
 
 : apply-font-style ( style gadget -- style gadget )
-    over specified-font over (>>font) ;
+    over specified-font >>font ;
 
 : apply-presentation-style ( style gadget -- style gadget )
     presented [ <presentation> ] apply-style ;
@@ -254,15 +260,15 @@ M: pane-stream make-block-stream
 
 ! Tables
 : apply-table-gap-style ( style grid -- style grid )
-    table-gap [ over (>>gap) ] apply-style ;
+    table-gap [ >>gap ] apply-style ;
 
 : apply-table-border-style ( style grid -- style grid )
-    table-border [ <grid-lines> over (>>boundary) ]
+    table-border [ <grid-lines> >>boundary ]
     apply-style ;
 
 : styled-grid ( style grid -- grid )
     <grid>
-    f over (>>fill?)
+    f >>fill?
     apply-table-gap-style
     apply-table-border-style
     nip ;
@@ -286,13 +292,13 @@ M: pack dispose drop ;
 M: paragraph dispose drop ;
 
 : gadget-write ( string gadget -- )
-    over empty?
-    [ 2drop ] [ >r <label> text-theme r> swap add-gadget drop ] if ;
+    swap dup empty?
+    [ 2drop ] [ <label> text-theme add-gadget drop ] if ;
 
 M: pack stream-write gadget-write ;
 
 : gadget-bl ( style stream -- )
-    >r " " <word-break-gadget> style-label r> swap add-gadget drop ;
+    swap " " <word-break-gadget> style-label add-gadget drop ;
 
 M: paragraph stream-write
     swap " " split
@@ -309,8 +315,8 @@ M: paragraph stream-write1
     [ H{ } swap gadget-bl drop ] [ gadget-write1 ] if ;
 
 : gadget-format ( string style stream -- )
-    pick empty?
-    [ 3drop ] [ >r swap <styled-label> r> swap add-gadget drop ] if ;
+    spin dup empty?
+    [ 3drop ] [ <styled-label> add-gadget drop ] if ;
 
 M: pack stream-format
     gadget-format ;
@@ -326,8 +332,8 @@ M: paragraph stream-format
     ] if ;
 
 : caret>mark ( pane -- pane )
-  dup caret>> >>mark
-  dup relayout-1 ;
+    dup caret>> >>mark
+    dup relayout-1 ;
 
 GENERIC: sloppy-pick-up* ( loc gadget -- n )
 
@@ -350,12 +356,10 @@ M: f sloppy-pick-up*
     if ;
 
 : move-caret ( pane -- pane )
-  dup hand-rel
-  over sloppy-pick-up
-  over (>>caret)
-  dup relayout-1 ;
+    dup hand-rel over sloppy-pick-up >>caret
+    dup relayout-1 ;
 
-: begin-selection ( pane -- ) move-caret f swap (>>mark) ;
+: begin-selection ( pane -- ) move-caret f >>mark drop ;
 
 : extend-selection ( pane -- )
     hand-moved? [

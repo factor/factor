@@ -24,7 +24,7 @@ TUPLE: incremental < pack cursor ;
 
 M: incremental pref-dim*
     dup layout-state>> [
-        dup call-next-method over (>>cursor)
+        dup call-next-method >>cursor
     ] when cursor>> ;
 
 : next-cursor ( gadget incremental -- cursor )
@@ -57,5 +57,5 @@ M: incremental pref-dim*
     not-in-layout
     dup (clear-gadget)
     dup forget-pref-dim
-    { 0 0 } over (>>cursor)
+    { 0 0 } >>cursor
     parent>> [ relayout ] when* ;

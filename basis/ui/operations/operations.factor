@@ -19,8 +19,7 @@ TUPLE: operation predicate command translator hook listener? ;
         swap >>predicate ;
 
 PREDICATE: listener-operation < operation
-    dup command>> listener-command?
-    swap listener?>> or ;
+    [ command>> listener-command? ] [ listener?>> ] bi or ;
 
 M: operation command-name
     command>> command-name ;
@@ -59,15 +58,15 @@ SYMBOL: operations
 
 : modify-operation ( hook translator operation -- operation )
     clone
-    tuck (>>translator)
-    tuck (>>hook)
-    t over (>>listener?) ;
+        swap >>translator
+        swap >>hook
+        t >>listener? ;
 
 : modify-operations ( operations hook translator -- operations )
-    rot [ >r 2dup r> modify-operation ] map 2nip ;
+    rot [ modify-operation ] with with map ;
 
 : operations>commands ( object hook translator -- pairs )
-    >r >r object-operations r> r> modify-operations
+    [ object-operations ] 2dip modify-operations
     [ [ operation-gesture ] keep ] { } map>assoc ;
 
 : define-operation-map ( class group blurb object hook translator -- )

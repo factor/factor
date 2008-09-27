@@ -21,8 +21,8 @@ C: <x11-handle> x11-handle
 M: world expose-event nip relayout ;
 
 M: world configure-event
-    over configured-loc over (>>window-loc)
-    swap configured-dim over (>>dim)
+    over configured-loc >>window-loc
+    swap configured-dim >>dim
     ! In case dimensions didn't change
     relayout-1 ;
 

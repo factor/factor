@@ -27,10 +27,10 @@ M: gadget model-changed 2drop ;
 : nth-gadget ( n gadget -- child ) children>> nth ;
 
 : init-gadget ( gadget -- gadget )
-  init-rect
-  { 0 1 } >>orientation
-  t       >>visible?
-  { f f } >>graft-state ; inline
+    init-rect
+    { 0 1 } >>orientation
+    t >>visible?
+    { f f } >>graft-state ; inline
 
 : new-gadget ( class -- gadget ) new init-gadget ; inline
 
@@ -147,7 +147,7 @@ M: array gadget-text*
 DEFER: relayout
 
 : invalidate* ( gadget -- )
-    \ invalidate* over (>>layout-state)
+    \ invalidate* >>layout-state
     dup forget-pref-dim
     dup root?>>
     [ layout-later ] [ parent>> [ relayout ] when* ] if ;
@@ -167,7 +167,7 @@ DEFER: relayout
 DEFER: in-layout?
 
 : do-invalidate ( gadget -- gadget )
-  in-layout? get [ dup invalidate ] [ dup invalidate* ] if ;
+    in-layout? get [ dup invalidate ] [ dup invalidate* ] if ;
 
 M: gadget (>>dim) ( dim gadget -- )
    2dup dim>> =
@@ -282,8 +282,7 @@ SYMBOL: in-layout?
 
 : (clear-gadget) ( gadget -- )
     dup [ (unparent) ] each-child
-    f over (>>focus)
-    f swap (>>children) ;
+    f >>focus f >>children drop ;
 
 : clear-gadget ( gadget -- )
     not-in-layout
@@ -305,7 +304,7 @@ SYMBOL: in-layout?
     not-in-layout
     (add-gadget)
     dup relayout ;
-  
+
 : add-gadgets ( parent children -- parent )
     not-in-layout
     [ (add-gadget) ] each
