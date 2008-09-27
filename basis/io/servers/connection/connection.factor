@@ -119,9 +119,9 @@ PRIVATE>
     dup secure-config>> [
         dup threaded-server [
             dup name>> [
-                listen-on [
-                    start-accept-loop
-                ] parallel-each
+                [ listen-on [ start-accept-loop ] parallel-each ]
+                [ ready>> raise-flag ]
+                bi
             ] with-logging
         ] with-variable
     ] with-secure-context ;
