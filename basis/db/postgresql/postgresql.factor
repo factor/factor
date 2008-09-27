@@ -231,6 +231,8 @@ M: postgresql-db persistent-table ( -- hashtable )
         { +user-assigned-id+ { f f f } }
         { +random-id+ { "bigint" "bigint" f } }
 
+        { +foreign-id+ { f f "references" } }
+
         { +on-delete+ { f f "on delete" } }
         { +restrict+ { f f "restrict" } }
         { +cascade+ { f f "cascade" } }
@@ -251,7 +253,6 @@ M: postgresql-db persistent-table ( -- hashtable )
         { BLOB { "bytea" "bytea" f } }
         { FACTOR-BLOB { "bytea" "bytea" f } }
         { URL { "varchar" "varchar" f } }
-        { +foreign-id+ { f f "references" } }
         { +autoincrement+ { f f "autoincrement" } }
         { +unique+ { f f "unique" } }
         { +default+ { f f "default" } }
@@ -267,10 +268,6 @@ M: postgresql-db compound ( string object -- string' )
     over {
         { "default" [ first number>string join-space ] }
         { "varchar" [ first number>string paren append ] }
-        { "references" [
-                first2 >r [ unparse join-space ] keep db-columns r>
-                swap [ slot-name>> = ] with find nip
-                column-name>> paren append
-            ] }
+        { "references" [ >reference-string ] }
         [ drop no-compound-found ]
     } case ;

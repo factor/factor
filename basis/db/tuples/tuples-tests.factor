@@ -195,7 +195,8 @@ TUPLE: annotation n paste-id summary author mode contents ;
     annotation "ANNOTATION"
     {
         { "n" "ID" +db-assigned-id+ }
-        { "paste-id" "PASTE_ID" INTEGER { +foreign-id+ paste "n" } }
+        { "paste-id" "PASTE_ID" INTEGER { +foreign-id+ paste "n" }
+            +on-delete+ +cascade+ }
         { "summary" "SUMMARY" TEXT }
         { "author" "AUTHOR" TEXT }
         { "mode" "MODE" TEXT }
@@ -574,9 +575,9 @@ compound-foo "COMPOUND_FOO"
 [ test-compound-primary-key ] test-sqlite
 [ test-compound-primary-key ] test-postgresql
 
-: test-sqlite-db ( -- )
+: sqlite-test-db ( -- )
     "tuples-test.db" temp-file sqlite-db make-db db-open db set ;
 
-: test-postgresql-db ( -- )
+: postgresql-test-db ( -- )
     { "localhost" "postgres" "foob" "factor-test" } postgresql-db
     make-db db-open db set ;

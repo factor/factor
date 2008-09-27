@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs db kernel math math.parser
-sequences continuations sequences.deep
+sequences continuations sequences.deep prettyprint
 words namespaces slots slots.private classes mirrors
 classes.tuple combinators calendar.format symbols
 classes.singleton accessors quotations random ;
@@ -158,3 +158,9 @@ ERROR: no-sql-type type ;
 
 HOOK: bind% db ( spec -- )
 HOOK: bind# db ( spec obj -- )
+
+: >reference-string ( string pair -- string )
+    first2
+    [ [ unparse join-space ] [ db-columns ] bi ] dip
+    swap [ slot-name>> = ] with find nip
+    column-name>> paren append ;

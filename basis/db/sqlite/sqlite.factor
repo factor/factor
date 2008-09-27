@@ -171,7 +171,7 @@ M: sqlite-db persistent-table ( -- assoc )
         { +db-assigned-id+ { "integer" "integer" f } }
         { +user-assigned-id+ { f f f } }
         { +random-id+ { "integer" "integer" f } }
-        { +foreign-id+ { "integer" "integer" f } }
+        { +foreign-id+ { "integer" "integer" "references" } }
 
         { +on-delete+ { f f "on delete" } }
         { +restrict+ { f f "restrict" } }
@@ -203,8 +203,9 @@ M: sqlite-db persistent-table ( -- assoc )
         { random-generator { f f f } }
     } ;
 
-M: sqlite-db compound ( str seq -- str' )
+M: sqlite-db compound ( string seq -- new-string )
     over {
         { "default" [ first number>string join-space ] }
-        [ 2drop ] 
+        { "references" [ >reference-string ] }
+        [ 2dup . . 2drop ] 
     } case ;
