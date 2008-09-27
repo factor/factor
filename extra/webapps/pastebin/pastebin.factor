@@ -232,7 +232,7 @@ M: annotation entity-url
 
 : <pastebin> ( -- responder )
     pastebin new-dispatcher
-        <pastebin-action> "list" add-main-responder
+        <pastebin-action> "" add-responder
         <pastebin-feed-action> "list.atom" add-responder
         <paste-action> "paste" add-responder
         <paste-feed-action> "paste.atom" add-responder

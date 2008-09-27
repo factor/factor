@@ -183,7 +183,7 @@ posting "POSTINGS"
 
 : <planet-admin> ( -- responder )
     planet-admin new-dispatcher
-        <edit-blogroll-action> "blogroll" add-main-responder
+        <edit-blogroll-action> "" add-responder
         <update-action> "update" add-responder
         <new-blog-action> "new-blog" add-responder
         <edit-blog-action> "edit-blog" add-responder
@@ -194,7 +194,7 @@ posting "POSTINGS"
 
 : <planet> ( -- responder )
     planet new-dispatcher
-        <planet-action> "list" add-main-responder
+        <planet-action> "" add-responder
         <planet-feed-action> "feed.xml" add-responder
         <planet-admin> "admin" add-responder
     <boilerplate>

@@ -82,14 +82,10 @@ SYMBOL: dh-file
     common-configuration
     <factor-website> main-responder set-global ;
 
-: no-www-prefix ( -- responder )
-    "http://concatenative.org" <permanent-redirect> <trivial-responder> ;
-
 : init-production ( -- )
     common-configuration
     <vhost-dispatcher>
         <factor-website> "concatenative.org" add-responder
-        no-www-prefix "www.concatenative.org" add-responder
     main-responder set-global ;
 
 : <factor-secure-config> ( -- config )
