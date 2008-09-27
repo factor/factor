@@ -150,3 +150,6 @@ link-no-follow? off
 
 [ "<p>paragraph\n a ___ b</p>" ]
 [ "paragraph\n a ___ b" convert-farkup ] unit-test
+
+[ "<p>\n<ul><li> a</li>\n</ul><hr/></p>" ]
+[ "\n- a\n___" convert-farkup ] unit-test
