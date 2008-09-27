@@ -37,8 +37,7 @@ M: postgresql-db db-open ( db -- db )
 M: postgresql-db dispose ( db -- )
     handle>> PQfinish ;
 
-M: postgresql-statement bind-statement* ( statement -- )
-    drop ;
+M: postgresql-statement bind-statement* ( statement -- ) drop ;
 
 GENERIC: postgresql-bind-conversion ( tuple object -- low-level-binding )
 
@@ -67,11 +66,11 @@ M: postgresql-result-set #columns ( result-set -- n )
     [ handle>> ] [ n>> ] bi ;
 
 M: postgresql-result-set row-column ( result-set column -- object )
-    >r result-handle-n r> pq-get-string ;
+    [ result-handle-n ] dip pq-get-string ;
 
 M: postgresql-result-set row-column-typed ( result-set column -- object )
     dup pick out-params>> nth type>>
-    >r >r result-handle-n r> r> postgresql-column-typed ;
+    [ result-handle-n ] 2dip postgresql-column-typed ;
 
 M: postgresql-statement query-results ( query -- result-set )
     dup bind-params>> [
@@ -126,13 +125,20 @@ M: postgresql-db bind# ( spec object -- )
 
 : create-table-sql ( class -- statement )
     [
+        dupd
         "create table " 0% 0%
         "(" 0% [ ", " 0% ] [
             dup column-name>> 0%
             " " 0%
             dup type>> lookup-create-type 0%
             modifiers 0%
-        ] interleave ");" 0%
+        ] interleave
+
+        ", " 0%
+        find-primary-key
+        "primary key(" 0%
+        [ "," 0% ] [ column-name>> 0% ] interleave
+        "));" 0%
     ] query-make ;
 
 : create-function-sql ( class -- statement )
@@ -160,8 +166,7 @@ M: postgresql-db bind# ( spec object -- )
 M: postgresql-db create-sql-statement ( class -- seq )
     [
         [ create-table-sql , ] keep
-        dup db-columns find-primary-key db-assigned-id-spec?
-        [ create-function-sql , ] [ drop ] if
+        dup db-assigned? [ create-function-sql , ] [ drop ] if
     ] { } make ;
 
 : drop-function-sql ( class -- statement )
@@ -181,15 +186,14 @@ M: postgresql-db create-sql-statement ( class -- seq )
 M: postgresql-db drop-sql-statement ( class -- seq )
     [
         [ drop-table-sql , ] keep
-        dup db-columns find-primary-key db-assigned-id-spec?
-        [ drop-function-sql , ] [ drop ] if
+        dup db-assigned? [ drop-function-sql , ] [ drop ] if
     ] { } make ;
 
 M: postgresql-db <insert-db-assigned-statement> ( class -- statement )
     [
         "select add_" 0% 0%
         "(" 0%
-        dup find-primary-key 2,
+        dup find-primary-key first 2,
         remove-id
         [ ", " 0% ] [ bind% ] interleave
         ");" 0%
@@ -218,14 +222,14 @@ M: postgresql-db <insert-user-assigned-statement> ( class -- statement )
         ");" 0%
     ] query-make ;
 
-M: postgresql-db insert-tuple* ( tuple statement -- )
+M: postgresql-db insert-tuple-set-key ( tuple statement -- )
     query-modify-tuple ;
 
 M: postgresql-db persistent-table ( -- hashtable )
     H{
-        { +db-assigned-id+ { "integer" "serial primary key" f } }
-        { +user-assigned-id+ { f f "primary key" } }
-        { +random-id+ { "bigint" "bigint primary key" f } }
+        { +db-assigned-id+ { "integer" "serial" f } }
+        { +user-assigned-id+ { f f f } }
+        { +random-id+ { "bigint" "bigint" f } }
         { TEXT { "text" "text" f } }
         { VARCHAR { "varchar" "varchar" f } }
         { INTEGER { "integer" "integer" f } }

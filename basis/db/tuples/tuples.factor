@@ -19,23 +19,7 @@ HOOK: <select-by-slots-statement> db ( tuple class -- tuple )
 HOOK: <count-statement> db ( query -- statement )
 HOOK: query>statement db ( query -- statement )
 
-HOOK: insert-tuple* db ( tuple statement -- )
-
-ERROR: not-persistent class ;
-
-: db-table ( class -- object )
-    dup "db-table" word-prop [ ] [ not-persistent ] ?if ;
-
-: db-columns ( class -- object )
-    superclasses [ "db-columns" word-prop ] map concat ;
-
-: db-relations ( class -- object )
-    "db-relations" word-prop ;
-
-: set-primary-key ( key tuple -- )
-    [
-        class db-columns find-primary-key slot-name>>
-    ] keep set-slot-named ;
+HOOK: insert-tuple-set-key db ( tuple statement -- )
 
 SYMBOL: sql-counter
 : next-sql-counter ( -- str )
@@ -69,7 +53,7 @@ GENERIC: eval-generator ( singleton -- object )
 : insert-db-assigned-statement ( tuple -- )
     dup class
     db get insert-statements>> [ <insert-db-assigned-statement> ] cache
-    [ bind-tuple ] 2keep insert-tuple* ;
+    [ bind-tuple ] 2keep insert-tuple-set-key ;
 
 : insert-user-assigned-statement ( tuple -- )
     dup class

@@ -30,14 +30,44 @@ UNION: +primary-key+ +db-assigned-id+ +user-assigned-id+ +random-id+ ;
 SYMBOLS: +autoincrement+ +serial+ +unique+ +default+ +null+ +not-null+
 +foreign-id+ +has-many+ ;
 
+: offset-of-slot ( string tuple -- n )
+    class superclasses [ "slots" word-prop ] map concat
+    slot-named offset>> ;
+
+: get-slot-named ( name tuple -- value )
+    tuck offset-of-slot slot ;
+
+: set-slot-named ( value name obj -- )
+    tuck offset-of-slot set-slot ;
+
+ERROR: not-persistent class ;
+
+: db-table ( class -- object )
+    dup "db-table" word-prop [ ] [ not-persistent ] ?if ;
+
+: db-columns ( class -- object )
+    superclasses [ "db-columns" word-prop ] map concat ;
+
+: db-relations ( class -- object )
+    "db-relations" word-prop ;
+
+: find-primary-key ( specs -- seq )
+    [ primary-key>> ] filter ;
+
+: set-primary-key ( value tuple -- )
+    [
+        class db-columns
+        find-primary-key first slot-name>>
+    ] keep set-slot-named ;
+
 : primary-key? ( spec -- ? )
     primary-key>> +primary-key+? ;
 
-: db-assigned-id-spec? ( spec -- ? )
-    primary-key>> +db-assigned-id+? ;
+: db-assigned-id-spec? ( specs -- ? )
+    [ primary-key>> +db-assigned-id+? ] contains? ;
 
-: assigned-id-spec? ( spec -- ? )
-    primary-key>> +user-assigned-id+? ;
+: assigned-id-spec? ( specs -- ? )
+    [ primary-key>> +user-assigned-id+? ] contains? ;
 
 : normalize-spec ( spec -- )
     dup type>> dup +primary-key+? [
@@ -49,8 +79,8 @@ SYMBOLS: +autoincrement+ +serial+ +unique+ +default+ +null+ +not-null+
         [ >>primary-key drop ] [ drop ] if*
     ] if ;
 
-: find-primary-key ( specs -- obj )
-    [ primary-key>> ] find nip ;
+: db-assigned? ( class -- ? )
+    db-columns find-primary-key db-assigned-id-spec? ;
 
 : relation? ( spec -- ? ) [ +has-many+ = ] deep-find ;
 
@@ -125,13 +155,3 @@ ERROR: no-sql-type ;
 
 HOOK: bind% db ( spec -- )
 HOOK: bind# db ( spec obj -- )
-
-: offset-of-slot ( string tuple -- n )
-    class superclasses [ "slots" word-prop ] map concat
-    slot-named offset>> ;
-
-: get-slot-named ( name tuple -- value )
-    tuck offset-of-slot slot ;
-
-: set-slot-named ( value name obj -- )
-    tuck offset-of-slot set-slot ;

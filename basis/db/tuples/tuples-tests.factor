@@ -513,15 +513,35 @@ string-encoding-test "STRING_ENCODING_TEST" {
 
 : test-queries ( -- )
     [ ] [ exam ensure-table ] unit-test
-    ! [ ] [ T{ exam f f "Kyle" 100 } insert-tuple ] unit-test
-    ! [ ] [ T{ exam f f "Stan" 80 } insert-tuple ] unit-test
-    ! [ ] [ T{ exam f f "Kenny" 60 } insert-tuple ] unit-test
-    ! [ ] [ T{ exam f f "Cartman" 41 } insert-tuple ] unit-test
-    [ ] [ 10 [ random-exam insert-tuple ] times ] unit-test
-    [ 5 ] [ <query> T{ exam { score T{ interval { from { 0 t } } { to { 100 t } } } } } >>tuple 5 >>limit select-tuples length ] unit-test
-    ! [ ] [ T{ exam { name "Kenny" } } >query  ] unit-test
-    ! [ ] [ query ] unit-test
-    ;
+    [ ] [ 1000 [ random-exam insert-tuple ] times ] unit-test
+    [ 5 ] [
+        <query>
+        T{ exam { score T{ interval { from { 0 t } } { to { 100 t } } } } }
+            >>tuple
+        5 >>limit select-tuples length
+    ] unit-test ;
+
+TUPLE: compound-foo a b c ;
+
+compound-foo "COMPOUND_FOO" 
+{
+    { "a" "A" INTEGER +user-assigned-id+ }
+    { "b" "B" INTEGER +user-assigned-id+ }
+    { "c" "C" INTEGER }
+} define-persistent
+
+: test-compound-primary-key ( -- )
+    [ ] [ compound-foo ensure-table ] unit-test
+    [ ] [ compound-foo drop-table ] unit-test
+    [ ] [ compound-foo create-table ] unit-test
+    [ ] [ 1 2 3 compound-foo boa insert-tuple ] unit-test
+    [ 1 2 3 compound-foo boa insert-tuple ] must-fail
+    [ ] [ 2 3 4 compound-foo boa insert-tuple ] unit-test
+    [ T{ compound-foo { a 2 } { b 3 } { c 4 } } ]
+    [ compound-foo new 4 >>c select-tuple ] unit-test ;
+
+[ test-compound-primary-key ] test-sqlite
+[ test-compound-primary-key ] test-postgresql
 
 : test-db ( -- )
     "tuples-test.db" temp-file sqlite-db make-db db-open db set ;

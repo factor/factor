@@ -88,7 +88,7 @@ M: sqlite-statement bind-tuple ( tuple statement -- )
     db get handle>> sqlite3_last_insert_rowid
     dup zero? [ "last-id failed" throw ] when ;
 
-M: sqlite-db insert-tuple* ( tuple statement -- )
+M: sqlite-db insert-tuple-set-key ( tuple statement -- )
     execute-statement last-insert-id swap set-primary-key ;
 
 M: sqlite-result-set #columns ( result-set -- n )
@@ -114,13 +114,20 @@ M: sqlite-statement query-results ( query -- result-set )
 
 M: sqlite-db create-sql-statement ( class -- statement )
     [
+        dupd
         "create table " 0% 0%
         "(" 0% [ ", " 0% ] [
             dup column-name>> 0%
             " " 0%
             dup type>> lookup-create-type 0%
             modifiers 0%
-        ] interleave ");" 0%
+        ] interleave
+
+        ", " 0%
+        find-primary-key
+        "primary key(" 0%
+        [ "," 0% ] [ column-name>> 0% ] interleave
+        "));" 0%
     ] query-make ;
 
 M: sqlite-db drop-sql-statement ( class -- statement )
@@ -161,10 +168,10 @@ M: sqlite-db bind% ( spec -- )
 
 M: sqlite-db persistent-table ( -- assoc )
     H{
-        { +db-assigned-id+ { "integer primary key" "integer primary key" "primary key" } }
-        { +user-assigned-id+ { f f "primary key" } }
-        { +random-id+ { "integer primary key" "integer primary key" "primary key" } }
-        { INTEGER { "integer" "integer" "primary key" } }
+        { +db-assigned-id+ { "integer" "integer" f } }
+        { +user-assigned-id+ { f f f } }
+        { +random-id+ { "integer" "integer" f } }
+        { INTEGER { "integer" "integer" f } }
         { BIG-INTEGER { "bigint" "bigint" } }
         { SIGNED-BIG-INTEGER { "bigint" "bigint" } }
         { UNSIGNED-BIG-INTEGER { "bigint" "bigint" } }
