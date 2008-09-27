@@ -210,12 +210,10 @@ TUPLE: annotation n paste-id summary author mode contents ;
     [ ] [ paste drop-table ] unit-test
     [ ] [ paste create-table ] unit-test
     [ ] [ annotation create-table ] unit-test
-
     ;
 
-! [ test-paste-schema ] test-sqlite
-! [ test-paste-schema ] test-postgresql
-
+[ test-paste-schema ] test-sqlite
+[ test-paste-schema ] test-postgresql
 
 : test-repeated-insert
     [ ] [ person ensure-table ] unit-test

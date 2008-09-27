@@ -171,6 +171,7 @@ M: sqlite-db persistent-table ( -- assoc )
         { +db-assigned-id+ { "integer" "integer" f } }
         { +user-assigned-id+ { f f f } }
         { +random-id+ { "integer" "integer" f } }
+        { +foreign-id+ { "integer" "integer" f } }
         { INTEGER { "integer" "integer" f } }
         { BIG-INTEGER { "bigint" "bigint" } }
         { SIGNED-BIG-INTEGER { "bigint" "bigint" } }
