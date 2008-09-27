@@ -172,20 +172,27 @@ M: sqlite-db persistent-table ( -- assoc )
         { +user-assigned-id+ { f f f } }
         { +random-id+ { "integer" "integer" f } }
         { +foreign-id+ { "integer" "integer" f } }
+
+        { +on-delete+ { f f "on delete" } }
+        { +restrict+ { f f "restrict" } }
+        { +cascade+ { f f "cascade" } }
+        { +set-null+ { f f "set null" } }
+        { +set-default+ { f f "set default" } }
+
         { INTEGER { "integer" "integer" f } }
-        { BIG-INTEGER { "bigint" "bigint" } }
-        { SIGNED-BIG-INTEGER { "bigint" "bigint" } }
-        { UNSIGNED-BIG-INTEGER { "bigint" "bigint" } }
-        { TEXT { "text" "text" } }
-        { VARCHAR { "text" "text" } }
-        { DATE { "date" "date" } }
-        { TIME { "time" "time" } }
-        { DATETIME { "datetime" "datetime" } }
-        { TIMESTAMP { "timestamp" "timestamp" } }
-        { DOUBLE { "real" "real" } }
-        { BLOB { "blob" "blob" } }
-        { FACTOR-BLOB { "blob" "blob" } }
-        { URL { "text" "text" } }
+        { BIG-INTEGER { "bigint" "bigint" f } }
+        { SIGNED-BIG-INTEGER { "bigint" "bigint" f } }
+        { UNSIGNED-BIG-INTEGER { "bigint" "bigint" f } }
+        { TEXT { "text" "text" f } }
+        { VARCHAR { "text" "text" f } }
+        { DATE { "date" "date" f } }
+        { TIME { "time" "time" f } }
+        { DATETIME { "datetime" "datetime" f } }
+        { TIMESTAMP { "timestamp" "timestamp" f } }
+        { DOUBLE { "real" "real" f } }
+        { BLOB { "blob" "blob" f } }
+        { FACTOR-BLOB { "blob" "blob" f } }
+        { URL { "text" "text" f } }
         { +autoincrement+ { f f "autoincrement" } }
         { +unique+ { f f "unique" } }
         { +default+ { f f "default" } }

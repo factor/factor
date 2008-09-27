@@ -210,6 +210,28 @@ TUPLE: annotation n paste-id summary author mode contents ;
     [ ] [ paste drop-table ] unit-test
     [ ] [ paste create-table ] unit-test
     [ ] [ annotation create-table ] unit-test
+
+    [ ] [
+        paste new
+            "summary1" >>summary
+            "erg" >>author
+            "#lol" >>channel
+            "contents1" >>contents
+            now >>timestamp
+        insert-tuple
+    ] unit-test
+
+    [ ] [
+        annotation new
+            1 >>paste-id
+            "annotation1" >>summary
+            "erg" >>author
+            "annotation contents" >>contents
+        insert-tuple
+    ] unit-test
+
+    [ ] [
+    ] unit-test
     ;
 
 [ test-paste-schema ] test-sqlite
@@ -552,5 +574,9 @@ compound-foo "COMPOUND_FOO"
 [ test-compound-primary-key ] test-sqlite
 [ test-compound-primary-key ] test-postgresql
 
-: test-db ( -- )
+: test-sqlite-db ( -- )
     "tuples-test.db" temp-file sqlite-db make-db db-open db set ;
+
+: test-postgresql-db ( -- )
+    { "localhost" "postgres" "foob" "factor-test" } postgresql-db
+    make-db db-open db set ;

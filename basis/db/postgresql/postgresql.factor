@@ -230,6 +230,13 @@ M: postgresql-db persistent-table ( -- hashtable )
         { +db-assigned-id+ { "integer" "serial" f } }
         { +user-assigned-id+ { f f f } }
         { +random-id+ { "bigint" "bigint" f } }
+
+        { +on-delete+ { f f "on delete" } }
+        { +restrict+ { f f "restrict" } }
+        { +cascade+ { f f "cascade" } }
+        { +set-null+ { f f "set null" } }
+        { +set-default+ { f f "set default" } }
+
         { TEXT { "text" "text" f } }
         { VARCHAR { "varchar" "varchar" f } }
         { INTEGER { "integer" "integer" f } }

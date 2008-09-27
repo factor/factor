@@ -22,13 +22,12 @@ SINGLETON: random-id-generator
 TUPLE: low-level-binding value ;
 C: <low-level-binding> low-level-binding
 
-SINGLETON: +db-assigned-id+
-SINGLETON: +user-assigned-id+
-SINGLETON: +random-id+
+SINGLETONS: +db-assigned-id+ +user-assigned-id+ +random-id+ ;
 UNION: +primary-key+ +db-assigned-id+ +user-assigned-id+ +random-id+ ;
 
 SYMBOLS: +autoincrement+ +serial+ +unique+ +default+ +null+ +not-null+
-+foreign-id+ +has-many+ ;
++foreign-id+ +has-many+ +on-delete+ +restrict+ +cascade+ +set-null+
++set-default+ ;
 
 : offset-of-slot ( string tuple -- n )
     class superclasses [ "slots" word-prop ] map concat
@@ -116,10 +115,11 @@ FACTOR-BLOB NULL URL ;
 ! PostgreSQL Types:
 ! http://developer.postgresql.org/pgdocs/postgres/datatype.html
 
-ERROR: unknown-modifier modifier ;
 
 : ?at ( obj assoc -- value/obj ? )
     dupd at* [ [ nip ] [ drop ] if ] keep ;
+
+ERROR: unknown-modifier modifier ;
 
 : lookup-modifier ( obj -- string )
     {
@@ -127,10 +127,10 @@ ERROR: unknown-modifier modifier ;
         [ persistent-table ?at [ unknown-modifier ] unless third ]
     } cond ;
 
-ERROR: no-sql-type ;
+ERROR: no-sql-type type ;
 
 : (lookup-type) ( obj -- string )
-    persistent-table at* [ no-sql-type ] unless ;
+    persistent-table ?at [ no-sql-type ] unless ;
 
 : lookup-type ( obj -- string )
     dup array? [
