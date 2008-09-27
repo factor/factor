@@ -116,12 +116,15 @@ FACTOR-BLOB NULL URL ;
 ! PostgreSQL Types:
 ! http://developer.postgresql.org/pgdocs/postgres/datatype.html
 
-ERROR: unknown-modifier ;
+ERROR: unknown-modifier modifier ;
+
+: ?at ( obj assoc -- value/obj ? )
+    dupd at* [ [ nip ] [ drop ] if ] keep ;
 
 : lookup-modifier ( obj -- string )
     {
         { [ dup array? ] [ unclip lookup-modifier swap compound ] }
-        [ persistent-table at* [ unknown-modifier ] unless third ]
+        [ persistent-table ?at [ unknown-modifier ] unless third ]
     } cond ;
 
 ERROR: no-sql-type ;

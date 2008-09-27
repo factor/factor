@@ -7,6 +7,17 @@ db.postgresql accessors random math.bitwise
 math.ranges strings urls fry db.tuples.private ;
 IN: db.tuples.tests
 
+: test-sqlite ( quot -- )
+    [ ] swap '[
+        "tuples-test.db" temp-file sqlite-db _ with-db
+    ] unit-test ;
+
+: test-postgresql ( quot -- )
+    [ ] swap '[
+        { "localhost" "postgres" "foob" "factor-test" }
+        postgresql-db _ with-db
+    ] unit-test ;
+
 TUPLE: person the-id the-name the-number the-real
 ts date time blob factor-blob url ;
 
@@ -177,7 +188,7 @@ TUPLE: annotation n paste-id summary author mode contents ;
         { "channel" "CHANNEL" TEXT }
         { "mode" "MODE" TEXT }
         { "contents" "CONTENTS" TEXT }
-        { "date" "DATE" TIMESTAMP }
+        { "timestamp" "DATE" TIMESTAMP }
         { "annotations" { +has-many+ annotation } }
     } define-persistent
 
@@ -191,20 +202,20 @@ TUPLE: annotation n paste-id summary author mode contents ;
         { "contents" "CONTENTS" TEXT }
     } define-persistent ;
 
-! { "localhost" "postgres" "" "factor-test" } postgresql-db [
-    ! [ paste drop-table ] [ drop ] recover
-    ! [ annotation drop-table ] [ drop ] recover
-    ! [ paste drop-table ] [ drop ] recover
-    ! [ annotation drop-table ] [ drop ] recover
-    ! [ ] [ paste create-table ] unit-test
-    ! [ ] [ annotation create-table ] unit-test
-! ] with-db
+: test-paste-schema ( -- )
+    [ ] [ db-assigned-paste-schema ] unit-test
+    [ ] [ paste ensure-table ] unit-test
+    [ ] [ annotation ensure-table ] unit-test
+    [ ] [ annotation drop-table ] unit-test
+    [ ] [ paste drop-table ] unit-test
+    [ ] [ paste create-table ] unit-test
+    [ ] [ annotation create-table ] unit-test
 
-: test-sqlite ( quot -- )
-    [ ] swap '[ "tuples-test.db" temp-file sqlite-db _ with-db ] unit-test ;
+    ;
 
-: test-postgresql ( quot -- )
-    [ ] swap '[ { "localhost" "postgres" "foob" "factor-test" } postgresql-db _ with-db ] unit-test ;
+! [ test-paste-schema ] test-sqlite
+! [ test-paste-schema ] test-postgresql
+
 
 : test-repeated-insert
     [ ] [ person ensure-table ] unit-test
