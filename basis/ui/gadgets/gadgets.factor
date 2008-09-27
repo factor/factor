@@ -166,14 +166,13 @@ DEFER: relayout
 
 DEFER: in-layout?
 
-: do-invalidate ( gadget -- gadget )
-    in-layout? get [ dup invalidate ] [ dup invalidate* ] if ;
+GENERIC: dim-changed ( gadget -- )
+
+M: gadget dim-changed
+    in-layout? get [ invalidate ] [ invalidate* ] if ;
 
 M: gadget (>>dim) ( dim gadget -- )
-   2dup dim>> =
-     [ 2drop ]
-     [ tuck call-next-method do-invalidate drop ]
-   if ;
+    2dup dim>> = [ 2drop ] [ tuck call-next-method dim-changed ] if ;
 
 GENERIC: pref-dim* ( gadget -- dim )
 
