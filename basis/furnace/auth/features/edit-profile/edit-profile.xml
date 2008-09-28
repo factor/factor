@@ -61,7 +61,7 @@
 	</table>
 
 	<p>
-		<input type="submit" value="Update" />
+		<button>Update</button>
 		<t:validation-messages />
 	</p>
 

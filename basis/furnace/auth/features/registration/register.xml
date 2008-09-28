@@ -62,7 +62,7 @@
 
 		<p>
 
-			<input type="submit" value="Register" />
+			<button>Register</button>
 			<t:validation-messages />
 
 		</p>
