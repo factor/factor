@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators html.elements io
 io.streams.string kernel math memoize namespaces peg peg.ebnf
-prettyprint sequences sequences.deep strings xml.entities
+sequences sequences.deep strings xml.entities
 vectors splitting xmode.code2html urls ;
 IN: farkup
 

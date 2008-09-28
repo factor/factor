@@ -42,7 +42,7 @@ IN: furnace.chloe-tags
 
 : compile-a-url ( tag -- )
     {
-        [ "href" required-attr compile-attr ]
+        [ "href" optional-attr compile-attr ]
         [ "rest" optional-attr compile-attr ]
         [ "query" optional-attr compile-attr ]
         [ "value" optional-attr compile-attr ]

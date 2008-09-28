@@ -17,12 +17,9 @@ furnace.auth.features.registration
 furnace.auth.features.deactivate-user
 furnace.boilerplate
 furnace.redirection
-webapps.blogs
 webapps.pastebin
 webapps.planet
-webapps.todo
 webapps.wiki
-webapps.wee-url
 webapps.user-admin ;
 IN: websites.concatenative
 
@@ -33,11 +30,8 @@ IN: websites.concatenative
         init-furnace-tables
 
         {
-            post comment
             paste annotation
             blog posting
-            todo
-            short-url
             article revision
         } ensure-tables
     ] with-db ;
@@ -46,12 +40,9 @@ TUPLE: factor-website < dispatcher ;
 
 : <factor-website> ( -- responder )
     factor-website new-dispatcher
-        <blogs> "blogs" add-responder
-        <todo-list> "todo" add-responder
         <pastebin> "pastebin" add-responder
         <planet> "planet" add-responder
         <wiki> "wiki" add-responder
-        <wee-url> "wee-url" add-responder
         <user-admin> "user-admin" add-responder
         URL" /wiki/view/Front Page" <redirect-responder> "" add-responder
     "Factor website" <login-realm>
