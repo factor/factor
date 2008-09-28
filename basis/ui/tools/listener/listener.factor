@@ -13,8 +13,8 @@ IN: ui.tools.listener
 TUPLE: listener-gadget < track input output stack ;
 
 : listener-output, ( listener -- listener )
-  <scrolling-pane> >>output
-  dup output>> <scroller> "Output" <labelled-gadget> 1 track-add ;
+    <scrolling-pane> >>output
+    dup output>> <scroller> "Output" <labelled-gadget> 1 track-add ;
 
 : listener-streams ( listener -- input output )
     [ input>> ] [ output>> <pane-stream> ] bi ;
@@ -23,15 +23,15 @@ TUPLE: listener-gadget < track input output stack ;
     output>> <pane-stream> <interactor> ;
 
 : listener-input, ( listener -- listener )
-  dup <listener-input> >>input
-  dup input>>
-    { 0 100 } <limited-scroller>
-    "Input" <labelled-gadget>
-  f track-add ;
+    dup <listener-input> >>input
+    dup input>>
+        { 0 100 } <limited-scroller>
+        "Input" <labelled-gadget>
+    f track-add ;
 
 : welcome. ( -- )
-   "If this is your first time with Factor, please read the " print
-   "handbook" ($link) "." print nl ;
+    "If this is your first time with Factor, please read the " print
+    "handbook" ($link) "." print nl ;
 
 M: listener-gadget focusable-child*
     input>> ;
@@ -121,11 +121,10 @@ M: engine-word word-completion-string
 TUPLE: stack-display < track ;
 
 : <stack-display> ( workspace -- gadget )
-  listener>>
-  { 0 1 } stack-display new-track
+    listener>>
+    { 0 1 } stack-display new-track
     over <toolbar> f track-add
-    swap
-      stack>> [ [ stack. ] curry try ] t "Data stack" <labelled-pane>
+    swap stack>> [ [ stack. ] curry try ] t "Data stack" <labelled-pane>
     1 track-add ;
 
 M: stack-display tool-scroller
@@ -166,14 +165,14 @@ M: stack-display tool-scroller
     } cleave ;
 
 : init-listener ( listener -- )
-    f <model> swap (>>stack) ;
+    f <model> >>stack drop ;
 
 : <listener-gadget> ( -- gadget )
-  { 0 1 } listener-gadget new-track
-    dup init-listener
-    listener-output,
-    listener-input, ;
-    
+    { 0 1 } listener-gadget new-track
+        dup init-listener
+        listener-output,
+        listener-input, ;
+
 : listener-help ( -- ) "ui-listener" help-window ;
 
 \ listener-help H{ { +nullary+ t } } define-command

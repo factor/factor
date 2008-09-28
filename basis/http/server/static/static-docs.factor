@@ -32,6 +32,6 @@ $nl
 $nl
 "It is also possible to override the hook used when serving static files to the client:"
 { $subsection <file-responder> }
-"The default just sends the file's contents with the request; " { $vocab-link "xmode.responder" } " provides an alternate hook which sends a syntax-highlighted version of the file." ;
+"The default just sends the file's contents with the request; " { $vocab-link "xmode.code2html.responder" } " provides an alternate hook which sends a syntax-highlighted version of the file." ;
 
 ABOUT: "http.server.static"

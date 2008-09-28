@@ -1,7 +1,7 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math.private namespaces make sequences strings
-arrays combinators splitting math assocs ;
+USING: kernel math.private namespaces sequences strings
+arrays combinators splitting math assocs make ;
 IN: math.parser
 
 : digit> ( ch -- n )
@@ -94,10 +94,10 @@ PRIVATE>
 : >digit ( n -- ch )
     dup 10 < [ CHAR: 0 + ] [ 10 - CHAR: a + ] if ;
 
-: integer, ( num radix -- )
+: positive>base ( num radix -- str )
     dup 1 <= [ "Invalid radix" throw ] when
-    [ /mod >digit , ] keep over 0 >
-    [ integer, ] [ 2drop ] if ;
+    [ dup 0 > ] swap [ /mod >digit ] curry [ ] "" produce-as nip
+    dup reverse-here ; inline
 
 PRIVATE>
 
@@ -110,24 +110,27 @@ GENERIC# >base 1 ( n radix -- str )
 PRIVATE>
 
 M: integer >base
-    [
-        over 0 < [
-            swap neg swap integer, CHAR: - ,
+    over 0 = [
+        2drop "0"
+    ] [
+        over 0 > [
+            positive>base
         ] [
-            integer,
+            [ neg ] dip positive>base CHAR: - prefix
         ] if
-    ] "" make reverse ;
+    ] if ;
 
 M: ratio >base
     [
+        dup 0 < negative? set
+        1 /mod
+        [ dup zero? [ drop "" ] [ (>base) sign append ] if ]
         [
-            dup 0 < dup negative? set [ "-" % neg ] when
-            1 /mod
-            >r dup zero? [ drop ] [ (>base) % sign % ] if r>
-            dup numerator (>base) %
-            "/" %
-            denominator (>base) %
-        ] "" make
+            [ numerator (>base) ]
+            [ denominator (>base) ] bi
+            "/" swap 3append
+        ] bi* append
+        negative? get [ CHAR: - prefix ] when
     ] with-radix ;
 
 : fix-float ( str -- newstr )

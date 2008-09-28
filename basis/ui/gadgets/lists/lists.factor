@@ -27,8 +27,7 @@ TUPLE: list < pack index presenter color hook ;
     control-value length 1- min 0 max ;
 
 : bound-index ( list -- )
-    dup index>> over calc-bounded-index
-    swap (>>index) ;
+    dup index>> over calc-bounded-index >>index drop ;
 
 : list-presentation-hook ( list -- quot )
     hook>> [ [ list? ] find-parent ] prepend ;
@@ -49,7 +48,7 @@ TUPLE: list < pack index presenter color hook ;
 M: list model-changed
     nip
     dup clear-gadget
-    dup <list-items> over swap add-gadgets drop
+    dup <list-items> add-gadgets
     bound-index ;
 
 : selected-rect ( list -- rect )
@@ -79,8 +78,8 @@ M: list focusable-child* drop t ;
         2drop
     ] [
         [ control-value length rem ] keep
-        [ (>>index) ] keep
-        [ relayout-1 ] keep
+        swap >>index
+        dup relayout-1
         scroll>selected
     ] if ;
 

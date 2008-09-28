@@ -89,7 +89,7 @@ SYMBOL: ui-error-hook
                 (draw-world)
             ] [
                 over <world-error> ui-error
-                f swap (>>active?)
+                f >>active? drop
             ] recover
         ] with-variable
     ] [

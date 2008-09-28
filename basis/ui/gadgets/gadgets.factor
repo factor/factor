@@ -27,10 +27,10 @@ M: gadget model-changed 2drop ;
 : nth-gadget ( n gadget -- child ) children>> nth ;
 
 : init-gadget ( gadget -- gadget )
-  init-rect
-  { 0 1 } >>orientation
-  t       >>visible?
-  { f f } >>graft-state ; inline
+    init-rect
+    { 0 1 } >>orientation
+    t >>visible?
+    { f f } >>graft-state ; inline
 
 : new-gadget ( class -- gadget ) new init-gadget ; inline
 
@@ -132,9 +132,9 @@ M: array gadget-text*
 : gadget-text ( gadget -- string ) [ gadget-text* ] "" make ;
 
 : invalidate ( gadget -- )
-    \ invalidate swap (>>layout-state) ;
+    \ invalidate >>layout-state drop ;
 
-: forget-pref-dim ( gadget -- ) f swap (>>pref-dim) ;
+: forget-pref-dim ( gadget -- ) f >>pref-dim drop ;
 
 : layout-queue ( -- queue ) \ layout-queue get ;
 
@@ -147,7 +147,7 @@ M: array gadget-text*
 DEFER: relayout
 
 : invalidate* ( gadget -- )
-    \ invalidate* over (>>layout-state)
+    \ invalidate* >>layout-state
     dup forget-pref-dim
     dup root?>>
     [ layout-later ] [ parent>> [ relayout ] when* ] if ;
@@ -160,20 +160,19 @@ DEFER: relayout
     dup layout-state>>
     [ drop ] [ dup invalidate layout-later ] if ;
 
-: show-gadget ( gadget -- ) t swap (>>visible?) ;
-
-: hide-gadget ( gadget -- ) f swap (>>visible?) ;
+: show-gadget ( gadget -- ) t >>visible? drop ;
+                              
+: hide-gadget ( gadget -- ) f >>visible? drop ;
 
 DEFER: in-layout?
 
-: do-invalidate ( gadget -- gadget )
-  in-layout? get [ dup invalidate ] [ dup invalidate* ] if ;
+GENERIC: dim-changed ( gadget -- )
+
+M: gadget dim-changed
+    in-layout? get [ invalidate ] [ invalidate* ] if ;
 
 M: gadget (>>dim) ( dim gadget -- )
-   2dup dim>> =
-     [ 2drop ]
-     [ tuck call-next-method do-invalidate drop ]
-   if ;
+    2dup dim>> = [ 2drop ] [ tuck call-next-method dim-changed ] if ;
 
 GENERIC: pref-dim* ( gadget -- dim )
 
@@ -194,9 +193,9 @@ GENERIC: layout* ( gadget -- )
 
 M: gadget layout* drop ;
 
-: prefer ( gadget -- ) dup pref-dim swap (>>dim) ;
+: prefer ( gadget -- ) dup pref-dim >>dim drop ;
 
-: validate ( gadget -- ) f swap (>>layout-state) ;
+: validate ( gadget -- ) f >>layout-state drop ;
 
 : layout ( gadget -- )
     dup layout-state>> [
@@ -255,11 +254,10 @@ M: gadget ungraft* drop ;
 : (unparent) ( gadget -- )
     dup ungraft
     dup forget-pref-dim
-    f swap (>>parent) ;
+    f >>parent drop ;
 
 : unfocus-gadget ( child gadget -- )
-    tuck focus>> eq?
-    [ f swap (>>focus) ] [ drop ] if ;
+    tuck focus>> eq? [ f >>focus ] when drop ;
 
 SYMBOL: in-layout?
 
@@ -282,8 +280,7 @@ SYMBOL: in-layout?
 
 : (clear-gadget) ( gadget -- )
     dup [ (unparent) ] each-child
-    f over (>>focus)
-    f swap (>>children) ;
+    f >>focus f >>children drop ;
 
 : clear-gadget ( gadget -- )
     not-in-layout
@@ -305,7 +302,7 @@ SYMBOL: in-layout?
     not-in-layout
     (add-gadget)
     dup relayout ;
-  
+
 : add-gadgets ( parent children -- parent )
     not-in-layout
     [ (add-gadget) ] each
