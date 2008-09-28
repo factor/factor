@@ -78,6 +78,8 @@ M: threaded-server handle-client* handler>> call ;
         [ timeout>> timeouts ] [ handle-client* ] bi
     ] with-stream ;
 
+\ handle-client ERROR add-error-logging
+
 : thread-name ( server-name addrspec -- string )
     unparse-short " connection from " swap 3append ;
 
