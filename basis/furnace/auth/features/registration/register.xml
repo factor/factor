@@ -4,7 +4,7 @@
 
 	<t:title>New User Registration</t:title>
 
-	<t:form t:action="register">
+	<t:form t:action="register" autocomplete="off">
 
 		<table>
 
