@@ -207,5 +207,5 @@ M: sqlite-db compound ( string seq -- new-string )
     over {
         { "default" [ first number>string join-space ] }
         { "references" [ >reference-string ] }
-        [ 2dup . . 2drop ] 
+        [ 2drop ]
     } case ;
