@@ -86,7 +86,8 @@ labelled-link    = "[[" link-content "|" link-content "]]"
 
 link             = image-link | labelled-link | simple-link
 
-escaped-char  = "\" .                => [[ second 1string ]]
+escaped-char  = "\" .
+    => [[ second 1string ]]
 
 inline-tag       = strong | emphasis | superscript | subscript | inline-code
                    | link | escaped-char
@@ -108,9 +109,10 @@ table            =  ((table-row nl => [[ first ]] )+ table-row? | table-row)
 text = (!(nl | code | heading | inline-delimiter | table ).)+
     => [[ >string ]]
 
-paragraph-item = (table | nl list | nl line | code | text | inline-tag | inline-delimiter)+
-paragraph = ((paragraph-item nl => [[ first ]])+ nl+ => [[ first ]]
-             | (paragraph-item nl)+ paragraph-item?
+paragraph-nl-item = nl (list | line)?
+paragraph-item = (table | code | text | inline-tag | inline-delimiter)+
+paragraph = ((paragraph-item paragraph-nl-item)+ nl+ => [[ first ]]
+             | (paragraph-item paragraph-nl-item)+ paragraph-item?
              | paragraph-item)
     => [[ paragraph boa ]]
 
@@ -134,7 +136,8 @@ line = '___'
     => [[ drop line new ]]
 
 
-named-code       =  '[' (!('{' | whitespace | '[').)+ '{' (!("}]").)+ "}]"
+named-code
+           =  '[' (!('{' | whitespace | '[').)+ '{' (!("}]").)+ "}]"
     => [[ [ second >string ] [ fourth >string ] bi code boa ]]
 
 simple-code
@@ -147,8 +150,6 @@ code = named-code | simple-code
 stand-alone
            = (line | code | heading | list | table | paragraph | nl)*
 ;EBNF
-
-
 
 : invalid-url "javascript:alert('Invalid URL in farkup');" ;
 

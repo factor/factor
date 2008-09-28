@@ -49,16 +49,16 @@ link-no-follow? off
 [ "\n\n\n\n" ] [ "\r\r\r\r" convert-farkup ] unit-test
 [ "\n\n\n" ] [ "\r\r\r" convert-farkup ] unit-test
 [ "\n\n\n" ] [ "\n\n\n" convert-farkup ] unit-test
-[ "<p>foo</p><p>bar</p>" ] [ "foo\n\nbar" convert-farkup ] unit-test
-[ "<p>foo</p><p>bar</p>" ] [ "foo\r\n\r\nbar" convert-farkup ] unit-test
-[ "<p>foo</p><p>bar</p>" ] [ "foo\r\rbar" convert-farkup ] unit-test
-[ "<p>foo</p><p>bar</p>" ] [ "foo\r\r\nbar" convert-farkup ] unit-test
+[ "<p>foo\n</p><p>bar</p>" ] [ "foo\n\nbar" convert-farkup ] unit-test
+[ "<p>foo\n</p><p>bar</p>" ] [ "foo\r\n\r\nbar" convert-farkup ] unit-test
+[ "<p>foo\n</p><p>bar</p>" ] [ "foo\r\rbar" convert-farkup ] unit-test
+[ "<p>foo\n</p><p>bar</p>" ] [ "foo\r\r\nbar" convert-farkup ] unit-test
 
 [ "\n<p>bar\n</p>" ] [ "\nbar\n" convert-farkup ] unit-test
 [ "\n<p>bar\n</p>" ] [ "\rbar\r" convert-farkup ] unit-test
 [ "\n<p>bar\n</p>" ] [ "\r\nbar\r\n" convert-farkup ] unit-test
 
-[ "<p>foo</p><p>bar</p>" ] [ "foo\n\n\nbar" convert-farkup ] unit-test
+[ "<p>foo\n</p><p>bar</p>" ] [ "foo\n\n\nbar" convert-farkup ] unit-test
 
 [ "" ] [ "" convert-farkup ] unit-test
 
@@ -113,7 +113,7 @@ link-no-follow? off
 ] [ "Feature comparison:\n|a|Factor|Java|Lisp|\n|Coolness|Yes|No|No|\n|Badass|Yes|No|No|\n|Enterprise|Yes|Yes|No|\n|Kosher|Yes|No|Yes|\n" convert-farkup ] unit-test
 
 [
-    "<p>Feature comparison:</p><table><tr><td>a</td><td>Factor</td><td>Java</td><td>Lisp</td></tr><tr><td>Coolness</td><td>Yes</td><td>No</td><td>No</td></tr><tr><td>Badass</td><td>Yes</td><td>No</td><td>No</td></tr><tr><td>Enterprise</td><td>Yes</td><td>Yes</td><td>No</td></tr><tr><td>Kosher</td><td>Yes</td><td>No</td><td>Yes</td></tr></table>"
+    "<p>Feature comparison:\n</p><table><tr><td>a</td><td>Factor</td><td>Java</td><td>Lisp</td></tr><tr><td>Coolness</td><td>Yes</td><td>No</td><td>No</td></tr><tr><td>Badass</td><td>Yes</td><td>No</td><td>No</td></tr><tr><td>Enterprise</td><td>Yes</td><td>Yes</td><td>No</td></tr><tr><td>Kosher</td><td>Yes</td><td>No</td><td>Yes</td></tr></table>"
 ] [ "Feature comparison:\n\n|a|Factor|Java|Lisp|\n|Coolness|Yes|No|No|\n|Badass|Yes|No|No|\n|Enterprise|Yes|Yes|No|\n|Kosher|Yes|No|Yes|\n" convert-farkup ] unit-test
 
 [
@@ -131,7 +131,8 @@ link-no-follow? off
 
 [ "<p>asdf\n<ul><li>lol</li>\n<li>haha</li></ul></p>" ] [ "asdf\n-lol\n-haha" convert-farkup ] unit-test
 
-[ "<p>asdf</p><ul><li>lol</li>\n<li>haha</li></ul>" ] [ "asdf\n\n-lol\n-haha" convert-farkup ] unit-test
+[ "<p>asdf\n</p><ul><li>lol</li>\n<li>haha</li></ul>" ]
+ [ "asdf\n\n-lol\n-haha" convert-farkup ] unit-test
 
 [ "<hr/>" ] [ "___" convert-farkup ] unit-test
 [ "<hr/>\n" ] [ "___\n" convert-farkup ] unit-test
@@ -151,5 +152,5 @@ link-no-follow? off
 [ "<p>paragraph\n a ___ b</p>" ]
 [ "paragraph\n a ___ b" convert-farkup ] unit-test
 
-[ "<p>\n<ul><li> a</li>\n</ul><hr/></p>" ]
+[ "\n<ul><li> a</li>\n</ul><hr/>" ]
 [ "\n- a\n___" convert-farkup ] unit-test
