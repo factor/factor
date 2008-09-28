@@ -102,11 +102,11 @@ HELP: URL
 HELP: VARCHAR
 { $description "The SQL varchar type.  This type can take an integer as an argument." } ;
 
-HELP: assigned-id-spec?
+HELP: user-assigned-id-spec?
 { $values
-     { "spec" null }
+     { "specs" "a sequence of sql specs" }
      { "?" "a boolean" } }
-{ $description "" } ;
+{ $description "Tests if any of the sql specs has the type " { $link +user-assigned-id+ } "." } ;
 
 HELP: bind#
 { $values
@@ -126,15 +126,15 @@ HELP: compound
 
 HELP: db-assigned-id-spec?
 { $values
-     { "spec" null }
+     { "specs" "a sequence of sql specs" }
      { "?" "a boolean" } }
-{ $description "" } ;
+{ $description "Tests if any of the sql specs has the type " { $link +db-assigned-id+ } "." } ;
 
 HELP: find-primary-key
 { $values
-     { "specs" "an array of sql-specs" }
-     { "obj" object } }
-{ $description "Returns the row from the sql-specs array." }
+     { "specs" "a sequence of sql-specs" }
+     { "seq" "a sequence of sql-specs" } }
+{ $description "Returns the rows from the sql-specs array that are part of the primary key. Composite primary keys are supported, so this word must return a sequence." }
 { $notes "This is a low-level word." } ;
 
 HELP: generator-bind
@@ -183,7 +183,9 @@ HELP: modifiers
 { $description "" } ;
 
 HELP: no-sql-type
-{ $description "" } ;
+{ $values
+     { "type" "a sql type" } }
+{ $description "Throws an error containing a sql type that is unsupported or the result of a typo." } ;
 
 HELP: normalize-spec
 { $values
@@ -250,7 +252,8 @@ HELP: sql-spec
 { $description "" } ;
 
 HELP: unknown-modifier
-{ $description "" } ;
+{ $values { "modifier" string } }
+{ $description "Throws an error containing an unknown sql modifier." } ;
 
 ARTICLE: "db.types" "Database types"
 "The " { $vocab-link "db.types" } " vocabulary maps Factor types to database types." $nl

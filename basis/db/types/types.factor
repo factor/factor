@@ -65,7 +65,7 @@ ERROR: not-persistent class ;
 : db-assigned-id-spec? ( specs -- ? )
     [ primary-key>> +db-assigned-id+? ] contains? ;
 
-: assigned-id-spec? ( specs -- ? )
+: user-assigned-id-spec? ( specs -- ? )
     [ primary-key>> +user-assigned-id+? ] contains? ;
 
 : normalize-spec ( spec -- )
