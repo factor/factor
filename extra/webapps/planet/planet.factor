@@ -144,13 +144,8 @@ posting "POSTINGS"
             f <blog>
             [ deposit-blog-slots ]
             [ insert-tuple ]
-            [
-                <url>
-                    "$planet/admin/edit-blog" >>path
-                    swap id>> "id" set-query-param
-                <redirect>
-            ]
-            tri
+            bi
+            URL" $planet/admin" <redirect>
         ] >>submit ;
 
 : <edit-blog-action> ( -- action )
