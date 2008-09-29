@@ -63,11 +63,11 @@ M: topic browser-link-href topic>filename ;
 
 : all-topics ( -- topics )
     [
-        ! articles get keys [ >link ] map %
-        ! all-words [ >link ] map %
-        ! all-authors [ <vocab-author> ] map %
+        articles get keys [ >link ] map %
+        all-words [ >link ] map %
+        all-authors [ <vocab-author> ] map %
         all-tags [ <vocab-tag> ] map %
-        ! all-vocabs-really %
+        all-vocabs-really %
     ] { } make ;
 
 : serialize-index ( index file -- )
@@ -79,8 +79,18 @@ M: topic browser-link-href topic>filename ;
     all-words [ dup name>> ] { } map>assoc "words.idx" serialize-index
     all-vocabs-really [ dup vocab-name ] { } map>assoc "vocabs.idx" serialize-index ;
 
-: generate-help ( -- )
+: generate-help-files ( -- )
     all-topics [ help>html ] each ;
+
+: generate-help ( -- )
+    { "resource:core" "resource:basis" "resource:extra" } vocab-roots [
+        load-everything
+
+        "/tmp/docs/" [
+            generate-indices
+            generate-help-files
+        ] with-directory
+    ] with-variable ;
 
 MEMO: load-index ( name -- index )
     binary file-contents bytes>object ;
