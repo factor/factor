@@ -81,7 +81,7 @@ SYMBOL: dh-file
     common-configuration
     <vhost-dispatcher>
         <factor-website> "concatenative.org" add-responder
-        <pastebin> "pastebin.factorcode.org" add-responder
+        <pastebin> "paste.factorcode.org" add-responder
         <planet> "planet.factorcode.org" add-responder
     <configuration>
     main-responder set-global ;
