@@ -154,3 +154,6 @@ link-no-follow? off
 
 [ "\n<ul><li> a</li>\n</ul><hr/>" ]
 [ "\n- a\n___" convert-farkup ] unit-test
+
+[ "<p>hello_world how are you today?\n<ul><li> hello_world how are you today?</li></ul></p>" ]
+[ "hello_world how are you today?\n- hello_world how are you today?" convert-farkup ] unit-test
