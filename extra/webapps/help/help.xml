@@ -11,7 +11,7 @@
 			<t:base t:href="$help-webapp" />
 		</head>
 
-		<frameset cols="25%, 75%">
+		<frameset cols="30%, 70%">
 			<frame src="search" name="search" />
 			<frame src="content/article-handbook.html" name="content" />
 		</frameset>

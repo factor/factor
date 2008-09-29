@@ -86,6 +86,8 @@ M: topic browser-link-href topic>filename ;
     { "resource:core" "resource:basis" "resource:extra" } vocab-roots [
         load-everything
 
+        "/tmp/docs/" make-directory
+
         "/tmp/docs/" [
             generate-indices
             generate-help-files

@@ -7,18 +7,34 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<t:base t:href="$help-webapp/content/" />
+
+		<style>
+			body { font-family: sans-serif; font-size: 85%; }
+			a:link { text-decoration: none; color: #00004c; }
+			a:visited { text-decoration: none; color: #00004c; }
+			a:active { text-decoration: none; color: #00004c; }
+			a:hover { text-decoration: underline; color: #00004c; }
+		</style>
 	</head>
 
 	<body>
-		<h1>Factor documentation</h1>
+		<h1><t:a t:href="$help-webapp/content/article-handbook.html"
+			target="content">Factor help</t:a></h1>
 
+		<p>This documentation was generated offline from a Factor
+		image where <code>load-everything</code> was run.</p>
+		
+		<p>You may search article titles below.</p>
+		
 		<t:form t:action="$help-webapp/search">
 			<t:field t:name="search" />
 			<button>Search</button>
 		</t:form>
 		
 		<t:if t:value="articles">
-			<h1>Articles</h1>
+			<hr/>
+			
+			<h2>Articles</h2>
 			
 			<ul>
 				<t:each t:name="articles">
@@ -28,7 +44,9 @@
 		</t:if>
 		
 		<t:if t:value="vocabs">
-			<h1>Vocabularies</h1>
+			<hr/>
+			
+			<h2>Vocabularies</h2>
 			
 			<ul>
 				<t:each t:name="vocabs">
@@ -38,7 +56,9 @@
 		</t:if>
 		
 		<t:if t:value="words">
-			<h1>Words</h1>
+			<hr/>
+			
+			<h2>Words</h2>
 			
 			<ul>
 				<t:each t:name="words">
