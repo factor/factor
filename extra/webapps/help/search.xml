@@ -21,7 +21,7 @@
 		<h1><t:a t:href="$help-webapp/content/article-handbook.html"
 			target="content">Factor documentation</t:a></h1>
 
-		<p>This is the <a href="http://factorcode.org">Factor</a>
+		<p>This is the <a href="http://factorcode.org" target="_top">Factor</a>
 		documentation, generated offline from a
 		<code>load-everything</code> image. The Factor UI also
 		includes a documentation browser tool.</p>
