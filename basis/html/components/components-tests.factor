@@ -163,7 +163,7 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
 
 [ t ] [
     [ "object" inspector render ] with-string-writer
-    [ "object" value [ describe ] with-html-stream ] with-string-writer
+    [ "object" value [ describe ] with-html-writer ] with-string-writer
     =
 ] unit-test
 

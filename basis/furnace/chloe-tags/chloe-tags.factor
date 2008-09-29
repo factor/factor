@@ -59,8 +59,12 @@ CHLOE: write-atom drop [ write-atom-feeds ] [code] ;
     attrs>> '[ [ [ _ ] dip link-attr ] each-responder ] [code] ;
 
 : a-start-tag ( tag -- )
-    [ compile-link-attrs ] [ compile-a-url ] bi
-    [ <a =href a> ] [code] ;
+    [ <a ] [code]
+    [ non-chloe-attrs-only compile-attrs ]
+    [ compile-link-attrs ]
+    [ compile-a-url ]
+    tri
+    [ =href a> ] [code] ;
 
 : a-end-tag ( tag -- )
     drop [ </a> ] [code] ;
@@ -69,6 +73,9 @@ CHLOE: a
     [
         [ a-start-tag ] [ compile-children ] [ a-end-tag ] tri
     ] compile-with-scope ;
+
+CHLOE: base
+    compile-a-url [ <base =href base/> ] [code] ;
 
 : compile-hidden-form-fields ( for -- )
     '[

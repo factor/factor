@@ -153,8 +153,8 @@ main-responder global [ <404> <trivial-responder> or ] change-at
     [ add-responder-nesting ] [ call-responder* ] 2bi ;
 
 : http-error. ( error -- )
-    "Internal server error" [
-        [ print-error nl :c ] with-html-stream
+    "Internal server error" [ ] [
+        [ print-error nl :c ] with-html-writer
     ] simple-page ;
 
 : <500> ( error -- response )

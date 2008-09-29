@@ -1,22 +1,18 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs sequences kernel parser fry quotations
-classes.tuple
+classes.tuple classes.singleton
 html.components
 html.templates.chloe.compiler
 html.templates.chloe.syntax ;
 IN: html.templates.chloe.components
+  
+GENERIC: component-tag ( tag class -- )
 
-: singleton-component-tag ( tag class -- )
+M: singleton-class component-tag ( tag class -- )
     [ "name" required-attr compile-attr ]
     [ literalize [ render ] [code-with] ]
     bi* ;
-
-: CHLOE-SINGLETON:
-    scan-word
-    [ name>> ] [ '[ _ singleton-component-tag ] ] bi
-    define-chloe-tag ;
-    parsing
 
 : compile-component-attrs ( tag class -- )
     [ attrs>> [ drop main>> "name" = not ] assoc-filter ] dip
@@ -24,12 +20,12 @@ IN: html.templates.chloe.components
     [ [ boa ] [code-with] ]
     bi ;
 
-: tuple-component-tag ( tag class -- )
+M: tuple-class component-tag ( tag class -- )
     [ drop "name" required-attr compile-attr ] [ compile-component-attrs ] 2bi
     [ render ] [code] ;
 
-: CHLOE-TUPLE:
+: COMPONENT:
     scan-word
-    [ name>> ] [ '[ _ tuple-component-tag ] ] bi
+    [ name>> ] [ '[ _ component-tag ] ] bi
     define-chloe-tag ;
     parsing

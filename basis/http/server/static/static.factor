@@ -60,7 +60,7 @@ TUPLE: file-responder root hook special allow-listings ;
     dup <a =href a> escape-string write </a> ;
 
 : directory. ( path -- )
-    dup file-name [
+    dup file-name [ ] [
         [ <h1> file-name escape-string write </h1> ]
         [
             <ul>

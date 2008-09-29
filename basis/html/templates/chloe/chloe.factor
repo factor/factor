@@ -78,20 +78,19 @@ CHLOE: call-next-template
 
 CHLOE: if dup if>quot [ swap when ] append process-children ;
 
-CHLOE-SINGLETON: label
-CHLOE-SINGLETON: link
-CHLOE-SINGLETON: inspector
-CHLOE-SINGLETON: comparison
-CHLOE-SINGLETON: html
-CHLOE-SINGLETON: hidden
-
-CHLOE-TUPLE: farkup
-CHLOE-TUPLE: field
-CHLOE-TUPLE: textarea
-CHLOE-TUPLE: password
-CHLOE-TUPLE: choice
-CHLOE-TUPLE: checkbox
-CHLOE-TUPLE: code
+COMPONENT: label
+COMPONENT: link
+COMPONENT: inspector
+COMPONENT: comparison
+COMPONENT: html
+COMPONENT: hidden
+COMPONENT: farkup
+COMPONENT: field
+COMPONENT: textarea
+COMPONENT: password
+COMPONENT: choice
+COMPONENT: checkbox
+COMPONENT: code
 
 SYMBOL: template-cache
 

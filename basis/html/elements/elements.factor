@@ -113,6 +113,7 @@ SYMBOL: html
     "hr"
     "link"
     "img"
+    "base"
 ] [ define-open-html-word ] each
 
 ! Define some attributes
@@ -124,7 +125,7 @@ SYMBOL: html
     "width" "selected" "onsubmit" "xmlns" "lang" "xml:lang"
     "media" "title" "multiple" "checked"
     "summary" "cellspacing" "align" "scope" "abbr"
-    "nofollow" "alt"
+    "nofollow" "alt" "target"
 ] [ define-attribute-word ] each
 
 >>
@@ -133,12 +134,16 @@ SYMBOL: html
     "<?xml version=\"1.0\"?>" write-html
     "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">" write-html ;
 
-: simple-page ( title quot -- )
+: simple-page ( title head-quot body-quot -- )
     #! Call the quotation, with all output going to the
     #! body of an html page with the given title.
+    spin
     xhtml-preamble
     <html "http://www.w3.org/1999/xhtml" =xmlns "en" =xml:lang "en" =lang html>
-        <head> <title> swap write </title> </head>
+        <head>
+            <title> write </title>
+            call
+        </head>
         <body> call </body>
     </html> ; inline
 

@@ -27,13 +27,9 @@ HELP: CHLOE:
 { $values { "name" "the tag name" } { "definition" "a quotation with stack effect " { $snippet "( tag -- )" } } }
 { $description "Defines compilation semantics for the Chloe tag named " { $snippet "tag" } ". The definition body receives a " { $link tag } " on the stack." } ;
 
-HELP: CHLOE-SINGLETON:
-{ $syntax "CHLOE-SINGLETON: name" }
-{ $description "Defines a Chloe tag named " { $snippet "name" } " rendering an HTML component with singleton class word " { $snippet "name" } ". See " { $link "html.components" } "." } ;
-
-HELP: CHLOE-TUPLE:
-{ $syntax "CHLOE-TUPLE: name" }
-{ $description "Defines a Chloe tag named " { $snippet "name" } " rendering an HTML component with tuple class word " { $snippet "name" } ". See " { $link "html.components" } "." } ;
+HELP: COMPONENT:
+{ $syntax "COMPONENT: name" }
+{ $description "Defines a Chloe tag named " { $snippet "name" } " rendering the HTML component with class word " { $snippet "name" } ". See " { $link "html.components" } "." } ;
 
 HELP: reset-cache
 { $description "Resets the compiled template cache. Chloe automatically recompiles templates when their file changes on disk, however other when redefining Chloe tags or words which they call, the cache may have to be reset manually for the changes to take effect." } ;
@@ -135,6 +131,7 @@ ARTICLE: "html.templates.chloe.tags.form" "Chloe link and form tags"
             "s</a>"
         }
     } }
+    { { $snippet "t:base" } { "Outputs an HTML " { $snippet "<base>" } " tag. The attributes are interpreted in the same manner as the attributes of " { $snippet "t:a" } "." } }
     { { $snippet "t:form" } {
         "Renders a form; extends the standard XHTML " { $snippet "form" } " tag by providing some integration with other web framework features, for example by adding hidden fields for authentication credentials and session management allowing those features to work with form submission transparently. The following attributes are supported:"
         { $list
@@ -264,14 +261,13 @@ ARTICLE: "html.templates.chloe.extend.components.example" "An example of a custo
 "Now we define a method on the " { $link render* } " generic word which renders the image using " { $vocab-link "html.elements" } ":"
 { $code "M: image render* 2drop <img =src img/> ;" }
 "Finally, we can define a Chloe component:"
-{ $code "CHLOE-SINGLETON: image" }
+{ $code "COMPONENT: image" }
 "We can use it as follows, assuming the current form has a value named " { $snippet "image" } ":"
 { $code "<t:image t:name='image' />" } ;
 
 ARTICLE: "html.templates.chloe.extend.components" "Extending Chloe with custom components"
 "Custom HTML components implementing the " { $link render* } " word can be wired up with Chloe using the following syntax from " { $vocab-link "html.templates.chloe.components" } ":"
-{ $subsection POSTPONE: CHLOE-SINGLETON: }
-{ $subsection POSTPONE: CHLOE-TUPLE: }
+{ $subsection POSTPONE: COMPONENT: }
 { $subsection "html.templates.chloe.extend.components.example" } ;
 
 ARTICLE: "html.templates.chloe" "Chloe templates"

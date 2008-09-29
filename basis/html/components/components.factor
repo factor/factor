@@ -126,11 +126,11 @@ M: string link-href ;
 M: url link-title ;
 M: url link-href ;
 
-SINGLETON: link
+TUPLE: link target ;
 
 M: link render*
-    2drop
-    <a dup link-href =href a>
+    nip
+    <a target>> [ =target ] when* dup link-href =href a>
         link-title present escape-string write
     </a> ;
 
@@ -169,7 +169,7 @@ M: farkup render*
 SINGLETON: inspector
 
 M: inspector render*
-    2drop [ describe ] with-html-stream ;
+    2drop [ describe ] with-html-writer ;
 
 ! Diff component
 SINGLETON: comparison
