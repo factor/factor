@@ -25,7 +25,7 @@ TUPLE: button < border pressed? selected? quot ;
     dup mouse-clicked?
     over button-rollover? and
     buttons-down? and
-    over (>>pressed?)
+    >>pressed?
     relayout-1 ;
 
 : if-clicked ( button quot -- )
@@ -115,20 +115,18 @@ M: checkmark-paint draw-interior
         dup { 0 1 } v* swap { 1 0 } v* gl-line
     ] with-translation ;
 
-: checkmark-theme ( gadget -- )
+: checkmark-theme ( gadget -- gadget )
     f
     f
     black <solid>
     black <checkmark-paint>
-    <button-paint>
-    over (>>interior)
-    black <solid>
-    swap (>>boundary) ;
+    <button-paint> >>interior
+    black <solid> >>boundary ;
 
 : <checkmark> ( -- gadget )
     <gadget>
-    dup checkmark-theme
-    { 14 14 } over (>>dim) ;
+    checkmark-theme
+    { 14 14 } >>dim ;
 
 : toggle-model ( model -- )
     [ not ] change-model ;
@@ -148,7 +146,7 @@ TUPLE: checkbox < button ;
         align-left ;
 
 M: checkbox model-changed
-    swap value>> over (>>selected?) relayout-1 ;
+    swap value>> >>selected? relayout-1 ;
 
 TUPLE: radio-paint color ;
 
@@ -162,20 +160,18 @@ M: radio-paint draw-boundary
     color>> set-color
     origin get { 1 1 } v+ swap rect-dim { 2 2 } v- 12 gl-circle ;
 
-: radio-knob-theme ( gadget -- )
+: radio-knob-theme ( gadget -- gadget )
     f
     f
     black <radio-paint>
     black <radio-paint>
-    <button-paint>
-    over (>>interior)
-    black <radio-paint>
-    swap (>>boundary) ;
+    <button-paint> >>interior
+    black <radio-paint> >>boundary ;
 
 : <radio-knob> ( -- gadget )
     <gadget>
-    dup radio-knob-theme
-    { 16 16 } over (>>dim) ;
+    radio-knob-theme
+    { 16 16 } >>dim ;
 
 TUPLE: radio-control < button value ;
 
@@ -188,13 +184,12 @@ TUPLE: radio-control < button value ;
 
 M: radio-control model-changed
     swap value>>
-    over value>> =
-    over (>>selected?)
+    over value>> = >>selected?
     relayout-1 ;
 
 : <radio-controls> ( parent model assoc quot -- parent )
-  #! quot has stack effect ( value model label -- )
-  swapd [ swapd call add-gadget ] 2curry assoc-each ; inline
+    #! quot has stack effect ( value model label -- )
+    swapd [ swapd call add-gadget ] 2curry assoc-each ; inline
 
 : radio-button-theme ( gadget -- gadget )
     { 5 5 } >>gap
@@ -204,18 +199,18 @@ M: radio-control model-changed
     <radio-knob> label-on-right radio-button-theme <radio-control> ;
 
 : <radio-buttons> ( model assoc -- gadget )
-  <filled-pile>
-    -rot
-    [ <radio-button> ] <radio-controls>
-  { 5 5 } >>gap ;
+    <filled-pile>
+        -rot
+        [ <radio-button> ] <radio-controls>
+        { 5 5 } >>gap ;
 
 : <toggle-button> ( value model label -- gadget )
     <radio-control> bevel-button-theme ;
 
 : <toggle-buttons> ( model assoc -- gadget )
-  <shelf>
-    -rot
-    [ <toggle-button> ] <radio-controls> ;
+    <shelf>
+        -rot
+        [ <toggle-button> ] <radio-controls> ;
 
 : command-button-quot ( target command -- quot )
     [ invoke-command drop ] 2curry ;
@@ -227,7 +222,7 @@ M: radio-control model-changed
     <bevel-button> ;
 
 : <toolbar> ( target -- toolbar )
-  <shelf>
-    swap
-    "toolbar" over class command-map commands>> swap
-    [ -rot <command-button> add-gadget ] curry assoc-each ;
+    <shelf>
+        swap
+        "toolbar" over class command-map commands>> swap
+        [ -rot <command-button> add-gadget ] curry assoc-each ;

@@ -123,7 +123,11 @@ PRIVATE>
 : callstack. ( callstack -- )
     callstack>array 2 <groups> [
         remove-breakpoints
-        3 nesting-limit [ . ] with-variable
+        [
+            3 nesting-limit set
+            100 length-limit set
+            .
+        ] with-scope
     ] assoc-each ;
 
 : .c ( -- ) callstack callstack. ;

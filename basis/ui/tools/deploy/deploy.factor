@@ -42,8 +42,8 @@ TUPLE: deploy-gadget < pack vocab settings ;
     deploy-c-types? get "Retain all C types" <checkbox> add-gadget ;
 
 : deploy-settings-theme ( gadget -- gadget )
-  { 10 10 } >>gap
-  1         >>fill ;
+    { 10 10 } >>gap
+    1 >>fill ;
 
 : <deploy-settings> ( vocab -- control )
     default-config [ <model> ] assoc-map
@@ -57,7 +57,7 @@ TUPLE: deploy-gadget < pack vocab settings ;
             advanced-settings
 
             deploy-settings-theme
-            namespace <mapping> over (>>model)
+            namespace <mapping> >>model
         ]
     bind ;
 

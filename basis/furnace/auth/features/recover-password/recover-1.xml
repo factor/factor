@@ -32,7 +32,7 @@
 
 		</table>
 
-		<input type="submit" value="Recover password" />
+		<button>Recover password</button>
 
 	</t:form>
 

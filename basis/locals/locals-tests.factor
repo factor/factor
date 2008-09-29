@@ -1,7 +1,7 @@
 USING: locals math sequences tools.test hashtables words kernel
 namespaces arrays strings prettyprint io.streams.string parser
 accessors generic eval combinators combinators.short-circuit
-combinators.short-circuit.smart ;
+combinators.short-circuit.smart math.order ;
 IN: locals.tests
 
 :: foo ( a b -- a a ) a a ;
@@ -332,3 +332,12 @@ M:: sequence method-with-locals ( a -- y ) a reverse ;
 [ 0 3 "abc" [| from to seq | T{ slice f from to seq } ] call ] unit-test
 
 { 3 1 } [| from to seq | T{ slice f from to seq } ] must-infer-as
+
+:: compare-case ( obj1 obj2 lt-quot eq-quot gt-quot -- )
+    obj1 obj2 <=> {
+        { +lt+ [ lt-quot call ] }
+        { +eq+ [ eq-quot call ] }
+        { +gt+ [ gt-quot call ] }
+    } case ; inline
+
+[ [ ] [ ] [ ] compare-case ] must-infer

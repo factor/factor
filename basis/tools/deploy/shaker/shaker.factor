@@ -281,6 +281,8 @@ IN: tools.deploy.shaker
             } %
 
             { } { "math.partial-dispatch" } strip-vocab-globals %
+            
+            "peg-cache" "peg" lookup ,
         ] when
 
         strip-prettyprint? [

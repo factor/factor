@@ -5,9 +5,9 @@ math.vectors namespaces math.order accessors math.geometry.rect ;
 IN: ui.gadgets.packs
 
 TUPLE: pack < gadget
-  { align initial: 0       }
-  { fill  initial: 0       }
-  { gap   initial: { 0 0 } } ;
+    { align initial: 0 }
+    { fill  initial: 0 }
+    { gap   initial: { 0 0 } } ;
 
 : packed-dim-2 ( gadget sizes -- list )
     [ over rect-dim over v- rot fill>> v*n v+ ] with map ;
@@ -40,7 +40,7 @@ TUPLE: pack < gadget
 
 : <pile> ( -- pack ) { 0 1 } <pack> ;
 
-: <filled-pile> ( -- pack ) <pile> 1 over (>>fill) ;
+: <filled-pile> ( -- pack ) <pile> 1 >>fill ;
 
 : <shelf> ( -- pack ) { 1 0 } <pack> ;
 

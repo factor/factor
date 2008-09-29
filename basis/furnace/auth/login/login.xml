@@ -35,7 +35,7 @@
 
 		<p>
 
-			<input type="submit" value="Log in" />
+			<button>Log in</button>
 			<t:validation-messages />
 
 		</p>

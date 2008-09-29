@@ -18,7 +18,7 @@ IN: ui.gadgets.worlds.tests
 
 <gadget> "g1" set
 <gadget> "g2" set
-"g1" get "g2" get swap add-gadget drop
+"g2" get "g1" get add-gadget drop
 
 [ ] [
     "g2" get <test-world> "w" set
@@ -33,8 +33,8 @@ IN: ui.gadgets.worlds.tests
 <gadget> "g1" set
 <gadget> "g2" set
 <gadget> "g3" set
-"g1" get "g3" get swap add-gadget drop
-"g2" get "g3" get swap add-gadget drop
+"g3" get "g1" get add-gadget drop
+"g3" get "g2" get add-gadget drop
 
 [ ] [
     "g3" get <test-world> "w" set
@@ -55,7 +55,7 @@ TUPLE: focus-test < gadget ;
 
 : <focus-test>
     focus-test new-gadget
-    <focusing> over swap add-gadget drop ;
+    dup <focusing> add-gadget drop ;
 
 M: focus-test focusable-child* gadget-child ;
 

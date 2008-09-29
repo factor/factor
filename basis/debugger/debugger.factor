@@ -323,3 +323,5 @@ M: bad-effect summary
     drop "Bad stack effect declaration" ;
 
 M: bad-escape summary drop "Bad escape code" ;
+
+M: bad-literal-tuple summary drop "Bad literal tuple" ;

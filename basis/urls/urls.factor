@@ -4,12 +4,11 @@ USING: kernel ascii combinators combinators.short-circuit
 sequences splitting fry namespaces make assocs arrays strings
 io.sockets io.sockets.secure io.encodings.string
 io.encodings.utf8 math math.parser accessors parser
-strings.parser lexer prettyprint.backend hashtables present ;
+strings.parser lexer prettyprint.backend hashtables present
+peg.ebnf ;
 IN: urls
 
 : url-quotable? ( ch -- ? )
-    #! In a URL, can this character be used without
-    #! URL-encoding?
     {
         [ letter? ]
         [ LETTER? ]
@@ -20,8 +19,10 @@ IN: urls
 <PRIVATE
 
 : push-utf8 ( ch -- )
-    1string utf8 encode
-    [ CHAR: % , >hex 2 CHAR: 0 pad-left % ] each ;
+    dup CHAR: \s = [ drop "+" % ] [
+        1string utf8 encode
+        [ CHAR: % , >hex 2 CHAR: 0 pad-left % ] each
+    ] if ;
 
 PRIVATE>
 
@@ -86,7 +87,7 @@ PRIVATE>
         ] keep
     ] when ;
 
-: assoc>query ( hash -- str )
+: assoc>query ( assoc -- str )
     [
         dup array? [ [ present ] map ] [ present 1array ] if
     ] assoc-map
@@ -104,8 +105,15 @@ TUPLE: url protocol username password host port path query anchor ;
 : query-param ( url key -- value )
     swap query>> at ;
 
+: delete-query-param ( url key -- url )
+    over query>> delete-at ;
+
 : set-query-param ( url value key -- url )
-    '[ [ _ _ ] dip ?set-at ] change-query ;
+    over [
+        '[ [ _ _ ] dip ?set-at ] change-query
+    ] [
+        nip delete-query-param
+    ] if ;
 
 : parse-host ( string -- host port )
     ":" split1 [ url-decode ] [
@@ -115,44 +123,62 @@ TUPLE: url protocol username password host port path query anchor ;
         ] when
     ] bi* ;
 
-<PRIVATE
-
-: parse-host-part ( url protocol rest -- url string' )
-    [ >>protocol ] [
-        "//" ?head [ "Invalid URL" throw ] unless
-        "@" split1 [
-            [
-                ":" split1 [ >>username ] [ >>password ] bi*
-            ] dip
-        ] when*
-        "/" split1 [
-            parse-host [ >>host ] [ >>port ] bi*
-        ] [ "/" prepend ] bi*
-    ] bi* ;
-
-PRIVATE>
-
 GENERIC: >url ( obj -- url )
 
 M: f >url drop <url> ;
 
 M: url >url ;
 
+<PRIVATE
+
+EBNF: parse-url
+
+protocol = [a-z]+                   => [[ url-decode ]]
+username = [^/:@#?]+                => [[ url-decode ]]
+password = [^/:@#?]+                => [[ url-decode ]]
+pathname = [^#?]+                   => [[ url-decode ]]
+query    = [^#]+                    => [[ query>assoc ]]
+anchor   = .+                       => [[ url-decode ]]
+
+hostname = [^/#?]+                  => [[ url-decode ]]
+
+hostname-spec = hostname ("/"|!(.)) => [[ first ]]
+
+auth     = (username (":" password  => [[ second ]])? "@"
+                                    => [[ first2 2array ]])?
+
+url      = ((protocol "://")        => [[ first ]] auth hostname)?
+           (pathname)?
+           ("?" query               => [[ second ]])?
+           ("#" anchor              => [[ second ]])?
+
+;EBNF
+
+PRIVATE>
+
 M: string >url
-    <url> swap
-    ":" split1 [ parse-host-part ] when*
-    "#" split1 [
-        "?" split1
-        [ url-decode >>path ]
-        [ [ query>assoc >>query ] when* ] bi*
-    ]
-    [ url-decode >>anchor ] bi* ;
+    parse-url {
+        [
+            first [
+                [ first ] ! protocol
+                [
+                    second
+                    [ first [ first2 ] [ f f ] if* ] ! username, password
+                    [ second parse-host ] ! host, port
+                    bi
+                ] bi
+            ] [ f f f f f ] if*
+        ]
+        [ second ] ! pathname
+        [ third ] ! query
+        [ fourth ] ! anchor
+    } cleave url boa
+    dup host>> [ [ "/" or ] change-path ] when ;
 
 : protocol-port ( protocol -- port )
     {
         { "http" [ 80 ] }
         { "https" [ 443 ] }
-        { "feed" [ 80 ] }
         { "ftp" [ 21 ] }
         [ drop f ]
     } case ;
@@ -168,8 +194,6 @@ M: string >url
     [ port>> ] [ port>> ] [ protocol>> protocol-port ] tri =
     [ drop f ] when ;
 
-PRIVATE>
-
 : unparse-host-part ( url protocol -- )
     %
     "://" %
@@ -179,6 +203,8 @@ PRIVATE>
         [ url-port [ ":" % # ] when* ]
         [ path>> "/" head? [ "/" % ] unless ]
     } cleave ;
+
+PRIVATE>
 
 M: url present
     [
@@ -224,10 +250,15 @@ PRIVATE>
     "https" = ;
 
 : url-addr ( url -- addr )
-    [ [ host>> ] [ port>> ] bi <inet> ] [ protocol>> ] bi
+    [
+        [ host>> ]
+        [ port>> ]
+        [ protocol>> protocol-port ]
+        tri or <inet>
+    ] [ protocol>> ] bi
     secure-protocol? [ <secure> ] when ;
 
-: ensure-port ( url -- url' )
+: ensure-port ( url -- url )
     dup protocol>> '[ _ protocol-port or ] change-port ;
 
 ! Literal syntax

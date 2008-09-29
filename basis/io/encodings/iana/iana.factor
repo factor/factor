@@ -59,4 +59,4 @@ PRIVATE>
 PRIVATE>
 
 "resource:basis/io/encodings/iana/character-sets"
-ascii <file-reader> make-n>e \ n>e-table set-value
+ascii <file-reader> make-n>e to: n>e-table

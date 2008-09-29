@@ -106,7 +106,7 @@ todo "TODO"
 
 : <todo-list> ( -- responder )
     todo-list new-dispatcher
-        <list-action>   "list"   add-main-responder
+        <list-action>   ""       add-responder
         <view-action>   "view"   add-responder
         <new-action>    "new"    add-responder
         <edit-action>   "edit"   add-responder

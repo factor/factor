@@ -13,35 +13,30 @@ mirrors ;
 IN: ui.tools
 
 : <workspace-tabs> ( workspace -- tabs )
-  model>>
-  "tool-switching" workspace command-map commands>>
-    [ command-string ] { } assoc>map <enum> >alist
-  <toggle-buttons> ;
+    model>>
+        "tool-switching" workspace command-map commands>>
+        [ command-string ] { } assoc>map <enum> >alist
+    <toggle-buttons> ;
 
 : <workspace-book> ( workspace -- gadget )
-
-  dup
-    <stack-display>
-    <browser-gadget>
-    <inspector-gadget>
-    <profiler-gadget>
-  4array
-
-  swap model>>
-
-  <book> ;
+    dup
+        <stack-display>
+        <browser-gadget>
+        <inspector-gadget>
+        <profiler-gadget>
+    4array
+    swap model>> <book> ;
   
 : <workspace> ( -- workspace )
-  { 0 1 } workspace new-track
+    { 0 1 } workspace new-track
+        0 <model> >>model
+        <listener-gadget> >>listener
+        dup <workspace-book> >>book
 
-    0 <model>            >>model
-    <listener-gadget>    >>listener
-    dup <workspace-book> >>book
-    
-    dup <workspace-tabs> f   track-add
-    dup book>>           1/5 track-add
-    dup listener>>       4/5 track-add
-    dup <toolbar>        f   track-add ;
+        dup <workspace-tabs> f track-add
+        dup book>> 1/5 track-add
+        dup listener>> 4/5 track-add
+        dup <toolbar> f track-add ;
 
 : resize-workspace ( workspace -- )
     dup sizes>> over control-value zero? [

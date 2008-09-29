@@ -519,7 +519,7 @@ HELP: UNION:
 HELP: INTERSECTION:
 { $syntax "INTERSECTION: class participants... ;" }
 { $values { "class" "a new class word to define" } { "participants" "a list of class words separated by whitespace" } }
-{ $description "Defines an intersection class. An object is an instance of a union class if it is an instance of all of its participants." } ;
+{ $description "Defines an intersection class. An object is an instance of an intersection class if it is an instance of all of its participants." } ;
 
 HELP: MIXIN:
 { $syntax "MIXIN: class" }

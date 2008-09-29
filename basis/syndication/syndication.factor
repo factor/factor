@@ -102,12 +102,12 @@ TUPLE: entry title url description date ;
         { "feed" [ atom1.0 ] }
     } case ;
 
-: read-feed ( string -- feed )
+: string>feed ( string -- feed )
     [ string>xml xml>feed ] with-html-entities ;
 
 : download-feed ( url -- feed )
     #! Retrieve an news syndication file, return as a feed tuple.
-    http-get nip read-feed ;
+    http-get nip string>feed ;
 
 ! Atom generation
 : simple-tag, ( content name -- )

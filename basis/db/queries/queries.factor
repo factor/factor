@@ -3,7 +3,7 @@
 USING: accessors kernel math namespaces make sequences random
 strings math.parser math.intervals combinators math.bitwise
 nmake db db.tuples db.types db.sql classes words shuffle arrays
-destructors continuations ;
+destructors continuations db.tuples.private ;
 IN: db.queries
 
 GENERIC: where ( specs obj -- )
@@ -46,13 +46,18 @@ M: retryable execute-statement* ( statement type -- )
     [ db-columns ] [ db-table ] bi ;
 
 : query-make ( class quot -- )
-    >r sql-props r>
-    [ 0 sql-counter rot with-variable ] curry { "" { } { } } nmake
+    [ sql-props ] dip
+    [ 0 sql-counter rot with-variable ] curry
+    { "" { } { } } nmake
     <simple-statement> maybe-make-retryable ; inline
 
 : where-primary-key% ( specs -- )
     " where " 0%
-    find-primary-key dup column-name>> 0% " = " 0% bind% ;
+    find-primary-key [
+        " and " 0%
+    ] [
+        dup column-name>> 0% " = " 0% bind%
+    ] interleave ;
 
 M: db <update-tuple-statement> ( class -- statement )
     [
@@ -121,16 +126,15 @@ M: string where ( spec obj -- ) object-where ;
         dup double-infinite-interval? [ drop f ] when
     ] with filter ;
 
-: where-clause ( tuple specs -- )
-    dupd filter-slots [
-        drop
+: many-where ( tuple seq -- )
+    " where " 0% [
+        " and " 0%
     ] [
-        " where " 0% [
-            " and " 0%
-        ] [
-            2dup slot-name>> swap get-slot-named where
-        ] interleave drop
-    ] if-empty ;
+        2dup slot-name>> swap get-slot-named where
+    ] interleave drop ;
+
+: where-clause ( tuple specs -- )
+    dupd filter-slots [ drop ] [ many-where ] if-empty ;
 
 M: db <delete-tuples-statement> ( tuple table -- sql )
     [
@@ -177,7 +181,8 @@ M: db <select-by-slots-statement> ( tuple class -- statement )
         [ offset>> [ do-offset ] [ drop ] if* ]
     } 2cleave ;
 
-M: db make-query ( tuple class query -- tuple )
+M: db query>statement ( query -- tuple )
+    [ tuple>> dup class ] keep
     [ <select-by-slots-statement> ] dip make-query* ;
 
 ! select ID, NAME, SCORE from EXAM limit 1 offset 3
@@ -194,9 +199,8 @@ M: db make-query ( tuple class query -- tuple )
     >r >r parse-sql 4drop r> r>
     <simple-statement> maybe-make-retryable do-select ;
 
-M: db <count-statement> ( tuple class groups -- statement )
-    \ query new
-        swap >>group
+M: db <count-statement> ( query -- statement )
+    [ tuple>> dup class ] keep
     [ [ "select count(*) from " 0% 0% where-clause ] query-make ]
     dip make-query* ;
 

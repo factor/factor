@@ -60,15 +60,14 @@ search-field H{
     swap <list> ;
 
 : <live-search> ( string seq limited? presenter -- gadget )
-  { 0 1 } live-search new-track
-    <search-field> >>field
-    dup field>> f track-add
-    -roll <search-list> >>list
-    dup list>> <scroller> 1 track-add
-
-  swap                         
-    over field>> set-editor-string
-  dup field>> end-of-document ;
+    { 0 1 } live-search new-track
+        <search-field> >>field
+        dup field>> f track-add
+        -roll <search-list> >>list
+        dup list>> <scroller> 1 track-add
+    swap                         
+        over field>> set-editor-string
+    dup field>> end-of-document ;
 
 M: live-search focusable-child* field>> ;
 
