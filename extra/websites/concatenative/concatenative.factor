@@ -38,13 +38,7 @@ IN: websites.concatenative
 
 TUPLE: factor-website < dispatcher ;
 
-: <factor-website> ( -- responder )
-    factor-website new-dispatcher
-        <pastebin> "pastebin" add-responder
-        <planet> "planet" add-responder
-        <wiki> "wiki" add-responder
-        <user-admin> "user-admin" add-responder
-        URL" /wiki/view/Front Page" <redirect-responder> "" add-responder
+: <configuration> ( responder -- responder' )
     "Factor website" <login-realm>
         "Factor website" >>name
         allow-registration
@@ -54,6 +48,12 @@ TUPLE: factor-website < dispatcher ;
     <boilerplate>
         { factor-website "page" } >>template
     test-db <alloy> ;
+
+: <factor-website> ( -- responder )
+    factor-website new-dispatcher
+        <wiki> "wiki" add-responder
+        <user-admin> "user-admin" add-responder
+        URL" /wiki/view/Front Page" <redirect-responder> "" add-responder ;
 
 SYMBOL: key-password
 SYMBOL: key-file
@@ -71,12 +71,19 @@ SYMBOL: dh-file
     "resource:basis/openssl/test/server.pem" key-file set-global
     "password" key-password set-global
     common-configuration
-    <factor-website> main-responder set-global ;
+    <factor-website>
+        <pastebin> "pastebin" add-responder
+        <planet> "planet" add-responder
+    <configuration>
+    main-responder set-global ;
 
 : init-production ( -- )
     common-configuration
     <vhost-dispatcher>
         <factor-website> "concatenative.org" add-responder
+        <pastebin> "pastebin.factorcode.org" add-responder
+        <planet> "planet.factorcode.org" add-responder
+    <configuration>
     main-responder set-global ;
 
 : <factor-secure-config> ( -- config )
