@@ -230,10 +230,14 @@ M: word declarations.
 : pprint-; ( -- ) \ ; pprint-word ;
 
 : (see) ( spec -- )
-    <colon dup synopsis*
-    <block dup definition pprint-elements block>
-    dup definer nip [ pprint-word ] when* declarations.
-    block> ;
+    [
+        12 nesting-limit set
+        100 length-limit set
+        <colon dup synopsis*
+        <block dup definition pprint-elements block>
+        dup definer nip [ pprint-word ] when* declarations.
+        block>
+    ] with-scope ;
 
 M: object see
     [ (see) ] with-use nl ;
