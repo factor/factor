@@ -13,13 +13,13 @@ HELP: <html-stream>
 { $values { "stream" "an output stream" } { "html-stream" html-stream } }
 { $description "Creates a new formatted output stream which emits HTML markup on " { $snippet "stream" } "." } ;
 
-HELP: with-html-stream
+HELP: with-html-writer
 { $values { "quot" quotation } }
 { $description "Calls the quotation in a new dynamic scope with " { $link output-stream } " rebound to an " { $link html-stream } " wrapping the current " { $link output-stream } "." }
 { $examples
     { $example
         "USING: io io.styles html.streams ;"
-        "[ \"Hello\" { { font-style bold } } format nl ] with-html-stream"
+        "[ \"Hello\" { { font-style bold } } format nl ] with-html-writer"
         "<span style='font-style: normal; font-weight: bold; '>Hello</span><br/>"
     }
 } ;
@@ -28,6 +28,6 @@ ARTICLE: "html.streams" "HTML streams"
 "The " { $vocab-link "html.streams" } " vocabulary provides a stream which implements " { $link "styles" } " by writing HTML markup to the wrapped stream."
 { $subsection html-stream }
 { $subsection <html-stream> }
-{ $subsection with-html-stream } ;
+{ $subsection with-html-writer } ;
 
 ABOUT: "html.streams"

@@ -22,7 +22,7 @@ TUPLE: html-stream stream last-div ;
 : not-a-div ( stream -- stream )
     f >>last-div ; inline
 
-: a-div ( stream -- straem )
+: a-div ( stream -- stream )
     t >>last-div ; inline
 
 : <html-stream> ( stream -- html-stream )
@@ -47,6 +47,9 @@ TUPLE: html-sub-stream < html-stream style parent ;
             <a =href a> call </a>
         ] [ call ] if*
     ] [ call ] if* ; inline
+
+: href-link-tag ( style quot -- )
+    href pick at [ <a =href a> call </a> ] [ call ] if* ; inline
 
 : hex-color, ( color -- )
     [ red>> ] [ green>> ] [ blue>> ] tri
@@ -95,7 +98,7 @@ TUPLE: html-sub-stream < html-stream style parent ;
 
 : format-html-span ( string style stream -- )
     stream>> [
-        [ [ drop write ] span-tag ] object-link-tag
+        [ [ [ drop write ] span-tag ] href-link-tag ] object-link-tag
     ] with-output-stream* ;
 
 TUPLE: html-span-stream < html-sub-stream ;
@@ -192,5 +195,5 @@ M: html-stream stream-write-table
 
 M: html-stream dispose stream>> dispose ;
 
-: with-html-stream ( quot -- )
+: with-html-writer ( quot -- )
     output-stream get <html-stream> swap with-output-stream* ; inline
