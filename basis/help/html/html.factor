@@ -4,7 +4,8 @@ USING: io.encodings.utf8 io.encodings.ascii io.encodings.binary
 io.files html.streams html.elements html.components help kernel
 assocs sequences make words accessors arrays help.topics vocabs
 tools.vocabs tools.vocabs.browser namespaces prettyprint io
-vocabs.loader serialize fry memoize unicode.case ;
+vocabs.loader serialize fry memoize unicode.case math.order
+sorting ;
 IN: help.html
 
 : escape-char ( ch -- )
@@ -106,7 +107,8 @@ M: result link-href href>> ;
 : offline-apropos ( string index -- results )
     load-index swap >lower
     '[ [ drop _ ] dip >lower subseq? ] assoc-filter
-    [ swap result boa ] { } assoc>map ;
+    [ swap result boa ] { } assoc>map
+    [ [ title>> ] compare ] sort ;
 
 : article-apropos ( string -- results )
     "articles.idx" offline-apropos ;

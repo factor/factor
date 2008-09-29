@@ -19,10 +19,12 @@
 
 	<body>
 		<h1><t:a t:href="$help-webapp/content/article-handbook.html"
-			target="content">Factor help</t:a></h1>
+			target="content">Factor documentation</t:a></h1>
 
-		<p>This documentation was generated offline from a Factor
-		image where <code>load-everything</code> was run.</p>
+		<p>This is the <a href="http://factorcode.org">Factor</a>
+		documentation, generated offline from a
+		<code>load-everything</code> image. The Factor UI also
+		includes a documentation browser tool.</p>
 		
 		<p>You may search article titles below.</p>
 		
