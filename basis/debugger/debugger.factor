@@ -22,6 +22,9 @@ M: tuple error-help class ;
 
 M: string error. print ;
 
+: :error ( -- )
+    error get error. ;
+
 : :s ( -- )
     error-continuation get data>> stack. ;
 
