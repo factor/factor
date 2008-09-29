@@ -1,0 +1,53 @@
+<?xml version='1.0' ?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<t:chloe xmlns:t="http://factorcode.org/chloe/1.0">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<t:base t:href="$help-webapp/content/" />
+	</head>
+
+	<body>
+		<h1>Factor documentation</h1>
+
+		<t:form t:action="$help-webapp/search">
+			<t:field t:name="search" />
+			<button>Search</button>
+		</t:form>
+		
+		<t:if t:value="articles">
+			<h1>Articles</h1>
+			
+			<ul>
+				<t:each t:name="articles">
+					<li> <t:link t:name="value" t:target="content" /> </li>
+				</t:each>
+			</ul>
+		</t:if>
+		
+		<t:if t:value="vocabs">
+			<h1>Vocabularies</h1>
+			
+			<ul>
+				<t:each t:name="vocabs">
+					<li> <t:link t:name="value" t:target="content" /> </li>
+				</t:each>
+			</ul>
+		</t:if>
+		
+		<t:if t:value="words">
+			<h1>Words</h1>
+			
+			<ul>
+				<t:each t:name="words">
+					<li> <t:link t:name="value" t:target="content" /> </li>
+				</t:each>
+			</ul>
+		</t:if>
+
+	</body>
+</html>
+
+</t:chloe>
