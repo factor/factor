@@ -38,6 +38,10 @@ IN: websites.concatenative
 
 TUPLE: factor-website < dispatcher ;
 
+: <factor-boilerplate> ( responder -- responder' )
+    <boilerplate>
+        { factor-website "page" } >>template ;
+
 : <configuration> ( responder -- responder' )
     "Factor website" <login-realm>
         "Factor website" >>name
@@ -45,8 +49,6 @@ TUPLE: factor-website < dispatcher ;
         allow-password-recovery
         allow-edit-profile
         allow-deactivation
-    <boilerplate>
-        { factor-website "page" } >>template
     test-db <alloy> ;
 
 : <factor-website> ( -- responder )
@@ -74,15 +76,16 @@ SYMBOL: dh-file
     <factor-website>
         <pastebin> "pastebin" add-responder
         <planet> "planet" add-responder
+    <factor-boilerplate>
     <configuration>
     main-responder set-global ;
 
 : init-production ( -- )
     common-configuration
     <vhost-dispatcher>
-        <factor-website> "concatenative.org" add-responder
-        <pastebin> "paste.factorcode.org" add-responder
-        <planet> "planet.factorcode.org" add-responder
+        <factor-website> <factor-boilerplate> "concatenative.org" add-responder
+        <pastebin> <factor-boilerplate> "paste.factorcode.org" add-responder
+        <planet> <factor-boilerplate> "planet.factorcode.org" add-responder
     <configuration>
     main-responder set-global ;
 
