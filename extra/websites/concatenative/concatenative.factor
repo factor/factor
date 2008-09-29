@@ -77,7 +77,7 @@ SYMBOL: dh-file
     <factor-website>
         <pastebin> "pastebin" add-responder
         <planet> "planet" add-responder
-        <help-webapp> "docs" add-responder
+        "/tmp/docs/" <help-webapp> "docs" add-responder
     <factor-boilerplate>
     <configuration>
     main-responder set-global ;
@@ -88,7 +88,7 @@ SYMBOL: dh-file
         <factor-website> <factor-boilerplate> "concatenative.org" add-responder
         <pastebin> <factor-boilerplate> "paste.factorcode.org" add-responder
         <planet> <factor-boilerplate> "planet.factorcode.org" add-responder
-        <help-webapp> "docs.factorcode.org" add-responder
+        home "docs" append-path <help-webapp> "docs.factorcode.org" add-responder
     <configuration>
     main-responder set-global ;
 
