@@ -117,7 +117,7 @@ paragraph = ((paragraph-item paragraph-nl-item)+ nl+ => [[ first ]]
     => [[ paragraph boa ]]
 
 
-list-item     = (cell | inline-tag)*
+list-item     = (cell | inline-tag | inline-delimiter)*
 
 ordered-list-item      = '#' list-item
     => [[ second list-item boa ]]
