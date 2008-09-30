@@ -77,10 +77,9 @@ SYMBOL: dh-file
     "password" key-password set-global
     common-configuration
     <factor-website>
-        <pastebin> "pastebin" add-responder
-        <planet> "planet" add-responder
+        <pastebin> <factor-boilerplate> "pastebin" add-responder
+        <planet> <factor-boilerplate> "planet" add-responder
         "/tmp/docs/" <help-webapp> "docs" add-responder
-    <factor-boilerplate>
     <configuration>
     main-responder set-global ;
 
