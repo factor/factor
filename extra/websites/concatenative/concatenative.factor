@@ -45,7 +45,7 @@ TUPLE: factor-website < dispatcher ;
     <boilerplate>
         { factor-website "page" } >>template ;
 
-: <configuration> ( responder -- responder' )
+: <login-config> ( responder -- responder' )
     "Factor website" <login-realm>
         "Factor website" >>name
         allow-registration
@@ -77,10 +77,10 @@ SYMBOL: dh-file
     "password" key-password set-global
     common-configuration
     <factor-website>
-        <pastebin> <factor-boilerplate> "pastebin" add-responder
-        <planet> <factor-boilerplate> "planet" add-responder
+        <pastebin> <factor-boilerplate> <login-config> "pastebin" add-responder
+        <planet> <factor-boilerplate> <login-config> "planet" add-responder
         "/tmp/docs/" <help-webapp> "docs" add-responder
-    <configuration>
+    test-db <alloy>
     main-responder set-global ;
 
 : <gitweb> ( path -- responder )
@@ -91,11 +91,12 @@ SYMBOL: dh-file
 : init-production ( -- )
     common-configuration
     <vhost-dispatcher>
-        <factor-website> <factor-boilerplate> <configuration> "concatenative.org" add-responder
-        <pastebin> <factor-boilerplate> <configuration> "paste.factorcode.org" add-responder
-        <planet> <factor-boilerplate> <configuration> "planet.factorcode.org" add-responder
-        home "docs" append-path <help-webapp> <configuration> "docs.factorcode.org" add-responder
+        <factor-website> <login-config> <factor-boilerplate> "concatenative.org" add-responder
+        <pastebin> <login-config> <factor-boilerplate> "paste.factorcode.org" add-responder
+        <planet> <login-config> <factor-boilerplate> "planet.factorcode.org" add-responder
+        home "docs" append-path <help-webapp> "docs.factorcode.org" add-responder
         home "cgi" append-path <gitweb> "gitweb.factorcode.org" add-responder
+    test-db <alloy>
     main-responder set-global ;
 
 : <factor-secure-config> ( -- config )
