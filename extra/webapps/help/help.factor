@@ -13,7 +13,7 @@ TUPLE: help-webapp < dispatcher ;
 
         [
             {
-                { "search" [ 2 v-min-length 50 v-max-length v-one-line ] }
+                { "search" [ 1 v-min-length 50 v-max-length v-one-line ] }
             } validate-params
 
             help-dir set-current-directory
