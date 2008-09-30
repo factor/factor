@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs kernel math math.intervals
-namespaces sequences combinators.lib money math.order ;
+namespaces sequences money math.order ;
 IN: taxes.usa.futa
 
 ! Employer tax only, not withheld
