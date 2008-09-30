@@ -65,7 +65,7 @@ HELP: [wlet
 
 HELP: ::
 { $syntax ":: word ( bindings... -- outputs... ) body... ;" }
-{ $description "Defines a word with named inputs; it reads stack values into bindings from left to right, then executes the body with those bindings in lexical scope. Any " { $link POSTPONE: [| } ", " { $link POSTPONE: [let } " or " { $link POSTPONE: [wlet } " forms used in the body of the word definition are automatically closure-converted." }
+{ $description "Defines a word with named inputs; it reads stack values into bindings from left to right, then executes the body with those bindings in lexical scope." }
 { $notes "The output names do not affect the word's behavior, however the compiler attempts to check the stack effect as with other definitions." }
 { $examples "See " { $link POSTPONE: [| } ", " { $link POSTPONE: [let } " and " { $link POSTPONE: [wlet } "." } ;
 

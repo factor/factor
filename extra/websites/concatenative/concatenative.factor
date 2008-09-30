@@ -45,14 +45,13 @@ TUPLE: factor-website < dispatcher ;
     <boilerplate>
         { factor-website "page" } >>template ;
 
-: <configuration> ( responder -- responder' )
+: <login-config> ( responder -- responder' )
     "Factor website" <login-realm>
         "Factor website" >>name
         allow-registration
         allow-password-recovery
         allow-edit-profile
-        allow-deactivation
-    test-db <alloy> ;
+        allow-deactivation ;
 
 : <factor-website> ( -- responder )
     factor-website new-dispatcher
@@ -77,11 +76,10 @@ SYMBOL: dh-file
     "password" key-password set-global
     common-configuration
     <factor-website>
-        <pastebin> "pastebin" add-responder
-        <planet> "planet" add-responder
+        <pastebin> <factor-boilerplate> <login-config> "pastebin" add-responder
+        <planet> <factor-boilerplate> <login-config> "planet" add-responder
         "/tmp/docs/" <help-webapp> "docs" add-responder
-    <factor-boilerplate>
-    <configuration>
+    test-db <alloy>
     main-responder set-global ;
 
 : <gitweb> ( path -- responder )
@@ -92,10 +90,10 @@ SYMBOL: dh-file
 : init-production ( -- )
     common-configuration
     <vhost-dispatcher>
-        <factor-website> <factor-boilerplate> <configuration> "concatenative.org" add-responder
-        <pastebin> <factor-boilerplate> <configuration> "paste.factorcode.org" add-responder
-        <planet> <factor-boilerplate> <configuration> "planet.factorcode.org" add-responder
-        home "docs" append-path <help-webapp> <configuration> "docs.factorcode.org" add-responder
+        <factor-website> <login-config> <factor-boilerplate> test-db <alloy> "concatenative.org" add-responder
+        <pastebin> <login-config> <factor-boilerplate> test-db <alloy> "paste.factorcode.org" add-responder
+        <planet> <login-config> <factor-boilerplate> test-db <alloy> "planet.factorcode.org" add-responder
+        home "docs" append-path <help-webapp> test-db <alloy> "docs.factorcode.org" add-responder
         home "cgi" append-path <gitweb> "gitweb.factorcode.org" add-responder
     main-responder set-global ;
 

@@ -8,7 +8,7 @@ strings.parser lexer prettyprint.backend hashtables present
 peg.ebnf urls.encoding ;
 IN: urls
 
-TUPLE: url protocol username password host port path raw-query query anchor ;
+TUPLE: url protocol username password host port path query anchor ;
 
 : <url> ( -- url ) url new ;
 
@@ -47,7 +47,7 @@ protocol = [a-z]+                   => [[ url-decode ]]
 username = [^/:@#?]+                => [[ url-decode ]]
 password = [^/:@#?]+                => [[ url-decode ]]
 pathname = [^#?]+                   => [[ url-decode ]]
-query    = [^#]+                    => [[ >string ]]
+query    = [^#]+                    => [[ query>assoc ]]
 anchor   = .+                       => [[ url-decode ]]
 
 hostname = [^/#?]+                  => [[ url-decode ]]
@@ -80,7 +80,7 @@ M: string >url
             ] [ f f f f f ] if*
         ]
         [ second ] ! pathname
-        [ third dup query>assoc ] ! query
+        [ third ] ! query
         [ fourth ] ! anchor
     } cleave url boa
     dup host>> [ [ "/" or ] change-path ] when ;
@@ -139,14 +139,14 @@ PRIVATE>
 
 : derive-url ( base url -- url' )
     [ clone ] dip over {
-        [ [ protocol>> ] either? >>protocol ]
-        [ [ username>> ] either? >>username ]
-        [ [ password>> ] either? >>password ]
-        [ [ host>>     ] either? >>host ]
-        [ [ port>>     ] either? >>port ]
-        [ [ path>>     ] bi@ swap url-append-path >>path ]
-        [ [ query>>    ] either? >>query ]
-        [ [ anchor>>   ] either? >>anchor ]
+        [ [ protocol>>  ] either? >>protocol ]
+        [ [ username>>  ] either? >>username ]
+        [ [ password>>  ] either? >>password ]
+        [ [ host>>      ] either? >>host ]
+        [ [ port>>      ] either? >>port ]
+        [ [ path>>      ] bi@ swap url-append-path >>path ]
+        [ [ query>>     ] either? >>query ]
+        [ [ anchor>>    ] either? >>anchor ]
     } 2cleave ;
 
 : relative-url ( url -- url' )

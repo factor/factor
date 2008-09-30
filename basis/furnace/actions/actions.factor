@@ -79,7 +79,7 @@ TUPLE: action rest authorize init display validate submit ;
 
 : revalidate-url ( -- url/f )
     revalidate-url-key param
-    dup [ >url [ same-host? ] keep and ] when ;
+    dup [ >url ensure-port [ same-host? ] keep and ] when ;
 
 : validation-failed ( -- * )
     post-request? revalidate-url and [
