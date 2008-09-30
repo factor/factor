@@ -21,6 +21,8 @@ USING: urls.encoding tools.test arrays kernel assocs present accessors ;
 
 [ H{ { "a" { "b" "c" } } } ] [ "a=b&a=c" query>assoc ] unit-test
 
+[ H{ { "a" { "b" "c" } } } ] [ "a=b;a=c" query>assoc ] unit-test
+
 [ H{ { "text" "hello world" } } ] [ "text=hello+world" query>assoc ] unit-test
 
 [ "a=3" ] [ { { "a" 3 } } assoc>query ] unit-test

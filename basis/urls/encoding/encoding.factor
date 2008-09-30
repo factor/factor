@@ -76,7 +76,7 @@ PRIVATE>
 
 : query>assoc ( query -- assoc )
     dup [
-        "&" split H{ } clone [
+        "&;" split H{ } clone [
             [
                 [ "=" split1 [ dup [ query-decode ] when ] bi@ swap ] dip
                 add-query-param

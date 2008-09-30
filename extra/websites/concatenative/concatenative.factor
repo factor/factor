@@ -8,6 +8,8 @@ html.templates.chloe
 http.server
 http.server.dispatchers
 http.server.redirection
+http.server.static
+http.server.cgi
 furnace.alloy
 furnace.auth.login
 furnace.auth.providers.db
@@ -82,14 +84,19 @@ SYMBOL: dh-file
     <configuration>
     main-responder set-global ;
 
+: <gitweb> ( path -- responder )
+    <dispatcher>
+        swap <static> enable-cgi >>default
+        URL" /gitweb.cgi" <redirect-responder> "" add-responder ;
+
 : init-production ( -- )
     common-configuration
     <vhost-dispatcher>
-        <factor-website> <factor-boilerplate> "concatenative.org" add-responder
-        <pastebin> <factor-boilerplate> "paste.factorcode.org" add-responder
-        <planet> <factor-boilerplate> "planet.factorcode.org" add-responder
-        home "docs" append-path <help-webapp> "docs.factorcode.org" add-responder
-    <configuration>
+        <factor-website> <factor-boilerplate> <configuration> "concatenative.org" add-responder
+        <pastebin> <factor-boilerplate> <configuration> "paste.factorcode.org" add-responder
+        <planet> <factor-boilerplate> <configuration> "planet.factorcode.org" add-responder
+        home "docs" append-path <help-webapp> <configuration> "docs.factorcode.org" add-responder
+        home "cgi" append-path <gitweb> "gitweb.factorcode.org" add-responder
     main-responder set-global ;
 
 : <factor-secure-config> ( -- config )
