@@ -29,9 +29,17 @@ SYMBOLS: +autoincrement+ +serial+ +unique+ +default+ +null+ +not-null+
 +foreign-id+ +has-many+ +on-delete+ +restrict+ +cascade+ +set-null+
 +set-default+ ;
 
+SYMBOL: IGNORE
+
+: filter-ignores ( tuple specs -- specs' )
+    [ <mirror> [ nip IGNORE = ] assoc-filter keys ] dip
+    [ slot-name>> swap member? not ] with filter ;
+
+ERROR: no-slot ;
+
 : offset-of-slot ( string tuple -- n )
     class superclasses [ "slots" word-prop ] map concat
-    slot-named offset>> ;
+    slot-named dup [ no-slot ] unless offset>> ;
 
 : get-slot-named ( name tuple -- value )
     tuck offset-of-slot slot ;

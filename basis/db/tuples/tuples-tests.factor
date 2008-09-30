@@ -350,6 +350,16 @@ TUPLE: exam id name score ;
     [ ] [ T{ exam f f "Kenny" 60 } insert-tuple ] unit-test
     [ ] [ T{ exam f f "Cartman" 41 } insert-tuple ] unit-test
 
+    [ 4 ]
+    [ T{ exam { name IGNORE } { score IGNORE } } select-tuples length ] unit-test
+
+    [ f ]
+    [ T{ exam { name IGNORE } { score IGNORE } } select-tuples first score>> ] unit-test
+
+    ! FIXME
+    ! [ f ]
+    ! [ T{ exam { name IGNORE } { score IGNORE } { id IGNORE } } select-tuples first score>> ] unit-test
+
     [
         {
             T{ exam f 3 "Kenny" 60 }

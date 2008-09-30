@@ -52,9 +52,7 @@ M: retryable execute-statement* ( statement type -- )
     [ 0 sql-counter rot with-variable ] curry
     { "" { } { } { } } nmake
     [ <simple-statement> maybe-make-retryable ] dip
-    [
-        [ 1array ] dip append
-    ] unless-empty ; inline
+    [ [ 1array ] dip append ] unless-empty ; inline
 
 : where-primary-key% ( specs -- )
     " where " 0%
@@ -150,9 +148,10 @@ M: db <delete-tuples-statement> ( tuple table -- sql )
 M: db <select-by-slots-statement> ( tuple class -- statement )
     [
         "select " 0%
-        over [ ", " 0% ]
+        [ dupd filter-ignores ] dip
+        over
+        [ ", " 0% ]
         [ dup column-name>> 0% 2, ] interleave
-
         " from " 0% 0%
         where-clause
     ] query-make ;
