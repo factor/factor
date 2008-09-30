@@ -23,10 +23,10 @@
 
 		<p>This is the <a href="http://factorcode.org" target="_top">Factor</a>
 		documentation, generated offline from a
-		<code>load-everything</code> image. The Factor UI also
-		includes a documentation browser tool.</p>
+		<code>load-everything</code> image. If you want, you can also browse the
+		documentation from within the Factor UI.</p>
 		
-		<p>You may search article titles below.</p>
+		<p>You may search article titles below; for example, try searching for "HTTP".</p>
 		
 		<t:form t:action="$help-webapp/search">
 			<t:field t:name="search" />
