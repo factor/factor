@@ -1,20 +1,15 @@
 USING: help.markup help.syntax quotations kernel irc.messages ;
 IN: irc.client
 
-HELP: irc-client "IRC Client object"
-"blah" ;
+HELP: irc-client "IRC Client object" ;
 
-HELP: irc-server-listener "Listener for server messages unmanaged by other listeners"
-"blah" ;
+HELP: irc-server-listener "Listener for server messages unmanaged by other listeners" ;
 
-HELP: irc-channel-listener "Listener for irc channels"
-"blah" ;
+HELP: irc-channel-listener "Listener for irc channels" ;
 
-HELP: irc-nick-listener "Listener for irc users"
-"blah" ;
+HELP: irc-nick-listener "Listener for irc users" ;
 
-HELP: irc-profile "IRC Client profile object"
-"blah" ;
+HELP: irc-profile "IRC Client profile object" ;
 
 HELP: connect-irc "Connecting to an irc server"
 { $values { "irc-client" "an irc client object" } }
@@ -23,6 +18,10 @@ HELP: connect-irc "Connecting to an irc server"
 HELP: add-listener "Listening to irc channels/users/etc"
 { $values { "irc-listener" "an irc listener object" } { "irc-client" "an irc client object" } }
 { $description "Registers " { $snippet "irc-listener" } " with " { $snippet "irc-client" } " and starts listening." } ;
+
+HELP: join-irc-channel "Joining channels"
+{ $values { "irc-client-listener" "an irc client listener object" } }
+{ $description "Joins to the channel being listened by " { $snippet "irc-listener" } "." } ;
 
 HELP: remove-listener "Stop an unregister listener"
 { $values { "irc-listener" "an irc listener object" } { "irc-client" "an irc client object" } }
@@ -55,6 +54,7 @@ ARTICLE: "irc.client" "IRC Client"
 { $subsection terminate-irc }
 { $subsection add-listener }
 { $subsection remove-listener }
+{ $subsection join-irc-channel }
 { $subsection read-message }
 { $subsection write-message }
 { $heading "IRC messages" }
@@ -77,13 +77,14 @@ ARTICLE: "irc.client" "IRC Client"
 { $heading "Special messages" }
 "Some special messages that are created by the library and not by the irc server."
 { $table
-  { { $link irc-end } " sent when the client isn't running anymore, listeners should stop after this." }
+  { { $link irc-listener-end } "sent to a listener when it has been dettached from the client, the listener should stop after it receives this message. " }
+  { { $link irc-end } " sent when the client isn't running anymore, listeners should stop after it receives this message." }
   { { $link irc-disconnected } " sent to notify listeners that connection was lost." }
   { { $link irc-connected } " sent to notify listeners that a connection with the irc server was established." } }
 
 { $heading "Example:" }
 { $code
-  "USING: irc.client concurrency.mailboxes ;"
+  "USING: irc.client ;"
   "SYMBOL: bot"
   "SYMBOL: mychannel"
   "! Create the profile and client objects"
@@ -94,6 +95,8 @@ ARTICLE: "irc.client" "IRC Client"
   "\"#mychannel123\" <irc-channel-listener> mychannel set"
   "! Register and start listener (this joins the channel)"
   "mychannel get bot get add-listener"
+  "! Join to the channel"
+  "mychannel get join-irc-channel"
   "! Send a message to the channel"
   "\"what's up?\" mychannel get write-message"
   "! Read a message from the channel"
