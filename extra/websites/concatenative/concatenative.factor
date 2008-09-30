@@ -51,8 +51,7 @@ TUPLE: factor-website < dispatcher ;
         allow-registration
         allow-password-recovery
         allow-edit-profile
-        allow-deactivation
-    test-db <alloy> ;
+        allow-deactivation ;
 
 : <factor-website> ( -- responder )
     factor-website new-dispatcher
