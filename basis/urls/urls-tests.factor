@@ -2,30 +2,6 @@ IN: urls.tests
 USING: urls urls.private tools.test
 arrays kernel assocs present accessors ;
 
-[ "hello+world" ] [ "hello world" url-encode ] unit-test
-[ "hello world" ] [ "hello%20world" url-decode ] unit-test
-[ "~hello world" ] [ "%7ehello+world" url-decode ] unit-test
-[ f ] [ "%XX%XX%XX" url-decode ] unit-test
-[ f ] [ "%XX%XX%X" url-decode ] unit-test
-
-[ "hello world" ] [ "hello+world"   url-decode ] unit-test
-[ "hello world" ] [ "hello%20world" url-decode ] unit-test
-[ " ! "         ] [ "%20%21%20"     url-decode ] unit-test
-[ "hello world" ] [ "hello world%"  url-decode ] unit-test
-[ "hello world" ] [ "hello world%x" url-decode ] unit-test
-[ "hello+world" ] [ "hello world"   url-encode ] unit-test
-[ "+%21+"       ] [ " ! "           url-encode ] unit-test
-
-[ "\u001234hi\u002045" ] [ "\u001234hi\u002045" url-encode url-decode ] unit-test
-
-[ "a=b&a=c" ] [ { { "a" { "b" "c" } } } assoc>query ] unit-test
-
-[ H{ { "a" "b" } } ] [ "a=b" query>assoc ] unit-test
-
-[ H{ { "a" { "b" "c" } } } ] [ "a=b&a=c" query>assoc ] unit-test
-
-[ "a=3" ] [ { { "a" 3 } } assoc>query ] unit-test
-
 : urls
     {
         {
