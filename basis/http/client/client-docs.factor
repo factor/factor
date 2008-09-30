@@ -1,6 +1,6 @@
 USING: http help.markup help.syntax io.files io.streams.string
 io.encodings.8-bit io.encodings.binary kernel strings urls
-byte-arrays strings assocs sequences ;
+urls.encoding byte-arrays strings assocs sequences ;
 IN: http.client
 
 HELP: download-failed
