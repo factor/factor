@@ -14,7 +14,7 @@ io.encodings.binary
 io.streams.limited
 io.servers.connection
 io.timeouts
-fry logging logging.insomniac calendar urls
+fry logging logging.insomniac calendar urls urls.encoding
 http
 http.parsers
 http.server.responses

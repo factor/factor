@@ -2,7 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs io.files io.streams.duplex
 combinators arrays io.launcher io http.server.static http.server
-http accessors sequences strings math.parser fry urls ;
+http accessors sequences strings math.parser fry urls
+urls.encoding ;
 IN: http.server.cgi
 
 : cgi-variables ( script-path -- assoc )
