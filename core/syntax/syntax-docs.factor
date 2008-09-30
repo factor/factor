@@ -573,12 +573,12 @@ $nl
 } ;
 
 HELP: initial:
-{ $syntax "TUPLE: ... { \"slot\" initial: value } ... ;" }
+{ $syntax "TUPLE: ... { slot initial: value } ... ;" }
 { $values { "slot" "a slot name" } { "value" "any literal" } }
 { $description "Specifies an initial value for a tuple slot." } ;
 
 HELP: read-only
-{ $syntax "TUPLE: ... { \"slot\" read-only } ... ;" }
+{ $syntax "TUPLE: ... { slot read-only } ... ;" }
 { $values { "slot" "a slot name" } }
 { $description "Defines a tuple slot to be read-only. If a tuple has read-only slots, instances of the tuple should only be created by calling " { $link boa } ", instead of " { $link new } ". Using " { $link boa } " is the only way to set the value of a read-only slot." } ;
 
