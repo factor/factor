@@ -105,7 +105,7 @@ GENERIC# >base 1 ( n radix -- str )
 
 <PRIVATE
 
-: (>base) ( n -- str ) radix get >base ;
+: (>base) ( n -- str ) radix get positive>base ;
 
 PRIVATE>
 
@@ -123,7 +123,7 @@ M: integer >base
 M: ratio >base
     [
         dup 0 < negative? set
-        1 /mod
+        abs 1 /mod
         [ dup zero? [ drop "" ] [ (>base) sign append ] if ]
         [
             [ numerator (>base) ]
