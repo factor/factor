@@ -10,7 +10,6 @@ arrays kernel assocs present accessors ;
                 { host "www.apple.com" }
                 { port 1234 }
                 { path "/a/path" }
-                { raw-query "a=b" }
                 { query H{ { "a" "b" } } }
                 { anchor "foo" }
             }
@@ -21,7 +20,6 @@ arrays kernel assocs present accessors ;
                 { protocol "http" }
                 { host "www.apple.com" }
                 { path "/a/path" }
-                { raw-query "a=b" }
                 { query H{ { "a" "b" } } }
                 { anchor "foo" }
             }
@@ -59,7 +57,6 @@ arrays kernel assocs present accessors ;
         {
             T{ url
                 { path "bar" }
-                { raw-query "a=b" }
                 { query H{ { "a" "b" } } }
             }
             "bar?a=b"
@@ -213,7 +210,6 @@ urls [
     T{ url
         { protocol "http" }
         { host "localhost" }
-        { raw-query "foo=bar" }
         { query H{ { "foo" "bar" } } }
         { path "/" }
     }
@@ -224,7 +220,6 @@ urls [
     T{ url
         { protocol "http" }
         { host "localhost" }
-        { raw-query "foo=bar" }
         { query H{ { "foo" "bar" } } }
         { path "/" }
     }
