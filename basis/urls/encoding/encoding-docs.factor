@@ -19,10 +19,10 @@ HELP: assoc>query
 { $notes "This word is used by the implementation of " { $link "urls" } ". It is also used by the HTTP client to encode POST requests." }
 { $examples
     { $example
-        "USING: io urls ;"
+        "USING: io urls.encoding ;"
         "{ { \"from\" \"Lead\" } { \"to\" \"Gold, please\" } }"
         "assoc>query print"
-        "from=Lead&to=Gold%2c+please"
+        "from=Lead&to=Gold%2c%20please"
     }
 } ;
 
@@ -32,7 +32,7 @@ HELP: query>assoc
 { $notes "This word is used by the implementation of " { $link "urls" } ". It is also used by the HTTP server to parse POST requests." }
 { $examples
     { $unchecked-example
-        "USING: prettyprint urls ;"
+        "USING: prettyprint urls.encoding ;"
         "\"gender=female&agefrom=22&ageto=28&location=Omaha+NE\""
         "query>assoc ."
         <" H{

@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel ascii combinators combinators.short-circuit
 sequences splitting fry namespaces make assocs arrays strings
-io.sockets io.sockets.secure io.encodings.string
-io.encodings.utf8 math math.parser accessors hashtables present ;
+io.encodings.string io.encodings.utf8 math math.parser accessors
+hashtables present ;
 IN: urls.encoding
 
 : url-quotable? ( ch -- ? )
@@ -76,7 +76,7 @@ PRIVATE>
 
 : query>assoc ( query -- assoc )
     dup [
-        "&" split H{ } clone [
+        "&;" split H{ } clone [
             [
                 [ "=" split1 [ dup [ query-decode ] when ] bi@ swap ] dip
                 add-query-param
