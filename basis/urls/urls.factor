@@ -8,7 +8,7 @@ strings.parser lexer prettyprint.backend hashtables present
 peg.ebnf urls.encoding ;
 IN: urls
 
-TUPLE: url protocol username password host port path query anchor ;
+TUPLE: url protocol username password host port path raw-query query anchor ;
 
 : <url> ( -- url ) url new ;
 
@@ -47,7 +47,7 @@ protocol = [a-z]+                   => [[ url-decode ]]
 username = [^/:@#?]+                => [[ url-decode ]]
 password = [^/:@#?]+                => [[ url-decode ]]
 pathname = [^#?]+                   => [[ url-decode ]]
-query    = [^#]+                    => [[ query>assoc ]]
+query    = [^#]+                    => [[ >string ]]
 anchor   = .+                       => [[ url-decode ]]
 
 hostname = [^/#?]+                  => [[ url-decode ]]
@@ -80,7 +80,7 @@ M: string >url
             ] [ f f f f f ] if*
         ]
         [ second ] ! pathname
-        [ third ] ! query
+        [ third dup query>assoc ] ! query
         [ fourth ] ! anchor
     } cleave url boa
     dup host>> [ [ "/" or ] change-path ] when ;
