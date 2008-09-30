@@ -83,7 +83,7 @@ TUPLE: choice size multiple choices ;
     choice new ;
 
 : render-option ( text selected? -- )
-    <option [ "true" =selected ] when option>
+    <option [ "selected" =selected ] when option>
         present escape-string write
     </option> ;
 
