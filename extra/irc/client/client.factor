@@ -67,6 +67,7 @@ SINGLETON: irc-listener-end ! send to a listener to stop its execution
 SINGLETON: irc-end          ! sent when the client isn't running anymore
 SINGLETON: irc-disconnected ! sent when connection is lost
 SINGLETON: irc-connected    ! sent when connection is established
+SINGLETON: irc-ready        ! sent after the client is logged in
 
 : terminate-irc ( irc-client -- )
     [ is-running>> ] keep and [
@@ -115,7 +116,7 @@ M: irc-listener to-listener in-messages>> mailbox-put ;
 
 : listeners-with-participant ( nick -- seq )
     irc> listeners>> values
-    [ [ irc-channel-listener? ] keep and [ participants>> key? ] when* ]
+    [ [ irc-channel-listener? ] keep and [ participants>> key? ] [ drop f ] if* ]
     with filter ;
 
 : to-listeners-with-participant ( message nickname -- )
