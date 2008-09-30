@@ -3,7 +3,7 @@
 USING: accessors kernel math namespaces make sequences random
 strings math.parser math.intervals combinators math.bitwise
 nmake db db.tuples db.types db.sql classes words shuffle arrays
-destructors continuations db.tuples.private ;
+destructors continuations db.tuples.private prettyprint ;
 IN: db.queries
 
 GENERIC: where ( specs obj -- )
@@ -45,11 +45,16 @@ M: retryable execute-statement* ( statement type -- )
 : sql-props ( class -- columns table )
     [ db-columns ] [ db-table ] bi ;
 
-: query-make ( class quot -- )
+: query-make ( class quot -- statements )
+    #! query, input, outputs, secondary queries
+    over unparse "table" set
     [ sql-props ] dip
     [ 0 sql-counter rot with-variable ] curry
-    { "" { } { } } nmake
-    <simple-statement> maybe-make-retryable ; inline
+    { "" { } { } { } } nmake
+    [ <simple-statement> maybe-make-retryable ] dip
+    [
+        [ 1array ] dip append
+    ] unless-empty ; inline
 
 : where-primary-key% ( specs -- )
     " where " 0%
@@ -152,25 +157,20 @@ M: db <select-by-slots-statement> ( tuple class -- statement )
         where-clause
     ] query-make ;
 
+: splice ( string1 string2 string3 -- string )
+    swap 3append ;
+
 : do-group ( tuple groups -- )
-    [
-        ", " join " group by " swap 3append
-    ] curry change-sql drop ;
+    [ ", " join " group by " splice ] curry change-sql drop ;
 
 : do-order ( tuple order -- )
-    [
-        ", " join " order by " swap 3append
-    ] curry change-sql drop ;
+    [ ", " join " order by " splice ] curry change-sql drop ;
 
 : do-offset ( tuple n -- )
-    [
-        number>string " offset " swap 3append
-    ] curry change-sql drop ;
+    [ number>string " offset " splice ] curry change-sql drop ;
 
 : do-limit ( tuple n -- )
-    [
-        number>string " limit " swap 3append
-    ] curry change-sql drop ;
+    [ number>string " limit " splice ] curry change-sql drop ;
 
 : make-query* ( tuple query -- tuple' )
     dupd

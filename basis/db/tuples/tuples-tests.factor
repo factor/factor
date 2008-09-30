@@ -176,26 +176,49 @@ SYMBOL: person4
         T{ timestamp f 0 0 0 12 34 56 T{ duration f 0 0 0 0 0 0 } }
         f H{ { 1 2 } { 3 4 } { 5 "lol" } } URL" http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search" <user-assigned-person> person4 set ;
 
+
 TUPLE: paste n summary author channel mode contents timestamp annotations ;
 TUPLE: annotation n paste-id summary author mode contents ;
 
-: db-assigned-paste-schema ( -- )
-    paste "PASTE"
-    {
-        { "n" "ID" +db-assigned-id+ }
-        { "summary" "SUMMARY" TEXT }
-        { "author" "AUTHOR" TEXT }
-        { "channel" "CHANNEL" TEXT }
-        { "mode" "MODE" TEXT }
-        { "contents" "CONTENTS" TEXT }
-        { "timestamp" "DATE" TIMESTAMP }
-        { "annotations" { +has-many+ annotation } }
-    } define-persistent
+paste "PASTE"
+{
+    { "n" "ID" +db-assigned-id+ }
+    { "summary" "SUMMARY" TEXT }
+    { "author" "AUTHOR" TEXT }
+    { "channel" "CHANNEL" TEXT }
+    { "mode" "MODE" TEXT }
+    { "contents" "CONTENTS" TEXT }
+    { "timestamp" "DATE" TIMESTAMP }
+    { "annotations" { +has-many+ annotation } }
+} define-persistent
 
+: annotation-schema-foreign-key ( -- )
     annotation "ANNOTATION"
     {
         { "n" "ID" +db-assigned-id+ }
-        { "paste-id" "PASTE_ID" INTEGER { +foreign-id+ paste "n" }
+        { "paste-id" "PASTE_ID" INTEGER { +foreign-id+ paste "ID" } }
+        { "summary" "SUMMARY" TEXT }
+        { "author" "AUTHOR" TEXT }
+        { "mode" "MODE" TEXT }
+        { "contents" "CONTENTS" TEXT }
+    } define-persistent ;
+
+: annotation-schema-foreign-key-not-null ( -- )
+    annotation "ANNOTATION"
+    {
+        { "n" "ID" +db-assigned-id+ }
+        { "paste-id" "PASTE_ID" INTEGER { +foreign-id+ paste "ID" } +not-null+ }
+        { "summary" "SUMMARY" TEXT }
+        { "author" "AUTHOR" TEXT }
+        { "mode" "MODE" TEXT }
+        { "contents" "CONTENTS" TEXT }
+    } define-persistent ;
+
+: annotation-schema-cascade ( -- )
+    annotation "ANNOTATION"
+    {
+        { "n" "ID" +db-assigned-id+ }
+        { "paste-id" "PASTE_ID" INTEGER { +foreign-id+ paste "ID" }
             +on-delete+ +cascade+ }
         { "summary" "SUMMARY" TEXT }
         { "author" "AUTHOR" TEXT }
@@ -203,8 +226,18 @@ TUPLE: annotation n paste-id summary author mode contents ;
         { "contents" "CONTENTS" TEXT }
     } define-persistent ;
 
+: annotation-schema-restrict ( -- )
+    annotation "ANNOTATION"
+    {
+        { "n" "ID" +db-assigned-id+ }
+        { "paste-id" "PASTE_ID" INTEGER { +foreign-id+ paste "ID" } }
+        { "summary" "SUMMARY" TEXT }
+        { "author" "AUTHOR" TEXT }
+        { "mode" "MODE" TEXT }
+        { "contents" "CONTENTS" TEXT }
+    } define-persistent ;
+
 : test-paste-schema ( -- )
-    [ ] [ db-assigned-paste-schema ] unit-test
     [ ] [ paste ensure-table ] unit-test
     [ ] [ annotation ensure-table ] unit-test
     [ ] [ annotation drop-table ] unit-test
@@ -229,14 +262,38 @@ TUPLE: annotation n paste-id summary author mode contents ;
             "erg" >>author
             "annotation contents" >>contents
         insert-tuple
-    ] unit-test
+    ] unit-test ;
 
-    [ ] [
-    ] unit-test
-    ;
+: test-foreign-key ( -- )
+    [ ] [ annotation-schema-foreign-key ] unit-test
+    test-paste-schema
+    [ paste new 1 >>n delete-tuples ] must-fail ;
 
-[ test-paste-schema ] test-sqlite
-[ test-paste-schema ] test-postgresql
+: test-foreign-key-not-null ( -- )
+    [ ] [ annotation-schema-foreign-key-not-null ] unit-test
+    test-paste-schema
+    [ paste new 1 >>n delete-tuples ] must-fail ;
+
+: test-cascade ( -- )
+    [ ] [ annotation-schema-cascade ] unit-test
+    test-paste-schema
+    [ ] [ paste new 1 >>n delete-tuples ] unit-test
+    [ 0 ] [ paste new select-tuples length ] unit-test ;
+
+: test-restrict ( -- )
+    [ ] [ annotation-schema-restrict ] unit-test
+    test-paste-schema
+    [ paste new 1 >>n delete-tuples ] must-fail ;
+
+[ test-foreign-key ] test-sqlite
+[ test-foreign-key-not-null ] test-sqlite
+[ test-cascade ] test-sqlite
+[ test-restrict ] test-sqlite
+
+[ test-foreign-key ] test-postgresql
+[ test-foreign-key-not-null ] test-postgresql
+[ test-cascade ] test-postgresql
+[ test-restrict ] test-postgresql
 
 : test-repeated-insert
     [ ] [ person ensure-table ] unit-test
