@@ -46,37 +46,6 @@ HELP: URL"
     }
 } ;
 
-HELP: assoc>query
-{ $values { "assoc" assoc } { "str" string } }
-{ $description "Converts an assoc of query parameters into a query string, performing URL encoding." }
-{ $notes "This word is used to implement the " { $link present } " method on URLs; it is also used by the HTTP client to encode POST requests." }
-{ $examples
-    { $example
-        "USING: io urls ;"
-        "{ { \"from\" \"Lead\" } { \"to\" \"Gold, please\" } }"
-        "assoc>query print"
-        "from=Lead&to=Gold%2c+please"
-    }
-} ;
-
-HELP: query>assoc
-{ $values { "query" string } { "assoc" assoc } }
-{ $description "Parses a URL query string and URL-decodes each component." }
-{ $notes "This word is used to implement " { $link >url } ". It is also used by the HTTP server to parse POST requests." }
-{ $examples
-    { $unchecked-example
-        "USING: prettyprint urls ;"
-        "\"gender=female&agefrom=22&ageto=28&location=Omaha+NE\""
-        "query>assoc ."
-        <" H{
-    { "gender" "female" }
-    { "agefrom" "22" }
-    { "ageto" "28" }
-    { "location" "Omaha NE" }
-}">
-    }
-} ;
-
 HELP: derive-url
 { $values { "base" url } { "url" url } { "url'" url } }
 { $description "Builds a URL by filling in missing components of " { $snippet "url" } " from " { $snippet "base" } "." }
@@ -192,28 +161,7 @@ HELP: url-append-path
 { $values { "path1" string } { "path2" string } { "path" string } }
 { $description "Like " { $link append-path } ", but intended for use with URL paths and not filesystem paths." } ;
 
-HELP: url-decode
-{ $values { "str" string } { "decoded" string } }
-{ $description "Decodes a URL-encoded string." } ;
-
-HELP: url-encode
-{ $values { "str" string } { "encoded" string } }
-{ $description "URL-encodes a string." } ;
-
-HELP: url-quotable?
-{ $values { "ch" "a character" } { "?" "a boolean" } }
-{ $description "Tests if a character be used without URL-encoding in a URL." } ;
-
-ARTICLE: "url-encoding" "URL encoding and decoding"
-"URL encoding and decoding strings:"
-{ $subsection url-encode }
-{ $subsection url-decode }
-{ $subsection url-quotable? }
-"The URL implemention encodes and decodes components of " { $link url } " instances automatically, but sometimes it is required for non-URL strings. See " { $url "http://en.wikipedia.org/wiki/Percent-encoding" } " for a description of URL encoding." ;
-
 ARTICLE: "url-utilities" "URL implementation utilities"
-{ $subsection assoc>query }
-{ $subsection query>assoc }
 { $subsection parse-host }
 { $subsection secure-protocol? }
 { $subsection url-append-path } ;
@@ -240,8 +188,9 @@ $nl
 { $subsection set-query-param }
 "Creating " { $link "network-addressing" } " from URLs:"
 { $subsection url-addr }
-"Additional topics:"
-{ $subsection "url-utilities" }
-{ $subsection "url-encoding" } ;
+"The URL implemention encodes and decodes components of " { $link url } " instances automatically, but sometimes this functionality is needed for non-URL strings."
+{ $subsection "url-encoding" }
+"Utility words used by the URL implementation:"
+{ $subsection "url-utilities" } ;
 
 ABOUT: "urls"

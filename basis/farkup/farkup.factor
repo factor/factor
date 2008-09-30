@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators html.elements io
-io.streams.string kernel math memoize namespaces peg peg.ebnf
+io.streams.string kernel math namespaces peg peg.ebnf
 sequences sequences.deep strings xml.entities
-vectors splitting xmode.code2html urls ;
+vectors splitting xmode.code2html urls.encoding ;
 IN: farkup
 
 SYMBOL: relative-link-prefix

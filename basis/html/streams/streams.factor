@@ -4,7 +4,7 @@ USING: combinators generic assocs help http io io.styles
 io.files continuations io.streams.string kernel math math.order
 math.parser namespaces make quotations assocs sequences strings
 words html.elements xml.entities sbufs continuations destructors
-accessors arrays ;
+accessors arrays urls.encoding ;
 IN: html.streams
 
 GENERIC: browser-link-href ( presented -- href )
@@ -44,12 +44,14 @@ TUPLE: html-sub-stream < html-stream style parent ;
 : object-link-tag ( style quot -- )
     presented pick at [
         browser-link-href [
-            <a =href a> call </a>
+            <a url-encode =href a> call </a>
         ] [ call ] if*
     ] [ call ] if* ; inline
 
 : href-link-tag ( style quot -- )
-    href pick at [ <a =href a> call </a> ] [ call ] if* ; inline
+    href pick at [
+        <a url-encode =href a> call </a>
+    ] [ call ] if* ; inline
 
 : hex-color, ( color -- )
     [ red>> ] [ green>> ] [ blue>> ] tri

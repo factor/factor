@@ -29,21 +29,28 @@ IN: help.html
 
 GENERIC: topic>filename* ( topic -- name prefix )
 
-M: word topic>filename* [ name>> ] [ vocabulary>> ] bi 2array "word" ;
-M: link topic>filename* name>> "article" ;
+M: word topic>filename*
+    dup vocabulary>> [
+        [ name>> ] [ vocabulary>> ] bi 2array "word"
+    ] [ drop f f ] if ;
+
+M: link topic>filename* name>> dup [ "article" ] [ topic>filename* ] if ;
 M: word-link topic>filename* name>> topic>filename* ;
 M: vocab-spec topic>filename* vocab-name "vocab" ;
 M: vocab-tag topic>filename* name>> "tag" ;
 M: vocab-author topic>filename* name>> "author" ;
+M: f topic>filename* drop \ f topic>filename* ;
 
 : topic>filename ( topic -- filename )
-    [
-        topic>filename* % "-" %
-        dup array?
-        [ [ escape-filename ] map "," join ]
-        [ escape-filename ]
-        if % ".html" %
-    ] "" make ;
+    topic>filename* dup [
+        [
+            % "-" %
+            dup array?
+            [ [ escape-filename ] map "," join ]
+            [ escape-filename ]
+            if % ".html" %
+        ] "" make
+    ] [ 2drop f ] if ;
 
 M: topic browser-link-href topic>filename ;
 

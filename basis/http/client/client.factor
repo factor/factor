@@ -10,7 +10,7 @@ io.encodings.ascii
 io.encodings.8-bit
 io.encodings.binary
 io.streams.duplex
-fry debugger summary ascii urls present
+fry debugger summary ascii urls urls.encoding present
 http http.parsers ;
 IN: http.client
 
