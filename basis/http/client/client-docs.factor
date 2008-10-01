@@ -39,9 +39,19 @@ HELP: http-post
 { $description "Submits a form at a URL." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
+HELP: with-http-get
+{ $values { "url" "a " { $link url } " or " { $link string } } { "quot" "a quotation with stack effect " { $snippet "( chunk -- )" } } { "response" response } }
+{ $description "Downloads the contents of a URL. Chunks of data are passed to the quotation as they are read." }
+{ $errors "Throws an error if the HTTP request fails." } ;
+
 HELP: http-request
 { $values { "request" request } { "response" response } { "data" sequence } }
 { $description "Sends an HTTP request to an HTTP server, and reads the response." }
+{ $errors "Throws an error if the HTTP request fails." } ;
+
+HELP: with-http-request
+{ $values { "request" request } { "quot" "a quotation with stack effect " { $snippet "( chunk -- )" } } { "response" response } }
+{ $description "Sends an HTTP request to an HTTP server, and reads the response incrementally. Chunks of data are passed to the quotation as they are read." }
 { $errors "Throws an error if the HTTP request fails." } ;
 
 ARTICLE: "http.client.get" "GET requests with the HTTP client"
@@ -52,7 +62,10 @@ ARTICLE: "http.client.get" "GET requests with the HTTP client"
 { $subsection download-to }
 "Advanced usage involves constructing a " { $link request } ", which allows " { $link "http.cookies" } " and " { $link "http.headers" } " to be set:"
 { $subsection <get-request> }
-{ $subsection http-request } ;
+{ $subsection http-request }
+"The " { $link http-get } " and " { $link http-request } " words output sequences. This is undesirable if the response data may be large. Another pair of words take a quotation instead, and pass the quotation chunks of data incrementally:"
+{ $subsection with-http-get }
+{ $subsection with-http-request } ;
 
 ARTICLE: "http.client.post" "POST requests with the HTTP client"
 "As with GET requests, there is a high-level word which takes a " { $link url } " and a lower-level word which constructs an HTTP request object which can be passed to " { $link http-request } ":"
