@@ -417,7 +417,7 @@ M: quotation '
     } [ [ bootstrap-word ] [ get ] bi ] H{ } map>assoc
     {
         class<=-cache class-not-cache classes-intersect-cache
-        class-and-cache class-or-cache
+        class-and-cache class-or-cache next-method-quot-cache
     } [ H{ } clone ] H{ } map>assoc assoc-union
     bootstrap-global set
     bootstrap-global emit-userenv ;

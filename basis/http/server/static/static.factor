@@ -3,7 +3,7 @@
 USING: calendar io io.files kernel math math.order
 math.parser namespaces parser sequences strings
 assocs hashtables debugger mime-types sorting logging
-calendar.format accessors
+calendar.format accessors splitting
 io.encodings.binary fry xml.entities destructors urls
 html.elements html.templates.fhtml
 http
@@ -14,9 +14,13 @@ IN: http.server.static
 
 TUPLE: file-responder root hook special allow-listings ;
 
+: modified-since ( request -- date )
+    "if-modified-since" header ";" split1 drop
+    dup [ rfc822>timestamp ] when ;
+
 : modified-since? ( filename -- ? )
-    request get "if-modified-since" header dup [
-        [ file-info modified>> ] [ rfc822>timestamp ] bi* after?
+    request get modified-since dup [
+        [ file-info modified>> ] dip after?
     ] [
         2drop t
     ] if ;

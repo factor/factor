@@ -87,6 +87,8 @@ M: word (quot-uses) over crossref? [ conjoin ] [ 2drop ] if ;
 
 M: array (quot-uses) seq-uses ;
 
+M: hashtable (quot-uses) >r >alist r> seq-uses ;
+
 M: callable (quot-uses) seq-uses ;
 
 M: wrapper (quot-uses) >r wrapped>> r> (quot-uses) ;
