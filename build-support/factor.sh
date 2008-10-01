@@ -175,6 +175,7 @@ find_os() {
         *FreeBSD*) OS=freebsd;;
         *OpenBSD*) OS=openbsd;;
         *DragonFly*) OS=dragonflybsd;;
+    	SunOS) OS=solaris;;
     esac
 }
 
@@ -186,6 +187,7 @@ find_architecture() {
     case $uname_m in
        i386) ARCH=x86;;
        i686) ARCH=x86;;
+       i86pc) ARCH=x86;;
        amd64) ARCH=x86;;
        ppc64) ARCH=ppc;;
        *86) ARCH=x86;;
@@ -214,9 +216,8 @@ intel_macosx_word_size() {
     $ECHO -n "Testing if your Intel Mac supports 64bit binaries..."
     sysctl machdep.cpu.extfeatures | grep EM64T >/dev/null
     if [[ $? -eq 0 ]] ; then
-        WORD=32
+        WORD=64
         $ECHO "yes!"
-        $ECHO "Defaulting to 32bit for now though..."
     else
         WORD=32
         $ECHO "no."
@@ -261,6 +262,8 @@ check_os_arch_word() {
         $ECHO "ARCH: $ARCH"
         $ECHO "WORD: $WORD"
         $ECHO "OS, ARCH, or WORD is empty.  Please report this."
+
+    	echo $MAKE_TARGET
         exit 5
     fi
 }
@@ -460,7 +463,7 @@ make_boot_image() {
 }
 
 install_build_system_apt() {
-    sudo apt-get --yes install sudo libc6-dev libfreetype6-dev libx11-dev xorg-dev glutg3-dev wget git-core git-doc rlwrap gcc make
+    sudo apt-get --yes install libc6-dev libfreetype6-dev libx11-dev xorg-dev glutg3-dev wget git-core git-doc rlwrap gcc make
     check_ret sudo
 }
 
@@ -485,6 +488,8 @@ usage() {
     echo "Example for overriding the default target:"
     echo "    $0 update macosx-x86-32"
 }
+
+MAKE_TARGET=unknown
 
 # -n is nonzero length, -z is zero length
 if [[ -n "$2" ]] ; then

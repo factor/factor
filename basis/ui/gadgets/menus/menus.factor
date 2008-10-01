@@ -15,19 +15,17 @@ TUPLE: menu-glass < gadget ;
 : <menu-glass> ( menu world -- glass )
     menu-glass new-gadget
     >r over menu-loc >>loc r>
-    [ swap add-gadget drop ] keep ;
+    swap add-gadget ;
 
 M: menu-glass layout* gadget-child prefer ;
 
 : hide-glass ( world -- )
-    dup glass>> [ unparent ] when*
-    f swap (>>glass) ;
+    [ [ unparent ] when* f ] change-glass drop ;
 
 : show-glass ( gadget world -- )
-    over hand-clicked set-global
-    [ hide-glass ] keep
-    [ swap add-gadget drop ] 2keep
-    (>>glass) ;
+    dup hide-glass
+    swap [ hand-clicked set-global ] [ >>glass ] bi
+    dup glass>> add-gadget drop ;
 
 : show-menu ( gadget owner -- )
     find-world [ <menu-glass> ] keep show-glass ;
@@ -48,7 +46,7 @@ M: menu-glass layout* gadget-child prefer ;
     faint-boundary ;
 
 : <commands-menu> ( hook target commands -- gadget )
-  <filled-pile>
-  -roll
-    [ <menu-item> add-gadget ] with with each
-  5 <border> menu-theme ;
+    <filled-pile>
+        -roll
+        [ <menu-item> add-gadget ] with with each
+    5 <border> menu-theme ;

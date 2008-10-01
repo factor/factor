@@ -35,5 +35,3 @@ FUNCTION: SInt32 CFRunLoopRunInMode (
 
 : start-run-loop-thread ( -- )
     [ run-loop-thread t ] "CFRunLoop dispatcher" spawn-server drop ;
-
-[ start-run-loop-thread ] "core-foundation.run-loop" add-init-hook

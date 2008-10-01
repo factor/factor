@@ -139,7 +139,7 @@ M: polygon draw-interior
 : <polygon-gadget> ( color points -- gadget )
     dup max-dim
     >r <polygon> <gadget> r> >>dim
-    [ (>>interior) ] keep ;
+    swap >>interior ;
 
 ! Font rendering
 SYMBOL: font-renderer

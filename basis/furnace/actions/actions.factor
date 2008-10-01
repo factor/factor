@@ -14,7 +14,8 @@ html.elements
 html.components
 html.components
 html.templates.chloe
-html.templates.chloe.syntax ;
+html.templates.chloe.syntax
+html.templates.chloe.compiler ;
 IN: furnace.actions
 
 SYMBOL: params
@@ -29,7 +30,8 @@ SYMBOL: rest
         </ul>
     ] unless-empty ;
 
-CHLOE: validation-messages drop render-validation-messages ;
+CHLOE: validation-messages
+    drop [ render-validation-messages ] [code] ;
 
 TUPLE: action rest authorize init display validate submit ;
 
@@ -77,14 +79,14 @@ TUPLE: action rest authorize init display validate submit ;
 
 : revalidate-url ( -- url/f )
     revalidate-url-key param
-    dup [ >url [ same-host? ] keep and ] when ;
+    dup [ >url ensure-port [ same-host? ] keep and ] when ;
 
 : validation-failed ( -- * )
     post-request? revalidate-url and [
         begin-conversation
         nested-forms-key param " " split harvest nested-forms cset
         form get form cset
-        <redirect>
+        <continue-conversation>
     ] [ <400> ] if*
     exit-with ;
 

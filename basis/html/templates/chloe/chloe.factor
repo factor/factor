@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel sequences combinators kernel fry
-namespaces make classes.tuple assocs splitting words arrays
-memoize io io.files io.encodings.utf8 io.streams.string
-unicode.case mirrors math urls present multiline quotations xml
+namespaces make classes.tuple assocs splitting words arrays io
+io.files io.encodings.utf8 io.streams.string unicode.case
+mirrors math urls present multiline quotations xml logging
 xml.data
 html.forms
 html.elements
@@ -37,7 +37,11 @@ CHLOE: style
     ] ?if ;
 
 CHLOE: write-style
-    drop [ <style> write-style </style> ] [code] ;
+    drop [
+        <style "text/css" =type style>
+            write-style
+        </style>
+    ] [code] ;
 
 CHLOE: even
     [ "index" value even? swap when ] process-children ;
@@ -74,36 +78,54 @@ CHLOE: call-next-template
 
 CHLOE: if dup if>quot [ swap when ] append process-children ;
 
-CHLOE-SINGLETON: label
-CHLOE-SINGLETON: link
-CHLOE-SINGLETON: inspector
-CHLOE-SINGLETON: comparison
-CHLOE-SINGLETON: html
-CHLOE-SINGLETON: hidden
+COMPONENT: label
+COMPONENT: link
+COMPONENT: inspector
+COMPONENT: comparison
+COMPONENT: html
+COMPONENT: hidden
+COMPONENT: farkup
+COMPONENT: field
+COMPONENT: textarea
+COMPONENT: password
+COMPONENT: choice
+COMPONENT: checkbox
+COMPONENT: code
 
-CHLOE-TUPLE: farkup
-CHLOE-TUPLE: field
-CHLOE-TUPLE: textarea
-CHLOE-TUPLE: password
-CHLOE-TUPLE: choice
-CHLOE-TUPLE: checkbox
-CHLOE-TUPLE: code
+SYMBOL: template-cache
 
-: read-template ( chloe -- xml )
-    path>> ".xml" append utf8 <file-reader> read-xml ;
+H{ } template-cache set-global
 
-MEMO: template-quot ( chloe -- quot )
-    read-template compile-template ;
+TUPLE: cached-template path last-modified quot ;
 
-MEMO: nested-template-quot ( chloe -- quot )
-    read-template compile-nested-template ;
+: load-template ( chloe -- cached-template )
+    path>> ".xml" append
+    [ ]
+    [ file-info modified>> ]
+    [ utf8 <file-reader> read-xml compile-template ] tri
+    \ cached-template boa ;
 
-: reset-templates ( -- )
-    { template-quot nested-template-quot } [ reset-memoized ] each ;
+\ load-template DEBUG add-input-logging
+
+: cached-template ( chloe -- cached-template/f )
+    template-cache get at* [
+        [
+            [ path>> file-info modified>> ]
+            [ last-modified>> ]
+            bi =
+        ] keep and
+    ] when ;
+
+: template-quot ( chloe -- quot )
+    dup cached-template [ ] [
+        [ load-template dup ] keep
+        template-cache get set-at
+    ] ?if quot>> ;
+
+: reset-cache ( -- )
+    template-cache get clear-assoc ;
 
 M: chloe call-template*
-    nested-template? get
-    [ nested-template-quot ] [ template-quot ] if
-    assert-depth ;
+    template-quot assert-depth ;
 
 INSTANCE: chloe template

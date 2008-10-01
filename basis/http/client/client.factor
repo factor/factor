@@ -10,7 +10,7 @@ io.encodings.ascii
 io.encodings.8-bit
 io.encodings.binary
 io.streams.duplex
-fry debugger summary ascii urls present
+fry debugger summary ascii urls urls.encoding present
 http http.parsers ;
 IN: http.client
 
@@ -33,7 +33,7 @@ IN: http.client
         [ content-type>> "content-type" pick set-at ]
         bi
     ] when*
-    over cookies>> f like [ unparse-cookie "cookie" pick set-at ] when*
+    over cookies>> [ unparse-cookie "cookie" pick set-at ] unless-empty
     write-header ;
 
 GENERIC: >post-data ( object -- post-data )

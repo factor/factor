@@ -4,7 +4,7 @@
 
         <t:form t:action="$wee-url">
 		<p>Shorten URL: <t:field t:name="url" t:size="40" /></p>
-		<input type="submit" value="Shorten" />
+		<button>Shorten</button>
 	</t:form>
 
 </t:chloe>

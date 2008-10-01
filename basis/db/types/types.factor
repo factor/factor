@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs db kernel math math.parser
-sequences continuations sequences.deep
+sequences continuations sequences.deep prettyprint
 words namespaces slots slots.private classes mirrors
 classes.tuple combinators calendar.format symbols
 classes.singleton accessors quotations random ;
@@ -22,22 +22,51 @@ SINGLETON: random-id-generator
 TUPLE: low-level-binding value ;
 C: <low-level-binding> low-level-binding
 
-SINGLETON: +db-assigned-id+
-SINGLETON: +user-assigned-id+
-SINGLETON: +random-id+
+SINGLETONS: +db-assigned-id+ +user-assigned-id+ +random-id+ ;
 UNION: +primary-key+ +db-assigned-id+ +user-assigned-id+ +random-id+ ;
 
 SYMBOLS: +autoincrement+ +serial+ +unique+ +default+ +null+ +not-null+
-+foreign-id+ +has-many+ ;
++foreign-id+ +has-many+ +on-delete+ +restrict+ +cascade+ +set-null+
++set-default+ ;
+
+: offset-of-slot ( string tuple -- n )
+    class superclasses [ "slots" word-prop ] map concat
+    slot-named offset>> ;
+
+: get-slot-named ( name tuple -- value )
+    tuck offset-of-slot slot ;
+
+: set-slot-named ( value name obj -- )
+    tuck offset-of-slot set-slot ;
+
+ERROR: not-persistent class ;
+
+: db-table ( class -- object )
+    dup "db-table" word-prop [ ] [ not-persistent ] ?if ;
+
+: db-columns ( class -- object )
+    superclasses [ "db-columns" word-prop ] map concat ;
+
+: db-relations ( class -- object )
+    "db-relations" word-prop ;
+
+: find-primary-key ( specs -- seq )
+    [ primary-key>> ] filter ;
+
+: set-primary-key ( value tuple -- )
+    [
+        class db-columns
+        find-primary-key first slot-name>>
+    ] keep set-slot-named ;
 
 : primary-key? ( spec -- ? )
     primary-key>> +primary-key+? ;
 
-: db-assigned-id-spec? ( spec -- ? )
-    primary-key>> +db-assigned-id+? ;
+: db-assigned-id-spec? ( specs -- ? )
+    [ primary-key>> +db-assigned-id+? ] contains? ;
 
-: assigned-id-spec? ( spec -- ? )
-    primary-key>> +user-assigned-id+? ;
+: user-assigned-id-spec? ( specs -- ? )
+    [ primary-key>> +user-assigned-id+? ] contains? ;
 
 : normalize-spec ( spec -- )
     dup type>> dup +primary-key+? [
@@ -49,8 +78,8 @@ SYMBOLS: +autoincrement+ +serial+ +unique+ +default+ +null+ +not-null+
         [ >>primary-key drop ] [ drop ] if*
     ] if ;
 
-: find-primary-key ( specs -- obj )
-    [ primary-key>> ] find nip ;
+: db-assigned? ( class -- ? )
+    db-columns find-primary-key db-assigned-id-spec? ;
 
 : relation? ( spec -- ? ) [ +has-many+ = ] deep-find ;
 
@@ -86,18 +115,22 @@ FACTOR-BLOB NULL URL ;
 ! PostgreSQL Types:
 ! http://developer.postgresql.org/pgdocs/postgres/datatype.html
 
-ERROR: unknown-modifier ;
+
+: ?at ( obj assoc -- value/obj ? )
+    dupd at* [ [ nip ] [ drop ] if ] keep ;
+
+ERROR: unknown-modifier modifier ;
 
 : lookup-modifier ( obj -- string )
     {
         { [ dup array? ] [ unclip lookup-modifier swap compound ] }
-        [ persistent-table at* [ unknown-modifier ] unless third ]
+        [ persistent-table ?at [ unknown-modifier ] unless third ]
     } cond ;
 
-ERROR: no-sql-type ;
+ERROR: no-sql-type type ;
 
 : (lookup-type) ( obj -- string )
-    persistent-table at* [ no-sql-type ] unless ;
+    persistent-table ?at [ no-sql-type ] unless ;
 
 : lookup-type ( obj -- string )
     dup array? [
@@ -113,25 +146,21 @@ ERROR: no-sql-type ;
         (lookup-type) second
     ] if ;
 
-: paren ( string -- new-string )
-    "(" swap ")" 3append ;
-
-: join-space ( string1 string2 -- new-string )
-    " " swap 3append ;
-
 : modifiers ( spec -- string )
     modifiers>> [ lookup-modifier ] map " " join
     [ "" ] [ " " prepend ] if-empty ;
 
+: join-space ( string1 string2 -- new-string )
+    " " swap 3append ;
+
+: paren ( string -- new-string )
+    "(" swap ")" 3append ;
+
 HOOK: bind% db ( spec -- )
 HOOK: bind# db ( spec obj -- )
 
-: offset-of-slot ( string obj -- n )
-    class superclasses [ "slots" word-prop ] map concat
-    slot-named offset>> ;
-
-: get-slot-named ( name obj -- value )
-    tuck offset-of-slot slot ;
-
-: set-slot-named ( value name obj -- )
-    tuck offset-of-slot set-slot ;
+: >reference-string ( string pair -- string )
+    first2
+    [ [ unparse join-space ] [ db-columns ] bi ] dip
+    swap [ slot-name>> = ] with find nip
+    column-name>> paren append ;

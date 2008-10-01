@@ -15,7 +15,7 @@ IN: ui.tools.listener.tests
     [ "dup" ] [
         \ dup word-completion-string
     ] unit-test
-  
+
     [ "equal?" ]
     [ \ array \ equal? method word-completion-string ] unit-test
 

@@ -1,7 +1,10 @@
  ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators hashtables kernel
-math fry namespaces make sequences words stack-checker.inlining
+math fry namespaces make sequences words byte-arrays
+locals layouts
+stack-checker.inlining
+compiler.intrinsics
 compiler.tree
 compiler.tree.builder
 compiler.tree.combinators
@@ -10,9 +13,9 @@ compiler.cfg
 compiler.cfg.stacks
 compiler.cfg.templates
 compiler.cfg.iterator
-compiler.alien
-compiler.instructions
-compiler.registers ;
+compiler.cfg.instructions
+compiler.cfg.registers
+compiler.alien ;
 IN: compiler.cfg.builder
 
 ! Convert tree SSA IR to CFG (not quite SSA yet) IR.
@@ -32,18 +35,9 @@ IN: compiler.cfg.builder
 
 : stop-iterating ( -- next ) end-basic-block f ;
 
-USE: qualified
-FROM: compiler.generator.registers => +input+   ;
-FROM: compiler.generator.registers => +output+  ;
-FROM: compiler.generator.registers => +scratch+ ;
-FROM: compiler.generator.registers => +clobber+ ;
-
 SYMBOL: procedures
-
 SYMBOL: current-word
-
 SYMBOL: current-label
-
 SYMBOL: loops
 
 ! Basic block after prologue, makes recursion faster
@@ -81,8 +75,8 @@ GENERIC: emit-node ( node -- next )
     #! labelled by the current word, so that self-recursive
     #! calls can skip an epilogue/prologue.
     init-phantoms
-    %prologue
-    %branch
+    ##prologue
+    ##branch
     begin-basic-block
     current-label get remember-loop ;
 
@@ -92,27 +86,30 @@ GENERIC: emit-node ( node -- next )
         [ emit-nodes ] with-node-iterator
     ] with-cfg-builder ;
 
-: build-cfg ( nodes word label -- procedures )
+: build-cfg ( nodes word -- procedures )
     V{ } clone [
         procedures [
-            (build-cfg)
+            dup (build-cfg)
         ] with-variable
     ] keep ;
 
+SYMBOL: +intrinsics+
+SYMBOL: +if-intrinsics+
+
 : if-intrinsics ( #call -- quot )
-    word>> "if-intrinsics" word-prop ;
+    word>> +if-intrinsics+ word-prop ;
 
 : local-recursive-call ( basic-block -- next )
-    %branch
+    ##branch
     basic-block get successors>> push
     stop-iterating ;
 
 : emit-call ( word -- next )
     finalize-phantoms
     {
-        { [ tail-call? not ] [ 0 %frame-required %call iterate-next ] }
+        { [ tail-call? not ] [ 0 ##frame-required ##call iterate-next ] }
         { [ dup loops get key? ] [ loops get at local-recursive-call ] }
-        [ %epilogue %jump stop-iterating ]
+        [ ##epilogue ##jump stop-iterating ]
     } cond ;
 
 ! #recursive
@@ -130,50 +127,53 @@ M: #recursive emit-node
     dup label>> loop?>> [ compile-loop ] [ compile-recursive ] if ;
 
 ! #if
-: emit-branch ( nodes -- final-bb )
-    [
+: emit-branch ( obj quot -- final-bb )
+    '[
         begin-basic-block copy-phantoms
-        emit-nodes
-        basic-block get dup [ %branch ] when
+        @
+        basic-block get dup [ ##branch ] when
     ] with-scope ;
 
-: emit-if ( node -- next )
-    children>> [ emit-branch ] map
+: emit-branches ( seq quot -- )
+    '[ _ emit-branch ] map
     end-basic-block
     begin-basic-block
     basic-block get '[ [ _ swap successors>> push ] when* ] each
-    init-phantoms
-    iterate-next ;
+    init-phantoms ;
+
+: emit-if ( node -- next )
+    children>> [ emit-nodes ] emit-branches ;
 
 M: #if emit-node
-    { { f "flag" } } lazy-load first %branch-t
-    emit-if ;
+    phantom-pop ##branch-t emit-if iterate-next ;
 
 ! #dispatch
 : dispatch-branch ( nodes word -- label )
+    #! The order here is important, dispatch-branches must
+    #! run after ##dispatch, so that each branch gets the
+    #! correct register state
     gensym [
         [
             copy-phantoms
-            %prologue
+            ##prologue
             [ emit-nodes ] with-node-iterator
-            %epilogue
-            %return
+            ##epilogue
+            ##return
         ] with-cfg-builder
     ] keep ;
 
 : dispatch-branches ( node -- )
     children>> [
         current-word get dispatch-branch
-        %dispatch-label
+        ##dispatch-label
     ] each ;
 
 : emit-dispatch ( node -- )
-    %dispatch dispatch-branches init-phantoms ;
+    phantom-pop int-regs next-vreg
+    [ finalize-contents finalize-heights ##epilogue ] 2dip ##dispatch
+    dispatch-branches init-phantoms ;
 
 M: #dispatch emit-node
-    #! The order here is important, dispatch-branches must
-    #! run after %dispatch, so that each branch gets the
-    #! correct register state
     tail-call? [
         emit-dispatch iterate-next
     ] [
@@ -187,23 +187,23 @@ M: #dispatch emit-node
 
 ! #call
 : define-intrinsics ( word intrinsics -- )
-    "intrinsics" set-word-prop ;
+    +intrinsics+ set-word-prop ;
 
 : define-intrinsic ( word quot assoc -- )
     2array 1array define-intrinsics ;
 
 : define-if-intrinsics ( word intrinsics -- )
-    [ +input+ associate ] assoc-map
-    "if-intrinsics" set-word-prop ;
+    [ template new swap >>input ] assoc-map
+    +if-intrinsics+ set-word-prop ;
 
 : define-if-intrinsic ( word quot inputs -- )
     2array 1array define-if-intrinsics ;
 
 : find-intrinsic ( #call -- pair/f )
-    word>> "intrinsics" word-prop find-template ;
+    word>> +intrinsics+ word-prop find-template ;
 
 : find-boolean-intrinsic ( #call -- pair/f )
-    word>> "if-intrinsics" word-prop find-template ;
+    word>> +if-intrinsics+ word-prop find-template ;
 
 : find-if-intrinsic ( #call -- pair/f )
     node@ {
@@ -213,25 +213,61 @@ M: #dispatch emit-node
     } cond ;
 
 : do-if-intrinsic ( pair -- next )
-    [ %if-intrinsic ] apply-template skip-next emit-if ;
+    [ ##if-intrinsic ] apply-template skip-next emit-if
+    iterate-next ;
 
 : do-boolean-intrinsic ( pair -- next )
-    [
-        f alloc-vreg [ %boolean-intrinsic ] keep phantom-push
-    ] apply-template iterate-next ;
+    [ ##if-intrinsic ] apply-template
+    { t f } [
+        <constant> phantom-push finalize-phantoms
+    ] emit-branches
+    iterate-next ;
 
 : do-intrinsic ( pair -- next )
-    [ %intrinsic ] apply-template iterate-next ;
+    [ ##intrinsic ] apply-template iterate-next ;
 
-: setup-operand-classes ( #call -- )
-    node-input-infos [ class>> ] map set-operand-classes ;
+: setup-value-classes ( #call -- )
+    node-input-infos [ class>> ] map set-value-classes ;
+
+{
+    (tuple) (array) (byte-array)
+    (complex) (ratio) (wrapper)
+    (write-barrier)
+} [ t "intrinsic" set-word-prop ] each
+
+: allot-size ( #call -- n )
+    1 phantom-datastack get phantom-input first value>> ;
+
+:: emit-allot ( size type tag -- )
+    int-regs next-vreg
+    dup fresh-object
+    dup size type tag int-regs next-vreg ##allot
+    type tagged boa phantom-push ;
+
+: emit-write-barrier ( -- )
+    phantom-pop dup >vreg fresh-object? [ drop ] [
+        int-regs next-vreg ##write-barrier
+    ] if ;
+
+: emit-intrinsic ( word -- next )
+    {
+        { \ (tuple) [ allot-size 2 cells + tuple tuple emit-allot ] }
+        { \ (array) [ allot-size 2 cells + array object emit-allot ] }
+        { \ (byte-array) [ allot-size cells 2 + byte-array object emit-allot ] }
+        { \ (complex) [ 3 cells complex complex emit-allot ] }
+        { \ (ratio) [ 3 cells ratio ratio emit-allot ] }
+        { \ (wrapper) [ 2 cells wrapper object emit-allot ] }
+        { \ (write-barrier) [ emit-write-barrier ] }
+    } case
+    iterate-next ;
 
 M: #call emit-node
-    dup setup-operand-classes
+    dup setup-value-classes
     dup find-if-intrinsic [ do-if-intrinsic ] [
         dup find-boolean-intrinsic [ do-boolean-intrinsic ] [
             dup find-intrinsic [ do-intrinsic ] [
-                word>> emit-call
+                word>> dup "intrinsic" word-prop
+                [ emit-intrinsic ] [ emit-call ] if
             ] ?if
         ] ?if
     ] ?if ;
@@ -259,12 +295,12 @@ M: #r> emit-node
 
 ! #return
 M: #return emit-node
-    drop finalize-phantoms %epilogue %return f ;
+    drop finalize-phantoms ##epilogue ##return f ;
 
 M: #return-recursive emit-node
     finalize-phantoms
     label>> id>> loops get key?
-    [ %epilogue %return ] unless f ;
+    [ ##epilogue ##return ] unless f ;
 
 ! #terminate
 M: #terminate emit-node drop stop-iterating ;
@@ -272,19 +308,19 @@ M: #terminate emit-node drop stop-iterating ;
 ! FFI
 M: #alien-invoke emit-node
     params>>
-    [ alien-invoke-frame %frame-required ]
-    [ %alien-invoke iterate-next ]
+    [ alien-invoke-frame ##frame-required ]
+    [ ##alien-invoke iterate-next ]
     bi ;
 
 M: #alien-indirect emit-node
     params>>
-    [ alien-invoke-frame %frame-required ]
-    [ %alien-indirect iterate-next ]
+    [ alien-invoke-frame ##frame-required ]
+    [ ##alien-indirect iterate-next ]
     bi ;
 
 M: #alien-callback emit-node
     params>> dup xt>> dup
-    [ init-phantoms %alien-callback ] with-cfg-builder
+    [ init-phantoms ##alien-callback ] with-cfg-builder
     iterate-next ;
 
 ! No-op nodes

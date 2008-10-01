@@ -470,6 +470,7 @@ F_STRING* reallot_string(F_STRING* string, CELL capacity, CELL fill)
 		UNREGISTER_UNTAGGED(new_string);
 		UNREGISTER_UNTAGGED(string);
 
+		write_barrier((CELL)new_string);
 		new_string->aux = tag_object(new_aux);
 
 		F_BYTE_ARRAY *aux = untag_object(string->aux);
@@ -477,7 +478,9 @@ F_STRING* reallot_string(F_STRING* string, CELL capacity, CELL fill)
 	}
 
 	REGISTER_UNTAGGED(string);
+	REGISTER_UNTAGGED(new_string);
 	fill_string(new_string,to_copy,capacity,fill);
+	UNREGISTER_UNTAGGED(new_string);
 	UNREGISTER_UNTAGGED(string);
 
 	return new_string;

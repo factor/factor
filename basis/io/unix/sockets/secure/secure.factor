@@ -27,8 +27,10 @@ M: ssl-handle handle-fd file>> handle-fd ;
     {
         { SSL_ERROR_NONE [ 2drop f ] }
         { SSL_ERROR_WANT_READ [ 2drop +input+ ] }
+        { SSL_ERROR_WANT_ACCEPT [ 2drop +input+ ] }
         { SSL_ERROR_WANT_WRITE [ 2drop +output+ ] }
         { SSL_ERROR_SYSCALL [ syscall-error ] }
+        { SSL_ERROR_ZERO_RETURN [ (ssl-error) ] }
         { SSL_ERROR_SSL [ (ssl-error) ] }
     } case ;
 

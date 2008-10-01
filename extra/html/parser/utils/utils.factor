@@ -1,7 +1,8 @@
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: assocs circular combinators continuations hashtables
-hashtables.private io kernel math
-namespaces prettyprint quotations sequences splitting
-state-parser strings sequences.lib ;
+hashtables.private io kernel math namespaces prettyprint
+quotations sequences splitting state-parser strings ;
 IN: html.parser.utils
 
 : string-parse-end? ( -- ? ) get-next not ;

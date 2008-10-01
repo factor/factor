@@ -31,7 +31,7 @@ HELP: [let
 } ;
 
 HELP: [let*
-{ $syntax "[let* | binding1 [ value1... ]\n       binding2 [ value2... ]\n       ... |\n    body... ]" }
+{ $syntax "[let* | binding1 [ value1... ]\n        binding2 [ value2... ]\n        ... |\n    body... ]" }
 { $description "Introduces a set of lexical bindings and evaluates the body. The values are evaluated sequentially, and may refer to previous bindings from the same " { $link POSTPONE: [let* } " form; for Lisp programmers, this means that " { $link POSTPONE: [let* } " is equivalent to the Lisp " { $snippet "let*" } ", not " { $snippet "let" } "." }
 { $examples
     { $example
@@ -65,7 +65,7 @@ HELP: [wlet
 
 HELP: ::
 { $syntax ":: word ( bindings... -- outputs... ) body... ;" }
-{ $description "Defines a word with named inputs; it reads stack values into bindings from left to right, then executes the body with those bindings in lexical scope. Any " { $link POSTPONE: [| } ", " { $link POSTPONE: [let } " or " { $link POSTPONE: [wlet } " forms used in the body of the word definition are automatically closure-converted." }
+{ $description "Defines a word with named inputs; it reads stack values into bindings from left to right, then executes the body with those bindings in lexical scope." }
 { $notes "The output names do not affect the word's behavior, however the compiler attempts to check the stack effect as with other definitions." }
 { $examples "See " { $link POSTPONE: [| } ", " { $link POSTPONE: [let } " and " { $link POSTPONE: [wlet } "." } ;
 
@@ -85,7 +85,7 @@ HELP: MEMO::
 { POSTPONE: MEMO: POSTPONE: MEMO:: } related-words
 
 ARTICLE: "locals-mutable" "Mutable locals"
-"In the list of bindings supplied to " { $link POSTPONE: :: } ", " { $link POSTPONE: [let } " or " { $link POSTPONE: [| } ", a mutable binding may be introduced by suffixing its named with " { $snippet "!" } ". Mutable bindings are read by giving their name as usual; the suffix is not part of the binding's name. To write to a mutable binding, use the binding's with the " { $snippet "!" } " suffix."
+"In the list of bindings supplied to " { $link POSTPONE: :: } ", " { $link POSTPONE: [let } ", " { $link POSTPONE: [let* } " or " { $link POSTPONE: [| } ", a mutable binding may be introduced by suffixing its named with " { $snippet "!" } ". Mutable bindings are read by giving their name as usual; the suffix is not part of the binding's name. To write to a mutable binding, use the binding's with the " { $snippet "!" } " suffix."
 $nl
 "Here is a example word which outputs a pair of quotations which increment and decrement an internal counter, and then return the new value. The quotations are closed over the counter and each invocation of the word yields new quotations with their unique internal counter:"
 { $code

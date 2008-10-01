@@ -134,7 +134,7 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
 [ ] [ link-test "link" set-value ] unit-test
 
 [ "<a href='http://www.apple.com/foo&amp;bar'>&lt;Link Title&gt;</a>" ] [
-    [ "link" link render ] with-string-writer
+    [ "link" link new render ] with-string-writer
 ] unit-test
 
 [ ] [
@@ -163,7 +163,7 @@ M: link-test link-href drop "http://www.apple.com/foo&bar" ;
 
 [ t ] [
     [ "object" inspector render ] with-string-writer
-    [ "object" value [ describe ] with-html-stream ] with-string-writer
+    [ "object" value [ describe ] with-html-writer ] with-string-writer
     =
 ] unit-test
 

@@ -8,6 +8,8 @@ html.templates.chloe
 http.server
 http.server.dispatchers
 http.server.redirection
+http.server.static
+http.server.cgi
 furnace.alloy
 furnace.auth.login
 furnace.auth.providers.db
@@ -17,13 +19,11 @@ furnace.auth.features.registration
 furnace.auth.features.deactivate-user
 furnace.boilerplate
 furnace.redirection
-webapps.blogs
 webapps.pastebin
 webapps.planet
-webapps.todo
 webapps.wiki
-webapps.wee-url
-webapps.user-admin ;
+webapps.user-admin
+webapps.help ;
 IN: websites.concatenative
 
 : test-db ( -- params db ) "resource:test.db" sqlite-db ;
@@ -33,43 +33,37 @@ IN: websites.concatenative
         init-furnace-tables
 
         {
-            post comment
             paste annotation
             blog posting
-            todo
-            short-url
             article revision
         } ensure-tables
     ] with-db ;
 
 TUPLE: factor-website < dispatcher ;
 
-: <factor-website> ( -- responder )
-    factor-website new-dispatcher
-        <blogs> "blogs" add-responder
-        <todo-list> "todo" add-responder
-        <pastebin> "pastebin" add-responder
-        <planet> "planet" add-responder
-        <wiki> "wiki" add-responder
-        <wee-url> "wee-url" add-responder
-        <user-admin> "user-admin" add-responder
-        URL" /wiki/view/Front Page" <redirect-responder> "" add-responder
+: <factor-boilerplate> ( responder -- responder' )
+    <boilerplate>
+        { factor-website "page" } >>template ;
+
+: <login-config> ( responder -- responder' )
     "Factor website" <login-realm>
         "Factor website" >>name
         allow-registration
         allow-password-recovery
         allow-edit-profile
-        allow-deactivation
-    <boilerplate>
-        { factor-website "page" } >>template
-    test-db <alloy> ;
+        allow-deactivation ;
+
+: <factor-website> ( -- responder )
+    factor-website new-dispatcher
+        <wiki> "wiki" add-responder
+        <user-admin> "user-admin" add-responder
+        URL" /wiki/view/Front Page" <redirect-responder> "" add-responder ;
 
 SYMBOL: key-password
 SYMBOL: key-file
 SYMBOL: dh-file
 
 : common-configuration ( -- )
-    reset-templates
     "concatenative.org" 25 <inet> smtp-server set-global
     "noreply@concatenative.org" lost-password-from set-global
     "website@concatenative.org" insomniac-sender set-global
@@ -81,16 +75,26 @@ SYMBOL: dh-file
     "resource:basis/openssl/test/server.pem" key-file set-global
     "password" key-password set-global
     common-configuration
-    <factor-website> main-responder set-global ;
+    <factor-website>
+        <pastebin> <factor-boilerplate> <login-config> "pastebin" add-responder
+        <planet> <factor-boilerplate> <login-config> "planet" add-responder
+        "/tmp/docs/" <help-webapp> "docs" add-responder
+    test-db <alloy>
+    main-responder set-global ;
 
-: no-www-prefix ( -- responder )
-    "http://concatenative.org" <permanent-redirect> <trivial-responder> ;
+: <gitweb> ( path -- responder )
+    <dispatcher>
+        swap <static> enable-cgi >>default
+        URL" /gitweb.cgi" <redirect-responder> "" add-responder ;
 
 : init-production ( -- )
     common-configuration
     <vhost-dispatcher>
-        <factor-website> "concatenative.org" add-responder
-        no-www-prefix "www.concatenative.org" add-responder
+        <factor-website> <login-config> <factor-boilerplate> test-db <alloy> "concatenative.org" add-responder
+        <pastebin> <login-config> <factor-boilerplate> test-db <alloy> "paste.factorcode.org" add-responder
+        <planet> <login-config> <factor-boilerplate> test-db <alloy> "planet.factorcode.org" add-responder
+        home "docs" append-path <help-webapp> test-db <alloy> "docs.factorcode.org" add-responder
+        home "cgi" append-path <gitweb> "gitweb.factorcode.org" add-responder
     main-responder set-global ;
 
 : <factor-secure-config> ( -- config )

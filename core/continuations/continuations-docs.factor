@@ -77,6 +77,9 @@ $nl
 "Another two words resume continuations:"
 { $subsection continue }
 { $subsection continue-with }
+"Continuations as control-flow:"
+{ $subsection attempt-all }
+{ $subsection with-return }
 "Reflecting the datastack:"
 { $subsection with-datastack }
 "Continuations serve as the building block for a number of higher-level abstractions, such as " { $link "errors" } " and " { $link "threads" } "."
@@ -211,3 +214,42 @@ HELP: with-datastack
 { $examples
     { $example "USING: continuations math prettyprint ;" "{ 3 7 } [ + ] with-datastack ." "{ 10 }" }
 } ;
+
+HELP: <continuation>
+{ $description "Constructs a new continuation." }
+{ $notes "User code should call " { $link continuation } " instead." } ;
+
+HELP: attempt-all
+{ $values
+     { "seq" sequence } { "quot" quotation }
+     { "obj" object } }
+{ $description "Applies the quotation to elements in a sequence and returns the value from the first quotation that does not throw an error. If all quotations throw an error, returns the last error thrown." }
+{ $examples "The first two numbers throw, the last one doesn't:"
+    { $example
+    "USING: prettyprint continuations kernel math ;"
+    "{ 1 3 6 } [ dup odd? [ \"Odd\" throw ] when ] attempt-all ."
+    "6" }
+    "All quotations throw, the last exception is rethrown:"
+    { $example
+    "USING: prettyprint continuations kernel math ;"
+    "[ { 1 3 5 } [ dup odd? [ throw ] when ] attempt-all ] [ ] recover ."
+    "5"
+    }
+} ;
+
+HELP: return
+{ $description "Returns early from a quotation by reifying the continuation captured by " { $link with-return } " ; execution is resumed starting immediately after " { $link with-return } "." } ;
+
+HELP: with-return
+{ $values
+     { "quot" quotation } }
+{ $description "Captures a continuation that can be reified by calling the " { $link return } " word. If so, it will resume execution immediatly after the " { $link with-return } " word. If " { $link return } " is not called, then execution proceeds as if this word were simply " { $link call } "." }
+{ $examples
+    "Only \"Hi\" will print:"
+    { $example
+    "USING: prettyprint continuations io ;"
+    "[ \"Hi\" print return \"Bye\" print ] with-return"
+    "Hi"
+} } ;
+
+{ return with-return } related-words

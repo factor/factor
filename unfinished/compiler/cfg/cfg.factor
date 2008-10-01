@@ -11,17 +11,18 @@ C: <cfg> cfg
 TUPLE: basic-block < identity-tuple
 visited
 number
-label
 instructions
-successors
-predecessors ;
+successors ;
 
 : <basic-block> ( -- basic-block )
     basic-block new
         V{ } clone >>instructions
-        V{ } clone >>successors
-        V{ } clone >>predecessors ;
+        V{ } clone >>successors ;
 
-TUPLE: mr instructions word label ;
+TUPLE: mr instructions word label frame-size spill-counts ;
 
-C: <mr> mr
+: <mr> ( instructions word label -- mr )
+    mr new
+        swap >>label
+        swap >>word
+        swap >>instructions ;

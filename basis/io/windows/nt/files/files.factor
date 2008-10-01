@@ -20,11 +20,14 @@ M: winnt cd
 
 M: winnt root-directory? ( path -- ? )
     {
-        { [ dup empty? ] [ f ] }
-        { [ dup [ path-separator? ] all? ] [ t ] }
-        { [ dup trim-right-separators { [ length 2 = ] [ second CHAR: : = ] } 1&& ] [ t ] }
-        [ f ]
-    } cond nip ;
+        { [ dup empty? ] [ drop f ] }
+        { [ dup [ path-separator? ] all? ] [ drop t ] }
+        { [ dup trim-right-separators { [ length 2 = ]
+          [ second CHAR: : = ] } 1&& ] [ drop t ] }
+        { [ dup unicode-prefix head? ]
+          [ trim-right-separators length unicode-prefix length 2 + = ] }
+        [ drop f ]
+    } cond ;
 
 ERROR: not-absolute-path ;
 

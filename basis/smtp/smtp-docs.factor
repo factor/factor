@@ -41,7 +41,7 @@ HELP: send-email
     }
 } ;
 
-ARTICLE: "smtp" "SMTP Client Library"
+ARTICLE: "smtp" "SMTP client library"
 "Configuring SMTP:"
 { $subsection smtp-server }
 { $subsection smtp-read-timeout }

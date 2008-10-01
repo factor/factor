@@ -61,10 +61,10 @@ IN: help.lint
 : vocab-exists? ( name -- ? )
     dup vocab swap "all-vocabs" get member? or ;
 
-: check-modules ( word element -- )
-    nip \ $vocab-link swap elements [
+: check-modules ( element -- )
+    \ $vocab-link swap elements [
         second
-        vocab-exists? [ "Missing vocabulary" throw ] unless
+        vocab-exists? [ "$vocab-link to non-existent vocabulary" throw ] unless
     ] each ;
 
 : check-rendering ( word element -- )
@@ -91,7 +91,7 @@ M: help-error error.
                 2dup check-examples
                 2dup check-values
                 2dup check-see-also
-                2dup check-modules
+                2dup nip check-modules
                 2dup drop check-rendering
             ] assert-depth 2drop
         ] check-something
@@ -101,12 +101,20 @@ M: help-error error.
 
 : check-article ( article -- )
     [
-        [ dup check-rendering ] assert-depth drop
+        dup article-content [
+            2dup check-modules check-rendering
+        ] assert-depth 2drop
     ] check-something ;
+
+: files>vocabs ( -- assoc )
+    vocabs
+    [ [ [ vocab-docs-path ] keep ] H{ } map>assoc ]
+    [ [ [ vocab-source-path ] keep ] H{ } map>assoc ]
+    bi assoc-union ;
 
 : group-articles ( -- assoc )
     articles get keys
-    vocabs [ dup vocab-docs-path swap ] H{ } map>assoc
+    files>vocabs
     H{ } clone [
         '[
             dup >link where dup

@@ -33,3 +33,14 @@ HELP: from
 " It will block the calling thread until there is data in the channel." 
 }
 { $see-also <channel> to } ;
+
+ARTICLE: "channels" "Channels"
+"The " { $vocab-link "channels" } " vocabulary provides a simple abstraction to send and receive objects." $nl
+"Opening a channel:"
+{ $subsection <channel> }
+"Sending a message:"
+{ $subsection to }
+"Receiving a message:"
+{ $subsection from } ;
+
+ABOUT: "channels"

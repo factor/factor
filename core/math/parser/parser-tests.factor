@@ -41,8 +41,8 @@ unit-test
 [ "-1.0e-2" string>number number>string ]
 unit-test
 
-[ "-1.0e-12" ]
-[ "-1.0e-12" string>number number>string ]
+[ t ]
+[ "-1.0e-12" string>number number>string { "-1.0e-12" "-1.0e-012" } member? ]
 unit-test
 
 [ f ]
@@ -108,3 +108,6 @@ unit-test
 [ -1.0/0.0 ] [ "-1/0." string>number ] unit-test
 
 [ "-0.0" ] [ -0.0 number>string ] unit-test
+
+[ "-3/4" ] [ -3/4 number>string ] unit-test
+[ "-1-1/4" ] [ -5/4 number>string ] unit-test

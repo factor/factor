@@ -62,7 +62,7 @@ M: tuple-class group-words
     protocol-consult keys ;
 
 : lost-words ( protocol wordlist -- lost-words )
-    >r protocol-words r> diff ;
+    [ protocol-words ] dip diff ;
 
 : forget-old-definitions ( protocol new-wordlist -- )
     [ drop protocol-users ] [ lost-words ] 2bi

@@ -4,21 +4,21 @@ IN: math.statistics
 
 : mean ( seq -- n )
     #! arithmetic mean, sum divided by length
-    [ sum ] keep length / ;
+    [ sum ] [ length ] bi / ;
 
 : geometric-mean ( seq -- n )
     #! geometric mean, nth root of product
-    [ product ] keep length swap nth-root ;
+    [ length ] [ product ] bi nth-root ;
 
 : harmonic-mean ( seq -- n )
     #! harmonic mean, reciprocal of sum of reciprocals.
     #! positive reals only
-    0 [ recip + ] reduce recip ;
+    [ recip ] sigma recip ;
 
 : median ( seq -- n )
     #! middle number if odd, avg of two middle numbers if even
     natural-sort dup length dup even? [
-        1- 2 / swap [ nth ] 2keep >r 1+ r> nth + 2 /
+        1- 2 / swap [ nth ] [ >r 1+ r> nth ] 2bi + 2 /
     ] [
         2 / swap nth
     ] if ;
