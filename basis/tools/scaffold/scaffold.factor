@@ -217,9 +217,9 @@ PRIVATE>
 : help. ( word -- )
     [ (help.) ] [ nl vocabulary>> link-vocab ] bi ;
 
-: scaffold-help ( vocab-root string -- )
+: scaffold-help ( string -- )
     [
-        check-vocab
+        [ find-vocab-root ] [ check-vocab ] bi
         prepare-scaffold
         [ "-docs.factor" scaffold-path ] dip
         swap [ set-scaffold-help-file ] [ 2drop ] if

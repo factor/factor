@@ -13,8 +13,7 @@ HELP: help.
 { $description "Prints out scaffold help markup for a given word." } ;
 
 HELP: scaffold-help
-{ $values
-     { "vocab-root" "a vocabulary root string" } { "string" string } }
+{ $values { "string" string } }
 { $description "Takes an existing vocabulary and creates a help file with scaffolded help for each word. This word only works if no help file yet exists." } ;
 
 HELP: scaffold-undocumented
