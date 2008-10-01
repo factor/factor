@@ -5,7 +5,8 @@ io.files kernel math math.parser namespaces prettyprint
 sequences strings classes.tuple alien.c-types continuations
 db.sqlite.lib db.sqlite.ffi db.tuples words db.types combinators
 math.intervals io nmake accessors vectors math.ranges random
-math.bitwise db.queries destructors db.tuples.private ;
+math.bitwise db.queries destructors db.tuples.private interpolate
+io.streams.string multiline make ;
 IN: db.sqlite
 
 TUPLE: sqlite-db < db path ;
@@ -117,7 +118,8 @@ M: sqlite-db create-sql-statement ( class -- statement )
         dupd
         "create table " 0% 0%
         "(" 0% [ ", " 0% ] [
-            dup column-name>> 0%
+            dup "sql-spec" set
+            dup column-name>> [ "table-id" set ] [ 0% ] bi
             " " 0%
             dup type>> lookup-create-type 0%
             modifiers 0%
@@ -203,9 +205,110 @@ M: sqlite-db persistent-table ( -- assoc )
         { random-generator { f f f } }
     } ;
 
+: insert-trigger ( -- string )
+    [
+    <"
+        CREATE TRIGGER fki_${table}_${foreign-table}_id
+        BEFORE INSERT ON ${table}
+        FOR EACH ROW BEGIN
+            SELECT RAISE(ROLLBACK, 'insert on table "${table}" violates foreign key constraint "fk_${foreign-table}_id"')
+            WHERE  (SELECT ${foreign-table-id} FROM ${foreign-table} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
+        END;
+    "> interpolate
+    ] with-string-writer ;
+
+: insert-trigger-not-null ( -- string )
+    [
+    <"
+        CREATE TRIGGER fki_${table}_${foreign-table}_id
+        BEFORE INSERT ON ${table}
+        FOR EACH ROW BEGIN
+            SELECT RAISE(ROLLBACK, 'insert on table "${table}" violates foreign key constraint "fk_${foreign-table}_id"')
+            WHERE NEW.${foreign-table-id} IS NOT NULL
+                AND (SELECT ${foreign-table-id} FROM ${foreign-table} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
+        END;
+    "> interpolate
+    ] with-string-writer ;
+
+: update-trigger ( -- string )
+    [
+    <"
+        CREATE TRIGGER fku_${table}_${foreign-table}_id
+        BEFORE UPDATE ON ${table}
+        FOR EACH ROW BEGIN
+            SELECT RAISE(ROLLBACK, 'update on table "${table}" violates foreign key constraint "fk_${foreign-table}_id"')
+            WHERE  (SELECT ${foreign-table-id} FROM ${foreign-table} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
+        END;
+    "> interpolate
+    ] with-string-writer ;
+
+: update-trigger-not-null ( -- string )
+    [
+    <"
+        CREATE TRIGGER fku_${table}_${foreign-table}_id
+        BEFORE UPDATE ON ${table}
+        FOR EACH ROW BEGIN
+            SELECT RAISE(ROLLBACK, 'update on table "${table}" violates foreign key constraint "fk_${foreign-table}_id"')
+            WHERE NEW.${foreign-table-id} IS NOT NULL
+                AND (SELECT ${foreign-table-id} FROM ${foreign-table} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
+        END;
+    "> interpolate
+    ] with-string-writer ;
+
+: delete-trigger-restrict ( -- string )
+    [
+    <"
+        CREATE TRIGGER fkd_${table}_${foreign-table}_id
+        BEFORE DELETE ON ${foreign-table}
+        FOR EACH ROW BEGIN
+            SELECT RAISE(ROLLBACK, 'delete on table "${foreign-table}" violates foreign key constraint "fk_${foreign-table}_id"')
+            WHERE  (SELECT ${foreign-table-id} FROM ${foreign-table} WHERE ${foreign-table-id} = OLD.${foreign-table-id}) IS NOT NULL;
+        END;
+    "> interpolate
+    ] with-string-writer ;
+
+: delete-trigger-cascade ( -- string )
+    [
+    <"
+        CREATE TRIGGER fkd_${table}_${foreign-table}_id
+        BEFORE DELETE ON ${foreign-table}
+        FOR EACH ROW BEGIN
+            DELETE from ${table} WHERE ${table-id} = OLD.${foreign-table-id};
+        END;
+    "> interpolate
+    ] with-string-writer ;
+
+: can-be-null? ( -- ? )
+    "sql-spec" get modifiers>> [ +not-null+ = ] contains? not ;
+
+: delete-cascade? ( -- ? )
+    "sql-spec" get modifiers>> { +on-delete+ +cascade+ } swap subseq? ;
+
+: sqlite-trigger, ( string -- )
+    { } { } <simple-statement> 3, ;
+
+: create-sqlite-triggers ( -- )
+    can-be-null? [
+        insert-trigger sqlite-trigger,
+        update-trigger sqlite-trigger,
+    ] [ 
+        insert-trigger-not-null sqlite-trigger,
+        update-trigger-not-null sqlite-trigger,
+    ] if
+    delete-cascade? [
+        delete-trigger-cascade sqlite-trigger,
+    ] [
+        delete-trigger-restrict sqlite-trigger,
+    ] if ;
+
 M: sqlite-db compound ( string seq -- new-string )
     over {
         { "default" [ first number>string join-space ] }
-        { "references" [ >reference-string ] }
+        { "references" [
+            [ >reference-string ] keep
+            first2 [ "foreign-table" set ]
+            [ "foreign-table-id" set ] bi*
+            create-sqlite-triggers
+        ] }
         [ 2drop ]
     } case ;
