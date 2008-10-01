@@ -3,7 +3,7 @@
 USING: accessors assocs kernel math math.parser namespaces make
 sequences io io.sockets io.streams.string io.files io.timeouts
 strings splitting calendar continuations accessors vectors
-math.order hashtables byte-arrays prettyprint
+math.order hashtables byte-arrays prettyprint destructors
 io.encodings
 io.encodings.string
 io.encodings.ascii
@@ -88,72 +88,92 @@ M: too-many-redirects summary
     drop
     [ "Redirection limit of " % max-redirects # " exceeded" % ] "" make ;
 
-DEFER: (http-request)
-
 <PRIVATE
+
+DEFER: (with-http-request)
 
 SYMBOL: redirects
 
 : redirect-url ( request url -- request )
     '[ _ >url derive-url ensure-port ] change-url ;
 
-: do-redirect ( response data -- response data )
-    over code>> 300 399 between? [
-        drop
-        redirects inc
-        redirects get max-redirects < [
-            request get
-            swap "location" header redirect-url
-            "GET" >>method (http-request)
-        ] [
-            too-many-redirects
-        ] if
-    ] when ;
+: redirect? ( response -- ? )
+    code>> 300 399 between? ;
 
-PRIVATE>
+: do-redirect ( quot: ( chunk -- ) response -- response )
+    redirects inc
+    redirects get max-redirects < [
+        request get clone
+        swap "location" header redirect-url
+        "GET" >>method swap (with-http-request)
+    ] [ too-many-redirects ] if ; inline recursive
 
 : read-chunk-size ( -- n )
     read-crlf ";" split1 drop [ blank? ] trim-right
     hex> [ "Bad chunk size" throw ] unless* ;
 
-: read-chunks ( -- )
+: read-chunked ( quot: ( chunk -- ) -- )
     read-chunk-size dup zero?
-    [ drop ] [ read % read-crlf B{ } assert= read-chunks ] if ;
+    [ 2drop ] [
+        read [ swap call ] [ drop ] 2bi
+        read-crlf B{ } assert= read-chunked
+    ] if ; inline recursive
 
-: read-response-body ( response -- response data )
-    dup "transfer-encoding" header "chunked" = [
-        binary decode-input
-        [ read-chunks ] B{ } make
-        over content-charset>> decode
-    ] [
-        dup content-charset>> decode-input
-        input-stream get contents
-    ] if ;
+: read-unchunked ( quot: ( chunk -- ) -- )
+    8192 read dup [
+        [ swap call ] [ drop read-unchunked ] 2bi
+    ] [ 2drop ] if ; inline recursive
 
-: (http-request) ( request -- response data )
-    dup request [
-        dup url>> url-addr ascii [
-            1 minutes timeouts
-            write-request
-            read-response
-            read-response-body
-        ] with-client
-        do-redirect
-    ] with-variable ;
+: read-response-body ( quot response -- )
+    binary decode-input
+    "transfer-encoding" header "chunked" =
+    [ read-chunked ] [ read-unchunked ] if ; inline
+
+: <request-socket> ( -- stream )
+    request get url>> url-addr ascii <client> drop
+    1 minutes over set-timeout ;
+
+: (with-http-request) ( request quot: ( chunk -- ) -- response )
+    swap
+    request [
+        <request-socket> [
+            [
+                out>>
+                [ request get write-request ]
+                with-output-stream*
+            ] [
+                in>> [
+                    read-response dup redirect? [ t ] [
+                        [ nip response set ]
+                        [ read-response-body ]
+                        [ ]
+                        2tri f
+                    ] if
+                ] with-input-stream*
+            ] bi
+        ] with-disposal
+        [ do-redirect ] [ nip ] if
+    ] with-variable ; inline recursive
+
+PRIVATE>
 
 : success? ( code -- ? ) 200 = ;
 
-ERROR: download-failed response body ;
+ERROR: download-failed response ;
 
 M: download-failed error.
-    "HTTP download failed:" print nl
-    [ response>> . nl ] [ body>> write ] bi ;
+    "HTTP request failed:" print nl
+    response>> . ;
 
-: check-response ( response data -- response data )
-    over code>> success? [ download-failed ] unless ;
+: check-response ( response -- response )
+    dup code>> success? [ download-failed ] unless ;
+
+: with-http-request ( request quot -- response )
+    (with-http-request) check-response ; inline
 
 : http-request ( request -- response data )
-    (http-request) check-response ;
+    [ [ % ] with-http-request ] B{ } make
+    over content-charset>> decode ;
 
 : <get-request> ( url -- request )
     <request>
@@ -163,14 +183,14 @@ M: download-failed error.
 : http-get ( url -- response data )
     <get-request> http-request ;
 
+: with-http-get ( url quot -- response )
+    [ <get-request> ] dip with-http-request ; inline
+
 : download-name ( url -- name )
     present file-name "?" split1 drop "/" ?tail drop ;
 
 : download-to ( url file -- )
-    #! Downloads the contents of a URL to a file.
-    swap http-get
-    [ content-charset>> ] [ '[ _ write ] ] bi*
-    with-file-writer ;
+    binary [ [ write ] with-http-get drop ] with-file-writer ;
 
 : download ( url -- )
     dup download-name download-to ;
