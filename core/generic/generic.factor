@@ -152,8 +152,8 @@ M: method-body forget*
                 ] keep eq?
                 [
                     [ [ delete-at ] with-methods ]
-                    [ [ delete-at ] with-implementors ]
-                    2bi
+                    [ [ delete-at ] with-implementors ] 2bi
+                    reset-caches
                 ] [ 2drop ] if
             ] if
         ]
