@@ -1,19 +1,20 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors assocs kernel sequences vectors ;
+USING: accessors assocs hashtables hashtables.private kernel sequences vectors ;
 IN: digraphs
 
-TUPLE: digraph ;
-TUPLE: vertex value edges ;
+TUPLE: digraph < hashtable ;
 
 : <digraph> ( -- digraph )
-    digraph new H{ } clone over set-delegate ;
+    0 digraph new [ reset-hash ] keep ;
+
+TUPLE: vertex value edges ;
 
 : <vertex> ( value -- vertex )
     V{ } clone vertex boa ;
 
 : add-vertex ( key value digraph -- )
-    >r <vertex> swap r> set-at ;
+    [ <vertex> swap ] dip set-at ;
 
 : children ( key digraph -- seq )
     at edges>> ;
