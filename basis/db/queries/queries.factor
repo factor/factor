@@ -186,18 +186,6 @@ M: db query>statement ( query -- tuple )
 
 ! select ID, NAME, SCORE from EXAM limit 1 offset 3
 
-: select-tuples* ( tuple -- statement )
-    dup
-    [
-        select 0,
-        dup class db-columns [ ", " 0, ]
-        [ dup column-name>> 0, 2, ] interleave
-        from 0,
-        class name>> 0,
-    ] { { } { } { } } nmake
-    >r >r parse-sql 4drop r> r>
-    <simple-statement> maybe-make-retryable do-select ;
-
 M: db <count-statement> ( query -- statement )
     [ tuple>> dup class ] keep
     [ [ "select count(*) from " 0% 0% where-clause ] query-make ]
