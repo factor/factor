@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math namespaces make sequences random
 strings math.parser math.intervals combinators math.bitwise
-nmake db db.tuples db.types db.sql classes words shuffle arrays
+nmake db db.tuples db.types classes words shuffle arrays
 destructors continuations db.tuples.private prettyprint ;
 IN: db.queries
 
