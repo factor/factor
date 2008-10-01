@@ -1,27 +1,30 @@
 ! Copyright (C) 2008 Marc Fauconneau.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test suffix-arrays kernel namespaces ;
+USING: tools.test suffix-arrays kernel namespaces sequences ;
 IN: suffix-arrays.tests
 
 ! built from [ all-words 10 head [ name>> ] map ]
-{
-    "run-tests"
-    "must-fail-with"
-    "test-all"
-    "short-effect"
-    "failure"
-    "test"
-    "<failure>"
-    "this-test"
-    "(unit-test)"
-    "unit-test"
-} "strings" set
+[ ] [
+     SA{
+        "run-tests"
+        "must-fail-with"
+        "test-all"
+        "short-effect"
+        "failure"
+        "test"
+        "<failure>"
+        "this-test"
+        "(unit-test)"
+        "unit-test"
+    } "suffix-array" set
+] unit-test
 
-[ "strings" get >suffix-array "" swap query ] must-fail
+[ "suffix-array" get "" swap query ] must-fail
 
-[ { } >suffix-array "something" swap query ] must-fail
+[ SA{ } "something" swap query ] must-fail
 
 [ V{ "unit-test" "(unit-test)" } ]
-[ "strings" get >suffix-array "unit-test" swap query ] unit-test
+[ "suffix-array" get "unit-test" swap query ] unit-test
 
-[ V{ } ] [ "strings" get >suffix-array "something else" swap query ] unit-test
+[ t ]
+[ "suffix-array" get "something else" swap query empty? ] unit-test
