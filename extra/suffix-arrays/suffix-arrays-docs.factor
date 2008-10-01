@@ -8,7 +8,7 @@ HELP: >suffix-array
 { $values
      { "seq" sequence }
      { "array" array } }
-{ $description "Creates a suffix array from the input sequence." } ;
+{ $description "Creates a suffix array from the input sequence.  Suffix arrays are arrays of slices." } ;
 
 HELP: SA{
 { $description "Creates a new literal suffix array at parse-time." } ;
@@ -21,15 +21,15 @@ HELP: suffixes
 
 HELP: from-to
 { $values
-     { "index" integer } { "suffix-array" "a suffix-array" } { "begin" string }
+     { "index" integer } { "suffix-array" "a suffix-array" } { "begin" sequence }
      { "from" integer } { "to" integer } }
 { $notes "Slices are [m,n) and we want (m,n) so we increment." } ;
 
 HELP: query
 { $values
-     { "begin" string } { "suffix-array" "a suffix-array" }
+     { "begin" sequence } { "suffix-array" "a suffix-array" }
      { "matches" array } }
-{ $description "Returns " } ;
+{ $description "Returns a sequence of sequences from the suffix-array that contain the input sequence. An empty array is returned when there are no matches." } ;
 
 ARTICLE: "suffix-arrays" "Suffix arrays"
 "The " { $vocab-link "suffix-arrays" } " vocabulary implements the suffix array data structure for efficient lookup of subsequences. This suffix array implementation is a sorted array of suffixes. Querying it for matches uses binary search for efficiency." $nl
