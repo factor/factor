@@ -91,8 +91,3 @@ HELP: slurp-heap
 { $values
      { "heap" "a heap" } { "quot" quotation } }
 { $description "Removes values from a heap and processes them with the quotation until the heap is empty." } ;
-
-HELP: slurp-heap-when
-{ $values
-     { "heap" "a heap" } { "quot1" quotation } { "quot2" quotation } }
-{ $description "Removes values from a heap that match the predicate quotation " { $snippet "quot1" } " and processes them with " { $snippet "quot2" } " until the predicate quotation no longer matches." } ;
