@@ -13,7 +13,6 @@ QUALIFIED: compiler.errors.private
 QUALIFIED: continuations
 QUALIFIED: definitions
 QUALIFIED: init
-QUALIFIED: io.thread
 QUALIFIED: layouts
 QUALIFIED: listener
 QUALIFIED: prettyprint.config
@@ -214,12 +213,13 @@ IN: tools.deploy.shaker
             continuations:restarts
             listener:error-hook
             init:init-hooks
-            io.thread:io-thread
             source-files:source-files
             input-stream
             output-stream
             error-stream
         } %
+
+        "io-thread" "io.thread" lookup ,
 
         "mallocs" "libc.private" lookup ,
 
