@@ -10,7 +10,7 @@ IN: math.binpack
 
 : binpack ( assoc n -- bins )
     [ sort-values reverse [ length ] keep swap ] dip 
-    [ / ceiling ] keep <array> [ <vector> ] map 
+    [ / ceiling ] keep swap <array> [ <vector> ] map 
     swap [ dupd (binpack) ] each ;
 
 : binpack* ( items n -- bins )
