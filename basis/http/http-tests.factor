@@ -179,7 +179,7 @@ http.server.dispatchers db.tuples ;
 
 : add-quit-action
     <action>
-        [ stop-server "Goodbye" "text/html" <content> ] >>display
+        [ stop-this-server "Goodbye" "text/html" <content> ] >>display
     "quit" add-responder ;
 
 : test-db "test.db" temp-file <sqlite-db> ;
