@@ -26,7 +26,7 @@ webapps.user-admin
 webapps.help ;
 IN: websites.concatenative
 
-: test-db ( -- params db ) "resource:test.db" sqlite-db ;
+: test-db ( -- params db ) "resource:test.db" <sqlite-db> ;
 
 : init-factor-db ( -- )
     test-db [

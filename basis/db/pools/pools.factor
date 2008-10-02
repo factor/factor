@@ -6,13 +6,12 @@ IN: db.pools
 
 TUPLE: db-pool < pool db ;
 
-: <db-pool> ( params db -- pool )
+: <db-pool> ( db -- pool )
     db-pool <pool>
-        swap >>db
-        swap >>params ;
+        swap >>db ;
 
-: with-db-pool ( db params quot -- )
-    >r <db-pool> r> with-pool ; inline
+: with-db-pool ( db quot -- )
+    [ <db-pool> ] dip with-pool ; inline
 
 M: db-pool make-connection ( pool -- )
     db>> db-open ;

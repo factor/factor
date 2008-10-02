@@ -182,7 +182,7 @@ http.server.dispatchers db.tuples ;
         [ stop-server "Goodbye" "text/html" <content> ] >>display
     "quit" add-responder ;
 
-: test-db "test.db" temp-file sqlite-db ;
+: test-db "test.db" temp-file <sqlite-db> ;
 
 [ test-db drop delete-file ] ignore-errors
 
