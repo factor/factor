@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.parser project-euler.common sequences sequences.lib ;
+USING: kernel math math.parser project-euler.common sequences ;
 IN: project-euler.055
 
 ! http://projecteuler.net/index.php?section=problems&id=55
@@ -49,8 +49,8 @@ IN: project-euler.055
 
 : (lychrel?) ( n iteration -- ? )
     dup 50 < [
-        >r add-reverse dup palindrome?
-        [ r> 2drop f ] [ r> 1+ (lychrel?) ] if
+        [ add-reverse ] dip over palindrome?
+        [ 2drop f ] [ 1+ (lychrel?) ] if
     ] [
         2drop t
     ] if ;
