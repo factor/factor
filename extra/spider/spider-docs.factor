@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax io.streams.string urls
-multiline ;
+multiline spider.private quotations ;
 IN: spider
 
 HELP: <spider>
@@ -16,11 +16,10 @@ HELP: run-spider
      { "spider" spider } }
 { $description "Runs a spider until completion. See the " { $subsection "spider-tutorial" } " for a complete description of the tuple slots that affect how thet spider works." } ;
 
-HELP: spider
-{ $description "" } ;
-
-HELP: spider-result
-{ $description "" } ;
+HELP: slurp-heap-when
+{ $values
+     { "heap" "a heap" } { "quot1" quotation } { "quot2" quotation } }
+{ $description "Removes values from a heap that match the predicate quotation " { $snippet "quot1" } " and processes them with " { $snippet "quot2" } " until the predicate quotation no longer matches." } ;
 
 ARTICLE: "spider-tutorial" "Spider tutorial"
 "To create a new spider, call the " { $link <spider> } " word with a link to the site you wish to spider."

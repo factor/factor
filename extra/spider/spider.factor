@@ -3,12 +3,12 @@
 USING: accessors fry html.parser html.parser.analyzer
 http.client kernel tools.time sets assocs sequences
 concurrency.combinators io threads namespaces math multiline
-heaps math.parser inspector urls assoc-deques logging
+heaps math.parser inspector urls assoc-heaps logging
 combinators.short-circuit continuations calendar prettyprint ;
 IN: spider
 
 TUPLE: spider base count max-count sleep max-depth initial-links
-filters spidered todo nonmatching ;
+filters spidered todo nonmatching quiet ;
 ! secure? agent page-timeout data-timeout overall-timeout
 
 TUPLE: spider-result url depth headers fetch-time parsed-html
@@ -27,19 +27,19 @@ links processing-time timestamp ;
 
 <PRIVATE
 
+: relative-url? ( url -- ? ) protocol>> not ;
+
 : apply-filters ( links spider -- links' )
     filters>> [ '[ _ 1&& ] filter ] when* ;
 
+: push-links ( links level assoc-heap -- )
+    '[ _ _ heap-push ] each ;
+
 : add-todo ( links level spider -- )
-    tuck [ apply-filters ] 2dip
-    tuck
-    [ spidered>> keys diff ]
-    [ todo>> ] 2bi* '[ _ _ heap-push ] each ;
+    todo>> push-links ;
 
 : add-nonmatching ( links level spider -- )
-    nonmatching>> '[ _ _ heap-push ] each ;
-
-: relative-url? ( url -- ? ) protocol>> not ;
+    nonmatching>> push-links ;
 
 : filter-base ( spider spider-result -- base-links nonmatching-links )
     [ base>> host>> ] [ links>> prune ] bi*
@@ -51,26 +51,27 @@ links processing-time timestamp ;
     [ filter-base ] 2keep
     depth>> 1+ swap
     [ add-nonmatching ]
-    [ add-todo ] 2bi ;
-
-: print-spidering ( url depth -- )
-    "depth: " write number>string write
-    ", spidering: " write . yield ;
+    [ tuck [ apply-filters ] 2dip add-todo ] 2bi ;
 
 : normalize-hrefs ( links -- links' )
     [ >url ] map
     spider get base>> swap [ derive-url ] with map ;
 
+: print-spidering ( url depth -- )
+    "depth: " write number>string write
+    ", spidering: " write . yield ;
+
 : (spider-page) ( url depth -- spider-result )
-    2dup print-spidering
     f pick spider get spidered>> set-at
     over '[ _ http-get ] benchmark swap
     [ parse-html dup find-hrefs normalize-hrefs ] benchmark
-    now spider-result boa
-    dup describe ;
+    now spider-result boa ;
 
 : spider-page ( url depth -- )
-    (spider-page) spider get swap add-spidered ;
+    spider get quiet>> [ 2dup print-spidering ] unless
+    (spider-page)
+    spider get [ quiet>> [ dup describe ] unless ]
+    [ swap add-spidered ] bi ;
 
 \ spider-page ERROR add-error-logging
 
@@ -80,6 +81,12 @@ links processing-time timestamp ;
 : queue-initial-links ( spider -- spider )
     [ initial-links>> normalize-hrefs 0 ] keep
     [ add-todo ] keep ;
+
+: slurp-heap-when ( heap quot1 quot2: ( value key -- ) -- )
+    pick heap-empty? [ 3drop ] [
+        [ [ heap-pop dup ] 2dip slip [ t ] compose [ 2drop f ] if ]
+        [ roll [ slurp-heap-when ] [ 3drop ] if ] 3bi
+    ] if ; inline recursive
 
 PRIVATE>
 
