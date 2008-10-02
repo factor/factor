@@ -195,9 +195,3 @@ M: heap heap-pop ( heap -- value key )
     over heap-empty? [ 2drop ] [
         [ [ heap-pop drop ] dip call ] [ slurp-heap ] 2bi
     ] if ; inline recursive
-
-: slurp-heap-when ( heap quot1 quot2: ( value key -- ) -- )
-    pick heap-empty? [ 3drop ] [
-        [ [ heap-pop dup ] 2dip slip [ t ] compose [ 2drop f ] if ]
-        [ roll [ slurp-heap-when ] [ 3drop ] if ] 3bi
-    ] if ; inline recursive
