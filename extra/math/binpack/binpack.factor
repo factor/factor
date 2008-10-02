@@ -6,16 +6,17 @@ USING: sequences kernel arrays vectors accessors assocs sorting math math.functi
 IN: math.binpack 
 
 : (binpack) ( bins item -- )
-    swap dup [ [ second ] map sum ] map swap zip sort-keys values first push ;
+    [ [ values sum ] map ] keep
+    zip sort-keys values first push ;
 
 : binpack ( assoc n -- bins )
-    [ sort-values reverse [ length ] keep swap ] dip 
-    [ / ceiling ] keep swap <array> [ <vector> ] map 
-    swap [ dupd (binpack) ] each ;
+    [ sort-values <reversed> dup length ] dip
+    tuck / ceiling <array> [ <vector> ] map
+    tuck [ (binpack) ] curry each ;
 
 : binpack* ( items n -- bins )
     [ dup zip ] dip binpack [ keys ] map ;
 
 : binpack! ( items quot n -- bins ) 
-    [ dup ] 2dip [ map zip ] dip binpack [ keys ] map ;
+    [ dupd map zip ] dip binpack [ keys ] map ;
 
