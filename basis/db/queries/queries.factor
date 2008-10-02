@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math namespaces make sequences random
 strings math.parser math.intervals combinators math.bitwise
-nmake db db.tuples db.types db.sql classes words shuffle arrays
+nmake db db.tuples db.types classes words shuffle arrays
 destructors continuations db.tuples.private prettyprint ;
 IN: db.queries
 
@@ -185,18 +185,6 @@ M: db query>statement ( query -- tuple )
     [ <select-by-slots-statement> ] dip make-query* ;
 
 ! select ID, NAME, SCORE from EXAM limit 1 offset 3
-
-: select-tuples* ( tuple -- statement )
-    dup
-    [
-        select 0,
-        dup class db-columns [ ", " 0, ]
-        [ dup column-name>> 0, 2, ] interleave
-        from 0,
-        class name>> 0,
-    ] { { } { } { } } nmake
-    >r >r parse-sql 4drop r> r>
-    <simple-statement> maybe-make-retryable do-select ;
 
 M: db <count-statement> ( query -- statement )
     [ tuple>> dup class ] keep
