@@ -5,27 +5,19 @@ alien assocs strings math multiline quotations ;
 IN: db
 
 HELP: db
-{ $description "The " { $snippet "db" } " class is the superclass of all other database classes.  It stores a " { $snippet "handle" } " to the database as well as insert, update, and delete queries." } ;
+{ $description "The " { $snippet "db" } " class is the superclass of all other database classes. It stores a " { $snippet "handle" } " to the database as well as insert, update, and delete queries." } ;
 
 HELP: new-db
 { $values { "class" class } { "obj" object } }
-{ $description "Creates a new database object from a given class." } ;
-
-HELP: make-db*
-{ $values { "object" object } { "db" object } { "db" object } }
-{ $description "Takes a sequence of parameters specific to each database and a class name of the database, and constructs a new database object." } ;
-
-HELP: make-db
-{ $values { "object" object } { "class" class } { "db" db } }
-{ $description "Takes a sequence of parameters specific to each database and a class name of the database, and constructs a new database object." } ;
+{ $description "Creates a new database object from a given class with caches for prepared statements. Does not actually connect to the database until " { $link db-open } " or " { $link with-db } " is called." } ;
 
 HELP: db-open
 { $values { "db" db } { "db" db } }
-{ $description "Opens a database using the configuration data stored in a " { $link db } " tuple." } ;
+{ $description "Opens a database using the configuration data stored in a " { $link db } " tuple. The database object now references a database handle that must be cleaned up. Therefore, it is better to use the " { $link with-db } " combinator than calling this word directly." } ;
 
 HELP: db-close
 { $values { "handle" alien } }
-{ $description "Closes a database using the handle provided." } ;
+{ $description "Closes a database using the handle provided. Use of the " { $link with-db } " combinator is preferred over manually opening and closing databases so that resources are not leaked." } ;
 
 HELP: dispose-statements
 { $values { "assoc" assoc } }
@@ -38,29 +30,17 @@ HELP: db-dispose
 HELP: statement
 { $description "A " { $snippet "statement" } " stores the information about a statemen, such as the SQL statement text, the in/out parameters, and type information." } ;
 
-HELP: simple-statement
-{ $description } ;
-
-HELP: prepared-statement
-{ $description } ;
-
 HELP: result-set
 { $description "An object encapsulating a raw SQL result object. There are two ways in which a result set can be accessed, but they are specific to the database backend in use."
     { $subsection "db-random-access-result-set" }
     { $subsection "db-sequential-result-set" }
 } ;
 
-HELP: init-result-set
-{ $values
-     { "result-set" result-set } }
-{ $description "" } ;
-
 HELP: new-result-set
 { $values
      { "query" "a query" } { "handle" alien } { "class" class }
      { "result-set" result-set } }
 { $description "Creates a new " { $link result-set } " object of type " { $snippet "class" } "." } ;
-
 
 HELP: new-statement
 { $values { "sql" string } { "in" sequence } { "out" sequence } { "class" class } { "statement" statement } }
@@ -79,18 +59,6 @@ HELP: <prepared-statement>
 HELP: prepare-statement
 { $values { "statement" statement } }
 { $description "For databases which implement a method on this generic, it does some internal processing to ready the statement for execution." } ;
-
-HELP: bind-statement*
-{ $values { "statement" statement } }
-{ $description "" } ;
-
-HELP: low-level-bind
-{ $values { "statement" statement } }
-{ $description "" } ;
-
-HELP: bind-tuple
-{ $values { "tuple" tuple } { "statement" statement } }
-{ $description "" } ;
 
 HELP: query-results
 { $values { "query" object }
@@ -125,40 +93,13 @@ HELP: more-rows?
 { $values { "result-set" result-set } { "?" "a boolean" } }
 { $description "Returns true if the " { $link result-set } " has more rows to traverse." } ;
 
-HELP: execute-statement*
-{ $values { "statement" statement } { "type" object } }
-{ $description } ;
-
-HELP: execute-one-statement
-{ $values
-     { "statement" null } }
-{ $description "" } ;
-
-HELP: execute-statement
-{ $values { "statement" statement } }
-{ $description "" } ;
-
-
-
-
 
 
 HELP: begin-transaction
 { $description "Begins a new transaction. User code should make use of the " { $link with-transaction } " combinator." } ;
 
-HELP: bind-statement
-{ $values
-     { "obj" object } { "statement" null } }
-{ $description "" } ;
-
 HELP: commit-transaction
 { $description "Commits a transaction. User code should make use of the " { $link with-transaction } " combinator." } ;
-
-HELP: default-query
-{ $values
-     { "query" null }
-     { "result-set" null } }
-{ $description "" } ;
 
 HELP: in-transaction
 { $description "A variable that is set true when a transaction is in progress." } ;
@@ -170,14 +111,14 @@ HELP: in-transaction?
 
 HELP: query-each
 { $values
-     { "statement" null } { "quot" quotation } }
-{ $description "" } ;
+     { "statement" statement } { "quot" quotation } }
+{ $description "A combinator that calls a quotation on a sequence of SQL statments to their results query results." } ;
 
 HELP: query-map
 { $values
-     { "statement" null } { "quot" quotation }
+     { "statement" statement } { "quot" quotation }
      { "seq" sequence } }
-{ $description "" } ;
+{ $description "A combinator that maps a sequence of SQL statments to their results query results." } ;
 
 HELP: rollback-transaction
 { $description "Rolls back a transaction; no data is committed to the database. User code should make use of the " { $link with-transaction } " combinator." } ;
@@ -211,7 +152,7 @@ HELP: sql-row-typed
 
 HELP: with-db
 { $values
-     { "seq" sequence } { "class" class } { "quot" quotation } }
+     { "db" db } { "quot" quotation } }
 { $description "Calls the quotation with a database bound to the " { $link db } " symbol. The database called is based on the " { $snippet "class" } " with the " } ;
 
 HELP: with-transaction
@@ -247,7 +188,7 @@ $nl
 { $subsection row-column-typed } ;
 
 ARTICLE: "db-sequential-result-set" "Sequential result sets"
-"Sequential result sets can be iterated one element after the next.  SQLite's result sets offer this method of traversal."
+"Sequential result sets can be iterated one element after the next. SQLite's result sets offer this method of traversal."
 $nl
 "Databases which work in this way must provide methods for the following traversal words:"
 { $subsection more-rows? }
@@ -272,26 +213,44 @@ $nl
 { $subsection row-column-typed } ;
 
 ARTICLE: "db-protocol" "Low-level database protocol"
-"The high-level protocol (see " { $vocab-link "db.tuples" } ") uses this low-level protocol for executing statements and queries."
-;
+"The high-level protocol (see " { $vocab-link "db.tuples" } ") uses this low-level protocol for executing statements and queries." $nl
+"Opening a database:"
+{ $subsection db-open }
+"Closing a database:"
+{ $subsection db-close }
+
+"Performing a query:"
+{ $subsection query-results }
+
+"Handling query results:"
+{ $subsection "db-result-sets" }
+
+ ;
 
 ARTICLE: "db-lowlevel-tutorial" "Low-level database tutorial"
 "Although Factor makes integrating a database with its object system easy (see " { $vocab-link "db.tuples" } "), sometimes you may want to write SQL directly and get the results back as arrays of strings, for instance, when interfacing with a legacy database that doesn't easily map to " { $snippet "tuples" } "."
 ;
 
 ARTICLE: "db-porting-the-library" "Porting the database library"
-"This section is not yet written."
+"There are two layers to implement when porting the database library."
+{ $subsection "db-protocol" }
 ;
 
 ARTICLE: "db-custom-database-combinators" "Custom database combinators"
-"Every database library requires some effort on the programmer's part to initialize and open a database.  SQLite uses files on your harddisk, so a simple pathname is all the setup required. With PostgreSQL, you log in to a networked server as a user on a specfic port." $nl
+"Every database library requires some effort on the programmer's part to initialize and open a database. SQLite uses files on your harddisk, so a simple pathname is all the setup required. With PostgreSQL, you log in to a networked server as a user on a specfic port." $nl
 
-"Make a " { $snippet "with-" } " word to open, close, and use your database."
+"Make a " { $snippet "with-" } " combinator to open and close a database so that resources are not leaked."
 { $code <"
 USING: db.sqlite db io.files ;
-: with-my-database ( quot -- )
-    { "my-database.db" temp-file } sqlite-db rot with-db ;
-"> }
+: with-sqlite-db ( quot -- )
+    "my-database.db" temp-file sqlite-db rot with-db ;"> } 
+
+{ $code <"
+USING: db.postgresql db ;
+: with-postgresql-db ( quot -- )
+    { "localhost" "db-username" "db-password" "db-name" }
+    postgresql-db rot with-db ;">
+}
 
 ;
 

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes continuations destructors kernel math
 namespaces sequences classes.tuple words strings
-tools.walker accessors combinators ;
+tools.walker accessors combinators fry ;
 IN: db
 
 TUPLE: db
@@ -16,10 +16,6 @@ TUPLE: db
         H{ } clone >>insert-statements
         H{ } clone >>update-statements
         H{ } clone >>delete-statements ; inline
-
-GENERIC: make-db* ( object db -- db )
-
-: make-db ( object class -- db ) new-db make-db* ;
 
 GENERIC: db-open ( db -- db )
 HOOK: db-close db ( handle -- )
@@ -111,10 +107,9 @@ M: object execute-statement* ( statement type -- )
 : query-map ( statement quot -- seq )
     accumulator [ query-each ] dip { } like ; inline
 
-: with-db ( seq class quot -- )
-    [ make-db db-open db ] dip
-    [ db get swap [ drop ] prepose with-disposal ] curry with-variable ;
-    inline
+: with-db ( db quot -- )
+    [ db-open db ] dip
+    '[ db get [ drop @ ] with-disposal ] with-variable ; inline
 
 : default-query ( query -- result-set )
     query-results [ [ sql-row ] query-map ] with-disposal ;
