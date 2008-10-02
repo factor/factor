@@ -7,11 +7,12 @@ heaps math.parser inspector urls assoc-deques logging
 combinators.short-circuit continuations calendar prettyprint ;
 IN: spider
 
-TUPLE: spider base count max-count sleep max-depth secure? agent timeout
-filters spidered todo nonmatching initial-links ;
+TUPLE: spider base count max-count sleep max-depth initial-links
+filters spidered todo nonmatching ;
+! secure? agent page-timeout data-timeout overall-timeout
 
 TUPLE: spider-result url depth headers fetch-time parsed-html
-links processing-time ;
+links processing-time timestamp ;
 
 : <spider> ( base -- spider )
     >url
@@ -65,7 +66,7 @@ links processing-time ;
     f pick spider get spidered>> set-at
     over '[ _ http-get ] benchmark swap
     [ parse-html dup find-hrefs normalize-hrefs ] benchmark
-    spider-result boa
+    now spider-result boa
     dup describe ;
 
 : spider-page ( url depth -- )
@@ -76,11 +77,16 @@ links processing-time ;
 : spider-sleep ( -- )
     spider get sleep>> [ sleep ] when* ;
 
+: queue-initial-links ( spider -- spider )
+    [ initial-links>> normalize-hrefs 0 ] keep
+    [ add-todo ] keep ;
+
 PRIVATE>
 
 : run-spider ( spider -- spider )
     "spider" [
         dup spider [
+            queue-initial-links
             [ todo>> ] [ max-depth>> ] bi
             '[
                 _ <= spider get
