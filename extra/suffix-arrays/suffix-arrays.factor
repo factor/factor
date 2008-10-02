@@ -22,10 +22,9 @@ IN: suffix-arrays
 : <funky-slice> ( from/f to/f seq -- slice )
     [
         tuck
-        [ drop [ 0 ] unless* ]
-        [ dupd length ? ] 2bi*
+        [ drop 0 or ] [ length or ] 2bi*
         [ min ] keep
-    ] keep <slice> ;
+    ] keep <slice> ; inline
 
 PRIVATE>
 
@@ -35,6 +34,6 @@ PRIVATE>
 : SA{ \ } [ >suffix-array ] parse-literal ; parsing
 
 : query ( begin suffix-array -- matches )
-    2dup find-index
+    2dup find-index dup
     [ -rot [ from-to ] keep <funky-slice> [ seq>> ] map prune ]
-    [ 2drop { } ] if* ;
+    [ 3drop { } ] if ;
