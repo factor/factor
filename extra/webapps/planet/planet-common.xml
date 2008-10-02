@@ -5,7 +5,7 @@
 	<t:style t:include="resource:extra/webapps/planet/planet.css" />
 
 	<div class="navbar">
-		  <t:a t:href="$planet/list">Front Page</t:a>
+		  <t:a t:href="$planet">Front Page</t:a>
 		| <t:a t:href="$planet/feed.xml">Atom Feed</t:a>
 		| <t:a t:href="$planet/admin">Admin</t:a>
 

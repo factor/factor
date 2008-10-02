@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math namespaces make sequences words io
 io.streams.string math.vectors ui.gadgets columns accessors
-math.geometry.rect ;
+math.geometry.rect locals ;
 IN: ui.gadgets.grids
 
 TUPLE: grid < gadget
@@ -12,18 +12,18 @@ grid
 
 : new-grid ( children class -- grid )
     new-gadget
-    [ (>>grid) ] [ >r concat r> swap add-gadgets drop ] [ nip ] 2tri ;
-    inline
+        swap >>grid
+        dup grid>> concat add-gadgets ; inline
 
 : <grid> ( children -- grid )
     grid new-grid ;
 
 : grid-child ( grid i j -- gadget ) rot grid>> nth nth ;
 
-: grid-add ( grid child i j -- grid )
-  >r >r dupd swap r> r>
-  >r >r 2dup swap add-gadget drop r> r>
-  3dup grid-child unparent rot grid>> nth set-nth ;
+:: grid-add ( grid child i j -- grid )
+    grid i j grid-child unparent
+    grid child add-gadget
+    child i j grid grid>> nth set-nth ;
 
 : grid-remove ( grid i j -- grid ) <gadget> -rot grid-add ;
 
@@ -33,10 +33,10 @@ grid
 : (compute-grid) ( grid -- seq ) [ max-dim ] map ;
 
 : compute-grid ( grid -- horiz vert )
-    pref-dim-grid dup flip (compute-grid) swap (compute-grid) ;
+    pref-dim-grid [ flip (compute-grid) ] [ (compute-grid) ] bi ;
 
 : (pair-up) ( horiz vert -- dim )
-    >r first r> second 2array ;
+    [ first ] [ second ] bi* 2array ;
 
 : pair-up ( horiz vert -- dims )
     [ [ (pair-up) ] curry map ] with map ;

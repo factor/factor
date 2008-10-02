@@ -32,7 +32,7 @@
 			</tr>
 		</table>
 
-		<input type="submit" value="View" />
+		<button>View</button>
 	</t:form>
 
 </t:chloe>

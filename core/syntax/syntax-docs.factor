@@ -519,7 +519,7 @@ HELP: UNION:
 HELP: INTERSECTION:
 { $syntax "INTERSECTION: class participants... ;" }
 { $values { "class" "a new class word to define" } { "participants" "a list of class words separated by whitespace" } }
-{ $description "Defines an intersection class. An object is an instance of a union class if it is an instance of all of its participants." } ;
+{ $description "Defines an intersection class. An object is an instance of an intersection class if it is an instance of all of its participants." } ;
 
 HELP: MIXIN:
 { $syntax "MIXIN: class" }
@@ -573,12 +573,12 @@ $nl
 } ;
 
 HELP: initial:
-{ $syntax "TUPLE: ... { \"slot\" initial: value } ... ;" }
+{ $syntax "TUPLE: ... { slot initial: value } ... ;" }
 { $values { "slot" "a slot name" } { "value" "any literal" } }
 { $description "Specifies an initial value for a tuple slot." } ;
 
 HELP: read-only
-{ $syntax "TUPLE: ... { \"slot\" read-only } ... ;" }
+{ $syntax "TUPLE: ... { slot read-only } ... ;" }
 { $values { "slot" "a slot name" } }
 { $description "Defines a tuple slot to be read-only. If a tuple has read-only slots, instances of the tuple should only be created by calling " { $link boa } ", instead of " { $link new } ". Using " { $link boa } " is the only way to set the value of a read-only slot." } ;
 

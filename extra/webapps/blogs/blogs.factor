@@ -90,7 +90,7 @@ M: comment entity-url
 
 : list-posts ( -- posts )
     f <post> "author" value >>author
-    select-tuples [ dup id>> f <comment> f count-tuples >>comments ] map
+    select-tuples [ dup id>> f <comment> count-tuples >>comments ] map
     reverse-chronological-order ;
 
 : <list-posts-action> ( -- action )

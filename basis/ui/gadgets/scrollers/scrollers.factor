@@ -33,17 +33,17 @@ scroller H{
     0 0 0 0 <range> 0 0 0 0 <range> 2array <compose> ;
 
 : new-scroller ( gadget class -- scroller )
-  new-frame
-    t >>root?
-    <scroller-model> >>model
-    faint-boundary
+    new-frame
+        t >>root?
+        <scroller-model> >>model
+        faint-boundary
 
-    dup model>> dependencies>> first  <x-slider> >>x dup x>> @bottom grid-add
-    dup model>> dependencies>> second <y-slider> >>y dup y>> @right  grid-add
+        dup model>> dependencies>> first  <x-slider> >>x dup x>> @bottom grid-add
+        dup model>> dependencies>> second <y-slider> >>y dup y>> @right  grid-add
 
-    swap over model>> <viewport> >>viewport
-    dup viewport>> @center grid-add ;
-    
+        swap over model>> <viewport> >>viewport
+        dup viewport>> @center grid-add ;
+
 : <scroller> ( gadget -- scroller ) scroller new-scroller ;
 
 : scroll ( value scroller -- )
@@ -81,7 +81,7 @@ scroller H{
 : scroll>rect ( rect gadget -- )
     dup find-scroller* dup [
         [ relative-scroll-rect ] keep
-        [ (>>follows) ] keep
+        swap >>follows
         relayout
     ] [
         3drop
@@ -94,7 +94,7 @@ scroller H{
 
 : scroll>gadget ( gadget -- )
     dup find-scroller* dup [
-        [ (>>follows) ] keep
+        swap >>follows
         relayout
     ] [
         2drop
@@ -104,9 +104,7 @@ scroller H{
     dup viewport>> viewport-dim { 0 1 } v* swap scroll ;
 
 : scroll>bottom ( gadget -- )
-    find-scroller [
-        t over (>>follows) relayout-1
-    ] when* ;
+    find-scroller [ t >>follows relayout-1 ] when* ;
 
 : scroll>top ( gadget -- )
     <zero-rect> swap scroll>rect ;
@@ -124,14 +122,14 @@ M: f update-scroller drop dup scroller-value swap scroll ;
 M: scroller layout*
     dup call-next-method
     dup follows>>
-    [ update-scroller ] 2keep
-    swap (>>follows) ;
+    2dup update-scroller
+    >>follows drop ;
 
 M: scroller focusable-child*
     viewport>> ;
 
 M: scroller model-changed
-    nip f swap (>>follows) ;
+    nip f >>follows drop ;
 
 TUPLE: limited-scroller < scroller fixed-dim ;
 

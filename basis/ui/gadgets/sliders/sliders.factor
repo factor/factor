@@ -46,7 +46,7 @@ M: slider model-changed nip elevator>> relayout-1 ;
 TUPLE: thumb < gadget ;
 
 : begin-drag ( thumb -- )
-    find-slider dup slider-value swap (>>saved) ;
+    find-slider dup slider-value >>saved drop ;
 
 : do-drag ( thumb -- )
     find-slider drag-loc over orientation>> v.
@@ -83,7 +83,7 @@ thumb H{
     dup direction>> swap find-slider slide-by-page ;
 
 : elevator-click ( elevator -- )
-    dup compute-direction over (>>direction)
+    dup compute-direction >>direction
     elevator-hold ;
 
 elevator H{
@@ -123,13 +123,13 @@ M: elevator layout*
 : <slide-button> ( vector polygon amount -- button )
     >r gray swap <polygon-gadget> r>
     [ swap find-slider slide-by-line ] curry <repeat-button>
-    [ (>>orientation) ] keep ;
+    swap >>orientation ;
 
 : elevator, ( gadget orientation -- gadget )
-  tuck <elevator> >>elevator
-  swap <thumb>    >>thumb
-  dup elevator>> over thumb>> add-gadget
-  @center grid-add ;
+    tuck <elevator> >>elevator
+    swap <thumb>    >>thumb
+    dup elevator>> over thumb>> add-gadget
+    @center grid-add ;
 
 : <left-button>  ( -- button ) { 0 1 } arrow-left -1 <slide-button> ;
 : <right-button> ( -- button ) { 0 1 } arrow-right 1 <slide-button> ;
@@ -143,16 +143,16 @@ M: elevator layout*
         32 >>line ;
 
 : <x-slider> ( range -- slider )
-  { 1 0 } <slider>
-    <left-button> @left grid-add
-    { 0 1 } elevator,
-    <right-button> @right grid-add ;
+    { 1 0 } <slider>
+        <left-button> @left grid-add
+        { 0 1 } elevator,
+        <right-button> @right grid-add ;
 
 : <y-slider> ( range -- slider )
-  { 0 1 } <slider>
-    <up-button> @top grid-add
-    { 1 0 } elevator,
-    <down-button> @bottom grid-add ;
+    { 0 1 } <slider>
+        <up-button> @top grid-add
+        { 1 0 } elevator,
+        <down-button> @bottom grid-add ;
 
 M: slider pref-dim*
     dup call-next-method

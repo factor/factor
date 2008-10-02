@@ -149,7 +149,7 @@ can-administer-users? define-capability
 
 : <user-admin> ( -- responder )
     user-admin new-dispatcher
-        <user-list-action> "list" add-main-responder
+        <user-list-action> "" add-responder
         <new-user-action> "new" add-responder
         <edit-user-action> "edit" add-responder
         <delete-user-action> "delete" add-responder

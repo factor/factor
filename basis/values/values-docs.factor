@@ -7,6 +7,7 @@ ARTICLE: "values" "Global values"
 "To get the value, just call the word. The following words manipulate values:"
 { $subsection get-value }
 { $subsection set-value }
+{ $subsection POSTPONE: to: }
 { $subsection change-value } ;
 
 HELP: VALUE:
@@ -20,8 +21,19 @@ HELP: get-value
 
 HELP: set-value
 { $values { "value" "a new value" } { "word" "a value word" } }
-{ $description "Sets the value word." } ;
+{ $description "Sets a value word." } ;
+
+HELP: to:
+{ $syntax "... to: value" }
+{ $values { "word" "a value word" } }
+{ $description "Sets a value word." }
+{ $notes
+    "Note that"
+    { $code "foo to: value" }
+    "is just sugar for"
+    { $code "foo \\ value set-value" }
+} ;
 
 HELP: change-value
-{ $values { "word" "a value word" } { "quot" "a quotation ( oldvalue -- newvalue )" } }
+{ $values { "word" "a value word" } { "quot" "a quotation with stack effect " { $snippet "( oldvalue -- newvalue )" } } }
 { $description "Changes the value using the given quotation." } ;

@@ -4,7 +4,7 @@ USING: accessors qualified io.streams.c init fry namespaces make
 assocs kernel parser lexer strings.parser tools.deploy.config
 vocabs sequences words words.private memory kernel.private
 continuations io prettyprint vocabs.loader debugger system
-strings sets vectors quotations byte-arrays ;
+strings sets vectors quotations byte-arrays sorting ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes
 QUALIFIED: command-line
@@ -29,6 +29,7 @@ IN: tools.deploy.shaker
     "cpu.x86" init-hooks get delete-at
     "command-line" init-hooks get delete-at
     "libc" init-hooks get delete-at
+    "system" init-hooks get delete-at
     deploy-threads? get [
         "threads" init-hooks get delete-at
     ] unless
@@ -36,7 +37,12 @@ IN: tools.deploy.shaker
         "io.thread" init-hooks get delete-at
     ] unless
     strip-io? [
+        "io.files" init-hooks get delete-at
         "io.backend" init-hooks get delete-at
+    ] when
+    strip-dictionary? [
+        "compiler.units" init-hooks get delete-at
+        "tools.vocabs" init-hooks get delete-at
     ] when ;
 
 : strip-debugger ( -- )
@@ -74,30 +80,50 @@ IN: tools.deploy.shaker
 : strip-word-props ( stripped-props words -- )
     "Stripping word properties" show
     [
-        [
-            props>> swap
-            '[ drop _ member? not ] assoc-filter sift-assoc
-            dup assoc-empty? [ drop f ] [ >alist >vector ] if
-        ] keep (>>props)
-    ] with each ;
+        swap '[
+            [
+                [ drop _ member? not ] assoc-filter sift-assoc
+                >alist f like
+            ] change-props drop
+        ] each
+    ] [
+        "Remaining word properties:" print
+        [ props>> keys ] gather .
+    ] [
+        H{ } clone '[
+            [ [ _ [ ] cache ] map ] change-props drop
+        ] each
+    ] tri ;
 
 : stripped-word-props ( -- seq )
     [
+        strip-dictionary? deploy-compiler? get and [
+            {
+                "combination"
+                "members"
+                "methods"
+            } %
+        ] when
+
         strip-dictionary? [
             {
+                "alias"
+                "boa-check"
                 "cannot-infer"
                 "coercer"
-                "combination"
                 "compiled-effect"
                 "compiled-generic-uses"
                 "compiled-uses"
                 "constraints"
+                "custom-inlining"
                 "declared-effect"
                 "default"
                 "default-method"
                 "default-output-classes"
                 "derived-from"
                 "engines"
+                "forgotten"
+                "identities"
                 "if-intrinsics"
                 "infer"
                 "inferred-effect"
@@ -114,11 +140,11 @@ IN: tools.deploy.shaker
                 "local-writer?"
                 "local?"
                 "macro"
-                "members"
                 "memo-quot"
+                "mixin"
                 "method-class"
                 "method-generic"
-                "methods"
+                "modular-arithmetic"
                 "no-compile"
                 "optimizer-hooks"
                 "outputs"
@@ -126,9 +152,12 @@ IN: tools.deploy.shaker
                 "predicate"
                 "predicate-definition"
                 "predicating"
+                "primitive"
                 "reader"
                 "reading"
                 "recursive"
+                "register"
+                "register-size"
                 "shuffle"
                 "slot-names"
                 "slots"
@@ -210,9 +239,12 @@ IN: tools.deploy.shaker
             "alarms"
             "tools"
             "io.launcher"
+            "random"
         } strip-vocab-globals %
 
         strip-dictionary? [
+            "libraries" "alien" lookup ,
+
             { } { "cpu" } strip-vocab-globals %
 
             {
@@ -230,6 +262,7 @@ IN: tools.deploy.shaker
                 compiled-generic-crossref
                 compiler.units:recompile-hook
                 compiler.units:update-tuples-hook
+                compiler.units:definition-observers
                 definitions:crossref
                 interactive-vocabs
                 layouts:num-tags
@@ -244,9 +277,12 @@ IN: tools.deploy.shaker
                 vocabs:dictionary
                 vocabs:load-vocab-hook
                 word
+                parser-notes
             } %
 
             { } { "math.partial-dispatch" } strip-vocab-globals %
+            
+            "peg-cache" "peg" lookup ,
         ] when
 
         strip-prettyprint? [
@@ -273,7 +309,7 @@ IN: tools.deploy.shaker
             "ui-error-hook" "ui.gadgets.worlds" lookup ,
         ] when
 
-        "<computer>" "inference.dataflow" lookup [ , ] when*
+        "<value>" "stack-checker.state" lookup [ , ] when*
 
         "windows-messages" "windows.messages" lookup [ , ] when*
 

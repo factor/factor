@@ -51,7 +51,7 @@ SYMBOL: stamp
     with-directory ;
 
 : git-id ( -- id )
-    { "git" "show" } utf8 <process-reader> [ readln ] with-input-stream
+    { "git" "show" } utf8 [ readln ] with-process-reader
     " " split second ;
 
 : ?prepare-build-machine ( -- )

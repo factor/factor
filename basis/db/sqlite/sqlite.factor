@@ -5,7 +5,8 @@ io.files kernel math math.parser namespaces prettyprint
 sequences strings classes.tuple alien.c-types continuations
 db.sqlite.lib db.sqlite.ffi db.tuples words db.types combinators
 math.intervals io nmake accessors vectors math.ranges random
-math.bitwise db.queries destructors ;
+math.bitwise db.queries destructors db.tuples.private interpolate
+io.streams.string multiline make ;
 IN: db.sqlite
 
 TUPLE: sqlite-db < db path ;
@@ -88,7 +89,7 @@ M: sqlite-statement bind-tuple ( tuple statement -- )
     db get handle>> sqlite3_last_insert_rowid
     dup zero? [ "last-id failed" throw ] when ;
 
-M: sqlite-db insert-tuple* ( tuple statement -- )
+M: sqlite-db insert-tuple-set-key ( tuple statement -- )
     execute-statement last-insert-id swap set-primary-key ;
 
 M: sqlite-result-set #columns ( result-set -- n )
@@ -114,13 +115,21 @@ M: sqlite-statement query-results ( query -- result-set )
 
 M: sqlite-db create-sql-statement ( class -- statement )
     [
+        dupd
         "create table " 0% 0%
         "(" 0% [ ", " 0% ] [
-            dup column-name>> 0%
+            dup "sql-spec" set
+            dup column-name>> [ "table-id" set ] [ 0% ] bi
             " " 0%
             dup type>> lookup-create-type 0%
             modifiers 0%
-        ] interleave ");" 0%
+        ] interleave
+
+        ", " 0%
+        find-primary-key
+        "primary key(" 0%
+        [ "," 0% ] [ column-name>> 0% ] interleave
+        "));" 0%
     ] query-make ;
 
 M: sqlite-db drop-sql-statement ( class -- statement )
@@ -161,23 +170,31 @@ M: sqlite-db bind% ( spec -- )
 
 M: sqlite-db persistent-table ( -- assoc )
     H{
-        { +db-assigned-id+ { "integer primary key" "integer primary key" "primary key" } }
-        { +user-assigned-id+ { f f "primary key" } }
-        { +random-id+ { "integer primary key" "integer primary key" "primary key" } }
-        { INTEGER { "integer" "integer" "primary key" } }
-        { BIG-INTEGER { "bigint" "bigint" } }
-        { SIGNED-BIG-INTEGER { "bigint" "bigint" } }
-        { UNSIGNED-BIG-INTEGER { "bigint" "bigint" } }
-        { TEXT { "text" "text" } }
-        { VARCHAR { "text" "text" } }
-        { DATE { "date" "date" } }
-        { TIME { "time" "time" } }
-        { DATETIME { "datetime" "datetime" } }
-        { TIMESTAMP { "timestamp" "timestamp" } }
-        { DOUBLE { "real" "real" } }
-        { BLOB { "blob" "blob" } }
-        { FACTOR-BLOB { "blob" "blob" } }
-        { URL { "text" "text" } }
+        { +db-assigned-id+ { "integer" "integer" f } }
+        { +user-assigned-id+ { f f f } }
+        { +random-id+ { "integer" "integer" f } }
+        { +foreign-id+ { "integer" "integer" "references" } }
+
+        { +on-delete+ { f f "on delete" } }
+        { +restrict+ { f f "restrict" } }
+        { +cascade+ { f f "cascade" } }
+        { +set-null+ { f f "set null" } }
+        { +set-default+ { f f "set default" } }
+
+        { INTEGER { "integer" "integer" f } }
+        { BIG-INTEGER { "bigint" "bigint" f } }
+        { SIGNED-BIG-INTEGER { "bigint" "bigint" f } }
+        { UNSIGNED-BIG-INTEGER { "bigint" "bigint" f } }
+        { TEXT { "text" "text" f } }
+        { VARCHAR { "text" "text" f } }
+        { DATE { "date" "date" f } }
+        { TIME { "time" "time" f } }
+        { DATETIME { "datetime" "datetime" f } }
+        { TIMESTAMP { "timestamp" "timestamp" f } }
+        { DOUBLE { "real" "real" f } }
+        { BLOB { "blob" "blob" f } }
+        { FACTOR-BLOB { "blob" "blob" f } }
+        { URL { "text" "text" f } }
         { +autoincrement+ { f f "autoincrement" } }
         { +unique+ { f f "unique" } }
         { +default+ { f f "default" } }
@@ -188,8 +205,110 @@ M: sqlite-db persistent-table ( -- assoc )
         { random-generator { f f f } }
     } ;
 
-M: sqlite-db compound ( str seq -- str' )
+: insert-trigger ( -- string )
+    [
+    <"
+        CREATE TRIGGER fki_${table}_${foreign-table}_id
+        BEFORE INSERT ON ${table}
+        FOR EACH ROW BEGIN
+            SELECT RAISE(ROLLBACK, 'insert on table "${table}" violates foreign key constraint "fk_${foreign-table}_id"')
+            WHERE  (SELECT ${foreign-table-id} FROM ${foreign-table} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
+        END;
+    "> interpolate
+    ] with-string-writer ;
+
+: insert-trigger-not-null ( -- string )
+    [
+    <"
+        CREATE TRIGGER fki_${table}_${foreign-table}_id
+        BEFORE INSERT ON ${table}
+        FOR EACH ROW BEGIN
+            SELECT RAISE(ROLLBACK, 'insert on table "${table}" violates foreign key constraint "fk_${foreign-table}_id"')
+            WHERE NEW.${foreign-table-id} IS NOT NULL
+                AND (SELECT ${foreign-table-id} FROM ${foreign-table} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
+        END;
+    "> interpolate
+    ] with-string-writer ;
+
+: update-trigger ( -- string )
+    [
+    <"
+        CREATE TRIGGER fku_${table}_${foreign-table}_id
+        BEFORE UPDATE ON ${table}
+        FOR EACH ROW BEGIN
+            SELECT RAISE(ROLLBACK, 'update on table "${table}" violates foreign key constraint "fk_${foreign-table}_id"')
+            WHERE  (SELECT ${foreign-table-id} FROM ${foreign-table} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
+        END;
+    "> interpolate
+    ] with-string-writer ;
+
+: update-trigger-not-null ( -- string )
+    [
+    <"
+        CREATE TRIGGER fku_${table}_${foreign-table}_id
+        BEFORE UPDATE ON ${table}
+        FOR EACH ROW BEGIN
+            SELECT RAISE(ROLLBACK, 'update on table "${table}" violates foreign key constraint "fk_${foreign-table}_id"')
+            WHERE NEW.${foreign-table-id} IS NOT NULL
+                AND (SELECT ${foreign-table-id} FROM ${foreign-table} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
+        END;
+    "> interpolate
+    ] with-string-writer ;
+
+: delete-trigger-restrict ( -- string )
+    [
+    <"
+        CREATE TRIGGER fkd_${table}_${foreign-table}_id
+        BEFORE DELETE ON ${foreign-table}
+        FOR EACH ROW BEGIN
+            SELECT RAISE(ROLLBACK, 'delete on table "${foreign-table}" violates foreign key constraint "fk_${foreign-table}_id"')
+            WHERE  (SELECT ${foreign-table-id} FROM ${foreign-table} WHERE ${foreign-table-id} = OLD.${foreign-table-id}) IS NOT NULL;
+        END;
+    "> interpolate
+    ] with-string-writer ;
+
+: delete-trigger-cascade ( -- string )
+    [
+    <"
+        CREATE TRIGGER fkd_${table}_${foreign-table}_id
+        BEFORE DELETE ON ${foreign-table}
+        FOR EACH ROW BEGIN
+            DELETE from ${table} WHERE ${table-id} = OLD.${foreign-table-id};
+        END;
+    "> interpolate
+    ] with-string-writer ;
+
+: can-be-null? ( -- ? )
+    "sql-spec" get modifiers>> [ +not-null+ = ] contains? not ;
+
+: delete-cascade? ( -- ? )
+    "sql-spec" get modifiers>> { +on-delete+ +cascade+ } swap subseq? ;
+
+: sqlite-trigger, ( string -- )
+    { } { } <simple-statement> 3, ;
+
+: create-sqlite-triggers ( -- )
+    can-be-null? [
+        insert-trigger sqlite-trigger,
+        update-trigger sqlite-trigger,
+    ] [ 
+        insert-trigger-not-null sqlite-trigger,
+        update-trigger-not-null sqlite-trigger,
+    ] if
+    delete-cascade? [
+        delete-trigger-cascade sqlite-trigger,
+    ] [
+        delete-trigger-restrict sqlite-trigger,
+    ] if ;
+
+M: sqlite-db compound ( string seq -- new-string )
     over {
         { "default" [ first number>string join-space ] }
-        [ 2drop ] 
+        { "references" [
+            [ >reference-string ] keep
+            first2 [ "foreign-table" set ]
+            [ "foreign-table-id" set ] bi*
+            create-sqlite-triggers
+        ] }
+        [ 2drop ]
     } case ;

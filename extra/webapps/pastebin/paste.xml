@@ -20,7 +20,7 @@
 
 	<t:bind-each t:name="annotations">
 
-		<a name="@id"><h2>Annotation: <t:label t:name="summary" /></h2></a>
+		<h2><a name="@id">Annotation: <t:label t:name="summary" /></a></h2>
 
 		<table>
 			<tr><th class="field-label">Author: </th><td><t:label t:name="author" /></td></tr>
@@ -52,7 +52,7 @@
 				</tr>
 			</table>
 
-			<input type="SUBMIT" value="Done" />
+			<p> <button>Done</button> </p>
 
 		</t:form>
 

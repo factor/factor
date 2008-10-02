@@ -3,7 +3,7 @@
 USING: calendar io io.files kernel math math.order
 math.parser namespaces parser sequences strings
 assocs hashtables debugger mime-types sorting logging
-calendar.format accessors
+calendar.format accessors splitting
 io.encodings.binary fry xml.entities destructors urls
 html.elements html.templates.fhtml
 http
@@ -12,12 +12,15 @@ http.server.responses
 http.server.redirection ;
 IN: http.server.static
 
-! special maps mime types to quots with effect ( path -- )
 TUPLE: file-responder root hook special allow-listings ;
 
+: modified-since ( request -- date )
+    "if-modified-since" header ";" split1 drop
+    dup [ rfc822>timestamp ] when ;
+
 : modified-since? ( filename -- ? )
-    request get "if-modified-since" header dup [
-        [ file-info modified>> ] [ rfc822>timestamp ] bi* after?
+    request get modified-since dup [
+        [ file-info modified>> ] dip after?
     ] [
         2drop t
     ] if ;
@@ -61,7 +64,7 @@ TUPLE: file-responder root hook special allow-listings ;
     dup <a =href a> escape-string write </a> ;
 
 : directory. ( path -- )
-    dup file-name [
+    dup file-name [ ] [
         [ <h1> file-name escape-string write </h1> ]
         [
             <ul>

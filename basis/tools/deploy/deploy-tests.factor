@@ -43,6 +43,11 @@ namespaces continuations layouts accessors ;
 
 [ t ] [ 2500000 small-enough? ] unit-test
 
+: run-temp-image ( -- )
+    vm
+    "-i=" "test.image" temp-file append
+    2array try-process ;
+
 {
     "tools.deploy.test.1"
     "tools.deploy.test.2"
@@ -51,9 +56,7 @@ namespaces continuations layouts accessors ;
 } [
     [ ] swap [
         shake-and-bake
-        vm
-        "-i=" "test.image" temp-file append
-        2array try-process
+        run-temp-image
     ] curry unit-test
 ] each
 
@@ -88,9 +91,12 @@ M: quit-responder call-responder*
 
 [ ] [
     "tools.deploy.test.5" shake-and-bake
-    vm
-    "-i=" "test.image" temp-file append
-    2array try-process
+    run-temp-image
 ] unit-test
 
 [ ] [ "http://localhost:1237/quit" http-get 2drop ] unit-test
+
+[ ] [
+    "tools.deploy.test.6" shake-and-bake
+    run-temp-image
+] unit-test

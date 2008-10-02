@@ -9,23 +9,23 @@ IN: ui.gadgets.tracks
 TUPLE: track < pack sizes ;
 
 : normalized-sizes ( track -- seq )
-  sizes>> dup sift sum '[ dup [ _ / ] when ] map ;
+    sizes>> dup sift sum '[ dup [ _ / ] when ] map ;
 
 : init-track ( track -- track )
-  init-gadget
-  V{ } clone >>sizes
-  1          >>fill ;
+    init-gadget
+    V{ } clone >>sizes
+    1 >>fill ;
 
 : new-track ( orientation class -- track )
-  new
-    init-track
-    swap >>orientation ;
+    new
+        init-track
+        swap >>orientation ;
 
 : <track> ( orientation -- track ) track new-track ;
 
 : alloted-dim ( track -- dim )
-  [ children>> ] [ sizes>> ] bi { 0 0 }
-  [ [ drop { 0 0 } ] [ pref-dim ] if v+ ] 2reduce ;
+    [ children>> ] [ sizes>> ] bi { 0 0 }
+    [ [ drop { 0 0 } ] [ pref-dim ] if v+ ] 2reduce ;
 
 : available-dim ( track -- dim ) [ dim>> ] [ alloted-dim ] bi v- ;
 
@@ -38,29 +38,26 @@ M: track layout* ( track -- ) dup track-layout pack-layout ;
 : track-pref-dims-1 ( track -- dim ) children>> pref-dims max-dim ;
 
 : track-pref-dims-2 ( track -- dim )
-  [ children>> pref-dims ] [ normalized-sizes ] bi
-  [ [ v/n ] when* ] 2map
-  max-dim
-  [ >fixnum ] map ;
+    [ children>> pref-dims ] [ normalized-sizes ] bi
+    [ [ v/n ] when* ] 2map
+    max-dim
+    [ >fixnum ] map ;
 
 M: track pref-dim* ( gadget -- dim )
-   [ track-pref-dims-1                           ]
-   [ [ alloted-dim ] [ track-pref-dims-2 ] bi v+ ]
-   [ orientation>>                               ]
-   tri
-   set-axis ;
+    [ track-pref-dims-1 ]
+    [ [ alloted-dim ] [ track-pref-dims-2 ] bi v+ ]
+    [ orientation>> ]
+    tri
+    set-axis ;
 
 : track-add ( track gadget constraint -- track )
-  pick sizes>> push add-gadget ;
+    pick sizes>> push add-gadget ;
 
 : track-remove ( track gadget -- track )
-  dupd dup
-    [
-      [ swap children>> index ]
-      [ unparent sizes>>      ] 2bi
-      delete-nth 
-    ]
-    [ 2drop ]
-  if ;
+    dupd dup [
+        [ swap children>> index ]
+        [ unparent sizes>> ] 2bi
+        delete-nth 
+    ] [ 2drop ] if ;
 
 : clear-track ( track -- ) V{ } clone >>sizes clear-gadget ;

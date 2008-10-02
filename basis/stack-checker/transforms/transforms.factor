@@ -96,7 +96,7 @@ IN: stack-checker.transforms
 \ boa [
     dup tuple-class? [
         dup inlined-dependency depends-on
-        [ "boa-check" word-prop ]
+        [ "boa-check" word-prop [ ] or ]
         [ tuple-layout '[ _ <tuple-boa> ] ]
         bi append
     ] [ drop f ] if

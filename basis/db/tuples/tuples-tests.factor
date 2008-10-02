@@ -4,8 +4,19 @@ USING: io.files kernel tools.test db db.tuples classes
 db.types continuations namespaces math math.ranges
 prettyprint calendar sequences db.sqlite math.intervals
 db.postgresql accessors random math.bitwise
-math.ranges strings urls fry ;
+math.ranges strings urls fry db.tuples.private ;
 IN: db.tuples.tests
+
+: test-sqlite ( quot -- )
+    [ ] swap '[
+        "tuples-test.db" temp-file sqlite-db _ with-db
+    ] unit-test ;
+
+: test-postgresql ( quot -- )
+    [ ] swap '[
+        { "localhost" "postgres" "foob" "factor-test" }
+        postgresql-db _ with-db
+    ] unit-test ;
 
 TUPLE: person the-id the-name the-number the-real
 ts date time blob factor-blob url ;
@@ -165,46 +176,124 @@ SYMBOL: person4
         T{ timestamp f 0 0 0 12 34 56 T{ duration f 0 0 0 0 0 0 } }
         f H{ { 1 2 } { 3 4 } { 5 "lol" } } URL" http://www.google.com/search?hl=en&q=trailer+park+boys&btnG=Google+Search" <user-assigned-person> person4 set ;
 
+
 TUPLE: paste n summary author channel mode contents timestamp annotations ;
 TUPLE: annotation n paste-id summary author mode contents ;
 
-: db-assigned-paste-schema ( -- )
-    paste "PASTE"
-    {
-        { "n" "ID" +db-assigned-id+ }
-        { "summary" "SUMMARY" TEXT }
-        { "author" "AUTHOR" TEXT }
-        { "channel" "CHANNEL" TEXT }
-        { "mode" "MODE" TEXT }
-        { "contents" "CONTENTS" TEXT }
-        { "date" "DATE" TIMESTAMP }
-        { "annotations" { +has-many+ annotation } }
-    } define-persistent
+paste "PASTE"
+{
+    { "n" "ID" +db-assigned-id+ }
+    { "summary" "SUMMARY" TEXT }
+    { "author" "AUTHOR" TEXT }
+    { "channel" "CHANNEL" TEXT }
+    { "mode" "MODE" TEXT }
+    { "contents" "CONTENTS" TEXT }
+    { "timestamp" "DATE" TIMESTAMP }
+    { "annotations" { +has-many+ annotation } }
+} define-persistent
 
+: annotation-schema-foreign-key ( -- )
     annotation "ANNOTATION"
     {
         { "n" "ID" +db-assigned-id+ }
-        { "paste-id" "PASTE_ID" INTEGER { +foreign-id+ paste "n" } }
+        { "paste-id" "PASTE_ID" INTEGER { +foreign-id+ paste "ID" } }
         { "summary" "SUMMARY" TEXT }
         { "author" "AUTHOR" TEXT }
         { "mode" "MODE" TEXT }
         { "contents" "CONTENTS" TEXT }
     } define-persistent ;
 
-! { "localhost" "postgres" "" "factor-test" } postgresql-db [
-    ! [ paste drop-table ] [ drop ] recover
-    ! [ annotation drop-table ] [ drop ] recover
-    ! [ paste drop-table ] [ drop ] recover
-    ! [ annotation drop-table ] [ drop ] recover
-    ! [ ] [ paste create-table ] unit-test
-    ! [ ] [ annotation create-table ] unit-test
-! ] with-db
+: annotation-schema-foreign-key-not-null ( -- )
+    annotation "ANNOTATION"
+    {
+        { "n" "ID" +db-assigned-id+ }
+        { "paste-id" "PASTE_ID" INTEGER { +foreign-id+ paste "ID" } +not-null+ }
+        { "summary" "SUMMARY" TEXT }
+        { "author" "AUTHOR" TEXT }
+        { "mode" "MODE" TEXT }
+        { "contents" "CONTENTS" TEXT }
+    } define-persistent ;
 
-: test-sqlite ( quot -- )
-    [ ] swap '[ "tuples-test.db" temp-file sqlite-db _ with-db ] unit-test ;
+: annotation-schema-cascade ( -- )
+    annotation "ANNOTATION"
+    {
+        { "n" "ID" +db-assigned-id+ }
+        { "paste-id" "PASTE_ID" INTEGER { +foreign-id+ paste "ID" }
+            +on-delete+ +cascade+ }
+        { "summary" "SUMMARY" TEXT }
+        { "author" "AUTHOR" TEXT }
+        { "mode" "MODE" TEXT }
+        { "contents" "CONTENTS" TEXT }
+    } define-persistent ;
 
-: test-postgresql ( quot -- )
-    [ ] swap '[ { "localhost" "postgres" "foob" "factor-test" } postgresql-db _ with-db ] unit-test ;
+: annotation-schema-restrict ( -- )
+    annotation "ANNOTATION"
+    {
+        { "n" "ID" +db-assigned-id+ }
+        { "paste-id" "PASTE_ID" INTEGER { +foreign-id+ paste "ID" } }
+        { "summary" "SUMMARY" TEXT }
+        { "author" "AUTHOR" TEXT }
+        { "mode" "MODE" TEXT }
+        { "contents" "CONTENTS" TEXT }
+    } define-persistent ;
+
+: test-paste-schema ( -- )
+    [ ] [ paste ensure-table ] unit-test
+    [ ] [ annotation ensure-table ] unit-test
+    [ ] [ annotation drop-table ] unit-test
+    [ ] [ paste drop-table ] unit-test
+    [ ] [ paste create-table ] unit-test
+    [ ] [ annotation create-table ] unit-test
+
+    [ ] [
+        paste new
+            "summary1" >>summary
+            "erg" >>author
+            "#lol" >>channel
+            "contents1" >>contents
+            now >>timestamp
+        insert-tuple
+    ] unit-test
+
+    [ ] [
+        annotation new
+            1 >>paste-id
+            "annotation1" >>summary
+            "erg" >>author
+            "annotation contents" >>contents
+        insert-tuple
+    ] unit-test ;
+
+: test-foreign-key ( -- )
+    [ ] [ annotation-schema-foreign-key ] unit-test
+    test-paste-schema
+    [ paste new 1 >>n delete-tuples ] must-fail ;
+
+: test-foreign-key-not-null ( -- )
+    [ ] [ annotation-schema-foreign-key-not-null ] unit-test
+    test-paste-schema
+    [ paste new 1 >>n delete-tuples ] must-fail ;
+
+: test-cascade ( -- )
+    [ ] [ annotation-schema-cascade ] unit-test
+    test-paste-schema
+    [ ] [ paste new 1 >>n delete-tuples ] unit-test
+    [ 0 ] [ paste new select-tuples length ] unit-test ;
+
+: test-restrict ( -- )
+    [ ] [ annotation-schema-restrict ] unit-test
+    test-paste-schema
+    [ paste new 1 >>n delete-tuples ] must-fail ;
+
+[ test-foreign-key ] test-sqlite
+[ test-foreign-key-not-null ] test-sqlite
+[ test-cascade ] test-sqlite
+[ test-restrict ] test-sqlite
+
+[ test-foreign-key ] test-postgresql
+[ test-foreign-key-not-null ] test-postgresql
+[ test-cascade ] test-postgresql
+[ test-restrict ] test-postgresql
 
 : test-repeated-insert
     [ ] [ person ensure-table ] unit-test
@@ -236,6 +325,17 @@ TUPLE: exam id name score ;
     exam boa ;
 
 : test-intervals ( -- )
+    [
+        exam "EXAM"
+        {
+            { "idd" "ID" +db-assigned-id+ }
+            { "named" "NAME" TEXT }
+            { "score" "SCORE" INTEGER }
+        } define-persistent
+    ] [
+        seq>> { "idd" "named" } =
+    ] must-fail-with
+
     exam "EXAM"
     {
         { "id" "ID" +db-assigned-id+ }
@@ -249,6 +349,16 @@ TUPLE: exam id name score ;
     [ ] [ T{ exam f f "Stan" 80 } insert-tuple ] unit-test
     [ ] [ T{ exam f f "Kenny" 60 } insert-tuple ] unit-test
     [ ] [ T{ exam f f "Cartman" 41 } insert-tuple ] unit-test
+
+    [ 4 ]
+    [ T{ exam { name IGNORE } { score IGNORE } } select-tuples length ] unit-test
+
+    [ f ]
+    [ T{ exam { name IGNORE } { score IGNORE } } select-tuples first score>> ] unit-test
+
+    ! FIXME
+    ! [ f ]
+    ! [ T{ exam { name IGNORE } { score IGNORE } { id IGNORE } } select-tuples first score>> ] unit-test
 
     [
         {
@@ -346,7 +456,7 @@ TUPLE: exam id name score ;
         T{ exam } select-tuples
     ] unit-test
 
-    [ 4 ] [ T{ exam } f count-tuples ] unit-test ;
+    [ 4 ] [ T{ exam } count-tuples ] unit-test ;
 
 TUPLE: bignum-test id m n o ;
 : <bignum-test> ( m n o -- obj )
@@ -499,3 +609,42 @@ string-encoding-test "STRING_ENCODING_TEST" {
 \ ensure-table must-infer
 \ create-table must-infer
 \ drop-table must-infer
+
+: test-queries ( -- )
+    [ ] [ exam ensure-table ] unit-test
+    [ ] [ 1000 [ random-exam insert-tuple ] times ] unit-test
+    [ 5 ] [
+        <query>
+        T{ exam { score T{ interval { from { 0 t } } { to { 100 t } } } } }
+            >>tuple
+        5 >>limit select-tuples length
+    ] unit-test ;
+
+TUPLE: compound-foo a b c ;
+
+compound-foo "COMPOUND_FOO" 
+{
+    { "a" "A" INTEGER +user-assigned-id+ }
+    { "b" "B" INTEGER +user-assigned-id+ }
+    { "c" "C" INTEGER }
+} define-persistent
+
+: test-compound-primary-key ( -- )
+    [ ] [ compound-foo ensure-table ] unit-test
+    [ ] [ compound-foo drop-table ] unit-test
+    [ ] [ compound-foo create-table ] unit-test
+    [ ] [ 1 2 3 compound-foo boa insert-tuple ] unit-test
+    [ 1 2 3 compound-foo boa insert-tuple ] must-fail
+    [ ] [ 2 3 4 compound-foo boa insert-tuple ] unit-test
+    [ T{ compound-foo { a 2 } { b 3 } { c 4 } } ]
+    [ compound-foo new 4 >>c select-tuple ] unit-test ;
+
+[ test-compound-primary-key ] test-sqlite
+[ test-compound-primary-key ] test-postgresql
+
+: sqlite-test-db ( -- )
+    "tuples-test.db" temp-file sqlite-db make-db db-open db set ;
+
+: postgresql-test-db ( -- )
+    { "localhost" "postgres" "foob" "factor-test" } postgresql-db
+    make-db db-open db set ;

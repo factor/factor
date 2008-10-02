@@ -1,4 +1,4 @@
-USING: generic kernel kernel.private math memory prettyprint
+USING: generic kernel kernel.private math memory prettyprint io
 sequences tools.test words namespaces layouts classes
 classes.builtin arrays quotations ;
 IN: memory.tests
@@ -19,6 +19,7 @@ TUPLE: testing x y z ;
 [ ] [
     num-types get [
         type>class [
+            dup . flush
             "predicate" word-prop instances [
                 class drop
             ] each

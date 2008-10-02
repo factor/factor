@@ -8,7 +8,7 @@ $nl
 $nl
 "Buffers are used to implement native I/O backends."
 $nl
-"Buffer words are found in the " { $vocab-link "buffers" } " vocabulary."
+"Buffer words are found in the " { $vocab-link "io.buffers" } " vocabulary."
 { $subsection buffer }
 { $subsection <buffer> }
 "Buffers must be manually deallocated by calling " { $link dispose } "."

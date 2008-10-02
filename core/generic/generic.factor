@@ -45,7 +45,9 @@ GENERIC: effective-method ( generic -- method )
 GENERIC: next-method-quot* ( class generic combination -- quot )
 
 : next-method-quot ( class generic -- quot )
-    dup "combination" word-prop next-method-quot* ;
+    next-method-quot-cache get [
+        dup "combination" word-prop next-method-quot*
+    ] 2cache ;
 
 : (call-next-method) ( class generic -- )
     next-method-quot call ;
@@ -99,10 +101,11 @@ M: method-body crossref?
     2bi ;
 
 : create-method ( class generic -- method )
-    2dup method dup [
-        2nip
-    ] [
-        drop [ <method> dup ] 2keep reveal-method
+    2dup method dup [ 2nip ] [
+        drop
+        [ <method> dup ] 2keep
+        reveal-method
+        reset-caches
     ] if ;
 
 PREDICATE: default-method < word "default" word-prop ;
@@ -149,8 +152,8 @@ M: method-body forget*
                 ] keep eq?
                 [
                     [ [ delete-at ] with-methods ]
-                    [ [ delete-at ] with-implementors ]
-                    2bi
+                    [ [ delete-at ] with-implementors ] 2bi
+                    reset-caches
                 ] [ 2drop ] if
             ] if
         ]

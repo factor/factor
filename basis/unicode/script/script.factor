@@ -32,7 +32,7 @@ SYMBOL: interned
 
 : process-script ( ranges -- )
     dup values prune >symbols interned [
-        expand-ranges \ script-table set-value
+        expand-ranges to: script-table
     ] with-variable ;
 
 : load-script ( -- )

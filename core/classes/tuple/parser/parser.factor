@@ -63,11 +63,14 @@ ERROR: invalid-slot-name name ;
 : parse-slot-value ( -- )
     scan scan-object 2array , scan "}" assert= ;
 
+ERROR: bad-literal-tuple ;
+
 : (parse-slot-values) ( -- )
     parse-slot-value
     scan {
         { "{" [ (parse-slot-values) ] }
         { "}" [ ] }
+        [ bad-literal-tuple ]
     } case ;
 
 : parse-slot-values ( -- )
@@ -86,4 +89,5 @@ ERROR: invalid-slot-name name ;
         { "f" [ \ } parse-until boa>tuple ] }
         { "{" [ parse-slot-values assoc>tuple ] }
         { "}" [ new ] }
+        [ bad-literal-tuple ]
     } case ;

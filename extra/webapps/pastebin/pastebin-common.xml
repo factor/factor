@@ -8,7 +8,7 @@
 
 	<div class="navbar">
 
-		  <t:a t:href="$pastebin/list">Pastes</t:a>
+		  <t:a t:href="$pastebin">Pastes</t:a>
 		| <t:a t:href="$pastebin/new-paste">New Paste</t:a>
 
 		<t:if t:code="furnace.auth:logged-in?">

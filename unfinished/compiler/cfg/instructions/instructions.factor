@@ -100,8 +100,8 @@ M: ##if-intrinsic defs-vregs intrinsic-defs-vregs ;
 M: ##if-intrinsic uses-vregs intrinsic-uses-vregs ;
 
 ! Instructions used by machine IR only.
-INSN: _prologue n ;
-INSN: _epilogue n ;
+INSN: _prologue ;
+INSN: _epilogue ;
 
 INSN: _label id ;
 
@@ -117,5 +117,8 @@ M: _cond-branch uses-vregs src>> >vreg 1array ;
 M: _if-intrinsic defs-vregs intrinsic-defs-vregs ;
 M: _if-intrinsic uses-vregs intrinsic-uses-vregs ;
 
-INSN: _spill src n ;
-INSN: _reload dst n ;
+INSN: _spill-integer src n ;
+INSN: _reload-integer dst n ;
+
+INSN: _spill-float src n ;
+INSN: _reload-float dst n ;

@@ -26,7 +26,6 @@ IN: bootstrap.image
         "x86.32"
         "x86.64"
         "linux-ppc" "macosx-ppc"
-        ! "arm"
     } ;
 
 <PRIVATE
@@ -412,14 +411,14 @@ M: quotation '
     all-words [ emit-word ] each ;
 
 : emit-global ( -- )
-    [
-        {
-            dictionary source-files builtins
-            update-map implementors-map class<=-cache
-            class-not-cache classes-intersect-cache class-and-cache
-            class-or-cache
-        } [ dup get swap bootstrap-word set ] each
-    ] H{ } make-assoc
+    {
+        dictionary source-files builtins
+        update-map implementors-map
+    } [ [ bootstrap-word ] [ get ] bi ] H{ } map>assoc
+    {
+        class<=-cache class-not-cache classes-intersect-cache
+        class-and-cache class-or-cache next-method-quot-cache
+    } [ H{ } clone ] H{ } map>assoc assoc-union
     bootstrap-global set
     bootstrap-global emit-userenv ;
 

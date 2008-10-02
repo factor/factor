@@ -31,7 +31,7 @@
 		</table>
 
 		<p>
-			<input type="submit" value="Set password" />
+			<button>Set password</button>
 			<t:validation-messages />
 		</p>
 

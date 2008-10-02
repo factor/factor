@@ -15,12 +15,12 @@
 
 			<tr>
 				<th class="field-label">Home page:</th>
-				<td><t:field t:name="www-url" /></td>
+				<td><t:field t:name="www-url" t:size="40" /></td>
 			</tr>
 
 			<tr>
 				<th class="field-label">Feed:</th>
-				<td><t:field t:name="feed-url" /></td>
+				<td><t:field t:name="feed-url" t:size="40" /></td>
 			</tr>
 
 		</table>

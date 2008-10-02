@@ -16,15 +16,15 @@ M: book model-changed ( model book -- )
     relayout ;
 
 : new-book ( pages model class -- book )
-  new-gadget
-    swap >>model
-    swap add-gadgets ; inline
+    new-gadget
+        swap >>model
+        swap add-gadgets ; inline
 
 : <book> ( pages model -- book ) book new-book ;
 
 M: book pref-dim* ( book -- dim ) children>> pref-dims max-dim ;
 
 M: book layout* ( book -- )
-   [ dim>> ] [ children>> ] bi [ (>>dim) ] with each ;
+    [ children>> ] [ dim>> ] bi [ >>dim drop ] curry each ;
 
 M: book focusable-child* ( book -- child/t ) current-page ;

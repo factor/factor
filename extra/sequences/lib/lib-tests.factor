@@ -60,3 +60,6 @@ IN: sequences.lib.tests
 [ 1 2 { 3 4 } [ + + drop ] 2 each-withn  ] must-infer
 { 13 } [ 1 2 { 3 4 } [ + + ] 2 each-withn + ] unit-test
 [ { 910 911 912 } ] [ 10 900 3 [ + + ] map-with2 ] unit-test
+
+[ { { 0 1 } { 1 2 } { 2 3 } } ] [ { 1 2 3 } enumerate ] unit-test
+
