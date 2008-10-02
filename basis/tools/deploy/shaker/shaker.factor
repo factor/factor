@@ -85,8 +85,8 @@ IN: tools.deploy.shaker
             ] change-props drop
         ] each
     ] [
-        "Remaining word properties:" print
-        [ props>> keys ] gather .
+        "Remaining word properties:\n" show
+        [ props>> keys ] gather unparse show
     ] [
         H{ } clone '[
             [ [ _ [ ] cache ] map ] change-props drop
@@ -360,15 +360,21 @@ SYMBOL: deploy-vocab
         init-hooks get values concat %
         ,
         strip-io? [ \ flush , ] unless
-    ] [ ] make "Boot quotation: " write dup . flush
+    ] [ ] make "Boot quotation: " show dup unparse show
     set-boot-quot ;
 
+: init-stripper ( -- )
+    t "quiet" set-global
+    f output-stream set-global ;
+
 : strip ( -- )
-    strip-c-io
+    init-stripper
     strip-libc
     strip-cocoa
     strip-debugger
     strip-init-hooks
+    strip-c-io
+    f 5 setenv ! we can't use the Factor debugger or Factor I/O anymore
     deploy-vocab get vocab-main set-boot-quot*
     stripped-word-props >r
     stripped-globals strip-globals
