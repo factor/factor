@@ -48,9 +48,9 @@ M: foo call-responder*
     <action>
         [ [ ] "text/plain" <content> exit-with ] >>display ;
 
-[ "auth-test.db" temp-file sqlite-db delete-file ] ignore-errors
+[ "auth-test.db" temp-file delete-file ] ignore-errors
 
-"auth-test.db" temp-file sqlite-db [
+"auth-test.db" temp-file <sqlite-db> [
 
     <request> init-request
     session ensure-table
