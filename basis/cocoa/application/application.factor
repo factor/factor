@@ -30,7 +30,7 @@ IN: cocoa.application
 FUNCTION: void NSBeep ( ) ;
 
 : with-cocoa ( quot -- )
-    [ NSApp drop call ] with-autorelease-pool ;
+    [ NSApp drop call ] with-autorelease-pool ; inline
 
 : next-event ( app -- event )
     0 f CFRunLoopDefaultMode 1

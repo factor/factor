@@ -16,9 +16,16 @@ HELP: SUPER->
 
 { send super-send POSTPONE: -> POSTPONE: SUPER-> } related-words
 
+HELP: IMPORT:
+{ $syntax "IMPORT: name" }
+{ $description "Makes an Objective C class available for use." } 
+{ $examples
+    { $code "IMPORT: QTMovie" "QTMovie \"My Movie.mov\" <NSString> f -> movieWithFile:error:" }
+} ;
+
 ARTICLE: "objc-calling" "Calling Objective C code"
 "Before an Objective C class can be used, it must be imported; by default, a small set of common classes are imported automatically, but additional classes can be imported as needed."
-{ $subsection import-objc-class }
+{ $subsection POSTPONE: IMPORT: }
 "Every imported Objective C class has as corresponding class word in the " { $vocab-link "cocoa.classes" } " vocabulary. Class words push the class object in the stack, allowing class methods to be invoked."
 $nl
 "Messages can be sent to classes and instances using a pair of parsing words:"
