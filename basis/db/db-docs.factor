@@ -218,7 +218,7 @@ ARTICLE: "db-protocol" "Low-level database protocol"
 { $subsection db-open }
 "Closing a database:"
 { $subsection db-close }
-"Creating tatements:"
+"Creating statements:"
 { $subsection <simple-statement> }
 { $subsection <prepared-statement> }
 "Using statements with the database:"
