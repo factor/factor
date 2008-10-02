@@ -7,7 +7,7 @@ destructors mirrors sets db.types ;
 IN: db.tuples
 
 <PRIVATE
-! returns a sequence of prepared-statements
+
 HOOK: create-sql-statement db ( class -- object )
 HOOK: drop-sql-statement db ( class -- object )
 
@@ -65,6 +65,7 @@ GENERIC: eval-generator ( singleton -- object )
 
 : do-count ( exemplar-tuple statement -- tuples )
     [ [ bind-tuple ] [ nip default-query ] 2bi ] with-disposal ;
+
 PRIVATE>
 
 
