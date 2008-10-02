@@ -112,13 +112,13 @@ HELP: in-transaction?
 HELP: query-each
 { $values
      { "statement" statement } { "quot" quotation } }
-{ $description "A combinator that calls a quotation on a sequence of SQL statments to their results query results." } ;
+{ $description "A combinator that calls a quotation on a sequence of SQL statements to their results query results." } ;
 
 HELP: query-map
 { $values
      { "statement" statement } { "quot" quotation }
      { "seq" sequence } }
-{ $description "A combinator that maps a sequence of SQL statments to their results query results." } ;
+{ $description "A combinator that maps a sequence of SQL statements to their results query results." } ;
 
 HELP: rollback-transaction
 { $description "Rolls back a transaction; no data is committed to the database. User code should make use of the " { $link with-transaction } " combinator." } ;
@@ -218,14 +218,19 @@ ARTICLE: "db-protocol" "Low-level database protocol"
 { $subsection db-open }
 "Closing a database:"
 { $subsection db-close }
-
+"Creating tatements:"
+{ $subsection <simple-statement> }
+{ $subsection <prepared-statement> }
+"Using statements with the database:"
+{ $subsection prepare-statement }
+{ $subsection bind-statement* }
+{ $subsection low-level-bind }
 "Performing a query:"
 { $subsection query-results }
-
 "Handling query results:"
 { $subsection "db-result-sets" }
-
- ;
+;
+! { $subsection bind-tuple }
 
 ARTICLE: "db-lowlevel-tutorial" "Low-level database tutorial"
 "Although Factor makes integrating a database with its object system easy (see " { $vocab-link "db.tuples" } "), sometimes you may want to write SQL directly and get the results back as arrays of strings, for instance, when interfacing with a legacy database that doesn't easily map to " { $snippet "tuples" } "."
@@ -243,13 +248,16 @@ ARTICLE: "db-custom-database-combinators" "Custom database combinators"
 { $code <"
 USING: db.sqlite db io.files ;
 : with-sqlite-db ( quot -- )
-    "my-database.db" temp-file sqlite-db rot with-db ;"> } 
+    "my-database.db" temp-file <sqlite-db> rot with-db ;"> } 
 
-{ $code <"
-USING: db.postgresql db ;
+{ $code <" USING: db.postgresql db ;
 : with-postgresql-db ( quot -- )
-    { "localhost" "db-username" "db-password" "db-name" }
-    postgresql-db rot with-db ;">
+    <postgresql-db>
+        "localhost" >>host
+        "erg" >>username
+        "secrets?" >>password
+        "factor-test" >>database
+    swap with-db ;">
 }
 
 ;
