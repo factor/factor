@@ -182,9 +182,11 @@ http.server.dispatchers db.tuples ;
         [ stop-this-server "Goodbye" "text/html" <content> ] >>display
     "quit" add-responder ;
 
-: test-db "test.db" temp-file <sqlite-db> ;
+: test-db-file "test.db" temp-file ;
 
-[ test-db drop delete-file ] ignore-errors
+: test-db test-db-file <sqlite-db> ;
+
+[ test-db-file delete-file ] ignore-errors
 
 test-db [
     init-furnace-tables
