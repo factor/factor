@@ -21,8 +21,7 @@ M: assoc-heap heap-push* ( value key assoc-heap -- entry )
     ] if ;
 
 M: assoc-heap heap-pop ( assoc-heap -- value key )
-    [ heap>> heap-pop ] keep
-    [ over ] dip assoc>> delete-at ;
+    heap>> heap-pop ;
 
 M: assoc-heap heap-peek ( assoc-heap -- value key )
     heap>> heap-peek ;
