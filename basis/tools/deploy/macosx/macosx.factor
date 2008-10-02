@@ -4,7 +4,7 @@ USING: io io.files kernel namespaces make sequences
 system tools.deploy.backend tools.deploy.config assocs
 hashtables prettyprint io.unix.backend cocoa io.encodings.utf8
 io.backend cocoa.application cocoa.classes cocoa.plists
-qualified ;
+qualified combinators ;
 IN: tools.deploy.macosx
 
 : bundle-dir ( -- dir )
@@ -30,12 +30,26 @@ IN: tools.deploy.macosx
     "Contents/Info.plist" append-path
     write-plist ;
 
+: copy-dll ( bundle-name -- )
+    "Frameworks/libfactor.dylib" copy-bundle-dir ;
+
+: copy-freetype ( bundle-name -- )
+    deploy-ui? get [ "Frameworks" copy-bundle-dir ] [ drop ] if ;
+
+: copy-nib ( bundle-name -- )
+    deploy-ui? get [
+        "Resources/English.lproj/MiniFactor.nib" copy-bundle-dir
+    ] [ drop ] if ;
+
 : create-app-dir ( vocab bundle-name -- vm )
     [
-        nip
-        [ "Frameworks" copy-bundle-dir ]
-        [ "Resources/English.lproj/MiniFactor.nib" copy-bundle-dir ]
-        [ "Contents/Resources/" copy-fonts ] tri
+        nip {
+            [ copy-dll ]
+            [ copy-freetype ]
+            [ copy-nib ]
+            [ "Contents/Resources/" copy-fonts ]
+            [ "Contents/Resources" append-path make-directories ]
+        } cleave
     ]
     [ create-app-plist ]
     [ "Contents/MacOS/" append-path "" copy-vm ] 2tri ;
