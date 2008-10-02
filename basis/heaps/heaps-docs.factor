@@ -29,10 +29,8 @@ $nl
 { $subsection heap-pop* }
 { $subsection heap-pop }
 { $subsection heap-delete }
-$nl
 "Processing heaps:"
-{ $subsection slurp-heap }
-{ $subsection slurp-heap-when } ;
+{ $subsection slurp-heap } ;
 
 ABOUT: "heaps"
 
