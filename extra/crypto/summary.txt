@@ -1,1 +1,1 @@
-Cryptographic algorithms implemented in Factor, such as MD5 and SHA1
+HMAC, XOR, Barrett, RSA, Timing
