@@ -19,7 +19,7 @@ SYMBOL: lost-password-from
         [ username>> "username" set-query-param ]
         [ ticket>> "ticket" set-query-param ]
         bi
-    adjust-url relative-to-request ;
+    adjust-url ;
 
 : password-email ( user -- email )
     <email>

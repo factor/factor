@@ -3,36 +3,10 @@
 USING: arrays assocs classes db kernel namespaces
 classes.tuple words sequences slots math accessors
 math.parser io prettyprint db.types continuations
-destructors mirrors ;
+destructors mirrors sets db.types ;
 IN: db.tuples
 
-: define-persistent ( class table columns -- )
-    >r dupd "db-table" set-word-prop dup r>
-    [ relation? ] partition swapd
-    dupd [ spec>tuple ] with map
-    "db-columns" set-word-prop
-    "db-relations" set-word-prop ;
-
-ERROR: not-persistent class ;
-
-: db-table ( class -- object )
-    dup "db-table" word-prop [ ] [ not-persistent ] ?if ;
-
-: db-columns ( class -- object )
-    superclasses [ "db-columns" word-prop ] map concat ;
-
-: db-relations ( class -- object )
-    "db-relations" word-prop ;
-
-: set-primary-key ( key tuple -- )
-    [
-        class db-columns find-primary-key slot-name>>
-    ] keep set-slot-named ;
-
-SYMBOL: sql-counter
-: next-sql-counter ( -- str )
-    sql-counter [ inc ] [ get ] bi number>string ;
-
+<PRIVATE
 ! returns a sequence of prepared-statements
 HOOK: create-sql-statement db ( class -- object )
 HOOK: drop-sql-statement db ( class -- object )
@@ -42,19 +16,20 @@ HOOK: <insert-user-assigned-statement> db ( class -- object )
 HOOK: <update-tuple-statement> db ( class -- object )
 HOOK: <delete-tuples-statement> db ( tuple class -- object )
 HOOK: <select-by-slots-statement> db ( tuple class -- tuple )
-TUPLE: query group order offset limit ;
-HOOK: <query> db ( tuple class query -- statement' )
-HOOK: <count-statement> db ( tuple class groups -- n )
+HOOK: <count-statement> db ( query -- statement )
+HOOK: query>statement db ( query -- statement )
 
-HOOK: insert-tuple* db ( tuple statement -- )
+HOOK: insert-tuple-set-key db ( tuple statement -- )
+
+SYMBOL: sql-counter
+: next-sql-counter ( -- str )
+    sql-counter [ inc ] [ get ] bi number>string ;
 
 GENERIC: eval-generator ( singleton -- object )
 
 : resulting-tuple ( exemplar-tuple row out-params -- tuple )
     rot class new [
-        [
-            [ slot-name>> ] dip set-slot-named
-        ] curry 2each
+        [ [ slot-name>> ] dip set-slot-named ] curry 2each
     ] keep ;
 
 : query-tuples ( exemplar-tuple statement -- seq )
@@ -75,6 +50,51 @@ GENERIC: eval-generator ( singleton -- object )
         with-disposal
     ] if ; inline
 
+: insert-db-assigned-statement ( tuple -- )
+    dup class
+    db get insert-statements>> [ <insert-db-assigned-statement> ] cache
+    [ bind-tuple ] 2keep insert-tuple-set-key ;
+
+: insert-user-assigned-statement ( tuple -- )
+    dup class
+    db get insert-statements>> [ <insert-user-assigned-statement> ] cache
+    [ bind-tuple ] keep execute-statement ;
+
+: do-select ( exemplar-tuple statement -- tuples )
+    [ [ bind-tuple ] [ query-tuples ] 2bi ] with-disposal ;
+
+: do-count ( exemplar-tuple statement -- tuples )
+    [ [ bind-tuple ] [ nip default-query ] 2bi ] with-disposal ;
+PRIVATE>
+
+
+! High level
+ERROR: no-slots-named class seq ;
+: check-columns ( class columns -- )
+    tuck
+    [ [ first ] map ]
+    [ all-slots [ name>> ] map ] bi* diff
+    [ drop ] [ no-slots-named ] if-empty ;
+
+: define-persistent ( class table columns -- )
+    pick dupd
+    check-columns
+    [ dupd "db-table" set-word-prop dup ] dip
+    [ relation? ] partition swapd
+    dupd [ spec>tuple ] with map
+    "db-columns" set-word-prop
+    "db-relations" set-word-prop ;
+
+TUPLE: query tuple group order offset limit ;
+
+: <query> ( -- query ) \ query new ;
+
+GENERIC: >query ( object -- query )
+
+M: query >query clone ;
+
+M: tuple >query <query> swap >>tuple ;
+
 : create-table ( class -- )
     create-sql-statement [ execute-statement ] with-disposals ;
 
@@ -87,21 +107,9 @@ GENERIC: eval-generator ( singleton -- object )
         ] curry ignore-errors
     ] [ create-table ] bi ;
 
-: ensure-table ( class -- )
-    [ create-table ] curry ignore-errors ;
+: ensure-table ( class -- ) [ create-table ] curry ignore-errors ;
 
-: ensure-tables ( classes -- )
-    [ ensure-table ] each ;
-
-: insert-db-assigned-statement ( tuple -- )
-    dup class
-    db get insert-statements>> [ <insert-db-assigned-statement> ] cache
-    [ bind-tuple ] 2keep insert-tuple* ;
-
-: insert-user-assigned-statement ( tuple -- )
-    dup class
-    db get insert-statements>> [ <insert-user-assigned-statement> ] cache
-    [ bind-tuple ] keep execute-statement ;
+: ensure-tables ( classes -- ) [ ensure-table ] each ;
 
 : insert-tuple ( tuple -- )
     dup class db-columns find-primary-key db-assigned-id-spec?
@@ -117,25 +125,14 @@ GENERIC: eval-generator ( singleton -- object )
         [ bind-tuple ] keep execute-statement
     ] with-disposal ;
 
-: do-select ( exemplar-tuple statement -- tuples )
-    [ [ bind-tuple ] [ query-tuples ] 2bi ] with-disposal ;
+: select-tuples ( query/tuple -- tuples )
+    >query [ tuple>> ] [ query>statement ] bi do-select ;
 
-: query ( tuple query -- tuples )
-    [ dup dup class ] dip <query> do-select ;
-
-: select-tuples ( tuple -- tuples )
-    dup dup class <select-by-slots-statement> do-select ;
-
-: select-tuple ( tuple -- tuple/f )
-    dup dup class \ query new 1 >>limit <query> do-select
+: select-tuple ( query/tuple -- tuple/f )
+    >query 1 >>limit [ tuple>> ] [ query>statement ] bi do-select
     [ f ] [ first ] if-empty ;
 
-: do-count ( exemplar-tuple statement -- tuples )
-    [
-        [ bind-tuple ] [ nip default-query ] 2bi
-    ] with-disposal ;
-
-: count-tuples ( tuple groups -- n )
-    >r dup dup class r> <count-statement> do-count
+: count-tuples ( query/tuple -- n )
+    >query [ tuple>> ] [ <count-statement> ] bi do-count
     dup length 1 =
     [ first first string>number ] [ [ first string>number ] map ] if ;

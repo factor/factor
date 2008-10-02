@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel assocs namespaces accessors db db.tuples urls
 http.server.dispatchers
-furnace.conversations
+furnace.asides
 furnace.actions
 furnace.auth
 furnace.auth.providers ;

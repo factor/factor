@@ -22,6 +22,9 @@ M: tuple error-help class ;
 
 M: string error. print ;
 
+: :error ( -- )
+    error get error. ;
+
 : :s ( -- )
     error-continuation get data>> stack. ;
 
@@ -323,3 +326,5 @@ M: bad-effect summary
     drop "Bad stack effect declaration" ;
 
 M: bad-escape summary drop "Bad escape code" ;
+
+M: bad-literal-tuple summary drop "Bad literal tuple" ;

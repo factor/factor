@@ -3,7 +3,7 @@
 USING: accessors assocs namespaces kernel sequences sets
 destructors combinators fry logging
 io.encodings.utf8 io.encodings.string io.binary random
-checksums checksums.sha2
+checksums checksums.sha2 urls
 html.forms
 http.server
 http.server.filters
@@ -59,6 +59,10 @@ V{ } clone capabilities set-global
 TUPLE: realm < dispatcher name users checksum secure ;
 
 GENERIC: login-required* ( description capabilities realm -- response )
+
+GENERIC: user-registered ( user realm -- response )
+
+M: object user-registered 2drop URL" $realm" <redirect> ;
 
 GENERIC: init-realm ( realm -- )
 

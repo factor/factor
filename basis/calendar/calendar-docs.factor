@@ -21,8 +21,8 @@ HELP: <date>
 { $description "Returns a timestamp object representing the start of the specified day in your current timezone." }
 { $examples
     { $example "USING: calendar prettyprint ;"
-               "2010 12 25 <date> ."
-               "T{ timestamp\n    { year 2010 }\n    { month 12 }\n    { day 25 }\n    { gmt-offset T{ duration { hour -5 } } }\n}"
+               "2010 12 25 <date> >gmt midnight ."
+               "T{ timestamp { year 2010 } { month 12 } { day 25 } }"
     }
 } ;
 

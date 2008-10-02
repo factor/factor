@@ -8,7 +8,7 @@ IN: syndication.tests
 : load-news-file ( filename -- feed )
     #! Load an news syndication file and process it, returning
     #! it as an feed tuple.
-    utf8 file-contents read-feed ;
+    utf8 file-contents string>feed ;
 
 [ T{
     feed

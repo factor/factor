@@ -1,17 +1,18 @@
 ! Copyright (C) 2006, 2008 Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel continuations sequences math namespaces make sets
-math.parser math.ranges assocs regexp unicode.categories arrays
-hashtables words classes quotations xmode.catalog ;
+math.parser math.ranges assocs parser-combinators.regexp
+unicode.categories arrays hashtables words classes quotations
+xmode.catalog ;
 IN: validators
 
-: v-default ( str def -- str )
+: v-default ( str def -- str/def )
     over empty? spin ? ;
 
 : v-required ( str -- str )
     dup empty? [ "required" throw ] when ;
 
-: v-optional ( str quot -- str )
+: v-optional ( str quot -- result )
     over empty? [ 2drop f ] [ call ] if ; inline
 
 : v-min-length ( str n -- str )
@@ -90,7 +91,7 @@ IN: validators
         "not a valid syntax mode" throw 
     ] unless ;
 
-: luhn? ( n -- ? )
+: luhn? ( str -- ? )
     string>digits <reversed>
     [ odd? [ 2 * 10 /mod + ] when ] map-index
     sum 10 mod 0 = ;

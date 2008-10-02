@@ -11,18 +11,13 @@ furnace.sessions
 furnace.redirection ;
 IN: furnace.conversations
 
-TUPLE: conversation < scope
-session
-method url post-data ;
+TUPLE: conversation < scope session ;
 
-: <conversation> ( id -- aside )
+: <conversation> ( id -- conversation )
     conversation new-server-state ;
 
 conversation "CONVERSATIONS" {
     { "session" "SESSION" BIG-INTEGER +not-null+ }
-    { "method" "METHOD" { VARCHAR 10 } }
-    { "url" "URL" URL }
-    { "post-data" "POST_DATA" FACTOR-BLOB }
 } define-persistent
 
 : conversation-id-key "__c" ;
@@ -46,8 +41,7 @@ SYMBOL: conversation-id
     conversation get scope-change ; inline
 
 : get-conversation ( id -- conversation )
-    dup [ conversation get-state ] when
-    dup [ dup session>> session get id>> = [ drop f ] unless ] when ;
+    dup [ conversation get-state ] when check-session ;
 
 : request-conversation-id ( request -- id )
     conversation-id-key swap request-params at string>number ;
@@ -88,22 +82,21 @@ M: conversations call-responder*
 : add-conversation ( conversation -- )
     [ touch-conversation ] [ insert-tuple ] bi ;
 
-: begin-conversation* ( -- conversation )
-    empty-conversastion dup add-conversation ;
-
 : begin-conversation ( -- )
     conversation get [
-        begin-conversation*
-        set-conversation
+        empty-conversastion
+        [ add-conversation ]
+        [ set-conversation ] bi
     ] unless ;
 
 : end-conversation ( -- )
     conversation off
     conversation-id off ;
 
-: <conversation-redirect> ( url seq -- response )
-    begin-conversation
-    [ [ get ] keep cset ] each
+: <continue-conversation> ( url -- response )
+    conversation-id get
+    conversation-id-key
+    set-query-param
     <redirect> ;
 
 : restore-conversation ( seq -- )
@@ -113,64 +106,6 @@ M: conversations call-responder*
         [ '[ [ _ at ] keep set ] each ]
         bi
     ] [ 2drop ] if ;
-
-: begin-aside ( -- )
-    begin-conversation
-    conversation get
-        request get
-        [ method>> >>method ]
-        [ url>> >>url ]
-        [ post-data>> >>post-data ]
-        tri
-    touch-conversation ;
-
-: end-aside-post ( aside -- response )
-    request [
-        clone
-            over post-data>> >>post-data
-            over url>> >>url
-    ] change
-    [ url>> url set ]
-    [ url>> path>> split-path ] bi
-    conversations get responder>> call-responder ;
-
-\ end-aside-post DEBUG add-input-logging
-
-ERROR: end-aside-in-get-error ;
-
-: move-on ( id -- response )
-    post-request? [ end-aside-in-get-error ] unless
-    dup method>> {
-        { "GET" [ url>> <redirect> ] }
-        { "HEAD" [ url>> <redirect> ] }
-        { "POST" [ end-aside-post ] }
-    } case ;
-
-: get-aside ( id -- conversation )
-    get-conversation dup [ dup method>> [ drop f ] unless ] when ;
-
-: end-aside* ( url id -- response )
-    get-aside [ move-on ] [ <redirect> ] ?if ;
-
-: end-aside ( default -- response )
-    conversation-id get
-    end-conversation
-    end-aside* ;
-
-M: conversations link-attr ( tag -- )
-    drop
-    "aside" optional-attr {
-        { "none" [ conversation-id off ] }
-        { "begin" [ begin-aside ] }
-        { "current" [ ] }
-        { f [ ] }
-    } case ;
-
-M: conversations modify-query ( query conversations -- query' )
-    drop
-    conversation-id get [
-        conversation-id-key associate assoc-union
-    ] when* ;
 
 M: conversations modify-form ( conversations -- )
     drop

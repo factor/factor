@@ -123,7 +123,11 @@ PRIVATE>
 : callstack. ( callstack -- )
     callstack>array 2 <groups> [
         remove-breakpoints
-        3 nesting-limit [ . ] with-variable
+        [
+            3 nesting-limit set
+            100 length-limit set
+            .
+        ] with-scope
     ] assoc-each ;
 
 : .c ( -- ) callstack callstack. ;
@@ -225,14 +229,15 @@ M: word declarations.
 
 : pprint-; ( -- ) \ ; pprint-word ;
 
-: (see) ( spec -- )
-    <colon dup synopsis*
-    <block dup definition pprint-elements block>
-    dup definer nip [ pprint-word ] when* declarations.
-    block> ;
-
 M: object see
-    [ (see) ] with-use nl ;
+    [
+        12 nesting-limit set
+        100 length-limit set
+        <colon dup synopsis*
+        <block dup definition pprint-elements block>
+        dup definer nip [ pprint-word ] when* declarations.
+        block>
+    ] with-use nl ;
 
 GENERIC: see-class* ( word -- )
 
@@ -320,10 +325,8 @@ M: word see
     dup class? over symbol? not and [
         nl
     ] when
-    dup class? over symbol? and not [
-        [ dup (see) ] with-use nl
-    ] when
-    drop ;
+    dup [ class? ] [ symbol? ] bi and
+    [ drop ] [ call-next-method ] if ;
 
 : see-all ( seq -- )
     natural-sort [ nl ] [ see ] interleave ;

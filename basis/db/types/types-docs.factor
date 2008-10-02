@@ -1,13 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: classes hashtables help.markup help.syntax io.streams.string kernel sequences strings ;
+USING: classes hashtables help.markup help.syntax io.streams.string
+kernel sequences strings math ;
 IN: db.types
-
-HELP: (lookup-type)
-{ $values
-     { "obj" object }
-     { "string" string } }
-{ $description "" } ;
 
 HELP: +autoincrement+
 { $description "" } ;
@@ -55,7 +50,7 @@ HELP: <low-level-binding>
 { $description "" } ;
 
 HELP: BIG-INTEGER
-{ $description "A 64-bit integer." } ;
+{ $description "A 64-bit integer. Whether this number is signed or unsigned depends on the database backend." } ;
 
 HELP: BLOB
 { $description "A serialized Factor object.  The database library automatically serializes the object for a SQL insert or update and deserializes it on a tuple query." } ;
@@ -73,13 +68,13 @@ HELP: DOUBLE
 { $description "Corresponds to Factor's 64bit floating-point numbers." } ;
 
 HELP: FACTOR-BLOB
-{ $description "" } ;
+{ $description "A serialized Factor object." } ;
 
 HELP: INTEGER
-{ $description "" } ;
+{ $description "A small integer, at least 32 bits in length. Whether this number is signed or unsigned depends on the database backend." } ;
 
 HELP: NULL
-{ $description "" } ;
+{ $description "The SQL null type." } ;
 
 HELP: REAL
 { $description "" } ;
@@ -94,22 +89,24 @@ HELP: TIME
 { $description "" } ;
 
 HELP: TIMESTAMP
-{ $description "" } ;
+{ $description "A Factor timestamp." } ;
 
 HELP: UNSIGNED-BIG-INTEGER
-{ $description "" } ;
+{ $description "For portability, if a number is known to be 64bit, then this datatype may be used.  Some databases, like SQLite, cannot store arbitrary bignums as BIGINT types.  If storing arbitrary bignums, use " { $link FACTOR-BLOB } "." } ;
+
+{ INTEGER SIGNED-BIG-INTEGER UNSIGNED-BIG-INTEGER } related-words
 
 HELP: URL
-{ $description "" } ;
+{ $description "A Factor " { $link "urls" } "  object." } ;
 
 HELP: VARCHAR
-{ $description "" } ;
+{ $description "The SQL varchar type.  This type can take an integer as an argument." } ;
 
-HELP: assigned-id-spec?
+HELP: user-assigned-id-spec?
 { $values
-     { "spec" null }
+     { "specs" "a sequence of sql specs" }
      { "?" "a boolean" } }
-{ $description "" } ;
+{ $description "Tests if any of the sql specs has the type " { $link +user-assigned-id+ } "." } ;
 
 HELP: bind#
 { $values
@@ -129,24 +126,25 @@ HELP: compound
 
 HELP: db-assigned-id-spec?
 { $values
-     { "spec" null }
+     { "specs" "a sequence of sql specs" }
      { "?" "a boolean" } }
-{ $description "" } ;
+{ $description "Tests if any of the sql specs has the type " { $link +db-assigned-id+ } "." } ;
 
 HELP: find-primary-key
 { $values
-     { "specs" null }
-     { "obj" object } }
-{ $description "" } ;
+     { "specs" "a sequence of sql-specs" }
+     { "seq" "a sequence of sql-specs" } }
+{ $description "Returns the rows from the sql-specs array that are part of the primary key. Composite primary keys are supported, so this word must return a sequence." }
+{ $notes "This is a low-level word." } ;
 
 HELP: generator-bind
 { $description "" } ;
 
 HELP: get-slot-named
 { $values
-     { "name" null } { "obj" object }
-     { "value" null } }
-{ $description "" } ;
+     { "name" "a slot name" } { "tuple" tuple }
+     { "value" "the value stored in the slot" } }
+{ $description "Returns the value stored in a tuple slot, where the tuple slot is a string." } ;
 
 HELP: join-space
 { $values
@@ -185,30 +183,20 @@ HELP: modifiers
 { $description "" } ;
 
 HELP: no-sql-type
-{ $description "" } ;
+{ $values
+     { "type" "a sql type" } }
+{ $description "Throws an error containing a sql type that is unsupported or the result of a typo." } ;
 
 HELP: normalize-spec
 { $values
      { "spec" null } }
 { $description "" } ;
 
-HELP: number>string*
-{ $values
-     { "n/string" null }
-     { "string" string } }
-{ $description "" } ;
-
 HELP: offset-of-slot
 { $values
-     { "string" string } { "obj" object }
-     { "n" null } }
-{ $description "" } ;
-
-HELP: paren
-{ $values
-     { "string" string }
-     { "new-string" null } }
-{ $description "" } ;
+     { "string" string } { "tuple" tuple }
+     { "n" integer } }
+{ $description "Returns the offset of a tuple slot accessed by name." } ;
 
 HELP: persistent-table
 { $values
@@ -264,7 +252,8 @@ HELP: sql-spec
 { $description "" } ;
 
 HELP: unknown-modifier
-{ $description "" } ;
+{ $values { "modifier" string } }
+{ $description "Throws an error containing an unknown sql modifier." } ;
 
 ARTICLE: "db.types" "Database types"
 "The " { $vocab-link "db.types" } " vocabulary maps Factor types to database types." $nl
@@ -294,7 +283,6 @@ ARTICLE: "db.types" "Database types"
 { $subsection BLOB }
 { $subsection FACTOR-BLOB }
 "Factor URLs:"
-{ $subsection URL }
-;
+{ $subsection URL } ;
 
 ABOUT: "db.types"

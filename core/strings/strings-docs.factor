@@ -23,7 +23,8 @@ $nl
 "Since strings are sequences, basic string manipulation can be performed using sequence operations (" { $link "sequences" } "). More advanced functionality can be found in other vocabularies, including but not limited to:"
 { $list
     { { $vocab-link "ascii" } " - traditional ASCII character classes" }
-    { { $vocab-link "unicode" } " - Unicode 5.0-aware character classes, case conversion, word breaks, ..." }
+    { { $vocab-link "unicode.categories" } " - Unicode character classes" }
+    { { $vocab-link "unicode.case" } " - Unicode case conversion" }
     { { $vocab-link "regexp" } " - regular expressions" }
     { { $vocab-link "peg" } " - parser expression grammars" }
 } ;

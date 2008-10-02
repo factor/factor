@@ -61,7 +61,7 @@ IN: ui.gadgets.scrollers.tests
 
 <gadget> { 600 400 } >>dim "g1" set
 <gadget> { 600 10 } >>dim "g2" set
-"g2" get "g1" get swap add-gadget drop
+"g1" get "g2" get add-gadget drop
 
 "g1" get <scroller>
 { 300 300 } >>dim

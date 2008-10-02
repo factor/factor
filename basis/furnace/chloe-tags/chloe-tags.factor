@@ -37,12 +37,12 @@ IN: furnace.chloe-tags
         <url>
             swap parse-query-attr >>query
             -rot a-url-path >>path
-        adjust-url relative-to-request
+        adjust-url
     ] if ;
 
 : compile-a-url ( tag -- )
     {
-        [ "href" required-attr compile-attr ]
+        [ "href" optional-attr compile-attr ]
         [ "rest" optional-attr compile-attr ]
         [ "query" optional-attr compile-attr ]
         [ "value" optional-attr compile-attr ]
@@ -59,8 +59,12 @@ CHLOE: write-atom drop [ write-atom-feeds ] [code] ;
     attrs>> '[ [ [ _ ] dip link-attr ] each-responder ] [code] ;
 
 : a-start-tag ( tag -- )
-    [ compile-link-attrs ] [ compile-a-url ] bi
-    [ <a =href a> ] [code] ;
+    [ <a ] [code]
+    [ non-chloe-attrs-only compile-attrs ]
+    [ compile-link-attrs ]
+    [ compile-a-url ]
+    tri
+    [ =href a> ] [code] ;
 
 : a-end-tag ( tag -- )
     drop [ </a> ] [code] ;
@@ -70,11 +74,16 @@ CHLOE: a
         [ a-start-tag ] [ compile-children ] [ a-end-tag ] tri
     ] compile-with-scope ;
 
+CHLOE: base
+    compile-a-url [ <base =href base/> ] [code] ;
+
 : compile-hidden-form-fields ( for -- )
     '[
-        _ [ "," split [ hidden render ] each ] when*
-        nested-forms get " " join f like nested-forms-key hidden-form-field
-        [ modify-form ] each-responder
+        <div "display: none;" =style div>
+            _ [ "," split [ hidden render ] each ] when*
+            nested-forms get " " join f like nested-forms-key hidden-form-field
+            [ modify-form ] each-responder
+        </div>
     ] [code] ;
 
 : compile-form-attrs ( method action attrs -- )
@@ -109,7 +118,7 @@ CHLOE: form
 
 STRING: button-tag-markup
 <t:form class="inline" xmlns:t="http://factorcode.org/chloe/1.0">
-    <button type="submit"></button>
+    <div style="display: inline;"><button type="submit"></button></div>
 </t:form>
 ;
 
@@ -120,7 +129,7 @@ CHLOE: button
     button-tag-markup string>xml body>>
     {
         [ [ attrs>> chloe-attrs-only ] dip add-tag-attrs ]
-        [ [ attrs>> non-chloe-attrs-only ] dip "button" tag-named add-tag-attrs ]
-        [ [ children>> ] dip "button" tag-named (>>children) ]
+        [ [ attrs>> non-chloe-attrs-only ] dip "button" deep-tag-named add-tag-attrs ]
+        [ [ children>> ] dip "button" deep-tag-named (>>children) ]
         [ nip ]
     } 2cleave compile-chloe-tag ;

@@ -10,17 +10,17 @@
 
 	<table width="100%">
 		<tr>
-			<t:if t:value="sidebar">
+			<t:if t:value="contents">
 				<td valign="top" style="width: 210px;">
-					<div class="sidebar">
-						<t:bind t:name="sidebar">
+					<div class="contents">
+						<t:bind t:name="contents">
 							<h2>
 								<t:a t:href="$wiki/view" t:query="title">
 									<t:label t:name="title" />
 								</t:a>
 							</h2>
 
-							<t:html t:name="html" />
+							<t:farkup t:name="parsed" t:parsed="true" />
 						</t:bind>
 					</div>
 				</td>
@@ -56,11 +56,9 @@
 
 		<t:if t:value="footer">
 			<tr>
-				<td colspan="2">
+				<td colspan="2" class="footer">
 					<t:bind t:name="footer">
-						<small>
-							<t:html t:name="html" />
-						</small>
+						<t:farkup t:name="parsed" t:parsed="true" />
 					</t:bind>
 				</td>
 			</tr>

@@ -57,8 +57,7 @@ BEGIN
       CALL square;
       x := x + 1;
    END
-END.
-"> main \ pl0 rule (parse) remaining>> empty?
+END."> main \ pl0 rule (parse) remaining>> empty?
 ] unit-test
 
 { f } [

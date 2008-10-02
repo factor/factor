@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Slava Pestov.
+! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces math words kernel assocs classes
 math.order kernel.private ;
@@ -25,7 +25,13 @@ SYMBOL: type-numbers
 : tag-fixnum ( n -- tagged )
     tag-bits get shift ;
 
+! We do this in its own compilation unit so that they can be
+! folded below
+<<
 : cell ( -- n ) 7 getenv ; foldable
+
+: (first-bignum) ( m -- n ) tag-bits get - 1 - 2^ ; foldable
+>>
 
 : cells ( m -- n ) cell * ; inline
 
@@ -37,23 +43,20 @@ SYMBOL: type-numbers
 
 : bootstrap-cell-bits 8 bootstrap-cells ; inline
 
-: (first-bignum) ( m -- n )
-    tag-bits get - 1 - 2^ ;
-
 : first-bignum ( -- n )
-    cell-bits (first-bignum) ;
+    cell-bits (first-bignum) ; inline
 
 : most-positive-fixnum ( -- n )
-    first-bignum 1- ;
+    first-bignum 1- ; inline
 
 : most-negative-fixnum ( -- n )
-    first-bignum neg ;
+    first-bignum neg ; inline
 
 : (max-array-capacity) ( b -- n )
-    5 - 2^ 1- ;
+    5 - 2^ 1- ; inline
 
 : max-array-capacity ( -- n )
-    cell-bits (max-array-capacity) ;
+    cell-bits (max-array-capacity) ; inline
 
 : bootstrap-first-bignum ( -- n )
     bootstrap-cell-bits (first-bignum) ;
@@ -74,3 +77,5 @@ M: bignum >integer
 M: real >integer
     dup most-negative-fixnum most-positive-fixnum between?
     [ >fixnum ] [ >bignum ] if ;
+
+UNION: immediate fixnum POSTPONE: f ;

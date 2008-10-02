@@ -17,16 +17,13 @@ TUPLE: boilerplate < filter-responder template init ;
         [ ] >>init ;
 
 : wrap-boilerplate? ( response -- ? )
-    {
-        [ code>> { [ 200 = ] [ 400 499 between? ] } 1|| ]
-        [ content-type>> "text/html" = ]
-    } 1&& ;
+    { [ code>> 200 = ] [ content-type>> "text/html" = ] } 1&& ;
 
 M:: boilerplate call-responder* ( path responder -- )
     begin-form
     path responder call-next-method
     responder init>> call
-    dup content-type>> "text/html" = [
+    dup wrap-boilerplate? [
         clone [| body |
             [
                 body

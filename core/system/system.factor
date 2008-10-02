@@ -55,14 +55,14 @@ UNION: unix bsd solaris linux ;
 
 PRIVATE>
 
+: image ( -- path ) \ image get-global ;
+
+: vm ( -- path ) \ vm get-global ;
+
 [
     8 getenv string>cpu \ cpu set-global
     9 getenv string>os \ os set-global
 ] "system" add-init-hook
-
-: image ( -- path ) 13 getenv ;
-
-: vm ( -- path ) 14 getenv ;
 
 : embedded? ( -- ? ) 15 getenv ;
 

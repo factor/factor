@@ -18,6 +18,6 @@
 			</tr>
 		</table>
 
-		<input type="SUBMIT" value="Submit" />
+		<p> <button>Submit</button> </p>
 	</t:form>
 </t:chloe>

@@ -96,9 +96,9 @@ M: editor ungraft*
 : click-loc ( editor model -- )
     >r clicked-loc r> set-model ;
 
-: focus-editor ( editor -- ) t over (>>focused?) relayout-1 ;
+: focus-editor ( editor -- ) t >>focused? relayout-1 ;
 
-: unfocus-editor ( editor -- ) f over (>>focused?) relayout-1 ;
+: unfocus-editor ( editor -- ) f >>focused? relayout-1 ;
 
 : (offset>x) ( font col# str -- x )
     swap head-slice string-width ;

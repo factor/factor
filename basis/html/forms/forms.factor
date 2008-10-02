@@ -102,5 +102,5 @@ C: <validation-error> validation-error
     dup validation-error? [ form get t >>validation-failed drop ] when
     swap set-value ;
 
-: validate-values ( assoc validators -- assoc' )
+: validate-values ( assoc validators -- )
     swap '[ [ dup _ at ] dip validate-value ] assoc-each ;

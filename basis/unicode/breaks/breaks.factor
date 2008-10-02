@@ -98,5 +98,4 @@ VALUE: grapheme-table
 
 init-grapheme-table table
 [ make-grapheme-table finish-table ] with-variable
-\ grapheme-table set-value
-
+to: grapheme-table

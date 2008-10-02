@@ -2,10 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: continuations destructors kernel math math.parser
 namespaces parser sequences strings prettyprint debugger
-quotations combinators logging calendar assocs
+quotations combinators logging calendar assocs present
 fry accessors arrays io io.sockets io.encodings.ascii
 io.sockets.secure io.files io.streams.duplex io.timeouts
-io.encodings threads concurrency.combinators
+io.encodings threads make concurrency.combinators
 concurrency.semaphores concurrency.flags
 combinators.short-circuit ;
 IN: io.servers.connection
@@ -56,11 +56,17 @@ GENERIC: handle-client* ( threaded-server -- )
     [ secure>> >secure ] [ insecure>> >insecure ] bi
     [ resolve-host ] bi@ append ;
 
-LOG: accepted-connection NOTICE
+: accepted-connection ( remote local -- )
+    [
+        [ "remote: " % present % ", " % ]
+        [ "local: " % present % ]
+        bi*
+    ] "" make
+    \ accepted-connection NOTICE log-message ;
 
 : log-connection ( remote local -- )
+    [ accepted-connection ]
     [ [ remote-address set ] [ local-address set ] bi* ]
-    [ 2array accepted-connection ]
     2bi ;
 
 M: threaded-server handle-client* handler>> call ;
@@ -71,6 +77,8 @@ M: threaded-server handle-client* handler>> call ;
         threaded-server get
         [ timeout>> timeouts ] [ handle-client* ] bi
     ] with-stream ;
+
+\ handle-client ERROR add-error-logging
 
 : thread-name ( server-name addrspec -- string )
     unparse-short " connection from " swap 3append ;
@@ -113,9 +121,9 @@ PRIVATE>
     dup secure-config>> [
         dup threaded-server [
             dup name>> [
-                listen-on [
-                    start-accept-loop
-                ] parallel-each
+                [ listen-on [ start-accept-loop ] parallel-each ]
+                [ ready>> raise-flag ]
+                bi
             ] with-logging
         ] with-variable
     ] with-secure-context ;

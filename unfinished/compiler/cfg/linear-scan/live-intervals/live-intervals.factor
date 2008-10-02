@@ -43,7 +43,6 @@ SYMBOL: live-intervals
 
 : compute-live-intervals ( instructions -- live-intervals )
     H{ } clone [
-        live-intervals [
-            [ compute-live-intervals* ] each-index
-        ] with-variable
+        live-intervals set
+        [ compute-live-intervals* ] each-index
     ] keep finalize-live-intervals ;

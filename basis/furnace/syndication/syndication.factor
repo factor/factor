@@ -32,7 +32,7 @@ M: object >entry
 : process-entries ( seq -- seq' )
     20 short head-slice [
         >entry clone
-        [ adjust-url relative-to-request ] change-url
+        [ adjust-url ] change-url
     ] map ;
 
 : <feed-content> ( body -- response )
@@ -46,7 +46,7 @@ TUPLE: feed-action < action title url entries ;
             feed new
                 _
                 [ title>> call >>title ]
-                [ url>> call adjust-url relative-to-request >>url ]
+                [ url>> call adjust-url >>url ]
                 [ entries>> call process-entries >>entries ]
                 tri
             <feed-content>

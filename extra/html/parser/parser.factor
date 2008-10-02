@@ -1,7 +1,8 @@
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays html.parser.utils hashtables io kernel
 namespaces make prettyprint quotations sequences splitting
-state-parser strings unicode.categories unicode.case
-sequences.lib ;
+state-parser strings unicode.categories unicode.case ;
 IN: html.parser
 
 TUPLE: tag name attributes text closing? ;

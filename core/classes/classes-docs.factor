@@ -28,12 +28,13 @@ $nl
 $nl
 "Classes themselves form a class:"
 { $subsection class? }
-"You can ask an object for its class or superclass:"
+"You can ask an object for its class:"
 { $subsection class }
-{ $subsection superclass }
-{ $subsection superclasses }
 "Testing if an object is an instance of a class:"
 { $subsection instance? }
+"You can ask a class for its superclass:"
+{ $subsection superclass }
+{ $subsection superclasses }
 "Class predicates can be used to test instances directly:"
 { $subsection "class-predicates" }
 "There is a universal class which all objects are an instance of, and an empty class with no instances:"

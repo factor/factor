@@ -7,7 +7,7 @@ stack-checker stack-checker.state stack-checker.inlining
 compiler.errors compiler.units compiler.tree.builder
 compiler.tree.optimizer compiler.cfg.builder
 compiler.cfg.linearization compiler.cfg.linear-scan
-compiler.codegen ;
+compiler.cfg.stack-frame compiler.codegen ;
 IN: compiler.new
 
 SYMBOL: compile-queue
@@ -79,7 +79,13 @@ SYMBOL: +failed+
     bi ;
 
 : backend ( nodes word -- )
-    build-cfg [ build-mr linear-scan generate save-asm ] each ;
+    build-cfg [
+        build-mr
+        linear-scan
+        build-stack-frame
+        generate
+        save-asm
+    ] each ;
 
 : (compile) ( word -- )
     '[

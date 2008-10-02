@@ -125,7 +125,8 @@ ERROR: bad-superclass class ;
     } cond ;
 
 : boa-check-quot ( class -- quot )
-    all-slots [ class>> instance-check-quot ] map spread>quot ;
+    all-slots [ class>> instance-check-quot ] map spread>quot
+    f like ;
 
 : define-boa-check ( class -- )
     dup boa-check-quot "boa-check" set-word-prop ;
@@ -311,7 +312,7 @@ M: tuple-class new
     [ (clone) ] [ tuple-layout <tuple> ] ?if ;
 
 M: tuple-class boa
-    [ "boa-check" word-prop call ]
+    [ "boa-check" word-prop [ call ] when* ]
     [ tuple-layout ]
     bi <tuple-boa> ;
 
