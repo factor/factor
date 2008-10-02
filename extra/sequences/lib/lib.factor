@@ -173,8 +173,3 @@ USE: random
 : enumerate ( seq -- seq' )
     <enum> >alist ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: switch ( x y seq -- )
-    3dup swap [ nth ] dip [ [ move ] keep ] 2dip rot set-nth ;
-

@@ -27,14 +27,3 @@ HELP: enumerate
 { $values { "seq" sequence } { "seq'" sequence } }
 { $description "Returns a new sequence where each element is an array of { index, value }" } ;
 
-HELP: switch
-{ $values { "x" number } { "y" number } { "seq" sequence } } 
-{ $description "Swaps the values between indices 'x' and 'y' in the sequence." }
-{ $examples
-  { $example 
-    "USING: sequences.lib ;"
-    "1 2 \"asdf\" [ switch ] keep"
-    "\"adsf\"" }
-} ;
-
-
