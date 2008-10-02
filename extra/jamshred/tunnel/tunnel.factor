@@ -21,7 +21,7 @@ C: <segment> segment
 : random-segment ( previous-segment -- segment )
     clone dup random-rotation-angle random-turn
     tunnel-segment-distance over go-forward
-    random-color over set-segment-color dup segment-number++ ;
+    random-color >>color dup segment-number++ ;
 
 : (random-segments) ( segments n -- segments )
     dup 0 > [
@@ -77,7 +77,7 @@ C: <segment> segment
 : nearest-segment ( segments oint start-segment -- segment )
     #! find the segment nearest to 'oint', and return it.
     #! start looking at segment 'start-segment'
-    segment-number over >r
+    number>> over >r
     [ nearest-segment-forward ] 3keep
     nearest-segment-backward r> nearer-segment ;
 

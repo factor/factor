@@ -1,9 +1,6 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors combinators jamshred.log jamshred.oint
-jamshred.sound jamshred.tunnel kernel locals math math.constants
-math.order math.ranges math.vectors math.matrices shuffle
-sequences system float-arrays ;
+USING: accessors colors combinators float-arrays jamshred.log jamshred.oint jamshred.sound jamshred.tunnel kernel locals math math.constants math.order math.ranges math.vectors math.matrices sequences shuffle system ;
 IN: jamshred.player
 
 TUPLE: player < oint name sounds tunnel nearest-segment last-move speed ;

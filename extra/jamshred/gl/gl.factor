@@ -1,9 +1,6 @@
-! Copyright (C) 2007 Alex Chapman
+! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types colors jamshred.game
-jamshred.oint jamshred.player jamshred.tunnel kernel math
-math.constants math.functions math.vectors opengl opengl.gl
-opengl.glu sequences float-arrays ;
+USING: accessors alien.c-types jamshred.game jamshred.oint jamshred.player jamshred.tunnel kernel math math.constants math.functions math.vectors opengl opengl.gl opengl.glu sequences float-arrays ;
 IN: jamshred.gl
 
 : min-vertices 6 ; inline
@@ -45,7 +42,7 @@ IN: jamshred.gl
     #! return a sequence of n numbers between 0 and 2pi
     dup [ / pi 2 * * ] curry map ;
 : draw-segment-vertex ( segment theta -- )
-    over segment-color gl-color segment-vertex-and-normal
+    over color>> gl-color segment-vertex-and-normal
     gl-normal gl-vertex ;
 
 : draw-vertex-pair ( theta next-segment segment -- )
@@ -61,8 +58,8 @@ IN: jamshred.gl
     1 over length pick subseq swap [ draw-segment ] 2each ;
 
 : segments-to-render ( player -- segments )
-    dup player-nearest-segment segment-number dup n-segments-behind -
-    swap n-segments-ahead + rot player-tunnel sub-tunnel ;
+    dup nearest-segment>> number>> dup n-segments-behind -
+    swap n-segments-ahead + rot tunnel>> sub-tunnel ;
 
 : draw-tunnel ( player -- )
     segments-to-render draw-segments ;

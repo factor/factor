@@ -1,4 +1,4 @@
-! Copyright (C) 2007 Alex Chapman
+! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays float-arrays kernel locals math math.constants math.functions math.matrices math.vectors math.quaternions random sequences ;
 IN: jamshred.oint

@@ -1,15 +1,12 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alarms arrays calendar jamshred.game jamshred.gl
-jamshred.player jamshred.log kernel math math.constants namespaces
-sequences threads ui ui.backend ui.gadgets ui.gadgets.worlds
-ui.gestures ui.render math.vectors math.geometry.rect ;
+USING: accessors arrays calendar jamshred.game jamshred.gl jamshred.player jamshred.log kernel math math.constants math.geometry.rect math.vectors namespaces sequences threads ui ui.backend ui.gadgets ui.gadgets.worlds ui.gestures ui.render ;
 IN: jamshred
 
-TUPLE: jamshred-gadget jamshred last-hand-loc alarm ;
+TUPLE: jamshred-gadget < gadget { jamshred jamshred } last-hand-loc ;
 
 : <jamshred-gadget> ( jamshred -- gadget )
-    jamshred-gadget construct-gadget swap >>jamshred ;
+    jamshred-gadget new-gadget swap >>jamshred ;
 
 : default-width ( -- x ) 800 ;
 : default-height ( -- y ) 600 ;
@@ -91,7 +88,7 @@ jamshred-gadget H{
     { T{ mouse-scroll } [ handle-mouse-scroll ] }
 } set-gestures
 
-: jamshred-window ( -- jamshred )
-    [ <jamshred> dup <jamshred-gadget> "Jamshred" open-window ] with-ui ;
+: jamshred-window ( -- gadget )
+    [ <jamshred> <jamshred-gadget> dup "Jamshred" open-window ] with-ui ;
 
 MAIN: jamshred-window
