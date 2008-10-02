@@ -356,9 +356,7 @@ TUPLE: exam id name score ;
     [ f ]
     [ T{ exam { name IGNORE } { score IGNORE } } select-tuples first score>> ] unit-test
 
-    ! FIXME
-    ! [ f ]
-    ! [ T{ exam { name IGNORE } { score IGNORE } { id IGNORE } } select-tuples first score>> ] unit-test
+    [ T{ exam { name IGNORE } { score IGNORE } { id IGNORE } } select-tuples first score>> ] [ class>> "EXAM" = ] must-fail-with
 
     [
         {
