@@ -65,7 +65,7 @@ links processing-time timestamp ;
     f pick spider get spidered>> set-at
     over '[ _ http-get ] benchmark swap
     [ parse-html dup find-hrefs normalize-hrefs ] benchmark
-    now spider-result boa
+    now spider-result boa ;
 
 : spider-page ( url depth -- )
     spider get quiet>> [ 2dup print-spidering ] unless

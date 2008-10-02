@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: help.markup help.syntax io.streams.string urls
-multiline ;
+multiline spider.private quotations ;
 IN: spider
 
 HELP: <spider>
@@ -15,12 +15,6 @@ HELP: run-spider
      { "spider" spider }
      { "spider" spider } }
 { $description "Runs a spider until completion. See the " { $subsection "spider-tutorial" } " for a complete description of the tuple slots that affect how thet spider works." } ;
-
-HELP: spider
-{ $description "" } ;
-
-HELP: spider-result
-{ $description "" } ;
 
 HELP: slurp-heap-when
 { $values
