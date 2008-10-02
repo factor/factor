@@ -1,7 +1,7 @@
 ! Copyright (C) 2007 Daniel Ehrenberg
 ! See http://factorcode.org/license.txt for BSD license.
-USING: xml kernel sequences xml.utilities combinators.lib
-math xml.data arrays assocs xml.generator xml.writer namespaces
+USING: xml kernel sequences xml.utilities math xml.data
+arrays assocs xml.generator xml.writer namespaces
 make math.parser io accessors ;
 IN: faq
 
