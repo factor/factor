@@ -1,19 +1,18 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors qualified io.streams.c init fry namespaces make
-assocs kernel parser lexer strings.parser tools.deploy.config
-vocabs sequences words words.private memory kernel.private
-continuations io prettyprint vocabs.loader debugger system
-strings sets vectors quotations byte-arrays sorting ;
+USING: accessors qualified io.backend io.streams.c init fry
+namespaces make assocs kernel parser lexer strings.parser
+tools.deploy.config vocabs sequences words words.private memory
+kernel.private continuations io prettyprint vocabs.loader
+debugger system strings sets vectors quotations byte-arrays
+sorting compiler.units definitions ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes
 QUALIFIED: command-line
 QUALIFIED: compiler.errors.private
-QUALIFIED: compiler.units
 QUALIFIED: continuations
 QUALIFIED: definitions
 QUALIFIED: init
-QUALIFIED: io.backend
 QUALIFIED: io.thread
 QUALIFIED: layouts
 QUALIFIED: listener
@@ -198,11 +197,6 @@ IN: tools.deploy.shaker
     strip-word-names? [ dup strip-word-names ] when
     2drop ;
 
-: strip-recompile-hook ( -- )
-    [ [ f ] { } map>assoc ]
-    compiler.units:recompile-hook
-    set-global ;
-
 : strip-vocab-globals ( except names -- words )
     [ child-vocabs [ words ] map concat ] map concat swap diff ;
 
@@ -233,7 +227,7 @@ IN: tools.deploy.shaker
             "initial-thread" "threads" lookup ,
         ] unless
 
-        strip-io? [ io.backend:io-backend , ] when
+        strip-io? [ io-backend , ] when
 
         { } {
             "alarms"
@@ -260,9 +254,9 @@ IN: tools.deploy.shaker
                 command-line:main-vocab-hook
                 compiled-crossref
                 compiled-generic-crossref
-                compiler.units:recompile-hook
-                compiler.units:update-tuples-hook
-                compiler.units:definition-observers
+                recompile-hook
+                update-tuples-hook
+                definition-observers
                 definitions:crossref
                 interactive-vocabs
                 layouts:num-tags
@@ -326,6 +320,14 @@ IN: tools.deploy.shaker
         21 setenv
     ] [ drop ] if ;
 
+: strip-c-io ( -- )
+    deploy-io get 2 = [
+        [
+            c-io-backend forget
+            "io.streams.c" forget-vocab
+        ] with-compilation-unit
+    ] unless ;
+
 : compress ( pred string -- )
     "Compressing " prepend show
     instances
@@ -362,10 +364,10 @@ SYMBOL: deploy-vocab
     set-boot-quot ;
 
 : strip ( -- )
+    strip-c-io
     strip-libc
     strip-cocoa
     strip-debugger
-    strip-recompile-hook
     strip-init-hooks
     deploy-vocab get vocab-main set-boot-quot*
     stripped-word-props >r
