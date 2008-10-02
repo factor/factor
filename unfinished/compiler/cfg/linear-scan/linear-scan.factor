@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors
+USING: kernel accessors namespaces
 compiler.backend
 compiler.cfg
 compiler.cfg.linear-scan.live-intervals
@@ -24,7 +24,10 @@ IN: compiler.cfg.linear-scan
 
 : linear-scan ( mr -- mr' )
     [
-        dup compute-live-intervals
-        machine-registers allocate-registers
-        assign-registers
-    ] change-instructions ;
+        [
+            dup compute-live-intervals
+            machine-registers allocate-registers
+            assign-registers
+        ] change-instructions
+        spill-counts get >>spill-counts
+    ] with-scope ;

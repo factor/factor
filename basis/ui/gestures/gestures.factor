@@ -249,12 +249,6 @@ SYMBOL: drag-timer
 : send-action ( world gesture -- )
     swap world-focus send-gesture drop ;
 
-: resend-button-down ( gesture world -- )
-    hand-loc get-global swap send-button-down ;
-
-: resend-button-up  ( gesture world -- )
-    hand-loc get-global swap send-button-up ;
-
 GENERIC: gesture>string ( gesture -- string/f )
 
 : modifiers>string ( modifiers -- string )

@@ -1,8 +1,9 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs io.files io.streams.duplex
-combinators arrays io.launcher io http.server.static http.server
-http accessors sequences strings math.parser fry urls ;
+combinators arrays io.launcher io.encodings.binary io
+http.server.static http.server http accessors sequences strings
+math.parser fry urls urls.encoding calendar ;
 IN: http.server.cgi
 
 : cgi-variables ( script-path -- assoc )
@@ -43,14 +44,15 @@ IN: http.server.cgi
 : <cgi-process> ( name -- desc )
     <process>
         over 1array >>command
-        swap cgi-variables >>environment ;
+        swap cgi-variables >>environment
+        1 minutes >>timeout ;
 
 : serve-cgi ( name -- response )
     <raw-response>
     200 >>code
     "CGI output follows" >>message
     swap '[
-        _ output-stream get swap <cgi-process> <process-stream> [
+        _ output-stream get swap <cgi-process> binary <process-stream> [
             post-request? [ request get post-data>> raw>> write flush ] when
             input-stream get swap (stream-copy)
         ] with-stream

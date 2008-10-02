@@ -18,12 +18,8 @@ IN: tools.deploy.backend
 : image-name ( vocab bundle-name -- str )
   prepend-path ".image" append ;
 
-: (copy-lines) ( stream -- )
-    dup stream-readln dup
-    [ print flush (copy-lines) ] [ 2drop ] if ;
-
-: copy-lines ( stream -- )
-    [ (copy-lines) ] with-disposal ;
+: copy-lines ( -- )
+    readln [ print flush copy-lines ] when* ;
 
 : run-with-output ( arguments -- )
     <process>
@@ -31,9 +27,7 @@ IN: tools.deploy.backend
         +stdout+ >>stderr
         +closed+ >>stdin
         +low-priority+ >>priority
-    utf8 <process-reader*>
-    copy-lines
-    wait-for-process zero? [ "Deployment failed" throw ] unless ;
+    utf8 [ copy-lines ] with-process-reader ;
 
 : make-boot-image ( -- )
     #! If stage1 image doesn't exist, create one.

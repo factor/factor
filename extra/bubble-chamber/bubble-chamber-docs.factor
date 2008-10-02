@@ -55,48 +55,30 @@ HELP: axion
 
 ARTICLE: "bubble-chamber" "Bubble Chamber"
 
-  { $subsection "bubble-chamber-introduction" }
-  { $subsection "bubble-chamber-particles" }
-  { $subsection "bubble-chamber-author" }
-  { $subsection "bubble-chamber-running" } ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-ARTICLE: "bubble-chamber-introduction" "Introduction"
-
-"The Bubble Chamber is a generative painting system of imaginary "
+"The " { $vocab-link "bubble-chamber" } 
+" is a generative painting system of imaginary "
 "colliding particles. A single super-massive collision produces a "
 "discrete universe of four particle types. Particles draw their "
-"positions over time as pixel exposures. " ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-ARTICLE: "bubble-chamber-particles" "Particles"
-
+"positions over time as pixel exposures.\n"
+"\n"
 "Four types of particles exist. The behavior and graphic appearance of "
-"each particle type is unique."
-
+"each particle type is unique.\n"
   { $subsection muon }
   { $subsection quark }
   { $subsection hadron }
-  { $subsection axion } ;
+  { $subsection axion } 
+"\n"
+"After you run the vocabulary, a window will appear. Click the "
+"mouse in a random area to fire 11 particles of each type. "
+"Another way to fire particles is to press the "
+"spacebar. This fires all the particles.\n"
+"\n"
+"Bubble Chamber was created by Jared Tarbell. "
+"It was originally implemented in Processing. "
+"It was ported to Factor by Eduardo Cavazos. "
+"The original work is on display here: "
+{ $url
+"http://www.complexification.net/gallery/machines/bubblechamber/" } ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+ABOUT: "bubble-chamber"
 
-ARTICLE: "bubble-chamber-author" "Author"
-
-  "Bubble Chamber was created by Jared Tarbell. "
-  "It was originally implemented in Processing. "
-  "It was ported to Factor by Eduardo Cavazos. "
-  "The original work is on display here: "
-  { $url
-  "http://www.complexification.net/gallery/machines/bubblechamber/" } ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-ARTICLE: "bubble-chamber-running" "How to use"
-
-  "After you run the vocabulary, a window will appear. Click the "
-  "mouse in a random area to fire 11 particles of each type. "
-  "Another way to fire particles is to press the "
-  "spacebar. This fires all the particles." ;

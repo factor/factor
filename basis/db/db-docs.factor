@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes kernel help.markup help.syntax sequences
-alien assocs strings math multiline ;
+alien assocs strings math multiline quotations ;
 IN: db
 
 HELP: db
@@ -45,7 +45,22 @@ HELP: prepared-statement
 { $description } ;
 
 HELP: result-set
-{ $description } ;
+{ $description "An object encapsulating a raw SQL result object. There are two ways in which a result set can be accessed, but they are specific to the database backend in use."
+    { $subsection "db-random-access-result-set" }
+    { $subsection "db-sequential-result-set" }
+} ;
+
+HELP: init-result-set
+{ $values
+     { "result-set" result-set } }
+{ $description "" } ;
+
+HELP: new-result-set
+{ $values
+     { "query" "a query" } { "handle" alien } { "class" class }
+     { "result-set" result-set } }
+{ $description "Creates a new " { $link result-set } " object of type " { $snippet "class" } "." } ;
+
 
 HELP: new-statement
 { $values { "sql" string } { "in" sequence } { "out" sequence } { "class" class } { "statement" statement } }
@@ -81,7 +96,7 @@ HELP: query-results
 { $values { "query" object }
     { "result-set" result-set }
 }
-{ $description "" } ;
+{ $description "Returns a " { $link result-set } " object representing the reults of a SQL query." } ;
 
 HELP: #rows
 { $values { "result-set" result-set } { "n" integer } }
@@ -95,42 +110,166 @@ HELP: row-column
 { $values { "result-set" result-set } { "column" integer }
     { "obj" object }
 }
-{ $description "" } ;
+{ $description "Returns the value indexed by " { $snippet "column" } " in the current row of a " { $link result-set } "." } ;
 
 HELP: row-column-typed
 { $values { "result-set" result-set } { "column" integer }
     { "sql" "sql" } }
-{ $description "" } ;
+{ $description "Returns the value indexed by " { $snippet "column" } " in the current row of a " { $link result-set } " and converts the result based on a type stored in the " { $link result-set } "'s " { $slot "out-params" } "." } ;
 
 HELP: advance-row
 { $values { "result-set" result-set } }
-;
+{ $description "Advanced the pointer to an underlying SQL result set stored in a " { $link result-set } " object." } ;
 
 HELP: more-rows?
 { $values { "result-set" result-set } { "?" "a boolean" } }
-;
+{ $description "Returns true if the " { $link result-set } " has more rows to traverse." } ;
 
 HELP: execute-statement*
 { $values { "statement" statement } { "type" object } }
 { $description } ;
 
+HELP: execute-one-statement
+{ $values
+     { "statement" null } }
+{ $description "" } ;
+
 HELP: execute-statement
 { $values { "statement" statement } }
-{ $description } ;
+{ $description "" } ;
 
-ARTICLE: "db" "Low-level database library"
+
+
+
+
+
+HELP: begin-transaction
+{ $description "Begins a new transaction. User code should make use of the " { $link with-transaction } " combinator." } ;
+
+HELP: bind-statement
+{ $values
+     { "obj" object } { "statement" null } }
+{ $description "" } ;
+
+HELP: commit-transaction
+{ $description "Commits a transaction. User code should make use of the " { $link with-transaction } " combinator." } ;
+
+HELP: default-query
+{ $values
+     { "query" null }
+     { "result-set" null } }
+{ $description "" } ;
+
+HELP: in-transaction
+{ $description "A variable that is set true when a transaction is in progress." } ;
+
+HELP: in-transaction?
+{ $values
+     { "?" "a boolean" } }
+{ $description "Returns true if there is currently a transaction in progress in this scope." } ;
+
+HELP: query-each
+{ $values
+     { "statement" null } { "quot" quotation } }
+{ $description "" } ;
+
+HELP: query-map
+{ $values
+     { "statement" null } { "quot" quotation }
+     { "seq" sequence } }
+{ $description "" } ;
+
+HELP: rollback-transaction
+{ $description "Rolls back a transaction; no data is committed to the database. User code should make use of the " { $link with-transaction } " combinator." } ;
+
+HELP: sql-command
+{ $values
+     { "sql" string } }
+{ $description "Executes a SQL string using the databse in the " { $link db } " symbol." } ;
+
+HELP: sql-query
+{ $values
+     { "sql" string }
+     { "rows" "an array of arrays of strings" } }
+{ $description "Runs a SQL query of raw text in the database in the " { $link db } " symbol. Each row is returned as an array of strings; no type-conversions are done on the resulting data." } ;
+
+{ sql-command sql-query } related-words
+
+HELP: sql-row
+{ $values
+     { "result-set" result-set }
+     { "seq" sequence } }
+{ $description "Returns the current row in a " { $link result-set } " as an array of strings." } ;
+
+HELP: sql-row-typed
+{ $values
+     { "result-set" result-set }
+     { "seq" sequence } }
+{ $description "Returns the current row in a " { $link result-set } " as an array of typed Factor objects." } ;
+
+{ sql-row sql-row-typed } related-words
+
+HELP: with-db
+{ $values
+     { "seq" sequence } { "class" class } { "quot" quotation } }
+{ $description "Calls the quotation with a database bound to the " { $link db } " symbol. The database called is based on the " { $snippet "class" } " with the " } ;
+
+HELP: with-transaction
+{ $values
+     { "quot" quotation } }
+{ $description "" } ;
+
+ARTICLE: "db" "Database library"
 { $subsection "db-custom-database-combinators" }
 { $subsection "db-protocol" }
+{ $subsection "db-result-sets" }
 { $subsection "db-lowlevel-tutorial" }
 "Higher-level database:"
 { $vocab-subsection "Database types" "db.types" }
 { $vocab-subsection "High-level tuple/database integration" "db.tuples" }
+! { $subsection "db-tuples" }
+! { $subsection "db-tuples-protocol" }
+! { $subsection "db-tuples-tutorial" }
 "Supported database backends:"
 { $vocab-subsection "SQLite" "db.sqlite" }
 { $vocab-subsection "PostgreSQL" "db.postgresql" }
 "To add support for another database to Factor:"
 { $subsection "db-porting-the-library" }
 ;
+
+ARTICLE: "db-random-access-result-set" "Random access result sets"
+"Random-access result sets do not have to be traversed in order. For instance, PostgreSQL's result set object can be accessed as a matrix with i,j coordinates."
+$nl
+"Databases which work in this way must provide methods for the following traversal words:"
+{ $subsection #rows }
+{ $subsection #columns }
+{ $subsection row-column }
+{ $subsection row-column-typed } ;
+
+ARTICLE: "db-sequential-result-set" "Sequential result sets"
+"Sequential result sets can be iterated one element after the next.  SQLite's result sets offer this method of traversal."
+$nl
+"Databases which work in this way must provide methods for the following traversal words:"
+{ $subsection more-rows? }
+{ $subsection advance-row }
+{ $subsection row-column }
+{ $subsection row-column-typed } ;
+
+ARTICLE: "db-result-sets" "Result sets"
+"Result sets are the encapsulated, database-specific results from a SQL query."
+$nl
+"Two possible protocols for iterating over result sets exist:"
+{ $subsection "db-random-access-result-set" }
+{ $subsection "db-sequential-result-set" }
+"Query the number of rows or columns:"
+{ $subsection #rows }
+{ $subsection #columns }
+"Traversing a result set:"
+{ $subsection advance-row }
+{ $subsection more-rows? }
+"Pulling out a single row of results:"
+{ $subsection row-column }
+{ $subsection row-column-typed } ;
 
 ARTICLE: "db-protocol" "Low-level database protocol"
 "The high-level protocol (see " { $vocab-link "db.tuples" } ") uses this low-level protocol for executing statements and queries."
@@ -144,7 +283,6 @@ ARTICLE: "db-porting-the-library" "Porting the database library"
 "This section is not yet written."
 ;
 
-
 ARTICLE: "db-custom-database-combinators" "Custom database combinators"
 "Every database library requires some effort on the programmer's part to initialize and open a database.  SQLite uses files on your harddisk, so a simple pathname is all the setup required. With PostgreSQL, you log in to a networked server as a user on a specfic port." $nl
 
@@ -154,7 +292,6 @@ USING: db.sqlite db io.files ;
 : with-my-database ( quot -- )
     { "my-database.db" temp-file } sqlite-db rot with-db ;
 "> }
-
 
 ;
 

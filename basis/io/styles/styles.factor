@@ -20,6 +20,8 @@ SYMBOL: presented
 SYMBOL: presented-path
 SYMBOL: presented-printer
 
+SYMBOL: href
+
 ! Paragraph styles
 SYMBOL: page-color
 SYMBOL: border-color

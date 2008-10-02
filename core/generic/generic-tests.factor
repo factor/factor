@@ -222,3 +222,17 @@ M: integer a-generic a-word ;
     M: boii jeah ;
     "> eval
 ] unit-test
+
+! call-next-method cache test
+GENERIC: c-n-m-cache ( a -- b )
+
+! Force it to be unoptimized
+M: fixnum c-n-m-cache { } [ ] like call call-next-method ;
+M: integer c-n-m-cache 1 + ;
+M: number c-n-m-cache ;
+
+[ 3 ] [ 2 c-n-m-cache ] unit-test
+
+[ ] [ [ { integer c-n-m-cache } forget ] with-compilation-unit ] unit-test
+
+[ 2 ] [ 2 c-n-m-cache ] unit-test

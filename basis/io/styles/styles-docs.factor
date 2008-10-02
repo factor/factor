@@ -36,7 +36,7 @@ ARTICLE: "presentations" "Presentations"
 ARTICLE: "styles" "Formatted output"
 "The " { $link stream-format } ", " { $link with-style } ", " { $link with-nesting } " and " { $link tabular-output } " words take a hashtable of style attributes. Output stream implementations are free to ignore style information."
 $nl
-"Style hashtables are keyed by symbols from the " { $vocab-link "styles" } " vocabulary."
+"Style hashtables are keyed by symbols from the " { $vocab-link "io.styles" } " vocabulary."
 { $subsection "character-styles" }
 { $subsection "paragraph-styles" }
 { $subsection "table-styles" }

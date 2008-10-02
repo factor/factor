@@ -9,47 +9,6 @@ urls math math.parser combinators present fry ;
 
 IN: html.elements
 
-! These words are used to provide a means of writing
-! formatted HTML to standard output with a familiar 'html' look
-! and feel in the code.
-!
-! HTML tags can be used in a number of different ways. The highest
-! level involves a similar syntax to HTML:
-!
-! <p> "someoutput" write </p>
-!
-! <p> will output the opening tag and </p> will output the closing
-! tag with no attributes.
-!
-! <p "red" =class p> "someoutput" write </p>
-!
-! This time the opening tag does not have the '>'. It pushes
-! a namespace on the stack to hold the attributes and values.
-! Any attribute words used will store the attribute and values
-! in that namespace. Before the attribute word should come the
-! value of that attribute.
-! The finishing word will print out the operning tag including
-! attributes.
-! Any writes after this will appear after the opening tag.
-!
-! Values for attributes can be used directly without any stack
-! operations:
-!
-! (url -- )
-! <a =href a> "Click me" write </a>
-!
-! (url -- )
-! <a "http://" prepend =href a> "click" write </a>
-!
-! (url -- )
-! <a [ "http://" % % ] "" make =href a> "click" write </a>
-!
-! Tags that have no 'closing' equivalent have a trailing tag/> form:
-!
-! <input "text" =type "name" =name "20" =size input/>
-
-: elements-vocab ( -- vocab-name ) "html.elements" ;
-
 SYMBOL: html
 
 : write-html ( str -- )
@@ -59,6 +18,8 @@ SYMBOL: html
     write-html "\n" write-html ;
 
 <<
+
+: elements-vocab ( -- vocab-name ) "html.elements" ;
 
 : html-word ( name def effect -- )
     #! Define 'word creating' word to allow
@@ -149,8 +110,10 @@ SYMBOL: html
 [
     "input"
     "br"
+    "hr"
     "link"
     "img"
+    "base"
 ] [ define-open-html-word ] each
 
 ! Define some attributes
@@ -162,21 +125,25 @@ SYMBOL: html
     "width" "selected" "onsubmit" "xmlns" "lang" "xml:lang"
     "media" "title" "multiple" "checked"
     "summary" "cellspacing" "align" "scope" "abbr"
-    "nofollow" "alt"
+    "nofollow" "alt" "target"
 ] [ define-attribute-word ] each
 
 >>
 
 : xhtml-preamble ( -- )
     "<?xml version=\"1.0\"?>" write-html
-    "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">" write-html ;
+    "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">" write-html ;
 
-: simple-page ( title quot -- )
+: simple-page ( title head-quot body-quot -- )
     #! Call the quotation, with all output going to the
     #! body of an html page with the given title.
+    spin
     xhtml-preamble
     <html "http://www.w3.org/1999/xhtml" =xmlns "en" =xml:lang "en" =lang html>
-        <head> <title> swap write </title> </head>
+        <head>
+            <title> write </title>
+            call
+        </head>
         <body> call </body>
     </html> ; inline
 

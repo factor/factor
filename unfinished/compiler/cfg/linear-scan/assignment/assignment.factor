@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math assocs namespaces sequences heaps
-fry make
+fry make combinators
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.linear-scan.live-intervals ;
@@ -34,7 +34,13 @@ SYMBOL: unhandled-intervals
     [ add-unhandled ] each ;
 
 : insert-spill ( live-interval -- )
-    [ reg>> ] [ spill-to>> ] bi dup [ _spill ] [ 2drop ] if ;
+    [ reg>> ] [ spill-to>> ] [ vreg>> reg-class>> ] tri
+    over [
+        {
+            { int-regs [ _spill-integer ] }
+            { double-float-regs [ _spill-float ] }
+        } case
+    ] [ 3drop ] if ;
 
 : expire-old-intervals ( n -- )
     active-intervals get
@@ -43,7 +49,13 @@ SYMBOL: unhandled-intervals
     [ insert-spill ] each ;
 
 : insert-reload ( live-interval -- )
-    [ reg>> ] [ reload-from>> ] bi dup [ _reload ] [ 2drop ] if ;
+    [ reg>> ] [ reload-from>> ] [ vreg>> reg-class>> ] tri
+    over [
+        {
+            { int-regs [ _reload-integer ] }
+            { double-float-regs [ _reload-float ] }
+        } case
+    ] [ 3drop ] if ;
 
 : activate-new-intervals ( n -- )
     #! Any live intervals which start on the current instruction

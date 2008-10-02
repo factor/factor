@@ -9,7 +9,7 @@ xmode.code2html lcs.diff2html farkup
 html.elements html.streams html.forms ;
 IN: html.components
 
-GENERIC: render* ( value name render -- )
+GENERIC: render* ( value name renderer -- )
 
 : render ( name renderer -- )
     prepare-value
@@ -83,7 +83,7 @@ TUPLE: choice size multiple choices ;
     choice new ;
 
 : render-option ( text selected? -- )
-    <option [ "true" =selected ] when option>
+    <option [ "selected" =selected ] when option>
         present escape-string write
     </option> ;
 
@@ -126,11 +126,11 @@ M: string link-href ;
 M: url link-title ;
 M: url link-href ;
 
-SINGLETON: link
+TUPLE: link target ;
 
 M: link render*
-    2drop
-    <a dup link-href =href a>
+    nip
+    <a target>> [ =target ] when* dup link-href =href a>
         link-title present escape-string write
     </a> ;
 
@@ -144,26 +144,32 @@ M: code render*
     [ string-lines ] [ drop ] [ mode>> value ] tri* htmlize-lines ;
 
 ! Farkup component
-TUPLE: farkup no-follow disable-images ;
+TUPLE: farkup no-follow disable-images parsed ;
+
+: <farkup> ( -- farkup )
+    farkup new ;
 
 : string>boolean ( string -- boolean )
     {
         { "true" [ t ] }
         { "false" [ f ] }
+        { f [ f ] }
     } case ;
 
 M: farkup render*
     [
+        nip
         [ no-follow>> [ string>boolean link-no-follow? set ] when* ]
-        [ disable-images>> [ string>boolean disable-images? set ] when* ] bi
-        drop string-lines "\n" join write-farkup
+        [ disable-images>> [ string>boolean disable-images? set ] when* ]
+        [ parsed>> string>boolean [ (write-farkup) ] [ write-farkup ] if ]
+        tri
     ] with-scope ;
 
 ! Inspector component
 SINGLETON: inspector
 
 M: inspector render*
-    2drop [ describe ] with-html-stream ;
+    2drop [ describe ] with-html-writer ;
 
 ! Diff component
 SINGLETON: comparison

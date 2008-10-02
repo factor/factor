@@ -4,7 +4,7 @@ kernel vectors arrays effects sequences ;
 IN: compiler.generator
 
 ARTICLE: "generator" "Compiled code generator"
-"Most of the words in the " { $vocab-link "generator" } " vocabulary are internal to the compiler and user code has no reason to call them."
+"Most of the words in the " { $vocab-link "compiler.generator" } " vocabulary are internal to the compiler and user code has no reason to call them."
 $nl
 "Debugging information can be enabled or disabled; this hook is used by " { $link "tools.deploy" } ":"
 { $subsection compiled-stack-traces? }

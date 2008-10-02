@@ -33,8 +33,7 @@ IN: furnace.auth.features.registration
             users new-user [ user-exists ] unless*
 
             realm get init-user-profile
-
-            URL" $realm" <redirect>
+            realm get user-registered
         ] >>submit
     <auth-boilerplate>
     <secure-realm-only> ;

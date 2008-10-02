@@ -1,5 +1,8 @@
 USING: http.client http.client.private http tools.test
 namespaces urls ;
+
+\ download must-infer
+
 [ "localhost" f ] [ "localhost" parse-host ] unit-test
 [ "localhost" 8888 ] [ "localhost:8888" parse-host ] unit-test
 

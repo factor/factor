@@ -26,7 +26,7 @@ GENERIC: tool-scroller ( tool -- scroller )
 M: gadget tool-scroller drop f ;
 
 : find-tool ( class workspace -- index tool )
-  book>> children>> [ class eq? ] with find ;
+    book>> children>> [ class eq? ] with find ;
 
 : show-tool ( class workspace -- tool )
     [ find-tool swap ] keep book>> model>>
@@ -55,15 +55,15 @@ M: gadget tool-scroller drop f ;
     article-title open-window ;
 
 : hide-popup ( workspace -- )
-  dup popup>> track-remove
-  f >>popup
-  request-focus ;
+    dup popup>> track-remove
+    f >>popup
+    request-focus ;
 
 : show-popup ( gadget workspace -- )
-  dup hide-popup
-  over >>popup
-  over f track-add drop
-  request-focus ;
+    dup hide-popup
+    over >>popup
+    over f track-add drop
+    request-focus ;
 
 : show-titled-popup ( workspace gadget title -- )
     [ find-workspace hide-popup ] <closable-gadget>

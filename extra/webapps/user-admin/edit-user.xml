@@ -4,7 +4,7 @@
 
 	<t:title>Edit User</t:title>
 
-	<t:form t:action="$user-admin/edit" t:for="username">
+	<t:form t:action="$user-admin/edit" t:for="username" autocomplete="off">
 
 	<table>
 	

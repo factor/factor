@@ -9,9 +9,9 @@ IN: ui.gadgets.tests
     ! c contains b contains a
     <gadget> "a" set
     <gadget> "b" set
-    "a" get "b" get swap add-gadget drop
+    "b" get "a" get add-gadget drop
     <gadget> "c" set
-    "b" get "c" get swap add-gadget drop
+    "c" get "b" get add-gadget drop
 
     ! position a and b
     "a" get { 100 200 } >>loc drop
@@ -33,8 +33,8 @@ IN: ui.gadgets.tests
 <gadget> "g3" set
 "g3" get { 100 200 } >>dim drop
 
-"g1" get "g2" get swap add-gadget drop
-"g2" get "g3" get swap add-gadget drop
+"g2" get "g1" get add-gadget drop
+"g3" get "g2" get add-gadget drop
 
 [ { 30 30 } ] [ "g1" get screen-loc ] unit-test
 [ { 30 30 } ] [ "g1" get screen-rect rect-loc ] unit-test
@@ -49,11 +49,11 @@ IN: ui.gadgets.tests
 <gadget> "g1" set
 "g1" get { 300 300 } >>dim drop
 <gadget> "g2" set
-"g2" get "g1" get swap add-gadget drop
+"g1" get "g2" get add-gadget drop
 "g2" get { 20 20 } >>loc
          { 20 20 } >>dim drop
 <gadget> "g3" set
-"g3" get "g1" get swap add-gadget drop
+"g1" get "g3" get add-gadget drop
 "g3" get { 100 100 } >>loc
          { 20 20 } >>dim drop
 
@@ -66,7 +66,7 @@ IN: ui.gadgets.tests
 [ t ] [ { 110 110 } "g1" get pick-up "g3" get eq? ] unit-test
 
 <gadget> "g4" set
-"g4" get "g2" get swap add-gadget drop
+"g2" get "g4" get add-gadget drop
 "g4" get { 5 5 } >>loc
          { 1 1 } >>dim drop
 
@@ -121,7 +121,7 @@ M: mock-gadget ungraft*
     : add-some-children
         3 [
             <mock-gadget> over <model> >>model
-            dup "g" get swap add-gadget drop
+            "g" get over add-gadget drop
             swap 1+ number>string set
         ] each ;
 

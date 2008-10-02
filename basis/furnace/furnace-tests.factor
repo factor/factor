@@ -1,7 +1,7 @@
 IN: furnace.tests
-USING: http.server.dispatchers http.server.responses
+USING: http http.server.dispatchers http.server.responses
 http.server furnace tools.test kernel namespaces accessors
-io.streams.string ;
+io.streams.string urls ;
 TUPLE: funny-dispatcher < dispatcher ;
 
 : <funny-dispatcher> funny-dispatcher new-dispatcher ;
@@ -33,3 +33,9 @@ M: base-path-check-responder call-responder*
 [ "<input type='hidden' name='foo' value='&amp;&amp;&amp;'/>" ]
 [ [ "&&&" "foo" hidden-form-field ] with-string-writer ]
 unit-test
+
+[ f ] [ <request> request [ referrer ] with-variable ] unit-test
+
+[ t ] [ URL" http://foo" dup url [ same-host? ] with-variable ] unit-test
+
+[ f ] [ f URL" http://foo" url [ same-host? ] with-variable ] unit-test

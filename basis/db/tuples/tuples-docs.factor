@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes help.markup help.syntax io.streams.string kernel
-quotations sequences strings multiline math ;
+quotations sequences strings multiline math db.types ;
 IN: db.tuples
 
 HELP: define-persistent
@@ -11,7 +11,18 @@ HELP: define-persistent
 { $list
     { "a slot name from the " { $snippet "tuple class" } }
     { "the name of a database column that maps to the slot" }        { "a database type (see " { $link "db.types" } ")" }
-} } ;
+} "Throws an error if the slot name (column one from each row) is not a slot in the tuple or its superclases." }
+{ $examples
+    { $unchecked-example "USING: db.tuples db.types ;"
+        "TUPLE: boat id year name ;"
+        "boat \"BOAT\" {"
+        "    { \"id\" \"ID\" +db-assigned-id+ }"
+        "    { \"year\" \"YEAR\" INTEGER }"
+        "    { \"name\" \"NAME\" TEXT }"
+        "} define-persistent"
+        ""
+    }
+} ;
 
 HELP: create-table
 { $values
@@ -64,36 +75,35 @@ HELP: delete-tuples
 
 HELP: select-tuple
 { $values
-     { "tuple" tuple }
+     { "query/tuple" tuple }
      { "tuple/f" "a tuple or f" } }
 { $description "A SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". Returns a single tuple from the database if it matches the query constructed from the exemplar tuple." } ;
 
 HELP: select-tuples
 { $values
-     { "tuple" tuple }
+     { "query/tuple" tuple }
      { "tuples" "an array of tuples" } }
 { $description "A SQL query is constructed from the slots of the exemplar tuple that are not " { $link f } ". Returns a multiple tuples from the database that match the query constructed from the exemplar tuple." } ;
 
 HELP: count-tuples
 { $values
-     { "tuple" tuple } { "groups" "an array of slots to group by" }
+     { "query/tuple" tuple }
      { "n" integer } }
-{ $description "" } ;
+{ $description "Returns the number of items that would be returned if the query were a select query. Counting the tuples with this word is more efficient than calling " { $link length } " on the result of " { $link select-tuples } "." } ;
 
-HELP: query
-{ $values
-     { "tuple" tuple } { "query" query }
-     { "tuples" "a sequence of tuples" } }
-{ $description "Allows for queries with group by, order by, limit, and offset clauses.  " } ;
+{ select-tuple select-tuples count-tuples } related-words
 
-{ select-tuple select-tuples count-tuples query } related-words
+
 
 ARTICLE: "db-tuples" "High-level tuple/database integration"
 "Start with a tutorial:"
 { $subsection "db-tuples-tutorial" }
+"Database types supported:"
+{ $subsection "db.types" }
 "Useful words:"
 { $subsection "db-tuples-words" }
-
+"For porting db.tuples to other databases:"
+{ $subsection "db-tuples-protocol" }
 ;
 
 ARTICLE: "db-tuples-words" "High-level tuple/database words"
@@ -115,12 +125,9 @@ ARTICLE: "db-tuples-words" "High-level tuple/database words"
 "Querying tuples:"
 { $subsection select-tuple }
 { $subsection select-tuples }
-{ $subsection count-tuples }
-"Advanced querying of tuples:"
-{ $subsection query } ;
+{ $subsection count-tuples } ;
 
-
-ARTICLE: "db-tuples-protocol" "High-level tuple/database protocol"
+ARTICLE: "db-tuples-protocol" "Tuple database protocol"
 ;
 
 ARTICLE: "db-tuples-tutorial" "Tuple database tutorial"

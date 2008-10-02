@@ -1,10 +1,10 @@
 USING: help help.markup help.syntax help.definitions help.topics
 namespaces words sequences classes assocs vocabs kernel arrays
 prettyprint.backend kernel.private io generic math system
-strings sbufs vectors byte-arrays
-quotations io.streams.byte-array
-classes.builtin parser lexer classes.predicate classes.union
-classes.intersection classes.singleton classes.tuple ;
+strings sbufs vectors byte-arrays quotations
+io.streams.byte-array classes.builtin parser lexer
+classes.predicate classes.union classes.intersection
+classes.singleton classes.tuple tools.vocabs.browser ;
 IN: help.handbook
 
 ARTICLE: "conventions" "Conventions"
@@ -139,7 +139,7 @@ ARTICLE: "collections" "Collections"
 { $subsection "heaps" }
 { $subsection "graphs" }
 { $subsection "buffers" }
-"There are many other collections in " { $snippet "extra/" } ", such as " { $vocab-link "disjoint-sets" } ", " { $vocab-link "persistent-vectors" } ", and " { $vocab-link "tuple-arrays" } "." ;
+"There are also many other vocabularies tagged " { $link T{ vocab-tag { name "collections" } } } " in the library." ;
 
 USING: io.encodings.utf8 io.encodings.utf16 io.encodings.binary io.encodings.ascii io.files ;
 
@@ -244,7 +244,8 @@ ARTICLE: "handbook-language-reference" "Language reference"
 { $subsection "program-org" }
 { $subsection "numbers" }
 { $subsection "collections" }
-{ $subsection "io" } ;
+{ $subsection "io" }
+"Vocabularies tagged " { $link T{ vocab-tag { name "extensions" } } } " implement various additional language abstractions." ;
 
 ARTICLE: "handbook-environment-reference" "Environment reference"
 { $subsection "prettyprint" }

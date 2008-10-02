@@ -72,8 +72,8 @@ TUPLE: effect-error word inferred declared ;
 M: effect-error error.
     "Stack effects of the word " write
     [ word>> pprint " do not match." print ]
-    [ "Inferred: " write inferred>> effect>string . ]
-    [ "Declared: " write declared>> effect>string . ] tri ;
+    [ "Inferred: " write inferred>> . ]
+    [ "Declared: " write declared>> . ] tri ;
 
 TUPLE: recursive-quotation-error quot ;
 

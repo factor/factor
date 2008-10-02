@@ -17,8 +17,8 @@ TUPLE: paragraph < gadget margin ;
 
 : <paragraph> ( margin -- gadget )
     paragraph new-gadget
-    { 1 0 } over (>>orientation)
-    [ (>>margin) ] keep ;
+    { 1 0 } >>orientation
+    swap >>margin ;
 
 SYMBOL: x SYMBOL: max-x
 

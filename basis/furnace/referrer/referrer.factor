@@ -14,4 +14,4 @@ M: referrer-check call-responder*
     [ 2drop 403 "Bad referrer" <trivial-response> ] if ;
 
 : <check-form-submissions> ( responder -- responder' )
-    [ same-host? post-request? not or ] <referrer-check> ;
+    [ post-request? [ same-host? ] [ drop t ] if ] <referrer-check> ;

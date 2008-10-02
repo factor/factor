@@ -4,7 +4,7 @@
 
 	<t:title>New User</t:title>
 
-	<t:form t:action="$user-admin/new">
+	<t:form t:action="$user-admin/new" autocomplete="off">
 
 	<table>
 	

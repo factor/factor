@@ -1,97 +1,30 @@
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: assocs html.parser kernel math sequences strings ascii
 arrays generalizations shuffle unicode.case namespaces make
-splitting http sequences.lib accessors io combinators
-http.client urls ;
+splitting http accessors io combinators http.client urls
+urls.encoding fry ;
 IN: html.parser.analyzer
 
 TUPLE: link attributes clickable ;
 
-: scrape-html ( url -- vector )
-    http-get nip parse-html ;
-
-: (find-relative)
-    [ >r + dup r> ?nth* [ 2drop f f ] unless ] [ 2drop f ] if ; inline
-
-: find-relative ( seq quot n -- i elt )
-    >r over [ find drop ] dip r> swap pick
-    (find-relative) ; inline
-
-: (find-all) ( n seq quot -- )
-    2dup >r >r find-from [
-        dupd 2array , 1+ r> r> (find-all)
-    ] [
-        r> r> 3drop
-    ] if* ; inline
+: scrape-html ( url -- headers vector )
+    http-get parse-html ;
 
 : find-all ( seq quot -- alist )
-    [ 0 -rot (find-all) ] { } make ; inline
-
-: (find-nth) ( offset seq quot n count -- obj )
-    >r >r [ find-from ] 2keep 4 npick [
-        r> r> 1+ 2dup <= [
-            4drop
-        ] [
-            >r >r >r >r drop 1+ r> r> r> r>
-            (find-nth)
-        ] if
-    ] [
-        2drop r> r> 2drop
-    ] if ; inline
+   [ <enum> >alist ] [ '[ second @ ] ] bi* filter ; inline
 
 : find-nth ( seq quot n -- i elt )
-    0 -roll 0 (find-nth) ; inline
-
-: find-nth-relative ( seq quot n offest -- i elt )
-    >r [ find-nth ] 3keep 2drop nip r> swap pick
-    (find-relative) ; inline
-
-: remove-blank-text ( vector -- vector' )
-    [
-        dup name>> text = [
-            text>> [ blank? ] all? not
-        ] [
-            drop t
-        ] if
-    ] filter ;
-
-: trim-text ( vector -- vector' )
-    [
-        dup name>> text = [
-            [ [ blank? ] trim ] change-text
-        ] when
-    ] map ;
-
-: find-by-id ( id vector -- vector )
-    [ attributes>> "id" swap at = ] with filter ;
-
-: find-by-class ( id vector -- vector )
-    [ attributes>> "class" swap at = ] with filter ;
-
-: find-by-name ( str vector -- vector )
-    >r >lower r>
-    [ name>> = ] with filter ;
+    [ <enum> >alist ] 2dip -rot
+    '[ _ [ second @ ] find-from rot drop swap 1+ ]
+    [ f 0 ] 2dip times drop first2 ; inline
 
 : find-first-name ( str vector -- i/f tag/f )
-    >r >lower r>
-    [ name>> = ] with find ;
+    [ >lower ] dip [ name>> = ] with find ; inline
 
 : find-matching-close ( str vector -- i/f tag/f )
-    >r >lower r>
-    [ [ name>> = ] keep closing?>> and ] with find ;
-
-: find-by-attribute-key ( key vector -- vector )
-    >r >lower r>
-    [ attributes>> at ] with filter
-    sift ;
-
-: find-by-attribute-key-value ( value key vector -- vector )
-    >r >lower r>
-    [ attributes>> at over = ] with filter nip
-    sift ;
-
-: find-first-attribute-key-value ( value key vector -- i/f tag/f )
-    >r >lower r>
-    [ attributes>> at over = ] with find rot drop ;
+    [ >lower ] dip
+    [ [ name>> = ] [ closing?>> ] bi and ] with find ; inline
 
 : find-between* ( i/f tag/f vector -- vector )
     pick integer? [
@@ -101,19 +34,55 @@ TUPLE: link attributes clickable ;
         swap [ head ] [ first ] if*
     ] [
         3drop V{ } clone
-    ] if ;
+    ] if ; inline
     
 : find-between ( i/f tag/f vector -- vector )
     find-between* dup length 3 >= [
         [ rest-slice but-last-slice ] keep like
-    ] when ;
+    ] when ; inline
 
 : find-between-first ( string vector -- vector' )
-    [ find-first-name ] keep find-between ;
+    [ find-first-name ] keep find-between ; inline
 
 : find-between-all ( vector quot -- seq )
     [ [ [ closing?>> not ] bi and ] curry find-all ] curry
-    [ [ >r first2 r> find-between* ] curry map ] bi ;
+    [ [ >r first2 r> find-between* ] curry map ] bi ; inline
+
+
+: remove-blank-text ( vector -- vector' )
+    [
+        dup name>> text =
+        [ text>> [ blank? ] all? not ] [ drop t ] if
+    ] filter ;
+
+: trim-text ( vector -- vector' )
+    [
+        dup name>> text =
+        [ [ [ blank? ] trim ] change-text ] when
+    ] map ;
+
+: find-by-id ( id vector -- vector )
+    [ attributes>> "id" swap at = ] with filter ;
+
+: find-by-class ( id vector -- vector )
+    [ attributes>> "class" swap at = ] with filter ;
+
+: find-by-name ( str vector -- vector )
+    [ >lower ] dip [ name>> = ] with filter ;
+
+: find-by-attribute-key ( key vector -- vector )
+    [ >lower ] dip
+    [ attributes>> at ] with filter
+    sift ;
+
+: find-by-attribute-key-value ( value key vector -- vector )
+    [ >lower ] dip
+    [ attributes>> at over = ] with filter nip
+    sift ;
+
+: find-first-attribute-key-value ( value key vector -- i/f tag/f )
+    [ >lower ] dip
+    [ attributes>> at over = ] with find rot drop ;
 
 : tag-link ( tag -- link/f )
     attributes>> [ "href" swap at ] [ f ] if* ;
@@ -135,7 +104,7 @@ TUPLE: link attributes clickable ;
     [ dup name>> text = ] prepose find drop ;
 
 : find-opening-tags-by-name ( name seq -- seq )
-    [ [ name>> = ] keep closing?>> not and ] with find-all ;
+    [ [ name>> = ] [ closing?>> not ] bi and ] with find-all ;
 
 : href-contains? ( str tag -- ? )
     attributes>> "href" swap at* [ subseq? ] [ 2drop f ] if ;
@@ -154,7 +123,7 @@ TUPLE: link attributes clickable ;
 
 : find-html-objects ( string vector -- vector' )
     [ find-opening-tags-by-name ] keep
-    [ >r first2 r> find-between* ] curry map ;
+    [ [ first2 ] dip find-between* ] curry map ;
 
 : form-action ( vector -- string )
     [ name>> "form" = ] find nip 

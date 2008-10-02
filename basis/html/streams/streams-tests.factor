@@ -4,7 +4,7 @@ xml.writer sbufs sequences inspector colors ;
 IN: html.streams.tests
 
 : make-html-string
-    [ with-html-stream ] with-string-writer ; inline
+    [ with-html-writer ] with-string-writer ; inline
 
 [ [ ] make-html-string ] must-infer
 
@@ -71,4 +71,4 @@ M: funky browser-link-href
     [ H{ } [ ] with-nesting nl ] make-html-string
 ] unit-test
 
-[ ] [ [ { 1 2 3 } describe ] with-html-stream ] unit-test
+[ ] [ [ { 1 2 3 } describe ] with-html-writer ] unit-test

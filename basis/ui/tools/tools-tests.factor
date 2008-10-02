@@ -7,7 +7,7 @@ IN: ui.tools.tests
 
 [ f ]
 [
-  <gadget> 0 <model> >>model <workspace-tabs> children>> empty?
+    <gadget> 0 <model> >>model <workspace-tabs> children>> empty?
 ] unit-test
 
 [ ] [ <workspace> "w" set ] unit-test

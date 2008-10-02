@@ -3,12 +3,9 @@
 USING: alien alien.c-types alien.strings alien.syntax kernel
 math sequences namespaces make assocs init accessors
 continuations combinators core-foundation
-core-foundation.run-loop io.encodings.utf8 destructors ;
+core-foundation.run-loop core-foundation.run-loop.thread
+io.encodings.utf8 destructors ;
 IN: core-foundation.fsevents
-
-! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
-! FSEventStream API, Leopard only !
-! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
 : kFSEventStreamCreateFlagUseCFTypes 2 ; inline
 : kFSEventStreamCreateFlagWatchRoot 4 ; inline

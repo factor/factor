@@ -9,7 +9,7 @@ HELP: write-farkup
 { $values { "string" string } }
 { $description "Parse a Farkup string and writes the resulting HTML to " { $link output-stream } "." } ;
 
-HELP: farkup ( string -- farkup )
+HELP: parse-farkup ( string -- farkup )
 { $values { "string" string } { "farkup" "a Farkup syntax tree node" } }
 { $description "Parses Farkup and outputs a tree of " { $link "farkup-ast" } "." } ;
 
@@ -18,7 +18,7 @@ HELP: (write-farkup)
 { $description "Writes a Farkup syntax tree as HTML on " { $link output-stream } "." } ;
 
 ARTICLE: "farkup-ast" "Farkup syntax tree nodes"
-"The " { $link farkup } " word outputs a tree of nodes corresponding to the Farkup syntax of the input string. This tree can be programatically traversed and mutated before being passed on to " { $link write-farkup } "."
+"The " { $link parse-farkup } " word outputs a tree of nodes corresponding to the Farkup syntax of the input string. This tree can be programatically traversed and mutated before being passed on to " { $link write-farkup } "."
 { $subsection heading1 }
 { $subsection heading2 }
 { $subsection heading3 }
@@ -30,7 +30,8 @@ ARTICLE: "farkup-ast" "Farkup syntax tree nodes"
 { $subsection inline-code }
 { $subsection paragraph }
 { $subsection list-item }
-{ $subsection list }
+{ $subsection unordered-list }
+{ $subsection ordered-list }
 { $subsection table }
 { $subsection table-row }
 { $subsection link }
@@ -44,7 +45,7 @@ $nl
 { $subsection convert-farkup }
 { $subsection write-farkup }
 "The syntax tree of a piece of Farkup can also be inspected and modified:"
-{ $subsection farkup }
+{ $subsection parse-farkup }
 { $subsection (write-farkup) }
 { $subsection "farkup-ast" } ;
 

@@ -14,10 +14,11 @@ io.encodings.binary
 io.streams.limited
 io.servers.connection
 io.timeouts
-fry logging logging.insomniac calendar urls
+fry logging logging.insomniac calendar urls urls.encoding
 http
 http.parsers
 http.server.responses
+http.server.remapping
 html.templates
 html.elements
 html.streams ;
@@ -152,8 +153,8 @@ main-responder global [ <404> <trivial-responder> or ] change-at
     [ add-responder-nesting ] [ call-responder* ] 2bi ;
 
 : http-error. ( error -- )
-    "Internal server error" [
-        [ print-error nl :c ] with-html-stream
+    "Internal server error" [ ] [
+        [ print-error nl :c ] with-html-writer
     ] simple-page ;
 
 : <500> ( error -- response )
@@ -198,19 +199,20 @@ LOG: httpd-header NOTICE
     [
         local-address get
         [ secure? "https" "http" ? >>protocol ]
-        [ port>> '[ _ or ] change-port ]
+        [ port>> remap-port '[ _ or ] change-port ]
         bi
     ] change-url drop ;
 
 : valid-request? ( request -- ? )
-    url>> port>> local-address get port>> = ;
+    url>> port>> remap-port
+    local-address get port>> remap-port = ;
 
 : do-request ( request -- response )
     '[
         _
         {
-            [ init-request ]
             [ prepare-request ]
+            [ init-request ]
             [ log-request ]
             [ dup valid-request? [ dispatch-request ] [ drop <400> ] if ]
         } cleave
@@ -253,3 +255,11 @@ M: http-server handle-client*
 
 : http-insomniac ( -- )
     "http.server" { "httpd-hit" } schedule-insomniac ;
+
+USE: vocabs.loader
+
+"http.server.filters" require
+"http.server.dispatchers" require
+"http.server.redirection" require
+"http.server.static" require
+"http.server.cgi" require

@@ -257,7 +257,7 @@ test-db [
             "" add-responder
             add-quit-action
             <dispatcher>
-                <action> "a" add-main-responder
+                <action> "" add-responder
             "d" add-responder
         test-db <db-persistence>
         main-responder set

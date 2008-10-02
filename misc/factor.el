@@ -76,7 +76,7 @@
     (modify-syntax-entry ?\" "\"    " factor-mode-syntax-table)))
 
 (defvar factor-mode-map (make-sparse-keymap))
-    
+
 (defcustom factor-mode-hook nil
   "Hook run when entering Factor mode."
   :type 'hook
@@ -111,6 +111,7 @@
   (use-local-map factor-mode-map)
   (setq major-mode 'factor-mode)
   (setq mode-name "Factor")
+  (set (make-local-variable 'indent-line-function) #'factor-indent-line)
   (make-local-variable 'comment-start)
   (setq comment-start "! ")
   (make-local-variable 'font-lock-defaults)
@@ -210,7 +211,7 @@
 (defun factor-clear ()
   (interactive)
   (factor-send-string "clear"))
-  
+
 (defun factor-comment-line ()
   (interactive)
   (beginning-of-line)
@@ -224,6 +225,73 @@
 (define-key factor-mode-map "\C-c\C-h" 'factor-help)
 (define-key factor-mode-map "\C-cc"    'comment-region)
 (define-key factor-mode-map [return]   'newline-and-indent)
+(define-key factor-mode-map [tab]      'indent-for-tab-command)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; indentation
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defconst factor-word-starting-keywords
+  '("" ":" "TUPLE" "MACRO" "MACRO:" "M"))
+
+(defmacro factor-word-start-re (keywords)
+  `(format
+    "^\\(%s\\): "
+    (mapconcat 'identity ,keywords "\\|")))
+
+(defun factor-calculate-indentation ()
+  "Calculate Factor indentation for line at point."
+  (let ((not-indented t)
+        (cur-indent 0))
+    (save-excursion
+      (beginning-of-line)
+      (if (bobp)
+          (setq cur-indent 0)
+        (save-excursion
+          (while not-indented
+            ;; Check that we are inside open brackets
+            (save-excursion
+              (let ((cur-depth (factor-brackets-depth)))
+                (forward-line -1)
+                (setq cur-indent (+ (current-indentation)
+                                    (* default-tab-width
+                                       (- cur-depth (factor-brackets-depth)))))
+                (setq not-indented nil)))
+            (forward-line -1)
+              ;; Check that we are after the end of previous word
+              (if (looking-at ".*;[ \t]*$")
+                  (progn
+                    (setq cur-indent (- (current-indentation) default-tab-width))
+                    (setq not-indented nil))
+                ;; Check that we are after the start of word
+                (if (looking-at (factor-word-start-re factor-word-starting-keywords))
+;                (if (looking-at "^[A-Z:]*: ")
+                    (progn
+                      (message "inword")
+                      (setq cur-indent (+ (current-indentation) default-tab-width))
+                      (setq not-indented nil))
+                  (if (bobp)
+                      (setq not-indented nil))))))))
+    cur-indent))
+
+(defun factor-brackets-depth ()
+  "Returns number of brackets, not closed on previous lines."
+  (syntax-ppss-depth
+   (save-excursion
+     (syntax-ppss (line-beginning-position)))))
+
+(defun factor-indent-line ()
+  "Indent current line as Factor code"
+  (let ((target (factor-calculate-indentation))
+        (pos (- (point-max) (point))))
+    (if (= target (current-indentation))
+        (if (< (current-column) (current-indentation))
+            (back-to-indentation))
+      (beginning-of-line)
+      (delete-horizontal-space)
+      (indent-to target)
+      (if (> (- (point-max) pos) (point))
+          (goto-char (- (point-max) pos))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; factor-listener-mode
@@ -244,5 +312,3 @@
 (defun factor-refresh-all ()
   (interactive)
   (comint-send-string "*factor*" "refresh-all\n"))
-
-
