@@ -23,7 +23,7 @@ M: color-preview model-changed
     swap value>> >>interior relayout-1 ;
 
 : <color-model> ( model -- model )
-    [ [ 256 /f ] map 1 suffix first4 rgba boa <solid> ] <filter> ;
+    [ first3 [ 256 /f ] tri@ 1 <rgba> <solid> ] <filter> ;
 
 : <color-sliders> ( -- model gadget )
     3 [ 0 0 0 255 <range> ] replicate

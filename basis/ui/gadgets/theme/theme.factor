@@ -2,7 +2,8 @@
 ! Copyright (C) 2006, 2007 Alex Chapman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel sequences io.styles ui.gadgets ui.render
-colors accessors ;
+colors colors.gray qualified accessors ;
+QUALIFIED: colors
 IN: ui.gadgets.theme
 
 : solid-interior ( gadget color -- gadget )
@@ -12,7 +13,7 @@ IN: ui.gadgets.theme
     <solid> >>boundary ; inline
 
 : faint-boundary ( gadget -- gadget )
-    gray solid-boundary ; inline
+    colors:gray solid-boundary ; inline
 
 : selection-color ( -- color ) light-purple ;
 

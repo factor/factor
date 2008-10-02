@@ -6,6 +6,10 @@ IN: io.backend
 
 SYMBOL: io-backend
 
+SINGLETON: c-io-backend
+
+c-io-backend io-backend set-global
+
 HOOK: init-io io-backend ( -- )
 
 HOOK: (init-stdio) io-backend ( -- stdin stdout stderr )

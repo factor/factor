@@ -10,7 +10,7 @@ SYMBOL: local-node
 
 : handle-node-client ( -- )
     deserialize
-    [ first2 get-process send ] [ stop-server ] if* ;
+    [ first2 get-process send ] [ stop-this-server ] if* ;
 
 : <node-server> ( addrspec -- threaded-server )
     <threaded-server>

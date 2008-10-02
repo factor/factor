@@ -26,6 +26,10 @@ HELP: with-cocoa
 { $values { "quot" quotation } }
 { $description "Sets up an autorelease pool, initializes the " { $snippet "NSApplication" } " singleton, and calls the quotation." } ;
 
+HELP: cocoa-app
+{ $values { "quot" quotation } }
+{ $description "Initializes Cocoa, calls the quotation, and starts the Cocoa event loop." } ;
+
 HELP: do-event
 { $values { "app" "an " { $snippet "NSApplication" } } { "?" "a boolean" } }
 { $description "Processes a pending event in the queue, if any, returning a boolean indicating if there was one. Does not block." } ;
@@ -46,13 +50,16 @@ HELP: objc-error
 { $error-description "Thrown by the Objective C runtime when an error occurs, for example, sending a message to an object with an unrecognized selector." } ;
 
 ARTICLE: "cocoa-application-utils" "Cocoa application utilities"
+"Utilities:"
 { $subsection NSApp }
-{ $subsection with-autorelease-pool }
-{ $subsection with-cocoa }
 { $subsection do-event }
 { $subsection add-observer }
 { $subsection remove-observer }
-{ $subsection install-delegate } ;
+{ $subsection install-delegate }
+"Combinators:"
+{ $subsection cocoa-app }
+{ $subsection with-autorelease-pool }
+{ $subsection with-cocoa } ;
 
 IN: cocoa.application
 ABOUT: "cocoa-application-utils"

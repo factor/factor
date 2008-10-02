@@ -32,11 +32,7 @@ HELP: alien>objc-types
 
 HELP: import-objc-class
 { $values { "name" string } { "quot" "a quotation with stack effect " { $snippet "( -- )" } } }
-{ $description "If a class named " { $snippet "name" } " is already known to the Objective C interface, does nothing. Otherwise, first calls the quotation. The quotation should make the class available to the Objective C runtime if necessary, either by loading a framework or defining it directly. After the quotation returns, this word makes the class available to Factor programs by importing methods and creating a class word the class object in the " { $vocab-link "cocoa.classes" } " vocabulary." }
-{ $notes "In most cases, the quotation should be " { $link f } "." }
-{ $examples
-    { $code "\"QTMovie\" f import-objc-class" "QTMovie \"My Movie.mov\" <NSString> f -> movieWithFile:error:" }
-} ;
+{ $description "If a class named " { $snippet "name" } " is already known to the Objective C interface, does nothing. Otherwise, first calls the quotation. The quotation should make the class available to the Objective C runtime if necessary, either by loading a framework or defining it directly. After the quotation returns, this word makes the class available to Factor programs by importing methods and creating a class word the class object in the " { $vocab-link "cocoa.classes" } " vocabulary." } ;
 
 HELP: root-class
 { $values { "class" alien } { "root" alien } }

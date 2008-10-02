@@ -136,8 +136,11 @@ PRIVATE>
     [ wait-for-server ]
     bi ;
 
-: stop-server ( -- )
-    threaded-server get [ f ] change-sockets drop dispose-each ;
+: stop-server ( threaded-server -- )
+    [ f ] change-sockets drop dispose-each ;
+
+: stop-this-server ( -- )
+    threaded-server get stop-server ;
 
 GENERIC: port ( addrspec -- n )
 
