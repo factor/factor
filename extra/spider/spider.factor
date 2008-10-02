@@ -3,7 +3,7 @@
 USING: accessors fry html.parser html.parser.analyzer
 http.client kernel tools.time sets assocs sequences
 concurrency.combinators io threads namespaces math multiline
-heaps math.parser inspector urls assoc-deques logging
+heaps math.parser inspector urls assoc-heaps logging
 combinators.short-circuit continuations calendar prettyprint ;
 IN: spider
 
