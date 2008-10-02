@@ -120,7 +120,7 @@ SYMBOL: redirects
     ] if ; inline recursive
 
 : read-unchunked ( quot: ( chunk -- ) -- )
-    8192 read dup [
+    8192 read-partial dup [
         [ swap call ] [ drop read-unchunked ] 2bi
     ] [ 2drop ] if ; inline recursive
 

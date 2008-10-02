@@ -139,7 +139,9 @@ M: unix (send) ( packet addrspec datagram -- )
 ! Unix domain sockets
 M: local protocol-family drop PF_UNIX ;
 
-M: local sockaddr-type drop "sockaddr-un" c-type ;
+M: local sockaddr-size drop "sockaddr-un" heap-size ;
+
+M: local empty-sockaddr drop "sockaddr-un" <c-object> ;
 
 M: local make-sockaddr
     path>> (normalize-path)

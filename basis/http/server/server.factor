@@ -24,6 +24,8 @@ html.elements
 html.streams ;
 IN: http.server
 
+\ parse-cookie DEBUG add-input-logging
+
 : check-absolute ( url -- url )
     dup path>> "/" head? [ "Bad request: URL" throw ] unless ; inline
 

@@ -27,7 +27,7 @@ M: sequence lengthen 2dup length > [ set-length ] [ 2drop ] if ;
 
 M: sequence shorten 2dup length < [ set-length ] [ 2drop ] if ;
 
-: empty? ( seq -- ? ) length zero? ; inline
+: empty? ( seq -- ? ) length 0 = ; inline
 
 : if-empty ( seq quot1 quot2 -- )
     [ dup empty? ] [ [ drop ] prepose ] [ ] tri* if ; inline
@@ -362,7 +362,7 @@ PRIVATE>
     prepose curry ; inline
 
 : (interleave) ( n elt between quot -- )
-    roll zero? [ nip ] [ swapd 2slip ] if call ; inline
+    roll 0 = [ nip ] [ swapd 2slip ] if call ; inline
 
 PRIVATE>
 
@@ -530,7 +530,7 @@ M: sequence <=>
     [ -rot 2nth-unsafe <=> ] [ [ length ] compare ] if* ;
 
 : sequence= ( seq1 seq2 -- ? )
-    2dup [ length ] bi@ number=
+    2dup [ length ] bi@ =
     [ mismatch not ] [ 2drop f ] if ; inline
 
 : sequence-hashcode-step ( oldhash newpart -- newhash )
@@ -547,7 +547,7 @@ M: reversed equal? over reversed? [ sequence= ] [ 2drop f ] if ;
 M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 
 : move ( to from seq -- )
-    2over number=
+    2over =
     [ 3drop ] [ [ nth swap ] [ set-nth ] bi ] if ; inline
 
 <PRIVATE
@@ -582,7 +582,7 @@ PRIVATE>
 <PRIVATE
 
 : move-backward ( shift from to seq -- )
-    2over number= [
+    2over = [
         2drop 2drop
     ] [
         [ >r 2over + pick r> move >r 1+ r> ] keep
@@ -590,7 +590,7 @@ PRIVATE>
     ] if ;
 
 : move-forward ( shift from to seq -- )
-    2over number= [
+    2over = [
         2drop 2drop
     ] [
         [ >r pick >r dup dup r> + swap r> move 1- ] keep
@@ -607,7 +607,7 @@ PRIVATE>
 PRIVATE>
 
 : open-slice ( shift from seq -- )
-    pick zero? [
+    pick 0 = [
         3drop
     ] [
         pick over length + over >r >r
@@ -680,7 +680,7 @@ PRIVATE>
 
 : padding ( seq n elt quot -- newseq )
     [
-        [ over length [-] dup zero? [ drop ] ] dip
+        [ over length [-] dup 0 = [ drop ] ] dip
         [ <repetition> ] curry
     ] dip compose if ; inline
 

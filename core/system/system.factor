@@ -11,7 +11,7 @@ SINGLETON: ppc
 
 UNION: x86 x86.32 x86.64 ;
 
-: cpu ( -- class ) \ cpu get ;
+: cpu ( -- class ) \ cpu get-global ; foldable
 
 SINGLETON: winnt
 SINGLETON: wince
@@ -29,7 +29,7 @@ UNION: bsd freebsd netbsd openbsd macosx ;
 
 UNION: unix bsd solaris linux ;
 
-: os ( -- class ) \ os get ;
+: os ( -- class ) \ os get-global ; foldable
 
 <PRIVATE
 

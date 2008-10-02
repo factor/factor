@@ -362,3 +362,18 @@ TUPLE: some-tuple x ;
 [ B{ 0 1 2 3 4 5 6 7 } ] [ [ 8 [ ] B{ } map-as ] compile-call ] unit-test
 
 [ 0 ] [ 1234 [ { fixnum } declare -64 shift ] compile-call ] unit-test
+
+! Loop detection problem found by doublec
+SYMBOL: counter
+
+DEFER: loop-bbb
+
+: loop-aaa ( -- )
+    counter inc counter get 2 < [ loop-bbb ] when ; inline recursive
+
+: loop-bbb ( -- )
+    [ loop-aaa ] with-scope ; inline recursive
+
+: loop-ccc ( -- ) loop-bbb ;
+
+[ 0 ] [ 0 counter set loop-ccc counter get ] unit-test
