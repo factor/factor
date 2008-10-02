@@ -373,7 +373,8 @@ SYMBOL: deploy-vocab
     r> strip-words
     compress-byte-arrays
     compress-quotations
-    compress-strings ;
+    compress-strings
+    H{ } clone classes:next-method-quot-cache set-global ;
 
 : (deploy) ( final-image vocab config -- )
     #! Does the actual work of a deployment in the slave
