@@ -50,6 +50,13 @@ FUNCTION: void NSBeep ( ) ;
 
 : finish-launching ( -- ) NSApp -> finishLaunching ;
 
+: cocoa-app ( quot -- )
+    [
+        call
+        finish-launching
+        NSApp -> run
+    ] with-cocoa ; inline
+
 : install-delegate ( receiver delegate -- )
     -> alloc -> init -> setDelegate: ;
 
