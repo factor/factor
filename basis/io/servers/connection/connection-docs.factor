@@ -58,9 +58,11 @@ ARTICLE: "io.servers.connection" "Threaded servers"
 { $subsection start-server }
 { $subsection start-server* }
 { $subsection wait-for-server }
+"Stopping the server:"
+{ $subsection stop-server }
 "From within the dynamic scope of a client handler, several words can be used to interact with the threaded server:"
 { $subsection remote-address }
-{ $subsection stop-server }
+{ $subsection stop-this-server }
 { $subsection secure-port }
 { $subsection insecure-port }
 "Additionally, the " { $link local-address } " variable is set, as in " { $link with-client } "." ;
@@ -88,7 +90,8 @@ HELP: handle-client*
 
 HELP: start-server
 { $values { "threaded-server" threaded-server } }
-{ $description "Starts a threaded server, returning when a client handler calls " { $link stop-server } "." } ;
+{ $description "Starts a threaded server." }
+{ $notes "Use " { $link stop-server } " or " { $link stop-this-server } " to stop the server." } ;
 
 HELP: wait-for-server
 { $values { "threaded-server" threaded-server } }
@@ -96,9 +99,13 @@ HELP: wait-for-server
 
 HELP: start-server*
 { $values { "threaded-server" threaded-server } }
-{ $description "Starts a threaded server, returning as soon as it is accepting connections." } ;
+{ $description "Starts a threaded server, returning as soon as it is ready to begin accepting connections." } ;
 
 HELP: stop-server
+{ $values { "threaded-server" threaded-server } }
+{ $description "Stops a threaded server, preventing it from accepting any more connections and returning to the caller of " { $link start-server } ". All client connections which have already been opened continue to be serviced." } ;
+
+HELP: stop-this-server
 { $description "Stops the current threaded server, preventing it from accepting any more connections and returning to the caller of " { $link start-server } ". All client connections which have already been opened continue to be serviced." } ;
 
 HELP: secure-port

@@ -5,7 +5,7 @@ IN: tools.scaffold
 
 HELP: developer-name
 { $description "Set this symbol to hold your name so that the scaffold tools can generate the correct file header for copyright. Setting this variable in your .factor-boot-rc file is recommended." }
-{ $unchecked-example "USING: namespaces tools.scaffold ;\n\"Stacky Guy\" developer-name set-global" } ;
+{ $code "USING: namespaces tools.scaffold ;\n\"Stacky Guy\" developer-name set-global" } ;
 
 HELP: help.
 { $values
@@ -13,8 +13,7 @@ HELP: help.
 { $description "Prints out scaffold help markup for a given word." } ;
 
 HELP: scaffold-help
-{ $values
-     { "vocab-root" "a vocabulary root string" } { "string" string } }
+{ $values { "string" string } }
 { $description "Takes an existing vocabulary and creates a help file with scaffolded help for each word. This word only works if no help file yet exists." } ;
 
 HELP: scaffold-undocumented

@@ -18,11 +18,11 @@ HELP: printf
     { $example
         "USING: printf ;"
         "1.23456789 \"%.3f\" printf"
-        "1.234" }
+        "1.235" }
     { $example 
         "USING: printf ;"
         "1234567890 \"%.5e\" printf"
-        "1.23456e+09" }
+        "1.23457e+09" }
     { $example
         "USING: printf ;"
         "12 \"%'#4d\" printf"

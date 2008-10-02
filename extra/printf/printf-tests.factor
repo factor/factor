@@ -23,25 +23,27 @@ USING: kernel printf tools.test ;
 
 [ t ] [ "+0010" 10 "%+05d" sprintf = ] unit-test
 
-[ t ] [ "123.456" 123.456 "%f" sprintf = ] unit-test
+[ t ] [ "123.456000" 123.456 "%f" sprintf = ] unit-test
+
+[ t ] [ "2.44" 2.436 "%.2f" sprintf = ] unit-test
 
 [ t ] [ "123.10" 123.1 "%01.2f" sprintf = ] unit-test
 
-[ t ] [ "1.2345" 1.23456789 "%.4f" sprintf = ] unit-test
+[ t ] [ "1.2346" 1.23456789 "%.4f" sprintf = ] unit-test
 
 [ t ] [ "  1.23" 1.23456789 "%6.2f" sprintf = ] unit-test
 
-[ t ] [ "1.234e+08" 123400000 "%e" sprintf = ] unit-test
+[ t ] [ "1.234000e+08" 123400000 "%e" sprintf = ] unit-test
 
-[ t ] [ "-1.234e+08" -123400000 "%e" sprintf = ] unit-test
+[ t ] [ "-1.234000e+08" -123400000 "%e" sprintf = ] unit-test
 
 [ t ] [ "1.234567e+08" 123456700 "%e" sprintf = ] unit-test
 
 [ t ] [ "3.625e+08" 362525200 "%.3e" sprintf = ] unit-test
 
-[ t ] [ "2.5e-03" 0.0025 "%e" sprintf = ] unit-test
+[ t ] [ "2.500000e-03" 0.0025 "%e" sprintf = ] unit-test
 
-[ t ] [ "2.5E-03" 0.0025 "%E" sprintf = ] unit-test
+[ t ] [ "2.500000E-03" 0.0025 "%E" sprintf = ] unit-test
 
 [ t ] [ "   1.0E+01" 10 "%10.1E" sprintf = ] unit-test
 

@@ -195,5 +195,5 @@ posting "POSTINGS"
     <boilerplate>
         { planet "planet-common" } >>template ;
 
-: start-update-task ( db params -- )
-    '[ _ _ [ update-cached-postings ] with-db ] 10 minutes every drop ;
+: start-update-task ( db -- )
+    '[ _ [ update-cached-postings ] with-db ] 10 minutes every drop ;
