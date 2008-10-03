@@ -3,14 +3,15 @@
 USING: accessors alien alien.accessors arrays assocs
 combinators.lib io kernel macros math namespaces prettyprint
 quotations sequences vectors vocabs words html.elements sets
-slots.private combinators.short-circuit ;
+slots.private combinators.short-circuit math.order hashtables
+sequences.deep ;
 IN: lint
 
 SYMBOL: def-hash
 SYMBOL: def-hash-keys
 
 : set-hash-vector ( val key hash -- )
-    2dup at -rot >r >r ?push r> r> set-at ;
+    2dup at -rot [ ?push ] 2dip set-at ;
 
 : add-word-def ( word quot -- )
     dup callable? [
@@ -67,7 +68,7 @@ def-hash get-global [
 
 ! Remove constants [ 1 ]
 [
-    drop dup length 1 = swap first number? and not
+    drop { [ length 1 = ] [ first number? ] } 1&& not
 ] assoc-filter
 
 ! Remove set-alien-cell, etc.
@@ -78,6 +79,13 @@ def-hash get-global [
 ! Remove trivial defs
 [
     drop trivial-defs member? not
+] assoc-filter
+
+[
+    drop {
+        [ [ wrapper? ] deep-contains? ]
+        [ [ hashtable? ] deep-contains? ]
+    } 1|| not
 ] assoc-filter
 
 ! Remove n m shift defs
