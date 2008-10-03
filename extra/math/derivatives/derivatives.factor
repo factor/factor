@@ -1,4 +1,3 @@
-
 USING: kernel continuations combinators sequences math
       math.order math.ranges accessors float-arrays ;
 
@@ -7,11 +6,11 @@ IN: math.derivatives
 TUPLE: state x func h err i j errt fac hh ans a done ;
 
 : largest-float ( -- x ) HEX: 7fefffffffffffff bits>double ; foldable
-: ntab ( -- val ) 8 ;
-: con ( -- val ) 1.6 ;
-: con2 ( -- val ) con con * ;
-: big ( -- val ) largest-float ;
-: safe ( -- val ) 2.0 ;
+: ntab ( -- val ) 8 ; inline
+: con ( -- val ) 1.6 ; inline
+: con2 ( -- val ) con con * ; inline
+: big ( -- val ) largest-float ; inline
+: safe ( -- val ) 2.0 ; inline
 
 ! Yes, this was ported from C code.
 : a[i][i]     ( state -- elt ) [ i>>     ] [ i>>     ] [ a>> ] tri nth nth ;
