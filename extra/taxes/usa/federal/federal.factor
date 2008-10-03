@@ -45,3 +45,15 @@ M: federal withholding* ( salary w4 tax-table entity -- x )
     [ federal-tax ] 3keep drop
     [ fica-tax ] 2keep
     medicare-tax + + ;
+
+: total-withholding ( salary w4 tax-table -- x )
+    dup entity>> dup federal = [
+        withholding* 
+    ] [
+        drop
+        [ drop <federal> federal withholding* ]
+        [ dup entity>> withholding* ] 3bi +
+    ] if ;
+
+: net ( salary w4 collector -- x )
+    >r dupd r> total-withholding - ;

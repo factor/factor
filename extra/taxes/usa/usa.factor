@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs kernel math math.intervals
-namespaces sequences money math.order taxes.usa.w4
-taxes.usa.federal ;
+namespaces sequences money math.order taxes.usa.w4 ;
 IN: taxes.usa
 
 ! Withhold: FICA, Medicare, Federal (FICA is social security)
@@ -17,12 +16,7 @@ GENERIC: withholding* ( salary w4 tax-table entity -- x )
     dup entity>> adjust-allowances* ;
 
 : withholding ( salary w4 tax-table -- x )
-    dup entity>> federal = [
-        dup entity>> withholding*
-    ] [
-        [ dup entity>> withholding* ] 
-        [ drop <federal> federal withholding* ] 3bi +
-    ] if ;
+    dup entity>> withholding* ;
 
 : tax-bracket-range ( pair -- n ) first2 swap - ;
 
@@ -36,6 +30,3 @@ GENERIC: withholding* ( salary w4 tax-table entity -- x )
 : marriage-table ( w4 tax-table -- triples )
     swap married?>>
     [ married>> ] [ single>> ] if ;
-
-: net ( salary w4 collector -- x )
-    >r dupd r> withholding - ;

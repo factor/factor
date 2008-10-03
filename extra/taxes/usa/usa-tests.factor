@@ -110,9 +110,9 @@ IN: taxes.usa.tests
 
 
 [ 138 69 ] [
-    24000 2008 2 f <w4> <federal> withholding biweekly dollars/cents
+    24000 2008 2 f <w4> <federal> total-withholding biweekly dollars/cents
 ] unit-test
 
 [ 754 72 ] [
-    78250 2008 2 f <w4> <federal> withholding biweekly dollars/cents
+    78250 2008 2 f <w4> <federal> total-withholding biweekly dollars/cents
 ] unit-test
