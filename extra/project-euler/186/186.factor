@@ -1,5 +1,5 @@
 USING: circular disjoint-sets kernel math math.ranges
-       sequences sequences.lib ;
+sequences ;
 IN: project-euler.186
 
 : (generator) ( k -- n )

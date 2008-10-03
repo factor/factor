@@ -1,5 +1,7 @@
-USING: kernel money taxes tools.test ;
-IN: taxes.tests
+USING: kernel money tools.test
+taxes.usa taxes.usa.federal taxes.usa.mn
+taxes.utils taxes.usa.w4 usa-cities ;
+IN: taxes.usa.tests
 
 [
     426 23
@@ -42,14 +44,14 @@ IN: taxes.tests
 [
     780 81
 ] [
-    24000 2008 3 f <w4> <minnesota> net biweekly
+    24000 2008 3 f <w4> <mn> net biweekly
     dollars/cents
 ] unit-test
 
 [
     818 76
 ] [
-    24000 2008 3 t <w4> <minnesota> net biweekly
+    24000 2008 3 t <w4> <mn> net biweekly
     dollars/cents
 ] unit-test
 
@@ -57,14 +59,14 @@ IN: taxes.tests
 [
     2124 39
 ] [
-    78250 2008 3 f <w4> <minnesota> net biweekly
+    78250 2008 3 f <w4> <mn> net biweekly
     dollars/cents
 ] unit-test
 
 [
     2321 76
 ] [
-    78250 2008 3 t <w4> <minnesota> net biweekly
+    78250 2008 3 t <w4> <mn> net biweekly
     dollars/cents
 ] unit-test
 
@@ -72,45 +74,45 @@ IN: taxes.tests
 [
     2612 63
 ] [
-    100000 2008 3 f <w4> <minnesota> net biweekly
+    100000 2008 3 f <w4> <mn> net biweekly
     dollars/cents
 ] unit-test
 
 [
     22244 52
 ] [
-    1000000 2008 3 f <w4> <minnesota> net biweekly
+    1000000 2008 3 f <w4> <mn> net biweekly
     dollars/cents
 ] unit-test
 
 [
     578357 40
 ] [
-    1000000 2008 3 f <w4> <minnesota> net
+    1000000 2008 3 f <w4> <mn> net
     dollars/cents
 ] unit-test
 
 [
     588325 41
 ] [
-    1000000 2008 3 t <w4> <minnesota> net
+    1000000 2008 3 t <w4> <mn> net
     dollars/cents
 ] unit-test
 
 
 [ 30 97 ] [
-    24000 2008 2 f <w4> <minnesota> withholding biweekly dollars/cents
+    24000 2008 2 f <w4> <mn> MN withholding* biweekly dollars/cents
 ] unit-test
 
 [ 173 66 ] [
-    78250 2008 2 f <w4> <minnesota> withholding biweekly dollars/cents
+    78250 2008 2 f <w4> <mn> MN withholding* biweekly dollars/cents
 ] unit-test
 
 
 [ 138 69 ] [
-    24000 2008 2 f <w4> <federal> withholding biweekly dollars/cents
+    24000 2008 2 f <w4> <federal> total-withholding biweekly dollars/cents
 ] unit-test
 
 [ 754 72 ] [
-    78250 2008 2 f <w4> <federal> withholding biweekly dollars/cents
+    78250 2008 2 f <w4> <federal> total-withholding biweekly dollars/cents
 ] unit-test

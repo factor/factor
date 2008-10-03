@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel sequences sequences.lib math math.functions math.ranges locals ;
+USING: kernel sequences math math.functions math.ranges locals ;
 IN: project-euler.190
 
 ! http://projecteuler.net/index.php?section=problems&id=190
