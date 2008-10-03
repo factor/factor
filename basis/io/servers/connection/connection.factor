@@ -105,7 +105,7 @@ M: threaded-server handle-client* handler>> call ;
     threaded-server get encoding>> <server>
     [ started-accept-loop ] [ [ accept-loop ] with-disposal ] bi ;
 
-\ start-accept-loop ERROR add-error-logging
+\ start-accept-loop NOTICE add-error-logging
 
 : init-server ( threaded-server -- threaded-server )
     dup semaphore>> [
