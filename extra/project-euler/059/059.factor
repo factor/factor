@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer, Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays ascii assocs hashtables io.encodings.ascii io.files kernel math
-    math.parser namespaces make sequences sequences.lib sequences.private sorting
+    math.parser namespaces make sequences sequences.private sorting
     splitting grouping strings sets accessors ;
 IN: project-euler.059
 

@@ -1,5 +1,8 @@
-USING: arrays io io.streams.string kernel math math.parser namespaces
-prettyprint sequences sequences.lib splitting grouping strings ascii ;
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
+USING: arrays io io.streams.string kernel math math.parser
+namespaces prettyprint sequences splitting grouping strings
+ascii ;
 IN: hexdump
 
 <PRIVATE
@@ -21,11 +24,12 @@ IN: hexdump
     nl ;
 
 PRIVATE>
-: hexdump ( seq -- str )
+
+: hexdump ( sequence -- string )
     [
         dup length header.
         16 <sliced-groups> [ line. ] each-index
     ] with-string-writer ;
 
-: hexdump. ( seq -- )
+: hexdump. ( sequence -- )
     hexdump write ;
