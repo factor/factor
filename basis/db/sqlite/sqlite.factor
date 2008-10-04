@@ -49,8 +49,8 @@ M: sqlite-result-set dispose ( result-set -- )
     handle>> [ sqlite3_reset drop ] [ sqlite3_clear_bindings drop ] bi ;
 
 M: sqlite-statement low-level-bind ( statement -- )
-    [ bind-params>> ] [ handle>> ] bi
-    [ swap [ key>> ] [ value>> ] [ type>> ] tri sqlite-bind-type ] curry each ;
+    [ handle>> ] [ bind-params>> ] bi
+    [ [ key>> ] [ value>> ] [ type>> ] tri sqlite-bind-type ] with each ;
 
 M: sqlite-statement bind-statement* ( statement -- )
     sqlite-maybe-prepare

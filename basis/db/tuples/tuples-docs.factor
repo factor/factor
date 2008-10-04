@@ -1,8 +1,45 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes help.markup help.syntax io.streams.string kernel
-quotations sequences strings multiline math db.types ;
+quotations sequences strings multiline math db.types db ;
 IN: db.tuples
+
+HELP: <count-statement>
+{ $values
+     { "query" query }
+     { "statement" statement } }
+{ $description "A database-specific hook for generating the SQL for a count statement." } ;
+
+HELP: <delete-tuples-statement>
+{ $values
+     { "tuple" tuple } { "class" class }
+     { "object" object } }
+{ $description "A database-specific hook for generating the SQL for an delete statement." } ;
+
+HELP: <insert-db-assigned-statement>
+{ $values
+     { "class" class }
+     { "object" object } }
+{ $description "A database-specific hook for generating the SQL for an insert statement with a database-assigned primary key." } ;
+
+HELP: <insert-user-assigned-statement>
+{ $values
+     { "class" class }
+     { "object" object } }
+{ $description "A database-specific hook for generating the SQL for an insert statement with a user-assigned primary key." } ;
+
+HELP: <select-by-slots-statement>
+{ $values
+     { "tuple" tuple } { "class" class }
+     { "tuple" tuple } }
+{ $description "A database-specific hook for generating the SQL for a select statement." } ;
+
+HELP: <update-tuple-statement>
+{ $values
+     { "class" class }
+     { "object" object } }
+{ $description "A database-specific hook for generating the SQL for an update statement." } ;
+
 
 HELP: define-persistent
 { $values
@@ -128,7 +165,21 @@ ARTICLE: "db-tuples-words" "High-level tuple/database words"
 { $subsection count-tuples } ;
 
 ARTICLE: "db-tuples-protocol" "Tuple database protocol"
-;
+"Creating a table:"
+{ $subsection create-sql-statement }
+"Dropping a table:"
+{ $subsection drop-sql-statement }
+"Inserting a tuple:"
+{ $subsection <insert-db-assigned-statement> }
+{ $subsection <insert-user-assigned-statement> }
+"Updating a tuple:"
+{ $subsection <update-tuple-statement> }
+"Deleting tuples:"
+{ $subsection <delete-tuples-statement> }
+"Selecting tuples:"
+{ $subsection <select-by-slots-statement> }
+"Counting tuples:"
+{ $subsection <count-statement> } ;
 
 ARTICLE: "db-tuples-tutorial" "Tuple database tutorial"
 "Let's make a tuple and store it in a database. To follow along, click on each code example and run it in the listener.  If you forget to run an example, just start at the top and run them all again in order." $nl

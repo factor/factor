@@ -111,22 +111,22 @@ M: object execute-statement* ( statement type -- )
     [ db-open db ] dip
     '[ db get [ drop @ ] with-disposal ] with-variable ; inline
 
+! Words for working with raw SQL statements
 : default-query ( query -- result-set )
     query-results [ [ sql-row ] query-map ] with-disposal ;
 
 : sql-query ( sql -- rows )
     f f <simple-statement> [ default-query ] with-disposal ;
 
-: sql-command ( sql -- )
-    dup string? [
-        f f <simple-statement> [ execute-statement ] with-disposal
-    ] [
-        ! [
-            [ sql-command ] each
-        ! ] with-transaction
-    ] if ;
+: (sql-command) ( string -- )
+    f f <simple-statement> [ execute-statement ] with-disposal ;
 
+: sql-command ( sql -- )
+    dup string? [ (sql-command) ] [ [ (sql-command) ] each ] if ;
+
+! Transactions
 SYMBOL: in-transaction
+
 HOOK: begin-transaction db ( -- )
 HOOK: commit-transaction db ( -- )
 HOOK: rollback-transaction db ( -- )
