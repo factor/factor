@@ -3,17 +3,17 @@ random.mersenne-twister sequences tools.test math.order ;
 IN: random.mersenne-twister.tests
 
 : check-random ( max -- ? )
-    dup >r random 0 r> between? ;
+    [ random 0 ] keep between? ;
 
 [ t ] [ 100 [ drop 674 check-random ] all? ] unit-test
 
-: make-100-randoms
-    [ 100 [ 100 random , ] times ] { } make ;
+: randoms ( -- seq )
+    100 [ 100 random ] replicate ;
 
 : test-rng ( seed quot -- )
     >r <mersenne-twister> r> with-random ;
 
-[ f ] [ 1234 [ make-100-randoms make-100-randoms = ] test-rng ] unit-test
+[ f ] [ 1234 [ randoms randoms = ] test-rng ] unit-test
 
 [ 1333075495 ] [
     0 [ 1000 [ drop random-generator get random-32* drop ] each random-generator get random-32* ] test-rng
