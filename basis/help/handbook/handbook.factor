@@ -90,7 +90,7 @@ ARTICLE: "numbers" "Numbers"
 { $subsection "math-constants" }
 { $subsection "math-functions" }
 { $subsection "number-strings" }
-{ $subsection "random-numbers" }
+{ $subsection "random" }
 "Number implementations:"
 { $subsection "integers" }
 { $subsection "rationals" }
