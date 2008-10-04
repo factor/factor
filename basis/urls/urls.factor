@@ -155,6 +155,8 @@ PRIVATE>
         f >>host
         f >>port ;
 
+: relative-url? ( url -- ? ) protocol>> not ;
+
 ! Half-baked stuff follows
 : secure-protocol? ( protocol -- ? )
     "https" = ;

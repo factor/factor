@@ -1,6 +1,5 @@
 ! Copyright 2007, 2008 Ryan Murphy, Slava Pestov
 ! See http://factorcode.org/license.txt for BSD license.
-
 USING: arrays kernel math namespaces tools.test
 heaps heaps.private math.parser random assocs sequences sorting
 accessors math.order ;
@@ -53,9 +52,6 @@ IN: heaps.tests
 14 [
     [ t ] swap [ 2^ test-entry-indices ] curry unit-test
 ] each
-
-: delete-random ( seq -- elt )
-    dup length random dup pick nth >r swap delete-nth r> ;
 
 : sort-entries ( entries -- entries' )
     [ [ key>> ] compare ] sort ;

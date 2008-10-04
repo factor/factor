@@ -6,8 +6,6 @@ math.parser io prettyprint db.types continuations
 destructors mirrors sets db.types ;
 IN: db.tuples
 
-<PRIVATE
-
 HOOK: create-sql-statement db ( class -- object )
 HOOK: drop-sql-statement db ( class -- object )
 
@@ -18,10 +16,12 @@ HOOK: <delete-tuples-statement> db ( tuple class -- object )
 HOOK: <select-by-slots-statement> db ( tuple class -- tuple )
 HOOK: <count-statement> db ( query -- statement )
 HOOK: query>statement db ( query -- statement )
-
 HOOK: insert-tuple-set-key db ( tuple statement -- )
 
+<PRIVATE
+
 SYMBOL: sql-counter
+
 : next-sql-counter ( -- str )
     sql-counter [ inc ] [ get ] bi number>string ;
 
@@ -67,7 +67,6 @@ GENERIC: eval-generator ( singleton -- object )
     [ [ bind-tuple ] [ nip default-query ] 2bi ] with-disposal ;
 
 PRIVATE>
-
 
 ! High level
 ERROR: no-slots-named class seq ;

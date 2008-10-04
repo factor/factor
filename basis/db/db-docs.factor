@@ -9,7 +9,8 @@ HELP: db
 
 HELP: new-db
 { $values { "class" class } { "obj" object } }
-{ $description "Creates a new database object from a given class with caches for prepared statements. Does not actually connect to the database until " { $link db-open } " or " { $link with-db } " is called." } ;
+{ $description "Creates a new database object from a given class with caches for prepared statements. Does not actually connect to the database until " { $link db-open } " or " { $link with-db } " is called." }
+{ $notes "User-defined databases must call this constructor word instead of " { $link new } "." } ;
 
 HELP: db-open
 { $values { "db" db } { "db" db } }
@@ -18,6 +19,8 @@ HELP: db-open
 HELP: db-close
 { $values { "handle" alien } }
 { $description "Closes a database using the handle provided. Use of the " { $link with-db } " combinator is preferred over manually opening and closing databases so that resources are not leaked." } ;
+
+{ db-open db-close with-db } related-words
 
 HELP: dispose-statements
 { $values { "assoc" assoc } }
@@ -46,25 +49,41 @@ HELP: new-statement
 { $values { "sql" string } { "in" sequence } { "out" sequence } { "class" class } { "statement" statement } }
 { $description "Makes a new statement object from the given parameters." } ;
 
+HELP: bind-statement
+{ $values
+     { "obj" object } { "statement" statement } }
+{ $description "Sets the statement's " { $slot "bind-params" } " and calls " { $link bind-statement* } " to do the database-specific bind. Sets " { $slot "bound?" } " to true if binding succeeds." } ;
+
+HELP: bind-statement*
+{ $values
+     { "statement" statement } }
+{ $description "Does a low-level bind of the SQL statement's tuple parameters if the database requires. Some databases should treat this as a no-op and bind instead when the actual statement is run." } ;
+
 HELP: <simple-statement>
 { $values { "string" string } { "in" sequence } { "out" sequence }
     { "statement" statement } }
-{ $description "Makes a new simple statement object from the given parameters." } ;
+{ $description "Makes a new simple statement object from the given parameters.." }
+{ $warning "Using a simple statement can lead to SQL injection attacks in PostgreSQL. The Factor database implementation for SQLite only uses " { $link <prepared-statement> } " as the sole kind of statement; simple statements alias to prepared ones." } ;
 
 HELP: <prepared-statement>
 { $values { "string" string } { "in" sequence } { "out" sequence }
     { "statement" statement } }
-{ $description "Makes a new prepared statement object from the given parameters." } ;
+{ $description "Makes a new prepared statement object from the given parameters. A prepared statement's parameters will be escaped by the database backend to avoid SQL injection attacks. Prepared statements should be preferred over simple statements." } ;
 
 HELP: prepare-statement
 { $values { "statement" statement } }
 { $description "For databases which implement a method on this generic, it does some internal processing to ready the statement for execution." } ;
 
+HELP: low-level-bind
+{ $values
+     { "statement" statement } }
+{ $description "For use with prepared statements, methods on this word should bind the datatype in the SQL spec to its identifier in the SQL string. To name bound variables, SQLite uses identifiers in the form of " { $snippet ":name" } ", while PostgreSQL uses increasing numbers beginning with a dollar sign, e.g. " { $snippet "$1" } "." } ;
+
 HELP: query-results
 { $values { "query" object }
     { "result-set" result-set }
 }
-{ $description "Returns a " { $link result-set } " object representing the reults of a SQL query." } ;
+{ $description "Returns a " { $link result-set } " object representing the results of a SQL query. See " { $link "db-result-sets" } "." } ;
 
 HELP: #rows
 { $values { "result-set" result-set } { "n" integer } }
@@ -161,22 +180,18 @@ HELP: with-transaction
 { $description "" } ;
 
 ARTICLE: "db" "Database library"
+"Accessing a database:"
 { $subsection "db-custom-database-combinators" }
+"Higher-level database help:"
+{ $vocab-subsection "Database types" "db.types" }
+{ $vocab-subsection "High-level tuple/database integration" "db.tuples" }
+"Low-level database help:"
 { $subsection "db-protocol" }
 { $subsection "db-result-sets" }
 { $subsection "db-lowlevel-tutorial" }
-"Higher-level database:"
-{ $vocab-subsection "Database types" "db.types" }
-{ $vocab-subsection "High-level tuple/database integration" "db.tuples" }
-! { $subsection "db-tuples" }
-! { $subsection "db-tuples-protocol" }
-! { $subsection "db-tuples-tutorial" }
 "Supported database backends:"
 { $vocab-subsection "SQLite" "db.sqlite" }
-{ $vocab-subsection "PostgreSQL" "db.postgresql" }
-"To add support for another database to Factor:"
-{ $subsection "db-porting-the-library" }
-;
+{ $vocab-subsection "PostgreSQL" "db.postgresql" } ;
 
 ARTICLE: "db-random-access-result-set" "Random access result sets"
 "Random-access result sets do not have to be traversed in order. For instance, PostgreSQL's result set object can be accessed as a matrix with i,j coordinates."
@@ -234,32 +249,54 @@ ARTICLE: "db-protocol" "Low-level database protocol"
 
 ARTICLE: "db-lowlevel-tutorial" "Low-level database tutorial"
 "Although Factor makes integrating a database with its object system easy (see " { $vocab-link "db.tuples" } "), sometimes you may want to write SQL directly and get the results back as arrays of strings, for instance, when interfacing with a legacy database that doesn't easily map to " { $snippet "tuples" } "."
-;
-
-ARTICLE: "db-porting-the-library" "Porting the database library"
-"There are two layers to implement when porting the database library."
-{ $subsection "db-protocol" }
-;
+"Executing a SQL command:"
+{ $subsection sql-command }
+"Executing a query directly:"
+{ $subsection sql-query }
+"Here's an example usage where we'll make a book table, insert some objects, and query them." $nl
+"First, let's set up a custom combinator for using our database.  See " { $link "db-custom-database-combinators" } " for more details."
+{ $code <"
+USING: db.sqlite db io.files ;
+: with-book-db ( quot -- )
+    "book.db" temp-file <sqlite-db> swap with-db ;"> }
+"Now let's create the table manually:"
+{ $code <" "create table books
+    (id integer primary key, title text, author text, date_published timestamp,
+     edition integer, cover_price double, condition text)"
+    [ sql-command ] with-book-db" "> }
+"Time to insert some books:"
+{ $code <"
+"insert into books
+    (title, author, date_published, edition, cover_price, condition)
+    values('Factor for Sheeple', 'Mister Stacky Pants', date('now'), 1, 13.37, 'mint')"
+[ sql-command ] with-book-db"> }
+"Now let's select the book:"
+{ $code <"
+"select id, title, cover_price from books;" [ sql-query ] with-book-db "> }
+"Notice that the result of this query is a Factor array containing the database rows as arrays of strings. We would have to convert the " { $snippet "cover_price" } " from a string to a number in order to use it in a calculation." $nl
+"In conclusion, this method of accessing a database is supported, but it is fairly low-level and generally specific to a single database. The " { $vocab-link "db.tuples" } " vocabulary is a good alternative to writing SQL by hand." ;
 
 ARTICLE: "db-custom-database-combinators" "Custom database combinators"
 "Every database library requires some effort on the programmer's part to initialize and open a database. SQLite uses files on your harddisk, so a simple pathname is all the setup required. With PostgreSQL, you log in to a networked server as a user on a specfic port." $nl
 
-"Make a " { $snippet "with-" } " combinator to open and close a database so that resources are not leaked."
+"Make a " { $snippet "with-" } " combinator to open and close a database so that resources are not leaked." $nl
+
+"SQLite example combinator:"
 { $code <"
 USING: db.sqlite db io.files ;
 : with-sqlite-db ( quot -- )
-    "my-database.db" temp-file <sqlite-db> rot with-db ;"> } 
+    "my-database.db" temp-file <sqlite-db> swap with-db ;"> } 
 
+"PostgreSQL example combinator:"
 { $code <" USING: db.postgresql db ;
 : with-postgresql-db ( quot -- )
     <postgresql-db>
         "localhost" >>host
+        5432 >>port
         "erg" >>username
         "secrets?" >>password
         "factor-test" >>database
     swap with-db ;">
-}
-
-;
+} ;
 
 ABOUT: "db"

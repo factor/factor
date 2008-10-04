@@ -1,5 +1,5 @@
 USING: random sequences tools.test kernel math math.functions
-sets ;
+sets math.constants ;
 IN: random.tests
 
 [ 4 ] [ 4 random-bytes length ] unit-test
@@ -15,3 +15,7 @@ IN: random.tests
 [ t ] [ 10000 [ 0 [ drop 400 random + ] reduce ] keep / 2 * 400 10 ~ ] unit-test
 
 [ t ] [ 1000 [ 400 random ] replicate prune length 256 > ] unit-test
+
+[ t ] [ pi random float? ] unit-test
+
+[ 0 ] [ 0 random ] unit-test
