@@ -181,9 +181,7 @@ ARTICLE: "db" "Database library"
 { $subsection "db-lowlevel-tutorial" }
 "Supported database backends:"
 { $vocab-subsection "SQLite" "db.sqlite" }
-{ $vocab-subsection "PostgreSQL" "db.postgresql" }
-"To add support for another database to Factor:"
-{ $subsection "db-porting-the-library" } ;
+{ $vocab-subsection "PostgreSQL" "db.postgresql" } ;
 
 ARTICLE: "db-random-access-result-set" "Random access result sets"
 "Random-access result sets do not have to be traversed in order. For instance, PostgreSQL's result set object can be accessed as a matrix with i,j coordinates."
@@ -267,11 +265,6 @@ USING: db.sqlite db io.files ;
 "select id, title, cover_price from books;" [ sql-query ] with-book-db "> }
 "Notice that the result of this query is a Factor array containing the database rows as arrays of strings. We would have to convert the " { $snippet "cover_price" } " from a string to a number in order to use it in a calculation." $nl
 "In conclusion, this method of accessing a database is supported, but it is fairly low-level and generally specific to a single database. The " { $vocab-link "db.tuples" } " vocabulary is a good alternative to writing SQL by hand." ;
-
-ARTICLE: "db-porting-the-library" "Porting the database library"
-"There are two layers to implement when porting the database library."
-{ $subsection "db-protocol" }
-;
 
 ARTICLE: "db-custom-database-combinators" "Custom database combinators"
 "Every database library requires some effort on the programmer's part to initialize and open a database. SQLite uses files on your harddisk, so a simple pathname is all the setup required. With PostgreSQL, you log in to a networked server as a user on a specfic port." $nl
