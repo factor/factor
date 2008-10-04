@@ -1,6 +1,6 @@
 USING: kernel opengl.demo-support opengl.gl opengl.shaders opengl.framebuffers
 opengl multiline ui.gadgets accessors sequences ui.render ui math locals
-arrays generalizations combinators opengl.capabilities ;
+arrays generalizations combinators opengl.capabilities ui.gadgets.worlds ;
 IN: spheres
 
 STRING: plane-vertex-shader
@@ -162,6 +162,7 @@ M: spheres-gadget distance-step ( gadget -- dz )
     3array <gl-program> check-gl-program ;
 
 M: spheres-gadget graft* ( gadget -- )
+    dup find-gl-context
     "2.0" { "GL_ARB_shader_objects" } require-gl-version-or-extensions
     { "GL_EXT_framebuffer_object" } require-gl-extensions
     (plane-program) >>plane-program
@@ -173,6 +174,7 @@ M: spheres-gadget graft* ( gadget -- )
     drop ;
 
 M: spheres-gadget ungraft* ( gadget -- )
+    dup find-gl-context
     {
         [ reflection-framebuffer>> [ delete-framebuffer ] when* ]
         [ reflection-depthbuffer>> [ delete-renderbuffer ] when* ]
