@@ -49,6 +49,16 @@ HELP: new-statement
 { $values { "sql" string } { "in" sequence } { "out" sequence } { "class" class } { "statement" statement } }
 { $description "Makes a new statement object from the given parameters." } ;
 
+HELP: bind-statement
+{ $values
+     { "obj" object } { "statement" statement } }
+{ $description "Sets the statement's " { $slot "bind-params" } " and calls " { $link bind-statement* } " to do the database-specific bind. Sets " { $slot "bound?" } " to true if binding succeeds." } ;
+
+HELP: bind-statement*
+{ $values
+     { "statement" statement } }
+{ $description "Does a low-level bind of the SQL statement's tuple parameters if the database requires. Some databases should treat this as a no-op and bind instead when the actual statement is run." } ;
+
 HELP: <simple-statement>
 { $values { "string" string } { "in" sequence } { "out" sequence }
     { "statement" statement } }

@@ -4,6 +4,23 @@ USING: classes help.markup help.syntax io.streams.string kernel
 quotations sequences strings multiline math db.types db ;
 IN: db.tuples
 
+HELP: create-sql-statement
+{ $values
+     { "class" class }
+     { "object" object } }
+{ $description "Generates the SQL code for creating a table for a given class." } ;
+
+HELP: drop-sql-statement
+{ $values
+     { "class" class }
+     { "object" object } }
+{ $description "Generates the SQL code for dropping a table for a given class." } ;
+
+HELP: insert-tuple-set-key
+{ $values
+     { "tuple" tuple } { "statement" statement } }
+{ $description "Inserts a tuple and sets its primary key in one word. This is necessary for some databases." } ;
+
 HELP: <count-statement>
 { $values
      { "query" query }
