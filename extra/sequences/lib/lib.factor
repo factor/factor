@@ -131,15 +131,6 @@ PRIVATE>
 : power-set ( seq -- subsets )
     2 over length exact-number-strings swap [ switches ] curry map ;
 
-: ?first ( seq -- first/f ) 0 swap ?nth ; inline
-: ?second ( seq -- second/f ) 1 swap ?nth ; inline
-: ?third ( seq -- third/f ) 2 swap ?nth ; inline
-: ?fourth ( seq -- fourth/f ) 3 swap ?nth ; inline
-
-: ?first2 ( seq -- 1st/f 2nd/f ) dup ?first swap ?second ; inline
-: ?first3 ( seq -- 1st/f 2nd/f 3rd/f ) dup ?first2 rot ?third ; inline
-: ?first4 ( seq -- 1st/f 2nd/f 3rd/f 4th/f ) dup ?first3 roll ?fourth ; inline
-
 USE: continuations
 : ?subseq ( from to seq -- subseq )
     >r >r 0 max r> r>
