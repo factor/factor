@@ -100,8 +100,8 @@ ducet insert-helpers
     ] { } map-as concat ;
 
 : append-weights ( weights quot -- )
-    swap [ ignorable?>> not ] filter
-    swap map [ zero? not ] filter % 0 , ;
+    [ [ ignorable?>> not ] filter ] dip
+    map [ zero? not ] filter % 0 , ; inline
 
 : variable-weight ( weight -- )
     dup ignorable?>> [ primary>> ] [ drop HEX: FFFF ] if , ;
@@ -135,7 +135,7 @@ PRIVATE>
 <PRIVATE
 : insensitive= ( str1 str2 levels-removed -- ? )
     [
-        swap collation-key swap
+        [ collation-key ] dip
         [ [ 0 = not ] trim-right but-last ] times
     ] curry bi@ = ;
 PRIVATE>
@@ -158,8 +158,7 @@ PRIVATE>
 PRIVATE>
 
 : sort-strings ( strings -- sorted )
-    [ w/collation-key ] map
-    natural-sort values ;
+    [ w/collation-key ] map natural-sort values ;
 
 : string<=> ( str1 str2 -- <=> )
     [ w/collation-key ] compare ;
