@@ -3,11 +3,11 @@ IN: irc.client
 
 HELP: irc-client "IRC Client object" ;
 
-HELP: irc-server-listener "Listener for server messages unmanaged by other listeners" ;
+HELP: irc-server-chat "Chat for server messages unmanaged by other chats" ;
 
-HELP: irc-channel-listener "Listener for irc channels" ;
+HELP: irc-channel-chat "Chat for irc channels" ;
 
-HELP: irc-nick-listener "Listener for irc users" ;
+HELP: irc-nick-chat "Chat for irc users" ;
 
 HELP: irc-profile "IRC Client profile object" ;
 
@@ -15,48 +15,43 @@ HELP: connect-irc "Connecting to an irc server"
 { $values { "irc-client" "an irc client object" } }
 { $description "Connects and logins " { $link irc-client } " using the settings specified on its " { $link irc-profile } "." } ;
 
-HELP: add-listener "Listening to irc channels/users/etc"
-{ $values { "irc-listener" "an irc listener object" } { "irc-client" "an irc client object" } }
-{ $description "Registers " { $snippet "irc-listener" } " with " { $snippet "irc-client" } " and starts listening." } ;
+HELP: attach-chat "Chatting with irc channels/users/etc"
+{ $values { "irc-chat" "an irc chat object" } { "irc-client" "an irc client object" } }
+{ $description "Registers " { $snippet "irc-chat" } " with " { $snippet "irc-client" } " and starts listening." } ;
 
-HELP: join-irc-channel "Joining channels"
-{ $values { "irc-client-listener" "an irc client listener object" } }
-{ $description "Joins to the channel being listened by " { $snippet "irc-listener" } "." } ;
-
-HELP: remove-listener "Stop an unregister listener"
-{ $values { "irc-listener" "an irc listener object" } { "irc-client" "an irc client object" } }
-{ $description "Unregisters " { $snippet "irc-listener" } " from " { $snippet "irc-client" } " and stops listening. This is how you part from a channel." } ;
+HELP: dettach-chat "Stop an unregister chat"
+{ $values { "irc-chat" "an irc chat object" } { "irc-client" "an irc client object" } }
+{ $description "Unregisters " { $snippet "irc-chat" } " from " { $snippet "irc-client" } " and stops listening. This is how you part from a channel." } ;
 
 HELP: terminate-irc "Terminates an irc client"
 { $values { "irc-client" "an irc client object" } }
-{ $description "Terminates all activity by " { $link irc-client } " cleaning up resources and notifying listeners." } ;
+{ $description "Terminates all activity by " { $link irc-client } " cleaning up resources and notifying chats." } ;
 
-HELP: write-message "Sends a message through a listener"
-{ $values { "message" "a string or irc message object" } { "irc-listener" "an irc listener object" } }
-{ $description "Sends " { $snippet "message" } " through " { $snippet "irc-listener" } ". Strings are automatically promoted to privmsg objects." } ;
+HELP: speak "Sends a message through a chat"
+{ $values { "message" "a string or irc message object" } { "irc-chat" "an irc chat object" } }
+{ $description "Sends " { $snippet "message" } " through " { $snippet "irc-chat" } ". Strings are automatically promoted to privmsg objects." } ;
 
-HELP: read-message "Reads a message from a listener"
-{ $values { "irc-listener" "an irc listener object" } { "message" "an irc message object" } }
-{ $description "Reads " { $snippet "message" } " from " { $snippet "irc-listener" } "." } ;
+HELP: hear "Reads a message from a chat"
+{ $values { "irc-chat" "an irc chat object" } { "message" "an irc message object" } }
+{ $description "Reads " { $snippet "message" } " from " { $snippet "irc-chat" } "." } ;
 
 ARTICLE: "irc.client" "IRC Client"
 "An IRC Client library"
 { $heading "IRC objects:" }
 { $subsection irc-client }
-{ $heading "Listener objects:" }
-{ $subsection irc-server-listener }
-{ $subsection irc-channel-listener }
-{ $subsection irc-nick-listener }
+{ $heading "Chat objects:" }
+{ $subsection irc-server-chat }
+{ $subsection irc-channel-chat }
+{ $subsection irc-nick-chat }
 { $heading "Setup objects:" }
 { $subsection irc-profile }
 { $heading "Words:" }
 { $subsection connect-irc }
 { $subsection terminate-irc }
-{ $subsection add-listener }
-{ $subsection remove-listener }
-{ $subsection join-irc-channel }
-{ $subsection read-message }
-{ $subsection write-message }
+{ $subsection attach-chat }
+{ $subsection dettach-chat }
+{ $subsection hear }
+{ $subsection speak }
 { $heading "IRC messages" }
 "Some of the RFC defined irc messages as objects:"
 { $table
@@ -77,10 +72,10 @@ ARTICLE: "irc.client" "IRC Client"
 { $heading "Special messages" }
 "Some special messages that are created by the library and not by the irc server."
 { $table
-  { { $link irc-listener-end } "sent to a listener when it has been dettached from the client, the listener should stop after it receives this message. " }
-  { { $link irc-end } " sent when the client isn't running anymore, listeners should stop after it receives this message." }
-  { { $link irc-disconnected } " sent to notify listeners that connection was lost." }
-  { { $link irc-connected } " sent to notify listeners that a connection with the irc server was established." } }
+  { { $link irc-chat-end } "sent to a chat when it has been dettached from the client, the chat should stop after it receives this message. " }
+  { { $link irc-end } " sent when the client isn't running anymore, chats should stop after it receives this message." }
+  { { $link irc-disconnected } " sent to notify chats that connection was lost." }
+  { { $link irc-connected } " sent to notify chats that a connection with the irc server was established." } }
 
 { $heading "Example:" }
 { $code
@@ -91,16 +86,14 @@ ARTICLE: "irc.client" "IRC Client"
   "\"irc.freenode.org\" irc-port \"mybot123\" f <irc-profile> <irc-client> bot set"
   "! Connect to the server"
   "bot get connect-irc"
-  "! Create a channel listener"
-  "\"#mychannel123\" <irc-channel-listener> mychannel set"
-  "! Register and start listener (this joins the channel)"
-  "mychannel get bot get add-listener"
-  "! Join to the channel"
-  "mychannel get join-irc-channel"
+  "! Create a channel chat"
+  "\"#mychannel123\" <irc-channel-chat> mychannel set"
+  "! Register and start chat (this joins the channel)"
+  "mychannel get bot get attach-chat"
   "! Send a message to the channel"
-  "\"what's up?\" mychannel get write-message"
+  "\"what's up?\" mychannel get speak"
   "! Read a message from the channel"
-  "mychannel get read-message"
+  "mychannel get hear"
 }
   ;
 
