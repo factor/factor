@@ -334,13 +334,3 @@ IN: math.intervals.tests
         [ execute ] [ swapd execute ] 3bi =
     ] all?
 ] unit-test
-
-[ t ] [ 1.0 1.0 epsilon + [a,b] random float? ] unit-test
-[ t ] [ 1.0 1.0 epsilon + [a,b) random float? ] unit-test
-[ t ] [ 1.0 1.0 epsilon + (a,b] random float? ] unit-test
-[ 1.0 1.0 (a,b) random float? ] must-fail
-
-[ 3 4 + (a,b) random ] must-fail
-[ 3 ] [ 3 4 [a,b) random ] unit-test
-[ 4 ] [ 3 4 (a,b] random ] unit-test
-[ t ] [ 3 4 [a,b] random { 3 4 } member? ] unit-test
