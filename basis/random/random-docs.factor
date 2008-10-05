@@ -16,8 +16,21 @@ HELP: random-bytes*
 
 HELP: random
 { $values { "obj" object } { "elt" "a random element" } }
-{ $description "Outputs a random element of the input object. If the object is an integer, an input of zero always returns a zero, a negative integer throws an error, and positive integers yield a random integer in the interval " { $snippet "[0,n)" } ". On a sequence, an empty sequence always outputs " { $link f } " while any other sequence outputs a random element." }
-{ $notes "Since integers are sequences, passing an integer " { $snippet "n" } " yields a random integer in the interval " { $snippet "[0,n)" } "." } ;
+{ $description "Outputs a random element of the input object. If the object is an integer, an input of zero always returns a zero, while any other integer integers yield a random integer in the interval between itself and zero, inclusive of zero. On a sequence, an empty sequence always outputs " { $link f } "." }
+{ $examples
+    { $unchecked-example "USING: random prettyprint ;"
+        "10 random ."
+        "3" }
+    { $example "USING: random prettyprint ;"
+        "0 random ."
+        "0" }
+    { $unchecked-example "USING: random prettyprint ;"
+        "-10 random ."
+        "-8" }
+    { $unchecked-example "USING: random prettyprint ;"
+        "{ \"a\" \"b\" \"c\" } random ."
+        "\"a\"" }
+} ;
 
 HELP: random-bytes
 { $values { "n" "an integer" } { "byte-array" "a random integer" } }
@@ -51,7 +64,7 @@ HELP: delete-random
 { $values
      { "seq" sequence }
      { "elt" object } }
-{ $description "Delete a random number from a sequence using " { $link delete-nth } " and returns the deleted object." } ;
+{ $description "Deletes a random number from a sequence using " { $link delete-nth } " and returns the deleted object." } ;
 
 ARTICLE: "random-protocol" "Random protocol"
 "A random number generator must implement one of these two words:"

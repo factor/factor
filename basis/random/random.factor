@@ -55,12 +55,9 @@ ERROR: negative-random n ;
 M: integer random ( integer -- integer' )
     {
         { [ dup 0 = ] [ ] }
-        { [ dup 0 < ] [ negative-random ] }
+        { [ dup 0 < ] [ neg random-integer neg ] }
         [ random-integer ]
     } cond ;
-
-M: float random ( float -- elt )
-    64 random-bits 64 2^ 1- / * ;
 
 : delete-random ( seq -- elt )
     [ length random-integer ] keep [ nth ] 2keep delete-nth ;

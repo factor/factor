@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math math.functions namespaces sequences
 strings system vocabs.loader threads accessors combinators
-locals classes.tuple math.order summary
+locals classes.tuple math.order summary structs
 combinators.short-circuit ;
 IN: calendar
 
@@ -129,6 +129,8 @@ PRIVATE>
 : minutes ( x -- duration ) instant clone swap >>minute ;
 : seconds ( x -- duration ) instant clone swap >>second ;
 : milliseconds ( x -- duration ) 1000 / seconds ;
+: microseconds ( x -- duration ) 1000000 / seconds ;
+: nanoseconds ( x -- duration ) 1000000000 / seconds ;
 
 GENERIC: leap-year? ( obj -- ? )
 
@@ -261,6 +263,8 @@ M: duration <=> [ duration>years ] compare ;
 : duration>minutes ( duration -- x ) duration>years minutes-per-year * ;
 : duration>seconds ( duration -- x ) duration>years seconds-per-year * ;
 : duration>milliseconds ( duration -- x ) duration>seconds 1000 * ;
+: duration>microseconds ( duration -- x ) duration>seconds 1000000 * ;
+: duration>nanoseconds ( duration -- x ) duration>seconds 1000000000 * ;
 
 GENERIC: time- ( time1 time2 -- time3 )
 
@@ -397,6 +401,10 @@ PRIVATE>
 
 : time-since-midnight ( timestamp -- duration )
     dup midnight time- ;
+
+: timeval>unix-time ( timeval -- timestamp )
+    [ timeval-sec seconds ] [ timeval-usec microseconds ] bi
+    time+ unix-1970 time+ >local-time ;
 
 M: timestamp sleep-until timestamp>millis sleep-until ;
 

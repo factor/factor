@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 ! Based on Slate's src/unfinished/interval.slate by Brian Rice.
 USING: accessors kernel sequences arrays math math.order
-combinators generic random math.constants qualified ;
-FROM: math.ranges => <range> ;
+combinators generic ;
 IN: math.intervals
 
 SYMBOL: empty-interval
@@ -397,37 +396,3 @@ SYMBOL: incomparable
         [ to>> first2 [ 1- ] unless ]
         bi [a,b]
     ] unless ;
-
-<PRIVATE
-
-: open-left? ( interval -- ? ) from>> second not ;
-
-: open-right? ( interval -- ? ) to>> second not ;
-
-: integral-interval? ( interval -- ? )
-    [ from>> ] [ to>> ] bi [ first integer? ] both? ;
-
-PRIVATE>
-
-ERROR: empty-random-interval ;
-
-: random-interval-integer ( interval -- n )
-    [ [ to>> first ] [ open-right? [ 1- ] when ] bi ]
-    [
-        [ from>> first ]
-        [ open-left? [ 1+ ] when ] bi
-        tuck - 1+ random +
-    ] bi ;
-
-: random-interval-float ( interval -- x )
-    [ [ from>> first ] [ open-left? [ epsilon + ] when ] bi ]
-    [ [ to>> first ] [ open-right? [ epsilon - ] when ] bi ] bi
-    epsilon <range> random [ empty-random-interval ] unless* ;
-
-M: interval random ( interval -- x )
-    dup empty-interval = [ empty-random-interval ] when
-    dup integral-interval? [
-        random-interval-integer
-    ] [
-        random-interval-float
-    ] if ;
