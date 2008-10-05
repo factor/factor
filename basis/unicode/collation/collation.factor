@@ -1,3 +1,5 @@
+! Copyright (C) 2008 Daniel Ehrenberg.
+! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit sequences io.files
 io.encodings.ascii kernel values splitting accessors math.parser
 ascii io assocs strings math namespaces make sorting combinators
