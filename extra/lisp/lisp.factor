@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 James Cash
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel peg sequences arrays strings combinators.lib
+USING: kernel peg sequences arrays strings 
 namespaces combinators math locals locals.private locals.backend accessors
-vectors syntax lisp.parser assocs parser sequences.lib words
+vectors syntax lisp.parser assocs parser words
 quotations fry lists summary combinators.short-circuit continuations multiline ;
 IN: lisp
 

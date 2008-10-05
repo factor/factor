@@ -29,9 +29,17 @@ SYMBOLS: +autoincrement+ +serial+ +unique+ +default+ +null+ +not-null+
 +foreign-id+ +has-many+ +on-delete+ +restrict+ +cascade+ +set-null+
 +set-default+ ;
 
+SYMBOL: IGNORE
+
+: filter-ignores ( tuple specs -- specs' )
+    [ <mirror> [ nip IGNORE = ] assoc-filter keys ] dip
+    [ slot-name>> swap member? not ] with filter ;
+
+ERROR: no-slot ;
+
 : offset-of-slot ( string tuple -- n )
     class superclasses [ "slots" word-prop ] map concat
-    slot-named offset>> ;
+    slot-named dup [ no-slot ] unless offset>> ;
 
 : get-slot-named ( name tuple -- value )
     tuck offset-of-slot slot ;
@@ -87,16 +95,17 @@ SYMBOLS: INTEGER BIG-INTEGER SIGNED-BIG-INTEGER UNSIGNED-BIG-INTEGER
 DOUBLE REAL BOOLEAN TEXT VARCHAR DATE TIME DATETIME TIMESTAMP BLOB
 FACTOR-BLOB NULL URL ;
 
-: spec>tuple ( class spec -- tuple )
-    3 f pad-right
-    [ first3 ] keep 3 tail
+: <sql-spec> ( class slot-name column-name type modifiers -- sql-spec )
     sql-spec new
         swap >>modifiers
         swap >>type
         swap >>column-name
         swap >>slot-name
         swap >>class
-    dup normalize-spec ;
+        dup normalize-spec ;
+
+: spec>tuple ( class spec -- tuple )
+    3 f pad-right [ first3 ] keep 3 tail <sql-spec> ;
 
 : number>string* ( n/string -- string )
     dup number? [ number>string ] when ;
@@ -114,7 +123,6 @@ FACTOR-BLOB NULL URL ;
 ! NULL INTEGER REAL TEXT BLOB
 ! PostgreSQL Types:
 ! http://developer.postgresql.org/pgdocs/postgres/datatype.html
-
 
 : ?at ( obj assoc -- value/obj ? )
     dupd at* [ [ nip ] [ drop ] if ] keep ;
@@ -159,8 +167,11 @@ ERROR: no-sql-type type ;
 HOOK: bind% db ( spec -- )
 HOOK: bind# db ( spec obj -- )
 
+ERROR: no-column column ;
+
 : >reference-string ( string pair -- string )
     first2
     [ [ unparse join-space ] [ db-columns ] bi ] dip
-    swap [ slot-name>> = ] with find nip
+    swap [ column-name>> = ] with find nip
+    [ no-column ] unless*
     column-name>> paren append ;

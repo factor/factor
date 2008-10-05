@@ -19,11 +19,7 @@ HELP: enable-fhtml
 { $notes "See " { $link "html.templates.fhtml" } "." }
 { $side-effects "responder" } ;
 
-ARTICLE: "http.server.static" "Serving static content"
-"The " { $vocab-link "http.server.static" } " vocabulary implements a responder for serving static files."
-{ $subsection <static> }
-"The static responder does not serve directory listings by default, as a security measure. Directory listings can be enabled by storing a true value in the " { $slot "allow-listings" } " slot."
-$nl
+ARTICLE: "http.server.static.extend" "Hooks for dynamic content"
 "The static responder can be extended for dynamic content by associating quotations with MIME types in the hashtable stored in the " { $slot "special" } " slot. The quotations have stack effect " { $snippet "( path -- )" } "."
 $nl
 "A utility word uses the above feature to enable server-side " { $snippet ".fhtml" } " scripts, allowing a development style much like PHP:"
@@ -33,5 +29,18 @@ $nl
 "It is also possible to override the hook used when serving static files to the client:"
 { $subsection <file-responder> }
 "The default just sends the file's contents with the request; " { $vocab-link "xmode.code2html.responder" } " provides an alternate hook which sends a syntax-highlighted version of the file." ;
+
+ARTICLE: "http.server.static" "Serving static content"
+"The " { $vocab-link "http.server.static" } " vocabulary implements a responder for serving static files."
+{ $subsection <static> }
+"The static responder does not serve directory listings by default, as a security measure. Directory listings can be enabled by storing a true value in the " { $slot "allow-listings" } " slot."
+$nl
+"If all you want to do is serve files from a directory, the following phrase does the trick:"
+{ $code
+    "USING: namespaces http.server http.server.static ;"
+    "/var/www/mysite.com/ <static> main-responder set"
+    "8080 httpd"
+}
+{ $subsection "http.server.static.extend" } ;
 
 ABOUT: "http.server.static"

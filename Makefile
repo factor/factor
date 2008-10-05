@@ -150,13 +150,10 @@ macosx.app: factor
 	cp $(ENGINE) $(BUNDLE)/Contents/Frameworks
 
 	install_name_tool \
-		-id @executable_path/../Frameworks/libfreetype.6.dylib \
-		Factor.app/Contents/Frameworks/libfreetype.6.dylib
-	install_name_tool \
 		-change libfactor.dylib \
 		@executable_path/../Frameworks/libfactor.dylib \
 		Factor.app/Contents/MacOS/factor
-
+        
 factor: $(DLL_OBJS) $(EXE_OBJS)
 	$(LINKER) $(ENGINE) $(DLL_OBJS)
 	$(CC) $(LIBS) $(LIBPATH) -L. $(LINK_WITH_ENGINE) \

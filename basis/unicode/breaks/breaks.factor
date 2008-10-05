@@ -1,3 +1,5 @@
+! Copyright (C) 2008 Daniel Ehrenberg.
+! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit unicode.categories kernel math
 combinators splitting sequences math.parser io.files io assocs
 arrays namespaces make math.ranges unicode.normalize values

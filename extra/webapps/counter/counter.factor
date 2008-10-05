@@ -27,8 +27,7 @@ M: counter-app init-session* drop 0 count sset ;
     counter-app new-dispatcher
         [ 1+ ] <counter-action> "inc" add-responder
         [ 1- ] <counter-action> "dec" add-responder
-        <display-action> "" add-responder
-    <sessions> ;
+        <display-action> "" add-responder ;
 
 ! Deployment example
 USING: db.sqlite furnace.alloy namespaces ;

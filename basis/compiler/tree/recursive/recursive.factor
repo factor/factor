@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel assocs namespaces accessors sequences deques
+USING: kernel assocs arrays namespaces accessors sequences deques
 search-deques compiler.tree compiler.tree.combinators ;
 IN: compiler.tree.recursive
 
@@ -50,11 +50,10 @@ GENERIC: collect-loop-info* ( tail? node -- )
     loop-stack get length swap loop-heights get set-at ;
 
 M: #recursive collect-loop-info*
-    nip
     [
         [
             label>>
-            [ loop-stack [ swap suffix ] change ]
+            [ swap 2array loop-stack [ swap suffix ] change ]
             [ remember-loop-info ]
             [ t >>loop? drop ]
             tri
@@ -62,7 +61,7 @@ M: #recursive collect-loop-info*
         [ t swap child>> (collect-loop-info) ] bi
     ] with-scope ;
 
-: current-loop-nesting ( label -- labels )
+: current-loop-nesting ( label -- alist )
     loop-stack get swap loop-heights get at tail ;
 
 : disqualify-loop ( label -- )
@@ -71,7 +70,10 @@ M: #recursive collect-loop-info*
 M: #call-recursive collect-loop-info*
     label>>
     swap [ dup disqualify-loop ] unless
-    dup current-loop-nesting [ loop-calls get push-at ] with each ;
+    dup current-loop-nesting
+    [ keys [ loop-calls get push-at ] with each ]
+    [ [ nip not ] assoc-filter keys [ disqualify-loop ] each ]
+    bi ;
 
 M: #if collect-loop-info*
     children>> [ (collect-loop-info) ] with each ;

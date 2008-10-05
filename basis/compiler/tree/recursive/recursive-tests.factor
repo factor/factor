@@ -148,3 +148,27 @@ DEFER: a'
     [ a' ] build-tree analyze-recursive
     \ b' label-is-loop?
 ] unit-test
+
+DEFER: a''
+
+: b'' ( -- )
+    a'' ; inline recursive
+
+: a'' ( -- )
+    b'' a'' ; inline recursive
+
+[ t ] [
+    [ a'' ] build-tree analyze-recursive
+    \ a'' label-is-not-loop?
+] unit-test
+
+: loop-in-non-loop ( x quot: ( i -- ) -- )
+    over 0 > [
+        [ [ 1 - ] dip loop-in-non-loop ] [ call ] 2bi
+    ] [ 2drop ] if ; inline recursive
+
+[ t ] [
+    [ 10 [ [ drop ] each-integer ] loop-in-non-loop ]
+    build-tree analyze-recursive
+    \ (each-integer) label-is-loop?
+] unit-test

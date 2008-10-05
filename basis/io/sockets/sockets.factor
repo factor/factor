@@ -17,9 +17,11 @@ IN: io.sockets
 ! Addressing
 GENERIC: protocol-family ( addrspec -- af )
 
-GENERIC: sockaddr-type ( addrspec -- type )
+GENERIC: sockaddr-size ( addrspec -- n )
 
 GENERIC: make-sockaddr ( addrspec -- sockaddr )
+
+GENERIC: empty-sockaddr ( addrspec -- sockaddr )
 
 GENERIC: address-size ( addrspec -- n )
 
@@ -28,10 +30,10 @@ GENERIC: inet-ntop ( data addrspec -- str )
 GENERIC: inet-pton ( str addrspec -- data )
 
 : make-sockaddr/size ( addrspec -- sockaddr size )
-    [ make-sockaddr ] [ sockaddr-type heap-size ] bi ;
+    [ make-sockaddr ] [ sockaddr-size ] bi ;
 
 : empty-sockaddr/size ( addrspec -- sockaddr size )
-    sockaddr-type [ <c-object> ] [ heap-size ] bi ;
+    [ empty-sockaddr ] [ sockaddr-size ] bi ;
 
 GENERIC: parse-sockaddr ( sockaddr addrspec -- newaddrspec )
 
@@ -74,7 +76,9 @@ M: inet4 address-size drop 4 ;
 
 M: inet4 protocol-family drop PF_INET ;
 
-M: inet4 sockaddr-type drop "sockaddr-in" c-type ;
+M: inet4 sockaddr-size drop "sockaddr-in" heap-size ;
+
+M: inet4 empty-sockaddr drop "sockaddr-in" <c-object> ;
 
 M: inet4 make-sockaddr ( inet -- sockaddr )
     "sockaddr-in" <c-object>
@@ -128,7 +132,9 @@ M: inet6 address-size drop 16 ;
 
 M: inet6 protocol-family drop PF_INET6 ;
 
-M: inet6 sockaddr-type drop "sockaddr-in6" c-type ;
+M: inet6 sockaddr-size drop "sockaddr-in6" heap-size ;
+
+M: inet6 empty-sockaddr drop "sockaddr-in6" <c-object> ;
 
 M: inet6 make-sockaddr ( inet -- sockaddr )
     "sockaddr-in6" <c-object>

@@ -11,11 +11,7 @@ IN: unicode.collation.tests
 : test-two ( str1 str2 -- )
     [ +lt+ ] -rot [ string<=> ] 2curry unit-test ;
 
-: failures
-    parse-test dup 2 <clumps>
-    [ string<=> +lt+ = not ] assoc-filter dup assoc-size ;
-
-: test-equality
+: test-equality ( str1 str2 -- )
     { primary= secondary= tertiary= quaternary= }
     [ execute ] with with each ;
 

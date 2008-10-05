@@ -1,3 +1,5 @@
+! Copyright (C) 2008 Daniel Ehrenberg.
+! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit assocs math kernel sequences
 io.files hashtables quotations splitting grouping arrays
 math.parser hash2 math.order byte-arrays words namespaces words

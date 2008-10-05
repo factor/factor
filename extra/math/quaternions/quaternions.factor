@@ -28,7 +28,7 @@ PRIVATE>
 
 : qconjugate ( u -- u' )
     #! Quaternion conjugate.
-    first2 neg >r conjugate r> 2array ;
+    first2 [ conjugate ] [ neg  ] bi* 2array ;
 
 : qrecip ( u -- 1/u )
     #! Quaternion inverse.

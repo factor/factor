@@ -4,7 +4,7 @@ USING: combinators generic assocs help http io io.styles
 io.files continuations io.streams.string kernel math math.order
 math.parser namespaces make quotations assocs sequences strings
 words html.elements xml.entities sbufs continuations destructors
-accessors arrays ;
+accessors arrays urls.encoding ;
 IN: html.streams
 
 GENERIC: browser-link-href ( presented -- href )
@@ -22,7 +22,7 @@ TUPLE: html-stream stream last-div ;
 : not-a-div ( stream -- stream )
     f >>last-div ; inline
 
-: a-div ( stream -- straem )
+: a-div ( stream -- stream )
     t >>last-div ; inline
 
 : <html-stream> ( stream -- html-stream )
@@ -44,8 +44,13 @@ TUPLE: html-sub-stream < html-stream style parent ;
 : object-link-tag ( style quot -- )
     presented pick at [
         browser-link-href [
-            <a =href a> call </a>
+            <a url-encode =href a> call </a>
         ] [ call ] if*
+    ] [ call ] if* ; inline
+
+: href-link-tag ( style quot -- )
+    href pick at [
+        <a url-encode =href a> call </a>
     ] [ call ] if* ; inline
 
 : hex-color, ( color -- )
@@ -95,7 +100,7 @@ TUPLE: html-sub-stream < html-stream style parent ;
 
 : format-html-span ( string style stream -- )
     stream>> [
-        [ [ drop write ] span-tag ] object-link-tag
+        [ [ [ drop write ] span-tag ] href-link-tag ] object-link-tag
     ] with-output-stream* ;
 
 TUPLE: html-span-stream < html-sub-stream ;
@@ -192,5 +197,5 @@ M: html-stream stream-write-table
 
 M: html-stream dispose stream>> dispose ;
 
-: with-html-stream ( quot -- )
+: with-html-writer ( quot -- )
     output-stream get <html-stream> swap with-output-stream* ; inline

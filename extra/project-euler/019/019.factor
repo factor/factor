@@ -1,7 +1,7 @@
 ! Copyright (c) 2007 Samuel Tardieu, Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: calendar combinators kernel math math.ranges namespaces sequences
-    sequences.lib math.order ;
+    math.order ;
 IN: project-euler.019
 
 ! http://projecteuler.net/index.php?section=problems&id=19
@@ -32,7 +32,7 @@ IN: project-euler.019
 
 : euler019 ( -- answer )
     1901 2000 [a,b] [
-        12 [1,b] [ 1 zeller-congruence ] map-with
+        12 [1,b] [ 1 zeller-congruence ] with map
     ] map concat [ zero? ] count ;
 
 ! [ euler019 ] 100 ave-time

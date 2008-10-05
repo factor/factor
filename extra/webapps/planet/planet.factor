@@ -166,14 +166,14 @@ posting "POSTINGS"
         [
             f <blog>
             [ deposit-blog-slots ]
+            [ "id" value >>id ]
             [ update-tuple ]
-            [
-                <url>
-                    "$planet/admin" >>path
-                    swap id>> "id" set-query-param
-                <redirect>
-            ]
             tri
+
+            <url>
+                "$planet/admin" >>path
+                "id" value "id" set-query-param
+            <redirect>
         ] >>submit ;
 
 : <planet-admin> ( -- responder )
@@ -195,5 +195,5 @@ posting "POSTINGS"
     <boilerplate>
         { planet "planet-common" } >>template ;
 
-: start-update-task ( db params -- )
-    '[ _ _ [ update-cached-postings ] with-db ] 10 minutes every drop ;
+: start-update-task ( db -- )
+    '[ _ [ update-cached-postings ] with-db ] 10 minutes every drop ;

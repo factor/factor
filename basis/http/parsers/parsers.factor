@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.short-circuit math math.order math.parser
 kernel sequences sequences.deep peg peg.parsers assocs arrays
-hashtables strings unicode.case namespaces make ascii logging ;
+hashtables strings unicode.case namespaces make ascii ;
 IN: http.parsers
 
 : except ( quot -- parser )
@@ -60,8 +60,6 @@ PEG: parse-request-line ( string -- triple )
         'http-version' ,
         'space' ,
     ] seq* just ;
-
-\ parse-request-line DEBUG add-input-logging
 
 : 'text' ( -- parser )
     [ ctl? ] except ;

@@ -6,7 +6,7 @@ IN: furnace.db
 
 TUPLE: db-persistence < filter-responder pool ;
 
-: <db-persistence> ( responder params db -- responder' )
+: <db-persistence> ( responder db -- responder' )
     <db-pool> db-persistence boa ;
 
 M: db-persistence call-responder*

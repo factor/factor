@@ -69,11 +69,15 @@ TUPLE: entry title url description date ;
     [ "item" tags-named [ rss2.0-entry ] map set-entries ]
     tri ;
 
+: atom-entry-link ( tag -- url/f )
+    "link" tags-named [ "rel" swap at "alternate" = ] find nip
+    dup [ "href" swap at >url ] when ;
+
 : atom1.0-entry ( tag -- entry )
     entry new
     swap {
         [ "title" tag-named children>string >>title ]
-        [ "link" tag-named "href" swap at >url >>url ]
+        [ atom-entry-link >>url ]
         [
             { "content" "summary" } any-tag-named
             dup children>> [ string? not ] contains?

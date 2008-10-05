@@ -3,13 +3,13 @@
 USING: assocs html.parser kernel math sequences strings ascii
 arrays generalizations shuffle unicode.case namespaces make
 splitting http accessors io combinators http.client urls
-fry sequences.lib ;
+urls.encoding fry ;
 IN: html.parser.analyzer
 
 TUPLE: link attributes clickable ;
 
-: scrape-html ( url -- vector )
-    http-get nip parse-html ;
+: scrape-html ( url -- headers vector )
+    http-get parse-html ;
 
 : find-all ( seq quot -- alist )
    [ <enum> >alist ] [ '[ second @ ] ] bi* filter ; inline

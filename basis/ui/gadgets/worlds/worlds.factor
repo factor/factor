@@ -101,10 +101,10 @@ world H{
     { T{ key-down f { C+ } "c" } [ T{ copy-action } send-action ] }
     { T{ key-down f { C+ } "v" } [ T{ paste-action } send-action ] }
     { T{ key-down f { C+ } "a" } [ T{ select-all-action } send-action ] }
-    { T{ button-down f { C+ } 1 } [ T{ button-down f f 3 } swap resend-button-down ] }
-    { T{ button-down f { A+ } 1 } [ T{ button-down f f 2 } swap resend-button-down ] }
-    { T{ button-up f { C+ } 1 } [ T{ button-up f f 3 } swap resend-button-up ] }
-    { T{ button-up f { A+ } 1 } [ T{ button-up f f 2 } swap resend-button-up ] }
+    { T{ button-down f { C+ } 1 } [ drop T{ button-down f f 3 } button-gesture ] }
+    { T{ button-down f { A+ } 1 } [ drop T{ button-down f f 2 } button-gesture ] }
+    { T{ button-up f { C+ } 1 } [ drop T{ button-up f f 3 } button-gesture ] }
+    { T{ button-up f { A+ } 1 } [ drop T{ button-up f f 2 } button-gesture ] }
 } set-gestures
 
 : close-global ( world global -- )
