@@ -1,7 +1,7 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: unix
 USING: alien.syntax ;
+IN: unix
 
 ! Linux.
 
