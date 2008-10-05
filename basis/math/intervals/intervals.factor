@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 ! Based on Slate's src/unfinished/interval.slate by Brian Rice.
 USING: accessors kernel sequences arrays math math.order
-combinators generic random math.constants qualified ;
-FROM: math.ranges => <range> ;
+combinators generic ;
 IN: math.intervals
 
 SYMBOL: empty-interval
