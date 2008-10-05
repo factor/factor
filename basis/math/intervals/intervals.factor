@@ -397,37 +397,3 @@ SYMBOL: incomparable
         [ to>> first2 [ 1- ] unless ]
         bi [a,b]
     ] unless ;
-
-<PRIVATE
-
-: open-left? ( interval -- ? ) from>> second not ;
-
-: open-right? ( interval -- ? ) to>> second not ;
-
-: integral-interval? ( interval -- ? )
-    [ from>> ] [ to>> ] bi [ first integer? ] both? ;
-
-PRIVATE>
-
-ERROR: empty-random-interval ;
-
-: random-interval-integer ( interval -- n )
-    [ [ to>> first ] [ open-right? [ 1- ] when ] bi ]
-    [
-        [ from>> first ]
-        [ open-left? [ 1+ ] when ] bi
-        tuck - 1+ random +
-    ] bi ;
-
-: random-interval-float ( interval -- x )
-    [ [ from>> first ] [ open-left? [ epsilon + ] when ] bi ]
-    [ [ to>> first ] [ open-right? [ epsilon - ] when ] bi ] bi
-    epsilon <range> random [ empty-random-interval ] unless* ;
-
-M: interval random ( interval -- x )
-    dup empty-interval = [ empty-random-interval ] when
-    dup integral-interval? [
-        random-interval-integer
-    ] [
-        random-interval-float
-    ] if ;
