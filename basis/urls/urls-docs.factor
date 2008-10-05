@@ -139,7 +139,7 @@ HELP: relative-url?
 { $values
      { "url" url }
      { "?" "a boolean" } }
-{ $description "Tests whether a given url is relative to a domain." } ;
+{ $description "Tests whether a given URL is relative to a domain." } ;
 
 HELP: secure-protocol?
 { $values { "protocol" string } { "?" "a boolean" } }
