@@ -1,20 +1,12 @@
 USING: alien alien.c-types alien.syntax arrays calendar
-kernel structs math unix.time namespaces system ;
+kernel structs math unix unix.time namespaces system ;
 IN: calendar.unix
-
-C-STRUCT: timeval
-    { "long" "sec" }
-    { "long" "usec" } ;
 
 : make-timeval ( ms -- timeval )
     1000 /mod 1000 *
     "timeval" <c-object>
     [ set-timeval-usec ] keep
     [ set-timeval-sec ] keep ;
-
-C-STRUCT: timespec
-    { "time_t" "sec" }
-    { "long" "nsec" } ;
 
 : make-timespec ( ms -- timespec )
     1000 /mod 1000000 *
