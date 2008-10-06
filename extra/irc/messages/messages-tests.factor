@@ -63,3 +63,13 @@ IN: irc.messages.tests
      { trailing "someuser2" } } }
 [ ":someuser!n=user@some.where NICK :someuser2"
   parse-irc-line f >>timestamp ] unit-test
+
+{ T{ nick-in-use
+     { line ":ircserver.net 433 * nickname :Nickname is already in use" }
+     { prefix "ircserver.net" }
+     { command "433" }
+     { parameters { "*" "nickname" } }
+     { name "nickname" }
+     { trailing "Nickname is already in use" } } }
+[ ":ircserver.net 433 * nickname :Nickname is already in use"
+  parse-irc-line f >>timestamp ] unit-test

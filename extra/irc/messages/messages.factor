@@ -17,7 +17,7 @@ TUPLE: nick < irc-message ;
 TUPLE: privmsg < irc-message name ;
 TUPLE: kick < irc-message channel who ;
 TUPLE: roomlist < irc-message channel names ;
-TUPLE: nick-in-use < irc-message asterisk name ;
+TUPLE: nick-in-use < irc-message name ;
 TUPLE: notice < irc-message type ;
 TUPLE: mode < irc-message name mode parameter ;
 TUPLE: names-reply < irc-message who channel ;
@@ -31,45 +31,43 @@ TUPLE: unhandled < irc-message ;
 
 GENERIC: command-string>> ( irc-message -- string )
 
-M: irc-message command-string>> ( irc-message -- string ) command>> ;
-M: ping        command-string>> ( ping -- string )    drop "PING" ;
-M: join        command-string>> ( join -- string )    drop "JOIN" ;
-M: part        command-string>> ( part -- string )    drop "PART" ;
-M: quit        command-string>> ( quit -- string )    drop "QUIT" ;
-M: nick        command-string>> ( nick -- string )    drop "NICK" ;
-M: privmsg     command-string>> ( privmsg -- string ) drop "PRIVMSG" ;
-M: notice      command-string>> ( notice -- string )  drop "NOTICE" ;
-M: mode        command-string>> ( mode -- string )    drop "MODE" ;
-M: kick        command-string>> ( kick -- string )    drop "KICK" ;
+M: irc-message command-string>> command>> ;
+M: ping        command-string>> drop "PING" ;
+M: join        command-string>> drop "JOIN" ;
+M: part        command-string>> drop "PART" ;
+M: quit        command-string>> drop "QUIT" ;
+M: nick        command-string>> drop "NICK" ;
+M: privmsg     command-string>> drop "PRIVMSG" ;
+M: notice      command-string>> drop "NOTICE" ;
+M: mode        command-string>> drop "MODE" ;
+M: kick        command-string>> drop "KICK" ;
 
 GENERIC: command-parameters>> ( irc-message -- seq )
 
-M: irc-message command-parameters>> ( irc-message -- seq ) parameters>> ;
-M: ping        command-parameters>> ( ping -- seq )    drop { } ;
-M: join        command-parameters>> ( join -- seq )    drop { } ;
-M: part        command-parameters>> ( part -- seq )    channel>> 1array ;
-M: quit        command-parameters>> ( quit -- seq )    drop { } ;
-M: nick        command-parameters>> ( nick -- seq )    drop { } ;
-M: privmsg     command-parameters>> ( privmsg -- seq ) name>> 1array ;
-M: notice      command-parameters>> ( norice -- seq )  type>> 1array ;
-M: kick command-parameters>> ( kick -- seq )
-    [ channel>> ] [ who>> ] bi 2array ;
-M: mode command-parameters>> ( mode -- seq )
-    [ name>> ] [ channel>> ] [ mode>> ] tri 3array ;
+M: irc-message command-parameters>> parameters>> ;
+M: ping        command-parameters>> drop { } ;
+M: join        command-parameters>> drop { } ;
+M: part        command-parameters>> channel>> 1array ;
+M: quit        command-parameters>> drop { } ;
+M: nick        command-parameters>> drop { } ;
+M: privmsg     command-parameters>> name>> 1array ;
+M: notice      command-parameters>> type>> 1array ;
+M: kick command-parameters>> [ channel>> ] [ who>> ] bi 2array ;
+M: mode command-parameters>> [ name>> ] [ channel>> ] [ mode>> ] tri 3array ;
 
 GENERIC: (>>command-parameters) ( params irc-message -- )
 
-M: irc-message (>>command-parameters) ( params irc-message -- ) 2drop ;
-M: logged-in (>>command-parameters) ( params part -- )  [ first ] dip (>>name) ;
-M: privmsg (>>command-parameters) ( params privmsg -- ) [ first ] dip (>>name) ;
-M: notice  (>>command-parameters) ( params notice -- )  [ first ] dip (>>type) ;
-M: part    (>>command-parameters) ( params part -- )
-    [ first ] dip (>>channel) ;
-M: kick    (>>command-parameters) ( params kick -- )
+M: irc-message (>>command-parameters) 2drop ;
+M: logged-in (>>command-parameters) [ first ] dip (>>name) ;
+M: privmsg (>>command-parameters) [ first ] dip (>>name) ;
+M: notice  (>>command-parameters) [ first ] dip (>>type) ;
+M: part    (>>command-parameters) [ first ] dip (>>channel) ;
+M: nick-in-use (>>command-parameters) [ second ] dip (>>name) ;
+M: kick    (>>command-parameters)
     [ first2 ] dip [ (>>who) ] [ (>>channel) ] bi ;
-M: names-reply (>>command-parameters) ( params names-reply -- )
+M: names-reply (>>command-parameters)
     [ [ first ] dip (>>who) ] [ [ third ] dip (>>channel) ] 2bi ;
-M: mode    (>>command-parameters) ( params mode -- )
+M: mode    (>>command-parameters)
     { { [ >r 2array r> ] [ [ (>>mode) ] [ (>>name) ] bi ] }
       { [ >r 3array r> ] [ [ (>>parameter) ] [ (>>mode) ] [ (>>name) ] tri ] }
     } switch ;
@@ -78,16 +76,14 @@ PRIVATE>
 
 GENERIC: irc-message>client-line ( irc-message -- string )
 
-M: irc-message irc-message>client-line ( irc-message -- string )
+M: irc-message irc-message>client-line
     [ command-string>> ]
     [ command-parameters>> " " sjoin ]
     [ trailing>> [ CHAR: : prefix ] [ "" ] if* ]
     tri 3array " " sjoin ;
 
 GENERIC: irc-message>server-line ( irc-message -- string )
-
-M: irc-message irc-message>server-line ( irc-message -- string )
-   drop "not implemented yet" ;
+M: irc-message irc-message>server-line drop "not implemented yet" ;
 
 <PRIVATE
 ! ======================================
@@ -124,8 +120,7 @@ PRIVATE>
 
 UNION: sender-in-prefix privmsg join part quit kick mode nick ;
 GENERIC: irc-message-sender ( irc-message -- sender )
-M: sender-in-prefix irc-message-sender ( sender-in-prefix -- sender )
-    prefix>> parse-name ;
+M: sender-in-prefix irc-message-sender prefix>> parse-name ;
 
 : string>irc-message ( string -- object )
     dup split-prefix split-trailing
