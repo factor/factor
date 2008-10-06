@@ -1,3 +1,5 @@
+! Copyright (C) 2008 Daniel Ehrenberg.
+! See http://factorcode.org/license.txt for BSD license.
 USING: unicode.data sequences sequences.next namespaces make
 unicode.normalize math unicode.categories combinators
 assocs strings splitting kernel accessors ;
@@ -69,17 +71,6 @@ SYMBOL: locale ! Just casing locale, or overall?
 
 : final-sigma ( string -- string )
     HEX: 3A3 over member? [ sigma-map ] when ;
-
-! : map-case ( string string-quot char-quot -- case )
-!     [
-!         rot [
-!             -rot [
-!                 rot dup special-casing at
-!                 [ -rot drop call % ]
-!                 [ -rot nip call , ] ?if
-!             ] 2keep
-!         ] each 2drop
-!     ] "" make ; inline
 
 : map-case ( string string-quot char-quot -- case )
     [
