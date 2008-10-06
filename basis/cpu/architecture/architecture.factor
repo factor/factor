@@ -1,8 +1,8 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays generic kernel kernel.private math memory
-namespaces make sequences layouts system hashtables classes
-alien byte-arrays combinators words sets ;
+USING: accessors arrays generic kernel kernel.private math
+memory namespaces make sequences layouts system hashtables
+classes alien byte-arrays combinators words sets ;
 IN: cpu.architecture
 
 ! Register classes
@@ -33,10 +33,9 @@ GENERIC# load-literal 1 ( obj vreg -- )
 
 HOOK: load-indirect cpu ( obj reg -- )
 
-HOOK: stack-frame cpu ( frame-size -- n )
+HOOK: stack-frame-size cpu ( frame-size -- n )
 
-: stack-frame* ( -- n )
-    \ stack-frame get stack-frame ;
+TUPLE: stack-frame total-size size params return ;
 
 ! Set up caller stack frame
 HOOK: %prologue cpu ( n -- )
@@ -117,7 +116,7 @@ HOOK: %box cpu ( n reg-class func -- )
 
 HOOK: %box-long-long cpu ( n func -- )
 
-HOOK: %prepare-box-struct cpu ( size -- )
+HOOK: %prepare-box-struct cpu ( -- )
 
 HOOK: %box-small-struct cpu ( c-type -- )
 

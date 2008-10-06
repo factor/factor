@@ -299,18 +299,17 @@ M: #return-recursive generate-node
     dup large-struct? [ heap-size ] [ drop 2 cells ] if ;
 
 : alien-stack-frame ( params -- n )
-    alien-parameters parameter-sizes drop ;
+    stack-frame new
+        swap
+        [ return>> return-size >>return ]
+        [ alien-parameters parameter-sizes drop >>params ] bi
+        dup [ params>> ] [ return>> ] bi + >>size
+        dup size>> stack-frame-size >>total-size ;
 
-: alien-invoke-frame ( params -- n )
-    [ return>> return-size ] [ alien-stack-frame ] bi + ;
-
-: set-stack-frame ( n -- )
-    dup [ frame-required ] when* \ stack-frame set ;
-
-: with-stack-frame ( n quot -- )
-    swap set-stack-frame
+: with-stack-frame ( params quot -- )
+    swap alien-stack-frame [ size>> frame-required ] [ stack-frame set ] bi
     call
-    f set-stack-frame ; inline
+    stack-frame off ; inline
 
 GENERIC: reg-size ( register-class -- n )
 
@@ -413,8 +412,8 @@ M: long-long-type flatten-value-type ( type -- types )
     #! parameters. If the C function is returning a structure,
     #! the first parameter is an implicit target area pointer,
     #! so we need to use a different offset.
-    return>> dup large-struct?
-    [ heap-size %prepare-box-struct cell ] [ drop 0 ] if ;
+    return>> large-struct?
+    [ %prepare-box-struct cell ] [ 0 ] if ;
 
 : objects>registers ( params -- )
     #! Generate code for unboxing a list of C types, then
@@ -473,7 +472,7 @@ M: no-such-symbol compiler-error-type
 
 M: #alien-invoke generate-node
     params>>
-    dup alien-invoke-frame [
+    dup [
         end-basic-block
         %prepare-alien-invoke
         dup objects>registers
@@ -487,7 +486,7 @@ M: #alien-invoke generate-node
 ! #alien-indirect
 M: #alien-indirect generate-node
     params>>
-    dup alien-invoke-frame [
+    dup [
         ! Flush registers
         end-basic-block
         ! Save registers for GC
@@ -553,7 +552,7 @@ TUPLE: callback-context ;
 
 : callback-unwind ( params -- n )
     {
-        { [ dup abi>> "stdcall" = ] [ alien-stack-frame ] }
+        { [ dup abi>> "stdcall" = ] [ drop stack-frame get params>> ] }
         { [ dup return>> large-struct? ] [ drop 4 ] }
         [ drop 0 ]
     } cond ;
@@ -569,7 +568,7 @@ TUPLE: callback-context ;
     dup xt>> dup [
         init-templates
         %prologue-later
-        dup alien-stack-frame [
+        dup [
             [ registers>objects ]
             [ wrap-callback-quot %alien-callback ]
             [ %callback-return ]

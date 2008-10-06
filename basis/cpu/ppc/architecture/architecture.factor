@@ -43,8 +43,8 @@ IN: cpu.ppc.architecture
 
 : xt-save ( n -- i ) 2 cells - ;
 
-M: ppc stack-frame ( n -- i )
-    local@ factor-area-size + cell + 4 cells align ;
+M: ppc stack-frame-size ( n -- i )
+    local@ factor-area-size + 4 cells align ;
 
 M: temp-reg v>operand drop 11 ;
 
@@ -166,7 +166,7 @@ M: float-regs %load-param-reg >r 1 rot local@ r> LF ;
 M: stack-params %load-param-reg ( stack reg reg-class -- )
     drop >r 0 1 rot local@ LWZ 0 1 r> param@ STW ;
 
-: next-param@ ( n -- x ) param@ stack-frame* + ;
+: next-param@ ( n -- x ) param@ stack-frame get total-size>> + ;
 
 M: stack-params %save-param-reg ( stack reg reg-class -- )
     #! Funky. Read the parameter from the caller's stack frame.
@@ -218,20 +218,18 @@ M: ppc %box-long-long ( n func -- )
         4 1 rot cell + local@ LWZ
     ] when* r> f %alien-invoke ;
 
-: struct-return@ ( size n -- n )
-    [ local@ ] [ stack-frame* factor-area-size - swap - ] ?if ;
+: struct-return@ ( n -- n )
+    [ stack-frame get params>> ] unless* local@ ;
 
-M: ppc %prepare-box-struct ( size -- )
+M: ppc %prepare-box-struct ( -- )
     #! Compute target address for value struct return
-    3 1 rot f struct-return@ ADDI
+    3 1 f struct-return@ ADDI
     3 1 0 local@ STW ;
 
 M: ppc %box-large-struct ( n c-type -- )
-    #! If n = f, then we're boxing a returned struct
-    heap-size
-    [ swap struct-return@ ] keep
+    ! If n = f, then we're boxing a returned struct
     ! Compute destination address and load struct size
-    [ 3 1 rot ADDI ] [ 4 LI ] bi*
+    [ 3 1 rot struct-return@ ADDI ] [ heap-size 4 LI ] bi*
     ! Call the function
     "box_value_struct" f %alien-invoke ;
 
