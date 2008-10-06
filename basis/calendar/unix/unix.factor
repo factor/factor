@@ -1,5 +1,7 @@
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.syntax arrays calendar
-kernel structs math unix unix.time namespaces system ;
+kernel math unix unix.time namespaces system ;
 IN: calendar.unix
 
 : make-timeval ( ms -- timeval )

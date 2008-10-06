@@ -29,15 +29,6 @@ C-STRUCT: group
     { "int" "gr_gid" }
     { "char**" "gr_mem" } ;
 
-C-STRUCT: timeval
-    { "long" "sec" }
-    { "long" "usec" } ;
-
-C-STRUCT: timespec
-    { "time_t" "sec" }
-    { "long" "nsec" } ;
-
-
 LIBRARY: factor
 
 FUNCTION: void clear_err_no ( ) ;

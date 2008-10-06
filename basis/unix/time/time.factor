@@ -3,6 +3,14 @@
 USING: kernel alien.syntax alien.c-types math unix.types ;
 IN: unix.time
 
+C-STRUCT: timeval
+    { "long" "sec" }
+    { "long" "usec" } ;
+
+C-STRUCT: timespec
+    { "time_t" "sec" }
+    { "long" "nsec" } ;
+
 C-STRUCT: tm
     { "int" "sec" }    ! Seconds: 0-59 (K&R says 0-61?)
     { "int" "min" }    ! Minutes: 0-59
