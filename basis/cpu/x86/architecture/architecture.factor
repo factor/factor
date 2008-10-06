@@ -69,7 +69,7 @@ M: x86 %prologue ( n -- )
     3 cells - decr-stack-reg ;
 
 : incr-stack-reg ( n -- )
-    dup 0 = [ ] [ stack-reg swap ADD ] if ;
+    dup 0 = [ drop ] [ stack-reg swap ADD ] if ;
 
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 
