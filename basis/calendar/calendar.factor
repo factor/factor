@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math math.functions namespaces sequences
 strings system vocabs.loader threads accessors combinators
-locals classes.tuple math.order summary structs
-combinators.short-circuit ;
+locals classes.tuple math.order summary combinators.short-circuit ;
 IN: calendar
 
 HOOK: gmt-offset os ( -- hours minutes seconds )
