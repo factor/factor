@@ -296,16 +296,13 @@ M: #return-recursive generate-node
 
 : return-size ( ctype -- n )
     #! Amount of space we reserve for a return value.
-    dup large-struct? [ heap-size ] [ drop 0 ] if ;
+    dup large-struct? [ heap-size ] [ drop 2 cells ] if ;
 
 : alien-stack-frame ( params -- n )
     alien-parameters parameter-sizes drop ;
 
 : alien-invoke-frame ( params -- n )
-    #! Two cells for temporary storage, temp@ and on x86.64,
-    #! small struct return value unpacking
-    [ return>> return-size ] [ alien-stack-frame ] bi
-    + 2 cells + ;
+    [ return>> return-size ] [ alien-stack-frame ] bi + ;
 
 : set-stack-frame ( n -- )
     dup [ frame-required ] when* \ stack-frame set ;
