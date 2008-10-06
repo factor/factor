@@ -321,7 +321,7 @@ IN: tools.deploy.shaker
     ] [ drop ] if ;
 
 : strip-c-io ( -- )
-    deploy-io get 2 = [
+    deploy-io get 2 = os windows? or [
         [
             c-io-backend forget
             "io.streams.c" forget-vocab
