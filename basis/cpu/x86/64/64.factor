@@ -12,7 +12,6 @@ IN: cpu.x86.64
 M: x86.64 ds-reg R14 ;
 M: x86.64 rs-reg R15 ;
 M: x86.64 stack-reg RSP ;
-M: x86.64 stack-save-reg RSI ;
 M: x86.64 temp-reg-1 RAX ;
 M: x86.64 temp-reg-2 RCX ;
 
@@ -46,7 +45,9 @@ M: stack-params %load-param-reg
     r> stack@ R11 MOV ;
 
 M: stack-params %save-param-reg
-    >r stack-frame* + cell + swap r> %load-param-reg ;
+    drop
+    R11 swap next-stack@ MOV
+    stack@ R11 MOV ;
 
 : with-return-regs ( quot -- )
     [
@@ -121,7 +122,7 @@ M: x86.64 %unbox-large-struct ( n c-type -- )
     ! Source is in RDI
     heap-size
     ! Load destination address
-    RSI RSP roll [+] LEA
+    RSI rot stack@ LEA
     ! Load structure size
     RDX swap MOV
     ! Copy the struct to the C stack
@@ -145,7 +146,7 @@ M: x86.64 %box-long-long ( n func -- )
 M: x86.64 struct-small-enough? ( size -- ? )
     heap-size 2 cells <= ;
 
-: box-struct-field@ ( i -- operand ) RSP swap 1+ cells [+] ;
+: box-struct-field@ ( i -- operand ) 1+ cells stack@ ;
 
 : %box-struct-field ( c-type i -- )
     box-struct-field@ swap reg-class>> {
@@ -164,21 +165,22 @@ M: x86.64 %box-small-struct ( c-type -- )
     ] with-return-regs ;
 
 : struct-return@ ( size n -- n )
-    [ ] [ \ stack-frame get swap - ] ?if ;
+    [ ] [ \ stack-frame get swap - ] ?if stack@ ;
 
 M: x86.64 %box-large-struct ( n c-type -- )
     ! Struct size is parameter 2
     heap-size
     RSI over MOV
     ! Compute destination address
-    swap struct-return@ RDI RSP rot [+] LEA
+    RDI spin struct-return@ LEA
     ! Copy the struct from the C stack
     "box_value_struct" f %alien-invoke ;
 
 M: x86.64 %prepare-box-struct ( size -- )
-    ! Compute target address for value struct return
-    RAX RSP rot f struct-return@ [+] LEA
-    RSP 0 [+] RAX MOV ;
+    ! Compute target address for value struct return, store it
+    ! as the first parameter
+    RAX swap f struct-return@ LEA
+    0 stack@ RAX MOV ;
 
 M: x86.64 %prepare-var-args RAX RAX XOR ;
 
@@ -192,10 +194,10 @@ M: x86.64 %alien-invoke
 
 M: x86.64 %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke
-    cell temp@ RAX MOV ;
+    RBP RAX MOV ;
 
 M: x86.64 %alien-indirect ( -- )
-    cell temp@ CALL ;
+    RBP CALL ;
 
 M: x86.64 %alien-callback ( quot -- )
     RDI load-indirect "c_to_factor" f %alien-invoke ;
@@ -203,12 +205,14 @@ M: x86.64 %alien-callback ( quot -- )
 M: x86.64 %callback-value ( ctype -- )
     ! Save top of data stack
     %prepare-unbox
-    ! Put former top of data stack in RDI
-    cell temp@ RDI MOV
+    ! Save top of data stack
+    RSP 8 SUB
+    RDI PUSH
     ! Restore data/call/retain stacks
     "unnest_stacks" f %alien-invoke
     ! Put former top of data stack in RDI
-    RDI cell temp@ MOV
+    RDI POP
+    RSP 8 ADD
     ! Unbox former top of data stack to return registers
     unbox-return ;
 
