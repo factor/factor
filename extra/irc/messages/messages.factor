@@ -4,7 +4,6 @@ USING: kernel fry splitting ascii calendar accessors combinators qualified
        arrays classes.tuple math.order ;
 RENAME: join sequences => sjoin
 EXCLUDE: sequences => join ;
-EXCLUDE: inverse => _ ;
 IN: irc.messages
 
 TUPLE: irc-message line prefix command parameters trailing timestamp ;
@@ -24,8 +23,11 @@ TUPLE: names-reply < irc-message who channel ;
 TUPLE: unhandled < irc-message ;
 
 : <irc-client-message> ( command parameters trailing -- irc-message )
-    irc-message new now >>timestamp
-    [ [ (>>trailing) ] [ (>>parameters) ] [ (>>command) ] tri ] keep ;
+    irc-message new
+        now >>timestamp
+        swap >>trailing
+        swap >>parameters
+        swap >>command ;
 
 <PRIVATE
 
@@ -57,22 +59,38 @@ M: kick command-parameters>> ( kick -- seq )
 M: mode command-parameters>> ( mode -- seq )
     [ name>> ] [ channel>> ] [ mode>> ] tri 3array ;
 
-GENERIC: (>>command-parameters) ( params irc-message -- )
+GENERIC# >>command-parameters 1 ( irc-message params -- irc-message )
 
-M: irc-message (>>command-parameters) ( params irc-message -- ) 2drop ;
-M: logged-in (>>command-parameters) ( params part -- )  [ first ] dip (>>name) ;
-M: privmsg (>>command-parameters) ( params privmsg -- ) [ first ] dip (>>name) ;
-M: notice  (>>command-parameters) ( params notice -- )  [ first ] dip (>>type) ;
-M: part    (>>command-parameters) ( params part -- )
-    [ first ] dip (>>channel) ;
-M: kick    (>>command-parameters) ( params kick -- )
-    [ first2 ] dip [ (>>who) ] [ (>>channel) ] bi ;
-M: names-reply (>>command-parameters) ( params names-reply -- )
-    [ [ first ] dip (>>who) ] [ [ third ] dip (>>channel) ] 2bi ;
-M: mode    (>>command-parameters) ( params mode -- )
-    { { [ >r 2array r> ] [ [ (>>mode) ] [ (>>name) ] bi ] }
-      { [ >r 3array r> ] [ [ (>>parameter) ] [ (>>mode) ] [ (>>name) ] tri ] }
-    } switch ;
+M: irc-message >>command-parameters ( irc-message params -- irc-message )
+    drop ;
+
+M: logged-in >>command-parameters ( part params -- part )
+    first >>name ;
+
+M: privmsg >>command-parameters ( privmsg params -- privmsg )
+    first >>name ;
+
+M: notice >>command-parameters ( notice params -- notice )
+    first >>type ;
+
+M: part >>command-parameters ( part params -- part )
+    first >>channel ;
+
+M: kick >>command-parameters ( kick params -- kick )
+    first2 [ >>channel ] [ >>who ] bi* ;
+
+M: nick-in-use >>command-parameters ( nick-in-use params -- nick-in-use )
+    second >>name ;
+
+M: names-reply >>command-parameters ( names-reply params -- names-reply )
+    first3 nip [ >>who ] [ >>channel ] bi* ;
+
+M: mode >>command-parameters ( mode params -- mode )
+    dup length 3 = [
+        first3 [ >>name ] [ >>mode ] [ >>parameter ] tri*
+    ] [
+        first2 [ >>name ] [ >>mode ] bi*
+    ] if ;
 
 PRIVATE>
 
@@ -90,6 +108,7 @@ M: irc-message irc-message>server-line ( irc-message -- string )
    drop "not implemented yet" ;
 
 <PRIVATE
+
 ! ======================================
 ! Message parsing
 ! ======================================
@@ -97,28 +116,28 @@ M: irc-message irc-message>server-line ( irc-message -- string )
 : split-at-first ( seq separators -- before after )
     dupd '[ _ member? ] find [ cut 1 tail ] [ swap ] if ;
 
-: remove-heading-: ( seq -- seq ) dup ":" head? [ 1 tail ] when ;
+: remove-heading-: ( seq -- seq )
+    ":" ?head drop ;
 
 : parse-name ( string -- string )
     remove-heading-: "!" split-at-first drop ;
 
 : split-prefix ( string -- string/f string )
     dup ":" head?
-        [ remove-heading-: " " split1 ]
-        [ f swap ]
-    if ;
+    [ remove-heading-: " " split1 ] [ f swap ] if ;
 
 : split-trailing ( string -- string string/f )
     ":" split1 ;
 
-: copy-message-in ( origin dest -- )
-    { [ [ parameters>> ] dip [ (>>command-parameters) ] [ (>>parameters) ] 2bi ]
-      [ [ line>>       ] dip (>>line) ]
-      [ [ prefix>>     ] dip (>>prefix) ]
-      [ [ command>>    ] dip (>>command) ]
-      [ [ trailing>>   ] dip (>>trailing) ]
-      [ [ timestamp>>  ] dip (>>timestamp) ]
-    } 2cleave ;
+: copy-message-in ( command irc-message -- command )
+    {
+        [ parameters>> [ >>parameters ] [ >>command-parameters ] bi ]
+        [ line>>      >>line ]
+        [ prefix>>    >>prefix ]
+        [ command>>   >>command ]
+        [ trailing>>  >>trailing ]
+        [ timestamp>> >>timestamp ]
+    } cleave ;
 
 PRIVATE>
 
@@ -132,20 +151,24 @@ M: sender-in-prefix irc-message-sender ( sender-in-prefix -- sender )
     [ [ blank? ] trim " " split unclip swap ] dip
     now irc-message boa ;
 
+: irc-message>command ( irc-message -- command )
+    [
+        command>> {
+            { "PING"    [ ping ] }
+            { "NOTICE"  [ notice ] }
+            { "001"     [ logged-in ] }
+            { "433"     [ nick-in-use ] }
+            { "353"     [ names-reply ] }
+            { "JOIN"    [ join ] }
+            { "PART"    [ part ] }
+            { "NICK"    [ nick ] }
+            { "PRIVMSG" [ privmsg ] }
+            { "QUIT"    [ quit ] }
+            { "MODE"    [ mode ] }
+            { "KICK"    [ kick ] }
+            [ drop unhandled ]
+        } case new
+    ] keep copy-message-in ;
+
 : parse-irc-line ( string -- message )
-    string>irc-message
-    dup command>> {
-        { "PING"    [ ping ] }
-        { "NOTICE"  [ notice ] }
-        { "001"     [ logged-in ] }
-        { "433"     [ nick-in-use ] }
-        { "353"     [ names-reply ] }
-        { "JOIN"    [ join ] }
-        { "PART"    [ part ] }
-        { "NICK"    [ nick ] }
-        { "PRIVMSG" [ privmsg ] }
-        { "QUIT"    [ quit ] }
-        { "MODE"    [ mode ] }
-        { "KICK"    [ kick ] }
-        [ drop unhandled ]
-    } case new [ copy-message-in ] keep ;
+    string>irc-message irc-message>command ;

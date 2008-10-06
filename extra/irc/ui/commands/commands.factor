@@ -8,7 +8,7 @@ IN: irc.ui.commands
 : say ( string -- )
     irc-tab get
     [ window>> client>> profile>> nickname>> <own-message> print-irc ]
-    [ listener>> write-message ] 2bi ;
+    [ chat>> speak ] 2bi ;
 
 : join ( string -- )
     irc-tab get window>> join-channel ;
@@ -18,7 +18,7 @@ IN: irc.ui.commands
 
 : whois ( string -- )
     "WHOIS" swap { } clone swap  <irc-client-message>
-    irc-tab get listener>> write-message ;
+    irc-tab get listener>> speak ;
 
 : quote ( string -- )
     drop ; ! THIS WILL CHANGE
