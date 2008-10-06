@@ -16,4 +16,4 @@ IN: random.tests
 
 [ t ] [ 1000 [ 400 random ] replicate prune length 256 > ] unit-test
 
-[ 0 ] [ 0 random ] unit-test
+[ f ] [ 0 random ] unit-test
