@@ -14,6 +14,14 @@ IN: calendar.unix
     [ set-timespec-nsec ] keep
     [ set-timespec-sec ] keep ;
 
+: timeval>unix-time ( timeval -- timestamp )
+    [ timeval-sec seconds ] [ timeval-usec microseconds ] bi
+    time+ since-1970 ;
+
+: timespec>unix-time ( timeval -- timestamp )
+    [ timespec-sec seconds ] [ timespec-nsec nanoseconds ] bi
+    time+ since-1970 ;
+
 : get-time ( -- alien )
     f time <uint> localtime ;
 
