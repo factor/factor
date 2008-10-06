@@ -13,5 +13,5 @@ M: freebsd stat>file-info ( stat -- file-info )
     {
         [ stat-st_flags >>flags ]
         [ stat-st_gen >>gen ]
-        [ stat-st_birthtimepsec timespec>timestamp >>birth-time ]
+        [ stat-st_birthtimespec timespec>timestamp >>birth-time ]
     } cleave ;
