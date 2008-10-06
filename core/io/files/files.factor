@@ -153,7 +153,7 @@ PRIVATE>
     "." last-split1 nip ;
 
 ! File info
-TUPLE: file-info type size permissions modified ;
+TUPLE: file-info type size permissions created modified accessed ;
 
 HOOK: file-info io-backend ( path -- info )
 

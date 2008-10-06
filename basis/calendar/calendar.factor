@@ -402,9 +402,16 @@ PRIVATE>
 : time-since-midnight ( timestamp -- duration )
     dup midnight time- ;
 
+: since-1970 ( time -- timestamp )
+    unix-1970 time+ >local-time ;
+
 : timeval>unix-time ( timeval -- timestamp )
     [ timeval-sec seconds ] [ timeval-usec microseconds ] bi
-    time+ unix-1970 time+ >local-time ;
+    time+ since-1970 ;
+
+: timespec>unix-time ( timeval -- timestamp )
+    [ timespec-sec seconds ] [ timespec-nsec nanoseconds ] bi
+    time+ since-1970 ;
 
 M: timestamp sleep-until timestamp>millis sleep-until ;
 

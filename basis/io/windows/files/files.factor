@@ -147,18 +147,18 @@ SYMBOLS: +read-only+ +hidden+ +system+
     FILE_ATTRIBUTE_DIRECTORY mask? +directory+ +regular-file+ ? ;
 
 : WIN32_FIND_DATA>file-info ( WIN32_FIND_DATA -- file-info )
+    [ file-info new ] dip
     {
-        [ WIN32_FIND_DATA-dwFileAttributes win32-file-type ]
+        [ WIN32_FIND_DATA-dwFileAttributes win32-file-type >>type ]
         [
             [ WIN32_FIND_DATA-nFileSizeLow ]
-            [ WIN32_FIND_DATA-nFileSizeHigh ] bi >64bit
+            [ WIN32_FIND_DATA-nFileSizeHigh ] bi >64bit >>size
         ]
-        [ WIN32_FIND_DATA-dwFileAttributes ]
-        ! [ WIN32_FIND_DATA-ftCreationTime FILETIME>timestamp ]
-        [ WIN32_FIND_DATA-ftLastWriteTime FILETIME>timestamp ]
-        ! [ WIN32_FIND_DATA-ftLastAccessTime FILETIME>timestamp ]
-    } cleave
-    \ file-info boa ;
+        [ WIN32_FIND_DATA-dwFileAttributes >>mode ]
+        [ WIN32_FIND_DATA-ftCreationTime FILETIME>timestamp >>created ]
+        [ WIN32_FIND_DATA-ftLastWriteTime FILETIME>timestamp >>modified ]
+        [ WIN32_FIND_DATA-ftLastAccessTime FILETIME>timestamp >>accessed ]
+    } cleave ;
 
 : find-first-file-stat ( path -- WIN32_FIND_DATA )
     "WIN32_FIND_DATA" <c-object> [
@@ -168,23 +168,32 @@ SYMBOLS: +read-only+ +hidden+ +system+
     ] keep ;
 
 : BY_HANDLE_FILE_INFORMATION>file-info ( HANDLE_FILE_INFORMATION -- file-info )
+    [ file-info new ] dip
     {
-        [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes win32-file-type ]
+        [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes win32-file-type >>type ]
         [
             [ BY_HANDLE_FILE_INFORMATION-nFileSizeLow ]
-            [ BY_HANDLE_FILE_INFORMATION-nFileSizeHigh ] bi >64bit
+            [ BY_HANDLE_FILE_INFORMATION-nFileSizeHigh ] bi >64bit >>size
         ]
-        [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes ]
-        ! [ BY_HANDLE_FILE_INFORMATION-ftCreationTime FILETIME>timestamp ]
-        [ BY_HANDLE_FILE_INFORMATION-ftLastWriteTime FILETIME>timestamp ]
-        ! [ BY_HANDLE_FILE_INFORMATION-ftLastAccessTime FILETIME>timestamp ]
+        [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes >>mode ]
+        [
+            BY_HANDLE_FILE_INFORMATION-ftCreationTime
+            FILETIME>timestamp >>created
+        ]
+        [
+            BY_HANDLE_FILE_INFORMATION-ftLastWriteTime
+            FILETIME>timestamp >>modified
+        ]
+        [
+            BY_HANDLE_FILE_INFORMATION-ftLastAccessTime
+            FILETIME>timestamp >>accessed
+        ]
         ! [ BY_HANDLE_FILE_INFORMATION-nNumberOfLinks ]
         ! [
           ! [ BY_HANDLE_FILE_INFORMATION-nFileIndexLow ]
           ! [ BY_HANDLE_FILE_INFORMATION-nFileIndexHigh ] bi >64bit
         ! ]
-    } cleave
-    \ file-info boa ;
+    } cleave ;
 
 : get-file-information ( handle -- BY_HANDLE_FILE_INFORMATION )
     [
