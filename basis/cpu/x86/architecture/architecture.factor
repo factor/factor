@@ -18,7 +18,7 @@ HOOK: stack-reg cpu ( -- reg )
     #! input values to callbacks; the callback has its own
     #! stack frame set up, and we want to read the frame
     #! set up by the caller.
-    stack-frame* + stack@ ;
+    stack-frame get total-size>> + stack@ ;
 
 : reg-stack ( n reg -- op ) swap cells neg [+] ;
 
@@ -51,19 +51,27 @@ HOOK: prepare-division cpu ( -- )
 
 M: immediate load-literal v>operand swap v>operand MOV ;
 
-M: x86 stack-frame ( n -- i )
-    3 cells + 16 align ;
+: align-stack ( n -- n' )
+    os macosx? cpu x86.64? or [ 16 align ] when ;
+
+M: x86 stack-frame-size ( n -- i )
+    3 cells + align-stack ;
 
 M: x86 %save-word-xt ( -- )
     temp-reg v>operand 0 MOV rc-absolute-cell rel-this ;
 
+: decr-stack-reg ( n -- )
+    dup 0 = [ drop ] [ stack-reg swap SUB ] if ;
+
 M: x86 %prologue ( n -- )
     dup PUSH
     temp-reg v>operand PUSH
-    stack-reg swap 3 cells - SUB ;
+    3 cells - decr-stack-reg ;
 
-M: x86 %epilogue ( n -- )
-    stack-reg swap cell - ADD ;
+: incr-stack-reg ( n -- )
+    dup 0 = [ drop ] [ stack-reg swap ADD ] if ;
+
+M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
 
 HOOK: %alien-global cpu ( symbol dll register -- )
 

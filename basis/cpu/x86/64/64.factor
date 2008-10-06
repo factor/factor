@@ -164,22 +164,21 @@ M: x86.64 %box-small-struct ( c-type -- )
         "box_small_struct" f %alien-invoke
     ] with-return-regs ;
 
-: struct-return@ ( size n -- n )
-    [ ] [ \ stack-frame get swap - ] ?if stack@ ;
+: struct-return@ ( n -- operand )
+    [ stack-frame get params>> ] unless* stack@ ;
 
 M: x86.64 %box-large-struct ( n c-type -- )
     ! Struct size is parameter 2
-    heap-size
-    RSI over MOV
+    RSI swap heap-size MOV
     ! Compute destination address
-    RDI spin struct-return@ LEA
+    RDI swap struct-return@ LEA
     ! Copy the struct from the C stack
     "box_value_struct" f %alien-invoke ;
 
-M: x86.64 %prepare-box-struct ( size -- )
-    ! Compute target address for value struct return, store it
-    ! as the first parameter
-    RAX swap f struct-return@ LEA
+M: x86.64 %prepare-box-struct ( -- )
+    ! Compute target address for value struct return
+    RAX f struct-return@ LEA
+    ! Store it as the first parameter
     0 stack@ RAX MOV ;
 
 M: x86.64 %prepare-var-args RAX RAX XOR ;

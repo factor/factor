@@ -30,8 +30,8 @@ M: x86.32 struct-small-enough? ( size -- ? )
     heap-size { 1 2 4 8 } member?
     os { linux netbsd solaris } member? not and ;
 
-: struct-return@ ( size n -- operand )
-    [ next-stack@ ] [ \ stack-frame get swap - stack@ ] ?if ;
+: struct-return@ ( n -- operand )
+    [ next-stack@ ] [ stack-frame get params>> stack@ ] if* ;
 
 ! On x86, parameters are never passed in registers.
 M: int-regs return-reg drop EAX ;
@@ -63,10 +63,10 @@ M: float-regs store-return-reg
     [ stack@ ] [ reg-size ] bi* FSTP ;
 
 : align-sub ( n -- )
-    dup 16 align swap - ESP swap SUB ;
+    [ align-stack ] keep - decr-stack-reg ;
 
 : align-add ( n -- )
-    16 align ESP swap ADD ;
+    align-stack incr-stack-reg ;
 
 : with-aligned-stack ( n quot -- )
     [ [ align-sub ] [ call ] bi* ]
@@ -113,7 +113,7 @@ M: x86.32 %box-long-long ( n func -- )
 
 M:: x86.32 %box-large-struct ( n c-type -- )
     ! Compute destination address
-    ECX c-type heap-size n struct-return@ LEA
+    ECX n struct-return@ LEA
     8 [
         ! Push struct size
         c-type heap-size PUSH
@@ -123,9 +123,9 @@ M:: x86.32 %box-large-struct ( n c-type -- )
         "box_value_struct" f %alien-invoke
     ] with-aligned-stack ;
 
-M: x86.32 %prepare-box-struct ( size -- )
+M: x86.32 %prepare-box-struct ( -- )
     ! Compute target address for value struct return
-    EAX swap f struct-return@ LEA
+    EAX f struct-return@ LEA
     ! Store it as the first parameter
     0 stack@ EAX MOV ;
 
@@ -248,7 +248,7 @@ M: x86.32 %cleanup ( alien-node -- )
     {
         {
             [ dup abi>> "stdcall" = ]
-            [ alien-stack-frame ESP swap SUB ]
+            [ drop ESP stack-frame get params>> SUB ]
         } {
             [ dup return>> large-struct? ]
             [ drop EAX PUSH ]
