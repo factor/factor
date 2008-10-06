@@ -362,7 +362,7 @@ PRIVATE>
 
 : attach-chat ( irc-chat irc-client -- ) [ (attach-chat) ] with-irc-client ;
 
-: dettach-chat ( irc-chat -- )
+: detach-chat ( irc-chat -- )
     [ client>> ] keep '[ _ (remove-chat) ] with-irc-client ;
 
 : speak ( message irc-chat -- )
