@@ -51,13 +51,12 @@ M: sequence random ( seq -- elt )
         [ length random-integer ] keep nth
     ] if-empty ;
 
-ERROR: negative-random n ;
 M: integer random ( integer -- integer' )
-    {
-        { [ dup 0 = ] [ ] }
-        { [ dup 0 < ] [ neg random-integer neg ] }
-        [ random-integer ]
-    } cond ;
+    dup sgn {
+        {  0 [ ] }
+        { -1 [ neg random-integer neg ] }
+        {  1 [ random-integer ] }
+    } case ;
 
 : delete-random ( seq -- elt )
     [ length random-integer ] keep [ nth ] 2keep delete-nth ;
