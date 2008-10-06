@@ -134,4 +134,5 @@ os {
     { freebsd [ "io.unix.files.freebsd" require ] }
     { netbsd  [ "io.unix.files.netbsd"  require ] }
     { openbsd [ "io.unix.files.openbsd" require ] }
+    { linux [ ] }
 } case
