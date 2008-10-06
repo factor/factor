@@ -16,7 +16,7 @@ TUPLE: nick < irc-message ;
 TUPLE: privmsg < irc-message name ;
 TUPLE: kick < irc-message channel who ;
 TUPLE: roomlist < irc-message channel names ;
-TUPLE: nick-in-use < irc-message asterisk name ;
+TUPLE: nick-in-use < irc-message name ;
 TUPLE: notice < irc-message type ;
 TUPLE: mode < irc-message name mode parameter ;
 TUPLE: names-reply < irc-message who channel ;
