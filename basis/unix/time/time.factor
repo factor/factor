@@ -1,7 +1,7 @@
-USING: kernel alien.syntax alien.c-types math ;
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
+USING: kernel alien.syntax alien.c-types math unix.types ;
 IN: unix.time
-
-TYPEDEF: uint time_t
 
 C-STRUCT: tm
     { "int" "sec" }    ! Seconds: 0-59 (K&R says 0-61?)

@@ -1,4 +1,4 @@
-USING: alien.c-types alien.syntax kernel math ;
+USING: alien.c-types alien.syntax kernel math unix.types ;
 IN: structs
 
 C-STRUCT: timeval
