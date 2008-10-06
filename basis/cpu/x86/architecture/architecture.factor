@@ -52,7 +52,7 @@ HOOK: prepare-division cpu ( -- )
 M: immediate load-literal v>operand swap v>operand MOV ;
 
 : align-stack ( n -- n' )
-    os macosx? [ 16 align ] when ;
+    os macosx? cpu x86.64? or [ 16 align ] when ;
 
 M: x86 stack-frame-size ( n -- i )
     3 cells + align-stack ;
