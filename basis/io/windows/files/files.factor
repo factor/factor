@@ -154,7 +154,7 @@ SYMBOLS: +read-only+ +hidden+ +system+
             [ WIN32_FIND_DATA-nFileSizeLow ]
             [ WIN32_FIND_DATA-nFileSizeHigh ] bi >64bit >>size
         ]
-        [ WIN32_FIND_DATA-dwFileAttributes >>mode ]
+        [ WIN32_FIND_DATA-dwFileAttributes >>permissions ]
         [ WIN32_FIND_DATA-ftCreationTime FILETIME>timestamp >>created ]
         [ WIN32_FIND_DATA-ftLastWriteTime FILETIME>timestamp >>modified ]
         [ WIN32_FIND_DATA-ftLastAccessTime FILETIME>timestamp >>accessed ]
@@ -175,7 +175,7 @@ SYMBOLS: +read-only+ +hidden+ +system+
             [ BY_HANDLE_FILE_INFORMATION-nFileSizeLow ]
             [ BY_HANDLE_FILE_INFORMATION-nFileSizeHigh ] bi >64bit >>size
         ]
-        [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes >>mode ]
+        [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes >>permissions ]
         [
             BY_HANDLE_FILE_INFORMATION-ftCreationTime
             FILETIME>timestamp >>created
