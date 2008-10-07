@@ -165,7 +165,15 @@ HELP: milliseconds
 { $values { "x" number } { "duration" duration } }
 { $description "Creates a duration object with the specified number of milliseconds." } ;
 
-{ years months days hours minutes seconds milliseconds } related-words
+HELP: microseconds
+{ $values { "x" number } { "duration" duration } }
+{ $description "Creates a duration object with the specified number of microseconds." } ;
+
+HELP: nanoseconds
+{ $values { "x" number } { "duration" duration } }
+{ $description "Creates a duration object with the specified number of nanoseconds." } ;
+
+{ years months days hours minutes seconds milliseconds microseconds nanoseconds } related-words
 
 HELP: leap-year?
 { $values { "obj" object } { "?" "a boolean" } }
@@ -263,7 +271,27 @@ HELP: duration>milliseconds
     }
 } ;
 
-{ duration>years duration>months duration>days duration>hours duration>minutes duration>seconds duration>milliseconds } related-words
+HELP: duration>microseconds
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in microseconds." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "6 seconds duration>microseconds ."
+               "6000000"
+    }
+} ;
+
+HELP: duration>nanoseconds
+{ $values { "duration" duration } { "x" number } }
+{ $description "Calculates the length of a duration in nanoseconds." }
+{ $examples
+    { $example "USING: calendar prettyprint ;"
+               "6 seconds duration>nanoseconds ."
+               "6000000000"
+    }
+} ;
+
+{ duration>years duration>months duration>days duration>hours duration>minutes duration>seconds duration>milliseconds duration>microseconds duration>nanoseconds } related-words
 
 
 HELP: time-
@@ -484,6 +512,12 @@ HELP: time-since-midnight
 { $values { "timestamp" timestamp } { "duration" duration } }
 { $description "Calculates a " { $snippet "duration" } " that represents the elapsed time since midnight of the input " { $snippet "timestamp" } "." } ;
 
+HELP: since-1970
+{ $values
+     { "duration" duration }
+     { "timestamp" timestamp } }
+{ $description "Adds the duration to the beginning of Unix time and returns the result as a timestamp." } ;
+
 ARTICLE: "calendar" "Calendar"
 "The two data types used throughout the calendar library:"
 { $subsection timestamp }
@@ -528,6 +562,8 @@ ARTICLE: "using-durations" "Using durations"
 { $subsection minutes }
 { $subsection seconds }
 { $subsection milliseconds }
+{ $subsection microseconds }
+{ $subsection nanoseconds }
 { $subsection instant }
 "Converting a duration to a number:"
 { $subsection duration>years }
@@ -536,7 +572,9 @@ ARTICLE: "using-durations" "Using durations"
 { $subsection duration>hours }
 { $subsection duration>minutes }
 { $subsection duration>seconds }
-{ $subsection duration>milliseconds } ;
+{ $subsection duration>milliseconds }
+{ $subsection duration>microseconds }
+{ $subsection duration>nanoseconds } ;
 
 ARTICLE: "relative-timestamps" "Relative timestamps"
 "In the future:"

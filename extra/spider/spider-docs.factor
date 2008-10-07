@@ -16,7 +16,7 @@ HELP: run-spider
      { "spider" spider } }
 { $description "Runs a spider until completion. See the " { $subsection "spider-tutorial" } " for a complete description of the tuple slots that affect how thet spider works." } ;
 
-HELP: slurp-heap-when
+HELP: slurp-heap-while
 { $values
      { "heap" "a heap" } { "quot1" quotation } { "quot2" quotation } }
 { $description "Removes values from a heap that match the predicate quotation " { $snippet "quot1" } " and processes them with " { $snippet "quot2" } " until the predicate quotation no longer matches." } ;

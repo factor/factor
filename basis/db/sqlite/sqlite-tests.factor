@@ -4,7 +4,7 @@ continuations db.types db.tuples unicode.case ;
 IN: db.sqlite.tests
 
 : db-path "test.db" temp-file ;
-: test.db db-path sqlite-db ;
+: test.db db-path <sqlite-db> ;
 
 [ ] [ [ db-path delete-file ] ignore-errors ] unit-test
 

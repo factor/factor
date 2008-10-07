@@ -1,3 +1,5 @@
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel sequences vectors math math.vectors
 namespaces make shuffle splitting sequences.lib math.order ;
 IN: math.polynomials
@@ -82,5 +84,5 @@ PRIVATE>
 
 : polyval ( p x -- p[x] )
     #! Evaluate a polynomial.
-    >r dup length r> powers v. ;
+    [ dup length ] dip powers v. ;
 

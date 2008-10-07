@@ -1,8 +1,8 @@
 ! Copyright (C) 2006 Mackenzie Straight, Doug Coleman.
-
+! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types alien.strings alien.syntax arrays
 byte-arrays kernel math sequences windows.types windows.kernel32
-windows.errors structs windows math.bitwise alias ;
+windows.errors windows math.bitwise alias ;
 IN: windows.winsock
 
 USE: libc
@@ -137,6 +137,10 @@ C-STRUCT: addrinfo
     { "char*" "canonname" }
     { "sockaddr*" "addr" }
     { "addrinfo*" "next" } ;
+
+C-STRUCT: timeval
+    { "long" "sec" }
+    { "long" "usec" } ;
 
 : hostent-addr ( hostent -- addr ) hostent-addr-list *void* ; ! *uint ;
 
@@ -440,4 +444,3 @@ FUNCTION: void GetAcceptExSockaddrs ( void* a, int b, int c, int d, void* e, voi
 
 : init-winsock ( -- )
     HEX: 0202 <wsadata> WSAStartup winsock-return-check ;
-

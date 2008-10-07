@@ -1,12 +1,10 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-
-USING: alien alien.c-types alien.syntax kernel libc structs sequences
-       continuations byte-arrays strings
-       math namespaces system combinators vocabs.loader qualified
-       accessors stack-checker macros locals generalizations 
-       unix.types debugger io prettyprint ;
-
+USING: alien alien.c-types alien.syntax kernel libc
+sequences continuations byte-arrays strings math namespaces
+system combinators vocabs.loader qualified accessors
+stack-checker macros locals generalizations unix.types
+debugger io prettyprint ;
 IN: unix
 
 TYPEDEF: uint in_addr_t
@@ -109,8 +107,12 @@ FUNCTION: uid_t geteuid ;
 FUNCTION: gid_t getgid ;
 FUNCTION: int getgrgid_r ( gid_t gid, group* grp, char* buffer, size_t bufsize, group** result ) ;
 FUNCTION: int getgrnam_r ( char* name, group* grp, char* buffer, size_t bufsize, group** result ) ;
+FUNCTION: passwd* getpwent ( ) ;
 FUNCTION: int getpwnam_r ( char* login, passwd* pwd, char* buffer, size_t bufsize, passwd** result ) ;
 FUNCTION: int getgroups ( int gidsetlen, gid_t* gidset ) ;
+FUNCTION: int getgrouplist ( char* name, int basegid, int* groups, int* ngroups ) ;
+
+FUNCTION: group* getgrent ;
 FUNCTION: int gethostname ( char* name, int len ) ;
 FUNCTION: int getsockname ( int socket, sockaddr* address, socklen_t* address_len ) ;
 FUNCTION: int getpeername ( int socket, sockaddr* address, socklen_t* address_len ) ;

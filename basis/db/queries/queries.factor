@@ -145,10 +145,13 @@ M: db <delete-tuples-statement> ( tuple table -- sql )
         where-clause
     ] query-make ;
 
+ERROR: all-slots-ignored class ;
+
 M: db <select-by-slots-statement> ( tuple class -- statement )
     [
         "select " 0%
         [ dupd filter-ignores ] dip
+        over empty? [ all-slots-ignored ] when
         over
         [ ", " 0% ]
         [ dup column-name>> 0% 2, ] interleave

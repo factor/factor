@@ -43,7 +43,7 @@ IN: cpu.ppc.architecture
 
 : xt-save ( n -- i ) 2 cells - ;
 
-M: ppc stack-frame ( n -- i )
+M: ppc stack-frame-size ( n -- i )
     local@ factor-area-size + 4 cells align ;
 
 M: temp-reg v>operand drop 11 ;
@@ -166,11 +166,13 @@ M: float-regs %load-param-reg >r 1 rot local@ r> LF ;
 M: stack-params %load-param-reg ( stack reg reg-class -- )
     drop >r 0 1 rot local@ LWZ 0 1 r> param@ STW ;
 
+: next-param@ ( n -- x ) param@ stack-frame get total-size>> + ;
+
 M: stack-params %save-param-reg ( stack reg reg-class -- )
     #! Funky. Read the parameter from the caller's stack frame.
     #! This word is used in callbacks
     drop
-    0 1 rot param@ stack-frame* + LWZ
+    0 1 rot next-param@ LWZ
     0 1 rot local@ STW ;
 
 M: ppc %prepare-unbox ( -- )
@@ -197,10 +199,8 @@ M: ppc %unbox-long-long ( n func -- )
 
 M: ppc %unbox-large-struct ( n c-type -- )
     ! Value must be in r3
-    ! Compute destination address
-    4 1 roll local@ ADDI
-    ! Load struct size
-    heap-size 5 LI
+    ! Compute destination address and load struct size
+    [ 4 1 rot local@ ADDI ] [ heap-size 5 LI ] bi*
     ! Call the function
     "to_value_struct" f %alien-invoke ;
 
@@ -218,23 +218,18 @@ M: ppc %box-long-long ( n func -- )
         4 1 rot cell + local@ LWZ
     ] when* r> f %alien-invoke ;
 
-: temp@ ( m -- n ) stack-frame* factor-area-size - swap - ;
+: struct-return@ ( n -- n )
+    [ stack-frame get params>> ] unless* local@ ;
 
-: struct-return@ ( size n -- n ) [ local@ ] [ temp@ ] ?if ;
-
-M: ppc %prepare-box-struct ( size -- )
+M: ppc %prepare-box-struct ( -- )
     #! Compute target address for value struct return
-    3 1 rot f struct-return@ ADDI
+    3 1 f struct-return@ ADDI
     3 1 0 local@ STW ;
 
 M: ppc %box-large-struct ( n c-type -- )
-    #! If n = f, then we're boxing a returned struct
-    heap-size
-    [ swap struct-return@ ] keep
-    ! Compute destination address
-    3 1 roll ADDI
-    ! Load struct size
-    4 LI
+    ! If n = f, then we're boxing a returned struct
+    ! Compute destination address and load struct size
+    [ 3 1 rot struct-return@ ADDI ] [ heap-size 4 LI ] bi*
     ! Call the function
     "box_value_struct" f %alien-invoke ;
 
@@ -256,10 +251,10 @@ M: ppc %alien-callback ( quot -- )
 
 M: ppc %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke
-    3 1 cell temp@ STW ;
+    3 11 MR ;
 
 M: ppc %alien-indirect ( -- )
-    11 1 cell temp@ LWZ (%call) ;
+    (%call) ;
 
 M: ppc %callback-value ( ctype -- )
      ! Save top of data stack

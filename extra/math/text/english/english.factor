@@ -1,8 +1,7 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: combinators.lib kernel math math.functions math.parser namespaces
-    sequences splitting grouping sequences.lib
-    combinators.short-circuit ;
+sequences splitting grouping combinators.short-circuit ;
 IN: math.text.english
 
 <PRIVATE
@@ -86,14 +85,10 @@ SYMBOL: and-needed?
     ] if ;
 
 : (number>text) ( n -- str )
-    dup negative-text swap abs 3digit-groups recombine append ;
+    [ negative-text ] [ abs 3digit-groups recombine ] bi append ;
 
 PRIVATE>
 
 : number>text ( n -- str )
-    dup zero? [
-        small-numbers
-    ] [
-        [ (number>text) ] with-scope
-    ] if ;
+    dup zero? [ small-numbers ] [ [ (number>text) ] with-scope ] if ;
 

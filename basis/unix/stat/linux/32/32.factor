@@ -18,9 +18,9 @@ C-STRUCT: stat
     { "off_t"     "st_size" }
     { "blksize_t" "st_blksize" }
     { "blkcnt_t"  "st_blocks" }
-    { "timespec"  "st_atim" }
-    { "timespec"  "st_mtim" }
-    { "timespec"  "st_ctim" }
+    { "timespec"  "st_atimespec" }
+    { "timespec"  "st_mtimespec" }
+    { "timespec"  "st_ctimespec" }
     { "ulong"     "unused4" }
     { "ulong"     "unused5" } ;
 

@@ -135,6 +135,12 @@ HELP: relative-url
     }
 } ;
 
+HELP: relative-url?
+{ $values
+     { "url" url }
+     { "?" "a boolean" } }
+{ $description "Tests whether a URL is relative." } ;
+
 HELP: secure-protocol?
 { $values { "protocol" string } { "?" "a boolean" } }
 { $description "Tests if protocol connections must be made with secure sockets (SSL/TLS)." }

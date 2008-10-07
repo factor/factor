@@ -76,12 +76,24 @@ M: #declare propagate-before
 : fold-call ( #call word -- )
     [ (fold-call) ] [ drop out-d>> ] 2bi set-value-infos ;
 
-: predicate-output-infos ( info class -- info )
+: predicate-output-infos/literal ( info class -- info )
+    [ literal>> ] dip
+    '[ _ _ instance? <literal-info> ]
+    [ drop object-info ]
+    recover ;
+
+: predicate-output-infos/class ( info class -- info )
     [ class>> ] dip {
         { [ 2dup class<= ] [ t <literal-info> ] }
         { [ 2dup classes-intersect? not ] [ f <literal-info> ] }
         [ object-info ]
     } cond 2nip ;
+
+: predicate-output-infos ( info class -- info )
+    over literal?>>
+    [ predicate-output-infos/literal ]
+    [ predicate-output-infos/class ]
+    if ;
 
 : propagate-predicate ( #call word -- infos )
     #! We need to force the caller word to recompile when the class

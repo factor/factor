@@ -4,7 +4,7 @@ USING: io.backend io.ports io.unix.backend io.files io
 unix unix.stat unix.time kernel math continuations
 math.bitwise byte-arrays alien combinators calendar
 io.encodings.binary accessors sequences strings system
-io.files.private destructors ;
+io.files.private destructors vocabs.loader calendar.unix ;
 
 IN: io.unix.files
 
@@ -74,26 +74,14 @@ M: unix copy-file ( from to -- )
     [ swap file-info permissions>> chmod io-error ]
     2bi ;
 
-: stat>type ( stat -- type )
-    stat-st_mode S_IFMT bitand {
-        { S_IFREG [ +regular-file+ ] }
-        { S_IFDIR [ +directory+ ] }
-        { S_IFCHR [ +character-device+ ] }
-        { S_IFBLK [ +block-device+ ] }
-        { S_IFIFO [ +fifo+ ] }
-        { S_IFLNK [ +symbolic-link+ ] }
-        { S_IFSOCK [ +socket+ ] }
-        [ drop +unknown+ ]
-    } case ;
+HOOK: stat>file-info os ( stat -- file-info )
 
-: stat>file-info ( stat -- info )
-    {
-        [ stat>type ]
-        [ stat-st_size ]
-        [ stat-st_mode ]
-        [ stat-st_mtim timespec-sec seconds unix-1970 time+ ]
-    } cleave
-    \ file-info boa ;
+HOOK: stat>type os ( stat -- file-info )
+
+HOOK: new-file-info os ( -- class )
+
+TUPLE: unix-file-info < file-info uid gid dev ino
+nlink rdev blocks blocksize ;
 
 M: unix file-info ( path -- info )
     normalize-path file-status stat>file-info ;
@@ -106,3 +94,45 @@ M: unix make-link ( path1 path2 -- )
 
 M: unix read-link ( path -- path' )
    normalize-path read-symbolic-link ;
+
+M: unix new-file-info ( -- class ) unix-file-info new ;
+
+M: unix stat>file-info ( stat -- file-info )
+    [ new-file-info ] dip
+    {
+        [ stat>type >>type ]
+        [ stat-st_size >>size ]
+        [ stat-st_mode >>permissions ]
+        [ stat-st_ctimespec timespec>unix-time >>created ]
+        [ stat-st_mtimespec timespec>unix-time >>modified ]
+        [ stat-st_atimespec timespec>unix-time >>accessed ]
+        [ stat-st_uid >>uid ]
+        [ stat-st_gid >>gid ]
+        [ stat-st_dev >>dev ]
+        [ stat-st_ino >>ino ]
+        [ stat-st_nlink >>nlink ]
+        [ stat-st_rdev >>rdev ]
+        [ stat-st_blocks >>blocks ]
+        [ stat-st_blksize >>blocksize ]
+    } cleave ;
+
+M: unix stat>type ( stat -- type )
+    stat-st_mode S_IFMT bitand {
+        { S_IFREG [ +regular-file+ ] }
+        { S_IFDIR [ +directory+ ] }
+        { S_IFCHR [ +character-device+ ] }
+        { S_IFBLK [ +block-device+ ] }
+        { S_IFIFO [ +fifo+ ] }
+        { S_IFLNK [ +symbolic-link+ ] }
+        { S_IFSOCK [ +socket+ ] }
+        [ drop +unknown+ ]
+    } case ;
+
+! Linux has no extra fields in its stat struct
+os {
+    { macosx  [ "io.unix.files.bsd" require ] }
+    { netbsd  [ "io.unix.files.bsd" require ] }
+    { openbsd  [ "io.unix.files.bsd" require ] }
+    { freebsd  [ "io.unix.files.bsd" require ] }
+    { linux [ ] }
+} case

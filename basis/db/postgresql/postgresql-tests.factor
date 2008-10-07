@@ -1,13 +1,14 @@
-! You will need to run  'createdb factor-test' to create the database.
-! Set username and password in  the 'connect' word.
-
 USING: kernel db.postgresql alien continuations io classes
 prettyprint sequences namespaces tools.test db
-db.tuples db.types unicode.case ;
+db.tuples db.types unicode.case accessors ;
 IN: db.postgresql.tests
 
 : test-db ( -- postgresql-db )
-    { "localhost" "postgres" "foob" "factor-test" } postgresql-db ;
+    <postgresql-db>
+        "localhost" >>host
+        "postgres" >>username
+        "thepasswordistrust" >>password
+        "factor-test" >>database ;
 
 [ ] [ test-db [ ] with-db ] unit-test
 
@@ -92,4 +93,4 @@ IN: db.postgresql.tests
 
 
 : with-dummy-db ( quot -- )
-    >r T{ postgresql-db } db r> with-variable ;
+    [ T{ postgresql-db } db ] dip with-variable ;

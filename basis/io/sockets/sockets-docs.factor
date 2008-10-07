@@ -104,7 +104,7 @@ HELP: <client>
 } ;
 
 HELP: with-client
-{ $values { "remote" "an address specifier" } { "encoding" "an encding descriptor" } { "quot" quotation } }
+{ $values { "remote" "an address specifier" } { "encoding" "an encoding descriptor" } { "quot" quotation } }
 { $description "Opens a network connection and calls the quotation in a new dynamic scope with " { $link input-stream } " and " { $link output-stream } " rebound to the network streams. The local address the socket is bound to is stored in the " { $link local-address } " variable." }
 { $errors "Throws an error if the connection cannot be established." } ;
 

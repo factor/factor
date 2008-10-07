@@ -11,8 +11,9 @@ IN: db.sqlite
 
 TUPLE: sqlite-db < db path ;
 
-M: sqlite-db make-db* ( path db -- db )
-    swap >>path ;
+: <sqlite-db> ( path -- sqlite-db )
+    sqlite-db new-db
+        swap >>path ;
 
 M: sqlite-db db-open ( db -- db )
     dup path>> sqlite-open >>handle ;
@@ -48,8 +49,8 @@ M: sqlite-result-set dispose ( result-set -- )
     handle>> [ sqlite3_reset drop ] [ sqlite3_clear_bindings drop ] bi ;
 
 M: sqlite-statement low-level-bind ( statement -- )
-    [ bind-params>> ] [ handle>> ] bi
-    [ swap [ key>> ] [ value>> ] [ type>> ] tri sqlite-bind-type ] curry each ;
+    [ handle>> ] [ bind-params>> ] bi
+    [ [ key>> ] [ value>> ] [ type>> ] tri sqlite-bind-type ] with each ;
 
 M: sqlite-statement bind-statement* ( statement -- )
     sqlite-maybe-prepare
@@ -78,7 +79,8 @@ M: generator-bind sqlite-bind-conversion ( tuple generate-bind -- array )
     tuck
     [ generator-singleton>> eval-generator tuck ] [ slot-name>> ] bi
     rot set-slot-named
-    >r [ key>> ] [ type>> ] bi r> swap <sqlite-low-level-binding> ;
+    [ [ key>> ] [ type>> ] bi ] dip
+    swap <sqlite-low-level-binding> ;
 
 M: sqlite-statement bind-tuple ( tuple statement -- )
     [
@@ -100,7 +102,7 @@ M: sqlite-result-set row-column ( result-set n -- obj )
 
 M: sqlite-result-set row-column-typed ( result-set n -- obj )
     dup pick out-params>> nth type>>
-    >r >r handle>> r> r> sqlite-column-typed ;
+    [ handle>> ] 2dip sqlite-column-typed ;
 
 M: sqlite-result-set advance-row ( result-set -- )
     dup handle>> sqlite-next >>has-more? drop ;
@@ -160,10 +162,10 @@ M: sqlite-db <insert-user-assigned-statement> ( tuple -- statement )
     <insert-db-assigned-statement> ;
 
 M: sqlite-db bind# ( spec obj -- )
-    >r
-    [ column-name>> ":" swap next-sql-counter 3append dup 0% ]
-    [ type>> ] bi
-    r> <literal-bind> 1, ;
+    [
+        [ column-name>> ":" swap next-sql-counter 3append dup 0% ]
+        [ type>> ] bi
+    ] dip <literal-bind> 1, ;
 
 M: sqlite-db bind% ( spec -- )
     dup 1, column-name>> ":" prepend 0% ;

@@ -1,8 +1,8 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel io.ports io.unix.backend
-bit-arrays sequences assocs unix math namespaces structs
-accessors math.order locals ;
+bit-arrays sequences assocs unix math namespaces
+accessors math.order locals unix.time ;
 IN: io.unix.select
 
 TUPLE: select-mx < mx read-fdset write-fdset ;

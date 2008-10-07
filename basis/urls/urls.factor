@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel ascii combinators combinators.short-circuit
 sequences splitting fry namespaces make assocs arrays strings
-io.sockets io.sockets.secure io.encodings.string
+io.sockets io.encodings.string
 io.encodings.utf8 math math.parser accessors parser
 strings.parser lexer prettyprint.backend hashtables present
 peg.ebnf urls.encoding ;
@@ -155,9 +155,17 @@ PRIVATE>
         f >>host
         f >>port ;
 
+: relative-url? ( url -- ? ) protocol>> not ;
+
 ! Half-baked stuff follows
 : secure-protocol? ( protocol -- ? )
     "https" = ;
+
+<PRIVATE
+
+GENERIC: >secure-addr ( addrspec -- addrspec' )
+
+PRIVATE>
 
 : url-addr ( url -- addr )
     [
@@ -166,7 +174,7 @@ PRIVATE>
         [ protocol>> protocol-port ]
         tri or <inet>
     ] [ protocol>> ] bi
-    secure-protocol? [ <secure> ] when ;
+    secure-protocol? [ >secure-addr ] when ;
 
 : ensure-port ( url -- url )
     dup protocol>> '[ _ protocol-port or ] change-port ;

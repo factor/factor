@@ -19,4 +19,3 @@ IN: math.compare
 
 : clamp ( a value b -- x )
    min max ; 
-

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: cocoa cocoa.messages cocoa.application cocoa.nibs assocs
 namespaces kernel kernel.private words compiler.units sequences
-ui ui.cocoa init ;
+init vocabs ;
 IN: tools.deploy.shaker.cocoa
 
 : pool ( obj -- obj' ) \ pool get [ ] cache ;
@@ -23,9 +23,12 @@ IN: cocoa.application
 
 H{ } clone \ pool [
     global [
-        stop-after-last-window? set
+        "stop-after-last-window?" "ui" lookup set
 
-        [ "MiniFactor.nib" load-nib ] cocoa-init-hook set-global
+        "ui.cocoa" vocab [
+            [ "MiniFactor.nib" load-nib ]
+            "cocoa-init-hook" "ui.cocoa" lookup set-global
+        ] when
 
         ! Only keeps those methods that we actually call
         sent-messages get super-sent-messages get assoc-union

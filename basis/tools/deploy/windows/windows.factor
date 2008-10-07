@@ -5,16 +5,23 @@ tools.deploy.backend tools.deploy.config assocs hashtables
 prettyprint combinators windows.shell32 windows.user32 ;
 IN: tools.deploy.windows
 
-: copy-dlls ( bundle-name -- )
-    {
-        "resource:freetype6.dll"
-        "resource:zlib1.dll"
-        "resource:factor.dll"
-    } swap copy-files-into ;
+: copy-dll ( bundle-name -- )
+    "resource:factor.dll" swap copy-file-into ;
+
+: copy-freetype ( bundle-name -- )
+    deploy-ui? get [
+        {
+            "resource:freetype6.dll"
+            "resource:zlib1.dll"
+        } swap copy-files-into
+    ] [ drop ] if ;
 
 : create-exe-dir ( vocab bundle-name -- vm )
-    dup copy-dlls
-    dup "" copy-fonts
+    deploy-ui? get [
+        dup copy-dll
+        dup copy-freetype
+        dup "" copy-fonts
+    ] when
     ".exe" copy-vm ;
 
 M: winnt deploy*
