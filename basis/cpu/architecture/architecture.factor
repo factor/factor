@@ -5,12 +5,15 @@ memory namespaces make sequences layouts system hashtables
 classes alien byte-arrays combinators words sets ;
 IN: cpu.architecture
 
-! Register classes
-SINGLETON: int-regs
-SINGLETON: single-float-regs
-SINGLETON: double-float-regs
-UNION: float-regs single-float-regs double-float-regs ;
-UNION: reg-class int-regs float-regs ;
+! Labels
+TUPLE: label offset ;
+
+: <label> ( -- label ) label new ;
+: define-label ( name -- ) <label> swap set ;
+: resolve-label ( label/name -- ) dup label? [ get ] unless , ;
+
+! Mapping from register class to machine registers
+HOOK: machine-registers cpu ( -- assoc )
 
 ! A pseudo-register class for parameters spilled on the stack
 SINGLETON: stack-params
@@ -29,7 +32,7 @@ M: object param-reg param-regs nth ;
 GENERIC: vregs ( register-class -- regs )
 
 ! Load a literal (immediate or indirect)
-GENERIC# load-literal 1 ( obj vreg -- )
+GENERIC# load-literal 1 ( obj reg -- )
 
 HOOK: load-indirect cpu ( obj reg -- )
 
@@ -40,20 +43,8 @@ TUPLE: stack-frame total-size size params return ;
 ! Set up caller stack frame
 HOOK: %prologue cpu ( n -- )
 
-: %prologue-later ( -- ) \ %prologue-later , ;
-
 ! Tear down stack frame
 HOOK: %epilogue cpu ( n -- )
-
-: %epilogue-later ( -- ) \ %epilogue-later , ;
-
-! Store word XT in stack frame
-HOOK: %save-word-xt cpu ( -- )
-
-! Store dispatch branch XT in stack frame
-HOOK: %save-dispatch-xt cpu ( -- )
-
-M: object %save-dispatch-xt %save-word-xt ;
 
 ! Call another word
 HOOK: %call cpu ( word -- )
@@ -103,7 +94,7 @@ HOOK: small-enough? cpu ( n -- ? )
 ! Is this structure small enough to be returned in registers?
 HOOK: struct-small-enough? cpu ( heap-size -- ? )
 
-! Do we pass explode value structs?
+! Do we pass value structs by value or hidden reference?
 HOOK: value-structs? cpu ( -- ? )
 
 ! If t, fp parameters are shadowed by dummy int parameters
@@ -158,12 +149,6 @@ M: stack-params param-reg drop ;
 
 M: stack-params param-regs drop f ;
 
-GENERIC: v>operand ( obj -- operand )
-
-M: integer v>operand tag-fixnum ;
-
-M: f v>operand drop \ f tag-number ;
-
 M: object load-literal v>operand load-indirect ;
 
 PREDICATE: small-slot < integer cells small-enough? ;
@@ -207,8 +192,3 @@ HOOK: %write-barrier cpu ( src temp -- )
 
 ! GC check
 HOOK: %gc cpu ( -- )
-
-: operand ( var -- op ) get v>operand ; inline
-
-: unique-operands ( operands quot -- )
-    >r [ operand ] map prune r> each ; inline

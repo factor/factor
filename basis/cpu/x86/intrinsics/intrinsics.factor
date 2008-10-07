@@ -1,103 +1,74 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.accessors arrays cpu.x86.assembler
-cpu.x86.allot cpu.x86.architecture cpu.architecture kernel
-kernel.private math math.private namespaces quotations sequences
-words generic byte-arrays hashtables hashtables.private
-sequences.private sbufs sbufs.private
-vectors vectors.private layouts system strings.private
-slots.private 
-compiler.constants
-compiler.intrinsics
-compiler.generator
-compiler.generator.fixup
-compiler.generator.registers ;
+USING: accessors arrays byte-arrays alien.accessors
+compiler.backend kernel kernel.private math memory namespaces
+make sequences words system layouts combinators math.order
+math.private alien alien.c-types slots.private cpu.x86.assembler
+cpu.x86.assembler.private locals compiler.backend
+compiler.codegen.fixup compiler.constants compiler.intrinsics
+compiler.cfg.builder compiler.cfg.registers compiler.cfg.stacks
+compiler.cfg.templates compiler.codegen ;
 IN: cpu.x86.intrinsics
 
 ! Type checks
 \ tag [
     "in" operand tag-mask get AND
     "in" operand %tag-fixnum
-] H{
-    { +input+ { { f "in" } } }
-    { +output+ { "in" } }
+] T{ template
+    { input { { f "in" } } }
+    { output { "in" } }
 } define-intrinsic
 
 ! Slots
-: %slot-literal-known-tag ( -- op )
-    "obj" operand
-    "n" get cells
-    "obj" get operand-tag - [+] ;
-
-: %slot-literal-any-tag ( -- op )
-    "obj" operand %untag
-    "obj" operand "n" get cells [+] ;
-
-: %slot-any ( -- op )
-    "obj" operand %untag
-    "n" operand fixnum>slot@
-    "obj" operand "n" operand [+] ;
-
 \ slot {
     ! Slot number is literal and the tag is known
     {
-        [ "val" operand %slot-literal-known-tag MOV ] H{
-            { +input+ { { f "obj" known-tag } { [ small-slot? ] "n" } } }
-            { +scratch+ { { f "val" } } }
-            { +output+ { "val" } }
+        [ "val" operand %slot-literal-known-tag MOV ] T{ template
+            { input { { f "obj" known-tag } { small-slot "n" } } }
+            { scratch { { f "val" } } }
+            { output { "val" } }
         }
     }
     ! Slot number is literal
     {
-        [ "obj" operand %slot-literal-any-tag MOV ] H{
-            { +input+ { { f "obj" } { [ small-slot? ] "n" } } }
-            { +output+ { "obj" } }
+        [ "obj" operand %slot-literal-any-tag MOV ] T{ template
+            { input { { f "obj" } { small-slot "n" } } }
+            { output { "obj" } }
         }
     }
     ! Slot number in a register
     {
-        [ "obj" operand %slot-any MOV ] H{
-            { +input+ { { f "obj" } { f "n" } } }
-            { +output+ { "obj" } }
-            { +clobber+ { "n" } }
+        [ "obj" operand %slot-any MOV ] T{ template
+            { input { { f "obj" } { f "n" } } }
+            { output { "obj" } }
+            { clobber { "n" } }
         }
     }
 } define-intrinsics
 
-: generate-write-barrier ( -- )
-    #! Mark the card pointed to by vreg.
-    "val" get operand-immediate? "obj" get fresh-object? or [
-        ! Mark the card
-        "obj" operand card-bits SHR
-        "cards_offset" f temp-reg v>operand %alien-global
-        temp-reg v>operand "obj" operand [+] card-mark <byte> MOV
-
-        ! Mark the card deck
-        "obj" operand deck-bits card-bits - SHR
-        "decks_offset" f temp-reg v>operand %alien-global
-        temp-reg v>operand "obj" operand [+] card-mark <byte> MOV
-    ] unless ;
-
-\ set-slot {
+\ (set-slot) {
     ! Slot number is literal and the tag is known
     {
-        [ %slot-literal-known-tag "val" operand MOV generate-write-barrier ] H{
-            { +input+ { { f "val" } { f "obj" known-tag } { [ small-slot? ] "n" } } }
-            { +clobber+ { "obj" } }
+        [ %slot-literal-known-tag "val" operand MOV ] T{ template
+            { input { { f "val" } { f "obj" known-tag } { small-slot "n" } } }
+            { scratch { { f "scratch" } } }
+            { clobber { "obj" } }
         }
     }
     ! Slot number is literal
     {
-        [ %slot-literal-any-tag "val" operand MOV generate-write-barrier ] H{
-            { +input+ { { f "val" } { f "obj" } { [ small-slot? ] "n" } } }
-            { +clobber+ { "obj" } }
+        [ %slot-literal-any-tag "val" operand MOV ] T{ template
+            { input { { f "val" } { f "obj" } { small-slot "n" } } }
+            { scratch { { f "scratch" } } }
+            { clobber { "obj" } }
         }
     }
     ! Slot number in a register
     {
-        [ %slot-any "val" operand MOV generate-write-barrier ] H{
-            { +input+ { { f "val" } { f "obj" } { f "n" } } }
-            { +clobber+ { "obj" "n" } }
+        [ %slot-any "val" operand MOV ] T{ template
+            { input { { f "val" } { f "obj" } { f "n" } } }
+            { scratch { { f "scratch" } } }
+            { clobber { "obj" "n" } }
         }
     }
 } define-intrinsics
@@ -117,15 +88,15 @@ IN: cpu.x86.intrinsics
     >r [ "x" operand "y" operand ] swap suffix r> 2array ;
 
 : fixnum-value-op ( op -- pair )
-    H{
-        { +input+ { { f "x" } { [ small-tagged? ] "y" } } }
-        { +output+ { "x" } }
+    T{ template
+        { input { { f "x" } { small-tagged "y" } } }
+        { output { "x" } }
     } fixnum-op ;
 
 : fixnum-register-op ( op -- pair )
-    H{
-        { +input+ { { f "x" } { f "y" } } }
-        { +output+ { "x" } }
+    T{ template
+        { input { { f "x" } { f "y" } } }
+        { output { "x" } }
     } fixnum-op ;
 
 : define-fixnum-op ( word op -- )
@@ -145,28 +116,28 @@ IN: cpu.x86.intrinsics
 \ fixnum-bitnot [
     "x" operand NOT
     "x" operand tag-mask get XOR
-] H{
-    { +input+ { { f "x" } } }
-    { +output+ { "x" } }
+] T{ template
+    { input { { f "x" } } }
+    { output { "x" } }
 } define-intrinsic
 
 \ fixnum*fast {
     {
         [
             "x" operand "y" get IMUL2
-        ] H{
-            { +input+ { { f "x" } { [ small-tagged? ] "y" } } }
-            { +output+ { "x" } }
+        ] T{ template
+            { input { { f "x" } { [ small-tagged? ] "y" } } }
+            { output { "x" } }
         }
     } {
         [
             "out" operand "x" operand MOV
             "out" operand %untag-fixnum
             "y" operand "out" operand IMUL2
-        ] H{
-            { +input+ { { f "x" } { f "y" } } }
-            { +scratch+ { { f "out" } } }
-            { +output+ { "out" } }
+        ] T{ template
+            { input { { f "x" } { f "y" } } }
+            { scratch { { f "out" } } }
+            { output { "out" } }
         }
     }
 } define-intrinsics
@@ -179,9 +150,9 @@ IN: cpu.x86.intrinsics
     dup 0 < [ neg SAR ] [ SHL ] if
     ! Mask off low bits
     "x" operand %untag
-] H{
-    { +input+ { { f "x" } { [ ] "y" } } }
-    { +output+ { "x" } }
+] T{ template
+    { input { { f "x" } { [ ] "y" } } }
+    { output { "x" } }
 } define-intrinsic
 
 : overflow-check ( word -- )
@@ -194,15 +165,16 @@ IN: cpu.x86.intrinsics
     ! There was an overflow. Recompute the original operand.
     { "y" "x" } %untag-fixnums
     "x" operand "y" operand rot execute
-    "z" get "x" get %allot-bignum-signed-1
+    "z" operand "x" operand "y" operand %allot-bignum-signed-1
     "end" resolve-label ; inline
 
 : overflow-template ( word insn -- )
-    [ overflow-check ] curry H{
-        { +input+ { { f "x" } { f "y" } } }
-        { +scratch+ { { f "z" } } }
-        { +output+ { "z" } }
-        { +clobber+ { "x" "y" } }
+    [ overflow-check ] curry T{ template
+        { input { { f "x" } { f "y" } } }
+        { scratch { { f "z" } } }
+        { output { "z" } }
+        { clobber { "x" "y" } }
+        { gc t }
     } define-intrinsic ;
 
 \ fixnum+ \ ADD overflow-template
@@ -222,21 +194,23 @@ IN: cpu.x86.intrinsics
     2array define-if-intrinsics ;
 
 {
-    { fixnum< JGE }
-    { fixnum<= JG }
-    { fixnum> JLE }
-    { fixnum>= JL }
-    { eq? JNE }
+    { fixnum< JL }
+    { fixnum<= JLE }
+    { fixnum> JG }
+    { fixnum>= JGE }
+    { eq? JE }
 } [
     first2 define-fixnum-jump
 ] each
 
 \ fixnum>bignum [
     "x" operand %untag-fixnum
-    "x" get dup %allot-bignum-signed-1
-] H{
-    { +input+ { { f "x" } } }
-    { +output+ { "x" } }
+    "x" operand dup "scratch" operand %allot-bignum-signed-1
+] T{ template
+    { input { { f "x" } } }
+    { scratch { { f "scratch" } } }
+    { output { "x" } }
+    { gc t }
 } define-intrinsic
 
 \ bignum>fixnum [
@@ -247,7 +221,7 @@ IN: cpu.x86.intrinsics
     "y" operand "x" operand cell [+] MOV
      ! if the length is 1, its just the sign and nothing else,
      ! so output 0
-    "y" operand 1 v>operand CMP
+    "y" operand 1 tag-fixnum CMP
     "nonzero" get JNE
     "y" operand 0 MOV
     "end" get JMP
@@ -263,11 +237,11 @@ IN: cpu.x86.intrinsics
     "positive" resolve-label
     "y" operand 3 SHL
     "end" resolve-label
-] H{
-    { +input+ { { f "x" } } }
-    { +scratch+ { { f "y" } } }
-    { +clobber+ { "x" } }
-    { +output+ { "y" } }
+] T{ template
+    { input { { f "x" } } }
+    { scratch { { f "y" } } }
+    { clobber { "x" } }
+    { output { "y" } }
 } define-intrinsic
 
 ! User environment
@@ -279,96 +253,18 @@ IN: cpu.x86.intrinsics
 
 \ getenv [
     %userenv  "n" operand dup [] MOV
-] H{
-    { +input+ { { f "n" } } }
-    { +scratch+ { { f "x" } } }
-    { +output+ { "n" } }
+] T{ template
+    { input { { f "n" } } }
+    { scratch { { f "x" } } }
+    { output { "n" } }
 } define-intrinsic
 
 \ setenv [
     %userenv  "n" operand [] "val" operand MOV
-] H{
-    { +input+ { { f "val" } { f "n" } } }
-    { +scratch+ { { f "x" } } }
-    { +clobber+ { "n" } }
-} define-intrinsic
-
-\ (tuple) [
-    tuple "layout" get size>> 2 + cells [
-        ! Store layout
-        "layout" get "scratch" get load-literal
-        1 object@ "scratch" operand MOV
-        ! Store tagged ptr in reg
-        "tuple" get tuple %store-tagged
-    ] %allot
-] H{
-    { +input+ { { [ ] "layout" } } }
-    { +scratch+ { { f "tuple" } { f "scratch" } } }
-    { +output+ { "tuple" } }
-} define-intrinsic
-
-\ (array) [
-    array "n" get 2 + cells [
-        ! Store length
-        1 object@ "n" operand MOV
-        ! Store tagged ptr in reg
-        "array" get object %store-tagged
-    ] %allot
-] H{
-    { +input+ { { [ ] "n" } } }
-    { +scratch+ { { f "array" } } }
-    { +output+ { "array" } }
-} define-intrinsic
-
-\ (byte-array) [
-    byte-array "n" get 2 cells + [
-        ! Store length
-        1 object@ "n" operand MOV
-        ! Store tagged ptr in reg
-        "array" get object %store-tagged
-    ] %allot
-] H{
-    { +input+ { { [ ] "n" } } }
-    { +scratch+ { { f "array" } } }
-    { +output+ { "array" } }
-} define-intrinsic
-
-\ <ratio> [
-    ratio 3 cells [
-        1 object@ "numerator" operand MOV
-        2 object@ "denominator" operand MOV
-        ! Store tagged ptr in reg
-        "ratio" get ratio %store-tagged
-    ] %allot
-] H{
-    { +input+ { { f "numerator" } { f "denominator" } } }
-    { +scratch+ { { f "ratio" } } }
-    { +output+ { "ratio" } }
-} define-intrinsic
-
-\ <complex> [
-    complex 3 cells [
-        1 object@ "real" operand MOV
-        2 object@ "imaginary" operand MOV
-        ! Store tagged ptr in reg
-        "complex" get complex %store-tagged
-    ] %allot
-] H{
-    { +input+ { { f "real" } { f "imaginary" } } }
-    { +scratch+ { { f "complex" } } }
-    { +output+ { "complex" } }
-} define-intrinsic
-
-\ <wrapper> [
-    wrapper 2 cells [
-        1 object@ "obj" operand MOV
-        ! Store tagged ptr in reg
-        "wrapper" get object %store-tagged
-    ] %allot
-] H{
-    { +input+ { { f "obj" } } }
-    { +scratch+ { { f "wrapper" } } }
-    { +output+ { "wrapper" } }
+] T{ template
+    { input { { f "val" } { f "n" } } }
+    { scratch { { f "x" } } }
+    { clobber { "n" } }
 } define-intrinsic
 
 ! Alien intrinsics
@@ -385,14 +281,14 @@ IN: cpu.x86.intrinsics
     small-reg POP ; inline
 
 : alien-integer-get-template
-    H{
-        { +input+ {
+    T{ template
+        { input {
             { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { { f "value" } } }
-        { +output+ { "value" } }
-        { +clobber+ { "offset" } }
+        { scratch { { f "value" } } }
+        { output { "value" } }
+        { clobber { "offset" } }
     } ;
 
 : define-getter ( word quot reg -- )
@@ -414,13 +310,13 @@ IN: cpu.x86.intrinsics
     small-reg POP ; inline
 
 : alien-integer-set-template
-    H{
-        { +input+ {
+    T{ template
+        { input {
             { f "value" fixnum }
             { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
-        { +clobber+ { "value" "offset" } }
+        { clobber { "value" "offset" } }
     } ;
 
 : define-setter ( word reg -- )
@@ -443,23 +339,23 @@ IN: cpu.x86.intrinsics
 
 \ alien-cell [
     "value" operand [ MOV ] %alien-accessor
-] H{
-    { +input+ {
+] T{ template
+    { input {
         { unboxed-c-ptr "alien" c-ptr }
         { f "offset" fixnum }
     } }
-    { +scratch+ { { unboxed-alien "value" } } }
-    { +output+ { "value" } }
-    { +clobber+ { "offset" } }
+    { scratch { { unboxed-alien "value" } } }
+    { output { "value" } }
+    { clobber { "offset" } }
 } define-intrinsic
 
 \ set-alien-cell [
     "value" operand [ swap MOV ] %alien-accessor
-] H{
-    { +input+ {
+] T{ template
+    { input {
         { unboxed-c-ptr "value" pinned-c-ptr }
         { unboxed-c-ptr "alien" c-ptr }
         { f "offset" fixnum }
     } }
-    { +clobber+ { "offset" } }
+    { clobber { "offset" } }
 } define-intrinsic

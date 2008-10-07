@@ -8,7 +8,14 @@ cpu.architecture math.floats.private layouts quotations
 system ;
 IN: cpu.x86.sse2
 
-M: x86 %copy-float [ v>operand ] bi@ MOVSD ;
+M: x86 %copy-float MOVSD ;
+
+M:: x86 %box-float ( dst src temp -- )
+    dst 16 float float temp %allot
+    dst 8 float tag-number - [+] src MOVSD ;
+
+M: x86 %unbox-float ( dst src -- )
+    float-offset [+] MOVSD ;
 
 : define-float-op ( word op -- )
     [ "x" operand "y" operand ] swap suffix H{

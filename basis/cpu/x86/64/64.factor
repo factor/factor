@@ -15,8 +15,6 @@ M: x86.64 stack-reg RSP ;
 M: x86.64 temp-reg-1 RAX ;
 M: x86.64 temp-reg-2 RCX ;
 
-M: temp-reg v>operand drop RBX ;
-
 M: int-regs return-reg drop RAX ;
 M: int-regs vregs drop { RAX RCX RDX RBP RSI RDI R8 R9 R10 R11 R12 R13 } ;
 M: int-regs param-regs drop { RDI RSI RDX RCX R8 R9 } ;

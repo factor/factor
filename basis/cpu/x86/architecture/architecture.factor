@@ -22,8 +22,10 @@ HOOK: stack-reg cpu ( -- reg )
 
 : reg-stack ( n reg -- op ) swap cells neg [+] ;
 
-M: ds-loc v>operand n>> ds-reg reg-stack ;
-M: rs-loc v>operand n>> rs-reg reg-stack ;
+GENERIC: loc>operand ( loc -- operand )
+
+M: ds-loc loc>operand n>> ds-reg reg-stack ;
+M: rs-loc loc>operand n>> rs-reg reg-stack ;
 
 M: int-regs %save-param-reg drop >r stack@ r> MOV ;
 M: int-regs %load-param-reg drop swap stack@ MOV ;
@@ -49,7 +51,11 @@ HOOK: fixnum>slot@ cpu ( op -- )
 
 HOOK: prepare-division cpu ( -- )
 
-M: immediate load-literal v>operand swap v>operand MOV ;
+M: f load-literal
+    \ f tag-number MOV drop ;
+
+M: fixnum load-literal
+    swap tag-fixnum MOV ;
 
 : align-stack ( n -- n' )
     os macosx? cpu x86.64? or [ 16 align ] when ;
@@ -57,16 +63,16 @@ M: immediate load-literal v>operand swap v>operand MOV ;
 M: x86 stack-frame-size ( n -- i )
     3 cells + align-stack ;
 
-M: x86 %save-word-xt ( -- )
-    temp-reg v>operand 0 MOV rc-absolute-cell rel-this ;
+M: x86 %save-word-xt ( -- ) ;
 
 : decr-stack-reg ( n -- )
     dup 0 = [ drop ] [ stack-reg swap SUB ] if ;
 
 M: x86 %prologue ( n -- )
-    dup PUSH
-    temp-reg v>operand PUSH
-    3 cells - decr-stack-reg ;
+    temp-reg-1 0 MOV rc-absolute-cell rel-this
+    dup cell + PUSH
+    temp-reg-1 PUSH
+    stack-reg swap 2 cells - SUB ;
 
 : incr-stack-reg ( n -- )
     dup 0 = [ drop ] [ stack-reg swap ADD ] if ;
@@ -79,21 +85,21 @@ M: x86 %prepare-alien-invoke
     #! Save Factor stack pointers in case the C code calls a
     #! callback which does a GC, which must reliably trace
     #! all roots.
-    "stack_chain" f temp-reg v>operand %alien-global
-    temp-reg v>operand [] stack-reg MOV
-    temp-reg v>operand [] cell SUB
-    temp-reg v>operand 2 cells [+] ds-reg MOV
-    temp-reg v>operand 3 cells [+] rs-reg MOV ;
+    "stack_chain" f temp-reg-1 %alien-global
+    temp-reg-1 [] stack-reg MOV
+    temp-reg-1 [] cell SUB
+    temp-reg-1 2 cells [+] ds-reg MOV
+    temp-reg-1 3 cells [+] rs-reg MOV ;
 
 M: x86 %call ( label -- ) CALL ;
 
 M: x86 %jump-label ( label -- ) JMP ;
 
-M: x86 %jump-f ( label -- )
-    "flag" operand f v>operand CMP JE ;
+M: x86 %jump-f ( label vreg -- )
+    \ f tag-number CMP JE ;
 
-M: x86 %jump-t ( label -- )
-    "flag" operand f v>operand CMP JNE ;
+M: x86 %jump-t ( label vreg -- )
+    \ f tag-number CMP JNE ;
 
 : code-alignment ( -- n )
     building get length dup cell align swap - ;
@@ -126,14 +132,9 @@ M: x86 %dispatch ( -- )
 M: x86 %dispatch-label ( word -- )
     0 cell, rc-absolute-cell rel-word ;
 
-M: x86 %unbox-float ( dst src -- )
-    [ v>operand ] bi@ float-offset [+] MOVSD ;
+M: x86 %peek loc>operand MOV ;
 
-M: x86 %peek [ v>operand ] bi@ MOV ;
-
-M: x86 %replace swap %peek ;
-
-M: x86 %copy [ v>operand ] bi@ MOV ;
+M: x86 %replace loc>operand swap MOV ;
 
 : (%inc) ( n reg -- ) swap cells dup 0 > [ ADD ] [ neg SUB ] if ;
 
@@ -158,13 +159,13 @@ M: x86 %return ( -- ) 0 %unwind ;
 
 ! Alien intrinsics
 M: x86 %unbox-byte-array ( dst src -- )
-    [ v>operand ] bi@ byte-array-offset [+] LEA ;
+    byte-array-offset [+] LEA ;
 
 M: x86 %unbox-alien ( dst src -- )
-    [ v>operand ] bi@ alien-offset [+] MOV ;
+    alien-offset [+] MOV ;
 
 M: x86 %unbox-f ( dst src -- )
-    drop v>operand 0 MOV ;
+    drop 0 MOV ;
 
 M: x86 %unbox-any-c-ptr ( dst src -- )
     { "is-byte-array" "end" "start" } [ define-label ] each
@@ -173,11 +174,11 @@ M: x86 %unbox-any-c-ptr ( dst src -- )
     ds-reg 0 MOV
     ! Object is stored in ds-reg
     rs-reg PUSH
-    rs-reg swap v>operand MOV
+    rs-reg swap MOV
     ! We come back here with displaced aliens
     "start" resolve-label
     ! Is the object f?
-    rs-reg f v>operand CMP
+    rs-reg \ f tag-number CMP
     "end" get JE
     ! Is the object an alien?
     rs-reg header-offset [+] alien type-number tag-fixnum CMP
@@ -194,7 +195,7 @@ M: x86 %unbox-any-c-ptr ( dst src -- )
     ds-reg byte-array-offset ADD
     "end" resolve-label
     ! Done, store address in destination register
-    v>operand ds-reg MOV
+    ds-reg MOV
     ! Restore rs-reg
     rs-reg POP
     ! Restore ds-reg
