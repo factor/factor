@@ -4,18 +4,6 @@ USING: alien alien.c-types alien.syntax arrays calendar
 kernel math unix unix.time namespaces system ;
 IN: calendar.unix
 
-: make-timeval ( ms -- timeval )
-    1000 /mod 1000 *
-    "timeval" <c-object>
-    [ set-timeval-usec ] keep
-    [ set-timeval-sec ] keep ;
-
-: make-timespec ( ms -- timespec )
-    1000 /mod 1000000 *
-    "timespec" <c-object>
-    [ set-timespec-nsec ] keep
-    [ set-timespec-sec ] keep ;
-
 : timeval>unix-time ( timeval -- timestamp )
     [ timeval-sec seconds ] [ timeval-usec microseconds ] bi
     time+ since-1970 ;
