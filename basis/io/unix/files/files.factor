@@ -4,7 +4,7 @@ USING: io.backend io.ports io.unix.backend io.files io
 unix unix.stat unix.time kernel math continuations
 math.bitwise byte-arrays alien combinators calendar
 io.encodings.binary accessors sequences strings system
-io.files.private destructors vocabs.loader ;
+io.files.private destructors vocabs.loader calendar.unix ;
 
 IN: io.unix.files
 
