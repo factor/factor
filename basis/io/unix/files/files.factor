@@ -103,9 +103,9 @@ M: unix stat>file-info ( stat -- file-info )
         [ stat>type >>type ]
         [ stat-st_size >>size ]
         [ stat-st_mode >>permissions ]
-        [ stat-st_ctim timespec>unix-time >>created ]
-        [ stat-st_mtim timespec>unix-time >>modified ]
-        [ stat-st_atim timespec>unix-time >>accessed ]
+        [ stat-st_ctimespec timespec>unix-time >>created ]
+        [ stat-st_mtimespec timespec>unix-time >>modified ]
+        [ stat-st_atimespec timespec>unix-time >>accessed ]
         [ stat-st_uid >>uid ]
         [ stat-st_gid >>gid ]
         [ stat-st_dev >>dev ]
@@ -130,9 +130,9 @@ M: unix stat>type ( stat -- type )
 
 ! Linux has no extra fields in its stat struct
 os {
-    { macosx  [ "io.unix.files.macosx"  require ] }
-    { freebsd [ "io.unix.files.freebsd" require ] }
-    { netbsd  [ "io.unix.files.netbsd"  require ] }
-    { openbsd [ "io.unix.files.openbsd" require ] }
+    { macosx  [ "io.unix.files.bsd" require ] }
+    { netbsd  [ "io.unix.files.bsd" require ] }
+    { openbsd  [ "io.unix.files.bsd" require ] }
+    { freebsd  [ "io.unix.files.bsd" require ] }
     { linux [ ] }
 } case
