@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types kernel io.ports io.unix.backend
 bit-arrays sequences assocs unix unix.linux.epoll math
-namespaces structs ;
+namespaces unix.time ;
 IN: io.unix.epoll
 
 TUPLE: epoll-mx < mx events ;

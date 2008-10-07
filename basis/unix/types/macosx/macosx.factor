@@ -22,6 +22,7 @@ TYPEDEF: __uint32_t uid_t
 TYPEDEF: __uint32_t gid_t
 TYPEDEF: __int64_t  off_t
 TYPEDEF: __int64_t  blkcnt_t
+TYPEDEF: __int64_t  ino64_t
 TYPEDEF: __int32_t  blksize_t
 TYPEDEF: long       ssize_t
 TYPEDEF: __int32_t  pid_t

@@ -172,7 +172,7 @@ HELP: sql-row-typed
 HELP: with-db
 { $values
      { "db" db } { "quot" quotation } }
-{ $description "Calls the quotation with a database bound to the " { $link db } " symbol. The database called is based on the " { $snippet "class" } " with the " } ;
+{ $description "Calls the quotation with a database bound to the " { $link db } " symbol. See " { $link "db-custom-database-combinators" } " for help setting up database access." } ;
 
 HELP: with-transaction
 { $values

@@ -1,11 +1,11 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.c-types generic assocs kernel kernel.private
-math io.ports sequences strings structs sbufs threads unix
+math io.ports sequences strings sbufs threads unix
 vectors io.buffers io.backend io.encodings math.parser
 continuations system libc qualified namespaces make io.timeouts
 io.encodings.utf8 destructors accessors summary combinators
-locals ;
+locals unix.time ;
 QUALIFIED: io
 IN: io.unix.backend
 

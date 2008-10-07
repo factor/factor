@@ -2,8 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel math math.functions namespaces sequences
 strings system vocabs.loader threads accessors combinators
-locals classes.tuple math.order summary structs
-combinators.short-circuit ;
+locals classes.tuple math.order summary combinators.short-circuit ;
 IN: calendar
 
 HOOK: gmt-offset os ( -- hours minutes seconds )
@@ -402,16 +401,8 @@ PRIVATE>
 : time-since-midnight ( timestamp -- duration )
     dup midnight time- ;
 
-: since-1970 ( time -- timestamp )
+: since-1970 ( duration -- timestamp )
     unix-1970 time+ >local-time ;
-
-: timeval>unix-time ( timeval -- timestamp )
-    [ timeval-sec seconds ] [ timeval-usec microseconds ] bi
-    time+ since-1970 ;
-
-: timespec>unix-time ( timeval -- timestamp )
-    [ timespec-sec seconds ] [ timespec-nsec nanoseconds ] bi
-    time+ since-1970 ;
 
 M: timestamp sleep-until timestamp>millis sleep-until ;
 
