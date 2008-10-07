@@ -13,5 +13,5 @@ M: netbsd stat>file-info ( stat -- file-info )
     {
         [ stat-st_flags >>flags ]
         [ stat-st_gen >>gen ]
-        [ stat-st_birthtim timespec>timestamp >>birth-time ]
+        [ stat-st_birthtim timespec>unix-time >>birth-time ]
     } cleave ;
