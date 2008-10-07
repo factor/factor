@@ -4,8 +4,11 @@ USING: alien alien.accessors arrays cpu.x86.assembler
 cpu.x86.architecture cpu.x86.intrinsics generic kernel
 kernel.private math math.private memory namespaces sequences
 words compiler.generator compiler.generator.registers
-cpu.architecture math.floats.private layouts quotations ;
+cpu.architecture math.floats.private layouts quotations
+system ;
 IN: cpu.x86.sse2
+
+M: x86 %copy-float [ v>operand ] bi@ MOVSD ;
 
 : define-float-op ( word op -- )
     [ "x" operand "y" operand ] swap suffix H{

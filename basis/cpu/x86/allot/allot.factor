@@ -3,7 +3,8 @@
 USING: kernel cpu.architecture cpu.x86.assembler
 cpu.x86.architecture kernel.private namespaces math sequences
 generic arrays compiler.generator compiler.generator.fixup
-compiler.generator.registers system layouts alien ;
+compiler.generator.registers system layouts alien locals
+compiler.constants ;
 IN: cpu.x86.allot
 
 : allot-reg ( -- reg )
@@ -117,3 +118,37 @@ M: x86 %box-alien ( dst src -- )
         f [ v>operand ] bi@ MOV
         "end" resolve-label
     ] with-scope ;
+
+M:: x86 %write-barrier ( src temp -- )
+    #! Mark the card pointed to by vreg.
+    ! Mark the card
+    src card-bits SHR
+    "cards_offset" f temp %alien-global
+    temp temp [+] card-mark <byte> MOV
+
+    ! Mark the card deck
+    temp deck-bits card-bits - SHR
+    "decks_offset" f temp %alien-global
+    temp temp [+] card-mark <byte> MOV ;
+
+! : load-zone-ptr ( reg -- )
+!     #! Load pointer to start of zone array
+!     0 MOV "nursery" f rc-absolute-cell rel-dlsym ;
+! 
+! : load-allot-ptr ( temp -- )
+!     [ load-zone-ptr ] [ PUSH ] [ dup cell [+] MOV ] tri ;
+! 
+! : inc-allot-ptr ( n temp -- )
+!     [ POP ] [ cell [+] swap 8 align ADD ] bi ;
+! 
+! : store-header ( temp type -- )
+!     [ 0 [+] ] [ type-number tag-fixnum ] bi* MOV ;
+! 
+! : store-tagged ( dst temp tag -- )
+!     dupd tag-number OR MOV ;
+! 
+! M:: x86 %allot ( dst size type tag temp -- )
+!     temp load-allot-ptr
+!     temp type store-header
+!     temp size inc-allot-ptr
+!     dst temp store-tagged ;

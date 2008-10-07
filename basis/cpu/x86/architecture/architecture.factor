@@ -92,6 +92,9 @@ M: x86 %jump-label ( label -- ) JMP ;
 M: x86 %jump-f ( label -- )
     "flag" operand f v>operand CMP JE ;
 
+M: x86 %jump-t ( label -- )
+    "flag" operand f v>operand CMP JNE ;
+
 : code-alignment ( -- n )
     building get length dup cell align swap - ;
 
@@ -129,6 +132,8 @@ M: x86 %unbox-float ( dst src -- )
 M: x86 %peek [ v>operand ] bi@ MOV ;
 
 M: x86 %replace swap %peek ;
+
+M: x86 %copy [ v>operand ] bi@ MOV ;
 
 : (%inc) ( n reg -- ) swap cells dup 0 > [ ADD ] [ neg SUB ] if ;
 

@@ -64,6 +64,9 @@ HOOK: %jump-label cpu ( label -- )
 ! Test if vreg is 'f' or not
 HOOK: %jump-f cpu ( label -- )
 
+! Test if vreg is 't' or not
+HOOK: %jump-t cpu ( label -- )
+
 HOOK: %dispatch cpu ( -- )
 
 HOOK: %dispatch-label cpu ( word -- )
@@ -82,6 +85,10 @@ HOOK: %peek cpu ( vreg loc -- )
 
 ! Store vreg to stack
 HOOK: %replace cpu ( vreg loc -- )
+
+! Copy values between vregs
+HOOK: %copy cpu ( dst src -- )
+HOOK: %copy-float cpu ( dst src -- )
 
 ! Box and unbox floats
 HOOK: %unbox-float cpu ( dst src -- )
@@ -192,6 +199,11 @@ HOOK: %unbox-f cpu ( dst src -- )
 HOOK: %unbox-any-c-ptr cpu ( dst src -- )
 
 HOOK: %box-alien cpu ( dst src -- )
+
+! Allocation
+HOOK: %allot cpu ( dst size type tag temp -- )
+
+HOOK: %write-barrier cpu ( src temp -- )
 
 ! GC check
 HOOK: %gc cpu ( -- )

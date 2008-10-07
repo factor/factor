@@ -1,11 +1,29 @@
 ! Copyright (C) 2004, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel namespaces arrays sequences io debugger words fry
-compiler.units continuations vocabs assocs dlists definitions
-math threads graphs generic combinators deques search-deques
-stack-checker stack-checker.state compiler.generator
-compiler.errors compiler.tree.builder compiler.tree.optimizer ;
+USING: accessors kernel namespaces arrays sequences io debugger
+words fry continuations vocabs assocs dlists definitions math
+threads graphs generic combinators deques search-deques
+stack-checker stack-checker.state stack-checker.inlining
+compiler.errors compiler.units compiler.tree.builder
+compiler.tree.optimizer compiler.cfg.builder
+compiler.cfg.linearization compiler.cfg.linear-scan
+compiler.cfg.stack-frame compiler.codegen ;
 IN: compiler
+
+SYMBOL: compile-queue
+SYMBOL: compiled
+
+: queue-compile ( word -- )
+    {
+        { [ dup "forgotten" word-prop ] [ ] }
+        { [ dup compiled get key? ] [ ] }
+        { [ dup inlined-block? ] [ ] }
+        { [ dup primitive? ] [ ] }
+        [ dup compile-queue get push-front ]
+    } cond drop ;
+
+: maybe-compile ( word -- )
+    dup compiled>> [ drop ] [ queue-compile ] if ;
 
 SYMBOL: +failed+
 
@@ -24,10 +42,12 @@ SYMBOL: +failed+
     [ "compiled-effect" set-word-prop ]
     2bi ;
 
-: compile-begins ( word -- )
+: start ( word -- )
+    H{ } clone dependencies set
+    H{ } clone generic-dependencies set
     f swap compiler-error ;
 
-: compile-failed ( word error -- )
+: fail ( word error -- )
     [ swap compiler-error ]
     [
         drop
@@ -35,9 +55,13 @@ SYMBOL: +failed+
         [ f swap compiled get set-at ]
         [ +failed+ save-effect ]
         tri
-    ] 2bi ;
+    ] 2bi
+    return ;
 
-: compile-succeeded ( effect word -- )
+: frontend ( word -- effect nodes )
+    [ build-tree-from-word ] [ fail ] recover optimize-tree ;
+
+: finish ( effect word -- )
     [ swap save-effect ]
     [ compiled-unxref ]
     [
@@ -49,19 +73,27 @@ SYMBOL: +failed+
         ] [ drop ] if
     ] tri ;
 
+: save-asm ( asm -- )
+    [ [ code>> ] [ label>> ] bi compiled get set-at ]
+    [ calls>> [ queue-compile ] each ]
+    bi ;
+
+: backend ( nodes word -- )
+    build-cfg [
+        build-mr
+        linear-scan
+        build-stack-frame
+        generate
+        save-asm
+    ] each ;
+
 : (compile) ( word -- )
     '[
-        H{ } clone dependencies set
-        H{ } clone generic-dependencies set
-
         _ {
-            [ compile-begins ]
-            [
-                [ build-tree-from-word ] [ compile-failed return ] recover
-                optimize-tree
-            ]
-            [ dup generate ]
-            [ compile-succeeded ]
+            [ start ]
+            [ frontend ]
+            [ backend ]
+            [ finish ]
         } cleave
     ] with-return ;
 
