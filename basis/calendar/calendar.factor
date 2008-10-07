@@ -401,7 +401,7 @@ PRIVATE>
 : time-since-midnight ( timestamp -- duration )
     dup midnight time- ;
 
-: since-1970 ( time -- timestamp )
+: since-1970 ( duration -- timestamp )
     unix-1970 time+ >local-time ;
 
 M: timestamp sleep-until timestamp>millis sleep-until ;

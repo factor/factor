@@ -512,6 +512,12 @@ HELP: time-since-midnight
 { $values { "timestamp" timestamp } { "duration" duration } }
 { $description "Calculates a " { $snippet "duration" } " that represents the elapsed time since midnight of the input " { $snippet "timestamp" } "." } ;
 
+HELP: since-1970
+{ $values
+     { "duration" duration }
+     { "timestamp" timestamp } }
+{ $description "Adds the duration to the beginning of Unix time and returns the result as a timestamp." } ;
+
 ARTICLE: "calendar" "Calendar"
 "The two data types used throughout the calendar library:"
 { $subsection timestamp }
