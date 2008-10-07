@@ -8,7 +8,7 @@ C-STRUCT: stat
     { "dev_t"      "st_dev" }
     { "mode_t"     "st_mode" }
     { "nlink_t"    "st_nlink" }
-    { "ino_t"      "st_ino" }
+    { "ino64_t"    "st_ino" }
     { "uid_t"      "st_uid" }
     { "gid_t"      "st_gid" }
     { "dev_t"      "st_rdev" }
