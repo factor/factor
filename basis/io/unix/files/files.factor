@@ -144,7 +144,7 @@ os {
     
 : chmod-set-bit ( path mask ? -- ) 
     [ dup stat-mode ] 2dip 
-    [ set-bit ] [ clear-bit ] if chmod io-error ;
+    [ bitor ] [ unmask ] if chmod io-error ;
 
 : file-mode? ( path mask -- ? ) [ stat-mode ] dip mask? ;
 
@@ -220,22 +220,22 @@ PRIVATE>
 : set-file-access-time ( path timestamp -- )
     f 2array set-file-times ;
 
-: set-file-write-time ( path timestamp -- )
+: set-file-modified-time ( path timestamp -- )
     f swap 2array set-file-times ;
 
 : set-file-ids ( path uid gid -- )
     [ normalize-path ] 2dip
     [ [ -1 ] unless* ] bi@ chown io-error ;
 
-GENERIC: set-file-username ( path string/id -- )
+GENERIC: set-file-user ( path string/id -- )
 
 GENERIC: set-file-group ( path string/id -- )
 
-M: integer set-file-username ( path uid -- )
+M: integer set-file-user ( path uid -- )
     f set-file-ids ;
 
-M: string set-file-username ( path string -- )
-    username-id f set-file-ids ;
+M: string set-file-user ( path string -- )
+    user-id f set-file-ids ;
     
 M: integer set-file-group ( path gid -- )
     f swap set-file-ids ;
@@ -244,11 +244,11 @@ M: string set-file-group ( path string -- )
     group-id
     f swap set-file-ids ;
 
-: file-username-id ( path -- uid )
+: file-user-id ( path -- uid )
     normalize-path file-info uid>> ;
 
 : file-username ( path -- string )
-    file-username-id username ;
+    file-user-id username ;
 
 : file-group-id ( path -- gid )
     normalize-path file-info gid>> ;

@@ -28,7 +28,7 @@ HELP: file-username
      { "string" string } }
 { $description "Returns the username for a given file." } ;
 
-HELP: file-username-id
+HELP: file-user-id
 { $values
      { "path" "a pathname string" }
      { "uid" integer } }
@@ -107,15 +107,15 @@ HELP: set-file-times
      { "path" "a pathname string" } { "timestamps" "an array of two timestamps" } }
 { $description "Sets the access and write timestamps for a file as provided in the input array. A value of " { $link f } " provided for either of the timestamps will not change that timestamp." } ;
 
-HELP: set-file-username
+HELP: set-file-user
 { $values
      { "path" "a pathname string" } { "string/id" "a string or a user id" } }
 { $description "Sets a file's user id from the given user id or username." } ;
 
-HELP: set-file-write-time
+HELP: set-file-modified-time
 { $values
      { "path" "a pathname string" } { "timestamp" timestamp } }
-{ $description "Sets a file's last write timestamp." } ;
+{ $description "Sets a file's last modified timestamp, or write timestamp." } ;
 
 HELP: set-gid
 { $values
@@ -251,16 +251,16 @@ ARTICLE: "unix-file-timestamps" "Unix file timestamps"
 { $subsection set-file-times }
 "Setting just the last access time:"
 { $subsection set-file-access-time }
-"Setting just the last write time:"
-{ $subsection set-file-write-time } ;
+"Setting just the last modified time:"
+{ $subsection set-file-modified-time } ;
 
 
 ARTICLE: "unix-file-ids" "Unix file user and group ids"
 "Reading file user data:"
-{ $subsection file-username-id }
+{ $subsection file-user-id }
 { $subsection file-username }
 "Setting file user data:"
-{ $subsection set-file-username }
+{ $subsection set-file-user }
 "Reading file group data:"
 { $subsection file-group-id }
 { $subsection file-group-name }
