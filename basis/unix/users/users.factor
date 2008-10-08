@@ -57,56 +57,56 @@ M: string user-passwd ( string -- passwd/f )
 : username ( id -- string )
     user-passwd username>> ;
 
-: username-id ( string -- id )
+: user-id ( string -- id )
     user-passwd uid>> ;
 
-: real-username-id ( -- id )
+: real-user-id ( -- id )
     getuid ; inline
 
 : real-username ( -- string )
-    real-username-id username ; inline
+    real-user-id username ; inline
 
-: effective-username-id ( -- id )
+: effective-user-id ( -- id )
     geteuid ; inline
 
 : effective-username ( -- string )
-    effective-username-id username ; inline
+    effective-user-id username ; inline
 
-GENERIC: set-real-username ( string/id -- )
+GENERIC: set-real-user ( string/id -- )
 
-GENERIC: set-effective-username ( string/id -- )
+GENERIC: set-effective-user ( string/id -- )
 
-: with-real-username ( string/id quot -- )
-    '[ _ set-real-username @ ]
-    real-username-id '[ _ set-real-username ]
+: with-real-user ( string/id quot -- )
+    '[ _ set-real-user @ ]
+    real-user-id '[ _ set-real-user ]
     [ ] cleanup ; inline
 
-: with-effective-username ( string/id quot -- )
-    '[ _ set-effective-username @ ]
-    effective-username-id '[ _ set-effective-username ]
+: with-effective-user ( string/id quot -- )
+    '[ _ set-effective-user @ ]
+    effective-user-id '[ _ set-effective-user ]
     [ ] cleanup ; inline
 
 <PRIVATE
 
-: (set-real-username) ( id -- )
+: (set-real-user) ( id -- )
     setuid io-error ; inline
 
-: (set-effective-username) ( id -- )
+: (set-effective-user) ( id -- )
     seteuid io-error ; inline
 
 PRIVATE>
 
-M: string set-real-username ( string -- )
-    username-id (set-real-username) ;
+M: string set-real-user ( string -- )
+    user-id (set-real-user) ;
 
-M: integer set-real-username ( id -- )
-    (set-real-username) ;
+M: integer set-real-user ( id -- )
+    (set-real-user) ;
 
-M: integer set-effective-username ( id -- )
-    (set-effective-username) ; 
+M: integer set-effective-user ( id -- )
+    (set-effective-user) ; 
 
-M: string set-effective-username ( string -- )
-    username-id (set-effective-username) ;
+M: string set-effective-user ( string -- )
+    user-id (set-effective-user) ;
 
 os {
     { [ dup bsd? ] [ drop "unix.users.bsd" require ] }
