@@ -26,7 +26,7 @@ GENERIC: group-struct ( obj -- group )
     ] [ ] produce nip ;
 
 : (group-struct) ( id -- group-struct id group-struct byte-array length void* )
-    "group" <c-object> tuck 1024
+    "group" <c-object> tuck 4096
     [ <byte-array> ] keep f <void*> ;
 
 M: integer group-struct ( id -- group )

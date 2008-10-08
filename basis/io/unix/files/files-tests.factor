@@ -92,7 +92,7 @@ prepare-test-file
     test-file now
     [ set-file-access-time ] 2keep
     [ file-info accessed>> ]
-    [ [ truncate >integer ] change-second ] bi* =
+    [ [ [ truncate >integer ] change-second ] bi@ ] bi* =
 ] unit-test
 
 [ t ]
@@ -100,7 +100,7 @@ prepare-test-file
     test-file now
     [ set-file-modified-time ] 2keep
     [ file-info modified>> ]
-    [ [ truncate >integer ] change-second ] bi* =
+    [ [ [ truncate >integer ] change-second ] bi@ ] bi* =
 ] unit-test
 
 [ t ]
