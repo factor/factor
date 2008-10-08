@@ -1,9 +1,9 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays compiler.generator.fixup io.binary kernel
-combinators kernel.private math namespaces make sequences
-words system layouts math.order accessors
-cpu.x86.assembler.syntax ;
+USING: arrays cpu.architecture compiler.constants
+compiler.codegen.fixup io.binary kernel combinators
+kernel.private math namespaces make sequences words system
+layouts math.order accessors cpu.x86.assembler.syntax ;
 IN: cpu.x86.assembler
 
 ! A postfix assembler for x86 and AMD64.

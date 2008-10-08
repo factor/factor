@@ -2,6 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math assocs namespaces sequences heaps
 fry make combinators
+cpu.architecture
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.linear-scan.live-intervals ;

@@ -1,10 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces sequences math math.order kernel assocs
-accessors vectors fry heaps
+accessors vectors fry heaps cpu.architecture
 compiler.cfg.registers
-compiler.cfg.linear-scan.live-intervals
-compiler.backend ;
+compiler.cfg.linear-scan.live-intervals ;
 IN: compiler.cfg.linear-scan.allocation
 
 ! Mapping from register classes to sequences of machine registers

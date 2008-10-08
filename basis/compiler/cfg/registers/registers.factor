@@ -17,13 +17,6 @@ M: value >vreg drop f ;
 M: value set-value-class 2drop ;
 M: value value-class* drop f ;
 
-! Register classes
-SINGLETON: int-regs
-SINGLETON: single-float-regs
-SINGLETON: double-float-regs
-UNION: float-regs single-float-regs double-float-regs ;
-UNION: reg-class int-regs float-regs ;
-
 ! Virtual registers
 TUPLE: vreg reg-class n ;
 SYMBOL: vreg-counter

@@ -1,10 +1,10 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel cpu.architecture cpu.x86.assembler
-cpu.x86.architecture kernel.private namespaces math sequences
-generic arrays compiler.generator compiler.generator.fixup
-compiler.generator.registers system layouts alien locals
-compiler.constants ;
+USING: kernel words kernel.private namespaces math math.private
+sequences generic arrays system layouts alien locals
+cpu.architecture cpu.x86.assembler cpu.x86.architecture
+compiler.constants compiler.cfg.templates compiler.cfg.builder
+compiler.codegen compiler.codegen.fixup ;
 IN: cpu.x86.allot
 
 M:: x86 %write-barrier ( src temp -- )
@@ -102,3 +102,38 @@ M:: x86 %box-alien ( dst src temp -- )
         \ f tag-number MOV
         "end" resolve-label
     ] with-scope ;
+
+: overflow-check ( word -- )
+    "end" define-label
+    "z" operand "x" operand MOV
+    "z" operand "y" operand pick execute
+    ! If the previous arithmetic operation overflowed, then we
+    ! turn the result into a bignum and leave it in EAX.
+    "end" get JNO
+    ! There was an overflow. Recompute the original operand.
+    { "y" "x" } [ %untag-fixnum ] unique-operands
+    "x" operand "y" operand rot execute
+    "z" operand "x" operand "y" operand %allot-bignum-signed-1
+    "end" resolve-label ; inline
+
+: overflow-template ( word insn -- )
+    [ overflow-check ] curry T{ template
+        { input { { f "x" } { f "y" } } }
+        { scratch { { f "z" } } }
+        { output { "z" } }
+        { clobber { "x" "y" } }
+        { gc t }
+    } define-intrinsic ;
+
+\ fixnum+ \ ADD overflow-template
+\ fixnum- \ SUB overflow-template
+
+\ fixnum>bignum [
+    "x" operand %untag-fixnum
+    "x" operand dup "scratch" operand %allot-bignum-signed-1
+] T{ template
+    { input { { f "x" } } }
+    { scratch { { f "scratch" } } }
+    { output { "x" } }
+    { gc t }
+} define-intrinsic

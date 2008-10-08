@@ -12,6 +12,13 @@ TUPLE: label offset ;
 : define-label ( name -- ) <label> swap set ;
 : resolve-label ( label/name -- ) dup label? [ get ] unless , ;
 
+! Register classes
+SINGLETON: int-regs
+SINGLETON: single-float-regs
+SINGLETON: double-float-regs
+UNION: float-regs single-float-regs double-float-regs ;
+UNION: reg-class int-regs float-regs ;
+
 ! Mapping from register class to machine registers
 HOOK: machine-registers cpu ( -- assoc )
 
@@ -38,8 +45,6 @@ HOOK: load-indirect cpu ( obj reg -- )
 
 HOOK: stack-frame-size cpu ( frame-size -- n )
 
-TUPLE: stack-frame total-size size params return ;
-
 ! Set up caller stack frame
 HOOK: %prologue cpu ( n -- )
 
@@ -53,10 +58,10 @@ HOOK: %call cpu ( word -- )
 HOOK: %jump-label cpu ( label -- )
 
 ! Test if vreg is 'f' or not
-HOOK: %jump-f cpu ( label -- )
+HOOK: %jump-f cpu ( label vreg -- )
 
 ! Test if vreg is 't' or not
-HOOK: %jump-t cpu ( label -- )
+HOOK: %jump-t cpu ( label vreg -- )
 
 HOOK: %dispatch cpu ( -- )
 
@@ -149,11 +154,7 @@ M: stack-params param-reg drop ;
 
 M: stack-params param-regs drop f ;
 
-M: object load-literal v>operand load-indirect ;
-
-PREDICATE: small-slot < integer cells small-enough? ;
-
-PREDICATE: small-tagged < integer v>operand small-enough? ;
+M: object load-literal load-indirect ;
 
 : if-small-struct ( n size true false -- ? )
     [ over not over struct-small-enough? and ] 2dip

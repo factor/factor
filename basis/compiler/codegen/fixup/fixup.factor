@@ -4,7 +4,7 @@ USING: arrays byte-arrays generic assocs hashtables io.binary
 kernel kernel.private math namespaces make sequences words
 quotations strings alien.accessors alien.strings layouts system
 combinators math.bitwise words.private math.order accessors
-growable compiler.constants compiler.backend ;
+growable cpu.architecture compiler.constants ;
 IN: compiler.codegen.fixup
 
 GENERIC: fixup* ( obj -- )

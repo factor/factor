@@ -2,9 +2,10 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors alien alien.c-types arrays cpu.x86.assembler
 cpu.x86.assembler.private cpu.architecture kernel kernel.private
-math memory namespaces make sequences words compiler.generator
-compiler.generator.registers compiler.generator.fixup system
-layouts combinators compiler.constants math.order ;
+math memory namespaces make sequences words system
+layouts combinators math.order locals compiler.constants
+compiler.cfg.registers compiler.cfg.instructions
+compiler.codegen.fixup ;
 IN: cpu.x86.architecture
 
 HOOK: ds-reg cpu ( -- reg )
@@ -63,8 +64,6 @@ M: fixnum load-literal
 M: x86 stack-frame-size ( n -- i )
     3 cells + align-stack ;
 
-M: x86 %save-word-xt ( -- ) ;
-
 : decr-stack-reg ( n -- )
     dup 0 = [ drop ] [ stack-reg swap SUB ] if ;
 
@@ -95,10 +94,10 @@ M: x86 %call ( label -- ) CALL ;
 
 M: x86 %jump-label ( label -- ) JMP ;
 
-M: x86 %jump-f ( label vreg -- )
+M: x86 %jump-f ( label reg -- )
     \ f tag-number CMP JE ;
 
-M: x86 %jump-t ( label vreg -- )
+M: x86 %jump-t ( label reg -- )
     \ f tag-number CMP JNE ;
 
 : code-alignment ( -- n )
@@ -107,27 +106,20 @@ M: x86 %jump-t ( label vreg -- )
 : align-code ( n -- )
     0 <repetition> % ;
 
-M: x86 %dispatch ( -- )
-    [
-        %epilogue-later
-        ! Load jump table base. We use a temporary register
-        ! since on AMD64 we have to load a 64-bit immediate. On
-        ! x86, this is redundant.
-        ! Untag and multiply to get a jump table offset
-        "n" operand fixnum>slot@
-        ! Add jump table base
-        "offset" operand HEX: ffffffff MOV rc-absolute-cell rel-here
-        "n" operand "offset" operand ADD
-        "n" operand HEX: 7f [+] JMP
-        ! Fix up the displacement above
-        code-alignment dup bootstrap-cell 8 = 15 9 ? +
-        building get dup pop* push
-        align-code
-    ] H{
-        { +input+ { { f "n" } } }
-        { +scratch+ { { f "offset" } } }
-        { +clobber+ { "n" } }
-    } with-template ;
+M:: x86 %dispatch ( src temp -- )
+    ! Load jump table base. We use a temporary register
+    ! since on AMD64 we have to load a 64-bit immediate. On
+    ! x86, this is redundant.
+    ! Untag and multiply to get a jump table offset
+    src fixnum>slot@
+    ! Add jump table base
+    temp HEX: ffffffff MOV rc-absolute-cell rel-here
+    src temp ADD
+    src HEX: 7f [+] JMP
+    ! Fix up the displacement above
+    code-alignment dup bootstrap-cell 8 = 15 9 ? +
+    building get dup pop* push
+    align-code ;
 
 M: x86 %dispatch-label ( word -- )
     0 cell, rc-absolute-cell rel-word ;
@@ -141,6 +133,8 @@ M: x86 %replace loc>operand swap MOV ;
 M: x86 %inc-d ( n -- ) ds-reg (%inc) ;
 
 M: x86 %inc-r ( n -- ) rs-reg (%inc) ;
+
+M: x86 %copy ( dst src -- ) MOV ;
 
 M: x86 fp-shadows-int? ( -- ? ) f ;
 

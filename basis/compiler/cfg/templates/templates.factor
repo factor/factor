@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors sequences kernel fry namespaces
-quotations combinators classes.algebra compiler.backend
-compiler.cfg.instructions compiler.cfg.registers compiler.cfg.stacks ;
+quotations combinators classes.algebra compiler.cfg.instructions
+compiler.cfg.registers compiler.cfg.stacks ;
 IN: compiler.cfg.templates
 
 TUPLE: template input output scratch clobber gc ;

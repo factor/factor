@@ -1,13 +1,22 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays cpu.x86.assembler
-cpu.x86.architecture cpu.x86.intrinsics cpu.x86.sse2
-cpu.x86.allot cpu.architecture kernel kernel.private math
-namespaces make sequences compiler.generator
-compiler.generator.registers compiler.generator.fixup system
+USING: accessors alien.c-types arrays kernel kernel.private math
+namespaces make sequences system
 layouts alien alien.accessors alien.structs slots splitting
-assocs combinators ;
+assocs combinators cpu.x86.assembler
+cpu.x86.architecture cpu.x86.intrinsics cpu.x86.sse2
+cpu.x86.allot cpu.architecture compiler.constants
+compiler.codegen compiler.codegen.fixup compiler.cfg.instructions ;
 IN: cpu.x86.64
+
+M: x86.64 machine-registers
+    {
+        { int-regs { RAX RCX RDX RBP RSI RDI R8 R9 R10 R11 R12 R13 } }
+        { double-float-regs {
+            XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7
+            XMM8 XMM9 XMM10 XMM11 XMM12 XMM13 XMM14 XMM15
+        } }
+    } ;
 
 M: x86.64 ds-reg R14 ;
 M: x86.64 rs-reg R15 ;
@@ -215,7 +224,7 @@ M: x86.64 %callback-value ( ctype -- )
 
 M: x86.64 %cleanup ( alien-node -- ) drop ;
 
-M: x86.64 %unwind ( n -- ) drop %epilogue-later 0 RET ;
+M: x86.64 %unwind ( n -- ) drop 0 RET ;
 
 USE: cpu.x86.intrinsics
 

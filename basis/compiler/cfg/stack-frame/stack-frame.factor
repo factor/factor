@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces accessors math.order assocs kernel sequences
-make compiler.cfg.instructions compiler.cfg.instructions.syntax
-compiler.cfg.registers ;
+combinators make compiler.cfg.instructions
+compiler.cfg.instructions.syntax compiler.cfg.registers ;
 IN: compiler.cfg.stack-frame
 
 SYMBOL: frame-required?
@@ -21,7 +21,7 @@ GENERIC: compute-stack-frame* ( insn -- )
         [ [ params>> ] bi@ max ]
         [ [ return>> ] bi@ max ]
         [ [ total-size>> ] bi@ max ]
-    } cleave
+    } 2cleave
     stack-frame boa ;
 
 M: ##stack-frame compute-stack-frame*

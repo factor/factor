@@ -3,10 +3,10 @@
 USING: namespaces make math math.parser sequences accessors
 kernel kernel.private layouts assocs words summary arrays
 combinators classes.algebra alien alien.c-types alien.structs
-alien.strings sets threads libc continuations.private
+alien.strings alien.arrays sets threads libc continuations.private
+cpu.architecture
 compiler.errors
 compiler.alien
-compiler.backend
 compiler.codegen.fixup
 compiler.cfg
 compiler.cfg.instructions
@@ -88,7 +88,7 @@ M: ##peek generate-insn
     [ dst>> v>operand ] [ loc>> ] bi %peek ;
 
 M: ##replace generate-insn
-    [ src>> ] [ loc>> ] bi %replace ;
+    [ src>> v>operand ] [ loc>> ] bi %replace ;
 
 M: ##inc-d generate-insn n>> %inc-d ;
 
@@ -110,6 +110,9 @@ M: ##intrinsic generate-insn
 
 : (operand) ( name -- operand )
     operands get at* [ "Bad operand name" throw ] unless ;
+
+: literal ( name -- value )
+    (operand) value>> ;
 
 : operand ( name -- operand )
     (operand) v>operand ;
@@ -134,10 +137,10 @@ M: _branch generate-insn
     label>> lookup-label %jump-label ;
 
 M: _branch-f generate-insn
-    [ src>> v>operand ] [ label>> lookup-label ] bi %jump-f ;
+    [ label>> lookup-label ] [ src>> v>operand ] bi %jump-f ;
 
 M: _branch-t generate-insn
-    [ src>> v>operand ] [ label>> lookup-label ] bi %jump-t ;
+    [ label>> lookup-label ] [ src>> v>operand ] bi %jump-t ;
 
 M: ##dispatch-label generate-insn label>> %dispatch-label ;
 

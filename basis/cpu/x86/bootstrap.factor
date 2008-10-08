@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.x86.assembler layouts compiler.units math
-math.private compiler.generator.fixup compiler.constants vocabs
+math.private compiler.constants vocabs
 slots.private words words.private ;
 IN: bootstrap.x86
 

@@ -1,4 +1,4 @@
-USING: compiler.generator help.markup help.syntax words io parser
+USING: help.markup help.syntax words io parser
 assocs words.private sequences compiler.units ;
 IN: compiler
 

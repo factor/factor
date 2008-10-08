@@ -4,6 +4,7 @@ USING: accessors arrays assocs combinators hashtables kernel
 math fry namespaces make sequences words byte-arrays
 locals layouts alien.c-types alien.structs
 stack-checker.inlining
+cpu.architecture
 compiler.intrinsics
 compiler.tree
 compiler.tree.builder
@@ -154,7 +155,7 @@ M: #if emit-node
     #! correct register state
     gensym [
         [
-            copy-phantoms
+            init-phantoms
             ##prologue
             [ emit-nodes ] with-node-iterator
             ##epilogue
@@ -170,12 +171,12 @@ M: #if emit-node
 
 : emit-dispatch ( node -- )
     phantom-pop int-regs next-vreg
-    [ finalize-contents finalize-heights ##epilogue ] 2dip ##dispatch
+    [ finalize-phantoms ##epilogue ] 2dip ##dispatch
     dispatch-branches init-phantoms ;
 
 M: #dispatch emit-node
     tail-call? [
-        emit-dispatch iterate-next
+        emit-dispatch stop-iterating
     ] [
         current-word get gensym [
             [
@@ -295,12 +296,12 @@ M: #r> emit-node
 
 ! #return
 M: #return emit-node
-    drop finalize-phantoms ##epilogue ##return f ;
+    drop finalize-phantoms ##epilogue ##return stop-iterating ;
 
 M: #return-recursive emit-node
     finalize-phantoms
     label>> id>> loops get key?
-    [ ##epilogue ##return ] unless f ;
+    [ ##epilogue ##return ] unless stop-iterating ;
 
 ! #terminate
 M: #terminate emit-node drop stop-iterating ;

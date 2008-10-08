@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors namespaces
-compiler.backend
+cpu.architecture
 compiler.cfg
 compiler.cfg.linear-scan.live-intervals
 compiler.cfg.linear-scan.allocation
@@ -29,5 +29,5 @@ IN: compiler.cfg.linear-scan
             machine-registers allocate-registers
             assign-registers
         ] change-instructions
-        spill-counts get >>spill-counts
+        ! spill-counts get >>spill-counts
     ] with-scope ;

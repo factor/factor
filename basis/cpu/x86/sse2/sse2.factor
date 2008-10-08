@@ -1,11 +1,11 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien alien.accessors arrays cpu.x86.assembler
-cpu.x86.architecture cpu.x86.intrinsics generic kernel
+USING: alien alien.accessors arrays generic kernel
 kernel.private math math.private memory namespaces sequences
-words compiler.generator compiler.generator.registers
-cpu.architecture math.floats.private layouts quotations
-system ;
+words math.floats.private layouts quotations locals
+system compiler.constants compiler.codegen compiler.cfg.templates
+compiler.cfg.registers compiler.cfg.builder cpu.architecture
+cpu.x86.assembler cpu.x86.architecture cpu.x86.intrinsics ;
 IN: cpu.x86.sse2
 
 M: x86 %copy-float MOVSD ;
@@ -18,9 +18,9 @@ M: x86 %unbox-float ( dst src -- )
     float-offset [+] MOVSD ;
 
 : define-float-op ( word op -- )
-    [ "x" operand "y" operand ] swap suffix H{
-        { +input+ { { float "x" } { float "y" } } }
-        { +output+ { "x" } }
+    [ "x" operand "y" operand ] swap suffix T{ template
+        { input { { float "x" } { float "y" } } }
+        { output { "x" } }
     } define-intrinsic ;
 
 {
@@ -49,41 +49,41 @@ M: x86 %unbox-float ( dst src -- )
 \ float>fixnum [
     "out" operand "in" operand CVTTSD2SI
     "out" operand tag-bits get SHL
-] H{
-    { +input+ { { float "in" } } }
-    { +scratch+ { { f "out" } } }
-    { +output+ { "out" } }
+] T{ template
+    { input { { float "in" } } }
+    { scratch { { f "out" } } }
+    { output { "out" } }
 } define-intrinsic
 
 \ fixnum>float [
     "in" operand %untag-fixnum
     "out" operand "in" operand CVTSI2SD
-] H{
-    { +input+ { { f "in" } } }
-    { +scratch+ { { float "out" } } }
-    { +output+ { "out" } }
-    { +clobber+ { "in" } }
+] T{ template
+    { input { { f "in" } } }
+    { scratch { { float "out" } } }
+    { output { "out" } }
+    { clobber { "in" } }
 } define-intrinsic
 
 : alien-float-get-template
-    H{
-        { +input+ {
+    T{ template
+        { input {
             { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
-        { +scratch+ { { float "value" } } }
-        { +output+ { "value" } }
-        { +clobber+ { "offset" } }
+        { scratch { { float "value" } } }
+        { output { "value" } }
+        { clobber { "offset" } }
     } ;
 
 : alien-float-set-template
-    H{
-        { +input+ {
+    T{ template
+        { input {
             { float "value" float }
             { unboxed-c-ptr "alien" c-ptr }
             { f "offset" fixnum }
         } }
-        { +clobber+ { "offset" } }
+        { clobber { "offset" } }
     } ;
 
 : define-alien-float-intrinsics ( word get-quot word set-quot -- )

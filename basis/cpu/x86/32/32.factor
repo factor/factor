@@ -1,18 +1,25 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: locals alien.c-types arrays cpu.x86.assembler
-cpu.x86.architecture cpu.x86.intrinsics cpu.x86.allot
-cpu.architecture kernel kernel.private math namespaces sequences
-stack-checker.known-words compiler.generator.registers
-compiler.generator.fixup compiler.generator system layouts
-combinators command-line compiler compiler.units io
-vocabs.loader accessors init ;
+USING: locals alien.c-types arrays kernel kernel.private math
+namespaces sequences stack-checker.known-words system layouts io
+vocabs.loader accessors init combinators command-line
+cpu.x86.assembler cpu.x86.architecture cpu.x86.intrinsics
+cpu.x86.allot cpu.architecture compiler compiler.units
+compiler.constants compiler.alien compiler.codegen
+compiler.codegen.fixup compiler.cfg.builder
+compiler.cfg.instructions ;
 IN: cpu.x86.32
 
 ! We implement the FFI for Linux, OS X and Windows all at once.
 ! OS X requires that the stack be 16-byte aligned, and we do
 ! this on all platforms, sacrificing some stack space for
 ! code simplicity.
+
+M: x86.32 machine-registers
+    {
+        { int-regs { EAX ECX EDX EBP EBX } }
+        { double-float-regs { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } }
+    } ;
 
 M: x86.32 ds-reg ESI ;
 M: x86.32 rs-reg EDI ;
@@ -254,7 +261,7 @@ M: x86.32 %cleanup ( alien-node -- )
         [ drop ]
     } cond ;
 
-M: x86.32 %unwind ( n -- ) %epilogue-later RET ;
+M: x86.32 %unwind ( n -- ) RET ;
 
 os windows? [
     cell "longlong" c-type (>>align)
@@ -273,7 +280,7 @@ os windows? [
     EDX 26 SHR
     EDX 1 AND
     { EAX EBX ECX EDX } [ POP ] each
-    JE
+    JNE
 ] { } define-if-intrinsic
 
 \ (sse2?) { } { object } define-primitive

@@ -1,10 +1,10 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays byte-arrays alien.accessors
-compiler.backend kernel kernel.private math memory namespaces
-make sequences words system layouts combinators math.order
-math.private alien alien.c-types slots.private cpu.x86.assembler
-cpu.x86.assembler.private locals compiler.backend
+USING: accessors arrays byte-arrays alien.accessors kernel
+kernel.private math memory namespaces make sequences words
+system layouts combinators math.order math.private alien
+alien.c-types slots.private locals cpu.architecture
+cpu.x86.assembler cpu.x86.assembler.private cpu.x86.architecture
 compiler.codegen.fixup compiler.constants compiler.intrinsics
 compiler.cfg.builder compiler.cfg.registers compiler.cfg.stacks
 compiler.cfg.templates compiler.codegen ;
@@ -20,6 +20,20 @@ IN: cpu.x86.intrinsics
 } define-intrinsic
 
 ! Slots
+: %slot-literal-known-tag ( -- op )
+    "obj" operand
+    "n" literal cells
+    "obj" operand-tag - [+] ;
+
+: %slot-literal-any-tag ( -- op )
+    "obj" operand %untag
+    "obj" operand "n" literal cells [+] ;
+
+: %slot-any ( -- op )
+    "obj" operand %untag
+    "n" operand fixnum>slot@
+    "obj" operand "n" operand [+] ;
+
 \ slot {
     ! Slot number is literal and the tag is known
     {
@@ -124,9 +138,9 @@ IN: cpu.x86.intrinsics
 \ fixnum*fast {
     {
         [
-            "x" operand "y" get IMUL2
+            "x" operand "y" literal IMUL2
         ] T{ template
-            { input { { f "x" } { [ small-tagged? ] "y" } } }
+            { input { { f "x" } { small-tagged "y" } } }
             { output { "x" } }
         }
     } {
@@ -142,55 +156,27 @@ IN: cpu.x86.intrinsics
     }
 } define-intrinsics
 
-: %untag-fixnums ( seq -- )
-    [ %untag-fixnum ] unique-operands ;
-
 \ fixnum-shift-fast [
-    "x" operand "y" get
+    "x" operand "y" literal
     dup 0 < [ neg SAR ] [ SHL ] if
     ! Mask off low bits
     "x" operand %untag
 ] T{ template
-    { input { { f "x" } { [ ] "y" } } }
+    { input { { f "x" } { small-tagged "y" } } }
     { output { "x" } }
 } define-intrinsic
-
-: overflow-check ( word -- )
-    "end" define-label
-    "z" operand "x" operand MOV
-    "z" operand "y" operand pick execute
-    ! If the previous arithmetic operation overflowed, then we
-    ! turn the result into a bignum and leave it in EAX.
-    "end" get JNO
-    ! There was an overflow. Recompute the original operand.
-    { "y" "x" } %untag-fixnums
-    "x" operand "y" operand rot execute
-    "z" operand "x" operand "y" operand %allot-bignum-signed-1
-    "end" resolve-label ; inline
-
-: overflow-template ( word insn -- )
-    [ overflow-check ] curry T{ template
-        { input { { f "x" } { f "y" } } }
-        { scratch { { f "z" } } }
-        { output { "z" } }
-        { clobber { "x" "y" } }
-        { gc t }
-    } define-intrinsic ;
-
-\ fixnum+ \ ADD overflow-template
-\ fixnum- \ SUB overflow-template
 
 : fixnum-jump ( op inputs -- pair )
     >r [ "x" operand "y" operand CMP ] swap suffix r> 2array ;
 
 : fixnum-value-jump ( op -- pair )
-    { { f "x" } { [ small-tagged? ] "y" } } fixnum-jump ;
+    { { f "x" } { small-tagged "y" } } fixnum-jump ;
 
 : fixnum-register-jump ( op -- pair )
     { { f "x" } { f "y" } } fixnum-jump ;
 
 : define-fixnum-jump ( word op -- )
-    [ fixnum-value-jump ] keep fixnum-register-jump
+    [ fixnum-value-jump ] [ fixnum-register-jump ] bi
     2array define-if-intrinsics ;
 
 {
@@ -202,16 +188,6 @@ IN: cpu.x86.intrinsics
 } [
     first2 define-fixnum-jump
 ] each
-
-\ fixnum>bignum [
-    "x" operand %untag-fixnum
-    "x" operand dup "scratch" operand %allot-bignum-signed-1
-] T{ template
-    { input { { f "x" } } }
-    { scratch { { f "scratch" } } }
-    { output { "x" } }
-    { gc t }
-} define-intrinsic
 
 \ bignum>fixnum [
     "nonzero" define-label
