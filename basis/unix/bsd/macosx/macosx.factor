@@ -1,4 +1,4 @@
-USING: alien.syntax ;
+USING: alien.syntax unix.time ;
 IN: unix
 
 : FD_SETSIZE 1024 ; inline
