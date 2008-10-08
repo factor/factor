@@ -3,7 +3,8 @@
 USING: alien alien.c-types alien.strings io.encodings.utf8
 io.unix.backend kernel math sequences splitting unix strings
 combinators.short-circuit byte-arrays combinators qualified
-accessors math.parser fry assocs namespaces continuations ;
+accessors math.parser fry assocs namespaces continuations
+unix.users ;
 IN: unix.groups
 
 QUALIFIED: grouping
@@ -61,14 +62,22 @@ PRIVATE>
 : >groups ( byte-array n -- groups )
     [ 4 grouping:group ] dip head-slice [ *uint group-name ] map ;
 
-PRIVATE>
-
-: user-groups ( string -- seq )
+: (user-groups) ( string -- seq )
     #! first group is -1337, legacy unix code
     -1337 NGROUPS_MAX [ 4 * <byte-array> ] keep
     <int> [ getgrouplist io-error ] 2keep
     [ 4 tail-slice ] [ *int 1- ] bi* >groups ;
 
+PRIVATE>
+    
+GENERIC: user-groups ( string/id -- seq )
+
+M: string user-groups ( string -- seq )
+    (user-groups) ; 
+
+M: integer user-groups ( id -- seq )
+    username (user-groups) ;
+    
 : all-groups ( -- seq )
     [ getgrent dup ] [ group-struct>group ] [ drop ] produce ;
 
