@@ -60,13 +60,13 @@ M: string user-passwd ( string -- passwd/f )
 : username-id ( string -- id )
     user-passwd username>> ;
 
-: real-username-id ( -- string )
+: real-username-id ( -- id )
     getuid ; inline
 
 : real-username ( -- string )
     real-username-id username ; inline
 
-: effective-username-id ( -- string )
+: effective-username-id ( -- id )
     geteuid username ; inline
 
 : effective-username ( -- string )
