@@ -150,9 +150,25 @@ os {
 
 PRIVATE>
 
-: set-uid? ( path -- ? ) UID file-mode? ;
-: set-gid? ( path -- ? ) GID file-mode? ;
-: set-sticky? ( path -- ? ) STICKY file-mode? ;
+: UID           OCT: 0004000 ; inline
+: GID           OCT: 0002000 ; inline
+: STICKY        OCT: 0001000 ; inline
+: USER-ALL      OCT: 0000700 ; inline
+: USER-READ     OCT: 0000400 ; inline
+: USER-WRITE    OCT: 0000200 ; inline 
+: USER-EXECUTE  OCT: 0000100 ; inline   
+: GROUP-ALL     OCT: 0000070 ; inline
+: GROUP-READ    OCT: 0000040 ; inline 
+: GROUP-WRITE   OCT: 0000020 ; inline  
+: GROUP-EXECUTE OCT: 0000010 ; inline    
+: OTHER-ALL     OCT: 0000007 ; inline
+: OTHER-READ    OCT: 0000004 ; inline
+: OTHER-WRITE   OCT: 0000002 ; inline  
+: OTHER-EXECUTE OCT: 0000001 ; inline    
+
+: uid? ( path -- ? ) UID file-mode? ;
+: gid? ( path -- ? ) GID file-mode? ;
+: sticky? ( path -- ? ) STICKY file-mode? ;
 : user-read? ( path -- ? ) USER-READ file-mode? ;
 : user-write? ( path -- ? ) USER-WRITE file-mode? ;
 : user-execute? ( path -- ? ) USER-EXECUTE file-mode? ;
@@ -176,8 +192,11 @@ PRIVATE>
 : set-other-write ( path ? -- ) OTHER-WRITE swap chmod-set-bit ; 
 : set-other-execute ( path ? -- ) OTHER-EXECUTE swap chmod-set-bit ;
 
-: set-file-permissions ( path octal-n -- )
+: set-file-permissions ( path n -- )
     [ normalize-path ] dip chmod io-error ;
+
+: file-permissions ( path -- n )
+    normalize-path file-info permissions>> ;
 
 <PRIVATE
 
@@ -225,10 +244,14 @@ M: string set-file-group ( path string -- )
     group-id
     f swap set-file-ids ;
 
-: file-uid ( path -- uid ) normalize-path file-info uid>> ;
+: file-username-id ( path -- uid )
+    normalize-path file-info uid>> ;
 
-: file-user-name ( path -- string ) file-uid username ;
+: file-username ( path -- string )
+    file-username-id username ;
 
-: file-gid ( path -- gid ) normalize-path file-info gid>> ;
+: file-group-id ( path -- gid )
+    normalize-path file-info gid>> ;
 
-: file-group ( path -- string ) file-gid group-name ;
+: file-group-name ( path -- string )
+    file-group-id group-name ;
