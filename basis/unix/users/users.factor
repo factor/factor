@@ -58,7 +58,7 @@ M: string user-passwd ( string -- passwd/f )
     user-passwd username>> ;
 
 : username-id ( string -- id )
-    user-passwd username>> ;
+    user-passwd uid>> ;
 
 : real-username-id ( -- id )
     getuid ; inline
@@ -67,7 +67,7 @@ M: string user-passwd ( string -- passwd/f )
     real-username-id username ; inline
 
 : effective-username-id ( -- id )
-    geteuid username ; inline
+    geteuid ; inline
 
 : effective-username ( -- string )
     effective-username-id username ; inline
