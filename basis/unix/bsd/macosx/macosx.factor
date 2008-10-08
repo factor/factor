@@ -117,3 +117,18 @@ C-STRUCT: addrinfo
 : ETIME 101 ; inline
 : EOPNOTSUPP 102 ; inline
 : ENOPOLICY 103 ; inline
+
+: _UTX_USERSIZE 256 ; inline
+: _UTX_LINESIZE 32 ; inline
+: _UTX_IDSIZE 4 ; inline
+: _UTX_HOSTSIZE 256 ; inline
+    
+C-STRUCT: utmpx
+    { { "char" _UTX_USERSIZE } "ut_user" }
+    { { "char" _UTX_IDSIZE } "ut_id" }
+    { { "char" _UTX_LINESIZE } "ut_line" }
+    { "pid_t" "ut_pid" }
+    { "short" "ut_type" }
+    { "timeval" "ut_tv" }
+    { { "char" _UTX_HOSTSIZE } "ut_host" }
+    { { "uint" 16 } "ut_pad" } ;

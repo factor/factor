@@ -1,4 +1,4 @@
-USING: alien.syntax ;
+USING: alien.syntax alien.c-types math ;
 IN: unix
 
 : FD_SETSIZE 256 ; inline
@@ -111,3 +111,46 @@ C-STRUCT: addrinfo
 : ENOLINK 95 ; inline
 : EPROTO 96 ; inline
 : ELAST 96 ; inline
+
+TYPEDEF: __uint8_t sa_family_t
+
+: _UTX_USERSIZE   32 ; inline
+: _UTX_LINESIZE   32 ; inline
+: _UTX_IDSIZE     4 ; inline
+: _UTX_HOSTSIZE   256 ; inline
+
+: _SS_MAXSIZE ( -- n )
+    128 ; inline
+
+: _SS_ALIGNSIZE ( -- n )
+    "__int64_t" heap-size ; inline
+    
+: _SS_PAD1SIZE ( -- n )
+    _SS_ALIGNSIZE 2 - ; inline
+    
+: _SS_PAD2SIZE ( -- n )
+    _SS_MAXSIZE 2 - _SS_PAD1SIZE - _SS_ALIGNSIZE - ; inline
+
+C-STRUCT: sockaddr_storage
+    { "__uint8_t" "ss_len" }
+    { "sa_family_t" "ss_family" }
+    { { "char" _SS_PAD1SIZE } "__ss_pad1" }
+    { "__int64_t" "__ss_align" }
+    { { "char" _SS_PAD2SIZE } "__ss_pad2" } ;
+
+C-STRUCT: exit_struct
+    { "uint16_t" "e_termination" }
+    { "uint16_t" "e_exit" } ;
+
+C-STRUCT: utmpx
+    { { "char" _UTX_USERSIZE } "ut_user" }
+    { { "char" _UTX_IDSIZE } "ut_id" }
+    { { "char" _UTX_LINESIZE } "ut_line" }
+    { { "char" _UTX_HOSTSIZE } "ut_host" }
+    { "uint16_t" "ut_session" }
+    { "uint16_t" "ut_type" }
+    { "pid_t" "ut_pid" }
+    { "exit_struct" "ut_exit" }
+    { "sockaddr_storage" "ut_ss" }
+    { "timeval" "ut_tv" }
+    { { "uint32_t" 10 } "ut_pad" } ;
