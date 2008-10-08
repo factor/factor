@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax vocabs.loader ;
+USING: alien.syntax ;
 IN: unix
 
 C-STRUCT: sockaddr_storage

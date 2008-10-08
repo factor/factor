@@ -1,4 +1,4 @@
-USING: alien.syntax alien.c-types math ;
+USING: alien.syntax alien.c-types math vocabs.loader ;
 IN: unix
 
 : FD_SETSIZE 256 ; inline
