@@ -144,7 +144,8 @@ M: _branch-t generate-insn
 
 M: ##dispatch-label generate-insn label>> %dispatch-label ;
 
-M: ##dispatch generate-insn drop %dispatch ;
+M: ##dispatch generate-insn
+    [ src>> v>operand ] [ temp>> v>operand ] bi %dispatch ;
 
 : dst/src ( insn -- dst src )
     [ dst>> v>operand ] [ src>> v>operand ] bi ;

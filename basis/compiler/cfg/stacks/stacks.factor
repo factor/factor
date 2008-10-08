@@ -305,9 +305,7 @@ M: loc lazy-store
 : set-value-classes ( classes -- )
     phantom-datastack get
     over length over add-locs
-    stack>> [
-        [ value-class class-and ] keep set-value-class
-    ] 2reverse-each ;
+    stack>> [ set-value-class ] 2reverse-each ;
 
 : finalize-phantoms ( -- )
     #! Commit all deferred stacking shuffling, and ensure the

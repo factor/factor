@@ -63,7 +63,7 @@ HOOK: %jump-f cpu ( label vreg -- )
 ! Test if vreg is 't' or not
 HOOK: %jump-t cpu ( label vreg -- )
 
-HOOK: %dispatch cpu ( -- )
+HOOK: %dispatch cpu ( src temp -- )
 
 HOOK: %dispatch-label cpu ( word -- )
 

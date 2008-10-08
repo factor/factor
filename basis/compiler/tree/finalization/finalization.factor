@@ -1,9 +1,9 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel arrays accessors sequences sequences.private words
-fry namespaces make math math.order memoize classes.builtin
-classes.tuple.private slots.private combinators layouts
-byte-arrays alien.accessors
+fry namespaces make math math.private math.order memoize
+classes.builtin classes.tuple.private classes.algebra
+slots.private combinators layouts byte-arrays alien.accessors
 compiler.intrinsics
 compiler.tree
 compiler.tree.combinators
@@ -23,6 +23,10 @@ IN: compiler.tree.finalization
 
 GENERIC: finalize* ( node -- nodes )
 
+: finalize ( nodes -- nodes' ) [ finalize* ] map-nodes ;
+
+: splice-final ( quot -- nodes ) splice-quot finalize ;
+
 M: #copy finalize* drop f ;
 
 M: #shuffle finalize*
@@ -34,30 +38,30 @@ M: #shuffle finalize*
     word>> "predicating" word-prop builtin-class? ;
 
 MEMO: builtin-predicate-expansion ( word -- nodes )
-    def>> splice-quot ;
+    def>> splice-final ;
 
 : expand-builtin-predicate ( #call -- nodes )
     word>> builtin-predicate-expansion ;
-
-: first-literal ( #call -- obj ) node-input-infos first literal>> ;
-
-: last-literal ( #call -- obj ) node-input-infos peek literal>> ;
 
 : expand-tuple-boa? ( #call -- ? )
     dup word>> \ <tuple-boa> eq? [
         last-literal tuple-layout?
     ] [ drop f ] if ;
 
-MEMO: (tuple-boa-expansion) ( n -- quot )
+MEMO: (tuple-boa-expansion) ( n -- nodes )
     [
-        [ 2 + ] map <reversed>
-        [ '[ [ _ set-slot ] keep ] % ] each
-    ] [ ] make ;
+        [ '[ _ (tuple) ] % ]
+        [
+            [ 2 + ] map <reversed>
+            [ '[ [ _ set-slot ] keep ] % ] each
+        ] bi
+    ] [ ] make '[ _ dip ] splice-final ;
 
 : tuple-boa-expansion ( layout -- quot )
     #! No memoization here since otherwise we'd hang on to
     #! tuple layout objects.
-    size>> (tuple-boa-expansion) \ (tuple) prefix splice-quot ;
+    size>> (tuple-boa-expansion)
+    [ over 1 set-slot ] splice-final append ;
 
 : expand-tuple-boa ( #call -- node )
     last-literal tuple-boa-expansion ;
@@ -65,14 +69,15 @@ MEMO: (tuple-boa-expansion) ( n -- quot )
 MEMO: <array>-expansion ( n -- quot )
     [
         [ swap (array) ] %
-        [ \ 2dup , , [ swap set-array-nth ] % ] each
+        [ '[ _ over 1 set-slot ] % ]
+        [ [ '[ 2dup _ swap set-array-nth ] % ] each ] bi
         \ nip ,
-    ] [ ] make splice-quot ;
+    ] [ ] make splice-final ;
 
 : expand-<array>? ( #call -- ? )
     dup word>> \ <array> eq? [
         first-literal dup integer?
-        [ 0 32 between? ] [ drop f ] if
+        [ 0 8 between? ] [ drop f ] if
     ] [ drop f ] if ;
 
 : expand-<array> ( #call -- node )
@@ -83,18 +88,46 @@ MEMO: <array>-expansion ( n -- quot )
 MEMO: <byte-array>-expansion ( n -- quot )
     [
         [ (byte-array) ] %
-        bytes>cells [ cell * ] map
-        [ [ 0 over ] % , [ set-alien-unsigned-cell ] % ] each
-    ] [ ] make splice-quot ;
+        [ '[ _ over 1 set-slot ] % ]
+        [
+            bytes>cells [
+                cell *
+                '[ 0 over _ set-alien-unsigned-cell ] %
+            ] each
+        ] bi
+    ] [ ] make splice-final ;
 
 : expand-<byte-array>? ( #call -- ? )
     dup word>> \ <byte-array> eq? [
         first-literal dup integer?
-        [ 0 128 between? ] [ drop f ] if
+        [ 0 32 between? ] [ drop f ] if
     ] [ drop f ] if ;
 
 : expand-<byte-array> ( #call -- nodes )
     first-literal <byte-array>-expansion ;
+
+MEMO: <ratio>-expansion ( -- quot )
+    [ (ratio) [ 1 set-slot ] keep [ 2 set-slot ] keep ] splice-final ;
+
+: expand-<ratio> ( #call -- nodes )
+    drop <ratio>-expansion ;
+
+MEMO: <complex>-expansion ( -- quot )
+    [ (complex) [ 1 set-slot ] keep [ 2 set-slot ] keep ] splice-final ;
+
+: expand-<complex> ( #call -- nodes )
+    drop <complex>-expansion ;
+
+MEMO: <wrapper>-expansion ( -- quot )
+    [ (wrapper) [ 1 set-slot ] keep ] splice-final ;
+
+: expand-<wrapper> ( #call -- nodes )
+    drop <wrapper>-expansion ;
+
+: expand-set-slot ( #call -- nodes )
+    dup in-d>> first node-value-info class>> immediate class<=
+    [ (set-slot) ] [ over >r (set-slot) r> (write-barrier) ] ?
+    splice-final ;
 
 M: #call finalize*
     {
@@ -102,9 +135,15 @@ M: #call finalize*
         { [ dup expand-tuple-boa? ] [ expand-tuple-boa ] }
         { [ dup expand-<array>? ] [ expand-<array> ] }
         { [ dup expand-<byte-array>? ] [ expand-<byte-array> ] }
-        [ ]
+        [
+            dup word>> {
+                { \ <ratio> [ expand-<ratio> ] }
+                { \ <complex> [ expand-<complex> ] }
+                { \ <wrapper> [ expand-<wrapper> ] }
+                { \ set-slot [ expand-set-slot ] }
+                [ drop ]
+            } case
+        ]
     } cond ;
 
 M: node finalize* ;
-
-: finalize ( nodes -- nodes' ) [ finalize* ] map-nodes ;

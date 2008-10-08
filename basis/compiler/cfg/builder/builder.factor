@@ -158,8 +158,6 @@ M: #if emit-node
             init-phantoms
             ##prologue
             [ emit-nodes ] with-node-iterator
-            ##epilogue
-            ##return
         ] with-cfg-builder
     ] keep ;
 
@@ -304,7 +302,8 @@ M: #return-recursive emit-node
     [ ##epilogue ##return ] unless stop-iterating ;
 
 ! #terminate
-M: #terminate emit-node drop stop-iterating ;
+M: #terminate emit-node
+    drop finalize-phantoms stop-iterating ;
 
 ! FFI
 : return-size ( ctype -- n )

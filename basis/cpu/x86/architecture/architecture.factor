@@ -69,9 +69,9 @@ M: x86 stack-frame-size ( n -- i )
 
 M: x86 %prologue ( n -- )
     temp-reg-1 0 MOV rc-absolute-cell rel-this
-    dup cell + PUSH
+    dup PUSH
     temp-reg-1 PUSH
-    stack-reg swap 2 cells - SUB ;
+    stack-reg swap 3 cells - SUB ;
 
 : incr-stack-reg ( n -- )
     dup 0 = [ drop ] [ stack-reg swap ADD ] if ;
