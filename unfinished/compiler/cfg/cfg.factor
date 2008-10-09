@@ -19,7 +19,7 @@ successors ;
         V{ } clone >>instructions
         V{ } clone >>successors ;
 
-TUPLE: mr instructions word label frame-size spill-counts ;
+TUPLE: mr instructions word label ;
 
 : <mr> ( instructions word label -- mr )
     mr new
