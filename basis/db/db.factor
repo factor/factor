@@ -6,7 +6,6 @@ tools.walker accessors combinators fry ;
 IN: db
 
 TUPLE: db
-    disposed
     handle
     insert-statements
     update-statements
@@ -23,12 +22,13 @@ HOOK: db-close db ( handle -- )
 
 : dispose-statements ( assoc -- ) values dispose-each ;
 
-: db-dispose ( db -- ) 
+M: db dispose ( db -- ) 
     dup db [
         [ dispose-statements H{ } clone ] change-insert-statements
         [ dispose-statements H{ } clone ] change-update-statements
         [ dispose-statements H{ } clone ] change-delete-statements
-        handle>> db-close
+        [ db-close f ] change-handle
+        drop
     ] with-variable ;
 
 TUPLE: result-set sql in-params out-params handle n max ;

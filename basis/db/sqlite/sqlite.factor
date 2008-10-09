@@ -19,7 +19,6 @@ M: sqlite-db db-open ( db -- db )
     dup path>> sqlite-open >>handle ;
 
 M: sqlite-db db-close ( handle -- ) sqlite-close ;
-M: sqlite-db dispose ( db -- ) db-dispose ;
 
 TUPLE: sqlite-statement < statement ;
 
