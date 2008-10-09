@@ -71,7 +71,7 @@ M: x86 %gc ( -- )
         ! Allocate a bignum
         dst 4 cells bignum bignum temp %allot
         ! Write length
-        dst 1 bignum@ 2 MOV
+        dst 1 bignum@ 2 tag-fixnum MOV
         ! Test sign
         src 0 CMP
         "positive" get JGE
