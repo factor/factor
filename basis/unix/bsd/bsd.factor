@@ -48,6 +48,19 @@ C-STRUCT: sockaddr-un
     { "uchar" "family" }
     { { "char" 104 } "path" } ;
 
+C-STRUCT: passwd
+    { "char*"  "pw_name" }
+    { "char*"  "pw_passwd" }
+    { "uid_t"  "pw_uid" }
+    { "gid_t"  "pw_gid" }
+    { "time_t" "pw_change" }
+    { "char*"  "pw_class" }
+    { "char*"  "pw_gecos" }
+    { "char*"  "pw_dir" }
+    { "char*"  "pw_shell" }
+    { "time_t" "pw_expire" }
+    { "int"    "pw_fields" } ;
+
 : max-un-path 104 ; inline
 
 : SOCK_STREAM 1 ; inline
