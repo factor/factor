@@ -164,9 +164,12 @@ M: ##unbox-byte-array generate-insn dst/src %unbox-byte-array ;
 
 M: ##unbox-any-c-ptr generate-insn dst/src %unbox-any-c-ptr ;
 
-M: ##box-float generate-insn dst/src %box-float ;
+: dst/src/temp ( insn -- dst src temp )
+    [ dst/src ] [ temp>> v>operand ] bi ;
 
-M: ##box-alien generate-insn dst/src %box-alien ;
+M: ##box-float generate-insn dst/src/temp %box-float ;
+
+M: ##box-alien generate-insn dst/src/temp %box-alien ;
 
 M: ##allot generate-insn
     {
