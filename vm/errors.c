@@ -57,10 +57,10 @@ void throw_error(CELL error, F_STACK_FRAME *callstack_top)
 	crash. */
 	else
 	{
-		fprintf(stderr,"You have triggered a bug in Factor. Please report.\n");
-		fprintf(stderr,"early_error: ");
+		printf("You have triggered a bug in Factor. Please report.\n");
+		printf("early_error: ");
 		print_obj(error);
-		fprintf(stderr,"\n");
+		printf("\n");
 		factorbug();
 	}
 }

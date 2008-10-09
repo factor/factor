@@ -7,40 +7,47 @@ IN: compiler.cfg.stack-frame
 
 SYMBOL: frame-required?
 
-SYMBOL: frame-size
-
 SYMBOL: spill-counts
 
 : init-stack-frame-builder ( -- )
     frame-required? off
-    0 frame-size set ;
+    T{ stack-frame } clone stack-frame set ;
 
-GENERIC: compute-frame-size* ( insn -- )
+GENERIC: compute-stack-frame* ( insn -- )
 
-M: ##frame-required compute-frame-size*
+: max-stack-frame ( frame1 frame2 -- frame3 )
+    {
+        [ [ size>> ] bi@ max ]
+        [ [ params>> ] bi@ max ]
+        [ [ return>> ] bi@ max ]
+        [ [ total-size>> ] bi@ max ]
+    } cleave
+    stack-frame boa ;
+
+M: ##stack-frame compute-stack-frame*
     frame-required? on
-    n>> frame-size [ max ] change ;
+    stack-frame>> stack-frame [ max-stack-frame ] change ;
 
-M: _spill-integer compute-frame-size*
+M: _spill-integer compute-stack-frame*
     drop frame-required? on ;
 
-M: _spill-float compute-frame-size*
+M: _spill-float compute-stack-frame*
     drop frame-required? on ;
 
-M: insn compute-frame-size* drop ;
+M: insn compute-stack-frame* drop ;
 
-: compute-frame-size ( insns -- )
-    [ compute-frame-size* ] each ;
+: compute-stack-frame ( insns -- )
+    [ compute-stack-frame* ] each ;
 
 GENERIC: insert-pro/epilogues* ( insn -- )
 
-M: ##frame-required insert-pro/epilogues* drop ;
+M: ##stack-frame insert-pro/epilogues* drop ;
 
 M: ##prologue insert-pro/epilogues*
-    drop frame-required? get [ _prologue ] when ;
+    drop frame-required? get [ stack-frame get _prologue ] when ;
 
 M: ##epilogue insert-pro/epilogues*
-    drop frame-required? get [ _epilogue ] when ;
+    drop frame-required? get [ stack-frame get _epilogue ] when ;
 
 M: insn insert-pro/epilogues* , ;
 
@@ -51,9 +58,8 @@ M: insn insert-pro/epilogues* , ;
     [
         init-stack-frame-builder
         [
-            [ compute-frame-size ]
+            [ compute-stack-frame ]
             [ insert-pro/epilogues ]
             bi
         ] change-instructions
-        frame-size get >>frame-size
     ] with-scope ;

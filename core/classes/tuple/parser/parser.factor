@@ -86,6 +86,7 @@ ERROR: bad-literal-tuple ;
 
 : parse-tuple-literal ( -- tuple )
     scan-word scan {
+        { f [ unexpected-eof ] }
         { "f" [ \ } parse-until boa>tuple ] }
         { "{" [ parse-slot-values assoc>tuple ] }
         { "}" [ new ] }

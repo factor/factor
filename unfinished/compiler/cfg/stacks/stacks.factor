@@ -312,7 +312,7 @@ M: loc lazy-store
     finalize-contents
     finalize-heights
     fresh-objects get [
-        empty? [ 0 ##frame-required ##gc ] unless
+        empty? [ ##simple-stack-frame ##gc ] unless
     ] [ delete-all ] bi ;
 
 : init-phantoms ( -- )

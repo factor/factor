@@ -28,13 +28,10 @@ TUPLE: template input output scratch clobber gc ;
 
 : lazy-load ( specs -- seq )
     [ length phantom-datastack get phantom-input ] keep
-    [ drop ] [
-        [
-            2dup second clobbered?
-            [ first (eager-load) ] [ first (lazy-load) ] if
-        ] 2map
-    ] 2bi
-    [ substitute-vregs ] keep ;
+    [
+        2dup second clobbered?
+        [ first (eager-load) ] [ first (lazy-load) ] if
+    ] 2map ;
 
 : load-inputs ( template -- assoc )
     [
