@@ -3,6 +3,29 @@ system ;
 IN: unix.types
 
 TYPEDEF: void* caddr_t
+TYPEDEF: uint in_addr_t
+TYPEDEF: uint socklen_t
+
+TYPEDEF: char int8_t
+TYPEDEF: short int16_t
+TYPEDEF: int int32_t
+TYPEDEF: longlong int64_t
+
+TYPEDEF: uchar uint8_t
+TYPEDEF: ushort uint16_t
+TYPEDEF: uint uint32_t
+TYPEDEF: ulonglong uint64_t
+
+TYPEDEF: char __int8_t
+TYPEDEF: short __int16_t
+TYPEDEF: int __int32_t
+TYPEDEF: longlong __int64_t
+
+TYPEDEF: uchar __uint8_t
+TYPEDEF: ushort __uint16_t
+TYPEDEF: uint __uint32_t
+TYPEDEF: ulonglong __uint64_t
+
 
 os {
     { linux   [ "unix.types.linux"   require ] }

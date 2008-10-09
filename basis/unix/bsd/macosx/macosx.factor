@@ -1,4 +1,4 @@
-USING: alien.syntax ;
+USING: alien.syntax unix.time ;
 IN: unix
 
 : FD_SETSIZE 1024 ; inline
@@ -12,19 +12,6 @@ C-STRUCT: addrinfo
     { "char*" "canonname" }
     { "void*" "addr" }
     { "addrinfo*" "next" } ;
-
-C-STRUCT: passwd
-    { "char*"  "pw_name" }
-    { "char*"  "pw_passwd" }
-    { "uid_t"  "pw_uid" }
-    { "gid_t"  "pw_gid" }
-    { "time_t" "pw_change" }
-    { "char*"  "pw_class" }
-    { "char*"  "pw_gecos" }
-    { "char*"  "pw_dir" }
-    { "char*"  "pw_shell" }
-    { "time_t" "pw_expire" }
-    { "int"    "pw_fields" } ;
 
 : EPERM 1 ; inline
 : ENOENT 2 ; inline
@@ -130,3 +117,18 @@ C-STRUCT: passwd
 : ETIME 101 ; inline
 : EOPNOTSUPP 102 ; inline
 : ENOPOLICY 103 ; inline
+
+: _UTX_USERSIZE 256 ; inline
+: _UTX_LINESIZE 32 ; inline
+: _UTX_IDSIZE 4 ; inline
+: _UTX_HOSTSIZE 256 ; inline
+    
+C-STRUCT: utmpx
+    { { "char" _UTX_USERSIZE } "ut_user" }
+    { { "char" _UTX_IDSIZE } "ut_id" }
+    { { "char" _UTX_LINESIZE } "ut_line" }
+    { "pid_t" "ut_pid" }
+    { "short" "ut_type" }
+    { "timeval" "ut_tv" }
+    { { "char" _UTX_HOSTSIZE } "ut_host" }
+    { { "uint" 16 } "ut_pad" } ;
