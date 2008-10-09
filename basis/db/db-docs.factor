@@ -26,10 +26,6 @@ HELP: dispose-statements
 { $values { "assoc" assoc } }
 { $description "Disposes an associative list of statements." } ;
 
-HELP: db-dispose
-{ $values { "db" db } }
-{ $description "Disposes of all the statements stored in the " { $link db } " object." } ;
-
 HELP: statement
 { $description "A " { $snippet "statement" } " stores the information about a statemen, such as the SQL statement text, the in/out parameters, and type information." } ;
 
