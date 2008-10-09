@@ -96,3 +96,16 @@ TUPLE: syntax-test bar baz ;
 [ T{ syntax-test } ] [ T{ syntax-test } ] unit-test
 [ T{ syntax-test f { 2 3 } { 4 { 5 } } } ]
 [ T{ syntax-test { bar { 2 3 } } { baz { 4 { 5 } } } } ] unit-test
+
+! Corner case
+TUPLE: parsing-corner-case x ;
+
+[ T{ parsing-corner-case f 3 } ] [
+    {
+        "USE: classes.tuple.parser.tests"
+        "T{ parsing-corner-case"
+        "    f"
+        "    3"
+        "}"
+    } "\n" join eval
+] unit-test
