@@ -96,9 +96,9 @@ M: ppc %epilogue ( n -- )
     1 1 rot ADDI
     0 MTLR ;
 
-: (%call) ( -- ) 11 MTLR BLRL ;
+: (%call) ( reg -- ) MTLR BLRL ;
 
-: (%jump) ( -- ) 11 MTCTR BCTR ;
+: (%jump) ( reg -- ) MTCTR BCTR ;
 
 : %load-dlsym ( symbol dll register -- )
     0 swap LOAD32 rc-absolute-ppc-2/2 rel-dlsym ;
@@ -117,7 +117,7 @@ M: ppc %dispatch ( -- )
         "offset" operand "n" operand 1 SRAWI
         11 11 "offset" operand ADD
         11 dup 6 cells LWZ
-        (%jump)
+        11 (%jump)
     ] H{
         { +input+ { { f "n" } } }
         { +scratch+ { { f "offset" } } }
@@ -244,17 +244,17 @@ M: ppc %prepare-alien-invoke
     rs-reg 11 12 STW ;
 
 M: ppc %alien-invoke ( symbol dll -- )
-    11 %load-dlsym (%call) ;
+    11 %load-dlsym 11 (%call) ;
 
 M: ppc %alien-callback ( quot -- )
     3 load-indirect "c_to_factor" f %alien-invoke ;
 
 M: ppc %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke
-    3 11 MR ;
+    13 3 MR ;
 
 M: ppc %alien-indirect ( -- )
-    (%call) ;
+    13 (%call) ;
 
 M: ppc %callback-value ( ctype -- )
      ! Save top of data stack
