@@ -285,7 +285,7 @@ ARTICLE: "db-custom-database-combinators" "Custom database combinators"
 { $code <"
 USING: db.sqlite db io.files ;
 : with-sqlite-db ( quot -- )
-    "my-database.db" temp-file <sqlite-db> swap with-db ;"> } 
+    "my-database.db" temp-file <sqlite-db> swap with-db ; inline"> } 
 
 "PostgreSQL example combinator:"
 { $code <" USING: db.postgresql db ;
@@ -296,7 +296,7 @@ USING: db.sqlite db io.files ;
         "erg" >>username
         "secrets?" >>password
         "factor-test" >>database
-    swap with-db ;">
+    swap with-db ; inline">
 } ;
 
 ABOUT: "db"
