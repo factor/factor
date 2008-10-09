@@ -24,7 +24,7 @@ GENERIC: lazy-store ( dst src -- )
 GENERIC: minimal-ds-loc* ( min obj -- min )
 
 ! This will be a multimethod soon
-DEFER: %move
+DEFER: ##move
 
 PRIVATE>
 
@@ -62,7 +62,7 @@ M: cached (lazy-load) >r vreg>> r> (lazy-load) ;
 M: cached (eager-load) >r vreg>> r> (eager-load) ;
 M: cached lazy-store
     2dup loc>> live-loc?
-    [ "live-locs" get at %move ] [ 2drop ] if ;
+    [ "live-locs" get at ##move ] [ 2drop ] if ;
 M: cached minimal-ds-loc* loc>> minimal-ds-loc* ;
 
 M: tagged move-spec drop f ;
@@ -78,9 +78,9 @@ M: unboxed-c-ptr move-spec class ;
 M: constant move-spec class ;
 
 ! Moving values between locations and registers
-: %move-bug ( -- * ) "Bug in generator.registers" throw ;
+: ##move-bug ( -- * ) "Bug in generator.registers" throw ;
 
-: %unbox-c-ptr ( dst src -- )
+: ##unbox-c-ptr ( dst src -- )
     dup value-class {
         { [ dup \ f class<= ] [ drop ##unbox-f ] }
         { [ dup simple-alien class<= ] [ drop ##unbox-alien ] }
@@ -88,15 +88,15 @@ M: constant move-spec class ;
         [ drop ##unbox-any-c-ptr ]
     } cond ; inline
 
-: %move-via-temp ( dst src -- )
+: ##move-via-temp ( dst src -- )
     #! For many transfers, such as loc to unboxed-alien, we
     #! don't have an intrinsic, so we transfer the source to
     #! temp then temp to the destination.
-    int-regs next-vreg [ over %move value-class ] keep
+    int-regs next-vreg [ over ##move value-class ] keep
     tagged new
         swap >>vreg
         swap >>class
-    %move ;
+    ##move ;
 
 ! Operands holding pointers to freshly-allocated objects which
 ! are guaranteed to be in the nursery
@@ -106,7 +106,7 @@ SYMBOL: fresh-objects
 
 : fresh-object? ( vreg -- ? ) fresh-objects get memq? ;
 
-: %move ( dst src -- )
+: ##move ( dst src -- )
     2dup [ move-spec ] bi@ 2array {
         { { f f } [ ##copy ] }
         { { unboxed-alien unboxed-alien } [ ##copy ] }
@@ -115,8 +115,8 @@ SYMBOL: fresh-objects
         { { unboxed-c-ptr unboxed-c-ptr } [ ##copy ] }
         { { float float } [ ##copy-float ] }
 
-        { { f unboxed-c-ptr } [ %move-bug ] }
-        { { f unboxed-byte-array } [ %move-bug ] }
+        { { f unboxed-c-ptr } [ ##move-bug ] }
+        { { f unboxed-byte-array } [ ##move-bug ] }
 
         { { f constant } [ value>> ##load-literal ] }
 
@@ -128,10 +128,10 @@ SYMBOL: fresh-objects
         { { unboxed-alien f } [ ##unbox-alien ] }
         { { unboxed-byte-array f } [ ##unbox-byte-array ] }
         { { unboxed-f f } [ ##unbox-f ] }
-        { { unboxed-c-ptr f } [ %unbox-c-ptr ] }
+        { { unboxed-c-ptr f } [ ##unbox-c-ptr ] }
         { { loc f } [ swap ##replace ] }
 
-        [ drop %move-via-temp ]
+        [ drop ##move-via-temp ]
     } case ;
 
 ! A compile-time stack
@@ -264,10 +264,10 @@ M: value (lazy-load)
 
 M: value (eager-load) ( value spec -- vreg )
     [ alloc-vreg-for ] [ drop ] 2bi
-    [ %move ] [ drop ] 2bi ;
+    [ ##move ] [ drop ] 2bi ;
 
 M: loc lazy-store
-    2dup live-loc? [ "live-locs" get at %move ] [ 2drop ] if ;
+    2dup live-loc? [ "live-locs" get at ##move ] [ 2drop ] if ;
 
 : finalize-locs ( -- )
     #! Perform any deferred stack shuffling.
@@ -279,7 +279,7 @@ M: loc lazy-store
 : finalize-vregs ( -- )
     #! Store any vregs to their final stack locations.
     [
-        dup loc? over cached? or [ 2drop ] [ %move ] if
+        dup loc? over cached? or [ 2drop ] [ ##move ] if
     ] each-loc ;
 
 : clear-phantoms ( -- )

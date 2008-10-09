@@ -250,9 +250,9 @@ M: #dispatch emit-node
 
 : emit-intrinsic ( word -- next )
     {
-        { \ (tuple) [ allot-size 2 cells + tuple tuple emit-allot ] }
-        { \ (array) [ allot-size 2 cells + array object emit-allot ] }
-        { \ (byte-array) [ allot-size cells 2 + byte-array object emit-allot ] }
+        { \ (tuple) [ allot-size 2 + cells tuple tuple emit-allot ] }
+        { \ (array) [ allot-size 2 + cells array object emit-allot ] }
+        { \ (byte-array) [ allot-size 2 cells + byte-array object emit-allot ] }
         { \ (complex) [ 3 cells complex complex emit-allot ] }
         { \ (ratio) [ 3 cells ratio ratio emit-allot ] }
         { \ (wrapper) [ 2 cells wrapper object emit-allot ] }

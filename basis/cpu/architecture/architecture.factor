@@ -88,7 +88,7 @@ HOOK: %copy-float cpu ( dst src -- )
 
 ! Box and unbox floats
 HOOK: %unbox-float cpu ( dst src -- )
-HOOK: %box-float cpu ( dst src -- )
+HOOK: %box-float cpu ( dst src temp -- )
 
 ! FFI stuff
 
@@ -184,7 +184,7 @@ HOOK: %unbox-f cpu ( dst src -- )
 
 HOOK: %unbox-any-c-ptr cpu ( dst src -- )
 
-HOOK: %box-alien cpu ( dst src -- )
+HOOK: %box-alien cpu ( dst src temp1 temp2 -- )
 
 ! Allocation
 HOOK: %allot cpu ( dst size type tag temp -- )

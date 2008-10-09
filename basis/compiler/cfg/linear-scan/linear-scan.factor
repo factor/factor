@@ -22,12 +22,12 @@ IN: compiler.cfg.linear-scan
 ! by Omri Traub, Glenn Holloway, Michael D. Smith
 ! http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.34.8435
 
+: (linear-scan) ( insns -- insns' )
+    dup compute-live-intervals
+    machine-registers allocate-registers assign-registers ;
+
 : linear-scan ( mr -- mr' )
     [
-        [
-            dup compute-live-intervals
-            machine-registers allocate-registers
-            assign-registers
-        ] change-instructions
+        [ (linear-scan) ] change-instructions
         ! spill-counts get >>spill-counts
     ] with-scope ;

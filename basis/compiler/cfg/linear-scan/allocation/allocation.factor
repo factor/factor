@@ -24,15 +24,21 @@ SYMBOL: active-intervals
 : delete-active ( live-interval -- )
     active-intervals get delete ;
 
+: expired-interval? ( n interval -- ? )
+    [ end>> ] [ start>> ] bi or > ;
+
 : expire-old-intervals ( n -- )
     active-intervals get
-    swap '[ end>> _ < ] partition
-    active-intervals set
-    [ deallocate-register ] each ;
+    [ expired-interval? ] with partition
+    [ [ deallocate-register ] each ] [ active-intervals set ] bi* ;
 
 : expire-old-uses ( n -- )
     active-intervals get
-    swap '[ uses>> dup peek _ < [ pop* ] [ drop ] if ] each ;
+    swap '[
+        uses>> [
+            dup peek _ < [ pop* ] [ drop ] if
+        ] unless-empty
+    ] each ;
 
 : update-state ( live-interval -- )
     start>> [ expire-old-intervals ] [ expire-old-uses ] bi ;
@@ -59,13 +65,7 @@ SYMBOL: progress
     unhandled-intervals get heap-push-all ;
 
 : assign-free-register ( live-interval registers -- )
-    #! If the live interval does not have any uses, it means it
-    #! will be spilled immediately, so it still needs a register
-    #! to compute the new value, but we don't add the interval
-    #! to the active set and we don't remove the register from
-    #! the free list.
-    over uses>> empty?
-    [ peek >>reg drop ] [ pop >>reg add-active ] if ;
+    pop >>reg add-active ;
 
 ! Spilling
 SYMBOL: spill-counts
@@ -75,7 +75,9 @@ SYMBOL: spill-counts
 
 : interval-to-spill ( -- live-interval )
     #! We spill the interval with the most distant use location.
-    active-intervals get unclip-slice [
+    active-intervals get
+    [ uses>> empty? not ] filter
+    unclip-slice [
         [ [ uses>> peek ] bi@ > ] most
     ] reduce ;
 
@@ -95,15 +97,16 @@ SYMBOL: spill-counts
 
 : assign-spill ( before after -- before after )
     #! If it has been spilled already, reuse spill location.
-    over reload-from>> [ next-spill-location ] unless*
+    USE: cpu.architecture ! XXX
+    over reload-from>>
+    [ int-regs next-spill-location ] unless*
     tuck [ >>spill-to ] [ >>reload-from ] 2bi* ;
 
 : split-and-spill ( live-interval -- before after )
     dup split-interval [ record-split ] [ assign-spill ] 2bi ;
 
 : reuse-register ( new existing -- )
-    reg>> >>reg
-    dup uses>> empty? [ deallocate-register ] [ add-active ] if ;
+    reg>> >>reg add-active ;
 
 : spill-existing ( new existing -- )
     #! Our new interval will be used before the active interval

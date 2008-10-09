@@ -2,6 +2,8 @@ IN: compiler.cfg.linear-scan.tests
 USING: tools.test random sorting sequences sets hashtables assocs
 kernel fry arrays splitting namespaces math accessors vectors
 math.order
+cpu.architecture
+compiler.cfg.instructions
 compiler.cfg.registers
 compiler.cfg.linear-scan
 compiler.cfg.linear-scan.live-intervals
@@ -103,3 +105,17 @@ SYMBOL: max-uses
 USING: math.private compiler.cfg.debugger ;
 
 [ ] [ [ float+ float>fixnum 3 fixnum*fast ] test-mr first linear-scan drop ] unit-test
+
+[ f ] [
+    T{ ##allot
+        f
+        T{ vreg f int-regs 1 }
+        40
+        array
+        object
+        T{ vreg f int-regs 2 }
+        T{ vreg f int-regs 3 }
+        f
+    } clone
+    1array (linear-scan) first regs>> values all-equal?
+] unit-test

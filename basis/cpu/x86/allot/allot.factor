@@ -12,34 +12,34 @@ M:: x86 %write-barrier ( src temp -- )
     ! Mark the card
     src card-bits SHR
     "cards_offset" f temp %alien-global
-    temp temp [+] card-mark <byte> MOV
+    temp src [+] card-mark <byte> MOV
 
     ! Mark the card deck
-    temp deck-bits card-bits - SHR
+    src deck-bits card-bits - SHR
     "decks_offset" f temp %alien-global
-    temp temp [+] card-mark <byte> MOV ;
+    temp src [+] card-mark <byte> MOV ;
 
 : load-zone-ptr ( reg -- )
     #! Load pointer to start of zone array
     0 MOV "nursery" f rc-absolute-cell rel-dlsym ;
 
-: load-allot-ptr ( temp -- )
-    [ load-zone-ptr ] [ PUSH ] [ dup cell [+] MOV ] tri ;
+: load-allot-ptr ( nursery-ptr allot-ptr -- )
+    [ drop load-zone-ptr ] [ swap cell [+] MOV ] 2bi ;
 
-: inc-allot-ptr ( n temp -- )
-    [ POP ] [ cell [+] swap 8 align ADD ] bi ;
+: inc-allot-ptr ( nursery-ptr n -- )
+    [ cell [+] ] dip 8 align ADD ;
 
 : store-header ( temp type -- )
-    [ 0 [+] ] [ type-number tag-fixnum ] bi* MOV ;
+    [ [] ] [ type-number tag-fixnum ] bi* MOV ;
 
-: store-tagged ( dst temp tag -- )
-    dupd tag-number OR MOV ;
+: store-tagged ( dst tag -- )
+    tag-number OR ;
 
-M:: x86 %allot ( dst size type tag temp -- )
-    temp load-allot-ptr
-    temp type store-header
-    temp size inc-allot-ptr
-    dst temp store-tagged ;
+M:: x86 %allot ( dst size type tag nursery-ptr -- )
+    nursery-ptr dst load-allot-ptr
+    dst type store-header
+    dst tag store-tagged
+    nursery-ptr size inc-allot-ptr ;
 
 M: x86 %gc ( -- )
     "end" define-label
@@ -130,10 +130,11 @@ M:: x86 %box-alien ( dst src temp -- )
 
 \ fixnum>bignum [
     "x" operand %untag-fixnum
-    "x" operand dup "scratch" operand %allot-bignum-signed-1
+    "y" operand "x" operand "scratch" operand %allot-bignum-signed-1
 ] T{ template
     { input { { f "x" } } }
-    { scratch { { f "scratch" } } }
-    { output { "x" } }
+    { scratch { { f "y" } { f "scratch" } } }
+    { output { "y" } }
+    { clobber { "x" } }
     { gc t }
 } define-intrinsic
