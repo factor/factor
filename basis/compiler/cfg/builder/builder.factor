@@ -40,6 +40,7 @@ SYMBOL: procedures
 SYMBOL: current-word
 SYMBOL: current-label
 SYMBOL: loops
+SYMBOL: first-basic-block
 
 ! Basic block after prologue, makes recursion faster
 SYMBOL: current-label-start
@@ -68,9 +69,6 @@ GENERIC: emit-node ( node -- next )
     [ current-node emit-node check-basic-block ] iterate-nodes
     finalize-phantoms ;
 
-: remember-loop ( label -- )
-    basic-block get swap loops get set-at ;
-
 : begin-word ( -- )
     #! We store the basic block after the prologue as a loop
     #! labelled by the current word, so that self-recursive
@@ -79,7 +77,7 @@ GENERIC: emit-node ( node -- next )
     ##prologue
     ##branch
     begin-basic-block
-    current-label get remember-loop ;
+    basic-block get first-basic-block set ;
 
 : (build-cfg) ( nodes word label -- )
     [
@@ -108,8 +106,9 @@ SYMBOL: +if-intrinsics+
 : emit-call ( word -- next )
     finalize-phantoms
     {
-        { [ tail-call? not ] [ ##simple-stack-frame ##call iterate-next ] }
         { [ dup loops get key? ] [ loops get at local-recursive-call ] }
+        { [ tail-call? not ] [ ##simple-stack-frame ##call iterate-next ] }
+        { [ dup current-label get eq? ] [ drop first-basic-block get local-recursive-call ] }
         [ ##epilogue ##jump stop-iterating ]
     } cond ;
 
@@ -117,6 +116,9 @@ SYMBOL: +if-intrinsics+
 : compile-recursive ( node -- next )
     [ label>> id>> emit-call ]
     [ [ child>> ] [ label>> word>> ] [ label>> id>> ] tri (build-cfg) ] bi ;
+
+: remember-loop ( label -- )
+    basic-block get swap loops get set-at ;
 
 : compile-loop ( node -- next )
     finalize-phantoms
@@ -299,7 +301,7 @@ M: #return emit-node
 M: #return-recursive emit-node
     finalize-phantoms
     label>> id>> loops get key?
-    [ ##epilogue ##return ] unless stop-iterating ;
+    [ iterate-next ] [ ##epilogue ##return stop-iterating ] if ;
 
 ! #terminate
 M: #terminate emit-node
