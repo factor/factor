@@ -6,13 +6,22 @@ math.functions math.parser peg.ebnf sequences strings vectors ;
 
 IN: time
 
-: timestring ( timestamp -- string ) 
+: >timestring ( timestamp -- string ) 
     [ hour>> ] keep [ minute>> ] keep second>> 3array
     [ number>string 2 CHAR: 0 pad-left ] map ":" join ; inline
 
-: datestring ( timestamp -- string )
+: >datestring ( timestamp -- string )
     [ month>> ] keep [ day>> ] keep year>> 3array
     [ number>string 2 CHAR: 0 pad-left ] map "/" join ; inline
+
+: week-of-year-sunday ( timestamp -- n )
+    dup clone 1 >>month 1 >>day day-of-week dup 0 > [ 7 swap - ] when 
+    [ day-of-year ] dip 2dup < [ 0 2nip ] [ - 7 / 1+ >fixnum ] if ;
+
+: week-of-year-monday ( timestamp -- n )
+    dup clone 1 >>month 1 >>day day-of-week dup 1 > [ 7 swap - ] when 
+    [ day-of-year ] dip 2dup < [ 0 2nip ] [ - 7 / 1+ >fixnum ] if ;
+
 
 <PRIVATE
 
@@ -35,8 +44,8 @@ fmt-S     = "S"                  => [[ [ dup second>> round number>string 2 CHAR
 fmt-U     = "U"                  => [[ [ "Not yet implemented" throw ] ]] 
 fmt-w     = "w"                  => [[ [ dup day-of-week number>string ] ]] 
 fmt-W     = "W"                  => [[ [ "Not yet implemented" throw ] ]] 
-fmt-x     = "x"                  => [[ [ dup datestring ] ]] 
-fmt-X     = "X"                  => [[ [ dup timestring ] ]] 
+fmt-x     = "x"                  => [[ [ dup >datestring ] ]] 
+fmt-X     = "X"                  => [[ [ dup >timestring ] ]] 
 fmt-y     = "y"                  => [[ [ dup year>> 100 mod number>string ] ]] 
 fmt-Y     = "Y"                  => [[ [ dup year>> number>string ] ]] 
 fmt-Z     = "Z"                  => [[ [ "Not yet implemented" throw ] ]] 
