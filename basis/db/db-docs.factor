@@ -26,10 +26,6 @@ HELP: dispose-statements
 { $values { "assoc" assoc } }
 { $description "Disposes an associative list of statements." } ;
 
-HELP: db-dispose
-{ $values { "db" db } }
-{ $description "Disposes of all the statements stored in the " { $link db } " object." } ;
-
 HELP: statement
 { $description "A " { $snippet "statement" } " stores the information about a statemen, such as the SQL statement text, the in/out parameters, and type information." } ;
 
@@ -285,7 +281,7 @@ ARTICLE: "db-custom-database-combinators" "Custom database combinators"
 { $code <"
 USING: db.sqlite db io.files ;
 : with-sqlite-db ( quot -- )
-    "my-database.db" temp-file <sqlite-db> swap with-db ;"> } 
+    "my-database.db" temp-file <sqlite-db> swap with-db ; inline"> } 
 
 "PostgreSQL example combinator:"
 { $code <" USING: db.postgresql db ;
@@ -296,7 +292,7 @@ USING: db.sqlite db io.files ;
         "erg" >>username
         "secrets?" >>password
         "factor-test" >>database
-    swap with-db ;">
+    swap with-db ; inline">
 } ;
 
 ABOUT: "db"

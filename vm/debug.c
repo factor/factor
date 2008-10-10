@@ -325,6 +325,12 @@ void find_code_references(CELL look_for_)
 
 void factorbug(void)
 {
+	if(fep_disabled)
+	{
+		printf("Low level debugger disabled\n");
+		exit(1);
+	}
+
 	open_console();
 
 	printf("Starting low level debugger...\n");
@@ -366,6 +372,8 @@ void factorbug(void)
 				dump stacks. This is useful for builder and
 				other cases where Factor is run with stdin
 				redirected to /dev/null */
+				fep_disabled = true;
+
 				print_datastack();
 				print_retainstack();
 				print_callstack();

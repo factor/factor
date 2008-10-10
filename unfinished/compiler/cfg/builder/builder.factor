@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators hashtables kernel
 math fry namespaces make sequences words byte-arrays
-locals layouts
+locals layouts alien.c-types alien.structs
 stack-checker.inlining
 compiler.intrinsics
 compiler.tree
@@ -107,7 +107,7 @@ SYMBOL: +if-intrinsics+
 : emit-call ( word -- next )
     finalize-phantoms
     {
-        { [ tail-call? not ] [ 0 ##frame-required ##call iterate-next ] }
+        { [ tail-call? not ] [ ##simple-stack-frame ##call iterate-next ] }
         { [ dup loops get key? ] [ loops get at local-recursive-call ] }
         [ ##epilogue ##jump stop-iterating ]
     } cond ;
@@ -235,7 +235,7 @@ M: #dispatch emit-node
     (write-barrier)
 } [ t "intrinsic" set-word-prop ] each
 
-: allot-size ( #call -- n )
+: allot-size ( -- n )
     1 phantom-datastack get phantom-input first value>> ;
 
 :: emit-allot ( size type tag -- )
@@ -306,21 +306,41 @@ M: #return-recursive emit-node
 M: #terminate emit-node drop stop-iterating ;
 
 ! FFI
+: return-size ( ctype -- n )
+    #! Amount of space we reserve for a return value.
+    {
+        { [ dup c-struct? not ] [ drop 0 ] }
+        { [ dup large-struct? not ] [ drop 2 cells ] }
+        [ heap-size ]
+    } cond ;
+
+: <alien-stack-frame> ( params -- stack-frame )
+    stack-frame new
+        swap
+        [ return>> return-size >>return ]
+        [ alien-parameters parameter-sizes drop >>params ] bi
+        dup [ params>> ] [ return>> ] bi + >>size ;
+
+: alien-stack-frame ( node -- )
+    params>> <alien-stack-frame> ##stack-frame ;
+
+: emit-alien-node ( node quot -- next )
+    [ drop alien-stack-frame ]
+    [ [ params>> ] dip call ] 2bi
+    iterate-next ; inline
+
 M: #alien-invoke emit-node
-    params>>
-    [ alien-invoke-frame ##frame-required ]
-    [ ##alien-invoke iterate-next ]
-    bi ;
+    [ ##alien-invoke ] emit-alien-node ;
 
 M: #alien-indirect emit-node
-    params>>
-    [ alien-invoke-frame ##frame-required ]
-    [ ##alien-indirect iterate-next ]
-    bi ;
+    [ ##alien-indirect ] emit-alien-node ;
 
 M: #alien-callback emit-node
     params>> dup xt>> dup
-    [ init-phantoms ##alien-callback ] with-cfg-builder
+    [
+        init-phantoms
+        [ ##alien-callback ] emit-alien-node drop
+    ] with-cfg-builder
     iterate-next ;
 
 ! No-op nodes

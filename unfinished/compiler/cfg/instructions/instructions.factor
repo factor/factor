@@ -17,12 +17,19 @@ INSN: ##replace src loc ;
 INSN: ##inc-d n ;
 INSN: ##inc-r n ;
 
-! Calling convention
-INSN: ##return ;
-
 ! Subroutine calls
+TUPLE: stack-frame
+{ size integer }
+{ params integer }
+{ return integer }
+{ total-size integer } ;
+
+INSN: ##stack-frame stack-frame ;
+ : ##simple-stack-frame ( -- ) T{ stack-frame } ##stack-frame ;
 INSN: ##call word ;
 INSN: ##jump word ;
+INSN: ##return ;
+
 INSN: ##intrinsic quot defs-vregs uses-vregs ;
 
 ! Jump tables
@@ -87,7 +94,6 @@ M: ##intrinsic uses-vregs intrinsic-uses-vregs ;
 ! Instructions used by CFG IR only.
 INSN: ##prologue ;
 INSN: ##epilogue ;
-INSN: ##frame-required n ;
 
 INSN: ##branch ;
 INSN: ##branch-f < ##cond-branch ;
@@ -100,8 +106,8 @@ M: ##if-intrinsic defs-vregs intrinsic-defs-vregs ;
 M: ##if-intrinsic uses-vregs intrinsic-uses-vregs ;
 
 ! Instructions used by machine IR only.
-INSN: _prologue ;
-INSN: _epilogue ;
+INSN: _prologue stack-frame ;
+INSN: _epilogue stack-frame ;
 
 INSN: _label id ;
 

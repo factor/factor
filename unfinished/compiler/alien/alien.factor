@@ -1,15 +1,11 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel namespaces make math sequences layouts
-alien.c-types alien.structs compiler.backend ;
+alien.c-types alien.structs cpu.architecture ;
 IN: compiler.alien
 
-! Common utilities
-
 : large-struct? ( ctype -- ? )
-    dup c-struct? [
-        heap-size struct-small-enough? not
-    ] [ drop f ] if ;
+    dup c-struct? [ struct-small-enough? not ] [ drop f ] if ;
 
 : alien-parameters ( params -- seq )
     dup parameters>>
@@ -31,16 +27,3 @@ IN: compiler.alien
             [ parameter-align drop dup , ] keep stack-size +
         ] reduce cell align
     ] { } make ;
-
-: return-size ( ctype -- n )
-    #! Amount of space we reserve for a return value.
-    dup large-struct? [ heap-size ] [ drop 0 ] if ;
-
-: alien-stack-frame ( params -- n )
-    alien-parameters parameter-sizes drop ;
-    
-: alien-invoke-frame ( params -- n )
-    #! One cell is temporary storage, temp@
-    dup return>> return-size
-    swap alien-stack-frame +
-    cell + ;
