@@ -247,7 +247,9 @@ M: #dispatch emit-node
 
 : emit-write-barrier ( -- )
     phantom-pop dup >vreg fresh-object? [ drop ] [
-        int-regs next-vreg ##write-barrier
+        int-regs next-vreg
+        int-regs next-vreg
+        ##write-barrier
     ] if ;
 
 : emit-intrinsic ( word -- next )

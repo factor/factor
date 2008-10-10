@@ -7,17 +7,18 @@ compiler.constants compiler.cfg.templates compiler.cfg.builder
 compiler.codegen compiler.codegen.fixup ;
 IN: cpu.x86.allot
 
-M:: x86 %write-barrier ( src temp -- )
+M:: x86 %write-barrier ( src card# table -- )
     #! Mark the card pointed to by vreg.
     ! Mark the card
-    src card-bits SHR
-    "cards_offset" f temp %alien-global
-    temp src [+] card-mark <byte> MOV
+    card# src MOV
+    card# card-bits SHR
+    "cards_offset" f table %alien-global
+    table card# [+] card-mark <byte> MOV
 
     ! Mark the card deck
-    src deck-bits card-bits - SHR
-    "decks_offset" f temp %alien-global
-    temp src [+] card-mark <byte> MOV ;
+    card# deck-bits card-bits - SHR
+    "decks_offset" f table %alien-global
+    table card# [+] card-mark <byte> MOV ;
 
 : load-zone-ptr ( reg -- )
     #! Load pointer to start of zone array

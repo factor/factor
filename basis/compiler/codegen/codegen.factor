@@ -182,7 +182,10 @@ M: ##allot generate-insn
     %allot ;
 
 M: ##write-barrier generate-insn
-    [ src>> v>operand ] [ temp>> v>operand ] bi %write-barrier ;
+    [ src>> v>operand ]
+    [ card#>> v>operand ]
+    [ table>> v>operand ]
+    tri %write-barrier ;
 
 M: ##gc generate-insn drop %gc ;
 

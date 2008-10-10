@@ -49,7 +49,7 @@ INSN: ##box-alien < ##unary temp ;
 
 ! Memory allocation
 INSN: ##allot < ##nullary size type tag temp ;
-INSN: ##write-barrier src temp ;
+INSN: ##write-barrier src card# table ;
 INSN: ##gc ;
 
 ! FFI
@@ -62,7 +62,8 @@ GENERIC: uses-vregs ( insn -- seq )
 
 M: ##nullary defs-vregs dst>> >vreg 1array ;
 M: ##unary defs-vregs dst>> >vreg 1array ;
-M: ##write-barrier defs-vregs temp>> >vreg 1array ;
+M: ##write-barrier defs-vregs
+    [ card#>> >vreg ] [ table>> >vreg ] bi 2array ;
 
 : allot-defs-vregs ( insn -- seq )
     [ dst>> >vreg ] [ temp>> >vreg ] bi 2array ;
