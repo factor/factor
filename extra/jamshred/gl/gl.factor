@@ -41,8 +41,9 @@ IN: jamshred.gl
 : equally-spaced-radians ( n -- seq )
     #! return a sequence of n numbers between 0 and 2pi
     dup [ / pi 2 * * ] curry map ;
+
 : draw-segment-vertex ( segment theta -- )
-    over color>> gl-color segment-vertex-and-normal
+    over color>> set-color segment-vertex-and-normal
     gl-normal gl-vertex ;
 
 : draw-vertex-pair ( theta next-segment segment -- )

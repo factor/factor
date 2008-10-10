@@ -23,7 +23,7 @@ M: jamshred-gadget draw-gadget* ( gadget -- )
     ] [
         [ jamshred>> jamshred-update ]
         [ relayout-1 ]
-        [ yield jamshred-loop ] tri
+        [ 10 sleep yield jamshred-loop ] tri
     ] if ;
 
 : fullscreen ( gadget -- )
@@ -36,7 +36,7 @@ M: jamshred-gadget draw-gadget* ( gadget -- )
     [ fullscreen? not ] keep set-fullscreen* ;
 
 M: jamshred-gadget graft* ( gadget -- )
-    [ jamshred-loop ] in-thread drop ;
+    [ jamshred-loop ] curry in-thread ;
 
 M: jamshred-gadget ungraft* ( gadget -- )
     jamshred>> t swap (>>quit) ;

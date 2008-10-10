@@ -1,9 +1,15 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors colors combinators float-arrays jamshred.log jamshred.oint jamshred.sound jamshred.tunnel kernel locals math math.constants math.order math.ranges math.vectors math.matrices sequences shuffle system ;
+USING: accessors colors combinators float-arrays jamshred.log jamshred.oint jamshred.sound jamshred.tunnel kernel locals math math.constants math.order math.ranges math.vectors math.matrices sequences shuffle strings system ;
 IN: jamshred.player
 
-TUPLE: player < oint name sounds tunnel nearest-segment last-move speed ;
+TUPLE: player < oint
+    { name string }
+    { sounds sounds }
+    tunnel
+    nearest-segment
+    { last-move integer }
+    { speed float } ;
 
 ! speeds are in GL units / second
 : default-speed ( -- speed ) 1.0 ;
@@ -11,7 +17,7 @@ TUPLE: player < oint name sounds tunnel nearest-segment last-move speed ;
 
 : <player> ( name sounds -- player )
     [ F{ 0 0 5 } F{ 0 0 -1 } F{ 0 1 0 } F{ -1 0 0 } ] 2dip
-    f f f default-speed player boa ;
+    f f 0 default-speed player boa ;
 
 : turn-player ( player x-radians y-radians -- )
     >r over r> left-pivot up-pivot ;
@@ -69,6 +75,9 @@ TUPLE: player < oint name sounds tunnel nearest-segment last-move speed ;
 : distance-to-collision ( player -- distance )
     dup nearest-segment>> (distance-to-collision) ;
 
+: almost-to-collision ( player -- distance )
+    distance-to-collision 0.1 - dup 0 < [ drop 0 ] when ;
+
 : from ( player -- radius distance-from-centre )
     [ nearest-segment>> dup radius>> swap ] [ location>> ] bi
     distance-from-centre ;
@@ -93,14 +102,17 @@ TUPLE: player < oint name sounds tunnel nearest-segment last-move speed ;
         heading player update-nearest-segment2
         d-left d-to-move - player ] ;
 
-: move-toward-wall ( d-left player d-to-wall -- d-left' player )
-    over [ forward>> ] keep distance-to-heading-segment-area min
-    over forward>> move-player-on-heading ;
+: distance-to-move-freely ( player -- distance )
+    [ almost-to-collision ]
+    [ [ forward>> ] keep distance-to-heading-segment-area ] bi min ;
 
 : ?move-player-freely ( d-left player -- d-left' player )
     over 0 > [
-        dup distance-to-collision dup 0.2 > [ ! bug! should be 0, not 0.2
-            move-toward-wall ?move-player-freely
+        ! must make sure we are moving a significant distance, otherwise
+        ! we can recurse endlessly due to floating-point imprecision.
+        ! (at least I /think/ that's what causes it...)
+        dup distance-to-move-freely dup 0.1 > [
+            over forward>> move-player-on-heading ?move-player-freely
         ] [ drop ] if
     ] when ;
 

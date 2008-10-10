@@ -1,6 +1,6 @@
 ! Copyright (C) 2007, 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays combinators float-arrays kernel jamshred.oint locals math math.constants math.matrices math.order math.ranges math.vectors math.quadratic random sequences vectors ;
+USING: accessors arrays colors combinators float-arrays kernel jamshred.oint locals math math.constants math.matrices math.order math.ranges math.vectors math.quadratic random sequences vectors ;
 USE: tools.walker
 IN: jamshred.tunnel
 
@@ -13,7 +13,7 @@ C: <segment> segment
     [ number>> 1+ ] keep (>>number) ;
 
 : random-color ( -- color )
-    { 100 100 100 } [ random 100 / >float ] map { 1.0 } append ;
+    { 100 100 100 } [ random 100 / >float ] map first3 1.0 <rgba> ;
 
 : tunnel-segment-distance ( -- n ) 0.4 ;
 : random-rotation-angle ( -- theta ) pi 20 / ;
