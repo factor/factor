@@ -37,11 +37,11 @@ M: x86 %unbox-float ( dst src -- )
     { { float "x" } { float "y" } } define-if-intrinsic ;
 
 {
-    { float< JAE }
-    { float<= JA }
-    { float> JBE }
-    { float>= JB }
-    { float= JNE }
+    { float< JB }
+    { float<= JBE }
+    { float> JA }
+    { float>= JAE }
+    { float= JE }
 } [
     first2 define-float-jump
 ] each
