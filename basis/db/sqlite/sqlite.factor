@@ -178,6 +178,7 @@ M: sqlite-db persistent-table ( -- assoc )
         { +random-id+ { "integer" "integer" f } }
         { +foreign-id+ { "integer" "integer" "references" } }
 
+        { +on-update+ { f f "on update" } }
         { +on-delete+ { f f "on delete" } }
         { +restrict+ { f f "restrict" } }
         { +cascade+ { f f "cascade" } }

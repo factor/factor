@@ -26,8 +26,8 @@ SINGLETONS: +db-assigned-id+ +user-assigned-id+ +random-id+ ;
 UNION: +primary-key+ +db-assigned-id+ +user-assigned-id+ +random-id+ ;
 
 SYMBOLS: +autoincrement+ +serial+ +unique+ +default+ +null+ +not-null+
-+foreign-id+ +has-many+ +on-delete+ +restrict+ +cascade+ +set-null+
-+set-default+ ;
++foreign-id+ +has-many+ +on-update+ +on-delete+ +restrict+ +cascade+
++set-null+ +set-default+ ;
 
 SYMBOL: IGNORE
 
