@@ -75,7 +75,7 @@ SYMBOL: +failed+
 
 : save-asm ( asm -- )
     [ [ code>> ] [ label>> ] bi compiled get set-at ]
-    [ calls>> [ queue-compile ] each ]
+    [ calls>> [ maybe-compile ] each ]
     bi ;
 
 : backend ( nodes word -- )
