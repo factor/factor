@@ -20,69 +20,44 @@ IN: cpu.x86.intrinsics
 } define-intrinsic
 
 ! Slots
-: %slot-literal-known-tag ( -- op )
+: %constant-slot ( -- op )
     "obj" operand
-    "n" literal cells
-    "obj" operand-tag - [+] ;
+    "n" literal cells "tag" literal - [+] ;
 
-: %slot-literal-any-tag ( -- op )
-    "obj" operand %untag
-    "obj" operand "n" literal cells [+] ;
-
-: %slot-any ( -- op )
-    "obj" operand %untag
+: %computed-slot ( -- op )
     "n" operand fixnum>slot@
-    "obj" operand "n" operand [+] ;
+    "n" operand "obj" operand ADD
+    "n" operand "tag" literal neg [+] ;
 
-\ slot {
-    ! Slot number is literal and the tag is known
+\ (slot) {
     {
-        [ "val" operand %slot-literal-known-tag MOV ] T{ template
-            { input { { f "obj" known-tag } { small-slot "n" } } }
+        [ "val" operand %constant-slot MOV ] T{ template
+            { input { { f "obj" } { small-slot "n" } { small-slot "tag" } } }
             { scratch { { f "val" } } }
             { output { "val" } }
         }
     }
-    ! Slot number is literal
     {
-        [ "obj" operand %slot-literal-any-tag MOV ] T{ template
-            { input { { f "obj" } { small-slot "n" } } }
-            { output { "obj" } }
-        }
-    }
-    ! Slot number in a register
-    {
-        [ "obj" operand %slot-any MOV ] T{ template
-            { input { { f "obj" } { f "n" } } }
-            { output { "obj" } }
+        [ "val" operand %computed-slot MOV ] T{ template
+            { input { { f "obj" } { f "n" } { small-slot "tag" } } }
+            { scratch { { f "val" } } }
+            { output { "val" } }
             { clobber { "n" } }
         }
     }
 } define-intrinsics
 
 \ (set-slot) {
-    ! Slot number is literal and the tag is known
     {
-        [ %slot-literal-known-tag "val" operand MOV ] T{ template
-            { input { { f "val" } { f "obj" known-tag } { small-slot "n" } } }
-            { scratch { { f "scratch" } } }
+        [ %constant-slot "val" operand MOV ] T{ template
+            { input { { f "val" } { f "obj" } { small-slot "n" } { small-slot "tag" } } }
             { clobber { "obj" } }
         }
     }
-    ! Slot number is literal
     {
-        [ %slot-literal-any-tag "val" operand MOV ] T{ template
-            { input { { f "val" } { f "obj" } { small-slot "n" } } }
-            { scratch { { f "scratch" } } }
-            { clobber { "obj" } }
-        }
-    }
-    ! Slot number in a register
-    {
-        [ %slot-any "val" operand MOV ] T{ template
-            { input { { f "val" } { f "obj" } { f "n" } } }
-            { scratch { { f "scratch" } } }
-            { clobber { "obj" "n" } }
+        [ %computed-slot "val" operand MOV ] T{ template
+            { input { { f "val" } { f "obj" } { small-slot "n" } { small-slot "tag" } } }
+            { clobber { "n" } }
         }
     }
 } define-intrinsics
