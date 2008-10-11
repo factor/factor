@@ -9,8 +9,6 @@ IN: compiler.cfg.stacks
 
 ! Converting stack operations into register operations, while
 ! doing a bit of optimization along the way.
-SYMBOL: known-tag
-
 PREDICATE: small-slot < integer cells small-enough? ;
 
 PREDICATE: small-tagged < integer tag-fixnum small-enough? ;

@@ -73,11 +73,7 @@ TUPLE: template input output scratch clobber gc ;
     } cond ;
 
 : class-matches? ( actual expected -- ? )
-    {
-        { f [ drop t ] }
-        { known-tag [ dup [ class-tag >boolean ] when ] }
-        [ class<= ]
-    } case ;
+    dup [ class<= ] [ 2drop t ] if ;
 
 : spec-matches? ( value spec -- ? )
     2dup first value-matches?
