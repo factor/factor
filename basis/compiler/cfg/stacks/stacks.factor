@@ -56,15 +56,6 @@ M: loc move-spec drop loc ;
 M: f move-spec drop loc ;
 M: f value-class* ;
 
-M: cached move-spec drop cached ;
-M: cached live-loc? loc>> live-loc? ;
-M: cached (lazy-load) >r vreg>> r> (lazy-load) ;
-M: cached (eager-load) >r vreg>> r> (eager-load) ;
-M: cached lazy-store
-    2dup loc>> live-loc?
-    [ "live-locs" get at ##move ] [ 2drop ] if ;
-M: cached minimal-ds-loc* loc>> minimal-ds-loc* ;
-
 M: tagged move-spec drop f ;
 
 M: unboxed-alien move-spec class ;
@@ -278,9 +269,7 @@ M: loc lazy-store
 
 : finalize-vregs ( -- )
     #! Store any vregs to their final stack locations.
-    [
-        dup loc? over cached? or [ 2drop ] [ ##move ] if
-    ] each-loc ;
+    [ dup loc? [ 2drop ] [ ##move ] if ] each-loc ;
 
 : clear-phantoms ( -- )
     [ stack>> delete-all ] each-phantom ;
@@ -289,19 +278,6 @@ M: loc lazy-store
     finalize-locs finalize-vregs clear-phantoms ;
 
 ! Loading stacks to vregs
-: vreg-substitution ( value vreg -- pair )
-    dupd <cached> 2array ;
-
-: substitute-vreg? ( old new -- ? )
-    #! We don't substitute locs for float or alien vregs,
-    #! since in those cases the boxing overhead might kill us.
-    vreg>> tagged? >r loc? r> and ;
-
-: substitute-vregs ( values vregs -- )
-    [ vreg-substitution ] 2map
-    [ substitute-vreg? ] assoc-filter >hashtable
-    '[ stack>> _ substitute-here ] each-phantom ;
-
 : set-value-classes ( classes -- )
     phantom-datastack get
     over length over add-locs
@@ -350,5 +326,4 @@ M: loc lazy-store
     phantom-retainstack get phantom-input drop ;
 
 : phantom-pop ( -- vreg )
-    1 phantom-datastack get phantom-input dup first f (lazy-load)
-    [ 1array substitute-vregs ] keep ;
+    1 phantom-datastack get phantom-input first f (lazy-load) ;

@@ -36,9 +36,13 @@ ERROR: missing-intrinsic ;
 \ (wrapper) { } { wrapper } define-primitive
 \ (wrapper) make-flushable
 
-: (set-slot) ( val obj n -- ) missing-intrinsic ;
+: (slot) ( obj n tag# -- val ) missing-intrinsic ;
 
-\ (set-slot) { object object fixnum } { } define-primitive
+\ (slot) { object fixnum fixnum } { object } define-primitive
+
+: (set-slot) ( val obj n tag# -- ) missing-intrinsic ;
+
+\ (set-slot) { object object fixnum fixnum } { } define-primitive
 
 : (write-barrier) ( obj -- ) missing-intrinsic ;
 

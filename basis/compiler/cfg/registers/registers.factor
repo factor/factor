@@ -38,20 +38,6 @@ TUPLE: rs-loc < loc ;
 
 INSTANCE: loc value
 
-! A stack location which has been loaded into a register. To
-! read the location, we just read the register, but when time
-! comes to save it back to the stack, we know the register just
-! contains a stack value so we don't have to redundantly write
-! it back.
-TUPLE: cached loc vreg ;
-C: <cached> cached
-
-M: cached set-value-class vreg>> set-value-class ;
-M: cached value-class* vreg>> value-class* ;
-M: cached >vreg vreg>> >vreg ;
-
-INSTANCE: cached value
-
 ! A tagged pointer
 TUPLE: tagged vreg class ;
 : <tagged> ( vreg -- tagged ) f tagged boa ;

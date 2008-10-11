@@ -124,10 +124,25 @@ MEMO: <wrapper>-expansion ( -- quot )
 : expand-<wrapper> ( #call -- nodes )
     drop <wrapper>-expansion ;
 
+MEMO: slot-expansion ( tag -- nodes )
+    '[ _ (slot) ] splice-final ;
+
+: value-tag ( node value -- n )
+    node-value-info class>> class-tag ;
+
+: expand-slot ( #call -- nodes )
+    dup dup in-d>> first value-tag [ slot-expansion ] [ ] ?if ;
+
+MEMO: set-slot-expansion ( write-barrier? tag# -- nodes )
+    [ '[ [ _ (set-slot) ] [ drop (write-barrier) ] 2bi ] ]
+    [ '[ _ (set-slot) ] ]
+    bi ? splice-final ;
+
 : expand-set-slot ( #call -- nodes )
-    dup in-d>> first node-value-info class>> immediate class<=
-    [ (set-slot) ] [ over >r (set-slot) r> (write-barrier) ] ?
-    splice-final ;
+    dup dup in-d>> second value-tag [
+        [ dup in-d>> first node-value-info class>> immediate class<= not ] dip
+        set-slot-expansion
+    ] when* ;
 
 M: #call finalize*
     {
@@ -141,6 +156,7 @@ M: #call finalize*
                 { \ <complex> [ expand-<complex> ] }
                 { \ <wrapper> [ expand-<wrapper> ] }
                 { \ set-slot [ expand-set-slot ] }
+                { \ slot [ expand-slot ] }
                 [ drop ]
             } case
         ]
