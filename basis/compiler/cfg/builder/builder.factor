@@ -178,11 +178,14 @@ M: #if emit-node
     [ finalize-phantoms ##epilogue ] 2dip ##dispatch
     dispatch-branches init-phantoms ;
 
+: <dispatch-block> ( -- word )
+    gensym dup t "inlined-block" set-word-prop ;
+
 M: #dispatch emit-node
     tail-call? [
         emit-dispatch stop-iterating
     ] [
-        current-word get gensym [
+        current-word get <dispatch-block> [
             [
                 begin-word
                 emit-dispatch
@@ -329,12 +332,9 @@ M: #terminate emit-node
         [ alien-parameters parameter-sizes drop >>params ] bi
         dup [ params>> ] [ return>> ] bi + >>size ;
 
-: alien-stack-frame ( node -- )
-    params>> <alien-stack-frame> ##stack-frame ;
-
 : emit-alien-node ( node quot -- next )
-    [ drop alien-stack-frame ]
-    [ [ params>> ] dip call ] 2bi
+    [ params>> ] dip
+    [ drop <alien-stack-frame> ##stack-frame ] [ call ] 2bi
     iterate-next ; inline
 
 M: #alien-invoke emit-node
@@ -344,7 +344,7 @@ M: #alien-indirect emit-node
     [ ##alien-indirect ] emit-alien-node ;
 
 M: #alien-callback emit-node
-    params>> dup xt>> dup
+    dup params>> xt>> dup
     [
         init-phantoms
         [ ##alien-callback ] emit-alien-node drop
