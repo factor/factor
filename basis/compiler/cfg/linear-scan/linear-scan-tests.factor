@@ -114,7 +114,6 @@ USING: math.private compiler.cfg.debugger ;
         array
         object
         T{ vreg f int-regs 2 }
-        T{ vreg f int-regs 3 }
         f
     } clone
     1array (linear-scan) first regs>> values all-equal?
