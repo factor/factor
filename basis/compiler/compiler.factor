@@ -73,9 +73,14 @@ SYMBOL: +failed+
         ] [ drop ] if
     ] tri ;
 
+! Only switch this off for debugging.
+SYMBOL: compile-dependencies?
+
+t compile-dependencies? set-global
+
 : save-asm ( asm -- )
     [ [ code>> ] [ label>> ] bi compiled get set-at ]
-    [ calls>> [ maybe-compile ] each ]
+    [ compile-dependencies? get [ calls>> [ maybe-compile ] each ] [ drop ] if ]
     bi ;
 
 : backend ( nodes word -- )
