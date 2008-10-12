@@ -78,22 +78,21 @@ SYMBOL: quotations
     V{ } clone meta-r set
     d-in [ ] change ;
 
-: infer-branch ( literal quot -- namespace )
+: infer-branch ( literal -- namespace )
     [
         copy-inference
         nest-visitor
-        [ [ value>> quotation set ] [ infer-literal-quot ] bi ] dip
+        [ value>> quotation set ] [ infer-literal-quot ] bi
         check->r
-        call
     ] H{ } make-assoc ; inline
 
-: infer-branches ( branches quot -- input children data )
-    [ pop-d ] 2dip
-    [ infer-branch ] curry map
+: infer-branches ( branches -- input children data )
+    [ pop-d ] dip
+    [ infer-branch ] map
     [ stack-visitor branch-variable ] keep ; inline
 
 : (infer-if) ( branches -- )
-    [ ] infer-branches
+    infer-branches
     [ first2 #if, ] dip compute-phi-function ;
 
 : infer-if ( -- )
@@ -108,5 +107,5 @@ SYMBOL: quotations
 
 : infer-dispatch ( -- )
     pop-literal nip [ <literal> ] map
-    [ f #return, ] infer-branches
+    infer-branches
     [ #dispatch, ] dip compute-phi-function ;

@@ -82,7 +82,8 @@ GENERIC: emit-node ( node -- next )
 : (build-cfg) ( nodes word label -- )
     [
         begin-word
-        [ emit-nodes ] with-node-iterator
+        V{ } clone node-stack set
+        emit-nodes
     ] with-cfg-builder ;
 
 : build-cfg ( nodes word -- procedures )
@@ -152,14 +153,17 @@ M: #if emit-node
 
 ! #dispatch
 : dispatch-branch ( nodes word -- label )
-    #! The order here is important, dispatch-branches must
-    #! run after ##dispatch, so that each branch gets the
-    #! correct register state
     gensym [
         [
+            V{ } clone node-stack set
             init-phantoms
             ##prologue
-            [ emit-nodes ] with-node-iterator
+            emit-nodes
+            basic-block get [
+                ##epilogue
+                ##return
+                end-basic-block
+            ] when
         ] with-cfg-builder
     ] keep ;
 

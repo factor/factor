@@ -19,9 +19,6 @@ SYMBOL: node-stack
         [ swap >node call node> drop ] keep iterate-nodes
     ] if ; inline recursive
 
-: with-node-iterator ( quot -- )
-    >r V{ } clone node-stack r> with-variable ; inline
-
 DEFER: (tail-call?)
 
 : tail-phi? ( cursor -- ? )
