@@ -56,7 +56,7 @@ IN: cpu.x86.intrinsics
     }
     {
         [ %computed-slot "val" operand MOV ] T{ template
-            { input { { f "val" } { f "obj" } { small-slot "n" } { small-slot "tag" } } }
+            { input { { f "val" } { f "obj" } { f "n" } { small-slot "tag" } } }
             { clobber { "n" } }
         }
     }
