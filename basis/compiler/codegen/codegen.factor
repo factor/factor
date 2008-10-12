@@ -198,6 +198,8 @@ M: single-float-regs reg-size drop 4 ;
 
 M: double-float-regs reg-size drop 8 ;
 
+M: stack-params reg-size drop "void*" heap-size ;
+
 GENERIC: reg-class-variable ( register-class -- symbol )
 
 M: reg-class reg-class-variable ;
