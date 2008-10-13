@@ -472,7 +472,12 @@ TUPLE: exam id name score ;
         T{ exam } select-tuples
     ] unit-test
 
-    [ 4 ] [ T{ exam } count-tuples ] unit-test ;
+    [ 4 ] [ T{ exam } count-tuples ] unit-test
+
+    [ ] [ T{ exam { score 10 } } insert-tuple ] unit-test
+
+    [ 10 ]
+    [ T{ exam { name NULL } } select-tuples first score>> ] unit-test ;
 
 TUPLE: bignum-test id m n o ;
 : <bignum-test> ( m n o -- obj )
