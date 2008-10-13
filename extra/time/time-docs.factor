@@ -27,9 +27,9 @@ ARTICLE: "strftime" "Formatted timestamps"
     { "%M"     "Minute as a decimal number [00,59]." }
     { "%p"     "Either AM or PM." }
     { "%S"     "Second as a decimal number [00,59]." }
-    { "%U"     "Week number of the year (Sunday as the first day of the week) as a decimal numberb [00,53]." }
+    { "%U"     "Week number of the year (Sunday as the first day of the week) as a decimal number [00,53]." }
     { "%w"     "Weekday as a decimal number [0(Sunday),6]." }
-    { "%W"     "Week number of the year (Monday as the first day of the week) as a decimal numberb [00,53]." }
+    { "%W"     "Week number of the year (Monday as the first day of the week) as a decimal number [00,53]." }
     { "%x"     "Date representation." }
     { "%X"     "Time representation." }
     { "%y"     "Year without century as a decimal number [00,99]." }
