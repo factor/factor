@@ -107,13 +107,13 @@ MEMO: <byte-array>-expansion ( n -- quot )
     first-literal <byte-array>-expansion ;
 
 MEMO: <ratio>-expansion ( -- quot )
-    [ (ratio) [ 1 set-slot ] keep [ 2 set-slot ] keep ] splice-final ;
+    [ (ratio) [ 2 set-slot ] keep [ 1 set-slot ] keep ] splice-final ;
 
 : expand-<ratio> ( #call -- nodes )
     drop <ratio>-expansion ;
 
 MEMO: <complex>-expansion ( -- quot )
-    [ (complex) [ 1 set-slot ] keep [ 2 set-slot ] keep ] splice-final ;
+    [ (complex) [ 2 set-slot ] keep [ 1 set-slot ] keep ] splice-final ;
 
 : expand-<complex> ( #call -- nodes )
     drop <complex>-expansion ;

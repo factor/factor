@@ -188,7 +188,7 @@ HOOK: %unbox-f cpu ( dst src -- )
 
 HOOK: %unbox-any-c-ptr cpu ( dst src -- )
 
-HOOK: %box-alien cpu ( dst src temp1 temp2 -- )
+HOOK: %box-alien cpu ( dst src temp -- )
 
 ! Allocation
 HOOK: %allot cpu ( dst size type tag temp -- )
