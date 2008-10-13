@@ -175,16 +175,32 @@ M: download-failed error.
     [ [ % ] with-http-request ] B{ } make
     over content-charset>> decode ;
 
+: <client-request> ( url -- request )
+    <request> swap >url ensure-port >>url ;
+
+: <client-data-request> ( data url -- request )
+    <client-request> swap >>post-data ;
+
 : <get-request> ( url -- request )
-    <request>
-        "GET" >>method
-        swap >url ensure-port >>url ;
+    <client-request> "GET" >>method ;
 
 : http-get ( url -- response data )
     <get-request> http-request ;
 
 : with-http-get ( url quot -- response )
     [ <get-request> ] dip with-http-request ; inline
+
+: <delete-request> ( url -- request )
+    <client-request> "DELETE" >>method ;
+
+: http-delete ( url -- response data )
+    <delete-request> http-request ;
+
+: <trace-request> ( url -- request )
+    <client-request> "TRACE" >>method ;
+
+: http-trace ( url -- response data )
+    <trace-request> http-request ;
 
 : download-name ( url -- name )
     present file-name "?" split1 drop "/" ?tail drop ;
@@ -196,16 +212,13 @@ M: download-failed error.
     dup download-name download-to ;
 
 : <post-request> ( post-data url -- request )
-    <request>
-        "POST" >>method
-        swap >url ensure-port >>url
-        swap >>post-data ;
+    <client-data-request> "POST" >>method ;
 
 : http-post ( post-data url -- response data )
     <post-request> http-request ;
 
 : <put-request> ( data url -- request )
-    <post-request> "PUT" >>method ;
+    <client-data-request> "PUT" >>method ;
 
 : http-put ( data url -- response data )
     <put-request> http-request ;

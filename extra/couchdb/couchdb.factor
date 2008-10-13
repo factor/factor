@@ -1,14 +1,16 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs continuations debugger http.client io json.reader json.writer kernel sequences strings ;
+USING: accessors arrays assocs continuations debugger http.client io json.reader json.writer kernel sequences strings urls ;
 IN: couchdb
 
-TUPLE: server { base string initial: "http://localhost:5984" } ;
+TUPLE: db < url { url url initial: URL" http://localhost:5984" } ;
+C: <db> db
 
-TUPLE: db { server server } { name string } ;
+! : <default-db> 
 
+: set-db-name ( db name 
 : db-path ( db -- path )
-    [ server>> base>> ] [ name>> ] bi "/" swap 3array concat ;
+    [ url>> ] [ name>> ] bi "/" swap 3array concat ;
 
 TUPLE: couchdb-error { data assoc } ;
 C: <couchdb-error> couchdb-error
@@ -41,3 +43,6 @@ USE: prettyprint
     (create-db) [ drop ] [
         <couchdb-error> dup db-exists-error? [ drop ] [ throw ] if
     ] if ;
+
+: delete-db ( db -- )
+    
