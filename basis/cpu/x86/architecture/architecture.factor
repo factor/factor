@@ -149,7 +149,7 @@ M: x86 small-enough? ( n -- ? )
 
 : %tag-fixnum ( reg -- ) tag-bits get SHL ;
 
-M: x86 %return ( -- ) 0 %unwind ;
+M: x86 %return ( -- ) 0 RET ;
 
 ! Alien intrinsics
 M: x86 %unbox-byte-array ( dst src -- )

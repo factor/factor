@@ -428,23 +428,14 @@ TUPLE: callback-context ;
 
 : %unnest-stacks ( -- ) "unnest_stacks" f %alien-invoke ;
 
-: callback-unwind ( params -- n )
-    {
-        { [ dup abi>> "stdcall" = ] [ <alien-stack-frame> size>> ] }
-        { [ dup return>> large-struct? ] [ drop 4 ] }
-        [ drop 0 ]
-    } cond ;
-
-: %callback-return ( params -- )
+M: ##callback-return generate-insn
     #! All the extra book-keeping for %unwind is only for x86.
     #! On other platforms its an alias for %return.
-    dup alien-return
-    [ %unnest-stacks ] [ %callback-value ] if-void
-    callback-unwind %unwind ;
+    params>> %callback-return ;
 
 M: ##alien-callback generate-insn
     params>>
     [ registers>objects ]
     [ wrap-callback-quot %alien-callback ]
-    [ %callback-return ]
+    [ alien-return [ %unnest-stacks ] [ %callback-value ] if-void ]
     tri ;

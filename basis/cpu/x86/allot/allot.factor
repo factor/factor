@@ -100,7 +100,7 @@ M:: x86 %box-alien ( dst src temp -- )
         dst 3 alien@ src MOV
         "end" get JMP
         "f" resolve-label
-        \ f tag-number MOV
+        dst \ f tag-number MOV
         "end" resolve-label
     ] with-scope ;
 

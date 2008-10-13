@@ -56,6 +56,7 @@ INSN: ##gc ;
 INSN: ##alien-invoke params ;
 INSN: ##alien-indirect params ;
 INSN: ##alien-callback params ;
+INSN: ##callback-return params ;
 
 GENERIC: defs-vregs ( insn -- seq )
 GENERIC: uses-vregs ( insn -- seq )

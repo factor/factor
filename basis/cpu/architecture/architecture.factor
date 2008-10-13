@@ -137,14 +137,18 @@ M: object %prepare-var-args ;
 
 HOOK: %alien-invoke cpu ( function library -- )
 
-HOOK: %cleanup cpu ( alien-node -- )
+HOOK: %cleanup cpu ( params -- )
+
+M: object %cleanup ( params -- ) drop ;
 
 HOOK: %alien-callback cpu ( quot -- )
 
 HOOK: %callback-value cpu ( ctype -- )
 
 ! Return to caller with stdcall unwinding (only for x86)
-HOOK: %unwind cpu ( n -- )
+HOOK: %callback-return cpu ( params -- )
+
+M: object %callback-return drop %return ;
 
 HOOK: %prepare-alien-indirect cpu ( -- )
 

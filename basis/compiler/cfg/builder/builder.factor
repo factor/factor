@@ -332,9 +332,12 @@ M: #terminate emit-node
         [ alien-parameters parameter-sizes drop >>params ] bi
         dup [ params>> ] [ return>> ] bi + >>size ;
 
+: alien-stack-frame ( params -- )
+    <alien-stack-frame> ##stack-frame ;
+
 : emit-alien-node ( node quot -- next )
-    [ params>> ] dip
-    [ drop <alien-stack-frame> ##stack-frame ] [ call ] 2bi
+    finalize-phantoms
+    [ params>> ] dip [ drop alien-stack-frame ] [ call ] 2bi
     iterate-next ; inline
 
 M: #alien-invoke emit-node
@@ -347,7 +350,10 @@ M: #alien-callback emit-node
     dup params>> xt>> dup
     [
         init-phantoms
-        [ ##alien-callback ] emit-alien-node drop
+        ##prologue
+        dup [ ##alien-callback ] emit-alien-node drop
+        ##epilogue
+        params>> ##callback-return
     ] with-cfg-builder
     iterate-next ;
 

@@ -244,7 +244,7 @@ M: x86.32 %callback-value ( ctype -- )
     ! Unbox EAX
     unbox-return ;
 
-M: x86.32 %cleanup ( alien-node -- )
+M: x86.32 %cleanup ( params -- )
     #! a) If we just called an stdcall function in Windows, it
     #! cleaned up the stack frame for us. But we don't want that
     #! so we 'undo' the cleanup since we do that in %epilogue.
@@ -261,7 +261,16 @@ M: x86.32 %cleanup ( alien-node -- )
         [ drop ]
     } cond ;
 
-M: x86.32 %unwind ( n -- ) RET ;
+M: x86.32 %callback-return ( n -- )
+    #! a) If the callback is stdcall, we have to clean up the
+    #! caller's stack frame.
+    #! b) If the callback is returning a large struct, we have
+    #! to fix ESP.
+    {
+        { [ dup abi>> "stdcall" = ] [ <alien-stack-frame> size>> ] }
+        { [ dup return>> large-struct? ] [ drop 4 ] }
+        [ drop 0 ]
+    } cond RET ;
 
 os windows? [
     cell "longlong" c-type (>>align)

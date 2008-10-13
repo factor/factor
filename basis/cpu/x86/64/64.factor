@@ -222,10 +222,6 @@ M: x86.64 %callback-value ( ctype -- )
     ! Unbox former top of data stack to return registers
     unbox-return ;
 
-M: x86.64 %cleanup ( alien-node -- ) drop ;
-
-M: x86.64 %unwind ( n -- ) drop 0 RET ;
-
 USE: cpu.x86.intrinsics
 
 ! On 64-bit systems, the result of reading 4 bytes from memory
