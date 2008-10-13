@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien alien.accessors arrays generic kernel
 kernel.private math math.private memory namespaces sequences
-words math.floats.private layouts quotations locals
+words math.floats.private layouts quotations locals fry
 system compiler.constants compiler.codegen compiler.cfg.templates
 compiler.cfg.registers compiler.cfg.builder cpu.architecture
 cpu.x86.assembler cpu.x86.architecture cpu.x86.intrinsics ;
@@ -87,10 +87,10 @@ M: x86 %unbox-float ( dst src -- )
     } ;
 
 : define-alien-float-intrinsics ( word get-quot word set-quot -- )
-    [ "value" operand swap %alien-accessor ] curry
+    '[ "value" operand _ %alien-accessor ]
     alien-float-set-template
     define-intrinsic
-    [ "value" operand swap %alien-accessor ] curry
+    '[ "value" operand _ %alien-accessor ]
     alien-float-get-template
     define-intrinsic ;
 

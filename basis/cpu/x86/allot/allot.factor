@@ -1,7 +1,7 @@
 ! Copyright (C) 2006, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel words kernel.private namespaces math math.private
-sequences generic arrays system layouts alien locals
+sequences generic arrays system layouts alien locals fry
 cpu.architecture cpu.x86.assembler cpu.x86.architecture
 compiler.constants compiler.cfg.templates compiler.cfg.builder
 compiler.codegen compiler.codegen.fixup ;
@@ -118,7 +118,7 @@ M:: x86 %box-alien ( dst src temp -- )
     "end" resolve-label ; inline
 
 : overflow-template ( word insn -- )
-    [ overflow-check ] curry T{ template
+    '[ _ overflow-check ] T{ template
         { input { { f "x" } { f "y" } } }
         { scratch { { f "z" } } }
         { output { "z" } }

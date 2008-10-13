@@ -3,7 +3,7 @@
 USING: accessors arrays byte-arrays alien.accessors kernel
 kernel.private math memory namespaces make sequences words
 system layouts combinators math.order math.private alien
-alien.c-types slots.private locals cpu.architecture
+alien.c-types slots.private locals fry cpu.architecture
 cpu.x86.assembler cpu.x86.assembler.private cpu.x86.architecture
 compiler.codegen.fixup compiler.constants compiler.intrinsics
 compiler.cfg.builder compiler.cfg.registers compiler.cfg.stacks
@@ -51,7 +51,6 @@ IN: cpu.x86.intrinsics
     {
         [ %constant-slot "val" operand MOV ] T{ template
             { input { { f "val" } { f "obj" } { small-slot "n" } { small-slot "tag" } } }
-            { clobber { "obj" } }
         }
     }
     {
@@ -61,16 +60,6 @@ IN: cpu.x86.intrinsics
         }
     }
 } define-intrinsics
-
-! Sometimes, we need to do stuff with operands which are
-! less than the word size. Instead of teaching the register
-! allocator about the different sized registers, with all
-! the complexity this entails, we just push/pop a register
-! which is guaranteed to be unused (the tempreg)
-: small-reg cell 8 = RBX EBX ? ; inline
-: small-reg-8 BL ; inline
-: small-reg-16 BX ; inline
-: small-reg-32 EBX ; inline
 
 ! Fixnums
 : fixnum-op ( op hash -- pair )
@@ -219,17 +208,38 @@ IN: cpu.x86.intrinsics
 } define-intrinsic
 
 ! Alien intrinsics
-: %alien-accessor ( quot -- )
+
+! Sometimes, we need to do stuff with operands which are
+! less than the word size. Instead of teaching the register
+! allocator about the different sized registers, with all
+! the complexity this entails, we just push/pop a register
+! which is guaranteed to be unused (the tempreg)
+: small-reg cell 8 = RAX EAX ? ; inline
+: small-reg-8 AL ; inline
+: small-reg-16 AX ; inline
+: small-reg-32 EAX ; inline
+
+: %prepare-alien-accessor ( -- )
     "offset" operand %untag-fixnum
-    "offset" operand "alien" operand ADD
+    "offset" operand "alien" operand ADD ;
+
+: (%alien-accessor) ( quot -- )
     "offset" operand [] swap call ; inline
 
-: %alien-integer-get ( quot reg -- )
-    small-reg PUSH
-    swap %alien-accessor
-    "value" operand small-reg MOV
-    "value" operand %tag-fixnum
-    small-reg POP ; inline
+: %alien-accessor ( quot -- )
+    %prepare-alien-accessor (%alien-accessor) ; inline
+
+: %alien-integer-get ( reg quot -- )
+    %prepare-alien-accessor
+    "value" operand small-reg = [
+        (%alien-accessor)
+    ] [
+        small-reg PUSH
+        (%alien-accessor)
+        "value" operand small-reg MOV
+        small-reg POP
+    ] if
+    "value" operand %tag-fixnum ; inline
 
 : alien-integer-get-template
     T{ template
@@ -242,23 +252,28 @@ IN: cpu.x86.intrinsics
         { clobber { "offset" } }
     } ;
 
-: define-getter ( word quot reg -- )
-    [ %alien-integer-get ] 2curry
+: define-getter ( word reg quot -- )
+    '[ _ _ %alien-integer-get ]
     alien-integer-get-template
     define-intrinsic ;
 
 : define-unsigned-getter ( word reg -- )
-    [ small-reg dup XOR MOV ] swap define-getter ;
+    [ small-reg dup XOR MOV ] define-getter ;
 
 : define-signed-getter ( word reg -- )
-    [ [ >r MOV small-reg r> MOVSX ] curry ] keep define-getter ;
+    dup '[ MOV small-reg _ MOVSX ] define-getter ;
 
-: %alien-integer-set ( quot reg -- )
-    small-reg PUSH
-    small-reg "value" operand MOV
-    small-reg %untag-fixnum
-    swap %alien-accessor
-    small-reg POP ; inline
+: %alien-integer-set ( reg quot -- )
+    "value" operand %untag-fixnum
+    %prepare-alien-accessor
+    small-reg "value" operand = [
+        (%alien-accessor)
+    ] [
+        small-reg PUSH
+        small-reg "value" operand MOV
+        (%alien-accessor)
+        small-reg POP
+    ] if ; inline
 
 : alien-integer-set-template
     T{ template
@@ -271,8 +286,7 @@ IN: cpu.x86.intrinsics
     } ;
 
 : define-setter ( word reg -- )
-    [ swap MOV ] swap
-    [ %alien-integer-set ] 2curry
+    '[ _ [ swap MOV ] %alien-integer-set ]
     alien-integer-set-template
     define-intrinsic ;
 

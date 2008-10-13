@@ -49,7 +49,6 @@ HOOK: temp-reg-1 cpu ( -- reg )
 HOOK: temp-reg-2 cpu ( -- reg )
 
 HOOK: fixnum>slot@ cpu ( op -- )
-
 HOOK: prepare-division cpu ( -- )
 
 M: f load-literal
