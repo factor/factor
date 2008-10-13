@@ -7,16 +7,34 @@ db.postgresql accessors random math.bitwise
 math.ranges strings urls fry db.tuples.private ;
 IN: db.tuples.tests
 
+: sqlite-db ( -- sqlite-db )
+    "tuples-test.db" temp-file <sqlite-db> ;
+
 : test-sqlite ( quot -- )
-    [ ] swap '[
-        "tuples-test.db" temp-file sqlite-db _ with-db
-    ] unit-test ;
+    '[
+        [ ] [
+            "tuples-test.db" temp-file <sqlite-db> _ with-db
+        ] unit-test
+    ] call ; inline
+
+: postgresql-db ( -- postgresql-db )
+    <postgresql-db>
+        "localhost" >>host
+        "postgres" >>username
+        "thepasswordistrust" >>password
+        "factor-test" >>database ;
 
 : test-postgresql ( quot -- )
-    [ ] swap '[
-        { "localhost" "postgres" "foob" "factor-test" }
-        postgresql-db _ with-db
-    ] unit-test ;
+    '[
+        [ ] [ postgresql-db _ with-db ] unit-test
+    ] call ; inline
+
+! These words leak resources, but are useful for interactivel testing 
+: sqlite-test-db ( -- )
+    sqlite-db db-open db set ;
+
+: postgresql-test-db ( -- )
+    postgresql-db db-open db set ;
 
 TUPLE: person the-id the-name the-number the-real
 ts date time blob factor-blob url ;
@@ -356,9 +374,7 @@ TUPLE: exam id name score ;
     [ f ]
     [ T{ exam { name IGNORE } { score IGNORE } } select-tuples first score>> ] unit-test
 
-    ! FIXME
-    ! [ f ]
-    ! [ T{ exam { name IGNORE } { score IGNORE } { id IGNORE } } select-tuples first score>> ] unit-test
+    [ T{ exam { name IGNORE } { score IGNORE } { id IGNORE } } select-tuples first score>> ] [ class>> "EXAM" = ] must-fail-with
 
     [
         {
@@ -641,10 +657,3 @@ compound-foo "COMPOUND_FOO"
 
 [ test-compound-primary-key ] test-sqlite
 [ test-compound-primary-key ] test-postgresql
-
-: sqlite-test-db ( -- )
-    "tuples-test.db" temp-file sqlite-db make-db db-open db set ;
-
-: postgresql-test-db ( -- )
-    { "localhost" "postgres" "foob" "factor-test" } postgresql-db
-    make-db db-open db set ;

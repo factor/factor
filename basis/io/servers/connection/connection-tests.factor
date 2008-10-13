@@ -33,7 +33,7 @@ concurrency.promises io.encodings.ascii io threads calendar ;
     <threaded-server>
         5 >>max-connections
         1237 >>insecure
-        [ "Hello world." write stop-server ] >>handler
+        [ "Hello world." write stop-this-server ] >>handler
     "server" set
 ] unit-test
 

@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.lib combinators.short-circuit kernel math.parser math.ranges
+USING: combinators.short-circuit kernel math.parser math.ranges
     project-euler.common sequences ;
 IN: project-euler.036
 

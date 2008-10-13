@@ -47,13 +47,6 @@ IN: sequences.lib.tests
 [ t ] [ "ab" 4 strings [ >string ] map "abab" swap member? ] unit-test
 [ { { } { 1 } { 2 } { 1 2 } } ] [ { 1 2 } power-set ] unit-test
 
-[ f ] [ { } ?first ] unit-test
-[ f ] [ { } ?fourth ] unit-test
-[ 1 ] [ { 1 2 3 } ?first ] unit-test
-[ 2 ] [ { 1 2 3 } ?second ] unit-test
-[ 3 ] [ { 1 2 3 } ?third ] unit-test
-[ f ] [ { 1 2 3 } ?fourth ] unit-test
-
 [ 1 2 { 3 4 } [ + + ] 2 map-withn ] must-infer
 { { 6 7 } } [ 1 2 { 3 4 } [ + + ] 2 map-withn ] unit-test
 { { 16 17 18 19 20 } } [ 1 2 3 4 { 6 7 8 9 10 } [ + + + + ] 4 map-withn ] unit-test

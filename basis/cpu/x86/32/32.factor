@@ -1,13 +1,12 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.c-types arrays cpu.x86.assembler
+USING: locals alien.c-types arrays cpu.x86.assembler
 cpu.x86.architecture cpu.x86.intrinsics cpu.x86.allot
 cpu.architecture kernel kernel.private math namespaces sequences
-stack-checker.known-words
-compiler.generator.registers compiler.generator.fixup
-compiler.generator system layouts combinators
-command-line compiler compiler.units io vocabs.loader accessors
-init ;
+stack-checker.known-words compiler.generator.registers
+compiler.generator.fixup compiler.generator system layouts
+combinators command-line compiler compiler.units io
+vocabs.loader accessors init ;
 IN: cpu.x86.32
 
 ! We implement the FFI for Linux, OS X and Windows all at once.
@@ -18,7 +17,6 @@ IN: cpu.x86.32
 M: x86.32 ds-reg ESI ;
 M: x86.32 rs-reg EDI ;
 M: x86.32 stack-reg ESP ;
-M: x86.32 stack-save-reg EDX ;
 M: x86.32 temp-reg-1 EAX ;
 M: x86.32 temp-reg-2 ECX ;
 
@@ -32,15 +30,20 @@ M: x86.32 struct-small-enough? ( size -- ? )
     heap-size { 1 2 4 8 } member?
     os { linux netbsd solaris } member? not and ;
 
+: struct-return@ ( n -- operand )
+    [ next-stack@ ] [ stack-frame get params>> stack@ ] if* ;
+
 ! On x86, parameters are never passed in registers.
 M: int-regs return-reg drop EAX ;
 M: int-regs param-regs drop { } ;
 M: int-regs vregs drop { EAX ECX EDX EBP } ;
 M: int-regs push-return-reg return-reg PUSH ;
-: load/store-int-return ( n reg-class -- src dst )
-    return-reg stack-reg rot [+] ;
-M: int-regs load-return-reg load/store-int-return MOV ;
-M: int-regs store-return-reg load/store-int-return swap MOV ;
+
+M: int-regs load-return-reg
+    return-reg swap next-stack@ MOV ;
+
+M: int-regs store-return-reg
+    [ stack@ ] [ return-reg ] bi* MOV ;
 
 M: float-regs param-regs drop { } ;
 M: float-regs vregs drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
@@ -48,23 +51,26 @@ M: float-regs vregs drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 : FSTP ( operand size -- ) 4 = [ FSTPS ] [ FSTPL ] if ;
 
 M: float-regs push-return-reg
-    stack-reg swap reg-size [ SUB  stack-reg [] ] keep FSTP ;
+    stack-reg swap reg-size
+    [ SUB ] [ [ [] ] dip FSTP ] 2bi ;
 
 : FLD ( operand size -- ) 4 = [ FLDS ] [ FLDL ] if ;
 
-: load/store-float-return ( n reg-class -- op size )
-    [ stack@ ] [ reg-size ] bi* ;
-M: float-regs load-return-reg load/store-float-return FLD ;
-M: float-regs store-return-reg load/store-float-return FSTP ;
+M: float-regs load-return-reg
+    [ next-stack@ ] [ reg-size ] bi* FLD ;
+
+M: float-regs store-return-reg
+    [ stack@ ] [ reg-size ] bi* FSTP ;
 
 : align-sub ( n -- )
-    dup 16 align swap - ESP swap SUB ;
+    [ align-stack ] keep - decr-stack-reg ;
 
 : align-add ( n -- )
-    16 align ESP swap ADD ;
+    align-stack incr-stack-reg ;
 
 : with-aligned-stack ( n quot -- )
-    swap dup align-sub slip align-add ; inline
+    [ [ align-sub ] [ call ] bi* ]
+    [ [ align-add ] [ drop ] bi* ] 2bi ; inline
 
 M: x86.32 fixnum>slot@ 1 SHR ;
 
@@ -77,68 +83,51 @@ M: object %load-param-reg 3drop ;
 
 M: object %save-param-reg 3drop ;
 
-: box@ ( n reg-class -- stack@ )
-    #! Used for callbacks; we want to box the values given to
-    #! us by the C function caller. Computes stack location of
-    #! nth parameter; note that we must go back one more stack
-    #! frame, since %box sets one up to call the one-arg boxer
-    #! function. The size of this stack frame so far depends on
-    #! the reg-class of the boxer's arg.
-    reg-size neg + stack-frame* + 20 + ;
-
 : (%box) ( n reg-class -- )
     #! If n is f, push the return register onto the stack; we
     #! are boxing a return value of a C function. If n is an
     #! integer, push [ESP+n] on the stack; we are boxing a
     #! parameter being passed to a callback from C.
-    over [ [ box@ ] keep [ load-return-reg ] keep ] [ nip ] if
-    push-return-reg ;
+    over [ load-return-reg ] [ 2drop ] if ;
 
-M: x86.32 %box ( n reg-class func -- )
-    over reg-size [
-        >r (%box) r> f %alien-invoke
+M:: x86.32 %box ( n reg-class func -- )
+    n reg-class (%box)
+    reg-class reg-size [
+        reg-class push-return-reg
+        func f %alien-invoke
     ] with-aligned-stack ;
     
 : (%box-long-long) ( n -- )
-    #! If n is f, push the return registers onto the stack; we
-    #! are boxing a return value of a C function. If n is an
-    #! integer, push [ESP+n]:[ESP+n+4] on the stack; we are
-    #! boxing a parameter being passed to a callback from C.
     [
-        int-regs box@
-        EDX over stack@ MOV
-        EAX swap cell - stack@ MOV 
-    ] when*
-    EDX PUSH
-    EAX PUSH ;
+        EDX over next-stack@ MOV
+        EAX swap cell - next-stack@ MOV 
+    ] when* ;
 
 M: x86.32 %box-long-long ( n func -- )
+    [ (%box-long-long) ] dip
     8 [
-        [ (%box-long-long) ] [ f %alien-invoke ] bi*
+        EDX PUSH
+        EAX PUSH
+        f %alien-invoke
     ] with-aligned-stack ;
 
-: struct-return@ ( size n -- n )
-    [ stack-frame* cell + + ] [ \ stack-frame get swap - ] ?if ;
-
-M: x86.32 %box-large-struct ( n c-type -- )
+M:: x86.32 %box-large-struct ( n c-type -- )
     ! Compute destination address
-    heap-size
-    [ swap struct-return@ ] keep
-    ECX ESP roll [+] LEA
+    ECX n struct-return@ LEA
     8 [
         ! Push struct size
-        PUSH
+        c-type heap-size PUSH
         ! Push destination address
         ECX PUSH
         ! Copy the struct from the C stack
         "box_value_struct" f %alien-invoke
     ] with-aligned-stack ;
 
-M: x86.32 %prepare-box-struct ( size -- )
+M: x86.32 %prepare-box-struct ( -- )
     ! Compute target address for value struct return
-    EAX ESP rot f struct-return@ [+] LEA
+    EAX f struct-return@ LEA
     ! Store it as the first parameter
-    ESP [] EAX MOV ;
+    0 stack@ EAX MOV ;
 
 M: x86.32 %box-small-struct ( c-type -- )
     #! Box a <= 8-byte struct returned in EAX:EDX. OS X only.
@@ -207,13 +196,12 @@ M: x86 %unbox-small-struct ( size -- )
     } case ;
 
 M: x86.32 %unbox-large-struct ( n c-type -- )
-    #! Alien must be in EAX.
-    heap-size
+    ! Alien must be in EAX.
     ! Compute destination address
-    ECX ESP roll [+] LEA
+    ECX rot stack@ LEA
     12 [
         ! Push struct size
-        PUSH
+        heap-size PUSH
         ! Push destination address
         ECX PUSH
         ! Push source address
@@ -224,10 +212,10 @@ M: x86.32 %unbox-large-struct ( n c-type -- )
 
 M: x86.32 %prepare-alien-indirect ( -- )
     "unbox_alien" f %alien-invoke
-    cell temp@ EAX MOV ;
+    EBP EAX MOV ;
 
 M: x86.32 %alien-indirect ( -- )
-    cell temp@ CALL ;
+    EBP CALL ;
 
 M: x86.32 %alien-callback ( quot -- )
     4 [
@@ -239,7 +227,7 @@ M: x86.32 %alien-callback ( quot -- )
 M: x86.32 %callback-value ( ctype -- )
     ! Align C stack
     ESP 12 SUB
-    ! Save top of data stack
+    ! Save top of data stack in non-volatile register
     %prepare-unbox
     EAX PUSH
     ! Restore data/call/retain stacks
@@ -260,7 +248,7 @@ M: x86.32 %cleanup ( alien-node -- )
     {
         {
             [ dup abi>> "stdcall" = ]
-            [ alien-stack-frame ESP swap SUB ]
+            [ drop ESP stack-frame get params>> SUB ]
         } {
             [ dup return>> large-struct? ]
             [ drop EAX PUSH ]

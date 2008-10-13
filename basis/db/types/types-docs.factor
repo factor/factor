@@ -8,7 +8,7 @@ HELP: +autoincrement+
 { $description "" } ;
 
 HELP: +db-assigned-id+
-{ $description "The database assigns a primary key to the object.  The primary key is most likely a big integer, but is database-dependent." } ;
+{ $description "The database assigns a primary key to the object. The primary key is most likely a big integer, but is database-dependent." } ;
 
 HELP: +default+
 { $description "" } ;
@@ -29,7 +29,7 @@ HELP: +primary-key+
 { $description "" } ;
 
 HELP: +random-id+
-{ $description "Factor chooses a random number and tries to insert the tuple into the database with this number as its primary key.  The default number of retries to find a unique random number is 10, though in practice it will almost certainly succeed on the first try." } ;
+{ $description "Factor chooses a random number and tries to insert the tuple into the database with this number as its primary key. The default number of retries to find a unique random number is 10, though in practice it will almost certainly succeed on the first try." } ;
 
 HELP: +serial+
 { $description "" } ;
@@ -38,7 +38,7 @@ HELP: +unique+
 { $description "" } ;
 
 HELP: +user-assigned-id+
-{ $description "The user is responsible for choosing a primary key for tuples inserted with this database type.  Keys must be unique or else the database will throw an error.  Usually it is better to use a " { $link +db-assigned-id+ } "." } ;
+{ $description "The user is responsible for choosing a primary key for tuples inserted with this database type. Keys must be unique or else the database will throw an error. Usually it is better to use a " { $link +db-assigned-id+ } "." } ;
 
 HELP: <generator-bind>
 { $description "" } ;
@@ -53,7 +53,7 @@ HELP: BIG-INTEGER
 { $description "A 64-bit integer. Whether this number is signed or unsigned depends on the database backend." } ;
 
 HELP: BLOB
-{ $description "A serialized Factor object.  The database library automatically serializes the object for a SQL insert or update and deserializes it on a tuple query." } ;
+{ $description "A byte array." } ;
 
 HELP: BOOLEAN
 { $description "Either true or false." } ;
@@ -65,7 +65,7 @@ HELP: DATETIME
 { $description "A date and a time." } ;
 
 HELP: DOUBLE
-{ $description "Corresponds to Factor's 64bit floating-point numbers." } ;
+{ $description "Corresponds to Factor's 64-bit floating-point numbers." } ;
 
 HELP: FACTOR-BLOB
 { $description "A serialized Factor object." } ;
@@ -77,30 +77,31 @@ HELP: NULL
 { $description "The SQL null type." } ;
 
 HELP: REAL
-{ $description "" } ;
+{ $description "A real number of unlimited precision. May not be supported on all databases." } ;
 
 HELP: SIGNED-BIG-INTEGER
-{ $description "For portability, if a number is known to be 64bit and signed, then this datatype may be used.  Some databases, like SQLite, cannot store arbitrary bignums as BIGINT types.  If storing arbitrary bignums, use " { $link FACTOR-BLOB } "." } ;
+{ $description "For portability, if a number is known to be 64bit and signed, then this datatype may be used. Some databases, like SQLite, cannot store arbitrary bignums as BIGINT types. If storing arbitrary bignums, use " { $link FACTOR-BLOB } "." } ;
 
 HELP: TEXT
-{ $description "" } ;
+{ $description "Stores a string that is longer than a " { $link VARCHAR } ". SQLite uses this type for strings; it does not handle " { $link VARCHAR } " strings." } ;
 
 HELP: TIME
-{ $description "" } ;
+{ $description "A timestamp without a date component." } ;
 
 HELP: TIMESTAMP
 { $description "A Factor timestamp." } ;
 
 HELP: UNSIGNED-BIG-INTEGER
-{ $description "For portability, if a number is known to be 64bit, then this datatype may be used.  Some databases, like SQLite, cannot store arbitrary bignums as BIGINT types.  If storing arbitrary bignums, use " { $link FACTOR-BLOB } "." } ;
+{ $description "For portability, if a number is known to be 64bit, then this datatype may be used. Some databases, like SQLite, cannot store arbitrary bignums as BIGINT types. If storing arbitrary bignums, use " { $link FACTOR-BLOB } "." } ;
 
 { INTEGER SIGNED-BIG-INTEGER UNSIGNED-BIG-INTEGER } related-words
 
 HELP: URL
-{ $description "A Factor " { $link "urls" } "  object." } ;
+{ $description "A Factor " { $link "urls" } " object." } ;
 
 HELP: VARCHAR
-{ $description "The SQL varchar type.  This type can take an integer as an argument." } ;
+{ $description "The SQL varchar type. This type can take an integer as an argument." }
+{ $examples { $unchecked-example "{ VARCHAR 256 }" "" } } ;
 
 HELP: user-assigned-id-spec?
 { $values
@@ -279,8 +280,9 @@ ARTICLE: "db.types" "Database types"
 { $subsection DATETIME }
 { $subsection TIME }
 { $subsection TIMESTAMP }
-"Arbitrary Factor objects:"
+"Factor byte-arrays:"
 { $subsection BLOB }
+"Arbitrary Factor objects:"
 { $subsection FACTOR-BLOB }
 "Factor URLs:"
 { $subsection URL } ;

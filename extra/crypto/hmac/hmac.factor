@@ -1,4 +1,4 @@
-USING: arrays combinators crypto.common checksums checksums.md5
+USING: arrays combinators checksums checksums.md5
 checksums.sha1 checksums.md5.private io io.binary io.files
 io.streams.byte-array kernel math math.vectors memoize sequences
 io.encodings.binary ;

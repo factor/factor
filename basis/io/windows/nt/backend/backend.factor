@@ -1,9 +1,9 @@
 USING: alien alien.c-types arrays assocs combinators
 continuations destructors io io.backend io.ports io.timeouts
-io.windows io.windows.files libc kernel math namespaces
-sequences threads windows windows.errors windows.kernel32
-strings splitting io.files io.buffers qualified ascii system
-accessors locals ;
+io.windows io.windows.files io.files io.buffers io.streams.c
+libc kernel math namespaces sequences threads windows
+windows.errors windows.kernel32 strings splitting qualified
+ascii system accessors locals ;
 QUALIFIED: windows.winsock
 IN: io.windows.nt.backend
 
@@ -120,3 +120,5 @@ M: winnt (wait-to-read) ( port -- )
         [ finish-read ]
         tri
     ] with-destructors ;
+
+M: winnt (init-stdio) init-c-stdio ;

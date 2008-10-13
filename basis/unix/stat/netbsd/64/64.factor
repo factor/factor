@@ -11,16 +11,16 @@ C-STRUCT: stat
     { "uid_t" "st_uid" }
     { "gid_t" "st_gid" }
     { "dev_t" "st_rdev" }
-    { "timespec" "st_atim" }
-    { "timespec" "st_mtim" }
-    { "timespec" "st_ctim" }
+    { "timespec" "st_atimespec" }
+    { "timespec" "st_mtimespec" }
+    { "timespec" "st_ctimespec" }
     { "off_t" "st_size" }
     { "blkcnt_t" "st_blocks" }
     { "blksize_t" "st_blksize" }
     { "uint32_t" "st_flags" }
     { "uint32_t" "st_gen" }
     { "uint32_t" "st_spare0" }
-    { "timespec" "st_birthtim" } ;
+    { "timespec" "st_birthtimespec" } ;
 
 FUNCTION: int __stat13 ( char* pathname, stat* buf ) ;
 FUNCTION: int __lstat13 ( char* pathname, stat* buf ) ;

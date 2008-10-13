@@ -3,7 +3,7 @@
 USING: compiler io kernel cocoa.runtime cocoa.subclassing
 cocoa.messages cocoa.types sequences words vocabs parser
 core-foundation namespaces assocs hashtables compiler.units
-lexer ;
+lexer init ;
 IN: cocoa
 
 : (remember-send) ( selector variable -- )
@@ -26,6 +26,16 @@ SYMBOL: super-sent-messages
 : SUPER->
     scan dup remember-super-send parsed \ super-send parsed ;
     parsing
+
+SYMBOL: frameworks
+
+frameworks global [ V{ } clone or ] change-at
+
+[ frameworks get [ load-framework ] each ] "cocoa.messages" add-init-hook
+
+: FRAMEWORK: scan [ load-framework ] [ frameworks get push ] bi ; parsing
+
+: IMPORT: scan [ ] import-objc-class ; parsing
 
 "Compiling Objective C bridge..." print
 

@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.lib combinators.short-circuit kernel math
+USING: combinators.short-circuit kernel math
     project-euler.common sequences sorting ;
 IN: project-euler.052
 

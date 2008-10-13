@@ -9,7 +9,6 @@ IN: spider
 
 TUPLE: spider base count max-count sleep max-depth initial-links
 filters spidered todo nonmatching quiet ;
-! secure? agent page-timeout data-timeout overall-timeout
 
 TUPLE: spider-result url depth headers fetch-time parsed-html
 links processing-time timestamp ;
@@ -26,8 +25,6 @@ links processing-time timestamp ;
         H{ } clone >>spidered ;
 
 <PRIVATE
-
-: relative-url? ( url -- ? ) protocol>> not ;
 
 : apply-filters ( links spider -- links' )
     filters>> [ '[ _ 1&& ] filter ] when* ;
@@ -82,10 +79,10 @@ links processing-time timestamp ;
     [ initial-links>> normalize-hrefs 0 ] keep
     [ add-todo ] keep ;
 
-: slurp-heap-when ( heap quot1 quot2: ( value key -- ) -- )
+: slurp-heap-while ( heap quot1 quot2: ( value key -- ) -- )
     pick heap-empty? [ 3drop ] [
         [ [ heap-pop dup ] 2dip slip [ t ] compose [ 2drop f ] if ]
-        [ roll [ slurp-heap-when ] [ 3drop ] if ] 3bi
+        [ roll [ slurp-heap-while ] [ 3drop ] if ] 3bi
     ] if ; inline recursive
 
 PRIVATE>
@@ -98,7 +95,7 @@ PRIVATE>
             '[
                 _ <= spider get
                 [ count>> ] [ max-count>> ] bi < and
-            ] [ spider-page spider-sleep ] slurp-heap-when
+            ] [ spider-page spider-sleep ] slurp-heap-while
             spider get
         ] with-variable
     ] with-logging ;

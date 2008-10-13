@@ -1,5 +1,7 @@
+! Copyright (C) 2008 Doug Coleman, Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.constants math.functions math.intervals
-math.vectors namespaces sequences ;
+math.vectors namespaces sequences combinators.short-circuit ;
 IN: math.analysis
 
 <PRIVATE
@@ -20,8 +22,8 @@ IN: math.analysis
 
 : (gamma-lanczos6) ( x -- log[gamma[x+1]] )
     #! log(gamma(x+1)
-    dup 0.5 + dup gamma-g6 + dup >r log * r> -
-    swap 6 gamma-z gamma-p6 v. log + ;
+    [ 0.5 + dup gamma-g6 + dup [ log * ] dip - ]
+    [ 6 gamma-z gamma-p6 v. log ] bi + ;
 
 : gamma-lanczos6 ( x -- gamma[x] )
     #! gamma(x) = gamma(x+1) / x
@@ -39,7 +41,7 @@ PRIVATE>
 : gamma ( x -- y )
     #! gamma(x) = integral 0..inf [ t^(x-1) exp(-t) ] dt
     #! gamma(n+1) = n! for n > 0
-    dup 0.0 <= over 1.0 mod zero? and [
+    dup { [ 0.0 <= ] [ 1.0 mod zero? ] } 1&& [
             drop 1./0.
         ] [
             dup abs gamma-lanczos6 swap dup 0 > [ drop ] [ gamma-neg ] if
@@ -55,7 +57,7 @@ PRIVATE>
     ] if ;
 
 : nth-root ( n x -- y )
-    over 0 = [ "0th root is undefined" throw ] when >r recip r> swap ^ ;
+    [ recip ] dip swap ^ ;
 
 ! Forth Scientific Library Algorithm #1
 !

@@ -1,41 +1,38 @@
-! Copyright (C) 2007 Eduardo Cavazos
+! Copyright (C) 2008 Eduardo Cavazos.
 ! See http://factorcode.org/license.txt for BSD license.
-
-USING: kernel combinators arrays sequences math math.functions ;
-
+USING: colors kernel combinators math math.functions accessors ;
 IN: colors.hsv
-
-<PRIVATE
-
-: H ( hsv -- H ) first ;
-
-: S ( hsv -- S ) second ;
-
-: V ( hsv -- V ) third ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: Hi ( hsv -- Hi ) H 60 / floor 6 mod ;
-
-: f ( hsv -- f ) [ H 60 / ] [ Hi ] bi - ;
-
-: p ( hsv -- p ) [ S 1 swap - ] [ V ] bi * ;
-
-: q ( hsv -- q ) [ [ f ] [ S ] bi * 1 swap - ] [ V ] bi * ;
-
-: t ( hsv -- t ) [ [ f 1 swap - ] [ S ] bi * 1 swap - ] [ V ] bi * ;
-
-PRIVATE>
 
 ! h [0,360)
 ! s [0,1]
 ! v [0,1]
+TUPLE: hsva < color hue saturation value alpha ;
 
-: hsv>rgb ( hsv -- rgb )
-dup Hi
-{ { 0 [ [ V ] [ t ] [ p ] tri ] }
-  { 1 [ [ q ] [ V ] [ p ] tri ] }
-  { 2 [ [ p ] [ V ] [ t ] tri ] }
-  { 3 [ [ p ] [ q ] [ V ] tri ] }
-  { 4 [ [ t ] [ p ] [ V ] tri ] }
-  { 5 [ [ V ] [ p ] [ q ] tri ] } } case 3array ;
+C: <hsva> hsva
+
+<PRIVATE
+
+: Hi ( hsv -- Hi ) hue>> 60 / floor 6 mod ; inline
+
+: f ( hsv -- f ) [ hue>> 60 / ] [ Hi ] bi - ; inline
+
+: p ( hsv -- p ) [ saturation>> 1 swap - ] [ value>> ] bi * ; inline
+
+: q ( hsv -- q ) [ [ f ] [ saturation>> ] bi * 1 swap - ] [ value>> ] bi * ; inline
+
+: t ( hsv -- t ) [ [ f 1 swap - ] [ saturation>> ] bi * 1 swap - ] [ value>> ] bi * ; inline
+
+PRIVATE>
+
+M: hsva >rgba ( hsva -- rgba )
+    [
+        dup Hi
+        {
+            { 0 [ [ value>> ] [ t ] [ p ] tri ] }
+            { 1 [ [ q ] [ value>> ] [ p ] tri ] }
+            { 2 [ [ p ] [ value>> ] [ t ] tri ] }
+            { 3 [ [ p ] [ q ] [ value>> ] tri ] }
+            { 4 [ [ t ] [ p ] [ value>> ] tri ] }
+            { 5 [ [ value>> ] [ p ] [ q ] tri ] }
+        } case
+    ] [ alpha>> ] bi <rgba> ;

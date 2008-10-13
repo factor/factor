@@ -1,7 +1,7 @@
 ! Copyright (c) 2007, 2008 Slava Pestov, Doug Coleman, Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs kernel math math.order math.ranges mirrors
-namespaces make sequences sequences.lib sorting ;
+namespaces sequences sorting fry ;
 IN: math.combinatorics
 
 <PRIVATE
@@ -13,7 +13,7 @@ IN: math.combinatorics
     2dup - dupd > [ dupd - ] when ; inline
 
 ! See this article for explanation of the factoradic-based permutation methodology:
-!     http://msdn2.microsoft.com/en-us/library/aa302371.aspx
+! http://msdn2.microsoft.com/en-us/library/aa302371.aspx
 
 : factoradic ( n -- factoradic )
     0 [ over 0 > ] [ 1+ [ /mod ] keep swap ] [ ] produce reverse 2nip ;
@@ -39,13 +39,10 @@ PRIVATE>
     twiddle [ nPk ] keep factorial / ;
 
 : permutation ( n seq -- seq )
-    tuck permutation-indices swap nths ;
+    [ permutation-indices ] keep nths ;
 
 : all-permutations ( seq -- seq )
-    [
-        [ length factorial ] keep [ permutation , ] curry each
-    ] { } make ;
+    [ length factorial ] keep '[ _ permutation ] map ;
 
 : inverse-permutation ( seq -- permutation )
     <enum> >alist sort-values keys ;
-

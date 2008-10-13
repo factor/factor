@@ -71,7 +71,7 @@ TUPLE: AcceptEx-args port
     dwLocalAddressLength dwRemoteAddressLength lpdwBytesReceived lpOverlapped ;
 
 : init-accept-buffer ( addr AcceptEx -- )
-    swap sockaddr-type heap-size 16 +
+    swap sockaddr-size 16 +
         [ >>dwLocalAddressLength ] [ >>dwRemoteAddressLength ] bi
         dup dwLocalAddressLength>> 2 * malloc &free >>lpOutputBuffer
         drop ; inline
@@ -135,7 +135,7 @@ TUPLE: WSARecvFrom-args port
     WSARecvFrom-args new
         swap >>port
         dup port>> handle>> handle>> >>s
-        dup port>> addr>> sockaddr-type heap-size
+        dup port>> addr>> sockaddr-size
             [ malloc &free >>lpFrom ]
             [ malloc-int &free >>lpFromLen ] bi
         make-receive-buffer >>lpBuffers

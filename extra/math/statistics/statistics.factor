@@ -1,5 +1,7 @@
+! Copyright (C) 2008 Doug Coleman, Michael Judge.
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math math.analysis math.functions math.vectors sequences
-    sequences.lib sorting ;
+sequences.lib sorting ;
 IN: math.statistics
 
 : mean ( seq -- n )
@@ -18,7 +20,7 @@ IN: math.statistics
 : median ( seq -- n )
     #! middle number if odd, avg of two middle numbers if even
     natural-sort dup length dup even? [
-        1- 2 / swap [ nth ] [ >r 1+ r> nth ] 2bi + 2 /
+        1- 2 / swap [ nth ] [ [ 1+ ] dip nth ] 2bi + 2 /
     ] [
         2 / swap nth
     ] if ;

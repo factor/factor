@@ -15,7 +15,7 @@ RENAME: join sequences => sjoin
 
 IN: irc.ui
 
-SYMBOL: listener
+SYMBOL: chat
 
 SYMBOL: client
 
@@ -24,7 +24,7 @@ TUPLE: ui-window < tabbed client ;
 M: ui-window ungraft*
     client>> terminate-irc ;
 
-TUPLE: irc-tab < frame listener client window ;
+TUPLE: irc-tab < frame chat client window ;
 
 : write-color ( str color -- )
     foreground associate format ;
@@ -117,7 +117,7 @@ M: irc-disconnected write-irc
 M: irc-connected write-irc
     drop "* Connected" dark-green write-color ;
 
-M: irc-listener-end write-irc
+M: irc-chat-end write-irc
     drop ;
 
 M: irc-message write-irc
@@ -135,7 +135,7 @@ M: object time-happened drop now ;
 
 : send-message ( message -- )
     [ print-irc ]
-    [ listener get write-message ] bi ;
+    [ chat get speak ] bi ;
 
 GENERIC: handle-inbox ( tab message -- )
 
@@ -150,7 +150,7 @@ M: object handle-inbox
 
 : display ( stream tab -- )
     '[ _ [ [ t ]
-           [ _ dup listener>> read-message handle-inbox ]
+           [ _ dup chat>> hear handle-inbox ]
            [  ] while ] with-output-stream ] "ircv" spawn drop ;
 
 : <irc-pane> ( tab -- tab pane )
@@ -175,28 +175,28 @@ irc-editor "general" f {
     { T{ key-down f f "ENTER" } editor-send }
 } define-command-map
 
-: new-irc-tab ( listener ui-window class -- irc-tab )
+: new-irc-tab ( chat ui-window class -- irc-tab )
     new-frame
     swap >>window
-    swap >>listener
+    swap >>chat
     <irc-pane> [ <scroller> @center grid-add ] keep
     <irc-editor> <scroller> @bottom grid-add ;
 
 M: irc-tab graft*
-    [ listener>> ] [ window>> client>> ] bi add-listener ;
+    [ chat>> ] [ window>> client>> ] bi attach-chat ;
 
 M: irc-tab ungraft*
-    [ listener>> ] [ window>> client>> ] bi remove-listener ;
+    chat>> detach-chat ;
 
 TUPLE: irc-channel-tab < irc-tab userlist ;
 
-: <irc-channel-tab> ( listener ui-window -- irc-tab )
+: <irc-channel-tab> ( chat ui-window -- irc-tab )
     irc-channel-tab new-irc-tab
     <pile> [ <scroller> @right grid-add ] keep >>userlist ;
 
 : update-participants ( tab -- )
     [ userlist>> [ clear-gadget ] keep ]
-    [ listener>> participants>> ] bi
+    [ chat>> participants>> ] bi
     [ +operator+ value-labels dark-green add-gadget-color ]
     [ +voice+ value-labels blue add-gadget-color ]
     [ +normal+ value-labels black add-gadget-color ] tri drop ;
@@ -206,22 +206,22 @@ M: participant-changed handle-inbox
 
 TUPLE: irc-server-tab < irc-tab ;
 
-: <irc-server-tab> ( listener -- irc-tab )
+: <irc-server-tab> ( chat -- irc-tab )
     f irc-server-tab new-irc-tab ;
 
-: <irc-nick-tab> ( listener ui-window -- irc-tab )
+: <irc-nick-tab> ( chat ui-window -- irc-tab )
     irc-tab new-irc-tab ;
 
 M: irc-tab pref-dim*
     drop { 480 480 } ;
 
 : join-channel ( name ui-window -- )
-    [ dup <irc-channel-listener> ] dip
+    [ dup <irc-channel-chat> ] dip
     [ <irc-channel-tab> swap ] keep
     add-page ;
 
 : query-nick ( nick ui-window -- )
-    [ dup <irc-nick-listener> ] dip
+    [ dup <irc-nick-chat> ] dip
     [ <irc-nick-tab> swap ] keep
     add-page ;
 
@@ -232,8 +232,8 @@ M: irc-tab pref-dim*
 
 : ui-connect ( profile -- ui-window )
     <irc-client>
-    { [ [ <irc-server-listener> ] dip add-listener ]
-      [ listeners>> +server-listener+ swap at <irc-server-tab> dup
+    { [ [ <irc-server-chat> ] dip attach-chat ]
+      [ chats>> +server-chat+ swap at <irc-server-tab> dup
         "Server" associate ui-window new-tabbed [ swap (>>window) ] keep ]
       [ >>client ]
       [ connect-irc ] } cleave ;

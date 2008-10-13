@@ -1,9 +1,27 @@
-
-USING: kernel alien.syntax alien.c-types math ;
-
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
+USING: kernel alien.syntax alien.c-types math unix.types ;
 IN: unix.time
 
-TYPEDEF: uint time_t
+C-STRUCT: timeval
+    { "long" "sec" }
+    { "long" "usec" } ;
+
+C-STRUCT: timespec
+    { "time_t" "sec" }
+    { "long" "nsec" } ;
+
+: make-timeval ( ms -- timeval )
+    1000 /mod 1000 *
+    "timeval" <c-object>
+    [ set-timeval-usec ] keep
+    [ set-timeval-sec ] keep ;
+
+: make-timespec ( ms -- timespec )
+    1000 /mod 1000000 *
+    "timespec" <c-object>
+    [ set-timespec-nsec ] keep
+    [ set-timespec-sec ] keep ;
 
 C-STRUCT: tm
     { "int" "sec" }    ! Seconds: 0-59 (K&R says 0-61?)
@@ -17,16 +35,6 @@ C-STRUCT: tm
     { "int" "isdst" }  ! +1 Daylight Savings Time, 0 No DST,
     { "long" "gmtoff" } ! Seconds: 0-59 (K&R says 0-61?)
     { "char*" "zone" } ;
-
-C-STRUCT: timespec
-    { "time_t" "sec" }
-    { "long" "nsec" } ;
-
-: make-timespec ( ms -- timespec )
-    1000 /mod 1000000 *
-    "timespec" <c-object>
-    [ set-timespec-nsec ] keep
-    [ set-timespec-sec ] keep ;
 
 FUNCTION: time_t time ( time_t* t ) ;
 FUNCTION: tm* localtime ( time_t* clock ) ;
