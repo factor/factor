@@ -86,22 +86,24 @@ M: x86 %unbox-float ( dst src -- )
         { clobber { "offset" } }
     } ;
 
-: define-alien-float-intrinsics ( word get-quot word set-quot -- )
-    '[ "value" operand _ %alien-accessor ]
-    alien-float-set-template
-    define-intrinsic
-    '[ "value" operand _ %alien-accessor ]
+: define-float-getter ( word get-quot -- )
+    '[
+        %prepare-alien-accessor
+        "value" operand "offset" operand [] @
+    ]
     alien-float-get-template
     define-intrinsic ;
 
-\ alien-double
-[ MOVSD ]
-\ set-alien-double
-[ swap MOVSD ]
-define-alien-float-intrinsics
+: define-float-setter ( word set-quot -- )
+    '[
+        %prepare-alien-accessor
+        "offset" operand [] "value" operand @
+    ]
+    alien-float-set-template
+    define-intrinsic ;
 
-\ alien-float
-[ dupd MOVSS dup CVTSS2SD ]
-\ set-alien-float
-[ swap dup dup CVTSD2SS MOVSS ]
-define-alien-float-intrinsics
+\ alien-double [ MOVSD ] define-float-getter
+\ set-alien-double [ MOVSD ] define-float-setter
+
+\ alien-float [ dupd MOVSS dup CVTSS2SD ] define-float-getter
+\ set-alien-float [ dup dup CVTSD2SS MOVSS ] define-float-setter

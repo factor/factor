@@ -6,7 +6,8 @@ layouts alien alien.accessors alien.structs slots splitting
 assocs combinators cpu.x86.assembler
 cpu.x86.architecture cpu.x86.intrinsics cpu.x86.sse2
 cpu.x86.allot cpu.architecture compiler.constants
-compiler.codegen compiler.codegen.fixup compiler.cfg.instructions ;
+compiler.codegen compiler.codegen.fixup compiler.cfg.instructions
+compiler.cfg.builder ;
 IN: cpu.x86.64
 
 M: x86.64 machine-registers
@@ -224,10 +225,64 @@ M: x86.64 %callback-value ( ctype -- )
 
 USE: cpu.x86.intrinsics
 
+: (%alien-get-4) ( -- )
+    small-reg-32 "offset" operand [] MOV ; inline
+
+: %alien-unsigned-4 ( -- )
+    %prepare-alien-accessor
+    "value" operand small-reg = [
+        (%alien-get-4)
+    ] [
+        small-reg PUSH
+        (%alien-get-4)
+        "value" operand small-reg MOV
+        small-reg POP
+    ] if
+    "value" operand %tag-fixnum ; inline
+
+: (%alien-signed-4) ( -- )
+    (%alien-get-4)
+    "value" operand small-reg-32 MOVSX ;
+
+: %alien-signed-4 ( -- )
+    %prepare-alien-accessor
+    "value" operand small-reg = [
+        (%alien-signed-4)
+    ] [
+        small-reg PUSH
+        (%alien-signed-4)
+        small-reg POP
+    ] if
+    "value" operand %tag-fixnum ; inline
+
+: define-alien-unsigned-4-getter ( word -- )
+    [ %alien-unsigned-4 ] alien-integer-get-template define-intrinsic ;
+
+: define-alien-signed-4-getter ( word -- )
+    [ %alien-signed-4 ] alien-integer-get-template define-intrinsic ;
+
+: %set-alien-4 ( -- )
+    "value" operand "offset" operand = [
+        "value" operand %untag-fixnum
+    ] unless
+    %prepare-alien-accessor
+    small-reg "offset" operand = [
+        "value" operand "offset" operand XCHG
+        "value" operand [] small-reg-32 MOV
+    ] [
+        small-reg PUSH
+        small-reg "value" operand MOV
+        "offset" operand [] small-reg-32 MOV
+        small-reg POP
+    ] if ; inline
+
+: define-alien-4-setter ( word -- )
+    [ %set-alien-4 ] alien-integer-set-template define-intrinsic ;
+
 ! On 64-bit systems, the result of reading 4 bytes from memory
 ! is a fixnum.
-\ alien-unsigned-4 small-reg-32 define-unsigned-getter
-\ set-alien-unsigned-4 small-reg-32 define-setter
+\ alien-unsigned-4 define-alien-unsigned-4-getter
+\ set-alien-unsigned-4 define-alien-4-setter
 
-\ alien-signed-4 small-reg-32 define-signed-getter
-\ set-alien-signed-4 small-reg-32 define-setter
+\ alien-signed-4 define-alien-signed-4-getter
+\ set-alien-signed-4 define-alien-4-setter

@@ -378,6 +378,8 @@ GENERIC: CMP ( dst src -- )
 M: immediate CMP swap { BIN: 111 t HEX: 80 } immediate-1/4 ;
 M: operand CMP OCT: 070 2-operand ;
 
+: XCHG ( dst src -- ) OCT: 207 2-operand ;
+
 : NOT  ( dst -- ) { BIN: 010 t HEX: f7 } 1-operand ;
 : NEG  ( dst -- ) { BIN: 011 t HEX: f7 } 1-operand ;
 : MUL  ( dst -- ) { BIN: 100 t HEX: f7 } 1-operand ;
@@ -402,6 +404,12 @@ M: operand IMUL2 OCT: 257 extended-opcode (2-operand) ;
 
 : MOVSX ( dst src -- )
     dup register-32? OCT: 143 OCT: 276 extended-opcode ?
+    over register-16? [ BIN: 1 opcode-or ] when
+    swapd
+    (2-operand) ;
+
+: MOVZX ( dst src -- )
+    OCT: 266 extended-opcode
     over register-16? [ BIN: 1 opcode-or ] when
     swapd
     (2-operand) ;

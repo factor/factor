@@ -214,29 +214,26 @@ IN: cpu.x86.intrinsics
 ! allocator about the different sized registers, with all
 ! the complexity this entails, we just push/pop a register
 ! which is guaranteed to be unused (the tempreg)
-: small-reg cell 8 = RAX EAX ? ; inline
-: small-reg-8 AL ; inline
-: small-reg-16 AX ; inline
-: small-reg-32 EAX ; inline
+: small-reg cell 8 = RDX EDX ? ; inline
+: small-reg-8 DL ; inline
+: small-reg-16 DX ; inline
+: small-reg-32 EDX ; inline
 
 : %prepare-alien-accessor ( -- )
     "offset" operand %untag-fixnum
     "offset" operand "alien" operand ADD ;
 
-: (%alien-accessor) ( quot -- )
-    "offset" operand [] swap call ; inline
-
-: %alien-accessor ( quot -- )
-    %prepare-alien-accessor (%alien-accessor) ; inline
+:: (%alien-integer-get) ( reg quot -- )
+    reg "offset" operand [] MOV
+    "value" operand reg quot call ; inline
 
 : %alien-integer-get ( reg quot -- )
     %prepare-alien-accessor
     "value" operand small-reg = [
-        (%alien-accessor)
+        (%alien-integer-get)
     ] [
         small-reg PUSH
-        (%alien-accessor)
-        "value" operand small-reg MOV
+        (%alien-integer-get)
         small-reg POP
     ] if
     "value" operand %tag-fixnum ; inline
@@ -258,20 +255,23 @@ IN: cpu.x86.intrinsics
     define-intrinsic ;
 
 : define-unsigned-getter ( word reg -- )
-    [ small-reg dup XOR MOV ] define-getter ;
+    [ MOVZX ] define-getter ;
 
 : define-signed-getter ( word reg -- )
-    dup '[ MOV small-reg _ MOVSX ] define-getter ;
+    [ MOVSX ] define-getter ;
 
-: %alien-integer-set ( reg quot -- )
-    "value" operand %untag-fixnum
+: %alien-integer-set ( reg -- )
+    "value" operand "offset" operand = [
+        "value" operand %untag-fixnum
+    ] unless
     %prepare-alien-accessor
-    small-reg "value" operand = [
-        (%alien-accessor)
+    small-reg "offset" operand = [
+        "value" operand "offset" operand XCHG
+        "value" operand [] swap MOV
     ] [
         small-reg PUSH
         small-reg "value" operand MOV
-        (%alien-accessor)
+        "offset" operand [] swap MOV
         small-reg POP
     ] if ; inline
 
@@ -286,7 +286,7 @@ IN: cpu.x86.intrinsics
     } ;
 
 : define-setter ( word reg -- )
-    '[ _ [ swap MOV ] %alien-integer-set ]
+    '[ _ %alien-integer-set ]
     alien-integer-set-template
     define-intrinsic ;
 
@@ -303,7 +303,8 @@ IN: cpu.x86.intrinsics
 \ set-alien-signed-2 small-reg-16 define-setter
 
 \ alien-cell [
-    "value" operand [ MOV ] %alien-accessor
+    %prepare-alien-accessor
+    "value" operand "offset" operand [] MOV
 ] T{ template
     { input {
         { unboxed-c-ptr "alien" c-ptr }
@@ -315,7 +316,8 @@ IN: cpu.x86.intrinsics
 } define-intrinsic
 
 \ set-alien-cell [
-    "value" operand [ swap MOV ] %alien-accessor
+    %prepare-alien-accessor
+    "offset" operand [] "value" operand MOV
 ] T{ template
     { input {
         { unboxed-c-ptr "value" pinned-c-ptr }
