@@ -33,19 +33,24 @@ M: f random-32* ( obj -- * ) no-random-number-generator ;
         random-generator get random-bytes*
     ] keep head ;
 
+<PRIVATE
+
+: random-integer ( n -- n' )
+    dup log2 7 + 8 /i 1+
+    [ random-bytes byte-array>bignum ]
+    [ 3 shift 2^ ] bi / * >integer ;
+
+PRIVATE>
+
+: random-bits ( n -- r ) 2^ random-integer ;
+
 : random ( seq -- elt )
     [ f ] [
-        [
-            length dup log2 7 + 8 /i 1+
-            [ random-bytes byte-array>bignum ]
-            [ 3 shift 2^ ] bi / * >integer
-        ] keep nth
+        [ length random-integer ] keep nth
     ] if-empty ;
 
 : delete-random ( seq -- elt )
-    [ length random ] keep [ nth ] 2keep delete-nth ;
-
-: random-bits ( n -- r ) 2^ random ;
+    [ length random-integer ] keep [ nth ] 2keep delete-nth ;
 
 : with-random ( tuple quot -- )
     random-generator swap with-variable ; inline

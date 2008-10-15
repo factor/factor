@@ -1,5 +1,5 @@
 USING: heaps.private help.markup help.syntax kernel math assocs
-math.order ;
+math.order quotations ;
 IN: heaps
 
 ARTICLE: "heaps" "Heaps"
@@ -28,7 +28,9 @@ $nl
 "Removal:"
 { $subsection heap-pop* }
 { $subsection heap-pop }
-{ $subsection heap-delete } ;
+{ $subsection heap-delete }
+"Processing heaps:"
+{ $subsection slurp-heap } ;
 
 ABOUT: "heaps"
 
@@ -82,3 +84,8 @@ HELP: heap-delete
 { $description "Remove the specified entry from the heap." }
 { $errors "Throws an error if the entry is from another heap or if it has already been deleted." }
 { $side-effects "heap" } ;
+
+HELP: slurp-heap
+{ $values
+     { "heap" "a heap" } { "quot" quotation } }
+{ $description "Removes values from a heap and processes them with the quotation until the heap is empty." } ;

@@ -2,101 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel ascii combinators combinators.short-circuit
 sequences splitting fry namespaces make assocs arrays strings
-io.sockets io.sockets.secure io.encodings.string
+io.sockets io.encodings.string
 io.encodings.utf8 math math.parser accessors parser
 strings.parser lexer prettyprint.backend hashtables present
-peg.ebnf ;
+peg.ebnf urls.encoding ;
 IN: urls
-
-: url-quotable? ( ch -- ? )
-    {
-        [ letter? ]
-        [ LETTER? ]
-        [ digit? ]
-        [ "/_-.:" member? ]
-    } 1|| ; foldable
-
-<PRIVATE
-
-: push-utf8 ( ch -- )
-    dup CHAR: \s = [ drop "+" % ] [
-        1string utf8 encode
-        [ CHAR: % , >hex 2 CHAR: 0 pad-left % ] each
-    ] if ;
-
-PRIVATE>
-
-: url-encode ( str -- encoded )
-    [
-        [ dup url-quotable? [ , ] [ push-utf8 ] if ] each
-    ] "" make ;
-
-<PRIVATE
-
-: url-decode-hex ( index str -- )
-    2dup length 2 - >= [
-        2drop
-    ] [
-        [ 1+ dup 2 + ] dip subseq  hex> [ , ] when*
-    ] if ;
-
-: url-decode-% ( index str -- index str )
-    2dup url-decode-hex [ 3 + ] dip ;
-
-: url-decode-+-or-other ( index str ch -- index str )
-    dup CHAR: + = [ drop CHAR: \s ] when , [ 1+ ] dip ;
-
-: url-decode-iter ( index str -- )
-    2dup length >= [
-        2drop
-    ] [
-        2dup nth dup CHAR: % = [
-            drop url-decode-%
-        ] [
-            url-decode-+-or-other
-        ] if url-decode-iter
-    ] if ;
-
-PRIVATE>
-
-: url-decode ( str -- decoded )
-    [ 0 swap url-decode-iter ] "" make utf8 decode ;
-
-<PRIVATE
-
-: add-query-param ( value key assoc -- )
-    [
-        at [
-            {
-                { [ dup string? ] [ swap 2array ] }
-                { [ dup array? ] [ swap suffix ] }
-                { [ dup not ] [ drop ] }
-            } cond
-        ] when*
-    ] 2keep set-at ;
-
-PRIVATE>
-
-: query>assoc ( query -- assoc )
-    dup [
-        "&" split H{ } clone [
-            [
-                [ "=" split1 [ dup [ url-decode ] when ] bi@ swap ] dip
-                add-query-param
-            ] curry each
-        ] keep
-    ] when ;
-
-: assoc>query ( assoc -- str )
-    [
-        dup array? [ [ present ] map ] [ present 1array ] if
-    ] assoc-map
-    [
-        [
-            [ url-encode ] dip
-            [ url-encode "=" swap 3append , ] with each
-        ] assoc-each
-    ] { } make "&" join ;
 
 TUPLE: url protocol username password host port path query anchor ;
 
@@ -229,14 +139,14 @@ PRIVATE>
 
 : derive-url ( base url -- url' )
     [ clone ] dip over {
-        [ [ protocol>> ] either? >>protocol ]
-        [ [ username>> ] either? >>username ]
-        [ [ password>> ] either? >>password ]
-        [ [ host>>     ] either? >>host ]
-        [ [ port>>     ] either? >>port ]
-        [ [ path>>     ] bi@ swap url-append-path >>path ]
-        [ [ query>>    ] either? >>query ]
-        [ [ anchor>>   ] either? >>anchor ]
+        [ [ protocol>>  ] either? >>protocol ]
+        [ [ username>>  ] either? >>username ]
+        [ [ password>>  ] either? >>password ]
+        [ [ host>>      ] either? >>host ]
+        [ [ port>>      ] either? >>port ]
+        [ [ path>>      ] bi@ swap url-append-path >>path ]
+        [ [ query>>     ] either? >>query ]
+        [ [ anchor>>    ] either? >>anchor ]
     } 2cleave ;
 
 : relative-url ( url -- url' )
@@ -245,9 +155,17 @@ PRIVATE>
         f >>host
         f >>port ;
 
+: relative-url? ( url -- ? ) protocol>> not ;
+
 ! Half-baked stuff follows
 : secure-protocol? ( protocol -- ? )
     "https" = ;
+
+<PRIVATE
+
+GENERIC: >secure-addr ( addrspec -- addrspec' )
+
+PRIVATE>
 
 : url-addr ( url -- addr )
     [
@@ -256,7 +174,7 @@ PRIVATE>
         [ protocol>> protocol-port ]
         tri or <inet>
     ] [ protocol>> ] bi
-    secure-protocol? [ <secure> ] when ;
+    secure-protocol? [ >secure-addr ] when ;
 
 : ensure-port ( url -- url )
     dup protocol>> '[ _ protocol-port or ] change-port ;

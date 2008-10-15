@@ -420,15 +420,25 @@ M: windows-ui-backend do-events
     style 0 ex-style AdjustWindowRectEx win32-error=0/f ;
 
 : make-RECT ( world -- RECT )
-    dup window-loc>> { 40 40 } vmax dup rot rect-dim v+
+    dup window-loc>> dup rot rect-dim v+
     "RECT" <c-object>
     over first over set-RECT-right
     swap second over set-RECT-bottom
     over first over set-RECT-left
     swap second over set-RECT-top ;
 
+: default-position-RECT ( RECT -- )
+    dup get-RECT-dimensions [ 2drop ] 2dip
+    CW_USEDEFAULT + pick set-RECT-bottom
+    CW_USEDEFAULT + over set-RECT-right
+    CW_USEDEFAULT over set-RECT-left
+    CW_USEDEFAULT swap set-RECT-top ;
+
 : make-adjusted-RECT ( rect -- RECT )
-    make-RECT dup adjust-RECT ;
+    make-RECT
+    dup get-RECT-top-left [ zero? ] both? swap
+    dup adjust-RECT
+    swap [ dup default-position-RECT ] when ;
 
 : create-window ( rect -- hwnd )
     make-adjusted-RECT

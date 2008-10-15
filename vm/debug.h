@@ -4,4 +4,6 @@ void dump_generations(void);
 void factorbug(void);
 void dump_zone(F_ZONE *z);
 
+bool fep_disabled;
+
 DECLARE_PRIMITIVE(die);

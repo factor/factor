@@ -10,20 +10,23 @@ SYMBOL: class-not-cache
 SYMBOL: classes-intersect-cache
 SYMBOL: class-and-cache
 SYMBOL: class-or-cache
+SYMBOL: next-method-quot-cache
 
 : init-caches ( -- )
     H{ } clone class<=-cache set
     H{ } clone class-not-cache set
     H{ } clone classes-intersect-cache set
     H{ } clone class-and-cache set
-    H{ } clone class-or-cache set ;
+    H{ } clone class-or-cache set
+    H{ } clone next-method-quot-cache set ;
 
 : reset-caches ( -- )
     class<=-cache get clear-assoc
     class-not-cache get clear-assoc
     classes-intersect-cache get clear-assoc
     class-and-cache get clear-assoc
-    class-or-cache get clear-assoc ;
+    class-or-cache get clear-assoc
+    next-method-quot-cache get clear-assoc ;
 
 SYMBOL: update-map
 

@@ -17,19 +17,17 @@ IN: furnace.alloy
     state-classes ensure-tables
     user ensure-table ;
 
-: <alloy> ( responder db params -- responder' )
-    [ [ init-furnace-tables ] with-db ]
+: <alloy> ( responder db -- responder' )
+    [ [ init-furnace-tables ] with-db ] keep
     [
-        [
-            <asides>
-            <conversations>
-            <sessions>
-        ] 2dip
-        <db-persistence>
-        <check-form-submissions>
-    ] 2bi ;
+        <asides>
+        <conversations>
+        <sessions>
+    ] dip
+    <db-persistence>
+    <check-form-submissions> ;
 
-: start-expiring ( db params -- )
+: start-expiring ( db -- )
     '[
-        _ _ [ state-classes [ expire-state ] each ] with-db
+        _ [ state-classes [ expire-state ] each ] with-db
     ] 5 minutes every drop ;

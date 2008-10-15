@@ -14,7 +14,7 @@ io.encodings.binary
 io.streams.limited
 io.servers.connection
 io.timeouts
-fry logging logging.insomniac calendar urls
+fry logging logging.insomniac calendar urls urls.encoding
 http
 http.parsers
 http.server.responses
@@ -23,6 +23,8 @@ html.templates
 html.elements
 html.streams ;
 IN: http.server
+
+\ parse-cookie DEBUG add-input-logging
 
 : check-absolute ( url -- url )
     dup path>> "/" head? [ "Bad request: URL" throw ] unless ; inline
@@ -153,8 +155,8 @@ main-responder global [ <404> <trivial-responder> or ] change-at
     [ add-responder-nesting ] [ call-responder* ] 2bi ;
 
 : http-error. ( error -- )
-    "Internal server error" [
-        [ print-error nl :c ] with-html-stream
+    "Internal server error" [ ] [
+        [ print-error nl :c ] with-html-writer
     ] simple-page ;
 
 : <500> ( error -- response )

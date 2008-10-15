@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs classes continuations destructors kernel math
 namespaces sequences classes.tuple words strings
-tools.walker accessors combinators ;
+tools.walker accessors combinators fry ;
 IN: db
 
 TUPLE: db
@@ -17,23 +17,18 @@ TUPLE: db
         H{ } clone >>update-statements
         H{ } clone >>delete-statements ; inline
 
-GENERIC: make-db* ( object db -- db )
-
-: make-db ( object class -- db ) new-db make-db* ;
-
 GENERIC: db-open ( db -- db )
 HOOK: db-close db ( handle -- )
 
 : dispose-statements ( assoc -- ) values dispose-each ;
 
-: db-dispose ( db -- ) 
+M: db dispose ( db -- ) 
     dup db [
-        {
-            [ insert-statements>> dispose-statements ]
-            [ update-statements>> dispose-statements ]
-            [ delete-statements>> dispose-statements ]
-            [ handle>> db-close ]
-        } cleave
+        [ dispose-statements H{ } clone ] change-insert-statements
+        [ dispose-statements H{ } clone ] change-update-statements
+        [ dispose-statements H{ } clone ] change-delete-statements
+        [ db-close f ] change-handle
+        drop
     ] with-variable ;
 
 TUPLE: result-set sql in-params out-params handle n max ;
@@ -111,27 +106,26 @@ M: object execute-statement* ( statement type -- )
 : query-map ( statement quot -- seq )
     accumulator [ query-each ] dip { } like ; inline
 
-: with-db ( seq class quot -- )
-    [ make-db db-open db ] dip
-    [ db get swap [ drop ] prepose with-disposal ] curry with-variable ;
-    inline
+: with-db ( db quot -- )
+    [ db-open db ] dip
+    '[ db get [ drop @ ] with-disposal ] with-variable ; inline
 
+! Words for working with raw SQL statements
 : default-query ( query -- result-set )
     query-results [ [ sql-row ] query-map ] with-disposal ;
 
 : sql-query ( sql -- rows )
     f f <simple-statement> [ default-query ] with-disposal ;
 
-: sql-command ( sql -- )
-    dup string? [
-        f f <simple-statement> [ execute-statement ] with-disposal
-    ] [
-        ! [
-            [ sql-command ] each
-        ! ] with-transaction
-    ] if ;
+: (sql-command) ( string -- )
+    f f <simple-statement> [ execute-statement ] with-disposal ;
 
+: sql-command ( sql -- )
+    dup string? [ (sql-command) ] [ [ (sql-command) ] each ] if ;
+
+! Transactions
 SYMBOL: in-transaction
+
 HOOK: begin-transaction db ( -- )
 HOOK: commit-transaction db ( -- )
 HOOK: rollback-transaction db ( -- )

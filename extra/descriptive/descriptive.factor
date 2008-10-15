@@ -1,4 +1,4 @@
-USING: words kernel sequences combinators.lib locals
+USING: words kernel sequences locals
 locals.private accessors parser namespaces continuations
 summary definitions generalizations arrays ;
 IN: descriptive

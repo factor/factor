@@ -1,3 +1,0 @@
-<% USING: xmode.code2html splitting namespaces ; %>
-
-<pre class="code"><% "contents" get string-lines "mode" get htmlize-lines %></pre>

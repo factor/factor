@@ -54,26 +54,28 @@ M: c-reader stream-read-until
 M: c-reader dispose*
     handle>> fclose ;
 
-M: object init-io ;
+M: c-io-backend init-io ;
 
 : stdin-handle 11 getenv ;
 : stdout-handle 12 getenv ;
 : stderr-handle 61 getenv ;
 
-M: object (init-stdio)
+: init-c-stdio ( -- stdin stdout stderr )
     stdin-handle <c-reader>
     stdout-handle <c-writer>
     stderr-handle <c-writer> ;
 
-M: object io-multiplex 60 60 * 1000 * or (sleep) ;
+M: c-io-backend (init-stdio) init-c-stdio ;
 
-M: object (file-reader)
+M: c-io-backend io-multiplex 60 60 * 1000 * or (sleep) ;
+
+M: c-io-backend (file-reader)
     "rb" fopen <c-reader> ;
 
-M: object (file-writer)
+M: c-io-backend (file-writer)
     "wb" fopen <c-writer> ;
 
-M: object (file-appender)
+M: c-io-backend (file-appender)
     "ab" fopen <c-writer> ;
 
 : show ( msg -- )

@@ -5,19 +5,20 @@ io.files kernel math math.parser namespaces prettyprint
 sequences strings classes.tuple alien.c-types continuations
 db.sqlite.lib db.sqlite.ffi db.tuples words db.types combinators
 math.intervals io nmake accessors vectors math.ranges random
-math.bitwise db.queries destructors db.tuples.private ;
+math.bitwise db.queries destructors db.tuples.private interpolate
+io.streams.string multiline make ;
 IN: db.sqlite
 
 TUPLE: sqlite-db < db path ;
 
-M: sqlite-db make-db* ( path db -- db )
-    swap >>path ;
+: <sqlite-db> ( path -- sqlite-db )
+    sqlite-db new-db
+        swap >>path ;
 
 M: sqlite-db db-open ( db -- db )
     dup path>> sqlite-open >>handle ;
 
 M: sqlite-db db-close ( handle -- ) sqlite-close ;
-M: sqlite-db dispose ( db -- ) db-dispose ;
 
 TUPLE: sqlite-statement < statement ;
 
@@ -47,8 +48,8 @@ M: sqlite-result-set dispose ( result-set -- )
     handle>> [ sqlite3_reset drop ] [ sqlite3_clear_bindings drop ] bi ;
 
 M: sqlite-statement low-level-bind ( statement -- )
-    [ bind-params>> ] [ handle>> ] bi
-    [ swap [ key>> ] [ value>> ] [ type>> ] tri sqlite-bind-type ] curry each ;
+    [ handle>> ] [ bind-params>> ] bi
+    [ [ key>> ] [ value>> ] [ type>> ] tri sqlite-bind-type ] with each ;
 
 M: sqlite-statement bind-statement* ( statement -- )
     sqlite-maybe-prepare
@@ -77,16 +78,19 @@ M: generator-bind sqlite-bind-conversion ( tuple generate-bind -- array )
     tuck
     [ generator-singleton>> eval-generator tuck ] [ slot-name>> ] bi
     rot set-slot-named
-    >r [ key>> ] [ type>> ] bi r> swap <sqlite-low-level-binding> ;
+    [ [ key>> ] [ type>> ] bi ] dip
+    swap <sqlite-low-level-binding> ;
 
 M: sqlite-statement bind-tuple ( tuple statement -- )
     [
         in-params>> [ sqlite-bind-conversion ] with map
     ] keep bind-statement ;
 
+ERROR: sqlite-last-id-fail ;
+
 : last-insert-id ( -- id )
     db get handle>> sqlite3_last_insert_rowid
-    dup zero? [ "last-id failed" throw ] when ;
+    dup zero? [ sqlite-last-id-fail ] when ;
 
 M: sqlite-db insert-tuple-set-key ( tuple statement -- )
     execute-statement last-insert-id swap set-primary-key ;
@@ -99,7 +103,7 @@ M: sqlite-result-set row-column ( result-set n -- obj )
 
 M: sqlite-result-set row-column-typed ( result-set n -- obj )
     dup pick out-params>> nth type>>
-    >r >r handle>> r> r> sqlite-column-typed ;
+    [ handle>> ] 2dip sqlite-column-typed ;
 
 M: sqlite-result-set advance-row ( result-set -- )
     dup handle>> sqlite-next >>has-more? drop ;
@@ -117,7 +121,8 @@ M: sqlite-db create-sql-statement ( class -- statement )
         dupd
         "create table " 0% 0%
         "(" 0% [ ", " 0% ] [
-            dup column-name>> 0%
+            dup "sql-spec" set
+            dup column-name>> [ "table-id" set ] [ 0% ] bi
             " " 0%
             dup type>> lookup-create-type 0%
             modifiers 0%
@@ -158,10 +163,10 @@ M: sqlite-db <insert-user-assigned-statement> ( tuple -- statement )
     <insert-db-assigned-statement> ;
 
 M: sqlite-db bind# ( spec obj -- )
-    >r
-    [ column-name>> ":" swap next-sql-counter 3append dup 0% ]
-    [ type>> ] bi
-    r> <literal-bind> 1, ;
+    [
+        [ column-name>> ":" swap next-sql-counter 3append dup 0% ]
+        [ type>> ] bi
+    ] dip <literal-bind> 1, ;
 
 M: sqlite-db bind% ( spec -- )
     dup 1, column-name>> ":" prepend 0% ;
@@ -173,6 +178,7 @@ M: sqlite-db persistent-table ( -- assoc )
         { +random-id+ { "integer" "integer" f } }
         { +foreign-id+ { "integer" "integer" "references" } }
 
+        { +on-update+ { f f "on update" } }
         { +on-delete+ { f f "on delete" } }
         { +restrict+ { f f "restrict" } }
         { +cascade+ { f f "cascade" } }
@@ -203,9 +209,110 @@ M: sqlite-db persistent-table ( -- assoc )
         { random-generator { f f f } }
     } ;
 
+: insert-trigger ( -- string )
+    [
+    <"
+        CREATE TRIGGER fki_${table}_${foreign-table}_id
+        BEFORE INSERT ON ${table}
+        FOR EACH ROW BEGIN
+            SELECT RAISE(ROLLBACK, 'insert on table "${table}" violates foreign key constraint "fk_${foreign-table}_id"')
+            WHERE  (SELECT ${foreign-table-id} FROM ${foreign-table} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
+        END;
+    "> interpolate
+    ] with-string-writer ;
+
+: insert-trigger-not-null ( -- string )
+    [
+    <"
+        CREATE TRIGGER fki_${table}_${foreign-table}_id
+        BEFORE INSERT ON ${table}
+        FOR EACH ROW BEGIN
+            SELECT RAISE(ROLLBACK, 'insert on table "${table}" violates foreign key constraint "fk_${foreign-table}_id"')
+            WHERE NEW.${foreign-table-id} IS NOT NULL
+                AND (SELECT ${foreign-table-id} FROM ${foreign-table} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
+        END;
+    "> interpolate
+    ] with-string-writer ;
+
+: update-trigger ( -- string )
+    [
+    <"
+        CREATE TRIGGER fku_${table}_${foreign-table}_id
+        BEFORE UPDATE ON ${table}
+        FOR EACH ROW BEGIN
+            SELECT RAISE(ROLLBACK, 'update on table "${table}" violates foreign key constraint "fk_${foreign-table}_id"')
+            WHERE  (SELECT ${foreign-table-id} FROM ${foreign-table} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
+        END;
+    "> interpolate
+    ] with-string-writer ;
+
+: update-trigger-not-null ( -- string )
+    [
+    <"
+        CREATE TRIGGER fku_${table}_${foreign-table}_id
+        BEFORE UPDATE ON ${table}
+        FOR EACH ROW BEGIN
+            SELECT RAISE(ROLLBACK, 'update on table "${table}" violates foreign key constraint "fk_${foreign-table}_id"')
+            WHERE NEW.${foreign-table-id} IS NOT NULL
+                AND (SELECT ${foreign-table-id} FROM ${foreign-table} WHERE ${foreign-table-id} = NEW.${table-id}) IS NULL;
+        END;
+    "> interpolate
+    ] with-string-writer ;
+
+: delete-trigger-restrict ( -- string )
+    [
+    <"
+        CREATE TRIGGER fkd_${table}_${foreign-table}_id
+        BEFORE DELETE ON ${foreign-table}
+        FOR EACH ROW BEGIN
+            SELECT RAISE(ROLLBACK, 'delete on table "${foreign-table}" violates foreign key constraint "fk_${foreign-table}_id"')
+            WHERE  (SELECT ${foreign-table-id} FROM ${foreign-table} WHERE ${foreign-table-id} = OLD.${foreign-table-id}) IS NOT NULL;
+        END;
+    "> interpolate
+    ] with-string-writer ;
+
+: delete-trigger-cascade ( -- string )
+    [
+    <"
+        CREATE TRIGGER fkd_${table}_${foreign-table}_id
+        BEFORE DELETE ON ${foreign-table}
+        FOR EACH ROW BEGIN
+            DELETE from ${table} WHERE ${table-id} = OLD.${foreign-table-id};
+        END;
+    "> interpolate
+    ] with-string-writer ;
+
+: can-be-null? ( -- ? )
+    "sql-spec" get modifiers>> [ +not-null+ = ] contains? not ;
+
+: delete-cascade? ( -- ? )
+    "sql-spec" get modifiers>> { +on-delete+ +cascade+ } swap subseq? ;
+
+: sqlite-trigger, ( string -- )
+    { } { } <simple-statement> 3, ;
+
+: create-sqlite-triggers ( -- )
+    can-be-null? [
+        insert-trigger sqlite-trigger,
+        update-trigger sqlite-trigger,
+    ] [ 
+        insert-trigger-not-null sqlite-trigger,
+        update-trigger-not-null sqlite-trigger,
+    ] if
+    delete-cascade? [
+        delete-trigger-cascade sqlite-trigger,
+    ] [
+        delete-trigger-restrict sqlite-trigger,
+    ] if ;
+
 M: sqlite-db compound ( string seq -- new-string )
     over {
         { "default" [ first number>string join-space ] }
-        { "references" [ >reference-string ] }
+        { "references" [
+            [ >reference-string ] keep
+            first2 [ "foreign-table" set ]
+            [ "foreign-table-id" set ] bi*
+            create-sqlite-triggers
+        ] }
         [ 2drop ]
     } case ;

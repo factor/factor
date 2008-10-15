@@ -1,3 +1,5 @@
+! Copyright (C) 2008 Doug Coleman.
+! See http://factorcode.org/license.txt for BSD license.
 USING: kernel io.ports io.unix.backend math.bitwise
 unix io.files.unique.backend system ;
 IN: io.unix.files.unique

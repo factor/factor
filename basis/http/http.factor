@@ -3,7 +3,7 @@
 USING: accessors kernel combinators math namespaces make
 assocs sequences splitting sorting sets debugger
 strings vectors hashtables quotations arrays byte-arrays
-math.parser calendar calendar.format present urls logging
+math.parser calendar calendar.format present urls
 
 io io.encodings io.encodings.iana io.encodings.binary
 io.encodings.8-bit
@@ -95,8 +95,6 @@ TUPLE: cookie name value version comment path domain expires max-age http-only s
         ] assoc-each
         drop
     ] { } make ;
-
-\ parse-cookie DEBUG add-input-logging
 
 : check-cookie-string ( string -- string' )
     dup "=;'\"\r\n" intersect empty?

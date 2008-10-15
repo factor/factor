@@ -1,8 +1,62 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: classes help.markup help.syntax io.streams.string kernel
-quotations sequences strings multiline math db.types ;
+quotations sequences strings multiline math db.types db ;
 IN: db.tuples
+
+HELP: create-sql-statement
+{ $values
+     { "class" class }
+     { "object" object } }
+{ $description "Generates the SQL code for creating a table for a given class." } ;
+
+HELP: drop-sql-statement
+{ $values
+     { "class" class }
+     { "object" object } }
+{ $description "Generates the SQL code for dropping a table for a given class." } ;
+
+HELP: insert-tuple-set-key
+{ $values
+     { "tuple" tuple } { "statement" statement } }
+{ $description "Inserts a tuple and sets its primary key in one word. This is necessary for some databases." } ;
+
+HELP: <count-statement>
+{ $values
+     { "query" query }
+     { "statement" statement } }
+{ $description "A database-specific hook for generating the SQL for a count statement." } ;
+
+HELP: <delete-tuples-statement>
+{ $values
+     { "tuple" tuple } { "class" class }
+     { "object" object } }
+{ $description "A database-specific hook for generating the SQL for an delete statement." } ;
+
+HELP: <insert-db-assigned-statement>
+{ $values
+     { "class" class }
+     { "object" object } }
+{ $description "A database-specific hook for generating the SQL for an insert statement with a database-assigned primary key." } ;
+
+HELP: <insert-user-assigned-statement>
+{ $values
+     { "class" class }
+     { "object" object } }
+{ $description "A database-specific hook for generating the SQL for an insert statement with a user-assigned primary key." } ;
+
+HELP: <select-by-slots-statement>
+{ $values
+     { "tuple" tuple } { "class" class }
+     { "tuple" tuple } }
+{ $description "A database-specific hook for generating the SQL for a select statement." } ;
+
+HELP: <update-tuple-statement>
+{ $values
+     { "class" class }
+     { "object" object } }
+{ $description "A database-specific hook for generating the SQL for an update statement." } ;
+
 
 HELP: define-persistent
 { $values
@@ -128,7 +182,21 @@ ARTICLE: "db-tuples-words" "High-level tuple/database words"
 { $subsection count-tuples } ;
 
 ARTICLE: "db-tuples-protocol" "Tuple database protocol"
-;
+"Creating a table:"
+{ $subsection create-sql-statement }
+"Dropping a table:"
+{ $subsection drop-sql-statement }
+"Inserting a tuple:"
+{ $subsection <insert-db-assigned-statement> }
+{ $subsection <insert-user-assigned-statement> }
+"Updating a tuple:"
+{ $subsection <update-tuple-statement> }
+"Deleting tuples:"
+{ $subsection <delete-tuples-statement> }
+"Selecting tuples:"
+{ $subsection <select-by-slots-statement> }
+"Counting tuples:"
+{ $subsection <count-statement> } ;
 
 ARTICLE: "db-tuples-tutorial" "Tuple database tutorial"
 "Let's make a tuple and store it in a database. To follow along, click on each code example and run it in the listener.  If you forget to run an example, just start at the top and run them all again in order." $nl
@@ -161,7 +229,7 @@ T{ book
 "Now we've created a book. Let's save it to the database."
 { $code <" USING: db db.sqlite fry io.files ;
 : with-book-tutorial ( quot -- )
-     '[ "book-tutorial.db" temp-file sqlite-db _ with-db ] call ;
+     '[ "book-tutorial.db" temp-file <sqlite-db> _ with-db ] call ;
 
 [
     book recreate-table
@@ -190,7 +258,7 @@ T{ book
 { $list
     "Make a new tuple to represent your data"
     { "Map the Factor types to the database types with " { $link define-persistent } }
-    { "Make a " { $link "db-custom-database-combinators" } " to open your database and run a " { $snippet "quotation" } }
+    { "Make a custom database combinator (see" { $link "db-custom-database-combinators" } ") to open your database and run a " { $link quotation } }
     { "Create a table with " { $link create-table } ", " { $link ensure-table } ", or " { $link recreate-table } }
     { "Start making and storing objects with " { $link insert-tuple } ", " { $link update-tuple } ", " { $link delete-tuples } ", and " { $link select-tuples } }
 } ;

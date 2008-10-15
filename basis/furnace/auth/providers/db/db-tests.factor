@@ -11,7 +11,7 @@ io.files accessors kernel ;
 
 [ "auth-test.db" temp-file delete-file ] ignore-errors
 
-"auth-test.db" temp-file sqlite-db [
+"auth-test.db" temp-file <sqlite-db> [
 
     user ensure-table
 

@@ -10,18 +10,14 @@ USE: tools.walker
 IN: db.postgresql
 
 TUPLE: postgresql-db < db
-    host port pgopts pgtty db user pass ;
+    host port pgopts pgtty database username password ;
+
+: <postgresql-db> ( -- postgresql-db )
+    postgresql-db new-db ;
 
 TUPLE: postgresql-statement < statement ;
 
 TUPLE: postgresql-result-set < result-set ;
-
-M: postgresql-db make-db* ( seq db -- db )
-    >r first4 r>
-        swap >>db
-        swap >>pass
-        swap >>user
-        swap >>host ;
 
 M: postgresql-db db-open ( db -- db )
     dup {
@@ -29,13 +25,13 @@ M: postgresql-db db-open ( db -- db )
         [ port>> ]
         [ pgopts>> ]
         [ pgtty>> ]
-        [ db>> ]
-        [ user>> ]
-        [ pass>> ]
+        [ database>> ]
+        [ username>> ]
+        [ password>> ]
     } cleave connect-postgres >>handle ;
 
-M: postgresql-db dispose ( db -- )
-    handle>> PQfinish ;
+M: postgresql-db db-close ( handle -- )
+    PQfinish ;
 
 M: postgresql-statement bind-statement* ( statement -- ) drop ;
 
@@ -102,7 +98,7 @@ M: postgresql-result-set dispose ( result-set -- )
 
 M: postgresql-statement prepare-statement ( statement -- )
     dup
-    >r db get handle>> f r>
+    [ db get handle>> f ] dip
     [ sql>> ] [ in-params>> ] bi
     length f PQprepare postgresql-error
     >>handle drop ;
@@ -121,7 +117,8 @@ M: postgresql-db bind% ( spec -- )
     bind-name% 1, ;
 
 M: postgresql-db bind# ( spec object -- )
-    >r bind-name% f swap type>> r> <literal-bind> 1, ;
+    [ bind-name% f swap type>> ] dip
+    <literal-bind> 1, ;
 
 : create-table-sql ( class -- statement )
     [
@@ -143,7 +140,7 @@ M: postgresql-db bind# ( spec object -- )
 
 : create-function-sql ( class -- statement )
     [
-        >r remove-id r>
+        [ remove-id ] dip
         "create function add_" 0% dup 0%
         "(" 0%
         over [ "," 0% ]
@@ -233,6 +230,7 @@ M: postgresql-db persistent-table ( -- hashtable )
 
         { +foreign-id+ { f f "references" } }
 
+        { +on-update+ { f f "on update" } }
         { +on-delete+ { f f "on delete" } }
         { +restrict+ { f f "restrict" } }
         { +cascade+ { f f "cascade" } }

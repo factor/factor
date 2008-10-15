@@ -1,6 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math.ranges math.text.english sequences sequences.lib strings
+USING: kernel math.ranges math.text.english sequences strings
     ascii combinators.short-circuit ;
 IN: project-euler.017
 

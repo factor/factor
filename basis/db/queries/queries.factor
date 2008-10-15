@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors kernel math namespaces make sequences random
 strings math.parser math.intervals combinators math.bitwise
-nmake db db.tuples db.types db.sql classes words shuffle arrays
-destructors continuations db.tuples.private ;
+nmake db db.tuples db.types classes words shuffle arrays
+destructors continuations db.tuples.private prettyprint ;
 IN: db.queries
 
 GENERIC: where ( specs obj -- )
@@ -45,11 +45,14 @@ M: retryable execute-statement* ( statement type -- )
 : sql-props ( class -- columns table )
     [ db-columns ] [ db-table ] bi ;
 
-: query-make ( class quot -- )
+: query-make ( class quot -- statements )
+    #! query, input, outputs, secondary queries
+    over unparse "table" set
     [ sql-props ] dip
     [ 0 sql-counter rot with-variable ] curry
-    { "" { } { } } nmake
-    <simple-statement> maybe-make-retryable ; inline
+    { "" { } { } { } } nmake
+    [ <simple-statement> maybe-make-retryable ] dip
+    [ [ 1array ] dip append ] unless-empty ; inline
 
 : where-primary-key% ( specs -- )
     " where " 0%
@@ -111,6 +114,9 @@ M: sequence where ( spec obj -- )
         [ " or " 0% ] [ dupd where ] interleave drop
     ] in-parens ;
 
+M: NULL where ( spec obj -- )
+    drop column-name>> 0% " is NULL" 0% ;
+
 : object-where ( spec obj -- )
     over column-name>> 0% " = " 0% bind# ;
 
@@ -142,35 +148,34 @@ M: db <delete-tuples-statement> ( tuple table -- sql )
         where-clause
     ] query-make ;
 
+ERROR: all-slots-ignored class ;
+
 M: db <select-by-slots-statement> ( tuple class -- statement )
     [
         "select " 0%
-        over [ ", " 0% ]
+        [ dupd filter-ignores ] dip
+        over empty? [ all-slots-ignored ] when
+        over
+        [ ", " 0% ]
         [ dup column-name>> 0% 2, ] interleave
-
         " from " 0% 0%
         where-clause
     ] query-make ;
 
+: splice ( string1 string2 string3 -- string )
+    swap 3append ;
+
 : do-group ( tuple groups -- )
-    [
-        ", " join " group by " swap 3append
-    ] curry change-sql drop ;
+    [ ", " join " group by " splice ] curry change-sql drop ;
 
 : do-order ( tuple order -- )
-    [
-        ", " join " order by " swap 3append
-    ] curry change-sql drop ;
+    [ ", " join " order by " splice ] curry change-sql drop ;
 
 : do-offset ( tuple n -- )
-    [
-        number>string " offset " swap 3append
-    ] curry change-sql drop ;
+    [ number>string " offset " splice ] curry change-sql drop ;
 
 : do-limit ( tuple n -- )
-    [
-        number>string " limit " swap 3append
-    ] curry change-sql drop ;
+    [ number>string " limit " splice ] curry change-sql drop ;
 
 : make-query* ( tuple query -- tuple' )
     dupd
@@ -186,18 +191,6 @@ M: db query>statement ( query -- tuple )
     [ <select-by-slots-statement> ] dip make-query* ;
 
 ! select ID, NAME, SCORE from EXAM limit 1 offset 3
-
-: select-tuples* ( tuple -- statement )
-    dup
-    [
-        select 0,
-        dup class db-columns [ ", " 0, ]
-        [ dup column-name>> 0, 2, ] interleave
-        from 0,
-        class name>> 0,
-    ] { { } { } { } } nmake
-    >r >r parse-sql 4drop r> r>
-    <simple-statement> maybe-make-retryable do-select ;
 
 M: db <count-statement> ( query -- statement )
     [ tuple>> dup class ] keep

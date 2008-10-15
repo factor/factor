@@ -1,20 +1,18 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors qualified io.streams.c init fry namespaces make
-assocs kernel parser lexer strings.parser tools.deploy.config
-vocabs sequences words words.private memory kernel.private
-continuations io prettyprint vocabs.loader debugger system
-strings sets vectors quotations byte-arrays sorting ;
+USING: accessors qualified io.backend io.streams.c init fry
+namespaces make assocs kernel parser lexer strings.parser
+tools.deploy.config vocabs sequences words words.private memory
+kernel.private continuations io prettyprint vocabs.loader
+debugger system strings sets vectors quotations byte-arrays
+sorting compiler.units definitions ;
 QUALIFIED: bootstrap.stage2
 QUALIFIED: classes
 QUALIFIED: command-line
 QUALIFIED: compiler.errors.private
-QUALIFIED: compiler.units
 QUALIFIED: continuations
 QUALIFIED: definitions
 QUALIFIED: init
-QUALIFIED: io.backend
-QUALIFIED: io.thread
 QUALIFIED: layouts
 QUALIFIED: listener
 QUALIFIED: prettyprint.config
@@ -87,8 +85,8 @@ IN: tools.deploy.shaker
             ] change-props drop
         ] each
     ] [
-        "Remaining word properties:" print
-        [ props>> keys ] gather .
+        "Remaining word properties:\n" show
+        [ props>> keys ] gather unparse show
     ] [
         H{ } clone '[
             [ [ _ [ ] cache ] map ] change-props drop
@@ -198,11 +196,6 @@ IN: tools.deploy.shaker
     strip-word-names? [ dup strip-word-names ] when
     2drop ;
 
-: strip-recompile-hook ( -- )
-    [ [ f ] { } map>assoc ]
-    compiler.units:recompile-hook
-    set-global ;
-
 : strip-vocab-globals ( except names -- words )
     [ child-vocabs [ words ] map concat ] map concat swap diff ;
 
@@ -220,12 +213,13 @@ IN: tools.deploy.shaker
             continuations:restarts
             listener:error-hook
             init:init-hooks
-            io.thread:io-thread
             source-files:source-files
             input-stream
             output-stream
             error-stream
         } %
+
+        "io-thread" "io.thread" lookup ,
 
         "mallocs" "libc.private" lookup ,
 
@@ -233,7 +227,7 @@ IN: tools.deploy.shaker
             "initial-thread" "threads" lookup ,
         ] unless
 
-        strip-io? [ io.backend:io-backend , ] when
+        strip-io? [ io-backend , ] when
 
         { } {
             "alarms"
@@ -260,9 +254,9 @@ IN: tools.deploy.shaker
                 command-line:main-vocab-hook
                 compiled-crossref
                 compiled-generic-crossref
-                compiler.units:recompile-hook
-                compiler.units:update-tuples-hook
-                compiler.units:definition-observers
+                recompile-hook
+                update-tuples-hook
+                definition-observers
                 definitions:crossref
                 interactive-vocabs
                 layouts:num-tags
@@ -326,6 +320,14 @@ IN: tools.deploy.shaker
         21 setenv
     ] [ drop ] if ;
 
+: strip-c-io ( -- )
+    deploy-io get 2 = os windows? or [
+        [
+            c-io-backend forget
+            "io.streams.c" forget-vocab
+        ] with-compilation-unit
+    ] unless ;
+
 : compress ( pred string -- )
     "Compressing " prepend show
     instances
@@ -358,22 +360,29 @@ SYMBOL: deploy-vocab
         init-hooks get values concat %
         ,
         strip-io? [ \ flush , ] unless
-    ] [ ] make "Boot quotation: " write dup . flush
+    ] [ ] make "Boot quotation: " show dup unparse show
     set-boot-quot ;
 
+: init-stripper ( -- )
+    t "quiet" set-global
+    f output-stream set-global ;
+
 : strip ( -- )
+    init-stripper
     strip-libc
     strip-cocoa
     strip-debugger
-    strip-recompile-hook
     strip-init-hooks
+    strip-c-io
+    f 5 setenv ! we can't use the Factor debugger or Factor I/O anymore
     deploy-vocab get vocab-main set-boot-quot*
     stripped-word-props >r
     stripped-globals strip-globals
     r> strip-words
     compress-byte-arrays
     compress-quotations
-    compress-strings ;
+    compress-strings
+    H{ } clone classes:next-method-quot-cache set-global ;
 
 : (deploy) ( final-image vocab config -- )
     #! Does the actual work of a deployment in the slave

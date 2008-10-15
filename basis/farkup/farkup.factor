@@ -1,14 +1,15 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays combinators html.elements io
-io.streams.string kernel math memoize namespaces peg peg.ebnf
+io.streams.string kernel math namespaces peg peg.ebnf
 sequences sequences.deep strings xml.entities
-vectors splitting xmode.code2html urls ;
+vectors splitting xmode.code2html urls.encoding ;
 IN: farkup
 
 SYMBOL: relative-link-prefix
 SYMBOL: disable-images?
 SYMBOL: link-no-follow?
+SYMBOL: line-breaks?
 
 TUPLE: heading1 child ;
 TUPLE: heading2 child ;
@@ -29,6 +30,7 @@ TUPLE: link href text ;
 TUPLE: image href text ;
 TUPLE: code mode string ;
 TUPLE: line ;
+TUPLE: line-break ;
 
 : absolute-url? ( string -- ? )
     { "http://" "https://" "ftp://" } [ head? ] with contains? ;
@@ -109,7 +111,9 @@ table            =  ((table-row nl => [[ first ]] )+ table-row? | table-row)
 text = (!(nl | code | heading | inline-delimiter | table ).)+
     => [[ >string ]]
 
-paragraph-nl-item = nl (list | line)?
+paragraph-nl-item = nl list
+    | nl line
+    | nl => [[ line-breaks? get [ drop line-break new ] when ]]
 paragraph-item = (table | code | text | inline-tag | inline-delimiter)+
 paragraph = ((paragraph-item paragraph-nl-item)+ nl+ => [[ first ]]
              | (paragraph-item paragraph-nl-item)+ paragraph-item?
@@ -209,6 +213,7 @@ M: link (write-farkup) [ href>> ] [ text>> ] bi write-link ;
 M: image (write-farkup) [ href>> ] [ text>> ] bi write-image-link ;
 M: code (write-farkup) [ string>> ] [ mode>> ] bi render-code ;
 M: line (write-farkup) drop <hr/> ;
+M: line-break (write-farkup) drop <br/> nl ;
 M: table-row (write-farkup) ( obj -- )
     child>> [ [ [ (write-farkup) ] "td" in-tag. ] each ] "tr" in-tag. ;
 M: table (write-farkup) [ child>> (write-farkup) ] "table" in-tag. ;

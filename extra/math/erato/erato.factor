@@ -11,8 +11,8 @@ TUPLE: erato limit bits latest ;
 : ind ( n -- i )
   2/ 1- ; inline
 
-: is-prime ( n erato -- bool )
-  >r ind r> bits>> nth ; inline
+: is-prime ( n limit -- bool )
+  [ ind ] [ bits>> ] bi* nth ; inline
 
 : indices ( n erato -- range )
   limit>> ind over 3 * ind swap rot <range> ;

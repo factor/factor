@@ -1,16 +1,11 @@
 ! Copyright (C) 2005, 2007 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-
-USING: alien alien.c-types alien.syntax kernel libc structs sequences
-       continuations byte-arrays strings
-       math namespaces system combinators vocabs.loader qualified
-       accessors stack-checker macros locals generalizations 
-       unix.types debugger io prettyprint ;
-
+USING: alien alien.c-types alien.syntax kernel libc
+sequences continuations byte-arrays strings math namespaces
+system combinators vocabs.loader qualified accessors
+stack-checker macros locals generalizations unix.types
+debugger io prettyprint ;
 IN: unix
-
-TYPEDEF: uint in_addr_t
-TYPEDEF: uint socklen_t
 
 : PROT_NONE   0 ; inline
 : PROT_READ   1 ; inline
@@ -80,6 +75,8 @@ MACRO:: unix-system-call ( quot -- )
 FUNCTION: int accept ( int s, void* sockaddr, socklen_t* socklen ) ;
 FUNCTION: int bind ( int s, void* name, socklen_t namelen ) ;
 FUNCTION: int chdir ( char* path ) ;
+FUNCTION: int chmod ( char* path, mode_t mode ) ;
+FUNCTION: int fchmod ( int fd, mode_t mode ) ;
 FUNCTION: int chown ( char* path, uid_t owner, gid_t group ) ;
 FUNCTION: int chroot ( char* path ) ;
 
@@ -93,6 +90,7 @@ FUNCTION: int dup2 ( int oldd, int newd ) ;
 : _exit ( status -- * )
     #! We throw to give this a terminating stack effect.
     "int" f "_exit" { "int" } alien-invoke "Exit failed" throw ;
+FUNCTION: void endpwent ( ) ;
 FUNCTION: int fchdir ( int fd ) ;
 FUNCTION: int fchown ( int fd, uid_t owner, gid_t group ) ;
 FUNCTION: int fcntl ( int fd, int cmd, int arg ) ;
@@ -109,8 +107,14 @@ FUNCTION: uid_t geteuid ;
 FUNCTION: gid_t getgid ;
 FUNCTION: int getgrgid_r ( gid_t gid, group* grp, char* buffer, size_t bufsize, group** result ) ;
 FUNCTION: int getgrnam_r ( char* name, group* grp, char* buffer, size_t bufsize, group** result ) ;
+FUNCTION: passwd* getpwent ( ) ;
+FUNCTION: passwd* getpwuid ( uid_t uid ) ;
+FUNCTION: passwd* getpwnam ( char* login ) ;
 FUNCTION: int getpwnam_r ( char* login, passwd* pwd, char* buffer, size_t bufsize, passwd** result ) ;
 FUNCTION: int getgroups ( int gidsetlen, gid_t* gidset ) ;
+FUNCTION: int getgrouplist ( char* name, int basegid, int* groups, int* ngroups ) ;
+
+FUNCTION: group* getgrent ;
 FUNCTION: int gethostname ( char* name, int len ) ;
 FUNCTION: int getsockname ( int socket, sockaddr* address, socklen_t* address_len ) ;
 FUNCTION: int getpeername ( int socket, sockaddr* address, socklen_t* address_len ) ;

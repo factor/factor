@@ -6,7 +6,7 @@ ARTICLE: "ui-grid-layout" "Grid layouts"
 { $subsection grid }
 "Creating grids from a fixed set of gadgets:"
 { $subsection <grid> }
-"Managing chidren:"
+"Managing children:"
 { $subsection grid-add }
 { $subsection grid-remove }
 { $subsection grid-child } ;

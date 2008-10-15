@@ -108,3 +108,6 @@ unit-test
 [ -1.0/0.0 ] [ "-1/0." string>number ] unit-test
 
 [ "-0.0" ] [ -0.0 number>string ] unit-test
+
+[ "-3/4" ] [ -3/4 number>string ] unit-test
+[ "-1-1/4" ] [ -5/4 number>string ] unit-test
