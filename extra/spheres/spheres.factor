@@ -1,6 +1,6 @@
 USING: kernel opengl.demo-support opengl.gl opengl.shaders opengl.framebuffers
-opengl multiline ui.gadgets accessors sequences ui.render ui math 
-arrays generalizations combinators ;
+opengl multiline ui.gadgets accessors sequences ui.render ui math locals
+arrays generalizations combinators opengl.capabilities ui.gadgets.worlds ;
 IN: spheres
 
 STRING: plane-vertex-shader
@@ -162,6 +162,9 @@ M: spheres-gadget distance-step ( gadget -- dz )
     3array <gl-program> check-gl-program ;
 
 M: spheres-gadget graft* ( gadget -- )
+    dup find-gl-context
+    "2.0" { "GL_ARB_shader_objects" } require-gl-version-or-extensions
+    { "GL_EXT_framebuffer_object" } require-gl-extensions
     (plane-program) >>plane-program
     (solid-sphere-program) >>solid-sphere-program
     (texture-sphere-program) >>texture-sphere-program
@@ -171,6 +174,7 @@ M: spheres-gadget graft* ( gadget -- )
     drop ;
 
 M: spheres-gadget ungraft* ( gadget -- )
+    dup find-gl-context
     {
         [ reflection-framebuffer>> [ delete-framebuffer ] when* ]
         [ reflection-depthbuffer>> [ delete-renderbuffer ] when* ]
@@ -182,14 +186,15 @@ M: spheres-gadget ungraft* ( gadget -- )
 
 M: spheres-gadget pref-dim* ( gadget -- dim )
     drop { 640 480 } ;
-    
-: (draw-sphere) ( program center radius surfacecolor -- )
-    roll
-    [ [ "center" glGetAttribLocation swap first3 glVertexAttrib3f ] curry ]
-    [ [ "radius" glGetAttribLocation swap glVertexAttrib1f ] curry ]
-    [ [ "surface_color" glGetAttribLocation swap first4 glVertexAttrib4f ] curry ]
-    tri tri*
+
+:: (draw-sphere) ( program center radius -- )
+    program "center" glGetAttribLocation center first3 glVertexAttrib3f
+    program "radius" glGetAttribLocation radius glVertexAttrib1f
     { -1.0 -1.0 } { 1.0 1.0 } rect-vertices ;
+    
+:: (draw-colored-sphere) ( program center radius surfacecolor -- )
+    program "surface_color" glGetAttribLocation surfacecolor first4 glVertexAttrib4f
+    program center radius (draw-sphere) ;
 
 : sphere-scene ( gadget -- )
     GL_DEPTH_BUFFER_BIT GL_COLOR_BUFFER_BIT bitor glClear
@@ -197,12 +202,12 @@ M: spheres-gadget pref-dim* ( gadget -- dim )
         solid-sphere-program>> [
             {
                 [ "light_position" glGetUniformLocation 0.0 0.0 100.0 glUniform3f ]
-                [ {  7.0  0.0  0.0 } 1.0 { 1.0 0.0 0.0 1.0 } (draw-sphere) ]
-                [ { -7.0  0.0  0.0 } 1.0 { 0.0 1.0 0.0 1.0 } (draw-sphere) ]
-                [ {  0.0  0.0  7.0 } 1.0 { 0.0 0.0 1.0 1.0 } (draw-sphere) ]
-                [ {  0.0  0.0 -7.0 } 1.0 { 1.0 1.0 0.0 1.0 } (draw-sphere) ]
-                [ {  0.0  7.0  0.0 } 1.0 { 1.0 0.0 1.0 1.0 } (draw-sphere) ]
-                [ {  0.0 -7.0  0.0 } 1.0 { 0.0 1.0 1.0 1.0 } (draw-sphere) ]
+                [ {  7.0  0.0  0.0 } 1.0 { 1.0 0.0 0.0 1.0 } (draw-colored-sphere) ]
+                [ { -7.0  0.0  0.0 } 1.0 { 0.0 1.0 0.0 1.0 } (draw-colored-sphere) ]
+                [ {  0.0  0.0  7.0 } 1.0 { 0.0 0.0 1.0 1.0 } (draw-colored-sphere) ]
+                [ {  0.0  0.0 -7.0 } 1.0 { 1.0 1.0 0.0 1.0 } (draw-colored-sphere) ]
+                [ {  0.0  7.0  0.0 } 1.0 { 1.0 0.0 1.0 1.0 } (draw-colored-sphere) ]
+                [ {  0.0 -7.0  0.0 } 1.0 { 0.0 1.0 1.0 1.0 } (draw-colored-sphere) ]
             } cleave
         ] with-gl-program
     ] [
@@ -271,7 +276,7 @@ M: spheres-gadget draw-gadget* ( gadget -- )
         [
             texture-sphere-program>> [
                 [ "surface_texture" glGetUniformLocation 0 glUniform1i ]
-                [ { 0.0 0.0 0.0 } 4.0 { 1.0 0.0 0.0 1.0 } (draw-sphere) ]
+                [ { 0.0 0.0 0.0 } 4.0 (draw-sphere) ]
                 bi
             ] with-gl-program
         ]
