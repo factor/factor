@@ -1,6 +1,7 @@
 USING: accessors arrays bunny.cel-shaded bunny.fixed-pipeline
 bunny.model bunny.outlined destructors kernel math opengl.demo-support
-opengl.gl sequences ui ui.gadgets ui.gestures ui.render words ;
+opengl.gl sequences ui ui.gadgets ui.gadgets.worlds ui.gestures
+ui.render words ;
 IN: bunny
 
 TUPLE: bunny-gadget < demo-gadget model-triangles geom draw-seq draw-n ;
@@ -18,6 +19,7 @@ TUPLE: bunny-gadget < demo-gadget model-triangles geom draw-seq draw-n ;
     >>draw-n relayout-1 ;
 
 M: bunny-gadget graft* ( gadget -- )
+    dup find-gl-context
     GL_DEPTH_TEST glEnable
     dup model-triangles>> <bunny-geom> >>geom
     dup
@@ -29,6 +31,7 @@ M: bunny-gadget graft* ( gadget -- )
     drop ;
 
 M: bunny-gadget ungraft* ( gadget -- )
+    dup find-gl-context
     [ geom>> [ dispose ] when* ]
     [ draw-seq>> [ [ dispose ] when* ] each ] bi ;
 
