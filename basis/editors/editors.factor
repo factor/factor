@@ -27,7 +27,8 @@ SYMBOL: edit-hook
 
 : edit-location ( file line -- )
     >r (normalize-path) r>
-    edit-hook get [ call ] [ no-edit-hook edit-location ] if* ;
+    edit-hook get-global
+    [ call ] [ no-edit-hook edit-location ] if* ;
 
 : edit ( defspec -- )
     where [ first2 edit-location ] when* ;

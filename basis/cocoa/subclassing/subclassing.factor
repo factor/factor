@@ -12,12 +12,17 @@ IN: cocoa.subclassing
     [ sel_registerName ] [ execute ] [ ascii string>alien ]
     tri* ;
 
+: throw-if-false ( YES/NO -- )
+    zero? [ "Failed to add method or protocol to class" throw ]
+    when ;
+
 : add-methods ( methods class -- )
     swap
-    [ init-method class_addMethod drop ] with each ;
+    [ init-method class_addMethod throw-if-false ] with each ;
 
 : add-protocols ( protocols class -- )
-    swap [ objc-protocol class_addProtocol drop ] with each ;
+    swap [ objc-protocol class_addProtocol throw-if-false ]
+    with each ;
 
 : (define-objc-class) ( protocols superclass name imeth -- )
     -rot

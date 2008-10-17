@@ -114,6 +114,9 @@ M: sequence where ( spec obj -- )
         [ " or " 0% ] [ dupd where ] interleave drop
     ] in-parens ;
 
+M: NULL where ( spec obj -- )
+    drop column-name>> 0% " is NULL" 0% ;
+
 : object-where ( spec obj -- )
     over column-name>> 0% " = " 0% bind# ;
 

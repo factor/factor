@@ -230,6 +230,7 @@ M: postgresql-db persistent-table ( -- hashtable )
 
         { +foreign-id+ { f f "references" } }
 
+        { +on-update+ { f f "on update" } }
         { +on-delete+ { f f "on delete" } }
         { +restrict+ { f f "restrict" } }
         { +cascade+ { f f "cascade" } }

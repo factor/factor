@@ -108,22 +108,34 @@ H{
     { "c" "char" }
     { "i" "int" }
     { "s" "short" }
-    { "l" "long" }
-    { "q" "longlong" }
     { "C" "uchar" }
     { "I" "uint" }
     { "S" "ushort" }
-    { "L" "ulong" }
-    { "Q" "ulonglong" }
     { "f" "float" }
     { "d" "double" }
     { "B" "bool" }
     { "v" "void" }
     { "*" "char*" }
+    { "?" "unknown_type" }
     { "@" "id" }
-    { "#" "id" }
+    { "#" "Class" }
     { ":" "SEL" }
-} objc>alien-types set-global
+}
+"ptrdiff_t" heap-size {
+    { 4 [ H{
+        { "l" "long" }
+        { "q" "longlong" }
+        { "L" "ulong" }
+        { "Q" "ulonglong" }
+    } ] }
+    { 8 [ H{
+        { "l" "long32" }
+        { "q" "long" }
+        { "L" "ulong32" }
+        { "Q" "ulong" }
+    } ] }
+} case
+assoc-union objc>alien-types set-global
 
 ! The transpose of the above map
 SYMBOL: alien>objc-types
@@ -132,16 +144,22 @@ objc>alien-types get [ swap ] assoc-map
 ! A hack...
 "ptrdiff_t" heap-size {
     { 4 [ H{
-        { "NSPoint" "{_NSPoint=ff}" }
-        { "NSRect" "{_NSRect=ffff}" }
-        { "NSSize" "{_NSSize=ff}" }
-        { "NSRange" "{_NSRange=II}" }
+        { "NSPoint"    "{_NSPoint=ff}" }
+        { "NSRect"     "{_NSRect={_NSPoint=ff}{_NSSize=ff}}" }
+        { "NSSize"     "{_NSSize=ff}" }
+        { "NSRange"    "{_NSRange=II}" }
+        { "NSInteger"  "i" }
+        { "NSUInteger" "I" }
+        { "CGFloat"    "f" }
     } ] }
     { 8 [ H{
-        { "NSPoint" "{_NSPoint=dd}" }
-        { "NSRect" "{_NSRect=dddd}" }
-        { "NSSize" "{_NSSize=dd}" }
-        { "NSRange" "{_NSRange=QQ}" }
+        { "NSPoint"    "{CGPoint=dd}" }
+        { "NSRect"     "{CGRect={CGPoint=dd}{CGSize=dd}}" }
+        { "NSSize"     "{CGSize=dd}" }
+        { "NSRange"    "{_NSRange=QQ}" }
+        { "NSInteger"  "q" }
+        { "NSUInteger" "Q" }
+        { "CGFloat"    "d" }
     } ] }
 } case
 assoc-union alien>objc-types set-global
@@ -184,12 +202,23 @@ assoc-union alien>objc-types set-global
     swap method_getName sel_getName
     objc-methods get set-at ;
 
-: (register-objc-methods) ( methods count -- methods )
-    over [ void*-nth register-objc-method ] curry each ;
+: each-method-in-class ( class quot -- )
+    [ 0 <uint> [ class_copyMethodList ] keep *uint over ] dip
+    '[ _ void*-nth @ ] each (free) ; inline
 
 : register-objc-methods ( class -- )
-    0 <uint> [ class_copyMethodList ] keep *uint 
-    (register-objc-methods) (free) ;
+    [ register-objc-method ] each-method-in-class ;
+
+: method. ( method -- )
+    {
+        [ method_getName sel_getName ]
+        [ method-return-type ]
+        [ method-arg-types ]
+        [ method_getImplementation ]
+    } cleave 4array . ;
+
+: methods. ( class -- )
+    [ method. ] each-method-in-class ;
 
 : class-exists? ( string -- class ) objc_getClass >boolean ;
 

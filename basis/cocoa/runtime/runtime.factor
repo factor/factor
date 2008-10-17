@@ -9,7 +9,7 @@ TYPEDEF: void* id
 
 FUNCTION: char* sel_getName ( SEL aSelector ) ;
 
-FUNCTION: bool sel_isMapped ( SEL aSelector ) ;
+FUNCTION: char sel_isMapped ( SEL aSelector ) ;
 
 FUNCTION: SEL sel_registerName ( char* str ) ;
 
@@ -54,6 +54,8 @@ FUNCTION: Method* class_copyMethodList ( Class class, uint* outCount ) ;
 
 FUNCTION: Class class_getSuperclass ( Class cls ) ;
 
+FUNCTION: char* class_getName ( Class cls ) ;
+
 FUNCTION: char class_addMethod ( Class class, SEL name, void* imp, void* types ) ;
 
 FUNCTION: char class_addProtocol ( Class class, Protocol protocol ) ;
@@ -73,5 +75,6 @@ FUNCTION: void* method_getTypeEncoding ( Method method ) ;
 FUNCTION: SEL method_getName ( Method method ) ;
 
 FUNCTION: void* method_setImplementation ( Method method, void* imp ) ; 
+FUNCTION: void* method_getImplementation ( Method method ) ; 
 
 FUNCTION: Class object_getClass ( id object ) ;
