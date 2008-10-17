@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays sequences sequences.private math.private
 kernel kernel.private math assocs quotations vectors
-hashtables sorting words sets math.order ;
+hashtables sorting words sets math.order make ;
 IN: combinators
 
 ! cleave
@@ -116,17 +116,16 @@ ERROR: no-case ;
         ] [ drop f ] if
     ] [ drop f ] if ;
 
-: dispatch-case ( value from to default array -- )
-    >r >r 3dup between? r> r> rot [
-        >r 2drop - >fixnum r> dispatch
-    ] [
-        drop 2nip call
-    ] if ; inline
-
 : dispatch-case-quot ( default assoc -- quot )
-    [ nip keys [ infimum ] [ supremum ] bi ] 2keep
-    sort-keys values [ >quotation ] map
-    [ dispatch-case ] 2curry 2curry ;
+    [
+        \ dup ,
+        dup keys [ infimum , ] [ supremum , ] bi \ between? ,
+        [
+            dup keys infimum , [ - >fixnum ] %
+            sort-keys values [ >quotation ] map ,
+            \ dispatch ,
+        ] [ ] make , , \ if ,
+    ] [ ] make ;
 
 : case>quot ( default assoc -- quot )
     dup keys {
