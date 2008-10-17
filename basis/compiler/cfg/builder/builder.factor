@@ -253,7 +253,7 @@ M: #dispatch emit-node
     type tagged boa phantom-push ;
 
 : emit-write-barrier ( -- )
-    phantom-pop dup >vreg fresh-object? [ drop ] [
+    phantom-pop dup fresh-object? [ drop ] [
         int-regs next-vreg
         int-regs next-vreg
         ##write-barrier

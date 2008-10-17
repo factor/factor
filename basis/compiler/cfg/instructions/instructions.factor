@@ -1,21 +1,21 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs accessors arrays kernel sequences namespaces
+USING: assocs accessors arrays kernel sequences namespaces words
 math compiler.cfg.registers compiler.cfg.instructions.syntax ;
 IN: compiler.cfg.instructions
 
 ! Virtual CPU instructions, used by CFG and machine IRs
 
-TUPLE: ##cond-branch < insn src ;
-TUPLE: ##unary < insn dst src ;
-TUPLE: ##nullary < insn dst ;
+TUPLE: ##cond-branch < insn { src vreg } ;
+TUPLE: ##unary < insn { dst vreg } { src vreg } ;
+TUPLE: ##nullary < insn { dst vreg } ;
 
 ! Stack operations
 INSN: ##load-literal < ##nullary obj ;
-INSN: ##peek < ##nullary loc ;
-INSN: ##replace src loc ;
-INSN: ##inc-d n ;
-INSN: ##inc-r n ;
+INSN: ##peek < ##nullary { loc loc } ;
+INSN: ##replace { src vreg } { loc loc } ;
+INSN: ##inc-d { n integer } ;
+INSN: ##inc-r { n integer } ;
 
 ! Subroutine calls
 TUPLE: stack-frame
@@ -33,8 +33,8 @@ INSN: ##return ;
 INSN: ##intrinsic quot defs-vregs uses-vregs ;
 
 ! Jump tables
-INSN: ##dispatch-label label ;
 INSN: ##dispatch src temp ;
+INSN: ##dispatch-label label ;
 
 ! Boxing and unboxing
 INSN: ##copy < ##unary ;
@@ -44,12 +44,12 @@ INSN: ##unbox-f < ##unary ;
 INSN: ##unbox-alien < ##unary ;
 INSN: ##unbox-byte-array < ##unary ;
 INSN: ##unbox-any-c-ptr < ##unary ;
-INSN: ##box-float < ##unary temp ;
-INSN: ##box-alien < ##unary temp ;
+INSN: ##box-float < ##unary { temp vreg } ;
+INSN: ##box-alien < ##unary { temp vreg } ;
 
 ! Memory allocation
-INSN: ##allot < ##nullary size type tag temp ;
-INSN: ##write-barrier src card# table ;
+INSN: ##allot < ##nullary size type tag { temp vreg } ;
+INSN: ##write-barrier { src vreg } card# table ;
 INSN: ##gc ;
 
 ! FFI
@@ -61,28 +61,28 @@ INSN: ##callback-return params ;
 GENERIC: defs-vregs ( insn -- seq )
 GENERIC: uses-vregs ( insn -- seq )
 
-M: ##nullary defs-vregs dst>> >vreg 1array ;
-M: ##unary defs-vregs dst>> >vreg 1array ;
+M: ##nullary defs-vregs dst>> 1array ;
+M: ##unary defs-vregs dst>> 1array ;
 M: ##write-barrier defs-vregs
-    [ card#>> >vreg ] [ table>> >vreg ] bi 2array ;
+    [ card#>> ] [ table>> ] bi 2array ;
 
 : allot-defs-vregs ( insn -- seq )
-    [ dst>> >vreg ] [ temp>> >vreg ] bi 2array ;
+    [ dst>> ] [ temp>> ] bi 2array ;
 
 M: ##box-float defs-vregs allot-defs-vregs ;
 M: ##box-alien defs-vregs allot-defs-vregs ;
 M: ##allot defs-vregs allot-defs-vregs ;
-M: ##dispatch defs-vregs temp>> >vreg 1array ;
+M: ##dispatch defs-vregs temp>> 1array ;
 M: insn defs-vregs drop f ;
 
-M: ##replace uses-vregs src>> >vreg 1array ;
-M: ##unary uses-vregs src>> >vreg 1array ;
-M: ##write-barrier uses-vregs src>> >vreg 1array ;
-M: ##dispatch uses-vregs src>> >vreg 1array ;
+M: ##replace uses-vregs src>> 1array ;
+M: ##unary uses-vregs src>> 1array ;
+M: ##write-barrier uses-vregs src>> 1array ;
+M: ##dispatch uses-vregs src>> 1array ;
 M: insn uses-vregs drop f ;
 
 : intrinsic-vregs ( assoc -- seq' )
-    [ nip >vreg ] { } assoc>map sift ;
+    values sift ;
 
 : intrinsic-defs-vregs ( insn -- seq )
     defs-vregs>> intrinsic-vregs ;
@@ -102,7 +102,7 @@ INSN: ##branch-f < ##cond-branch ;
 INSN: ##branch-t < ##cond-branch ;
 INSN: ##if-intrinsic quot defs-vregs uses-vregs ;
 
-M: ##cond-branch uses-vregs src>> >vreg 1array ;
+M: ##cond-branch uses-vregs src>> 1array ;
 
 M: ##if-intrinsic defs-vregs intrinsic-defs-vregs ;
 M: ##if-intrinsic uses-vregs intrinsic-uses-vregs ;
@@ -113,20 +113,20 @@ INSN: _epilogue stack-frame ;
 
 INSN: _label id ;
 
-TUPLE: _cond-branch < insn src label ;
+TUPLE: _cond-branch < insn { src vreg } label ;
 
 INSN: _branch label ;
 INSN: _branch-f < _cond-branch ;
 INSN: _branch-t < _cond-branch ;
 INSN: _if-intrinsic label quot defs-vregs uses-vregs ;
 
-M: _cond-branch uses-vregs src>> >vreg 1array ;
+M: _cond-branch uses-vregs src>> 1array ;
 
 M: _if-intrinsic defs-vregs intrinsic-defs-vregs ;
 M: _if-intrinsic uses-vregs intrinsic-uses-vregs ;
 
-INSN: _spill-integer src n ;
-INSN: _reload-integer dst n ;
+INSN: _spill-integer { src vreg } n ;
+INSN: _reload-integer { dst vreg } n ;
 
-INSN: _spill-float src n ;
-INSN: _reload-float dst n ;
+INSN: _spill-float { src vreg } n ;
+INSN: _reload-float { dst vreg } n ;

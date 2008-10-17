@@ -16,10 +16,7 @@ PREDICATE: small-tagged < integer tag-fixnum small-enough? ;
 ! Value protocol
 GENERIC: move-spec ( obj -- spec )
 GENERIC: live-loc? ( actual current -- ? )
-GENERIC# (lazy-load) 1 ( value spec -- value )
-GENERIC# (eager-load) 1 ( value spec -- value )
 GENERIC: lazy-store ( dst src -- )
-GENERIC: minimal-ds-loc* ( min obj -- min )
 
 ! This will be a multimethod soon
 DEFER: ##move
@@ -28,7 +25,6 @@ PRIVATE>
 
 ! Default implementation
 M: value live-loc? 2drop f ;
-M: value minimal-ds-loc* drop ;
 M: value lazy-store 2drop ;
 
 M: vreg move-spec reg-class>> move-spec ;
@@ -40,7 +36,6 @@ M: int-regs value-class* drop object ;
 M: float-regs move-spec drop float ;
 M: float-regs value-class* drop float ;
 
-M: ds-loc minimal-ds-loc* n>> min ;
 M: ds-loc live-loc?
     over ds-loc? [ [ n>> ] bi@ = not ] [ 2drop t ] if ;
 
@@ -67,14 +62,14 @@ M: unboxed-c-ptr move-spec class ;
 M: constant move-spec class ;
 
 ! Moving values between locations and registers
-: ##move-bug ( -- * ) "Bug in generator.registers" throw ;
+: ##move-bug ( -- * ) "Bug in compiler.cfg.stacks" throw ;
 
 : ##unbox-c-ptr ( dst src -- )
     dup value-class {
-        { [ dup \ f class<= ] [ drop ##unbox-f ] }
-        { [ dup simple-alien class<= ] [ drop ##unbox-alien ] }
-        { [ dup byte-array class<= ] [ drop ##unbox-byte-array ] }
-        [ drop ##unbox-any-c-ptr ]
+        { [ dup \ f class<= ] [ drop [ >vreg ] bi@ ##unbox-f ] }
+        { [ dup simple-alien class<= ] [ drop [ >vreg ] bi@ ##unbox-alien ] }
+        { [ dup byte-array class<= ] [ drop [ >vreg ] bi@ ##unbox-byte-array ] }
+        [ drop [ >vreg ] bi@ ##unbox-any-c-ptr ]
     } cond ; inline
 
 : ##move-via-temp ( dst src -- )
@@ -97,28 +92,28 @@ SYMBOL: fresh-objects
 
 : ##move ( dst src -- )
     2dup [ move-spec ] bi@ 2array {
-        { { f f } [ ##copy ] }
-        { { unboxed-alien unboxed-alien } [ ##copy ] }
-        { { unboxed-byte-array unboxed-byte-array } [ ##copy ] }
-        { { unboxed-f unboxed-f } [ ##copy ] }
-        { { unboxed-c-ptr unboxed-c-ptr } [ ##copy ] }
-        { { float float } [ ##copy-float ] }
+        { { f f } [ [ >vreg ] bi@ ##copy ] }
+        { { unboxed-alien unboxed-alien } [ [ >vreg ] bi@ ##copy ] }
+        { { unboxed-byte-array unboxed-byte-array } [ [ >vreg ] bi@ ##copy ] }
+        { { unboxed-f unboxed-f } [ [ >vreg ] bi@ ##copy ] }
+        { { unboxed-c-ptr unboxed-c-ptr } [ [ >vreg ] bi@ ##copy ] }
+        { { float float } [ [ >vreg ] bi@ ##copy-float ] }
 
         { { f unboxed-c-ptr } [ ##move-bug ] }
         { { f unboxed-byte-array } [ ##move-bug ] }
 
-        { { f constant } [ value>> ##load-literal ] }
+        { { f constant } [ [ >vreg ] [ value>> ] bi* ##load-literal ] }
 
-        { { f float } [ int-regs next-vreg ##box-float t fresh-object ] }
-        { { f unboxed-alien } [ int-regs next-vreg ##box-alien t fresh-object ] }
-        { { f loc } [ ##peek ] }
+        { { f float } [ [ >vreg ] bi@ int-regs next-vreg ##box-float t fresh-object ] }
+        { { f unboxed-alien } [ [ >vreg ] bi@ int-regs next-vreg ##box-alien t fresh-object ] }
+        { { f loc } [ [ >vreg ] dip ##peek ] }
 
-        { { float f } [ ##unbox-float ] }
-        { { unboxed-alien f } [ ##unbox-alien ] }
-        { { unboxed-byte-array f } [ ##unbox-byte-array ] }
-        { { unboxed-f f } [ ##unbox-f ] }
+        { { float f } [ [ >vreg ] bi@ ##unbox-float ] }
+        { { unboxed-alien f } [ [ >vreg ] bi@ ##unbox-alien ] }
+        { { unboxed-byte-array f } [ [ >vreg ] bi@ ##unbox-byte-array ] }
+        { { unboxed-f f } [ [ >vreg ] bi@ ##unbox-f ] }
         { { unboxed-c-ptr f } [ ##unbox-c-ptr ] }
-        { { loc f } [ swap ##replace ] }
+        { { loc f } [ >vreg swap ##replace ] }
 
         [ drop ##move-via-temp ]
     } case ;
@@ -168,7 +163,7 @@ M: phantom-retainstack finalize-height
 
 : phantom-locs ( n phantom -- locs )
     #! A sequence of n ds-locs or rs-locs indexing the stack.
-    >r <reversed> r> '[ _ <loc> ] map ;
+    [ <reversed> ] dip '[ _ <loc> ] map ;
 
 : phantom-locs* ( phantom -- locs )
     [ stack>> length ] keep phantom-locs ;
@@ -209,15 +204,6 @@ M: phantom-retainstack finalize-height
 
 : finalize-heights ( -- ) [ finalize-height ] each-phantom ;
 
-: (live-locs) ( phantom -- seq )
-    #! Discard locs which haven't moved
-    [ phantom-locs* ] [ stack>> ] bi zip
-    [ live-loc? ] assoc-filter
-    values ;
-
-: live-locs ( -- seq )
-    [ (live-locs) ] each-phantom append prune ;
-
 : reg-spec>class ( spec -- class )
     float eq? double-float-regs int-regs ? ;
 
@@ -231,6 +217,14 @@ M: phantom-retainstack finalize-height
         [ drop ]
     } case ;
 
+: alloc-vreg-for ( value spec -- vreg )
+    alloc-vreg swap value-class
+    over tagged? [ >>class ] [ drop ] if ;
+
+: (eager-load) ( value spec -- vreg )
+    [ alloc-vreg-for ] [ drop ] 2bi
+    [ ##move ] [ drop >vreg ] 2bi ;
+
 : compatible? ( value spec -- ? )
     >r move-spec r> {
         { [ 2dup = ] [ t ] }
@@ -240,20 +234,21 @@ M: phantom-retainstack finalize-height
         [ f ]
     } cond 2nip ;
 
-: alloc-vreg-for ( value spec -- vreg )
-    alloc-vreg swap value-class
-    over tagged? [ >>class ] [ drop ] if ;
-
-M: value (lazy-load)
+: (lazy-load) ( value spec -- value )
     {
-        { [ dup { small-slot small-tagged } memq? ] [ drop ] }
-        { [ 2dup compatible? ] [ drop ] }
+        { [ dup { small-slot small-tagged } memq? ] [ drop >vreg ] }
+        { [ 2dup compatible? ] [ drop >vreg ] }
         [ (eager-load) ]
     } cond ;
 
-M: value (eager-load) ( value spec -- vreg )
-    [ alloc-vreg-for ] [ drop ] 2bi
-    [ ##move ] [ drop ] 2bi ;
+: (live-locs) ( phantom -- seq )
+    #! Discard locs which haven't moved
+    [ phantom-locs* ] [ stack>> ] bi zip
+    [ live-loc? ] assoc-filter
+    values ;
+
+: live-locs ( -- seq )
+    [ (live-locs) ] each-phantom append prune ;
 
 M: loc lazy-store
     2dup live-loc? [ "live-locs" get at ##move ] [ 2drop ] if ;

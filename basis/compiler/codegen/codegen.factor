@@ -24,7 +24,7 @@ M: constant v>operand
     value>> [ tag-fixnum ] [ \ f tag-number ] if* ;
 
 M: value v>operand
-    >vreg [ registers get at ] [ "Bad value" throw ] if* ;
+    registers get at [ "Bad value" throw ] unless* ;
 
 : generate-insns ( insns -- code )
     [

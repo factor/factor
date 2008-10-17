@@ -7,14 +7,6 @@ IN: compiler.cfg.templates
 
 TUPLE: template input output scratch clobber gc ;
 
-: phantom&spec ( phantom specs -- phantom' specs' )
-    >r stack>> r>
-    [ length f pad-left ] keep
-    [ <reversed> ] bi@ ; inline
-
-: phantom&spec-agree? ( phantom spec quot -- ? )
-    >r phantom&spec r> 2all? ; inline
-
 : live-vregs ( -- seq )
     [ stack>> [ >vreg ] map sift ] each-phantom append ;
 
@@ -41,7 +33,7 @@ TUPLE: template input output scratch clobber gc ;
     ] with-scope ;
 
 : alloc-scratch ( template -- assoc )
-    scratch>> [ swap alloc-vreg ] assoc-map ;
+    scratch>> [ swap alloc-vreg >vreg ] assoc-map ;
 
 : do-template-inputs ( template -- defs uses )
     #! Load input values into registers and allocates scratch
@@ -59,6 +51,11 @@ TUPLE: template input output scratch clobber gc ;
         dup do-template-inputs
         [ do-template-outputs ] 2keep
     ] dip call ; inline
+
+: phantom&spec ( phantom specs -- phantom' specs' )
+    >r stack>> r>
+    [ length f pad-left ] keep
+    [ <reversed> ] bi@ ; inline
 
 : value-matches? ( value spec -- ? )
     #! If the spec is a quotation and the value is a literal
@@ -80,8 +77,8 @@ TUPLE: template input output scratch clobber gc ;
     >r >r value-class 2 r> ?nth class-matches? r> and ;
 
 : template-matches? ( template -- ? )
-    input>> phantom-datastack get swap
-    [ spec-matches? ] phantom&spec-agree? ;
+    input>> phantom-datastack get swap phantom&spec
+    [ spec-matches? ] 2all? ;
 
 : find-template ( templates -- pair/f )
     #! Pair has shape { quot assoc }
