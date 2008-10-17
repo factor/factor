@@ -460,7 +460,7 @@ M: lambda-memoized definition
     "lambda" word-prop body>> ;
 
 M: lambda-memoized reset-word
-    [ f "lambda" set-word-prop ] [ call-next-method ] bi ;
+    [ call-next-method ] [ f "lambda" set-word-prop ] bi ;
 
 : method-stack-effect ( method -- effect )
     dup "lambda" word-prop vars>>
