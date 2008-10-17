@@ -86,38 +86,38 @@ HINTS: normalize { float-array } { array } ;
 ! More rice. Experimental, currently causes a slowdown in raytracer
 ! for some odd reason.
 
-! USING: words classes.algebra compiler.tree.propagation.info ;
-! 
-! { v+ v- v* v/ vmax vmin } [
-!     [
-!         [ class>> float-array class<= ] both?
-!         float-array object ? <class-info>
-!     ] "outputs" set-word-prop
-! ] each
-! 
-! { n*v n/v } [
-!     [
-!         nip class>> float-array class<= float-array object ? <class-info>
-!     ] "outputs" set-word-prop
-! ] each
-! 
-! { v*n v/n } [
-!     [
-!         drop class>> float-array class<= float-array object ? <class-info>
-!     ] "outputs" set-word-prop
-! ] each
-! 
-! { vneg normalize } [
-!     [
-!         class>> float-array class<= float-array object ? <class-info>
-!     ] "outputs" set-word-prop
-! ] each
-! 
-! \ norm-sq [
-!     class>> float-array class<= float object ? <class-info>
-! ] "outputs" set-word-prop
-! 
-! \ v. [
-!     [ class>> float-array class<= ] both?
-!     float object ? <class-info>
-! ] "outputs" set-word-prop
+USING: words classes.algebra compiler.tree.propagation.info ;
+
+{ v+ v- v* v/ vmax vmin } [
+    [
+        [ class>> float-array class<= ] both?
+        float-array object ? <class-info>
+    ] "outputs" set-word-prop
+] each
+
+{ n*v n/v } [
+    [
+        nip class>> float-array class<= float-array object ? <class-info>
+    ] "outputs" set-word-prop
+] each
+
+{ v*n v/n } [
+    [
+        drop class>> float-array class<= float-array object ? <class-info>
+    ] "outputs" set-word-prop
+] each
+
+{ vneg normalize } [
+    [
+        class>> float-array class<= float-array object ? <class-info>
+    ] "outputs" set-word-prop
+] each
+
+\ norm-sq [
+    class>> float-array class<= float object ? <class-info>
+] "outputs" set-word-prop
+
+\ v. [
+    [ class>> float-array class<= ] both?
+    float object ? <class-info>
+] "outputs" set-word-prop
