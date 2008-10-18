@@ -8,10 +8,6 @@ IN: dns.forwarding
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: forever ( quot -- ) [ call ] [ forever ] bi ;         inline recursive
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 :: query->rrs ( QUERY -- rrs/f )
    [let | RRS [ QUERY cache-get ] |
      RRS
