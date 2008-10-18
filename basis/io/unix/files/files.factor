@@ -192,6 +192,19 @@ M: integer other-read? ( integer -- ? ) OTHER-READ mask? ;
 M: integer other-write? ( integer -- ? ) OTHER-WRITE mask? ; 
 M: integer other-execute? ( integer -- ? ) OTHER-EXECUTE mask? ;
 
+M: file-info uid? ( file-info -- ? ) permissions>> uid? ;
+M: file-info gid? ( file-info -- ? ) permissions>> gid? ;
+M: file-info sticky? ( file-info -- ? ) permissions>> sticky? ;
+M: file-info user-read? ( file-info -- ? ) permissions>> user-read? ;
+M: file-info user-write? ( file-info -- ? ) permissions>> user-write? ;
+M: file-info user-execute? ( file-info -- ? ) permissions>> user-execute? ;
+M: file-info group-read? ( file-info -- ? ) permissions>> group-read? ;
+M: file-info group-write? ( file-info -- ? ) permissions>> group-write? ;
+M: file-info group-execute? ( file-info -- ? ) permissions>> group-execute? ;
+M: file-info other-read? ( file-info -- ? ) permissions>> other-read? ;
+M: file-info other-write? ( file-info -- ? ) permissions>> other-write? ;
+M: file-info other-execute? ( file-info -- ? ) permissions>> other-execute? ;
+
 M: string uid? ( path -- ? ) UID file-mode? ;
 M: string gid? ( path -- ? ) GID file-mode? ;
 M: string sticky? ( path -- ? ) STICKY file-mode? ;

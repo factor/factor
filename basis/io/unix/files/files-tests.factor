@@ -55,32 +55,32 @@ prepare-test-file
 [ t ] [ test-file other-write? ] unit-test
 [ t ] [ test-file other-execute? ] unit-test
 
-[ t ]
-[ test-file f set-other-execute perms OCT: 776 = ] unit-test
+[ t ] [ test-file f set-other-execute perms OCT: 776 = ] unit-test
+[ f ] [ test-file file-info other-execute? ] unit-test
 
-[ t ]
-[ test-file f set-other-write perms OCT: 774 = ] unit-test
+[ t ] [ test-file f set-other-write perms OCT: 774 = ] unit-test
+[ f ] [ test-file file-info other-write? ] unit-test
 
-[ t ]
-[ test-file f set-other-read perms OCT: 770 = ] unit-test
+[ t ] [ test-file f set-other-read perms OCT: 770 = ] unit-test
+[ f ] [ test-file file-info other-read? ] unit-test
 
-[ t ]
-[ test-file f set-group-execute perms OCT: 760 = ] unit-test
+[ t ] [ test-file f set-group-execute perms OCT: 760 = ] unit-test
+[ f ] [ test-file file-info group-execute? ] unit-test
 
-[ t ]
-[ test-file f set-group-write perms OCT: 740 = ] unit-test
+[ t ] [ test-file f set-group-write perms OCT: 740 = ] unit-test
+[ f ] [ test-file file-info group-write? ] unit-test
 
-[ t ]
-[ test-file f set-group-read perms OCT: 700 = ] unit-test
+[ t ] [ test-file f set-group-read perms OCT: 700 = ] unit-test
+[ f ] [ test-file file-info group-read? ] unit-test
 
-[ t ]
-[ test-file f set-user-execute perms OCT: 600 = ] unit-test
+[ t ] [ test-file f set-user-execute perms OCT: 600 = ] unit-test
+[ f ] [ test-file file-info other-execute? ] unit-test
 
-[ t ]
-[ test-file f set-user-write perms OCT: 400 = ] unit-test
+[ t ] [ test-file f set-user-write perms OCT: 400 = ] unit-test
+[ f ] [ test-file file-info other-write? ] unit-test
 
-[ t ]
-[ test-file f set-user-read perms OCT: 000 = ] unit-test
+[ t ] [ test-file f set-user-read perms OCT: 000 = ] unit-test
+[ f ] [ test-file file-info other-read? ] unit-test
 
 [ t ]
 [ test-file { USER-ALL GROUP-ALL OTHER-EXECUTE } flags set-file-permissions perms OCT: 771 = ] unit-test
