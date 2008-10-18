@@ -33,7 +33,7 @@ TUPLE: template input output scratch clobber gc ;
     ] with-scope ;
 
 : alloc-scratch ( template -- assoc )
-    scratch>> [ swap alloc-vreg >vreg ] assoc-map ;
+    scratch>> [ swap alloc-vreg ] assoc-map ;
 
 : do-template-inputs ( template -- defs uses )
     #! Load input values into registers and allocates scratch
@@ -44,12 +44,13 @@ TUPLE: template input output scratch clobber gc ;
     [ output>> ] 2dip assoc-union '[ _ at ] map
     phantom-datastack get phantom-append ;
 
-: apply-template ( pair quot -- vregs )
+: apply-template ( pair quot -- )
     [
         first2
         dup gc>> [ t fresh-object ] when
         dup do-template-inputs
-        [ do-template-outputs ] 2keep
+        [ do-template-outputs ]
+        [ [ [ >vreg ] assoc-map ] dip ] 2bi
     ] dip call ; inline
 
 : phantom&spec ( phantom specs -- phantom' specs' )

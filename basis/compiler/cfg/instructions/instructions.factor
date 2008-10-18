@@ -82,7 +82,7 @@ M: ##dispatch uses-vregs src>> 1array ;
 M: insn uses-vregs drop f ;
 
 : intrinsic-vregs ( assoc -- seq' )
-    values sift ;
+    [ nip dup vreg? swap and ] { } assoc>map sift ;
 
 : intrinsic-defs-vregs ( insn -- seq )
     defs-vregs>> intrinsic-vregs ;

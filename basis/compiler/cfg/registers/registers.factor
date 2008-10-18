@@ -13,7 +13,6 @@ GENERIC: value-class* ( operand -- class )
 
 : value-class ( operand -- class ) value-class* object or ;
 
-M: value >vreg drop f ;
 M: value set-value-class 2drop ;
 M: value value-class* drop f ;
 
@@ -28,6 +27,8 @@ INSTANCE: vreg value
 
 ! Stack locations
 TUPLE: loc n class ;
+
+M: loc >vreg drop f ;
 
 ! A data stack location.
 TUPLE: ds-loc < loc ;
@@ -85,5 +86,6 @@ TUPLE: constant value ;
 C: <constant> constant
 
 M: constant value-class* value>> class ;
+M: constant >vreg ;
 
 INSTANCE: constant value
