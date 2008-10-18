@@ -5,7 +5,7 @@ combinators compiler compiler.alien kernel math namespaces make
 parser prettyprint prettyprint.sections quotations sequences
 strings words cocoa.runtime io macros memoize debugger
 io.encodings.ascii effects libc libc.private parser lexer init
-core-foundation ;
+core-foundation fry ;
 IN: cocoa.messages
 
 : make-sender ( method function -- quot )
