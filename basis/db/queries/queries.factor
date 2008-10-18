@@ -166,9 +166,11 @@ M: db <select-by-slots-statement> ( tuple class -- statement )
     swap 3append ;
 
 : do-group ( tuple groups -- )
+    dup string? [ 1array ] when
     [ ", " join " group by " splice ] curry change-sql drop ;
 
 : do-order ( tuple order -- )
+    dup string? [ 1array ] when
     [ ", " join " order by " splice ] curry change-sql drop ;
 
 : do-offset ( tuple n -- )
