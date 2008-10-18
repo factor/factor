@@ -62,12 +62,35 @@ IN: dns.forwarding
 : message-soa ( message -- rr/soa )
   authority-section>> [ type>> SOA = ] filter first ;
 
+! :: cache-message ( MSG -- msg )
+!    MSG rcode>> NAME-ERROR =
+!      [
+!        [let | NAME [ MSG message-query name>> ]
+!               TTL  [ MSG message-soa   ttl>>  ] |
+!          NAME TTL cache-non-existent-name
+!        ]
+!      ]
+!    when
+!    MSG answer-section>>     [ cache-add ] each
+!    MSG authority-section>>  [ cache-add ] each
+!    MSG additional-section>> [ cache-add ] each
+!    MSG ;
+
 :: cache-message ( MSG -- msg )
    MSG rcode>> NAME-ERROR =
      [
-       [let | NAME [ MSG message-query name>> ]
-              TTL  [ MSG message-soa   ttl>>  ] |
-         NAME TTL cache-non-existent-name
+       [let | RR/SOA [ MSG
+                         authority-section>>
+                         [ type>> SOA = ] filter
+                       dup empty? [ drop f ] [ first ] if ] |
+         RR/SOA
+           [
+             [let | NAME [ MSG message-query name>> ]
+                    TTL  [ MSG message-soa   ttl>>  ] |
+               NAME TTL cache-non-existent-name
+             ]
+           ]
+         when
        ]
      ]
    when
