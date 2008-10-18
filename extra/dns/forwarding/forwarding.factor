@@ -1,105 +1,102 @@
 
-USING: combinators.short-circuit kernel
-       combinators
-       vectors
-       sequences
+USING: kernel sequences combinators accessors locals random
+       combinators.short-circuit
        io.sockets
-       accessors
-       combinators.lib
-       newfx
-       dns dns.cache dns.misc ;
+       dns dns.util dns.cache.rr dns.cache.nx ;
 
 IN: dns.forwarding
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-! DNS server - caching, forwarding
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: (socket) ( -- vec ) V{ f } ;
-
-: socket ( -- socket ) (socket) 1st ;
-
-: init-socket-on-port ( port -- )
-  f swap <inet4> <datagram> 0 (socket) as-mutate ;
-
-: init-socket ( -- ) 53 init-socket-on-port ;
+: forever ( quot -- ) [ call ] [ forever ] bi ;         inline recursive
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: (upstream-server) ( -- vec ) V{ f } ;
+:: query->rrs ( QUERY -- rrs/f )
+   [let | RRS [ QUERY cache-get ] |
+     RRS
+       [ RRS ]
+       [
+         [let | NAME  [ QUERY name>>  ]
+                TYPE  [ QUERY type>>  ]
+                CLASS [ QUERY class>> ] |
+               
+           [let | RRS/CNAME [ T{ query f NAME CNAME CLASS } cache-get ] |
 
-: upstream-server ( -- ip ) (upstream-server) 1st ;
+             RRS/CNAME f =
+               [ f ]
+               [
+                 [let | RR/CNAME [ RRS/CNAME first ] |
+            
+                   [let | REAL-NAME [ RR/CNAME rdata>> ] |
+              
+                     [let | RRS [
+                                  T{ query f REAL-NAME TYPE CLASS } query->rrs
+                                ] |
 
-: set-upstream-server ( ip -- ) 0 (upstream-server) as-mutate ;
+                       RRS
+                         [ RRS/CNAME RRS append ]
+                         [ f ]
+                       if
+                     ] ] ]
+               ]
+             if
+           ] ]
+       ]
+     if
+   ] ;
 
-: init-upstream-server ( -- )
-  upstream-server not
-    [ resolv-conf-server set-upstream-server ]
-  when ;
+:: answer-from-cache ( MSG -- msg/f )
+   [let | QUERY [ MSG message-query ] |
+
+     [let | NX  [ QUERY name>> non-existent-name? ]
+            RRS [ QUERY query->rrs                ] |
+
+       {
+         { [ NX  ] [ MSG NAME-ERROR >>rcode          ] }
+         { [ RRS ] [ MSG RRS        >>answer-section ] }
+         { [ t   ] [ f                               ] }
+       }
+       cond
+     ]
+   ] ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: rrs? ( obj -- ? ) { [ NX = not ] [ f = not ] } 1&& ;
+: message-soa ( message -- rr/soa )
+  authority-section>> [ type>> SOA = ] filter first ;
 
-: query->answer/cache ( query -- rrs/NX/f )
-  dup cache-get* dup { [ rrs? ] [ NX = ] } 1||
-    [ nip ]
+:: cache-message ( MSG -- msg )
+   MSG rcode>> NAME-ERROR =
+     [
+       [let | NAME [ MSG message-query name>> ]
+              TTL  [ MSG message-soa   ttl>>  ] |
+         NAME TTL cache-non-existent-name
+       ]
+     ]
+   when
+   MSG answer-section>>     [ cache-add ] each
+   MSG authority-section>>  [ cache-add ] each
+   MSG additional-section>> [ cache-add ] each
+   MSG ;
+
+: answer-from-server ( msg servers -- msg ) random ask-server cache-message ;
+
+:: find-answer ( MSG SERVERS -- msg )
+   { [ MSG answer-from-cache ] [ MSG SERVERS answer-from-server ] } 0|| ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+:: start-server ( ADDR-SPEC SERVERS -- )
+
+  [let | SOCKET [ ADDR-SPEC <datagram> ] |
+
     [
-      drop
-      dup clone CNAME >>type cache-get* dup { [ NX = ] [ f = ] } 1||
-        [ nip ]
-        [                                       ! query rrs
-          tuck                                  ! rrs query rrs
-          1st                                   ! rrs query rr/cname
-          rdata>>                               ! rrs query name
-          >r clone r> >>name                    ! rrs query
-          query->answer/cache                   ! rrs rrs/NX/f
-          dup rrs? [ append ] [ nip ] if
-        ]
-      if
+      SOCKET receive-packet
+        [ parse-message SERVERS find-answer message->ba ]
+      change-data
+      respond
     ]
-  if ;
+    forever
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: answer-from-cache ( message -- message/f )
-  dup message-query                        ! message query
-  dup query->answer/cache                  ! message query rrs/NX/f
-    {
-      { [ dup f = ]  [ 3drop f ] }
-      { [ dup NX = ] [ 2drop NAME-ERROR >>rcode ] }
-      { [ t ]        [ nip >>answer-section ] }
-    }
-  cond ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: answer-from-server ( message -- message )
-  upstream-server ask-server
-  cache-message ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: find-answer ( message -- message )
-  dup answer-from-cache dup
-    [ nip ]
-    [ drop answer-from-server ]
-  if ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: loop ( -- )
-  socket receive                              ! byte-array addr-spec
-  swap                                        ! addr-spec byte-array
-  parse-message                               ! addr-spec message
-  find-answer                                 ! addr-spec message
-  message->ba                                 ! addr-spec byte-array
-  swap                                        ! byte-array addr-spec
-  socket send
-  loop ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: start ( -- ) init-socket init-upstream-server loop ;
-
-MAIN: start
+  ] ;
