@@ -19,7 +19,8 @@ DEFER: add-child-monitor
 
 : add-child-monitors ( path -- )
     #! We yield since this directory scan might take a while.
-    [
+    dup [
+        [ append-path ] with map
         [ add-child-monitor ] each yield
     ] with-directory-files ;
 
