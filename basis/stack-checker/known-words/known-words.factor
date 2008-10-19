@@ -396,8 +396,6 @@ do-primitive alien-invoke alien-indirect alien-callback
 
 \ (exists?) { string } { object } define-primitive
 
-\ (directory) { string } { array } define-primitive
-
 \ gc { } { } define-primitive
 
 \ gc-stats { } { array } define-primitive
