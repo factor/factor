@@ -235,19 +235,22 @@ HOOK: make-directory io-backend ( path -- )
         ]
     } cond drop ;
 
-! Directory listings
-: fixup-directory ( path seq -- newseq )
-    [
-        dup string?
-        [ tuck append-path file-info directory? 2array ] [ nip ] if
-    ] with map
-    [ first { "." ".." } member? not ] filter ;
+TUPLE: directory-entry name type ;
 
-: directory ( path -- seq )
-    normalize-directory dup (directory) fixup-directory ;
+HOOK: >directory-entry os ( byte-array -- directory-entry )
 
-: directory* ( path -- seq )
-    dup directory [ first2 >r append-path r> 2array ] with map ;
+HOOK: (directory-entries) os ( path -- seq )
+
+: directory-entries ( path -- seq )
+    normalize-path
+    (directory-entries)
+    [ name>> { "." ".." } member? not ] filter ;
+    
+: directory-files ( path -- seq )
+    directory-entries [ name>> ] map ;
+
+: with-directory-files ( path quot -- )
+    [ "" directory-files ] prepose with-directory ; inline
 
 ! Touching files
 HOOK: touch-file io-backend ( path -- )
@@ -259,12 +262,10 @@ HOOK: delete-directory io-backend ( path -- )
 
 : delete-tree ( path -- )
     dup link-info type>> +directory+ = [
-        dup directory over [
-            [ first delete-tree ] each
-        ] with-directory delete-directory
-    ] [
-        delete-file
-    ] if ;
+        [ [ [ delete-tree ] each ] with-directory-files ]
+        [ delete-directory ]
+        bi
+    ] [ delete-file ] if ;
 
 : to-directory ( from to -- from to' )
     over file-name append-path ;
@@ -303,9 +304,9 @@ DEFER: copy-tree-into
     {
         { +symbolic-link+ [ copy-link ] }
         { +directory+ [
-            >r dup directory r> rot [
-                [ >r first r> copy-tree-into ] curry each
-            ] with-directory
+            swap [
+                [ swap copy-tree-into ] with each
+            ] with-directory-files
         ] }
         [ drop copy-file ]
     } case ;

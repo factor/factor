@@ -61,44 +61,6 @@ DEFINE_PRIMITIVE(existsp)
 	box_boolean(stat(unbox_char_string(),&sb) >= 0);
 }
 
-/* Allocates memory */
-CELL parse_dir_entry(struct dirent *file)
-{
-	CELL name = tag_object(from_char_string(file->d_name));
-	if(UNKNOWN_TYPE_P(file))
-		return name;
-	else
-	{
-		CELL dirp = tag_boolean(DIRECTORY_P(file));
-		return allot_array_2(name,dirp);
-	}
-}
-
-DEFINE_PRIMITIVE(read_dir)
-{
-	DIR* dir = opendir(unbox_char_string());
-	GROWABLE_ARRAY(result);
-	REGISTER_ROOT(result);
-
-	if(dir != NULL)
-	{
-		struct dirent* file;
-
-		while((file = readdir(dir)) != NULL)
-		{
-			CELL pair = parse_dir_entry(file);
-			GROWABLE_ARRAY_ADD(result,pair);
-		}
-
-		closedir(dir);
-	}
-
-	UNREGISTER_ROOT(result);
-	GROWABLE_ARRAY_TRIM(result);
-
-	dpush(result);
-}
-
 F_SEGMENT *alloc_segment(CELL size)
 {
 	int pagesize = getpagesize();

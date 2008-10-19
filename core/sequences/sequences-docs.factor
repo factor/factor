@@ -398,7 +398,7 @@ HELP: filter
 { $description "Applies the quotation to each element in turn, and outputs a new sequence containing the elements of the original sequence for which the quotation output a true value." } ;
 
 HELP: filter-here
-{ $values { "seq" "a resizable mutable sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "subseq" "a new sequence" } }
+{ $values { "seq" "a resizable mutable sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } }
 { $description "Applies the quotation to each element in turn, and removes elements for which the quotation outputs a false value." }
 { $side-effects "seq" } ;
 

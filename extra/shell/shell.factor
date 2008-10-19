@@ -39,7 +39,7 @@ METHOD: expand { variable-expr } expr>> os-env ;
 METHOD: expand { glob-expr }
   expr>>
   dup "*" =
-    [ drop current-directory get directory [ first ] map ]
+    [ drop current-directory get directory-files ]
     [ ]
   if ;
 

@@ -55,7 +55,6 @@
 			#endif
 		#elif defined(__OpenBSD__)
 			#define FACTOR_OS_STRING "openbsd"
-			#include "os-openbsd.h"
 
 			#if defined(FACTOR_X86)
 				#include "os-openbsd-x86.32.h"
@@ -102,7 +101,6 @@
 				#error "Unsupported Solaris flavor"
 			#endif
 
-			#include "os-solaris.h"
 		#else
 			#error "Unsupported OS"
 		#endif

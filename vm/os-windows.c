@@ -87,21 +87,6 @@ const F_CHAR *vm_executable_path(void)
 	return safe_strdup(full_path);
 }
 
-void find_file_stat(F_CHAR *path)
-{
-	// FindFirstFile is the only call that can stat c:\pagefile.sys
-	WIN32_FIND_DATA st;
-	HANDLE h;
-
-	if(INVALID_HANDLE_VALUE == (h = FindFirstFile(path, &st)))
-		dpush(F);
-	else
-	{
-		FindClose(h);
-		dpush(T);
-	}
-}
-
 DEFINE_PRIMITIVE(existsp)
 {
 	BY_HANDLE_FILE_INFORMATION bhfi;
@@ -134,34 +119,6 @@ DEFINE_PRIMITIVE(existsp)
 
 	box_boolean(GetFileInformationByHandle(h, &bhfi));
 	CloseHandle(h);
-}
-
-DEFINE_PRIMITIVE(read_dir)
-{
-	HANDLE dir;
-	WIN32_FIND_DATA find_data;
-	F_CHAR *path = unbox_u16_string();
-
-	GROWABLE_ARRAY(result);
-	REGISTER_ROOT(result);
-
-	if(INVALID_HANDLE_VALUE != (dir = FindFirstFile(path, &find_data)))
-	{
-		do
-		{
-			CELL name = tag_object(from_u16_string(find_data.cFileName));
-			CELL dirp = tag_boolean(find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
-			CELL pair = allot_array_2(name,dirp);
-			GROWABLE_ARRAY_ADD(result,pair);
-		}
-		while (FindNextFile(dir, &find_data));
-		FindClose(dir);
-	}
-
-	UNREGISTER_ROOT(result);
-	GROWABLE_ARRAY_TRIM(result);
-
-	dpush(result);
 }
 
 F_SEGMENT *alloc_segment(CELL size)

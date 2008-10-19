@@ -1,6 +1,4 @@
-
 USING: alien.syntax ;
-
 IN: unix.linux.fs
 
 : MS_RDONLY             1    ; ! Mount read-only.

@@ -14,8 +14,7 @@ IN: tools.vocabs
 : vocab-tests-dir ( vocab -- paths )
     dup vocab-dir "tests" append-path vocab-append-path dup [
         dup exists? [
-            dup directory keys
-            [ ".factor" tail? ] filter
+            dup directory-files [ ".factor" tail? ] filter
             [ append-path ] with map
         ] [ drop f ] if
     ] [ drop f ] if ;
@@ -208,7 +207,9 @@ M: vocab-link summary vocab-summary ;
     dup vocab-authors-path set-vocab-file-contents ;
 
 : subdirs ( dir -- dirs )
-    directory [ second ] filter keys natural-sort ;
+    [
+        [ link-info directory? ] filter
+    ] with-directory-files natural-sort ;
 
 : (all-child-vocabs) ( root name -- vocabs )
     [ vocab-dir append-path subdirs ] keep

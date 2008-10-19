@@ -1,10 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types io.binary io.backend io.files io.buffers
-io.windows kernel math splitting
+io.windows kernel math splitting fry alien.strings
 windows windows.kernel32 windows.time calendar combinators
 math.functions sequences namespaces make words symbols system
-io.ports destructors accessors math.bitwise ;
+io.ports destructors accessors math.bitwise continuations
+windows.errors arrays ;
 IN: io.windows.files
 
 : open-file ( path access-mode create-mode flags -- handle )
@@ -113,8 +114,35 @@ M: windows delete-directory ( path -- )
     normalize-path
     RemoveDirectory win32-error=0/f ;
 
-M: windows normalize-directory ( string -- string )
-    normalize-path "\\" ?tail drop "\\*" append ;
+M: windows >directory-entry ( byte-array -- directory-entry )
+    [ WIN32_FIND_DATA-cFileName utf16n alien>string ]
+    [ WIN32_FIND_DATA-dwFileAttributes ]
+    bi directory-entry boa ;
+
+: find-first-file ( path -- WIN32_FIND_DATA handle )
+    "WIN32_FIND_DATA" <c-object> tuck
+    FindFirstFile
+    [ INVALID_HANDLE_VALUE = [ win32-error ] when ] keep ;
+
+: find-next-file ( path -- WIN32_FIND_DATA/f )
+    "WIN32_FIND_DATA" <c-object> tuck
+    FindNextFile 0 = [
+        GetLastError ERROR_NO_MORE_FILES = [
+            win32-error
+        ] unless drop f
+    ] when ;
+
+M: windows (directory-entries) ( path -- seq )
+    "\\" ?tail drop "\\*" append
+    find-first-file [ >directory-entry ] dip
+    [
+        '[
+            [ _ find-next-file dup ]
+            [ >directory-entry ]
+            [ drop ] produce
+            over name>> "." = [ nip ] [ swap prefix ] if
+        ]
+    ] [ '[ _ FindClose win32-error=0/f ] ] bi [ ] cleanup ;
 
 SYMBOLS: +read-only+ +hidden+ +system+
 +archive+ +device+ +normal+ +temporary+

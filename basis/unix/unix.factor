@@ -81,6 +81,7 @@ FUNCTION: int chown ( char* path, uid_t owner, gid_t group ) ;
 FUNCTION: int chroot ( char* path ) ;
 
 FUNCTION: int close ( int fd ) ;
+FUNCTION: int closedir ( DIR* dirp ) ;
 
 : close-file ( fd -- ) [ close ] unix-system-call drop ;
 
@@ -136,6 +137,8 @@ FUNCTION: int shutdown ( int fd, int how ) ;
 
 FUNCTION: int open ( char* path, int flags, int prot ) ;
 
+FUNCTION: DIR* opendir ( char* path ) ;
+
 : open-file ( path flags mode -- fd ) [ open ] unix-system-call ;
 
 C-STRUCT: utimbuf
@@ -156,6 +159,8 @@ FUNCTION: int pclose ( void* file ) ;
 FUNCTION: int pipe ( int* filedes ) ;
 FUNCTION: void* popen ( char* command, char* type ) ;
 FUNCTION: ssize_t read ( int fd, void* buf, size_t nbytes ) ;
+
+FUNCTION: int readdir_r ( void* dirp, dirent* entry, dirent** result ) ;
 
 FUNCTION: ssize_t readlink ( char* path, char* buf, size_t bufsize ) ;
 
