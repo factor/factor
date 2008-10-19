@@ -3,8 +3,6 @@
 USING: alien.syntax combinators system vocabs.loader ;
 IN: unix
 
-! FreeBSD
-
 : MAXPATHLEN 1024 ; inline
 
 : O_RDONLY   HEX: 0000 ; inline

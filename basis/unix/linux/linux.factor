@@ -92,6 +92,13 @@ C-STRUCT: passwd
     { "char*"  "pw_dir" }
     { "char*"  "pw_shell" } ;
 
+C-STRUCT: dirent
+    { "__ino_t" "d_ino" }
+    { "__off_t" "d_off" }
+    { "ushort" "d_reclen" }
+    { "uchar" "d_type" }
+    { { "char" 256 } "d_name" } ;
+
 : EPERM 1 ; inline
 : ENOENT 2 ; inline
 : ESRCH 3 ; inline
