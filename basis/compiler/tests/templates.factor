@@ -1,10 +1,14 @@
-! Black box testing of templating optimization
-USING: accessors arrays compiler kernel kernel.private math
-hashtables.private math.private namespaces sequences
-sequences.private tools.test namespaces.private slots.private
-sequences.private byte-arrays alien alien.accessors layouts
-words definitions compiler.units io combinators vectors ;
+USING: generalizations accessors arrays compiler kernel
+kernel.private math hashtables.private math.private namespaces
+sequences sequences.private tools.test namespaces.private
+slots.private sequences.private byte-arrays alien
+alien.accessors layouts words definitions compiler.units io
+combinators vectors ;
 IN: compiler.tests
+
+! Originally, this file did black box testing of templating
+! optimization. We now have a different codegen, but the tests
+! in here are still useful.
 
 ! Oops!
 [ 5000 ] [ [ 5000 ] compile-call ] unit-test
@@ -102,7 +106,7 @@ unit-test
 ] unit-test
 
 ! Test how dispatch handles the end of a basic block
-: try-breaking-dispatch ( n a b -- a b str )
+: try-breaking-dispatch ( n a b -- x str )
     float+ swap { [ "hey" ] [ "bye" ] } dispatch ;
 
 : try-breaking-dispatch-2 ( -- ? )
@@ -121,7 +125,7 @@ unit-test
 ] unit-test
 
 ! Regression
-: hellish-bug-1 2drop ;
+: hellish-bug-1 ( a b -- ) 2drop ;
 
 : hellish-bug-2 ( i array x -- x ) 
     2dup 1 slot eq? [ 2drop ] [ 
@@ -131,7 +135,7 @@ unit-test
                 pick 2dup hellish-bug-1 3drop
             ] 2keep
         ] unless >r 2 fixnum+fast r> hellish-bug-2
-    ] if ; inline
+    ] if ; inline recursive
 
 : hellish-bug-3 ( hash array -- ) 
     0 swap hellish-bug-2 drop ;
@@ -333,6 +337,35 @@ TUPLE: my-tuple ;
 [ 1.0 float-fixnum-spill-bug ] unit-test
 
 [ t ] [ \ float-fixnum-spill-bug compiled>> ] unit-test
+
+: resolve-spill-bug ( a b -- c )
+    [ 1 fixnum+fast ] bi@ dup 10 fixnum< [
+        nip 2 fixnum+fast
+    ] [
+        drop {
+            [ dup fixnum+fast ]
+            [ dup fixnum+fast ]
+            [ dup fixnum+fast ]
+            [ dup fixnum+fast ]
+            [ dup fixnum+fast ]
+            [ dup fixnum+fast ]
+            [ dup fixnum+fast ]
+            [ dup fixnum+fast ]
+            [ dup fixnum+fast ]
+            [ dup fixnum+fast ]
+            [ dup fixnum+fast ]
+            [ dup fixnum+fast ]
+            [ dup fixnum+fast ]
+            [ dup fixnum+fast ]
+            [ dup fixnum+fast ]
+            [ dup fixnum+fast ]
+        } cleave
+        16 narray
+    ] if ;
+
+[ t ] [ \ resolve-spill-bug compiled>> ] unit-test
+
+[ 4 ] [ 1 1 resolve-spill-bug ] unit-test
 
 ! Regression
 : dispatch-alignment-regression ( -- c )
