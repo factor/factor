@@ -132,3 +132,40 @@ C-STRUCT: utmpx
     { "timeval" "ut_tv" }
     { { "char" _UTX_HOSTSIZE } "ut_host" }
     { { "uint" 16 } "ut_pad" } ;
+
+: __PTHREAD_MUTEX_SIZE__ 40 ; inline
+
+C-STRUCT: _opaque_pthread_mutex_t
+    { "long" "__sig" }
+    { { "char" __PTHREAD_MUTEX_SIZE__ } "__opaque" } ;
+
+TYPEDEF: _opaque_pthread_mutex_t* __darwin_pthread_mutex_t
+
+C-STRUCT: DIR 
+    { "int" "__dd_fd" }
+    { "long" "__dd_loc" }
+    { "long" "__dd_size" }
+    { "char*" "__dd_buf" }
+    { "int" "__dd_len" }
+    { "long" "__dd_seek" }
+    { "long" "__dd_rewind" }
+    { "int" "__dd_flags" }
+    { "__darwin_pthread_mutex_t" "__dd_lock" }
+    { "void*" "__dd_td" } ;
+
+
+! #define DIRSIZ(dp) \
+    ! ((sizeof (struct direct) - (MAXNAMLEN+1)) + (((dp)->d_namlen+1 + 3) &~ 3))
+
+!  __DARWIN_STRUCT_DIRENTRY { \
+
+: __DARWIN_MAXPATHLEN 1024 ; inline
+: __DARWIN_MAXNAMELEN 255 ; inline
+: __DARWIN_MAXNAMELEN+1 255 ; inline
+
+C-STRUCT: dirent
+    { "ino_t" "d_ino" }
+    { "__uint16_t" "d_reclen" }
+    { "__uint8_t"  "d_type" }
+    { "__uint8_t"  "d_namlen" }
+    { { "char" __DARWIN_MAXNAMELEN+1 } "d_name" } ;

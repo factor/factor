@@ -27,11 +27,7 @@ FUNCTION: int mkdir ( char* path, mode_t mode ) ;
 } case >>
 
 : file-status ( pathname -- stat )
-    "stat" <c-object> [
-        [ stat ] unix-system-call drop
-    ] keep ;
+    "stat" <c-object> [ [ stat ] unix-system-call drop ] keep ;
 
 : link-status ( pathname -- stat )
-    "stat" <c-object> [
-        [ lstat ] unix-system-call drop
-    ] keep ;
+    "stat" <c-object> [ [ lstat ] unix-system-call drop ] keep ;
