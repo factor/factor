@@ -6,7 +6,7 @@ math.bitwise byte-arrays alien combinators calendar
 io.encodings.binary accessors sequences strings system
 io.files.private destructors vocabs.loader calendar.unix
 unix.stat alien.c-types arrays unix.users unix.groups
-environment ;
+environment fry io.encodings.utf8 alien.strings ;
 IN: io.unix.files
 
 M: unix cwd ( -- path )
@@ -137,6 +137,27 @@ os {
     { freebsd  [ "io.unix.files.bsd" require ] }
     { linux [ ] }
 } case
+
+: with-unix-directory ( path quot -- )
+    [ opendir dup [ (io-error) ] unless ] dip
+    dupd curry swap '[ _ closedir io-error ] [ ] cleanup ; inline
+
+: find-next-file ( DIR* -- byte-array )
+    "dirent" <c-object>
+    f <void*>
+    [ readdir_r 0 = [ (io-error) ] unless ] 2keep
+    *void* [ drop f ] unless ;
+
+M: unix >directory-entry ( byte-array -- directory-entry )
+    [ dirent-d_name utf8 alien>string ]
+    [ dirent-d_type ] bi directory-entry boa ;
+
+M: unix (directory-entries) ( path -- seq )
+    [
+        '[ _ find-next-file dup ]
+        [ >directory-entry ]
+        [ drop ] produce
+    ] with-unix-directory ;
 
 <PRIVATE
 

@@ -59,8 +59,8 @@ TUPLE: file-responder root hook special allow-listings ;
 
 \ serve-file NOTICE add-input-logging
 
-: file. ( name dirp -- )
-    [ "/" append ] when
+: file. ( name -- )
+    dup link-info directory? [ "/" append ] when
     dup <a =href a> escape-string write </a> ;
 
 : directory. ( path -- )
@@ -68,7 +68,7 @@ TUPLE: file-responder root hook special allow-listings ;
         [ <h1> file-name escape-string write </h1> ]
         [
             <ul>
-                directory sort-keys
+                directory-files 
                 [ <li> file. </li> ] assoc-each
             </ul>
         ] bi
