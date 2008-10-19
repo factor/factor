@@ -838,7 +838,8 @@ ALIAS: FindNextFile FindNextFileW
 ! FUNCTION: FormatMessageW
 ! FUNCTION: FreeConsole
 ! FUNCTION: FreeEnvironmentStringsA
-! FUNCTION: FreeEnvironmentStringsW
+FUNCTION: BOOL FreeEnvironmentStringsW ( LPTCH lpszEnvironmentBlock ) ;
+ALIAS: FreeEnvironmentStrings FreeEnvironmentStringsW
 ! FUNCTION: FreeLibrary
 ! FUNCTION: FreeLibraryAndExitThread
 ! FUNCTION: FreeResource
@@ -933,11 +934,12 @@ FUNCTION: HANDLE GetCurrentThread ( ) ;
 ! FUNCTION: GetDllDirectoryW
 ! FUNCTION: GetDriveTypeA
 ! FUNCTION: GetDriveTypeW
-FUNCTION: LPTCH GetEnvironmentStrings ( ) ;
+FUNCTION: void* GetEnvironmentStringsW ( ) ;
 ! FUNCTION: GetEnvironmentStringsA
 ALIAS: GetEnvironmentStrings GetEnvironmentStringsW
 ! FUNCTION: GetEnvironmentVariableA
-! FUNCTION: GetEnvironmentVariableW
+FUNCTION: DWORD GetEnvironmentVariableW ( LPCTSTR lpName, LPTSTR lpBuffer, DWORD nSize ) ;
+ALIAS: GetEnvironmentVariable GetEnvironmentVariableW
 FUNCTION: BOOL GetExitCodeProcess ( HANDLE hProcess, LPDWORD lpExitCode ) ;
 ! FUNCTION: GetExitCodeThread
 ! FUNCTION: GetExpandedNameA
@@ -1418,7 +1420,8 @@ ALIAS: SetCurrentDirectory SetCurrentDirectoryW
 ! FUNCTION: SetDllDirectoryW
 FUNCTION: BOOL SetEndOfFile ( HANDLE hFile ) ;
 ! FUNCTION: SetEnvironmentVariableA
-! FUNCTION: SetEnvironmentVariableW
+FUNCTION: BOOL SetEnvironmentVariableW ( LPCTSTR key, LPCTSTR value ) ;
+ALIAS: SetEnvironmentVariable SetEnvironmentVariableW
 ! FUNCTION: SetErrorMode
 ! FUNCTION: SetEvent
 ! FUNCTION: SetFileApisToANSI
