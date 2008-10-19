@@ -43,7 +43,7 @@ GENERIC# load-literal 1 ( obj reg -- )
 
 HOOK: load-indirect cpu ( obj reg -- )
 
-HOOK: stack-frame-size cpu ( frame-size -- n )
+HOOK: stack-frame-size cpu ( stack-frame -- n )
 
 ! Set up caller stack frame
 HOOK: %prologue cpu ( n -- )
@@ -197,3 +197,12 @@ HOOK: %write-barrier cpu ( src card# table -- )
 
 ! GC check
 HOOK: %gc cpu ( -- )
+
+! Spilling
+HOOK: %spill-integer cpu ( src n -- )
+
+HOOK: %spill-float cpu ( src n -- )
+
+HOOK: %reload-integer cpu ( dst n -- )
+
+HOOK: %reload-float cpu ( dst n -- )

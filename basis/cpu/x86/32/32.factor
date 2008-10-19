@@ -267,7 +267,10 @@ M: x86.32 %callback-return ( n -- )
     #! b) If the callback is returning a large struct, we have
     #! to fix ESP.
     {
-        { [ dup abi>> "stdcall" = ] [ <alien-stack-frame> size>> ] }
+        { [ dup abi>> "stdcall" = ] [
+            <alien-stack-frame>
+            [ params>> ] [ return>> ] bi +
+        ] }
         { [ dup return>> large-struct? ] [ drop 4 ] }
         [ drop 0 ]
     } cond RET ;

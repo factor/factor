@@ -8,6 +8,12 @@ compiler.cfg.registers compiler.cfg.builder cpu.architecture
 cpu.x86.assembler cpu.x86.architecture cpu.x86.intrinsics ;
 IN: cpu.x86.sse2
 
+M: x86 %spill-float ( src n -- )
+    spill-float@ swap MOVSD ;
+
+M: x86 %reload-float ( dst n -- )
+    spill-float@ MOVSD ;
+
 M: x86 %copy-float MOVSD ;
 
 M:: x86 %box-float ( dst src temp -- )

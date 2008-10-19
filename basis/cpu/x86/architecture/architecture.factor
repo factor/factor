@@ -1,10 +1,11 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien alien.c-types arrays cpu.x86.assembler
-cpu.x86.assembler.private cpu.architecture kernel kernel.private
-math memory namespaces make sequences words system
-layouts combinators math.order locals compiler.constants
-compiler.cfg.registers compiler.cfg.instructions
+USING: accessors assocs alien alien.c-types arrays
+cpu.x86.assembler cpu.x86.assembler.private cpu.architecture
+kernel kernel.private math memory namespaces make sequences
+words system layouts combinators math.order locals
+compiler.constants compiler.cfg.registers
+compiler.cfg.instructions compiler.codegen
 compiler.codegen.fixup ;
 IN: cpu.x86.architecture
 
@@ -13,6 +14,13 @@ HOOK: rs-reg cpu ( -- reg )
 HOOK: stack-reg cpu ( -- reg )
 
 : stack@ ( n -- op ) stack-reg swap [+] ;
+
+: spill-integer@ ( n -- op )
+    cells stack-frame get [ params>> ] [ return>> ] bi + + stack@ ;
+
+: spill-float@ ( n -- op )
+    #! XXX
+    cells stack-frame get [ params>> ] [ return>> ] bi + + stack@ ;
 
 : next-stack@ ( n -- operand )
     #! nth parameter from the next stack frame. Used to box
@@ -60,8 +68,13 @@ M: fixnum load-literal
 : align-stack ( n -- n' )
     os macosx? cpu x86.64? or [ 16 align ] when ;
 
-M: x86 stack-frame-size ( n -- i )
-    3 cells + align-stack ;
+M: x86 stack-frame-size ( stack-frame -- i )
+    [ spill-counts>> [ swap reg-size * ] { } assoc>map sum ]
+    [ params>> ]
+    [ return>> ]
+    tri + +
+    3 cells +
+    align-stack ;
 
 : decr-stack-reg ( n -- )
     dup 0 = [ drop ] [ stack-reg swap SUB ] if ;
@@ -193,3 +206,9 @@ M: x86 %unbox-any-c-ptr ( dst src -- )
     rs-reg POP
     ! Restore ds-reg
     ds-reg POP ;
+
+M: x86 %spill-integer ( src n -- )
+    spill-integer@ swap MOV ;
+
+M: x86 %reload-integer ( dst n -- )
+    spill-integer@ MOV ;
