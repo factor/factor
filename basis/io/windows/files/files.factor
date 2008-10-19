@@ -254,11 +254,11 @@ M: winnt file-system-info ( path -- file-system-info )
     "ULARGE_INTEGER" <c-object>
     "ULARGE_INTEGER" <c-object>
     "ULARGE_INTEGER" <c-object>
-    [ GetDiskFreeSpaceEx ] 3keep
+    [ GetDiskFreeSpaceEx win32-error=0/f ] 3keep
     \ winnt-file-system-info new
-        swap >>total-free-bytes
-        swap >>total-bytes
-        swap >>free-space ;
+        swap *ulonglong >>total-free-bytes
+        swap *ulonglong >>total-bytes
+        swap *ulonglong >>free-space ;
 
 : file-times ( path -- timestamp timestamp timestamp )
     [
