@@ -251,6 +251,7 @@ total-bytes total-free-bytes ;
 
 M: winnt file-system-info ( path -- file-system-info )
     normalize-path
+    dup file-info directory? [ parent-directory ] unless
     "ULARGE_INTEGER" <c-object>
     "ULARGE_INTEGER" <c-object>
     "ULARGE_INTEGER" <c-object>
