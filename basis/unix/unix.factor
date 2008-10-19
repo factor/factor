@@ -160,7 +160,7 @@ FUNCTION: int pipe ( int* filedes ) ;
 FUNCTION: void* popen ( char* command, char* type ) ;
 FUNCTION: ssize_t read ( int fd, void* buf, size_t nbytes ) ;
 
-FUNCTION: int readdir_r ( DIR* dirp, dirent* entry, dirent** result ) ;
+FUNCTION: int readdir_r ( void* dirp, dirent* entry, dirent** result ) ;
 
 FUNCTION: ssize_t readlink ( char* path, char* buf, size_t bufsize ) ;
 
