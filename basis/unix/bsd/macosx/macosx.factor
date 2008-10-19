@@ -13,6 +13,43 @@ C-STRUCT: addrinfo
     { "void*" "addr" }
     { "addrinfo*" "next" } ;
 
+: _UTX_USERSIZE 256 ; inline
+: _UTX_LINESIZE 32 ; inline
+: _UTX_IDSIZE 4 ; inline
+: _UTX_HOSTSIZE 256 ; inline
+    
+C-STRUCT: utmpx
+    { { "char" _UTX_USERSIZE } "ut_user" }
+    { { "char" _UTX_IDSIZE } "ut_id" }
+    { { "char" _UTX_LINESIZE } "ut_line" }
+    { "pid_t" "ut_pid" }
+    { "short" "ut_type" }
+    { "timeval" "ut_tv" }
+    { { "char" _UTX_HOSTSIZE } "ut_host" }
+    { { "uint" 16 } "ut_pad" } ;
+
+: __DARWIN_MAXPATHLEN 1024 ; inline
+: __DARWIN_MAXNAMELEN 255 ; inline
+: __DARWIN_MAXNAMELEN+1 255 ; inline
+
+C-STRUCT: dirent
+    { "ino_t" "d_ino" }
+    { "__uint16_t" "d_reclen" }
+    { "__uint8_t"  "d_type" }
+    { "__uint8_t"  "d_namlen" }
+    { { "char" __DARWIN_MAXNAMELEN+1 } "d_name" } ;
+
+: DT_UNKNOWN   0 ; inline
+: DT_FIFO      1 ; inline
+: DT_CHR       2 ; inline
+: DT_DIR       4 ; inline
+: DT_BLK       6 ; inline
+: DT_REG       8 ; inline
+: DT_LNK      10 ; inline
+: DT_SOCK     12 ; inline
+: DT_WHT      14 ; inline
+
+
 : EPERM 1 ; inline
 : ENOENT 2 ; inline
 : ESRCH 3 ; inline
@@ -117,37 +154,3 @@ C-STRUCT: addrinfo
 : ETIME 101 ; inline
 : EOPNOTSUPP 102 ; inline
 : ENOPOLICY 103 ; inline
-
-: _UTX_USERSIZE 256 ; inline
-: _UTX_LINESIZE 32 ; inline
-: _UTX_IDSIZE 4 ; inline
-: _UTX_HOSTSIZE 256 ; inline
-    
-C-STRUCT: utmpx
-    { { "char" _UTX_USERSIZE } "ut_user" }
-    { { "char" _UTX_IDSIZE } "ut_id" }
-    { { "char" _UTX_LINESIZE } "ut_line" }
-    { "pid_t" "ut_pid" }
-    { "short" "ut_type" }
-    { "timeval" "ut_tv" }
-    { { "char" _UTX_HOSTSIZE } "ut_host" }
-    { { "uint" 16 } "ut_pad" } ;
-
-: __PTHREAD_MUTEX_SIZE__ 40 ; inline
-
-C-STRUCT: _opaque_pthread_mutex_t
-    { "long" "__sig" }
-    { { "char" __PTHREAD_MUTEX_SIZE__ } "__opaque" } ;
-
-TYPEDEF: _opaque_pthread_mutex_t* __darwin_pthread_mutex_t
-
-: __DARWIN_MAXPATHLEN 1024 ; inline
-: __DARWIN_MAXNAMELEN 255 ; inline
-: __DARWIN_MAXNAMELEN+1 255 ; inline
-
-C-STRUCT: dirent
-    { "ino_t" "d_ino" }
-    { "__uint16_t" "d_reclen" }
-    { "__uint8_t"  "d_type" }
-    { "__uint8_t"  "d_namlen" }
-    { { "char" __DARWIN_MAXNAMELEN+1 } "d_name" } ;

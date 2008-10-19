@@ -13,6 +13,24 @@ C-STRUCT: addrinfo
     { "char*" "canonname" }
     { "addrinfo*" "next" } ;
 
+C-STRUCT: dirent
+    { "__uint32_t" "d_fileno" }
+    { "__uint16_t" "d_reclen" }
+    { "__uint8_t"  "d_type" }
+    { "__uint8_t"  "d_namlen" }
+    { { "char" 256 } "d_name" } ;
+
+: DT_UNKNOWN   0 ; inline
+: DT_FIFO      1 ; inline
+: DT_CHR       2 ; inline
+: DT_DIR       4 ; inline
+: DT_BLK       6 ; inline
+: DT_REG       8 ; inline
+: DT_LNK      10 ; inline
+: DT_SOCK     12 ; inline
+
+
+
 : EPERM 1 ; inline
 : ENOENT 2 ; inline
 : ESRCH 3 ; inline
