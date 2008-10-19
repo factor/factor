@@ -105,6 +105,8 @@ FUNCTION: int getdtablesize ;
 FUNCTION: gid_t getegid ;
 FUNCTION: uid_t geteuid ;
 FUNCTION: gid_t getgid ;
+FUNCTION: char* getenv ( char* name ) ;
+
 FUNCTION: int getgrgid_r ( gid_t gid, group* grp, char* buffer, size_t bufsize, group** result ) ;
 FUNCTION: int getgrnam_r ( char* name, group* grp, char* buffer, size_t bufsize, group** result ) ;
 FUNCTION: passwd* getpwent ( ) ;
@@ -171,6 +173,8 @@ FUNCTION: int rename ( char* from, char* to ) ;
 FUNCTION: int rmdir ( char* path ) ;
 FUNCTION: int select ( int nfds, void* readfds, void* writefds, void* exceptfds, timeval* timeout ) ;
 FUNCTION: ssize_t sendto ( int s, void* buf, size_t len, int flags, sockaddr-in* to, socklen_t tolen ) ;
+FUNCTION: int setenv ( char* name, char* value, int overwrite ) ;
+FUNCTION: int unsetenv ( char* name ) ;
 FUNCTION: int setegid ( gid_t egid ) ;
 FUNCTION: int seteuid ( uid_t euid ) ;
 FUNCTION: int setgid ( gid_t gid ) ;
