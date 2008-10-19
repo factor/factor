@@ -412,8 +412,6 @@ do-primitive alien-invoke alien-indirect alien-callback
 \ code-room { } { integer integer integer integer } define-primitive
 \ code-room  make-flushable
 
-\ os-env { string } { object } define-primitive
-
 \ millis { } { integer } define-primitive
 \ millis make-flushable
 
@@ -589,14 +587,6 @@ do-primitive alien-invoke alien-indirect alien-callback
 \ innermost-frame-scan { callstack } { fixnum } define-primitive
 
 \ set-innermost-frame-quot { quotation callstack } { } define-primitive
-
-\ (os-envs) { } { array } define-primitive
-
-\ set-os-env { string string } { } define-primitive
-
-\ unset-os-env { string } { } define-primitive
-
-\ (set-os-envs) { array } { } define-primitive
 
 \ dll-valid? { object } { object } define-primitive
 

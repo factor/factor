@@ -448,7 +448,6 @@ tuple
     { "exit" "system" }
     { "data-room" "memory" }
     { "code-room" "memory" }
-    { "os-env" "system" }
     { "millis" "system" }
     { "modify-code-heap" "compiler.units" }
     { "dlopen" "alien" }
@@ -518,10 +517,6 @@ tuple
     { "innermost-frame-scan" "kernel.private" }
     { "set-innermost-frame-quot" "kernel.private" }
     { "call-clear" "kernel" }
-    { "(os-envs)" "system.private" }
-    { "set-os-env" "system" }
-    { "unset-os-env" "system" }
-    { "(set-os-envs)" "system.private" }
     { "resize-byte-array" "byte-arrays" }
     { "dll-valid?" "alien" }
     { "unimplemented" "kernel.private" }

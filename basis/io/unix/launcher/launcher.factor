@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel namespaces math system sequences debugger
 continuations arrays assocs combinators alien.c-types strings
-threads accessors
+threads accessors environment
 io io.backend io.launcher io.ports io.files
 io.files.private io.unix.files io.unix.backend
 io.unix.launcher.parser
