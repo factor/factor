@@ -101,7 +101,6 @@ unit-test
     ] [ define-temp ] with-compilation-unit drop
 ] unit-test
 
-
 ! Test how dispatch handles the end of a basic block
 : try-breaking-dispatch ( n a b -- a b str )
     float+ swap { [ "hey" ] [ "bye" ] } dispatch ;
@@ -189,7 +188,7 @@ TUPLE: my-tuple ;
 ] unit-test
 
 ! Regression
-: a-dummy ( -- ) drop "hi" print ;
+: a-dummy ( a -- ) drop "hi" print ;
 
 [ ] [
     1 [
@@ -245,7 +244,95 @@ TUPLE: my-tuple ;
         [ dup float+ ]
     } cleave ;
 
+[ 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 ]
+[ 1.0 float-spill-bug ] unit-test
+
 [ t ] [ \ float-spill-bug compiled>> ] unit-test
+
+: float-fixnum-spill-bug ( object -- object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object object )
+    {
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+        [ dup float+ ]
+        [ float>fixnum dup fixnum+fast ]
+    } cleave ;
+
+[ 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 2.0 2 ]
+[ 1.0 float-fixnum-spill-bug ] unit-test
+
+[ t ] [ \ float-fixnum-spill-bug compiled>> ] unit-test
 
 ! Regression
 : dispatch-alignment-regression ( -- c )

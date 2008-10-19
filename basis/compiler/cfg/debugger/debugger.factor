@@ -16,7 +16,7 @@ M: word test-cfg
     [ build-tree-from-word nip optimize-tree ] keep build-cfg ;
 
 : test-mr ( quot -- mrs )
-    test-cfg [ build-mr ] map ;
+    test-cfg [ build-mr linear-scan build-stack-frame ] map ;
 
 : mr. ( mrs -- )
     [

@@ -18,16 +18,22 @@ SYMBOL: free-registers
 ! Vector of active live intervals
 SYMBOL: active-intervals
 
+: active-intervals-for ( vreg -- seq )
+    reg-class>> active-intervals get at ;
+
 : add-active ( live-interval -- )
-    active-intervals get push ;
+    dup vreg>> active-intervals-for push ;
 
 : delete-active ( live-interval -- )
-    active-intervals get delete ;
+    dup vreg>> active-intervals-for delq ;
 
 : expire-old-intervals ( n -- )
-    active-intervals get
-    [ end>> > ] with partition
-    [ [ deallocate-register ] each ] [ active-intervals set ] bi* ;
+    active-intervals swap '[
+        [
+            [ end>> _ < ] partition
+            [ [ deallocate-register ] each ] dip
+        ] assoc-map
+    ] change ;
 
 ! Minheap of live intervals which still need a register allocation
 SYMBOL: unhandled-intervals
@@ -115,7 +121,7 @@ SYMBOL: spill-counts
     over start>> '[ _ [ > ] find-use nip -1 or ] bi@ < ;
 
 : assign-blocked-register ( new -- )
-    [ active-intervals get ] keep interval-to-spill
+    [ dup vreg>> active-intervals-for ] keep interval-to-spill
     2dup spill-existing? [ spill-existing ] [ spill-new ] if ;
 
 : assign-free-register ( new registers -- )
@@ -126,11 +132,13 @@ SYMBOL: spill-counts
     [ assign-blocked-register ] [ assign-free-register ] if-empty ;
 
 ! Main loop
+: reg-classes ( -- seq ) { int-regs double-float-regs } ; inline
+
 : init-allocator ( registers -- )
-    V{ } clone active-intervals set
     <min-heap> unhandled-intervals set
     [ reverse >vector ] assoc-map free-registers set
-    H{ { int-regs 0 } { double-float-regs 0 } } clone spill-counts set
+    reg-classes [ 0 ] { } map>assoc spill-counts set
+    reg-classes [ V{ } clone ] { } map>assoc active-intervals set
     -1 progress set ;
 
 : handle-interval ( live-interval -- )

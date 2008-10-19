@@ -15,12 +15,24 @@ HOOK: stack-reg cpu ( -- reg )
 
 : stack@ ( n -- op ) stack-reg swap [+] ;
 
+: spill-integer-base ( stack-frame -- n )
+    [ params>> ] [ return>> ] bi + ;
+
 : spill-integer@ ( n -- op )
-    cells stack-frame get [ params>> ] [ return>> ] bi + + stack@ ;
+    cells
+    stack-frame get spill-integer-base
+    + stack@ ;
+
+: spill-float-base ( stack-frame -- n )
+    [ spill-counts>> int-regs swap at int-regs reg-size * ]
+    [ params>> ]
+    [ return>> ]
+    tri + + ;
 
 : spill-float@ ( n -- op )
-    #! XXX
-    cells stack-frame get [ params>> ] [ return>> ] bi + + stack@ ;
+    double-float-regs reg-size *
+    stack-frame get spill-float-base
+    + stack@ ;
 
 : next-stack@ ( n -- operand )
     #! nth parameter from the next stack frame. Used to box
