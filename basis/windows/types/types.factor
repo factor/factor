@@ -7,7 +7,7 @@ TYPEDEF: char                CHAR
 TYPEDEF: uchar               UCHAR
 TYPEDEF: uchar               BYTE
 
-TYPEDEF: ushort               wchar_t
+TYPEDEF: ushort              wchar_t
 TYPEDEF: wchar_t             WCHAR
 
 TYPEDEF: short               SHORT
@@ -65,6 +65,7 @@ TYPEDEF: longlong    LARGE_INTEGER
 TYPEDEF: LARGE_INTEGER* PLARGE_INTEGER
 
 TYPEDEF: WCHAR       TCHAR
+TYPEDEF: TCHAR*      LPTCH
 TYPEDEF: TCHAR       TBYTE
 TYPEDEF: wchar_t*  LPCSTR
 TYPEDEF: wchar_t*  LPWSTR

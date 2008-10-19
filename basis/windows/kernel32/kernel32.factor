@@ -933,9 +933,9 @@ FUNCTION: HANDLE GetCurrentThread ( ) ;
 ! FUNCTION: GetDllDirectoryW
 ! FUNCTION: GetDriveTypeA
 ! FUNCTION: GetDriveTypeW
-! FUNCTION: GetEnvironmentStrings
+FUNCTION: LPTCH GetEnvironmentStrings ( ) ;
 ! FUNCTION: GetEnvironmentStringsA
-! FUNCTION: GetEnvironmentStringsW
+ALIAS: GetEnvironmentStrings GetEnvironmentStringsW
 ! FUNCTION: GetEnvironmentVariableA
 ! FUNCTION: GetEnvironmentVariableW
 FUNCTION: BOOL GetExitCodeProcess ( HANDLE hProcess, LPDWORD lpExitCode ) ;
