@@ -498,14 +498,17 @@ PRIVATE>
 : contains? ( seq quot -- ? )
     find drop >boolean ; inline
 
-: member? ( obj seq -- ? )
+: member? ( elt seq -- ? )
     [ = ] with contains? ;
 
-: memq? ( obj seq -- ? )
+: memq? ( elt seq -- ? )
     [ eq? ] with contains? ;
 
-: remove ( obj seq -- newseq )
+: remove ( elt seq -- newseq )
     [ = not ] with filter ;
+
+: remq ( elt seq -- newseq )
+    [ eq? not ] with filter ;
 
 : sift ( seq -- newseq )
     [ ] filter ;
@@ -552,16 +555,24 @@ M: slice equal? over slice? [ sequence= ] [ 2drop f ] if ;
 
 <PRIVATE
 
-: (delete) ( elt store scan seq -- elt store scan seq )
+: (filter-here) ( quot: ( elt -- ? ) store scan seq -- )
     2dup length < [
-        3dup move
-        [ nth pick = ] 2keep rot
-        [ >r >r 1+ r> r> ] unless >r 1+ r> (delete)
-    ] when ;
+        [ move ] 3keep
+        [ nth-unsafe pick call [ 1+ ] when ] 2keep
+        [ 1+ ] dip
+        (filter-here)
+    ] [ nip set-length drop ] if ; inline recursive
 
 PRIVATE>
 
-: delete ( elt seq -- ) 0 0 rot (delete) nip set-length drop ;
+: filter-here ( seq quot -- )
+    0 0 roll (filter-here) ; inline
+
+: delete ( elt seq -- )
+    [ = not ] with filter-here ;
+
+: delq ( elt seq -- )
+    [ eq? not ] with filter-here ;
 
 : prefix ( seq elt -- newseq )
     over >r over length 1+ r> [
