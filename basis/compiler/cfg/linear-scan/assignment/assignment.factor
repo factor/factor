@@ -35,13 +35,8 @@ SYMBOL: unhandled-intervals
     [ add-unhandled ] each ;
 
 : insert-spill ( live-interval -- )
-    [ reg>> ] [ spill-to>> ] [ vreg>> reg-class>> ] tri
-    over [
-        {
-            { int-regs [ _spill-integer ] }
-            { double-float-regs [ _spill-float ] }
-        } case
-    ] [ 3drop ] if ;
+    [ reg>> ] [ vreg>> reg-class>> ] [ spill-to>> ] tri
+    dup [ _spill ] [ 3drop ] if ;
 
 : expire-old-intervals ( n -- )
     active-intervals get
@@ -50,13 +45,8 @@ SYMBOL: unhandled-intervals
     [ insert-spill ] each ;
 
 : insert-reload ( live-interval -- )
-    [ reg>> ] [ reload-from>> ] [ vreg>> reg-class>> ] tri
-    over [
-        {
-            { int-regs [ _reload-integer ] }
-            { double-float-regs [ _reload-float ] }
-        } case
-    ] [ 3drop ] if ;
+    [ reg>> ] [ vreg>> reg-class>> ] [ reload-from>> ] tri
+    dup [ _reload ] [ 3drop ] if ;
 
 : activate-new-intervals ( n -- )
     #! Any live intervals which start on the current instruction

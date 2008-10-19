@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel accessors namespaces assocs sequences sets fry ;
+USING: kernel arrays accessors namespaces assocs sequences sets fry ;
 IN: compiler.cfg
 
 TUPLE: cfg entry word label ;
@@ -19,7 +19,7 @@ successors ;
         V{ } clone >>instructions
         V{ } clone >>successors ;
 
-TUPLE: mr instructions word label ;
+TUPLE: mr { instructions array } word label spill-counts ;
 
 : <mr> ( instructions word label -- mr )
     mr new

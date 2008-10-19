@@ -19,10 +19,10 @@ INSN: ##inc-r { n integer } ;
 
 ! Subroutine calls
 TUPLE: stack-frame
-{ size integer }
 { params integer }
 { return integer }
-{ total-size integer } ;
+{ total-size integer }
+spill-counts ;
 
 INSN: ##stack-frame stack-frame ;
  : ##simple-stack-frame ( -- ) T{ stack-frame } ##stack-frame ;
@@ -125,8 +125,8 @@ M: _cond-branch uses-vregs src>> 1array ;
 M: _if-intrinsic defs-vregs intrinsic-defs-vregs ;
 M: _if-intrinsic uses-vregs intrinsic-uses-vregs ;
 
-INSN: _spill-integer { src vreg } n ;
-INSN: _reload-integer { dst vreg } n ;
-
-INSN: _spill-float { src vreg } n ;
-INSN: _reload-float { dst vreg } n ;
+! These instructions operate on machine registers and not
+! virtual registers
+INSN: _spill src class n ;
+INSN: _reload dst class n ;
+INSN: _spill-counts counts ;

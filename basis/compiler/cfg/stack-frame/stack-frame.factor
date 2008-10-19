@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces accessors math.order assocs kernel sequences
-combinators make compiler.cfg.instructions
+combinators make cpu.architecture compiler.cfg.instructions
 compiler.cfg.instructions.syntax compiler.cfg.registers ;
 IN: compiler.cfg.stack-frame
 
@@ -9,35 +9,31 @@ SYMBOL: frame-required?
 
 SYMBOL: spill-counts
 
-: init-stack-frame-builder ( -- )
-    frame-required? off
-    T{ stack-frame } clone stack-frame set ;
-
 GENERIC: compute-stack-frame* ( insn -- )
 
 : max-stack-frame ( frame1 frame2 -- frame3 )
-    {
-        [ [ size>> ] bi@ max ]
-        [ [ params>> ] bi@ max ]
-        [ [ return>> ] bi@ max ]
-        [ [ total-size>> ] bi@ max ]
-    } 2cleave
-    stack-frame boa ;
+    [ stack-frame new ] 2dip
+        [ [ params>> ] bi@ max >>params ]
+        [ [ return>> ] bi@ max >>return ]
+        2bi ;
 
 M: ##stack-frame compute-stack-frame*
     frame-required? on
     stack-frame>> stack-frame [ max-stack-frame ] change ;
 
-M: _spill-integer compute-stack-frame*
+M: _spill compute-stack-frame*
     drop frame-required? on ;
 
-M: _spill-float compute-stack-frame*
-    drop frame-required? on ;
+M: _spill-counts compute-stack-frame*
+    counts>> stack-frame get (>>spill-counts) ;
 
 M: insn compute-stack-frame* drop ;
 
 : compute-stack-frame ( insns -- )
-    [ compute-stack-frame* ] each ;
+    frame-required? off
+    T{ stack-frame } clone stack-frame set
+    [ compute-stack-frame* ] each
+    stack-frame get dup stack-frame-size >>total-size drop ;
 
 GENERIC: insert-pro/epilogues* ( insn -- )
 
@@ -56,7 +52,6 @@ M: insn insert-pro/epilogues* , ;
 
 : build-stack-frame ( mr -- mr )
     [
-        init-stack-frame-builder
         [
             [ compute-stack-frame ]
             [ insert-pro/epilogues ]

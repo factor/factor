@@ -4,16 +4,20 @@ USING: namespaces kernel assocs accessors sequences math fry
 compiler.cfg.instructions compiler.cfg.registers ;
 IN: compiler.cfg.linear-scan.live-intervals
 
-TUPLE: live-interval < identity-tuple
+TUPLE: live-interval
 vreg
 reg spill-to reload-from split-before split-after
 start end uses ;
 
+: add-use ( n live-interval -- )
+    [ (>>end) ] [ uses>> push ] 2bi ;
+
 : <live-interval> ( start vreg -- live-interval )
     live-interval new
+        V{ } clone >>uses
         swap >>vreg
-        swap >>start
-        V{ } clone >>uses ;
+        over >>start
+        [ add-use ] keep ;
 
 M: live-interval hashcode*
     nip [ start>> ] [ end>> 1000 * ] bi + ;
@@ -24,25 +28,18 @@ M: live-interval clone
 ! Mapping from vreg to live-interval
 SYMBOL: live-intervals
 
-: add-use ( n vreg live-intervals -- )
-    at [ (>>end) ] [ uses>> push ] 2bi ;
-
 : new-live-interval ( n vreg live-intervals -- )
     2dup key? [ "Multiple defs" throw ] when
     [ [ <live-interval> ] keep ] dip set-at ;
 
 : compute-live-intervals* ( insn n -- )
     live-intervals get
-    [ [ uses-vregs ] 2dip '[ _ swap _ add-use ] each ]
+    [ [ uses-vregs ] 2dip '[ _ swap _ at add-use ] each ]
     [ [ defs-vregs ] 2dip '[ _ swap _ new-live-interval ] each ]
     3bi ;
-
-: finalize-live-intervals ( assoc -- seq' )
-    #! Reverse uses lists so that we can pop values off.
-    values dup [ uses>> reverse-here ] each ;
 
 : compute-live-intervals ( instructions -- live-intervals )
     H{ } clone [
         live-intervals set
         [ compute-live-intervals* ] each-index
-    ] keep finalize-live-intervals ;
+    ] keep values ;

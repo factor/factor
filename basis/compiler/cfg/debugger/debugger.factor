@@ -4,7 +4,7 @@ USING: kernel words sequences quotations namespaces io
 accessors prettyprint prettyprint.config
 compiler.tree.builder compiler.tree.optimizer
 compiler.cfg.builder compiler.cfg.linearization
-compiler.cfg.stack-frame ;
+compiler.cfg.stack-frame compiler.cfg.linear-scan ;
 IN: compiler.cfg.debugger
 
 GENERIC: test-cfg ( quot -- cfgs )
@@ -16,7 +16,7 @@ M: word test-cfg
     [ build-tree-from-word nip optimize-tree ] keep build-cfg ;
 
 : test-mr ( quot -- mrs )
-    test-cfg [ build-mr build-stack-frame ] map ;
+    test-cfg [ build-mr ] map ;
 
 : mr. ( mrs -- )
     [

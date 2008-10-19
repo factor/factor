@@ -329,8 +329,7 @@ M: #terminate emit-node
     stack-frame new
         swap
         [ return>> return-size >>return ]
-        [ alien-parameters parameter-sizes drop >>params ] bi
-        dup [ params>> ] [ return>> ] bi + >>size ;
+        [ alien-parameters parameter-sizes drop >>params ] bi ;
 
 : alien-stack-frame ( params -- )
     <alien-stack-frame> ##stack-frame ;

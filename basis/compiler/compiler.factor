@@ -61,18 +61,6 @@ SYMBOL: +failed+
 : frontend ( word -- effect nodes )
     [ build-tree-from-word ] [ fail ] recover optimize-tree ;
 
-: finish ( effect word -- )
-    [ swap save-effect ]
-    [ compiled-unxref ]
-    [
-        dup crossref?
-        [
-            dependencies get >alist
-            generic-dependencies get >alist
-            compiled-xref
-        ] [ drop ] if
-    ] tri ;
-
 ! Only switch this off for debugging.
 SYMBOL: compile-dependencies?
 
@@ -91,6 +79,18 @@ t compile-dependencies? set-global
         generate
         save-asm
     ] each ;
+
+: finish ( effect word -- )
+    [ swap save-effect ]
+    [ compiled-unxref ]
+    [
+        dup crossref?
+        [
+            dependencies get >alist
+            generic-dependencies get >alist
+            compiled-xref
+        ] [ drop ] if
+    ] tri ;
 
 : (compile) ( word -- )
     '[

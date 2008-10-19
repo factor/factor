@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces sequences math math.order kernel assocs
-accessors vectors fry heaps cpu.architecture
+accessors vectors fry heaps cpu.architecture combinators
 compiler.cfg.registers
 compiler.cfg.linear-scan.live-intervals ;
 IN: compiler.cfg.linear-scan.allocation
@@ -24,24 +24,10 @@ SYMBOL: active-intervals
 : delete-active ( live-interval -- )
     active-intervals get delete ;
 
-: expired-interval? ( n interval -- ? )
-    [ end>> ] [ start>> ] bi or > ;
-
 : expire-old-intervals ( n -- )
     active-intervals get
-    [ expired-interval? ] with partition
+    [ end>> > ] with partition
     [ [ deallocate-register ] each ] [ active-intervals set ] bi* ;
-
-: expire-old-uses ( n -- )
-    active-intervals get
-    swap '[
-        uses>> [
-            dup peek _ < [ pop* ] [ drop ] if
-        ] unless-empty
-    ] each ;
-
-: update-state ( live-interval -- )
-    start>> [ expire-old-intervals ] [ expire-old-uses ] bi ;
 
 ! Minheap of live intervals which still need a register allocation
 SYMBOL: unhandled-intervals
@@ -64,8 +50,25 @@ SYMBOL: progress
     [ [ start>> ] keep ] { } map>assoc
     unhandled-intervals get heap-push-all ;
 
-: assign-free-register ( live-interval registers -- )
-    pop >>reg add-active ;
+! Splitting
+: find-use ( live-interval n quot -- i elt )
+    [ uses>> ] 2dip curry find ; inline
+
+: split-before ( live-interval i -- before )
+    [ clone dup uses>> ] dip
+    [ head >>uses ] [ 1- swap nth >>end ] 2bi ;
+
+: split-after ( live-interval i -- after )
+    [ clone dup uses>> ] dip
+    [ tail >>uses ] [ swap nth >>start ] 2bi
+    f >>reg ;
+
+: split-interval ( live-interval n -- before after )
+    [ drop ] [ [ > ] find-use drop ] 2bi
+    [ split-before ] [ split-after ] 2bi ;
+
+: record-split ( live-interval before after -- )
+    [ >>split-before ] [ >>split-after ] bi* drop ;
 
 ! Spilling
 SYMBOL: spill-counts
@@ -73,37 +76,20 @@ SYMBOL: spill-counts
 : next-spill-location ( reg-class -- n )
     spill-counts get [ dup 1+ ] change-at ;
 
-: interval-to-spill ( -- live-interval )
+: interval-to-spill ( active-intervals current -- live-interval )
     #! We spill the interval with the most distant use location.
-    active-intervals get
-    [ uses>> empty? not ] filter
-    unclip-slice [
-        [ [ uses>> peek ] bi@ > ] most
-    ] reduce ;
-
-: check-split ( live-interval -- )
-    [ start>> ] [ end>> ] bi = [ "Cannot split any further" throw ] when ;
-
-: split-interval ( live-interval -- before after )
-    #! Split the live interval at the location of its first use.
-    #! 'Before' now starts and ends on the same instruction.
-    [ check-split ]
-    [ clone [ uses>> delete-all ] [ dup start>> >>end ] bi ]
-    [ clone f >>reg dup uses>> peek >>start ]
-    tri ;
-
-: record-split ( live-interval before after -- )
-    [ >>split-before ] [ >>split-after ] bi* drop ;
+    start>> '[ dup _ [ >= ] find-use nip ] { } map>assoc
+    unclip-slice [ [ [ second ] bi@ > ] most ] reduce first ;
 
 : assign-spill ( before after -- before after )
     #! If it has been spilled already, reuse spill location.
-    USE: cpu.architecture ! XXX
     over reload-from>>
-    [ int-regs next-spill-location ] unless*
+    [ over vreg>> reg-class>> next-spill-location ] unless*
     tuck [ >>spill-to ] [ >>reload-from ] 2bi* ;
 
-: split-and-spill ( live-interval -- before after )
-    dup split-interval [ record-split ] [ assign-spill ] 2bi ;
+: split-and-spill ( new existing -- before after )
+    dup rot start>> split-interval
+    [ record-split ] [ assign-spill ] 2bi ;
 
 : reuse-register ( new existing -- )
     reg>> >>reg add-active ;
@@ -114,30 +100,30 @@ SYMBOL: spill-counts
     #! interval, then process the new interval and the tail end
     #! of the existing interval again.
     [ reuse-register ]
-    [ delete-active ]
-    [ split-and-spill [ drop ] [ add-unhandled ] bi* ] tri ;
+    [ nip delete-active ]
+    [ split-and-spill [ drop ] [ add-unhandled ] bi* ] 2tri ;
 
 : spill-new ( new existing -- )
     #! Our new interval will be used after the active interval
     #! with the most distant use location. Split the new
     #! interval, then process both parts of the new interval
     #! again.
-    [ split-and-spill add-unhandled ] dip spill-existing ;
+    [ dup split-and-spill add-unhandled ] dip spill-existing ;
 
 : spill-existing? ( new existing -- ? )
-    over uses>> empty? [ 2drop t ] [ [ uses>> peek ] bi@ < ] if ;
+    #! Test if 'new' will be used before 'existing'.
+    over start>> '[ _ [ > ] find-use nip -1 or ] bi@ < ;
 
-: assign-blocked-register ( live-interval -- )
-    interval-to-spill
-    2dup spill-existing?
-    [ spill-existing ] [ spill-new ] if ;
+: assign-blocked-register ( new -- )
+    [ active-intervals get ] keep interval-to-spill
+    2dup spill-existing? [ spill-existing ] [ spill-new ] if ;
 
-: assign-register ( live-interval -- )
-    dup vreg>> free-registers-for [
-        assign-blocked-register
-    ] [
-        assign-free-register
-    ] if-empty ;
+: assign-free-register ( new registers -- )
+    pop >>reg add-active ;
+
+: assign-register ( new -- )
+    dup vreg>> free-registers-for
+    [ assign-blocked-register ] [ assign-free-register ] if-empty ;
 
 ! Main loop
 : init-allocator ( registers -- )
@@ -148,7 +134,10 @@ SYMBOL: spill-counts
     -1 progress set ;
 
 : handle-interval ( live-interval -- )
-    [ start>> progress set ] [ update-state ] [ assign-register ] tri ;
+    [ start>> progress set ]
+    [ start>> expire-old-intervals ]
+    [ assign-register ]
+    tri ;
 
 : (allocate-registers) ( -- )
     unhandled-intervals get [ handle-interval ] slurp-heap ;

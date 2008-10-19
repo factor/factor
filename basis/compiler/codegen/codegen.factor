@@ -72,11 +72,7 @@ M: _label generate-insn
     id>> lookup-label , ;
 
 M: _prologue generate-insn
-    stack-frame>>
-    [ stack-frame set ]
-    [ dup size>> stack-frame-size >>total-size drop ]
-    [ total-size>> %prologue ]
-    tri ;
+    stack-frame>> [ stack-frame set ] [ total-size>> %prologue ] bi ;
 
 M: _epilogue generate-insn
     stack-frame>> total-size>> %epilogue ;
@@ -439,3 +435,17 @@ M: ##alien-callback generate-insn
     [ wrap-callback-quot %alien-callback ]
     [ alien-return [ %unnest-stacks ] [ %callback-value ] if-void ]
     tri ;
+
+M: _spill generate-insn
+    [ src>> ] [ n>> ] [ class>> ] tri {
+        { int-regs [ %spill-integer ] }
+        { double-float-regs [ %spill-float ] }
+    } case ;
+
+M: _reload generate-insn
+    [ dst>> ] [ n>> ] [ class>> ] tri {
+        { int-regs [ %reload-integer ] }
+        { double-float-regs [ %reload-float ] }
+    } case ;
+
+M: _spill-counts generate-insn drop ;
