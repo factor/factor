@@ -1,7 +1,7 @@
 USING: continuations destructors io.buffers io.files io.backend
 io.timeouts io.ports io.windows io.windows.files
 io.windows.nt.backend windows windows.kernel32
-kernel libc math threads system
+kernel libc math threads system environment
 alien.c-types alien.arrays alien.strings sequences combinators
 combinators.short-circuit ascii splitting alien strings
 assocs namespaces make io.files.private accessors tr ;
@@ -59,3 +59,5 @@ M: winnt FileArgs-overlapped ( port -- overlapped )
 M: winnt open-append
     [ dup file-info size>> ] [ drop 0 ] recover
     >r (open-append) r> >>ptr ;
+
+M: winnt home "USERPROFILE" os-env ;

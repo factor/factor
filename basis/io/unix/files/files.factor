@@ -5,7 +5,8 @@ unix unix.stat unix.time kernel math continuations
 math.bitwise byte-arrays alien combinators calendar
 io.encodings.binary accessors sequences strings system
 io.files.private destructors vocabs.loader calendar.unix
-unix.stat alien.c-types arrays unix.users unix.groups ;
+unix.stat alien.c-types arrays unix.users unix.groups
+environment ;
 IN: io.unix.files
 
 M: unix cwd ( -- path )
@@ -294,3 +295,5 @@ M: string set-file-group ( path string -- )
 
 : file-group-name ( path -- string )
     file-group-id group-name ;
+
+M: unix home "HOME" os-env ;
