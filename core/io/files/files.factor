@@ -332,10 +332,6 @@ C: <pathname> pathname
 M: pathname <=> [ string>> ] compare ;
 
 ! Home directory
-HOOK: home os ( -- dir )
+HOOK: home io-backend ( -- dir )
 
-M: winnt home "USERPROFILE" os-env ;
-
-M: wince home "" resource-path ;
-
-M: unix home "HOME" os-env ;
+M: object home "" resource-path ;

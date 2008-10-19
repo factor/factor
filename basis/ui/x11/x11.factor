@@ -6,8 +6,8 @@ assocs kernel math namespaces opengl sequences strings x11.xlib
 x11.events x11.xim x11.glx x11.clipboard x11.constants
 x11.windows io.encodings.string io.encodings.ascii
 io.encodings.utf8 combinators debugger command-line qualified
-math.vectors classes.tuple opengl.gl threads math.geometry.rect ;
-QUALIFIED: system
+math.vectors classes.tuple opengl.gl threads math.geometry.rect
+environment ;
 IN: ui.x11
 
 SINGLETON: x11-ui-backend
@@ -262,5 +262,5 @@ M: x11-ui-backend beep ( -- )
 
 x11-ui-backend ui-backend set-global
 
-[ "DISPLAY" system:os-env "ui" "listener" ? ]
+[ "DISPLAY" os-env "ui" "listener" ? ]
 main-vocab-hook set-global
