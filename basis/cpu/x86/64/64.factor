@@ -1,13 +1,12 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors alien.c-types arrays kernel kernel.private math
-namespaces make sequences system
-layouts alien alien.accessors alien.structs slots splitting
-assocs combinators cpu.x86.assembler
-cpu.x86.architecture cpu.x86.intrinsics cpu.x86.sse2
-cpu.x86.allot cpu.architecture compiler.constants
-compiler.codegen compiler.codegen.fixup compiler.cfg.instructions
-compiler.cfg.builder ;
+USING: accessors arrays kernel math namespaces make sequences
+system layouts alien alien.c-types alien.accessors alien.structs
+slots splitting assocs combinators cpu.x86.assembler
+cpu.x86.architecture cpu.architecture compiler.constants
+compiler.codegen compiler.codegen.fixup
+compiler.cfg.instructions compiler.cfg.builder
+compiler.cfg.builder.calls ;
 IN: cpu.x86.64
 
 M: x86.64 machine-registers
@@ -33,12 +32,8 @@ M: float-regs return-reg drop XMM0 ;
 M: float-regs param-regs
     drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 
-M: x86.64 fixnum>slot@ drop ;
-
-M: x86.64 prepare-division CQO ;
-
-M: x86.64 %load-indirect ( literal reg -- )
-    swap 0 [] MOV rc-relative rel-literal ;
+M: x86.64 %load-indirect
+    0 [] MOV rc-relative rel-literal ;
 
 M: stack-params %load-param-reg
     drop
@@ -58,8 +53,8 @@ M: stack-params %save-param-reg
     ] with-scope ; inline
 
 ! The ABI for passing structs by value is pretty messed up
-<< "void*" c-type clone "__stack_value" define-primitive-type
-stack-params "__stack_value" c-type (>>reg-class) >>
+"void*" c-type clone "__stack_value" define-primitive-type
+stack-params "__stack_value" c-type (>>reg-class)
 
 : struct-types&offset ( struct-type -- pairs )
     fields>> [
@@ -200,7 +195,7 @@ M: x86.64 %alien-indirect ( -- )
     RBP CALL ;
 
 M: x86.64 %alien-callback ( quot -- )
-    RDI load-indirect "c_to_factor" f %alien-invoke ;
+    RDI %load-indirect "c_to_factor" f %alien-invoke ;
 
 M: x86.64 %callback-value ( ctype -- )
     ! Save top of data stack
@@ -216,66 +211,9 @@ M: x86.64 %callback-value ( ctype -- )
     ! Unbox former top of data stack to return registers
     unbox-return ;
 
-USE: cpu.x86.intrinsics
+! The result of reading 4 bytes from memory is a fixnum on
+! x86-64.
+enable-alien-4-intrinsics
 
-: (%alien-get-4) ( -- )
-    small-reg-32 "offset" operand [] MOV ; inline
-
-: %alien-unsigned-4 ( -- )
-    %prepare-alien-accessor
-    "value" operand small-reg = [
-        (%alien-get-4)
-    ] [
-        small-reg PUSH
-        (%alien-get-4)
-        "value" operand small-reg MOV
-        small-reg POP
-    ] if
-    "value" operand %tag-fixnum ; inline
-
-: (%alien-signed-4) ( -- )
-    (%alien-get-4)
-    "value" operand small-reg-32 MOVSX ;
-
-: %alien-signed-4 ( -- )
-    %prepare-alien-accessor
-    "value" operand small-reg = [
-        (%alien-signed-4)
-    ] [
-        small-reg PUSH
-        (%alien-signed-4)
-        small-reg POP
-    ] if
-    "value" operand %tag-fixnum ; inline
-
-: define-alien-unsigned-4-getter ( word -- )
-    [ %alien-unsigned-4 ] alien-integer-get-template define-intrinsic ;
-
-: define-alien-signed-4-getter ( word -- )
-    [ %alien-signed-4 ] alien-integer-get-template define-intrinsic ;
-
-: %set-alien-4 ( -- )
-    "value" operand "offset" operand = [
-        "value" operand %untag-fixnum
-    ] unless
-    %prepare-alien-accessor
-    small-reg "offset" operand = [
-        "value" operand "offset" operand XCHG
-        "value" operand [] small-reg-32 MOV
-    ] [
-        small-reg PUSH
-        small-reg "value" operand MOV
-        "offset" operand [] small-reg-32 MOV
-        small-reg POP
-    ] if ; inline
-
-: define-alien-4-setter ( word -- )
-    [ %set-alien-4 ] alien-integer-set-template define-intrinsic ;
-
-! On 64-bit systems, the result of reading 4 bytes from memory
-! is a fixnum.
-\ alien-unsigned-4 define-alien-unsigned-4-getter
-\ set-alien-unsigned-4 define-alien-4-setter
-
-\ alien-signed-4 define-alien-signed-4-getter
-\ set-alien-signed-4 define-alien-4-setter
+! SSE2 is always available on x86-64.
+enable-float-intrinsics

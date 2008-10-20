@@ -1,13 +1,12 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: locals alien.c-types arrays kernel kernel.private math
-namespaces sequences stack-checker.known-words system layouts io
-vocabs.loader accessors init combinators command-line
-cpu.x86.assembler cpu.x86.architecture cpu.x86.intrinsics
-cpu.x86.allot cpu.architecture compiler compiler.units
+USING: locals alien.c-types alien.syntax arrays kernel
+math namespaces sequences system layouts io vocabs.loader
+accessors init combinators command-line cpu.x86.assembler
+cpu.x86.architecture cpu.architecture compiler compiler.units
 compiler.constants compiler.alien compiler.codegen
-compiler.codegen.fixup compiler.cfg.builder
-compiler.cfg.instructions ;
+compiler.codegen.fixup compiler.cfg.instructions
+compiler.cfg.builder compiler.cfg.builder.calls ;
 IN: cpu.x86.32
 
 ! We implement the FFI for Linux, OS X and Windows all at once.
@@ -75,12 +74,8 @@ M: float-regs store-return-reg
     [ [ align-sub ] [ call ] bi* ]
     [ [ align-add ] [ drop ] bi* ] 2bi ; inline
 
-M: x86.32 fixnum>slot@ 1 SHR ;
-
-M: x86.32 prepare-division CDQ ;
-
 M: x86.32 %load-indirect
-    swap 0 [] MOV rc-absolute-cell rel-literal ;
+    0 [] MOV rc-absolute-cell rel-literal ;
 
 M: object %load-param-reg 3drop ;
 
@@ -222,7 +217,7 @@ M: x86.32 %alien-indirect ( -- )
 
 M: x86.32 %alien-callback ( quot -- )
     4 [
-        EAX load-indirect
+        EAX %load-indirect
         EAX PUSH
         "c_to_factor" f %alien-invoke
     ] with-aligned-stack ;
@@ -279,34 +274,17 @@ os windows? [
     4 "double" c-type (>>align)
 ] unless
 
-: (sse2?) ( -- ? ) "Intrinsic" throw ;
+FUNCTION: bool check_sse2 ( ) ;
 
-<<
-
-\ (sse2?) [
-    { EAX EBX ECX EDX } [ PUSH ] each
-    EAX 1 MOV
-    CPUID
-    EDX 26 SHR
-    EDX 1 AND
-    { EAX EBX ECX EDX } [ POP ] each
-    JNE
-] { } define-if-intrinsic
-
-\ (sse2?) { } { object } define-primitive
-
->>
-
-: sse2? ( -- ? ) (sse2?) ;
+: sse2? ( -- ? )
+    [ optimized-recompile-hook ] recompile-hook
+    [ [ check_sse2 ] compile-call ] with-variable ;
 
 "-no-sse2" cli-args member? [
     "Checking if your CPU supports SSE2..." print flush
-    [ optimized-recompile-hook ] recompile-hook [
-        [ sse2? ] compile-call
-    ] with-variable
-    [
+    sse2? [
         " - yes" print
-        "cpu.x86.sse2" require
+        enable-float-intrinsics
         [
             sse2? [
                 "This image was built to use SSE2, which your CPU does not support." print
@@ -315,7 +293,5 @@ os windows? [
                 1 exit
             ] unless
         ] "cpu.x86" add-init-hook
-    ] [
-        " - no" print
-    ] if
+    ] [ " - no" print ] if
 ] unless
