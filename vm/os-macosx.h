@@ -1,8 +1,6 @@
 #define DLLEXPORT __attribute__((visibility("default")))
 #define FACTOR_OS_STRING "macosx"
 #define NULL_DLL "libfactor.dylib"
-#define UNKNOWN_TYPE_P(file) ((file)->d_type == DT_UNKNOWN)
-#define DIRECTORY_P(file) ((file)->d_type == DT_DIR)
 
 void init_signals(void);
 void early_init(void);

@@ -434,7 +434,6 @@ tuple
     { "getenv" "kernel.private" }
     { "setenv" "kernel.private" }
     { "(exists?)" "io.files.private" }
-    { "(directory)" "io.files.private" }
     { "gc" "memory" }
     { "gc-stats" "memory" }
     { "save-image" "memory" }

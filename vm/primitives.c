@@ -57,7 +57,6 @@ void *primitives[] = {
 	primitive_getenv,
 	primitive_setenv,
 	primitive_existsp,
-	primitive_read_dir,
 	primitive_gc,
 	primitive_gc_stats,
 	primitive_save_image,
