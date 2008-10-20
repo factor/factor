@@ -5,7 +5,7 @@ namespaces sequences db.sqlite.ffi db combinators
 continuations db.types calendar.format serialize
 io.streams.byte-array byte-arrays io.encodings.binary
 io.backend db.errors present urls io.encodings.utf8
-io.encodings.string accessors ;
+io.encodings.string accessors shuffle ;
 IN: db.sqlite.lib
 
 ERROR: sqlite-error < db-error n string ;
@@ -79,6 +79,9 @@ ERROR: sqlite-sql-error < sql-error n string ;
 : sqlite-bind-uint64-by-name ( handle name int64 -- )
     parameter-index sqlite-bind-uint64 ;
 
+: sqlite-bind-boolean-by-name ( handle name obj -- )
+    >boolean 1 0 ? parameter-index sqlite-bind-int ;
+
 : sqlite-bind-double-by-name ( handle name double -- )
     parameter-index sqlite-bind-double ;
 
@@ -88,14 +91,14 @@ ERROR: sqlite-sql-error < sql-error n string ;
 : sqlite-bind-null-by-name ( handle name obj -- )
     parameter-index drop sqlite-bind-null ;
 
-: sqlite-bind-type ( handle key value type -- )
-    over [ drop NULL ] unless
+: (sqlite-bind-type) ( handle key value type -- )
     dup array? [ first ] when
     {
         { INTEGER [ sqlite-bind-int-by-name ] }
         { BIG-INTEGER [ sqlite-bind-int64-by-name ] }
         { SIGNED-BIG-INTEGER [ sqlite-bind-int64-by-name ] }
         { UNSIGNED-BIG-INTEGER [ sqlite-bind-uint64-by-name ] }
+        { BOOLEAN [ sqlite-bind-boolean-by-name ] }
         { TEXT [ sqlite-bind-text-by-name ] }
         { VARCHAR [ sqlite-bind-text-by-name ] }
         { DOUBLE [ sqlite-bind-double-by-name ] }
@@ -104,16 +107,21 @@ ERROR: sqlite-sql-error < sql-error n string ;
         { DATETIME [ timestamp>ymdhms sqlite-bind-text-by-name ] }
         { TIMESTAMP [ timestamp>ymdhms sqlite-bind-text-by-name ] }
         { BLOB [ sqlite-bind-blob-by-name ] }
-        { FACTOR-BLOB [
-            object>bytes
-            sqlite-bind-blob-by-name
-        ] }
+        { FACTOR-BLOB [ object>bytes sqlite-bind-blob-by-name ] }
         { URL [ present sqlite-bind-text-by-name ] }
         { +db-assigned-id+ [ sqlite-bind-int-by-name ] }
         { +random-id+ [ sqlite-bind-int64-by-name ] }
         { NULL [ sqlite-bind-null-by-name ] }
         [ no-sql-type ]
     } case ;
+
+: sqlite-bind-type ( handle key value type -- )
+    #! null and empty values need to be set by sqlite-bind-null-by-name
+    over [
+        NULL = [ 2drop NULL NULL ] when
+    ] [
+        drop NULL 
+    ] if* (sqlite-bind-type) ;
 
 : sqlite-finalize ( handle -- ) sqlite3_finalize sqlite-check-result ;
 : sqlite-reset ( handle -- ) sqlite3_reset sqlite-check-result ;
@@ -141,6 +149,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
         { BIG-INTEGER [ sqlite3_column_int64 ] }
         { SIGNED-BIG-INTEGER [ sqlite3_column_int64 ] }
         { UNSIGNED-BIG-INTEGER [ sqlite3-column-uint64 ] }
+        { BOOLEAN [ sqlite3_column_int 1 = ] }
         { DOUBLE [ sqlite3_column_double ] }
         { TEXT [ sqlite3_column_text ] }
         { VARCHAR [ sqlite3_column_text ] }
@@ -150,11 +159,7 @@ ERROR: sqlite-sql-error < sql-error n string ;
         { DATETIME [ sqlite3_column_text dup [ ymdhms>timestamp ] when ] }
         { BLOB [ sqlite-column-blob ] }
         { URL [ sqlite3_column_text dup [ >url ] when ] }
-        { FACTOR-BLOB [
-            sqlite-column-blob
-            dup [ bytes>object ] when
-        ] }
-        ! { NULL [ 2drop f ] }
+        { FACTOR-BLOB [ sqlite-column-blob dup [ bytes>object ] when ] }
         [ no-sql-type ]
     } case ;
 

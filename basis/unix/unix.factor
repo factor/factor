@@ -81,6 +81,7 @@ FUNCTION: int chown ( char* path, uid_t owner, gid_t group ) ;
 FUNCTION: int chroot ( char* path ) ;
 
 FUNCTION: int close ( int fd ) ;
+FUNCTION: int closedir ( DIR* dirp ) ;
 
 : close-file ( fd -- ) [ close ] unix-system-call drop ;
 
@@ -105,6 +106,8 @@ FUNCTION: int getdtablesize ;
 FUNCTION: gid_t getegid ;
 FUNCTION: uid_t geteuid ;
 FUNCTION: gid_t getgid ;
+FUNCTION: char* getenv ( char* name ) ;
+
 FUNCTION: int getgrgid_r ( gid_t gid, group* grp, char* buffer, size_t bufsize, group** result ) ;
 FUNCTION: int getgrnam_r ( char* name, group* grp, char* buffer, size_t bufsize, group** result ) ;
 FUNCTION: passwd* getpwent ( ) ;
@@ -134,6 +137,8 @@ FUNCTION: int shutdown ( int fd, int how ) ;
 
 FUNCTION: int open ( char* path, int flags, int prot ) ;
 
+FUNCTION: DIR* opendir ( char* path ) ;
+
 : open-file ( path flags mode -- fd ) [ open ] unix-system-call ;
 
 C-STRUCT: utimbuf
@@ -155,6 +160,8 @@ FUNCTION: int pipe ( int* filedes ) ;
 FUNCTION: void* popen ( char* command, char* type ) ;
 FUNCTION: ssize_t read ( int fd, void* buf, size_t nbytes ) ;
 
+FUNCTION: int readdir_r ( void* dirp, dirent* entry, dirent** result ) ;
+
 FUNCTION: ssize_t readlink ( char* path, char* buf, size_t bufsize ) ;
 
 : PATH_MAX 1024 ; inline
@@ -171,6 +178,8 @@ FUNCTION: int rename ( char* from, char* to ) ;
 FUNCTION: int rmdir ( char* path ) ;
 FUNCTION: int select ( int nfds, void* readfds, void* writefds, void* exceptfds, timeval* timeout ) ;
 FUNCTION: ssize_t sendto ( int s, void* buf, size_t len, int flags, sockaddr-in* to, socklen_t tolen ) ;
+FUNCTION: int setenv ( char* name, char* value, int overwrite ) ;
+FUNCTION: int unsetenv ( char* name ) ;
 FUNCTION: int setegid ( gid_t egid ) ;
 FUNCTION: int seteuid ( uid_t euid ) ;
 FUNCTION: int setgid ( gid_t gid ) ;

@@ -397,6 +397,11 @@ HELP: filter
 { $values { "seq" sequence } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } { "subseq" "a new sequence" } }
 { $description "Applies the quotation to each element in turn, and outputs a new sequence containing the elements of the original sequence for which the quotation output a true value." } ;
 
+HELP: filter-here
+{ $values { "seq" "a resizable mutable sequence" } { "quot" "a quotation with stack effect " { $snippet "( elt -- ? )" } } }
+{ $description "Applies the quotation to each element in turn, and removes elements for which the quotation outputs a false value." }
+{ $side-effects "seq" } ;
+
 HELP: monotonic?
 { $values { "seq" sequence } { "quot" "a quotation with stack effect " { $snippet "( elt elt -- ? )" } } { "?" "a boolean" } }
 { $description "Applies the relation to successive pairs of elements in the sequence, testing for a truth value. The relation should be a transitive relation, such as a total order or an equality relation." }
@@ -436,20 +441,24 @@ HELP: last-index-from
 { $description "Outputs the index of the last element in the sequence equal to " { $snippet "obj" } ", traversing the sequence backwards starting from the " { $snippet "i" } "th element and finishing at the first. If no element is found, outputs " { $link f } "." } ;
 
 HELP: member?
-{ $values { "obj" object } { "seq" sequence } { "?" "a boolean" } }
-{ $description "Tests if the sequence contains an element equal to the object." } ;
+{ $values { "elt" object } { "seq" sequence } { "?" "a boolean" } }
+{ $description "Tests if the sequence contains an element equal to the object." }
+{ $notes "This word uses equality comparison (" { $link = } ")." } ;
 
 HELP: memq?
-{ $values { "obj" object } { "seq" sequence } { "?" "a boolean" } }
+{ $values { "elt" object } { "seq" sequence } { "?" "a boolean" } }
 { $description "Tests if the sequence contains the object." }
-{ $examples
-    "This word uses identity comparison, so the following will most likely print " { $link f } ":"
-    { $example "USING: prettyprint sequences ;" "\"hello\" { \"hello\" } memq? ." "f" }
-} ;
+{ $notes "This word uses identity comparison (" { $link eq? } ")." } ;
 
 HELP: remove
-{ $values { "obj" object } { "seq" sequence } { "newseq" "a new sequence" } }
-{ $description "Outputs a new sequence containing all elements of the input sequence except those equal to the given element." } ;
+{ $values { "elt" object } { "seq" sequence } { "newseq" "a new sequence" } }
+{ $description "Outputs a new sequence containing all elements of the input sequence except for given element." }
+{ $notes "This word uses equality comparison (" { $link = } ")." } ;
+
+HELP: remq
+{ $values { "elt" object } { "seq" sequence } { "newseq" "a new sequence" } }
+{ $description "Outputs a new sequence containing all elements of the input sequence except those equal to the given element." }
+{ $notes "This word uses identity comparison (" { $link eq? } ")." } ;
 
 HELP: remove-nth
 { $values
@@ -469,6 +478,13 @@ HELP: move
 HELP: delete
 { $values { "elt" object } { "seq" "a resizable mutable sequence" } }
 { $description "Removes all elements equal to " { $snippet "elt" } " from " { $snippet "seq" } "." }
+{ $notes "This word uses equality comparison (" { $link = } ")." }
+{ $side-effects "seq" } ;
+
+HELP: delq
+{ $values { "elt" object } { "seq" "a resizable mutable sequence" } }
+{ $description "Outputs a new sequence containing all elements of the input sequence except the given element." }
+{ $notes "This word uses identity comparison (" { $link eq? } ")." }
 { $side-effects "seq" } ;
 
 HELP: delete-nth
@@ -592,7 +608,7 @@ HELP: reverse
 { $values { "seq" sequence } { "newseq" "a new sequence" } }
 { $description "Outputs a new sequence having the same elements as " { $snippet "seq" } " but in reverse order." } ;
 
-{ reverse <reversed> } related-words
+{ reverse <reversed> reverse-here } related-words
 
 HELP: <reversed> ( seq -- reversed )
 { $values { "seq" sequence } { "reversed" "a new sequence" } }
@@ -784,7 +800,7 @@ HELP: tail?
 { $values { "seq" sequence } { "end" sequence } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "seq" } " ends with " { $snippet "end" } ". If " { $snippet "end" } " is longer than " { $snippet "seq" } ", this word outputs " { $link f } "." } ;
 
-{ delete-nth remove delete } related-words
+{ remove remove-nth remq delq delete delete-nth } related-words
 
 HELP: cut-slice
 { $values { "seq" sequence } { "n" "a non-negative integer" } { "before-slice" sequence } { "after-slice" "a slice" } }
@@ -982,7 +998,7 @@ HELP: harvest
     }
 } ;
 
-{ filter sift harvest } related-words
+{ filter filter-here sift harvest } related-words
 
 HELP: set-first
 { $values
@@ -1315,6 +1331,7 @@ ARTICLE: "sequences-add-remove" "Adding and removing sequence elements"
 { $subsection suffix }
 "Removing elements:"
 { $subsection remove }
+{ $subsection remq }
 { $subsection remove-nth } ;
 
 ARTICLE: "sequences-reshape" "Reshaping sequences"
@@ -1446,29 +1463,49 @@ ARTICLE: "sequences-trimming" "Trimming sequences"
 { $subsection trim-left-slice }
 { $subsection trim-right-slice } ;
 
+ARTICLE: "sequences-destructive-discussion" "When to use destructive operations"
+"Constructive (non-destructive) operations should be preferred where possible because code without side-effects is usually more re-usable and easier to reason about. There are two main reasons to use destructive operations:"
+{ $list
+    "For the side-effect. Some code is simpler to express with destructive operations; constructive operations return new objects, and sometimes ``threading'' the objects through the program manually complicates stack shuffling."
+    { "As an optimization. Some code can be written to use constructive operations, however would suffer from worse performance. An example is a loop which adds an element to a sequence on each iteration; one could use either " { $link suffix } " or " { $link push } ", however the former copies the entire sequence first, which would cause the loop to run in quadratic time." }
+}
+"The second reason is much weaker than the first one. In particular, many combinators (see " { $link map } ", " { $link produce } " and " { $link "namespaces-make" } ") as well as more advanced data structures (such as " { $vocab-link "persistent.vectors" } ") alleviate the need for explicit use of side effects." ;
+
 ARTICLE: "sequences-destructive" "Destructive operations"
 "These words modify their input, instead of creating a new sequence."
-$nl
-"In-place variant of " { $link reverse } ":"
-{ $subsection reverse-here }
-"In-place variant of " { $link append } ":"
-{ $subsection push-all }
-"In-place variant of " { $link remove } ":"
-{ $subsection delete }
-"In-place variant of " { $link map } ":"
-{ $subsection change-each }
+{ $subsection "sequences-destructive-discussion" }
 "Changing elements:"
+{ $subsection change-each }
 { $subsection change-nth }
 { $subsection cache-nth }
 "Deleting elements:"
+{ $subsection delete }
+{ $subsection delq }
 { $subsection delete-nth }
 { $subsection delete-slice }
 { $subsection delete-all }
+{ $subsection filter-here }
 "Other destructive words:"
+{ $subsection reverse-here }
+{ $subsection push-all }
 { $subsection move }
 { $subsection exchange }
 { $subsection copy }
 { $subsection replace-slice }
+"Many operations have constructive and destructive variants:"
+{ $table
+    { "Constructive" "Destructive" }
+    { { $link suffix } { $link push } }
+    { { $link but-last } { $link pop* } }
+    { { $link unclip-last } { $link pop } }
+    { { $link remove } { $link delete } }
+    { { $link remq } { $link delq } }
+    { { $link remove-nth } { $link delete-nth } }
+    { { $link reverse } { $link reverse-here } }
+    { { $link append } { $link push-all } }
+    { { $link map } { $link change-each } }
+    { { $link filter } { $link filter-here } }
+}
 { $see-also set-nth push pop "sequences-stacks" } ;
 
 ARTICLE: "sequences-stacks" "Treating sequences as stacks"

@@ -7,7 +7,6 @@ ABOUT: "system"
 ARTICLE: "system" "System interface"
 { $subsection "cpu" }
 { $subsection "os" }
-{ $subsection "environment-variables" }
 "Getting the path to the Factor VM and image:"
 { $subsection vm }
 { $subsection image }
@@ -15,15 +14,6 @@ ARTICLE: "system" "System interface"
 { $subsection millis }
 "Exiting the Factor VM:"
 { $subsection exit } ;
-
-ARTICLE: "environment-variables" "Environment variables"
-"Reading environment variables:"
-{ $subsection os-env }
-{ $subsection os-envs }
-"Writing environment variables:"
-{ $subsection set-os-env }
-{ $subsection unset-os-env }
-{ $subsection set-os-envs } ;
 
 ARTICLE: "cpu" "Processor detection"
 "Processor detection:"
@@ -78,49 +68,6 @@ HELP: millis ( -- n )
 { $values { "n" integer } }
 { $description "Outputs the number of milliseconds ellapsed since midnight January 1, 1970." }
 { $notes "This is a low-level word. The " { $vocab-link "calendar" } " vocabulary provides features for date/time arithmetic and formatting." } ;
-
-HELP: os-env ( key -- value )
-{ $values { "key" string } { "value" string } }
-{ $description "Looks up the value of a shell environment variable." }
-{ $examples 
-    "This is an operating system-specific feature. On Unix, you can do:"
-    { $unchecked-example "\"USER\" os-env print" "jane" }
-}
-{ $errors "Windows CE has no concept of environment variables, so this word throws an error there." } ;
-
-HELP: os-envs
-{ $values { "assoc" "an association mapping strings to strings" } }
-{ $description "Outputs the current set of environment variables." }
-{ $notes 
-    "Names and values of environment variables are operating system-specific."
-}
-{ $errors "Windows CE has no concept of environment variables, so this word throws an error there." } ;
-
-HELP: set-os-envs
-{ $values { "assoc" "an association mapping strings to strings" } }
-{ $description "Replaces the current set of environment variables." }
-{ $notes
-    "Names and values of environment variables are operating system-specific. Windows NT allows values up to 32766 characters in length."
-}
-{ $errors "Windows CE has no concept of environment variables, so this word throws an error there." } ;
-
-HELP: set-os-env ( value key -- )
-{ $values { "value" string } { "key" string } }
-{ $description "Set an environment variable." }
-{ $notes
-    "Names and values of environment variables are operating system-specific."
-}
-{ $errors "Windows CE has no concept of environment variables, so this word throws an error there." } ;
-
-HELP: unset-os-env ( key -- )
-{ $values { "key" string } }
-{ $description "Unset an environment variable." }
-{ $notes
-    "Names and values of environment variables are operating system-specific."
-}
-{ $errors "Windows CE has no concept of environment variables, so this word throws an error there." } ;
-
-{ os-env os-envs set-os-env unset-os-env set-os-envs } related-words
 
 HELP: image
 { $values { "path" "a pathname string" } }

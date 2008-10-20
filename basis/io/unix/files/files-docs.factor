@@ -36,39 +36,39 @@ HELP: file-user-id
 
 HELP: group-execute?
 { $values
-     { "path" "a pathname string" }
+     { "obj" "a pathname string or an integer" }
      { "?" "a boolean" } }
-{ $description "Tests whether the " { $snippet "group execute" } " bit is set on a file." } ;
+{ $description "Tests whether the " { $snippet "group execute" } " bit is set on a file, " { $link file-info } ", or an integer." } ;
 
 HELP: group-read?
 { $values
-     { "path" "a pathname string" }
+     { "obj" "a pathname string, file-info object, or an integer" }
      { "?" "a boolean" } }
-{ $description "Tests whether the " { $snippet "group read" } " bit is set on a file." } ;
+{ $description "Tests whether the " { $snippet "group read" } " bit is set on a file, " { $link file-info } ", or an integer." } ;
 
 HELP: group-write?
 { $values
-     { "path" "a pathname string" }
+     { "obj" "a pathname string, file-info object, or an integer" }
      { "?" "a boolean" } }
-{ $description "Tests whether the " { $snippet "group write" } " bit is set on a file." } ;
+{ $description "Tests whether the " { $snippet "group write" } " bit is set on a file, " { $link file-info } ", or an integer." } ;
 
 HELP: other-execute?
 { $values
-     { "path" "a pathname string" }
+     { "obj" "a pathname string, file-info object, or an integer" }
      { "?" "a boolean" } }
-{ $description "Tests whether the " { $snippet "other execute" } " bit is set on a file." } ;
+{ $description "Tests whether the " { $snippet "other execute" } " bit is set on a file, " { $link file-info } ", or an integer." } ;
 
 HELP: other-read?
 { $values
-     { "path" "a pathname string" }
+     { "obj" "a pathname string, file-info object, or an integer" }
      { "?" "a boolean" } }
-{ $description "Tests whether the " { $snippet "other read" } " bit is set on a file." } ;
+{ $description "Tests whether the " { $snippet "other read" } " bit is set on a file, " { $link file-info } ", or an integer." } ;
 
 HELP: other-write?
 { $values
-     { "path" "a pathname string" }
+     { "obj" "a pathname string, file-info object, or an integer" }
      { "?" "a boolean" } }
-{ $description "Tests whether the " { $snippet "other write" } " bit is set on a file." } ;
+{ $description "Tests whether the " { $snippet "other write" } " bit is set on a file, " { $link file-info } ", or an integer." } ;
 
 HELP: set-file-access-time
 { $values
@@ -124,9 +124,9 @@ HELP: set-gid
 
 HELP: gid?
 { $values
-     { "path" "a pathname string" }
+     { "obj" "a pathname string, file-info object, or an integer" }
      { "?" "a boolean" } }
-{ $description "Tests whether the " { $snippet "gid" } " bit is set on a file." } ;
+{ $description "Tests whether the " { $snippet "gid" } " bit is set on a file, " { $link file-info } ", or an integer." } ;
 
 HELP: set-group-execute
 { $values
@@ -165,9 +165,9 @@ HELP: set-sticky
 
 HELP: sticky?
 { $values
-     { "path" "a pathname string" }
+     { "obj" "a pathname string, file-info object, or an integer" }
      { "?" "a boolean" } }
-{ $description "Tests whether the " { $snippet "sticky" } " bit of a file is set." } ;
+{ $description "Tests whether the " { $snippet "sticky" } " bit is set on a file, " { $link file-info } ", or an integer." } ;
 
 HELP: set-uid
 { $values
@@ -176,9 +176,9 @@ HELP: set-uid
 
 HELP: uid?
 { $values
-     { "path" "a pathname string" }
+     { "obj" "a pathname string, file-info object, or an integer" }
      { "?" "a boolean" } }
-{ $description "Tests whether the " { $snippet "uid" } " bit of a file is set." } ;
+{ $description "Tests whether the " { $snippet "uid" } " bit is set on a file, " { $link file-info } ", or an integer." } ;
 
 HELP: set-user-execute
 { $values
@@ -197,21 +197,21 @@ HELP: set-user-write
 
 HELP: user-execute?
 { $values
-     { "path" "a pathname string" }
+     { "obj" "a pathname string, file-info object, or an integer" }
      { "?" "a boolean" } }
-{ $description "Tests whether the " { $snippet "user execute" } " bit is set on a file." } ;
+{ $description "Tests whether the " { $snippet "user execute" } " bit is set on a file, " { $link file-info } ", or an integer." } ;
 
 HELP: user-read?
 { $values
-     { "path" "a pathname string" }
+     { "obj" "a pathname string, file-info object, or an integer" }
      { "?" "a boolean" } }
-{ $description "Tests whether the " { $snippet "user read" } " bit is set on a file." } ;
+{ $description "Tests whether the " { $snippet "user read" } " bit is set on a file, " { $link file-info } ", or an integer." } ;
 
 HELP: user-write?
 { $values
-     { "path" "a pathname string" }
+     { "obj" "a pathname string, file-info object, or an integer" }
      { "?" "a boolean" } }
-{ $description "Tests whether the " { $snippet "user write" } " bit is set on a file." } ;
+{ $description "Tests whether the " { $snippet "user write" } " bit is set on a file, " { $link file-info } ", or an integer." } ;
 
 ARTICLE: "unix-file-permissions" "Unix file permissions"
 "Reading all file permissions:"

@@ -374,15 +374,16 @@ M: revision feed-entry-url id>> revision-url ;
         { wiki "wiki-common" } >>template ;
 
 : init-wiki ( -- )
-    "resource:extra/webapps/wiki/initial-content" directory* keys
-    [
-        dup file-name ".txt" ?tail [
-            swap ascii file-contents
-            f <revision>
-                swap >>content
-                swap >>title
-                "slava" >>author
-                now >>date
-            add-revision
-        ] [ 2drop ] if
-    ] each ;
+    "resource:extra/webapps/wiki/initial-content" [
+        [
+            dup ".txt" ?tail [
+                swap ascii file-contents
+                f <revision>
+                    swap >>content
+                    swap >>title
+                    "slava" >>author
+                    now >>date
+                add-revision
+            ] [ 2drop ] if
+        ] each
+    ] with-directory-files ;

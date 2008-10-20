@@ -16,6 +16,11 @@ TYPEDEF: ushort uint16_t
 TYPEDEF: uint uint32_t
 TYPEDEF: ulonglong uint64_t
 
+TYPEDEF: uchar u_int8_t
+TYPEDEF: ushort u_int16_t
+TYPEDEF: uint u_int32_t
+TYPEDEF: ulonglong u_int64_t
+
 TYPEDEF: char __int8_t
 TYPEDEF: short __int16_t
 TYPEDEF: int __int32_t
