@@ -207,10 +207,9 @@ M: vocab-link summary vocab-summary ;
     dup vocab-authors-path set-vocab-file-contents ;
 
 : subdirs ( dir -- dirs )
-    dup [
+    [
         [ link-info directory? ] filter
-    ] with-directory-files
-    [ append-path ] with map natural-sort ;
+    ] with-directory-files natural-sort ;
 
 : (all-child-vocabs) ( root name -- vocabs )
     [
