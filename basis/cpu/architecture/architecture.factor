@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays generic kernel kernel.private math
 memory namespaces make sequences layouts system hashtables
-classes alien byte-arrays combinators words sets ;
+classes alien byte-arrays combinators words sets fry ;
 IN: cpu.architecture
 
 ! Labels
@@ -35,60 +35,96 @@ GENERIC: param-reg ( n register-class -- reg )
 
 M: object param-reg param-regs nth ;
 
-! Sequence mapping vreg-n to native assembler registers
-GENERIC: vregs ( register-class -- regs )
+HOOK: %load-immediate cpu ( reg obj -- )
+HOOK: %load-indirect cpu ( reg obj -- )
 
-! Load a literal (immediate or indirect)
-GENERIC# load-literal 1 ( obj reg -- )
-
-HOOK: load-indirect cpu ( obj reg -- )
-
-HOOK: stack-frame-size cpu ( stack-frame -- n )
-
-! Set up caller stack frame
-HOOK: %prologue cpu ( n -- )
-
-! Tear down stack frame
-HOOK: %epilogue cpu ( n -- )
-
-! Call another word
-HOOK: %call cpu ( word -- )
-
-! Local jump for branches
-HOOK: %jump-label cpu ( label -- )
-
-! Test if vreg is 'f' or not
-HOOK: %jump-f cpu ( label vreg -- )
-
-! Test if vreg is 't' or not
-HOOK: %jump-t cpu ( label vreg -- )
-
-HOOK: %dispatch cpu ( src temp -- )
-
-HOOK: %dispatch-label cpu ( word -- )
-
-! Return to caller
-HOOK: %return cpu ( -- )
-
-! Change datastack height
+HOOK: %peek cpu ( vreg loc -- )
+HOOK: %replace cpu ( vreg loc -- )
 HOOK: %inc-d cpu ( n -- )
-
-! Change callstack height
 HOOK: %inc-r cpu ( n -- )
 
-! Load stack into vreg
-HOOK: %peek cpu ( vreg loc -- )
+HOOK: stack-frame-size cpu ( stack-frame -- n )
+HOOK: %call cpu ( word -- )
+HOOK: %jump-label cpu ( label -- )
+HOOK: %return cpu ( -- )
 
-! Store vreg to stack
-HOOK: %replace cpu ( vreg loc -- )
+HOOK: %dispatch cpu ( src temp -- )
+HOOK: %dispatch-label cpu ( word -- )
 
-! Copy values between vregs
+HOOK: %slot cpu ( dst obj slot tag -- )
+HOOK: %slot-imm cpu ( dst obj slot tag -- )
+HOOK: %set-slot cpu ( src obj slot tag -- )
+HOOK: %set-slot-imm cpu ( src obj slot tag -- )
+
+HOOK: %add     cpu ( dst src1 src2 -- )
+HOOK: %add-imm cpu ( dst src1 src2 -- )
+HOOK: %sub     cpu ( dst src1 src2 -- )
+HOOK: %sub-imm cpu ( dst src1 src2 -- )
+HOOK: %mul     cpu ( dst src1 src2 -- )
+HOOK: %mul-imm cpu ( dst src1 src2 -- )
+HOOK: %and     cpu ( dst src1 src2 -- )
+HOOK: %and-imm cpu ( dst src1 src2 -- )
+HOOK: %or      cpu ( dst src1 src2 -- )
+HOOK: %or-imm  cpu ( dst src1 src2 -- )
+HOOK: %xor     cpu ( dst src1 src2 -- )
+HOOK: %xor-imm cpu ( dst src1 src2 -- )
+HOOK: %shl-imm cpu ( dst src1 src2 -- )
+HOOK: %shr-imm cpu ( dst src1 src2 -- )
+HOOK: %sar-imm cpu ( dst src1 src2 -- )
+HOOK: %not     cpu ( dst src -- )
+
+HOOK: %integer>bignum cpu ( dst src -- )
+HOOK: %bignum>integer cpu ( dst src -- )
+
+HOOK: %add-float      cpu ( dst src1 src2 -- )
+HOOK: %sub-float      cpu ( dst src1 src2 -- )
+HOOK: %mul-float      cpu ( dst src1 src2 -- )
+HOOK: %div-float      cpu ( dst src1 src2 -- )
+
+HOOK: %integer>float  cpu ( dst src -- )
+HOOK: %float>integer  cpu ( dst src -- )
+
 HOOK: %copy cpu ( dst src -- )
 HOOK: %copy-float cpu ( dst src -- )
-
-! Box and unbox floats
 HOOK: %unbox-float cpu ( dst src -- )
+HOOK: %unbox-f cpu ( dst src -- )
+HOOK: %unbox-alien cpu ( dst src -- )
+HOOK: %unbox-byte-array cpu ( dst src -- )
+HOOK: %unbox-any-c-ptr cpu ( dst src -- )
 HOOK: %box-float cpu ( dst src temp -- )
+HOOK: %box-alien cpu ( dst src temp -- )
+
+HOOK: %alien-unsigned-1 cpu ( dst src -- )
+HOOK: %alien-unsigned-2 cpu ( dst src -- )
+HOOK: %alien-unsigned-4 cpu ( dst src -- )
+HOOK: %alien-signed-1   cpu ( dst src -- )
+HOOK: %alien-signed-2   cpu ( dst src -- )
+HOOK: %alien-signed-3   cpu ( dst src -- )
+HOOK: %alien-cell       cpu ( dst src -- )
+HOOK: %alien-float      cpu ( dst src -- )
+HOOK: %alien-double     cpu ( dst src -- )
+
+HOOK: %set-alien-integer-1 cpu ( src value -- )
+HOOK: %set-alien-integer-2 cpu ( src value -- )
+HOOK: %set-alien-integer-4 cpu ( src value -- )
+HOOK: %set-alien-cell      cpu ( src value -- )
+HOOK: %set-alien-float     cpu ( src value -- )
+HOOK: %set-alien-double    cpu ( src value -- )
+
+HOOK: %allot cpu ( dst size type tag temp -- )
+HOOK: %write-barrier cpu ( src card# table -- )
+HOOK: %gc cpu ( -- )
+
+HOOK: %prologue cpu ( n -- )
+HOOK: %epilogue cpu ( n -- )
+
+HOOK: %binary-branch cpu ( label src1 src2 label cc -- )
+HOOK: %binary-imm-branch cpu ( label src1 src2 label cc -- )
+
+HOOK: %spill-integer cpu ( src n -- )
+HOOK: %spill-float cpu ( src n -- )
+HOOK: %reload-integer cpu ( dst n -- )
+HOOK: %reload-float cpu ( dst n -- )
 
 ! FFI stuff
 
@@ -141,6 +177,10 @@ HOOK: %cleanup cpu ( params -- )
 
 M: object %cleanup ( params -- ) drop ;
 
+HOOK: %prepare-alien-indirect cpu ( -- )
+
+HOOK: %alien-indirect cpu ( -- )
+
 HOOK: %alien-callback cpu ( quot -- )
 
 HOOK: %callback-value cpu ( ctype -- )
@@ -150,59 +190,17 @@ HOOK: %callback-return cpu ( params -- )
 
 M: object %callback-return drop %return ;
 
-HOOK: %prepare-alien-indirect cpu ( -- )
-
-HOOK: %alien-indirect cpu ( -- )
-
 M: stack-params param-reg drop ;
 
 M: stack-params param-regs drop f ;
 
-M: object load-literal load-indirect ;
-
 : if-small-struct ( n size true false -- ? )
-    [ over not over struct-small-enough? and ] 2dip
-    [ [ nip ] prepose ] dip if ;
+    [ 2dup [ not ] [ struct-small-enough? ] bi and ] 2dip
+    [ '[ nip @ ] ] dip if ;
     inline
 
 : %unbox-struct ( n c-type -- )
-    [
-        %unbox-small-struct
-    ] [
-        %unbox-large-struct
-    ] if-small-struct ;
+    [ %unbox-small-struct ] [ %unbox-large-struct ] if-small-struct ;
 
 : %box-struct ( n c-type -- )
-    [
-        %box-small-struct
-    ] [
-        %box-large-struct
-    ] if-small-struct ;
-
-! Alien accessors
-HOOK: %unbox-byte-array cpu ( dst src -- )
-
-HOOK: %unbox-alien cpu ( dst src -- )
-
-HOOK: %unbox-f cpu ( dst src -- )
-
-HOOK: %unbox-any-c-ptr cpu ( dst src -- )
-
-HOOK: %box-alien cpu ( dst src temp -- )
-
-! Allocation
-HOOK: %allot cpu ( dst size type tag temp -- )
-
-HOOK: %write-barrier cpu ( src card# table -- )
-
-! GC check
-HOOK: %gc cpu ( -- )
-
-! Spilling
-HOOK: %spill-integer cpu ( src n -- )
-
-HOOK: %spill-float cpu ( src n -- )
-
-HOOK: %reload-integer cpu ( dst n -- )
-
-HOOK: %reload-float cpu ( dst n -- )
+    [ %box-small-struct ] [ %box-large-struct ] if-small-struct ;

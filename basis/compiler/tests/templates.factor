@@ -375,3 +375,8 @@ TUPLE: my-tuple ;
 [ t ] [ \ dispatch-alignment-regression compiled>> ] unit-test
 
 [ vector ] [ dispatch-alignment-regression ] unit-test
+
+! Regression
+: bad-value-bug ( a -- b ) [ 3 ] [ 3 ] if f <array> ;
+
+[ { f f f } ] [ t bad-value-bug ] unit-test

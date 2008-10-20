@@ -41,7 +41,6 @@ M: x86.32 struct-small-enough? ( size -- ? )
 ! On x86, parameters are never passed in registers.
 M: int-regs return-reg drop EAX ;
 M: int-regs param-regs drop { } ;
-M: int-regs vregs drop { EAX ECX EDX EBP } ;
 M: int-regs push-return-reg return-reg PUSH ;
 
 M: int-regs load-return-reg
@@ -51,7 +50,6 @@ M: int-regs store-return-reg
     [ stack@ ] [ return-reg ] bi* MOV ;
 
 M: float-regs param-regs drop { } ;
-M: float-regs vregs drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 
 : FSTP ( operand size -- ) 4 = [ FSTPS ] [ FSTPL ] if ;
 
@@ -81,8 +79,8 @@ M: x86.32 fixnum>slot@ 1 SHR ;
 
 M: x86.32 prepare-division CDQ ;
 
-M: x86.32 load-indirect
-    0 [] MOV rc-absolute-cell rel-literal ;
+M: x86.32 %load-indirect
+    swap 0 [] MOV rc-absolute-cell rel-literal ;
 
 M: object %load-param-reg 3drop ;
 

@@ -66,7 +66,7 @@ M: ppc %box-float ( dst src -- )
         ! is it zero?
         0 over v>operand 0 CMPI
         "non-zero" get BNE
-        0 >bignum over load-literal
+        dup 0 >bignum %load-literal
         "end" get B
         ! it is non-zero
         "non-zero" resolve-label

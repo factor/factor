@@ -6,9 +6,9 @@ IN: compiler.cfg.value-numbering
 
 GENERIC: make-value-node ( insn -- )
 
-M: ##cond-branch make-value-node src>> live-vreg ;
+M: ##unary-branch make-value-node src>> live-vreg ;
 M: ##unary make-value-node [ insn>vn ] [ dst>> ] bi set-vn ;
-M: ##nullary make-value-node drop ;
+M: ##flushable make-value-node drop ;
 M: ##load-literal make-value-node [ insn>vn ] [ dst>> ] bi set-vn ;
 M: ##peek make-value-node [ insn>vn ] [ dst>> ] bi set-vn ;
 M: ##replace make-value-node reset-value-graph ;

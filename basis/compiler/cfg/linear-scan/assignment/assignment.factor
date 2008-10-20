@@ -3,6 +3,7 @@
 USING: accessors kernel math assocs namespaces sequences heaps
 fry make combinators
 cpu.architecture
+compiler.cfg.def-use
 compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.linear-scan.live-intervals ;

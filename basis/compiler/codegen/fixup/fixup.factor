@@ -43,9 +43,10 @@ M: rel-fixup fixup*
 
 M: integer fixup* , ;
 
+: indq ( elt seq -- n ) [ eq? ] with find drop ;
+
 : adjoin* ( obj table -- n )
-    2dup swap [ eq? ] curry find drop
-    [ 2nip ] [ dup length >r push r> ] if* ;
+    2dup indq [ 2nip ] [ dup length >r push r> ] if* ;
 
 SYMBOL: literal-table
 

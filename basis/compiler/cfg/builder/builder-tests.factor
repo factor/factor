@@ -4,6 +4,8 @@ words sequences.private fry prettyprint alien
 math.private compiler.tree.builder compiler.tree.optimizer
 compiler.cfg.builder compiler.cfg.debugger  ;
 
+\ build-cfg must-infer
+
 ! Just ensure that various CFGs build correctly.
 {
     [ ]

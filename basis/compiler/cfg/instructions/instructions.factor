@@ -1,19 +1,49 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors arrays kernel sequences namespaces words
-math compiler.cfg.registers compiler.cfg.instructions.syntax ;
+math math.order layouts classes.algebra alien byte-arrays
+combinators compiler.cfg.registers
+compiler.cfg.instructions.syntax ;
 IN: compiler.cfg.instructions
 
 ! Virtual CPU instructions, used by CFG and machine IRs
 
-TUPLE: ##cond-branch < insn { src vreg } ;
-TUPLE: ##unary < insn { dst vreg } { src vreg } ;
-TUPLE: ##nullary < insn { dst vreg } ;
+! Instruction with no side effects; if 'out' is never read, we
+! can eliminate it.
+TUPLE: ##flushable < insn { dst vreg } ;
+
+! Instruction which is referentially transparent; we can replace
+! repeated computation with a reference to a previous value
+TUPLE: ##pure < ##flushable ;
+
+TUPLE: ##unary < ##pure { src vreg } ;
+TUPLE: ##boxer < ##unary { temp vreg } ;
+TUPLE: ##binary < ##pure { src1 vreg } { src2 vreg } ;
+TUPLE: ##binary-imm < ##pure { src1 vreg } { src2 integer } ;
+TUPLE: ##commutative < ##binary ;
+
+! Instruction only used for its side effect, produces no values
+TUPLE: ##effect < insn { src vreg } ;
+
+! Read/write ops: candidates for alias analysis
+TUPLE: ##read < ##flushable ;
+TUPLE: ##write < ##effect ;
+
+TUPLE: ##alien-getter < ##read { src vreg } ;
+TUPLE: ##alien-setter < ##effect { value vreg } ;
 
 ! Stack operations
-INSN: ##load-literal < ##nullary obj ;
-INSN: ##peek < ##nullary { loc loc } ;
-INSN: ##replace { src vreg } { loc loc } ;
+INSN: ##load-immediate < ##pure { val integer } ;
+INSN: ##load-indirect < ##pure obj ;
+
+GENERIC: ##load-literal ( dst value -- )
+
+M: fixnum ##load-literal tag-fixnum ##load-immediate ;
+M: f ##load-literal drop \ f tag-number ##load-immediate ;
+M: object ##load-literal ##load-indirect ;
+
+INSN: ##peek < ##read { loc loc } ;
+INSN: ##replace < ##write { loc loc } ;
 INSN: ##inc-d { n integer } ;
 INSN: ##inc-r { n integer } ;
 
@@ -30,11 +60,47 @@ INSN: ##call word ;
 INSN: ##jump word ;
 INSN: ##return ;
 
-INSN: ##intrinsic quot defs-vregs uses-vregs ;
-
 ! Jump tables
 INSN: ##dispatch src temp ;
 INSN: ##dispatch-label label ;
+
+! Slot access
+INSN: ##slot < ##read { obj vreg } { slot vreg } { tag integer } ;
+INSN: ##slot-imm < ##read { obj vreg } { slot integer } { tag integer } ;
+INSN: ##set-slot < ##write { obj vreg } { slot vreg } { tag integer } ;
+INSN: ##set-slot-imm < ##write { obj vreg } { slot integer } { tag integer } ;
+
+! Integer arithmetic
+INSN: ##add < ##commutative ;
+INSN: ##add-imm < ##binary-imm ;
+INSN: ##sub < ##binary ;
+INSN: ##sub-imm < ##binary-imm ;
+INSN: ##mul < ##commutative ;
+INSN: ##mul-imm < ##binary-imm ;
+INSN: ##and < ##commutative ;
+INSN: ##and-imm < ##binary-imm ;
+INSN: ##or < ##commutative ;
+INSN: ##or-imm < ##binary-imm ;
+INSN: ##xor < ##commutative ;
+INSN: ##xor-imm < ##binary-imm ;
+INSN: ##shl-imm < ##binary-imm ;
+INSN: ##shr-imm < ##binary-imm ;
+INSN: ##sar-imm < ##binary-imm ;
+INSN: ##not < ##unary ;
+
+! Bignum/integer conversion
+INSN: ##integer>bignum < ##boxer ;
+INSN: ##bignum>integer < ##unary ;
+
+! Float arithmetic
+INSN: ##add-float < ##commutative ;
+INSN: ##sub-float < ##binary ;
+INSN: ##mul-float < ##commutative ;
+INSN: ##div-float < ##binary ;
+
+! Float/integer conversion
+INSN: ##float>integer < ##unary ;
+INSN: ##integer>float < ##unary ;
 
 ! Boxing and unboxing
 INSN: ##copy < ##unary ;
@@ -44,12 +110,38 @@ INSN: ##unbox-f < ##unary ;
 INSN: ##unbox-alien < ##unary ;
 INSN: ##unbox-byte-array < ##unary ;
 INSN: ##unbox-any-c-ptr < ##unary ;
-INSN: ##box-float < ##unary { temp vreg } ;
-INSN: ##box-alien < ##unary { temp vreg } ;
+INSN: ##box-float < ##boxer ;
+INSN: ##box-alien < ##boxer ;
+
+: ##unbox-c-ptr ( dst src class -- )
+    {
+        { [ dup \ f class<= ] [ drop ##unbox-f ] }
+        { [ dup simple-alien class<= ] [ drop ##unbox-alien ] }
+        { [ dup byte-array class<= ] [ drop ##unbox-byte-array ] }
+        [ drop ##unbox-any-c-ptr ]
+    } cond ; inline
+
+! Alien accessors
+INSN: ##alien-unsigned-1 < ##alien-getter ;
+INSN: ##alien-unsigned-2 < ##alien-getter ;
+INSN: ##alien-unsigned-4 < ##alien-getter ;
+INSN: ##alien-signed-1 < ##alien-getter ;
+INSN: ##alien-signed-2 < ##alien-getter ;
+INSN: ##alien-signed-3 < ##alien-getter ;
+INSN: ##alien-cell < ##alien-getter ;
+INSN: ##alien-float < ##alien-getter ;
+INSN: ##alien-double < ##alien-getter ;
+
+INSN: ##set-alien-integer-1 < ##alien-setter ;
+INSN: ##set-alien-integer-2 < ##alien-setter ;
+INSN: ##set-alien-integer-4 < ##alien-setter ;
+INSN: ##set-alien-cell < ##alien-getter ;
+INSN: ##set-alien-float < ##alien-setter ;
+INSN: ##set-alien-double < ##alien-setter ;
 
 ! Memory allocation
-INSN: ##allot < ##nullary size type tag { temp vreg } ;
-INSN: ##write-barrier { src vreg } card# table ;
+INSN: ##allot < ##flushable size type tag { temp vreg } ;
+INSN: ##write-barrier < ##effect card# table ;
 INSN: ##gc ;
 
 ! FFI
@@ -58,54 +150,35 @@ INSN: ##alien-indirect params ;
 INSN: ##alien-callback params ;
 INSN: ##callback-return params ;
 
-GENERIC: defs-vregs ( insn -- seq )
-GENERIC: uses-vregs ( insn -- seq )
-
-M: ##nullary defs-vregs dst>> 1array ;
-M: ##unary defs-vregs dst>> 1array ;
-M: ##write-barrier defs-vregs
-    [ card#>> ] [ table>> ] bi 2array ;
-
-: allot-defs-vregs ( insn -- seq )
-    [ dst>> ] [ temp>> ] bi 2array ;
-
-M: ##box-float defs-vregs allot-defs-vregs ;
-M: ##box-alien defs-vregs allot-defs-vregs ;
-M: ##allot defs-vregs allot-defs-vregs ;
-M: ##dispatch defs-vregs temp>> 1array ;
-M: insn defs-vregs drop f ;
-
-M: ##replace uses-vregs src>> 1array ;
-M: ##unary uses-vregs src>> 1array ;
-M: ##write-barrier uses-vregs src>> 1array ;
-M: ##dispatch uses-vregs src>> 1array ;
-M: insn uses-vregs drop f ;
-
-: intrinsic-vregs ( assoc -- seq' )
-    [ nip dup vreg? swap and ] { } assoc>map sift ;
-
-: intrinsic-defs-vregs ( insn -- seq )
-    defs-vregs>> intrinsic-vregs ;
-
-: intrinsic-uses-vregs ( insn -- seq )
-    uses-vregs>> intrinsic-vregs ;
-
-M: ##intrinsic defs-vregs intrinsic-defs-vregs ;
-M: ##intrinsic uses-vregs intrinsic-uses-vregs ;
-
 ! Instructions used by CFG IR only.
 INSN: ##prologue ;
 INSN: ##epilogue ;
 
 INSN: ##branch ;
-INSN: ##branch-f < ##cond-branch ;
-INSN: ##branch-t < ##cond-branch ;
-INSN: ##if-intrinsic quot defs-vregs uses-vregs ;
 
-M: ##cond-branch uses-vregs src>> 1array ;
+! Condition codes
+SYMBOL: cc<
+SYMBOL: cc<=
+SYMBOL: cc=
+SYMBOL: cc>
+SYMBOL: cc>=
+SYMBOL: cc/=
 
-M: ##if-intrinsic defs-vregs intrinsic-defs-vregs ;
-M: ##if-intrinsic uses-vregs intrinsic-uses-vregs ;
+: evaluate-cc ( result cc -- ? )
+    H{
+        { cc<  { +lt+           } }
+        { cc<= { +lt+ +eq+      } }
+        { cc=  {      +eq+      } }
+        { cc>= {      +eq+ +gt+ } }
+        { cc>  {           +gt+ } }
+        { cc/= { +lt+      +gt+ } }
+    } at memq? ;
+
+INSN: ##binary-branch { src1 vreg } { src2 vreg } cc ;
+INSN: ##binary-imm-branch { src1 vreg } { src2 integer } cc ;
+
+INSN: ##boolean < ##binary cc ;
+INSN: ##boolean-imm < ##binary-imm cc ;
 
 ! Instructions used by machine IR only.
 INSN: _prologue stack-frame ;
@@ -113,17 +186,10 @@ INSN: _epilogue stack-frame ;
 
 INSN: _label id ;
 
-TUPLE: _cond-branch < insn { src vreg } label ;
-
 INSN: _branch label ;
-INSN: _branch-f < _cond-branch ;
-INSN: _branch-t < _cond-branch ;
-INSN: _if-intrinsic label quot defs-vregs uses-vregs ;
 
-M: _cond-branch uses-vregs src>> 1array ;
-
-M: _if-intrinsic defs-vregs intrinsic-defs-vregs ;
-M: _if-intrinsic uses-vregs intrinsic-uses-vregs ;
+INSN: _binary-branch label { src1 vreg } { src2 vreg } cc ;
+INSN: _binary-imm-branch label { src1 vreg } { src2 integer } cc ;
 
 ! These instructions operate on machine registers and not
 ! virtual registers

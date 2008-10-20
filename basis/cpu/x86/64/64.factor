@@ -26,16 +26,9 @@ M: x86.64 temp-reg-1 RAX ;
 M: x86.64 temp-reg-2 RCX ;
 
 M: int-regs return-reg drop RAX ;
-M: int-regs vregs drop { RAX RCX RDX RBP RSI RDI R8 R9 R10 R11 R12 R13 } ;
 M: int-regs param-regs drop { RDI RSI RDX RCX R8 R9 } ;
 
 M: float-regs return-reg drop XMM0 ;
-
-M: float-regs vregs
-    drop {
-        XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7
-        XMM8 XMM9 XMM10 XMM11 XMM12 XMM13 XMM14 XMM15
-    } ;
 
 M: float-regs param-regs
     drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
@@ -44,8 +37,8 @@ M: x86.64 fixnum>slot@ drop ;
 
 M: x86.64 prepare-division CQO ;
 
-M: x86.64 load-indirect ( literal reg -- )
-    0 [] MOV rc-relative rel-literal ;
+M: x86.64 %load-indirect ( literal reg -- )
+    swap 0 [] MOV rc-relative rel-literal ;
 
 M: stack-params %load-param-reg
     drop

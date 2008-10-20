@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces kernel assocs accessors sequences math fry
-compiler.cfg.instructions compiler.cfg.registers ;
+compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.def-use ;
 IN: compiler.cfg.linear-scan.live-intervals
 
 TUPLE: live-interval

@@ -71,11 +71,7 @@ HOOK: temp-reg-2 cpu ( -- reg )
 HOOK: fixnum>slot@ cpu ( op -- )
 HOOK: prepare-division cpu ( -- )
 
-M: f load-literal
-    \ f tag-number MOV drop ;
-
-M: fixnum load-literal
-    swap tag-fixnum MOV ;
+M: x86 %load-immediate MOV ;
 
 : align-stack ( n -- n' )
     os macosx? cpu x86.64? or [ 16 align ] when ;
@@ -118,11 +114,11 @@ M: x86 %call ( label -- ) CALL ;
 
 M: x86 %jump-label ( label -- ) JMP ;
 
-M: x86 %jump-f ( label reg -- )
-    \ f tag-number CMP JE ;
-
-M: x86 %jump-t ( label reg -- )
-    \ f tag-number CMP JNE ;
+! M: x86 %jump-f ( label reg -- )
+!     \ f tag-number CMP JE ;
+! 
+! M: x86 %jump-t ( label reg -- )
+!     \ f tag-number CMP JNE ;
 
 : code-alignment ( -- n )
     building get length dup cell align swap - ;

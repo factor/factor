@@ -9,11 +9,11 @@ IN: compiler.cfg.value-numbering.propagate
 
 GENERIC: propogate ( insn -- insn )
 
-M: ##cond-branch propagate [ resolve ] change-src ;
+M: ##unary-branch propagate [ resolve ] change-src ;
 
 M: ##unary propogate [ resolve ] change-src ;
 
-M: ##nullary propagate ;
+M: ##flushable propagate ;
 
 M: ##replace propagate [ resolve ] change-src ;
 

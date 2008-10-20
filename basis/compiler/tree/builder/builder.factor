@@ -7,7 +7,7 @@ stack-checker.backend compiler.tree ;
 IN: compiler.tree.builder
 
 : with-tree-builder ( quot -- nodes )
-    [ V{ } clone stack-visitor set ] prepose
+    '[ V{ } clone stack-visitor set @ ]
     with-infer ; inline
 
 : build-tree ( quot -- nodes )

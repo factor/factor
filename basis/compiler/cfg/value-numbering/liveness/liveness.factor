@@ -30,7 +30,7 @@ M: load-literal-expr live-expr in>> live-vn ;
 GENERIC: eliminate ( insn -- insn/f )
 
 : (eliminate) ( insn -- insn/f )
-    dup dst>> >vreg live? [ drop f ] unless ;
+    dup dst>> live? [ drop f ] unless ;
 
 M: ##peek eliminate (eliminate) ;
 M: ##unary eliminate (eliminate) ;

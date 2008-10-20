@@ -2,24 +2,23 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs combinators hashtables kernel
 math fry namespaces make sequences words byte-arrays
-locals layouts alien.c-types alien.structs
-stack-checker.inlining
-cpu.architecture
-compiler.intrinsics
+layouts alien.c-types alien.structs
+stack-checker.inlining cpu.architecture
 compiler.tree
 compiler.tree.builder
 compiler.tree.combinators
 compiler.tree.propagation.info
 compiler.cfg
-compiler.cfg.stacks
-compiler.cfg.templates
 compiler.cfg.iterator
-compiler.cfg.instructions
 compiler.cfg.registers
+compiler.cfg.instructions
+compiler.cfg.builder.hats
+compiler.cfg.builder.calls
+compiler.cfg.builder.stacks
 compiler.alien ;
 IN: compiler.cfg.builder
 
-! Convert tree SSA IR to CFG (not quite SSA yet) IR.
+! Convert tree SSA IR to CFG SSA IR.
 
 : set-basic-block ( basic-block -- )
     [ basic-block set ] [ instructions>> building set ] bi ;
@@ -93,12 +92,6 @@ GENERIC: emit-node ( node -- next )
         ] with-variable
     ] keep ;
 
-SYMBOL: +intrinsics+
-SYMBOL: +if-intrinsics+
-
-: if-intrinsics ( #call -- quot )
-    word>> +if-intrinsics+ word-prop ;
-
 : local-recursive-call ( basic-block -- next )
     ##branch
     basic-block get successors>> push
@@ -131,22 +124,22 @@ M: #recursive emit-node
     dup label>> loop?>> [ compile-loop ] [ compile-recursive ] if ;
 
 ! #if
-: emit-branch ( obj quot -- final-bb )
-    '[
+: emit-branch ( obj -- final-bb )
+    [
         begin-basic-block copy-phantoms
-        @
+        emit-nodes
         basic-block get dup [ ##branch ] when
     ] with-scope ;
 
-: emit-branches ( seq quot -- )
-    '[ _ emit-branch ] map
+: emit-if ( node -- )
+    children>>  [ emit-branch ] map
     end-basic-block
     begin-basic-block
     basic-block get '[ [ _ swap successors>> push ] when* ] each
     init-phantoms ;
 
-: emit-if ( node -- next )
-    children>> [ emit-nodes ] emit-branches ;
+: ##branch-t ( vreg -- )
+    \ f tag-number cc/= ##binary-imm-branch ;
 
 M: #if emit-node
     phantom-pop ##branch-t emit-if iterate-next ;
@@ -194,100 +187,16 @@ M: #dispatch emit-node
     ] if ;
 
 ! #call
-: define-intrinsics ( word intrinsics -- )
-    +intrinsics+ set-word-prop ;
-
-: define-intrinsic ( word quot assoc -- )
-    2array 1array define-intrinsics ;
-
-: define-if-intrinsics ( word intrinsics -- )
-    [ template new swap >>input ] assoc-map
-    +if-intrinsics+ set-word-prop ;
-
-: define-if-intrinsic ( word quot inputs -- )
-    2array 1array define-if-intrinsics ;
-
-: find-intrinsic ( #call -- pair/f )
-    word>> +intrinsics+ word-prop find-template ;
-
-: find-boolean-intrinsic ( #call -- pair/f )
-    word>> +if-intrinsics+ word-prop find-template ;
-
-: find-if-intrinsic ( #call -- pair/f )
-    node@ {
-        { [ dup length 2 < ] [ 2drop f ] }
-        { [ dup second #if? ] [ drop find-boolean-intrinsic ] }
-        [ 2drop f ]
-    } cond ;
-
-: do-if-intrinsic ( pair -- next )
-    [ ##if-intrinsic ] apply-template skip-next emit-if
-    iterate-next ;
-
-: do-boolean-intrinsic ( pair -- next )
-    [ ##if-intrinsic ] apply-template
-    { t f } [
-        <constant> phantom-push finalize-phantoms
-    ] emit-branches
-    iterate-next ;
-
-: do-intrinsic ( pair -- next )
-    [ ##intrinsic ] apply-template iterate-next ;
-
-: setup-value-classes ( #call -- )
-    node-input-infos [ class>> ] map set-value-classes ;
-
-{
-    (tuple) (array) (byte-array)
-    (complex) (ratio) (wrapper)
-    (write-barrier)
-} [ t "intrinsic" set-word-prop ] each
-
-: allot-size ( -- n )
-    1 phantom-datastack get phantom-input first value>> ;
-
-:: emit-allot ( size type tag -- )
-    int-regs next-vreg
-    dup fresh-object
-    dup size type tag int-regs next-vreg ##allot
-    type tagged boa phantom-push ;
-
-: emit-write-barrier ( -- )
-    phantom-pop dup fresh-object? [ drop ] [
-        int-regs next-vreg
-        int-regs next-vreg
-        ##write-barrier
-    ] if ;
-
-: emit-intrinsic ( word -- next )
-    {
-        { \ (tuple) [ allot-size 2 + cells tuple tuple emit-allot ] }
-        { \ (array) [ allot-size 2 + cells array object emit-allot ] }
-        { \ (byte-array) [ allot-size 2 cells + byte-array object emit-allot ] }
-        { \ (complex) [ 3 cells complex complex emit-allot ] }
-        { \ (ratio) [ 3 cells ratio ratio emit-allot ] }
-        { \ (wrapper) [ 2 cells wrapper object emit-allot ] }
-        { \ (write-barrier) [ emit-write-barrier ] }
-    } case
-    iterate-next ;
-
 M: #call emit-node
-    dup setup-value-classes
-    dup find-if-intrinsic [ do-if-intrinsic ] [
-        dup find-boolean-intrinsic [ do-boolean-intrinsic ] [
-            dup find-intrinsic [ do-intrinsic ] [
-                word>> dup "intrinsic" word-prop
-                [ emit-intrinsic ] [ emit-call ] if
-            ] ?if
-        ] ?if
-    ] ?if ;
+    dup word>> dup "intrinsic" word-prop
+    [ emit-intrinsic iterate-next ] [ nip emit-call ] if ;
 
 ! #call-recursive
 M: #call-recursive emit-node label>> id>> emit-call ;
 
 ! #push
 M: #push emit-node
-    literal>> <constant> phantom-push iterate-next ;
+    literal>> ^^load-literal phantom-push iterate-next ;
 
 ! #shuffle
 M: #shuffle emit-node

@@ -40,21 +40,14 @@ M: ##branch linearize-insn
 : conditional ( basic-block -- basic-block successor1 label2 )
     dup successors>> first2 swap number>> ; inline
 
-: boolean-conditional ( basic-block insn -- basic-block successor vreg label2 )
-    [ conditional ] [ src>> ] bi* swap ; inline
+: binary-conditional ( basic-block insn -- basic-block successor label2 src1 src2 cc )
+    [ conditional ] [ [ src1>> ] [ src2>> ] [ cc>> ] tri ] bi* ; inline
 
-M: ##branch-f linearize-insn
-    boolean-conditional _branch-f emit-branch ;
+M: ##binary-branch linearize-insn
+    binary-conditional _binary-branch emit-branch ;
 
-M: ##branch-t linearize-insn
-    boolean-conditional _branch-t emit-branch ;
-
-: >intrinsic< ( insn -- quot defs uses )
-    [ quot>> ] [ defs-vregs>> ] [ uses-vregs>> ] tri ;
-
-M: ##if-intrinsic linearize-insn
-    [ conditional ] [ >intrinsic< ] bi*
-    _if-intrinsic emit-branch ;
+M: ##binary-imm-branch linearize-insn
+    binary-conditional _binary-imm-branch emit-branch ;
 
 : linearize-basic-block ( bb -- )
     [ number>> _label ] [ linearize-insns ] bi ;

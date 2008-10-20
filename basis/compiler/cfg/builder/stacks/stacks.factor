@@ -3,84 +3,17 @@
 USING: arrays assocs classes classes.private classes.algebra
 combinators hashtables kernel layouts math fry namespaces
 quotations sequences system vectors words effects alien
-byte-arrays accessors sets math.order cpu.architecture
-compiler.cfg.instructions compiler.cfg.registers ;
-IN: compiler.cfg.stacks
+byte-arrays accessors sets math.order
+combinators.short-circuit cpu.architecture
+compiler.cfg.instructions compiler.cfg.registers
+compiler.cfg.builder.hats ;
+IN: compiler.cfg.builder.stacks
 
 ! Converting stack operations into register operations, while
 ! doing a bit of optimization along the way.
 PREDICATE: small-slot < integer cells small-enough? ;
 
 PREDICATE: small-tagged < integer tag-fixnum small-enough? ;
-
-! Value protocol
-GENERIC: move-spec ( obj -- spec )
-GENERIC: live-loc? ( actual current -- ? )
-GENERIC: lazy-store ( dst src -- )
-
-! This will be a multimethod soon
-DEFER: ##move
-
-PRIVATE>
-
-! Default implementation
-M: value live-loc? 2drop f ;
-M: value lazy-store 2drop ;
-
-M: vreg move-spec reg-class>> move-spec ;
-M: vreg value-class* reg-class>> value-class* ;
-
-M: int-regs move-spec drop f ;
-M: int-regs value-class* drop object ;
-
-M: float-regs move-spec drop float ;
-M: float-regs value-class* drop float ;
-
-M: ds-loc live-loc?
-    over ds-loc? [ [ n>> ] bi@ = not ] [ 2drop t ] if ;
-
-M: rs-loc live-loc?
-    over rs-loc? [ [ n>> ] bi@ = not ] [ 2drop t ] if ;
-
-M: loc value-class* class>> ;
-M: loc set-value-class (>>class) ;
-M: loc move-spec drop loc ;
-
-M: f move-spec drop loc ;
-M: f value-class* ;
-
-M: tagged move-spec drop f ;
-
-M: unboxed-alien move-spec class ;
-
-M: unboxed-byte-array move-spec class ;
-
-M: unboxed-f move-spec class ;
-
-M: unboxed-c-ptr move-spec class ;
-
-M: constant move-spec class ;
-
-! Moving values between locations and registers
-: ##move-bug ( -- * ) "Bug in compiler.cfg.stacks" throw ;
-
-: ##unbox-c-ptr ( dst src -- )
-    dup value-class {
-        { [ dup \ f class<= ] [ drop [ >vreg ] bi@ ##unbox-f ] }
-        { [ dup simple-alien class<= ] [ drop [ >vreg ] bi@ ##unbox-alien ] }
-        { [ dup byte-array class<= ] [ drop [ >vreg ] bi@ ##unbox-byte-array ] }
-        [ drop [ >vreg ] bi@ ##unbox-any-c-ptr ]
-    } cond ; inline
-
-: ##move-via-temp ( dst src -- )
-    #! For many transfers, such as loc to unboxed-alien, we
-    #! don't have an intrinsic, so we transfer the source to
-    #! temp then temp to the destination.
-    int-regs next-vreg [ over ##move value-class ] keep
-    tagged new
-        swap >>vreg
-        swap >>class
-    ##move ;
 
 ! Operands holding pointers to freshly-allocated objects which
 ! are guaranteed to be in the nursery
@@ -89,34 +22,6 @@ SYMBOL: fresh-objects
 : fresh-object ( vreg/t -- ) fresh-objects get push ;
 
 : fresh-object? ( vreg -- ? ) fresh-objects get memq? ;
-
-: ##move ( dst src -- )
-    2dup [ move-spec ] bi@ 2array {
-        { { f f } [ [ >vreg ] bi@ ##copy ] }
-        { { unboxed-alien unboxed-alien } [ [ >vreg ] bi@ ##copy ] }
-        { { unboxed-byte-array unboxed-byte-array } [ [ >vreg ] bi@ ##copy ] }
-        { { unboxed-f unboxed-f } [ [ >vreg ] bi@ ##copy ] }
-        { { unboxed-c-ptr unboxed-c-ptr } [ [ >vreg ] bi@ ##copy ] }
-        { { float float } [ [ >vreg ] bi@ ##copy-float ] }
-
-        { { f unboxed-c-ptr } [ ##move-bug ] }
-        { { f unboxed-byte-array } [ ##move-bug ] }
-
-        { { f constant } [ [ >vreg ] [ value>> ] bi* ##load-literal ] }
-
-        { { f float } [ [ >vreg ] bi@ int-regs next-vreg ##box-float t fresh-object ] }
-        { { f unboxed-alien } [ [ >vreg ] bi@ int-regs next-vreg ##box-alien t fresh-object ] }
-        { { f loc } [ [ >vreg ] dip ##peek ] }
-
-        { { float f } [ [ >vreg ] bi@ ##unbox-float ] }
-        { { unboxed-alien f } [ [ >vreg ] bi@ ##unbox-alien ] }
-        { { unboxed-byte-array f } [ [ >vreg ] bi@ ##unbox-byte-array ] }
-        { { unboxed-f f } [ [ >vreg ] bi@ ##unbox-f ] }
-        { { unboxed-c-ptr f } [ ##unbox-c-ptr ] }
-        { { loc f } [ >vreg swap ##replace ] }
-
-        [ drop ##move-via-temp ]
-    } case ;
 
 ! A compile-time stack
 TUPLE: phantom-stack height stack ;
@@ -204,42 +109,13 @@ M: phantom-retainstack finalize-height
 
 : finalize-heights ( -- ) [ finalize-height ] each-phantom ;
 
-: reg-spec>class ( spec -- class )
-    float eq? double-float-regs int-regs ? ;
+GENERIC: lazy-load ( loc/vreg -- vreg )
+M: loc lazy-load ^^peek ;
+M: vreg lazy-load ;
 
-: alloc-vreg ( spec -- reg )
-    [ reg-spec>class next-vreg ] keep {
-        { f [ <tagged> ] }
-        { unboxed-alien [ <unboxed-alien> ] }
-        { unboxed-byte-array [ <unboxed-byte-array> ] }
-        { unboxed-f [ <unboxed-f> ] }
-        { unboxed-c-ptr [ <unboxed-c-ptr> ] }
-        [ drop ]
-    } case ;
-
-: alloc-vreg-for ( value spec -- vreg )
-    alloc-vreg swap value-class
-    over tagged? [ >>class ] [ drop ] if ;
-
-: (eager-load) ( value spec -- vreg )
-    [ alloc-vreg-for ] [ drop ] 2bi
-    [ ##move ] [ drop >vreg ] 2bi ;
-
-: compatible? ( value spec -- ? )
-    >r move-spec r> {
-        { [ 2dup = ] [ t ] }
-        { [ dup unboxed-c-ptr eq? ] [
-            over { unboxed-byte-array unboxed-alien } member?
-        ] }
-        [ f ]
-    } cond 2nip ;
-
-: (lazy-load) ( value spec -- value )
-    {
-        { [ dup { small-slot small-tagged } memq? ] [ drop >vreg ] }
-        { [ 2dup compatible? ] [ drop >vreg ] }
-        [ (eager-load) ]
-    } cond ;
+GENERIC: live-loc? ( actual current -- ? )
+M: vreg live-loc? 2drop f ;
+M: loc live-loc? { [ [ class ] bi@ = ] [ [ n>> ] bi@ = not ] } 2&& ;
 
 : (live-locs) ( phantom -- seq )
     #! Discard locs which haven't moved
@@ -250,19 +126,26 @@ M: phantom-retainstack finalize-height
 : live-locs ( -- seq )
     [ (live-locs) ] each-phantom append prune ;
 
+GENERIC: lazy-store ( dst src -- )
+
+M: vreg lazy-store 2drop ;
+
 M: loc lazy-store
-    2dup live-loc? [ "live-locs" get at ##move ] [ 2drop ] if ;
+    2dup live-loc? [
+        \ live-locs get at swap ##replace
+    ] [ 2drop ] if ;
 
 : finalize-locs ( -- )
     #! Perform any deferred stack shuffling.
-    live-locs [ dup f (lazy-load) ] H{ } map>assoc
+    live-locs [ dup lazy-load ] H{ } map>assoc
     dup assoc-empty? [ drop ] [
-        "live-locs" set [ lazy-store ] each-loc
+        \ live-locs set
+        [ lazy-store ] each-loc
     ] if ;
 
 : finalize-vregs ( -- )
     #! Store any vregs to their final stack locations.
-    [ dup loc? [ 2drop ] [ ##move ] if ] each-loc ;
+    [ dup loc? [ 2drop ] [ swap ##replace ] if ] each-loc ;
 
 : clear-phantoms ( -- )
     [ stack>> delete-all ] each-phantom ;
@@ -271,11 +154,6 @@ M: loc lazy-store
     finalize-locs finalize-vregs clear-phantoms ;
 
 ! Loading stacks to vregs
-: set-value-classes ( classes -- )
-    phantom-datastack get
-    over length over add-locs
-    stack>> [ set-value-class ] 2reverse-each ;
-
 : finalize-phantoms ( -- )
     #! Commit all deferred stacking shuffling, and ensure the
     #! in-memory data and retain stacks are up to date with
@@ -318,5 +196,14 @@ M: loc lazy-store
 : phantom-rdrop ( n -- )
     phantom-retainstack get phantom-input drop ;
 
+: phantom-load ( n -- vreg )
+    phantom-datastack get phantom-input [ lazy-load ] map ;
+
 : phantom-pop ( -- vreg )
-    1 phantom-datastack get phantom-input first f (lazy-load) ;
+    1 phantom-load first ;
+
+: 2phantom-pop ( -- vreg1 vreg2 )
+    2 phantom-load first2 ;
+
+: 3phantom-pop ( -- vreg1 vreg2 vreg3 )
+    3 phantom-load first3 ;

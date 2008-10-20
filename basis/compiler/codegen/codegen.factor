@@ -4,26 +4,21 @@ USING: namespaces make math math.parser sequences accessors
 kernel kernel.private layouts assocs words summary arrays
 combinators classes.algebra alien alien.c-types alien.structs
 alien.strings alien.arrays sets threads libc continuations.private
-cpu.architecture
+fry cpu.architecture
 compiler.errors
 compiler.alien
-compiler.codegen.fixup
 compiler.cfg
 compiler.cfg.instructions
 compiler.cfg.registers
-compiler.cfg.builder ;
+compiler.cfg.builder
+compiler.codegen.fixup ;
 IN: compiler.codegen
 
 GENERIC: generate-insn ( insn -- )
 
-GENERIC: v>operand ( obj -- operand )
-
 SYMBOL: registers
 
-M: constant v>operand
-    value>> [ tag-fixnum ] [ \ f tag-number ] if* ;
-
-M: value v>operand
+: register ( vreg -- operand )
     registers get at [ "Bad value" throw ] unless* ;
 
 : generate-insns ( insns -- code )
@@ -68,124 +63,142 @@ SYMBOL: labels
 : lookup-label ( id -- label )
     labels get [ drop <label> ] cache ;
 
-M: _label generate-insn
-    id>> lookup-label , ;
+M: ##load-immediate generate-insn
+    [ dst>> register ] [ obj>> ] bi %load-immediate ;
 
-M: _prologue generate-insn
-    stack-frame>> [ stack-frame set ] [ total-size>> %prologue ] bi ;
-
-M: _epilogue generate-insn
-    stack-frame>> total-size>> %epilogue ;
-
-M: ##load-literal generate-insn
-    [ obj>> ] [ dst>> v>operand ] bi load-literal ;
+M: ##load-indirect generate-insn
+    [ dst>> register ] [ obj>> ] bi %load-indirect ;
 
 M: ##peek generate-insn
-    [ dst>> v>operand ] [ loc>> ] bi %peek ;
+    [ dst>> register ] [ loc>> ] bi %peek ;
 
 M: ##replace generate-insn
-    [ src>> v>operand ] [ loc>> ] bi %replace ;
+    [ src>> register ] [ loc>> ] bi %replace ;
 
 M: ##inc-d generate-insn n>> %inc-d ;
 
 M: ##inc-r generate-insn n>> %inc-r ;
 
-M: ##return generate-insn drop %return ;
-
 M: ##call generate-insn word>> [ add-call ] [ %call ] bi ;
 
 M: ##jump generate-insn word>> [ add-call ] [ %jump-label ] bi ;
 
-SYMBOL: operands
-
-: init-intrinsic ( insn -- )
-    [ defs-vregs>> ] [ uses-vregs>> ] bi append operands set ;
-
-M: ##intrinsic generate-insn
-    [ init-intrinsic ] [ quot>> call ] bi ;
-
-: (operand) ( name -- operand )
-    operands get at* [ "Bad operand name" throw ] unless ;
-
-: literal ( name -- value )
-    (operand) value>> ;
-
-: operand ( name -- operand )
-    (operand) v>operand ;
-
-: operand-class ( var -- class )
-    (operand) value-class ;
-
-: operand-tag ( operand -- tag/f )
-    operand-class dup [ class-tag ] when ;
-
-: operand-immediate? ( operand -- ? )
-    operand-class immediate class<= ;
-
-: unique-operands ( operands quot -- )
-    >r [ operand ] map prune r> each ; inline
-
-M: _if-intrinsic generate-insn
-    [ init-intrinsic ]
-    [ [ label>> lookup-label ] [ quot>> ] bi call ] bi ;
-
-M: _branch generate-insn
-    label>> lookup-label %jump-label ;
-
-M: _branch-f generate-insn
-    [ label>> lookup-label ] [ src>> v>operand ] bi %jump-f ;
-
-M: _branch-t generate-insn
-    [ label>> lookup-label ] [ src>> v>operand ] bi %jump-t ;
+M: ##return generate-insn drop %return ;
 
 M: ##dispatch-label generate-insn label>> %dispatch-label ;
 
 M: ##dispatch generate-insn
-    [ src>> v>operand ] [ temp>> v>operand ] bi %dispatch ;
+    [ src>> register ] [ temp>> register ] bi %dispatch ;
+
+: >slot<
+    {
+        [ dst>> register ]
+        [ obj>> register ]
+        [ slot>> dup vreg? [ register ] when ]
+        [ tag>> ]
+    } cleave ; inline
+
+M: ##slot generate-insn >slot< %slot ;
+
+M: ##slot-imm generate-insn >slot< %slot-imm ;
+
+: >set-slot<
+    {
+        [ src>> register ]
+        [ obj>> register ]
+        [ slot>> dup vreg? [ register ] when ]
+        [ tag>> ]
+    } cleave ; inline
+
+M: ##set-slot generate-insn >set-slot< %set-slot ;
+
+M: ##set-slot-imm generate-insn >set-slot< %set-slot-imm ;
 
 : dst/src ( insn -- dst src )
-    [ dst>> v>operand ] [ src>> v>operand ] bi ;
+    [ dst>> register ] [ src>> register ] bi ; inline
 
-M: ##copy generate-insn dst/src %copy ;
+: dst/src1/src2 ( insn -- dst src1 src2 )
+    [ dst>> register ] [ src1>> register ] [ src2>> register ] tri ; inline
 
-M: ##copy-float generate-insn dst/src %copy-float ;
-
-M: ##unbox-float generate-insn dst/src %unbox-float ;
-
-M: ##unbox-f generate-insn dst/src %unbox-f ;
-
-M: ##unbox-alien generate-insn dst/src %unbox-alien ;
-
-M: ##unbox-byte-array generate-insn dst/src %unbox-byte-array ;
-
-M: ##unbox-any-c-ptr generate-insn dst/src %unbox-any-c-ptr ;
+M: ##add     generate-insn dst/src1/src2 %add     ;
+M: ##add-imm generate-insn dst/src1/src2 %add-imm ;
+M: ##sub     generate-insn dst/src1/src2 %sub     ;
+M: ##sub-imm generate-insn dst/src1/src2 %sub-imm ;
+M: ##mul     generate-insn dst/src1/src2 %mul     ;
+M: ##mul-imm generate-insn dst/src1/src2 %mul-imm ;
+M: ##and     generate-insn dst/src1/src2 %and     ;
+M: ##and-imm generate-insn dst/src1/src2 %and-imm ;
+M: ##or      generate-insn dst/src1/src2 %or      ;
+M: ##or-imm  generate-insn dst/src1/src2 %or-imm  ;
+M: ##xor     generate-insn dst/src1/src2 %xor     ;
+M: ##xor-imm generate-insn dst/src1/src2 %xor-imm ;
+M: ##shl-imm generate-insn dst/src1/src2 %shl-imm ;
+M: ##shr-imm generate-insn dst/src1/src2 %shr-imm ;
+M: ##sar-imm generate-insn dst/src1/src2 %sar-imm ;
+M: ##not     generate-insn dst/src       %not     ;
 
 : dst/src/temp ( insn -- dst src temp )
-    [ dst/src ] [ temp>> v>operand ] bi ;
+    [ dst/src ] [ temp>> register ] bi ; inline
 
-M: ##box-float generate-insn dst/src/temp %box-float ;
+M: ##integer>bignum generate-insn dst/src/temp %integer>bignum ;
+M: ##bignum>integer generate-insn dst/src %bignum>integer ;
 
-M: ##box-alien generate-insn dst/src/temp %box-alien ;
+M: ##add-float generate-insn dst/src1/src2 %add-float ;
+M: ##sub-float generate-insn dst/src1/src2 %sub-float ;
+M: ##mul-float generate-insn dst/src1/src2 %mul-float ;
+M: ##div-float generate-insn dst/src1/src2 %div-float ;
+
+M: ##integer>float generate-insn dst/src/temp %integer>float ;
+M: ##float>integer generate-insn dst/src %float>integer ;
+
+M: ##copy             generate-insn dst/src %copy             ;
+M: ##copy-float       generate-insn dst/src %copy-float       ;
+M: ##unbox-float      generate-insn dst/src %unbox-float      ;
+M: ##unbox-f          generate-insn dst/src %unbox-f          ;
+M: ##unbox-alien      generate-insn dst/src %unbox-alien      ;
+M: ##unbox-byte-array generate-insn dst/src %unbox-byte-array ;
+M: ##unbox-any-c-ptr  generate-insn dst/src %unbox-any-c-ptr  ;
+M: ##box-float        generate-insn dst/src/temp %box-float   ;
+M: ##box-alien        generate-insn dst/src/temp %box-alien   ;
+
+M: ##alien-unsigned-1 generate-insn dst/src %alien-unsigned-1 ;
+M: ##alien-unsigned-2 generate-insn dst/src %alien-unsigned-2 ;
+M: ##alien-unsigned-4 generate-insn dst/src %alien-unsigned-4 ;
+M: ##alien-signed-1   generate-insn dst/src %alien-signed-1   ;
+M: ##alien-signed-2   generate-insn dst/src %alien-signed-2   ;
+M: ##alien-signed-3   generate-insn dst/src %alien-signed-3   ;
+M: ##alien-cell       generate-insn dst/src %alien-cell       ;
+M: ##alien-float      generate-insn dst/src %alien-float      ;
+M: ##alien-double     generate-insn dst/src %alien-double     ;
+
+: >alien-setter< [ src>> register ] [ value>> register ] bi ;
+
+M: ##set-alien-integer-1 generate-insn >alien-setter< %set-alien-integer-1 ;
+M: ##set-alien-integer-2 generate-insn >alien-setter< %set-alien-integer-2 ;
+M: ##set-alien-integer-4 generate-insn >alien-setter< %set-alien-integer-4 ;
+M: ##set-alien-cell      generate-insn >alien-setter< %set-alien-cell      ;
+M: ##set-alien-float     generate-insn >alien-setter< %set-alien-float     ;
+M: ##set-alien-double    generate-insn >alien-setter< %set-alien-double    ;
 
 M: ##allot generate-insn
     {
-        [ dst>> v>operand ]
+        [ dst>> register ]
         [ size>> ]
         [ type>> ]
         [ tag>> ]
-        [ temp>> v>operand ]
+        [ temp>> register ]
     } cleave
     %allot ;
 
 M: ##write-barrier generate-insn
-    [ src>> v>operand ]
-    [ card#>> v>operand ]
-    [ table>> v>operand ]
+    [ src>> register ]
+    [ card#>> register ]
+    [ table>> register ]
     tri %write-barrier ;
 
 M: ##gc generate-insn drop %gc ;
 
-! #alien-invoke
+! ##alien-invoke
 GENERIC: reg-size ( register-class -- n )
 
 M: int-regs reg-size drop cell ;
@@ -276,7 +289,7 @@ M: long-long-type flatten-value-type ( type -- types )
     >r
     alien-parameters
     flatten-value-types
-    r> [ >r alloc-parameter r> execute ] curry each-parameter ;
+    r> '[ alloc-parameter _ execute ] each-parameter ;
     inline
 
 : unbox-parameters ( offset node -- )
@@ -331,7 +344,7 @@ M: no-such-symbol compiler-error-type
 
 : check-dlsym ( symbols dll -- )
     dup dll-valid? [
-        dupd [ dlsym ] curry contains?
+        dupd '[ _ dlsym ] contains?
         [ drop ] [ no-such-symbol ] if
     ] [
         dll-path no-such-library drop
@@ -407,7 +420,7 @@ TUPLE: callback-context ;
 : callback-return-quot ( ctype -- quot )
     return>> {
         { [ dup "void" = ] [ drop [ ] ] }
-        { [ dup large-struct? ] [ heap-size [ memcpy ] curry ] }
+        { [ dup large-struct? ] [ heap-size '[ _ memcpy ] ] }
         [ c-type c-type-unboxer-quot ]
     } cond ;
 
@@ -435,6 +448,32 @@ M: ##alien-callback generate-insn
     [ wrap-callback-quot %alien-callback ]
     [ alien-return [ %unnest-stacks ] [ %callback-value ] if-void ]
     tri ;
+
+M: _prologue generate-insn
+    stack-frame>> [ stack-frame set ] [ total-size>> %prologue ] bi ;
+
+M: _epilogue generate-insn
+    stack-frame>> total-size>> %epilogue ;
+
+M: _label generate-insn
+    id>> lookup-label , ;
+
+M: _branch generate-insn
+    label>> lookup-label %jump-label ;
+
+: >binary-branch< ( insn -- label src1 src2 cc )
+    {
+        [ label>> lookup-label ]
+        [ src1>> register ]
+        [ src2>> dup vreg? [ register ] when ]
+        [ cc>> ]
+    } cleave ;
+
+M: _binary-branch generate-insn
+    >binary-branch< %binary-branch ;
+
+M: _binary-imm-branch generate-insn
+    >binary-branch< %binary-imm-branch ;
 
 M: _spill generate-insn
     [ src>> ] [ n>> ] [ class>> ] tri {

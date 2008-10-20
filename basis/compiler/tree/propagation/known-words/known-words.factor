@@ -277,7 +277,7 @@ generic-comparison-ops [
         }
     } cond
     [ fixnum fits? fixnum integer ? ] keep <class/interval-info>
-    [ 2nip ] curry "outputs" set-word-prop
+    '[ 2drop _ ] "outputs" set-word-prop
 ] each
 
 { <tuple> <tuple-boa> (tuple) } [
