@@ -68,8 +68,7 @@ TUPLE: file-responder root hook special allow-listings ;
         [ <h1> file-name escape-string write </h1> ]
         [
             <ul>
-                directory-files 
-                [ <li> file. </li> ] assoc-each
+                directory-files [ <li> file. </li> ] each
             </ul>
         ] bi
     ] simple-page ;
