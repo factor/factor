@@ -212,8 +212,10 @@ M: vocab-link summary vocab-summary ;
     ] with-directory-files natural-sort ;
 
 : (all-child-vocabs) ( root name -- vocabs )
-    [ vocab-dir append-path subdirs ] keep
     [
+        vocab-dir append-path dup exists?
+        [ subdirs ] [ drop { } ] if
+    ] keep [
         swap [ "." swap 3append ] with map
     ] unless-empty ;
 

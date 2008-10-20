@@ -153,7 +153,8 @@ PRIVATE>
     "." last-split1 nip ;
 
 ! File info
-TUPLE: file-info type size permissions created modified accessed ;
+TUPLE: file-info type size permissions created modified
+accessed ;
 
 HOOK: file-info io-backend ( path -- info )
 
@@ -180,6 +181,12 @@ SYMBOL: +unknown+
 : exists? ( path -- ? ) normalize-path (exists?) ;
 
 : directory? ( file-info -- ? ) type>> +directory+ = ;
+
+! File-system
+
+TUPLE: file-system-info mount-on free-space ;
+
+HOOK: file-system-info os ( path -- file-system-info )
 
 <PRIVATE
 
