@@ -115,12 +115,6 @@ C-STRUCT: vfsquery
 : NFSV2_MAX_FH_SIZE 32 ; inline
 : NFS_MAX_FH_SIZE NFSV4_MAX_FH_SIZE ; inline
 
-! C-STRUCT: fhandle
-    ! { "int" "fh_len" }
-    ! { { "uchar" NFS_MAX_FH_SIZE } "fh_data" } ;
-
-! TYPEDEF: fhandle fhandle_t
-
 : MFSNAMELEN 15 ; inline
 : MNAMELEN 90 ; inline
 : MFSTYPENAMELEN 16 ; inline
