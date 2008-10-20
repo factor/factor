@@ -1,6 +1,4 @@
-
 USING: kernel alien.syntax math ;
-
 IN: unix.stat
 
 ! Ubuntu 8.04 32-bit
@@ -42,4 +40,3 @@ C-STRUCT: statfs
     { "long"    "f_ffree" }
     { "fsid_t"  "f_fsid" }
     { "long"    "f_namelen" } ;
-
