@@ -59,11 +59,6 @@ TUPLE: fstab spec file vfstype mntops type freq passno ;
         [ fstab-fs_passno >>passno ]
     } cleave ;
 
-C-STRUCT: fsid
-    { { "int" 2 } "__val" } ;
-
-TYPEDEF: fsid __fsid_t
-
 TYPEDEF: ssize_t __SWORD_TYPE
 TYPEDEF: ulonglong __fsblkcnt64_t
 TYPEDEF: ulonglong __fsfilcnt64_t
