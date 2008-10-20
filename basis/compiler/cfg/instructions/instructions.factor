@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: assocs accessors arrays kernel sequences namespaces words
 math math.order layouts classes.algebra alien byte-arrays
-combinators compiler.cfg.registers
+compiler.constants combinators compiler.cfg.registers
 compiler.cfg.instructions.syntax ;
 IN: compiler.cfg.instructions
 
@@ -17,7 +17,7 @@ TUPLE: ##flushable < insn { dst vreg } ;
 TUPLE: ##pure < ##flushable ;
 
 TUPLE: ##unary < ##pure { src vreg } ;
-TUPLE: ##boxer < ##unary { temp vreg } ;
+TUPLE: ##unary/temp < ##unary { temp vreg } ;
 TUPLE: ##binary < ##pure { src1 vreg } { src2 vreg } ;
 TUPLE: ##binary-imm < ##pure { src1 vreg } { src2 integer } ;
 TUPLE: ##commutative < ##binary ;
@@ -65,9 +65,9 @@ INSN: ##dispatch src temp ;
 INSN: ##dispatch-label label ;
 
 ! Slot access
-INSN: ##slot < ##read { obj vreg } { slot vreg } { tag integer } ;
+INSN: ##slot < ##read { obj vreg } { slot vreg } { tag integer } { temp vreg } ;
 INSN: ##slot-imm < ##read { obj vreg } { slot integer } { tag integer } ;
-INSN: ##set-slot < ##write { obj vreg } { slot vreg } { tag integer } ;
+INSN: ##set-slot < ##write { obj vreg } { slot vreg } { tag integer } { temp vreg } ;
 INSN: ##set-slot-imm < ##write { obj vreg } { slot integer } { tag integer } ;
 
 ! Integer arithmetic
@@ -89,8 +89,8 @@ INSN: ##sar-imm < ##binary-imm ;
 INSN: ##not < ##unary ;
 
 ! Bignum/integer conversion
-INSN: ##integer>bignum < ##boxer ;
-INSN: ##bignum>integer < ##unary ;
+INSN: ##integer>bignum < ##unary/temp ;
+INSN: ##bignum>integer < ##unary/temp ;
 
 ! Float arithmetic
 INSN: ##add-float < ##commutative ;
@@ -106,20 +106,21 @@ INSN: ##integer>float < ##unary ;
 INSN: ##copy < ##unary ;
 INSN: ##copy-float < ##unary ;
 INSN: ##unbox-float < ##unary ;
-INSN: ##unbox-f < ##unary ;
-INSN: ##unbox-alien < ##unary ;
-INSN: ##unbox-byte-array < ##unary ;
-INSN: ##unbox-any-c-ptr < ##unary ;
-INSN: ##box-float < ##boxer ;
-INSN: ##box-alien < ##boxer ;
+INSN: ##unbox-any-c-ptr < ##unary/temp ;
+INSN: ##box-float < ##unary/temp ;
+INSN: ##box-alien < ##unary/temp ;
 
-: ##unbox-c-ptr ( dst src class -- )
+: ##unbox-f ( dst src -- ) drop 0 ##load-immediate ;
+: ##unbox-byte-array ( dst src -- ) byte-array-offset ##add-imm ;
+: ##unbox-alien ( dst src -- ) 3 object tag-number ##slot-imm ;
+
+: ##unbox-c-ptr ( dst src class temp -- )
     {
-        { [ dup \ f class<= ] [ drop ##unbox-f ] }
-        { [ dup simple-alien class<= ] [ drop ##unbox-alien ] }
-        { [ dup byte-array class<= ] [ drop ##unbox-byte-array ] }
-        [ drop ##unbox-any-c-ptr ]
-    } cond ; inline
+        { [ over \ f class<= ] [ 2drop ##unbox-f ] }
+        { [ over simple-alien class<= ] [ 2drop ##unbox-alien ] }
+        { [ over byte-array class<= ] [ 2drop ##unbox-byte-array ] }
+        [ nip ##unbox-any-c-ptr ]
+    } cond ;
 
 ! Alien accessors
 INSN: ##alien-unsigned-1 < ##alien-getter ;
@@ -127,7 +128,7 @@ INSN: ##alien-unsigned-2 < ##alien-getter ;
 INSN: ##alien-unsigned-4 < ##alien-getter ;
 INSN: ##alien-signed-1 < ##alien-getter ;
 INSN: ##alien-signed-2 < ##alien-getter ;
-INSN: ##alien-signed-3 < ##alien-getter ;
+INSN: ##alien-signed-4 < ##alien-getter ;
 INSN: ##alien-cell < ##alien-getter ;
 INSN: ##alien-float < ##alien-getter ;
 INSN: ##alien-double < ##alien-getter ;
@@ -174,11 +175,16 @@ SYMBOL: cc/=
         { cc/= { +lt+      +gt+ } }
     } at memq? ;
 
-INSN: ##binary-branch { src1 vreg } { src2 vreg } cc ;
-INSN: ##binary-imm-branch { src1 vreg } { src2 integer } cc ;
+TUPLE: ##conditional-branch < insn { src1 vreg } { src2 vreg } cc ;
 
-INSN: ##boolean < ##binary cc ;
-INSN: ##boolean-imm < ##binary-imm cc ;
+INSN: ##compare-branch < ##conditional-branch ;
+INSN: ##compare-imm-branch { src1 vreg } { src2 integer } cc ;
+
+INSN: ##compare < ##binary cc ;
+INSN: ##compare-imm < ##binary-imm cc ;
+
+INSN: ##compare-float-branch < ##conditional-branch ;
+INSN: ##compare-float < ##binary cc ;
 
 ! Instructions used by machine IR only.
 INSN: _prologue stack-frame ;
@@ -188,8 +194,12 @@ INSN: _label id ;
 
 INSN: _branch label ;
 
-INSN: _binary-branch label { src1 vreg } { src2 vreg } cc ;
-INSN: _binary-imm-branch label { src1 vreg } { src2 integer } cc ;
+TUPLE: _conditional-branch < insn label { src1 vreg } { src2 vreg } cc ;
+
+INSN: _compare-branch < _conditional-branch ;
+INSN: _compare-imm-branch label { src1 vreg } { src2 integer } cc ;
+
+INSN: _compare-float-branch < _conditional-branch ;
 
 ! These instructions operate on machine registers and not
 ! virtual registers

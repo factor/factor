@@ -98,9 +98,11 @@ M: ##dispatch generate-insn
         [ tag>> ]
     } cleave ; inline
 
-M: ##slot generate-insn >slot< %slot ;
+M: ##slot generate-insn
+    [ >slot< ] [ temp>> register ] bi %slot ;
 
-M: ##slot-imm generate-insn >slot< %slot-imm ;
+M: ##slot-imm generate-insn
+    >slot< %slot-imm ;
 
 : >set-slot<
     {
@@ -110,9 +112,11 @@ M: ##slot-imm generate-insn >slot< %slot-imm ;
         [ tag>> ]
     } cleave ; inline
 
-M: ##set-slot generate-insn >set-slot< %set-slot ;
+M: ##set-slot generate-insn
+    [ >set-slot< ] [ temp>> register ] bi %set-slot ;
 
-M: ##set-slot-imm generate-insn >set-slot< %set-slot-imm ;
+M: ##set-slot-imm generate-insn
+    >set-slot< %set-slot-imm ;
 
 : dst/src ( insn -- dst src )
     [ dst>> register ] [ src>> register ] bi ; inline
@@ -154,9 +158,6 @@ M: ##float>integer generate-insn dst/src %float>integer ;
 M: ##copy             generate-insn dst/src %copy             ;
 M: ##copy-float       generate-insn dst/src %copy-float       ;
 M: ##unbox-float      generate-insn dst/src %unbox-float      ;
-M: ##unbox-f          generate-insn dst/src %unbox-f          ;
-M: ##unbox-alien      generate-insn dst/src %unbox-alien      ;
-M: ##unbox-byte-array generate-insn dst/src %unbox-byte-array ;
 M: ##unbox-any-c-ptr  generate-insn dst/src %unbox-any-c-ptr  ;
 M: ##box-float        generate-insn dst/src/temp %box-float   ;
 M: ##box-alien        generate-insn dst/src/temp %box-alien   ;
@@ -166,7 +167,7 @@ M: ##alien-unsigned-2 generate-insn dst/src %alien-unsigned-2 ;
 M: ##alien-unsigned-4 generate-insn dst/src %alien-unsigned-4 ;
 M: ##alien-signed-1   generate-insn dst/src %alien-signed-1   ;
 M: ##alien-signed-2   generate-insn dst/src %alien-signed-2   ;
-M: ##alien-signed-3   generate-insn dst/src %alien-signed-3   ;
+M: ##alien-signed-4   generate-insn dst/src %alien-signed-4   ;
 M: ##alien-cell       generate-insn dst/src %alien-cell       ;
 M: ##alien-float      generate-insn dst/src %alien-float      ;
 M: ##alien-double     generate-insn dst/src %alien-double     ;
@@ -461,19 +462,22 @@ M: _label generate-insn
 M: _branch generate-insn
     label>> lookup-label %jump-label ;
 
-: >binary-branch< ( insn -- label src1 src2 cc )
+: >binary-branch< ( insn -- label cc src1 src2 )
     {
         [ label>> lookup-label ]
+        [ cc>> ]
         [ src1>> register ]
         [ src2>> dup vreg? [ register ] when ]
-        [ cc>> ]
     } cleave ;
 
-M: _binary-branch generate-insn
-    >binary-branch< %binary-branch ;
+M: _compare-branch generate-insn
+    >binary-branch< %compare-branch ;
 
-M: _binary-imm-branch generate-insn
-    >binary-branch< %binary-imm-branch ;
+M: _compare-imm-branch generate-insn
+    >binary-branch< %compare-imm-branch ;
+
+M: _compare-float-branch generate-insn
+    >binary-branch< %compare-float-branch ;
 
 M: _spill generate-insn
     [ src>> ] [ n>> ] [ class>> ] tri {

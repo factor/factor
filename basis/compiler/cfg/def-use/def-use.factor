@@ -7,11 +7,11 @@ IN: compiler.cfg.def-use
 GENERIC: defs-vregs ( insn -- seq )
 GENERIC: uses-vregs ( insn -- seq )
 
-: allot-defs-vregs ( insn -- seq ) [ dst>> ] [ temp>> ] bi 2array ;
+: dst/tmp-vregs ( insn -- seq ) [ dst>> ] [ temp>> ] bi 2array ;
 M: ##flushable defs-vregs dst>> 1array ;
 M: ##write-barrier defs-vregs [ card#>> ] [ table>> ] bi 2array ;
-M: ##boxer defs-vregs allot-defs-vregs ;
-M: ##allot defs-vregs allot-defs-vregs ;
+M: ##unary/temp defs-vregs dst/tmp-vregs ;
+M: ##allot defs-vregs dst/tmp-vregs ;
 M: ##dispatch defs-vregs temp>> 1array ;
 M: insn defs-vregs drop f ;
 
@@ -23,9 +23,9 @@ M: ##slot uses-vregs [ obj>> ] [ slot>> ] bi 2array ;
 M: ##slot-imm uses-vregs obj>> 1array ;
 M: ##set-slot uses-vregs [ src>> ] [ obj>> ] [ slot>> ] tri 3array ;
 M: ##set-slot-imm uses-vregs [ src>> ] [ obj>> ] bi 2array ;
-M: ##binary-branch uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
-M: ##binary-imm-branch uses-vregs src1>> 1array ;
+M: ##conditional-branch uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
+M: ##compare-imm-branch uses-vregs src1>> 1array ;
 M: ##dispatch uses-vregs src>> 1array ;
-M: _binary-branch uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
-M: _binary-imm-branch uses-vregs src1>> 1array ;
+M: _conditional-branch uses-vregs [ src1>> ] [ src2>> ] bi 2array ;
+M: _compare-imm-branch uses-vregs src1>> 1array ;
 M: insn uses-vregs drop f ;

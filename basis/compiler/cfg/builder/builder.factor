@@ -139,7 +139,7 @@ M: #recursive emit-node
     init-phantoms ;
 
 : ##branch-t ( vreg -- )
-    \ f tag-number cc/= ##binary-imm-branch ;
+    \ f tag-number cc/= ##compare-imm-branch ;
 
 M: #if emit-node
     phantom-pop ##branch-t emit-if iterate-next ;
@@ -168,7 +168,9 @@ M: #if emit-node
 
 : emit-dispatch ( node -- )
     phantom-pop int-regs next-vreg
-    [ finalize-phantoms ##epilogue ] 2dip ##dispatch
+    [ finalize-phantoms ##epilogue ] 2dip
+    [ ^^offset>slot ] dip
+    ##dispatch
     dispatch-branches init-phantoms ;
 
 : <dispatch-block> ( -- word )

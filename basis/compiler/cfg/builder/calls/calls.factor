@@ -85,8 +85,6 @@ IN: compiler.cfg.builder.calls
 : emit-tag ( -- )
     phantom-pop tag-mask get ^^and-imm ^^tag-fixnum phantom-push ;
 
-: ^^offset>slot ( vreg -- vreg' ) cell 4 = [ 1 ^^shr-imm ] when ;
-
 : (emit-slot) ( infos -- dst )
     [ 2phantom-pop ] [ third literal>> ] bi*
     ^^slot ;
@@ -108,7 +106,7 @@ IN: compiler.cfg.builder.calls
 
 : (emit-set-slot) ( infos -- )
     [ 3phantom-pop ] [ fourth literal>> ] bi*
-    ##set-slot ;
+    ^^set-slot ;
 
 : (emit-set-slot-imm) ( infos -- )
     1 phantom-drop
@@ -136,6 +134,7 @@ IN: compiler.cfg.builder.calls
         [ infos imm-insn (emit-fixnum-imm-op) ]
         [ insn (emit-fixnum-op) ]
         if
+        phantom-push
     ] ; inline
 
 : emit-primitive ( node -- )
@@ -170,7 +169,7 @@ IN: compiler.cfg.builder.calls
     phantom-push ;
 
 : emit-fixnum-comparison ( node cc -- )
-    [ '[ _ ##boolean ] ] [ '[ _ ##boolean-imm ] ] bi
+    [ '[ _ ^^compare ] ] [ '[ _ ^^compare-imm ] ] bi
     emit-fixnum-op ;
 
 : emit-bignum>fixnum ( -- )
@@ -180,10 +179,12 @@ IN: compiler.cfg.builder.calls
     phantom-pop ^^untag-fixnum ^^integer>bignum phantom-push ;
 
 : emit-float-op ( insn -- )
-    [ 2phantom-pop [ ^^unbox-float ] bi@ ] dip call ^^box-float ; inline
+    [ 2phantom-pop [ ^^unbox-float ] bi@ ] dip call ^^box-float
+    phantom-push ; inline
 
 : emit-float-comparison ( cc -- )
-    '[ _ ##boolean ] emit-float-op ;
+    [ 2phantom-pop [ ^^unbox-float ] bi@ ] dip ^^compare-float
+    phantom-push ; inline
 
 : emit-float>fixnum ( -- )
     phantom-pop ^^unbox-float ^^float>integer ^^tag-fixnum phantom-push ;

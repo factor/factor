@@ -43,11 +43,14 @@ M: ##branch linearize-insn
 : binary-conditional ( basic-block insn -- basic-block successor label2 src1 src2 cc )
     [ conditional ] [ [ src1>> ] [ src2>> ] [ cc>> ] tri ] bi* ; inline
 
-M: ##binary-branch linearize-insn
-    binary-conditional _binary-branch emit-branch ;
+M: ##compare-branch linearize-insn
+    binary-conditional _compare-branch emit-branch ;
 
-M: ##binary-imm-branch linearize-insn
-    binary-conditional _binary-imm-branch emit-branch ;
+M: ##compare-imm-branch linearize-insn
+    binary-conditional _compare-imm-branch emit-branch ;
+
+M: ##compare-float-branch linearize-insn
+    binary-conditional _compare-float-branch emit-branch ;
 
 : linearize-basic-block ( bb -- )
     [ number>> _label ] [ linearize-insns ] bi ;
