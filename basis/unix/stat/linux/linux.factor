@@ -1,5 +1,10 @@
-USING: layouts combinators vocabs.loader ;
+USING: alien.syntax layouts combinators vocabs.loader ;
 IN: unix.stat
+
+C-STRUCT: fsid
+    { { "int" 2 } "__val" } ;
+
+TYPEDEF: fsid __fsid_t
 
 cell-bits
 {
