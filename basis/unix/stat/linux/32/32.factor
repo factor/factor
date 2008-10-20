@@ -31,3 +31,15 @@ FUNCTION: int __lxstat ( int ver, char* pathname, stat* buf ) ;
 
 :  stat ( pathname buf -- int ) 3 -rot __xstat ;
 : lstat ( pathname buf -- int ) 3 -rot __lxstat ;
+
+C-STRUCT: statfs
+    { "long"    "f_type" }
+    { "long"    "f_bsize" }
+    { "long"    "f_blocks" }
+    { "long"    "f_bfree" }
+    { "long"    "f_bavail" }
+    { "long"    "f_files" }
+    { "long"    "f_ffree" }
+    { "fsid_t"  "f_fsid" }
+    { "long"    "f_namelen" } ;
+
