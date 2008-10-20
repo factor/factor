@@ -8,6 +8,7 @@ TYPEDEF: __uint32_t     dev_t
 TYPEDEF: __uint32_t     mode_t
 TYPEDEF: __uint32_t     nlink_t
 TYPEDEF: __uint32_t     uid_t
+TYPEDEF: __uint32_t     __uid_t
 TYPEDEF: __uint32_t     gid_t
 TYPEDEF: __int64_t      off_t
 TYPEDEF: __int64_t      blkcnt_t
@@ -15,6 +16,13 @@ TYPEDEF: __uint32_t     blksize_t
 TYPEDEF: long           ssize_t
 TYPEDEF: int            pid_t
 TYPEDEF: int            time_t
+
+
+TYPEDEF: __uint64_t    fsblkcnt_t
+TYPEDEF: fsblkcnt_t      __fsblkcnt_t    
+
+TYPEDEF: __uint64_t    fsfilcnt_t
+TYPEDEF: fsfilcnt_t     __fsfilcnt_t
 
 cell-bits {
     { 32 [ "unix.types.netbsd.32" require ] }
