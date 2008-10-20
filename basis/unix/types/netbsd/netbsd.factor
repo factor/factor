@@ -17,7 +17,6 @@ TYPEDEF: long           ssize_t
 TYPEDEF: int            pid_t
 TYPEDEF: int            time_t
 
-
 TYPEDEF: __uint64_t    fsblkcnt_t
 TYPEDEF: fsblkcnt_t      __fsblkcnt_t    
 
