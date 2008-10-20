@@ -5,6 +5,7 @@ C-STRUCT: fsid
     { { "int" 2 } "__val" } ;
 
 TYPEDEF: fsid __fsid_t
+TYPEDEF: fsid fsid_t
 
 cell-bits
 {
