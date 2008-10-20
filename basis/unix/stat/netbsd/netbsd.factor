@@ -29,7 +29,7 @@ C-STRUCT: statvfs
     { "fsid_t"    "f_fsidx" }
     { "ulong"   "f_fsid" }
     { "ulong"   "f_namemax" }      
-    { "uid_t""   "f_owner" }
+    { "uid_t"   "f_owner" }
     { { "uint32_t" 4 } "f_spare" }     
     { { "char" _VFS_NAMELEN } "f_fstypename" }
     { { "char" _VFS_NAMELEN } "f_mntonname" }
