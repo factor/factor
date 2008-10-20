@@ -14,11 +14,11 @@ C-STRUCT: addrinfo
     { "addrinfo*" "next" } ;
 
 C-STRUCT: dirent
-    { "ino_t" "d_fileno" }
+    { "__uint32_t" "d_fileno" }
     { "__uint16_t" "d_reclen" }
-    { "__uint16_t"  "d_namlen" }
     { "__uint8_t"  "d_type" }
-    { { "char" 512 } "d_name" } ;
+    { "__uint8_t"  "d_namlen" }
+    { { "char" 256 } "d_name" } ;
 
 : DT_UNKNOWN       0 ; inline
 : DT_FIFO          1 ; inline
