@@ -1,6 +1,7 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax kernel ;
+USING: alien.syntax kernel unix io.files math accessors
+combinators system io.backend alien.c-types ;
 IN: unix.statfs.freebsd
 
 : ST_RDONLY       1 ; inline
@@ -19,6 +20,7 @@ C-STRUCT: statvfs
     { "ulong" "f_fsid" }
     { "ulong" "f_namemax" } ;
 
+FUNCTION: int statvfs ( char* path, statvfs* buf ) ;
 
 TUPLE: freebsd-file-system-info < file-system-info
 bavail bfree blocks favail ffree ffiles
@@ -28,20 +30,20 @@ bsize flag frsize fsid namemax ;
     [ \ freebsd-file-system-info new ] dip
     {
         [
-            [ statfs64-f_bsize ]
-            [ statfs64-f_bavail ] bi * >>free-space
+            [ statvfs-f_bsize ]
+            [ statvfs-f_bavail ] bi * >>free-space
         ]
-        [ statfs64-f_bavail >>bavail ]
-        [ statfs64-f_bfree >>bfree ]
-        [ statfs64-f_blocks >>blocks ]
-        [ statfs64-f_favail >>favail ]
-        [ statfs64-f_ffree >>ffree ]
-        [ statfs64-f_files >>files ]
-        [ statfs64-f_bsize >>bsize ]
-        [ statfs64-f_flag >>flag ]
-        [ statfs64-f_frsize >>frsize ]
-        [ statfs64-f_fsid >>fsid ]
-        [ statfs64-f_namelen >>namelen ]
+        [ statvfs-f_bavail >>bavail ]
+        [ statvfs-f_bfree >>bfree ]
+        [ statvfs-f_blocks >>blocks ]
+        [ statvfs-f_favail >>favail ]
+        [ statvfs-f_ffree >>ffree ]
+        [ statvfs-f_files >>files ]
+        [ statvfs-f_bsize >>bsize ]
+        [ statvfs-f_flag >>flag ]
+        [ statvfs-f_frsize >>frsize ]
+        [ statvfs-f_fsid >>fsid ]
+        [ statvfs-f_namemax >>namemax ]
     } cleave ;
 
 M: freebsd file-system-info ( path -- byte-array )
