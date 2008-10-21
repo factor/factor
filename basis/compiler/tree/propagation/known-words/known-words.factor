@@ -7,7 +7,6 @@ classes.algebra combinators generic.math splitting fry locals
 classes.tuple alien.accessors classes.tuple.private slots.private
 definitions
 stack-checker.state
-compiler.intrinsics
 compiler.tree.comparisons
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
@@ -280,7 +279,7 @@ generic-comparison-ops [
     '[ 2drop _ ] "outputs" set-word-prop
 ] each
 
-{ <tuple> <tuple-boa> (tuple) } [
+{ <tuple> <tuple-boa> } [
     [
         literal>> dup tuple-layout? [ class>> ] [ drop tuple ] if <class-info>
         [ clear ] dip
