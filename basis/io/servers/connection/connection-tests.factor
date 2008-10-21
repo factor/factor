@@ -27,25 +27,12 @@ concurrency.promises io.encodings.ascii io threads calendar ;
     init-server semaphore>> count>> 
 ] unit-test
 
-[ ] [ <promise> "p" set ] unit-test
-
 [ ] [
     <threaded-server>
         5 >>max-connections
-        1237 >>insecure
+        0 >>insecure
         [ "Hello world." write stop-this-server ] >>handler
-    "server" set
+    dup start-server* sockets>> first addr>> port>> "port" set
 ] unit-test
 
-[ ] [
-    [
-        "server" get start-server
-        t "p" get fulfill
-    ] in-thread
-] unit-test
-
-[ ] [ "server" get wait-for-server ] unit-test
-
-[ "Hello world." ] [ "localhost" 1237 <inet> ascii <client> drop contents ] unit-test
-
-[ t ] [ "p" get 2 seconds ?promise-timeout ] unit-test
+[ "Hello world." ] [ "localhost" "port" get <inet> ascii <client> drop contents ] unit-test

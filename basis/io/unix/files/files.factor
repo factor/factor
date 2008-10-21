@@ -142,7 +142,9 @@ os {
     [ opendir dup [ (io-error) ] unless ] dip
     dupd curry swap '[ _ closedir io-error ] [ ] cleanup ; inline
 
-: find-next-file ( DIR* -- byte-array )
+HOOK: find-next-file os ( DIR* -- byte-array )
+
+M: unix find-next-file ( DIR* -- byte-array )
     "dirent" <c-object>
     f <void*>
     [ readdir_r 0 = [ (io-error) ] unless ] 2keep
@@ -158,6 +160,8 @@ M: unix (directory-entries) ( path -- seq )
         [ >directory-entry ]
         [ drop ] produce
     ] with-unix-directory ;
+
+os openbsd = [ "io.unix.files.openbsd" require ] when
 
 <PRIVATE
 

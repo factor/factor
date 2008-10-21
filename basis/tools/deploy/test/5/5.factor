@@ -1,7 +1,10 @@
 IN: tools.deploy.test.5
-USING: http.client kernel ;
+USING: accessors urls io.encodings.ascii io.files math.parser
+http.client kernel ;
 
 : deploy-test-5 ( -- )
-    "http://localhost:1237/foo.html" http-get 2drop ;
+    URL" http://localhost/foo.html" clone
+    "resource:port-number" ascii file-contents string>number >>port
+    http-get 2drop ;
 
 MAIN: deploy-test-5
