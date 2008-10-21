@@ -1,18 +1,17 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: qualified kernel words sequences layouts namespaces
-accessors fry arrays byte-arrays locals math math.order
-combinators alien classes.algebra cpu.architecture
-compiler.tree.propagation.info
+USING: qualified words sequences kernel combinators
+cpu.architecture
 compiler.cfg.hats
-compiler.cfg.stacks
-compiler.cfg.registers
 compiler.cfg.instructions
 compiler.cfg.intrinsics.alien
 compiler.cfg.intrinsics.allot
 compiler.cfg.intrinsics.fixnum
 compiler.cfg.intrinsics.float
 compiler.cfg.intrinsics.slots ;
+QUALIFIED: kernel
+QUALIFIED: arrays
+QUALIFIED: byte-arrays
 QUALIFIED: kernel.private
 QUALIFIED: slots.private
 QUALIFIED: classes.tuple.private
@@ -36,15 +35,15 @@ IN: compiler.cfg.intrinsics
     math.private:fixnum>
     math.private:bignum>fixnum
     math.private:fixnum>bignum
-    eq?
+    kernel:eq?
     slots.private:slot
     slots.private:set-slot
     classes.tuple.private:<tuple-boa>
-    <array>
-    <byte-array>
+    arrays:<array>
+    byte-arrays:<byte-array>
     math.private:<complex>
     math.private:<ratio>
-    <wrapper>
+    kernel:<wrapper>
     alien.accessors:alien-unsigned-1
     alien.accessors:set-alien-unsigned-1
     alien.accessors:alien-signed-1
@@ -94,7 +93,7 @@ IN: compiler.cfg.intrinsics
         { \ math.private:fixnum<= [ cc<= emit-fixnum-comparison ] }
         { \ math.private:fixnum>= [ cc>= emit-fixnum-comparison ] }
         { \ math.private:fixnum> [ cc> emit-fixnum-comparison ] }
-        { \ eq? [ cc= emit-fixnum-comparison ] }
+        { \ kernel:eq? [ cc= emit-fixnum-comparison ] }
         { \ math.private:bignum>fixnum [ drop emit-bignum>fixnum ] }
         { \ math.private:fixnum>bignum [ drop emit-fixnum>bignum ] }
         { \ math.private:float+ [ drop [ ^^add-float ] emit-float-op ] }
@@ -111,11 +110,11 @@ IN: compiler.cfg.intrinsics
         { \ slots.private:slot [ emit-slot ] }
         { \ slots.private:set-slot [ emit-set-slot ] }
         { \ classes.tuple.private:<tuple-boa> [ emit-<tuple-boa> ] }
-        { \ <array> [ emit-<array> ] }
-        { \ <byte-array> [ emit-<byte-array> ] }
+        { \ arrays:<array> [ emit-<array> ] }
+        { \ byte-arrays:<byte-array> [ emit-<byte-array> ] }
         { \ math.private:<complex> [ emit-simple-allot ] }
         { \ math.private:<ratio> [ emit-simple-allot ] }
-        { \ <wrapper> [ emit-simple-allot ] }
+        { \ kernel:<wrapper> [ emit-simple-allot ] }
         { \ alien.accessors:alien-unsigned-1 [ 1 emit-alien-unsigned-getter ] }
         { \ alien.accessors:set-alien-unsigned-1 [ 1 emit-alien-integer-setter ] }
         { \ alien.accessors:alien-signed-1 [ 1 emit-alien-signed-getter ] }
