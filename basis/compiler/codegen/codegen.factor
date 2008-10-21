@@ -185,8 +185,7 @@ M: ##allot generate-insn
     {
         [ dst>> register ]
         [ size>> ]
-        [ type>> ]
-        [ tag>> ]
+        [ class>> ]
         [ temp>> register ]
     } cleave
     %allot ;
