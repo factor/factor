@@ -29,8 +29,8 @@ M: linux >file-system-info ( struct -- statfs )
         [ statfs64-f_ffree >>ffree ]
         [ statfs64-f_fsid >>fsid ]
         [ statfs64-f_namelen >>namelen ]
-        [ statfs64-f_frsize >>frsize ]
-        [ statfs64-f_spare >>spare ]
+        ! [ statfs64-f_frsize >>frsize ]
+        ! [ statfs64-f_spare >>spare ]
     } cleave ;
 
 M: linux file-system-info ( path -- byte-array )
