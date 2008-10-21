@@ -21,6 +21,9 @@ SYMBOL: registers
 : register ( vreg -- operand )
     registers get at [ "Bad value" throw ] unless* ;
 
+: ?register ( obj -- operand )
+    dup vreg? [ register ] when ;
+
 : generate-insns ( insns -- code )
     [
         [
@@ -64,7 +67,7 @@ SYMBOL: labels
     labels get [ drop <label> ] cache ;
 
 M: ##load-immediate generate-insn
-    [ dst>> register ] [ obj>> ] bi %load-immediate ;
+    [ dst>> register ] [ val>> ] bi %load-immediate ;
 
 M: ##load-indirect generate-insn
     [ dst>> register ] [ obj>> ] bi %load-indirect ;
@@ -94,7 +97,7 @@ M: ##dispatch generate-insn
     {
         [ dst>> register ]
         [ obj>> register ]
-        [ slot>> dup vreg? [ register ] when ]
+        [ slot>> ?register ]
         [ tag>> ]
     } cleave ; inline
 
@@ -108,7 +111,7 @@ M: ##slot-imm generate-insn
     {
         [ src>> register ]
         [ obj>> register ]
-        [ slot>> dup vreg? [ register ] when ]
+        [ slot>> ?register ]
         [ tag>> ]
     } cleave ; inline
 
@@ -122,7 +125,9 @@ M: ##set-slot-imm generate-insn
     [ dst>> register ] [ src>> register ] bi ; inline
 
 : dst/src1/src2 ( insn -- dst src1 src2 )
-    [ dst>> register ] [ src1>> register ] [ src2>> register ] tri ; inline
+    [ dst>> register ]
+    [ src1>> register ]
+    [ src2>> ?register ] tri ; inline
 
 M: ##add     generate-insn dst/src1/src2 %add     ;
 M: ##add-imm generate-insn dst/src1/src2 %add-imm ;
@@ -152,15 +157,15 @@ M: ##sub-float generate-insn dst/src1/src2 %sub-float ;
 M: ##mul-float generate-insn dst/src1/src2 %mul-float ;
 M: ##div-float generate-insn dst/src1/src2 %div-float ;
 
-M: ##integer>float generate-insn dst/src/temp %integer>float ;
+M: ##integer>float generate-insn dst/src %integer>float ;
 M: ##float>integer generate-insn dst/src %float>integer ;
 
-M: ##copy             generate-insn dst/src %copy             ;
-M: ##copy-float       generate-insn dst/src %copy-float       ;
-M: ##unbox-float      generate-insn dst/src %unbox-float      ;
-M: ##unbox-any-c-ptr  generate-insn dst/src %unbox-any-c-ptr  ;
-M: ##box-float        generate-insn dst/src/temp %box-float   ;
-M: ##box-alien        generate-insn dst/src/temp %box-alien   ;
+M: ##copy             generate-insn dst/src %copy ;
+M: ##copy-float       generate-insn dst/src %copy-float ;
+M: ##unbox-float      generate-insn dst/src %unbox-float ;
+M: ##unbox-any-c-ptr  generate-insn dst/src/temp %unbox-any-c-ptr ;
+M: ##box-float        generate-insn dst/src/temp %box-float ;
+M: ##box-alien        generate-insn dst/src/temp %box-alien ;
 
 M: ##alien-unsigned-1 generate-insn dst/src %alien-unsigned-1 ;
 M: ##alien-unsigned-2 generate-insn dst/src %alien-unsigned-2 ;
@@ -172,7 +177,7 @@ M: ##alien-cell       generate-insn dst/src %alien-cell       ;
 M: ##alien-float      generate-insn dst/src %alien-float      ;
 M: ##alien-double     generate-insn dst/src %alien-double     ;
 
-: >alien-setter< [ src>> register ] [ value>> register ] bi ;
+: >alien-setter< [ src>> register ] [ value>> register ] bi ; inline
 
 M: ##set-alien-integer-1 generate-insn >alien-setter< %set-alien-integer-1 ;
 M: ##set-alien-integer-2 generate-insn >alien-setter< %set-alien-integer-2 ;
@@ -461,13 +466,25 @@ M: _label generate-insn
 M: _branch generate-insn
     label>> lookup-label %jump-label ;
 
+: >compare< ( insn -- label cc src1 src2 )
+    {
+        [ dst>> register ]
+        [ cc>> ]
+        [ src1>> register ]
+        [ src2>> ?register ]
+    } cleave ; inline
+
+M: ##compare generate-insn >compare< %compare ;
+M: ##compare-imm generate-insn >compare< %compare-imm ;
+M: ##compare-float generate-insn >compare< %compare-float ;
+
 : >binary-branch< ( insn -- label cc src1 src2 )
     {
         [ label>> lookup-label ]
         [ cc>> ]
         [ src1>> register ]
-        [ src2>> dup vreg? [ register ] when ]
-    } cleave ;
+        [ src2>> ?register ]
+    } cleave ; inline
 
 M: _compare-branch generate-insn
     >binary-branch< %compare-branch ;

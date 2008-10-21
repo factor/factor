@@ -32,8 +32,13 @@ M: float-regs return-reg drop XMM0 ;
 M: float-regs param-regs
     drop { XMM0 XMM1 XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 } ;
 
-M: x86.64 %load-indirect
-    0 [] MOV rc-relative rel-literal ;
+M: x86.64 rel-literal-x86 rc-relative rel-literal ;
+
+M: x86.64 %prologue ( n -- )
+    temp-reg-1 0 MOV rc-absolute-cell rel-this
+    dup PUSH
+    temp-reg-1 PUSH
+    stack-reg swap 3 cells - SUB ;
 
 M: stack-params %load-param-reg
     drop
@@ -53,8 +58,8 @@ M: stack-params %save-param-reg
     ] with-scope ; inline
 
 ! The ABI for passing structs by value is pretty messed up
-"void*" c-type clone "__stack_value" define-primitive-type
-stack-params "__stack_value" c-type (>>reg-class)
+<< "void*" c-type clone "__stack_value" define-primitive-type
+stack-params "__stack_value" c-type (>>reg-class) >>
 
 : struct-types&offset ( struct-type -- pairs )
     fields>> [

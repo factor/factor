@@ -74,7 +74,7 @@ HOOK: %sar-imm cpu ( dst src1 src2 -- )
 HOOK: %not     cpu ( dst src -- )
 
 HOOK: %integer>bignum cpu ( dst src temp -- )
-HOOK: %bignum>integer cpu ( dst src temp -- )
+HOOK: %bignum>integer cpu ( dst src -- )
 
 HOOK: %add-float cpu ( dst src1 src2 -- )
 HOOK: %sub-float cpu ( dst src1 src2 -- )
@@ -114,6 +114,10 @@ HOOK: %gc cpu ( -- )
 
 HOOK: %prologue cpu ( n -- )
 HOOK: %epilogue cpu ( n -- )
+
+HOOK: %compare cpu ( dst cc src1 src2 -- )
+HOOK: %compare-imm cpu ( dst cc src1 src2 -- )
+HOOK: %compare-float cpu ( dst cc src1 src2 -- )
 
 HOOK: %compare-branch cpu ( label cc src1 src2 -- )
 HOOK: %compare-imm-branch cpu ( label cc src1 src2 -- )
@@ -193,7 +197,7 @@ M: stack-params param-reg drop ;
 M: stack-params param-regs drop f ;
 
 : if-small-struct ( n size true false -- ? )
-    [ 2dup [ not ] [ struct-small-enough? ] bi and ] 2dip
+    [ 2dup [ not ] [ struct-small-enough? ] bi* and ] 2dip
     [ '[ nip @ ] ] dip if ;
     inline
 

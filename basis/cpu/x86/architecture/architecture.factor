@@ -14,6 +14,10 @@ HOOK: temp-reg-2 cpu ( -- reg )
 
 M: x86 %load-immediate MOV ;
 
+HOOK: rel-literal-x86 cpu ( literal -- )
+
+M: x86 %load-indirect swap 0 [] MOV rel-literal-x86 ;
+
 HOOK: ds-reg cpu ( -- reg )
 HOOK: rs-reg cpu ( -- reg )
 
@@ -178,7 +182,7 @@ M: x86 %copy-float MOVSD ;
 M: x86 %unbox-float ( dst src -- )
     float-offset [+] MOVSD ;
 
-M:: x86 %unbox-any-c-ptr ( dst src dst temp -- )
+M:: x86 %unbox-any-c-ptr ( dst src temp -- )
     [
         { "is-byte-array" "end" "start" } [ define-label ] each
         dst 0 MOV
@@ -269,9 +273,9 @@ M:: x86 %box-alien ( dst src temp -- )
 
 : small-reg ( reg size -- reg' )
     {
-        { 1 small-reg-1 }
-        { 2 small-reg-2 }
-        { 4 small-reg-4 }
+        { 1 [ small-reg-1 ] }
+        { 2 [ small-reg-2 ] }
+        { 4 [ small-reg-4 ] }
     } case ;
 
 : small-regs ( -- regs ) { EAX ECX EDX EBX } ; inline
@@ -287,7 +291,7 @@ M:: x86 %box-alien ( dst src temp -- )
     #! call the quot with that. Otherwise, we find a small
     #! register that is not equal to src, and call quot, saving
     #! and restoring the small register.
-    dst small-regs memq? [ src quot call ] [
+    dst small-regs memq? [ dst src quot call ] [
         src small-reg-that-isn't
         [ src quot call ]
         with-save/restore
@@ -381,16 +385,38 @@ HOOK: stack-reg cpu ( -- reg )
 : decr-stack-reg ( n -- )
     dup 0 = [ drop ] [ stack-reg swap SUB ] if ;
 
-M: x86 %prologue ( n -- )
-    temp-reg-1 0 MOV rc-absolute-cell rel-this
-    dup PUSH
-    temp-reg-1 PUSH
-    stack-reg swap 3 cells - SUB ;
-
 : incr-stack-reg ( n -- )
     dup 0 = [ drop ] [ stack-reg swap ADD ] if ;
 
 M: x86 %epilogue ( n -- ) cell - incr-stack-reg ;
+
+: %boolean ( dst word -- )
+    over \ f tag-number MOV
+    0 [] swap execute
+    \ t rel-literal-x86 ; inline
+
+M: x86 %compare ( dst cc src1 src2 -- )
+    CMP {
+        { cc< [ \ CMOVL %boolean ] }
+        { cc<= [ \ CMOVLE %boolean ] }
+        { cc> [ \ CMOVG %boolean ] }
+        { cc>= [ \ CMOVGE %boolean ] }
+        { cc= [ \ CMOVE %boolean ] }
+        { cc/= [ \ CMOVNE %boolean ] }
+    } case ;
+
+M: x86 %compare-imm ( dst cc src1 src2 -- )
+    %compare ;
+
+M: x86 %compare-float ( dst cc src1 src2 -- )
+    UCOMISD {
+        { cc< [ \ CMOVB %boolean ] }
+        { cc<= [ \ CMOVBE %boolean ] }
+        { cc> [ \ CMOVA %boolean ] }
+        { cc>= [ \ CMOVAE %boolean ] }
+        { cc= [ \ CMOVE %boolean ] }
+        { cc/= [ \ CMOVNE %boolean ] }
+    } case ;
 
 M: x86 %compare-branch ( label cc src1 src2 -- )
     CMP {
@@ -399,6 +425,7 @@ M: x86 %compare-branch ( label cc src1 src2 -- )
         { cc> [ JG ] }
         { cc>= [ JGE ] }
         { cc= [ JE ] }
+        { cc/= [ JNE ] }
     } case ;
 
 M: x86 %compare-imm-branch ( label src1 src2 cc -- )
@@ -411,6 +438,7 @@ M: x86 %compare-float-branch ( label cc src1 src2 -- )
         { cc> [ JA ] }
         { cc>= [ JAE ] }
         { cc= [ JE ] }
+        { cc/= [ JNE ] }
     } case ;
 
 : stack@ ( n -- op ) stack-reg swap [+] ;
