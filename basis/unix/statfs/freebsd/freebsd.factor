@@ -7,17 +7,17 @@ IN: unix.statfs.freebsd
 : ST_NOSUID       2 ; inline
 
 C-STRUCT: statvfs               
-	{ "fsblkcnt_t" "f_bavail" }
-	{ "fsblkcnt_t" "f_bfree" }
-	{ "fsblkcnt_t" "f_blocks" }
-	{ "fsfilcnt_t" "f_favail" }
-	{ "fsfilcnt_t" "f_ffree" }
-	{ "fsfilcnt_t" "f_files" }
-	{ "ulong" "f_bsize" }
-	{ "ulong" "f_flag" }
-	{ "ulong" "f_frsize" }
-	{ "ulong" "f_fsid" }
-	{ "ulong" "f_namemax" }	;
+    { "fsblkcnt_t" "f_bavail" }
+    { "fsblkcnt_t" "f_bfree" }
+    { "fsblkcnt_t" "f_blocks" }
+    { "fsfilcnt_t" "f_favail" }
+    { "fsfilcnt_t" "f_ffree" }
+    { "fsfilcnt_t" "f_files" }
+    { "ulong" "f_bsize" }
+    { "ulong" "f_flag" }
+    { "ulong" "f_frsize" }
+    { "ulong" "f_fsid" }
+    { "ulong" "f_namemax" } ;
 
 
 TUPLE: freebsd-file-system-info < file-system-info
