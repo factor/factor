@@ -138,8 +138,12 @@ ERROR: bad-superclass class ;
 : define-tuple-prototype ( class -- )
     dup tuple-prototype "prototype" set-word-prop ;
 
+: prepare-slots ( slots superclass -- slots' )
+    [ make-slots ] [ class-size 2 + ] bi* finalize-slots ;
+
 : define-tuple-slots ( class -- )
-    dup "slots" word-prop define-accessors ;
+    dup "slots" word-prop over superclass prepare-slots
+    define-accessors ;
 
 : make-tuple-layout ( class -- layout )
     [ ]
@@ -242,7 +246,7 @@ PRIVATE>
 
 : define-tuple-class ( class superclass slots -- )
     over check-superclass
-    make-slots over class-size 2 + finalize-slots
+    over prepare-slots
     (define-tuple-class) ;
 
 M: word (define-tuple-class)
