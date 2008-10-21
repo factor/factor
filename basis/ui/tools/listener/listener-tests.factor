@@ -2,7 +2,7 @@ USING: continuations documents ui.tools.interactor
 ui.tools.listener hashtables kernel namespaces parser sequences
 tools.test ui.commands ui.gadgets ui.gadgets.editors
 ui.gadgets.panes vocabs words tools.test.ui slots.private
-threads arrays generic threads accessors listener ;
+threads arrays generic threads accessors listener math ;
 IN: ui.tools.listener.tests
 
 [ f ] [ "word" source-editor command-map commands>> empty? ] unit-test
@@ -51,3 +51,5 @@ IN: ui.tools.listener.tests
 
     [ ] [ "listener" get com-end ] unit-test
 ] with-grafted-gadget
+
+[ ] [ \ + <pane> <interactor> interactor-use use-if-necessary ] unit-test
