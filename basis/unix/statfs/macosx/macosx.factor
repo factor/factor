@@ -128,7 +128,7 @@ M: macosx mounted* ( -- array )
     [ *void* ] dip
     "statfs64" heap-size [ * memory>byte-array ] keep group ;
 
-: statfs64>file-system-info ( byte-array -- file-system-info )
+M: macosx >file-system-info ( byte-array -- file-system-info )
     [ \ macosx-file-system-info new ] dip
     {
         [
@@ -162,4 +162,4 @@ M: macosx mounted* ( -- array )
 M: macosx file-system-info ( path -- file-system-info )
     normalize-path
     "statfs64" <c-object> tuck statfs64 io-error
-    statfs64>file-system-info ;
+    >file-system-info ;

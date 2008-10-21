@@ -43,7 +43,7 @@ files ffree sync-reads sync-writes async-reads async-writes
 fsidx fsid namemax owner spare fstype mnotonname mntfromname
 file-system-type-name mount-from ;
 
-: statvfs>file-system-info ( byte-array -- netbsd-file-system-info )
+M: netbsd >file-system-info ( byte-array -- netbsd-file-system-info )
     [ \ netbsd-file-system-info new ] dip
     {
         [
@@ -75,4 +75,4 @@ file-system-type-name mount-from ;
 
 M: netbsd file-system-info
     normalize-path "statvfs" <c-object> tuck statvfs io-error 
-    statvfs>file-system-info ;
+    >file-system-info ;

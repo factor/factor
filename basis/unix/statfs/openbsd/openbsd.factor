@@ -26,7 +26,7 @@ TUPLE: openbsd-file-system-info < file-system-info
 bsize frsize blocks bfree bavail files ffree favail
 fsid flag namemax ;
 
-: statfs>file-system-info ( struct -- statfs )
+M: openbsd >file-system-info ( struct -- statfs )
     [ \ openbsd-file-system-info new ] dip
     {
         [
@@ -49,4 +49,4 @@ fsid flag namemax ;
 M: openbsd file-system-info ( path -- byte-array )
     normalize-path
     "statvfs" <c-object> tuck statvfs io-error
-    statfs>file-system-info ;
+    >file-system-info ;

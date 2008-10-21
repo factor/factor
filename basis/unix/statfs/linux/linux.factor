@@ -13,7 +13,7 @@ TUPLE: linux-file-system-info < file-system-info
 type bsize blocks bfree bavail files ffree fsid
 namelen frsize spare ;
 
-: statfs>file-system-info ( struct -- statfs )
+M: linux >file-system-info ( struct -- statfs )
     [ \ linux-file-system-info new ] dip
     {
         [
@@ -36,4 +36,4 @@ namelen frsize spare ;
 M: linux file-system-info ( path -- byte-array )
     normalize-path
     "statfs64" <c-object> tuck statfs64 io-error
-    statfs>file-system-info ;
+    >file-system-info ;
