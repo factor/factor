@@ -4,15 +4,15 @@ USING: kernel compiler.cfg.stacks compiler.cfg.hats ;
 IN: compiler.cfg.intrinsics.float
 
 : emit-float-op ( insn -- )
-    [ 2phantom-pop [ ^^unbox-float ] bi@ ] dip call ^^box-float
-    phantom-push ; inline
+    [ 2inputs [ ^^unbox-float ] bi@ ] dip call ^^box-float
+    ds-push ; inline
 
 : emit-float-comparison ( cc -- )
-    [ 2phantom-pop [ ^^unbox-float ] bi@ ] dip ^^compare-float
-    phantom-push ; inline
+    [ 2inputs [ ^^unbox-float ] bi@ ] dip ^^compare-float
+    ds-push ; inline
 
 : emit-float>fixnum ( -- )
-    phantom-pop ^^unbox-float ^^float>integer ^^tag-fixnum phantom-push ;
+    ds-pop ^^unbox-float ^^float>integer ^^tag-fixnum ds-push ;
 
 : emit-fixnum>float ( -- )
-    phantom-pop ^^untag-fixnum ^^integer>float ^^box-float phantom-push ;
+    ds-pop ^^untag-fixnum ^^integer>float ^^box-float ds-push ;

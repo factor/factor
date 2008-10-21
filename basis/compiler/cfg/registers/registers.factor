@@ -16,7 +16,7 @@ TUPLE: ds-loc < loc ;
 C: <ds-loc> ds-loc
 
 TUPLE: rs-loc < loc ;
-C: <rs-loc> ds-loc
+C: <rs-loc> rs-loc
 
 ! Prettyprinting
 : V scan-word scan-word vreg boa parsed ; parsing

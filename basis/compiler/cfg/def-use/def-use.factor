@@ -13,6 +13,8 @@ M: ##write-barrier defs-vregs [ card#>> ] [ table>> ] bi 2array ;
 M: ##unary/temp defs-vregs dst/tmp-vregs ;
 M: ##allot defs-vregs dst/tmp-vregs ;
 M: ##dispatch defs-vregs temp>> 1array ;
+M: ##slot defs-vregs [ dst>> ] [ temp>> ] bi 2array ;
+M: ##set-slot defs-vregs temp>> 1array ;
 M: insn defs-vregs drop f ;
 
 M: ##unary uses-vregs src>> 1array ;

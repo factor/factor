@@ -3,7 +3,8 @@
 USING: kernel math math.order sequences accessors arrays
 byte-arrays layouts classes.tuple.private fry locals
 compiler.tree.propagation.info compiler.cfg.hats
-compiler.cfg.instructions compiler.cfg.stacks ;
+compiler.cfg.instructions compiler.cfg.stacks
+compiler.cfg.intrinsics.utilities ;
 IN: compiler.cfg.intrinsics.allot
 
 : ##set-slots ( regs obj class -- )
@@ -11,16 +12,16 @@ IN: compiler.cfg.intrinsics.allot
 
 : emit-simple-allot ( node -- )
     [ in-d>> length ] [ node-output-infos first class>> ] bi
-    [ drop phantom-load ] [ [ 1+ cells ] dip ^^allot ] [ nip ] 2tri
-    [ ##set-slots ] [ [ drop ] [ phantom-push ] [ drop ] tri* ] 3bi ;
+    [ drop ds-load ] [ [ 1+ cells ] dip ^^allot ] [ nip ] 2tri
+    [ ##set-slots ] [ [ drop ] [ ds-push ] [ drop ] tri* ] 3bi ;
 
 : tuple-slot-regs ( layout -- vregs )
-    [ size>> phantom-load ] [ ^^load-literal ] bi prefix ;
+    [ size>> ds-load ] [ ^^load-literal ] bi prefix ;
 
 :: emit-<tuple-boa> ( node -- )
     [let | layout [ node node-input-infos peek literal>> ] |
         layout tuple-layout? [
-            1 phantom-drop
+            ds-drop
             layout tuple-slot-regs
             layout size>> ^^allot-tuple
             tuple ##set-slots
@@ -36,11 +37,11 @@ IN: compiler.cfg.intrinsics.allot
 :: emit-<array> ( node -- )
     [let | len [ node node-input-infos first literal>> ] |
         len expand-<array>? [
-            [let | elt [ phantom-pop ]
+            [let | elt [ ds-pop ]
                    reg [ len ^^allot-array ] |
-                1 phantom-drop
+                ds-drop
                 elt reg len store-initial-element
-                reg phantom-push
+                reg ds-push
             ]
         ] [ node emit-primitive ] if
     ] ;
@@ -55,9 +56,9 @@ IN: compiler.cfg.intrinsics.allot
         len expand-<byte-array>? [
             [let | elt [ 0 ^^load-literal ]
                    reg [ len ^^allot-byte-array ] |
-                1 phantom-drop
+                ds-drop
                 elt reg len bytes>cells store-initial-element
-                reg phantom-push
+                reg ds-push
             ]
         ] [ node emit-primitive ] if
     ] ;

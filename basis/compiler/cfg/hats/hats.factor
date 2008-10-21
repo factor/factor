@@ -5,13 +5,6 @@ sequences classes.tuple cpu.architecture compiler.cfg.registers
 compiler.cfg.instructions ;
 IN: compiler.cfg.hats
 
-! Operands holding pointers to freshly-allocated objects which
-! are guaranteed to be in the nursery
-SYMBOL: fresh-objects
-
-: fresh-object ( vreg/t -- ) fresh-objects get push ;
-: fresh-object? ( vreg -- ? ) fresh-objects get memq? ;
-
 : i int-regs next-vreg ; inline
 : ^^i i dup ; inline
 : ^^i1 [ ^^i ] dip ; inline
@@ -53,11 +46,10 @@ SYMBOL: fresh-objects
 : ^^div-float ( src1 src2 -- dst ) ^^d2 ##div-float ; inline
 : ^^float>integer ( src -- dst ) ^^i1 ##float>integer ; inline
 : ^^integer>float ( src -- dst ) ^^d1 ##integer>float ; inline
-: ^^allot ( size class -- dst ) ^^i2 i ##allot dup fresh-object ; inline
+: ^^allot ( size class -- dst ) ^^i2 i ##allot ; inline
 : ^^allot-tuple ( n -- dst ) 2 + cells tuple ^^allot ; inline
 : ^^allot-array ( n -- dst ) 2 + cells array ^^allot ; inline
 : ^^allot-byte-array ( n -- dst ) 2 cells + byte-array ^^allot ; inline
-: ^^write-barrier ( src -- ) dup fresh-object? [ drop ] [ i i ##write-barrier ] if ; inline
 : ^^box-float ( src -- dst ) ^^i1 i ##box-float ; inline
 : ^^unbox-float ( src -- dst ) ^^d1 ##unbox-float ; inline
 : ^^box-alien ( src -- dst ) ^^i1 i ##box-alien ; inline
@@ -72,9 +64,9 @@ SYMBOL: fresh-objects
 : ^^alien-cell ( src -- dst ) ^^i1 ##alien-cell ; inline
 : ^^alien-float ( src -- dst ) ^^i1 ##alien-float ; inline
 : ^^alien-double ( src -- dst ) ^^i1 ##alien-double ; inline
-: ^^compare ( src1 src2 -- dst ) ^^i2 ##compare ; inline
-: ^^compare-imm ( src1 src2 -- dst ) ^^i2 ##compare-imm ; inline
-: ^^compare-float ( src1 src2 -- dst ) ^^i2 ##compare-float ; inline
+: ^^compare ( src1 src2 cc -- dst ) ^^i3 ##compare ; inline
+: ^^compare-imm ( src1 src2 cc -- dst ) ^^i3 ##compare-imm ; inline
+: ^^compare-float ( src1 src2 cc -- dst ) ^^i3 ##compare-float ; inline
 : ^^offset>slot ( vreg -- vreg' ) cell 4 = [ 1 ^^shr-imm ] when ; inline
 : ^^tag-fixnum ( src -- dst ) ^^i1 ##tag-fixnum ; inline
 : ^^untag-fixnum ( src -- dst ) ^^i1 ##untag-fixnum ; inline

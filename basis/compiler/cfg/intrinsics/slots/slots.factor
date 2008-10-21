@@ -7,17 +7,17 @@ compiler.cfg.intrinsics.utilities ;
 IN: compiler.cfg.intrinsics.slots
 
 : emit-tag ( -- )
-    phantom-pop tag-mask get ^^and-imm ^^tag-fixnum phantom-push ;
+    ds-pop tag-mask get ^^and-imm ^^tag-fixnum ds-push ;
 
 : value-tag ( info -- n ) class>> class-tag ; inline
 
 : (emit-slot) ( infos -- dst )
-    [ 2phantom-pop ] [ first value-tag ] bi*
+    [ 2inputs ] [ first value-tag ] bi*
     ^^slot ;
 
 : (emit-slot-imm) ( infos -- dst )
-    1 phantom-drop
-    [ phantom-pop ^^offset>slot ]
+    ds-drop
+    [ ds-pop ^^offset>slot ]
     [ [ second literal>> ] [ first value-tag ] bi ] bi*
     ^^slot-imm ;
 
@@ -27,17 +27,17 @@ IN: compiler.cfg.intrinsics.slots
         nip
         dup second value-info-small-tagged?
         [ (emit-slot-imm) ] [ (emit-slot) ] if
-        phantom-push
+        ds-push
     ] [ drop emit-primitive ] if ;
 
 : (emit-set-slot) ( infos -- obj-reg )
-    [ 3phantom-pop [ tuck ] dip ^^offset>slot ]
+    [ 3inputs [ tuck ] dip ^^offset>slot ]
     [ second value-tag ]
     bi* ^^set-slot ;
 
 : (emit-set-slot-imm) ( infos -- obj-reg )
-    1 phantom-drop
-    [ 2phantom-pop tuck ]
+    ds-drop
+    [ 2inputs tuck ]
     [ [ third literal>> ] [ second value-tag ] bi ] bi*
     ##set-slot-imm ;
 
@@ -45,10 +45,10 @@ IN: compiler.cfg.intrinsics.slots
     dup node-input-infos
     dup second value-tag [
         nip
-        1 phantom-drop
+        ds-drop
         [
             dup third value-info-small-tagged?
             [ (emit-set-slot-imm) ] [ (emit-set-slot) ] if
         ] [ first class>> immediate class<= ] bi
-        [ drop ] [ ^^write-barrier ] if
+        [ drop ] [ i i ##write-barrier ] if
     ] [ drop emit-primitive ] if ;

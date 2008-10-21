@@ -65,14 +65,12 @@ GENERIC: emit-node ( node -- next )
     basic-block get [ drop f ] unless ; inline
 
 : emit-nodes ( nodes -- )
-    [ current-node emit-node check-basic-block ] iterate-nodes
-    finalize-phantoms ;
+    [ current-node emit-node check-basic-block ] iterate-nodes ;
 
 : begin-word ( -- )
     #! We store the basic block after the prologue as a loop
     #! labelled by the current word, so that self-recursive
     #! calls can skip an epilogue/prologue.
-    init-phantoms
     ##prologue
     ##branch
     begin-basic-block
@@ -98,7 +96,6 @@ GENERIC: emit-node ( node -- next )
     stop-iterating ;
 
 : emit-call ( word -- next )
-    finalize-phantoms
     {
         { [ dup loops get key? ] [ loops get at local-recursive-call ] }
         { [ tail-call? not ] [ ##simple-stack-frame ##call iterate-next ] }
@@ -115,7 +112,6 @@ GENERIC: emit-node ( node -- next )
     basic-block get swap loops get set-at ;
 
 : compile-loop ( node -- next )
-    finalize-phantoms
     begin-basic-block
     [ label>> id>> remember-loop ] [ child>> emit-nodes ] bi
     iterate-next ;
@@ -126,7 +122,7 @@ M: #recursive emit-node
 ! #if
 : emit-branch ( obj -- final-bb )
     [
-        begin-basic-block copy-phantoms
+        begin-basic-block
         emit-nodes
         basic-block get dup [ ##branch ] when
     ] with-scope ;
@@ -135,21 +131,19 @@ M: #recursive emit-node
     children>>  [ emit-branch ] map
     end-basic-block
     begin-basic-block
-    basic-block get '[ [ _ swap successors>> push ] when* ] each
-    init-phantoms ;
+    basic-block get '[ [ _ swap successors>> push ] when* ] each ;
 
 : ##branch-t ( vreg -- )
     \ f tag-number cc/= ##compare-imm-branch ;
 
 M: #if emit-node
-    phantom-pop ##branch-t emit-if iterate-next ;
+    ds-pop ##branch-t emit-if iterate-next ;
 
 ! #dispatch
 : dispatch-branch ( nodes word -- label )
     gensym [
         [
             V{ } clone node-stack set
-            init-phantoms
             ##prologue
             emit-nodes
             basic-block get [
@@ -167,11 +161,9 @@ M: #if emit-node
     ] each ;
 
 : emit-dispatch ( node -- )
-    phantom-pop int-regs next-vreg
-    [ finalize-phantoms ##epilogue ] 2dip
-    [ ^^offset>slot ] dip
-    ##dispatch
-    dispatch-branches init-phantoms ;
+    ##epilogue
+    ds-pop ^^offset>slot i ##dispatch
+    dispatch-branches ;
 
 : <dispatch-block> ( -- word )
     gensym dup t "inlined-block" set-word-prop ;
@@ -198,34 +190,36 @@ M: #call-recursive emit-node label>> id>> emit-call ;
 
 ! #push
 M: #push emit-node
-    literal>> ^^load-literal phantom-push iterate-next ;
+    literal>> ^^load-literal ds-push iterate-next ;
 
 ! #shuffle
+: emit-shuffle ( effect -- )
+    [ out>> ] [ in>> dup length ds-load zip ] bi
+    '[ _ at ] map ds-store ;
+
 M: #shuffle emit-node
-    shuffle-effect phantom-shuffle iterate-next ;
+    shuffle-effect emit-shuffle iterate-next ;
 
 M: #>r emit-node
     [ in-d>> length ] [ out-r>> empty? ] bi
-    [ phantom-drop ] [ phantom->r ] if
+    [ neg ##inc-d ] [ ds-load rs-store ] if
     iterate-next ;
 
 M: #r> emit-node
     [ in-r>> length ] [ out-d>> empty? ] bi
-    [ phantom-rdrop ] [ phantom-r> ] if
+    [ neg ##inc-r ] [ rs-load ds-store ] if
     iterate-next ;
 
 ! #return
 M: #return emit-node
-    drop finalize-phantoms ##epilogue ##return stop-iterating ;
+    drop ##epilogue ##return stop-iterating ;
 
 M: #return-recursive emit-node
-    finalize-phantoms
     label>> id>> loops get key?
     [ iterate-next ] [ ##epilogue ##return stop-iterating ] if ;
 
 ! #terminate
-M: #terminate emit-node
-    drop finalize-phantoms stop-iterating ;
+M: #terminate emit-node drop stop-iterating ;
 
 ! FFI
 : return-size ( ctype -- n )
@@ -246,7 +240,6 @@ M: #terminate emit-node
     <alien-stack-frame> ##stack-frame ;
 
 : emit-alien-node ( node quot -- next )
-    finalize-phantoms
     [ params>> ] dip [ drop alien-stack-frame ] [ call ] 2bi
     iterate-next ; inline
 
@@ -259,7 +252,6 @@ M: #alien-indirect emit-node
 M: #alien-callback emit-node
     dup params>> xt>> dup
     [
-        init-phantoms
         ##prologue
         dup [ ##alien-callback ] emit-alien-node drop
         ##epilogue
