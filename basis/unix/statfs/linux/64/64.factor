@@ -20,12 +20,12 @@ C-STRUCT: statfs64
 
 FUNCTION: int statfs64 ( char* path, statfs64* buf ) ;
 
-TUPLE: linux-file-system-info < file-system-info
+TUPLE: linux64-file-system-info < file-system-info
 type bsize blocks bfree bavail files ffree fsid
 namelen frsize spare ;
 
 M: linux >file-system-info ( struct -- statfs )
-    [ \ linux-file-system-info new ] dip
+    [ \ linux64-file-system-info new ] dip
     {
         [
             [ statfs64-f_bsize ]
