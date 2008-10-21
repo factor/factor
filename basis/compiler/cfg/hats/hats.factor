@@ -1,8 +1,16 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel layouts cpu.architecture compiler.cfg.registers
+USING: arrays byte-arrays kernel layouts math namespaces
+sequences classes.tuple cpu.architecture compiler.cfg.registers
 compiler.cfg.instructions ;
-IN: compiler.cfg.builder.hats
+IN: compiler.cfg.hats
+
+! Operands holding pointers to freshly-allocated objects which
+! are guaranteed to be in the nursery
+SYMBOL: fresh-objects
+
+: fresh-object ( vreg/t -- ) fresh-objects get push ;
+: fresh-object? ( vreg -- ? ) fresh-objects get memq? ;
 
 : i int-regs next-vreg ; inline
 : ^^i i dup ; inline
@@ -45,8 +53,11 @@ IN: compiler.cfg.builder.hats
 : ^^div-float ( src1 src2 -- dst ) ^^d2 ##div-float ; inline
 : ^^float>integer ( src -- dst ) ^^i1 ##float>integer ; inline
 : ^^integer>float ( src -- dst ) ^^d1 ##integer>float ; inline
-: ^^allot ( size type tag -- dst ) ^^i3 i ##allot ; inline
-: ^^write-barrier ( src -- ) i i ##write-barrier ; inline
+: ^^allot ( size class -- dst ) ^^i2 i ##allot dup fresh-object ; inline
+: ^^allot-tuple ( n -- dst ) 2 + cells tuple ^^allot ; inline
+: ^^allot-array ( n -- dst ) 2 + cells array ^^allot ; inline
+: ^^allot-byte-array ( n -- dst ) 2 cells + byte-array ^^allot ; inline
+: ^^write-barrier ( src -- ) dup fresh-object? [ drop ] [ i i ##write-barrier ] if ; inline
 : ^^box-float ( src -- dst ) ^^i1 i ##box-float ; inline
 : ^^unbox-float ( src -- dst ) ^^d1 ##unbox-float ; inline
 : ^^box-alien ( src -- dst ) ^^i1 i ##box-alien ; inline
@@ -65,3 +76,5 @@ IN: compiler.cfg.builder.hats
 : ^^compare-imm ( src1 src2 -- dst ) ^^i2 ##compare-imm ; inline
 : ^^compare-float ( src1 src2 -- dst ) ^^i2 ##compare-float ; inline
 : ^^offset>slot ( vreg -- vreg' ) cell 4 = [ 1 ^^shr-imm ] when ; inline
+: ^^tag-fixnum ( src -- dst ) ^^i1 ##tag-fixnum ; inline
+: ^^untag-fixnum ( src -- dst ) ^^i1 ##untag-fixnum ; inline

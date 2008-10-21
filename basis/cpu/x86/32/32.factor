@@ -6,7 +6,7 @@ accessors init combinators command-line cpu.x86.assembler
 cpu.x86.architecture cpu.architecture compiler compiler.units
 compiler.constants compiler.alien compiler.codegen
 compiler.codegen.fixup compiler.cfg.instructions
-compiler.cfg.builder compiler.cfg.builder.calls ;
+compiler.cfg.builder compiler.cfg.intrinsics ;
 IN: cpu.x86.32
 
 ! We implement the FFI for Linux, OS X and Windows all at once.

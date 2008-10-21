@@ -88,6 +88,9 @@ INSN: ##shr-imm < ##binary-imm ;
 INSN: ##sar-imm < ##binary-imm ;
 INSN: ##not < ##unary ;
 
+: ##tag-fixnum ( dst src -- ) tag-bits get ##shl-imm ; inline
+: ##untag-fixnum ( dst src -- ) tag-bits get ##sar-imm ; inline
+
 ! Bignum/integer conversion
 INSN: ##integer>bignum < ##unary/temp ;
 INSN: ##bignum>integer < ##unary/temp ;
@@ -141,7 +144,7 @@ INSN: ##set-alien-float < ##alien-setter ;
 INSN: ##set-alien-double < ##alien-setter ;
 
 ! Memory allocation
-INSN: ##allot < ##flushable size type tag { temp vreg } ;
+INSN: ##allot < ##flushable size class { temp vreg } ;
 INSN: ##write-barrier < ##effect card# table ;
 INSN: ##gc ;
 

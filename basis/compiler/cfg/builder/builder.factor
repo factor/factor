@@ -9,12 +9,12 @@ compiler.tree.builder
 compiler.tree.combinators
 compiler.tree.propagation.info
 compiler.cfg
+compiler.cfg.hats
+compiler.cfg.stacks
 compiler.cfg.iterator
 compiler.cfg.registers
+compiler.cfg.intrinsics
 compiler.cfg.instructions
-compiler.cfg.builder.hats
-compiler.cfg.builder.calls
-compiler.cfg.builder.stacks
 compiler.alien ;
 IN: compiler.cfg.builder
 

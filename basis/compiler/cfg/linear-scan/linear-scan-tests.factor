@@ -272,7 +272,6 @@ USING: math.private compiler.cfg.debugger ;
         T{ vreg f int-regs 1 }
         40
         array
-        object
         T{ vreg f int-regs 2 }
         f
     } clone

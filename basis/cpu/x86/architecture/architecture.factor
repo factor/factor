@@ -122,7 +122,7 @@ M:: x86 %integer>bignum ( dst src temp -- )
         "end" get JMP
         "nonzero" resolve-label
         ! Allocate a bignum
-        dst 4 cells bignum bignum temp %allot
+        dst 4 cells bignum temp %allot
         ! Write length
         dst 1 bignum@ 2 tag-fixnum MOV
         ! Test sign
@@ -205,7 +205,7 @@ M:: x86 %unbox-any-c-ptr ( dst src dst temp -- )
     ] with-scope ;
 
 M:: x86 %box-float ( dst src temp -- )
-    dst 16 float float temp %allot
+    dst 16 float temp %allot
     dst 8 float tag-number - [+] src MOVSD ;
 
 : alien@ ( reg n -- op ) cells object tag-number - [+] ;
@@ -215,7 +215,7 @@ M:: x86 %box-alien ( dst src temp -- )
         { "end" "f" } [ define-label ] each
         src 0 CMP
         "f" get JE
-        dst 4 cells alien object temp %allot
+        dst 4 cells alien temp %allot
         dst 1 alien@ \ f tag-number MOV
         dst 2 alien@ \ f tag-number MOV
         ! Store src in alien-offset slot
@@ -343,10 +343,10 @@ M: x86 %set-alien-double [ [] ] dip MOVSD ;
 : store-tagged ( dst tag -- )
     tag-number OR ;
 
-M:: x86 %allot ( dst size type tag nursery-ptr -- )
+M:: x86 %allot ( dst size class nursery-ptr -- )
     nursery-ptr dst load-allot-ptr
-    dst type store-header
-    dst tag store-tagged
+    dst class store-header
+    dst class store-tagged
     nursery-ptr size inc-allot-ptr ;
 
 HOOK: %alien-global cpu ( symbol dll register -- )

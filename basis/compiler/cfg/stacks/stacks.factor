@@ -6,25 +6,14 @@ quotations sequences system vectors words effects alien
 byte-arrays accessors sets math.order
 combinators.short-circuit cpu.architecture
 compiler.cfg.instructions compiler.cfg.registers
-compiler.cfg.builder.hats ;
-IN: compiler.cfg.builder.stacks
+compiler.cfg.hats ;
+IN: compiler.cfg.stacks
 
 ! Converting stack operations into register operations, while
 ! doing a bit of optimization along the way.
-PREDICATE: small-slot < integer cells small-enough? ;
-
-PREDICATE: small-tagged < integer tag-fixnum small-enough? ;
-
-! Operands holding pointers to freshly-allocated objects which
-! are guaranteed to be in the nursery
-SYMBOL: fresh-objects
-
-: fresh-object ( vreg/t -- ) fresh-objects get push ;
-
-: fresh-object? ( vreg -- ? ) fresh-objects get memq? ;
 
 ! A compile-time stack
-TUPLE: phantom-stack height stack ;
+TUPLE: phantom-stack { height integer } { stack vector } ;
 
 M: phantom-stack clone
     call-next-method [ clone ] change-stack ;
@@ -32,11 +21,11 @@ M: phantom-stack clone
 GENERIC: finalize-height ( stack -- )
 
 : new-phantom-stack ( class -- stack )
-    >r 0 V{ } clone r> boa ; inline
+    new V{ } clone >>stack ; inline
 
 : (loc) ( m stack -- n )
     #! Utility for methods on <loc>
-    height>> - ;
+    height>> - ; inline
 
 : (finalize-height) ( stack word -- )
     #! We consolidate multiple stack height changes until the
@@ -207,3 +196,6 @@ M: loc lazy-store
 
 : 3phantom-pop ( -- vreg1 vreg2 vreg3 )
     3 phantom-load first3 ;
+
+: emit-primitive ( node -- )
+    finalize-phantoms word>> ##simple-stack-frame ##call ;

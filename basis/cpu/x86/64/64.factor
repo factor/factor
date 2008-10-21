@@ -6,7 +6,7 @@ slots splitting assocs combinators cpu.x86.assembler
 cpu.x86.architecture cpu.architecture compiler.constants
 compiler.codegen compiler.codegen.fixup
 compiler.cfg.instructions compiler.cfg.builder
-compiler.cfg.builder.calls ;
+compiler.cfg.intrinsics ;
 IN: cpu.x86.64
 
 M: x86.64 machine-registers
