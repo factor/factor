@@ -16,7 +16,7 @@ C-STRUCT: statfs
     { "fsid_t"  "f_fsid" }
     { "long"    "f_namelen" } ;
 
-FUNCTION: int statfs ( char* path, statfs64* buf ) ;
+FUNCTION: int statfs ( char* path, statfs* buf ) ;
 
 TUPLE: linux32-file-system-info < file-system-info
 type bsize blocks bfree bavail files ffree fsid
@@ -26,8 +26,8 @@ M: linux >file-system-info ( struct -- statfs )
     [ \ linux32-file-system-info new ] dip
     {
         [
-            [ statfs64-f_bsize ]
-            [ statfs64-f_bavail ] bi * >>free-space
+            [ statfs-f_bsize ]
+            [ statfs-f_bavail ] bi * >>free-space
         ]
         [ statfs-f_type >>type ]
         [ statfs-f_bsize >>bsize ]
