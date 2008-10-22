@@ -81,6 +81,7 @@ ARTICLE: "fs-meta" "File metadata"
 { $subsection link-info }
 { $subsection exists? }
 { $subsection directory? }
+
 "File types:"
 { $subsection "file-types" } ;
 
@@ -321,6 +322,12 @@ HELP: directory-files
 HELP: with-directory-files
 { $values { "path" "a pathname string" } { "quot" quotation } }
 { $description "Calls the quotation with the directory file names on the stack and with the directory set as the " { $link current-directory } ".  Restores the current directory after the quotation is called." } ;
+
+HELP: file-system-info
+{ $values
+{ "path" "a pathname string" }
+{ "file-system-info" file-system-info } }
+{ $description "Returns a platform-specific object describing the file-system that contains the path. The cross-platform slot is " { $slot "free-space" } "." } ;
 
 HELP: resource-path
 { $values { "path" "a pathname string" } { "newpath" "a pathname string" } }
