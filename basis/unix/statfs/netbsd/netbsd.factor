@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.syntax kernel io.files unix.stat math unix
 combinators system io.backend accessors alien.c-types
-io.encodings.utf8 alien.strings ;
+io.encodings.utf8 alien.strings unix.types ;
 IN: unix.statfs.netbsd
 
 : _VFS_NAMELEN    32   ; inline
@@ -34,6 +34,8 @@ C-STRUCT: statvfs
     { { "char" _VFS_NAMELEN } "f_mntonname" }
     { { "char" _VFS_NAMELEN } "f_mntfromname" } ;
 
+FUNCTION: int statvfs ( char* path, statvfs *buf ) ;
+
 TUPLE: netbsd-file-system-info < file-system-info
 flag bsize frsize io-size
 blocks blocks-free blocks-available blocks-reserved
@@ -41,7 +43,7 @@ files ffree sync-reads sync-writes async-reads async-writes
 fsidx fsid namemax owner spare fstype mnotonname mntfromname
 file-system-type-name mount-from ;
 
-: statvfs>file-system-info ( byte-array -- netbsd-file-system-info )
+M: netbsd >file-system-info ( byte-array -- netbsd-file-system-info )
     [ \ netbsd-file-system-info new ] dip
     {
         [
@@ -73,4 +75,4 @@ file-system-type-name mount-from ;
 
 M: netbsd file-system-info
     normalize-path "statvfs" <c-object> tuck statvfs io-error 
-    statvfs>file-system-info ;
+    >file-system-info ;

@@ -246,6 +246,21 @@ M: winnt file-info ( path -- info )
 M: winnt link-info ( path -- info )
     file-info ;
 
+TUPLE: winnt-file-system-info < file-system-info
+total-bytes total-free-bytes ;
+
+M: winnt file-system-info ( path -- file-system-info )
+    normalize-path
+    dup file-info directory? [ parent-directory ] unless
+    "ULARGE_INTEGER" <c-object>
+    "ULARGE_INTEGER" <c-object>
+    "ULARGE_INTEGER" <c-object>
+    [ GetDiskFreeSpaceEx win32-error=0/f ] 3keep
+    \ winnt-file-system-info new
+        swap *ulonglong >>total-free-bytes
+        swap *ulonglong >>total-bytes
+        swap *ulonglong >>free-space ;
+
 : file-times ( path -- timestamp timestamp timestamp )
     [
         normalize-path open-existing &dispose handle>>

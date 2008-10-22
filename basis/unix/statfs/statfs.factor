@@ -25,7 +25,7 @@ TUPLE: file-system-info root-directory total-free-size total-size ;
 os {
     { linux   [ "unix.statfs.linux"   require ] }
     { macosx  [ "unix.statfs.macosx"  require ] }
-    ! { freebsd [ "unix.statfs.freebsd" require ] }
-    ! { netbsd  [ "unix.statfs.netbsd"  require ] }
-    ! { openbsd [ "unix.statfs.openbsd" require ] }
+    { freebsd [ "unix.statfs.freebsd" require ] }
+    { netbsd  [ "unix.statfs.netbsd"  require ] }
+    { openbsd [ "unix.statfs.openbsd" require ] }
 } case
