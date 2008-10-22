@@ -16,7 +16,6 @@ IN: compiler.cfg.intrinsics.alien
 : prepare-alien-accessor ( infos -- offset-vreg )
     <reversed> [ second class>> ] [ first ] bi
     dup value-info-small-tagged? [
-        ds-drop
         literal>> (prepare-alien-accessor-imm)
     ] [ drop (prepare-alien-accessor) ] if ;
 

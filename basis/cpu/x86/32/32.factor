@@ -221,7 +221,7 @@ M: x86.32 %alien-indirect ( -- )
 
 M: x86.32 %alien-callback ( quot -- )
     4 [
-        EAX %load-indirect
+        EAX swap %load-indirect
         EAX PUSH
         "c_to_factor" f %alien-invoke
     ] with-aligned-stack ;

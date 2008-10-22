@@ -62,8 +62,8 @@ IN: compiler.cfg.hats
 : ^^alien-signed-2 ( src -- dst ) ^^i1 ##alien-signed-2 ; inline
 : ^^alien-signed-4 ( src -- dst ) ^^i1 ##alien-signed-4 ; inline
 : ^^alien-cell ( src -- dst ) ^^i1 ##alien-cell ; inline
-: ^^alien-float ( src -- dst ) ^^i1 ##alien-float ; inline
-: ^^alien-double ( src -- dst ) ^^i1 ##alien-double ; inline
+: ^^alien-float ( src -- dst ) ^^d1 ##alien-float ; inline
+: ^^alien-double ( src -- dst ) ^^d1 ##alien-double ; inline
 : ^^compare ( src1 src2 cc -- dst ) ^^i3 ##compare ; inline
 : ^^compare-imm ( src1 src2 cc -- dst ) ^^i3 ##compare-imm ; inline
 : ^^compare-float ( src1 src2 cc -- dst ) ^^i3 ##compare-float ; inline

@@ -8,4 +8,4 @@ IN: compiler.cfg.intrinsics.utilities
     literal>> dup fixnum? [ tag-fixnum small-enough? ] [ drop f ] if ;
 
 : emit-primitive ( node -- )
-    word>> ##simple-stack-frame ##call ;
+    word>> ##call ;

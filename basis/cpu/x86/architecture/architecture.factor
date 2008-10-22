@@ -96,7 +96,7 @@ M: x86 %add     [+] LEA ;
 M: x86 %add-imm [+] LEA ;
 M: x86 %sub     2operand SUB ;
 M: x86 %sub-imm neg [+] LEA ;
-M: x86 %mul     2operand IMUL2 ;
+M: x86 %mul     2operand swap IMUL2 ;
 M: x86 %mul-imm 2operand IMUL2 ;
 M: x86 %and     2operand AND ;
 M: x86 %and-imm 2operand AND ;
@@ -146,7 +146,6 @@ M:: x86 %integer>bignum ( dst src temp -- )
 M:: x86 %bignum>integer ( dst src -- )
     [
         "nonzero" define-label
-        "positive" define-label
         "end" define-label
         dst src 1 bignum@ MOV
          ! if the length is 1, its just the sign and nothing else,
@@ -160,20 +159,27 @@ M:: x86 %bignum>integer ( dst src -- )
         dst src 3 bignum@ MOV
         ! is the sign negative?
         src 2 bignum@ 0 CMP
-        "positive" get JE
-        dst -1 IMUL2
-        "positive" resolve-label
-        dst 3 SHL
+        "end" get JE
+        dst NEG
         "end" resolve-label
     ] with-scope ;
 
-M: x86 %add-float 2operand ADDSD ;
-M: x86 %sub-float 2operand SUBSD ;
-M: x86 %mul-float 2operand MULSD ;
-M: x86 %div-float 2operand DIVSD ;
+: ?MOVSD ( dst src -- )
+    2dup = [ 2drop ] [ MOVSD ] if ; inline
 
-M: x86 %integer>float CVTTSD2SI ;
-M: x86 %float>integer CVTSI2SD ;
+: 1operand-fp ( dst src -- dst' )
+    dupd ?MOVSD ; inline
+
+: 2operand-fp ( dst src1 src2 -- dst src )
+    [ 1operand-fp ] dip ; inline
+
+M: x86 %add-float 2operand-fp ADDSD ;
+M: x86 %sub-float 2operand-fp SUBSD ;
+M: x86 %mul-float 2operand-fp MULSD ;
+M: x86 %div-float 2operand-fp DIVSD ;
+
+M: x86 %integer>float CVTSI2SD ;
+M: x86 %float>integer CVTTSD2SI ;
 
 M: x86 %copy ( dst src -- ) MOV ;
 
@@ -210,7 +216,7 @@ M:: x86 %unbox-any-c-ptr ( dst src temp -- )
 
 M:: x86 %box-float ( dst src temp -- )
     dst 16 float temp %allot
-    dst 8 float tag-number - [+] src MOVSD ;
+    dst float-offset [+] src MOVSD ;
 
 : alien@ ( reg n -- op ) cells object tag-number - [+] ;
 
@@ -291,21 +297,23 @@ M:: x86 %box-alien ( dst src temp -- )
     #! call the quot with that. Otherwise, we find a small
     #! register that is not equal to src, and call quot, saving
     #! and restoring the small register.
-    dst small-regs memq? [ dst src quot call ] [
+    dst small-reg-4 small-regs memq? [ dst src quot call ] [
         src small-reg-that-isn't
-        [ src quot call ]
-        with-save/restore
+        [| new-dst |
+            new-dst src quot call
+            dst new-dst MOV
+        ] with-save/restore
     ] if ; inline
 
 : %alien-integer-getter ( dst src size quot -- )
-    '[ [ _ small-reg ] dip @ ] with-small-register ; inline
+    '[ [ dup _ small-reg dup ] [ [] ] bi* MOV @ ]
+    with-small-register ; inline
 
 : %alien-unsigned-getter ( dst src size -- )
     [ MOVZX ] %alien-integer-getter ; inline
 
 M: x86 %alien-unsigned-1 1 %alien-unsigned-getter ;
 M: x86 %alien-unsigned-2 2 %alien-unsigned-getter ;
-M: x86 %alien-unsigned-4 4 %alien-unsigned-getter ;
 
 : %alien-signed-getter ( dst src size -- )
     [ MOVSX ] %alien-integer-getter ; inline
@@ -313,6 +321,8 @@ M: x86 %alien-unsigned-4 4 %alien-unsigned-getter ;
 M: x86 %alien-signed-1 1 %alien-signed-getter ;
 M: x86 %alien-signed-2 2 %alien-signed-getter ;
 M: x86 %alien-signed-4 4 %alien-signed-getter ;
+
+M: x86 %alien-unsigned-4 4 [ 2drop ] %alien-integer-getter ;
 
 M: x86 %alien-cell [] MOV ;
 M: x86 %alien-float dupd [] MOVSS dup CVTSS2SD ;

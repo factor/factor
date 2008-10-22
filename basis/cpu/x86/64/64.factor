@@ -200,7 +200,8 @@ M: x86.64 %alien-indirect ( -- )
     RBP CALL ;
 
 M: x86.64 %alien-callback ( quot -- )
-    RDI %load-indirect "c_to_factor" f %alien-invoke ;
+    RDI swap %load-indirect
+    "c_to_factor" f %alien-invoke ;
 
 M: x86.64 %callback-value ( ctype -- )
     ! Save top of data stack

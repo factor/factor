@@ -55,7 +55,6 @@ TUPLE: stack-frame
 spill-counts ;
 
 INSN: ##stack-frame stack-frame ;
- : ##simple-stack-frame ( -- ) T{ stack-frame } ##stack-frame ;
 INSN: ##call word ;
 INSN: ##jump word ;
 INSN: ##return ;
@@ -139,7 +138,7 @@ INSN: ##alien-double < ##alien-getter ;
 INSN: ##set-alien-integer-1 < ##alien-setter ;
 INSN: ##set-alien-integer-2 < ##alien-setter ;
 INSN: ##set-alien-integer-4 < ##alien-setter ;
-INSN: ##set-alien-cell < ##alien-getter ;
+INSN: ##set-alien-cell < ##alien-setter ;
 INSN: ##set-alien-float < ##alien-setter ;
 INSN: ##set-alien-double < ##alien-setter ;
 

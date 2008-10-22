@@ -98,7 +98,7 @@ GENERIC: emit-node ( node -- next )
 : emit-call ( word -- next )
     {
         { [ dup loops get key? ] [ loops get at local-recursive-call ] }
-        { [ tail-call? not ] [ ##simple-stack-frame ##call iterate-next ] }
+        { [ tail-call? not ] [ ##call iterate-next ] }
         { [ dup current-label get eq? ] [ drop first-basic-block get local-recursive-call ] }
         [ ##epilogue ##jump stop-iterating ]
     } cond ;

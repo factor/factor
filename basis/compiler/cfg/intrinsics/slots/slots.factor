@@ -45,7 +45,6 @@ IN: compiler.cfg.intrinsics.slots
     dup node-input-infos
     dup second value-tag [
         nip
-        ds-drop
         [
             dup third value-info-small-tagged?
             [ (emit-set-slot-imm) ] [ (emit-set-slot) ] if

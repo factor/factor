@@ -3,7 +3,7 @@
 USING: sequences accessors layouts kernel math namespaces
 combinators fry locals
 compiler.tree.propagation.info
-compiler.cfg.stacks compiler.cfg.hats
+compiler.cfg.stacks compiler.cfg.hats compiler.cfg.instructions
 compiler.cfg.intrinsics.utilities ;
 IN: compiler.cfg.intrinsics.fixnum
 
@@ -60,4 +60,4 @@ IN: compiler.cfg.intrinsics.fixnum
     ds-pop ^^bignum>integer ^^tag-fixnum ds-push ;
 
 : emit-fixnum>bignum ( -- )
-    ds-pop ^^untag-fixnum ^^integer>bignum ds-push ;
+    ds-pop ^^untag-fixnum ^^integer>bignum ds-push ##gc ;
