@@ -14,6 +14,8 @@ HOOK: mounted-struct>mounted os ( byte-array -- mounted )
 
 TUPLE: file-system-info root-directory total-free-size total-size ;
 
+HOOK: >file-system-info os ( struct -- statfs )
+
 : mounted ( -- array )
     mounted* [ mounted-struct>mounted ] map ;
 
