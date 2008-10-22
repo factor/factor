@@ -59,6 +59,8 @@ DEFER: if
 
 : 2dip ( obj1 obj2 quot -- obj1 obj2 ) -rot 2slip ; inline
 
+: 3dip ( obj1 obj2 obj3 quot -- obj1 obj2 obj3 ) -roll 3slip ; inline
+
 ! Keepers
 : keep ( x quot -- x ) over slip ; inline
 

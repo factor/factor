@@ -6,6 +6,11 @@ TYPEDEF: void* caddr_t
 TYPEDEF: uint in_addr_t
 TYPEDEF: uint socklen_t
 
+TYPEDEF: __uint64_t fsblkcnt_t
+TYPEDEF: fsblkcnt_t __fsblkcnt_t    
+TYPEDEF: __uint64_t    fsfilcnt_t
+TYPEDEF: fsfilcnt_t     __fsfilcnt_t
+
 TYPEDEF: char int8_t
 TYPEDEF: short int16_t
 TYPEDEF: int int32_t
@@ -15,6 +20,11 @@ TYPEDEF: uchar uint8_t
 TYPEDEF: ushort uint16_t
 TYPEDEF: uint uint32_t
 TYPEDEF: ulonglong uint64_t
+
+TYPEDEF: uchar u_int8_t
+TYPEDEF: ushort u_int16_t
+TYPEDEF: uint u_int32_t
+TYPEDEF: ulonglong u_int64_t
 
 TYPEDEF: char __int8_t
 TYPEDEF: short __int16_t

@@ -3,8 +3,6 @@
 USING: alien.syntax combinators system vocabs.loader ;
 IN: unix
 
-! FreeBSD
-
 : MAXPATHLEN 1024 ; inline
 
 : O_RDONLY   HEX: 0000 ; inline
@@ -84,6 +82,16 @@ C-STRUCT: passwd
 : SEEK_SET 0 ; inline
 : SEEK_CUR 1 ; inline
 : SEEK_END 2 ; inline
+
+: DT_UNKNOWN   0 ; inline
+: DT_FIFO      1 ; inline
+: DT_CHR       2 ; inline
+: DT_DIR       4 ; inline
+: DT_BLK       6 ; inline
+: DT_REG       8 ; inline
+: DT_LNK      10 ; inline
+: DT_SOCK     12 ; inline
+: DT_WHT      14 ; inline
 
 os {
     { macosx  [ "unix.bsd.macosx"  require ] }

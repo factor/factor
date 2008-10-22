@@ -621,6 +621,14 @@ HELP: 2dip
     { $code "[ foo bar ] 2dip" }
 } ;
 
+HELP: 3dip
+{ $values { "obj1" object } { "obj2" object } { "obj3" object } { "quot" quotation } }
+{ $description "Calls " { $snippet "quot" } " with " { $snippet "obj1" } ", " { $snippet "obj2" } " and " { $snippet "obj3" } " hidden on the retain stack." }
+{ $notes "The following are equivalent:"
+    { $code ">r >r >r foo bar r> r> r>" }
+    { $code "[ foo bar ] 3dip" }
+} ;
+
 HELP: while
 { $values { "pred" "a quotation with stack effect " { $snippet "( -- ? )" } } { "body" "a quotation" } { "tail" "a quotation" } }
 { $description "Repeatedly calls " { $snippet "pred" } ". If it yields " { $link f } ", iteration stops, otherwise " { $snippet "body" } " is called. After iteration stops, " { $snippet "tail" } " is called." }
@@ -815,6 +823,7 @@ ARTICLE: "slip-keep-combinators" "The dip, slip and keep combinators"
 "The dip combinators invoke the quotation at the top of the stack, hiding the values underneath:"
 { $subsection dip }
 { $subsection 2dip }
+{ $subsection 3dip }
 "The slip combinators invoke a quotation further down on the stack. They are most useful for implementing other combinators:"
 { $subsection slip }
 { $subsection 2slip }

@@ -101,8 +101,8 @@ M: engine-word word-completion-string
     "engine-generic" word-prop word-completion-string ;
 
 : use-if-necessary ( word seq -- )
-    over vocabulary>> [
-        2dup assoc-stack pick = [ 2drop ] [
+    over vocabulary>> over and [
+        2dup [ assoc-stack ] keep = [ 2drop ] [
             >r vocabulary>> vocab-words r> push
         ] if
     ] [ 2drop ] if ;
@@ -114,9 +114,10 @@ M: engine-word word-completion-string
     2bi ;
 
 : quot-action ( interactor -- lines )
-    dup control-value
-    dup "\n" join pick add-interactor-history
-    swap select-all ;
+    [ control-value ] keep
+    [ [ "\n" join ] dip add-interactor-history ]
+    [ select-all ]
+    2bi ;
 
 TUPLE: stack-display < track ;
 

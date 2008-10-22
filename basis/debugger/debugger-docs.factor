@@ -1,7 +1,6 @@
 USING: alien arrays generic generic.math help.markup help.syntax
 kernel math memory strings sbufs vectors io io.files classes
-help generic.standard continuations system io.files.private
-listener ;
+help generic.standard continuations io.files.private listener ;
 IN: debugger
 
 ARTICLE: "debugger" "The debugger"
@@ -144,5 +143,4 @@ HELP: memory-error.
 { $notes "This can be a result of incorrect usage of C library interface words, a bug in the compiler, or a bug in the VM." } ;
 
 HELP: primitive-error.
-{ $error-description "Thrown by the Factor VM if an unsupported primitive word is called." }
-{ $notes "This word is only ever thrown on Windows CE, where the " { $link cwd } ", " { $link cd } ", and " { $link os-env } " primitives are unsupported." } ;
+{ $error-description "Thrown by the Factor VM if an unsupported primitive word is called." } ;

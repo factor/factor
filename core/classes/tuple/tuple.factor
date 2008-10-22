@@ -102,8 +102,8 @@ ERROR: bad-superclass class ;
     dup dup tuple-layout echelon>>
     [ tuple-instance? ] 2curry define-predicate ;
 
-: superclass-size ( class -- n )
-    superclasses but-last [ "slots" word-prop length ] sigma ;
+: class-size ( class -- n )
+    superclasses [ "slots" word-prop length ] sigma ;
 
 : (instance-check-quot) ( class -- quot )
     [
@@ -138,16 +138,16 @@ ERROR: bad-superclass class ;
 : define-tuple-prototype ( class -- )
     dup tuple-prototype "prototype" set-word-prop ;
 
-: finalize-tuple-slots ( class slots -- slots )
-    swap superclass-size 2 + finalize-slots ;
+: prepare-slots ( slots superclass -- slots' )
+    [ make-slots ] [ class-size 2 + ] bi* finalize-slots ;
 
 : define-tuple-slots ( class -- )
-    dup dup "slots" word-prop finalize-tuple-slots
+    dup "slots" word-prop over superclass prepare-slots
     define-accessors ;
 
 : make-tuple-layout ( class -- layout )
     [ ]
-    [ [ superclass-size ] [ "slots" word-prop length ] bi + ]
+    [ [ superclass class-size ] [ "slots" word-prop length ] bi + ]
     [ superclasses dup length 1- ] tri
     <tuple-layout> ;
 
@@ -208,7 +208,6 @@ M: tuple-class update-class
     } cleave ;
 
 : define-new-tuple-class ( class superclass slots -- )
-    make-slots
     [ drop f f tuple-class define-class ]
     [ nip "slots" set-word-prop ]
     [ 2drop update-classes ]
@@ -241,16 +240,19 @@ M: tuple-class update-class
 : check-superclass ( superclass -- )
     dup valid-superclass? [ bad-superclass ] unless drop ;
 
+GENERIC# (define-tuple-class) 2 ( class superclass slots -- )
+
 PRIVATE>
 
-GENERIC# define-tuple-class 2 ( class superclass slots -- )
-
-M: word define-tuple-class
+: define-tuple-class ( class superclass slots -- )
     over check-superclass
+    over prepare-slots
+    (define-tuple-class) ;
+
+M: word (define-tuple-class)
     define-new-tuple-class ;
 
-M: tuple-class define-tuple-class
-    over check-superclass
+M: tuple-class (define-tuple-class)
     3dup tuple-class-unchanged?
     [ 3drop ] [ redefine-tuple-class ] if ;
 

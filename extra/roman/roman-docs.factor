@@ -43,3 +43,6 @@ HELP: roman/mod
 { $values { "str1" "a string" } { "str2" "a string" } { "str3" "a string" } { "str4" "a string" } }
 { $description "Computes the quotient and remainder of two Roman numerals." }
 { $see-also roman* roman/i /mod } ;
+
+HELP: ROMAN:
+{ $description "A parsing word that reads the next token and converts it to an integer." } ;

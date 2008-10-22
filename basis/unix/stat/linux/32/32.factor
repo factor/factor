@@ -1,6 +1,4 @@
-
 USING: kernel alien.syntax math ;
-
 IN: unix.stat
 
 ! Ubuntu 8.04 32-bit
@@ -23,8 +21,6 @@ C-STRUCT: stat
     { "timespec"  "st_ctimespec" }
     { "ulong"     "unused4" }
     { "ulong"     "unused5" } ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 FUNCTION: int __xstat  ( int ver, char* pathname, stat* buf ) ;
 FUNCTION: int __lxstat ( int ver, char* pathname, stat* buf ) ;

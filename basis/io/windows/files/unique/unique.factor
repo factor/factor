@@ -1,6 +1,6 @@
 USING: kernel system io.files.unique.backend
 windows.kernel32 io.windows io.windows.files io.ports windows
-destructors ;
+destructors environment ;
 IN: io.windows.files.unique
 
 M: windows (make-unique-file) ( path -- )

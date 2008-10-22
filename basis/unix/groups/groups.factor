@@ -4,7 +4,7 @@ USING: alien alien.c-types alien.strings io.encodings.utf8
 io.unix.backend kernel math sequences splitting unix strings
 combinators.short-circuit byte-arrays combinators qualified
 accessors math.parser fry assocs namespaces continuations
-unix.users ;
+unix.users unix.utilities ;
 IN: unix.groups
 
 QUALIFIED: grouping
@@ -18,12 +18,7 @@ GENERIC: group-struct ( obj -- group )
 <PRIVATE
 
 : group-members ( group-struct -- seq )
-    group-gr_mem
-    [ dup { [ ] [ *void* ] } 1&& ]
-    [
-        dup *void* utf8 alien>string
-        [ alien-address "char**" heap-size + <alien> ] dip
-    ] [ ] produce nip ;
+    group-gr_mem utf8 alien>strings ;
 
 : (group-struct) ( id -- group-struct id group-struct byte-array length void* )
     "group" <c-object> tuck 4096

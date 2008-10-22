@@ -151,16 +151,22 @@ USE: debugger.threads
     "delete-tree-test" temp-file delete-tree
 ] unit-test
 
-[ { { "kernel" t } } ] [
+[ { "kernel" } ] [
     "core" resource-path [
-        "." directory [ first "kernel" = ] filter
+        "." directory-files [ "kernel" = ] filter
     ] with-directory
 ] unit-test
 
-[ { { "kernel" t } } ] [
+[ { "kernel" } ] [
     "resource:core" [
-        "." directory [ first "kernel" = ] filter
+        "." directory-files [ "kernel" = ] filter
     ] with-directory
+] unit-test
+
+[ { "kernel" } ] [
+    "resource:core" [
+        [ "kernel" = ] filter
+    ] with-directory-files
 ] unit-test
 
 [ ] [
