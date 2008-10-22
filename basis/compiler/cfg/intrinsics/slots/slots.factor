@@ -3,7 +3,7 @@
 USING: layouts namespaces kernel accessors sequences
 classes.algebra compiler.tree.propagation.info
 compiler.cfg.stacks compiler.cfg.hats compiler.cfg.instructions
-compiler.cfg.intrinsics.utilities ;
+compiler.cfg.utilities ;
 IN: compiler.cfg.intrinsics.slots
 
 : emit-tag ( -- )

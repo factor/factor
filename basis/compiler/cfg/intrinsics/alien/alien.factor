@@ -4,7 +4,7 @@ USING: accessors kernel sequences alien math classes.algebra
 fry locals combinators cpu.architecture
 compiler.tree.propagation.info
 compiler.cfg.hats compiler.cfg.stacks compiler.cfg.instructions
-compiler.cfg.intrinsics.utilities ;
+compiler.cfg.utilities ;
 IN: compiler.cfg.intrinsics.alien
 
 : (prepare-alien-accessor-imm) ( class offset -- offset-vreg )

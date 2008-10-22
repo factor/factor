@@ -7,17 +7,18 @@ TUPLE: cfg entry word label ;
 
 C: <cfg> cfg
 
-! - "number" and "visited" is used by linearization.
 TUPLE: basic-block < identity-tuple
-visited
+id
 number
 instructions
-successors ;
+successors
+gc ;
 
 : <basic-block> ( -- basic-block )
     basic-block new
         V{ } clone >>instructions
-        V{ } clone >>successors ;
+        V{ } clone >>successors
+        \ basic-block counter >>id ;
 
 TUPLE: mr { instructions array } word label spill-counts ;
 

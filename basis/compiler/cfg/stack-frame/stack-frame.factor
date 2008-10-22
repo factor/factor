@@ -21,10 +21,10 @@ M: ##stack-frame compute-stack-frame*
     frame-required? on
     stack-frame>> stack-frame [ max-stack-frame ] change ;
 
-M: ##gc compute-stack-frame*
+M: ##call compute-stack-frame*
     drop frame-required? on ;
 
-M: ##call compute-stack-frame*
+M: _gc compute-stack-frame*
     drop frame-required? on ;
 
 M: _spill compute-stack-frame*

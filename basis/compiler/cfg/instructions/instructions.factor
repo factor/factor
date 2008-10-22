@@ -29,7 +29,7 @@ TUPLE: ##effect < insn { src vreg } ;
 TUPLE: ##read < ##flushable ;
 TUPLE: ##write < ##effect ;
 
-TUPLE: ##alien-getter < ##read { src vreg } ;
+TUPLE: ##alien-getter < ##flushable { src vreg } ;
 TUPLE: ##alien-setter < ##effect { value vreg } ;
 
 ! Stack operations
@@ -145,7 +145,6 @@ INSN: ##set-alien-double < ##alien-setter ;
 ! Memory allocation
 INSN: ##allot < ##flushable size class { temp vreg } ;
 INSN: ##write-barrier < ##effect card# table ;
-INSN: ##gc ;
 
 ! FFI
 INSN: ##alien-invoke params ;
@@ -193,6 +192,8 @@ INSN: _prologue stack-frame ;
 INSN: _epilogue stack-frame ;
 
 INSN: _label id ;
+
+INSN: _gc ;
 
 INSN: _branch label ;
 

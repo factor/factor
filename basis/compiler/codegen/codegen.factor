@@ -201,7 +201,7 @@ M: ##write-barrier generate-insn
     [ table>> register ]
     tri %write-barrier ;
 
-M: ##gc generate-insn drop %gc ;
+M: _gc generate-insn drop %gc ;
 
 ! ##alien-invoke
 GENERIC: reg-size ( register-class -- n )

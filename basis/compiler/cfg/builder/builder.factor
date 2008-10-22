@@ -12,6 +12,7 @@ compiler.cfg
 compiler.cfg.hats
 compiler.cfg.stacks
 compiler.cfg.iterator
+compiler.cfg.utilities
 compiler.cfg.registers
 compiler.cfg.intrinsics
 compiler.cfg.instructions
@@ -19,19 +20,6 @@ compiler.alien ;
 IN: compiler.cfg.builder
 
 ! Convert tree SSA IR to CFG SSA IR.
-
-: set-basic-block ( basic-block -- )
-    [ basic-block set ] [ instructions>> building set ] bi ;
-
-: begin-basic-block ( -- )
-    <basic-block> basic-block get [
-        dupd successors>> push
-    ] when*
-    set-basic-block ;
-
-: end-basic-block ( -- )
-    building off
-    basic-block off ;
 
 : stop-iterating ( -- next ) end-basic-block f ;
 
@@ -98,7 +86,7 @@ GENERIC: emit-node ( node -- next )
 : emit-call ( word -- next )
     {
         { [ dup loops get key? ] [ loops get at local-recursive-call ] }
-        { [ tail-call? not ] [ ##call iterate-next ] }
+        { [ tail-call? not ] [ ##call begin-basic-block iterate-next ] }
         { [ dup current-label get eq? ] [ drop first-basic-block get local-recursive-call ] }
         [ ##epilogue ##jump stop-iterating ]
     } cond ;
@@ -241,7 +229,7 @@ M: #terminate emit-node drop stop-iterating ;
 
 : emit-alien-node ( node quot -- next )
     [ params>> ] dip [ drop alien-stack-frame ] [ call ] 2bi
-    iterate-next ; inline
+    begin-basic-block iterate-next ; inline
 
 M: #alien-invoke emit-node
     [ ##alien-invoke ] emit-alien-node ;
