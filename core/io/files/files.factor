@@ -188,9 +188,6 @@ TUPLE: file-system-info mount-on free-space ;
 
 HOOK: file-system-info os ( path -- file-system-info )
 
-HOOK: >file-system-info os ( struct -- statfs )
-
-
 <PRIVATE
 
 HOOK: cd io-backend ( path -- )
