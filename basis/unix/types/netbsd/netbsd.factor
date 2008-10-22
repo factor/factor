@@ -17,12 +17,6 @@ TYPEDEF: long           ssize_t
 TYPEDEF: int            pid_t
 TYPEDEF: int            time_t
 
-TYPEDEF: __uint64_t    fsblkcnt_t
-TYPEDEF: fsblkcnt_t      __fsblkcnt_t    
-
-TYPEDEF: __uint64_t    fsfilcnt_t
-TYPEDEF: fsfilcnt_t     __fsfilcnt_t
-
 cell-bits {
     { 32 [ "unix.types.netbsd.32" require ] }
     { 64 [ "unix.types.netbsd.64" require ] }

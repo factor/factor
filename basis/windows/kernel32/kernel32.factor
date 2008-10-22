@@ -928,7 +928,8 @@ FUNCTION: HANDLE GetCurrentThread ( ) ;
 ! FUNCTION: GetDevicePowerState
 ! FUNCTION: GetDiskFreeSpaceA
 ! FUNCTION: GetDiskFreeSpaceExA
-! FUNCTION: GetDiskFreeSpaceExW
+FUNCTION: BOOL GetDiskFreeSpaceExW ( LPCTSTR lpDirectoryName, PULARGE_INTEGER pFreeBytesAvailable, PULARGE_INTEGER lpTotalNumberOfBytes, PULARGE_INTEGER lpTotalNumberOfFreeBytes ) ;
+ALIAS: GetDiskFreeSpaceEx GetDiskFreeSpaceExW
 ! FUNCTION: GetDiskFreeSpaceW
 ! FUNCTION: GetDllDirectoryA
 ! FUNCTION: GetDllDirectoryW

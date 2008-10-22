@@ -64,18 +64,18 @@ M: indirect extended? base>> extended? ;
 
 : canonicalize-EBP ( indirect -- indirect )
     #! { EBP } ==> { EBP 0 }
-    dup base>> { EBP RBP R13 } member? [
-        dup displacement>> [ 0 >>displacement ] unless
-    ] when ;
+    dup [ base>> { EBP RBP R13 } member? ] [ displacement>> not ] bi and
+    [ 0 >>displacement ] when ;
 
-: canonicalize-ESP ( indirect -- indirect )
-    #! { ESP } ==> { ESP ESP }
-    dup base>> { ESP RSP R12 } member? [ ESP >>index ] when ;
+ERROR: bad-index indirect ;
+
+: check-ESP ( indirect -- indirect )
+    dup index>> { ESP RSP } memq? [ bad-index ] when ;
 
 : canonicalize ( indirect -- indirect )
     #! Modify the indirect to work around certain addressing mode
     #! quirks.
-    canonicalize-EBP canonicalize-ESP ;
+    canonicalize-EBP check-ESP ;
 
 : <indirect> ( base index scale displacement -- indirect )
     indirect boa canonicalize ;
@@ -91,7 +91,7 @@ M: indirect extended? base>> extended? ;
 GENERIC: sib-present? ( op -- ? )
 
 M: indirect sib-present?
-    [ base>> { ESP RSP } member? ] [ index>> ] [ scale>> ] tri or or ;
+    [ base>> { ESP RSP R12 } member? ] [ index>> ] [ scale>> ] tri or or ;
 
 M: register sib-present? drop f ;
 
@@ -254,7 +254,8 @@ M: object operand-64? drop f ;
     reg-code swap addressing ;
 
 : direction-bit ( dst src op -- dst' src' op' )
-    pick register? [ BIN: 10 opcode-or swapd ] when ;
+    pick register? pick register? not and
+    [ BIN: 10 opcode-or swapd ] when ;
 
 : operand-size-bit ( dst src op -- dst' src' op' )
     over register-8? [ BIN: 1 opcode-or ] unless ;

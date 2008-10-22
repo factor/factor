@@ -23,3 +23,7 @@ TYPEDEF: __slongword_type blkcnt_t
 TYPEDEF: __sword_type     ssize_t
 TYPEDEF: __s32_type       pid_t
 TYPEDEF: __slongword_type time_t
+
+TYPEDEF: ssize_t __SWORD_TYPE
+TYPEDEF: ulonglong __fsblkcnt64_t
+TYPEDEF: ulonglong __fsfilcnt64_t
