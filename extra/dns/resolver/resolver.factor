@@ -2,7 +2,7 @@
 USING: kernel accessors namespaces continuations
        io io.sockets io.binary io.timeouts io.encodings.binary
        destructors
-       locals strings sequences random prettyprint calendar dns ;
+       locals strings sequences random prettyprint calendar dns dns.misc ;
 
 IN: dns.resolver
 
@@ -50,7 +50,11 @@ IN: dns.resolver
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: dns-servers ( -- seq ) \ dns-servers get ;
+: dns-servers ( -- seq )
+  \ dns-servers get
+    [ ]
+    [ resolv-conf-servers \ dns-servers set dns-servers ]
+  if* ;
 
 ! : dns-server ( -- server ) dns-servers random ;
 
