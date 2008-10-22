@@ -4,7 +4,8 @@ USING: kernel words sequences quotations namespaces io
 classes.tuple accessors prettyprint prettyprint.config
 compiler.tree.builder compiler.tree.optimizer
 compiler.cfg.builder compiler.cfg.linearization
-compiler.cfg.stack-frame compiler.cfg.linear-scan ;
+compiler.cfg.stack-frame compiler.cfg.linear-scan
+compiler.cfg.optimizer ;
 IN: compiler.cfg.debugger
 
 GENERIC: test-cfg ( quot -- cfgs )
@@ -19,6 +20,7 @@ SYMBOL: allocate-registers?
 
 : test-mr ( quot -- mrs )
     test-cfg [
+        optimize-cfg
         build-mr
         allocate-registers? get
         [ linear-scan build-stack-frame ] when

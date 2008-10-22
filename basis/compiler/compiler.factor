@@ -6,8 +6,9 @@ threads graphs generic combinators deques search-deques
 stack-checker stack-checker.state stack-checker.inlining
 compiler.errors compiler.units compiler.tree.builder
 compiler.tree.optimizer compiler.cfg.builder
-compiler.cfg.linearization compiler.cfg.linear-scan
-compiler.cfg.stack-frame compiler.codegen ;
+compiler.cfg.optimizer compiler.cfg.linearization
+compiler.cfg.linear-scan compiler.cfg.stack-frame
+compiler.codegen ;
 IN: compiler
 
 SYMBOL: compile-queue
@@ -73,6 +74,7 @@ t compile-dependencies? set-global
 
 : backend ( nodes word -- )
     build-cfg [
+        optimize-cfg
         build-mr
         linear-scan
         build-stack-frame

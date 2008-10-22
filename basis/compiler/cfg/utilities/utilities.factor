@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors kernel math layouts namespaces cpu.architecture
-namespaces compiler.cfg compiler.cfg.instructions ;
+USING: accessors kernel math layouts make sequences
+cpu.architecture namespaces compiler.cfg
+compiler.cfg.instructions ;
 IN: compiler.cfg.utilities
 
 : value-info-small-tagged? ( value-info -- ? )

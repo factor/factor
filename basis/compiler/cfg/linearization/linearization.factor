@@ -53,7 +53,10 @@ M: ##compare-float-branch linearize-insn
     binary-conditional _compare-float-branch emit-branch ;
 
 : linearize-basic-block ( bb -- )
-    [ number>> _label ] [ linearize-insns ] bi ;
+    [ number>> _label ]
+    [ gc>> [ _gc ] when ]
+    [ linearize-insns ]
+    tri ;
 
 : linearize-basic-blocks ( rpo -- insns )
     [ [ linearize-basic-block ] each ] { } make ;

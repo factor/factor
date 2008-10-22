@@ -5,12 +5,12 @@ parser prettyprint.backend prettyprint.sections ;
 IN: compiler.cfg.registers
 
 ! Virtual registers, used by CFG and machine IRs
-TUPLE: vreg reg-class n ;
+TUPLE: vreg { reg-class read-only } { n read-only } ;
 SYMBOL: vreg-counter
 : next-vreg ( reg-class -- vreg ) \ vreg-counter counter vreg boa ;
 
 ! Stack locations
-TUPLE: loc n ;
+TUPLE: loc { n read-only } ;
 
 TUPLE: ds-loc < loc ;
 C: <ds-loc> ds-loc
