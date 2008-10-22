@@ -2,10 +2,11 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays assocs kernel math math.order math.vectors
 namespaces make quotations sequences sequences.lib
-sequences.private strings unicode.case ;
+sequences.private strings unicode.case lexer parser ;
 IN: roman
 
 <PRIVATE
+
 : roman-digits ( -- seq )
     { "m" "cm" "d" "cd" "c" "xc" "l" "xl" "x" "ix" "v" "iv" "i" } ;
 
@@ -34,6 +35,7 @@ ERROR: roman-range-error n ;
     ] [
         first2 swap -
     ] if ;
+
 PRIVATE>
 
 : >roman ( n -- str )
@@ -49,11 +51,13 @@ PRIVATE>
     ] map sum ;
 
 <PRIVATE
+
 : 2roman> ( str1 str2 -- m n )
     [ roman> ] bi@ ;
 
 : binary-roman-op ( str1 str2 quot -- str3 )
     >r 2roman> r> call >roman ; inline
+
 PRIVATE>
 
 : roman+ ( str1 str2 -- str3 )
@@ -70,3 +74,5 @@ PRIVATE>
 
 : roman/mod ( str1 str2 -- str3 str4 )
     [ /mod ] binary-roman-op >r >roman r> ;
+
+: ROMAN: scan roman> parsed ; parsing
