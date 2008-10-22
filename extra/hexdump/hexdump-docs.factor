@@ -1,14 +1,14 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: help.markup help.syntax kernel ;
+USING: help.markup help.syntax kernel sequences strings ;
 IN: hexdump
 
 HELP: hexdump.
-{ $values { "sequence" "a sequence" } }
+{ $values { "seq" sequence } }
 { $description "Converts a sequence to its hexadecimal and ASCII representation sixteen characters at a time and writes it to standard out." } ;
 
 HELP: hexdump
-{ $values { "sequence" "a sequence" } { "string" "a string" } }
+{ $values { "seq" sequence } { "str" string } }
 { $description "Converts a sequence to its hexadecimal and ASCII representation sixteen characters at a time.  Lines are separated by a newline character." }
 { $see-also hexdump. } ;
 
