@@ -10,14 +10,13 @@ flags filesystem-subtype file-system-type-name mount-on
 mount-from ;
 
 HOOK: mounted* os ( -- array )
-HOOK: mounted-struct>mounted os ( byte-array -- mounted )
+HOOK: >mounted os ( byte-array -- mounted )
 
 TUPLE: file-system-info root-directory total-free-size total-size ;
 
 HOOK: >file-system-info os ( struct -- statfs )
 
-: mounted ( -- array )
-    mounted* [ mounted-struct>mounted ] map ;
+: mounted ( -- array ) mounted* [ >mounted ] map ;      
 
 : mounted-drive ( path -- mounted/f )
     mounted
