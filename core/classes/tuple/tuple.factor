@@ -93,9 +93,8 @@ ERROR: bad-superclass class ;
 : tuple-instance? ( object class echelon -- ? )
     #! 4 slot == superclasses>>
     rot dup tuple? [
-        layout-of 4 slot
-        2dup 1 slot fixnum<
-        [ array-nth eq? ] [ 3drop f ] if
+        layout-of 4 slot { array } declare
+        2dup 1 slot fixnum< [ array-nth eq? ] [ 3drop f ] if
     ] [ 3drop f ] if ; inline
 
 : define-tuple-predicate ( class -- )
