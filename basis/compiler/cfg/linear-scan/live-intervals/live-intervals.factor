@@ -11,6 +11,7 @@ reg spill-to reload-from split-before split-after
 start end uses ;
 
 : add-use ( n live-interval -- )
+    dup live-interval? [ "No def" throw ] unless
     [ (>>end) ] [ uses>> push ] 2bi ;
 
 : <live-interval> ( start vreg -- live-interval )
