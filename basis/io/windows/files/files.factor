@@ -5,7 +5,7 @@ io.windows kernel math splitting fry alien.strings
 windows windows.kernel32 windows.time calendar combinators
 math.functions sequences namespaces make words symbols system
 io.ports destructors accessors math.bitwise continuations
-windows.errors arrays ;
+windows.errors arrays byte-arrays ;
 IN: io.windows.files
 
 : open-file ( path access-mode create-mode flags -- handle )
@@ -251,18 +251,52 @@ HOOK: root-directory os ( string -- string' )
 TUPLE: winnt-file-system-info < file-system-info
 total-bytes total-free-bytes ;
 
+: file-system-type ( normalized-path -- str )
+    MAX_PATH 1+ <byte-array>
+    MAX_PATH 1+
+    "DWORD" <c-object> "DWORD" <c-object> "DWORD" <c-object>
+    MAX_PATH 1+ <byte-array>
+    MAX_PATH 1+
+    [ GetVolumeInformation win32-error=0/f ] 2keep drop
+    utf16n alien>string ;
+
+: file-system-space ( normalized-path -- free-space total-bytes total-free-bytes )
+    "ULARGE_INTEGER" <c-object>
+    "ULARGE_INTEGER" <c-object>
+    "ULARGE_INTEGER" <c-object>
+    [ GetDiskFreeSpaceEx win32-error=0/f ] 3keep ;
+
 M: winnt file-system-info ( path -- file-system-info )
     normalize-path root-directory
-    dup
-    "ULARGE_INTEGER" <c-object>
-    "ULARGE_INTEGER" <c-object>
-    "ULARGE_INTEGER" <c-object>
-    [ GetDiskFreeSpaceEx win32-error=0/f ] 3keep
+    dup [ file-system-type ] [ file-system-space ] bi
     \ winnt-file-system-info new
         swap *ulonglong >>total-free-bytes
         swap *ulonglong >>total-bytes
         swap *ulonglong >>free-space
-        swap "\\\\?\\" ?head drop root-directory >>name ;
+        swap >>type
+        swap >>name ;
+
+: find-first-volume ( word -- string handle )
+    MAX_PATH 1+ <byte-array> dup length
+    dupd
+    FindFirstVolume dup win32-error=0/f
+    [ utf16n alien>string ] dip ;
+
+: find-next-volume ( handle -- string )
+    MAX_PATH 1+ <byte-array> dup length
+    [ FindNextVolume win32-error=0/f ] 2keep drop
+    utf16n alien>string ;
+
+: mounted ( -- array )
+    find-first-volume
+    [
+        '[
+            [ _ find-next-volume dup ]
+            [ ]
+            [ drop ] produce
+            swap prefix
+        ]
+    ] [ '[ _ FindVolumeClose win32-error=0/f ] ] bi [ ] cleanup ;
 
 : file-times ( path -- timestamp timestamp timestamp )
     [
