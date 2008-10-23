@@ -21,6 +21,7 @@ TUPLE: ##unary/temp < ##unary { temp vreg } ;
 TUPLE: ##binary < ##pure { src1 vreg } { src2 vreg } ;
 TUPLE: ##binary-imm < ##pure { src1 vreg } { src2 integer } ;
 TUPLE: ##commutative < ##binary ;
+TUPLE: ##commutative-imm < ##binary-imm ;
 
 ! Instruction only used for its side effect, produces no values
 TUPLE: ##effect < insn { src vreg } ;
@@ -71,17 +72,17 @@ INSN: ##set-slot-imm < ##write { obj vreg } { slot integer } { tag integer } ;
 
 ! Integer arithmetic
 INSN: ##add < ##commutative ;
-INSN: ##add-imm < ##binary-imm ;
+INSN: ##add-imm < ##commutative-imm ;
 INSN: ##sub < ##binary ;
 INSN: ##sub-imm < ##binary-imm ;
 INSN: ##mul < ##commutative ;
-INSN: ##mul-imm < ##binary-imm ;
+INSN: ##mul-imm < ##commutative-imm ;
 INSN: ##and < ##commutative ;
-INSN: ##and-imm < ##binary-imm ;
+INSN: ##and-imm < ##commutative-imm ;
 INSN: ##or < ##commutative ;
-INSN: ##or-imm < ##binary-imm ;
+INSN: ##or-imm < ##commutative-imm ;
 INSN: ##xor < ##commutative ;
-INSN: ##xor-imm < ##binary-imm ;
+INSN: ##xor-imm < ##commutative-imm ;
 INSN: ##shl-imm < ##binary-imm ;
 INSN: ##shr-imm < ##binary-imm ;
 INSN: ##sar-imm < ##binary-imm ;
