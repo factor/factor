@@ -11,9 +11,10 @@ IN: compiler.tree.finalization
 ! See the comment in compiler.tree.late-optimizations.
 
 ! This pass runs after propagation, so that it can expand
-! built-in type predicates; these cannot
-! be expanded before propagation since we need to see 'fixnum?'
-! instead of 'tag 0 eq?' and so on, for semantic reasoning.
+! built-in type predicates; these cannot be expanded before
+! propagation since we need to see 'fixnum?' instead of
+! 'tag 0 eq?' and so on, for semantic reasoning.
+
 ! We also delete empty stack shuffles and copies to facilitate
 ! tail call optimization in the code generator.
 
