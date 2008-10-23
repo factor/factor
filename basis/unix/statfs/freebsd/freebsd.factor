@@ -23,7 +23,7 @@ C-STRUCT: statvfs
 FUNCTION: int statvfs ( char* path, statvfs* buf ) ;
 
 TUPLE: freebsd-file-system-info < file-system-info
-bavail bfree blocks favail ffree ffiles
+bavail bfree blocks favail ffree files
 bsize flag frsize fsid namemax ;
 
 M: freebsd >file-system-info ( struct -- statfs )
