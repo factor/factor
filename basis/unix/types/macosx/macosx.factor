@@ -1,18 +1,12 @@
-
 USING: alien.syntax ;
-
 IN: unix.types
 
-! Darwin 9.1.0 ppc
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Darwin 9.1.0
 
 TYPEDEF: ushort   __uint16_t
 TYPEDEF: uint     __uint32_t
 TYPEDEF: int      __int32_t
 TYPEDEF: longlong __int64_t
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 TYPEDEF: __int32_t  dev_t
 TYPEDEF: __uint32_t ino_t

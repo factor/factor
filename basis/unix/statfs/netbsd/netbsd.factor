@@ -1,8 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax kernel io.files unix.stat math unix
+USING: alien.syntax kernel unix.stat math unix
 combinators system io.backend accessors alien.c-types
-io.encodings.utf8 alien.strings unix.types ;
+io.encodings.utf8 alien.strings unix.types unix.statfs io.files ;
 IN: unix.statfs.netbsd
 
 : _VFS_NAMELEN    32   ; inline
@@ -69,7 +69,7 @@ M: netbsd >file-system-info ( byte-array -- netbsd-file-system-info )
         [ statvfs-f_owner >>owner ]
         [ statvfs-f_spare >>spare ]
         [ statvfs-f_fstypename utf8 alien>string >>file-system-type-name ]
-        [ statvfs-f_mntonname utf8 alien>string >>mount-on ]
+        [ statvfs-f_mntonname utf8 alien>string >>name ]
         [ statvfs-f_mntfromname utf8 alien>string >>mount-from ]
     } cleave ;
 

@@ -120,13 +120,13 @@ FUNCTION: int getmntinfo64 ( statfs64** mntbufp, int flags ) ;
 
 TUPLE: macosx-file-system-info < file-system-info
 block-size io-size blocks blocks-free blocks-available files
-files-free file-system-id owner type flags filesystem-subtype
-file-system-type-name mount-from ;
+files-free file-system-id owner type-id flags filesystem-subtype ;
 
-M: macosx mounted* ( -- array )
+M: macosx mounted ( -- array )
     f <void*> dup 0 getmntinfo64 dup io-error
     [ *void* ] dip
-    "statfs64" heap-size [ * memory>byte-array ] keep group ;
+    "statfs64" heap-size [ * memory>byte-array ] keep group
+    [ >file-system-info ] map ;
 
 M: macosx >file-system-info ( byte-array -- file-system-info )
     [ \ macosx-file-system-info new ] dip
@@ -135,7 +135,7 @@ M: macosx >file-system-info ( byte-array -- file-system-info )
             [ statfs64-f_bavail ] [ statfs64-f_bsize ] bi *
             >>free-space
         ]
-        [ statfs64-f_mntonname utf8 alien>string >>mount-on ]
+        [ statfs64-f_mntonname utf8 alien>string >>name ]
         [ statfs64-f_bsize >>block-size ]
 
         [ statfs64-f_iosize >>io-size ]
@@ -146,16 +146,16 @@ M: macosx >file-system-info ( byte-array -- file-system-info )
         [ statfs64-f_ffree >>files-free ]
         [ statfs64-f_fsid >>file-system-id ]
         [ statfs64-f_owner >>owner ]
-        [ statfs64-f_type >>type ]
+        [ statfs64-f_type >>type-id ]
         [ statfs64-f_flags >>flags ]
         [ statfs64-f_fssubtype >>filesystem-subtype ]
         [
             statfs64-f_fstypename utf8 alien>string
-            >>file-system-type-name
+            >>type
         ]
         [
             statfs64-f_mntfromname
-            utf8 alien>string >>mount-from
+            utf8 alien>string >>device-name
         ]
     } cleave ;
 
