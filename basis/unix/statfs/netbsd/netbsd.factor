@@ -69,7 +69,7 @@ M: netbsd >file-system-info ( byte-array -- netbsd-file-system-info )
         [ statvfs-f_owner >>owner ]
         [ statvfs-f_spare >>spare ]
         [ statvfs-f_fstypename utf8 alien>string >>file-system-type-name ]
-        [ statvfs-f_mntonname utf8 alien>string >>name ]
+        [ statvfs-f_mntonname utf8 alien>string >>mount-point ]
         [ statvfs-f_mntfromname utf8 alien>string >>mount-from ]
     } cleave ;
 

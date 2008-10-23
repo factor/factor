@@ -135,7 +135,7 @@ M: macosx >file-system-info ( byte-array -- file-system-info )
             [ statfs64-f_bavail ] [ statfs64-f_bsize ] bi *
             >>free-space
         ]
-        [ statfs64-f_mntonname utf8 alien>string >>name ]
+        [ statfs64-f_mntonname utf8 alien>string >>mount-point ]
         [ statfs64-f_bsize >>block-size ]
 
         [ statfs64-f_iosize >>io-size ]
