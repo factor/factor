@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax kernel unix io.files math accessors
-combinators system io.backend alien.c-types ;
+USING: alien.syntax kernel unix math accessors
+combinators system io.backend alien.c-types unix.statfs 
+io.files ;
 IN: unix.statfs.freebsd
 
 : ST_RDONLY       1 ; inline
