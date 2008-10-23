@@ -9,19 +9,11 @@ blocks-available files files-free file-system-id owner type
 flags filesystem-subtype file-system-type-name mount-on
 mount-from ;
 
-HOOK: mounted* os ( -- array )
-HOOK: >mounted os ( byte-array -- mounted )
-
 TUPLE: file-system-info root-directory total-free-size total-size ;
 
 HOOK: >file-system-info os ( struct -- statfs )
 
-: mounted ( -- array ) mounted* [ >file-system-info ] map ;      
-
-: mounted-drive ( path -- mounted/f )
-    mounted
-    [ [ mount-on>> ] bi@ <=> ] sort <reversed>
-    [ mount-on>> head? ] with find nip ;
+HOOK: mounted os ( -- array )
 
 os {
     { linux   [ "unix.statfs.linux"   require ] }

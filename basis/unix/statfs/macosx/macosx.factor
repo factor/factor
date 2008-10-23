@@ -123,10 +123,11 @@ block-size io-size blocks blocks-free blocks-available files
 files-free file-system-id owner type flags filesystem-subtype
 file-system-type-name mount-from ;
 
-M: macosx mounted* ( -- array )
+M: macosx mounted ( -- array )
     f <void*> dup 0 getmntinfo64 dup io-error
     [ *void* ] dip
-    "statfs64" heap-size [ * memory>byte-array ] keep group ;
+    "statfs64" heap-size [ * memory>byte-array ] keep group
+    [ >file-system-info ] map ;
 
 M: macosx >file-system-info ( byte-array -- file-system-info )
     [ \ macosx-file-system-info new ] dip
