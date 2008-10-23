@@ -33,4 +33,7 @@ frequency pass-number ;
     [ mtab-csv>mtab-entry ] map ;
 
 M: linux mounted
-    parse-mtab [ mount-point>> file-system-info ] map ;
+    parse-mtab [
+        mount-point>>
+        [ file-system-info ] keep >>name
+    ] map ;

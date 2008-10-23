@@ -184,7 +184,7 @@ SYMBOL: +unknown+
 
 ! File-system
 
-TUPLE: file-system-info mount-on free-space ;
+TUPLE: file-system-info name free-space ;
 
 HOOK: file-system-info os ( path -- file-system-info )
 
