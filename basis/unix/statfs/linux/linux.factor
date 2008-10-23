@@ -34,6 +34,10 @@ frequency pass-number ;
 
 M: linux mounted
     parse-mtab [
-        mount-point>>
-        [ file-system-info ] keep >>name
+        [ mount-point>> file-system-info ] keep
+        {
+            [ file-system-name>> >>device-name ]
+            [ mount-point>> >>name ]
+            [ type>> >>type ]
+        } cleave
     ] map ;
