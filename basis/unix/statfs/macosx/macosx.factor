@@ -128,9 +128,6 @@ M: macosx mounted* ( -- array )
     [ *void* ] dip
     "statfs64" heap-size [ * memory>byte-array ] keep group ;
 
-M: macosx >mounted
-    >file-system-info ;
-
 M: macosx >file-system-info ( byte-array -- file-system-info )
     [ \ macosx-file-system-info new ] dip
     {
