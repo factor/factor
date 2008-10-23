@@ -6,7 +6,7 @@ compiler.cfg.registers compiler.cfg.instructions
 compiler.cfg.instructions.syntax compiler.cfg.copy-prop ;
 IN: compiler.cfg.alias-analysis
 
-! Alias analysis -- must be run after compiler.cfg.height.
+! Alias analysis -- assumes compiler.cfg.height has already run.
 !
 ! We try to eliminate redundant slot and stack
 ! traffic using some simple heuristics.

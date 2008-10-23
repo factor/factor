@@ -5,13 +5,23 @@ math
 compiler.cfg.instructions
 compiler.cfg.instructions.syntax
 compiler.cfg.value-numbering.graph
+compiler.cfg.value-numbering.simplify
 compiler.cfg.value-numbering.expressions ;
 IN: compiler.cfg.value-numbering.rewrite
 
 GENERIC: rewrite ( insn -- insn' )
 
+M: ##mul-imm rewrite
+    dup src2>> dup power-of-2? [
+        [ [ dst>> ] [ src1>> ] bi ] [ log2 ] bi* f \ ##shl-imm boa
+        dup number-values
+    ] [ drop ] if ;
+
 : ##branch-t? ( insn -- ? )
-    [ cc>> cc/= eq? ] [ src2>> \ f tag-number eq? ] bi and ; inline
+    dup ##compare-imm-branch? [
+        [ cc>> cc/= eq? ]
+        [ src2>> \ f tag-number eq? ] bi and
+    ] [ drop f ] if ; inline
 
 : rewrite-boolean-comparison? ( insn -- ? )
     dup ##branch-t? [
@@ -37,9 +47,11 @@ GENERIC: rewrite ( insn -- insn' )
 
 : rewrite-tagged-comparison? ( insn -- ? )
     #! Are we comparing two tagged fixnums? Then untag them.
-    [ src1>> vreg>expr tag-fixnum-expr? ]
-    [ src2>> tag-mask get bitand 0 = ]
-    bi and ; inline
+    dup ##compare-imm-branch? [
+        [ src1>> vreg>expr tag-fixnum-expr? ]
+        [ src2>> tag-mask get bitand 0 = ]
+        bi and
+    ] [ drop f ] if ; inline
 
 : rewrite-tagged-comparison ( insn -- insn' )
     [ src1>> vreg>expr in1>> vn>vreg ]

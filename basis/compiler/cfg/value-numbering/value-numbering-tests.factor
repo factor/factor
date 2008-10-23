@@ -50,3 +50,19 @@ compiler.cfg.registers cpu.architecture tools.test kernel ;
         T{ ##replace f V int-regs 23 D 0 }
     } dup value-numbering =
 ] unit-test
+
+[
+    {
+        T{ ##peek f V int-regs 1 D 0 }
+        T{ ##shl-imm f V int-regs 2 V int-regs 1 3 }
+        T{ ##shr-imm f V int-regs 3 V int-regs 2 3 }
+        T{ ##replace f V int-regs 1 D 0 }
+    }
+] [
+    {
+        T{ ##peek f V int-regs 1 D 0 }
+        T{ ##mul-imm f V int-regs 2 V int-regs 1 8 }
+        T{ ##shr-imm f V int-regs 3 V int-regs 2 3 }
+        T{ ##replace f V int-regs 3 D 0 }
+    } value-numbering
+] unit-test

@@ -7,9 +7,6 @@ IN: compiler.cfg.height
 
 ! Combine multiple stack height changes into one at the
 ! start of the basic block.
-!
-! Alias analysis and value numbering assume this optimization
-! has been performed.
 
 SYMBOL: ds-height
 SYMBOL: rs-height

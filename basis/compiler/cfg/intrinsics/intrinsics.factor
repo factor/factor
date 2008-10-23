@@ -72,6 +72,10 @@ IN: compiler.cfg.intrinsics
         math.private:float/f
         math.private:fixnum>float
         math.private:float>fixnum
+        math.private:float<
+        math.private:float<=
+        math.private:float>
+        math.private:float>=
         alien.accessors:alien-float
         alien.accessors:set-alien-float
         alien.accessors:alien-double

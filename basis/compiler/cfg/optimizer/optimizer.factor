@@ -5,6 +5,7 @@ compiler.cfg.instructions
 compiler.cfg.height
 compiler.cfg.alias-analysis
 compiler.cfg.value-numbering
+compiler.cfg.dead-code
 compiler.cfg.write-barrier ;
 IN: compiler.cfg.optimizer
 
@@ -17,6 +18,7 @@ IN: compiler.cfg.optimizer
             normalize-height
             alias-analysis
             value-numbering
+            eliminate-dead-code
             eliminate-write-barriers
         ] unless
     ] change-basic-blocks ;
