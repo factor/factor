@@ -60,5 +60,3 @@ M: ##dispatch propagate
     [ resolve ] change-src ;
 
 M: insn propagate ;
-
-M: f propagate ;

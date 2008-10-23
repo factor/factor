@@ -4,6 +4,7 @@ compiler.cfg.registers cpu.architecture tools.test kernel ;
 [
     {
         T{ ##peek f V int-regs 45 D 1 }
+        T{ ##copy f V int-regs 48 V int-regs 45 }
         T{ ##compare-imm-branch f V int-regs 45 7 cc/= }
     }
 ] [
@@ -16,6 +17,7 @@ compiler.cfg.registers cpu.architecture tools.test kernel ;
 
 [
     {
+        T{ ##load-immediate f V int-regs 2 8 }
         T{ ##peek f V int-regs 3 D 0 }
         T{ ##slot-imm f V int-regs 4 V int-regs 3 1 3 }
         T{ ##replace f V int-regs 4 D 0 }
