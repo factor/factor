@@ -80,6 +80,7 @@ bootstrapping? on
     "io.files"
     "io.files.private"
     "io.streams.c"
+    "locals.backend"
     "kernel"
     "kernel.private"
     "math"
@@ -370,6 +371,8 @@ tuple
     { "eq?" "kernel" }
     { "tag" "kernel.private" }
     { "slot" "slots.private" }
+    { "get-local" "locals.backend" }
+    { "drop-locals" "locals.backend" }
 } [ make-sub-primitive ] assoc-each
 
 ! Primitive words

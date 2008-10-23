@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.x86.assembler layouts compiler.units math
-math.private compiler.constants vocabs
-slots.private words words.private ;
+math.private compiler.constants vocabs slots.private words
+words.private locals.backend ;
 IN: bootstrap.x86
 
 big-endian off
@@ -301,5 +301,21 @@ big-endian off
     arg0 tag-mask get XOR                      ! clear tag bits
     ds-reg [] arg0 MOV                         ! save
 ] f f f \ fixnum-bitnot define-sub-primitive
+
+[
+    arg0 ds-reg [] MOV                         ! load local number
+    fixnum>slot@                               ! turn local number into offset
+    arg1 bootstrap-cell MOV                    ! load base
+    arg1 arg0 SUB                              ! turn it into a stack offset
+    arg0 rs-reg arg1 [+] MOV                   ! load local value
+    ds-reg [] arg0 MOV                         ! push to stack
+] f f f \ get-local define-sub-primitive
+
+[
+    arg0 ds-reg [] MOV                         ! load local count
+    ds-reg bootstrap-cell SUB                  ! adjust stack pointer
+    fixnum>slot@                               ! turn local number into offset
+    rs-reg arg0 SUB                            ! decrement retain stack pointer
+] f f f \ drop-locals define-sub-primitive
 
 [ "bootstrap.x86" forget-vocab ] with-compilation-unit
