@@ -1,7 +1,9 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types combinators kernel io.files unix.stat
-math accessors system unix io.backend layouts vocabs.loader ;
+math accessors system unix io.backend layouts vocabs.loader
+sequences csv io.streams.string io.encodings.utf8 namespaces
+unix.statfs io.files ;
 IN: unix.statfs.linux
 
 cell-bits {
@@ -30,5 +32,5 @@ frequency pass-number ;
     ] with-scope
     [ mtab-csv>mtab-entry ] map ;
 
-M: linux mounted*
-    parse-mtab [ mount-point>> >file-system-info ] map ;
+M: linux mounted
+    parse-mtab [ mount-point>> file-system-info ] map ;
