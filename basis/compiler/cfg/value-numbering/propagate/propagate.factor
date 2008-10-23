@@ -1,58 +1,64 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: namespaces assocs sequences kernel accessors
+compiler.cfg.instructions compiler.cfg.instructions.syntax
+compiler.cfg.value-numbering.graph ;
 IN: compiler.cfg.value-numbering.propagate
 
 ! If two vregs compute the same value, replace references to
 ! the latter with the former.
 
-: resolve ( vreg -- vreg' ) vreg>vn vn>vreg ;
+: resolve ( vreg -- vreg' ) vreg>vn vn>vreg ; inline
 
-GENERIC: propogate ( insn -- insn )
+GENERIC: propagate ( insn -- insn )
 
-M: ##unary-branch propagate [ resolve ] change-src ;
+M: ##effect propagate
+    [ resolve ] change-src ;
 
-M: ##unary propogate [ resolve ] change-src ;
+M: ##unary propagate
+    [ resolve ] change-src ;
 
-M: ##flushable propagate ;
+M: ##binary propagate
+    [ resolve ] change-src1
+    [ resolve ] change-src2 ;
 
-M: ##replace propagate [ resolve ] change-src ;
+M: ##binary-imm propagate
+    [ resolve ] change-src1 ;
 
-M: ##inc-d propagate ;
+M: ##slot propagate
+    [ resolve ] change-obj
+    [ resolve ] change-slot ;
 
-M: ##inc-r propagate ;
+M: ##slot-imm propagate
+    [ resolve ] change-obj ;
 
-M: ##stack-frame propagate ;
+M: ##set-slot propagate
+    call-next-method
+    [ resolve ] change-obj
+    [ resolve ] change-slot ;
 
-M: ##call propagate ;
+M: ##set-slot-imm propagate
+    call-next-method
+    [ resolve ] change-obj ;
 
-M: ##jump propagate ;
+M: ##alien-getter propagate
+    call-next-method
+    [ resolve ] change-src ;
 
-M: ##return propagate ;
+M: ##alien-setter propagate
+    call-next-method
+    [ resolve ] change-value ;
 
-M: ##intrinsic propagate
-    [ [ resolve ] assoc-map ] change-defs-vregs
-    [ [ resolve ] assoc-map ] change-uses-vregs ;
+M: ##conditional-branch propagate
+    [ resolve ] change-src1
+    [ resolve ] change-src2 ;
 
-M: ##dispatch propagate [ resolve ] change-src ;
+M: ##compare-imm-branch propagate
+    [ resolve ] change-src1 ;
 
-M: ##dispatch-label propagate ;
+M: ##dispatch propagate
+    [ resolve ] change-src ;
 
-M: ##write-barrier propagate [ resolve ] change-src ;
+M: insn propagate ;
 
-M: ##alien-invoke propagate ;
-
-M: ##alien-indirect propagate ;
-
-M: ##alien-callback propagate ;
-
-M: ##callback-return propagate ;
-
-M: ##prologue propagate ;
-
-M: ##epilogue propagate ;
-
-M: ##branch propagate ;
-
-M: ##if-intrinsic propagate
-    [ [ resolve ] assoc-map ] change-defs-vregs
-    [ [ resolve ] assoc-map ] change-uses-vregs ;
+M: f propagate ;

@@ -1,9 +1,15 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
+USING: namespaces kernel assocs sets accessors
+compiler.cfg.instructions
+compiler.cfg.instructions.syntax
+compiler.cfg.value-numbering.graph
+compiler.cfg.value-numbering.expressions ;
 IN: compiler.cfg.value-numbering.liveness
 
-! A set of VNs which are (transitively) used by side-effecting
-! instructions.
+! A set of VNs which are (transitively) used by effect-ops. This
+! is precisely the set of VNs whose value is needed outside of
+! the basic block.
 SYMBOL: live-vns
 
 GENERIC: live-expr ( expr -- )
@@ -14,11 +20,11 @@ GENERIC: live-expr ( expr -- )
         [ live-vns get conjoin ] [ vn>expr live-expr ] bi
     ] if ;
 
-M: peek-expr live-expr drop ;
-M: unary-expr live-expr in>> live-vn ;
-M: load-literal-expr live-expr in>> live-vn ;
-
 : live-vreg ( vreg -- ) vreg>vn live-vn ;
+
+M: expr live-expr drop ;
+M: unary-expr live-expr in>> live-vn ;
+M: binary-expr live-expr [ in1>> live-vn ] [ in2>> live-vn ] bi ;
 
 : live? ( vreg -- ? )
     dup vreg>vn tuck vn>vreg =
@@ -27,12 +33,7 @@ M: load-literal-expr live-expr in>> live-vn ;
 : init-liveness ( -- )
     H{ } clone live-vns set ;
 
-GENERIC: eliminate ( insn -- insn/f )
+GENERIC: eliminate ( insn -- insn' )
 
-: (eliminate) ( insn -- insn/f )
-    dup dst>> live? [ drop f ] unless ;
-
-M: ##peek eliminate (eliminate) ;
-M: ##unary eliminate (eliminate) ;
-M: ##load-literal eliminate (eliminate) ;
+M: ##flushable eliminate dup dst>> live? [ drop f ] unless ;
 M: insn eliminate ;
