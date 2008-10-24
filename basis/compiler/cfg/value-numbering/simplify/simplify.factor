@@ -2,7 +2,6 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors combinators classes math layouts
 compiler.cfg.instructions
-compiler.cfg.instructions.syntax
 compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.expressions ;
 IN: compiler.cfg.value-numbering.simplify

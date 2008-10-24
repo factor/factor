@@ -1,7 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays kernel compiler.cfg.instructions
-compiler.cfg.instructions.syntax ;
+USING: accessors arrays kernel compiler.cfg.instructions ;
 IN: compiler.cfg.def-use
 
 GENERIC: defs-vregs ( insn -- seq )

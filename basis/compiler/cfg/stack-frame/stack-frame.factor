@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces accessors math.order assocs kernel sequences
 combinators make cpu.architecture compiler.cfg.instructions
-compiler.cfg.instructions.syntax compiler.cfg.registers ;
+compiler.cfg.registers ;
 IN: compiler.cfg.stack-frame
 
 SYMBOL: frame-required?

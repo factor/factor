@@ -3,7 +3,7 @@
 USING: kernel math namespaces assocs hashtables sequences
 accessors vectors combinators sets classes compiler.cfg
 compiler.cfg.registers compiler.cfg.instructions
-compiler.cfg.instructions.syntax compiler.cfg.copy-prop ;
+compiler.cfg.copy-prop ;
 IN: compiler.cfg.alias-analysis
 
 ! Alias analysis -- assumes compiler.cfg.height has already run.

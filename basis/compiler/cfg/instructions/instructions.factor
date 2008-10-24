@@ -7,6 +7,7 @@ compiler.cfg.instructions.syntax ;
 IN: compiler.cfg.instructions
 
 ! Virtual CPU instructions, used by CFG and machine IRs
+TUPLE: insn ;
 
 ! Instruction with no side effects; if 'out' is never read, we
 ! can eliminate it.

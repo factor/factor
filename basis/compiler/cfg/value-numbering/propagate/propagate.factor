@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: namespaces assocs sequences kernel accessors
-compiler.cfg.instructions compiler.cfg.instructions.syntax
-compiler.cfg.value-numbering.graph ;
+compiler.cfg.instructions compiler.cfg.value-numbering.graph ;
 IN: compiler.cfg.value-numbering.propagate
 
 ! If two vregs compute the same value, replace references to

@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel accessors namespaces assocs sets sequences locals
-compiler.cfg compiler.cfg.instructions
-compiler.cfg.instructions.syntax compiler.cfg.copy-prop ;
+compiler.cfg compiler.cfg.instructions compiler.cfg.copy-prop ;
 IN: compiler.cfg.write-barrier
 
 ! Eliminate redundant write barrier hits.

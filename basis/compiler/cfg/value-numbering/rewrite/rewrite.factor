@@ -3,7 +3,6 @@
 USING: kernel sequences layouts accessors combinators namespaces
 math
 compiler.cfg.instructions
-compiler.cfg.instructions.syntax
 compiler.cfg.value-numbering.graph
 compiler.cfg.value-numbering.simplify
 compiler.cfg.value-numbering.expressions ;

@@ -4,8 +4,7 @@ USING: kernel math accessors sequences namespaces make
 combinators
 compiler.cfg
 compiler.cfg.rpo
-compiler.cfg.instructions
-compiler.cfg.instructions.syntax ;
+compiler.cfg.instructions ;
 IN: compiler.cfg.linearization
 
 ! Convert CFG IR to machine IR.

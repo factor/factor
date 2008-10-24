@@ -1,8 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors assocs sets kernel namespaces sequences
-compiler.cfg.instructions compiler.cfg.instructions.syntax
-compiler.cfg.def-use ;
+compiler.cfg.instructions compiler.cfg.def-use ;
 IN: compiler.cfg.dead-code
 
 ! Dead code elimination -- assumes compiler.cfg.alias-analysis
