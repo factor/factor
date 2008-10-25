@@ -195,3 +195,11 @@ M: mb-writer dispose drop ;
       [ participant-changed? ] read-matching-message
   ] unit-test
 ] with-irc
+
+! Mode change
+[ { T{ participant-changed f "ircuser" +mode+ "+o" } } [
+      "#factortest" <irc-channel-chat> [ %add-named-chat ] keep
+      ":ircserver.net MODE #factortest +o ircuser" %push-line
+      [ participant-changed? ] read-matching-message
+  ] unit-test
+] with-irc

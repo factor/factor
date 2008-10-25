@@ -141,7 +141,9 @@ M: irc-chat to-chat in-messages>> mailbox-put ;
 : change-participant-mode ( channel mode nick -- )
     rot chat>
     [ participants>> set-at ]
-    [ [ [ +mode+ ] dip <participant-changed> ] dip to-chat ] 3bi ; ! FIXME
+    [ [ participant-changed new
+        [ (>>nick) ] [ (>>parameter) ] [ +mode+ >>action ] tri ] dip to-chat ]
+    3bi ; ! FIXME
 
 DEFER: me?
 
@@ -224,11 +226,11 @@ M: quit process-message
 M: nick process-message
     [ irc-message-sender ] [ trailing>> ] bi rename-participant-in-all ;
 
-! M: mode process-message ( mode -- )
-!    [ channel-mode? ] keep and [
-!        [ name>> ] [ mode>> ] [ parameter>> ] tri
-!        [ change-participant-mode ] [ 2drop ] if*
-!    ] when* ;
+M: mode process-message ( mode -- )
+    [ channel-mode? ] keep and [
+        [ name>> ] [ mode>> ] [ parameter>> ] tri
+        [ change-participant-mode ] [ 2drop ] if*
+    ] when* ;
 
 : >nick/mode ( string -- nick mode )
     dup first "+@" member? [ unclip ] [ 0 ] if participant-mode ;
