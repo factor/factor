@@ -7,7 +7,7 @@ TYPEDEF: char                CHAR
 TYPEDEF: uchar               UCHAR
 TYPEDEF: uchar               BYTE
 
-TYPEDEF: ushort               wchar_t
+TYPEDEF: ushort              wchar_t
 TYPEDEF: wchar_t             WCHAR
 
 TYPEDEF: short               SHORT
@@ -62,14 +62,16 @@ TYPEDEF: ulonglong   ULONGLONG
 TYPEDEF: longlong    LONG64
 TYPEDEF: ulonglong   DWORD64
 TYPEDEF: longlong    LARGE_INTEGER
+TYPEDEF: ulonglong   ULARGE_INTEGER
 TYPEDEF: LARGE_INTEGER* PLARGE_INTEGER
+TYPEDEF: ULARGE_INTEGER* PULARGE_INTEGER
 
-TYPEDEF: WCHAR       TCHAR
-TYPEDEF: TCHAR       TBYTE
 TYPEDEF: wchar_t*  LPCSTR
 TYPEDEF: wchar_t*  LPWSTR
-
-
+TYPEDEF: WCHAR       TCHAR
+TYPEDEF: LPWSTR      LPTCH
+TYPEDEF: LPWSTR      PTCH
+TYPEDEF: TCHAR       TBYTE
 
 TYPEDEF: WORD                ATOM
 TYPEDEF: BYTE                BOOLEAN

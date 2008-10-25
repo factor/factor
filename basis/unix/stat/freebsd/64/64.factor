@@ -12,9 +12,9 @@ C-STRUCT: stat
     { "uid_t"      "st_uid" }
     { "gid_t"      "st_gid" }
     { "__dev_t"    "st_rdev" }
-    { "timespec"   "st_atim" }
-    { "timespec"   "st_mtim" }
-    { "timespec"   "st_ctim" }
+    { "timespec"   "st_atimespec" }
+    { "timespec"   "st_mtimespec" }
+    { "timespec"   "st_ctimespec" }
     { "off_t"      "st_size" }
     { "blkcnt_t"   "st_blocks" }
     { "blksize_t"  "st_blksize" }

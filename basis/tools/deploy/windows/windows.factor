@@ -14,7 +14,7 @@ IN: tools.deploy.windows
             "resource:freetype6.dll"
             "resource:zlib1.dll"
         } swap copy-files-into
-    ] when ;
+    ] [ drop ] if ;
 
 : create-exe-dir ( vocab bundle-name -- vm )
     deploy-ui? get [

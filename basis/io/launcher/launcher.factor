@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: system kernel namespaces strings hashtables sequences 
 assocs combinators vocabs.loader init threads continuations
-math accessors concurrency.flags destructors
+math accessors concurrency.flags destructors environment
 io io.backend io.timeouts io.pipes io.pipes.private io.encodings
 io.streams.duplex io.ports debugger prettyprint summary ;
 IN: io.launcher
@@ -58,8 +58,6 @@ SYMBOL: +realtime-priority+
 ! Non-blocking process exit notification facility
 SYMBOL: processes
 
-[ H{ } clone processes set-global ] "io.launcher" add-init-hook
-
 HOOK: wait-for-processes io-backend ( -- ? )
 
 SYMBOL: wait-flag
@@ -73,7 +71,10 @@ SYMBOL: wait-flag
     <flag> wait-flag set-global
     [ wait-loop t ] "Process wait" spawn-server drop ;
 
-[ start-wait-thread ] "io.launcher" add-init-hook
+[
+    H{ } clone processes set-global
+    start-wait-thread
+] "io.launcher" add-init-hook
 
 : process-started ( process handle -- )
     >>handle

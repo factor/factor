@@ -15,21 +15,18 @@ HELP: random-bytes*
 { $description "Generates a byte-array of random bytes." } ;
 
 HELP: random
-{ $values { "obj" object } { "elt" "a random element" } }
-{ $description "Outputs a random element of the input object. If the object is an integer, an input of zero always returns a zero, while any other integer integers yield a random integer in the interval between itself and zero, inclusive of zero. On a sequence, an empty sequence always outputs " { $link f } "." }
+{ $values { "seq" sequence } { "elt" "a random element" } }
+{ $description "Outputs a random element of the input sequence. Outputs " { $link f } " if the sequence is empty." }
+{ $notes "Since integers are sequences, passing an integer " { $snippet "n" } " outputs an integer in the interval " { $snippet "[0,n)" } "." }
 { $examples
     { $unchecked-example "USING: random prettyprint ;"
         "10 random ."
         "3" }
-    { $example "USING: random prettyprint ;"
-        "0 random ."
-        "0" }
     { $unchecked-example "USING: random prettyprint ;"
-        "-10 random ."
-        "-8" }
-    { $unchecked-example "USING: random prettyprint ;"
-        "{ \"a\" \"b\" \"c\" } random ."
-        "\"a\"" }
+        "SYMBOL: heads"
+        "SYMBOL: tails"
+        "{ heads tails } random ."
+        "heads" }
 } ;
 
 HELP: random-bytes
@@ -74,7 +71,10 @@ ARTICLE: "random-protocol" "Random protocol"
 { $subsection seed-random } ;
 
 ARTICLE: "random" "Generating random integers"
-"The " { $vocab-link "random" } " vocabulary contains a protocol for generating random or pseudorandom numbers. The ``Mersenne Twister'' pseudorandom number generator algorithm is the default generator stored in " { $link random-generator } "."
+"The " { $vocab-link "random" } " vocabulary contains a protocol for generating random or pseudorandom numbers."
+$nl
+"The ``Mersenne Twister'' pseudorandom number generator algorithm is the default generator stored in " { $link random-generator } "."
+$nl
 "Generate a random object:"
 { $subsection random }
 "Combinators to change the random number generator:"

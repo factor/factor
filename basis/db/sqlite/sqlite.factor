@@ -19,7 +19,6 @@ M: sqlite-db db-open ( db -- db )
     dup path>> sqlite-open >>handle ;
 
 M: sqlite-db db-close ( handle -- ) sqlite-close ;
-M: sqlite-db dispose ( db -- ) db-dispose ;
 
 TUPLE: sqlite-statement < statement ;
 
@@ -87,9 +86,11 @@ M: sqlite-statement bind-tuple ( tuple statement -- )
         in-params>> [ sqlite-bind-conversion ] with map
     ] keep bind-statement ;
 
+ERROR: sqlite-last-id-fail ;
+
 : last-insert-id ( -- id )
     db get handle>> sqlite3_last_insert_rowid
-    dup zero? [ "last-id failed" throw ] when ;
+    dup zero? [ sqlite-last-id-fail ] when ;
 
 M: sqlite-db insert-tuple-set-key ( tuple statement -- )
     execute-statement last-insert-id swap set-primary-key ;
@@ -177,12 +178,14 @@ M: sqlite-db persistent-table ( -- assoc )
         { +random-id+ { "integer" "integer" f } }
         { +foreign-id+ { "integer" "integer" "references" } }
 
+        { +on-update+ { f f "on update" } }
         { +on-delete+ { f f "on delete" } }
         { +restrict+ { f f "restrict" } }
         { +cascade+ { f f "cascade" } }
         { +set-null+ { f f "set null" } }
         { +set-default+ { f f "set default" } }
 
+        { BOOLEAN { "boolean" "boolean" f } }
         { INTEGER { "integer" "integer" f } }
         { BIG-INTEGER { "bigint" "bigint" f } }
         { SIGNED-BIG-INTEGER { "bigint" "bigint" f } }

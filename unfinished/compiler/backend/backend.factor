@@ -33,10 +33,7 @@ GENERIC# load-literal 1 ( obj reg -- )
 
 HOOK: load-indirect cpu ( obj reg -- )
 
-HOOK: stack-frame cpu ( frame-size -- n )
-
-: stack-frame* ( -- n )
-    \ stack-frame get stack-frame ;
+HOOK: stack-frame-size cpu ( frame-size -- n )
 
 ! Set up caller stack frame
 HOOK: %prologue cpu ( n -- )

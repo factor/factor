@@ -19,9 +19,16 @@ C: <irc-profile> irc-profile
 
 TUPLE: irc-client profile stream in-messages out-messages
        chats is-running nick connect reconnect-time is-ready ;
+
 : <irc-client> ( profile -- irc-client )
-    [ f <mailbox> <mailbox> H{ } clone f ] keep nickname>>
-    [ <inet> latin1 <client> ] 15 seconds f irc-client boa ;
+    irc-client new
+        swap >>profile
+        <mailbox> >>in-messages
+        <mailbox> >>out-messages
+        H{ } clone >>chats
+        dup profile>> nickname>> >>nick
+        [ <inet> latin1 <client> ] >>connect
+        15 seconds >>reconnect-time ;
 
 TUPLE: irc-chat in-messages client ;
 TUPLE: irc-server-chat < irc-chat ;
@@ -357,7 +364,7 @@ PRIVATE>
 
 : attach-chat ( irc-chat irc-client -- ) [ (attach-chat) ] with-irc-client ;
 
-: dettach-chat ( irc-chat -- )
+: detach-chat ( irc-chat -- )
     [ client>> ] keep '[ _ (remove-chat) ] with-irc-client ;
 
 : speak ( message irc-chat -- )

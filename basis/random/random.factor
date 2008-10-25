@@ -33,10 +33,6 @@ M: f random-32* ( obj -- * ) no-random-number-generator ;
         random-generator get random-bytes*
     ] keep head ;
 
-GENERIC: random ( obj -- elt )
-
-: random-bits ( n -- r ) 2^ random ;
-
 <PRIVATE
 
 : random-integer ( n -- n' )
@@ -46,18 +42,12 @@ GENERIC: random ( obj -- elt )
 
 PRIVATE>
 
-M: sequence random ( seq -- elt )
+: random-bits ( n -- r ) 2^ random-integer ;
+
+: random ( seq -- elt )
     [ f ] [
         [ length random-integer ] keep nth
     ] if-empty ;
-
-ERROR: negative-random n ;
-M: integer random ( integer -- integer' )
-    {
-        { [ dup 0 = ] [ ] }
-        { [ dup 0 < ] [ neg random-integer neg ] }
-        [ random-integer ]
-    } cond ;
 
 : delete-random ( seq -- elt )
     [ length random-integer ] keep [ nth ] 2keep delete-nth ;

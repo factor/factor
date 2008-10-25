@@ -1,4 +1,4 @@
-USING: alien.syntax ;
+USING: alien.syntax alien.c-types math vocabs.loader ;
 IN: unix
 
 : FD_SETSIZE 256 ; inline
@@ -12,6 +12,13 @@ C-STRUCT: addrinfo
     { "char*" "canonname" }
     { "void*" "addr" }
     { "addrinfo*" "next" } ;
+
+C-STRUCT: dirent
+    { "__uint32_t" "d_fileno" }
+    { "__uint16_t" "d_reclen" }
+    { "__uint8_t"  "d_type" }
+    { "__uint8_t"  "d_namlen" }
+    { { "char" 256 } "d_name" } ;
 
 : EPERM 1 ; inline
 : ENOENT 2 ; inline
@@ -111,3 +118,24 @@ C-STRUCT: addrinfo
 : ENOLINK 95 ; inline
 : EPROTO 96 ; inline
 : ELAST 96 ; inline
+
+TYPEDEF: __uint8_t sa_family_t
+
+: _UTX_USERSIZE   32 ; inline
+: _UTX_LINESIZE   32 ; inline
+: _UTX_IDSIZE     4 ; inline
+: _UTX_HOSTSIZE   256 ; inline
+
+: _SS_MAXSIZE ( -- n )
+    128 ; inline
+
+: _SS_ALIGNSIZE ( -- n )
+    "__int64_t" heap-size ; inline
+    
+: _SS_PAD1SIZE ( -- n )
+    _SS_ALIGNSIZE 2 - ; inline
+    
+: _SS_PAD2SIZE ( -- n )
+    _SS_MAXSIZE 2 - _SS_PAD1SIZE - _SS_ALIGNSIZE - ; inline
+
+"unix.bsd.netbsd.structs" require

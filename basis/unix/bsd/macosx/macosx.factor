@@ -1,4 +1,4 @@
-USING: alien.syntax ;
+USING: alien.syntax unix.time ;
 IN: unix
 
 : FD_SETSIZE 1024 ; inline
@@ -13,18 +13,31 @@ C-STRUCT: addrinfo
     { "void*" "addr" }
     { "addrinfo*" "next" } ;
 
-C-STRUCT: passwd
-    { "char*"  "pw_name" }
-    { "char*"  "pw_passwd" }
-    { "uid_t"  "pw_uid" }
-    { "gid_t"  "pw_gid" }
-    { "time_t" "pw_change" }
-    { "char*"  "pw_class" }
-    { "char*"  "pw_gecos" }
-    { "char*"  "pw_dir" }
-    { "char*"  "pw_shell" }
-    { "time_t" "pw_expire" }
-    { "int"    "pw_fields" } ;
+: _UTX_USERSIZE 256 ; inline
+: _UTX_LINESIZE 32 ; inline
+: _UTX_IDSIZE 4 ; inline
+: _UTX_HOSTSIZE 256 ; inline
+    
+C-STRUCT: utmpx
+    { { "char" _UTX_USERSIZE } "ut_user" }
+    { { "char" _UTX_IDSIZE } "ut_id" }
+    { { "char" _UTX_LINESIZE } "ut_line" }
+    { "pid_t" "ut_pid" }
+    { "short" "ut_type" }
+    { "timeval" "ut_tv" }
+    { { "char" _UTX_HOSTSIZE } "ut_host" }
+    { { "uint" 16 } "ut_pad" } ;
+
+: __DARWIN_MAXPATHLEN 1024 ; inline
+: __DARWIN_MAXNAMELEN 255 ; inline
+: __DARWIN_MAXNAMELEN+1 255 ; inline
+
+C-STRUCT: dirent
+    { "ino_t" "d_ino" }
+    { "__uint16_t" "d_reclen" }
+    { "__uint8_t"  "d_type" }
+    { "__uint8_t"  "d_namlen" }
+    { { "char" __DARWIN_MAXNAMELEN+1 } "d_name" } ;
 
 : EPERM 1 ; inline
 : ENOENT 2 ; inline

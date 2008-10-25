@@ -186,7 +186,7 @@ M: irc-tab graft*
     [ chat>> ] [ window>> client>> ] bi attach-chat ;
 
 M: irc-tab ungraft*
-    chat>> dettach-chat ;
+    chat>> detach-chat ;
 
 TUPLE: irc-channel-tab < irc-tab userlist ;
 

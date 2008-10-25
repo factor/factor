@@ -114,6 +114,9 @@ M: sequence where ( spec obj -- )
         [ " or " 0% ] [ dupd where ] interleave drop
     ] in-parens ;
 
+M: NULL where ( spec obj -- )
+    drop column-name>> 0% " is NULL" 0% ;
+
 : object-where ( spec obj -- )
     over column-name>> 0% " = " 0% bind# ;
 
@@ -163,9 +166,11 @@ M: db <select-by-slots-statement> ( tuple class -- statement )
     swap 3append ;
 
 : do-group ( tuple groups -- )
+    dup string? [ 1array ] when
     [ ", " join " group by " splice ] curry change-sql drop ;
 
 : do-order ( tuple order -- )
+    dup string? [ 1array ] when
     [ ", " join " order by " splice ] curry change-sql drop ;
 
 : do-offset ( tuple n -- )

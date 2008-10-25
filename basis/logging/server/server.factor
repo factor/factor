@@ -83,7 +83,7 @@ SYMBOL: log-files
 
 : (rotate-logs) ( -- )
     (close-logs)
-    log-root directory [ drop rotate-log ] assoc-each ;
+    log-root directory-files [ rotate-log ] each ;
 
 : log-server-loop ( -- )
     receive unclip {

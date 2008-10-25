@@ -1,10 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types io.binary io.backend io.files io.buffers
-io.windows kernel math splitting
+io.windows kernel math splitting fry alien.strings
 windows windows.kernel32 windows.time calendar combinators
 math.functions sequences namespaces make words symbols system
-io.ports destructors accessors math.bitwise ;
+io.ports destructors accessors math.bitwise continuations
+windows.errors arrays byte-arrays ;
 IN: io.windows.files
 
 : open-file ( path access-mode create-mode flags -- handle )
@@ -113,8 +114,35 @@ M: windows delete-directory ( path -- )
     normalize-path
     RemoveDirectory win32-error=0/f ;
 
-M: windows normalize-directory ( string -- string )
-    normalize-path "\\" ?tail drop "\\*" append ;
+M: windows >directory-entry ( byte-array -- directory-entry )
+    [ WIN32_FIND_DATA-cFileName utf16n alien>string ]
+    [ WIN32_FIND_DATA-dwFileAttributes ]
+    bi directory-entry boa ;
+
+: find-first-file ( path -- WIN32_FIND_DATA handle )
+    "WIN32_FIND_DATA" <c-object> tuck
+    FindFirstFile
+    [ INVALID_HANDLE_VALUE = [ win32-error ] when ] keep ;
+
+: find-next-file ( path -- WIN32_FIND_DATA/f )
+    "WIN32_FIND_DATA" <c-object> tuck
+    FindNextFile 0 = [
+        GetLastError ERROR_NO_MORE_FILES = [
+            win32-error
+        ] unless drop f
+    ] when ;
+
+M: windows (directory-entries) ( path -- seq )
+    "\\" ?tail drop "\\*" append
+    find-first-file [ >directory-entry ] dip
+    [
+        '[
+            [ _ find-next-file dup ]
+            [ >directory-entry ]
+            [ drop ] produce
+            over name>> "." = [ nip ] [ swap prefix ] if
+        ]
+    ] [ '[ _ FindClose win32-error=0/f ] ] bi [ ] cleanup ;
 
 SYMBOLS: +read-only+ +hidden+ +system+
 +archive+ +device+ +normal+ +temporary+
@@ -147,18 +175,18 @@ SYMBOLS: +read-only+ +hidden+ +system+
     FILE_ATTRIBUTE_DIRECTORY mask? +directory+ +regular-file+ ? ;
 
 : WIN32_FIND_DATA>file-info ( WIN32_FIND_DATA -- file-info )
+    [ \ file-info new ] dip
     {
-        [ WIN32_FIND_DATA-dwFileAttributes win32-file-type ]
+        [ WIN32_FIND_DATA-dwFileAttributes win32-file-type >>type ]
         [
             [ WIN32_FIND_DATA-nFileSizeLow ]
-            [ WIN32_FIND_DATA-nFileSizeHigh ] bi >64bit
+            [ WIN32_FIND_DATA-nFileSizeHigh ] bi >64bit >>size
         ]
-        [ WIN32_FIND_DATA-dwFileAttributes ]
-        ! [ WIN32_FIND_DATA-ftCreationTime FILETIME>timestamp ]
-        [ WIN32_FIND_DATA-ftLastWriteTime FILETIME>timestamp ]
-        ! [ WIN32_FIND_DATA-ftLastAccessTime FILETIME>timestamp ]
-    } cleave
-    \ file-info boa ;
+        [ WIN32_FIND_DATA-dwFileAttributes >>permissions ]
+        [ WIN32_FIND_DATA-ftCreationTime FILETIME>timestamp >>created ]
+        [ WIN32_FIND_DATA-ftLastWriteTime FILETIME>timestamp >>modified ]
+        [ WIN32_FIND_DATA-ftLastAccessTime FILETIME>timestamp >>accessed ]
+    } cleave ;
 
 : find-first-file-stat ( path -- WIN32_FIND_DATA )
     "WIN32_FIND_DATA" <c-object> [
@@ -168,23 +196,32 @@ SYMBOLS: +read-only+ +hidden+ +system+
     ] keep ;
 
 : BY_HANDLE_FILE_INFORMATION>file-info ( HANDLE_FILE_INFORMATION -- file-info )
+    [ \ file-info new ] dip
     {
-        [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes win32-file-type ]
+        [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes win32-file-type >>type ]
         [
             [ BY_HANDLE_FILE_INFORMATION-nFileSizeLow ]
-            [ BY_HANDLE_FILE_INFORMATION-nFileSizeHigh ] bi >64bit
+            [ BY_HANDLE_FILE_INFORMATION-nFileSizeHigh ] bi >64bit >>size
         ]
-        [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes ]
-        ! [ BY_HANDLE_FILE_INFORMATION-ftCreationTime FILETIME>timestamp ]
-        [ BY_HANDLE_FILE_INFORMATION-ftLastWriteTime FILETIME>timestamp ]
-        ! [ BY_HANDLE_FILE_INFORMATION-ftLastAccessTime FILETIME>timestamp ]
+        [ BY_HANDLE_FILE_INFORMATION-dwFileAttributes >>permissions ]
+        [
+            BY_HANDLE_FILE_INFORMATION-ftCreationTime
+            FILETIME>timestamp >>created
+        ]
+        [
+            BY_HANDLE_FILE_INFORMATION-ftLastWriteTime
+            FILETIME>timestamp >>modified
+        ]
+        [
+            BY_HANDLE_FILE_INFORMATION-ftLastAccessTime
+            FILETIME>timestamp >>accessed
+        ]
         ! [ BY_HANDLE_FILE_INFORMATION-nNumberOfLinks ]
         ! [
           ! [ BY_HANDLE_FILE_INFORMATION-nFileIndexLow ]
           ! [ BY_HANDLE_FILE_INFORMATION-nFileIndexHigh ] bi >64bit
         ! ]
-    } cleave
-    \ file-info boa ;
+    } cleave ;
 
 : get-file-information ( handle -- BY_HANDLE_FILE_INFORMATION )
     [
@@ -208,6 +245,58 @@ M: winnt file-info ( path -- info )
 
 M: winnt link-info ( path -- info )
     file-info ;
+
+HOOK: root-directory os ( string -- string' )
+
+TUPLE: winnt-file-system-info < file-system-info
+total-bytes total-free-bytes ;
+
+: file-system-type ( normalized-path -- str )
+    MAX_PATH 1+ <byte-array>
+    MAX_PATH 1+
+    "DWORD" <c-object> "DWORD" <c-object> "DWORD" <c-object>
+    MAX_PATH 1+ <byte-array>
+    MAX_PATH 1+
+    [ GetVolumeInformation win32-error=0/f ] 2keep drop
+    utf16n alien>string ;
+
+: file-system-space ( normalized-path -- free-space total-bytes total-free-bytes )
+    "ULARGE_INTEGER" <c-object>
+    "ULARGE_INTEGER" <c-object>
+    "ULARGE_INTEGER" <c-object>
+    [ GetDiskFreeSpaceEx win32-error=0/f ] 3keep ;
+
+M: winnt file-system-info ( path -- file-system-info )
+    normalize-path root-directory
+    dup [ file-system-type ] [ file-system-space ] bi
+    \ winnt-file-system-info new
+        swap *ulonglong >>total-free-bytes
+        swap *ulonglong >>total-bytes
+        swap *ulonglong >>free-space
+        swap >>type
+        swap >>mount-point ;
+
+: find-first-volume ( word -- string handle )
+    MAX_PATH 1+ <byte-array> dup length
+    dupd
+    FindFirstVolume dup win32-error=0/f
+    [ utf16n alien>string ] dip ;
+
+: find-next-volume ( handle -- string )
+    MAX_PATH 1+ <byte-array> dup length
+    [ FindNextVolume win32-error=0/f ] 2keep drop
+    utf16n alien>string ;
+
+: mounted ( -- array )
+    find-first-volume
+    [
+        '[
+            [ _ find-next-volume dup ]
+            [ ]
+            [ drop ] produce
+            swap prefix
+        ]
+    ] [ '[ _ FindVolumeClose win32-error=0/f ] ] bi [ ] cleanup ;
 
 : file-times ( path -- timestamp timestamp timestamp )
     [

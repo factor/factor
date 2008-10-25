@@ -1,6 +1,4 @@
-
 USING: kernel alien.syntax math ;
-
 IN: unix.stat
 
 ! Ubuntu 8.04 32-bit
@@ -18,13 +16,11 @@ C-STRUCT: stat
     { "off_t"     "st_size" }
     { "blksize_t" "st_blksize" }
     { "blkcnt_t"  "st_blocks" }
-    { "timespec"  "st_atim" }
-    { "timespec"  "st_mtim" }
-    { "timespec"  "st_ctim" }
+    { "timespec"  "st_atimespec" }
+    { "timespec"  "st_mtimespec" }
+    { "timespec"  "st_ctimespec" }
     { "ulong"     "unused4" }
     { "ulong"     "unused5" } ;
-
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 FUNCTION: int __xstat  ( int ver, char* pathname, stat* buf ) ;
 FUNCTION: int __lxstat ( int ver, char* pathname, stat* buf ) ;

@@ -1,49 +1,72 @@
 
-USING: kernel vectors sequences combinators random
-       accessors newfx dns dns.cache ;
+USING: kernel accessors namespaces continuations
+       io io.sockets io.binary io.timeouts io.encodings.binary
+       destructors
+       locals strings sequences random prettyprint calendar dns dns.misc ;
 
 IN: dns.resolver
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: canonical/cache ( name -- name )
-  dup CNAME IN query boa cache-get dup vector? ! name result ?
-    [ nip 1st rdata>> ]
-    [ drop            ]
-  if ;
+:: send-receive-udp ( BA SERVER -- ba )
+   T{ inet4 f f 0 } <datagram>
+   T{ duration { second 3 } } over set-timeout
+     [| SOCKET | BA SERVER SOCKET send SOCKET receive drop ]
+   with-disposal ;
 
-: name->ip/cache ( name -- ip )
-  canonical/cache
-  dup A IN query boa cache-get ! name result
-    {
-      { [ dup NX = ] [ 2drop f ] }
-      { [ dup f = ]  [ 2drop f ] }
-      { [ t ]        [ nip random rdata>> ] }
-    }
-  cond ;
+:: send-receive-tcp ( BA SERVER -- ba )
+   [let | BA [ BA length 2 >be BA append ] |
+     SERVER binary
+       [
+         T{ duration { second 3 } } input-stream get set-timeout
+         BA write flush 2 read be> read
+       ]
+     with-client                                        ] ;
+
+:: send-receive-server ( BA SERVER -- msg )
+   [let | RESULT [ BA SERVER send-receive-udp parse-message ] |
+     RESULT tc>> 1 =
+       [ BA SERVER send-receive-tcp parse-message ]
+       [ RESULT                                   ]
+     if                                                 ] ;
+
+: >dns-inet4 ( obj -- inet4 ) dup string? [ 53 <inet4> ] [ ] if ;
+
+:: send-receive-servers ( BA SERVERS -- msg )
+   SERVERS empty? [ "send-receive-servers: servers list empty" throw ] when
+   [let | SERVER [ SERVERS random >dns-inet4 ] |
+     ! if this throws an error ...
+     [ BA SERVER send-receive-server ]
+     ! we try with the other servers...
+     [ drop BA SERVER SERVERS remove send-receive-servers ]
+     recover                                            ] ;
+
+:: ask-servers ( MSG SERVERS -- msg )
+   MSG message->ba SERVERS send-receive-servers ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: canonical/server ( name -- name )
-  dup CNAME IN query boa query->message ask cache-message answer-section>>
-  [ type>> CNAME = ] filter dup empty? not
-    [ nip 1st rdata>> ]
-    [ drop ]
-  if ;
-
-: name->ip/server ( name -- ip )
-  canonical/server
-  dup A IN query boa query->message ask cache-message answer-section>>
-  [ type>> A = ] filter dup empty? not
-    [ nip random rdata>> ]
-    [ 2drop f ]
-  if ;
+: fully-qualified ( name -- name ) dup "." tail? [ ] [ "." append ] if ;
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: name->ip ( name -- ip )
+: dns-servers ( -- seq )
+  \ dns-servers get
+    [ ]
+    [ resolv-conf-servers \ dns-servers set dns-servers ]
+  if* ;
+
+! : dns-server ( -- server ) dns-servers random ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+: dns-ip4 ( name -- ips )
   fully-qualified
-  dup name->ip/cache dup
-    [ nip ]
-    [ drop name->ip/server ]
-  if ;
+  [let | MSG [ A IN query boa query->message dns-servers ask-servers ] |
+    MSG rcode>> NO-ERROR =
+      [ MSG answer-section>> [ type>> A = ] filter [ rdata>> ] map ]
+      [ "dns-ip: rcode = " MSG rcode>> unparse append throw        ]
+    if ] ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+

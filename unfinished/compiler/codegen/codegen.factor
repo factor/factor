@@ -10,7 +10,8 @@ compiler.backend
 compiler.codegen.fixup
 compiler.cfg
 compiler.cfg.instructions
-compiler.cfg.registers ;
+compiler.cfg.registers
+compiler.cfg.builder ;
 IN: compiler.codegen
 
 GENERIC: generate-insn ( insn -- )
@@ -71,10 +72,14 @@ M: _label generate-insn
     id>> lookup-label , ;
 
 M: _prologue generate-insn
-    drop %prologue ;
+    stack-frame>>
+    [ stack-frame set ]
+    [ dup size>> stack-frame-size >>total-size drop ]
+    [ total-size>> %prologue ]
+    tri ;
 
 M: _epilogue generate-insn
-    drop %epilogue ;
+    stack-frame>> total-size>> %epilogue ;
 
 M: ##load-literal generate-insn
     [ obj>> ] [ dst>> v>operand ] bi load-literal ;
@@ -276,8 +281,8 @@ M: long-long-type flatten-value-type ( type -- types )
     #! parameters. If the C function is returning a structure,
     #! the first parameter is an implicit target area pointer,
     #! so we need to use a different offset.
-    return>> dup large-struct?
-    [ heap-size %prepare-box-struct cell ] [ drop 0 ] if ;
+    return>> large-struct?
+    [ %prepare-box-struct cell ] [ 0 ] if ;
 
 : objects>registers ( params -- )
     #! Generate code for unboxing a list of C types, then
@@ -413,7 +418,7 @@ TUPLE: callback-context ;
 
 : callback-unwind ( params -- n )
     {
-        { [ dup abi>> "stdcall" = ] [ alien-stack-frame ] }
+        { [ dup abi>> "stdcall" = ] [ <alien-stack-frame> size>> ] }
         { [ dup return>> large-struct? ] [ drop 4 ] }
         [ drop 0 ]
     } cond ;

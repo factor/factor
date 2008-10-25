@@ -1,20 +1,25 @@
-USING: io.sockets io kernel math threads io.encodings.ascii
-io.streams.duplex debugger tools.time prettyprint
-concurrency.count-downs namespaces arrays continuations
-destructors ;
+! Copyright (C) 2008 Slava Pestov.
+! See http://factorcode.org/license.txt for BSD license.
+USING: accessors kernel math threads io io.sockets
+io.encodings.ascii io.streams.duplex debugger tools.time
+prettyprint concurrency.count-downs concurrency.promises
+namespaces arrays continuations destructors ;
 IN: benchmark.sockets
 
 SYMBOL: counter
+SYMBOL: port-promise
+SYMBOL: server
 
 : number-of-requests 1000 ;
 
-: server-addr ( -- addr ) "127.0.0.1" 7777 <inet4> ;
+: server-addr ( -- addr )
+    "127.0.0.1" port-promise get ?promise <inet4> ;
 
 : server-loop ( server -- )
     dup accept drop [
         [
             read1 CHAR: x = [
-                "server" get dispose
+                server get dispose
             ] [
                 number-of-requests
                 [ read1 write1 flush ] times
@@ -25,9 +30,11 @@ SYMBOL: counter
 
 : simple-server ( -- )
     [
-        server-addr ascii <server> dup "server" set [
-            server-loop
-        ] with-disposal
+        "127.0.0.1" 0 <inet4> ascii <server>
+        [ server set ]
+        [ addr>> port>> port-promise get fulfill ]
+        [ [ server-loop ] with-disposal ]
+        tri
     ] ignore-errors ;
 
 : simple-client ( -- )
@@ -47,6 +54,7 @@ SYMBOL: counter
 
 : clients ( n -- )
     dup pprint " clients: " write [
+        <promise> port-promise set
         dup 2 * <count-down> counter set
         [ simple-server ] "Simple server" spawn drop
         yield yield

@@ -192,110 +192,104 @@ test-db [
     init-furnace-tables
 ] with-db
 
-: test-httpd ( -- )
-    #! Return as soon as server is running.
-    <http-server>
-        1237 >>insecure
-        f >>secure
-    start-server* ;
+: test-httpd ( responder -- )
+    [
+        main-responder set
+        <http-server>
+            0 >>insecure
+            f >>secure
+        dup start-server*
+        sockets>> first addr>> port>>
+    ] with-scope "port" set ;
 
 [ ] [
-    [
+    <dispatcher>
+        add-quit-action
         <dispatcher>
-            add-quit-action
-            <dispatcher>
-                "resource:basis/http/test" <static> >>default
-            "nested" add-responder
-            <action>
-                [ URL" redirect-loop" <temporary-redirect> ] >>display
-            "redirect-loop" add-responder
-        main-responder set
+            "resource:basis/http/test" <static> >>default
+        "nested" add-responder
+        <action>
+            [ URL" redirect-loop" <temporary-redirect> ] >>display
+        "redirect-loop" add-responder
 
-        test-httpd
-    ] with-scope
+    test-httpd
 ] unit-test
+
+: add-port ( url -- url' )
+    >url clone "port" get >>port ;
 
 [ t ] [
     "resource:basis/http/test/foo.html" ascii file-contents
-    "http://localhost:1237/nested/foo.html" http-get nip =
+    "http://localhost/nested/foo.html" add-port http-get nip =
 ] unit-test
 
-[ "http://localhost:1237/redirect-loop" http-get nip ]
+[ "http://localhost/redirect-loop" add-port http-get nip ]
 [ too-many-redirects? ] must-fail-with
 
 [ "Goodbye" ] [
-    "http://localhost:1237/quit" http-get nip
+    "http://localhost/quit" add-port http-get nip
 ] unit-test
 
 ! HTTP client redirect bug
 [ ] [
-    [
-        <dispatcher>
-            add-quit-action
-            <action> [ "quit" <temporary-redirect> ] >>display
-            "redirect" add-responder
-        main-responder set
+    <dispatcher>
+        add-quit-action
+        <action> [ "quit" <temporary-redirect> ] >>display
+        "redirect" add-responder
 
-        test-httpd
-    ] with-scope
+    test-httpd
 ] unit-test
 
 [ "Goodbye" ] [
-    "http://localhost:1237/redirect" http-get nip
+    "http://localhost/redirect" add-port http-get nip
 ] unit-test
 
 
 [ ] [
-    [ "http://localhost:1237/quit" http-get 2drop ] ignore-errors
+    [ "http://localhost/quit" add-port http-get 2drop ] ignore-errors
 ] unit-test
 
 ! Dispatcher bugs
 [ ] [
-    [
+    <dispatcher>
+        <action> <protected>
+        "Test" <login-realm>
+        <sessions>
+        "" add-responder
+        add-quit-action
         <dispatcher>
-            <action> <protected>
-            "Test" <login-realm>
-            <sessions>
-            "" add-responder
-            add-quit-action
-            <dispatcher>
-                <action> "" add-responder
-            "d" add-responder
-        test-db <db-persistence>
-        main-responder set
+            <action> "" add-responder
+        "d" add-responder
+    test-db <db-persistence>
 
-        test-httpd
-    ] with-scope
+    test-httpd
 ] unit-test
 
 : 404? [ download-failed? ] [ response>> code>> 404 = ] bi and ;
 
 ! This should give a 404 not an infinite redirect loop
-[ "http://localhost:1237/d/blah" http-get nip ] [ 404? ] must-fail-with
+[ "http://localhost/d/blah" add-port http-get nip ] [ 404? ] must-fail-with
 
 ! This should give a 404 not an infinite redirect loop
-[ "http://localhost:1237/blah/" http-get nip ] [ 404? ] must-fail-with
+[ "http://localhost/blah/" add-port http-get nip ] [ 404? ] must-fail-with
 
-[ "Goodbye" ] [ "http://localhost:1237/quit" http-get nip ] unit-test
+[ "Goodbye" ] [ "http://localhost/quit" add-port http-get nip ] unit-test
 
 [ ] [
-    [
-        <dispatcher>
-            <action> [ [ "Hi" write ] "text/plain" <content> ] >>display
-            "Test" <login-realm>
-            <sessions>
-            "" add-responder
-            add-quit-action
-        test-db <db-persistence>
-        main-responder set
+    <dispatcher>
+        <action> [ [ "Hi" write ] "text/plain" <content> ] >>display
+        "Test" <login-realm>
+        <sessions>
+        "" add-responder
+        add-quit-action
+    test-db <db-persistence>
 
-        test-httpd
-    ] with-scope
+    test-httpd
 ] unit-test
 
-[ "Hi" ] [ "http://localhost:1237/" http-get nip ] unit-test
+[ "Hi" ] [ "http://localhost/" add-port http-get nip ] unit-test
 
-[ "Goodbye" ] [ "http://localhost:1237/quit" http-get nip ] unit-test
+[ "Goodbye" ] [ "http://localhost/quit" add-port http-get nip ] unit-test
 
 USING: html.components html.elements html.forms
 xml xml.utilities validators
@@ -304,22 +298,19 @@ furnace furnace.conversations ;
 SYMBOL: a
 
 [ ] [
-    [
-        <dispatcher>
-            <action>
-                [ a get-global "a" set-value ] >>init
-                [ [ <html> "a" <field> render </html> ] "text/html" <content> ] >>display
-                [ { { "a" [ v-integer ] } } validate-params ] >>validate
-                [ "a" value a set-global URL" " <redirect> ] >>submit
-            <conversations>
-            <sessions>
-            >>default
-            add-quit-action
-        test-db <db-persistence>
-        main-responder set
+    <dispatcher>
+        <action>
+            [ a get-global "a" set-value ] >>init
+            [ [ <html> "a" <field> render </html> ] "text/html" <content> ] >>display
+            [ { { "a" [ v-integer ] } } validate-params ] >>validate
+            [ "a" value a set-global URL" " <redirect> ] >>submit
+        <conversations>
+        <sessions>
+        >>default
+        add-quit-action
+    test-db <db-persistence>
 
-        test-httpd
-    ] with-scope
+    test-httpd
 ] unit-test
 
 3 a set-global
@@ -327,27 +318,35 @@ SYMBOL: a
 : test-a string>xml "input" tag-named "value" swap at ;
 
 [ "3" ] [
-    "http://localhost:1237/" http-get
+    "http://localhost/" add-port http-get
     swap dup cookies>> "cookies" set session-id-key get-cookie
     value>> "session-id" set test-a
 ] unit-test
 
 [ "4" ] [
-    H{ { "a" "4" } { "__u" "http://localhost:1237/" } } "session-id" get session-id-key associate assoc-union
-    "http://localhost:1237/" <post-request> "cookies" get >>cookies http-request nip test-a
+    [
+        "4" "a" set
+        "http://localhost" add-port "__u" set
+        "session-id" get session-id-key set
+    ] H{ } make-assoc
+    "http://localhost/" add-port <post-request> "cookies" get >>cookies http-request nip test-a
 ] unit-test
 
 [ 4 ] [ a get-global ] unit-test
 
 ! Test flash scope
 [ "xyz" ] [
-    H{ { "a" "xyz" } { "__u" "http://localhost:1237/" } } "session-id" get session-id-key associate assoc-union
-    "http://localhost:1237/" <post-request> "cookies" get >>cookies http-request nip test-a
+    [
+        "xyz" "a" set
+        "http://localhost" add-port "__u" set
+        "session-id" get session-id-key set
+    ] H{ } make-assoc
+    "http://localhost/" add-port <post-request> "cookies" get >>cookies http-request nip test-a
 ] unit-test
 
 [ 4 ] [ a get-global ] unit-test
 
-[ "Goodbye" ] [ "http://localhost:1237/quit" http-get nip ] unit-test
+[ "Goodbye" ] [ "http://localhost/quit" add-port http-get nip ] unit-test
 
 ! Test cloning
 [ f ] [ <404> dup clone "b" "a" set-header drop "a" header ] unit-test

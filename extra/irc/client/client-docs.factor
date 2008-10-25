@@ -19,8 +19,8 @@ HELP: attach-chat "Chatting with irc channels/users/etc"
 { $values { "irc-chat" "an irc chat object" } { "irc-client" "an irc client object" } }
 { $description "Registers " { $snippet "irc-chat" } " with " { $snippet "irc-client" } " and starts listening." } ;
 
-HELP: dettach-chat "Stop an unregister chat"
-{ $values { "irc-chat" "an irc chat object" } { "irc-client" "an irc client object" } }
+HELP: detach-chat "Stop an unregister chat"
+{ $values { "irc-chat" "an irc chat object" } }
 { $description "Unregisters " { $snippet "irc-chat" } " from " { $snippet "irc-client" } " and stops listening. This is how you part from a channel." } ;
 
 HELP: terminate-irc "Terminates an irc client"
@@ -49,7 +49,7 @@ ARTICLE: "irc.client" "IRC Client"
 { $subsection connect-irc }
 { $subsection terminate-irc }
 { $subsection attach-chat }
-{ $subsection dettach-chat }
+{ $subsection detach-chat }
 { $subsection hear }
 { $subsection speak }
 { $heading "IRC messages" }
@@ -72,7 +72,7 @@ ARTICLE: "irc.client" "IRC Client"
 { $heading "Special messages" }
 "Some special messages that are created by the library and not by the irc server."
 { $table
-  { { $link irc-chat-end } "sent to a chat when it has been dettached from the client, the chat should stop after it receives this message. " }
+  { { $link irc-chat-end } "sent to a chat when it has been detached from the client, the chat should stop after it receives this message. " }
   { { $link irc-end } " sent when the client isn't running anymore, chats should stop after it receives this message." }
   { { $link irc-disconnected } " sent to notify chats that connection was lost." }
   { { $link irc-connected } " sent to notify chats that a connection with the irc server was established." } }

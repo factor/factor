@@ -87,21 +87,6 @@ const F_CHAR *vm_executable_path(void)
 	return safe_strdup(full_path);
 }
 
-void find_file_stat(F_CHAR *path)
-{
-	// FindFirstFile is the only call that can stat c:\pagefile.sys
-	WIN32_FIND_DATA st;
-	HANDLE h;
-
-	if(INVALID_HANDLE_VALUE == (h = FindFirstFile(path, &st)))
-		dpush(F);
-	else
-	{
-		FindClose(h);
-		dpush(T);
-	}
-}
-
 DEFINE_PRIMITIVE(existsp)
 {
 	BY_HANDLE_FILE_INFORMATION bhfi;
@@ -134,34 +119,6 @@ DEFINE_PRIMITIVE(existsp)
 
 	box_boolean(GetFileInformationByHandle(h, &bhfi));
 	CloseHandle(h);
-}
-
-DEFINE_PRIMITIVE(read_dir)
-{
-	HANDLE dir;
-	WIN32_FIND_DATA find_data;
-	F_CHAR *path = unbox_u16_string();
-
-	GROWABLE_ARRAY(result);
-	REGISTER_ROOT(result);
-
-	if(INVALID_HANDLE_VALUE != (dir = FindFirstFile(path, &find_data)))
-	{
-		do
-		{
-			CELL name = tag_object(from_u16_string(find_data.cFileName));
-			CELL dirp = tag_boolean(find_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
-			CELL pair = allot_array_2(name,dirp);
-			GROWABLE_ARRAY_ADD(result,pair);
-		}
-		while (FindNextFile(dir, &find_data));
-		FindClose(dir);
-	}
-
-	UNREGISTER_ROOT(result);
-	GROWABLE_ARRAY_TRIM(result);
-
-	dpush(result);
 }
 
 F_SEGMENT *alloc_segment(CELL size)
@@ -213,39 +170,4 @@ long getpagesize(void)
 void sleep_millis(DWORD msec)
 {
 	Sleep(msec);
-}
-
-DEFINE_PRIMITIVE(os_env)
-{
-	F_CHAR *key = unbox_u16_string();
-	F_CHAR *value = safe_malloc(MAX_UNICODE_PATH * 2);
-	int ret;
-	ret = GetEnvironmentVariable(key, value, MAX_UNICODE_PATH * 2);
-	if(ret == 0)
-		dpush(F);
-	else
-		dpush(tag_object(from_u16_string(value)));
-	free(value);
-}
-
-DEFINE_PRIMITIVE(set_os_env)
-{
-	F_CHAR *key = unbox_u16_string();
-	REGISTER_C_STRING(key);
-	F_CHAR *value = unbox_u16_string();
-	UNREGISTER_C_STRING(key);
-	if(!SetEnvironmentVariable(key, value))
-		general_error(ERROR_IO, tag_object(get_error_message()), F, NULL);
-}
-
-DEFINE_PRIMITIVE(unset_os_env)
-{
-	if(!SetEnvironmentVariable(unbox_u16_string(), NULL)
-		&& GetLastError() != ERROR_ENVVAR_NOT_FOUND)
-		general_error(ERROR_IO, tag_object(get_error_message()), F, NULL);
-}
-
-DEFINE_PRIMITIVE(set_os_envs)
-{
-	not_implemented_error();
 }

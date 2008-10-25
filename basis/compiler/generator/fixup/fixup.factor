@@ -13,7 +13,7 @@ TUPLE: frame-required n ;
 
 : frame-required ( n -- ) \ frame-required boa , ;
 
-: stack-frame-size ( code -- n )
+: compute-stack-frame-size ( code -- n )
     no-stack-frame [
         dup frame-required? [ n>> max ] [ drop ] if
     ] reduce ;
@@ -37,7 +37,7 @@ M: label fixup*
 
 : if-stack-frame ( frame-size quot -- )
     swap dup no-stack-frame =
-    [ 2drop ] [ stack-frame swap call ] if ; inline
+    [ 2drop ] [ stack-frame-size swap call ] if ; inline
 
 M: word fixup*
     {
@@ -146,7 +146,7 @@ SYMBOL: literal-table
 : fixup ( code -- literals relocation labels code )
     [
         init-fixup
-        dup stack-frame-size swap [ fixup* ] each drop
+        dup compute-stack-frame-size swap [ fixup* ] each drop
 
         literal-table get >array
         relocation-table get >byte-array

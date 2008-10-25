@@ -30,8 +30,8 @@ M: postgresql-db db-open ( db -- db )
         [ password>> ]
     } cleave connect-postgres >>handle ;
 
-M: postgresql-db dispose ( db -- )
-    handle>> PQfinish ;
+M: postgresql-db db-close ( handle -- )
+    PQfinish ;
 
 M: postgresql-statement bind-statement* ( statement -- ) drop ;
 
@@ -230,6 +230,7 @@ M: postgresql-db persistent-table ( -- hashtable )
 
         { +foreign-id+ { f f "references" } }
 
+        { +on-update+ { f f "on update" } }
         { +on-delete+ { f f "on delete" } }
         { +restrict+ { f f "restrict" } }
         { +cascade+ { f f "cascade" } }
