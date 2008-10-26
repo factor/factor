@@ -302,8 +302,8 @@ ARTICLE: "embedding" "Embedding Factor into C applications"
 "The Factor " { $snippet "Makefile" } " builds the Factor VM both as an executable and a library. The library can be used by other applications. File names for the library on various operating systems:"
 { $table
     { "OS" "Library name" "Shared?" }
-    { "Windows XP/Vista" { $snippet "factor-nt.dll" } "Yes" }
-    { "Windows CE" { $snippet "factor-ce.dll" } "Yes" }
+    { "Windows XP/Vista" { $snippet "factor.dll" } "Yes" }
+    ! { "Windows CE" { $snippet "factor-ce.dll" } "Yes" }
     { "Mac OS X" { $snippet "libfactor.dylib" } "Yes" }
     { "Other Unix" { $snippet "libfactor.a" } "No" }
 }
