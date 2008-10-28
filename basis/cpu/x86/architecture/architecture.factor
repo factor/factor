@@ -9,6 +9,8 @@ compiler.cfg.instructions compiler.codegen
 compiler.codegen.fixup ;
 IN: cpu.x86.architecture
 
+M: x86 two-operand? t ;
+
 HOOK: temp-reg-1 cpu ( -- reg )
 HOOK: temp-reg-2 cpu ( -- reg )
 
@@ -83,31 +85,22 @@ M: x86 %slot-imm ( dst obj slot tag -- ) (%slot-imm) MOV ;
 M: x86 %set-slot ( src obj slot tag temp -- ) (%slot) swap MOV ;
 M: x86 %set-slot-imm ( src obj slot tag -- ) (%slot-imm) swap MOV ;
 
-: ?MOV ( dst src -- )
-    2dup = [ 2drop ] [ MOV ] if ; inline
-
-: 1operand ( dst src -- dst' )
-    dupd ?MOV ; inline
-
-: 2operand ( dst src1 src2 -- dst src )
-    [ 1operand ] dip ; inline
-
 M: x86 %add     [+] LEA ;
 M: x86 %add-imm [+] LEA ;
-M: x86 %sub     2operand SUB ;
+M: x86 %sub     nip SUB ;
 M: x86 %sub-imm neg [+] LEA ;
-M: x86 %mul     2operand swap IMUL2 ;
-M: x86 %mul-imm 2operand IMUL2 ;
-M: x86 %and     2operand AND ;
-M: x86 %and-imm 2operand AND ;
-M: x86 %or      2operand OR ;
-M: x86 %or-imm  2operand OR ;
-M: x86 %xor     2operand XOR ;
-M: x86 %xor-imm 2operand XOR ;
-M: x86 %shl-imm 2operand SHL ;
-M: x86 %shr-imm 2operand SHR ;
-M: x86 %sar-imm 2operand SAR ;
-M: x86 %not     1operand NOT ;
+M: x86 %mul     nip swap IMUL2 ;
+M: x86 %mul-imm nip IMUL2 ;
+M: x86 %and     nip AND ;
+M: x86 %and-imm nip AND ;
+M: x86 %or      nip OR ;
+M: x86 %or-imm  nip OR ;
+M: x86 %xor     nip XOR ;
+M: x86 %xor-imm nip XOR ;
+M: x86 %shl-imm nip SHL ;
+M: x86 %shr-imm nip SHR ;
+M: x86 %sar-imm nip SAR ;
+M: x86 %not     drop NOT ;
 
 : bignum@ ( reg n -- op )
     cells bignum tag-number - [+] ; inline
@@ -164,26 +157,21 @@ M:: x86 %bignum>integer ( dst src -- )
         "end" resolve-label
     ] with-scope ;
 
-: ?MOVSD ( dst src -- )
-    2dup = [ 2drop ] [ MOVSD ] if ; inline
-
-: 1operand-fp ( dst src -- dst' )
-    dupd ?MOVSD ; inline
-
-: 2operand-fp ( dst src1 src2 -- dst src )
-    [ 1operand-fp ] dip ; inline
-
-M: x86 %add-float 2operand-fp ADDSD ;
-M: x86 %sub-float 2operand-fp SUBSD ;
-M: x86 %mul-float 2operand-fp MULSD ;
-M: x86 %div-float 2operand-fp DIVSD ;
+M: x86 %add-float nip ADDSD ;
+M: x86 %sub-float nip SUBSD ;
+M: x86 %mul-float nip MULSD ;
+M: x86 %div-float nip DIVSD ;
 
 M: x86 %integer>float CVTSI2SD ;
 M: x86 %float>integer CVTTSD2SI ;
 
-M: x86 %copy ( dst src -- ) MOV ;
+: ?MOV ( dst src -- )
+    2dup = [ 2drop ] [ MOV ] if ; inline
 
-M: x86 %copy-float MOVSD ;
+M: x86 %copy ( dst src -- ) ?MOV ;
+
+M: x86 %copy-float ( dst src -- )
+    2dup = [ 2drop ] [ MOVSD ] if ;
 
 M: x86 %unbox-float ( dst src -- )
     float-offset [+] MOVSD ;

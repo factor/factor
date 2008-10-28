@@ -35,6 +35,8 @@ GENERIC: param-reg ( n register-class -- reg )
 
 M: object param-reg param-regs nth ;
 
+HOOK: two-operand? cpu ( -- ? )
+
 HOOK: %load-immediate cpu ( reg obj -- )
 HOOK: %load-indirect cpu ( reg obj -- )
 

@@ -31,8 +31,11 @@ M: live-interval clone
 SYMBOL: live-intervals
 
 : new-live-interval ( n vreg live-intervals -- )
-    2dup key? [ "Multiple defs" throw ] when
-    [ [ <live-interval> ] keep ] dip set-at ;
+    2dup key? [
+        at add-use
+    ] [
+        [ [ <live-interval> ] keep ] dip set-at
+    ] if ;
 
 : compute-live-intervals* ( insn n -- )
     live-intervals get
