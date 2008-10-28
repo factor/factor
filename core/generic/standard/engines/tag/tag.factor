@@ -49,7 +49,7 @@ C: <hi-tag-dispatch-engine> hi-tag-dispatch-engine
     \ hi-tag def>> ;
 
 M: hi-tag-dispatch-engine engine>quot
-    methods>> engines>quots* [ >r "type" word-prop r> ] assoc-map
+    methods>> engines>quots* [ >r hi-tag-number r> ] assoc-map
     [
         picker % hi-tag-quot % [
             linear-dispatch-quot
