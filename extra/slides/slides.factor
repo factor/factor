@@ -16,7 +16,7 @@ IN: slides
         }
         { default-block-style
             H{
-                { wrap-margin 1000 }
+                { wrap-margin 1100 }
             }
         }
         { code-style
@@ -34,7 +34,7 @@ IN: slides
             }
         }
         { table-content-style
-            H{ { wrap-margin 800 } }
+            H{ { wrap-margin 1000 } }
         }
         { list-style
             H{ { table-gap { 10 20 } } }
