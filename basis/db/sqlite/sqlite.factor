@@ -185,6 +185,7 @@ M: sqlite-db persistent-table ( -- assoc )
         { +set-null+ { f f "set null" } }
         { +set-default+ { f f "set default" } }
 
+        { BOOLEAN { "boolean" "boolean" f } }
         { INTEGER { "integer" "integer" f } }
         { BIG-INTEGER { "bigint" "bigint" f } }
         { SIGNED-BIG-INTEGER { "bigint" "bigint" f } }

@@ -18,6 +18,12 @@ FUNCTION: int chmod ( char* path, mode_t mode ) ;
 FUNCTION: int fchmod ( int fd, mode_t mode ) ;
 FUNCTION: int mkdir ( char* path, mode_t mode ) ;
 
+C-STRUCT: fsid
+    { { "int" 2 } "__val" } ;
+
+    TYPEDEF: fsid __fsid_t
+    TYPEDEF: fsid fsid_t
+
 << os {
     { linux   [ "unix.stat.linux"   require ] }
     { macosx  [ "unix.stat.macosx"  require ] }
@@ -27,11 +33,7 @@ FUNCTION: int mkdir ( char* path, mode_t mode ) ;
 } case >>
 
 : file-status ( pathname -- stat )
-    "stat" <c-object> [
-        [ stat ] unix-system-call drop
-    ] keep ;
+    "stat" <c-object> [ [ stat ] unix-system-call drop ] keep ;
 
 : link-status ( pathname -- stat )
-    "stat" <c-object> [
-        [ lstat ] unix-system-call drop
-    ] keep ;
+    "stat" <c-object> [ [ lstat ] unix-system-call drop ] keep ;

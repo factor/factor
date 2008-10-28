@@ -13,6 +13,13 @@ C-STRUCT: addrinfo
     { "void*" "addr" }
     { "addrinfo*" "next" } ;
 
+C-STRUCT: dirent
+    { "u_int32_t" "d_fileno" }
+    { "u_int16_t" "d_reclen" }
+    { "u_int8_t"  "d_type" }
+    { "u_int8_t"  "d_namlen" }
+    { { "char" 256 } "d_name" } ;
+
 : EPERM 1 ; inline
 : ENOENT 2 ; inline
 : ESRCH 3 ; inline

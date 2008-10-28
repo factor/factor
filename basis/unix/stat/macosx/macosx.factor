@@ -1,4 +1,5 @@
-USING: kernel alien.syntax math ;
+USING: kernel alien.syntax math unix math.bitwise
+alien.c-types alien sequences grouping accessors combinators ;
 IN: unix.stat
 
 ! Mac OS X ppc

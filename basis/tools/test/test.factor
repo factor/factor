@@ -12,6 +12,7 @@ SYMBOL: failures
     error-continuation get 3array ;
 
 : failure ( error what -- )
+    "--> test failed!" print
     <failure> failures get push ;
 
 SYMBOL: this-test

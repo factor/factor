@@ -3,7 +3,7 @@
 USING: assocs html.parser kernel math sequences strings ascii
 arrays generalizations shuffle unicode.case namespaces make
 splitting http accessors io combinators http.client urls
-urls.encoding fry ;
+urls.encoding fry prettyprint ;
 IN: html.parser.analyzer
 
 TUPLE: link attributes clickable ;
@@ -19,35 +19,34 @@ TUPLE: link attributes clickable ;
     '[ _ [ second @ ] find-from rot drop swap 1+ ]
     [ f 0 ] 2dip times drop first2 ; inline
 
-: find-first-name ( str vector -- i/f tag/f )
-    [ >lower ] dip [ name>> = ] with find ; inline
+: find-first-name ( vector string -- i/f tag/f )
+    >lower '[ name>> _ = ] find ; inline
 
-: find-matching-close ( str vector -- i/f tag/f )
-    [ >lower ] dip
-    [ [ name>> = ] [ closing?>> ] bi and ] with find ; inline
+: find-matching-close ( vector string -- i/f tag/f )
+    >lower
+    '[ [ name>> _ = ] [ closing?>> ] bi and ] find ; inline
 
-: find-between* ( i/f tag/f vector -- vector )
-    pick integer? [
-        rot tail-slice
-        >r name>> r>
-        [ find-matching-close drop dup [ 1+ ] when ] keep
-        swap [ head ] [ first ] if*
+: find-between* ( vector i/f tag/f -- vector )
+    over integer? [
+        [ tail-slice ] [ name>> ] bi*
+        dupd find-matching-close drop dup [ 1+ ] when
+        [ head ] [ first ] if*
     ] [
         3drop V{ } clone
     ] if ; inline
-    
-: find-between ( i/f tag/f vector -- vector )
+
+: find-between ( vector i/f tag/f -- vector )
     find-between* dup length 3 >= [
         [ rest-slice but-last-slice ] keep like
     ] when ; inline
 
-: find-between-first ( string vector -- vector' )
-    [ find-first-name ] keep find-between ; inline
+: find-between-first ( vector string -- vector' )
+    dupd find-first-name find-between ; inline
 
 : find-between-all ( vector quot -- seq )
-    [ [ [ closing?>> not ] bi and ] curry find-all ] curry
-    [ [ >r first2 r> find-between* ] curry map ] bi ; inline
-
+    dupd
+    '[ _ [ closing?>> not ] bi and ] find-all
+    [ first2 find-between* ] with map ;
 
 : remove-blank-text ( vector -- vector' )
     [
@@ -61,27 +60,40 @@ TUPLE: link attributes clickable ;
         [ [ [ blank? ] trim ] change-text ] when
     ] map ;
 
-: find-by-id ( id vector -- vector )
-    [ attributes>> "id" swap at = ] with filter ;
+: find-by-id ( vector id -- vector' )
+    '[ attributes>> "id" at _ = ] find ;
+    
+: find-by-class ( vector id -- vector' )
+    '[ attributes>> "class" at _ = ] find ;
 
-: find-by-class ( id vector -- vector )
-    [ attributes>> "class" swap at = ] with filter ;
+: find-by-name ( vector string -- vector )
+    >lower '[ name>> _ = ] find ;
 
-: find-by-name ( str vector -- vector )
-    [ >lower ] dip [ name>> = ] with filter ;
+: find-by-id-between ( vector string -- vector' )
+    dupd
+    '[ attributes>> "id" swap at _ = ] find find-between* ;
+    
+: find-by-class-between ( vector string -- vector' )
+    dupd
+    '[ attributes>> "class" swap at _ = ] find find-between* ;
+    
+: find-by-class-id-between ( vector class id -- vector' )
+    '[
+        [ attributes>> "class" swap at _ = ]
+        [ attributes>> "id" swap at _ = ] bi and
+    ] dupd find find-between* ;
 
-: find-by-attribute-key ( key vector -- vector )
-    [ >lower ] dip
-    [ attributes>> at ] with filter
-    sift ;
+: find-by-attribute-key ( vector key -- vector' )
+    >lower
+    [ attributes>> at _ = ] filter sift ;
 
-: find-by-attribute-key-value ( value key vector -- vector )
-    [ >lower ] dip
+: find-by-attribute-key-value ( vector value key -- vector' )
+    >lower
     [ attributes>> at over = ] with filter nip
     sift ;
 
-: find-first-attribute-key-value ( value key vector -- i/f tag/f )
-    [ >lower ] dip
+: find-first-attribute-key-value ( vector value key -- i/f tag/f )
+    >lower
     [ attributes>> at over = ] with find rot drop ;
 
 : tag-link ( tag -- link/f )
@@ -121,9 +133,9 @@ TUPLE: link attributes clickable ;
     swap [ >r first2 r> find-between* ] curry map
     [ [ name>> { "form" "input" } member? ] filter ] map ;
 
-: find-html-objects ( string vector -- vector' )
-    [ find-opening-tags-by-name ] keep
-    [ [ first2 ] dip find-between* ] curry map ;
+: find-html-objects ( vector string -- vector' )
+    dupd find-opening-tags-by-name
+    [ first2 find-between* ] curry map ;
 
 : form-action ( vector -- string )
     [ name>> "form" = ] find nip 
@@ -150,3 +162,12 @@ TUPLE: link attributes clickable ;
 
 : query>assoc* ( str -- hash )
     "?" split1 nip query>assoc ;
+    
+: html-class? ( tag string -- ? )
+    swap attributes>> "class" swap at = ;
+    
+: html-id? ( tag string -- ? )
+    swap attributes>> "id" swap at = ;
+
+: opening-tag? ( tag -- ? )
+    closing?>> not ;

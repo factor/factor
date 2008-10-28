@@ -1,7 +1,7 @@
 USING: locals math sequences tools.test hashtables words kernel
 namespaces arrays strings prettyprint io.streams.string parser
 accessors generic eval combinators combinators.short-circuit
-combinators.short-circuit.smart math.order ;
+combinators.short-circuit.smart math.order math.functions ;
 IN: locals.tests
 
 :: foo ( a b -- a a ) a a ;
@@ -305,17 +305,29 @@ M:: sequence method-with-locals ( a -- y ) a reverse ;
 [ f ] [ 8 &&-test ] unit-test
 [ t ] [ 12 &&-test ] unit-test
 
-:: wlet-&&-test ( a -- ? )
-    [wlet | is-integer? [ a integer? ]
-            is-even? [ a even? ]
-            >10? [ a 10 > ] |
-        { [ is-integer? ] [ is-even? ] [ >10? ] } &&
+:: let-and-cond-test-1 ( -- a )
+    [let | a [ 10 ] |
+        [let | a [ 20 ] |
+            {
+                { [ t ] [ [let | c [ 30 ] | a ] ] }
+            } cond
+        ]
     ] ;
 
-! [ f ] [ 1.5 wlet-&&-test ] unit-test
-! [ f ] [ 3 wlet-&&-test ] unit-test
-! [ f ] [ 8 wlet-&&-test ] unit-test
-! [ t ] [ 12 wlet-&&-test ] unit-test
+\ let-and-cond-test-1 must-infer
+
+[ 20 ] [ let-and-cond-test-1 ] unit-test
+
+:: let-and-cond-test-2 ( -- pair )
+    [let | A [ 10 ] |
+        [let | B [ 20 ] |
+            { { [ t ] [ { A B } ] } } cond
+        ]
+    ] ;
+
+\ let-and-cond-test-2 must-infer
+
+[ { 10 20 } ] [ let-and-cond-test-2 ] unit-test
 
 [ { 10       } ] [ 10       [| a     | { a     } ] call ] unit-test
 [ { 10 20    } ] [ 10 20    [| a b   | { a b   } ] call ] unit-test
@@ -333,6 +345,16 @@ M:: sequence method-with-locals ( a -- y ) a reverse ;
 
 { 3 1 } [| from to seq | T{ slice f from to seq } ] must-infer-as
 
+
+:: literal-identity-test ( -- a b )
+    { } V{ } ;
+
+[ t f ] [
+    literal-identity-test
+    literal-identity-test
+    swapd [ eq? ] [ eq? ] 2bi*
+] unit-test
+
 :: compare-case ( obj1 obj2 lt-quot eq-quot gt-quot -- )
     obj1 obj2 <=> {
         { +lt+ [ lt-quot call ] }
@@ -341,3 +363,29 @@ M:: sequence method-with-locals ( a -- y ) a reverse ;
     } case ; inline
 
 [ [ ] [ ] [ ] compare-case ] must-infer
+
+:: big-case-test ( a -- b )
+    a {
+        { 0 [ a 1 + ] }
+        { 1 [ a 1 - ] }
+        { 2 [ a 1 swap / ] }
+        { 3 [ a dup * ] }
+        { 4 [ a sqrt ] }
+        { 5 [ a a ^ ] }
+    } case ;
+
+\ big-case-test must-infer
+
+[ 9 ] [ 3 big-case-test ] unit-test
+
+! :: wlet-&&-test ( a -- ? )
+!     [wlet | is-integer? [ a integer? ]
+!             is-even? [ a even? ]
+!             >10? [ a 10 > ] |
+!         { [ is-integer? ] [ is-even? ] [ >10? ] } &&
+!     ] ;
+
+! [ f ] [ 1.5 wlet-&&-test ] unit-test
+! [ f ] [ 3 wlet-&&-test ] unit-test
+! [ f ] [ 8 wlet-&&-test ] unit-test
+! [ t ] [ 12 wlet-&&-test ] unit-test

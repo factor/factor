@@ -55,8 +55,9 @@ ARTICLE: "directories" "Directories"
 "Home directory:"
 { $subsection home }
 "Directory listing:"
-{ $subsection directory }
-{ $subsection directory* }
+{ $subsection directory-entries }
+{ $subsection directory-files }
+{ $subsection with-directory-files }
 "Creating directories:"
 { $subsection make-directory }
 { $subsection make-directories }
@@ -80,6 +81,7 @@ ARTICLE: "fs-meta" "File metadata"
 { $subsection link-info }
 { $subsection exists? }
 { $subsection directory? }
+
 "File types:"
 { $subsection "file-types" } ;
 
@@ -304,23 +306,28 @@ HELP: directory?
 { $values { "file-info" file-info } { "?" "a boolean" } }
 { $description "Tests if " { $snippet "file-info" } " is a directory." } ;
 
-HELP: (directory)
+HELP: (directory-entries)
 { $values { "path" "a pathname string" } { "seq" "a sequence of " { $snippet "{ name dir? }" } " pairs" } }
 { $description "Outputs the contents of a directory named by " { $snippet "path" } "." }
-{ $notes "This is a low-level word, and user code should call " { $link directory } " instead." } ;
+{ $notes "This is a low-level word, and user code should call one of the related words instead." } ;
 
-HELP: directory
-{ $values { "path" "a pathname string" } { "seq" "a sequence of " { $snippet "{ name dir? }" } " pairs" } }
+HELP: directory-entries
+{ $values { "path" "a pathname string" } { "seq" "a sequence of " { $link directory-entry } " objects" } }
 { $description "Outputs the contents of a directory named by " { $snippet "path" } "." } ;
 
-HELP: directory*
-{ $values { "path" "a pathname string" } { "seq" "a sequence of " { $snippet "{ path dir? }" } " pairs" } }
-{ $description "Outputs the contents of a directory named by " { $snippet "path" } "." }
-{ $notes "Unlike " { $link directory } ", this word prepends the directory's path to all file names in the list." } ;
+HELP: directory-files
+{ $values { "path" "a pathname string" } { "seq" "a sequence of filenames" } }
+{ $description "Outputs the contents of a directory named by " { $snippet "path" } "." } ;
 
-! HELP: file-modified
-! { $values { "path" "a pathname string" } { "n" "a non-negative integer or " { $link f } } }
-! { $description "Outputs a file's last modification time, since midnight January 1, 1970. If the file does not exist, outputs " { $link f } "." } ;
+HELP: with-directory-files
+{ $values { "path" "a pathname string" } { "quot" quotation } }
+{ $description "Calls the quotation with the directory file names on the stack and with the directory set as the " { $link current-directory } ".  Restores the current directory after the quotation is called." } ;
+
+HELP: file-system-info
+{ $values
+{ "path" "a pathname string" }
+{ "file-system-info" file-system-info } }
+{ $description "Returns a platform-specific object describing the file-system that contains the path. The cross-platform slot is " { $slot "free-space" } "." } ;
 
 HELP: resource-path
 { $values { "path" "a pathname string" } { "newpath" "a pathname string" } }
@@ -328,10 +335,6 @@ HELP: resource-path
 
 HELP: pathname
 { $class-description "Class of path name objects. Path name objects can be created by calling " { $link <pathname> } "." } ;
-
-HELP: normalize-directory
-{ $values { "str" "a pathname string" } { "newstr" "a new pathname string" } }
-{ $description "Called by the " { $link directory } " word to prepare a pathname before passing it to the " { $link (directory) } " primitive." } ;
 
 HELP: normalize-path
 { $values { "str" "a pathname string" } { "newstr" "a new pathname string" } }
