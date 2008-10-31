@@ -1,7 +1,7 @@
 USING: continuations destructors io.buffers io.files io.backend
 io.timeouts io.ports io.windows io.windows.files
 io.windows.nt.backend windows windows.kernel32
-kernel libc math threads system
+kernel libc math threads system environment
 alien.c-types alien.arrays alien.strings sequences combinators
 combinators.short-circuit ascii splitting alien strings
 assocs namespaces make io.files.private accessors tr ;
@@ -31,12 +31,13 @@ M: winnt root-directory? ( path -- ? )
 
 ERROR: not-absolute-path ;
 
-: root-directory ( string -- string' )
+M: winnt root-directory ( string -- string' )
+    unicode-prefix ?head drop
     dup {
         [ length 2 >= ]
         [ second CHAR: : = ]
         [ first Letter? ]
-    } 1&& [ 2 head ] [ not-absolute-path ] if ;
+    } 1&& [ 2 head "\\" append ] [ not-absolute-path ] if ;
 
 : prepend-prefix ( string -- string' )
     dup unicode-prefix head? [
@@ -59,3 +60,5 @@ M: winnt FileArgs-overlapped ( port -- overlapped )
 M: winnt open-append
     [ dup file-info size>> ] [ drop 0 ] recover
     >r (open-append) r> >>ptr ;
+
+M: winnt home "USERPROFILE" os-env ;

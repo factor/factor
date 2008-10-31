@@ -4,7 +4,8 @@
 USING: combinators.lib kernel sequences math namespaces make
 assocs random sequences.private shuffle math.functions arrays
 math.parser math.private sorting strings ascii macros assocs.lib
-quotations hashtables math.order locals generalizations ;
+quotations hashtables math.order locals generalizations
+math.ranges random  ;
 IN: sequences.lib
 
 : each-withn ( seq quot n -- ) nwith each ; inline
@@ -131,11 +132,6 @@ PRIVATE>
 : power-set ( seq -- subsets )
     2 over length exact-number-strings swap [ switches ] curry map ;
 
-USE: continuations
-: ?subseq ( from to seq -- subseq )
-    >r >r 0 max r> r>
-    [ length tuck min >r min r> ] keep subseq ;
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 <PRIVATE
@@ -149,18 +145,10 @@ PRIVATE>
 : attempt-each ( seq quot -- result )
     (each) iterate-prep (attempt-each-integer) ; inline
 
-: ?nth* ( n seq -- elt/f ? )
-    2dup bounds-check? [ nth-unsafe t ] [ 2drop f f ] if ; flushable
-
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-USE: math.ranges
-USE: random 
 : randomize ( seq -- seq' )
     dup length 1 (a,b] [ dup random pick exchange ] each ;
 
-! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-: enumerate ( seq -- seq' )
-    <enum> >alist ;
+: enumerate ( seq -- seq' ) <enum> >alist ;
 

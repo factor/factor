@@ -7,29 +7,30 @@ IN: hexdump
 
 <PRIVATE
 
-: header. ( len -- )
-    "Length: " write dup unparse write ", " write >hex write "h" write nl ;
+: write-header ( len -- )
+    "Length: " write
+    [ unparse write ", " write ]
+    [ >hex write "h" write nl ] bi ;
 
-: offset. ( lineno -- )
+: write-offset ( lineno -- )
     16 * >hex 8 CHAR: 0 pad-left write "h: " write ;
 
-: h-pad. ( digit -- )
+: write-hex-digit ( digit -- )
     >hex 2 CHAR: 0 pad-left write ;
 
-: line. ( str n -- )
-    offset.
-    dup [ h-pad. " " write ] each
+: write-hex-line ( str n -- )
+    write-offset
+    dup [ write-hex-digit bl ] each
     16 over length - 3 * CHAR: \s <string> write
     [ dup printable? [ drop CHAR: . ] unless write1 ] each
     nl ;
 
 PRIVATE>
 
-: hexdump ( sequence -- string )
+: hexdump ( seq -- str )
     [
-        dup length header.
-        16 <sliced-groups> [ line. ] each-index
+        [ length write-header ]
+        [ 16 <sliced-groups> [ write-hex-line ] each-index ] bi
     ] with-string-writer ;
 
-: hexdump. ( sequence -- )
-    hexdump write ;
+: hexdump. ( seq -- ) hexdump write ;

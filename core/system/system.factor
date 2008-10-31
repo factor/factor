@@ -65,9 +65,3 @@ PRIVATE>
 ] "system" add-init-hook
 
 : embedded? ( -- ? ) 15 getenv ;
-
-: os-envs ( -- assoc )
-    (os-envs) [ "=" split1 ] H{ } map>assoc ;
-
-: set-os-envs ( assoc -- )
-    [ "=" swap 3append ] { } assoc>map (set-os-envs) ;

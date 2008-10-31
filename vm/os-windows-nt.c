@@ -8,35 +8,6 @@ s64 current_millis(void)
 		- EPOCH_OFFSET) / 10000;
 }
 
-DEFINE_PRIMITIVE(os_envs)
-{
-	GROWABLE_ARRAY(result);
-	REGISTER_ROOT(result);
-
-	TCHAR *env = GetEnvironmentStrings();
-	TCHAR *finger = env;
-
-	for(;;)
-	{
-		TCHAR *scan = finger;
-		while(*scan != '\0')
-			scan++;
-		if(scan == finger)
-			break;
-
-		CELL string = tag_object(from_u16_string(finger));
-		GROWABLE_ARRAY_ADD(result,string);
-
-		finger = scan + 1;
-	}
-
-	FreeEnvironmentStrings(env);
-
-	UNREGISTER_ROOT(result);
-	GROWABLE_ARRAY_TRIM(result);
-	dpush(result);
-}
-
 long exception_handler(PEXCEPTION_POINTERS pe)
 {
 	PEXCEPTION_RECORD e = (PEXCEPTION_RECORD)pe->ExceptionRecord;

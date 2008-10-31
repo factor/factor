@@ -39,7 +39,7 @@ TUPLE: <entry> time data ;
            [let | NAME  [ OBJ name>>       ]
                   TYPE  [ OBJ type>>       ]
                   CLASS [ OBJ class>>      ]
-                  TTL   [ now ENT time>> - ] |
+                  TTL   [ ENT time>> now - ] |
              ENT data>>
                [| RDATA | T{ rr f NAME TYPE CLASS TTL RDATA } ]
              map

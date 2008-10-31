@@ -1,10 +1,11 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: alien.c-types io.binary io.backend io.files io.buffers
-io.windows kernel math splitting
+io.windows kernel math splitting fry alien.strings
 windows windows.kernel32 windows.time calendar combinators
 math.functions sequences namespaces make words symbols system
-io.ports destructors accessors math.bitwise ;
+io.ports destructors accessors math.bitwise continuations
+windows.errors arrays byte-arrays ;
 IN: io.windows.files
 
 : open-file ( path access-mode create-mode flags -- handle )
@@ -113,8 +114,35 @@ M: windows delete-directory ( path -- )
     normalize-path
     RemoveDirectory win32-error=0/f ;
 
-M: windows normalize-directory ( string -- string )
-    normalize-path "\\" ?tail drop "\\*" append ;
+M: windows >directory-entry ( byte-array -- directory-entry )
+    [ WIN32_FIND_DATA-cFileName utf16n alien>string ]
+    [ WIN32_FIND_DATA-dwFileAttributes ]
+    bi directory-entry boa ;
+
+: find-first-file ( path -- WIN32_FIND_DATA handle )
+    "WIN32_FIND_DATA" <c-object> tuck
+    FindFirstFile
+    [ INVALID_HANDLE_VALUE = [ win32-error ] when ] keep ;
+
+: find-next-file ( path -- WIN32_FIND_DATA/f )
+    "WIN32_FIND_DATA" <c-object> tuck
+    FindNextFile 0 = [
+        GetLastError ERROR_NO_MORE_FILES = [
+            win32-error
+        ] unless drop f
+    ] when ;
+
+M: windows (directory-entries) ( path -- seq )
+    "\\" ?tail drop "\\*" append
+    find-first-file [ >directory-entry ] dip
+    [
+        '[
+            [ _ find-next-file dup ]
+            [ >directory-entry ]
+            [ drop ] produce
+            over name>> "." = [ nip ] [ swap prefix ] if
+        ]
+    ] [ '[ _ FindClose win32-error=0/f ] ] bi [ ] cleanup ;
 
 SYMBOLS: +read-only+ +hidden+ +system+
 +archive+ +device+ +normal+ +temporary+
@@ -217,6 +245,58 @@ M: winnt file-info ( path -- info )
 
 M: winnt link-info ( path -- info )
     file-info ;
+
+HOOK: root-directory os ( string -- string' )
+
+TUPLE: winnt-file-system-info < file-system-info
+total-bytes total-free-bytes ;
+
+: file-system-type ( normalized-path -- str )
+    MAX_PATH 1+ <byte-array>
+    MAX_PATH 1+
+    "DWORD" <c-object> "DWORD" <c-object> "DWORD" <c-object>
+    MAX_PATH 1+ <byte-array>
+    MAX_PATH 1+
+    [ GetVolumeInformation win32-error=0/f ] 2keep drop
+    utf16n alien>string ;
+
+: file-system-space ( normalized-path -- free-space total-bytes total-free-bytes )
+    "ULARGE_INTEGER" <c-object>
+    "ULARGE_INTEGER" <c-object>
+    "ULARGE_INTEGER" <c-object>
+    [ GetDiskFreeSpaceEx win32-error=0/f ] 3keep ;
+
+M: winnt file-system-info ( path -- file-system-info )
+    normalize-path root-directory
+    dup [ file-system-type ] [ file-system-space ] bi
+    \ winnt-file-system-info new
+        swap *ulonglong >>total-free-bytes
+        swap *ulonglong >>total-bytes
+        swap *ulonglong >>free-space
+        swap >>type
+        swap >>mount-point ;
+
+: find-first-volume ( word -- string handle )
+    MAX_PATH 1+ <byte-array> dup length
+    dupd
+    FindFirstVolume dup win32-error=0/f
+    [ utf16n alien>string ] dip ;
+
+: find-next-volume ( handle -- string )
+    MAX_PATH 1+ <byte-array> dup length
+    [ FindNextVolume win32-error=0/f ] 2keep drop
+    utf16n alien>string ;
+
+: mounted ( -- array )
+    find-first-volume
+    [
+        '[
+            [ _ find-next-volume dup ]
+            [ ]
+            [ drop ] produce
+            swap prefix
+        ]
+    ] [ '[ _ FindVolumeClose win32-error=0/f ] ] bi [ ] cleanup ;
 
 : file-times ( path -- timestamp timestamp timestamp )
     [

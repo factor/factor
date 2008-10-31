@@ -4,9 +4,9 @@ IN: cpu.x86.assembler.tests
 [ { HEX: 49 HEX: 89 HEX: 04 HEX: 24 } ] [ [ R12 [] RAX MOV ] { } make ] unit-test
 [ { HEX: 49 HEX: 8b HEX: 06 } ] [ [ RAX R14 [] MOV ] { } make ] unit-test
 
-! [ { HEX: 89 HEX: ca } ] [ [ EDX ECX MOV ] { } make ] unit-test
-! [ { HEX: 4c HEX: 89 HEX: e2 } ] [ [ RDX R12 MOV ] { } make ] unit-test
-! [ { HEX: 49 HEX: 89 HEX: d4 } ] [ [ R12 RDX MOV ] { } make ] unit-test
+[ { HEX: 89 HEX: ca } ] [ [ EDX ECX MOV ] { } make ] unit-test
+[ { HEX: 4c HEX: 89 HEX: e2 } ] [ [ RDX R12 MOV ] { } make ] unit-test
+[ { HEX: 49 HEX: 89 HEX: d4 } ] [ [ R12 RDX MOV ] { } make ] unit-test
 
 [ { HEX: f2 HEX: 0f HEX: 2c HEX: c0 } ] [ [ EAX XMM0 CVTTSD2SI ] { } make ] unit-test
 [ { HEX: f2 HEX: 48 HEX: 0f HEX: 2c HEX: c0 } ] [ [ RAX XMM0 CVTTSD2SI ] { } make ] unit-test
@@ -39,3 +39,21 @@ IN: cpu.x86.assembler.tests
 
 [ { HEX: 80 HEX: 08 HEX: 05 } ] [ [ EAX [] 5 <byte> OR ] { } make ] unit-test
 [ { HEX: c6 HEX: 00 HEX: 05 } ] [ [ EAX [] 5 <byte> MOV ] { } make ] unit-test
+
+[ { HEX: 49 HEX: 89 HEX: 04 HEX: 1a } ] [ [ R10 RBX [+] RAX MOV ] { } make ] unit-test
+[ { HEX: 49 HEX: 89 HEX: 04 HEX: 1b } ] [ [ R11 RBX [+] RAX MOV ] { } make ] unit-test
+
+[ { HEX: 49 HEX: 89 HEX: 04 HEX: 1c } ] [ [ R12 RBX [+] RAX MOV ] { } make ] unit-test
+[ { HEX: 48 HEX: 89 HEX: 04 HEX: 1c } ] [ [ RSP RBX [+] RAX MOV ] { } make ] unit-test
+
+[ { HEX: 49 HEX: 89 HEX: 44 HEX: 1d HEX: 00 } ] [ [ R13 RBX [+] RAX MOV ] { } make ] unit-test
+[ { HEX: 48 HEX: 89 HEX: 44 HEX: 1d HEX: 00 } ] [ [ RBP RBX [+] RAX MOV ] { } make ] unit-test
+
+[ { HEX: 4a HEX: 89 HEX: 04 HEX: 23 } ] [ [ RBX R12 [+] RAX MOV ] { } make ] unit-test
+[ { HEX: 4a HEX: 89 HEX: 04 HEX: 2b } ] [ [ RBX R13 [+] RAX MOV ] { } make ] unit-test
+
+[ { HEX: 4b HEX: 89 HEX: 44 HEX: 25 HEX: 00 } ] [ [ R13 R12 [+] RAX MOV ] { } make ] unit-test
+[ { HEX: 4b HEX: 89 HEX: 04 HEX: 2c } ] [ [ R12 R13 [+] RAX MOV ] { } make ] unit-test
+
+[ { HEX: 49 HEX: 89 HEX: 04 HEX: 2c } ] [ [ R12 RBP [+] RAX MOV ] { } make ] unit-test
+[ [ R12 RSP [+] RAX MOV ] { } make ] must-fail

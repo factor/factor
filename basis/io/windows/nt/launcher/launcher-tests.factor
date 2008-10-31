@@ -1,7 +1,7 @@
-IN: io.windows.launcher.nt.tests
-USING: io.launcher tools.test calendar accessors
+USING: io.launcher tools.test calendar accessors environment
 namespaces kernel system arrays io io.files io.encodings.ascii
 sequences parser assocs hashtables math continuations eval ;
+IN: io.windows.launcher.nt.tests
 
 [ ] [
     <process>

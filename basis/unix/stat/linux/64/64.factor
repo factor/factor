@@ -1,6 +1,5 @@
-
-USING: kernel alien.syntax math ;
-
+USING: kernel alien.syntax math sequences unix
+alien.c-types arrays accessors combinators ;
 IN: unix.stat
 
 ! Ubuntu 7.10 64-bit

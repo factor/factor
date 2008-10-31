@@ -3,7 +3,7 @@ USING: kernel parser words continuations namespaces debugger
        sequences combinators splitting prettyprint
        system io io.files io.launcher io.encodings.utf8 io.pipes sequences.deep
        accessors multi-methods newfx shell.parser
-       combinators.short-circuit eval ;
+       combinators.short-circuit eval environment ;
 
 IN: shell
 
@@ -39,7 +39,7 @@ METHOD: expand { variable-expr } expr>> os-env ;
 METHOD: expand { glob-expr }
   expr>>
   dup "*" =
-    [ drop current-directory get directory [ first ] map ]
+    [ drop current-directory get directory-files ]
     [ ]
   if ;
 

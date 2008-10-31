@@ -59,5 +59,5 @@ TUPLE: ftp-response n strings parsed ;
     3array " " join ;
 
 : directory-list ( -- seq )
-    "" directory keys
+    "" directory-files
     [ [ link-info ] keep file-info>string ] map ;

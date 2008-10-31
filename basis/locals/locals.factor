@@ -35,10 +35,14 @@ C: <wlet> wlet
 
 M: lambda expand-macros clone [ expand-macros ] change-body ;
 
+M: lambda expand-macros* expand-macros literal ;
+
 M: binding-form expand-macros
     clone
         [ [ expand-macros ] assoc-map ] change-bindings
         [ expand-macros ] change-body ;
+
+M: binding-form expand-macros* expand-macros literal ;
 
 PREDICATE: local < word "local?" word-prop ;
 
@@ -142,12 +146,12 @@ GENERIC: free-vars* ( form -- )
     [ free-vars* ] { } make prune ;
 
 : add-if-free ( object -- )
-  {
-      { [ dup local-writer? ] [ "local-reader" word-prop , ] }
-      { [ dup lexical? ]      [ , ] }
-      { [ dup quote? ]        [ local>> , ] }
-      { [ t ]                 [ free-vars* ] }
-  } cond ;
+    {
+        { [ dup local-writer? ] [ "local-reader" word-prop , ] }
+        { [ dup lexical? ] [ , ] }
+        { [ dup quote? ] [ local>> , ] }
+        { [ t ] [ free-vars* ] }
+    } cond ;
 
 M: object free-vars* drop ;
 
@@ -195,6 +199,20 @@ M: block lambda-rewrite*
         swap point-free ,
     ] keep length \ curry <repetition> % ;
 
+GENERIC: rewrite-literal? ( obj -- ? )
+
+M: special rewrite-literal? drop t ;
+
+M: array rewrite-literal? [ rewrite-literal? ] contains? ;
+
+M: hashtable rewrite-literal? drop t ;
+
+M: vector rewrite-literal? drop t ;
+
+M: tuple rewrite-literal? drop t ;
+
+M: object rewrite-literal? drop f ;
+
 GENERIC: rewrite-element ( obj -- )
 
 : rewrite-elements ( seq -- )
@@ -203,7 +221,8 @@ GENERIC: rewrite-element ( obj -- )
 : rewrite-sequence ( seq -- )
     [ rewrite-elements ] [ length , ] [ , ] tri \ nsequence , ;
 
-M: array rewrite-element rewrite-sequence ;
+M: array rewrite-element
+    dup rewrite-literal? [ rewrite-sequence ] [ , ] if ;
 
 M: vector rewrite-element rewrite-sequence ;
 
@@ -441,7 +460,7 @@ M: lambda-memoized definition
     "lambda" word-prop body>> ;
 
 M: lambda-memoized reset-word
-    [ f "lambda" set-word-prop ] [ call-next-method ] bi ;
+    [ call-next-method ] [ f "lambda" set-word-prop ] bi ;
 
 : method-stack-effect ( method -- effect )
     dup "lambda" word-prop vars>>

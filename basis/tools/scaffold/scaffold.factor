@@ -16,13 +16,18 @@ ERROR: vocab-name-contains-dot path ;
 ERROR: no-vocab vocab ;
 
 <PRIVATE
-: root? ( string -- ? )
-    vocab-roots get member?  ;
+
+: root? ( string -- ? ) vocab-roots get member?  ;
+
+: length-changes? ( seq quot -- ? )
+    dupd call [ length ] bi@ = not ; inline
 
 : check-vocab-name ( string -- string )
-    dup dup [ CHAR: . = ] trim [ length ] bi@ =
-    [ vocab-name-contains-dot ] unless
+    dup [ [ CHAR: . = ] trim ] length-changes?
+    [ vocab-name-contains-dot ] when
+
     ".." over subseq? [ vocab-name-contains-dot ] when
+
     dup [ path-separator? ] contains?
     [ vocab-name-contains-separator ] when ;
 
@@ -43,8 +48,11 @@ ERROR: no-vocab vocab ;
 : scaffolding ( path -- )
     "Creating scaffolding for " write <pathname> . ;
 
+: (scaffold-path) ( path string -- path )
+    dupd [ file-name ] dip append append-path ;
+
 : scaffold-path ( path string -- path ? )
-    dupd [ file-name ] dip append append-path
+    (scaffold-path)
     dup exists? [ dup not-scaffolding f ] [ dup scaffolding t ] if ;
 
 : scaffold-copyright ( -- )
@@ -205,14 +213,15 @@ ERROR: no-vocab vocab ;
 
 : check-vocab ( vocab -- vocab )
     dup find-vocab-root [ no-vocab ] unless ;
+
 PRIVATE>
 
 : link-vocab ( vocab -- )
     check-vocab
     "Edit documentation: " write
-    [ find-vocab-root ] keep
-    [ append-path ] keep "-docs.factor" append append-path
-    <pathname> . ;
+    [ find-vocab-root ]
+    [ vocab>scaffold-path ] bi
+    "-docs.factor" (scaffold-path) <pathname> . ;
 
 : help. ( word -- )
     [ (help.) ] [ nl vocabulary>> link-vocab ] bi ;

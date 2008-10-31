@@ -5,7 +5,8 @@ unix unix.stat unix.time kernel math continuations
 math.bitwise byte-arrays alien combinators calendar
 io.encodings.binary accessors sequences strings system
 io.files.private destructors vocabs.loader calendar.unix
-unix.stat alien.c-types arrays unix.users unix.groups ;
+unix.stat alien.c-types arrays unix.users unix.groups
+environment fry io.encodings.utf8 alien.strings unix.statfs ;
 IN: io.unix.files
 
 M: unix cwd ( -- path )
@@ -137,6 +138,27 @@ os {
     { linux [ ] }
 } case
 
+: with-unix-directory ( path quot -- )
+    [ opendir dup [ (io-error) ] unless ] dip
+    dupd curry swap '[ _ closedir io-error ] [ ] cleanup ; inline
+
+: find-next-file ( DIR* -- byte-array )
+    "dirent" <c-object>
+    f <void*>
+    [ readdir_r 0 = [ (io-error) ] unless ] 2keep
+    *void* [ drop f ] unless ;
+
+M: unix >directory-entry ( byte-array -- directory-entry )
+    [ dirent-d_name utf8 alien>string ]
+    [ dirent-d_type ] bi directory-entry boa ;
+
+M: unix (directory-entries) ( path -- seq )
+    [
+        '[ _ find-next-file dup ]
+        [ >directory-entry ]
+        [ drop ] produce
+    ] with-unix-directory ;
+
 <PRIVATE
 
 : stat-mode ( path -- mode )
@@ -166,18 +188,57 @@ PRIVATE>
 : OTHER-WRITE   OCT: 0000002 ; inline  
 : OTHER-EXECUTE OCT: 0000001 ; inline    
 
-: uid? ( path -- ? ) UID file-mode? ;
-: gid? ( path -- ? ) GID file-mode? ;
-: sticky? ( path -- ? ) STICKY file-mode? ;
-: user-read? ( path -- ? ) USER-READ file-mode? ;
-: user-write? ( path -- ? ) USER-WRITE file-mode? ;
-: user-execute? ( path -- ? ) USER-EXECUTE file-mode? ;
-: group-read? ( path -- ? ) GROUP-READ file-mode? ;
-: group-write? ( path -- ? ) GROUP-WRITE file-mode? ;
-: group-execute? ( path -- ? ) GROUP-EXECUTE file-mode? ;
-: other-read? ( path -- ? ) OTHER-READ file-mode? ;
-: other-write? ( path -- ? ) OTHER-WRITE file-mode? ; 
-: other-execute? ( path -- ? ) OTHER-EXECUTE file-mode? ;
+GENERIC: uid? ( obj -- ? )
+GENERIC: gid? ( obj -- ? )
+GENERIC: sticky? ( obj -- ? )
+GENERIC: user-read? ( obj -- ? )
+GENERIC: user-write? ( obj -- ? )
+GENERIC: user-execute? ( obj -- ? )
+GENERIC: group-read? ( obj -- ? )
+GENERIC: group-write? ( obj -- ? )
+GENERIC: group-execute? ( obj -- ? )
+GENERIC: other-read? ( obj -- ? )
+GENERIC: other-write? ( obj -- ? )
+GENERIC: other-execute? ( obj -- ? )
+
+M: integer uid? ( integer -- ? ) UID mask? ;
+M: integer gid? ( integer -- ? ) GID mask? ;
+M: integer sticky? ( integer -- ? ) STICKY mask? ;
+M: integer user-read? ( integer -- ? ) USER-READ mask? ;
+M: integer user-write? ( integer -- ? ) USER-WRITE mask? ;
+M: integer user-execute? ( integer -- ? ) USER-EXECUTE mask? ;
+M: integer group-read? ( integer -- ? ) GROUP-READ mask? ;
+M: integer group-write? ( integer -- ? ) GROUP-WRITE mask? ;
+M: integer group-execute? ( integer -- ? ) GROUP-EXECUTE mask? ;
+M: integer other-read? ( integer -- ? ) OTHER-READ mask? ;
+M: integer other-write? ( integer -- ? ) OTHER-WRITE mask? ; 
+M: integer other-execute? ( integer -- ? ) OTHER-EXECUTE mask? ;
+
+M: file-info uid? ( file-info -- ? ) permissions>> uid? ;
+M: file-info gid? ( file-info -- ? ) permissions>> gid? ;
+M: file-info sticky? ( file-info -- ? ) permissions>> sticky? ;
+M: file-info user-read? ( file-info -- ? ) permissions>> user-read? ;
+M: file-info user-write? ( file-info -- ? ) permissions>> user-write? ;
+M: file-info user-execute? ( file-info -- ? ) permissions>> user-execute? ;
+M: file-info group-read? ( file-info -- ? ) permissions>> group-read? ;
+M: file-info group-write? ( file-info -- ? ) permissions>> group-write? ;
+M: file-info group-execute? ( file-info -- ? ) permissions>> group-execute? ;
+M: file-info other-read? ( file-info -- ? ) permissions>> other-read? ;
+M: file-info other-write? ( file-info -- ? ) permissions>> other-write? ;
+M: file-info other-execute? ( file-info -- ? ) permissions>> other-execute? ;
+
+M: string uid? ( path -- ? ) UID file-mode? ;
+M: string gid? ( path -- ? ) GID file-mode? ;
+M: string sticky? ( path -- ? ) STICKY file-mode? ;
+M: string user-read? ( path -- ? ) USER-READ file-mode? ;
+M: string user-write? ( path -- ? ) USER-WRITE file-mode? ;
+M: string user-execute? ( path -- ? ) USER-EXECUTE file-mode? ;
+M: string group-read? ( path -- ? ) GROUP-READ file-mode? ;
+M: string group-write? ( path -- ? ) GROUP-WRITE file-mode? ;
+M: string group-execute? ( path -- ? ) GROUP-EXECUTE file-mode? ;
+M: string other-read? ( path -- ? ) OTHER-READ file-mode? ;
+M: string other-write? ( path -- ? ) OTHER-WRITE file-mode? ; 
+M: string other-execute? ( path -- ? ) OTHER-EXECUTE file-mode? ;
 
 : set-uid ( path ? -- ) UID swap chmod-set-bit ;
 : set-gid ( path ? -- ) GID swap chmod-set-bit ;
@@ -255,3 +316,5 @@ M: string set-file-group ( path string -- )
 
 : file-group-name ( path -- string )
     file-group-id group-name ;
+
+M: unix home "HOME" os-env ;

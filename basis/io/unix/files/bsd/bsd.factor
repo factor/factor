@@ -13,5 +13,8 @@ M: bsd stat>file-info ( stat -- file-info )
     {
         [ stat-st_flags >>flags ]
         [ stat-st_gen >>gen ]
-        [ stat-st_birthtimespec timespec>unix-time >>birth-time ]
+        [
+            stat-st_birthtimespec timespec>unix-time
+            >>birth-time
+        ]
     } cleave ;
