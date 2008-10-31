@@ -15,6 +15,14 @@ TUPLE: bitmap magic size reserved offset header-length width
     height planes bit-count compression size-image
     x-pels y-pels color-used color-important rgb-quads color-index array ;
 
+: bgr>bitmap ( array height width -- bitmap )
+    bitmap new
+        2over * 3 * >>size-image
+        swap >>height
+        swap >>width
+        swap [ >>array ] [ >>color-index ] bi
+        24 >>bit-count ;
+
 : raw-bitmap>string ( str n -- str )
     {
         { 32 [ "32bit" throw ] }
@@ -74,7 +82,7 @@ M: bitmap-magic summary
 
 : save-bitmap ( bitmap path -- )
     binary [
-        "BM" write
+        "BM" >byte-array write
         dup array>> length 14 + 40 + 4 >le write
         0 4 >le write
         54 4 >le write
@@ -87,10 +95,10 @@ M: bitmap-magic summary
             [ bit-count>> 24 or 2 >le write ]
             [ compression>> 0 or 4 >le write ]
             [ size-image>> 4 >le write ]
-            [ x-pels>> 4 >le write ]
-            [ y-pels>> 4 >le write ]
-            [ color-used>> 4 >le write ]
-            [ color-important>> 4 >le write ]
+            [ x-pels>> 0 or 4 >le write ]
+            [ y-pels>> 0 or 4 >le write ]
+            [ color-used>> 0 or 4 >le write ]
+            [ color-important>> 0 or 4 >le write ]
             [ rgb-quads>> write ]
             [ color-index>> write ]
         } cleave
