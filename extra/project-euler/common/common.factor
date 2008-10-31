@@ -1,8 +1,8 @@
 ! Copyright (c) 2007-2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays kernel math math.functions math.miller-rabin math.matrices
-    math.order math.parser math.primes.factors math.ranges make namespaces
-    sequences sequences.lib sorting unicode.case ;
+USING: arrays kernel make math math.functions math.matrices math.miller-rabin
+    math.order math.parser math.primes.factors math.ranges sequences
+    sequences.lib sorting unicode.case ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution
@@ -12,7 +12,6 @@ IN: project-euler.common
 ! -------------------------------
 ! alpha-value - #22, #42
 ! cartesian-product - #4, #27, #29, #32, #33, #43, #44, #56
-! collect-consecutive - #8, #11
 ! log10 - #25, #134
 ! max-path - #18, #67
 ! nth-triangle - #12, #42
@@ -34,18 +33,12 @@ IN: project-euler.common
 
 <PRIVATE
 
-: count-shifts ( seq width -- n )
-    [ length 1+ ] dip - ;
-
 : max-children ( seq -- seq )
     [ dup length 1- [ over nth-pair max , ] each ] { } make nip ;
 
 ! Propagate one row into the upper one
 : propagate ( bottom top -- newtop )
     [ over rest rot first2 max rot + ] map nip ;
-
-: shift-3rd ( seq obj obj -- seq obj obj )
-    rot rest -rot ;
 
 : (sum-divisors) ( n -- sum )
     dup sqrt >fixnum [1,b] [
@@ -63,11 +56,6 @@ PRIVATE>
 
 : cartesian-product ( seq1 seq2 -- seq1xseq2 )
     swap [ swap [ 2array ] map-with ] map-with concat ;
-
-: collect-consecutive ( seq width -- seq )
-    [
-        2dup count-shifts [ 2dup head shift-3rd , ] times
-    ] { } make 2nip ;
 
 : log10 ( m -- n )
     log 10 log / ;
