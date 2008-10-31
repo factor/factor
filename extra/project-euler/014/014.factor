@@ -1,7 +1,6 @@
 ! Copyright (c) 2007 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays combinators.short-circuit kernel
-math math.ranges namespaces make sequences sorting ;
+USING: combinators.short-circuit kernel make math math.ranges sequences ;
 IN: project-euler.014
 
 ! http://projecteuler.net/index.php?section=problems&id=14

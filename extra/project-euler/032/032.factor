@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: hashtables kernel math math.combinatorics math.functions
-    math.parser math.ranges project-euler.common sequences sets ;
+USING: kernel math math.combinatorics math.functions math.parser math.ranges
+    project-euler.common sequences sets ;
 IN: project-euler.032
 
 ! http://projecteuler.net/index.php?section=problems&id=32
@@ -38,7 +38,7 @@ IN: project-euler.032
     [ string>number ] tri@ [ * ] dip = ;
 
 : valid? ( n -- ? )
-    dup 1and4 swap 2and3 or ;
+    [ 1and4 ] [ 2and3 ] bi or ;
 
 : products ( seq -- m )
     [ 10 4 ^ mod ] map ;

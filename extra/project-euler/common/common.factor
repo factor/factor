@@ -1,7 +1,8 @@
-USING: arrays kernel math math.functions math.miller-rabin
-math.matrices math.order math.parser math.primes.factors
-math.ranges namespaces make sequences sequences.lib sorting
-unicode.case ;
+! Copyright (c) 2007-2008 Aaron Schaefer.
+! See http://factorcode.org/license.txt for BSD license.
+USING: arrays kernel math math.functions math.miller-rabin math.matrices
+    math.order math.parser math.primes.factors math.ranges make namespaces
+    sequences sequences.lib sorting unicode.case ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution
@@ -26,7 +27,7 @@ IN: project-euler.common
 
 
 : nth-pair ( n seq -- nth next )
-    over 1+ over nth >r nth r> ;
+    2dup [ 1+ ] dip [ nth ] 2bi@ ;
 
 : perfect-square? ( n -- ? )
     dup sqrt mod zero? ;
@@ -34,7 +35,7 @@ IN: project-euler.common
 <PRIVATE
 
 : count-shifts ( seq width -- n )
-    >r length 1+ r> - ;
+    [ length 1+ ] dip - ;
 
 : max-children ( seq -- seq )
     [ dup length 1- [ over nth-pair max , ] each ] { } make nip ;
