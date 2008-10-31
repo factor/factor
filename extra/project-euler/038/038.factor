@@ -1,6 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel math math.parser math.ranges project-euler.common sequences ;
+USING: kernel math math.parser math.ranges project-euler.common sequences
+    strings ;
 IN: project-euler.038
 
 ! http://projecteuler.net/index.php?section=problems&id=38

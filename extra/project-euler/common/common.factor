@@ -77,7 +77,7 @@ PRIVATE>
     number>string dup reverse = ;
 
 : pandigital? ( n -- ? )
-    number>string natural-sort "123456789" = ;
+    number>string natural-sort >string "123456789" = ;
 
 : pentagonal? ( n -- ? )
     dup 0 > [ 24 * 1+ sqrt 1+ 6 / 1 mod zero? ] [ drop f ] if ;
