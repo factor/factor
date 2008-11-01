@@ -7,7 +7,11 @@ HELP: url-decode
 
 HELP: url-encode
 { $values { "str" string } { "encoded" string } }
-{ $description "URL-encodes a string." } ;
+{ $description "URL-encodes a string, excluding certain characters, such as \"/\"." } ;
+
+HELP: url-encode-full
+{ $values { "str" string } { "encoded" string } }
+{ $description "URL-encodes a string, including all reserved characters, such as \"/\"." } ;
 
 HELP: url-quotable?
 { $values { "ch" "a character" } { "?" "a boolean" } }
