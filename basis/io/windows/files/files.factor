@@ -274,7 +274,7 @@ M: winnt file-system-info ( path -- file-system-info )
         swap *ulonglong >>total-bytes
         swap *ulonglong >>free-space
         swap >>type
-        swap >>name ;
+        swap >>mount-point ;
 
 : find-first-volume ( word -- string handle )
     MAX_PATH 1+ <byte-array> dup length

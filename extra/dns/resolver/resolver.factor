@@ -60,11 +60,13 @@ IN: dns.resolver
 
 ! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-: dns-ip ( name -- ips )
+: dns-ip4 ( name -- ips )
   fully-qualified
   [let | MSG [ A IN query boa query->message dns-servers ask-servers ] |
     MSG rcode>> NO-ERROR =
       [ MSG answer-section>> [ type>> A = ] filter [ rdata>> ] map ]
       [ "dns-ip: rcode = " MSG rcode>> unparse append throw        ]
     if ] ;
+
+! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

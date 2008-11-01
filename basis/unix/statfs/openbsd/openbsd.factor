@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: alien.syntax accessors combinators kernel io.files
-unix.types math system io.backend alien.c-types unix ;
+USING: alien.syntax accessors combinators kernel
+unix.types math system io.backend alien.c-types unix
+unix.statfs io.files ;
 IN: unix.statfs.openbsd
 
 C-STRUCT: statvfs

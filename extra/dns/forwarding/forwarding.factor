@@ -2,7 +2,8 @@
 USING: kernel sequences combinators accessors locals random
        combinators.short-circuit
        io.sockets
-       dns dns.util dns.cache.rr dns.cache.nx ;
+       dns dns.util dns.cache.rr dns.cache.nx
+       dns.resolver ;
 
 IN: dns.forwarding
 
@@ -99,7 +100,9 @@ IN: dns.forwarding
    MSG additional-section>> [ cache-add ] each
    MSG ;
 
-: answer-from-server ( msg servers -- msg ) random ask-server cache-message ;
+! : answer-from-server ( msg servers -- msg ) random ask-server cache-message ;
+
+: answer-from-server ( msg servers -- msg ) ask-servers cache-message ;
 
 :: find-answer ( MSG SERVERS -- msg )
    { [ MSG answer-from-cache ] [ MSG SERVERS answer-from-server ] } 0|| ;

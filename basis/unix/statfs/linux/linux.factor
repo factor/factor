@@ -37,7 +37,7 @@ M: linux mounted
         [ mount-point>> file-system-info ] keep
         {
             [ file-system-name>> >>device-name ]
-            [ mount-point>> >>name ]
+            [ mount-point>> >>mount-point ]
             [ type>> >>type ]
         } cleave
     ] map ;
