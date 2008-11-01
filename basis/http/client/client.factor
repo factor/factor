@@ -89,9 +89,9 @@ M: too-many-redirects summary
     drop
     [ "Redirection limit of " % max-redirects # " exceeded" % ] "" make ;
 
-<PRIVATE
-
 DEFER: with-http-request
+
+<PRIVATE
 
 SYMBOL: redirects
 
@@ -134,6 +134,8 @@ SYMBOL: redirects
     request get url>> url-addr ascii <client> drop
     1 minutes over set-timeout ;
 
+PRIVATE>
+
 : with-http-request ( request quot: ( chunk -- ) -- response )
     swap
     request [
@@ -155,8 +157,6 @@ SYMBOL: redirects
         ] with-disposal
         [ do-redirect ] [ nip ] if
     ] with-variable ; inline recursive
-
-PRIVATE>
 
 : success? ( code -- ? ) 200 299 between? ;
 
