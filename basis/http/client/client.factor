@@ -52,7 +52,8 @@ M: f >post-data ;
     [ >post-data ] change-post-data ;
 
 : write-post-data ( request -- request )
-    dup method>> "POST" = [ dup post-data>> raw>> write ] when ; 
+    dup method>> [ "POST" = ] [ "PUT" = ] bi or
+    [ dup post-data>> [ raw>> write ] when* ] when ; 
 
 : write-request ( request -- )
     unparse-post-data
@@ -90,7 +91,7 @@ M: too-many-redirects summary
 
 <PRIVATE
 
-DEFER: (with-http-request)
+DEFER: with-http-request
 
 SYMBOL: redirects
 
@@ -105,7 +106,7 @@ SYMBOL: redirects
     redirects get max-redirects < [
         request get clone
         swap "location" header redirect-url
-        "GET" >>method swap (with-http-request)
+        "GET" >>method swap with-http-request
     ] [ too-many-redirects ] if ; inline recursive
 
 : read-chunk-size ( -- n )
@@ -133,7 +134,7 @@ SYMBOL: redirects
     request get url>> url-addr ascii <client> drop
     1 minutes over set-timeout ;
 
-: (with-http-request) ( request quot: ( chunk -- ) -- response )
+: with-http-request ( request quot: ( chunk -- ) -- response )
     swap
     request [
         <request-socket> [
@@ -159,21 +160,21 @@ PRIVATE>
 
 : success? ( code -- ? ) 200 299 between? ;
 
-ERROR: download-failed response ;
+ERROR: download-failed response data ;
 
 M: download-failed error.
     "HTTP request failed:" print nl
-    response>> . ;
+    [ response>> . ] [ data>> . ] bi ;
+
+: check-response* ( response data -- response data )
+    over code>> success? [ download-failed ] unless ;
 
 : check-response ( response -- response )
-    dup code>> success? [ download-failed ] unless ;
-
-: with-http-request ( request quot -- response )
-    (with-http-request) check-response ; inline
+    f check-response* drop ;
 
 : http-request ( request -- response data )
     [ [ % ] with-http-request ] B{ } make
-    over content-charset>> decode ;
+    over content-charset>> decode check-response* ;
 
 : <client-request> ( url -- request )
     <request> swap >url ensure-port >>url ;
@@ -188,7 +189,7 @@ M: download-failed error.
     <get-request> http-request ;
 
 : with-http-get ( url quot -- response )
-    [ <get-request> ] dip with-http-request ; inline
+    [ <get-request> ] dip with-http-request check-response ; inline
 
 : <delete-request> ( url -- request )
     <client-request> "DELETE" >>method ;
