@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Alex Chapman
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs continuations debugger hashtables http http.client io json.reader json.writer kernel make math math.parser namespaces sequences strings urls vectors ;
+USING: accessors arrays assocs continuations debugger hashtables http http.client io json.reader json.writer kernel make math math.parser namespaces sequences strings urls urls.encoding vectors ;
 IN: couchdb
 
 ! NOTE: This code only works with the latest couchdb (0.9.*), because old
@@ -130,6 +130,8 @@ C: <db> db
 : >id ( assoc id -- assoc ) "_id" pick set-at ;
 : rev> ( assoc -- rev ) "_rev" swap at ;
 : >rev ( assoc rev -- assoc ) "_rev" pick set-at ;
+: attachments> ( assoc -- attachments ) "_attachments" swap at ;
+: >attachments ( assoc attachments -- assoc ) "_attachments" pick set-at ;
 
 : copy-key ( to from to-key from-key -- )
     rot at spin set-at ;
@@ -141,38 +143,50 @@ C: <db> db
     "_rev" "rev" copy-key ;
 
 : id-url ( id -- url )
-    couch get db-url swap append ;
+    couch get db-url swap url-encode-full append ;
 
 : doc-url ( assoc -- url )
     id> id-url ;
 
-: new-doc-url ( -- url )
-    couch get [ db-url ] [ server>> next-uuid ] bi append ;
+: temp-view ( view -- results )
+    <json-post-data> couch get db-url "_temp_view" append couch-post ;
 
-: save-new ( assoc -- )
-    dup <json-post-data> new-doc-url couch-put response-ok
+: temp-view-map ( map -- results )
+    "map" H{ } clone [ set-at ] keep temp-view ;
+
+: save-doc-as ( assoc id -- )
+    [ dup <json-post-data> ] dip id-url couch-put response-ok
     [ copy-id ] [ copy-rev ] 2bi ;
 
-: save-existing ( assoc id -- )
-    [ dup <json-post-data> ] dip id-url couch-put response-ok copy-rev ;
+: save-new-doc ( assoc -- )
+    couch get server>> next-uuid save-doc-as ;
 
-: save ( assoc -- )
-    dup id> [ save-existing ] [ save-new ] if* ; 
+: save-doc ( assoc -- )
+    dup id> [ save-doc-as ] [ save-new-doc ] if* ; 
 
-: load ( id -- assoc )
+: load-doc ( id -- assoc )
     id-url couch-get ;
 
-: delete ( assoc -- )
+: delete-doc ( assoc -- deletion-revision )
     [
         [ doc-url % ]
         [ "?rev=" % "_rev" swap at % ] bi
-    ] "" make couch-delete response-ok* ;
+    ] "" make couch-delete response-ok "rev" swap at  ;
 
 : remove-keys ( assoc keys -- )
     swap [ delete-at ] curry each ;
 
 : remove-couch-info ( assoc -- )
     { "_id" "_rev" "_attachments" } remove-keys ;
+
+! : construct-attachment ( content-type data -- assoc )
+!     H{ } clone "name" pick set-at "content-type" pick set-at ;
+! 
+! : add-attachment ( assoc name attachment -- )
+!     pick attachments> [ H{ } clone ] unless* 
+! 
+! : attach ( assoc name content-type data -- )
+!     construct-attachment H{ } clone
 
 ! TODO:
 ! - startkey, count, descending, etc.
