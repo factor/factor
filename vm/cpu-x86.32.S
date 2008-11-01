@@ -40,9 +40,9 @@ DEF(void,set_callstack,(F_STACK_FRAME *to, F_STACK_FRAME *from, CELL length, voi
 	ret                                /* return _with new stack_ */
 
 /* cpu.x86.32 calls this */
-DEF(bool,check_sse2,())
+DEF(bool,check_sse2,()):
 	push %ebx
-	mov 1,%eax
+	mov $1,%eax
 	cpuid
 	shr $26,%edx
 	and $1,%edx

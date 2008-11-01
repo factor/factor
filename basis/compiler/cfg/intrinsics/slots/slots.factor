@@ -12,12 +12,12 @@ IN: compiler.cfg.intrinsics.slots
 : value-tag ( info -- n ) class>> class-tag ; inline
 
 : (emit-slot) ( infos -- dst )
-    [ 2inputs ] [ first value-tag ] bi*
+    [ 2inputs ^^offset>slot ] [ first value-tag ] bi*
     ^^slot ;
 
 : (emit-slot-imm) ( infos -- dst )
     ds-drop
-    [ ds-pop ^^offset>slot ]
+    [ ds-pop ]
     [ [ second literal>> ] [ first value-tag ] bi ] bi*
     ^^slot-imm ;
 

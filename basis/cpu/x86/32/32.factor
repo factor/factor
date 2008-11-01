@@ -74,7 +74,7 @@ M: float-regs store-return-reg
     [ [ align-sub ] [ call ] bi* ]
     [ [ align-add ] [ drop ] bi* ] 2bi ; inline
 
-M: x86.64 rel-literal-x86 rc-absolute-cell rel-literal ;
+M: x86.32 rel-literal-x86 rc-absolute-cell rel-literal ;
 
 M: x86.32 %prologue ( n -- )
     dup PUSH
@@ -281,10 +281,12 @@ os windows? [
 FUNCTION: bool check_sse2 ( ) ;
 
 : sse2? ( -- ? )
-    [ optimized-recompile-hook ] recompile-hook
-    [ [ check_sse2 ] compile-call ] with-variable ;
+    check_sse2 ;
 
 "-no-sse2" cli-args member? [
+    [ optimized-recompile-hook ] recompile-hook
+    [ { check_sse2 } compile ] with-variable
+
     "Checking if your CPU supports SSE2..." print flush
     sse2? [
         " - yes" print
