@@ -36,9 +36,9 @@ urls math.parser ;
 
 [ t ] [ 1200000 small-enough? ] unit-test
 
-! [ ] [ "tetris" shake-and-bake ] unit-test
-! 
-! [ t ] [ 1500000 small-enough? ] unit-test
+[ ] [ "tetris" shake-and-bake ] unit-test
+
+[ t ] [ 1500000 small-enough? ] unit-test
 
 [ ] [ "bunny" shake-and-bake ] unit-test
 
