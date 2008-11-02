@@ -8,7 +8,8 @@ IN: compiler.cfg.linear-scan.live-intervals
 TUPLE: live-interval
 vreg
 reg spill-to reload-from split-before split-after
-start end uses ;
+start end uses
+copy-from ;
 
 : add-use ( n live-interval -- )
     dup live-interval? [ "No def" throw ] unless
@@ -37,11 +38,22 @@ SYMBOL: live-intervals
         [ [ <live-interval> ] keep ] dip set-at
     ] if ;
 
-: compute-live-intervals* ( insn n -- )
+GENERIC# compute-live-intervals* 1 ( insn n -- )
+
+M: insn compute-live-intervals*
     live-intervals get
     [ [ uses-vregs ] 2dip '[ _ swap _ at add-use ] each ]
     [ [ defs-vregs ] 2dip '[ _ swap _ new-live-interval ] each ]
     3bi ;
+
+: record-copy ( insn -- )
+    [ dst>> live-intervals get at ] [ src>> ] bi >>copy-from drop ;
+
+M: ##copy compute-live-intervals*
+    [ call-next-method ] [ drop record-copy ] 2bi ;
+
+M: ##copy-float compute-live-intervals*
+    [ call-next-method ] [ drop record-copy ] 2bi ;
 
 : compute-live-intervals ( instructions -- live-intervals )
     H{ } clone [

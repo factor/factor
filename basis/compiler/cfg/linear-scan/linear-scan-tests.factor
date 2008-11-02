@@ -303,3 +303,55 @@ USING: math.private compiler.cfg.debugger ;
     allocate-registers
     first split-before>> [ start>> ] [ end>> ] bi
 ] unit-test
+
+! Coalescing interacted badly with splitting
+[ ] [
+    {
+        T{ live-interval
+            { vreg V int-regs 70 }
+            { start 14 }
+            { end 17 }
+            { uses V{ 14 15 16 17 } }
+            { copy-from V int-regs 67 }
+        }
+        T{ live-interval
+            { vreg V int-regs 67 }
+            { start 13 }
+            { end 14 }
+            { uses V{ 13 14 } }
+        }
+        T{ live-interval
+            { vreg V int-regs 30 }
+            { start 4 }
+            { end 18 }
+            { uses V{ 4 12 16 17 18 } }
+        }
+        T{ live-interval
+            { vreg V int-regs 27 }
+            { start 3 }
+            { end 13 }
+            { uses V{ 3 7 13 } }
+        }
+        T{ live-interval
+            { vreg V int-regs 59 }
+            { start 10 }
+            { end 18 }
+            { uses V{ 10 11 12 18 } }
+            { copy-from V int-regs 56 }
+        }
+        T{ live-interval
+            { vreg V int-regs 60 }
+            { start 12 }
+            { end 17 }
+            { uses V{ 12 17 } }
+        }
+        T{ live-interval
+            { vreg V int-regs 56 }
+            { start 9 }
+            { end 10 }
+            { uses V{ 9 10 } }
+        }
+    }
+    { { int-regs { 0 1 2 3 } } }
+    allocate-registers
+] unit-test

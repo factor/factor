@@ -56,6 +56,20 @@ SYMBOL: progress
     [ [ start>> ] keep ] { } map>assoc
     unhandled-intervals get heap-push-all ;
 
+! Coalescing
+: active-interval ( vreg -- live-interval )
+    dup active-intervals-for [ vreg>> = ] with find nip ;
+
+: coalesce? ( live-interval -- ? )
+    [ start>> ] [ copy-from>> ] bi
+    dup [ active-interval end>> = ] [ 2drop f ] if ;
+
+: coalesce ( live-interval -- )
+    dup copy-from>> active-interval
+    [ [ add-active ] [ delete-active ] bi* ]
+    [ reg>> >>reg drop ]
+    2bi ;
+
 ! Splitting
 : find-use ( live-interval n quot -- i elt )
     [ uses>> ] 2dip curry find ; inline
@@ -67,7 +81,7 @@ SYMBOL: progress
 : split-after ( live-interval i -- after )
     [ clone dup uses>> ] dip
     [ tail >>uses ] [ swap nth >>start ] 2bi
-    f >>reg ;
+    f >>reg f >>copy-from ;
 
 : split-interval ( live-interval n -- before after )
     [ drop ] [ [ > ] find-use drop ] 2bi
@@ -128,8 +142,14 @@ SYMBOL: spill-counts
     pop >>reg add-active ;
 
 : assign-register ( new -- )
-    dup vreg>> free-registers-for
-    [ assign-blocked-register ] [ assign-free-register ] if-empty ;
+    dup coalesce? [
+        coalesce
+    ] [
+        dup vreg>> free-registers-for
+        [ assign-blocked-register ]
+        [ assign-free-register ]
+        if-empty
+    ] if ;
 
 ! Main loop
 : reg-classes ( -- seq ) { int-regs double-float-regs } ; inline
