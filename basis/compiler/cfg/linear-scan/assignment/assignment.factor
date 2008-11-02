@@ -59,12 +59,16 @@ SYMBOL: unhandled-intervals
         ] [ 2drop ] if
     ] if ;
 
-: (assign-registers) ( insn -- )
+GENERIC: (assign-registers) ( insn -- )
+
+M: vreg-insn (assign-registers)
     dup
     [ defs-vregs ] [ uses-vregs ] bi append
     active-intervals get swap '[ vreg>> _ member? ] filter
     [ [ vreg>> ] [ reg>> ] bi ] { } map>assoc
     >>regs drop ;
+
+M: insn (assign-registers) drop ;
 
 : init-assignment ( live-intervals -- )
     V{ } clone active-intervals set

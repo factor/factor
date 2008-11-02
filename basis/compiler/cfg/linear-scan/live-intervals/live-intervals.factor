@@ -40,7 +40,9 @@ SYMBOL: live-intervals
 
 GENERIC# compute-live-intervals* 1 ( insn n -- )
 
-M: insn compute-live-intervals*
+M: insn compute-live-intervals* 2drop ;
+
+M: vreg-insn compute-live-intervals*
     live-intervals get
     [ [ uses-vregs ] 2dip '[ _ swap _ at add-use ] each ]
     [ [ defs-vregs ] 2dip '[ _ swap _ new-live-interval ] each ]
