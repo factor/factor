@@ -60,4 +60,4 @@ IN: compiler.cfg.intrinsics.fixnum
     ds-pop ^^bignum>integer ^^tag-fixnum ds-push ;
 
 : emit-fixnum>bignum ( -- )
-    ds-pop ^^untag-fixnum ^^integer>bignum ds-push need-gc ;
+    ds-pop ^^untag-fixnum ^^integer>bignum ds-push ;

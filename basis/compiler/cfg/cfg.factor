@@ -11,8 +11,7 @@ TUPLE: basic-block < identity-tuple
 id
 number
 instructions
-successors
-gc ;
+successors ;
 
 : <basic-block> ( -- basic-block )
     basic-block new

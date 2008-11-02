@@ -1,7 +1,7 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel math accessors sequences namespaces make
-combinators
+combinators classes
 compiler.cfg
 compiler.cfg.rpo
 compiler.cfg.instructions ;
@@ -51,9 +51,19 @@ M: ##compare-imm-branch linearize-insn
 M: ##compare-float-branch linearize-insn
     binary-conditional _compare-float-branch emit-branch ;
 
+: gc? ( bb -- ? )
+    instructions>> [
+        class {
+            ##allot
+            ##integer>bignum
+            ##box-float
+            ##box-alien
+        } memq?
+    ] contains? ;
+
 : linearize-basic-block ( bb -- )
     [ number>> _label ]
-    [ gc>> [ _gc ] when ]
+    [ gc? [ _gc ] when ]
     [ linearize-insns ]
     tri ;
 

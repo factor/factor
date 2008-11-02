@@ -23,5 +23,3 @@ IN: compiler.cfg.utilities
 
 : emit-primitive ( node -- )
     word>> ##call begin-basic-block ;
-
-: need-gc ( -- ) basic-block get t >>gc drop ;
