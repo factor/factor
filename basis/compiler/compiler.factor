@@ -3,12 +3,13 @@
 USING: accessors kernel namespaces arrays sequences io debugger
 words fry continuations vocabs assocs dlists definitions math
 threads graphs generic combinators deques search-deques
-stack-checker stack-checker.state stack-checker.inlining
-compiler.errors compiler.units compiler.tree.builder
-compiler.tree.optimizer compiler.cfg.builder
-compiler.cfg.optimizer compiler.cfg.linearization
-compiler.cfg.two-operand compiler.cfg.linear-scan
-compiler.cfg.stack-frame compiler.codegen ;
+prettyprint io stack-checker stack-checker.state
+stack-checker.inlining compiler.errors compiler.units
+compiler.tree.builder compiler.tree.optimizer
+compiler.cfg.builder compiler.cfg.optimizer
+compiler.cfg.linearization compiler.cfg.two-operand
+compiler.cfg.linear-scan compiler.cfg.stack-frame
+compiler.codegen ;
 IN: compiler
 
 SYMBOL: compile-queue
@@ -43,7 +44,10 @@ SYMBOL: +failed+
     [ "compiled-effect" set-word-prop ]
     2bi ;
 
+SYMBOL: trace-compilation?
+
 : start ( word -- )
+    trace-compilation? get [ dup . flush ] when
     H{ } clone dependencies set
     H{ } clone generic-dependencies set
     f swap compiler-error ;
