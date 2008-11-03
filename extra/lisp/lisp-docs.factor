@@ -2,7 +2,7 @@ IN: lisp
 USING: help.markup help.syntax ;
 HELP: <LISP
 { $description "parsing word which converts the lisp code between <LISP and LISP> into factor quotations and calls it" }
-{ $ see-also lisp-string>factor }
+{ $see-also lisp-string>factor }
 
 HELP: lisp-string>factor
 { $values { "str"  "a string of lisp code" } { "quot" "the quotation the lisp compiles into" } }
