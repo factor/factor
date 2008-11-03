@@ -54,11 +54,11 @@ IN: compiler.tests
 
 ! Labels
 
-: recursive ( ? -- ) [ f recursive ] when ; inline
+: recursive-test ( ? -- ) [ f recursive-test ] when ; inline
 
-[ ] [ t [ recursive ] compile-call ] unit-test
+[ ] [ t [ recursive-test ] compile-call ] unit-test
 
-[ ] [ t recursive ] unit-test
+[ ] [ t recursive-test ] unit-test
 
 ! Make sure error reporting works
 
