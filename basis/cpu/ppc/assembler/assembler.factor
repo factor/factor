@@ -1,6 +1,6 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: compiler.generator.fixup kernel namespaces words
+USING: compiler.codegen.fixup kernel namespaces words
 io.binary math math.order cpu.ppc.assembler.backend ;
 IN: cpu.ppc.assembler
 
