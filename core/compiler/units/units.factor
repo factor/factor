@@ -72,6 +72,7 @@ GENERIC: definitions-changed ( assoc obj -- )
 
 SYMBOL: outdated-tuples
 SYMBOL: update-tuples-hook
+SYMBOL: remake-generics-hook
 
 : dependency>= ( how1 how2 -- ? )
     [
@@ -127,6 +128,9 @@ SYMBOL: update-tuples-hook
 : call-recompile-hook ( -- )
     to-recompile recompile-hook get call ;
 
+: call-remake-generics-hook ( -- )
+    remake-generics-hook get call ;
+
 : call-update-tuples-hook ( -- )
     update-tuples-hook get call ;
 
@@ -136,6 +140,7 @@ SYMBOL: update-tuples-hook
     [ delete-compiled-xref ] each ;
 
 : finish-compilation-unit ( -- )
+    call-remake-generics-hook
     call-recompile-hook
     call-update-tuples-hook
     unxref-forgotten-definitions
@@ -145,6 +150,7 @@ SYMBOL: update-tuples-hook
     [
         H{ } clone changed-definitions set
         H{ } clone changed-generics set
+        H{ } clone remake-generics set
         H{ } clone outdated-tuples set
         H{ } clone new-classes set
         [ finish-compilation-unit ] [ ] cleanup
@@ -154,6 +160,7 @@ SYMBOL: update-tuples-hook
     [
         H{ } clone changed-definitions set
         H{ } clone changed-generics set
+        H{ } clone remake-generics set
         H{ } clone forgotten-definitions set
         H{ } clone outdated-tuples set
         H{ } clone new-classes set
