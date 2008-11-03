@@ -44,10 +44,8 @@ SYMBOL: +failed+
     [ "compiled-effect" set-word-prop ]
     2bi ;
 
-SYMBOL: trace-compilation?
-
 : start ( word -- )
-    trace-compilation? get [ dup . flush ] when
+    "trace-compilation" get [ dup . flush ] when
     H{ } clone dependencies set
     H{ } clone generic-dependencies set
     f swap compiler-error ;
