@@ -346,6 +346,8 @@ tuple
     { "fixnum-bitor" "math.private" }
     { "fixnum-bitxor" "math.private" }
     { "fixnum-bitnot" "math.private" }
+    { "fixnum-mod" "math.private" }
+    { "fixnum-shift-fast" "math.private" }
     { "fixnum<" "math.private" }
     { "fixnum<=" "math.private" }
     { "fixnum>" "math.private" }
@@ -399,10 +401,8 @@ tuple
     { "fixnum-" "math.private" }
     { "fixnum*" "math.private" }
     { "fixnum/i" "math.private" }
-    { "fixnum-mod" "math.private" }
     { "fixnum/mod" "math.private" }
     { "fixnum-shift" "math.private" }
-    { "fixnum-shift-fast" "math.private" }
     { "bignum=" "math.private" }
     { "bignum+" "math.private" }
     { "bignum-" "math.private" }
