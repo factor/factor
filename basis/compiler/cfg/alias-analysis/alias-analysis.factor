@@ -229,6 +229,16 @@ M: ##allot analyze-aliases*
     #! object.
     dup dst>> set-new-ac ;
 
+M: ##box-float analyze-aliases*
+    #! A freshly allocated object is distinct from any other
+    #! object.
+    dup dst>> set-new-ac ;
+
+M: ##box-alien analyze-aliases*
+    #! A freshly allocated object is distinct from any other
+    #! object.
+    dup dst>> set-new-ac ;
+
 M: ##read analyze-aliases*
     dup dst>> set-heap-ac
     dup [ dst>> ] [ insn-slot# ] [ insn-object ] tri
