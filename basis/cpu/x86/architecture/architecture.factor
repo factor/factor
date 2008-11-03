@@ -51,8 +51,8 @@ M: x86 %call ( label -- ) CALL ;
 M: x86 %jump-label ( label -- ) JMP ;
 M: x86 %return ( -- ) 0 RET ;
 
-: code-alignment ( -- n )
-    building get length dup cell align swap - ;
+: code-alignment ( align -- n )
+    [ building get [ integer? ] count dup ] dip align swap - ;
 
 : align-code ( n -- )
     0 <repetition> % ;
@@ -66,7 +66,7 @@ M:: x86 %dispatch ( src temp -- )
     src temp ADD
     src HEX: 7f [+] JMP
     ! Fix up the displacement above
-    code-alignment dup bootstrap-cell 8 = 15 9 ? +
+    cell code-alignment dup bootstrap-cell 8 = 15 9 ? +
     building get dup pop* push
     align-code ;
 
@@ -465,6 +465,9 @@ M: x86 %reload-integer ( dst n -- ) spill-integer@ MOV ;
 
 M: x86 %spill-float spill-float@ swap MOVSD ;
 M: x86 %reload-float spill-float@ MOVSD ;
+
+M: x86 %loop-entry
+    16 code-alignment [ NOP ] times ;
 
 M: int-regs %save-param-reg drop >r stack@ r> MOV ;
 M: int-regs %load-param-reg drop swap stack@ MOV ;

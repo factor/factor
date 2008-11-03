@@ -160,6 +160,8 @@ INSN: ##epilogue ;
 
 INSN: ##branch ;
 
+INSN: ##loop-entry ;
+
 ! Condition codes
 SYMBOL: cc<
 SYMBOL: cc<=

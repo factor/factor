@@ -446,6 +446,10 @@ M: operand IMUL2 OCT: 257 extended-opcode (2-operand) ;
 
 : CPUID ( -- ) HEX: a2 extended-opcode, ;
 
+! Misc
+
+: NOP ( -- ) HEX: 90 , ;
+
 ! x87 Floating Point Unit
 
 : FSTPS ( operand -- ) { BIN: 011 f HEX: d9 } 1-operand ;

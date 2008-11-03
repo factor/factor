@@ -130,6 +130,8 @@ HOOK: %spill-float cpu ( src n -- )
 HOOK: %reload-integer cpu ( dst n -- )
 HOOK: %reload-float cpu ( dst n -- )
 
+HOOK: %loop-entry cpu ( -- )
+
 ! FFI stuff
 
 ! Is this integer small enough to appear in value template

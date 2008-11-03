@@ -205,6 +205,8 @@ M: ##write-barrier generate-insn
 
 M: _gc generate-insn drop %gc ;
 
+M: ##loop-entry generate-insn drop %loop-entry ;
+
 ! ##alien-invoke
 GENERIC: reg-size ( register-class -- n )
 

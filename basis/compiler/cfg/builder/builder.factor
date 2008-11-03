@@ -100,6 +100,7 @@ GENERIC: emit-node ( node -- next )
     basic-block get swap loops get set-at ;
 
 : compile-loop ( node -- next )
+    ##loop-entry
     begin-basic-block
     [ label>> id>> remember-loop ] [ child>> emit-nodes ] bi
     iterate-next ;
