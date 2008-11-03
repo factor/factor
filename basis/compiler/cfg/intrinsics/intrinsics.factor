@@ -76,6 +76,7 @@ IN: compiler.cfg.intrinsics
         math.private:float<=
         math.private:float>
         math.private:float>=
+        math.private:float=
         alien.accessors:alien-float
         alien.accessors:set-alien-float
         alien.accessors:alien-double
@@ -108,7 +109,7 @@ IN: compiler.cfg.intrinsics
         { \ math.private:float<= [ drop cc<= emit-float-comparison ] }
         { \ math.private:float>= [ drop cc>= emit-float-comparison ] }
         { \ math.private:float> [ drop cc> emit-float-comparison ] }
-        { \ math.private:float= [ drop cc> emit-float-comparison ] }
+        { \ math.private:float= [ drop cc= emit-float-comparison ] }
         { \ math.private:float>fixnum [ drop emit-float>fixnum ] }
         { \ math.private:fixnum>float [ drop emit-fixnum>float ] }
         { \ slots.private:slot [ emit-slot ] }
