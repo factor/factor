@@ -100,7 +100,7 @@ SYMBOL: quotations
     dup [ known [ curried? ] [ composed? ] bi or ] contains? [
         output-d
         [ rot [ drop call ] [ nip call ] if ]
-        recursive-state get infer-quot
+        infer-quot-here
     ] [
         [ #drop, ] [ [ literal ] map (infer-if) ] bi
     ] if ;

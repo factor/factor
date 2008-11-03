@@ -68,14 +68,14 @@ M: literal infer-call*
 
 M: curried infer-call*
     swap push-d
-    [ uncurry ] recursive-state get infer-quot
+    [ uncurry ] infer-quot-here
     [ quot>> known pop-d [ set-known ] keep ]
     [ obj>> known pop-d [ set-known ] keep ] bi
     push-d infer-call ;
 
 M: composed infer-call*
     swap push-d
-    [ uncompose ] recursive-state get infer-quot
+    [ uncompose ] infer-quot-here
     [ quot2>> known pop-d [ set-known ] keep ]
     [ quot1>> known pop-d [ set-known ] keep ] bi
     push-d push-d
