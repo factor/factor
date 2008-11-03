@@ -353,5 +353,5 @@ USING: math.private compiler.cfg.debugger ;
         }
     }
     { { int-regs { 0 1 2 3 } } }
-    allocate-registers
+    allocate-registers drop
 ] unit-test
