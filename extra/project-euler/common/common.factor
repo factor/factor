@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays kernel make math math.functions math.matrices math.miller-rabin
     math.order math.parser math.primes.factors math.ranges sequences
-    sequences.lib sorting unicode.case ;
+    sequences.lib sorting strings unicode.case ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution

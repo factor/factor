@@ -1,6 +1,6 @@
 ! Copyright (c) 2008 Eric Mertens.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: arrays assocs combinators kernel locals math math.order math.ranges
+USING: arrays assocs kernel locals.backend math math.order math.ranges
     sequences ;
 IN: project-euler.076
 
@@ -55,6 +55,6 @@ PRIVATE>
     100 (euler076) ;
 
 ! [ euler076 ] 100 ave-time
-! 704 ms run time - 100 trials
+! 560 ms ave run time - 17.74 SD (100 trials)
 
 MAIN: euler076

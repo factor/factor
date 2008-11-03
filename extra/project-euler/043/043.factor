@@ -1,8 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit hashtables kernel math
-    math.combinatorics math.parser math.ranges project-euler.common sequences
-    sorting sets ;
+USING: combinators.short-circuit kernel math math.combinatorics math.parser
+    math.ranges project-euler.common sequences sets sorting ;
 IN: project-euler.043
 
 ! http://projecteuler.net/index.php?section=problems&id=43
@@ -74,13 +73,13 @@ PRIVATE>
     1000 over <range> [ number>digits 3 0 pad-left ] map [ all-unique? ] filter ;
 
 : overlap? ( seq -- ? )
-    dup first 2 tail* swap second 2 head = ;
+    [ first 2 tail* ] [ second 2 head ] bi = ;
 
 : clean ( seq -- seq )
     [ unclip 1 head prefix concat ] map [ all-unique? ] filter ;
 
 : add-missing-digit ( seq -- seq )
-    dup natural-sort 10 swap diff first prefix ;
+    dup natural-sort 10 swap diff prepend ;
 
 : interesting-pandigitals ( -- seq )
     17 candidates { 13 11 7 5 3 2 } [
@@ -93,6 +92,6 @@ PRIVATE>
     interesting-pandigitals [ 10 digits>integer ] sigma ;
 
 ! [ euler043a ] 100 ave-time
-! 19 ms run / 1 ms GC ave time - 100 trials
+! 12 ms ave run time - 2.32 SD (100 trials)
 
 MAIN: euler043a

@@ -31,7 +31,7 @@ IN: project-euler.044
     dup 3 * 1- * 2 / ;
 
 : sum-and-diff? ( m n -- ? )
-    2dup + -rot - [ pentagonal? ] bi@ and ;
+    [ + ] [ - ] 2bi [ pentagonal? ] bi@ and ;
 
 PRIVATE>
 
@@ -40,7 +40,7 @@ PRIVATE>
     [ first2 sum-and-diff? ] filter [ first2 - abs ] map infimum ;
 
 ! [ euler044 ] 10 ave-time
-! 8924 ms run / 2872 ms GC ave time - 10 trials
+! 5727 ms ave run time - 1102.38 SD (10 trials)
 
 ! TODO: this solution is ugly and not very efficient...find a better algorithm
 

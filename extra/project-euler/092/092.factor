@@ -32,7 +32,7 @@ IN: project-euler.092
     0 swap [ dup zero? not ] [ 10 /mod sq -rot [ + ] dip ] [ ] while drop ;
 
 : chain-ending ( n -- m )
-    dup 1 = over 89 = or [ next-link chain-ending ] unless ;
+    dup [ 1 = ] [ 89 = ] bi or [ next-link chain-ending ] unless ;
 
 : lower-endings ( -- seq )
     567 [1,b] [ chain-ending ] map ;
