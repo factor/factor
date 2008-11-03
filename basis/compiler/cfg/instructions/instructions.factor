@@ -168,6 +168,16 @@ SYMBOL: cc>
 SYMBOL: cc>=
 SYMBOL: cc/=
 
+: negate-cc ( cc -- cc' )
+    H{
+        { cc< cc>= }
+        { cc<= cc> }
+        { cc> cc<= }
+        { cc>= cc< }
+        { cc= cc/= }
+        { cc/= cc= }
+    } at ;
+
 : evaluate-cc ( result cc -- ? )
     H{
         { cc<  { +lt+           } }

@@ -22,4 +22,4 @@ IN: compiler.cfg.utilities
     basic-block off ;
 
 : emit-primitive ( node -- )
-    word>> ##call begin-basic-block ;
+    word>> ##call ##branch begin-basic-block ;

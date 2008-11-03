@@ -18,7 +18,7 @@ M: insn linearize-insn , drop ;
 : useless-branch? ( basic-block successor -- ? )
     #! If our successor immediately follows us in RPO, then we
     #! don't need to branch.
-    [ number>> 1+ ] [ number>> ] bi* = ; inline
+    [ number>> ] bi@ 1- = ; inline
 
 : branch-to-return? ( successor -- ? )
     #! A branch to a block containing just a return is cloned.
@@ -36,11 +36,14 @@ M: insn linearize-insn , drop ;
 M: ##branch linearize-insn
     drop dup successors>> first emit-branch ;
 
-: conditional ( basic-block -- basic-block successor1 label2 )
-    dup successors>> first2 swap number>> ; inline
+: (binary-conditional)
+    [ dup successors>> first2 ]
+    [ [ src1>> ] [ src2>> ] [ cc>> ] tri ] bi* ; inline
 
 : binary-conditional ( basic-block insn -- basic-block successor label2 src1 src2 cc )
-    [ conditional ] [ [ src1>> ] [ src2>> ] [ cc>> ] tri ] bi* ; inline
+    [ (binary-conditional) ]
+    [ drop dup successors>> first useless-branch? ] 2bi
+    [ [ number>> ] 3dip negate-cc ] [ [ swap number>> ] 3dip ] if ;
 
 M: ##compare-branch linearize-insn
     binary-conditional _compare-branch emit-branch ;
