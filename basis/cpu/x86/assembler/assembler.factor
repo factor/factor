@@ -391,13 +391,20 @@ M: operand CMP OCT: 070 2-operand ;
 : CDQ ( -- ) HEX: 99 , ;
 : CQO ( -- ) HEX: 48 , CDQ ;
 
-: ROL ( dst n -- ) swap { BIN: 000 t HEX: c0 } immediate-1 ;
-: ROR ( dst n -- ) swap { BIN: 001 t HEX: c0 } immediate-1 ;
-: RCL ( dst n -- ) swap { BIN: 010 t HEX: c0 } immediate-1 ;
-: RCR ( dst n -- ) swap { BIN: 011 t HEX: c0 } immediate-1 ;
-: SHL ( dst n -- ) swap { BIN: 100 t HEX: c0 } immediate-1 ;
-: SHR ( dst n -- ) swap { BIN: 101 t HEX: c0 } immediate-1 ;
-: SAR ( dst n -- ) swap { BIN: 111 t HEX: c0 } immediate-1 ;
+: (SHIFT) ( dst src op -- )
+    over CL eq? [
+        nip t HEX: d3 3array 1-operand
+    ] [
+        swapd t HEX: c0 3array immediate-1
+    ] if ; inline
+
+: ROL ( dst n -- ) BIN: 000 (SHIFT) ;
+: ROR ( dst n -- ) BIN: 001 (SHIFT) ;
+: RCL ( dst n -- ) BIN: 010 (SHIFT) ;
+: RCR ( dst n -- ) BIN: 011 (SHIFT) ;
+: SHL ( dst n -- ) BIN: 100 (SHIFT) ;
+: SHR ( dst n -- ) BIN: 101 (SHIFT) ;
+: SAR ( dst n -- ) BIN: 111 (SHIFT) ;
 
 GENERIC: IMUL2 ( dst src -- )
 M: immediate IMUL2 swap dup reg-code t HEX: 68 3array immediate-1/4 ;
