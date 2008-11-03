@@ -82,7 +82,9 @@ M: ##inc-d generate-insn n>> %inc-d ;
 
 M: ##inc-r generate-insn n>> %inc-r ;
 
-M: ##call generate-insn word>> [ add-call ] [ %call ] bi ;
+M: ##call generate-insn
+    word>> dup sub-primitive>>
+    [ first % ] [ [ add-call ] [ %call ] bi ] ?if ;
 
 M: ##jump generate-insn word>> [ add-call ] [ %jump-label ] bi ;
 

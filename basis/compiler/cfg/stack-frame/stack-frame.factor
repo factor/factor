@@ -22,7 +22,7 @@ M: ##stack-frame compute-stack-frame*
     stack-frame>> stack-frame [ max-stack-frame ] change ;
 
 M: ##call compute-stack-frame*
-    drop frame-required? on ;
+    word>> sub-primitive>> [ frame-required? on ] unless ;
 
 M: _gc compute-stack-frame*
     drop frame-required? on ;
