@@ -303,6 +303,21 @@ big-endian off
 ] f f f \ fixnum-bitnot define-sub-primitive
 
 [
+    ECX ds-reg [] MOV                          ! load shift count
+    ECX tag-bits get SHR                       ! untag shift count
+    ds-reg bootstrap-cell SUB                  ! adjust stack pointer
+    arg0 ds-reg [] MOV                         ! load value
+    arg1 arg0 MOV                              ! make a copy
+    arg1 CL SHL                                ! compute positive shift value in arg1
+    ECX NEG                                    ! compute negative shift value in arg0
+    arg0 CL SHR
+    arg0 tag-mask get bitnot AND
+    ECX 0 CMP                                  ! if shift count was negative, move arg0 to arg1
+    arg1 arg0 CMOVLE
+    ds-reg [] arg1 MOV                         ! push to stack
+] f f f \ fixnum-shift-fast define-sub-primitive
+
+[
     arg0 ds-reg [] MOV                         ! load local number
     fixnum>slot@                               ! turn local number into offset
     arg1 bootstrap-cell MOV                    ! load base
