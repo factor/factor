@@ -14,9 +14,11 @@ GENERIC: integer-op-input-classes ( word -- classes )
 M: math-partial integer-op-input-classes
     "derived-from" word-prop rest ;
 
+ERROR: bad-integer-op word ;
+
 M: word integer-op-input-classes
-    "input-classes" word-prop
-    [ "Bug: integer-op-input-classes" throw ] unless* ;
+    dup "input-classes" word-prop
+    [ ] [ bad-integer-op ] ?if ;
 
 : generic-variant ( op -- generic-op/f )
     dup "derived-from" word-prop [ first ] [ ] ?if ;
