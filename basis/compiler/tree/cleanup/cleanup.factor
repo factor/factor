@@ -78,7 +78,7 @@ GENERIC: cleanup* ( node -- node/nodes )
     } cond ;
 
 : remove-overflow-check ( #call -- #call )
-    [ in-d>> ] [ out-d>> ] [ word>> no-overflow-variant ] tri #call cleanup* ;
+    [ no-overflow-variant ] change-word cleanup* ;
 
 M: #call cleanup*
     {
