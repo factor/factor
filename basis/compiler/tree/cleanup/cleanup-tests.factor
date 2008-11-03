@@ -5,7 +5,7 @@ strings sbufs sequences.private slots.private combinators
 definitions system layouts vectors math.partial-dispatch
 math.order math.functions accessors hashtables classes assocs
 io.encodings.utf8 io.encodings.ascii io.encodings fry slots
-sorting.private
+sorting.private combinators.short-circuit
 compiler.tree
 compiler.tree.combinators
 compiler.tree.cleanup
@@ -13,6 +13,7 @@ compiler.tree.builder
 compiler.tree.recursive
 compiler.tree.normalization
 compiler.tree.propagation
+compiler.tree.propagation.info
 compiler.tree.checker
 compiler.tree.debugger ;
 
@@ -493,4 +494,9 @@ cell-bits 32 = [
 
 [ t ] [
     [ hashtable new ] \ new inlined?
+] unit-test
+
+[ t ] [
+    [ { array-capacity } declare 1 fixnum+ ] cleaned-up-tree
+    [ { [ #call? ] [ node-input-infos second literal>> 1 = ] } 1&& ] contains?
 ] unit-test

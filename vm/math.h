@@ -14,9 +14,7 @@ DECLARE_PRIMITIVE(fixnum_subtract);
 DECLARE_PRIMITIVE(fixnum_multiply);
 DECLARE_PRIMITIVE(fixnum_divint);
 DECLARE_PRIMITIVE(fixnum_divmod);
-DECLARE_PRIMITIVE(fixnum_mod);
 DECLARE_PRIMITIVE(fixnum_shift);
-DECLARE_PRIMITIVE(fixnum_shift_fast);
 
 CELL bignum_zero;
 CELL bignum_pos_one;

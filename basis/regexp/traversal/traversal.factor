@@ -102,7 +102,7 @@ M: capture-group-off flag-action ( dfa-traverser flag -- )
     [ [ first2 1+ 2array ] map ] change-capture-counters
     ! dup current-state>> .
     dup [ current-state>> ] [ traversal-flags>> ] bi
-    at [ dup . flag-action ] with each ;
+    at [ flag-action ] with each ;
 
 : increment-state ( dfa-traverser state -- dfa-traverser )
     [

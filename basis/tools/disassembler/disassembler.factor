@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: io.files io words alien kernel math.parser alien.syntax
 io.launcher system assocs arrays sequences namespaces make
-qualified system math compiler.generator.fixup
+qualified system math compiler.codegen.fixup
 io.encodings.ascii accessors generic tr ;
 IN: tools.disassembler
 

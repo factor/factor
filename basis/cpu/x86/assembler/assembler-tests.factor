@@ -57,3 +57,8 @@ IN: cpu.x86.assembler.tests
 
 [ { HEX: 49 HEX: 89 HEX: 04 HEX: 2c } ] [ [ R12 RBP [+] RAX MOV ] { } make ] unit-test
 [ [ R12 RSP [+] RAX MOV ] { } make ] must-fail
+
+[ { HEX: 48 HEX: d3 HEX: e0 } ] [ [ RAX CL SHL ] { } make ] unit-test
+[ { HEX: 48 HEX: d3 HEX: e1 } ] [ [ RCX CL SHL ] { } make ] unit-test
+[ { HEX: 48 HEX: d3 HEX: e8 } ] [ [ RAX CL SHR ] { } make ] unit-test
+[ { HEX: 48 HEX: d3 HEX: e9 } ] [ [ RCX CL SHR ] { } make ] unit-test

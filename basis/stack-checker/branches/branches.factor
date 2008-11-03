@@ -89,21 +89,23 @@ SYMBOL: quotations
 : infer-branches ( branches -- input children data )
     [ pop-d ] dip
     [ infer-branch ] map
-    [ stack-visitor branch-variable ] keep ;
+    [ stack-visitor branch-variable ] keep ; inline
 
 : (infer-if) ( branches -- )
-    infer-branches [ first2 #if, ] dip compute-phi-function ;
+    infer-branches
+    [ first2 #if, ] dip compute-phi-function ;
 
 : infer-if ( -- )
     2 consume-d
     dup [ known [ curried? ] [ composed? ] bi or ] contains? [
         output-d
         [ rot [ drop call ] [ nip call ] if ]
-        recursive-state get infer-quot
+        infer-quot-here
     ] [
         [ #drop, ] [ [ literal ] map (infer-if) ] bi
     ] if ;
 
 : infer-dispatch ( -- )
     pop-literal nip [ <literal> ] map
-    infer-branches [ #dispatch, ] dip compute-phi-function ;
+    infer-branches
+    [ #dispatch, ] dip compute-phi-function ;

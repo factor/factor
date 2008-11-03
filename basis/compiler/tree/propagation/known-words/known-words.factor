@@ -7,7 +7,6 @@ classes.algebra combinators generic.math splitting fry locals
 classes.tuple alien.accessors classes.tuple.private slots.private
 definitions
 stack-checker.state
-compiler.intrinsics
 compiler.tree.comparisons
 compiler.tree.propagation.info
 compiler.tree.propagation.nodes
@@ -277,10 +276,10 @@ generic-comparison-ops [
         }
     } cond
     [ fixnum fits? fixnum integer ? ] keep <class/interval-info>
-    [ 2nip ] curry "outputs" set-word-prop
+    '[ 2drop _ ] "outputs" set-word-prop
 ] each
 
-{ <tuple> <tuple-boa> (tuple) } [
+{ <tuple> <tuple-boa> } [
     [
         literal>> dup tuple-layout? [ class>> ] [ drop tuple ] if <class-info>
         [ clear ] dip

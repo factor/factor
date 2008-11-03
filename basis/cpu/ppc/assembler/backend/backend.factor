@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: compiler.generator.fixup kernel namespaces make sequences
-words math math.bitwise io.binary parser lexer ;
+USING: compiler.codegen.fixup cpu.architecture
+compiler.constants kernel namespaces make sequences words math
+math.bitwise io.binary parser lexer ;
 IN: cpu.ppc.assembler.backend
 
 : insn ( operand opcode -- ) { 26 0 } bitfield , ;

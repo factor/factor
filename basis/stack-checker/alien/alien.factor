@@ -36,7 +36,7 @@ TUPLE: alien-callback-params < alien-node-params quot xt ;
     pop-literal nip >>library
     pop-literal nip >>return
     ! Quotation which coerces parameters to required types
-    dup param-prep-quot recursive-state get infer-quot
+    dup param-prep-quot infer-quot-here
     ! Set ABI
     dup library>> library [ abi>> ] [ "cdecl" ] if* >>abi
     ! Magic #: consume exactly the number of inputs
@@ -44,7 +44,7 @@ TUPLE: alien-callback-params < alien-node-params quot xt ;
     ! Add node to IR
     dup #alien-invoke,
     ! Quotation which coerces return value to required type
-    return-prep-quot recursive-state get infer-quot ;
+    return-prep-quot infer-quot-here ;
 
 : infer-alien-indirect ( -- )
     alien-indirect-params new
@@ -53,13 +53,13 @@ TUPLE: alien-callback-params < alien-node-params quot xt ;
     pop-parameters >>parameters
     pop-literal nip >>return
     ! Quotation which coerces parameters to required types
-    dup param-prep-quot [ dip ] curry recursive-state get infer-quot
+    dup param-prep-quot [ dip ] curry infer-quot-here
     ! Magic #: consume the function pointer, too
     dup 1 alien-stack
     ! Add node to IR
     dup #alien-indirect,
     ! Quotation which coerces return value to required type
-    return-prep-quot recursive-state get infer-quot ;
+    return-prep-quot infer-quot-here ;
 
 ! Callbacks are registered in a global hashtable. If you clear
 ! this hashtable, they will all be blown away by code GC, beware
@@ -71,7 +71,7 @@ SYMBOL: callbacks
 
 : callback-bottom ( params -- )
     xt>> [ [ register-callback ] [ word-xt drop <alien> ] bi ] curry
-    recursive-state get infer-quot ;
+    infer-quot-here ;
 
 : infer-alien-callback ( -- )
     alien-callback-params new

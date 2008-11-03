@@ -1,6 +1,6 @@
 ! Copyright (C) 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: kernel words sequences lexer parser ;
+USING: kernel words sequences lexer parser fry ;
 IN: cpu.x86.assembler.syntax
 
 : define-register ( name num size -- )
@@ -9,7 +9,7 @@ IN: cpu.x86.assembler.syntax
     "register-size" set-word-prop ;
 
 : define-registers ( names size -- )
-    >r dup length r> [ define-register ] curry 2each ;
+    '[ _ define-register ] each-index ;
 
 : REGISTERS: ( -- )
     scan-word ";" parse-tokens swap define-registers ; parsing
