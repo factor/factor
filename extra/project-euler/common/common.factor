@@ -15,7 +15,7 @@ IN: project-euler.common
 ! log10 - #25, #134
 ! max-path - #18, #67
 ! nth-triangle - #12, #42
-! number>digits - #16, #20, #30, #34, #35, #38, #43, #52, #55, #56
+! number>digits - #16, #20, #30, #34, #35, #38, #43, #52, #55, #56, #92
 ! palindrome? - #4, #36, #55
 ! pandigital? - #32, #38
 ! pentagonal? - #44, #45
@@ -25,8 +25,8 @@ IN: project-euler.common
 ! [uad]-transform - #39, #75
 
 
-: nth-pair ( n seq -- nth next )
-    2dup [ 1+ ] dip [ nth ] 2bi@ ;
+: nth-pair ( seq n -- nth next )
+    tail-slice first2 ;
 
 : perfect-square? ( n -- ? )
     dup sqrt mod zero? ;
@@ -34,7 +34,7 @@ IN: project-euler.common
 <PRIVATE
 
 : max-children ( seq -- seq )
-    [ dup length 1- [ over nth-pair max , ] each ] { } make nip ;
+    [ dup length 1- [ nth-pair max , ] with each ] { } make ;
 
 ! Propagate one row into the upper one
 : propagate ( bottom top -- newtop )
@@ -84,8 +84,9 @@ PRIVATE>
 
 ! Not strictly needed, but it is nice to be able to dump the triangle after the
 ! propagation
-: propagate-all ( triangle -- newtriangle )
-    reverse [ first dup ] keep rest [ propagate dup ] map nip reverse swap suffix ;
+: propagate-all ( triangle -- new-triangle )
+    reverse [ first dup ] [ rest ] bi
+    [ propagate dup ] map nip reverse swap suffix ;
 
 : sum-divisors ( n -- sum )
     dup 4 < [ { 0 1 3 4 } nth ] [ (sum-divisors) ] if ;
@@ -108,8 +109,9 @@ PRIVATE>
 
 ! Optimized brute-force, is often faster than prime factorization
 : tau* ( m -- n )
-    factor-2s [ 1+ ] dip [ perfect-square? -1 0 ? ] keep
-    dup sqrt >fixnum [1,b] [
+    factor-2s dup [ 1+ ]
+    [ perfect-square? -1 0 ? ]
+    [ dup sqrt >fixnum [1,b] ] tri* [
         dupd mod zero? [ [ 2 + ] dip ] when
     ] each drop * ;
 
