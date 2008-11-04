@@ -3,7 +3,7 @@
 USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.ppc.assembler compiler.codegen.fixup compiler.units
 compiler.constants math math.private layouts words words.private
-vocabs slots.private ;
+vocabs slots.private locals.backend ;
 IN: bootstrap.ppc
 
 4 \ cell set
@@ -304,5 +304,46 @@ big-endian on
     3 3 tag-mask get XORI
     3 ds-reg 0 STW
 ] f f f \ fixnum-bitnot define-sub-primitive
+
+[
+    3 ds-reg 0 LWZ
+    3 3 tag-bits get SRAWI
+    ds-reg ds-reg 4 SUBI
+    4 ds-reg 0 LWZ
+    5 4 3 SLW
+    6 3 NEG
+    7 4 6 SRAW
+    7 7 0 0 31 tag-bits get - RLWINM
+    0 3 0 CMPI
+    2 BGT
+    5 7 MR
+    5 ds-reg 0 STW
+] f f f \ fixnum-shift-fast define-sub-primitive
+
+[
+    3 ds-reg 0 LWZ
+    ds-reg ds-reg 4 SUBI
+    4 ds-reg 0 LWZ
+    5 4 3 DIVW
+    6 5 3 MULLW
+    7 6 4 SUBF
+    7 ds-reg 0 STW
+] f f f \ fixnum-mod define-sub-primitive
+
+[
+    3 ds-reg 0 LWZ
+    3 3 1 SRAWI
+    4 4 LI
+    4 3 4 SUBF
+    rs-reg 3 4 LWZX
+    3 ds-reg 0 STW
+] f f f \ get-local define-sub-primitive
+
+[
+    3 ds-reg 0 LWZ
+    ds-reg ds-reg 4 SUBI
+    3 3 1 SRAWI
+    rs-reg 3 rs-reg SUBF
+] f f f \ drop-locals define-sub-primitive
 
 [ "bootstrap.ppc" forget-vocab ] with-compilation-unit
