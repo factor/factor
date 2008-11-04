@@ -256,6 +256,7 @@ IN: tools.deploy.shaker
                 compiled-generic-crossref
                 recompile-hook
                 update-tuples-hook
+                remake-generics-hook
                 definition-observers
                 definitions:crossref
                 interactive-vocabs
