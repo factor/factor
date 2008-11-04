@@ -1,10 +1,9 @@
 USING: alien arrays definitions generic assocs hashtables io
-kernel math namespaces parser prettyprint sequences strings
-tools.test vectors words quotations classes
+io.streams.string kernel math namespaces parser prettyprint
+sequences strings tools.test vectors words quotations classes
 classes.private classes.union classes.mixin classes.predicate
-classes.algebra vectors definitions source-files
-compiler.units kernel.private sorting vocabs memory eval
-accessors ;
+classes.algebra vectors definitions source-files compiler.units
+kernel.private sorting vocabs memory eval accessors ;
 IN: classes.tests
 
 [ t ] [ 3 object instance? ] unit-test
@@ -37,4 +36,46 @@ M: method-forget-class method-forget-test ;
 [ 0 ] [
     [ word? ] instances
     [ [ name>> "forget-me" = ] [ vocabulary>> "classes.tests" = ] bi and ] count
+] unit-test
+
+! Long-standing problem
+USE: multiline
+
+! So the user has some code...
+[ ] [
+    <" IN: classes.test.a
+    GENERIC: g ( a -- b )
+    TUPLE: x ;
+    M: x g ;
+    TUPLE: z < x ;"> <string-reader>
+    "class-intersect-no-method-a" parse-stream drop
+] unit-test
+
+! Note that q inlines M: x g ;
+[ ] [
+    <" IN: classes.test.b
+    USE: classes.test.a
+    USE: kernel
+    : q ( -- b ) z new g ;"> <string-reader>
+    "class-intersect-no-method-b" parse-stream drop
+] unit-test
+
+! Now, the user removes the z class and adds a method,
+[ ] [
+    <" IN: classes.test.a
+    GENERIC: g ( a -- b )
+    TUPLE: x ;
+    M: x g ;
+    TUPLE: j ;
+    M: j g ;"> <string-reader>
+    "class-intersect-no-method-a" parse-stream drop
+] unit-test
+
+! And changes the definition of q
+[ ] [
+    <" IN: classes.test.b
+    USE: classes.test.a
+    USE: kernel
+    : q ( -- b ) j new g ;"> <string-reader>
+    "class-intersect-no-method-b" parse-stream drop
 ] unit-test
