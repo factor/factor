@@ -36,6 +36,7 @@ H{ } clone dictionary set
 H{ } clone new-classes set
 H{ } clone changed-definitions set
 H{ } clone changed-generics set
+H{ } clone remake-generics set
 H{ } clone forgotten-definitions set
 H{ } clone root-cache set
 H{ } clone source-files set
@@ -80,6 +81,7 @@ bootstrapping? on
     "io.files"
     "io.files.private"
     "io.streams.c"
+    "locals.backend"
     "kernel"
     "kernel.private"
     "math"
@@ -345,6 +347,8 @@ tuple
     { "fixnum-bitor" "math.private" }
     { "fixnum-bitxor" "math.private" }
     { "fixnum-bitnot" "math.private" }
+    { "fixnum-mod" "math.private" }
+    { "fixnum-shift-fast" "math.private" }
     { "fixnum<" "math.private" }
     { "fixnum<=" "math.private" }
     { "fixnum>" "math.private" }
@@ -370,6 +374,8 @@ tuple
     { "eq?" "kernel" }
     { "tag" "kernel.private" }
     { "slot" "slots.private" }
+    { "get-local" "locals.backend" }
+    { "drop-locals" "locals.backend" }
 } [ make-sub-primitive ] assoc-each
 
 ! Primitive words
@@ -396,10 +402,8 @@ tuple
     { "fixnum-" "math.private" }
     { "fixnum*" "math.private" }
     { "fixnum/i" "math.private" }
-    { "fixnum-mod" "math.private" }
     { "fixnum/mod" "math.private" }
     { "fixnum-shift" "math.private" }
-    { "fixnum-shift-fast" "math.private" }
     { "bignum=" "math.private" }
     { "bignum+" "math.private" }
     { "bignum-" "math.private" }

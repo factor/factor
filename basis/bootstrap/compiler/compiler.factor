@@ -7,7 +7,7 @@ hashtables.private sequences.private math classes.tuple.private
 growable namespaces.private assocs words command-line vocabs io
 io.encodings.string prettyprint libc splitting math.parser
 compiler.units math.order compiler.tree.builder
-compiler.tree.optimizer ;
+compiler.tree.optimizer compiler.cfg.optimizer ;
 IN: bootstrap.compiler
 
 ! Don't bring this in when deploying, since it will store a
@@ -92,6 +92,10 @@ nl
 { build-tree } compile-uncompiled
 
 { optimize-tree } compile-uncompiled
+
+{ optimize-cfg } compile-uncompiled
+
+{ (compile) } compile-uncompiled
 
 vocabs [ words compile-uncompiled "." write flush ] each
 

@@ -43,10 +43,10 @@ C: <hi-tag-dispatch-engine> hi-tag-dispatch-engine
 : num-hi-tags ( -- n ) num-types get num-tags get - ;
 
 : hi-tag-number ( class -- n )
-    "type" word-prop num-tags get - ;
+    "type" word-prop ;
 
 : hi-tag-quot ( -- quot )
-    [ 0 slot ] num-tags get [ fixnum-fast ] curry compose ;
+    \ hi-tag def>> ;
 
 M: hi-tag-dispatch-engine engine>quot
     methods>> engines>quots* [ >r hi-tag-number r> ] assoc-map
@@ -54,6 +54,8 @@ M: hi-tag-dispatch-engine engine>quot
         picker % hi-tag-quot % [
             linear-dispatch-quot
         ] [
+            num-tags get , \ fixnum-fast ,
+            [ >r num-tags get - r> ] assoc-map
             num-hi-tags direct-dispatch-quot
         ] if-small? %
     ] [ ] make ;

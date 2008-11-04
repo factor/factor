@@ -27,7 +27,7 @@ IN: compiler.tests
 
 [ 1 ] [ { 1 2 } [ 2 slot ] compile-call ] unit-test
 [ 1 ] [ [ { 1 2 } 2 slot ] compile-call ] unit-test
-[ 3 ] [ 3 1 2 2array [ [ 2 set-slot ] keep ] compile-call first ] unit-test
+[ 3 ] [ 3 1 2 2array [ { array } declare [ 2 set-slot ] keep ] compile-call first ] unit-test
 [ 3 ] [ 3 1 2 [ 2array [ 2 set-slot ] keep ] compile-call first ] unit-test
 [ 3 ] [ [ 3 1 2 2array [ 2 set-slot ] keep ] compile-call first ] unit-test
 [ 3 ] [ 3 1 2 2array [ [ 3 set-slot ] keep ] compile-call second ] unit-test
@@ -252,31 +252,34 @@ cell 8 = [
 ! Some randomized tests
 : compiled-fixnum* fixnum* ;
 
-: test-fixnum* ( -- )
-    32 random-bits >fixnum 32 random-bits >fixnum
-    2dup
-    [ fixnum* ] 2keep compiled-fixnum* =
-    [ 2drop ] [ "Oops" throw ] if ;
-
-[ ] [ 10000 [ test-fixnum* ] times ] unit-test
+[ ] [
+    10000 [ 
+        32 random-bits >fixnum 32 random-bits >fixnum
+        2dup
+        [ fixnum* ] 2keep compiled-fixnum* =
+        [ 2drop ] [ "Oops" throw ] if
+    ] times
+] unit-test
 
 : compiled-fixnum>bignum fixnum>bignum ;
 
-: test-fixnum>bignum ( -- )
-    32 random-bits >fixnum
-    dup [ fixnum>bignum ] keep compiled-fixnum>bignum =
-    [ drop ] [ "Oops" throw ] if ;
-
-[ ] [ 10000 [ test-fixnum>bignum ] times ] unit-test
+[ ] [
+    10000 [
+        32 random-bits >fixnum
+        dup [ fixnum>bignum ] keep compiled-fixnum>bignum =
+        [ drop ] [ "Oops" throw ] if
+    ] times
+] unit-test
 
 : compiled-bignum>fixnum bignum>fixnum ;
 
-: test-bignum>fixnum ( -- )
-    5 random [ drop 32 random-bits ] map product >bignum
-    dup [ bignum>fixnum ] keep compiled-bignum>fixnum =
-    [ drop ] [ "Oops" throw ] if ;
-
-[ ] [ 10000 [ test-bignum>fixnum ] times ] unit-test
+[ ] [
+    10000 [
+        5 random [ drop 32 random-bits ] map product >bignum
+        dup [ bignum>fixnum ] keep compiled-bignum>fixnum =
+        [ drop ] [ "Oops" throw ] if
+    ] times
+] unit-test
 
 ! Test overflow check removal
 [ t ] [
@@ -377,25 +380,23 @@ cell 8 = [
 [ 252 ] [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-unsigned-1 ] compile-call ] unit-test
 [ -4 ] [ B{ 1 2 3 -4 5 } 3 [ { byte-array fixnum } declare alien-signed-1 ] compile-call ] unit-test
 
-: xword-def ( word -- def ) def>> [ { fixnum } declare ] prepend ;
-
 [ -100 ] [ -100 <char> [ { byte-array } declare *char ] compile-call ] unit-test
 [ 156 ] [ -100 <uchar> [ { byte-array } declare *uchar ] compile-call ] unit-test
 
-[ -100 ] [ -100 \ <char> xword-def compile-call *char ] unit-test
-[ 156 ] [ -100 \ <uchar> xword-def compile-call *uchar ] unit-test
+[ -100 ] [ -100 \ <char> def>> [ { fixnum } declare ] prepend compile-call *char ] unit-test
+[ 156 ] [ -100 \ <uchar> def>> [ { fixnum } declare ] prepend compile-call *uchar ] unit-test
 
 [ -1000 ] [ -1000 <short> [ { byte-array } declare *short ] compile-call ] unit-test
 [ 64536 ] [ -1000 <ushort> [ { byte-array } declare *ushort ] compile-call ] unit-test
 
-[ -1000 ] [ -1000 \ <short> xword-def compile-call *short ] unit-test
-[ 64536 ] [ -1000 \ <ushort> xword-def compile-call *ushort ] unit-test
+[ -1000 ] [ -1000 \ <short> def>> [ { fixnum } declare ] prepend compile-call *short ] unit-test
+[ 64536 ] [ -1000 \ <ushort> def>> [ { fixnum } declare ] prepend compile-call *ushort ] unit-test
 
 [ -100000 ] [ -100000 <int> [ { byte-array } declare *int ] compile-call ] unit-test
 [ 4294867296 ] [ -100000 <uint> [ { byte-array } declare *uint ] compile-call ] unit-test
 
-[ -100000 ] [ -100000 \ <int> xword-def compile-call *int ] unit-test
-[ 4294867296 ] [ -100000 \ <uint> xword-def compile-call *uint ] unit-test
+[ -100000 ] [ -100000 \ <int> def>> [ { fixnum } declare ] prepend compile-call *int ] unit-test
+[ 4294867296 ] [ -100000 \ <uint> def>> [ { fixnum } declare ] prepend compile-call *uint ] unit-test
 
 [ t ] [ pi pi <double> *double = ] unit-test
 
@@ -461,3 +462,21 @@ TUPLE: alien-accessor-regression { b byte-array } { i fixnum } ;
     ] compile-call
     b>>
 ] unit-test
+
+: mutable-value-bug-1 ( a b -- c )
+    swap [
+        { tuple } declare 1 slot
+    ] [
+        0 slot
+    ] if ;
+
+[ t ] [ f B{ } mutable-value-bug-1 byte-array type-number = ] unit-test
+
+: mutable-value-bug-2 ( a b -- c )
+    swap [
+        0 slot
+    ] [
+        { tuple } declare 1 slot
+    ] if ;
+
+[ t ] [ t B{ } mutable-value-bug-2 byte-array type-number = ] unit-test

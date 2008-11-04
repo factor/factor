@@ -8,7 +8,8 @@ grouping growable classes classes.builtin classes.tuple
 classes.tuple.private words.private io.binary io.files vocabs
 vocabs.loader source-files definitions debugger
 quotations.private sequences.private combinators
-io.encodings.binary math.order math.private accessors slots.private ;
+io.encodings.binary math.order math.private accessors
+slots.private compiler.units ;
 IN: bootstrap.image
 
 : my-arch ( -- arch )
@@ -458,6 +459,8 @@ M: quotation '
     800000 <vector> image set
     20000 <hashtable> objects set
     emit-header t, 0, 1, -1,
+    "Building generic words..." print flush
+    call-remake-generics-hook
     "Serializing words..." print flush
     emit-words
     "Serializing JIT data..." print flush

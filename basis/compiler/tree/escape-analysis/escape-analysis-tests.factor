@@ -6,7 +6,7 @@ math.functions compiler.tree.propagation compiler.tree.cleanup
 compiler.tree.combinators compiler.tree sequences math
 math.private kernel tools.test accessors slots.private
 quotations.private prettyprint classes.tuple.private classes
-classes.tuple compiler.intrinsics namespaces
+classes.tuple namespaces
 compiler.tree.propagation.info stack-checker.errors
 kernel.private ;
 

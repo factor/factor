@@ -2,8 +2,8 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel kernel.private namespaces
 system cpu.x86.assembler layouts compiler.units math
-math.private compiler.generator.fixup compiler.constants vocabs
-slots.private words words.private ;
+math.private compiler.constants vocabs slots.private words
+words.private locals.backend ;
 IN: bootstrap.x86
 
 big-endian off
@@ -301,5 +301,46 @@ big-endian off
     arg0 tag-mask get XOR                      ! clear tag bits
     ds-reg [] arg0 MOV                         ! save
 ] f f f \ fixnum-bitnot define-sub-primitive
+
+[
+    shift-arg ds-reg [] MOV                    ! load shift count
+    shift-arg tag-bits get SAR                 ! untag shift count
+    ds-reg bootstrap-cell SUB                  ! adjust stack pointer
+    arg0 ds-reg [] MOV                         ! load value
+    arg1 arg0 MOV                              ! make a copy
+    arg1 CL SHL                                ! compute positive shift value in arg1
+    shift-arg NEG                              ! compute negative shift value in arg0
+    arg0 CL SAR
+    arg0 tag-mask get bitnot AND
+    shift-arg 0 CMP                            ! if shift count was negative, move arg0 to arg1
+    arg1 arg0 CMOVGE
+    ds-reg [] arg1 MOV                         ! push to stack
+] f f f \ fixnum-shift-fast define-sub-primitive
+
+[
+    temp-reg ds-reg [] MOV                     ! load second parameter
+    ds-reg bootstrap-cell SUB                  ! adjust stack pointer
+    div-arg ds-reg [] MOV                      ! load first parameter
+    mod-arg div-arg MOV                        ! make a copy
+    mod-arg bootstrap-cell-bits 1- SAR         ! sign-extend
+    temp-reg IDIV                              ! divide
+    ds-reg [] mod-arg MOV                      ! push to stack
+] f f f \ fixnum-mod define-sub-primitive
+
+[
+    arg0 ds-reg [] MOV                         ! load local number
+    fixnum>slot@                               ! turn local number into offset
+    arg1 bootstrap-cell MOV                    ! load base
+    arg1 arg0 SUB                              ! turn it into a stack offset
+    arg0 rs-reg arg1 [+] MOV                   ! load local value
+    ds-reg [] arg0 MOV                         ! push to stack
+] f f f \ get-local define-sub-primitive
+
+[
+    arg0 ds-reg [] MOV                         ! load local count
+    ds-reg bootstrap-cell SUB                  ! adjust stack pointer
+    fixnum>slot@                               ! turn local number into offset
+    rs-reg arg0 SUB                            ! decrement retain stack pointer
+] f f f \ drop-locals define-sub-primitive
 
 [ "bootstrap.x86" forget-vocab ] with-compilation-unit

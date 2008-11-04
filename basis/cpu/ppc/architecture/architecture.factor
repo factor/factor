@@ -128,8 +128,6 @@ M: ppc %dispatch-label ( word -- )
 
 M: ppc %return ( -- ) %epilogue-later BLR ;
 
-M: ppc %unwind drop %return ;
-
 M: ppc %peek ( vreg loc -- )
     >r v>operand r> loc>operand LWZ ;
 
@@ -266,8 +264,6 @@ M: ppc %callback-value ( ctype -- )
      3 1 0 local@ LWZ
      ! Unbox former top of data stack to return registers
      unbox-return ;
-
-M: ppc %cleanup ( alien-node -- ) drop ;
 
 : %untag ( src dest -- ) 0 0 31 tag-bits get - RLWINM ;
 

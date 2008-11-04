@@ -109,3 +109,36 @@ TUPLE: parsing-corner-case x ;
         "}"
     } "\n" join eval
 ] unit-test
+
+[ T{ parsing-corner-case f 3 } ] [
+    {
+        "USE: classes.tuple.parser.tests"
+        "T{ parsing-corner-case"
+        "    { x 3 }"
+        "}"
+    } "\n" join eval
+] unit-test
+
+[ T{ parsing-corner-case f 3 } ] [
+    {
+        "USE: classes.tuple.parser.tests"
+        "T{ parsing-corner-case {"
+        "    x 3 }"
+        "}"
+    } "\n" join eval
+] unit-test
+
+
+[
+    {
+        "USE: classes.tuple.parser.tests T{ parsing-corner-case"
+        "    { x 3 }"
+    } "\n" join eval
+] [ error>> unexpected-eof? ] must-fail-with
+
+[
+    {
+        "USE: classes.tuple.parser.tests T{ parsing-corner-case {"
+        "    x 3 }"
+    } "\n" join eval
+] [ error>> unexpected-eof? ] must-fail-with

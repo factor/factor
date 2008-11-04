@@ -1,7 +1,7 @@
 ! Copyright (C) 2007, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: bootstrap.image.private kernel kernel.private namespaces
-system cpu.ppc.assembler compiler.generator.fixup compiler.units
+system cpu.ppc.assembler compiler.codegen.fixup compiler.units
 compiler.constants math math.private layouts words words.private
 vocabs slots.private ;
 IN: bootstrap.ppc

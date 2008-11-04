@@ -1,7 +1,8 @@
 ! Copyright (C) 2008 Doug Coleman.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors furnace.actions http.server.dispatchers
-html.forms io.servers.connection namespaces prettyprint ;
+USING: accessors furnace.actions http.server
+http.server.dispatchers html.forms io.servers.connection
+namespaces prettyprint ;
 IN: webapps.ip
 
 TUPLE: ip-app < dispatcher ;
@@ -14,3 +15,9 @@ TUPLE: ip-app < dispatcher ;
 : <ip-app> ( -- dispatcher )
     ip-app new-dispatcher
         <display-ip-action> "" add-responder ;
+
+: run-ip-app ( -- )
+    <ip-app> main-responder set-global
+    8080 httpd ;
+
+MAIN: run-ip-app

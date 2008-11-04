@@ -60,17 +60,20 @@ M: object apply-object push-literal ;
 : terminate ( -- )
     terminated? on meta-d get clone meta-r get clone #terminate, ;
 
+: infer-quot-here ( quot -- )
+    [ apply-object terminated? get not ] all? drop ;
+
 : infer-quot ( quot rstate -- )
     recursive-state get [
         recursive-state set
-        [ apply-object terminated? get not ] all? drop
+        infer-quot-here
     ] dip recursive-state set ;
 
 : infer-quot-recursive ( quot word label -- )
     2array recursive-state get swap prefix infer-quot ;
 
 : time-bomb ( error -- )
-    '[ _ throw ] recursive-state get infer-quot ;
+    '[ _ throw ] infer-quot-here ;
 
 : bad-call ( -- )
     "call must be given a callable" time-bomb ;
