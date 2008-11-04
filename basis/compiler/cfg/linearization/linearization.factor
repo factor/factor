@@ -20,16 +20,17 @@ M: insn linearize-insn , drop ;
     #! don't need to branch.
     [ number>> ] bi@ 1- = ; inline
 
-: branch-to-return? ( successor -- ? )
-    #! A branch to a block containing just a return is cloned.
+: branch-to-branch? ( successor -- ? )
+    #! A branch to a block containing just a jump return is cloned.
     instructions>> dup length 2 = [
-        [ first ##epilogue? ] [ second ##return? ] bi and
+        [ first ##epilogue? ]
+        [ second [ ##return? ] [ ##jump? ] bi or ] bi and
     ] [ drop f ] if ;
 
 : emit-branch ( basic-block successor -- )
     {
         { [ 2dup useless-branch? ] [ 2drop ] }
-        { [ dup branch-to-return? ] [ nip linearize-insns ] }
+        { [ dup branch-to-branch? ] [ nip linearize-insns ] }
         [ nip number>> _branch ]
     } cond ;
 
