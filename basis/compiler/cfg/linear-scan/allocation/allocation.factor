@@ -58,11 +58,11 @@ SYMBOL: progress
 
 ! Coalescing
 : active-interval ( vreg -- live-interval )
-    dup active-intervals-for [ vreg>> = ] with find nip ;
+    dup [ dup active-intervals-for [ vreg>> = ] with find nip ] when ;
 
 : coalesce? ( live-interval -- ? )
-    [ start>> ] [ copy-from>> ] bi
-    dup [ active-interval end>> = ] [ 2drop f ] if ;
+    [ start>> ] [ copy-from>> active-interval ] bi
+    dup [ end>> = ] [ 2drop f ] if ;
 
 : coalesce ( live-interval -- )
     dup copy-from>> active-interval
