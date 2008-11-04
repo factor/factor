@@ -51,3 +51,8 @@ DEF(bool,check_sse2,(void)):
 	ret
 
 #include "cpu-x86.S"
+
+#ifdef WINDOWS
+	.section .drectve
+	.ascii " -export:check_sse2"
+#endif
