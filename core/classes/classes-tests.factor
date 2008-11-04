@@ -3,7 +3,8 @@ kernel math namespaces parser prettyprint sequences strings
 tools.test vectors words quotations classes
 classes.private classes.union classes.mixin classes.predicate
 classes.algebra vectors definitions source-files
-compiler.units kernel.private sorting vocabs ;
+compiler.units kernel.private sorting vocabs memory eval
+accessors ;
 IN: classes.tests
 
 [ t ] [ 3 object instance? ] unit-test
@@ -26,4 +27,14 @@ M: method-forget-class method-forget-test ;
     all-words [ class? ] filter
     implementors-map get keys
     [ natural-sort ] bi@ =
+] unit-test
+
+! Minor leak
+[ ] [ "IN: classes.tests TUPLE: forget-me ;" eval ] unit-test
+[ ] [ f \ word set-global ] unit-test
+[ ] [ "IN: classes.tests USE: kernel USE: classes.algebra forget-me tuple class<= drop" eval ] unit-test
+[ ] [ "IN: classes.tests FORGET: forget-me" eval ] unit-test
+[ 0 ] [
+    [ word? ] instances
+    [ [ name>> "forget-me" = ] [ vocabulary>> "classes.tests" = ] bi and ] count
 ] unit-test
