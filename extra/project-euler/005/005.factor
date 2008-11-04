@@ -21,6 +21,6 @@ IN: project-euler.005
     20 1 [ 1+ lcm ] reduce ;
 
 ! [ euler005 ] 100 ave-time
-! 0 ms run / 0 ms GC ave time - 100 trials
+! 0 ms ave run time - 0.14 SD (100 trials)
 
 MAIN: euler005

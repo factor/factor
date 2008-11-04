@@ -13,7 +13,8 @@ IN: project-euler.002
 
 !     1, 2, 3, 5, 8, 13, 21, 34, 55, 89, ...
 
-! Find the sum of all the even-valued terms in the sequence which do not exceed one million.
+! Find the sum of all the even-valued terms in the sequence which do not exceed
+! four million.
 
 
 ! SOLUTION
@@ -30,10 +31,10 @@ PRIVATE>
     V{ 0 } clone 1 rot (fib-upto) ;
 
 : euler002 ( -- answer )
-    1000000 fib-upto [ even? ] filter sum ;
+    4000000 fib-upto [ even? ] filter sum ;
 
 ! [ euler002 ] 100 ave-time
-! 0 ms run / 0 ms GC ave time - 100 trials
+! 0 ms ave run time - 0.22 SD (100 trials)
 
 
 ! ALTERNATE SOLUTIONS
@@ -44,9 +45,9 @@ PRIVATE>
     but-last-slice { 0 1 } prepend ;
 
 : euler002a ( -- answer )
-    1000000 fib-upto* [ even? ] filter sum ;
+    4000000 fib-upto* [ even? ] filter sum ;
 
 ! [ euler002a ] 100 ave-time
-! 0 ms run / 0 ms GC ave time - 100 trials
+! 0 ms ave run time - 0.2 SD (100 trials)
 
 MAIN: euler002a
