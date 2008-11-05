@@ -51,6 +51,6 @@ PRIVATE>
     9123 9876 [a,b] [ concat-product ] map [ pandigital? ] filter supremum ;
 
 ! [ euler038 ] 100 ave-time
-! 37 ms run / 1 ms GC ave time - 100 trials
+! 11 ms ave run time - 1.5 SD (100 trials)
 
 MAIN: euler038

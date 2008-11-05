@@ -33,6 +33,6 @@ IN: project-euler.021
     10000 [1,b] [ dup amicable? [ drop 0 ] unless ] sigma ;
 
 ! [ euler021 ] 100 ave-time
-! 328 ms run / 10 ms GC ave time - 100 trials
+! 335 ms ave run time - 18.63 SD (100 trials)
 
 MAIN: euler021

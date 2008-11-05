@@ -46,6 +46,6 @@ PRIVATE>
     6 123456 next-all-same ;
 
 ! [ euler052 ] 100 ave-time
-! 403 ms run / 7 ms GC ave time - 100 trials
+! 92 ms ave run time - 6.29 SD (100 trials)
 
 MAIN: euler052

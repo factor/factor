@@ -20,7 +20,7 @@ USING: combinators kernel math math.functions memoize ;
 ! 2 + 4 + 4
 ! 2 + 8
 
-! What is f(1025)?
+! What is f(10^25)?
 
 
 ! SOLUTION
@@ -37,6 +37,6 @@ MEMO: fn ( n -- x )
     10 25 ^ fn ;
 
 ! [ euler169 ] 100 ave-time
-! 0 ms run / 0 ms GC ave time - 100 trials
+! 0 ms ave run time - 0.2 SD (100 trials)
 
 MAIN: euler169

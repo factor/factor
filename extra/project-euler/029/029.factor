@@ -32,6 +32,6 @@ IN: project-euler.029
     2 100 [a,b] dup cartesian-product [ first2 ^ ] map prune length ;
 
 ! [ euler029 ] 100 ave-time
-! 951 ms run / 12 ms GC ave time - 100 trials
+! 704 ms ave run time - 28.07 SD (100 trials)
 
 MAIN: euler029

@@ -47,7 +47,7 @@ PRIVATE>
     source-067 propagate-all first first ;
 
 ! [ euler067 ] 100 ave-time
-! 18 ms run / 0 ms GC time
+! 20 ms ave run time - 2.12 SD (100 trials)
 
 
 ! ALTERNATE SOLUTIONS
@@ -57,6 +57,6 @@ PRIVATE>
     source-067 max-path ;
 
 ! [ euler067a ] 100 ave-time
-! 14 ms run / 0 ms GC ave time - 100 trials
+! 21 ms ave run time - 2.65 SD (100 trials)
 
 MAIN: euler067a

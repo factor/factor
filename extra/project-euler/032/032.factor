@@ -49,7 +49,7 @@ PRIVATE>
     source-032 [ valid? ] filter products prune sum ;
 
 ! [ euler032 ] 10 ave-time
-! 23922 ms run / 1505 ms GC ave time - 10 trials
+! 16361 ms ave run time - 417.8 SD (10 trials)
 
 
 ! ALTERNATE SOLUTIONS
@@ -72,7 +72,7 @@ PRIVATE>
 : euler032a ( -- answer )
     source-032a [ mmp ] map [ pandigital? ] filter products prune sum ;
 
-! [ euler032a ] 100 ave-time
-! 5978 ms run / 327 ms GC ave time - 100 trials
+! [ euler032a ] 10 ave-time
+! 2624 ms ave run time - 131.91 SD (10 trials)
 
 MAIN: euler032a

@@ -40,6 +40,6 @@ PRIVATE>
     source-022 natural-sort name-scores sum ;
 
 ! [ euler022 ] 100 ave-time
-! 123 ms run / 4 ms GC ave time - 100 trials
+! 74 ms ave run time - 5.13 SD (100 trials)
 
 MAIN: euler022

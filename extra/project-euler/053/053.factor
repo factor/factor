@@ -30,6 +30,6 @@ IN: project-euler.053
     23 100 [a,b] [ dup [ nCk 1000000 > ] with count ] sigma ;
 
 ! [ euler053 ] 100 ave-time
-! 64 ms run / 2 ms GC ave time - 100 trials
+! 52 ms ave run time - 4.44 SD (100 trials)
 
 MAIN: euler053

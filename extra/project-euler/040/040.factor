@@ -46,6 +46,6 @@ PRIVATE>
     [ swap nth-integer ] with map product ;
 
 ! [ euler040 ] 100 ave-time
-! 1002 ms run / 43 ms GC ave time - 100 trials
+! 444 ms ave run time - 23.64 SD (100 trials)
 
 MAIN: euler040

@@ -47,6 +47,6 @@ PRIVATE>
     9 disprove-conjecture ;
 
 ! [ euler046 ] 100 ave-time
-! 150 ms run / 2 ms GC ave time - 100 trials
+! 37 ms ave run time - 3.39 SD (100 trials)
 
 MAIN: euler046

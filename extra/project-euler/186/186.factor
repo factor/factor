@@ -51,11 +51,10 @@ IN: project-euler.186
     [ first ] [ advance ] bi ;
 
 : 2unless? ( x y ?quot quot -- )
-    >r 2keep rot [ 2drop ] r> if ; inline
+    [ 2keep rot [ 2drop ] ] dip if ; inline
 
 : (p186) ( generator counter unionfind -- counter )
-    524287 over equiv-set-size 990000 <
-    [
+    524287 over equiv-set-size 990000 < [
         pick [ next ] [ next ] bi
         [ = ] [
             pick equate

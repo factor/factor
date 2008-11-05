@@ -26,7 +26,7 @@ IN: project-euler.075
 
 !     120 cm: (30,40,50), (20,48,52), (24,45,51)
 
-! Given that L is the length of the wire, for how many values of L ≤ 1,000,000
+! Given that L is the length of the wire, for how many values of L ≤ 2,000,000
 ! can exactly one right angle triangle be formed?
 
 
@@ -36,9 +36,9 @@ IN: project-euler.075
 ! Algorithm adapted from http://mathworld.wolfram.com/PythagoreanTriple.html
 ! Identical implementation as problem #39
 
-! Basically, this makes an array of 1000000 zeros, recursively creates
+! Basically, this makes an array of 2000000 zeros, recursively creates
 ! primitive triples using the three transforms and then increments the array at
-! index [a+b+c] by one for each triple's sum AND its multiples under 1000000
+! index [a+b+c] by one for each triple's sum AND its multiples under 2000000
 ! (to account for non-primitive triples). The answer is just the total number
 ! of indexes that are equal to one.
 
@@ -69,10 +69,10 @@ PRIVATE>
 
 : euler075 ( -- answer )
     [
-        1000000 count-perimeters p-count get [ 1 = ] count
+        2000000 count-perimeters p-count get [ 1 = ] count
     ] with-scope ;
 
-! [ euler075 ] 100 ave-time
-! 1873 ms run / 123 ms GC ave time - 100 trials
+! [ euler075 ] 10 ave-time
+! 3341 ms ave run timen - 157.77 SD (10 trials)
 
 MAIN: euler075

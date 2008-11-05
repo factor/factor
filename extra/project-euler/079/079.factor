@@ -58,7 +58,7 @@ PRIVATE>
     source-079 >edges topological-sort 10 digits>integer ;
 
 ! [ euler079 ] 100 ave-time
-! 1 ms ave run time - 1.41 SD (100 trials)
+! 1 ms ave run time - 0.46 SD (100 trials)
 
 ! TODO: prune and diff are relatively slow; topological sort could be
 ! cleaned up and generalized much better, but it works for this problem

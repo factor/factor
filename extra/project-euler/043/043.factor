@@ -56,7 +56,7 @@ PRIVATE>
     [ interesting? ] filter [ 10 digits>integer ] map sum ;
 
 ! [ euler043 ] time
-! 125196 ms run / 19548 ms GC time
+! 104526 ms run / 42735 ms GC time
 
 
 ! ALTERNATE SOLUTIONS
@@ -92,6 +92,6 @@ PRIVATE>
     interesting-pandigitals [ 10 digits>integer ] sigma ;
 
 ! [ euler043a ] 100 ave-time
-! 12 ms ave run time - 2.32 SD (100 trials)
+! 10 ms ave run time - 1.37 SD (100 trials)
 
 MAIN: euler043a

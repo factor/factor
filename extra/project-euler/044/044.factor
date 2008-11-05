@@ -40,7 +40,7 @@ PRIVATE>
     [ first2 sum-and-diff? ] filter [ first2 - abs ] map infimum ;
 
 ! [ euler044 ] 10 ave-time
-! 5727 ms ave run time - 1102.38 SD (10 trials)
+! 4996 ms ave run time - 87.46 SD (10 trials)
 
 ! TODO: this solution is ugly and not very efficient...find a better algorithm
 

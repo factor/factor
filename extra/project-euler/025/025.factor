@@ -55,7 +55,7 @@ PRIVATE>
     1000 digit-fib ;
 
 ! [ euler025 ] 10 ave-time
-! 5237 ms run / 72 ms GC ave time - 10 trials
+! 5345 ms ave run time - 105.91 SD (10 trials)
 
 
 ! ALTERNATE SOLUTIONS
@@ -76,6 +76,6 @@ PRIVATE>
     1000 digit-fib* ;
 
 ! [ euler025a ] 100 ave-time
-! 0 ms run / 0 ms GC ave time - 100 trials
+! 0 ms ave run time - 0.17 SD (100 trials)
 
 MAIN: euler025a
