@@ -3,7 +3,7 @@
 USING: accessors arrays kernel math namespaces make sequences
 system layouts alien alien.c-types alien.accessors alien.structs
 slots splitting assocs combinators cpu.x86.assembler
-cpu.x86.architecture cpu.architecture compiler.constants
+cpu.x86 cpu.architecture compiler.constants
 compiler.codegen compiler.codegen.fixup
 compiler.cfg.instructions compiler.cfg.builder
 compiler.cfg.intrinsics ;

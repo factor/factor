@@ -271,9 +271,7 @@ big-endian off
 : jit-math ( insn -- )
     arg0 ds-reg [] MOV                         ! load second input
     ds-reg bootstrap-cell SUB                  ! pop stack
-    arg1 ds-reg [] MOV                         ! load first input
-    [ arg1 arg0 ] dip execute                  ! compute result
-    ds-reg [] arg1 MOV                         ! push result
+    [ ds-reg [] arg0 ] dip execute             ! compute result
     ;
 
 [ \ ADD jit-math ] f f f \ fixnum+fast define-sub-primitive
@@ -296,10 +294,8 @@ big-endian off
 [ \ XOR jit-math ] f f f \ fixnum-bitxor define-sub-primitive
 
 [
-    arg0 ds-reg [] MOV                         ! load input input
-    arg0 NOT                                   ! complement
-    arg0 tag-mask get XOR                      ! clear tag bits
-    ds-reg [] arg0 MOV                         ! save
+    ds-reg [] NOT                              ! complement
+    ds-reg [] tag-mask get XOR                 ! clear tag bits
 ] f f f \ fixnum-bitnot define-sub-primitive
 
 [
