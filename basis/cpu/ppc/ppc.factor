@@ -1,13 +1,30 @@
 ! Copyright (C) 2005, 2008 Slava Pestov.
 ! See http://factorcode.org/license.txt for BSD license.
-IN: cpu.ppc.architecture
+USING: alien.c-types
+accessors
+cpu.architecture
+compiler.cfg.registers
+cpu.ppc.assembler
+kernel
+locals
+layouts
+combinators
+make
+compiler.cfg.instructions
+math.order
+system
+math
+compiler.constants
+namespaces compiler.codegen.fixup ;
+IN: cpu.ppc
 
-! PowerPC register assignments
-! r3-r11, r16-r31: integer vregs
-! f0-f13: float vregs
-! r12: scratch
-! r14: data stack
-! r15: retain stack
+! PowerPC register assignments:
+! r2-r28: integer vregs
+! r29: integer scratch
+! r30: data stack
+! r31: retain stack
+! f0-f29: float vregs
+! f30, f31: float scratch
 
 << {
     { [ os macosx? ] [
@@ -23,13 +40,15 @@ IN: cpu.ppc.architecture
 
 M: ppc machine-registers
     {
-        { int-regs { 3 4 5 6 7 8 9 10 11 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 } }
-        { double-float-regs { 0 1 2 3 4 5 6 7 8 9 10 11 12 13 } }
+        { int-regs T{ range f 2 27 1 } }
+        { double-float-regs T{ range f 0 28 1 } }
     } ;
 
-: scratch-reg 12 ; inline
+: scratch-reg 29 ; inline
+: fp-scratch-reg-1 30 ; inline
+: fp-scratch-reg-2 31 ; inline
 
-M: ppc two-operand? t ;
+M: ppc two-operand? f ;
 
 M: ppc %load-immediate ( reg n -- ) swap LOAD ;
 
@@ -38,8 +57,8 @@ M:: ppc %load-indirect ( reg obj -- )
     obj rc-absolute-ppc-2/2 rel-literal
     reg reg 0 LWZ ;
 
-: ds-reg 14 ; inline
-: rs-reg 15 ; inline
+: ds-reg 30 ; inline
+: rs-reg 31 ; inline
 
 GENERIC: loc-reg ( loc -- reg )
 
@@ -83,15 +102,14 @@ M: ppc %inc-r ( n -- ) rs-reg (%inc) ;
 : xt-save ( n -- i ) 2 cells - ;
 
 M: ppc stack-frame-size ( stack-frame -- i )
-    local@ factor-area-size + 4 cells align ;
-
-! M: x86 stack-frame-size ( stack-frame -- i )
-!     [ spill-counts>> [ swap reg-size * ] { } assoc>map sum ]
-!     [ params>> ]
-!     [ return>> ]
-!     tri + +
-!     3 cells +
-!     align-stack ;
+    [ spill-counts>> [ swap reg-size * ] { } assoc>map sum ]
+    [ params>> ]
+    [ return>> ]
+    tri + +
+    reserved-area-size +
+    param-save-size +
+    factor-area-size +
+    4 cells align ;
 
 M: ppc %call ( label -- ) BL ;
 M: ppc %jump-label ( label -- ) B ;
@@ -136,62 +154,57 @@ M: ppc %shr-imm swapd SRWI ;
 M: ppc %sar-imm SRAWI ;
 M: ppc %not     NOT ;
 
+: bignum@ ( n -- offset ) cells bignum tag-number - ; inline
+
 M: ppc %integer>bignum ( dst src temp -- )
     [
         { "end" "non-zero" "pos" "store" } [ define-label ] each
-        ! is it zero?
-        0 over v>operand 0 CMPI
-        "non-zero" get BNE
-        dup 0 >bignum %load-literal
-        "end" get B
-        ! it is non-zero
-        "non-zero" resolve-label
-        1 bignum over 3 + cells %allot
-        1+ v>operand 12 LI ! compute the length
-        12 11 cell STW ! store the length
-        ! is the fixnum negative?
-        0 over v>operand 0 CMPI
-        "pos" get BGE
-        1 12 LI
-        ! store negative sign
-        12 11 2 cells STW
-        ! negate fixnum
-        dup v>operand dup -1 MULI
-        "store" get B
-        "pos" resolve-label
-        0 12 LI
-        ! store positive sign
-        12 11 2 cells STW
-        "store" resolve-label
-        ! store the number
-        dup v>operand 11 3 cells STW
-        ! tag the bignum, store it in reg
-        bignum %store-tagged
+        dst 0 >bignum %load-immediate
+        ! Is it zero? Then just go to the end and return this zero
+        0 src 0 CMPI
+        "end" get BEQ
+        ! Allocate a bignum
+        dst 4 cells bignum temp %allot
+        ! Write length
+        2 temp LI
+        dst 1 bignum@ temp STW
+        ! Store value
+        dst 3 bignum@ src STW
+        ! Compute sign
+        temp src MR
+        temp cell-bits 1- SRAWI
+        temp temp 1 ANDI
+        ! Store sign
+        dst 2 bignum@ temp STW
+        ! Make negative value positive
+        temp temp temp ADD
+        temp temp NEG
+        temp temp 1 ADDI
+        temp src temp MULLW
+        ! Store the bignum
+        dst 3 bignum@ temp STW
         "end" resolve-label
     ] with-scope ;
 
-: bignum@ ( n -- offset ) cells bignum tag-number - ; inline
-
-M:: %bignum>integer ( dst src -- )
+M:: %bignum>integer ( dst src temp -- )
     [
         "end" define-label
-        scratch-reg src 1 bignum@ LWZ
+        temp src 1 bignum@ LWZ
         ! if the length is 1, its just the sign and nothing else,
         ! so output 0
         0 dst LI
-        0 scratch-reg 1 v>operand CMPI
+        0 temp 1 v>operand CMPI
         "end" get BEQ
         ! load the value
         dst src 3 bignum@ LWZ
         ! load the sign
-        scratch-reg src 2 bignum@ LWZ
+        temp src 2 bignum@ LWZ
         ! branchless arithmetic: we want to turn 0 into 1,
         ! and 1 into -1
-        scratch-reg scratch-reg 1 SLWI
-        scratch-reg scratch-reg NEG
-        scratch-reg scratch-reg 1 ADDI
+        temp temp temp ADD
+        temp temp 1 SUBI
         ! multiply value by sign
-        dst dst scratch-reg MULLW
+        dst dst temp MULLW
         "end" resolve-label
     ] with-scope ;
 
@@ -200,20 +213,21 @@ M: ppc %sub-float FSUB ;
 M: ppc %mul-float FMUL ;
 M: ppc %div-float FDIV ;
 
-M: ppc %integer>float
-    HEX: 4330 "scratch" operand LIS
-    "scratch" operand 1 0 param@ STW
-    "in" operand dup HEX: 8000 XORIS
-    "in" operand 1 cell param@ STW
-    "f1" operand 1 0 param@ LFD
-    4503601774854144.0 "in" operand load-indirect
-    "f2" operand "in" operand float-offset LFD
-    "f1" operand "f1" operand "f2" operand FSUB ;
+M: ppc %integer>float ( dst src -- )
+    HEX: 4330 scratch-reg LIS
+    scratch-reg 1 0 param@ STW
+    scratch-reg src MR
+    scratch-reg dup HEX: 8000 XORIS
+    scratch-reg 1 cell param@ STW
+    fp-scratch-reg-2 1 0 param@ LFD
+    4503601774854144.0 scratch-reg load-indirect
+    fp-scratch-reg-2 scratch-reg float-offset LFD
+    fp-scratch-reg-2 fp-scratch-reg-2 fp-scratch-reg-2 FSUB ;
 
-M: ppc %float>integer
-    "scratch" operand "in" operand FCTIWZ
-    "scratch" operand 1 0 param@ STFD
-    "out" operand 1 cell param@ LWZ ;
+M:: ppc %float>integer ( dst src -- )
+    fp-scratch-reg-1 src FCTIWZ
+    fp-scratch-reg-2 1 0 param@ STFD
+    dst 1 4 param@ LWZ ;
 
 M: ppc %copy ( dst src -- ) MR ;
 
@@ -407,11 +421,32 @@ M: ppc %compare-branch (%compare) %branch ;
 M: ppc %compare-imm-branch (%compare-imm) %branch ;
 M: ppc %compare-float-branch (%compare-float) %branch ;
 
-! M: ppc %spill-integer ( src n -- ) spill-integer@ swap MOV ;
-! M: ppc %reload-integer ( dst n -- ) spill-integer@ MOV ;
-! 
-! M: ppc %spill-float ( src n -- ) spill-float@ swap MOVSD ;
-! M: ppc %reload-float ( dst n -- ) spill-float@ MOVSD ;
+: spill-integer-base ( stack-frame -- n )
+    [ params>> ] [ return>> ] bi + ;
+
+: stack@ 1 swap ; inline
+
+: spill-integer@ ( n -- op )
+    cells
+    stack-frame get spill-integer-base
+    + stack@ ;
+
+: spill-float-base ( stack-frame -- n )
+    [ spill-counts>> int-regs swap at int-regs reg-size * ]
+    [ params>> ]
+    [ return>> ]
+    tri + + ;
+
+: spill-float@ ( n -- op )
+    double-float-regs reg-size *
+    stack-frame get spill-float-base
+    + stack@ ;
+
+M: ppc %spill-integer ( src n -- ) spill-integer@ STW ;
+M: ppc %reload-integer ( dst n -- ) spill-integer@ LWZ ;
+
+M: ppc %spill-float ( src n -- ) spill-float@ STFD ;
+M: ppc %reload-float ( dst n -- ) spill-float@ LFD ;
 
 M: ppc %loop-entry ;
 
