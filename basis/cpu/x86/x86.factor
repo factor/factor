@@ -7,7 +7,7 @@ words system layouts combinators math.order fry locals
 compiler.constants compiler.cfg.registers
 compiler.cfg.instructions compiler.codegen
 compiler.codegen.fixup ;
-IN: cpu.x86.architecture
+IN: cpu.x86
 
 M: x86 two-operand? t ;
 
@@ -111,49 +111,54 @@ M:: x86 %integer>bignum ( dst src temp -- )
     #! 1 cell header, 1 cell length, 1 cell sign, + digits
     #! length is the # of digits + sign
     [
-        { "end" "nonzero" "positive" } [ define-label ] each
-        src 0 CMP ! is it zero?
-        "nonzero" get JNE
-        ! Use cached zero value
+        "end" define-label
+        ! Load cached zero value
         dst 0 >bignum %load-indirect
-        "end" get JMP
-        "nonzero" resolve-label
+        src 0 CMP
+        ! Is it zero? Then just go to the end and return this zero
+        "end" get JE
         ! Allocate a bignum
         dst 4 cells bignum temp %allot
         ! Write length
         dst 1 bignum@ 2 tag-fixnum MOV
-        ! Test sign
-        src 0 CMP
-        "positive" get JGE
-        dst 2 bignum@ 1 MOV ! negative sign
-        src NEG
+        ! Store value
         dst 3 bignum@ src MOV
-        src NEG ! we don't want to clobber src
-        "end" get JMP
-        "positive" resolve-label
-        dst 2 bignum@ 0 MOV ! positive sign
-        dst 3 bignum@ src MOV
+        ! Compute sign
+        temp src MOV
+        temp cell-bits 1- SAR
+        temp 1 AND
+        ! Store sign
+        dst 2 bignum@ temp MOV
+        ! Make negative value positive
+        temp temp ADD
+        temp NEG
+        temp 1 ADD
+        src temp IMUL2
+        ! Store the bignum
+        dst 3 bignum@ temp MOV
         "end" resolve-label
     ] with-scope ;
 
-M:: x86 %bignum>integer ( dst src -- )
+M:: x86 %bignum>integer ( dst src temp -- )
     [
-        "nonzero" define-label
         "end" define-label
-        dst src 1 bignum@ MOV
-         ! if the length is 1, its just the sign and nothing else,
-         ! so output 0
-        dst 1 tag-fixnum CMP
-        "nonzero" get JNE
+        ! load length
+        temp src 1 bignum@ MOV
+        ! if the length is 1, its just the sign and nothing else,
+        ! so output 0
         dst 0 MOV
-        "end" get JMP
-        "nonzero" resolve-label
+        temp 1 tag-fixnum CMP
+        "end" get JE
         ! load the value
         dst src 3 bignum@ MOV
-        ! is the sign negative?
-        src 2 bignum@ 0 CMP
-        "end" get JE
-        dst NEG
+        ! load the sign
+        temp src 2 bignum@ MOV
+        ! convert it into -1 or 1
+        temp temp ADD
+        temp NEG
+        temp 1 ADD
+        ! make dst signed
+        temp dst IMUL2
         "end" resolve-label
     ] with-scope ;
 
@@ -206,21 +211,19 @@ M:: x86 %box-float ( dst src temp -- )
     dst 16 float temp %allot
     dst float-offset [+] src MOVSD ;
 
-: alien@ ( reg n -- op ) cells object tag-number - [+] ;
+: alien@ ( reg n -- op ) cells alien tag-number - [+] ;
 
 M:: x86 %box-alien ( dst src temp -- )
     [
-        { "end" "f" } [ define-label ] each
+        "end" define-label
+        dst \ f tag-number MOV
         src 0 CMP
-        "f" get JE
+        "end" get JE
         dst 4 cells alien temp %allot
         dst 1 alien@ \ f tag-number MOV
         dst 2 alien@ \ f tag-number MOV
         ! Store src in alien-offset slot
         dst 3 alien@ src MOV
-        "end" get JMP
-        "f" resolve-label
-        dst \ f tag-number MOV
         "end" resolve-label
     ] with-scope ;
 
@@ -339,7 +342,7 @@ M: x86 %set-alien-double [ [] ] dip MOVSD ;
 : inc-allot-ptr ( nursery-ptr n -- )
     [ cell [+] ] dip 8 align ADD ;
 
-: store-header ( temp type -- )
+: store-header ( temp class -- )
     [ [] ] [ type-number tag-fixnum ] bi* MOV ;
 
 : store-tagged ( dst tag -- )
@@ -463,11 +466,10 @@ M: x86 %compare-float-branch ( label cc src1 src2 -- )
 M: x86 %spill-integer ( src n -- ) spill-integer@ swap MOV ;
 M: x86 %reload-integer ( dst n -- ) spill-integer@ MOV ;
 
-M: x86 %spill-float spill-float@ swap MOVSD ;
-M: x86 %reload-float spill-float@ MOVSD ;
+M: x86 %spill-float ( src n -- ) spill-float@ swap MOVSD ;
+M: x86 %reload-float ( dst n -- ) spill-float@ MOVSD ;
 
-M: x86 %loop-entry
-    16 code-alignment [ NOP ] times ;
+M: x86 %loop-entry 16 code-alignment [ NOP ] times ;
 
 M: int-regs %save-param-reg drop >r stack@ r> MOV ;
 M: int-regs %load-param-reg drop swap stack@ MOV ;

@@ -4,27 +4,19 @@ USING: help.markup help.syntax io.streams.string kernel quotations sequences str
 IN: unix.users
 
 HELP: all-users
-{ $values
-    
-     { "seq" sequence } }
+{ $values { "seq" sequence } }
 { $description "Returns a sequence of high-level " { $link passwd } " tuples that are platform-dependent and field for field complete with the Unix " { $link passwd } " structure." } ;
 
 HELP: effective-username
-{ $values
-    
-     { "string" string } }
+{ $values { "string" string } }
 { $description "Returns the effective username for the current user." } ;
 
 HELP: effective-user-id
-{ $values
-    
-     { "id" integer } }
+{ $values { "id" integer } }
 { $description "Returns the effective username id for the current user." } ;
 
 HELP: new-passwd
-{ $values
-    
-     { "passwd" passwd } }
+{ $values { "passwd" passwd } }
 { $description "Creates a new passwd tuple dependent on the operating system." } ;
 
 HELP: passwd
@@ -40,25 +32,19 @@ HELP: passwd>new-passwd
 { $description "A platform-specific conversion routine from a passwd structure to a passwd tuple." } ;
 
 HELP: real-username
-{ $values
-    
-     { "string" string } }
+{ $values { "string" string } }
 { $description "The real username of the current user." } ;
 
 HELP: real-user-id
-{ $values
-    
-     { "id" integer } }
+{ $values { "id" integer } }
 { $description "The real user id of the current user." } ;
 
 HELP: set-effective-user
-{ $values
-     { "string/id" "a string or a user id" } }
+{ $values { "string/id" "a string or a user id" } }
 { $description "Sets the current effective user given a username or a user id." } ;
 
 HELP: set-real-user
-{ $values
-     { "string/id" "a string or a user id" } }
+{ $values { "string/id" "a string or a user id" } }
 { $description "Sets the current real user given a username or a user id." } ;
 
 HELP: user-passwd
@@ -100,8 +86,9 @@ HELP: with-real-user
     set-effective-user
 } related-words
 
-ARTICLE: "unix.users" "unix.users"
+ARTICLE: "unix.users" "Unix users"
 "The " { $vocab-link "unix.users" } " vocabulary contains words that return information about Unix users."
+$nl
 "Listing all users:"
 { $subsection all-users }
 "Returning a passwd tuple:"

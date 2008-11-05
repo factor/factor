@@ -117,7 +117,7 @@ ARTICLE: "ui-workspace-keys" "UI keyboard shortcuts"
 { $heading "Implementation" }
 "Workspaces are instances of " { $link workspace } "." ;
 
-ARTICLE: "ui-tools" "UI development tools"
+ARTICLE: "ui-tools" "UI developer tools"
 "The Factor development environment can seem rather different from what you are used to, because it is very simple and powerful.."
 $nl
 "To take full advantage of the UI, you should be using a supported text editor. See " { $link "editor" } "."

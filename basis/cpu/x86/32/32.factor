@@ -3,7 +3,7 @@
 USING: locals alien.c-types alien.syntax arrays kernel
 math namespaces sequences system layouts io vocabs.loader
 accessors init combinators command-line cpu.x86.assembler
-cpu.x86.architecture cpu.architecture compiler compiler.units
+cpu.x86 cpu.architecture compiler compiler.units
 compiler.constants compiler.alien compiler.codegen
 compiler.codegen.fixup compiler.cfg.instructions
 compiler.cfg.builder compiler.cfg.intrinsics ;

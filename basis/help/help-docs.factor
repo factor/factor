@@ -407,7 +407,7 @@ HELP: ARTICLE:
 } ;
 
 HELP: ABOUT:
-{ $syntax "MAIN: article" }
+{ $syntax "ABOUT: article" }
 { $values { "article" "a help article" } }
 { $description "Defines the main documentation article for the current vocabulary." } ;
 
