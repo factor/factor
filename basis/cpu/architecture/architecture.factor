@@ -76,7 +76,7 @@ HOOK: %sar-imm cpu ( dst src1 src2 -- )
 HOOK: %not     cpu ( dst src -- )
 
 HOOK: %integer>bignum cpu ( dst src temp -- )
-HOOK: %bignum>integer cpu ( dst src -- )
+HOOK: %bignum>integer cpu ( dst src temp -- )
 
 HOOK: %add-float cpu ( dst src1 src2 -- )
 HOOK: %sub-float cpu ( dst src1 src2 -- )
