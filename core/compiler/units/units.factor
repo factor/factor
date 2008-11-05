@@ -109,10 +109,11 @@ SYMBOL: remake-generics-hook
     compiled-generic-crossref get at ;
 
 : (compiled-generic-usages) ( generic class -- assoc )
-    dup class? [
-        [ compiled-generic-usage ] dip
-        [ classes-intersect? nip ] curry assoc-filter
-    ] [ 2drop f ] if ;
+    [ compiled-generic-usage ] dip
+    [
+        2dup [ class? ] both?
+        [ classes-intersect? ] [ 2drop f ] if nip
+    ] curry assoc-filter ;
 
 : compiled-generic-usages ( assoc -- assocs )
     [ (compiled-generic-usages) ] { } assoc>map ;

@@ -176,7 +176,8 @@ GENERIC: class-forgotten ( use class -- )
         [ implementors-map- ]
         [ update-map- ]
         [ reset-class ]
-    } cleave ;
+    } cleave
+    reset-caches ;
 
 M: class class-forgotten
     nip forget-class ;
