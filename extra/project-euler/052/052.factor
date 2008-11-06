@@ -30,7 +30,7 @@ IN: project-euler.052
     [ number>digits natural-sort ] map all-equal? ;
 
 : candidate? ( n -- ? )
-    { [ dup odd? ] [ dup 3 mod zero? ] } 0&& nip ;
+    { [ odd? ] [ 3 mod zero? ] } 1&& ;
 
 : next-all-same ( x n -- n )
     dup candidate? [
@@ -46,6 +46,6 @@ PRIVATE>
     6 123456 next-all-same ;
 
 ! [ euler052 ] 100 ave-time
-! 403 ms run / 7 ms GC ave time - 100 trials
+! 92 ms ave run time - 6.29 SD (100 trials)
 
 MAIN: euler052

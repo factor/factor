@@ -73,6 +73,6 @@ PRIVATE>
     1000 (euler150) ;
 
 ! [ euler150 ] 10 ave-time
-! 32858 ms run time - 10 trials
+! 30208 ms ave run time - 593.45 SD (10 trials)
 
 MAIN: euler150

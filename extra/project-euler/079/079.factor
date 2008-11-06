@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: assocs hashtables io.files kernel math math.parser
-namespaces make io.encodings.ascii sequences sets ;
+USING: assocs io.encodings.ascii io.files kernel make math math.parser
+    sequences sets ;
 IN: project-euler.079
 
 ! http://projecteuler.net/index.php?section=problems&id=79
@@ -58,7 +58,7 @@ PRIVATE>
     source-079 >edges topological-sort 10 digits>integer ;
 
 ! [ euler079 ] 100 ave-time
-! 2 ms run / 0 ms GC ave time - 100 trials
+! 1 ms ave run time - 0.46 SD (100 trials)
 
 ! TODO: prune and diff are relatively slow; topological sort could be
 ! cleaned up and generalized much better, but it works for this problem

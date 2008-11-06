@@ -42,6 +42,6 @@ PRIVATE>
     3 2000000 [a,b] [ factorion? ] filter sum ;
 
 ! [ euler034 ] 10 ave-time
-! 15089 ms run / 725 ms GC ave time - 10 trials
+! 5506 ms ave run time - 144.0 SD (10 trials)
 
 MAIN: euler034

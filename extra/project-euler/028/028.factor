@@ -30,7 +30,7 @@ IN: project-euler.028
 <PRIVATE
 
 : sum-corners ( n -- sum )
-    dup 1 = [ [ sq 4 * ] keep 6 * - 6 + ] unless ;
+    dup 1 = [ [ sq 4 * ] [ 6 * ] bi - 6 + ] unless ;
 
 : sum-diags ( n -- sum )
     1 swap 2 <range> [ sum-corners ] sigma ;
@@ -41,6 +41,6 @@ PRIVATE>
     1001 sum-diags ;
 
 ! [ euler028 ] 100 ave-time
-! 0 ms run / 0 ms GC ave time - 100 trials
+! 0 ms ave run time - 0.39 SD (100 trials)
 
 MAIN: euler028

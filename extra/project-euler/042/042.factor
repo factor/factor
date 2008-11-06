@@ -1,7 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: ascii io.files kernel math math.functions namespaces make
-    project-euler.common sequences splitting io.encodings.ascii ;
+USING: ascii io.encodings.ascii io.files kernel make math math.functions
+    namespaces project-euler.common sequences splitting ;
 IN: project-euler.042
 
 ! http://projecteuler.net/index.php?section=problems&id=42
@@ -50,7 +50,7 @@ PRIVATE>
     triangle-upto [ member? ] curry count ;
 
 ! [ euler042 ] 100 ave-time
-! 27 ms run / 1 ms GC ave time - 100 trials
+! 19 ms ave run time - 1.97 SD (100 trials)
 
 
 ! ALTERNATE SOLUTIONS
@@ -69,6 +69,6 @@ PRIVATE>
     source-042 [ alpha-value ] map [ triangle? ] count ;
 
 ! [ euler042a ] 100 ave-time
-! 25 ms run / 1 ms GC ave time - 100 trials
+! 21 ms ave run time - 2.2 SD (100 trials)
 
 MAIN: euler042a

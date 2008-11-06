@@ -68,7 +68,7 @@ PRIVATE>
     source-027 max-consecutive drop product ;
 
 ! [ euler027 ] 100 ave-time
-! 687 ms run / 23 ms GC ave time - 100 trials
+! 111 ms ave run time - 6.07 SD (100 trials)
 
 ! TODO: generalize max-consecutive/max-product (from #26) into a new word
 

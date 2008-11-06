@@ -1,7 +1,8 @@
-USING: arrays kernel math math.functions math.miller-rabin
-math.matrices math.order math.parser math.primes.factors
-math.ranges namespaces make sequences sequences.lib sorting
-unicode.case ;
+! Copyright (c) 2007-2008 Aaron Schaefer.
+! See http://factorcode.org/license.txt for BSD license.
+USING: arrays kernel make math math.functions math.matrices math.miller-rabin
+    math.order math.parser math.primes.factors math.ranges sequences
+    sequences.lib sorting strings unicode.case ;
 IN: project-euler.common
 
 ! A collection of words used by more than one Project Euler solution
@@ -11,11 +12,10 @@ IN: project-euler.common
 ! -------------------------------
 ! alpha-value - #22, #42
 ! cartesian-product - #4, #27, #29, #32, #33, #43, #44, #56
-! collect-consecutive - #8, #11
 ! log10 - #25, #134
 ! max-path - #18, #67
 ! nth-triangle - #12, #42
-! number>digits - #16, #20, #30, #34, #35, #38, #43, #52, #55, #56
+! number>digits - #16, #20, #30, #34, #35, #38, #43, #52, #55, #56, #92
 ! palindrome? - #4, #36, #55
 ! pandigital? - #32, #38
 ! pentagonal? - #44, #45
@@ -25,26 +25,20 @@ IN: project-euler.common
 ! [uad]-transform - #39, #75
 
 
-: nth-pair ( n seq -- nth next )
-    over 1+ over nth >r nth r> ;
+: nth-pair ( seq n -- nth next )
+    tail-slice first2 ;
 
 : perfect-square? ( n -- ? )
     dup sqrt mod zero? ;
 
 <PRIVATE
 
-: count-shifts ( seq width -- n )
-    >r length 1+ r> - ;
-
 : max-children ( seq -- seq )
-    [ dup length 1- [ over nth-pair max , ] each ] { } make nip ;
+    [ dup length 1- [ nth-pair max , ] with each ] { } make ;
 
 ! Propagate one row into the upper one
 : propagate ( bottom top -- newtop )
     [ over rest rot first2 max rot + ] map nip ;
-
-: shift-3rd ( seq obj obj -- seq obj obj )
-    rot rest -rot ;
 
 : (sum-divisors) ( n -- sum )
     dup sqrt >fixnum [1,b] [
@@ -62,11 +56,6 @@ PRIVATE>
 
 : cartesian-product ( seq1 seq2 -- seq1xseq2 )
     swap [ swap [ 2array ] map-with ] map-with concat ;
-
-: collect-consecutive ( seq width -- seq )
-    [
-        2dup count-shifts [ 2dup head shift-3rd , ] times
-    ] { } make 2nip ;
 
 : log10 ( m -- n )
     log 10 log / ;
@@ -88,15 +77,16 @@ PRIVATE>
     number>string dup reverse = ;
 
 : pandigital? ( n -- ? )
-    number>string natural-sort "123456789" = ;
+    number>string natural-sort >string "123456789" = ;
 
 : pentagonal? ( n -- ? )
     dup 0 > [ 24 * 1+ sqrt 1+ 6 / 1 mod zero? ] [ drop f ] if ;
 
 ! Not strictly needed, but it is nice to be able to dump the triangle after the
 ! propagation
-: propagate-all ( triangle -- newtriangle )
-    reverse [ first dup ] keep rest [ propagate dup ] map nip reverse swap suffix ;
+: propagate-all ( triangle -- new-triangle )
+    reverse [ first dup ] [ rest ] bi
+    [ propagate dup ] map nip reverse swap suffix ;
 
 : sum-divisors ( n -- sum )
     dup 4 < [ { 0 1 3 4 } nth ] [ (sum-divisors) ] if ;
@@ -119,8 +109,9 @@ PRIVATE>
 
 ! Optimized brute-force, is often faster than prime factorization
 : tau* ( m -- n )
-    factor-2s [ 1+ ] dip [ perfect-square? -1 0 ? ] keep
-    dup sqrt >fixnum [1,b] [
+    factor-2s dup [ 1+ ]
+    [ perfect-square? -1 0 ? ]
+    [ dup sqrt >fixnum [1,b] ] tri* [
         dupd mod zero? [ [ 2 + ] dip ] when
     ] each drop * ;
 

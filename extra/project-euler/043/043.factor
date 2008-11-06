@@ -1,8 +1,7 @@
 ! Copyright (c) 2008 Aaron Schaefer.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: combinators.short-circuit hashtables kernel math
-    math.combinatorics math.parser math.ranges project-euler.common sequences
-    sorting sets ;
+USING: combinators.short-circuit kernel math math.combinatorics math.parser
+    math.ranges project-euler.common sequences sets sorting ;
 IN: project-euler.043
 
 ! http://projecteuler.net/index.php?section=problems&id=43
@@ -41,14 +40,14 @@ IN: project-euler.043
 
 : interesting? ( seq -- ? )
     {
-        [ 17 8 pick subseq-divisible? ]
-        [ 13 7 pick subseq-divisible? ]
-        [ 11 6 pick subseq-divisible? ]
-        [ 7 5 pick subseq-divisible? ]
-        [ 5 4 pick subseq-divisible? ]
-        [ 3 3 pick subseq-divisible? ]
-        [ 2 2 pick subseq-divisible? ]
-    } 0&& nip ;
+        [ 17 8 rot subseq-divisible? ]
+        [ 13 7 rot subseq-divisible? ]
+        [ 11 6 rot subseq-divisible? ]
+        [ 7  5 rot subseq-divisible? ]
+        [ 5  4 rot subseq-divisible? ]
+        [ 3  3 rot subseq-divisible? ]
+        [ 2  2 rot subseq-divisible? ]
+    } 1&& ;
 
 PRIVATE>
 
@@ -57,7 +56,7 @@ PRIVATE>
     [ interesting? ] filter [ 10 digits>integer ] map sum ;
 
 ! [ euler043 ] time
-! 125196 ms run / 19548 ms GC time
+! 104526 ms run / 42735 ms GC time
 
 
 ! ALTERNATE SOLUTIONS
@@ -74,13 +73,13 @@ PRIVATE>
     1000 over <range> [ number>digits 3 0 pad-left ] map [ all-unique? ] filter ;
 
 : overlap? ( seq -- ? )
-    dup first 2 tail* swap second 2 head = ;
+    [ first 2 tail* ] [ second 2 head ] bi = ;
 
 : clean ( seq -- seq )
     [ unclip 1 head prefix concat ] map [ all-unique? ] filter ;
 
 : add-missing-digit ( seq -- seq )
-    dup natural-sort 10 swap diff first prefix ;
+    dup natural-sort 10 swap diff prepend ;
 
 : interesting-pandigitals ( -- seq )
     17 candidates { 13 11 7 5 3 2 } [
@@ -93,6 +92,6 @@ PRIVATE>
     interesting-pandigitals [ 10 digits>integer ] sigma ;
 
 ! [ euler043a ] 100 ave-time
-! 19 ms run / 1 ms GC ave time - 100 trials
+! 10 ms ave run time - 1.37 SD (100 trials)
 
 MAIN: euler043a

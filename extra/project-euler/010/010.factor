@@ -10,16 +10,19 @@ IN: project-euler.010
 
 ! The sum of the primes below 10 is 2 + 3 + 5 + 7 = 17.
 
-! Find the sum of all the primes below one million.
+! Find the sum of all the primes below two million.
 
 
 ! SOLUTION
 ! --------
 
 : euler010 ( -- answer )
-    1000000 primes-upto sum ;
+    2000000 primes-upto sum ;
 
-! [ euler010 ] 100 ave-time
-! 14 ms run / 0 ms GC ave time - 100 trials
+! [ euler010 ] time
+! 266425 ms run / 10001 ms GC time
+
+! TODO: this takes well over one minute now that they changed the problem to
+! two million instead of one. the primes vocab could use some improvements
 
 MAIN: euler010
