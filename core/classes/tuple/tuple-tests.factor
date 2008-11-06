@@ -238,12 +238,6 @@ C: <laptop> laptop
 
 test-laptop-slot-values
 
-[ laptop ] [
-    "laptop" get 1 slot
-    dup echelon>> swap
-    superclasses>> nth
-] unit-test
-
 [ "TUPLE: laptop < computer battery ;" ] [
     [ \ laptop see ] with-string-writer string-lines second
 ] unit-test

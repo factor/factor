@@ -59,7 +59,7 @@ PRIVATE>
 : tuple>array ( tuple -- array )
     prepare-tuple>array
     >r copy-tuple-slots r>
-    class>> prefix ;
+    first prefix ;
 
 : tuple-slots ( tuple -- seq )
     prepare-tuple>array drop copy-tuple-slots ;
@@ -177,13 +177,13 @@ ERROR: bad-superclass class ;
     [ first3 update-slot ] with map ;
 
 : permute-slots ( old-values layout -- new-values )
-    [ class>> all-slots ] [ outdated-tuples get at ] bi
+    [ first all-slots ] [ outdated-tuples get at ] bi
     compute-slot-permutation
     apply-slot-permutation ;
 
 : update-tuple ( tuple -- newtuple )
     [ tuple-slots ] [ layout-of ] bi
-    [ permute-slots ] [ class>> ] bi
+    [ permute-slots ] [ first ] bi
     slots>tuple ;
 
 : outdated-tuple? ( tuple assoc -- ? )
