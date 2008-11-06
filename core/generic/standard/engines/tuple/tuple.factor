@@ -48,10 +48,14 @@ TUPLE: tuple-dispatch-engine echelons ;
     \ <tuple-dispatch-engine> convert-methods ;
 
 M: trivial-tuple-dispatch-engine engine>quot
-    [
-        [ n>> nth-superclass% ]
-        [ methods>> engines>quots* linear-dispatch-quot % ] bi
-    ] [ ] make ;
+    [ n>> ] [ methods>> ] bi dup assoc-empty? [
+        2drop default get [ drop ] prepend
+    ] [
+        [
+            [ nth-superclass% ]
+            [ engines>quots* linear-dispatch-quot % ] bi*
+        ] [ ] make
+    ] if ;
 
 : hash-methods ( n methods -- buckets )
     >alist V{ } clone [ hashcode 1array ] distribute-buckets
@@ -119,11 +123,19 @@ M: echelon-dispatch-engine engine>quot
     ] assoc-map
     alist>quot ;
 
+: simplify-echelon-alist ( default alist -- default' alist' )
+    dup empty? [
+        dup first first 1 <= [
+            nip unclip second swap
+            simplify-echelon-alist
+        ] when
+    ] unless ;
+
 : echelon-case-quot ( alist -- quot )
     #! We don't have to test for echelon 1 since all tuple
     #! classes are at least at depth 1 in the inheritance
     #! hierarchy.
-    dup first first 1 = [ unclip second ] [ default get ] if swap
+    default get swap simplify-echelon-alist
     [
         [
             picker %
@@ -140,8 +152,11 @@ M: tuple-dispatch-engine engine>quot
             echelons>> unclip-last
             [
                 [
-                    engine>quot define-engine-word
-                    [ remember-engine ] [ 1quotation ] bi
+                    engine>quot
+                    over 0 = [
+                        define-engine-word
+                        [ remember-engine ] [ 1quotation ] bi
+                    ] unless
                     dup default set
                 ] assoc-map
             ]

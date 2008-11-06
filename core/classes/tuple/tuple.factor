@@ -90,20 +90,29 @@ ERROR: bad-superclass class ;
         2drop f
     ] if ; inline
 
+: tuple-instance-1? ( object class -- ? )
+    swap dup tuple? [
+        layout-of 7 slot eq?
+    ] [ 2drop f ] if ; inline
+
 : tuple-instance? ( object class offset -- ? )
-    #! 4 slot == superclasses>>
     rot dup tuple? [
         layout-of
         2dup 1 slot fixnum<=
         [ swap slot eq? ] [ 3drop f ] if
     ] [ 3drop f ] if ; inline
 
-: layout-class-offset ( class -- n )
-    tuple-layout third 2 * 5 + ;
+: layout-class-offset ( echelon -- n )
+    2 * 5 + ;
+
+: echelon-of ( class -- n )
+    tuple-layout third ;
 
 : define-tuple-predicate ( class -- )
-    dup dup layout-class-offset
-    [ tuple-instance? ] 2curry define-predicate ;
+    dup dup echelon-of {
+        { 1 [ [ tuple-instance-1? ] curry ] }
+        [ layout-class-offset [ tuple-instance? ] 2curry ]
+    } case define-predicate ;
 
 : class-size ( class -- n )
     superclasses [ "slots" word-prop length ] sigma ;
@@ -292,7 +301,7 @@ M: tuple-class reset-class
 M: tuple-class rank-class drop 0 ;
 
 M: tuple-class instance?
-    dup layout-class-offset tuple-instance? ;
+    dup echelon-of layout-class-offset tuple-instance? ;
 
 M: tuple-class (flatten-class) dup set ;
 
