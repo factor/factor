@@ -22,6 +22,7 @@ IN: compiler.cfg.hats
 : ^^slot ( obj slot tag -- dst ) ^^i3 i ##slot ; inline
 : ^^slot-imm ( obj slot tag -- dst ) ^^i3 ##slot-imm ; inline
 : ^^set-slot ( src obj slot tag -- ) i ##set-slot ; inline
+: ^^string-nth ( obj index -- dst ) ^^i2 i ##string-nth ; inline
 : ^^add ( src1 src2 -- dst ) ^^i2 ##add ; inline
 : ^^add-imm ( src1 src2 -- dst ) ^^i2 ##add-imm ; inline
 : ^^sub ( src1 src2 -- dst ) ^^i2 ##sub ; inline

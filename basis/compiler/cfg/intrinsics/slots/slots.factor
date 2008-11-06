@@ -51,3 +51,6 @@ IN: compiler.cfg.intrinsics.slots
         ] [ first class>> immediate class<= ] bi
         [ drop ] [ i i ##write-barrier ] if
     ] [ drop emit-primitive ] if ;
+
+: emit-string-nth ( -- )
+    2inputs swap ^^untag-fixnum ^^string-nth ^^tag-fixnum ds-push ;

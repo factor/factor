@@ -14,6 +14,7 @@ QUALIFIED: arrays
 QUALIFIED: byte-arrays
 QUALIFIED: kernel.private
 QUALIFIED: slots.private
+QUALIFIED: strings.private
 QUALIFIED: classes.tuple.private
 QUALIFIED: math.private
 QUALIFIED: alien.accessors
@@ -38,6 +39,7 @@ IN: compiler.cfg.intrinsics
     kernel:eq?
     slots.private:slot
     slots.private:set-slot
+    strings.private:string-nth
     classes.tuple.private:<tuple-boa>
     arrays:<array>
     byte-arrays:<byte-array>
@@ -114,6 +116,7 @@ IN: compiler.cfg.intrinsics
         { \ math.private:fixnum>float [ drop emit-fixnum>float ] }
         { \ slots.private:slot [ emit-slot ] }
         { \ slots.private:set-slot [ emit-set-slot ] }
+        { \ strings.private:string-nth [ drop emit-string-nth ] }
         { \ classes.tuple.private:<tuple-boa> [ emit-<tuple-boa> ] }
         { \ arrays:<array> [ emit-<array> ] }
         { \ byte-arrays:<byte-array> [ emit-<byte-array> ] }

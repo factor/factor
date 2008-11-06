@@ -89,13 +89,23 @@ nl
     . malloc calloc free memcpy
 } compile-uncompiled
 
+"." write flush
+
 { build-tree } compile-uncompiled
+
+"." write flush
 
 { optimize-tree } compile-uncompiled
 
+"." write flush
+
 { optimize-cfg } compile-uncompiled
 
+"." write flush
+
 { (compile) } compile-uncompiled
+
+"." write flush
 
 vocabs [ words compile-uncompiled "." write flush ] each
 
