@@ -44,5 +44,12 @@ PRIVATE>
 : all-permutations ( seq -- seq )
     [ length factorial ] keep '[ _ permutation ] map ;
 
+: each-permutation ( seq quot -- )
+    [ [ length factorial ] keep ] dip
+    '[ _ permutation @ ] each ; inline
+
+: reduce-permutations ( seq initial quot -- result )
+    swapd each-permutation ; inline
+
 : inverse-permutation ( seq -- permutation )
     <enum> >alist sort-values keys ;
