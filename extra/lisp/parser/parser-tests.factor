@@ -66,3 +66,15 @@ IN: lisp.parser.tests
 } [
     "(1 (3 4) 2)" lisp-expr
 ] unit-test
+    
+{ { T{ lisp-symbol { name "quote" } } { 1 2 3 } } } [
+    "'(1 2 3)" lisp-expr cons>seq
+] unit-test
+    
+{ { T{ lisp-symbol f "quote" } T{ lisp-symbol f "foo" } } } [
+    "'foo" lisp-expr cons>seq
+] unit-test
+    
+{ { 1 2 { T{ lisp-symbol { name "quote" } } { 3 4 } } 5 } } [
+    "(1 2 '(3 4) 5)" lisp-expr cons>seq
+] unit-test
