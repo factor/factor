@@ -125,8 +125,35 @@ M: #recursive emit-node
 : ##branch-t ( vreg -- )
     \ f tag-number cc/= ##compare-imm-branch ;
 
+: trivial-branch? ( nodes -- value ? )
+    dup length 1 = [
+        first dup #push? [ literal>> t ] [ drop f f ] if
+    ] [ drop f f ] if ;
+
+: trivial-if? ( #if -- ? )
+    children>> first2
+    [ trivial-branch? [ t eq? ] when ]
+    [ trivial-branch? [ f eq? ] when ] bi*
+    and ;
+
+: emit-trivial-if ( -- )
+    ds-pop \ f tag-number cc/= ^^compare-imm ds-push ;
+
+: trivial-not-if? ( #if -- ? )
+    children>> first2
+    [ trivial-branch? [ f eq? ] when ]
+    [ trivial-branch? [ t eq? ] when ] bi*
+    and ;
+
+: emit-trivial-not-if ( -- )
+    ds-pop \ f tag-number cc= ^^compare-imm ds-push ;
+
 M: #if emit-node
-    ds-pop ##branch-t emit-if iterate-next ;
+    {
+        { [ dup trivial-if? ] [ drop emit-trivial-if ] }
+        { [ dup trivial-not-if? ] [ drop emit-trivial-not-if ] }
+        [ ds-pop ##branch-t emit-if ]
+    } cond iterate-next ;
 
 ! #dispatch
 : dispatch-branch ( nodes word -- label )
