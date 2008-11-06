@@ -20,6 +20,14 @@ C: <anonymous-complement> anonymous-complement
 : 2cache ( key1 key2 assoc quot -- value )
     >r >r 2array r> [ first2 ] r> compose cache ; inline
 
+GENERIC: valid-class? ( obj -- ? )
+
+M: class valid-class? drop t ;
+M: anonymous-union valid-class? members>> [ valid-class? ] all? ;
+M: anonymous-intersection valid-class? participants>> [ valid-class? ] all? ;
+M: anonymous-complement valid-class? class>> valid-class? ;
+M: word valid-class? drop f ;
+
 DEFER: (class<=)
 
 : class<= ( first second -- ? )

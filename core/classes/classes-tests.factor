@@ -79,3 +79,37 @@ USE: multiline
     : q ( -- b ) j new g ;"> <string-reader>
     "class-intersect-no-method-b" parse-stream drop
 ] unit-test
+
+! Similar problem, but with anonymous classes
+[ ] [
+    <" IN: classes.test.c
+    USE: kernel
+    GENERIC: g ( a -- b )
+    M: object g ;
+    TUPLE: z ;"> <string-reader>
+    "class-intersect-no-method-c" parse-stream drop
+] unit-test
+
+[ ] [
+    <" IN: classes.test.d
+    USE: classes.test.c
+    USE: kernel
+    : q ( a -- b ) dup z? [ g ] unless ;"> <string-reader>
+    "class-intersect-no-method-d" parse-stream drop
+] unit-test
+
+! Now, the user removes the z class and adds a method,
+[ ] [
+    <" IN: classes.test.c
+    USE: kernel
+    GENERIC: g ( a -- b )
+    M: object g ;
+    TUPLE: j ;
+    M: j g ;"> <string-reader>
+    "class-intersect-no-method-c" parse-stream drop
+] unit-test
+
+TUPLE: forgotten-predicate-test ;
+
+[ ] [ [ \ forgotten-predicate-test forget ] with-compilation-unit ] unit-test
+[ f ] [ \ forgotten-predicate-test? predicate? ] unit-test
