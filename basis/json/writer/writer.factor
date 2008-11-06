@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: kernel io.streams.string io strings splitting sequences
 math math.parser assocs classes words namespaces make
-prettyprint hashtables mirrors tr ;
+prettyprint hashtables mirrors tr json.reader ;
 IN: json.writer
 
 #! Writes the object out to a stream in JSON format
@@ -14,6 +14,9 @@ GENERIC: json-print ( obj -- )
 
 M: f json-print ( f -- )
   drop "false" write ;
+
+M: t json-print ( t -- )
+  drop "true" write
 
 M: string json-print ( obj -- )
   CHAR: " write1 "\"" split "\\\"" join CHAR: \r swap remove "\n" split "\\r\\n" join write CHAR: " write1 ;
@@ -41,4 +44,4 @@ M: hashtable json-print ( hashtable -- )
   CHAR: } write1 ;
 
 M: object json-print ( object -- )
-    unparse json-print ;
+    dup json-null = [ "null" write drop ] [ unparse json-print ] if ;
