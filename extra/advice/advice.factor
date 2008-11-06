@@ -3,7 +3,7 @@
 USING: kernel sequences symbols fry words assocs tools.annotations coroutines ;
 IN: advice
 
-SYMBOLS: before after around ;
+SYMBOLS: before after around advised ;
 
 : advise ( quot name word loc --  )
     word-prop set-at ;
@@ -28,17 +28,20 @@ SYMBOLS: before after around ;
     after get-advice [ call ] each ;
 
 : call-around ( main word --  )
-    around get-advice [ [ coresume ] each ] dip call
-    around get-advice reverse [ coresume ] each ;
+    around get-advice tuck 
+    [ [ coresume ] each ] [ call ] [ reverse [ coresume ] each ] tri* ;
 
 : remove-advice ( name word loc --  )
     word-prop delete-at ;
 
 : ad-do-it ( input -- result )
     coyield ;
-    
+
+: advised? ( word -- ? )
+    advised word-prop ;
     
 : make-advised ( word -- )
     [ dup [ over dup '[ _ call-before _ _ call-around _ call-after ] ] annotate ]
-    [ { before after around } [ H{ } clone swap set-word-prop ] with each ] bi ;
+    [ { before after around } [ H{ } clone swap set-word-prop ] with each ] 
+    [ t advised set-word-prop ] tri ;
     
