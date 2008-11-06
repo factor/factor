@@ -27,7 +27,7 @@ M: lo-tag-dispatch-engine engine>quot
     [ >r lo-tag-number r> ] assoc-map
     [
         picker % [ tag ] % [
-            ! >alist sort-keys reverse
+            >alist sort-keys reverse
             linear-dispatch-quot
         ] [
             num-tags get direct-dispatch-quot
