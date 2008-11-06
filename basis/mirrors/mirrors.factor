@@ -44,7 +44,7 @@ M: mirror >alist ( mirror -- alist )
     [ object>> [ swap slot ] curry ] bi
     map zip ;
 
-M: mirror assoc-size object>> layout-of size>> ;
+M: mirror assoc-size object>> layout-of second ;
 
 INSTANCE: mirror assoc
 
