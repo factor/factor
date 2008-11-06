@@ -123,8 +123,8 @@ M: echelon-dispatch-engine engine>quot
         ] [ ] make
     ] if ;
 
-: >=-case-quot ( alist -- quot )
-    default get [ drop ] prepend swap
+: >=-case-quot ( default alist -- quot )
+    [ [ drop ] prepend ] dip
     [
         [ [ dup ] swap [ fixnum>= ] curry compose ]
         [ [ drop ] prepose ]
@@ -132,31 +132,40 @@ M: echelon-dispatch-engine engine>quot
     ] assoc-map
     alist>quot ;
 
-: tuple-layout-echelon% ( -- )
+: tuple-layout-echelon-quot ( -- quot )
     [
         { tuple } declare
         1 slot { tuple-layout } declare
         5 slot
-    ] % ; inline
+    ] ; inline
+
+: echelon-case-quot ( alist -- quot )
+    #! We don't have to test for echelon 1 since all tuple
+    #! classes are at least at depth 1 in the inheritance
+    #! hierarchy.
+    dup first first 1 = [ unclip second ] [ default get ] if swap
+    [
+        [
+            picker %
+            tuple-layout-echelon-quot %
+            >=-case-quot %
+        ] [ ] make
+    ] unless-empty ;
 
 M: tuple-dispatch-engine engine>quot
     [
-        picker %
-        tuple-layout-echelon%
         [
             tuple assumed set
-            echelons>> dup empty? [
-                unclip-last
+            echelons>> unclip-last
+            [
                 [
-                    [
-                        engine>quot define-engine-word
-                        [ remember-engine ] [ 1quotation ] bi
-                        dup default set
-                    ] assoc-map
-                ]
-                [ first2 engine>quot 2array ] bi*
-                suffix
-            ] unless
+                    engine>quot define-engine-word
+                    [ remember-engine ] [ 1quotation ] bi
+                    dup default set
+                ] assoc-map
+            ]
+            [ first2 engine>quot 2array ] bi*
+            suffix
         ] with-scope
-        >=-case-quot %
+        echelon-case-quot %
     ] [ ] make ;
