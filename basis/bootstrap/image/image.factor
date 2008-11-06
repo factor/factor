@@ -374,9 +374,11 @@ M: tombstone '
     [ emit-tuple ] cache-object ;
 
 ! Arrays
-M: array '
+: emit-array ( array -- offset )
     [ ' ] map array type-number object tag-number
     [ [ length emit-fixnum ] [ emit-seq ] bi ] emit-object ;
+
+M: array ' emit-array ;
 
 ! This is a hack. We need to detect arrays which are tuple
 ! layout arrays so that they can be internalized, but making
@@ -389,7 +391,11 @@ PREDICATE: tuple-layout-array < array
         tri and and
     ] [ drop f ] if ;
 
-M: tuple-layout-array ' [ call-next-method ] cache-object ;
+M: tuple-layout-array '
+    [
+        [ dup integer? [ <fake-bignum> ] when ] map
+        emit-array
+    ] cache-object ;
 
 ! Quotations
 
