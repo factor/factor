@@ -156,19 +156,30 @@ M: #if emit-node
     } cond iterate-next ;
 
 ! #dispatch
+: trivial-dispatch-branch? ( nodes -- ? )
+    dup length 1 = [
+        first dup #call? [
+            word>> "intrinsic" word-prop not
+        ] [ drop f ] if
+    ] [ drop f ] if ;
+
 : dispatch-branch ( nodes word -- label )
-    gensym [
-        [
-            V{ } clone node-stack set
-            ##prologue
-            emit-nodes
-            basic-block get [
-                ##epilogue
-                ##return
-                end-basic-block
-            ] when
-        ] with-cfg-builder
-    ] keep ;
+    over trivial-dispatch-branch? [
+        drop first word>>
+    ] [
+        gensym [
+            [
+                V{ } clone node-stack set
+                ##prologue
+                emit-nodes
+                basic-block get [
+                    ##epilogue
+                    ##return
+                    end-basic-block
+                ] when
+            ] with-cfg-builder
+        ] keep
+    ] if ;
 
 : dispatch-branches ( node -- )
     children>> [
